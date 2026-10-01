@@ -63,14 +63,15 @@ class QRhiResourceUpdateBatch;
 /**
  * @brief Interleaved vertex attributes (position, normal, color, curvature) for brain surface GPU upload.
  */
-struct VertexData {
+struct VertexData
+{
     QVector3D pos;
     QVector3D norm;
     uint32_t color;           // curvature / base / STC color  (ABGR packed)
     uint32_t colorAnnotation; // annotation region color       (ABGR packed)
-    float surfaceId = 0.0f;  // WORKAROUND(QRhi-GLES2): surface ID for merged
-                             // single-drawIndexed on WASM.  Always 0 for
-                             // individual surfaces; set by merged path.
+    float surfaceId = 0.0f;   // WORKAROUND(QRhi-GLES2): surface ID for merged
+                              // single-drawIndexed on WASM.  Always 0 for
+                              // individual surfaces; set by merged path.
 };
 
 //=============================================================================================================
@@ -97,12 +98,13 @@ public:
     // VisualizationMode is defined in core/rendertypes.h for lightweight inclusion.
     // These aliases preserve backward compatibility.
     using VisualizationMode = ::VisualizationMode;
-    static constexpr VisualizationMode ModeSurface        = ::ModeSurface;
-    static constexpr VisualizationMode ModeAnnotation     = ::ModeAnnotation;
-    static constexpr VisualizationMode ModeScientific     = ::ModeScientific;
+    static constexpr VisualizationMode ModeSurface = ::ModeSurface;
+    static constexpr VisualizationMode ModeAnnotation = ::ModeAnnotation;
+    static constexpr VisualizationMode ModeScientific = ::ModeScientific;
     static constexpr VisualizationMode ModeSourceEstimate = ::ModeSourceEstimate;
 
-    enum TissueType {
+    enum TissueType
+    {
         TissueUnknown = 0,
         TissueBrain = 1,
         TissueSkin = 2,       // Head/Scalp surface
@@ -124,15 +126,21 @@ public:
      *
      * @return True if visible.
      */
-    bool isVisible() const { return m_visible; }
-    
+    bool isVisible() const
+    {
+        return m_visible;
+    }
+
     //=========================================================================================================
     /**
      * Set the hemisphere index.
      *
      * @param[in] hemi       0 for Left, 1 for Right.
      */
-    void setHemi(int hemi) { m_hemi = hemi; }
+    void setHemi(int hemi)
+    {
+        m_hemi = hemi;
+    }
 
     //=========================================================================================================
     /**
@@ -140,7 +148,10 @@ public:
      *
      * @param[in] type       TissueType enum value.
      */
-    void setTissueType(TissueType type) { m_tissueType = type; }
+    void setTissueType(TissueType type)
+    {
+        m_tissueType = type;
+    }
 
     //=========================================================================================================
     /**
@@ -148,7 +159,10 @@ public:
      *
      * @return TissueType enum value.
      */
-    TissueType tissueType() const { return m_tissueType; }
+    TissueType tissueType() const
+    {
+        return m_tissueType;
+    }
 
     //=========================================================================================================
     /**
@@ -156,7 +170,10 @@ public:
      *
      * @return Hemisphere index (0=LH, 1=RH).
      */
-    int hemi() const { return m_hemi; }
+    int hemi() const
+    {
+        return m_hemi;
+    }
 
     //=========================================================================================================
     /**
@@ -164,7 +181,7 @@ public:
      *
      * @param[in] surf       Input FreeSurfer surface.
      */
-    void fromSurface(const FSLIB::FsSurface &surf);
+    void fromSurface(const FSLIB::FsSurface& surf);
 
     //=========================================================================================================
     /**
@@ -173,7 +190,7 @@ public:
      * @param[in] surf       Input BEM surface.
      * @param[in] color      Base color for the surface.
      */
-    void fromBemSurface(const MNELIB::MNEBemSurface &surf, const QColor &color = Qt::white);
+    void fromBemSurface(const MNELIB::MNEBemSurface& surf, const QColor& color = Qt::white);
 
     //=========================================================================================================
     /**
@@ -183,7 +200,7 @@ public:
      * @param[in] triangles  Mx3 matrix of triangle indices.
      * @param[in] color      FsSurface color.
      */
-    void createFromData(const Eigen::MatrixX3f &vertices, const Eigen::MatrixX3i &triangles, const QColor &color);
+    void createFromData(const Eigen::MatrixX3f& vertices, const Eigen::MatrixX3i& triangles, const QColor& color);
 
     //=========================================================================================================
     /**
@@ -194,7 +211,7 @@ public:
      * @param[in] triangles  Mx3 matrix of triangle indices.
      * @param[in] color      FsSurface color.
      */
-    void createFromData(const Eigen::MatrixX3f &vertices, const Eigen::MatrixX3f &normals, const Eigen::MatrixX3i &triangles, const QColor &color);
+    void createFromData(const Eigen::MatrixX3f& vertices, const Eigen::MatrixX3f& normals, const Eigen::MatrixX3i& triangles, const QColor& color);
 
     //=========================================================================================================
     /**
@@ -203,7 +220,7 @@ public:
      * @param[in] path       Path to the .annot file.
      * @return True if successful.
      */
-    bool loadAnnotation(const QString &path);
+    bool loadAnnotation(const QString& path);
 
     //=========================================================================================================
     /**
@@ -211,7 +228,7 @@ public:
      *
      * @param[in] annotation Input annotation data.
      */
-    void addAnnotation(const FSLIB::FsAnnotation &annotation);
+    void addAnnotation(const FSLIB::FsAnnotation& annotation);
 
     //=========================================================================================================
     /**
@@ -227,13 +244,13 @@ public:
      *
      * @param[in] colors     Vector of packed ABGR colors, one per vertex.
      */
-    void applySourceEstimateColors(const QVector<uint32_t> &colors);
+    void applySourceEstimateColors(const QVector<uint32_t>& colors);
 
     /**
      * Clear source estimate overlay colors and restore curvature-based coloring.
      */
     void clearSourceEstimateColors();
-    
+
     //=========================================================================================================
     /**
      * Update graphics buffers (vertex/index) on the GPU.
@@ -241,12 +258,18 @@ public:
      * @param[in] rhi        Pointer to QRhi instance.
      * @param[in] u          Resource update batch.
      */
-    void updateBuffers(QRhi *rhi, QRhiResourceUpdateBatch *u);
+    void updateBuffers(QRhi* rhi, QRhiResourceUpdateBatch* u);
 
     QRhiBuffer* vertexBuffer() const;
     QRhiBuffer* indexBuffer() const;
-    uint32_t indexCount() const { return m_indexCount; }
-    uint32_t vertexCount() const { return m_vertexData.size(); }
+    uint32_t indexCount() const
+    {
+        return m_indexCount;
+    }
+    uint32_t vertexCount() const
+    {
+        return m_vertexData.size();
+    }
 
     //=========================================================================================================
     /**
@@ -270,28 +293,40 @@ public:
      *
      * @return Copy of the index data, three vertex indices per triangle.
      */
-    QVector<uint32_t> triangleIndices() const { return m_indexData; }
+    QVector<uint32_t> triangleIndices() const
+    {
+        return m_indexData;
+    }
 
     /**
      * @brief Const-ref access to CPU-side vertex data (used by merged rendering).
      *
      * @return Reference to the internal vertex array, valid while this surface lives.
      */
-    const QVector<VertexData>& vertexDataRef() const { return m_vertexData; }
+    const QVector<VertexData>& vertexDataRef() const
+    {
+        return m_vertexData;
+    }
     /**
      * @brief Const-ref access to CPU-side index data (used by merged rendering).
      *
      * @return Reference to the internal triangle index array, valid while this surface lives.
      */
-    const QVector<uint32_t>& indexDataRef() const { return m_indexData; }
+    const QVector<uint32_t>& indexDataRef() const
+    {
+        return m_indexData;
+    }
 
     /**
      * @brief Monotonically increasing counter bumped whenever vertex data changes.
      *
      * @return Current vertex data generation counter.
      */
-    quint64 vertexGeneration() const { return m_vertexGeneration; }
-    
+    quint64 vertexGeneration() const
+    {
+        return m_vertexGeneration;
+    }
+
     //=========================================================================================================
     /**
      * Get minimum X coordinate.
@@ -315,7 +350,7 @@ public:
      * @param[out] min       Minimum coordinates.
      * @param[out] max       Maximum coordinates.
      */
-    void boundingBox(QVector3D &min, QVector3D &max) const;
+    void boundingBox(QVector3D& min, QVector3D& max) const;
 
     //=========================================================================================================
     /**
@@ -330,7 +365,7 @@ public:
      * @param[in, out] vertexIdx Index of the vertex closest to the intersection.
      * @return True if intersected.
      */
-    bool intersects(const QVector3D &rayOrigin, const QVector3D &rayDir, float &dist, int &vertexIdx) const;
+    bool intersects(const QVector3D& rayOrigin, const QVector3D& rayDir, float& dist, int& vertexIdx) const;
 
     //=========================================================================================================
     /**
@@ -362,7 +397,7 @@ public:
      *
      * @param[in] m          Transformation matrix.
      */
-    void transform(const QMatrix4x4 &m);
+    void transform(const QMatrix4x4& m);
 
     //=========================================================================================================
     /**
@@ -371,7 +406,7 @@ public:
      *
      * @param[in] m          Transformation matrix.
      */
-    void applyTransform(const QMatrix4x4 &m);
+    void applyTransform(const QMatrix4x4& m);
 
     //=========================================================================================================
     /**
@@ -389,7 +424,7 @@ public:
      * @return Nx3 matrix of vertex positions.
      */
     Eigen::MatrixX3f verticesAsMatrix() const;
-    
+
     //=========================================================================================================
     /**
      * Set/Get whether to use the default surface color.
@@ -397,11 +432,20 @@ public:
      * @param[in] useDefault   True to use the surface's default color as base, false for white.
      */
     void setUseDefaultColor(bool useDefault);
-    
+
     void setSelected(bool selected);
-    bool isSelected() const { return m_selected; }
-    int selectedRegionId() const { return m_selectedRegionId; }
-    int selectedVertexStart() const { return m_selectedVertexStart; }
+    bool isSelected() const
+    {
+        return m_selected;
+    }
+    int selectedRegionId() const
+    {
+        return m_selectedRegionId;
+    }
+    int selectedVertexStart() const
+    {
+        return m_selectedVertexStart;
+    }
 
     /**
      * Highlight a contiguous range of vertices (e.g. a single sphere in a batched mesh).
@@ -411,7 +455,7 @@ public:
      * @param[in] count  Number of vertices to highlight.
      */
     void setSelectedVertexRange(int start, int count);
-    
+
 private:
     void updateVertexColors();
     void markVertexDirty();
@@ -420,16 +464,16 @@ private:
     QVector<VertexData> m_originalVertexData;
     QVector<uint32_t> m_indexData;
     uint32_t m_indexCount = 0;
-    
+
     QColor m_defaultColor = Qt::white;
     QColor m_baseColor = Qt::white;
-    
+
     FSLIB::FsAnnotation m_annotation;
     bool m_hasAnnotation = false;
     VisualizationMode m_visMode = ModeSurface;
     QVector<float> m_curvature;
     QVector<uint32_t> m_stcColors;
-    
+
     bool m_visible = true;
     bool m_selected = false;
     int m_selectedRegionId = -1;

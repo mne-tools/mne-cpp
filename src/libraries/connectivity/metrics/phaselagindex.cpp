@@ -61,34 +61,34 @@ PhaseLagIndex::PhaseLagIndex()
 
 Network PhaseLagIndex::calculate(ConnectivitySettings& connectivitySettings)
 {
-//    QElapsedTimer timer;
-//    qint64 iTime = 0;
-//    timer.start();
+    //    QElapsedTimer timer;
+    //    qint64 iTime = 0;
+    //    timer.start();
 
     Network finalNetwork("PLI");
 
-    if(connectivitySettings.isEmpty()) {
+    if (connectivitySettings.isEmpty()) {
         qDebug() << "PhaseLagIndex::calculate - Input data is empty";
         return finalNetwork;
     }
 
-    if(AbstractMetric::m_bStorageModeIsActive == false) {
+    if (AbstractMetric::m_bStorageModeIsActive == false) {
         connectivitySettings.clearIntermediateData();
     }
 
     finalNetwork.setSamplingFrequency(connectivitySettings.getSamplingFrequency());
 
-    #ifdef EIGEN_FFTW_DEFAULT
-        fftw_make_planner_thread_safe();
-    #endif
+#ifdef EIGEN_FFTW_DEFAULT
+    fftw_make_planner_thread_safe();
+#endif
 
     //Create nodes
     int iNRows = connectivitySettings.at(0).matData.rows();
     RowVectorXf rowVert = RowVectorXf::Zero(3);
 
-    for(int i = 0; i < iNRows; ++i) {
+    for (int i = 0; i < iNRows; ++i) {
         rowVert = RowVectorXf::Zero(3);
-        if(connectivitySettings.getNodePositions().rows() != 0 && i < connectivitySettings.getNodePositions().rows()) {
+        if (connectivitySettings.getNodePositions().rows() != 0 && i < connectivitySettings.getNodePositions().rows()) {
             rowVert(0) = connectivitySettings.getNodePositions().row(i)(0);
             rowVert(1) = connectivitySettings.getNodePositions().row(i)(1);
             rowVert(2) = connectivitySettings.getNodePositions().row(i)(2);
@@ -108,11 +108,11 @@ Network PhaseLagIndex::calculate(ConnectivitySettings& connectivitySettings)
     int iNFreqs = int(floor(iNfft / 2.0)) + 1;
 
     // Check if start and bin amount need to be reset to full spectrum
-    if(m_iNumberBinStart == -1 ||
-       m_iNumberBinAmount == -1 ||
-       m_iNumberBinStart > iNFreqs ||
-       m_iNumberBinAmount > iNFreqs ||
-       m_iNumberBinAmount + m_iNumberBinStart > iNFreqs) {
+    if (m_iNumberBinStart == -1 ||
+        m_iNumberBinAmount == -1 ||
+        m_iNumberBinStart > iNFreqs ||
+        m_iNumberBinAmount > iNFreqs ||
+        m_iNumberBinAmount + m_iNumberBinStart > iNFreqs) {
         qDebug() << "PhaseLagIndex::calculate - Resetting to full spectrum";
         AbstractMetric::m_iNumberBinStart = 0;
         AbstractMetric::m_iNumberBinAmount = iNFreqs;
@@ -135,26 +135,26 @@ Network PhaseLagIndex::calculate(ConnectivitySettings& connectivitySettings)
                 tapers);
     };
 
-//    iTime = timer.elapsed();
-//    qWarning() << "Preparation" << iTime;
-//    timer.restart();
+    //    iTime = timer.elapsed();
+    //    qWarning() << "Preparation" << iTime;
+    //    timer.restart();
 
     // Compute DSWPLV in parallel for all trials
     QFuture<void> result = QtConcurrent::map(connectivitySettings.getTrialData(),
                                              computeLambda);
     result.waitForFinished();
 
-//    iTime = timer.elapsed();
-//    qWarning() << "ComputeSpectraPSDCSD" << iTime;
-//    timer.restart();
+    //    iTime = timer.elapsed();
+    //    qWarning() << "ComputeSpectraPSDCSD" << iTime;
+    //    timer.restart();
 
     // Compute PLI
     computePLI(connectivitySettings,
                finalNetwork);
 
-//    iTime = timer.elapsed();
-//    qWarning() << "Compute" << iTime;
-//    timer.restart();
+    //    iTime = timer.elapsed();
+    //    qWarning() << "Compute" << iTime;
+    //    timer.restart();
 
     return finalNetwork;
 }
@@ -162,15 +162,15 @@ Network PhaseLagIndex::calculate(ConnectivitySettings& connectivitySettings)
 //=============================================================================================================
 
 void PhaseLagIndex::compute(ConnectivitySettings::IntermediateTrialData& inputData,
-                            QVector<QPair<int,MatrixXcd> >& vecPairCsdSum,
-                            QVector<QPair<int,MatrixXd> >& vecPairCsdImagSignSum,
+                            QVector<QPair<int, MatrixXcd>>& vecPairCsdSum,
+                            QVector<QPair<int, MatrixXd>>& vecPairCsdImagSignSum,
                             QMutex& mutex,
                             int iNRows,
                             int iNFreqs,
                             int iNfft,
                             const QPair<MatrixXd, VectorXd>& tapers)
 {
-    if(inputData.vecPairCsdImagSign.size() == iNRows) {
+    if (inputData.vecPairCsdImagSign.size() == iNRows) {
         //qDebug() << "PhaseLagIndex::compute - vecPairCsdImagSign was already computed for this trial.";
         return;
     }
@@ -179,7 +179,7 @@ void PhaseLagIndex::compute(ConnectivitySettings::IntermediateTrialData& inputDa
 
     // Calculate tapered spectra if not available already
     // This code was copied and changed modified Utils/Spectra since we do not want to call the function due to time loss.
-    if(inputData.vecTapSpectra.isEmpty()) {
+    if (inputData.vecTapSpectra.isEmpty()) {
         RowVectorXd vecInputFFT, rowData;
         RowVectorXcd vecTmpFreq;
 
@@ -193,11 +193,12 @@ void PhaseLagIndex::compute(ConnectivitySettings::IntermediateTrialData& inputDa
             rowData.array() = inputData.matData.row(i).array() - inputData.matData.row(i).mean();
 
             // Calculate tapered spectra
-            for(int j = 0; j < tapers.first.rows(); j++) {
+            for (int j = 0; j < tapers.first.rows(); j++) {
                 // Zero padd if necessary. The zero padding in Eigen's FFT is only working for column vectors.
                 if (rowData.cols() < iNfft) {
                     vecInputFFT.setZero(iNfft);
-                    vecInputFFT.block(0,0,1,rowData.cols()) = rowData.cwiseProduct(tapers.first.row(j));;
+                    vecInputFFT.block(0, 0, 1, rowData.cols()) = rowData.cwiseProduct(tapers.first.row(j));
+                    ;
                 } else {
                     vecInputFFT = rowData.cwiseProduct(tapers.first.row(j));
                 }
@@ -212,38 +213,38 @@ void PhaseLagIndex::compute(ConnectivitySettings::IntermediateTrialData& inputDa
     }
 
     // Compute CSD
-    if(inputData.vecPairCsd.isEmpty()) {
+    if (inputData.vecPairCsd.isEmpty()) {
         MatrixXcd matCsd = MatrixXcd(iNRows, m_iNumberBinAmount);
 
         double denomCSD = sqrt(tapers.second.cwiseAbs2().sum()) * sqrt(tapers.second.cwiseAbs2().sum()) / 2.0;
 
         bool bNfftEven = false;
-        if (iNfft % 2 == 0){
+        if (iNfft % 2 == 0) {
             bNfftEven = true;
         }
 
         for (i = 0; i < iNRows; ++i) {
             for (int j = i; j < iNRows; ++j) {
                 // Compute CSD (average over tapers if necessary)
-                matCsd.row(j) = inputData.vecTapSpectra.at(i).block(0,m_iNumberBinStart,inputData.vecTapSpectra.at(i).rows(),m_iNumberBinAmount).cwiseProduct(inputData.vecTapSpectra.at(j).block(0,m_iNumberBinStart,inputData.vecTapSpectra.at(j).rows(),m_iNumberBinAmount).conjugate()).colwise().sum() / denomCSD;
+                matCsd.row(j) = inputData.vecTapSpectra.at(i).block(0, m_iNumberBinStart, inputData.vecTapSpectra.at(i).rows(), m_iNumberBinAmount).cwiseProduct(inputData.vecTapSpectra.at(j).block(0, m_iNumberBinStart, inputData.vecTapSpectra.at(j).rows(), m_iNumberBinAmount).conjugate()).colwise().sum() / denomCSD;
 
                 // Divide first and last element by 2 due to half spectrum
-                if(m_iNumberBinStart == 0) {
+                if (m_iNumberBinStart == 0) {
                     matCsd.row(j)(0) /= 2.0;
                 }
 
-                if(bNfftEven && m_iNumberBinStart + m_iNumberBinAmount >= iNFreqs) {
+                if (bNfftEven && m_iNumberBinStart + m_iNumberBinAmount >= iNFreqs) {
                     matCsd.row(j).tail(1) /= 2.0;
                 }
             }
 
-            inputData.vecPairCsd.append(QPair<int,MatrixXcd>(i,matCsd));
-            inputData.vecPairCsdImagSign.append(QPair<int,MatrixXd>(i,matCsd.imag().cwiseSign()));
+            inputData.vecPairCsd.append(QPair<int, MatrixXcd>(i, matCsd));
+            inputData.vecPairCsdImagSign.append(QPair<int, MatrixXd>(i, matCsd.imag().cwiseSign()));
         }
 
         mutex.lock();
 
-        if(vecPairCsdSum.isEmpty()) {
+        if (vecPairCsdSum.isEmpty()) {
             vecPairCsdSum = inputData.vecPairCsd;
             vecPairCsdImagSignSum = inputData.vecPairCsdImagSign;
         } else {
@@ -255,14 +256,14 @@ void PhaseLagIndex::compute(ConnectivitySettings::IntermediateTrialData& inputDa
 
         mutex.unlock();
     } else {
-        if(inputData.vecPairCsdImagSign.isEmpty()) {
+        if (inputData.vecPairCsdImagSign.isEmpty()) {
             for (i = 0; i < inputData.vecPairCsd.size(); ++i) {
-                inputData.vecPairCsdImagSign.append(QPair<int,MatrixXd>(i,inputData.vecPairCsd.at(i).second.imag().cwiseSign()));
+                inputData.vecPairCsdImagSign.append(QPair<int, MatrixXd>(i, inputData.vecPairCsd.at(i).second.imag().cwiseSign()));
             }
 
             mutex.lock();
 
-            if(vecPairCsdImagSignSum.isEmpty()) {
+            if (vecPairCsdImagSignSum.isEmpty()) {
                 vecPairCsdImagSignSum = inputData.vecPairCsdImagSign;
             } else {
                 for (int j = 0; j < vecPairCsdImagSignSum.size(); ++j) {
@@ -274,7 +275,7 @@ void PhaseLagIndex::compute(ConnectivitySettings::IntermediateTrialData& inputDa
         }
     }
 
-    if(!m_bStorageModeIsActive) {
+    if (!m_bStorageModeIsActive) {
         inputData.vecPairCsd.clear();
         inputData.vecTapSpectra.clear();
         inputData.vecPairCsdImagSign.clear();
@@ -283,7 +284,7 @@ void PhaseLagIndex::compute(ConnectivitySettings::IntermediateTrialData& inputDa
 
 //=============================================================================================================
 
-void PhaseLagIndex::computePLI(ConnectivitySettings &connectivitySettings,
+void PhaseLagIndex::computePLI(ConnectivitySettings& connectivitySettings,
                                Network& finalNetwork)
 {
     // Compute final PLI and create Network
@@ -295,7 +296,7 @@ void PhaseLagIndex::computePLI(ConnectivitySettings &connectivitySettings,
     for (int i = 0; i < connectivitySettings.getIntermediateSumData().vecPairCsdImagSignSum.size(); ++i) {
         matNom = connectivitySettings.getIntermediateSumData().vecPairCsdImagSignSum.at(i).second.cwiseAbs() / connectivitySettings.size();
 
-        for(j = i; j < matNom.rows(); ++j) {
+        for (j = i; j < matNom.rows(); ++j) {
             matWeight = matNom.row(j).transpose();
 
             pEdge = QSharedPointer<NetworkEdge>(new NetworkEdge(i, j, matWeight));
@@ -306,4 +307,3 @@ void PhaseLagIndex::computePLI(ConnectivitySettings &connectivitySettings,
         }
     }
 }
-

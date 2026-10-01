@@ -29,7 +29,8 @@
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-namespace Ui {
+namespace Ui
+{
 class GUSBAmpSetupProjectWidget;
 }
 
@@ -65,7 +66,7 @@ public:
      * @param[in] pTMSI a pointer to the corresponding ECGSimulator.
      */
     explicit GUSBAmpSetupProjectWidget(GUSBAmp* pGUSBAmp,
-                                       QWidget *parent = 0);
+                                       QWidget* parent = 0);
 
     //=========================================================================================================
     /**
@@ -96,8 +97,8 @@ private:
      */
     void changeQLineEdits();
 
-    GUSBAmp*                        m_pGUSBAmp;         /**< a pointer to corresponding GUSBAmp.*/
-    Ui::GUSBAmpSetupProjectWidget*  ui;                 /**< the user interface for the GUSBAmpSetupProjectWidget.*/
+    GUSBAmp* m_pGUSBAmp;               /**< a pointer to corresponding GUSBAmp.*/
+    Ui::GUSBAmpSetupProjectWidget* ui; /**< the user interface for the GUSBAmpSetupProjectWidget.*/
 };
 } // NAMESPACE
 

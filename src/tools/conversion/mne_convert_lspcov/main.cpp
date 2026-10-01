@@ -55,8 +55,16 @@ using namespace Eigen;
 // LISP S-expression parser
 //=============================================================================================================
 
-struct LspToken {
-    enum Type { LeftParen, RightParen, Number, Symbol, EndOfFile };
+struct LspToken
+{
+    enum Type
+    {
+        LeftParen,
+        RightParen,
+        Number,
+        Symbol,
+        EndOfFile
+    };
     Type type;
     double numVal;
     QString strVal;
@@ -64,9 +72,14 @@ struct LspToken {
 
 //=============================================================================================================
 
-class LspParser {
+class LspParser
+{
 public:
-    explicit LspParser(QTextStream& stream) : m_stream(stream), m_pos(0) {}
+    explicit LspParser(QTextStream& stream)
+    : m_stream(stream)
+    , m_pos(0)
+    {
+    }
 
     LspToken next()
     {
@@ -76,21 +89,29 @@ public:
         }
 
         QChar c = m_buffer[m_pos];
-        if (c == '(') { m_pos++; return {LspToken::LeftParen, 0.0, {"("}}; }
-        if (c == ')') { m_pos++; return {LspToken::RightParen, 0.0, {")"}}; }
+        if (c == '(') {
+            m_pos++;
+            return {LspToken::LeftParen, 0.0, {"("}};
+        }
+        if (c == ')') {
+            m_pos++;
+            return {LspToken::RightParen, 0.0, {")"}};
+        }
 
         // Read a token (number or symbol)
         QString tok;
         while (m_pos < m_buffer.size()) {
             QChar ch = m_buffer[m_pos];
-            if (ch.isSpace() || ch == '(' || ch == ')') break;
+            if (ch.isSpace() || ch == '(' || ch == ')')
+                break;
             tok += ch;
             m_pos++;
         }
 
         bool ok = false;
         double val = tok.toDouble(&ok);
-        if (ok) return {LspToken::Number, val, tok};
+        if (ok)
+            return {LspToken::Number, val, tok};
         return {LspToken::Symbol, 0.0, tok};
     }
 
@@ -98,15 +119,19 @@ private:
     void skipWhitespace()
     {
         while (true) {
-            while (m_pos < m_buffer.size() && m_buffer[m_pos].isSpace()) m_pos++;
-            if (m_pos < m_buffer.size()) return;
-            if (!readMore()) return;
+            while (m_pos < m_buffer.size() && m_buffer[m_pos].isSpace())
+                m_pos++;
+            if (m_pos < m_buffer.size())
+                return;
+            if (!readMore())
+                return;
         }
     }
 
     bool readMore()
     {
-        if (m_stream.atEnd()) return false;
+        if (m_stream.atEnd())
+            return false;
         m_buffer = m_stream.readLine();
         // Strip comments (lines starting with ; or #)
         if (m_buffer.startsWith(';') || m_buffer.startsWith('#')) {
@@ -133,31 +158,37 @@ static bool parseLspMatrix(QTextStream& stream, MatrixXd& mat)
     bool foundStart = false;
     while (true) {
         tok = parser.next();
-        if (tok.type == LspToken::EndOfFile) break;
+        if (tok.type == LspToken::EndOfFile)
+            break;
         if (tok.type == LspToken::LeftParen) {
             foundStart = true;
             break;
         }
     }
-    if (!foundStart) return false;
+    if (!foundStart)
+        return false;
 
     // Parse rows: each row is ( num num num ... )
     while (true) {
         tok = parser.next();
-        if (tok.type == LspToken::EndOfFile || tok.type == LspToken::RightParen) break;
+        if (tok.type == LspToken::EndOfFile || tok.type == LspToken::RightParen)
+            break;
 
         if (tok.type == LspToken::LeftParen) {
             QList<double> row;
             while (true) {
                 tok = parser.next();
-                if (tok.type == LspToken::RightParen || tok.type == LspToken::EndOfFile) break;
-                if (tok.type == LspToken::Number) row.append(tok.numVal);
+                if (tok.type == LspToken::RightParen || tok.type == LspToken::EndOfFile)
+                    break;
+                if (tok.type == LspToken::Number)
+                    row.append(tok.numVal);
             }
             rows.append(row);
         }
     }
 
-    if (rows.isEmpty()) return false;
+    if (rows.isEmpty())
+        return false;
 
     int n = rows.size();
     mat.resize(n, n);
@@ -177,7 +208,7 @@ static bool parseLspMatrix(QTextStream& stream, MatrixXd& mat)
 
 //=============================================================================================================
 
-int main(int argc, char *argv[])
+int main(int argc, char* argv[])
 {
     qInstallMessageHandler(MNELogger::customLogWriter);
     QCoreApplication app(argc, argv);
@@ -212,8 +243,14 @@ int main(int argc, char *argv[])
     QString outFile = parser.value(outOpt);
     QString outascFile = parser.value(outascOpt);
 
-    if (lspcovFile.isEmpty()) { qCritical("--lspcov is required."); return 1; }
-    if (measFile.isEmpty()) { qCritical("--meas is required."); return 1; }
+    if (lspcovFile.isEmpty()) {
+        qCritical("--lspcov is required.");
+        return 1;
+    }
+    if (measFile.isEmpty()) {
+        qCritical("--meas is required.");
+        return 1;
+    }
     if (outFile.isEmpty() && outascFile.isEmpty()) {
         qCritical("At least one of --out or --outasc is required.");
         return 1;
@@ -231,7 +268,7 @@ int main(int argc, char *argv[])
     const FiffInfo& info = raw.info;
 
     int nChan = info.nchan;
-    qInfo("Measurement file: %d channels" , nChan);
+    qInfo("Measurement file: %d channels", nChan);
 
     //=========================================================================
     // Parse LISP covariance matrix
@@ -250,8 +287,8 @@ int main(int argc, char *argv[])
     }
     lspFile.close();
 
-    qInfo("Parsed %dx%d matrix from LISP file" ,
-           static_cast<int>(covMat.rows()), static_cast<int>(covMat.cols()));
+    qInfo("Parsed %dx%d matrix from LISP file",
+          static_cast<int>(covMat.rows()), static_cast<int>(covMat.cols()));
 
     if (covMat.rows() != nChan) {
         qCritical("Matrix dimension (%d) does not match channel count (%d).",
@@ -277,12 +314,13 @@ int main(int argc, char *argv[])
         for (int i = 0; i < nChan; ++i) {
             for (int j = 0; j < nChan; ++j) {
                 out << QString::number(covMat(i, j), 'e', 8);
-                if (j < nChan - 1) out << "\t";
+                if (j < nChan - 1)
+                    out << "\t";
             }
             out << "\n";
         }
         ascFile.close();
-        qInfo("Written ASCII covariance to: %s" , qPrintable(outascFile));
+        qInfo("Written ASCII covariance to: %s", qPrintable(outascFile));
     }
 
     //=========================================================================
@@ -318,7 +356,7 @@ int main(int argc, char *argv[])
             return 1;
         }
 
-        qInfo("Written FIFF covariance to: %s" , qPrintable(outFile));
+        qInfo("Written FIFF covariance to: %s", qPrintable(outFile));
     }
 
     return 0;

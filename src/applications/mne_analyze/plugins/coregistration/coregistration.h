@@ -39,23 +39,27 @@
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-namespace ANSHAREDLIB {
-    class Communicator;
-    class AbstractModel;
+namespace ANSHAREDLIB
+{
+class Communicator;
+class AbstractModel;
 }
 
-namespace DISPLIB {
-    class CoregSettingsView;
+namespace DISPLIB
+{
+class CoregSettingsView;
 }
 
-namespace MNELIB {
-    class MNEBem;
+namespace MNELIB
+{
+class MNEBem;
 }
 
-namespace FIFFLIB {
-    class FiffDigPoint;
-    class FiffDigPointSet;
-    class FiffCoordTrans;
+namespace FIFFLIB
+{
+class FiffDigPoint;
+class FiffDigPointSet;
+class FiffCoordTrans;
 }
 //=============================================================================================================
 // DEFINE NAMESPACE SURFERPLUGIN
@@ -131,7 +135,7 @@ private:
      *
      * @param[in] text  name of bem selected in the GUI.
      */
-    void onChangeSelectedBem(const QString &sText);
+    void onChangeSelectedBem(const QString& sText);
 
     //=========================================================================================================
     /**
@@ -295,32 +299,32 @@ private:
      */
     void onModelRemoved(QSharedPointer<ANSHAREDLIB::AbstractModel> pRemovedModel);
 
-    QVector<QSharedPointer<ANSHAREDLIB::AbstractModel>>     m_vecBemDataModels;     /**< Vector with all available Bem Models. */
-    QSharedPointer<MNELIB::MNEBem>                          m_pBem;                 /**< The currently selected Bem model. */
-    QString                                                 m_sCurrentSelectedBem;  /**< The name of the currently selected Bem. */
-    FIFFLIB::FiffDigPointSet                                m_digSetHead;           /**< The currently selected digitizer set. */
-    FIFFLIB::FiffDigPointSet                                m_digFidMri;            /**< The currently selected mri fiducials. */
-    FIFFLIB::FiffCoordTrans                                 m_transHeadMri;         /**< The resulting head-mri transformation. */
+    QVector<QSharedPointer<ANSHAREDLIB::AbstractModel>> m_vecBemDataModels; /**< Vector with all available Bem Models. */
+    QSharedPointer<MNELIB::MNEBem> m_pBem;                                  /**< The currently selected Bem model. */
+    QString m_sCurrentSelectedBem;                                          /**< The name of the currently selected Bem. */
+    FIFFLIB::FiffDigPointSet m_digSetHead;                                  /**< The currently selected digitizer set. */
+    FIFFLIB::FiffDigPointSet m_digFidMri;                                   /**< The currently selected mri fiducials. */
+    FIFFLIB::FiffCoordTrans m_transHeadMri;                                 /**< The resulting head-mri transformation. */
 
-    int m_iFiducial;                                        /**< Currently selected fiducial. */
-    bool m_bScale;                                            /**< Wether to apply automatic scaling. */
-    float m_fWeightLPA;                                       /**< Weight LPA. */
-    float m_fWeightNAS;                                       /**< Weight NAS. */
-    float m_fWeightRPA;                                       /**< Weight RPA. */
-    float m_fWeightHPI;                                       /**< Weight HPI. */
-    float m_fWeightHSP;                                       /**< Weight HSP (Head Shape Point). */
-    float m_fWeightEEG;                                       /**< Weight EEG . */
-    float m_fMaxDist;                                         /**< Maximum distace - electrode surface. */
-    float m_fTol;                                             /**< Divergence Tolerance . */
-    int m_iMaxIter;                                           /**< Maximum ammount of iterations. */
+    int m_iFiducial;    /**< Currently selected fiducial. */
+    bool m_bScale;      /**< Wether to apply automatic scaling. */
+    float m_fWeightLPA; /**< Weight LPA. */
+    float m_fWeightNAS; /**< Weight NAS. */
+    float m_fWeightRPA; /**< Weight RPA. */
+    float m_fWeightHPI; /**< Weight HPI. */
+    float m_fWeightHSP; /**< Weight HSP (Head Shape Point). */
+    float m_fWeightEEG; /**< Weight EEG . */
+    float m_fMaxDist;   /**< Maximum distace - electrode surface. */
+    float m_fTol;       /**< Divergence Tolerance . */
+    int m_iMaxIter;     /**< Maximum ammount of iterations. */
 
-    QPointer<ANSHAREDLIB::Communicator>                     m_pCommu;
+    QPointer<ANSHAREDLIB::Communicator> m_pCommu;
 
-    DISPLIB::CoregSettingsView*                             m_pCoregSettingsView;   /**< Pointer to coreg GUI. */
+    DISPLIB::CoregSettingsView* m_pCoregSettingsView; /**< Pointer to coreg GUI. */
 
-    QFutureWatcher<FIFFLIB::FiffCoordTrans>                 m_FutureWatcher;
-    QFuture<FIFFLIB::FiffCoordTrans>                        m_Future;
-    QMutex                                                  m_ParameterMutex;
+    QFutureWatcher<FIFFLIB::FiffCoordTrans> m_FutureWatcher;
+    QFuture<FIFFLIB::FiffCoordTrans> m_Future;
+    QMutex m_ParameterMutex;
 };
 
 //=============================================================================================================

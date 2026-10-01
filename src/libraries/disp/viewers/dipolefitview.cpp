@@ -36,7 +36,7 @@ using namespace DISPLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-DipoleFitView::DipoleFitView(QWidget *parent,
+DipoleFitView::DipoleFitView(QWidget* parent,
                              Qt::WindowFlags)
 : AbstractView(parent)
 , m_pUi(new Ui::DipoleFitViewWidget)
@@ -51,21 +51,19 @@ DipoleFitView::DipoleFitView(QWidget *parent,
 
 void DipoleFitView::saveSettings()
 {
-
 }
 
 //=============================================================================================================
 
 void DipoleFitView::loadSettings()
 {
-
 }
 
 //=============================================================================================================
 
 void DipoleFitView::updateGuiMode(GuiMode mode)
 {
-    switch(mode) {
+    switch (mode) {
         case GuiMode::Clinical:
             break;
         default: // default is research mode
@@ -77,7 +75,7 @@ void DipoleFitView::updateGuiMode(GuiMode mode)
 
 void DipoleFitView::updateProcessingMode(ProcessingMode mode)
 {
-    switch(mode) {
+    switch (mode) {
         case ProcessingMode::Offline:
             break;
         default: // default is realtime mode
@@ -87,21 +85,21 @@ void DipoleFitView::updateProcessingMode(ProcessingMode mode)
 
 //=============================================================================================================
 
-void DipoleFitView::addBem(const QString &sFileName)
+void DipoleFitView::addBem(const QString& sFileName)
 {
     m_pUi->comboBox_bem->addItem(sFileName);
 }
 
 //=============================================================================================================
 
-void DipoleFitView::addMri(const QString &sFileName)
+void DipoleFitView::addMri(const QString& sFileName)
 {
     m_pUi->comboBox_mri->addItem(sFileName);
 }
 
 //=============================================================================================================
 
-void DipoleFitView::addNoise(const QString &sFileName)
+void DipoleFitView::addNoise(const QString& sFileName)
 {
     m_pUi->comboBox_noise->addItem(sFileName);
 }
@@ -149,133 +147,133 @@ void DipoleFitView::initGui()
 
     //Perform Fit
     connect(m_pUi->pushButton_fit, &QPushButton::clicked, [=, this] {
-            emit performDipoleFit(m_pUi->lineEdit_name->text());
-            });
+        emit performDipoleFit(m_pUi->lineEdit_name->text());
+    });
 
     connect(m_pUi->spinBox_set, QOverload<int>::of(&QSpinBox::valueChanged),
             this, &DipoleFitView::setChanged, Qt::UniqueConnection);
 
     //Time settings
-    connect(m_pUi->spinBox_tmin, QOverload<int>::of(&QSpinBox::valueChanged), [=, this](int iValue){
-                emit timeChanged(iValue,
-                                 m_pUi->spinBox_tmax->value(),
-                                 m_pUi->spinBox_tstep->value(),
-                                 m_pUi->spinBox_tint->value());
-            });
-    connect(m_pUi->spinBox_tmax, QOverload<int>::of(&QSpinBox::valueChanged), [=, this](int iValue){
-                emit timeChanged(m_pUi->spinBox_tmin->value(),
-                                 iValue,
-                                 m_pUi->spinBox_tstep->value(),
-                                 m_pUi->spinBox_tint->value());
-            });
-    connect(m_pUi->spinBox_tstep, QOverload<int>::of(&QSpinBox::valueChanged), [=, this](int iValue){
-                emit timeChanged(m_pUi->spinBox_tmin->value(),
-                                 m_pUi->spinBox_tmax->value(),
-                                 iValue,
-                                 m_pUi->spinBox_tint->value());
-            });
-    connect(m_pUi->spinBox_tint, QOverload<int>::of(&QSpinBox::valueChanged), [=, this](int iValue){
-                emit timeChanged(m_pUi->spinBox_tmin->value(),
-                                 m_pUi->spinBox_tmax->value(),
-                                 m_pUi->spinBox_tstep->value(),
-                                 iValue);
-            });
+    connect(m_pUi->spinBox_tmin, QOverload<int>::of(&QSpinBox::valueChanged), [=, this](int iValue) {
+        emit timeChanged(iValue,
+                         m_pUi->spinBox_tmax->value(),
+                         m_pUi->spinBox_tstep->value(),
+                         m_pUi->spinBox_tint->value());
+    });
+    connect(m_pUi->spinBox_tmax, QOverload<int>::of(&QSpinBox::valueChanged), [=, this](int iValue) {
+        emit timeChanged(m_pUi->spinBox_tmin->value(),
+                         iValue,
+                         m_pUi->spinBox_tstep->value(),
+                         m_pUi->spinBox_tint->value());
+    });
+    connect(m_pUi->spinBox_tstep, QOverload<int>::of(&QSpinBox::valueChanged), [=, this](int iValue) {
+        emit timeChanged(m_pUi->spinBox_tmin->value(),
+                         m_pUi->spinBox_tmax->value(),
+                         iValue,
+                         m_pUi->spinBox_tint->value());
+    });
+    connect(m_pUi->spinBox_tint, QOverload<int>::of(&QSpinBox::valueChanged), [=, this](int iValue) {
+        emit timeChanged(m_pUi->spinBox_tmin->value(),
+                         m_pUi->spinBox_tmax->value(),
+                         m_pUi->spinBox_tstep->value(),
+                         iValue);
+    });
 
     //Baseline
-    connect(m_pUi->spinBox_bmin, QOverload<int>::of(&QSpinBox::valueChanged), [=, this](int iValue){
-                if (iValue != m_pUi->spinBox_bmax->value()){
-                    emit baselineChanged(iValue,
-                                         m_pUi->spinBox_bmax->value());
-                } else {
-                    emit baselineChanged(1e6, 1e6);
-                }
-            });
-    connect(m_pUi->spinBox_bmax, QOverload<int>::of(&QSpinBox::valueChanged), [=, this](int iValue){
-                if (iValue != m_pUi->spinBox_bmin->value()){
-                    emit baselineChanged(m_pUi->spinBox_bmin->value(),
-                                         iValue);
-                } else {
-                    emit baselineChanged(1e6, 1e6);
-                }
-            });
+    connect(m_pUi->spinBox_bmin, QOverload<int>::of(&QSpinBox::valueChanged), [=, this](int iValue) {
+        if (iValue != m_pUi->spinBox_bmax->value()) {
+            emit baselineChanged(iValue,
+                                 m_pUi->spinBox_bmax->value());
+        } else {
+            emit baselineChanged(1e6, 1e6);
+        }
+    });
+    connect(m_pUi->spinBox_bmax, QOverload<int>::of(&QSpinBox::valueChanged), [=, this](int iValue) {
+        if (iValue != m_pUi->spinBox_bmin->value()) {
+            emit baselineChanged(m_pUi->spinBox_bmin->value(),
+                                 iValue);
+        } else {
+            emit baselineChanged(1e6, 1e6);
+        }
+    });
 
     //Modality
-    connect(m_pUi->checkBox_EEG, &QCheckBox::toggled, [=, this](bool bChecked){
-                emit modalityChanged(bChecked, m_pUi->checkBox_MEG->isChecked());
-            });
-    connect(m_pUi->checkBox_MEG, &QCheckBox::toggled, [=, this](bool bChecked){
-                emit modalityChanged(m_pUi->checkBox_EEG->isChecked(), bChecked);
-            });
+    connect(m_pUi->checkBox_EEG, &QCheckBox::toggled, [=, this](bool bChecked) {
+        emit modalityChanged(bChecked, m_pUi->checkBox_MEG->isChecked());
+    });
+    connect(m_pUi->checkBox_MEG, &QCheckBox::toggled, [=, this](bool bChecked) {
+        emit modalityChanged(m_pUi->checkBox_EEG->isChecked(), bChecked);
+    });
 
     //Fittings
-    connect(m_pUi->doubleSpinBox_dist, QOverload<double>::of(&QDoubleSpinBox::valueChanged), [=, this](double dValue){
-                emit fittingChanged(dValue,
-                                    m_pUi->doubleSpinBox_grid->value());
-            });
-    connect(m_pUi->doubleSpinBox_grid, QOverload<double>::of(&QDoubleSpinBox::valueChanged), [=, this](double dValue){
-                emit fittingChanged(m_pUi->doubleSpinBox_dist->value(),
-                                    dValue);
-            });
+    connect(m_pUi->doubleSpinBox_dist, QOverload<double>::of(&QDoubleSpinBox::valueChanged), [=, this](double dValue) {
+        emit fittingChanged(dValue,
+                            m_pUi->doubleSpinBox_grid->value());
+    });
+    connect(m_pUi->doubleSpinBox_grid, QOverload<double>::of(&QDoubleSpinBox::valueChanged), [=, this](double dValue) {
+        emit fittingChanged(m_pUi->doubleSpinBox_dist->value(),
+                            dValue);
+    });
 
     //Noise
-    connect(m_pUi->doubleSpinBox_gradnoise, QOverload<double>::of(&QDoubleSpinBox::valueChanged), [=, this](double dValue){
-                emit noiseChanged(dValue,
-                                  m_pUi->doubleSpinBox_magnoise->value(),
-                                  m_pUi->doubleSpinBox_eegnoise->value());
-            });
-    connect(m_pUi->doubleSpinBox_magnoise, QOverload<double>::of(&QDoubleSpinBox::valueChanged), [=, this](double dValue){
-                emit noiseChanged(m_pUi->doubleSpinBox_gradnoise->value(),
-                                  dValue,
-                                  m_pUi->doubleSpinBox_eegnoise->value());
-            });
-    connect(m_pUi->doubleSpinBox_eegnoise, QOverload<double>::of(&QDoubleSpinBox::valueChanged), [=, this](double dValue){
-                emit noiseChanged(m_pUi->doubleSpinBox_gradnoise->value(),
-                                  m_pUi->doubleSpinBox_magnoise->value(),
-                                  dValue);
-            });
+    connect(m_pUi->doubleSpinBox_gradnoise, QOverload<double>::of(&QDoubleSpinBox::valueChanged), [=, this](double dValue) {
+        emit noiseChanged(dValue,
+                          m_pUi->doubleSpinBox_magnoise->value(),
+                          m_pUi->doubleSpinBox_eegnoise->value());
+    });
+    connect(m_pUi->doubleSpinBox_magnoise, QOverload<double>::of(&QDoubleSpinBox::valueChanged), [=, this](double dValue) {
+        emit noiseChanged(m_pUi->doubleSpinBox_gradnoise->value(),
+                          dValue,
+                          m_pUi->doubleSpinBox_eegnoise->value());
+    });
+    connect(m_pUi->doubleSpinBox_eegnoise, QOverload<double>::of(&QDoubleSpinBox::valueChanged), [=, this](double dValue) {
+        emit noiseChanged(m_pUi->doubleSpinBox_gradnoise->value(),
+                          m_pUi->doubleSpinBox_magnoise->value(),
+                          dValue);
+    });
 
     //Reg
-    connect(m_pUi->doubleSpinBox_gradreg, QOverload<double>::of(&QDoubleSpinBox::valueChanged), [=, this](double dValue){
-                emit regChanged(dValue,
-                                m_pUi->doubleSpinBox_magreg->value(),
-                                m_pUi->doubleSpinBox_eegreg->value());
-            });
-    connect(m_pUi->doubleSpinBox_magreg, QOverload<double>::of(&QDoubleSpinBox::valueChanged), [=, this](double dValue){
-                emit regChanged(m_pUi->doubleSpinBox_gradreg->value(),
-                                dValue,
-                                m_pUi->doubleSpinBox_eegreg->value());
-            });
-    connect(m_pUi->doubleSpinBox_eegreg, QOverload<double>::of(&QDoubleSpinBox::valueChanged), [=, this](double dValue){
-                emit regChanged(m_pUi->doubleSpinBox_gradreg->value(),
-                                m_pUi->doubleSpinBox_magreg->value(),
-                                dValue);
-            });
+    connect(m_pUi->doubleSpinBox_gradreg, QOverload<double>::of(&QDoubleSpinBox::valueChanged), [=, this](double dValue) {
+        emit regChanged(dValue,
+                        m_pUi->doubleSpinBox_magreg->value(),
+                        m_pUi->doubleSpinBox_eegreg->value());
+    });
+    connect(m_pUi->doubleSpinBox_magreg, QOverload<double>::of(&QDoubleSpinBox::valueChanged), [=, this](double dValue) {
+        emit regChanged(m_pUi->doubleSpinBox_gradreg->value(),
+                        dValue,
+                        m_pUi->doubleSpinBox_eegreg->value());
+    });
+    connect(m_pUi->doubleSpinBox_eegreg, QOverload<double>::of(&QDoubleSpinBox::valueChanged), [=, this](double dValue) {
+        emit regChanged(m_pUi->doubleSpinBox_gradreg->value(),
+                        m_pUi->doubleSpinBox_magreg->value(),
+                        dValue);
+    });
 
     //Sphere model
-    connect(m_pUi->doubleSpinBox_orgx, QOverload<double>::of(&QDoubleSpinBox::valueChanged), [=, this](double dValue){
-                emit sphereChanged(dValue,
-                                   m_pUi->doubleSpinBox_orgy->value(),
-                                   m_pUi->doubleSpinBox_orgz->value(),
-                                   m_pUi->doubleSpinBox_rad->value());
-            });
-    connect(m_pUi->doubleSpinBox_orgy, QOverload<double>::of(&QDoubleSpinBox::valueChanged), [=, this](double dValue){
-                emit sphereChanged(m_pUi->doubleSpinBox_orgx->value(),
-                                   dValue,
-                                   m_pUi->doubleSpinBox_orgz->value(),
-                                   m_pUi->doubleSpinBox_rad->value());
-            });
-    connect(m_pUi->doubleSpinBox_orgz, QOverload<double>::of(&QDoubleSpinBox::valueChanged), [=, this](double dValue){
-                emit sphereChanged(m_pUi->doubleSpinBox_orgx->value(),
-                                   m_pUi->doubleSpinBox_orgy->value(),
-                                   dValue,
-                                   m_pUi->doubleSpinBox_rad->value());
-            });
-    connect(m_pUi->doubleSpinBox_rad, QOverload<double>::of(&QDoubleSpinBox::valueChanged), [=, this](double dValue){
-                emit sphereChanged(m_pUi->doubleSpinBox_orgx->value(),
-                                   m_pUi->doubleSpinBox_orgy->value(),
-                                   m_pUi->doubleSpinBox_orgz->value(),
-                                   dValue);
-            });
+    connect(m_pUi->doubleSpinBox_orgx, QOverload<double>::of(&QDoubleSpinBox::valueChanged), [=, this](double dValue) {
+        emit sphereChanged(dValue,
+                           m_pUi->doubleSpinBox_orgy->value(),
+                           m_pUi->doubleSpinBox_orgz->value(),
+                           m_pUi->doubleSpinBox_rad->value());
+    });
+    connect(m_pUi->doubleSpinBox_orgy, QOverload<double>::of(&QDoubleSpinBox::valueChanged), [=, this](double dValue) {
+        emit sphereChanged(m_pUi->doubleSpinBox_orgx->value(),
+                           dValue,
+                           m_pUi->doubleSpinBox_orgz->value(),
+                           m_pUi->doubleSpinBox_rad->value());
+    });
+    connect(m_pUi->doubleSpinBox_orgz, QOverload<double>::of(&QDoubleSpinBox::valueChanged), [=, this](double dValue) {
+        emit sphereChanged(m_pUi->doubleSpinBox_orgx->value(),
+                           m_pUi->doubleSpinBox_orgy->value(),
+                           dValue,
+                           m_pUi->doubleSpinBox_rad->value());
+    });
+    connect(m_pUi->doubleSpinBox_rad, QOverload<double>::of(&QDoubleSpinBox::valueChanged), [=, this](double dValue) {
+        emit sphereChanged(m_pUi->doubleSpinBox_orgx->value(),
+                           m_pUi->doubleSpinBox_orgy->value(),
+                           m_pUi->doubleSpinBox_orgz->value(),
+                           dValue);
+    });
 
     //Models
     connect(m_pUi->comboBox_bem, &QComboBox::currentTextChanged,
@@ -284,41 +282,40 @@ void DipoleFitView::initGui()
             this, &DipoleFitView::selectedNoise, Qt::UniqueConnection);
     connect(m_pUi->comboBox_mri, &QComboBox::currentTextChanged,
             this, &DipoleFitView::selectedMri, Qt::UniqueConnection);
-    connect(m_pUi->comboBox_meas, &QComboBox::currentTextChanged, [=, this](const QString& sFileName){
+    connect(m_pUi->comboBox_meas, &QComboBox::currentTextChanged, [=, this](const QString& sFileName) {
 #if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
-            auto skip = QString::SkipEmptyParts;
+        auto skip = QString::SkipEmptyParts;
 #else
             auto skip = Qt::SkipEmptyParts;
 #endif
-            // clear() reports an empty selection, which has no name to derive.
-            const QStringList parts = sFileName.split(".",skip);
-            if(parts.isEmpty()){
-                m_pUi->lineEdit_name->clear();
-                emit selectedMeas(sFileName);
-                return;
-            }
-            QString sName = parts.at(0);
-            if(sName.endsWith("-ave") || sName.endsWith("_ave") || sName.endsWith("-raw") || sName.endsWith("_raw")){
-                sName.chop(4);
-            }
-            m_pUi->lineEdit_name->setText("Dipole Fit - " + sName + " - " + QDateTime::currentDateTime().toString("MMMM d yyyy hh:mm:ss"));
+        // clear() reports an empty selection, which has no name to derive.
+        const QStringList parts = sFileName.split(".", skip);
+        if (parts.isEmpty()) {
+            m_pUi->lineEdit_name->clear();
             emit selectedMeas(sFileName);
+            return;
+        }
+        QString sName = parts.at(0);
+        if (sName.endsWith("-ave") || sName.endsWith("_ave") || sName.endsWith("-raw") || sName.endsWith("_raw")) {
+            sName.chop(4);
+        }
+        m_pUi->lineEdit_name->setText("Dipole Fit - " + sName + " - " + QDateTime::currentDateTime().toString("MMMM d yyyy hh:mm:ss"));
+        emit selectedMeas(sFileName);
     });
-
 }
 
 //=============================================================================================================
 
-void DipoleFitView::addMeas(const QString &sFileName)
+void DipoleFitView::addMeas(const QString& sFileName)
 {
     m_pUi->comboBox_meas->addItem(sFileName);
 
-//    QString sName = sFileName.split(".",QString::SkipEmptyParts).at(0);
-//    if(sName.endsWith("-ave") || sName.endsWith("_ave") || sName.endsWith("-raw") || sName.endsWith("_raw")){
-//        sName.chop(4);
-//    }
+    //    QString sName = sFileName.split(".",QString::SkipEmptyParts).at(0);
+    //    if(sName.endsWith("-ave") || sName.endsWith("_ave") || sName.endsWith("-raw") || sName.endsWith("_raw")){
+    //        sName.chop(4);
+    //    }
 
-//    m_pUi->lineEdit_name->setText("Dipole Fit - " + sName + " - " + QDateTime::currentDateTime().toString("MMMM d yyyy hh:mm:ss"));
+    //    m_pUi->lineEdit_name->setText("Dipole Fit - " + sName + " - " + QDateTime::currentDateTime().toString("MMMM d yyyy hh:mm:ss"));
 }
 
 //=============================================================================================================
@@ -333,40 +330,40 @@ void DipoleFitView::clearView()
 
 //=============================================================================================================
 
-void DipoleFitView::removeModel(const QString &sModelName, int iType)
+void DipoleFitView::removeModel(const QString& sModelName, int iType)
 {
-    switch (iType){
-    case 1: {
-        int iIndex = m_pUi->comboBox_meas->findText(sModelName);
-        if(iIndex != -1){
-            m_pUi->comboBox_meas->removeItem(iIndex);
+    switch (iType) {
+        case 1: {
+            int iIndex = m_pUi->comboBox_meas->findText(sModelName);
+            if (iIndex != -1) {
+                m_pUi->comboBox_meas->removeItem(iIndex);
+            }
+            break;
         }
-        break;
-    }
-    case 2: {
-        int iIndex = m_pUi->comboBox_bem->findText(sModelName);
-        if(iIndex != -1){
-            m_pUi->comboBox_bem->removeItem(iIndex);
+        case 2: {
+            int iIndex = m_pUi->comboBox_bem->findText(sModelName);
+            if (iIndex != -1) {
+                m_pUi->comboBox_bem->removeItem(iIndex);
+            }
+            break;
         }
-        break;
-    }
-    case 3: {
-        int iIndex = m_pUi->comboBox_mri->findText(sModelName);
-        if(iIndex != -1){
-            m_pUi->comboBox_mri->removeItem(iIndex);
+        case 3: {
+            int iIndex = m_pUi->comboBox_mri->findText(sModelName);
+            if (iIndex != -1) {
+                m_pUi->comboBox_mri->removeItem(iIndex);
+            }
+            break;
         }
-        break;
-    }
-    case 4: {
-        int iIndex = m_pUi->comboBox_noise->findText(sModelName);
-        if(iIndex != -1){
-            m_pUi->comboBox_noise->removeItem(iIndex);
+        case 4: {
+            int iIndex = m_pUi->comboBox_noise->findText(sModelName);
+            if (iIndex != -1) {
+                m_pUi->comboBox_noise->removeItem(iIndex);
+            }
+            break;
         }
-        break;
-    }
-    default:{
-        qWarning() << "[DipoleFitView::removeModel] Model type not recognized";
-        break;
-    }
+        default: {
+            qWarning() << "[DipoleFitView::removeModel] Model type not recognized";
+            break;
+        }
     }
 }

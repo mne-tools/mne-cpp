@@ -62,7 +62,7 @@ RtAveragingWorker::RtAveragingWorker(quint32 numAverages,
 , m_fTriggerThreshold(0.5f)
 , m_bActivateThreshold(false)
 , m_bDoBaselineCorrection(false)
-, m_pairBaselineSec(qMakePair(float(iBaselineFromMSecs),float(iBaselineToMSecs)))
+, m_pairBaselineSec(qMakePair(float(iBaselineFromMSecs), float(iBaselineToMSecs)))
 , m_pFiffInfo(pFiffInfo)
 {
     m_mapThresholds["eog"] = 300e-6;
@@ -72,7 +72,7 @@ RtAveragingWorker::RtAveragingWorker(quint32 numAverages,
     m_iNewPreStimSamples = m_iPreStimSamples;
     m_iNewPostStimSamples = m_iPostStimSamples;
 
-    if(m_iNumAverages <= 0) {
+    if (m_iNumAverages <= 0) {
         qDebug() << "RtAveragingWorker::RtAveragingWorker - Number of averages <= 0. Setting to 1 as default.";
         m_iNumAverages = 1;
     }
@@ -82,11 +82,11 @@ RtAveragingWorker::RtAveragingWorker(quint32 numAverages,
 
 void RtAveragingWorker::doWork(const MatrixXd& rawSegment)
 {
-    if(this->thread()->isInterruptionRequested()) {
+    if (this->thread()->isInterruptionRequested()) {
         return;
     }
 
-    if(controlValuesChanged()) {
+    if (controlValuesChanged()) {
         reset();
     }
 
@@ -97,23 +97,23 @@ void RtAveragingWorker::doWork(const MatrixXd& rawSegment)
 
 void RtAveragingWorker::setAverageNumber(qint32 numAve)
 {
-    if(numAve <= 0) {
+    if (numAve <= 0) {
         qDebug() << "[RtAveragingWorker::setAverageNumber] Number of averages <= 0 are not allowed. Returning.";
         return;
     }
 
-    if(numAve < m_iNumAverages) {
+    if (numAve < m_iNumAverages) {
         int iDiff = m_iNumAverages - numAve;
 
         //Do averaging for each trigger type
-        QMutableMapIterator<double,QList<Eigen::MatrixXd> > idx(m_mapStimAve);
+        QMutableMapIterator<double, QList<Eigen::MatrixXd>> idx(m_mapStimAve);
 
-        while(idx.hasNext()) {
+        while (idx.hasNext()) {
             idx.next();
 
-            if(idx.value().size() > iDiff) {
+            if (idx.value().size() > iDiff) {
                 //Pop data from buffer
-                for(int i = 0; i < iDiff; ++i) {
+                for (int i = 0; i < iDiff; ++i) {
                     idx.value().pop_front();
                 }
             }
@@ -150,9 +150,9 @@ void RtAveragingWorker::setTriggerChIndx(qint32 idx)
 
 //=============================================================================================================
 
-void RtAveragingWorker::setArtifactReduction(const QMap<QString, double> &mapThresholds)
+void RtAveragingWorker::setArtifactReduction(const QMap<QString, double>& mapThresholds)
 {
-    if(mapThresholds["Active"] == 0.0) {
+    if (mapThresholds["Active"] == 0.0) {
         m_bActivateThreshold = false;
     } else {
         m_bActivateThreshold = true;
@@ -167,12 +167,12 @@ void RtAveragingWorker::setBaselineActive(bool activate)
 {
     m_bDoBaselineCorrection = activate;
 
-    if(!m_bDoBaselineCorrection) {
-        for(int i = 0; i < m_stimEvokedSet.evoked.size(); ++i) {
+    if (!m_bDoBaselineCorrection) {
+        for (int i = 0; i < m_stimEvokedSet.evoked.size(); ++i) {
             m_stimEvokedSet.evoked[i].baseline = qMakePair(-1.0f, -1.0f);
         }
     } else {
-        for(int i = 0; i < m_stimEvokedSet.evoked.size(); ++i) {
+        for (int i = 0; i < m_stimEvokedSet.evoked.size(); ++i) {
             m_stimEvokedSet.evoked[i].baseline = m_pairBaselineSec;
         }
     }
@@ -183,11 +183,11 @@ void RtAveragingWorker::setBaselineActive(bool activate)
 void RtAveragingWorker::setBaselineFrom(int fromSamp,
                                         int fromMSec)
 {
-    m_pairBaselineSec.first = float(fromMSec)/1000.0f;
+    m_pairBaselineSec.first = float(fromMSec) / 1000.0f;
     m_pairBaselineSamp.first = float(fromSamp);
 
-    for(int i = 0; i < m_stimEvokedSet.evoked.size(); ++i) {
-        m_stimEvokedSet.evoked[i].baseline.first = float(fromMSec)/1000.0f;
+    for (int i = 0; i < m_stimEvokedSet.evoked.size(); ++i) {
+        m_stimEvokedSet.evoked[i].baseline.first = float(fromMSec) / 1000.0f;
     }
 }
 
@@ -196,11 +196,11 @@ void RtAveragingWorker::setBaselineFrom(int fromSamp,
 void RtAveragingWorker::setBaselineTo(int toSamp,
                                       int toMSec)
 {
-    m_pairBaselineSec.second = float(toMSec)/1000.0f;
+    m_pairBaselineSec.second = float(toMSec) / 1000.0f;
     m_pairBaselineSamp.second = float(toSamp);
 
-    for(int i = 0; i < m_stimEvokedSet.evoked.size(); ++i) {
-        m_stimEvokedSet.evoked[i].baseline.second = float(toMSec)/1000.0f;
+    for (int i = 0; i < m_stimEvokedSet.evoked.size(); ++i) {
+        m_stimEvokedSet.evoked[i].baseline.second = float(toMSec) / 1000.0f;
     }
 }
 
@@ -209,11 +209,11 @@ void RtAveragingWorker::setBaselineTo(int toSamp,
 void RtAveragingWorker::doAveraging(const MatrixXd& rawSegment)
 {
     //Detect trigger
-    QList<QPair<int,double> > lDetectedTriggers = RTPROCESSINGLIB::detectTriggerFlanksMax(rawSegment, m_iTriggerChIndex, 0, m_fTriggerThreshold, true);
+    QList<QPair<int, double>> lDetectedTriggers = RTPROCESSINGLIB::detectTriggerFlanksMax(rawSegment, m_iTriggerChIndex, 0, m_fTriggerThreshold, true);
 
     //TODO: This does not permit the same trigger type twice in one data block
-    for(int i = 0; i < lDetectedTriggers.size(); ++i) {
-        if(!m_mapFillingBackBuffer.contains(lDetectedTriggers.at(i).second)) {
+    for (int i = 0; i < lDetectedTriggers.size(); ++i) {
+        if (!m_mapFillingBackBuffer.contains(lDetectedTriggers.at(i).second)) {
             double dTriggerType = lDetectedTriggers.at(i).second;
 
             //qDebug()<<"Adding dTriggerType"<<dTriggerType;
@@ -226,48 +226,48 @@ void RtAveragingWorker::doAveraging(const MatrixXd& rawSegment)
     }
 
     //Fill front / pre stim buffer even if no triggers have been located at all yet
-    if(m_mapFillingBackBuffer.isEmpty()) {
+    if (m_mapFillingBackBuffer.isEmpty()) {
         fillFrontBuffer(rawSegment, -1.0);
     }
 
     //Do averaging for each trigger type
-    QMutableMapIterator<double,bool> idx(m_mapFillingBackBuffer);
+    QMutableMapIterator<double, bool> idx(m_mapFillingBackBuffer);
     QStringList lResponsibleTriggerTypes;
 
-    while(idx.hasNext()) {
+    while (idx.hasNext()) {
         idx.next();
 
         double dTriggerType = idx.key();
 
         //Fill front / pre stim buffer
-        if(lDetectedTriggers.isEmpty()) {
+        if (lDetectedTriggers.isEmpty()) {
             fillFrontBuffer(rawSegment, -1.0);
         }
 
         //Fill back buffer and decide when to do the data packing of the different buffers
-        if(m_mapFillingBackBuffer[dTriggerType]) {
-            if(m_mapMatDataPostIdx[dTriggerType] != m_iPostStimSamples) {
+        if (m_mapFillingBackBuffer[dTriggerType]) {
+            if (m_mapMatDataPostIdx[dTriggerType] != m_iPostStimSamples) {
                 fillBackBuffer(rawSegment, dTriggerType);
             }
 
-            if(m_mapMatDataPostIdx[dTriggerType] == m_iPostStimSamples) {
+            if (m_mapMatDataPostIdx[dTriggerType] == m_iPostStimSamples) {
                 m_mapMatDataPostIdx[dTriggerType] = 0;
                 m_mapFillingBackBuffer[dTriggerType] = false;
                 emitEvoked(dTriggerType, lResponsibleTriggerTypes);
             }
         } else {
-            if(lDetectedTriggers.isEmpty()) {
+            if (lDetectedTriggers.isEmpty()) {
                 //Fill front / pre stim buffer
                 fillFrontBuffer(rawSegment, dTriggerType);
             } else {
-                for(int i = 0; i < lDetectedTriggers.size(); ++i) {
-                    if(dTriggerType == lDetectedTriggers.at(i).second) {
+                for (int i = 0; i < lDetectedTriggers.size(); ++i) {
+                    if (dTriggerType == lDetectedTriggers.at(i).second) {
                         int iTriggerPos = lDetectedTriggers.at(i).first;
 
                         //Do front buffer stuff
                         MatrixXd tempMat;
 
-                        if(iTriggerPos >= m_iPreStimSamples) {
+                        if (iTriggerPos >= m_iPreStimSamples) {
                             tempMat = rawSegment.block(0,
                                                        iTriggerPos - m_iPreStimSamples,
                                                        rawSegment.rows(),
@@ -282,7 +282,7 @@ void RtAveragingWorker::doAveraging(const MatrixXd& rawSegment)
                         fillFrontBuffer(tempMat, dTriggerType);
 
                         //Do back buffer stuff
-                        if(rawSegment.cols() - iTriggerPos >= m_mapDataPost[dTriggerType].cols()) {
+                        if (rawSegment.cols() - iTriggerPos >= m_mapDataPost[dTriggerType].cols()) {
                             m_mapDataPost[dTriggerType] = rawSegment.block(0,
                                                                            iTriggerPos,
                                                                            m_mapDataPost[dTriggerType].rows(),
@@ -323,28 +323,28 @@ void RtAveragingWorker::emitEvoked(double dTriggerType, QStringList& lResponsibl
     generateEvoked(dTriggerType);
 
     //List of all trigger types which lead to the recent emit of a new evoked set. */
-    if(!lResponsibleTriggerTypes.contains(QString::number(dTriggerType))) {
+    if (!lResponsibleTriggerTypes.contains(QString::number(dTriggerType))) {
         lResponsibleTriggerTypes << QString::number(dTriggerType);
     }
 
-    if(m_stimEvokedSet.evoked.size() > 0) {
+    if (m_stimEvokedSet.evoked.size() > 0) {
         emit resultReady(m_stimEvokedSet, lResponsibleTriggerTypes);
     }
 
-//    qDebug()<<"RtAveragingWorker::emitEvoked() - dTriggerType:" << dTriggerType;
-//    qDebug()<<"RtAveragingWorker::emitEvoked() - m_mapStimAve[dTriggerType].size():" << m_mapStimAve[dTriggerType].size();
+    //    qDebug()<<"RtAveragingWorker::emitEvoked() - dTriggerType:" << dTriggerType;
+    //    qDebug()<<"RtAveragingWorker::emitEvoked() - m_mapStimAve[dTriggerType].size():" << m_mapStimAve[dTriggerType].size();
 }
 
 //=============================================================================================================
 
-void RtAveragingWorker::fillBackBuffer(const MatrixXd &data, double dTriggerType)
+void RtAveragingWorker::fillBackBuffer(const MatrixXd& data, double dTriggerType)
 {
     int iResidualCols = data.cols();
-    if(m_mapMatDataPostIdx[dTriggerType] + data.cols() > m_iPostStimSamples) {
+    if (m_mapMatDataPostIdx[dTriggerType] + data.cols() > m_iPostStimSamples) {
         iResidualCols = m_iPostStimSamples - m_mapMatDataPostIdx[dTriggerType];
-        m_mapDataPost[dTriggerType].block(0,m_mapMatDataPostIdx[dTriggerType],m_mapDataPost[dTriggerType].rows(),iResidualCols) = data.block(0,0,data.rows(),iResidualCols);
+        m_mapDataPost[dTriggerType].block(0, m_mapMatDataPostIdx[dTriggerType], m_mapDataPost[dTriggerType].rows(), iResidualCols) = data.block(0, 0, data.rows(), iResidualCols);
     } else {
-        m_mapDataPost[dTriggerType].block(0,m_mapMatDataPostIdx[dTriggerType],m_mapDataPost[dTriggerType].rows(),iResidualCols) = data;
+        m_mapDataPost[dTriggerType].block(0, m_mapMatDataPostIdx[dTriggerType], m_mapDataPost[dTriggerType].rows(), iResidualCols) = data;
     }
 
     m_mapMatDataPostIdx[dTriggerType] += iResidualCols;
@@ -352,11 +352,11 @@ void RtAveragingWorker::fillBackBuffer(const MatrixXd &data, double dTriggerType
 
 //=============================================================================================================
 
-void RtAveragingWorker::fillFrontBuffer(const MatrixXd &data, double dTriggerType)
+void RtAveragingWorker::fillFrontBuffer(const MatrixXd& data, double dTriggerType)
 {
     //Init m_mapDataPre
-    if(!m_mapDataPre.contains(dTriggerType)) {
-        if(dTriggerType != -1.0) {
+    if (!m_mapDataPre.contains(dTriggerType)) {
+        if (dTriggerType != -1.0) {
             m_mapDataPre[dTriggerType] = m_mapDataPre[-1.0];
         } else {
             m_mapDataPre[-1.0].resize(m_pFiffInfo->chs.size(), m_iPreStimSamples);
@@ -364,8 +364,8 @@ void RtAveragingWorker::fillFrontBuffer(const MatrixXd &data, double dTriggerTyp
         }
     }
 
-    if(m_mapDataPre[dTriggerType].cols() <= data.cols()) {
-        if(m_iPreStimSamples > 0 && data.cols() >= m_iPreStimSamples) {
+    if (m_mapDataPre[dTriggerType].cols() <= data.cols()) {
+        if (m_iPreStimSamples > 0 && data.cols() >= m_iPreStimSamples) {
             m_mapDataPre[dTriggerType] = data.block(0,
                                                     data.cols() - m_iPreStimSamples,
                                                     data.rows(),
@@ -395,7 +395,7 @@ void RtAveragingWorker::fillFrontBuffer(const MatrixXd &data, double dTriggerTyp
 
 void RtAveragingWorker::mergeData(double dTriggerType)
 {
-    if(m_mapDataPre[dTriggerType].rows() != m_mapDataPost[dTriggerType].rows()) {
+    if (m_mapDataPre[dTriggerType].rows() != m_mapDataPost[dTriggerType].rows()) {
         qDebug() << "[RtAveragingWorker::mergeData] Rows of m_mapDataPre (" << m_mapDataPre[dTriggerType].rows() << ") and m_mapDataPost (" << m_mapDataPost[dTriggerType].rows() << ") are not the same. Returning.";
         return;
     }
@@ -407,7 +407,7 @@ void RtAveragingWorker::mergeData(double dTriggerType)
     //Perform artifact threshold
     bool bArtifactDetected = false;
 
-    if(m_bActivateThreshold && m_pFiffInfo) {
+    if (m_bActivateThreshold && m_pFiffInfo) {
         qDebug() << "[RtAveragingWorker::mergeData] Doing artifact reduction for" << m_mapThresholds;
 
         bArtifactDetected = MNEEpochDataList::checkForArtifact(mergedData,
@@ -415,14 +415,14 @@ void RtAveragingWorker::mergeData(double dTriggerType)
                                                                m_mapThresholds);
     }
 
-    if(!bArtifactDetected) {
+    if (!bArtifactDetected) {
         //Add cut data to average buffer
         m_mapStimAve[dTriggerType].append(mergedData);
 
         //Pop data from buffer
-        int iDiff =  m_mapStimAve[dTriggerType].size() - m_iNumAverages;
-        if(iDiff > 0) {
-            for(int i = 0; i < iDiff; ++i) {
+        int iDiff = m_mapStimAve[dTriggerType].size() - m_iNumAverages;
+        if (iDiff > 0) {
+            for (int i = 0; i < iDiff; ++i) {
                 m_mapStimAve[dTriggerType].pop_front();
             }
         }
@@ -433,7 +433,7 @@ void RtAveragingWorker::mergeData(double dTriggerType)
 
 void RtAveragingWorker::generateEvoked(double dTriggerType)
 {
-    if(m_mapStimAve[dTriggerType].isEmpty()) {
+    if (m_mapStimAve[dTriggerType].isEmpty()) {
         qDebug() << "[RtAveragingWorker::generateEvoked] m_mapStimAve is empty for type" << dTriggerType << "Returning.";
         return;
     }
@@ -444,8 +444,8 @@ void RtAveragingWorker::generateEvoked(double dTriggerType)
     evoked.setInfo(*m_pFiffInfo.data());
     int iEvokedIdx = -1;
 
-    for(int i = 0; i < m_stimEvokedSet.evoked.size(); ++i) {
-        if(m_stimEvokedSet.evoked.at(i).comment == QString::number(dTriggerType)) {
+    for (int i = 0; i < m_stimEvokedSet.evoked.size(); ++i) {
+        if (m_stimEvokedSet.evoked.at(i).comment == QString::number(dTriggerType)) {
             evoked = m_stimEvokedSet.evoked.at(i);
             iEvokedIdx = i;
             break;
@@ -453,12 +453,12 @@ void RtAveragingWorker::generateEvoked(double dTriggerType)
     }
 
     //If the evoked is not yet present add it here
-    if(iEvokedIdx == -1) {
+    if (iEvokedIdx == -1) {
         evoked.baseline = m_pairBaselineSec;
         evoked.times.resize(m_iPreStimSamples + m_iPostStimSamples);
         evoked.times = RowVectorXf::LinSpaced(m_iPreStimSamples + m_iPostStimSamples,
-                                              -1*m_iPreStimSamples/m_pFiffInfo->sfreq,
-                                              m_iPostStimSamples/m_pFiffInfo->sfreq);
+                                              -1 * m_iPreStimSamples / m_pFiffInfo->sfreq,
+                                              m_iPostStimSamples / m_pFiffInfo->sfreq);
         evoked.times[m_iPreStimSamples] = 0.0;
         evoked.first = 0;
         evoked.last = m_iPreStimSamples + m_iPostStimSamples;
@@ -466,17 +466,17 @@ void RtAveragingWorker::generateEvoked(double dTriggerType)
     }
 
     // Generate final evoked
-    MatrixXd finalAverage = MatrixXd::Zero(m_mapStimAve[dTriggerType].first().rows(), m_iPreStimSamples+m_iPostStimSamples);
+    MatrixXd finalAverage = MatrixXd::Zero(m_mapStimAve[dTriggerType].first().rows(), m_iPreStimSamples + m_iPostStimSamples);
 
-    for(int i = 0; i < m_mapStimAve[dTriggerType].size(); ++i) {
+    for (int i = 0; i < m_mapStimAve[dTriggerType].size(); ++i) {
         finalAverage += m_mapStimAve[dTriggerType].at(i);
     }
 
-    if(!m_mapStimAve[dTriggerType].isEmpty()) {
-        finalAverage = finalAverage/m_mapStimAve[dTriggerType].size();
+    if (!m_mapStimAve[dTriggerType].isEmpty()) {
+        finalAverage = finalAverage / m_mapStimAve[dTriggerType].size();
     }
 
-    if(m_bDoBaselineCorrection) {
+    if (m_bDoBaselineCorrection) {
         finalAverage = Numerics::rescale(finalAverage, evoked.times, m_pairBaselineSec, QString("mean"));
     }
 
@@ -485,7 +485,7 @@ void RtAveragingWorker::generateEvoked(double dTriggerType)
     evoked.nave = m_mapStimAve[dTriggerType].size();
 
     //Add new data to evoked data set
-    if(iEvokedIdx != -1) {
+    if (iEvokedIdx != -1) {
         //Evoked data is already present
         m_stimEvokedSet.evoked[iEvokedIdx] = evoked;
     } else {
@@ -526,12 +526,12 @@ RtAveraging::RtAveraging(quint32 numAverages,
                          quint32 iBaselineToSecs,
                          quint32 iTriggerIndex,
                          FiffInfo::SPtr pFiffInfo,
-                         QObject *parent)
+                         QObject* parent)
 : QObject(parent)
 {
     qRegisterMetaType<Eigen::MatrixXd>("Eigen::MatrixXd");
 
-    RtAveragingWorker *worker = new RtAveragingWorker(numAverages,
+    RtAveragingWorker* worker = new RtAveragingWorker(numAverages,
                                                       iPreStimSamples,
                                                       iPostStimSamples,
                                                       iBaselineFromSecs,
@@ -580,7 +580,7 @@ RtAveraging::~RtAveraging()
 
 //=============================================================================================================
 
-void RtAveraging::append(const MatrixXd &data)
+void RtAveraging::append(const MatrixXd& data)
 {
     emit operate(data);
 }
@@ -588,7 +588,7 @@ void RtAveraging::append(const MatrixXd &data)
 //=============================================================================================================
 
 void RtAveraging::handleResults(const FiffEvokedSet& evokedStimSet,
-                          const QStringList &lResponsibleTriggerTypes)
+                                const QStringList& lResponsibleTriggerTypes)
 {
     emit evokedStim(evokedStimSet,
                     lResponsibleTriggerTypes);
@@ -606,7 +606,7 @@ void RtAveraging::restart(quint32 numAverages,
 {
     stop();
 
-    RtAveragingWorker *worker = new RtAveragingWorker(numAverages,
+    RtAveragingWorker* worker = new RtAveragingWorker(numAverages,
                                                       iPreStimSamples,
                                                       iPostStimSamples,
                                                       iBaselineFromSecs,
@@ -693,7 +693,7 @@ void RtAveraging::setTriggerChIndx(qint32 idx)
 
 //=============================================================================================================
 
-void RtAveraging::setArtifactReduction(const QMap<QString,double>& mapThresholds)
+void RtAveraging::setArtifactReduction(const QMap<QString, double>& mapThresholds)
 {
     emit averageArtifactReductionChanged(mapThresholds);
 }

@@ -45,7 +45,7 @@ using namespace UTILSLIB;
 
 //=============================================================================================================
 
-int main(int argc, char *argv[])
+int main(int argc, char* argv[])
 {
     qInstallMessageHandler(MNELogger::customLogWriter);
     QCoreApplication app(argc, argv);
@@ -65,7 +65,10 @@ int main(int argc, char *argv[])
     parser.process(app);
 
     QString rawFile = parser.value(rawOpt);
-    if (rawFile.isEmpty()) { qCritical("--raw is required."); return 1; }
+    if (rawFile.isEmpty()) {
+        qCritical("--raw is required.");
+        return 1;
+    }
 
     // Open file for update
     QFile file(rawFile);
@@ -77,7 +80,7 @@ int main(int argc, char *argv[])
 
     // Scan directory for FIFF_DATA_SKIP tags
     int nToggled = 0;
-    const QList<FiffDirEntry::SPtr> &dirEntries = stream->dir();
+    const QList<FiffDirEntry::SPtr>& dirEntries = stream->dir();
 
     for (int i = 0; i < dirEntries.size(); ++i) {
         if (dirEntries[i]->kind == FIFF_DATA_SKIP) {
@@ -102,8 +105,8 @@ int main(int argc, char *argv[])
             // Write as big-endian int32
             stream->writeRawData(reinterpret_cast<const char*>(&beVal), sizeof(fiff_int_t));
 
-            qInfo("  Tag at pos %lld: skip count %d -> %d" ,
-                   static_cast<long long>(dirEntries[i]->pos), skipCount, newSkipCount);
+            qInfo("  Tag at pos %lld: skip count %d -> %d",
+                  static_cast<long long>(dirEntries[i]->pos), skipCount, newSkipCount);
             ++nToggled;
         }
     }
@@ -111,9 +114,9 @@ int main(int argc, char *argv[])
     stream->close();
 
     if (nToggled == 0) {
-        qInfo("No FIFF_DATA_SKIP tags found in %s" , qPrintable(rawFile));
+        qInfo("No FIFF_DATA_SKIP tags found in %s", qPrintable(rawFile));
     } else {
-        qInfo("Toggled %d skip tag(s) in %s" , nToggled, qPrintable(rawFile));
+        qInfo("Toggled %d skip tag(s) in %s", nToggled, qPrintable(rawFile));
     }
 
     return 0;

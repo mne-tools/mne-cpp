@@ -54,14 +54,14 @@ class SCMEASSHARED_EXPORT RealTimeCov : public Measurement
     Q_OBJECT
 
 public:
-    typedef QSharedPointer<RealTimeCov> SPtr;               /**< Shared pointer type for RealTimeCov. */
-    typedef QSharedPointer<const RealTimeCov> ConstSPtr;    /**< Const shared pointer type for RealTimeCov. */
+    typedef QSharedPointer<RealTimeCov> SPtr;            /**< Shared pointer type for RealTimeCov. */
+    typedef QSharedPointer<const RealTimeCov> ConstSPtr; /**< Const shared pointer type for RealTimeCov. */
 
     //=========================================================================================================
     /**
      * Constructs a RealTimeCov.
      */
-    explicit RealTimeCov(QObject *parent = 0);
+    explicit RealTimeCov(QObject* parent = 0);
 
     //=========================================================================================================
     /**
@@ -111,12 +111,12 @@ public:
     inline bool isInitialized() const;
 
 private:
-    mutable QMutex          m_qMutex;       /**< Mutex to ensure thread safety. */
+    mutable QMutex m_qMutex; /**< Mutex to ensure thread safety. */
 
-    FIFFLIB::FiffCov::SPtr  m_pFiffCov;     /**< Covariance data set. */
-    FIFFLIB::FiffInfo::SPtr m_pFiffInfo;    /**< The Fiff Info. */
+    FIFFLIB::FiffCov::SPtr m_pFiffCov;   /**< Covariance data set. */
+    FIFFLIB::FiffInfo::SPtr m_pFiffInfo; /**< The Fiff Info. */
 
-    bool                    m_bInitialized; /**< If values are stored.*/
+    bool m_bInitialized; /**< If values are stored.*/
 };
 
 //=============================================================================================================

@@ -51,7 +51,6 @@ class SCSHAREDSHARED_EXPORT PluginConnectorConnectionWidget : public QWidget
     Q_OBJECT
 
 public:
-
     //=========================================================================================================
     /**
      * Constructs a PluginConnectorConnectionWidget which is a child of parent.
@@ -59,7 +58,7 @@ public:
      * @param[in] parent pointer to parent widget; If parent is 0, the new PluginConnectorConnectionWidget becomes a window. If parent is another widget, PluginConnectorConnectionWidget becomes a child window inside parent. PluginConnectorConnectionWidget is deleted when its parent is deleted.
      * @param[in] pPluginConnectorConnection a pointer to the corresponding Connector Connection.
      */
-    PluginConnectorConnectionWidget(PluginConnectorConnection* pPluginConnectorConnection, QWidget *parent = 0);
+    PluginConnectorConnectionWidget(PluginConnectorConnection* pPluginConnectorConnection, QWidget* parent = 0);
 
     //=========================================================================================================
     /**
@@ -74,18 +73,18 @@ public:
      *
      * @param[in] p_sCurrentReceiver   the receivers name.
      */
-    void updateReceiver(const QString &p_sCurrentReceiver);
+    void updateReceiver(const QString& p_sCurrentReceiver);
 
 signals:
 
 public slots:
 
 private:
-    QLabel* m_pLabel;                                           /**< Holds the start up widget label. */
+    QLabel* m_pLabel; /**< Holds the start up widget label. */
 
-    PluginConnectorConnection*  m_pPluginConnectorConnection;   /**< a pointer to corresponding PluginConnectorConnection.*/
+    PluginConnectorConnection* m_pPluginConnectorConnection; /**< a pointer to corresponding PluginConnectorConnection.*/
 
-    QMap<QString, QComboBox*> m_qMapSenderToReceiverConnections;/**< To each output a possible list of inputs. */
+    QMap<QString, QComboBox*> m_qMapSenderToReceiverConnections; /**< To each output a possible list of inputs. */
 };
 } // NAMESPACE
 

@@ -43,8 +43,14 @@
 class BrainTreeModel;
 class BrainView;
 
-namespace DISP3DLIB { class MultimodalScene; }
-namespace MNELIB    { class MNEBem; }
+namespace DISP3DLIB
+{
+class MultimodalScene;
+}
+namespace MNELIB
+{
+class MNEBem;
+}
 
 //=============================================================================================================
 // DEFINE NAMESPACE MNEALIGN
@@ -57,7 +63,11 @@ namespace MNEALIGN
 /**
  * @brief Camera focus mode for the 3-D viewer.
  */
-enum class CameraFocus { Brain, Pointer };
+enum class CameraFocus
+{
+    Brain,
+    Pointer
+};
 
 //=============================================================================================================
 /**
@@ -131,25 +141,43 @@ public:
     void setPenStation(int station);
 
     /** @return Current camera preset index. */
-    int         cameraPreset() const { return m_cameraPreset; }
+    int cameraPreset() const
+    {
+        return m_cameraPreset;
+    }
 
     /** @return Current camera focus mode. */
-    CameraFocus cameraFocus()  const { return m_cameraFocus; }
+    CameraFocus cameraFocus() const
+    {
+        return m_cameraFocus;
+    }
 
     /** @return The underlying multimodal scene. */
     DISP3DLIB::MultimodalScene* scene() const;
 
     /** @return The loaded BEM data (may be null). */
-    std::shared_ptr<MNELIB::MNEBem> bem() const { return m_pBem; }
+    std::shared_ptr<MNELIB::MNEBem> bem() const
+    {
+        return m_pBem;
+    }
 
     /** @return Combined device→MRI transform (device→head × head→MRI). */
-    QMatrix4x4 trackerToMri() const { return m_headToMri * m_deviceToHead; }
+    QMatrix4x4 trackerToMri() const
+    {
+        return m_headToMri * m_deviceToHead;
+    }
 
     /** @return Device→Head transform (runtime, not stored in trans.fif). */
-    QMatrix4x4 deviceToHead() const { return m_deviceToHead; }
+    QMatrix4x4 deviceToHead() const
+    {
+        return m_deviceToHead;
+    }
 
     /** @return Head→MRI coregistration (stored in trans.fif). */
-    QMatrix4x4 headToMri() const { return m_headToMri; }
+    QMatrix4x4 headToMri() const
+    {
+        return m_headToMri;
+    }
 
     /**
      * @brief Notify that the digitizer connection state changed.
@@ -180,7 +208,10 @@ public:
     void clearHeadToMriOverride();
 
     /** @return true if an external head→MRI override is currently in effect. */
-    bool hasHeadToMriOverride() const { return m_haveHeadToMriOverride; }
+    bool hasHeadToMriOverride() const
+    {
+        return m_haveHeadToMriOverride;
+    }
 
 signals:
     /** @brief Emitted when the viewport count changes. */
@@ -207,29 +238,30 @@ private:
     void recomputeAlignment();
     void applyViewConfiguration();
 
-    AcquiredPoints*                                m_pPoints = nullptr;
-    std::unique_ptr<DISP3DLIB::MultimodalScene>    m_pScene;
-    std::shared_ptr<MNELIB::MNEBem>                m_pBem;
-    int                                            m_cameraPreset = 1;
-    CameraFocus                                    m_cameraFocus = CameraFocus::Brain;
-    int                                            m_penStation = 1;
+    AcquiredPoints* m_pPoints = nullptr;
+    std::unique_ptr<DISP3DLIB::MultimodalScene> m_pScene;
+    std::shared_ptr<MNELIB::MNEBem> m_pBem;
+    int m_cameraPreset = 1;
+    CameraFocus m_cameraFocus = CameraFocus::Brain;
+    int m_penStation = 1;
 
     // Per-station live tracker state
-    struct StationPose {
-        QVector3D   position;
+    struct StationPose
+    {
+        QVector3D position;
         QQuaternion orientation;
     };
-    bool                                           m_digitizerConnected = false;
-    bool                                           m_liveTrackerDirty = false;
-    QMap<int, StationPose>                         m_stationPoses;
-    QTimer                                         m_liveUpdateTimer;
-    QMatrix4x4                                     m_deviceToHead;  ///< runtime offset, not in trans.fif
-    QMatrix4x4                                     m_headToMri;     ///< coregistration for trans.fif
-    bool                                           m_haveHeadToMriOverride = false;
-    QMatrix4x4                                     m_headToMriOverride;
+    bool m_digitizerConnected = false;
+    bool m_liveTrackerDirty = false;
+    QMap<int, StationPose> m_stationPoses;
+    QTimer m_liveUpdateTimer;
+    QMatrix4x4 m_deviceToHead; ///< runtime offset, not in trans.fif
+    QMatrix4x4 m_headToMri;    ///< coregistration for trans.fif
+    bool m_haveHeadToMriOverride = false;
+    QMatrix4x4 m_headToMriOverride;
 
-    QPointer<BrainView>                            m_pBrainView;
-    QPointer<BrainTreeModel>                       m_pBrainModel;
+    QPointer<BrainView> m_pBrainView;
+    QPointer<BrainTreeModel> m_pBrainModel;
 };
 
 } // namespace MNEALIGN

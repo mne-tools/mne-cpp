@@ -46,7 +46,7 @@ using namespace DISPLIB;
 
 MinimumNormSettingsView::MinimumNormSettingsView(const QString& sSettingsPath,
                                                  const QString& sMethod,
-                                                 QWidget *parent,
+                                                 QWidget* parent,
                                                  Qt::WindowFlags f)
 : AbstractView(parent, f)
 , m_pUi(new Ui::MinimumNormSettingsViewWidget)
@@ -67,8 +67,7 @@ MinimumNormSettingsView::MinimumNormSettingsView(const QString& sSettingsPath,
     connect(m_pUi->m_pushButton_browseModelCheckpoint, &QPushButton::clicked,
             this, &MinimumNormSettingsView::onBrowseModelCheckpointClicked);
 
-    if(!m_sMethod.isEmpty())
-    {
+    if (!m_sMethod.isEmpty()) {
         m_pUi->m_comboBox_method->setCurrentIndex(m_pUi->m_comboBox_method->findText(m_sMethod));
         m_pUi->m_comboBox_method->setEnabled(false);
     }
@@ -94,8 +93,8 @@ MinimumNormSettingsView::~MinimumNormSettingsView()
 
 void MinimumNormSettingsView::setTriggerTypes(const QStringList& lTriggerTypes)
 {
-    for(const QString &sTriggerType : lTriggerTypes) {
-        if(m_pUi->m_comboBox_triggerType->findText(sTriggerType) == -1) {
+    for (const QString& sTriggerType : lTriggerTypes) {
+        if (m_pUi->m_comboBox_triggerType->findText(sTriggerType) == -1) {
             m_pUi->m_comboBox_triggerType->addItem(sTriggerType);
         }
     }
@@ -105,7 +104,7 @@ void MinimumNormSettingsView::setTriggerTypes(const QStringList& lTriggerTypes)
 
 void MinimumNormSettingsView::saveSettings()
 {
-    if(m_sSettingsPath.isEmpty()) {
+    if (m_sSettingsPath.isEmpty()) {
         return;
     }
 
@@ -118,14 +117,15 @@ void MinimumNormSettingsView::saveSettings()
 
 void MinimumNormSettingsView::loadSettings()
 {
-    if(m_sSettingsPath.isEmpty()) {
+    if (m_sSettingsPath.isEmpty()) {
         return;
     }
 
     QSettings settings("MNECPP");
     const QString sStored = settings.value(m_sSettingsPath + QString("/MinimumNormSettingsView/modelCheckpoint"),
-                                           QString()).toString();
-    if(!sStored.isEmpty()) {
+                                           QString())
+                                .toString();
+    if (!sStored.isEmpty()) {
         setModelCheckpoint(sStored);
     }
 }
@@ -134,7 +134,7 @@ void MinimumNormSettingsView::loadSettings()
 
 void MinimumNormSettingsView::updateGuiMode(GuiMode mode)
 {
-    switch(mode) {
+    switch (mode) {
         case GuiMode::Clinical:
             break;
         default: // default is research mode
@@ -146,7 +146,7 @@ void MinimumNormSettingsView::updateGuiMode(GuiMode mode)
 
 void MinimumNormSettingsView::updateProcessingMode(ProcessingMode mode)
 {
-    switch(mode) {
+    switch (mode) {
         case ProcessingMode::Offline:
             break;
         default: // default is realtime mode
@@ -166,7 +166,7 @@ void MinimumNormSettingsView::onMethodChanged(const QString& method)
 
 void MinimumNormSettingsView::setModelCheckpoint(const QString& sPath)
 {
-    if(m_sModelCheckpoint == sPath) {
+    if (m_sModelCheckpoint == sPath) {
         return;
     }
     m_sModelCheckpoint = sPath;
@@ -202,7 +202,7 @@ void MinimumNormSettingsView::onBrowseModelCheckpointClicked()
                                                        tr("Select CMNE model checkpoint"),
                                                        sStartDir,
                                                        tr("ONNX model (*.onnx);;All files (*)"));
-    if(!sFile.isEmpty()) {
+    if (!sFile.isEmpty()) {
         setModelCheckpoint(sFile);
     }
 }
@@ -225,5 +225,4 @@ void MinimumNormSettingsView::onTimePointValueChanged()
 
 void MinimumNormSettingsView::clearView()
 {
-
 }

@@ -71,14 +71,14 @@ namespace FIFFLIB
 class FIFFSHARED_EXPORT FiffIO : public QObject
 {
 public:
-//    enum Type {
-//        _RAW = FIFFB_RAW_DATA, //102
-//        _EVOKED = FIFFB_EVOKED, //104
-//        _PROJ = FIFFB_PROJ, //313
-//        _FWD = FIFFB_MNE_FORWARD_SOLUTION, //352
-//        _COV = FIFFB_MNE_COV, //355
-//        _NAMED_MATRIX = FIFFB_MNE_NAMED_MATRIX //357
-//    };
+    //    enum Type {
+    //        _RAW = FIFFB_RAW_DATA, //102
+    //        _EVOKED = FIFFB_EVOKED, //104
+    //        _PROJ = FIFFB_PROJ, //313
+    //        _FWD = FIFFB_MNE_FORWARD_SOLUTION, //352
+    //        _COV = FIFFB_MNE_COV, //355
+    //        _NAMED_MATRIX = FIFFB_MNE_NAMED_MATRIX //357
+    //    };
 
     //=========================================================================================================
     /**
@@ -202,19 +202,20 @@ public:
      */
 
     friend std::ostream& operator<<(std::ostream& out,
-                                    const FiffIO &p_fiffIO) {
+                                    const FiffIO& p_fiffIO)
+    {
         out << "\n\n---------------------- Fiff data read summary ---------------------- " << std::endl;
         out << "fiff data contains" << std::endl;
         out << p_fiffIO.m_qlistRaw.size() << " raw data sets" << std::endl;
         out << p_fiffIO.m_qlistEvoked.size() << " evoked sets" << std::endl;
-//        out << p_fiffIO.m_qlistFwd.size() << " forward solutions" << std::endl;
+        //        out << p_fiffIO.m_qlistFwd.size() << " forward solutions" << std::endl;
         return out;
     }
 
 public:
-    QList<QSharedPointer<FiffRawData> >     m_qlistRaw;     /**< List of raw data sets. */
-    QList<QSharedPointer<FiffEvoked> >      m_qlistEvoked;  /**< List of evoked data sets. */
-//    QList<QSharedPointer<MNEForwardSolution> > m_qlistFwd;
+    QList<QSharedPointer<FiffRawData>> m_qlistRaw;   /**< List of raw data sets. */
+    QList<QSharedPointer<FiffEvoked>> m_qlistEvoked; /**< List of evoked data sets. */
+    //    QList<QSharedPointer<MNEForwardSolution> > m_qlistFwd;
     //FiffCov, MNEInverseOperator, FsAnnotationSet,
 };
 

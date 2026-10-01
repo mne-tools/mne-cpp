@@ -141,9 +141,9 @@ void TestMNEMath::testGcd()
     // Standard cases
     QCOMPARE(Numerics::gcd(12, 8), 4);
     QCOMPARE(Numerics::gcd(100, 75), 25);
-    QCOMPARE(Numerics::gcd(17, 13), 1);    // coprime
-    QCOMPARE(Numerics::gcd(0, 5), 5);      // zero case
-    QCOMPARE(Numerics::gcd(7, 7), 7);      // equal
+    QCOMPARE(Numerics::gcd(17, 13), 1); // coprime
+    QCOMPARE(Numerics::gcd(0, 5), 5);   // zero case
+    QCOMPARE(Numerics::gcd(7, 7), 7);   // equal
     QCOMPARE(Numerics::gcd(1024, 512), 512);
     QCOMPARE(Numerics::gcd(48, 18), 6);
 }
@@ -184,7 +184,7 @@ void TestMNEMath::testConditionNumber()
     // Ill-conditioned matrix
     MatrixXd A(2, 2);
     A << 1.0, 0.0,
-         0.0, 1e-10;
+        0.0, 1e-10;
     double c2 = Linalg::getConditionNumber(A, s);
     QVERIFY(c2 > 1e9);
 }
@@ -207,8 +207,8 @@ void TestMNEMath::testGetWhitener()
     // Create a simple 3x3 symmetric positive definite matrix (covariance)
     MatrixXd cov(3, 3);
     cov << 4.0, 2.0, 0.0,
-           2.0, 3.0, 1.0,
-           0.0, 1.0, 2.0;
+        2.0, 3.0, 1.0,
+        0.0, 1.0, 2.0;
 
     VectorXd eig;
     MatrixXd eigvec;
@@ -281,7 +281,7 @@ void TestMNEMath::testMakeBlockDiag()
     // Create a 2x4 matrix => 2 blocks of size 2x2
     MatrixXd A(2, 4);
     A << 1, 2, 3, 4,
-         5, 6, 7, 8;
+        5, 6, 7, 8;
 
     SparseMatrix<double> bd = Linalg::make_block_diag(A, 2);
 
@@ -323,15 +323,15 @@ void TestMNEMath::testRank()
     // Full rank 3x3
     MatrixXd A(3, 3);
     A << 1, 0, 0,
-         0, 2, 0,
-         0, 0, 3;
+        0, 2, 0,
+        0, 0, 3;
     QCOMPARE(Linalg::rank(A), (qint32)3);
 
     // Rank deficient: last row is sum of first two
     MatrixXd B(3, 3);
     B << 1, 0, 0,
-         0, 1, 0,
-         1, 1, 0;
+        0, 1, 0,
+        1, 1, 0;
     QCOMPARE(Linalg::rank(B), (qint32)2);
 
     // Zero matrix
@@ -355,7 +355,7 @@ void TestMNEMath::testRescaleMean()
 
     RowVectorXf times(10);
     for (int i = 0; i < 10; ++i)
-        times(i) = -0.3f + 0.1f * i;  // -0.3 to 0.6
+        times(i) = -0.3f + 0.1f * i; // -0.3 to 0.6
 
     QPair<float, float> baseline(-0.3f, 0.0f);
 
@@ -421,7 +421,7 @@ void TestMNEMath::testRescalePercent()
     data.setOnes();
     data *= 4.0;
     // Make some columns different to see percent change
-    data(0, 5) = 8.0;  // 100% increase from baseline mean of 4
+    data(0, 5) = 8.0; // 100% increase from baseline mean of 4
 
     RowVectorXf times(10);
     for (int i = 0; i < 10; ++i)
@@ -461,7 +461,7 @@ void TestMNEMath::testSortAscending()
     VectorXd v(5);
     v << 5.0, 3.0, 1.0, 4.0, 2.0;
 
-    VectorXi idx = Linalg::sort<double>(v, false);  // ascending
+    VectorXi idx = Linalg::sort<double>(v, false); // ascending
 
     // After sort, v should be: 1, 2, 3, 4, 5
     QVERIFY(std::abs(v(0) - 1.0) < m_dEpsilon);
@@ -481,7 +481,7 @@ void TestMNEMath::testSortDescending()
     VectorXd v(5);
     v << 5.0, 3.0, 1.0, 4.0, 2.0;
 
-    VectorXi idx = Linalg::sort<double>(v, true);  // descending
+    VectorXi idx = Linalg::sort<double>(v, true); // descending
 
     QVERIFY(std::abs(v(0) - 5.0) < m_dEpsilon);
     QVERIFY(std::abs(v(1) - 4.0) < m_dEpsilon);
@@ -502,9 +502,9 @@ void TestMNEMath::testSortWithMatrix()
 
     MatrixXd mat(2, 3);
     mat << 10, 20, 30,
-           40, 50, 60;
+        40, 50, 60;
 
-    VectorXi idx = Linalg::sort<double>(v, mat, false);  // ascending
+    VectorXi idx = Linalg::sort<double>(v, mat, false); // ascending
 
     // After sort: v = [1, 2, 3], mat columns reordered accordingly
     QVERIFY(std::abs(v(0) - 1.0) < m_dEpsilon);
@@ -525,7 +525,7 @@ void TestMNEMath::testSortrows()
     triplets.push_back(Triplet<double>(1, 3, 20.0));
     triplets.push_back(Triplet<double>(2, 2, 30.0));
 
-    auto sorted = Linalg::sortrows<double>(triplets, 0);  // sort by row
+    auto sorted = Linalg::sortrows<double>(triplets, 0); // sort by row
 
     QCOMPARE((int)sorted.size(), 3);
     QCOMPARE(sorted[0].row(), 1);
@@ -622,8 +622,8 @@ void TestMNEMath::testPinv()
     // Rectangular matrix: A * pinv(A) * A ≈ A (Moore-Penrose condition)
     MatrixXd A(3, 2);
     A << 1, 2,
-         3, 4,
-         5, 6;
+        3, 4,
+        5, 6;
     MatrixXd A_pinv = Linalg::pinv<double>(A);
     QCOMPARE(A_pinv.rows(), (Eigen::Index)2);
     QCOMPARE(A_pinv.cols(), (Eigen::Index)3);
@@ -639,8 +639,8 @@ void TestMNEMath::testPinvRankDeficient()
     // Rank-1 matrix
     MatrixXd A(3, 3);
     A << 1, 2, 3,
-         2, 4, 6,
-         3, 6, 9;
+        2, 4, 6,
+        3, 6, 9;
 
     MatrixXd A_pinv = Linalg::pinv<double>(A);
 

@@ -62,7 +62,7 @@ namespace RTPROCESSINGLIB
  *
  * @return A list of transformed Eigen matrices.
  */
-DSPSHARED_EXPORT QList<Eigen::MatrixXi> toEventMatrix(QMap<int,QList<QPair<int,double> > > mapTriggers);
+DSPSHARED_EXPORT QList<Eigen::MatrixXi> toEventMatrix(QMap<int, QList<QPair<int, double>>> mapTriggers);
 
 //=========================================================================================================
 /**
@@ -79,12 +79,12 @@ DSPSHARED_EXPORT QList<Eigen::MatrixXi> toEventMatrix(QMap<int,QList<QPair<int,d
  * @return     This map holds the indices of the channels which are to be read from data. For each
  *                   index/channel the found triggersand corresponding signal values are written to the value of the map.
  */
-DSPSHARED_EXPORT QMap<int, QList<QPair<int, double> > > detectTriggerFlanksMax(const Eigen::MatrixXd &data,
-                                                                                       const QList<int>& lTriggerChannels,
-                                                                                       int iOffsetIndex,
-                                                                                       double dThreshold,
-                                                                                       bool bRemoveOffset,
-                                                                                       int iBurstLengthSamp = 100);
+DSPSHARED_EXPORT QMap<int, QList<QPair<int, double>>> detectTriggerFlanksMax(const Eigen::MatrixXd& data,
+                                                                             const QList<int>& lTriggerChannels,
+                                                                             int iOffsetIndex,
+                                                                             double dThreshold,
+                                                                             bool bRemoveOffset,
+                                                                             int iBurstLengthSamp = 100);
 
 //=========================================================================================================
 /**
@@ -99,12 +99,12 @@ DSPSHARED_EXPORT QMap<int, QList<QPair<int, double> > > detectTriggerFlanksMax(c
  *
  * @return     This list holds the found trigger indices and corresponding signal values.
  */
-DSPSHARED_EXPORT QList<QPair<int,double> > detectTriggerFlanksMax(const Eigen::MatrixXd &data,
-                                                                          int iTriggerChannelIdx,
-                                                                          int iOffsetIndex,
-                                                                          double dThreshold,
-                                                                          bool bRemoveOffset,
-                                                                          int iBurstLengthSamp = 100);
+DSPSHARED_EXPORT QList<QPair<int, double>> detectTriggerFlanksMax(const Eigen::MatrixXd& data,
+                                                                  int iTriggerChannelIdx,
+                                                                  int iOffsetIndex,
+                                                                  double dThreshold,
+                                                                  bool bRemoveOffset,
+                                                                  int iBurstLengthSamp = 100);
 
 //=========================================================================================================
 /**
@@ -120,13 +120,13 @@ DSPSHARED_EXPORT QList<QPair<int,double> > detectTriggerFlanksMax(const Eigen::M
  *
  * @return     This map holds the indices of the channels which are to be read from data. For each index/channel the found triggers and corresponding signal values are written to the value of the map.
  */
-DSPSHARED_EXPORT QMap<int,QList<QPair<int,double> > > detectTriggerFlanksGrad(const Eigen::MatrixXd &data,
-                                                                                      const QList<int>& lTriggerChannels,
-                                                                                      int iOffsetIndex,
-                                                                                      double dThreshold,
-                                                                                      bool bRemoveOffset,
-                                                                                      const QString& type,
-                                                                                      int iBurstLengthSamp = 100);
+DSPSHARED_EXPORT QMap<int, QList<QPair<int, double>>> detectTriggerFlanksGrad(const Eigen::MatrixXd& data,
+                                                                              const QList<int>& lTriggerChannels,
+                                                                              int iOffsetIndex,
+                                                                              double dThreshold,
+                                                                              bool bRemoveOffset,
+                                                                              const QString& type,
+                                                                              int iBurstLengthSamp = 100);
 
 //=========================================================================================================
 /**
@@ -142,13 +142,13 @@ DSPSHARED_EXPORT QMap<int,QList<QPair<int,double> > > detectTriggerFlanksGrad(co
  *
  * @return     This list holds the found trigger indices and corresponding signal values.
  */
-DSPSHARED_EXPORT QList<QPair<int,double> > detectTriggerFlanksGrad(const Eigen::MatrixXd &data,
-                                                                           int iTriggerChannelIdx,
-                                                                            int iOffsetIndex,
-                                                                           double dThreshold,
-                                                                           bool bRemoveOffset,
-                                                                           const QString& type,
-                                                                           int iBurstLengthSamp = 100);
+DSPSHARED_EXPORT QList<QPair<int, double>> detectTriggerFlanksGrad(const Eigen::MatrixXd& data,
+                                                                   int iTriggerChannelIdx,
+                                                                   int iOffsetIndex,
+                                                                   double dThreshold,
+                                                                   bool bRemoveOffset,
+                                                                   const QString& type,
+                                                                   int iBurstLengthSamp = 100);
 
 //=============================================================================================================
 // INLINE DEFINITIONS

@@ -59,8 +59,8 @@ bool EEGoSportsProducer::init(bool bWriteDriverDebugToFile,
                               bool bMeasureImpedance)
 {
     //Initialise device
-    if(m_pEEGoSportsDriver->initDevice(bWriteDriverDebugToFile,
-                                       bMeasureImpedance)) {
+    if (m_pEEGoSportsDriver->initDevice(bWriteDriverDebugToFile,
+                                        bMeasureImpedance)) {
         m_bIsConnected = true;
     } else {
         m_bIsConnected = false;
@@ -82,9 +82,7 @@ void EEGoSportsProducer::start(int iSamplesPerBlock,
                                bool bMeasureImpedance)
 {
     //Initialise device
-    if(m_bIsConnected && m_pEEGoSportsDriver->startRecording(iSamplesPerBlock,
-                                iSamplingFrequency,
-                                bMeasureImpedance)) {
+    if (m_bIsConnected && m_pEEGoSportsDriver->startRecording(iSamplesPerBlock, iSamplingFrequency, bMeasureImpedance)) {
         QThread::start();
     }
 }
@@ -115,9 +113,9 @@ void EEGoSportsProducer::run()
 {
     MatrixXd matRawBuffer;
 
-    while(!isInterruptionRequested()) {
+    while (!isInterruptionRequested()) {
         //Get the EEG data out of the device buffer and send it to main thread
-        if(m_pEEGoSportsDriver->getSampleMatrixValue(matRawBuffer)) {
+        if (m_pEEGoSportsDriver->getSampleMatrixValue(matRawBuffer)) {
             m_pEEGoSports->setSampleData(matRawBuffer);
         }
     }

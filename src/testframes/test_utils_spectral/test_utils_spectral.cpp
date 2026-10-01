@@ -64,7 +64,7 @@ private slots:
     void testCalculateFFTFreqs()
     {
         VectorXd freqs = Spectral::calculateFFTFreqs(128, 1000.0);
-        QCOMPARE(freqs.size(), 65);  // N/2+1 (half spectrum)
+        QCOMPARE(freqs.size(), 65); // N/2+1 (half spectrum)
         // First element is DC = 0 Hz
         QVERIFY(std::abs(freqs(0)) < 1e-10);
         // Frequency resolution is sFreq/Nfft = 1000/128 ≈ 7.8125
@@ -74,7 +74,7 @@ private slots:
     void testCalculateFFTFreqs256()
     {
         VectorXd freqs = Spectral::calculateFFTFreqs(256, 500.0);
-        QCOMPARE(freqs.size(), 129);  // N/2+1 (half spectrum)
+        QCOMPARE(freqs.size(), 129); // N/2+1 (half spectrum)
         QVERIFY(std::abs(freqs(0)) < 1e-10);
     }
 
@@ -101,7 +101,7 @@ private slots:
         MatrixXd tapers = tapResult.first;
 
         MatrixXcd result = Spectral::computeTaperedSpectraRow(data, tapers, N);
-        QCOMPARE(result.cols(), int(floor(N / 2.0)) + 1);  // half spectrum
+        QCOMPARE(result.cols(), int(floor(N / 2.0)) + 1); // half spectrum
         QCOMPARE(result.rows(), tapers.rows());
     }
 
@@ -118,7 +118,7 @@ private slots:
             data, tapers, iNfft, false /* sequential */);
         QCOMPARE(result.size(), nChannels);
         for (int ch = 0; ch < nChannels; ++ch) {
-            QCOMPARE(result[ch].cols(), int(floor(iNfft / 2.0)) + 1);  // half spectrum
+            QCOMPARE(result[ch].cols(), int(floor(iNfft / 2.0)) + 1); // half spectrum
         }
     }
 
@@ -146,7 +146,7 @@ private slots:
         RowVectorXd psd = Spectral::psdFromTaperedSpectra(
             tapSpectra, tapResult.second, N, 1000.0);
 
-        QCOMPARE(psd.size(), int(floor(N / 2.0)) + 1);  // half spectrum
+        QCOMPARE(psd.size(), int(floor(N / 2.0)) + 1); // half spectrum
         // PSD values should be non-negative
         for (int i = 0; i < psd.size(); ++i) {
             QVERIFY(psd(i) >= 0.0);
@@ -168,7 +168,7 @@ private slots:
             tapResult.second, tapResult.second,
             N, 1000.0);
 
-        QCOMPARE(csd.size(), int(floor(N / 2.0)) + 1);  // half spectrum
+        QCOMPARE(csd.size(), int(floor(N / 2.0)) + 1); // half spectrum
     }
 
     void testPsdParseval()
@@ -214,7 +214,7 @@ private slots:
             tapResult.second, tapResult.second,
             N, 1000.0);
 
-        QCOMPARE(csd.size(), int(floor(N / 2.0)) + 1);  // half spectrum
+        QCOMPARE(csd.size(), int(floor(N / 2.0)) + 1); // half spectrum
         // Auto-CSD should have non-negative real parts
         for (int i = 0; i < csd.size(); ++i) {
             QVERIFY(csd(i).real() >= -1e-6);

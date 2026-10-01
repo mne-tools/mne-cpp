@@ -62,28 +62,27 @@ using namespace Eigen;
 FiffCoordTrans::FiffCoordTrans()
 : from(-1)
 , to(-1)
-, trans(MatrixXf::Identity(4,4))
-, invtrans(MatrixXf::Identity(4,4))
+, trans(MatrixXf::Identity(4, 4))
+, invtrans(MatrixXf::Identity(4, 4))
 {
 }
 
 //=============================================================================================================
 
-FiffCoordTrans::FiffCoordTrans(QIODevice &p_IODevice)
+FiffCoordTrans::FiffCoordTrans(QIODevice& p_IODevice)
 : from(-1)
 , to(-1)
-, trans(MatrixXf::Identity(4,4))
-, invtrans(MatrixXf::Identity(4,4))
+, trans(MatrixXf::Identity(4, 4))
+, invtrans(MatrixXf::Identity(4, 4))
 {
-    if(!read(p_IODevice, *this))
-    {
+    if (!read(p_IODevice, *this)) {
         throw std::runtime_error("Coordinate transform not found");
     }
 }
 
 //=============================================================================================================
 
-FiffCoordTrans::FiffCoordTrans(const FiffCoordTrans &p_FiffCoordTrans)
+FiffCoordTrans::FiffCoordTrans(const FiffCoordTrans& p_FiffCoordTrans)
 : from(p_FiffCoordTrans.from)
 , to(p_FiffCoordTrans.to)
 , trans(p_FiffCoordTrans.trans)
@@ -112,8 +111,8 @@ void FiffCoordTrans::clear()
 bool FiffCoordTrans::invert_transform()
 {
     fiff_int_t from_new = this->to;
-    this->to    = this->from;
-    this->from  = from_new;
+    this->to = this->from;
+    this->from = from_new;
     this->trans = this->trans.inverse().eval();
     this->invtrans = this->invtrans.inverse().eval();
 
@@ -127,7 +126,7 @@ bool FiffCoordTrans::read(QIODevice& p_IODevice, FiffCoordTrans& p_Trans)
     FiffStream::SPtr pStream(new FiffStream(&p_IODevice));
 
     qInfo("Reading coordinate transform from %s...\n", pStream->streamName().toUtf8().constData());
-    if(!pStream->open())
+    if (!pStream->open())
         return false;
 
     //
@@ -139,11 +138,9 @@ bool FiffCoordTrans::read(QIODevice& p_IODevice, FiffCoordTrans& p_Trans)
     //
     //   Get the MRI <-> head coordinate transformation
     //
-    for ( qint32 k = 0; k < pStream->dir().size(); ++k )
-    {
-        if ( pStream->dir()[k]->kind == FIFF_COORD_TRANS )
-        {
-            pStream->read_tag(t_pTag,pStream->dir()[k]->pos);
+    for (qint32 k = 0; k < pStream->dir().size(); ++k) {
+        if (pStream->dir()[k]->kind == FIFF_COORD_TRANS) {
+            pStream->read_tag(t_pTag, pStream->dir()[k]->pos);
             p_Trans = t_pTag->toCoordTrans();
             success = true;
         }
@@ -154,7 +151,7 @@ bool FiffCoordTrans::read(QIODevice& p_IODevice, FiffCoordTrans& p_Trans)
 
 //=============================================================================================================
 
-void FiffCoordTrans::write(QIODevice &qIODevice)
+void FiffCoordTrans::write(QIODevice& qIODevice)
 {
     // Create the file and save the essentials
     FiffStream::SPtr pStream = FiffStream::start_file(qIODevice);
@@ -176,13 +173,13 @@ void FiffCoordTrans::writeToStream(FiffStream* pStream)
 MatrixX3f FiffCoordTrans::apply_trans(const MatrixX3f& rr, bool do_move) const
 {
     MatrixX4f rr_ones(rr.rows(), 4);
-    if(do_move) {
+    if (do_move) {
         rr_ones.setOnes();
     } else {
         rr_ones.setZero();
     }
-    rr_ones.block(0,0,rr.rows(),3) = rr;
-    return rr_ones*trans.block<3,4>(0,0).transpose();
+    rr_ones.block(0, 0, rr.rows(), 3) = rr;
+    return rr_ones * trans.block<3, 4>(0, 0).transpose();
 }
 
 //=============================================================================================================
@@ -190,36 +187,52 @@ MatrixX3f FiffCoordTrans::apply_trans(const MatrixX3f& rr, bool do_move) const
 MatrixX3f FiffCoordTrans::apply_inverse_trans(const MatrixX3f& rr, bool do_move) const
 {
     MatrixX4f rr_ones(rr.rows(), 4);
-    if(do_move) {
+    if (do_move) {
         rr_ones.setOnes();
     } else {
         rr_ones.setZero();
     }
-    rr_ones.block(0,0,rr.rows(),3) = rr;
-    return rr_ones*invtrans.block<3,4>(0,0).transpose();
+    rr_ones.block(0, 0, rr.rows(), 3) = rr;
+    return rr_ones * invtrans.block<3, 4>(0, 0).transpose();
 }
 
 //=============================================================================================================
 
-QString FiffCoordTrans::frame_name (int frame)
+QString FiffCoordTrans::frame_name(int frame)
 {
-    switch(frame) {
-        case FIFFV_COORD_UNKNOWN: return "unknown";
-        case FIFFV_COORD_DEVICE: return "MEG device";
-        case FIFFV_COORD_ISOTRAK: return "isotrak";
-        case FIFFV_COORD_HPI: return "hpi";
-        case FIFFV_COORD_HEAD: return "head";
-        case FIFFV_COORD_MRI: return "MRI (surface RAS)";
-        case FIFFV_MNE_COORD_MRI_VOXEL: return "MRI voxel";
-        case FIFFV_COORD_MRI_SLICE: return "MRI slice";
-        case FIFFV_COORD_MRI_DISPLAY: return "MRI display";
-        case FIFFV_MNE_COORD_CTF_DEVICE: return "CTF MEG device";
-        case FIFFV_MNE_COORD_CTF_HEAD: return "CTF/4D/KIT head";
-        case FIFFV_MNE_COORD_RAS: return "RAS (non-zero origin)";
-        case FIFFV_MNE_COORD_MNI_TAL: return "MNI Talairach";
-        case FIFFV_MNE_COORD_FS_TAL_GTZ: return "Talairach (MNI z > 0)";
-        case FIFFV_MNE_COORD_FS_TAL_LTZ: return "Talairach (MNI z < 0)";
-        default: return "unknown";
+    switch (frame) {
+        case FIFFV_COORD_UNKNOWN:
+            return "unknown";
+        case FIFFV_COORD_DEVICE:
+            return "MEG device";
+        case FIFFV_COORD_ISOTRAK:
+            return "isotrak";
+        case FIFFV_COORD_HPI:
+            return "hpi";
+        case FIFFV_COORD_HEAD:
+            return "head";
+        case FIFFV_COORD_MRI:
+            return "MRI (surface RAS)";
+        case FIFFV_MNE_COORD_MRI_VOXEL:
+            return "MRI voxel";
+        case FIFFV_COORD_MRI_SLICE:
+            return "MRI slice";
+        case FIFFV_COORD_MRI_DISPLAY:
+            return "MRI display";
+        case FIFFV_MNE_COORD_CTF_DEVICE:
+            return "CTF MEG device";
+        case FIFFV_MNE_COORD_CTF_HEAD:
+            return "CTF/4D/KIT head";
+        case FIFFV_MNE_COORD_RAS:
+            return "RAS (non-zero origin)";
+        case FIFFV_MNE_COORD_MNI_TAL:
+            return "MNI Talairach";
+        case FIFFV_MNE_COORD_FS_TAL_GTZ:
+            return "Talairach (MNI z > 0)";
+        case FIFFV_MNE_COORD_FS_TAL_LTZ:
+            return "Talairach (MNI z < 0)";
+        default:
+            return "unknown";
     }
 }
 
@@ -227,14 +240,14 @@ QString FiffCoordTrans::frame_name (int frame)
 
 FiffCoordTrans::FiffCoordTrans(int from, int to, const Matrix3f& rot, const Vector3f& move)
 {
-    this->trans = MatrixXf::Zero(4,4);
+    this->trans = MatrixXf::Zero(4, 4);
 
     this->from = from;
-    this->to   = to;
+    this->to = to;
 
-    this->trans.block<3,3>(0,0) = rot;
-    this->trans.block<3,1>(0,3) = move;
-    this->trans(3,3) = 1.0f;
+    this->trans.block<3, 3>(0, 0) = rot;
+    this->trans.block<3, 1>(0, 3) = move;
+    this->trans(3, 3) = 1.0f;
 
     FiffCoordTrans::addInverse(*this);
 }
@@ -245,11 +258,11 @@ FiffCoordTrans::FiffCoordTrans(int from, int to, const Matrix4f& matTrans, bool 
 {
     this->trans = matTrans;
     this->from = from;
-    this->to   = to;
+    this->to = to;
 
-    if(bStandard) {
+    if (bStandard) {
         // make sure that it is a standard transform if requested
-        this->trans.row(3) = Vector4f(0,0,0,1).transpose();
+        this->trans.row(3) = Vector4f(0, 0, 0, 1).transpose();
     }
 
     FiffCoordTrans::addInverse(*this);
@@ -257,7 +270,7 @@ FiffCoordTrans::FiffCoordTrans(int from, int to, const Matrix4f& matTrans, bool 
 
 //=============================================================================================================
 
-bool FiffCoordTrans::addInverse(FiffCoordTrans &t)
+bool FiffCoordTrans::addInverse(FiffCoordTrans& t)
 {
     t.invtrans = t.trans.inverse().eval();
     return true;
@@ -271,17 +284,17 @@ void FiffCoordTrans::print() const
     std::cout << (QString("%1 -> %2\n").arg(frame_name(this->from)).arg(frame_name(this->to))).toUtf8().data();
 
     for (int p = 0; p < 3; p++)
-        qDebug("\t% 8.6f % 8.6f % 8.6f\t% 7.2f mm\n", trans(p,0),trans(p,1),trans(p,2),1000*trans(p,3));
-    qDebug("\t% 8.6f % 8.6f % 8.6f   % 7.2f\n",trans(3,0),trans(3,1),trans(3,2),trans(3,3));
+        qDebug("\t% 8.6f % 8.6f % 8.6f\t% 7.2f mm\n", trans(p, 0), trans(p, 1), trans(p, 2), 1000 * trans(p, 3));
+    qDebug("\t% 8.6f % 8.6f % 8.6f   % 7.2f\n", trans(3, 0), trans(3, 1), trans(3, 2), trans(3, 3));
 }
 
 //=============================================================================================================
 
-float FiffCoordTrans::angleTo(Eigen::MatrixX4f  mTransDest)
+float FiffCoordTrans::angleTo(Eigen::MatrixX4f mTransDest)
 {
     MatrixX4f mDevHeadT = this->trans;
-    Matrix3f mRot = mDevHeadT.block(0,0,3,3);
-    Matrix3f mRotNew = mTransDest.block(0,0,3,3);
+    Matrix3f mRot = mDevHeadT.block(0, 0, 3, 3);
+    Matrix3f mRotNew = mTransDest.block(0, 0, 3, 3);
 
     Quaternionf quat(mRot);
     Quaternionf quatNew(mRotNew);
@@ -291,7 +304,7 @@ float FiffCoordTrans::angleTo(Eigen::MatrixX4f  mTransDest)
     // calculate rotation
     Quaternionf quatCompare;
 
-    quatCompare = quat*quatNew.inverse();
+    quatCompare = quat * quatNew.inverse();
     fAngle = quat.angularDistance(quatNew);
     fAngle = fAngle * 180 / M_PI;
 
@@ -300,12 +313,12 @@ float FiffCoordTrans::angleTo(Eigen::MatrixX4f  mTransDest)
 
 //=============================================================================================================
 
-float FiffCoordTrans::translationTo(Eigen::MatrixX4f  mTransDest)
+float FiffCoordTrans::translationTo(Eigen::MatrixX4f mTransDest)
 {
     VectorXf vTrans = this->trans.col(3);
     VectorXf vTransDest = mTransDest.col(3);
 
-    float fMove = (vTrans-vTransDest).norm();
+    float fMove = (vTrans - vTransDest).norm();
     return fMove;
 }
 
@@ -315,9 +328,9 @@ void FiffCoordTrans::apply_trans(float r[3], const FiffCoordTrans& t, bool do_mo
 {
     float res[3];
     for (int j = 0; j < 3; j++) {
-        res[j] = do_move ? t.trans(j,3) : 0.0f;
+        res[j] = do_move ? t.trans(j, 3) : 0.0f;
         for (int k = 0; k < 3; k++)
-            res[j] += t.trans(j,k) * r[k];
+            res[j] += t.trans(j, k) * r[k];
     }
     for (int j = 0; j < 3; j++)
         r[j] = res[j];
@@ -329,9 +342,9 @@ void FiffCoordTrans::apply_inverse_trans(float r[3], const FiffCoordTrans& t, bo
 {
     float res[3];
     for (int j = 0; j < 3; j++) {
-        res[j] = do_move ? t.invtrans(j,3) : 0.0f;
+        res[j] = do_move ? t.invtrans(j, 3) : 0.0f;
         for (int k = 0; k < 3; k++)
-            res[j] += t.invtrans(j,k) * r[k];
+            res[j] += t.invtrans(j, k) * r[k];
     }
     for (int j = 0; j < 3; j++)
         r[j] = res[j];
@@ -372,13 +385,21 @@ FiffCoordTrans FiffCoordTrans::combine(int from, int to, const FiffCoordTrans& t
         const FiffCoordTrans& s2 = (swapped == 0) ? t2 : t1;
 
         if (s1.to == to && s2.from == from) {
-            a = s1; b = s2; found = true;
+            a = s1;
+            b = s2;
+            found = true;
         } else if (s1.from == to && s2.from == from) {
-            a = s1.inverted(); b = s2; found = true;
+            a = s1.inverted();
+            b = s2;
+            found = true;
         } else if (s1.to == to && s2.to == from) {
-            a = s1; b = s2.inverted(); found = true;
+            a = s1;
+            b = s2.inverted();
+            found = true;
         } else if (s1.from == to && s2.to == from) {
-            a = s1.inverted(); b = s2.inverted(); found = true;
+            a = s1.inverted();
+            b = s2.inverted();
+            found = true;
         }
     }
 
@@ -548,7 +569,7 @@ FiffCoordTrans FiffCoordTrans::readFromTag(const FiffTag::UPtr& tag)
 
     qint32* t_pInt32 = (qint32*)tag->data();
     t.from = t_pInt32[0];
-    t.to   = t_pInt32[1];
+    t.to = t_pInt32[1];
 
     float* t_pFloat = (float*)tag->data();
     int count = 0;
@@ -560,7 +581,10 @@ FiffCoordTrans FiffCoordTrans::readFromTag(const FiffTag::UPtr& tag)
             ++count;
         }
     }
-    t.trans(3, 0) = 0.0f; t.trans(3, 1) = 0.0f; t.trans(3, 2) = 0.0f; t.trans(3, 3) = 1.0f;
+    t.trans(3, 0) = 0.0f;
+    t.trans(3, 1) = 0.0f;
+    t.trans(3, 2) = 0.0f;
+    t.trans(3, 3) = 1.0f;
 
     count = 0;
     for (r = 0; r < 3; ++r) {
@@ -570,7 +594,10 @@ FiffCoordTrans FiffCoordTrans::readFromTag(const FiffTag::UPtr& tag)
             ++count;
         }
     }
-    t.invtrans(3, 0) = 0.0f; t.invtrans(3, 1) = 0.0f; t.invtrans(3, 2) = 0.0f; t.invtrans(3, 3) = 1.0f;
+    t.invtrans(3, 0) = 0.0f;
+    t.invtrans(3, 1) = 0.0f;
+    t.invtrans(3, 2) = 0.0f;
+    t.invtrans(3, 3) = 1.0f;
 
     return t;
 }
@@ -613,21 +640,21 @@ FiffCoordTrans FiffCoordTrans::readTransformFromNode(FiffStream::SPtr& stream,
 
 //=============================================================================================================
 
-FiffCoordTrans FiffCoordTrans::procrustesAlign(int   from_frame,
-                                                int   to_frame,
-                                                const Eigen::MatrixXf& fromPts,
-                                                const Eigen::MatrixXf& toPts,
-                                                const Eigen::VectorXf& w,
-                                                float max_diff)
+FiffCoordTrans FiffCoordTrans::procrustesAlign(int from_frame,
+                                               int to_frame,
+                                               const Eigen::MatrixXf& fromPts,
+                                               const Eigen::MatrixXf& toPts,
+                                               const Eigen::VectorXf& w,
+                                               float max_diff)
 {
     int np = fromPts.rows();
 
     /* Calculate centroids and subtract */
     Eigen::Vector3f from0 = fromPts.colwise().mean();
-    Eigen::Vector3f to0   = toPts.colwise().mean();
+    Eigen::Vector3f to0 = toPts.colwise().mean();
 
     Eigen::MatrixXf fromC = fromPts.rowwise() - from0.transpose();
-    Eigen::MatrixXf toC   = toPts.rowwise() - to0.transpose();
+    Eigen::MatrixXf toC = toPts.rowwise() - to0.transpose();
 
     /* Compute the cross-covariance matrix S */
     Eigen::Matrix3f S;
@@ -650,7 +677,7 @@ FiffCoordTrans FiffCoordTrans::procrustesAlign(int   from_frame,
         float diff = (toPts.row(p).transpose() - rr).norm();
         if (diff > max_diff) {
             qWarning("Too large difference in matching : %7.1f > %7.1f mm",
-                   1000.0f * diff, 1000.0f * max_diff);
+                     1000.0f * diff, 1000.0f * max_diff);
             return FiffCoordTrans();
         }
     }

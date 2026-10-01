@@ -45,7 +45,7 @@ using namespace COMLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-CommandManager::CommandManager(bool p_bIsActive, QObject *parent)
+CommandManager::CommandManager(bool p_bIsActive, QObject* parent)
 : QObject(parent)
 , m_bIsActive(p_bIsActive)
 {
@@ -54,7 +54,7 @@ CommandManager::CommandManager(bool p_bIsActive, QObject *parent)
 
 //=============================================================================================================
 
-CommandManager::CommandManager(const QByteArray &p_qByteArrayJsonDoc, bool p_bIsActive, QObject *parent)
+CommandManager::CommandManager(const QByteArray& p_qByteArrayJsonDoc, bool p_bIsActive, QObject* parent)
 : QObject(parent)
 , m_bIsActive(p_bIsActive)
 {
@@ -67,7 +67,7 @@ CommandManager::CommandManager(const QByteArray &p_qByteArrayJsonDoc, bool p_bIs
 
 //=============================================================================================================
 
-CommandManager::CommandManager(const QJsonDocument &p_jsonDoc, bool p_bIsActive, QObject *parent)
+CommandManager::CommandManager(const QJsonDocument& p_jsonDoc, bool p_bIsActive, QObject* parent)
 : QObject(parent)
 , m_bIsActive(p_bIsActive)
 , m_jsonDocumentOrigin(p_jsonDoc)
@@ -82,7 +82,7 @@ CommandManager::CommandManager(const QJsonDocument &p_jsonDoc, bool p_bIsActive,
 CommandManager::~CommandManager()
 {
     //Disconnect all connections which are created with the help of this manager.
-//    this->disconnectAll();
+    //    this->disconnectAll();
 
     //Remove commands which where inserted into the static command list
 }
@@ -102,20 +102,19 @@ void CommandManager::init()
 
 //=============================================================================================================
 //ToDo connect all commands inserted in this class by default.
-void CommandManager::insert(const QJsonDocument &p_jsonDocument)
+void CommandManager::insert(const QJsonDocument& p_jsonDocument)
 {
     QJsonObject t_jsonObjectCommand;
 
     //Switch to command object
-    if(p_jsonDocument.isObject() && p_jsonDocument.object().value(QString("commands")) != QJsonValue::Undefined)
+    if (p_jsonDocument.isObject() && p_jsonDocument.object().value(QString("commands")) != QJsonValue::Undefined)
         t_jsonObjectCommand = p_jsonDocument.object().value(QString("commands")).toObject();
     else
         return;
 
     QJsonObject::Iterator it;
-    for(it = t_jsonObjectCommand.begin(); it != t_jsonObjectCommand.end(); ++it)
-    {
-        if(!m_qMapCommands.contains(it.key()))
+    for (it = t_jsonObjectCommand.begin(); it != t_jsonObjectCommand.end(); ++it) {
+        if (!m_qMapCommands.contains(it.key()))
             m_qMapCommands.insert(it.key(), Command(it.key(), it.value().toObject(), true, this));
         else
             qWarning("Warning: CommandMap contains command %s already. Insertion skipped.\n", it.key().toUtf8().constData());
@@ -126,7 +125,7 @@ void CommandManager::insert(const QJsonDocument &p_jsonDocument)
 
 //=============================================================================================================
 
-void CommandManager::insert(const QString &p_sKey, const QString &p_sDescription)
+void CommandManager::insert(const QString& p_sKey, const QString& p_sDescription)
 {
     Command t_command(p_sKey, p_sDescription, false, this);
     insert(p_sKey, t_command);
@@ -134,7 +133,7 @@ void CommandManager::insert(const QString &p_sKey, const QString &p_sDescription
 
 //=============================================================================================================
 
-void CommandManager::insert(const QString &p_sKey, const Command &p_command)
+void CommandManager::insert(const QString& p_sKey, const Command& p_command)
 {
     Command t_command(p_command);
     t_command.setParent(this);
@@ -147,7 +146,7 @@ void CommandManager::insert(const QString &p_sKey, const Command &p_command)
 void CommandManager::update(UTILSLIB::Subject* p_pSubject)
 {
     // If Manager is not active do not parse commands
-    if(!m_bIsActive)
+    if (!m_bIsActive)
         return;
 
     CommandParser* t_pCommandParser = static_cast<CommandParser*>(p_pSubject);
@@ -155,22 +154,20 @@ void CommandManager::update(UTILSLIB::Subject* p_pSubject)
     RawCommand t_rawCommand(t_pCommandParser->getRawCommand());
     QString t_sCommandName = t_rawCommand.command();
 
-    if(!this->hasCommand(t_sCommandName))
+    if (!this->hasCommand(t_sCommandName))
         return;
 
     // check if number of parameters is right
-    if(t_rawCommand.count() >= m_qMapCommands[t_sCommandName].count())
-    {
+    if (t_rawCommand.count() >= m_qMapCommands[t_sCommandName].count()) {
         m_qMapCommands[t_sCommandName].isJson() = t_rawCommand.isJson();
 
         //Parse Parameters
-        for(quint32 i = 0; i < m_qMapCommands[t_sCommandName].count(); ++i)
-        {
+        for (quint32 i = 0; i < m_qMapCommands[t_sCommandName].count(); ++i) {
             QMetaType t_metaType = m_qMapCommands[t_sCommandName][i].metaType();
 
             QVariant t_qVariantParam(t_rawCommand.pValues()[i]);
 
-            if(t_qVariantParam.canConvert(t_metaType) && t_qVariantParam.convert(t_metaType))
+            if (t_qVariantParam.canConvert(t_metaType) && t_qVariantParam.convert(t_metaType))
                 m_qMapCommands[t_sCommandName][i] = t_qVariantParam;
             else
                 return;
@@ -182,14 +179,14 @@ void CommandManager::update(UTILSLIB::Subject* p_pSubject)
 
 //=============================================================================================================
 
-Command& CommandManager::operator[] (const QString &key)
+Command& CommandManager::operator[](const QString& key)
 {
     return m_qMapCommands[key];
 }
 
 //=============================================================================================================
 
-const Command CommandManager::operator[] (const QString &key) const
+const Command CommandManager::operator[](const QString& key) const
 {
     return m_qMapCommands[key];
 }

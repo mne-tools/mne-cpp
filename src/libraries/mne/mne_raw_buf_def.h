@@ -63,8 +63,8 @@ namespace MNELIB
 class MNESHARED_EXPORT MNERawBufDef
 {
 public:
-    typedef QSharedPointer<MNERawBufDef> SPtr;              /**< Shared pointer type for MNERawBufDef. */
-    typedef QSharedPointer<const MNERawBufDef> ConstSPtr;   /**< Const shared pointer type for MNERawBufDef. */
+    typedef QSharedPointer<MNERawBufDef> SPtr;            /**< Shared pointer type for MNERawBufDef. */
+    typedef QSharedPointer<const MNERawBufDef> ConstSPtr; /**< Const shared pointer type for MNERawBufDef. */
 
     //=========================================================================================================
     /**
@@ -79,19 +79,18 @@ public:
     ~MNERawBufDef();
 
 
-
 public:
-    FIFFLIB::FiffDirEntry::SPtr ent;    /**< Directory entry locating this buffer in the FIFF file (file buffers only). */
-    int   firsts = 0;       /**< First sample index. */
-    int   lasts = 0;        /**< Last sample index. */
-    int   ntaper = 0;       /**< Taper length for filtered buffers. */
-    int   ns = 0;           /**< Number of samples (lasts - firsts + 1). */
-    int   nchan = 0;        /**< Number of channels. */
-    bool  is_skip = false;     /**< True if this buffer represents a data skip. */
-    Eigen::Matrix<float, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor> vals;  /**< Sample values matrix [nchan x ns], row-major (empty if not loaded). */
-    bool  valid = false;        /**< True if the data in this buffer are meaningful. */
-    Eigen::VectorXi ch_filtered; /**< Per-channel flag: has this channel been filtered already (filtered buffers only). */
-    int   comp_status = 0;  /**< Compensation status for raw buffers. */
+    FIFFLIB::FiffDirEntry::SPtr ent;                                            /**< Directory entry locating this buffer in the FIFF file (file buffers only). */
+    int firsts = 0;                                                             /**< First sample index. */
+    int lasts = 0;                                                              /**< Last sample index. */
+    int ntaper = 0;                                                             /**< Taper length for filtered buffers. */
+    int ns = 0;                                                                 /**< Number of samples (lasts - firsts + 1). */
+    int nchan = 0;                                                              /**< Number of channels. */
+    bool is_skip = false;                                                       /**< True if this buffer represents a data skip. */
+    Eigen::Matrix<float, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor> vals; /**< Sample values matrix [nchan x ns], row-major (empty if not loaded). */
+    bool valid = false;                                                         /**< True if the data in this buffer are meaningful. */
+    Eigen::VectorXi ch_filtered;                                                /**< Per-channel flag: has this channel been filtered already (filtered buffers only). */
+    int comp_status = 0;                                                        /**< Compensation status for raw buffers. */
 };
 
 } // NAMESPACE MNELIB

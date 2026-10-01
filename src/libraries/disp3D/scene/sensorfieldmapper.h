@@ -78,13 +78,16 @@ public:
      *
      * @param[in] evoked    The evoked dataset (contains info + data matrix).
      */
-    void setEvoked(const FIFFLIB::FiffEvoked &evoked);
+    void setEvoked(const FIFFLIB::FiffEvoked& evoked);
 
     //=========================================================================================================
     /**
      * @return @c true if evoked data has been loaded and is non-empty.
      */
-    bool isLoaded() const { return m_loaded; }
+    bool isLoaded() const
+    {
+        return m_loaded;
+    }
 
     //=========================================================================================================
     /**
@@ -92,12 +95,18 @@ public:
      *
      * @param[in] tp    Zero-based time index.
      */
-    void setTimePoint(int tp) { m_timePoint = tp; }
+    void setTimePoint(int tp)
+    {
+        m_timePoint = tp;
+    }
 
     /**
      * @return Current time point index.
      */
-    int timePoint() const { return m_timePoint; }
+    int timePoint() const
+    {
+        return m_timePoint;
+    }
 
     //=========================================================================================================
     /**
@@ -106,9 +115,15 @@ public:
      *
      * @param[in] onHead    @c true to map onto head, @c false for helmet.
      */
-    void setMegFieldMapOnHead(bool onHead) { m_megOnHead = onHead; }
+    void setMegFieldMapOnHead(bool onHead)
+    {
+        m_megOnHead = onHead;
+    }
 
-    bool megFieldMapOnHead() const { return m_megOnHead; }
+    bool megFieldMapOnHead() const
+    {
+        return m_megOnHead;
+    }
 
     //=========================================================================================================
     /**
@@ -116,15 +131,24 @@ public:
      *
      * @param[in] name  Colormap identifier (e.g. "MNE", "hot", "RdBu_r").
      */
-    void setColormap(const QString &name) { m_colormap = name; }
+    void setColormap(const QString& name)
+    {
+        m_colormap = name;
+    }
 
-    const QString &colormap() const { return m_colormap; }
+    const QString& colormap() const
+    {
+        return m_colormap;
+    }
 
     //=========================================================================================================
     /**
      * @return Const reference to the loaded evoked data.
      */
-    const FIFFLIB::FiffEvoked &evoked() const { return m_evoked; }
+    const FIFFLIB::FiffEvoked& evoked() const
+    {
+        return m_evoked;
+    }
 
     //=========================================================================================================
     /**
@@ -135,27 +159,39 @@ public:
      * @param[in] newEvoked     The candidate new evoked data.
      * @return @c true if the existing mapping is compatible, @c false if rebuild is needed.
      */
-    bool hasMappingFor(const FIFFLIB::FiffEvoked &newEvoked) const;
+    bool hasMappingFor(const FIFFLIB::FiffEvoked& newEvoked) const;
 
     /**
      * @return Const reference to the MEG channel pick indices.
      */
-    const Eigen::VectorXi &megPick() const { return m_megPick; }
+    const Eigen::VectorXi& megPick() const
+    {
+        return m_megPick;
+    }
 
     /**
      * @return Const reference to the EEG channel pick indices.
      */
-    const Eigen::VectorXi &eegPick() const { return m_eegPick; }
+    const Eigen::VectorXi& eegPick() const
+    {
+        return m_eegPick;
+    }
 
     /**
      * @return Shared pointer to the MEG mapping matrix (may be null).
      */
-    std::shared_ptr<Eigen::MatrixXf> megMapping() const { return m_megMapping; }
+    std::shared_ptr<Eigen::MatrixXf> megMapping() const
+    {
+        return m_megMapping;
+    }
 
     /**
      * @return Shared pointer to the EEG mapping matrix (may be null).
      */
-    std::shared_ptr<Eigen::MatrixXf> eegMapping() const { return m_eegMapping; }
+    std::shared_ptr<Eigen::MatrixXf> eegMapping() const
+    {
+        return m_eegMapping;
+    }
 
     //=========================================================================================================
     /**
@@ -170,8 +206,8 @@ public:
      * @param[in] applySensorTrans  Whether to apply the sensor → MRI transform.
      * @return @c true on success (at least one mapping built).
      */
-    bool buildMapping(const QMap<QString, std::shared_ptr<BrainSurface>> &surfaces,
-                      const FIFFLIB::FiffCoordTrans &headToMriTrans,
+    bool buildMapping(const QMap<QString, std::shared_ptr<BrainSurface>>& surfaces,
+                      const FIFFLIB::FiffCoordTrans& headToMriTrans,
                       bool applySensorTrans);
 
     //=========================================================================================================
@@ -185,20 +221,26 @@ public:
      * @param[in]     singleView    The single-view SubView for visibility flags.
      * @param[in]     subViews      The four multi-view SubViews.
      */
-    void apply(QMap<QString, std::shared_ptr<BrainSurface>> &surfaces,
-               const SubView &singleView,
-               const QVector<SubView> &subViews);
+    void apply(QMap<QString, std::shared_ptr<BrainSurface>>& surfaces,
+               const SubView& singleView,
+               const QVector<SubView>& subViews);
 
     //=========================================================================================================
     /**
      * @return The surface key used for the MEG mapping target.
      */
-    const QString &megSurfaceKey() const { return m_megSurfaceKey; }
+    const QString& megSurfaceKey() const
+    {
+        return m_megSurfaceKey;
+    }
 
     /**
      * @return The surface key used for the EEG mapping target.
      */
-    const QString &eegSurfaceKey() const { return m_eegSurfaceKey; }
+    const QString& eegSurfaceKey() const
+    {
+        return m_eegSurfaceKey;
+    }
 
     //=========================================================================================================
     // ── Static utilities ───────────────────────────────────────────────
@@ -212,7 +254,7 @@ public:
      * @param[in] surfaces   Surface map keyed by surface name.
      * @return Head surface key, else the first BEM key, or an empty string if no BEM surface exists.
      */
-    static QString findHeadSurfaceKey(const QMap<QString, std::shared_ptr<BrainSurface>> &surfaces);
+    static QString findHeadSurfaceKey(const QMap<QString, std::shared_ptr<BrainSurface>>& surfaces);
 
     /**
      * Find the MEG helmet surface key ("sens_surface_meg") if present.
@@ -220,7 +262,7 @@ public:
      * @param[in] surfaces   Surface map keyed by surface name.
      * @return "sens_surface_meg" if present, otherwise an empty string.
      */
-    static QString findHelmetSurfaceKey(const QMap<QString, std::shared_ptr<BrainSurface>> &surfaces);
+    static QString findHelmetSurfaceKey(const QMap<QString, std::shared_ptr<BrainSurface>>& surfaces);
 
     /**
      * Compute a "nice" iso-contour step given a value range and target number of ticks.
@@ -245,8 +287,8 @@ public:
      * @return The sphere centre in head coordinates (metres).
      *         Returns (0, 0, 0.04) if the fit cannot be performed.
      */
-    static Eigen::Vector3f fitSphereOrigin(const FIFFLIB::FiffInfo &info,
-                                           float *radius = nullptr);
+    static Eigen::Vector3f fitSphereOrigin(const FIFFLIB::FiffInfo& info,
+                                           float* radius = nullptr);
 
     /**
      * Compute the normalization range anchored at the peak-GFP time.
@@ -282,10 +324,10 @@ private:
      * @param[in]     step      Iso-step distance.
      * @param[in]     visible   Whether contours should be shown.
      */
-    void updateContourSurfaces(QMap<QString, std::shared_ptr<BrainSurface>> &surfaces,
-                               const QString &prefix,
-                               const BrainSurface &surface,
-                               const QVector<float> &values,
+    void updateContourSurfaces(QMap<QString, std::shared_ptr<BrainSurface>>& surfaces,
+                               const QString& prefix,
+                               const BrainSurface& surface,
+                               const QVector<float>& values,
                                float step,
                                bool visible);
 
@@ -293,9 +335,9 @@ private:
     // ── Internal data ──────────────────────────────────────────────────
 
     FIFFLIB::FiffEvoked m_evoked;
-    bool   m_loaded    = false;
-    int    m_timePoint = 0;
-    bool   m_megOnHead = false;
+    bool m_loaded = false;
+    int m_timePoint = 0;
+    bool m_megOnHead = false;
     QString m_colormap = QStringLiteral("MNE");
 
     QString m_megSurfaceKey;
@@ -303,15 +345,15 @@ private:
     QString m_megContourPrefix = QStringLiteral("sens_contour_meg");
     QString m_eegContourPrefix = QStringLiteral("sens_contour_eeg");
 
-    Eigen::VectorXi                   m_megPick;
-    Eigen::VectorXi                   m_eegPick;
-    std::vector<Eigen::Vector3f>      m_megPositions;
-    std::vector<Eigen::Vector3f>      m_eegPositions;
+    Eigen::VectorXi m_megPick;
+    Eigen::VectorXi m_eegPick;
+    std::vector<Eigen::Vector3f> m_megPositions;
+    std::vector<Eigen::Vector3f> m_eegPositions;
     std::shared_ptr<Eigen::MatrixXf> m_megMapping;
     std::shared_ptr<Eigen::MatrixXf> m_eegMapping;
 
-    float m_megVmax = 0.0f;      /**< Colour-map normalisation: max |mapped| at peak-GFP time for MEG. */
-    float m_eegVmax = 0.0f;      /**< Colour-map normalisation: max |mapped| at peak-GFP time for EEG. */
+    float m_megVmax = 0.0f; /**< Colour-map normalisation: max |mapped| at peak-GFP time for MEG. */
+    float m_eegVmax = 0.0f; /**< Colour-map normalisation: max |mapped| at peak-GFP time for EEG. */
 };
 
 #endif // SENSORFIELDMAPPER_H

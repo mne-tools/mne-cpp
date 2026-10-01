@@ -60,7 +60,8 @@ static constexpr double SSS_PI = M_PI;
 // PRIVATE HELPERS
 //=============================================================================================================
 
-namespace {
+namespace
+{
 
 //=============================================================================================================
 /**
@@ -70,9 +71,9 @@ namespace {
 MatrixXd regPinv(const MatrixXd& A, double reg = 1e-5)
 {
     JacobiSVD<MatrixXd> svd(A, ComputeThinU | ComputeThinV);
-    const VectorXd& sv   = svd.singularValues();
-    double threshold     = reg * sv(0);
-    VectorXd invSv       = sv;
+    const VectorXd& sv = svd.singularValues();
+    double threshold = reg * sv(0);
+    VectorXd invSv = sv;
     for (int i = 0; i < invSv.size(); ++i) {
         invSv(i) = (sv(i) > threshold) ? 1.0 / sv(i) : 0.0;
     }
@@ -106,7 +107,7 @@ MatrixXd orthonormalCols(const MatrixXd& A)
 //=============================================================================================================
 
 void SSS::computeNormALP(int lmax, double cosTheta, double sinTheta,
-                          MatrixXd& P, MatrixXd& dP)
+                         MatrixXd& P, MatrixXd& dP)
 {
     // Guard against pole singularity
     if (sinTheta < 1e-12) {
@@ -139,9 +140,7 @@ void SSS::computeNormALP(int lmax, double cosTheta, double sinTheta,
         Praw(l, l) = -(2 * l - 1) * sinTheta * Praw(l - 1, l - 1);
         Praw(l, l - 1) = (2 * l - 1) * cosTheta * Praw(l - 1, l - 1);
         for (int m = 0; m <= l - 2; ++m) {
-            Praw(l, m) = ((2 * l - 1) * cosTheta * Praw(l - 1, m)
-                          - (l - 1 + m) * Praw(l - 2, m))
-                         / static_cast<double>(l - m);
+            Praw(l, m) = ((2 * l - 1) * cosTheta * Praw(l - 1, m) - (l - 1 + m) * Praw(l - 2, m)) / static_cast<double>(l - m);
         }
     }
 
@@ -155,8 +154,8 @@ void SSS::computeNormALP(int lmax, double cosTheta, double sinTheta,
                 fac /= static_cast<double>(k);
             }
             double norm = (m == 0)
-                          ? std::sqrt((2.0 * l + 1.0) / (4.0 * SSS_PI) * fac)
-                          : std::sqrt(2.0 * (2.0 * l + 1.0) / (4.0 * SSS_PI) * fac);
+                ? std::sqrt((2.0 * l + 1.0) / (4.0 * SSS_PI) * fac)
+                : std::sqrt(2.0 * (2.0 * l + 1.0) / (4.0 * SSS_PI) * fac);
 
             P(l, m) = norm * Praw(l, m);
 
@@ -175,10 +174,10 @@ void SSS::computeNormALP(int lmax, double cosTheta, double sinTheta,
 //=============================================================================================================
 
 Vector3d SSS::basisGradCart(int l, int m, bool bInternal,
-                              const Vector3d& rPos,
-                              const MatrixXd& P, const MatrixXd& dP,
-                              double cosTheta, double sinTheta,
-                              double cosPhi,   double sinPhi)
+                            const Vector3d& rPos,
+                            const MatrixXd& P, const MatrixXd& dP,
+                            double cosTheta, double sinTheta,
+                            double cosPhi, double sinPhi)
 {
     // Precompute |r| and its powers
     double r = rPos.norm();
@@ -199,34 +198,34 @@ Vector3d SSS::basisGradCart(int l, int m, bool bInternal,
     //   dY/dθ:  N * dP/dθ * {1, cos(mφ), sin(|m|φ)}
     //   dY/dφ:  N * P * {0, -m sin(mφ), |m| cos(|m|φ)}
 
-    double Plm   = P(l, absM);    // normalised, at (θ,φ)
-    double dPlm  = dP(l, absM);   // normalised dP/dθ
+    double Plm = P(l, absM);   // normalised, at (θ,φ)
+    double dPlm = dP(l, absM); // normalised dP/dθ
 
     double angFactor, dAngFactor_phi;
     if (m == 0) {
-        angFactor        = 1.0;
-        dAngFactor_phi   = 0.0;
+        angFactor = 1.0;
+        dAngFactor_phi = 0.0;
     } else if (m > 0) {
-        double cosmPhi   = std::cos(static_cast<double>(m) * std::atan2(sinPhi, cosPhi));
-        double sinmPhi   = std::sin(static_cast<double>(m) * std::atan2(sinPhi, cosPhi));
-        angFactor        =  cosmPhi;
-        dAngFactor_phi   = -static_cast<double>(m) * sinmPhi;
+        double cosmPhi = std::cos(static_cast<double>(m) * std::atan2(sinPhi, cosPhi));
+        double sinmPhi = std::sin(static_cast<double>(m) * std::atan2(sinPhi, cosPhi));
+        angFactor = cosmPhi;
+        dAngFactor_phi = -static_cast<double>(m) * sinmPhi;
     } else {
         // m < 0
-        double cosmPhi   = std::cos(static_cast<double>(absM) * std::atan2(sinPhi, cosPhi));
-        double sinmPhi   = std::sin(static_cast<double>(absM) * std::atan2(sinPhi, cosPhi));
-        angFactor        =  sinmPhi;
-        dAngFactor_phi   =  static_cast<double>(absM) * cosmPhi;
+        double cosmPhi = std::cos(static_cast<double>(absM) * std::atan2(sinPhi, cosPhi));
+        double sinmPhi = std::sin(static_cast<double>(absM) * std::atan2(sinPhi, cosPhi));
+        angFactor = sinmPhi;
+        dAngFactor_phi = static_cast<double>(absM) * cosmPhi;
     }
 
     // Y_l^m at this point
-    double Ylm     = Plm * angFactor;
+    double Ylm = Plm * angFactor;
 
     // dY_l^m/dθ = dP/dθ * angFactor   (for m=0 angFactor=1, for m≠0 it's cos/sin but θ-independent)
     double dYdTheta = dPlm * angFactor;
 
     // dY_l^m/dφ  =  P_l^|m| * dAngFactor/dφ
-    double dYdPhi  = Plm * dAngFactor_phi;
+    double dYdPhi = Plm * dAngFactor_phi;
 
     // ---- Gradient in spherical coordinates ----
     // For internal:  grad(r^l * Y_l^m)
@@ -241,18 +240,18 @@ Vector3d SSS::basisGradCart(int l, int m, bool bInternal,
 
     double radPow, Gr_coeff, Gtu_coeff;
     if (bInternal) {
-        radPow    = std::pow(r, l - 1);
-        Gr_coeff  = static_cast<double>(l)   * radPow;
-        Gtu_coeff =                             radPow;   // G_θ and sinθ*G_φ share this
+        radPow = std::pow(r, l - 1);
+        Gr_coeff = static_cast<double>(l) * radPow;
+        Gtu_coeff = radPow; // G_θ and sinθ*G_φ share this
     } else {
-        radPow    = std::pow(r, -(l + 2));
-        Gr_coeff  = -static_cast<double>(l + 1) * radPow;
-        Gtu_coeff =                                radPow;
+        radPow = std::pow(r, -(l + 2));
+        Gr_coeff = -static_cast<double>(l + 1) * radPow;
+        Gtu_coeff = radPow;
     }
 
-    double Gr          = Gr_coeff  * Ylm;
-    double Gtheta      = Gtu_coeff * dYdTheta;
-    double GphiTimesSin = Gtu_coeff * dYdPhi;   // = G_φ * sinθ (avoids 1/sinθ singularity)
+    double Gr = Gr_coeff * Ylm;
+    double Gtheta = Gtu_coeff * dYdTheta;
+    double GphiTimesSin = Gtu_coeff * dYdPhi; // = G_φ * sinθ (avoids 1/sinθ singularity)
 
     // ---- Convert (Gr, Gθ, sinθ * Gφ) to Cartesian ----
     // r̂  = (sinθ cosφ,  sinθ sinφ,  cosθ)
@@ -267,7 +266,7 @@ Vector3d SSS::basisGradCart(int l, int m, bool bInternal,
 
     double gx = Gr * sinTheta * cosPhi + Gtheta * cosTheta * cosPhi - Gphi * sinPhi;
     double gy = Gr * sinTheta * sinPhi + Gtheta * cosTheta * sinPhi + Gphi * cosPhi;
-    double gz = Gr * cosTheta           - Gtheta * sinTheta;
+    double gz = Gr * cosTheta - Gtheta * sinTheta;
 
     return Vector3d(gx, gy, gz);
 }
@@ -277,10 +276,10 @@ Vector3d SSS::basisGradCart(int l, int m, bool bInternal,
 SSS::Basis SSS::computeBasis(const FiffInfo& fiffInfo, const Params& params)
 {
     Basis basis;
-    basis.iOrderIn  = params.iOrderIn;
+    basis.iOrderIn = params.iOrderIn;
     basis.iOrderOut = params.iOrderOut;
-    basis.iNin      = params.iOrderIn  * (params.iOrderIn  + 2);
-    basis.iNout     = params.iOrderOut * (params.iOrderOut + 2);
+    basis.iNin = params.iOrderIn * (params.iOrderIn + 2);
+    basis.iNout = params.iOrderOut * (params.iOrderOut + 2);
 
     // ---- Collect MEG channel indices and geometry ----
     for (int i = 0; i < fiffInfo.nchan; ++i) {
@@ -325,14 +324,15 @@ SSS::Basis SSS::computeBasis(const FiffInfo& fiffInfo, const Params& params)
         normal /= nNorm;
 
         // Convert to spherical coordinates
-        double r        = rPos.norm();
+        double r = rPos.norm();
         if (r < 1e-12) {
             continue;
         }
         double cosTheta = rPos(2) / r;
         double sinTheta = std::sqrt(rPos(0) * rPos(0) + rPos(1) * rPos(1)) / r;
-        if (sinTheta < 1e-12) sinTheta = 1e-12;
-        double phi    = std::atan2(rPos(1), rPos(0));
+        if (sinTheta < 1e-12)
+            sinTheta = 1e-12;
+        double phi = std::atan2(rPos(1), rPos(0));
         double cosPhi = std::cos(phi);
         double sinPhi = std::sin(phi);
 
@@ -371,10 +371,10 @@ SSS::Basis SSS::computeBasis(const FiffInfo& fiffInfo, const Params& params)
     // pinv(S) = V * diag(1/σ_i) * U^T  with Tikhonov regularisation
     // P_in = S_in * pinv(S)[:N_in, :]
     MatrixXd S(nMeg, basis.iNin + basis.iNout);
-    S.leftCols(basis.iNin)  = basis.matSin;
+    S.leftCols(basis.iNin) = basis.matSin;
     S.rightCols(basis.iNout) = basis.matSout;
 
-    basis.matPinvAll = regPinv(S, params.dRegIn);          // (N_in+N_out) × n_meg
+    basis.matPinvAll = regPinv(S, params.dRegIn); // (N_in+N_out) × n_meg
 
     // Build an oblique projector onto the internal subspace along the external
     // subspace. This preserves internal components better than the direct
@@ -426,17 +426,17 @@ MatrixXd SSS::apply(const MatrixXd& matData, const Basis& basis)
 //=============================================================================================================
 
 MatrixXd SSS::applyTemporal(const MatrixXd& matData,
-                              const Basis&   basis,
-                              int            iBufferLength,
-                              double         dCorrLimit)
+                            const Basis& basis,
+                            int iBufferLength,
+                            double dCorrLimit)
 {
     if (basis.megChannelIdx.isEmpty()) {
         return matData;
     }
 
-    const int nMeg    = basis.megChannelIdx.size();
-    const int nSamp   = static_cast<int>(matData.cols());
-    const int bufLen  = std::min(iBufferLength, nSamp);
+    const int nMeg = basis.megChannelIdx.size();
+    const int nSamp = static_cast<int>(matData.cols());
+    const int bufLen = std::min(iBufferLength, nSamp);
 
     MatrixXd matOut = matData;
 
@@ -449,7 +449,7 @@ MatrixXd SSS::applyTemporal(const MatrixXd& matData,
     // Decompose time series into expansion coefficients
     // c_in  (N_in  × nSamp) = pinv_all[:N_in , :] * megData
     // c_out (N_out × nSamp) = pinv_all[N_in: , :] * megData
-    MatrixXd cIn  = basis.matPinvAll.topRows(basis.iNin)  * megData;   // N_in  × nSamp
+    MatrixXd cIn = basis.matPinvAll.topRows(basis.iNin) * megData;      // N_in  × nSamp
     MatrixXd cOut = basis.matPinvAll.bottomRows(basis.iNout) * megData; // N_out × nSamp
 
     // Process in sliding windows
@@ -458,16 +458,16 @@ MatrixXd SSS::applyTemporal(const MatrixXd& matData,
         int winLen = std::min(bufLen, nSamp - offset);
 
         // Window slices
-        MatrixXd cInWin  = cIn.middleCols(offset, winLen);   // N_in  × winLen
-        MatrixXd cOutWin = cOut.middleCols(offset, winLen);  // N_out × winLen
+        MatrixXd cInWin = cIn.middleCols(offset, winLen);   // N_in  × winLen
+        MatrixXd cOutWin = cOut.middleCols(offset, winLen); // N_out × winLen
 
         // ---- Temporal tSSS projection ----
         // SVD of external coefficient matrix (column = time point):
         // cOutWin = U * S * V^T   (N_out × winLen)
         // Right singular vectors V (winLen × min) form the temporal subspace of external signals.
         JacobiSVD<MatrixXd> svd(cOutWin, ComputeThinU | ComputeThinV);
-        const VectorXd& sv   = svd.singularValues();
-        const MatrixXd& V    = svd.matrixV();   // winLen × rank_out
+        const VectorXd& sv = svd.singularValues();
+        const MatrixXd& V = svd.matrixV(); // winLen × rank_out
 
         // Determine how many external temporal components to suppress
         double svMax = (sv.size() > 0) ? sv(0) : 0.0;
@@ -479,7 +479,7 @@ MatrixXd SSS::applyTemporal(const MatrixXd& matData,
         // Build temporal projector to remove the correlated subspace
         // P_remove: (winLen × winLen) = V_r * V_r^T
         // Applied: cInWin_clean = cInWin * (I - P_remove)
-        MatrixXd Vr;   // winLen × n_remove
+        MatrixXd Vr; // winLen × n_remove
         int nRemove = 0;
         for (int k = 0; k < sv.size(); ++k) {
             if (sv(k) / svMax > dCorrLimit) {
@@ -490,7 +490,7 @@ MatrixXd SSS::applyTemporal(const MatrixXd& matData,
         }
 
         if (nRemove > 0) {
-            Vr = V.leftCols(nRemove);   // winLen × nRemove
+            Vr = V.leftCols(nRemove); // winLen × nRemove
             // cInWin_clean = cInWin * (I - Vr * Vr^T)
             MatrixXd cInWinClean = cInWin - cInWin * (Vr * Vr.transpose());
             cIn.middleCols(offset, winLen) = cInWinClean;
@@ -500,7 +500,7 @@ MatrixXd SSS::applyTemporal(const MatrixXd& matData,
     }
 
     // Reconstruct cleaned MEG data from internal expansion
-    MatrixXd megTsss = basis.matSin * cIn;   // n_meg × nSamp
+    MatrixXd megTsss = basis.matSin * cIn; // n_meg × nSamp
 
     // Write back
     for (int i = 0; i < nMeg; ++i) {

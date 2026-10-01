@@ -52,22 +52,22 @@ using namespace UTILSLIB;
 
 //=============================================================================================================
 
-static void printTransform(const FiffCoordTrans &t)
+static void printTransform(const FiffCoordTrans& t)
 {
-    qInfo("%s -> %s transform:" ,
-           qPrintable(FiffCoordTrans::frame_name(t.from)),
-           qPrintable(FiffCoordTrans::frame_name(t.to)));
+    qInfo("%s -> %s transform:",
+          qPrintable(FiffCoordTrans::frame_name(t.from)),
+          qPrintable(FiffCoordTrans::frame_name(t.to)));
     for (int i = 0; i < 3; i++) {
-        qInfo("  %10.6f %10.6f %10.6f  %10.4f mm" ,
-               t.trans(i, 0), t.trans(i, 1), t.trans(i, 2),
-               1000.0f * t.trans(i, 3));
+        qInfo("  %10.6f %10.6f %10.6f  %10.4f mm",
+              t.trans(i, 0), t.trans(i, 1), t.trans(i, 2),
+              1000.0f * t.trans(i, 3));
     }
     qInfo("%s", "");
 }
 
 //=============================================================================================================
 
-int main(int argc, char *argv[])
+int main(int argc, char* argv[])
 {
     qInstallMessageHandler(MNELogger::customLogWriter);
     QCoreApplication app(argc, argv);

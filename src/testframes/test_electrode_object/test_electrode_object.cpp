@@ -191,13 +191,13 @@ void TestElectrodeObject::testBoundingBox()
     for (const auto& arr : arrays) {
         for (const auto& contact : arr.contacts) {
             QVERIFY2(contact.position.x() >= bbMin.x() - 1.0f &&
-                     contact.position.x() <= bbMax.x() + 1.0f,
+                         contact.position.x() <= bbMax.x() + 1.0f,
                      "Contact X outside bounding box");
             QVERIFY2(contact.position.y() >= bbMin.y() - 1.0f &&
-                     contact.position.y() <= bbMax.y() + 1.0f,
+                         contact.position.y() <= bbMax.y() + 1.0f,
                      "Contact Y outside bounding box");
             QVERIFY2(contact.position.z() >= bbMin.z() - 1.0f &&
-                     contact.position.z() <= bbMax.z() + 1.0f,
+                         contact.position.z() <= bbMax.z() + 1.0f,
                      "Contact Z outside bounding box");
         }
     }

@@ -48,7 +48,7 @@ void MvarModel::fit(const MatrixXd& data, int p)
 {
     m_nChannels = static_cast<int>(data.rows());
 
-    if(p <= 0) {
+    if (p <= 0) {
         p = selectOrderBIC(data);
     }
 
@@ -87,10 +87,10 @@ QVector<MatrixXcd> MvarModel::transferFunction(const VectorXd& freqs) const
     const MatrixXcd matI = MatrixXcd::Identity(nCh, nCh);
     const std::complex<double> j(0.0, 1.0);
 
-    for(int fi = 0; fi < freqs.size(); ++fi) {
+    for (int fi = 0; fi < freqs.size(); ++fi) {
         MatrixXcd matA = matI;
 
-        for(int k = 0; k < m_order; ++k) {
+        for (int k = 0; k < m_order; ++k) {
             const double phase = -2.0 * M_PI * freqs(fi) * (k + 1);
             const std::complex<double> expVal = std::exp(j * phase);
             matA -= m_coeffs[k].cast<std::complex<double>>() * expVal;
@@ -112,7 +112,7 @@ QVector<MatrixXcd> MvarModel::spectralMatrix(const VectorXd& freqs) const
 
     const MatrixXcd matSigma = m_noiseCov.cast<std::complex<double>>();
 
-    for(int fi = 0; fi < vecH.size(); ++fi) {
+    for (int fi = 0; fi < vecH.size(); ++fi) {
         vecS.append(vecH[fi] * matSigma * vecH[fi].adjoint());
     }
 
@@ -130,7 +130,7 @@ void MvarModel::fitLevinsonDurbin(const MatrixXd& data, int p)
     const int nSamples = static_cast<int>(data.cols());
     const int nObs = nSamples - p;
 
-    if(nObs <= 0) {
+    if (nObs <= 0) {
         qWarning() << "MvarModel::fitLevinsonDurbin - Not enough samples for model order" << p;
         m_coeffs.clear();
         m_noiseCov = MatrixXd::Identity(nCh, nCh);
@@ -139,7 +139,7 @@ void MvarModel::fitLevinsonDurbin(const MatrixXd& data, int p)
 
     // Subtract mean from each channel
     MatrixXd dataCentered = data;
-    for(int i = 0; i < nCh; ++i) {
+    for (int i = 0; i < nCh; ++i) {
         dataCentered.row(i).array() -= dataCentered.row(i).mean();
     }
 
@@ -152,7 +152,7 @@ void MvarModel::fitLevinsonDurbin(const MatrixXd& data, int p)
     MatrixXd matY = dataCentered.rightCols(nObs);
     MatrixXd matZ(nCh * p, nObs);
 
-    for(int k = 0; k < p; ++k) {
+    for (int k = 0; k < p; ++k) {
         matZ.middleRows(static_cast<Eigen::Index>(k) * nCh, nCh) = dataCentered.middleCols(p - 1 - k, nObs);
     }
 
@@ -164,7 +164,7 @@ void MvarModel::fitLevinsonDurbin(const MatrixXd& data, int p)
     // Extract coefficient matrices A_1..A_p
     m_coeffs.clear();
     m_coeffs.reserve(p);
-    for(int k = 0; k < p; ++k) {
+    for (int k = 0; k < p; ++k) {
         m_coeffs.append(matA.middleCols(k * nCh, nCh));
     }
 
@@ -182,22 +182,22 @@ int MvarModel::selectOrderBIC(const MatrixXd& data, int maxOrder) const
 
     // Limit max order to avoid underdetermined systems
     maxOrder = qMin(maxOrder, nSamples / (nCh + 1));
-    if(maxOrder < 1) {
+    if (maxOrder < 1) {
         maxOrder = 1;
     }
 
     // Subtract mean
     MatrixXd dataCentered = data;
-    for(int i = 0; i < nCh; ++i) {
+    for (int i = 0; i < nCh; ++i) {
         dataCentered.row(i).array() -= dataCentered.row(i).mean();
     }
 
     double bestBIC = std::numeric_limits<double>::max();
     int bestOrder = 1;
 
-    for(int p = 1; p <= maxOrder; ++p) {
+    for (int p = 1; p <= maxOrder; ++p) {
         const int nObs = nSamples - p;
-        if(nObs <= nCh * p) {
+        if (nObs <= nCh * p) {
             break;
         }
 
@@ -205,7 +205,7 @@ int MvarModel::selectOrderBIC(const MatrixXd& data, int maxOrder) const
         MatrixXd matY = dataCentered.rightCols(nObs);
         MatrixXd matZ(nCh * p, nObs);
 
-        for(int k = 0; k < p; ++k) {
+        for (int k = 0; k < p; ++k) {
             matZ.middleRows(static_cast<Eigen::Index>(k) * nCh, nCh) = dataCentered.middleCols(p - 1 - k, nObs);
         }
 
@@ -220,14 +220,14 @@ int MvarModel::selectOrderBIC(const MatrixXd& data, int maxOrder) const
 
         // BIC = n * ln(det(Sigma)) + k * ln(n), where k = p * nCh^2
         double detSigma = matSigma.determinant();
-        if(detSigma <= 0.0) {
+        if (detSigma <= 0.0) {
             continue;
         }
 
         const int nParams = p * nCh * nCh;
         double bic = nObs * std::log(detSigma) + nParams * std::log(static_cast<double>(nObs));
 
-        if(bic < bestBIC) {
+        if (bic < bestBIC) {
             bestBIC = bic;
             bestOrder = p;
         }

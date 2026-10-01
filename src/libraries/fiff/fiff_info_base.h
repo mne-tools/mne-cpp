@@ -72,12 +72,11 @@ namespace FIFFLIB
  */
 class FIFFSHARED_EXPORT FiffInfoBase
 {
-
 public:
-    using SPtr = QSharedPointer<FiffInfoBase>;            /**< Shared pointer type for FiffInfoBase. */
-    using ConstSPtr = QSharedPointer<const FiffInfoBase>; /**< Const shared pointer type for FiffInfoBase. */
-    using UPtr = std::unique_ptr<FiffInfoBase>;             /**< Unique pointer type for FiffInfoBase. */
-    using ConstUPtr = std::unique_ptr<const FiffInfoBase>;  /**< Const unique pointer type for FiffInfoBase. */
+    using SPtr = QSharedPointer<FiffInfoBase>;             /**< Shared pointer type for FiffInfoBase. */
+    using ConstSPtr = QSharedPointer<const FiffInfoBase>;  /**< Const shared pointer type for FiffInfoBase. */
+    using UPtr = std::unique_ptr<FiffInfoBase>;            /**< Unique pointer type for FiffInfoBase. */
+    using ConstUPtr = std::unique_ptr<const FiffInfoBase>; /**< Const unique pointer type for FiffInfoBase. */
 
     //=========================================================================================================
     /**
@@ -213,7 +212,7 @@ public:
      *
      * @return true if equal, false otherwise.
      */
-    friend bool operator== (const FiffInfoBase &a, const FiffInfoBase &b);
+    friend bool operator==(const FiffInfoBase& a, const FiffInfoBase& b);
 
     /**
      * Read MEG, compensation, and EEG channel information from this measurement info.
@@ -257,15 +256,15 @@ public:
     static bool readBadChannelsFromFile(const QString& name, QStringList& listOut);
 
 public:
-    QString filename;           /**< Filename when the info is read of a fiff file. */
-    QStringList bads;           /**< List of bad channels. */
-    FiffId meas_id;             /**< Measurement ID. */
-    fiff_int_t  nchan;          /**< Number of channels. */
-    QList<FiffChInfo> chs;      /**< List of all channel info descriptors. */
-    QStringList ch_names;       /**< List of all channel names. */
-    FiffCoordTrans dev_head_t;  /**< Device to head coordinate transformation. */
-    FiffCoordTrans ctf_head_t;  /**< CTF to head coordinate transformation. */
-    QList<FiffCoordTrans> all_coord_trans;  /**< All coordinate transformations stored in the file, in file order. */
+    QString filename;                      /**< Filename when the info is read of a fiff file. */
+    QStringList bads;                      /**< List of bad channels. */
+    FiffId meas_id;                        /**< Measurement ID. */
+    fiff_int_t nchan;                      /**< Number of channels. */
+    QList<FiffChInfo> chs;                 /**< List of all channel info descriptors. */
+    QStringList ch_names;                  /**< List of all channel names. */
+    FiffCoordTrans dev_head_t;             /**< Device to head coordinate transformation. */
+    FiffCoordTrans ctf_head_t;             /**< CTF to head coordinate transformation. */
+    QList<FiffCoordTrans> all_coord_trans; /**< All coordinate transformations stored in the file, in file order. */
 };
 
 //=============================================================================================================
@@ -279,7 +278,7 @@ inline bool FiffInfoBase::isEmpty() const
 
 //=============================================================================================================
 
-inline bool operator== (const FiffInfoBase &a, const FiffInfoBase &b)
+inline bool operator==(const FiffInfoBase& a, const FiffInfoBase& b)
 {
     return (a.bads == b.bads &&
             //a.meas_id == b.meas_id &&

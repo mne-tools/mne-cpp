@@ -87,8 +87,8 @@ namespace INVLIB
 class INVSHARED_EXPORT InvSourceEstimate
 {
 public:
-    typedef QSharedPointer<InvSourceEstimate> SPtr;             /**< Shared pointer type for InvSourceEstimate. */
-    typedef QSharedPointer<const InvSourceEstimate> ConstSPtr;  /**< Const shared pointer type for InvSourceEstimate. */
+    typedef QSharedPointer<InvSourceEstimate> SPtr;            /**< Shared pointer type for InvSourceEstimate. */
+    typedef QSharedPointer<const InvSourceEstimate> ConstSPtr; /**< Const shared pointer type for InvSourceEstimate. */
 
     //=========================================================================================================
     /**
@@ -105,7 +105,7 @@ public:
      * @param[in] p_tmin Time of the first sample in seconds.
      * @param[in] p_tstep Time between samples in seconds.
      */
-    InvSourceEstimate(const Eigen::MatrixXd &p_sol, const Eigen::VectorXi &p_vertices, float p_tmin, float p_tstep);
+    InvSourceEstimate(const Eigen::MatrixXd& p_sol, const Eigen::VectorXi& p_vertices, float p_tmin, float p_tstep);
 
     //=========================================================================================================
     /**
@@ -122,7 +122,7 @@ public:
      * @param[in] p_IODevice     IO device to read from the source estimation.
      *
      */
-    InvSourceEstimate(QIODevice &p_IODevice);
+    InvSourceEstimate(QIODevice& p_IODevice);
 
     //=========================================================================================================
     /**
@@ -152,7 +152,7 @@ public:
      *
      * @return true if successful, false otherwise.
      */
-    static bool read(QIODevice &p_IODevice, InvSourceEstimate& p_stc);
+    static bool read(QIODevice& p_IODevice, InvSourceEstimate& p_stc);
 
     //=========================================================================================================
     /**
@@ -164,7 +164,7 @@ public:
      *
      * @return True if successful, false if the device could not be opened for writing.
      */
-    bool write(QIODevice &p_IODevice);
+    bool write(QIODevice& p_IODevice);
 
     //=========================================================================================================
     /**
@@ -226,7 +226,7 @@ public:
      *
      * @return the copied source estimate.
      */
-    InvSourceEstimate& operator= (const InvSourceEstimate &rhs);
+    InvSourceEstimate& operator=(const InvSourceEstimate& rhs);
 
     //=========================================================================================================
     /**
@@ -245,32 +245,32 @@ public:
      *
      * @return the indices.
      */
-    Eigen::VectorXi getIndicesByLabel(const QList<FSLIB::FsLabel> &lPickedLabels, bool bIsClustered) const;
+    Eigen::VectorXi getIndicesByLabel(const QList<FSLIB::FsLabel>& lPickedLabels, bool bIsClustered) const;
 
 public:
-    Eigen::MatrixXd data;           /**< Matrix of shape [n_dipoles x n_times] which contains the data in source space. */
-    Eigen::VectorXi vertices;       /**< The indices of the dipoles in the different source spaces. In the clustered case, holds the ROI indices. */
-    Eigen::RowVectorXf times;       /**< The time vector with n_times steps. */
-    float tmin;                     /**< Time starting point. */
-    float tstep;                    /**< Time steps within the times vector. */
-    int nVerticesLh;                /**< Number of leading entries in vertices/data that belong to the left hemisphere. -1 when unknown, which is the case for non surface source spaces. */
+    Eigen::MatrixXd data;     /**< Matrix of shape [n_dipoles x n_times] which contains the data in source space. */
+    Eigen::VectorXi vertices; /**< The indices of the dipoles in the different source spaces. In the clustered case, holds the ROI indices. */
+    Eigen::RowVectorXf times; /**< The time vector with n_times steps. */
+    float tmin;               /**< Time starting point. */
+    float tstep;              /**< Time steps within the times vector. */
+    int nVerticesLh;          /**< Number of leading entries in vertices/data that belong to the left hemisphere. -1 when unknown, which is the case for non surface source spaces. */
 
     // --- Metadata ---
-    InvEstimateMethod   method;         /**< The inverse method that produced this estimate. */
-    InvSourceSpaceType  sourceSpaceType;/**< Source space type (surface, volume, mixed, discrete). */
-    InvOrientationType  orientationType;/**< Orientation constraint used (fixed, free, loose). */
+    InvEstimateMethod method;           /**< The inverse method that produced this estimate. */
+    InvSourceSpaceType sourceSpaceType; /**< Source space type (surface, volume, mixed, discrete). */
+    InvOrientationType orientationType; /**< Orientation constraint used (fixed, free, loose). */
 
     // --- Positions (for discrete source spaces: sEEG contacts, ECoG electrodes, custom ROIs) ---
-    Eigen::MatrixX3f    positions;      /**< 3D positions (m) in head coordinates, one row per source. Empty when positions live in an external source space. */
+    Eigen::MatrixX3f positions; /**< 3D positions (m) in head coordinates, one row per source. Empty when positions live in an external source space. */
 
     // --- Coupling layer (e.g. RAP-MUSIC correlated N-tuples on the grid) ---
-    std::vector<InvSourceCoupling> couplings;   /**< Correlated source groups overlaid on the grid. */
+    std::vector<InvSourceCoupling> couplings; /**< Correlated source groups overlaid on the grid. */
 
     // --- Focal layer (e.g. ECD off-grid dipoles) ---
-    std::vector<InvFocalDipole>    focalDipoles; /**< Off-grid focal dipoles (ECD results). */
+    std::vector<InvFocalDipole> focalDipoles; /**< Off-grid focal dipoles (ECD results). */
 
     // --- Connectivity layer (pairwise source connectivity) ---
-    std::vector<InvConnectivity>   connectivity; /**< Pairwise connectivity matrices between sources (one per metric / freq band). */
+    std::vector<InvConnectivity> connectivity; /**< Pairwise connectivity matrices between sources (one per metric / freq band). */
 
     //=========================================================================================================
     /**

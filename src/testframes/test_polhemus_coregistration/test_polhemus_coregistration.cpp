@@ -231,18 +231,18 @@ void TestPolhemusCoregistration::seedFiducials(PolhemusCoregistration& coreg,
     settings.setValue("hasPenFid/LPA", false);
     settings.setValue("hasPenFid/NAS", true);
     settings.setValue("hasPenFid/RPA", true);
-    settings.setValue("hasPenFid/CZ",  true);
+    settings.setValue("hasPenFid/CZ", true);
     writeVec3(settings, "penFid/NAS", penLpa);
     writeVec3(settings, "penFid/RPA", penNas);
-    writeVec3(settings, "penFid/CZ",  penRpa);
+    writeVec3(settings, "penFid/CZ", penRpa);
 
     settings.setValue("hasModelFid/LPA", false);
     settings.setValue("hasModelFid/NAS", true);
     settings.setValue("hasModelFid/RPA", true);
-    settings.setValue("hasModelFid/CZ",  true);
+    settings.setValue("hasModelFid/CZ", true);
     writeVec3(settings, "modelFid/NAS", modelLpa);
     writeVec3(settings, "modelFid/RPA", modelNas);
-    writeVec3(settings, "modelFid/CZ",  modelRpa);
+    writeVec3(settings, "modelFid/CZ", modelRpa);
 
     settings.sync();
 
@@ -266,14 +266,14 @@ void TestPolhemusCoregistration::registration_recoversKnownTransform_data()
     // A rigid transform applied to the pen fiducials to make the model ones.
     // Whatever the fit produces has to map pen onto model again, so each row
     // is an independent check of the Kabsch implementation.
-    QTest::newRow("identity")      << QVector3D(0, 0, 1) <<   0.0f << QVector3D(0.0f,   0.0f,   0.0f);
-    QTest::newRow("yaw 30")        << QVector3D(0, 0, 1) <<  30.0f << QVector3D(0.0f,   0.0f,   0.0f);
-    QTest::newRow("pitch 45")      << QVector3D(1, 0, 0) <<  45.0f << QVector3D(0.0f,   0.0f,   0.0f);
-    QTest::newRow("roll 90")       << QVector3D(0, 1, 0) <<  90.0f << QVector3D(0.0f,   0.0f,   0.0f);
-    QTest::newRow("translation")   << QVector3D(0, 0, 1) <<   0.0f << QVector3D(0.05f, -0.03f,  0.10f);
-    QTest::newRow("yaw + shift")   << QVector3D(0, 0, 1) <<  60.0f << QVector3D(0.02f,  0.04f, -0.01f);
-    QTest::newRow("oblique axis")  << QVector3D(1, 1, 1) << 120.0f << QVector3D(-0.07f, 0.01f,  0.03f);
-    QTest::newRow("near 180")      << QVector3D(0, 1, 0) << 179.0f << QVector3D(0.0f,   0.0f,   0.0f);
+    QTest::newRow("identity") << QVector3D(0, 0, 1) << 0.0f << QVector3D(0.0f, 0.0f, 0.0f);
+    QTest::newRow("yaw 30") << QVector3D(0, 0, 1) << 30.0f << QVector3D(0.0f, 0.0f, 0.0f);
+    QTest::newRow("pitch 45") << QVector3D(1, 0, 0) << 45.0f << QVector3D(0.0f, 0.0f, 0.0f);
+    QTest::newRow("roll 90") << QVector3D(0, 1, 0) << 90.0f << QVector3D(0.0f, 0.0f, 0.0f);
+    QTest::newRow("translation") << QVector3D(0, 0, 1) << 0.0f << QVector3D(0.05f, -0.03f, 0.10f);
+    QTest::newRow("yaw + shift") << QVector3D(0, 0, 1) << 60.0f << QVector3D(0.02f, 0.04f, -0.01f);
+    QTest::newRow("oblique axis") << QVector3D(1, 1, 1) << 120.0f << QVector3D(-0.07f, 0.01f, 0.03f);
+    QTest::newRow("near 180") << QVector3D(0, 1, 0) << 179.0f << QVector3D(0.0f, 0.0f, 0.0f);
 }
 
 //=============================================================================================================
@@ -286,9 +286,9 @@ void TestPolhemusCoregistration::registration_recoversKnownTransform()
 
     // Head scale fiducials in metres, well spread so the degeneracy guard
     // does not trip.
-    const QVector3D penLpa(-0.075f,  0.000f, 0.000f);
-    const QVector3D penNas( 0.000f,  0.095f, 0.000f);
-    const QVector3D penRpa( 0.075f,  0.000f, 0.000f);
+    const QVector3D penLpa(-0.075f, 0.000f, 0.000f);
+    const QVector3D penNas(0.000f, 0.095f, 0.000f);
+    const QVector3D penRpa(0.075f, 0.000f, 0.000f);
 
     QMatrix4x4 expected;
     expected.translate(translation);
@@ -318,21 +318,29 @@ void TestPolhemusCoregistration::registration_recoversKnownTransform()
     // differently expressed transform pass.
     const QMatrix4x4 actual = coreg.worldToModel();
 
-    struct { const char* name; QVector3D from; QVector3D to; } cases[] = {
+    struct
+    {
+        const char* name;
+        QVector3D from;
+        QVector3D to;
+    } cases[] = {
         {"LPA", penLpa, modelLpa},
         {"NAS", penNas, modelNas},
-        {"RPA", penRpa, modelRpa}
-    };
+        {"RPA", penRpa, modelRpa}};
 
-    for(const auto& c : cases) {
+    for (const auto& c : cases) {
         const QVector3D mapped = actual.map(c.from);
         const float err = (mapped - c.to).length();
         QVERIFY2(err < 1.0e-4f,
                  qPrintable(QString("%1 maps to (%2, %3, %4), expected (%5, %6, %7), error %8 m")
-                            .arg(c.name)
-                            .arg(mapped.x()).arg(mapped.y()).arg(mapped.z())
-                            .arg(c.to.x()).arg(c.to.y()).arg(c.to.z())
-                            .arg(err)));
+                                .arg(c.name)
+                                .arg(mapped.x())
+                                .arg(mapped.y())
+                                .arg(mapped.z())
+                                .arg(c.to.x())
+                                .arg(c.to.y())
+                                .arg(c.to.z())
+                                .arg(err)));
     }
 
     // A rigid transform preserves distances. This catches a fit that happens
@@ -344,7 +352,8 @@ void TestPolhemusCoregistration::registration_recoversKnownTransform()
     const float distAfter = (actual.map(probe) - actual.map(probe2)).length();
     QVERIFY2(std::fabs(distBefore - distAfter) < 1.0e-5f,
              qPrintable(QString("transform is not rigid: %1 m became %2 m")
-                        .arg(distBefore).arg(distAfter)));
+                            .arg(distBefore)
+                            .arg(distAfter)));
 }
 
 //=============================================================================================================
@@ -427,9 +436,9 @@ void TestPolhemusCoregistration::registration_requiresAllFiducials()
 
 void TestPolhemusCoregistration::sessionState_roundTrip()
 {
-    const QVector3D penLpa(-0.075f,  0.001f, 0.002f);
-    const QVector3D penNas( 0.003f,  0.095f, 0.004f);
-    const QVector3D penRpa( 0.075f,  0.005f, 0.006f);
+    const QVector3D penLpa(-0.075f, 0.001f, 0.002f);
+    const QVector3D penNas(0.003f, 0.095f, 0.004f);
+    const QVector3D penRpa(0.075f, 0.005f, 0.006f);
 
     QTemporaryDir tmpDir;
     QVERIFY(tmpDir.isValid());

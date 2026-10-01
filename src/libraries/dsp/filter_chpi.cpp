@@ -57,10 +57,10 @@ static QVector<int> megChannelIndices(const FiffInfo& info)
 //=============================================================================================================
 
 void UTILSLIB::filterChpi(MatrixXd& data,
-                           const FiffInfo& info,
-                           double sfreq,
-                           const QVector<double>& hpiFreqs,
-                           const FilterChpiParams& params)
+                          const FiffInfo& info,
+                          double sfreq,
+                          const QVector<double>& hpiFreqs,
+                          const FilterChpiParams& params)
 {
     if (hpiFreqs.isEmpty()) {
         return;
@@ -80,12 +80,12 @@ void UTILSLIB::filterChpi(MatrixXd& data,
         const double fHigh = freq + params.dNotchWidth;
         if (freq <= 0.0 || fHigh >= dNyquist) {
             qWarning() << "filterChpi: Skipping invalid cHPI frequency" << freq
-                        << "Hz (Nyquist =" << dNyquist << "Hz).";
+                       << "Hz (Nyquist =" << dNyquist << "Hz).";
             continue;
         }
         if (fLow <= 0.0) {
             qWarning() << "filterChpi: Skipping cHPI frequency" << freq
-                        << "Hz (notch lower edge <= 0 Hz).";
+                       << "Hz (notch lower edge <= 0 Hz).";
             continue;
         }
         validFreqs.append(freq);
@@ -141,9 +141,9 @@ void UTILSLIB::filterChpi(MatrixXd& data,
 //=============================================================================================================
 
 void UTILSLIB::filterChpi(MatrixXd& data,
-                           const FiffInfo& info,
-                           double sfreq,
-                           const FilterChpiParams& params)
+                          const FiffInfo& info,
+                          double sfreq,
+                          const FilterChpiParams& params)
 {
     // Attempt to extract HPI coil frequencies from FiffInfo.
     // The HPI frequency information may be stored in various FIFF blocks

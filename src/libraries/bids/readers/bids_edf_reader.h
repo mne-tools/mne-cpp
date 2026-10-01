@@ -61,19 +61,19 @@ namespace BIDSLIB
  */
 struct BIDSSHARED_EXPORT EDFChannelInfo
 {
-    int     channelNumber{-1};
+    int channelNumber{-1};
     QString label;
     QString transducerType;
     QString physicalDimension;
     QString prefiltering;
-    float   physicalMin{0.0f};
-    float   physicalMax{0.0f};
-    long    digitalMin{0};
-    long    digitalMax{0};
-    long    samplesPerRecord{0};
-    long    sampleCount{0};
-    float   frequency{0.0f};
-    bool    isMeasurement{false};
+    float physicalMin{0.0f};
+    float physicalMax{0.0f};
+    long digitalMin{0};
+    long digitalMax{0};
+    long samplesPerRecord{0};
+    long sampleCount{0};
+    float frequency{0.0f};
+    bool isMeasurement{false};
 
     FIFFLIB::FiffChInfo toFiffChInfo() const;
 };
@@ -127,44 +127,45 @@ public:
 
 private:
     // EDF header field byte lengths
-    enum EDFHeaderFieldLengths {
-        EDF_VERSION         = 8,
-        LOCAL_PATIENT_INFO  = 80,
-        LOCAL_RECORD_INFO   = 80,
-        STARTDATE           = 8,
-        STARTTIME           = 8,
-        NUM_BYTES_HEADER    = 8,
-        HEADER_RESERVED     = 44,
-        NUM_DATA_RECORDS    = 8,
-        DURATION_DATA_RECS  = 8,
-        NUM_SIGNALS         = 4,
-        SIG_LABEL           = 16,
-        SIG_TRANSDUCER      = 80,
-        SIG_PHYS_DIM        = 8,
-        SIG_PHYS_MIN        = 8,
-        SIG_PHYS_MAX        = 8,
-        SIG_DIG_MIN         = 8,
-        SIG_DIG_MAX         = 8,
-        SIG_PREFILTERING    = 80,
-        SIG_NUM_SAMPLES     = 8,
-        SIG_RESERVED        = 32,
+    enum EDFHeaderFieldLengths
+    {
+        EDF_VERSION = 8,
+        LOCAL_PATIENT_INFO = 80,
+        LOCAL_RECORD_INFO = 80,
+        STARTDATE = 8,
+        STARTTIME = 8,
+        NUM_BYTES_HEADER = 8,
+        HEADER_RESERVED = 44,
+        NUM_DATA_RECORDS = 8,
+        DURATION_DATA_RECS = 8,
+        NUM_SIGNALS = 4,
+        SIG_LABEL = 16,
+        SIG_TRANSDUCER = 80,
+        SIG_PHYS_DIM = 8,
+        SIG_PHYS_MIN = 8,
+        SIG_PHYS_MAX = 8,
+        SIG_DIG_MIN = 8,
+        SIG_DIG_MAX = 8,
+        SIG_PREFILTERING = 80,
+        SIG_NUM_SAMPLES = 8,
+        SIG_RESERVED = 32,
     };
 
     void parseHeader(QIODevice* pDev);
 
-    float   m_fScaleFactor;
+    float m_fScaleFactor;
     QString m_sFilePath;
 
     // Header data
-    QString     m_sVersionNo;
-    QString     m_sPatientId;
-    QString     m_sRecordingId;
-    QDateTime   m_startDateTime;
-    int         m_iNumBytesInHeader{0};
-    int         m_iNumDataRecords{0};
-    float       m_fDataRecordsDuration{0.0f};
-    int         m_iNumChannels{0};
-    int         m_iNumBytesPerDataRecord{0};
+    QString m_sVersionNo;
+    QString m_sPatientId;
+    QString m_sRecordingId;
+    QDateTime m_startDateTime;
+    int m_iNumBytesInHeader{0};
+    int m_iNumDataRecords{0};
+    float m_fDataRecordsDuration{0.0f};
+    int m_iNumChannels{0};
+    int m_iNumBytesPerDataRecord{0};
 
     QVector<EDFChannelInfo> m_vAllChannels;
     QVector<EDFChannelInfo> m_vMeasChannels;

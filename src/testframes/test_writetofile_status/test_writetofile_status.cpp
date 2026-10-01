@@ -39,15 +39,15 @@ private slots:
 
 void TestWriteToFileStatus::formatHelpers_produceExpectedStrings()
 {
-    QCOMPARE(WriteToFile::formatElapsed(0),                  QStringLiteral("00:00:00"));
-    QCOMPARE(WriteToFile::formatElapsed(7'500),              QStringLiteral("00:00:07"));
-    QCOMPARE(WriteToFile::formatElapsed(125'000),            QStringLiteral("00:02:05"));
-    QCOMPARE(WriteToFile::formatElapsed(3'661'000),          QStringLiteral("01:01:01"));
+    QCOMPARE(WriteToFile::formatElapsed(0), QStringLiteral("00:00:00"));
+    QCOMPARE(WriteToFile::formatElapsed(7'500), QStringLiteral("00:00:07"));
+    QCOMPARE(WriteToFile::formatElapsed(125'000), QStringLiteral("00:02:05"));
+    QCOMPARE(WriteToFile::formatElapsed(3'661'000), QStringLiteral("01:01:01"));
 
-    QCOMPARE(WriteToFile::formatBytes(0),                    QStringLiteral("0 B"));
-    QCOMPARE(WriteToFile::formatBytes(512),                  QStringLiteral("512 B"));
-    QCOMPARE(WriteToFile::formatBytes(2048),                 QStringLiteral("2.0 KB"));
-    QCOMPARE(WriteToFile::formatBytes(2 * 1024 * 1024),      QStringLiteral("2.0 MB"));
+    QCOMPARE(WriteToFile::formatBytes(0), QStringLiteral("0 B"));
+    QCOMPARE(WriteToFile::formatBytes(512), QStringLiteral("512 B"));
+    QCOMPARE(WriteToFile::formatBytes(2048), QStringLiteral("2.0 KB"));
+    QCOMPARE(WriteToFile::formatBytes(2 * 1024 * 1024), QStringLiteral("2.0 MB"));
 }
 
 //=============================================================================================================
@@ -106,9 +106,12 @@ void TestWriteToFileStatus::emitRecordingStatus_isRepeatableAndMonotonic()
 
         double value = m.captured(4).toDouble();
         const QString unit = m.captured(5);
-        if (unit == QLatin1String("KB")) value *= 1024.0;
-        else if (unit == QLatin1String("MB")) value *= 1024.0 * 1024.0;
-        else if (unit == QLatin1String("GB")) value *= 1024.0 * 1024.0 * 1024.0;
+        if (unit == QLatin1String("KB"))
+            value *= 1024.0;
+        else if (unit == QLatin1String("MB"))
+            value *= 1024.0 * 1024.0;
+        else if (unit == QLatin1String("GB"))
+            value *= 1024.0 * 1024.0 * 1024.0;
         QVERIFY2(value >= lastBytes,
                  qPrintable(QStringLiteral("File size regressed: %1 -> %2").arg(lastBytes).arg(value)));
         lastBytes = value;
@@ -118,9 +121,7 @@ void TestWriteToFileStatus::emitRecordingStatus_isRepeatableAndMonotonic()
     const QString last = spy.last().first().toString();
     const auto lastMatch = re.match(last);
     QVERIFY(lastMatch.hasMatch());
-    const int lastSecs = lastMatch.captured(1).toInt() * 3600
-                       + lastMatch.captured(2).toInt() * 60
-                       + lastMatch.captured(3).toInt();
+    const int lastSecs = lastMatch.captured(1).toInt() * 3600 + lastMatch.captured(2).toInt() * 60 + lastMatch.captured(3).toInt();
     // qWait() guarantees a lower bound, so the four 600 ms waits put at least 2 s on
     // the recording clock however slow the machine is.
     QVERIFY2(lastSecs >= 2,

@@ -36,7 +36,7 @@ using namespace Eigen;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-Plot::Plot(QWidget *parent)
+Plot::Plot(QWidget* parent)
 : Graph(parent)
 , m_bHoldOn(false)
 {
@@ -45,7 +45,7 @@ Plot::Plot(QWidget *parent)
 
 //=============================================================================================================
 
-Plot::Plot(VectorXd &p_dVec, QWidget *parent)
+Plot::Plot(VectorXd& p_dVec, QWidget* parent)
 : Graph(parent)
 , m_bHoldOn(false)
 {
@@ -76,24 +76,22 @@ void Plot::init()
 
 //=============================================================================================================
 
-void Plot::updateData(VectorXd &p_dVec)
+void Plot::updateData(VectorXd& p_dVec)
 {
-    if(p_dVec.size() > 0)
-    {
-        if(!m_bHoldOn)
+    if (p_dVec.size() > 0) {
+        if (!m_bHoldOn)
             init();
 
         QVector<QPointF> t_qVecPointFPaths;
         //No X data given
         m_dMinX = 0 < m_dMinX ? 0 : m_dMinX;
-        m_dMaxX = p_dVec.size()-1 > m_dMaxX ? p_dVec.size()-1 : m_dMaxX;
+        m_dMaxX = p_dVec.size() - 1 > m_dMaxX ? p_dVec.size() - 1 : m_dMaxX;
 
         m_dMinY = p_dVec.minCoeff() < m_dMinY ? p_dVec.minCoeff() : m_dMinY;
         m_dMaxY = p_dVec.maxCoeff() > m_dMaxY ? p_dVec.maxCoeff() : m_dMaxY;
 
         double t_dX = 0;
-        for(qint32 i = 0; i < p_dVec.size(); ++i)
-        {
+        for (qint32 i = 0; i < p_dVec.size(); ++i) {
             t_qVecPointFPaths.append(QPointF(t_dX, p_dVec[i]));
             t_dX += 1;
         }
@@ -106,7 +104,7 @@ void Plot::updateData(VectorXd &p_dVec)
 
 //=============================================================================================================
 
-void Plot::paintEvent(QPaintEvent *event)
+void Plot::paintEvent(QPaintEvent* event)
 {
     Q_UNUSED(event);
 
@@ -115,21 +113,20 @@ void Plot::paintEvent(QPaintEvent *event)
     // A second one was also being constructed here and never used, which means
     // two QPainters were active on this widget at once - Qt only allows one.
     //
-    if (m_qListVecPointFPaths.size() > 0)
-    {
-        QPoint t_qPointTopLeft(m_iBorderLeftRight,m_iBorderTopBottom);
+    if (m_qListVecPointFPaths.size() > 0) {
+        QPoint t_qPointTopLeft(m_iBorderLeftRight, m_iBorderTopBottom);
 
         QSize t_qSizePlot = m_qSizeWidget;
 
-        t_qSizePlot.setWidth(t_qSizePlot.width() - 2*m_iBorderLeftRight);
-        t_qSizePlot.setHeight(t_qSizePlot.height() - 2*m_iBorderTopBottom);
+        t_qSizePlot.setWidth(t_qSizePlot.width() - 2 * m_iBorderLeftRight);
+        t_qSizePlot.setHeight(t_qSizePlot.height() - 2 * m_iBorderTopBottom);
 
         //Draw background
         QPainter painter(this);
         painter.fillRect(t_qPointTopLeft.x(), t_qPointTopLeft.y(), t_qSizePlot.width(), t_qSizePlot.height(), Qt::white);
 
         //Draw border
-        painter.drawRect(t_qPointTopLeft.x()-1, t_qPointTopLeft.y()-1, t_qSizePlot.width()+1, t_qSizePlot.height()+1);
+        painter.drawRect(t_qPointTopLeft.x() - 1, t_qPointTopLeft.y() - 1, t_qSizePlot.width() + 1, t_qSizePlot.height() + 1);
 
         // -- Data --
         painter.save();
@@ -137,21 +134,20 @@ void Plot::paintEvent(QPaintEvent *event)
         pen.setWidth(1);
         pen.setBrush(Qt::blue);
         painter.setPen(pen);
-        painter.translate(m_iBorderLeftRight-m_dMinX,m_iBorderTopBottom+t_qSizePlot.height()/2);
-        for(qint32 i = 0; i < m_qListVecPointFPaths.size(); ++i)
-        {
-            double scale_x = t_qSizePlot.width()/(m_dMaxX - m_dMinX);
-            double scale_y = (t_qSizePlot.height()-(t_qSizePlot.height()*0.1))/(m_dMaxY - m_dMinY);
+        painter.translate(m_iBorderLeftRight - m_dMinX, m_iBorderTopBottom + t_qSizePlot.height() / 2);
+        for (qint32 i = 0; i < m_qListVecPointFPaths.size(); ++i) {
+            double scale_x = t_qSizePlot.width() / (m_dMaxX - m_dMinX);
+            double scale_y = (t_qSizePlot.height() - (t_qSizePlot.height() * 0.1)) / (m_dMaxY - m_dMinY);
 
             //scale
             QVector<QPointF> t_qVecPointFPath;
             QVector<QPointF>::ConstIterator it;
-            for(it = m_qListVecPointFPaths[i].begin(); it != m_qListVecPointFPaths[i].end(); ++it)
-                t_qVecPointFPath.append(QPointF(it->x()*scale_x, it->y()*scale_y));
+            for (it = m_qListVecPointFPaths[i].begin(); it != m_qListVecPointFPaths[i].end(); ++it)
+                t_qVecPointFPath.append(QPointF(it->x() * scale_x, it->y() * scale_y));
 
             //draw
-            for(it = t_qVecPointFPath.begin()+1; it != t_qVecPointFPath.end(); ++it)
-                painter.drawLine(*(it-1), *it);
+            for (it = t_qVecPointFPath.begin() + 1; it != t_qVecPointFPath.end(); ++it)
+                painter.drawLine(*(it - 1), *it);
         }
         painter.restore();
 
@@ -159,4 +155,3 @@ void Plot::paintEvent(QPaintEvent *event)
         Graph::drawLabels(t_qSizePlot.width(), t_qSizePlot.height());
     }
 }
-

@@ -47,15 +47,15 @@ using namespace UTILSLIB;
 //=============================================================================================================
 
 PythonRunner::PythonRunner(QObject* pParent)
-    : QObject(pParent)
+: QObject(pParent)
 {
 }
 
 //=============================================================================================================
 
 PythonRunner::PythonRunner(const PythonRunnerConfig& config, QObject* pParent)
-    : QObject(pParent)
-    , m_config(config)
+: QObject(pParent)
+, m_config(config)
 {
 }
 
@@ -104,7 +104,7 @@ PythonRunnerResult PythonRunner::run(const QString& scriptPath,
 //=============================================================================================================
 
 PythonRunnerResult PythonRunner::runCode(const QString& code,
-                                          const QStringList& args)
+                                         const QStringList& args)
 {
     QStringList fullArgs;
     if (m_config.unbuffered) {
@@ -123,8 +123,8 @@ bool PythonRunner::isPythonAvailable() const
     QProcess proc;
     proc.start(m_config.pythonExe, {QStringLiteral("--version")});
     return proc.waitForFinished(5000) &&
-           proc.exitStatus() == QProcess::NormalExit &&
-           proc.exitCode() == 0;
+        proc.exitStatus() == QProcess::NormalExit &&
+        proc.exitCode() == 0;
 }
 
 //=============================================================================================================
@@ -161,14 +161,15 @@ bool PythonRunner::isPackageAvailable(const QString& packageName) const
     proc.start(m_config.pythonExe,
                {QStringLiteral("-c"),
                 QStringLiteral("import importlib.util, sys; "
-                               "sys.exit(0 if importlib.util.find_spec('%1') else 1)").arg(packageName)});
+                               "sys.exit(0 if importlib.util.find_spec('%1') else 1)")
+                    .arg(packageName)});
     if (!proc.waitForFinished(10000)) {
         proc.kill();
         proc.waitForFinished(1000);
         return false;
     }
     return proc.exitStatus() == QProcess::NormalExit &&
-           proc.exitCode() == 0;
+        proc.exitCode() == 0;
 }
 
 //=============================================================================================================
@@ -213,7 +214,7 @@ PythonRunnerResult PythonRunner::ensureVenv()
             return result;
         }
 
-        if (!venvProc.waitForFinished(120000)) {  // 2 min timeout for venv creation
+        if (!venvProc.waitForFinished(120000)) { // 2 min timeout for venv creation
             result.stdErr = QStringLiteral("Venv creation timed out.");
             venvProc.kill();
             venvProc.waitForFinished(5000);
@@ -278,7 +279,7 @@ PythonRunnerResult PythonRunner::ensureVenv()
         }
 
         // pip install can take a while (torch alone is ~2 GB)
-        if (!pipProc.waitForFinished(1800000)) {  // 30 min timeout
+        if (!pipProc.waitForFinished(1800000)) { // 30 min timeout
             result.stdErr = QStringLiteral("pip install timed out.");
             result.timedOut = true;
             pipProc.kill();
@@ -312,7 +313,7 @@ PythonRunnerResult PythonRunner::ensureVenv()
 //=============================================================================================================
 
 PythonRunnerResult PythonRunner::runInVenv(const QString& scriptPath,
-                                            const QStringList& args)
+                                           const QStringList& args)
 {
     // Ensure venv is set up
     PythonRunnerResult setupResult = ensureVenv();
@@ -371,8 +372,10 @@ PythonRunnerResult PythonRunner::execute(const QStringList& fullArgs)
             buffer.remove(0, idx + 1);
 
             // Accumulate full output
-            if (channel == 0) stdOutLines << line;
-            else              stdErrLines << line;
+            if (channel == 0)
+                stdOutLines << line;
+            else
+                stdErrLines << line;
 
             // Dispatch to callback
             if (m_lineCb) {
@@ -437,24 +440,26 @@ PythonRunnerResult PythonRunner::execute(const QStringList& fullArgs)
     if (!stdOutBuf.isEmpty()) {
         QString line = QString::fromUtf8(stdOutBuf);
         stdOutLines << line;
-        if (m_lineCb) m_lineCb(0, line);
+        if (m_lineCb)
+            m_lineCb(0, line);
         emit lineReceived(0, line);
     }
     if (!stdErrBuf.isEmpty()) {
         QString line = QString::fromUtf8(stdErrBuf);
         stdErrLines << line;
-        if (m_lineCb) m_lineCb(1, line);
+        if (m_lineCb)
+            m_lineCb(1, line);
         emit lineReceived(1, line);
     }
 
     // Assemble full output from accumulated lines
-    result.stdOut  = stdOutLines.join(QLatin1Char('\n'));
+    result.stdOut = stdOutLines.join(QLatin1Char('\n'));
     result.stdErr += stdErrLines.join(QLatin1Char('\n'));
 
     result.exitCode = process.exitCode();
-    result.success  = (!result.timedOut &&
-                       process.exitStatus() == QProcess::NormalExit &&
-                       result.exitCode == 0);
+    result.success = (!result.timedOut &&
+                      process.exitStatus() == QProcess::NormalExit &&
+                      result.exitCode == 0);
 
     if (result.success) {
         qDebug() << "[PythonRunner] Script finished successfully.";
@@ -470,8 +475,8 @@ PythonRunnerResult PythonRunner::execute(const QStringList& fullArgs)
 //=============================================================================================================
 
 bool PythonRunner::parseProgressLine(const QString& line,
-                                      float& pct,
-                                      QString& msg) const
+                                     float& pct,
+                                     QString& msg) const
 {
     // Match: [progress] 42.5%  or  [progress] 42.5% Training epoch 10/50
     static const QRegularExpression re(

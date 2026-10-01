@@ -35,28 +35,31 @@
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-namespace ANSHAREDLIB {
-    class FiffRawViewModel;
-    class AbstractModel;
-    class AveragingDataModel;
-    class Communicator;
+namespace ANSHAREDLIB
+{
+class FiffRawViewModel;
+class AbstractModel;
+class AveragingDataModel;
+class Communicator;
 }
 
-namespace DISPLIB {
-    class AveragingSettingsView;
-    class ChannelSelectionView;
-    class AverageLayoutView;
-    class ChannelInfoModel;
-    class EvokedSetModel;
-    class ButterflyView;
-    class SelectionItem;
+namespace DISPLIB
+{
+class AveragingSettingsView;
+class ChannelSelectionView;
+class AverageLayoutView;
+class ChannelInfoModel;
+class EvokedSetModel;
+class ButterflyView;
+class SelectionItem;
 }
 
-namespace FIFFLIB {
-    class FiffEvokedSet;
-    class FiffEvoked;
-    class FiffInfo;
-    class FiffRawData;
+namespace FIFFLIB
+{
+class FiffEvokedSet;
+class FiffEvoked;
+class FiffInfo;
+class FiffRawData;
 }
 
 //=============================================================================================================
@@ -114,8 +117,9 @@ signals:
     //=========================================================================================================
     void showSelectedChannels(const QList<int> selectedChannelsIndexes);
     void showAllChannels();
-    void channelSelectionManagerChanged(const QVariant &data);
-    void layoutChanged(const QMap<QString,QPointF> &layoutMap);
+    void channelSelectionManagerChanged(const QVariant& data);
+    void layoutChanged(const QMap<QString, QPointF>& layoutMap);
+
 private:
     //=========================================================================================================
     /**
@@ -253,7 +257,7 @@ private:
      *
      * @param[in] data     QVariant with a SelectionItem object with channel selection information.
      */
-    void setChannelSelection(const QVariant &data);
+    void setChannelSelection(const QVariant& data);
 
     //=========================================================================================================
     /**
@@ -261,7 +265,7 @@ private:
      *
      * @param[in] data     QVariant with a ScalingParameters object with relevant scaling data.
      */
-    void setScalingMap(const QVariant &data);
+    void setScalingMap(const QVariant& data);
 
     //=========================================================================================================
     /**
@@ -297,41 +301,40 @@ private:
 
     void updateEvokedSetModel();
 
-    QSharedPointer<ANSHAREDLIB::FiffRawViewModel>           m_pFiffRawModel;            /**< Pointer to currently loaded FiffRawView Model. */
-    QSharedPointer<QList<QPair<int,double>>>                m_pTriggerList;             /**< Pointer to list of stim triggers. */
-    QSharedPointer<DISPLIB::EvokedSetModel>                 m_pEvokedModel;             /**< Pointer to model used to display averaging data from m_pFiffEvokedSet and m_pFiffEvoked. */
-    QSharedPointer<DISPLIB::ChannelInfoModel>               m_pChannelInfoModel;        /**< Pointer to model that holds channel info data. */
-    QSharedPointer<FIFFLIB::FiffInfo>                       m_pFiffInfo;                /**< Pointer to info about loaded fiff data. */
+    QSharedPointer<ANSHAREDLIB::FiffRawViewModel> m_pFiffRawModel; /**< Pointer to currently loaded FiffRawView Model. */
+    QSharedPointer<QList<QPair<int, double>>> m_pTriggerList;      /**< Pointer to list of stim triggers. */
+    QSharedPointer<DISPLIB::EvokedSetModel> m_pEvokedModel;        /**< Pointer to model used to display averaging data from m_pFiffEvokedSet and m_pFiffEvoked. */
+    QSharedPointer<DISPLIB::ChannelInfoModel> m_pChannelInfoModel; /**< Pointer to model that holds channel info data. */
+    QSharedPointer<FIFFLIB::FiffInfo> m_pFiffInfo;                 /**< Pointer to info about loaded fiff data. */
 
-    QPointer<ANSHAREDLIB::Communicator>                     m_pCommu;                   /**< To broadcst signals. */
-    QPointer<DISPLIB::ButterflyView>                        m_pButterflyView;           /**< The butterfly plot view. */
-    QPointer<DISPLIB::AverageLayoutView>                    m_pAverageLayoutView;       /**< The average layout plot view. */
+    QPointer<ANSHAREDLIB::Communicator> m_pCommu;              /**< To broadcst signals. */
+    QPointer<DISPLIB::ButterflyView> m_pButterflyView;         /**< The butterfly plot view. */
+    QPointer<DISPLIB::AverageLayoutView> m_pAverageLayoutView; /**< The average layout plot view. */
 
-    DISPLIB::AveragingSettingsView*                         m_pAveragingSettingsView;   /**< Pointer to averaging settings GUI. */
+    DISPLIB::AveragingSettingsView* m_pAveragingSettingsView; /**< Pointer to averaging settings GUI. */
 
-    float                                                   m_fBaselineFromS;            /**< Baseline start - in seconds relative to stim(0) - can be negative*/
-    float                                                   m_fBaselineToS;              /**< Baseline end - in seconds relative to stim(0) - can be negative*/
-    float                                                   m_fPreStim;                 /**< Time before stim - in seconds - stored as positive number (>0). */
-    float                                                   m_fPostStim;                /**< Time after stim - in seconds - stored as positive number (>0). */
-    float                                                   m_fTriggerThreshold;        /**< Threshold to count stim channel events. */
+    float m_fBaselineFromS;    /**< Baseline start - in seconds relative to stim(0) - can be negative*/
+    float m_fBaselineToS;      /**< Baseline end - in seconds relative to stim(0) - can be negative*/
+    float m_fPreStim;          /**< Time before stim - in seconds - stored as positive number (>0). */
+    float m_fPostStim;         /**< Time after stim - in seconds - stored as positive number (>0). */
+    float m_fTriggerThreshold; /**< Threshold to count stim channel events. */
 
-    QVBoxLayout*                                            m_pLayout;                  /**< Pointer to layout that holds parameter GUI tab elements. */
-    QTabWidget*                                             m_pTabView;                 /**< Pointer to object that stores multiple tabs of GUI items. */
+    QVBoxLayout* m_pLayout; /**< Pointer to layout that holds parameter GUI tab elements. */
+    QTabWidget* m_pTabView; /**< Pointer to object that stores multiple tabs of GUI items. */
 
-    bool                                                    m_bBaseline;                /**< Whether to apply baseline correction. */
-    bool                                                    m_bRejection;               /**< Whether to drop data points marked fro rejection when calculating average. */
-    bool                                                    m_bLoaded;                  /**< Whether the full GUI has already been laoaded. */
-    bool                                                    m_bPerformFiltering;        /**< Flag whether to activate/deactivate filtering. */
-    bool                                                    m_bAutoRecompute;           /**< Whether to auto recompute averages */
-    bool                                                    m_bSavingAverage;           /**< Whether to save average */
+    bool m_bBaseline;         /**< Whether to apply baseline correction. */
+    bool m_bRejection;        /**< Whether to drop data points marked fro rejection when calculating average. */
+    bool m_bLoaded;           /**< Whether the full GUI has already been laoaded. */
+    bool m_bPerformFiltering; /**< Flag whether to activate/deactivate filtering. */
+    bool m_bAutoRecompute;    /**< Whether to auto recompute averages */
+    bool m_bSavingAverage;    /**< Whether to save average */
 
-    UTILSLIB::FilterKernel                           m_filterKernel;             /**< List of currently active filters. */
+    UTILSLIB::FilterKernel m_filterKernel; /**< List of currently active filters. */
 
-    QFutureWatcher<QSharedPointer<FIFFLIB::FiffEvokedSet>>  m_FutureWatcher;            /**< Future watcher for notifing of completed average calculations. */
-    QFuture<QSharedPointer<FIFFLIB::FiffEvokedSet>>         m_Future;                   /**< Future for performing average calculations of separate thread. */
+    QFutureWatcher<QSharedPointer<FIFFLIB::FiffEvokedSet>> m_FutureWatcher; /**< Future watcher for notifing of completed average calculations. */
+    QFuture<QSharedPointer<FIFFLIB::FiffEvokedSet>> m_Future;               /**< Future for performing average calculations of separate thread. */
 
-    QMutex                                                  m_ParameterMutex;           /**< Mutex for thread-safing. */
-
+    QMutex m_ParameterMutex; /**< Mutex for thread-safing. */
 };
 
 } // NAMESPACE

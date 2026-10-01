@@ -44,7 +44,8 @@ using namespace ANSHAREDLIB;
 // DEFINE STATIC HELPERS
 //=============================================================================================================
 
-namespace {
+namespace
+{
 
 //=============================================================================================================
 /**
@@ -62,12 +63,11 @@ bool containsBemSurfaces(const QString& sFilePath)
     QFile file(sFilePath);
     FIFFLIB::FiffStream::SPtr pStream(new FIFFLIB::FiffStream(&file));
 
-    if(!pStream->open()) {
+    if (!pStream->open()) {
         return false;
     }
 
-    const bool bHasBem = !pStream->dirtree()->dir_tree_find(FIFFB_BEM).isEmpty()
-                      || !pStream->dirtree()->dir_tree_find(FIFFB_BEM_SURF).isEmpty();
+    const bool bHasBem = !pStream->dirtree()->dir_tree_find(FIFFB_BEM).isEmpty() || !pStream->dirtree()->dir_tree_find(FIFFB_BEM_SURF).isEmpty();
 
     pStream->close();
 
@@ -98,7 +98,6 @@ DataLoader::DataLoader()
 
 DataLoader::~DataLoader()
 {
-
 }
 
 //=============================================================================================================
@@ -120,7 +119,6 @@ void DataLoader::init()
 
 void DataLoader::unload()
 {
-
 }
 
 //=============================================================================================================
@@ -132,7 +130,7 @@ QString DataLoader::getName() const
 
 //=============================================================================================================
 
-QMenu *DataLoader::getMenu()
+QMenu* DataLoader::getMenu()
 {
     QMenu* pMenuFile = new QMenu(tr("File"));
 
@@ -158,21 +156,21 @@ QMenu *DataLoader::getMenu()
 
     QAction* pActionSaveData = new QAction(tr("Save data"));
     pActionLoadFile->setStatusTip(tr("Save the selected data file"));
-    connect(pActionSaveData, &QAction::triggered,[=, this] {
-                onSaveFilePressed(DATA_FILE);
-            });
+    connect(pActionSaveData, &QAction::triggered, [=, this] {
+        onSaveFilePressed(DATA_FILE);
+    });
 
     QAction* pActionSaveAvg = new QAction(tr("Save average"));
     pActionLoadFile->setStatusTip(tr("Save the selected data file"));
-    connect(pActionSaveAvg, &QAction::triggered,[=, this] {
-                onSaveFilePressed(AVERAGE_FILE);
-            });
+    connect(pActionSaveAvg, &QAction::triggered, [=, this] {
+        onSaveFilePressed(AVERAGE_FILE);
+    });
 
     QAction* pActionSaveAnn = new QAction(tr("Save events"));
     pActionLoadFile->setStatusTip(tr("Save the selected data file"));
-    connect(pActionSaveAnn, &QAction::triggered,[=, this] {
-                onSaveFilePressed(EVENT_FILE);
-            });
+    connect(pActionSaveAnn, &QAction::triggered, [=, this] {
+        onSaveFilePressed(EVENT_FILE);
+    });
 
     QMenu* pBIDSMenu = new QMenu(tr("Load BIDS Folder"));
     pBIDSMenu->addAction(pActionLoadSubject);
@@ -194,14 +192,14 @@ QMenu *DataLoader::getMenu()
 
 //=============================================================================================================
 
-QDockWidget *DataLoader::getControl()
+QDockWidget* DataLoader::getControl()
 {
     return Q_NULLPTR;
 }
 
 //=============================================================================================================
 
-QWidget *DataLoader::getView()
+QWidget* DataLoader::getView()
 {
     return Q_NULLPTR;
 }
@@ -211,11 +209,11 @@ QWidget *DataLoader::getView()
 void DataLoader::handleEvent(QSharedPointer<Event> e)
 {
     switch (e->getType()) {
-    case EVENT_TYPE::SELECTED_MODEL_CHANGED:
-        onModelChanged(e->getData().value<QSharedPointer<ANSHAREDLIB::AbstractModel> >());
-        break;
-    default:
-        qWarning() << "[DataLoader::handleEvent] Received an Event that is not handled by switch cases.";
+        case EVENT_TYPE::SELECTED_MODEL_CHANGED:
+            onModelChanged(e->getData().value<QSharedPointer<ANSHAREDLIB::AbstractModel>>());
+            break;
+        default:
+            qWarning() << "[DataLoader::handleEvent] Received an Event that is not handled by switch cases.";
     }
 }
 
@@ -232,7 +230,7 @@ QVector<EVENT_TYPE> DataLoader::getEventSubscriptions(void) const
 
 void DataLoader::cmdLineStartup(const QStringList& sArguments)
 {
-    if(sArguments.size() == 2 && (sArguments.first() == "file" || sArguments.first() == "f")) {
+    if (sArguments.size() == 2 && (sArguments.first() == "file" || sArguments.first() == "f")) {
         loadFilePath(sArguments.at(1));
     }
 }
@@ -245,26 +243,26 @@ void DataLoader::loadFilePath(const QString& sFilePath)
 
     startProgress("Loading " + fileInfo.fileName());
 
-    if(fileInfo.exists() && (fileInfo.completeSuffix() == "eve")){
+    if (fileInfo.exists() && (fileInfo.completeSuffix() == "eve")) {
         QSharedPointer<ANSHAREDLIB::EventModel> pModel = m_pAnalyzeData->loadModel<ANSHAREDLIB::EventModel>(sFilePath);
         //pModel->applyOffset(m_pSelectedModel->absoluteFirstSample());
         pModel->setFiffModel(m_pSelectedModel);
         pModel->setFirstLastSample(m_pSelectedModel->absoluteFirstSample(), m_pSelectedModel->absoluteLastSample());
         pModel->setSampleFreq(m_pSelectedModel->getFiffInfo()->sfreq);
-    } else if(fileInfo.exists() && (fileInfo.completeSuffix() == "fif")) {
-        if(fileInfo.completeBaseName().endsWith("eve")){
+    } else if (fileInfo.exists() && (fileInfo.completeSuffix() == "fif")) {
+        if (fileInfo.completeBaseName().endsWith("eve")) {
             m_pAnalyzeData->loadModel<ANSHAREDLIB::EventModel>(sFilePath);
-        } else if(fileInfo.completeBaseName().endsWith("bem")) {
+        } else if (fileInfo.completeBaseName().endsWith("bem")) {
             m_pAnalyzeData->loadModel<ANSHAREDLIB::BemDataModel>(sFilePath);
-        } else if(fileInfo.completeBaseName().endsWith("raw")){
+        } else if (fileInfo.completeBaseName().endsWith("raw")) {
             m_pAnalyzeData->loadModel<ANSHAREDLIB::FiffRawViewModel>(sFilePath);
-        } else if (fileInfo.completeBaseName().endsWith("ave")){
+        } else if (fileInfo.completeBaseName().endsWith("ave")) {
             m_pAnalyzeData->loadModel<ANSHAREDLIB::AveragingDataModel>(sFilePath);
-        } else if(fileInfo.completeBaseName().endsWith("cov")){
+        } else if (fileInfo.completeBaseName().endsWith("cov")) {
             m_pAnalyzeData->loadModel<ANSHAREDLIB::CovarianceModel>(sFilePath);
-        } else if(fileInfo.completeBaseName().endsWith("trans")){
+        } else if (fileInfo.completeBaseName().endsWith("trans")) {
             m_pAnalyzeData->loadModel<ANSHAREDLIB::MriCoordModel>(sFilePath);
-        } else if(containsBemSurfaces(sFilePath)) {
+        } else if (containsBemSurfaces(sFilePath)) {
             //
             // The naming conventions above miss perfectly valid files: the
             // high-resolution head surfaces shipped with the sample data are
@@ -286,33 +284,32 @@ void DataLoader::loadFilePath(const QString& sFilePath)
 
 void DataLoader::onLoadFilePressed()
 {
-    #ifdef WASMBUILD
-    auto fileContentReady = [&](const QString &sFilePath, const QByteArray &fileContent) {
-        if(!sFilePath.isNull()) {
+#ifdef WASMBUILD
+    auto fileContentReady = [&](const QString& sFilePath, const QByteArray& fileContent) {
+        if (!sFilePath.isNull()) {
             // We need to prepend "wasm/" because QFileDialog::getOpenFileContent does not provide a full
             // path, which we need for organzing the different models in AnalyzeData
-            m_pAnalyzeData->loadModel<FiffRawViewModel>("wasm/"+sFilePath, fileContent);
+            m_pAnalyzeData->loadModel<FiffRawViewModel>("wasm/" + sFilePath, fileContent);
         }
     };
-    QFileDialog::getOpenFileContent("Fiff File (*.fif *.fiff)",  fileContentReady);
-    #else
+    QFileDialog::getOpenFileContent("Fiff File (*.fif *.fiff)", fileContentReady);
+#else
     //Get the path
     QString sFilePath = QFileDialog::getOpenFileName(Q_NULLPTR,
-                                                    tr("Open File"),
-                                                    m_sLastDir,
-                                                    tr("Fiff file (*.fif *.fiff);;Event file (*.eve)"));
+                                                     tr("Open File"),
+                                                     m_sLastDir,
+                                                     tr("Fiff file (*.fif *.fiff);;Event file (*.eve)"));
 
     QFileInfo fileInfo(sFilePath);
 
-    if(fileInfo.fileName().isEmpty() || !fileInfo.isFile()){
-
+    if (fileInfo.fileName().isEmpty() || !fileInfo.isFile()) {
         return;
     }
 
     updateLastDir(fileInfo.absolutePath());
 
     loadFilePath(sFilePath);
-    #endif
+#endif
 }
 
 //=============================================================================================================
@@ -347,8 +344,7 @@ void DataLoader::loadSettings()
 {
     QSettings settings("MNECPP");
     settings.beginGroup(m_sSettingsPath);
-    if(settings.contains("lastDirectory"))
-    {
+    if (settings.contains("lastDirectory")) {
         m_sLastDir = settings.value("lastDirectory").toString();
     } else {
         saveSettings();
@@ -359,14 +355,14 @@ void DataLoader::loadSettings()
 
 void DataLoader::onSaveFilePressed(FileType type)
 {
-    if(!m_pSelectedModel) {
+    if (!m_pSelectedModel) {
         qWarning() << "[DataLoader::onSaveFilePressed] No model selected.";
         return;
     }
 
-    #ifdef WASMBUILD
-    switch (type){
-        case DATA_FILE:{
+#ifdef WASMBUILD
+    switch (type) {
+        case DATA_FILE: {
             m_pSelectedModel->saveToFile("");
             break;
         }
@@ -383,12 +379,12 @@ void DataLoader::onSaveFilePressed(FileType type)
             qWarning() << "[DataLoader::onSaveFilePressed] Saving operation not supported.";
         }
     }
-    #else
+#else
 
     QString sFile, sFileType, sDir;
 
-    switch (type){
-        case DATA_FILE:{
+    switch (type) {
+        case DATA_FILE: {
             sFile = tr("Save File");
             sFileType = tr("Fiff file(*.fif *.fiff)");
             sDir = "/../resources/data/MNE-sample-data";
@@ -411,19 +407,19 @@ void DataLoader::onSaveFilePressed(FileType type)
 
     //Get the path
     QString sFilePath = QFileDialog::getSaveFileName(Q_NULLPTR,
-                                                    sFile,
-                                                    QDir::currentPath()+sDir,
-                                                    sFileType);
+                                                     sFile,
+                                                     QDir::currentPath() + sDir,
+                                                     sFileType);
     QFileInfo fileInfo(sFilePath);
 
-    if(fileInfo.fileName().isEmpty()){
+    if (fileInfo.fileName().isEmpty()) {
         return;
     }
 
     startProgress("Saving " + fileInfo.fileName());
 
-    switch (type){
-        case DATA_FILE:{
+    switch (type) {
+        case DATA_FILE: {
             m_pSelectedModel->saveToFile(sFilePath);
             break;
         }
@@ -442,7 +438,7 @@ void DataLoader::onSaveFilePressed(FileType type)
 
     endProgress();
 
-    #endif
+#endif
 }
 
 //=============================================================================================================
@@ -450,10 +446,10 @@ void DataLoader::onSaveFilePressed(FileType type)
 void DataLoader::onLoadSubjectPressed()
 {
     QString dir = QFileDialog::getExistingDirectory(Q_NULLPTR,
-                                                       tr("select directory"),
-                                                       QDir::currentPath()+"/../resources/data/MNE-sample-data");
+                                                    tr("select directory"),
+                                                    QDir::currentPath() + "/../resources/data/MNE-sample-data");
 
-    if(dir.isEmpty()){
+    if (dir.isEmpty()) {
         qDebug() << "Empty input";
         return;
     }
@@ -467,14 +463,13 @@ void DataLoader::onLoadSubjectPressed()
 
 void DataLoader::onLoadSessionPressed()
 {
-
 }
 
 //=============================================================================================================
 
 void DataLoader::startProgress(QString sMessage)
 {
-    if (!m_pProgressViewWidget->isHidden()){
+    if (!m_pProgressViewWidget->isHidden()) {
         return;
     }
 
@@ -483,17 +478,16 @@ void DataLoader::startProgress(QString sMessage)
     m_pProgressViewWidget->show();
     m_pProgressViewWidget->move(qApp->topLevelWindows().first()->screen()->geometry().center() - m_pProgressViewWidget->rect().center());
 
-    for (QWindow* window : qApp->topLevelWindows()){
+    for (QWindow* window : qApp->topLevelWindows()) {
         window->setOpacity(0.8);
-        for (QWidget* widget : window->findChildren<QWidget*>()){
-         widget->setEnabled(false);
+        for (QWidget* widget : window->findChildren<QWidget*>()) {
+            widget->setEnabled(false);
         }
     }
 
     m_pProgressViewWidget->setWindowOpacity(1.0);
 
     QApplication::processEvents();
-
 }
 
 //=============================================================================================================
@@ -502,10 +496,10 @@ void DataLoader::endProgress()
 {
     m_pProgressViewWidget->hide();
 
-    for (QWindow* window : qApp->topLevelWindows()){
+    for (QWindow* window : qApp->topLevelWindows()) {
         window->setOpacity(1.0);
-        for (QWidget* widget : window->findChildren<QWidget*>()){
-         widget->setEnabled(true);
+        for (QWidget* widget : window->findChildren<QWidget*>()) {
+            widget->setEnabled(true);
         }
     }
 }
@@ -514,9 +508,9 @@ void DataLoader::endProgress()
 
 void DataLoader::onModelChanged(QSharedPointer<ANSHAREDLIB::AbstractModel> pNewModel)
 {
-    if(pNewModel->getType() == MODEL_TYPE::ANSHAREDLIB_FIFFRAW_MODEL) {
-        if(m_pSelectedModel) {
-            if(m_pSelectedModel == pNewModel) {
+    if (pNewModel->getType() == MODEL_TYPE::ANSHAREDLIB_FIFFRAW_MODEL) {
+        if (m_pSelectedModel) {
+            if (m_pSelectedModel == pNewModel) {
                 qInfo() << "[Averaging::onModelChanged] New model is the same as old model";
                 return;
             }
@@ -529,5 +523,5 @@ void DataLoader::onModelChanged(QSharedPointer<ANSHAREDLIB::AbstractModel> pNewM
 
 QString DataLoader::getBuildInfo()
 {
-    return QString(DATALOADERPLUGIN::buildDateTime()) + QString(" - ")  + QString(DATALOADERPLUGIN::buildHash());
+    return QString(DATALOADERPLUGIN::buildDateTime()) + QString(" - ") + QString(DATALOADERPLUGIN::buildHash());
 }

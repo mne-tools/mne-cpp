@@ -43,8 +43,8 @@ void TestDspSphara::makeSpharaProjector_simpleProjector_matchesExpectedBlock()
 {
     MatrixXd basis(3, 2);
     basis << 1.0, 0.0,
-             0.0, 1.0,
-             0.0, 0.0;
+        0.0, 1.0,
+        0.0, 0.0;
 
     VectorXi indices(3);
     indices << 2, 0, 3;
@@ -68,7 +68,7 @@ void TestDspSphara::makeSpharaProjector_skipReplicatesAcrossSensorGroups()
 {
     MatrixXd basis(2, 1);
     basis << 1.0,
-             0.0;
+        0.0;
 
     VectorXi indices(4);
     indices << 0, 1, 2, 3;

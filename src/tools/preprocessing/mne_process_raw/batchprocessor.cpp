@@ -47,11 +47,11 @@ using namespace Eigen;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-bool BatchProcessor::composeSaveNames(const QString &rawName,
-                                      const QString &tag,
+bool BatchProcessor::composeSaveNames(const QString& rawName,
+                                      const QString& tag,
                                       bool stripDir,
-                                      QString &saveName,
-                                      QString &logName)
+                                      QString& saveName,
+                                      QString& logName)
 {
     if (tag.isEmpty() || rawName.isEmpty()) {
         qWarning() << "[BatchProcessor::composeSaveNames] Tag or rawname missing.";
@@ -76,14 +76,14 @@ bool BatchProcessor::composeSaveNames(const QString &rawName,
     }
 
     saveName = base + tag + ".fif";
-    logName  = base + tag + ".log";
+    logName = base + tag + ".log";
 
     return true;
 }
 
 //=============================================================================================================
 
-bool BatchProcessor::writeLog(const QString &logFile, const QString &log)
+bool BatchProcessor::writeLog(const QString& logFile, const QString& log)
 {
     if (logFile.isEmpty() || log.isEmpty())
         return true;
@@ -104,7 +104,7 @@ bool BatchProcessor::writeLog(const QString &logFile, const QString &log)
 
 //=============================================================================================================
 
-int BatchProcessor::run(const ProcessingSettings &settings)
+int BatchProcessor::run(const ProcessingSettings& settings)
 {
     if (settings.rawFiles.isEmpty()) {
         qCritical() << "Raw data file not specified.";
@@ -119,7 +119,7 @@ int BatchProcessor::run(const ProcessingSettings &settings)
 
     // Process each raw file
     for (int f = 0; f < settings.rawFiles.size(); ++f) {
-        const QString &rawName = settings.rawFiles[f];
+        const QString& rawName = settings.rawFiles[f];
 
         qInfo() << "\n--- Opening" << rawName << "---\n";
 
@@ -128,11 +128,11 @@ int BatchProcessor::run(const ProcessingSettings &settings)
         std::optional<FiffRawData> rawData;
         try {
             rawData.emplace(rawFile);
-        } catch (const std::exception &error) {
+        } catch (const std::exception& error) {
             qCritical() << "Failed to open raw data file:" << rawName << error.what();
             return 1;
         }
-        FiffRawData &raw = *rawData;
+        FiffRawData& raw = *rawData;
 
         if (raw.info.nchan == 0) {
             qCritical() << "Failed to open raw data file:" << rawName;
@@ -168,10 +168,10 @@ int BatchProcessor::run(const ProcessingSettings &settings)
             // Detect from trigger channel
             qInfo() << "Detecting events from trigger channel" << settings.digTrigger;
             FiffEvents::detect_from_raw(raw,
-                                     fiffEvents,
-                                     settings.digTrigger,
-                                     settings.digTriggerMask,
-                                     true);
+                                        fiffEvents,
+                                        settings.digTrigger,
+                                        settings.digTriggerMask,
+                                        true);
         }
 
         qInfo() << fiffEvents.num_events() << "events found.";
@@ -201,10 +201,10 @@ int BatchProcessor::run(const ProcessingSettings &settings)
             if (settings.makeProj) {
                 qInfo() << "\n--- Creating new projection operator ---\n";
 
-                QMap<QString,double> projReject;
+                QMap<QString, double> projReject;
                 projReject["grad"] = settings.projGradReject;
-                projReject["mag"]  = settings.projMagReject;
-                projReject["eeg"]  = settings.projEegReject;
+                projReject["mag"] = settings.projMagReject;
+                projReject["eeg"] = settings.projEegReject;
 
                 QList<FiffProj> newProjs = MNE::compute_proj(
                     raw, fiffEvents.events,
@@ -233,7 +233,7 @@ int BatchProcessor::run(const ProcessingSettings &settings)
             } else {
                 // Load projections from files
                 QList<FiffProj> loadedProjs;
-                for (const QString &projFile : settings.projFiles) {
+                for (const QString& projFile : settings.projFiles) {
                     QFile pFile(projFile);
                     FiffStream::SPtr pStream(new FiffStream(&pFile));
                     if (pStream->open()) {
@@ -352,7 +352,7 @@ int BatchProcessor::run(const ProcessingSettings &settings)
             covLog += QString("Computing covariance matrix\n");
 
             for (int d = 0; d < covDesc.defs.size(); ++d) {
-                const CovDefinition &def = covDesc.defs[d];
+                const CovDefinition& def = covDesc.defs[d];
 
                 // Convert event codes from unsigned to int
                 QList<int> eventCodes;
@@ -371,7 +371,8 @@ int BatchProcessor::run(const ProcessingSettings &settings)
                 if (defCov.dim > 0) {
                     defCovs.append(defCov);
                     covLog += QString("  Definition %1: %2 degrees of freedom\n")
-                        .arg(d + 1).arg(defCov.nfree);
+                                  .arg(d + 1)
+                                  .arg(defCov.nfree);
                 }
             }
 

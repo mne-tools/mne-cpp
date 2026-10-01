@@ -59,10 +59,10 @@ public:
      * Default constructor. Initializes all fields to zero.
      */
     FiffDataRef()
-        : type(0)
-        , endian(0)
-        , size(0)
-        , offset(0)
+    : type(0)
+    , endian(0)
+    , size(0)
+    , offset(0)
     {
     }
 
@@ -81,10 +81,10 @@ public:
     inline static qint32 storageSize();
 
 public:
-    qint32  type;       /**< Type of the data. */
-    qint32  endian;     /**< Are the data in the little or big endian byte order. */
-    qint64  size;       /**< Size of the data, can be over 2 GB. */
-    qint64  offset;     /**< Offset to the data in the external file. */
+    qint32 type;   /**< Type of the data. */
+    qint32 endian; /**< Are the data in the little or big endian byte order. */
+    qint64 size;   /**< Size of the data, can be over 2 GB. */
+    qint64 offset; /**< Offset to the data in the external file. */
 };
 
 //=============================================================================================================
@@ -102,8 +102,7 @@ typedef FiffDataRef* fiffDataRef;
 
 inline qint32 FiffDataRef::storageSize()
 {
-    return sizeof(FiffDataRef::type) + sizeof(FiffDataRef::endian)
-         + sizeof(FiffDataRef::size) + sizeof(FiffDataRef::offset);
+    return sizeof(FiffDataRef::type) + sizeof(FiffDataRef::endian) + sizeof(FiffDataRef::size) + sizeof(FiffDataRef::offset);
 }
 
 } // NAMESPACE FIFFLIB

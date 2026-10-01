@@ -46,10 +46,11 @@ namespace
 /**
  * Apply a coordinate transform to a 3-D point using FiffCoordTrans.
  */
-Eigen::Vector3f applyTransform(const Eigen::Vector3f &point,
-                               const FiffCoordTrans &trans)
+Eigen::Vector3f applyTransform(const Eigen::Vector3f& point,
+                               const FiffCoordTrans& trans)
 {
-    if (trans.isEmpty()) return point;
+    if (trans.isEmpty())
+        return point;
     float r[3] = {point.x(), point.y(), point.z()};
     FiffCoordTrans::apply_trans(r, trans, FIFFV_MOVE);
     return Eigen::Vector3f(r[0], r[1], r[2]);
@@ -61,7 +62,7 @@ Eigen::Vector3f applyTransform(const Eigen::Vector3f &point,
 // MEMBER METHODS
 //=============================================================================================================
 
-void SensorFieldMapper::setEvoked(const FiffEvoked &evoked)
+void SensorFieldMapper::setEvoked(const FiffEvoked& evoked)
 {
     m_evoked = evoked;
     m_loaded = (m_evoked.nave != -1 && m_evoked.data.rows() > 0);
@@ -76,7 +77,7 @@ void SensorFieldMapper::setEvoked(const FiffEvoked &evoked)
         // Find earliest time and t=0 boundaries
         float tmin = m_evoked.times.size() > 0 ? m_evoked.times(0) : 0.0f;
         if (tmin < 0.0f) {
-            QPair<float,float> bl(tmin, 0.0f);
+            QPair<float, float> bl(tmin, 0.0f);
             m_evoked.applyBaselineCorrection(bl);
         }
     }
@@ -84,7 +85,7 @@ void SensorFieldMapper::setEvoked(const FiffEvoked &evoked)
 
 //=============================================================================================================
 
-bool SensorFieldMapper::hasMappingFor(const FiffEvoked &newEvoked) const
+bool SensorFieldMapper::hasMappingFor(const FiffEvoked& newEvoked) const
 {
     // No existing mapping to reuse
     if (!m_loaded || (!m_megMapping && !m_eegMapping))
@@ -118,14 +119,15 @@ bool SensorFieldMapper::hasMappingFor(const FiffEvoked &newEvoked) const
 //=============================================================================================================
 
 QString SensorFieldMapper::findHeadSurfaceKey(
-    const QMap<QString, std::shared_ptr<BrainSurface>> &surfaces)
+    const QMap<QString, std::shared_ptr<BrainSurface>>& surfaces)
 {
     if (surfaces.contains("bem_head"))
         return QStringLiteral("bem_head");
 
     QString fallback;
     for (auto it = surfaces.cbegin(); it != surfaces.cend(); ++it) {
-        if (!it.key().startsWith("bem_")) continue;
+        if (!it.key().startsWith("bem_"))
+            continue;
         if (it.value() && it.value()->tissueType() == BrainSurface::TissueSkin)
             return it.key();
         if (fallback.isEmpty())
@@ -137,7 +139,7 @@ QString SensorFieldMapper::findHeadSurfaceKey(
 //=============================================================================================================
 
 QString SensorFieldMapper::findHelmetSurfaceKey(
-    const QMap<QString, std::shared_ptr<BrainSurface>> &surfaces)
+    const QMap<QString, std::shared_ptr<BrainSurface>>& surfaces)
 {
     return surfaces.contains("sens_surface_meg")
         ? QStringLiteral("sens_surface_meg")
@@ -148,20 +150,26 @@ QString SensorFieldMapper::findHelmetSurfaceKey(
 
 float SensorFieldMapper::contourStep(float minVal, float maxVal, int targetTicks)
 {
-    if (targetTicks <= 0) return 0.0f;
+    if (targetTicks <= 0)
+        return 0.0f;
     const double range = static_cast<double>(maxVal - minVal);
-    if (range <= 0.0) return 0.0f;
+    if (range <= 0.0)
+        return 0.0f;
 
-    const double raw      = range / static_cast<double>(targetTicks);
+    const double raw = range / static_cast<double>(targetTicks);
     const double exponent = std::floor(std::log10(raw));
-    const double base     = std::pow(10.0, exponent);
-    const double frac     = raw / base;
+    const double base = std::pow(10.0, exponent);
+    const double frac = raw / base;
 
     double niceFrac = 1.0;
-    if      (frac <= 1.0) niceFrac = 1.0;
-    else if (frac <= 2.0) niceFrac = 2.0;
-    else if (frac <= 5.0) niceFrac = 5.0;
-    else                  niceFrac = 10.0;
+    if (frac <= 1.0)
+        niceFrac = 1.0;
+    else if (frac <= 2.0)
+        niceFrac = 2.0;
+    else if (frac <= 5.0)
+        niceFrac = 5.0;
+    else
+        niceFrac = 10.0;
 
     return static_cast<float>(niceFrac * base);
 }
@@ -169,11 +177,12 @@ float SensorFieldMapper::contourStep(float minVal, float maxVal, int targetTicks
 //=============================================================================================================
 
 bool SensorFieldMapper::buildMapping(
-    const QMap<QString, std::shared_ptr<BrainSurface>> &surfaces,
-    const FiffCoordTrans &headToMriTrans,
+    const QMap<QString, std::shared_ptr<BrainSurface>>& surfaces,
+    const FiffCoordTrans& headToMriTrans,
     bool applySensorTrans)
 {
-    if (!m_loaded || m_evoked.isEmpty()) return false;
+    if (!m_loaded || m_evoked.isEmpty())
+        return false;
 
     // ── Reset state ────────────────────────────────────────────────────
     m_megPick.resize(0);
@@ -204,8 +213,8 @@ bool SensorFieldMapper::buildMapping(
     bool hasDevHead = false;
     QMatrix4x4 devHeadQt;
     if (!m_evoked.info.dev_head_t.isEmpty() &&
-         m_evoked.info.dev_head_t.from == FIFFV_COORD_DEVICE &&
-         m_evoked.info.dev_head_t.to   == FIFFV_COORD_HEAD &&
+        m_evoked.info.dev_head_t.from == FIFFV_COORD_DEVICE &&
+        m_evoked.info.dev_head_t.to == FIFFV_COORD_HEAD &&
         !m_evoked.info.dev_head_t.trans.isIdentity()) {
         hasDevHead = true;
         for (int r = 0; r < 4; ++r)
@@ -224,30 +233,34 @@ bool SensorFieldMapper::buildMapping(
     QList<FiffChInfo> megChs, eegChs;
     QStringList megChNames, eegChNames;
 
-    auto isBad = [this](const QString &name) {
+    auto isBad = [this](const QString& name) {
         return m_evoked.info.bads.contains(name);
     };
 
     const int nChs = m_evoked.info.chs.size();
-    m_megPick.resize(nChs);   // upper bound
+    m_megPick.resize(nChs); // upper bound
     m_eegPick.resize(nChs);
     int nMeg = 0, nEeg = 0;
 
     for (int k = 0; k < nChs; ++k) {
-        const auto &ch = m_evoked.info.chs[k];
-        if (isBad(ch.ch_name)) continue;
+        const auto& ch = m_evoked.info.chs[k];
+        if (isBad(ch.ch_name))
+            continue;
 
         QVector3D pos(ch.chpos.r0(0), ch.chpos.r0(1), ch.chpos.r0(2));
 
         if (ch.kind == FIFFV_MEG_CH) {
-            if (hasDevHead)                                  pos = devHeadQt.map(pos);
-            if (applySensorTrans && !headToMriTrans.isEmpty()) pos = headToMri.map(pos);
+            if (hasDevHead)
+                pos = devHeadQt.map(pos);
+            if (applySensorTrans && !headToMriTrans.isEmpty())
+                pos = headToMri.map(pos);
             m_megPick(nMeg++) = k;
             m_megPositions.push_back(Eigen::Vector3f(pos.x(), pos.y(), pos.z()));
             megChs.append(ch);
             megChNames.append(ch.ch_name);
         } else if (ch.kind == FIFFV_EEG_CH) {
-            if (applySensorTrans && !headToMriTrans.isEmpty()) pos = headToMri.map(pos);
+            if (applySensorTrans && !headToMriTrans.isEmpty())
+                pos = headToMri.map(pos);
             m_eegPick(nEeg++) = k;
             m_eegPositions.push_back(Eigen::Vector3f(pos.x(), pos.y(), pos.z()));
             eegChs.append(ch);
@@ -259,7 +272,7 @@ bool SensorFieldMapper::buildMapping(
     m_eegPick.conservativeResize(nEeg);
 
     // ── Constants (matching MNE-Python) ────────────────────────────────
-    constexpr float kIntrad  = 0.06f;
+    constexpr float kIntrad = 0.06f;
     constexpr float kMegMiss = 1e-4f;
     constexpr float kEegMiss = 1e-3f;
 
@@ -268,15 +281,17 @@ bool SensorFieldMapper::buildMapping(
     const Eigen::Vector3f fittedOrigin = fitSphereOrigin(m_evoked.info);
 
     FiffCoordTrans headMri = (applySensorTrans && !headToMriTrans.isEmpty())
-        ? headToMriTrans : FiffCoordTrans();
+        ? headToMriTrans
+        : FiffCoordTrans();
     FiffCoordTrans devHead = (!m_evoked.info.dev_head_t.isEmpty() &&
-                        m_evoked.info.dev_head_t.from == FIFFV_COORD_DEVICE &&
-                        m_evoked.info.dev_head_t.to   == FIFFV_COORD_HEAD)
-        ? m_evoked.info.dev_head_t : FiffCoordTrans();
+                              m_evoked.info.dev_head_t.from == FIFFV_COORD_DEVICE &&
+                              m_evoked.info.dev_head_t.to == FIFFV_COORD_HEAD)
+        ? m_evoked.info.dev_head_t
+        : FiffCoordTrans();
 
     // ── MEG mapping ────────────────────────────────────────────────────
     if (!m_megSurfaceKey.isEmpty() && surfaces.contains(m_megSurfaceKey) && !megChs.isEmpty()) {
-        const BrainSurface &surf = *surfaces[m_megSurfaceKey];
+        const BrainSurface& surf = *surfaces[m_megSurfaceKey];
         Eigen::MatrixX3f verts = surf.vertexPositions();
         Eigen::MatrixX3f norms = surf.vertexNormals();
 
@@ -296,8 +311,7 @@ bool SensorFieldMapper::buildMapping(
         }
 
         if (verts.rows() > 0 && norms.rows() == verts.rows()) {
-            const QString coilPath = QCoreApplication::applicationDirPath()
-                + "/../resources/general/coilDefinitions/coil_def.dat";
+            const QString coilPath = QCoreApplication::applicationDirPath() + "/../resources/general/coilDefinitions/coil_def.dat";
             auto templates =
                 FWDLIB::FwdCoilSet::read_coil_defs(coilPath);
 
@@ -334,12 +348,13 @@ bool SensorFieldMapper::buildMapping(
 
     // ── EEG mapping ────────────────────────────────────────────────────
     if (!m_eegSurfaceKey.isEmpty() && surfaces.contains(m_eegSurfaceKey) && !eegChs.isEmpty()) {
-        const BrainSurface &surf = *surfaces[m_eegSurfaceKey];
+        const BrainSurface& surf = *surfaces[m_eegSurfaceKey];
         Eigen::MatrixX3f verts = surf.vertexPositions();
 
         if (verts.rows() > 0) {
             Eigen::Vector3f origin = fittedOrigin;
-            if (!headMri.isEmpty()) origin = applyTransform(origin, headMri);
+            if (!headMri.isEmpty())
+                origin = applyTransform(origin, headMri);
 
             auto eegCoils =
                 FWDLIB::FwdCoilSet::create_eeg_els(
@@ -360,8 +375,8 @@ bool SensorFieldMapper::buildMapping(
 
 //=============================================================================================================
 
-Eigen::Vector3f SensorFieldMapper::fitSphereOrigin(const FIFFLIB::FiffInfo &info,
-                                                    float *radius)
+Eigen::Vector3f SensorFieldMapper::fitSphereOrigin(const FIFFLIB::FiffInfo& info,
+                                                   float* radius)
 {
     const Eigen::Vector3f fallback(0.0f, 0.0f, 0.04f);
 
@@ -372,7 +387,7 @@ Eigen::Vector3f SensorFieldMapper::fitSphereOrigin(const FIFFLIB::FiffInfo &info
 
     auto gatherPoints = [&](bool includeEeg) -> Eigen::MatrixXd {
         QVector<Eigen::Vector3d> pts;
-        for (const auto &dp : info.dig) {
+        for (const auto& dp : info.dig) {
             if (dp.coord_frame != FIFFV_COORD_HEAD)
                 continue;
             if (dp.kind == FIFFV_POINT_EXTRA ||
@@ -391,13 +406,14 @@ Eigen::Vector3f SensorFieldMapper::fitSphereOrigin(const FIFFLIB::FiffInfo &info
         return mat;
     };
 
-    Eigen::MatrixXd points = gatherPoints(false);   // EXTRA only
+    Eigen::MatrixXd points = gatherPoints(false); // EXTRA only
     if (points.rows() < 4)
-        points = gatherPoints(true);                 // EXTRA + EEG
+        points = gatherPoints(true); // EXTRA + EEG
     if (points.rows() < 4) {
         qWarning() << "SensorFieldMapper::fitSphereOrigin: fewer than 4 dig "
                       "points – falling back to default origin (0, 0, 0.04).";
-        if (radius) *radius = 0.0f;
+        if (radius)
+            *radius = 0.0f;
         return fallback;
     }
 
@@ -413,9 +429,7 @@ Eigen::Vector3f SensorFieldMapper::fitSphereOrigin(const FIFFLIB::FiffInfo &info
         A(i, 1) = 2.0 * points(i, 1);
         A(i, 2) = 2.0 * points(i, 2);
         A(i, 3) = 1.0;
-        b(i) = points(i, 0) * points(i, 0)
-             + points(i, 1) * points(i, 1)
-             + points(i, 2) * points(i, 2);
+        b(i) = points(i, 0) * points(i, 0) + points(i, 1) * points(i, 1) + points(i, 2) * points(i, 2);
     }
 
     // Solve via normal equations: x = (A^T A)^{-1} A^T b
@@ -430,10 +444,11 @@ Eigen::Vector3f SensorFieldMapper::fitSphereOrigin(const FIFFLIB::FiffInfo &info
     const float cx = static_cast<float>(x(0));
     const float cy = static_cast<float>(x(1));
     const float cz = static_cast<float>(x(2));
-    const float R  = static_cast<float>(
+    const float R = static_cast<float>(
         std::sqrt(x(0) * x(0) + x(1) * x(1) + x(2) * x(2) + x(3)));
 
-    if (radius) *radius = R;
+    if (radius)
+        *radius = R;
 
     return Eigen::Vector3f(cx, cy, cz);
 }
@@ -453,8 +468,9 @@ void SensorFieldMapper::computeNormRange()
     // ── Helper: find peak-GFP time for a set of channels ───────────────
     // GFP = sqrt(mean(V_i^2)).  We only need the argmax, so comparing
     // the sum-of-squares is sufficient (avoids sqrt).
-    auto peakGfpTime = [&](const Eigen::VectorXi &pick) -> int {
-        if (pick.size() == 0 || nTimes == 0) return 0;
+    auto peakGfpTime = [&](const Eigen::VectorXi& pick) -> int {
+        if (pick.size() == 0 || nTimes == 0)
+            return 0;
         int best = 0;
         double bestSS = -1.0;
         for (int t = 0; t < nTimes; ++t) {
@@ -463,7 +479,10 @@ void SensorFieldMapper::computeNormRange()
                 double v = m_evoked.data(pick(i), t);
                 ss += v * v;
             }
-            if (ss > bestSS) { bestSS = ss; best = t; }
+            if (ss > bestSS) {
+                bestSS = ss;
+                best = t;
+            }
         }
         return best;
     };
@@ -493,28 +512,32 @@ void SensorFieldMapper::computeNormRange()
         m_eegVmax = mapped.cwiseAbs().maxCoeff();
     }
 
-    if (m_megVmax <= 0.0f) m_megVmax = 1.0f;
-    if (m_eegVmax <= 0.0f) m_eegVmax = 1.0f;
+    if (m_megVmax <= 0.0f)
+        m_megVmax = 1.0f;
+    if (m_eegVmax <= 0.0f)
+        m_eegVmax = 1.0f;
 }
 
 //=============================================================================================================
 
 void SensorFieldMapper::apply(
-    QMap<QString, std::shared_ptr<BrainSurface>> &surfaces,
-    const SubView &singleView,
-    const QVector<SubView> &subViews)
+    QMap<QString, std::shared_ptr<BrainSurface>>& surfaces,
+    const SubView& singleView,
+    const QVector<SubView>& subViews)
 {
-    if (!m_loaded || m_evoked.isEmpty()) return;
+    if (!m_loaded || m_evoked.isEmpty())
+        return;
 
     // ── Lambda that maps one modality onto its target surface ───────────
-    auto applyMap = [&](const QString &key,
-                        const QString &contourPrefix,
-                        const Eigen::VectorXi &pick,
-                        const Eigen::MatrixXf *mat,
+    auto applyMap = [&](const QString& key,
+                        const QString& contourPrefix,
+                        const Eigen::VectorXi& pick,
+                        const Eigen::MatrixXf* mat,
                         float globalMaxAbs,
                         bool visible,
                         bool showContours) {
-        if (key.isEmpty() || !surfaces.contains(key)) return;
+        if (key.isEmpty() || !surfaces.contains(key))
+            return;
 
         auto surface = surfaces[key];
         if (!visible || !mat || pick.size() == 0) {
@@ -571,13 +594,13 @@ void SensorFieldMapper::apply(
     };
 
     // ── Aggregate visibility across all views ──────────────────────────
-    bool anyMegField    = singleView.visibility.megFieldMap;
-    bool anyEegField    = singleView.visibility.eegFieldMap;
+    bool anyMegField = singleView.visibility.megFieldMap;
+    bool anyEegField = singleView.visibility.eegFieldMap;
     bool anyMegContours = singleView.visibility.megFieldContours;
     bool anyEegContours = singleView.visibility.eegFieldContours;
     for (int i = 0; i < subViews.size(); ++i) {
-        anyMegField    |= subViews[i].visibility.megFieldMap;
-        anyEegField    |= subViews[i].visibility.eegFieldMap;
+        anyMegField |= subViews[i].visibility.megFieldMap;
+        anyEegField |= subViews[i].visibility.eegFieldMap;
         anyMegContours |= subViews[i].visibility.megFieldContours;
         anyEegContours |= subViews[i].visibility.eegFieldContours;
     }
@@ -596,20 +619,21 @@ void SensorFieldMapper::apply(
 //=============================================================================================================
 
 void SensorFieldMapper::updateContourSurfaces(
-    QMap<QString, std::shared_ptr<BrainSurface>> &surfaces,
-    const QString &prefix,
-    const BrainSurface &surface,
-    const QVector<float> &values,
+    QMap<QString, std::shared_ptr<BrainSurface>>& surfaces,
+    const QString& prefix,
+    const BrainSurface& surface,
+    const QVector<float>& values,
     float step,
     bool visible)
 {
     // ── Helper: hide all three contour sets ─────────────────────────────
     auto hideContours = [&]() {
-        for (const auto &suffix : {QStringLiteral("_neg"),
-                                    QStringLiteral("_zero"),
-                                    QStringLiteral("_pos")}) {
+        for (const auto& suffix : {QStringLiteral("_neg"),
+                                   QStringLiteral("_zero"),
+                                   QStringLiteral("_pos")}) {
             const QString key = prefix + suffix;
-            if (surfaces.contains(key)) surfaces[key]->setVisible(false);
+            if (surfaces.contains(key))
+                surfaces[key]->setVisible(false);
         }
     };
 
@@ -628,23 +652,27 @@ void SensorFieldMapper::updateContourSurfaces(
     // ── Contour levels ─────────────────────────────────────────────────
     QVector<float> negLevels, posLevels;
     const bool hasZero = (minVal < 0.0f && maxVal > 0.0f);
-    for (float lv = -step; lv >= minVal; lv -= step) negLevels.append(lv);
-    for (float lv =  step; lv <= maxVal; lv += step) posLevels.append(lv);
+    for (float lv = -step; lv >= minVal; lv -= step)
+        negLevels.append(lv);
+    for (float lv = step; lv <= maxVal; lv += step)
+        posLevels.append(lv);
 
     // ── Segment buffer ─────────────────────────────────────────────────
-    struct ContourBuf {
+    struct ContourBuf
+    {
         QVector<Eigen::Vector3f> verts;
         QVector<Eigen::Vector3f> norms;
         QVector<Eigen::Vector3i> tris;
     };
 
-    auto addSegment = [](ContourBuf &buf,
-                         const QVector3D &p0, const QVector3D &p1,
-                         const QVector3D &normal,
+    auto addSegment = [](ContourBuf& buf,
+                         const QVector3D& p0, const QVector3D& p1,
+                         const QVector3D& normal,
                          float halfW, float shift) {
         QVector3D dir = p1 - p0;
         const float len = dir.length();
-        if (len < 1e-6f) return;
+        if (len < 1e-6f)
+            return;
         dir /= len;
 
         QVector3D binormal = QVector3D::crossProduct(normal, dir);
@@ -656,7 +684,7 @@ void SensorFieldMapper::updateContourSurfaces(
 
         const QVector3D off = normal * shift;
 
-        auto toEig = [](const QVector3D &v) {
+        auto toEig = [](const QVector3D& v) {
             return Eigen::Vector3f(v.x(), v.y(), v.z());
         };
 
@@ -670,8 +698,10 @@ void SensorFieldMapper::updateContourSurfaces(
             buf.verts.append(toEig(p0 + w + off));
             buf.verts.append(toEig(p1 - w + off));
             buf.verts.append(toEig(p1 + w + off));
-            buf.norms.append(n); buf.norms.append(n);
-            buf.norms.append(n); buf.norms.append(n);
+            buf.norms.append(n);
+            buf.norms.append(n);
+            buf.norms.append(n);
+            buf.norms.append(n);
             buf.tris.append(Eigen::Vector3i(base, base + 1, base + 2));
             buf.tris.append(Eigen::Vector3i(base + 1, base + 3, base + 2));
         }
@@ -686,22 +716,25 @@ void SensorFieldMapper::updateContourSurfaces(
             buf.verts.append(toEig(p0 + h + off));
             buf.verts.append(toEig(p1 - h + off));
             buf.verts.append(toEig(p1 + h + off));
-            buf.norms.append(n); buf.norms.append(n);
-            buf.norms.append(n); buf.norms.append(n);
+            buf.norms.append(n);
+            buf.norms.append(n);
+            buf.norms.append(n);
+            buf.norms.append(n);
             buf.tris.append(Eigen::Vector3i(base, base + 1, base + 2));
             buf.tris.append(Eigen::Vector3i(base + 1, base + 3, base + 2));
         }
     };
 
     // ── Marching-triangle iso-line extraction ──────────────────────────
-    auto buildContours = [&](const QVector<float> &levels, ContourBuf &buf) {
+    auto buildContours = [&](const QVector<float>& levels, ContourBuf& buf) {
         const Eigen::MatrixX3f rr = surface.vertexPositions();
         const Eigen::MatrixX3f nn = surface.vertexNormals();
         const QVector<uint32_t> idx = surface.triangleIndices();
-        if (rr.rows() == 0 || nn.rows() == 0 || idx.isEmpty()) return;
+        if (rr.rows() == 0 || nn.rows() == 0 || idx.isEmpty())
+            return;
 
-        constexpr float shift   = 0.001f;
-        constexpr float halfW   = 0.0005f;
+        constexpr float shift = 0.001f;
+        constexpr float halfW = 0.0005f;
 
         for (float level : levels) {
             for (int t = 0; t + 2 < idx.size(); t += 3) {
@@ -720,9 +753,10 @@ void SensorFieldMapper::updateContourSurfaces(
                     triN = QVector3D::crossProduct(p1 - p0, p2 - p0).normalized();
 
                 QVector<QVector3D> hits;
-                auto checkEdge = [&](const QVector3D &a, const QVector3D &b,
+                auto checkEdge = [&](const QVector3D& a, const QVector3D& b,
                                      float va, float vb) {
-                    if (va == vb) return;
+                    if (va == vb)
+                        return;
                     float tval = (level - va) / (vb - va);
                     if (tval >= 0.0f && tval < 1.0f)
                         hits.append(a + (b - a) * tval);
@@ -746,13 +780,14 @@ void SensorFieldMapper::updateContourSurfaces(
     }
 
     // ── Upload contour meshes ──────────────────────────────────────────
-    auto updateSurf = [&](const QString &suffix,
-                          const ContourBuf &buf,
-                          const QColor &color,
+    auto updateSurf = [&](const QString& suffix,
+                          const ContourBuf& buf,
+                          const QColor& color,
                           bool show) {
         const QString key = prefix + suffix;
         if (!show || buf.verts.isEmpty()) {
-            if (surfaces.contains(key)) surfaces[key]->setVisible(false);
+            if (surfaces.contains(key))
+                surfaces[key]->setVisible(false);
             return;
         }
 
@@ -777,7 +812,7 @@ void SensorFieldMapper::updateContourSurfaces(
         csurf->setVisible(true);
     };
 
-    updateSurf("_neg",  negBuf,  QColor(0,   0, 255, 200), visible && !negBuf.verts.isEmpty());
-    updateSurf("_zero", zeroBuf, QColor(0,   0,   0, 220), visible && !zeroBuf.verts.isEmpty());
-    updateSurf("_pos",  posBuf,  QColor(255, 0,   0, 200), visible && !posBuf.verts.isEmpty());
+    updateSurf("_neg", negBuf, QColor(0, 0, 255, 200), visible && !negBuf.verts.isEmpty());
+    updateSurf("_zero", zeroBuf, QColor(0, 0, 0, 220), visible && !zeroBuf.verts.isEmpty());
+    updateSurf("_pos", posBuf, QColor(255, 0, 0, 200), visible && !posBuf.verts.isEmpty());
 }

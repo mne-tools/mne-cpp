@@ -54,7 +54,7 @@ using namespace UTILSLIB;
  * @param[in] argv (argument vector) is an array of pointers to arrays of character objects. The array objects are null-terminated strings, representing the arguments that were entered on the command line when the program was started.
  * @return the value that was set to exit() (which is 0 if exit() is called via quit()).
  */
-int main(int argc, char *argv[])
+int main(int argc, char* argv[])
 {
     qInstallMessageHandler(MNELogger::customLogWriter);
     QCoreApplication app(argc, argv);
@@ -80,18 +80,16 @@ int main(int argc, char *argv[])
     qint32 comp_now = p_FiffEvokedSet.info.get_current_comp();
     qint32 dest_comp = parser.value(destCompsOption).toInt();
 
-    if(comp_now != dest_comp)
-        p_FiffEvokedSet.compensate_to(p_FiffEvokedSet,dest_comp);
+    if (comp_now != dest_comp)
+        p_FiffEvokedSet.compensate_to(p_FiffEvokedSet, dest_comp);
 
     //example for compensator generation
     FiffCtfComp comp;
-    if(dest_comp > 0 )
-    {
+    if (dest_comp > 0) {
         qDebug() << "This part needs to be debugged";
-        p_FiffEvokedSet.info.make_compensator(comp_now,dest_comp,comp); //ToDo: make_compensator needs to be debugged
+        p_FiffEvokedSet.info.make_compensator(comp_now, dest_comp, comp); //ToDo: make_compensator needs to be debugged
         printf("Appropriate forward operator compensator created.\n");
-    }
-    else
+    } else
         printf("No forward operator compensator needed.\n");
 
     //Do the projection

@@ -72,7 +72,7 @@ using namespace MNEANALYZESTUDIO;
  *
  * @brief Checks the mne_analyze_studio core logic.
  */
-class TestStudioCore: public QObject
+class TestStudioCore : public QObject
 {
     Q_OBJECT
 
@@ -113,8 +113,7 @@ private slots:
 
 QString TestStudioCore::rawPath()
 {
-    return QCoreApplication::applicationDirPath()
-           + "/../resources/data/mne-cpp-test-data/MEG/sample/sample_audvis_trunc_raw.fif";
+    return QCoreApplication::applicationDirPath() + "/../resources/data/mne-cpp-test-data/MEG/sample/sample_audvis_trunc_raw.fif";
 }
 
 //=============================================================================================================
@@ -137,7 +136,7 @@ void TestStudioCore::cleanupTestCase()
 {
     QSettings settings("MNE-CPP", "MNEAnalyzeStudio");
     settings.remove("agent/profiles/coverage-test-profile");
-    if(settings.value("agent/selected_profile").toString() == QLatin1String("coverage-test-profile")) {
+    if (settings.value("agent/selected_profile").toString() == QLatin1String("coverage-test-profile")) {
         settings.remove("agent/selected_profile");
     }
 }
@@ -180,7 +179,7 @@ void TestStudioCore::jsonRpc_responseAndErrorAreDistinct()
     result.insert("ok", true);
 
     const QJsonObject response = JsonRpcMessage::createResponse(QJsonValue("id-2"), result);
-    const QJsonObject failure  = JsonRpcMessage::createError(QJsonValue("id-2"), -32601, "method not found");
+    const QJsonObject failure = JsonRpcMessage::createError(QJsonValue("id-2"), -32601, "method not found");
 
     QVERIFY(JsonRpcMessage::isValid(response));
     QVERIFY(JsonRpcMessage::isValid(failure));
@@ -229,14 +228,14 @@ void TestStudioCore::planner_modeSelectsProvider_data()
     // mode that resolved to the wrong provider would send a payload the remote
     // service cannot read. The names are exact, not prefixes: "openai" alone
     // is not the OpenAI mode, it falls through to the generic compatible path.
-    QTest::newRow("openai responses")    << "openai_responses"    << "OpenAI";
-    QTest::newRow("gemini openai compat") << "gemini_openai"      << "Google Gemini";
-    QTest::newRow("anthropic messages")  << "anthropic_messages"  << "Anthropic";
+    QTest::newRow("openai responses") << "openai_responses" << "OpenAI";
+    QTest::newRow("gemini openai compat") << "gemini_openai" << "Google Gemini";
+    QTest::newRow("anthropic messages") << "anthropic_messages" << "Anthropic";
 
     // Anything unrecognised has to land on the generic compatible provider
     // rather than on one of the specific ones, which is what stops an unknown
     // mode silently borrowing another provider's request format.
-    QTest::newRow("unrecognised")        << "something-else"      << "openai-compatible";
+    QTest::newRow("unrecognised") << "something-else" << "openai-compatible";
 }
 
 //=============================================================================================================
@@ -426,8 +425,8 @@ void TestStudioCore::agentChatDockWidget_conversationAndConfirmations()
     QCOMPARE(widget.archivedConversationSessions(), restoredArchive);
 
     QPushButton* historyButton = nullptr;
-    for(QPushButton* button : widget.findChildren<QPushButton*>("agentHeaderBtn")) {
-        if(button->text() == QLatin1String("History")) {
+    for (QPushButton* button : widget.findChildren<QPushButton*>("agentHeaderBtn")) {
+        if (button->text() == QLatin1String("History")) {
             historyButton = button;
             break;
         }
@@ -477,10 +476,10 @@ void TestStudioCore::llmSettingsDialog_ruleBasedAndProfileFlow()
     const auto selectors = dialog.findChildren<PillSelectorWidget*>();
     PillSelectorWidget* modeSelector = nullptr;
     PillSelectorWidget* suggestedModelSelector = nullptr;
-    for(PillSelectorWidget* selector : selectors) {
-        if(selector->currentValue() == QLatin1String("openai_responses")) {
+    for (PillSelectorWidget* selector : selectors) {
+        if (selector->currentValue() == QLatin1String("openai_responses")) {
             modeSelector = selector;
-        } else if(selector->currentValue().isEmpty()) {
+        } else if (selector->currentValue().isEmpty()) {
             suggestedModelSelector = selector;
         }
     }
@@ -505,7 +504,6 @@ void TestStudioCore::llmSettingsDialog_ruleBasedAndProfileFlow()
     QVERIFY(std::any_of(statusLabels.cbegin(), statusLabels.cend(), [](const QLabel* label) {
         return label->text().contains("No model catalog endpoint");
     }));
-
 }
 
 //=============================================================================================================
@@ -529,21 +527,18 @@ void TestStudioCore::workflowMiniMapWidget_graphRenderingAndActivation()
         {"label", "Load Raw"},
         {"stage", "input"},
         {"outputs", QJsonObject{{"raw", "raw-output"}}},
-        {"runtime", QJsonObject{{"status", "completed"}}}
-    };
+        {"runtime", QJsonObject{{"status", "completed"}}}};
     const QJsonObject processNode{
         {"uid", "process"},
         {"label", "Filter"},
         {"skill_id", "filter-skill"},
         {"inputs", QJsonObject{{"raw", "raw-output"}}},
         {"outputs", QJsonObject{{"filtered", "filtered-output"}}},
-        {"runtime", QJsonObject{{"status", "running"}}}
-    };
+        {"runtime", QJsonObject{{"status", "running"}}}};
     const QJsonObject resultNode{
         {"uid", "result"},
         {"inputs", QJsonObject{{"data", "filtered-output"}}},
-        {"runtime", QJsonObject{{"status", "failed"}}}
-    };
+        {"runtime", QJsonObject{{"status", "failed"}}}};
     widget.setWorkflowGraph(QJsonObject{{"pipeline", QJsonArray{resultNode, sourceNode, processNode}}});
     widget.setFocusNodeUid("process");
 
@@ -606,8 +601,7 @@ void TestStudioCore::analysisResultWidget_jsonAndStatisticsViews()
         {"message", "Generic output"},
         {"object", QJsonObject{{"enabled", true}, {"missing", QJsonValue::Null}}},
         {"array", QJsonArray{"entry", 2.5}},
-        {"count", 7}
-    };
+        {"count", 7}};
     widget.setResult("custom.summary", genericResult);
     QCOMPARE(widget.toolName(), QString("custom.summary"));
     QCOMPARE(widget.result(), genericResult);
@@ -619,8 +613,7 @@ void TestStudioCore::analysisResultWidget_jsonAndStatisticsViews()
 
     const QJsonArray channelStats{
         QJsonObject{{"name", "MEG 0111"}, {"rms", 1.25}, {"mean_abs", 0.75}, {"peak_abs", 3.5}},
-        QJsonObject{{"name", "EEG 001"}, {"rms", 2.0}, {"mean_abs", 1.0}, {"peak_abs", 4.0}}
-    };
+        QJsonObject{{"name", "EEG 001"}, {"rms", 2.0}, {"mean_abs", 1.0}, {"peak_abs", 4.0}}};
     widget.setResult("neurokernel.channel_stats",
                      QJsonObject{{"message", "Channel statistics"}, {"channels", channelStats}});
     QCOMPARE(stack->currentWidget(), table);
@@ -631,8 +624,7 @@ void TestStudioCore::analysisResultWidget_jsonAndStatisticsViews()
     QCOMPARE(table->item(0, 3)->text(), QString("3.5"));
 
     const QJsonArray rawStats{
-        QJsonObject{{"name", "MEG 0121"}, {"rms", 9.5}}
-    };
+        QJsonObject{{"name", "MEG 0121"}, {"rms", 9.5}}};
     widget.setResult("neurokernel.raw_stats", QJsonObject{{"top_channels", rawStats}});
     QCOMPARE(stack->currentWidget(), table);
     QCOMPARE(table->rowCount(), 1);
@@ -669,16 +661,8 @@ void TestStudioCore::extensionHostedViewWidget_descriptorCommandsAndUpdates()
         {"scene_id", "scene-7"},
         {"message", "Rendering surface"},
         {"state", QJsonObject{{"hemisphere", "left"}, {"camera", "lateral"}, {"opacity", 0.65}}},
-        {"controls", QJsonObject{{"opacity", QJsonObject{{"command", "change_opacity"},
-                                                          {"target_argument", "alpha"}}}}},
-        {"actions", QJsonArray{
-            QJsonObject{{"command", "reset_camera"},
-                        {"label", "Reset Camera"},
-                        {"description", "Restore the default view"},
-                        {"arguments", QJsonObject{{"camera", "lateral"}}}},
-            QJsonObject{{"label", "Ignored"}}
-        }}
-    };
+        {"controls", QJsonObject{{"opacity", QJsonObject{{"command", "change_opacity"}, {"target_argument", "alpha"}}}}},
+        {"actions", QJsonArray{QJsonObject{{"command", "reset_camera"}, {"label", "Reset Camera"}, {"description", "Restore the default view"}, {"arguments", QJsonObject{{"camera", "lateral"}}}}, QJsonObject{{"label", "Ignored"}}}}};
     widget.setSessionDescriptor(descriptor);
     QCOMPARE(widget.sessionId(), QString("session-42"));
     QCOMPARE(widget.filePath(), QString("/tmp/sample-raw.fif"));
@@ -694,8 +678,8 @@ void TestStudioCore::extensionHostedViewWidget_descriptorCommandsAndUpdates()
     QCOMPARE(arguments.at(2).toJsonObject(), expectedOpacityArguments);
 
     QPushButton* resetButton = nullptr;
-    for(QPushButton* button : widget.findChildren<QPushButton*>()) {
-        if(button->text() == QLatin1String("Reset Camera")) {
+    for (QPushButton* button : widget.findChildren<QPushButton*>()) {
+        if (button->text() == QLatin1String("Reset Camera")) {
             resetButton = button;
             break;
         }
@@ -718,8 +702,8 @@ void TestStudioCore::extensionHostedViewWidget_descriptorCommandsAndUpdates()
 
     widget.setSessionDescriptor(QJsonObject{{"actions", QJsonArray{QJsonObject{{"command", "refresh"}}}}});
     QPushButton* refreshButton = nullptr;
-    for(QPushButton* button : widget.findChildren<QPushButton*>()) {
-        if(button->text() == QLatin1String("refresh")) {
+    for (QPushButton* button : widget.findChildren<QPushButton*>()) {
+        if (button->text() == QLatin1String("refresh")) {
             refreshButton = button;
             break;
         }
@@ -742,7 +726,7 @@ void TestStudioCore::editorTabBar_closeButtonsFollowTabIndexes()
     tabBar.addTab("First");
     tabBar.addTab("Second");
     tabBar.addTab("Third");
-    for(int index = 0; index < tabBar.count(); ++index) {
+    for (int index = 0; index < tabBar.count(); ++index) {
         QToolButton* closeButton = qobject_cast<QToolButton*>(tabBar.tabButton(index, QTabBar::RightSide));
         QVERIFY(closeButton);
         QCOMPARE(closeButton->toolTip(), QString("Close"));
@@ -799,7 +783,7 @@ void TestStudioCore::fiffBuffer_missingFileFailsToOpen()
 
 void TestStudioCore::fiffBuffer_realFileOpensAndDescribesItself()
 {
-    if(!QFile::exists(rawPath())) {
+    if (!QFile::exists(rawPath())) {
         QSKIP("Raw test data not found");
     }
 

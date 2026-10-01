@@ -51,7 +51,7 @@ using namespace DISPLIB;
 //=============================================================================================================
 
 RealTimeSpectrumWidget::RealTimeSpectrumWidget(QSharedPointer<RealTimeSpectrum> pFS,
-                                               QSharedPointer<QTime> &pTime,
+                                               QSharedPointer<QTime>& pTime,
                                                QWidget* parent)
 : MeasurementWidget(parent)
 , m_pFS(pFS)
@@ -60,7 +60,7 @@ RealTimeSpectrumWidget::RealTimeSpectrumWidget(QSharedPointer<RealTimeSpectrum> 
 {
     Q_UNUSED(pTime)
 
-    m_pActionFrequencySettings = new QAction(QIcon(":/images/frqResolution.png"), tr("Shows the frequency spectrum settings widget (F12)"),this);
+    m_pActionFrequencySettings = new QAction(QIcon(":/images/frqResolution.png"), tr("Shows the frequency spectrum settings widget (F12)"), this);
     m_pActionFrequencySettings->setShortcut(tr("F12"));
     m_pActionFrequencySettings->setStatusTip(tr("Shows the frequency spectrum settings widget (F12)"));
     connect(m_pActionFrequencySettings.data(), &QAction::triggered,
@@ -72,7 +72,7 @@ RealTimeSpectrumWidget::RealTimeSpectrumWidget(QSharedPointer<RealTimeSpectrum> 
     m_pSpectrumView = new SpectrumView("MNESCAN", this, Qt::Window);
 
     //set vertical layout
-    QVBoxLayout *neLayout = new QVBoxLayout(this);
+    QVBoxLayout* neLayout = new QVBoxLayout(this);
     neLayout->addWidget(m_pSpectrumView);
 
     //set layouts
@@ -88,7 +88,7 @@ RealTimeSpectrumWidget::~RealTimeSpectrumWidget()
     // Save Settings
     // Same as RealTimeEvokedSetWidget: m_pFS is only set once a measurement
     // arrives, so it is still null if the widget is destroyed before that.
-    if(m_pFS && !m_pFS->getName().isEmpty())  {
+    if (m_pFS && !m_pFS->getName().isEmpty()) {
         QString t_sFSName = m_pFS->getName();
 
         QSettings settings("MNECPP");
@@ -109,8 +109,8 @@ void RealTimeSpectrumWidget::update(SCMEASLIB::Measurement::SPtr)
 
 void RealTimeSpectrumWidget::getData()
 {
-    if(m_pFS->isInit()) {
-        if(!m_bDisplayWidgetsInitialized) {
+    if (m_pFS->isInit()) {
+        if (!m_bDisplayWidgetsInitialized) {
             initDisplayControllWidgets();
         }
 
@@ -126,9 +126,9 @@ void RealTimeSpectrumWidget::getData()
 
 void RealTimeSpectrumWidget::initDisplayControllWidgets()
 {
-    if(m_pFS->getFiffInfo()) {
+    if (m_pFS->getFiffInfo()) {
         QSettings settings("MNECPP");
-        if(!m_pFS->getName().isEmpty()) {
+        if (!m_pFS->getName().isEmpty()) {
             QString t_sFSName = m_pFS->getName();
             m_fLowerFrqBound = settings.value(QString("MNESCAN/RTSW/lowerFrqBound").arg(t_sFSName), 0).toFloat();
             m_fUpperFrqBound = settings.value(QString("MNESCAN/RTSW/upperFrqBound").arg(t_sFSName), 300).toFloat();
@@ -146,7 +146,7 @@ void RealTimeSpectrumWidget::initDisplayControllWidgets()
 
 void RealTimeSpectrumWidget::initSettingsWidget()
 {
-    if(!m_pSpectrumSettingsView) {
+    if (!m_pSpectrumSettingsView) {
         m_pSpectrumSettingsView = QSharedPointer<SpectrumSettingsView>(new SpectrumSettingsView("MNESCAN", this, Qt::Window));
 
         m_pSpectrumSettingsView->setWindowTitle("Frequency Spectrum Settings");
@@ -154,8 +154,7 @@ void RealTimeSpectrumWidget::initSettingsWidget()
         connect(m_pSpectrumSettingsView.data(), &SpectrumSettingsView::settingsChanged, this, &RealTimeSpectrumWidget::broadcastSettings);
     }
 
-    if(m_pFS->isInit() && m_pFS->getFiffInfo())
-    {
+    if (m_pFS->isInit() && m_pFS->getFiffInfo()) {
         m_fUpperFrqBound = m_fLowerFrqBound < m_fUpperFrqBound ? m_fUpperFrqBound : m_fLowerFrqBound;
 
         m_pSpectrumSettingsView->setBoundaries(m_pFS->getFiffInfo()->sfreq,
@@ -168,8 +167,7 @@ void RealTimeSpectrumWidget::initSettingsWidget()
 
 void RealTimeSpectrumWidget::broadcastSettings()
 {
-    if(m_pSpectrumSettingsView)
-    {
+    if (m_pSpectrumSettingsView) {
         m_fLowerFrqBound = m_pSpectrumSettingsView->getLowerBound();
         m_fUpperFrqBound = m_pSpectrumSettingsView->getUpperBound();
         m_pSpectrumView->setBoundaries(m_fLowerFrqBound, m_fUpperFrqBound);
@@ -186,8 +184,7 @@ void RealTimeSpectrumWidget::showSpectrumSettingsView()
 
 //=============================================================================================================
 
-bool RealTimeSpectrumWidget::eventFilter(QObject *object, QEvent *event)
+bool RealTimeSpectrumWidget::eventFilter(QObject* object, QEvent* event)
 {
     return QWidget::eventFilter(object, event);
 }
-

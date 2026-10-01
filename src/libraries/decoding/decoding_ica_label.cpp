@@ -60,11 +60,16 @@ using namespace Eigen;
 QString IcaLabelResult::labelToString(IcaComponentLabel label)
 {
     switch (label) {
-        case IcaComponentLabel::Brain:  return QStringLiteral("brain");
-        case IcaComponentLabel::Eog:    return QStringLiteral("eog");
-        case IcaComponentLabel::Ecg:    return QStringLiteral("ecg");
-        case IcaComponentLabel::Muscle: return QStringLiteral("muscle");
-        case IcaComponentLabel::Other:  return QStringLiteral("other");
+        case IcaComponentLabel::Brain:
+            return QStringLiteral("brain");
+        case IcaComponentLabel::Eog:
+            return QStringLiteral("eog");
+        case IcaComponentLabel::Ecg:
+            return QStringLiteral("ecg");
+        case IcaComponentLabel::Muscle:
+            return QStringLiteral("muscle");
+        case IcaComponentLabel::Other:
+            return QStringLiteral("other");
     }
     return QStringLiteral("unknown");
 }
@@ -72,11 +77,11 @@ QString IcaLabelResult::labelToString(IcaComponentLabel label)
 //=============================================================================================================
 
 QList<IcaLabelResult> MlIcaLabel::classify(const MatrixXd& matSources,
-                                             const MatrixXd& matEog,
-                                             const MatrixXd& matEcg,
-                                             double dSFreq,
-                                             double dEogThresh,
-                                             double dEcgThresh)
+                                           const MatrixXd& matEog,
+                                           const MatrixXd& matEcg,
+                                           double dSFreq,
+                                           double dEogThresh,
+                                           double dEcgThresh)
 {
     QList<IcaLabelResult> results;
 

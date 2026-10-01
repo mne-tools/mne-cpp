@@ -34,11 +34,11 @@ using namespace MNELIB;
 
 MNESurfacePatch::MNESurfacePatch(int np)
 {
-     if (np > 0) {
-       vert   = Eigen::VectorXi::Zero(np);
-       border = Eigen::VectorXi::Zero(np);
-     }
-     s = std::make_unique<MNESourceSpace>(np);
+    if (np > 0) {
+        vert = Eigen::VectorXi::Zero(np);
+        border = Eigen::VectorXi::Zero(np);
+    }
+    s = std::make_unique<MNESourceSpace>(np);
 }
 
 //=============================================================================================================

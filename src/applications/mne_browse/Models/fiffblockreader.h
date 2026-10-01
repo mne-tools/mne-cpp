@@ -73,7 +73,7 @@ public:
      *
      * @param[in] parent    Parent QObject.
      */
-    explicit FiffBlockReader(QObject *parent = nullptr);
+    explicit FiffBlockReader(QObject* parent = nullptr);
 
     //=========================================================================================================
     /**
@@ -89,7 +89,7 @@ public:
      * @param[in] path  Absolute path to the .fif file.
      * @return true on success.
      */
-    bool open(const QString &path);
+    bool open(const QString& path);
 
     //=========================================================================================================
     /**
@@ -100,7 +100,7 @@ public:
      * @param[in] displayName  Friendly name used by the caller for status/UI display.
      * @return true on success.
      */
-    bool openBuffer(const QByteArray &data, const QString &displayName = QString());
+    bool openBuffer(const QByteArray& data, const QString& displayName = QString());
 
     //=========================================================================================================
     /**
@@ -114,7 +114,10 @@ public:
      *
      * @return True if the reader holds a valid raw FIFF handle.
      */
-    bool isOpen() const { return !m_raw.isNull() && !m_raw->isEmpty(); }
+    bool isOpen() const
+    {
+        return !m_raw.isNull() && !m_raw->isEmpty();
+    }
 
     // ── File metadata ─────────────────────────────────────────────────
 
@@ -124,7 +127,10 @@ public:
      *
      * @return Shared measurement info pointer.
      */
-    QSharedPointer<FIFFLIB::FiffInfo> fiffInfo()   const { return m_fiffInfo; }
+    QSharedPointer<FIFFLIB::FiffInfo> fiffInfo() const
+    {
+        return m_fiffInfo;
+    }
 
     //=========================================================================================================
     /**
@@ -132,7 +138,10 @@ public:
      *
      * @return First raw-file sample index.
      */
-    int                               firstSample() const { return m_firstSample; }
+    int firstSample() const
+    {
+        return m_firstSample;
+    }
 
     //=========================================================================================================
     /**
@@ -140,7 +149,10 @@ public:
      *
      * @return Last raw-file sample index.
      */
-    int                               lastSample()  const { return m_lastSample; }
+    int lastSample() const
+    {
+        return m_lastSample;
+    }
 
     //=========================================================================================================
     /**
@@ -148,7 +160,10 @@ public:
      *
      * @return Total raw-file sample count.
      */
-    int                               totalSamples() const { return m_lastSample - m_firstSample + 1; }
+    int totalSamples() const
+    {
+        return m_lastSample - m_firstSample + 1;
+    }
 
     // ── Asynchronous block loading ────────────────────────────────────
 
@@ -189,7 +204,7 @@ signals:
      * @param[in] data         channels × samples matrix (double).
      * @param[in] firstSample  Absolute sample index of column 0.
      */
-    void blockLoaded(const Eigen::MatrixXd &data, int firstSample);
+    void blockLoaded(const Eigen::MatrixXd& data, int firstSample);
 
 private:
     //=========================================================================================================
@@ -202,24 +217,24 @@ private:
      */
     Eigen::MatrixXd doRead(int from, int to);
 
-    QFile*                               m_file        = nullptr; /**< File-backed source device for desktop paths. */
-    QBuffer*                             m_buffer      = nullptr; /**< Memory-backed source device used for in-memory loads. */
-    QByteArray                           m_bufferData;            /**< Owned buffer for memory-backed FIFF content. */
-    QSharedPointer<FIFFLIB::FiffRawData> m_raw;                   /**< Raw FIFF reader used for header and block access. */
-    QSharedPointer<FIFFLIB::FiffInfo>    m_fiffInfo;              /**< Cached measurement information of the open file. */
-    int                                  m_firstSample = 0;       /**< First sample index of the open raw file. */
-    int                                  m_lastSample  = 0;       /**< Last sample index of the open raw file. */
+    QFile* m_file = nullptr;                      /**< File-backed source device for desktop paths. */
+    QBuffer* m_buffer = nullptr;                  /**< Memory-backed source device used for in-memory loads. */
+    QByteArray m_bufferData;                      /**< Owned buffer for memory-backed FIFF content. */
+    QSharedPointer<FIFFLIB::FiffRawData> m_raw;   /**< Raw FIFF reader used for header and block access. */
+    QSharedPointer<FIFFLIB::FiffInfo> m_fiffInfo; /**< Cached measurement information of the open file. */
+    int m_firstSample = 0;                        /**< First sample index of the open raw file. */
+    int m_lastSample = 0;                         /**< Last sample index of the open raw file. */
 
-    QFutureWatcher<Eigen::MatrixXd>      m_watcher;               /**< Watcher for the currently running async block read. */
-    int                                  m_inFlightFrom = 0;      /**< First sample of the currently running async read. */
-    bool                                 m_loading      = false;  /**< True while an async read is running. */
+    QFutureWatcher<Eigen::MatrixXd> m_watcher; /**< Watcher for the currently running async block read. */
+    int m_inFlightFrom = 0;                    /**< First sample of the currently running async read. */
+    bool m_loading = false;                    /**< True while an async read is running. */
 
     // Queued-up request: set when loadBlockAsync() is called while a read is running.
     // The in-flight read is allowed to complete (no waitForFinished), but its result
     // is discarded; then the pending request is started immediately.
-    bool                                 m_hasPending   = false;  /**< True if another block read is queued behind the current one. */
-    int                                  m_pendingFrom  = 0;      /**< First sample of the queued request. */
-    int                                  m_pendingTo    = 0;      /**< Last sample of the queued request. */
+    bool m_hasPending = false; /**< True if another block read is queued behind the current one. */
+    int m_pendingFrom = 0;     /**< First sample of the queued request. */
+    int m_pendingTo = 0;       /**< Last sample of the queued request. */
 };
 
 } // namespace MNEBROWSE

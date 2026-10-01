@@ -47,11 +47,12 @@ public:
     /**
      * Digitizer point category, matching FIFF digitizer point kinds.
      */
-    enum PointKind {
-        Cardinal = 0,   /**< Cardinal (fiducial) points: Nasion, LPA, RPA. */
-        HPI,            /**< HPI (Head Position Indicator) coil positions. */
-        EEG,            /**< EEG electrode positions. */
-        Extra           /**< Extra head shape digitization points. */
+    enum PointKind
+    {
+        Cardinal = 0, /**< Cardinal (fiducial) points: Nasion, LPA, RPA. */
+        HPI,          /**< HPI (Head Position Indicator) coil positions. */
+        EEG,          /**< EEG electrode positions. */
+        Extra         /**< Extra head shape digitization points. */
     };
 
     //=========================================================================================================
@@ -66,11 +67,11 @@ public:
      * @param[in] scale      Radius of each rendered sphere.
      * @param[in] type       Item type identifier.
      */
-    explicit DigitizerTreeItem(const QString &text,
+    explicit DigitizerTreeItem(const QString& text,
                                PointKind kind,
-                               const QVector<QVector3D> &positions,
-                               const QStringList &names,
-                               const QColor &color,
+                               const QVector<QVector3D>& positions,
+                               const QStringList& names,
+                               const QColor& color,
                                float scale,
                                int type = AbstractTreeItem::DigitizerItem);
     ~DigitizerTreeItem() = default;
@@ -108,10 +109,10 @@ public:
     PointKind pointKind() const;
 
 private:
-    PointKind m_kind;                /**< Digitizer point category. */
-    QVector<QVector3D> m_positions;  /**< 3D positions of all points. */
-    QStringList m_names;             /**< Display names for individual points. */
-    float m_scale;                   /**< Radius/size for rendering. */
+    PointKind m_kind;               /**< Digitizer point category. */
+    QVector<QVector3D> m_positions; /**< 3D positions of all points. */
+    QStringList m_names;            /**< Display names for individual points. */
+    float m_scale;                  /**< Radius/size for rendering. */
 };
 
 #endif // DIGITIZERTREEITEM_H

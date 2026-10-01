@@ -22,7 +22,7 @@
 //=============================================================================================================
 
 #include "dsp_global.h"
-#include "ica.h"  // Re-use IcaResult
+#include "ica.h" // Re-use IcaResult
 
 //=============================================================================================================
 // EIGEN INCLUDES
@@ -74,11 +74,11 @@ public:
      * @return IcaResult with mixing/unmixing matrices and source time series.
      */
     static IcaResult run(const Eigen::MatrixXd& matData,
-                         int    nComponents  = -1,
-                         int    maxIter      = 200,
-                         double tol          = 1e-7,
-                         int    lbfgsMemory  = 7,
-                         int    randomSeed   = 42);
+                         int nComponents = -1,
+                         int maxIter = 200,
+                         double tol = 1e-7,
+                         int lbfgsMemory = 7,
+                         int randomSeed = 42);
 
 private:
     PicardIca() = delete;

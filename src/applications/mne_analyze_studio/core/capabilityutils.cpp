@@ -36,7 +36,7 @@ QString MNEANALYZESTUDIO::pipelineRunAliasToolName(const QString& pipelineId)
 QString MNEANALYZESTUDIO::pipelineIdFromPipelineRunAliasToolName(const QString& toolName)
 {
     const QString trimmedToolName = toolName.trimmed();
-    if(!trimmedToolName.startsWith(QString::fromLatin1(kPipelineRunAliasPrefix))) {
+    if (!trimmedToolName.startsWith(QString::fromLatin1(kPipelineRunAliasPrefix))) {
         return QString();
     }
 
@@ -54,16 +54,16 @@ QJsonArray MNEANALYZESTUDIO::mergeCapabilityAliases(const QJsonArray& existingAl
 {
     QStringList mergedAliases;
 
-    for(const QJsonValue& value : existingAliases) {
+    for (const QJsonValue& value : existingAliases) {
         const QString alias = value.toString().trimmed();
-        if(!alias.isEmpty() && !mergedAliases.contains(alias)) {
+        if (!alias.isEmpty() && !mergedAliases.contains(alias)) {
             mergedAliases.append(alias);
         }
     }
 
-    for(const QString& alias : additionalAliases) {
+    for (const QString& alias : additionalAliases) {
         const QString trimmedAlias = alias.trimmed();
-        if(!trimmedAlias.isEmpty() && !mergedAliases.contains(trimmedAlias)) {
+        if (!trimmedAlias.isEmpty() && !mergedAliases.contains(trimmedAlias)) {
             mergedAliases.append(trimmedAlias);
         }
     }
@@ -88,14 +88,14 @@ QJsonObject MNEANALYZESTUDIO::annotatePlannerMetadata(const QJsonObject& rawTool
     tool.insert(QStringLiteral("planner_execution_default"), executionDefault.trimmed());
     tool.insert(QStringLiteral("planner_execution_reason"), executionReason.trimmed());
 
-    if(readOnly) {
+    if (readOnly) {
         tool.insert(QStringLiteral("planner_read_only"), true);
     }
-    if(!requiredContext.isEmpty()) {
+    if (!requiredContext.isEmpty()) {
         tool.insert(QStringLiteral("planner_required_context"), requiredContext);
     }
 
-    for(auto it = extraMetadata.constBegin(); it != extraMetadata.constEnd(); ++it) {
+    for (auto it = extraMetadata.constBegin(); it != extraMetadata.constEnd(); ++it) {
         tool.insert(it.key(), it.value());
     }
 
@@ -110,20 +110,18 @@ QJsonObject MNEANALYZESTUDIO::annotateCapabilityMetadata(const QJsonObject& rawT
     const QString pipelineId = tool.value("pipeline_id").toString(pipelineIdFromPipelineRunAliasToolName(toolName)).trimmed();
 
     QString capabilityKind = tool.value("capability_kind").toString().trimmed();
-    if(capabilityKind.isEmpty()) {
-        if(!pipelineId.isEmpty()) {
+    if (capabilityKind.isEmpty()) {
+        if (!pipelineId.isEmpty()) {
             capabilityKind = QStringLiteral("analysis_pipeline");
-        } else if(tool.value("workflow_operator").toBool(false)) {
+        } else if (tool.value("workflow_operator").toBool(false)) {
             capabilityKind = QStringLiteral("workflow_skill");
-        } else if(toolName.startsWith(QLatin1String("neurokernel."))) {
+        } else if (toolName.startsWith(QLatin1String("neurokernel."))) {
             capabilityKind = QStringLiteral("neurokernel_tool");
-        } else if(toolName.startsWith(QLatin1String("settings."))) {
+        } else if (toolName.startsWith(QLatin1String("settings."))) {
             capabilityKind = QStringLiteral("extension_setting");
-        } else if(toolName.startsWith(QLatin1String("studio."))
-                  || toolName.startsWith(QLatin1String("view.raw."))
-                  || toolName.startsWith(QLatin1String("view.hosted."))) {
+        } else if (toolName.startsWith(QLatin1String("studio.")) || toolName.startsWith(QLatin1String("view.raw.")) || toolName.startsWith(QLatin1String("view.hosted."))) {
             capabilityKind = QStringLiteral("studio_tool");
-        } else if(!tool.value("extension_id").toString().trimmed().isEmpty()) {
+        } else if (!tool.value("extension_id").toString().trimmed().isEmpty()) {
             capabilityKind = QStringLiteral("extension_tool");
         } else {
             capabilityKind = QStringLiteral("tool");
@@ -131,24 +129,24 @@ QJsonObject MNEANALYZESTUDIO::annotateCapabilityMetadata(const QJsonObject& rawT
     }
     tool.insert("capability_kind", capabilityKind);
 
-    if(!pipelineId.isEmpty()) {
+    if (!pipelineId.isEmpty()) {
         tool.insert("pipeline_id", pipelineId);
-        if(tool.value("pipeline_run_tool").toString().trimmed().isEmpty()) {
+        if (tool.value("pipeline_run_tool").toString().trimmed().isEmpty()) {
             tool.insert("pipeline_run_tool", QStringLiteral("studio.pipeline.run"));
         }
     }
 
     QString capabilityId = tool.value("capability_id").toString().trimmed();
-    if(capabilityId.isEmpty()) {
-        if(!pipelineId.isEmpty()) {
+    if (capabilityId.isEmpty()) {
+        if (!pipelineId.isEmpty()) {
             capabilityId = QStringLiteral("pipeline:%1").arg(pipelineId);
-        } else if(!skillId.isEmpty()) {
+        } else if (!skillId.isEmpty()) {
             capabilityId = QStringLiteral("workflow_skill:%1").arg(skillId);
-        } else if(!toolName.isEmpty()) {
+        } else if (!toolName.isEmpty()) {
             capabilityId = QStringLiteral("tool:%1").arg(toolName);
         }
     }
-    if(!capabilityId.isEmpty()) {
+    if (!capabilityId.isEmpty()) {
         tool.insert("capability_id", capabilityId);
     }
 
@@ -168,9 +166,9 @@ QStringList MNEANALYZESTUDIO::plannerRequiredContext(const QJsonObject& tool)
 {
     QStringList contexts;
     const QJsonArray requiredContext = tool.value(QStringLiteral("planner_required_context")).toArray();
-    for(const QJsonValue& value : requiredContext) {
+    for (const QJsonValue& value : requiredContext) {
         const QString context = value.toString().trimmed();
-        if(!context.isEmpty() && !contexts.contains(context)) {
+        if (!context.isEmpty() && !contexts.contains(context)) {
             contexts.append(context);
         }
     }
@@ -181,11 +179,10 @@ QStringList MNEANALYZESTUDIO::plannerRequiredContext(const QJsonObject& tool)
 QStringList MNEANALYZESTUDIO::extractTemplatePlaceholders(const QString& templateText)
 {
     QStringList placeholders;
-    QRegularExpressionMatchIterator matchIterator
-        = QRegularExpression(QStringLiteral("\\$\\{([^}]+)\\}")).globalMatch(templateText);
-    while(matchIterator.hasNext()) {
+    QRegularExpressionMatchIterator matchIterator = QRegularExpression(QStringLiteral("\\$\\{([^}]+)\\}")).globalMatch(templateText);
+    while (matchIterator.hasNext()) {
         const QString placeholder = matchIterator.next().captured(1).trimmed();
-        if(!placeholder.isEmpty() && !placeholders.contains(placeholder)) {
+        if (!placeholder.isEmpty() && !placeholders.contains(placeholder)) {
             placeholders.append(placeholder);
         }
     }

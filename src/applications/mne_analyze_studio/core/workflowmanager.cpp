@@ -35,10 +35,9 @@ QJsonObject stringSchema(const QString& title, const QString& description = QStr
 {
     QJsonObject schema{
         {"type", "string"},
-        {"title", title}
-    };
+        {"title", title}};
 
-    if(!description.isEmpty()) {
+    if (!description.isEmpty()) {
         schema.insert("description", description);
     }
 
@@ -50,17 +49,16 @@ QJsonObject objectSchema(const QJsonObject& properties, const QJsonArray& requir
     return QJsonObject{
         {"type", "object"},
         {"properties", properties},
-        {"required", required}
-    };
+        {"required", required}};
 }
 
 QStringList requiredFieldNames(const QJsonObject& schema)
 {
     QStringList required;
     const QJsonArray requiredArray = schema.value(QStringLiteral("required")).toArray();
-    for(const QJsonValue& value : requiredArray) {
+    for (const QJsonValue& value : requiredArray) {
         const QString key = value.toString().trimmed();
-        if(!key.isEmpty()) {
+        if (!key.isEmpty()) {
             required.append(key);
         }
     }
@@ -90,11 +88,11 @@ WorkflowManager::WorkflowManager(QObject* parent)
 
 void WorkflowManager::registerOperator(ISkillOperator* skillOperator)
 {
-    if(!skillOperator) {
+    if (!skillOperator) {
         throw WorkflowValidationError(QStringLiteral("Attempted to register a null skill operator."));
     }
 
-    if(skillOperator->parent() != this) {
+    if (skillOperator->parent() != this) {
         skillOperator->setParent(this);
     }
 
@@ -102,21 +100,21 @@ void WorkflowManager::registerOperator(ISkillOperator* skillOperator)
     const QString toolName = definition.value(QStringLiteral("tool_name")).toString().trimmed();
     const QString skillId = definition.value(QStringLiteral("skill_id")).toString().trimmed();
 
-    if(toolName.isEmpty()) {
+    if (toolName.isEmpty()) {
         throw WorkflowValidationError(QStringLiteral("Registered skill operator is missing `tool_name`."));
     }
 
-    if(skillId.isEmpty()) {
+    if (skillId.isEmpty()) {
         throw WorkflowValidationError(QStringLiteral("Registered skill operator `%1` is missing `skill_id`.").arg(toolName));
     }
 
-    if(m_registrationsByToolName.contains(toolName)) {
+    if (m_registrationsByToolName.contains(toolName)) {
         const OperatorRegistration existingRegistration = m_registrationsByToolName.value(toolName);
         throw WorkflowValidationError(QStringLiteral("Workflow tool name `%1` is already registered for skill `%2`.")
                                           .arg(toolName, existingRegistration.skillId));
     }
 
-    if(m_registrationsBySkillId.contains(skillId)) {
+    if (m_registrationsBySkillId.contains(skillId)) {
         const OperatorRegistration existingRegistration = m_registrationsBySkillId.value(skillId);
         throw WorkflowValidationError(QStringLiteral("Workflow skill id `%1` is already registered for tool `%2`.")
                                           .arg(skillId, existingRegistration.toolName));
@@ -147,7 +145,7 @@ QJsonArray WorkflowManager::toolDefinitions() const
     std::sort(toolNames.begin(), toolNames.end());
 
     QJsonArray tools;
-    for(const QString& toolName : toolNames) {
+    for (const QString& toolName : toolNames) {
         tools.append(translateOperatorToToolDefinition(m_registrationsByToolName.value(toolName)));
     }
 
@@ -165,20 +163,17 @@ QJsonArray WorkflowManager::resourceDefinitions() const
             {"mime_type", "application/json"},
             {"kind", "workflow_graph"},
             {"extension_id", "temporal-filter-skill"},
-            {"extension_display_name", "Workflow Manager"}
-        }
-    };
+            {"extension_display_name", "Workflow Manager"}}};
 }
 
 QJsonObject WorkflowManager::readResource(const QString& resourceUri) const
 {
     const QString trimmedUri = resourceUri.trimmed();
-    if(trimmedUri != activeGraphResourceUri()) {
+    if (trimmedUri != activeGraphResourceUri()) {
         return QJsonObject{
             {"tool_name", "resources/read"},
             {"status", "error"},
-            {"message", QString("Workflow manager does not expose resource `%1`.").arg(trimmedUri)}
-        };
+            {"message", QString("Workflow manager does not expose resource `%1`.").arg(trimmedUri)}};
     }
 
     return QJsonObject{
@@ -189,8 +184,7 @@ QJsonObject WorkflowManager::readResource(const QString& resourceUri) const
         {"message", "Serialized active workflow graph."},
         {"source_file", m_activeGraphSourceFile},
         {"contents", QString::fromUtf8(QJsonDocument(m_activeGraph.toJson()).toJson(QJsonDocument::Indented))},
-        {"graph", m_activeGraph.toJson()}
-    };
+        {"graph", m_activeGraph.toJson()}};
 }
 
 const WorkflowGraph& WorkflowManager::activeGraph() const
@@ -221,29 +215,29 @@ void WorkflowManager::loadAnalysisFile(const QString& filePath)
 
 void WorkflowManager::saveAnalysisFile(const QString& filePath)
 {
-    if(m_activeGraph.nodes().isEmpty() && m_activeGraph.resources().isEmpty()) {
+    if (m_activeGraph.nodes().isEmpty() && m_activeGraph.resources().isEmpty()) {
         throw WorkflowValidationError(QStringLiteral("No active workflow graph is available to save."));
     }
 
     const QString resolvedFilePath = filePath.trimmed().isEmpty()
         ? m_activeGraphSourceFile.trimmed()
         : QFileInfo(filePath.trimmed()).absoluteFilePath();
-    if(resolvedFilePath.isEmpty()) {
+    if (resolvedFilePath.isEmpty()) {
         throw WorkflowValidationError(QStringLiteral("Workflow save requires a target `.mne` file path."));
     }
 
     const QJsonDocument document(m_activeGraph.toDeclarativeJson());
     QSaveFile outputFile(resolvedFilePath);
-    if(!outputFile.open(QIODevice::WriteOnly | QIODevice::Text)) {
+    if (!outputFile.open(QIODevice::WriteOnly | QIODevice::Text)) {
         throw WorkflowValidationError(QStringLiteral("Failed to open workflow file `%1` for writing.")
                                           .arg(resolvedFilePath));
     }
 
-    if(outputFile.write(document.toJson(QJsonDocument::Indented)) < 0) {
+    if (outputFile.write(document.toJson(QJsonDocument::Indented)) < 0) {
         throw WorkflowValidationError(QStringLiteral("Failed to write workflow file `%1`.").arg(resolvedFilePath));
     }
 
-    if(!outputFile.commit()) {
+    if (!outputFile.commit()) {
         throw WorkflowValidationError(QStringLiteral("Failed to finalize workflow save for `%1`.").arg(resolvedFilePath));
     }
 
@@ -274,15 +268,13 @@ QJsonObject WorkflowManager::appendNodeAndExecute(const QString& toolName, const
     return QJsonObject{
         {"tool_name", registration.toolName},
         {"status", completedNode.executionStatus},
-        {"message", completedNode.lastResult.value(QStringLiteral("message"))
-                        .toString(QStringLiteral("Executed workflow node `%1`.").arg(completedNode.uid))},
+        {"message", completedNode.lastResult.value(QStringLiteral("message")).toString(QStringLiteral("Executed workflow node `%1`.").arg(completedNode.uid))},
         {"node_uid", completedNode.uid},
         {"skill_id", completedNode.skillId},
         {"source_file", m_activeGraphSourceFile},
         {"graph_resource_uri", activeGraphResourceUri()},
         {"outputs", completedNode.resolvedOutputs},
-        {"graph", m_activeGraph.toJson()}
-    };
+        {"graph", m_activeGraph.toJson()}};
 }
 
 QJsonObject WorkflowManager::translateOperatorToToolDefinition(const OperatorRegistration& registration) const
@@ -292,9 +284,7 @@ QJsonObject WorkflowManager::translateOperatorToToolDefinition(const OperatorReg
     const QJsonObject outputsSchema = registration.definition.value(QStringLiteral("outputs_schema")).toObject();
 
     QJsonObject properties{
-        {"uid", stringSchema("Node UID",
-                             QStringLiteral("Optional workflow node identifier. If omitted, the workflow manager generates one."))}
-    };
+        {"uid", stringSchema("Node UID", QStringLiteral("Optional workflow node identifier. If omitted, the workflow manager generates one."))}};
 
     QJsonArray required;
 
@@ -303,13 +293,13 @@ QJsonObject WorkflowManager::translateOperatorToToolDefinition(const OperatorReg
                                                               bool includeRequired) {
         const QJsonObject sectionProperties = schema.value(QStringLiteral("properties")).toObject();
         const QStringList sectionRequired = requiredFieldNames(schema);
-        for(auto it = sectionProperties.constBegin(); it != sectionProperties.constEnd(); ++it) {
+        for (auto it = sectionProperties.constBegin(); it != sectionProperties.constEnd(); ++it) {
             properties.insert(it.key(), propertySchemaWithSection(it.value().toObject(), sectionName));
         }
 
-        if(includeRequired) {
-            for(const QString& requiredField : sectionRequired) {
-                if(!required.contains(requiredField)) {
+        if (includeRequired) {
+            for (const QString& requiredField : sectionRequired) {
+                if (!required.contains(requiredField)) {
                     required.append(requiredField);
                 }
             }
@@ -321,13 +311,13 @@ QJsonObject WorkflowManager::translateOperatorToToolDefinition(const OperatorReg
     appendSchemaSection(outputsSchema, QStringLiteral("outputs"), false);
 
     QJsonObject resultSchema = registration.definition.value(QStringLiteral("result_schema")).toObject();
-    if(resultSchema.isEmpty()) {
+    if (resultSchema.isEmpty()) {
         resultSchema = objectSchema(QJsonObject{
-            {"status", stringSchema("Status")},
-            {"node_uid", stringSchema("Node UID")},
-            {"skill_id", stringSchema("Skill ID")},
-            {"graph_resource_uri", stringSchema("Graph Resource URI")}
-        }, QJsonArray{"status", "node_uid", "skill_id", "graph_resource_uri"});
+                                        {"status", stringSchema("Status")},
+                                        {"node_uid", stringSchema("Node UID")},
+                                        {"skill_id", stringSchema("Skill ID")},
+                                        {"graph_resource_uri", stringSchema("Graph Resource URI")}},
+                                    QJsonArray{"status", "node_uid", "skill_id", "graph_resource_uri"});
     }
 
     QJsonObject tool{
@@ -339,17 +329,14 @@ QJsonObject WorkflowManager::translateOperatorToToolDefinition(const OperatorReg
         {"skill_id", registration.skillId},
         {"capability_id", QStringLiteral("workflow_skill:%1").arg(registration.skillId)},
         {"capability_kind", QStringLiteral("workflow_skill")},
-        {"capability_aliases", QJsonArray::fromStringList(QStringList()
-             << registration.skillId
-             << registration.toolName)},
+        {"capability_aliases", QJsonArray::fromStringList(QStringList() << registration.skillId << registration.toolName)},
         {"workflow_operator", true},
-        {"graph_mutation", "append_node"}
-    };
+        {"graph_mutation", "append_node"}};
 
-    if(!registration.extensionId.isEmpty()) {
+    if (!registration.extensionId.isEmpty()) {
         tool.insert("extension_id", registration.extensionId);
     }
-    if(!registration.extensionDisplayName.isEmpty()) {
+    if (!registration.extensionDisplayName.isEmpty()) {
         tool.insert("extension_display_name", registration.extensionDisplayName);
     }
 
@@ -373,9 +360,9 @@ WorkflowNode WorkflowManager::buildNodeFromToolArguments(const OperatorRegistrat
     WorkflowNode node;
     node.skillId = registration.skillId;
 
-    for(auto it = properties.constBegin(); it != properties.constEnd(); ++it) {
+    for (auto it = properties.constBegin(); it != properties.constEnd(); ++it) {
         const QString propertyName = it.key();
-        if(propertyName == QLatin1String("uid")) {
+        if (propertyName == QLatin1String("uid")) {
             continue;
         }
 
@@ -383,17 +370,17 @@ WorkflowNode WorkflowManager::buildNodeFromToolArguments(const OperatorRegistrat
         const QString sectionName = propertySchema.value(QStringLiteral("x_workflow_section")).toString();
         const QJsonValue value = arguments.value(propertyName);
 
-        if(!value.isUndefined() && !value.isNull()) {
-            if(sectionName == QLatin1String("inputs")) {
+        if (!value.isUndefined() && !value.isNull()) {
+            if (sectionName == QLatin1String("inputs")) {
                 node.inputs.insert(propertyName, value);
-            } else if(sectionName == QLatin1String("parameters")) {
+            } else if (sectionName == QLatin1String("parameters")) {
                 node.parameters.insert(propertyName, value);
-            } else if(sectionName == QLatin1String("outputs")) {
+            } else if (sectionName == QLatin1String("outputs")) {
                 node.outputs.insert(propertyName, value);
             }
         }
 
-        if(required.contains(propertyName) && value.isUndefined()) {
+        if (required.contains(propertyName) && value.isUndefined()) {
             throw WorkflowValidationError(QStringLiteral("Tool `%1` is missing required argument `%2`.")
                                               .arg(registration.toolName, propertyName));
         }
@@ -404,7 +391,7 @@ WorkflowNode WorkflowManager::buildNodeFromToolArguments(const OperatorRegistrat
                                    candidateGraph);
 
     const QJsonObject outputsSchema = registration.definition.value(QStringLiteral("outputs_schema")).toObject().value(QStringLiteral("properties")).toObject();
-    for(auto it = outputsSchema.constBegin(); it != outputsSchema.constEnd(); ++it) {
+    for (auto it = outputsSchema.constBegin(); it != outputsSchema.constEnd(); ++it) {
         const QString outputRole = it.key();
         const QString providedOutputUid = valueToUid(node.outputs.value(outputRole));
         const QString outputUid = providedOutputUid.isEmpty()
@@ -419,19 +406,18 @@ WorkflowNode WorkflowManager::buildNodeFromToolArguments(const OperatorRegistrat
 void WorkflowManager::executePendingNodes()
 {
     const QVector<QString> executionOrder = m_activeGraph.topologicalSort();
-    for(const QString& nodeUid : executionOrder) {
+    for (const QString& nodeUid : executionOrder) {
         WorkflowNode& workflowNode = m_activeGraph.node(nodeUid);
-        if(workflowNode.executionStatus == QLatin1String("completed")) {
+        if (workflowNode.executionStatus == QLatin1String("completed")) {
             continue;
         }
 
         const OperatorRegistration registration = registrationForSkill(workflowNode.skillId);
-        if(!registration.skillOperator) {
+        if (!registration.skillOperator) {
             workflowNode.executionStatus = QStringLiteral("failed");
             workflowNode.lastResult = QJsonObject{
                 {"status", "failed"},
-                {"message", QString("No registered skill operator found for `%1`.").arg(workflowNode.skillId)}
-            };
+                {"message", QString("No registered skill operator found for `%1`.").arg(workflowNode.skillId)}};
             emit activeGraphChanged(m_activeGraph.toJson());
             throw WorkflowValidationError(workflowNode.lastResult.value(QStringLiteral("message")).toString());
         }
@@ -443,7 +429,7 @@ void WorkflowManager::executePendingNodes()
         const QString executionStatus = executionResult.value(QStringLiteral("status")).toString(QStringLiteral("completed"));
         workflowNode.lastResult = executionResult;
 
-        if(executionStatus == QLatin1String("error") || executionStatus == QLatin1String("failed")) {
+        if (executionStatus == QLatin1String("error") || executionStatus == QLatin1String("failed")) {
             workflowNode.executionStatus = QStringLiteral("failed");
             emit activeGraphChanged(m_activeGraph.toJson());
             throw WorkflowValidationError(executionResult.value(QStringLiteral("message"))
@@ -451,7 +437,7 @@ void WorkflowManager::executePendingNodes()
         }
 
         const QJsonObject outputUris = executionResult.value(QStringLiteral("outputs")).toObject();
-        for(auto it = workflowNode.outputs.constBegin(); it != workflowNode.outputs.constEnd(); ++it) {
+        for (auto it = workflowNode.outputs.constBegin(); it != workflowNode.outputs.constEnd(); ++it) {
             const QString outputRole = it.key();
             const QString outputUid = it.value().toString().trimmed();
             const QString outputUri = outputUris.value(outputRole).toString(defaultOutputUri(outputUid));
@@ -468,9 +454,9 @@ void WorkflowManager::executePendingNodes()
 QJsonObject WorkflowManager::resolvedInputsForNode(const WorkflowNode& node) const
 {
     QJsonObject resolvedInputs;
-    for(auto it = node.inputs.constBegin(); it != node.inputs.constEnd(); ++it) {
+    for (auto it = node.inputs.constBegin(); it != node.inputs.constEnd(); ++it) {
         const QString inputUid = valueToUid(it.value());
-        if(inputUid.isEmpty()) {
+        if (inputUid.isEmpty()) {
             continue;
         }
 
@@ -500,8 +486,7 @@ WorkflowResource WorkflowManager::materializeOutputResource(const OperatorRegist
     resource.metadata = QJsonObject{
         {"producer_node_uid", node.uid},
         {"producer_skill_id", node.skillId},
-        {"output_role", outputRole}
-    };
+        {"output_role", outputRole}};
 
     return resource;
 }
@@ -509,13 +494,13 @@ WorkflowResource WorkflowManager::materializeOutputResource(const OperatorRegist
 QString WorkflowManager::ensureUniqueNodeUid(const QString& preferredUid, const WorkflowGraph& graph) const
 {
     QString candidate = sanitizeIdentifier(preferredUid);
-    if(candidate.isEmpty()) {
+    if (candidate.isEmpty()) {
         candidate = QStringLiteral("workflow_node");
     }
 
     QString uniqueCandidate = candidate;
     int suffix = 1;
-    while(graph.hasNode(uniqueCandidate)) {
+    while (graph.hasNode(uniqueCandidate)) {
         uniqueCandidate = QStringLiteral("%1_%2").arg(candidate).arg(++suffix);
     }
 
@@ -525,11 +510,11 @@ QString WorkflowManager::ensureUniqueNodeUid(const QString& preferredUid, const 
 QString WorkflowManager::ensureUniqueOutputUid(const QString& preferredUid, const WorkflowGraph& graph) const
 {
     const QString candidate = preferredUid.trimmed();
-    if(candidate.isEmpty()) {
+    if (candidate.isEmpty()) {
         throw WorkflowValidationError(QStringLiteral("Workflow output uid cannot be empty."));
     }
 
-    if(graph.hasArtifact(candidate)) {
+    if (graph.hasArtifact(candidate)) {
         throw WorkflowValidationError(QStringLiteral("Workflow output uid `%1` already exists in the active graph.")
                                           .arg(candidate));
     }
@@ -543,13 +528,13 @@ QString WorkflowManager::defaultOutputUid(const QString& nodeUid,
 {
     QString candidateBase = QStringLiteral("%1_%2").arg(sanitizeIdentifier(nodeUid),
                                                         sanitizeIdentifier(outputRole));
-    if(candidateBase.isEmpty()) {
+    if (candidateBase.isEmpty()) {
         candidateBase = QStringLiteral("workflow_output");
     }
 
     QString candidate = candidateBase;
     int suffix = 1;
-    while(graph.hasArtifact(candidate)) {
+    while (graph.hasArtifact(candidate)) {
         candidate = QStringLiteral("%1_%2").arg(candidateBase).arg(++suffix);
     }
 
@@ -574,7 +559,7 @@ WorkflowManager::OperatorRegistration WorkflowManager::registrationForTool(const
 {
     const QString trimmedToolName = toolName.trimmed();
     const auto it = m_registrationsByToolName.constFind(trimmedToolName);
-    if(it == m_registrationsByToolName.constEnd()) {
+    if (it == m_registrationsByToolName.constEnd()) {
         throw WorkflowValidationError(QStringLiteral("No registered workflow tool found for `%1`.").arg(trimmedToolName));
     }
 
@@ -585,7 +570,7 @@ WorkflowManager::OperatorRegistration WorkflowManager::registrationForSkill(cons
 {
     const QString trimmedSkillId = skillId.trimmed();
     const auto it = m_registrationsBySkillId.constFind(trimmedSkillId);
-    if(it == m_registrationsBySkillId.constEnd()) {
+    if (it == m_registrationsBySkillId.constEnd()) {
         throw WorkflowValidationError(QStringLiteral("No registered skill operator found for `%1`.").arg(trimmedSkillId));
     }
 

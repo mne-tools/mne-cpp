@@ -30,7 +30,7 @@ using namespace DISP3DLIB;
 //=============================================================================================================
 
 MultimodalScene::MultimodalScene(QObject* parent)
-    : QObject(parent)
+: QObject(parent)
 {
 }
 
@@ -204,9 +204,7 @@ void MultimodalScene::setOverlayThresholds(float fmin, float fmid, float fmax)
     if (fmax < fmid) {
         fmax = fmid;
     }
-    const bool same = qFuzzyCompare(fmin + 1.0f, m_overlayFmin + 1.0f)
-                   && qFuzzyCompare(fmid + 1.0f, m_overlayFmid + 1.0f)
-                   && qFuzzyCompare(fmax + 1.0f, m_overlayFmax + 1.0f);
+    const bool same = qFuzzyCompare(fmin + 1.0f, m_overlayFmin + 1.0f) && qFuzzyCompare(fmid + 1.0f, m_overlayFmid + 1.0f) && qFuzzyCompare(fmax + 1.0f, m_overlayFmax + 1.0f);
     if (same) {
         return;
     }

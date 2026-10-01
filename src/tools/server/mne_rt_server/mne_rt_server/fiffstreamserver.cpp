@@ -36,7 +36,7 @@ using namespace COMLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-FiffStreamServer::FiffStreamServer(QObject *parent)
+FiffStreamServer::FiffStreamServer(QObject* parent)
 : QTcpServer(parent)
 , m_iNextClientId(0)
 {
@@ -57,8 +57,7 @@ void FiffStreamServer::comClist(Command p_command)
     QString t_sOutput("");
     t_sOutput.append("\tID\tAlias\r\n");
     QMap<qint32, FiffStreamThread*>::iterator i;
-    for (i = this->m_qClientList.begin(); i != this->m_qClientList.end(); ++i)
-    {
+    for (i = this->m_qClientList.begin(); i != this->m_qClientList.end(); ++i) {
         QString str = QString("\t%1\t%2\r\n").arg(i.key()).arg(i.value()->getAlias());
         t_sOutput.append(str);
     }
@@ -73,13 +72,12 @@ void FiffStreamServer::comClist(Command p_command)
 void FiffStreamServer::comMeasinfo(Command p_command)
 {
     qint32 t_id = -1;
-//            p_blockOutputInfo.append(parseToId(p_sListCommand[1],t_id));
+    //            p_blockOutputInfo.append(parseToId(p_sListCommand[1],t_id));
 
     t_id = p_command.pValues()[0].toInt();
 
-    if(t_id != -1)
-    {
-        emit requestMeasInfo(t_id);//requestMeasInfo(t_id);
+    if (t_id != -1) {
+        emit requestMeasInfo(t_id); //requestMeasInfo(t_id);
 
         QString str = QString("\tsend measurement info to FiffStreamClient (ID: %1)\r\n\n").arg(t_id);
         qobject_cast<MNERTServer*>(this->parent())->getCommandManager()["measinfo"].reply(str);
@@ -93,10 +91,9 @@ void FiffStreamServer::comStart(Command p_command)
     qint32 t_id = -1;
     QString t_sOutput("");
     QString t_sAlias(p_command.pValues()[0].toString());
-    t_sOutput.append(parseToId(t_sAlias,t_id));
+    t_sOutput.append(parseToId(t_sAlias, t_id));
 
-    if(t_id != -1)
-    {
+    if (t_id != -1) {
         emit startMeasFiffStreamClient(t_id);
 
         QString str = QString("\tFiffStreamClient (ID: %1) is now set to accept raw buffers\r\n\n").arg(t_id);
@@ -112,11 +109,10 @@ void FiffStreamServer::comStop(Command p_command)
     qint32 t_id = -1;
     QString t_sOutput("");
     QString t_sAlias(p_command.pValues()[0].toString());
-    t_sOutput.append(parseToId(t_sAlias,t_id));
+    t_sOutput.append(parseToId(t_sAlias, t_id));
 
-    if(t_id != -1)
-    {
-        emit stopMeasFiffStreamClient(t_id);//emit requestStopMeas(t_id);
+    if (t_id != -1) {
+        emit stopMeasFiffStreamClient(t_id); //emit requestStopMeas(t_id);
 
         QString str = QString("\tstop FiffStreamClient (ID: %1) from receiving raw Buffers.\r\n\n").arg(t_id);
         t_sOutput.append(str);
@@ -140,7 +136,7 @@ void FiffStreamServer::comStopAll(Command p_command)
 void FiffStreamServer::connectCommands()
 {
     //Connect slots
-    MNERTServer* t_pMNERTServer = qobject_cast<MNERTServer*> (this->parent());
+    MNERTServer* t_pMNERTServer = qobject_cast<MNERTServer*>(this->parent());
 
     QObject::connect(&t_pMNERTServer->getCommandManager()["clist"], &Command::executed, this, &FiffStreamServer::comClist);
     QObject::connect(&t_pMNERTServer->getCommandManager()["measinfo"], &Command::executed, this, &FiffStreamServer::comMeasinfo);
@@ -148,11 +144,11 @@ void FiffStreamServer::connectCommands()
     QObject::connect(&t_pMNERTServer->getCommandManager()["stop"], &Command::executed, this, &FiffStreamServer::comStop);
     QObject::connect(&t_pMNERTServer->getCommandManager()["stop-all"], &Command::executed, this, &FiffStreamServer::comStopAll);
 
-//    t_pMNERTServer->getCommandManager().connectSlot(QString("clist"), this, &FiffStreamServer::comClist);
-//    t_pMNERTServer->getCommandManager().connectSlot(QString("measinfo"), this, &FiffStreamServer::comMeasinfo);
-//    t_pMNERTServer->getCommandManager().connectSlot(QString("start"), this, &FiffStreamServer::comStart);
-//    t_pMNERTServer->getCommandManager().connectSlot(QString("stop"), this, &FiffStreamServer::comStop);
-//    t_pMNERTServer->getCommandManager().connectSlot(QString("stop-all"), this, &FiffStreamServer::comStopAll);
+    //    t_pMNERTServer->getCommandManager().connectSlot(QString("clist"), this, &FiffStreamServer::comClist);
+    //    t_pMNERTServer->getCommandManager().connectSlot(QString("measinfo"), this, &FiffStreamServer::comMeasinfo);
+    //    t_pMNERTServer->getCommandManager().connectSlot(QString("start"), this, &FiffStreamServer::comStart);
+    //    t_pMNERTServer->getCommandManager().connectSlot(QString("stop"), this, &FiffStreamServer::comStop);
+    //    t_pMNERTServer->getCommandManager().connectSlot(QString("stop-all"), this, &FiffStreamServer::comStopAll);
 }
 
 ////=============================================================================================================
@@ -271,22 +267,16 @@ QByteArray FiffStreamServer::parseToId(QString& p_sRawId, qint32& p_iParsedId)
 {
     p_iParsedId = -1;
     QByteArray t_blockCmdIdInfo;
-    if(!p_sRawId.isEmpty())
-    {
+    if (!p_sRawId.isEmpty()) {
         bool t_isInt;
         qint32 t_id = p_sRawId.toInt(&t_isInt);
 
-        if(t_isInt && this->m_qClientList.contains(t_id))
-        {
+        if (t_isInt && this->m_qClientList.contains(t_id)) {
             p_iParsedId = t_id;
-        }
-        else
-        {
+        } else {
             QMap<qint32, FiffStreamThread*>::iterator i;
-            for (i = this->m_qClientList.begin(); i != this->m_qClientList.end(); ++i)
-            {
-                if(i.value()->getAlias().compare(p_sRawId) == 0)
-                {
+            for (i = this->m_qClientList.begin(); i != this->m_qClientList.end(); ++i) {
+                if (i.value()->getAlias().compare(p_sRawId) == 0) {
                     p_iParsedId = i.key();
                     QString str = QString("\tconvert alias '%1' => %2\r\n").arg(i.value()->getAlias()).arg(i.key());
                     t_blockCmdIdInfo.append(str.toUtf8());
@@ -296,13 +286,10 @@ QByteArray FiffStreamServer::parseToId(QString& p_sRawId, qint32& p_iParsedId)
         }
     }
 
-    if(p_iParsedId != -1)
-    {
+    if (p_iParsedId != -1) {
         QString str = QString("\tselect FiffStreamClient %1\r\n").arg(p_iParsedId);
         t_blockCmdIdInfo.append(str.toUtf8());
-    }
-    else
-    {
+    } else {
         t_blockCmdIdInfo.append("\twarning: requested FiffStreamClient not available\r\n\n");
     }
 

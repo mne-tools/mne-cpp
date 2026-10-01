@@ -49,15 +49,17 @@
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-namespace FIFFLIB {
-    class FiffInfo;
+namespace FIFFLIB
+{
+class FiffInfo;
 }
 
 //=============================================================================================================
 // DEFINE NAMESPACE UTILSLIB
 //=============================================================================================================
 
-namespace UTILSLIB {
+namespace UTILSLIB
+{
 
 //=============================================================================================================
 /**
@@ -65,7 +67,7 @@ namespace UTILSLIB {
  */
 struct DSPSHARED_EXPORT BridgedElectrodeParams
 {
-    double dElectricalDistanceThreshold = 0.3;  /**< Max electrical distance to flag as bridged. */
+    double dElectricalDistanceThreshold = 0.3; /**< Max electrical distance to flag as bridged. */
 };
 
 //=============================================================================================================
@@ -84,7 +86,7 @@ struct DSPSHARED_EXPORT BridgedElectrodeParams
  *         indices stored in the order they appear in info.
  */
 DSPSHARED_EXPORT Eigen::MatrixXd computeElectricalDistance(const Eigen::MatrixXd& data,
-                                                            const FIFFLIB::FiffInfo& info);
+                                                           const FIFFLIB::FiffInfo& info);
 
 //=============================================================================================================
 /**
@@ -100,7 +102,7 @@ DSPSHARED_EXPORT Eigen::MatrixXd computeElectricalDistance(const Eigen::MatrixXd
  * @return List of bridged electrode pairs as (channel_index_1, channel_index_2)
  *         using indices into info.chs.
  */
-DSPSHARED_EXPORT QList<QPair<int,int>> computeBridgedElectrodes(
+DSPSHARED_EXPORT QList<QPair<int, int>> computeBridgedElectrodes(
     const Eigen::MatrixXd& data,
     const FIFFLIB::FiffInfo& info,
     const BridgedElectrodeParams& params = BridgedElectrodeParams());

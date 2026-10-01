@@ -66,7 +66,8 @@ using namespace Eigen;
 static QColor valueToColor(double value, double fthresh, [[maybe_unused]] double fmid, double fmax, bool isSigned)
 {
     double absVal = std::abs(value);
-    if (absVal < fthresh) return QColor(128, 128, 128);
+    if (absVal < fthresh)
+        return QColor(128, 128, 128);
 
     // Interpolate between hot colors
     double t = 0.0;
@@ -113,30 +114,44 @@ static QImage renderFrame(const FsSurface& surf,
     const MatrixX3f& rr = surf.rr();
     const MatrixX3i& tris = surf.tris();
 
-    if (rr.rows() == 0 || tris.rows() == 0) return image;
+    if (rr.rows() == 0 || tris.rows() == 0)
+        return image;
 
     // Simple orthographic projection
     float cx = 0.0f, cy = 0.0f, cz = 0.0f;
     for (int i = 0; i < rr.rows(); ++i) {
-        cx += rr(i, 0); cy += rr(i, 1); cz += rr(i, 2);
+        cx += rr(i, 0);
+        cy += rr(i, 1);
+        cz += rr(i, 2);
     }
-    cx /= rr.rows(); cy /= rr.rows(); cz /= rr.rows();
+    cx /= rr.rows();
+    cy /= rr.rows();
+    cz /= rr.rows();
 
     // View rotation
     int xIdx = 0, yIdx = 1;
     float flipX = 1.0f, flipY = -1.0f;
     if (viewName == "lat" || viewName == "lateral") {
-        xIdx = 1; yIdx = 2;
+        xIdx = 1;
+        yIdx = 2;
     } else if (viewName == "med" || viewName == "medial") {
-        xIdx = 1; yIdx = 2; flipX = -1.0f;
+        xIdx = 1;
+        yIdx = 2;
+        flipX = -1.0f;
     } else if (viewName == "dor" || viewName == "dorsal") {
-        xIdx = 0; yIdx = 1;
+        xIdx = 0;
+        yIdx = 1;
     } else if (viewName == "ven" || viewName == "ventral") {
-        xIdx = 0; yIdx = 1; flipY = 1.0f;
+        xIdx = 0;
+        yIdx = 1;
+        flipY = 1.0f;
     } else if (viewName == "ros" || viewName == "rostral") {
-        xIdx = 0; yIdx = 2;
+        xIdx = 0;
+        yIdx = 2;
     } else if (viewName == "cau" || viewName == "caudal") {
-        xIdx = 0; yIdx = 2; flipX = -1.0f;
+        xIdx = 0;
+        yIdx = 2;
+        flipX = -1.0f;
     }
 
     // Find bounds
@@ -144,10 +159,14 @@ static QImage renderFrame(const FsSurface& surf,
     for (int i = 0; i < rr.rows(); ++i) {
         float px = flipX * (rr(i, xIdx) - (xIdx == 0 ? cx : (xIdx == 1 ? cy : cz)));
         float py = flipY * (rr(i, yIdx) - (yIdx == 0 ? cx : (yIdx == 1 ? cy : cz)));
-        if (px < minX) minX = px;
-        if (px > maxX) maxX = px;
-        if (py < minY) minY = py;
-        if (py > maxY) maxY = py;
+        if (px < minX)
+            minX = px;
+        if (px > maxX)
+            maxX = px;
+        if (py < minY)
+            minY = py;
+        if (py > maxY)
+            maxY = py;
     }
 
     float rangeX = maxX - minX;
@@ -161,10 +180,20 @@ static QImage renderFrame(const FsSurface& surf,
         // Average value for this triangle
         double triVal = 0.0;
         int count = 0;
-        if (i0 < values.size()) { triVal += values(i0); count++; }
-        if (i1 < values.size()) { triVal += values(i1); count++; }
-        if (i2 < values.size()) { triVal += values(i2); count++; }
-        if (count > 0) triVal /= count;
+        if (i0 < values.size()) {
+            triVal += values(i0);
+            count++;
+        }
+        if (i1 < values.size()) {
+            triVal += values(i1);
+            count++;
+        }
+        if (i2 < values.size()) {
+            triVal += values(i2);
+            count++;
+        }
+        if (count > 0)
+            triVal /= count;
 
         QColor color = valueToColor(triVal, fthresh, fmid, fmax, isSigned);
 
@@ -187,7 +216,7 @@ static QImage renderFrame(const FsSurface& surf,
 
 //=============================================================================================================
 
-int main(int argc, char *argv[])
+int main(int argc, char* argv[])
 {
     qInstallMessageHandler(MNELogger::customLogWriter);
     QGuiApplication app(argc, argv);
@@ -304,9 +333,9 @@ int main(int argc, char *argv[])
                 qCritical("Cannot read LH STC from: %s", qPrintable(lhFile));
                 return 1;
             }
-            qInfo("Read LH STC: %d sources x %d time points (tmin=%.3f, tstep=%.6f)" ,
-                   static_cast<int>(stcLH.data.rows()), static_cast<int>(stcLH.data.cols()),
-                   stcLH.tmin, stcLH.tstep);
+            qInfo("Read LH STC: %d sources x %d time points (tmin=%.3f, tstep=%.6f)",
+                  static_cast<int>(stcLH.data.rows()), static_cast<int>(stcLH.data.cols()),
+                  stcLH.tmin, stcLH.tstep);
         }
 
         QFile fRH(rhFile);
@@ -315,8 +344,8 @@ int main(int argc, char *argv[])
                 qCritical("Cannot read RH STC from: %s", qPrintable(rhFile));
                 return 1;
             }
-            qInfo("Read RH STC: %d sources x %d time points" ,
-                   static_cast<int>(stcRH.data.rows()), static_cast<int>(stcRH.data.cols()));
+            qInfo("Read RH STC: %d sources x %d time points",
+                  static_cast<int>(stcRH.data.rows()), static_cast<int>(stcRH.data.cols()));
         }
 
         if (stcLH.isEmpty() && stcRH.isEmpty()) {
@@ -352,8 +381,8 @@ int main(int argc, char *argv[])
         }
 
         FiffEvoked evoked = evokedSet.evoked[setNo];
-        qInfo("Computing inverse: %s, SNR=%.1f, lambda2=%.4f" ,
-               qPrintable(method), snr, lambda2);
+        qInfo("Computing inverse: %s, SNR=%.1f, lambda2=%.4f",
+              qPrintable(method), snr, lambda2);
 
         InvMinimumNorm minimumNorm(invOp, lambda2, method);
         stcLH = minimumNorm.calculateInverse(evoked);
@@ -367,8 +396,8 @@ int main(int argc, char *argv[])
             subject = "sample";
         }
 
-        qInfo("Computed STC: %d sources x %d time points" ,
-               static_cast<int>(stcLH.data.rows()), static_cast<int>(stcLH.data.cols()));
+        qInfo("Computed STC: %d sources x %d time points",
+              static_cast<int>(stcLH.data.rows()), static_cast<int>(stcLH.data.cols()));
     } else {
         qCritical("Provide either --stcin or both --inv and --meas.");
         return 1;
@@ -411,8 +440,8 @@ int main(int argc, char *argv[])
             return 1;
         }
 
-        qInfo("Extracting label time course for %lld vertices" ,
-               static_cast<long long>(label.vertices.size()));
+        qInfo("Extracting label time course for %lld vertices",
+              static_cast<long long>(label.vertices.size()));
 
         QFile outFile(labelOutFile);
         if (!outFile.open(QIODevice::WriteOnly | QIODevice::Text)) {
@@ -432,12 +461,13 @@ int main(int argc, char *argv[])
                     count++;
                 }
             }
-            if (count > 0) meanVal /= count;
+            if (count > 0)
+                meanVal /= count;
             out << QString::number(time, 'f', 6) << "\t" << QString::number(meanVal, 'e', 6) << "\n";
         }
 
         outFile.close();
-        qInfo("Written label time course to: %s" , qPrintable(labelOutFile));
+        qInfo("Written label time course to: %s", qPrintable(labelOutFile));
     }
 
     //=========================================================================
@@ -468,14 +498,14 @@ int main(int argc, char *argv[])
             qCritical("Cannot read surface: %s", qPrintable(surfPath));
             return;
         }
-        qInfo("Loaded surface %s: %d vertices, %d triangles" ,
-               qPrintable(surfPath), static_cast<int>(surf.rr().rows()),
-               static_cast<int>(surf.tris().rows()));
+        qInfo("Loaded surface %s: %d vertices, %d triangles",
+              qPrintable(surfPath), static_cast<int>(surf.rr().rows()),
+              static_cast<int>(surf.tris().rows()));
 
         // Select the appropriate STC for this hemisphere
         const InvSourceEstimate& hemiStc = (hemi == "lh") ? stcLH : stcRH;
         if (hemiStc.isEmpty()) {
-            qInfo("No STC data for %s hemisphere, skipping." , qPrintable(hemi));
+            qInfo("No STC data for %s hemisphere, skipping.", qPrintable(hemi));
             return;
         }
 
@@ -511,13 +541,15 @@ int main(int argc, char *argv[])
         }
     };
 
-    if (doLH) renderHemi("lh");
-    if (doRH) renderHemi("rh");
+    if (doLH)
+        renderHemi("lh");
+    if (doRH)
+        renderHemi("rh");
 
-    qInfo("Exported %d frame(s) to %s-*.png" , frameCount, qPrintable(pngPrefix));
+    qInfo("Exported %d frame(s) to %s-*.png", frameCount, qPrintable(pngPrefix));
     qInfo("\nTo create a movie, use:");
-    qInfo("  ffmpeg -framerate 24 -i %s-lh-%%05d.png -c:v libx264 -pix_fmt yuv420p movie.mp4" ,
-           qPrintable(pngPrefix));
+    qInfo("  ffmpeg -framerate 24 -i %s-lh-%%05d.png -c:v libx264 -pix_fmt yuv420p movie.mp4",
+          qPrintable(pngPrefix));
 
     return 0;
 }

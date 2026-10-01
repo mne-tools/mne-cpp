@@ -35,26 +35,16 @@ using namespace ANSHAREDLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-MriCoordModel::MriCoordModel(const QString &sFilePath,
+MriCoordModel::MriCoordModel(const QString& sFilePath,
                              [[maybe_unused]] const QByteArray& byteLoadedData,
                              QObject* parent)
-:AbstractModel(sFilePath, parent)
+: AbstractModel(sFilePath, parent)
 {
-
 }
 
 //=============================================================================================================
 
-int MriCoordModel::rowCount(const QModelIndex &parent) const
-{
-    Q_UNUSED(parent);
-
-    return 1;
-}
-
-//=============================================================================================================
-
-int MriCoordModel::columnCount(const QModelIndex &parent) const
+int MriCoordModel::rowCount(const QModelIndex& parent) const
 {
     Q_UNUSED(parent);
 
@@ -63,7 +53,16 @@ int MriCoordModel::columnCount(const QModelIndex &parent) const
 
 //=============================================================================================================
 
-QVariant MriCoordModel::data(const QModelIndex &index,
+int MriCoordModel::columnCount(const QModelIndex& parent) const
+{
+    Q_UNUSED(parent);
+
+    return 1;
+}
+
+//=============================================================================================================
+
+QVariant MriCoordModel::data(const QModelIndex& index,
                              int role) const
 {
     Q_UNUSED(index);
@@ -74,7 +73,7 @@ QVariant MriCoordModel::data(const QModelIndex &index,
 
 //=============================================================================================================
 
-Qt::ItemFlags MriCoordModel::flags(const QModelIndex &index) const
+Qt::ItemFlags MriCoordModel::flags(const QModelIndex& index) const
 {
     return QAbstractItemModel::flags(index);
 }

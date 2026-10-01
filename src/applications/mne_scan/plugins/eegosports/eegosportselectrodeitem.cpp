@@ -31,9 +31,9 @@ using namespace std;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-EEGoSportsElectrodeItem::EEGoSportsElectrodeItem(const QString& electrodeName, 
+EEGoSportsElectrodeItem::EEGoSportsElectrodeItem(const QString& electrodeName,
                                                  const QPointF& electrodePosition,
-                                                 const QColor& electrodeColor, 
+                                                 const QColor& electrodeColor,
                                                  int channelIndex)
 : m_sElectrodeName(electrodeName)
 , m_qpElectrodePosition(electrodePosition)
@@ -52,7 +52,7 @@ QRectF EEGoSportsElectrodeItem::boundingRect() const
 
 //=============================================================================================================
 
-void EEGoSportsElectrodeItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
+void EEGoSportsElectrodeItem::paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget)
 {
     Q_UNUSED(option);
     Q_UNUSED(widget);
@@ -70,19 +70,19 @@ void EEGoSportsElectrodeItem::paint(QPainter *painter, const QStyleOptionGraphic
     // Plot electrode name
     QStaticText staticElectrodeName = QStaticText(m_sElectrodeName);
     QSizeF sizeText = staticElectrodeName.size();
-    painter->drawStaticText(-15+((30-sizeText.width())/2), -32, staticElectrodeName);
+    painter->drawStaticText(-15 + ((30 - sizeText.width()) / 2), -32, staticElectrodeName);
 
     // Plot electrodes impedance value
     QStaticText staticElectrodeValue;
-    if (m_dImpedanceValue > 0){
+    if (m_dImpedanceValue > 0) {
         QString impedanceValueToString;
-        staticElectrodeValue = QStaticText(QString("%1 %2").arg(impedanceValueToString.setNum(m_dImpedanceValue/1000,'f',2)).arg(/*"kOhm"*/"k")); // transform to kilo ohm (divide by 1000)
+        staticElectrodeValue = QStaticText(QString("%1 %2").arg(impedanceValueToString.setNum(m_dImpedanceValue / 1000, 'f', 2)).arg(/*"kOhm"*/ "k")); // transform to kilo ohm (divide by 1000)
     } else {
         staticElectrodeValue = QStaticText("HIGH");
     }
 
     QSizeF sizeValue = staticElectrodeValue.size();
-    painter->drawStaticText(-15+((30-sizeValue.width())/2), 19, staticElectrodeValue);
+    painter->drawStaticText(-15 + ((30 - sizeValue.width()) / 2), 19, staticElectrodeValue);
 
     this->setPos(m_qpElectrodePosition);
 }

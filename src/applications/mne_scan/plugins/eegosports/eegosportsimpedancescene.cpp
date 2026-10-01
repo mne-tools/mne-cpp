@@ -41,7 +41,7 @@ EEGoSportsImpedanceScene::EEGoSportsImpedanceScene(QGraphicsView* view, QObject*
 
 void EEGoSportsImpedanceScene::mousePressEvent(QGraphicsSceneMouseEvent* event)
 {
-    if(event->button() == Qt::RightButton)
+    if (event->button() == Qt::RightButton)
         m_bRightMouseKeyPressed = true;
 
     QGraphicsScene::mousePressEvent(event);
@@ -51,12 +51,11 @@ void EEGoSportsImpedanceScene::mousePressEvent(QGraphicsSceneMouseEvent* event)
 
 void EEGoSportsImpedanceScene::mouseMoveEvent(QGraphicsSceneMouseEvent* event)
 {
-    if(m_bRightMouseKeyPressed)
-    {
-        if(m_mousePosition.x()-event->scenePos().x() > 0) // user moved mouse to the left while pressing the right mouse key
+    if (m_bRightMouseKeyPressed) {
+        if (m_mousePosition.x() - event->scenePos().x() > 0) // user moved mouse to the left while pressing the right mouse key
             scaleElectrodePositions(0.99);
 
-        if(m_mousePosition.x()-event->scenePos().x() < 0) // user moved mouse to the right while pressing the right mouse key
+        if (m_mousePosition.x() - event->scenePos().x() < 0) // user moved mouse to the right while pressing the right mouse key
             scaleElectrodePositions(1.01);
     }
 
@@ -69,7 +68,7 @@ void EEGoSportsImpedanceScene::mouseMoveEvent(QGraphicsSceneMouseEvent* event)
 
 void EEGoSportsImpedanceScene::mouseReleaseEvent(QGraphicsSceneMouseEvent* event)
 {
-    if(event->button() == Qt::RightButton)
+    if (event->button() == Qt::RightButton)
         m_bRightMouseKeyPressed = false;
 
     QGraphicsScene::mouseReleaseEvent(event);
@@ -80,16 +79,15 @@ void EEGoSportsImpedanceScene::mouseReleaseEvent(QGraphicsSceneMouseEvent* event
 void EEGoSportsImpedanceScene::scaleElectrodePositions(double scaleFactor)
 {
     // Get scene items
-    QList< QGraphicsItem *> itemList = this->items();
+    QList<QGraphicsItem*> itemList = this->items();
 
     // Update position
-    for(int i = 0; i<itemList.size(); i++)
-    {
-        EEGoSportsElectrodeItem* item = (EEGoSportsElectrodeItem *) itemList.at(i);
+    for (int i = 0; i < itemList.size(); i++) {
+        EEGoSportsElectrodeItem* item = (EEGoSportsElectrodeItem*)itemList.at(i);
 
         // Set both positions -> dunno why :-)
-        item->setPosition(item->getPosition()*scaleFactor);
-        item->setPos(item->pos()*scaleFactor);
+        item->setPosition(item->getPosition() * scaleFactor);
+        item->setPos(item->pos() * scaleFactor);
     }
 
     this->update(this->sceneRect());

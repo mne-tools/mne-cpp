@@ -57,24 +57,18 @@ VectorXd WelchPsd::buildWindow(int iN, WindowType window)
     for (int n = 0; n < iN; ++n) {
         const double t = static_cast<double>(n) / static_cast<double>(iN - 1);
         switch (window) {
-        case Hann:
-            w[n] = 0.5 * (1.0 - std::cos(pi2 * t));
-            break;
-        case Hamming:
-            w[n] = 0.54 - 0.46 * std::cos(pi2 * t);
-            break;
-        case Blackman:
-            w[n] = 0.42
-                 - 0.5  * std::cos(      pi2 * t)
-                 + 0.08 * std::cos(2.0 * pi2 * t);
-            break;
-        case FlatTop:
-            w[n] = 1.0
-                 - 1.93293488969 * std::cos(      pi2 * t)
-                 + 1.28349769674 * std::cos(2.0 * pi2 * t)
-                 - 0.38763473916 * std::cos(3.0 * pi2 * t)
-                 + 0.03279543650 * std::cos(4.0 * pi2 * t);
-            break;
+            case Hann:
+                w[n] = 0.5 * (1.0 - std::cos(pi2 * t));
+                break;
+            case Hamming:
+                w[n] = 0.54 - 0.46 * std::cos(pi2 * t);
+                break;
+            case Blackman:
+                w[n] = 0.42 - 0.5 * std::cos(pi2 * t) + 0.08 * std::cos(2.0 * pi2 * t);
+                break;
+            case FlatTop:
+                w[n] = 1.0 - 1.93293488969 * std::cos(pi2 * t) + 1.28349769674 * std::cos(2.0 * pi2 * t) - 0.38763473916 * std::cos(3.0 * pi2 * t) + 0.03279543650 * std::cos(4.0 * pi2 * t);
+                break;
         }
     }
     return w;
@@ -94,20 +88,20 @@ RowVectorXd WelchPsd::freqAxis(int iNfft, double dSFreq)
 //=============================================================================================================
 
 RowVectorXd WelchPsd::computeVector(const RowVectorXd& vecData,
-                                     double     dSFreq,
-                                     int        iNfft,
-                                     double     dOverlap,
-                                     WindowType window)
+                                    double dSFreq,
+                                    int iNfft,
+                                    double dOverlap,
+                                    WindowType window)
 {
     const int nIn = static_cast<int>(vecData.cols());
-    if (iNfft > nIn) iNfft = nIn;
+    if (iNfft > nIn)
+        iNfft = nIn;
 
     const int iNFreqs = iNfft / 2 + 1;
-    const int iStep   = std::max(1, static_cast<int>(std::round(
-                            static_cast<double>(iNfft) * (1.0 - dOverlap))));
+    const int iStep = std::max(1, static_cast<int>(std::round(static_cast<double>(iNfft) * (1.0 - dOverlap))));
 
-    const VectorXd w       = buildWindow(iNfft, window);
-    const double   dWinPow = w.squaredNorm();  // Σ w²
+    const VectorXd w = buildWindow(iNfft, window);
+    const double dWinPow = w.squaredNorm(); // Σ w²
 
     Eigen::FFT<double> fft;
     RowVectorXd psd = RowVectorXd::Zero(iNFreqs);
@@ -120,7 +114,7 @@ RowVectorXd WelchPsd::computeVector(const RowVectorXd& vecData,
         fft.fwd(spec, seg);
 
         for (int k = 0; k < iNFreqs; ++k)
-            psd[k] += std::norm(spec[k]);  // accumulate |X[k]|²
+            psd[k] += std::norm(spec[k]); // accumulate |X[k]|²
         ++nSeg;
     }
 
@@ -140,12 +134,12 @@ RowVectorXd WelchPsd::computeVector(const RowVectorXd& vecData,
 
 //=============================================================================================================
 
-WelchPsdResult WelchPsd::compute(const MatrixXd&    matData,
-                                  double             dSFreq,
-                                  int                iNfft,
-                                  double             dOverlap,
-                                  WindowType         window,
-                                  const RowVectorXi& vecPicks)
+WelchPsdResult WelchPsd::compute(const MatrixXd& matData,
+                                 double dSFreq,
+                                 int iNfft,
+                                 double dOverlap,
+                                 WindowType window,
+                                 const RowVectorXi& vecPicks)
 {
     std::vector<int> picks;
     if (vecPicks.size() > 0) {

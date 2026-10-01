@@ -21,7 +21,8 @@
 using namespace UTILSLIB;
 using namespace Eigen;
 
-namespace {
+namespace
+{
 
 VectorXd makeSignal(int nSamples, int periodSamples)
 {

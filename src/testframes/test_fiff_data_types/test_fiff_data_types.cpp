@@ -117,19 +117,25 @@ private slots:
         FiffDigPoint p1;
         p1.kind = FIFFV_POINT_CARDINAL;
         p1.ident = FIFFV_POINT_LPA;
-        p1.r[0] = -0.07f; p1.r[1] = 0.0f; p1.r[2] = 0.0f;
+        p1.r[0] = -0.07f;
+        p1.r[1] = 0.0f;
+        p1.r[2] = 0.0f;
         p1.coord_frame = FIFFV_COORD_HEAD;
 
         FiffDigPoint p2;
         p2.kind = FIFFV_POINT_CARDINAL;
         p2.ident = FIFFV_POINT_RPA;
-        p2.r[0] = 0.07f; p2.r[1] = 0.0f; p2.r[2] = 0.0f;
+        p2.r[0] = 0.07f;
+        p2.r[1] = 0.0f;
+        p2.r[2] = 0.0f;
         p2.coord_frame = FIFFV_COORD_HEAD;
 
         FiffDigPoint p3;
         p3.kind = FIFFV_POINT_CARDINAL;
         p3.ident = FIFFV_POINT_NASION;
-        p3.r[0] = 0.0f; p3.r[1] = 0.07f; p3.r[2] = 0.0f;
+        p3.r[0] = 0.0f;
+        p3.r[1] = 0.07f;
+        p3.r[2] = 0.0f;
         p3.coord_frame = FIFFV_COORD_HEAD;
 
         dps << p1 << p2 << p3;
@@ -142,7 +148,9 @@ private slots:
         FiffDigPointSet dps;
         FiffDigPoint p;
         p.kind = FIFFV_POINT_CARDINAL;
-        p.r[0] = 1.0f; p.r[1] = 2.0f; p.r[2] = 3.0f;
+        p.r[0] = 1.0f;
+        p.r[1] = 2.0f;
+        p.r[2] = 3.0f;
         dps << p;
 
         FiffDigPointSet copy(dps);
@@ -162,12 +170,21 @@ private slots:
     void digPointSet_pickTypes()
     {
         FiffDigPointSet dps;
-        FiffDigPoint p1; p1.kind = FIFFV_POINT_CARDINAL;
-        p1.r[0] = 0; p1.r[1] = 0; p1.r[2] = 0;
-        FiffDigPoint p2; p2.kind = FIFFV_POINT_EEG;
-        p2.r[0] = 0; p2.r[1] = 0; p2.r[2] = 0;
-        FiffDigPoint p3; p3.kind = FIFFV_POINT_EXTRA;
-        p3.r[0] = 0; p3.r[1] = 0; p3.r[2] = 0;
+        FiffDigPoint p1;
+        p1.kind = FIFFV_POINT_CARDINAL;
+        p1.r[0] = 0;
+        p1.r[1] = 0;
+        p1.r[2] = 0;
+        FiffDigPoint p2;
+        p2.kind = FIFFV_POINT_EEG;
+        p2.r[0] = 0;
+        p2.r[1] = 0;
+        p2.r[2] = 0;
+        FiffDigPoint p3;
+        p3.kind = FIFFV_POINT_EXTRA;
+        p3.r[0] = 0;
+        p3.r[1] = 0;
+        p3.r[2] = 0;
         dps << p1 << p2 << p3;
 
         QList<int> types;
@@ -181,10 +198,12 @@ private slots:
         FiffDigPointSet dps;
         FiffDigPoint p;
         p.kind = FIFFV_POINT_CARDINAL;
-        p.r[0] = 1.0f; p.r[1] = 2.0f; p.r[2] = 3.0f;
+        p.r[0] = 1.0f;
+        p.r[1] = 2.0f;
+        p.r[2] = 3.0f;
         dps << p;
 
-        const FiffDigPoint &ref = dps[0];
+        const FiffDigPoint& ref = dps[0];
         QVERIFY(qAbs(ref.r[0] - 1.0f) < 1e-5f);
     }
 
@@ -194,7 +213,9 @@ private slots:
         FiffDigPoint p;
         p.kind = FIFFV_POINT_CARDINAL;
         p.coord_frame = FIFFV_COORD_HEAD;
-        p.r[0] = 1.0f; p.r[1] = 0.0f; p.r[2] = 0.0f;
+        p.r[0] = 1.0f;
+        p.r[1] = 0.0f;
+        p.r[2] = 0.0f;
         dps << p;
 
         FiffCoordTrans trans;
@@ -210,8 +231,11 @@ private slots:
     void digPointSet_getList()
     {
         FiffDigPointSet dps;
-        FiffDigPoint p; p.kind = FIFFV_POINT_CARDINAL;
-        p.r[0] = 0; p.r[1] = 0; p.r[2] = 0;
+        FiffDigPoint p;
+        p.kind = FIFFV_POINT_CARDINAL;
+        p.r[0] = 0;
+        p.r[1] = 0;
+        p.r[2] = 0;
         dps << p;
         QList<FiffDigPoint> list = dps.getList();
         QCOMPARE(list.size(), 1);
@@ -224,7 +248,9 @@ private slots:
         p.kind = FIFFV_POINT_CARDINAL;
         p.ident = FIFFV_POINT_LPA;
         p.coord_frame = FIFFV_COORD_HEAD;
-        p.r[0] = -0.07f; p.r[1] = 0.0f; p.r[2] = 0.0f;
+        p.r[0] = -0.07f;
+        p.r[1] = 0.0f;
+        p.r[2] = 0.0f;
         dps << p;
 
         QBuffer buf;
@@ -255,8 +281,7 @@ private slots:
 
     void evokedSet_readFromSampleFile()
     {
-        QString path = QCoreApplication::applicationDirPath()
-                       + "/../resources/data/mne-cpp-test-data/MEG/sample/sample_audvis-ave.fif";
+        QString path = QCoreApplication::applicationDirPath() + "/../resources/data/mne-cpp-test-data/MEG/sample/sample_audvis-ave.fif";
         if (!QFile::exists(path)) {
             QSKIP("Sample evoked file not found");
         }
@@ -268,14 +293,14 @@ private slots:
 
     void evokedSet_pickChannels()
     {
-        QString path = QCoreApplication::applicationDirPath()
-                       + "/../resources/data/mne-cpp-test-data/MEG/sample/sample_audvis-ave.fif";
+        QString path = QCoreApplication::applicationDirPath() + "/../resources/data/mne-cpp-test-data/MEG/sample/sample_audvis-ave.fif";
         if (!QFile::exists(path)) {
             QSKIP("Sample evoked file not found");
         }
         QFile file(path);
         FiffEvokedSet es(file);
-        if (es.evoked.isEmpty()) QSKIP("Failed to load evoked set");
+        if (es.evoked.isEmpty())
+            QSKIP("Failed to load evoked set");
 
         QStringList include;
         include << es.info.ch_names[0] << es.info.ch_names[1];
@@ -328,29 +353,31 @@ private slots:
     {
         // Test the (from, to, rot, move) constructor — covers lines 240-254
         Matrix3f rot = Matrix3f::Identity();
-        rot(0,0) = 0.0f; rot(0,1) = -1.0f;
-        rot(1,0) = 1.0f; rot(1,1) = 0.0f; // 90-degree rotation about z
+        rot(0, 0) = 0.0f;
+        rot(0, 1) = -1.0f;
+        rot(1, 0) = 1.0f;
+        rot(1, 1) = 0.0f; // 90-degree rotation about z
         Vector3f move(0.01f, 0.02f, 0.03f);
         FiffCoordTrans t(FIFFV_COORD_HEAD, FIFFV_COORD_MRI, rot, move);
         QCOMPARE(t.from, (int)FIFFV_COORD_HEAD);
         QCOMPARE(t.to, (int)FIFFV_COORD_MRI);
-        QVERIFY(qAbs(t.trans(0,3) - 0.01f) < 1e-5f);
-        QVERIFY(qAbs(t.trans(1,3) - 0.02f) < 1e-5f);
-        QVERIFY(qAbs(t.trans(3,3) - 1.0f) < 1e-5f);
+        QVERIFY(qAbs(t.trans(0, 3) - 0.01f) < 1e-5f);
+        QVERIFY(qAbs(t.trans(1, 3) - 0.02f) < 1e-5f);
+        QVERIFY(qAbs(t.trans(3, 3) - 1.0f) < 1e-5f);
         // Verify inverse was computed
-        QVERIFY(qAbs(t.invtrans(3,3) - 1.0f) < 1e-5f);
+        QVERIFY(qAbs(t.invtrans(3, 3) - 1.0f) < 1e-5f);
     }
 
     void coordTrans_matrix4fCtor()
     {
         // Test 4x4 matrix constructor — covers lines 258-272
         Matrix4f mat = Matrix4f::Identity();
-        mat(0,3) = 0.05f;
-        mat(3,0) = 0.001f; // non-standard row 3
+        mat(0, 3) = 0.05f;
+        mat(3, 0) = 0.001f; // non-standard row 3
         FiffCoordTrans t(FIFFV_COORD_HEAD, FIFFV_COORD_DEVICE, mat, true);
-        QVERIFY(qAbs(t.trans(3,0)) < 1e-5f); // row 3 was zeroed by bStandard=true
-        QVERIFY(qAbs(t.trans(3,3) - 1.0f) < 1e-5f);
-        QVERIFY(qAbs(t.trans(0,3) - 0.05f) < 1e-5f);
+        QVERIFY(qAbs(t.trans(3, 0)) < 1e-5f); // row 3 was zeroed by bStandard=true
+        QVERIFY(qAbs(t.trans(3, 3) - 1.0f) < 1e-5f);
+        QVERIFY(qAbs(t.trans(0, 3) - 0.05f) < 1e-5f);
     }
 
     void coordTrans_frameName()
@@ -380,14 +407,14 @@ private slots:
         tmp.close();
 
         FiffCoordTrans t = FiffCoordTrans::readTransformAscii(tmp.fileName(),
-                                                               FIFFV_COORD_HEAD,
-                                                               FIFFV_COORD_MRI);
+                                                              FIFFV_COORD_HEAD,
+                                                              FIFFV_COORD_MRI);
         QCOMPARE(t.from, (int)FIFFV_COORD_HEAD);
         QCOMPARE(t.to, (int)FIFFV_COORD_MRI);
         // Translation values are divided by 1000 (mm -> m)
-        QVERIFY(qAbs(t.trans(0,3) - 0.01f) < 1e-5f);
-        QVERIFY(qAbs(t.trans(1,3) - 0.02f) < 1e-5f);
-        QVERIFY(qAbs(t.trans(2,3) - 0.03f) < 1e-5f);
+        QVERIFY(qAbs(t.trans(0, 3) - 0.01f) < 1e-5f);
+        QVERIFY(qAbs(t.trans(1, 3) - 0.02f) < 1e-5f);
+        QVERIFY(qAbs(t.trans(2, 3) - 0.03f) < 1e-5f);
     }
 
     void coordTrans_readTransformAsciiComments()
@@ -405,18 +432,18 @@ private slots:
         tmp.close();
 
         FiffCoordTrans t = FiffCoordTrans::readTransformAscii(tmp.fileName(),
-                                                               FIFFV_COORD_MRI,
-                                                               FIFFV_COORD_HEAD);
+                                                              FIFFV_COORD_MRI,
+                                                              FIFFV_COORD_HEAD);
         QCOMPARE(t.from, (int)FIFFV_COORD_MRI);
-        QVERIFY(qAbs(t.trans(0,3) - 0.005f) < 1e-5f);
+        QVERIFY(qAbs(t.trans(0, 3) - 0.005f) < 1e-5f);
     }
 
     void coordTrans_procrustesAlign()
     {
         // Test Procrustes alignment
         Eigen::MatrixXf fromPts(4, 3), toPts(4, 3);
-        fromPts << 0,0,0, 1,0,0, 0,1,0, 0,0,1;
-        toPts   << 0.1f,0,0, 1.1f,0,0, 0.1f,1,0, 0.1f,0,1;
+        fromPts << 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1;
+        toPts << 0.1f, 0, 0, 1.1f, 0, 0, 0.1f, 1, 0, 0.1f, 0, 1;
         Eigen::VectorXf w(4);
         w << 1.0f, 1.0f, 1.0f, 1.0f;
 
@@ -427,22 +454,22 @@ private slots:
         QCOMPARE(t.from, (int)FIFFV_COORD_HEAD);
         QCOMPARE(t.to, (int)FIFFV_COORD_DEVICE);
         // The translation should be approximately (0.1, 0, 0)
-        QVERIFY(qAbs(t.trans(0,3) - 0.1f) < 0.01f);
+        QVERIFY(qAbs(t.trans(0, 3) - 0.1f) < 0.01f);
     }
 
     void coordTrans_procrustesNoWeights()
     {
         // Test Procrustes without weights — empty weight vector
         Eigen::MatrixXf fromPts(3, 3), toPts(3, 3);
-        fromPts << 0,0,0, 1,0,0, 0,1,0;
-        toPts   << 0,0,0, 1,0,0, 0,1,0;
+        fromPts << 0, 0, 0, 1, 0, 0, 0, 1, 0;
+        toPts << 0, 0, 0, 1, 0, 0, 0, 1, 0;
 
         FiffCoordTrans t = FiffCoordTrans::procrustesAlign(
             FIFFV_COORD_HEAD, FIFFV_COORD_MRI,
             fromPts, toPts, Eigen::VectorXf(), 0.01f);
         QVERIFY(!t.isEmpty());
         // Identity-like — rotation should be close to identity
-        QVERIFY(qAbs(t.trans(0,0) - 1.0f) < 0.01f);
+        QVERIFY(qAbs(t.trans(0, 0) - 1.0f) < 0.01f);
     }
 
     void coordTrans_angleTo()
@@ -469,7 +496,7 @@ private slots:
         t.invtrans = Matrix4f::Identity();
 
         MatrixX4f dest = Matrix4f::Identity();
-        dest(0,3) = 0.1f;
+        dest(0, 3) = 0.1f;
         float dist = t.translationTo(dest);
         QVERIFY(qAbs(dist - 0.1f) < 1e-3f);
     }
@@ -491,7 +518,9 @@ private slots:
         p.kind = FIFFV_POINT_CARDINAL;
         p.ident = FIFFV_POINT_LPA;
         p.coord_frame = FIFFV_COORD_HEAD;
-        p.r[0] = 1.0f; p.r[1] = 2.0f; p.r[2] = 3.0f;
+        p.r[0] = 1.0f;
+        p.r[1] = 2.0f;
+        p.r[2] = 3.0f;
         dd.points.append(p);
 
         // Copy

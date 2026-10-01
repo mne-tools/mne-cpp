@@ -22,7 +22,7 @@
 #include "eegosportsproducer.h"
 
 #include "eemagine/sdk/wrapper.cc" // Wrapper code to be compiled.
-#include "eemagine/sdk/factory.h" // SDK header
+#include "eemagine/sdk/factory.h"  // SDK header
 
 #ifndef _WIN32
 #include <unistd.h>
@@ -81,7 +81,7 @@ bool EEGoSportsDriver::initDevice(bool bWriteDriverDebugToFile,
     m_bMeasureImpedances = bMeasureImpedance;
 
     //Check if the driver DLL was loaded
-    if(!m_bDllLoaded) {
+    if (!m_bDllLoaded) {
         return false;
     }
 
@@ -89,16 +89,16 @@ bool EEGoSportsDriver::initDevice(bool bWriteDriverDebugToFile,
     m_bWriteDriverDebugToFile = bWriteDriverDebugToFile;
 
     //Open debug file to write to
-    if(m_bWriteDriverDebugToFile) {
+    if (m_bWriteDriverDebugToFile) {
         m_outputFileStream.open("./EEGoSports_Driver_Debug.txt", std::ios::trunc); //ios::trunc deletes old file data
     }
 
     try {
         // Get device handler
 #ifdef _WIN32
-        factory factoryObj ("eego-SDK.dll"); // Make sure that eego-SDK.dll resides in the working directory
+        factory factoryObj("eego-SDK.dll"); // Make sure that eego-SDK.dll resides in the working directory
 #else
-        factory factoryObj ("libeego-SDK.so"); // Make sure that eego-SDK.dll resides in the working directory
+        factory factoryObj("libeego-SDK.so"); // Make sure that eego-SDK.dll resides in the working directory
 #endif
 
         m_pAmplifier = factoryObj.getAmplifier(); // Get an amplifier
@@ -108,7 +108,7 @@ bool EEGoSportsDriver::initDevice(bool bWriteDriverDebugToFile,
         QThread::msleep(100);
 
     } catch (std::runtime_error& e) {
-        qWarning() <<"[EEGoSportsDriver::initDevice] error " << e.what();
+        qWarning() << "[EEGoSportsDriver::initDevice] error " << e.what();
         return false;
     }
 
@@ -116,13 +116,13 @@ bool EEGoSportsDriver::initDevice(bool bWriteDriverDebugToFile,
 
     int iEEGChannelCount = 0;
     int iBipolarChannelCount = 0;
-    for(std::vector<channel>::iterator it = channellist.begin(); it != channellist.end(); ++it){
-        if(it->getType() == 1)
+    for (std::vector<channel>::iterator it = channellist.begin(); it != channellist.end(); ++it) {
+        if (it->getType() == 1)
             ++iEEGChannelCount;
-        else if(it->getType() == 2)
+        else if (it->getType() == 2)
             ++iBipolarChannelCount;
     }
-    if(!bMeasureImpedance)
+    if (!bMeasureImpedance)
         m_uiNumberOfChannels = channellist.size() + 3; //trigger, sample count, and ref not considered here
     else
         m_uiNumberOfChannels = iEEGChannelCount + 2; //ref and gnd not considered here
@@ -155,7 +155,7 @@ bool EEGoSportsDriver::startRecording(int iSamplesPerBlock,
 
     try {
         //Start the stream
-        if(bMeasureImpedance) {
+        if (bMeasureImpedance) {
             m_pDataStream = m_pAmplifier->OpenImpedanceStream();
 
         } else {
@@ -170,7 +170,7 @@ bool EEGoSportsDriver::startRecording(int iSamplesPerBlock,
         QThread::msleep(100);
 
     } catch (std::runtime_error& e) {
-        qWarning() <<"[EEGoSportsDriver::startRecording]" << e.what();
+        qWarning() << "[EEGoSportsDriver::startRecording]" << e.what();
         return false;
     }
 
@@ -187,25 +187,25 @@ bool EEGoSportsDriver::startRecording(int iSamplesPerBlock,
 bool EEGoSportsDriver::uninitDevice()
 {
     //Check if the device was initialised
-    if(!m_bStartRecordingSuccess) {
+    if (!m_bStartRecordingSuccess) {
         qWarning() << "[EEGoSportsDriver::uninitDevice] Recording was not started - therefore can not be stopped";
         return false;
     }
 
     //Check if the device was initialised
-    if(!m_bInitDeviceSuccess) {
+    if (!m_bInitDeviceSuccess) {
         qWarning() << "[EEGoSportsDriver::uninitDevice] Device was not initialised - therefore can not be uninitialised";
         return false;
     }
 
     //Check if the driver DLL was loaded
-    if(!m_bDllLoaded) {
+    if (!m_bDllLoaded) {
         qWarning() << "[EEGoSportsDriver::uninitDevice] Driver DLL was not loaded";
         return false;
     }
 
     //Close the output stream/file
-    if(m_outputFileStream.is_open() && m_bWriteDriverDebugToFile) {
+    if (m_outputFileStream.is_open() && m_bWriteDriverDebugToFile) {
         m_outputFileStream.close();
         m_outputFileStream.clear();
     }
@@ -223,15 +223,15 @@ bool EEGoSportsDriver::uninitDevice()
 
 //=============================================================================================================
 
-bool EEGoSportsDriver::getSampleMatrixValue(Eigen::MatrixXd &sampleMatrix)
+bool EEGoSportsDriver::getSampleMatrixValue(Eigen::MatrixXd& sampleMatrix)
 {
     //Check if device was initialised and connected correctly
-    if(!m_bInitDeviceSuccess) {
+    if (!m_bInitDeviceSuccess) {
         qWarning() << "[EEGoSportsDriver::getSampleMatrixValue] Cannot start to get samples from device because device was not initialised correctly";
         return false;
     }
 
-    if(!m_bStartRecordingSuccess) {
+    if (!m_bStartRecordingSuccess) {
         qWarning() << "[EEGoSportsDriver::getSampleMatrixValue] Cannot start to get samples from device because recording was not started";
         return false;
     }
@@ -246,7 +246,7 @@ bool EEGoSportsDriver::getSampleMatrixValue(Eigen::MatrixXd &sampleMatrix)
     VectorXd vec;
 
     //get samples from device until the complete matrix is filled, i.e. the samples per block size is met
-    while(iSampleIterator < m_uiSamplesPerBlock) {
+    while (iSampleIterator < m_uiSamplesPerBlock) {
         //Get sample block from device
         buf = m_pDataStream->getData();
 
@@ -254,11 +254,11 @@ bool EEGoSportsDriver::getSampleMatrixValue(Eigen::MatrixXd &sampleMatrix)
         iChannelCount = buf.getChannelCount();
 
         //Write the received samples to an extra buffer, so that they are not getting lost if too many samples were received. These are then written to the next matrix (block)
-        for(i = 0; i < iReceivedSamples; ++i) {
+        for (i = 0; i < iReceivedSamples; ++i) {
             vec.resize(iChannelCount);
 
-            for(j = 0; j < iChannelCount; ++j) {
-                vec(j) = buf.getSample(j,i);
+            for (j = 0; j < iChannelCount; ++j) {
+                vec(j) = buf.getSample(j, i);
                 //std::cout<<vec(j)<<std::endl;
             }
 
@@ -266,8 +266,8 @@ bool EEGoSportsDriver::getSampleMatrixValue(Eigen::MatrixXd &sampleMatrix)
         }
 
         //Fill matrix with data from buffer
-        while(!m_lSampleBlockBuffer.isEmpty()) {
-            if(iSampleIterator >= m_uiSamplesPerBlock) {
+        while (!m_lSampleBlockBuffer.isEmpty()) {
+            if (iSampleIterator >= m_uiSamplesPerBlock) {
                 break;
             }
 
@@ -276,15 +276,16 @@ bool EEGoSportsDriver::getSampleMatrixValue(Eigen::MatrixXd &sampleMatrix)
             iSampleIterator++;
         }
 
-        if(m_outputFileStream.is_open() && m_bWriteDriverDebugToFile) {
+        if (m_outputFileStream.is_open() && m_bWriteDriverDebugToFile) {
             m_outputFileStream << "buf.getSampleCount(): " << buf.getSampleCount() << std::endl;
             m_outputFileStream << "buf.getChannelCount(): " << buf.getChannelCount() << std::endl;
             m_outputFileStream << "buf.size(): " << buf.size() << std::endl;
             m_outputFileStream << "iSampleIterator: " << iSampleIterator << std::endl;
-            m_outputFileStream << "m_lSampleBlockBuffer.size(): " << m_lSampleBlockBuffer.size() << std::endl << std::endl;
+            m_outputFileStream << "m_lSampleBlockBuffer.size(): " << m_lSampleBlockBuffer.size() << std::endl
+                               << std::endl;
             std::vector<channel> channellist = m_pDataStream->getChannelList();
-            if(iSampleIterator == 1)
-                for(std::vector<channel>::iterator it = channellist.begin(); it != channellist.end(); ++it){
+            if (iSampleIterator == 1)
+                for (std::vector<channel>::iterator it = channellist.begin(); it != channellist.end(); ++it) {
                     m_outputFileStream << "Channeltype " << it->getType() << std::endl;
                     m_outputFileStream << "Channelindex " << it->getIndex() << std::endl;
                 }
@@ -322,7 +323,7 @@ QList<uint> EEGoSportsDriver::getChannellist()
     std::vector<channel> channellist = m_pAmplifier->getChannelList();
 
     QList<uint> uichannellist;
-    for(std::vector<channel>::iterator it = channellist.begin(); it != channellist.end(); ++it)
+    for (std::vector<channel>::iterator it = channellist.begin(); it != channellist.end(); ++it)
         uichannellist.append(it->getType());
 
     return uichannellist;

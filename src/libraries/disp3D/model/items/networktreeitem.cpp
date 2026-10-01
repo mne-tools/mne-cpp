@@ -20,8 +20,8 @@
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-NetworkTreeItem::NetworkTreeItem(const QString &text, const QString &objectKey)
-    : AbstractTreeItem(text, AbstractTreeItem::NetworkItem)
-    , m_objectKey(objectKey)
+NetworkTreeItem::NetworkTreeItem(const QString& text, const QString& objectKey)
+: AbstractTreeItem(text, AbstractTreeItem::NetworkItem)
+, m_objectKey(objectKey)
 {
 }

@@ -97,10 +97,10 @@ public:
      */
     struct StreamContext
     {
-        MnaGraph*                  graph = nullptr;         ///< The pipeline graph (owned externally)
-        QMap<QString, QObject*>    livePlugins;             ///< nodeId → live plugin instance (QObject* avoids scan dependency)
-        bool                       running = false;         ///< Whether the stream is active
-        QStringList                executionOrder;          ///< Topological order used for startup/shutdown
+        MnaGraph* graph = nullptr;           ///< The pipeline graph (owned externally)
+        QMap<QString, QObject*> livePlugins; ///< nodeId → live plugin instance (QObject* avoids scan dependency)
+        bool running = false;                ///< Whether the stream is active
+        QStringList executionOrder;          ///< Topological order used for startup/shutdown
     };
 
     /**
@@ -126,11 +126,11 @@ public:
      * @return Output data keyed by port name.
      */
     static QVariantMap executeNode(const MnaNode& node,
-                                    const QVariantMap& inputs);
+                                   const QVariantMap& inputs);
 
     /// Progress callback type.
     using ProgressCallback = std::function<void(const QString& nodeId,
-                                                 int current, int total)>;
+                                                int current, int total)>;
 
     /**
      * Set a progress callback invoked for each node execution.

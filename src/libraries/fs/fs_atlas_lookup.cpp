@@ -46,7 +46,7 @@ using namespace Eigen;
 //=============================================================================================================
 
 FsAtlasLookup::FsAtlasLookup()
-    : m_ras2vox(Matrix4f::Identity())
+: m_ras2vox(Matrix4f::Identity())
 {
     initLookupTable();
 }
@@ -64,7 +64,7 @@ bool FsAtlasLookup::load(const QString& sParcellationPath)
 
     QByteArray data;
 
-    if(sParcellationPath.endsWith(QStringLiteral(".mgz"), Qt::CaseInsensitive)) {
+    if (sParcellationPath.endsWith(QStringLiteral(".mgz"), Qt::CaseInsensitive)) {
 #ifdef WASMBUILD
         qWarning() << "[FsAtlasLookup::load] .mgz files not supported in WebAssembly build (QProcess unavailable):" << sParcellationPath;
         return false;
@@ -72,11 +72,11 @@ bool FsAtlasLookup::load(const QString& sParcellationPath)
         // Decompress mgz via gzip
         QProcess gzipProc;
         gzipProc.start(QStringLiteral("gzip"), QStringList() << QStringLiteral("-dc") << sParcellationPath);
-        if(!gzipProc.waitForFinished(30000)) {
+        if (!gzipProc.waitForFinished(30000)) {
             qWarning() << "[FsAtlasLookup::load] gzip decompression timed out for" << sParcellationPath;
             return false;
         }
-        if(gzipProc.exitCode() != 0) {
+        if (gzipProc.exitCode() != 0) {
             qWarning() << "[FsAtlasLookup::load] gzip decompression failed for" << sParcellationPath;
             return false;
         }
@@ -84,7 +84,7 @@ bool FsAtlasLookup::load(const QString& sParcellationPath)
 #endif
     } else {
         QFile file(sParcellationPath);
-        if(!file.open(QIODevice::ReadOnly)) {
+        if (!file.open(QIODevice::ReadOnly)) {
             qWarning() << "[FsAtlasLookup::load] Cannot open" << sParcellationPath;
             return false;
         }
@@ -92,7 +92,7 @@ bool FsAtlasLookup::load(const QString& sParcellationPath)
         file.close();
     }
 
-    if(data.size() < 284 + 64) { // Minimum header size
+    if (data.size() < 284 + 64) { // Minimum header size
         qWarning() << "[FsAtlasLookup::load] File too small:" << sParcellationPath;
         return false;
     }
@@ -113,7 +113,7 @@ bool FsAtlasLookup::load(const QString& sParcellationPath)
     };
 
     qint32 version = readInt32(0);
-    if(version != 1) {
+    if (version != 1) {
         qWarning() << "[FsAtlasLookup::load] Unsupported MGH version:" << version;
         return false;
     }
@@ -124,7 +124,7 @@ bool FsAtlasLookup::load(const QString& sParcellationPath)
     qint32 nframes = readInt32(16);
     qint32 type = readInt32(20);
 
-    if(m_dimX <= 0 || m_dimY <= 0 || m_dimZ <= 0) {
+    if (m_dimX <= 0 || m_dimY <= 0 || m_dimZ <= 0) {
         qWarning() << "[FsAtlasLookup::load] Invalid dimensions:" << m_dimX << m_dimY << m_dimZ;
         return false;
     }
@@ -151,7 +151,7 @@ bool FsAtlasLookup::load(const QString& sParcellationPath)
 
     Matrix4f vox2ras = Matrix4f::Identity();
 
-    if(rasGoodFlag > 0) {
+    if (rasGoodFlag > 0) {
         // Read voxel sizes and direction cosines to construct vox2ras
         // Properly read floats by memcpy + endian swap
         auto readBEFloat = [&](int offset) -> float {
@@ -193,8 +193,8 @@ bool FsAtlasLookup::load(const QString& sParcellationPath)
 
         Vector3f Pxyz_0 = c_ras - MdcD * Pcrs_center;
 
-        vox2ras.block<3,3>(0,0) = MdcD;
-        vox2ras.block<3,1>(0,3) = Pxyz_0;
+        vox2ras.block<3, 3>(0, 0) = MdcD;
+        vox2ras.block<3, 1>(0, 3) = Pxyz_0;
     }
 
     // Compute ras2vox = inverse(vox2ras)
@@ -208,50 +208,50 @@ bool FsAtlasLookup::load(const QString& sParcellationPath)
     const char* voxPtr = raw + headerSize;
     qint64 dataSize = data.size() - headerSize;
 
-    switch(type) {
-    case 0: { // MRI_UCHAR
-        if(dataSize < nVoxels) {
-            qWarning() << "[FsAtlasLookup::load] Insufficient data for uchar volume";
+    switch (type) {
+        case 0: { // MRI_UCHAR
+            if (dataSize < nVoxels) {
+                qWarning() << "[FsAtlasLookup::load] Insufficient data for uchar volume";
+                return false;
+            }
+            for (qint64 i = 0; i < nVoxels; ++i)
+                m_voxelData[static_cast<int>(i)] = static_cast<int>(static_cast<unsigned char>(voxPtr[i]));
+            break;
+        }
+        case 1: { // MRI_INT
+            if (dataSize < nVoxels * 4) {
+                qWarning() << "[FsAtlasLookup::load] Insufficient data for int volume";
+                return false;
+            }
+            for (qint64 i = 0; i < nVoxels; ++i)
+                m_voxelData[static_cast<int>(i)] = qFromBigEndian<qint32>(voxPtr + i * 4);
+            break;
+        }
+        case 3: { // MRI_FLOAT
+            if (dataSize < nVoxels * 4) {
+                qWarning() << "[FsAtlasLookup::load] Insufficient data for float volume";
+                return false;
+            }
+            for (qint64 i = 0; i < nVoxels; ++i) {
+                quint32 bits = qFromBigEndian<quint32>(voxPtr + i * 4);
+                float val;
+                memcpy(&val, &bits, sizeof(float));
+                m_voxelData[static_cast<int>(i)] = static_cast<int>(std::round(val));
+            }
+            break;
+        }
+        case 4: { // MRI_SHORT
+            if (dataSize < nVoxels * 2) {
+                qWarning() << "[FsAtlasLookup::load] Insufficient data for short volume";
+                return false;
+            }
+            for (qint64 i = 0; i < nVoxels; ++i)
+                m_voxelData[static_cast<int>(i)] = qFromBigEndian<qint16>(voxPtr + i * 2);
+            break;
+        }
+        default:
+            qWarning() << "[FsAtlasLookup::load] Unsupported MGH data type:" << type;
             return false;
-        }
-        for(qint64 i = 0; i < nVoxels; ++i)
-            m_voxelData[static_cast<int>(i)] = static_cast<int>(static_cast<unsigned char>(voxPtr[i]));
-        break;
-    }
-    case 1: { // MRI_INT
-        if(dataSize < nVoxels * 4) {
-            qWarning() << "[FsAtlasLookup::load] Insufficient data for int volume";
-            return false;
-        }
-        for(qint64 i = 0; i < nVoxels; ++i)
-            m_voxelData[static_cast<int>(i)] = qFromBigEndian<qint32>(voxPtr + i * 4);
-        break;
-    }
-    case 3: { // MRI_FLOAT
-        if(dataSize < nVoxels * 4) {
-            qWarning() << "[FsAtlasLookup::load] Insufficient data for float volume";
-            return false;
-        }
-        for(qint64 i = 0; i < nVoxels; ++i) {
-            quint32 bits = qFromBigEndian<quint32>(voxPtr + i * 4);
-            float val;
-            memcpy(&val, &bits, sizeof(float));
-            m_voxelData[static_cast<int>(i)] = static_cast<int>(std::round(val));
-        }
-        break;
-    }
-    case 4: { // MRI_SHORT
-        if(dataSize < nVoxels * 2) {
-            qWarning() << "[FsAtlasLookup::load] Insufficient data for short volume";
-            return false;
-        }
-        for(qint64 i = 0; i < nVoxels; ++i)
-            m_voxelData[static_cast<int>(i)] = qFromBigEndian<qint16>(voxPtr + i * 2);
-        break;
-    }
-    default:
-        qWarning() << "[FsAtlasLookup::load] Unsupported MGH data type:" << type;
-        return false;
     }
 
     m_loaded = true;
@@ -262,15 +262,15 @@ bool FsAtlasLookup::load(const QString& sParcellationPath)
 
 QString FsAtlasLookup::labelAtRas(const Vector3f& ras) const
 {
-    if(!m_loaded)
+    if (!m_loaded)
         return QStringLiteral("Unknown");
 
     Vector3i vox = rasToVoxel(ras);
 
     // Bounds check
-    if(vox(0) < 0 || vox(0) >= m_dimX ||
-       vox(1) < 0 || vox(1) >= m_dimY ||
-       vox(2) < 0 || vox(2) >= m_dimZ)
+    if (vox(0) < 0 || vox(0) >= m_dimX ||
+        vox(1) < 0 || vox(1) >= m_dimY ||
+        vox(2) < 0 || vox(2) >= m_dimZ)
         return QStringLiteral("Unknown");
 
     // MGH stores data in column-major Fortran order: index = x + dimX * (y + dimY * z)
@@ -286,7 +286,7 @@ QStringList FsAtlasLookup::labelsForPositions(const QVector<Vector3f>& positions
 {
     QStringList result;
     result.reserve(positions.size());
-    for(const auto& pos : positions)
+    for (const auto& pos : positions)
         result.append(labelAtRas(pos));
     return result;
 }
@@ -314,13 +314,13 @@ Vector3i FsAtlasLookup::rasToVoxel(const Vector3f& ras) const
 void FsAtlasLookup::initLookupTable()
 {
     // Subcortical / standard FreeSurfer labels
-    m_lookupTable[0]  = QStringLiteral("Unknown");
-    m_lookupTable[2]  = QStringLiteral("Left-Cerebral-White-Matter");
-    m_lookupTable[3]  = QStringLiteral("Left-Cerebral-Cortex");
-    m_lookupTable[4]  = QStringLiteral("Left-Lateral-Ventricle");
-    m_lookupTable[5]  = QStringLiteral("Left-Inf-Lat-Vent");
-    m_lookupTable[7]  = QStringLiteral("Left-Cerebellum-White-Matter");
-    m_lookupTable[8]  = QStringLiteral("Left-Cerebellum-Cortex");
+    m_lookupTable[0] = QStringLiteral("Unknown");
+    m_lookupTable[2] = QStringLiteral("Left-Cerebral-White-Matter");
+    m_lookupTable[3] = QStringLiteral("Left-Cerebral-Cortex");
+    m_lookupTable[4] = QStringLiteral("Left-Lateral-Ventricle");
+    m_lookupTable[5] = QStringLiteral("Left-Inf-Lat-Vent");
+    m_lookupTable[7] = QStringLiteral("Left-Cerebellum-White-Matter");
+    m_lookupTable[8] = QStringLiteral("Left-Cerebellum-Cortex");
     m_lookupTable[10] = QStringLiteral("Left-Thalamus");
     m_lookupTable[11] = QStringLiteral("Left-Caudate");
     m_lookupTable[12] = QStringLiteral("Left-Putamen");

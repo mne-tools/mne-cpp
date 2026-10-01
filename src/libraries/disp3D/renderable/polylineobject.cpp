@@ -63,7 +63,7 @@ void PolylineObject::setPoints(const QVector<Eigen::Vector3f>& vecPoints)
 {
     // A single point has no segment, so it is treated the same as no data at
     // all rather than drawn as a degenerate line.
-    if(vecPoints.size() < 2) {
+    if (vecPoints.size() < 2) {
         clear();
         return;
     }
@@ -104,7 +104,7 @@ void PolylineObject::setGradient(const QColor& startColor,
 
 void PolylineObject::createSegmentGeometry()
 {
-    if(!m_vertexData.isEmpty()) {
+    if (!m_vertexData.isEmpty()) {
         return;
     }
 
@@ -117,7 +117,7 @@ void PolylineObject::createSegmentGeometry()
     std::vector<VertexData> vertices;
     std::vector<quint32> indices;
 
-    for(int i = 0; i < iSegments; ++i) {
+    for (int i = 0; i < iSegments; ++i) {
         const float fAngle = 2.0f * static_cast<float>(M_PI) * static_cast<float>(i) / static_cast<float>(iSegments);
         const float x = std::cos(fAngle);
         const float z = std::sin(fAngle);
@@ -125,11 +125,11 @@ void PolylineObject::createSegmentGeometry()
         QVector3D normal(x, 0.0f, z);
         normal.normalize();
 
-        vertices.push_back({x,  fHalfHeight, z, normal.x(), normal.y(), normal.z()});
+        vertices.push_back({x, fHalfHeight, z, normal.x(), normal.y(), normal.z()});
         vertices.push_back({x, -fHalfHeight, z, normal.x(), normal.y(), normal.z()});
     }
 
-    for(int i = 0; i < iSegments; ++i) {
+    for (int i = 0; i < iSegments; ++i) {
         const quint32 uTop = static_cast<quint32>(i * 2);
         const quint32 uBottom = uTop + 1;
         const quint32 uNextTop = static_cast<quint32>(((i + 1) % iSegments) * 2);
@@ -156,7 +156,7 @@ void PolylineObject::createSegmentGeometry()
 
 void PolylineObject::buildInstances()
 {
-    if(m_vecPoints.size() < 2) {
+    if (m_vecPoints.size() < 2) {
         m_instanceData.clear();
         m_iInstanceCount = 0;
         return;
@@ -168,7 +168,7 @@ void PolylineObject::buildInstances()
 
     const float fLastStep = static_cast<float>(iSegmentCount - 1);
 
-    for(int i = 0; i < iSegmentCount; ++i) {
+    for (int i = 0; i < iSegmentCount; ++i) {
         const Eigen::Vector3f& vecStart = m_vecPoints.at(i);
         const Eigen::Vector3f& vecEnd = m_vecPoints.at(i + 1);
 
@@ -189,7 +189,7 @@ void PolylineObject::buildInstances()
         // is small enough that only genuinely coincident points are dropped,
         // and large enough to keep the division below well conditioned.
         constexpr float fMinSegmentLength = 1.0e-12f;
-        if(fLength < fMinSegmentLength) {
+        if (fLength < fMinSegmentLength) {
             continue;
         }
 
@@ -222,16 +222,16 @@ void PolylineObject::buildInstances()
 
 //=============================================================================================================
 
-void PolylineObject::updateBuffers(QRhi *rhi, QRhiResourceUpdateBatch *u)
+void PolylineObject::updateBuffers(QRhi* rhi, QRhiResourceUpdateBatch* u)
 {
-    if(m_bGeometryDirty) {
-        if(!m_gpu->vertexBuffer) {
+    if (m_bGeometryDirty) {
+        if (!m_gpu->vertexBuffer) {
             m_gpu->vertexBuffer.reset(rhi->newBuffer(QRhiBuffer::Immutable,
                                                      QRhiBuffer::VertexBuffer,
                                                      m_vertexData.size()));
             m_gpu->vertexBuffer->create();
         }
-        if(!m_gpu->indexBuffer) {
+        if (!m_gpu->indexBuffer) {
             m_gpu->indexBuffer.reset(rhi->newBuffer(QRhiBuffer::Immutable,
                                                     QRhiBuffer::IndexBuffer,
                                                     m_indexData.size()));
@@ -243,10 +243,10 @@ void PolylineObject::updateBuffers(QRhi *rhi, QRhiResourceUpdateBatch *u)
         m_bGeometryDirty = false;
     }
 
-    if(m_bInstancesDirty && m_iInstanceCount > 0) {
+    if (m_bInstancesDirty && m_iInstanceCount > 0) {
         const int iRequiredSize = m_instanceData.size();
 
-        if(!m_gpu->instanceBuffer || m_gpu->instanceBuffer->size() < static_cast<quint32>(iRequiredSize)) {
+        if (!m_gpu->instanceBuffer || m_gpu->instanceBuffer->size() < static_cast<quint32>(iRequiredSize)) {
             m_gpu->instanceBuffer.reset(rhi->newBuffer(QRhiBuffer::Dynamic,
                                                        QRhiBuffer::VertexBuffer,
                                                        iRequiredSize));

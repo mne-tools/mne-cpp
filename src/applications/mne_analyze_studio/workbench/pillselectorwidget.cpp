@@ -43,7 +43,7 @@ PillSelectorWidget::PillSelectorWidget(QWidget* parent)
 void PillSelectorWidget::setPlaceholderText(const QString& placeholderText)
 {
     m_placeholderText = placeholderText.trimmed().isEmpty() ? QString("Select") : placeholderText.trimmed();
-    if(m_comboBox->count() == 0) {
+    if (m_comboBox->count() == 0) {
         m_comboBox->setToolTip(m_placeholderText);
     }
 }
@@ -51,7 +51,7 @@ void PillSelectorWidget::setPlaceholderText(const QString& placeholderText)
 void PillSelectorWidget::setEmptyText(const QString& emptyText)
 {
     m_emptyText = emptyText.trimmed().isEmpty() ? QString("Unavailable") : emptyText.trimmed();
-    if(m_comboBox->count() == 0) {
+    if (m_comboBox->count() == 0) {
         m_comboBox->setToolTip(m_emptyText);
     }
 }
@@ -61,7 +61,7 @@ void PillSelectorWidget::setItems(const QList<QPair<QString, QString>>& items)
     const QSignalBlocker blocker(m_comboBox);
     m_items = items;
     m_comboBox->clear();
-    for(const auto& item : m_items) {
+    for (const auto& item : m_items) {
         m_comboBox->addItem(item.first, item.second);
     }
 
@@ -78,12 +78,12 @@ void PillSelectorWidget::setCurrentValue(const QString& value)
 
     const QSignalBlocker blocker(m_comboBox);
     const int index = m_comboBox->findData(trimmedValue);
-    if(index >= 0) {
+    if (index >= 0) {
         m_comboBox->setCurrentIndex(index);
         return;
     }
 
-    if(m_comboBox->count() > 0) {
+    if (m_comboBox->count() > 0) {
         m_comboBox->setCurrentIndex(0);
         m_currentValue = m_comboBox->currentData().toString();
     }
@@ -106,7 +106,7 @@ bool PillSelectorWidget::hasItems() const
 
 void PillSelectorWidget::emitCurrentValueChanged(int index)
 {
-    if(index < 0) {
+    if (index < 0) {
         return;
     }
 
@@ -116,8 +116,8 @@ void PillSelectorWidget::emitCurrentValueChanged(int index)
 
 QString PillSelectorWidget::displayTextForValue(const QString& value) const
 {
-    for(const auto& item : m_items) {
-        if(item.second == value) {
+    for (const auto& item : m_items) {
+        if (item.second == value) {
             return item.first;
         }
     }

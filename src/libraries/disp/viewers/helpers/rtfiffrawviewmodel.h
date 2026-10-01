@@ -57,8 +57,9 @@
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-namespace FIFFLIB {
-    class FiffInfo;
+namespace FIFFLIB
+{
+class FiffInfo;
 }
 
 //=============================================================================================================
@@ -76,8 +77,8 @@ namespace DISPLIB
 // DEFINE TYPEDEFS
 //=============================================================================================================
 
-typedef QPair<const double*,qint32> RowVectorPair;
-typedef Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic,Eigen::RowMajor> MatrixXdR;
+typedef QPair<const double*, qint32> RowVectorPair;
+typedef Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor> MatrixXdR;
 
 //=============================================================================================================
 /**
@@ -93,8 +94,8 @@ class DISPSHARED_EXPORT RtFiffRawViewModel : public QAbstractTableModel
     Q_OBJECT
 
 public:
-    typedef QSharedPointer<RtFiffRawViewModel> SPtr;              /**< Shared pointer type for RtFiffRawViewModel. */
-    typedef QSharedPointer<const RtFiffRawViewModel> ConstSPtr;   /**< Const shared pointer type for RtFiffRawViewModel. */
+    typedef QSharedPointer<RtFiffRawViewModel> SPtr;            /**< Shared pointer type for RtFiffRawViewModel. */
+    typedef QSharedPointer<const RtFiffRawViewModel> ConstSPtr; /**< Const shared pointer type for RtFiffRawViewModel. */
 
     //=========================================================================================================
     /**
@@ -102,7 +103,7 @@ public:
      *
      * @param[in] parent     parent of the table model.
      */
-    RtFiffRawViewModel(QObject *parent = 0);
+    RtFiffRawViewModel(QObject* parent = 0);
 
     //=========================================================================================================
     /**
@@ -119,7 +120,7 @@ public:
      *
      * @return number of rows.
      */
-    virtual int rowCount(const QModelIndex &parent = QModelIndex()) const ;
+    virtual int rowCount(const QModelIndex& parent = QModelIndex()) const;
 
     //=========================================================================================================
     /**
@@ -129,7 +130,7 @@ public:
      *
      * @return number of columns.
      */
-    virtual int columnCount(const QModelIndex &parent = QModelIndex()) const;
+    virtual int columnCount(const QModelIndex& parent = QModelIndex()) const;
 
     //=========================================================================================================
     /**
@@ -140,7 +141,7 @@ public:
      *
      * @return accessed data.
      */
-    virtual QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const;
+    virtual QVariant data(const QModelIndex& index, int role = Qt::DisplayRole) const;
 
     //=========================================================================================================
     /**
@@ -186,7 +187,7 @@ public:
      *
      * @param[in] data       data to add (Time points of channel samples).
      */
-    void addData(const QList<Eigen::MatrixXd> &data);
+    void addData(const QList<Eigen::MatrixXd>& data);
 
     //=========================================================================================================
     /**
@@ -250,7 +251,7 @@ public:
      *
      * @return the channel idx to selection status.
      */
-    inline const QMap<qint32,qint32>& getIdxSelMap() const;
+    inline const QMap<qint32, qint32>& getIdxSelMap() const;
 
     //=========================================================================================================
     /**
@@ -258,7 +259,7 @@ public:
      *
      * @param[in] selection      channel index list to select.
      */
-    void selectRows(const QList<qint32> &selection);
+    void selectRows(const QList<qint32>& selection);
 
     //=========================================================================================================
     /**
@@ -266,7 +267,7 @@ public:
      *
      * @param[in] selection      channel index list to select.
      */
-    void hideRows(const QList<qint32> &selection);
+    void hideRows(const QList<qint32>& selection);
 
     //=========================================================================================================
     /**
@@ -280,7 +281,7 @@ public:
      *
      * @param[in] index     of the channel which has been double clicked.
      */
-    void toggleFreeze(const QModelIndex &index);
+    void toggleFreeze(const QModelIndex& index);
 
     //=========================================================================================================
     /**
@@ -288,7 +289,7 @@ public:
      *
      * @param[in] p_qMapChScaling    Map of scaling factors.
      */
-    void setScaling(const QMap< qint32,float >& p_qMapChScaling);
+    void setScaling(const QMap<qint32, float>& p_qMapChScaling);
 
     //=========================================================================================================
     /**
@@ -354,7 +355,7 @@ public:
      *
      * @param[in] channelType    the channel type which is to be filtered (EEG, MEG, All).
      */
-    void setFilterChannelType(const QString &channelType);
+    void setFilterChannelType(const QString& channelType);
 
     //=========================================================================================================
     /**
@@ -429,7 +430,7 @@ public:
      *
      * @return the current scaling.
      */
-    inline const QMap< qint32,float >& getScaling() const;
+    inline const QMap<qint32, float>& getScaling() const;
 
     //=========================================================================================================
     /**
@@ -437,7 +438,7 @@ public:
      *
      * @return the current detected trigger flanks.
      */
-    inline QList<QPair<int,double> > getDetectedTriggers() const;
+    inline QList<QPair<int, double>> getDetectedTriggers() const;
 
     //=========================================================================================================
     /**
@@ -445,7 +446,7 @@ public:
      *
      * @return the old detected trigger flanks.
      */
-    inline QList<QPair<int, double> > getDetectedTriggersOld() const;
+    inline QList<QPair<int, double>> getDetectedTriggersOld() const;
 
     //=========================================================================================================
     /**
@@ -556,7 +557,7 @@ private:
      */
     void initSphara();
 
-    static void doFilterPerChannelRTMSA(QPair<QList<UTILSLIB::FilterKernel>,QPair<int,Eigen::RowVectorXd> > &channelDataTime);
+    static void doFilterPerChannelRTMSA(QPair<QList<UTILSLIB::FilterKernel>, QPair<int, Eigen::RowVectorXd>>& channelDataTime);
 
     //=========================================================================================================
     /**
@@ -571,7 +572,7 @@ private:
      * @param[in] data          data which is to be filtered.
      * @param[in] iDataIndex    current position in the global data matrix.
      */
-    void filterDataBlock(const Eigen::MatrixXd &data, int iDataIndex);
+    void filterDataBlock(const Eigen::MatrixXd& data, int iDataIndex);
 
     //=========================================================================================================
     /**
@@ -579,79 +580,79 @@ private:
      */
     void clearModel();
 
-    bool                                m_bProjActivated;                           /**< Projections activated. */
-    bool                                m_bCompActivated;                           /**< Compensator activated. */
-    bool                                m_bSpharaActivated;                         /**< Sphara activated. */
-    bool                                m_bIsFreezed;                               /**< Display is freezed. */
-    bool                                m_bDrawFilterFront;                         /**< Flag whether to plot/write the delayed frontal part of the filtered signal. This flag is necessary to get rid of nasty signal jumps when changing the filter parameters. */
-    bool                                m_bPerformFiltering;                        /**< Flag whether to activate/deactivate filtering. */
-    bool                                m_bTriggerDetectionActive;                  /**< Trigger detection activation state. */
-    float                               m_fSps;                                     /**< Sampling rate. */
-    double                              m_dTriggerThreshold;                        /**< Trigger detection threshold. */
-    qint32                              m_iT;                                       /**< Time window. */
-    qint32                              m_iDownsampling;                            /**< Down sampling factor. */
-    qint32                              m_iMaxSamples;                              /**< Max samples per window. */
-    qint32                              m_iCurrentSample;                           /**< Current sample which holds the current position in the data matrix. */
-    qint32                              m_iCurrentStartingSample;                   /**< Accumulates cumulative starting sample position when m_iCurrentSample resets to 0 */
-    qint32                              m_iCurrentSampleFreeze;                     /**< Current sample which holds the current position in the data matrix when freezing tool is active. */
-    qint32                              m_iMaxFilterLength;                         /**< Max order of the current filters. */
-    qint32                              m_iCurrentBlockSize;                        /**< Current block size. */
-    qint32                              m_iResidual;                                /**< Current amount of samples which were to size. */
-    int                                 m_iCurrentTriggerChIndex;                   /**< The index of the current trigger channel. */
-    int                                 m_iDistanceTimerSpacer;                     /**< The distance for the horizontal time spacers in the view in ms. */
-    int                                 m_iDetectedTriggers;                        /**< Detected triggers since the last reset. */
+    bool m_bProjActivated;           /**< Projections activated. */
+    bool m_bCompActivated;           /**< Compensator activated. */
+    bool m_bSpharaActivated;         /**< Sphara activated. */
+    bool m_bIsFreezed;               /**< Display is freezed. */
+    bool m_bDrawFilterFront;         /**< Flag whether to plot/write the delayed frontal part of the filtered signal. This flag is necessary to get rid of nasty signal jumps when changing the filter parameters. */
+    bool m_bPerformFiltering;        /**< Flag whether to activate/deactivate filtering. */
+    bool m_bTriggerDetectionActive;  /**< Trigger detection activation state. */
+    float m_fSps;                    /**< Sampling rate. */
+    double m_dTriggerThreshold;      /**< Trigger detection threshold. */
+    qint32 m_iT;                     /**< Time window. */
+    qint32 m_iDownsampling;          /**< Down sampling factor. */
+    qint32 m_iMaxSamples;            /**< Max samples per window. */
+    qint32 m_iCurrentSample;         /**< Current sample which holds the current position in the data matrix. */
+    qint32 m_iCurrentStartingSample; /**< Accumulates cumulative starting sample position when m_iCurrentSample resets to 0 */
+    qint32 m_iCurrentSampleFreeze;   /**< Current sample which holds the current position in the data matrix when freezing tool is active. */
+    qint32 m_iMaxFilterLength;       /**< Max order of the current filters. */
+    qint32 m_iCurrentBlockSize;      /**< Current block size. */
+    qint32 m_iResidual;              /**< Current amount of samples which were to size. */
+    int m_iCurrentTriggerChIndex;    /**< The index of the current trigger channel. */
+    int m_iDistanceTimerSpacer;      /**< The distance for the horizontal time spacers in the view in ms. */
+    int m_iDetectedTriggers;         /**< Detected triggers since the last reset. */
 
-    QString                             m_sCurrentTriggerCh;                        /**< Current trigger channel which is beeing scanned. */
-    QString                             m_sFilterChannelType;                       /**< Kind of channel which is to be filtered. */
+    QString m_sCurrentTriggerCh;  /**< Current trigger channel which is beeing scanned. */
+    QString m_sFilterChannelType; /**< Kind of channel which is to be filtered. */
 
-    QSharedPointer<FIFFLIB::FiffInfo>   m_pFiffInfo;                                /**< Fiff info. */
+    QSharedPointer<FIFFLIB::FiffInfo> m_pFiffInfo; /**< Fiff info. */
 
-    Eigen::RowVectorXi                  m_vecBadIdcs;                               /**< Idcs of bad channels. */
-    Eigen::VectorXd                     m_vecLastBlockFirstValuesFiltered;          /**< The first value of the last complete filtered data display block. */
-    Eigen::VectorXd                     m_vecLastBlockFirstValuesRaw;               /**< The first value of the last complete raw data display block. */
+    Eigen::RowVectorXi m_vecBadIdcs;                   /**< Idcs of bad channels. */
+    Eigen::VectorXd m_vecLastBlockFirstValuesFiltered; /**< The first value of the last complete filtered data display block. */
+    Eigen::VectorXd m_vecLastBlockFirstValuesRaw;      /**< The first value of the last complete raw data display block. */
 
-    MatrixXdR                           m_matDataRaw;                               /**< The raw data. */
-    MatrixXdR                           m_matDataFiltered;                          /**< The filtered data. */
-    MatrixXdR                           m_matDataRawFreeze;                         /**< The raw data in freeze mode. */
-    MatrixXdR                           m_matDataFilteredFreeze;                    /**< The raw filtered data in freeze mode. */
-    Eigen::MatrixXd                     m_matOverlap;                               /**< Last overlap block for the back. */
+    MatrixXdR m_matDataRaw;            /**< The raw data. */
+    MatrixXdR m_matDataFiltered;       /**< The filtered data. */
+    MatrixXdR m_matDataRawFreeze;      /**< The raw data in freeze mode. */
+    MatrixXdR m_matDataFilteredFreeze; /**< The raw filtered data in freeze mode. */
+    Eigen::MatrixXd m_matOverlap;      /**< Last overlap block for the back. */
 
-    Eigen::VectorXi                     m_vecIndicesFirstVV;                        /**< The indices of the channels to pick for the first SPHARA operator in case of a VectorView system.*/
-    Eigen::VectorXi                     m_vecIndicesSecondVV;                       /**< The indices of the channels to pick for the second SPHARA operator in case of a VectorView system.*/
-    Eigen::VectorXi                     m_vecIndicesFirstBabyMEG;                   /**< The indices of the channels to pick for the first SPHARA operator in case of a BabyMEG system.*/
-    Eigen::VectorXi                     m_vecIndicesSecondBabyMEG;                  /**< The indices of the channels to pick for the second SPHARA operator in case of a BabyMEG system.*/
-    Eigen::VectorXi                     m_vecIndicesFirstEEG;                       /**< The indices of the channels to pick for the second SPHARA operator in case of an EEG system.*/
+    Eigen::VectorXi m_vecIndicesFirstVV;       /**< The indices of the channels to pick for the first SPHARA operator in case of a VectorView system.*/
+    Eigen::VectorXi m_vecIndicesSecondVV;      /**< The indices of the channels to pick for the second SPHARA operator in case of a VectorView system.*/
+    Eigen::VectorXi m_vecIndicesFirstBabyMEG;  /**< The indices of the channels to pick for the first SPHARA operator in case of a BabyMEG system.*/
+    Eigen::VectorXi m_vecIndicesSecondBabyMEG; /**< The indices of the channels to pick for the second SPHARA operator in case of a BabyMEG system.*/
+    Eigen::VectorXi m_vecIndicesFirstEEG;      /**< The indices of the channels to pick for the second SPHARA operator in case of an EEG system.*/
 
-    Eigen::SparseMatrix<double>         m_matSparseSpharaMult;                      /**< The final sparse SPHARA operator .*/
-    Eigen::SparseMatrix<double>         m_matSparseProjCompMult;                    /**< The final sparse projection + compensator operator.*/
-    Eigen::SparseMatrix<double>         m_matSparseProjMult;                        /**< The final sparse SSP projector. */
-    Eigen::SparseMatrix<double>         m_matSparseCompMult;                        /**< The final sparse compensator matrix. */
+    Eigen::SparseMatrix<double> m_matSparseSpharaMult;   /**< The final sparse SPHARA operator .*/
+    Eigen::SparseMatrix<double> m_matSparseProjCompMult; /**< The final sparse projection + compensator operator.*/
+    Eigen::SparseMatrix<double> m_matSparseProjMult;     /**< The final sparse SSP projector. */
+    Eigen::SparseMatrix<double> m_matSparseCompMult;     /**< The final sparse compensator matrix. */
 
-    Eigen::MatrixXd                     m_matProj;                                  /**< SSP projector. */
-    Eigen::MatrixXd                     m_matComp;                                  /**< Compensator. */
+    Eigen::MatrixXd m_matProj; /**< SSP projector. */
+    Eigen::MatrixXd m_matComp; /**< Compensator. */
 
-    Eigen::MatrixXd                     m_matSpharaVVGradLoaded;                    /**< The loaded VectorView gradiometer basis functions.*/
-    Eigen::MatrixXd                     m_matSpharaVVMagLoaded;                     /**< The loaded VectorView magnetometer basis functions.*/
-    Eigen::MatrixXd                     m_matSpharaBabyMEGInnerLoaded;              /**< The loaded babyMEG inner layer basis functions.*/
-    Eigen::MatrixXd                     m_matSpharaBabyMEGOuterLoaded;              /**< The loaded babyMEG outer layer basis functions.*/
-    Eigen::MatrixXd                     m_matSpharaEEGLoaded;                       /**< The loaded EEG basis functions.*/
+    Eigen::MatrixXd m_matSpharaVVGradLoaded;       /**< The loaded VectorView gradiometer basis functions.*/
+    Eigen::MatrixXd m_matSpharaVVMagLoaded;        /**< The loaded VectorView magnetometer basis functions.*/
+    Eigen::MatrixXd m_matSpharaBabyMEGInnerLoaded; /**< The loaded babyMEG inner layer basis functions.*/
+    Eigen::MatrixXd m_matSpharaBabyMEGOuterLoaded; /**< The loaded babyMEG outer layer basis functions.*/
+    Eigen::MatrixXd m_matSpharaEEGLoaded;          /**< The loaded EEG basis functions.*/
 
-    QMap<double, QColor>                m_qMapTriggerColor;                         /**< Current colors for all trigger channels. */
-    QMap<int,QList<QPair<int,double> > >m_qMapDetectedTrigger;                      /**< Detected trigger for each trigger channel. */
-    QList<int>                          m_lTriggerChannelIndices;                   /**< List of all trigger channel indices. */
-    QMap<int,QList<QPair<int,double> > >m_qMapDetectedTriggerFreeze;                /**< Detected trigger for each trigger channel while display is freezed. */
-    QMap<int,QList<QPair<int,double> > >m_qMapDetectedTriggerOld;                   /**< Old detected trigger for each trigger channel. */
-    QMap<int,QList<QPair<int,double> > >m_qMapDetectedTriggerOldFreeze;             /**< Old detected trigger for each trigger channel while display is freezed. */
-    QMap<qint32,float>                  m_qMapChScaling;                            /**< Channel scaling map. */
-    QList<UTILSLIB::FilterKernel>m_filterKernel;                             /**< List of currently active filters. */
-    QStringList                         m_filterChannelList;                        /**< List of channels which are to be filtered.*/
-    QStringList                         m_visibleChannelList;                       /**< List of currently visible channels in the view.*/
-    QMap<qint32,qint32>                 m_qMapIdxRowSelection;                      /**< Selection mapping.*/
+    QMap<double, QColor> m_qMapTriggerColor;                             /**< Current colors for all trigger channels. */
+    QMap<int, QList<QPair<int, double>>> m_qMapDetectedTrigger;          /**< Detected trigger for each trigger channel. */
+    QList<int> m_lTriggerChannelIndices;                                 /**< List of all trigger channel indices. */
+    QMap<int, QList<QPair<int, double>>> m_qMapDetectedTriggerFreeze;    /**< Detected trigger for each trigger channel while display is freezed. */
+    QMap<int, QList<QPair<int, double>>> m_qMapDetectedTriggerOld;       /**< Old detected trigger for each trigger channel. */
+    QMap<int, QList<QPair<int, double>>> m_qMapDetectedTriggerOldFreeze; /**< Old detected trigger for each trigger channel while display is freezed. */
+    QMap<qint32, float> m_qMapChScaling;                                 /**< Channel scaling map. */
+    QList<UTILSLIB::FilterKernel> m_filterKernel;                        /**< List of currently active filters. */
+    QStringList m_filterChannelList;                                     /**< List of channels which are to be filtered.*/
+    QStringList m_visibleChannelList;                                    /**< List of currently visible channels in the view.*/
+    QMap<qint32, qint32> m_qMapIdxRowSelection;                          /**< Selection mapping.*/
 
-    QColor                              m_colBackground;                            /**< The background color.*/
+    QColor m_colBackground; /**< The background color.*/
 
-    std::function<void(int)>             m_fnAddEvent;                               /**< Callback for adding an event at a sample. */
-    std::function<std::vector<int>(int, int)> m_fnGetEventSamples;                  /**< Callback for querying event sample positions in a range. */
+    std::function<void(int)> m_fnAddEvent;                         /**< Callback for adding an event at a sample. */
+    std::function<std::vector<int>(int, int)> m_fnGetEventSamples; /**< Callback for querying event sample positions in a range. */
 
 signals:
     //=========================================================================================================
@@ -674,7 +675,7 @@ signals:
     /**
      * Emmited when trigger detection was performed
      */
-    void triggerDetected(int numberDetectedTriggers, const QMap<int,QList<QPair<int,double> > >& mapDetectedTriggers);
+    void triggerDetected(int numberDetectedTriggers, const QMap<int, QList<QPair<int, double>>>& mapDetectedTriggers);
 };
 
 //=============================================================================================================
@@ -690,12 +691,12 @@ inline qint32 RtFiffRawViewModel::getMaxSamples() const
 
 inline qint32 RtFiffRawViewModel::getCurrentSampleIndex() const
 {
-    if(m_bIsFreezed) {
+    if (m_bIsFreezed) {
         return m_iCurrentSampleFreeze;
     }
 
-    if(!m_filterKernel.isEmpty() && m_bPerformFiltering) {
-        return m_iCurrentSample-m_iMaxFilterLength/2;
+    if (!m_filterKernel.isEmpty() && m_bPerformFiltering) {
+        return m_iCurrentSample - m_iMaxFilterLength / 2;
     }
 
     return m_iCurrentSample;
@@ -705,10 +706,10 @@ inline qint32 RtFiffRawViewModel::getCurrentSampleIndex() const
 
 inline double RtFiffRawViewModel::getLastBlockFirstValue(int row) const
 {
-    if(row>m_vecLastBlockFirstValuesFiltered.rows() || row>m_vecLastBlockFirstValuesRaw.rows())
+    if (row > m_vecLastBlockFirstValuesFiltered.rows() || row > m_vecLastBlockFirstValuesRaw.rows())
         return 0;
 
-    if(!m_filterKernel.isEmpty())
+    if (!m_filterKernel.isEmpty())
         return m_vecLastBlockFirstValuesFiltered[row];
 
     return m_vecLastBlockFirstValuesRaw[row];
@@ -716,7 +717,7 @@ inline double RtFiffRawViewModel::getLastBlockFirstValue(int row) const
 
 //=============================================================================================================
 
-inline const QMap<qint32,qint32>& RtFiffRawViewModel::getIdxSelMap() const
+inline const QMap<qint32, qint32>& RtFiffRawViewModel::getIdxSelMap() const
 {
     return m_qMapIdxRowSelection;
 }
@@ -737,7 +738,7 @@ inline bool RtFiffRawViewModel::isFreezed() const
 
 //=============================================================================================================
 
-inline const QMap<qint32,float>& RtFiffRawViewModel::getScaling() const
+inline const QMap<qint32, float>& RtFiffRawViewModel::getScaling() const
 {
     return m_qMapChScaling;
 }
@@ -746,7 +747,7 @@ inline const QMap<qint32,float>& RtFiffRawViewModel::getScaling() const
 
 inline QMap<double, QColor> RtFiffRawViewModel::getTriggerColor() const
 {
-    if(m_bTriggerDetectionActive) {
+    if (m_bTriggerDetectionActive) {
         return m_qMapTriggerColor;
     }
 
@@ -756,33 +757,31 @@ inline QMap<double, QColor> RtFiffRawViewModel::getTriggerColor() const
 
 //=============================================================================================================
 
-inline QList<QPair<int,double> >  RtFiffRawViewModel::getDetectedTriggers() const
+inline QList<QPair<int, double>> RtFiffRawViewModel::getDetectedTriggers() const
 {
-    QList<QPair<int,double> > triggerIndices;
+    QList<QPair<int, double>> triggerIndices;
 
-    if(m_bIsFreezed)
+    if (m_bIsFreezed)
         return m_qMapDetectedTriggerFreeze[m_iCurrentTriggerChIndex];
 
-    if(m_bTriggerDetectionActive) {
+    if (m_bTriggerDetectionActive) {
         return m_qMapDetectedTrigger[m_iCurrentTriggerChIndex];
-    }
-    else
+    } else
         return triggerIndices;
 }
 
 //=============================================================================================================
 
-inline QList<QPair<int,double> > RtFiffRawViewModel::getDetectedTriggersOld() const
+inline QList<QPair<int, double>> RtFiffRawViewModel::getDetectedTriggersOld() const
 {
-    QList<QPair<int,double> > triggerIndices;
+    QList<QPair<int, double>> triggerIndices;
 
-    if(m_bIsFreezed)
+    if (m_bIsFreezed)
         return m_qMapDetectedTriggerOldFreeze[m_iCurrentTriggerChIndex];
 
-    if(m_bTriggerDetectionActive) {
+    if (m_bTriggerDetectionActive) {
         return m_qMapDetectedTriggerOld[m_iCurrentTriggerChIndex];
-    }
-    else
+    } else
         return triggerIndices;
 }
 
@@ -791,7 +790,7 @@ inline QList<QPair<int,double> > RtFiffRawViewModel::getDetectedTriggersOld() co
 inline int RtFiffRawViewModel::getNumberOfTimeSpacers() const
 {
     //qDebug()<<((m_iT*1000)/m_iDistanceTimerSpacer)-1;
-    return ((1000)/m_iDistanceTimerSpacer)-1;
+    return ((1000) / m_iDistanceTimerSpacer) - 1;
 }
 
 //=============================================================================================================
@@ -826,8 +825,8 @@ inline bool RtFiffRawViewModel::triggerDetectionActive() const
 
 inline int RtFiffRawViewModel::getCurrentOverlapAddDelay() const
 {
-    if(!m_filterKernel.isEmpty())
-        return m_iMaxFilterLength/2;
+    if (!m_filterKernel.isEmpty())
+        return m_iMaxFilterLength / 2;
     else
         return 0;
 }

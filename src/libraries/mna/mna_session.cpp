@@ -42,7 +42,7 @@ QJsonObject MnaSession::toJson() const
     json[QLatin1String("id")] = id;
 
     QJsonArray recsArr;
-    for(const MnaRecording& r : recordings) {
+    for (const MnaRecording& r : recordings) {
         recsArr.append(r.toJson());
     }
     json[QLatin1String("recordings")] = recsArr;
@@ -58,13 +58,12 @@ MnaSession MnaSession::fromJson(const QJsonObject& json)
     session.id = json[QLatin1String("id")].toString();
 
     const QJsonArray recsArr = json[QLatin1String("recordings")].toArray();
-    for(const QJsonValue& v : recsArr) {
+    for (const QJsonValue& v : recsArr) {
         session.recordings.append(MnaRecording::fromJson(v.toObject()));
     }
 
     static const QSet<QString> knownKeys = {
-        QStringLiteral("id"), QStringLiteral("recordings")
-    };
+        QStringLiteral("id"), QStringLiteral("recordings")};
     for (auto it = json.constBegin(); it != json.constEnd(); ++it) {
         if (!knownKeys.contains(it.key()))
             session.extras.insert(it.key(), it.value());
@@ -81,7 +80,7 @@ QCborMap MnaSession::toCbor() const
     cbor[QLatin1String("id")] = id;
 
     QCborArray recsArr;
-    for(const MnaRecording& r : recordings) {
+    for (const MnaRecording& r : recordings) {
         recsArr.append(r.toCbor());
     }
     cbor[QLatin1String("recordings")] = recsArr;
@@ -97,13 +96,12 @@ MnaSession MnaSession::fromCbor(const QCborMap& cbor)
     session.id = cbor[QLatin1String("id")].toString();
 
     const QCborArray recsArr = cbor[QLatin1String("recordings")].toArray();
-    for(const QCborValue& v : recsArr) {
+    for (const QCborValue& v : recsArr) {
         session.recordings.append(MnaRecording::fromCbor(v.toMap()));
     }
 
     static const QSet<QString> knownKeys = {
-        QStringLiteral("id"), QStringLiteral("recordings")
-    };
+        QStringLiteral("id"), QStringLiteral("recordings")};
     QJsonObject cborJson = cbor.toJsonObject();
     for (auto it = cborJson.constBegin(); it != cborJson.constEnd(); ++it) {
         if (!knownKeys.contains(it.key()))

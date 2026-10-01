@@ -40,8 +40,9 @@
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-namespace Ui {
-    class TMSIImpedanceWidget;
+namespace Ui
+{
+class TMSIImpedanceWidget;
 }
 
 //=============================================================================================================
@@ -68,7 +69,7 @@ class TMSIImpedanceWidget : public QWidget
     Q_OBJECT
 
 public:
-    explicit TMSIImpedanceWidget(TMSI* pTMSI, QWidget *parent = 0);
+    explicit TMSIImpedanceWidget(TMSI* pTMSI, QWidget* parent = 0);
     ~TMSIImpedanceWidget();
 
     //=========================================================================================================
@@ -84,17 +85,17 @@ public:
     void initGraphicScene();
 
 private:
-    TMSI*                                       m_pTMSI;                    /**< The pointer back to the TMSI plugin.*/
+    TMSI* m_pTMSI; /**< The pointer back to the TMSI plugin.*/
 
-    TMSIImpedanceScene*                         m_qGScene;                  /**< The QGraphicScene.*/
+    TMSIImpedanceScene* m_qGScene; /**< The QGraphicScene.*/
 
-    QMap< QString, int >                        m_qmElectrodeNameIndex;     /**< Lookup table for electrode name and their corresponding index in the received data matrix.*/
+    QMap<QString, int> m_qmElectrodeNameIndex; /**< Lookup table for electrode name and their corresponding index in the received data matrix.*/
 
-    Ui::TMSIImpedanceWidget*                    ui;                         /**< The user interface for the TMSIImpedanceWidget.*/
+    Ui::TMSIImpedanceWidget* ui; /**< The user interface for the TMSIImpedanceWidget.*/
 
-    QSharedPointer<DISPLIB::ColorMap>           m_cbColorMap;               /**< The pointer the colormap object.*/
+    QSharedPointer<DISPLIB::ColorMap> m_cbColorMap; /**< The pointer the colormap object.*/
 
-    double                                      m_dMaxImpedance;            /**< Maximum impedance value. This is a fixed value to scale the color map.*/
+    double m_dMaxImpedance; /**< Maximum impedance value. This is a fixed value to scale the color map.*/
 
     //=========================================================================================================
     /**
@@ -130,7 +131,7 @@ private:
     /**
      * Reimplemnted closing event handler. Used to stop the measurement when closing the widget.
      */
-    void closeEvent(QCloseEvent *event);
+    void closeEvent(QCloseEvent* event);
 
     //=========================================================================================================
     /**

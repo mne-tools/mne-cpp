@@ -63,9 +63,9 @@ void TestFiffAnnotationEventUtils::testAnnotationsFromEvents()
 {
     // 3 events at samples 0, 100, 200 with event ids 1, 2, 3
     MatrixXi events(3, 3);
-    events << 0,   0, 1,
-              100, 0, 2,
-              200, 0, 3;
+    events << 0, 0, 1,
+        100, 0, 2,
+        200, 0, 3;
 
     const double sfreq = 100.0;
     FiffAnnotations annot = annotationsFromEvents(events, sfreq);
@@ -93,9 +93,9 @@ void TestFiffAnnotationEventUtils::testAnnotationsFromEvents()
 void TestFiffAnnotationEventUtils::testAnnotationsFromEventsWithMap()
 {
     MatrixXi events(3, 3);
-    events << 0,   0, 1,
-              100, 0, 2,
-              200, 0, 3;
+    events << 0, 0, 1,
+        100, 0, 2,
+        200, 0, 3;
 
     QMap<int, QString> descMap;
     descMap[1] = "auditory/left";
@@ -152,7 +152,7 @@ void TestFiffAnnotationEventUtils::testEventsFromAnnotationsWithMap()
     annot.append(2.0, 0.0, "visual");
 
     QMap<QString, int> eventIds;
-    eventIds["auditory/left"]  = 1;
+    eventIds["auditory/left"] = 1;
     eventIds["auditory/right"] = 2;
     // "visual" not in map and not parseable as int -> event_id = 0
 
@@ -171,10 +171,10 @@ void TestFiffAnnotationEventUtils::testRoundTrip()
 {
     // events -> annotations -> events
     MatrixXi original(4, 3);
-    original << 0,   0, 10,
-                500, 0, 20,
-                1000,0, 30,
-                1500,0, 10;
+    original << 0, 0, 10,
+        500, 0, 20,
+        1000, 0, 30,
+        1500, 0, 10;
 
     const double sfreq = 500.0;
 
@@ -269,13 +269,13 @@ void TestFiffAnnotationEventUtils::testFirstSampleOffset()
     // Events with samples relative to firstSample
     MatrixXi events(2, 3);
     events << 1000, 0, 1,
-              1200, 0, 2;
+        1200, 0, 2;
 
     FiffAnnotations annot = annotationsFromEvents(events, sfreq, QMap<int, QString>(), firstSample);
 
     QCOMPARE(annot.size(), 2);
-    QVERIFY(qAbs(annot[0].onset - 0.0) < 1e-9);   // (1000 - 1000) / 200 = 0.0
-    QVERIFY(qAbs(annot[1].onset - 1.0) < 1e-9);   // (1200 - 1000) / 200 = 1.0
+    QVERIFY(qAbs(annot[0].onset - 0.0) < 1e-9); // (1000 - 1000) / 200 = 0.0
+    QVERIFY(qAbs(annot[1].onset - 1.0) < 1e-9); // (1200 - 1000) / 200 = 1.0
 
     // Convert back with firstSample
     MatrixXi recovered = eventsFromAnnotations(annot, sfreq, QMap<QString, int>(), firstSample);

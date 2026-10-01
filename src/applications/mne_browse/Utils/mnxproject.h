@@ -31,7 +31,8 @@ class QTemporaryDir;
 // DEFINE NAMESPACE
 //=============================================================================================================
 
-namespace MNEBROWSE {
+namespace MNEBROWSE
+{
 
 //=============================================================================================================
 /**
@@ -110,7 +111,10 @@ public:
     void close();
 
     /** @return Path to the .mnx file that was opened (empty for unsaved new projects). */
-    QString mnxFilePath() const { return m_mnxFilePath; }
+    QString mnxFilePath() const
+    {
+        return m_mnxFilePath;
+    }
 
     // ── Paths to extracted files (empty if not present) ──────────────
 
@@ -136,7 +140,10 @@ public:
     QString inversePath() const;
 
     /** @return The parsed manifest settings (view, filter, averaging, etc.). */
-    QJsonObject settings() const { return m_settings; }
+    QJsonObject settings() const
+    {
+        return m_settings;
+    }
 
     /** @return The base temp directory path. */
     QString tempDir() const;

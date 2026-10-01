@@ -62,9 +62,9 @@ InvTrapMusic::InvTrapMusic(int iMaxSources, double dThreshold)
 //=============================================================================================================
 
 QList<TrapMusicDipole> InvTrapMusic::compute(const MatrixXd& matLeadField,
-                                              const MatrixXd& matData,
-                                              const MatrixXd& matSourcePos,
-                                              int iNOrient) const
+                                             const MatrixXd& matData,
+                                             const MatrixXd& matSourcePos,
+                                             int iNOrient) const
 {
     QList<TrapMusicDipole> dipoles;
 
@@ -83,13 +83,12 @@ QList<TrapMusicDipole> InvTrapMusic::compute(const MatrixXd& matLeadField,
     // Determine signal subspace dimension: look for a significant gap in singular values
     int nSignal = 1;
     for (int i = 1; i < singVals.size(); ++i) {
-        if (singVals[i] < singVals[0] * 0.05)  // Below 5% of max
+        if (singVals[i] < singVals[0] * 0.05) // Below 5% of max
             break;
         ++nSignal;
     }
     nSignal = std::max(nSignal, m_iMaxSources);
-    nSignal = std::min(nSignal, static_cast<int>(std::min(dataSvd.matrixU().cols(),
-                                                           static_cast<Index>(nCh / 2))));
+    nSignal = std::min(nSignal, static_cast<int>(std::min(dataSvd.matrixU().cols(), static_cast<Index>(nCh / 2))));
 
     // Signal subspace: U_s columns
     MatrixXd signalSubspace = dataSvd.matrixU().leftCols(nSignal);
@@ -109,7 +108,7 @@ QList<TrapMusicDipole> InvTrapMusic::compute(const MatrixXd& matLeadField,
         ssDim = std::min(ssDim, static_cast<int>(projSS.cols()));
 
         JacobiSVD<MatrixXd> ssSvd(projSS, ComputeThinU);
-        MatrixXd truncSS = ssSvd.matrixU().leftCols(ssDim);  // Truncation step
+        MatrixXd truncSS = ssSvd.matrixU().leftCols(ssDim); // Truncation step
 
         // Scan correlations
         VectorXd correlations = scanCorrelations(projLF, truncSS, iNOrient);
@@ -146,7 +145,7 @@ QList<TrapMusicDipole> InvTrapMusic::compute(const MatrixXd& matLeadField,
         // Project out the found source from the lead field (RAP step)
         MatrixXd lfSrc = matLeadField.block(0, colStart, nCh, iNOrient);
         MatrixXd lfOrth = lfSrc.householderQr().householderQ() *
-                          MatrixXd::Identity(nCh, iNOrient);
+            MatrixXd::Identity(nCh, iNOrient);
         projector = projector - lfOrth * lfOrth.transpose() * projector;
     }
 
@@ -156,8 +155,8 @@ QList<TrapMusicDipole> InvTrapMusic::compute(const MatrixXd& matLeadField,
 //=============================================================================================================
 
 VectorXd InvTrapMusic::scanCorrelations(const MatrixXd& matLeadField,
-                                          const MatrixXd& matSignalSubspace,
-                                          int iNOrient)
+                                        const MatrixXd& matSignalSubspace,
+                                        int iNOrient)
 {
     const int nSrcTotal = static_cast<int>(matLeadField.cols()) / iNOrient;
     VectorXd correlations(nSrcTotal);

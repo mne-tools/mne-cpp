@@ -57,7 +57,7 @@ public:
      * @param[in] parent pointer to parent widget; If parent is 0, the new TMSIManualAnnotationWidget becomes a window. If parent is another widget, TMSIManualAnnotationWidget becomes a child window inside parent. TMSIManualAnnotationWidget is deleted when its parent is deleted.
      * @param[in] pTMSI a pointer to the corresponding ECGSimulator.
      */
-    TMSIManualAnnotationWidget(TMSI* pTMSI, QWidget *parent = 0);
+    TMSIManualAnnotationWidget(TMSI* pTMSI, QWidget* parent = 0);
 
     //=========================================================================================================
     /**
@@ -74,11 +74,11 @@ public:
     void initGui();
 
 private:
-    TMSI*           m_pTMSI;                /**< a pointer to corresponding TMSI.*/
+    TMSI* m_pTMSI; /**< a pointer to corresponding TMSI.*/
 
-    Ui::TMSIManualAnnotationWidget ui;      /**< the user interface for the TMSIManualAnnotationWidget.*/
+    Ui::TMSIManualAnnotationWidget ui; /**< the user interface for the TMSIManualAnnotationWidget.*/
 
-    virtual void  keyPressEvent(QKeyEvent *event);
+    virtual void keyPressEvent(QKeyEvent* event);
 };
 } // NAMESPACE
 

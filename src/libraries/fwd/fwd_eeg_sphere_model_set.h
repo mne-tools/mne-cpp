@@ -55,7 +55,8 @@
 // DEFINE NAMESPACE FWDLIB
 //=============================================================================================================
 
-namespace FWDLIB {
+namespace FWDLIB
+{
 
 //=============================================================================================================
 // FIFFLIB FORWARD DECLARATIONS
@@ -70,9 +71,8 @@ namespace FWDLIB {
 
 class FWDSHARED_EXPORT FwdEegSphereModelSet
 {
-
 public:
-    typedef std::unique_ptr<FwdEegSphereModelSet> UPtr;   /**< Unique pointer type for FwdEegSphereModelSet. */
+    typedef std::unique_ptr<FwdEegSphereModelSet> UPtr; /**< Unique pointer type for FwdEegSphereModelSet. */
 
     //=========================================================================================================
     /**
@@ -153,7 +153,7 @@ public:
     }
 
 public:
-    std::vector<FwdEegSphereModel::UPtr> models;     /**< Set of EEG sphere model definitions. */
+    std::vector<FwdEegSphereModel::UPtr> models; /**< Set of EEG sphere model definitions. */
 };
 
 //=============================================================================================================

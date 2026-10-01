@@ -83,9 +83,9 @@ static QVariant defaultVariant;
  * by both name (@c operator[](QString)) and index
  * (@c operator[](qint32)).
  */
-class COMSHARED_EXPORT Command: public QObject, public UTILSLIB::ICommand
+class COMSHARED_EXPORT Command : public QObject, public UTILSLIB::ICommand
 {
-Q_OBJECT
+    Q_OBJECT
 
 public:
     typedef QSharedPointer<Command> SPtr;
@@ -98,7 +98,7 @@ public:
      * @param[in] p_bIsJson      If is received/should be send as JSON (optional, default true).
      * @param[in] parent         Parent QObject (optional).
      */
-    explicit Command(bool p_bIsJson = true, QObject *parent = 0);
+    explicit Command(bool p_bIsJson = true, QObject* parent = 0);
 
     //=========================================================================================================
     /**
@@ -109,7 +109,7 @@ public:
      * @param[in] p_bIsJson          If is received/should be send as JSON (optional, default true).
      * @param[in] parent             Parent QObject (optional).
      */
-    explicit Command(const QString &p_sCommand, const QJsonObject &p_qCommandContent, bool p_bIsJson = true, QObject *parent = 0);
+    explicit Command(const QString& p_sCommand, const QJsonObject& p_qCommandContent, bool p_bIsJson = true, QObject* parent = 0);
 
     //=========================================================================================================
     /**
@@ -120,7 +120,7 @@ public:
      * @param[in] p_bIsJson          If is received/should be send as JSON (optional, default true).
      * @param[in] parent             Parent QObject (optional).
      */
-    explicit Command(const QString &p_sCommand, const QString &p_sDescription, bool p_bIsJson = true, QObject *parent = 0);
+    explicit Command(const QString& p_sCommand, const QString& p_sDescription, bool p_bIsJson = true, QObject* parent = 0);
 
     //=========================================================================================================
     /**
@@ -133,8 +133,8 @@ public:
      * @param[in] p_bIsJson          If is received/should be send as JSON (optional, default true).
      * @param[in] parent             Parent QObject (optional).
      */
-    explicit Command(const QString &p_sCommand, const QString &p_sDescription,
-                     const QStringList &p_qListParamNames, const QList<QVariant> &p_qListParamValues, bool p_bIsJson = true, QObject *parent = 0);
+    explicit Command(const QString& p_sCommand, const QString& p_sDescription,
+                     const QStringList& p_qListParamNames, const QList<QVariant>& p_qListParamValues, bool p_bIsJson = true, QObject* parent = 0);
 
     //=========================================================================================================
     /**
@@ -148,8 +148,8 @@ public:
      * @param[in] p_bIsJson Whether the command is exchanged in JSON format.
      * @param[in] parent Parent QObject.
      */
-    explicit Command(const QString &p_sCommand, const QString &p_sDescription,
-                     const QStringList &p_qListParamNames, const QList<QVariant> &p_qListParamValues, const QStringList &p_vecParameterDescriptions, bool p_bIsJson = true, QObject *parent = 0);
+    explicit Command(const QString& p_sCommand, const QString& p_sDescription,
+                     const QStringList& p_qListParamNames, const QList<QVariant>& p_qListParamValues, const QStringList& p_vecParameterDescriptions, bool p_bIsJson = true, QObject* parent = 0);
 
     //=========================================================================================================
     /**
@@ -157,7 +157,7 @@ public:
      *
      * @param[in] p_Command      Command to be copied.
      */
-    Command(const Command &p_Command);
+    Command(const Command& p_Command);
 
     //=========================================================================================================
     /**
@@ -233,7 +233,7 @@ public:
      *
      * @param[in] p_sReply   command reply.
      */
-    void reply(const QString &p_sReply);
+    void reply(const QString& p_sReply);
 
     //=========================================================================================================
     /**
@@ -273,7 +273,7 @@ public:
      *
      * @return Reference to this object.
      */
-    Command& operator= (const Command &rhs);
+    Command& operator=(const Command& rhs);
 
     //=========================================================================================================
     /**
@@ -283,7 +283,7 @@ public:
      *
      * @return Parameter value related to the parameter name.
      */
-    QVariant& operator[] (const QString &key);
+    QVariant& operator[](const QString& key);
 
     //=========================================================================================================
     /**
@@ -293,7 +293,7 @@ public:
      *
      * @return Parameter value related to the parameter index.
      */
-    QVariant& operator[] (qint32 idx);
+    QVariant& operator[](qint32 idx);
 
     //=========================================================================================================
     /**
@@ -303,7 +303,7 @@ public:
      *
      * @return Parameter value related to the parameter name.
      */
-    const QVariant operator[] (const QString &key) const;
+    const QVariant operator[](const QString& key) const;
 
 signals:
     //=========================================================================================================
@@ -315,12 +315,12 @@ signals:
     void executed(Command p_command);
 
 public:
-    QString             m_sCommand;                 /**< The command keyword. */
-    QString             m_sDescription;             /**< Human-readable description of the command. */
-    QStringList         m_qListParamNames;          /**< Parameter names (positional order). */
-    QList<QVariant>     m_qListParamValues;         /**< Current parameter values (same order as names). */
-    QStringList         m_qListParamDescriptions;   /**< Per-parameter description strings. */
-    bool                m_bIsJson;                  /**< True when the command was parsed from JSON. */
+    QString m_sCommand;                   /**< The command keyword. */
+    QString m_sDescription;               /**< Human-readable description of the command. */
+    QStringList m_qListParamNames;        /**< Parameter names (positional order). */
+    QList<QVariant> m_qListParamValues;   /**< Current parameter values (same order as names). */
+    QStringList m_qListParamDescriptions; /**< Per-parameter description strings. */
+    bool m_bIsJson;                       /**< True when the command was parsed from JSON. */
 };
 
 //=============================================================================================================

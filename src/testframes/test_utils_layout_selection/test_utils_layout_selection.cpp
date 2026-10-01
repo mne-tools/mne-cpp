@@ -338,8 +338,7 @@ void TestUtilsLayoutSelection::testMakeLayoutStdVectorNoFit()
         {0.1f, 0.0f, 0.0f},
         {0.0f, 0.1f, 0.0f},
         {-0.1f, 0.0f, 0.0f},
-        {0.0f, -0.1f, 0.0f}
-    };
+        {0.0f, -0.1f, 0.0f}};
 
     std::vector<std::vector<float>> outputPoints;
     std::vector<std::string> names = {"Ch1", "Ch2", "Ch3", "Ch4"};
@@ -364,8 +363,7 @@ void TestUtilsLayoutSelection::testMakeLayoutStdVectorWithFit()
         {0.0f, 0.1f, 0.05f},
         {-0.1f, 0.0f, 0.05f},
         {0.0f, -0.1f, 0.05f},
-        {0.05f, 0.05f, 0.07f}
-    };
+        {0.05f, 0.05f, 0.07f}};
 
     std::vector<std::vector<float>> outputPoints;
     std::vector<std::string> names = {"Ch1", "Ch2", "Ch3", "Ch4", "Ch5"};
@@ -385,8 +383,7 @@ void TestUtilsLayoutSelection::testMakeLayoutStdVectorMirrorX()
     std::vector<std::vector<float>> inputPoints = {
         {0.1f, 0.0f, 0.0f},
         {0.0f, 0.1f, 0.0f},
-        {-0.1f, 0.0f, 0.0f}
-    };
+        {-0.1f, 0.0f, 0.0f}};
 
     std::vector<std::vector<float>> outputNormal, outputMirrored;
     std::vector<std::string> names = {"Ch1", "Ch2", "Ch3"};
@@ -412,8 +409,7 @@ void TestUtilsLayoutSelection::testMakeLayoutStdVectorWriteFile()
     std::vector<std::vector<float>> inputPoints = {
         {0.1f, 0.0f, 0.0f},
         {0.0f, 0.1f, 0.0f},
-        {-0.1f, 0.0f, 0.0f}
-    };
+        {-0.1f, 0.0f, 0.0f}};
 
     std::vector<std::vector<float>> outputPoints;
     std::vector<std::string> names = {"Ch1", "Ch2", "Ch3"};

@@ -42,7 +42,7 @@ using namespace Eigen;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-template <class T>
+template<class T>
 InvDipole<T>::InvDipole()
 : m_vecPosition(Matrix<T, 3, 1>::Zero(3))
 , m_vecDirection(Matrix<T, 3, 1>::Zero(3))
@@ -53,14 +53,14 @@ InvDipole<T>::InvDipole()
 
 //=============================================================================================================
 
-template <class T>
+template<class T>
 InvDipole<T>::~InvDipole()
 {
 }
 
 //=============================================================================================================
 
-template <class T>
+template<class T>
 void InvDipole<T>::clean()
 {
     m_vecPosition.setZero();
@@ -68,6 +68,6 @@ void InvDipole<T>::clean()
     m_dLength = 1;
     m_dFrequency = 0;
 }
-}//Namespace
+} //Namespace
 
 #endif //DIPOLE_SOURCES

@@ -79,7 +79,7 @@ public:
      * @param[in] filePath      string of the filepath where data will be stored.
      *
      */
-    virtual void start(std::vector<QString> &serials, std::vector<int> channels, int sampleRate);
+    virtual void start(std::vector<QString>& serials, std::vector<int> channels, int sampleRate);
 
     //=========================================================================================================
     /**
@@ -103,13 +103,13 @@ protected:
     virtual void run();
 
 private:
-    GUSBAmp*                        m_pGUSBAmp;            /**< A pointer to the corresponding GUSBAmp class.*/
-    QSharedPointer<GUSBAmpDriver>   m_pGUSBAmpDriver;      /**< A pointer to the corresponding GUSBAmp driver class.*/
+    GUSBAmp* m_pGUSBAmp;                            /**< A pointer to the corresponding GUSBAmp class.*/
+    QSharedPointer<GUSBAmpDriver> m_pGUSBAmpDriver; /**< A pointer to the corresponding GUSBAmp driver class.*/
 
-    int                 m_iSampRate;            /**< sample rate of the device. */
-    QString             m_sFilePath;            /**< path of the file of written data. */
-    std::vector<QString>     m_vSerials;             /**< vector with the serial numbers of the devices*/
-    std::vector<int>         m_viSizeOfSampleMatrix; /**< size of the sample matrix [rows columns]. */
+    int m_iSampRate;                         /**< sample rate of the device. */
+    QString m_sFilePath;                     /**< path of the file of written data. */
+    std::vector<QString> m_vSerials;         /**< vector with the serial numbers of the devices*/
+    std::vector<int> m_viSizeOfSampleMatrix; /**< size of the sample matrix [rows columns]. */
 };
 } // NAMESPACE
 

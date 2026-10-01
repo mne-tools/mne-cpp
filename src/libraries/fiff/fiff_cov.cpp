@@ -64,13 +64,13 @@ FiffCov::FiffCov()
 , dim(-1)
 , nfree(-1)
 {
-    qRegisterMetaType<QSharedPointer<FIFFLIB::FiffCov> >("QSharedPointer<FIFFLIB::FiffCov>");
+    qRegisterMetaType<QSharedPointer<FIFFLIB::FiffCov>>("QSharedPointer<FIFFLIB::FiffCov>");
     qRegisterMetaType<FIFFLIB::FiffCov>("FIFFLIB::FiffCov");
 }
 
 //=============================================================================================================
 
-FiffCov::FiffCov(QIODevice &p_IODevice)
+FiffCov::FiffCov(QIODevice& p_IODevice)
 : kind(-1)
 , diag(false)
 , dim(-1)
@@ -78,21 +78,20 @@ FiffCov::FiffCov(QIODevice &p_IODevice)
 {
     FiffStream::SPtr t_pStream(new FiffStream(&p_IODevice));
 
-    if(!t_pStream->open())
-    {
+    if (!t_pStream->open()) {
         throw std::runtime_error("Not able to open IODevice");
     }
 
-    if(!t_pStream->read_cov(t_pStream->dirtree(), FIFFV_MNE_NOISE_COV, *this))
+    if (!t_pStream->read_cov(t_pStream->dirtree(), FIFFV_MNE_NOISE_COV, *this))
         throw std::runtime_error("Fiff covariance not found");
 
-    qRegisterMetaType<QSharedPointer<FIFFLIB::FiffCov> >("QSharedPointer<FIFFLIB::FiffCov>");
+    qRegisterMetaType<QSharedPointer<FIFFLIB::FiffCov>>("QSharedPointer<FIFFLIB::FiffCov>");
     qRegisterMetaType<FIFFLIB::FiffCov>("FIFFLIB::FiffCov");
 }
 
 //=============================================================================================================
 
-FiffCov::FiffCov(const FiffCov &p_FiffCov)
+FiffCov::FiffCov(const FiffCov& p_FiffCov)
 : QSharedData(p_FiffCov)
 , kind(p_FiffCov.kind)
 , diag(p_FiffCov.diag)
@@ -105,7 +104,7 @@ FiffCov::FiffCov(const FiffCov &p_FiffCov)
 , eig(p_FiffCov.eig)
 , eigvec(p_FiffCov.eigvec)
 {
-    qRegisterMetaType<QSharedPointer<FIFFLIB::FiffCov> >("QSharedPointer<FIFFLIB::FiffCov>");
+    qRegisterMetaType<QSharedPointer<FIFFLIB::FiffCov>>("QSharedPointer<FIFFLIB::FiffCov>");
     qRegisterMetaType<FIFFLIB::FiffCov>("FIFFLIB::FiffCov");
 }
 
@@ -133,26 +132,26 @@ void FiffCov::clear()
 
 //=============================================================================================================
 
-FiffCov FiffCov::pick_channels(const QStringList &p_include, const QStringList &p_exclude)
+FiffCov FiffCov::pick_channels(const QStringList& p_include, const QStringList& p_exclude)
 {
     RowVectorXi sel = FiffInfoBase::pick_channels(this->names, p_include, p_exclude);
-    FiffCov res;//No deep copy here - since almost everything else is adapted anyway
+    FiffCov res; //No deep copy here - since almost everything else is adapted anyway
 
     res.kind = this->kind;
     res.diag = this->diag;
     res.dim = sel.size();
 
-    for(qint32 k = 0; k < sel.size(); ++k)
+    for (qint32 k = 0; k < sel.size(); ++k)
         res.names << this->names[sel(k)];
 
     res.data.resize(res.dim, res.dim);
-    for(qint32 i = 0; i < res.dim; ++i)
-        for(qint32 j = 0; j < res.dim; ++j)
+    for (qint32 i = 0; i < res.dim; ++i)
+        for (qint32 j = 0; j < res.dim; ++j)
             res.data(i, j) = this->data(sel(i), sel(j));
     res.projs = this->projs;
 
-    for(qint32 k = 0; k < this->bads.size(); ++k)
-        if(res.names.contains(this->bads[k]))
+    for (qint32 k = 0; k < this->bads.size(); ++k)
+        if (res.names.contains(this->bads[k]))
             res.bads << this->bads[k];
     res.nfree = this->nfree;
 
@@ -161,17 +160,15 @@ FiffCov FiffCov::pick_channels(const QStringList &p_include, const QStringList &
 
 //=============================================================================================================
 
-FiffCov FiffCov::prepare_noise_cov(const FiffInfo &p_Info, const QStringList &p_ChNames) const
+FiffCov FiffCov::prepare_noise_cov(const FiffInfo& p_Info, const QStringList& p_ChNames) const
 {
     FiffCov p_NoiseCov(*this);
 
     VectorXi C_ch_idx = VectorXi::Zero(p_NoiseCov.names.size());
     qint32 count = 0;
-    for(qint32 i = 0; i < p_ChNames.size(); ++i)
-    {
+    for (qint32 i = 0; i < p_ChNames.size(); ++i) {
         qint32 idx = p_NoiseCov.names.indexOf(p_ChNames[i]);
-        if(idx > -1)
-        {
+        if (idx > -1) {
             C_ch_idx[count] = idx;
             ++count;
         }
@@ -180,24 +177,22 @@ FiffCov FiffCov::prepare_noise_cov(const FiffInfo &p_Info, const QStringList &p_
 
     MatrixXd C(count, count);
 
-    if(!p_NoiseCov.diag)
-        for(qint32 i = 0; i < count; ++i)
-            for(qint32 j = 0; j < count; ++j)
-                C(i,j) = p_NoiseCov.data(C_ch_idx(i), C_ch_idx(j));
-    else
-    {
+    if (!p_NoiseCov.diag)
+        for (qint32 i = 0; i < count; ++i)
+            for (qint32 j = 0; j < count; ++j)
+                C(i, j) = p_NoiseCov.data(C_ch_idx(i), C_ch_idx(j));
+    else {
         qWarning("Warning in FiffCov::prepare_noise_cov: This has to be debugged - not done before!");
         C = MatrixXd::Zero(count, count);
-        for(qint32 i = 0; i < count; ++i)
-            C.diagonal()[i] = p_NoiseCov.data(C_ch_idx(i),0);
+        for (qint32 i = 0; i < count; ++i)
+            C.diagonal()[i] = p_NoiseCov.data(C_ch_idx(i), 0);
     }
 
     MatrixXd proj;
     qint32 ncomp = p_Info.make_projector(proj, p_ChNames);
 
     //Create the projection operator
-    if (ncomp > 0 && proj.rows() == count)
-    {
+    if (ncomp > 0 && proj.rows() == count) {
         qInfo("Created an SSP operator (subspace dimension = %d)\n", ncomp);
         C = proj * (C * proj.transpose());
     } else {
@@ -209,38 +204,34 @@ FiffCov FiffCov::prepare_noise_cov(const FiffInfo &p_Info, const QStringList &p_
 
     QStringList meg_names, eeg_names;
 
-    for(qint32 i = 0; i < pick_meg.size(); ++i)
+    for (qint32 i = 0; i < pick_meg.size(); ++i)
         meg_names << p_Info.chs[pick_meg[i]].ch_name;
     VectorXi C_meg_idx = VectorXi::Zero(p_NoiseCov.names.size());
     count = 0;
-    for(qint32 k = 0; k < C.rows(); ++k)
-    {
-        if(meg_names.indexOf(p_ChNames[k]) > -1)
-        {
+    for (qint32 k = 0; k < C.rows(); ++k) {
+        if (meg_names.indexOf(p_ChNames[k]) > -1) {
             C_meg_idx[count] = k;
             ++count;
         }
     }
-    if(count > 0)
+    if (count > 0)
         C_meg_idx.conservativeResize(count);
     else
         C_meg_idx = VectorXi();
 
     //
-    for(qint32 i = 0; i < pick_eeg.size(); ++i)
-        eeg_names << p_Info.chs[pick_eeg(0,i)].ch_name;
+    for (qint32 i = 0; i < pick_eeg.size(); ++i)
+        eeg_names << p_Info.chs[pick_eeg(0, i)].ch_name;
     VectorXi C_eeg_idx = VectorXi::Zero(p_NoiseCov.names.size());
     count = 0;
-    for(qint32 k = 0; k < C.rows(); ++k)
-    {
-        if(eeg_names.indexOf(p_ChNames[k]) > -1)
-        {
+    for (qint32 k = 0; k < C.rows(); ++k) {
+        if (eeg_names.indexOf(p_ChNames[k]) > -1) {
             C_eeg_idx[count] = k;
             ++count;
         }
     }
 
-    if(count > 0)
+    if (count > 0)
         C_eeg_idx.conservativeResize(count);
     else
         C_eeg_idx = VectorXi();
@@ -251,23 +242,21 @@ FiffCov FiffCov::prepare_noise_cov(const FiffInfo &p_Info, const QStringList &p_
     MatrixXd C_meg, C_eeg;
     VectorXd C_meg_eig, C_eeg_eig;
     MatrixXd C_meg_eigvec, C_eeg_eigvec;
-    if (has_meg)
-    {
+    if (has_meg) {
         count = C_meg_idx.rows();
-        C_meg = MatrixXd(count,count);
-        for(qint32 i = 0; i < count; ++i)
-            for(qint32 j = 0; j < count; ++j)
-                C_meg(i,j) = C(C_meg_idx(i), C_meg_idx(j));
+        C_meg = MatrixXd(count, count);
+        for (qint32 i = 0; i < count; ++i)
+            for (qint32 j = 0; j < count; ++j)
+                C_meg(i, j) = C(C_meg_idx(i), C_meg_idx(j));
         Linalg::get_whitener(C_meg, false, QString("MEG"), C_meg_eig, C_meg_eigvec);
     }
 
-    if (has_eeg)
-    {
+    if (has_eeg) {
         count = C_eeg_idx.rows();
-        C_eeg = MatrixXd(count,count);
-        for(qint32 i = 0; i < count; ++i)
-            for(qint32 j = 0; j < count; ++j)
-                C_eeg(i,j) = C(C_eeg_idx(i), C_eeg_idx(j));
+        C_eeg = MatrixXd(count, count);
+        for (qint32 i = 0; i < count; ++i)
+            for (qint32 j = 0; j < count; ++j)
+                C_eeg(i, j) = C(C_eeg_idx(i), C_eeg_idx(j));
         Linalg::get_whitener(C_eeg, false, QString("EEG"), C_eeg_eig, C_eeg_eigvec);
     }
 
@@ -275,25 +264,22 @@ FiffCov FiffCov::prepare_noise_cov(const FiffInfo &p_Info, const QStringList &p_
     p_NoiseCov.eigvec = MatrixXd::Zero(n_chan, n_chan);
     p_NoiseCov.eig = VectorXd::Zero(n_chan);
 
-    if(has_meg)
-    {
-        for(qint32 i = 0; i < C_meg_idx.rows(); ++i)
-            for(qint32 j = 0; j < C_meg_idx.rows(); ++j)
+    if (has_meg) {
+        for (qint32 i = 0; i < C_meg_idx.rows(); ++i)
+            for (qint32 j = 0; j < C_meg_idx.rows(); ++j)
                 p_NoiseCov.eigvec(C_meg_idx[i], C_meg_idx[j]) = C_meg_eigvec(i, j);
-        for(qint32 i = 0; i < C_meg_idx.rows(); ++i)
+        for (qint32 i = 0; i < C_meg_idx.rows(); ++i)
             p_NoiseCov.eig(C_meg_idx[i]) = C_meg_eig[i];
     }
-    if(has_eeg)
-    {
-        for(qint32 i = 0; i < C_eeg_idx.rows(); ++i)
-            for(qint32 j = 0; j < C_eeg_idx.rows(); ++j)
+    if (has_eeg) {
+        for (qint32 i = 0; i < C_eeg_idx.rows(); ++i)
+            for (qint32 j = 0; j < C_eeg_idx.rows(); ++j)
                 p_NoiseCov.eigvec(C_eeg_idx[i], C_eeg_idx[j]) = C_eeg_eigvec(i, j);
-        for(qint32 i = 0; i < C_eeg_idx.rows(); ++i)
+        for (qint32 i = 0; i < C_eeg_idx.rows(); ++i)
             p_NoiseCov.eig(C_eeg_idx[i]) = C_eeg_eig[i];
     }
 
-    if (C_meg_idx.size() + C_eeg_idx.size() != n_chan)
-    {
+    if (C_meg_idx.size() + C_eeg_idx.size() != n_chan) {
         qWarning("FiffCov::prepare_noise_cov: %lld MEG + %lld EEG channels != %d total (unclassified channels present)",
                  (long long)C_meg_idx.size(), (long long)C_eeg_idx.size(), n_chan);
     }
@@ -312,17 +298,16 @@ FiffCov FiffCov::regularize(const FiffInfo& p_info, double p_fRegMag, double p_f
 {
     FiffCov cov(*this);
 
-    if(p_exclude.size() == 0)
-    {
+    if (p_exclude.size() == 0) {
         p_exclude = p_info.bads;
-        for(qint32 i = 0; i < cov.bads.size(); ++i)
-            if(!p_exclude.contains(cov.bads[i]))
+        for (qint32 i = 0; i < cov.bads.size(); ++i)
+            if (!p_exclude.contains(cov.bads[i]))
                 p_exclude << cov.bads[i];
     }
 
     //Allways exclude all STI channels from covariance computation
-    for(int i=0; i<p_info.chs.size(); i++) {
-        if(p_info.chs[i].kind == FIFFV_STIM_CH) {
+    for (int i = 0; i < p_info.chs.size(); i++) {
+        if (p_info.chs[i].kind == FIFFV_STIM_CH) {
             p_exclude << p_info.chs[i].ch_name;
         }
     }
@@ -333,11 +318,11 @@ FiffCov FiffCov::regularize(const FiffInfo& p_info, double p_fRegMag, double p_f
 
     QStringList info_ch_names = p_info.ch_names;
     QStringList ch_names_eeg, ch_names_mag, ch_names_grad;
-    for(qint32 i = 0; i < sel_eeg.size(); ++i)
+    for (qint32 i = 0; i < sel_eeg.size(); ++i)
         ch_names_eeg << info_ch_names[sel_eeg(i)];
-    for(qint32 i = 0; i < sel_mag.size(); ++i)
+    for (qint32 i = 0; i < sel_mag.size(); ++i)
         ch_names_mag << info_ch_names[sel_mag(i)];
-    for(qint32 i = 0; i < sel_grad.size(); ++i)
+    for (qint32 i = 0; i < sel_grad.size(); ++i)
         ch_names_grad << info_ch_names[sel_grad(i)];
 
     // This actually removes bad channels from the cov, which is not backward
@@ -346,66 +331,61 @@ FiffCov FiffCov::regularize(const FiffInfo& p_info, double p_fRegMag, double p_f
     QStringList ch_names = cov_good.names;
 
     std::vector<qint32> idx_eeg, idx_mag, idx_grad;
-    for(qint32 i = 0; i < ch_names.size(); ++i)
-    {
-        if(ch_names_eeg.contains(ch_names[i]))
+    for (qint32 i = 0; i < ch_names.size(); ++i) {
+        if (ch_names_eeg.contains(ch_names[i]))
             idx_eeg.push_back(i);
-        else if(ch_names_mag.contains(ch_names[i]))
+        else if (ch_names_mag.contains(ch_names[i]))
             idx_mag.push_back(i);
-        else if(ch_names_grad.contains(ch_names[i]))
+        else if (ch_names_grad.contains(ch_names[i]))
             idx_grad.push_back(i);
     }
 
     MatrixXd C(cov_good.data);
 
     //Check dimension consistency (channels not classified as EEG/MAG/GRAD, e.g. EOG/MISC, are expected)
-    if(static_cast<unsigned>(C.rows()) != idx_eeg.size() + idx_mag.size() + idx_grad.size()) {
+    if (static_cast<unsigned>(C.rows()) != idx_eeg.size() + idx_mag.size() + idx_grad.size()) {
         qWarning("FiffCov::regularize: %lld channels in cov but only %zu classified as EEG/MAG/GRAD (others will not be regularized)",
                  static_cast<long long>(C.rows()), idx_eeg.size() + idx_mag.size() + idx_grad.size());
     }
 
     QList<FiffProj> t_listProjs;
-    if(p_bProj)
-    {
+    if (p_bProj) {
         t_listProjs = p_info.projs + cov_good.projs;
         FiffProj::activate_projs(t_listProjs);
     }
 
     //Build regularization MAP
-    QMap<QString, QPair<double, std::vector<qint32> > > regData;
-    regData.insert("EEG", QPair<double, std::vector<qint32> >(p_fRegEeg, idx_eeg));
-    regData.insert("MAG", QPair<double, std::vector<qint32> >(p_fRegMag, idx_mag));
-    regData.insert("GRAD", QPair<double, std::vector<qint32> >(p_fRegGrad, idx_grad));
+    QMap<QString, QPair<double, std::vector<qint32>>> regData;
+    regData.insert("EEG", QPair<double, std::vector<qint32>>(p_fRegEeg, idx_eeg));
+    regData.insert("MAG", QPair<double, std::vector<qint32>>(p_fRegMag, idx_mag));
+    regData.insert("GRAD", QPair<double, std::vector<qint32>>(p_fRegGrad, idx_grad));
 
     //
     //Regularize
     //
-    QMap<QString, QPair<double, std::vector<qint32> > >::Iterator it;
-    for(it = regData.begin(); it != regData.end(); ++it)
-    {
+    QMap<QString, QPair<double, std::vector<qint32>>>::Iterator it;
+    for (it = regData.begin(); it != regData.end(); ++it) {
         QString desc(it.key());
         double reg = it.value().first;
         std::vector<qint32> idx = it.value().second;
 
-        if(idx.size() == 0 || reg == 0.0)
+        if (idx.size() == 0 || reg == 0.0)
             qInfo("\tNothing to regularize within %s data.\n", desc.toUtf8().constData());
-        else
-        {
+        else {
             qInfo("\tRegularize %s: %f\n", desc.toUtf8().constData(), reg);
             MatrixXd this_C(idx.size(), idx.size());
-            for(quint32 i = 0; i < idx.size(); ++i)
-                for(quint32 j = 0; j < idx.size(); ++j)
-                    this_C(i,j) = cov_good.data(idx[i], idx[j]);
+            for (quint32 i = 0; i < idx.size(); ++i)
+                for (quint32 j = 0; j < idx.size(); ++j)
+                    this_C(i, j) = cov_good.data(idx[i], idx[j]);
 
             MatrixXd U;
             // Only assigned when projecting, but read again below to decide
             // whether the SSP operator has to be undone. Without projection
             // there are no components to remove.
             qint32 ncomp = 0;
-            if(p_bProj)
-            {
+            if (p_bProj) {
                 QStringList this_ch_names;
-                for(quint32 k = 0; k < idx.size(); ++k)
+                for (quint32 k = 0; k < idx.size(); ++k)
                     this_ch_names << ch_names[idx[k]];
 
                 MatrixXd P;
@@ -417,30 +397,29 @@ FiffCov FiffCov::regularize(const FiffInfo& p_info, double p_fRegMag, double p_f
                 MatrixXd t_U = svd.matrixU();
                 Linalg::sort<double>(t_s, t_U);
 
-                U = t_U.block(0,0, t_U.rows(), t_U.cols()-ncomp);
+                U = t_U.block(0, 0, t_U.rows(), t_U.cols() - ncomp);
 
-                if (ncomp > 0)
-                {
+                if (ncomp > 0) {
                     qInfo("\tCreated an SSP operator for %s (dimension = %d).\n", desc.toUtf8().constData(), ncomp);
                     this_C = U.transpose() * (this_C * U);
                 }
             }
 
             double sigma = this_C.diagonal().mean();
-            this_C.diagonal() = this_C.diagonal().array() + reg * sigma;  // modify diag inplace
-            if(p_bProj && ncomp > 0)
+            this_C.diagonal() = this_C.diagonal().array() + reg * sigma; // modify diag inplace
+            if (p_bProj && ncomp > 0)
                 this_C = U * (this_C * U.transpose());
 
-            for(qint32 i = 0; i < this_C.rows(); ++i)
-                for(qint32 j = 0; j < this_C.cols(); ++j)
-                    C(idx[i],idx[j]) = this_C(i,j);
+            for (qint32 i = 0; i < this_C.rows(); ++i)
+                for (qint32 j = 0; j < this_C.cols(); ++j)
+                    C(idx[i], idx[j]) = this_C(i, j);
         }
     }
 
     // Put data back in correct locations
     RowVectorXi idx = FiffInfo::pick_channels(cov.names, info_ch_names, p_exclude);
-    for(qint32 i = 0; i < idx.size(); ++i)
-        for(qint32 j = 0; j < idx.size(); ++j)
+    for (qint32 i = 0; i < idx.size(); ++i)
+        for (qint32 j = 0; j < idx.size(); ++j)
             cov.data(idx[i], idx[j]) = C(i, j);
 
     return cov;
@@ -448,7 +427,7 @@ FiffCov FiffCov::regularize(const FiffInfo& p_info, double p_fRegMag, double p_f
 
 //=============================================================================================================
 
-FiffCov& FiffCov::operator= (const FiffCov &rhs)
+FiffCov& FiffCov::operator=(const FiffCov& rhs)
 {
     if (this != &rhs) // protect against invalid self-assignment
     {
@@ -469,21 +448,21 @@ FiffCov& FiffCov::operator= (const FiffCov &rhs)
 
 //=============================================================================================================
 
-FiffCov FiffCov::compute_from_epochs(const FiffRawData &raw,
-                                      const MatrixXi &events,
-                                      const QList<int> &eventCodes,
-                                      float tmin,
-                                      float tmax,
-                                      float bmin,
-                                      float bmax,
-                                      bool doBaseline,
-                                      bool removeMean,
-                                      unsigned int ignoreMask,
-                                      float delay)
+FiffCov FiffCov::compute_from_epochs(const FiffRawData& raw,
+                                     const MatrixXi& events,
+                                     const QList<int>& eventCodes,
+                                     float tmin,
+                                     float tmax,
+                                     float bmin,
+                                     float bmax,
+                                     bool doBaseline,
+                                     bool removeMean,
+                                     unsigned int ignoreMask,
+                                     float delay)
 {
     FiffCov cov;
     float sfreq = raw.info.sfreq;
-    int nchan   = raw.info.nchan;
+    int nchan = raw.info.nchan;
 
     int minSamp = static_cast<int>(std::round(tmin * sfreq));
     int maxSamp = static_cast<int>(std::round(tmax * sfreq));
@@ -508,7 +487,7 @@ FiffCov FiffCov::compute_from_epochs(const FiffRawData &raw,
 
     for (int k = 0; k < events.rows(); ++k) {
         int evFrom = events(k, 1) & ~static_cast<int>(ignoreMask);
-        int evTo   = events(k, 2) & ~static_cast<int>(ignoreMask);
+        int evTo = events(k, 2) & ~static_cast<int>(ignoreMask);
 
         // Check if event matches any of the desired event codes
         bool match = false;
@@ -523,7 +502,7 @@ FiffCov FiffCov::compute_from_epochs(const FiffRawData &raw,
 
         int evSample = events(k, 0);
         int epochStart = evSample + delaySamp + minSamp;
-        int epochEnd   = evSample + delaySamp + maxSamp;
+        int epochEnd = evSample + delaySamp + maxSamp;
 
         if (epochStart < raw.first_samp || epochEnd > raw.last_samp)
             continue;
@@ -563,17 +542,16 @@ FiffCov FiffCov::compute_from_epochs(const FiffRawData &raw,
 
     if (removeMean) {
         VectorXd grandMean = meanAccum / static_cast<double>(totalSamples);
-        cov.data = (covAccum / static_cast<double>(totalSamples - 1))
-                   - (grandMean * grandMean.transpose()) * (static_cast<double>(totalSamples) / (totalSamples - 1));
+        cov.data = (covAccum / static_cast<double>(totalSamples - 1)) - (grandMean * grandMean.transpose()) * (static_cast<double>(totalSamples) / (totalSamples - 1));
     } else {
         cov.data = covAccum / static_cast<double>(totalSamples - 1);
     }
 
-    cov.kind  = FIFFV_MNE_NOISE_COV;
-    cov.dim   = nchan;
+    cov.kind = FIFFV_MNE_NOISE_COV;
+    cov.dim = nchan;
     cov.names = raw.info.ch_names;
     cov.nfree = totalSamples - 1;
-    cov.bads  = raw.info.bads;
+    cov.bads = raw.info.bads;
     cov.projs = raw.info.projs;
 
     qInfo() << "[FiffCov::compute_from_epochs] Computed:" << nchan << "channels,"
@@ -584,7 +562,7 @@ FiffCov FiffCov::compute_from_epochs(const FiffRawData &raw,
 
 //=============================================================================================================
 
-bool FiffCov::save(const QString &fileName) const
+bool FiffCov::save(const QString& fileName) const
 {
     if (fileName.isEmpty()) {
         qWarning() << "[FiffCov::save] Output file not specified.";
@@ -610,7 +588,7 @@ bool FiffCov::save(const QString &fileName) const
 
 //=============================================================================================================
 
-FiffCov FiffCov::computeGrandAverage(const QList<FiffCov> &covs)
+FiffCov FiffCov::computeGrandAverage(const QList<FiffCov>& covs)
 {
     FiffCov grandCov;
 

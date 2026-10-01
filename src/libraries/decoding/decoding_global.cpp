@@ -26,12 +26,21 @@
 // DEFINES
 //=============================================================================================================
 
-const char* DECODINGLIB::buildDateTime(){ return UTILSLIB::dateTimeNow();}
+const char* DECODINGLIB::buildDateTime()
+{
+    return UTILSLIB::dateTimeNow();
+}
 
 //=============================================================================================================
 
-const char* DECODINGLIB::buildHash(){ return UTILSLIB::gitHash();}
+const char* DECODINGLIB::buildHash()
+{
+    return UTILSLIB::gitHash();
+}
 
 //=============================================================================================================
 
-const char* DECODINGLIB::buildHashLong(){ return UTILSLIB::gitHashLong();}
+const char* DECODINGLIB::buildHashLong()
+{
+    return UTILSLIB::gitHashLong();
+}

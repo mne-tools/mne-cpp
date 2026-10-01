@@ -28,7 +28,7 @@ using namespace Eigen;
 using namespace MNELIB;
 
 constexpr int FAIL = -1;
-constexpr int OK   =  0;
+constexpr int OK = 0;
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS
@@ -37,7 +37,7 @@ constexpr int OK   =  0;
 int MNENamedVector::pick(const QStringList& pick_names, int nnames, bool require_all, Eigen::Ref<Eigen::VectorXf> res) const
 {
     int found;
-    int k,p;
+    int k, p;
 
     if (names.size() == 0) {
         qCritical("No names present in vector. Cannot pick.");
@@ -50,7 +50,7 @@ int MNENamedVector::pick(const QStringList& pick_names, int nnames, bool require
     for (k = 0; k < nnames; k++) {
         found = 0;
         for (p = 0; p < nvec; p++) {
-            if (QString::compare(names[p],pick_names[k]) == 0) {
+            if (QString::compare(names[p], pick_names[k]) == 0) {
                 res[k] = data[p];
                 found = true;
                 break;

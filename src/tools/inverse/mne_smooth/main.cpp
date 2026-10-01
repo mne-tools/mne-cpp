@@ -70,9 +70,12 @@ static SparseMatrix<double> buildSmoothingOperator(const MatrixX3i& tris, int nV
 
     for (int t = 0; t < tris.rows(); ++t) {
         int v0 = tris(t, 0), v1 = tris(t, 1), v2 = tris(t, 2);
-        neighbors[v0].insert(v1); neighbors[v0].insert(v2);
-        neighbors[v1].insert(v0); neighbors[v1].insert(v2);
-        neighbors[v2].insert(v0); neighbors[v2].insert(v1);
+        neighbors[v0].insert(v1);
+        neighbors[v0].insert(v2);
+        neighbors[v1].insert(v0);
+        neighbors[v1].insert(v2);
+        neighbors[v2].insert(v0);
+        neighbors[v2].insert(v1);
     }
 
     // Build sparse triplets
@@ -99,7 +102,7 @@ static SparseMatrix<double> buildSmoothingOperator(const MatrixX3i& tris, int nV
 
 //=============================================================================================================
 
-int main(int argc, char *argv[])
+int main(int argc, char* argv[])
 {
     qInstallMessageHandler(MNELogger::customLogWriter);
     QCoreApplication app(argc, argv);
@@ -138,8 +141,14 @@ int main(int argc, char *argv[])
         qCritical("Either --src or --surf is required.");
         parser.showHelp(1);
     }
-    if (stcFile.isEmpty()) { qCritical("--stc is required."); parser.showHelp(1); }
-    if (outFile.isEmpty()) { qCritical("--out is required."); parser.showHelp(1); }
+    if (stcFile.isEmpty()) {
+        qCritical("--stc is required.");
+        parser.showHelp(1);
+    }
+    if (outFile.isEmpty()) {
+        qCritical("--out is required.");
+        parser.showHelp(1);
+    }
 
     // Get surface triangulation
     MatrixX3i tris;
@@ -153,7 +162,7 @@ int main(int argc, char *argv[])
         }
         tris = surface.tris();
         nVert = surface.rr().rows();
-        qInfo("Read surface: %d vertices, %d triangles" , nVert, (int)tris.rows());
+        qInfo("Read surface: %d vertices, %d triangles", nVert, (int)tris.rows());
     } else {
         // Read source space
         QFile file(srcFile);
@@ -170,12 +179,12 @@ int main(int argc, char *argv[])
         // Use first hemisphere's triangulation
         tris = srcSpaces[0].itris;
         nVert = srcSpaces[0].np;
-        qInfo("Read source space: %d vertices, %d triangles" , nVert, (int)tris.rows());
+        qInfo("Read source space: %d vertices, %d triangles", nVert, (int)tris.rows());
     }
 
     // Build smoothing operator
     SparseMatrix<double> S = buildSmoothingOperator(tris, nVert);
-    qInfo("Built smoothing operator: %d x %d" , (int)S.rows(), (int)S.cols());
+    qInfo("Built smoothing operator: %d x %d", (int)S.rows(), (int)S.cols());
 
     // Read STC data (text format: one value per line, or vertex value pairs)
     QFile stcIn(stcFile);
@@ -205,14 +214,14 @@ int main(int argc, char *argv[])
         if (pair.first >= 0 && pair.first < nVert)
             data(pair.first) = pair.second;
     }
-    qInfo("Read %d data values" , (int)dataList.size());
+    qInfo("Read %d data values", (int)dataList.size());
 
     // Apply iterative smoothing
     VectorXd smoothed = data;
     for (int iter = 0; iter < nSmooth; ++iter) {
         smoothed = S * smoothed;
     }
-    qInfo("Applied %d iterations of Laplacian smoothing" , nSmooth);
+    qInfo("Applied %d iterations of Laplacian smoothing", nSmooth);
 
     // Write output
     QFile stcOut(outFile);
@@ -227,7 +236,7 @@ int main(int argc, char *argv[])
             out << i << " " << QString::number(smoothed(i), 'g', 10) << "\n";
     }
     stcOut.close();
-    qInfo("Written smoothed data to: %s" , qPrintable(outFile));
+    qInfo("Written smoothed data to: %s", qPrintable(outFile));
 
     return 0;
 }

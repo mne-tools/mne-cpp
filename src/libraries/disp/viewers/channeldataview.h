@@ -57,8 +57,9 @@ class QScrollBar;
 class QSplitter;
 class QToolButton;
 
-namespace FIFFLIB {
-    class FiffInfo;
+namespace FIFFLIB
+{
+class FiffInfo;
 }
 
 //=============================================================================================================
@@ -90,7 +91,7 @@ class DISPSHARED_EXPORT ChannelDataView : public AbstractView
     Q_OBJECT
 
 public:
-    typedef QSharedPointer<ChannelDataView>       SPtr;
+    typedef QSharedPointer<ChannelDataView> SPtr;
     typedef QSharedPointer<const ChannelDataView> ConstSPtr;
 
     //=========================================================================================================
@@ -101,8 +102,8 @@ public:
      * @param[in] parent         Parent widget.
      * @param[in] f              Window flags.
      */
-    explicit ChannelDataView(const QString &sSettingsPath = QString(),
-                             QWidget *parent = nullptr,
+    explicit ChannelDataView(const QString& sSettingsPath = QString(),
+                             QWidget* parent = nullptr,
                              Qt::WindowFlags f = Qt::Widget);
 
     ~ChannelDataView() override;
@@ -126,7 +127,7 @@ public:
      * @param[in] matData         Channels × samples matrix.
      * @param[in] firstSample  Absolute sample index of column 0.
      */
-    void setData(const Eigen::MatrixXd &matData, int firstSample = 0);
+    void setData(const Eigen::MatrixXd& matData, int firstSample = 0);
 
     //=========================================================================================================
     /**
@@ -134,7 +135,7 @@ public:
      *
      * @param[in] matData  Channels × new-samples matrix.
      */
-    void addData(const Eigen::MatrixXd &matData);
+    void addData(const Eigen::MatrixXd& matData);
 
     // ── Scroll / zoom API ─────────────────────────────────────────────
 
@@ -188,7 +189,7 @@ public:
      *
      * @param[in] color  New background colour.
      */
-    void setBackgroundColor(const QColor &color);
+    void setBackgroundColor(const QColor& color);
     QColor backgroundColor() const;
 
     //=========================================================================================================
@@ -197,7 +198,7 @@ public:
      *
      * @param[in] color  New signal colour.
      */
-    void setSignalColor(const QColor &color);
+    void setSignalColor(const QColor& color);
     QColor signalColor() const;
 
     //=========================================================================================================
@@ -207,7 +208,7 @@ public:
      *
      * @param[in] scaleMap  Map from FIFF kind to physical amplitude (e.g. 1.2e-12 for MEG).
      */
-    void setScalingMap(const QMap<qint32, float> &scaleMap);
+    void setScalingMap(const QMap<qint32, float>& scaleMap);
     QMap<qint32, float> scalingMap() const;
 
     //=========================================================================================================
@@ -227,7 +228,7 @@ public:
      *
      * @param[in] names  List of channel names to show (case-sensitive).
      */
-    void setChannelFilter(const QStringList &names);
+    void setChannelFilter(const QStringList& names);
 
     //=========================================================================================================
     /**
@@ -266,9 +267,9 @@ public:
      *
      * @param[in] events  List of EventMarker objects.
      */
-    void setEvents(const QVector<ChannelRhiView::EventMarker> &events);
+    void setEvents(const QVector<ChannelRhiView::EventMarker>& events);
 
-    void setEpochMarkers(const QVector<int> &triggerSamples);
+    void setEpochMarkers(const QVector<int>& triggerSamples);
     void setEpochMarkersVisible(bool visible);
     bool epochMarkersVisible() const;
 
@@ -284,7 +285,7 @@ public:
      *
      * @param[in] markers  Reference markers to display in the ruler.
      */
-    void setReferenceMarkers(const QVector<TimeRulerReferenceMark> &markers);
+    void setReferenceMarkers(const QVector<TimeRulerReferenceMark>& markers);
 
     //=========================================================================================================
     /**
@@ -292,7 +293,7 @@ public:
      *
      * @param[in] annotations  List of AnnotationSpan objects.
      */
-    void setAnnotations(const QVector<ChannelRhiView::AnnotationSpan> &annotations);
+    void setAnnotations(const QVector<ChannelRhiView::AnnotationSpan>& annotations);
 
     //=========================================================================================================
     /**
@@ -364,7 +365,7 @@ public:
     // ── AbstractView overrides ────────────────────────────────────────
     void saveSettings() override;
     void loadSettings() override;
-    void clearView()    override;
+    void clearView() override;
 
     //=========================================================================================================
     /**
@@ -408,7 +409,10 @@ public:
      *
      * @return Non-owning pointer to the ChannelDataModel.
      */
-    ChannelDataModel* model() const { return m_pModel.data(); }
+    ChannelDataModel* model() const
+    {
+        return m_pModel.data();
+    }
 
 signals:
     //=========================================================================================================
@@ -473,13 +477,13 @@ signals:
      * Forwarded from the underlying ChannelRhiView when the crosshair is active.
      */
     void cursorDataChanged(float timeSec, float amplitude,
-                           const QString &channelName, const QString &unitLabel);
+                           const QString& channelName, const QString& unitLabel);
 
 protected:
     void updateGuiMode(GuiMode mode) override;
     void updateProcessingMode(ProcessingMode mode) override;
-    void keyPressEvent(QKeyEvent *event) override;
-    void resizeEvent(QResizeEvent *event) override;
+    void keyPressEvent(QKeyEvent* event) override;
+    void resizeEvent(QResizeEvent* event) override;
 
 private slots:
     void onScrollBarMoved(int value);
@@ -493,31 +497,31 @@ private:
     void setupLayout();
     void updateSamplesPerPixel();
 
-    QString                          m_sSettingsPath;
+    QString m_sSettingsPath;
     QSharedPointer<ChannelDataModel> m_pModel;
-    ChannelLabelPanel*               m_pLabelPanel          = nullptr;
-    ChannelRhiView*                  m_pRhiView             = nullptr;
-    TimeRulerWidget*                 m_pTimeRuler           = nullptr;
-    OverviewBarWidget*               m_pOverviewBar         = nullptr;
-    QWidget*                         m_pRulerHeader         = nullptr;
-    QScrollBar*                      m_pScrollBar           = nullptr;
-    QScrollBar*                      m_pChannelScrollBar    = nullptr;
-    QToolButton*                     m_pScrollModeButton    = nullptr;
+    ChannelLabelPanel* m_pLabelPanel = nullptr;
+    ChannelRhiView* m_pRhiView = nullptr;
+    TimeRulerWidget* m_pTimeRuler = nullptr;
+    OverviewBarWidget* m_pOverviewBar = nullptr;
+    QWidget* m_pRulerHeader = nullptr;
+    QScrollBar* m_pScrollBar = nullptr;
+    QScrollBar* m_pChannelScrollBar = nullptr;
+    QToolButton* m_pScrollModeButton = nullptr;
 
     bool m_channelScrollBarUpdating = false;
 
     QSharedPointer<FIFFLIB::FiffInfo> m_pFiffInfo;
-    QMap<qint32, float>               m_scaleMap;
-    QColor                            m_signalColor { Qt::darkGreen };
-    QColor                            m_bgColor     { 250, 250, 250 };
+    QMap<qint32, float> m_scaleMap;
+    QColor m_signalColor{Qt::darkGreen};
+    QColor m_bgColor{250, 250, 250};
 
-    float  m_windowSizeSeconds  = 10.f;
-    double m_zoomFactor         = 1.0;
-    bool   m_hideBadChannels    = false;
-    bool   m_scrollBarUpdating  = false; // re-entrance guard
+    float m_windowSizeSeconds = 10.f;
+    double m_zoomFactor = 1.0;
+    bool m_hideBadChannels = false;
+    bool m_scrollBarUpdating = false; // re-entrance guard
 
-    int    m_firstFileSample    = -1;    // -1 = not yet set (fall back to model)
-    int    m_lastFileSample     = -1;    // -1 = not yet set
+    int m_firstFileSample = -1; // -1 = not yet set (fall back to model)
+    int m_lastFileSample = -1;  // -1 = not yet set
 };
 
 } // namespace DISPLIB

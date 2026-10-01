@@ -71,11 +71,11 @@ private:
     QString findApplication();
     bool hasFreeSurfer();
 
-    QString m_sAppPath;             /**< Path to the mne_flash_bem executable. */
-    bool m_bAppAvailable;           /**< Whether the app is found. */
-    bool m_bFreeSurferAvailable;    /**< Whether FreeSurfer is installed. */
-    QString m_sFreeSurferHome;      /**< Path to FreeSurfer home. */
-    QTemporaryDir m_tempDir;        /**< Temporary directory for test output. */
+    QString m_sAppPath;          /**< Path to the mne_flash_bem executable. */
+    bool m_bAppAvailable;        /**< Whether the app is found. */
+    bool m_bFreeSurferAvailable; /**< Whether FreeSurfer is installed. */
+    QString m_sFreeSurferHome;   /**< Path to FreeSurfer home. */
+    QTemporaryDir m_tempDir;     /**< Temporary directory for test output. */
 };
 
 //=============================================================================================================
@@ -308,38 +308,38 @@ void TestMneFlashBem::testNonExistentSubjectDir()
 void TestMneFlashBem::testSyntheticFullRun()
 {
 #ifdef Q_OS_WIN
-        QSKIP("Synthetic FreeSurfer command shims require Unix executables");
+    QSKIP("Synthetic FreeSurfer command shims require Unix executables");
 #else
-        if (!m_bAppAvailable) {
-                QSKIP("mne_flash_bem executable not found");
-        }
+    if (!m_bAppAvailable) {
+        QSKIP("mne_flash_bem executable not found");
+    }
 
-        const QString freeSurferHome = m_tempDir.filePath("freesurfer");
-        const QString binDir = freeSurferHome + "/bin";
-        const QString subjectsDir = m_tempDir.filePath("subjects");
-        const QString subject = "synthetic";
-        const QString subjectDir = subjectsDir + "/" + subject;
-        const QString mriDir = subjectDir + "/mri";
-        const QString flashDir = mriDir + "/flash";
-        QVERIFY(QDir().mkpath(binDir));
-        QVERIFY(QDir().mkpath(flashDir));
+    const QString freeSurferHome = m_tempDir.filePath("freesurfer");
+    const QString binDir = freeSurferHome + "/bin";
+    const QString subjectsDir = m_tempDir.filePath("subjects");
+    const QString subject = "synthetic";
+    const QString subjectDir = subjectsDir + "/" + subject;
+    const QString mriDir = subjectDir + "/mri";
+    const QString flashDir = mriDir + "/flash";
+    QVERIFY(QDir().mkpath(binDir));
+    QVERIFY(QDir().mkpath(flashDir));
 
-        QFile t1File(mriDir + "/T1.mgz");
-        QVERIFY(t1File.open(QIODevice::WriteOnly));
-        t1File.write("synthetic T1");
-        t1File.close();
+    QFile t1File(mriDir + "/T1.mgz");
+    QVERIFY(t1File.open(QIODevice::WriteOnly));
+    t1File.write("synthetic T1");
+    t1File.close();
 
-        QFile brainFile(mriDir + "/brain.mgz");
-        QVERIFY(brainFile.open(QIODevice::WriteOnly));
-        brainFile.write("synthetic brain");
-        brainFile.close();
+    QFile brainFile(mriDir + "/brain.mgz");
+    QVERIFY(brainFile.open(QIODevice::WriteOnly));
+    brainFile.write("synthetic brain");
+    brainFile.close();
 
-        QFile flashFile(flashDir + "/mef05_001.mgz");
-        QVERIFY(flashFile.open(QIODevice::WriteOnly));
-        flashFile.write("synthetic flash");
-        flashFile.close();
+    QFile flashFile(flashDir + "/mef05_001.mgz");
+    QVERIFY(flashFile.open(QIODevice::WriteOnly));
+    flashFile.write("synthetic flash");
+    flashFile.close();
 
-        const QByteArray shim = R"SH(#!/bin/sh
+    const QByteArray shim = R"SH(#!/bin/sh
 program=$(basename "$0")
 case "$program" in
     mri_average|fsl_rigid_register)
@@ -377,43 +377,39 @@ esac
 exit 0
 )SH";
 
-        const QStringList commands = {
-                "mri_average", "fsl_rigid_register", "mri_convert",
-                "mri_make_bem_surfaces", "mne_convert_surface"
-        };
-        for (const QString& command : commands) {
-                QFile executable(binDir + "/" + command);
-                QVERIFY(executable.open(QIODevice::WriteOnly));
-                QCOMPARE(executable.write(shim), shim.size());
-                executable.close();
-                QVERIFY(executable.setPermissions(QFileDevice::ReadOwner | QFileDevice::WriteOwner
-                                                                                    | QFileDevice::ExeOwner | QFileDevice::ReadGroup
-                                                                                    | QFileDevice::ExeGroup | QFileDevice::ReadOther
-                                                                                    | QFileDevice::ExeOther));
-        }
+    const QStringList commands = {
+        "mri_average", "fsl_rigid_register", "mri_convert",
+        "mri_make_bem_surfaces", "mne_convert_surface"};
+    for (const QString& command : commands) {
+        QFile executable(binDir + "/" + command);
+        QVERIFY(executable.open(QIODevice::WriteOnly));
+        QCOMPARE(executable.write(shim), shim.size());
+        executable.close();
+        QVERIFY(executable.setPermissions(QFileDevice::ReadOwner | QFileDevice::WriteOwner | QFileDevice::ExeOwner | QFileDevice::ReadGroup | QFileDevice::ExeGroup | QFileDevice::ReadOther | QFileDevice::ExeOther));
+    }
 
-        QProcess proc;
-        QProcessEnvironment env = QProcessEnvironment::systemEnvironment();
-        env.insert("FREESURFER_HOME", freeSurferHome);
-        env.insert("SUBJECTS_DIR", subjectsDir);
-        env.insert("SUBJECT", subject);
-        env.remove("MNE_BIN_DIR");
-        env.remove("MNE_ROOT");
-        proc.setProcessEnvironment(env);
-        proc.start(m_sAppPath, {"--noconvert", "--noflash30"});
-        QVERIFY2(proc.waitForFinished(30000), "Synthetic FLASH-BEM run timed out");
-        QCOMPARE(proc.exitStatus(), QProcess::NormalExit);
-        QCOMPARE(proc.exitCode(), 0);
+    QProcess proc;
+    QProcessEnvironment env = QProcessEnvironment::systemEnvironment();
+    env.insert("FREESURFER_HOME", freeSurferHome);
+    env.insert("SUBJECTS_DIR", subjectsDir);
+    env.insert("SUBJECT", subject);
+    env.remove("MNE_BIN_DIR");
+    env.remove("MNE_ROOT");
+    proc.setProcessEnvironment(env);
+    proc.start(m_sAppPath, {"--noconvert", "--noflash30"});
+    QVERIFY2(proc.waitForFinished(30000), "Synthetic FLASH-BEM run timed out");
+    QCOMPARE(proc.exitStatus(), QProcess::NormalExit);
+    QCOMPARE(proc.exitCode(), 0);
 
-        const QString bemDir = subjectDir + "/bem/flash";
-        const QStringList surfaces = {"inner_skull", "outer_skull", "outer_skin"};
-        for (const QString& surface : surfaces) {
-                QVERIFY(QFileInfo(bemDir + "/" + surface + ".tri").size() > 0);
-                QVERIFY(QFileInfo(bemDir + "/" + surface + ".surf").size() > 0);
-        }
-        QVERIFY(!QDir(mriDir + "/flash5").exists());
-        QVERIFY(!QDir(mriDir + "/T1").exists());
-        QVERIFY(!QDir(mriDir + "/brain").exists());
+    const QString bemDir = subjectDir + "/bem/flash";
+    const QStringList surfaces = {"inner_skull", "outer_skull", "outer_skin"};
+    for (const QString& surface : surfaces) {
+        QVERIFY(QFileInfo(bemDir + "/" + surface + ".tri").size() > 0);
+        QVERIFY(QFileInfo(bemDir + "/" + surface + ".surf").size() > 0);
+    }
+    QVERIFY(!QDir(mriDir + "/flash5").exists());
+    QVERIFY(!QDir(mriDir + "/T1").exists());
+    QVERIFY(!QDir(mriDir + "/brain").exists());
 #endif
 }
 

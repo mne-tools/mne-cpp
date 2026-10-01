@@ -45,8 +45,9 @@
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-namespace Ui {
-    class BidsViewWidget;
+namespace Ui
+{
+class BidsViewWidget;
 }
 
 //=============================================================================================================
@@ -75,7 +76,7 @@ public:
      *
      * @param[in] parent     If parent is not NULL the QWidget becomes a child of QWidget inside parent.
      */
-    explicit BidsView(QWidget *parent = 0);
+    explicit BidsView(QWidget* parent = 0);
 
     //=========================================================================================================
     /**
@@ -89,7 +90,7 @@ public:
      *
      * @param[in] pModel       The new model.
      */
-    void setModel(QAbstractItemModel *pModel);
+    void setModel(QAbstractItemModel* pModel);
 
     //=========================================================================================================
     /**
@@ -126,7 +127,6 @@ public:
     void clearView();
 
 private:
-
     //=========================================================================================================
     /**
      * Brings up contextual menu for user to interact with data manager
@@ -142,8 +142,8 @@ private:
      * @param[in] selected     New item being selected.
      * @param[in] deselected   UNUSED - previously selected item.
      */
-    void onCurrentItemChanged(const QItemSelection &selected,
-                              const QItemSelection &deselected);
+    void onCurrentItemChanged(const QItemSelection& selected,
+                              const QItemSelection& deselected);
 
     //=========================================================================================================
     /**
@@ -175,9 +175,9 @@ private:
      *
      * @param[in] event    Key event for delete key to delete selected item.
      */
-    void keyPressEvent(QKeyEvent *event);
+    void keyPressEvent(QKeyEvent* event);
 
-    Ui::BidsViewWidget *m_pUi;   /**< The user interface. */
+    Ui::BidsViewWidget* m_pUi; /**< The user interface. */
 
 signals:
     //=========================================================================================================
@@ -210,7 +210,7 @@ signals:
      *
      * @param[in] sSubjectName     name of new subject.
      */
-    void onAddSubject(const QString &sSubjectName);
+    void onAddSubject(const QString& sSubjectName);
 
     //=========================================================================================================
     /**
@@ -220,7 +220,7 @@ signals:
      * @param[in] sSessionName     name of new session.
      */
     void onAddSession(QModelIndex subjectIndex,
-                      const QString &sSessionName);
+                      const QString& sSessionName);
 
     //=========================================================================================================
     /**
@@ -241,7 +241,6 @@ signals:
      */
     void onMoveData(QModelIndex sessionIndex,
                     QModelIndex dataIndex);
-
 };
 } // NAMESPACE DISPLIB
 #endif // BIDSVIEW_H

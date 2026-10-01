@@ -53,7 +53,7 @@ using namespace Eigen;
 
 //=============================================================================================================
 
-int main(int argc, char *argv[])
+int main(int argc, char* argv[])
 {
     qInstallMessageHandler(MNELogger::customLogWriter);
     QCoreApplication app(argc, argv);
@@ -80,9 +80,18 @@ int main(int argc, char *argv[])
     QString outFile = parser.value(outOpt);
     int grade = parser.isSet(gradeOpt) ? parser.value(gradeOpt).toInt() : -1;
 
-    if (inFile.isEmpty()) { qCritical("--in is required."); return 1; }
-    if (outFile.isEmpty()) { qCritical("--out is required."); return 1; }
-    if (grade < 0) { qCritical("--grade is required (0, 1, 2, or 3)."); return 1; }
+    if (inFile.isEmpty()) {
+        qCritical("--in is required.");
+        return 1;
+    }
+    if (outFile.isEmpty()) {
+        qCritical("--out is required.");
+        return 1;
+    }
+    if (grade < 0) {
+        qCritical("--grade is required (0, 1, 2, or 3).");
+        return 1;
+    }
 
     // Open input file
     QFile fileIn(inFile);
@@ -93,8 +102,8 @@ int main(int argc, char *argv[])
     }
 
     qint32 currentComp = raw.info.get_current_comp();
-    qInfo("Current compensation grade: %d" , currentComp);
-    qInfo("Desired compensation grade: %d" , grade);
+    qInfo("Current compensation grade: %d", currentComp);
+    qInfo("Desired compensation grade: %d", grade);
 
     if (currentComp == grade) {
         qInfo("Data already at desired compensation grade. No changes needed.");
@@ -109,7 +118,7 @@ int main(int argc, char *argv[])
         qCritical("Cannot create compensator from grade %d to %d", currentComp, grade);
         return 1;
     }
-    qInfo("Compensation matrix created (%d -> %d)" , currentComp, grade);
+    qInfo("Compensation matrix created (%d -> %d)", currentComp, grade);
 
     // Read all data
     MatrixXd data;
@@ -119,7 +128,7 @@ int main(int argc, char *argv[])
         qCritical("Cannot read raw data segment");
         return 1;
     }
-    qInfo("Read %d channels x %d samples" , (int)data.rows(), (int)data.cols());
+    qInfo("Read %d channels x %d samples", (int)data.rows(), (int)data.cols());
 
     // Apply compensation
     data = comp.data->data.cast<double>() * data;
@@ -146,7 +155,7 @@ int main(int argc, char *argv[])
     }
 
     outStream->finish_writing_raw();
-    qInfo("Written compensated data to: %s" , qPrintable(outFile));
+    qInfo("Written compensated data to: %s", qPrintable(outFile));
 
     return 0;
 }

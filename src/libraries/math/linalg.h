@@ -70,7 +70,7 @@ namespace UTILSLIB
 class MATHSHARED_EXPORT Linalg
 {
 public:
-    typedef std::pair<int,int> IdxIntValue;         /**< Typedef of a pair of ints. */
+    typedef std::pair<int, int> IdxIntValue; /**< Typedef of a pair of ints. */
 
     //=========================================================================================================
     /**
@@ -98,7 +98,7 @@ public:
      * @return the condition number.
      */
     static double getConditionNumber(const Eigen::MatrixXd& A,
-                                     Eigen::VectorXd &s);
+                                     Eigen::VectorXd& s);
 
     //=========================================================================================================
     /**
@@ -110,7 +110,7 @@ public:
      * @return the condition slope.
      */
     static double getConditionSlope(const Eigen::MatrixXd& A,
-                                    Eigen::VectorXd &s);
+                                    Eigen::VectorXd& s);
 
     //=========================================================================================================
     /**
@@ -154,9 +154,9 @@ public:
      *
      * @return the sorted, unique values that are in both of the input arrays.
      */
-    static Eigen::VectorXi intersect(const Eigen::VectorXi &v1,
-                                     const Eigen::VectorXi &v2,
-                                     Eigen::VectorXi &idx_sel);
+    static Eigen::VectorXi intersect(const Eigen::VectorXi& v1,
+                                     const Eigen::VectorXi& v2,
+                                     Eigen::VectorXi& idx_sel);
 
     //=========================================================================================================
     /**
@@ -171,7 +171,7 @@ public:
      *
      * @return A sparse block diagonal, diagonalized from the elements in "A".
      */
-    static Eigen::SparseMatrix<double> make_block_diag(const Eigen::MatrixXd &A,
+    static Eigen::SparseMatrix<double> make_block_diag(const Eigen::MatrixXd& A,
                                                        qint32 n);
 
     //=========================================================================================================
@@ -207,7 +207,7 @@ public:
      * @return Vector of the original indices in the new order.
      */
     template<typename T>
-    static Eigen::VectorXi sort(Eigen::Matrix<T, Eigen::Dynamic, 1> &v,
+    static Eigen::VectorXi sort(Eigen::Matrix<T, Eigen::Dynamic, 1>& v,
                                 bool desc = true);
 
     //=========================================================================================================
@@ -222,8 +222,8 @@ public:
      * @return Vector of the original indices in the new order.
      */
     template<typename T>
-    static Eigen::VectorXi sort(Eigen::Matrix<T, Eigen::Dynamic, 1> &v_prime,
-                                Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic> &mat,
+    static Eigen::VectorXi sort(Eigen::Matrix<T, Eigen::Dynamic, 1>& v_prime,
+                                Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>& mat,
                                 bool desc = true);
 
     //=========================================================================================================
@@ -236,8 +236,8 @@ public:
      * @return Sorted copy of the triplet vector.
      */
     template<typename T>
-    static std::vector<Eigen::Triplet<T> > sortrows(const std::vector<Eigen::Triplet<T> > &A,
-                                                    qint32 column = 0);
+    static std::vector<Eigen::Triplet<T>> sortrows(const std::vector<Eigen::Triplet<T>>& A,
+                                                   qint32 column = 0);
 
     //=========================================================================================================
     /**
@@ -248,8 +248,8 @@ public:
      * @return True if the value of lhs is greater than the value of rhs.
      */
     template<typename T>
-    static inline bool compareIdxValuePairBiggerThan(const std::pair<int,T>& lhs,
-                                                     const std::pair<int,T>& rhs);
+    static inline bool compareIdxValuePairBiggerThan(const std::pair<int, T>& lhs,
+                                                     const std::pair<int, T>& rhs);
 
     //=========================================================================================================
     /**
@@ -260,8 +260,8 @@ public:
      * @return True if the value of lhs is less than the value of rhs.
      */
     template<typename T>
-    static inline bool compareIdxValuePairSmallerThan(const std::pair<int,T>& lhs,
-                                                      const std::pair<int,T>& rhs);
+    static inline bool compareIdxValuePairSmallerThan(const std::pair<int, T>& lhs,
+                                                      const std::pair<int, T>& rhs);
 
     //=========================================================================================================
     /**
@@ -273,7 +273,7 @@ public:
      */
     template<typename T>
     static inline bool compareTripletFirstEntry(const Eigen::Triplet<T>& lhs,
-                                                const Eigen::Triplet<T> & rhs);
+                                                const Eigen::Triplet<T>& rhs);
 
     //=========================================================================================================
     /**
@@ -285,7 +285,7 @@ public:
      */
     template<typename T>
     static inline bool compareTripletSecondEntry(const Eigen::Triplet<T>& lhs,
-                                                 const Eigen::Triplet<T> & rhs);
+                                                 const Eigen::Triplet<T>& rhs);
 };
 
 //=============================================================================================================
@@ -293,24 +293,22 @@ public:
 //=============================================================================================================
 
 template<typename T>
-Eigen::VectorXi Linalg::sort(Eigen::Matrix<T, Eigen::Dynamic, 1> &v,
+Eigen::VectorXi Linalg::sort(Eigen::Matrix<T, Eigen::Dynamic, 1>& v,
                              bool desc)
 {
-    std::vector< std::pair<int,T> > t_vecIdxValue;
+    std::vector<std::pair<int, T>> t_vecIdxValue;
     Eigen::VectorXi idx(v.size());
 
-    if(v.size() > 0)
-    {
-        for(qint32 i = 0; i < v.size(); ++i)
-            t_vecIdxValue.push_back(std::pair<int,T>(i, v[i]));
+    if (v.size() > 0) {
+        for (qint32 i = 0; i < v.size(); ++i)
+            t_vecIdxValue.push_back(std::pair<int, T>(i, v[i]));
 
-        if(desc)
+        if (desc)
             std::sort(t_vecIdxValue.begin(), t_vecIdxValue.end(), Linalg::compareIdxValuePairBiggerThan<T>);
         else
             std::sort(t_vecIdxValue.begin(), t_vecIdxValue.end(), Linalg::compareIdxValuePairSmallerThan<T>);
 
-        for(qint32 i = 0; i < v.size(); ++i)
-        {
+        for (qint32 i = 0; i < v.size(); ++i) {
             idx[i] = t_vecIdxValue[i].first;
             v[i] = t_vecIdxValue[i].second;
         }
@@ -322,16 +320,15 @@ Eigen::VectorXi Linalg::sort(Eigen::Matrix<T, Eigen::Dynamic, 1> &v,
 //=============================================================================================================
 
 template<typename T>
-Eigen::VectorXi Linalg::sort(Eigen::Matrix<T, Eigen::Dynamic, 1> &v_prime,
-                             Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic> &mat,
+Eigen::VectorXi Linalg::sort(Eigen::Matrix<T, Eigen::Dynamic, 1>& v_prime,
+                             Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>& mat,
                              bool desc)
 {
     Eigen::VectorXi idx = Linalg::sort<T>(v_prime, desc);
 
-    if(v_prime.size() > 0)
-    {
+    if (v_prime.size() > 0) {
         Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic> newMat(mat.rows(), mat.cols());
-        for(qint32 i = 0; i < idx.size(); ++i)
+        for (qint32 i = 0; i < idx.size(); ++i)
             newMat.col(i) = mat.col(idx[i]);
         mat = newMat;
     }
@@ -342,17 +339,17 @@ Eigen::VectorXi Linalg::sort(Eigen::Matrix<T, Eigen::Dynamic, 1> &v_prime,
 //=============================================================================================================
 
 template<typename T>
-std::vector<Eigen::Triplet<T> > Linalg::sortrows(const std::vector<Eigen::Triplet<T> > &A,
-                                                  qint32 column)
+std::vector<Eigen::Triplet<T>> Linalg::sortrows(const std::vector<Eigen::Triplet<T>>& A,
+                                                qint32 column)
 {
-    std::vector<Eigen::Triplet<T> > p_ASorted;
+    std::vector<Eigen::Triplet<T>> p_ASorted;
 
-    for(quint32 i = 0; i < A.size(); ++i)
+    for (quint32 i = 0; i < A.size(); ++i)
         p_ASorted.push_back(A[i]);
 
-    if(column == 0)
+    if (column == 0)
         std::sort(p_ASorted.begin(), p_ASorted.end(), Linalg::compareTripletFirstEntry<T>);
-    if(column == 1)
+    if (column == 1)
         std::sort(p_ASorted.begin(), p_ASorted.end(), Linalg::compareTripletSecondEntry<T>);
 
     return p_ASorted;
@@ -361,8 +358,8 @@ std::vector<Eigen::Triplet<T> > Linalg::sortrows(const std::vector<Eigen::Triple
 //=============================================================================================================
 
 template<typename T>
-inline bool Linalg::compareIdxValuePairBiggerThan(const std::pair<int,T>& lhs,
-                                                  const std::pair<int,T>& rhs)
+inline bool Linalg::compareIdxValuePairBiggerThan(const std::pair<int, T>& lhs,
+                                                  const std::pair<int, T>& rhs)
 {
     return lhs.second > rhs.second;
 }
@@ -370,8 +367,8 @@ inline bool Linalg::compareIdxValuePairBiggerThan(const std::pair<int,T>& lhs,
 //=============================================================================================================
 
 template<typename T>
-inline bool Linalg::compareIdxValuePairSmallerThan(const std::pair<int,T>& lhs,
-                                                   const std::pair<int,T>& rhs)
+inline bool Linalg::compareIdxValuePairSmallerThan(const std::pair<int, T>& lhs,
+                                                   const std::pair<int, T>& rhs)
 {
     return lhs.second < rhs.second;
 }
@@ -380,7 +377,7 @@ inline bool Linalg::compareIdxValuePairSmallerThan(const std::pair<int,T>& lhs,
 
 template<typename T>
 inline bool Linalg::compareTripletFirstEntry(const Eigen::Triplet<T>& lhs,
-                                             const Eigen::Triplet<T> & rhs)
+                                             const Eigen::Triplet<T>& rhs)
 {
     return lhs.row() < rhs.row();
 }
@@ -389,7 +386,7 @@ inline bool Linalg::compareTripletFirstEntry(const Eigen::Triplet<T>& lhs,
 
 template<typename T>
 inline bool Linalg::compareTripletSecondEntry(const Eigen::Triplet<T>& lhs,
-                                              const Eigen::Triplet<T> & rhs)
+                                              const Eigen::Triplet<T>& rhs)
 {
     return lhs.col() < rhs.col();
 }
@@ -398,11 +395,11 @@ inline bool Linalg::compareTripletSecondEntry(const Eigen::Triplet<T>& lhs,
 
 template<typename T>
 Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic> Linalg::pinv(const Eigen::Matrix<T,
-                                                               Eigen::Dynamic,
-                                                               Eigen::Dynamic>& a)
+                                                                                  Eigen::Dynamic,
+                                                                                  Eigen::Dynamic>& a)
 {
     double epsilon = std::numeric_limits<double>::epsilon();
-    Eigen::JacobiSVD< Eigen::MatrixXd > svd(a, Eigen::ComputeThinU | Eigen::ComputeThinV);
+    Eigen::JacobiSVD<Eigen::MatrixXd> svd(a, Eigen::ComputeThinU | Eigen::ComputeThinV);
     double tolerance = epsilon * std::max(a.cols(), a.rows()) * svd.singularValues().array().abs()(0);
     return svd.matrixV() * (svd.singularValues().array().abs() > tolerance).select(svd.singularValues().array().inverse(), 0).matrix().asDiagonal() * svd.matrixU().adjoint();
 }

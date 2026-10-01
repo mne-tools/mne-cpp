@@ -54,9 +54,8 @@ using namespace UTILSLIB;
  * @param[in] argv (argument vector) is an array of pointers to arrays of character objects. The array objects are null-terminated strings, representing the arguments that were entered on the command line when the program was started.
  * @return the value that was set to exit() (which is 0 if exit() is called via quit()).
  */
-int main(int argc, char *argv[])
+int main(int argc, char* argv[])
 {
-    
     qInstallMessageHandler(MNELogger::customLogWriter);
     QCoreApplication a(argc, argv);
 
@@ -69,7 +68,7 @@ int main(int argc, char *argv[])
     QCommandLineOption covFileOption("cov", "Path to the covariance <file>.", "file", QCoreApplication::applicationDirPath() + "/../resources/data/MNE-sample-data/MEG/sample/sample_audvis-cov.fif");
     QCommandLineOption evokedFileOption("ave", "Path to the evoked/average <file>.", "file", QCoreApplication::applicationDirPath() + "/../resources/data/MNE-sample-data/MEG/sample/sample_audvis-ave.fif");
     QCommandLineOption methodOption("method", "Inverse estimation <method>, i.e., 'MNE', 'dSPM' or 'sLORETA'.", "method", "dSPM");
-    QCommandLineOption snrOption("snr", "The SNR value used for computation <snr>.", "snr", "3.0");//3.0;//0.1;//3.0;
+    QCommandLineOption snrOption("snr", "The SNR value used for computation <snr>.", "snr", "3.0"); //3.0;//0.1;//3.0;
 
     parser.addOption(fwdMEGOption);
     parser.addOption(fwdEEGOption);
@@ -93,7 +92,7 @@ int main(int argc, char *argv[])
     fiff_int_t setno = 0;
     QPair<float, float> baseline(-1.0f, -1.0f);
     FiffEvoked evoked(t_fileEvoked, setno, baseline);
-    if(evoked.isEmpty())
+    if (evoked.isEmpty())
         return 1;
 
     MNEForwardSolution t_forwardMeeg(t_fileFwdMeeg, false, true);
@@ -125,18 +124,24 @@ int main(int argc, char *argv[])
     InvMinimumNorm minimumNorm_eeg(inverse_operator_eeg, lambda2, method);
     InvSourceEstimate sourceEstimate_eeg = minimumNorm_eeg.calculateInverse(evoked);
 
-    if(sourceEstimate_meeg.isEmpty() || sourceEstimate_meg.isEmpty() || sourceEstimate_eeg.isEmpty())
+    if (sourceEstimate_meeg.isEmpty() || sourceEstimate_meg.isEmpty() || sourceEstimate_eeg.isEmpty())
         return 1;
 
     // View activation time-series
-    std::cout << "\nsourceEstimate_meeg:\n" << sourceEstimate_meeg.data.block(0,0,10,10) << std::endl;
-    std::cout << "time\n" << sourceEstimate_meeg.times.block(0,0,1,10) << std::endl;
+    std::cout << "\nsourceEstimate_meeg:\n"
+              << sourceEstimate_meeg.data.block(0, 0, 10, 10) << std::endl;
+    std::cout << "time\n"
+              << sourceEstimate_meeg.times.block(0, 0, 1, 10) << std::endl;
 
-    std::cout << "\nsourceEstimate_meg:\n" << sourceEstimate_meg.data.block(0,0,10,10) << std::endl;
-    std::cout << "time\n" << sourceEstimate_meg.times.block(0,0,1,10) << std::endl;
+    std::cout << "\nsourceEstimate_meg:\n"
+              << sourceEstimate_meg.data.block(0, 0, 10, 10) << std::endl;
+    std::cout << "time\n"
+              << sourceEstimate_meg.times.block(0, 0, 1, 10) << std::endl;
 
-    std::cout << "\nsourceEstimate_eeg:\n" << sourceEstimate_eeg.data.block(0,0,10,10) << std::endl;
-    std::cout << "time\n" << sourceEstimate_eeg.times.block(0,0,1,10) << std::endl;
+    std::cout << "\nsourceEstimate_eeg:\n"
+              << sourceEstimate_eeg.data.block(0, 0, 10, 10) << std::endl;
+    std::cout << "time\n"
+              << sourceEstimate_eeg.times.block(0, 0, 1, 10) << std::endl;
 
     return a.exec();
 }

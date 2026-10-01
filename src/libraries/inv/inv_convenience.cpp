@@ -62,7 +62,8 @@ using namespace Eigen;
 // LOCAL HELPERS
 //=============================================================================================================
 
-namespace {
+namespace
+{
 
 /**
  * Compute FFT-based PSD (Welch-like, single window) for a single row of data.
@@ -93,7 +94,8 @@ VectorXd computeRowPsd(const VectorXd& row, int nFft, double sfreq)
         }
         psd(f) = (re * re + im * im) / (sfreq * nFft);
         // Double for non-DC/Nyquist bins (one-sided spectrum)
-        if (f > 0 && f < nFreqs - 1) psd(f) *= 2.0;
+        if (f > 0 && f < nFreqs - 1)
+            psd(f) *= 2.0;
     }
 
     return psd;
@@ -150,8 +152,10 @@ InvSourceEstimate INVLIB::applyInverseRaw(
     bool pickNormal)
 {
     // Default: use full range
-    if (from < 0) from = raw.first_samp;
-    if (to < 0) to = raw.last_samp;
+    if (from < 0)
+        from = raw.first_samp;
+    if (to < 0)
+        to = raw.last_samp;
 
     // Pick channels matching the inverse operator
     RowVectorXi picks = FiffInfo::pick_channels(raw.info.ch_names, inverse.noise_cov->names);
@@ -204,8 +208,7 @@ QPair<VectorXd, RowVectorXf> INVLIB::estimateSnr(
     VectorXd snrTimeCourse(nTimes);
 
     for (int t = 0; t < nTimes; ++t) {
-        snrTimeCourse(t) = std::sqrt(stc.data.col(t).squaredNorm()
-                                     / static_cast<double>(stc.data.rows()));
+        snrTimeCourse(t) = std::sqrt(stc.data.col(t).squaredNorm() / static_cast<double>(stc.data.rows()));
     }
 
     return QPair<VectorXd, RowVectorXf>(snrTimeCourse, stc.times);
@@ -244,9 +247,11 @@ QPair<MatrixXd, int> INVLIB::computeWhitener(
         double threshold = maxEig * 1e-10;
         rank = 0;
         for (int i = 0; i < eig.size(); ++i) {
-            if (eig(i) > threshold) ++rank;
+            if (eig(i) > threshold)
+                ++rank;
         }
-        if (rank == 0) rank = 1;
+        if (rank == 0)
+            rank = 1;
     }
 
     // Build whitening matrix: W = diag(1/sqrt(eig)) @ V^T
@@ -284,8 +289,10 @@ QPair<MatrixXd, VectorXd> INVLIB::computeSourcePsd(
     const int nSources = static_cast<int>(stc.data.rows());
     const int nTimes = static_cast<int>(stc.data.cols());
 
-    if (nFft <= 0) nFft = nTimes;
-    if (fmax < 0) fmax = sfreq / 2.0f;
+    if (nFft <= 0)
+        nFft = nTimes;
+    if (fmax < 0)
+        fmax = sfreq / 2.0f;
 
     const int nFreqs = nFft / 2 + 1;
 
@@ -298,10 +305,16 @@ QPair<MatrixXd, VectorXd> INVLIB::computeSourcePsd(
     // Find frequency range indices
     int fminIdx = 0, fmaxIdx = nFreqs - 1;
     for (int f = 0; f < nFreqs; ++f) {
-        if (freqs(f) >= fmin) { fminIdx = f; break; }
+        if (freqs(f) >= fmin) {
+            fminIdx = f;
+            break;
+        }
     }
     for (int f = nFreqs - 1; f >= 0; --f) {
-        if (freqs(f) <= fmax) { fmaxIdx = f; break; }
+        if (freqs(f) <= fmax) {
+            fmaxIdx = f;
+            break;
+        }
     }
 
     int nBandFreqs = fmaxIdx - fminIdx + 1;
@@ -338,7 +351,8 @@ QMap<QString, VectorXd> INVLIB::computeSourceBandPower(
 
     // Compute full PSD
     auto [psd, freqs] = computeSourcePsd(stc, sfreq);
-    if (psd.size() == 0) return result;
+    if (psd.size() == 0)
+        return result;
 
     const int nSources = static_cast<int>(psd.rows());
     const int nFreqs = static_cast<int>(freqs.size());

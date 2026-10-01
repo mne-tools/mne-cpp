@@ -46,7 +46,6 @@ namespace TMSIPLUGIN
  */
 class TMSIElectrodeItem : public QGraphicsItem
 {
-
 public:
     //=========================================================================================================
     /**
@@ -70,7 +69,7 @@ public:
     /**
      * Reimplemented paint function.
      */
-    void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
+    void paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget);
 
     //=========================================================================================================
     /**
@@ -109,11 +108,11 @@ public:
     int getChannelIndex();
 
 private:
-    QString     m_sElectrodeName;           /**< Holds the electrode name.*/
-    QPointF     m_qpElectrodePosition;      /**< Holds the electrode 2D position in the scene.*/
-    QColor      m_cElectrodeColor;          /**< Holds the current electrode color.*/
-    double      m_dImpedanceValue;          /**< Holds the current electrode impedance value.*/
-    int         m_iChannelIndex;            /**< Holds the corresonding channel index.*/
+    QString m_sElectrodeName;      /**< Holds the electrode name.*/
+    QPointF m_qpElectrodePosition; /**< Holds the electrode 2D position in the scene.*/
+    QColor m_cElectrodeColor;      /**< Holds the current electrode color.*/
+    double m_dImpedanceValue;      /**< Holds the current electrode impedance value.*/
+    int m_iChannelIndex;           /**< Holds the corresonding channel index.*/
 };
 } // NAMESPACE
 

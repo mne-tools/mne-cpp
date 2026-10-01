@@ -52,12 +52,12 @@ namespace UTILSLIB
  */
 struct DSPSHARED_EXPORT BadChannelsMaxwellParams
 {
-    int    iOrderIn      = 8;           /**< Internal SSS order. */
-    int    iOrderOut     = 3;           /**< External SSS order. */
+    int iOrderIn = 8;                       /**< Internal SSS order. */
+    int iOrderOut = 3;                      /**< External SSS order. */
     Eigen::Vector3d origin{0.0, 0.0, 0.04}; /**< Expansion origin (metres, head frame). */
-    double dZThreshold   = 4.0;        /**< Z-score threshold for flagging bad channels. */
-    int    iBlockSize    = 0;          /**< Block size for averaging (0 = use all data). */
-    double dMinRatio     = 1e-4;       /**< Minimum relative residual to consider (skip near-zero). */
+    double dZThreshold = 4.0;               /**< Z-score threshold for flagging bad channels. */
+    int iBlockSize = 0;                     /**< Block size for averaging (0 = use all data). */
+    double dMinRatio = 1e-4;                /**< Minimum relative residual to consider (skip near-zero). */
 };
 
 //=============================================================================================================
@@ -66,10 +66,10 @@ struct DSPSHARED_EXPORT BadChannelsMaxwellParams
  */
 struct DSPSHARED_EXPORT BadChannelsMaxwellResult
 {
-    QStringList badChannels;            /**< Names of detected bad channels. */
-    QList<int>  badIndices;             /**< Indices in the MEG channel list. */
-    Eigen::VectorXd residuals;          /**< Per-channel reconstruction residuals. */
-    Eigen::VectorXd zScores;            /**< Per-channel z-scores of residuals. */
+    QStringList badChannels;   /**< Names of detected bad channels. */
+    QList<int> badIndices;     /**< Indices in the MEG channel list. */
+    Eigen::VectorXd residuals; /**< Per-channel reconstruction residuals. */
+    Eigen::VectorXd zScores;   /**< Per-channel z-scores of residuals. */
 };
 
 //=============================================================================================================

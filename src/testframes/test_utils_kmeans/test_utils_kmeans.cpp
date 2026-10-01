@@ -15,10 +15,11 @@ class TestUtilsKMeans : public QObject
 
 private:
     // Generate 2D blobs with known cluster centers
-    MatrixXd generateBlobs(int pointsPerCluster, int k) {
+    MatrixXd generateBlobs(int pointsPerCluster, int k)
+    {
         MatrixXd data(pointsPerCluster * k, 2);
         for (int c = 0; c < k; ++c) {
-            double cx = c * 10.0;  // well-separated centers
+            double cx = c * 10.0; // well-separated centers
             double cy = c * 10.0;
             for (int i = 0; i < pointsPerCluster; ++i) {
                 int row = c * pointsPerCluster + i;
@@ -30,7 +31,8 @@ private:
     }
 
 private slots:
-    void initTestCase() {
+    void initTestCase()
+    {
         srand(42);
     }
 
@@ -109,9 +111,9 @@ private slots:
         // reports a false -Warray-bounds inside Eigen.
         MatrixXd X = MatrixXd::Zero(30, 3);
         for (int i = 0; i < 10; ++i) {
-            X(i, 0)      = 1.0 + 0.1*i;
-            X(10+i, 1)   = 1.0 + 0.1*i;
-            X(20+i, 2)   = 1.0 + 0.1*i;
+            X(i, 0) = 1.0 + 0.1 * i;
+            X(10 + i, 1) = 1.0 + 0.1 * i;
+            X(20 + i, 2) = 1.0 + 0.1 * i;
         }
 
         VectorXi idx;

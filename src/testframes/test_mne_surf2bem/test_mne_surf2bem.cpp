@@ -78,11 +78,11 @@ private:
     QString findSurfaceFile(const QString& name);
     void setupProcess(QProcess& proc);
 
-    QString m_sAppPath;         /**< Path to the mne_surf2bem executable. */
-    bool m_bAppAvailable;       /**< Whether the app is found. */
-    bool m_bDataAvailable;      /**< Whether sample data is found. */
-    QString m_sSubjectsDir;     /**< Path to subjects dir. */
-    QTemporaryDir m_tempDir;    /**< Temporary directory for test output. */
+    QString m_sAppPath;      /**< Path to the mne_surf2bem executable. */
+    bool m_bAppAvailable;    /**< Whether the app is found. */
+    bool m_bDataAvailable;   /**< Whether sample data is found. */
+    QString m_sSubjectsDir;  /**< Path to subjects dir. */
+    QTemporaryDir m_tempDir; /**< Temporary directory for test output. */
 };
 
 //=============================================================================================================
@@ -385,7 +385,7 @@ void TestMneSurf2Bem::testMultiSurfConversion()
     //
     QString innerSkull = findSurfaceFile("inner_skull.surf");
     QString outerSkull = findSurfaceFile("outer_skull.surf");
-    QString outerSkin  = findSurfaceFile("outer_skin.surf");
+    QString outerSkin = findSurfaceFile("outer_skin.surf");
 
     if (innerSkull.isEmpty() || outerSkull.isEmpty() || outerSkin.isEmpty()) {
         QSKIP("Not all three BEM surfaces found in sample data");
@@ -398,7 +398,7 @@ void TestMneSurf2Bem::testMultiSurfConversion()
     QStringList args;
     args << "--surf" << innerSkull << "--id" << "1"
          << "--surf" << outerSkull << "--id" << "3"
-         << "--surf" << outerSkin  << "--id" << "4"
+         << "--surf" << outerSkin << "--id" << "4"
          << "--fif" << outputFif;
 
     proc.start(m_sAppPath, args);
@@ -456,7 +456,7 @@ void TestMneSurf2Bem::testSurfConversionWithCheck()
     //
     QString innerSkull = findSurfaceFile("inner_skull.surf");
     QString outerSkull = findSurfaceFile("outer_skull.surf");
-    QString outerSkin  = findSurfaceFile("outer_skin.surf");
+    QString outerSkin = findSurfaceFile("outer_skin.surf");
 
     if (innerSkull.isEmpty() || outerSkull.isEmpty() || outerSkin.isEmpty()) {
         QSKIP("Not all three BEM surfaces found in sample data");
@@ -469,7 +469,7 @@ void TestMneSurf2Bem::testSurfConversionWithCheck()
     QStringList args;
     args << "--surf" << innerSkull << "--id" << "1"
          << "--surf" << outerSkull << "--id" << "3"
-         << "--surf" << outerSkin  << "--id" << "4"
+         << "--surf" << outerSkin << "--id" << "4"
          << "--check"
          << "--fif" << outputFif;
 

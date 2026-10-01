@@ -59,7 +59,8 @@ using namespace Eigen;
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-enum SurfaceFormat {
+enum SurfaceFormat
+{
     FORMAT_UNKNOWN = 0,
     FORMAT_FIF,
     FORMAT_TRI,
@@ -285,7 +286,7 @@ static bool writeFifSurface(const QString& filename, const MatrixX3f& rr, const 
 
 //=============================================================================================================
 
-int main(int argc, char *argv[])
+int main(int argc, char* argv[])
 {
     qInstallMessageHandler(MNELogger::customLogWriter);
     QCoreApplication app(argc, argv);
@@ -397,31 +398,31 @@ int main(int argc, char *argv[])
     bool ok = false;
 
     switch (inputFormat) {
-    case FORMAT_FIF:
-        ok = readFifSurface(inputFile, rr, tris);
-        break;
-    case FORMAT_TRI:
-        ok = readTriFile(inputFile, rr, tris);
-        if (ok && !scaleSet)
-            scaleFactor = 0.001f; // tri files are typically in mm
-        break;
-    case FORMAT_FREESURFER: {
-        FsSurface surface;
-        ok = FsSurface::read(inputFile, surface);
-        if (ok) {
-            rr = surface.rr();
-            tris = surface.tris();
+        case FORMAT_FIF:
+            ok = readFifSurface(inputFile, rr, tris);
+            break;
+        case FORMAT_TRI:
+            ok = readTriFile(inputFile, rr, tris);
+            if (ok && !scaleSet)
+                scaleFactor = 0.001f; // tri files are typically in mm
+            break;
+        case FORMAT_FREESURFER: {
+            FsSurface surface;
+            ok = FsSurface::read(inputFile, surface);
+            if (ok) {
+                rr = surface.rr();
+                tris = surface.tris();
+            }
+            break;
         }
-        break;
-    }
-    case FORMAT_SMF:
-        ok = readSmfFile(inputFile, rr, tris);
-        if (ok && !scaleSet)
-            scaleFactor = 0.001f; // smf files are typically in mm
-        break;
-    default:
-        fprintf(stderr, "Cannot determine input format. Use --surf, --fif, --tri, or --smf.\n");
-        return 1;
+        case FORMAT_SMF:
+            ok = readSmfFile(inputFile, rr, tris);
+            if (ok && !scaleSet)
+                scaleFactor = 0.001f; // smf files are typically in mm
+            break;
+        default:
+            fprintf(stderr, "Cannot determine input format. Use --surf, --fif, --tri, or --smf.\n");
+            return 1;
     }
 
     if (!ok) {
@@ -429,8 +430,8 @@ int main(int argc, char *argv[])
         return 1;
     }
 
-    qInfo("Read surface: %ld vertices, %ld triangles" ,
-           static_cast<long>(rr.rows()), static_cast<long>(tris.rows()));
+    qInfo("Read surface: %ld vertices, %ld triangles",
+          static_cast<long>(rr.rows()), static_cast<long>(tris.rows()));
 
     // Apply scale factor to convert to meters (internal representation)
     if (scaleFactor != 1.0f) {
@@ -441,23 +442,23 @@ int main(int argc, char *argv[])
     // Write output surface
     //
     switch (outputFormat) {
-    case FORMAT_FIF:
-        ok = writeFifSurface(outputFile, rr, tris, surfId);
-        break;
-    case FORMAT_TRI:
-        // tri format uses mm
-        ok = writeTriFile(outputFile, rr * 1000.0f, tris);
-        break;
-    case FORMAT_FREESURFER:
-        fprintf(stderr, "FreeSurfer surface writing not yet supported. Use --outtri or --outfif.\n");
-        return 1;
-    case FORMAT_SMF:
-        // smf format uses mm
-        ok = writeSmfFile(outputFile, rr * 1000.0f, tris);
-        break;
-    default:
-        fprintf(stderr, "Unknown output format.\n");
-        return 1;
+        case FORMAT_FIF:
+            ok = writeFifSurface(outputFile, rr, tris, surfId);
+            break;
+        case FORMAT_TRI:
+            // tri format uses mm
+            ok = writeTriFile(outputFile, rr * 1000.0f, tris);
+            break;
+        case FORMAT_FREESURFER:
+            fprintf(stderr, "FreeSurfer surface writing not yet supported. Use --outtri or --outfif.\n");
+            return 1;
+        case FORMAT_SMF:
+            // smf format uses mm
+            ok = writeSmfFile(outputFile, rr * 1000.0f, tris);
+            break;
+        default:
+            fprintf(stderr, "Unknown output format.\n");
+            return 1;
     }
 
     if (!ok) {
@@ -465,6 +466,6 @@ int main(int argc, char *argv[])
         return 1;
     }
 
-    qInfo("Wrote surface to %s" , outputFile.toUtf8().constData());
+    qInfo("Wrote surface to %s", outputFile.toUtf8().constData());
     return 0;
 }

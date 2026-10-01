@@ -54,21 +54,23 @@ public:
     /**
      * @brief Filter design family.
      */
-    enum class DesignMethod {
-        Cosine,         /**< FIR cosine-window design. */
-        Tschebyscheff,  /**< FIR Parks-McClellan / equiripple design. */
-        Butterworth     /**< IIR Butterworth design using SOS sections. */
+    enum class DesignMethod
+    {
+        Cosine,        /**< FIR cosine-window design. */
+        Tschebyscheff, /**< FIR Parks-McClellan / equiripple design. */
+        Butterworth    /**< IIR Butterworth design using SOS sections. */
     };
 
     //=========================================================================================================
     /**
      * @brief Supported filter types.
      */
-    enum class FilterType {
-        LowPass,        /**< Low-pass filter. */
-        HighPass,       /**< High-pass filter. */
-        BandPass,       /**< Band-pass filter. */
-        BandStop        /**< Band-stop / notch filter. */
+    enum class FilterType
+    {
+        LowPass,  /**< Low-pass filter. */
+        HighPass, /**< High-pass filter. */
+        BandPass, /**< Band-pass filter. */
+        BandStop  /**< Band-stop / notch filter. */
     };
 
     SessionFilter();
@@ -182,20 +184,20 @@ private:
     QVector<UTILSLIB::IirBiquad> createIirSections() const;
     Eigen::VectorXcd frequencyResponse(int iPoints) const;
 
-    QString                         m_sName;                /**< Human-readable filter name. */
-    DesignMethod                    m_designMethod;         /**< Filter design method. */
-    FilterType                      m_filterType;           /**< Filter type. */
-    int                             m_iOrder;               /**< FIR taps or IIR order. */
-    double                          m_dCutoffLowHz;         /**< Lower cutoff in Hz. */
-    double                          m_dCutoffHighHz;        /**< Upper cutoff in Hz. */
-    double                          m_dTransitionHz;        /**< FIR transition width in Hz. */
-    double                          m_dSamplingFrequencyHz; /**< Sampling frequency in Hz. */
-    QString                         m_sApplyTo;             /**< Channel scope for this filter. */
-    mutable UTILSLIB::FilterKernel  m_firKernel;            /**< Lazily prepared FIR kernel. */
-    mutable QVector<UTILSLIB::IirBiquad> m_iirSections;     /**< Lazily designed IIR SOS cascade. */
-    mutable bool                    m_bFirDesigned = false; /**< True once the FIR kernel matches this session-filter definition. */
-    mutable bool                    m_bIirDesigned = false; /**< True once the IIR sections match this session-filter definition. */
-    mutable int                     m_iPreparedDataSize = 0;/**< Last data size used to prepare the FIR kernel. */
+    QString m_sName;                                    /**< Human-readable filter name. */
+    DesignMethod m_designMethod;                        /**< Filter design method. */
+    FilterType m_filterType;                            /**< Filter type. */
+    int m_iOrder;                                       /**< FIR taps or IIR order. */
+    double m_dCutoffLowHz;                              /**< Lower cutoff in Hz. */
+    double m_dCutoffHighHz;                             /**< Upper cutoff in Hz. */
+    double m_dTransitionHz;                             /**< FIR transition width in Hz. */
+    double m_dSamplingFrequencyHz;                      /**< Sampling frequency in Hz. */
+    QString m_sApplyTo;                                 /**< Channel scope for this filter. */
+    mutable UTILSLIB::FilterKernel m_firKernel;         /**< Lazily prepared FIR kernel. */
+    mutable QVector<UTILSLIB::IirBiquad> m_iirSections; /**< Lazily designed IIR SOS cascade. */
+    mutable bool m_bFirDesigned = false;                /**< True once the FIR kernel matches this session-filter definition. */
+    mutable bool m_bIirDesigned = false;                /**< True once the IIR sections match this session-filter definition. */
+    mutable int m_iPreparedDataSize = 0;                /**< Last data size used to prepare the FIR kernel. */
 };
 
 } // namespace MNEBROWSE

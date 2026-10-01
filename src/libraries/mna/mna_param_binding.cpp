@@ -41,9 +41,9 @@ using namespace MNALIB;
 QJsonObject MnaParamBinding::toJson() const
 {
     QJsonObject json;
-    json[QStringLiteral("target")]     = targetPath;
+    json[QStringLiteral("target")] = targetPath;
     json[QStringLiteral("expression")] = expression;
-    json[QStringLiteral("trigger")]    = trigger;
+    json[QStringLiteral("trigger")] = trigger;
 
     if (trigger == QStringLiteral("periodic") && periodMs > 0) {
         json[QStringLiteral("period_ms")] = periodMs;
@@ -65,10 +65,10 @@ QJsonObject MnaParamBinding::toJson() const
 MnaParamBinding MnaParamBinding::fromJson(const QJsonObject& json)
 {
     MnaParamBinding b;
-    b.targetPath  = json.value(QStringLiteral("target")).toString();
-    b.expression  = json.value(QStringLiteral("expression")).toString();
-    b.trigger     = json.value(QStringLiteral("trigger")).toString();
-    b.periodMs    = json.value(QStringLiteral("period_ms")).toInt(0);
+    b.targetPath = json.value(QStringLiteral("target")).toString();
+    b.expression = json.value(QStringLiteral("expression")).toString();
+    b.trigger = json.value(QStringLiteral("trigger")).toString();
+    b.periodMs = json.value(QStringLiteral("period_ms")).toInt(0);
 
     const QJsonArray arr = json.value(QStringLiteral("dependencies")).toArray();
     for (const QJsonValue& v : arr) {
@@ -83,9 +83,9 @@ MnaParamBinding MnaParamBinding::fromJson(const QJsonObject& json)
 QCborMap MnaParamBinding::toCbor() const
 {
     QCborMap cbor;
-    cbor.insert(QStringLiteral("target"),     targetPath);
+    cbor.insert(QStringLiteral("target"), targetPath);
     cbor.insert(QStringLiteral("expression"), expression);
-    cbor.insert(QStringLiteral("trigger"),    trigger);
+    cbor.insert(QStringLiteral("trigger"), trigger);
 
     if (trigger == QStringLiteral("periodic") && periodMs > 0) {
         cbor.insert(QStringLiteral("period_ms"), periodMs);
@@ -107,10 +107,10 @@ QCborMap MnaParamBinding::toCbor() const
 MnaParamBinding MnaParamBinding::fromCbor(const QCborMap& cbor)
 {
     MnaParamBinding b;
-    b.targetPath  = cbor.value(QStringLiteral("target")).toString();
-    b.expression  = cbor.value(QStringLiteral("expression")).toString();
-    b.trigger     = cbor.value(QStringLiteral("trigger")).toString();
-    b.periodMs    = static_cast<int>(cbor.value(QStringLiteral("period_ms")).toInteger(0));
+    b.targetPath = cbor.value(QStringLiteral("target")).toString();
+    b.expression = cbor.value(QStringLiteral("expression")).toString();
+    b.trigger = cbor.value(QStringLiteral("trigger")).toString();
+    b.periodMs = static_cast<int>(cbor.value(QStringLiteral("period_ms")).toInteger(0));
 
     const QCborArray arr = cbor.value(QStringLiteral("dependencies")).toArray();
     for (const QCborValue& v : arr) {

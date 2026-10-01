@@ -53,19 +53,23 @@ using namespace Eigen;
 QString SurfaceChecks::getNameOf(int id)
 {
     switch (id) {
-        case FIFFV_BEM_SURF_ID_HEAD:  return "outer skin ";
-        case FIFFV_BEM_SURF_ID_SKULL: return "outer skull";
-        case FIFFV_BEM_SURF_ID_BRAIN: return "inner skull";
-        default:                      return "unknown    ";
+        case FIFFV_BEM_SURF_ID_HEAD:
+            return "outer skin ";
+        case FIFFV_BEM_SURF_ID_SKULL:
+            return "outer skull";
+        case FIFFV_BEM_SURF_ID_BRAIN:
+            return "inner skull";
+        default:
+            return "unknown    ";
     }
 }
 
 //=============================================================================================================
 
 double SurfaceChecks::solidAngle(const Vector3f& from,
-                                  const Vector3f& v0,
-                                  const Vector3f& v1,
-                                  const Vector3f& v2)
+                                 const Vector3f& v0,
+                                 const Vector3f& v1,
+                                 const Vector3f& v2)
 {
     //
     // Compute the solid angle according to van Oosterom's formula
@@ -80,10 +84,7 @@ double SurfaceChecks::solidAngle(const Vector3f& from,
 
     double triple = d1.cross(d2).dot(d3);
 
-    double s = l1 * l2 * l3
-             + d1.dot(d2) * l3
-             + d1.dot(d3) * l2
-             + d2.dot(d3) * l1;
+    double s = l1 * l2 * l3 + d1.dot(d2) * l3 + d1.dot(d3) * l2 + d2.dot(d3) * l1;
 
     return 2.0 * atan2(triple, s);
 }
@@ -127,7 +128,7 @@ bool SurfaceChecks::isCompleteSurface(const MNEBemSurface& surf)
     double totAngle = sumSolids(cm, surf) / (4.0 * M_PI);
     if (fabs(totAngle - 1.0) > 1e-5) {
         qCritical() << "FsSurface" << getNameOf(surf.id) << "is not complete"
-                     << "(sum of solid angles =" << totAngle << "* 4*PI instead).";
+                    << "(sum of solid angles =" << totAngle << "* 4*PI instead).";
         return false;
     }
     return true;
@@ -142,8 +143,8 @@ bool SurfaceChecks::isInside(const MNEBemSurface& from, const MNEBemSurface& to)
         double totAngle = sumSolids(pt, to) / (4.0 * M_PI);
         if (fabs(totAngle - 1.0) > 1e-5) {
             qCritical() << "FsSurface" << getNameOf(from.id)
-                         << "is not completely inside surface" << getNameOf(to.id)
-                         << "(sum of solid angles =" << totAngle << "* 4*PI).";
+                        << "is not completely inside surface" << getNameOf(to.id)
+                        << "(sum of solid angles =" << totAngle << "* 4*PI).";
             return false;
         }
     }
@@ -234,8 +235,8 @@ bool SurfaceChecks::checkSurfaceSize(const MNEBemSurface& surf)
     for (int c = 0; c < 3; ++c) {
         if (maxDim(c) - minDim(c) < MINSIZE) {
             qCritical() << "Dimensions of the surface" << getNameOf(surf.id)
-                         << "seem too small (" << 1000.0f * (maxDim(c) - minDim(c)) << "mm)."
-                         << "Maybe the unit of measure is meters instead of mm.";
+                        << "seem too small (" << 1000.0f * (maxDim(c) - minDim(c)) << "mm)."
+                        << "Maybe the unit of measure is meters instead of mm.";
             return false;
         }
     }

@@ -53,7 +53,8 @@
 // DEFINE NAMESPACE MNALIB
 //=============================================================================================================
 
-namespace MNALIB{
+namespace MNALIB
+{
 
 //=============================================================================================================
 /**
@@ -62,8 +63,8 @@ namespace MNALIB{
 class MNASHARED_EXPORT MnaProject
 {
 public:
-    typedef QSharedPointer<MnaProject>       SPtr;            /**< Shared pointer type. */
-    typedef QSharedPointer<const MnaProject>  ConstSPtr;      /**< Const shared pointer type. */
+    typedef QSharedPointer<MnaProject> SPtr;            /**< Shared pointer type. */
+    typedef QSharedPointer<const MnaProject> ConstSPtr; /**< Const shared pointer type. */
 
     //=========================================================================================================
     /**
@@ -73,16 +74,16 @@ public:
 
     //=========================================================================================================
 
-    static constexpr const char* CURRENT_SCHEMA_VERSION = "1.0";  /**< Current MNA schema version. */
+    static constexpr const char* CURRENT_SCHEMA_VERSION = "1.0"; /**< Current MNA schema version. */
 
-    QString            name;          /**< Project name. */
-    QString            description;   /**< Project description. */
-    QString            mnaVersion;    /**< MNA schema version. */
-    QDateTime          created;       /**< Creation timestamp. */
-    QDateTime          modified;      /**< Last modification timestamp. */
-    QList<MnaSubject>  subjects;      /**< Subjects in the project. */
-    QList<MnaNode>     pipeline;      /**< Processing pipeline nodes. */
-    QJsonObject        extras;        /**< Unknown keys preserved for lossless round-trip. */
+    QString name;               /**< Project name. */
+    QString description;        /**< Project description. */
+    QString mnaVersion;         /**< MNA schema version. */
+    QDateTime created;          /**< Creation timestamp. */
+    QDateTime modified;         /**< Last modification timestamp. */
+    QList<MnaSubject> subjects; /**< Subjects in the project. */
+    QList<MnaNode> pipeline;    /**< Processing pipeline nodes. */
+    QJsonObject extras;         /**< Unknown keys preserved for lossless round-trip. */
 
     //=========================================================================================================
     /**

@@ -43,7 +43,7 @@ using namespace UTILSLIB;
 //=============================================================================================================
 
 Report::Report(const QString& sTitle)
-    : m_sTitle(sTitle)
+: m_sTitle(sTitle)
 {
 }
 
@@ -60,8 +60,8 @@ void Report::addText(const QString& sTitle, const QString& sContent)
 //=============================================================================================================
 
 void Report::addTable(const QString& sTitle,
-                       const QStringList& headers,
-                       const QList<QStringList>& rows)
+                      const QStringList& headers,
+                      const QList<QStringList>& rows)
 {
     QString html = "<table>\n<thead><tr>\n";
     for (const auto& h : headers) {
@@ -87,7 +87,7 @@ void Report::addTable(const QString& sTitle,
 //=============================================================================================================
 
 void Report::addKeyValue(const QString& sTitle,
-                          const QList<QPair<QString, QString>>& pairs)
+                         const QList<QPair<QString, QString>>& pairs)
 {
     QString html = "<dl>\n";
     for (const auto& pair : pairs) {

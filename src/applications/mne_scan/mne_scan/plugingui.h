@@ -63,7 +63,7 @@ class PluginGui : public QMainWindow
     friend class PluginScene;
 
 public:
-    PluginGui(SCSHAREDLIB::PluginManager *pPluginManager, SCSHAREDLIB::PluginSceneManager *pPluginSceneManager);
+    PluginGui(SCSHAREDLIB::PluginManager* pPluginManager, SCSHAREDLIB::PluginSceneManager* pPluginSceneManager);
 
     ~PluginGui();
 
@@ -114,18 +114,17 @@ public:
     void uiSetupRunningState(bool state);
 
 signals:
-   void selectedPluginChanged(SCSHAREDLIB::AbstractPlugin::SPtr pPlugin);
+    void selectedPluginChanged(SCSHAREDLIB::AbstractPlugin::SPtr pPlugin);
 
-   void selectedConnectionChanged(SCSHAREDLIB::PluginConnectorConnection::SPtr pConnection);
+    void selectedConnectionChanged(SCSHAREDLIB::PluginConnectorConnection::SPtr pConnection);
 
 private:
-
     void pointerGroupClicked();
     void actionGroupTriggered(QAction* action);
 
     bool removePlugin(SCSHAREDLIB::AbstractPlugin::SPtr pPlugin);
 
-    void itemInserted(PluginItem *item);
+    void itemInserted(PluginItem* item);
     void newItemSelected();
 
     //=========================================================================================================
@@ -160,32 +159,32 @@ private:
      */
     void saveConfigMna(const QString& fullPath);
 
-    SCSHAREDLIB::PluginManager*          m_pPluginManager;       /**< Corresponding plugin manager. */
-    SCSHAREDLIB::PluginSceneManager*     m_pPluginSceneManager;  /**< Corresponding plugin scene manager. */
+    SCSHAREDLIB::PluginManager* m_pPluginManager;           /**< Corresponding plugin manager. */
+    SCSHAREDLIB::PluginSceneManager* m_pPluginSceneManager; /**< Corresponding plugin scene manager. */
 
-    SCSHAREDLIB::AbstractPlugin::SPtr                   m_pCurrentPlugin;
+    SCSHAREDLIB::AbstractPlugin::SPtr m_pCurrentPlugin;
     SCSHAREDLIB::PluginConnectorConnection::SPtr m_pCurrentConnection;
 
-    PluginScene*    m_pPluginScene;         /**< Plugin graph. */
-    QGraphicsView*  m_pGraphicsView;        /**< View to show graph. */
+    PluginScene* m_pPluginScene;    /**< Plugin graph. */
+    QGraphicsView* m_pGraphicsView; /**< View to show graph. */
 
-    QToolButton*    m_pSensorToolButton;
-    QToolButton*    m_pAlgorithmToolButton;
-    QToolBar*       m_pToolBarPlugins;
-    QActionGroup*   m_pActionGroupPlugins;
+    QToolButton* m_pSensorToolButton;
+    QToolButton* m_pAlgorithmToolButton;
+    QToolBar* m_pToolBarPlugins;
+    QActionGroup* m_pActionGroupPlugins;
 
-    QToolButton*    m_pPointerButton;
-    QToolButton*    m_pLinePointerButton;
-    QToolBar *      m_pToolBarPointer;
-    QButtonGroup *  m_pButtonGroupPointers;
+    QToolButton* m_pPointerButton;
+    QToolButton* m_pLinePointerButton;
+    QToolBar* m_pToolBarPointer;
+    QButtonGroup* m_pButtonGroupPointers;
 
-    QToolBar*   m_pToolBarItem;
-    QMenu*      m_pMenuItem;
-    QAction*    deleteAction;
-    QAction*    toFrontAction;
-    QAction*    sendBackAction;
+    QToolBar* m_pToolBarItem;
+    QMenu* m_pMenuItem;
+    QAction* deleteAction;
+    QAction* toFrontAction;
+    QAction* sendBackAction;
 
-    MNALIB::MnaProject m_loadedMnaProject;   /**< Loaded project preserved for enriching round-trip saves. */
+    MNALIB::MnaProject m_loadedMnaProject; /**< Loaded project preserved for enriching round-trip saves. */
 };
 
 //=============================================================================================================

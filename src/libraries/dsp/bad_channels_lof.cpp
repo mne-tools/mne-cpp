@@ -68,8 +68,8 @@ VectorXd UTILSLIB::computeLofScores(const MatrixXd& features, int k)
 //=============================================================================================================
 
 QStringList UTILSLIB::findBadChannelsLof(const MatrixXd& data,
-                                          const FiffInfo& info,
-                                          const LofBadChannelParams& params)
+                                         const FiffInfo& info,
+                                         const LofBadChannelParams& params)
 {
     // Select channel indices based on type filter
     QList<int> chIdx;

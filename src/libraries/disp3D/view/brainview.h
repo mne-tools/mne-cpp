@@ -65,8 +65,15 @@ class BrainSurface;
 class DipoleObject;
 class NetworkObject;
 class PolylineObject;
-namespace DISP3DLIB { class VideoOverlay; class SliceObject; }
-namespace CONNECTIVITYLIB { class Network; }
+namespace DISP3DLIB
+{
+class VideoOverlay;
+class SliceObject;
+}
+namespace CONNECTIVITYLIB
+{
+class Network;
+}
 
 //=============================================================================================================
 /**
@@ -76,11 +83,12 @@ namespace CONNECTIVITYLIB { class Network; }
  * (e.g. digitizer tracker tip, orientation axes) without going through
  * the model pipeline or recalculating scene bounds.
  */
-struct DISP3DSHARED_EXPORT LiveMarker {
+struct DISP3DSHARED_EXPORT LiveMarker
+{
     QVector3D position;
-    QColor    color;
-    float     radius = 0.003f;
-    bool      transparent = false; ///< If true, rendered with alpha blending.
+    QColor color;
+    float radius = 0.003f;
+    bool transparent = false; ///< If true, rendered with alpha blending.
 };
 
 //=============================================================================================================
@@ -98,9 +106,10 @@ public:
     /**
      * View mode for single or multi-viewport display.
      */
-    enum ViewMode {
-        SingleView,     /**< Single viewport with interactive camera */
-        MultiView       /**< Three viewports with fixed cameras (top, left, front) */
+    enum ViewMode
+    {
+        SingleView, /**< Single viewport with interactive camera */
+        MultiView   /**< Three viewports with fixed cameras (top, left, front) */
     };
 
 public:
@@ -110,7 +119,7 @@ public:
      *
      * @param[in] parent     Parent widget.
      */
-    explicit BrainView(QWidget *parent = nullptr);
+    explicit BrainView(QWidget* parent = nullptr);
 
     //=========================================================================================================
     /**
@@ -124,7 +133,7 @@ public:
      *
      * @param[in] model      Pointer to BrainTreeModel.
      */
-    void setModel(BrainTreeModel *model);
+    void setModel(BrainTreeModel* model);
 
     //=========================================================================================================
     /**
@@ -133,18 +142,18 @@ public:
      *
      * @param[in] rotation   Initial camera rotation quaternion.
      */
-    void setInitialCameraRotation(const QQuaternion &rotation);
+    void setInitialCameraRotation(const QQuaternion& rotation);
 
 public slots:
-    void onRowsInserted(const QModelIndex &parent, int first, int last);
-    void onDataChanged(const QModelIndex &topLeft, const QModelIndex &bottomRight, const QVector<int> &roles);
+    void onRowsInserted(const QModelIndex& parent, int first, int last);
+    void onDataChanged(const QModelIndex& topLeft, const QModelIndex& bottomRight, const QVector<int>& roles);
     //=========================================================================================================
     /**
      * Set the active surface type to search for (e.g. "pial").
      *
      * @param[in] type       The surface type to activate.
      */
-    void setActiveSurface(const QString &type);
+    void setActiveSurface(const QString& type);
 
     //=========================================================================================================
     /**
@@ -152,7 +161,7 @@ public slots:
      *
      * @param[in] mode       The shader mode to set.
      */
-    void setShaderMode(const QString &mode);
+    void setShaderMode(const QString& mode);
 
     //=========================================================================================================
     /**
@@ -160,7 +169,7 @@ public slots:
      *
      * @param[in] mode       The shader mode to set.
      */
-    void setBemShaderMode(const QString &mode);
+    void setBemShaderMode(const QString& mode);
 
     /**
      * Synchronize all BEM shader targets to their respective brain shader targets.
@@ -173,7 +182,7 @@ public slots:
      *
      * @param[in] mode       The visualization mode to set.
      */
-    void setVisualizationMode(const QString &mode);
+    void setVisualizationMode(const QString& mode);
 
     //=========================================================================================================
     /**
@@ -191,7 +200,7 @@ public slots:
      * @param[in] name       "head", "outer_skull", or "inner_skull".
      * @param[in] visible    Visibility state.
      */
-    void setBemVisible(const QString &name, bool visible);
+    void setBemVisible(const QString& name, bool visible);
 
     //=========================================================================================================
     /**
@@ -208,7 +217,7 @@ public slots:
      * @param[in] type       "MEG", "EEG", or "Digitizer".
      * @param[in] visible    Visibility state.
      */
-    void setSensorVisible(const QString &type, bool visible);
+    void setSensorVisible(const QString& type, bool visible);
 
     //=========================================================================================================
     /**
@@ -224,7 +233,7 @@ public slots:
      *
      * @param[in] path       Absolute path to a helmet surface file. Empty to use auto selection.
      */
-    void setMegHelmetOverride(const QString &path);
+    void setMegHelmetOverride(const QString& path);
 
     //=========================================================================================================
     /**
@@ -236,7 +245,7 @@ public slots:
      * @param[in] helmetFilePath   Absolute path to a helmet BEM FIF file.
      * @return True if the helmet surface was loaded successfully.
      */
-    bool loadMegHelmetSurface(const QString &helmetFilePath);
+    bool loadMegHelmetSurface(const QString& helmetFilePath);
 
     //=========================================================================================================
     /**
@@ -254,7 +263,7 @@ public slots:
      * @param[in] name       Display name for the network.
      * @return True if successful.
      */
-    bool loadNetwork(const CONNECTIVITYLIB::Network &network, const QString &name = "Network");
+    bool loadNetwork(const CONNECTIVITYLIB::Network& network, const QString& name = "Network");
 
     //=========================================================================================================
     /**
@@ -278,7 +287,7 @@ public slots:
      *
      * @param[in] name       Colormap name ("Hot", "Jet", etc.).
      */
-    void setNetworkColormap(const QString &name);
+    void setNetworkColormap(const QString& name);
 
     //=========================================================================================================
     /**
@@ -350,8 +359,8 @@ public slots:
      * @param[in] surfaceType Surface type to match (default "pial").
      * @return true on success, false on failure.
      */
-    bool savePng(const QString &path, int width = 1200, int height = 800,
-                 const QString &surfaceType = QStringLiteral("pial"));
+    bool savePng(const QString& path, int width = 1200, int height = 800,
+                 const QString& surfaceType = QStringLiteral("pial"));
 
     //=========================================================================================================
     /**
@@ -377,7 +386,10 @@ public slots:
     /**
      * @return Current number of visible viewport panes (1–4).
      */
-    int  viewCount() const { return m_viewCount; }
+    int viewCount() const
+    {
+        return m_viewCount;
+    }
 
     //=========================================================================================================
     /**
@@ -471,7 +483,7 @@ public slots:
      * @param[in] target     -1=Single, 0=Top, 1=Perspective, 2=Front, 3=Left.
      * @return               True if visible, false otherwise.
      */
-    bool objectVisibleForTarget(const QString &object, int target) const;
+    bool objectVisibleForTarget(const QString& object, int target) const;
 
     /**
      * Check whether MEG field mapping uses head surface for a target.
@@ -503,7 +515,10 @@ public slots:
      *
      * @return True if visible.
      */
-    bool isInfoPanelVisible() const { return m_infoPanelVisible; }
+    bool isInfoPanelVisible() const
+    {
+        return m_infoPanelVisible;
+    }
 
     //=========================================================================================================
     /**
@@ -511,7 +526,10 @@ public slots:
      *
      * @return Current ViewMode.
      */
-    ViewMode viewMode() const { return m_viewMode; }
+    ViewMode viewMode() const
+    {
+        return m_viewMode;
+    }
 
     //=========================================================================================================
     /**
@@ -521,7 +539,7 @@ public slots:
      * @param[in] rhPath     Path to right hemisphere .stc file.
      * @return True if successful.
      */
-    bool loadSourceEstimate(const QString &lhPath, const QString &rhPath);
+    bool loadSourceEstimate(const QString& lhPath, const QString& rhPath);
 
     //=========================================================================================================
     /**
@@ -530,7 +548,7 @@ public slots:
      * @param[in] fifPath    Path to the FIF file.
      * @return True if successful.
      */
-    bool loadSensors(const QString &fifPath);
+    bool loadSensors(const QString& fifPath);
 
     /**
      * @brief Return cardinal fiducials (NAS/LPA/RPA) transformed to MRI coordinates.
@@ -559,7 +577,7 @@ public slots:
      * @param[in] dipPath    Path to the dipole file.
      * @return True if successful.
      */
-    bool loadDipoles(const QString &dipPath);
+    bool loadDipoles(const QString& dipPath);
 
     //=========================================================================================================
     /**
@@ -568,7 +586,7 @@ public slots:
      * @param[in] fwdPath    Path to the FIF file containing source space data.
      * @return True if successful.
      */
-    bool loadSourceSpace(const QString &fwdPath);
+    bool loadSourceSpace(const QString& fwdPath);
 
     //=========================================================================================================
     /**
@@ -581,7 +599,7 @@ public slots:
      * @param[in] evokedPath   Path to the evoked/average FIF file.
      * @return Descriptive labels for each evoked set.
      */
-    static QStringList probeEvokedSets(const QString &evokedPath);
+    static QStringList probeEvokedSets(const QString& evokedPath);
 
     /**
      * Load sensor measurements from an evoked/average FIF file.
@@ -590,7 +608,7 @@ public slots:
      * @param[in] aveIndex     Dataset index to load from the file.
      * @return True if successful.
      */
-    bool loadSensorField(const QString &evokedPath, int aveIndex = 0);
+    bool loadSensorField(const QString& evokedPath, int aveIndex = 0);
 
     //=========================================================================================================
     /**
@@ -607,7 +625,7 @@ public slots:
      * @param[in] transPath  Path to the transformation file.
      * @return True if successful.
      */
-    bool loadTransformation(const QString &transPath);
+    bool loadTransformation(const QString& transPath);
 
     //=========================================================================================================
     /**
@@ -623,7 +641,7 @@ public slots:
      *
      * @param[in] pos        2D mouse position.
      */
-    void castRay(const QPoint &pos);
+    void castRay(const QPoint& pos);
 
     //=========================================================================================================
     /**
@@ -631,7 +649,7 @@ public slots:
      *
      * @param[in] name       Colormap name ("Hot", "Jet", etc.).
      */
-    void setSourceColormap(const QString &name);
+    void setSourceColormap(const QString& name);
 
     //=========================================================================================================
     /**
@@ -658,7 +676,7 @@ public slots:
      * @param[in] type       "MEG" or "EEG".
      * @param[in] visible    Visibility state.
      */
-    void setSensorFieldVisible(const QString &type, bool visible);
+    void setSensorFieldVisible(const QString& type, bool visible);
 
     //=========================================================================================================
     /**
@@ -667,7 +685,7 @@ public slots:
      * @param[in] type       "MEG" or "EEG".
      * @param[in] visible    Visibility state.
      */
-    void setSensorFieldContourVisible(const QString &type, bool visible);
+    void setSensorFieldContourVisible(const QString& type, bool visible);
 
     //=========================================================================================================
     /**
@@ -683,7 +701,7 @@ public slots:
      *
      * @param[in] name       Colormap name.
      */
-    void setSensorFieldColormap(const QString &name);
+    void setSensorFieldColormap(const QString& name);
 
     //=========================================================================================================
     /**
@@ -756,7 +774,7 @@ public slots:
      *
      * @param[in] matData       Source activity vector.
      */
-    void pushRealtimeSourceData(const Eigen::VectorXd &matData);
+    void pushRealtimeSourceData(const Eigen::VectorXd& matData);
 
     //=========================================================================================================
     /**
@@ -782,7 +800,7 @@ public slots:
      * @param[out] tmax      End time in seconds.
      * @return True if sensor field data is loaded, false otherwise.
      */
-    bool sensorFieldTimeRange(float &tmin, float &tmax) const;
+    bool sensorFieldTimeRange(float& tmin, float& tmax) const;
 
     //=========================================================================================================
     // ── Real-time sensor data streaming ────────────────────────────────
@@ -798,7 +816,7 @@ public slots:
      *
      * @param[in] modality   "MEG" or "EEG".
      */
-    void startRealtimeSensorStreaming(const QString &modality = QStringLiteral("MEG"));
+    void startRealtimeSensorStreaming(const QString& modality = QStringLiteral("MEG"));
 
     //=========================================================================================================
     /**
@@ -822,7 +840,7 @@ public slots:
      *
      * @param[in] vecData       Sensor measurement vector.
      */
-    void pushRealtimeSensorData(const Eigen::VectorXf &vecData);
+    void pushRealtimeSensorData(const Eigen::VectorXf& vecData);
 
     //=========================================================================================================
     /**
@@ -854,7 +872,7 @@ public slots:
      *
      * @param[in] name       Colormap name.
      */
-    void setRealtimeSensorColormap(const QString &name);
+    void setRealtimeSensorColormap(const QString& name);
 
     // ── Data removal ───────────────────────────────────────────────────
 
@@ -989,10 +1007,10 @@ public slots:
     bool isVideoOverlayEnabled() const;
 
     /** Set the world-space focus position (metres) of the overlay quad. */
-    void setVideoOverlayFocusPosition(const QVector3D &position);
+    void setVideoOverlayFocusPosition(const QVector3D& position);
 
     /** Set the orientation hint for the overlay quad (world-space direction). */
-    void setVideoOverlayUpHint(const QVector3D &dir);
+    void setVideoOverlayUpHint(const QVector3D& dir);
 
     /** Set the side length of the overlay quad (metres). Default ≈ 0.06 m. */
     void setVideoOverlaySize(float meters);
@@ -1001,7 +1019,7 @@ public slots:
     void setVideoOverlayOpacity(float opacity);
 
     /** Push a new video frame to the overlay (e.g. from QVideoSink). */
-    void pushVideoOverlayFrame(const QImage &frame);
+    void pushVideoOverlayFrame(const QImage& frame);
 
     /** Enable or disable depth-based parallax relief on the video overlay. */
     void setVideoDepthEnabled(bool enabled);
@@ -1013,7 +1031,7 @@ public slots:
     void setVideoDepthSteps(int steps);
 
     /** Push a monocular depth map corresponding to the current video frame. */
-    void pushVideoDepthFrame(const QImage &depthFrame);
+    void pushVideoDepthFrame(const QImage& depthFrame);
 
     /**
      * @brief Intersect a world-space ray with loaded scene geometry.
@@ -1038,7 +1056,7 @@ public slots:
      * @param[in] slotIndex  Slot index (0=axial, 1=coronal, 2=sagittal).
      * @param[in] slice      Pointer to SliceObject, or nullptr to hide.
      */
-    void setSlice(int slotIndex, DISP3DLIB::SliceObject *slice);
+    void setSlice(int slotIndex, DISP3DLIB::SliceObject* slice);
 
     /**
      * Toggle visibility of an MRI slice slot.
@@ -1098,7 +1116,7 @@ signals:
      * @param[in] percent        Progress percentage (0-100).
      * @param[in] message        Status message.
      */
-    void stcLoadingProgress(int percent, const QString &message);
+    void stcLoadingProgress(int percent, const QString& message);
 
     //=========================================================================================================
     /**
@@ -1115,7 +1133,7 @@ signals:
      *
      * @param[in] regionName  Name of the region under the cursor.
      */
-    void hoveredRegionChanged(const QString &regionName);
+    void hoveredRegionChanged(const QString& regionName);
 
     //=========================================================================================================
     /**
@@ -1144,19 +1162,19 @@ signals:
      *
      * @param[in] modeName  Shader name as accepted by @ref setShaderMode.
      */
-    void shaderModeChanged(const QString &modeName);
+    void shaderModeChanged(const QString& modeName);
 
     /**
      * Emitted on left-click when the click hits a surface.
      * @param[in] worldPos  Hit point in world (model) coordinates.
      */
-    void surfacePointClicked(const QVector3D &worldPos);
+    void surfacePointClicked(const QVector3D& worldPos);
 
     /**
      * Emitted on double-click when the click hits a surface.
      * @param[in] worldPos  Hit point in world (model) coordinates.
      */
-    void surfacePointDoubleClicked(const QVector3D &worldPos);
+    void surfacePointDoubleClicked(const QVector3D& worldPos);
 
 private slots:
     //=========================================================================================================
@@ -1176,39 +1194,39 @@ private slots:
      * @param[in] colorsLh   Per-vertex ABGR colors for the left hemisphere.
      * @param[in] colorsRh   Per-vertex ABGR colors for the right hemisphere.
      */
-    void onRealtimeColorsAvailable(const QVector<uint32_t> &colorsLh,
-                                   const QVector<uint32_t> &colorsRh);
+    void onRealtimeColorsAvailable(const QVector<uint32_t>& colorsLh,
+                                   const QVector<uint32_t>& colorsRh);
 
     //=========================================================================================================
     /** Repaint after sensor streaming produces new colours. */
-    void onSensorStreamColorsAvailable(const QString &surfaceKey,
-                                       const QVector<uint32_t> &colors);
+    void onSensorStreamColorsAvailable(const QString& surfaceKey,
+                                       const QVector<uint32_t>& colors);
 
 private:
     // Note: ViewVisibilityProfile and SubView are defined in core/viewstate.h.
     // SplitterHit is defined in view/multiviewlayout.h.
 
     /** Return the SubView for a given target (-1 = single, 0..3 = multi). */
-    SubView&       subViewForTarget(int target);
+    SubView& subViewForTarget(int target);
     const SubView& subViewForTarget(int target) const;
 
     ViewVisibilityProfile& visibilityProfileForTarget(int target);
     const ViewVisibilityProfile& visibilityProfileForTarget(int target) const;
 
     void refreshSensorTransforms();
-    void removeSurfacesByPrefix(const QString &prefix);
+    void removeSurfacesByPrefix(const QString& prefix);
 
 protected:
-    void initialize(QRhiCommandBuffer *cb) override;
-    void render(QRhiCommandBuffer *cb) override;
+    void initialize(QRhiCommandBuffer* cb) override;
+    void render(QRhiCommandBuffer* cb) override;
 
-    void mousePressEvent(QMouseEvent *event) override;
-    void mouseMoveEvent(QMouseEvent *event) override;
-    void mouseReleaseEvent(QMouseEvent *event) override;
-    void mouseDoubleClickEvent(QMouseEvent *event) override;
-    void wheelEvent(QWheelEvent *event) override;
-    void keyPressEvent(QKeyEvent *event) override;
-    void resizeEvent(QResizeEvent *event) override;
+    void mousePressEvent(QMouseEvent* event) override;
+    void mouseMoveEvent(QMouseEvent* event) override;
+    void mouseReleaseEvent(QMouseEvent* event) override;
+    void mouseDoubleClickEvent(QMouseEvent* event) override;
+    void wheelEvent(QWheelEvent* event) override;
+    void keyPressEvent(QKeyEvent* event) override;
+    void resizeEvent(QResizeEvent* event) override;
 
 private:
     // ── Layout helpers (delegate to MultiViewLayout) ───────────────────
@@ -1223,22 +1241,22 @@ private:
     void updateViewportSeparators();
     void updateOverlayLayout();
     void updateViewportLabelHighlight();
-    void showViewportPresetMenu(int viewport, const QPoint &globalPos);
+    void showViewportPresetMenu(int viewport, const QPoint& globalPos);
     void logPerspectiveRotation(const QString& context) const;
     void loadMultiViewSettings();
     void saveMultiViewSettings() const;
     void updateInflatedSurfaceTransforms();
 
     // ── Rendering ───────────────────────────────────────────────────────
-    std::unique_ptr<BrainRenderer> m_renderer;      /**< GPU renderer for all surfaces/dipoles. */
-    BrainTreeModel* m_model = nullptr;              /**< Data model driving the scene graph (not owned). */
+    std::unique_ptr<BrainRenderer> m_renderer; /**< GPU renderer for all surfaces/dipoles. */
+    BrainTreeModel* m_model = nullptr;         /**< Data model driving the scene graph (not owned). */
 
-    QMap<const QStandardItem*, std::shared_ptr<BrainSurface>> m_itemSurfaceMap;  /**< Model-item → renderable surface. */
-    QMap<const QStandardItem*, std::shared_ptr<DipoleObject>> m_itemDipoleMap;   /**< Model-item → dipole renderable. */
+    QMap<const QStandardItem*, std::shared_ptr<BrainSurface>> m_itemSurfaceMap; /**< Model-item → renderable surface. */
+    QMap<const QStandardItem*, std::shared_ptr<DipoleObject>> m_itemDipoleMap;  /**< Model-item → dipole renderable. */
 
-    QMap<QString, std::shared_ptr<BrainSurface>> m_surfaces;  /**< Key → surface lookup (e.g. "lh_pial", "bem_head"). */
-    std::shared_ptr<BrainSurface> m_activeSurface;            /**< Currently selected brain surface for stats. */
-    QString m_activeSurfaceType;                              /**< Type name of the active surface (e.g. "pial"). */
+    QMap<QString, std::shared_ptr<BrainSurface>> m_surfaces; /**< Key → surface lookup (e.g. "lh_pial", "bem_head"). */
+    std::shared_ptr<BrainSurface> m_activeSurface;           /**< Currently selected brain surface for stats. */
+    QString m_activeSurfaceType;                             /**< Type name of the active surface (e.g. "pial"). */
 
     // ── SubView state ──────────────────────────────────────────────────
     static constexpr int kDefaultViewportCount = 4; /**< Default number of multi-view panes. */
@@ -1247,93 +1265,92 @@ private:
     int m_visualizationEditTarget = -1;             /**< Active pane for UI edits (-1 = single, 0..N-1 = multi). */
 
     // ── Active (runtime) copies — kept in sync with selected SubView ──
-    ShaderMode m_brainShaderMode = Standard;      /**< Current brain shader mode. */
-    ShaderMode m_bemShaderMode = Standard;        /**< Current BEM shader mode. */
+    ShaderMode m_brainShaderMode = Standard;          /**< Current brain shader mode. */
+    ShaderMode m_bemShaderMode = Standard;            /**< Current BEM shader mode. */
     VisualizationMode m_currentVisMode = ModeSurface; /**< Current overlay mode. */
-    bool m_lightingEnabled = true;                  /**< Whether per-fragment lighting is active. */
+    bool m_lightingEnabled = true;                    /**< Whether per-fragment lighting is active. */
 
     // ── Extracted components ───────────────────────────────────────────
-    CameraController        m_camera;               /**< Camera maths helper. */
-    MultiViewLayout         m_layout;               /**< Multi-view pane geometry and splitter logic. */
-    SensorFieldMapper       m_fieldMapper;          /**< Sensor → surface field mapping helper. */
-    SourceEstimateManager   m_sourceManager;        /**< Source estimate lifecycle (load, stream, navigate). */
-    RtSensorStreamManager   m_sensorStreamManager;  /**< Real-time sensor streaming lifecycle. */
+    CameraController m_camera;                   /**< Camera maths helper. */
+    MultiViewLayout m_layout;                    /**< Multi-view pane geometry and splitter logic. */
+    SensorFieldMapper m_fieldMapper;             /**< Sensor → surface field mapping helper. */
+    SourceEstimateManager m_sourceManager;       /**< Source estimate lifecycle (load, stream, navigate). */
+    RtSensorStreamManager m_sensorStreamManager; /**< Real-time sensor streaming lifecycle. */
 
     // ── Camera state ───────────────────────────────────────────────────
-    QQuaternion m_cameraRotation;                   /**< Global camera orientation quaternion. */
-    QVector3D m_sceneCenter = QVector3D(0, 0, 0);   /**< Bounding-box centre of the scene. */
-    float m_sceneSize = 0.3f;                       /**< Bounding-box diagonal of the scene (metres). */
-    bool m_cameraFocusOverride = false;              /**< When true, m_sceneCenter/m_sceneSize are user-set. */
-    QVector3D m_cameraFocusCenter;                   /**< Override center (valid when m_cameraFocusOverride). */
-    float m_cameraFocusSize = 0.3f;                  /**< Override size   (valid when m_cameraFocusOverride). */
-    float m_zoom = 0.0f;                            /**< Zoom level for single-view mode. */
-    QPoint m_lastMousePos;                          /**< Previous mouse position for drag deltas. */
-    QTimer *m_pAutoRotateTimer = nullptr;           /**< Drives the automated rotation animation. */
+    QQuaternion m_cameraRotation;                 /**< Global camera orientation quaternion. */
+    QVector3D m_sceneCenter = QVector3D(0, 0, 0); /**< Bounding-box centre of the scene. */
+    float m_sceneSize = 0.3f;                     /**< Bounding-box diagonal of the scene (metres). */
+    bool m_cameraFocusOverride = false;           /**< When true, m_sceneCenter/m_sceneSize are user-set. */
+    QVector3D m_cameraFocusCenter;                /**< Override center (valid when m_cameraFocusOverride). */
+    float m_cameraFocusSize = 0.3f;               /**< Override size   (valid when m_cameraFocusOverride). */
+    float m_zoom = 0.0f;                          /**< Zoom level for single-view mode. */
+    QPoint m_lastMousePos;                        /**< Previous mouse position for drag deltas. */
+    QTimer* m_pAutoRotateTimer = nullptr;         /**< Drives the automated rotation animation. */
 
     // ── UI overlays ────────────────────────────────────────────────────
-    int m_frameCount = 0;                           /**< Frames rendered since last FPS sample. */
-    QElapsedTimer m_fpsTimer;                       /**< Timer for FPS measurement. */
-    QLabel *m_fpsLabel = nullptr;                   /**< Overlay label showing FPS and vertex count. */
-    QLabel *m_singleViewInfoLabel = nullptr;        /**< Overlay label for single-view shader/surface info. */
-    bool m_sceneDirty = true;                       /**< Set when scene needs redraw; cleared after render. */
-    qint64 m_cachedVertexCount = 0;                 /**< Cached visible vertex count (invalidated on surface changes). */
-    bool m_vertexCountDirty = true;                 /**< Recount vertices on next FPS update when true. */
-    int m_snapshotCounter = 0;                      /**< Sequential counter for snapshot filenames. */
-    bool m_infoPanelVisible = true;                 /**< Whether the info overlay panel is shown. */
+    int m_frameCount = 0;                    /**< Frames rendered since last FPS sample. */
+    QElapsedTimer m_fpsTimer;                /**< Timer for FPS measurement. */
+    QLabel* m_fpsLabel = nullptr;            /**< Overlay label showing FPS and vertex count. */
+    QLabel* m_singleViewInfoLabel = nullptr; /**< Overlay label for single-view shader/surface info. */
+    bool m_sceneDirty = true;                /**< Set when scene needs redraw; cleared after render. */
+    qint64 m_cachedVertexCount = 0;          /**< Cached visible vertex count (invalidated on surface changes). */
+    bool m_vertexCountDirty = true;          /**< Recount vertices on next FPS update when true. */
+    int m_snapshotCounter = 0;               /**< Sequential counter for snapshot filenames. */
+    bool m_infoPanelVisible = true;          /**< Whether the info overlay panel is shown. */
 
     // ── Scene objects ──────────────────────────────────────────────────
-    std::unique_ptr<DipoleObject> m_dipoles;        /**< Standalone dipole set (loaded via file). */
-    std::unique_ptr<NetworkObject> m_network;       /**< Connectivity network visualization. */
-    std::unique_ptr<PolylineObject> m_headPath;     /**< Head movement path over the course of a measurement. */
+    std::unique_ptr<DipoleObject> m_dipoles;                 /**< Standalone dipole set (loaded via file). */
+    std::unique_ptr<NetworkObject> m_network;                /**< Connectivity network visualization. */
+    std::unique_ptr<PolylineObject> m_headPath;              /**< Head movement path over the course of a measurement. */
     std::unique_ptr<DISP3DLIB::VideoOverlay> m_videoOverlay; /**< Live RGB video overlay decal. */
 
     // ── MRI slices ─────────────────────────────────────────────────────
     static constexpr int kMaxSliceSlots = 3;
-    DISP3DLIB::SliceObject *m_slices[kMaxSliceSlots] = {};   /**< Non-owning pointers to slice data. */
+    DISP3DLIB::SliceObject* m_slices[kMaxSliceSlots] = {};    /**< Non-owning pointers to slice data. */
     bool m_sliceVisible[kMaxSliceSlots] = {true, true, true}; /**< Per-slot visibility flags. */
 
     /** Update the scene bounding box based on visible objects. */
     void updateSceneBounds();
 
     // ── Coordinate transforms ──────────────────────────────────────────
-    FIFFLIB::FiffCoordTrans m_headToMriTrans;       /**< Head-to-MRI coordinate transform. */
+    FIFFLIB::FiffCoordTrans m_headToMriTrans;         /**< Head-to-MRI coordinate transform. */
     QList<FIFFLIB::FiffDigPoint> m_cardinalDigPoints; /**< Cardinal dig points from last sensor load. */
-    bool m_applySensorTrans = true;                 /**< Whether to apply the transform to sensors/digitizers. */
-    QString m_megHelmetOverridePath;                /**< Optional override path for MEG helmet surface. */
-    QMatrix4x4 m_devHeadTrans;                      /**< Device→Head transformation from last sensor load. */
-    bool m_hasDevHead = false;                      /**< Whether a valid Device→Head transform is available. */
-    bool m_dipolesVisible = true;                   /**< Whether dipoles are rendered. */
-    bool m_networkVisible = false;                  /**< Whether the connectivity network is rendered. */
+    bool m_applySensorTrans = true;                   /**< Whether to apply the transform to sensors/digitizers. */
+    QString m_megHelmetOverridePath;                  /**< Optional override path for MEG helmet surface. */
+    QMatrix4x4 m_devHeadTrans;                        /**< Device→Head transformation from last sensor load. */
+    bool m_hasDevHead = false;                        /**< Whether a valid Device→Head transform is available. */
+    bool m_dipolesVisible = true;                     /**< Whether dipoles are rendered. */
+    bool m_networkVisible = false;                    /**< Whether the connectivity network is rendered. */
 
     // ── Ray-pick hover state ───────────────────────────────────────────
-    QStandardItem* m_hoveredItem = nullptr;         /**< Model item currently under the cursor. */
-    int m_hoveredIndex = -1;                        /**< Vertex index at the hover point. */
-    QString m_hoveredRegion;                        /**< Atlas region name at the hover point. */
-    QString m_hoveredSurfaceKey;                    /**< FsSurface map key at the hover point. */
-    QLabel* m_regionLabel = nullptr;                /**< Overlay label showing the hovered region name. */
-    QVector<QLabel*> m_viewportNameLabels;          /**< Per-viewport name labels (e.g. "Top", "Front"). */
-    QVector<QLabel*> m_viewportInfoLabels;          /**< Per-viewport info labels (shader, surface info). */
+    QStandardItem* m_hoveredItem = nullptr; /**< Model item currently under the cursor. */
+    int m_hoveredIndex = -1;                /**< Vertex index at the hover point. */
+    QString m_hoveredRegion;                /**< Atlas region name at the hover point. */
+    QString m_hoveredSurfaceKey;            /**< FsSurface map key at the hover point. */
+    QLabel* m_regionLabel = nullptr;        /**< Overlay label showing the hovered region name. */
+    QVector<QLabel*> m_viewportNameLabels;  /**< Per-viewport name labels (e.g. "Top", "Front"). */
+    QVector<QLabel*> m_viewportInfoLabels;  /**< Per-viewport info labels (shader, surface info). */
 
     // ── Debug intersection ─────────────────────────────────────────────
     std::shared_ptr<BrainSurface> m_debugPointerSurface; /**< Semi-transparent sphere at hit point. */
-    QVector3D m_lastIntersectionPoint;              /**< World-space position of last ray hit. */
-    bool m_hasIntersection = false;                 /**< Whether the last ray cast produced a hit. */
-
+    QVector3D m_lastIntersectionPoint;                   /**< World-space position of last ray hit. */
+    bool m_hasIntersection = false;                      /**< Whether the last ray cast produced a hit. */
 
 
     // ── Multi-view support ─────────────────────────────────────────────
-    ViewMode m_viewMode = SingleView;               /**< Current view mode (single or multi). */
-    int m_viewCount = 1;                            /**< Number of viewports to show (1..kDefaultViewportCount). */
-    float m_multiSplitX = 0.5f;                     /**< Horizontal splitter position (0..1). */
-    float m_multiSplitY = 0.5f;                     /**< Vertical splitter position (0..1). */
-    bool m_isDraggingSplitter = false;              /**< True while the user is dragging a splitter. */
+    ViewMode m_viewMode = SingleView;                 /**< Current view mode (single or multi). */
+    int m_viewCount = 1;                              /**< Number of viewports to show (1..kDefaultViewportCount). */
+    float m_multiSplitX = 0.5f;                       /**< Horizontal splitter position (0..1). */
+    float m_multiSplitY = 0.5f;                       /**< Vertical splitter position (0..1). */
+    bool m_isDraggingSplitter = false;                /**< True while the user is dragging a splitter. */
     SplitterHit m_activeSplitter = SplitterHit::None; /**< Which splitter is being dragged. */
-    int m_splitterHitTolerancePx = 6;               /**< Pixel tolerance for splitter hit testing. */
-    int m_splitterMinPanePx = 80;                   /**< Minimum pane size in pixels. */
-    int m_separatorLinePx = 2;                      /**< Separator line thickness in pixels. */
-    QFrame* m_verticalSeparator = nullptr;          /**< Visual separator between left/right panes. */
-    QFrame* m_horizontalSeparator = nullptr;        /**< Visual separator between top/bottom panes. */
-    bool m_perspectiveRotatedSincePress = false;    /**< True if mouse drag rotated a perspective pane. */
+    int m_splitterHitTolerancePx = 6;                 /**< Pixel tolerance for splitter hit testing. */
+    int m_splitterMinPanePx = 80;                     /**< Minimum pane size in pixels. */
+    int m_separatorLinePx = 2;                        /**< Separator line thickness in pixels. */
+    QFrame* m_verticalSeparator = nullptr;            /**< Visual separator between left/right panes. */
+    QFrame* m_horizontalSeparator = nullptr;          /**< Visual separator between top/bottom panes. */
+    bool m_perspectiveRotatedSincePress = false;      /**< True if mouse drag rotated a perspective pane. */
 };
 
 #endif // BRAINVIEW_H

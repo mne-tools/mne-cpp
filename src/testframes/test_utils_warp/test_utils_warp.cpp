@@ -19,11 +19,11 @@ private slots:
     {
         // When source and destination landmarks are the same, warp should be identity
         MatrixXf landmarks(5, 3);
-        landmarks << 0,0,0, 1,0,0, 0,1,0, 0,0,1, 1,1,1;
+        landmarks << 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 1, 1, 1;
         MatrixXf vertices(3, 3);
         vertices << 0.5f, 0.5f, 0.0f,
-                    0.0f, 0.5f, 0.5f,
-                    0.5f, 0.0f, 0.5f;
+            0.0f, 0.5f, 0.5f,
+            0.5f, 0.0f, 0.5f;
 
         Warp warp;
         MatrixXf result = warp.calculate(landmarks, landmarks, vertices);
@@ -32,7 +32,7 @@ private slots:
         // Result should be close to vertices
         for (int i = 0; i < 3; ++i) {
             for (int j = 0; j < 3; ++j) {
-                QVERIFY(std::abs(result(i,j) - vertices(i,j)) < 0.01f);
+                QVERIFY(std::abs(result(i, j) - vertices(i, j)) < 0.01f);
             }
         }
     }
@@ -41,20 +41,20 @@ private slots:
     {
         // Shift all landmarks by +1 in X
         MatrixXf sLm(4, 3);
-        sLm << 0,0,0, 1,0,0, 0,1,0, 0,0,1;
+        sLm << 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1;
         MatrixXf dLm = sLm;
         dLm.col(0).array() += 1.0f;
 
         MatrixXf vertices(2, 3);
         vertices << 0.5f, 0.5f, 0.0f,
-                    0.2f, 0.3f, 0.4f;
+            0.2f, 0.3f, 0.4f;
 
         Warp warp;
         MatrixXf result = warp.calculate(sLm, dLm, vertices);
         QCOMPARE(result.rows(), 2);
         // X coordinates should be shifted by ~1
         for (int i = 0; i < 2; ++i) {
-            QVERIFY(std::abs(result(i,0) - (vertices(i,0) + 1.0f)) < 0.5f);
+            QVERIFY(std::abs(result(i, 0) - (vertices(i, 0) + 1.0f)) < 0.5f);
         }
     }
 
@@ -63,12 +63,12 @@ private slots:
         // When source and destination landmarks are the same,
         // warp should be approximately identity
         MatrixXf sLm(4, 3);
-        sLm << 0,0,0, 1,0,0, 0,1,0, 0,0,1;
+        sLm << 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1;
         MatrixXf dLm = sLm; // identity warp
 
         QList<MatrixXf> vertList;
         MatrixXf v1(3, 3);
-        v1 << 0.1f,0.2f,0.3f, 0.4f,0.5f,0.6f, 0.7f,0.8f,0.9f;
+        v1 << 0.1f, 0.2f, 0.3f, 0.4f, 0.5f, 0.6f, 0.7f, 0.8f, 0.9f;
         vertList.append(v1);
 
         Warp warp;
@@ -86,9 +86,9 @@ private slots:
     {
         // When destination landmarks are shifted, vertices should shift too
         MatrixXf sLm(4, 3);
-        sLm << 0,0,0, 1,0,0, 0,1,0, 0,0,1;
+        sLm << 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1;
         MatrixXf dLm(4, 3);
-        dLm << 1,0,0, 2,0,0, 1,1,0, 1,0,1; // shifted +1 in x
+        dLm << 1, 0, 0, 2, 0, 0, 1, 1, 0, 1, 0, 1; // shifted +1 in x
 
         QList<MatrixXf> vertList;
         MatrixXf v1(1, 3);
@@ -104,14 +104,14 @@ private slots:
     void testCalculateList()
     {
         MatrixXf sLm(4, 3);
-        sLm << 0,0,0, 1,0,0, 0,1,0, 0,0,1;
+        sLm << 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1;
         MatrixXf dLm = sLm;
 
         QList<MatrixXf> vertList;
         MatrixXf v1(3, 3);
-        v1 << 0.1f,0.2f,0.3f, 0.4f,0.5f,0.6f, 0.7f,0.8f,0.9f;
+        v1 << 0.1f, 0.2f, 0.3f, 0.4f, 0.5f, 0.6f, 0.7f, 0.8f, 0.9f;
         MatrixXf v2(2, 3);
-        v2 << 0.5f,0.5f,0.5f, 0.2f,0.2f,0.2f;
+        v2 << 0.5f, 0.5f, 0.5f, 0.2f, 0.2f, 0.2f;
         vertList.append(v1);
         vertList.append(v2);
 
@@ -139,7 +139,7 @@ private slots:
         MatrixXf electrodes = warp.readsLm(tmpFile.fileName());
         QCOMPARE(electrodes.rows(), 3);
         QCOMPARE(electrodes.cols(), 3);
-        QVERIFY(std::abs(electrodes(0,0) - (-0.0309f)) < 0.001f);
+        QVERIFY(std::abs(electrodes(0, 0) - (-0.0309f)) < 0.001f);
     }
 
     void testReadsLmStdString()
@@ -164,7 +164,7 @@ private slots:
     {
         // Scale by factor 2: dLm = 2 * sLm
         MatrixXf sLm(5, 3);
-        sLm << 0,0,0, 1,0,0, 0,1,0, 0,0,1, 1,1,1;
+        sLm << 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 1, 1, 1;
         MatrixXf dLm = sLm * 2.0f;
 
         MatrixXf vertices(1, 3);

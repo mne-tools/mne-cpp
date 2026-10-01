@@ -41,8 +41,9 @@
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-namespace FIFFLIB {
-    class FiffInfo;
+namespace FIFFLIB
+{
+class FiffInfo;
 }
 
 //=============================================================================================================
@@ -138,9 +139,9 @@ public:
 
     inline FIFFLIB::FiffInfo getFiffInfo() const;
 
-    int         chnNum;
-    int         dataLength;
-    double      sfreq;
+    int chnNum;
+    int dataLength;
+    double sfreq;
     QStringList lm_ch_names;
 
     // parameters of single channel
@@ -162,14 +163,14 @@ public:
     QStringList lm_ch_gain;
 
     //BB_QUEUE
-    QQueue<QByteArray>  g_queue;
-    int                 g_maxlen;
-    QMutex              g_mutex;
-    QWaitCondition      g_queueNotFull;
-    QWaitCondition      g_queueNotEmpty;
+    QQueue<QByteArray> g_queue;
+    int g_maxlen;
+    QMutex g_mutex;
+    QWaitCondition g_queueNotFull;
+    QWaitCondition g_queueNotEmpty;
 
 private:
-    FIFFLIB::FiffInfo   m_FiffInfo;
+    FIFFLIB::FiffInfo m_FiffInfo;
 
 signals:
     void fiffInfoAvailable(FIFFLIB::FiffInfo);

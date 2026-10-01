@@ -64,7 +64,8 @@
 // DEFINE NAMESPACE CONNECTIVITYLIB
 //=============================================================================================================
 
-namespace CONNECTIVITYLIB {
+namespace CONNECTIVITYLIB
+{
 
 //=============================================================================================================
 // CONNECTIVITYLIB FORWARD DECLARATIONS
@@ -87,7 +88,6 @@ class Network;
  */
 class CONNECTIVITYSHARED_EXPORT Correlation : public AbstractMetric
 {
-
 public:
     typedef QSharedPointer<Correlation> SPtr;            /**< Shared pointer type for Correlation. */
     typedef QSharedPointer<const Correlation> ConstSPtr; /**< Const shared pointer type for Correlation. */
@@ -106,7 +106,7 @@ public:
      *
      * @return                   The connectivity information in form of a network structure.
      */
-    static Network calculate(ConnectivitySettings &connectivitySettings);
+    static Network calculate(ConnectivitySettings& connectivitySettings);
 
 protected:
     //=========================================================================================================
@@ -126,8 +126,8 @@ protected:
      * @param[out] resultData    The result data.
      * @param[in] data          The incoming, temporary result data.
      */
-    static void reduce(Eigen::MatrixXd &resultData,
-                       const Eigen::MatrixXd &data);
+    static void reduce(Eigen::MatrixXd& resultData,
+                       const Eigen::MatrixXd& data);
 };
 
 //=============================================================================================================

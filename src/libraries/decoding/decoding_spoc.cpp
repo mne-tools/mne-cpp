@@ -63,9 +63,9 @@ using namespace Eigen;
 DecodingSpoc::DecodingSpoc(int nComponents,
                            TransformMode transformInto,
                            bool useLog)
-    : m_nComponents(nComponents)
-    , m_transformInto(transformInto)
-    , m_useLog(useLog)
+: m_nComponents(nComponents)
+, m_transformInto(transformInto)
+, m_useLog(useLog)
 {
 }
 
@@ -89,24 +89,23 @@ void DecodingSpoc::fit(const std::vector<MatrixXd>& epochs,
     // 1. Normalize target
     double z_mean = y.mean();
     double z_std = std::sqrt(
-        (y.array() - z_mean).square().sum()
-        / static_cast<double>(n_epochs - 1));
+        (y.array() - z_mean).square().sum() / static_cast<double>(n_epochs - 1));
     VectorXd z = (y.array() - z_mean).matrix();
-    if (z_std > 1e-15) z /= z_std;
+    if (z_std > 1e-15)
+        z /= z_std;
 
     // 2. Per-epoch covariance → C and Cz
-    MatrixXd C  = MatrixXd::Zero(n_ch, n_ch);
+    MatrixXd C = MatrixXd::Zero(n_ch, n_ch);
     MatrixXd Cz = MatrixXd::Zero(n_ch, n_ch);
 
     for (Index e = 0; e < n_epochs; ++e) {
         const auto& X = epochs[static_cast<size_t>(e)];
         MatrixXd Xc = X.colwise() - X.rowwise().mean();
-        MatrixXd cov_e = (Xc * Xc.transpose())
-                         / static_cast<double>(Xc.cols());
-        C  += cov_e;
+        MatrixXd cov_e = (Xc * Xc.transpose()) / static_cast<double>(Xc.cols());
+        C += cov_e;
         Cz += z(e) * cov_e;
     }
-    C  /= static_cast<double>(n_epochs);
+    C /= static_cast<double>(n_epochs);
     Cz /= static_cast<double>(n_epochs);
 
     // 3. Generalized eigenvalue problem: Cz w = λ C w
@@ -133,7 +132,8 @@ void DecodingSpoc::fit(const std::vector<MatrixXd>& epochs,
         int j = idx[static_cast<size_t>(i)];
         VectorXd w = all_evecs.col(j);
         double norm = w.norm();
-        if (norm > 0.0) w /= norm;
+        if (norm > 0.0)
+            w /= norm;
         m_filters.row(i) = w.transpose();
     }
 
@@ -141,7 +141,7 @@ void DecodingSpoc::fit(const std::vector<MatrixXd>& epochs,
     MatrixXd Wt = m_filters.transpose();
     MatrixXd CW = C * Wt;
     MatrixXd WtCW = Wt.transpose() * CW;
-    m_patterns = (CW * WtCW.inverse());  // (n_ch × n_comp) — already correct shape
+    m_patterns = (CW * WtCW.inverse()); // (n_ch × n_comp) — already correct shape
 
     // Compute mean band power for z-score normalisation
     MatrixXd powerFeatures = computePowerFeatures(epochs);
@@ -150,8 +150,7 @@ void DecodingSpoc::fit(const std::vector<MatrixXd>& epochs,
     m_std = VectorXd(powerFeatures.cols());
     for (int c = 0; c < powerFeatures.cols(); ++c) {
         VectorXd centered = powerFeatures.col(c).array() - m_mean(c);
-        m_std(c) = std::sqrt(centered.squaredNorm()
-                             / static_cast<double>(centered.size()));
+        m_std(c) = std::sqrt(centered.squaredNorm() / static_cast<double>(centered.size()));
     }
 
     m_fitted = true;
@@ -185,7 +184,8 @@ MatrixXd DecodingSpoc::transform(const std::vector<MatrixXd>& epochs) const
     } else {
         for (int c = 0; c < X.cols(); ++c) {
             double s = m_std(c);
-            if (s < 1e-15) s = 1.0;
+            if (s < 1e-15)
+                s = 1.0;
             X.col(c) = (X.col(c).array() - m_mean(c)) / s;
         }
     }
@@ -261,8 +261,7 @@ MatrixXd DecodingSpoc::computePowerFeatures(
     for (int e = 0; e < nEpochs; ++e) {
         MatrixXd filtered = m_filters * epochs[static_cast<size_t>(e)];
         for (int c = 0; c < nComp; ++c) {
-            features(e, c) = filtered.row(c).squaredNorm()
-                            / static_cast<double>(filtered.cols());
+            features(e, c) = filtered.row(c).squaredNorm() / static_cast<double>(filtered.cols());
         }
     }
 

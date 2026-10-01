@@ -39,14 +39,15 @@ using namespace Eigen;
 // HELPERS
 //=============================================================================================================
 
-namespace {
+namespace
+{
 
 /** Build an n_ch × n_samp matrix where all channels are correlated sinusoids. */
 MatrixXd makeSineMatrix(int nCh, int nSamp, double sFreq, double freqHz)
 {
     MatrixXd m(nCh, nSamp);
     for (int ch = 0; ch < nCh; ++ch) {
-        double phase = ch * 0.1;  // small phase offset so channels are distinct but correlated
+        double phase = ch * 0.1; // small phase offset so channels are distinct but correlated
         for (int t = 0; t < nSamp; ++t)
             m(ch, t) = std::sin(2.0 * M_PI * freqHz * t / sFreq + phase);
     }
@@ -230,9 +231,9 @@ void TestDspBadChannelDetect::detect_unionOfAllThree()
 
     BadChannelDetect::Params p;
     p.dFlatThreshold = 1e-10;
-    p.dVarZThresh    = 4.0;
-    p.dCorrThresh    = 0.4;
-    p.iNeighbours    = 3;
+    p.dVarZThresh = 4.0;
+    p.dCorrThresh = 0.4;
+    p.iNeighbours = 3;
 
     auto bad = BadChannelDetect::detect(data, p);
 
@@ -257,8 +258,8 @@ void TestDspBadChannelDetect::detect_noDefaults_clean_returnsEmpty()
 
     BadChannelDetect::Params p;
     p.dFlatThreshold = 1e-13;
-    p.dVarZThresh    = 4.0;
-    p.dCorrThresh    = 0.4;
+    p.dVarZThresh = 4.0;
+    p.dCorrThresh = 0.4;
 
     auto bad = BadChannelDetect::detect(data, p);
     QVERIFY(bad.isEmpty());

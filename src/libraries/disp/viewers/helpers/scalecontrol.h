@@ -42,15 +42,17 @@
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-namespace Ui {
-    class ScaleControlWidget;
+namespace Ui
+{
+class ScaleControlWidget;
 }
 
 //=============================================================================================================
 // DEFINE NAMESPACE DISPLIB
 //=============================================================================================================
 
-namespace DISPLIB {
+namespace DISPLIB
+{
 
 //=============================================================================================================
 /**
@@ -65,14 +67,13 @@ class DISPSHARED_EXPORT ScaleControl : public QWidget
     Q_OBJECT
 
 public:
-
     //=========================================================================================================
     /**
      * Constructs a ScaleControl object who's Qlabel element will be set.
      *
      * @param[in] label    Text for the Qlabel.
      */
-     explicit ScaleControl(const char* label);
+    explicit ScaleControl(const char* label);
 
     //=========================================================================================================
     /**
@@ -95,13 +96,13 @@ public:
      * @param[in] min      Min value of the control.
      * @param[in] max      Max value of the control.
      */
-     explicit ScaleControl(const char* label,
-                           QWidget* parent,
-                           double min,
-                           double max);
+    explicit ScaleControl(const char* label,
+                          QWidget* parent,
+                          double min,
+                          double max);
 
     //=========================================================================================================
-     /**
+    /**
      * getUI Return a pointer to the GUI of the ScaleControl.
      *
      * @return Pointer to the ScaleControlWidget.
@@ -178,7 +179,6 @@ signals:
     void valueChanged(double dScale);
 
 private:
-
     //=========================================================================================================
     /**
      * Set the text label of the Control.
@@ -284,19 +284,19 @@ private:
      */
     void promptMaxValueChange();
 
-    Ui::ScaleControlWidget* m_pUi;                          /**< Pointer to the user interface object. */
-    bool                    m_bManagingSpinBoxChange;       /**< Bool member guarding the state of the spinbox. */
-    bool                    m_bManagingSliderChange;        /**< Bool member guarding the state of the slider. */
-    float                   m_fSensitivity;                 /**< Sensitivity of the non-linear mapping fcn for the slider. */
-    float                   m_fSensitivityWeighted;         /**< Sensitivity of the non-linear mapping fcn, weighted by the max value of the spinbox. */
-    float                   m_fMaxSensitivityPoint;         /**< Max sensitivity point of the non-linear mapping fcn for the slider. */
-    float                   m_fMapYconstant;                /**< Y constant in the non-linear mapping curve for the slider. */
-    float                   m_fMapKconstant;                /**< K constant in the non-linear mapping curve for the slider. */
-    bool                    m_bSliderInverted;              /**< State variable to store the inverted or not state of the slider. */
+    Ui::ScaleControlWidget* m_pUi; /**< Pointer to the user interface object. */
+    bool m_bManagingSpinBoxChange; /**< Bool member guarding the state of the spinbox. */
+    bool m_bManagingSliderChange;  /**< Bool member guarding the state of the slider. */
+    float m_fSensitivity;          /**< Sensitivity of the non-linear mapping fcn for the slider. */
+    float m_fSensitivityWeighted;  /**< Sensitivity of the non-linear mapping fcn, weighted by the max value of the spinbox. */
+    float m_fMaxSensitivityPoint;  /**< Max sensitivity point of the non-linear mapping fcn for the slider. */
+    float m_fMapYconstant;         /**< Y constant in the non-linear mapping curve for the slider. */
+    float m_fMapKconstant;         /**< K constant in the non-linear mapping curve for the slider. */
+    bool m_bSliderInverted;        /**< State variable to store the inverted or not state of the slider. */
 
-    QMenu*                  m_pSettingsMenu;
+    QMenu* m_pSettingsMenu;
 };
 
-}//DISPLIB NAMESPACE
+} //DISPLIB NAMESPACE
 
 #endif // SCALECONTROL_H

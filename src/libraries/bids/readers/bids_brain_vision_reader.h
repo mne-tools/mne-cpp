@@ -63,12 +63,12 @@ namespace BIDSLIB
  */
 struct BIDSSHARED_EXPORT BrainVisionMarker
 {
-    QString type;           /**< Marker type (e.g., "New Segment", "Stimulus", "Response"). */
-    QString description;    /**< Description (e.g., "S253", "R255"). */
-    long    position{0};    /**< 0-based sample position. */
-    long    duration{0};    /**< Duration in samples (0 = point marker). */
-    int     channel{0};     /**< Channel number (0 = all channels). */
-    QDateTime date;         /**< Optional date/time (for New Segment markers). */
+    QString type;        /**< Marker type (e.g., "New Segment", "Stimulus", "Response"). */
+    QString description; /**< Description (e.g., "S253", "R255"). */
+    long position{0};    /**< 0-based sample position. */
+    long duration{0};    /**< Duration in samples (0 = point marker). */
+    int channel{0};      /**< Channel number (0 = all channels). */
+    QDateTime date;      /**< Optional date/time (for New Segment markers). */
 };
 
 //=============================================================================================================
@@ -77,11 +77,11 @@ struct BIDSSHARED_EXPORT BrainVisionMarker
  */
 struct BIDSSHARED_EXPORT BrainVisionChannelInfo
 {
-    int     channelNumber{0};
+    int channelNumber{0};
     QString name;
     QString reference;
-    float   resolution{1.0f};   /**< Scaling factor (calibration value). */
-    QString unit;               /**< Physical unit string (e.g. "µV", "V"). */
+    float resolution{1.0f}; /**< Scaling factor (calibration value). */
+    QString unit;           /**< Physical unit string (e.g. "µV", "V"). */
 
     FIFFLIB::FiffChInfo toFiffChInfo() const;
 };
@@ -90,7 +90,8 @@ struct BIDSSHARED_EXPORT BrainVisionChannelInfo
 /**
  * @brief Binary format enumeration for BrainVision data files.
  */
-enum class BVBinaryFormat {
+enum class BVBinaryFormat
+{
     INT_16,
     INT_32,
     IEEE_FLOAT_32
@@ -100,7 +101,8 @@ enum class BVBinaryFormat {
 /**
  * @brief Data orientation enumeration.
  */
-enum class BVOrientation {
+enum class BVOrientation
+{
     MULTIPLEXED,
     VECTORIZED
 };
@@ -165,11 +167,11 @@ private:
     QString m_sMarkerPath;
 
     // Header fields
-    float           m_fSFreq{0.0f};
-    int             m_iNumChannels{0};
-    BVBinaryFormat  m_binaryFormat{BVBinaryFormat::INT_16};
-    BVOrientation   m_orientation{BVOrientation::MULTIPLEXED};
-    long            m_lSampleCount{0};
+    float m_fSFreq{0.0f};
+    int m_iNumChannels{0};
+    BVBinaryFormat m_binaryFormat{BVBinaryFormat::INT_16};
+    BVOrientation m_orientation{BVOrientation::MULTIPLEXED};
+    long m_lSampleCount{0};
 
     QVector<BrainVisionChannelInfo> m_vChannels;
     QVector<BrainVisionMarker> m_vMarkers;

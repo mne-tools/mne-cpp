@@ -45,26 +45,26 @@ namespace INVLIB
  */
 struct InvFocalDipole
 {
-    Eigen::Vector3f position;   /**< Dipole position (m) in head coordinates. */
-    Eigen::Vector3f moment;     /**< Current dipole moment (Am). */
-    int   gridIndex;            /**< Nearest grid index (-1 if truly off-grid). */
-    float goodness;             /**< Goodness-of-fit (0..1). */
-    float khi2;                 /**< Chi-squared value of the fit. */
-    int   nfree;                /**< Degrees of freedom. */
-    bool  valid;                /**< Whether this dipole passed validity checks. */
-    float tmin;                 /**< Start of the time window (s) this dipole represents. */
-    float tmax;                 /**< End of the time window (s) this dipole represents. */
+    Eigen::Vector3f position; /**< Dipole position (m) in head coordinates. */
+    Eigen::Vector3f moment;   /**< Current dipole moment (Am). */
+    int gridIndex;            /**< Nearest grid index (-1 if truly off-grid). */
+    float goodness;           /**< Goodness-of-fit (0..1). */
+    float khi2;               /**< Chi-squared value of the fit. */
+    int nfree;                /**< Degrees of freedom. */
+    bool valid;               /**< Whether this dipole passed validity checks. */
+    float tmin;               /**< Start of the time window (s) this dipole represents. */
+    float tmax;               /**< End of the time window (s) this dipole represents. */
 
     InvFocalDipole()
-        : position(Eigen::Vector3f::Zero())
-        , moment(Eigen::Vector3f::Zero())
-        , gridIndex(-1)
-        , goodness(0.0f)
-        , khi2(0.0f)
-        , nfree(0)
-        , valid(false)
-        , tmin(0.0f)
-        , tmax(0.0f)
+    : position(Eigen::Vector3f::Zero())
+    , moment(Eigen::Vector3f::Zero())
+    , gridIndex(-1)
+    , goodness(0.0f)
+    , khi2(0.0f)
+    , nfree(0)
+    , valid(false)
+    , tmin(0.0f)
+    , tmax(0.0f)
     {
     }
 };

@@ -53,8 +53,8 @@ using namespace MNESCAN;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-PluginGui::PluginGui(SCSHAREDLIB::PluginManager *pPluginManager,
-                     SCSHAREDLIB::PluginSceneManager *pPluginSceneManager)
+PluginGui::PluginGui(SCSHAREDLIB::PluginManager* pPluginManager,
+                     SCSHAREDLIB::PluginSceneManager* pPluginSceneManager)
 : m_pPluginManager(pPluginManager)
 , m_pPluginSceneManager(pPluginSceneManager)
 , m_pCurrentPlugin(0)
@@ -99,8 +99,7 @@ PluginGui::PluginGui(SCSHAREDLIB::PluginManager *pPluginManager,
     QSettings settings("MNECPP");
     bool loadingState = settings.value(QString("MNEScan/loadingState"), false).toBool();
 
-    if(loadingState)
-    {
+    if (loadingState) {
         settings.setValue(QString("MNEScan/loadingState"), false);
 
         QString appData = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
@@ -120,7 +119,7 @@ PluginGui::PluginGui(SCSHAREDLIB::PluginManager *pPluginManager,
 
 void PluginGui::updateSceneRect()
 {
-    if(!m_pPluginScene || !m_pGraphicsView) {
+    if (!m_pPluginScene || !m_pGraphicsView) {
         return;
     }
 
@@ -134,7 +133,7 @@ void PluginGui::updateSceneRect()
     QRectF rect = m_pPluginScene->itemsBoundingRect().adjusted(-margin, -margin, margin, margin);
 
     const QRectF viewRect = m_pGraphicsView->viewport()->rect();
-    if(rect.width() < viewRect.width() || rect.height() < viewRect.height()) {
+    if (rect.width() < viewRect.width() || rect.height() < viewRect.height()) {
         rect.setSize(rect.size().expandedTo(viewRect.size()));
     }
 
@@ -148,7 +147,7 @@ PluginGui::~PluginGui()
     //
     // Save current configuration (MNA format)
     //
-    saveConfig(QStandardPaths::writableLocation(QStandardPaths::AppDataLocation),"default.mna");
+    saveConfig(QStandardPaths::writableLocation(QStandardPaths::AppDataLocation), "default.mna");
 
     m_pCurrentPlugin.reset();
 
@@ -170,13 +169,10 @@ PluginGui::~PluginGui()
 
 void PluginGui::clearScene()
 {
-    foreach (QGraphicsItem *item, m_pPluginScene->items())
-    {
-        if(item->type() == PluginItem::Type)
-        {
-            if(removePlugin(qgraphicsitem_cast<PluginItem *>(item)->plugin()))
-            {
-                qgraphicsitem_cast<PluginItem *>(item)->removeArrows();
+    foreach (QGraphicsItem* item, m_pPluginScene->items()) {
+        if (item->type() == PluginItem::Type) {
+            if (removePlugin(qgraphicsitem_cast<PluginItem*>(item)->plugin())) {
+                qgraphicsitem_cast<PluginItem*>(item)->removeArrows();
                 m_pPluginScene->removeItem(item);
                 delete item;
             }
@@ -188,7 +184,7 @@ void PluginGui::clearScene()
 
 void PluginGui::loadConfig(const QString& sPath, const QString& sFileName)
 {
-    qDebug() << "load" << sPath+"/"+sFileName;
+    qDebug() << "load" << sPath + "/" + sFileName;
 
     QString fullPath = sPath + QStringLiteral("/") + sFileName;
 
@@ -269,7 +265,7 @@ void PluginGui::loadConfigMna(const QString& fullPath)
                 continue;
 
             PluginItem* startItem = itemMap.value(inPort.sourceNodeId);
-            PluginItem* endItem   = itemMap.value(node.id);
+            PluginItem* endItem = itemMap.value(node.id);
             if (!startItem || !endItem)
                 continue;
 
@@ -297,7 +293,7 @@ void PluginGui::loadConfigMna(const QString& fullPath)
 
 void PluginGui::saveConfig(const QString& sPath, const QString& sFileName)
 {
-    qDebug() << "Save Config" << sPath+"/"+sFileName;
+    qDebug() << "Save Config" << sPath + "/" + sFileName;
 
     QString fullPath = sPath + QStringLiteral("/") + sFileName;
 
@@ -306,7 +302,8 @@ void PluginGui::saveConfig(const QString& sPath, const QString& sFileName)
 
 //=============================================================================================================
 
-namespace {
+namespace
+{
 constexpr const char* kUiLayoutPrefix = "ui.layout.";
 }
 
@@ -360,10 +357,10 @@ void PluginGui::saveConfigMna(const QString& fullPath)
     if (!m_loadedMnaProject.subjects.isEmpty() || !m_loadedMnaProject.pipeline.isEmpty()) {
         project = m_loadedMnaProject;
     } else {
-        project.name        = QStringLiteral("MNE Scan Pipeline");
+        project.name = QStringLiteral("MNE Scan Pipeline");
         project.description = QStringLiteral("MNE Scan plugin configuration");
-        project.mnaVersion  = QString::fromLatin1(MNALIB::MnaProject::CURRENT_SCHEMA_VERSION);
-        project.created     = QDateTime::currentDateTimeUtc();
+        project.mnaVersion = QString::fromLatin1(MNALIB::MnaProject::CURRENT_SCHEMA_VERSION);
+        project.created = QDateTime::currentDateTimeUtc();
     }
     project.pipeline = m_pPluginSceneManager->pipelineGraph().nodes();
     project.modified = QDateTime::currentDateTimeUtc();
@@ -383,14 +380,11 @@ void PluginGui::saveConfigMna(const QString& fullPath)
 
 void PluginGui::uiSetupRunningState(bool state)
 {
-    if(state)
-    {
+    if (state) {
         m_pToolBarPlugins->setEnabled(false);
         m_pButtonGroupPointers->button(1)->setEnabled(false);
         deleteAction->setEnabled(false);
-    }
-    else
-    {
+    } else {
         m_pToolBarPlugins->setEnabled(true);
         m_pButtonGroupPointers->button(1)->setEnabled(true);
         deleteAction->setEnabled(true);
@@ -403,17 +397,13 @@ bool PluginGui::removePlugin(SCSHAREDLIB::AbstractPlugin::SPtr pPlugin)
 {
     bool bRemoved = m_pPluginSceneManager->removePlugin(pPlugin);
 
-    if(bRemoved)
-    {
+    if (bRemoved) {
         //If single instance activate menu again
-        if(!pPlugin->multiInstanceAllowed())
-        {
+        if (!pPlugin->multiInstanceAllowed()) {
             QString sPluginName = pPlugin->getName();
 
-            foreach (QAction *action, m_pActionGroupPlugins->actions())
-            {
-                if(action->text() == sPluginName)
-                {
+            foreach (QAction* action, m_pActionGroupPlugins->actions()) {
+                if (action->text() == sPluginName) {
                     action->setEnabled(true);
                     break;
                 }
@@ -421,15 +411,15 @@ bool PluginGui::removePlugin(SCSHAREDLIB::AbstractPlugin::SPtr pPlugin)
         }
 
         //Select the last added plugin
-        if(m_pPluginSceneManager->getPlugins().size() > 0)
-            m_pCurrentPlugin = m_pPluginSceneManager->getPlugins()[m_pPluginSceneManager->getPlugins().size()-1];
+        if (m_pPluginSceneManager->getPlugins().size() > 0)
+            m_pCurrentPlugin = m_pPluginSceneManager->getPlugins()[m_pPluginSceneManager->getPlugins().size() - 1];
         else
             m_pCurrentPlugin.reset();
 
         selectedPluginChanged(m_pCurrentPlugin);
     }
 
-    saveConfig(QStandardPaths::writableLocation(QStandardPaths::AppDataLocation),"default.mna");
+    saveConfig(QStandardPaths::writableLocation(QStandardPaths::AppDataLocation), "default.mna");
 
     return bRemoved;
 }
@@ -444,9 +434,9 @@ void PluginGui::actionGroupTriggered(QAction* action)
 
 //=============================================================================================================
 
-void PluginGui::itemInserted(PluginItem *item)
+void PluginGui::itemInserted(PluginItem* item)
 {
-    if(item) {
+    if (item) {
         m_pCurrentPlugin = item->plugin();
         emit selectedPluginChanged(m_pCurrentPlugin);
     }
@@ -460,7 +450,7 @@ void PluginGui::itemInserted(PluginItem *item)
     m_pButtonGroupPointers->button(int(PluginScene::MovePluginItem))->setChecked(true);
     m_pPluginScene->setMode(PluginScene::Mode(m_pButtonGroupPointers->checkedId()));
 
-    saveConfig(QStandardPaths::writableLocation(QStandardPaths::AppDataLocation),"default.mna");
+    saveConfig(QStandardPaths::writableLocation(QStandardPaths::AppDataLocation), "default.mna");
 }
 
 //=============================================================================================================
@@ -470,23 +460,18 @@ void PluginGui::newItemSelected()
     SCSHAREDLIB::AbstractPlugin::SPtr pPlugin;
     SCSHAREDLIB::PluginConnectorConnection::SPtr pConnection;
 
-    foreach (QGraphicsItem *item, m_pPluginScene->selectedItems())
-    {
-        if(item->type() == PluginItem::Type)
-            pPlugin = qgraphicsitem_cast<PluginItem *>(item)->plugin();
-        else if(item->type() == Arrow::Type)
-            pConnection = qgraphicsitem_cast<Arrow *>(item)->connection();
-
+    foreach (QGraphicsItem* item, m_pPluginScene->selectedItems()) {
+        if (item->type() == PluginItem::Type)
+            pPlugin = qgraphicsitem_cast<PluginItem*>(item)->plugin();
+        else if (item->type() == Arrow::Type)
+            pConnection = qgraphicsitem_cast<Arrow*>(item)->connection();
     }
 
-    if(!pPlugin.isNull() && pPlugin != m_pCurrentPlugin)
-    {
+    if (!pPlugin.isNull() && pPlugin != m_pCurrentPlugin) {
         m_pCurrentPlugin = pPlugin;
         m_pCurrentConnection = SCSHAREDLIB::PluginConnectorConnection::SPtr();
         emit selectedPluginChanged(m_pCurrentPlugin);
-    }
-    else if(!pConnection.isNull() && pConnection != m_pCurrentConnection)
-    {
+    } else if (!pConnection.isNull() && pConnection != m_pCurrentConnection) {
         m_pCurrentConnection = pConnection;
         m_pCurrentPlugin = SCSHAREDLIB::AbstractPlugin::SPtr();
         emit selectedConnectionChanged(m_pCurrentConnection);
@@ -498,12 +483,10 @@ void PluginGui::newItemSelected()
 void PluginGui::deleteItem()
 {
     //Remove Arrows ToDo Connections
-    foreach (QGraphicsItem *item, m_pPluginScene->selectedItems())
-    {
-        if (item->type() == Arrow::Type)
-        {
+    foreach (QGraphicsItem* item, m_pPluginScene->selectedItems()) {
+        if (item->type() == Arrow::Type) {
             m_pPluginScene->removeItem(item);
-            Arrow *arrow = qgraphicsitem_cast<Arrow *>(item);
+            Arrow* arrow = qgraphicsitem_cast<Arrow*>(item);
             arrow->startItem()->removeArrow(arrow);
             arrow->endItem()->removeArrow(arrow);
             delete item;
@@ -511,19 +494,16 @@ void PluginGui::deleteItem()
     }
 
     //Remove Items
-    foreach (QGraphicsItem *item, m_pPluginScene->selectedItems())
-    {
-         if (item->type() == PluginItem::Type)
-         {
-             if(removePlugin(qgraphicsitem_cast<PluginItem *>(item)->plugin()))
-             {
-                 qgraphicsitem_cast<PluginItem *>(item)->removeArrows();
+    foreach (QGraphicsItem* item, m_pPluginScene->selectedItems()) {
+        if (item->type() == PluginItem::Type) {
+            if (removePlugin(qgraphicsitem_cast<PluginItem*>(item)->plugin())) {
+                qgraphicsitem_cast<PluginItem*>(item)->removeArrows();
 
-                 m_pPluginScene->removeItem(item);
-                 delete item;
-             }
-         }
-     }
+                m_pPluginScene->removeItem(item);
+                delete item;
+            }
+        }
+    }
 
     //The remaining items occupy less space, so let the scene follow them back in
     updateSceneRect();
@@ -543,11 +523,11 @@ void PluginGui::bringToFront()
     if (m_pPluginScene->selectedItems().isEmpty())
         return;
 
-    QGraphicsItem *selectedItem = m_pPluginScene->selectedItems().first();
-    QList<QGraphicsItem *> overlapItems = selectedItem->collidingItems();
+    QGraphicsItem* selectedItem = m_pPluginScene->selectedItems().first();
+    QList<QGraphicsItem*> overlapItems = selectedItem->collidingItems();
 
     qreal zValue = 0;
-    foreach (QGraphicsItem *item, overlapItems) {
+    foreach (QGraphicsItem* item, overlapItems) {
         if (item->zValue() >= zValue && item->type() == PluginItem::Type)
             zValue = item->zValue() + 0.1;
     }
@@ -561,11 +541,11 @@ void PluginGui::sendToBack()
     if (m_pPluginScene->selectedItems().isEmpty())
         return;
 
-    QGraphicsItem *selectedItem = m_pPluginScene->selectedItems().first();
-    QList<QGraphicsItem *> overlapItems = selectedItem->collidingItems();
+    QGraphicsItem* selectedItem = m_pPluginScene->selectedItems().first();
+    QList<QGraphicsItem*> overlapItems = selectedItem->collidingItems();
 
     qreal zValue = 0;
-    foreach (QGraphicsItem *item, overlapItems) {
+    foreach (QGraphicsItem* item, overlapItems) {
         if (item->zValue() <= zValue && item->type() == PluginItem::Type)
             zValue = item->zValue() - 0.1;
     }
@@ -616,8 +596,8 @@ void PluginGui::createToolbars()
 
     //Sensors
     m_pSensorToolButton = new QToolButton;
-    QMenu *menuSensors = new QMenu;
-    for(qint32 i = 0; i < m_pPluginManager->getSensorPlugins().size(); ++i)
+    QMenu* menuSensors = new QMenu;
+    for (qint32 i = 0; i < m_pPluginManager->getSensorPlugins().size(); ++i)
         createItemAction(m_pPluginManager->getSensorPlugins()[i]->getName(), menuSensors);
 
     m_pSensorToolButton->setMenu(menuSensors);
@@ -628,8 +608,8 @@ void PluginGui::createToolbars()
 
     //Algorithms
     m_pAlgorithmToolButton = new QToolButton;
-    QMenu *menuAlgorithms = new QMenu;
-    for(qint32 i = 0; i < m_pPluginManager->getAlgorithmPlugins().size(); ++i)
+    QMenu* menuAlgorithms = new QMenu;
+    for (qint32 i = 0; i < m_pPluginManager->getAlgorithmPlugins().size(); ++i)
         createItemAction(m_pPluginManager->getAlgorithmPlugins()[i]->getName(), menuAlgorithms);
 
     m_pAlgorithmToolButton->setMenu(menuAlgorithms);

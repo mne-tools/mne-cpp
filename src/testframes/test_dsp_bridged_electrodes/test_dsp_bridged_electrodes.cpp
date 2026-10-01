@@ -101,12 +101,14 @@ private:
     }
 
 private slots:
-    void initTestCase() {}
+    void initTestCase()
+    {
+    }
 
     void testDetectsBridgedPair()
     {
         FiffInfo info = makeTestInfo(8);
-        MatrixXd data = makeTestData(8, 1000, 2, 5);  // EEG3 and EEG6 bridged
+        MatrixXd data = makeTestData(8, 1000, 2, 5); // EEG3 and EEG6 bridged
 
         auto bridged = computeBridgedElectrodes(data, info);
 
@@ -128,10 +130,10 @@ private slots:
     void testNoBridgeCleanData()
     {
         FiffInfo info = makeTestInfo(8);
-        MatrixXd data = makeTestData(8, 1000);  // No bridge
+        MatrixXd data = makeTestData(8, 1000); // No bridge
 
         BridgedElectrodeParams params;
-        params.dElectricalDistanceThreshold = 0.1;  // Strict threshold
+        params.dElectricalDistanceThreshold = 0.1; // Strict threshold
 
         auto bridged = computeBridgedElectrodes(data, info, params);
         QVERIFY2(bridged.isEmpty(), "Clean data should have no bridges");
@@ -140,7 +142,7 @@ private slots:
     void testElectricalDistanceMatrix()
     {
         FiffInfo info = makeTestInfo(4);
-        MatrixXd data = makeTestData(4, 1000, 0, 1);  // Bridge channels 0 and 1
+        MatrixXd data = makeTestData(4, 1000, 0, 1); // Bridge channels 0 and 1
 
         MatrixXd edist = computeElectricalDistance(data, info);
 
@@ -222,7 +224,9 @@ private slots:
         QVERIFY(bridged.isEmpty());
     }
 
-    void cleanupTestCase() {}
+    void cleanupTestCase()
+    {
+    }
 };
 
 //=============================================================================================================

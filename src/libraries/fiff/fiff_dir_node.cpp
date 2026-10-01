@@ -76,28 +76,25 @@ FiffDirNode::~FiffDirNode()
 
 bool FiffDirNode::copy_tree(FiffStream::SPtr& p_pStreamIn, const FiffId& in_id, const QList<FiffDirNode::SPtr>& p_Nodes, FiffStream::SPtr& p_pStreamOut)
 {
-    if(p_Nodes.size() <= 0)
+    if (p_Nodes.size() <= 0)
         return false;
 
     qint32 k, p;
 
-    for(k = 0; k < p_Nodes.size(); ++k)
-    {
-        p_pStreamOut->start_block(p_Nodes[k]->type);//8
-        if (p_Nodes[k]->id.version != -1)
-        {
+    for (k = 0; k < p_Nodes.size(); ++k) {
+        p_pStreamOut->start_block(p_Nodes[k]->type); //8
+        if (p_Nodes[k]->id.version != -1) {
             if (in_id.version != -1)
-                p_pStreamOut->write_id(FIFF_PARENT_FILE_ID, in_id);//9
+                p_pStreamOut->write_id(FIFF_PARENT_FILE_ID, in_id); //9
 
-            p_pStreamOut->write_id(FIFF_BLOCK_ID);//10
-            p_pStreamOut->write_id(FIFF_PARENT_BLOCK_ID, p_Nodes[k]->id);//11
+            p_pStreamOut->write_id(FIFF_BLOCK_ID);                        //10
+            p_pStreamOut->write_id(FIFF_PARENT_BLOCK_ID, p_Nodes[k]->id); //11
         }
-        for (p = 0; p < p_Nodes[k]->nent(); ++p)
-        {
+        for (p = 0; p < p_Nodes[k]->nent(); ++p) {
             //
             //   Do not copy these tags
             //
-            if(p_Nodes[k]->dir[p]->kind == FIFF_BLOCK_ID || p_Nodes[k]->dir[p]->kind == FIFF_PARENT_BLOCK_ID || p_Nodes[k]->dir[p]->kind == FIFF_PARENT_FILE_ID)
+            if (p_Nodes[k]->dir[p]->kind == FIFF_BLOCK_ID || p_Nodes[k]->dir[p]->kind == FIFF_PARENT_BLOCK_ID || p_Nodes[k]->dir[p]->kind == FIFF_PARENT_FILE_ID)
                 continue;
 
             //
@@ -128,8 +125,7 @@ bool FiffDirNode::copy_tree(FiffStream::SPtr& p_pStreamIn, const FiffId& in_id, 
             //
             // Read data when available
             //
-            if (tag->size() > 0)
-            {
+            if (tag->size() > 0) {
                 in->readRawData(tag->data(), tag->size());
                 // Don't do this conversion because it breaks the writing on
                 // little endian systems (i.e., OSX, Linux, Windows...)
@@ -145,10 +141,9 @@ bool FiffDirNode::copy_tree(FiffStream::SPtr& p_pStreamIn, const FiffId& in_id, 
             *out << (qint32)tag->size();
             *out << (qint32)FIFFV_NEXT_SEQ;
 
-            out->writeRawData(tag->data(),tag->size());
+            out->writeRawData(tag->data(), tag->size());
         }
-        for(p = 0; p < p_Nodes[k]->nchild(); ++p)
-        {
+        for (p = 0; p < p_Nodes[k]->nchild(); ++p) {
             QList<FiffDirNode::SPtr> childList;
             childList << p_Nodes[k]->children[p];
             FiffDirNode::copy_tree(p_pStreamIn, in_id, childList, p_pStreamOut);
@@ -163,7 +158,7 @@ bool FiffDirNode::copy_tree(FiffStream::SPtr& p_pStreamIn, const FiffId& in_id, 
 QList<FiffDirNode::SPtr> FiffDirNode::dir_tree_find(fiff_int_t p_kind) const
 {
     QList<FiffDirNode::SPtr> nodes;
-    if(this->type == p_kind)
+    if (this->type == p_kind)
         nodes.append(FiffDirNode::SPtr(new FiffDirNode(this)));
 
     QList<FiffDirNode::SPtr>::const_iterator i;
@@ -177,11 +172,9 @@ QList<FiffDirNode::SPtr> FiffDirNode::dir_tree_find(fiff_int_t p_kind) const
 
 bool FiffDirNode::find_tag(FiffStream* p_pStream, fiff_int_t findkind, FiffTag::UPtr& p_pTag) const
 {
-    for (qint32 p = 0; p < this->nent(); ++p)
-    {
-        if (this->dir[p]->kind == findkind)
-        {
-            p_pStream->read_tag(p_pTag,this->dir[p]->pos);
+    for (qint32 p = 0; p < this->nent(); ++p) {
+        if (this->dir[p]->kind == findkind) {
+            p_pStream->read_tag(p_pTag, this->dir[p]->pos);
             return true;
         }
     }
@@ -195,8 +188,8 @@ bool FiffDirNode::find_tag(FiffStream* p_pStream, fiff_int_t findkind, FiffTag::
 
 bool FiffDirNode::has_tag(fiff_int_t findkind)
 {
-    for(qint32 p = 0; p < this->nent(); ++p)
-        if(this->dir.at(p)->kind == findkind)
+    for (qint32 p = 0; p < this->nent(); ++p)
+        if (this->dir.at(p)->kind == findkind)
             return true;
     return false;
 }
@@ -205,12 +198,12 @@ bool FiffDirNode::has_tag(fiff_int_t findkind)
 
 bool FiffDirNode::has_kind(fiff_int_t p_kind) const
 {
-    if(this->type == p_kind)
+    if (this->type == p_kind)
         return true;
 
     QList<FiffDirNode::SPtr>::const_iterator i;
-    for(i = this->children.begin(); i != this->children.end(); ++i)
-        if((*i)->has_kind(p_kind))
+    for (i = this->children.begin(); i != this->children.end(); ++i)
+        if ((*i)->has_kind(p_kind))
             return true;
 
     return false;
@@ -220,12 +213,12 @@ bool FiffDirNode::has_kind(fiff_int_t p_kind) const
 
 void FiffDirNode::print(int indent) const
 {
-    int j, prev_kind,count;
+    int j, prev_kind, count;
     QList<FiffDirEntry::SPtr> dentry = this->dir;
 
     for (int k = 0; k < indent; k++)
         putchar(' ');
-    explain_block (this->type);
+    explain_block(this->type);
     qDebug(" { ");
     if (!this->id.isEmpty())
         this->id.print();
@@ -234,25 +227,24 @@ void FiffDirNode::print(int indent) const
     for (j = 0, prev_kind = -1, count = 0; j < this->nent(); j++) {
         if (dentry[j]->kind != prev_kind) {
             if (count > 1)
-                qDebug(" [%d]\n",count);
+                qDebug(" [%d]\n", count);
             else if (j > 0)
                 putchar('\n');
-            for (int k = 0; k < indent+2; k++)
+            for (int k = 0; k < indent + 2; k++)
                 putchar(' ');
-            explain (dentry[j]->kind);
+            explain(dentry[j]->kind);
             prev_kind = dentry[j]->kind;
             count = 1;
-        }
-        else
+        } else
             count++;
         prev_kind = dentry[j]->kind;
     }
     if (count > 1)
-        qDebug(" [%d]\n",count);
+        qDebug(" [%d]\n", count);
     else if (j > 0)
-        putchar ('\n');
+        putchar('\n');
     for (j = 0; j < this->nchild(); j++)
-        this->children[j]->print(indent+5);
+        this->children[j]->print(indent + 5);
     for (int k = 0; k < indent; k++)
         putchar(' ');
     qDebug("}\n");
@@ -264,11 +256,11 @@ void FiffDirNode::explain_block(int kind)
 {
     for (int k = 0; _fiff_block_explanations[k].kind >= 0; k++) {
         if (_fiff_block_explanations[k].kind == kind) {
-            qDebug("%d = %s",kind,_fiff_block_explanations[k].text);
+            qDebug("%d = %s", kind, _fiff_block_explanations[k].text);
             return;
         }
     }
-    qWarning("Cannot explain: %d",kind);
+    qWarning("Cannot explain: %d", kind);
 }
 
 //=============================================================================================================
@@ -278,16 +270,16 @@ void FiffDirNode::explain(int kind)
     int k;
     for (k = 0; _fiff_explanations[k].kind >= 0; k++) {
         if (_fiff_explanations[k].kind == kind) {
-            qDebug("%d = %s",kind,_fiff_explanations[k].text);
+            qDebug("%d = %s", kind, _fiff_explanations[k].text);
             return;
         }
     }
-    qWarning("Cannot explain: %d",kind);
+    qWarning("Cannot explain: %d", kind);
 }
 
 //=============================================================================================================
 
-const char *FiffDirNode::get_tag_explanation(int kind)
+const char* FiffDirNode::get_tag_explanation(int kind)
 {
     int k;
     for (k = 0; _fiff_explanations[k].kind >= 0; k++) {

@@ -119,14 +119,14 @@ protected:
     virtual void run();
 
 private:
-    FIFFLIB::FiffInfo::SPtr                         m_pFiffInfo;                /**< Fiff measurement info.*/
+    FIFFLIB::FiffInfo::SPtr m_pFiffInfo; /**< Fiff measurement info.*/
 
-    QSharedPointer<DummyYourWidget>                 m_pYourWidget;              /**< The widget used to control this plugin by the user.*/
+    QSharedPointer<DummyYourWidget> m_pYourWidget; /**< The widget used to control this plugin by the user.*/
 
-    QSharedPointer<UTILSLIB::CircularBuffer_Matrix_double>       m_pCircularBuffer;          /**< Holds incoming raw data. */
+    QSharedPointer<UTILSLIB::CircularBuffer_Matrix_double> m_pCircularBuffer; /**< Holds incoming raw data. */
 
-    SCSHAREDLIB::PluginInputData<SCMEASLIB::RealTimeMultiSampleArray>::SPtr      m_pInput;      /**< The incoming data.*/
-    SCSHAREDLIB::PluginOutputData<SCMEASLIB::RealTimeMultiSampleArray>::SPtr     m_pOutput;     /**< The outgoing data.*/
+    SCSHAREDLIB::PluginInputData<SCMEASLIB::RealTimeMultiSampleArray>::SPtr m_pInput;   /**< The incoming data.*/
+    SCSHAREDLIB::PluginOutputData<SCMEASLIB::RealTimeMultiSampleArray>::SPtr m_pOutput; /**< The outgoing data.*/
 
 signals:
     //=========================================================================================================

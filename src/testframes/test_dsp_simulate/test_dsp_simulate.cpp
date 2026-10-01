@@ -58,14 +58,17 @@ class TestDspSimulate : public QObject
     Q_OBJECT
 
 private slots:
-    void initTestCase() {}
+    void initTestCase()
+    {
+    }
 
     //--- simulateStc tests ---
 
     void testSimulateStcDimensions()
     {
         VectorXi allVerts(20);
-        for (int i = 0; i < 20; ++i) allVerts(i) = i * 100;
+        for (int i = 0; i < 20; ++i)
+            allVerts(i) = i * 100;
 
         VectorXi activeVerts(3);
         activeVerts << 0, 500, 1000; // vertices 0, 5, 10
@@ -86,7 +89,8 @@ private slots:
     void testSimulateStcActiveVerticesNonZero()
     {
         VectorXi allVerts(10);
-        for (int i = 0; i < 10; ++i) allVerts(i) = i;
+        for (int i = 0; i < 10; ++i)
+            allVerts(i) = i;
 
         VectorXi activeVerts(2);
         activeVerts << 3, 7;
@@ -112,7 +116,8 @@ private slots:
     void testSimulateStcReproducibility()
     {
         VectorXi allVerts(5);
-        for (int i = 0; i < 5; ++i) allVerts(i) = i;
+        for (int i = 0; i < 5; ++i)
+            allVerts(i) = i;
         VectorXi activeVerts(1);
         activeVerts << 2;
 
@@ -143,7 +148,8 @@ private slots:
     void testSimulateFromWaveforms()
     {
         VectorXi allVerts(5);
-        for (int i = 0; i < 5; ++i) allVerts(i) = i;
+        for (int i = 0; i < 5; ++i)
+            allVerts(i) = i;
         VectorXi activeVerts(2);
         activeVerts << 1, 3;
 
@@ -191,7 +197,8 @@ private slots:
 
         // Create source estimate
         VectorXi verts(nSrc);
-        for (int i = 0; i < nSrc; ++i) verts(i) = i;
+        for (int i = 0; i < nSrc; ++i)
+            verts(i) = i;
         MatrixXd srcData = MatrixXd::Ones(nSrc, nTimes);
         InvSourceEstimate stc(srcData, verts, 0.0f, 0.001f);
 
@@ -229,7 +236,7 @@ private slots:
         verts << 0, 1;
         MatrixXd srcData(nSrc, nTimes);
         srcData << 1, 2, 3, 4,
-                   5, 6, 7, 8;
+            5, 6, 7, 8;
         InvSourceEstimate stc(srcData, verts, 0.0f, 0.001f);
 
         FiffInfo info;
@@ -264,7 +271,8 @@ private slots:
         fwd.sol->data = MatrixXd::Random(nChan, nSrc) * 0.1;
 
         VectorXi verts(nSrc);
-        for (int i = 0; i < nSrc; ++i) verts(i) = i;
+        for (int i = 0; i < nSrc; ++i)
+            verts(i) = i;
         MatrixXd srcData = MatrixXd::Zero(nSrc, nTimes);
         InvSourceEstimate stc(srcData, verts, 0.0f, 0.001f);
 
@@ -302,7 +310,9 @@ private slots:
         QCOMPARE(evoked.data.size(), static_cast<Eigen::Index>(0));
     }
 
-    void cleanupTestCase() {}
+    void cleanupTestCase()
+    {
+    }
 };
 
 //=============================================================================================================

@@ -47,8 +47,9 @@
 
 class QTableView;
 
-namespace FIFFLIB {
-    class FiffInfo;
+namespace FIFFLIB
+{
+class FiffInfo;
 }
 
 //=============================================================================================================
@@ -78,8 +79,8 @@ class DISPSHARED_EXPORT SpectrumView : public AbstractView
     Q_OBJECT
 
 public:
-    typedef QSharedPointer<SpectrumView> SPtr;              /**< Shared pointer type for SpectrumView. */
-    typedef QSharedPointer<const SpectrumView> ConstSPtr;   /**< Const shared pointer type for SpectrumView. */
+    typedef QSharedPointer<SpectrumView> SPtr;            /**< Shared pointer type for SpectrumView. */
+    typedef QSharedPointer<const SpectrumView> ConstSPtr; /**< Const shared pointer type for SpectrumView. */
 
     //=========================================================================================================
     /**
@@ -106,7 +107,7 @@ public:
      * @param[in] info          The FiffInfo.
      * @param[in] iScaleType    The scale type.
      */
-    void init(QSharedPointer<FIFFLIB::FiffInfo> &info,
+    void init(QSharedPointer<FIFFLIB::FiffInfo>& info,
               int iScaleType);
 
     //=========================================================================================================
@@ -115,7 +116,7 @@ public:
      *
      * @param[in] matData          The new data.
      */
-    void addData(const Eigen::MatrixXd &matData);
+    void addData(const Eigen::MatrixXd& matData);
 
     //=========================================================================================================
     /**
@@ -174,9 +175,9 @@ protected:
      */
     void updateProcessingMode(ProcessingMode mode);
 
-    QPointer<QTableView>                                m_pTableView;           /**< The QTableView being part of the model/view framework of Qt. */
-    QPointer<DISPLIB::FrequencySpectrumDelegate>        m_pFSDelegate;          /**< Frequency spectrum delegate. */
-    QPointer<DISPLIB::FrequencySpectrumModel>           m_pFSModel;             /**< Frequency spectrum model. */
+    QPointer<QTableView> m_pTableView;                          /**< The QTableView being part of the model/view framework of Qt. */
+    QPointer<DISPLIB::FrequencySpectrumDelegate> m_pFSDelegate; /**< Frequency spectrum delegate. */
+    QPointer<DISPLIB::FrequencySpectrumModel> m_pFSModel;       /**< Frequency spectrum model. */
 
 signals:
     //=========================================================================================================

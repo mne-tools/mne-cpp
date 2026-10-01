@@ -68,7 +68,7 @@ using namespace Eigen;
  *
  */
 
-int main(int argc, char *argv[])
+int main(int argc, char* argv[])
 {
     qInstallMessageHandler(MNELogger::customLogWriter);
     QElapsedTimer timer;
@@ -81,13 +81,13 @@ int main(int argc, char *argv[])
     qInfo() << "Please download the mne-cpp-test-data folder from Github (mne-tools) into mne-cpp/resources/data.";
 
     QCommandLineOption inFile("fileIn", "The input file.", "in", QCoreApplication::applicationDirPath() + "../resources/data/mne-cpp-test-data/MEG/sample/test_hpiFit_raw.fif");
-    QCommandLineOption inWindow("window", "The window size for the HPI fit in ms.", "in","400");
-    QCommandLineOption inStep("step", "The step size in ms.", "in","10");
-    QCommandLineOption inFreqs("freqs", "The frequencies used.", "in","154,158,161,166");
-    QCommandLineOption inSave("save", "Store the fitting results [0,1].", "in","0");
-    QCommandLineOption inVerbose("verbose", "Print to command line [0,1].", "in","1");
-    QCommandLineOption inFast("fast", "Do fast fits [0,1].", "in","0");
-    QCommandLineOption outName("fileOut", "The output file name for movement data.", "out","position.txt");
+    QCommandLineOption inWindow("window", "The window size for the HPI fit in ms.", "in", "400");
+    QCommandLineOption inStep("step", "The step size in ms.", "in", "10");
+    QCommandLineOption inFreqs("freqs", "The frequencies used.", "in", "154,158,161,166");
+    QCommandLineOption inSave("save", "Store the fitting results [0,1].", "in", "0");
+    QCommandLineOption inVerbose("verbose", "Print to command line [0,1].", "in", "1");
+    QCommandLineOption inFast("fast", "Do fast fits [0,1].", "in", "0");
+    QCommandLineOption outName("fileOut", "The output file name for movement data.", "out", "position.txt");
 
     parser.addOption(inFile);
     parser.addOption(inWindow);
@@ -100,14 +100,14 @@ int main(int argc, char *argv[])
 
     parser.process(a);
 
-    float fWindow = parser.value(inWindow).toFloat()/1000.0; // convert to seconds
-    if(fWindow <= 0.0) {
+    float fWindow = parser.value(inWindow).toFloat() / 1000.0; // convert to seconds
+    if (fWindow <= 0.0) {
         // check for proper buffer size
         qWarning() << "Window <= 0. Window was set to 200 ms.";
         fWindow = 0.2f;
     }
-    float fStep = parser.value(inStep).toFloat()/1000; // convert to seconds
-    if(fStep <= 0.0) {
+    float fStep = parser.value(inStep).toFloat() / 1000; // convert to seconds
+    if (fStep <= 0.0) {
         // check for proper step size
         qWarning() << "Step <= 0. Step size was set to 0.1 seconds.";
         fStep = 0.1f;
@@ -124,9 +124,9 @@ int main(int argc, char *argv[])
     QSharedPointer<FiffInfo> pFiffInfo = QSharedPointer<FiffInfo>::create(raw.info);
 
     // Setup comparison of transformation matrices
-    FiffCoordTrans transDevHead = pFiffInfo->dev_head_t;    // transformation that only updates after big head movements
-    float fThreshRot = 5.0f;          // in degree
-    float fThreshTrans = 0.005f;    // in m
+    FiffCoordTrans transDevHead = pFiffInfo->dev_head_t; // transformation that only updates after big head movements
+    float fThreshRot = 5.0f;                             // in degree
+    float fThreshTrans = 0.005f;                         // in m
 
     // Set up the reading parameters
     RowVectorXi vecPicks = pFiffInfo->pick_types(true, false, false);
@@ -138,17 +138,17 @@ int main(int argc, char *argv[])
     fiff_int_t last = raw.last_samp;
 
     // create time vector that specifies when to fit
-    int iQuantum = floor(static_cast<double>(fWindow)*pFiffInfo->sfreq);     // window size
-    int iQuantumT = floor(static_cast<double>(fStep)*pFiffInfo->sfreq);      // samples between fits
-    int iN = floor((last-first)/iQuantumT)-floor(iQuantum/iQuantumT);
-    RowVectorXf vecTime = RowVectorXf::LinSpaced(iN, 0, iN-1);
+    int iQuantum = floor(static_cast<double>(fWindow) * pFiffInfo->sfreq); // window size
+    int iQuantumT = floor(static_cast<double>(fStep) * pFiffInfo->sfreq);  // samples between fits
+    int iN = floor((last - first) / iQuantumT) - floor(iQuantum / iQuantumT);
+    RowVectorXf vecTime = RowVectorXf::LinSpaced(iN, 0, iN - 1);
 
     // matPosition matrix to save hpi fit results
     MatrixXd matPosition;
 
     // setup informations for HPI fit (VectorView)
     QVector<int> vecFreqs(lFreqs.size());
-    for(int i = 0; i < lFreqs.size(); i++) {
+    for (int i = 0; i < lFreqs.size(); i++) {
         vecFreqs[i] = lFreqs[i].toInt();
     }
 
@@ -164,7 +164,7 @@ int main(int argc, char *argv[])
     FiffInfo infoTemp = *(pFiffInfo.data());
 
     //Turn on all SSP
-    for(int i = 0; i < infoTemp.projs.size(); ++i) {
+    for (int i = 0; i < infoTemp.projs.size(); ++i) {
         infoTemp.projs[i].active = true;
     }
 
@@ -172,7 +172,7 @@ int main(int argc, char *argv[])
     infoTemp.make_projector(matProjectors);
 
     //set columns of matrix to zero depending on bad channels indexes
-    for(qint32 j = 0; j < infoTemp.bads.size(); ++j) {
+    for (qint32 j = 0; j < infoTemp.bads.size(); ++j) {
         matProjectors.col(infoTemp.ch_names.indexOf(infoTemp.bads.at(j))).setZero();
     }
 
@@ -183,52 +183,52 @@ int main(int argc, char *argv[])
     InvHpiFit HPI = InvHpiFit(hpiDataUpdater.getSensors());
 
     MatrixXd matAmplitudes;
-    MatrixXd matCoilLoc(4,3);
+    MatrixXd matCoilLoc(4, 3);
 
     // ordering of frequencies
     from = first + vecTime(0);
     to = from + iQuantum;
-    if(!raw.read_raw_segment(matData, matTimes, from, to)) {
+    if (!raw.read_raw_segment(matData, matTimes, from, to)) {
         qCritical("error during read_raw_segment");
         return -1;
     }
 
     // order frequencies
     timer.start();
-    hpiDataUpdater.prepareDataAndProjectors(matData,matProjectors);
+    hpiDataUpdater.prepareDataAndProjectors(matData, matProjectors);
     const auto& matProjectedData = hpiDataUpdater.getProjectedData();
     const auto& matPreparedProjectors = hpiDataUpdater.getProjectors();
     const auto& matCoilsHead = hpiDataUpdater.getHpiDigitizer();
     InvHpiModelParameters hpiModelParameters(vecFreqs,
-                                          pFiffInfo->sfreq,
-                                          pFiffInfo->linefreq,
-                                          bFast);
+                                             pFiffInfo->sfreq,
+                                             pFiffInfo->linefreq,
+                                             bFast);
 
     HpiFitResult hpiFitResult;
-    HPI.fit(matProjectedData,matPreparedProjectors,hpiModelParameters,matCoilsHead,true,hpiFitResult);
+    HPI.fit(matProjectedData, matPreparedProjectors, hpiModelParameters, matCoilsHead, true, hpiFitResult);
     hpiModelParameters = InvHpiModelParameters(hpiFitResult.hpiFreqs,
-                                            pFiffInfo->sfreq,
-                                            pFiffInfo->linefreq,
-                                            bFast);
+                                               pFiffInfo->sfreq,
+                                               pFiffInfo->linefreq,
+                                               bFast);
 
     float fTimer = 0.0;
 
     // read and fit
-    for(int i = 0; i < vecTime.size(); i++) {
-        from = first + vecTime(i)*iQuantumT;
+    for (int i = 0; i < vecTime.size(); i++) {
+        from = first + vecTime(i) * iQuantumT;
         to = from + iQuantum;
         if (to > last) {
             to = last;
             qWarning() << "Block size < iQuantum " << iQuantum;
         }
         // Reading
-        if(!raw.read_raw_segment(matData, matTimes, from, to)) {
+        if (!raw.read_raw_segment(matData, matTimes, from, to)) {
             qCritical("error during read_raw_segment");
             return -1;
         }
 
         timer.start();
-        hpiDataUpdater.prepareDataAndProjectors(matData,matProjectors);
+        hpiDataUpdater.prepareDataAndProjectors(matData, matProjectors);
         const auto& matProjectedDataLoop = hpiDataUpdater.getProjectedData();
         const auto& matPreparedProjectorsLoop = hpiDataUpdater.getProjectors();
         HPI.fit(matProjectedDataLoop,
@@ -239,16 +239,16 @@ int main(int argc, char *argv[])
         fTimer = timer.elapsed();
 
         InvHpiFit::storeHeadPosition(vecTime(i), hpiFitResult.devHeadTrans.trans, matPosition, hpiFitResult.GoF, hpiFitResult.errorDistances);
-        matPosition(i,9) = fTimer;
+        matPosition(i, 9) = fTimer;
         // if big head displacement occures, update debHeadTrans
-        if(InvHpiFit::compareTransformation(transDevHead.trans, hpiFitResult.devHeadTrans.trans, fThreshRot, fThreshTrans)) {
+        if (InvHpiFit::compareTransformation(transDevHead.trans, hpiFitResult.devHeadTrans.trans, fThreshRot, fThreshTrans)) {
             transDevHead = hpiFitResult.devHeadTrans;
             qInfo() << "dev_head_t has been updated.";
         }
-        if(bVerbose) {
+        if (bVerbose) {
             qInfo() << "Iteration" << i << "Of" << vecTime.size()
                     << " Duration " << fTimer << "ms"
-                    << " Error" << hpiFitResult.errorDistances[0]*1000 << hpiFitResult.errorDistances[1]*1000 << hpiFitResult.errorDistances[2]*1000 << hpiFitResult.errorDistances[3]*1000
+                    << " Error" << hpiFitResult.errorDistances[0] * 1000 << hpiFitResult.errorDistances[1] * 1000 << hpiFitResult.errorDistances[2] * 1000 << hpiFitResult.errorDistances[3] * 1000
                     << " GoF" << hpiFitResult.GoF[0] << hpiFitResult.GoF[1] << hpiFitResult.GoF[2] << hpiFitResult.GoF[3];
         }
     }
@@ -257,7 +257,7 @@ int main(int argc, char *argv[])
             << "Average Error:" << matPosition.col(8).mean() * 1000 << "mm"
             << "Average Duration:" << matPosition.col(9).mean() << "ms";
 
-    if(bSave) {
+    if (bSave) {
         IOUtils::write_eigen_matrix(matPosition, QString(QCoreApplication::applicationDirPath() + "/MNE-sample-data/" + sNameOut));
     }
 }

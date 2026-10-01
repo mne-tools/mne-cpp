@@ -270,7 +270,9 @@ void TestDisp3dBrainView::initTestCase()
 
 //=============================================================================================================
 
-void TestDisp3dBrainView::cleanupTestCase() {}
+void TestDisp3dBrainView::cleanupTestCase()
+{
+}
 
 //=============================================================================================================
 
@@ -548,10 +550,10 @@ void TestDisp3dBrainView::multiViewLayout_geometry()
     QVERIFY(h2 == SplitterHit::Vertical || h2 == SplitterHit::None);
 
     // cursorForHit
-    QCOMPARE(MultiViewLayout::cursorForHit(SplitterHit::None),       Qt::ArrowCursor);
-    QCOMPARE(MultiViewLayout::cursorForHit(SplitterHit::Vertical),   Qt::SizeHorCursor);
+    QCOMPARE(MultiViewLayout::cursorForHit(SplitterHit::None), Qt::ArrowCursor);
+    QCOMPARE(MultiViewLayout::cursorForHit(SplitterHit::Vertical), Qt::SizeHorCursor);
     QCOMPARE(MultiViewLayout::cursorForHit(SplitterHit::Horizontal), Qt::SizeVerCursor);
-    QCOMPARE(MultiViewLayout::cursorForHit(SplitterHit::Both),       Qt::SizeAllCursor);
+    QCOMPARE(MultiViewLayout::cursorForHit(SplitterHit::Both), Qt::SizeAllCursor);
 
     // viewportIndexAt
     QVector<int> vp = {0, 1, 2, 3};
@@ -577,10 +579,10 @@ void TestDisp3dBrainView::multiViewLayout_geometry()
     layout.separatorGeometries(4, sz, vr, hr);
 
     // dragSplitter
-    layout.dragSplitter(QPoint(300, 200), SplitterHit::Vertical,   sz);
+    layout.dragSplitter(QPoint(300, 200), SplitterHit::Vertical, sz);
     layout.dragSplitter(QPoint(300, 200), SplitterHit::Horizontal, sz);
-    layout.dragSplitter(QPoint(300, 200), SplitterHit::Both,       sz);
-    layout.dragSplitter(QPoint(300, 200), SplitterHit::None,       sz);
+    layout.dragSplitter(QPoint(300, 200), SplitterHit::Both, sz);
+    layout.dragSplitter(QPoint(300, 200), SplitterHit::None, sz);
 
     // setSplitX/Y clamp and reset
     layout.setSplitX(0.3f);
@@ -671,33 +673,43 @@ void TestDisp3dBrainView::digitizerSetTreeItem_basics()
     QList<FIFFLIB::FiffDigPoint> pts;
 
     FIFFLIB::FiffDigPoint cardinal;
-    cardinal.kind  = FIFFV_POINT_CARDINAL;
+    cardinal.kind = FIFFV_POINT_CARDINAL;
     cardinal.ident = FIFFV_POINT_NASION;
-    cardinal.r[0] = 0.0f; cardinal.r[1] = 0.08f; cardinal.r[2] = 0.0f;
+    cardinal.r[0] = 0.0f;
+    cardinal.r[1] = 0.08f;
+    cardinal.r[2] = 0.0f;
     pts << cardinal;
 
     FIFFLIB::FiffDigPoint lpa;
-    lpa.kind  = FIFFV_POINT_CARDINAL;
+    lpa.kind = FIFFV_POINT_CARDINAL;
     lpa.ident = FIFFV_POINT_LPA;
-    lpa.r[0] = -0.07f; lpa.r[1] = 0.0f; lpa.r[2] = 0.0f;
+    lpa.r[0] = -0.07f;
+    lpa.r[1] = 0.0f;
+    lpa.r[2] = 0.0f;
     pts << lpa;
 
     FIFFLIB::FiffDigPoint hpi;
-    hpi.kind  = FIFFV_POINT_HPI;
+    hpi.kind = FIFFV_POINT_HPI;
     hpi.ident = 1;
-    hpi.r[0] = 0.01f; hpi.r[1] = 0.01f; hpi.r[2] = 0.06f;
+    hpi.r[0] = 0.01f;
+    hpi.r[1] = 0.01f;
+    hpi.r[2] = 0.06f;
     pts << hpi;
 
     FIFFLIB::FiffDigPoint eeg;
-    eeg.kind  = FIFFV_POINT_EEG;
+    eeg.kind = FIFFV_POINT_EEG;
     eeg.ident = 1;
-    eeg.r[0] = 0.02f; eeg.r[1] = 0.02f; eeg.r[2] = 0.07f;
+    eeg.r[0] = 0.02f;
+    eeg.r[1] = 0.02f;
+    eeg.r[2] = 0.07f;
     pts << eeg;
 
     FIFFLIB::FiffDigPoint extra;
-    extra.kind  = FIFFV_POINT_EXTRA;
+    extra.kind = FIFFV_POINT_EXTRA;
     extra.ident = 1;
-    extra.r[0] = 0.03f; extra.r[1] = 0.03f; extra.r[2] = 0.05f;
+    extra.r[0] = 0.03f;
+    extra.r[1] = 0.03f;
+    extra.r[2] = 0.05f;
     pts << extra;
 
     DigitizerSetTreeItem item("Digitizer", pts);
@@ -708,9 +720,9 @@ void TestDisp3dBrainView::digitizerSetTreeItem_basics()
     // categoryItem uses DigitizerTreeItem::PointKind (Cardinal=0, HPI=1, EEG=2, Extra=3),
     // not the FIFF constants (FIFFV_POINT_CARDINAL=1, etc.)
     QVERIFY(item.categoryItem(DigitizerTreeItem::Cardinal) != nullptr);
-    QVERIFY(item.categoryItem(DigitizerTreeItem::HPI)      != nullptr);
-    QVERIFY(item.categoryItem(DigitizerTreeItem::EEG)      != nullptr);
-    QVERIFY(item.categoryItem(DigitizerTreeItem::Extra)    != nullptr);
+    QVERIFY(item.categoryItem(DigitizerTreeItem::HPI) != nullptr);
+    QVERIFY(item.categoryItem(DigitizerTreeItem::EEG) != nullptr);
+    QVERIFY(item.categoryItem(DigitizerTreeItem::Extra) != nullptr);
 
     // Non-existent category returns nullptr
     QVERIFY(item.categoryItem(999) == nullptr);
@@ -723,7 +735,7 @@ void TestDisp3dBrainView::digitizerSetTreeItem_basics()
 void TestDisp3dBrainView::rayPicker_basics()
 {
     // unproject — valid 800×600 viewport, identity PVM matrix
-    QMatrix4x4 pvm;  // identity
+    QMatrix4x4 pvm; // identity
     QRect paneRect(0, 0, 800, 600);
     QVector3D origin, dir;
 
@@ -775,15 +787,19 @@ void TestDisp3dBrainView::brainTreeModel_advanced()
     // addDigitizerData with a real set of points
     QList<FIFFLIB::FiffDigPoint> pts;
     FIFFLIB::FiffDigPoint nasion;
-    nasion.kind  = FIFFV_POINT_CARDINAL;
+    nasion.kind = FIFFV_POINT_CARDINAL;
     nasion.ident = FIFFV_POINT_NASION;
-    nasion.r[0] = 0.0f; nasion.r[1] = 0.08f; nasion.r[2] = 0.0f;
+    nasion.r[0] = 0.0f;
+    nasion.r[1] = 0.08f;
+    nasion.r[2] = 0.0f;
     pts << nasion;
 
     FIFFLIB::FiffDigPoint hpi;
     hpi.kind = FIFFV_POINT_HPI;
     hpi.ident = 1;
-    hpi.r[0] = 0.01f; hpi.r[1] = 0.01f; hpi.r[2] = 0.06f;
+    hpi.r[0] = 0.01f;
+    hpi.r[1] = 0.01f;
+    hpi.r[2] = 0.06f;
     pts << hpi;
 
     model.addDigitizerData(pts);
@@ -824,7 +840,7 @@ void TestDisp3dBrainView::treeItems_basics()
         MNELIB::MNEBemSurface bemSurf;
         BemTreeItem bemItem("BEM", bemSurf);
         QCOMPARE(bemItem.text(), QString("BEM"));
-        const MNELIB::MNEBemSurface &ref = bemItem.bemSurfaceData();
+        const MNELIB::MNEBemSurface& ref = bemItem.bemSurfaceData();
         Q_UNUSED(ref);
     }
 
@@ -865,7 +881,7 @@ void TestDisp3dBrainView::brainTreeModel_extended()
     {
         MNELIB::MNEBemSurface bemSurf;
         bemSurf.id = 4; // Head
-        BemTreeItem *bemItem = model.addBemSurface("SubjectA", "head", bemSurf);
+        BemTreeItem* bemItem = model.addBemSurface("SubjectA", "head", bemSurf);
         QVERIFY(bemItem != nullptr);
         QCOMPARE(bemItem->text(), QString("head"));
 
@@ -897,12 +913,12 @@ void TestDisp3dBrainView::brainTreeModel_extended()
     // addNetwork
     {
         CONNECTIVITYLIB::Network net("Coherence");
-        NetworkTreeItem *netItem = model.addNetwork(net, "TestNet");
+        NetworkTreeItem* netItem = model.addNetwork(net, "TestNet");
         QVERIFY(netItem != nullptr);
         QCOMPARE(netItem->text(), QString("TestNet"));
 
         CONNECTIVITYLIB::Network net2("PLV");
-        NetworkTreeItem *netItem2 = model.addNetwork(net2, "");
+        NetworkTreeItem* netItem2 = model.addNetwork(net2, "");
         QVERIFY(netItem2 != nullptr);
     }
 
@@ -923,9 +939,9 @@ void TestDisp3dBrainView::brainSurface_advanced()
 
     // createFromData with a single triangle (3 vertices)
     Eigen::MatrixX3f verts(3, 3);
-    verts << 0.0f,  0.0f, 0.0f,
-             0.01f, 0.0f, 0.0f,
-             0.0f,  0.01f, 0.0f;
+    verts << 0.0f, 0.0f, 0.0f,
+        0.01f, 0.0f, 0.0f,
+        0.0f, 0.01f, 0.0f;
     Eigen::MatrixX3i tris(1, 3);
     tris << 0, 1, 2;
     surf.createFromData(verts, tris, QColor(200, 200, 200));
@@ -1130,7 +1146,7 @@ void TestDisp3dBrainView::brainView_streamingApi()
     view.setSensorFieldVisible("MEG", false);
     view.setSensorFieldVisible("EEG", true);
     view.setSensorFieldVisible("EEG", false);
-    view.setSensorFieldVisible("INVALID", false);   // early return path
+    view.setSensorFieldVisible("INVALID", false); // early return path
     view.setSensorFieldContourVisible("MEG", true);
     view.setSensorFieldContourVisible("MEG", false);
     view.setSensorFieldContourVisible("EEG", false);
@@ -1231,18 +1247,18 @@ void TestDisp3dBrainView::dipoleObject_extended()
     {
         INVLIB::InvEcd d1;
         d1.valid = true;
-        d1.time  = 0.05f;
-        d1.rd    = Eigen::Vector3f(0.01f, 0.02f, 0.03f);
-        d1.Q     = Eigen::Vector3f(1e-9f, 0.0f, 0.0f);
-        d1.good  = 0.9f;
-        d1.khi2  = 0.1f;
+        d1.time = 0.05f;
+        d1.rd = Eigen::Vector3f(0.01f, 0.02f, 0.03f);
+        d1.Q = Eigen::Vector3f(1e-9f, 0.0f, 0.0f);
+        d1.good = 0.9f;
+        d1.khi2 = 0.1f;
         d1.nfree = 3;
         d1.neval = 10;
         ecdSet.addEcd(d1);
 
         INVLIB::InvEcd d2 = d1;
         d2.rd = Eigen::Vector3f(-0.01f, 0.01f, 0.04f);
-        d2.Q  = Eigen::Vector3f(0.0f, 1e-9f, 0.0f);
+        d2.Q = Eigen::Vector3f(0.0f, 1e-9f, 0.0f);
         ecdSet.addEcd(d2);
     }
     QCOMPARE(ecdSet.size(), (qint32)2);
@@ -1294,7 +1310,7 @@ void TestDisp3dBrainView::brainView_headMovementPath()
 
     // A realistic short drift: a few centimetres over several fits.
     QVector<Eigen::Vector3f> vecPositions;
-    for(int i = 0; i < 8; ++i) {
+    for (int i = 0; i < 8; ++i) {
         vecPositions.append(Eigen::Vector3f(0.001f * i, 0.002f * i, 0.05f + 0.001f * i));
     }
     view.setHeadMovementPath(vecPositions);
@@ -1326,7 +1342,7 @@ void TestDisp3dBrainView::polylineObject_segments()
 
     // N points must give exactly N-1 segments.
     QVector<Eigen::Vector3f> vecPoints;
-    for(int i = 0; i < 8; ++i) {
+    for (int i = 0; i < 8; ++i) {
         vecPoints.append(Eigen::Vector3f(0.001f * i, 0.0f, 0.0f));
     }
     polyline.setPoints(vecPoints);
@@ -1351,7 +1367,7 @@ void TestDisp3dBrainView::polylineObject_segments()
     // implementation keyed nodes by, to show the index type no longer caps the
     // path length.
     QVector<Eigen::Vector3f> vecLong;
-    for(int i = 0; i < 40000; ++i) {
+    for (int i = 0; i < 40000; ++i) {
         vecLong.append(Eigen::Vector3f(0.0f, 0.0f, 1.0e-6f * i));
     }
     polyline.setPoints(vecLong);

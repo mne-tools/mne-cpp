@@ -92,7 +92,7 @@ public:
      * @param[in] atlas              Name of the atlas to load (eg. aparc.a2009s, aparc, aparc.DKTatlas40, BA, BA.thresh, ...).
      * @param[in] subjects_dir       Subjects directory.
      */
-    explicit FsAnnotationSet(const QString &subject_id, qint32 hemi, const QString &atlas, const QString &subjects_dir);
+    explicit FsAnnotationSet(const QString& subject_id, qint32 hemi, const QString& atlas, const QString& subjects_dir);
 
     //=========================================================================================================
     /**
@@ -102,7 +102,7 @@ public:
      * @param[in] hemi               Which hemisphere to load {0 -> lh, 1 -> rh, 2 -> both}.
      * @param[in] atlas              Name of the atlas to load (eg. aparc.a2009s, aparc, aparc.DKTatlas40, BA, BA.thresh, ...).
      */
-    explicit FsAnnotationSet(const QString &path, qint32 hemi, const QString &atlas);
+    explicit FsAnnotationSet(const QString& path, qint32 hemi, const QString& atlas);
 
     //=========================================================================================================
     /**
@@ -126,7 +126,9 @@ public:
     /**
      * Destroys the annotation set.
      */
-    ~FsAnnotationSet(){}
+    ~FsAnnotationSet()
+    {
+    }
 
     //=========================================================================================================
     /**
@@ -168,7 +170,7 @@ public:
      *
      * @return true if succesfull, false otherwise.
      */
-    static bool read(const QString& p_sLHFileName, const QString& p_sRHFileName, FsAnnotationSet &p_AnnotationSet);
+    static bool read(const QString& p_sLHFileName, const QString& p_sRHFileName, FsAnnotationSet& p_AnnotationSet);
 
     //=========================================================================================================
     /**
@@ -183,9 +185,9 @@ public:
      *
      * @return true if successful, false otherwise.
      */
-    bool toLabels(const FsSurfaceSet &p_surfSet,
-                  QList<FsLabel> &p_qListLabels,
-                  QList<Eigen::RowVector4i> &p_qListLabelRGBAs,
+    bool toLabels(const FsSurfaceSet& p_surfSet,
+                  QList<FsLabel>& p_qListLabels,
+                  QList<Eigen::RowVector4i>& p_qListLabelRGBAs,
                   const QStringList& lLabelPicks = QStringList()) const;
 
     //=========================================================================================================
@@ -196,7 +198,7 @@ public:
      *
      * @return FsAnnotation related to the parameter index.
      */
-    FsAnnotation& operator[] (qint32 idx);
+    FsAnnotation& operator[](qint32 idx);
 
     //=========================================================================================================
     /**
@@ -206,7 +208,7 @@ public:
      *
      * @return FsAnnotation related to the parameter index.
      */
-    const FsAnnotation operator[] (qint32 idx) const;
+    const FsAnnotation operator[](qint32 idx) const;
 
     //=========================================================================================================
     /**
@@ -216,7 +218,7 @@ public:
      *
      * @return FsAnnotation related to the parameter identifier.
      */
-    FsAnnotation& operator[] (QString idt);
+    FsAnnotation& operator[](QString idt);
 
     //=========================================================================================================
     /**
@@ -226,7 +228,7 @@ public:
      *
      * @return FsAnnotation related to the parameter identifier.
      */
-    const FsAnnotation operator[] (QString idt) const;
+    const FsAnnotation operator[](QString idt) const;
 
     //=========================================================================================================
     /**
@@ -237,7 +239,7 @@ public:
     inline qint32 size() const;
 
 private:
-    QMap<qint32, FsAnnotation> m_qMapAnnots;   /**< Hemisphere annotations (lh = 0; rh = 1). */
+    QMap<qint32, FsAnnotation> m_qMapAnnots; /**< Hemisphere annotations (lh = 0; rh = 1). */
 };
 
 //=============================================================================================================

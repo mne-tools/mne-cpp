@@ -51,7 +51,7 @@ using namespace Eigen;
 
 //=============================================================================================================
 
-int main(int argc, char *argv[])
+int main(int argc, char* argv[])
 {
     qInstallMessageHandler(MNELogger::customLogWriter);
     QCoreApplication app(argc, argv);
@@ -64,7 +64,7 @@ int main(int argc, char *argv[])
     parser.addVersionOption();
 
     QCommandLineOption descOpt("desc",
-        "Description file listing <weight> <stc-path> pairs (one per line).", "file");
+                               "Description file listing <weight> <stc-path> pairs (one per line).", "file");
     parser.addOption(descOpt);
 
     QCommandLineOption outOpt("out", "Output STC file path.", "file");

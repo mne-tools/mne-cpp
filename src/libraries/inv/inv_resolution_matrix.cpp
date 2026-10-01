@@ -44,8 +44,8 @@ MatrixXd InvResolutionMatrix::compute(const MatrixXd& matInverseKernel,
 {
     if (matInverseKernel.cols() != matLeadField.rows()) {
         qWarning() << "[InvResolutionMatrix::compute] Dimension mismatch:"
-                    << "inverse kernel cols" << matInverseKernel.cols()
-                    << "!= lead field rows" << matLeadField.rows();
+                   << "inverse kernel cols" << matInverseKernel.cols()
+                   << "!= lead field rows" << matLeadField.rows();
         return MatrixXd();
     }
 
@@ -151,7 +151,7 @@ VectorXd InvResolutionMatrix::spatialSpread(const MatrixXd& matResolution,
 //=============================================================================================================
 
 VectorXd InvResolutionMatrix::peakLocalisationError(const MatrixXd& matResolution,
-                                                     const MatrixX3d& matPositions)
+                                                    const MatrixX3d& matPositions)
 {
     const int nSrc = static_cast<int>(matResolution.rows());
     VectorXd ple(nSrc);

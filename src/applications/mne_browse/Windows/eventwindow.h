@@ -67,7 +67,7 @@ public:
      *
      * @param [in] parent pointer to parent widget; If parent is 0, the new EventWindow becomes a window. If parent is another widget, EventWindow becomes a child window inside parent. EventWindow is deleted when its parent is deleted.
      */
-    EventWindow(QWidget *parent = 0);
+    EventWindow(QWidget* parent = 0);
 
     //=========================================================================================================
     /**
@@ -135,24 +135,24 @@ private:
     /**
      * Updates the event filter type combo box whenever a new event file was loaded
      */
-    void updateComboBox(const QString &currentEventType);
+    void updateComboBox(const QString& currentEventType);
 
     //=========================================================================================================
     /**
      * event reimplemented virtual function to handle events of the event dock window
      */
-    bool event(QEvent * event);
+    bool event(QEvent* event);
 
-    std::unique_ptr<Ui::EventWindowDockWidget> ui;          /**< Pointer to the qt designer generated ui class.*/
+    std::unique_ptr<Ui::EventWindowDockWidget> ui; /**< Pointer to the qt designer generated ui class.*/
 
-    MainWindow*         m_pMainWindow;              /**< Pointer to the parent, the MainWindow class.*/
+    MainWindow* m_pMainWindow; /**< Pointer to the parent, the MainWindow class.*/
 
-    QSettings           m_qSettings;                /**< QSettings variable used to write or read from independent application sessions. */
+    QSettings m_qSettings; /**< QSettings variable used to write or read from independent application sessions. */
 
-    EventDelegate*      m_pEventDelegate;           /**< the QAbstractDelegate being part of the event model/view framework of Qt. */
-    EventModel*         m_pEventModel;              /**< the QAbstractTable event model being part of the model/view framework of Qt. */
+    EventDelegate* m_pEventDelegate; /**< the QAbstractDelegate being part of the event model/view framework of Qt. */
+    EventModel* m_pEventModel;       /**< the QAbstractTable event model being part of the model/view framework of Qt. */
 
-    QColorDialog*       m_pColordialog;             /**< The qt color dialog for changing event type colors.*/
+    QColorDialog* m_pColordialog; /**< The qt color dialog for changing event type colors.*/
 
 protected slots:
     //=========================================================================================================
@@ -162,7 +162,7 @@ protected slots:
      * @param [in] current model item focused in the view
      * @param [in] previous model item focused in the view
      */
-    void jumpToEvent(const QModelIndex &current, const QModelIndex &previous);
+    void jumpToEvent(const QModelIndex& current, const QModelIndex& previous);
 
     //=========================================================================================================
     /**

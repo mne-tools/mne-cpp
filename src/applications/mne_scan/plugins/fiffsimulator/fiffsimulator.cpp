@@ -74,7 +74,7 @@ FiffSimulator::FiffSimulator()
 
 FiffSimulator::~FiffSimulator()
 {
-    if(m_pFiffSimulatorProducer->isRunning() || this->isRunning()) {
+    if (m_pFiffSimulatorProducer->isRunning() || this->isRunning()) {
         stop();
     }
 }
@@ -101,11 +101,11 @@ QSharedPointer<AbstractPlugin> FiffSimulator::clone() const
 void FiffSimulator::init()
 {
     m_pRTMSA_FiffSimulator = PluginOutputData<RealTimeMultiSampleArray>::create(this, "FiffSimulator", "Fiff Simulator Output");
-    m_pRTMSA_FiffSimulator->measurementData()->setName(this->getName());//Provide name to auto store widget settings
+    m_pRTMSA_FiffSimulator->measurementData()->setName(this->getName()); //Provide name to auto store widget settings
     m_outputConnectors.append(m_pRTMSA_FiffSimulator);
 
     //Try to connect the cmd client on start up using localhost connection
- //   this->connectCmdClient();
+    //   this->connectCmdClient();
 }
 
 //=============================================================================================================
@@ -119,7 +119,7 @@ void FiffSimulator::unload()
 
 bool FiffSimulator::start()
 {
-    if(m_bCmdClientIsConnected && m_pFiffInfo) {
+    if (m_bCmdClientIsConnected && m_pFiffInfo) {
         //Set buffer size
         (*m_pRtCmdClient)["bufsize"].pValues()[0].setValue(m_iBufferSize);
         (*m_pRtCmdClient)["bufsize"].send();
@@ -153,7 +153,7 @@ bool FiffSimulator::stop()
     m_pFiffSimulatorProducer->stop();
 
     // Tell the mne_rt_server to stop sending data
-    if(m_bCmdClientIsConnected) {
+    if (m_bCmdClientIsConnected) {
         (*m_pRtCmdClient)["stop-all"].send();
     }
 
@@ -183,7 +183,7 @@ QString FiffSimulator::getName() const
 QWidget* FiffSimulator::setupWidget()
 {
     //widget is later distroyed by CentralWidget - so it has to be created everytime new
-    QWidget * pWidget(new FiffSimulatorSetupWidget(this));
+    QWidget* pWidget(new FiffSimulatorSetupWidget(this));
     return pWidget;
 }
 
@@ -193,11 +193,11 @@ void FiffSimulator::run()
 {
     MatrixXf matValue;
 
-    while(!isInterruptionRequested()) {
+    while (!isInterruptionRequested()) {
         //pop matrix
-        if(m_pCircularBuffer->pop(matValue)) {
+        if (m_pCircularBuffer->pop(matValue)) {
             //emit values
-            if(!isInterruptionRequested()) {
+            if (!isInterruptionRequested()) {
                 m_pRTMSA_FiffSimulator->measurementData()->setValue(matValue.cast<double>());
             }
         }
@@ -208,8 +208,8 @@ void FiffSimulator::run()
 
 void FiffSimulator::initConnector()
 {
-    QMutexLocker locker (&m_qMutex);
-    if(m_pFiffInfo) {
+    QMutexLocker locker(&m_qMutex);
+    if (m_pFiffInfo) {
         m_pRTMSA_FiffSimulator->measurementData()->initFromFiffInfo(m_pFiffInfo);
         m_pRTMSA_FiffSimulator->measurementData()->setDigitizerData(m_pFiffDigData);
         m_pRTMSA_FiffSimulator->measurementData()->setMultiArraySize(1);
@@ -222,7 +222,7 @@ void FiffSimulator::initConnector()
 
 void FiffSimulator::changeConnector(qint32 p_iNewConnectorId)
 {
-    if(p_iNewConnectorId != m_iActiveConnectorId) {
+    if (p_iNewConnectorId != m_iActiveConnectorId) {
         // read meas info
         (*m_pRtCmdClient)["selcon"].pValues()[0].setValue(p_iNewConnectorId);
         (*m_pRtCmdClient)["selcon"].send();
@@ -236,7 +236,7 @@ void FiffSimulator::changeConnector(qint32 p_iNewConnectorId)
         m_pRtCmdClient->requestCommands();
 
         // Read Info
-        if(!m_pFiffInfo)
+        if (!m_pFiffInfo)
             requestInfo();
 
         // Read Buffer Size
@@ -250,23 +250,21 @@ void FiffSimulator::changeConnector(qint32 p_iNewConnectorId)
 
 void FiffSimulator::connectCmdClient()
 {
-    if(m_bCmdClientIsConnected) {
+    if (m_bCmdClientIsConnected) {
         this->disconnectCmdClient();
     }
 
-    if(!m_pFiffSimulatorProducer->isRunning()) {
+    if (!m_pFiffSimulatorProducer->isRunning()) {
         m_pFiffSimulatorProducer->start();
     }
 
     m_pRtCmdClient->connectToHost(m_sFiffSimulatorIP, m_iDefaultPortCmdClient);
     m_pRtCmdClient->waitForConnected(1000);
 
-    if(m_pRtCmdClient->state() == QTcpSocket::ConnectedState)
-    {
+    if (m_pRtCmdClient->state() == QTcpSocket::ConnectedState) {
         m_qMutex.lock();
 
-        if(!m_bCmdClientIsConnected)
-        {
+        if (!m_bCmdClientIsConnected) {
             // request available commands
             m_pRtCmdClient->requestCommands();
 
@@ -274,16 +272,16 @@ void FiffSimulator::connectCmdClient()
             m_bCmdClientIsConnected = true;
 
             // Read Info
-            if(!m_pFiffInfo)
+            if (!m_pFiffInfo)
                 requestInfo();
 
             // Read Connectors
-            if(m_qMapConnectors.size() == 0)
+            if (m_qMapConnectors.size() == 0)
                 m_iActiveConnectorId = m_pRtCmdClient->requestConnectors(m_qMapConnectors);
 
             QMap<qint32, QString>::const_iterator it;
-            for(it = m_qMapConnectors.begin(); it != m_qMapConnectors.end(); ++it)
-                if(it.value().compare("Fiff File Simulator") == 0 && m_iActiveConnectorId != it.key())
+            for (it = m_qMapConnectors.begin(); it != m_qMapConnectors.end(); ++it)
+                if (it.value().compare("Fiff File Simulator") == 0 && m_iActiveConnectorId != it.key())
                     changeConnector(it.key());
 
             // Read Buffer Size
@@ -300,10 +298,9 @@ void FiffSimulator::connectCmdClient()
 void FiffSimulator::disconnectCmdClient()
 {
     QMutexLocker locker(&m_qMutex);
-    if(m_bCmdClientIsConnected)
-    {
+    if (m_bCmdClientIsConnected) {
         m_pRtCmdClient->disconnectFromHost();
-        if(m_pRtCmdClient->ConnectedState != QTcpSocket::UnconnectedState) {
+        if (m_pRtCmdClient->ConnectedState != QTcpSocket::UnconnectedState) {
             m_pRtCmdClient->waitForDisconnected();
         }
         m_bCmdClientIsConnected = false;
@@ -315,11 +312,11 @@ void FiffSimulator::disconnectCmdClient()
 
 void FiffSimulator::requestInfo()
 {
-    while(!(m_pFiffSimulatorProducer->m_iDataClientId > -1 && m_bCmdClientIsConnected)) {
+    while (!(m_pFiffSimulatorProducer->m_iDataClientId > -1 && m_bCmdClientIsConnected)) {
         qWarning() << "FiffSimulatorProducer is not running! Retry...";
     }
 
-    if(m_pFiffSimulatorProducer->m_iDataClientId > -1 && m_bCmdClientIsConnected) {
+    if (m_pFiffSimulatorProducer->m_iDataClientId > -1 && m_bCmdClientIsConnected) {
         // read meas info
         (*m_pRtCmdClient)["measinfo"].pValues()[0].setValue(m_pFiffSimulatorProducer->m_iDataClientId);
         (*m_pRtCmdClient)["measinfo"].send();
@@ -336,5 +333,5 @@ void FiffSimulator::requestInfo()
 
 QString FiffSimulator::getBuildInfo()
 {
-    return QString(FIFFSIMULATORPLUGIN::buildDateTime()) + QString(" - ")  + QString(FIFFSIMULATORPLUGIN::buildHash());
+    return QString(FIFFSIMULATORPLUGIN::buildDateTime()) + QString(" - ") + QString(FIFFSIMULATORPLUGIN::buildHash());
 }

@@ -32,8 +32,9 @@
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-namespace Ui {
-    class FtBufferSetupUi;
+namespace Ui
+{
+class FtBufferSetupUi;
 }
 
 //=============================================================================================================
@@ -71,7 +72,7 @@ public:
      */
     FtBufferSetupWidget(FtBuffer* toolbox,
                         const QString& sSettingsPath = "",
-                        QWidget *parent = 0);
+                        QWidget* parent = 0);
 
     //=========================================================================================================
     /**
@@ -116,11 +117,11 @@ signals:
                        int port);
 
 private:
-    FtBuffer*   m_pFtBuffer;                /**< Holds a pointer to corresponding FtBuffer.*/
+    FtBuffer* m_pFtBuffer; /**< Holds a pointer to corresponding FtBuffer.*/
 
-    QString     m_sSettingsPath;            /**< The settings path to store the GUI settings to. */
+    QString m_sSettingsPath; /**< The settings path to store the GUI settings to. */
 
-    Ui::FtBufferSetupUi* m_pUi;	/**< Holds the user interface for the FtBufferSetupWidget.*/
+    Ui::FtBufferSetupUi* m_pUi; /**< Holds the user interface for the FtBufferSetupWidget.*/
 };
 
 } // NAMESPACE

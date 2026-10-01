@@ -76,7 +76,7 @@ private:
             ch.ch_name = names[i];
             ch.range = 1.0f;
             ch.cal = 1.0f;
-            ch.unit = 107;  // FIFF_UNIT_V
+            ch.unit = 107; // FIFF_UNIT_V
             ch.unit_mul = 0;
             ch.coord_frame = 0;
             info.chs.append(ch);
@@ -270,10 +270,10 @@ private slots:
         QCOMPARE(info.ch_names[3], QString("EEG1-EEG2"));
 
         // Verify data values
-        QVERIFY(data.row(0).isApprox(RowVectorXd::Constant(10, 30.0), 1e-10));   // EEG3
-        QVERIFY(data.row(1).isApprox(RowVectorXd::Constant(10, 100.0), 1e-10));  // MEG1
-        QVERIFY(data.row(2).isApprox(RowVectorXd::Constant(10, 200.0), 1e-10));  // MEG2
-        QVERIFY(data.row(3).isApprox(RowVectorXd::Constant(10, -10.0), 1e-10));  // EEG1-EEG2
+        QVERIFY(data.row(0).isApprox(RowVectorXd::Constant(10, 30.0), 1e-10));  // EEG3
+        QVERIFY(data.row(1).isApprox(RowVectorXd::Constant(10, 100.0), 1e-10)); // MEG1
+        QVERIFY(data.row(2).isApprox(RowVectorXd::Constant(10, 200.0), 1e-10)); // MEG2
+        QVERIFY(data.row(3).isApprox(RowVectorXd::Constant(10, -10.0), 1e-10)); // EEG1-EEG2
     }
 
     //=========================================================================================================

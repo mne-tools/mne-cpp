@@ -66,8 +66,8 @@ namespace MNELIB
 class MNESHARED_EXPORT MNEProjItem
 {
 public:
-    typedef QSharedPointer<MNEProjItem> SPtr;              /**< Shared pointer type for MNEProjItem. */
-    typedef QSharedPointer<const MNEProjItem> ConstSPtr;   /**< Const shared pointer type for MNEProjItem. */
+    typedef QSharedPointer<MNEProjItem> SPtr;            /**< Shared pointer type for MNEProjItem. */
+    typedef QSharedPointer<const MNEProjItem> ConstSPtr; /**< Const shared pointer type for MNEProjItem. */
 
     //=========================================================================================================
     /**
@@ -137,13 +137,13 @@ public:
 
 public:
     std::unique_ptr<MNENamedMatrix> vecs; /**< Projection vectors (nrow = nvec, ncol = nch); may be nullptr when nvec == 0. */
-    int             nvec;           /**< Number of projection vectors (== vecs->nrow when vecs is set). */
-    QString         desc;           /**< Human-readable description (e.g. "PCA-v1"). */
-    int             kind;           /**< FIFF projection item kind (FIFFV_PROJ_ITEM_*). */
-    bool            active;         /**< Whether this item is currently active. */
-    bool            active_file;    /**< Whether this item was active when loaded from file. */
-    bool            has_meg;        /**< Whether the projection covers MEG channels. */
-    bool            has_eeg;        /**< Whether the projection covers EEG channels. */
+    int nvec;                             /**< Number of projection vectors (== vecs->nrow when vecs is set). */
+    QString desc;                         /**< Human-readable description (e.g. "PCA-v1"). */
+    int kind;                             /**< FIFF projection item kind (FIFFV_PROJ_ITEM_*). */
+    bool active;                          /**< Whether this item is currently active. */
+    bool active_file;                     /**< Whether this item was active when loaded from file. */
+    bool has_meg;                         /**< Whether the projection covers MEG channels. */
+    bool has_eeg;                         /**< Whether the projection covers EEG channels. */
 };
 
 } // NAMESPACE MNELIB

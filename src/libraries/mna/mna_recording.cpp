@@ -42,7 +42,7 @@ QJsonObject MnaRecording::toJson() const
     json[QLatin1String("id")] = id;
 
     QJsonArray filesArr;
-    for(const MnaFileRef& f : files) {
+    for (const MnaFileRef& f : files) {
         filesArr.append(f.toJson());
     }
     json[QLatin1String("files")] = filesArr;
@@ -58,13 +58,12 @@ MnaRecording MnaRecording::fromJson(const QJsonObject& json)
     rec.id = json[QLatin1String("id")].toString();
 
     const QJsonArray filesArr = json[QLatin1String("files")].toArray();
-    for(const QJsonValue& v : filesArr) {
+    for (const QJsonValue& v : filesArr) {
         rec.files.append(MnaFileRef::fromJson(v.toObject()));
     }
 
     static const QSet<QString> knownKeys = {
-        QStringLiteral("id"), QStringLiteral("files")
-    };
+        QStringLiteral("id"), QStringLiteral("files")};
     for (auto it = json.constBegin(); it != json.constEnd(); ++it) {
         if (!knownKeys.contains(it.key()))
             rec.extras.insert(it.key(), it.value());
@@ -81,7 +80,7 @@ QCborMap MnaRecording::toCbor() const
     cbor[QLatin1String("id")] = id;
 
     QCborArray filesArr;
-    for(const MnaFileRef& f : files) {
+    for (const MnaFileRef& f : files) {
         filesArr.append(f.toCbor());
     }
     cbor[QLatin1String("files")] = filesArr;
@@ -97,13 +96,12 @@ MnaRecording MnaRecording::fromCbor(const QCborMap& cbor)
     rec.id = cbor[QLatin1String("id")].toString();
 
     const QCborArray filesArr = cbor[QLatin1String("files")].toArray();
-    for(const QCborValue& v : filesArr) {
+    for (const QCborValue& v : filesArr) {
         rec.files.append(MnaFileRef::fromCbor(v.toMap()));
     }
 
     static const QSet<QString> knownKeys = {
-        QStringLiteral("id"), QStringLiteral("files")
-    };
+        QStringLiteral("id"), QStringLiteral("files")};
     QJsonObject cborJson = cbor.toJsonObject();
     for (auto it = cborJson.constBegin(); it != cborJson.constEnd(); ++it) {
         if (!knownKeys.contains(it.key()))

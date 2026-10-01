@@ -36,13 +36,13 @@ static FiffInfo makeInfoWithEcgEog(int nMeg, bool hasEcg, bool hasEog)
     for (int i = 0; i < nMeg; ++i, ++idx) {
         FiffChInfo ch;
         ch.kind = FIFFV_MEG_CH;
-        ch.unit = 112;   // Tesla
+        ch.unit = 112; // Tesla
         info.chs.append(ch);
     }
 
     if (hasEcg) {
         FiffChInfo ch;
-        ch.kind    = FIFFV_ECG_CH;
+        ch.kind = FIFFV_ECG_CH;
         ch.ch_name = "ECG001";
         info.chs.append(ch);
         ++idx;
@@ -50,7 +50,7 @@ static FiffInfo makeInfoWithEcgEog(int nMeg, bool hasEcg, bool hasEog)
 
     if (hasEog) {
         FiffChInfo ch;
-        ch.kind    = FIFFV_EOG_CH;
+        ch.kind = FIFFV_EOG_CH;
         ch.ch_name = "EOG001";
         info.chs.append(ch);
         ++idx;
@@ -62,13 +62,13 @@ static FiffInfo makeInfoWithEcgEog(int nMeg, bool hasEcg, bool hasEog)
 
 // Build synthetic ECG-like signal: Gaussian R-peaks at regular RR intervals
 static RowVectorXd makeSyntheticEcg(int nSamp, double fs, double bpm,
-                                     double peakAmplitude = 1.0,
-                                     double noiseLevel    = 0.05)
+                                    double peakAmplitude = 1.0,
+                                    double noiseLevel = 0.05)
 {
     RowVectorXd sig = RowVectorXd::Zero(nSamp);
     double rrSamples = fs * 60.0 / bpm;
-    double sigma     = fs * 0.02;  // 20 ms wide Gaussian
-    int firstPeak    = static_cast<int>(rrSamples * 0.3);
+    double sigma = fs * 0.02; // 20 ms wide Gaussian
+    int firstPeak = static_cast<int>(rrSamples * 0.3);
 
     for (int peak = firstPeak; peak < nSamp; peak += static_cast<int>(rrSamples)) {
         for (int j = -static_cast<int>(3 * sigma); j <= static_cast<int>(3 * sigma); ++j) {
@@ -89,13 +89,13 @@ static RowVectorXd makeSyntheticEcg(int nSamp, double fs, double bpm,
 
 // Build synthetic EOG-like signal: periodic blinks
 static RowVectorXd makeSyntheticEog(int nSamp, double fs, double blinkRateHz,
-                                     double amplitude = 200e-6,
-                                     double noiseLevel = 1e-6)
+                                    double amplitude = 200e-6,
+                                    double noiseLevel = 1e-6)
 {
     RowVectorXd sig = RowVectorXd::Zero(nSamp);
     double blinkPeriod = fs / blinkRateHz;
-    double sigma       = fs * 0.05;  // 50 ms blink
-    int firstBlink     = static_cast<int>(blinkPeriod * 0.5);
+    double sigma = fs * 0.05; // 50 ms blink
+    int firstBlink = static_cast<int>(blinkPeriod * 0.5);
 
     for (int blink = firstBlink; blink < nSamp; blink += static_cast<int>(blinkPeriod)) {
         for (int j = -static_cast<int>(3 * sigma); j <= static_cast<int>(3 * sigma); ++j) {
@@ -125,10 +125,10 @@ private slots:
     //=========================================================================
     void ecg_detectsCorrectCount_dedicatedChannel()
     {
-        const double fs   = 1000.0;
-        const double bpm  = 70.0;
-        const int    nSamp = 10000;  // 10 s
-        const int    expectedPeaks = static_cast<int>(bpm / 60.0 * (nSamp / fs));
+        const double fs = 1000.0;
+        const double bpm = 70.0;
+        const int nSamp = 10000; // 10 s
+        const int expectedPeaks = static_cast<int>(bpm / 60.0 * (nSamp / fs));
 
         FiffInfo info = makeInfoWithEcgEog(0, /*hasEcg=*/true, /*hasEog=*/false);
 
@@ -146,9 +146,9 @@ private slots:
 
     void ecg_peakSpacingReasonable()
     {
-        const double fs   = 1000.0;
-        const double bpm  = 60.0;  // 1 Hz → 1000 samples between peaks
-        const int    nSamp = 8000;
+        const double fs = 1000.0;
+        const double bpm = 60.0; // 1 Hz → 1000 samples between peaks
+        const int nSamp = 8000;
 
         FiffInfo info = makeInfoWithEcgEog(0, /*hasEcg=*/true, /*hasEog=*/false);
 
@@ -168,9 +168,9 @@ private slots:
 
     void ecg_noEcgChannel_fallsBackToMeg()
     {
-        const double fs    = 1000.0;
-        const int    nSamp = 5000;
-        const double bpm   = 65.0;
+        const double fs = 1000.0;
+        const int nSamp = 5000;
+        const double bpm = 65.0;
 
         // 5 MEG magnetometers, each carrying a scaled ECG artefact
         FiffInfo info = makeInfoWithEcgEog(5, /*hasEcg=*/false, /*hasEog=*/false);
@@ -200,10 +200,10 @@ private slots:
     //=========================================================================
     void eog_detectsCorrectCount()
     {
-        const double fs         = 1000.0;
-        const double blinkRate  = 0.3;   // 0.3 Hz → ~3 blinks in 10 s
-        const int    nSamp      = 10000;
-        const int    expectedBlinks = static_cast<int>(blinkRate * (nSamp / fs));
+        const double fs = 1000.0;
+        const double blinkRate = 0.3; // 0.3 Hz → ~3 blinks in 10 s
+        const int nSamp = 10000;
+        const int expectedBlinks = static_cast<int>(blinkRate * (nSamp / fs));
 
         FiffInfo info = makeInfoWithEcgEog(0, /*hasEcg=*/false, /*hasEog=*/true);
 
@@ -216,7 +216,8 @@ private slots:
 
         QVERIFY2(std::abs(events.size() - expectedBlinks) <= 1,
                  qPrintable(QString("Expected ~%1 blinks, got %2")
-                            .arg(expectedBlinks).arg(events.size())));
+                                .arg(expectedBlinks)
+                                .arg(events.size())));
     }
 
     void eog_noEogChannel_returnsEmpty()
@@ -229,14 +230,14 @@ private slots:
 
     void eog_multipleChannels_usesLargestAmplitude()
     {
-        const double fs    = 1000.0;
-        const int    nSamp = 5000;
+        const double fs = 1000.0;
+        const int nSamp = 5000;
 
         FiffInfo info;
         // Two EOG channels
         for (int i = 0; i < 2; ++i) {
             FiffChInfo ch;
-            ch.kind    = FIFFV_EOG_CH;
+            ch.kind = FIFFV_EOG_CH;
             ch.ch_name = QString("EOG%1").arg(i + 1);
             info.chs.append(ch);
         }

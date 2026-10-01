@@ -32,7 +32,8 @@ class STUDIOCORESHARED_EXPORT IBuffer : public QObject
     Q_OBJECT
 
 public:
-    enum class BufferKind {
+    enum class BufferKind
+    {
         Fiff,
         MriVolume,
         Surface,

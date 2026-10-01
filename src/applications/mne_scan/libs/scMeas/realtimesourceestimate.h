@@ -59,8 +59,8 @@ namespace SCMEASLIB
 class SCMEASSHARED_EXPORT RealTimeSourceEstimate : public Measurement
 {
 public:
-    typedef QSharedPointer<RealTimeSourceEstimate> SPtr;               /**< Shared pointer type for RealTimeSourceEstimate. */
-    typedef QSharedPointer<const RealTimeSourceEstimate> ConstSPtr;    /**< Const shared pointer type for RealTimeSourceEstimate. */
+    typedef QSharedPointer<RealTimeSourceEstimate> SPtr;            /**< Shared pointer type for RealTimeSourceEstimate. */
+    typedef QSharedPointer<const RealTimeSourceEstimate> ConstSPtr; /**< Const shared pointer type for RealTimeSourceEstimate. */
 
     //=========================================================================================================
     /**
@@ -68,7 +68,7 @@ public:
      *
      * @param[in] parent     the QObject parent of this measurement.
      */
-    RealTimeSourceEstimate(QObject *parent = 0);
+    RealTimeSourceEstimate(QObject* parent = 0);
 
     //=========================================================================================================
     /**
@@ -147,7 +147,7 @@ public:
      *
      * @param[in] v the value which is attached to the sample array vector.
      */
-    virtual void setValue(INVLIB::InvSourceEstimate &v);
+    virtual void setValue(INVLIB::InvSourceEstimate& v);
 
     //=========================================================================================================
     /**
@@ -199,19 +199,19 @@ public:
     inline qint32 getSourceEstimateSize() const;
 
 private:
-    mutable QMutex                          m_qMutex;               /**< Mutex to ensure thread safety. */
+    mutable QMutex m_qMutex; /**< Mutex to ensure thread safety. */
 
-    FIFFLIB::FiffInfo::SPtr                 m_pFiffInfo;            /**< The Fiff info. */
-    FIFFLIB::FiffCoordTrans                 m_mriHeadTrans;         /**< Mri to head transformation. */
+    FIFFLIB::FiffInfo::SPtr m_pFiffInfo;    /**< The Fiff info. */
+    FIFFLIB::FiffCoordTrans m_mriHeadTrans; /**< Mri to head transformation. */
 
-    FSLIB::FsAnnotationSet::SPtr              m_pAnnotSet;            /**< FsAnnotation set. */
-    FSLIB::FsSurfaceSet::SPtr                 m_pSurfSet;             /**< FsSurface set. */
-    MNELIB::MNEForwardSolution::SPtr        m_pFwdSolution;         /**< Forward solution. */
+    FSLIB::FsAnnotationSet::SPtr m_pAnnotSet;        /**< FsAnnotation set. */
+    FSLIB::FsSurfaceSet::SPtr m_pSurfSet;            /**< FsSurface set. */
+    MNELIB::MNEForwardSolution::SPtr m_pFwdSolution; /**< Forward solution. */
 
-    qint32                                  m_iSourceEstimateSize;  /**< Sample size of the multi sample array.*/
+    qint32 m_iSourceEstimateSize; /**< Sample size of the multi sample array.*/
 
-    QList<INVLIB::InvSourceEstimate::SPtr>  m_pMNEStc;              /**< The source estimates. */
-    bool                                    m_bInitialized;         /**< Is initialized. */
+    QList<INVLIB::InvSourceEstimate::SPtr> m_pMNEStc; /**< The source estimates. */
+    bool m_bInitialized;                              /**< Is initialized. */
 };
 
 //=============================================================================================================
@@ -309,10 +309,10 @@ inline void RealTimeSourceEstimate::setSourceEstimateSize(qint32 iSourceEstimate
 {
     QMutexLocker locker(&m_qMutex);
     //Obsolete unsigned char can't be bigger
-//    if(ucArraySize > 255)
-//        m_ucArraySize = 255;
-//    else
-        m_iSourceEstimateSize = iSourceEstimateSize;
+    //    if(ucArraySize > 255)
+    //        m_ucArraySize = 255;
+    //    else
+    m_iSourceEstimateSize = iSourceEstimateSize;
 }
 
 //=============================================================================================================

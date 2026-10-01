@@ -55,14 +55,15 @@ using namespace Eigen;
 
 //=============================================================================================================
 
-struct TriggerEvent {
+struct TriggerEvent
+{
     int sample;
     int value;
 };
 
 //=============================================================================================================
 
-static QList<TriggerEvent> readTriggerFile(const QString &filename)
+static QList<TriggerEvent> readTriggerFile(const QString& filename)
 {
     QList<TriggerEvent> triggers;
     QFile file(filename);
@@ -88,7 +89,7 @@ static QList<TriggerEvent> readTriggerFile(const QString &filename)
 
 //=============================================================================================================
 
-int main(int argc, char *argv[])
+int main(int argc, char* argv[])
 {
     qInstallMessageHandler(MNELogger::customLogWriter);
     QCoreApplication app(argc, argv);
@@ -115,9 +116,18 @@ int main(int argc, char *argv[])
     QString trgFile = parser.value(trgOpt);
     QString outFile = parser.value(outOpt);
 
-    if (rawFile.isEmpty()) { qCritical("--raw is required."); return 1; }
-    if (trgFile.isEmpty()) { qCritical("--trg is required."); return 1; }
-    if (outFile.isEmpty()) { qCritical("--out is required."); return 1; }
+    if (rawFile.isEmpty()) {
+        qCritical("--raw is required.");
+        return 1;
+    }
+    if (trgFile.isEmpty()) {
+        qCritical("--trg is required.");
+        return 1;
+    }
+    if (outFile.isEmpty()) {
+        qCritical("--out is required.");
+        return 1;
+    }
 
     // Read trigger file
     QList<TriggerEvent> triggers = readTriggerFile(trgFile);
@@ -125,8 +135,8 @@ int main(int argc, char *argv[])
         qCritical("No triggers read from: %s", qPrintable(trgFile));
         return 1;
     }
-    qInfo("Read %lld trigger events from %s" ,
-           static_cast<long long>(triggers.size()), qPrintable(trgFile));
+    qInfo("Read %lld trigger events from %s",
+          static_cast<long long>(triggers.size()), qPrintable(trgFile));
 
     // Open raw data
     QFile fileIn(rawFile);
@@ -151,8 +161,8 @@ int main(int argc, char *argv[])
         qCritical("No STI/stimulus channel found in data.");
         return 1;
     }
-    qInfo("Using stimulus channel: %s (index %d)" ,
-           qPrintable(raw.info.chs[stiIdx].ch_name), stiIdx);
+    qInfo("Using stimulus channel: %s (index %d)",
+          qPrintable(raw.info.chs[stiIdx].ch_name), stiIdx);
 
     // Read all data
     MatrixXd data;
@@ -164,7 +174,7 @@ int main(int argc, char *argv[])
 
     // Add triggers
     int nAdded = 0;
-    for (const TriggerEvent &evt : triggers) {
+    for (const TriggerEvent& evt : triggers) {
         int col = evt.sample - raw.first_samp;
         if (col >= 0 && col < data.cols()) {
             data(stiIdx, col) = static_cast<double>(evt.value);
@@ -174,7 +184,7 @@ int main(int argc, char *argv[])
                      evt.sample, raw.first_samp, raw.last_samp);
         }
     }
-    qInfo("Added %d trigger events." , nAdded);
+    qInfo("Added %d trigger events.", nAdded);
 
     // Write output
     QFile fileOut(outFile);
@@ -196,6 +206,6 @@ int main(int argc, char *argv[])
     }
     outStream->finish_writing_raw();
 
-    qInfo("Written modified raw data to: %s" , qPrintable(outFile));
+    qInfo("Written modified raw data to: %s", qPrintable(outFile));
     return 0;
 }

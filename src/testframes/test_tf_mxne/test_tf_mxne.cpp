@@ -28,7 +28,7 @@ private slots:
     void testGaborDictionary()
     {
         MatrixXd dict = InvTfMxne::buildGaborDictionary(100, 4, 1.0, 30.0, 200.0);
-        QCOMPARE(dict.rows(), static_cast<Index>(8));   // 2 * 4 frequencies
+        QCOMPARE(dict.rows(), static_cast<Index>(8)); // 2 * 4 frequencies
         QCOMPARE(dict.cols(), static_cast<Index>(100));
 
         // Each row should be approximately unit norm
@@ -41,7 +41,7 @@ private slots:
     void testGaborSingleFreq()
     {
         MatrixXd dict = InvTfMxne::buildGaborDictionary(50, 1, 10.0, 10.0, 100.0);
-        QCOMPARE(dict.rows(), static_cast<Index>(2));  // cos + sin for 1 freq
+        QCOMPARE(dict.rows(), static_cast<Index>(2)); // cos + sin for 1 freq
         QCOMPARE(dict.cols(), static_cast<Index>(50));
     }
 
@@ -55,7 +55,7 @@ private slots:
 
         // Active sources at indices 3 and 15
         for (int t = 0; t < nTimes; ++t) {
-            X(3, t)  = 5.0 * std::sin(2.0 * M_PI * 10.0 * t / 200.0);
+            X(3, t) = 5.0 * std::sin(2.0 * M_PI * 10.0 * t / 200.0);
             X(15, t) = 3.0 * std::cos(2.0 * M_PI * 20.0 * t / 200.0);
         }
 
@@ -89,7 +89,7 @@ private slots:
     void testComputeDimensionMismatch()
     {
         MatrixXd G = MatrixXd::Random(5, 10);
-        MatrixXd M = MatrixXd::Random(7, 20);  // 7 != 5
+        MatrixXd M = MatrixXd::Random(7, 20); // 7 != 5
         InvTfMxneResult result = InvTfMxne::compute(G, M);
         QVERIFY(result.stc.isEmpty());
     }

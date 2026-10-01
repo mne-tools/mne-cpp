@@ -34,16 +34,16 @@ static FiffInfo makeSyntheticMegInfo(int nSensors, double radius = 0.12)
 
     // Distribute sensors roughly uniformly on a sphere of given radius using
     // the Fibonacci lattice (golden-angle spiral).
-    const double golden = M_PI * (3.0 - std::sqrt(5.0));  // golden angle
+    const double golden = M_PI * (3.0 - std::sqrt(5.0)); // golden angle
 
     for (int i = 0; i < nSensors; ++i) {
-        double y   = 1.0 - (static_cast<double>(i) / (nSensors - 1)) * 2.0;
+        double y = 1.0 - (static_cast<double>(i) / (nSensors - 1)) * 2.0;
         double r2d = std::sqrt(1.0 - y * y);
         double phi = golden * i;
 
         // Sensor position on sphere
         double x = std::cos(phi) * r2d * radius;
-        double z = std::sin(phi) * r2d * radius + 0.04;  // 4 cm superior
+        double z = std::sin(phi) * r2d * radius + 0.04; // 4 cm superior
         double yy = y * radius;
 
         // Outward-pointing normal (radial)
@@ -53,22 +53,23 @@ static FiffInfo makeSyntheticMegInfo(int nSensors, double radius = 0.12)
         // Build ez and ex arbitrarily perpendicular
         Vector3f ez = normal;
         Vector3f ex = Vector3f(1, 0, 0);
-        if (std::abs(ez.dot(ex)) > 0.9f) ex = Vector3f(0, 1, 0);
+        if (std::abs(ez.dot(ex)) > 0.9f)
+            ex = Vector3f(0, 1, 0);
         Vector3f ey = ez.cross(ex).normalized();
         ex = ey.cross(ez).normalized();
 
         FiffChInfo ch;
-        ch.kind         = FIFFV_MEG_CH;
-        ch.unit         = 112;   // Tesla
-        ch.chpos.r0     = pos;
-        ch.chpos.ex     = ex;
-        ch.chpos.ey     = ey;
-        ch.chpos.ez     = ez;
-        ch.ch_name      = QString("MEG%1").arg(i + 1, 4, 10, QChar('0'));
-        info.chs[i]     = ch;
+        ch.kind = FIFFV_MEG_CH;
+        ch.unit = 112; // Tesla
+        ch.chpos.r0 = pos;
+        ch.chpos.ex = ex;
+        ch.chpos.ey = ey;
+        ch.chpos.ez = ez;
+        ch.ch_name = QString("MEG%1").arg(i + 1, 4, 10, QChar('0'));
+        info.chs[i] = ch;
     }
 
-    info.sfreq  = 1000.0;
+    info.sfreq = 1000.0;
     return info;
 }
 
@@ -86,17 +87,17 @@ private slots:
     {
         FiffInfo info = makeSyntheticMegInfo(102);
         SSS::Params p;
-        p.iOrderIn  = 8;
+        p.iOrderIn = 8;
         p.iOrderOut = 3;
         SSS::Basis basis = SSS::computeBasis(info, p);
 
         const int nMeg = 102;
-        const int Nin  = 8 * (8 + 2);  // 80
-        const int Nout = 3 * (3 + 2);  // 15
+        const int Nin = 8 * (8 + 2);  // 80
+        const int Nout = 3 * (3 + 2); // 15
 
         QCOMPARE(basis.megChannelIdx.size(), nMeg);
-        QCOMPARE(basis.matSin.rows(),  nMeg);
-        QCOMPARE(basis.matSin.cols(),  Nin);
+        QCOMPARE(basis.matSin.rows(), nMeg);
+        QCOMPARE(basis.matSin.cols(), Nin);
         QCOMPARE(basis.matSout.rows(), nMeg);
         QCOMPARE(basis.matSout.cols(), Nout);
         QCOMPARE(basis.matProjIn.rows(), nMeg);
@@ -109,14 +110,14 @@ private slots:
     {
         FiffInfo info = makeSyntheticMegInfo(60);
         SSS::Params p;
-        p.iOrderIn  = 4;
+        p.iOrderIn = 4;
         p.iOrderOut = 2;
         SSS::Basis basis = SSS::computeBasis(info, p);
 
-        const int Nin  = 4 * 6;   // 24
-        const int Nout = 2 * 4;   // 8
+        const int Nin = 4 * 6;  // 24
+        const int Nout = 2 * 4; // 8
 
-        QCOMPARE(basis.iNin,  Nin);
+        QCOMPARE(basis.iNin, Nin);
         QCOMPARE(basis.iNout, Nout);
         QCOMPARE(basis.matProjIn.rows(), 60);
         QCOMPARE(basis.matProjIn.cols(), 60);
@@ -127,7 +128,8 @@ private slots:
         FiffInfo info;
         info.nchan = 3;
         info.chs.resize(3);
-        for (auto& ch : info.chs) ch.kind = FIFFV_EEG_CH;
+        for (auto& ch : info.chs)
+            ch.kind = FIFFV_EEG_CH;
 
         SSS::Basis basis = SSS::computeBasis(info, SSS::Params());
         QVERIFY(basis.megChannelIdx.isEmpty());
@@ -141,12 +143,12 @@ private slots:
     {
         FiffInfo info = makeSyntheticMegInfo(102);
         SSS::Params p;
-        p.iOrderIn  = 8;
+        p.iOrderIn = 8;
         p.iOrderOut = 3;
         SSS::Basis basis = SSS::computeBasis(info, p);
 
-        MatrixXd P   = basis.matProjIn;
-        MatrixXd P2  = P * P;
+        MatrixXd P = basis.matProjIn;
+        MatrixXd P2 = P * P;
         double maxErr = (P2 - P).cwiseAbs().maxCoeff();
 
         QVERIFY2(maxErr < 1e-6,
@@ -169,7 +171,7 @@ private slots:
         SSS::Basis basis = SSS::computeBasis(info, SSS::Params());
 
         MatrixXd data = MatrixXd::Random(103, 500);
-        MatrixXd out  = SSS::apply(data, basis);
+        MatrixXd out = SSS::apply(data, basis);
 
         QCOMPARE(out.rows(), data.rows());
         QCOMPARE(out.cols(), data.cols());
@@ -187,7 +189,7 @@ private slots:
         // Build 102-sensor array
         FiffInfo info = makeSyntheticMegInfo(102);
         SSS::Params p;
-        p.iOrderIn  = 8;
+        p.iOrderIn = 8;
         p.iOrderOut = 3;
         SSS::Basis basis = SSS::computeBasis(info, p);
 
@@ -205,12 +207,12 @@ private slots:
         MatrixXd cleaned = SSS::apply(data, basis);
 
         // External interference should be strongly suppressed.
-        double normIn  = data.norm();
+        double normIn = data.norm();
         double normOut = cleaned.norm();
         QVERIFY2(normIn > 1e-30, "Input signal is zero");
         QVERIFY2(normOut < normIn * 0.1,
                  qPrintable(QString("SSS did not sufficiently suppress the external field: ratio = %1")
-                            .arg(normOut / normIn)));
+                                .arg(normOut / normIn)));
     }
 
     //=========================================================================
@@ -222,7 +224,7 @@ private slots:
         SSS::Basis basis = SSS::computeBasis(info, SSS::Params());
 
         MatrixXd data = MatrixXd::Random(102, 2000);
-        MatrixXd out  = SSS::applyTemporal(data, basis, 500, 0.98);
+        MatrixXd out = SSS::applyTemporal(data, basis, 500, 0.98);
 
         QCOMPARE(out.rows(), data.rows());
         QCOMPARE(out.cols(), data.cols());

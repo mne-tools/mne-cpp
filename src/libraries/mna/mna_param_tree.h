@@ -74,9 +74,9 @@ public:
     // Static parameters
     //=========================================================================================================
 
-    void        setParam(const QString& path, const QVariant& value);
-    QVariant    param(const QString& path) const;
-    bool        hasParam(const QString& path) const;
+    void setParam(const QString& path, const QVariant& value);
+    QVariant param(const QString& path) const;
+    bool hasParam(const QString& path) const;
     QStringList allPaths() const;
 
     //=========================================================================================================
@@ -116,7 +116,7 @@ public:
     static MnaParamTree fromJson(const QJsonObject& obj);
 
 private:
-    QMap<QString, QVariant>        m_params;
+    QMap<QString, QVariant> m_params;
     QMap<QString, MnaParamBinding> m_bindings;
 };
 

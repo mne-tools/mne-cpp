@@ -43,8 +43,8 @@ public:
      * @param[in] text           Display text.
      * @param[in] objectKey      Unique key (e.g. "net_coherence").
      */
-    explicit NetworkTreeItem(const QString &text = "Network",
-                             const QString &objectKey = QString());
+    explicit NetworkTreeItem(const QString& text = "Network",
+                             const QString& objectKey = QString());
 
     //=========================================================================================================
     /**
@@ -52,10 +52,13 @@ public:
      *
      * @return The object key.
      */
-    QString objectKey() const { return m_objectKey; }
+    QString objectKey() const
+    {
+        return m_objectKey;
+    }
 
 private:
-    QString m_objectKey;    /**< Unique key for this network item. */
+    QString m_objectKey; /**< Unique key for this network item. */
 };
 
 #endif // NETWORKTREEITEM_H

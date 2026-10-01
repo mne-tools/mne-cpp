@@ -67,8 +67,8 @@ class MNESourceSpace;
 class MNESHARED_EXPORT MNESurfacePatch
 {
 public:
-    typedef QSharedPointer<MNESurfacePatch> SPtr;              /**< Shared pointer type for MNESurfacePatch. */
-    typedef QSharedPointer<const MNESurfacePatch> ConstSPtr;   /**< Const shared pointer type for MNESurfacePatch. */
+    typedef QSharedPointer<MNESurfacePatch> SPtr;            /**< Shared pointer type for MNESurfacePatch. */
+    typedef QSharedPointer<const MNESurfacePatch> ConstSPtr; /**< Const shared pointer type for MNESurfacePatch. */
 
     //=========================================================================================================
     /**
@@ -85,13 +85,13 @@ public:
     ~MNESurfacePatch();
 
 public:
-    std::unique_ptr<MNESourceSpace> s;		    /**< Patch represented as a source space surface. */
-    Eigen::VectorXi  vert;	    /**< Vertex numbers in the complete surface (size np). */
-    Eigen::VectorXi  surf_vert;	    /**< Map from complete-surface vertex index to patch vertex index (-1 if absent). */
-    Eigen::VectorXi  tri;	    /**< Map from patch triangle index to complete-surface triangle index. */
-    Eigen::VectorXi  surf_tri;	    /**< Map from complete-surface triangle index to patch triangle index (-1 if absent). */
-    Eigen::VectorXi  border;	    /**< Per-vertex flag: non-zero if the vertex lies on the patch border (size np). */
-    int              flat = 0;	    /**< Non-zero if the patch has been flattened. */
+    std::unique_ptr<MNESourceSpace> s; /**< Patch represented as a source space surface. */
+    Eigen::VectorXi vert;              /**< Vertex numbers in the complete surface (size np). */
+    Eigen::VectorXi surf_vert;         /**< Map from complete-surface vertex index to patch vertex index (-1 if absent). */
+    Eigen::VectorXi tri;               /**< Map from patch triangle index to complete-surface triangle index. */
+    Eigen::VectorXi surf_tri;          /**< Map from complete-surface triangle index to patch triangle index (-1 if absent). */
+    Eigen::VectorXi border;            /**< Per-vertex flag: non-zero if the vertex lies on the patch border (size np). */
+    int flat = 0;                      /**< Non-zero if the patch has been flattened. */
 };
 
 } // NAMESPACE MNELIB

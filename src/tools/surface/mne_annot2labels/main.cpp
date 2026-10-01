@@ -53,9 +53,9 @@ using namespace Eigen;
 
 //=============================================================================================================
 
-static bool writeLabel(const QString &filename, const QString &comment,
-                       const VectorXi &vertices, const MatrixX3f &positions,
-                       const VectorXd &values)
+static bool writeLabel(const QString& filename, const QString& comment,
+                       const VectorXi& vertices, const MatrixX3f& positions,
+                       const VectorXd& values)
 {
     QFile file(filename);
     if (!file.open(QIODevice::WriteOnly | QIODevice::Text)) {
@@ -67,18 +67,18 @@ static bool writeLabel(const QString &filename, const QString &comment,
     out << vertices.size() << "\n";
     for (int i = 0; i < vertices.size(); i++) {
         out << QString::asprintf("%d  %8.4f  %8.4f  %8.4f  %10.6f\n",
-            vertices(i),
-            positions(i, 0), positions(i, 1), positions(i, 2),
-            values(i));
+                                 vertices(i),
+                                 positions(i, 0), positions(i, 1), positions(i, 2),
+                                 values(i));
     }
     return true;
 }
 
 //=============================================================================================================
 
-static bool processHemisphere(const QString &subjectsDir, const QString &subject,
-                              const QString &hemi, const QString &annotName,
-                              const QString &surfName, const QString &outDir)
+static bool processHemisphere(const QString& subjectsDir, const QString& subject,
+                              const QString& hemi, const QString& annotName,
+                              const QString& surfName, const QString& outDir)
 {
     // Read surface for vertex coordinates
     QString surfPath = QString("%1/%2/surf/%3.%4").arg(subjectsDir, subject, hemi, surfName);
@@ -87,9 +87,9 @@ static bool processHemisphere(const QString &subjectsDir, const QString &subject
         qCritical("Cannot read surface: %s", qPrintable(surfPath));
         return false;
     }
-    qInfo("Read surface: %s (%lld vertices)" ,
-           qPrintable(surfPath),
-           static_cast<long long>(surface.rr().rows()));
+    qInfo("Read surface: %s (%lld vertices)",
+          qPrintable(surfPath),
+          static_cast<long long>(surface.rr().rows()));
 
     // Read annotation
     QString annotPath = QString("%1/%2/label/%3.%4.annot").arg(subjectsDir, subject, hemi, annotName);
@@ -98,21 +98,21 @@ static bool processHemisphere(const QString &subjectsDir, const QString &subject
         qCritical("Cannot read annotation: %s", qPrintable(annotPath));
         return false;
     }
-    qInfo("Read annotation: %s" , qPrintable(annotPath));
+    qInfo("Read annotation: %s", qPrintable(annotPath));
 
     // Convert to labels using the library method
     QList<FsLabel> labels;
     QList<Eigen::RowVector4i> labelRgbas;
     annot.toLabels(surface, labels, labelRgbas);
 
-    qInfo("Found %lld labels in %s hemisphere" ,
-           static_cast<long long>(labels.size()),
-           qPrintable(hemi));
+    qInfo("Found %lld labels in %s hemisphere",
+          static_cast<long long>(labels.size()),
+          qPrintable(hemi));
 
     // Write each label to a file
     int written = 0;
     for (int i = 0; i < labels.size(); i++) {
-        const FsLabel &label = labels[i];
+        const FsLabel& label = labels[i];
         QString labelName = label.name;
         if (labelName.isEmpty())
             labelName = QString("label_%1").arg(i);
@@ -138,13 +138,13 @@ static bool processHemisphere(const QString &subjectsDir, const QString &subject
         }
     }
 
-    qInfo("Wrote %d label files for %s hemisphere" , written, qPrintable(hemi));
+    qInfo("Wrote %d label files for %s hemisphere", written, qPrintable(hemi));
     return true;
 }
 
 //=============================================================================================================
 
-int main(int argc, char *argv[])
+int main(int argc, char* argv[])
 {
     qInstallMessageHandler(MNELogger::customLogWriter);
     QCoreApplication app(argc, argv);
@@ -183,8 +183,14 @@ int main(int argc, char *argv[])
     QString outDir = parser.value(outdirOpt);
     QString surfName = parser.value(surfOpt);
 
-    if (subject.isEmpty()) { qCritical("--subject is required."); return 1; }
-    if (subjectsDir.isEmpty()) { qCritical("--subjects_dir or $SUBJECTS_DIR is required."); return 1; }
+    if (subject.isEmpty()) {
+        qCritical("--subject is required.");
+        return 1;
+    }
+    if (subjectsDir.isEmpty()) {
+        qCritical("--subjects_dir or $SUBJECTS_DIR is required.");
+        return 1;
+    }
 
     // Default output dir
     if (outDir.isEmpty())

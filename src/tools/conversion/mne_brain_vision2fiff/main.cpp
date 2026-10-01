@@ -57,32 +57,35 @@ using namespace Eigen;
 // BrainVision header structures
 //=============================================================================================================
 
-struct BVChannelInfo {
+struct BVChannelInfo
+{
     QString name;
     QString refName;
-    double resolution;        // microvolts per bit
+    double resolution; // microvolts per bit
     QString unit;
 };
 
-struct BVMarker {
+struct BVMarker
+{
     QString type;
     QString description;
-    int position;             // sample index
-    int duration;             // in samples
-    int channel;              // 0 = all channels
+    int position; // sample index
+    int duration; // in samples
+    int channel;  // 0 = all channels
 };
 
-struct BVHeader {
+struct BVHeader
+{
     // Common Infos
     QString dataFile;
     QString markerFile;
-    QString dataFormat;       // BINARY or ASCII
-    int dataOrientation;      // 0 = MULTIPLEXED, 1 = VECTORIZED
+    QString dataFormat;  // BINARY or ASCII
+    int dataOrientation; // 0 = MULTIPLEXED, 1 = VECTORIZED
     int numberOfChannels;
-    double samplingInterval;  // in microseconds
+    double samplingInterval; // in microseconds
 
     // Binary Format
-    QString binaryFormat;     // INT_16, UINT_16, IEEE_FLOAT_32
+    QString binaryFormat; // INT_16, UINT_16, IEEE_FLOAT_32
 
     // Channel info
     QList<BVChannelInfo> channels;
@@ -93,7 +96,7 @@ struct BVHeader {
 
 //=============================================================================================================
 
-static bool parseBVHeader(const QString &vhdrPath, BVHeader &hdr)
+static bool parseBVHeader(const QString& vhdrPath, BVHeader& hdr)
 {
     QFile file(vhdrPath);
     if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
@@ -105,9 +108,9 @@ static bool parseBVHeader(const QString &vhdrPath, BVHeader &hdr)
     QString currentSection;
     int chIdx = 0;
 
-    hdr.dataOrientation = 0;  // default: multiplexed
+    hdr.dataOrientation = 0; // default: multiplexed
     hdr.numberOfChannels = 0;
-    hdr.samplingInterval = 1000.0;  // 1 ms default
+    hdr.samplingInterval = 1000.0; // 1 ms default
     hdr.binaryFormat = "INT_16";
 
     while (!in.atEnd()) {
@@ -141,17 +144,14 @@ static bool parseBVHeader(const QString &vhdrPath, BVHeader &hdr)
                 hdr.dataFormat = value;
             else if (key == "DataOrientation") {
                 hdr.dataOrientation = (value.toUpper() == "VECTORIZED") ? 1 : 0;
-            }
-            else if (key == "NumberOfChannels")
+            } else if (key == "NumberOfChannels")
                 hdr.numberOfChannels = value.toInt();
             else if (key == "SamplingInterval")
                 hdr.samplingInterval = value.toDouble();
-        }
-        else if (currentSection == "Binary Infos") {
+        } else if (currentSection == "Binary Infos") {
             if (key == "BinaryFormat")
                 hdr.binaryFormat = value;
-        }
-        else if (currentSection == "Channel Infos") {
+        } else if (currentSection == "Channel Infos") {
             // Format: ChN=name,refName,resolution,unit
             QStringList parts = value.split(',');
             BVChannelInfo ch;
@@ -187,11 +187,11 @@ static bool parseBVHeader(const QString &vhdrPath, BVHeader &hdr)
 // Parse BrainVision .vmrk marker file
 //=============================================================================================================
 
-static bool parseBVMarkers(const QString &vmrkPath, BVHeader &hdr)
+static bool parseBVMarkers(const QString& vmrkPath, BVHeader& hdr)
 {
     QFile file(vmrkPath);
     if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
-        qInfo("Warning: Cannot open marker file: %s" , qPrintable(vmrkPath));
+        qInfo("Warning: Cannot open marker file: %s", qPrintable(vmrkPath));
         return false;
     }
 
@@ -235,7 +235,7 @@ static bool parseBVMarkers(const QString &vmrkPath, BVHeader &hdr)
 // Read BrainVision binary data
 //=============================================================================================================
 
-static bool readBVData(const QString &dataPath, const BVHeader &hdr, MatrixXd &data)
+static bool readBVData(const QString& dataPath, const BVHeader& hdr, MatrixXd& data)
 {
     QFile file(dataPath);
     if (!file.open(QIODevice::ReadOnly)) {
@@ -261,7 +261,7 @@ static bool readBVData(const QString &dataPath, const BVHeader &hdr, MatrixXd &d
         nSamples = fileSize / (nChan * bytesPerSample);
     }
 
-    qInfo("Data: %d channels x %lld samples (%s)" , nChan, nSamples, qPrintable(hdr.binaryFormat));
+    qInfo("Data: %d channels x %lld samples (%s)", nChan, nSamples, qPrintable(hdr.binaryFormat));
 
     data.resize(nChan, nSamples);
     QDataStream ds(&file);
@@ -318,7 +318,7 @@ static bool readBVData(const QString &dataPath, const BVHeader &hdr, MatrixXd &d
 
 //=============================================================================================================
 
-int main(int argc, char *argv[])
+int main(int argc, char* argv[])
 {
     qInstallMessageHandler(MNELogger::customLogWriter);
     QCoreApplication app(argc, argv);
@@ -341,8 +341,14 @@ int main(int argc, char *argv[])
     QString vhdrFile = parser.value(vhdrOpt);
     QString outFile = parser.value(outOpt);
 
-    if (vhdrFile.isEmpty()) { qCritical("--vhdr is required."); return 1; }
-    if (outFile.isEmpty()) { qCritical("--out is required."); return 1; }
+    if (vhdrFile.isEmpty()) {
+        qCritical("--vhdr is required.");
+        return 1;
+    }
+    if (outFile.isEmpty()) {
+        qCritical("--out is required.");
+        return 1;
+    }
 
     // Parse header
     BVHeader hdr;
@@ -352,16 +358,16 @@ int main(int argc, char *argv[])
     QFileInfo vhdrInfo(vhdrFile);
     QDir baseDir = vhdrInfo.absoluteDir();
 
-    qInfo("BrainVision header: %d channels, sfreq=%.1f Hz, format=%s" ,
-           hdr.numberOfChannels,
-           1e6 / hdr.samplingInterval,
-           qPrintable(hdr.binaryFormat));
+    qInfo("BrainVision header: %d channels, sfreq=%.1f Hz, format=%s",
+          hdr.numberOfChannels,
+          1e6 / hdr.samplingInterval,
+          qPrintable(hdr.binaryFormat));
 
     // Parse markers if available
     if (!hdr.markerFile.isEmpty()) {
         QString vmrkPath = baseDir.filePath(hdr.markerFile);
         parseBVMarkers(vmrkPath, hdr);
-        qInfo("Markers: %lld events" , static_cast<long long>(hdr.markers.size()));
+        qInfo("Markers: %lld events", static_cast<long long>(hdr.markers.size()));
     }
 
     // Read binary data
@@ -380,7 +386,7 @@ int main(int argc, char *argv[])
     data *= 1e-6;
 
     // Build FiffInfo
-    double sfreq = 1e6 / hdr.samplingInterval;  // samplingInterval is in µs
+    double sfreq = 1e6 / hdr.samplingInterval; // samplingInterval is in µs
     int nChan = hdr.numberOfChannels;
 
     FiffInfo info;
@@ -444,8 +450,8 @@ int main(int argc, char *argv[])
     }
 
     stream->finish_writing_raw();
-    qInfo("Written FIFF: %s (%d channels, %d samples, %.1f Hz)" ,
-           qPrintable(outFile), nChan, nSamples, sfreq);
+    qInfo("Written FIFF: %s (%d channels, %d samples, %.1f Hz)",
+          qPrintable(outFile), nChan, nSamples, sfreq);
 
     return 0;
 }

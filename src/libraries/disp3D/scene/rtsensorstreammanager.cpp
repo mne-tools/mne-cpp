@@ -25,8 +25,8 @@
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-RtSensorStreamManager::RtSensorStreamManager(QObject *parent)
-    : QObject(parent)
+RtSensorStreamManager::RtSensorStreamManager(QObject* parent)
+: QObject(parent)
 {
 }
 
@@ -39,9 +39,9 @@ RtSensorStreamManager::~RtSensorStreamManager()
 
 //=============================================================================================================
 
-bool RtSensorStreamManager::startStreaming(const QString &modality,
-                                            const SensorFieldMapper &fieldMapper,
-                                            const QMap<QString, std::shared_ptr<BrainSurface>> &surfaces)
+bool RtSensorStreamManager::startStreaming(const QString& modality,
+                                           const SensorFieldMapper& fieldMapper,
+                                           const QMap<QString, std::shared_ptr<BrainSurface>>& surfaces)
 {
     if (m_isStreaming) {
         qDebug() << "RtSensorStreamManager: Real-time sensor streaming already active";
@@ -103,7 +103,8 @@ bool RtSensorStreamManager::startStreaming(const QString &modality,
     double sFreq = 1000.0;
     if (fieldMapper.evoked().times.size() > 1) {
         double dt = fieldMapper.evoked().times(1) - fieldMapper.evoked().times(0);
-        if (dt > 0) sFreq = 1.0 / dt;
+        if (dt > 0)
+            sFreq = 1.0 / dt;
     }
     m_controller->setSFreq(sFreq);
 
@@ -133,7 +134,8 @@ bool RtSensorStreamManager::startStreaming(const QString &modality,
 
 void RtSensorStreamManager::stopStreaming()
 {
-    if (!m_isStreaming) return;
+    if (!m_isStreaming)
+        return;
 
     if (m_controller)
         m_controller->setStreamingState(false);
@@ -144,7 +146,7 @@ void RtSensorStreamManager::stopStreaming()
 
 //=============================================================================================================
 
-void RtSensorStreamManager::pushData(const Eigen::VectorXf &data)
+void RtSensorStreamManager::pushData(const Eigen::VectorXf& data)
 {
     if (m_controller)
         m_controller->addData(data);
@@ -176,7 +178,7 @@ void RtSensorStreamManager::setAverages(int numAvr)
 
 //=============================================================================================================
 
-void RtSensorStreamManager::setColormap(const QString &name)
+void RtSensorStreamManager::setColormap(const QString& name)
 {
     if (m_controller)
         m_controller->setColormapType(name);

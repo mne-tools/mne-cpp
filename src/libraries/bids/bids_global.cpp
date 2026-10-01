@@ -20,12 +20,21 @@
 // DEFINE METHODS
 //=============================================================================================================
 
-const char* BIDSLIB::buildDateTime(){ return UTILSLIB::dateTimeNow();}
+const char* BIDSLIB::buildDateTime()
+{
+    return UTILSLIB::dateTimeNow();
+}
 
 //=============================================================================================================
 
-const char* BIDSLIB::buildHash(){ return UTILSLIB::gitHash();}
+const char* BIDSLIB::buildHash()
+{
+    return UTILSLIB::gitHash();
+}
 
 //=============================================================================================================
 
-const char* BIDSLIB::buildHashLong(){ return UTILSLIB::gitHashLong();}
+const char* BIDSLIB::buildHashLong()
+{
+    return UTILSLIB::gitHashLong();
+}

@@ -105,7 +105,8 @@ double StatsFtest::fCdf(double f, int df1, int df2)
 {
     // P(F <= f) using the relationship to the regularized incomplete beta function:
     // P(F <= f) = I_x(df1/2, df2/2) where x = df1*f / (df1*f + df2)
-    if (f <= 0.0) return 0.0;
+    if (f <= 0.0)
+        return 0.0;
 
     double x = static_cast<double>(df1) * f / (static_cast<double>(df1) * f + static_cast<double>(df2));
     double a = static_cast<double>(df1) / 2.0;

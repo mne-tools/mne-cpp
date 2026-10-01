@@ -44,13 +44,15 @@
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-namespace FIFFLIB {
-    class FiffInfo;
+namespace FIFFLIB
+{
+class FiffInfo;
 }
 
-namespace MNELIB {
-    class MNEForwardSolution;
-    class MNEInverseOperator;
+namespace MNELIB
+{
+class MNEForwardSolution;
+class MNEInverseOperator;
 }
 
 //=============================================================================================================
@@ -67,10 +69,11 @@ namespace RTPROCESSINGLIB
 /**
  * @brief Input bundle for the real-time inverse operator worker containing noise covariance, forward solution, and settings.
  */
-struct RtInvOpInput {
-    QSharedPointer<FIFFLIB::FiffInfo>           pFiffInfo;
-    QSharedPointer<MNELIB::MNEForwardSolution>  pFwd;
-    FIFFLIB::FiffCov                            noiseCov;
+struct RtInvOpInput
+{
+    QSharedPointer<FIFFLIB::FiffInfo> pFiffInfo;
+    QSharedPointer<MNELIB::MNEForwardSolution> pFwd;
+    FIFFLIB::FiffCov noiseCov;
 };
 
 //=============================================================================================================
@@ -90,7 +93,7 @@ public:
      *
      * @param[in] inputData  Data to estimate the inverse operator from.
      */
-    void doWork(const RtInvOpInput &inputData);
+    void doWork(const RtInvOpInput& inputData);
 
 signals:
     //=========================================================================================================
@@ -113,8 +116,8 @@ class DSPSHARED_EXPORT RtInvOp : public QObject
     Q_OBJECT
 
 public:
-    typedef QSharedPointer<RtInvOp> SPtr;             /**< Shared pointer type for RtInvOp. */
-    typedef QSharedPointer<const RtInvOp> ConstSPtr;  /**< Const shared pointer type for RtInvOp. */
+    typedef QSharedPointer<RtInvOp> SPtr;            /**< Shared pointer type for RtInvOp. */
+    typedef QSharedPointer<const RtInvOp> ConstSPtr; /**< Const shared pointer type for RtInvOp. */
 
     //=========================================================================================================
     /**
@@ -124,9 +127,9 @@ public:
      * @param[in] p_pFwd         Forward solution.
      * @param[in] parent         Parent QObject (optional).
      */
-    explicit RtInvOp(QSharedPointer<FIFFLIB::FiffInfo> &p_pFiffInfo,
-                     QSharedPointer<MNELIB::MNEForwardSolution> &p_pFwd,
-                     QObject *parent = 0);
+    explicit RtInvOp(QSharedPointer<FIFFLIB::FiffInfo>& p_pFiffInfo,
+                     QSharedPointer<MNELIB::MNEForwardSolution>& p_pFwd,
+                     QObject* parent = 0);
 
     //=========================================================================================================
     /**
@@ -140,7 +143,7 @@ public:
      *
      * @param[in] noiseCov     Noise covariance estimation.
      */
-    void append(const FIFFLIB::FiffCov &noiseCov);
+    void append(const FIFFLIB::FiffCov& noiseCov);
 
     //=========================================================================================================
     /**
@@ -171,10 +174,10 @@ protected:
      */
     void handleResults(const MNELIB::MNEInverseOperator& invOp);
 
-    QSharedPointer<FIFFLIB::FiffInfo>           m_pFiffInfo;        /**< The fiff measurement information. */
-    QSharedPointer<MNELIB::MNEForwardSolution>  m_pFwd;             /**< The forward solution. */
+    QSharedPointer<FIFFLIB::FiffInfo> m_pFiffInfo;     /**< The fiff measurement information. */
+    QSharedPointer<MNELIB::MNEForwardSolution> m_pFwd; /**< The forward solution. */
 
-    QThread                                     m_workerThread;     /**< The worker thread. */
+    QThread m_workerThread; /**< The worker thread. */
 
 signals:
     //=========================================================================================================
@@ -191,7 +194,7 @@ signals:
      *
      * @param[in] inputData  The new covariance estimation.
      */
-    void operate(const RtInvOpInput &inputData);
+    void operate(const RtInvOpInput& inputData);
 };
 
 //=============================================================================================================

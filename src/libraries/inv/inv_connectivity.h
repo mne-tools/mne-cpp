@@ -54,20 +54,20 @@ namespace INVLIB
  */
 struct InvConnectivity
 {
-    Eigen::MatrixXd matrix;     /**< [N x N] connectivity values between sources. */
-    std::string     measure;    /**< Metric name, e.g. "coh", "imcoh", "plv", "pli", "wpli", "granger", "pdc", "dtf". */
-    bool            directed;   /**< True for directed measures (Granger, PDC, DTF); false for undirected (COH, PLV, PLI). */
-    float           fmin;       /**< Lower frequency bound (Hz); 0 if broadband / time-domain. */
-    float           fmax;       /**< Upper frequency bound (Hz); 0 if broadband / time-domain. */
-    float           tmin;       /**< Start of the time window (s) this connectivity represents. */
-    float           tmax;       /**< End of the time window (s) this connectivity represents. */
+    Eigen::MatrixXd matrix; /**< [N x N] connectivity values between sources. */
+    std::string measure;    /**< Metric name, e.g. "coh", "imcoh", "plv", "pli", "wpli", "granger", "pdc", "dtf". */
+    bool directed;          /**< True for directed measures (Granger, PDC, DTF); false for undirected (COH, PLV, PLI). */
+    float fmin;             /**< Lower frequency bound (Hz); 0 if broadband / time-domain. */
+    float fmax;             /**< Upper frequency bound (Hz); 0 if broadband / time-domain. */
+    float tmin;             /**< Start of the time window (s) this connectivity represents. */
+    float tmax;             /**< End of the time window (s) this connectivity represents. */
 
     InvConnectivity()
-        : directed(false)
-        , fmin(0.0f)
-        , fmax(0.0f)
-        , tmin(0.0f)
-        , tmax(0.0f)
+    : directed(false)
+    , fmin(0.0f)
+    , fmax(0.0f)
+    , tmin(0.0f)
+    , tmax(0.0f)
     {
     }
 };

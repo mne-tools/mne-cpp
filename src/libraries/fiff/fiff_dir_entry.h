@@ -63,10 +63,10 @@ namespace FIFFLIB
 class FIFFSHARED_EXPORT FiffDirEntry
 {
 public:
-    using SPtr = QSharedPointer<FiffDirEntry>;            /**< Shared pointer type for FiffDirEntry. */
-    using ConstSPtr = QSharedPointer<const FiffDirEntry>; /**< Const shared pointer type for FiffDirEntry. */
-    using UPtr = std::unique_ptr<FiffDirEntry>;             /**< Unique pointer type for FiffDirEntry. */
-    using ConstUPtr = std::unique_ptr<const FiffDirEntry>;  /**< Const unique pointer type for FiffDirEntry. */
+    using SPtr = QSharedPointer<FiffDirEntry>;             /**< Shared pointer type for FiffDirEntry. */
+    using ConstSPtr = QSharedPointer<const FiffDirEntry>;  /**< Const shared pointer type for FiffDirEntry. */
+    using UPtr = std::unique_ptr<FiffDirEntry>;            /**< Unique pointer type for FiffDirEntry. */
+    using ConstUPtr = std::unique_ptr<const FiffDirEntry>; /**< Const unique pointer type for FiffDirEntry. */
 
     //=========================================================================================================
     /**
@@ -97,11 +97,10 @@ public:
     inline static qint32 storageSize();
 
 public:
-    fiff_int_t  kind;   /**< Tag number. */
-    fiff_int_t  type;   /**< Data type. */
-    fiff_int_t  size;   /**< How many bytes. */
-    fiff_int_t  pos;    /**< Location in file; Note: the data is located at pos + FIFFC_DATA_OFFSET: 2GB restriction -> change this to fiff_long_t. */
-
+    fiff_int_t kind; /**< Tag number. */
+    fiff_int_t type; /**< Data type. */
+    fiff_int_t size; /**< How many bytes. */
+    fiff_int_t pos;  /**< Location in file; Note: the data is located at pos + FIFFC_DATA_OFFSET: 2GB restriction -> change this to fiff_long_t. */
 };
 
 //=============================================================================================================
@@ -110,8 +109,7 @@ public:
 
 inline qint32 FiffDirEntry::storageSize()
 {
-    return sizeof(FiffDirEntry::kind) + sizeof(FiffDirEntry::type)
-         + sizeof(FiffDirEntry::size) + sizeof(FiffDirEntry::pos);
+    return sizeof(FiffDirEntry::kind) + sizeof(FiffDirEntry::type) + sizeof(FiffDirEntry::size) + sizeof(FiffDirEntry::pos);
 }
 } // NAMESPACE
 

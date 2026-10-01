@@ -46,15 +46,17 @@
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-namespace FSLIB {
-    class FsLabel;
+namespace FSLIB
+{
+class FsLabel;
 }
 
 //=============================================================================================================
 // DEFINE NAMESPACE
 //=============================================================================================================
 
-namespace DISP3DLIB {
+namespace DISP3DLIB
+{
 
 //=============================================================================================================
 /**
@@ -87,9 +89,10 @@ public:
     /**
      * Visualization type enum — selects which matrix the worker emits.
      */
-    enum VisualizationType {
-        InterpolationBased = 0,   /**< Smooth distance-based interpolation (default). */
-        AnnotationBased    = 1    /**< Per-parcellation uniform coloring from annotation. */
+    enum VisualizationType
+    {
+        InterpolationBased = 0, /**< Smooth distance-based interpolation (default). */
+        AnnotationBased = 1     /**< Per-parcellation uniform coloring from annotation. */
     };
 
     //=========================================================================================================
@@ -98,7 +101,7 @@ public:
      *
      * @param[in] parent     Parent QObject.
      */
-    explicit RtSourceInterpolationMatWorker(QObject *parent = nullptr);
+    explicit RtSourceInterpolationMatWorker(QObject* parent = nullptr);
 
     //=========================================================================================================
     /**
@@ -108,7 +111,7 @@ public:
      *
      * @param[in] sInterpolationFunction    Function name.
      */
-    void setInterpolationFunction(const QString &sInterpolationFunction);
+    void setInterpolationFunction(const QString& sInterpolationFunction);
 
     //=========================================================================================================
     /**
@@ -127,9 +130,9 @@ public:
      * @param[in] vecNeighborVertices  Per-vertex neighbor index lists.
      * @param[in] vecSourceVertices    Source vertex indices into the surface.
      */
-    void setInterpolationInfoLeft(const Eigen::MatrixX3f &matVertices,
-                                    const std::vector<Eigen::VectorXi> &vecNeighborVertices,
-                                    const Eigen::VectorXi &vecSourceVertices);
+    void setInterpolationInfoLeft(const Eigen::MatrixX3f& matVertices,
+                                  const std::vector<Eigen::VectorXi>& vecNeighborVertices,
+                                  const Eigen::VectorXi& vecSourceVertices);
     //=========================================================================================================
     /**
      * Set the surface and source geometry for the right hemisphere.
@@ -138,9 +141,9 @@ public:
      * @param[in] vecNeighborVertices  Per-vertex neighbor index lists.
      * @param[in] vecSourceVertices    Source vertex indices into the surface.
      */
-    void setInterpolationInfoRight(const Eigen::MatrixX3f &matVertices,
-                                     const std::vector<Eigen::VectorXi> &vecNeighborVertices,
-                                     const Eigen::VectorXi &vecSourceVertices);
+    void setInterpolationInfoRight(const Eigen::MatrixX3f& matVertices,
+                                   const std::vector<Eigen::VectorXi>& vecNeighborVertices,
+                                   const Eigen::VectorXi& vecSourceVertices);
     //=========================================================================================================
     /**
      * Set the visualization type.
@@ -160,9 +163,9 @@ public:
      * @param[in] lLabels       List of FreeSurfer Labels.
      * @param[in] vecVertNo     Source-space vertex numbers.
      */
-    void setAnnotationInfoLeft(const Eigen::VectorXi &vecLabelIds,
-                               const QList<FSLIB::FsLabel> &lLabels,
-                               const Eigen::VectorXi &vecVertNo);
+    void setAnnotationInfoLeft(const Eigen::VectorXi& vecLabelIds,
+                               const QList<FSLIB::FsLabel>& lLabels,
+                               const Eigen::VectorXi& vecVertNo);
 
     //=========================================================================================================
     /**
@@ -172,9 +175,9 @@ public:
      * @param[in] lLabels       List of FreeSurfer Labels.
      * @param[in] vecVertNo     Source-space vertex numbers.
      */
-    void setAnnotationInfoRight(const Eigen::VectorXi &vecLabelIds,
-                                const QList<FSLIB::FsLabel> &lLabels,
-                                const Eigen::VectorXi &vecVertNo);
+    void setAnnotationInfoRight(const Eigen::VectorXi& vecLabelIds,
+                                const QList<FSLIB::FsLabel>& lLabels,
+                                const Eigen::VectorXi& vecVertNo);
 
 public slots:
     //=========================================================================================================
@@ -210,7 +213,7 @@ private:
      * @param[in] name    Function name ("linear", "gaussian", "square", "cubic").
      * @return Function pointer for use with Interpolation::createInterpolationMat().
      */
-    static double (*resolveInterpolationFunction(const QString &name))(double);
+    static double (*resolveInterpolationFunction(const QString& name))(double);
 
     //=========================================================================================================
     /**
@@ -224,8 +227,8 @@ private:
      * @return Shared pointer to the computed sparse interpolation matrix.
      */
     static QSharedPointer<Eigen::SparseMatrix<float>> computeHemi(
-        const Eigen::MatrixX3f &matVertices,
-        const std::vector<Eigen::VectorXi> &vecNeighborVertices,
+        const Eigen::MatrixX3f& matVertices,
+        const std::vector<Eigen::VectorXi>& vecNeighborVertices,
         Eigen::VectorXi vecSourceVertices,
         double dCancelDist,
         double (*interpFunc)(double));
@@ -242,42 +245,42 @@ private:
      * @return FsAnnotation matrix (nVertices x nSources).
      */
     static QSharedPointer<Eigen::SparseMatrix<float>> computeAnnotationOperator(
-        const QList<FSLIB::FsLabel> &lLabels,
-        const QMap<qint32, qint32> &mapLabelIdSrc,
-        const QList<int> &vertNos);
+        const QList<FSLIB::FsLabel>& lLabels,
+        const QMap<qint32, qint32>& mapLabelIdSrc,
+        const QList<int>& vertNos);
 
-    mutable QMutex m_mutex;                                      /**< Protects all data members. */
+    mutable QMutex m_mutex; /**< Protects all data members. */
 
     // LH geometry
-    Eigen::MatrixX3f m_matVerticesLh;                            /**< LH vertex positions. */
-    std::vector<Eigen::VectorXi> m_vecNeighborsLh;               /**< LH per-vertex neighbors. */
-    Eigen::VectorXi m_vecSourceVerticesLh;                        /**< LH source vertex indices. */
-    bool m_hasLh = false;                                        /**< Whether LH data has been set. */
+    Eigen::MatrixX3f m_matVerticesLh;              /**< LH vertex positions. */
+    std::vector<Eigen::VectorXi> m_vecNeighborsLh; /**< LH per-vertex neighbors. */
+    Eigen::VectorXi m_vecSourceVerticesLh;         /**< LH source vertex indices. */
+    bool m_hasLh = false;                          /**< Whether LH data has been set. */
 
     // RH geometry
-    Eigen::MatrixX3f m_matVerticesRh;                            /**< RH vertex positions. */
-    std::vector<Eigen::VectorXi> m_vecNeighborsRh;               /**< RH per-vertex neighbors. */
-    Eigen::VectorXi m_vecSourceVerticesRh;                        /**< RH source vertex indices. */
-    bool m_hasRh = false;                                        /**< Whether RH data has been set. */
+    Eigen::MatrixX3f m_matVerticesRh;              /**< RH vertex positions. */
+    std::vector<Eigen::VectorXi> m_vecNeighborsRh; /**< RH per-vertex neighbors. */
+    Eigen::VectorXi m_vecSourceVerticesRh;         /**< RH source vertex indices. */
+    bool m_hasRh = false;                          /**< Whether RH data has been set. */
 
     // Interpolation parameters
-    double m_dCancelDist = 0.05;                                 /**< Cancel distance in meters. */
-    QString m_sInterpolationFunction = QStringLiteral("cubic");  /**< Active interpolation function name. */
+    double m_dCancelDist = 0.05;                                /**< Cancel distance in meters. */
+    QString m_sInterpolationFunction = QStringLiteral("cubic"); /**< Active interpolation function name. */
 
     // Visualization type
-    int m_iVisualizationType = InterpolationBased;               /**< Current visualization type. */
+    int m_iVisualizationType = InterpolationBased; /**< Current visualization type. */
 
     // LH annotation data
-    QList<FSLIB::FsLabel> m_lLabelsLh;                             /**< LH FreeSurfer labels. */
-    QMap<qint32, qint32> m_mapLabelIdSourcesLh;                  /**< LH source vertex → label ID map. */
-    QList<int> m_vertNosLh;                                      /**< LH source vertex numbers. */
-    bool m_bAnnotationLhInit = false;                             /**< Whether LH annotation data is set. */
+    QList<FSLIB::FsLabel> m_lLabelsLh;          /**< LH FreeSurfer labels. */
+    QMap<qint32, qint32> m_mapLabelIdSourcesLh; /**< LH source vertex → label ID map. */
+    QList<int> m_vertNosLh;                     /**< LH source vertex numbers. */
+    bool m_bAnnotationLhInit = false;           /**< Whether LH annotation data is set. */
 
     // RH annotation data
-    QList<FSLIB::FsLabel> m_lLabelsRh;                             /**< RH FreeSurfer labels. */
-    QMap<qint32, qint32> m_mapLabelIdSourcesRh;                  /**< RH source vertex → label ID map. */
-    QList<int> m_vertNosRh;                                      /**< RH source vertex numbers. */
-    bool m_bAnnotationRhInit = false;                             /**< Whether RH annotation data is set. */
+    QList<FSLIB::FsLabel> m_lLabelsRh;          /**< RH FreeSurfer labels. */
+    QMap<qint32, qint32> m_mapLabelIdSourcesRh; /**< RH source vertex → label ID map. */
+    QList<int> m_vertNosRh;                     /**< RH source vertex numbers. */
+    bool m_bAnnotationRhInit = false;           /**< Whether RH annotation data is set. */
 };
 
 } // namespace DISP3DLIB

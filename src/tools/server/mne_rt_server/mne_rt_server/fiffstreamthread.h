@@ -48,7 +48,7 @@ class FiffStreamThread : public QThread
     Q_OBJECT
 
 public:
-    FiffStreamThread(qint32 id, int socketDescriptor, QObject *parent);
+    FiffStreamThread(qint32 id, int socketDescriptor, QObject* parent);
 
     ~FiffStreamThread();
 
@@ -58,13 +58,13 @@ public:
 
     inline QString getAlias();
 
-//    void deactivateRawBufferSending();
+    //    void deactivateRawBufferSending();
 
     void parseCommand(const std::unique_ptr<FIFFLIB::FiffTag>& p_pTag);
 
     void writeClientId();
 
-//    void sendData(QTcpSocket& p_qTcpSocket);
+    //    void sendData(QTcpSocket& p_qTcpSocket);
 
 signals:
     void error(QTcpSocket::SocketError socketError);
@@ -90,7 +90,7 @@ private:
 
     void sendRawBuffer(QSharedPointer<Eigen::MatrixXf> m_pMatRawData);
     //void readToBuffer1();
-//    void readProc(QTcpSocket& p_qTcpSocket);
+    //    void readProc(QTcpSocket& p_qTcpSocket);
 };
 
 inline qint32 FiffStreamThread::getID()

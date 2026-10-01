@@ -180,24 +180,24 @@ void TestDecodingSpoc::testCorrelationWithTarget()
 void TestDecodingSpoc::testNotFittedThrows()
 {
     DecodingSpoc spoc;
-    std::vector<MatrixXd> epochs = { MatrixXd::Random(6, 100) };
+    std::vector<MatrixXd> epochs = {MatrixXd::Random(6, 100)};
 
     QVERIFY_THROWS_EXCEPTION(std::runtime_error,
-        static_cast<void>(spoc.transform(epochs)));
+                             static_cast<void>(spoc.transform(epochs)));
 }
 
 //=============================================================================================================
 
 void TestDecodingSpoc::testMismatchedSizeThrows()
 {
-    std::vector<MatrixXd> epochs = { MatrixXd::Random(6, 100),
-                                     MatrixXd::Random(6, 100) };
+    std::vector<MatrixXd> epochs = {MatrixXd::Random(6, 100),
+                                    MatrixXd::Random(6, 100)};
     VectorXd target(3);
     target << 0.1, 0.5, 0.9;
 
     DecodingSpoc spoc;
     QVERIFY_THROWS_EXCEPTION(std::invalid_argument,
-        spoc.fit(epochs, target));
+                             spoc.fit(epochs, target));
 }
 
 //=============================================================================================================

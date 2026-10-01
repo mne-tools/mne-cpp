@@ -54,8 +54,8 @@ public:
     TestBids() = default;
 
 private:
-    QString bidsRoot() const;    /**< Path to BIDS test fixtures. */
-    QString dataPath() const;    /**< Base path for mne-cpp-test-data. */
+    QString bidsRoot() const; /**< Path to BIDS test fixtures. */
+    QString dataPath() const; /**< Base path for mne-cpp-test-data. */
 
 private slots:
     void initTestCase();
@@ -108,8 +108,7 @@ private slots:
 
 QString TestBids::dataPath() const
 {
-    return QCoreApplication::applicationDirPath()
-           + QStringLiteral("/../resources/data/mne-cpp-test-data/");
+    return QCoreApplication::applicationDirPath() + QStringLiteral("/../resources/data/mne-cpp-test-data/");
 }
 
 QString TestBids::bidsRoot() const
@@ -222,7 +221,7 @@ void TestBids::testChannelsWriteRoundTrip()
     QList<BidsChannel> roundTripped = BidsChannel::readTsv(tmpPath);
     QCOMPARE(roundTripped.size(), original.size());
 
-    for(int i = 0; i < original.size(); ++i) {
+    for (int i = 0; i < original.size(); ++i) {
         QCOMPARE(roundTripped[i].name, original[i].name);
         QCOMPARE(roundTripped[i].type, original[i].type);
         QCOMPARE(roundTripped[i].units, original[i].units);
@@ -264,7 +263,7 @@ void TestBids::testElectrodesWriteRoundTrip()
     QList<BidsElectrode> roundTripped = BidsElectrode::readTsv(tmpPath);
     QCOMPARE(roundTripped.size(), original.size());
 
-    for(int i = 0; i < original.size(); ++i) {
+    for (int i = 0; i < original.size(); ++i) {
         QCOMPARE(roundTripped[i].name, original[i].name);
         QCOMPARE(roundTripped[i].x, original[i].x);
         QCOMPARE(roundTripped[i].y, original[i].y);
@@ -308,7 +307,7 @@ void TestBids::testEventsWriteRoundTrip()
     QList<BidsEvent> roundTripped = BidsEvent::readTsv(tmpPath);
     QCOMPARE(roundTripped.size(), original.size());
 
-    for(int i = 0; i < original.size(); ++i) {
+    for (int i = 0; i < original.size(); ++i) {
         QVERIFY(std::abs(roundTripped[i].onset - original[i].onset) < 0.001f);
         QCOMPARE(roundTripped[i].sample, original[i].sample);
         QCOMPARE(roundTripped[i].value, original[i].value);
@@ -543,7 +542,7 @@ void TestBids::testPathValidation()
 {
     QVERIFY(BIDSPath::isValidEntityValue("abc"));
     QVERIFY(BIDSPath::isValidEntityValue("abc123"));
-    QVERIFY(BIDSPath::isValidEntityValue(""));   // empty is valid per implementation
+    QVERIFY(BIDSPath::isValidEntityValue("")); // empty is valid per implementation
     QVERIFY(!BIDSPath::isValidEntityValue("abc-def"));
     QVERIFY(!BIDSPath::isValidEntityValue("abc_def"));
     QVERIFY(!BIDSPath::isValidEntityValue("abc/def"));
@@ -554,7 +553,7 @@ void TestBids::testPathValidation()
 void TestBids::testPathEquality()
 {
     BIDSPath a(bidsRoot(), "01", "01", "rest", "ieeg", "ieeg", ".vhdr");
-    BIDSPath b(a);  // copy constructor
+    BIDSPath b(a); // copy constructor
 
     QCOMPARE(b.root(), a.root());
     QCOMPARE(b.subject(), a.subject());

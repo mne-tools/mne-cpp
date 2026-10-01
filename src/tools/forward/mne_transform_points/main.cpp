@@ -56,17 +56,22 @@ using namespace Eigen;
 static int frameFromName(const QString& name)
 {
     QString lower = name.toLower();
-    if (lower == "head")        return FIFFV_COORD_HEAD;
-    if (lower == "mri")         return FIFFV_COORD_MRI;
-    if (lower == "device")      return FIFFV_COORD_DEVICE;
-    if (lower == "isotrak")     return FIFFV_COORD_ISOTRAK;
-    if (lower == "hpi")         return FIFFV_COORD_HPI;
+    if (lower == "head")
+        return FIFFV_COORD_HEAD;
+    if (lower == "mri")
+        return FIFFV_COORD_MRI;
+    if (lower == "device")
+        return FIFFV_COORD_DEVICE;
+    if (lower == "isotrak")
+        return FIFFV_COORD_ISOTRAK;
+    if (lower == "hpi")
+        return FIFFV_COORD_HPI;
     return -1;
 }
 
 //=============================================================================================================
 
-int main(int argc, char *argv[])
+int main(int argc, char* argv[])
 {
     qInstallMessageHandler(MNELogger::customLogWriter);
     QCoreApplication app(argc, argv);

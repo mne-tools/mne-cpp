@@ -34,7 +34,7 @@ using namespace NOISEREDUCTIONPLUGIN;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-NoiseReductionSetupWidget::NoiseReductionSetupWidget(NoiseReduction* toolbox, QWidget *parent)
+NoiseReductionSetupWidget::NoiseReductionSetupWidget(NoiseReduction* toolbox, QWidget* parent)
 : QWidget(parent)
 , m_pNoiseReduction(toolbox)
 {

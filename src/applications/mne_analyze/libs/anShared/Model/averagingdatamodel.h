@@ -41,15 +41,17 @@
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-namespace FIFFLIB {
-    class FiffEvokedSet;
+namespace FIFFLIB
+{
+class FiffEvokedSet;
 }
 
 //=============================================================================================================
 // DEFINE NAMESPACE ANSHAREDLIB
 //=============================================================================================================
 
-namespace ANSHAREDLIB {
+namespace ANSHAREDLIB
+{
 
 //=============================================================================================================
 /**
@@ -71,7 +73,7 @@ public:
                        QObject* parent = Q_NULLPTR);
 
     //=========================================================================================================
-    AveragingDataModel(const QString &sFilePath,
+    AveragingDataModel(const QString& sFilePath,
                        const QByteArray& byteLoadedData = QByteArray(),
                        QObject* parent = Q_NULLPTR);
 
@@ -90,7 +92,7 @@ public:
      *
      * @return      returns saved FiffEvokedModel with averaging data.
      */
-    QVariant data(const QModelIndex &index,
+    QVariant data(const QModelIndex& index,
                   int role = Qt::DisplayRole) const override;
 
     //=========================================================================================================
@@ -99,7 +101,7 @@ public:
      *
      * @param[in] index   The index that referres to the requested item.
      */
-    Qt::ItemFlags flags(const QModelIndex &index) const override;
+    Qt::ItemFlags flags(const QModelIndex& index) const override;
 
     //=========================================================================================================
     /**
@@ -107,7 +109,7 @@ public:
      *
      * @param[in] parent     The parent index.
      */
-    int rowCount(const QModelIndex &parent = QModelIndex()) const override;
+    int rowCount(const QModelIndex& parent = QModelIndex()) const override;
 
     //=========================================================================================================
     /**
@@ -115,7 +117,7 @@ public:
      *
      * @param[in] parent     The parent index.
      */
-    int columnCount(const QModelIndex &parent = QModelIndex()) const override;
+    int columnCount(const QModelIndex& parent = QModelIndex()) const override;
 
     //=========================================================================================================
     /**
@@ -153,7 +155,7 @@ public:
      */
     inline QModelIndex index(int row,
                              int column,
-                             const QModelIndex &parent = QModelIndex()) const override;
+                             const QModelIndex& parent = QModelIndex()) const override;
 
     //=========================================================================================================
     /**
@@ -162,7 +164,7 @@ public:
      *
      * @param[in] index   The index that referres to the child.
      */
-    inline QModelIndex parent(const QModelIndex &index) const override;
+    inline QModelIndex parent(const QModelIndex& index) const override;
 
     //=========================================================================================================
     /**
@@ -197,7 +199,7 @@ inline MODEL_TYPE AveragingDataModel::getType() const
 
 //=============================================================================================================
 
-QModelIndex AveragingDataModel::parent(const QModelIndex &index) const
+QModelIndex AveragingDataModel::parent(const QModelIndex& index) const
 {
     Q_UNUSED(index);
     return QModelIndex();
@@ -205,7 +207,7 @@ QModelIndex AveragingDataModel::parent(const QModelIndex &index) const
 
 //=============================================================================================================
 
-QModelIndex AveragingDataModel::index(int row, int column, const QModelIndex &parent) const
+QModelIndex AveragingDataModel::index(int row, int column, const QModelIndex& parent) const
 {
     Q_UNUSED(parent);
     return createIndex(row, column);

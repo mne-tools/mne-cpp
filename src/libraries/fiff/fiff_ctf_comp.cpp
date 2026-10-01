@@ -34,7 +34,7 @@ using namespace Eigen;
 
 FiffCtfComp::FiffCtfComp()
 : ctfkind(-1)
-, kind (-1)
+, kind(-1)
 , save_calibrated(false)
 , data(new FiffNamedMatrix())
 {
@@ -42,7 +42,7 @@ FiffCtfComp::FiffCtfComp()
 
 //=============================================================================================================
 
-FiffCtfComp::FiffCtfComp(const FiffCtfComp &p_FiffCtfComp)
+FiffCtfComp::FiffCtfComp(const FiffCtfComp& p_FiffCtfComp)
 : ctfkind(p_FiffCtfComp.ctfkind)
 , kind(p_FiffCtfComp.kind)
 , save_calibrated(p_FiffCtfComp.save_calibrated)

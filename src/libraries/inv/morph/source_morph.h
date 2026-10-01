@@ -99,7 +99,10 @@ public:
      *
      * @return True if the morph matrix is available for apply().
      */
-    bool isComputed() const { return m_bComputed; }
+    bool isComputed() const
+    {
+        return m_bComputed;
+    }
 
     //=========================================================================================================
     /**
@@ -107,13 +110,16 @@ public:
      *
      * @return Number of vertices in the target subject's source space.
      */
-    int nVerticesTo() const { return static_cast<int>(m_verticesTo.size()); }
+    int nVerticesTo() const
+    {
+        return static_cast<int>(m_verticesTo.size());
+    }
 
 private:
     bool m_bComputed = false;
     Eigen::VectorXi m_verticesFrom;
     Eigen::VectorXi m_verticesTo;
-    Eigen::SparseMatrix<double> m_morphMatrix;  /**< (nTo x nFrom) interpolation matrix. */
+    Eigen::SparseMatrix<double> m_morphMatrix; /**< (nTo x nFrom) interpolation matrix. */
 };
 
 } // namespace INVLIB

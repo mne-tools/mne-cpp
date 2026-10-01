@@ -97,10 +97,7 @@ MatrixXd SurfaceLaplacian::computeG(const MatrixXd& matCosAng,
     MatrixXd G = MatrixXd::Zero(nRows, nCols);
 
     for (int n = 1; n <= iNLegendreTerms; ++n) {
-        const double factor = static_cast<double>(2 * n + 1)
-                            / (std::pow(static_cast<double>(n), iStiffness)
-                             * std::pow(static_cast<double>(n + 1), iStiffness)
-                             * 4.0 * CSD_PI);
+        const double factor = static_cast<double>(2 * n + 1) / (std::pow(static_cast<double>(n), iStiffness) * std::pow(static_cast<double>(n + 1), iStiffness) * 4.0 * CSD_PI);
 
         for (Index i = 0; i < nRows * nCols; ++i)
             G.data()[i] += factor * legP(n, i);
@@ -124,10 +121,7 @@ MatrixXd SurfaceLaplacian::computeH(const MatrixXd& matCosAng,
     MatrixXd H = MatrixXd::Zero(nRows, nCols);
 
     for (int n = 1; n <= iNLegendreTerms; ++n) {
-        const double factor = static_cast<double>(2 * n + 1)
-                            / (std::pow(static_cast<double>(n), iStiffness - 1)
-                             * std::pow(static_cast<double>(n + 1), iStiffness - 1)
-                             * 4.0 * CSD_PI);
+        const double factor = static_cast<double>(2 * n + 1) / (std::pow(static_cast<double>(n), iStiffness - 1) * std::pow(static_cast<double>(n + 1), iStiffness - 1) * 4.0 * CSD_PI);
 
         for (Index i = 0; i < nRows * nCols; ++i)
             H.data()[i] += factor * legP(n, i);
@@ -216,17 +210,17 @@ MatrixXd SurfaceLaplacian::computeTransform(const MatrixX3d& matPositions,
 //=============================================================================================================
 
 SurfaceLaplacianResult SurfaceLaplacian::compute(const MatrixXd& matData,
-                                                  const MatrixX3d& matPositions,
-                                                  double dLambda2,
-                                                  int iStiffness,
-                                                  int iNLegendreTerms,
-                                                  double dSphereRadius)
+                                                 const MatrixX3d& matPositions,
+                                                 double dLambda2,
+                                                 int iStiffness,
+                                                 int iNLegendreTerms,
+                                                 double dSphereRadius)
 {
     SurfaceLaplacianResult result;
 
     if (matData.rows() != matPositions.rows()) {
         qWarning() << "[SurfaceLaplacian::compute] Data rows" << matData.rows()
-                    << "!= position rows" << matPositions.rows();
+                   << "!= position rows" << matPositions.rows();
         return result;
     }
 

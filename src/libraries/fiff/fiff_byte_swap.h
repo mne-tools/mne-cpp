@@ -49,9 +49,9 @@ namespace FIFFLIB
  */
 inline qint16 swap_short(qint16 source)
 {
-    auto *csource = reinterpret_cast<unsigned char *>(&source);
+    auto* csource = reinterpret_cast<unsigned char*>(&source);
     qint16 result;
-    auto *cresult = reinterpret_cast<unsigned char *>(&result);
+    auto* cresult = reinterpret_cast<unsigned char*>(&result);
     cresult[0] = csource[1];
     cresult[1] = csource[0];
     return result;
@@ -67,9 +67,9 @@ inline qint16 swap_short(qint16 source)
  */
 inline qint32 swap_int(qint32 source)
 {
-    auto *csource = reinterpret_cast<unsigned char *>(&source);
+    auto* csource = reinterpret_cast<unsigned char*>(&source);
     qint32 result;
-    auto *cresult = reinterpret_cast<unsigned char *>(&result);
+    auto* cresult = reinterpret_cast<unsigned char*>(&result);
     cresult[0] = csource[3];
     cresult[1] = csource[2];
     cresult[2] = csource[1];
@@ -83,12 +83,16 @@ inline qint32 swap_int(qint32 source)
  *
  * @param[in, out] source   Pointer to the value whose four bytes are reversed in place.
  */
-inline void swap_intp(qint32 *source)
+inline void swap_intp(qint32* source)
 {
-    auto *csource = reinterpret_cast<unsigned char *>(source);
+    auto* csource = reinterpret_cast<unsigned char*>(source);
     unsigned char c;
-    c = csource[3]; csource[3] = csource[0]; csource[0] = c;
-    c = csource[2]; csource[2] = csource[1]; csource[1] = c;
+    c = csource[3];
+    csource[3] = csource[0];
+    csource[0] = c;
+    c = csource[2];
+    csource[2] = csource[1];
+    csource[1] = c;
 }
 
 //=============================================================================================================
@@ -101,9 +105,9 @@ inline void swap_intp(qint32 *source)
  */
 inline qint64 swap_long(qint64 source)
 {
-    auto *csource = reinterpret_cast<unsigned char *>(&source);
+    auto* csource = reinterpret_cast<unsigned char*>(&source);
     qint64 result;
-    auto *cresult = reinterpret_cast<unsigned char *>(&result);
+    auto* cresult = reinterpret_cast<unsigned char*>(&result);
     cresult[0] = csource[7];
     cresult[1] = csource[6];
     cresult[2] = csource[5];
@@ -121,14 +125,22 @@ inline qint64 swap_long(qint64 source)
  *
  * @param[in, out] source   Pointer to the value whose eight bytes are reversed in place.
  */
-inline void swap_longp(qint64 *source)
+inline void swap_longp(qint64* source)
 {
-    auto *csource = reinterpret_cast<unsigned char *>(source);
+    auto* csource = reinterpret_cast<unsigned char*>(source);
     unsigned char c;
-    c = csource[0]; csource[0] = csource[7]; csource[7] = c;
-    c = csource[1]; csource[1] = csource[6]; csource[6] = c;
-    c = csource[2]; csource[2] = csource[5]; csource[5] = c;
-    c = csource[3]; csource[3] = csource[4]; csource[4] = c;
+    c = csource[0];
+    csource[0] = csource[7];
+    csource[7] = c;
+    c = csource[1];
+    csource[1] = csource[6];
+    csource[6] = c;
+    c = csource[2];
+    csource[2] = csource[5];
+    csource[5] = c;
+    c = csource[3];
+    csource[3] = csource[4];
+    csource[4] = c;
 }
 
 //=============================================================================================================
@@ -141,9 +153,9 @@ inline void swap_longp(qint64 *source)
  */
 inline float swap_float(float source)
 {
-    auto *csource = reinterpret_cast<unsigned char *>(&source);
+    auto* csource = reinterpret_cast<unsigned char*>(&source);
     float result;
-    auto *cresult = reinterpret_cast<unsigned char *>(&result);
+    auto* cresult = reinterpret_cast<unsigned char*>(&result);
     cresult[0] = csource[3];
     cresult[1] = csource[2];
     cresult[2] = csource[1];
@@ -157,12 +169,16 @@ inline float swap_float(float source)
  *
  * @param[in, out] source   Pointer to the value whose four bytes are reversed in place.
  */
-inline void swap_floatp(float *source)
+inline void swap_floatp(float* source)
 {
-    auto *csource = reinterpret_cast<unsigned char *>(source);
+    auto* csource = reinterpret_cast<unsigned char*>(source);
     unsigned char c;
-    c = csource[3]; csource[3] = csource[0]; csource[0] = c;
-    c = csource[2]; csource[2] = csource[1]; csource[1] = c;
+    c = csource[3];
+    csource[3] = csource[0];
+    csource[0] = c;
+    c = csource[2];
+    csource[2] = csource[1];
+    csource[1] = c;
 }
 
 //=============================================================================================================
@@ -171,14 +187,22 @@ inline void swap_floatp(float *source)
  *
  * @param[in, out] source   Pointer to the value whose eight bytes are reversed in place.
  */
-inline void swap_doublep(double *source)
+inline void swap_doublep(double* source)
 {
-    auto *csource = reinterpret_cast<unsigned char *>(source);
+    auto* csource = reinterpret_cast<unsigned char*>(source);
     unsigned char c;
-    c = csource[7]; csource[7] = csource[0]; csource[0] = c;
-    c = csource[6]; csource[6] = csource[1]; csource[1] = c;
-    c = csource[5]; csource[5] = csource[2]; csource[2] = c;
-    c = csource[4]; csource[4] = csource[3]; csource[3] = c;
+    c = csource[7];
+    csource[7] = csource[0];
+    csource[0] = c;
+    c = csource[6];
+    csource[6] = csource[1];
+    csource[1] = c;
+    c = csource[5];
+    csource[5] = csource[2];
+    csource[2] = c;
+    c = csource[4];
+    csource[4] = csource[3];
+    csource[3] = c;
 }
 
 } // NAMESPACE FIFFLIB

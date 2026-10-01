@@ -96,17 +96,17 @@ signals:
 private:
     static QVector<float> hanning(int N, short itype);
 
-    qint32              m_iFftLength;       /**< FFT window length. */
-    double              m_dFs;              /**< Sampling frequency. */
-    qint32              m_iDataLength;      /**< Number of blocks to accumulate. */
-    QVector<float>      m_fWin;             /**< Hanning window coefficients. */
+    qint32 m_iFftLength;   /**< FFT window length. */
+    double m_dFs;          /**< Sampling frequency. */
+    qint32 m_iDataLength;  /**< Number of blocks to accumulate. */
+    QVector<float> m_fWin; /**< Hanning window coefficients. */
 
-    int                 m_iNumOfBlocks = 0; /**< Total blocks to accumulate. */
-    int                 m_iBlockSize = 0;   /**< Columns per block. */
-    int                 m_iSensors = 0;     /**< Number of sensor rows. */
-    int                 m_iBlockIndex = 0;  /**< Current block write index. */
-    bool                m_bFirstBlock = true;/**< True until first block arrives. */
-    Eigen::MatrixXd     m_matCircBuf;       /**< Circular accumulation buffer. */
+    int m_iNumOfBlocks = 0;       /**< Total blocks to accumulate. */
+    int m_iBlockSize = 0;         /**< Columns per block. */
+    int m_iSensors = 0;           /**< Number of sensor rows. */
+    int m_iBlockIndex = 0;        /**< Current block write index. */
+    bool m_bFirstBlock = true;    /**< True until first block arrives. */
+    Eigen::MatrixXd m_matCircBuf; /**< Circular accumulation buffer. */
 };
 
 //=============================================================================================================
@@ -118,8 +118,8 @@ class DSPSHARED_EXPORT RtNoise : public QObject
     Q_OBJECT
 
 public:
-    typedef QSharedPointer<RtNoise> SPtr;             /**< Shared pointer type for RtNoise. */
-    typedef QSharedPointer<const RtNoise> ConstSPtr;  /**< Const shared pointer type for RtNoise. */
+    typedef QSharedPointer<RtNoise> SPtr;            /**< Shared pointer type for RtNoise. */
+    typedef QSharedPointer<const RtNoise> ConstSPtr; /**< Const shared pointer type for RtNoise. */
 
     //=========================================================================================================
     /**
@@ -133,7 +133,7 @@ public:
     explicit RtNoise(qint32 iFftLength,
                      FIFFLIB::FiffInfo::SPtr pFiffInfo,
                      qint32 iDataLength,
-                     QObject *parent = nullptr);
+                     QObject* parent = nullptr);
 
     //=========================================================================================================
     /**
@@ -195,8 +195,8 @@ signals:
     void operate(const Eigen::MatrixXd& matData);
 
 private:
-    QThread             m_workerThread;     /**< The worker thread. */
-    bool                m_bIsRunning = false;/**< Running state flag. */
+    QThread m_workerThread;    /**< The worker thread. */
+    bool m_bIsRunning = false; /**< Running state flag. */
 };
 
 //=============================================================================================================

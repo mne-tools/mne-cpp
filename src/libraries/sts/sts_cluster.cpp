@@ -86,8 +86,10 @@ StatsClusterResult StatsCluster::permutationTest(
     // Step 4: Combine all data for permutation
     QVector<MatrixXd> allData;
     allData.reserve(nA + dataB.size());
-    for (const auto& m : dataA) allData.append(m);
-    for (const auto& m : dataB) allData.append(m);
+    for (const auto& m : dataA)
+        allData.append(m);
+    for (const auto& m : dataB)
+        allData.append(m);
 
     // Step 5: Build null distribution via permutations (using QtConcurrent)
     QVector<double> nullDist(nPermutations);
@@ -187,7 +189,8 @@ QPair<MatrixXi, QVector<double>> StatsCluster::findClusters(
                 double val = tMap(ch, t);
                 bool suprathreshold = positive ? (val > threshold) : (val < -threshold);
 
-                if (!suprathreshold || visited(ch, t)) continue;
+                if (!suprathreshold || visited(ch, t))
+                    continue;
 
                 // Start BFS for a new cluster
                 currentClusterId++;
@@ -206,7 +209,8 @@ QPair<MatrixXi, QVector<double>> StatsCluster::findClusters(
                     // Temporal neighbors (consecutive time points)
                     for (int dt = -1; dt <= 1; dt += 2) {
                         int nt = curT + dt;
-                        if (nt < 0 || nt >= nTimes) continue;
+                        if (nt < 0 || nt >= nTimes)
+                            continue;
                         double nval = tMap(curCh, nt);
                         bool nSupra = positive ? (nval > threshold) : (nval < -threshold);
                         if (nSupra && !visited(curCh, nt)) {
@@ -423,7 +427,8 @@ QPair<MatrixXi, QVector<double>> StatsCluster::findClustersFlat(
         double val = statMap(v, t);
 
         bool suprathreshold = positiveOnly ? (val > threshold) : (val < -threshold);
-        if (!suprathreshold || visited[idx]) continue;
+        if (!suprathreshold || visited[idx])
+            continue;
 
         currentClusterId++;
         double clusterSum = 0.0;
@@ -444,7 +449,8 @@ QPair<MatrixXi, QVector<double>> StatsCluster::findClustersFlat(
             // Iterate over adjacency neighbors
             for (SparseMatrix<int>::InnerIterator it(adjacency, curIdx); it; ++it) {
                 int nIdx = static_cast<int>(it.row());
-                if (visited[nIdx]) continue;
+                if (visited[nIdx])
+                    continue;
                 int nV = nIdx / nTimes;
                 int nT = nIdx % nTimes;
                 double nval = statMap(nV, nT);
@@ -493,13 +499,15 @@ double StatsCluster::permuteOnceOneSample(
     if (tail == StatsTailType::Both || tail == StatsTailType::Right) {
         auto [ids, stats] = findClustersFlat(tMap, threshold, adjacency, true);
         for (double s : stats) {
-            if (std::fabs(s) > maxStat) maxStat = std::fabs(s);
+            if (std::fabs(s) > maxStat)
+                maxStat = std::fabs(s);
         }
     }
     if (tail == StatsTailType::Both || tail == StatsTailType::Left) {
         auto [ids, stats] = findClustersFlat(tMap, threshold, adjacency, false);
         for (double s : stats) {
-            if (std::fabs(s) > maxStat) maxStat = std::fabs(s);
+            if (std::fabs(s) > maxStat)
+                maxStat = std::fabs(s);
         }
     }
 
@@ -545,7 +553,8 @@ double StatsCluster::permuteOnceFTest(
 
     double maxStat = 0.0;
     for (double s : stats) {
-        if (s > maxStat) maxStat = s;
+        if (s > maxStat)
+            maxStat = s;
     }
     return maxStat;
 }
@@ -579,8 +588,10 @@ StatsClusterResult StatsCluster::oneSamplePermutationTest(
 
     // Merge cluster ID maps
     MatrixXi clusterIds = MatrixXi::Zero(tObs.rows(), tObs.cols());
-    if (clusterIdsPos.size() > 0) clusterIds += clusterIdsPos;
-    if (clusterIdsNeg.size() > 0) clusterIds += clusterIdsNeg;
+    if (clusterIdsPos.size() > 0)
+        clusterIds += clusterIdsPos;
+    if (clusterIdsNeg.size() > 0)
+        clusterIds += clusterIdsNeg;
 
     // Step 3: Build null distribution via sign-flip permutations
     QVector<int> permIndices(nPermutations);
@@ -702,7 +713,8 @@ MatrixXd StatsCluster::tfce(
     // Helper: run TFCE on one polarity
     auto runTfce = [&](const MatrixXd& absMap, bool isPositive) {
         double maxVal = absMap.maxCoeff();
-        if (maxVal <= 0.0) return;
+        if (maxVal <= 0.0)
+            return;
 
         double dh = maxVal / static_cast<double>(nSteps);
 
@@ -716,7 +728,8 @@ MatrixXd StatsCluster::tfce(
                 int v = idx / nTimes;
                 int t = idx % nTimes;
 
-                if (absMap(v, t) < h || visited[idx]) continue;
+                if (absMap(v, t) < h || visited[idx])
+                    continue;
 
                 // BFS to find cluster
                 std::vector<int> cluster;
@@ -731,7 +744,8 @@ MatrixXd StatsCluster::tfce(
 
                     for (SparseMatrix<int>::InnerIterator it(adjacency, curIdx); it; ++it) {
                         int nIdx = static_cast<int>(it.row());
-                        if (visited[nIdx]) continue;
+                        if (visited[nIdx])
+                            continue;
                         int nV = nIdx / nTimes;
                         int nT = nIdx % nTimes;
                         if (absMap(nV, nT) >= h) {

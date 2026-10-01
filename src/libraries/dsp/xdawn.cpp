@@ -47,7 +47,8 @@ using namespace Eigen;
 // PRIVATE HELPERS
 //=============================================================================================================
 
-namespace {
+namespace
+{
 
 MatrixXd computePatterns(const MatrixXd& filters, const MatrixXd& dataCov)
 {
@@ -67,9 +68,9 @@ MatrixXd computePatterns(const MatrixXd& filters, const MatrixXd& dataCov)
 //=============================================================================================================
 
 XdawnResult Xdawn::fit(const QVector<MNEEpochData>& epochs,
-                       int                          iTargetEvent,
-                       int                          nComponents,
-                       double                       dReg)
+                       int iTargetEvent,
+                       int nComponents,
+                       double dReg)
 {
     XdawnResult result;
     result.iTargetEvent = iTargetEvent;
@@ -137,9 +138,9 @@ XdawnResult Xdawn::fit(const QVector<MNEEpochData>& epochs,
     result.matTargetEvoked = targetSum / static_cast<double>(nTarget);
 
     MatrixXd noiseCov = MatrixXd::Zero(nCh, nCh);
-    MatrixXd dataCov  = MatrixXd::Zero(nCh, nCh);
+    MatrixXd dataCov = MatrixXd::Zero(nCh, nCh);
     long long nNoiseSamples = 0;
-    long long nDataSamples  = 0;
+    long long nDataSamples = 0;
 
     QHash<int, MatrixXd> classMeans;
     for (auto it = classSums.constBegin(); it != classSums.constEnd(); ++it) {
@@ -150,9 +151,9 @@ XdawnResult Xdawn::fit(const QVector<MNEEpochData>& epochs,
         const MNEEpochData& ep = epochs[idx];
         const MatrixXd residual = ep.epoch - classMeans.value(ep.event);
 
-        dataCov  += ep.epoch * ep.epoch.transpose();
+        dataCov += ep.epoch * ep.epoch.transpose();
         noiseCov += residual * residual.transpose();
-        nDataSamples  += nSamp;
+        nDataSamples += nSamp;
         nNoiseSamples += nSamp;
     }
 
@@ -162,8 +163,8 @@ XdawnResult Xdawn::fit(const QVector<MNEEpochData>& epochs,
     }
 
     result.matSignalCov = result.matTargetEvoked * result.matTargetEvoked.transpose() / static_cast<double>(nSamp);
-    result.matNoiseCov  = noiseCov / static_cast<double>(nNoiseSamples);
-    dataCov             = dataCov  / static_cast<double>(nDataSamples);
+    result.matNoiseCov = noiseCov / static_cast<double>(nNoiseSamples);
+    dataCov = dataCov / static_cast<double>(nDataSamples);
 
     const double traceNoise = result.matNoiseCov.trace();
     const double regValue = std::max(dReg, 0.0) * ((traceNoise > 0.0) ? traceNoise / static_cast<double>(nCh) : 1.0);
@@ -197,9 +198,7 @@ XdawnResult Xdawn::fit(const QVector<MNEEpochData>& epochs,
     result.matFilters = invSqrtNoise * signalVecs;
 
     for (int col = 0; col < result.matFilters.cols(); ++col) {
-        const double noiseNorm = std::sqrt(result.matFilters.col(col).transpose()
-                                           * regNoiseCov
-                                           * result.matFilters.col(col));
+        const double noiseNorm = std::sqrt(result.matFilters.col(col).transpose() * regNoiseCov * result.matFilters.col(col));
         if (noiseNorm > 1e-12) {
             result.matFilters.col(col) /= noiseNorm;
         }
@@ -243,7 +242,7 @@ MatrixXd Xdawn::denoise(const MatrixXd& matEpoch, const XdawnResult& result, int
         nComponents = result.matFilters.cols();
     }
 
-    MatrixXd filters  = result.matFilters.leftCols(nComponents);
+    MatrixXd filters = result.matFilters.leftCols(nComponents);
     MatrixXd patterns = result.matPatterns.leftCols(nComponents);
 
     return patterns * (filters.transpose() * matEpoch);
@@ -252,8 +251,8 @@ MatrixXd Xdawn::denoise(const MatrixXd& matEpoch, const XdawnResult& result, int
 //=============================================================================================================
 
 QVector<MNEEpochData> Xdawn::denoiseEpochs(const QVector<MNEEpochData>& epochs,
-                                          const XdawnResult&           result,
-                                          int                          nComponents)
+                                           const XdawnResult& result,
+                                           int nComponents)
 {
     QVector<MNEEpochData> out = epochs;
     for (int i = 0; i < out.size(); ++i) {

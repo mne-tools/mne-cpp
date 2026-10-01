@@ -46,7 +46,7 @@ using namespace FIFFLIB;
 //=============================================================================================================
 
 TriggerDetectionView::TriggerDetectionView(const QString& sSettingsPath,
-                                           QWidget *parent,
+                                           QWidget* parent,
                                            Qt::WindowFlags f)
 : AbstractView(parent, f)
 , m_pUi(new Ui::TriggerDetectionViewWidget)
@@ -76,7 +76,7 @@ TriggerDetectionView::~TriggerDetectionView()
 
 void TriggerDetectionView::init(const FiffInfo::SPtr pFiffInfo)
 {
-    if(pFiffInfo) {
+    if (pFiffInfo) {
         m_pFiffInfo = pFiffInfo;
         //Trigger detection
         connect(m_pUi->m_checkBox_activateTriggerDetection, &QCheckBox::checkStateChanged,
@@ -84,8 +84,8 @@ void TriggerDetectionView::init(const FiffInfo::SPtr pFiffInfo)
 
         m_pUi->m_comboBox_triggerChannels->clear();
 
-        for(int i = 0; i<m_pFiffInfo->chs.size(); i++) {
-            if(m_pFiffInfo->chs[i].kind == FIFFV_STIM_CH) {
+        for (int i = 0; i < m_pFiffInfo->chs.size(); i++) {
+            if (m_pFiffInfo->chs[i].kind == FIFFV_STIM_CH) {
                 m_pUi->m_comboBox_triggerChannels->addItem(m_pFiffInfo->chs[i].ch_name);
             }
         }
@@ -102,7 +102,7 @@ void TriggerDetectionView::init(const FiffInfo::SPtr pFiffInfo)
         m_pUi->m_pushButton_triggerColor->setAutoFillBackground(true);
         m_pUi->m_pushButton_triggerColor->setFlat(true);
         QPalette* palette1 = new QPalette();
-        palette1->setColor(QPalette::Button,QColor(177,0,0));
+        palette1->setColor(QPalette::Button, QColor(177, 0, 0));
         m_pUi->m_pushButton_triggerColor->setPalette(*palette1);
         m_pUi->m_pushButton_triggerColor->update();
 
@@ -110,7 +110,7 @@ void TriggerDetectionView::init(const FiffInfo::SPtr pFiffInfo)
                 this, &TriggerDetectionView::onTriggerInfoChanged);
 
         connect(m_pUi->m_spinBox_detectionThresholdSecond, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged),
-                    this, &TriggerDetectionView::onTriggerInfoChanged);
+                this, &TriggerDetectionView::onTriggerInfoChanged);
 
         connect(m_pUi->m_pushButton_resetNumberTriggers, static_cast<void (QPushButton::*)(bool)>(&QPushButton::clicked),
                 this, &TriggerDetectionView::onResetTriggerNumbers);
@@ -124,19 +124,19 @@ void TriggerDetectionView::init(const FiffInfo::SPtr pFiffInfo)
 
 //=============================================================================================================
 
-void TriggerDetectionView::setNumberDetectedTriggersAndTypes(int numberDetections, const QMap<int,QList<QPair<int,double> > >& mapDetectedTriggers)
+void TriggerDetectionView::setNumberDetectedTriggersAndTypes(int numberDetections, const QMap<int, QList<QPair<int, double>>>& mapDetectedTriggers)
 {
     //if(m_bTriggerDetection) {
-        m_pUi->m_label_numberDetectedTriggers->setText(QString("%1").arg(numberDetections));
+    m_pUi->m_label_numberDetectedTriggers->setText(QString("%1").arg(numberDetections));
     //}
 
     //Set trigger types
-    QMapIterator<int,QList<QPair<int,double> > > i(mapDetectedTriggers);
+    QMapIterator<int, QList<QPair<int, double>>> i(mapDetectedTriggers);
     while (i.hasNext()) {
         i.next();
 
-        for(int j = 0; j < i.value().size(); ++j) {
-            if(m_pUi->m_comboBox_triggerColorType->findText(QString::number(i.value().at(j).second)) == -1) {
+        for (int j = 0; j < i.value().size(); ++j) {
+            if (m_pUi->m_comboBox_triggerColorType->findText(QString::number(i.value().at(j).second)) == -1) {
                 m_pUi->m_comboBox_triggerColorType->addItem(QString::number(i.value().at(j).second));
             }
         }
@@ -147,7 +147,7 @@ void TriggerDetectionView::setNumberDetectedTriggersAndTypes(int numberDetection
 
 void TriggerDetectionView::saveSettings()
 {
-    if(m_sSettingsPath.isEmpty()) {
+    if (m_sSettingsPath.isEmpty()) {
         return;
     }
 
@@ -161,8 +161,8 @@ void TriggerDetectionView::saveSettings()
     settings.beginGroup(m_sSettingsPath + QString("/TriggerDetectionView/Colors"));
     QMap<double, QColor>::const_iterator i = m_qMapTriggerColor.constBegin();
     while (i != m_qMapTriggerColor.constEnd()) {
-         settings.setValue(QString::number(i.key()), i.value());
-         ++i;
+        settings.setValue(QString::number(i.key()), i.value());
+        ++i;
     }
     settings.endGroup();
 }
@@ -171,7 +171,7 @@ void TriggerDetectionView::saveSettings()
 
 void TriggerDetectionView::loadSettings()
 {
-    if(m_sSettingsPath.isEmpty()) {
+    if (m_sSettingsPath.isEmpty()) {
         return;
     }
 
@@ -197,7 +197,7 @@ void TriggerDetectionView::loadSettings()
 
 void TriggerDetectionView::updateGuiMode(GuiMode mode)
 {
-    switch(mode) {
+    switch (mode) {
         case GuiMode::Clinical:
             break;
         default: // default is research mode
@@ -209,7 +209,7 @@ void TriggerDetectionView::updateGuiMode(GuiMode mode)
 
 void TriggerDetectionView::updateProcessingMode(ProcessingMode mode)
 {
-    switch(mode) {
+    switch (mode) {
         case ProcessingMode::Offline:
             m_pUi->label->hide();
             m_pUi->label_9->hide();
@@ -240,7 +240,7 @@ void TriggerDetectionView::onTriggerInfoChanged()
     emit triggerInfoChanged(m_qMapTriggerColor,
                             m_pUi->m_checkBox_activateTriggerDetection->isChecked(),
                             m_pUi->m_comboBox_triggerChannels->currentText(),
-                            m_pUi->m_doubleSpinBox_detectionThresholdFirst->value()*pow(10, m_pUi->m_spinBox_detectionThresholdSecond->value()));
+                            m_pUi->m_doubleSpinBox_detectionThresholdFirst->value() * pow(10, m_pUi->m_spinBox_detectionThresholdSecond->value()));
 
     saveSettings();
 }
@@ -255,7 +255,7 @@ void TriggerDetectionView::onRealTimeTriggerColorChanged(bool state)
 
     //Change color of pushbutton
     QPalette* palette1 = new QPalette();
-    palette1->setColor(QPalette::Button,color);
+    palette1->setColor(QPalette::Button, color);
     m_pUi->m_pushButton_triggerColor->setPalette(*palette1);
     m_pUi->m_pushButton_triggerColor->update();
 
@@ -266,11 +266,11 @@ void TriggerDetectionView::onRealTimeTriggerColorChanged(bool state)
 
 //=============================================================================================================
 
-void TriggerDetectionView::onRealTimeTriggerColorTypeChanged(const QString &value)
+void TriggerDetectionView::onRealTimeTriggerColorTypeChanged(const QString& value)
 {
     //Change color of pushbutton
     QPalette* palette1 = new QPalette();
-    palette1->setColor(QPalette::Button,m_qMapTriggerColor[value.toDouble()]);
+    palette1->setColor(QPalette::Button, m_qMapTriggerColor[value.toDouble()]);
     m_pUi->m_pushButton_triggerColor->setPalette(*palette1);
     m_pUi->m_pushButton_triggerColor->update();
 }
@@ -291,11 +291,11 @@ void TriggerDetectionView::onResetTriggerNumbers()
 
 void TriggerDetectionView::onDetectTriggers()
 {
-    if(m_pUi->m_comboBox_triggerChannels->currentText() == ""){
+    if (m_pUi->m_comboBox_triggerChannels->currentText() == "") {
         return;
     }
     emit detectTriggers(m_pUi->m_comboBox_triggerChannels->currentText(),
-                        m_pUi->m_doubleSpinBox_detectionThresholdFirst->value()*pow(10, m_pUi->m_spinBox_detectionThresholdSecond->value()));
+                        m_pUi->m_doubleSpinBox_detectionThresholdFirst->value() * pow(10, m_pUi->m_spinBox_detectionThresholdSecond->value()));
 }
 
 //=============================================================================================================
@@ -309,5 +309,4 @@ QString TriggerDetectionView::getSelectedStimChannel()
 
 void TriggerDetectionView::clearView()
 {
-
 }

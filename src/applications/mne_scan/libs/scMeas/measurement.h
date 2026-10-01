@@ -42,8 +42,8 @@ class SCMEASSHARED_EXPORT Measurement : public QObject
     Q_OBJECT
 
 public:
-    typedef QSharedPointer<Measurement> SPtr;               /**< Shared pointer type for Measurement. */
-    typedef QSharedPointer<const Measurement> ConstSPtr;    /**< Const shared pointer type for Measurement. */
+    typedef QSharedPointer<Measurement> SPtr;            /**< Shared pointer type for Measurement. */
+    typedef QSharedPointer<const Measurement> ConstSPtr; /**< Const shared pointer type for Measurement. */
 
     //=========================================================================================================
     /**
@@ -53,7 +53,7 @@ public:
      * @param[in] parent     the parent object.
      */
     explicit Measurement(int type = QMetaType::UnknownType,
-                         QObject *parent = 0);
+                         QObject* parent = 0);
 
     //=========================================================================================================
     /**
@@ -114,10 +114,10 @@ protected:
     inline void setType(int type);
 
 private:
-    mutable QMutex                      m_qMutex;           /**< Mutex to ensure thread safety. */
-    int                                 m_iMetaTypeId;      /**< QMetaType id of the Measurement. */
-    QString                             m_qString_Name;     /**< Name of the Measurement. */
-    bool                                m_bVisibility;      /**< Visibility status. */
+    mutable QMutex m_qMutex; /**< Mutex to ensure thread safety. */
+    int m_iMetaTypeId;       /**< QMetaType id of the Measurement. */
+    QString m_qString_Name;  /**< Name of the Measurement. */
+    bool m_bVisibility;      /**< Visibility status. */
 };
 
 //=============================================================================================================

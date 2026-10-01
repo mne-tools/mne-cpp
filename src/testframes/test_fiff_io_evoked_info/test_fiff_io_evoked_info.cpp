@@ -48,9 +48,18 @@ class TestFiffIoEvokedInfo : public QObject
 private:
     QString m_sTestDataPath;
 
-    QString rawPath() const { return m_sTestDataPath + "/MEG/sample/sample_audvis_trunc_raw.fif"; }
-    QString avePath() const { return m_sTestDataPath + "/MEG/sample/sample_audvis-ave.fif"; }
-    QString covPath() const { return m_sTestDataPath + "/MEG/sample/sample_audvis-cov.fif"; }
+    QString rawPath() const
+    {
+        return m_sTestDataPath + "/MEG/sample/sample_audvis_trunc_raw.fif";
+    }
+    QString avePath() const
+    {
+        return m_sTestDataPath + "/MEG/sample/sample_audvis-ave.fif";
+    }
+    QString covPath() const
+    {
+        return m_sTestDataPath + "/MEG/sample/sample_audvis-cov.fif";
+    }
 
 private slots:
     void initTestCase();
@@ -104,13 +113,14 @@ void TestFiffIoEvokedInfo::initTestCase()
 {
     qInstallMessageHandler(MNELogger::customLogWriter);
 
-    m_sTestDataPath = QCoreApplication::applicationDirPath()
-                      + "/../resources/data/mne-cpp-test-data";
+    m_sTestDataPath = QCoreApplication::applicationDirPath() + "/../resources/data/mne-cpp-test-data";
     QVERIFY2(QFile::exists(rawPath()),
              qPrintable(QString("Test data not found: %1").arg(rawPath())));
 }
 
-void TestFiffIoEvokedInfo::cleanupTestCase() {}
+void TestFiffIoEvokedInfo::cleanupTestCase()
+{
+}
 
 //=============================================================================================================
 // FiffIO tests
@@ -125,7 +135,6 @@ void TestFiffIoEvokedInfo::fiffIO_defaultConstruction()
 
 void TestFiffIoEvokedInfo::fiffIO_readRawFile()
 {
-
     QFile file(rawPath());
 
     FiffIO fio(file);
@@ -135,7 +144,6 @@ void TestFiffIoEvokedInfo::fiffIO_readRawFile()
 
 void TestFiffIoEvokedInfo::fiffIO_readAveFile()
 {
-
     QFile file(avePath());
 
     // Read the averaged data
@@ -146,7 +154,6 @@ void TestFiffIoEvokedInfo::fiffIO_readAveFile()
 
 void TestFiffIoEvokedInfo::fiffIO_writeRawRoundTrip()
 {
-
     QFile fileIn(rawPath());
 
     FiffIO fioIn(fileIn);
@@ -169,7 +176,6 @@ void TestFiffIoEvokedInfo::fiffIO_writeRawRoundTrip()
 
 void TestFiffIoEvokedInfo::fiffIO_setupRead()
 {
-
     QFile file(rawPath());
     FiffInfo info;
     FiffDirNode::SPtr dirTree;
@@ -192,7 +198,6 @@ void TestFiffIoEvokedInfo::evokedSet_defaultConstruction()
 
 void TestFiffIoEvokedInfo::evokedSet_readFromFile()
 {
-
     QFile file(avePath());
     FiffEvokedSet set;
     bool ok = FiffEvokedSet::read(file, set);
@@ -209,7 +214,6 @@ void TestFiffIoEvokedInfo::evokedSet_readFromFile()
 
 void TestFiffIoEvokedInfo::evokedSet_pickChannels()
 {
-
     QFile file(avePath());
     FiffEvokedSet set;
     FiffEvokedSet::read(file, set);
@@ -235,7 +239,6 @@ void TestFiffIoEvokedInfo::evokedSet_clear()
 
 void TestFiffIoEvokedInfo::evokedSet_copyConstruction()
 {
-
     QFile file(avePath());
     FiffEvokedSet set;
     FiffEvokedSet::read(file, set);
@@ -247,7 +250,6 @@ void TestFiffIoEvokedInfo::evokedSet_copyConstruction()
 
 void TestFiffIoEvokedInfo::evokedSet_saveAndReload()
 {
-
     QFile file(avePath());
     FiffEvokedSet setOrig;
     FiffEvokedSet::read(file, setOrig);
@@ -304,7 +306,6 @@ void TestFiffIoEvokedInfo::evokedSet_subtractBaseline()
 
 void TestFiffIoEvokedInfo::evokedSet_grandAverage()
 {
-
     QFile file(avePath());
     FiffEvokedSet set;
     FiffEvokedSet::read(file, set);
@@ -328,7 +329,7 @@ void TestFiffIoEvokedInfo::evokedSet_checkArtifacts()
     // Create synthetic epoch
     int nChan = 3;
     int nSamp = 100;
-    MatrixXd epoch = MatrixXd::Random(nChan, nSamp) * 1e-12;  // Small MEG-scale values
+    MatrixXd epoch = MatrixXd::Random(nChan, nSamp) * 1e-12; // Small MEG-scale values
 
     FiffInfo info;
     // Create minimal channel info
@@ -357,7 +358,7 @@ void TestFiffIoEvokedInfo::evokedSet_checkArtifacts()
     MatrixXd badEpoch = MatrixXd::Zero(nChan, nSamp);
     for (int c = 0; c < nChan; c++) {
         badEpoch(c, 0) = -1e-9;
-        badEpoch(c, 1) = 1e-9;  // pp = 2e-9 T, much larger than 4e-12 T reject
+        badEpoch(c, 1) = 1e-9; // pp = 2e-9 T, much larger than 4e-12 T reject
     }
     bool badEpochOk = FiffEvokedSet::checkArtifacts(badEpoch, info, QStringList(), rej, reason);
     // Large peak-to-peak should trigger rejection (returns false = artifact found)
@@ -378,7 +379,6 @@ void TestFiffIoEvokedInfo::fiffInfo_defaultConstruction()
 
 void TestFiffIoEvokedInfo::fiffInfo_copyConstruction()
 {
-
     QFile file(rawPath());
     FiffRawData raw(file);
     FiffInfo copy(raw.info);
@@ -390,7 +390,6 @@ void TestFiffIoEvokedInfo::fiffInfo_copyConstruction()
 
 void TestFiffIoEvokedInfo::fiffInfo_clear()
 {
-
     QFile file(rawPath());
     FiffRawData raw(file);
     FiffInfo info = raw.info;
@@ -403,13 +402,13 @@ void TestFiffIoEvokedInfo::fiffInfo_clear()
 
 void TestFiffIoEvokedInfo::fiffInfo_pickInfo()
 {
-
     QFile file(rawPath());
     FiffRawData raw(file);
 
     // Pick first 10 channels
     RowVectorXi sel(10);
-    for (int i = 0; i < 10; i++) sel(i) = i;
+    for (int i = 0; i < 10; i++)
+        sel(i) = i;
 
     FiffInfo picked = raw.info.pick_info(sel);
     QCOMPARE(picked.nchan, 10);
@@ -419,17 +418,15 @@ void TestFiffIoEvokedInfo::fiffInfo_pickInfo()
 
 void TestFiffIoEvokedInfo::fiffInfo_getCurrentComp()
 {
-
     QFile file(rawPath());
     FiffRawData raw(file);
 
     qint32 comp = raw.info.get_current_comp();
-    QVERIFY(comp >= 0);  // Neuromag data: grade 0
+    QVERIFY(comp >= 0); // Neuromag data: grade 0
 }
 
 void TestFiffIoEvokedInfo::fiffInfo_setCurrentComp()
 {
-
     QFile file(rawPath());
     FiffRawData raw(file);
     FiffInfo info = raw.info;
@@ -440,7 +437,6 @@ void TestFiffIoEvokedInfo::fiffInfo_setCurrentComp()
 
 void TestFiffIoEvokedInfo::fiffInfo_makeCompensator()
 {
-
     QFile file(rawPath());
     FiffRawData raw(file);
 
@@ -455,7 +451,6 @@ void TestFiffIoEvokedInfo::fiffInfo_makeCompensator()
 
 void TestFiffIoEvokedInfo::fiffInfo_writeToStream()
 {
-
     QFile file(rawPath());
     FiffRawData raw(file);
 
@@ -477,20 +472,18 @@ void TestFiffIoEvokedInfo::fiffInfo_writeToStream()
 
 void TestFiffIoEvokedInfo::fiffInfo_readMegEegChannels()
 {
-
     QList<FiffChInfo> chsp;
     int nmeg = 0, neeg = 0;
 
     bool ok = FiffInfo::readMegEegChannels(rawPath(), true, true, QStringList(),
                                            chsp, nmeg, neeg);
     QVERIFY(ok);
-    QVERIFY(nmeg > 0);  // Should find MEG channels
+    QVERIFY(nmeg > 0); // Should find MEG channels
     QVERIFY(chsp.size() == nmeg + neeg);
 }
 
 void TestFiffIoEvokedInfo::fiffInfo_print()
 {
-
     QFile file(rawPath());
     FiffRawData raw(file);
 
@@ -536,7 +529,6 @@ void TestFiffIoEvokedInfo::digitizerData_assignment()
 
 void TestFiffIoEvokedInfo::digitizerData_readFromFile()
 {
-
     QFile file(rawPath());
     FiffDigitizerData dd(file);
     // The raw file should have digitizer points
@@ -551,21 +543,27 @@ void TestFiffIoEvokedInfo::digitizerData_pickCardinalFiducials()
     FiffDigPoint dp1;
     dp1.kind = FIFFV_POINT_CARDINAL;
     dp1.ident = FIFFV_POINT_LPA;
-    dp1.r[0] = -0.07f; dp1.r[1] = 0.0f; dp1.r[2] = 0.0f;
+    dp1.r[0] = -0.07f;
+    dp1.r[1] = 0.0f;
+    dp1.r[2] = 0.0f;
     dp1.coord_frame = FIFFV_COORD_HEAD;
     dd.points.append(dp1);
 
     FiffDigPoint dp2;
     dp2.kind = FIFFV_POINT_CARDINAL;
     dp2.ident = FIFFV_POINT_RPA;
-    dp2.r[0] = 0.07f; dp2.r[1] = 0.0f; dp2.r[2] = 0.0f;
+    dp2.r[0] = 0.07f;
+    dp2.r[1] = 0.0f;
+    dp2.r[2] = 0.0f;
     dp2.coord_frame = FIFFV_COORD_HEAD;
     dd.points.append(dp2);
 
     FiffDigPoint dp3;
     dp3.kind = FIFFV_POINT_CARDINAL;
     dp3.ident = FIFFV_POINT_NASION;
-    dp3.r[0] = 0.0f; dp3.r[1] = 0.1f; dp3.r[2] = 0.0f;
+    dp3.r[0] = 0.0f;
+    dp3.r[1] = 0.1f;
+    dp3.r[2] = 0.0f;
     dp3.coord_frame = FIFFV_COORD_HEAD;
     dd.points.append(dp3);
 
@@ -590,7 +588,7 @@ void TestFiffIoEvokedInfo::digitizerData_pickCardinalFiducials()
 void TestFiffIoEvokedInfo::fileSharer_defaultConstruction()
 {
     FiffFileSharer sharer;
-    QVERIFY(true);  // Just verify construction doesn't crash
+    QVERIFY(true); // Just verify construction doesn't crash
 }
 
 void TestFiffIoEvokedInfo::fileSharer_withDirectory()
@@ -598,7 +596,7 @@ void TestFiffIoEvokedInfo::fileSharer_withDirectory()
     QTemporaryDir tmpDir;
     QVERIFY(tmpDir.isValid());
     FiffFileSharer sharer(tmpDir.path());
-    QVERIFY(true);  // Construction with valid directory shouldn't crash
+    QVERIFY(true); // Construction with valid directory shouldn't crash
 }
 
 //=============================================================================================================

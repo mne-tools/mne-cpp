@@ -138,7 +138,7 @@ static double responseMagnitudeAt(const VectorXd& response,
                                   double samplingFrequency,
                                   double frequencyHz)
 {
-    if(response.size() == 0 || samplingFrequency <= 0.0) {
+    if (response.size() == 0 || samplingFrequency <= 0.0) {
         return 0.0;
     }
 
@@ -157,14 +157,16 @@ class TestRtProcessingAveraging : public QObject
 private:
     QString m_sDataPath;
 
-    bool hasData() const { return !m_sDataPath.isEmpty(); }
+    bool hasData() const
+    {
+        return !m_sDataPath.isEmpty();
+    }
 
 private slots:
     void initTestCase()
     {
         qInstallMessageHandler(MNELogger::customLogWriter);
-        QString base = QCoreApplication::applicationDirPath()
-                       + "/../resources/data/mne-cpp-test-data";
+        QString base = QCoreApplication::applicationDirPath() + "/../resources/data/mne-cpp-test-data";
         if (QFile::exists(base + "/MEG/sample/sample_audvis_trunc_raw.fif"))
             m_sDataPath = base;
     }
@@ -302,9 +304,11 @@ private slots:
     //=========================================================================
     void data_rtAveraging_withRealInfo()
     {
-        if (!hasData()) QSKIP("No test data");
+        if (!hasData())
+            QSKIP("No test data");
         QFile file(m_sDataPath + "/MEG/sample/sample_audvis_trunc_raw.fif");
-        if (!file.exists()) QSKIP("Raw file not found");
+        if (!file.exists())
+            QSKIP("Raw file not found");
 
         FiffRawData raw(file);
         FiffInfo::SPtr info = FiffInfo::SPtr::create(raw.info);
@@ -317,7 +321,8 @@ private slots:
                 break;
             }
         }
-        if (stiIdx < 0) QSKIP("No stimulus channel found");
+        if (stiIdx < 0)
+            QSKIP("No stimulus channel found");
 
         RtAveraging avg(10, 50, 100, 0, 0, stiIdx, info);
         avg.setBaselineActive(true);
@@ -340,18 +345,21 @@ private slots:
     //=========================================================================
     void data_rtInvOp_withRealFwd()
     {
-        if (!hasData()) QSKIP("No test data");
+        if (!hasData())
+            QSKIP("No test data");
 
         QString fwdPath = m_sDataPath + "/Result/ref-sample_audvis-meg-eeg-oct-6-fwd.fif";
         QString rawPath = m_sDataPath + "/MEG/sample/sample_audvis_trunc_raw.fif";
 
         QFile fwdFile(fwdPath), rawFile(rawPath);
-        if (!fwdFile.exists() || !rawFile.exists()) QSKIP("Required files not found");
+        if (!fwdFile.exists() || !rawFile.exists())
+            QSKIP("Required files not found");
 
         MNEForwardSolution fwdSol(fwdFile);
         FiffRawData raw(rawFile);
 
-        if (fwdSol.isEmpty()) QSKIP("Forward solution empty");
+        if (fwdSol.isEmpty())
+            QSKIP("Forward solution empty");
 
         FiffInfo::SPtr info = FiffInfo::SPtr::create(raw.info);
         QSharedPointer<MNEForwardSolution> fwd(new MNEForwardSolution(fwdSol));
@@ -366,9 +374,11 @@ private slots:
     //=========================================================================
     void data_filterRealRawData()
     {
-        if (!hasData()) QSKIP("No test data");
+        if (!hasData())
+            QSKIP("No test data");
         QFile file(m_sDataPath + "/MEG/sample/sample_audvis_trunc_raw.fif");
-        if (!file.exists()) QSKIP("Raw file not found");
+        if (!file.exists())
+            QSKIP("Raw file not found");
 
         FiffRawData raw(file);
 
@@ -376,14 +386,15 @@ private slots:
         MatrixXd data, times;
         fiff_int_t from = raw.first_samp;
         fiff_int_t to = qMin(raw.first_samp + 1000, raw.last_samp);
-        if (!raw.read_raw_segment(data, times, from, to)) QSKIP("Segment read failed");
+        if (!raw.read_raw_segment(data, times, from, to))
+            QSKIP("Segment read failed");
 
         // Apply bandpass filter to a subset of channels
         int nCh = qMin(10, (int)data.rows());
         MatrixXd subset = data.topRows(nCh);
 
         FilterKernel kernel = FilterKernel("data_bp", 2, // BPF=2
-                                           256, 10.0/raw.info.sfreq, 30.0/raw.info.sfreq, 1.0/raw.info.sfreq,
+                                           256, 10.0 / raw.info.sfreq, 30.0 / raw.info.sfreq, 1.0 / raw.info.sfreq,
                                            raw.info.sfreq, 0);
 
         MatrixXd filtered = subset;
@@ -403,9 +414,11 @@ private slots:
     //=========================================================================
     void data_browserFilterOperator_handlesLongBlocks()
     {
-        if (!hasData()) QSKIP("No test data");
+        if (!hasData())
+            QSKIP("No test data");
         QFile file(m_sDataPath + "/MEG/sample/sample_audvis_trunc_raw.fif");
-        if (!file.exists()) QSKIP("Raw file not found");
+        if (!file.exists())
+            QSKIP("Raw file not found");
 
         FiffRawData raw(file);
 
@@ -413,7 +426,8 @@ private slots:
         const fiff_int_t from = raw.first_samp;
         const fiff_int_t to = qMin(raw.first_samp + static_cast<fiff_int_t>(raw.info.sfreq * 60.0f),
                                    raw.last_samp);
-        if (!raw.read_raw_segment(data, times, from, to)) QSKIP("Segment read failed");
+        if (!raw.read_raw_segment(data, times, from, to))
+            QSKIP("Segment read failed");
 
         QVERIFY(data.rows() > 0);
         QVERIFY(data.cols() > 4000);
@@ -424,8 +438,7 @@ private slots:
 
         const QList<FilterOperator::DesignMethod> methods = {
             FilterOperator::Cosine,
-            FilterOperator::Tschebyscheff
-        };
+            FilterOperator::Tschebyscheff};
 
         for (FilterOperator::DesignMethod method : methods) {
             FilterOperator filter(QStringLiteral("browser_filter"),
@@ -449,9 +462,11 @@ private slots:
     //=========================================================================
     void data_sessionFilter_handlesLongBlocks()
     {
-        if (!hasData()) QSKIP("No test data");
+        if (!hasData())
+            QSKIP("No test data");
         QFile file(m_sDataPath + "/MEG/sample/sample_audvis_trunc_raw.fif");
-        if (!file.exists()) QSKIP("Raw file not found");
+        if (!file.exists())
+            QSKIP("Raw file not found");
 
         FiffRawData raw(file);
 
@@ -459,7 +474,8 @@ private slots:
         const fiff_int_t from = raw.first_samp;
         const fiff_int_t to = qMin(raw.first_samp + static_cast<fiff_int_t>(raw.info.sfreq * 60.0f),
                                    raw.last_samp);
-        if (!raw.read_raw_segment(data, times, from, to)) QSKIP("Segment read failed");
+        if (!raw.read_raw_segment(data, times, from, to))
+            QSKIP("Segment read failed");
 
         QVERIFY(data.rows() > 0);
         QVERIFY(data.cols() > 4000);
@@ -477,7 +493,8 @@ private slots:
 
         QVERIFY(megIndex >= 0);
 
-        struct FilterCase {
+        struct FilterCase
+        {
             SessionFilter::DesignMethod designMethod;
             SessionFilter::FilterType filterType;
             int order;
@@ -487,13 +504,12 @@ private slots:
         };
 
         const QList<FilterCase> filterCases = {
-            {SessionFilter::DesignMethod::Cosine,        SessionFilter::FilterType::LowPass,  256, 40.0, 40.0, 5.0},
-            {SessionFilter::DesignMethod::Cosine,        SessionFilter::FilterType::HighPass, 256, 10.0, 10.0, 5.0},
-            {SessionFilter::DesignMethod::Tschebyscheff, SessionFilter::FilterType::BandPass, 256,  1.0, 40.0, 5.0},
+            {SessionFilter::DesignMethod::Cosine, SessionFilter::FilterType::LowPass, 256, 40.0, 40.0, 5.0},
+            {SessionFilter::DesignMethod::Cosine, SessionFilter::FilterType::HighPass, 256, 10.0, 10.0, 5.0},
+            {SessionFilter::DesignMethod::Tschebyscheff, SessionFilter::FilterType::BandPass, 256, 1.0, 40.0, 5.0},
             {SessionFilter::DesignMethod::Tschebyscheff, SessionFilter::FilterType::BandStop, 256, 48.0, 52.0, 2.0},
-            {SessionFilter::DesignMethod::Butterworth,   SessionFilter::FilterType::BandPass,   4,  1.0, 40.0, 5.0},
-            {SessionFilter::DesignMethod::Butterworth,   SessionFilter::FilterType::BandStop,   4, 48.0, 52.0, 2.0}
-        };
+            {SessionFilter::DesignMethod::Butterworth, SessionFilter::FilterType::BandPass, 4, 1.0, 40.0, 5.0},
+            {SessionFilter::DesignMethod::Butterworth, SessionFilter::FilterType::BandStop, 4, 48.0, 52.0, 2.0}};
 
         for (const FilterCase& filterCase : filterCases) {
             SessionFilter filter(QStringLiteral("session_filter"),
@@ -541,7 +557,8 @@ private slots:
     {
         const double samplingFrequency = 1000.0;
 
-        struct ResponseCase {
+        struct ResponseCase
+        {
             SessionFilter::DesignMethod designMethod;
             SessionFilter::FilterType filterType;
             int order;
@@ -555,13 +572,12 @@ private slots:
         };
 
         const QList<ResponseCase> responseCases = {
-            {SessionFilter::DesignMethod::Cosine,        SessionFilter::FilterType::LowPass,  80, 40.0, 40.0, 5.0,  5.0, 200.0, 0.70, 0.20},
-            {SessionFilter::DesignMethod::Cosine,        SessionFilter::FilterType::HighPass, 80, 10.0, 10.0, 5.0, 120.0,  2.0, 0.70, 0.20},
-            {SessionFilter::DesignMethod::Tschebyscheff, SessionFilter::FilterType::LowPass, 128, 40.0, 40.0, 5.0,  5.0, 200.0, 0.70, 0.20},
-            {SessionFilter::DesignMethod::Tschebyscheff, SessionFilter::FilterType::BandPass, 128, 10.0, 40.0, 5.0, 20.0, 120.0, 0.50, 0.30}
-        };
+            {SessionFilter::DesignMethod::Cosine, SessionFilter::FilterType::LowPass, 80, 40.0, 40.0, 5.0, 5.0, 200.0, 0.70, 0.20},
+            {SessionFilter::DesignMethod::Cosine, SessionFilter::FilterType::HighPass, 80, 10.0, 10.0, 5.0, 120.0, 2.0, 0.70, 0.20},
+            {SessionFilter::DesignMethod::Tschebyscheff, SessionFilter::FilterType::LowPass, 128, 40.0, 40.0, 5.0, 5.0, 200.0, 0.70, 0.20},
+            {SessionFilter::DesignMethod::Tschebyscheff, SessionFilter::FilterType::BandPass, 128, 10.0, 40.0, 5.0, 20.0, 120.0, 0.50, 0.30}};
 
-        for(const ResponseCase& responseCase : responseCases) {
+        for (const ResponseCase& responseCase : responseCases) {
             SessionFilter filter(QStringLiteral("response_filter"),
                                  responseCase.designMethod,
                                  responseCase.filterType,
@@ -608,9 +624,11 @@ private slots:
     //=========================================================================
     void data_computeAverageFromRawEvents()
     {
-        if (!hasData()) QSKIP("No test data");
+        if (!hasData())
+            QSKIP("No test data");
         QFile file(m_sDataPath + "/MEG/sample/sample_audvis_trunc_raw.fif");
-        if (!file.exists()) QSKIP("Raw file not found");
+        if (!file.exists())
+            QSKIP("Raw file not found");
 
         FiffRawData raw(file);
         const MatrixXi events = deriveStimEvents(raw);
@@ -641,9 +659,11 @@ private slots:
     //=========================================================================
     void data_sessionFilter_changesOfflineResults()
     {
-        if (!hasData()) QSKIP("No test data");
+        if (!hasData())
+            QSKIP("No test data");
         QFile file(m_sDataPath + "/MEG/sample/sample_audvis_trunc_raw.fif");
-        if (!file.exists()) QSKIP("Raw file not found");
+        if (!file.exists())
+            QSKIP("Raw file not found");
 
         FiffRawData raw(file);
         const MatrixXi events = deriveStimEvents(raw);
@@ -716,9 +736,11 @@ private slots:
     //=========================================================================
     void data_averageCategoriesFromRawEvents()
     {
-        if (!hasData()) QSKIP("No test data");
+        if (!hasData())
+            QSKIP("No test data");
         QFile file(m_sDataPath + "/MEG/sample/sample_audvis_trunc_raw.fif");
-        if (!file.exists()) QSKIP("Raw file not found");
+        if (!file.exists())
+            QSKIP("Raw file not found");
 
         FiffRawData raw(file);
         const MatrixXi events = deriveStimEvents(raw);
@@ -755,9 +777,11 @@ private slots:
     //=========================================================================
     void data_computeCovarianceFromRawEvents()
     {
-        if (!hasData()) QSKIP("No test data");
+        if (!hasData())
+            QSKIP("No test data");
         QFile file(m_sDataPath + "/MEG/sample/sample_audvis_trunc_raw.fif");
-        if (!file.exists()) QSKIP("Raw file not found");
+        if (!file.exists())
+            QSKIP("Raw file not found");
 
         FiffRawData raw(file);
         const MatrixXi events = deriveStimEvents(raw);
@@ -788,15 +812,18 @@ private slots:
     //=========================================================================
     void data_detectTriggers()
     {
-        if (!hasData()) QSKIP("No test data");
+        if (!hasData())
+            QSKIP("No test data");
         QFile file(m_sDataPath + "/MEG/sample/sample_audvis_trunc_raw.fif");
-        if (!file.exists()) QSKIP("Raw file not found");
+        if (!file.exists())
+            QSKIP("Raw file not found");
 
         FiffRawData raw(file);
 
         // Read full data
         MatrixXd data, times;
-        if (!raw.read_raw_segment(data, times)) QSKIP("Read failed");
+        if (!raw.read_raw_segment(data, times))
+            QSKIP("Read failed");
 
         // Find STI channel
         int stiIdx = -1;
@@ -806,10 +833,11 @@ private slots:
                 break;
             }
         }
-        if (stiIdx < 0) QSKIP("No STI channel");
+        if (stiIdx < 0)
+            QSKIP("No STI channel");
 
         // Detect triggers
-        QList<QPair<int,double>> triggers = RTPROCESSINGLIB::detectTriggerFlanksMax(data, stiIdx, 0, 0.0, false, 100);
+        QList<QPair<int, double>> triggers = RTPROCESSINGLIB::detectTriggerFlanksMax(data, stiIdx, 0, 0.0, false, 100);
         // May or may not find triggers depending on data content
         QVERIFY(true); // Exercise the code path
     }
@@ -819,10 +847,12 @@ private slots:
     //=========================================================================
     void data_evokedSetReadAndPick()
     {
-        if (!hasData()) QSKIP("No test data");
+        if (!hasData())
+            QSKIP("No test data");
         QString path = m_sDataPath + "/MEG/sample/sample_audvis-ave.fif";
         QFile file(path);
-        if (!file.exists()) QSKIP("Evoked file not found");
+        if (!file.exists())
+            QSKIP("Evoked file not found");
 
         FiffEvokedSet evokedSet(file);
         QVERIFY(evokedSet.evoked.size() > 0);
@@ -836,7 +866,9 @@ private slots:
         QCOMPARE(picked.info.nchan, picks.size());
     }
 
-    void cleanupTestCase() {}
+    void cleanupTestCase()
+    {
+    }
 };
 
 QTEST_GUILESS_MAIN(TestRtProcessingAveraging)

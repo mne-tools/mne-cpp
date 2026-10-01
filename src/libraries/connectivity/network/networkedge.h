@@ -46,7 +46,7 @@
 // EIGEN INCLUDES
 //=============================================================================================================
 
-#include<Eigen/Core>
+#include <Eigen/Core>
 
 //=============================================================================================================
 // FORWARD DECLARATIONS
@@ -56,7 +56,8 @@
 // DEFINE NAMESPACE CONNECTIVITYLIB
 //=============================================================================================================
 
-namespace CONNECTIVITYLIB {
+namespace CONNECTIVITYLIB
+{
 
 //=============================================================================================================
 // CONNECTIVITYLIB FORWARD DECLARATIONS
@@ -80,7 +81,6 @@ class NetworkNode;
 
 class CONNECTIVITYSHARED_EXPORT NetworkEdge
 {
-
 public:
     typedef QSharedPointer<NetworkEdge> SPtr;            /**< Shared pointer type for NetworkEdge. */
     typedef QSharedPointer<const NetworkEdge> ConstSPtr; /**< Const shared pointer type for NetworkEdge. */
@@ -171,7 +171,7 @@ public:
      *
      * @param[in] minMaxFreqBins        The new lower/upper bin to average from/to.
      */
-    void setFrequencyBins(const QPair<int, int> &minMaxFreqBins);
+    void setFrequencyBins(const QPair<int, int>& minMaxFreqBins);
 
     //=========================================================================================================
     /**
@@ -179,19 +179,19 @@ public:
      *
      * @return The current upper/lower bin to average from/to.
      */
-    const QPair<int,int>& getFrequencyBins();
+    const QPair<int, int>& getFrequencyBins();
 
 protected:
-    int             m_iStartNodeID;         /**< The start node of the edge.*/
-    int             m_iEndNodeID;           /**< The end node of the edge.*/
+    int m_iStartNodeID; /**< The start node of the edge.*/
+    int m_iEndNodeID;   /**< The end node of the edge.*/
 
-    bool            m_bIsActive;            /**< The activity flag indicating whether this edge is part of a thresholded network.*/
+    bool m_bIsActive; /**< The activity flag indicating whether this edge is part of a thresholded network.*/
 
-    QPair<int,int>  m_iMinMaxFreqBins;      /**< The lower/upper bin indeces to start avergaing from/to. Default is -1 which means an average over all weights.*/
+    QPair<int, int> m_iMinMaxFreqBins; /**< The lower/upper bin indeces to start avergaing from/to. Default is -1 which means an average over all weights.*/
 
-    Eigen::MatrixXd m_matWeight;            /**< The weight matrix of the edge. E.g. rows could be different frequency bins/bands and columns could be different instances in time.*/
+    Eigen::MatrixXd m_matWeight; /**< The weight matrix of the edge. E.g. rows could be different frequency bins/bands and columns could be different instances in time.*/
 
-    double          m_dAveragedWeight;      /**< The current averaged edge weight.*/
+    double m_dAveragedWeight; /**< The current averaged edge weight.*/
 };
 
 //=============================================================================================================

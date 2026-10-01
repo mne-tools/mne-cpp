@@ -72,9 +72,9 @@ class MNECTFCompData;
 class MNESHARED_EXPORT MNECTFCompDataSet
 {
 public:
-    typedef QSharedPointer<MNECTFCompDataSet> SPtr;             /**< Shared pointer type for MNECTFCompDataSet. */
-    typedef QSharedPointer<const MNECTFCompDataSet> ConstSPtr;  /**< Const shared pointer type for MNECTFCompDataSet. */
-    typedef std::unique_ptr<MNECTFCompDataSet> UPtr;            /**< Unique pointer type for MNECTFCompDataSet. */
+    typedef QSharedPointer<MNECTFCompDataSet> SPtr;            /**< Shared pointer type for MNECTFCompDataSet. */
+    typedef QSharedPointer<const MNECTFCompDataSet> ConstSPtr; /**< Const shared pointer type for MNECTFCompDataSet. */
+    typedef std::unique_ptr<MNECTFCompDataSet> UPtr;           /**< Unique pointer type for MNECTFCompDataSet. */
 
     //=========================================================================================================
     /**
@@ -136,9 +136,9 @@ public:
      *
      * @return Number of channels modified.
      */
-    static int set_comp(QList<FIFFLIB::FiffChInfo> &chs,
-                        int        nch,
-                        int        comp);
+    static int set_comp(QList<FIFFLIB::FiffChInfo>& chs,
+                        int nch,
+                        int comp);
 
     //=========================================================================================================
     /**
@@ -151,8 +151,8 @@ public:
      *
      * @return OK on success, FAIL on error.
      */
-    int apply(bool                 do_it,
-              Eigen::Ref<Eigen::VectorXf>     data,
+    int apply(bool do_it,
+              Eigen::Ref<Eigen::VectorXf> data,
               Eigen::Ref<const Eigen::VectorXf> compdata);
 
     //=========================================================================================================
@@ -164,8 +164,8 @@ public:
      *
      * @return OK on success, FAIL on error.
      */
-    int apply(bool                 do_it,
-              Eigen::Ref<Eigen::VectorXf>     data);
+    int apply(bool do_it,
+              Eigen::Ref<Eigen::VectorXf> data);
 
     //=========================================================================================================
     /**
@@ -177,8 +177,8 @@ public:
      *
      * @return OK on success, FAIL on error.
      */
-    int apply_transpose(bool              do_it,
-                        Eigen::MatrixXf&  data);
+    int apply_transpose(bool do_it,
+                        Eigen::MatrixXf& data);
 
     //=========================================================================================================
     /**
@@ -190,7 +190,7 @@ public:
      * @return The uniform compensation grade, or FAIL if channels have
      *         inconsistent compensation.
      */
-    static int get_comp(const QList<FIFFLIB::FiffChInfo>& chs,int nch);
+    static int get_comp(const QList<FIFFLIB::FiffChInfo>& chs, int nch);
 
     //=========================================================================================================
     /**
@@ -233,12 +233,12 @@ public:
                          int ncomp_chan);
 
 public:
-    std::vector<std::unique_ptr<MNECTFCompData>> comps;   /**< All available compensation data sets. */
-    int            ncomp;           /**< Number of compensation data sets. */
-    QList<FIFFLIB::FiffChInfo>     chs;    /**< Channel information associated with compensation. */
-    int            nch;             /**< Number of channels. */
-    std::unique_ptr<MNECTFCompData> undo;           /**< Compensation data to undo the current state. */
-    std::unique_ptr<MNECTFCompData> current;        /**< Compiled compensation operator for the current target grade. */
+    std::vector<std::unique_ptr<MNECTFCompData>> comps; /**< All available compensation data sets. */
+    int ncomp;                                          /**< Number of compensation data sets. */
+    QList<FIFFLIB::FiffChInfo> chs;                     /**< Channel information associated with compensation. */
+    int nch;                                            /**< Number of channels. */
+    std::unique_ptr<MNECTFCompData> undo;               /**< Compensation data to undo the current state. */
+    std::unique_ptr<MNECTFCompData> current;            /**< Compiled compensation operator for the current target grade. */
 };
 
 //=============================================================================================================

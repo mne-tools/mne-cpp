@@ -45,13 +45,13 @@ using namespace Eigen;
 //=============================================================================================================
 
 MultitaperPsdResult MultitaperPsd::compute(const MatrixXd& matData,
-                                            double          sfreq,
-                                            double          halfBandwidth,
-                                            int             nTapers,
-                                            int             nFft)
+                                           double sfreq,
+                                           double halfBandwidth,
+                                           int nTapers,
+                                           int nFft)
 {
     const int nChannels = static_cast<int>(matData.rows());
-    const int nTimes    = static_cast<int>(matData.cols());
+    const int nTimes = static_cast<int>(matData.cols());
 
     if (nFft < 0)
         nFft = nTimes;
@@ -83,8 +83,7 @@ MultitaperPsdResult MultitaperPsd::compute(const MatrixXd& matData,
 
         for (int t = 0; t < nTap; ++t) {
             // Apply taper element-wise
-            VectorXd tapered = matData.row(ch).transpose().array()
-                             * dpss.matTapers.row(t).transpose().array();
+            VectorXd tapered = matData.row(ch).transpose().array() * dpss.matTapers.row(t).transpose().array();
 
             // Zero-pad to nFft if needed
             VectorXd padded = VectorXd::Zero(nFft);

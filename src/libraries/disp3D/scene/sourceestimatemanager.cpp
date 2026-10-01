@@ -30,8 +30,8 @@
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-SourceEstimateManager::SourceEstimateManager(QObject *parent)
-    : QObject(parent)
+SourceEstimateManager::SourceEstimateManager(QObject* parent)
+: QObject(parent)
 {
 }
 
@@ -56,9 +56,9 @@ void SourceEstimateManager::cancelLoading()
 
 //=============================================================================================================
 
-bool SourceEstimateManager::load(const QString &lhPath, const QString &rhPath,
-                                  const QMap<QString, std::shared_ptr<BrainSurface>> &surfaces,
-                                  const QString &activeSurfaceType)
+bool SourceEstimateManager::load(const QString& lhPath, const QString& rhPath,
+                                 const QMap<QString, std::shared_ptr<BrainSurface>>& surfaces,
+                                 const QString& activeSurfaceType)
 {
     if (m_isLoading) {
         qWarning() << "SourceEstimateManager: STC loading already in progress";
@@ -66,8 +66,8 @@ bool SourceEstimateManager::load(const QString &lhPath, const QString &rhPath,
     }
 
     // Find surfaces for the active surface type
-    BrainSurface *lhSurface = nullptr;
-    BrainSurface *rhSurface = nullptr;
+    BrainSurface* lhSurface = nullptr;
+    BrainSurface* rhSurface = nullptr;
 
     const QString lhKey = "lh_" + activeSurfaceType;
     const QString rhKey = "rh_" + activeSurfaceType;
@@ -94,8 +94,8 @@ bool SourceEstimateManager::load(const QString &lhPath, const QString &rhPath,
 
     if (!lhSurface && !rhSurface) {
         qWarning() << "SourceEstimateManager: No surfaces available for STC loading."
-                    << "Active surface type:" << activeSurfaceType
-                    << "Available keys:" << surfaces.keys();
+                   << "Active surface type:" << activeSurfaceType
+                   << "Available keys:" << surfaces.keys();
         return false;
     }
 
@@ -174,11 +174,12 @@ void SourceEstimateManager::onStcLoadingFinished(bool success)
 //=============================================================================================================
 
 void SourceEstimateManager::setTimePoint(int index,
-                                          const QMap<QString, std::shared_ptr<BrainSurface>> &surfaces,
-                                          const SubView &singleView,
-                                          const QVector<SubView> &subViews)
+                                         const QMap<QString, std::shared_ptr<BrainSurface>>& surfaces,
+                                         const SubView& singleView,
+                                         const QVector<SubView>& subViews)
 {
-    if (!m_overlay || !m_overlay->isLoaded()) return;
+    if (!m_overlay || !m_overlay->isLoaded())
+        return;
 
     m_currentTimePoint = qBound(0, index, m_overlay->numTimePoints() - 1);
 
@@ -190,7 +191,7 @@ void SourceEstimateManager::setTimePoint(int index,
 
     // Apply source estimate to surfaces matching ANY active type
     for (auto it = surfaces.begin(); it != surfaces.end(); ++it) {
-        for (const QString &type : activeTypes) {
+        for (const QString& type : activeTypes) {
             if (it.key().endsWith(type)) {
                 m_overlay->applyToSurface(it.value().get(), m_currentTimePoint);
                 break;
@@ -226,12 +227,14 @@ int SourceEstimateManager::numTimePoints() const
 
 int SourceEstimateManager::closestIndex(float timeSec) const
 {
-    if (!m_overlay || !m_overlay->isLoaded()) return -1;
+    if (!m_overlay || !m_overlay->isLoaded())
+        return -1;
 
     const float t0 = m_overlay->tmin();
     const float dt = m_overlay->tstep();
     const int numPts = m_overlay->numTimePoints();
-    if (numPts <= 0 || dt <= 0.0f) return -1;
+    if (numPts <= 0 || dt <= 0.0f)
+        return -1;
 
     const int idx = qRound((timeSec - t0) / dt);
     return qBound(0, idx, numPts - 1);
@@ -239,7 +242,7 @@ int SourceEstimateManager::closestIndex(float timeSec) const
 
 //=============================================================================================================
 
-void SourceEstimateManager::setColormap(const QString &name)
+void SourceEstimateManager::setColormap(const QString& name)
 {
     if (m_overlay)
         m_overlay->setColormap(name);
@@ -258,9 +261,9 @@ void SourceEstimateManager::setThresholds(float min, float mid, float max)
 
 //=============================================================================================================
 
-void SourceEstimateManager::startStreaming(const QMap<QString, std::shared_ptr<BrainSurface>> &surfaces,
-                                            const SubView &singleView,
-                                            const QVector<SubView> &subViews)
+void SourceEstimateManager::startStreaming(const QMap<QString, std::shared_ptr<BrainSurface>>& surfaces,
+                                           const SubView& singleView,
+                                           const QVector<SubView>& subViews)
 {
     Q_UNUSED(surfaces)
     Q_UNUSED(singleView)
@@ -290,8 +293,8 @@ void SourceEstimateManager::startStreaming(const QMap<QString, std::shared_ptr<B
     // Propagate current visualization parameters
     m_rtController->setColormapType(m_overlay->colormap());
     m_rtController->setThresholds(m_overlay->thresholdMin(),
-                                   m_overlay->thresholdMid(),
-                                   m_overlay->thresholdMax());
+                                  m_overlay->thresholdMid(),
+                                  m_overlay->thresholdMax());
     m_rtController->setSFreq(1.0 / m_overlay->tstep());
 
     // Feed all STC time-points into the queue
@@ -315,7 +318,8 @@ void SourceEstimateManager::startStreaming(const QMap<QString, std::shared_ptr<B
 
 void SourceEstimateManager::stopStreaming()
 {
-    if (!m_isStreaming) return;
+    if (!m_isStreaming)
+        return;
 
     if (m_rtController)
         m_rtController->setStreamingState(false);
@@ -326,7 +330,7 @@ void SourceEstimateManager::stopStreaming()
 
 //=============================================================================================================
 
-void SourceEstimateManager::pushData(const Eigen::VectorXd &data)
+void SourceEstimateManager::pushData(const Eigen::VectorXd& data)
 {
     if (m_rtController)
         m_rtController->addData(data);
@@ -350,7 +354,7 @@ void SourceEstimateManager::setLooping(bool enabled)
 
 //=============================================================================================================
 
-const SourceEstimateOverlay *SourceEstimateManager::overlay() const
+const SourceEstimateOverlay* SourceEstimateManager::overlay() const
 {
     return m_overlay.get();
 }

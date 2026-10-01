@@ -49,7 +49,8 @@ using namespace Eigen;
 
 void EpochExtractor::applyBaseline(MatrixXd& matEpoch, int iBase0, int iBase1)
 {
-    if (iBase0 > iBase1 || iBase0 < 0 || iBase1 >= matEpoch.cols()) return;
+    if (iBase0 > iBase1 || iBase0 < 0 || iBase1 >= matEpoch.cols())
+        return;
     const int nBaseSamp = iBase1 - iBase0 + 1;
     // Per-channel baseline mean
     VectorXd baseline = matEpoch.block(0, iBase0, matEpoch.rows(), nBaseSamp).rowwise().mean();
@@ -60,27 +61,28 @@ void EpochExtractor::applyBaseline(MatrixXd& matEpoch, int iBase0, int iBase1)
 // PUBLIC
 //=============================================================================================================
 
-QVector<MNEEpochData> EpochExtractor::extract(const MatrixXd&     matData,
-                                               const QVector<int>& eventSamples,
-                                               double              dSFreq,
-                                               const Params&       params,
-                                               const QVector<int>& eventCodes)
+QVector<MNEEpochData> EpochExtractor::extract(const MatrixXd& matData,
+                                              const QVector<int>& eventSamples,
+                                              double dSFreq,
+                                              const Params& params,
+                                              const QVector<int>& eventCodes)
 {
     QVector<MNEEpochData> epochs;
 
-    if (matData.size() == 0 || eventSamples.isEmpty()) return epochs;
+    if (matData.size() == 0 || eventSamples.isEmpty())
+        return epochs;
     if (dSFreq <= 0.0) {
         qWarning() << "EpochExtractor::extract: invalid sampling frequency.";
         return epochs;
     }
 
-    const int nSamp     = static_cast<int>(matData.cols());
-    const int nCh       = static_cast<int>(matData.rows());
+    const int nSamp = static_cast<int>(matData.cols());
+    const int nCh = static_cast<int>(matData.rows());
 
     // Convert time to sample offsets
-    const int iOffset0  = static_cast<int>(std::round(params.dTmin * dSFreq));
-    const int iOffset1  = static_cast<int>(std::round(params.dTmax * dSFreq));
-    const int epochLen  = iOffset1 - iOffset0 + 1;
+    const int iOffset0 = static_cast<int>(std::round(params.dTmin * dSFreq));
+    const int iOffset1 = static_cast<int>(std::round(params.dTmax * dSFreq));
+    const int epochLen = iOffset1 - iOffset0 + 1;
 
     if (epochLen <= 0) {
         qWarning() << "EpochExtractor::extract: tmax must be > tmin.";
@@ -95,17 +97,18 @@ QVector<MNEEpochData> EpochExtractor::extract(const MatrixXd&     matData,
 
     for (int ev = 0; ev < eventSamples.size(); ++ev) {
         const int evSamp = eventSamples[ev];
-        const int s0     = evSamp + iOffset0;
-        const int s1     = evSamp + iOffset1;
+        const int s0 = evSamp + iOffset0;
+        const int s1 = evSamp + iOffset1;
 
         // Skip if epoch extends outside the recording
-        if (s0 < 0 || s1 >= nSamp) continue;
+        if (s0 < 0 || s1 >= nSamp)
+            continue;
 
         MNEEpochData epoch;
-        epoch.epoch  = matData.block(0, s0, nCh, epochLen);
-        epoch.tmin   = static_cast<float>(params.dTmin);
-        epoch.tmax   = static_cast<float>(params.dTmax);
-        epoch.event  = bHaveCodes ? eventCodes[ev] : 1;
+        epoch.epoch = matData.block(0, s0, nCh, epochLen);
+        epoch.tmin = static_cast<float>(params.dTmin);
+        epoch.tmax = static_cast<float>(params.dTmax);
+        epoch.event = bHaveCodes ? eventCodes[ev] : 1;
         epoch.bReject = false;
 
         // Baseline correction
@@ -139,7 +142,8 @@ MatrixXd EpochExtractor::average(const QVector<MNEEpochData>& epochs)
     int nGood = 0;
 
     for (const MNEEpochData& ep : epochs) {
-        if (ep.bReject) continue;
+        if (ep.bReject)
+            continue;
         if (result.size() == 0) {
             result = ep.epoch;
         } else {
@@ -152,7 +156,8 @@ MatrixXd EpochExtractor::average(const QVector<MNEEpochData>& epochs)
         ++nGood;
     }
 
-    if (nGood > 1) result /= static_cast<double>(nGood);
+    if (nGood > 1)
+        result /= static_cast<double>(nGood);
     return result;
 }
 
@@ -163,7 +168,8 @@ QVector<MNEEpochData> EpochExtractor::rejectMarked(const QVector<MNEEpochData>& 
     QVector<MNEEpochData> good;
     good.reserve(epochs.size());
     for (const MNEEpochData& ep : epochs) {
-        if (!ep.bReject) good.append(ep);
+        if (!ep.bReject)
+            good.append(ep);
     }
     return good;
 }

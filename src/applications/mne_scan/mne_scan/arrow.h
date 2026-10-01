@@ -50,27 +50,45 @@ namespace MNESCAN
 class Arrow : public QGraphicsLineItem
 {
 public:
-    enum { Type = UserType + 4 };
+    enum
+    {
+        Type = UserType + 4
+    };
 
-    Arrow(PluginItem *startItem, PluginItem *endItem, SCSHAREDLIB::PluginConnectorConnection::SPtr &connection, QGraphicsItem *parent = 0);
+    Arrow(PluginItem* startItem, PluginItem* endItem, SCSHAREDLIB::PluginConnectorConnection::SPtr& connection, QGraphicsItem* parent = 0);
 
-    int type() const { return Type; }
+    int type() const
+    {
+        return Type;
+    }
     QRectF boundingRect() const;
     QPainterPath shape() const;
-    void setColor(const QColor &color) { m_qColor = color; }
-    PluginItem *startItem() const { return m_StartItem; }
-    PluginItem *endItem() const { return m_EndItem; }
+    void setColor(const QColor& color)
+    {
+        m_qColor = color;
+    }
+    PluginItem* startItem() const
+    {
+        return m_StartItem;
+    }
+    PluginItem* endItem() const
+    {
+        return m_EndItem;
+    }
 
-    SCSHAREDLIB::PluginConnectorConnection::SPtr connection() { return m_pConnection; }
+    SCSHAREDLIB::PluginConnectorConnection::SPtr connection()
+    {
+        return m_pConnection;
+    }
 
     void updatePosition();
 
 protected:
-    void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget = 0);
+    void paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget = 0);
 
 private:
-    PluginItem *m_StartItem;
-    PluginItem *m_EndItem;
+    PluginItem* m_StartItem;
+    PluginItem* m_EndItem;
 
     SCSHAREDLIB::PluginConnectorConnection::SPtr m_pConnection;
 

@@ -40,39 +40,39 @@ using namespace Eigen;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-QSharedPointer<SparseMatrix<float> > Interpolation::createInterpolationMat(const VectorXi &vecProjectedSensors,
-                                                                             const QSharedPointer<MatrixXd> matDistanceTable,
-                                                                             double (*interpolationFunction) (double),
-                                                                             const double dCancelDist,
-                                                                             const VectorXi &vecExcludeIndex)
+QSharedPointer<SparseMatrix<float>> Interpolation::createInterpolationMat(const VectorXi& vecProjectedSensors,
+                                                                          const QSharedPointer<MatrixXd> matDistanceTable,
+                                                                          double (*interpolationFunction)(double),
+                                                                          const double dCancelDist,
+                                                                          const VectorXi& vecExcludeIndex)
 {
-    if(matDistanceTable->rows() == 0 && matDistanceTable->cols() == 0) {
+    if (matDistanceTable->rows() == 0 && matDistanceTable->cols() == 0) {
         qDebug() << "[WARNING] Interpolation::createInterpolationMat - received an empty distance table.";
-        return QSharedPointer<SparseMatrix<float> >::create();
+        return QSharedPointer<SparseMatrix<float>>::create();
     }
 
-    QSharedPointer<Eigen::SparseMatrix<float> > matInterpolationMatrix = QSharedPointer<SparseMatrix<float> >::create(matDistanceTable->rows(), static_cast<int>(vecProjectedSensors.size()));
+    QSharedPointer<Eigen::SparseMatrix<float>> matInterpolationMatrix = QSharedPointer<SparseMatrix<float>>::create(matDistanceTable->rows(), static_cast<int>(vecProjectedSensors.size()));
 
-    QVector<Triplet<float> > vecNonZeroEntries;
+    QVector<Triplet<float>> vecNonZeroEntries;
     const qint32 iRows = matInterpolationMatrix->rows();
     const qint32 iCols = matInterpolationMatrix->cols();
 
     // Build exclude set for O(1) lookup
     std::unordered_set<int> excludeSet;
-    for(Eigen::Index i = 0; i < vecExcludeIndex.size(); ++i) {
+    for (Eigen::Index i = 0; i < vecExcludeIndex.size(); ++i) {
         excludeSet.insert(vecExcludeIndex[i]);
     }
 
     QSet<qint32> sensorLookup;
-    for(Eigen::Index idx = 0; idx < vecProjectedSensors.size(); ++idx){
-        if(excludeSet.count(static_cast<int>(idx)) == 0){
+    for (Eigen::Index idx = 0; idx < vecProjectedSensors.size(); ++idx) {
+        if (excludeSet.count(static_cast<int>(idx)) == 0) {
             sensorLookup.insert(vecProjectedSensors[idx]);
         }
     }
 
     for (qint32 r = 0; r < iRows; ++r) {
         if (sensorLookup.contains(r) == false) {
-            QVector<QPair<qint32, float> > vecBelowThresh;
+            QVector<QPair<qint32, float>> vecBelowThresh;
             float dWeightsSum = 0.0;
             const RowVectorXd& rowVec = matDistanceTable->row(r);
 
@@ -86,19 +86,19 @@ QSharedPointer<SparseMatrix<float> > Interpolation::createInterpolationMat(const
                 }
             }
 
-            for (const QPair<qint32, float> &qp : vecBelowThresh) {
-                vecNonZeroEntries.push_back(Eigen::Triplet<float> (r, qp.first, qp.second / dWeightsSum));
+            for (const QPair<qint32, float>& qp : vecBelowThresh) {
+                vecNonZeroEntries.push_back(Eigen::Triplet<float>(r, qp.first, qp.second / dWeightsSum));
             }
         } else {
             // Find index of r in vecProjectedSensors
             int iIndexInSubset = 0;
-            for(Eigen::Index k = 0; k < vecProjectedSensors.size(); ++k) {
-                if(vecProjectedSensors[k] == r) {
+            for (Eigen::Index k = 0; k < vecProjectedSensors.size(); ++k) {
+                if (vecProjectedSensors[k] == r) {
                     iIndexInSubset = static_cast<int>(k);
                     break;
                 }
             }
-            vecNonZeroEntries.push_back(Eigen::Triplet<float> (r, iIndexInSubset, 1));
+            vecNonZeroEntries.push_back(Eigen::Triplet<float>(r, iIndexInSubset, 1));
         }
     }
 
@@ -109,8 +109,8 @@ QSharedPointer<SparseMatrix<float> > Interpolation::createInterpolationMat(const
 
 //=============================================================================================================
 
-VectorXf Interpolation::interpolateSignal(const QSharedPointer<SparseMatrix<float> > matInterpolationMatrix,
-                                          const QSharedPointer<VectorXf> &vecMeasurementData)
+VectorXf Interpolation::interpolateSignal(const QSharedPointer<SparseMatrix<float>> matInterpolationMatrix,
+                                          const QSharedPointer<VectorXf>& vecMeasurementData)
 {
     if (matInterpolationMatrix->cols() != vecMeasurementData->rows()) {
         qDebug() << "[WARNING] Interpolation::interpolateSignal - Dimension mismatch. Return null pointer...";
@@ -123,8 +123,8 @@ VectorXf Interpolation::interpolateSignal(const QSharedPointer<SparseMatrix<floa
 
 //=============================================================================================================
 
-VectorXf Interpolation::interpolateSignal(const SparseMatrix<float> &matInterpolationMatrix,
-                                          const VectorXf &vecMeasurementData)
+VectorXf Interpolation::interpolateSignal(const SparseMatrix<float>& matInterpolationMatrix,
+                                          const VectorXf& vecMeasurementData)
 {
     if (matInterpolationMatrix.cols() != vecMeasurementData.rows()) {
         qDebug() << "[WARNING] Interpolation::interpolateSignal - Dimension mismatch. Return null pointer...";

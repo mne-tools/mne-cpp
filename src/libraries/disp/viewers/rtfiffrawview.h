@@ -51,16 +51,19 @@
 
 class QTableView;
 
-namespace FIFFLIB {
-    class FiffInfo;
+namespace FIFFLIB
+{
+class FiffInfo;
 }
 
-namespace UTILSLIB {
-    class FilterKernel;
+namespace UTILSLIB
+{
+class FilterKernel;
 }
 
-namespace RTPROCESSINGLIB {
-    class EventList;
+namespace RTPROCESSINGLIB
+{
+class EventList;
 }
 
 //=============================================================================================================
@@ -91,8 +94,8 @@ class DISPSHARED_EXPORT RtFiffRawView : public AbstractView
     Q_OBJECT
 
 public:
-    typedef QSharedPointer<RtFiffRawView> SPtr;              /**< Shared pointer type for RtFiffRawView. */
-    typedef QSharedPointer<const RtFiffRawView> ConstSPtr;   /**< Const shared pointer type for RtFiffRawView. */
+    typedef QSharedPointer<RtFiffRawView> SPtr;            /**< Shared pointer type for RtFiffRawView. */
+    typedef QSharedPointer<const RtFiffRawView> ConstSPtr; /**< Const shared pointer type for RtFiffRawView. */
 
     //=========================================================================================================
     /**
@@ -134,7 +137,7 @@ public:
      *
      * @param[in] info    The FiffInfo.
      */
-    void init(QSharedPointer<FIFFLIB::FiffInfo> &info);
+    void init(QSharedPointer<FIFFLIB::FiffInfo>& info);
 
     //=========================================================================================================
     /**
@@ -162,7 +165,7 @@ public:
      *
      * @return
      */
-    bool eventFilter(QObject *object, QEvent *event);
+    bool eventFilter(QObject* object, QEvent* event);
 
     //=========================================================================================================
     /**
@@ -316,7 +319,7 @@ public:
      *
      * @param[in] filterData   the currently active filter.
      */
-    void setFilter(const UTILSLIB::FilterKernel &filterData);
+    void setFilter(const UTILSLIB::FilterKernel& filterData);
 
     //=========================================================================================================
     /**
@@ -468,25 +471,25 @@ protected:
      */
     void onAddEvent(bool bChecked);
 
-    QPointer<QTableView>                        m_pTableView;                   /**< The QTableView being part of the model/view framework of Qt. */
-    QPointer<DISPLIB::RtFiffRawViewDelegate>    m_pDelegate;                    /**< The channel data delegate. */
-    QPointer<DISPLIB::RtFiffRawViewModel>       m_pModel;                       /**< The channel data model. */
+    QPointer<QTableView> m_pTableView;                    /**< The QTableView being part of the model/view framework of Qt. */
+    QPointer<DISPLIB::RtFiffRawViewDelegate> m_pDelegate; /**< The channel data delegate. */
+    QPointer<DISPLIB::RtFiffRawViewModel> m_pModel;       /**< The channel data model. */
 
-    QMap<qint32,float>                          m_qMapChScaling;                /**< Channel scaling values. */
+    QMap<qint32, float> m_qMapChScaling; /**< Channel scaling values. */
 
-    qint32                                      m_iT;                           /**< Display window size in seconds. */
-    QSharedPointer<FIFFLIB::FiffInfo>           m_pFiffInfo;                    /**< FiffInfo, which is used insteadd of ListChInfo*/
-    float                                       m_fSamplingRate;                /**< Sampling rate. */
-    float                                       m_fZoomFactor;                  /**< Zoom factor. */
-    QList<qint32>                               m_qListBadChannels;             /**< Current list of bad channels . */
-    QList<qint32>                               m_qListCurrentSelection;        /**< Current selection list -> hack around C++11 lambda . */
-    bool                                        m_bHideBadChannels;             /**< hide bad channels flag. */
-    QStringList                                 m_slSelectedChannels;           /**< the currently selected channels from the selection manager window. */
-    QColor                                      m_backgroundColor;              /**< Current background color. */
-    int                                         m_iDistanceTimeSpacer;          /**< Current distance between time spacer. */
-    int                                         m_iClickPosX;
+    qint32 m_iT;                                   /**< Display window size in seconds. */
+    QSharedPointer<FIFFLIB::FiffInfo> m_pFiffInfo; /**< FiffInfo, which is used insteadd of ListChInfo*/
+    float m_fSamplingRate;                         /**< Sampling rate. */
+    float m_fZoomFactor;                           /**< Zoom factor. */
+    QList<qint32> m_qListBadChannels;              /**< Current list of bad channels . */
+    QList<qint32> m_qListCurrentSelection;         /**< Current selection list -> hack around C++11 lambda . */
+    bool m_bHideBadChannels;                       /**< hide bad channels flag. */
+    QStringList m_slSelectedChannels;              /**< the currently selected channels from the selection manager window. */
+    QColor m_backgroundColor;                      /**< Current background color. */
+    int m_iDistanceTimeSpacer;                     /**< Current distance between time spacer. */
+    int m_iClickPosX;
 
-    QString                                     m_sSettingsPath;                /**< The settings path to store the GUI settings to. */
+    QString m_sSettingsPath; /**< The settings path to store the GUI settings to. */
 
 signals:
     //=========================================================================================================
@@ -504,7 +507,7 @@ signals:
      * Emmited when trigger detection was performed
      */
     void triggerDetected(int numberDetectedTriggers,
-                         const QMap<int,QList<QPair<int,double> > >& mapDetectedTriggers);
+                         const QMap<int, QList<QPair<int, double>>>& mapDetectedTriggers);
 
     //=========================================================================================================
     /**

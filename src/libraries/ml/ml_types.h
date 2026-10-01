@@ -30,25 +30,40 @@
 // DEFINE NAMESPACE MLLIB
 //=============================================================================================================
 
-namespace MLLIB{
+namespace MLLIB
+{
 
 //=============================================================================================================
 /**
  * Available ML back-end engines.
  */
-enum class MlBackend { OnnxRuntime, BuiltIn };
+enum class MlBackend
+{
+    OnnxRuntime,
+    BuiltIn
+};
 
 //=============================================================================================================
 /**
  * Supported data types for tensors.
  */
-enum class MlDataType { Float32, Float64, Int64 };
+enum class MlDataType
+{
+    Float32,
+    Float64,
+    Int64
+};
 
 //=============================================================================================================
 /**
  * ML task categories.
  */
-enum class MlTaskType { Classification, Regression, FeatureExtraction };
+enum class MlTaskType
+{
+    Classification,
+    Regression,
+    FeatureExtraction
+};
 
 } // namespace MLLIB
 

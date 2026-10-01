@@ -40,7 +40,8 @@
 // DEFINE NAMESPACE
 //=============================================================================================================
 
-namespace DISP3DLIB {
+namespace DISP3DLIB
+{
 
 //=============================================================================================================
 /**
@@ -66,7 +67,7 @@ public:
      *
      * @param[in] parent     Parent QObject.
      */
-    explicit RtSensorDataWorker(QObject *parent = nullptr);
+    explicit RtSensorDataWorker(QObject* parent = nullptr);
 
     //=========================================================================================================
     /**
@@ -75,7 +76,7 @@ public:
      *
      * @param[in] data       Sensor measurement vector (nChannels x 1).
      */
-    void addData(const Eigen::VectorXf &data);
+    void addData(const Eigen::VectorXf& data);
 
     //=========================================================================================================
     /**
@@ -107,7 +108,7 @@ public:
      *
      * @param[in] name       Colormap name ("MNE", "Hot", "Jet", "Viridis", "Cool", "RedBlue").
      */
-    void setColormapType(const QString &name);
+    void setColormapType(const QString& name);
 
     //=========================================================================================================
     /**
@@ -169,8 +170,8 @@ signals:
      * @param[in] surfaceKey  FsSurface key identifying the target surface.
      * @param[in] colors      Per-vertex ABGR color array.
      */
-    void newRtSensorColors(const QString &surfaceKey,
-                           const QVector<uint32_t> &colors);
+    void newRtSensorColors(const QString& surfaceKey,
+                           const QVector<uint32_t>& colors);
 
     //=========================================================================================================
     /**
@@ -178,7 +179,7 @@ signals:
      *
      * @param[in] data        Raw sensor measurement vector.
      */
-    void newRtRawSensorData(const Eigen::VectorXf &data);
+    void newRtRawSensorData(const Eigen::VectorXf& data);
 
 private:
     //=========================================================================================================
@@ -189,28 +190,28 @@ private:
      * @param[in] sensorData    Measurement vector (nChannels x 1).
      * @return Per-vertex ABGR color array (nVertices).
      */
-    QVector<uint32_t> computeSurfaceColors(const Eigen::VectorXf &sensorData) const;
+    QVector<uint32_t> computeSurfaceColors(const Eigen::VectorXf& sensorData) const;
 
-    mutable QMutex m_mutex;                                         /**< Protects data members. */
+    mutable QMutex m_mutex; /**< Protects data members. */
 
-    QList<Eigen::VectorXf> m_lDataQ;                                /**< Incoming data queue. */
-    QList<Eigen::VectorXf> m_lDataLoopQ;                            /**< Copy for looping. */
-    Eigen::VectorXf m_vecAverage;                                   /**< Running average accumulator. */
-    int m_iSampleCtr = 0;                                           /**< Sample counter for averaging. */
-    int m_iCurrentSample = 0;                                       /**< Current sample index for loop replay. */
+    QList<Eigen::VectorXf> m_lDataQ;     /**< Incoming data queue. */
+    QList<Eigen::VectorXf> m_lDataLoopQ; /**< Copy for looping. */
+    Eigen::VectorXf m_vecAverage;        /**< Running average accumulator. */
+    int m_iSampleCtr = 0;                /**< Sample counter for averaging. */
+    int m_iCurrentSample = 0;            /**< Current sample index for loop replay. */
 
-    std::shared_ptr<Eigen::MatrixXf> m_mappingMat;                   /**< Dense mapping matrix (nVerts x nChans). */
-    QString m_sSurfaceKey;                                          /**< FsSurface key for the target surface. */
+    std::shared_ptr<Eigen::MatrixXf> m_mappingMat; /**< Dense mapping matrix (nVerts x nChans). */
+    QString m_sSurfaceKey;                         /**< FsSurface key for the target surface. */
 
-    int m_iNumAverages = 1;                                         /**< Number of samples to average. */
-    bool m_bIsLooping = true;                                       /**< Whether to loop data. */
-    bool m_bStreamSmoothedData = true;                               /**< Whether to stream smoothed colors (true) or raw data (false). */
-    double m_dSFreq = 1000.0;                                       /**< Sampling frequency in Hz. */
+    int m_iNumAverages = 1;            /**< Number of samples to average. */
+    bool m_bIsLooping = true;          /**< Whether to loop data. */
+    bool m_bStreamSmoothedData = true; /**< Whether to stream smoothed colors (true) or raw data (false). */
+    double m_dSFreq = 1000.0;          /**< Sampling frequency in Hz. */
 
-    QString m_sColormapType = QStringLiteral("MNE");                /**< Active colormap name. */
-    double m_dThreshMin = 0.0;                                       /**< Explicit min threshold (0 = auto). */
-    double m_dThreshMax = 0.0;                                       /**< Explicit max threshold (0 = auto). */
-    bool m_bUseAutoNorm = true;                                      /**< True = symmetric auto-norm (default). */
+    QString m_sColormapType = QStringLiteral("MNE"); /**< Active colormap name. */
+    double m_dThreshMin = 0.0;                       /**< Explicit min threshold (0 = auto). */
+    double m_dThreshMax = 0.0;                       /**< Explicit max threshold (0 = auto). */
+    bool m_bUseAutoNorm = true;                      /**< True = symmetric auto-norm (default). */
 };
 
 } // namespace DISP3DLIB

@@ -56,28 +56,28 @@ using namespace MNALIB;
 static QString bidsSubdirForRole(MnaFileRole role)
 {
     switch (role) {
-    case MnaFileRole::Surface:
-    case MnaFileRole::Annotation:
-        return QStringLiteral("anat");
-    case MnaFileRole::Bem:
-    case MnaFileRole::SourceSpace:
-        return QStringLiteral("bem");
-    case MnaFileRole::Digitizer:
-    case MnaFileRole::Transform:
-    case MnaFileRole::Evoked:
-        return QStringLiteral("meg");
-    case MnaFileRole::SourceEstimate:
-        return QStringLiteral("source");
-    default:
-        return QStringLiteral("other");
+        case MnaFileRole::Surface:
+        case MnaFileRole::Annotation:
+            return QStringLiteral("anat");
+        case MnaFileRole::Bem:
+        case MnaFileRole::SourceSpace:
+            return QStringLiteral("bem");
+        case MnaFileRole::Digitizer:
+        case MnaFileRole::Transform:
+        case MnaFileRole::Evoked:
+            return QStringLiteral("meg");
+        case MnaFileRole::SourceEstimate:
+            return QStringLiteral("source");
+        default:
+            return QStringLiteral("other");
     }
 }
 
 /**
  * Build a BIDS-like relative path: sub-<subj>/ses-<sess>/<modality>/<filename>
  */
-static QString bidsBuildRelPath(const QString &subjId, const QString &sessId,
-                                MnaFileRole role, const QString &fileName)
+static QString bidsBuildRelPath(const QString& subjId, const QString& sessId,
+                                MnaFileRole role, const QString& fileName)
 {
     return QStringLiteral("sub-%1/ses-%2/%3/%4")
         .arg(subjId, sessId, bidsSubdirForRole(role), QFileInfo(fileName).fileName());
@@ -86,14 +86,12 @@ static QString bidsBuildRelPath(const QString &subjId, const QString &sessId,
 /**
  * Guess MnaFileRole from a file name.
  */
-static MnaFileRole guessRoleFromFileName(const QString &fileName)
+static MnaFileRole guessRoleFromFileName(const QString& fileName)
 {
     const QString fn = fileName.toLower();
 
     // Surface files
-    if (fn.endsWith(QLatin1String(".pial")) || fn.endsWith(QLatin1String(".inflated"))
-        || fn.endsWith(QLatin1String(".white")) || fn.endsWith(QLatin1String(".orig"))
-        || fn.endsWith(QLatin1String(".sphere")))
+    if (fn.endsWith(QLatin1String(".pial")) || fn.endsWith(QLatin1String(".inflated")) || fn.endsWith(QLatin1String(".white")) || fn.endsWith(QLatin1String(".orig")) || fn.endsWith(QLatin1String(".sphere")))
         return MnaFileRole::Surface;
 
     // Annotations
@@ -107,11 +105,9 @@ static MnaFileRole guessRoleFromFileName(const QString &fileName)
     // FIFF-based files — use name heuristics
     if (fn.contains(QLatin1String("-bem")) || fn.contains(QLatin1String("_bem")))
         return MnaFileRole::Bem;
-    if (fn.contains(QLatin1String("-src")) || fn.contains(QLatin1String("_src"))
-        || fn.contains(QLatin1String("-oct-")))
+    if (fn.contains(QLatin1String("-src")) || fn.contains(QLatin1String("_src")) || fn.contains(QLatin1String("-oct-")))
         return MnaFileRole::SourceSpace;
-    if (fn.contains(QLatin1String("-trans")) || fn.contains(QLatin1String("_trans"))
-        || fn.contains(QLatin1String("all-trans")))
+    if (fn.contains(QLatin1String("-trans")) || fn.contains(QLatin1String("_trans")) || fn.contains(QLatin1String("all-trans")))
         return MnaFileRole::Transform;
     if (fn.contains(QLatin1String("-ave")) || fn.contains(QLatin1String("_ave")))
         return MnaFileRole::Evoked;
@@ -132,7 +128,7 @@ static MnaFileRole guessRoleFromFileName(const QString &fileName)
 /**
  * Infer BIDS modality directory from a subdirectory name.
  */
-static MnaFileRole guessRoleFromBidsDir(const QString &dirName)
+static MnaFileRole guessRoleFromBidsDir(const QString& dirName)
 {
     if (dirName == QLatin1String("anat"))
         return MnaFileRole::Surface; // default; file name will disambiguate
@@ -149,7 +145,7 @@ static MnaFileRole guessRoleFromBidsDir(const QString &dirName)
 // COMMAND: extract
 //=============================================================================================================
 
-static int cmdExtract(const QString &inputPath, const QString &outputDir)
+static int cmdExtract(const QString& inputPath, const QString& outputDir)
 {
     QTextStream out(stdout);
     QTextStream err(stderr);
@@ -163,10 +159,10 @@ static int cmdExtract(const QString &inputPath, const QString &outputDir)
     int extracted = 0;
     int skipped = 0;
 
-    for (const MnaSubject &subj : proj.subjects) {
-        for (const MnaSession &sess : subj.sessions) {
-            for (const MnaRecording &rec : sess.recordings) {
-                for (const MnaFileRef &ref : rec.files) {
+    for (const MnaSubject& subj : proj.subjects) {
+        for (const MnaSession& sess : subj.sessions) {
+            for (const MnaRecording& rec : sess.recordings) {
+                for (const MnaFileRef& ref : rec.files) {
                     // Build BIDS output path
                     QString relPath = ref.path;
                     if (relPath.isEmpty())
@@ -213,10 +209,10 @@ static int cmdExtract(const QString &inputPath, const QString &outputDir)
 
     // Write a sidecar .mna with non-embedded references pointing into BIDS tree
     MnaProject outProj = proj;
-    for (MnaSubject &subj : outProj.subjects) {
-        for (MnaSession &sess : subj.sessions) {
-            for (MnaRecording &rec : sess.recordings) {
-                for (MnaFileRef &ref : rec.files) {
+    for (MnaSubject& subj : outProj.subjects) {
+        for (MnaSession& sess : subj.sessions) {
+            for (MnaRecording& rec : sess.recordings) {
+                for (MnaFileRef& ref : rec.files) {
                     ref.embedded = false;
                     ref.data.clear();
                 }
@@ -236,7 +232,7 @@ static int cmdExtract(const QString &inputPath, const QString &outputDir)
 // COMMAND: pack
 //=============================================================================================================
 
-static int cmdPack(const QString &inputDir, const QString &outputPath, bool embed)
+static int cmdPack(const QString& inputDir, const QString& outputPath, bool embed)
 {
     QTextStream out(stdout);
     QTextStream err(stderr);
@@ -251,10 +247,10 @@ static int cmdPack(const QString &inputDir, const QString &outputPath, bool embe
 
         if (embed) {
             // Read file data into each ref
-            for (MnaSubject &subj : proj.subjects) {
-                for (MnaSession &sess : subj.sessions) {
-                    for (MnaRecording &rec : sess.recordings) {
-                        for (MnaFileRef &ref : rec.files) {
+            for (MnaSubject& subj : proj.subjects) {
+                for (MnaSession& sess : subj.sessions) {
+                    for (MnaRecording& rec : sess.recordings) {
+                        for (MnaFileRef& ref : rec.files) {
                             const QString filePath = QDir(inputDir).filePath(ref.path);
                             QFile f(filePath);
                             if (f.open(QIODevice::ReadOnly)) {
@@ -281,28 +277,30 @@ static int cmdPack(const QString &inputDir, const QString &outputPath, bool embe
         // Find sub-* directories
         QDir rootDir(inputDir);
         QStringList subDirs = rootDir.entryList(QStringList() << QStringLiteral("sub-*"),
-                                                 QDir::Dirs | QDir::NoDotAndDotDot);
+                                                QDir::Dirs | QDir::NoDotAndDotDot);
 
         if (subDirs.isEmpty()) {
             // Flat structure — treat all files as belonging to one subject
             subDirs << QStringLiteral(".");
         }
 
-        for (const QString &subDirName : subDirs) {
+        for (const QString& subDirName : subDirs) {
             MnaSubject subj;
             subj.id = subDirName.startsWith(QLatin1String("sub-"))
-                      ? subDirName.mid(4) : subDirName;
+                ? subDirName.mid(4)
+                : subDirName;
 
             QDir subDir(rootDir.filePath(subDirName));
             QStringList sesDirs = subDir.entryList(QStringList() << QStringLiteral("ses-*"),
-                                                    QDir::Dirs | QDir::NoDotAndDotDot);
+                                                   QDir::Dirs | QDir::NoDotAndDotDot);
             if (sesDirs.isEmpty())
                 sesDirs << QStringLiteral(".");
 
-            for (const QString &sesDirName : sesDirs) {
+            for (const QString& sesDirName : sesDirs) {
                 MnaSession sess;
                 sess.id = sesDirName.startsWith(QLatin1String("ses-"))
-                          ? sesDirName.mid(4) : QStringLiteral("01");
+                    ? sesDirName.mid(4)
+                    : QStringLiteral("01");
 
                 MnaRecording rec;
                 rec.id = QStringLiteral("recording-01");
@@ -313,12 +311,12 @@ static int cmdPack(const QString &inputDir, const QString &outputPath, bool embe
                 if (modDirs.isEmpty())
                     modDirs << QStringLiteral(".");
 
-                for (const QString &modDirName : modDirs) {
+                for (const QString& modDirName : modDirs) {
                     QDir modDir(sesDir.filePath(modDirName));
                     MnaFileRole defaultRole = guessRoleFromBidsDir(modDirName);
 
                     QStringList files = modDir.entryList(QDir::Files | QDir::NoDotAndDotDot);
-                    for (const QString &fileName : files) {
+                    for (const QString& fileName : files) {
                         MnaFileRef ref;
                         // Prefer file-name heuristic; fall back to directory-based guess
                         ref.role = guessRoleFromFileName(fileName);
@@ -373,7 +371,7 @@ static int cmdPack(const QString &inputDir, const QString &outputPath, bool embe
 // COMMAND: convert
 //=============================================================================================================
 
-static int cmdConvert(const QString &inputPath, const QString &outputPath)
+static int cmdConvert(const QString& inputPath, const QString& outputPath)
 {
     QTextStream out(stdout);
     QTextStream err(stderr);
@@ -390,10 +388,10 @@ static int cmdConvert(const QString &inputPath, const QString &outputPath)
     // When converting .mna → .mnx, embed file data automatically
     if (outSuffix == QLatin1String("mnx") && inSuffix == QLatin1String("mna")) {
         const QString projDir = QFileInfo(inputPath).absolutePath();
-        for (MnaSubject &subj : proj.subjects) {
-            for (MnaSession &sess : subj.sessions) {
-                for (MnaRecording &rec : sess.recordings) {
-                    for (MnaFileRef &ref : rec.files) {
+        for (MnaSubject& subj : proj.subjects) {
+            for (MnaSession& sess : subj.sessions) {
+                for (MnaRecording& rec : sess.recordings) {
+                    for (MnaFileRef& ref : rec.files) {
                         if (!ref.embedded) {
                             const QString filePath = QDir(projDir).filePath(ref.path);
                             QFile f(filePath);
@@ -417,10 +415,10 @@ static int cmdConvert(const QString &inputPath, const QString &outputPath)
     // When converting .mnx → .mna, strip embedded data (files must be extracted first)
     if (outSuffix == QLatin1String("mna") && inSuffix == QLatin1String("mnx")) {
         out << "  Note: embedded data will be dropped. Use 'extract' first to write files to disk.\n";
-        for (MnaSubject &subj : proj.subjects) {
-            for (MnaSession &sess : subj.sessions) {
-                for (MnaRecording &rec : sess.recordings) {
-                    for (MnaFileRef &ref : rec.files) {
+        for (MnaSubject& subj : proj.subjects) {
+            for (MnaSession& sess : subj.sessions) {
+                for (MnaRecording& rec : sess.recordings) {
+                    for (MnaFileRef& ref : rec.files) {
                         ref.embedded = false;
                         ref.data.clear();
                     }
@@ -444,7 +442,7 @@ static int cmdConvert(const QString &inputPath, const QString &outputPath)
 // MAIN
 //=============================================================================================================
 
-static void printUsage(QTextStream &out)
+static void printUsage(QTextStream& out)
 {
     out << "Usage: mne_mna_bids_converter <command> [options]\n\n"
         << "Commands:\n"
@@ -458,7 +456,7 @@ static void printUsage(QTextStream &out)
         << "  --version   Show version\n";
 }
 
-int main(int argc, char *argv[])
+int main(int argc, char* argv[])
 {
     QCoreApplication app(argc, argv);
     app.setApplicationName(QStringLiteral("mne_mna_bids_converter"));

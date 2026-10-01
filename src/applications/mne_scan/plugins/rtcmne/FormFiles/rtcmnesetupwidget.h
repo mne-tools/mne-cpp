@@ -51,7 +51,6 @@ class RtcMneSetupWidget : public QWidget
     Q_OBJECT
 
 public:
-
     //=========================================================================================================
     /**
      * Constructs a RtcMneSetupWidget which is a child of parent.
@@ -59,7 +58,7 @@ public:
      * @param[in] toolbox a pointer to the corresponding MNEToolbox.
      * @param[in] parent pointer to parent widget; If parent is 0, the new RtcMneSetupWidget becomes a window. If parent is another widget, DummySetupWidget becomes a child window inside parent. DummySetupWidget is deleted when its parent is deleted.
      */
-    RtcMneSetupWidget(RtcMne* toolbox, QWidget *parent = 0);
+    RtcMneSetupWidget(RtcMne* toolbox, QWidget* parent = 0);
 
     //=========================================================================================================
     /**
@@ -69,7 +68,6 @@ public:
     ~RtcMneSetupWidget();
 
 private:
-
     //=========================================================================================================
     /**
      * Shows atlas selection dialog
@@ -90,7 +88,7 @@ private:
 
     RtcMne* m_pMNE;
 
-    Ui::RtcMneSetupWidgetClass ui;   /**< Holds the user interface for the RtcMneSetupWidgetClass.*/
+    Ui::RtcMneSetupWidgetClass ui; /**< Holds the user interface for the RtcMneSetupWidgetClass.*/
 };
 } // NAMESPACE
 

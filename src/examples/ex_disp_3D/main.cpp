@@ -79,12 +79,12 @@ using namespace Eigen;
  * @param[in] argv (argument vector) is an array of pointers to arrays of character objects. The array objects are null-terminated strings, representing the arguments that were entered on the command line when the program was started.
  * @return the value that was set to exit() (which is 0 if exit() is called via quit()).
  */
-int main(int argc, char *argv[])
+int main(int argc, char* argv[])
 {
-    #ifdef STATICBUILD
-    // Q_INIT_RESOURCE(mne_disp3d);
-    #endif
-    
+#ifdef STATICBUILD
+// Q_INIT_RESOURCE(mne_disp3d);
+#endif
+
     qInstallMessageHandler(MNELogger::customLogWriter);
     QApplication a(argc, argv);
     QCoreApplication::setOrganizationName(QStringLiteral("MNE-CPP"));
@@ -107,8 +107,8 @@ int main(int argc, char *argv[])
     QCommandLineOption clustOption("doClust", "Path to clustered inverse operator <doClust>.", "doClust", "true");
     QCommandLineOption covFileOption("cov", "Path to the covariance <file>.", "file", QCoreApplication::applicationDirPath() + "/../resources/data/MNE-sample-data/MEG/sample/sample_audvis-cov.fif");
     QCommandLineOption evokedFileOption("ave", "Path to the evoked/average <file>.", "file", QCoreApplication::applicationDirPath() + "/../resources/data/MNE-sample-data/MEG/sample/sample_audvis-ave.fif");
-    QCommandLineOption methodOption("method", "Inverse estimation <method>, i.e., 'MNE', 'dSPM' or 'sLORETA'.", "method", "dSPM");//"MNE" | "dSPM" | "sLORETA"
-    QCommandLineOption snrOption("snr", "The SNR value used for computation <snr>.", "snr", "3.0");//3.0;//0.1;//3.0;
+    QCommandLineOption methodOption("method", "Inverse estimation <method>, i.e., 'MNE', 'dSPM' or 'sLORETA'.", "method", "dSPM"); //"MNE" | "dSPM" | "sLORETA"
+    QCommandLineOption snrOption("snr", "The SNR value used for computation <snr>.", "snr", "3.0");                                //3.0;//0.1;//3.0;
     QCommandLineOption evokedIndexOption("aveIdx", "The average <index> to choose from the average file.", "index", "1");
 
     parser.addOption(surfOption);
@@ -128,22 +128,22 @@ int main(int argc, char *argv[])
     parser.process(a);
 
     bool bAddRtSourceLoc = false;
-    if(parser.value(sourceLocOption) == "false" || parser.value(sourceLocOption) == "0") {
+    if (parser.value(sourceLocOption) == "false" || parser.value(sourceLocOption) == "0") {
         bAddRtSourceLoc = false;
-    } else if(parser.value(sourceLocOption) == "true" || parser.value(sourceLocOption) == "1") {
+    } else if (parser.value(sourceLocOption) == "true" || parser.value(sourceLocOption) == "1") {
         bAddRtSourceLoc = true;
     }
 
     bool bDoClustering = false;
-    if(parser.value(clustOption) == "false" || parser.value(clustOption) == "0") {
+    if (parser.value(clustOption) == "false" || parser.value(clustOption) == "0") {
         bDoClustering = false;
-    } else if(parser.value(clustOption) == "true" || parser.value(clustOption) == "1") {
+    } else if (parser.value(clustOption) == "true" || parser.value(clustOption) == "1") {
         bDoClustering = true;
     }
 
     //Inits
-    FsSurfaceSet tSurfSet (parser.value(subjectOption), parser.value(hemiOption).toInt(), parser.value(surfOption), parser.value(subjectPathOption));
-    FsAnnotationSet tAnnotSet (parser.value(subjectOption), parser.value(hemiOption).toInt(), parser.value(annotOption), parser.value(subjectPathOption));
+    FsSurfaceSet tSurfSet(parser.value(subjectOption), parser.value(hemiOption).toInt(), parser.value(surfOption), parser.value(subjectPathOption));
+    FsAnnotationSet tAnnotSet(parser.value(subjectOption), parser.value(hemiOption).toInt(), parser.value(annotOption), parser.value(subjectPathOption));
 
     QFile t_fileFwd(parser.value(fwdOption));
     MNEForwardSolution t_Fwd(t_fileFwd);
@@ -165,20 +165,20 @@ int main(int argc, char *argv[])
     InvSourceEstimate sourceEstimate;
     FiffEvoked evoked(t_fileEvoked, parser.value(evokedIndexOption).toInt(), baseline);
 
-    if(bAddRtSourceLoc) {
+    if (bAddRtSourceLoc) {
         double snr = parser.value(snrOption).toDouble();
         double lambda2 = 1.0 / pow(snr, 2);
         QString method(parser.value(methodOption));
 
         // Load data
         t_fileEvoked.close();
-        if(evoked.isEmpty())
+        if (evoked.isEmpty())
             return 1;
 
         std::cout << std::endl;
         std::cout << "Evoked description: " << evoked.comment.toUtf8().constData() << std::endl;
 
-        if(t_Fwd.isEmpty())
+        if (t_Fwd.isEmpty())
             return 1;
 
         FiffCov noise_cov(t_fileCov);
@@ -189,7 +189,7 @@ int main(int argc, char *argv[])
         //
         // Cluster forward solution;
         //
-        if(bDoClustering) {
+        if (bDoClustering) {
             t_clusteredFwd = t_Fwd.cluster_forward_solution(tAnnotSet, 40);
         } else {
             t_clusteredFwd = t_Fwd;
@@ -202,8 +202,7 @@ int main(int argc, char *argv[])
 
         MNEInverseOperator inverse_operator(info, t_clusteredFwd, noise_cov, 0.2f, 0.8f);
 
-        if(!t_sFileClusteredInverse.isEmpty())
-        {
+        if (!t_sFileClusteredInverse.isEmpty()) {
             QFile t_fileClusteredInverse(t_sFileClusteredInverse);
             inverse_operator.write(t_fileClusteredInverse);
         }
@@ -214,15 +213,20 @@ int main(int argc, char *argv[])
         InvMinimumNorm minimumNorm(inverse_operator, lambda2, method);
         sourceEstimate = minimumNorm.calculateInverse(evoked);
 
-        if(sourceEstimate.isEmpty())
+        if (sourceEstimate.isEmpty())
             return 1;
 
         // View activation time-series
-        std::cout << "\nsourceEstimate:\n" << sourceEstimate.data.block(0,0,10,10) << std::endl;
-        std::cout << "time\n" << sourceEstimate.times.block(0,0,1,10) << std::endl;
-        std::cout << "timeMin\n" << sourceEstimate.times[0] << std::endl;
-        std::cout << "timeMax\n" << sourceEstimate.times[sourceEstimate.times.size()-1] << std::endl;
-        std::cout << "time step\n" << sourceEstimate.tstep << std::endl;
+        std::cout << "\nsourceEstimate:\n"
+                  << sourceEstimate.data.block(0, 0, 10, 10) << std::endl;
+        std::cout << "time\n"
+                  << sourceEstimate.times.block(0, 0, 1, 10) << std::endl;
+        std::cout << "timeMin\n"
+                  << sourceEstimate.times[0] << std::endl;
+        std::cout << "timeMax\n"
+                  << sourceEstimate.times[sourceEstimate.times.size() - 1] << std::endl;
+        std::cout << "time step\n"
+                  << sourceEstimate.tstep << std::endl;
     }
 
     //########################################################################################
@@ -232,8 +236,8 @@ int main(int argc, char *argv[])
     //########################################################################################
 
     //Create 3D data model
-    BrainView *pBrainView = new BrainView();
-    BrainTreeModel *pModel = new BrainTreeModel();
+    BrainView* pBrainView = new BrainView();
+    BrainTreeModel* pModel = new BrainTreeModel();
     pBrainView->setModel(pModel);
 
     //Add fressurfer surface set including both hemispheres
@@ -268,7 +272,7 @@ int main(int argc, char *argv[])
     // Load sensor field data from evoked file for MEG/EEG field mapping
     pBrainView->loadSensorField(parser.value(evokedFileOption), parser.value(evokedIndexOption).toInt());
 
-    if(bAddRtSourceLoc) {
+    if (bAddRtSourceLoc) {
         // Write source estimate to temp files for visualization
         int nVertLh = t_clusteredFwd.src[0].nuse;
         InvSourceEstimate stcLh, stcRh;

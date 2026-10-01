@@ -43,7 +43,7 @@ using namespace Eigen;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-NatusProducer::NatusProducer(int iBlockSize, int iChannelSize, QObject *parent)
+NatusProducer::NatusProducer(int iBlockSize, int iChannelSize, QObject* parent)
 : QObject(parent)
 , m_iMatDataSampleIterator(1)
 {
@@ -71,7 +71,7 @@ void NatusProducer::readPendingDatagrams()
 
 //=============================================================================================================
 
-void NatusProducer::processDatagram(const QNetworkDatagram &datagram)
+void NatusProducer::processDatagram(const QNetworkDatagram& datagram)
 {
     QByteArray data = datagram.data();
     QDataStream stream(data);
@@ -79,7 +79,7 @@ void NatusProducer::processDatagram(const QNetworkDatagram &datagram)
     // Read info
     float fNumberSamples, fNumberChannels;
 
-    char cInfo[3*sizeof(float)];
+    char cInfo[3 * sizeof(float)];
     stream.readRawData(cInfo, sizeof(cInfo));
 
     float* fInfo = reinterpret_cast<float*>(cInfo);
@@ -87,18 +87,18 @@ void NatusProducer::processDatagram(const QNetworkDatagram &datagram)
     fNumberSamples = fInfo[1];
     fNumberChannels = fInfo[2];
 
-//    // Print info about received data
-//    qDebug()<<"fNumberSamples "<<fNumberSamples;
-//    qDebug()<<"fNumberChannels "<<fNumberChannels;
-//    qDebug()<<"data.size() "<<data.size();
-//    qDebug()<<"data.size() "<<data.size();
-//    qDebug()<<"data.size() "<<data.size();
+    //    // Print info about received data
+    //    qDebug()<<"fNumberSamples "<<fNumberSamples;
+    //    qDebug()<<"fNumberChannels "<<fNumberChannels;
+    //    qDebug()<<"data.size() "<<data.size();
+    //    qDebug()<<"data.size() "<<data.size();
+    //    qDebug()<<"data.size() "<<data.size();
 
     // Read actual data
     int iDataSize = int(fNumberSamples * fNumberChannels);
-    QScopedArrayPointer<char> cData(new char[iDataSize*sizeof(float)]);
+    QScopedArrayPointer<char> cData(new char[iDataSize * sizeof(float)]);
     //char *cData = new char[iDataSize*sizeof(float)];
-    stream.readRawData(cData.data(), iDataSize*sizeof(float));
+    stream.readRawData(cData.data(), iDataSize * sizeof(float));
 
     float* fData = reinterpret_cast<float*>(cData.data());
 
@@ -106,25 +106,25 @@ void NatusProducer::processDatagram(const QNetworkDatagram &datagram)
     Eigen::MatrixXf matData;
     matData.resize(fNumberChannels, fNumberSamples);
     int itr = 0;
-    for(int j = 0; j < fNumberSamples; ++j) {
-        for(int i = 0; i < fNumberChannels; ++i) {
-            matData(i,j) = fData[itr++]/10e06;
+    for (int j = 0; j < fNumberSamples; ++j) {
+        for (int i = 0; i < fNumberChannels; ++i) {
+            matData(i, j) = fData[itr++] / 10e06;
         }
     }
 
-    if(m_iMatDataSampleIterator+matData.cols() <= m_matData.cols()) {
+    if (m_iMatDataSampleIterator + matData.cols() <= m_matData.cols()) {
         m_matData.block(0, m_iMatDataSampleIterator, matData.rows(), matData.cols()) = matData.cast<double>();
 
         m_iMatDataSampleIterator += matData.cols();
     } else {
-        m_matData.block(0, m_iMatDataSampleIterator, matData.rows(), m_matData.cols()-m_iMatDataSampleIterator) = matData.block(0, 0, matData.rows(), m_matData.cols()-m_iMatDataSampleIterator).cast<double>();
+        m_matData.block(0, m_iMatDataSampleIterator, matData.rows(), m_matData.cols() - m_iMatDataSampleIterator) = matData.block(0, 0, matData.rows(), m_matData.cols() - m_iMatDataSampleIterator).cast<double>();
 
         m_iMatDataSampleIterator = 0;
     }
 
     //qDebug() << "m_iMatDataSampleIterator" << m_iMatDataSampleIterator;
 
-    if(m_iMatDataSampleIterator == m_matData.cols()) {
+    if (m_iMatDataSampleIterator == m_matData.cols()) {
         m_iMatDataSampleIterator = 0;
         //qDebug()<<"Emit data";
         MatrixXd matEmit = m_matData.cast<double>();

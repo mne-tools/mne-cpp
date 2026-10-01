@@ -95,7 +95,7 @@ double Spline::pixelToDataX(double pixelX) const
 
 //=============================================================================================================
 
-void Spline::paintEvent(QPaintEvent * /*event*/)
+void Spline::paintEvent(QPaintEvent* /*event*/)
 {
     QPainter painter(this);
     painter.setRenderHint(QPainter::Antialiasing);
@@ -181,8 +181,10 @@ void Spline::paintEvent(QPaintEvent * /*event*/)
         // Catmull-Rom spline
         auto getPoint = [this](int idx) -> QPointF {
             const int count = m_seriesData.size();
-            if (idx < 0) idx = 0;
-            if (idx >= count) idx = count - 1;
+            if (idx < 0)
+                idx = 0;
+            if (idx >= count)
+                idx = count - 1;
             return QPointF(dataToPixelX(m_seriesData[idx].x()),
                            dataToPixelY(m_seriesData[idx].y()));
         };
@@ -227,7 +229,7 @@ void Spline::paintEvent(QPaintEvent * /*event*/)
 
 //=============================================================================================================
 
-void Spline::mousePressEvent(QMouseEvent *event)
+void Spline::mousePressEvent(QMouseEvent* event)
 {
     if (!m_bHasData || m_seriesData.isEmpty()) {
         qDebug() << "Data set not found.";
@@ -286,9 +288,9 @@ void Spline::setThreshold(const QVector3D& vecThresholdValues)
         m_dRightThreshold = 0.99 * m_dMaxAxisX;
     } else {
         // Sort the three values into left < middle < right
-        double vals[3] = { static_cast<double>(correctedVectorThreshold.x()),
-                           static_cast<double>(correctedVectorThreshold.y()),
-                           static_cast<double>(correctedVectorThreshold.z()) };
+        double vals[3] = {static_cast<double>(correctedVectorThreshold.x()),
+                          static_cast<double>(correctedVectorThreshold.y()),
+                          static_cast<double>(correctedVectorThreshold.z())};
         std::sort(vals, vals + 3);
         m_dLeftThreshold = vals[0];
         m_dMiddleThreshold = vals[1];
@@ -326,32 +328,21 @@ QVector3D Spline::correctionDisplayTrueValue(QVector3D vecOriginalValues, QStrin
 {
     QVector3D returnCorrectedVector;
 
-    if(m_vecResultExponentValues.rows() > 0) {
+    if (m_vecResultExponentValues.rows() > 0) {
         int exponent = 0;
-        if (upOrDown == "up")
-        {
-            if (m_vecResultExponentValues[0] < 0)
-            {
+        if (upOrDown == "up") {
+            if (m_vecResultExponentValues[0] < 0) {
                 exponent = std::abs(m_vecResultExponentValues[0]);
-            }
-            else if (m_vecResultExponentValues[0] > 0)
-            {
+            } else if (m_vecResultExponentValues[0] > 0) {
                 exponent = -(std::abs(m_vecResultExponentValues[0]));
             }
-        }
-        else if (upOrDown == "down")
-        {
-            if (m_vecResultExponentValues[0] < 0)
-            {
+        } else if (upOrDown == "down") {
+            if (m_vecResultExponentValues[0] < 0) {
                 exponent = -(std::abs(m_vecResultExponentValues[0]));
-            }
-            else if (m_vecResultExponentValues[0] > 0)
-            {
+            } else if (m_vecResultExponentValues[0] > 0) {
                 exponent = std::abs(m_vecResultExponentValues[0]);
             }
-        }
-        else
-        {
+        } else {
             qDebug() << "Spline::correctionDisplayTrueValue error.";
         }
 

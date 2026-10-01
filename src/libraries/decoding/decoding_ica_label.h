@@ -97,9 +97,9 @@ enum class IcaComponentLabel
  */
 struct DECODINGSHARED_EXPORT IcaLabelResult
 {
-    int componentIndex;         /**< 0-based component index. */
-    IcaComponentLabel label;    /**< Assigned label. */
-    double confidence;          /**< Confidence score in [0, 1]. */
+    int componentIndex;      /**< 0-based component index. */
+    IcaComponentLabel label; /**< Assigned label. */
+    double confidence;       /**< Confidence score in [0, 1]. */
 
     static QString labelToString(IcaComponentLabel label);
 };
@@ -149,11 +149,11 @@ public:
      * @return Label results for each component.
      */
     static QList<IcaLabelResult> classify(const Eigen::MatrixXd& matSources,
-                                           const Eigen::MatrixXd& matEog,
-                                           const Eigen::MatrixXd& matEcg,
-                                           double dSFreq,
-                                           double dEogThresh = 0.3,
-                                           double dEcgThresh = 0.3);
+                                          const Eigen::MatrixXd& matEog,
+                                          const Eigen::MatrixXd& matEcg,
+                                          double dSFreq,
+                                          double dEogThresh = 0.3,
+                                          double dEcgThresh = 0.3);
 
     //=========================================================================================================
     /**
@@ -175,7 +175,7 @@ public:
      * @return Maximum |r| across reference channels.
      */
     static double maxAbsCorrelation(const Eigen::VectorXd& source,
-                                     const Eigen::MatrixXd& matRef);
+                                    const Eigen::MatrixXd& matRef);
 
     //=========================================================================================================
     /**

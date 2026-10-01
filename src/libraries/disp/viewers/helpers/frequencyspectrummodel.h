@@ -47,8 +47,9 @@
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-namespace FIFFLIB {
-    class FiffInfo;
+namespace FIFFLIB
+{
+class FiffInfo;
 }
 
 //=============================================================================================================
@@ -75,8 +76,8 @@ class DISPSHARED_EXPORT FrequencySpectrumModel : public QAbstractTableModel
     Q_OBJECT
 
 public:
-    typedef QSharedPointer<FrequencySpectrumModel> SPtr;              /**< Shared pointer type for FrequencySpectrumModel. */
-    typedef QSharedPointer<const FrequencySpectrumModel> ConstSPtr;   /**< Const shared pointer type for FrequencySpectrumModel. */
+    typedef QSharedPointer<FrequencySpectrumModel> SPtr;            /**< Shared pointer type for FrequencySpectrumModel. */
+    typedef QSharedPointer<const FrequencySpectrumModel> ConstSPtr; /**< Const shared pointer type for FrequencySpectrumModel. */
 
     //=========================================================================================================
     /**
@@ -84,7 +85,7 @@ public:
      *
      * @param[in] parent     parent of the table model.
      */
-    FrequencySpectrumModel(QObject *parent = 0);
+    FrequencySpectrumModel(QObject* parent = 0);
 
     //=========================================================================================================
     /**
@@ -94,7 +95,7 @@ public:
      *
      * @return number of rows.
      */
-    virtual int rowCount(const QModelIndex &parent = QModelIndex()) const ;
+    virtual int rowCount(const QModelIndex& parent = QModelIndex()) const;
 
     //=========================================================================================================
     /**
@@ -104,7 +105,7 @@ public:
      *
      * @return number of columns.
      */
-    virtual int columnCount(const QModelIndex &parent = QModelIndex()) const;
+    virtual int columnCount(const QModelIndex& parent = QModelIndex()) const;
 
     //=========================================================================================================
     /**
@@ -115,7 +116,7 @@ public:
      *
      * @return accessed data.
      */
-    virtual QVariant data(const QModelIndex &index,
+    virtual QVariant data(const QModelIndex& index,
                           int role = Qt::DisplayRole) const;
 
     //=========================================================================================================
@@ -137,7 +138,7 @@ public:
      *
      * @param[in] info       The corresponding fiff information object.
      */
-    void setInfo(QSharedPointer<FIFFLIB::FiffInfo> &info);
+    void setInfo(QSharedPointer<FIFFLIB::FiffInfo>& info);
 
     //=========================================================================================================
     /**
@@ -153,7 +154,7 @@ public:
      *
      * @param[in] data   the frequency estimation.
      */
-    void addData(const Eigen::MatrixXd &data);
+    void addData(const Eigen::MatrixXd& data);
 
     //=========================================================================================================
     /**
@@ -193,7 +194,7 @@ public:
      *
      * @return the channel idx to selection status.
      */
-    inline const QMap<qint32,qint32>& getIdxSelMap() const;
+    inline const QMap<qint32, qint32>& getIdxSelMap() const;
 
     //=========================================================================================================
     /**
@@ -201,7 +202,7 @@ public:
      *
      * @param[in] selection      channel index list to select.
      */
-    void selectRows(const QList<qint32> &selection);
+    void selectRows(const QList<qint32>& selection);
 
     //=========================================================================================================
     /**
@@ -215,7 +216,7 @@ public:
      *
      * @param[in] index     of the channel which has been double clicked.
      */
-    void toggleFreeze(const QModelIndex &index);
+    void toggleFreeze(const QModelIndex& index);
 
     //=========================================================================================================
     /**
@@ -260,22 +261,22 @@ signals:
     void newSelection(QList<qint32> selection);
 
 private:
-    QSharedPointer<FIFFLIB::FiffInfo> m_pFiffInfo;  /**< Fiff Information.*/
+    QSharedPointer<FIFFLIB::FiffInfo> m_pFiffInfo; /**< Fiff Information.*/
 
-    QMap<qint32,qint32>     m_qMapIdxRowSelection;  /**< Selection mapping.*/
+    QMap<qint32, qint32> m_qMapIdxRowSelection; /**< Selection mapping.*/
 
-    Eigen::RowVectorXd      m_vecFreqScale;         /**< Frequency scale. */
-    Eigen::RowVectorXd      m_vecFreqScaleBound;    /**< Frequency scaled to boundaries. */
-    Eigen::MatrixXd         m_dataCurrent;          /**< List that holds the current data*/
-    Eigen::MatrixXd         m_dataCurrentFreeze;    /**< List that holds the current data when freezed*/
+    Eigen::RowVectorXd m_vecFreqScale;      /**< Frequency scale. */
+    Eigen::RowVectorXd m_vecFreqScaleBound; /**< Frequency scaled to boundaries. */
+    Eigen::MatrixXd m_dataCurrent;          /**< List that holds the current data*/
+    Eigen::MatrixXd m_dataCurrentFreeze;    /**< List that holds the current data when freezed*/
 
-    float       m_fSps;                 /**< Sampling rate. */
-    qint32      m_iT;                   /**< Time window. */
-    qint32      m_iLowerFrqIdx;         /**< Upper frequency plotting boundary. */
-    qint32      m_iUpperFrqIdx;         /**< Lower frequency plotting boundary. */
-    qint8       m_iScaleType;           /**< The display scale type. */
-    bool        m_bIsFreezed;           /**< Display is freezed. */
-    bool        m_bInitialized;         /**< If it's initailized. */
+    float m_fSps;          /**< Sampling rate. */
+    qint32 m_iT;           /**< Time window. */
+    qint32 m_iLowerFrqIdx; /**< Upper frequency plotting boundary. */
+    qint32 m_iUpperFrqIdx; /**< Lower frequency plotting boundary. */
+    qint8 m_iScaleType;    /**< The display scale type. */
+    bool m_bIsFreezed;     /**< Display is freezed. */
+    bool m_bInitialized;   /**< If it's initailized. */
 };
 
 //=============================================================================================================
@@ -310,7 +311,7 @@ inline qint32 FrequencySpectrumModel::getNumStems() const
 
 //=============================================================================================================
 
-inline const QMap<qint32,qint32>& FrequencySpectrumModel::getIdxSelMap() const
+inline const QMap<qint32, qint32>& FrequencySpectrumModel::getIdxSelMap() const
 {
     return m_qMapIdxRowSelection;
 }
@@ -340,7 +341,7 @@ inline qint32 FrequencySpectrumModel::getUpperFrqBound() const
 #if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
 #ifndef metatype_rowvectorxd
 #define metatype_rowvectorxd
-Q_DECLARE_METATYPE(Eigen::RowVectorXd);    /**< Provides QT META type declaration of the Eigen::RowVectorXd type. For signal/slot usage.*/
+Q_DECLARE_METATYPE(Eigen::RowVectorXd); /**< Provides QT META type declaration of the Eigen::RowVectorXd type. For signal/slot usage.*/
 #endif
 #endif
 

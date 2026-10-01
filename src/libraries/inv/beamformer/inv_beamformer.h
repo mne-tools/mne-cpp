@@ -121,38 +121,38 @@ public:
     inline int nFreqs() const;
 
 public:
-    QString kind;                       /**< "LCMV" or "DICS". */
+    QString kind; /**< "LCMV" or "DICS". */
 
     // --- Spatial filter weights ---
-    std::vector<Eigen::MatrixXd> weights;  /**< Filter weights, size 1 for LCMV, n_freqs for DICS.
+    std::vector<Eigen::MatrixXd> weights; /**< Filter weights, size 1 for LCMV, n_freqs for DICS.
                                                 Each matrix: (n_sources * n_orient, n_channels). */
 
     // --- Whitening & projection ---
-    Eigen::MatrixXd whitener;           /**< Whitening matrix (n_channels, n_channels). */
-    Eigen::MatrixXd proj;               /**< SSP projection matrix (n_channels, n_channels). */
+    Eigen::MatrixXd whitener; /**< Whitening matrix (n_channels, n_channels). */
+    Eigen::MatrixXd proj;     /**< SSP projection matrix (n_channels, n_channels). */
 
     // --- Source space info ---
-    Eigen::VectorXi vertices;           /**< Source vertex indices. */
-    int nVerticesLh = -1;               /**< Leading entries of vertices belonging to the left hemisphere. -1 when unknown, as for a volume source space. */
-    Eigen::MatrixX3f sourceNn;          /**< Source normals (n_sources, 3). */
-    bool isFreOri;                      /**< True if free orientation (n_orient = 3). */
-    int nSourcesTotal;                  /**< Total number of source points. */
-    QString srcType;                    /**< "surface", "volume", "mixed", "discrete". */
-    QString subject;                    /**< Subject identifier. */
+    Eigen::VectorXi vertices;  /**< Source vertex indices. */
+    int nVerticesLh = -1;      /**< Leading entries of vertices belonging to the left hemisphere. -1 when unknown, as for a volume source space. */
+    Eigen::MatrixX3f sourceNn; /**< Source normals (n_sources, 3). */
+    bool isFreOri;             /**< True if free orientation (n_orient = 3). */
+    int nSourcesTotal;         /**< Total number of source points. */
+    QString srcType;           /**< "surface", "volume", "mixed", "discrete". */
+    QString subject;           /**< Subject identifier. */
 
     // --- Filter parameters ---
-    QStringList chNames;                /**< Channel names used for filter computation. */
-    BeamformerWeightNorm weightNorm;    /**< Applied weight normalization. */
-    BeamformerPickOri pickOri;          /**< Orientation picking mode. */
-    BeamformerInversion inversion;      /**< Inversion method used. */
-    double reg;                         /**< Regularization parameter used. */
-    int rank;                           /**< Data covariance rank used. */
+    QStringList chNames;             /**< Channel names used for filter computation. */
+    BeamformerWeightNorm weightNorm; /**< Applied weight normalization. */
+    BeamformerPickOri pickOri;       /**< Orientation picking mode. */
+    BeamformerInversion inversion;   /**< Inversion method used. */
+    double reg;                      /**< Regularization parameter used. */
+    int rank;                        /**< Data covariance rank used. */
 
     // --- Max-power orientation (if pickOri == MaxPower) ---
-    Eigen::MatrixX3d maxPowerOri;       /**< Optimal orientation per source (n_sources, 3). Empty if not max-power. */
+    Eigen::MatrixX3d maxPowerOri; /**< Optimal orientation per source (n_sources, 3). Empty if not max-power. */
 
     // --- Frequency info (DICS only) ---
-    Eigen::VectorXd frequencies;        /**< Center frequencies for DICS (Hz). Empty for LCMV. */
+    Eigen::VectorXd frequencies; /**< Center frequencies for DICS (Hz). Empty for LCMV. */
 };
 
 //=============================================================================================================

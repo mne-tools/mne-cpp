@@ -42,8 +42,9 @@
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-namespace DISP3DLIB {
-    class MultimodalScene;
+namespace DISP3DLIB
+{
+class MultimodalScene;
 }
 
 namespace ELECTRODESPLUGIN
@@ -53,10 +54,11 @@ namespace ELECTRODESPLUGIN
 /**
  * @brief Source of the electrode geometry the plugin currently holds.
  */
-enum class ElectrodeSource {
+enum class ElectrodeSource
+{
     None = 0,
-    Fiff,    /**< Digitiser points read from a .fif file. */
-    Csv      /**< CSV file with label,x,y,z[,array,layout] columns. */
+    Fiff, /**< Digitiser points read from a .fif file. */
+    Csv   /**< CSV file with label,x,y,z[,array,layout] columns. */
 };
 
 //=============================================================================================================
@@ -127,13 +129,19 @@ public:
     /**
      * @return Source format of the most recent successful load.
      */
-    ElectrodeSource source() const { return m_source; }
+    ElectrodeSource source() const
+    {
+        return m_source;
+    }
 
     //=========================================================================================================
     /**
      * @return Path of the most recent successful load. Empty if none.
      */
-    QString sourcePath() const { return m_sourcePath; }
+    QString sourcePath() const
+    {
+        return m_sourcePath;
+    }
 
     //=========================================================================================================
     /**
@@ -151,13 +159,19 @@ public:
     /**
      * @return Underlying renderable. Owned by the plugin; never null.
      */
-    DISP3DLIB::ElectrodeObject* electrodeObject() const { return m_object.get(); }
+    DISP3DLIB::ElectrodeObject* electrodeObject() const
+    {
+        return m_object.get();
+    }
 
     //=========================================================================================================
     /**
      * @return Stable scene-layer id used by @ref attachScene.
      */
-    QString sceneLayerId() const { return QStringLiteral("electrodes"); }
+    QString sceneLayerId() const
+    {
+        return QStringLiteral("electrodes");
+    }
 
     //=========================================================================================================
     /**
@@ -222,9 +236,9 @@ private:
     void rebuildFromArrays(const QVector<DISP3DLIB::ElectrodeArray>& arrays);
 
     std::unique_ptr<DISP3DLIB::ElectrodeObject> m_object;
-    DISP3DLIB::MultimodalScene*                 m_scene = nullptr;
-    ElectrodeSource                             m_source = ElectrodeSource::None;
-    QString                                     m_sourcePath;
+    DISP3DLIB::MultimodalScene* m_scene = nullptr;
+    ElectrodeSource m_source = ElectrodeSource::None;
+    QString m_sourcePath;
 };
 
 } // namespace ELECTRODESPLUGIN

@@ -146,7 +146,8 @@ static bool readRefData(const QString& filename, MatrixXf& refData, int& nChanne
         for (const QString& p : parts) {
             bool ok;
             float val = p.toFloat(&ok);
-            if (ok) row.append(val);
+            if (ok)
+                row.append(val);
         }
         if (!row.isEmpty())
             rows.append(row);
@@ -167,13 +168,13 @@ static bool readRefData(const QString& filename, MatrixXf& refData, int& nChanne
         }
     }
 
-    qInfo("Read reference data: %d channels x %d samples" , nChannels, nSamples);
+    qInfo("Read reference data: %d channels x %d samples", nChannels, nSamples);
     return true;
 }
 
 //=============================================================================================================
 
-int main(int argc, char *argv[])
+int main(int argc, char* argv[])
 {
     qInstallMessageHandler(MNELogger::customLogWriter);
     QCoreApplication app(argc, argv);
@@ -215,8 +216,8 @@ int main(int argc, char *argv[])
     QFile fIn(inFile);
     FiffRawData raw(fIn);
     if (!raw.info.isEmpty()) {
-        qInfo("Read input: %d channels at %.1f Hz" ,
-               raw.info.nchan, raw.info.sfreq);
+        qInfo("Read input: %d channels at %.1f Hz",
+              raw.info.nchan, raw.info.sfreq);
     } else {
         fprintf(stderr, "Failed to read input FIFF: %s\n", inFile.toUtf8().constData());
         return 1;
@@ -245,7 +246,7 @@ int main(int argc, char *argv[])
                           static_cast<int>(megPos.rows()));
         if (nMatch >= 3) {
             alignTransform = procrustes(refPos.topRows(nMatch), megPos.topRows(nMatch));
-            qInfo("Computed Procrustes alignment from %d matching points" , nMatch);
+            qInfo("Computed Procrustes alignment from %d matching points", nMatch);
         }
     }
 
@@ -359,8 +360,8 @@ int main(int argc, char *argv[])
     outStream->end_block(FIFFB_MEAS);
     outStream->end_file();
 
-    qInfo("Wrote merged FIFF: %d channels (%d original + %d reference) to %s" ,
-           totalCh, raw.info.nchan, nRefCh, outFile.toUtf8().constData());
+    qInfo("Wrote merged FIFF: %d channels (%d original + %d reference) to %s",
+          totalCh, raw.info.nchan, nRefCh, outFile.toUtf8().constData());
 
     return 0;
 }

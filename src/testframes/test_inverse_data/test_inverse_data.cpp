@@ -73,7 +73,7 @@ static MNEInverseOperator makeSmallInverseOp(const FiffInfo& info,
 {
     MNEForwardSolution small(fwd);
     const bool isFixed = small.isFixedOrient();
-    const int  orient  = isFixed ? 1 : 3;
+    const int orient = isFixed ? 1 : 3;
 
     // 1. Thin the inuse vector in each hemisphere
     for (qint32 h = 0; h < small.src.size(); ++h) {
@@ -95,7 +95,7 @@ static MNEInverseOperator makeSmallInverseOp(const FiffInfo& info,
     int globalOffset = 0;
     for (qint32 h = 0; h < fwd.src.size(); ++h) {
         const MNESourceSpace& origSp = fwd.src[h];
-        const MNESourceSpace& newSp  = small.src[h];
+        const MNESourceSpace& newSp = small.src[h];
         int origCount = 0;
         for (int v = 0; v < origSp.np; ++v) {
             if (origSp.inuse[v]) {
@@ -118,7 +118,7 @@ static MNEInverseOperator makeSmallInverseOp(const FiffInfo& info,
     small.sol->data = G;
     small.sol->nrow = G.rows();
     small.sol->ncol = G.cols();
-    small.nsource   = nKeep;
+    small.nsource = nKeep;
 
     // 4. Subsample source positions / normals
     MatrixX3f rr(nKeep, 3);
@@ -165,8 +165,8 @@ static void stripSourceSpaceGeometry(MNEInverseOperator& inv)
         const int nkeep = sp.nuse;
 
         // Extract only in-use vertex positions and normals
-        auto origRr = sp.rr;   // copy (PointsT  — RowMajor float Nx3)
-        auto origNn = sp.nn;   // copy (NormalsT — RowMajor float Nx3)
+        auto origRr = sp.rr; // copy (PointsT  — RowMajor float Nx3)
+        auto origNn = sp.nn; // copy (NormalsT — RowMajor float Nx3)
         decltype(sp.rr) newRr(nkeep, 3);
         decltype(sp.nn) newNn(nkeep, 3);
         int idx = 0;
@@ -179,14 +179,14 @@ static void stripSourceSpaceGeometry(MNEInverseOperator& inv)
         }
         Q_ASSERT(idx == nkeep);
 
-        sp.np     = nkeep;
-        sp.rr     = newRr;
-        sp.nn     = newNn;
-        sp.inuse  = VectorXi::Ones(nkeep);
+        sp.np = nkeep;
+        sp.rr = newRr;
+        sp.nn = newNn;
+        sp.inuse = VectorXi::Ones(nkeep);
         sp.vertno = VectorXi::LinSpaced(nkeep, 0, nkeep - 1);
 
         // Clear triangulation (writer skips when ntri == 0)
-        sp.ntri     = 0;
+        sp.ntri = 0;
         sp.itris.resize(0, 3);
         sp.nuse_tri = 0;
         sp.use_itris.resize(0, 3);
@@ -195,7 +195,7 @@ static void stripSourceSpaceGeometry(MNEInverseOperator& inv)
         sp.nearest.clear();
 
         // Clear distances
-        sp.dist       = FiffSparseMatrix();
+        sp.dist = FiffSparseMatrix();
         sp.dist_limit = 0;
     }
 }
@@ -211,10 +211,11 @@ private:
     MNEForwardSolution m_fwd;
     FiffCov m_noiseCov;
     FiffInfo m_info;
-    MNEInverseOperator m_invOp;   // Cached inverse operator (loose=0.2, depth=0.8)
+    MNEInverseOperator m_invOp; // Cached inverse operator (loose=0.2, depth=0.8)
     bool m_bDataLoaded;
 
-    bool hasData() const {
+    bool hasData() const
+    {
         return !m_sDataPath.isEmpty();
     }
 
@@ -226,8 +227,7 @@ private slots:
         qInstallMessageHandler(MNELogger::customLogWriter);
         m_bDataLoaded = false;
 
-        QString base = QCoreApplication::applicationDirPath()
-                       + "/../resources/data/mne-cpp-test-data";
+        QString base = QCoreApplication::applicationDirPath() + "/../resources/data/mne-cpp-test-data";
         if (QFile::exists(base + "/MEG/sample/sample_audvis_trunc_raw.fif")) {
             m_sDataPath = base;
         }
@@ -274,7 +274,8 @@ private slots:
     //=========================================================================
     void inverseOp_makeFromComponents()
     {
-        if (!m_bDataLoaded) QSKIP("Required data not loaded");
+        if (!m_bDataLoaded)
+            QSKIP("Required data not loaded");
 
         // Verify cached inverse operator (computed once in initTestCase)
         QVERIFY(m_invOp.nchan > 0);
@@ -288,8 +289,10 @@ private slots:
     //=========================================================================
     void inverseOp_writeReadRoundtrip()
     {
-        if (!m_bDataLoaded) QSKIP("Required data not loaded");
-        if (m_invOp.nchan == 0) QSKIP("Failed to build inverse operator");
+        if (!m_bDataLoaded)
+            QSKIP("Required data not loaded");
+        if (m_invOp.nchan == 0)
+            QSKIP("Failed to build inverse operator");
 
         // Build a small inverse operator (~500 sources instead of ~8000)
         // to keep source-space I/O feasible within CI time limits.
@@ -327,9 +330,9 @@ private slots:
         }
 
         // Compare key fields
-        QCOMPARE(invRead.nchan,      smallInv.nchan);
-        QCOMPARE(invRead.nsource,    smallInv.nsource);
-        QCOMPARE(invRead.methods,    smallInv.methods);
+        QCOMPARE(invRead.nchan, smallInv.nchan);
+        QCOMPARE(invRead.nsource, smallInv.nsource);
+        QCOMPARE(invRead.methods, smallInv.methods);
         QCOMPARE(invRead.source_ori, smallInv.source_ori);
         QCOMPARE(invRead.coord_frame, smallInv.coord_frame);
         QCOMPARE(invRead.src.size(), smallInv.src.size());
@@ -338,8 +341,10 @@ private slots:
         // Verify singular values match within tolerance
         for (int i = 0; i < smallInv.sing.size(); ++i) {
             QVERIFY2(qAbs(invRead.sing(i) - smallInv.sing(i)) < 1e-4,
-                      qPrintable(QString("sing[%1] mismatch: %2 vs %3")
-                                 .arg(i).arg(invRead.sing(i)).arg(smallInv.sing(i))));
+                     qPrintable(QString("sing[%1] mismatch: %2 vs %3")
+                                    .arg(i)
+                                    .arg(invRead.sing(i))
+                                    .arg(smallInv.sing(i))));
         }
 
         // Verify eigen_leads dimensions match
@@ -363,8 +368,10 @@ private slots:
     //=========================================================================
     void inverseOp_prepareDSPM()
     {
-        if (!m_bDataLoaded) QSKIP("Required data not loaded");
-        if (m_invOp.nchan == 0) QSKIP("Failed to build inverse operator");
+        if (!m_bDataLoaded)
+            QSKIP("Required data not loaded");
+        if (m_invOp.nchan == 0)
+            QSKIP("Failed to build inverse operator");
 
         MNEInverseOperator invOp = m_invOp;
 
@@ -372,10 +379,10 @@ private slots:
         float lambda2 = 1.0f / (snr * snr);
 
         MNEInverseOperator prepared = invOp.prepare_inverse_operator(
-            1,       // nave
+            1, // nave
             lambda2,
-            true,    // dSPM
-            false    // sLORETA
+            true, // dSPM
+            false // sLORETA
         );
 
         QVERIFY(prepared.nchan > 0);
@@ -387,15 +394,17 @@ private slots:
     //=========================================================================
     void inverseOp_prepareSLORETA()
     {
-        if (!m_bDataLoaded) QSKIP("Required data not loaded");
-        if (m_invOp.nchan == 0) QSKIP("Failed to build inverse operator");
+        if (!m_bDataLoaded)
+            QSKIP("Required data not loaded");
+        if (m_invOp.nchan == 0)
+            QSKIP("Failed to build inverse operator");
 
         MNEInverseOperator invOp = m_invOp;
 
         float lambda2 = 1.0f / 9.0f;
 
         MNEInverseOperator prepared = invOp.prepare_inverse_operator(
-            1, lambda2, false, true);  // sLORETA
+            1, lambda2, false, true); // sLORETA
 
         QVERIFY(prepared.nchan > 0);
     }
@@ -405,15 +414,18 @@ private slots:
     //=========================================================================
     void minimumNorm_dSPM_fromEvoked()
     {
-        if (!m_bDataLoaded) QSKIP("Required data not loaded");
-        if (m_invOp.nchan == 0) QSKIP("Failed to build inverse operator");
+        if (!m_bDataLoaded)
+            QSKIP("Required data not loaded");
+        if (m_invOp.nchan == 0)
+            QSKIP("Failed to build inverse operator");
 
         MNEInverseOperator invOp = m_invOp;
 
         // Read evoked data
         QString evkPath = m_sDataPath + "/MEG/sample/sample_audvis-ave.fif";
         QFile evkFile(evkPath);
-        if (!evkFile.exists()) QSKIP("Evoked file not found");
+        if (!evkFile.exists())
+            QSKIP("Evoked file not found");
 
         QPair<float, float> noBaseline(-1.0f, -1.0f);
         FiffEvoked evoked(evkFile, 0, noBaseline);
@@ -444,14 +456,17 @@ private slots:
     //=========================================================================
     void minimumNorm_MNE_fromEvoked()
     {
-        if (!m_bDataLoaded) QSKIP("Required data not loaded");
-        if (m_invOp.nchan == 0) QSKIP("Failed to build inverse operator");
+        if (!m_bDataLoaded)
+            QSKIP("Required data not loaded");
+        if (m_invOp.nchan == 0)
+            QSKIP("Failed to build inverse operator");
 
         MNEInverseOperator invOp = m_invOp;
 
         QString evkPath = m_sDataPath + "/MEG/sample/sample_audvis-ave.fif";
         QFile evkFile(evkPath);
-        if (!evkFile.exists()) QSKIP("Evoked file not found");
+        if (!evkFile.exists())
+            QSKIP("Evoked file not found");
 
         QPair<float, float> noBaseline(-1.0f, -1.0f);
         FiffEvoked evoked(evkFile, 0, noBaseline);
@@ -477,14 +492,17 @@ private slots:
     //=========================================================================
     void minimumNorm_sLORETA_fromEvoked()
     {
-        if (!m_bDataLoaded) QSKIP("Required data not loaded");
-        if (m_invOp.nchan == 0) QSKIP("Failed to build inverse operator");
+        if (!m_bDataLoaded)
+            QSKIP("Required data not loaded");
+        if (m_invOp.nchan == 0)
+            QSKIP("Failed to build inverse operator");
 
         MNEInverseOperator invOp = m_invOp;
 
         QString evkPath = m_sDataPath + "/MEG/sample/sample_audvis-ave.fif";
         QFile evkFile(evkPath);
-        if (!evkFile.exists()) QSKIP("Evoked file not found");
+        if (!evkFile.exists())
+            QSKIP("Evoked file not found");
 
         QPair<float, float> noBaseline(-1.0f, -1.0f);
         FiffEvoked evoked(evkFile, 0, noBaseline);
@@ -510,8 +528,10 @@ private slots:
     //=========================================================================
     void minimumNorm_methodSwitching()
     {
-        if (!m_bDataLoaded) QSKIP("Required data not loaded");
-        if (m_invOp.nchan == 0) QSKIP("Failed to build inverse operator");
+        if (!m_bDataLoaded)
+            QSKIP("Required data not loaded");
+        if (m_invOp.nchan == 0)
+            QSKIP("Failed to build inverse operator");
 
         MNEInverseOperator invOp = m_invOp;
 
@@ -536,15 +556,18 @@ private slots:
     //=========================================================================
     void sourceEstimate_writeReadRoundtrip()
     {
-        if (!m_bDataLoaded) QSKIP("Required data not loaded");
-        if (m_invOp.nchan == 0) QSKIP("Failed to build inverse operator");
+        if (!m_bDataLoaded)
+            QSKIP("Required data not loaded");
+        if (m_invOp.nchan == 0)
+            QSKIP("Failed to build inverse operator");
 
         MNEInverseOperator invOp = m_invOp;
 
         // Create a small STC
         QString evkPath = m_sDataPath + "/MEG/sample/sample_audvis-ave.fif";
         QFile evkFile(evkPath);
-        if (!evkFile.exists()) QSKIP("Evoked file not found");
+        if (!evkFile.exists())
+            QSKIP("Evoked file not found");
 
         QPair<float, float> noBaseline(-1.0f, -1.0f);
         FiffEvoked evoked(evkFile, 0, noBaseline);
@@ -559,7 +582,8 @@ private slots:
         InvSourceEstimate stc = mn.calculateInverse(
             pickedEvoked.data, tmin, tstep, false);
 
-        if (stc.isEmpty()) QSKIP("Failed to compute STC");
+        if (stc.isEmpty())
+            QSKIP("Failed to compute STC");
 
         QTemporaryDir tmpDir;
         QVERIFY(tmpDir.isValid());
@@ -585,7 +609,8 @@ private slots:
     //=========================================================================
     void rapMusic_initWithFwd()
     {
-        if (!m_bDataLoaded) QSKIP("Required data not loaded");
+        if (!m_bDataLoaded)
+            QSKIP("Required data not loaded");
 
         // InvRapMusic needs a forward solution
         InvRapMusic rap;
@@ -678,7 +703,7 @@ private slots:
     void sensorSet_construct()
     {
         InvSensorSet sensors;
-        QVERIFY(sensors.ncoils() == 0 || true);  // Default should be empty or zero
+        QVERIFY(sensors.ncoils() == 0 || true); // Default should be empty or zero
     }
 
     //=========================================================================
@@ -686,14 +711,15 @@ private slots:
     //=========================================================================
     void inverseOp_fixedOrientation()
     {
-        if (!m_bDataLoaded) QSKIP("Required data not loaded");
+        if (!m_bDataLoaded)
+            QSKIP("Required data not loaded");
 
         MNEInverseOperator invOp = MNEInverseOperator::make_inverse_operator(
             m_info, m_fwd, m_noiseCov,
-            0.0f,   // loose=0 (fixed)
-            0.8f,   // depth
-            true,   // fixed
-            true    // limit_depth_chs
+            0.0f, // loose=0 (fixed)
+            0.8f, // depth
+            true, // fixed
+            true  // limit_depth_chs
         );
 
         // Fixed orientation may or may not succeed depending on forward solution type
@@ -712,11 +738,13 @@ private slots:
     //=========================================================================
     void evokedSet_readAllConditions()
     {
-        if (!hasData()) QSKIP("No test data");
+        if (!hasData())
+            QSKIP("No test data");
 
         QString path = m_sDataPath + "/MEG/sample/sample_audvis-ave.fif";
         QFile file(path);
-        if (!file.exists()) QSKIP("Evoked file not found");
+        if (!file.exists())
+            QSKIP("Evoked file not found");
 
         FiffEvokedSet evokedSet(file);
         QVERIFY(evokedSet.evoked.size() > 0);
@@ -740,16 +768,18 @@ private slots:
     //=========================================================================
     void noiseCov_verifyStructure()
     {
-        if (!hasData()) QSKIP("No test data");
+        if (!hasData())
+            QSKIP("No test data");
 
         QString path = m_sDataPath + "/MEG/sample/sample_audvis-cov.fif";
         QFile file(path);
-        if (!file.exists()) QSKIP("Covariance file not found");
+        if (!file.exists())
+            QSKIP("Covariance file not found");
 
         FiffCov cov(file);
         QVERIFY(!cov.isEmpty());
         QVERIFY(cov.data.rows() > 0);
-        QCOMPARE(cov.data.rows(), cov.data.cols());  // Should be square
+        QCOMPARE(cov.data.rows(), cov.data.cols()); // Should be square
         QVERIFY(cov.names.size() > 0);
         QCOMPARE(cov.names.size(), (int)cov.data.rows());
         QVERIFY(cov.kind >= 0);
@@ -763,12 +793,14 @@ private slots:
     //=========================================================================
     void noiseCov_pickChannels()
     {
-        if (!hasData()) QSKIP("No test data");
+        if (!hasData())
+            QSKIP("No test data");
 
         QString path = m_sDataPath + "/MEG/sample/sample_audvis-cov.fif";
         QFile file(path);
         FiffCov cov(file);
-        if (cov.isEmpty()) QSKIP("Failed to read covariance");
+        if (cov.isEmpty())
+            QSKIP("Failed to read covariance");
 
         // Pick first 50 channels
         int nPick = qMin(50, cov.names.size());
@@ -781,7 +813,9 @@ private slots:
     }
 
     //=========================================================================
-    void cleanupTestCase() {}
+    void cleanupTestCase()
+    {
+    }
 };
 
 QTEST_GUILESS_MAIN(TestInverseData)

@@ -58,7 +58,7 @@ Network PartialDirectedCoherence::calculate(ConnectivitySettings& connectivitySe
 {
     Network finalNetwork("PDC");
 
-    if(connectivitySettings.isEmpty()) {
+    if (connectivitySettings.isEmpty()) {
         qDebug() << "PartialDirectedCoherence::calculate - Input data is empty";
         return finalNetwork;
     }
@@ -68,7 +68,7 @@ Network PartialDirectedCoherence::calculate(ConnectivitySettings& connectivitySe
     // Average trial data for MVAR fitting
     const int nTrials = connectivitySettings.size();
     MatrixXd matDataAvg = connectivitySettings.at(0).matData;
-    for(int t = 1; t < nTrials; ++t) {
+    for (int t = 1; t < nTrials; ++t) {
         matDataAvg += connectivitySettings.at(t).matData;
     }
     matDataAvg /= static_cast<double>(nTrials);
@@ -82,9 +82,9 @@ Network PartialDirectedCoherence::calculate(ConnectivitySettings& connectivitySe
 
     // Create nodes
     RowVectorXf rowVert = RowVectorXf::Zero(3);
-    for(int i = 0; i < nCh; ++i) {
+    for (int i = 0; i < nCh; ++i) {
         rowVert = RowVectorXf::Zero(3);
-        if(connectivitySettings.getNodePositions().rows() != 0 && i < connectivitySettings.getNodePositions().rows()) {
+        if (connectivitySettings.getNodePositions().rows() != 0 && i < connectivitySettings.getNodePositions().rows()) {
             rowVert(0) = connectivitySettings.getNodePositions().row(i)(0);
             rowVert(1) = connectivitySettings.getNodePositions().row(i)(1);
             rowVert(2) = connectivitySettings.getNodePositions().row(i)(2);
@@ -106,26 +106,26 @@ Network PartialDirectedCoherence::calculate(ConnectivitySettings& connectivitySe
 
     // Compute PDC: PDC_{ij}(f) = |A_{ij}(f)| / sqrt(sum_k |A_{kj}(f)|^2)
     // (normalized per column j)
-    for(int i = 0; i < nCh; ++i) {
-        for(int j = 0; j < nCh; ++j) {
+    for (int i = 0; i < nCh; ++i) {
+        for (int j = 0; j < nCh; ++j) {
             MatrixXd matWeight(iNFreqs, 1);
 
-            for(int fi = 0; fi < iNFreqs; ++fi) {
+            for (int fi = 0; fi < iNFreqs; ++fi) {
                 // Compute A(f) at this frequency
                 MatrixXcd matAf = matI;
-                for(int k = 0; k < p; ++k) {
+                for (int k = 0; k < p; ++k) {
                     const double phase = -2.0 * M_PI * vecFreqs(fi) * (k + 1);
                     matAf -= coeffs[k].cast<std::complex<double>>() * std::exp(jImag * phase);
                 }
 
                 // Column normalization: sqrt(sum_k |A_{kj}(f)|^2)
                 double colNorm = 0.0;
-                for(int k = 0; k < nCh; ++k) {
+                for (int k = 0; k < nCh; ++k) {
                     colNorm += std::norm(matAf(k, j));
                 }
                 colNorm = std::sqrt(colNorm);
 
-                if(colNorm > 0.0) {
+                if (colNorm > 0.0) {
                     matWeight(fi, 0) = std::abs(matAf(i, j)) / colNorm;
                 } else {
                     matWeight(fi, 0) = 0.0;

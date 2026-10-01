@@ -54,8 +54,8 @@ namespace MNELIB
 class MNESHARED_EXPORT MNEMneData
 {
 public:
-    typedef QSharedPointer<MNEMneData> SPtr;              /**< Shared pointer type for MNEMneData. */
-    typedef QSharedPointer<const MNEMneData> ConstSPtr;   /**< Const shared pointer type for MNEMneData. */
+    typedef QSharedPointer<MNEMneData> SPtr;            /**< Shared pointer type for MNEMneData. */
+    typedef QSharedPointer<const MNEMneData> ConstSPtr; /**< Const shared pointer type for MNEMneData. */
 
     //=========================================================================================================
     /**
@@ -70,11 +70,11 @@ public:
     ~MNEMneData() = default;
 
 public:
-    Eigen::MatrixXf datap;          /**< Projection of the whitened data onto the field eigenvectors. */
-    Eigen::MatrixXf predicted;      /**< The predicted data. */
-    Eigen::VectorXf SNR;            /**< Estimated power SNR as a function of time. */
-    Eigen::VectorXf lambda2_est;    /**< Regularization parameter estimated from available data. */
-    Eigen::VectorXf lambda2;        /**< Regularization parameter to be used (as a function of time). */
+    Eigen::MatrixXf datap;       /**< Projection of the whitened data onto the field eigenvectors. */
+    Eigen::MatrixXf predicted;   /**< The predicted data. */
+    Eigen::VectorXf SNR;         /**< Estimated power SNR as a function of time. */
+    Eigen::VectorXf lambda2_est; /**< Regularization parameter estimated from available data. */
+    Eigen::VectorXf lambda2;     /**< Regularization parameter to be used (as a function of time). */
 };
 
 //=============================================================================================================

@@ -85,8 +85,10 @@ SparseMatrix<int> StatsAdjacency::fromChannelPositions(const FiffInfo& info, con
             double d = (pos.row(i) - pos.row(j)).norm();
             distMat(i, j) = d;
             distMat(j, i) = d;
-            if (d < nnDist[i]) nnDist[i] = d;
-            if (d < nnDist[j]) nnDist[j] = d;
+            if (d < nnDist[i])
+                nnDist[i] = d;
+            if (d < nnDist[j])
+                nnDist[j] = d;
         }
     }
 
@@ -155,8 +157,7 @@ SparseMatrix<int> StatsAdjacency::fromSourceSpaceTemporal(
     std::vector<Triplet<int>> triplets;
 
     // Reserve approximate capacity: spatial edges * nTimes + temporal edges
-    triplets.reserve(static_cast<size_t>(spatialAdj.nonZeros()) * nTimes
-                     + static_cast<size_t>(nVertices) * (nTimes - 1) * 2);
+    triplets.reserve(static_cast<size_t>(spatialAdj.nonZeros()) * nTimes + static_cast<size_t>(nVertices) * (nTimes - 1) * 2);
 
     // Spatial neighbors repeated for each time point
     // Linear index: v * nTimes + t

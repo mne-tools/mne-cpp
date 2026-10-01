@@ -67,7 +67,8 @@ namespace UTILSLIB
 /**
  * @brief Per-row input bundle for parallel multi-taper spectral estimation (data row, taper matrix, FFT length).
  */
-struct TaperedSpectraInputData {
+struct TaperedSpectraInputData
+{
     Eigen::RowVectorXd vecData;
     Eigen::MatrixXd matTaper;
     int iNfft;
@@ -84,7 +85,6 @@ struct TaperedSpectraInputData {
  */
 class MATHSHARED_EXPORT Spectral
 {
-
 public:
     //=========================================================================================================
     /**
@@ -102,8 +102,8 @@ public:
      *
      * @return tapered spectra of the input data.
      */
-    static Eigen::MatrixXcd computeTaperedSpectraRow(const Eigen::RowVectorXd &vecData,
-                                                     const Eigen::MatrixXd &matTaper,
+    static Eigen::MatrixXcd computeTaperedSpectraRow(const Eigen::RowVectorXd& vecData,
+                                                     const Eigen::MatrixXd& matTaper,
                                                      int iNfft);
 
     //=========================================================================================================
@@ -117,8 +117,8 @@ public:
      *
      * @return tapered spectra of the input data.
      */
-    static QVector<Eigen::MatrixXcd> computeTaperedSpectraMatrix(const Eigen::MatrixXd &matData,
-                                                                 const Eigen::MatrixXd &matTaper,
+    static QVector<Eigen::MatrixXcd> computeTaperedSpectraMatrix(const Eigen::MatrixXd& matData,
+                                                                 const Eigen::MatrixXd& matTaper,
                                                                  int iNfft,
                                                                  bool bUseThreads = true);
 
@@ -153,10 +153,10 @@ public:
      *
      * @return power spectral density of a given tapered spectrum.
      */
-    static Eigen::RowVectorXd psdFromTaperedSpectra(const Eigen::MatrixXcd &matTapSpectrum,
-                                                    const Eigen::VectorXd &vecTapWeights,
+    static Eigen::RowVectorXd psdFromTaperedSpectra(const Eigen::MatrixXcd& matTapSpectrum,
+                                                    const Eigen::VectorXd& vecTapWeights,
                                                     int iNfft,
-                                                    double dSampFreq=1.0);
+                                                    double dSampFreq = 1.0);
 
     //=========================================================================================================
     /**
@@ -171,10 +171,10 @@ public:
      *
      * @return cross-spectral density of the tapered spectra of seed and target.
      */
-    static Eigen::RowVectorXcd csdFromTaperedSpectra(const Eigen::MatrixXcd &vecTapSpectrumSeed,
-                                                     const Eigen::MatrixXcd &vecTapSpectrumTarget,
-                                                     const Eigen::VectorXd &vecTapWeightsSeed,
-                                                     const Eigen::VectorXd &vecTapWeightsTarget,
+    static Eigen::RowVectorXcd csdFromTaperedSpectra(const Eigen::MatrixXcd& vecTapSpectrumSeed,
+                                                     const Eigen::MatrixXcd& vecTapSpectrumTarget,
+                                                     const Eigen::VectorXd& vecTapWeightsSeed,
+                                                     const Eigen::VectorXd& vecTapWeightsTarget,
                                                      int iNfft,
                                                      double dSampFreq = 1.0);
 
@@ -199,7 +199,7 @@ public:
      * @return Qpair of tapers and taper weights.
      */
     static QPair<Eigen::MatrixXd, Eigen::VectorXd> generateTapers(int iSignalLength,
-                                                                  const QString &sWindowType = "hanning");
+                                                                  const QString& sWindowType = "hanning");
 
     //=========================================================================================================
     /**
@@ -211,7 +211,7 @@ public:
      * @return Qpair of tapers and taper weights.
      */
     static std::pair<Eigen::MatrixXd, Eigen::VectorXd> generateTapers(int iSignalLength,
-                                                                  const std::string &sWindowType = "hanning");
+                                                                      const std::string& sWindowType = "hanning");
 
 private:
     //=========================================================================================================
@@ -228,6 +228,6 @@ private:
 //=============================================================================================================
 // INLINE DEFINITIONS
 //=============================================================================================================
-}//namespace
+} //namespace
 
 #endif // SPECTRAL_H

@@ -75,10 +75,10 @@ namespace FIFFLIB
 class FIFFSHARED_EXPORT FiffChInfo
 {
 public:
-    using SPtr = QSharedPointer<FiffChInfo>;            /**< Shared pointer type for FiffChInfo. */
-    using ConstSPtr = QSharedPointer<const FiffChInfo>; /**< Const shared pointer type for FiffChInfo. */
-    using UPtr = std::unique_ptr<FiffChInfo>;             /**< Unique pointer type for FiffChInfo. */
-    using ConstUPtr = std::unique_ptr<const FiffChInfo>;  /**< Const unique pointer type for FiffChInfo. */
+    using SPtr = QSharedPointer<FiffChInfo>;             /**< Shared pointer type for FiffChInfo. */
+    using ConstSPtr = QSharedPointer<const FiffChInfo>;  /**< Const shared pointer type for FiffChInfo. */
+    using UPtr = std::unique_ptr<FiffChInfo>;            /**< Unique pointer type for FiffChInfo. */
+    using ConstUPtr = std::unique_ptr<const FiffChInfo>; /**< Const unique pointer type for FiffChInfo. */
 
     //=========================================================================================================
     /**
@@ -92,7 +92,7 @@ public:
      *
      * @param[in] p_FiffChInfo   Channel Info descriptor which should be copied.
      */
-    FiffChInfo(const FiffChInfo &p_FiffChInfo);
+    FiffChInfo(const FiffChInfo& p_FiffChInfo);
 
     //=========================================================================================================
     /**
@@ -152,24 +152,23 @@ public:
      *
      * @return true if equal, false otherwise.
      */
-    friend bool operator== (const FiffChInfo &a, const FiffChInfo &b);
+    friend bool operator==(const FiffChInfo& a, const FiffChInfo& b);
 
 public:
-    fiff_int_t    scanNo;       /**< Scanning order number. */
-    fiff_int_t    logNo;        /**< Logical channel #. */
-    fiff_int_t    kind;         /**< Kind of channel. */
-    fiff_float_t  range;        /**< Voltmeter range (-1 = auto ranging). */
-    fiff_float_t  cal;          /**< Calibration from volts to units used. */
-    FiffChPos     chpos;        /**< Channel location. */
-    fiff_int_t    unit;         /**< Unit of measurement. */
-    fiff_int_t    unit_mul;     /**< Unit multiplier exponent. */
-    QString       ch_name;      /**< Descriptive name for the channel. */
+    fiff_int_t scanNo;   /**< Scanning order number. */
+    fiff_int_t logNo;    /**< Logical channel #. */
+    fiff_int_t kind;     /**< Kind of channel. */
+    fiff_float_t range;  /**< Voltmeter range (-1 = auto ranging). */
+    fiff_float_t cal;    /**< Calibration from volts to units used. */
+    FiffChPos chpos;     /**< Channel location. */
+    fiff_int_t unit;     /**< Unit of measurement. */
+    fiff_int_t unit_mul; /**< Unit multiplier exponent. */
+    QString ch_name;     /**< Descriptive name for the channel. */
 
     //Convenience members - MATLAB -
-    Eigen::Matrix<float,4,4, Eigen::DontAlign>    coil_trans;     /**< Coil coordinate system transformation. */
-    Eigen::Matrix<float,3,2, Eigen::DontAlign>    eeg_loc;        /**< Channel location. */
-    fiff_int_t    coord_frame;                      /**< Coordinate Frame. */
-
+    Eigen::Matrix<float, 4, 4, Eigen::DontAlign> coil_trans; /**< Coil coordinate system transformation. */
+    Eigen::Matrix<float, 3, 2, Eigen::DontAlign> eeg_loc;    /**< Channel location. */
+    fiff_int_t coord_frame;                                  /**< Coordinate Frame. */
 };
 
 //=============================================================================================================
@@ -180,13 +179,12 @@ inline qint32 FiffChInfo::storageSize()
 {
     // On-disk layout: scanNo, logNo, kind, range, cal, chpos, unit, unit_mul, ch_name[16]
     // (C++ class uses QString but on-disk stores fixed 16-char name)
-    return 3 * sizeof(fiff_int_t) + 2 * sizeof(fiff_float_t)
-         + FiffChPos::storageSize() + 2 * sizeof(fiff_int_t) + 16;
+    return 3 * sizeof(fiff_int_t) + 2 * sizeof(fiff_float_t) + FiffChPos::storageSize() + 2 * sizeof(fiff_int_t) + 16;
 }
 
 //=============================================================================================================
 
-inline bool operator== (const FiffChInfo &a, const FiffChInfo &b)
+inline bool operator==(const FiffChInfo& a, const FiffChInfo& b)
 {
     return (a.scanNo == b.scanNo &&
             a.logNo == b.logNo &&

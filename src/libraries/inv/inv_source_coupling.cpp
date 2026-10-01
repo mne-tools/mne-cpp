@@ -32,7 +32,7 @@ using namespace INVLIB;
 //=============================================================================================================
 
 InvSourceCoupling::InvSourceCoupling()
-    : tmin(0.0f)
-    , tmax(0.0f)
+: tmin(0.0f)
+, tmax(0.0f)
 {
 }

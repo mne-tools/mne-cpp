@@ -130,7 +130,7 @@ public:
      * @param[in] rhi   The RHI to allocate through.
      * @param[in] u     Batch collecting the resource updates.
      */
-    void updateBuffers(QRhi *rhi, QRhiResourceUpdateBatch *u);
+    void updateBuffers(QRhi* rhi, QRhiResourceUpdateBatch* u);
 
     //=========================================================================================================
     /**
@@ -154,19 +154,28 @@ public:
     /**
      * @return Number of indices in the unit segment mesh.
      */
-    int indexCount() const { return m_iIndexCount; }
+    int indexCount() const
+    {
+        return m_iIndexCount;
+    }
 
     //=========================================================================================================
     /**
      * @return Number of segment instances, one less than the number of points.
      */
-    int instanceCount() const { return m_iInstanceCount; }
+    int instanceCount() const
+    {
+        return m_iInstanceCount;
+    }
 
     //=========================================================================================================
     /**
      * @return Whether the polyline is drawn.
      */
-    bool isVisible() const { return m_bVisible; }
+    bool isVisible() const
+    {
+        return m_bVisible;
+    }
 
     //=========================================================================================================
     /**
@@ -174,13 +183,19 @@ public:
      *
      * @param[in] bVisible  True to draw the polyline.
      */
-    void setVisible(bool bVisible) { m_bVisible = bVisible; }
+    void setVisible(bool bVisible)
+    {
+        m_bVisible = bVisible;
+    }
 
     //=========================================================================================================
     /**
      * @return Whether there is at least one segment to draw.
      */
-    bool hasData() const { return m_iInstanceCount > 0; }
+    bool hasData() const
+    {
+        return m_iInstanceCount > 0;
+    }
 
 private:
     //=========================================================================================================
@@ -197,36 +212,38 @@ private:
 
     // Instance layout shared with DipoleObject and NetworkObject so that the
     // Dipole pipeline can render this object unchanged.
-    struct InstanceData {
+    struct InstanceData
+    {
         float model[16];
         float color[4];
-        float isSelected;   /**< Always 0, polylines are not pickable. */
+        float isSelected; /**< Always 0, polylines are not pickable. */
     };
 
-    struct VertexData {
+    struct VertexData
+    {
         float x, y, z;
         float nx, ny, nz;
     };
 
-    QVector<Eigen::Vector3f>    m_vecPoints;            /**< Points of the polyline, in order. */
+    QVector<Eigen::Vector3f> m_vecPoints; /**< Points of the polyline, in order. */
 
-    QByteArray                  m_vertexData;           /**< Unit segment vertices. */
-    QByteArray                  m_indexData;            /**< Unit segment indices. */
-    QByteArray                  m_instanceData;         /**< Per-segment instance data. */
+    QByteArray m_vertexData;   /**< Unit segment vertices. */
+    QByteArray m_indexData;    /**< Unit segment indices. */
+    QByteArray m_instanceData; /**< Per-segment instance data. */
 
-    int                         m_iIndexCount;          /**< Index count of the unit segment. */
-    int                         m_iInstanceCount;       /**< Number of segments. */
+    int m_iIndexCount;    /**< Index count of the unit segment. */
+    int m_iInstanceCount; /**< Number of segments. */
 
-    float                       m_fRadius;              /**< Segment radius in scene units. */
-    QColor                      m_startColor;           /**< Colour of the first segment. */
-    QColor                      m_endColor;             /**< Colour of the last segment. */
+    float m_fRadius;     /**< Segment radius in scene units. */
+    QColor m_startColor; /**< Colour of the first segment. */
+    QColor m_endColor;   /**< Colour of the last segment. */
 
-    bool                        m_bVisible;             /**< Whether the polyline is drawn. */
-    bool                        m_bGeometryDirty;       /**< Unit segment needs uploading. */
-    bool                        m_bInstancesDirty;      /**< Instance buffer needs refreshing. */
+    bool m_bVisible;        /**< Whether the polyline is drawn. */
+    bool m_bGeometryDirty;  /**< Unit segment needs uploading. */
+    bool m_bInstancesDirty; /**< Instance buffer needs refreshing. */
 
     struct GpuResources;
-    std::unique_ptr<GpuResources> m_gpu;                /**< RHI buffers, hidden to keep QRhi out of this header. */
+    std::unique_ptr<GpuResources> m_gpu; /**< RHI buffers, hidden to keep QRhi out of this header. */
 };
 
 #endif // DISP3DLIB_POLYLINEOBJECT_H

@@ -51,9 +51,10 @@
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-namespace FIFFLIB {
-    class FiffEvokedSet;
-    class FiffProj;
+namespace FIFFLIB
+{
+class FiffEvokedSet;
+class FiffProj;
 }
 
 //=============================================================================================================
@@ -67,16 +68,20 @@ namespace DISPLIB
 // DISPLIB FORWARD DECLARATIONS
 //=============================================================================================================
 
-namespace EvokedSetModelRoles {
-    enum ItemRole{GetAverageData = Qt::UserRole + 1020};
+namespace EvokedSetModelRoles
+{
+enum ItemRole
+{
+    GetAverageData = Qt::UserRole + 1020
+};
 }
 
 //=============================================================================================================
 // DEFINE TYPEDEFS
 //=============================================================================================================
 
-typedef Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic,Eigen::RowMajor> MatrixXdR;
-typedef QPair<const double*,qint32> RowVectorPair;
+typedef Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor> MatrixXdR;
+typedef QPair<const double*, qint32> RowVectorPair;
 typedef QPair<QString, Eigen::RowVectorXd> AvrTypeRowVector;
 typedef QPair<QString, DISPLIB::RowVectorPair> AvrTypeRowVectorPair;
 
@@ -94,8 +99,8 @@ class DISPSHARED_EXPORT EvokedSetModel : public QAbstractTableModel
     Q_OBJECT
 
 public:
-    typedef QSharedPointer<EvokedSetModel> SPtr;              /**< Shared pointer type for EvokedSetModel. */
-    typedef QSharedPointer<const EvokedSetModel> ConstSPtr;   /**< Const shared pointer type for EvokedSetModel. */
+    typedef QSharedPointer<EvokedSetModel> SPtr;            /**< Shared pointer type for EvokedSetModel. */
+    typedef QSharedPointer<const EvokedSetModel> ConstSPtr; /**< Const shared pointer type for EvokedSetModel. */
 
     //=========================================================================================================
     /**
@@ -103,7 +108,7 @@ public:
      *
      * @param[in] parent     parent of the table model.
      */
-    EvokedSetModel(QObject *parent = 0);
+    EvokedSetModel(QObject* parent = 0);
 
     ~EvokedSetModel();
 
@@ -131,7 +136,7 @@ public:
      *
      * @return number of rows.
      */
-    virtual int rowCount(const QModelIndex &parent = QModelIndex()) const ;
+    virtual int rowCount(const QModelIndex& parent = QModelIndex()) const;
 
     //=========================================================================================================
     /**
@@ -141,7 +146,7 @@ public:
      *
      * @return number of columns.
      */
-    virtual int columnCount(const QModelIndex &parent = QModelIndex()) const;
+    virtual int columnCount(const QModelIndex& parent = QModelIndex()) const;
 
     //=========================================================================================================
     /**
@@ -166,7 +171,7 @@ public:
      *
      * @return accessed data.
      */
-    virtual QVariant data(const QModelIndex &index,
+    virtual QVariant data(const QModelIndex& index,
                           int role = Qt::DisplayRole) const;
 
     //=========================================================================================================
@@ -208,7 +213,7 @@ public:
      *
      * @return Pointer to the current average colors.
      */
-    QSharedPointer<QMap<QString, QColor> > getAverageColor() const;
+    QSharedPointer<QMap<QString, QColor>> getAverageColor() const;
 
     //=========================================================================================================
     /**
@@ -216,7 +221,7 @@ public:
      *
      * @return Pointer to the current average activations.
      */
-    QSharedPointer<QMap<QString, bool> > getAverageActivation() const;
+    QSharedPointer<QMap<QString, bool>> getAverageActivation() const;
 
     //=========================================================================================================
     /**
@@ -224,7 +229,7 @@ public:
      *
      * @param[in] qMapAverageColor      Pointer to the new average colors.
      */
-    void setAverageColor(const QSharedPointer<QMap<QString, QColor> > qMapAverageColor);
+    void setAverageColor(const QSharedPointer<QMap<QString, QColor>> qMapAverageColor);
 
     //=========================================================================================================
     /**
@@ -232,7 +237,7 @@ public:
      *
      * @param[in] qMapAverageActivation      Pointer to the new average activations.
      */
-    void setAverageActivation(const QSharedPointer<QMap<QString, bool> > qMapAverageActivation);
+    void setAverageActivation(const QSharedPointer<QMap<QString, bool>> qMapAverageActivation);
 
     //=========================================================================================================
     /**
@@ -280,7 +285,7 @@ public:
      *
      * @return the channel idx to selection status.
      */
-    const QMap<qint32,qint32>& getIdxSelMap() const;
+    const QMap<qint32, qint32>& getIdxSelMap() const;
 
     //=========================================================================================================
     /**
@@ -296,7 +301,7 @@ public:
      *
      * @return the current baseline information as a from to QPair.
      */
-    QPair<QVariant,QVariant> getBaselineInfo() const;
+    QPair<QVariant, QVariant> getBaselineInfo() const;
 
     //=========================================================================================================
     /**
@@ -328,7 +333,7 @@ public:
      *
      * @param[in] selection      channel index list to select.
      */
-    void selectRows(const QList<qint32> &selection);
+    void selectRows(const QList<qint32>& selection);
 
     //=========================================================================================================
     /**
@@ -375,33 +380,33 @@ public:
     void toggleFreeze();
 
 private:
-    QSharedPointer<FIFFLIB::FiffEvokedSet>  m_pEvokedSet;                   /**< The evoked set measurement. */
+    QSharedPointer<FIFFLIB::FiffEvokedSet> m_pEvokedSet; /**< The evoked set measurement. */
 
-    QMap<qint32,qint32>                     m_qMapIdxRowSelection;          /**< Selection mapping.*/
-    QSharedPointer<QMap<QString, QColor> >  m_qMapAverageColor;             /**< Average colors. */
-    QSharedPointer<QMap<QString, bool> >    m_qMapAverageActivation;        /**< Average activation status. */
-    QSharedPointer<QMap<QString, QColor> >  m_qMapAverageColorOld;          /**< Average colors. */
-    QSharedPointer<QMap<QString, bool> >    m_qMapAverageActivationOld;     /**< Average activation status. */
+    QMap<qint32, qint32> m_qMapIdxRowSelection;                     /**< Selection mapping.*/
+    QSharedPointer<QMap<QString, QColor>> m_qMapAverageColor;       /**< Average colors. */
+    QSharedPointer<QMap<QString, bool>> m_qMapAverageActivation;    /**< Average activation status. */
+    QSharedPointer<QMap<QString, QColor>> m_qMapAverageColorOld;    /**< Average colors. */
+    QSharedPointer<QMap<QString, bool>> m_qMapAverageActivationOld; /**< Average activation status. */
 
-    QList<Eigen::MatrixXd>                  m_matData;                      /**< List that holds the data*/
-    QList<Eigen::MatrixXd>                  m_matDataFreeze;                /**< List that holds the data when freezed*/
-    QStringList                             m_lAvrTypes;                    /**< The average types. */
+    QList<Eigen::MatrixXd> m_matData;       /**< List that holds the data*/
+    QList<Eigen::MatrixXd> m_matDataFreeze; /**< List that holds the data when freezed*/
+    QStringList m_lAvrTypes;                /**< The average types. */
 
-    Eigen::MatrixXd                         m_matProj;                      /**< SSP projector. */
-    Eigen::MatrixXd                         m_matComp;                      /**< Compensator. */
-    Eigen::SparseMatrix<double>             m_matSparseProjCompMult;        /**< The final sparse projection + compensator operator.*/
-    Eigen::SparseMatrix<double>             m_matSparseProjMult;            /**< The final sparse SSP projector. */
-    Eigen::SparseMatrix<double>             m_matSparseCompMult;            /**< The final sparse compensator matrix. */
+    Eigen::MatrixXd m_matProj;                           /**< SSP projector. */
+    Eigen::MatrixXd m_matComp;                           /**< Compensator. */
+    Eigen::SparseMatrix<double> m_matSparseProjCompMult; /**< The final sparse projection + compensator operator.*/
+    Eigen::SparseMatrix<double> m_matSparseProjMult;     /**< The final sparse SSP projector. */
+    Eigen::SparseMatrix<double> m_matSparseCompMult;     /**< The final sparse compensator matrix. */
 
-    Eigen::RowVectorXi                      m_vecBadIdcs;                   /**< Idcs of bad channels. */
+    Eigen::RowVectorXi m_vecBadIdcs; /**< Idcs of bad channels. */
 
-    QPair<QVariant,QVariant>                m_pairBaseline;                 /**< Baseline information. */
+    QPair<QVariant, QVariant> m_pairBaseline; /**< Baseline information. */
 
-    bool                                    m_bIsInit;                      /**< Init flag. */
-    bool                                    m_bIsFreezed;                   /**< Display is freezed. */
-    bool                                    m_bProjActivated;               /**< Doo projections flag. */
-    bool                                    m_bCompActivated;               /**< Compensator activated. */
-    float                                   m_fSps;                         /**< Sampling rate. */
+    bool m_bIsInit;        /**< Init flag. */
+    bool m_bIsFreezed;     /**< Display is freezed. */
+    bool m_bProjActivated; /**< Doo projections flag. */
+    bool m_bCompActivated; /**< Compensator activated. */
+    float m_fSps;          /**< Sampling rate. */
 
 signals:
     //=========================================================================================================
@@ -418,7 +423,7 @@ signals:
      *
      * @param[in] qMapAverageColor     the average color map.
      */
-    void newAverageColorMap(const QSharedPointer<QMap<QString, QColor> > qMapAverageColor);
+    void newAverageColorMap(const QSharedPointer<QMap<QString, QColor>> qMapAverageColor);
 
     //=========================================================================================================
     /**
@@ -426,7 +431,7 @@ signals:
      *
      * @param[in] qMapAverageActivation     the average activation map.
      */
-    void newAverageActivationMap(const QSharedPointer<QMap<QString, bool> > qMapAverageActivation);
+    void newAverageActivationMap(const QSharedPointer<QMap<QString, bool>> qMapAverageActivation);
 };
 
 //=============================================================================================================
@@ -436,7 +441,7 @@ signals:
 
 #ifndef metatype_listrowvectorxd
 #define metatype_listrowvectorxd
-Q_DECLARE_METATYPE(DISPLIB::AvrTypeRowVector);    /**< Provides QT META type declaration of the Eigen::RowVectorXd type. For signal/slot usage.*/
+Q_DECLARE_METATYPE(DISPLIB::AvrTypeRowVector); /**< Provides QT META type declaration of the Eigen::RowVectorXd type. For signal/slot usage.*/
 #endif
 
 #ifndef metatype_listrowvectorpair

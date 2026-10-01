@@ -42,14 +42,12 @@ using namespace ANSHAREDLIB;
 
 Events::Events()
 {
-
 }
 
 //=============================================================================================================
 
 Events::~Events()
 {
-
 }
 
 //=============================================================================================================
@@ -71,7 +69,6 @@ void Events::init()
 
 void Events::unload()
 {
-
 }
 
 //=============================================================================================================
@@ -83,18 +80,18 @@ QString Events::getName() const
 
 //=============================================================================================================
 
-QMenu *Events::getMenu()
+QMenu* Events::getMenu()
 {
     return Q_NULLPTR;
 }
 
 //=============================================================================================================
 
-QDockWidget *Events::getControl()
+QDockWidget* Events::getControl()
 {
     EventView* pEventView = new EventView();
     pEventView->setSizePolicy(QSizePolicy(QSizePolicy::Expanding,
-                                                       QSizePolicy::Preferred));
+                                          QSizePolicy::Preferred));
 
     connect(pEventView, &EventView::triggerRedraw,
             this, &Events::onTriggerRedraw, Qt::UniqueConnection);
@@ -141,7 +138,7 @@ QDockWidget *Events::getControl()
 
 //=============================================================================================================
 
-QWidget *Events::getView()
+QWidget* Events::getView()
 {
     return Q_NULLPTR;
 }
@@ -151,18 +148,18 @@ QWidget *Events::getView()
 void Events::handleEvent(QSharedPointer<Event> e)
 {
     switch (e->getType()) {
-    case EVENT_TYPE::NEW_EVENT_ADDED:
-        emit newEventAvailable(e->getData().toInt());
-        onTriggerRedraw();
-        break;
-    case EVENT_TYPE::SELECTED_MODEL_CHANGED:
-        onModelChanged(e->getData().value<QSharedPointer<ANSHAREDLIB::AbstractModel> >());
-        break;
-    case EVENT_TYPE::MODEL_REMOVED:
-        onModelRemoved(e->getData().value<QSharedPointer<ANSHAREDLIB::AbstractModel>>());
-        break;
-    default:
-        qWarning() << "[Events::handleEvent] Received an Event that is not handled by switch cases.";
+        case EVENT_TYPE::NEW_EVENT_ADDED:
+            emit newEventAvailable(e->getData().toInt());
+            onTriggerRedraw();
+            break;
+        case EVENT_TYPE::SELECTED_MODEL_CHANGED:
+            onModelChanged(e->getData().value<QSharedPointer<ANSHAREDLIB::AbstractModel>>());
+            break;
+        case EVENT_TYPE::MODEL_REMOVED:
+            onModelRemoved(e->getData().value<QSharedPointer<ANSHAREDLIB::AbstractModel>>());
+            break;
+        default:
+            qWarning() << "[Events::handleEvent] Received an Event that is not handled by switch cases.";
     }
 }
 
@@ -182,23 +179,23 @@ QVector<EVENT_TYPE> Events::getEventSubscriptions(void) const
 
 void Events::onModelChanged(QSharedPointer<ANSHAREDLIB::AbstractModel> pNewModel)
 {
-    if(pNewModel->getType() == MODEL_TYPE::ANSHAREDLIB_FIFFRAW_MODEL) {
+    if (pNewModel->getType() == MODEL_TYPE::ANSHAREDLIB_FIFFRAW_MODEL) {
         emit disconnectFromModel();
         FiffRawViewModel::SPtr pFiffRawModel = qSharedPointerCast<FiffRawViewModel>(pNewModel);
 
-        if(pFiffRawModel->hasEventModel()){
+        if (pFiffRawModel->hasEventModel()) {
             emit newEventModelAvailable(pFiffRawModel->getEventModel());
         } else {
             QSharedPointer<EventModel> pEventModel = QSharedPointer<EventModel>::create(pFiffRawModel);
-            if (pFiffRawModel->isRealtime()){
+            if (pFiffRawModel->isRealtime()) {
                 pEventModel->setSharedMemory(true);
             }
             emit newEventModelAvailable(pEventModel);
             m_pAnalyzeData->addModel<ANSHAREDLIB::EventModel>(pEventModel,
-                                                                   "Events");
+                                                              "Events");
         }
         emit newFiffRawViewModel(pFiffRawModel);
-    } else if(pNewModel->getType() == MODEL_TYPE::ANSHAREDLIB_EVENT_MODEL) {
+    } else if (pNewModel->getType() == MODEL_TYPE::ANSHAREDLIB_EVENT_MODEL) {
         emit disconnectFromModel();
         EventModel::SPtr pEventModel = qSharedPointerCast<EventModel>(pNewModel);
         emit newEventModelAvailable(pEventModel);
@@ -253,7 +250,7 @@ void Events::triggerLoadingEnd(const QString& sMessage)
 
 void Events::onModelRemoved(QSharedPointer<ANSHAREDLIB::AbstractModel> pRemovedModel)
 {
-    if(pRemovedModel->getType() == MODEL_TYPE::ANSHAREDLIB_EVENT_MODEL || pRemovedModel->getType() == MODEL_TYPE::ANSHAREDLIB_FIFFRAW_MODEL) {
+    if (pRemovedModel->getType() == MODEL_TYPE::ANSHAREDLIB_EVENT_MODEL || pRemovedModel->getType() == MODEL_TYPE::ANSHAREDLIB_FIFFRAW_MODEL) {
         emit clearView(pRemovedModel);
     }
 }
@@ -262,5 +259,5 @@ void Events::onModelRemoved(QSharedPointer<ANSHAREDLIB::AbstractModel> pRemovedM
 
 QString Events::getBuildInfo()
 {
-    return QString(EVENTSPLUGIN::buildDateTime()) + QString(" - ")  + QString(EVENTSPLUGIN::buildHash());
+    return QString(EVENTSPLUGIN::buildDateTime()) + QString(" - ") + QString(EVENTSPLUGIN::buildHash());
 }

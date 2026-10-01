@@ -35,11 +35,11 @@
 //=============================================================================================================
 
 #if defined(STATICBUILD)
-#  define FSSHARED_EXPORT
+#define FSSHARED_EXPORT
 #elif defined(MNE_FS_LIBRARY)
-#  define FSSHARED_EXPORT Q_DECL_EXPORT    /**< Q_DECL_EXPORT must be added to the declarations of symbols used when compiling a shared library. */
+#define FSSHARED_EXPORT Q_DECL_EXPORT /**< Q_DECL_EXPORT must be added to the declarations of symbols used when compiling a shared library. */
 #else
-#  define FSSHARED_EXPORT Q_DECL_IMPORT    /**< Q_DECL_IMPORT must be added to the declarations of symbols used when compiling a client that uses the shared library. */
+#define FSSHARED_EXPORT Q_DECL_IMPORT /**< Q_DECL_IMPORT must be added to the declarations of symbols used when compiling a client that uses the shared library. */
 #endif
 
 //=============================================================================================================
@@ -55,7 +55,8 @@
  * companion lookup against volumetric parcellations
  * (@c aparc+aseg.mgz). The volumetric MRI side lives in MRILIB.
  */
-namespace FSLIB{
+namespace FSLIB
+{
 
 //=============================================================================================================
 /**

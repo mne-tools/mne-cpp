@@ -234,8 +234,8 @@ void TestStsCluster::testFtestDegreesOfFreedom()
 
     StatsFtestResult result = StatsFtest::oneWay(groups);
 
-    QCOMPARE(result.dfBetween, 2);    // k - 1
-    QCOMPARE(result.dfWithin, 27);    // N - k
+    QCOMPARE(result.dfBetween, 2); // k - 1
+    QCOMPARE(result.dfWithin, 27); // N - k
 }
 
 //=============================================================================================================
@@ -357,7 +357,8 @@ void TestStsCluster::testClusterPermutationNullDistribution()
     // Under null, most cluster p-values should be > 0.05
     int nSignificant = 0;
     for (double p : result.vecClusterPvals) {
-        if (p < 0.05) ++nSignificant;
+        if (p < 0.05)
+            ++nSignificant;
     }
     // At most 1 significant cluster by chance (generous)
     QVERIFY(nSignificant <= 2);

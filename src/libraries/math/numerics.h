@@ -97,7 +97,7 @@ public:
      *
      * @return true if sparse, false otherwise.
      */
-    static bool issparse(Eigen::VectorXd &v);
+    static bool issparse(Eigen::VectorXd& v);
 
     //=========================================================================================================
     /**
@@ -122,9 +122,9 @@ public:
      *
      * @return Rescaled data matrix.
      */
-    static Eigen::MatrixXd rescale(const Eigen::MatrixXd &data,
-                                   const Eigen::RowVectorXf &times,
-                                   const QPair<float, float> &baseline,
+    static Eigen::MatrixXd rescale(const Eigen::MatrixXd& data,
+                                   const Eigen::RowVectorXf& times,
+                                   const QPair<float, float>& baseline,
                                    QString mode);
 
     //=========================================================================================================
@@ -203,7 +203,7 @@ public:
 template<typename T>
 inline double Numerics::log2(const T d)
 {
-    return log(d)/log(2);
+    return log(d) / log(2);
 }
 
 //=============================================================================================================
@@ -249,61 +249,49 @@ void Numerics::histcounts(const Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>
                           double dGlobalMin,
                           double dGlobalMax)
 {
-    if(matRawData.rows() == 0 || matRawData.cols() == 0) {
+    if (matRawData.rows() == 0 || matRawData.cols() == 0) {
         return;
     }
 
     vecResultClassLimits.resize(iClassAmount + 1);
     vecResultFrequency.resize(iClassAmount);
 
-    for (int count = 0; count < iClassAmount; ++count)
-    {
+    for (int count = 0; count < iClassAmount; ++count) {
         vecResultFrequency(count) = 0;
     }
 
     double desiredMin,
-           desiredMax;
+        desiredMax;
     double rawMin(0.0),
-           rawMax(0.0),
-           localMin(0.0),
-           localMax(0.0);
+        rawMax(0.0),
+        localMin(0.0),
+        localMax(0.0);
 
     rawMin = matRawData.minCoeff();
     rawMax = matRawData.maxCoeff();
 
-    if (bMakeSymmetrical == true)
-    {
-        if (std::fabs(rawMin) > rawMax)
-        {
+    if (bMakeSymmetrical == true) {
+        if (std::fabs(rawMin) > rawMax) {
             localMax = std::fabs(rawMin);
             localMin = rawMin;
-        }
-        else if (rawMax > std::fabs(rawMin))
-        {
+        } else if (rawMax > std::fabs(rawMin)) {
             localMin = -(rawMax);
             localMax = rawMax;
-        }
-        else
-        {
+        } else {
             localMin = rawMin;
             localMax = rawMax;
         }
-    }
-    else
-    {
+    } else {
         localMin = rawMin;
         localMax = rawMax;
     }
 
-    if (dGlobalMin == 0.0 && dGlobalMax == 0.0)
-    {
+    if (dGlobalMin == 0.0 && dGlobalMax == 0.0) {
         desiredMin = localMin;
         desiredMax = localMax;
         vecResultClassLimits[0] = desiredMin;
         vecResultClassLimits[iClassAmount] = desiredMax;
-    }
-    else
-    {
+    } else {
         desiredMin = dGlobalMin;
         desiredMax = dGlobalMax;
         vecResultClassLimits(0) = desiredMin;
@@ -313,30 +301,21 @@ void Numerics::histcounts(const Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>
     double range = (vecResultClassLimits(iClassAmount) - vecResultClassLimits(0)),
            dynamicUpperClassLimit;
 
-    for (int kr = 0; kr < iClassAmount; ++kr)
-    {
+    for (int kr = 0; kr < iClassAmount; ++kr) {
         dynamicUpperClassLimit = (vecResultClassLimits(0) + (kr * (range / iClassAmount)));
         vecResultClassLimits(kr) = dynamicUpperClassLimit;
     }
 
-    for (int ir = 0; ir < matRawData.rows(); ++ir)
-    {
-        for (int jr = 0; jr < matRawData.cols(); ++jr)
-        {
-            if(matRawData(ir,jr) != 0.0) {
-                for (int kr = 0; kr < iClassAmount; ++kr)
-                {
-                    if (kr == iClassAmount - 1)
-                    {
-                        if (matRawData(ir,jr) >= vecResultClassLimits(kr) && matRawData(ir,jr) <= vecResultClassLimits(kr + 1))
-                        {
+    for (int ir = 0; ir < matRawData.rows(); ++ir) {
+        for (int jr = 0; jr < matRawData.cols(); ++jr) {
+            if (matRawData(ir, jr) != 0.0) {
+                for (int kr = 0; kr < iClassAmount; ++kr) {
+                    if (kr == iClassAmount - 1) {
+                        if (matRawData(ir, jr) >= vecResultClassLimits(kr) && matRawData(ir, jr) <= vecResultClassLimits(kr + 1)) {
                             vecResultFrequency(kr) = vecResultFrequency(kr) + 1;
                         }
-                    }
-                    else
-                    {
-                        if (matRawData(ir,jr) >= vecResultClassLimits(kr) && matRawData(ir,jr) < vecResultClassLimits(kr + 1))
-                        {
+                    } else {
+                        if (matRawData(ir, jr) >= vecResultClassLimits(kr) && matRawData(ir, jr) < vecResultClassLimits(kr + 1)) {
                             vecResultFrequency(kr) = vecResultFrequency(kr) + 1;
                         }
                     }

@@ -109,13 +109,19 @@ using namespace MRILIB;
 class OverlayColorBar : public QWidget
 {
 public:
-    explicit OverlayColorBar(QWidget* parent = nullptr) : QWidget(parent)
+    explicit OverlayColorBar(QWidget* parent = nullptr)
+    : QWidget(parent)
     {
         setMinimumHeight(40);
         setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
     }
 
-    enum class Colormap { Sequential = 0, Divergent, HotCool };
+    enum class Colormap
+    {
+        Sequential = 0,
+        Divergent,
+        HotCool
+    };
 
     void setRange(float fmin, float fmid, float fmax)
     {
@@ -169,9 +175,9 @@ protected:
     }
 
 private:
-    float    m_fmin = 0.0f;
-    float    m_fmid = 0.5f;
-    float    m_fmax = 1.0f;
+    float m_fmin = 0.0f;
+    float m_fmid = 0.5f;
+    float m_fmax = 1.0f;
     Colormap m_cmap = Colormap::Sequential;
 };
 
@@ -185,28 +191,28 @@ private:
 static QString bidsSubdirForRole(MnaFileRole role)
 {
     switch (role) {
-    case MnaFileRole::Surface:
-    case MnaFileRole::Annotation:
-        return QStringLiteral("anat");
-    case MnaFileRole::Bem:
-    case MnaFileRole::SourceSpace:
-        return QStringLiteral("bem");
-    case MnaFileRole::Digitizer:
-    case MnaFileRole::Transform:
-    case MnaFileRole::Evoked:
-        return QStringLiteral("meg");
-    case MnaFileRole::SourceEstimate:
-        return QStringLiteral("source");
-    default:
-        return QStringLiteral("other");
+        case MnaFileRole::Surface:
+        case MnaFileRole::Annotation:
+            return QStringLiteral("anat");
+        case MnaFileRole::Bem:
+        case MnaFileRole::SourceSpace:
+            return QStringLiteral("bem");
+        case MnaFileRole::Digitizer:
+        case MnaFileRole::Transform:
+        case MnaFileRole::Evoked:
+            return QStringLiteral("meg");
+        case MnaFileRole::SourceEstimate:
+            return QStringLiteral("source");
+        default:
+            return QStringLiteral("other");
     }
 }
 
 /**
  * Build a BIDS-like relative path: sub-<subj>/ses-<sess>/<modality>/<filename>
  */
-static QString bidsBuildRelPath(const QString &subjId, const QString &sessId,
-                                MnaFileRole role, const QString &fileName)
+static QString bidsBuildRelPath(const QString& subjId, const QString& sessId,
+                                MnaFileRole role, const QString& fileName)
 {
     return QStringLiteral("sub-%1/ses-%2/%3/%4")
         .arg(subjId, sessId, bidsSubdirForRole(role), QFileInfo(fileName).fileName());
@@ -222,7 +228,7 @@ static QString bidsBuildRelPath(const QString &subjId, const QString &sessId,
  * temporary path in the Emscripten virtual filesystem so that existing
  * file-path-based loaders can consume it transparently.
  */
-static QString wasmSaveToTemp(const QString &fileName, const QByteArray &fileContent)
+static QString wasmSaveToTemp(const QString& fileName, const QByteArray& fileContent)
 {
     QString tempPath = QStringLiteral("/tmp/") + QFileInfo(fileName).fileName();
     QFile f(tempPath);
@@ -244,39 +250,36 @@ static QString wasmSaveToTemp(const QString &fileName, const QByteArray &fileCon
  * Create a flat, modern title bar widget for a QDockWidget.
  * Thin bar with uppercase label on the left and a small close button on the right.
  */
-static QWidget *createFlatDockTitleBar(QDockWidget *dock, const QString &title)
+static QWidget* createFlatDockTitleBar(QDockWidget* dock, const QString& title)
 {
-    QWidget *bar = new QWidget(dock);
+    QWidget* bar = new QWidget(dock);
     bar->setObjectName("flatDockTitleBar");
     bar->setMinimumHeight(40);
     bar->setMaximumHeight(40);
     bar->setStyleSheet(
-        "#flatDockTitleBar { background: palette(window); border-bottom: 1px solid palette(mid); padding: 0px; margin: 0px; }"
-    );
+        "#flatDockTitleBar { background: palette(window); border-bottom: 1px solid palette(mid); padding: 0px; margin: 0px; }");
 
-    QHBoxLayout *lay = new QHBoxLayout(bar);
+    QHBoxLayout* lay = new QHBoxLayout(bar);
     lay->setContentsMargins(10, 8, 10, 8);
     lay->setSpacing(0);
 
-    QLabel *lbl = new QLabel(title.toUpper());
+    QLabel* lbl = new QLabel(title.toUpper());
     lbl->setStyleSheet(
         "font-size: 11px;"
         "font-weight: 600;"
         "letter-spacing: 0.5px;"
         "color: palette(text);"
         "background: transparent;"
-        "border: none;"
-    );
+        "border: none;");
     lay->addWidget(lbl, 1, Qt::AlignVCenter);
 
-    QPushButton *closeBtn = new QPushButton("\u00D7");   // multiplication sign ×
+    QPushButton* closeBtn = new QPushButton("\u00D7"); // multiplication sign ×
     closeBtn->setFixedSize(20, 20);
     closeBtn->setFlat(true);
     closeBtn->setCursor(Qt::ArrowCursor);
     closeBtn->setStyleSheet(
         "QPushButton { font-size: 14px; color: palette(text); background: transparent; border: none; border-radius: 3px; }"
-        "QPushButton:hover { background: palette(mid); }"
-    );
+        "QPushButton:hover { background: palette(mid); }");
     QObject::connect(closeBtn, &QPushButton::clicked, dock, &QDockWidget::close);
     lay->addWidget(closeBtn, 0, Qt::AlignVCenter);
 
@@ -302,12 +305,12 @@ MainWindow::~MainWindow()
 
 //=============================================================================================================
 
-MainWindow::MainWindow(QWidget *parent)
-    : QMainWindow(parent)
-    , m_scene(this)
-    , m_electrodesPlugin(this)
-    , m_mriSlicesPlugin(this)
-    , m_pickReadout(this)
+MainWindow::MainWindow(QWidget* parent)
+: QMainWindow(parent)
+, m_scene(this)
+, m_electrodesPlugin(this)
+, m_mriSlicesPlugin(this)
+, m_pickReadout(this)
 {
     setWindowTitle("MNE Inspect");
 
@@ -341,17 +344,17 @@ MainWindow::MainWindow(QWidget *parent)
 void MainWindow::setupUI()
 {
     // Side Panel (Controls) with Scroll Area
-    QScrollArea *scrollArea = new QScrollArea;
+    QScrollArea* scrollArea = new QScrollArea;
     scrollArea->setMinimumWidth(280);
     scrollArea->setMaximumWidth(320);
     scrollArea->setWidgetResizable(true);
     scrollArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     scrollArea->setFrameShape(QFrame::NoFrame);
 
-    QWidget *sidePanel = new QWidget;
+    QWidget* sidePanel = new QWidget;
     sidePanel->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Expanding);
     sidePanel->setMaximumWidth(280);
-    QVBoxLayout *sideLayout = new QVBoxLayout(sidePanel);
+    QVBoxLayout* sideLayout = new QVBoxLayout(sidePanel);
     sideLayout->setContentsMargins(4, 4, 4, 4);
     sideLayout->setSpacing(5);
     scrollArea->setWidget(sidePanel);
@@ -359,21 +362,21 @@ void MainWindow::setupUI()
     // ===== Brain Surface Group =====
     m_surfGroup = new QGroupBox("Brain Surface");
     m_surfGroup->setEnabled(false);
-    QVBoxLayout *surfLayout = new QVBoxLayout(m_surfGroup);
+    QVBoxLayout* surfLayout = new QVBoxLayout(m_surfGroup);
     surfLayout->setContentsMargins(6, 12, 6, 6);
     surfLayout->setSpacing(8);
 
     // Surface Selector
-    QLabel *surfLabel = new QLabel("Surface Type:");
+    QLabel* surfLabel = new QLabel("Surface Type:");
     m_surfCombo = new QComboBox;
     m_surfCombo->addItems({"pial", "inflated", "white"});
 
     // Shader Mode
-    QLabel *shaderLabel = new QLabel("Brain Shader:");
+    QLabel* shaderLabel = new QLabel("Brain Shader:");
     m_shaderCombo = new QComboBox;
     m_shaderCombo->addItems({"Standard", "Holographic", "Anatomical"});
 
-    QLabel *bemShaderLabel = new QLabel("Head Shader:");
+    QLabel* bemShaderLabel = new QLabel("Head Shader:");
     m_bemShaderCombo = new QComboBox;
     m_bemShaderCombo->addItems({"Standard", "Holographic", "Anatomical"});
     m_bemShaderCombo->setEnabled(false);
@@ -387,7 +390,7 @@ void MainWindow::setupUI()
     m_bemColorCheck->setToolTip("Toggle between standard Red/Green/Blue colors and White/Overlay colors.");
 
     // Overlay
-    QLabel *overlayLabel = new QLabel("Overlay:");
+    QLabel* overlayLabel = new QLabel("Overlay:");
     m_overlayCombo = new QComboBox;
     m_overlayCombo->addItems({"Surface", "Annotation", "Scientific"});
 
@@ -417,7 +420,7 @@ void MainWindow::setupUI()
     // ===== BEM Surface Group =====
     m_bemGroup = new QGroupBox("BEM Surface");
     m_bemGroup->setEnabled(false);
-    QVBoxLayout *bemLayout = new QVBoxLayout(m_bemGroup);
+    QVBoxLayout* bemLayout = new QVBoxLayout(m_bemGroup);
     bemLayout->setContentsMargins(6, 12, 6, 6);
     bemLayout->setSpacing(8);
 
@@ -432,7 +435,7 @@ void MainWindow::setupUI()
     // ===== MRI Volume Group =====
     m_mriGroup = new QGroupBox("MRI Volume");
     m_mriGroup->setEnabled(false);
-    QVBoxLayout *mriLayout = new QVBoxLayout(m_mriGroup);
+    QVBoxLayout* mriLayout = new QVBoxLayout(m_mriGroup);
     mriLayout->setContentsMargins(6, 12, 6, 6);
     mriLayout->setSpacing(6);
 
@@ -459,7 +462,7 @@ void MainWindow::setupUI()
     m_mriAxialSlider->setMinimum(0);
     m_mriAxialSlider->setMaximum(0);
     {
-        QHBoxLayout *row = new QHBoxLayout;
+        QHBoxLayout* row = new QHBoxLayout;
         row->addWidget(m_mriAxialCheck);
         row->addStretch(1);
         row->addWidget(m_mriAxialLabel);
@@ -475,7 +478,7 @@ void MainWindow::setupUI()
     m_mriCoronalSlider->setMinimum(0);
     m_mriCoronalSlider->setMaximum(0);
     {
-        QHBoxLayout *row = new QHBoxLayout;
+        QHBoxLayout* row = new QHBoxLayout;
         row->addWidget(m_mriCoronalCheck);
         row->addStretch(1);
         row->addWidget(m_mriCoronalLabel);
@@ -491,7 +494,7 @@ void MainWindow::setupUI()
     m_mriSagittalSlider->setMinimum(0);
     m_mriSagittalSlider->setMaximum(0);
     {
-        QHBoxLayout *row = new QHBoxLayout;
+        QHBoxLayout* row = new QHBoxLayout;
         row->addWidget(m_mriSagittalCheck);
         row->addStretch(1);
         row->addWidget(m_mriSagittalLabel);
@@ -501,10 +504,10 @@ void MainWindow::setupUI()
 
     // Window / Level controls (clinical MRI convention)
     {
-        QLabel *wlHeader = new QLabel("<b>Image Adjustment</b>");
+        QLabel* wlHeader = new QLabel("<b>Image Adjustment</b>");
         mriLayout->addWidget(wlHeader);
 
-        QHBoxLayout *wcRow = new QHBoxLayout;
+        QHBoxLayout* wcRow = new QHBoxLayout;
         wcRow->addWidget(new QLabel("Brightness:"));
         m_mriWindowCenterSlider = new QSlider(Qt::Horizontal);
         m_mriWindowCenterSlider->setRange(0, 100);
@@ -515,7 +518,7 @@ void MainWindow::setupUI()
         wcRow->addWidget(m_mriWindowCenterLabel);
         mriLayout->addLayout(wcRow);
 
-        QHBoxLayout *wwRow = new QHBoxLayout;
+        QHBoxLayout* wwRow = new QHBoxLayout;
         wwRow->addWidget(new QLabel("Contrast:"));
         m_mriWindowWidthSlider = new QSlider(Qt::Horizontal);
         m_mriWindowWidthSlider->setRange(1, 100);
@@ -526,7 +529,7 @@ void MainWindow::setupUI()
         wwRow->addWidget(m_mriWindowWidthLabel);
         mriLayout->addLayout(wwRow);
 
-        QHBoxLayout *opRow = new QHBoxLayout;
+        QHBoxLayout* opRow = new QHBoxLayout;
         opRow->addWidget(new QLabel("Opacity:"));
         m_mriOpacitySlider = new QSlider(Qt::Horizontal);
         m_mriOpacitySlider->setRange(0, 100);
@@ -541,16 +544,16 @@ void MainWindow::setupUI()
     // ===== Source Estimate Group =====
     m_stcGroup = new QGroupBox("Source Estimate");
     m_stcGroup->setEnabled(false);
-    QVBoxLayout *stcLayout = new QVBoxLayout(m_stcGroup);
+    QVBoxLayout* stcLayout = new QVBoxLayout(m_stcGroup);
     stcLayout->setContentsMargins(6, 12, 6, 6);
     stcLayout->setSpacing(8);
 
-    QLabel *stcSelectLabel = new QLabel("Source Estimate:");
+    QLabel* stcSelectLabel = new QLabel("Source Estimate:");
     m_stcCombo = new QComboBox;
     m_stcCombo->setEnabled(false);
     m_stcCombo->setToolTip("Select which loaded source estimate to display");
 
-    QLabel *colormapLabel = new QLabel("Colormap:");
+    QLabel* colormapLabel = new QLabel("Colormap:");
     m_colormapCombo = new QComboBox;
     m_colormapCombo->addItems({"Hot", "Jet", "Viridis", "Cool", "RedBlue", "Bone"});
 
@@ -558,7 +561,7 @@ void MainWindow::setupUI()
     m_timeSlider = new QSlider(Qt::Horizontal);
     m_timeSlider->setEnabled(false);
 
-    QLabel *threshLabel = new QLabel("Thresholds:");
+    QLabel* threshLabel = new QLabel("Thresholds:");
     m_minThresh = new QDoubleSpinBox;
     m_midThresh = new QDoubleSpinBox;
     m_maxThresh = new QDoubleSpinBox;
@@ -572,7 +575,7 @@ void MainWindow::setupUI()
     m_midThresh->setValue(0.5);
     m_maxThresh->setValue(10.0);
 
-    QGridLayout *threshGrid = new QGridLayout;
+    QGridLayout* threshGrid = new QGridLayout;
     threshGrid->addWidget(new QLabel("Min"), 0, 0);
     threshGrid->addWidget(m_minThresh, 0, 1);
     threshGrid->addWidget(new QLabel("Mid"), 1, 0);
@@ -580,8 +583,8 @@ void MainWindow::setupUI()
     threshGrid->addWidget(new QLabel("Max"), 2, 0);
     threshGrid->addWidget(m_maxThresh, 2, 1);
 
-    QLabel *playbackLabel = new QLabel("Playback:");
-    QHBoxLayout *playbackLayout = new QHBoxLayout;
+    QLabel* playbackLabel = new QLabel("Playback:");
+    QHBoxLayout* playbackLayout = new QHBoxLayout;
     m_playButton = new QPushButton("Play");
     m_speedCombo = new QComboBox;
     m_speedCombo->addItem("0.01x", 0.01);
@@ -602,7 +605,7 @@ void MainWindow::setupUI()
     m_loopCheck = new QCheckBox("Loop");
     m_loopCheck->setChecked(true);
     m_loopCheck->setToolTip("Loop data when the end of the stream is reached");
-    QHBoxLayout *rtLayout = new QHBoxLayout;
+    QHBoxLayout* rtLayout = new QHBoxLayout;
     rtLayout->addWidget(m_realtimeCheck);
     rtLayout->addWidget(m_loopCheck);
 
@@ -636,7 +639,7 @@ void MainWindow::setupUI()
     // ===== Dipole Group =====
     m_dipoleGroup = new QGroupBox("Dipoles");
     m_dipoleGroup->setEnabled(false);
-    QVBoxLayout *dipoleLayout = new QVBoxLayout(m_dipoleGroup);
+    QVBoxLayout* dipoleLayout = new QVBoxLayout(m_dipoleGroup);
     dipoleLayout->setContentsMargins(6, 12, 6, 6);
     dipoleLayout->setSpacing(8);
 
@@ -649,7 +652,7 @@ void MainWindow::setupUI()
     // ===== Source Space Group =====
     m_srcSpaceGroup = new QGroupBox("Source Space");
     m_srcSpaceGroup->setEnabled(false);
-    QVBoxLayout *srcSpaceLayout = new QVBoxLayout(m_srcSpaceGroup);
+    QVBoxLayout* srcSpaceLayout = new QVBoxLayout(m_srcSpaceGroup);
     srcSpaceLayout->setContentsMargins(6, 12, 6, 6);
     srcSpaceLayout->setSpacing(8);
 
@@ -662,7 +665,7 @@ void MainWindow::setupUI()
     // ===== Connectivity Network Group =====
     m_networkGroup = new QGroupBox("Connectivity Network");
     m_networkGroup->setEnabled(false);
-    QVBoxLayout *networkLayout = new QVBoxLayout(m_networkGroup);
+    QVBoxLayout* networkLayout = new QVBoxLayout(m_networkGroup);
     networkLayout->setContentsMargins(6, 12, 6, 6);
     networkLayout->setSpacing(8);
 
@@ -670,13 +673,13 @@ void MainWindow::setupUI()
     m_showNetworkCheck->setChecked(false);
     m_showNetworkCheck->setEnabled(false);
 
-    QLabel *netThreshLabel = new QLabel("Threshold:");
+    QLabel* netThreshLabel = new QLabel("Threshold:");
     m_networkThresholdSlider = new QSlider(Qt::Horizontal);
     m_networkThresholdSlider->setRange(0, 100);
     m_networkThresholdSlider->setValue(50);
     m_networkThresholdSlider->setEnabled(false);
 
-    QLabel *netCmapLabel = new QLabel("Colormap:");
+    QLabel* netCmapLabel = new QLabel("Colormap:");
     m_networkColormapCombo = new QComboBox;
     m_networkColormapCombo->addItems({"Hot", "Jet", "Bone", "RedBlue", "Plasma"});
     m_networkColormapCombo->setEnabled(false);
@@ -690,11 +693,11 @@ void MainWindow::setupUI()
     // ===== Evoked Group =====
     m_evokedGroup = new QGroupBox("Evoked");
     m_evokedGroup->setEnabled(false);
-    QVBoxLayout *evokedLayout = new QVBoxLayout(m_evokedGroup);
+    QVBoxLayout* evokedLayout = new QVBoxLayout(m_evokedGroup);
     evokedLayout->setContentsMargins(6, 12, 6, 6);
     evokedLayout->setSpacing(6);
 
-    QLabel *evokedSetLabel = new QLabel("Evoked Set:");
+    QLabel* evokedSetLabel = new QLabel("Evoked Set:");
     m_evokedSetCombo = new QComboBox;
     m_evokedSetCombo->setEnabled(false);
     m_evokedSetCombo->setToolTip("Select which evoked/average data set to display");
@@ -715,7 +718,7 @@ void MainWindow::setupUI()
     m_showEegContourCheck->setChecked(false);
     m_showEegContourCheck->setEnabled(false);
 
-    QLabel *megSurfLabel = new QLabel("MEG Surface:");
+    QLabel* megSurfLabel = new QLabel("MEG Surface:");
     m_megHelmetCombo = new QComboBox;
     m_megHelmetCombo->addItems({"Helmet", "Head"});
     m_megHelmetCombo->setToolTip("Choose whether MEG field mapping uses the helmet or head surface.");
@@ -748,11 +751,11 @@ void MainWindow::setupUI()
     // ===== Sensor Streaming Group =====
     m_sensorStreamGroup = new QGroupBox("Sensor Streaming");
     m_sensorStreamGroup->setEnabled(false);
-    QVBoxLayout *sensorStreamLayout = new QVBoxLayout(m_sensorStreamGroup);
+    QVBoxLayout* sensorStreamLayout = new QVBoxLayout(m_sensorStreamGroup);
     sensorStreamLayout->setContentsMargins(6, 12, 6, 6);
     sensorStreamLayout->setSpacing(6);
 
-    QLabel *ssModalityLabel = new QLabel("Modality:");
+    QLabel* ssModalityLabel = new QLabel("Modality:");
     m_sensorStreamModalityCombo = new QComboBox;
     m_sensorStreamModalityCombo->addItems({"MEG", "EEG"});
     m_sensorStreamModalityCombo->setEnabled(false);
@@ -764,13 +767,13 @@ void MainWindow::setupUI()
     m_sensorStreamLoopCheck->setChecked(true);
     m_sensorStreamLoopCheck->setEnabled(false);
 
-    QLabel *ssAvgLabel = new QLabel("Averages:");
+    QLabel* ssAvgLabel = new QLabel("Averages:");
     m_sensorStreamAvgSpin = new QSpinBox;
     m_sensorStreamAvgSpin->setRange(1, 100);
     m_sensorStreamAvgSpin->setValue(1);
     m_sensorStreamAvgSpin->setEnabled(false);
 
-    QLabel *ssCmapLabel = new QLabel("Colormap:");
+    QLabel* ssCmapLabel = new QLabel("Colormap:");
     m_sensorStreamColormapCombo = new QComboBox;
     m_sensorStreamColormapCombo->addItems({"MNE", "Hot", "Jet", "Viridis", "Cool", "RedBlue"});
     m_sensorStreamColormapCombo->setEnabled(false);
@@ -787,7 +790,7 @@ void MainWindow::setupUI()
     // ===== Sensor Group =====
     m_sensorGroup = new QGroupBox("Sensors");
     m_sensorGroup->setEnabled(false);
-    QVBoxLayout *sensorLayout = new QVBoxLayout(m_sensorGroup);
+    QVBoxLayout* sensorLayout = new QVBoxLayout(m_sensorGroup);
     sensorLayout->setContentsMargins(6, 12, 6, 6);
     sensorLayout->setSpacing(8);
 
@@ -825,7 +828,7 @@ void MainWindow::setupUI()
     m_showHelmetCheck->setEnabled(false);
 
     m_helmetShapeCombo = new QComboBox;
-    m_helmetShapeCombo->blockSignals(true);   // prevent premature loadMegHelmetSurface during addItems
+    m_helmetShapeCombo->blockSignals(true); // prevent premature loadMegHelmetSurface during addItems
     m_helmetShapeCombo->addItems({"306m", "122m", "306m RT", "BabyMEG",
                                   "BabySQUID", "CTF 275", "KIT", "Magnes 2500WH", "Magnes 3600WH"});
     m_helmetShapeCombo->blockSignals(false);
@@ -848,8 +851,8 @@ void MainWindow::setupUI()
     sensorLayout->addWidget(m_applyTransCheck);
 
     // ===== View Group =====
-    QGroupBox *viewGroup = new QGroupBox("View");
-    QVBoxLayout *viewLayout = new QVBoxLayout(viewGroup);
+    QGroupBox* viewGroup = new QGroupBox("View");
+    QVBoxLayout* viewLayout = new QVBoxLayout(viewGroup);
     viewLayout->setContentsMargins(6, 12, 6, 6);
     viewLayout->setSpacing(8);
 
@@ -860,12 +863,12 @@ void MainWindow::setupUI()
     viewLayout->addWidget(m_showInfoCheck);
 
     // View Count
-    QLabel *viewCountLabel = new QLabel("Layout:");
+    QLabel* viewCountLabel = new QLabel("Layout:");
     m_viewCountCombo = new QComboBox();
     m_viewCountCombo->addItems({"Single View", "2 Views", "3 Views", "4 Views"});
     m_viewCountCombo->setCurrentIndex(0);
     m_viewCountCombo->setToolTip("Number of viewport panes (1 = single, 2 = side-by-side, 3 = two + one, 4 = 2×2 grid).");
-    QHBoxLayout *viewCountRow = new QHBoxLayout();
+    QHBoxLayout* viewCountRow = new QHBoxLayout();
     viewCountRow->addWidget(viewCountLabel);
     viewCountRow->addWidget(m_viewCountCombo);
     viewLayout->addLayout(viewCountRow);
@@ -876,7 +879,7 @@ void MainWindow::setupUI()
     m_editTargetCombo->addItem("All Viewports");
     m_editTargetCombo->setToolTip("Select which viewport the surface, shader, and overlay controls apply to.");
     m_editTargetCombo->setEnabled(false);
-    QHBoxLayout *editTargetRow = new QHBoxLayout();
+    QHBoxLayout* editTargetRow = new QHBoxLayout();
     editTargetRow->addWidget(m_editTargetLabel);
     editTargetRow->addWidget(m_editTargetCombo);
     viewLayout->addLayout(editTargetRow);
@@ -885,10 +888,10 @@ void MainWindow::setupUI()
     m_cameraPresetLabel = new QLabel("Camera:");
     m_cameraPresetCombo = new QComboBox();
     m_cameraPresetCombo->addItems({"Top", "Perspective", "Front", "Left", "Bottom", "Back", "Right"});
-    m_cameraPresetCombo->setCurrentIndex(1);  // Perspective
+    m_cameraPresetCombo->setCurrentIndex(1); // Perspective
     m_cameraPresetCombo->setToolTip("Camera orientation preset for the selected viewport.");
     m_cameraPresetCombo->setEnabled(false);
-    QHBoxLayout *presetRow = new QHBoxLayout();
+    QHBoxLayout* presetRow = new QHBoxLayout();
     presetRow->addWidget(m_cameraPresetLabel);
     presetRow->addWidget(m_cameraPresetCombo);
     viewLayout->addLayout(presetRow);
@@ -913,8 +916,8 @@ void MainWindow::setupUI()
     m_brainView->setModel(m_model);
 
     // Wrap BrainView + per-viewport time strips in a vertical layout
-    QWidget *viewContainer = new QWidget;
-    QVBoxLayout *viewContainerLayout = new QVBoxLayout(viewContainer);
+    QWidget* viewContainer = new QWidget;
+    QVBoxLayout* viewContainerLayout = new QVBoxLayout(viewContainer);
     viewContainerLayout->setContentsMargins(0, 0, 0, 0);
     viewContainerLayout->setSpacing(0);
     viewContainerLayout->addWidget(m_brainView, 1);
@@ -941,16 +944,19 @@ void MainWindow::setupConnections()
 
     connect(m_actOpenProject, &QAction::triggered, [this]() {
 #ifdef WASMBUILD
-        QFileDialog::getOpenFileContent("MNA Project (*.mnx)", [this](const QString &fileName, const QByteArray &fileContent) {
-            if (fileName.isEmpty()) return;
+        QFileDialog::getOpenFileContent("MNA Project (*.mnx)", [this](const QString& fileName, const QByteArray& fileContent) {
+            if (fileName.isEmpty())
+                return;
             QString path = wasmSaveToTemp(fileName, fileContent);
-            if (path.isEmpty()) return;
+            if (path.isEmpty())
+                return;
             importMnaProject(path);
         });
 #else
         QString path = QFileDialog::getOpenFileName(this, "Open MNA Project", "",
-            "MNA Project Files (*.mna *.mnx);;All Files (*)");
-        if (path.isEmpty()) return;
+                                                    "MNA Project Files (*.mna *.mnx);;All Files (*)");
+        if (path.isEmpty())
+            return;
         importMnaProject(path);
 #endif
     });
@@ -970,7 +976,7 @@ void MainWindow::setupConnections()
         MnaRecording rec;
         rec.id = QStringLiteral("recording-01");
 
-        for (const auto &entry : m_loadedFiles) {
+        for (const auto& entry : m_loadedFiles) {
             MnaFileRef ref;
             ref.role = static_cast<MnaFileRole>(entry.second);
             ref.path = bidsBuildRelPath(subj.id, session.id, ref.role, entry.first);
@@ -999,8 +1005,9 @@ void MainWindow::setupConnections()
         QFileDialog::saveFileContent(out, "project.mnx");
 #else
         QString path = QFileDialog::getSaveFileName(this, "Export MNA Project", "project.mnx",
-            "MNX Binary (*.mnx);;MNA JSON (*.mna);;All Files (*)");
-        if (path.isEmpty()) return;
+                                                    "MNX Binary (*.mnx);;MNA JSON (*.mna);;All Files (*)");
+        if (path.isEmpty())
+            return;
         bool embed = path.endsWith(QLatin1String(".mnx"), Qt::CaseInsensitive);
         exportMnaProject(path, embed);
 #endif
@@ -1010,7 +1017,7 @@ void MainWindow::setupConnections()
     connect(m_surfCombo, &QComboBox::currentTextChanged, m_brainView, &BrainView::setActiveSurface);
 
     // Inflated surface logic
-    connect(m_surfCombo, &QComboBox::currentTextChanged, [this](const QString &text) {
+    connect(m_surfCombo, &QComboBox::currentTextChanged, [this](const QString& text) {
         bool isInflated = (text == "inflated");
         if (isInflated) {
             m_headCheck->setChecked(false);
@@ -1024,7 +1031,7 @@ void MainWindow::setupConnections()
 
     // Shaders
     connect(m_shaderCombo, &QComboBox::currentTextChanged, m_brainView, &BrainView::setShaderMode);
-    connect(m_shaderCombo, &QComboBox::currentTextChanged, [this](const QString &text) {
+    connect(m_shaderCombo, &QComboBox::currentTextChanged, [this](const QString& text) {
         if (m_linkShadersCheck->isChecked()) {
             m_bemShaderCombo->setCurrentText(text);
         }
@@ -1038,7 +1045,7 @@ void MainWindow::setupConnections()
     });
 
     // Overlay
-    connect(m_overlayCombo, &QComboBox::currentTextChanged, [this](const QString &text) {
+    connect(m_overlayCombo, &QComboBox::currentTextChanged, [this](const QString& text) {
         m_brainView->setVisualizationMode(text);
         if (text != "Source Estimate" && m_stcTimer->isActive()) {
             m_stcTimer->stop();
@@ -1053,15 +1060,18 @@ void MainWindow::setupConnections()
     // BEM loading
     connect(m_actLoadBem, &QAction::triggered, [this]() {
 #ifdef WASMBUILD
-        QFileDialog::getOpenFileContent("BEM Files (*.fif)", [this](const QString &fileName, const QByteArray &fileContent) {
-            if (fileName.isEmpty()) return;
+        QFileDialog::getOpenFileContent("BEM Files (*.fif)", [this](const QString& fileName, const QByteArray& fileContent) {
+            if (fileName.isEmpty())
+                return;
             QString path = wasmSaveToTemp(fileName, fileContent);
-            if (path.isEmpty()) return;
+            if (path.isEmpty())
+                return;
             loadBem("User", path);
         });
 #else
         QString path = QFileDialog::getOpenFileName(this, "Select BEM Surface", "", "BEM Files (*-bem.fif *-bem-sol.fif);;FIF Files (*.fif);;All Files (*)");
-        if (path.isEmpty()) return;
+        if (path.isEmpty())
+            return;
         loadBem("User", path);
 #endif
     });
@@ -1087,7 +1097,7 @@ void MainWindow::setupConnections()
         m_editTargetCombo->clear();
         if (isMulti) {
             for (int i = 0; i < count; ++i) {
-                const int preset = i;  // defaultForIndex assigns preset = index
+                const int preset = i; // defaultForIndex assigns preset = index
                 m_editTargetCombo->addItem(multiViewPresetName(preset), i);
             }
             m_editTargetCombo->setCurrentIndex(0);
@@ -1103,7 +1113,8 @@ void MainWindow::setupConnections()
 
     // Multi-view: edit target selection
     connect(m_editTargetCombo, QOverload<int>::of(&QComboBox::currentIndexChanged), [this](int index) {
-        if (m_brainView->viewMode() == BrainView::SingleView) return;
+        if (m_brainView->viewMode() == BrainView::SingleView)
+            return;
         const int target = m_editTargetCombo->itemData(index).toInt();
         m_brainView->setVisualizationEditTarget(target);
         syncUIToEditTarget(target);
@@ -1111,7 +1122,8 @@ void MainWindow::setupConnections()
 
     // Multi-view: camera preset for the selected viewport
     connect(m_cameraPresetCombo, QOverload<int>::of(&QComboBox::currentIndexChanged), [this](int presetIndex) {
-        if (m_brainView->viewMode() == BrainView::SingleView) return;
+        if (m_brainView->viewMode() == BrainView::SingleView)
+            return;
         const int target = m_brainView->visualizationEditTarget();
         if (target >= 0) {
             m_brainView->setViewportCameraPreset(target, presetIndex);
@@ -1120,7 +1132,8 @@ void MainWindow::setupConnections()
 
     // Multi-view: bidirectional sync when user clicks viewport labels inside BrainView
     connect(m_brainView, &BrainView::visualizationEditTargetChanged, [this](int target) {
-        if (target < 0) return;
+        if (target < 0)
+            return;
         // Update combo without re-triggering the connection
         m_editTargetCombo->blockSignals(true);
         for (int i = 0; i < m_editTargetCombo->count(); ++i) {
@@ -1136,17 +1149,22 @@ void MainWindow::setupConnections()
     // Brain Surface
     connect(m_actLoadSurface, &QAction::triggered, [this]() {
 #ifdef WASMBUILD
-        QFileDialog::getOpenFileContent("FreeSurfer Surface (*.*)", [this](const QString &fileName, const QByteArray &fileContent) {
-            if (fileName.isEmpty()) return;
+        QFileDialog::getOpenFileContent("FreeSurfer Surface (*.*)", [this](const QString& fileName, const QByteArray& fileContent) {
+            if (fileName.isEmpty())
+                return;
             QString path = wasmSaveToTemp(fileName, fileContent);
-            if (path.isEmpty()) return;
+            if (path.isEmpty())
+                return;
 
             QString fn = QFileInfo(path).fileName();
             QString hemi = fn.contains("lh.") ? "lh" : (fn.contains("rh.") ? "rh" : "lh");
             QString type = "pial";
-            if (fn.contains("inflated")) type = "inflated";
-            else if (fn.contains("white")) type = "white";
-            else if (fn.contains("orig")) type = "orig";
+            if (fn.contains("inflated"))
+                type = "inflated";
+            else if (fn.contains("white"))
+                type = "white";
+            else if (fn.contains("orig"))
+                type = "orig";
 
             FsSurface surf(path);
             if (!surf.isEmpty()) {
@@ -1154,20 +1172,24 @@ void MainWindow::setupConnections()
                 m_surfGroup->setEnabled(true);
                 trackLoadedFile(path, static_cast<int>(MnaFileRole::Surface));
                 qInfo() << "Loaded surface:" << hemi << type
-                         << "(load the opposite hemisphere separately in browser mode)";
+                        << "(load the opposite hemisphere separately in browser mode)";
             }
         });
 #else
         QString path = QFileDialog::getOpenFileName(this, "Select Surface", "", "FreeSurfer Surface (*.pial *.inflated *.white *.orig);;All Files (*)");
-        if (path.isEmpty()) return;
+        if (path.isEmpty())
+            return;
 
         // Guess hemi and type
         QString fileName = QFileInfo(path).fileName();
         QString hemi = fileName.contains("lh.") ? "lh" : (fileName.contains("rh.") ? "rh" : "lh");
         QString type = "pial";
-        if (fileName.contains("inflated")) type = "inflated";
-        else if (fileName.contains("white")) type = "white";
-        else if (fileName.contains("orig")) type = "orig";
+        if (fileName.contains("inflated"))
+            type = "inflated";
+        else if (fileName.contains("white"))
+            type = "white";
+        else if (fileName.contains("orig"))
+            type = "orig";
 
         FsSurface surf(path);
         if (!surf.isEmpty()) {
@@ -1193,10 +1215,12 @@ void MainWindow::setupConnections()
 
     connect(m_actLoadAtlas, &QAction::triggered, [this]() {
 #ifdef WASMBUILD
-        QFileDialog::getOpenFileContent("FreeSurfer Annotation (*.annot)", [this](const QString &fileName, const QByteArray &fileContent) {
-            if (fileName.isEmpty()) return;
+        QFileDialog::getOpenFileContent("FreeSurfer Annotation (*.annot)", [this](const QString& fileName, const QByteArray& fileContent) {
+            if (fileName.isEmpty())
+                return;
             QString path = wasmSaveToTemp(fileName, fileContent);
-            if (path.isEmpty()) return;
+            if (path.isEmpty())
+                return;
 
             QString fn = QFileInfo(path).fileName();
             QString hemi = fn.contains("lh.") ? "lh" : (fn.contains("rh.") ? "rh" : "lh");
@@ -1209,7 +1233,8 @@ void MainWindow::setupConnections()
         });
 #else
         QString path = QFileDialog::getOpenFileName(this, "Select Atlas", "", "FreeSurfer Annotation (*.annot);;All Files (*)");
-        if (path.isEmpty()) return;
+        if (path.isEmpty())
+            return;
 
         // Guess hemi
         QString fileName = QFileInfo(path).fileName();
@@ -1224,8 +1249,7 @@ void MainWindow::setupConnections()
 
         // Auto-load opposite hemisphere annotation if available
         QString otherHemi = (hemi == "lh") ? "rh" : "lh";
-        QString otherPath = QFileInfo(path).absolutePath() + "/"
-            + fileName.replace(hemi + ".", otherHemi + ".");
+        QString otherPath = QFileInfo(path).absolutePath() + "/" + fileName.replace(hemi + ".", otherHemi + ".");
         if (QFile::exists(otherPath)) {
             FsAnnotation otherAnnot(otherPath);
             if (!otherAnnot.isEmpty()) {
@@ -1240,16 +1264,19 @@ void MainWindow::setupConnections()
     // STC loading – add file to combo, which triggers the actual load
     connect(m_actLoadStc, &QAction::triggered, [this]() {
 #ifdef WASMBUILD
-        QFileDialog::getOpenFileContent("STC Files (*.stc)", [this](const QString &fileName, const QByteArray &fileContent) {
-            if (fileName.isEmpty()) return;
+        QFileDialog::getOpenFileContent("STC Files (*.stc)", [this](const QString& fileName, const QByteArray& fileContent) {
+            if (fileName.isEmpty())
+                return;
             QString path = wasmSaveToTemp(fileName, fileContent);
-            if (path.isEmpty()) return;
+            if (path.isEmpty())
+                return;
             trackLoadedFile(path, static_cast<int>(MnaFileRole::SourceEstimate));
             addStcEntry(path, true);
         });
 #else
         QString path = QFileDialog::getOpenFileName(this, "Select Source Estimate", "", "STC Files (*-lh.stc *-rh.stc *.stc)");
-        if (path.isEmpty()) return;
+        if (path.isEmpty())
+            return;
         trackLoadedFile(path, static_cast<int>(MnaFileRole::SourceEstimate));
         addStcEntry(path, true);
 #endif
@@ -1257,10 +1284,12 @@ void MainWindow::setupConnections()
 
     // STC combo selection changed – load the selected STC pair
     connect(m_stcCombo, QOverload<int>::of(&QComboBox::currentIndexChanged), [this](int index) {
-        if (index < 0) return;
+        if (index < 0)
+            return;
 
         QStringList pair = m_stcCombo->itemData(index).toStringList();
-        if (pair.size() < 2) return;
+        if (pair.size() < 2)
+            return;
         QString lhPath = pair[0];
         QString rhPath = pair[1];
 
@@ -1273,7 +1302,7 @@ void MainWindow::setupConnections()
         m_brainView->loadSourceEstimate(lhPath, rhPath);
     });
 
-    connect(m_brainView, &BrainView::stcLoadingProgress, [this](int percent, const QString &message) {
+    connect(m_brainView, &BrainView::stcLoadingProgress, [this](int percent, const QString& message) {
         m_stcProgressBar->setValue(percent);
         m_stcStatusLabel->setText(message);
     });
@@ -1300,7 +1329,7 @@ void MainWindow::setupConnections()
         // Use a fixed display-rate interval; the wall-clock elapsed-time
         // approach in the timeout handler dynamically computes the correct
         // number of frames to advance for any speed factor.
-        m_stcTimer->setInterval(16);  // ~60 fps
+        m_stcTimer->setInterval(16); // ~60 fps
     });
 
     connect(m_timeSlider, &QSlider::valueChanged, [this](int value) {
@@ -1329,8 +1358,7 @@ void MainWindow::setupConnections()
         m_brainView->setSourceThresholds(
             static_cast<float>(m_minThresh->value()),
             static_cast<float>(m_midThresh->value()),
-            static_cast<float>(m_maxThresh->value())
-        );
+            static_cast<float>(m_maxThresh->value()));
     };
     connect(m_minThresh, QOverload<double>::of(&QDoubleSpinBox::valueChanged), updateThresholds);
     connect(m_midThresh, QOverload<double>::of(&QDoubleSpinBox::valueChanged), updateThresholds);
@@ -1411,7 +1439,8 @@ void MainWindow::setupConnections()
 
     connect(m_stcTimer, &QTimer::timeout, [this]() {
         float tstep = m_brainView->stcStep();
-        if (tstep <= 0) return;
+        if (tstep <= 0)
+            return;
 
         // Measure actual elapsed wall-clock time since last tick
         double elapsedMs = m_playbackClock.elapsed();
@@ -1424,7 +1453,8 @@ void MainWindow::setupConnections()
         // Single accumulator, advance main slider
         m_stcStepAccum += samplesElapsed;
         int steps = static_cast<int>(m_stcStepAccum);
-        if (steps < 1) return;
+        if (steps < 1)
+            return;
         m_stcStepAccum -= steps;
 
         int cur = m_timeSlider->value();
@@ -1445,10 +1475,12 @@ void MainWindow::setupConnections()
     // Sensors
     connect(m_actLoadDigitizer, &QAction::triggered, [this]() {
 #ifdef WASMBUILD
-        QFileDialog::getOpenFileContent("FIF Files (*.fif)", [this](const QString &fileName, const QByteArray &fileContent) {
-            if (fileName.isEmpty()) return;
+        QFileDialog::getOpenFileContent("FIF Files (*.fif)", [this](const QString& fileName, const QByteArray& fileContent) {
+            if (fileName.isEmpty())
+                return;
             QString path = wasmSaveToTemp(fileName, fileContent);
-            if (path.isEmpty()) return;
+            if (path.isEmpty())
+                return;
 
             if (m_brainView->loadSensors(path)) {
                 trackLoadedFile(path, static_cast<int>(MnaFileRole::Digitizer));
@@ -1462,7 +1494,8 @@ void MainWindow::setupConnections()
         });
 #else
         QString path = QFileDialog::getOpenFileName(this, "Select Sensor/Digitizer File", "", "FIF Files (*.fif)");
-        if (path.isEmpty()) return;
+        if (path.isEmpty())
+            return;
 
         if (m_brainView->loadSensors(path)) {
             trackLoadedFile(path, static_cast<int>(MnaFileRole::Digitizer));
@@ -1479,16 +1512,19 @@ void MainWindow::setupConnections()
 
     connect(m_actLoadTransform, &QAction::triggered, [this]() {
 #ifdef WASMBUILD
-        QFileDialog::getOpenFileContent("FIF Files (*.fif)", [this](const QString &fileName, const QByteArray &fileContent) {
-            if (fileName.isEmpty()) return;
+        QFileDialog::getOpenFileContent("FIF Files (*.fif)", [this](const QString& fileName, const QByteArray& fileContent) {
+            if (fileName.isEmpty())
+                return;
             QString path = wasmSaveToTemp(fileName, fileContent);
-            if (path.isEmpty()) return;
+            if (path.isEmpty())
+                return;
             m_brainView->loadTransformation(path);
             trackLoadedFile(path, static_cast<int>(MnaFileRole::Transform));
         });
 #else
         QString path = QFileDialog::getOpenFileName(this, "Select Transformation", "", "FIF Files (*.fif)");
-        if (path.isEmpty()) return;
+        if (path.isEmpty())
+            return;
         m_brainView->loadTransformation(path);
         trackLoadedFile(path, static_cast<int>(MnaFileRole::Transform));
 #endif
@@ -1516,23 +1552,21 @@ void MainWindow::setupConnections()
     connect(m_showHelmetCheck, &QCheckBox::toggled, [this](bool checked) { m_brainView->setSensorVisible("MEG Helmet", checked); });
 
     // Helmet shape selection
-    connect(m_helmetShapeCombo, &QComboBox::currentTextChanged, [this](const QString &text) {
+    connect(m_helmetShapeCombo, &QComboBox::currentTextChanged, [this](const QString& text) {
         // Map combo text to helmet filename
         static const QMap<QString, QString> helmetFileMap = {
-            {"122m",           "122m.fif"},
-            {"306m",           "306m.fif"},
-            {"306m RT",        "306m_rt.fif"},
-            {"BabyMEG",        "BabyMEG.fif"},
-            {"BabySQUID",      "BabySQUID.fif"},
-            {"CTF 275",        "CTF_275.fif"},
-            {"KIT",            "KIT.fif"},
-            {"Magnes 2500WH",  "Magnes_2500wh.fif"},
-            {"Magnes 3600WH",  "Magnes_3600wh.fif"}
-        };
+            {"122m", "122m.fif"},
+            {"306m", "306m.fif"},
+            {"306m RT", "306m_rt.fif"},
+            {"BabyMEG", "BabyMEG.fif"},
+            {"BabySQUID", "BabySQUID.fif"},
+            {"CTF 275", "CTF_275.fif"},
+            {"KIT", "KIT.fif"},
+            {"Magnes 2500WH", "Magnes_2500wh.fif"},
+            {"Magnes 3600WH", "Magnes_3600wh.fif"}};
 
         QString fileName = helmetFileMap.value(text, "306m.fif");
-        QString helmetPath = QCoreApplication::applicationDirPath()
-            + "/../resources/general/sensorSurfaces/" + fileName;
+        QString helmetPath = QCoreApplication::applicationDirPath() + "/../resources/general/sensorSurfaces/" + fileName;
 
         m_brainView->setMegHelmetOverride(helmetPath);
         m_brainView->loadMegHelmetSurface(helmetPath);
@@ -1543,10 +1577,12 @@ void MainWindow::setupConnections()
     // Dipoles
     connect(m_actLoadDipoles, &QAction::triggered, [this]() {
 #ifdef WASMBUILD
-        QFileDialog::getOpenFileContent("Dipole Files (*.dip *.bdip)", [this](const QString &fileName, const QByteArray &fileContent) {
-            if (fileName.isEmpty()) return;
+        QFileDialog::getOpenFileContent("Dipole Files (*.dip *.bdip)", [this](const QString& fileName, const QByteArray& fileContent) {
+            if (fileName.isEmpty())
+                return;
             QString path = wasmSaveToTemp(fileName, fileContent);
-            if (path.isEmpty()) return;
+            if (path.isEmpty())
+                return;
             if (m_brainView->loadDipoles(path)) {
                 m_dipoleGroup->setEnabled(true);
                 m_showDipoleCheck->setEnabled(true);
@@ -1555,7 +1591,8 @@ void MainWindow::setupConnections()
         });
 #else
         QString path = QFileDialog::getOpenFileName(this, "Select Dipoles", "", "Dipole Files (*.dip *.bdip)");
-        if (path.isEmpty()) return;
+        if (path.isEmpty())
+            return;
         if (m_brainView->loadDipoles(path)) {
             m_dipoleGroup->setEnabled(true);
             m_showDipoleCheck->setEnabled(true);
@@ -1569,10 +1606,12 @@ void MainWindow::setupConnections()
     // Source Space
     connect(m_actLoadSrcSpace, &QAction::triggered, [this]() {
 #ifdef WASMBUILD
-        QFileDialog::getOpenFileContent("Source Space Files (*.fif)", [this](const QString &fileName, const QByteArray &fileContent) {
-            if (fileName.isEmpty()) return;
+        QFileDialog::getOpenFileContent("Source Space Files (*.fif)", [this](const QString& fileName, const QByteArray& fileContent) {
+            if (fileName.isEmpty())
+                return;
             QString path = wasmSaveToTemp(fileName, fileContent);
-            if (path.isEmpty()) return;
+            if (path.isEmpty())
+                return;
             if (m_brainView->loadSourceSpace(path)) {
                 trackLoadedFile(path, static_cast<int>(MnaFileRole::SourceSpace));
                 m_srcSpaceGroup->setEnabled(true);
@@ -1583,8 +1622,9 @@ void MainWindow::setupConnections()
         });
 #else
         QString path = QFileDialog::getOpenFileName(this, "Select Source Space / Forward Solution", "",
-            "Source Space Files (*-src.fif *-fwd.fif);;All FIF Files (*.fif)");
-        if (path.isEmpty()) return;
+                                                    "Source Space Files (*-src.fif *-fwd.fif);;All FIF Files (*.fif)");
+        if (path.isEmpty())
+            return;
         if (m_brainView->loadSourceSpace(path)) {
             trackLoadedFile(path, static_cast<int>(MnaFileRole::SourceSpace));
             m_srcSpaceGroup->setEnabled(true);
@@ -1602,7 +1642,7 @@ void MainWindow::setupConnections()
     connect(m_networkThresholdSlider, &QSlider::valueChanged, [this](int value) {
         m_brainView->setNetworkThreshold(value / 100.0);
     });
-    connect(m_networkColormapCombo, &QComboBox::currentTextChanged, [this](const QString &text) {
+    connect(m_networkColormapCombo, &QComboBox::currentTextChanged, [this](const QString& text) {
         m_brainView->setNetworkColormap(text);
     });
 
@@ -1611,10 +1651,12 @@ void MainWindow::setupConnections()
     // Load Evoked (average FIF) – probe for evoked sets first
     connect(m_actLoadEvoked, &QAction::triggered, [this]() {
 #ifdef WASMBUILD
-        QFileDialog::getOpenFileContent("Average FIF Files (*.fif)", [this](const QString &fileName, const QByteArray &fileContent) {
-            if (fileName.isEmpty()) return;
+        QFileDialog::getOpenFileContent("Average FIF Files (*.fif)", [this](const QString& fileName, const QByteArray& fileContent) {
+            if (fileName.isEmpty())
+                return;
             QString path = wasmSaveToTemp(fileName, fileContent);
-            if (path.isEmpty()) return;
+            if (path.isEmpty())
+                return;
 
             QStringList sets = BrainView::probeEvokedSets(path);
             m_evokedSetCombo->blockSignals(true);
@@ -1636,9 +1678,10 @@ void MainWindow::setupConnections()
         });
 #else
         QString path = QFileDialog::getOpenFileName(this,
-            "Select Evoked / Average", "",
-            "Average FIF Files (*-ave.fif);;All Files (*)");
-        if (path.isEmpty()) return;
+                                                    "Select Evoked / Average", "",
+                                                    "Average FIF Files (*-ave.fif);;All Files (*)");
+        if (path.isEmpty())
+            return;
 
         // Probe available evoked sets and populate combo
         QStringList sets = BrainView::probeEvokedSets(path);
@@ -1666,9 +1709,11 @@ void MainWindow::setupConnections()
 
     // Evoked set selection changed – reload with new index
     connect(m_evokedSetCombo, QOverload<int>::of(&QComboBox::currentIndexChanged), [this](int index) {
-        if (index < 0) return;
+        if (index < 0)
+            return;
         QString path = m_evokedSetCombo->property("evokedPath").toString();
-        if (path.isEmpty()) return;
+        if (path.isEmpty())
+            return;
         m_brainView->loadSensorField(path, index);
     });
 
@@ -1721,7 +1766,7 @@ void MainWindow::setupConnections()
     connect(m_showInfoCheck, &QCheckBox::toggled, m_brainView, &BrainView::setInfoPanelVisible);
 
     // MEG helmet surface selection
-    connect(m_megHelmetCombo, &QComboBox::currentTextChanged, [this](const QString &text) {
+    connect(m_megHelmetCombo, &QComboBox::currentTextChanged, [this](const QString& text) {
         m_brainView->setMegFieldMapOnHead(text == "Head");
     });
 
@@ -1735,9 +1780,7 @@ void MainWindow::setupConnections()
             float tmin = 0, tmax = 0;
             if (m_brainView->sensorFieldTimeRange(tmin, tmax)) {
                 int maxIdx = m_sensorFieldTimeSlider->maximum();
-                float timeSec = (maxIdx > 0) ?
-                    tmin + (tmax - tmin) * static_cast<float>(value) / static_cast<float>(maxIdx) :
-                    tmin;
+                float timeSec = (maxIdx > 0) ? tmin + (tmax - tmin) * static_cast<float>(value) / static_cast<float>(maxIdx) : tmin;
                 int stcIdx = m_brainView->closestStcIndex(timeSec);
                 if (stcIdx >= 0) {
                     m_timeSlider->blockSignals(true);
@@ -1777,7 +1820,7 @@ void MainWindow::setupConnections()
         m_brainView->setRealtimeSensorAverages(value);
     });
 
-    connect(m_sensorStreamColormapCombo, &QComboBox::currentTextChanged, [this](const QString &text) {
+    connect(m_sensorStreamColormapCombo, &QComboBox::currentTextChanged, [this](const QString& text) {
         m_brainView->setRealtimeSensorColormap(text);
     });
 
@@ -1903,7 +1946,7 @@ void MainWindow::setupConnections()
 
     // ── Status Bar Updates ────────────────────────────────────────────
 
-    connect(m_brainView, &BrainView::stcLoadingProgress, [this](int /*percent*/, const QString &message) {
+    connect(m_brainView, &BrainView::stcLoadingProgress, [this](int /*percent*/, const QString& message) {
         m_statusLabel->setText(message);
     });
     connect(m_brainView, &BrainView::sourceEstimateLoaded, [this](int /*numPoints*/) {
@@ -1916,9 +1959,11 @@ void MainWindow::setupConnections()
     // ── MRI Volume Slice Navigation ───────────────────────────────────
 
     // Sliders → move crosshair in the plugin
-    auto mriSliderMoved = [this]() { onMriSliderChanged(); };
-    connect(m_mriAxialSlider,    &QSlider::valueChanged, this, mriSliderMoved);
-    connect(m_mriCoronalSlider,  &QSlider::valueChanged, this, mriSliderMoved);
+    auto mriSliderMoved = [this]() {
+        onMriSliderChanged();
+    };
+    connect(m_mriAxialSlider, &QSlider::valueChanged, this, mriSliderMoved);
+    connect(m_mriCoronalSlider, &QSlider::valueChanged, this, mriSliderMoved);
     connect(m_mriSagittalSlider, &QSlider::valueChanged, this, mriSliderMoved);
 
     // Plugin crosshair → sync sliders (e.g. from pick events)
@@ -1928,8 +1973,8 @@ void MainWindow::setupConnections()
     // Plugin crosshair → push updated slice objects to BrainView for 3-D rendering
     connect(&m_mriSlicesPlugin, &MRISLICESPLUGIN::MriSlicesPlugin::crosshairChanged,
             this, [this]() {
-        applyMriDisplayPreferences();
-    });
+                applyMriDisplayPreferences();
+            });
 
     // Per-plane visibility toggles
     auto toggleMriPlane = [this](int planeIdx, bool visible) {
@@ -1939,8 +1984,8 @@ void MainWindow::setupConnections()
             m_brainView->setSliceVisible(planeIdx, visible);
         }
     };
-    connect(m_mriAxialCheck,    &QCheckBox::toggled, this, [toggleMriPlane](bool v) { toggleMriPlane(0, v); });
-    connect(m_mriCoronalCheck,  &QCheckBox::toggled, this, [toggleMriPlane](bool v) { toggleMriPlane(1, v); });
+    connect(m_mriAxialCheck, &QCheckBox::toggled, this, [toggleMriPlane](bool v) { toggleMriPlane(0, v); });
+    connect(m_mriCoronalCheck, &QCheckBox::toggled, this, [toggleMriPlane](bool v) { toggleMriPlane(1, v); });
     connect(m_mriSagittalCheck, &QCheckBox::toggled, this, [toggleMriPlane](bool v) { toggleMriPlane(2, v); });
 
     // Show-all toggle: per-viewport MRI slice visibility
@@ -1953,22 +1998,25 @@ void MainWindow::setupConnections()
         applyMriDisplayPreferences();
     };
     connect(m_mriWindowCenterSlider, &QSlider::valueChanged, this, updateSliceWindowing);
-    connect(m_mriWindowWidthSlider,  &QSlider::valueChanged, this, updateSliceWindowing);
-    connect(m_mriOpacitySlider,      &QSlider::valueChanged, this, updateSliceWindowing);
+    connect(m_mriWindowWidthSlider, &QSlider::valueChanged, this, updateSliceWindowing);
+    connect(m_mriOpacitySlider, &QSlider::valueChanged, this, updateSliceWindowing);
 
     // Volume combo: switch active MRI volume
     connect(m_mriVolumeCombo, QOverload<int>::of(&QComboBox::currentIndexChanged),
             this, [this](int index) {
-        if (index < 0 || index >= m_mriVolumePaths.size()) return;
-        const QString path = m_mriVolumePaths[index];
-        if (path == m_mriSlicesPlugin.sourcePath()) return;
-        m_mriSlicesPlugin.loadVolume(path);
-    });
+                if (index < 0 || index >= m_mriVolumePaths.size())
+                    return;
+                const QString path = m_mriVolumePaths[index];
+                if (path == m_mriSlicesPlugin.sourcePath())
+                    return;
+                m_mriSlicesPlugin.loadVolume(path);
+            });
 
     // Volume loaded → enable controls
     connect(&m_mriSlicesPlugin, &MRISLICESPLUGIN::MriSlicesPlugin::volumeChanged, this, [this]() {
         const MRILIB::MriVolData* vol = m_mriSlicesPlugin.volume();
-        if (!vol) return;
+        if (!vol)
+            return;
         m_mriGroup->setEnabled(true);
         m_mriFileLabel->setText(QFileInfo(m_mriSlicesPlugin.sourcePath()).fileName());
         m_mriFileLabel->setStyleSheet(QString());
@@ -1991,16 +2039,16 @@ void MainWindow::setupConnections()
 
 //=============================================================================================================
 
-void MainWindow::loadInitialData(const QString &subjectPath,
-                                  const QString &subjectName,
-                                  const QString &bemPath,
-                                  const QString &transPath,
-                                  const QStringList &stcPaths,
-                                  const QString &digitizerPath,
-                                  const QString &srcSpacePath,
-                                  const QString &atlasPath,
-                                  const QString &evokedPath,
-                                  const QString &mriPath)
+void MainWindow::loadInitialData(const QString& subjectPath,
+                                 const QString& subjectName,
+                                 const QString& bemPath,
+                                 const QString& transPath,
+                                 const QStringList& stcPaths,
+                                 const QString& digitizerPath,
+                                 const QString& srcSpacePath,
+                                 const QString& atlasPath,
+                                 const QString& evokedPath,
+                                 const QString& mriPath)
 {
     // Check if the subject directory actually exists before attempting to load
     QString subjectDir = subjectPath + "/" + subjectName + "/surf";
@@ -2106,11 +2154,11 @@ void MainWindow::loadInitialData(const QString &subjectPath,
 
     // Auto-load STC(s) – add all provided paths to the combo; activate only the first
     for (int i = 0; i < stcPaths.size(); ++i) {
-        const QString &stcPath = stcPaths[i];
+        const QString& stcPath = stcPaths[i];
         if (!stcPath.isEmpty() && QFile::exists(stcPath)) {
             qInfo() << "Auto-loading source estimate from:" << stcPath;
             trackLoadedFile(stcPath, static_cast<int>(MnaFileRole::SourceEstimate));
-            addStcEntry(stcPath, /*activate=*/ (i == 0));
+            addStcEntry(stcPath, /*activate=*/(i == 0));
         }
     }
 
@@ -2149,18 +2197,22 @@ void MainWindow::loadInitialData(const QString &subjectPath,
 
 //=============================================================================================================
 
-void MainWindow::addStcEntry(const QString &stcPath, bool activate)
+void MainWindow::addStcEntry(const QString& stcPath, bool activate)
 {
     // Resolve the LH/RH pair
     QString lhPath, rhPath;
     if (stcPath.contains("-lh.stc")) {
         lhPath = stcPath;
-        QString sibling = stcPath; sibling.replace("-lh.stc", "-rh.stc");
-        if (QFile::exists(sibling)) rhPath = sibling;
+        QString sibling = stcPath;
+        sibling.replace("-lh.stc", "-rh.stc");
+        if (QFile::exists(sibling))
+            rhPath = sibling;
     } else if (stcPath.contains("-rh.stc")) {
         rhPath = stcPath;
-        QString sibling = stcPath; sibling.replace("-rh.stc", "-lh.stc");
-        if (QFile::exists(sibling)) lhPath = sibling;
+        QString sibling = stcPath;
+        sibling.replace("-rh.stc", "-lh.stc");
+        if (QFile::exists(sibling))
+            lhPath = sibling;
     } else {
         lhPath = stcPath;
     }
@@ -2204,10 +2256,10 @@ void MainWindow::addStcEntry(const QString &stcPath, bool activate)
 
 //=============================================================================================================
 
-void MainWindow::loadHemisphere(const QString &subjectPath, const QString &subjectName, const QString &hemi)
+void MainWindow::loadHemisphere(const QString& subjectPath, const QString& subjectName, const QString& hemi)
 {
     QStringList types = {"pial", "inflated", "white"};
-    for (const auto &type : types) {
+    for (const auto& type : types) {
         QString surfPath = subjectPath + "/" + subjectName + "/surf/" + hemi + "." + type;
         if (!QFile::exists(surfPath)) {
             continue;
@@ -2235,7 +2287,7 @@ void MainWindow::loadHemisphere(const QString &subjectPath, const QString &subje
 
 //=============================================================================================================
 
-void MainWindow::loadBem(const QString &subjectName, const QString &bemPath)
+void MainWindow::loadBem(const QString& subjectName, const QString& bemPath)
 {
     QFile bemFile(bemPath);
     if (bemFile.exists()) {
@@ -2244,10 +2296,18 @@ void MainWindow::loadBem(const QString &subjectName, const QString &bemPath)
         for (int i = 0; i < bem.size(); ++i) {
             QString name;
             switch (bem[i].id) {
-                case 4: name = "head"; break;
-                case 3: name = "outer_skull"; break;
-                case 1: name = "inner_skull"; break;
-                default: name = QString("%1").arg(i); break;
+                case 4:
+                    name = "head";
+                    break;
+                case 3:
+                    name = "outer_skull";
+                    break;
+                case 1:
+                    name = "inner_skull";
+                    break;
+                default:
+                    name = QString("%1").arg(i);
+                    break;
             }
             m_model->addBemSurface(subjectName, name, bem[i]);
             qInfo() << "Added BEM:" << name;
@@ -2404,12 +2464,14 @@ void MainWindow::updateViewportCheckboxes(int count)
 
 //=============================================================================================================
 
-void MainWindow::trackLoadedFile(const QString &path, int role)
+void MainWindow::trackLoadedFile(const QString& path, int role)
 {
-    if (path.isEmpty()) return;
+    if (path.isEmpty())
+        return;
     // Avoid duplicates
-    for (const auto &entry : m_loadedFiles) {
-        if (entry.first == path) return;
+    for (const auto& entry : m_loadedFiles) {
+        if (entry.first == path)
+            return;
     }
     m_loadedFiles.append(qMakePair(path, role));
     addLoadedFileEntry(path, role);
@@ -2417,54 +2479,55 @@ void MainWindow::trackLoadedFile(const QString &path, int role)
 
 //=============================================================================================================
 
-void MainWindow::unloadFileFromScene(MnaFileRole role, const QString &path)
+void MainWindow::unloadFileFromScene(MnaFileRole role, const QString& path)
 {
-    if (!m_brainView) return;
+    if (!m_brainView)
+        return;
 
     switch (role) {
-    case MnaFileRole::Surface:
-    case MnaFileRole::Annotation:
-        m_brainView->clearSurfaces();
-        m_surfGroup->setEnabled(false);
-        break;
-    case MnaFileRole::Bem:
-        m_brainView->clearBem();
-        m_bemGroup->setEnabled(false);
-        break;
-    case MnaFileRole::SourceEstimate:
-        m_brainView->clearSourceEstimate();
-        m_stcGroup->setEnabled(false);
-        break;
-    case MnaFileRole::SourceSpace:
-        m_brainView->clearSourceSpace();
-        m_srcSpaceGroup->setEnabled(false);
-        break;
-    case MnaFileRole::Digitizer:
-        m_brainView->clearSensors();
-        m_sensorGroup->setEnabled(false);
-        break;
-    case MnaFileRole::Transform:
-        m_brainView->clearTransformation();
-        break;
-    case MnaFileRole::Evoked:
-        m_brainView->clearEvoked();
-        m_evokedGroup->setEnabled(false);
-        break;
-    case MnaFileRole::Custom:
-        // Dipole files use Custom role
-        if (path.endsWith(".dip") || path.endsWith(".bdip")) {
-            m_brainView->clearDipoles();
-            m_dipoleGroup->setEnabled(false);
-        }
-        break;
-    default:
-        break;
+        case MnaFileRole::Surface:
+        case MnaFileRole::Annotation:
+            m_brainView->clearSurfaces();
+            m_surfGroup->setEnabled(false);
+            break;
+        case MnaFileRole::Bem:
+            m_brainView->clearBem();
+            m_bemGroup->setEnabled(false);
+            break;
+        case MnaFileRole::SourceEstimate:
+            m_brainView->clearSourceEstimate();
+            m_stcGroup->setEnabled(false);
+            break;
+        case MnaFileRole::SourceSpace:
+            m_brainView->clearSourceSpace();
+            m_srcSpaceGroup->setEnabled(false);
+            break;
+        case MnaFileRole::Digitizer:
+            m_brainView->clearSensors();
+            m_sensorGroup->setEnabled(false);
+            break;
+        case MnaFileRole::Transform:
+            m_brainView->clearTransformation();
+            break;
+        case MnaFileRole::Evoked:
+            m_brainView->clearEvoked();
+            m_evokedGroup->setEnabled(false);
+            break;
+        case MnaFileRole::Custom:
+            // Dipole files use Custom role
+            if (path.endsWith(".dip") || path.endsWith(".bdip")) {
+                m_brainView->clearDipoles();
+                m_dipoleGroup->setEnabled(false);
+            }
+            break;
+        default:
+            break;
     }
 }
 
 //=============================================================================================================
 
-void MainWindow::importMnaProject(const QString &path)
+void MainWindow::importMnaProject(const QString& path)
 {
     MnaProject proj = MnaIO::read(path);
     if (proj.name.isEmpty() && proj.subjects.isEmpty()) {
@@ -2480,10 +2543,10 @@ void MainWindow::importMnaProject(const QString &path)
         proj.name.toLower().replace(QRegularExpression(QStringLiteral("[^a-z0-9]+")), QStringLiteral("_"));
 
     // Collect all file refs from all subjects/sessions/recordings
-    for (const MnaSubject &subj : proj.subjects) {
-        for (const MnaSession &sess : subj.sessions) {
-            for (const MnaRecording &rec : sess.recordings) {
-                for (const MnaFileRef &ref : rec.files) {
+    for (const MnaSubject& subj : proj.subjects) {
+        for (const MnaSession& sess : subj.sessions) {
+            for (const MnaRecording& rec : sess.recordings) {
+                for (const MnaFileRef& ref : rec.files) {
                     // Resolve the file: embedded → extract to BIDS tree, external → resolve relative path
                     QString filePath;
                     if (ref.embedded && !ref.data.isEmpty()) {
@@ -2511,81 +2574,84 @@ void MainWindow::importMnaProject(const QString &path)
 
                     // Dispatch to the appropriate loader based on role
                     switch (ref.role) {
-                    case MnaFileRole::Surface: {
-                        QString fn = QFileInfo(filePath).fileName();
-                        QString hemi = fn.contains("lh.") ? "lh" : (fn.contains("rh.") ? "rh" : "lh");
-                        QString type = "pial";
-                        if (fn.contains("inflated")) type = "inflated";
-                        else if (fn.contains("white")) type = "white";
-                        else if (fn.contains("orig")) type = "orig";
-                        FsSurface surf(filePath);
-                        if (!surf.isEmpty()) {
-                            m_model->addSurface(subj.id, hemi, type, surf);
-                            m_surfGroup->setEnabled(true);
-                            qInfo() << "Imported surface:" << fn;
+                        case MnaFileRole::Surface: {
+                            QString fn = QFileInfo(filePath).fileName();
+                            QString hemi = fn.contains("lh.") ? "lh" : (fn.contains("rh.") ? "rh" : "lh");
+                            QString type = "pial";
+                            if (fn.contains("inflated"))
+                                type = "inflated";
+                            else if (fn.contains("white"))
+                                type = "white";
+                            else if (fn.contains("orig"))
+                                type = "orig";
+                            FsSurface surf(filePath);
+                            if (!surf.isEmpty()) {
+                                m_model->addSurface(subj.id, hemi, type, surf);
+                                m_surfGroup->setEnabled(true);
+                                qInfo() << "Imported surface:" << fn;
+                            }
+                            break;
                         }
-                        break;
-                    }
-                    case MnaFileRole::Annotation: {
-                        QString fn = QFileInfo(filePath).fileName();
-                        QString hemi = fn.contains("lh.") ? "lh" : (fn.contains("rh.") ? "rh" : "lh");
-                        FsAnnotation annot(filePath);
-                        if (!annot.isEmpty()) {
-                            m_model->addAnnotation(subj.id, hemi, annot);
-                            qInfo() << "Imported annotation:" << fn;
+                        case MnaFileRole::Annotation: {
+                            QString fn = QFileInfo(filePath).fileName();
+                            QString hemi = fn.contains("lh.") ? "lh" : (fn.contains("rh.") ? "rh" : "lh");
+                            FsAnnotation annot(filePath);
+                            if (!annot.isEmpty()) {
+                                m_model->addAnnotation(subj.id, hemi, annot);
+                                qInfo() << "Imported annotation:" << fn;
+                            }
+                            break;
                         }
-                        break;
-                    }
-                    case MnaFileRole::Bem:
-                        loadBem(subj.id, filePath);
-                        qInfo() << "Imported BEM:" << ref.path;
-                        break;
-                    case MnaFileRole::Digitizer:
-                        if (m_brainView->loadSensors(filePath)) {
-                            m_sensorGroup->setEnabled(true);
-                            m_showMegCheck->setEnabled(true);
-                            m_showEegCheck->setEnabled(true);
-                            m_showDigCheck->setEnabled(true);
-                            m_showHelmetCheck->setEnabled(true);
-                            m_helmetShapeCombo->setEnabled(true);
-                            qInfo() << "Imported digitizer:" << ref.path;
+                        case MnaFileRole::Bem:
+                            loadBem(subj.id, filePath);
+                            qInfo() << "Imported BEM:" << ref.path;
+                            break;
+                        case MnaFileRole::Digitizer:
+                            if (m_brainView->loadSensors(filePath)) {
+                                m_sensorGroup->setEnabled(true);
+                                m_showMegCheck->setEnabled(true);
+                                m_showEegCheck->setEnabled(true);
+                                m_showDigCheck->setEnabled(true);
+                                m_showHelmetCheck->setEnabled(true);
+                                m_helmetShapeCombo->setEnabled(true);
+                                qInfo() << "Imported digitizer:" << ref.path;
+                            }
+                            break;
+                        case MnaFileRole::Transform:
+                            m_brainView->loadTransformation(filePath);
+                            qInfo() << "Imported transformation:" << ref.path;
+                            break;
+                        case MnaFileRole::SourceSpace:
+                            if (m_brainView->loadSourceSpace(filePath)) {
+                                m_srcSpaceGroup->setEnabled(true);
+                                m_showSrcSpaceCheck->setEnabled(true);
+                                m_showSrcSpaceCheck->setChecked(false);
+                                m_brainView->setSourceSpaceVisible(false);
+                                qInfo() << "Imported source space:" << ref.path;
+                            }
+                            break;
+                        case MnaFileRole::SourceEstimate:
+                            addStcEntry(filePath, m_stcCombo->count() == 0);
+                            qInfo() << "Imported STC:" << ref.path;
+                            break;
+                        case MnaFileRole::Evoked: {
+                            QStringList sets = BrainView::probeEvokedSets(filePath);
+                            m_evokedSetCombo->blockSignals(true);
+                            m_evokedSetCombo->clear();
+                            if (!sets.isEmpty()) {
+                                m_evokedSetCombo->addItems(sets);
+                                m_evokedSetCombo->setEnabled(sets.size() > 1);
+                                m_evokedSetCombo->setCurrentIndex(0);
+                            }
+                            m_evokedSetCombo->blockSignals(false);
+                            m_evokedSetCombo->setProperty("evokedPath", filePath);
+                            m_brainView->loadSensorField(filePath, 0);
+                            qInfo() << "Imported evoked:" << ref.path;
+                            break;
                         }
-                        break;
-                    case MnaFileRole::Transform:
-                        m_brainView->loadTransformation(filePath);
-                        qInfo() << "Imported transformation:" << ref.path;
-                        break;
-                    case MnaFileRole::SourceSpace:
-                        if (m_brainView->loadSourceSpace(filePath)) {
-                            m_srcSpaceGroup->setEnabled(true);
-                            m_showSrcSpaceCheck->setEnabled(true);
-                            m_showSrcSpaceCheck->setChecked(false);
-                            m_brainView->setSourceSpaceVisible(false);
-                            qInfo() << "Imported source space:" << ref.path;
-                        }
-                        break;
-                    case MnaFileRole::SourceEstimate:
-                        addStcEntry(filePath, m_stcCombo->count() == 0);
-                        qInfo() << "Imported STC:" << ref.path;
-                        break;
-                    case MnaFileRole::Evoked: {
-                        QStringList sets = BrainView::probeEvokedSets(filePath);
-                        m_evokedSetCombo->blockSignals(true);
-                        m_evokedSetCombo->clear();
-                        if (!sets.isEmpty()) {
-                            m_evokedSetCombo->addItems(sets);
-                            m_evokedSetCombo->setEnabled(sets.size() > 1);
-                            m_evokedSetCombo->setCurrentIndex(0);
-                        }
-                        m_evokedSetCombo->blockSignals(false);
-                        m_evokedSetCombo->setProperty("evokedPath", filePath);
-                        m_brainView->loadSensorField(filePath, 0);
-                        qInfo() << "Imported evoked:" << ref.path;
-                        break;
-                    }
-                    default:
-                        qInfo() << "Preserving foreign file with role:" << mnaFileRoleToString(ref.role) << ref.path;
-                        break;
+                        default:
+                            qInfo() << "Preserving foreign file with role:" << mnaFileRoleToString(ref.role) << ref.path;
+                            break;
                     }
                 }
             }
@@ -2594,10 +2660,10 @@ void MainWindow::importMnaProject(const QString &path)
 
     // Resolve all non-embedded file ref paths to absolute before storing,
     // so we can re-relativize correctly when saving to a different location.
-    for (auto &s : proj.subjects)
-        for (auto &se : s.sessions)
-            for (auto &r : se.recordings)
-                for (auto &f : r.files)
+    for (auto& s : proj.subjects)
+        for (auto& se : s.sessions)
+            for (auto& r : se.recordings)
+                for (auto& f : r.files)
                     if (!f.embedded)
                         f.path = QDir(projectDir).absoluteFilePath(f.path);
 
@@ -2609,7 +2675,7 @@ void MainWindow::importMnaProject(const QString &path)
 
 //=============================================================================================================
 
-void MainWindow::exportMnaProject(const QString &path, bool embedData)
+void MainWindow::exportMnaProject(const QString& path, bool embedData)
 {
     // ── Enriching mode: start from loaded project to preserve foreign data ──
     // Roles that mne_inspect owns and will replace with current state
@@ -2621,8 +2687,7 @@ void MainWindow::exportMnaProject(const QString &path, bool embedData)
         MnaFileRole::Transform,
         MnaFileRole::SourceSpace,
         MnaFileRole::SourceEstimate,
-        MnaFileRole::Evoked
-    };
+        MnaFileRole::Evoked};
 
     MnaProject proj;
     const bool hasBase = !m_loadedMnaProject.subjects.isEmpty();
@@ -2634,17 +2699,14 @@ void MainWindow::exportMnaProject(const QString &path, bool embedData)
         proj.modified = QDateTime::currentDateTimeUtc();
 
         // Strip only our owned roles from the first recording; keep everything else
-        if (!proj.subjects.isEmpty()
-            && !proj.subjects[0].sessions.isEmpty()
-            && !proj.subjects[0].sessions[0].recordings.isEmpty())
-        {
-            auto &files = proj.subjects[0].sessions[0].recordings[0].files;
+        if (!proj.subjects.isEmpty() && !proj.subjects[0].sessions.isEmpty() && !proj.subjects[0].sessions[0].recordings.isEmpty()) {
+            auto& files = proj.subjects[0].sessions[0].recordings[0].files;
             files.erase(std::remove_if(files.begin(), files.end(),
-                [](const MnaFileRef &r){ return ownedRoles.contains(r.role); }),
-                files.end());
+                                       [](const MnaFileRef& r) { return ownedRoles.contains(r.role); }),
+                        files.end());
 
             // Re-serialize foreign refs for the target format
-            for (auto &ref : files) {
+            for (auto& ref : files) {
                 if (embedData) {
                     if (!ref.embedded && !ref.path.isEmpty()) {
                         QFile f(ref.path);
@@ -2653,9 +2715,7 @@ void MainWindow::exportMnaProject(const QString &path, bool embedData)
                             ref.sizeBytes = ref.data.size();
                             f.close();
                         }
-                        ref.path = proj.subjects[0].id + QStringLiteral("/")
-                                   + proj.subjects[0].sessions[0].id + QStringLiteral("/passthrough/")
-                                   + QFileInfo(ref.path).fileName();
+                        ref.path = proj.subjects[0].id + QStringLiteral("/") + proj.subjects[0].sessions[0].id + QStringLiteral("/passthrough/") + QFileInfo(ref.path).fileName();
                         ref.embedded = true;
                     }
                 } else {
@@ -2695,10 +2755,10 @@ void MainWindow::exportMnaProject(const QString &path, bool embedData)
     }
 
     // Reference to the first recording where we add our files
-    auto &rec = proj.subjects[0].sessions[0].recordings[0];
+    auto& rec = proj.subjects[0].sessions[0].recordings[0];
 
     // Add current owned file refs
-    for (const auto &entry : m_loadedFiles) {
+    for (const auto& entry : m_loadedFiles) {
         MnaFileRef ref;
         ref.role = static_cast<MnaFileRole>(entry.second);
         ref.format = QFileInfo(entry.first).suffix();
@@ -2815,18 +2875,19 @@ void MainWindow::createMenus()
 
     m_cameraPresetsMenu = m_viewMenu->addMenu("Camera Presets");
     const QStringList presets = {"Left", "Right", "Top", "Bottom", "Front", "Back"};
-    for (const QString &preset : presets) {
-        QAction *act = m_cameraPresetsMenu->addAction(preset);
+    for (const QString& preset : presets) {
+        QAction* act = m_cameraPresetsMenu->addAction(preset);
         connect(act, &QAction::triggered, [this, preset]() {
             int idx = m_cameraPresetCombo->findText(preset);
-            if (idx >= 0) m_cameraPresetCombo->setCurrentIndex(idx);
+            if (idx >= 0)
+                m_cameraPresetCombo->setCurrentIndex(idx);
         });
     }
 
     m_actResetCamera = m_viewMenu->addAction("&Reset Camera");
     m_actResetCamera->setShortcut(QKeySequence("Ctrl+R"));
     connect(m_actResetCamera, &QAction::triggered, [this]() {
-        m_cameraPresetCombo->setCurrentIndex(1);  // Perspective
+        m_cameraPresetCombo->setCurrentIndex(1); // Perspective
     });
 
     // ── Tools Menu ─────────────────────────────────────────────────────
@@ -2855,10 +2916,10 @@ void MainWindow::createMenus()
 
     m_helpMenu->addAction("About MNE Inspect", [this]() {
         QMessageBox::about(this, "About MNE Inspect",
-            "MNE Inspect\n\n"
-            "Brain visualization and analysis tool.\n\n"
-            "Part of the MNE-CPP project.\n"
-            "https://mne-cpp.github.io");
+                           "MNE Inspect\n\n"
+                           "Brain visualization and analysis tool.\n\n"
+                           "Part of the MNE-CPP project.\n"
+                           "https://mne-cpp.github.io");
     });
 
     m_helpMenu->addAction("About Qt", []() {
@@ -2891,18 +2952,19 @@ void MainWindow::createLoadedFilesDock()
     m_loadedFilesTree->setColumnCount(3);
     m_loadedFilesTree->setContextMenuPolicy(Qt::CustomContextMenu);
 
-    connect(m_loadedFilesTree, &QTreeWidget::customContextMenuRequested, [this](const QPoint &pos) {
-        QTreeWidgetItem *item = m_loadedFilesTree->itemAt(pos);
-        if (!item) return;
+    connect(m_loadedFilesTree, &QTreeWidget::customContextMenuRequested, [this](const QPoint& pos) {
+        QTreeWidgetItem* item = m_loadedFilesTree->itemAt(pos);
+        if (!item)
+            return;
 
         QMenu menu;
-        QAction *removeAct = menu.addAction("Remove");
+        QAction* removeAct = menu.addAction("Remove");
 #ifndef WASMBUILD
-        QAction *showInFinderAct = menu.addAction("Show in Finder");
+        QAction* showInFinderAct = menu.addAction("Show in Finder");
 #endif
-        QAction *copyPathAct = menu.addAction("Copy Path");
+        QAction* copyPathAct = menu.addAction("Copy Path");
 
-        QAction *chosen = menu.exec(m_loadedFilesTree->viewport()->mapToGlobal(pos));
+        QAction* chosen = menu.exec(m_loadedFilesTree->viewport()->mapToGlobal(pos));
 
         if (chosen == removeAct) {
             QString path = item->text(2);
@@ -2929,8 +2991,9 @@ void MainWindow::createLoadedFilesDock()
     });
 
     // Double-click on STC entry activates it in the STC combo box
-    connect(m_loadedFilesTree, &QTreeWidget::itemDoubleClicked, [this](QTreeWidgetItem *item, int /*column*/) {
-        if (!item) return;
+    connect(m_loadedFilesTree, &QTreeWidget::itemDoubleClicked, [this](QTreeWidgetItem* item, int /*column*/) {
+        if (!item)
+            return;
         int role = item->data(0, Qt::UserRole).toInt();
         if (static_cast<MnaFileRole>(role) == MnaFileRole::SourceEstimate) {
             QString fileName = item->text(0);
@@ -2952,11 +3015,12 @@ void MainWindow::createLoadedFilesDock()
 
 //=============================================================================================================
 
-void MainWindow::addLoadedFileEntry(const QString &path, int role)
+void MainWindow::addLoadedFileEntry(const QString& path, int role)
 {
-    if (!m_loadedFilesTree) return;
+    if (!m_loadedFilesTree)
+        return;
 
-    QTreeWidgetItem *item = new QTreeWidgetItem;
+    QTreeWidgetItem* item = new QTreeWidgetItem;
     item->setText(0, QFileInfo(path).fileName());
     item->setText(1, mnaFileRoleToString(static_cast<MnaFileRole>(role)));
     item->setText(2, path);
@@ -2981,10 +3045,10 @@ void MainWindow::saveSettings()
 
     // MRI display preferences
     settings.setValue("mri/brightness", m_mriWindowCenterSlider->value());
-    settings.setValue("mri/contrast",   m_mriWindowWidthSlider->value());
-    settings.setValue("mri/opacity",    m_mriOpacitySlider->value());
-    settings.setValue("mri/showAxial",    m_mriAxialCheck->isChecked());
-    settings.setValue("mri/showCoronal",  m_mriCoronalCheck->isChecked());
+    settings.setValue("mri/contrast", m_mriWindowWidthSlider->value());
+    settings.setValue("mri/opacity", m_mriOpacitySlider->value());
+    settings.setValue("mri/showAxial", m_mriAxialCheck->isChecked());
+    settings.setValue("mri/showCoronal", m_mriCoronalCheck->isChecked());
     settings.setValue("mri/showSagittal", m_mriSagittalCheck->isChecked());
 #endif
 }
@@ -3020,7 +3084,7 @@ void MainWindow::restoreSettings()
 
 //=============================================================================================================
 
-void MainWindow::closeEvent(QCloseEvent *event)
+void MainWindow::closeEvent(QCloseEvent* event)
 {
     saveSettings();
 
@@ -3042,13 +3106,14 @@ void MainWindow::closeEvent(QCloseEvent *event)
 void MainWindow::updateRecentFilesMenu()
 {
 #ifndef WASMBUILD
-    if (!m_recentFilesMenu) return;
+    if (!m_recentFilesMenu)
+        return;
     m_recentFilesMenu->clear();
 
     const int maxRecent = qMin(m_recentFiles.size(), 10);
     for (int i = 0; i < maxRecent; ++i) {
-        const QString &filePath = m_recentFiles[i];
-        QAction *act = m_recentFilesMenu->addAction(QFileInfo(filePath).fileName());
+        const QString& filePath = m_recentFiles[i];
+        QAction* act = m_recentFilesMenu->addAction(QFileInfo(filePath).fileName());
         connect(act, &QAction::triggered, [this, filePath]() {
             importMnaProject(filePath);
         });
@@ -3059,7 +3124,7 @@ void MainWindow::updateRecentFilesMenu()
 
 //=============================================================================================================
 
-void MainWindow::addRecentFile(const QString &path)
+void MainWindow::addRecentFile(const QString& path)
 {
 #ifndef WASMBUILD
     m_recentFiles.removeAll(path);
@@ -3084,8 +3149,8 @@ void MainWindow::createPickDock()
     m_pickDock->setFeatures(QDockWidget::DockWidgetMovable | QDockWidget::DockWidgetClosable);
     m_pickDock->setTitleBarWidget(createFlatDockTitleBar(m_pickDock, "Pick"));
 
-    QWidget *body = new QWidget;
-    QVBoxLayout *lay = new QVBoxLayout(body);
+    QWidget* body = new QWidget;
+    QVBoxLayout* lay = new QVBoxLayout(body);
     lay->setContentsMargins(8, 8, 8, 8);
     lay->setSpacing(4);
 
@@ -3115,17 +3180,17 @@ void MainWindow::createLayersDock()
     m_layersDock->setFeatures(QDockWidget::DockWidgetMovable | QDockWidget::DockWidgetClosable);
     m_layersDock->setTitleBarWidget(createFlatDockTitleBar(m_layersDock, "Layers"));
 
-    QWidget *body = new QWidget;
-    QVBoxLayout *lay = new QVBoxLayout(body);
+    QWidget* body = new QWidget;
+    QVBoxLayout* lay = new QVBoxLayout(body);
     lay->setContentsMargins(8, 8, 8, 8);
     lay->setSpacing(6);
 
-    m_layerBrainCheck         = new QCheckBox("Cortical Surface");
-    m_layerElectrodesCheck    = new QCheckBox("Electrodes");
-    m_layerMriCheck           = new QCheckBox("MRI Slices");
-    m_layerSensorsCheck       = new QCheckBox("Sensors");
+    m_layerBrainCheck = new QCheckBox("Cortical Surface");
+    m_layerElectrodesCheck = new QCheckBox("Electrodes");
+    m_layerMriCheck = new QCheckBox("MRI Slices");
+    m_layerSensorsCheck = new QCheckBox("Sensors");
     m_layerSourceOverlayCheck = new QCheckBox("Source Overlay");
-    for (QCheckBox *c : {m_layerBrainCheck, m_layerElectrodesCheck, m_layerMriCheck,
+    for (QCheckBox* c : {m_layerBrainCheck, m_layerElectrodesCheck, m_layerMriCheck,
                          m_layerSensorsCheck, m_layerSourceOverlayCheck}) {
         c->setChecked(true);
         lay->addWidget(c);
@@ -3170,12 +3235,12 @@ void MainWindow::createOverlayDock()
     m_overlayDock->setFeatures(QDockWidget::DockWidgetMovable | QDockWidget::DockWidgetClosable);
     m_overlayDock->setTitleBarWidget(createFlatDockTitleBar(m_overlayDock, "Overlay"));
 
-    QWidget *body = new QWidget;
-    QVBoxLayout *lay = new QVBoxLayout(body);
+    QWidget* body = new QWidget;
+    QVBoxLayout* lay = new QVBoxLayout(body);
     lay->setContentsMargins(8, 8, 8, 8);
     lay->setSpacing(6);
 
-    QFormLayout *form = new QFormLayout;
+    QFormLayout* form = new QFormLayout;
     form->setLabelAlignment(Qt::AlignLeft);
 
     m_overlaySourceCombo = new QComboBox;
@@ -3207,7 +3272,7 @@ void MainWindow::createOverlayDock()
 
     lay->addLayout(form);
 
-    QHBoxLayout *timeRow = new QHBoxLayout;
+    QHBoxLayout* timeRow = new QHBoxLayout;
     timeRow->addWidget(new QLabel("Time"));
     m_overlayTimeSlider = new QSlider(Qt::Horizontal);
     m_overlayTimeSlider->setRange(0, 1000);
@@ -3228,7 +3293,9 @@ void MainWindow::createOverlayDock()
     m_overlayDock->setWidget(body);
     addDockWidget(Qt::RightDockWidgetArea, m_overlayDock);
 
-    auto pushThresholds = [this]() { pushOverlayToScene(); };
+    auto pushThresholds = [this]() {
+        pushOverlayToScene();
+    };
     connect(m_overlayFminSpin, qOverload<double>(&QDoubleSpinBox::valueChanged),
             this, pushThresholds);
     connect(m_overlayFmidSpin, qOverload<double>(&QDoubleSpinBox::valueChanged),
@@ -3252,23 +3319,23 @@ void MainWindow::createOverlayDock()
     // updates should reflect in the dock without firing a feedback loop.
     connect(&m_scene, &DISP3DLIB::MultimodalScene::overlayThresholdsChanged,
             this, [this](float fmin, float fmid, float fmax) {
-        QSignalBlocker b1(m_overlayFminSpin);
-        QSignalBlocker b2(m_overlayFmidSpin);
-        QSignalBlocker b3(m_overlayFmaxSpin);
-        m_overlayFminSpin->setValue(fmin);
-        m_overlayFmidSpin->setValue(fmid);
-        m_overlayFmaxSpin->setValue(fmax);
-        if (m_overlayColorBar) {
-            m_overlayColorBar->setRange(fmin, fmid, fmax);
-        }
-    });
+                QSignalBlocker b1(m_overlayFminSpin);
+                QSignalBlocker b2(m_overlayFmidSpin);
+                QSignalBlocker b3(m_overlayFmaxSpin);
+                m_overlayFminSpin->setValue(fmin);
+                m_overlayFmidSpin->setValue(fmid);
+                m_overlayFmaxSpin->setValue(fmax);
+                if (m_overlayColorBar) {
+                    m_overlayColorBar->setRange(fmin, fmid, fmax);
+                }
+            });
     connect(&m_scene, &DISP3DLIB::MultimodalScene::timeCursorChanged,
             this, [this](double seconds) {
-        QSignalBlocker b(m_overlayTimeSlider);
-        const int v = qBound(0, static_cast<int>(std::lround(seconds * 1000.0)), 1000);
-        m_overlayTimeSlider->setValue(v);
-        m_overlayTimeLabel->setText(QString::number(seconds, 'f', 3) + " s");
-    });
+                QSignalBlocker b(m_overlayTimeSlider);
+                const int v = qBound(0, static_cast<int>(std::lround(seconds * 1000.0)), 1000);
+                m_overlayTimeSlider->setValue(v);
+                m_overlayTimeLabel->setText(QString::number(seconds, 'f', 3) + " s");
+            });
 }
 
 //=============================================================================================================
@@ -3283,8 +3350,8 @@ void MainWindow::onLoadElectrodes()
     }
     const QString suffix = QFileInfo(path).suffix().toLower();
     const bool ok = (suffix == QLatin1String("csv"))
-                    ? m_electrodesPlugin.loadCsv(path)
-                    : m_electrodesPlugin.loadFiff(path);
+        ? m_electrodesPlugin.loadCsv(path)
+        : m_electrodesPlugin.loadFiff(path);
     if (!ok) {
         QMessageBox::warning(this, tr("Load Electrodes"),
                              tr("Failed to load electrode data from:\n%1").arg(path));
@@ -3292,8 +3359,8 @@ void MainWindow::onLoadElectrodes()
     }
     if (m_statusLabel) {
         m_statusLabel->setText(QStringLiteral("Loaded electrodes: %1 (%2 contacts)")
-                                .arg(QFileInfo(path).fileName())
-                                .arg(m_electrodesPlugin.contactCount()));
+                                   .arg(QFileInfo(path).fileName())
+                                   .arg(m_electrodesPlugin.contactCount()));
     }
     if (m_layerElectrodesCheck) {
         m_layerElectrodesCheck->setChecked(true);
@@ -3307,10 +3374,12 @@ void MainWindow::onLoadMri()
 #ifdef WASMBUILD
     QFileDialog::getOpenFileContent(
         QStringLiteral("MRI volume (*.mgh *.mgz *.nii *.nii.gz)"),
-        [this](const QString &fileName, const QByteArray &fileContent) {
-            if (fileName.isEmpty()) return;
+        [this](const QString& fileName, const QByteArray& fileContent) {
+            if (fileName.isEmpty())
+                return;
             QString path = wasmSaveToTemp(fileName, fileContent);
-            if (path.isEmpty()) return;
+            if (path.isEmpty())
+                return;
             if (!m_mriSlicesPlugin.loadVolume(path)) {
                 QMessageBox::warning(this, tr("Load MRI"),
                                      tr("Failed to load MRI volume from:\n%1").arg(fileName));
@@ -3339,7 +3408,7 @@ void MainWindow::onLoadMri()
     populateMriVolumeCombo(path);
     if (m_statusLabel) {
         m_statusLabel->setText(QStringLiteral("Loaded MRI: %1")
-                                .arg(QFileInfo(path).fileName()));
+                                   .arg(QFileInfo(path).fileName()));
     }
     if (m_layerMriCheck) {
         m_layerMriCheck->setChecked(true);
@@ -3359,8 +3428,7 @@ void MainWindow::populateMriVolumeCombo(const QString& activePath)
     const QDir dir = QFileInfo(activePath).absoluteDir();
     const QStringList filters = {
         QStringLiteral("*.mgh"), QStringLiteral("*.mgz"),
-        QStringLiteral("*.nii"), QStringLiteral("*.nii.gz")
-    };
+        QStringLiteral("*.nii"), QStringLiteral("*.nii.gz")};
     QFileInfoList entries = dir.entryInfoList(filters, QDir::Files, QDir::Name);
     int activeIndex = 0;
     for (const QFileInfo& fi : entries) {
@@ -3462,8 +3530,8 @@ void MainWindow::applyMriDisplayPreferences()
     m_mriOpacityLabel->setText(QString("%1%").arg(qRound(opacity * 100)));
 
     for (int i = 0; i < 3; ++i) {
-        DISP3DLIB::SliceObject *slice = (i == 0) ? m_mriSlicesPlugin.axialSlice()
-                                      : (i == 1) ? m_mriSlicesPlugin.coronalSlice()
+        DISP3DLIB::SliceObject* slice = (i == 0) ? m_mriSlicesPlugin.axialSlice()
+            : (i == 1)                           ? m_mriSlicesPlugin.coronalSlice()
                                                  : m_mriSlicesPlugin.sagittalSlice();
         if (slice) {
             slice->setWindowLevel(center, width);

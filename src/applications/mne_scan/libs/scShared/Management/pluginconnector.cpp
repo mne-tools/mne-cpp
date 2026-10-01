@@ -29,7 +29,7 @@ using namespace SCSHAREDLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-PluginConnector::PluginConnector(AbstractPlugin *parent, const QString &name, const QString &descr)
+PluginConnector::PluginConnector(AbstractPlugin* parent, const QString& name, const QString& descr)
 : QObject(parent)
 , m_pPlugin(parent)
 , m_sName(name)

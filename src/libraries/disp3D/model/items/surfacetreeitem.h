@@ -35,18 +35,19 @@
 class DISP3DSHARED_EXPORT SurfaceTreeItem : public AbstractTreeItem
 {
 public:
-    enum SurfaceRole {
+    enum SurfaceRole
+    {
         SurfaceDataRole = AlphaRole + 1,
         AnnotationDataRole,
         ShaderModeRole
     };
 
-    explicit SurfaceTreeItem(const QString &text = "");
+    explicit SurfaceTreeItem(const QString& text = "");
     ~SurfaceTreeItem() override = default;
 
     // Setters
-    void setSurfaceData(const FSLIB::FsSurface &surface);
-    void setAnnotationData(const FSLIB::FsAnnotation &annotation);
+    void setSurfaceData(const FSLIB::FsSurface& surface);
+    void setAnnotationData(const FSLIB::FsAnnotation& annotation);
     void setShaderMode(int mode); // 0=Standard, 1=Holo, 2=Glossy
 
     // Getters

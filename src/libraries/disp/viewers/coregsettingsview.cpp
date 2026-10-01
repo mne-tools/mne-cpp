@@ -12,7 +12,7 @@
  * @brief    Implementation of the CoregSettingsView co-registration parameter panel.
  */
 
-# define M_PI           3.14159265358979323846  /* pi */
+#define M_PI 3.14159265358979323846 /* pi */
 
 //=============================================================================================================
 // INCLUDES
@@ -60,7 +60,7 @@ using namespace Eigen;
 //=============================================================================================================
 
 CoregSettingsView::CoregSettingsView(const QString& sSettingsPath,
-                                     QWidget *parent,
+                                     QWidget* parent,
                                      Qt::WindowFlags f)
 : AbstractView(parent, f)
 , m_pUi(new Ui::CoregSettingsViewWidget)
@@ -145,37 +145,35 @@ CoregSettingsView::~CoregSettingsView()
 
 void CoregSettingsView::saveSettings()
 {
-    if(m_sSettingsPath.isEmpty()) {
+    if (m_sSettingsPath.isEmpty()) {
         return;
     }
 
     // Save Settings
     QSettings settings("MNECPP");
-
 }
 
 //=============================================================================================================
 
 void CoregSettingsView::loadSettings()
 {
-    if(m_sSettingsPath.isEmpty()) {
+    if (m_sSettingsPath.isEmpty()) {
         return;
     }
 
     // Load Settings
     QSettings settings("MNECPP");
-
 }
 
 //=============================================================================================================
 
 void CoregSettingsView::updateGuiMode(GuiMode mode)
 {
-    switch(mode) {
-    case GuiMode::Clinical:
-        break;
-    default: // default is research mode
-        break;
+    switch (mode) {
+        case GuiMode::Clinical:
+            break;
+        default: // default is research mode
+            break;
     }
 }
 
@@ -183,11 +181,11 @@ void CoregSettingsView::updateGuiMode(GuiMode mode)
 
 void CoregSettingsView::updateProcessingMode(ProcessingMode mode)
 {
-    switch(mode) {
-    case ProcessingMode::Offline:
-        break;
-    default: // default is realtime mode
-        break;
+    switch (mode) {
+        case ProcessingMode::Offline:
+            break;
+        default: // default is realtime mode
+            break;
     }
 }
 
@@ -231,7 +229,6 @@ void CoregSettingsView::setToolTipInfo()
     m_pUi->m_qDoubleSpinBox_TransX->setToolTip("Translation to apply in x-direction.");
     m_pUi->m_qDoubleSpinBox_TransY->setToolTip("Translation to apply in y-direction.");
     m_pUi->m_qDoubleSpinBox_TransZ->setToolTip("Translation to apply in z-direction.");
-
 }
 
 //=============================================================================================================
@@ -255,7 +252,7 @@ void CoregSettingsView::onLoadFidFile()
 void CoregSettingsView::onPickingStatus()
 {
     bool bState = m_pUi->m_qCheckBox_PickFiducials->isChecked();
-    if(bState) {
+    if (bState) {
         m_pUi->m_qWidget_ResultFiducials->setEnabled(true);
         emit pickFiducials(true);
     } else {
@@ -271,7 +268,7 @@ void CoregSettingsView::setFiducials(const QVector3D vecPosition)
 {
     QVector3D vecTemp;
     // store incoming vector
-    if(m_pUi->m_qRadioButton_LPA->isChecked()) {
+    if (m_pUi->m_qRadioButton_LPA->isChecked()) {
         m_vecLPA = vecPosition;
 
         // step to next fiducial
@@ -295,9 +292,9 @@ void CoregSettingsView::setFiducials(const QVector3D vecPosition)
     }
 
     // floor(vecAxialPosition[0]*100)/100 makes sure to only take 2 decimal positions
-    m_pUi->m_qLineEdit_FidX->setText(QString::number(floor(vecTemp[0]*100)/100 * 1000) + " mm" );
-    m_pUi->m_qLineEdit_FidY->setText(QString::number(floor(vecTemp[1]*100)/100 * 1000) + " mm" );
-    m_pUi->m_qLineEdit_FidZ->setText(QString::number(floor(vecTemp[2]*100)/100 * 1000) + " mm" );
+    m_pUi->m_qLineEdit_FidX->setText(QString::number(floor(vecTemp[0] * 100) / 100 * 1000) + " mm");
+    m_pUi->m_qLineEdit_FidY->setText(QString::number(floor(vecTemp[1] * 100) / 100 * 1000) + " mm");
+    m_pUi->m_qLineEdit_FidZ->setText(QString::number(floor(vecTemp[2] * 100) / 100 * 1000) + " mm");
     return;
 }
 
@@ -306,7 +303,7 @@ void CoregSettingsView::setFiducials(const QVector3D vecPosition)
 void CoregSettingsView::onFiducialChanged()
 {
     QVector3D vecTemp;
-    if(m_pUi->m_qRadioButton_LPA->isChecked()) {
+    if (m_pUi->m_qRadioButton_LPA->isChecked()) {
         vecTemp = m_vecLPA;
         emit fiducialChanged(FIFFV_POINT_LPA);
     } else if (m_pUi->m_qRadioButton_NAS->isChecked()) {
@@ -318,9 +315,9 @@ void CoregSettingsView::onFiducialChanged()
     }
 
     // floor(vecAxialPosition[0]*100)/100 makes sure to only take 2 decimal positions
-    m_pUi->m_qLineEdit_FidX->setText(QString::number(floor(vecTemp[0]*100)/100 * 1000) + " mm" );
-    m_pUi->m_qLineEdit_FidY->setText(QString::number(floor(vecTemp[1]*100)/100 * 1000) + " mm" );
-    m_pUi->m_qLineEdit_FidZ->setText(QString::number(floor(vecTemp[2]*100)/100 * 1000) + " mm" );
+    m_pUi->m_qLineEdit_FidX->setText(QString::number(floor(vecTemp[0] * 100) / 100 * 1000) + " mm");
+    m_pUi->m_qLineEdit_FidY->setText(QString::number(floor(vecTemp[1] * 100) / 100 * 1000) + " mm");
+    m_pUi->m_qLineEdit_FidZ->setText(QString::number(floor(vecTemp[2] * 100) / 100 * 1000) + " mm");
     return;
 }
 
@@ -381,7 +378,7 @@ void CoregSettingsView::onStoreTrans()
 
     if (sFileName.isEmpty()) {
         return;
-    } else{
+    } else {
         emit storeTrans(sFileName);
     }
 }
@@ -391,11 +388,11 @@ void CoregSettingsView::onStoreTrans()
 int CoregSettingsView::getCurrentFiducial()
 {
     // choose to use other points as well
-    if(m_pUi->m_qRadioButton_LPA->isChecked()) {
+    if (m_pUi->m_qRadioButton_LPA->isChecked()) {
         return FIFFV_POINT_LPA;
-    } else if(m_pUi->m_qRadioButton_NAS->isChecked()) {
+    } else if (m_pUi->m_qRadioButton_NAS->isChecked()) {
         return FIFFV_POINT_NASION;
-    } else if(m_pUi->m_qRadioButton_RPA->isChecked()) {
+    } else if (m_pUi->m_qRadioButton_RPA->isChecked()) {
         return FIFFV_POINT_RPA;
     };
     return -1;
@@ -412,7 +409,7 @@ int CoregSettingsView::getMaxIter()
 
 float CoregSettingsView::getConvergence()
 {
-    return m_pUi->m_qDoubleSpinBox_Converge->value()/1000;
+    return m_pUi->m_qDoubleSpinBox_Converge->value() / 1000;
 }
 
 //=============================================================================================================
@@ -468,7 +465,7 @@ float CoregSettingsView::getWeightHSP()
 
 float CoregSettingsView::getOmmitDistance()
 {
-    return static_cast<float>(m_pUi->m_qSpinBox_MaxDist->value())/1000.0;
+    return static_cast<float>(m_pUi->m_qSpinBox_MaxDist->value()) / 1000.0;
 }
 
 //=============================================================================================================
@@ -479,13 +476,13 @@ QList<int> CoregSettingsView::getDigitizerCheckState()
     QList<int> lPicks({FIFFV_POINT_CARDINAL});
 
     // choose to use other points as well
-    if(m_pUi->m_qCheckBox_EEG) {
+    if (m_pUi->m_qCheckBox_EEG) {
         lPicks << FIFFV_POINT_EEG;
     }
-    if(m_pUi->m_qCheckBox_HPI) {
+    if (m_pUi->m_qCheckBox_HPI) {
         lPicks << FIFFV_POINT_HPI;
     }
-    if(m_pUi->m_qCheckBox_HSP) {
+    if (m_pUi->m_qCheckBox_HSP) {
         lPicks << FIFFV_POINT_EXTRA;
     }
     return lPicks;
@@ -525,7 +522,7 @@ void CoregSettingsView::setOmittedPoints(const int iN)
 
 void CoregSettingsView::setRMSE(const float fRMSE)
 {
-    m_pUi->m_qLabel_RMSE->setText(QString::number(fRMSE*1000) + " mm");
+    m_pUi->m_qLabel_RMSE->setText(QString::number(fRMSE * 1000) + " mm");
 }
 
 //=============================================================================================================
@@ -545,14 +542,14 @@ void CoregSettingsView::setTransParams(const Vector3f& vecTrans,
     QSignalBlocker blockerScaleY(m_pUi->m_qDoubleSpinBox_ScalingY);
     QSignalBlocker blockerScaleZ(m_pUi->m_qDoubleSpinBox_ScalingZ);
 
-    m_pUi->m_qDoubleSpinBox_TransX->setValue(vecTrans(0)*1000);
-    m_pUi->m_qDoubleSpinBox_TransY->setValue(vecTrans(1)*1000);
-    m_pUi->m_qDoubleSpinBox_TransZ->setValue(vecTrans(2)*1000);
+    m_pUi->m_qDoubleSpinBox_TransX->setValue(vecTrans(0) * 1000);
+    m_pUi->m_qDoubleSpinBox_TransY->setValue(vecTrans(1) * 1000);
+    m_pUi->m_qDoubleSpinBox_TransZ->setValue(vecTrans(2) * 1000);
 
     // Inverted order due to euler rotation
-    m_pUi->m_qDoubleSpinBox_RotX->setValue(vecRot(2)*180/M_PI);
-    m_pUi->m_qDoubleSpinBox_RotY->setValue(vecRot(1)*180/M_PI);
-    m_pUi->m_qDoubleSpinBox_RotZ->setValue(vecRot(0)*180/M_PI);
+    m_pUi->m_qDoubleSpinBox_RotX->setValue(vecRot(2) * 180 / M_PI);
+    m_pUi->m_qDoubleSpinBox_RotY->setValue(vecRot(1) * 180 / M_PI);
+    m_pUi->m_qDoubleSpinBox_RotZ->setValue(vecRot(0) * 180 / M_PI);
 
     m_pUi->m_qDoubleSpinBox_ScalingX->setValue(vecScale(2));
     m_pUi->m_qDoubleSpinBox_ScalingY->setValue(vecScale(1));
@@ -565,14 +562,14 @@ void CoregSettingsView::getTransParams(Vector3f& vecRot,
                                        Vector3f& vecTrans,
                                        Vector3f& vecScale)
 {
-    vecTrans(0) = m_pUi->m_qDoubleSpinBox_TransX->value()/1000.0;
-    vecTrans(1) = m_pUi->m_qDoubleSpinBox_TransY->value()/1000.0;
-    vecTrans(2) = m_pUi->m_qDoubleSpinBox_TransZ->value()/1000.0;
+    vecTrans(0) = m_pUi->m_qDoubleSpinBox_TransX->value() / 1000.0;
+    vecTrans(1) = m_pUi->m_qDoubleSpinBox_TransY->value() / 1000.0;
+    vecTrans(2) = m_pUi->m_qDoubleSpinBox_TransZ->value() / 1000.0;
 
     // Inverted order due to euler rotation
-    vecRot(2) = m_pUi->m_qDoubleSpinBox_RotX->value() * M_PI/180.0;
-    vecRot(1) = m_pUi->m_qDoubleSpinBox_RotY->value() * M_PI/180.0;
-    vecRot(0) = m_pUi->m_qDoubleSpinBox_RotZ->value() * M_PI/180.0;
+    vecRot(2) = m_pUi->m_qDoubleSpinBox_RotX->value() * M_PI / 180.0;
+    vecRot(1) = m_pUi->m_qDoubleSpinBox_RotY->value() * M_PI / 180.0;
+    vecRot(0) = m_pUi->m_qDoubleSpinBox_RotZ->value() * M_PI / 180.0;
 
     // apply different scaling modes
     if (m_pUi->m_qComboBox_ScalingMode->currentText() == "Uniform") {
@@ -629,5 +626,4 @@ void CoregSettingsView::onFitICP()
 
 void CoregSettingsView::clearView()
 {
-
 }

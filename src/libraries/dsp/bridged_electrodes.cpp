@@ -45,7 +45,7 @@ using namespace Eigen;
 //=============================================================================================================
 
 MatrixXd UTILSLIB::computeElectricalDistance(const MatrixXd& data,
-                                              const FiffInfo& info)
+                                             const FiffInfo& info)
 {
     // Find EEG channel indices
     QList<int> eegIdx;
@@ -95,7 +95,7 @@ MatrixXd UTILSLIB::computeElectricalDistance(const MatrixXd& data,
 
 //=============================================================================================================
 
-QList<QPair<int,int>> UTILSLIB::computeBridgedElectrodes(
+QList<QPair<int, int>> UTILSLIB::computeBridgedElectrodes(
     const MatrixXd& data,
     const FiffInfo& info,
     const BridgedElectrodeParams& params)
@@ -109,7 +109,7 @@ QList<QPair<int,int>> UTILSLIB::computeBridgedElectrodes(
     }
 
     const int nEeg = eegIdx.size();
-    QList<QPair<int,int>> bridged;
+    QList<QPair<int, int>> bridged;
 
     if (nEeg < 2) {
         return bridged;

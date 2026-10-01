@@ -41,9 +41,9 @@ EEGoSportsSetupWidget::EEGoSportsSetupWidget(EEGoSports* pEEGoSports, QWidget* p
     ui.setupUi(this);
 
     QIcon impedanceIcon = QIcon(":/images/impedances.png");
-    ui.m_qLabel_Impedance->setPixmap(impedanceIcon.pixmap(QSize(32,32)));
+    ui.m_qLabel_Impedance->setPixmap(impedanceIcon.pixmap(QSize(32, 32)));
     QIcon filesIcon = QIcon(":/images/database.png");
-    ui.m_qLabel_Files->setPixmap(filesIcon.pixmap(QSize(32,32)));
+    ui.m_qLabel_Files->setPixmap(filesIcon.pixmap(QSize(32, 32)));
 
     //Connect device sampling properties
     connect(ui.m_comboBox_SamplingFreq, static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged),
@@ -96,4 +96,3 @@ void EEGoSportsSetupWidget::setWriteToFile()
 {
     m_pEEGoSports->m_bWriteDriverDebugToFile = ui.m_checkBox_WriteDriverDebugToFile->isChecked();
 }
-

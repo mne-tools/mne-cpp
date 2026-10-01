@@ -65,14 +65,14 @@
 #endif
 #endif
 
-#define NATIVE_ENDIAN    FIFFV_LITTLE_ENDIAN
+#define NATIVE_ENDIAN FIFFV_LITTLE_ENDIAN
 
-#ifdef  INTEL_X86_ARCH
-#define NATIVE_ENDIAN    FIFFV_LITTLE_ENDIAN
+#ifdef INTEL_X86_ARCH
+#define NATIVE_ENDIAN FIFFV_LITTLE_ENDIAN
 #endif
 
-#ifdef  BIG_ENDIAN_ARCH
-#define NATIVE_ENDIAN    FIFFV_BIG_ENDIAN
+#ifdef BIG_ENDIAN_ARCH
+#define NATIVE_ENDIAN FIFFV_BIG_ENDIAN
 #endif
 
 //=============================================================================================================
@@ -130,11 +130,11 @@ class FiffDirNode;
 //
 //   The magic hexadecimal values
 //
-#define IS_MATRIX               0xFFFF0000          /**< Is Matrix encoding. ffff0000. */
-#define MATRIX_CODING_DENSE     0x00004000          /**< MATRIX_CODING_DENSE encoding. 4000. */
-#define MATRIX_CODING_CCS       0x00004010          /**< MATRIX_CODING_CCS encoding. 4010. */
-#define MATRIX_CODING_RCS       0x00004020          /**< MATRIX_CODING_RCS encoding. 4020. */
-#define DATA_TYPE               0x0000FFFF          /**< DATA_TYPE encoding 0000ffff. */
+#define IS_MATRIX 0xFFFF0000           /**< Is Matrix encoding. ffff0000. */
+#define MATRIX_CODING_DENSE 0x00004000 /**< MATRIX_CODING_DENSE encoding. 4000. */
+#define MATRIX_CODING_CCS 0x00004010   /**< MATRIX_CODING_CCS encoding. 4010. */
+#define MATRIX_CODING_RCS 0x00004020   /**< MATRIX_CODING_RCS encoding. 4020. */
+#define DATA_TYPE 0x0000FFFF           /**< DATA_TYPE encoding 0000ffff. */
 
 //const fiff_int_t IS_MATRIX           = 4294901760; /**< Is Matrix encoding. ffff0000. */
 //const fiff_int_t MATRIX_CODING_DENSE = 16384;       /**< MATRIX_CODING_DENSE encoding. 4000. */
@@ -157,12 +157,11 @@ class FiffDirNode;
  */
 class FIFFSHARED_EXPORT FiffTag : public QByteArray
 {
-
 public:
-    using SPtr = QSharedPointer<FiffTag>;            /**< Shared pointer type for FiffTag. */
-    using ConstSPtr = QSharedPointer<const FiffTag>; /**< Const shared pointer type for FiffTag. */
-    using UPtr = std::unique_ptr<FiffTag>;             /**< Unique pointer type for FiffTag. */
-    using ConstUPtr = std::unique_ptr<const FiffTag>;  /**< Const unique pointer type for FiffTag. */
+    using SPtr = QSharedPointer<FiffTag>;             /**< Shared pointer type for FiffTag. */
+    using ConstSPtr = QSharedPointer<const FiffTag>;  /**< Const shared pointer type for FiffTag. */
+    using UPtr = std::unique_ptr<FiffTag>;            /**< Unique pointer type for FiffTag. */
+    using ConstUPtr = std::unique_ptr<const FiffTag>; /**< Const unique pointer type for FiffTag. */
 
     //=========================================================================================================
     /**
@@ -383,11 +382,11 @@ public:
      */
     inline FiffChInfo toChInfo() const;
 
-//    //=========================================================================================================
-//    /**
-//    * to fiff OLD PACK
-//    */
-//    inline fiff_coord_trans_t toCoordTrans() const;
+    //    //=========================================================================================================
+    //    /**
+    //    * to fiff OLD PACK
+    //    */
+    //    inline fiff_coord_trans_t toCoordTrans() const;
 
     //=========================================================================================================
     /**
@@ -395,7 +394,7 @@ public:
      *
      * @return List of directory entry descriptors.
      */
-    inline QList< QSharedPointer<FiffDirEntry> > toDirEntry() const;
+    inline QList<QSharedPointer<FiffDirEntry>> toDirEntry() const;
 
     //
     // MATRIX
@@ -525,11 +524,11 @@ public:
     inline static qint32 storageSize();
 
 public:
-    fiff_int_t  kind;       /**< Tag number.
+    fiff_int_t kind; /**< Tag number.
                              *   This defines the meaning of the item */
-    fiff_int_t  type;       /**< Data type.
+    fiff_int_t type; /**< Data type.
                              *   This defines the representation of the data. */
-    fiff_int_t  next;       /**< Pointer to the next object.
+    fiff_int_t next; /**< Pointer to the next object.
                              *   Zero if the object follows
                              *   sequentially in file.
                              *   Negative at the end of file */
@@ -544,9 +543,8 @@ inline qint32 FiffTag::storageSize()
     // On-disk layout: kind, type, size, next (4 x fiff_int_t)
     // Note: 'size' is not a class member (QByteArray::size() is used at runtime),
     //       but it is part of the on-disk wire format.
-    return sizeof(FiffTag::kind) + sizeof(FiffTag::type)
-         + sizeof(fiff_int_t)    /* size field on disk */
-         + sizeof(FiffTag::next);
+    return sizeof(FiffTag::kind) + sizeof(FiffTag::type) + sizeof(fiff_int_t) /* size field on disk */
+        + sizeof(FiffTag::next);
 }
 
 //=============================================================================================================
@@ -555,7 +553,7 @@ inline qint32 FiffTag::storageSize()
 
 inline quint8* FiffTag::toByte() const
 {
-    if(this->isMatrix() || this->getType() != FIFFT_BYTE)
+    if (this->isMatrix() || this->getType() != FIFFT_BYTE)
         return nullptr;
     else
         return (quint8*)this->data();
@@ -565,7 +563,7 @@ inline quint8* FiffTag::toByte() const
 
 inline quint16* FiffTag::toUnsignedShort() const
 {
-    if(this->isMatrix() || this->getType() != FIFFT_USHORT)
+    if (this->isMatrix() || this->getType() != FIFFT_USHORT)
         return nullptr;
     else
         return (quint16*)this->data();
@@ -575,7 +573,7 @@ inline quint16* FiffTag::toUnsignedShort() const
 
 inline qint16* FiffTag::toShort() const
 {
-    if(this->isMatrix() || this->getType() != FIFFT_SHORT)
+    if (this->isMatrix() || this->getType() != FIFFT_SHORT)
         return nullptr;
     else
         return (qint16*)this->data();
@@ -585,7 +583,7 @@ inline qint16* FiffTag::toShort() const
 
 inline quint32* FiffTag::toUnsignedInt() const
 {
-    if(this->isMatrix() || this->getType() != FIFFT_UINT)
+    if (this->isMatrix() || this->getType() != FIFFT_UINT)
         return nullptr;
     else
         return (quint32*)this->data();
@@ -595,11 +593,10 @@ inline quint32* FiffTag::toUnsignedInt() const
 
 inline qint32* FiffTag::toInt() const
 {
-    if(this->isMatrix() || this->getType() != FIFFT_INT) {
-        qWarning("Expected an integer tag : %d (found data type %d instead)\n",this->kind,this->getType());
+    if (this->isMatrix() || this->getType() != FIFFT_INT) {
+        qWarning("Expected an integer tag : %d (found data type %d instead)\n", this->kind, this->getType());
         return nullptr;
-    }
-    else
+    } else
         return (qint32*)this->data();
 }
 
@@ -607,11 +604,10 @@ inline qint32* FiffTag::toInt() const
 
 inline qint32* FiffTag::toJulian() const
 {
-    if(this->isMatrix() || this->getType() != FIFFT_JULIAN) {
-        qWarning("Expected a julian tag : %d (found data type %d instead)\n",this->kind,this->getType());
+    if (this->isMatrix() || this->getType() != FIFFT_JULIAN) {
+        qWarning("Expected a julian tag : %d (found data type %d instead)\n", this->kind, this->getType());
         return nullptr;
-    }
-    else
+    } else
         return (qint32*)this->data();
 }
 
@@ -619,7 +615,7 @@ inline qint32* FiffTag::toJulian() const
 
 inline const float* FiffTag::toFloat() const
 {
-    if(this->isMatrix() || this->getType() != FIFFT_FLOAT)
+    if (this->isMatrix() || this->getType() != FIFFT_FLOAT)
         return nullptr;
     else
         return reinterpret_cast<const float*>(this->data());
@@ -629,7 +625,7 @@ inline const float* FiffTag::toFloat() const
 
 inline const double* FiffTag::toDouble() const
 {
-    if(this->isMatrix() || this->getType() != FIFFT_DOUBLE)
+    if (this->isMatrix() || this->getType() != FIFFT_DOUBLE)
         return nullptr;
     else
         return reinterpret_cast<const double*>(this->data());
@@ -639,7 +635,7 @@ inline const double* FiffTag::toDouble() const
 
 inline QString FiffTag::toString() const
 {
-    if(this->isMatrix() || this->getType() != FIFFT_STRING)
+    if (this->isMatrix() || this->getType() != FIFFT_STRING)
         return nullptr;
     else
         return *this;
@@ -649,7 +645,7 @@ inline QString FiffTag::toString() const
 
 inline qint16* FiffTag::toDauPack16() const
 {
-    if(this->isMatrix() || this->getType() != FIFFT_DAU_PACK16)
+    if (this->isMatrix() || this->getType() != FIFFT_DAU_PACK16)
         return nullptr;
     else
         return (qint16*)this->data();
@@ -662,10 +658,9 @@ inline qint16* FiffTag::toDauPack16() const
 inline FiffId FiffTag::toFiffID() const
 {
     FiffId p_fiffID;
-    if(this->isMatrix() || this->getType() != FIFFT_ID_STRUCT || this->data() == nullptr)
+    if (this->isMatrix() || this->getType() != FIFFT_ID_STRUCT || this->data() == nullptr)
         return p_fiffID;
-    else
-    {
+    else {
         const qint32* t_pInt32 = (qint32*)this->data();
 
         p_fiffID.version = t_pInt32[0];
@@ -682,18 +677,16 @@ inline FiffId FiffTag::toFiffID() const
 
 inline FiffDigPoint FiffTag::toDigPoint() const
 {
-
     FiffDigPoint t_fiffDigPoint;
-    if(this->isMatrix() || this->getType() != FIFFT_DIG_POINT_STRUCT || this->data() == nullptr)
+    if (this->isMatrix() || this->getType() != FIFFT_DIG_POINT_STRUCT || this->data() == nullptr)
         return t_fiffDigPoint;
-    else
-    {
-        auto *t_pInt32 = reinterpret_cast<const qint32*>(this->data());
+    else {
+        auto* t_pInt32 = reinterpret_cast<const qint32*>(this->data());
 
         t_fiffDigPoint.kind = t_pInt32[0];
         t_fiffDigPoint.ident = t_pInt32[1];
 
-        auto *t_pFloat = reinterpret_cast<const float*>(this->data());
+        auto* t_pFloat = reinterpret_cast<const float*>(this->data());
         t_fiffDigPoint.r[0] = t_pFloat[2];
         t_fiffDigPoint.r[1] = t_pFloat[3];
         t_fiffDigPoint.r[2] = t_pFloat[4];
@@ -707,34 +700,32 @@ inline FiffDigPoint FiffTag::toDigPoint() const
 
 inline FiffCoordTrans FiffTag::toCoordTrans() const
 {
-
     FiffCoordTrans p_FiffCoordTrans;
-    if(this->isMatrix() || this->getType() != FIFFT_COORD_TRANS_STRUCT || this->data() == nullptr)
+    if (this->isMatrix() || this->getType() != FIFFT_COORD_TRANS_STRUCT || this->data() == nullptr)
         return p_FiffCoordTrans;
-    else
-    {
-        auto *t_pInt32 = reinterpret_cast<const qint32*>(this->data());
+    else {
+        auto* t_pInt32 = reinterpret_cast<const qint32*>(this->data());
         p_FiffCoordTrans.from = t_pInt32[0];
         p_FiffCoordTrans.to = t_pInt32[1];
 
-        p_FiffCoordTrans.trans.setIdentity(4,4);
-        auto *t_pFloat = reinterpret_cast<const float*>(this->data());
+        p_FiffCoordTrans.trans.setIdentity(4, 4);
+        auto* t_pFloat = reinterpret_cast<const float*>(this->data());
         int count = 0;
         int r, c;
         for (r = 0; r < 3; ++r) {
-            p_FiffCoordTrans.trans(r,3) = t_pFloat[11+r];
+            p_FiffCoordTrans.trans(r, 3) = t_pFloat[11 + r];
             for (c = 0; c < 3; ++c) {
-                p_FiffCoordTrans.trans(r,c) = t_pFloat[2+count];
+                p_FiffCoordTrans.trans(r, c) = t_pFloat[2 + count];
                 ++count;
             }
         }
 
-        p_FiffCoordTrans.invtrans.setIdentity(4,4);
+        p_FiffCoordTrans.invtrans.setIdentity(4, 4);
         count = 0;
         for (r = 0; r < 3; ++r) {
-            p_FiffCoordTrans.invtrans(r,3) = t_pFloat[23+r];
+            p_FiffCoordTrans.invtrans(r, 3) = t_pFloat[23 + r];
             for (c = 0; c < 3; ++c) {
-                p_FiffCoordTrans.invtrans(r,c) = t_pFloat[14+count];
+                p_FiffCoordTrans.invtrans(r, c) = t_pFloat[14 + count];
                 ++count;
             }
         }
@@ -751,15 +742,14 @@ inline FiffChInfo FiffTag::toChInfo() const
 {
     FiffChInfo p_FiffChInfo;
 
-    if(this->isMatrix() || this->getType() != FIFFT_CH_INFO_STRUCT || this->data() == nullptr)
+    if (this->isMatrix() || this->getType() != FIFFT_CH_INFO_STRUCT || this->data() == nullptr)
         return p_FiffChInfo;
-    else
-    {
-        auto *t_pInt32 = reinterpret_cast<const qint32*>(this->data());
+    else {
+        auto* t_pInt32 = reinterpret_cast<const qint32*>(this->data());
         p_FiffChInfo.scanNo = t_pInt32[0];
         p_FiffChInfo.logNo = t_pInt32[1];
         p_FiffChInfo.kind = t_pInt32[2];
-        auto *t_pFloat = reinterpret_cast<const float*>(this->data());
+        auto* t_pFloat = reinterpret_cast<const float*>(this->data());
         p_FiffChInfo.range = t_pFloat[3];
         p_FiffChInfo.cal = t_pFloat[4];
 
@@ -771,48 +761,44 @@ inline FiffChInfo FiffTag::toChInfo() const
         qint32 r;
         // r0
         for (r = 0; r < 3; ++r)
-            p_FiffChInfo.chpos.r0[r] = t_pFloat[6+r];
+            p_FiffChInfo.chpos.r0[r] = t_pFloat[6 + r];
         // ex
         for (r = 0; r < 3; ++r)
-            p_FiffChInfo.chpos.ex[r] = t_pFloat[6+3+r];
+            p_FiffChInfo.chpos.ex[r] = t_pFloat[6 + 3 + r];
         // ey
         for (r = 0; r < 3; ++r)
-            p_FiffChInfo.chpos.ey[r] = t_pFloat[6+6+r];
+            p_FiffChInfo.chpos.ey[r] = t_pFloat[6 + 6 + r];
         // ez
         for (r = 0; r < 3; ++r)
-            p_FiffChInfo.chpos.ez[r] = t_pFloat[6+9+r];
+            p_FiffChInfo.chpos.ez[r] = t_pFloat[6 + 9 + r];
 
         p_FiffChInfo.coord_frame = FIFFV_COORD_UNKNOWN;
 
         //
         //   Convert loc into a more useful format
         //
-        if (p_FiffChInfo.kind == FIFFV_MEG_CH || p_FiffChInfo.kind == FIFFV_REF_MEG_CH)
-        {
-            p_FiffChInfo.coil_trans.setIdentity(4,4);
+        if (p_FiffChInfo.kind == FIFFV_MEG_CH || p_FiffChInfo.kind == FIFFV_REF_MEG_CH) {
+            p_FiffChInfo.coil_trans.setIdentity(4, 4);
             // r0
             for (r = 0; r < 3; ++r)
-                p_FiffChInfo.coil_trans(r,3) = p_FiffChInfo.chpos.r0[r];
+                p_FiffChInfo.coil_trans(r, 3) = p_FiffChInfo.chpos.r0[r];
             // ex
             for (r = 0; r < 3; ++r)
-                p_FiffChInfo.coil_trans(r,0) = p_FiffChInfo.chpos.ex[r];
+                p_FiffChInfo.coil_trans(r, 0) = p_FiffChInfo.chpos.ex[r];
             // ey
             for (r = 0; r < 3; ++r)
-                p_FiffChInfo.coil_trans(r,1) = p_FiffChInfo.chpos.ey[r];
+                p_FiffChInfo.coil_trans(r, 1) = p_FiffChInfo.chpos.ey[r];
             // ez
             for (r = 0; r < 3; ++r)
-                p_FiffChInfo.coil_trans(r,2) = p_FiffChInfo.chpos.ez[r];
+                p_FiffChInfo.coil_trans(r, 2) = p_FiffChInfo.chpos.ez[r];
 
             p_FiffChInfo.coord_frame = FIFFV_COORD_DEVICE;
-        }
-        else if (p_FiffChInfo.kind == FIFFV_EEG_CH)
-        {
+        } else if (p_FiffChInfo.kind == FIFFV_EEG_CH) {
             if (p_FiffChInfo.chpos.ex.norm() > 0) {
-                p_FiffChInfo.eeg_loc.block(0,0,3,1) = p_FiffChInfo.chpos.r0.block(0,0,3,1);
-                p_FiffChInfo.eeg_loc.block(0,1,3,1) = p_FiffChInfo.chpos.ex.block(0,0,3,1);
-            }
-            else {
-                p_FiffChInfo.eeg_loc.block(0,0,3,1) = p_FiffChInfo.chpos.r0.block(0,0,3,1);
+                p_FiffChInfo.eeg_loc.block(0, 0, 3, 1) = p_FiffChInfo.chpos.r0.block(0, 0, 3, 1);
+                p_FiffChInfo.eeg_loc.block(0, 1, 3, 1) = p_FiffChInfo.chpos.ex.block(0, 0, 3, 1);
+            } else {
+                p_FiffChInfo.eeg_loc.block(0, 0, 3, 1) = p_FiffChInfo.chpos.r0.block(0, 0, 3, 1);
             }
             p_FiffChInfo.coord_frame = FIFFV_COORD_HEAD;
         }
@@ -826,7 +812,7 @@ inline FiffChInfo FiffTag::toChInfo() const
         //   Handle the channel name
         //
         const char* orig = static_cast<const char*>(this->data());
-        p_FiffChInfo.ch_name = QString::fromUtf8(orig + 80).replace(" ","");
+        p_FiffChInfo.ch_name = QString::fromUtf8(orig + 80).replace(" ", "");
 
         return p_FiffChInfo;
     }
@@ -843,23 +829,21 @@ inline FiffChInfo FiffTag::toChInfo() const
 
 //=============================================================================================================
 
-inline QList< QSharedPointer<FiffDirEntry> > FiffTag::toDirEntry() const
+inline QList<QSharedPointer<FiffDirEntry>> FiffTag::toDirEntry() const
 {
-//         tag.data = struct('kind',{},'type',{},'size',{},'pos',{});
-    QList< QSharedPointer<FiffDirEntry> > p_ListFiffDir;
-    if(this->isMatrix() || this->getType() != FIFFT_DIR_ENTRY_STRUCT || this->data() == nullptr)
+    //         tag.data = struct('kind',{},'type',{},'size',{},'pos',{});
+    QList<QSharedPointer<FiffDirEntry>> p_ListFiffDir;
+    if (this->isMatrix() || this->getType() != FIFFT_DIR_ENTRY_STRUCT || this->data() == nullptr)
         return p_ListFiffDir;
-    else
-    {
+    else {
         QSharedPointer<FiffDirEntry> t_pFiffDirEntry;
         qint32* t_pInt32 = (qint32*)this->data();
-        for (int k = 0; k < this->size()/16; ++k)
-        {
+        for (int k = 0; k < this->size() / 16; ++k) {
             t_pFiffDirEntry = QSharedPointer<FiffDirEntry>(new FiffDirEntry);
-            t_pFiffDirEntry->kind = t_pInt32[k*4];//fread(fid,1,'int32');
-            t_pFiffDirEntry->type = t_pInt32[k*4+1];//fread(fid,1,'uint32');
-            t_pFiffDirEntry->size = t_pInt32[k*4+2];//fread(fid,1,'int32');
-            t_pFiffDirEntry->pos  = t_pInt32[k*4+3];//fread(fid,1,'int32');
+            t_pFiffDirEntry->kind = t_pInt32[k * 4];     //fread(fid,1,'int32');
+            t_pFiffDirEntry->type = t_pInt32[k * 4 + 1]; //fread(fid,1,'uint32');
+            t_pFiffDirEntry->size = t_pInt32[k * 4 + 2]; //fread(fid,1,'int32');
+            t_pFiffDirEntry->pos = t_pInt32[k * 4 + 3];  //fread(fid,1,'int32');
             p_ListFiffDir.append(t_pFiffDirEntry);
         }
     }
@@ -874,15 +858,14 @@ inline QList< QSharedPointer<FiffDirEntry> > FiffTag::toDirEntry() const
 
 inline Eigen::MatrixXi FiffTag::toIntMatrix() const
 {
-    if(!this->isMatrix() || this->getType() != FIFFT_INT || this->data() == nullptr)
+    if (!this->isMatrix() || this->getType() != FIFFT_INT || this->data() == nullptr)
         return Eigen::MatrixXi();
 
     qint32 ndim;
     QVector<qint32> dims;
     this->getMatrixDimensions(ndim, dims);
 
-    if (ndim != 2)
-    {
+    if (ndim != 2) {
         qWarning("Only two-dimensional matrices are supported at this time");
         return Eigen::MatrixXi();
     }
@@ -897,11 +880,10 @@ inline Eigen::MatrixXi FiffTag::toIntMatrix() const
 
 inline Eigen::MatrixXf FiffTag::toFloatMatrix() const
 {
-    if(!this->isMatrix() || this->getType() != FIFFT_FLOAT || this->data() == nullptr)
-        return Eigen::MatrixXf();//NULL;
+    if (!this->isMatrix() || this->getType() != FIFFT_FLOAT || this->data() == nullptr)
+        return Eigen::MatrixXf(); //NULL;
 
-    if (fiff_type_matrix_coding(this->type) != FIFFTS_MC_DENSE)
-    {
+    if (fiff_type_matrix_coding(this->type) != FIFFTS_MC_DENSE) {
         qWarning("Error in FiffTag::toFloatMatrix(): Matrix is not dense!");
         return Eigen::MatrixXf();
     }
@@ -910,8 +892,7 @@ inline Eigen::MatrixXf FiffTag::toFloatMatrix() const
     QVector<qint32> dims;
     this->getMatrixDimensions(ndim, dims);
 
-    if (ndim != 2)
-    {
+    if (ndim != 2) {
         qWarning("Only two-dimensional matrices are supported at this time");
         return Eigen::MatrixXf();
     }
@@ -926,21 +907,19 @@ inline Eigen::MatrixXf FiffTag::toFloatMatrix() const
 
 inline Eigen::SparseMatrix<double> FiffTag::toSparseFloatMatrix() const
 {
-    if(!this->isMatrix() || this->getType() != FIFFT_FLOAT || this->data() == nullptr)
-        return Eigen::SparseMatrix<double>();//NULL;
+    if (!this->isMatrix() || this->getType() != FIFFT_FLOAT || this->data() == nullptr)
+        return Eigen::SparseMatrix<double>(); //NULL;
 
-    if (fiff_type_matrix_coding(this->type) != FIFFTS_MC_CCS && fiff_type_matrix_coding(this->type) != FIFFTS_MC_RCS)
-    {
+    if (fiff_type_matrix_coding(this->type) != FIFFTS_MC_CCS && fiff_type_matrix_coding(this->type) != FIFFTS_MC_RCS) {
         qCritical("Error in FiffTag::toSparseFloatMatrix(): Matrix is not sparse!\n");
-        return Eigen::SparseMatrix<double>();//NULL;
+        return Eigen::SparseMatrix<double>(); //NULL;
     }
 
     qint32 ndim;
     QVector<qint32> dims;
     this->getMatrixDimensions(ndim, dims);
 
-    if (ndim != 2)
-    {
+    if (ndim != 2) {
         qWarning("Only two-dimensional matrices are supported at this time");
         return Eigen::SparseMatrix<double>();
     }
@@ -953,48 +932,41 @@ inline Eigen::SparseMatrix<double> FiffTag::toSparseFloatMatrix() const
     std::vector<T> tripletList;
     tripletList.reserve(nnz);
 
-    auto *t_pFloat = reinterpret_cast<const float*>(this->data());
-    auto *t_pInt = reinterpret_cast<const int*>(this->data());
+    auto* t_pFloat = reinterpret_cast<const float*>(this->data());
+    auto* t_pInt = reinterpret_cast<const int*>(this->data());
     qint32 offset1 = nnz;
-    qint32 offset2 = 2*nnz;
-    if (fiff_type_matrix_coding(this->type) == FIFFTS_MC_CCS)
-    {
+    qint32 offset2 = 2 * nnz;
+    if (fiff_type_matrix_coding(this->type) == FIFFTS_MC_CCS) {
         //
         //    CCS
         //
         qWarning("Warning in FiffTag::toSparseFloatMatrix(): CCS has to be debugged - never done before.");
         qint32 p = 0;
-        for(qint32 j = 0; j < ncol; ++j)
-        {
-            while( p < t_pInt[offset2+j+1])
-            {
-//                tripletList[p] = T(tripletList[p].row(), j, tripletList[p].value());
-                tripletList.push_back(T(t_pInt[offset1+p], j, static_cast<double>(t_pFloat[p])));
+        for (qint32 j = 0; j < ncol; ++j) {
+            while (p < t_pInt[offset2 + j + 1]) {
+                //                tripletList[p] = T(tripletList[p].row(), j, tripletList[p].value());
+                tripletList.push_back(T(t_pInt[offset1 + p], j, static_cast<double>(t_pFloat[p])));
                 ++p;
             }
         }
-    }
-    else
-    {
+    } else {
         //
         //    RCS
         //
         qint32 p = 0;
-        for(qint32 j = 0; j < nrow; ++j)
-        {
-            while( p < t_pInt[offset2+j+1])
-            {
-//                tripletList[p] = T(j, tripletList[p].col(), tripletList[p].value());
-                tripletList.push_back(T(j, t_pInt[offset1+p], static_cast<double>(t_pFloat[p])));
+        for (qint32 j = 0; j < nrow; ++j) {
+            while (p < t_pInt[offset2 + j + 1]) {
+                //                tripletList[p] = T(j, tripletList[p].col(), tripletList[p].value());
+                tripletList.push_back(T(j, t_pInt[offset1 + p], static_cast<double>(t_pFloat[p])));
                 ++p;
             }
         }
     }
 
-//    std::cout << "Size: " << tripletList.size() << std::endl;
-//    qint32 offsetTest = tripletList.size() - 10;
-//    for(qint32 i = 0; i < 10; ++i)
-//        std::cout << std::endl << tripletList[offsetTest + i].row() << " " << tripletList[offsetTest + i].col() << " " << tripletList[offsetTest + i].value();
+    //    std::cout << "Size: " << tripletList.size() << std::endl;
+    //    qint32 offsetTest = tripletList.size() - 10;
+    //    for(qint32 i = 0; i < 10; ++i)
+    //        std::cout << std::endl << tripletList[offsetTest + i].row() << " " << tripletList[offsetTest + i].col() << " " << tripletList[offsetTest + i].value();
 
     Eigen::SparseMatrix<double> p_Matrix(nrow, ncol);
     p_Matrix.setFromTriplets(tripletList.begin(), tripletList.end());

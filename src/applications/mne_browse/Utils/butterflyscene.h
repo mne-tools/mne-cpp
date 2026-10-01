@@ -67,7 +67,7 @@ public:
     /**
      * Constructs a ButterflyScene.
      */
-    explicit ButterflyScene(QGraphicsView* view, QObject *parent = 0);
+    explicit ButterflyScene(QGraphicsView* view, QObject* parent = 0);
 
     //=========================================================================================================
     /**
@@ -75,7 +75,7 @@ public:
      *
      * @param [in] scaleMap map with all channel types and their current scaling value.
      */
-    void setScaleMap(const QMap<QString,double> &scaleMap);
+    void setScaleMap(const QMap<QString, double>& scaleMap);
 
     //=========================================================================================================
     /**
@@ -89,16 +89,16 @@ public:
      *
      *  @param [in] selectedChannelItems items which are to painted to the average scene
      */
-    void repaintItems(const QList<QGraphicsItem*> &selectedChannelItems);
+    void repaintItems(const QList<QGraphicsItem*>& selectedChannelItems);
 
 protected:
-    void drawForeground(QPainter *painter, const QRectF &rect) override;
-    void mouseMoveEvent(QGraphicsSceneMouseEvent *event) override;
-    void wheelEvent(QGraphicsSceneWheelEvent *event) override;
+    void drawForeground(QPainter* painter, const QRectF& rect) override;
+    void mouseMoveEvent(QGraphicsSceneMouseEvent* event) override;
+    void wheelEvent(QGraphicsSceneWheelEvent* event) override;
 
 private:
     QPointF m_crosshairPos;
-    bool    m_crosshairVisible = false;
+    bool m_crosshairVisible = false;
 };
 
 } // NAMESPACE

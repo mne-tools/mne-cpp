@@ -53,7 +53,7 @@ using namespace Eigen;
 
 #define PROGRAM_VERSION MNE_CPP_VERSION
 
-int main(int argc, char *argv[])
+int main(int argc, char* argv[])
 {
     qInstallMessageHandler(MNELogger::customLogWriter);
     QCoreApplication app(argc, argv);
@@ -83,15 +83,22 @@ int main(int argc, char *argv[])
     QString outDir = parser.value(outOpt);
     QString gradesStr = parser.value(gradesOpt);
 
-    if (bemFile.isEmpty()) { qCritical("--bem is required."); return 1; }
-    if (outDir.isEmpty()) { qCritical("--out is required."); return 1; }
+    if (bemFile.isEmpty()) {
+        qCritical("--bem is required.");
+        return 1;
+    }
+    if (outDir.isEmpty()) {
+        qCritical("--out is required.");
+        return 1;
+    }
 
     // Parse grades
     QStringList gradesParts = gradesStr.split(',', Qt::SkipEmptyParts);
     QList<int> grades;
-    for (const QString &g : gradesParts) {
+    for (const QString& g : gradesParts) {
         int val = g.trimmed().toInt();
-        if (val > 0) grades.append(val);
+        if (val > 0)
+            grades.append(val);
     }
     if (grades.isEmpty()) {
         qCritical("No valid vertex counts specified.");
@@ -112,7 +119,7 @@ int main(int argc, char *argv[])
         return 1;
     }
 
-    qInfo("Read BEM with %d surface(s) from %s" , bem.size(), qPrintable(bemFile));
+    qInfo("Read BEM with %d surface(s) from %s", bem.size(), qPrintable(bemFile));
 
     // Find outer skin surface (typically the last/outermost surface, or id == FIFFV_BEM_SURF_ID_HEAD)
     int skinIdx = -1;
@@ -125,11 +132,11 @@ int main(int argc, char *argv[])
     // Fallback: use the last surface (outermost)
     if (skinIdx < 0) {
         skinIdx = bem.size() - 1;
-        qInfo("No explicit outer skin surface found, using surface %d." , skinIdx);
+        qInfo("No explicit outer skin surface found, using surface %d.", skinIdx);
     }
 
-    const MNEBemSurface &skin = bem[skinIdx];
-    qInfo("Using surface %d: %d vertices, %d triangles" , skinIdx, skin.np, skin.ntri);
+    const MNEBemSurface& skin = bem[skinIdx];
+    qInfo("Using surface %d: %d vertices, %d triangles", skinIdx, skin.np, skin.ntri);
 
     // Create output directory
     QDir dir;
@@ -140,7 +147,7 @@ int main(int argc, char *argv[])
 
     // Generate decimated surfaces
     for (int targetVerts : grades) {
-        qInfo("Decimating to %d vertices..." , targetVerts);
+        qInfo("Decimating to %d vertices...", targetVerts);
         const QList<MNEBemSurface> surfaces =
             MNEBemSurface::makeScalpSurfaces(skin, {targetVerts});
         if (surfaces.isEmpty()) {
@@ -159,8 +166,8 @@ int main(int argc, char *argv[])
         QFile outFile(outPath);
         outBem.write(outFile);
 
-        qInfo("  Written %d vertices, %d triangles to %s" ,
-               decimated.np, decimated.ntri, qPrintable(outPath));
+        qInfo("  Written %d vertices, %d triangles to %s",
+              decimated.np, decimated.ntri, qPrintable(outPath));
     }
 
     qInfo("Done.");

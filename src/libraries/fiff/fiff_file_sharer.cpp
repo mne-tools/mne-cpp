@@ -58,14 +58,14 @@ FiffFileSharer::FiffFileSharer(const QString& sDirName)
 
 //=============================================================================================================
 
-void FiffFileSharer::copyRealtimeFile(const QString &sSourcePath)
+void FiffFileSharer::copyRealtimeFile(const QString& sSourcePath)
 {
-    if(initSharedDirectory()){
+    if (initSharedDirectory()) {
         QString sFilePath(m_sDirectory + "/" + m_sDefaultFileName + QString::number(m_iFileIndex++) + "_raw.fif");
 
-        if(QFile::copy(sSourcePath, sFilePath)){
+        if (QFile::copy(sSourcePath, sFilePath)) {
             QFile newFile(sFilePath);
-            if(newFile.open(QIODevice::ReadWrite)){
+            if (newFile.open(QIODevice::ReadWrite)) {
                 FIFFLIB::FiffStream stream(&newFile);
                 stream.skipRawData(newFile.bytesAvailable());
                 stream.finish_writing_raw();
@@ -80,7 +80,7 @@ void FiffFileSharer::copyRealtimeFile(const QString &sSourcePath)
 
 void FiffFileSharer::initWatcher()
 {
-    if(initSharedDirectory()){
+    if (initSharedDirectory()) {
         clearSharedDirectory();
         m_fileWatcher.addPath(m_sDirectory);
         connect(&m_fileWatcher, &QFileSystemWatcher::directoryChanged,
@@ -99,14 +99,14 @@ void FiffFileSharer::clearSharedDirectory()
     QDir directory(m_sDirectory);
     directory.setNameFilters(QStringList("*.*"));
     directory.setFilter(QDir::Files);
-    for(auto& file : directory.entryList()){
+    for (auto& file : directory.entryList()) {
         directory.remove(file);
     }
 }
 
 //=============================================================================================================
 
-void FiffFileSharer::onDirectoryChanged(const QString &sPath)
+void FiffFileSharer::onDirectoryChanged(const QString& sPath)
 {
     QString filePath(sPath + "/" + m_sDefaultFileName + QString::number(m_iFileIndex) + "_raw.fif");
     m_fileWatcher.addPath(filePath);
@@ -114,7 +114,7 @@ void FiffFileSharer::onDirectoryChanged(const QString &sPath)
 
 //=============================================================================================================
 
-void FiffFileSharer::onFileChanged(const QString &sPath)
+void FiffFileSharer::onFileChanged(const QString& sPath)
 {
     emit newFileAtPath(sPath);
     m_fileWatcher.removePath(sPath);
@@ -127,7 +127,7 @@ void FiffFileSharer::onFileChanged(const QString &sPath)
 bool FiffFileSharer::initSharedDirectory()
 {
     QDir sharedDirectory(m_sDirectory);
-    if(!sharedDirectory.exists()){
+    if (!sharedDirectory.exists()) {
         sharedDirectory.mkpath(".");
     }
 

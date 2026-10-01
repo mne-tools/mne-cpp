@@ -53,7 +53,8 @@
 // DEFINE NAMESPACE
 //=============================================================================================================
 
-namespace DISP3DLIB {
+namespace DISP3DLIB
+{
 
 #ifndef FLOAT_INFINITY
 #define FLOAT_INFINITY std::numeric_limits<float>::infinity()
@@ -68,7 +69,6 @@ namespace DISP3DLIB {
 
 class DISP3DSHARED_EXPORT Interpolation
 {
-
 public:
     typedef QSharedPointer<Interpolation> SPtr;
     typedef QSharedPointer<const Interpolation> ConstSPtr;
@@ -86,11 +86,11 @@ public:
      * @param[in] vecExcludeIndex         Sensor column indices that are not pinned to their own vertex.
      * @return Row-normalised sparse weight matrix (nVertices x nSensors), or an empty matrix if the table is empty.
      */
-static QSharedPointer<Eigen::SparseMatrix<float> > createInterpolationMat(const Eigen::VectorXi &vecProjectedSensors,
-                                                                                const QSharedPointer<Eigen::MatrixXd> matDistanceTable,
-                                                                                double (*interpolationFunction) (double),
-                                                                                const double dCancelDist = FLOAT_INFINITY,
-                                                                                const Eigen::VectorXi &vecExcludeIndex = Eigen::VectorXi());
+    static QSharedPointer<Eigen::SparseMatrix<float>> createInterpolationMat(const Eigen::VectorXi& vecProjectedSensors,
+                                                                             const QSharedPointer<Eigen::MatrixXd> matDistanceTable,
+                                                                             double (*interpolationFunction)(double),
+                                                                             const double dCancelDist = FLOAT_INFINITY,
+                                                                             const Eigen::VectorXi& vecExcludeIndex = Eigen::VectorXi());
 
     //=========================================================================================================
     /**
@@ -100,8 +100,8 @@ static QSharedPointer<Eigen::SparseMatrix<float> > createInterpolationMat(const 
      * @param[in] vecMeasurementData       Sensor values (nSensors).
      * @return Interpolated vertex values, or an empty vector on dimension mismatch.
      */
-    static Eigen::VectorXf interpolateSignal(const QSharedPointer<Eigen::SparseMatrix<float> > matInterpolationMatrix,
-                                             const QSharedPointer<Eigen::VectorXf> &vecMeasurementData);
+    static Eigen::VectorXf interpolateSignal(const QSharedPointer<Eigen::SparseMatrix<float>> matInterpolationMatrix,
+                                             const QSharedPointer<Eigen::VectorXf>& vecMeasurementData);
 
     //=========================================================================================================
     /**
@@ -111,8 +111,8 @@ static QSharedPointer<Eigen::SparseMatrix<float> > createInterpolationMat(const 
      * @param[in] vecMeasurementData       Sensor values (nSensors).
      * @return Interpolated vertex values, or an empty vector on dimension mismatch.
      */
-    static Eigen::VectorXf interpolateSignal(const Eigen::SparseMatrix<float> &matInterpolationMatrix,
-                                             const Eigen::VectorXf &vecMeasurementData);
+    static Eigen::VectorXf interpolateSignal(const Eigen::SparseMatrix<float>& matInterpolationMatrix,
+                                             const Eigen::VectorXf& vecMeasurementData);
 
     //=========================================================================================================
     /**

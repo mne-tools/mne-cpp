@@ -35,7 +35,7 @@ using namespace MNESCAN;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-PluginItem::PluginItem(SCSHAREDLIB::AbstractPlugin::SPtr pPlugin, QMenu *contextMenu, QGraphicsItem *parent)
+PluginItem::PluginItem(SCSHAREDLIB::AbstractPlugin::SPtr pPlugin, QMenu* contextMenu, QGraphicsItem* parent)
 : QGraphicsPolygonItem(parent)
 , m_pPlugin(pPlugin)
 , m_iWidth(MIN_WIDTH)
@@ -43,23 +43,23 @@ PluginItem::PluginItem(SCSHAREDLIB::AbstractPlugin::SPtr pPlugin, QMenu *context
 , m_contextMenu(contextMenu)
 {
     // Polygon for shape/collision detection
-    m_qPolygon << QPointF(-m_iWidth/2, -m_iHeight/2) << QPointF(m_iWidth/2, -m_iHeight/2)
-               << QPointF(m_iWidth/2, m_iHeight/2) << QPointF(-m_iWidth/2, m_iHeight/2)
-               << QPointF(-m_iWidth/2, -m_iHeight/2);
+    m_qPolygon << QPointF(-m_iWidth / 2, -m_iHeight / 2) << QPointF(m_iWidth / 2, -m_iHeight / 2)
+               << QPointF(m_iWidth / 2, m_iHeight / 2) << QPointF(-m_iWidth / 2, m_iHeight / 2)
+               << QPointF(-m_iWidth / 2, -m_iHeight / 2);
 
     // Modern color palette
     switch (m_pPlugin->getType()) {
         case SCSHAREDLIB::AbstractPlugin::_IAlgorithm:
-            m_qColorContour = QColor(34, 197, 94);     // green-500
-            m_qColorFillTop = QColor(240, 253, 244);   // green-50
+            m_qColorContour = QColor(34, 197, 94);   // green-500
+            m_qColorFillTop = QColor(240, 253, 244); // green-50
             break;
         case SCSHAREDLIB::AbstractPlugin::_ISensor:
-            m_qColorContour = QColor(59, 130, 246);    // blue-500
-            m_qColorFillTop = QColor(239, 246, 255);   // blue-50
+            m_qColorContour = QColor(59, 130, 246);  // blue-500
+            m_qColorFillTop = QColor(239, 246, 255); // blue-50
             break;
         default:
-            m_qColorContour = QColor(100, 116, 139);   // slate-500
-            m_qColorFillTop = QColor(248, 250, 252);   // slate-50
+            m_qColorContour = QColor(100, 116, 139); // slate-500
+            m_qColorFillTop = QColor(248, 250, 252); // slate-50
             break;
     }
 
@@ -79,7 +79,7 @@ PluginItem::PluginItem(SCSHAREDLIB::AbstractPlugin::SPtr pPlugin, QMenu *context
     setFlag(QGraphicsItem::ItemSendsGeometryChanges, true);
 
     // Drop shadow
-    auto *shadow = new QGraphicsDropShadowEffect();
+    auto* shadow = new QGraphicsDropShadowEffect();
     shadow->setBlurRadius(12);
     shadow->setOffset(0, 2);
     shadow->setColor(QColor(0, 0, 0, 35));
@@ -95,7 +95,7 @@ PluginItem::~PluginItem()
 
 //=============================================================================================================
 
-void PluginItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
+void PluginItem::paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget)
 {
     Q_UNUSED(option)
     Q_UNUSED(widget)
@@ -124,7 +124,8 @@ void PluginItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option
     // Selection glow
     if (isSelected()) {
         QPen glowPen(QColor(m_qColorContour.red(), m_qColorContour.green(),
-                            m_qColorContour.blue(), 70), 6);
+                            m_qColorContour.blue(), 70),
+                     6);
         glowPen.setJoinStyle(Qt::RoundJoin);
         painter->setPen(glowPen);
         painter->setBrush(Qt::NoBrush);
@@ -175,7 +176,7 @@ void PluginItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option
 
 //=============================================================================================================
 
-void PluginItem::removeArrow(Arrow *arrow)
+void PluginItem::removeArrow(Arrow* arrow)
 {
     int index = arrows.indexOf(arrow);
 
@@ -187,7 +188,7 @@ void PluginItem::removeArrow(Arrow *arrow)
 
 void PluginItem::removeArrows()
 {
-    foreach (Arrow *arrow, arrows) {
+    foreach (Arrow* arrow, arrows) {
         arrow->startItem()->removeArrow(arrow);
         arrow->endItem()->removeArrow(arrow);
         scene()->removeItem(arrow);
@@ -197,7 +198,7 @@ void PluginItem::removeArrows()
 
 //=============================================================================================================
 
-void PluginItem::addArrow(Arrow *arrow)
+void PluginItem::addArrow(Arrow* arrow)
 {
     arrows.append(arrow);
 }
@@ -234,7 +235,7 @@ QPixmap PluginItem::image() const
 
 //=============================================================================================================
 
-void PluginItem::contextMenuEvent(QGraphicsSceneContextMenuEvent *event)
+void PluginItem::contextMenuEvent(QGraphicsSceneContextMenuEvent* event)
 {
     scene()->clearSelection();
     setSelected(true);
@@ -243,29 +244,29 @@ void PluginItem::contextMenuEvent(QGraphicsSceneContextMenuEvent *event)
 
 //=============================================================================================================
 
-QVariant PluginItem::itemChange(GraphicsItemChange change, const QVariant &value)
+QVariant PluginItem::itemChange(GraphicsItemChange change, const QVariant& value)
 {
     if (change == QGraphicsItem::ItemPositionChange) {
-        foreach (Arrow *arrow, arrows) {
+        foreach (Arrow* arrow, arrows) {
             arrow->updatePosition();
         }
     }
 
     return value;
 
-//    if (change == ItemPositionChange && scene()) {
-//        // value is the new position.
-//        QPointF newPos = value.toPointF();
-//        QRectF rect = scene()->sceneRect();
-//        if (!rect.contains(newPos)) {
-//            // Keep the item inside the scene rect.
-//            newPos.setX(qMin(rect.right(), qMax(newPos.x(), rect.left())));
-//            newPos.setY(qMin(rect.bottom(), qMax(newPos.y(), rect.top())));
-//            return newPos;
-//        }
-//    }
+    //    if (change == ItemPositionChange && scene()) {
+    //        // value is the new position.
+    //        QPointF newPos = value.toPointF();
+    //        QRectF rect = scene()->sceneRect();
+    //        if (!rect.contains(newPos)) {
+    //            // Keep the item inside the scene rect.
+    //            newPos.setX(qMin(rect.right(), qMax(newPos.x(), rect.left())));
+    //            newPos.setY(qMin(rect.bottom(), qMax(newPos.y(), rect.top())));
+    //            return newPos;
+    //        }
+    //    }
 
-//    return QGraphicsItem::itemChange(change, value);
+    //    return QGraphicsItem::itemChange(change, value);
 }
 
 //=============================================================================================================
@@ -275,18 +276,18 @@ void PluginItem::resizeAsRectangle(int width, int height)
     width = qMax(width, MIN_WIDTH);
     height = qMax(height, MIN_HEIGHT);
 
-    if(m_iWidth == width && m_iHeight == height){
+    if (m_iWidth == width && m_iHeight == height) {
         return;
     }
 
     m_iWidth = width;
     m_iHeight = height;
 
-    m_qPolygon = QPolygonF({QPointF(-m_iWidth/2, -m_iHeight/2),
-                            QPointF(m_iWidth/2, -m_iHeight/2),
-                            QPointF(m_iWidth/2, m_iHeight/2),
-                            QPointF(-m_iWidth/2, m_iHeight/2),
-                            QPointF(-m_iWidth/2, -m_iHeight/2)});
+    m_qPolygon = QPolygonF({QPointF(-m_iWidth / 2, -m_iHeight / 2),
+                            QPointF(m_iWidth / 2, -m_iHeight / 2),
+                            QPointF(m_iWidth / 2, m_iHeight / 2),
+                            QPointF(-m_iWidth / 2, m_iHeight / 2),
+                            QPointF(-m_iWidth / 2, -m_iHeight / 2)});
 
     this->setPolygon(m_qPolygon);
 }

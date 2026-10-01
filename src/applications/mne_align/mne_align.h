@@ -34,7 +34,10 @@ class QLabel;
 class QAction;
 class QComboBox;
 
-namespace MNELIB { class MNEBem; }
+namespace MNELIB
+{
+class MNEBem;
+}
 
 //=============================================================================================================
 // DEFINE NAMESPACE MNEALIGN
@@ -82,10 +85,16 @@ public:
     Align3DView* view3d() const;
 
     /** @return The shared digitised-point store (never null after construction). */
-    AcquiredPoints* points() const { return m_pPoints; }
+    AcquiredPoints* points() const
+    {
+        return m_pPoints;
+    }
 
     /** @return The Polhemus digitizer connection (never null after construction; not opened). */
-    PolhemusConnection* digitizer() const { return m_pDigitizer; }
+    PolhemusConnection* digitizer() const
+    {
+        return m_pDigitizer;
+    }
 
 protected:
     void closeEvent(QCloseEvent* event) override;
@@ -109,22 +118,22 @@ private:
     void loadSettings();
     void saveSettings();
 
-    AcquiredPoints*       m_pPoints     = nullptr;
-    PolhemusConnection*   m_pDigitizer  = nullptr;
+    AcquiredPoints* m_pPoints = nullptr;
+    PolhemusConnection* m_pDigitizer = nullptr;
 
-    QPointer<QSplitter>   m_pSplitter;
+    QPointer<QSplitter> m_pSplitter;
     QPointer<AlignWizard> m_pWizard;
     QPointer<Align3DView> m_pView3d;
-    QPointer<QAction>     m_pBackAction;
-    QPointer<QAction>     m_pNextAction;
-    QPointer<QLabel>      m_pStepLabel;
-    QPointer<QComboBox>   m_pViewCountCombo;
-    QPointer<QComboBox>   m_pRenderModeCombo;
-    QPointer<QComboBox>   m_pCameraPresetCombo;
-    QPointer<QComboBox>   m_pCameraFocusCombo;
-    QPointer<QComboBox>   m_pPenStationCombo;
-    QPointer<QLabel>      m_pStatusDigitizer;
-    QPointer<QLabel>      m_pStatusBem;
+    QPointer<QAction> m_pBackAction;
+    QPointer<QAction> m_pNextAction;
+    QPointer<QLabel> m_pStepLabel;
+    QPointer<QComboBox> m_pViewCountCombo;
+    QPointer<QComboBox> m_pRenderModeCombo;
+    QPointer<QComboBox> m_pCameraPresetCombo;
+    QPointer<QComboBox> m_pCameraFocusCombo;
+    QPointer<QComboBox> m_pPenStationCombo;
+    QPointer<QLabel> m_pStatusDigitizer;
+    QPointer<QLabel> m_pStatusBem;
 };
 
 } // namespace MNEALIGN

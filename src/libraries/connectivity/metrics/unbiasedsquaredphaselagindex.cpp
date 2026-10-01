@@ -61,35 +61,35 @@ UnbiasedSquaredPhaseLagIndex::UnbiasedSquaredPhaseLagIndex()
 
 Network UnbiasedSquaredPhaseLagIndex::calculate(ConnectivitySettings& connectivitySettings)
 {
-//    QElapsedTimer timer;
-//    qint64 iTime = 0;
-//    timer.start();
+    //    QElapsedTimer timer;
+    //    qint64 iTime = 0;
+    //    timer.start();
 
     Network finalNetwork("USPLI");
 
-    if(connectivitySettings.isEmpty()) {
+    if (connectivitySettings.isEmpty()) {
         qDebug() << "UnbiasedSquaredPhaseLagIndex::calculate - Input data is empty";
         return finalNetwork;
     }
 
-    if(AbstractMetric::m_bStorageModeIsActive == false) {
+    if (AbstractMetric::m_bStorageModeIsActive == false) {
         connectivitySettings.clearIntermediateData();
     }
 
     finalNetwork.setSamplingFrequency(connectivitySettings.getSamplingFrequency());
 
-    #ifdef EIGEN_FFTW_DEFAULT
-        fftw_make_planner_thread_safe();
-    #endif
+#ifdef EIGEN_FFTW_DEFAULT
+    fftw_make_planner_thread_safe();
+#endif
 
     //Create nodes
     int rows = connectivitySettings.at(0).matData.rows();
     RowVectorXf rowVert = RowVectorXf::Zero(3);
 
-    for(int i = 0; i < rows; ++i) {
+    for (int i = 0; i < rows; ++i) {
         rowVert = RowVectorXf::Zero(3);
 
-        if(connectivitySettings.getNodePositions().rows() != 0 && i < connectivitySettings.getNodePositions().rows()) {
+        if (connectivitySettings.getNodePositions().rows() != 0 && i < connectivitySettings.getNodePositions().rows()) {
             rowVert(0) = connectivitySettings.getNodePositions().row(i)(0);
             rowVert(1) = connectivitySettings.getNodePositions().row(i)(1);
             rowVert(2) = connectivitySettings.getNodePositions().row(i)(2);
@@ -110,11 +110,11 @@ Network UnbiasedSquaredPhaseLagIndex::calculate(ConnectivitySettings& connectivi
     int iNFreqs = int(floor(iNfft / 2.0)) + 1;
 
     // Check if start and bin amount need to be reset to full spectrum
-    if(m_iNumberBinStart == -1 ||
-       m_iNumberBinAmount == -1 ||
-       m_iNumberBinStart > iNFreqs ||
-       m_iNumberBinAmount > iNFreqs ||
-       m_iNumberBinAmount + m_iNumberBinStart > iNFreqs) {
+    if (m_iNumberBinStart == -1 ||
+        m_iNumberBinAmount == -1 ||
+        m_iNumberBinStart > iNFreqs ||
+        m_iNumberBinAmount > iNFreqs ||
+        m_iNumberBinAmount + m_iNumberBinStart > iNFreqs) {
         qDebug() << "UnbiasedSquaredPhaseLagIndex::calculate - Resetting to full spectrum";
         AbstractMetric::m_iNumberBinStart = 0;
         AbstractMetric::m_iNumberBinAmount = iNFreqs;
@@ -137,26 +137,26 @@ Network UnbiasedSquaredPhaseLagIndex::calculate(ConnectivitySettings& connectivi
                 tapers);
     };
 
-//    iTime = timer.elapsed();
-//    qWarning() << "Preparation" << iTime;
-//    timer.restart();
+    //    iTime = timer.elapsed();
+    //    qWarning() << "Preparation" << iTime;
+    //    timer.restart();
 
     // Compute DSWPLV in parallel for all trials
     QFuture<void> result = QtConcurrent::map(connectivitySettings.getTrialData(),
                                              computeLambda);
     result.waitForFinished();
 
-//    iTime = timer.elapsed();
-//    qWarning() << "ComputeSpectraPSDCSD" << iTime;
-//    timer.restart();
+    //    iTime = timer.elapsed();
+    //    qWarning() << "ComputeSpectraPSDCSD" << iTime;
+    //    timer.restart();
 
     // Compute USPLI
     computeUSPLI(connectivitySettings,
                  finalNetwork);
 
-//    iTime = timer.elapsed();
-//    qWarning() << "Compute" << iTime;
-//    timer.restart();
+    //    iTime = timer.elapsed();
+    //    qWarning() << "Compute" << iTime;
+    //    timer.restart();
 
     return finalNetwork;
 }
@@ -164,15 +164,15 @@ Network UnbiasedSquaredPhaseLagIndex::calculate(ConnectivitySettings& connectivi
 //=============================================================================================================
 
 void UnbiasedSquaredPhaseLagIndex::compute(ConnectivitySettings::IntermediateTrialData& inputData,
-                                           QVector<QPair<int,MatrixXcd> >& vecPairCsdSum,
-                                           QVector<QPair<int,MatrixXd> >& vecPairCsdImagSignSum,
+                                           QVector<QPair<int, MatrixXcd>>& vecPairCsdSum,
+                                           QVector<QPair<int, MatrixXd>>& vecPairCsdImagSignSum,
                                            QMutex& mutex,
                                            int iNRows,
                                            int iNFreqs,
                                            int iNfft,
                                            const QPair<MatrixXd, VectorXd>& tapers)
 {
-    if(inputData.vecPairCsdImagSign.size() == iNRows) {
+    if (inputData.vecPairCsdImagSign.size() == iNRows) {
         //qDebug() << "UnbiasedSquaredPhaseLagIndex::compute - vecPairCsdImagSign was already computed for this trial.";
         return;
     }
@@ -181,7 +181,7 @@ void UnbiasedSquaredPhaseLagIndex::compute(ConnectivitySettings::IntermediateTri
 
     // Calculate tapered spectra if not available already
     // This code was copied and changed modified Utils/Spectra since we do not want to call the function due to time loss.
-    if(inputData.vecTapSpectra.size() != iNRows) {
+    if (inputData.vecTapSpectra.size() != iNRows) {
         inputData.vecTapSpectra.clear();
 
         RowVectorXd vecInputFFT, rowData;
@@ -197,11 +197,12 @@ void UnbiasedSquaredPhaseLagIndex::compute(ConnectivitySettings::IntermediateTri
             rowData.array() = inputData.matData.row(i).array() - inputData.matData.row(i).mean();
 
             // Calculate tapered spectra if not available already
-            for(int j = 0; j < tapers.first.rows(); j++) {
+            for (int j = 0; j < tapers.first.rows(); j++) {
                 // Zero padd if necessary. The zero padding in Eigen's FFT is only working for column vectors.
                 if (rowData.cols() < iNfft) {
                     vecInputFFT.setZero(iNfft);
-                    vecInputFFT.block(0,0,1,rowData.cols()) = rowData.cwiseProduct(tapers.first.row(j));;
+                    vecInputFFT.block(0, 0, 1, rowData.cols()) = rowData.cwiseProduct(tapers.first.row(j));
+                    ;
                 } else {
                     vecInputFFT = rowData.cwiseProduct(tapers.first.row(j));
                 }
@@ -216,11 +217,11 @@ void UnbiasedSquaredPhaseLagIndex::compute(ConnectivitySettings::IntermediateTri
     }
 
     // Compute CSD
-    if(inputData.vecPairCsd.isEmpty()) {
+    if (inputData.vecPairCsd.isEmpty()) {
         double denomCSD = sqrt(tapers.second.cwiseAbs2().sum()) * sqrt(tapers.second.cwiseAbs2().sum()) / 2.0;
 
         bool bNfftEven = false;
-        if (iNfft % 2 == 0){
+        if (iNfft % 2 == 0) {
             bNfftEven = true;
         }
 
@@ -229,25 +230,25 @@ void UnbiasedSquaredPhaseLagIndex::compute(ConnectivitySettings::IntermediateTri
         for (i = 0; i < iNRows; ++i) {
             for (int j = i; j < iNRows; ++j) {
                 // Compute CSD (average over tapers if necessary)
-                matCsd.row(j) = inputData.vecTapSpectra.at(i).block(0,m_iNumberBinStart,inputData.vecTapSpectra.at(i).rows(),m_iNumberBinAmount).cwiseProduct(inputData.vecTapSpectra.at(j).block(0,m_iNumberBinStart,inputData.vecTapSpectra.at(j).rows(),m_iNumberBinAmount).conjugate()).colwise().sum() / denomCSD;
+                matCsd.row(j) = inputData.vecTapSpectra.at(i).block(0, m_iNumberBinStart, inputData.vecTapSpectra.at(i).rows(), m_iNumberBinAmount).cwiseProduct(inputData.vecTapSpectra.at(j).block(0, m_iNumberBinStart, inputData.vecTapSpectra.at(j).rows(), m_iNumberBinAmount).conjugate()).colwise().sum() / denomCSD;
 
                 // Divide first and last element by 2 due to half spectrum
-                if(m_iNumberBinStart == 0) {
+                if (m_iNumberBinStart == 0) {
                     matCsd.row(j)(0) /= 2.0;
                 }
 
-                if(bNfftEven && m_iNumberBinStart + m_iNumberBinAmount >= iNFreqs) {
+                if (bNfftEven && m_iNumberBinStart + m_iNumberBinAmount >= iNFreqs) {
                     matCsd.row(j).tail(1) /= 2.0;
                 }
             }
 
-            inputData.vecPairCsd.append(QPair<int,MatrixXcd>(i,matCsd));
-            inputData.vecPairCsdImagSign.append(QPair<int,MatrixXd>(i,matCsd.imag().cwiseSign()));
+            inputData.vecPairCsd.append(QPair<int, MatrixXcd>(i, matCsd));
+            inputData.vecPairCsdImagSign.append(QPair<int, MatrixXd>(i, matCsd.imag().cwiseSign()));
         }
 
         mutex.lock();
 
-        if(vecPairCsdSum.isEmpty()) {
+        if (vecPairCsdSum.isEmpty()) {
             vecPairCsdSum = inputData.vecPairCsd;
             vecPairCsdImagSignSum = inputData.vecPairCsdImagSign;
         } else {
@@ -259,14 +260,14 @@ void UnbiasedSquaredPhaseLagIndex::compute(ConnectivitySettings::IntermediateTri
 
         mutex.unlock();
     } else {
-        if(inputData.vecPairCsdImagSign.isEmpty()) {
+        if (inputData.vecPairCsdImagSign.isEmpty()) {
             for (i = 0; i < inputData.vecPairCsd.size(); ++i) {
-                inputData.vecPairCsdImagSign.append(QPair<int,MatrixXd>(i,inputData.vecPairCsd.at(i).second.imag().cwiseSign()));
+                inputData.vecPairCsdImagSign.append(QPair<int, MatrixXd>(i, inputData.vecPairCsd.at(i).second.imag().cwiseSign()));
             }
 
             mutex.lock();
 
-            if(vecPairCsdImagSignSum.isEmpty()) {
+            if (vecPairCsdImagSignSum.isEmpty()) {
                 vecPairCsdImagSignSum = inputData.vecPairCsdImagSign;
             } else {
                 for (int j = 0; j < vecPairCsdImagSignSum.size(); ++j) {
@@ -278,7 +279,7 @@ void UnbiasedSquaredPhaseLagIndex::compute(ConnectivitySettings::IntermediateTri
         }
     }
 
-    if(!m_bStorageModeIsActive) {
+    if (!m_bStorageModeIsActive) {
         inputData.vecPairCsd.clear();
         inputData.vecTapSpectra.clear();
         inputData.vecPairCsdImagSign.clear();
@@ -287,8 +288,8 @@ void UnbiasedSquaredPhaseLagIndex::compute(ConnectivitySettings::IntermediateTri
 
 //=============================================================================================================
 
-void UnbiasedSquaredPhaseLagIndex::computeUSPLI(ConnectivitySettings &connectivitySettings,
-                               Network& finalNetwork)
+void UnbiasedSquaredPhaseLagIndex::computeUSPLI(ConnectivitySettings& connectivitySettings,
+                                                Network& finalNetwork)
 {
     // Compute final DSWPLV and create Network
     MatrixXd matNom;
@@ -301,7 +302,7 @@ void UnbiasedSquaredPhaseLagIndex::computeUSPLI(ConnectivitySettings &connectivi
         matNom = connectivitySettings.getIntermediateSumData().vecPairCsdImagSignSum.at(i).second.cwiseAbs() / connectivitySettings.size();
         matNom = (connectivitySettings.size() * matNom.array().square() - 1.0) / dNTrials;
 
-        for(j = i; j < matNom.rows(); ++j) {
+        for (j = i; j < matNom.rows(); ++j) {
             matWeight = matNom.row(j).transpose();
 
             pEdge = QSharedPointer<NetworkEdge>(new NetworkEdge(i, j, matWeight));
@@ -312,4 +313,3 @@ void UnbiasedSquaredPhaseLagIndex::computeUSPLI(ConnectivitySettings &connectivi
         }
     }
 }
-

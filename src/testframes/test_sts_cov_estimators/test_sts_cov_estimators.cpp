@@ -182,7 +182,7 @@ void TestStsCovEstimators::testLedoitWolfRankDeficient()
     // With rank < n_channels, alpha should be closer to 1
     // (heavy shrinkage needed to regularize)
     int nCh = 64;
-    int nSamples = 40;  // fewer samples than channels → severely rank-deficient
+    int nSamples = 40; // fewer samples than channels → severely rank-deficient
     MatrixXd data = generateRankDeficientData(nCh, nSamples, 30);
     auto [cov, alpha] = StsCovEstimators::ledoitWolf(data);
 
@@ -322,7 +322,9 @@ void TestStsCovEstimators::testDiagFixedIncreasedDiagonal()
     for (int i = 0; i < 10; ++i) {
         QVERIFY2(covReg(i, i) >= covBase(i, i),
                  qPrintable(QString("DiagFixed: reg diagonal(%1)=%2 < base=%3")
-                            .arg(i).arg(covReg(i, i)).arg(covBase(i, i))));
+                                .arg(i)
+                                .arg(covReg(i, i))
+                                .arg(covBase(i, i))));
     }
 }
 
@@ -351,7 +353,8 @@ void TestStsCovEstimators::testPcaAutoRank()
 
     QVERIFY2(static_cast<int>(detectedRank) <= trueRank + 2,
              qPrintable(QString("PCA auto rank=%1, true rank=%2")
-                        .arg(detectedRank).arg(trueRank)));
+                            .arg(detectedRank)
+                            .arg(trueRank)));
 }
 
 //=============================================================================================================
@@ -461,7 +464,7 @@ void TestStsCovEstimators::testGaussianLogLikelihoodFinite()
 {
     MatrixXd data = generateGaussianData(10, 200);
     MatrixXd cov = (data * data.transpose()) / 200.0;
-    cov.diagonal().array() += 1e-6;  // ensure invertible
+    cov.diagonal().array() += 1e-6; // ensure invertible
 
     double ll = StsCovEstimators::gaussianLogLikelihood(data, cov);
     QVERIFY2(std::isfinite(ll),

@@ -70,8 +70,8 @@ namespace MNELIB
 class MNESHARED_EXPORT MNEHemisphere : public MNESourceSpace
 {
 public:
-    using SPtr = std::shared_ptr<MNEHemisphere>;             /**< Shared pointer type for MNEHemisphere. */
-    using ConstSPtr = std::shared_ptr<const MNEHemisphere>;  /**< Const shared pointer type for MNEHemisphere. */
+    using SPtr = std::shared_ptr<MNEHemisphere>;            /**< Shared pointer type for MNEHemisphere. */
+    using ConstSPtr = std::shared_ptr<const MNEHemisphere>; /**< Const shared pointer type for MNEHemisphere. */
 
     //=========================================================================================================
     /**
@@ -165,7 +165,7 @@ public:
      *
      * @return true if succeeded, false otherwise.
      */
-    bool transform_hemisphere_to(FIFFLIB::fiff_int_t dest, const FIFFLIB::FiffCoordTrans &p_Trans);
+    bool transform_hemisphere_to(FIFFLIB::fiff_int_t dest, const FIFFLIB::FiffCoordTrans& p_Trans);
 
     //=========================================================================================================
     /**
@@ -199,7 +199,7 @@ public:
      *
      * @return true if equal, false otherwise.
      */
-    friend bool operator== (const MNEHemisphere &a, const MNEHemisphere &b);
+    friend bool operator==(const MNEHemisphere& a, const MNEHemisphere& b);
 
 public:
     // --- Fields inherited from MNESurfaceOrVolume via MNESourceSpace ---
@@ -213,16 +213,16 @@ public:
     // nearest / nearest_dist removed: now use inherited vector<MNENearest> nearest
     //   + nearestVertIdx() / nearestDistVec() accessors
     // dist removed: now use inherited FiffSparseMatrix dist + toEigenSparse() / fromEigenSparse()
-    QList<Eigen::VectorXi> pinfo;       /**< Patch information (using option -cps during mne_setup_source_space). */
-    Eigen::VectorXi patch_inds;         /**< List of neighboring vertices in the high resolution triangulation. */
+    QList<Eigen::VectorXi> pinfo; /**< Patch information (using option -cps during mne_setup_source_space). */
+    Eigen::VectorXi patch_inds;   /**< List of neighboring vertices in the high resolution triangulation. */
 
     // --- MNEHemisphere-specific fields ---
-    Eigen::MatrixX3d tri_cent;          /**< Triangle centers. */
-    Eigen::MatrixX3d tri_nn;            /**< Triangle normals. */
-    Eigen::VectorXd tri_area;           /**< Triangle areas. */
-    Eigen::MatrixX3d use_tri_cent;      /**< Triangle centers of used triangles. */
-    Eigen::MatrixX3d use_tri_nn;        /**< Triangle normals of used triangles. */
-    Eigen::VectorXd use_tri_area;       /**< Triangle areas of used triangles. */
+    Eigen::MatrixX3d tri_cent;     /**< Triangle centers. */
+    Eigen::MatrixX3d tri_nn;       /**< Triangle normals. */
+    Eigen::VectorXd tri_area;      /**< Triangle areas. */
+    Eigen::MatrixX3d use_tri_cent; /**< Triangle centers of used triangles. */
+    Eigen::MatrixX3d use_tri_nn;   /**< Triangle normals of used triangles. */
+    Eigen::VectorXd use_tri_area;  /**< Triangle areas of used triangles. */
 
     MNEClusterInfo cluster_info; /**< Holds the cluster information. */
 private:
@@ -241,11 +241,11 @@ inline bool MNEHemisphere::isClustered() const
 
 //=============================================================================================================
 
-inline bool operator== (const MNEHemisphere &a, const MNEHemisphere &b)
+inline bool operator==(const MNEHemisphere& a, const MNEHemisphere& b)
 {
-    if(a.pinfo.size() == b.pinfo.size()) {
-        for(int i = 0; i < a.pinfo.size(); ++i) {
-            if(!a.pinfo.at(i).isApprox(b.pinfo.at(i))) {
+    if (a.pinfo.size() == b.pinfo.size()) {
+        for (int i = 0; i < a.pinfo.size(); ++i) {
+            if (!a.pinfo.at(i).isApprox(b.pinfo.at(i))) {
                 return false;
             }
         }
@@ -253,22 +253,7 @@ inline bool operator== (const MNEHemisphere &a, const MNEHemisphere &b)
         return false;
     }
 
-    return (a.type == b.type &&
-            a.id == b.id &&
-            a.np == b.np &&
-            a.ntri == b.ntri &&
-            a.coord_frame == b.coord_frame &&
-            a.rr.isApprox(b.rr, 0.0001f) &&
-            a.nn.isApprox(b.nn, 0.0001f) &&
-            a.itris.isApprox(b.itris) &&
-            a.nuse == b.nuse &&
-            a.inuse.isApprox(b.inuse) &&
-            a.vertno.isApprox(b.vertno) &&
-            a.nuse_tri == b.nuse_tri &&
-            a.use_itris.isApprox(b.use_itris) &&
-            a.nearestVertIdx().isApprox(b.nearestVertIdx()) &&
-            a.nearestDistVec().isApprox(b.nearestDistVec(), 0.0001) &&
-            a.patch_inds.isApprox(b.patch_inds) &&
+    return (a.type == b.type && a.id == b.id && a.np == b.np && a.ntri == b.ntri && a.coord_frame == b.coord_frame && a.rr.isApprox(b.rr, 0.0001f) && a.nn.isApprox(b.nn, 0.0001f) && a.itris.isApprox(b.itris) && a.nuse == b.nuse && a.inuse.isApprox(b.inuse) && a.vertno.isApprox(b.vertno) && a.nuse_tri == b.nuse_tri && a.use_itris.isApprox(b.use_itris) && a.nearestVertIdx().isApprox(b.nearestVertIdx()) && a.nearestDistVec().isApprox(b.nearestDistVec(), 0.0001) && a.patch_inds.isApprox(b.patch_inds) &&
             //a.dist_limit == b.dist_limit && //TODO: We still not sure if dist_limit can also be a matrix. This needs to be debugged
             [&a, &b]() {
                 const auto& sa = a.dist.eigen();
@@ -277,30 +262,29 @@ inline bool operator== (const MNEHemisphere &a, const MNEHemisphere &b)
                     return true;
                 return sa.toDense().isApprox(sb.toDense(), 0.0001f);
             }() &&
-            a.tri_cent.isApprox(b.tri_cent, 0.0001) &&
-            a.tri_nn.isApprox(b.tri_nn, 0.0001) &&
-            a.tri_area.isApprox(b.tri_area, 0.0001) &&
-            a.use_tri_cent.isApprox(b.use_tri_cent, 0.0001) &&
-            a.use_tri_nn.isApprox(b.use_tri_nn, 0.0001) &&
-            a.use_tri_area.isApprox(b.use_tri_area, 0.0001) &&
-            [&a, &b]() {
-                if (a.neighbor_tri.size() != b.neighbor_tri.size()) return false;
+            a.tri_cent.isApprox(b.tri_cent, 0.0001) && a.tri_nn.isApprox(b.tri_nn, 0.0001) && a.tri_area.isApprox(b.tri_area, 0.0001) && a.use_tri_cent.isApprox(b.use_tri_cent, 0.0001) && a.use_tri_nn.isApprox(b.use_tri_nn, 0.0001) && a.use_tri_area.isApprox(b.use_tri_area, 0.0001) && [&a, &b]() {
+                if (a.neighbor_tri.size() != b.neighbor_tri.size())
+                    return false;
                 for (size_t i = 0; i < a.neighbor_tri.size(); ++i) {
-                    if (a.neighbor_tri[i].size() != b.neighbor_tri[i].size()) return false;
-                    if (a.neighbor_tri[i].size() > 0 && !(a.neighbor_tri[i].array() == b.neighbor_tri[i].array()).all()) return false;
+                    if (a.neighbor_tri[i].size() != b.neighbor_tri[i].size())
+                        return false;
+                    if (a.neighbor_tri[i].size() > 0 && !(a.neighbor_tri[i].array() == b.neighbor_tri[i].array()).all())
+                        return false;
                 }
                 return true;
             }() &&
             [&a, &b]() {
-                if (a.neighbor_vert.size() != b.neighbor_vert.size()) return false;
+                if (a.neighbor_vert.size() != b.neighbor_vert.size())
+                    return false;
                 for (size_t i = 0; i < a.neighbor_vert.size(); ++i) {
-                    if (a.neighbor_vert[i].size() != b.neighbor_vert[i].size()) return false;
-                    if (a.neighbor_vert[i].size() > 0 && !(a.neighbor_vert[i].array() == b.neighbor_vert[i].array()).all()) return false;
+                    if (a.neighbor_vert[i].size() != b.neighbor_vert[i].size())
+                        return false;
+                    if (a.neighbor_vert[i].size() > 0 && !(a.neighbor_vert[i].array() == b.neighbor_vert[i].array()).all())
+                        return false;
                 }
                 return true;
             }() &&
-            a.cluster_info == b.cluster_info &&
-            a.m_TriCoords.isApprox(b.m_TriCoords, 0.0001f));
+            a.cluster_info == b.cluster_info && a.m_TriCoords.isApprox(b.m_TriCoords, 0.0001f));
 }
 } // NAMESPACE
 

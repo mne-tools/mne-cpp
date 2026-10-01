@@ -46,18 +46,20 @@
 // DEFINE NAMESPACE UTILSLIB
 //=============================================================================================================
 
-namespace UTILSLIB {
+namespace UTILSLIB
+{
 
 //=============================================================================================================
 /**
  * Result structure for Extended Infomax ICA.
  */
-struct DSPSHARED_EXPORT InfomaxResult {
-    Eigen::MatrixXd matUnmixing;    /**< Unmixing matrix (n_components x n_channels). */
-    Eigen::MatrixXd matMixing;      /**< Mixing matrix (n_channels x n_components). */
-    Eigen::MatrixXd matSources;     /**< Source activations (n_components x n_times). */
-    int nIterations;                /**< Number of iterations performed. */
-    bool converged;                 /**< Whether the algorithm converged. */
+struct DSPSHARED_EXPORT InfomaxResult
+{
+    Eigen::MatrixXd matUnmixing; /**< Unmixing matrix (n_components x n_channels). */
+    Eigen::MatrixXd matMixing;   /**< Mixing matrix (n_channels x n_components). */
+    Eigen::MatrixXd matSources;  /**< Source activations (n_components x n_times). */
+    int nIterations;             /**< Number of iterations performed. */
+    bool converged;              /**< Whether the algorithm converged. */
 };
 
 //=============================================================================================================
@@ -67,7 +69,8 @@ struct DSPSHARED_EXPORT InfomaxResult {
  * Performs Independent Component Analysis using the extended infomax algorithm,
  * which can separate both super-Gaussian and sub-Gaussian sources.
  */
-class DSPSHARED_EXPORT ExtendedInfomax {
+class DSPSHARED_EXPORT ExtendedInfomax
+{
 public:
     /**
      * Compute ICA decomposition using the extended infomax algorithm.

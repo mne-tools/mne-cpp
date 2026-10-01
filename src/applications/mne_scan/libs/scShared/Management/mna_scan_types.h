@@ -42,14 +42,21 @@ using MNALIB::MnaDataKind;
  */
 inline MnaDataKind connectorDataTypeToMnaDataKind(ConnectorDataType t)
 {
-    switch(t) {
-    case _RTMSA: return MnaDataKind::FiffRaw;
-    case _RTES:  return MnaDataKind::Evoked;
-    case _RTC:   return MnaDataKind::Covariance;
-    case _RTSE:  return MnaDataKind::SourceEstimate;
-    case _RTHR:  return MnaDataKind::Custom;          // "hpi"
-    case _RTFS:  return MnaDataKind::Forward;
-    default:     return MnaDataKind::Custom;
+    switch (t) {
+        case _RTMSA:
+            return MnaDataKind::FiffRaw;
+        case _RTES:
+            return MnaDataKind::Evoked;
+        case _RTC:
+            return MnaDataKind::Covariance;
+        case _RTSE:
+            return MnaDataKind::SourceEstimate;
+        case _RTHR:
+            return MnaDataKind::Custom; // "hpi"
+        case _RTFS:
+            return MnaDataKind::Forward;
+        default:
+            return MnaDataKind::Custom;
     }
 }
 
@@ -64,14 +71,21 @@ inline MnaDataKind connectorDataTypeToMnaDataKind(ConnectorDataType t)
  */
 inline ConnectorDataType mnaDataKindToConnectorDataType(MnaDataKind k)
 {
-    switch(k) {
-    case MnaDataKind::FiffRaw:        return _RTMSA;
-    case MnaDataKind::Evoked:         return _RTES;
-    case MnaDataKind::Covariance:     return _RTC;
-    case MnaDataKind::SourceEstimate: return _RTSE;
-    case MnaDataKind::Forward:        return _RTFS;
-    case MnaDataKind::Custom:         return _N;       // ambiguous — caller must disambiguate
-    default:                          return _N;
+    switch (k) {
+        case MnaDataKind::FiffRaw:
+            return _RTMSA;
+        case MnaDataKind::Evoked:
+            return _RTES;
+        case MnaDataKind::Covariance:
+            return _RTC;
+        case MnaDataKind::SourceEstimate:
+            return _RTSE;
+        case MnaDataKind::Forward:
+            return _RTFS;
+        case MnaDataKind::Custom:
+            return _N; // ambiguous — caller must disambiguate
+        default:
+            return _N;
     }
 }
 

@@ -42,15 +42,17 @@
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-namespace FIFFLIB{
-    class FiffCoordTrans;
+namespace FIFFLIB
+{
+class FiffCoordTrans;
 }
 
 //=============================================================================================================
 // DEFINE NAMESPACE MNELIB
 //=============================================================================================================
 
-namespace MNELIB {
+namespace MNELIB
+{
 
 //=============================================================================================================
 // MNELIB FORWARD DECLARATIONS
@@ -104,7 +106,7 @@ MNESHARED_EXPORT bool fitMatchedPoints(const Eigen::MatrixXf& matSrcPoint,
                                        const Eigen::MatrixXf& matDstPoint,
                                        Eigen::Matrix4f& matTrans,
                                        float fScale = 1.0,
-                                       bool bScale=false,
+                                       bool bScale = false,
                                        const Eigen::VectorXf& vecWeights = vecDefaultWeights);
 
 //=========================================================================================================

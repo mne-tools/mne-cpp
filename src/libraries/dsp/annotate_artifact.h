@@ -59,13 +59,17 @@
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-namespace FIFFLIB { class FiffInfo; }
+namespace FIFFLIB
+{
+class FiffInfo;
+}
 
 //=============================================================================================================
 // DEFINE NAMESPACE UTILSLIB
 //=============================================================================================================
 
-namespace UTILSLIB {
+namespace UTILSLIB
+{
 
 //=============================================================================================================
 /**
@@ -73,12 +77,12 @@ namespace UTILSLIB {
  */
 struct DSPSHARED_EXPORT AnnotateMusclParams
 {
-    double dThreshold    = 5.0;     /**< Z-score threshold for marking as muscle artifact. */
-    double dFilterLow    = 110.0;   /**< High-pass cutoff for muscle band (Hz). */
-    double dFilterHigh   = 140.0;   /**< Low-pass cutoff for muscle band (Hz). */
-    int    iFilterOrder  = 4;       /**< Butterworth order. */
-    double dMinDuration  = 0.1;     /**< Minimum annotation duration in seconds. */
-    double dMinGapSec    = 0.25;    /**< Merge annotations closer than this (seconds). */
+    double dThreshold = 5.0;    /**< Z-score threshold for marking as muscle artifact. */
+    double dFilterLow = 110.0;  /**< High-pass cutoff for muscle band (Hz). */
+    double dFilterHigh = 140.0; /**< Low-pass cutoff for muscle band (Hz). */
+    int iFilterOrder = 4;       /**< Butterworth order. */
+    double dMinDuration = 0.1;  /**< Minimum annotation duration in seconds. */
+    double dMinGapSec = 0.25;   /**< Merge annotations closer than this (seconds). */
 };
 
 //=============================================================================================================
@@ -88,11 +92,11 @@ struct DSPSHARED_EXPORT AnnotateMusclParams
 struct DSPSHARED_EXPORT AnnotateAmplitudeParams
 {
     double dPeakMin = -std::numeric_limits<double>::infinity(); /**< Min amplitude — annotate if any sample goes below this. */
-    double dPeakMax =  std::numeric_limits<double>::infinity(); /**< Max amplitude — annotate if any sample exceeds this. */
-    double dFlatMin = 0.0;    /**< Flatness threshold — annotate if peak-to-peak in a window < this. */
-    double dWindowSec = 0.5;  /**< Sliding window duration in seconds for flatness check. */
-    double dMinDuration = 0.0; /**< Minimum duration of annotation (seconds). */
-    QString badDescription = "BAD_amplitude"; /**< Description string for annotations. */
+    double dPeakMax = std::numeric_limits<double>::infinity();  /**< Max amplitude — annotate if any sample exceeds this. */
+    double dFlatMin = 0.0;                                      /**< Flatness threshold — annotate if peak-to-peak in a window < this. */
+    double dWindowSec = 0.5;                                    /**< Sliding window duration in seconds for flatness check. */
+    double dMinDuration = 0.0;                                  /**< Minimum duration of annotation (seconds). */
+    QString badDescription = "BAD_amplitude";                   /**< Description string for annotations. */
 };
 
 //=============================================================================================================

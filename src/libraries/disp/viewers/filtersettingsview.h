@@ -45,8 +45,9 @@
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-namespace Ui {
-    class FilterSettingsViewWidget;
+namespace Ui
+{
+class FilterSettingsViewWidget;
 }
 
 //=============================================================================================================
@@ -75,8 +76,8 @@ class DISPSHARED_EXPORT FilterSettingsView : public AbstractView
     Q_OBJECT
 
 public:
-    typedef QSharedPointer<FilterSettingsView> SPtr;              /**< Shared pointer type for FilterSettingsView. */
-    typedef QSharedPointer<const FilterSettingsView> ConstSPtr;   /**< Const shared pointer type for FilterSettingsView. */
+    typedef QSharedPointer<FilterSettingsView> SPtr;            /**< Shared pointer type for FilterSettingsView. */
+    typedef QSharedPointer<const FilterSettingsView> ConstSPtr; /**< Const shared pointer type for FilterSettingsView. */
 
     //=========================================================================================================
     /**
@@ -87,7 +88,7 @@ public:
      * @param[in] f Qt window flags passed to the QWidget constructor.
      */
     FilterSettingsView(const QString& sSettingsPath = "",
-                       QWidget *parent = 0,
+                       QWidget* parent = 0,
                        Qt::WindowFlags f = Qt::Widget);
 
     //=========================================================================================================
@@ -194,11 +195,11 @@ protected:
      */
     void onFilterChannelTypeChanged(const QString& sType);
 
-    QString                                 m_sSettingsPath;                /**< The settings path to store the GUI settings to. */
+    QString m_sSettingsPath; /**< The settings path to store the GUI settings to. */
 
-    QSharedPointer<FilterDesignView>        m_pFilterView;                  /**< The filter view. */
+    QSharedPointer<FilterDesignView> m_pFilterView; /**< The filter view. */
 
-    Ui::FilterSettingsViewWidget*           m_pUi;                          /**< The filter settings GUI view. */
+    Ui::FilterSettingsViewWidget* m_pUi; /**< The filter settings GUI view. */
 };
 } // NAMESPACE
 

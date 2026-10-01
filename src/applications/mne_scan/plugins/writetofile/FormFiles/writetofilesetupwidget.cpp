@@ -34,7 +34,7 @@ using namespace WRITETOFILEPLUGIN;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-WriteToFileSetupWidget::WriteToFileSetupWidget(WriteToFile* toolbox, QWidget *parent)
+WriteToFileSetupWidget::WriteToFileSetupWidget(WriteToFile* toolbox, QWidget* parent)
 : QWidget(parent)
 , m_pWriteToFile(toolbox)
 {
@@ -52,4 +52,3 @@ WriteToFileSetupWidget::WriteToFileSetupWidget(WriteToFile* toolbox, QWidget *pa
 WriteToFileSetupWidget::~WriteToFileSetupWidget()
 {
 }
-

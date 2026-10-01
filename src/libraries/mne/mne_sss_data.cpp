@@ -83,15 +83,15 @@ MNESssData::~MNESssData() = default;
 
 //=============================================================================================================
 
-std::unique_ptr<MNESssData> MNESssData::read(const QString &name)
+std::unique_ptr<MNESssData> MNESssData::read(const QString& name)
 {
     QFile file(name);
     FiffStream::SPtr stream(new FiffStream(&file));
 
     std::unique_ptr<MNESssData> s;
 
-    if(stream->open())
-        s = read_from_node(stream,stream->dirtree());
+    if (stream->open())
+        s = read_from_node(stream, stream->dirtree());
 
     stream->close();
     return s;
@@ -99,14 +99,14 @@ std::unique_ptr<MNESssData> MNESssData::read(const QString &name)
 
 //=============================================================================================================
 
-std::unique_ptr<MNESssData> MNESssData::read_from_node(QSharedPointer<FiffStream> &stream, const QSharedPointer<FiffDirNode> &start)
+std::unique_ptr<MNESssData> MNESssData::read_from_node(QSharedPointer<FiffStream>& stream, const QSharedPointer<FiffDirNode>& start)
 {
     auto s = std::make_unique<MNESssData>();
     QList<FiffDirNode::SPtr> sss;
     FiffDirNode::SPtr node;
     FiffTag::UPtr t_pTag;
-    const float *r0;
-    int j,p,q,n;
+    const float* r0;
+    int j, p, q, n;
     /*
         * Locate the SSS information
         */
@@ -151,11 +151,11 @@ std::unique_ptr<MNESssData> MNESssData::read_from_node(QSharedPointer<FiffStream
             return nullptr;
         }
         {
-            int ncomp = static_cast<int>(t_pTag->size()/sizeof(fiff_int_t));
-            int *raw  = t_pTag->toInt();
+            int ncomp = static_cast<int>(t_pTag->size() / sizeof(fiff_int_t));
+            int* raw = t_pTag->toInt();
             s->comp_info = Eigen::VectorXi::Map(raw, ncomp);
 
-            if (ncomp != (s->in_order*(2+s->in_order) + s->out_order*(2+s->out_order))) {
+            if (ncomp != (s->in_order * (2 + s->in_order) + s->out_order * (2 + s->out_order))) {
                 qCritical("Number of SSS components does not match the expansion orders listed in the file");
                 return nullptr;
             }
@@ -184,35 +184,35 @@ namespace MNELIB
 {
 
 /** @brief Lookup record mapping a FIFF coordinate frame integer code to its human-readable name. */
-struct frameNameRec_1 {
+struct frameNameRec_1
+{
     int frame;
-    const char *name;
+    const char* name;
 };
 
 }
 
 //=============================================================================================================
 
-const char *mne_coord_frame_name_1(int frame)
+const char* mne_coord_frame_name_1(int frame)
 {
     static frameNameRec_1 frames[] = {
-        {FIFFV_COORD_UNKNOWN,"unknown"},
-        {FIFFV_COORD_DEVICE,"MEG device"},
-        {FIFFV_COORD_ISOTRAK,"isotrak"},
-        {FIFFV_COORD_HPI,"hpi"},
-        {FIFFV_COORD_HEAD,"head"},
-        {FIFFV_COORD_MRI,"MRI (surface RAS)"},
+        {FIFFV_COORD_UNKNOWN, "unknown"},
+        {FIFFV_COORD_DEVICE, "MEG device"},
+        {FIFFV_COORD_ISOTRAK, "isotrak"},
+        {FIFFV_COORD_HPI, "hpi"},
+        {FIFFV_COORD_HEAD, "head"},
+        {FIFFV_COORD_MRI, "MRI (surface RAS)"},
         {FIFFV_MNE_COORD_MRI_VOXEL, "MRI voxel"},
-        {FIFFV_COORD_MRI_SLICE,"MRI slice"},
-        {FIFFV_COORD_MRI_DISPLAY,"MRI display"},
-        {FIFFV_MNE_COORD_CTF_DEVICE,"CTF MEG device"},
-        {FIFFV_MNE_COORD_CTF_HEAD,"CTF/4D/KIT head"},
-        {FIFFV_MNE_COORD_RAS,"RAS (non-zero origin)"},
-        {FIFFV_MNE_COORD_MNI_TAL,"MNI Talairach"},
-        {FIFFV_MNE_COORD_FS_TAL_GTZ,"Talairach (MNI z > 0)"},
-        {FIFFV_MNE_COORD_FS_TAL_LTZ,"Talairach (MNI z < 0)"},
-        {-1,"unknown"}
-    };
+        {FIFFV_COORD_MRI_SLICE, "MRI slice"},
+        {FIFFV_COORD_MRI_DISPLAY, "MRI display"},
+        {FIFFV_MNE_COORD_CTF_DEVICE, "CTF MEG device"},
+        {FIFFV_MNE_COORD_CTF_HEAD, "CTF/4D/KIT head"},
+        {FIFFV_MNE_COORD_RAS, "RAS (non-zero origin)"},
+        {FIFFV_MNE_COORD_MNI_TAL, "MNI Talairach"},
+        {FIFFV_MNE_COORD_FS_TAL_GTZ, "Talairach (MNI z > 0)"},
+        {FIFFV_MNE_COORD_FS_TAL_LTZ, "Talairach (MNI z < 0)"},
+        {-1, "unknown"}};
     int k;
     for (k = 0; frames[k].frame != -1; k++) {
         if (frame == frames[k].frame)
@@ -223,14 +223,14 @@ const char *mne_coord_frame_name_1(int frame)
 
 //=============================================================================================================
 
-void MNESssData::print(QTextStream &out) const
+void MNESssData::print(QTextStream& out) const
 {
-    int j,p,q,n;
+    int j, p, q, n;
 
     out << "job         : " << this->job << "\n";
     out << "coord frame : " << mne_coord_frame_name_1(this->coord_frame) << "\n";
     out << "origin      : " << qSetFieldWidth(6) << qSetRealNumberPrecision(1) << Qt::fixed
-        << 1000*this->origin[0] << " " << 1000*this->origin[1] << " " << 1000*this->origin[2] << qSetFieldWidth(0) << " mm\n";
+        << 1000 * this->origin[0] << " " << 1000 * this->origin[1] << " " << 1000 * this->origin[2] << qSetFieldWidth(0) << " mm\n";
     out << "in order    : " << this->in_order << "\n";
     out << "out order   : " << this->out_order << "\n";
     out << "nchan       : " << this->nchan << "\n";

@@ -47,7 +47,7 @@ using namespace MNEANONYMIZE;
 //=============================================================================================================
 
 SettingsControllerGui::SettingsControllerGui(const QStringList& arguments)
-: m_pWin(QSharedPointer<MainWindow> (new MainWindow))
+: m_pWin(QSharedPointer<MainWindow>(new MainWindow))
 {
     initParser();
     m_bGuiMode = true;
@@ -59,24 +59,22 @@ SettingsControllerGui::SettingsControllerGui(const QStringList& arguments)
     m_pWin->show();
 
     QString msg("Ready.");
-    m_pWin->statusMsg(msg,2000);
+    m_pWin->statusMsg(msg, 2000);
 }
 
 //=============================================================================================================
 
 void SettingsControllerGui::executeAnonymizer()
 {
-    if(!m_pAnonymizer->isFileInSet())
-    {
+    if (!m_pAnonymizer->isFileInSet()) {
         m_pWin->winPopup("Please specify a valid input file first.");
         return;
     }
-    if(!m_pAnonymizer->isFileOutSet())
-    {
+    if (!m_pAnonymizer->isFileOutSet()) {
         m_pWin->winPopup("Please specify a valid output file first.");
         return;
     }
-    m_pWin->statusMsg("Anonymizing the input file into the output file.",2000);
+    m_pWin->statusMsg("Anonymizing the input file into the output file.", 2000);
     m_pAnonymizer->anonymizeFile();
     m_pWin->outputFileReady();
 }
@@ -85,9 +83,8 @@ void SettingsControllerGui::executeAnonymizer()
 
 void SettingsControllerGui::readData()
 {
-    if(m_pAnonymizer->isFileInSet())
-    {
-        m_pWin->statusMsg("Reading input file information...",0);
+    if (m_pAnonymizer->isFileInSet()) {
+        m_pWin->statusMsg("Reading input file information...", 0);
         QString stringTempDir(QStandardPaths::writableLocation(QStandardPaths::TempLocation));
         QString fileOutStr(QDir(stringTempDir).filePath(generateRandomFileName()));
         m_pAnonymizer->setOutFile(fileOutStr);
@@ -100,7 +97,7 @@ void SettingsControllerGui::readData()
         m_pAnonymizer->setOutFile(m_fiOutFile.absoluteFilePath());
         m_pAnonymizer->setVerboseMode(verboseMode);
         QString msg2("Input file information read correctly.");
-        m_pWin->statusMsg(msg2,2000);
+        m_pWin->statusMsg(msg2, 2000);
         m_pWin->repaintTabWidget();
     } else {
         m_pWin->winPopup("Cannot read data. Please select a valid input file first.");
@@ -113,21 +110,18 @@ void SettingsControllerGui::fileInChanged(const QString& strInFile)
 {
     QFileInfo newfiInFile(strInFile);
 
-    if(newfiInFile.isDir())
-    {
+    if (newfiInFile.isDir()) {
         m_pWin->statusMsg("Invalid input file. That's a directory");
         m_pWin->setInFile(m_fiInFile.absoluteFilePath());
         return;
     }
-    if(QString::compare(newfiInFile.suffix(),QString("fif")) != 0)
-    {
+    if (QString::compare(newfiInFile.suffix(), QString("fif")) != 0) {
         m_pWin->statusMsg("The input file extension must be \".fif\".");
         m_pWin->setInFile(m_fiInFile.absoluteFilePath());
         return;
     }
 
-    if(!newfiInFile.isReadable())
-    {
+    if (!newfiInFile.isReadable()) {
         m_pWin->statusMsg("You might not have reading permissions to this folder");
         m_pWin->setInFile(m_fiInFile.absoluteFilePath());
         return;
@@ -146,17 +140,15 @@ void SettingsControllerGui::fileInChanged(const QString& strInFile)
 void SettingsControllerGui::fileOutChanged(const QString& strOutFile)
 {
     QFileInfo newfiOutFile(strOutFile);
-    if(newfiOutFile.isDir())
-    {
+    if (newfiOutFile.isDir()) {
         QString fileOutDefaultName(newfiOutFile.absolutePath() + m_fiInFile.baseName() +
-                        "_anonymized." + m_fiInFile.completeSuffix());
+                                   "_anonymized." + m_fiInFile.completeSuffix());
         m_fiOutFile.setFile(fileOutDefaultName);
         m_pWin->setOutFile(m_fiOutFile.absoluteFilePath());
         return;
     }
 
-    if(QString::compare(newfiOutFile.suffix(),QString("fif")) != 0)
-    {
+    if (QString::compare(newfiOutFile.suffix(), QString("fif")) != 0) {
         m_pWin->statusMsg("The output file extension must be \".fif\".");
         m_pWin->setOutFile(m_fiOutFile.absoluteFilePath());
         return;
@@ -171,106 +163,103 @@ void SettingsControllerGui::fileOutChanged(const QString& strOutFile)
 void SettingsControllerGui::setupCommunication()
 {
     //view to controller
-    QObject::connect(m_pWin.data(),&MainWindow::fileInChanged,
-                     this,&SettingsControllerGui::fileInChanged,
+    QObject::connect(m_pWin.data(), &MainWindow::fileInChanged,
+                     this, &SettingsControllerGui::fileInChanged,
                      Qt::ConnectionType::DirectConnection);
 
-    QObject::connect(m_pWin.data(),&MainWindow::fileOutChanged,
-                     this,&SettingsControllerGui::fileOutChanged,
+    QObject::connect(m_pWin.data(), &MainWindow::fileOutChanged,
+                     this, &SettingsControllerGui::fileOutChanged,
                      Qt::ConnectionType::DirectConnection);
 
-    QObject::connect(m_pWin.data(),&MainWindow::readInputDataButtonClicked,
-                     this,&SettingsControllerGui::readData);
-    QObject::connect(m_pWin.data(),&MainWindow::saveOutputFileClicked,
-                     this,&SettingsControllerGui::executeAnonymizer);
+    QObject::connect(m_pWin.data(), &MainWindow::readInputDataButtonClicked,
+                     this, &SettingsControllerGui::readData);
+    QObject::connect(m_pWin.data(), &MainWindow::saveOutputFileClicked,
+                     this, &SettingsControllerGui::executeAnonymizer);
 
     //from view to model
-    QObject::connect(m_pWin.data(),&MainWindow::bruteModeChanged,
-                     m_pAnonymizer.data(),&FiffAnonymizer::setBruteMode);
-    QObject::connect(m_pWin.data(),&MainWindow::measurementDateChanged,
-                     m_pAnonymizer.data(),QOverload<const QDateTime&>::of(&FiffAnonymizer::setMeasurementDate));
-    QObject::connect(m_pWin.data(),&MainWindow::useMeasurementOffset,
-                     m_pAnonymizer.data(),&FiffAnonymizer::setUseMeasurementDateOffset);
-    QObject::connect(m_pWin.data(),&MainWindow::measurementDateOffsetChanged,
-                     m_pAnonymizer.data(),&FiffAnonymizer::setMeasurementDateOffset);
-    QObject::connect(m_pWin.data(),&MainWindow::birthdayDateChanged,
-                     m_pAnonymizer.data(),QOverload<const QDate&>::of(&FiffAnonymizer::setSubjectBirthday));
-    QObject::connect(m_pWin.data(),&MainWindow::useBirthdayOffset,
-                     m_pAnonymizer.data(),&FiffAnonymizer::setUseSubjectBirthdayOffset);
-    QObject::connect(m_pWin.data(),&MainWindow::birthdayOffsetChanged,
-                     m_pAnonymizer.data(),&FiffAnonymizer::setSubjectBirthdayOffset);
-    QObject::connect(m_pWin.data(),&MainWindow::subjectHisIdChanged,
-                     m_pAnonymizer.data(),&FiffAnonymizer::setSubjectHisId);
+    QObject::connect(m_pWin.data(), &MainWindow::bruteModeChanged,
+                     m_pAnonymizer.data(), &FiffAnonymizer::setBruteMode);
+    QObject::connect(m_pWin.data(), &MainWindow::measurementDateChanged,
+                     m_pAnonymizer.data(), QOverload<const QDateTime&>::of(&FiffAnonymizer::setMeasurementDate));
+    QObject::connect(m_pWin.data(), &MainWindow::useMeasurementOffset,
+                     m_pAnonymizer.data(), &FiffAnonymizer::setUseMeasurementDateOffset);
+    QObject::connect(m_pWin.data(), &MainWindow::measurementDateOffsetChanged,
+                     m_pAnonymizer.data(), &FiffAnonymizer::setMeasurementDateOffset);
+    QObject::connect(m_pWin.data(), &MainWindow::birthdayDateChanged,
+                     m_pAnonymizer.data(), QOverload<const QDate&>::of(&FiffAnonymizer::setSubjectBirthday));
+    QObject::connect(m_pWin.data(), &MainWindow::useBirthdayOffset,
+                     m_pAnonymizer.data(), &FiffAnonymizer::setUseSubjectBirthdayOffset);
+    QObject::connect(m_pWin.data(), &MainWindow::birthdayOffsetChanged,
+                     m_pAnonymizer.data(), &FiffAnonymizer::setSubjectBirthdayOffset);
+    QObject::connect(m_pWin.data(), &MainWindow::subjectHisIdChanged,
+                     m_pAnonymizer.data(), &FiffAnonymizer::setSubjectHisId);
 
     //from model to view
-    QObject::connect(m_pAnonymizer.data(),&FiffAnonymizer::readingIdFileVersion,
-                     m_pWin.data(),&MainWindow::setLineEditIdFileVersion);
-    QObject::connect(m_pAnonymizer.data(),&FiffAnonymizer::readingIdMeasurementDate,
-                     m_pWin.data(),&MainWindow::setLineEditIdMeasurementDate);
-    QObject::connect(m_pAnonymizer.data(),&FiffAnonymizer::readingIdMac,
-                     m_pWin.data(),&MainWindow::setLineEditIdMacAddress);
+    QObject::connect(m_pAnonymizer.data(), &FiffAnonymizer::readingIdFileVersion,
+                     m_pWin.data(), &MainWindow::setLineEditIdFileVersion);
+    QObject::connect(m_pAnonymizer.data(), &FiffAnonymizer::readingIdMeasurementDate,
+                     m_pWin.data(), &MainWindow::setLineEditIdMeasurementDate);
+    QObject::connect(m_pAnonymizer.data(), &FiffAnonymizer::readingIdMac,
+                     m_pWin.data(), &MainWindow::setLineEditIdMacAddress);
 
-    QObject::connect(m_pAnonymizer.data(),&FiffAnonymizer::readingFileMeasurementDate,
-                     m_pWin.data(),&MainWindow::setLineEditFileMeasurementDate);
-    QObject::connect(m_pAnonymizer.data(),&FiffAnonymizer::readingFileComment,
-                     m_pWin.data(),&MainWindow::setLineEditFileComment);
-    QObject::connect(m_pAnonymizer.data(),&FiffAnonymizer::readingFileExperimenter,
-                     m_pWin.data(),&MainWindow::setLineEditFileExperimenter);
+    QObject::connect(m_pAnonymizer.data(), &FiffAnonymizer::readingFileMeasurementDate,
+                     m_pWin.data(), &MainWindow::setLineEditFileMeasurementDate);
+    QObject::connect(m_pAnonymizer.data(), &FiffAnonymizer::readingFileComment,
+                     m_pWin.data(), &MainWindow::setLineEditFileComment);
+    QObject::connect(m_pAnonymizer.data(), &FiffAnonymizer::readingFileExperimenter,
+                     m_pWin.data(), &MainWindow::setLineEditFileExperimenter);
 
-    QObject::connect(m_pAnonymizer.data(),&FiffAnonymizer::readingSubjectId,
-                     m_pWin.data(),&MainWindow::setLineEditSubjectId);
-    QObject::connect(m_pAnonymizer.data(),&FiffAnonymizer::readingSubjectFirstName,
-                     m_pWin.data(),&MainWindow::setLineEditSubjectFirstName);
-    QObject::connect(m_pAnonymizer.data(),&FiffAnonymizer::readingSubjectMiddleName,
-                     m_pWin.data(),&MainWindow::setLineEditSubjectMiddleName);
-    QObject::connect(m_pAnonymizer.data(),&FiffAnonymizer::readingSubjectLastName,
-                     m_pWin.data(),&MainWindow::setLineEditSubjectLastName);
+    QObject::connect(m_pAnonymizer.data(), &FiffAnonymizer::readingSubjectId,
+                     m_pWin.data(), &MainWindow::setLineEditSubjectId);
+    QObject::connect(m_pAnonymizer.data(), &FiffAnonymizer::readingSubjectFirstName,
+                     m_pWin.data(), &MainWindow::setLineEditSubjectFirstName);
+    QObject::connect(m_pAnonymizer.data(), &FiffAnonymizer::readingSubjectMiddleName,
+                     m_pWin.data(), &MainWindow::setLineEditSubjectMiddleName);
+    QObject::connect(m_pAnonymizer.data(), &FiffAnonymizer::readingSubjectLastName,
+                     m_pWin.data(), &MainWindow::setLineEditSubjectLastName);
 
-    QObject::connect(m_pAnonymizer.data(),&FiffAnonymizer::readingSubjectBirthday,
-                     m_pWin.data(),&MainWindow::setLineEditSubjectBirthday);
-    QObject::connect(m_pAnonymizer.data(),&FiffAnonymizer::readingSubjectSex,
-                     m_pWin.data(),&MainWindow::setComboBoxSubjectSex);
-    QObject::connect(m_pAnonymizer.data(),&FiffAnonymizer::readingSubjectHand,
-                     m_pWin.data(),&MainWindow::setLineEditSubjectHand);
-    QObject::connect(m_pAnonymizer.data(),&FiffAnonymizer::readingSubjectWeight,
-                     m_pWin.data(),&MainWindow::setLineEditSubjectWeight);
-    QObject::connect(m_pAnonymizer.data(),&FiffAnonymizer::readingSubjectHeight,
-                     m_pWin.data(),&MainWindow::setLineEditSubjectHeight);
-    QObject::connect(m_pAnonymizer.data(),&FiffAnonymizer::readingSubjectComment,
-                     m_pWin.data(),&MainWindow::setLineEditSubjectComment);
-    QObject::connect(m_pAnonymizer.data(),&FiffAnonymizer::readingSubjectHisId,
-                     m_pWin.data(),&MainWindow::setLineEditSubjectHisId);
+    QObject::connect(m_pAnonymizer.data(), &FiffAnonymizer::readingSubjectBirthday,
+                     m_pWin.data(), &MainWindow::setLineEditSubjectBirthday);
+    QObject::connect(m_pAnonymizer.data(), &FiffAnonymizer::readingSubjectSex,
+                     m_pWin.data(), &MainWindow::setComboBoxSubjectSex);
+    QObject::connect(m_pAnonymizer.data(), &FiffAnonymizer::readingSubjectHand,
+                     m_pWin.data(), &MainWindow::setLineEditSubjectHand);
+    QObject::connect(m_pAnonymizer.data(), &FiffAnonymizer::readingSubjectWeight,
+                     m_pWin.data(), &MainWindow::setLineEditSubjectWeight);
+    QObject::connect(m_pAnonymizer.data(), &FiffAnonymizer::readingSubjectHeight,
+                     m_pWin.data(), &MainWindow::setLineEditSubjectHeight);
+    QObject::connect(m_pAnonymizer.data(), &FiffAnonymizer::readingSubjectComment,
+                     m_pWin.data(), &MainWindow::setLineEditSubjectComment);
+    QObject::connect(m_pAnonymizer.data(), &FiffAnonymizer::readingSubjectHisId,
+                     m_pWin.data(), &MainWindow::setLineEditSubjectHisId);
 
-    QObject::connect(m_pAnonymizer.data(),&FiffAnonymizer::readingProjectId,
-                     m_pWin.data(),&MainWindow::setLineEditProjectId);
-    QObject::connect(m_pAnonymizer.data(),&FiffAnonymizer::readingProjectName,
-                     m_pWin.data(),&MainWindow::setLineEditProjectName);
-    QObject::connect(m_pAnonymizer.data(),&FiffAnonymizer::readingProjectAim,
-                     m_pWin.data(),&MainWindow::setLineEditProjectAim);
-    QObject::connect(m_pAnonymizer.data(),&FiffAnonymizer::readingProjectPersons,
-                     m_pWin.data(),&MainWindow::setLineEditProjectPersons);
-    QObject::connect(m_pAnonymizer.data(),&FiffAnonymizer::readingProjectComment,
-                     m_pWin.data(),&MainWindow::setLineEditProjectComment);
-    QObject::connect(m_pAnonymizer.data(),&FiffAnonymizer::mriDataFoundInFile,
-                     m_pWin.data(),&MainWindow::setLabelMriDataFoundVisible);
+    QObject::connect(m_pAnonymizer.data(), &FiffAnonymizer::readingProjectId,
+                     m_pWin.data(), &MainWindow::setLineEditProjectId);
+    QObject::connect(m_pAnonymizer.data(), &FiffAnonymizer::readingProjectName,
+                     m_pWin.data(), &MainWindow::setLineEditProjectName);
+    QObject::connect(m_pAnonymizer.data(), &FiffAnonymizer::readingProjectAim,
+                     m_pWin.data(), &MainWindow::setLineEditProjectAim);
+    QObject::connect(m_pAnonymizer.data(), &FiffAnonymizer::readingProjectPersons,
+                     m_pWin.data(), &MainWindow::setLineEditProjectPersons);
+    QObject::connect(m_pAnonymizer.data(), &FiffAnonymizer::readingProjectComment,
+                     m_pWin.data(), &MainWindow::setLineEditProjectComment);
+    QObject::connect(m_pAnonymizer.data(), &FiffAnonymizer::mriDataFoundInFile,
+                     m_pWin.data(), &MainWindow::setLabelMriDataFoundVisible);
 
-    QObject::connect(m_pAnonymizer.data(),&FiffAnonymizer::readingMNEWorkingDir,
-                     m_pWin.data(),&MainWindow::setLineEditMNEWorkingDir);
-    QObject::connect(m_pAnonymizer.data(),&FiffAnonymizer::readingMNECommandLine,
-                     m_pWin.data(),&MainWindow::setLineEditMNECommand);
-
+    QObject::connect(m_pAnonymizer.data(), &FiffAnonymizer::readingMNEWorkingDir,
+                     m_pWin.data(), &MainWindow::setLineEditMNEWorkingDir);
+    QObject::connect(m_pAnonymizer.data(), &FiffAnonymizer::readingMNECommandLine,
+                     m_pWin.data(), &MainWindow::setLineEditMNECommand);
 }
 
 //=============================================================================================================
 
 void SettingsControllerGui::initializeOptionsState()
 {
-    if(m_pAnonymizer->isFileInSet())
-    {
+    if (m_pAnonymizer->isFileInSet()) {
         m_pWin->setInFile(m_fiInFile.absoluteFilePath());
     }
-    if(m_pAnonymizer->isFileOutSet())
-    {
+    if (m_pAnonymizer->isFileOutSet()) {
         m_pWin->setOutFile(m_fiOutFile.absoluteFilePath());
     }
 
@@ -281,8 +270,7 @@ void SettingsControllerGui::initializeOptionsState()
     m_pWin->setCheckBoxSubjectBirthdayOffset(m_pAnonymizer->getUseSubjectBirthdayOffset());
     m_pWin->setSubjectBirthday(m_pAnonymizer->getSubjectBirthday());
     m_pWin->setSubjectBirthdayOffset(m_pAnonymizer->getSubjectBirthdayOffset());
-    if(m_bHisIdSpecified)
-    {
+    if (m_bHisIdSpecified) {
         m_pWin->setSubjectHis(m_pAnonymizer->getSubjectHisID());
     }
 }

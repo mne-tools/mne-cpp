@@ -56,13 +56,13 @@ namespace FIFFLIB
  * buffers that cover a requested sample window and stream them in
  * without rescanning the file.
  */
-class FIFFSHARED_EXPORT FiffRawDir {
-
+class FIFFSHARED_EXPORT FiffRawDir
+{
 public:
-    using SPtr = QSharedPointer<FiffRawDir>;            /**< Shared pointer type for FiffRawDir. */
-    using ConstSPtr = QSharedPointer<const FiffRawDir>; /**< Const shared pointer type for FiffRawDir. */
-    using UPtr = std::unique_ptr<FiffRawDir>;             /**< Unique pointer type for FiffRawDir. */
-    using ConstUPtr = std::unique_ptr<const FiffRawDir>;  /**< Const unique pointer type for FiffRawDir. */
+    using SPtr = QSharedPointer<FiffRawDir>;             /**< Shared pointer type for FiffRawDir. */
+    using ConstSPtr = QSharedPointer<const FiffRawDir>;  /**< Const shared pointer type for FiffRawDir. */
+    using UPtr = std::unique_ptr<FiffRawDir>;            /**< Unique pointer type for FiffRawDir. */
+    using ConstUPtr = std::unique_ptr<const FiffRawDir>; /**< Const unique pointer type for FiffRawDir. */
 
     //=========================================================================================================
     /**
@@ -76,7 +76,7 @@ public:
      *
      * @param[in] p_FiffRawDir   Raw directory entry which should be copied.
      */
-    FiffRawDir(const FiffRawDir &p_FiffRawDir);
+    FiffRawDir(const FiffRawDir& p_FiffRawDir);
 
     //=========================================================================================================
     /**
@@ -98,10 +98,10 @@ public:
     ~FiffRawDir();
 
 public:
-    FiffDirEntry::SPtr  ent;    /**< Directory entry description. */
-    fiff_int_t          first;  /**< first sample. */
-    fiff_int_t          last;   /**< last sample. */
-    fiff_int_t          nsamp;  /**< Number of samples. */
+    FiffDirEntry::SPtr ent; /**< Directory entry description. */
+    fiff_int_t first;       /**< first sample. */
+    fiff_int_t last;        /**< last sample. */
+    fiff_int_t nsamp;       /**< Number of samples. */
 };
 } // NAMESPACE
 

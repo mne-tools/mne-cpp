@@ -53,7 +53,10 @@
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-namespace FIFFLIB { class FiffCoordTrans; }
+namespace FIFFLIB
+{
+class FiffCoordTrans;
+}
 
 //=============================================================================================================
 // DEFINE NAMESPACE MNELIB
@@ -81,8 +84,8 @@ class MNENamedMatrix;
 class MNESHARED_EXPORT MNEMeasData
 {
 public:
-    typedef QSharedPointer<MNEMeasData> SPtr;              /**< Shared pointer type for MNEMeasData. */
-    typedef QSharedPointer<const MNEMeasData> ConstSPtr;   /**< Const shared pointer type for MNEMeasData. */
+    typedef QSharedPointer<MNEMeasData> SPtr;            /**< Shared pointer type for MNEMeasData. */
+    typedef QSharedPointer<const MNEMeasData> ConstSPtr; /**< Const shared pointer type for MNEMeasData. */
 
     //=========================================================================================================
     /**
@@ -133,13 +136,13 @@ public:
      * @param[in] add_to    Existing container to append to, or @c nullptr to create a new one.
      * @return Pointer to the (new or existing) container, or @c nullptr on failure.
      */
-    static MNEMeasData* mne_read_meas_data_add(const QString&       name,
-                                       int                  set,
-                                       MNEInverseOperator*   op,
-                                       MNENamedMatrix*       fwd,
-                                       const QStringList&   namesp,
-                                       int                  nnamesp,
-                                       MNEMeasData*          add_to);
+    static MNEMeasData* mne_read_meas_data_add(const QString& name,
+                                               int set,
+                                               MNEInverseOperator* op,
+                                               MNENamedMatrix* fwd,
+                                               const QStringList& namesp,
+                                               int nnamesp,
+                                               MNEMeasData* add_to);
 
     /**
      * @brief Read an evoked-response data set into a new container.
@@ -154,38 +157,38 @@ public:
      * @param[in] nnamesp   Number of entries in @p namesp.
      * @return Pointer to the new container, or @c nullptr on failure.
      */
-    static MNEMeasData* mne_read_meas_data(const QString&       name,
-                                   int                  set,
-                                   MNEInverseOperator*  op,
-                                   MNENamedMatrix*      fwd,
-                                   const QStringList&   namesp,
-                                   int                  nnamesp);
+    static MNEMeasData* mne_read_meas_data(const QString& name,
+                                           int set,
+                                           MNEInverseOperator* op,
+                                           MNENamedMatrix* fwd,
+                                           const QStringList& namesp,
+                                           int nnamesp);
 
 public:
-    QString                 filename;   /**< Path to the source FIFF file. */
-    FIFFLIB::FiffId          meas_id;    /**< Measurement block ID from the FIFF file. */
-    FIFFLIB::FiffTime       meas_date;  /**< Measurement date / time stamp. */
-    QList<FIFFLIB::FiffChInfo>     chs; /**< Channel information list. */
+    QString filename;                                    /**< Path to the source FIFF file. */
+    FIFFLIB::FiffId meas_id;                             /**< Measurement block ID from the FIFF file. */
+    FIFFLIB::FiffTime meas_date;                         /**< Measurement date / time stamp. */
+    QList<FIFFLIB::FiffChInfo> chs;                      /**< Channel information list. */
     std::unique_ptr<FIFFLIB::FiffCoordTrans> meg_head_t; /**< MEG device ↔ head coordinate transform. */
     std::unique_ptr<FIFFLIB::FiffCoordTrans> mri_head_t; /**< MRI ↔ head coordinate transform. */
-    float                   sfreq;      /**< Sampling frequency (Hz). */
-    int                     nchan;      /**< Number of channels. */
-    float                   highpass;   /**< High-pass filter setting (Hz). */
-    float                   lowpass;    /**< Low-pass filter setting (Hz). */
-    std::unique_ptr<MNEProjOp>  proj; /**< SSP projection operator (may be @c nullptr). */
-    std::unique_ptr<MNECTFCompDataSet> comp; /**< Software gradient compensation data. */
-    MNEInverseOperator*     op;         /**< Associated inverse operator (not owned). */
-    MNENamedMatrix*         fwd; /**< Forward operator for dipole fitting (not owned). */
-    std::unique_ptr<MNERawData> raw; /**< Raw-data handle when data originates from a raw file. */
-    mneChSelection          chsel; /**< Channel selection for raw-data access. */
-    QStringList             badlist;    /**< List of bad channel names. */
-    int                     nbad;       /**< Number of bad channels. */
-    Eigen::VectorXi          bad;       /**< Per-channel bad flag array (0 = good, 1 = bad). */
+    float sfreq;                                         /**< Sampling frequency (Hz). */
+    int nchan;                                           /**< Number of channels. */
+    float highpass;                                      /**< High-pass filter setting (Hz). */
+    float lowpass;                                       /**< Low-pass filter setting (Hz). */
+    std::unique_ptr<MNEProjOp> proj;                     /**< SSP projection operator (may be @c nullptr). */
+    std::unique_ptr<MNECTFCompDataSet> comp;             /**< Software gradient compensation data. */
+    MNEInverseOperator* op;                              /**< Associated inverse operator (not owned). */
+    MNENamedMatrix* fwd;                                 /**< Forward operator for dipole fitting (not owned). */
+    std::unique_ptr<MNERawData> raw;                     /**< Raw-data handle when data originates from a raw file. */
+    mneChSelection chsel;                                /**< Channel selection for raw-data access. */
+    QStringList badlist;                                 /**< List of bad channel names. */
+    int nbad;                                            /**< Number of bad channels. */
+    Eigen::VectorXi bad;                                 /**< Per-channel bad flag array (0 = good, 1 = bad). */
 
-    bool                    ch_major;   /**< If true, data rows are channels (not times). */
-    QList<MNEMeasDataSet*>  sets;       /**< All loaded data-set epochs. */
-    int                     nset;       /**< Number of loaded data sets. */
-    MNEMeasDataSet*         current;    /**< Pointer to the currently active data set. */
+    bool ch_major;               /**< If true, data rows are channels (not times). */
+    QList<MNEMeasDataSet*> sets; /**< All loaded data-set epochs. */
+    int nset;                    /**< Number of loaded data sets. */
+    MNEMeasDataSet* current;     /**< Pointer to the currently active data set. */
 };
 
 //=============================================================================================================

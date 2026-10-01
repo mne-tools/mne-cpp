@@ -36,7 +36,7 @@ using namespace AVERAGINGPLUGIN;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-AveragingSetupWidget::AveragingSetupWidget(Averaging* toolbox, QWidget *parent)
+AveragingSetupWidget::AveragingSetupWidget(Averaging* toolbox, QWidget* parent)
 : QWidget(parent)
 , m_pAveraging(toolbox)
 {

@@ -43,7 +43,8 @@ private slots:
     void layer_compLayers()
     {
         FwdEegSphereLayer a, b;
-        a.rad = 0.5f; b.rad = 0.8f;
+        a.rad = 0.5f;
+        b.rad = 0.8f;
         QVERIFY(FwdEegSphereLayer::comp_layers(a, b));
         QVERIFY(!FwdEegSphereLayer::comp_layers(b, a));
     }
@@ -71,8 +72,10 @@ private slots:
     void sphereModel_createAndSetup()
     {
         // Standard 4-layer model - only test creation, skip setup (hangs)
-        VectorXf rads(4); rads << 0.90f, 0.92f, 0.97f, 1.0f;
-        VectorXf sigs(4); sigs << 0.33f, 1.0f, 0.004f, 0.33f;
+        VectorXf rads(4);
+        rads << 0.90f, 0.92f, 0.97f, 1.0f;
+        VectorXf sigs(4);
+        sigs << 0.33f, 1.0f, 0.004f, 0.33f;
 
         auto m = FwdEegSphereModel::fwd_create_eeg_sphere_model(
             "default", 4, rads, sigs);
@@ -83,8 +86,10 @@ private slots:
 
     void sphereModel_copyCtor()
     {
-        VectorXf rads(3); rads << 0.90f, 0.97f, 1.0f;
-        VectorXf sigs(3); sigs << 0.33f, 0.004f, 0.33f;
+        VectorXf rads(3);
+        rads << 0.90f, 0.97f, 1.0f;
+        VectorXf sigs(3);
+        sigs << 0.33f, 0.004f, 0.33f;
 
         auto orig = FwdEegSphereModel::fwd_create_eeg_sphere_model(
             "test", 3, rads, sigs);
@@ -97,8 +102,10 @@ private slots:
     void sphereModel_getCoeff()
     {
         // Test fwd_eeg_get_multi_sphere_model_coeff directly (no fitting needed)
-        Eigen::VectorXf rads(4); rads << 0.90f, 0.92f, 0.97f, 1.0f;
-        Eigen::VectorXf sigs(4); sigs << 0.33f, 0.0042f, 1.0f, 0.33f;
+        Eigen::VectorXf rads(4);
+        rads << 0.90f, 0.92f, 0.97f, 1.0f;
+        Eigen::VectorXf sigs(4);
+        sigs << 0.33f, 0.0042f, 1.0f, 0.33f;
         auto model = FwdEegSphereModel::fwd_create_eeg_sphere_model(
             "test", 4, rads, sigs);
         QVERIFY(model != nullptr);
@@ -117,8 +124,10 @@ private slots:
         double p0 = 0, p01 = 0, p1 = 0, p11 = 0;
         double x = 0.5;
         // Initialize for n=0
-        p0 = 1.0; p01 = 0.0;
-        p1 = x;   p11 = 1.0;
+        p0 = 1.0;
+        p01 = 0.0;
+        p1 = x;
+        p11 = 1.0;
 
         FwdEegSphereModel::next_legen(2, x, p0, p01, p1, p11);
         QVERIFY(std::isfinite(p0));
@@ -137,8 +146,10 @@ private slots:
     void sphereModel_bergScherg()
     {
         // Test fwd_setup_eeg_sphere_model WITHOUT Berg-Scherg fitting
-        Eigen::VectorXf rads(4); rads << 0.90f, 0.92f, 0.97f, 1.0f;
-        Eigen::VectorXf sigs(4); sigs << 0.33f, 0.0042f, 1.0f, 0.33f;
+        Eigen::VectorXf rads(4);
+        rads << 0.90f, 0.92f, 0.97f, 1.0f;
+        Eigen::VectorXf sigs(4);
+        sigs << 0.33f, 0.0042f, 1.0f, 0.33f;
         auto model = FwdEegSphereModel::fwd_create_eeg_sphere_model(
             "test_bs", 4, rads, sigs);
         QVERIFY(model != nullptr);
@@ -173,8 +184,10 @@ private slots:
 
     void sphereModelSet_addCustom()
     {
-        VectorXf rads(3); rads << 0.90f, 0.97f, 1.0f;
-        VectorXf sigs(3); sigs << 0.33f, 0.004f, 0.33f;
+        VectorXf rads(3);
+        rads << 0.90f, 0.97f, 1.0f;
+        VectorXf sigs(3);
+        sigs << 0.33f, 0.004f, 0.33f;
 
         auto m = FwdEegSphereModel::fwd_create_eeg_sphere_model(
             "custom", 3, rads, sigs);
@@ -475,8 +488,10 @@ private slots:
     void sphereModel_spherepot()
     {
         // Test sphere model setup without fitting, then verify accessors
-        Eigen::VectorXf rads(4); rads << 0.90f, 0.92f, 0.97f, 1.0f;
-        Eigen::VectorXf sigs(4); sigs << 0.33f, 0.0042f, 1.0f, 0.33f;
+        Eigen::VectorXf rads(4);
+        rads << 0.90f, 0.92f, 0.97f, 1.0f;
+        Eigen::VectorXf sigs(4);
+        sigs << 0.33f, 0.0042f, 1.0f, 0.33f;
         auto model = FwdEegSphereModel::fwd_create_eeg_sphere_model(
             "test_sp", 4, rads, sigs);
         QVERIFY(model != nullptr);

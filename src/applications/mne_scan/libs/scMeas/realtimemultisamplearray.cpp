@@ -41,7 +41,7 @@ using namespace Eigen;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-RealTimeMultiSampleArray::RealTimeMultiSampleArray(QObject *parent)
+RealTimeMultiSampleArray::RealTimeMultiSampleArray(QObject* parent)
 : Measurement(QMetaType::fromName("RealTimeMultiSampleArray::SPtr").id(), parent)
 , m_pFiffInfo_orig(nullptr)
 , m_pFiffDigitizerData_orig(nullptr)
@@ -59,21 +59,21 @@ RealTimeMultiSampleArray::~RealTimeMultiSampleArray()
 
 //=============================================================================================================
 
-void RealTimeMultiSampleArray::init(QList<RealTimeSampleArrayChInfo> &chInfo)
+void RealTimeMultiSampleArray::init(QList<RealTimeSampleArrayChInfo>& chInfo)
 {
     QMutexLocker locker(&m_qMutex);
     m_qListChInfo = chInfo;
 
     m_bChInfoIsInit = true;
 
-//    m_qListChInfo.clear();
-//    for(quint32 i = 0; i < uiNumChannels; ++i)
-//    {
-//        RealTimeSampleArrayChInfo initChInfo;
-//        QString string;
-//        initChInfo.setChannelName(string.number(i+1));
-//        m_qListChInfo.append(initChInfo);
-//    }
+    //    m_qListChInfo.clear();
+    //    for(quint32 i = 0; i < uiNumChannels; ++i)
+    //    {
+    //        RealTimeSampleArrayChInfo initChInfo;
+    //        QString string;
+    //        initChInfo.setChannelName(string.number(i+1));
+    //        m_qListChInfo.append(initChInfo);
+    //    }
 }
 
 //=============================================================================================================
@@ -84,8 +84,7 @@ void RealTimeMultiSampleArray::initFromFiffInfo(QSharedPointer<FIFFLIB::FiffInfo
     m_qListChInfo.clear();
     m_bChInfoIsInit = false;
 
-    for(qint32 i = 0; i < pFiffInfo->nchan; ++i)
-    {
+    for (qint32 i = 0; i < pFiffInfo->nchan; ++i) {
         RealTimeSampleArrayChInfo initChInfo;
         initChInfo.setChannelName(pFiffInfo->chs[i].ch_name);
 
@@ -93,9 +92,8 @@ void RealTimeMultiSampleArray::initFromFiffInfo(QSharedPointer<FIFFLIB::FiffInfo
         initChInfo.setUnit(pFiffInfo->chs[i].unit);
 
         //Treat stimulus channels different
-        if(pFiffInfo->chs[i].kind == FIFFV_STIM_CH)
-        {
-//            initChInfo.setUnit("");
+        if (pFiffInfo->chs[i].kind == FIFFV_STIM_CH) {
+            //            initChInfo.setUnit("");
             initChInfo.setMinValue(0);
             initChInfo.setMaxValue(1.0e6);
         }
@@ -121,20 +119,19 @@ void RealTimeMultiSampleArray::initFromFiffInfo(QSharedPointer<FIFFLIB::FiffInfo
 
 void RealTimeMultiSampleArray::setValue(const MatrixXd& mat)
 {
-    if(!m_bChInfoIsInit)
+    if (!m_bChInfoIsInit)
         return;
 
     m_qMutex.lock();
     //check vector size
-    if(mat.rows() != m_qListChInfo.size())
+    if (mat.rows() != m_qListChInfo.size())
         qCritical() << "Error Occured in RealTimeMultiSampleArray::setVector: Vector size does not match the number of channels! ";
 
     //Store
     m_matSamples.push_back(mat);
 
     m_qMutex.unlock();
-    if(m_matSamples.size() >= m_iMultiArraySize)
-    {
+    if (m_matSamples.size() >= m_iMultiArraySize) {
         emit notify();
         m_qMutex.lock();
         m_matSamples.clear();

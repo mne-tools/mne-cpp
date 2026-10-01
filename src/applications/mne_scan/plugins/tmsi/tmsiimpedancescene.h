@@ -49,30 +49,30 @@ public:
     /**
      * Constructs a TMSIImpedanceScene.
      */
-    explicit TMSIImpedanceScene(QGraphicsView* view, QObject *parent = 0);
+    explicit TMSIImpedanceScene(QGraphicsView* view, QObject* parent = 0);
 
 private:
-    QPointF         m_mousePosition;                /**< Holds the mouse position.*/
-    bool            m_bRightMouseKeyPressed;        /**< Whether the right mouse button was pressed.*/
-    QGraphicsView*  m_qvView;                       /**< Holds the view which visualizes this scene.*/
+    QPointF m_mousePosition;      /**< Holds the mouse position.*/
+    bool m_bRightMouseKeyPressed; /**< Whether the right mouse button was pressed.*/
+    QGraphicsView* m_qvView;      /**< Holds the view which visualizes this scene.*/
 
     //=========================================================================================================
     /**
      * Reimplemented mouse press event handler.
      */
-    void mousePressEvent(QGraphicsSceneMouseEvent * event);
+    void mousePressEvent(QGraphicsSceneMouseEvent* event);
 
     //=========================================================================================================
     /**
      * Reimplemented mouse move event handler.
      */
-    void mouseMoveEvent(QGraphicsSceneMouseEvent * event);
+    void mouseMoveEvent(QGraphicsSceneMouseEvent* event);
 
     //=========================================================================================================
     /**
      * Reimplemented mouse release event handler.
      */
-    void mouseReleaseEvent(QGraphicsSceneMouseEvent * event);
+    void mouseReleaseEvent(QGraphicsSceneMouseEvent* event);
 
     //=========================================================================================================
     /**

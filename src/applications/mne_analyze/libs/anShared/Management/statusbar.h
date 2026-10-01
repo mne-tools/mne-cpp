@@ -40,15 +40,17 @@
 class QLabel;
 class QProgressBar;
 
-namespace DISPLIB {
-    class ProgressView;
+namespace DISPLIB
+{
+class ProgressView;
 }
 
 //=============================================================================================================
 // DEFINE NAMESPACE ANSHAREDLIB
 //=============================================================================================================
 
-namespace ANSHAREDLIB {
+namespace ANSHAREDLIB
+{
 
 //=============================================================================================================
 // ANSHAREDLIB FORWARD DECLARATIONS
@@ -75,7 +77,7 @@ public:
     /**
      * Constructs a StatusBar object.
      */
-    StatusBar(QWidget *pParent = nullptr);
+    StatusBar(QWidget* pParent = nullptr);
 
     //=========================================================================================================
     /**
@@ -120,14 +122,14 @@ private:
      */
     void leaveEvent(QEvent* event) override;
 
-    ANSHAREDLIB::Communicator*          m_pCommunicator;            /**< Vector containing all plugins. */
+    ANSHAREDLIB::Communicator* m_pCommunicator; /**< Vector containing all plugins. */
 
-    int                                 m_iMsgTimeout;              /**< Timeout of one message in milliseconds. */
+    int m_iMsgTimeout; /**< Timeout of one message in milliseconds. */
 
-    QStack<QString>                     m_LoadingStack;             /** Keeps the currently loading messages */
+    QStack<QString> m_LoadingStack; /** Keeps the currently loading messages */
 
-    QPointer<QWidget>                   m_pHoverWidget;             /** Widget for showing all current loading messageswhen hovering over the loading bar */
-    QPointer<DISPLIB::ProgressView>     m_pProgressView;            /** Widget for showiung loading bar and loadoing message */
+    QPointer<QWidget> m_pHoverWidget;                /** Widget for showing all current loading messageswhen hovering over the loading bar */
+    QPointer<DISPLIB::ProgressView> m_pProgressView; /** Widget for showiung loading bar and loadoing message */
 };
 
 //=============================================================================================================

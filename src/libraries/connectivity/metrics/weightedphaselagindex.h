@@ -67,7 +67,8 @@
 // DEFINE NAMESPACE CONNECTIVITYLIB
 //=============================================================================================================
 
-namespace CONNECTIVITYLIB {
+namespace CONNECTIVITYLIB
+{
 
 //=============================================================================================================
 // CONNECTIVITYLIB FORWARD DECLARATIONS
@@ -93,7 +94,6 @@ class Network;
  */
 class CONNECTIVITYSHARED_EXPORT WeightedPhaseLagIndex : public AbstractMetric
 {
-
 public:
     typedef QSharedPointer<WeightedPhaseLagIndex> SPtr;            /**< Shared pointer type for WeightedPhaseLagIndex. */
     typedef QSharedPointer<const WeightedPhaseLagIndex> ConstSPtr; /**< Const shared pointer type for WeightedPhaseLagIndex. */
@@ -129,8 +129,8 @@ protected:
      * @param[in] tapers                 The taper information.
      */
     static void compute(ConnectivitySettings::IntermediateTrialData& inputData,
-                        QVector<QPair<int,Eigen::MatrixXcd> >& vecPairCsdSum,
-                        QVector<QPair<int,Eigen::MatrixXd> >& vecPairCsdImagAbsSum,
+                        QVector<QPair<int, Eigen::MatrixXcd>>& vecPairCsdSum,
+                        QVector<QPair<int, Eigen::MatrixXd>>& vecPairCsdImagAbsSum,
                         QMutex& mutex,
                         int iNRows,
                         int iNFreqs,
@@ -144,7 +144,7 @@ protected:
      * @param[out] connectivitySettings   The input data.
      * @param[in] finalNetwork           The final network.
      */
-    static void computeWPLI(ConnectivitySettings &connectivitySettings,
+    static void computeWPLI(ConnectivitySettings& connectivitySettings,
                             Network& finalNetwork);
 };
 

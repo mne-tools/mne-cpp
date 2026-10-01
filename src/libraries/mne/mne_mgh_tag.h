@@ -48,8 +48,8 @@ namespace MNELIB
 class MNESHARED_EXPORT MNEMghTag
 {
 public:
-    typedef QSharedPointer<MNEMghTag> SPtr;              /**< Shared pointer type for MNEMghTag. */
-    typedef QSharedPointer<const MNEMghTag> ConstSPtr;   /**< Const shared pointer type for MNEMghTag. */
+    typedef QSharedPointer<MNEMghTag> SPtr;            /**< Shared pointer type for MNEMghTag. */
+    typedef QSharedPointer<const MNEMghTag> ConstSPtr; /**< Const shared pointer type for MNEMghTag. */
 
     //=========================================================================================================
     /**
@@ -64,9 +64,9 @@ public:
     ~MNEMghTag() = default;
 
 public:
-    int        tag = 0;            /**< Tag identifier code. */
-    long long  len = 0;            /**< Byte length of the tag data payload. */
-    QByteArray data;               /**< Raw tag data payload. */
+    int tag = 0;       /**< Tag identifier code. */
+    long long len = 0; /**< Byte length of the tag data payload. */
+    QByteArray data;   /**< Raw tag data payload. */
 };
 
 //=============================================================================================================

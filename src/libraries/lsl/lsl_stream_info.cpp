@@ -211,18 +211,18 @@ stream_info stream_info::from_string(const std::string& data)
 
     // Validate: need at least 10 fields (header + 9 data fields)
     if (tokens.size() < 10 || tokens[0] != "MNELSL1") {
-        return stream_info();  // return invalid/empty
+        return stream_info(); // return invalid/empty
     }
 
     stream_info info;
-    info.m_name          = tokens[1];
-    info.m_type          = tokens[2];
+    info.m_name = tokens[1];
+    info.m_type = tokens[2];
     info.m_channel_count = std::stoi(tokens[3]);
     info.m_nominal_srate = std::stod(tokens[4]);
-    info.m_uid           = tokens[5];
-    info.m_hostname      = tokens[6];
-    info.m_source_id     = tokens[7];
-    info.m_data_port     = std::stoi(tokens[8]);
+    info.m_uid = tokens[5];
+    info.m_hostname = tokens[6];
+    info.m_source_id = tokens[7];
+    info.m_data_port = std::stoi(tokens[8]);
     info.m_channel_format = static_cast<ChannelFormat>(std::stoi(tokens[9]));
 
     return info;

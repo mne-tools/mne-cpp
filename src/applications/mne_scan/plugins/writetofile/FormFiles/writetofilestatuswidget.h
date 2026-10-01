@@ -54,7 +54,7 @@ private:
 
     QPointer<QLabel> m_pDot;
     QPointer<QLabel> m_pText;
-    bool             m_bActive;
+    bool m_bActive;
 };
 
 } // namespace

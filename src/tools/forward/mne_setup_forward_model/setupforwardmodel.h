@@ -40,7 +40,8 @@
 // DEFINE NAMESPACE MNESETUPFORWARDMODEL
 //=============================================================================================================
 
-namespace MNESETUPFORWARDMODEL {
+namespace MNESETUPFORWARDMODEL
+{
 
 //=============================================================================================================
 // FORWARD DECLARATIONS
@@ -184,7 +185,7 @@ private:
 
     //=========================================================================================================
 
-    const MNESetupForwardModelSettings& m_settings;  /**< Command-line settings. */
+    const MNESetupForwardModelSettings& m_settings; /**< Command-line settings. */
 };
 
 } // namespace MNESETUPFORWARDMODEL

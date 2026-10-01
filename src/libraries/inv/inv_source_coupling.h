@@ -52,11 +52,11 @@ namespace INVLIB
  */
 struct INVSHARED_EXPORT InvSourceCoupling
 {
-    std::vector<int>        gridIndices;    /**< Grid indices of the coupled sources (size N). */
-    std::vector<Eigen::Vector3d> moments;   /**< Dipole moment / orientation for each coupled source (size N). */
-    Eigen::MatrixXd         correlations;   /**< N x N correlation matrix between the coupled sources. */
-    float                   tmin;           /**< Start of the time window (s) this coupling represents. */
-    float                   tmax;           /**< End of the time window (s) this coupling represents. */
+    std::vector<int> gridIndices;         /**< Grid indices of the coupled sources (size N). */
+    std::vector<Eigen::Vector3d> moments; /**< Dipole moment / orientation for each coupled source (size N). */
+    Eigen::MatrixXd correlations;         /**< N x N correlation matrix between the coupled sources. */
+    float tmin;                           /**< Start of the time window (s) this coupling represents. */
+    float tmax;                           /**< End of the time window (s) this coupling represents. */
 
     InvSourceCoupling();
 };

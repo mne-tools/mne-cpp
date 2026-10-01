@@ -99,10 +99,12 @@ private slots:
     {
         const QJsonArray classes = m_registry.object().value("classes").toArray();
         int missing = 0;
-        for (const QJsonValue &val : classes) {
-            if (!val.isObject()) continue;
+        for (const QJsonValue& val : classes) {
+            if (!val.isObject())
+                continue;
             const QJsonObject cls = val.toObject();
-            if (!cls.contains("header")) continue;
+            if (!cls.contains("header"))
+                continue;
             const QString headerRel = cls.value("header").toString();
             const QString headerFull = m_repoRoot + "/src/libraries/" + headerRel;
             if (!QFile::exists(headerFull)) {
@@ -118,11 +120,13 @@ private slots:
     {
         const QJsonArray classes = m_registry.object().value("classes").toArray();
         int missing = 0;
-        for (const QJsonValue &val : classes) {
-            if (!val.isObject()) continue;
+        for (const QJsonValue& val : classes) {
+            if (!val.isObject())
+                continue;
             const QJsonObject cls = val.toObject();
             const QJsonValue tv = cls.value("test");
-            if (tv.isNull() || tv.toString().isEmpty()) continue;
+            if (tv.isNull() || tv.toString().isEmpty())
+                continue;
             const QString testName = tv.toString();
             const QString testDir = m_repoRoot + "/src/testframes/" + testName;
             if (!QDir(testDir).exists()) {
@@ -138,8 +142,9 @@ private slots:
     {
         const QJsonArray classes = m_registry.object().value("classes").toArray();
         int violations = 0;
-        for (const QJsonValue &val : classes) {
-            if (!val.isObject()) continue;
+        for (const QJsonValue& val : classes) {
+            if (!val.isObject())
+                continue;
             const QJsonObject cls = val.toObject();
             const bool skigenCand = cls.value("skigen_candidate").toBool(false);
             const QString status = cls.value("status").toString();

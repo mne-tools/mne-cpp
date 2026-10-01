@@ -49,18 +49,18 @@ using namespace UTILSLIB;
 //=============================================================================================================s
 
 bool LayoutLoader::readAsaElcFile(const QString& path,
-                                  QStringList &channelNames,
-                                  QList<QVector<float> > &location3D,
-                                  QList<QVector<float> > &location2D,
-                                  QString &unit)
+                                  QStringList& channelNames,
+                                  QList<QVector<float>>& location3D,
+                                  QList<QVector<float>>& location2D,
+                                  QString& unit)
 {
     //Open .elc file
-    if(!path.contains(".elc"))
+    if (!path.contains(".elc"))
         return false;
 
     QFile file(path);
-    if(!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
-        qDebug()<<"Error opening elc file";
+    if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
+        qDebug() << "Error opening elc file";
         return false;
     }
 
@@ -69,58 +69,56 @@ bool LayoutLoader::readAsaElcFile(const QString& path,
     QTextStream in(&file);
     bool read2D = false;
 
-    while(!in.atEnd())
-    {
+    while (!in.atEnd()) {
         QString line = in.readLine();
 
         QStringList fields = line.split(QRegularExpression("\\s+"));
 
         //Delete last element if it is a blank character
-        if(fields.at(fields.size()-1) == "")
+        if (fields.at(fields.size() - 1) == "")
             fields.removeLast();
 
-        if(!line.contains("#")) //Skip commented areas in file
+        if (!line.contains("#")) //Skip commented areas in file
         {
             //Read number of electrodes
-            if(line.contains("NumberPositions"))
+            if (line.contains("NumberPositions"))
                 numberElectrodes = fields.at(1).toDouble();
 
             //Read the unit of the position values
-            if(line.contains("UnitPosition"))
+            if (line.contains("UnitPosition"))
                 unit = fields.at(1);
 
             //Read actual electrode positions
-            if(line.contains("Positions2D"))
+            if (line.contains("Positions2D"))
                 read2D = true;
 
-            if(line.contains(":") && !read2D) //Read 3D positions
+            if (line.contains(":") && !read2D) //Read 3D positions
             {
                 channelNames.push_back(fields.at(0));
                 QVector<float> posTemp;
 
-                posTemp.push_back(fields.at(fields.size()-3).toDouble());    //x
-                posTemp.push_back(fields.at(fields.size()-2).toDouble());    //y
-                posTemp.push_back(fields.at(fields.size()-1).toDouble());    //z
+                posTemp.push_back(fields.at(fields.size() - 3).toDouble()); //x
+                posTemp.push_back(fields.at(fields.size() - 2).toDouble()); //y
+                posTemp.push_back(fields.at(fields.size() - 1).toDouble()); //z
 
                 location3D.append(posTemp);
             }
 
-            if(line.contains(":") && read2D) //Read 2D positions
+            if (line.contains(":") && read2D) //Read 2D positions
             {
                 QVector<float> posTemp;
-                posTemp.push_back(fields.at(fields.size()-2).toDouble());    //x
-                posTemp.push_back(fields.at(fields.size()-1).toDouble());    //y
+                posTemp.push_back(fields.at(fields.size() - 2).toDouble()); //x
+                posTemp.push_back(fields.at(fields.size() - 1).toDouble()); //y
                 location2D.append(posTemp);
             }
 
             //Read channel names
-            if(line.contains("Labels"))
-            {
+            if (line.contains("Labels")) {
                 line = in.readLine();
                 fields = line.split(QRegularExpression("\\s+"));
 
                 //Delete last element if it is a blank character
-                if(fields.at(fields.size()-1) == "")
+                if (fields.at(fields.size() - 1) == "")
                     fields.removeLast();
 
                 channelNames = fields;
@@ -137,21 +135,20 @@ bool LayoutLoader::readAsaElcFile(const QString& path,
 
 //=============================================================================================================
 
-bool LayoutLoader::readAsaElcFile(const std::string &path,
-                                  std::vector<std::string> &channelNames,
-                                  std::vector<std::vector<float> > &location3D,
-                                  std::vector<std::vector<float> > &location2D,
-                                  std::string &unit)
+bool LayoutLoader::readAsaElcFile(const std::string& path,
+                                  std::vector<std::string>& channelNames,
+                                  std::vector<std::vector<float>>& location3D,
+                                  std::vector<std::vector<float>>& location2D,
+                                  std::string& unit)
 {
-
-    if(path.find(".elc") == std::string::npos){
+    if (path.find(".elc") == std::string::npos) {
         return false;
     }
 
     std::ifstream inFile(path);
 
-    if(!inFile.is_open()){
-        qDebug()<<"Error opening elc file";
+    if (!inFile.is_open()) {
+        qDebug() << "Error opening elc file";
         return false;
     }
 
@@ -161,53 +158,52 @@ bool LayoutLoader::readAsaElcFile(const std::string &path,
 
     std::string line;
 
-    while(std::getline(inFile, line)){
-        if(line.find('#') == std::string::npos){
+    while (std::getline(inFile, line)) {
+        if (line.find('#') == std::string::npos) {
             std::vector<std::string> elements;
             std::stringstream stream{line};
             std::string element;
 
             stream >> std::ws;
-            while(stream >> element){
+            while (stream >> element) {
                 elements.push_back(std::move(element));
                 stream >> std::ws;
             }
 
             //Read number of electrodes
-            if(line.find("NumberPositions") != std::string::npos)
+            if (line.find("NumberPositions") != std::string::npos)
                 numberElectrodes = std::stod(elements.at(1));
 
             //Read the unit of the position values
-            if(line.find("UnitPosition") != std::string::npos)
+            if (line.find("UnitPosition") != std::string::npos)
                 unit = elements.at(1);
 
             //Read actual electrode positions
-            if(line.find("Positions2D") != std::string::npos)
+            if (line.find("Positions2D") != std::string::npos)
                 read2D = true;
 
-            if(line.find(':') != std::string::npos && !read2D) //Read 3D positions
+            if (line.find(':') != std::string::npos && !read2D) //Read 3D positions
             {
                 channelNames.push_back(elements.at(0));
                 std::vector<float> posTemp;
 
-                posTemp.push_back(std::stod(elements.at(elements.size()-3)));    //x
-                posTemp.push_back(std::stod(elements.at(elements.size()-2)));    //y
-                posTemp.push_back(std::stod(elements.at(elements.size()-1)));    //z
+                posTemp.push_back(std::stod(elements.at(elements.size() - 3))); //x
+                posTemp.push_back(std::stod(elements.at(elements.size() - 2))); //y
+                posTemp.push_back(std::stod(elements.at(elements.size() - 1))); //z
 
                 location3D.push_back(std::move(posTemp));
             }
 
-            if(line.find(":") != std::string::npos && read2D) //Read 2D positions
+            if (line.find(":") != std::string::npos && read2D) //Read 2D positions
             {
                 std::vector<float> posTemp;
-                posTemp.push_back(std::stod(elements.at(elements.size()-2)));    //x
-                posTemp.push_back(std::stod(elements.at(elements.size()-1)));    //y
+                posTemp.push_back(std::stod(elements.at(elements.size() - 2))); //x
+                posTemp.push_back(std::stod(elements.at(elements.size() - 1))); //y
                 location2D.push_back(std::move(posTemp));
             }
 
             //Read channel names
-            if(line.find("Labels") != std::string::npos)
-            {
+            if (line.find("Labels") != std::string::npos) {
                 std::getline(inFile, line);
                 std::stringstream channels{line};
                 std::vector<std::string> listOfNames;
@@ -215,7 +211,7 @@ bool LayoutLoader::readAsaElcFile(const std::string &path,
                 std::string channelName;
 
                 channels >> std::ws;
-                while(channels >> channelName){
+                while (channels >> channelName) {
                     listOfNames.push_back(std::move(channelName));
                     channels >> std::ws;
                 }
@@ -232,17 +228,17 @@ bool LayoutLoader::readAsaElcFile(const std::string &path,
 
 //=============================================================================================================
 
-bool LayoutLoader::readMNELoutFile(const QString &path, QMap<QString, QPointF> &channelData)
+bool LayoutLoader::readMNELoutFile(const QString& path, QMap<QString, QPointF>& channelData)
 {
     //Open .elc file
-    if(!path.contains(".lout"))
+    if (!path.contains(".lout"))
         return false;
 
     channelData.clear();
 
     QFile file(path);
-    if(!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
-        qDebug()<<"Error opening mne lout file";
+    if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
+        qDebug() << "Error opening mne lout file";
         return false;
     }
 
@@ -252,21 +248,21 @@ bool LayoutLoader::readMNELoutFile(const QString &path, QMap<QString, QPointF> &
     //skip first line
     in.readLine();
 
-    while(!in.atEnd()) {
+    while (!in.atEnd()) {
         QString line = in.readLine();
 
         QStringList fields = line.split(QRegularExpression("\\s+"));
 
         //Delete last element if it is a blank character
-        if(fields.at(fields.size()-1) == "")
+        if (fields.at(fields.size() - 1) == "")
             fields.removeLast();
 
         QPointF posTemp;
-        posTemp.setX(fields.at(1).toDouble());      //x
-        posTemp.setY(fields.at(2).toDouble());      //y
+        posTemp.setX(fields.at(1).toDouble()); //x
+        posTemp.setY(fields.at(2).toDouble()); //y
 
         //Create channel data map entry
-        QString key = QString("%1 %2").arg(fields.at(fields.size()-2)).arg(fields.at(fields.size()-1));
+        QString key = QString("%1 %2").arg(fields.at(fields.size() - 2)).arg(fields.at(fields.size() - 1));
         channelData.insert(key, posTemp);
     }
 
@@ -277,18 +273,17 @@ bool LayoutLoader::readMNELoutFile(const QString &path, QMap<QString, QPointF> &
 
 //=============================================================================================================
 
-bool LayoutLoader::readMNELoutFile(const std::string &path, QMap<std::string, QPointF> &channelData)
+bool LayoutLoader::readMNELoutFile(const std::string& path, QMap<std::string, QPointF>& channelData)
 {
-
-    if(path.find(".lout") == std::string::npos){
+    if (path.find(".lout") == std::string::npos) {
         return false;
     }
 
     channelData.clear();
     std::ifstream inFile(path);
 
-    if(!inFile.is_open()){
-        qDebug()<<"Error opening mne lout file";
+    if (!inFile.is_open()) {
+        qDebug() << "Error opening mne lout file";
         return false;
     }
 
@@ -297,24 +292,26 @@ bool LayoutLoader::readMNELoutFile(const std::string &path, QMap<std::string, QP
     // Skip first line (bounding box)
     std::getline(inFile, line);
 
-    while(std::getline(inFile, line)){
-        if(line.empty()) continue;
+    while (std::getline(inFile, line)) {
+        if (line.empty())
+            continue;
 
         std::vector<std::string> elements;
         std::stringstream stream{line};
         std::string element;
 
         stream >> std::ws;
-        while(stream >> element){
+        while (stream >> element) {
             elements.push_back(std::move(element));
             stream >> std::ws;
         }
 
-        if(elements.size() < 4) continue;
+        if (elements.size() < 4)
+            continue;
 
         QPointF posTemp;
-        posTemp.setX(std::stod(elements.at(1)));      //x
-        posTemp.setY(std::stod(elements.at(2)));      //y
+        posTemp.setX(std::stod(elements.at(1))); //x
+        posTemp.setY(std::stod(elements.at(2))); //y
 
         //Create channel data map entry
         std::string key{elements.at(elements.size() - 2) + " " + elements.at(elements.size() - 1)};

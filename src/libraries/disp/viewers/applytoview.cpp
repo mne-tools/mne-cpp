@@ -30,7 +30,7 @@ using namespace DISPLIB;
 //=============================================================================================================
 
 ApplyToView::ApplyToView(const QString& sSettingsPath,
-                         QWidget *parent,
+                         QWidget* parent,
                          Qt::WindowFlags f)
 : AbstractView(parent, f)
 , m_sSettingsPath(sSettingsPath)
@@ -57,21 +57,19 @@ ApplyToView::~ApplyToView()
 
 void ApplyToView::saveSettings()
 {
-
 }
 
 //=============================================================================================================
 
 void ApplyToView::loadSettings()
 {
-
 }
 
 //=============================================================================================================
 
 void ApplyToView::updateGuiMode(GuiMode mode)
 {
-    switch(mode) {
+    switch (mode) {
         case GuiMode::Clinical:
             break;
         default: // default is research mode
@@ -83,7 +81,7 @@ void ApplyToView::updateGuiMode(GuiMode mode)
 
 void ApplyToView::updateProcessingMode(ProcessingMode mode)
 {
-    switch(mode) {
+    switch (mode) {
         case ProcessingMode::Offline:
             break;
         default: // default is realtime mode
@@ -127,7 +125,7 @@ QList<QString> ApplyToView::getSelectedViews()
     if (m_pUi->m_checkBoxButterfly->isChecked()) {
         m_lViewList.append("butterflyview");
     }
-    if (m_pUi->m_checkBoxLayout->isChecked()){
+    if (m_pUi->m_checkBoxLayout->isChecked()) {
         m_lViewList.append("layoutview");
     }
 
@@ -138,5 +136,4 @@ QList<QString> ApplyToView::getSelectedViews()
 
 void ApplyToView::clearView()
 {
-
 }

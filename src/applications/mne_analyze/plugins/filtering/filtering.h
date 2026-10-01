@@ -36,16 +36,19 @@
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-namespace ANSHAREDLIB {
-    class Communicator;
+namespace ANSHAREDLIB
+{
+class Communicator;
 }
 
-namespace UTILSLIB {
-    class FilterKernel;
+namespace UTILSLIB
+{
+class FilterKernel;
 }
 
-namespace DISPLIB {
-    class FilterSettingsView;
+namespace DISPLIB
+{
+class FilterSettingsView;
 }
 
 //=============================================================================================================
@@ -118,9 +121,8 @@ private:
      */
     void setFilterActive(bool state);
 
-    QPointer<ANSHAREDLIB::Communicator>         m_pCommu;               /**< To broadcst signals. */
-    QPointer<DISPLIB::FilterSettingsView>       m_pFilterSettingsView;
-
+    QPointer<ANSHAREDLIB::Communicator> m_pCommu; /**< To broadcst signals. */
+    QPointer<DISPLIB::FilterSettingsView> m_pFilterSettingsView;
 };
 
 //=============================================================================================================

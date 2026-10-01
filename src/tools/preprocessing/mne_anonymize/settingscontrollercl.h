@@ -137,7 +137,6 @@ protected:
     QString generateDefaultOutputFileName();
 
 private:
-
     //=========================================================================================================
     /**
      * Processes the input parser and configures the state of the FiffAnonymizer instance according to
@@ -219,29 +218,29 @@ signals:
     void finished(const int);
 
 protected:
-    FiffAnonymizer::SPtr m_pAnonymizer;     /**< Local pointer to a Fiffanonyzer object to configure and use.*/
-    QString m_sAppName;                     /**< Application name.*/
-    QString m_sAppVer;                      /**< Application version number.*/
-    QString m_sBuildDate;                   /**< Application build date.*/
-    QString m_sBuildHash;                   /**< Repository hash whenever the application was built.*/
+    FiffAnonymizer::SPtr m_pAnonymizer; /**< Local pointer to a Fiffanonyzer object to configure and use.*/
+    QString m_sAppName;                 /**< Application name.*/
+    QString m_sAppVer;                  /**< Application version number.*/
+    QString m_sBuildDate;               /**< Application build date.*/
+    QString m_sBuildHash;               /**< Repository hash whenever the application was built.*/
 
-    QCommandLineParser m_parser;            /**< Parser object to work with member ptr to QCoreApp and parse input command line options.*/
+    QCommandLineParser m_parser; /**< Parser object to work with member ptr to QCoreApp and parse input command line options.*/
 
-    QFileInfo m_fiInFile;                   /**< Input File info obj.*/
-    QFileInfo m_fiOutFile;                  /**< Output File info obj.*/
+    QFileInfo m_fiInFile;  /**< Input File info obj.*/
+    QFileInfo m_fiOutFile; /**< Output File info obj.*/
 
 protected:
-    bool m_bGuiMode;                        /**< Object running in GUI mode.*/
-    bool m_bDeleteInputFileAfter;           /**< User's request to delete the input file after anonymization.*/
-    bool m_bDeleteInputFileConfirmation;    /**< User's request to avoid confirmation prompt for input file deletion.*/
-    bool m_bHisIdSpecified;                 /**< User specified a "his_id" field to be used if that info is present in the input file.*/
+    bool m_bGuiMode;                     /**< Object running in GUI mode.*/
+    bool m_bDeleteInputFileAfter;        /**< User's request to delete the input file after anonymization.*/
+    bool m_bDeleteInputFileConfirmation; /**< User's request to avoid confirmation prompt for input file deletion.*/
+    bool m_bHisIdSpecified;              /**< User specified a "his_id" field to be used if that info is present in the input file.*/
 
 private:
-    bool m_bVerboseMode;                    /**< Show header when executing.*/
-    bool m_bSilentMode;                     /**< Avoid any message to the user.*/
-    bool m_bInOutFileNamesEqual;            /**< Flags user's request to have both input and output files with the same name.*/
-    bool m_bInputFileDeleted;               /**< Flags if the input file has been deleted. */
-    bool m_bOutFileRenamed;                 /**< Flags if the output file has been renamed to match the name the input file had. */
+    bool m_bVerboseMode;         /**< Show header when executing.*/
+    bool m_bSilentMode;          /**< Avoid any message to the user.*/
+    bool m_bInOutFileNamesEqual; /**< Flags user's request to have both input and output files with the same name.*/
+    bool m_bInputFileDeleted;    /**< Flags if the input file has been deleted. */
+    bool m_bOutFileRenamed;      /**< Flags if the output file has been renamed to match the name the input file had. */
 };
 
 //=============================================================================================================
@@ -250,8 +249,7 @@ private:
 
 inline void SettingsControllerCl::printIfVerbose(const QString& str) const
 {
-    if(m_bVerboseMode)
-    {
+    if (m_bVerboseMode) {
         std::printf("\n%s", str.toUtf8().data());
     }
 }

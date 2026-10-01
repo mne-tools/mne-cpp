@@ -97,7 +97,7 @@ void TestRtcMneCmne::cleanupTestCase()
 QString TestRtcMneCmne::resolveModelCheckpoint() const
 {
     const QString sFromEnv = QProcessEnvironment::systemEnvironment().value(QStringLiteral("CMNE_MODEL_CHECKPOINT"));
-    if(!sFromEnv.isEmpty() && QFileInfo::exists(sFromEnv)) {
+    if (!sFromEnv.isEmpty() && QFileInfo::exists(sFromEnv)) {
         return sFromEnv;
     }
     const QString sShipped = QStringLiteral(MNE_CMNE_SMOKE_MODEL);
@@ -111,8 +111,8 @@ MatrixXd TestRtcMneCmne::buildSyntheticGain(int nChannels, int nSources, unsigne
     std::mt19937 gen(seed);
     std::normal_distribution<double> nd(0.0, 1.0);
     MatrixXd m(nChannels, nSources);
-    for(int r = 0; r < nChannels; ++r) {
-        for(int c = 0; c < nSources; ++c) {
+    for (int r = 0; r < nChannels; ++r) {
+        for (int c = 0; c < nSources; ++c) {
             m(r, c) = nd(gen);
         }
     }
@@ -131,11 +131,11 @@ MatrixXd TestRtcMneCmne::buildDiagonalCov(int n, double variance) const
 void TestRtcMneCmne::testSettingsRoundTrip()
 {
     InvCMNESettings settings;
-    settings.onnxModelPath     = QStringLiteral("/tmp/imaginary_checkpoint.onnx");
-    settings.lambda2           = 1.0 / 9.0;
-    settings.numSources        = 16;
-    settings.lookBack          = 4;
-    settings.method            = 1;
+    settings.onnxModelPath = QStringLiteral("/tmp/imaginary_checkpoint.onnx");
+    settings.lambda2 = 1.0 / 9.0;
+    settings.numSources = 16;
+    settings.lookBack = 4;
+    settings.method = 1;
     settings.looseOriConstraint = 0.2;
 
     QCOMPARE(settings.onnxModelPath, QStringLiteral("/tmp/imaginary_checkpoint.onnx"));
@@ -151,24 +151,24 @@ void TestRtcMneCmne::testSettingsRoundTrip()
 void TestRtcMneCmne::testCmneInverseSmoke()
 {
     const QString sCheckpoint = resolveModelCheckpoint();
-    if(sCheckpoint.isEmpty()) {
+    if (sCheckpoint.isEmpty()) {
         QSKIP("No CMNE model checkpoint available (set CMNE_MODEL_CHECKPOINT to a valid .onnx file).");
     }
 
     const int nChannels = 32;
-    const int nSources  = 16;
-    const int nTimes    = 16;
+    const int nSources = 16;
+    const int nTimes = 16;
 
-    const MatrixXd matGain     = buildSyntheticGain(nChannels, nSources);
+    const MatrixXd matGain = buildSyntheticGain(nChannels, nSources);
     const MatrixXd matNoiseCov = buildDiagonalCov(nChannels);
-    const MatrixXd matSrcCov   = buildDiagonalCov(nSources);
-    const MatrixXd matEvoked   = MatrixXd::Random(nChannels, nTimes);
+    const MatrixXd matSrcCov = buildDiagonalCov(nSources);
+    const MatrixXd matEvoked = MatrixXd::Random(nChannels, nTimes);
 
     InvCMNESettings settings;
     settings.onnxModelPath = sCheckpoint;
-    settings.numSources    = nSources;
-    settings.lookBack      = 4;
-    settings.lambda2       = 1.0 / 9.0;
+    settings.numSources = nSources;
+    settings.lookBack = 4;
+    settings.lambda2 = 1.0 / 9.0;
 
     const InvCMNEResult res = InvCMNE::compute(matEvoked, matGain, matNoiseCov, matSrcCov, settings);
 

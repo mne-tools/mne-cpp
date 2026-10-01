@@ -53,7 +53,7 @@ void RtHpiWorker::doWork(const Eigen::MatrixXd& matData,
                          const InvHpiModelParameters& hpiModelParameters,
                          const Eigen::MatrixXd& matCoilsHead)
 {
-    if(this->thread()->isInterruptionRequested()) {
+    if (this->thread()->isInterruptionRequested()) {
         return;
     }
 
@@ -75,16 +75,16 @@ void RtHpiWorker::doWork(const Eigen::MatrixXd& matData,
 // DEFINE MEMBER METHODS RtHpi
 //=============================================================================================================
 
-RtHpi::RtHpi(const InvSensorSet sensorSet, QObject *parent)
-: QObject(parent),
-  m_sensorSet(sensorSet)
+RtHpi::RtHpi(const InvSensorSet sensorSet, QObject* parent)
+: QObject(parent)
+, m_sensorSet(sensorSet)
 {
     qRegisterMetaType<INVLIB::HpiFitResult>("INVLIB::HpiFitResult");
-    qRegisterMetaType<QVector<int> >("QVector<int>");
-    qRegisterMetaType<QSharedPointer<FIFFLIB::FiffInfo> >("QSharedPointer<FIFFLIB::FiffInfo>");
+    qRegisterMetaType<QVector<int>>("QVector<int>");
+    qRegisterMetaType<QSharedPointer<FIFFLIB::FiffInfo>>("QSharedPointer<FIFFLIB::FiffInfo>");
     qRegisterMetaType<Eigen::MatrixXd>("Eigen::MatrixXd");
 
-    RtHpiWorker *worker = new RtHpiWorker(m_sensorSet);
+    RtHpiWorker* worker = new RtHpiWorker(m_sensorSet);
     worker->moveToThread(&m_workerThread);
 
     connect(&m_workerThread, &QThread::finished,
@@ -108,9 +108,9 @@ RtHpi::~RtHpi()
 
 //=============================================================================================================
 
-void RtHpi::append(const MatrixXd &data)
+void RtHpi::append(const MatrixXd& data)
 {
-    if(m_modelParameters.iNHpiCoils() >= 3) {
+    if (m_modelParameters.iNHpiCoils() >= 3) {
         emit operate(data,
                      m_matProjectors,
                      m_modelParameters,
@@ -154,7 +154,7 @@ void RtHpi::restart()
 {
     stop();
 
-    RtHpiWorker *worker = new RtHpiWorker(m_sensorSet);
+    RtHpiWorker* worker = new RtHpiWorker(m_sensorSet);
     worker->moveToThread(&m_workerThread);
 
     connect(&m_workerThread, &QThread::finished,

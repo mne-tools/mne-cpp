@@ -54,16 +54,17 @@ namespace DISP3DLIB
  * MRI slices) renders before translucent overlays (source-estimate, sensor,
  * dipole, electrode highlights, network graph).
  */
-enum class SceneLayerKind {
-    BrainSurface = 0,    /**< Cortical or BEM surface. */
-    MriSlice,            /**< MRI orthogonal slice. */
-    Sensor,              /**< MEG/EEG sensor positions. */
-    Helmet,              /**< MEG helmet shell. */
-    Electrode,           /**< sEEG / ECoG electrode array. */
-    Dipole,              /**< Dipole renderable. */
-    SourceOverlay,       /**< Source-estimate activation overlay. */
-    Network,             /**< Connectivity network graph. */
-    Custom               /**< Host-app-specific renderable. */
+enum class SceneLayerKind
+{
+    BrainSurface = 0, /**< Cortical or BEM surface. */
+    MriSlice,         /**< MRI orthogonal slice. */
+    Sensor,           /**< MEG/EEG sensor positions. */
+    Helmet,           /**< MEG helmet shell. */
+    Electrode,        /**< sEEG / ECoG electrode array. */
+    Dipole,           /**< Dipole renderable. */
+    SourceOverlay,    /**< Source-estimate activation overlay. */
+    Network,          /**< Connectivity network graph. */
+    Custom            /**< Host-app-specific renderable. */
 };
 
 //=============================================================================================================
@@ -82,13 +83,13 @@ enum class SceneLayerKind {
  */
 struct DISP3DSHARED_EXPORT SceneLayer
 {
-    QString                  id;              /**< Caller-supplied unique id ("cortex_lh", "seeg_LH", "mri_axial"). */
-    QString                  displayName;     /**< Human-readable label for the scene tree dock. */
-    SceneLayerKind           kind = SceneLayerKind::Custom;
-    bool                     visible = true;
-    float                    opacity = 1.0f;
-    int                      drawOrder = 0;   /**< Tie-breaker within the same kind. */
-    std::shared_ptr<void>    payload;          /**< Renderable-specific data (ElectrodeObject, SliceObject, BrainSurface, …). */
+    QString id;          /**< Caller-supplied unique id ("cortex_lh", "seeg_LH", "mri_axial"). */
+    QString displayName; /**< Human-readable label for the scene tree dock. */
+    SceneLayerKind kind = SceneLayerKind::Custom;
+    bool visible = true;
+    float opacity = 1.0f;
+    int drawOrder = 0;             /**< Tie-breaker within the same kind. */
+    std::shared_ptr<void> payload; /**< Renderable-specific data (ElectrodeObject, SliceObject, BrainSurface, …). */
 };
 
 //=============================================================================================================
@@ -329,15 +330,15 @@ signals:
     void picked(const DISP3DLIB::PickResult& pick);
 
 private:
-    QVector<SceneLayer>                       m_layers;       /**< Insertion-ordered layers. */
-    QHash<QString, int>                       m_indexById;     /**< id -> position in m_layers. */
-    QHash<int, BoundsFn>                      m_boundsFns;     /**< kind -> AABB extractor. */
-    int                                       m_currentTimeSample = -1;
-    double                                    m_timeCursor = 0.0;
-    float                                     m_overlayFmin = 0.0f;
-    float                                     m_overlayFmid = 0.5f;
-    float                                     m_overlayFmax = 1.0f;
-    PickResult                                m_lastPick;
+    QVector<SceneLayer> m_layers;     /**< Insertion-ordered layers. */
+    QHash<QString, int> m_indexById;  /**< id -> position in m_layers. */
+    QHash<int, BoundsFn> m_boundsFns; /**< kind -> AABB extractor. */
+    int m_currentTimeSample = -1;
+    double m_timeCursor = 0.0;
+    float m_overlayFmin = 0.0f;
+    float m_overlayFmid = 0.5f;
+    float m_overlayFmax = 1.0f;
+    PickResult m_lastPick;
 
     /** Re-sort m_layers by (kind, drawOrder, insertion) and refresh m_indexById. */
     void rebuildOrder();

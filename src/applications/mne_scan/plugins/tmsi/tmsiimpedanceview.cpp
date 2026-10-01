@@ -29,7 +29,7 @@ using namespace std;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-TMSIImpedanceView::TMSIImpedanceView(QWidget *parent)
+TMSIImpedanceView::TMSIImpedanceView(QWidget* parent)
 : QGraphicsView(parent)
 {
     // Enable scene interactions
@@ -53,11 +53,11 @@ TMSIImpedanceView::TMSIImpedanceView(QWidget *parent)
 
 void TMSIImpedanceView::wheelEvent(QWheelEvent* event)
 {
-    if(event->angleDelta().y()>0) // wheel was rotated forward
-        this->scale(1.25,1.25);
+    if (event->angleDelta().y() > 0) // wheel was rotated forward
+        this->scale(1.25, 1.25);
 
-    if(event->angleDelta().y()<0) // wheel was rotated backward
-        this->scale(0.75,0.75);
+    if (event->angleDelta().y() < 0) // wheel was rotated backward
+        this->scale(0.75, 0.75);
 
     // Don't call superclass handler here as wheel is normally used for moving scrollbars
     //QGraphicsView::wheelEvent(event);

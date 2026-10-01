@@ -71,7 +71,7 @@ void TestEpochs::initTestCase()
 {
     m_nCh = 4;
     m_sFreq = 100.0;
-    m_nTimes = 1000;  // 10 seconds
+    m_nTimes = 1000; // 10 seconds
 
     // Create simple ramp data for easy verification
     m_data = MatrixXd(m_nCh, m_nTimes);
@@ -129,7 +129,7 @@ void TestEpochs::testFixedLengthKeepLast()
 {
     // 10 seconds, 3 second epochs, keep last
     auto epochsKeep = FiffEpochs::makeFixedLengthEpochs(m_data, m_sFreq, 3.0, 0.0, false);
-    QCOMPARE(epochsKeep.size(), 4);  // 3 full + 1 partial
+    QCOMPARE(epochsKeep.size(), 4); // 3 full + 1 partial
 
     // Last epoch should be shorter (100 samples = 1 second)
     QCOMPARE(static_cast<int>(epochsKeep.last().data.cols()), 100);

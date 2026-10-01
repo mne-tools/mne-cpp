@@ -58,9 +58,9 @@ BadChannelsMaxwellResult UTILSLIB::findBadChannelsMaxwell(
 
     // Build SSS basis
     SSSParams sssParams;
-    sssParams.iOrderIn  = params.iOrderIn;
+    sssParams.iOrderIn = params.iOrderIn;
     sssParams.iOrderOut = params.iOrderOut;
-    sssParams.origin    = params.origin;
+    sssParams.origin = params.origin;
 
     SSS::Basis basis = SSS::computeBasis(info, sssParams);
 
@@ -117,7 +117,8 @@ BadChannelsMaxwellResult UTILSLIB::findBadChannelsMaxwell(
 
     // Robust scale: MAD * 1.4826 (consistency constant for normal distribution)
     double scale = mad * 1.4826;
-    if (scale < 1e-30) scale = 1e-30;
+    if (scale < 1e-30)
+        scale = 1e-30;
 
     result.zScores.resize(nMeg);
     for (int i = 0; i < nMeg; ++i) {
@@ -135,8 +136,8 @@ BadChannelsMaxwellResult UTILSLIB::findBadChannelsMaxwell(
         }
     }
 
-qInfo("[findBadChannelsMaxwell] Detected %lld bad channel(s) out of %d MEG channels.",
-           static_cast<long long>(result.badChannels.size()), nMeg);
+    qInfo("[findBadChannelsMaxwell] Detected %lld bad channel(s) out of %d MEG channels.",
+          static_cast<long long>(result.badChannels.size()), nMeg);
 
     return result;
 }

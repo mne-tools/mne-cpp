@@ -52,11 +52,11 @@ using namespace UTILSLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-InvBeamformer InvLCMV::makeLCMV([[maybe_unused]] const FiffInfo &info,
-                                const MNEForwardSolution &forward,
-                                const FiffCov &dataCov,
+InvBeamformer InvLCMV::makeLCMV([[maybe_unused]] const FiffInfo& info,
+                                const MNEForwardSolution& forward,
+                                const FiffCov& dataCov,
                                 double reg,
-                                const FiffCov &noiseCov,
+                                const FiffCov& noiseCov,
                                 BeamformerPickOri pickOri,
                                 BeamformerWeightNorm weightNorm,
                                 bool reduceRank,
@@ -68,12 +68,12 @@ InvBeamformer InvLCMV::makeLCMV([[maybe_unused]] const FiffInfo &info,
     // -----------------------------------------------------------------------
     // Extract leadfield G from forward solution
     // -----------------------------------------------------------------------
-    if(!forward.sol || forward.sol->data.size() == 0) {
+    if (!forward.sol || forward.sol->data.size() == 0) {
         qWarning("InvLCMV::makeLCMV - Forward solution has no gain matrix!");
         return result;
     }
 
-    MatrixXd G = forward.sol->data;  // (n_channels, n_sources * n_orient)
+    MatrixXd G = forward.sol->data; // (n_channels, n_sources * n_orient)
     const int nChannels = static_cast<int>(G.rows());
     const int nOrient = (forward.source_ori == FIFFV_MNE_FREE_ORI) ? 3 : 1;
     const int nSources = static_cast<int>(G.cols()) / nOrient;
@@ -85,12 +85,12 @@ InvBeamformer InvLCMV::makeLCMV([[maybe_unused]] const FiffInfo &info,
     // Build whitening matrix from noise covariance
     // -----------------------------------------------------------------------
     MatrixXd whitener;
-    if(noiseCov.data.size() > 0) {
+    if (noiseCov.data.size() > 0) {
         // Compute whitener from noise covariance eigendecomposition
         //   whitener = diag(1/sqrt(eig)) @ eigvec^T
-        if(noiseCov.eig.size() > 0 && noiseCov.eigvec.size() > 0) {
+        if (noiseCov.eig.size() > 0 && noiseCov.eigvec.size() > 0) {
             VectorXd invSqrtEig(noiseCov.eig.size());
-            for(int i = 0; i < noiseCov.eig.size(); ++i) {
+            for (int i = 0; i < noiseCov.eig.size(); ++i) {
                 invSqrtEig(i) = (noiseCov.eig(i) > 1e-30)
                     ? 1.0 / std::sqrt(noiseCov.eig(i))
                     : 0.0;
@@ -119,7 +119,7 @@ InvBeamformer InvLCMV::makeLCMV([[maybe_unused]] const FiffInfo &info,
     MatrixXd Gw = whitener * G;
 
     MatrixXd CmData = dataCov.data;
-    if(CmData.rows() != nChannels || CmData.cols() != nChannels) {
+    if (CmData.rows() != nChannels || CmData.cols() != nChannels) {
         qWarning("InvLCMV::makeLCMV - Data covariance dimension (%d x %d) "
                  "does not match leadfield channels (%d)!",
                  static_cast<int>(CmData.rows()), static_cast<int>(CmData.cols()), nChannels);
@@ -146,7 +146,7 @@ InvBeamformer InvLCMV::makeLCMV([[maybe_unused]] const FiffInfo &info,
         weightNorm, pickOri, reduceRank, invMethod,
         nn, W, mpOri);
 
-    if(!ok) {
+    if (!ok) {
         qWarning("InvLCMV::makeLCMV - Beamformer computation failed!");
         return result;
     }
@@ -158,8 +158,7 @@ InvBeamformer InvLCMV::makeLCMV([[maybe_unused]] const FiffInfo &info,
     result.whitener = whitener;
     result.proj = projMat;
     result.chNames = forward.sol->row_names;
-    result.isFreOri = (nOrient == 3 && pickOri != BeamformerPickOri::Normal
-                                    && pickOri != BeamformerPickOri::MaxPower);
+    result.isFreOri = (nOrient == 3 && pickOri != BeamformerPickOri::Normal && pickOri != BeamformerPickOri::MaxPower);
     result.nSourcesTotal = nSources;
     result.srcType = "surface";
     result.weightNorm = weightNorm;
@@ -172,14 +171,14 @@ InvBeamformer InvLCMV::makeLCMV([[maybe_unused]] const FiffInfo &info,
 
     // Vertex indices
     VectorXi verts(0);
-    if(forward.src.size() >= 2) {
+    if (forward.src.size() >= 2) {
         verts.resize(forward.src[0].vertno.size() + forward.src[1].vertno.size());
         verts << forward.src[0].vertno, forward.src[1].vertno;
         // Keep where the left hemisphere ends. The concatenation above is the
         // only place that knows it, and without it the result cannot be
         // written as the -lh/-rh pair mne-python expects.
         result.nVerticesLh = static_cast<int>(forward.src[0].vertno.size());
-    } else if(forward.src.size() == 1) {
+    } else if (forward.src.size() == 1) {
         verts = forward.src[0].vertno;
     }
     result.vertices = verts;
@@ -192,18 +191,18 @@ InvBeamformer InvLCMV::makeLCMV([[maybe_unused]] const FiffInfo &info,
 
 //=============================================================================================================
 
-MatrixXd InvLCMV::applyFilter(const MatrixXd &data, const InvBeamformer &filters)
+MatrixXd InvLCMV::applyFilter(const MatrixXd& data, const InvBeamformer& filters)
 {
     // Apply projection + whitening + spatial filter
     MatrixXd processed = data;
 
     // Project
-    if(filters.proj.size() > 0 && filters.proj.rows() == data.rows()) {
+    if (filters.proj.size() > 0 && filters.proj.rows() == data.rows()) {
         processed = filters.proj * processed;
     }
 
     // Whiten
-    if(filters.whitener.size() > 0 && filters.whitener.cols() == processed.rows()) {
+    if (filters.whitener.size() > 0 && filters.whitener.cols() == processed.rows()) {
         processed = filters.whitener * processed;
     }
 
@@ -213,24 +212,24 @@ MatrixXd InvLCMV::applyFilter(const MatrixXd &data, const InvBeamformer &filters
 
 //=============================================================================================================
 
-InvSourceEstimate InvLCMV::applyLCMV(const FiffEvoked &evoked, const InvBeamformer &filters)
+InvSourceEstimate InvLCMV::applyLCMV(const FiffEvoked& evoked, const InvBeamformer& filters)
 {
-    if(!filters.isValid() || filters.kind != "LCMV") {
+    if (!filters.isValid() || filters.kind != "LCMV") {
         qWarning("InvLCMV::applyLCMV - Invalid or non-LCMV filters!");
         return InvSourceEstimate();
     }
 
     // Pick channels from evoked to match filter channel order
     MatrixXd data;
-    if(filters.chNames.size() > 0 &&
-       static_cast<int>(filters.chNames.size()) != evoked.data.rows()) {
+    if (filters.chNames.size() > 0 &&
+        static_cast<int>(filters.chNames.size()) != evoked.data.rows()) {
         // Need to select and reorder channels
         const int nFilterCh = static_cast<int>(filters.chNames.size());
         const int nTimes = static_cast<int>(evoked.data.cols());
         data.resize(nFilterCh, nTimes);
-        for(int i = 0; i < nFilterCh; ++i) {
+        for (int i = 0; i < nFilterCh; ++i) {
             int idx = evoked.info.ch_names.indexOf(filters.chNames[i]);
-            if(idx < 0) {
+            if (idx < 0) {
                 qWarning("InvLCMV::applyLCMV - Channel %s not found in evoked!",
                          qPrintable(filters.chNames[i]));
                 return InvSourceEstimate();
@@ -245,12 +244,12 @@ InvSourceEstimate InvLCMV::applyLCMV(const FiffEvoked &evoked, const InvBeamform
 
     // Combine XYZ for free orientation if needed
     const int nOrient = filters.nOrient();
-    if(nOrient == 3 && filters.pickOri != BeamformerPickOri::Vector) {
+    if (nOrient == 3 && filters.pickOri != BeamformerPickOri::Vector) {
         // Combine: sqrt(x^2 + y^2 + z^2) per source per time
         const int nSources = static_cast<int>(sol.rows()) / 3;
         const int nTimes = static_cast<int>(sol.cols());
         MatrixXd combined(nSources, nTimes);
-        for(int s = 0; s < nSources; ++s) {
+        for (int s = 0; s < nSources; ++s) {
             combined.row(s) = sol.middleRows(s * 3, 3).colwise().norm();
         }
         sol = combined;
@@ -270,12 +269,12 @@ InvSourceEstimate InvLCMV::applyLCMV(const FiffEvoked &evoked, const InvBeamform
 
 //=============================================================================================================
 
-InvSourceEstimate InvLCMV::applyLCMVRaw(const MatrixXd &data,
+InvSourceEstimate InvLCMV::applyLCMVRaw(const MatrixXd& data,
                                         float tmin,
                                         float tstep,
-                                        const InvBeamformer &filters)
+                                        const InvBeamformer& filters)
 {
-    if(!filters.isValid() || filters.kind != "LCMV") {
+    if (!filters.isValid() || filters.kind != "LCMV") {
         qWarning("InvLCMV::applyLCMVRaw - Invalid or non-LCMV filters!");
         return InvSourceEstimate();
     }
@@ -283,11 +282,11 @@ InvSourceEstimate InvLCMV::applyLCMVRaw(const MatrixXd &data,
     MatrixXd sol = applyFilter(data, filters);
 
     const int nOrient = filters.nOrient();
-    if(nOrient == 3 && filters.pickOri != BeamformerPickOri::Vector) {
+    if (nOrient == 3 && filters.pickOri != BeamformerPickOri::Vector) {
         const int nSources = static_cast<int>(sol.rows()) / 3;
         const int nTimes = static_cast<int>(sol.cols());
         MatrixXd combined(nSources, nTimes);
-        for(int s = 0; s < nSources; ++s) {
+        for (int s = 0; s < nSources; ++s) {
             combined.row(s) = sol.middleRows(s * 3, 3).colwise().norm();
         }
         sol = combined;
@@ -304,17 +303,17 @@ InvSourceEstimate InvLCMV::applyLCMVRaw(const MatrixXd &data,
 
 //=============================================================================================================
 
-InvSourceEstimate InvLCMV::applyLCMVCov(const FiffCov &dataCov,
-                                        const InvBeamformer &filters)
+InvSourceEstimate InvLCMV::applyLCMVCov(const FiffCov& dataCov,
+                                        const InvBeamformer& filters)
 {
-    if(!filters.isValid() || filters.kind != "LCMV") {
+    if (!filters.isValid() || filters.kind != "LCMV") {
         qWarning("InvLCMV::applyLCMVCov - Invalid or non-LCMV filters!");
         return InvSourceEstimate();
     }
 
     // Whiten data covariance
     MatrixXd CmW = dataCov.data;
-    if(filters.whitener.size() > 0) {
+    if (filters.whitener.size() > 0) {
         CmW = filters.whitener * CmW * filters.whitener.transpose();
     }
 
@@ -322,7 +321,7 @@ InvSourceEstimate InvLCMV::applyLCMVCov(const FiffCov &dataCov,
     VectorXd power = InvBeamformerCompute::computePower(CmW, filters.weights[0], nOrient);
 
     // Return as 1-column source estimate
-    MatrixXd powerMat = power;  // (nSources, 1) implicitly via VectorXd
+    MatrixXd powerMat = power; // (nSources, 1) implicitly via VectorXd
 
     InvSourceEstimate stc(powerMat, filters.vertices, 0.0f, 1.0f);
     stc.method = InvEstimateMethod::LCMV;
@@ -335,10 +334,10 @@ InvSourceEstimate InvLCMV::applyLCMVCov(const FiffCov &dataCov,
 
 //=============================================================================================================
 
-QList<InvSourceEstimate> InvLCMV::applyLCMVEpochs(const QList<MatrixXd> &epochs,
-                                                    float tmin,
-                                                    float tstep,
-                                                    const InvBeamformer &filters)
+QList<InvSourceEstimate> InvLCMV::applyLCMVEpochs(const QList<MatrixXd>& epochs,
+                                                  float tmin,
+                                                  float tstep,
+                                                  const InvBeamformer& filters)
 {
     QList<InvSourceEstimate> results;
 
@@ -365,11 +364,11 @@ QList<InvSourceEstimate> InvLCMV::applyLCMVEpochs(const QList<MatrixXd> &epochs,
 //=============================================================================================================
 
 MatrixXd InvLCMV::makeLCMVResolutionMatrix(
-    const MNEForwardSolution &forward,
-    const FiffInfo &info,
-    const FiffCov &dataCov,
+    const MNEForwardSolution& forward,
+    const FiffInfo& info,
+    const FiffCov& dataCov,
     double reg,
-    const FiffCov &noiseCov)
+    const FiffCov& noiseCov)
 {
     // Build the LCMV filter
     InvBeamformer filters = makeLCMV(info, forward, dataCov, reg, noiseCov);

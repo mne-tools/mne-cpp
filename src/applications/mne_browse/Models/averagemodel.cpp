@@ -39,7 +39,7 @@ namespace
 
 QString baselineTextForEvoked(const FiffEvoked& evoked)
 {
-    if(evoked.baseline.first == 0.0f && evoked.baseline.second == 0.0f) {
+    if (evoked.baseline.first == 0.0f && evoked.baseline.second == 0.0f) {
         return QStringLiteral("off");
     }
 
@@ -56,7 +56,7 @@ QString baselineTextForEvoked(const FiffEvoked& evoked)
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-AverageModel::AverageModel(QObject *parent)
+AverageModel::AverageModel(QObject* parent)
 : QAbstractTableModel(parent)
 , m_bFileloaded(false)
 , m_pEvokedDataSet(FiffEvokedSet::SPtr(new FiffEvokedSet))
@@ -67,7 +67,7 @@ AverageModel::AverageModel(QObject *parent)
 
 //*************************************************************************************************************
 
-AverageModel::AverageModel(QFile& qFile, QObject *parent)
+AverageModel::AverageModel(QFile& qFile, QObject* parent)
 : QAbstractTableModel(parent)
 , m_bFileloaded(false)
 , m_pEvokedDataSet(FiffEvokedSet::SPtr(new FiffEvokedSet))
@@ -80,10 +80,10 @@ AverageModel::AverageModel(QFile& qFile, QObject *parent)
 
 //*************************************************************************************************************
 //virtual functions
-int AverageModel::rowCount(const QModelIndex & /*parent*/) const
+int AverageModel::rowCount(const QModelIndex& /*parent*/) const
 {
     //Return number of stored evoked sets
-    if(!(m_pEvokedDataSet->evoked.size()==0))
+    if (!(m_pEvokedDataSet->evoked.size() == 0))
         return m_pEvokedDataSet->evoked.size();
     else
         return 0;
@@ -92,7 +92,7 @@ int AverageModel::rowCount(const QModelIndex & /*parent*/) const
 
 //*************************************************************************************************************
 
-int AverageModel::columnCount(const QModelIndex & /*parent*/) const
+int AverageModel::columnCount(const QModelIndex& /*parent*/) const
 {
     return 6;
 }
@@ -102,18 +102,18 @@ int AverageModel::columnCount(const QModelIndex & /*parent*/) const
 
 QVariant AverageModel::headerData(int section, Qt::Orientation orientation, int role) const
 {
-    if(role != Qt::DisplayRole && role != Qt::TextAlignmentRole)
+    if (role != Qt::DisplayRole && role != Qt::TextAlignmentRole)
         return QVariant();
 
     //Return the number and description/comment of the fiff evoked data in the set as vertical header
-    if(orientation == Qt::Vertical) {
-        if(section<m_pEvokedDataSet->evoked.size())
+    if (orientation == Qt::Vertical) {
+        if (section < m_pEvokedDataSet->evoked.size())
             return QString("Set %1").arg(section);
     }
 
     //Return the horizontal header
-    if(orientation == Qt::Horizontal) {
-        switch(section) {
+    if (orientation == Qt::Horizontal) {
+        switch (section) {
             case 0:
                 return QString("%1").arg("Comment");
 
@@ -140,18 +140,18 @@ QVariant AverageModel::headerData(int section, Qt::Orientation orientation, int 
 
 //*************************************************************************************************************
 
-QVariant AverageModel::data(const QModelIndex &index, int role) const
+QVariant AverageModel::data(const QModelIndex& index, int role) const
 {
-    if(!index.isValid() || index.row() >= m_pEvokedDataSet->evoked.size())
+    if (!index.isValid() || index.row() >= m_pEvokedDataSet->evoked.size())
         return QVariant();
 
     const FiffEvoked& evoked = m_pEvokedDataSet->evoked.at(index.row());
 
-    if(role == Qt::TextAlignmentRole) {
+    if (role == Qt::TextAlignmentRole) {
         return QVariant(Qt::AlignHCenter | Qt::AlignVCenter);
     }
 
-    switch(role) {
+    switch (role) {
         case AverageModelRoles::GetComment:
             return QVariant(evoked.comment);
         case AverageModelRoles::GetAspectKind:
@@ -174,7 +174,7 @@ QVariant AverageModel::data(const QModelIndex &index, int role) const
         }
         case AverageModelRoles::GetFiffInfo: {
             QVariant v;
-            const FiffInfo *fiffInfo = &evoked.info;
+            const FiffInfo* fiffInfo = &evoked.info;
             v.setValue(fiffInfo);
             return v;
         }
@@ -198,40 +198,40 @@ QVariant AverageModel::data(const QModelIndex &index, int role) const
             break;
     }
 
-    if(role != Qt::DisplayRole) {
+    if (role != Qt::DisplayRole) {
         return QVariant();
     }
 
     if (index.isValid()) {
         //******** first column (evoked set comment) ********
-        if(index.column()==0) {
+        if (index.column() == 0) {
             return QString("%1").arg(evoked.comment);
-        }//end column check
+        } //end column check
 
         //******** second column (kept epochs) ********
-        if(index.column()==1) {
+        if (index.column() == 1) {
             return QString::number(evoked.nave);
-        }//end column check
+        } //end column check
 
         //******** third column (baseline window) ********
-        if(index.column()==2) {
+        if (index.column() == 2) {
             return baselineTextForEvoked(evoked);
-        }//end column check
+        } //end column check
 
         //******** fourth column (evoked set first sample) ********
-        if(index.column()==3) {
+        if (index.column() == 3) {
             return QString("%1").arg(evoked.first);
-        }//end column check
+        } //end column check
 
         //******** fifth column (evoked set last sample) ********
-        if(index.column()==4) {
+        if (index.column() == 4) {
             return QString("%1").arg(evoked.last);
-        }//end column check
+        } //end column check
 
         //******** sixth column (evoked set internal data handle) ********
-        if(index.column()==5) {
+        if (index.column() == 5) {
             return QStringLiteral("data");
-        }//end column check
+        } //end column check
     } // end index.valid() check
 
     return QVariant();
@@ -240,7 +240,7 @@ QVariant AverageModel::data(const QModelIndex &index, int role) const
 
 //*************************************************************************************************************
 
-bool AverageModel::insertRows(int position, int span, const QModelIndex & parent)
+bool AverageModel::insertRows(int position, int span, const QModelIndex& parent)
 {
     Q_UNUSED(position);
     Q_UNUSED(span);
@@ -252,7 +252,7 @@ bool AverageModel::insertRows(int position, int span, const QModelIndex & parent
 
 //*************************************************************************************************************
 
-bool AverageModel::removeRows(int position, int span, const QModelIndex & parent)
+bool AverageModel::removeRows(int position, int span, const QModelIndex& parent)
 {
     Q_UNUSED(position);
     Q_UNUSED(span);
@@ -264,7 +264,7 @@ bool AverageModel::removeRows(int position, int span, const QModelIndex & parent
 
 //*************************************************************************************************************
 
-Qt::ItemFlags AverageModel::flags(const QModelIndex & index) const
+Qt::ItemFlags AverageModel::flags(const QModelIndex& index) const
 {
     Q_UNUSED(index);
     return Qt::ItemIsEnabled | Qt::ItemIsSelectable /*| Qt::ItemIsEditable*/;
@@ -273,7 +273,7 @@ Qt::ItemFlags AverageModel::flags(const QModelIndex & index) const
 
 //*************************************************************************************************************
 
-bool AverageModel::setData(const QModelIndex & index, const QVariant & value, int role)
+bool AverageModel::setData(const QModelIndex& index, const QVariant& value, int role)
 {
     Q_UNUSED(index);
     Q_UNUSED(value);
@@ -307,14 +307,14 @@ bool AverageModel::setEvokedData(const FiffEvokedSet& evokedSet)
 
     endResetModel();
 
-    if(!m_bFileloaded) {
+    if (!m_bFileloaded) {
         qWarning("AverageModel: ERROR! Data set does not contain any evoked data!");
         emit fileLoaded(false);
         return false;
     }
 
     emit fileLoaded(true);
-    emit dataChanged(createIndex(0,0), createIndex(rowCount() - 1,columnCount() - 1));
+    emit dataChanged(createIndex(0, 0), createIndex(rowCount() - 1, columnCount() - 1));
 
     return true;
 }
@@ -324,7 +324,7 @@ bool AverageModel::setEvokedData(const FiffEvokedSet& evokedSet)
 
 bool AverageModel::saveEvokedData(QFile& qFile)
 {
-    if(!m_bFileloaded || !m_pEvokedDataSet || m_pEvokedDataSet->evoked.isEmpty()) {
+    if (!m_bFileloaded || !m_pEvokedDataSet || m_pEvokedDataSet->evoked.isEmpty()) {
         qWarning("AverageModel: ERROR! No evoked data available for saving.");
         return false;
     }
@@ -337,7 +337,7 @@ bool AverageModel::saveEvokedData(QFile& qFile)
 
 const FiffEvoked* AverageModel::getEvoked(int row) const
 {
-    if(!m_bFileloaded || !m_pEvokedDataSet || row < 0 || row >= m_pEvokedDataSet->evoked.size()) {
+    if (!m_bFileloaded || !m_pEvokedDataSet || row < 0 || row >= m_pEvokedDataSet->evoked.size()) {
         return nullptr;
     }
 

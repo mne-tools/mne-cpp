@@ -43,8 +43,9 @@ class QScrollArea;
 class QSpinBox;
 class QVBoxLayout;
 
-namespace FIFFLIB {
-    class FiffInfo;
+namespace FIFFLIB
+{
+class FiffInfo;
 }
 
 //=============================================================================================================
@@ -68,7 +69,7 @@ class IcaWindow : public QDockWidget
     Q_OBJECT
 
 public:
-    explicit IcaWindow(QWidget *parent = nullptr);
+    explicit IcaWindow(QWidget* parent = nullptr);
 
     void init();
 
@@ -77,8 +78,8 @@ signals:
      * Emitted when the user applies component exclusion.
      * @param[in] cleanedData  Channels × samples matrix after removing excluded components.
      */
-    void icaCleaned(const Eigen::MatrixXd &cleanedData);
-    void icaReset(const Eigen::MatrixXd &originalData);
+    void icaCleaned(const Eigen::MatrixXd& cleanedData);
+    void icaReset(const Eigen::MatrixXd& originalData);
 
 public slots:
     /**
@@ -88,7 +89,7 @@ public slots:
      * @param[in] fiffInfo   Shared pointer to FiffInfo for channel names.
      * @param[in] firstSample Absolute sample index of column 0.
      */
-    void setRawData(const Eigen::MatrixXd &rawData,
+    void setRawData(const Eigen::MatrixXd& rawData,
                     QSharedPointer<FIFFLIB::FiffInfo> fiffInfo,
                     int firstSample = 0);
 
@@ -105,27 +106,27 @@ private:
     QImage renderComponentWaveform(int compIdx, int width, int height) const;
 
     // UI elements
-    QWidget      *m_pCentralWidget = nullptr;
-    QVBoxLayout  *m_pMainLayout    = nullptr;
-    QSpinBox     *m_pNComponentsSpin = nullptr;
-    QPushButton  *m_pComputeButton = nullptr;
-    QPushButton  *m_pApplyButton   = nullptr;
-    QPushButton  *m_pResetButton   = nullptr;
-    QScrollArea  *m_pScrollArea    = nullptr;
-    QWidget      *m_pComponentListWidget = nullptr;
-    QVBoxLayout  *m_pComponentListLayout = nullptr;
-    QLabel       *m_pStatusLabel   = nullptr;
+    QWidget* m_pCentralWidget = nullptr;
+    QVBoxLayout* m_pMainLayout = nullptr;
+    QSpinBox* m_pNComponentsSpin = nullptr;
+    QPushButton* m_pComputeButton = nullptr;
+    QPushButton* m_pApplyButton = nullptr;
+    QPushButton* m_pResetButton = nullptr;
+    QScrollArea* m_pScrollArea = nullptr;
+    QWidget* m_pComponentListWidget = nullptr;
+    QVBoxLayout* m_pComponentListLayout = nullptr;
+    QLabel* m_pStatusLabel = nullptr;
 
     QVector<QCheckBox*> m_componentCheckboxes;
 
     // Data
-    Eigen::MatrixXd                     m_rawData;
-    QSharedPointer<FIFFLIB::FiffInfo>   m_pFiffInfo;
-    int                                 m_firstSample = 0;
+    Eigen::MatrixXd m_rawData;
+    QSharedPointer<FIFFLIB::FiffInfo> m_pFiffInfo;
+    int m_firstSample = 0;
 
     // ICA result
-    UTILSLIB::IcaResult                 m_icaResult;
-    bool                                m_bHasResult = false;
+    UTILSLIB::IcaResult m_icaResult;
+    bool m_bHasResult = false;
 };
 
 } // namespace MNEBROWSE

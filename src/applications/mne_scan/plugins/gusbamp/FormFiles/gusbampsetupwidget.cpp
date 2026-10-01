@@ -92,11 +92,11 @@ void GUSBAmpSetupWidget::showAboutDialog()
 
 //=============================================================================================================
 
-void GUSBAmpSetupWidget::on_comboBox_currentIndexChanged(const QString &arg1)
+void GUSBAmpSetupWidget::on_comboBox_currentIndexChanged(const QString& arg1)
 {
     bool ok;
     QString sampleRate = arg1;
-    m_pGUSBAmp->m_iSampleRate = sampleRate.toInt(&ok,10); //QString to int
+    m_pGUSBAmp->m_iSampleRate = sampleRate.toInt(&ok, 10); //QString to int
 }
 
 //=============================================================================================================
@@ -110,35 +110,28 @@ void GUSBAmpSetupWidget::setSerialAdresses()
     QString slave2 = ui.slave2->text();
     QString slave3 = ui.slave3->text();
 
-    if(master.isEmpty())
-    {
-        QMessageBox::information(this,"ERROR - master serial", "ERROR set master: field master is not supposed to be empty!");
+    if (master.isEmpty()) {
+        QMessageBox::information(this, "ERROR - master serial", "ERROR set master: field master is not supposed to be empty!");
         return;
     }
     //master has to be first in the list
     ui.label->setText(master);
     serials.push_back(master);
 
-    if(!slave1.isEmpty())
-    {
+    if (!slave1.isEmpty()) {
         ui.label1->setText(slave1);
         serials.push_back(slave1);
-    }
-    else
+    } else
         ui.label1->clear();
-    if(!slave2.isEmpty())
-    {
+    if (!slave2.isEmpty()) {
         ui.label2->setText(slave2);
         serials.push_back(slave2);
-    }
-    else
+    } else
         ui.label2->clear();
-    if(!slave3.isEmpty())
-    {
+    if (!slave3.isEmpty()) {
         ui.label3->setText(slave3);
         serials.push_back(slave3);
-    }
-    else
+    } else
         ui.label3->clear();
 
     int size = serials.size();
@@ -153,59 +146,58 @@ void GUSBAmpSetupWidget::checkBoxes()
 {
     vector<int> list;
 
-    if(ui.m_checkBox_channel1->isChecked())
+    if (ui.m_checkBox_channel1->isChecked())
         list.push_back(1);
 
-    if(ui.m_checkBox_channel2->isChecked())
+    if (ui.m_checkBox_channel2->isChecked())
         list.push_back(2);
 
-    if(ui.m_checkBox_channel3->isChecked())
+    if (ui.m_checkBox_channel3->isChecked())
         list.push_back(3);
 
-    if(ui.m_checkBox_channel4->isChecked())
+    if (ui.m_checkBox_channel4->isChecked())
         list.push_back(4);
 
-    if(ui.m_checkBox_channel5->isChecked())
+    if (ui.m_checkBox_channel5->isChecked())
         list.push_back(5);
 
-    if(ui.m_checkBox_channel6->isChecked())
+    if (ui.m_checkBox_channel6->isChecked())
         list.push_back(6);
 
-    if(ui.m_checkBox_channel7->isChecked())
+    if (ui.m_checkBox_channel7->isChecked())
         list.push_back(7);
 
-    if(ui.m_checkBox_channel8->isChecked())
+    if (ui.m_checkBox_channel8->isChecked())
         list.push_back(8);
 
-    if(ui.m_checkBox_channel9->isChecked())
+    if (ui.m_checkBox_channel9->isChecked())
         list.push_back(9);
 
-    if(ui.m_checkBox_channel10->isChecked())
+    if (ui.m_checkBox_channel10->isChecked())
         list.push_back(10);
 
-    if(ui.m_checkBox_channel11->isChecked())
+    if (ui.m_checkBox_channel11->isChecked())
         list.push_back(11);
 
-    if(ui.m_checkBox_channel12->isChecked())
+    if (ui.m_checkBox_channel12->isChecked())
         list.push_back(12);
 
-    if(ui.m_checkBox_channel13->isChecked())
+    if (ui.m_checkBox_channel13->isChecked())
         list.push_back(13);
 
-    if(ui.m_checkBox_channel14->isChecked())
+    if (ui.m_checkBox_channel14->isChecked())
         list.push_back(14);
 
-    if(ui.m_checkBox_channel15->isChecked())
+    if (ui.m_checkBox_channel15->isChecked())
         list.push_back(15);
 
-    if(ui.m_checkBox_channel16->isChecked())
+    if (ui.m_checkBox_channel16->isChecked())
         list.push_back(16);
 
-    if(!list.empty())
-    {
-    //store the channels-to-acquire-list in the according member variable
-    m_pGUSBAmp->m_viChannelsToAcquire.resize(list.size());
-    m_pGUSBAmp->m_viChannelsToAcquire = list;
+    if (!list.empty()) {
+        //store the channels-to-acquire-list in the according member variable
+        m_pGUSBAmp->m_viChannelsToAcquire.resize(list.size());
+        m_pGUSBAmp->m_viChannelsToAcquire = list;
     }
 }
 
@@ -213,8 +205,7 @@ void GUSBAmpSetupWidget::checkBoxes()
 
 void GUSBAmpSetupWidget::activateChannelSelect(bool checked)
 {
-    if(!checked)
-    {
+    if (!checked) {
         ui.m_checkBox_channel1->setChecked(true);
         ui.m_checkBox_channel2->setChecked(true);
         ui.m_checkBox_channel3->setChecked(true);
@@ -235,8 +226,7 @@ void GUSBAmpSetupWidget::activateChannelSelect(bool checked)
         checkBoxes();
     }
 
-    if(checked)
-    {
+    if (checked) {
         ui.m_checkBox_channel1->setChecked(false);
         ui.m_checkBox_channel2->setChecked(false);
         ui.m_checkBox_channel3->setChecked(false);

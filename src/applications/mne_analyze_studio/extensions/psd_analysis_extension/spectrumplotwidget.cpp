@@ -85,7 +85,7 @@ void SpectrumPlotWidget::paintEvent(QPaintEvent* event)
     painter.setPen(QColor("#8b949e"));
     painter.drawText(QRect(rect().left(), 4, rect().width(), 18), Qt::AlignHCenter, m_title);
 
-    if(m_frequencies.isEmpty() || m_values.isEmpty() || m_frequencies.size() != m_values.size() || plotRect.width() <= 0) {
+    if (m_frequencies.isEmpty() || m_values.isEmpty() || m_frequencies.size() != m_values.size() || plotRect.width() <= 0) {
         painter.setPen(QColor("#8b949e"));
         painter.drawText(plotRect, Qt::AlignCenter, "No spectrum available.");
         return;
@@ -97,9 +97,8 @@ void SpectrumPlotWidget::paintEvent(QPaintEvent* event)
     double minValue = *std::min_element(m_values.constBegin(), m_values.constEnd());
     double maxValue = *std::max_element(m_values.constBegin(), m_values.constEnd());
 
-    const bool hasComparison = !m_comparisonFrequencies.isEmpty()
-                               && m_comparisonFrequencies.size() == m_comparisonValues.size();
-    if(hasComparison) {
+    const bool hasComparison = !m_comparisonFrequencies.isEmpty() && m_comparisonFrequencies.size() == m_comparisonValues.size();
+    if (hasComparison) {
         const auto [comparisonMinFreqIt, comparisonMaxFreqIt] =
             std::minmax_element(m_comparisonFrequencies.constBegin(), m_comparisonFrequencies.constEnd());
         minFreq = std::min(minFreq, *comparisonMinFreqIt);
@@ -113,18 +112,18 @@ void SpectrumPlotWidget::paintEvent(QPaintEvent* event)
 
     painter.setPen(QColor("#30363d"));
     painter.drawRect(plotRect);
-    for(int i = 1; i < 5; ++i) {
+    for (int i = 1; i < 5; ++i) {
         const int y = plotRect.top() + (plotRect.height() * i) / 5;
         painter.drawLine(plotRect.left(), y, plotRect.right(), y);
     }
 
     QPainterPath path;
-    for(int i = 0; i < m_frequencies.size(); ++i) {
+    for (int i = 0; i < m_frequencies.size(); ++i) {
         const double xNorm = (m_frequencies.at(i) - minFreq) / freqSpan;
         const double yNorm = (m_values.at(i) - minValue) / valueSpan;
         const QPointF point(plotRect.left() + xNorm * plotRect.width(),
                             plotRect.bottom() - yNorm * plotRect.height());
-        if(i == 0) {
+        if (i == 0) {
             path.moveTo(point);
         } else {
             path.lineTo(point);
@@ -134,14 +133,14 @@ void SpectrumPlotWidget::paintEvent(QPaintEvent* event)
     painter.setPen(QPen(QColor("#2f81f7"), 2.0));
     painter.drawPath(path);
 
-    if(hasComparison) {
+    if (hasComparison) {
         QPainterPath comparisonPath;
-        for(int i = 0; i < m_comparisonFrequencies.size(); ++i) {
+        for (int i = 0; i < m_comparisonFrequencies.size(); ++i) {
             const double xNorm = (m_comparisonFrequencies.at(i) - minFreq) / freqSpan;
             const double yNorm = (m_comparisonValues.at(i) - minValue) / valueSpan;
             const QPointF point(plotRect.left() + xNorm * plotRect.width(),
                                 plotRect.bottom() - yNorm * plotRect.height());
-            if(i == 0) {
+            if (i == 0) {
                 comparisonPath.moveTo(point);
             } else {
                 comparisonPath.lineTo(point);
@@ -175,7 +174,7 @@ void SpectrumPlotWidget::paintEvent(QPaintEvent* event)
     painter.setPen(QColor("#8b949e"));
     painter.drawText(QRect(plotRect.left() + 26, plotRect.top() + 2, 220, 16), Qt::AlignLeft, "Current");
 
-    if(hasComparison) {
+    if (hasComparison) {
         painter.setPen(Qt::NoPen);
         painter.setBrush(QColor("#ffa657"));
         painter.drawRect(QRect(plotRect.left() + 8, plotRect.top() + 26, 12, 4));

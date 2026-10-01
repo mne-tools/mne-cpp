@@ -32,12 +32,15 @@ private slots:
         int nFrom = 5, nTo = 5, nTimes = 10;
 
         VectorXi vertsFrom(nFrom), vertsTo(nTo);
-        for (int i = 0; i < nFrom; ++i) vertsFrom(i) = i;
-        for (int i = 0; i < nTo; ++i) vertsTo(i) = i;
+        for (int i = 0; i < nFrom; ++i)
+            vertsFrom(i) = i;
+        for (int i = 0; i < nTo; ++i)
+            vertsTo(i) = i;
 
         // Identity sparse matrix
         SparseMatrix<double> morphMap(nTo, nFrom);
-        for (int i = 0; i < nTo; ++i) morphMap.insert(i, i) = 1.0;
+        for (int i = 0; i < nTo; ++i)
+            morphMap.insert(i, i) = 1.0;
         morphMap.makeCompressed();
 
         SourceMorph morph;
@@ -65,13 +68,15 @@ private slots:
         int nFrom = 10, nTo = 5, nTimes = 4;
 
         VectorXi vertsFrom(nFrom), vertsTo(nTo);
-        for (int i = 0; i < nFrom; ++i) vertsFrom(i) = i;
-        for (int i = 0; i < nTo; ++i) vertsTo(i) = i;
+        for (int i = 0; i < nFrom; ++i)
+            vertsFrom(i) = i;
+        for (int i = 0; i < nTo; ++i)
+            vertsTo(i) = i;
 
         SparseMatrix<double> morphMap(nTo, nFrom);
         for (int i = 0; i < nTo; ++i) {
-            morphMap.insert(i, 2*i) = 0.5;
-            morphMap.insert(i, 2*i+1) = 0.5;
+            morphMap.insert(i, 2 * i) = 0.5;
+            morphMap.insert(i, 2 * i + 1) = 0.5;
         }
         morphMap.makeCompressed();
 
@@ -125,10 +130,12 @@ private slots:
     {
         int n = 3, nTimes = 5;
         VectorXi verts(n);
-        for (int i = 0; i < n; ++i) verts(i) = i;
+        for (int i = 0; i < n; ++i)
+            verts(i) = i;
 
         SparseMatrix<double> morphMap(n, n);
-        for (int i = 0; i < n; ++i) morphMap.insert(i, i) = 1.0;
+        for (int i = 0; i < n; ++i)
+            morphMap.insert(i, i) = 1.0;
         morphMap.makeCompressed();
 
         SourceMorph morph;

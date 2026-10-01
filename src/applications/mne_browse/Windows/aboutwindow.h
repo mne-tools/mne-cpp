@@ -56,7 +56,7 @@ public:
      *
      * @param [in] parent pointer to parent widget; If parent is 0, the new AboutWindow becomes a window. If parent is another widget, AboutWindow becomes a child window inside parent. AboutWindow is deleted when its parent is deleted.
      */
-    AboutWindow(QWidget *parent = 0);
+    AboutWindow(QWidget* parent = 0);
 
 
     //=========================================================================================================
@@ -67,7 +67,7 @@ public:
     ~AboutWindow();
 
 private:
-    std::unique_ptr<Ui::AboutWindow> ui;                    /**< Pointer to the qt designer generated ui class.*/
+    std::unique_ptr<Ui::AboutWindow> ui; /**< Pointer to the qt designer generated ui class.*/
 };
 
 } // NAMESPACE MNEBROWSE

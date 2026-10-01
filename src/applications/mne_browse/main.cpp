@@ -54,40 +54,44 @@ MainWindow* mainWindow = nullptr;
 
 //*************************************************************************************************************
 
-void customMessageHandler(QtMsgType type, const QMessageLogContext &context, const QString &msg)
+void customMessageHandler(QtMsgType type, const QMessageLogContext& context, const QString& msg)
 {
     Q_UNUSED(context);
 
     if (!mainWindow)
         return;
 
-    QString dt  = QDateTime::currentDateTime().toString("dd/MM/yyyy hh:mm:ss");
+    QString dt = QDateTime::currentDateTime().toString("dd/MM/yyyy hh:mm:ss");
     QString txt = QString("[%1] ").arg(dt);
 
-    LogKind  kind  = _LogKndMessage;
+    LogKind kind = _LogKndMessage;
     LogLevel level = _LogLvMax;
-    bool doAbort   = false;
+    bool doAbort = false;
 
     switch (type) {
-    case QtDebugMsg:
-        txt  += QString("{Debug} \t\t %1").arg(msg);
-        kind  = _LogKndMessage; level = _LogLvMax;
-        break;
-    case QtWarningMsg:
-        txt  += QString("{Warning} \t %1").arg(msg);
-        kind  = _LogKndWarning; level = _LogLvNormal;
-        break;
-    case QtCriticalMsg:
-        txt  += QString("{Critical} \t %1").arg(msg);
-        kind  = _LogKndError;   level = _LogLvMin;
-        break;
-    case QtFatalMsg:
-        txt  += QString("{Fatal} \t\t %1").arg(msg);
-        kind  = _LogKndError;   level = _LogLvMin;
-        doAbort = true;
-        break;
-    default:
-        return;
+        case QtDebugMsg:
+            txt += QString("{Debug} \t\t %1").arg(msg);
+            kind = _LogKndMessage;
+            level = _LogLvMax;
+            break;
+        case QtWarningMsg:
+            txt += QString("{Warning} \t %1").arg(msg);
+            kind = _LogKndWarning;
+            level = _LogLvNormal;
+            break;
+        case QtCriticalMsg:
+            txt += QString("{Critical} \t %1").arg(msg);
+            kind = _LogKndError;
+            level = _LogLvMin;
+            break;
+        case QtFatalMsg:
+            txt += QString("{Fatal} \t\t %1").arg(msg);
+            kind = _LogKndError;
+            level = _LogLvMin;
+            doAbort = true;
+            break;
+        default:
+            return;
     }
 
     // writeToLog() modifies a QTextEdit — safe only from the GUI thread.
@@ -95,12 +99,10 @@ void customMessageHandler(QtMsgType type, const QMessageLogContext &context, con
     if (QThread::currentThread() == qApp->thread()) {
         mainWindow->writeToLog(txt, kind, level);
     } else {
-        QString capturedTxt   = txt;
-        LogKind  capturedKind  = kind;
+        QString capturedTxt = txt;
+        LogKind capturedKind = kind;
         LogLevel capturedLevel = level;
-        QMetaObject::invokeMethod(mainWindow, [capturedTxt, capturedKind, capturedLevel]() {
-            mainWindow->writeToLog(capturedTxt, capturedKind, capturedLevel);
-        }, Qt::QueuedConnection);
+        QMetaObject::invokeMethod(mainWindow, [capturedTxt, capturedKind, capturedLevel]() { mainWindow->writeToLog(capturedTxt, capturedKind, capturedLevel); }, Qt::QueuedConnection);
     }
 
     if (doAbort)
@@ -110,7 +112,7 @@ void customMessageHandler(QtMsgType type, const QMessageLogContext &context, con
 
 //=============================================================================================================
 // MAIN
-int main(int argc, char *argv[])
+int main(int argc, char* argv[])
 {
     qInstallMessageHandler(customMessageHandler);
     QApplication a(argc, argv);
@@ -132,58 +134,58 @@ int main(int argc, char *argv[])
 
     // --cd <dir>  Change the initial working directory
     QCommandLineOption cdOption("cd",
-        "Change the initial working directory to <dir>.",
-        "dir");
+                                "Change the initial working directory to <dir>.",
+                                "dir");
     parser.addOption(cdOption);
 
     // --raw <file>  Open a raw FIFF file on startup
     QCommandLineOption rawOption("raw",
-        "Raw FIFF input file to open on startup.",
-        "file");
+                                 "Raw FIFF input file to open on startup.",
+                                 "file");
     parser.addOption(rawOption);
 
     // --events <file>  Load an event/trigger file on startup
     QCommandLineOption eventsOption("events",
-        "FIFF event file (*-eve.fif) to load alongside the raw data.",
-        "file");
+                                    "FIFF event file (*-eve.fif) to load alongside the raw data.",
+                                    "file");
     parser.addOption(eventsOption);
 
     // --highpass <Hz>  High-pass corner frequency
     QCommandLineOption highpassOption(QStringList() << "highpass" << "hp",
-        "High-pass filter corner frequency in Hz.",
-        "Hz");
+                                      "High-pass filter corner frequency in Hz.",
+                                      "Hz");
     parser.addOption(highpassOption);
 
     // --lowpass <Hz>  Low-pass corner frequency
     QCommandLineOption lowpassOption(QStringList() << "lowpass" << "lp",
-        "Low-pass filter corner frequency in Hz.",
-        "Hz");
+                                     "Low-pass filter corner frequency in Hz.",
+                                     "Hz");
     parser.addOption(lowpassOption);
 
     parser.process(a);
 
     // Apply --cd before anything else
-    if(parser.isSet(cdOption)) {
+    if (parser.isSet(cdOption)) {
         const QString dir = parser.value(cdOption);
-        if(!QDir::setCurrent(dir)) {
+        if (!QDir::setCurrent(dir)) {
             qWarning("[mne_browse] --cd: could not change to directory: %s",
                      dir.toUtf8().data());
         }
     }
 
     // Collect remaining options to hand to the window after it is shown
-    const QString rawFile    = parser.isSet(rawOption)      ? parser.value(rawOption)    : QString();
-    const QString eventsFile = parser.isSet(eventsOption)   ? parser.value(eventsOption) : QString();
+    const QString rawFile = parser.isSet(rawOption) ? parser.value(rawOption) : QString();
+    const QString eventsFile = parser.isSet(eventsOption) ? parser.value(eventsOption) : QString();
 
     bool hpOk = false, lpOk = false;
     double highpass = parser.isSet(highpassOption) ? parser.value(highpassOption).toDouble(&hpOk) : -1.0;
-    double lowpass  = parser.isSet(lowpassOption)  ? parser.value(lowpassOption).toDouble(&lpOk)  : -1.0;
-    if(parser.isSet(highpassOption) && !hpOk) {
+    double lowpass = parser.isSet(lowpassOption) ? parser.value(lowpassOption).toDouble(&lpOk) : -1.0;
+    if (parser.isSet(highpassOption) && !hpOk) {
         qWarning("[mne_browse] --highpass: invalid value '%s', ignoring.",
                  parser.value(highpassOption).toUtf8().data());
         highpass = -1.0;
     }
-    if(parser.isSet(lowpassOption) && !lpOk) {
+    if (parser.isSet(lowpassOption) && !lpOk) {
         qWarning("[mne_browse] --lowpass: invalid value '%s', ignoring.",
                  parser.value(lowpassOption).toUtf8().data());
         lowpass = -1.0;
@@ -206,8 +208,8 @@ int main(int argc, char *argv[])
     // Defer CLI option application until after the first event-loop iteration.
     // This ensures the window is fully laid out (widgets have non-zero sizes) before
     // ChannelDataView::updateSamplesPerPixel() is called, which needs a valid width.
-    if(!rawFile.isEmpty() || highpass >= 0.0 || lowpass >= 0.0) {
-        MainWindow *win = mainWindow;
+    if (!rawFile.isEmpty() || highpass >= 0.0 || lowpass >= 0.0) {
+        MainWindow* win = mainWindow;
         QTimer::singleShot(0, win, [win, rawFile, eventsFile, highpass, lowpass]() {
             win->applyCommandLineOptions(rawFile, eventsFile, highpass, lowpass);
         });

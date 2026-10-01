@@ -57,7 +57,8 @@
 // DEFINE NAMESPACE CONNECTIVITYLIB
 //=============================================================================================================
 
-namespace CONNECTIVITYLIB {
+namespace CONNECTIVITYLIB
+{
 
 //=============================================================================================================
 // CONNECTIVITYLIB FORWARD DECLARATIONS
@@ -82,7 +83,6 @@ class Network;
  */
 class CONNECTIVITYSHARED_EXPORT Connectivity
 {
-
 public:
     typedef QSharedPointer<Connectivity> SPtr;            /**< Shared pointer type for Connectivity. */
     typedef QSharedPointer<const Connectivity> ConstSPtr; /**< Const shared pointer type for Connectivity. */

@@ -100,7 +100,7 @@ private slots:
         QVERIFY(html.contains("<html"));
         QVERIFY(html.contains("</html>"));
         QVERIFY(html.contains("<title>My Report</title>"));
-        QVERIFY(html.contains("MNE-CPP"));  // footer
+        QVERIFY(html.contains("MNE-CPP")); // footer
     }
 
     void testSaveToFile()

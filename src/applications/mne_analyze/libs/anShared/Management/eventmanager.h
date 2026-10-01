@@ -106,7 +106,7 @@ public:
      * @param[in] commu          The respective Communicator
      * @param[in] subs           New list of subscriptions
      */
-    static void updateSubscriptions(Communicator* commu, const QVector<EVENT_TYPE> &subs);
+    static void updateSubscriptions(Communicator* commu, const QVector<EVENT_TYPE>& subs);
 
     //=========================================================================================================
     /**
@@ -187,7 +187,7 @@ private:
      * @param[in] commu          The respective Communicator.
      * @param[in] subs           New list of subscriptions.
      */
-    void updateSubscriptionsInt(Communicator* commu, const QVector<EVENT_TYPE> &subs);
+    void updateSubscriptionsInt(Communicator* commu, const QVector<EVENT_TYPE>& subs);
 
     //=========================================================================================================
     /**
@@ -196,7 +196,7 @@ private:
      *
      * @param[in] commu          The communicator to remove.
      */
-    void removeCommunicatorInt(Communicator * commu);
+    void removeCommunicatorInt(Communicator* commu);
 
     //=========================================================================================================
     /**
@@ -254,16 +254,16 @@ private:
      */
     void run() override;
 
-    QMultiMap<EVENT_TYPE, Communicator*>    m_routingTable;         /**< Map that holds routing information. */
-    QQueue<QSharedPointer<Event> >          m_eventQ;               /**< Queue that buffers all published events. */
+    QMultiMap<EVENT_TYPE, Communicator*> m_routingTable; /**< Map that holds routing information. */
+    QQueue<QSharedPointer<Event>> m_eventQ;              /**< Queue that buffers all published events. */
 
-    QMutex                                  m_eventQMutex;          /**< Guarding mutex for the event queue. */
-    QMutex                                  m_routingTableMutex;    /**< Guarding mutex for the routing table. */
+    QMutex m_eventQMutex;       /**< Guarding mutex for the event queue. */
+    QMutex m_routingTableMutex; /**< Guarding mutex for the routing table. */
 
-    volatile long                           m_sleepTime;            /**< Controlling execution frequency of main loop. */
-    volatile bool                           m_running;              /**< Flag for remembering whether the EventManager is currently started or stopped. */
+    volatile long m_sleepTime; /**< Controlling execution frequency of main loop. */
+    volatile bool m_running;   /**< Flag for remembering whether the EventManager is currently started or stopped. */
 
-    QSemaphore                              m_eventSemaphore;       /**< Keeps track of events and blocks. */
+    QSemaphore m_eventSemaphore; /**< Keeps track of events and blocks. */
 };
 
 } // namespace

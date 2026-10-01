@@ -39,7 +39,7 @@ ExtensionViewFactoryRegistry& ExtensionViewFactoryRegistry::instance()
 
 void ExtensionViewFactoryRegistry::registerFactory(const IExtensionViewFactory* factory)
 {
-    if(!factory || factory->widgetType().trimmed().isEmpty()) {
+    if (!factory || factory->widgetType().trimmed().isEmpty()) {
         return;
     }
 

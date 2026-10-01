@@ -35,17 +35,17 @@ using namespace ANSHAREDLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-CovarianceModel::CovarianceModel(const QString &sFilePath,
-                       const QByteArray& byteLoadedData,
-                       QObject* parent)
-:AbstractModel(sFilePath, parent)
+CovarianceModel::CovarianceModel(const QString& sFilePath,
+                                 const QByteArray& byteLoadedData,
+                                 QObject* parent)
+: AbstractModel(sFilePath, parent)
 {
     Q_UNUSED(byteLoadedData);
 }
 
 //=============================================================================================================
 
-int CovarianceModel::rowCount(const QModelIndex &parent) const
+int CovarianceModel::rowCount(const QModelIndex& parent) const
 {
     Q_UNUSED(parent);
 
@@ -54,7 +54,7 @@ int CovarianceModel::rowCount(const QModelIndex &parent) const
 
 //=============================================================================================================
 
-int CovarianceModel::columnCount(const QModelIndex &parent) const
+int CovarianceModel::columnCount(const QModelIndex& parent) const
 {
     Q_UNUSED(parent);
 
@@ -63,8 +63,8 @@ int CovarianceModel::columnCount(const QModelIndex &parent) const
 
 //=============================================================================================================
 
-QVariant CovarianceModel::data(const QModelIndex &index,
-                             int role) const
+QVariant CovarianceModel::data(const QModelIndex& index,
+                               int role) const
 {
     Q_UNUSED(index);
     Q_UNUSED(role);
@@ -74,7 +74,7 @@ QVariant CovarianceModel::data(const QModelIndex &index,
 
 //=============================================================================================================
 
-Qt::ItemFlags CovarianceModel::flags(const QModelIndex &index) const
+Qt::ItemFlags CovarianceModel::flags(const QModelIndex& index) const
 {
     return QAbstractItemModel::flags(index);
 }

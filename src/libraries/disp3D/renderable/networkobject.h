@@ -73,7 +73,7 @@ public:
      * @param[in] network       The connectivity network to visualize.
      * @param[in] sColormap     Colormap name for weight-based coloring (e.g. "Viridis", "Hot").
      */
-    void load(const CONNECTIVITYLIB::Network &network, const QString &sColormap = "Viridis");
+    void load(const CONNECTIVITYLIB::Network& network, const QString& sColormap = "Viridis");
 
     //=========================================================================================================
     /**
@@ -89,7 +89,7 @@ public:
      *
      * @param[in] sColormap     Colormap name (e.g. "Hot", "Viridis", "Jet").
      */
-    void setColormap(const QString &sColormap);
+    void setColormap(const QString& sColormap);
 
     //=========================================================================================================
     /**
@@ -98,7 +98,7 @@ public:
      * @param[in] rhi         QRhi instance.
      * @param[in] u           Resource update batch.
      */
-    void updateNodeBuffers(QRhi *rhi, QRhiResourceUpdateBatch *u);
+    void updateNodeBuffers(QRhi* rhi, QRhiResourceUpdateBatch* u);
 
     //=========================================================================================================
     /**
@@ -107,27 +107,48 @@ public:
      * @param[in] rhi         QRhi instance.
      * @param[in] u           Resource update batch.
      */
-    void updateEdgeBuffers(QRhi *rhi, QRhiResourceUpdateBatch *u);
+    void updateEdgeBuffers(QRhi* rhi, QRhiResourceUpdateBatch* u);
 
     // ── Node accessors ──────────────────────────────────────────────────
     QRhiBuffer* nodeVertexBuffer() const;
     QRhiBuffer* nodeIndexBuffer() const;
     QRhiBuffer* nodeInstanceBuffer() const;
-    int nodeIndexCount() const { return m_nodeIndexCount; }
-    int nodeInstanceCount() const { return m_nodeInstanceCount; }
+    int nodeIndexCount() const
+    {
+        return m_nodeIndexCount;
+    }
+    int nodeInstanceCount() const
+    {
+        return m_nodeInstanceCount;
+    }
 
     // ── Edge accessors ──────────────────────────────────────────────────
     QRhiBuffer* edgeVertexBuffer() const;
     QRhiBuffer* edgeIndexBuffer() const;
     QRhiBuffer* edgeInstanceBuffer() const;
-    int edgeIndexCount() const { return m_edgeIndexCount; }
-    int edgeInstanceCount() const { return m_edgeInstanceCount; }
+    int edgeIndexCount() const
+    {
+        return m_edgeIndexCount;
+    }
+    int edgeInstanceCount() const
+    {
+        return m_edgeInstanceCount;
+    }
 
     // ── Visibility ──────────────────────────────────────────────────────
-    bool isVisible() const { return m_visible; }
-    void setVisible(bool visible) { m_visible = visible; }
+    bool isVisible() const
+    {
+        return m_visible;
+    }
+    void setVisible(bool visible)
+    {
+        m_visible = visible;
+    }
 
-    bool hasData() const { return !m_network.isEmpty(); }
+    bool hasData() const
+    {
+        return !m_network.isEmpty();
+    }
 
 private:
     /**
@@ -135,16 +156,18 @@ private:
      */
     // Instance data: identical layout to DipoleObject for shader compatibility
     // Model Matrix (4x4) + Color (vec4) + isSelected (float)
-    struct InstanceData {
+    struct InstanceData
+    {
         float model[16];
         float color[4];
-        float isSelected;   // Always 0.0 for networks
+        float isSelected; // Always 0.0 for networks
     };
 
     /**
      * @brief Interleaved vertex attributes for network node and edge meshes.
      */
-    struct VertexData {
+    struct VertexData
+    {
         float x, y, z;
         float nx, ny, nz;
     };

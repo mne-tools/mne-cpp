@@ -55,15 +55,15 @@ namespace RTSERVER
  */
 enum ConnectorID
 {
-    _FIFFSIMULATOR = 1,                 /**< Connector id of the FIFF file simulator. */
-    _default = -1                       /**< Default connector id. */
+    _FIFFSIMULATOR = 1, /**< Connector id of the FIFF file simulator. */
+    _default = -1       /**< Default connector id. */
 };
 
 //=============================================================================================================
 // DEFINES
 //=============================================================================================================
 
-#define RAW_BUFFFER_SIZE  10
+#define RAW_BUFFFER_SIZE 10
 
 //=========================================================================================================
 /**
@@ -80,13 +80,14 @@ public:
     /**
      * Creates the IConnector.
      */
-    IConnector(): m_bIsActive(false) {};
+    IConnector()
+    : m_bIsActive(false) {};
 
     //=========================================================================================================
     /**
      * Destroys the IConnector.
      */
-    virtual ~IConnector(){};
+    virtual ~IConnector() {};
 
     //=========================================================================================================
     /**
@@ -135,7 +136,7 @@ public:
      *
      * @return true if successful, false otherwise.
      */
-    virtual bool start() = 0;// = 0 call is not longer possible - it has to be reimplemented in child;
+    virtual bool start() = 0; // = 0 call is not longer possible - it has to be reimplemented in child;
 
     //=========================================================================================================
     /**
@@ -176,7 +177,6 @@ signals:
     void remitRawBuffer(QSharedPointer<Eigen::MatrixXf>);
 
 protected:
-
     //=========================================================================================================
     /**
      * The starting point for the thread. After calling start(), the newly created thread calls this function.
@@ -185,12 +185,12 @@ protected:
      */
     virtual void run() = 0;
 
-    QJsonObject     m_qJsonObjectMetaData;  /**< The meta data of the plugin defined in Q_PLUGIN_METADATA and the corresponding json file. */
+    QJsonObject m_qJsonObjectMetaData; /**< The meta data of the plugin defined in Q_PLUGIN_METADATA and the corresponding json file. */
 
-    COMLIB::CommandManager  m_commandManager;       /**< The CommandManager of the connector. */
+    COMLIB::CommandManager m_commandManager; /**< The CommandManager of the connector. */
 
 private:
-    bool        m_bIsActive;                /**< Holds the activation status. */
+    bool m_bIsActive; /**< Holds the activation status. */
 };
 
 //=============================================================================================================

@@ -34,15 +34,17 @@
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-namespace Ui {
-    class MainWindow;
+namespace Ui
+{
+class MainWindow;
 }
 
 //=============================================================================================================
 // DEFINE NAMESPACE MNEANONYMIZE
 //=============================================================================================================
 
-namespace MNEANONYMIZE {
+namespace MNEANONYMIZE
+{
 
 //=============================================================================================================
 // MNEANONYMIZE FORWARD DECLARATIONS
@@ -601,7 +603,7 @@ protected:
      * @param[in] event Event triggered.
      *
      */
-    void closeEvent(QCloseEvent *event) override;
+    void closeEvent(QCloseEvent* event) override;
 
 private slots:
 
@@ -648,7 +650,8 @@ private slots:
     /**
      * @brief Allows to manage the event of the output file path being changed.
      *
-     */    void outFileEditingFinished();
+     */
+    void outFileEditingFinished();
 
     //=========================================================================================================
     /**
@@ -753,17 +756,17 @@ private:
      */
     void checkSmallGui();
 
-    bool            m_bOptionsVisibility;               /**< Options and input file info is shown.*/
-    const int       m_iDefaultWindowHeight;             /**< Default UI window height when the options are hidden.*/
-    const int       m_iDefaultWindowHeightLarge;        /**< Defailt UI window height when the options are shown.*/
-    bool            m_bShowWarningMsgBoxInWasm;         /**< Flag to show a warning box about the size of the files, only once.*/
+    bool m_bOptionsVisibility;             /**< Options and input file info is shown.*/
+    const int m_iDefaultWindowHeight;      /**< Default UI window height when the options are hidden.*/
+    const int m_iDefaultWindowHeightLarge; /**< Defailt UI window height when the options are shown.*/
+    bool m_bShowWarningMsgBoxInWasm;       /**< Flag to show a warning box about the size of the files, only once.*/
 
-    QFileInfo       m_fiInFile;                         /**< Input file QFileInfo object.*/
-    QFileInfo       m_fiOutFile;                        /**< Output file QFileInfo object.*/
-    const QString   m_sDefaultWasmInFile;               /**< In Web Assembly context, the file name of the input file.*/
-    const QString   m_sDefaultWasmOutFile;              /**< In Web Assembly context, the file name of the output file.*/
+    QFileInfo m_fiInFile;                /**< Input file QFileInfo object.*/
+    QFileInfo m_fiOutFile;               /**< Output file QFileInfo object.*/
+    const QString m_sDefaultWasmInFile;  /**< In Web Assembly context, the file name of the input file.*/
+    const QString m_sDefaultWasmOutFile; /**< In Web Assembly context, the file name of the output file.*/
 
-    Ui::MainWindow* m_pUi;                              /**< Pointer to the user interface form.*/
+    Ui::MainWindow* m_pUi; /**< Pointer to the user interface form.*/
 };
 
 }

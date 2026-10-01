@@ -60,31 +60,31 @@ using namespace Eigen;
 #define PROGRAM_VERSION MNE_CPP_VERSION
 
 // MAT-file Level 5 constants
-static const quint32 miDOUBLE       = 9;
-static const quint32 miINT32        = 5;
-static const quint32 miUINT32       = 6;
-static const quint32 miINT8         = 1;
-static const quint32 miMATRIX       = 14;
+static const quint32 miDOUBLE = 9;
+static const quint32 miINT32 = 5;
+static const quint32 miUINT32 = 6;
+static const quint32 miINT8 = 1;
+static const quint32 miMATRIX = 14;
 static const quint32 mxDOUBLE_CLASS = 6;
 
 //=============================================================================================================
 // MAT-file writing helpers
 //=============================================================================================================
 
-static void writePad(QDataStream &ds, int numBytes)
+static void writePad(QDataStream& ds, int numBytes)
 {
     int pad = (8 - (numBytes % 8)) % 8;
     for (int i = 0; i < pad; ++i)
         ds << static_cast<quint8>(0);
 }
 
-static void writeMatTag(QDataStream &ds, quint32 dataType, quint32 numBytes)
+static void writeMatTag(QDataStream& ds, quint32 dataType, quint32 numBytes)
 {
     ds << dataType;
     ds << numBytes;
 }
 
-static void writeSmallTag(QDataStream &ds, quint32 dataType, quint32 numBytes, const QByteArray &data)
+static void writeSmallTag(QDataStream& ds, quint32 dataType, quint32 numBytes, const QByteArray& data)
 {
     if (numBytes <= 4) {
         quint32 packed = (numBytes << 16) | dataType;
@@ -100,7 +100,7 @@ static void writeSmallTag(QDataStream &ds, quint32 dataType, quint32 numBytes, c
     }
 }
 
-static void writeMatrixVariable(QDataStream &ds, const QString &name, const MatrixXd &mat)
+static void writeMatrixVariable(QDataStream& ds, const QString& name, const MatrixXd& mat)
 {
     int nRows = mat.rows();
     int nCols = mat.cols();
@@ -152,7 +152,7 @@ static void writeMatrixVariable(QDataStream &ds, const QString &name, const Matr
     writePad(ds, dataSize);
 }
 
-static void writeMatHeader(QDataStream &ds, const QString &toolName)
+static void writeMatHeader(QDataStream& ds, const QString& toolName)
 {
     QByteArray headerText = QString("MATLAB 5.0 MAT-file, created by %1").arg(toolName).toLatin1();
     headerText.append(QByteArray(116 - headerText.size(), ' '));
@@ -167,13 +167,14 @@ static void writeMatHeader(QDataStream &ds, const QString &toolName)
 
 //=============================================================================================================
 
-struct EventEntry {
+struct EventEntry
+{
     int sample;
     int prev;
     int id;
 };
 
-static QList<EventEntry> readEvents(const QString &filename)
+static QList<EventEntry> readEvents(const QString& filename)
 {
     QList<EventEntry> events;
     QFile file(filename);
@@ -203,7 +204,7 @@ static QList<EventEntry> readEvents(const QString &filename)
 
 //=============================================================================================================
 
-int main(int argc, char *argv[])
+int main(int argc, char* argv[])
 {
     qInstallMessageHandler(MNELogger::customLogWriter);
     QCoreApplication app(argc, argv);
@@ -244,8 +245,7 @@ int main(int argc, char *argv[])
     float tmax = parser.value(tmaxOpt).toFloat();
     int eventId = parser.value(eventIdOpt).toInt();
 
-    if (rawFile.isEmpty() || eventFile.isEmpty() || outDir.isEmpty()
-        || !parser.isSet(tminOpt) || !parser.isSet(tmaxOpt) || !parser.isSet(eventIdOpt)) {
+    if (rawFile.isEmpty() || eventFile.isEmpty() || outDir.isEmpty() || !parser.isSet(tminOpt) || !parser.isSet(tmaxOpt) || !parser.isSet(eventIdOpt)) {
         qCritical("--raw, --event, --tmin, --tmax, --event-id, and --out are required.");
         parser.showHelp(1);
     }

@@ -46,16 +46,17 @@ using namespace FWDLIB;
 // LOCAL CONSTANTS AND HELPERS
 //=============================================================================================================
 
-namespace {
+namespace
+{
 
-constexpr int    kNCoeff         = 100;                 // Legendre polynomial terms
-constexpr double kMegConst       = 4e-14 * M_PI;        // mu_0^2 / (4*pi)
-constexpr double kEegConst       = 1.0 / (4.0 * M_PI);  // 1 / (4*pi)
-constexpr double kEegIntradScale = 0.7;                  // EEG integration radius scale
+constexpr int kNCoeff = 100;                     // Legendre polynomial terms
+constexpr double kMegConst = 4e-14 * M_PI;       // mu_0^2 / (4*pi)
+constexpr double kEegConst = 1.0 / (4.0 * M_PI); // 1 / (4*pi)
+constexpr double kEegIntradScale = 0.7;          // EEG integration radius scale
 
-constexpr float  kGradStd        = 5e-13f;              // gradiometer noise std (5 fT/cm)
-constexpr float  kMagStd         = 20e-15f;             // magnetometer noise std (20 fT)
-constexpr float  kEegStd         = 1e-6f;               // EEG noise std (1 µV)
+constexpr float kGradStd = 5e-13f; // gradiometer noise std (5 fT/cm)
+constexpr float kMagStd = 20e-15f; // magnetometer noise std (20 fT)
+constexpr float kEegStd = 1e-6f;   // EEG noise std (1 µV)
 
 //=============================================================================================================
 
@@ -63,14 +64,19 @@ constexpr float  kEegStd         = 1e-6f;               // EEG noise std (1 µV)
 void computeLegendreDer(double x, int ncoeff,
                         double* p, double* pd, double* pdd)
 {
-    p[0] = 1.0;  pd[0] = 0.0;  pdd[0] = 0.0;
-    if (ncoeff < 2) return;
-    p[1] = x;    pd[1] = 1.0;  pdd[1] = 0.0;
+    p[0] = 1.0;
+    pd[0] = 0.0;
+    pdd[0] = 0.0;
+    if (ncoeff < 2)
+        return;
+    p[1] = x;
+    pd[1] = 1.0;
+    pdd[1] = 0.0;
     for (int n = 2; n < ncoeff; ++n) {
-        double old_p  = p[n - 1];
+        double old_p = p[n - 1];
         double old_pd = pd[n - 1];
-        p[n]   = ((2 * n - 1) * x * old_p - (n - 1) * p[n - 2]) / n;
-        pd[n]  = n * old_p + x * old_pd;
+        p[n] = ((2 * n - 1) * x * old_p - (n - 1) * p[n - 2]) / n;
+        pd[n] = n * old_p + x * old_pd;
         pdd[n] = (n + 1) * old_pd + x * pdd[n - 1];
     }
 }
@@ -81,7 +87,8 @@ void computeLegendreDer(double x, int ncoeff,
 void computeLegendreVal(double x, int ncoeff, double* p)
 {
     p[0] = 1.0;
-    if (ncoeff < 2) return;
+    if (ncoeff < 2)
+        return;
     p[1] = x;
     for (int n = 2; n < ncoeff; ++n) {
         p[n] = ((2 * n - 1) * x * p[n - 1] - (n - 1) * p[n - 2]) / n;
@@ -97,17 +104,17 @@ void compSumsMeg(double beta, double ctheta, double sums[4])
     computeLegendreDer(ctheta, kNCoeff, p, pd, pdd);
 
     sums[0] = sums[1] = sums[2] = sums[3] = 0.0;
-    double betan = beta;                         // accumulates beta^(n+1)
+    double betan = beta; // accumulates beta^(n+1)
     for (int n = 1; n < kNCoeff; ++n) {
-        betan *= beta;                           // beta^(n+1)
-        double dn    = static_cast<double>(n);
-        double multn = dn / (2.0 * dn + 1.0);   // n / (2n+1)
-        double mult  = multn / (dn + 1.0);       // n / ((2n+1)(n+1))
+        betan *= beta; // beta^(n+1)
+        double dn = static_cast<double>(n);
+        double multn = dn / (2.0 * dn + 1.0); // n / (2n+1)
+        double mult = multn / (dn + 1.0);     // n / ((2n+1)(n+1))
 
-        sums[0] += (dn + 1.0) * multn * p[n]   * betan;
-        sums[1] +=               multn * pd[n]  * betan;
-        sums[2] +=               mult  * pd[n]  * betan;
-        sums[3] +=               mult  * pdd[n] * betan;
+        sums[0] += (dn + 1.0) * multn * p[n] * betan;
+        sums[1] += multn * pd[n] * betan;
+        sums[2] += mult * pd[n] * betan;
+        sums[3] += mult * pdd[n] * betan;
     }
 }
 
@@ -119,11 +126,11 @@ double compSumEeg(double beta, double ctheta)
     double p[kNCoeff];
     computeLegendreVal(ctheta, kNCoeff, p);
 
-    double sum   = 0.0;
+    double sum = 0.0;
     double betan = 1.0;
     for (int n = 1; n < kNCoeff; ++n) {
-        betan *= beta;                           // beta^n
-        double dn     = static_cast<double>(n);
+        betan *= beta; // beta^n
+        double dn = static_cast<double>(n);
         double factor = 2.0 * dn + 1.0;
         sum += p[n] * betan * factor * factor / dn;
     }
@@ -137,10 +144,11 @@ double sphereDotMeg(double intrad,
                     const Vector3d& rr1, double lr1, const Vector3d& cosmag1,
                     const Vector3d& rr2, double lr2, const Vector3d& cosmag2)
 {
-    if (lr1 == 0.0 || lr2 == 0.0) return 0.0;
+    if (lr1 == 0.0 || lr2 == 0.0)
+        return 0.0;
 
     double beta = (intrad * intrad) / (lr1 * lr2);
-    double ct   = std::clamp(rr1.dot(rr2), -1.0, 1.0);
+    double ct = std::clamp(rr1.dot(rr2), -1.0, 1.0);
 
     double sums[4];
     compSumsMeg(beta, ct, sums);
@@ -154,10 +162,7 @@ double sphereDotMeg(double intrad,
     double part1 = ct * n1c1 * n2c2;
     double part2 = n1c1 * n2c1 + n1c2 * n2c2;
 
-    double result = n1c1 * n2c2 * sums[0]
-                  + (2.0 * part1 - part2) * sums[1]
-                  + (n1n2 + part1 - part2) * sums[2]
-                  + (n1c2 - ct * n1c1) * (n2c1 - ct * n2c2) * sums[3];
+    double result = n1c1 * n2c2 * sums[0] + (2.0 * part1 - part2) * sums[1] + (n1n2 + part1 - part2) * sums[2] + (n1c2 - ct * n1c1) * (n2c1 - ct * n2c2) * sums[3];
 
     result *= kMegConst / (lr1 * lr2);
     return result;
@@ -170,10 +175,11 @@ double sphereDotEeg(double intrad,
                     const Vector3d& rr1, double lr1,
                     const Vector3d& rr2, double lr2)
 {
-    if (lr1 == 0.0 || lr2 == 0.0) return 0.0;
+    if (lr1 == 0.0 || lr2 == 0.0)
+        return 0.0;
 
     double beta = (intrad * intrad) / (lr1 * lr2);
-    double ct   = std::clamp(rr1.dot(rr2), -1.0, 1.0);
+    double ct = std::clamp(rr1.dot(rr2), -1.0, 1.0);
 
     double sum = compSumEeg(beta, ct);
     return kEegConst * sum / (lr1 * lr2);
@@ -184,12 +190,15 @@ double sphereDotEeg(double intrad,
 // Per-coil data: normalised positions relative to sphere origin.
 struct CoilData
 {
-    Eigen::MatrixX3d rmag;     // normalised position vectors (np × 3)
-    Eigen::VectorXd  rlen;     // magnitudes (np)
-    Eigen::MatrixX3d cosmag;   // direction vectors (np × 3)
-    Eigen::VectorXd  w;        // integration weights (np)
+    Eigen::MatrixX3d rmag;   // normalised position vectors (np × 3)
+    Eigen::VectorXd rlen;    // magnitudes (np)
+    Eigen::MatrixX3d cosmag; // direction vectors (np × 3)
+    Eigen::VectorXd w;       // integration weights (np)
 
-    int np() const { return static_cast<int>(rlen.size()); }
+    int np() const
+    {
+        return static_cast<int>(rlen.size());
+    }
 };
 
 //=============================================================================================================
@@ -211,9 +220,9 @@ CoilData extractCoilData(const FwdCoil* coil, const Vector3d& r0)
             cd.rmag.row(i) = (rel / len).transpose();
         else
             cd.rmag.row(i).setZero();
-        cd.rlen(i)       = len;
+        cd.rlen(i) = len;
         cd.cosmag.row(i) = coil->cosmag.row(i).cast<double>();
-        cd.w(i)          = static_cast<double>(coil->w[i]);
+        cd.w(i) = static_cast<double>(coil->w[i]);
     }
     return cd;
 }
@@ -239,13 +248,9 @@ MatrixXd doSelfDots(double intrad, const FwdCoilSet& coils, const Vector3d& r0, 
                 for (int j = 0; j < c2.np(); ++j) {
                     double ww = c1.w(i) * c2.w(j);
                     if (isMeg) {
-                        dot += ww * sphereDotMeg(intrad,
-                                   c1.rmag.row(i).transpose(), c1.rlen(i), c1.cosmag.row(i).transpose(),
-                                   c2.rmag.row(j).transpose(), c2.rlen(j), c2.cosmag.row(j).transpose());
+                        dot += ww * sphereDotMeg(intrad, c1.rmag.row(i).transpose(), c1.rlen(i), c1.cosmag.row(i).transpose(), c2.rmag.row(j).transpose(), c2.rlen(j), c2.cosmag.row(j).transpose());
                     } else {
-                        dot += ww * sphereDotEeg(intrad,
-                                   c1.rmag.row(i).transpose(), c1.rlen(i),
-                                   c2.rmag.row(j).transpose(), c2.rlen(j));
+                        dot += ww * sphereDotEeg(intrad, c1.rmag.row(i).transpose(), c1.rlen(i), c2.rmag.row(j).transpose(), c2.rlen(j));
                     }
                 }
             }
@@ -277,20 +282,16 @@ MatrixXd doSurfaceDots(double intrad, const FwdCoilSet& coils,
         Vector3d rel = rr.row(vi).cast<double>() - r0.transpose();
         double lsurf = rel.norm();
         Vector3d rsurf = (lsurf > 0.0) ? Vector3d(rel / lsurf) : Vector3d::Zero();
-        Vector3d nsurf = nn.row(vi).cast<double>();  // surface normal (MEG cosmag)
+        Vector3d nsurf = nn.row(vi).cast<double>(); // surface normal (MEG cosmag)
 
         for (int ci = 0; ci < nc; ++ci) {
             const CoilData& c = cdata[ci];
             double dot = 0.0;
             for (int j = 0; j < c.np(); ++j) {
                 if (isMeg) {
-                    dot += c.w(j) * sphereDotMeg(intrad,
-                               rsurf, lsurf, nsurf,
-                               c.rmag.row(j).transpose(), c.rlen(j), c.cosmag.row(j).transpose());
+                    dot += c.w(j) * sphereDotMeg(intrad, rsurf, lsurf, nsurf, c.rmag.row(j).transpose(), c.rlen(j), c.cosmag.row(j).transpose());
                 } else {
-                    dot += c.w(j) * sphereDotEeg(intrad,
-                               rsurf, lsurf,
-                               c.rmag.row(j).transpose(), c.rlen(j));
+                    dot += c.w(j) * sphereDotEeg(intrad, rsurf, lsurf, c.rmag.row(j).transpose(), c.rlen(j));
                 }
             }
             products(vi, ci) = dot;
@@ -307,7 +308,7 @@ VectorXd adHocMegStds(const FwdCoilSet& coils)
     VectorXd stds(coils.ncoil());
     for (int k = 0; k < coils.ncoil(); ++k) {
         stds(k) = coils.coils[k]->is_axial_coil() ? static_cast<double>(kMagStd)
-                                                   : static_cast<double>(kGradStd);
+                                                  : static_cast<double>(kGradStd);
     }
     return stds;
 }
@@ -325,11 +326,11 @@ VectorXd adHocEegStds(int ncoil)
 // Compute mapping matrix via whitened SVD pseudo-inverse.
 // Returns float for GPU-friendly rendering; all internal math is double.
 std::unique_ptr<MatrixXf> computeMappingMatrix(const MatrixXd& selfDots,
-                                              const MatrixXd& surfaceDots,
-                                              const VectorXd& noiseStds,
-                                              double miss,
-                                              const MatrixXd& projOp = MatrixXd(),
-                                              bool applyAvgRef = false)
+                                               const MatrixXd& surfaceDots,
+                                               const VectorXd& noiseStds,
+                                               double miss,
+                                               const MatrixXd& projOp = MatrixXd(),
+                                               bool applyAvgRef = false)
 {
     if (selfDots.rows() == 0 || surfaceDots.rows() == 0) {
         return nullptr;
@@ -370,7 +371,7 @@ std::unique_ptr<MatrixXf> computeMappingMatrix(const MatrixXd& selfDots,
     }
     double totalVar = varexp(s.size() - 1);
 
-    int n = s.size();  // keep all by default
+    int n = s.size(); // keep all by default
     for (int i = 0; i < s.size(); ++i) {
         if (varexp(i) / totalVar >= (1.0 - miss)) {
             n = i + 1;

@@ -47,7 +47,7 @@ using namespace COMLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-CommandParser::CommandParser(QObject *parent)
+CommandParser::CommandParser(QObject* parent)
 : QObject(parent)
 {
 }
@@ -57,10 +57,9 @@ CommandParser::CommandParser(QObject *parent)
 bool CommandParser::exists(const QString& p_sCommand)
 {
     Subject::t_Observers::Iterator itObservers;
-    for(itObservers = this->observers().begin(); itObservers != this->observers().end(); ++itObservers)
-    {
-        CommandManager* t_pCommandManager = static_cast<CommandManager*> (*itObservers);
-        if(t_pCommandManager->hasCommand(p_sCommand))
+    for (itObservers = this->observers().begin(); itObservers != this->observers().end(); ++itObservers) {
+        CommandManager* t_pCommandManager = static_cast<CommandManager*>(*itObservers);
+        if (t_pCommandManager->hasCommand(p_sCommand))
             return true;
     }
     return false;
@@ -68,20 +67,19 @@ bool CommandParser::exists(const QString& p_sCommand)
 
 //=============================================================================================================
 
-bool CommandParser::parse(const QString &p_sInput, QStringList &p_qListCommandsParsed)
+bool CommandParser::parse(const QString& p_sInput, QStringList& p_qListCommandsParsed)
 {
-    if(p_sInput.size() <= 0)
+    if (p_sInput.size() <= 0)
         return false;
 
     p_qListCommandsParsed.clear();
 
     //Check if JSON format;
-    bool isJson  = false;
-    if(QString::compare(p_sInput.at(0), QString("{")) == 0)
+    bool isJson = false;
+    if (QString::compare(p_sInput.at(0), QString("{")) == 0)
         isJson = true;
 
-    if(isJson)
-    {
+    if (isJson) {
         qDebug() << "JSON command recognized";
 
         QJsonObject t_jsonObjectCommand;
@@ -89,7 +87,7 @@ bool CommandParser::parse(const QString &p_sInput, QStringList &p_qListCommandsP
         QJsonDocument t_jsonDocument(QJsonDocument::fromJson(p_sInput.toUtf8()));
 
         //Switch to command object
-        if(t_jsonDocument.isObject() && t_jsonDocument.object().value(QString("commands")) != QJsonValue::Undefined)
+        if (t_jsonDocument.isObject() && t_jsonDocument.object().value(QString("commands")) != QJsonValue::Undefined)
             t_jsonObjectCommand = t_jsonDocument.object().value(QString("commands")).toObject();
         else
             return false;
@@ -97,13 +95,11 @@ bool CommandParser::parse(const QString &p_sInput, QStringList &p_qListCommandsP
         //iterate over commands
         QJsonObject::Iterator it;
         QJsonObject::Iterator itParam;
-        for(it = t_jsonObjectCommand.begin(); it != t_jsonObjectCommand.end(); ++it)
-        {
+        for (it = t_jsonObjectCommand.begin(); it != t_jsonObjectCommand.end(); ++it) {
             //Print Command
             qInfo("%s\r\n", it.key().toUtf8().constData());
 
-            if(exists(it.key()))
-            {
+            if (exists(it.key())) {
                 RawCommand t_rawCommand(it.key(), true);
                 m_rawCommand = t_rawCommand;
                 t_jsonObjectParameters = it.value().toObject();
@@ -112,12 +108,11 @@ bool CommandParser::parse(const QString &p_sInput, QStringList &p_qListCommandsP
                 p_qListCommandsParsed.push_back(it.key());
 
                 //append the parameters
-                for(itParam= t_jsonObjectParameters.begin(); itParam != t_jsonObjectParameters.end(); ++itParam)
-                {
+                for (itParam = t_jsonObjectParameters.begin(); itParam != t_jsonObjectParameters.end(); ++itParam) {
                     qInfo(" %s", itParam.value().toString().toUtf8().constData());
                     //ToDo do a cross check with the param naming and key
                     m_rawCommand.pValues().append(itParam.value().toString());
-//                    qDebug() << itParam.key() << " + " << itParam.value().toString();
+                    //                    qDebug() << itParam.key() << " + " << itParam.value().toString();
                 }
 
                 //Notify attached command manager
@@ -125,16 +120,13 @@ bool CommandParser::parse(const QString &p_sInput, QStringList &p_qListCommandsP
             }
             qInfo("\r\n");
         }
-    }
-    else
-    {
+    } else {
         QStringList t_qCommandList = p_sInput.split(" ");
 
         //Print command
         qInfo("%s\r\n", t_qCommandList[0].toUtf8().constData());
 
-        if(!exists(t_qCommandList[0]))
-        {
+        if (!exists(t_qCommandList[0])) {
             qInfo("\r\n");
             return false;
         }
@@ -145,11 +137,10 @@ bool CommandParser::parse(const QString &p_sInput, QStringList &p_qListCommandsP
         // push command to processed commands
         p_qListCommandsParsed.push_back(t_qCommandList[0]);
 
-        if(t_qCommandList.size() > 1) //Parameter parsing
+        if (t_qCommandList.size() > 1) //Parameter parsing
         {
             //Parse Parameters
-            for(qint32 i = 1; i < t_qCommandList.size(); ++i)
-            {
+            for (qint32 i = 1; i < t_qCommandList.size(); ++i) {
                 qInfo(" %s", t_qCommandList[i].toUtf8().constData());
                 m_rawCommand.pValues().append(t_qCommandList[i]);
             }

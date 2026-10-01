@@ -80,9 +80,9 @@ void TestConnectivityAec::initTestCase()
     for (int t = 0; t < m_nSamples; ++t) {
         double time = static_cast<double>(t) / 100.0;
         m_data(0, t) = std::sin(2.0 * M_PI * 10.0 * time);
-        m_data(1, t) = std::sin(2.0 * M_PI * 10.0 * time + 0.1);  // Slightly phase-shifted
-        m_data(2, t) = std::sin(2.0 * M_PI * 25.0 * time);        // Different frequency
-        m_data(3, t) = std::cos(2.0 * M_PI * 10.0 * time);        // Same freq, 90° shift
+        m_data(1, t) = std::sin(2.0 * M_PI * 10.0 * time + 0.1); // Slightly phase-shifted
+        m_data(2, t) = std::sin(2.0 * M_PI * 25.0 * time);       // Different frequency
+        m_data(3, t) = std::cos(2.0 * M_PI * 10.0 * time);       // Same freq, 90° shift
     }
 }
 
@@ -106,8 +106,8 @@ void TestConnectivityAec::testUncorrelatedSignals()
 {
     // Signals at very different frequencies should have lower AEC
     MatrixXd data(2, m_nSamples);
-    data.row(0) = m_data.row(0);  // 10 Hz
-    data.row(1) = m_data.row(2);  // 25 Hz
+    data.row(0) = m_data.row(0); // 10 Hz
+    data.row(1) = m_data.row(2); // 25 Hz
 
     MatrixXd aec = ConnectivityAec::compute(data);
     // The AEC can be moderate since pure sinusoidal envelopes are flat,

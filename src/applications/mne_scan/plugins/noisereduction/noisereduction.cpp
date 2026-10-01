@@ -72,10 +72,10 @@ NoiseReduction::NoiseReduction()
 , m_pNoiseReductionInput(Q_NULLPTR)
 , m_pNoiseReductionOutput(Q_NULLPTR)
 {
-    if(m_sCurrentSystem == "BabyMEG") {
+    if (m_sCurrentSystem == "BabyMEG") {
         m_iNBaseFctsFirst = 270;
         m_iNBaseFctsSecond = 105;
-    } else if(m_sCurrentSystem == "VectorView") {
+    } else if (m_sCurrentSystem == "VectorView") {
         m_iNBaseFctsFirst = 102;
         m_iNBaseFctsSecond = 102;
     } else {
@@ -89,7 +89,7 @@ NoiseReduction::NoiseReduction()
 
 NoiseReduction::~NoiseReduction()
 {
-    if(this->isRunning()) {
+    if (this->isRunning()) {
         stop();
     }
 }
@@ -114,7 +114,7 @@ void NoiseReduction::init()
 
     // Output
     m_pNoiseReductionOutput = PluginOutputData<RealTimeMultiSampleArray>::create(this, "NoiseReductionOut", "NoiseReduction output data");
-    m_pNoiseReductionOutput->measurementData()->setName(this->getName());//Provide name to auto store widget settings
+    m_pNoiseReductionOutput->measurementData()->setName(this->getName()); //Provide name to auto store widget settings
     m_outputConnectors.append(m_pNoiseReductionOutput);
 }
 
@@ -165,7 +165,7 @@ QString NoiseReduction::getName() const
 
 QWidget* NoiseReduction::setupWidget()
 {
-    NoiseReductionSetupWidget* setupWidget = new NoiseReductionSetupWidget(this);//widget is later distroyed by CentralWidget - so it has to be created everytime new
+    NoiseReductionSetupWidget* setupWidget = new NoiseReductionSetupWidget(this); //widget is later distroyed by CentralWidget - so it has to be created everytime new
     return setupWidget;
 }
 
@@ -173,17 +173,17 @@ QWidget* NoiseReduction::setupWidget()
 
 void NoiseReduction::update(SCMEASLIB::Measurement::SPtr pMeasurement)
 {
-    if(QSharedPointer<RealTimeMultiSampleArray> pRTMSA = pMeasurement.dynamicCast<RealTimeMultiSampleArray>()) {
+    if (QSharedPointer<RealTimeMultiSampleArray> pRTMSA = pMeasurement.dynamicCast<RealTimeMultiSampleArray>()) {
         //Check if the fiff info was inititalized
-        if(!m_pFiffInfo) {
+        if (!m_pFiffInfo) {
             m_pFiffInfo = pRTMSA->info();
 
             //Init the multiplication matrices
-            m_matSparseProjMult = SparseMatrix<double>(m_pFiffInfo->chs.size(),m_pFiffInfo->chs.size());
-            m_matSparseCompMult = SparseMatrix<double>(m_pFiffInfo->chs.size(),m_pFiffInfo->chs.size());
-            m_matSparseSpharaMult = SparseMatrix<double>(m_pFiffInfo->chs.size(),m_pFiffInfo->chs.size());
-            m_matSparseProjCompMult = SparseMatrix<double>(m_pFiffInfo->chs.size(),m_pFiffInfo->chs.size());
-            m_matSparseFull = SparseMatrix<double>(m_pFiffInfo->chs.size(),m_pFiffInfo->chs.size());
+            m_matSparseProjMult = SparseMatrix<double>(m_pFiffInfo->chs.size(), m_pFiffInfo->chs.size());
+            m_matSparseCompMult = SparseMatrix<double>(m_pFiffInfo->chs.size(), m_pFiffInfo->chs.size());
+            m_matSparseSpharaMult = SparseMatrix<double>(m_pFiffInfo->chs.size(), m_pFiffInfo->chs.size());
+            m_matSparseProjCompMult = SparseMatrix<double>(m_pFiffInfo->chs.size(), m_pFiffInfo->chs.size());
+            m_matSparseFull = SparseMatrix<double>(m_pFiffInfo->chs.size(), m_pFiffInfo->chs.size());
 
             m_matSparseProjMult.setIdentity();
             m_matSparseCompMult.setIdentity();
@@ -197,19 +197,19 @@ void NoiseReduction::update(SCMEASLIB::Measurement::SPtr pMeasurement)
         }
 
         // Check if data is present
-        if(pRTMSA->getMultiSampleArray().size() > 0) {
+        if (pRTMSA->getMultiSampleArray().size() > 0) {
             //Init widgets
-            if(m_iMaxFilterTapSize == -1) {
+            if (m_iMaxFilterTapSize == -1) {
                 m_iMaxFilterTapSize = pRTMSA->getMultiSampleArray().first().cols();
                 initPluginControlWidgets();
                 QThread::start();
             }
 
-            for(qsizetype i = 0; i < pRTMSA->getMultiSampleArray().size(); ++i) {
+            for (qsizetype i = 0; i < pRTMSA->getMultiSampleArray().size(); ++i) {
                 // Please note that we do not need a copy here since this function will block until
                 // the buffer accepts new data again. Hence, the data is not deleted in the actual
                 // Measurement function after it emitted the notify signal.
-                while(!m_pCircularBuffer->push(pRTMSA->getMultiSampleArray()[i])) {
+                while (!m_pCircularBuffer->push(pRTMSA->getMultiSampleArray()[i])) {
                     //Do nothing until the circular buffer is ready to accept new data again
                 }
             }
@@ -221,7 +221,7 @@ void NoiseReduction::update(SCMEASLIB::Measurement::SPtr pMeasurement)
 
 void NoiseReduction::initPluginControlWidgets()
 {
-    if(m_pFiffInfo) {
+    if (m_pFiffInfo) {
         QList<QWidget*> plControlWidgets;
 
         // Projectors
@@ -323,13 +323,13 @@ void NoiseReduction::run()
     MatrixXd matData;
     QScopedPointer<RTPROCESSINGLIB::FilterOverlapAdd> pRtFilter(new RTPROCESSINGLIB::FilterOverlapAdd());
 
-    while(!isInterruptionRequested()) {
+    while (!isInterruptionRequested()) {
         // Get the current data
-        if(m_pCircularBuffer->pop(matData)) {
+        if (m_pCircularBuffer->pop(matData)) {
             m_mutex.lock();
             //Do SSP's and compensators here
-            if(m_bCompActivated) {
-                if(m_bProjActivated) {
+            if (m_bCompActivated) {
+                if (m_bProjActivated) {
                     //Comp + Proj
                     matData = m_matSparseProjCompMult * matData;
                 } else {
@@ -337,7 +337,7 @@ void NoiseReduction::run()
                     matData = m_matSparseCompMult * matData;
                 }
             } else {
-                if(m_bProjActivated) {
+                if (m_bProjActivated) {
                     //Proj
                     matData = m_matSparseProjMult * matData;
                 } else {
@@ -346,48 +346,48 @@ void NoiseReduction::run()
             }
 
             //Do temporal filtering here
-            if(m_bFilterActivated) {
+            if (m_bFilterActivated) {
                 matData = pRtFilter->calculate(matData,
                                                m_filterKernel,
                                                m_lFilterChannelList);
             }
 
             //Do SPHARA here
-            if(m_bSpharaActive) {
+            if (m_bSpharaActive) {
                 //Set bad channels to zero so they do not get smeared into
-                for(int i = 0; i < m_pFiffInfo->bads.size(); ++i) {
+                for (int i = 0; i < m_pFiffInfo->bads.size(); ++i) {
                     matData.row(m_pFiffInfo->ch_names.indexOf(m_pFiffInfo->bads.at(i))).setZero();
                 }
 
                 matData = m_matSparseSpharaMult * matData;
             }
 
-    //        //Common average
-    //        MatrixXd commonAvr = MatrixXd(m_pFiffInfo->chs.size(),m_pFiffInfo->chs.size());
-    //        commonAvr.setZero();
+            //        //Common average
+            //        MatrixXd commonAvr = MatrixXd(m_pFiffInfo->chs.size(),m_pFiffInfo->chs.size());
+            //        commonAvr.setZero();
 
-    //        int nEEGCh = 0;
+            //        int nEEGCh = 0;
 
-    //        for(int i = 0; i <m_pFiffInfo->chs.size(); ++i) {
-    //            if(m_pFiffInfo->chs.at(i).ch_name.contains("EEG") && !m_pFiffInfo->bads.contains(m_pFiffInfo->chs.at(i).ch_name)) {
-    //                nEEGCh++;
-    //            }
-    //        }
+            //        for(int i = 0; i <m_pFiffInfo->chs.size(); ++i) {
+            //            if(m_pFiffInfo->chs.at(i).ch_name.contains("EEG") && !m_pFiffInfo->bads.contains(m_pFiffInfo->chs.at(i).ch_name)) {
+            //                nEEGCh++;
+            //            }
+            //        }
 
-    //        for(int i = 0; i <m_pFiffInfo->chs.size(); ++i) {
-    //            for(int j = 0; j < m_pFiffInfo->chs.size(); ++j) {
-    //                if(m_pFiffInfo->chs.at(j).ch_name.contains("EEG") && !m_pFiffInfo->bads.contains(m_pFiffInfo->chs.at(j).ch_name)) {
-    //                    commonAvr(i,j) = 1/nEEGCh;
-    //                }
-    //            }
-    //        }
+            //        for(int i = 0; i <m_pFiffInfo->chs.size(); ++i) {
+            //            for(int j = 0; j < m_pFiffInfo->chs.size(); ++j) {
+            //                if(m_pFiffInfo->chs.at(j).ch_name.contains("EEG") && !m_pFiffInfo->bads.contains(m_pFiffInfo->chs.at(j).ch_name)) {
+            //                    commonAvr(i,j) = 1/nEEGCh;
+            //                }
+            //            }
+            //        }
 
-    //        UTILSLIB::IOUtils::write_eigen_matrix(commonAvr, "commonAvr.txt", "common vaergae matrix");
+            //        UTILSLIB::IOUtils::write_eigen_matrix(commonAvr, "commonAvr.txt", "common vaergae matrix");
 
             m_mutex.unlock();
 
             //Send the data to the connected plugins and the display
-            if(!isInterruptionRequested()) {
+            if (!isInterruptionRequested()) {
                 m_pNoiseReductionOutput->measurementData()->setValue(matData);
             }
         }
@@ -399,12 +399,12 @@ void NoiseReduction::run()
 void NoiseReduction::updateProjection(const QList<FIFFLIB::FiffProj>& projs)
 {
     //  Update the SSP projector
-    if(m_pFiffInfo) {
+    if (m_pFiffInfo) {
         m_mutex.lock();
         //If a minimum of one projector is active set m_bProjActivated to true so that this model applies the ssp to the incoming data
         m_bProjActivated = false;
-        for(qint32 i = 0; i < projs.size(); ++i) {
-            if(projs[i].active) {
+        for (qint32 i = 0; i < projs.size(); ++i) {
+            if (projs[i].active) {
                 m_bProjActivated = true;
                 break;
             }
@@ -414,9 +414,9 @@ void NoiseReduction::updateProjection(const QList<FIFFLIB::FiffProj>& projs)
         FiffProj::make_projector(projs, m_pFiffInfo->ch_names, matProj, m_pFiffInfo->bads);
 
         //set columns of matrix to zero depending on bad channels indexes
-        for(qint32 j = 0; j < m_pFiffInfo->bads.size(); ++j) {
+        for (qint32 j = 0; j < m_pFiffInfo->bads.size(); ++j) {
             int index = m_pFiffInfo->ch_names.indexOf(m_pFiffInfo->bads.at(j));
-            if(index >= 0 && index<m_pFiffInfo->ch_names.size()) {
+            if (index >= 0 && index < m_pFiffInfo->ch_names.size()) {
                 matProj.col(index).setZero();
             }
         }
@@ -430,17 +430,17 @@ void NoiseReduction::updateProjection(const QList<FIFFLIB::FiffProj>& projs)
         tripletList.reserve(nchan);
 
         tripletList.clear();
-        tripletList.reserve(matProj.rows()*matProj.cols());
-        for(i = 0; i < matProj.rows(); ++i) {
-            for(k = 0; k < matProj.cols(); ++k) {
-                if(matProj(i,k) != 0) {
-                    tripletList.push_back(T(i, k, matProj(i,k)));
+        tripletList.reserve(matProj.rows() * matProj.cols());
+        for (i = 0; i < matProj.rows(); ++i) {
+            for (k = 0; k < matProj.cols(); ++k) {
+                if (matProj(i, k) != 0) {
+                    tripletList.push_back(T(i, k, matProj(i, k)));
                 }
             }
         }
 
-        m_matSparseProjMult = SparseMatrix<double>(matProj.rows(),matProj.cols());
-        if(tripletList.size() > 0)
+        m_matSparseProjMult = SparseMatrix<double>(matProj.rows(), matProj.cols());
+        if (tripletList.size() > 0)
             m_matSparseProjMult.setFromTriplets(tripletList.begin(), tripletList.end());
 
         //Create full multiplication matrix
@@ -456,19 +456,19 @@ void NoiseReduction::updateProjection(const QList<FIFFLIB::FiffProj>& projs)
 void NoiseReduction::updateCompensator(int to)
 {
     // Update the compensator
-    if(m_pFiffInfo) {
-        if(to == 0) {
+    if (m_pFiffInfo) {
+        if (to == 0) {
             m_bCompActivated = false;
         } else {
             m_bCompActivated = true;
         }
 
-//        qDebug()<<"to"<<to;
-//        qDebug()<<"from"<<from;
-//        qDebug()<<"m_bCompActivated"<<m_bCompActivated;
+        //        qDebug()<<"to"<<to;
+        //        qDebug()<<"from"<<from;
+        //        qDebug()<<"m_bCompActivated"<<m_bCompActivated;
 
         FiffCtfComp newComp;
-        this->m_pFiffInfo->make_compensator(0, to, newComp);//Do this always from 0 since we always read new raw data, we never actually perform a multiplication on already existing data
+        this->m_pFiffInfo->make_compensator(0, to, newComp); //Do this always from 0 since we always read new raw data, we never actually perform a multiplication on already existing data
 
         //this->m_pFiffInfo->set_current_comp(to);
         MatrixXd matComp = newComp.data->data;
@@ -484,17 +484,17 @@ void NoiseReduction::updateCompensator(int to)
         tripletList.reserve(nchan);
 
         tripletList.clear();
-        tripletList.reserve(matComp.rows()*matComp.cols());
-        for(i = 0; i < matComp.rows(); ++i) {
-            for(k = 0; k < matComp.cols(); ++k) {
-                if(matComp(i,k) != 0) {
-                    tripletList.push_back(T(i, k, matComp(i,k)));
+        tripletList.reserve(matComp.rows() * matComp.cols());
+        for (i = 0; i < matComp.rows(); ++i) {
+            for (k = 0; k < matComp.cols(); ++k) {
+                if (matComp(i, k) != 0) {
+                    tripletList.push_back(T(i, k, matComp(i, k)));
                 }
             }
         }
 
-        m_matSparseCompMult = SparseMatrix<double>(matComp.rows(),matComp.cols());
-        if(tripletList.size() > 0) {
+        m_matSparseCompMult = SparseMatrix<double>(matComp.rows(), matComp.cols());
+        if (tripletList.size() > 0) {
             m_matSparseCompMult.setFromTriplets(tripletList.begin(), tripletList.end());
         }
 
@@ -516,17 +516,16 @@ void NoiseReduction::setFilterChannelType(QString sType)
     //Create channel filter list independent from channelNames
     m_lFilterChannelList.resize(0);
 
-    for(int i = 0; i < m_pFiffInfo->chs.size(); ++i) {
-        if((m_pFiffInfo->chs.at(i).kind == FIFFV_MEG_CH || m_pFiffInfo->chs.at(i).kind == FIFFV_EEG_CH ||
-            m_pFiffInfo->chs.at(i).kind == FIFFV_EOG_CH || m_pFiffInfo->chs.at(i).kind == FIFFV_ECG_CH ||
-            m_pFiffInfo->chs.at(i).kind == FIFFV_EMG_CH)/* && !m_pFiffInfo->bads.contains(m_pFiffInfo->chs.at(i).ch_name)*/) {
-
-            if(m_sFilterChannelType == "All") {
+    for (int i = 0; i < m_pFiffInfo->chs.size(); ++i) {
+        if ((m_pFiffInfo->chs.at(i).kind == FIFFV_MEG_CH || m_pFiffInfo->chs.at(i).kind == FIFFV_EEG_CH ||
+             m_pFiffInfo->chs.at(i).kind == FIFFV_EOG_CH || m_pFiffInfo->chs.at(i).kind == FIFFV_ECG_CH ||
+             m_pFiffInfo->chs.at(i).kind == FIFFV_EMG_CH) /* && !m_pFiffInfo->bads.contains(m_pFiffInfo->chs.at(i).ch_name)*/) {
+            if (m_sFilterChannelType == "All") {
                 m_lFilterChannelList.conservativeResize(m_lFilterChannelList.cols() + 1);
-                m_lFilterChannelList[m_lFilterChannelList.cols()-1] = i;
-            } else if(m_pFiffInfo->chs.at(i).ch_name.contains(m_sFilterChannelType)) {
+                m_lFilterChannelList[m_lFilterChannelList.cols() - 1] = i;
+            } else if (m_pFiffInfo->chs.at(i).ch_name.contains(m_sFilterChannelType)) {
                 m_lFilterChannelList.conservativeResize(m_lFilterChannelList.cols() + 1);
-                m_lFilterChannelList[m_lFilterChannelList.cols()-1] = i;
+                m_lFilterChannelList[m_lFilterChannelList.cols() - 1] = i;
             }
         }
     }
@@ -541,7 +540,7 @@ void NoiseReduction::setFilter(const FilterKernel& filterData)
     m_filterKernel = filterData;
 
     m_iMaxFilterLength = 1;
-    if(m_iMaxFilterLength < m_filterKernel.getFilterOrder()) {
+    if (m_iMaxFilterLength < m_filterKernel.getFilterOrder()) {
         m_iMaxFilterLength = m_filterKernel.getFilterOrder();
     }
     m_mutex.unlock();
@@ -571,77 +570,77 @@ void NoiseReduction::initSphara()
     m_vecIndicesFirstVV.resize(0);
     m_vecIndicesSecondVV.resize(0);
 
-    for(int r = 0; r < m_pFiffInfo->chs.size(); ++r) {
+    for (int r = 0; r < m_pFiffInfo->chs.size(); ++r) {
         //Find gardiometers
-        if(m_pFiffInfo->chs.at(r).chpos.coil_type == 3012) {
-            m_vecIndicesFirstVV.conservativeResize(m_vecIndicesFirstVV.rows()+1);
-            m_vecIndicesFirstVV(m_vecIndicesFirstVV.rows()-1) = r;
+        if (m_pFiffInfo->chs.at(r).chpos.coil_type == 3012) {
+            m_vecIndicesFirstVV.conservativeResize(m_vecIndicesFirstVV.rows() + 1);
+            m_vecIndicesFirstVV(m_vecIndicesFirstVV.rows() - 1) = r;
         }
 
         //Find magnetometers
-        if(m_pFiffInfo->chs.at(r).chpos.coil_type == 3024) {
-            m_vecIndicesSecondVV.conservativeResize(m_vecIndicesSecondVV.rows()+1);
-            m_vecIndicesSecondVV(m_vecIndicesSecondVV.rows()-1) = r;
+        if (m_pFiffInfo->chs.at(r).chpos.coil_type == 3024) {
+            m_vecIndicesSecondVV.conservativeResize(m_vecIndicesSecondVV.rows() + 1);
+            m_vecIndicesSecondVV(m_vecIndicesSecondVV.rows() - 1) = r;
         }
     }
 
     //Generate indices used to create the SPHARA operators for babyMEG
     m_vecIndicesFirstBabyMEG.resize(0);
-    for(int r = 0; r < m_pFiffInfo->chs.size(); ++r) {
+    for (int r = 0; r < m_pFiffInfo->chs.size(); ++r) {
         //Find inner layer
-        if(m_pFiffInfo->chs.at(r).chpos.coil_type == 7002) {
-            m_vecIndicesFirstBabyMEG.conservativeResize(m_vecIndicesFirstBabyMEG.rows()+1);
-            m_vecIndicesFirstBabyMEG(m_vecIndicesFirstBabyMEG.rows()-1) = r;
+        if (m_pFiffInfo->chs.at(r).chpos.coil_type == 7002) {
+            m_vecIndicesFirstBabyMEG.conservativeResize(m_vecIndicesFirstBabyMEG.rows() + 1);
+            m_vecIndicesFirstBabyMEG(m_vecIndicesFirstBabyMEG.rows() - 1) = r;
         }
 
         //Find outer layer
-        if(m_pFiffInfo->chs.at(r).chpos.coil_type == 7003) {
-            m_vecIndicesSecondBabyMEG.conservativeResize(m_vecIndicesSecondBabyMEG.rows()+1);
-            m_vecIndicesSecondBabyMEG(m_vecIndicesSecondBabyMEG.rows()-1) = r;
+        if (m_pFiffInfo->chs.at(r).chpos.coil_type == 7003) {
+            m_vecIndicesSecondBabyMEG.conservativeResize(m_vecIndicesSecondBabyMEG.rows() + 1);
+            m_vecIndicesSecondBabyMEG(m_vecIndicesSecondBabyMEG.rows() - 1) = r;
         }
     }
 
     //Generate indices used to create the SPHARA operators for EEG layouts
     m_vecIndicesFirstEEG.resize(0);
-    for(int r = 0; r < m_pFiffInfo->chs.size(); ++r) {
+    for (int r = 0; r < m_pFiffInfo->chs.size(); ++r) {
         //Find EEG
-        if(m_pFiffInfo->chs.at(r).kind == FIFFV_EEG_CH) {
-            m_vecIndicesFirstEEG.conservativeResize(m_vecIndicesFirstEEG.rows()+1);
-            m_vecIndicesFirstEEG(m_vecIndicesFirstEEG.rows()-1) = r;
+        if (m_pFiffInfo->chs.at(r).kind == FIFFV_EEG_CH) {
+            m_vecIndicesFirstEEG.conservativeResize(m_vecIndicesFirstEEG.rows() + 1);
+            m_vecIndicesFirstEEG(m_vecIndicesFirstEEG.rows() - 1) = r;
         }
     }
 
-//    qDebug()<<"NoiseReduction::createSpharaOperator - Read VectorView mag matrix "<<m_matSpharaVVMagLoaded.rows()<<m_matSpharaVVMagLoaded.cols()<<"and grad matrix"<<m_matSpharaVVGradLoaded.rows()<<m_matSpharaVVGradLoaded.cols();
-//    qDebug()<<"NoiseReduction::createSpharaOperator - Read BabyMEG inner layer matrix "<<m_matSpharaBabyMEGInnerLoaded.rows()<<m_matSpharaBabyMEGInnerLoaded.cols()<<"and outer layer matrix"<<m_matSpharaBabyMEGOuterFull.rows()<<m_matSpharaBabyMEGOuterFull.cols();
+    //    qDebug()<<"NoiseReduction::createSpharaOperator - Read VectorView mag matrix "<<m_matSpharaVVMagLoaded.rows()<<m_matSpharaVVMagLoaded.cols()<<"and grad matrix"<<m_matSpharaVVGradLoaded.rows()<<m_matSpharaVVGradLoaded.cols();
+    //    qDebug()<<"NoiseReduction::createSpharaOperator - Read BabyMEG inner layer matrix "<<m_matSpharaBabyMEGInnerLoaded.rows()<<m_matSpharaBabyMEGInnerLoaded.cols()<<"and outer layer matrix"<<m_matSpharaBabyMEGOuterFull.rows()<<m_matSpharaBabyMEGOuterFull.cols();
 }
 
 //=============================================================================================================
 
 void NoiseReduction::createSpharaOperator()
 {
-    qDebug()<<"NoiseReduction::createSpharaOperator - Creating SPHARA oerpator for"<<m_sCurrentSystem;
+    qDebug() << "NoiseReduction::createSpharaOperator - Creating SPHARA oerpator for" << m_sCurrentSystem;
 
     m_mutex.lock();
 
     MatrixXd matSpharaMultFirst = MatrixXd::Identity(m_pFiffInfo->chs.size(), m_pFiffInfo->chs.size());
     MatrixXd matSpharaMultSecond = MatrixXd::Identity(m_pFiffInfo->chs.size(), m_pFiffInfo->chs.size());
 
-    if(m_sCurrentSystem == "VectorView") {
-        matSpharaMultFirst = UTILSLIB::makeSpharaProjector(m_matSpharaVVGradLoaded, m_vecIndicesFirstVV, m_pFiffInfo->nchan, m_iNBaseFctsFirst, 1); //GRADIOMETERS
+    if (m_sCurrentSystem == "VectorView") {
+        matSpharaMultFirst = UTILSLIB::makeSpharaProjector(m_matSpharaVVGradLoaded, m_vecIndicesFirstVV, m_pFiffInfo->nchan, m_iNBaseFctsFirst, 1);   //GRADIOMETERS
         matSpharaMultSecond = UTILSLIB::makeSpharaProjector(m_matSpharaVVMagLoaded, m_vecIndicesSecondVV, m_pFiffInfo->nchan, m_iNBaseFctsSecond, 0); //Magnetometers
     }
 
-    if(m_sCurrentSystem == "BabyMEG") {
+    if (m_sCurrentSystem == "BabyMEG") {
         matSpharaMultFirst = UTILSLIB::makeSpharaProjector(m_matSpharaBabyMEGInnerLoaded, m_vecIndicesFirstBabyMEG, m_pFiffInfo->nchan, m_iNBaseFctsFirst, 0); //InnerLayer
     }
 
-    if(m_sCurrentSystem == "EEG") {
+    if (m_sCurrentSystem == "EEG") {
         matSpharaMultFirst = UTILSLIB::makeSpharaProjector(m_matSpharaEEGLoaded, m_vecIndicesFirstEEG, m_pFiffInfo->nchan, m_iNBaseFctsFirst, 0); //InnerLayer
     }
 
     //Write final operator matrices to file
-//    IOUtils::write_eigen_matrix(matSpharaMultFirst, QString(QCoreApplication::applicationDirPath() + "../resources/mne_scan/plugins/noisereduction/SPHARA/matSpharaMultFirst.txt"));
-//    IOUtils::write_eigen_matrix(matSpharaMultSecond, QString(QCoreApplication::applicationDirPath() + "../resources/mne_scan/plugins/noisereduction/SPHARA/matSpharaMultSecond.txt"));
+    //    IOUtils::write_eigen_matrix(matSpharaMultFirst, QString(QCoreApplication::applicationDirPath() + "../resources/mne_scan/plugins/noisereduction/SPHARA/matSpharaMultFirst.txt"));
+    //    IOUtils::write_eigen_matrix(matSpharaMultSecond, QString(QCoreApplication::applicationDirPath() + "../resources/mne_scan/plugins/noisereduction/SPHARA/matSpharaMultSecond.txt"));
 
     //
     // Make operators sparse
@@ -655,36 +654,36 @@ void NoiseReduction::createSpharaOperator()
 
     //First operator
     tripletList.clear();
-    tripletList.reserve(matSpharaMultFirst.rows()*matSpharaMultFirst.cols());
-    for(i = 0; i < matSpharaMultFirst.rows(); ++i) {
-        for(k = 0; k < matSpharaMultFirst.cols(); ++k) {
-            if(matSpharaMultFirst(i,k) != 0) {
-                tripletList.push_back(T(i, k, matSpharaMultFirst(i,k)));
+    tripletList.reserve(matSpharaMultFirst.rows() * matSpharaMultFirst.cols());
+    for (i = 0; i < matSpharaMultFirst.rows(); ++i) {
+        for (k = 0; k < matSpharaMultFirst.cols(); ++k) {
+            if (matSpharaMultFirst(i, k) != 0) {
+                tripletList.push_back(T(i, k, matSpharaMultFirst(i, k)));
             }
         }
     }
 
-    SparseMatrix<double> matSparseSpharaMultFirst = SparseMatrix<double>(m_pFiffInfo->chs.size(),m_pFiffInfo->chs.size());
+    SparseMatrix<double> matSparseSpharaMultFirst = SparseMatrix<double>(m_pFiffInfo->chs.size(), m_pFiffInfo->chs.size());
 
-    if(tripletList.size() > 0) {
+    if (tripletList.size() > 0) {
         matSparseSpharaMultFirst.setFromTriplets(tripletList.begin(), tripletList.end());
     }
 
     //Second operator
     tripletList.clear();
-    tripletList.reserve(matSpharaMultSecond.rows()*matSpharaMultSecond.cols());
+    tripletList.reserve(matSpharaMultSecond.rows() * matSpharaMultSecond.cols());
 
-    for(i = 0; i < matSpharaMultSecond.rows(); ++i) {
-        for(k = 0; k < matSpharaMultSecond.cols(); ++k) {
-            if(matSpharaMultSecond(i,k) != 0) {
-                tripletList.push_back(T(i, k, matSpharaMultSecond(i,k)));
+    for (i = 0; i < matSpharaMultSecond.rows(); ++i) {
+        for (k = 0; k < matSpharaMultSecond.cols(); ++k) {
+            if (matSpharaMultSecond(i, k) != 0) {
+                tripletList.push_back(T(i, k, matSpharaMultSecond(i, k)));
             }
         }
     }
 
-    SparseMatrix<double>matSparseSpharaMultSecond = SparseMatrix<double>(m_pFiffInfo->chs.size(),m_pFiffInfo->chs.size());
+    SparseMatrix<double> matSparseSpharaMultSecond = SparseMatrix<double>(m_pFiffInfo->chs.size(), m_pFiffInfo->chs.size());
 
-    if(tripletList.size() > 0) {
+    if (tripletList.size() > 0) {
         matSparseSpharaMultSecond.setFromTriplets(tripletList.begin(), tripletList.end());
     }
 
@@ -700,5 +699,5 @@ void NoiseReduction::createSpharaOperator()
 
 QString NoiseReduction::getBuildInfo()
 {
-    return QString(NOISEREDUCTIONPLUGIN::buildDateTime()) + QString(" - ")  + QString(NOISEREDUCTIONPLUGIN::buildHash());
+    return QString(NOISEREDUCTIONPLUGIN::buildDateTime()) + QString(" - ") + QString(NOISEREDUCTIONPLUGIN::buildHash());
 }

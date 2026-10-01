@@ -56,7 +56,6 @@ FiffProj::FiffProj()
 , desc("")
 , data(new FiffNamedMatrix)
 {
-
 }
 
 //=============================================================================================================
@@ -67,34 +66,31 @@ FiffProj::FiffProj(const FiffProj& p_FiffProj)
 , desc(p_FiffProj.desc)
 , data(p_FiffProj.data)
 {
-
 }
 
 //=============================================================================================================
 
-FiffProj::FiffProj( fiff_int_t p_kind, bool p_active, QString p_desc, FiffNamedMatrix& p_data)
+FiffProj::FiffProj(fiff_int_t p_kind, bool p_active, QString p_desc, FiffNamedMatrix& p_data)
 : kind(p_kind)
 , active(p_active)
 , desc(p_desc)
 , data(new FiffNamedMatrix(p_data))
 {
-
 }
 
 //=============================================================================================================
 
 FiffProj::~FiffProj()
 {
-
 }
 
 //=============================================================================================================
 
-void FiffProj::activate_projs(QList<FiffProj> &p_qListFiffProj)
+void FiffProj::activate_projs(QList<FiffProj>& p_qListFiffProj)
 {
     // Activate the projection items
     QList<FiffProj>::Iterator it;
-    for(it = p_qListFiffProj.begin(); it != p_qListFiffProj.end(); ++it)
+    for (it = p_qListFiffProj.begin(); it != p_qListFiffProj.end(); ++it)
         it->active = true;
 
     qInfo("\t%lld projection items activated.\n", p_qListFiffProj.size());
@@ -105,14 +101,13 @@ void FiffProj::activate_projs(QList<FiffProj> &p_qListFiffProj)
 fiff_int_t FiffProj::make_projector(const QList<FiffProj>& projs, const QStringList& ch_names, MatrixXd& proj, const QStringList& bads, MatrixXd& U)
 {
     fiff_int_t nchan = ch_names.size();
-    if (nchan == 0)
-    {
+    if (nchan == 0) {
         throw std::invalid_argument("No channel names specified");
     }
 
-//    if(proj)
-//        delete proj;
-    proj = MatrixXd::Identity(nchan,nchan);
+    //    if(proj)
+    //        delete proj;
+    proj = MatrixXd::Identity(nchan, nchan);
     fiff_int_t nproj = 0;
     U = MatrixXd();
 
@@ -122,12 +117,10 @@ fiff_int_t FiffProj::make_projector(const QList<FiffProj>& projs, const QStringL
     if (projs.size() == 0)
         return 0;
 
-    fiff_int_t nvec    = 0;
+    fiff_int_t nvec = 0;
     fiff_int_t k, l;
-    for (k = 0; k < projs.size(); ++k)
-    {
-        if (projs[k].active)
-        {
+    for (k = 0; k < projs.size(); ++k) {
+        if (projs[k].active) {
             ++nproj;
             nvec += projs[k].data->nrow;
         }
@@ -146,7 +139,7 @@ fiff_int_t FiffProj::make_projector(const QList<FiffProj>& projs, const QStringL
     //
     //   Pick the appropriate entries
     //
-    MatrixXd vecs = MatrixXd::Zero(nchan,nvec);
+    MatrixXd vecs = MatrixXd::Zero(nchan, nvec);
     nvec = 0;
     fiff_int_t nonzero = 0;
     qint32 p, c, i, j, v;
@@ -156,19 +149,16 @@ fiff_int_t FiffProj::make_projector(const QList<FiffProj>& projs, const QStringL
     RowVectorXi vecSel(nchan);
     sel.setConstant(-1);
     vecSel.setConstant(-1);
-    for (k = 0; k < projs.size(); ++k)
-    {
-        if (projs[k].active)
-        {
+    for (k = 0; k < projs.size(); ++k) {
+        if (projs[k].active) {
             FiffProj one = projs[k];
 
             QMap<QString, int> uniqueMap;
-            for(l = 0; l < one.data->col_names.size(); ++l)
-                uniqueMap[one.data->col_names[l] ] = 0;
+            for (l = 0; l < one.data->col_names.size(); ++l)
+                uniqueMap[one.data->col_names[l]] = 0;
 
-            if (one.data->col_names.size() != uniqueMap.keys().size())
-            {
-                qWarning("Channel name list in projection item %d contains duplicate items",k);
+            if (one.data->col_names.size() != uniqueMap.keys().size()) {
+                qWarning("Channel name list in projection item %d contains duplicate items", k);
                 return 0;
             }
 
@@ -181,28 +171,21 @@ fiff_int_t FiffProj::make_projector(const QList<FiffProj>& projs, const QStringL
             sel.setConstant(-1);
             vecSel.setConstant(-1);
             p = 0;
-            for (c = 0; c < nchan; ++c)
-            {
-                for (i = 0; i < one.data->col_names.size(); ++i)
-                {
-                    if (QString::compare(ch_names.at(c),one.data->col_names[i]) == 0)
-                    {
+            for (c = 0; c < nchan; ++c) {
+                for (i = 0; i < one.data->col_names.size(); ++i) {
+                    if (QString::compare(ch_names.at(c), one.data->col_names[i]) == 0) {
                         isBad = false;
-                        for (j = 0; j < bads.size(); ++j)
-                        {
-                            if (QString::compare(ch_names.at(c),bads.at(j)) == 0)
-                            {
+                        for (j = 0; j < bads.size(); ++j) {
+                            if (QString::compare(ch_names.at(c), bads.at(j)) == 0) {
                                 isBad = true;
                             }
                         }
 
-                        if (!isBad && sel[p] != c)
-                        {
+                        if (!isBad && sel[p] != c) {
                             sel[p] = c;
                             vecSel[p] = i;
                             ++p;
                         }
-
                     }
                 }
             }
@@ -214,17 +197,15 @@ fiff_int_t FiffProj::make_projector(const QList<FiffProj>& projs, const QStringL
             if (sel.cols() > 0)
                 for (v = 0; v < one.data->nrow; ++v)
                     for (i = 0; i < p; ++i)
-                        vecs(sel[i],nvec+v) = one.data->data(v,vecSel[i]);
+                        vecs(sel[i], nvec + v) = one.data->data(v, vecSel[i]);
 
             //
             //   Rescale for more straightforward detection of small singular values
             //
-            for (v = 0; v < one.data->nrow; ++v)
-            {
-                onesize = sqrt((vecs.col(nvec+v).transpose()*vecs.col(nvec+v))(0,0));
-                if (onesize > 0.0)
-                {
-                    vecs.col(nvec+v) = vecs.col(nvec+v)/onesize;
+            for (v = 0; v < one.data->nrow; ++v) {
+                onesize = sqrt((vecs.col(nvec + v).transpose() * vecs.col(nvec + v))(0, 0));
+                if (onesize > 0.0) {
+                    vecs.col(nvec + v) = vecs.col(nvec + v) / onesize;
                     ++nonzero;
                 }
             }
@@ -240,7 +221,7 @@ fiff_int_t FiffProj::make_projector(const QList<FiffProj>& projs, const QStringL
     //
     //   Reorthogonalize the vectors
     //
-    JacobiSVD<MatrixXd> svd(vecs.block(0,0,vecs.rows(),nvec), ComputeFullU);
+    JacobiSVD<MatrixXd> svd(vecs.block(0, 0, vecs.rows(), nvec), ComputeFullU);
     //Sort singular values and singular vectors
     VectorXd S = svd.singularValues();
     MatrixXd t_U = svd.matrixU();
@@ -250,8 +231,8 @@ fiff_int_t FiffProj::make_projector(const QList<FiffProj>& projs, const QStringL
     //   Throw away the linearly dependent guys
     //
     nproj = 0;
-    for(k = 0; k < S.size(); ++k)
-        if (S[k]/S[0] > 1e-2)
+    for (k = 0; k < S.size(); ++k)
+        if (S[k] / S[0] > 1e-2)
             ++nproj;
 
     U = t_U.block(0, 0, t_U.rows(), nproj);
@@ -259,26 +240,26 @@ fiff_int_t FiffProj::make_projector(const QList<FiffProj>& projs, const QStringL
     //
     //   Here is the celebrated result
     //
-    proj -= U*U.transpose();
+    proj -= U * U.transpose();
 
     return nproj;
 }
 
 //=============================================================================================================
 
-QList<FiffProj> FiffProj::compute_from_raw(const FiffRawData &raw,
-                                           const MatrixXi &events,
+QList<FiffProj> FiffProj::compute_from_raw(const FiffRawData& raw,
+                                           const MatrixXi& events,
                                            int eventCode,
                                            float tmin,
                                            float tmax,
                                            int nGrad,
                                            int nMag,
                                            int nEeg,
-                                           const QMap<QString,double> &mapReject)
+                                           const QMap<QString, double>& mapReject)
 {
     QList<FiffProj> projs;
     float sfreq = raw.info.sfreq;
-    int nchan   = raw.info.nchan;
+    int nchan = raw.info.nchan;
 
     int minSamp = static_cast<int>(std::round(tmin * sfreq));
     int maxSamp = static_cast<int>(std::round(tmax * sfreq));
@@ -307,8 +288,8 @@ QList<FiffProj> FiffProj::compute_from_raw(const FiffRawData &raw,
     // Collect matching epochs
     QList<MatrixXd> epochs;
     double gradReject = mapReject.value("grad", 0.0);
-    double magReject  = mapReject.value("mag", 0.0);
-    double eegReject  = mapReject.value("eeg", 0.0);
+    double magReject = mapReject.value("mag", 0.0);
+    double eegReject = mapReject.value("eeg", 0.0);
 
     for (int k = 0; k < events.rows(); ++k) {
         if (events(k, 1) != 0 || events(k, 2) != eventCode)
@@ -316,7 +297,7 @@ QList<FiffProj> FiffProj::compute_from_raw(const FiffRawData &raw,
 
         int evSample = events(k, 0);
         int epochStart = evSample + minSamp;
-        int epochEnd   = evSample + maxSamp;
+        int epochEnd = evSample + maxSamp;
 
         if (epochStart < raw.first_samp || epochEnd > raw.last_samp)
             continue;
@@ -340,7 +321,8 @@ QList<FiffProj> FiffProj::compute_from_raw(const FiffRawData &raw,
                 ok = false;
             }
         }
-        if (!ok) continue;
+        if (!ok)
+            continue;
 
         epochs.append(epochData);
     }
@@ -353,7 +335,7 @@ QList<FiffProj> FiffProj::compute_from_raw(const FiffRawData &raw,
     qInfo() << "[FiffProj::compute_from_raw]" << epochs.size() << "epochs collected for event" << eventCode;
 
     // Lambda: compute SVD-based projectors for a channel subset
-    auto computeProjForChannels = [&](const QList<int> &chIdx, int nVec, const QString &desc) {
+    auto computeProjForChannels = [&](const QList<int>& chIdx, int nVec, const QString& desc) {
         if (nVec <= 0 || chIdx.isEmpty())
             return;
 
@@ -378,9 +360,9 @@ QList<FiffProj> FiffProj::compute_from_raw(const FiffRawData &raw,
 
         for (int v = 0; v < nComp; ++v) {
             FiffProj proj;
-            proj.kind   = FIFFV_PROJ_ITEM_FIELD;
+            proj.kind = FIFFV_PROJ_ITEM_FIELD;
             proj.active = false;
-            proj.desc   = QString("%1-v%2").arg(desc).arg(v + 1);
+            proj.desc = QString("%1-v%2").arg(desc).arg(v + 1);
 
             FiffNamedMatrix::SDPtr namedMatrix(new FiffNamedMatrix());
             namedMatrix->nrow = 1;

@@ -55,8 +55,8 @@ namespace MNELIB
 class MNESHARED_EXPORT MNEMghTagGroup
 {
 public:
-    typedef QSharedPointer<MNEMghTagGroup> SPtr;              /**< Shared pointer type for MNEMghTagGroup. */
-    typedef QSharedPointer<const MNEMghTagGroup> ConstSPtr;   /**< Const shared pointer type for MNEMghTagGroup. */
+    typedef QSharedPointer<MNEMghTagGroup> SPtr;            /**< Shared pointer type for MNEMghTagGroup. */
+    typedef QSharedPointer<const MNEMghTagGroup> ConstSPtr; /**< Const shared pointer type for MNEMghTagGroup. */
 
     //=========================================================================================================
     /**
@@ -99,7 +99,10 @@ public:
      *
      * @return Number of owned tag entries.
      */
-    int ntags() const { return static_cast<int>(tags.size()); }
+    int ntags() const
+    {
+        return static_cast<int>(tags.size());
+    }
 };
 
 //=============================================================================================================

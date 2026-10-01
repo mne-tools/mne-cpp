@@ -47,7 +47,7 @@ AverageScene::AverageScene(QGraphicsView* view, QObject* parent)
 
 //=============================================================================================================
 
-void AverageScene::setScaleMap(const QMap<qint32,float> &scaleMap)
+void AverageScene::setScaleMap(const QMap<qint32, float>& scaleMap)
 {
     m_qMapChScaling = scaleMap;
 
@@ -64,7 +64,7 @@ void AverageScene::setScaleMap(const QMap<qint32,float> &scaleMap)
 
 //=============================================================================================================
 
-void AverageScene::repaintItems(const QList<QGraphicsItem *> &selectedChannelItems)
+void AverageScene::repaintItems(const QList<QGraphicsItem*>& selectedChannelItems)
 {
     this->clear();
 
@@ -80,7 +80,7 @@ void AverageScene::repaintItems(const QList<QGraphicsItem *> &selectedChannelIte
                                                                       m_colGlobalItemSignalColor);
 
         connect(averageSceneItemTemp, &AverageSceneItem::sceneUpdateRequested,
-                    this, &AverageScene::updateScene);
+                this, &AverageScene::updateScene);
 
         averageSceneItemTemp->setPos(160 * selectionSceneItemTemp->m_qpChannelPosition.x(),
                                      -160 * selectionSceneItemTemp->m_qpChannelPosition.y());
@@ -92,11 +92,11 @@ void AverageScene::repaintItems(const QList<QGraphicsItem *> &selectedChannelIte
 
 //=============================================================================================================
 
-void AverageScene::repaintSelectionItems(const DISPLIB::SelectionItem &selectedChannelItems)
+void AverageScene::repaintSelectionItems(const DISPLIB::SelectionItem& selectedChannelItems)
 {
     this->clear();
 
-    for (int i = 0; i < selectedChannelItems.m_iChannelKind.size(); i++){
+    for (int i = 0; i < selectedChannelItems.m_iChannelKind.size(); i++) {
         AverageSceneItem* averageSceneItemTemp = new AverageSceneItem(selectedChannelItems.m_sChannelName[i],
                                                                       selectedChannelItems.m_iChannelNumber[i],
                                                                       selectedChannelItems.m_qpChannelPosition[i],
@@ -117,12 +117,12 @@ void AverageScene::repaintSelectionItems(const DISPLIB::SelectionItem &selectedC
 
 //=============================================================================================================
 
-void AverageScene::setActivationPerAverage(const QSharedPointer<QMap<QString, bool> > qMapActivationPerAverage)
+void AverageScene::setActivationPerAverage(const QSharedPointer<QMap<QString, bool>> qMapActivationPerAverage)
 {
     QList<QGraphicsItem*> items = this->items();
     QListIterator<QGraphicsItem*> i(items);
     while (i.hasNext()) {
-        if(AverageSceneItem* averageSceneItemTemp = dynamic_cast<AverageSceneItem*>(i.next())) {
+        if (AverageSceneItem* averageSceneItemTemp = dynamic_cast<AverageSceneItem*>(i.next())) {
             averageSceneItemTemp->m_qMapAverageActivation = *qMapActivationPerAverage;
         }
     }
@@ -132,12 +132,12 @@ void AverageScene::setActivationPerAverage(const QSharedPointer<QMap<QString, bo
 
 //=============================================================================================================
 
-void AverageScene::setColorPerAverage(const QSharedPointer<QMap<QString, QColor> > qMapAverageColor)
+void AverageScene::setColorPerAverage(const QSharedPointer<QMap<QString, QColor>> qMapAverageColor)
 {
     QList<QGraphicsItem*> items = this->items();
     QListIterator<QGraphicsItem*> i(items);
     while (i.hasNext()) {
-        if(AverageSceneItem* averageSceneItemTemp = dynamic_cast<AverageSceneItem*>(i.next())) {
+        if (AverageSceneItem* averageSceneItemTemp = dynamic_cast<AverageSceneItem*>(i.next())) {
             averageSceneItemTemp->m_qMapAverageColor = *qMapAverageColor;
         }
     }
@@ -161,7 +161,7 @@ void AverageScene::updateScene()
 
 //=============================================================================================================
 
-void AverageScene::setSignalItemColor(const QColor &signalColor)
+void AverageScene::setSignalItemColor(const QColor& signalColor)
 {
     QList<QGraphicsItem*> items = this->items();
     QListIterator<QGraphicsItem*> i(items);
@@ -169,7 +169,7 @@ void AverageScene::setSignalItemColor(const QColor &signalColor)
     m_colGlobalItemSignalColor = signalColor;
 
     while (i.hasNext()) {
-        if(AverageSceneItem* averageSceneItemTemp = dynamic_cast<AverageSceneItem*>(i.next())) {
+        if (AverageSceneItem* averageSceneItemTemp = dynamic_cast<AverageSceneItem*>(i.next())) {
             averageSceneItemTemp->setDefaultColor(signalColor);
             averageSceneItemTemp->update();
         }

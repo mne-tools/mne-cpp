@@ -55,11 +55,11 @@ namespace BIDSLIB
  */
 struct BIDSSHARED_EXPORT BidsEvent
 {
-    float   onset{0.0f};        /**< Onset in seconds from the start of the recording. */
-    float   duration{0.0f};     /**< Duration of the event in seconds. */
-    int     sample{0};          /**< Sample index (0-based) corresponding to onset. */
-    int     value{0};           /**< Numeric event value / trigger code. */
-    QString trialType;          /**< Trial type or condition label (e.g. "stimulus", "response"). */
+    float onset{0.0f};    /**< Onset in seconds from the start of the recording. */
+    float duration{0.0f}; /**< Duration of the event in seconds. */
+    int sample{0};        /**< Sample index (0-based) corresponding to onset. */
+    int value{0};         /**< Numeric event value / trigger code. */
+    QString trialType;    /**< Trial type or condition label (e.g. "stimulus", "response"). */
 
     /**
      * @brief Read a BIDS *_events.tsv file.

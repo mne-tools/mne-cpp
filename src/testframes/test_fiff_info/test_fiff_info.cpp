@@ -30,9 +30,13 @@ class TestFiffInfo : public QObject
 private:
     QString m_sDataPath;
 
-    bool hasData() const { return !m_sDataPath.isEmpty(); }
+    bool hasData() const
+    {
+        return !m_sDataPath.isEmpty();
+    }
 
-    FiffChInfo makeCh(const QString &name, int kind, int unit, int coilType) {
+    FiffChInfo makeCh(const QString& name, int kind, int unit, int coilType)
+    {
         FiffChInfo ch;
         ch.ch_name = name;
         ch.kind = kind;
@@ -43,7 +47,8 @@ private:
         return ch;
     }
 
-    FiffInfoBase makeSyntheticInfoBase(int nCh = 4) {
+    FiffInfoBase makeSyntheticInfoBase(int nCh = 4)
+    {
         FiffInfoBase info;
         info.nchan = nCh;
         for (int i = 0; i < nCh; ++i) {
@@ -59,8 +64,7 @@ private slots:
     void initTestCase()
     {
         qInstallMessageHandler(MNELogger::customLogWriter);
-        QString base = QCoreApplication::applicationDirPath()
-                       + "/../resources/data/mne-cpp-test-data";
+        QString base = QCoreApplication::applicationDirPath() + "/../resources/data/mne-cpp-test-data";
         if (QFile::exists(base + "/MEG/sample/sample_audvis_trunc_raw.fif"))
             m_sDataPath = base;
     }
@@ -113,7 +117,7 @@ private slots:
     {
         QStringList allNames;
         allNames << "MEG 0001" << "MEG 0002" << "MEG 0003";
-        QStringList include;  // empty = include all
+        QStringList include; // empty = include all
         QStringList exclude;
         exclude << "MEG 0002";
 
@@ -226,8 +230,7 @@ private slots:
     //=========================================================================
     void info_readFromRaw()
     {
-        QString rawPath = QCoreApplication::applicationDirPath()
-                          + "/../resources/data/mne-cpp-test-data/MEG/sample/sample_audvis_trunc_raw.fif";
+        QString rawPath = QCoreApplication::applicationDirPath() + "/../resources/data/mne-cpp-test-data/MEG/sample/sample_audvis_trunc_raw.fif";
         if (!QFile::exists(rawPath)) {
             QSKIP("Sample raw file not found");
         }
@@ -251,8 +254,7 @@ private slots:
 
     void info_channelTypes()
     {
-        QString rawPath = QCoreApplication::applicationDirPath()
-                          + "/../resources/data/mne-cpp-test-data/MEG/sample/sample_audvis_trunc_raw.fif";
+        QString rawPath = QCoreApplication::applicationDirPath() + "/../resources/data/mne-cpp-test-data/MEG/sample/sample_audvis_trunc_raw.fif";
         if (!QFile::exists(rawPath)) {
             QSKIP("Sample raw file not found");
         }
@@ -269,7 +271,8 @@ private slots:
     //=========================================================================
     void data_pickTypes_allCombinations()
     {
-        if (!hasData()) QSKIP("No test data");
+        if (!hasData())
+            QSKIP("No test data");
         QFile file(m_sDataPath + "/MEG/sample/sample_audvis_trunc_raw.fif");
         FiffRawData raw(file);
 
@@ -297,13 +300,15 @@ private slots:
 
     void data_pickInfo_fromRaw()
     {
-        if (!hasData()) QSKIP("No test data");
+        if (!hasData())
+            QSKIP("No test data");
         QFile file(m_sDataPath + "/MEG/sample/sample_audvis_trunc_raw.fif");
         FiffRawData raw(file);
 
         // Pick first 50 channels
         RowVectorXi picks(50);
-        for (int i = 0; i < 50; ++i) picks(i) = i;
+        for (int i = 0; i < 50; ++i)
+            picks(i) = i;
 
         FiffInfo pickedInfo = raw.info.pick_info(picks);
         QCOMPARE(pickedInfo.nchan, 50);
@@ -316,12 +321,14 @@ private slots:
     //=========================================================================
     void data_proj_fromRealInfo()
     {
-        if (!hasData()) QSKIP("No test data");
+        if (!hasData())
+            QSKIP("No test data");
         QFile file(m_sDataPath + "/MEG/sample/sample_audvis_trunc_raw.fif");
         FiffRawData raw(file);
 
         QList<FiffProj>& projs = raw.info.projs;
-        if (projs.isEmpty()) QSKIP("No projectors in file");
+        if (projs.isEmpty())
+            QSKIP("No projectors in file");
 
         qDebug() << "Found" << projs.size() << "projectors:";
         for (const FiffProj& p : projs) {
@@ -351,10 +358,12 @@ private slots:
     //=========================================================================
     void data_cov_readAndPick()
     {
-        if (!hasData()) QSKIP("No test data");
+        if (!hasData())
+            QSKIP("No test data");
         QString path = m_sDataPath + "/MEG/sample/sample_audvis-cov.fif";
         QFile file(path);
-        if (!file.exists()) QSKIP("Covariance file not found");
+        if (!file.exists())
+            QSKIP("Covariance file not found");
 
         FiffCov cov(file);
         QVERIFY(!cov.isEmpty());
@@ -374,10 +383,12 @@ private slots:
     //=========================================================================
     void data_evokedInfo()
     {
-        if (!hasData()) QSKIP("No test data");
+        if (!hasData())
+            QSKIP("No test data");
         QString path = m_sDataPath + "/MEG/sample/sample_audvis-ave.fif";
         QFile file(path);
-        if (!file.exists()) QSKIP("Evoked file not found");
+        if (!file.exists())
+            QSKIP("Evoked file not found");
 
         FiffEvokedSet evokedSet(file);
         QVERIFY(evokedSet.evoked.size() > 0);
@@ -397,12 +408,14 @@ private slots:
     //=========================================================================
     void data_digPoints()
     {
-        if (!hasData()) QSKIP("No test data");
+        if (!hasData())
+            QSKIP("No test data");
         QFile file(m_sDataPath + "/MEG/sample/sample_audvis_trunc_raw.fif");
         FiffRawData raw(file);
 
         FiffDigPointSet digSet = raw.info.dig;
-        if (digSet.size() == 0) QSKIP("No dig points");
+        if (digSet.size() == 0)
+            QSKIP("No dig points");
 
         qDebug() << "Found" << digSet.size() << "digitization points";
 
@@ -418,7 +431,8 @@ private slots:
     //=========================================================================
     void data_compInfo()
     {
-        if (!hasData()) QSKIP("No test data");
+        if (!hasData())
+            QSKIP("No test data");
         QFile file(m_sDataPath + "/MEG/sample/sample_audvis_trunc_raw.fif");
         FiffRawData raw(file);
 
@@ -471,7 +485,9 @@ private slots:
         QVERIFY(raw.info.hpi_coil_freqs.isEmpty());
     }
 
-    void cleanupTestCase() {}
+    void cleanupTestCase()
+    {
+    }
 };
 
 QTEST_GUILESS_MAIN(TestFiffInfo)

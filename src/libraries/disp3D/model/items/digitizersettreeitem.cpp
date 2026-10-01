@@ -26,9 +26,9 @@
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-DigitizerSetTreeItem::DigitizerSetTreeItem(const QString &text,
-                                           const QList<FIFFLIB::FiffDigPoint> &digitizerPoints)
-    : QStandardItem(text)
+DigitizerSetTreeItem::DigitizerSetTreeItem(const QString& text,
+                                           const QList<FIFFLIB::FiffDigPoint>& digitizerPoints)
+: QStandardItem(text)
 {
     setCheckable(true);
     setCheckState(Qt::Checked);
@@ -40,67 +40,67 @@ DigitizerSetTreeItem::DigitizerSetTreeItem(const QString &text,
 
     int hpiIdx = 0, eegIdx = 0, extraIdx = 0;
 
-    for (const auto &p : digitizerPoints) {
+    for (const auto& p : digitizerPoints) {
         QVector3D pos(p.r[0], p.r[1], p.r[2]);
 
         switch (p.kind) {
-        case FIFFV_POINT_CARDINAL: {
-            cardinalPos.append(pos);
-            if (p.ident == FIFFV_POINT_NASION)
-                cardinalNames.append("Nasion");
-            else if (p.ident == FIFFV_POINT_LPA)
-                cardinalNames.append("LPA");
-            else if (p.ident == FIFFV_POINT_RPA)
-                cardinalNames.append("RPA");
-            else
-                cardinalNames.append(QString("Cardinal %1").arg(p.ident));
-            break;
-        }
-        case FIFFV_POINT_HPI:
-            hpiPos.append(pos);
-            hpiNames.append(QString("HPI %1").arg(++hpiIdx));
-            break;
-        case FIFFV_POINT_EEG:
-            eegPos.append(pos);
-            eegNames.append(QString("EEG %1").arg(++eegIdx));
-            break;
-        case FIFFV_POINT_EXTRA:
-            extraPos.append(pos);
-            extraNames.append(QString("Extra %1").arg(++extraIdx));
-            break;
-        default:
-            extraPos.append(pos);
-            extraNames.append(QString("Unknown %1").arg(extraPos.size()));
-            break;
+            case FIFFV_POINT_CARDINAL: {
+                cardinalPos.append(pos);
+                if (p.ident == FIFFV_POINT_NASION)
+                    cardinalNames.append("Nasion");
+                else if (p.ident == FIFFV_POINT_LPA)
+                    cardinalNames.append("LPA");
+                else if (p.ident == FIFFV_POINT_RPA)
+                    cardinalNames.append("RPA");
+                else
+                    cardinalNames.append(QString("Cardinal %1").arg(p.ident));
+                break;
+            }
+            case FIFFV_POINT_HPI:
+                hpiPos.append(pos);
+                hpiNames.append(QString("HPI %1").arg(++hpiIdx));
+                break;
+            case FIFFV_POINT_EEG:
+                eegPos.append(pos);
+                eegNames.append(QString("EEG %1").arg(++eegIdx));
+                break;
+            case FIFFV_POINT_EXTRA:
+                extraPos.append(pos);
+                extraNames.append(QString("Extra %1").arg(++extraIdx));
+                break;
+            default:
+                extraPos.append(pos);
+                extraNames.append(QString("Unknown %1").arg(extraPos.size()));
+                break;
         }
     }
 
     // Create child items for each non-empty category
     // Color and size scheme matches disp3D conventions
     if (!cardinalPos.isEmpty()) {
-        auto *item = new DigitizerTreeItem("Cardinal",
+        auto* item = new DigitizerTreeItem("Cardinal",
                                            DigitizerTreeItem::Cardinal,
                                            cardinalPos,
                                            cardinalNames,
-                                           QColor(0, 255, 0),   // Green
-                                           0.002f);             // 2mm
+                                           QColor(0, 255, 0), // Green
+                                           0.002f);           // 2mm
         appendRow(item);
         qDebug() << "DigitizerSetTreeItem: Cardinal points:" << cardinalPos.size();
     }
 
     if (!hpiPos.isEmpty()) {
-        auto *item = new DigitizerTreeItem("HPI",
+        auto* item = new DigitizerTreeItem("HPI",
                                            DigitizerTreeItem::HPI,
                                            hpiPos,
                                            hpiNames,
-                                           QColor(128, 0, 0),   // DarkRed
-                                           0.003f);             // 3mm - enlarged for better visibility
+                                           QColor(128, 0, 0), // DarkRed
+                                           0.003f);           // 3mm - enlarged for better visibility
         appendRow(item);
         qDebug() << "DigitizerSetTreeItem: HPI points:" << hpiPos.size();
     }
 
     if (!eegPos.isEmpty()) {
-        auto *item = new DigitizerTreeItem("EEG",
+        auto* item = new DigitizerTreeItem("EEG",
                                            DigitizerTreeItem::EEG,
                                            eegPos,
                                            eegNames,
@@ -111,7 +111,7 @@ DigitizerSetTreeItem::DigitizerSetTreeItem(const QString &text,
     }
 
     if (!extraPos.isEmpty()) {
-        auto *item = new DigitizerTreeItem("Extra",
+        auto* item = new DigitizerTreeItem("Extra",
                                            DigitizerTreeItem::Extra,
                                            extraPos,
                                            extraNames,
@@ -127,7 +127,7 @@ DigitizerSetTreeItem::DigitizerSetTreeItem(const QString &text,
 DigitizerTreeItem* DigitizerSetTreeItem::categoryItem(int kind) const
 {
     for (int i = 0; i < rowCount(); ++i) {
-        DigitizerTreeItem *item = dynamic_cast<DigitizerTreeItem*>(child(i));
+        DigitizerTreeItem* item = dynamic_cast<DigitizerTreeItem*>(child(i));
         if (item && static_cast<int>(item->pointKind()) == kind) {
             return item;
         }
@@ -141,7 +141,7 @@ int DigitizerSetTreeItem::totalPointCount() const
 {
     int count = 0;
     for (int i = 0; i < rowCount(); ++i) {
-        DigitizerTreeItem *item = dynamic_cast<DigitizerTreeItem*>(child(i));
+        DigitizerTreeItem* item = dynamic_cast<DigitizerTreeItem*>(child(i));
         if (item) {
             count += item->positions().size();
         }

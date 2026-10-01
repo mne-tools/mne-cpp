@@ -85,9 +85,9 @@ void TestPicardIca::initTestCase()
     m_sources = MatrixXd(3, m_nSamples);
     for (int t = 0; t < m_nSamples; ++t) {
         double time = static_cast<double>(t) / 250.0;
-        m_sources(0, t) = std::sin(2.0 * M_PI * 5.0 * time);                // 5 Hz sine
+        m_sources(0, t) = std::sin(2.0 * M_PI * 5.0 * time);               // 5 Hz sine
         m_sources(1, t) = (std::fmod(time * 3.0, 1.0) > 0.5) ? 1.0 : -1.0; // square wave
-        m_sources(2, t) = std::fmod(time * 7.0, 1.0) - 0.5;                 // sawtooth
+        m_sources(2, t) = std::fmod(time * 7.0, 1.0) - 0.5;                // sawtooth
     }
 
     // Random mixing matrix (5 x 3)
@@ -147,7 +147,7 @@ void TestPicardIca::testSourceSeparation()
             VectorXd orig = m_sources.row(j).transpose();
             // Compute absolute correlation
             double r = std::abs(recovered.dot(orig)) /
-                       (recovered.norm() * orig.norm());
+                (recovered.norm() * orig.norm());
             maxCorr = std::max(maxCorr, r);
         }
         QVERIFY2(maxCorr > 0.8,

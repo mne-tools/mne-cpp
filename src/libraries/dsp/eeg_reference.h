@@ -51,7 +51,7 @@
 
 namespace FIFFLIB
 {
-    class FiffInfo;
+class FiffInfo;
 }
 
 //=============================================================================================================
@@ -78,9 +78,9 @@ namespace UTILSLIB
  *                              (default: false — modify data directly)
  */
 DSPSHARED_EXPORT void setEegReference(Eigen::MatrixXd& data,
-                                       const FIFFLIB::FiffInfo& info,
-                                       const QStringList& refChannels = QStringList(),
-                                       bool projection = false);
+                                      const FIFFLIB::FiffInfo& info,
+                                      const QStringList& refChannels = QStringList(),
+                                      bool projection = false);
 
 //=============================================================================================================
 /**
@@ -95,8 +95,8 @@ DSPSHARED_EXPORT void setEegReference(Eigen::MatrixXd& data,
  * @param[in]     chNames   Names of the reference channel(s) to add.
  */
 DSPSHARED_EXPORT void addReferenceChannels(Eigen::MatrixXd& data,
-                                            FIFFLIB::FiffInfo& info,
-                                            const QStringList& chNames);
+                                           FIFFLIB::FiffInfo& info,
+                                           const QStringList& chNames);
 
 //=============================================================================================================
 /**
@@ -113,10 +113,10 @@ DSPSHARED_EXPORT void addReferenceChannels(Eigen::MatrixXd& data,
  *                               from the output (default: true).
  */
 DSPSHARED_EXPORT void setBipolarReference(Eigen::MatrixXd& data,
-                                           FIFFLIB::FiffInfo& info,
-                                           const QStringList& anodes,
-                                           const QStringList& cathodes,
-                                           bool dropOriginals = true);
+                                          FIFFLIB::FiffInfo& info,
+                                          const QStringList& anodes,
+                                          const QStringList& cathodes,
+                                          bool dropOriginals = true);
 
 } // namespace UTILSLIB
 

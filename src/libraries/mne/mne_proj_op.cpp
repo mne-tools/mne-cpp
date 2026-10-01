@@ -37,8 +37,7 @@
 #include <vector>
 
 constexpr int FAIL = -1;
-constexpr int OK   =  0;
-
+constexpr int OK = 0;
 
 
 //=============================================================================================================
@@ -54,9 +53,9 @@ using namespace MNELIB;
 //=============================================================================================================
 
 MNEProjOp::MNEProjOp()
-: nitems (0)
-, nch (0)
-, nvec (0)
+: nitems(0)
+, nch(0)
+, nvec(0)
 {
 }
 
@@ -73,7 +72,7 @@ void MNEProjOp::free_proj()
     proj_data.resize(0, 0);
 
     names.clear();
-    nch  = 0;
+    nch = 0;
     nvec = 0;
 
     return;
@@ -81,7 +80,7 @@ void MNEProjOp::free_proj()
 
 //=============================================================================================================
 
-MNEProjOp *MNEProjOp::combine(MNEProjOp *from)
+MNEProjOp* MNEProjOp::combine(MNEProjOp* from)
 /*
      * Copy items from 'from' operator to this operator
      */
@@ -89,8 +88,8 @@ MNEProjOp *MNEProjOp::combine(MNEProjOp *from)
     if (from) {
         for (int k = 0; k < from->nitems; k++) {
             const auto& it = from->items[k];
-            add_item(it.vecs.get(),it.kind,it.desc);
-            items[nitems-1].active_file = it.active_file;
+            add_item(it.vecs.get(), it.kind, it.desc);
+            items[nitems - 1].active_file = it.active_file;
         }
     }
     return this;
@@ -98,7 +97,7 @@ MNEProjOp *MNEProjOp::combine(MNEProjOp *from)
 
 //=============================================================================================================
 
-void MNEProjOp::add_item_active(const MNENamedMatrix *vecs, int kind, const QString& desc, bool is_active)
+void MNEProjOp::add_item_active(const MNENamedMatrix* vecs, int kind, const QString& desc, bool is_active)
 /*
  * Add a new item to an existing projection operator
  */
@@ -106,25 +105,23 @@ void MNEProjOp::add_item_active(const MNENamedMatrix *vecs, int kind, const QStr
     items.append(MNEProjItem());
     auto& new_item = items.back();
 
-    new_item.active      = is_active;
-    new_item.vecs        = std::make_unique<MNENamedMatrix>(*vecs);
+    new_item.active = is_active;
+    new_item.vecs = std::make_unique<MNENamedMatrix>(*vecs);
 
     if (kind == FIFFV_MNE_PROJ_ITEM_EEG_AVREF) {
         new_item.has_meg = false;
         new_item.has_eeg = true;
-    }
-    else {
+    } else {
         for (int k = 0; k < vecs->ncol; k++) {
-            if (vecs->collist[k].contains("EEG"))//strstr(vecs->collist[k],"EEG") == vecs->collist[k])
+            if (vecs->collist[k].contains("EEG")) //strstr(vecs->collist[k],"EEG") == vecs->collist[k])
                 new_item.has_eeg = true;
-            if (vecs->collist[k].contains("MEG"))//strstr(vecs->collist[k],"MEG") == vecs->collist[k])
+            if (vecs->collist[k].contains("MEG")) //strstr(vecs->collist[k],"MEG") == vecs->collist[k])
                 new_item.has_meg = true;
         }
         if (!new_item.has_meg && !new_item.has_eeg) {
             new_item.has_meg = true;
             new_item.has_eeg = false;
-        }
-        else if (new_item.has_meg && new_item.has_eeg) {
+        } else if (new_item.has_meg && new_item.has_eeg) {
             new_item.has_meg = true;
             new_item.has_eeg = false;
         }
@@ -136,13 +133,13 @@ void MNEProjOp::add_item_active(const MNENamedMatrix *vecs, int kind, const QStr
 
     nitems++;
 
-    free_proj();  /* These data are not valid any more */
+    free_proj(); /* These data are not valid any more */
     return;
 }
 
 //=============================================================================================================
 
-void MNEProjOp::add_item(const MNENamedMatrix *vecs, int kind, const QString& desc)
+void MNEProjOp::add_item(const MNENamedMatrix* vecs, int kind, const QString& desc)
 {
     add_item_active(vecs, kind, desc, true);
 }
@@ -158,7 +155,7 @@ std::unique_ptr<MNEProjOp> MNEProjOp::dup() const
 
     for (int k = 0; k < nitems; k++) {
         const auto& it = items[k];
-        res->add_item_active(it.vecs.get(),it.kind,it.desc,it.active);
+        res->add_item_active(it.vecs.get(), it.kind, it.desc, it.active);
         res->items[k].active_file = it.active_file;
     }
     return res;
@@ -173,7 +170,7 @@ std::unique_ptr<MNEProjOp> MNEProjOp::create_average_eeg_ref(const QList<FiffChI
 {
     int eegcount = 0;
     int k;
-    QStringList     names;
+    QStringList names;
 
     for (k = 0; k < nch; k++)
         if (chs.at(k).kind == FIFFV_EEG_CH)
@@ -187,13 +184,13 @@ std::unique_ptr<MNEProjOp> MNEProjOp::create_average_eeg_ref(const QList<FiffChI
         if (chs.at(k).kind == FIFFV_EEG_CH)
             names.append(chs.at(k).ch_name);
 
-    Eigen::MatrixXf vec_data = Eigen::MatrixXf::Constant(1, eegcount, 1.0f/sqrt(static_cast<double>(eegcount)));
+    Eigen::MatrixXf vec_data = Eigen::MatrixXf::Constant(1, eegcount, 1.0f / sqrt(static_cast<double>(eegcount)));
 
     QStringList emptyList;
-    auto vecs = MNENamedMatrix::build(1,eegcount,emptyList,names,vec_data);
+    auto vecs = MNENamedMatrix::build(1, eegcount, emptyList, names, vec_data);
 
     auto op = std::make_unique<MNEProjOp>();
-    op->add_item(vecs.get(),FIFFV_MNE_PROJ_ITEM_EEG_AVREF,"Average EEG reference");
+    op->add_item(vecs.get(), FIFFV_MNE_PROJ_ITEM_EEG_AVREF, "Average EEG reference");
 
     return op;
 }
@@ -206,7 +203,7 @@ int MNEProjOp::affect(const QStringList& list, int nlist)
     int naff;
 
     for (k = 0, naff = 0; k < nitems; k++)
-        if (items[k].active && items[k].affect(list,nlist))
+        if (items[k].active && items[k].affect(list, nlist))
             naff += items[k].nvec;
 
     return naff;
@@ -259,7 +256,7 @@ int MNEProjOp::project_vector(Eigen::Ref<Eigen::VectorXf> vec, bool do_complemen
 
 //=============================================================================================================
 
-std::unique_ptr<MNEProjOp> MNEProjOp::read_from_node(FiffStream::SPtr &stream, const FiffDirNode::SPtr &start)
+std::unique_ptr<MNEProjOp> MNEProjOp::read_from_node(FiffStream::SPtr& stream, const FiffDirNode::SPtr& start)
 /*
      * Load all the linear projection data
      */
@@ -268,13 +265,13 @@ std::unique_ptr<MNEProjOp> MNEProjOp::read_from_node(FiffStream::SPtr &stream, c
     FiffDirNode::SPtr start_node;
     QList<FiffDirNode::SPtr> items;
     FiffDirNode::SPtr node;
-    int         k;
-    QString     item_desc,desc_tag;
-    int         global_nchan,item_nchan;
+    int k;
+    QString item_desc, desc_tag;
+    int global_nchan, item_nchan;
     QStringList item_names;
-    int         item_kind;
-    int         item_nvec;
-    int         item_active;
+    int item_kind;
+    int item_nvec;
+    int item_active;
     FiffTag::UPtr t_pTag;
 
     if (!stream) {
@@ -289,19 +286,19 @@ std::unique_ptr<MNEProjOp> MNEProjOp::read_from_node(FiffStream::SPtr &stream, c
 
     auto op = std::make_unique<MNEProjOp>();
     proj = start_node->dir_tree_find(FIFFB_PROJ);
-    if (proj.size() == 0 || proj[0]->isEmpty())   /* The caller must recognize an empty projection */
+    if (proj.size() == 0 || proj[0]->isEmpty()) /* The caller must recognize an empty projection */
         return op;
     /*
         * Only the first projection block is recognized
         */
     items = proj[0]->dir_tree_find(FIFFB_PROJ_ITEM);
-    if (items.size() == 0 || items[0]->isEmpty())   /* The caller must recognize an empty projection */
+    if (items.size() == 0 || items[0]->isEmpty()) /* The caller must recognize an empty projection */
         return op;
     /*
         * Get a common number of channels
         */
     node = proj[0];
-    if(!node->find_tag(stream, FIFF_NCHAN, t_pTag))
+    if (!node->find_tag(stream, FIFF_NCHAN, t_pTag))
         global_nchan = 0;
     else {
         global_nchan = *t_pTag->toInt();
@@ -327,7 +324,7 @@ std::unique_ptr<MNEProjOp> MNEProjOp::read_from_node(FiffStream::SPtr &stream, c
         if (node->find_tag(stream, FIFF_DESCRIPTION, t_pTag)) {
             desc_tag = t_pTag->toString();
             int pos;
-            if((pos = desc_tag.indexOf("\n")) >= 0)
+            if ((pos = desc_tag.indexOf("\n")) >= 0)
                 desc_tag.truncate(pos);
             if (!item_desc.isEmpty())
                 item_desc += " ";
@@ -338,8 +335,7 @@ std::unique_ptr<MNEProjOp> MNEProjOp::read_from_node(FiffStream::SPtr &stream, c
         */
         if (!node->find_tag(stream, FIFF_NCHAN, t_pTag)) {
             item_nchan = global_nchan;
-        }
-        else {
+        } else {
             item_nchan = *t_pTag->toInt();
         }
         if (item_nchan <= 0) {
@@ -356,7 +352,7 @@ std::unique_ptr<MNEProjOp> MNEProjOp::read_from_node(FiffStream::SPtr &stream, c
         item_names = FiffStream::split_name_list(t_pTag->toString());
 
         if (item_names.size() != item_nchan) {
-            qCritical("Channel name list incorrectly specified for proj item # %d",k+1);
+            qCritical("Channel name list incorrectly specified for proj item # %d", k + 1);
             item_names.clear();
             return nullptr;
         }
@@ -370,14 +366,14 @@ std::unique_ptr<MNEProjOp> MNEProjOp::read_from_node(FiffStream::SPtr &stream, c
         /*
             * How many vectors
             */
-        if (!node->find_tag(stream,FIFF_PROJ_ITEM_NVEC, t_pTag)) {
+        if (!node->find_tag(stream, FIFF_PROJ_ITEM_NVEC, t_pTag)) {
             return nullptr;
         }
         item_nvec = *t_pTag->toInt();
         /*
             * The projection data
             */
-        if (!node->find_tag(stream,FIFF_PROJ_ITEM_VECTORS, t_pTag)) {
+        if (!node->find_tag(stream, FIFF_PROJ_ITEM_VECTORS, t_pTag)) {
             return nullptr;
         }
 
@@ -388,16 +384,15 @@ std::unique_ptr<MNEProjOp> MNEProjOp::read_from_node(FiffStream::SPtr &stream, c
             */
         if (node->find_tag(stream, FIFF_MNE_PROJ_ITEM_ACTIVE, t_pTag)) {
             item_active = *t_pTag->toInt();
-        }
-        else
+        } else
             item_active = false;
         /*
         * Ready to add
         */
         QStringList emptyList;
-        auto item = MNENamedMatrix::build(item_nvec,item_nchan,emptyList,item_names,item_vectors);
-        op->add_item_active(item.get(),item_kind,item_desc,item_active);
-        op->items[op->nitems-1].active_file = item_active;
+        auto item = MNENamedMatrix::build(item_nvec, item_nchan, emptyList, item_names, item_vectors);
+        op->add_item_active(item.get(), item_kind, item_desc, item_active);
+        op->items[op->nitems - 1].active_file = item_active;
     }
 
     return op;
@@ -405,16 +400,16 @@ std::unique_ptr<MNEProjOp> MNEProjOp::read_from_node(FiffStream::SPtr &stream, c
 
 //=============================================================================================================
 
-std::unique_ptr<MNEProjOp> MNEProjOp::read(const QString &name)
+std::unique_ptr<MNEProjOp> MNEProjOp::read(const QString& name)
 {
     QFile file(name);
     FiffStream::SPtr stream(new FiffStream(&file));
 
-    if(!stream->open())
+    if (!stream->open())
         return nullptr;
 
     FiffDirNode::SPtr t_default;
-    auto res = read_from_node(stream,t_default);
+    auto res = read_from_node(stream, t_default);
 
     stream->close();
 
@@ -423,12 +418,12 @@ std::unique_ptr<MNEProjOp> MNEProjOp::read(const QString &name)
 
 //=============================================================================================================
 
-void MNEProjOp::report_data(QTextStream &out, const QString &tag, bool list_data, const QStringList &exclude)
+void MNEProjOp::report_data(QTextStream& out, const QString& tag, bool list_data, const QStringList& exclude)
 /*
      * Output info about the projection operator
      */
 {
-    int p,q;
+    int p, q;
     MNENamedMatrix* vecs;
     bool found;
 
@@ -443,7 +438,7 @@ void MNEProjOp::report_data(QTextStream &out, const QString &tag, bool list_data
             out << tag << "\n";
         if (!tag.isEmpty())
             out << tag;
-        out << "# " << (k+1) << " : " << it.desc << " : " << it.nvec << " vecs : " << it.vecs->ncol << " chs "
+        out << "# " << (k + 1) << " : " << it.desc << " : " << it.nvec << " vecs : " << it.vecs->ncol << " chs "
             << (it.has_meg ? "MEG" : "EEG") << " "
             << (it.active ? "active" : "idle") << "\n";
         if (list_data && !tag.isEmpty())
@@ -453,14 +448,14 @@ void MNEProjOp::report_data(QTextStream &out, const QString &tag, bool list_data
 
             for (q = 0; q < vecs->ncol; q++) {
                 out << qSetFieldWidth(10) << Qt::left << vecs->collist[q] << qSetFieldWidth(0);
-                out << (q < vecs->ncol-1 ? " " : "\n");
+                out << (q < vecs->ncol - 1 ? " " : "\n");
             }
             for (p = 0; p < vecs->nrow; p++)
                 for (q = 0; q < vecs->ncol; q++) {
                     found = exclude.contains(vecs->collist[q]);
                     out << qSetFieldWidth(10) << qSetRealNumberPrecision(5) << Qt::forcepoint
                         << (found ? 0.0 : vecs->data(p, q)) << qSetFieldWidth(0) << " ";
-                    out << (q < vecs->ncol-1 ? " " : "\n");
+                    out << (q < vecs->ncol - 1 ? " " : "\n");
                 }
             if (list_data && !tag.isEmpty())
                 out << tag << "\n";
@@ -471,7 +466,7 @@ void MNEProjOp::report_data(QTextStream &out, const QString &tag, bool list_data
 
 //=============================================================================================================
 
-void MNEProjOp::report(QTextStream &out, const QString &tag)
+void MNEProjOp::report(QTextStream& out, const QString& tag)
 {
     report_data(out, tag, false, QStringList());
 }
@@ -480,20 +475,21 @@ void MNEProjOp::report(QTextStream &out, const QString &tag)
 
 int MNEProjOp::assign_channels(const QStringList& list, int nlist)
 {
-    free_proj();  /* Compiled data is no longer valid */
+    free_proj(); /* Compiled data is no longer valid */
 
     if (nlist == 0)
         return OK;
 
     names = list;
-    nch   = nlist;
+    nch = nlist;
 
     return OK;
 }
 
 //=============================================================================================================
 
-namespace {
+namespace
+{
 
 void clear_channel_group(Eigen::Ref<Eigen::VectorXf> data, const QStringList& ch_names, int nnames, const QString& prefix)
 {
@@ -502,7 +498,7 @@ void clear_channel_group(Eigen::Ref<Eigen::VectorXf> data, const QStringList& ch
             data[k] = 0.0;
 }
 
-constexpr float USE_LIMIT   = 1e-5f;
+constexpr float USE_LIMIT = 1e-5f;
 constexpr float SMALL_VALUE = 1e-4f;
 
 } // anonymous namespace
@@ -511,26 +507,26 @@ int MNEProjOp::make_proj_bad(const QStringList& bad)
 {
     using RowMatrixXf = Eigen::Matrix<float, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor>;
 
-    int   k,p,q,r,nvec_total;
+    int k, p, q, r, nvec_total;
     RowMatrixXf vv_meg_mat;
     Eigen::VectorXf sing_meg_vec;
     RowMatrixXf vv_eeg_mat;
     Eigen::VectorXf sing_eeg_vec;
-    int   nvec_meg;
-    int   nvec_eeg;
+    int nvec_meg;
+    int nvec_eeg;
     MNENamedVector vec;
     float size;
-    int   nzero;
+    int nzero;
 
     proj_data.resize(0, 0);
-    nvec      = 0;
+    nvec = 0;
 
     if (nch <= 0)
         return OK;
     if (nitems <= 0)
         return OK;
 
-    nvec_total = affect(names,nch);
+    nvec_total = affect(names, nch);
     if (nvec_total == 0)
         return OK;
 
@@ -538,22 +534,21 @@ int MNEProjOp::make_proj_bad(const QStringList& bad)
     RowMatrixXf mat_eeg_mat = RowMatrixXf::Zero(nvec_total, nch);
 
     for (k = 0, nvec_meg = nvec_eeg = 0; k < nitems; k++) {
-        if (items[k].active && items[k].affect(names,nch)) {
-            vec.nvec  = items[k].vecs->ncol;
+        if (items[k].active && items[k].affect(names, nch)) {
+            vec.nvec = items[k].vecs->ncol;
             vec.names = items[k].vecs->collist;
             if (items[k].has_meg) {
                 for (p = 0; p < items[k].nvec; p++, nvec_meg++) {
                     vec.data = items[k].vecs->data.row(p);
                     Eigen::Map<Eigen::VectorXf> res_meg(mat_meg_mat.row(nvec_meg).data(), nch);
-                    if (vec.pick(names,nch,false,res_meg) == FAIL)
+                    if (vec.pick(names, nch, false, res_meg) == FAIL)
                         return FAIL;
                 }
-            }
-            else if (items[k].has_eeg) {
+            } else if (items[k].has_eeg) {
                 for (p = 0; p < items[k].nvec; p++, nvec_eeg++) {
                     vec.data = items[k].vecs->data.row(p);
                     Eigen::Map<Eigen::VectorXf> res_eeg(mat_eeg_mat.row(nvec_eeg).data(), nch);
-                    if (vec.pick(names,nch,false,res_eeg) == FAIL)
+                    if (vec.pick(names, nch, false, res_eeg) == FAIL)
                         return FAIL;
                 }
             }
@@ -566,9 +561,9 @@ int MNEProjOp::make_proj_bad(const QStringList& bad)
         for (r = 0; r < nch; r++)
             if (names[r] == bad[q]) {
                 for (p = 0; p < nvec_meg; p++)
-                    mat_meg_mat(p,r) = 0.0;
+                    mat_meg_mat(p, r) = 0.0;
                 for (p = 0; p < nvec_eeg; p++)
-                    mat_eeg_mat(p,r) = 0.0;
+                    mat_eeg_mat(p, r) = 0.0;
             }
     /*
      * Scale the rows so that detection of linear dependence becomes easy
@@ -577,23 +572,23 @@ int MNEProjOp::make_proj_bad(const QStringList& bad)
         size = mat_meg_mat.row(p).norm();
         if (size > 0) {
             mat_meg_mat.row(p) /= size;
-        }
-        else
+        } else
             nzero++;
     }
     if (nzero == nvec_meg) {
-        mat_meg_mat.resize(0, 0); nvec_meg = 0;
+        mat_meg_mat.resize(0, 0);
+        nvec_meg = 0;
     }
     for (p = 0, nzero = 0; p < nvec_eeg; p++) {
         size = mat_eeg_mat.row(p).norm();
         if (size > 0) {
             mat_eeg_mat.row(p) /= size;
-        }
-        else
+        } else
             nzero++;
     }
     if (nzero == nvec_eeg) {
-        mat_eeg_mat.resize(0, 0); nvec_eeg = 0;
+        mat_eeg_mat.resize(0, 0);
+        nvec_eeg = 0;
     }
     if (nvec_meg + nvec_eeg == 0) {
         qWarning("No projection remains after excluding bad channels. Omitting projection.");
@@ -616,32 +611,32 @@ int MNEProjOp::make_proj_bad(const QStringList& bad)
      * Check for linearly dependent vectors
      */
     for (p = 0, nvec = 0; p < nvec_meg; p++, nvec++)
-        if (sing_meg_vec[p]/sing_meg_vec[0] < USE_LIMIT)
+        if (sing_meg_vec[p] / sing_meg_vec[0] < USE_LIMIT)
             break;
     for (p = 0; p < nvec_eeg; p++, nvec++)
-        if (sing_eeg_vec[p]/sing_eeg_vec[0] < USE_LIMIT)
+        if (sing_eeg_vec[p] / sing_eeg_vec[0] < USE_LIMIT)
             break;
-    proj_data = Eigen::Matrix<float, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor>::Zero(nvec,nch);
+    proj_data = Eigen::Matrix<float, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor>::Zero(nvec, nch);
     for (p = 0, nvec = 0; p < nvec_meg; p++, nvec++) {
-        if (sing_meg_vec[p]/sing_meg_vec[0] < USE_LIMIT)
+        if (sing_meg_vec[p] / sing_meg_vec[0] < USE_LIMIT)
             break;
         for (k = 0; k < nch; k++) {
-            if (std::fabs(vv_meg_mat(p,k)) < SMALL_VALUE)
-                proj_data(nvec,k) = 0.0;
+            if (std::fabs(vv_meg_mat(p, k)) < SMALL_VALUE)
+                proj_data(nvec, k) = 0.0;
             else
-                proj_data(nvec,k) = vv_meg_mat(p,k);
-            clear_channel_group(Eigen::Map<Eigen::VectorXf>(proj_data.row(nvec).data(), nch),names,nch,"EEG");
+                proj_data(nvec, k) = vv_meg_mat(p, k);
+            clear_channel_group(Eigen::Map<Eigen::VectorXf>(proj_data.row(nvec).data(), nch), names, nch, "EEG");
         }
     }
     for (p = 0; p < nvec_eeg; p++, nvec++) {
-        if (sing_eeg_vec[p]/sing_eeg_vec[0] < USE_LIMIT)
+        if (sing_eeg_vec[p] / sing_eeg_vec[0] < USE_LIMIT)
             break;
         for (k = 0; k < nch; k++) {
-            if (std::fabs(vv_eeg_mat(p,k)) < SMALL_VALUE)
-                proj_data(nvec,k) = 0.0;
+            if (std::fabs(vv_eeg_mat(p, k)) < SMALL_VALUE)
+                proj_data(nvec, k) = 0.0;
             else
-                proj_data(nvec,k) = vv_eeg_mat(p,k);
-            clear_channel_group(Eigen::Map<Eigen::VectorXf>(proj_data.row(nvec).data(), nch),names,nch,"MEG");
+                proj_data(nvec, k) = vv_eeg_mat(p, k);
+            clear_channel_group(Eigen::Map<Eigen::VectorXf>(proj_data.row(nvec).data(), nch), names, nch, "MEG");
         }
     }
     /*
@@ -650,7 +645,7 @@ int MNEProjOp::make_proj_bad(const QStringList& bad)
     for (k = 0; k < nch; k++)
         if (names[k].contains("STI")) {
             for (p = 0; p < nvec; p++)
-                proj_data(p,k) = 0.0;
+                proj_data(p, k) = 0.0;
         }
 
     return OK;
@@ -717,10 +712,12 @@ bool MNEProjOp::makeProjection(const QList<QString>& projnames,
         }
         if (one->nitems == 0) {
             qInfo("No linear projection information in %s.", projnames[k].toUtf8().data());
-        }
-        else {
+        } else {
             qInfo("Loaded projection from %s:", projnames[k].toUtf8().data());
-            { QTextStream errStream(stderr); one->report(errStream, QStringLiteral("\t")); }
+            {
+                QTextStream errStream(stderr);
+                one->report(errStream, QStringLiteral("\t"));
+            }
             if (!all)
                 all = std::make_unique<MNEProjOp>();
             all->combine(one.get());
@@ -740,7 +737,10 @@ bool MNEProjOp::makeProjection(const QList<QString>& projnames,
             std::unique_ptr<MNEProjOp> one(MNEProjOp::create_average_eeg_ref(chs, nch));
             if (one) {
                 qInfo("Average EEG reference projection added:");
-                { QTextStream errStream(stderr); one->report(errStream, QStringLiteral("\t")); }
+                {
+                    QTextStream errStream(stderr);
+                    one->report(errStream, QStringLiteral("\t"));
+                }
                 if (!all)
                     all = std::make_unique<MNEProjOp>();
                 all->combine(one.get());
@@ -761,7 +761,7 @@ int MNEProjOp::apply_cov(MNECovMatrix* c)
 {
     using RowMatrixXd = Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor>;
 
-    int j,k,p;
+    int j, k, p;
     bool do_complement = true;
 
     if (nitems == 0)
@@ -772,25 +772,24 @@ int MNEProjOp::apply_cov(MNECovMatrix* c)
         return FAIL;
     }
 
-    RowMatrixXd dcovMat = RowMatrixXd::Zero(c->ncov,c->ncov);
+    RowMatrixXd dcovMat = RowMatrixXd::Zero(c->ncov, c->ncov);
 
     if (c->cov_diag.size() > 0) {
         for (j = 0, p = 0; j < c->ncov; j++)
             for (k = 0; k < c->ncov; k++)
-                dcovMat(j,k) = (j == k) ? c->cov_diag[j] : 0;
-    }
-    else {
+                dcovMat(j, k) = (j == k) ? c->cov_diag[j] : 0;
+    } else {
         for (j = 0, p = 0; j < c->ncov; j++)
             for (k = 0; k <= j; k++)
-                dcovMat(j,k) = c->cov[p++];
+                dcovMat(j, k) = c->cov[p++];
         for (j = 0; j < c->ncov; j++)
-            for (k = j+1; k < c->ncov; k++)
-                dcovMat(j,k) = dcovMat(k,j);
+            for (k = j + 1; k < c->ncov; k++)
+                dcovMat(j, k) = dcovMat(k, j);
     }
 
     for (k = 0; k < c->ncov; k++) {
         Eigen::Map<Eigen::VectorXd> row_k(dcovMat.row(k).data(), c->ncov);
-        if (project_dvector(row_k,do_complement) != OK)
+        if (project_dvector(row_k, do_complement) != OK)
             return FAIL;
     }
 
@@ -798,22 +797,21 @@ int MNEProjOp::apply_cov(MNECovMatrix* c)
 
     for (k = 0; k < c->ncov; k++) {
         Eigen::Map<Eigen::VectorXd> row_k(dcovMat.row(k).data(), c->ncov);
-        if (project_dvector(row_k,do_complement) != OK)
+        if (project_dvector(row_k, do_complement) != OK)
             return FAIL;
     }
 
     if (c->cov_diag.size() > 0) {
         for (j = 0; j < c->ncov; j++) {
-            c->cov_diag[j] = dcovMat(j,j);
+            c->cov_diag[j] = dcovMat(j, j);
         }
         c->cov.resize(0);
-    }
-    else {
+    } else {
         for (j = 0, p = 0; j < c->ncov; j++)
             for (k = 0; k <= j; k++)
-                c->cov[p++] = dcovMat(j,k);
+                c->cov[p++] = dcovMat(j, k);
     }
 
-    c->nproj = affect(c->names,c->ncov);
+    c->nproj = affect(c->names, c->ncov);
     return OK;
 }

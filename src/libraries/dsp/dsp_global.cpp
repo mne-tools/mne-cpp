@@ -20,12 +20,21 @@
 // DEFINE METHODS
 //=============================================================================================================
 
-const char* DSPLIB::buildDateTime(){ return UTILSLIB::dateTimeNow();}
+const char* DSPLIB::buildDateTime()
+{
+    return UTILSLIB::dateTimeNow();
+}
 
 //=============================================================================================================
 
-const char* DSPLIB::buildHash(){ return UTILSLIB::gitHash();}
+const char* DSPLIB::buildHash()
+{
+    return UTILSLIB::gitHash();
+}
 
 //=============================================================================================================
 
-const char* DSPLIB::buildHashLong(){ return UTILSLIB::gitHashLong();}
+const char* DSPLIB::buildHashLong()
+{
+    return UTILSLIB::gitHashLong();
+}

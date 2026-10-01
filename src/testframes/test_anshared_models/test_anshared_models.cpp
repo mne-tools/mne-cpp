@@ -67,7 +67,7 @@ using namespace ANSHAREDLIB;
  *
  * @brief Checks the mne_analyze anShared models against mne-python and their empty states.
  */
-class TestAnSharedModels: public QObject
+class TestAnSharedModels : public QObject
 {
     Q_OBJECT
 
@@ -92,15 +92,14 @@ private slots:
 
 QString TestAnSharedModels::rawPath()
 {
-    return QCoreApplication::applicationDirPath()
-           + "/../resources/data/mne-cpp-test-data/MEG/sample/sample_audvis_trunc_raw.fif";
+    return QCoreApplication::applicationDirPath() + "/../resources/data/mne-cpp-test-data/MEG/sample/sample_audvis_trunc_raw.fif";
 }
 
 //=============================================================================================================
 
 void TestAnSharedModels::initTestCase()
 {
-    if(!QFile::exists(rawPath())) {
+    if (!QFile::exists(rawPath())) {
         QSKIP("Raw test data not found");
     }
 }
@@ -117,13 +116,13 @@ void TestAnSharedModels::rawModel_matchesPython()
     // the first sample offset the data would still draw, with a time axis that
     // is quietly wrong, which is not the kind of fault anyone notices by eye.
     QCOMPARE(static_cast<int>(model.absoluteFirstSample()), 12900);
-    QCOMPARE(static_cast<int>(model.absoluteLastSample()),  18906);
+    QCOMPARE(static_cast<int>(model.absoluteLastSample()), 18906);
 
     // Stored as float, so compared at float precision rather than as a double.
     const double sfreq = static_cast<double>(model.getSamplingFrequency());
     QVERIFY2(std::fabs(sfreq - 300.3074951171875) < 1.0e-4,
              qPrintable(QString("sampling frequency is %1, mne-python says 300.3074951171875")
-                        .arg(sfreq, 0, 'g', 17)));
+                            .arg(sfreq, 0, 'g', 17)));
 
     QCOMPARE(model.getFiffInfo()->nchan, 376);
 

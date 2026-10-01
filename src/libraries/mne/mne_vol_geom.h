@@ -58,8 +58,8 @@ namespace MNELIB
 class MNESHARED_EXPORT MNEVolGeom
 {
 public:
-    typedef QSharedPointer<MNEVolGeom> SPtr;              /**< Shared pointer type for MNEVolGeom. */
-    typedef QSharedPointer<const MNEVolGeom> ConstSPtr;   /**< Const shared pointer type for MNEVolGeom. */
+    typedef QSharedPointer<MNEVolGeom> SPtr;            /**< Shared pointer type for MNEVolGeom. */
+    typedef QSharedPointer<const MNEVolGeom> ConstSPtr; /**< Const shared pointer type for MNEVolGeom. */
 
     //=========================================================================================================
     /**
@@ -75,22 +75,22 @@ public:
     ~MNEVolGeom();
 
 public:
-    int     valid;                       /**< Non-zero if the geometry information below is valid. */
-    int     width,height,depth;          /**< Dimensions of the volume stack (in voxels). */
-    float   xsize,ysize,zsize;           /**< Voxel size in each direction (mm). */
-    float   x_ras[3],y_ras[3],z_ras[3];  /**< Direction cosines of the three voxel axes in RAS coordinates. */
-    float   c_ras[3];                    /**< Center of the volume in RAS coordinates (mm). */
+    int valid;                          /**< Non-zero if the geometry information below is valid. */
+    int width, height, depth;           /**< Dimensions of the volume stack (in voxels). */
+    float xsize, ysize, zsize;          /**< Voxel size in each direction (mm). */
+    float x_ras[3], y_ras[3], z_ras[3]; /**< Direction cosines of the three voxel axes in RAS coordinates. */
+    float c_ras[3];                     /**< Center of the volume in RAS coordinates (mm). */
     QString filename;                   /**< Path to the MRI data file this geometry was read from. */
 
-// ### OLD STRUCT ###
-//typedef struct {
-//    int            valid;                       /* Is the information below valid */
-//    int            width,height,depth;          /* Size of the stack */
-//    float          xsize,ysize,zsize;           /* Increments in the three voxel directions */
-//    float          x_ras[3],y_ras[3],z_ras[3];  /* Directions of the coordinate axes */
-//    float          c_ras[3];                    /* Center of the RAS coordinates */
-//    char           *filename;                   /* Name of the MRI data file */
-//} *mneVolGeom,mneVolGeomRec;                    /* MRI data volume geometry information like FreeSurfer keeps it */
+    // ### OLD STRUCT ###
+    //typedef struct {
+    //    int            valid;                       /* Is the information below valid */
+    //    int            width,height,depth;          /* Size of the stack */
+    //    float          xsize,ysize,zsize;           /* Increments in the three voxel directions */
+    //    float          x_ras[3],y_ras[3],z_ras[3];  /* Directions of the coordinate axes */
+    //    float          c_ras[3];                    /* Center of the RAS coordinates */
+    //    char           *filename;                   /* Name of the MRI data file */
+    //} *mneVolGeom,mneVolGeomRec;                    /* MRI data volume geometry information like FreeSurfer keeps it */
 };
 
 //=============================================================================================================

@@ -102,12 +102,12 @@ void TestWelchPsd::testFreqAxisLength()
 
 void TestWelchPsd::testFreqAxisValues()
 {
-    const int    nfft  = 256;
+    const int nfft = 256;
     const double sfreq = 512.0;
     RowVectorXd freqs = WelchPsd::freqAxis(nfft, sfreq);
-    QVERIFY(std::abs(freqs[0])                    < 1e-10);   // DC = 0 Hz
-    QVERIFY(std::abs(freqs[nfft/2] - sfreq / 2.0) < 1e-10);  // Nyquist
-    QVERIFY(std::abs(freqs[1] - sfreq / nfft)      < 1e-10);  // bin width
+    QVERIFY(std::abs(freqs[0]) < 1e-10);                      // DC = 0 Hz
+    QVERIFY(std::abs(freqs[nfft / 2] - sfreq / 2.0) < 1e-10); // Nyquist
+    QVERIFY(std::abs(freqs[1] - sfreq / nfft) < 1e-10);       // bin width
 }
 
 //=============================================================================================================
@@ -131,8 +131,8 @@ void TestWelchPsd::testPureSineFrequency()
 {
     // A pure 50 Hz sine at 500 Hz sampling should peak near bin index 50·256/500 = ~25
     const double dSFreq = 500.0;
-    const int    nfft   = 256;
-    const double dFreq  = 50.0;
+    const int nfft = 256;
+    const double dFreq = 50.0;
 
     RowVectorXd sig = makeSine(dFreq, dSFreq, 8192);
     RowVectorXd psd = WelchPsd::computeVector(sig, dSFreq, nfft, 0.5);
@@ -151,13 +151,13 @@ void TestWelchPsd::testNoiselessSinePeak()
 {
     // Non-peak bins should be much smaller than the peak
     const double dSFreq = 1000.0;
-    const int    nfft   = 512;
-    RowVectorXd  sig    = makeSine(100.0, dSFreq, 16384);
-    RowVectorXd  psd    = WelchPsd::computeVector(sig, dSFreq, nfft, 0.5);
+    const int nfft = 512;
+    RowVectorXd sig = makeSine(100.0, dSFreq, 16384);
+    RowVectorXd psd = WelchPsd::computeVector(sig, dSFreq, nfft, 0.5);
 
     double peak = psd.maxCoeff();
     double mean = (psd.sum() - peak) / static_cast<double>(psd.cols() - 1);
-    QVERIFY(peak / mean > 100.0);  // peak at least 100× average sidelobe
+    QVERIFY(peak / mean > 100.0); // peak at least 100× average sidelobe
 }
 
 //=============================================================================================================
@@ -165,15 +165,14 @@ void TestWelchPsd::testNoiselessSinePeak()
 void TestWelchPsd::testTwoSinePeaks()
 {
     const double dSFreq = 1000.0;
-    const int    nfft   = 512;
-    const int    nSamp  = 32768;
+    const int nfft = 512;
+    const int nSamp = 32768;
 
     RowVectorXd sig(nSamp);
     for (int n = 0; n < nSamp; ++n)
-        sig[n] = std::sin(2.0 * M_PI * 50.0  * n / dSFreq)
-               + std::sin(2.0 * M_PI * 200.0 * n / dSFreq);
+        sig[n] = std::sin(2.0 * M_PI * 50.0 * n / dSFreq) + std::sin(2.0 * M_PI * 200.0 * n / dSFreq);
 
-    RowVectorXd psd   = WelchPsd::computeVector(sig, dSFreq, nfft, 0.5);
+    RowVectorXd psd = WelchPsd::computeVector(sig, dSFreq, nfft, 0.5);
     RowVectorXd freqs = WelchPsd::freqAxis(nfft, dSFreq);
 
     // Find two largest peaks
@@ -183,8 +182,8 @@ void TestWelchPsd::testTwoSinePeaks()
     psd2[peak1] = 0.0;
     psd2.maxCoeff(&peak2);
 
-    QVERIFY(std::abs(freqs[peak1] - 50.0)  <= dSFreq / nfft + 1.0 ||
-            std::abs(freqs[peak2] - 50.0)  <= dSFreq / nfft + 1.0);
+    QVERIFY(std::abs(freqs[peak1] - 50.0) <= dSFreq / nfft + 1.0 ||
+            std::abs(freqs[peak2] - 50.0) <= dSFreq / nfft + 1.0);
     QVERIFY(std::abs(freqs[peak1] - 200.0) <= dSFreq / nfft + 1.0 ||
             std::abs(freqs[peak2] - 200.0) <= dSFreq / nfft + 1.0);
 }
@@ -196,15 +195,15 @@ void TestWelchPsd::testParsevalsRelation()
     // For a Hann-windowed Welch PSD:
     // integral of one-sided PSD ≈ mean square of the signal (within ~10 %)
     const double dSFreq = 500.0;
-    const int    nfft   = 256;
-    RowVectorXd  sig    = makeSine(75.0, dSFreq, 16384);
+    const int nfft = 256;
+    RowVectorXd sig = makeSine(75.0, dSFreq, 16384);
 
-    RowVectorXd psd   = WelchPsd::computeVector(sig, dSFreq, nfft, 0.5);
+    RowVectorXd psd = WelchPsd::computeVector(sig, dSFreq, nfft, 0.5);
     RowVectorXd freqs = WelchPsd::freqAxis(nfft, dSFreq);
-    const double df   = freqs[1];
+    const double df = freqs[1];
 
     double integral = psd.sum() * df;
-    double meanPow  = sig.squaredNorm() / static_cast<double>(sig.cols());
+    double meanPow = sig.squaredNorm() / static_cast<double>(sig.cols());
 
     // Pure sine: meanPow = 0.5; integral should be within ±10 %
     QVERIFY(std::abs(integral - meanPow) / meanPow < 0.10);
@@ -218,7 +217,7 @@ void TestWelchPsd::testWindowTypes()
     // All window types should run without throwing and return finite values
     for (int w = 0; w <= 3; ++w) {
         RowVectorXd psd = WelchPsd::computeVector(sig, 500.0, 256, 0.5,
-                                                   static_cast<WelchPsd::WindowType>(w));
+                                                  static_cast<WelchPsd::WindowType>(w));
         QVERIFY(psd.allFinite());
         QVERIFY((psd.array() >= 0.0).all());
     }
@@ -228,9 +227,9 @@ void TestWelchPsd::testWindowTypes()
 
 void TestWelchPsd::testMultiChannel()
 {
-    const int nCh   = 5;
+    const int nCh = 5;
     const int nSamp = 4096;
-    const int nfft  = 256;
+    const int nfft = 256;
     MatrixXd mat = MatrixXd::Random(nCh, nSamp);
     auto r = WelchPsd::compute(mat, 500.0, nfft);
     QCOMPARE(r.matPsd.rows(), nCh);
@@ -242,9 +241,9 @@ void TestWelchPsd::testMultiChannel()
 
 void TestWelchPsd::testChannelPicks()
 {
-    const int nCh   = 10;
+    const int nCh = 10;
     const int nSamp = 4096;
-    const int nfft  = 256;
+    const int nfft = 256;
     MatrixXd mat = MatrixXd::Random(nCh, nSamp);
 
     RowVectorXi picks(3);

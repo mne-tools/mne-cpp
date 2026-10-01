@@ -55,8 +55,8 @@ namespace INVLIB
 class INVSHARED_EXPORT InvEcd
 {
 public:
-    typedef QSharedPointer<InvEcd> SPtr;              /**< Shared pointer type for InvEcd. */
-    typedef QSharedPointer<const InvEcd> ConstSPtr;   /**< Const shared pointer type for InvEcd. */
+    typedef QSharedPointer<InvEcd> SPtr;            /**< Shared pointer type for InvEcd. */
+    typedef QSharedPointer<const InvEcd> ConstSPtr; /**< Const shared pointer type for InvEcd. */
 
     //=========================================================================================================
     /**
@@ -98,14 +98,14 @@ public:
     void print() const;
 
 public:
-    bool            valid;  /**< Is this dipole valid. */
-    float           time;   /**< Time point. */
-    Eigen::Vector3f rd;     /**< Dipole location. */
-    Eigen::Vector3f Q;      /**< Dipole moment. */
-    float           good;   /**< Goodness of fit. */
-    float           khi2;   /**< khi^2 value. */
-    int             nfree;  /**< Degrees of freedom for the above. */
-    int             neval;  /**< Number of function evaluations required for this fit. */
+    bool valid;         /**< Is this dipole valid. */
+    float time;         /**< Time point. */
+    Eigen::Vector3f rd; /**< Dipole location. */
+    Eigen::Vector3f Q;  /**< Dipole moment. */
+    float good;         /**< Goodness of fit. */
+    float khi2;         /**< khi^2 value. */
+    int nfree;          /**< Degrees of freedom for the above. */
+    int neval;          /**< Number of function evaluations required for this fit. */
 };
 
 //=============================================================================================================

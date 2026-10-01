@@ -71,12 +71,12 @@ namespace MNELIB
  */
 struct RegionDataOut
 {
-    Eigen::VectorXi roiIdx;         /**< Region cluster indices. */
-    Eigen::MatrixXd ctrs;           /**< Cluster centers. */
-    Eigen::VectorXd sumd;           /**< Sums of the distances to the centroid. */
-    Eigen::MatrixXd D;              /**< Distances to the centroid. */
+    Eigen::VectorXi roiIdx; /**< Region cluster indices. */
+    Eigen::MatrixXd ctrs;   /**< Cluster centers. */
+    Eigen::VectorXd sumd;   /**< Sums of the distances to the centroid. */
+    Eigen::MatrixXd D;      /**< Distances to the centroid. */
 
-    qint32 iLabelIdxOut;            /**< FsLabel ID. */
+    qint32 iLabelIdxOut; /**< FsLabel ID. */
 };
 
 //=========================================================================================================
@@ -87,22 +87,22 @@ struct RegionDataOut
  */
 struct RegionData
 {
-    Eigen::MatrixXd matRoiG;            /**< Reshaped region gain matrix sources x sensors(x,y,z)*/
-    Eigen::MatrixXd matRoiGWhitened;    /**< Reshaped whitened region gain matrix sources x sensors(x,y,z)*/
-    bool bUseWhitened;                  /**< Wheather indeces of whitened gain matrix should be used to calculate centroids. */
+    Eigen::MatrixXd matRoiG;         /**< Reshaped region gain matrix sources x sensors(x,y,z)*/
+    Eigen::MatrixXd matRoiGWhitened; /**< Reshaped whitened region gain matrix sources x sensors(x,y,z)*/
+    bool bUseWhitened;               /**< Wheather indeces of whitened gain matrix should be used to calculate centroids. */
 
-    Eigen::MatrixXd matRoiGOrig;        /**< Region gain matrix sensors x sources(x,y,z)*/
+    Eigen::MatrixXd matRoiGOrig; /**< Region gain matrix sensors x sources(x,y,z)*/
 
-    qint32 nClusters;      /**< Number of clusters within this region. */
+    qint32 nClusters; /**< Number of clusters within this region. */
 
-    Eigen::VectorXi idcs;           /**< Get source space indeces. */
-    qint32 iLabelIdxIn;    /**< FsLabel ID. */
-    QString sDistMeasure;   /**< "cityblock" or "sqeuclidean". */
+    Eigen::VectorXi idcs; /**< Get source space indeces. */
+    qint32 iLabelIdxIn;   /**< FsLabel ID. */
+    QString sDistMeasure; /**< "cityblock" or "sqeuclidean". */
 
     RegionDataOut cluster() const
     {
         QString t_sDistMeasure;
-        if(sDistMeasure.isEmpty())
+        if (sDistMeasure.isEmpty())
             t_sDistMeasure = QString("cityblock");
         else
             t_sDistMeasure = sDistMeasure;
@@ -112,30 +112,25 @@ struct RegionData
 
         UTILSLIB::KMeans t_kMeans(t_sDistMeasure, QString("sample"), 5);
 
-        if(bUseWhitened)
-        {
+        if (bUseWhitened) {
             t_kMeans.calculate(this->matRoiGWhitened, this->nClusters, p_RegionDataOut.roiIdx, p_RegionDataOut.ctrs, p_RegionDataOut.sumd, p_RegionDataOut.D);
 
             Eigen::MatrixXd newCtrs = Eigen::MatrixXd::Zero(p_RegionDataOut.ctrs.rows(), p_RegionDataOut.ctrs.cols());
-            for(qint32 c = 0; c < p_RegionDataOut.ctrs.rows(); ++c)
-            {
+            for (qint32 c = 0; c < p_RegionDataOut.ctrs.rows(); ++c) {
                 qint32 num = 0;
 
-                for(qint32 idx = 0; idx < p_RegionDataOut.roiIdx.size(); ++idx)
-                {
-                    if(c == p_RegionDataOut.roiIdx[idx])
-                    {
+                for (qint32 idx = 0; idx < p_RegionDataOut.roiIdx.size(); ++idx) {
+                    if (c == p_RegionDataOut.roiIdx[idx]) {
                         newCtrs.row(c) += this->matRoiG.row(idx); //just take whitened to get indeces calculate centroids using the original matrix
                         ++num;
                     }
                 }
 
-                if(num > 0)
+                if (num > 0)
                     newCtrs.row(c) /= num;
             }
             p_RegionDataOut.ctrs = newCtrs; //Replace whitened with original
-        }
-        else
+        } else
             t_kMeans.calculate(this->matRoiG, this->nClusters, p_RegionDataOut.roiIdx, p_RegionDataOut.ctrs, p_RegionDataOut.sumd, p_RegionDataOut.D);
 
         p_RegionDataOut.iLabelIdxOut = this->iLabelIdxIn;
@@ -181,7 +176,7 @@ public:
      * @param[in] bExcludeBads  If true bads are also read; default = false (optional).
      *
      */
-    MNEForwardSolution(QIODevice &p_IODevice,
+    MNEForwardSolution(QIODevice& p_IODevice,
                        bool force_fixed = false,
                        bool surf_ori = false,
                        const QStringList& include = FIFFLIB::defaultQStringList,
@@ -194,7 +189,7 @@ public:
      *
      * @param[in] p_MNEForwardSolution   MNE forward solution.
      */
-    MNEForwardSolution(const MNEForwardSolution &p_MNEForwardSolution);
+    MNEForwardSolution(const MNEForwardSolution& p_MNEForwardSolution);
 
     //=========================================================================================================
     /**
@@ -204,7 +199,7 @@ public:
      *
      * @return Reference to this.
      */
-    MNEForwardSolution& operator=(const MNEForwardSolution &other);
+    MNEForwardSolution& operator=(const MNEForwardSolution& other);
 
     //=========================================================================================================
     /**
@@ -212,7 +207,7 @@ public:
      *
      * @param[in, out] other   Forward solution to move from; left in a valid but unspecified state.
      */
-    MNEForwardSolution(MNEForwardSolution &&other) = default;
+    MNEForwardSolution(MNEForwardSolution&& other) = default;
 
     //=========================================================================================================
     /**
@@ -222,7 +217,7 @@ public:
      *
      * @return Reference to this object.
      */
-    MNEForwardSolution& operator=(MNEForwardSolution &&other) = default;
+    MNEForwardSolution& operator=(MNEForwardSolution&& other) = default;
 
     //=========================================================================================================
     /**
@@ -250,11 +245,11 @@ public:
      *
      * @return clustered MNE forward solution.
      */
-    MNEForwardSolution cluster_forward_solution(const FSLIB::FsAnnotationSet &p_AnnotationSet,
+    MNEForwardSolution cluster_forward_solution(const FSLIB::FsAnnotationSet& p_AnnotationSet,
                                                 qint32 p_iClusterSize,
                                                 Eigen::MatrixXd& p_D = defaultD,
-                                                const FIFFLIB::FiffCov &p_pNoise_cov = defaultCov,
-                                                const FIFFLIB::FiffInfo &p_pInfo = defaultInfo,
+                                                const FIFFLIB::FiffCov& p_pNoise_cov = defaultCov,
+                                                const FIFFLIB::FiffInfo& p_pInfo = defaultInfo,
                                                 QString p_sMethod = "cityblock") const;
 
     //=========================================================================================================
@@ -281,12 +276,12 @@ public:
      *
      * @return the depth prior.
      */
-    static FIFFLIB::FiffCov compute_depth_prior(const Eigen::MatrixXd &Gain,
-                                                const FIFFLIB::FiffInfo &gain_info,
+    static FIFFLIB::FiffCov compute_depth_prior(const Eigen::MatrixXd& Gain,
+                                                const FIFFLIB::FiffInfo& gain_info,
                                                 bool is_fixed_ori,
                                                 double exp = 0.8,
                                                 double limit = 10.0,
-                                                const Eigen::MatrixXd &patch_areas = FIFFLIB::defaultConstMatrixXd,
+                                                const Eigen::MatrixXd& patch_areas = FIFFLIB::defaultConstMatrixXd,
                                                 bool limit_depth_chs = false);
 
     //=========================================================================================================
@@ -335,7 +330,7 @@ public:
      *
      * @return the reduced forward solution.
      */
-    MNEForwardSolution pick_regions(const QList<FSLIB::FsLabel> &p_qListLabels) const;
+    MNEForwardSolution pick_regions(const QList<FSLIB::FsLabel>& p_qListLabels) const;
 
     //=========================================================================================================
     /**
@@ -368,14 +363,14 @@ public:
      * @param[out] p_outWhitener     Whitener.
      * @param[out] p_outNumNonZero   the rank (non zeros).
      */
-    void prepare_forward(const FIFFLIB::FiffInfo &p_info,
-                         const FIFFLIB::FiffCov &p_noise_cov,
+    void prepare_forward(const FIFFLIB::FiffInfo& p_info,
+                         const FIFFLIB::FiffCov& p_noise_cov,
                          bool p_pca,
-                         FIFFLIB::FiffInfo &p_outFwdInfo,
-                         Eigen::MatrixXd &gain,
-                         FIFFLIB::FiffCov &p_outNoiseCov,
-                         Eigen::MatrixXd &p_outWhitener,
-                         qint32 &p_outNumNonZero) const;
+                         FIFFLIB::FiffInfo& p_outFwdInfo,
+                         Eigen::MatrixXd& gain,
+                         FIFFLIB::FiffCov& p_outNoiseCov,
+                         Eigen::MatrixXd& p_outWhitener,
+                         qint32& p_outNumNonZero) const;
 
     //=========================================================================================================
     /**
@@ -383,12 +378,12 @@ public:
      */
     Eigen::VectorXi tripletSelection(const Eigen::VectorXi& p_vecIdxSelection) const
     {
-        Eigen::MatrixXi triSelect = p_vecIdxSelection.transpose().replicate(3,1).array() * 3;//repmat((p_vecIdxSelection - 1) * 3 + 1, 3, 1);
+        Eigen::MatrixXi triSelect = p_vecIdxSelection.transpose().replicate(3, 1).array() * 3; //repmat((p_vecIdxSelection - 1) * 3 + 1, 3, 1);
         triSelect.row(1).array() += 1;
         triSelect.row(2).array() += 2;
-        Eigen::VectorXi retTriSelect(triSelect.cols()*3);
-        for(int i = 0; i < triSelect.cols(); ++i)
-            retTriSelect.block(i*3,0,3,1) = triSelect.col(i);
+        Eigen::VectorXi retTriSelect(triSelect.cols() * 3);
+        for (int i = 0; i < triSelect.cols(); ++i)
+            retTriSelect.block(i * 3, 0, 3, 1) = triSelect.col(i);
         return retTriSelect;
     } // tripletSelection
 
@@ -450,7 +445,7 @@ public:
      * @param[in, out] G     Gain matrix to be restricted; result is stored in place.
      * @param[in] info       Fiff information.
      */
-    static void restrict_gain_matrix(Eigen::MatrixXd &G, const FIFFLIB::FiffInfo &info);
+    static void restrict_gain_matrix(Eigen::MatrixXd& G, const FIFFLIB::FiffInfo& info);
 
     //=========================================================================================================
     /**
@@ -467,7 +462,7 @@ public:
      *
      * @return the stream with the attached fiff projector.
      */
-    friend std::ostream& operator<<(std::ostream& out, const MNELIB::MNEForwardSolution &p_MNEForwardSolution);
+    friend std::ostream& operator<<(std::ostream& out, const MNELIB::MNEForwardSolution& p_MNEForwardSolution);
 
     /**
      * Overloaded == operator to compare an object to this instance.
@@ -477,7 +472,7 @@ public:
      *
      * @return true if equal, false otherwise.
      */
-    friend bool operator== (const MNEForwardSolution &a, const MNEForwardSolution &b);
+    friend bool operator==(const MNEForwardSolution& a, const MNEForwardSolution& b);
 
     //=========================================================================================================
     /**
@@ -488,7 +483,7 @@ public:
      *
      * @return the source position in 3D space.
      */
-    Eigen::MatrixX3f getSourcePositionsByLabel(const QList<FSLIB::FsLabel> &lPickedLabels,
+    Eigen::MatrixX3f getSourcePositionsByLabel(const QList<FSLIB::FsLabel>& lPickedLabels,
                                                const FSLIB::FsSurfaceSet& tSurfSetInflated);
 
 private:
@@ -509,20 +504,20 @@ private:
                          MNEForwardSolution& one);
 
 public:
-    FIFFLIB::FiffInfoBase info;                 /**< light weighted measurement info. */
-    FIFFLIB::fiff_int_t source_ori;             /**< Source orientation: fixed or free. */
-    bool surf_ori;                              /**< If surface oriented. */
-    FIFFLIB::fiff_int_t coord_frame;            /**< Coil coordinate system definition. */
-    FIFFLIB::fiff_int_t nsource;                /**< Number of source dipoles. */
-    FIFFLIB::fiff_int_t nchan;                  /**< Number of channels. */
-    FIFFLIB::FiffNamedMatrix::SDPtr sol;        /**< Forward solution. */
-    FIFFLIB::FiffNamedMatrix::SDPtr sol_grad;   /**< ToDo... */
-    FIFFLIB::FiffCoordTrans mri_head_t;         /**< MRI head coordinate transformation. */
-    QString mri_filename;                        /**< MRI file name (parent provenance). */
-    FIFFLIB::FiffId mri_id;                      /**< MRI file ID (parent provenance). */
-    MNELIB::MNESourceSpaces src;                /**< Geometric description of the source spaces (hemispheres). */
-    Eigen::MatrixX3f source_rr;                 /**< Source locations. */
-    Eigen::MatrixX3f source_nn;                 /**< Source normals (number depends on fixed or free orientation). */
+    FIFFLIB::FiffInfoBase info;               /**< light weighted measurement info. */
+    FIFFLIB::fiff_int_t source_ori;           /**< Source orientation: fixed or free. */
+    bool surf_ori;                            /**< If surface oriented. */
+    FIFFLIB::fiff_int_t coord_frame;          /**< Coil coordinate system definition. */
+    FIFFLIB::fiff_int_t nsource;              /**< Number of source dipoles. */
+    FIFFLIB::fiff_int_t nchan;                /**< Number of channels. */
+    FIFFLIB::FiffNamedMatrix::SDPtr sol;      /**< Forward solution. */
+    FIFFLIB::FiffNamedMatrix::SDPtr sol_grad; /**< ToDo... */
+    FIFFLIB::FiffCoordTrans mri_head_t;       /**< MRI head coordinate transformation. */
+    QString mri_filename;                     /**< MRI file name (parent provenance). */
+    FIFFLIB::FiffId mri_id;                   /**< MRI file ID (parent provenance). */
+    MNELIB::MNESourceSpaces src;              /**< Geometric description of the source spaces (hemispheres). */
+    Eigen::MatrixX3f source_rr;               /**< Source locations. */
+    Eigen::MatrixX3f source_nn;               /**< Source normals (number depends on fixed or free orientation). */
 };
 
 //=============================================================================================================
@@ -543,7 +538,7 @@ inline bool MNEForwardSolution::isFixedOrient() const
 
 //=============================================================================================================
 
-inline std::ostream& operator<<(std::ostream& out, const MNELIB::MNEForwardSolution &p_MNEForwardSolution)
+inline std::ostream& operator<<(std::ostream& out, const MNELIB::MNEForwardSolution& p_MNEForwardSolution)
 {
     out << "#### MNE Forward Solution ####\n";
 
@@ -559,7 +554,7 @@ inline std::ostream& operator<<(std::ostream& out, const MNELIB::MNEForwardSolut
 
 //=============================================================================================================
 
-inline bool operator== (const MNEForwardSolution &a, const MNEForwardSolution &b)
+inline bool operator==(const MNEForwardSolution& a, const MNEForwardSolution& b)
 {
     return (a.info == b.info &&
             a.source_ori == b.source_ori &&

@@ -50,7 +50,8 @@ using namespace Eigen;
 // PRIVATE HELPERS
 //=============================================================================================================
 
-namespace {
+namespace
+{
 
 //=============================================================================================================
 /**
@@ -70,12 +71,12 @@ void gramSchmidt(VectorXd& w, const MatrixXd& W, int iComp)
 //=============================================================================================================
 
 IcaResult ICA::run(const MatrixXd& matData,
-                   int    nComponents,
-                   int    maxIter,
+                   int nComponents,
+                   int maxIter,
                    double tol,
-                   int    randomSeed)
+                   int randomSeed)
 {
-    const int nCh      = static_cast<int>(matData.rows());
+    const int nCh = static_cast<int>(matData.rows());
     const int nSamples = static_cast<int>(matData.cols());
 
     if (nComponents <= 0 || nComponents > nCh) {
@@ -108,7 +109,7 @@ IcaResult ICA::run(const MatrixXd& matData,
     std::mt19937 rng(static_cast<unsigned>(randomSeed));
     std::normal_distribution<double> dist(0.0, 1.0);
 
-    MatrixXd W_ica(nComponents, nComponents);   // unmixing in whitened space
+    MatrixXd W_ica(nComponents, nComponents); // unmixing in whitened space
     bool bConverged = true;
 
     for (int i = 0; i < nComponents; ++i) {
@@ -123,12 +124,11 @@ IcaResult ICA::run(const MatrixXd& matData,
         for (int iter = 0; iter < maxIter; ++iter) {
             // g = tanh(w^T * X_white)  →  row vector (1 x nSamples)
             RowVectorXd u = w.transpose() * matWhite;
-            RowVectorXd g     = u.array().tanh();
-            RowVectorXd gPrime = 1.0 - g.array().square();    // derivative of tanh
+            RowVectorXd g = u.array().tanh();
+            RowVectorXd gPrime = 1.0 - g.array().square(); // derivative of tanh
 
             // Newton update
-            VectorXd wNew = (matWhite * g.transpose()) / nSamples
-                            - gPrime.mean() * w;
+            VectorXd wNew = (matWhite * g.transpose()) / nSamples - gPrime.mean() * w;
 
             // Deflation: orthogonalise against already-converged components
             gramSchmidt(wNew, W_ica, i);
@@ -170,20 +170,20 @@ IcaResult ICA::run(const MatrixXd& matData,
     //    A_full = W_dewhitening * W_ica^T  (n_ch x n_comp)  — exact inverse when n_comp == n_ch,
     //                                                          pseudo-inverse otherwise
     //----------------------------------------------------------------------------------------------------------
-    MatrixXd matUnmixing = W_ica * matWhitening;                     // n_comp x n_ch
-    MatrixXd matMixing   = matDewhitening * W_ica.transpose();       // n_ch   x n_comp
+    MatrixXd matUnmixing = W_ica * matWhitening;             // n_comp x n_ch
+    MatrixXd matMixing = matDewhitening * W_ica.transpose(); // n_ch   x n_comp
 
     //----------------------------------------------------------------------------------------------------------
     // 5. Compute source time series
     //----------------------------------------------------------------------------------------------------------
-    MatrixXd matSources = matUnmixing * matCentered;                 // n_comp x n_samples
+    MatrixXd matSources = matUnmixing * matCentered; // n_comp x n_samples
 
     IcaResult result;
-    result.matMixing   = std::move(matMixing);
+    result.matMixing = std::move(matMixing);
     result.matUnmixing = std::move(matUnmixing);
-    result.matSources  = std::move(matSources);
-    result.vecMean     = std::move(vecMean);
-    result.bConverged  = bConverged;
+    result.matSources = std::move(matSources);
+    result.vecMean = std::move(vecMean);
+    result.bConverged = bConverged;
 
     return result;
 }
@@ -200,8 +200,8 @@ MatrixXd ICA::applyUnmixing(const MatrixXd& matData, const IcaResult& result)
 //=============================================================================================================
 
 MatrixXd ICA::excludeComponents(const MatrixXd& matData,
-                                  const IcaResult& result,
-                                  const QVector<int>& excludedComponents)
+                                const IcaResult& result,
+                                const QVector<int>& excludedComponents)
 {
     if (excludedComponents.isEmpty()) {
         return matData;
@@ -217,8 +217,8 @@ MatrixXd ICA::excludeComponents(const MatrixXd& matData,
     MatrixXd matCentered = matData.colwise() - result.vecMean;
 
     // Build partial mixing and partial sources for only the excluded components
-    const int nExcl  = excludedComponents.size();
-    const int nCh    = static_cast<int>(result.matMixing.rows());
+    const int nExcl = excludedComponents.size();
+    const int nCh = static_cast<int>(result.matMixing.rows());
     const int nSamps = static_cast<int>(matCentered.cols());
 
     MatrixXd partialMixing(nCh, nExcl);
@@ -227,7 +227,7 @@ MatrixXd ICA::excludeComponents(const MatrixXd& matData,
     for (int i = 0; i < nExcl; ++i) {
         int idx = excludedComponents[i];
         if (idx >= 0 && idx < static_cast<int>(result.matUnmixing.rows())) {
-            partialMixing.col(i)  = result.matMixing.col(idx);
+            partialMixing.col(i) = result.matMixing.col(idx);
             partialSources.row(i) = result.matUnmixing.row(idx) * matCentered;
         } else {
             partialMixing.col(i).setZero();
@@ -241,9 +241,9 @@ MatrixXd ICA::excludeComponents(const MatrixXd& matData,
 //=============================================================================================================
 
 MatrixXd ICA::whiten(const MatrixXd& matCentered,
-                      int             nComponents,
-                      MatrixXd&       matWhitening,
-                      MatrixXd&       matDewhitening)
+                     int nComponents,
+                     MatrixXd& matWhitening,
+                     MatrixXd& matDewhitening)
 {
     const int nSamples = static_cast<int>(matCentered.cols());
 
@@ -254,15 +254,15 @@ MatrixXd ICA::whiten(const MatrixXd& matCentered,
     SelfAdjointEigenSolver<MatrixXd> eig(cov);
 
     // Take the nComponents largest eigenvalues/vectors (rightmost columns)
-    VectorXd eigenvalues  = eig.eigenvalues().tail(nComponents).cwiseMax(1e-12);
-    MatrixXd eigenvectors = eig.eigenvectors().rightCols(nComponents);   // n_ch x n_comp
+    VectorXd eigenvalues = eig.eigenvalues().tail(nComponents).cwiseMax(1e-12);
+    MatrixXd eigenvectors = eig.eigenvectors().rightCols(nComponents); // n_ch x n_comp
 
     // Whitening  : W_w = D^{-1/2} * V^T   (n_comp x n_ch)
     // Dewhitening: W_d = V * D^{1/2}       (n_ch   x n_comp)
-    VectorXd sqrtEig    = eigenvalues.cwiseSqrt();
+    VectorXd sqrtEig = eigenvalues.cwiseSqrt();
     VectorXd invSqrtEig = sqrtEig.cwiseInverse();
 
-    matWhitening   = invSqrtEig.asDiagonal() * eigenvectors.transpose();
+    matWhitening = invSqrtEig.asDiagonal() * eigenvectors.transpose();
     matDewhitening = eigenvectors * sqrtEig.asDiagonal();
 
     return matWhitening * matCentered;

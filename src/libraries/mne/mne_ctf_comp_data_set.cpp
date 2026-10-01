@@ -37,7 +37,7 @@
 #include <QDebug>
 
 constexpr int FAIL = -1;
-constexpr int OK   =  0;
+constexpr int OK = 0;
 
 
 //=============================================================================================================
@@ -51,14 +51,14 @@ using namespace MNELIB;
 //============================= mne_read_forward_solution.c =============================
 
 int mne_read_meg_comp_eeg_ch_info_32(const QString& name,
-                                  QList<FIFFLIB::FiffChInfo>& megp,	 /* MEG channels */
-                                  int *nmegp,
-                                  QList<FIFFLIB::FiffChInfo>& meg_compp,
-                                  int *nmeg_compp,
-                                  QList<FIFFLIB::FiffChInfo>& eegp,	 /* EEG channels */
-                                  int *neegp,
-                                  FiffCoordTrans *meg_head_t,
-                                  fiffId *idp)	 /* The measurement ID */
+                                     QList<FIFFLIB::FiffChInfo>& megp, /* MEG channels */
+                                     int* nmegp,
+                                     QList<FIFFLIB::FiffChInfo>& meg_compp,
+                                     int* nmeg_compp,
+                                     QList<FIFFLIB::FiffChInfo>& eegp, /* EEG channels */
+                                     int* neegp,
+                                     FiffCoordTrans* meg_head_t,
+                                     fiffId* idp) /* The measurement ID */
 /*
       * Read the channel information and split it into three arrays,
       * one for MEG, one for MEG compensation channels, and one for EEG
@@ -68,24 +68,25 @@ int mne_read_meg_comp_eeg_ch_info_32(const QString& name,
     FiffStream::SPtr stream(new FiffStream(&file));
 
     QList<FIFFLIB::FiffChInfo> chs;
-    int        nchan = 0;
+    int nchan = 0;
     QList<FIFFLIB::FiffChInfo> meg;
-    int        nmeg  = 0;
+    int nmeg = 0;
     QList<FIFFLIB::FiffChInfo> meg_comp;
-    int        nmeg_comp = 0;
+    int nmeg_comp = 0;
     QList<FIFFLIB::FiffChInfo> eeg;
-    int        neeg  = 0;
+    int neeg = 0;
     std::unique_ptr<FiffId> id;
     QList<FiffDirNode::SPtr> nodes;
     FiffDirNode::SPtr info;
     FiffTag::UPtr t_pTag;
-    FIFFLIB::FiffChInfo   this_ch;
+    FIFFLIB::FiffChInfo this_ch;
     FiffCoordTrans t;
     fiff_int_t kind, pos;
-    int j,k,to_find;
+    int j, k, to_find;
 
-    if(!stream->open()) {
-        stream->close(); return FIFF_FAIL;
+    if (!stream->open()) {
+        stream->close();
+        return FIFF_FAIL;
     }
 
     nodes = stream->dirtree()->dir_tree_find(FIFFB_MNE_PARENT_MEAS_FILE);
@@ -93,65 +94,71 @@ int mne_read_meg_comp_eeg_ch_info_32(const QString& name,
     if (nodes.size() == 0) {
         nodes = stream->dirtree()->dir_tree_find(FIFFB_MEAS_INFO);
         if (nodes.size() == 0) {
-            qCritical ("Could not find the channel information.");
-            stream->close(); return FIFF_FAIL;
+            qCritical("Could not find the channel information.");
+            stream->close();
+            return FIFF_FAIL;
         }
     }
     info = nodes[0];
     to_find = 0;
     for (k = 0; k < info->nent(); k++) {
         kind = info->dir[k]->kind;
-        pos  = info->dir[k]->pos;
+        pos = info->dir[k]->pos;
         switch (kind) {
-        case FIFF_NCHAN :
-            if (!stream->read_tag(t_pTag,pos)) {
-                stream->close(); return FIFF_FAIL;
-            }
-            nchan = *t_pTag->toInt();
+            case FIFF_NCHAN:
+                if (!stream->read_tag(t_pTag, pos)) {
+                    stream->close();
+                    return FIFF_FAIL;
+                }
+                nchan = *t_pTag->toInt();
 
-            for (j = 0; j < nchan; j++) {
-                chs.append(FiffChInfo());
-                chs[j].scanNo = -1;
-            }
-            to_find = nchan;
-            break;
+                for (j = 0; j < nchan; j++) {
+                    chs.append(FiffChInfo());
+                    chs[j].scanNo = -1;
+                }
+                to_find = nchan;
+                break;
 
-        case FIFF_PARENT_BLOCK_ID :
-            if(!stream->read_tag(t_pTag, pos)) {
-                stream->close(); return FIFF_FAIL;
-            }
-            id = std::make_unique<FiffId>(*(FiffId*)t_pTag->data());
-            break;
+            case FIFF_PARENT_BLOCK_ID:
+                if (!stream->read_tag(t_pTag, pos)) {
+                    stream->close();
+                    return FIFF_FAIL;
+                }
+                id = std::make_unique<FiffId>(*(FiffId*)t_pTag->data());
+                break;
 
-        case FIFF_COORD_TRANS :
-            if(!stream->read_tag(t_pTag, pos)) {
-                stream->close(); return FIFF_FAIL;
-            }
-//            t = t_pTag->toCoordTrans();
-            t = FiffCoordTrans::readFromTag( t_pTag );
-            if (t.from != FIFFV_COORD_DEVICE || t.to   != FIFFV_COORD_HEAD)
-                t = FiffCoordTrans();
-            break;
+            case FIFF_COORD_TRANS:
+                if (!stream->read_tag(t_pTag, pos)) {
+                    stream->close();
+                    return FIFF_FAIL;
+                }
+                //            t = t_pTag->toCoordTrans();
+                t = FiffCoordTrans::readFromTag(t_pTag);
+                if (t.from != FIFFV_COORD_DEVICE || t.to != FIFFV_COORD_HEAD)
+                    t = FiffCoordTrans();
+                break;
 
-        case FIFF_CH_INFO : /* Information about one channel */
-            if(!stream->read_tag(t_pTag, pos)) {
-                stream->close(); return FIFF_FAIL;
-            }
+            case FIFF_CH_INFO: /* Information about one channel */
+                if (!stream->read_tag(t_pTag, pos)) {
+                    stream->close();
+                    return FIFF_FAIL;
+                }
 
-            this_ch = t_pTag->toChInfo();
-            if (this_ch.scanNo <= 0 || this_ch.scanNo > nchan) {
-                qCritical ("FIFF_CH_INFO : scan # out of range %d (%d)!",this_ch.scanNo,nchan);
-                stream->close(); return FIFF_FAIL;
-            }
-            else
-                chs[this_ch.scanNo-1] = this_ch;
-            to_find--;
-            break;
+                this_ch = t_pTag->toChInfo();
+                if (this_ch.scanNo <= 0 || this_ch.scanNo > nchan) {
+                    qCritical("FIFF_CH_INFO : scan # out of range %d (%d)!", this_ch.scanNo, nchan);
+                    stream->close();
+                    return FIFF_FAIL;
+                } else
+                    chs[this_ch.scanNo - 1] = this_ch;
+                to_find--;
+                break;
         }
     }
     if (to_find != 0) {
         qCritical("Some of the channel information was missing.");
-        stream->close(); return FIFF_FAIL;
+        stream->close();
+        return FIFF_FAIL;
     }
     if (t.isEmpty() && meg_head_t != nullptr) {
         /*
@@ -160,7 +167,8 @@ int mne_read_meg_comp_eeg_ch_info_32(const QString& name,
         t = FiffCoordTrans::readMeasTransform(name);
         if (t.isEmpty()) {
             qCritical("MEG -> head coordinate transformation not found.");
-            stream->close(); return FIFF_FAIL;
+            stream->close();
+            return FIFF_FAIL;
         }
     }
     /*
@@ -178,54 +186,53 @@ int mne_read_meg_comp_eeg_ch_info_32(const QString& name,
             neeg++;
         }
     }
-//    fiff_close(in);
+    //    fiff_close(in);
     stream->close();
 
-    megp  = meg;
-    if(nmegp) {
+    megp = meg;
+    if (nmegp) {
         *nmegp = nmeg;
     }
 
     meg_compp = meg_comp;
-    if(nmeg_compp) {
+    if (nmeg_compp) {
         *nmeg_compp = nmeg_comp;
     }
 
     eegp = eeg;
-    if(neegp) {
+    if (neegp) {
         *neegp = neeg;
     }
 
     if (idp == nullptr) {
         /* id is auto-deleted by unique_ptr */
-    }
-    else
-        *idp   = id.release();
+    } else
+        *idp = id.release();
     if (meg_head_t == nullptr) {
-    }
-    else
+    } else
         *meg_head_t = t;
 
     return FIFF_OK;
 }
 
 #define MNE_CTFV_COMP_UNKNOWN -1
-#define MNE_CTFV_COMP_NONE    0
-#define MNE_CTFV_COMP_G1BR    0x47314252
-#define MNE_CTFV_COMP_G2BR    0x47324252
-#define MNE_CTFV_COMP_G3BR    0x47334252
-#define MNE_CTFV_COMP_G2OI    0x47324f49
-#define MNE_CTFV_COMP_G3OI    0x47334f49
+#define MNE_CTFV_COMP_NONE 0
+#define MNE_CTFV_COMP_G1BR 0x47314252
+#define MNE_CTFV_COMP_G2BR 0x47324252
+#define MNE_CTFV_COMP_G3BR 0x47334252
+#define MNE_CTFV_COMP_G2OI 0x47324f49
+#define MNE_CTFV_COMP_G3OI 0x47334f49
 
-static struct {
+static struct
+{
     int grad_comp;
     int ctf_comp;
-} compMap[] = { { MNE_CTFV_NOGRAD,       MNE_CTFV_COMP_NONE },
-{ MNE_CTFV_GRAD1,        MNE_CTFV_COMP_G1BR },
-{ MNE_CTFV_GRAD2,        MNE_CTFV_COMP_G2BR },
-{ MNE_CTFV_GRAD3,        MNE_CTFV_COMP_G3BR },
-{ MNE_4DV_COMP1,         MNE_4DV_COMP1 },             /* One-to-one mapping for 4D data */
-{ MNE_CTFV_COMP_UNKNOWN, MNE_CTFV_COMP_UNKNOWN }};
+} compMap[] = {{MNE_CTFV_NOGRAD, MNE_CTFV_COMP_NONE},
+               {MNE_CTFV_GRAD1, MNE_CTFV_COMP_G1BR},
+               {MNE_CTFV_GRAD2, MNE_CTFV_COMP_G2BR},
+               {MNE_CTFV_GRAD3, MNE_CTFV_COMP_G3BR},
+               {MNE_4DV_COMP1, MNE_4DV_COMP1}, /* One-to-one mapping for 4D data */
+               {MNE_CTFV_COMP_UNKNOWN, MNE_CTFV_COMP_UNKNOWN}};
 
 int mne_unmap_ctf_comp_kind(int ctf_comp)
 
@@ -238,19 +245,19 @@ int mne_unmap_ctf_comp_kind(int ctf_comp)
     return ctf_comp;
 }
 
-std::unique_ptr<FiffSparseMatrix> mne_convert_to_sparse(const Eigen::MatrixXf& dense,   /* The dense matrix to be converted */
-                                      int   stor_type,      /* Either FIFFTS_MC_CCS or FIFFTS_MC_RCS */
-                                      float small)          /* How small elements should be ignored? */
+std::unique_ptr<FiffSparseMatrix> mne_convert_to_sparse(const Eigen::MatrixXf& dense, /* The dense matrix to be converted */
+                                                        int stor_type,                /* Either FIFFTS_MC_CCS or FIFFTS_MC_RCS */
+                                                        float small)                  /* How small elements should be ignored? */
 /*
  * Convert a dense matrix to sparse using Eigen's sparseView.
  */
 {
     Q_UNUSED(stor_type);
 
-    if (small < 0) {		/* Automatic scaling */
+    if (small < 0) { /* Automatic scaling */
         float maxval = dense.cwiseAbs().maxCoeff();
         if (maxval > 0)
-            small = maxval*std::fabs(small);
+            small = maxval * std::fabs(small);
         else
             small = std::fabs(small);
     }
@@ -266,9 +273,9 @@ std::unique_ptr<FiffSparseMatrix> mne_convert_to_sparse(const Eigen::MatrixXf& d
     return std::make_unique<FiffSparseMatrix>(std::move(eigenSparse), FIFFTS_MC_RCS);
 }
 
-int  mne_sparse_vec_mult2_32(FiffSparseMatrix* mat,     /* The sparse matrix */
-                          float           *vector, /* Vector to be multiplied */
-                          float           *res)    /* Result of the multiplication */
+int mne_sparse_vec_mult2_32(FiffSparseMatrix* mat, /* The sparse matrix */
+                            float* vector,         /* Vector to be multiplied */
+                            float* res)            /* Result of the multiplication */
 /*
       * Multiply a vector by a sparse matrix using Eigen.
       */
@@ -284,34 +291,34 @@ int  mne_sparse_vec_mult2_32(FiffSparseMatrix* mat,     /* The sparse matrix */
 //=============================================================================================================
 
 MNECTFCompDataSet::MNECTFCompDataSet()
-:ncomp(0)
-,nch(0)
-,undo(nullptr)
-,current(nullptr)
+: ncomp(0)
+, nch(0)
+, undo(nullptr)
+, current(nullptr)
 {
 }
 
 //=============================================================================================================
 
-MNECTFCompDataSet::MNECTFCompDataSet(const MNECTFCompDataSet &set)
-:ncomp(0)
-,nch(set.nch)
-,undo(nullptr)
-,current(nullptr)
+MNECTFCompDataSet::MNECTFCompDataSet(const MNECTFCompDataSet& set)
+: ncomp(0)
+, nch(set.nch)
+, undo(nullptr)
+, current(nullptr)
 {
     if (set.ncomp > 0) {
         for (int k = 0; k < set.ncomp; k++)
-            if(set.comps[k])
+            if (set.comps[k])
                 this->comps.push_back(std::make_unique<MNECTFCompData>(*set.comps[k]));
         this->ncomp = static_cast<int>(this->comps.size());
     }
 
     this->chs = set.chs;
 
-    if(set.undo)
+    if (set.undo)
         this->undo = std::make_unique<MNECTFCompData>(*set.undo);
 
-    if(set.current)
+    if (set.current)
         this->current = std::make_unique<MNECTFCompData>(*set.current);
 }
 
@@ -323,7 +330,7 @@ MNECTFCompDataSet::~MNECTFCompDataSet()
 
 //=============================================================================================================
 
-std::unique_ptr<MNECTFCompDataSet> MNECTFCompDataSet::read(const QString &name)
+std::unique_ptr<MNECTFCompDataSet> MNECTFCompDataSet::read(const QString& name)
 /*
      * Read all CTF compensation data from a given file
      */
@@ -335,7 +342,7 @@ std::unique_ptr<MNECTFCompDataSet> MNECTFCompDataSet::read(const QString &name)
     QList<FiffDirNode::SPtr> nodes;
     QList<FiffDirNode::SPtr> comps;
     int ncomp;
-    int kind,k;
+    int kind, k;
     FiffTag::UPtr t_pTag;
     QList<FiffChInfo> chs;
     int nch = 0;
@@ -366,8 +373,9 @@ std::unique_ptr<MNECTFCompDataSet> MNECTFCompDataSet::read(const QString &name)
     /*
         * Read the rest of the stuff
         */
-    if(!stream->open()) {
-        stream->close(); return nullptr;
+    if (!stream->open()) {
+        stream->close();
+        return nullptr;
     }
     set = std::make_unique<MNECTFCompDataSet>();
     /*
@@ -375,11 +383,13 @@ std::unique_ptr<MNECTFCompDataSet> MNECTFCompDataSet::read(const QString &name)
         */
     nodes = stream->dirtree()->dir_tree_find(FIFFB_MNE_CTF_COMP);
     if (nodes.size() == 0) {
-        stream->close(); return set;
+        stream->close();
+        return set;
     }
     comps = nodes[0]->dir_tree_find(FIFFB_MNE_CTF_COMP_DATA);
     if (comps.size() == 0) {
-        stream->close(); return set;
+        stream->close();
+        return set;
     }
     ncomp = comps.size();
     /*
@@ -391,42 +401,41 @@ std::unique_ptr<MNECTFCompDataSet> MNECTFCompDataSet::read(const QString &name)
         * Read each data set
         */
     for (k = 0; k < ncomp; k++) {
-        auto mat = MNENamedMatrix::read(stream,comps[k],FIFF_MNE_CTF_COMP_DATA);
+        auto mat = MNENamedMatrix::read(stream, comps[k], FIFF_MNE_CTF_COMP_DATA);
         if (!mat) {
-            stream->close(); return nullptr;
+            stream->close();
+            return nullptr;
         }
         comps[k]->find_tag(stream, FIFF_MNE_CTF_COMP_KIND, t_pTag);
         if (t_pTag) {
             kind = *t_pTag->toInt();
-        }
-        else {
-            stream->close(); return nullptr;
+        } else {
+            stream->close();
+            return nullptr;
         }
         comps[k]->find_tag(stream, FIFF_MNE_CTF_COMP_CALIBRATED, t_pTag);
         if (t_pTag) {
             calibrated = *t_pTag->toInt();
-        }
-        else
+        } else
             calibrated = 0;
         /*
             * Add these data to the set
             */
         auto one = std::make_unique<MNECTFCompData>();
         one->data = std::move(mat);
-        one->kind                = kind;
-        one->mne_kind            = mne_unmap_ctf_comp_kind(one->kind);
-        one->calibrated          = calibrated;
+        one->kind = kind;
+        one->mne_kind = mne_unmap_ctf_comp_kind(one->kind);
+        one->calibrated = calibrated;
 
-        if (one->calibrate(set->chs,set->nch,true) == FAIL) {
+        if (one->calibrate(set->chs, set->nch, true) == FAIL) {
             qWarning("Warning: Compensation data for '%s' omitted\n", explain_comp(one->kind).toUtf8().constData());
-        }
-        else {
+        } else {
             set->comps.push_back(std::move(one));
             set->ncomp++;
         }
     }
 #ifdef DEBUG
-    qInfo("%d CTF compensation data sets read from %s\n",set->ncomp,name);
+    qInfo("%d CTF compensation data sets read from %s\n", set->ncomp, name);
 #endif
     stream->close();
     return set;
@@ -437,7 +446,7 @@ std::unique_ptr<MNECTFCompDataSet> MNECTFCompDataSet::read(const QString &name)
 int MNECTFCompDataSet::make_comp(const QList<FiffChInfo>& chList,
                                  int nChan,
                                  QList<FiffChInfo> compchs,
-                                 int nCompChan)      /* How many of these */
+                                 int nCompChan) /* How many of these */
 /*
      * Make compensation data to apply to a set of channels to yield (or uncompensated) compensated data
      */
@@ -449,16 +458,16 @@ int MNECTFCompDataSet::make_comp(const QList<FiffChInfo>& chList,
     Eigen::VectorXi comp_sel;
     QStringList names;
     QString name;
-    int  j,k,p;
+    int j, k, p;
 
     std::unique_ptr<FiffSparseMatrix> presel;
     std::unique_ptr<FiffSparseMatrix> postsel;
-    std::unique_ptr<MNENamedMatrix>   data;
+    std::unique_ptr<MNENamedMatrix> data;
 
     QStringList emptyList;
 
     if (compchs.isEmpty()) {
-        compchs   = chList;
+        compchs = chList;
         nCompChan = nChan;
     }
     qInfo("Setting up compensation data...\n");
@@ -480,15 +489,14 @@ int MNECTFCompDataSet::make_comp(const QList<FiffChInfo>& chList,
                 }
                 need_comp++;
             }
-        }
-        else
+        } else
             compGrades[k] = MNE_CTFV_COMP_NONE;
     }
     if (need_comp == 0) {
         qInfo("\tNo compensation set. Nothing more to do.\n");
         return OK;
     }
-    qInfo("\t%d out of %d channels have the compensation set.\n",need_comp,nChan);
+    qInfo("\t%d out of %d channels have the compensation set.\n", need_comp, nChan);
     /*
         * Find the desired compensation data matrix
         */
@@ -500,10 +508,10 @@ int MNECTFCompDataSet::make_comp(const QList<FiffChInfo>& chList,
     }
     if (!this_comp) {
         qCritical("Did not find the desired compensation data : %s",
-               explain_comp(map_comp_kind(first_comp)).toUtf8().constData());
+                  explain_comp(map_comp_kind(first_comp)).toUtf8().constData());
         return FAIL;
     }
-    qInfo("\tDesired compensation data (%s) found.\n",explain_comp(map_comp_kind(first_comp)).toUtf8().constData());
+    qInfo("\tDesired compensation data (%s) found.\n", explain_comp(map_comp_kind(first_comp)).toUtf8().constData());
     /*
         * Find the compensation channels
         */
@@ -512,12 +520,12 @@ int MNECTFCompDataSet::make_comp(const QList<FiffChInfo>& chList,
         comp_sel[k] = -1;
         name = this_comp->data->collist[k];
         for (p = 0; p < nCompChan; p++)
-            if (QString::compare(name,compchs[p].ch_name) == 0) {
+            if (QString::compare(name, compchs[p].ch_name) == 0) {
                 comp_sel[k] = p;
                 break;
             }
         if (comp_sel[k] < 0) {
-            qCritical("Compensation channel %s not found",name.toUtf8().constData());
+            qCritical("Compensation channel %s not found", name.toUtf8().constData());
             return FAIL;
         }
     }
@@ -563,12 +571,12 @@ int MNECTFCompDataSet::make_comp(const QList<FiffChInfo>& chList,
             return FAIL;
         qInfo("\tPostselector created.\n");
     }
-    current           = std::make_unique<MNECTFCompData>();
-    current->kind     = this_comp->kind;
+    current = std::make_unique<MNECTFCompData>();
+    current->kind = this_comp->kind;
     current->mne_kind = this_comp->mne_kind;
-    current->data     = std::move(data);
-    current->presel   = std::move(presel);
-    current->postsel  = std::move(postsel);
+    current->data = std::move(data);
+    current->presel = std::move(presel);
+    current->postsel = std::move(postsel);
 
     qInfo("\tCompensation set up.\n");
     return OK;
@@ -592,7 +600,7 @@ int MNECTFCompDataSet::set_comp(QList<FIFFLIB::FiffChInfo>& chs,
         }
     }
     qInfo("A new compensation value (%s) was assigned to %d MEG channels.\n",
-            explain_comp(map_comp_kind(comp)).toUtf8().constData(),nset);
+          explain_comp(map_comp_kind(comp)).toUtf8().constData(), nset);
     return nset;
 }
 
@@ -611,8 +619,8 @@ int MNECTFCompDataSet::apply(bool do_it, Eigen::Ref<Eigen::VectorXf> data, Eigen
      */
 {
     MNECTFCompData* this_comp;
-    int   ndata = static_cast<int>(data.size());
-    int   ncompdata = static_cast<int>(compdata.size());
+    int ndata = static_cast<int>(data.size());
+    int ncompdata = static_cast<int>(compdata.size());
 
     if (!current)
         return OK;
@@ -623,39 +631,36 @@ int MNECTFCompDataSet::apply(bool do_it, Eigen::Ref<Eigen::VectorXf> data, Eigen
     if (this_comp->presel) {
         if (this_comp->presel->cols() != ncompdata) {
             qCritical("Compensation data dimension mismatch. Expected %d, got %d channels.",
-                   this_comp->presel->cols(),ncompdata);
+                      this_comp->presel->cols(), ncompdata);
             return FAIL;
         }
-    }
-    else if (this_comp->data->ncol != ncompdata) {
+    } else if (this_comp->data->ncol != ncompdata) {
         qCritical("Compensation data dimension mismatch. Expected %d, got %d channels.",
-               this_comp->data->ncol,ncompdata);
+                  this_comp->data->ncol, ncompdata);
         return FAIL;
     }
     if (this_comp->postsel) {
         if (this_comp->postsel->rows() != ndata) {
             qCritical("Data dimension mismatch. Expected %d, got %d channels.",
-                   this_comp->postsel->rows(),ndata);
+                      this_comp->postsel->rows(), ndata);
             return FAIL;
         }
-    }
-    else if (this_comp->data->nrow != ndata) {
+    } else if (this_comp->data->nrow != ndata) {
         qCritical("Data dimension mismatch. Expected %d, got %d channels.",
-               this_comp->data->nrow,ndata);
+                  this_comp->data->nrow, ndata);
         return FAIL;
     }
     /*
         * Preselection is optional
         */
-    const float *presel;
+    const float* presel;
     if (this_comp->presel) {
         if (this_comp->presel_data.size() == 0)
             this_comp->presel_data.resize(this_comp->presel->rows());
-        if (mne_sparse_vec_mult2_32(this_comp->presel.get(),const_cast<float*>(compdata.data()),this_comp->presel_data.data()) != OK)
+        if (mne_sparse_vec_mult2_32(this_comp->presel.get(), const_cast<float*>(compdata.data()), this_comp->presel_data.data()) != OK)
             return FAIL;
         presel = this_comp->presel_data.data();
-    }
-    else
+    } else
         presel = compdata.data();
     /*
         * This always happens
@@ -670,13 +675,13 @@ int MNECTFCompDataSet::apply(bool do_it, Eigen::Ref<Eigen::VectorXf> data, Eigen
     /*
         * Optional postselection
         */
-    const float *comp;
+    const float* comp;
     if (!this_comp->postsel)
         comp = this_comp->comp_data.data();
     else {
         if (this_comp->postsel_data.size() == 0)
             this_comp->postsel_data.resize(this_comp->postsel->rows());
-        if (mne_sparse_vec_mult2_32(this_comp->postsel.get(),this_comp->comp_data.data(),this_comp->postsel_data.data()) != OK)
+        if (mne_sparse_vec_mult2_32(this_comp->postsel.get(), this_comp->comp_data.data(), this_comp->postsel_data.data()) != OK)
             return FAIL;
         comp = this_comp->postsel_data.data();
     }
@@ -699,8 +704,8 @@ int MNECTFCompDataSet::apply_transpose(bool do_it, Eigen::MatrixXf& data)
      */
 {
     MNECTFCompData* this_comp;
-    int   ndata = static_cast<int>(data.rows());
-    int   ncompdata  = ndata;
+    int ndata = static_cast<int>(data.rows());
+    int ncompdata = ndata;
 
     if (!current)
         return OK;
@@ -711,25 +716,23 @@ int MNECTFCompDataSet::apply_transpose(bool do_it, Eigen::MatrixXf& data)
     if (this_comp->presel) {
         if (this_comp->presel->cols() != ncompdata) {
             qCritical("Compensation data dimension mismatch. Expected %d, got %d channels.",
-                   this_comp->presel->cols(),ncompdata);
+                      this_comp->presel->cols(), ncompdata);
             return FAIL;
         }
-    }
-    else if (this_comp->data->ncol != ncompdata) {
+    } else if (this_comp->data->ncol != ncompdata) {
         qCritical("Compensation data dimension mismatch. Expected %d, got %d channels.",
-               this_comp->data->ncol,ncompdata);
+                  this_comp->data->ncol, ncompdata);
         return FAIL;
     }
     if (this_comp->postsel) {
         if (this_comp->postsel->rows() != ndata) {
             qCritical("Data dimension mismatch. Expected %d, got %d channels.",
-                   this_comp->postsel->rows(),ndata);
+                      this_comp->postsel->rows(), ndata);
             return FAIL;
         }
-    }
-    else if (this_comp->data->nrow != ndata) {
+    } else if (this_comp->data->nrow != ndata) {
         qCritical("Data dimension mismatch. Expected %d, got %d channels.",
-               this_comp->data->nrow,ndata);
+                  this_comp->data->nrow, ndata);
         return FAIL;
     }
     /*
@@ -738,8 +741,7 @@ int MNECTFCompDataSet::apply_transpose(bool do_it, Eigen::MatrixXf& data)
     Eigen::MatrixXf preselMat;
     if (this_comp->presel) {
         preselMat = this_comp->presel->eigen() * data;
-    }
-    else {
+    } else {
         preselMat = data;
     }
     /*
@@ -765,10 +767,10 @@ int MNECTFCompDataSet::apply_transpose(bool do_it, Eigen::MatrixXf& data)
 
 //=============================================================================================================
 
-int MNECTFCompDataSet::get_comp(const QList<FIFFLIB::FiffChInfo> &chs, int nch)
+int MNECTFCompDataSet::get_comp(const QList<FIFFLIB::FiffChInfo>& chs, int nch)
 {
     int res = MNE_CTFV_NOGRAD;
-    int first_comp,comp;
+    int first_comp, comp;
     int k;
 
     for (k = 0, first_comp = -1; k < nch; k++) {
@@ -806,15 +808,16 @@ int MNECTFCompDataSet::map_comp_kind(int grad)
 
 QString MNECTFCompDataSet::explain_comp(int kind)
 {
-    static const struct {
+    static const struct
+    {
         int kind;
-        const char *expl;
-    } explain[] = { { MNE_CTFV_COMP_NONE,    "uncompensated" },
-    { MNE_CTFV_COMP_G1BR,    "first order gradiometer" },
-    { MNE_CTFV_COMP_G2BR,    "second order gradiometer" },
-    { MNE_CTFV_COMP_G3BR,    "third order gradiometer" },
-    { MNE_4DV_COMP1,         "4D comp 1" },
-    { MNE_CTFV_COMP_UNKNOWN, "unknown" } };
+        const char* expl;
+    } explain[] = {{MNE_CTFV_COMP_NONE, "uncompensated"},
+                   {MNE_CTFV_COMP_G1BR, "first order gradiometer"},
+                   {MNE_CTFV_COMP_G2BR, "second order gradiometer"},
+                   {MNE_CTFV_COMP_G3BR, "third order gradiometer"},
+                   {MNE_4DV_COMP1, "4D comp 1"},
+                   {MNE_CTFV_COMP_UNKNOWN, "unknown"}};
     int k;
 
     for (k = 0; explain[k].kind != MNE_CTFV_COMP_UNKNOWN; k++)
@@ -829,7 +832,7 @@ int MNECTFCompDataSet::set_compensation(int compensate_to,
                                         QList<FiffChInfo>& chList,
                                         int nchan,
                                         QList<FiffChInfo> comp_chs,
-                                        int ncomp_chan)     /* How many */
+                                        int ncomp_chan) /* How many */
 /*
      * Make data which has the third-order gradient compensation applied
      */
@@ -854,35 +857,35 @@ int MNECTFCompDataSet::set_compensation(int compensate_to,
     /*
         * Update the 'current' field to reflect the compensation possibly present in the data now
         */
-    if (make_comp(chList,nchan,comp_chs,ncomp_chan) == FAIL)
+    if (make_comp(chList, nchan, comp_chs, ncomp_chan) == FAIL)
         return FAIL;
     /*
         * Are we there already?
         */
     if (current && current->mne_kind == compensate_to) {
-        qInfo("No further compensation necessary (comp = %s)\n",explain_comp(current->kind).toUtf8().constData());
+        qInfo("No further compensation necessary (comp = %s)\n", explain_comp(current->kind).toUtf8().constData());
         current.reset();
         return OK;
     }
-    undo    = std::move(current);
+    undo = std::move(current);
     if (compensate_to == MNE_CTFV_NOGRAD) {
         qInfo("No compensation was requested.\n");
-        set_comp(chList,nchan,compensate_to);
+        set_comp(chList, nchan, compensate_to);
         return OK;
     }
-    if (set_comp(chList,nchan,compensate_to) > 0) {
+    if (set_comp(chList, nchan, compensate_to) > 0) {
         if (undo)
             comp_was = undo->mne_kind;
         else
             comp_was = MNE_CTFV_NOGRAD;
-        if (make_comp(chList,nchan,comp_chs,ncomp_chan) == FAIL) {
+        if (make_comp(chList, nchan, comp_chs, ncomp_chan) == FAIL) {
             if (comp_was != MNE_CTFV_COMP_UNKNOWN)
-                set_comp(chList,nchan,comp_was);
+                set_comp(chList, nchan, comp_was);
             return FAIL;
         }
         qInfo("Compensation set up as requested (%s -> %s).\n",
-                explain_comp(map_comp_kind(comp_was)).toUtf8().constData(),
-                explain_comp(current->kind).toUtf8().constData());
+              explain_comp(map_comp_kind(comp_was)).toUtf8().constData(),
+              explain_comp(current->kind).toUtf8().constData());
     }
     return OK;
 }

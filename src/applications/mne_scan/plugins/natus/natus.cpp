@@ -52,11 +52,11 @@ Natus::Natus()
 : m_iSamplingFreq(2048)
 , m_iNumberChannels(46)
 , m_iSamplesPerBlock(256)
-, m_qStringResourcePath(qApp->applicationDirPath()+"/../resources/mne_scan/plugins/natus/")
+, m_qStringResourcePath(qApp->applicationDirPath() + "/../resources/mne_scan/plugins/natus/")
 , m_pRMTSA_Natus(PluginOutputData<RealTimeMultiSampleArray>::create(this, "Natus", "EEG output data"))
 , m_pFiffInfo(QSharedPointer<FiffInfo>::create())
 {
-    m_pRMTSA_Natus->measurementData()->setName(this->getName());//Provide name to auto store widget settings
+    m_pRMTSA_Natus->measurementData()->setName(this->getName()); //Provide name to auto store widget settings
 }
 
 //=============================================================================================================
@@ -64,7 +64,7 @@ Natus::Natus()
 Natus::~Natus()
 {
     //If the program is closed while the sampling is in process
-    if(this->isRunning()) {
+    if (this->isRunning()) {
         this->stop();
     }
 }
@@ -101,82 +101,81 @@ void Natus::setUpFiffInfo()
     m_pFiffInfo->nchan = m_iNumberChannels;
     m_pFiffInfo->sfreq = m_iSamplingFreq;
     m_pFiffInfo->highpass = 0.001f;
-    m_pFiffInfo->lowpass = m_iSamplingFreq/2;
+    m_pFiffInfo->lowpass = m_iSamplingFreq / 2;
 
     //Set up the channel info
     QStringList QSLChNames;
     m_pFiffInfo->chs.clear();
 
-    for(int i = 0; i < m_pFiffInfo->nchan; ++i)
-    {
+    for (int i = 0; i < m_pFiffInfo->nchan; ++i) {
         //Create information for each channel
         QString sChType;
         FiffChInfo fChInfo;
 
-//        //EEG Channels
-//        if(i <= m_pFiffInfo->nchan-2)
-//        {
-            //Set channel name
-            sChType = QString("EEG ");
-            if(i<10) {
-                sChType.append("00");
-            }
+        //        //EEG Channels
+        //        if(i <= m_pFiffInfo->nchan-2)
+        //        {
+        //Set channel name
+        sChType = QString("EEG ");
+        if (i < 10) {
+            sChType.append("00");
+        }
 
-            if(i>=10 && i<100) {
-                sChType.append("0");
-            }
+        if (i >= 10 && i < 100) {
+            sChType.append("0");
+        }
 
-            fChInfo.ch_name = sChType.append(sChType.number(i));
+        fChInfo.ch_name = sChType.append(sChType.number(i));
 
-            //Set channel type
-            fChInfo.kind = FIFFV_EEG_CH;
+        //Set channel type
+        fChInfo.kind = FIFFV_EEG_CH;
 
-            //Set logno
-            fChInfo.logNo = i;
+        //Set logno
+        fChInfo.logNo = i;
 
-            //Set coord frame
-            fChInfo.coord_frame = FIFFV_COORD_HEAD;
+        //Set coord frame
+        fChInfo.coord_frame = FIFFV_COORD_HEAD;
 
-            //Set unit
-            fChInfo.unit = FIFF_UNIT_V;
+        //Set unit
+        fChInfo.unit = FIFF_UNIT_V;
 
-            //Set EEG electrode location - Convert from mm to m
-            fChInfo.eeg_loc(0,0) = 0;
-            fChInfo.eeg_loc(1,0) = 0;
-            fChInfo.eeg_loc(2,0) = 0;
+        //Set EEG electrode location - Convert from mm to m
+        fChInfo.eeg_loc(0, 0) = 0;
+        fChInfo.eeg_loc(1, 0) = 0;
+        fChInfo.eeg_loc(2, 0) = 0;
 
-            //Set EEG electrode direction - Convert from mm to m
-            fChInfo.eeg_loc(0,1) = 0;
-            fChInfo.eeg_loc(1,1) = 0;
-            fChInfo.eeg_loc(2,1) = 0;
+        //Set EEG electrode direction - Convert from mm to m
+        fChInfo.eeg_loc(0, 1) = 0;
+        fChInfo.eeg_loc(1, 1) = 0;
+        fChInfo.eeg_loc(2, 1) = 0;
 
-            //Also write the eeg electrode locations into the meg loc variable (mne_ex_read_raw() matlab function wants this)
-            fChInfo.chpos.r0(0) = 0;
-            fChInfo.chpos.r0(1) = 0;
-            fChInfo.chpos.r0(2) = 0;
+        //Also write the eeg electrode locations into the meg loc variable (mne_ex_read_raw() matlab function wants this)
+        fChInfo.chpos.r0(0) = 0;
+        fChInfo.chpos.r0(1) = 0;
+        fChInfo.chpos.r0(2) = 0;
 
-            fChInfo.chpos.ex(0) = 1;
-            fChInfo.chpos.ex(1) = 0;
-            fChInfo.chpos.ex(2) = 0;
+        fChInfo.chpos.ex(0) = 1;
+        fChInfo.chpos.ex(1) = 0;
+        fChInfo.chpos.ex(2) = 0;
 
-            fChInfo.chpos.ey(0) = 0;
-            fChInfo.chpos.ey(1) = 1;
-            fChInfo.chpos.ey(2) = 0;
+        fChInfo.chpos.ey(0) = 0;
+        fChInfo.chpos.ey(1) = 1;
+        fChInfo.chpos.ey(2) = 0;
 
-            fChInfo.chpos.ez(0) = 0;
-            fChInfo.chpos.ez(1) = 0;
-            fChInfo.chpos.ez(2) = 1;
-//        }
+        fChInfo.chpos.ez(0) = 0;
+        fChInfo.chpos.ez(1) = 0;
+        fChInfo.chpos.ez(2) = 1;
+        //        }
 
-//        //Digital input channel
-//        if(i == m_pFiffInfo->nchan-1)
-//        {
-//            //Set channel type
-//            fChInfo.kind = FIFFV_STIM_CH;
+        //        //Digital input channel
+        //        if(i == m_pFiffInfo->nchan-1)
+        //        {
+        //            //Set channel type
+        //            fChInfo.kind = FIFFV_STIM_CH;
 
-//            sChType = QString("STIM");
-//            fChInfo.ch_name = sChType;
-//        }
+        //            sChType = QString("STIM");
+        //            fChInfo.ch_name = sChType;
+        //        }
 
         QSLChNames << sChType;
 
@@ -198,7 +197,7 @@ void Natus::setUpFiffInfo()
 bool Natus::start()
 {
     // Init circular buffer to transmit data from the producer to this thread
-    if(!m_pCircularBuffer) {
+    if (!m_pCircularBuffer) {
         m_pCircularBuffer = QSharedPointer<CircularBuffer_Matrix_double>(new CircularBuffer_Matrix_double(10));
     }
 
@@ -256,7 +255,7 @@ QString Natus::getName() const
 
 QWidget* Natus::setupWidget()
 {
-    NatusSetup* widget = new NatusSetup(this);//widget is later destroyed by CentralWidget - so it has to be created everytime new
+    NatusSetup* widget = new NatusSetup(this); //widget is later destroyed by CentralWidget - so it has to be created everytime new
 
     //init properties dialog
     widget->initGui();
@@ -266,9 +265,9 @@ QWidget* Natus::setupWidget()
 
 //=============================================================================================================
 
-void Natus::onNewDataAvailable(const Eigen::MatrixXd &matData)
+void Natus::onNewDataAvailable(const Eigen::MatrixXd& matData)
 {
-    while(!m_pCircularBuffer->push(matData)) {
+    while (!m_pCircularBuffer->push(matData)) {
         //Do nothing until the circular buffer is ready to accept new data again
     }
 }
@@ -279,10 +278,10 @@ void Natus::run()
 {
     MatrixXd matData;
 
-    while(!isInterruptionRequested()) {
-        if(m_pCircularBuffer->pop(matData)) {
+    while (!isInterruptionRequested()) {
+        if (m_pCircularBuffer->pop(matData)) {
             //emit values
-            if(!isInterruptionRequested()) {
+            if (!isInterruptionRequested()) {
                 m_pRMTSA_Natus->measurementData()->setValue(matData);
             }
         }
@@ -293,5 +292,5 @@ void Natus::run()
 
 QString Natus::getBuildInfo()
 {
-    return QString(NATUSPLUGIN::buildDateTime()) + QString(" - ")  + QString(NATUSPLUGIN::buildHash());
+    return QString(NATUSPLUGIN::buildDateTime()) + QString(" - ") + QString(NATUSPLUGIN::buildHash());
 }

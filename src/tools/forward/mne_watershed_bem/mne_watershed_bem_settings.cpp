@@ -34,7 +34,7 @@ using namespace MNEWATERSHEDBEM;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-MNEWatershedBemSettings::MNEWatershedBemSettings(int *argc, char **argv)
+MNEWatershedBemSettings::MNEWatershedBemSettings(int* argc, char** argv)
 : m_sVolume("T1")
 , m_bOverwrite(false)
 , m_bAtlas(false)
@@ -49,53 +49,52 @@ MNEWatershedBemSettings::MNEWatershedBemSettings(int *argc, char **argv)
         "skin surfaces from an MRI volume, then creates a FIFF BEM head surface file.\n\n"
         "Ported from the original MNE shell script mne_watershed_bem by Matti Hamalainen\n"
         "(SVN $Id: mne_watershed_bem 3391 2012-11-30 21:13:09Z msh $).\n\n"
-        "Cross-referenced with MNE-Python's mne.bem.make_watershed_bem()."
-    );
+        "Cross-referenced with MNE-Python's mne.bem.make_watershed_bem().");
     parser.addHelpOption();
     parser.addVersionOption();
 
     // --subject
     QCommandLineOption subjectOpt(QStringList() << "subject",
-        "Subject name (defaults to $SUBJECT environment variable).",
-        "subject");
+                                  "Subject name (defaults to $SUBJECT environment variable).",
+                                  "subject");
     parser.addOption(subjectOpt);
 
     // --subjects-dir
     QCommandLineOption subjectsDirOpt(QStringList() << "subjects-dir",
-        "Subjects directory (defaults to $SUBJECTS_DIR environment variable).",
-        "dir");
+                                      "Subjects directory (defaults to $SUBJECTS_DIR environment variable).",
+                                      "dir");
     parser.addOption(subjectsDirOpt);
 
     // --volume
     QCommandLineOption volumeOpt(QStringList() << "volume",
-        "MRI volume name (default: T1).",
-        "name", "T1");
+                                 "MRI volume name (default: T1).",
+                                 "name", "T1");
     parser.addOption(volumeOpt);
 
     // --overwrite
     QCommandLineOption overwriteOpt(QStringList() << "overwrite",
-        "Overwrite existing watershed files.");
+                                    "Overwrite existing watershed files.");
     parser.addOption(overwriteOpt);
 
     // --atlas
     QCommandLineOption atlasOpt(QStringList() << "atlas",
-        "Specify the --atlas option for mri_watershed.");
+                                "Specify the --atlas option for mri_watershed.");
     parser.addOption(atlasOpt);
 
     // --gcaatlas
     QCommandLineOption gcaAtlasOpt(QStringList() << "gcaatlas",
-        "Use the subcortical atlas for mri_watershed.");
+                                   "Use the subcortical atlas for mri_watershed.");
     parser.addOption(gcaAtlasOpt);
 
     // --preflood
     QCommandLineOption prefloodOpt(QStringList() << "preflood",
-        "Change the preflood height for mri_watershed.",
-        "number");
+                                   "Change the preflood height for mri_watershed.",
+                                   "number");
     parser.addOption(prefloodOpt);
 
     // --verbose
     QCommandLineOption verboseOpt(QStringList() << "verbose",
-        "Enable verbose output.");
+                                  "Enable verbose output.");
     parser.addOption(verboseOpt);
 
     // Build argument list from argc/argv

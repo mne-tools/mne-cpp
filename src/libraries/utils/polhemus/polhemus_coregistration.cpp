@@ -31,8 +31,8 @@ using namespace UTILSLIB;
 //=============================================================================================================
 
 PolhemusCoregistration::PolhemusCoregistration(QObject* parent)
-    : QObject(parent)
-    , m_pPoints(new AcquiredPoints(this))
+: QObject(parent)
+, m_pPoints(new AcquiredPoints(this))
 {
     m_deviceToWorld.setToIdentity();
     m_headToWorld.setToIdentity();
@@ -59,10 +59,10 @@ void PolhemusCoregistration::setProbeStation(int station)
 //=============================================================================================================
 
 void PolhemusCoregistration::setTrackerToDeviceOffset(const QVector3D& translation,
-                                                       const QQuaternion& rotation)
+                                                      const QQuaternion& rotation)
 {
     m_offsetTranslation = translation;
-    m_offsetRotation    = rotation;
+    m_offsetRotation = rotation;
 }
 
 //=============================================================================================================
@@ -75,9 +75,9 @@ void PolhemusCoregistration::setConnection(PolhemusConnection* conn)
     m_pConn = conn;
     if (m_pConn) {
         connect(m_pConn, &PolhemusConnection::pointReceived,
-                this,    &PolhemusCoregistration::onPointReceived);
+                this, &PolhemusCoregistration::onPointReceived);
         connect(m_pConn, &PolhemusConnection::penButtonPressed,
-                this,    &PolhemusCoregistration::onPenButtonPressedFromConn);
+                this, &PolhemusCoregistration::onPenButtonPressedFromConn);
     }
 }
 
@@ -89,7 +89,7 @@ bool PolhemusCoregistration::captureCurrentPenPositionAsFiducial(FiducialId id)
         return false;
     }
 
-    static const char* labels[] = { nullptr, "LPA", "NAS", "RPA" };
+    static const char* labels[] = {nullptr, "LPA", "NAS", "RPA"};
     const int ident = static_cast<int>(id);
 
     // Store pen fiducial BEFORE append (which emits pointsChanged)
@@ -97,27 +97,27 @@ bool PolhemusCoregistration::captureCurrentPenPositionAsFiducial(FiducialId id)
     m_hasPenFid[ident] = true;
 
     qInfo().nospace() << "Fiducial captured: " << labels[ident]
-        << "  (" << m_penPosition.x()*1000.f << ", "
-        << m_penPosition.y()*1000.f << ", "
-        << m_penPosition.z()*1000.f << ") mm";
+                      << "  (" << m_penPosition.x() * 1000.f << ", "
+                      << m_penPosition.y() * 1000.f << ", "
+                      << m_penPosition.z() * 1000.f << ") mm";
 
     // Log distances to previously captured fiducials
     for (int j = 1; j <= 3; ++j) {
         if (j != ident && m_hasPenFid[j]) {
             float dist = (m_penFid[ident] - m_penFid[j]).length() * 1000.0f;
             qInfo().nospace() << "  " << labels[ident] << " ↔ " << labels[j]
-                << ": " << dist << " mm"
-                << (dist > 200.0f ? "  *** WARNING: > 200 mm!" : "");
+                              << ": " << dist << " mm"
+                              << (dist > 200.0f ? "  *** WARNING: > 200 mm!" : "");
         }
     }
 
     m_pPoints->removeFiducial(id);
 
     DigitizedPoint dp;
-    dp.kind        = PointKind::Fiducial;
-    dp.label       = QString::fromLatin1(labels[ident]);
+    dp.kind = PointKind::Fiducial;
+    dp.label = QString::fromLatin1(labels[ident]);
     dp.identNumber = ident;
-    dp.position    = m_penPosition;
+    dp.position = m_penPosition;
     m_pPoints->append(dp);
     return true;
 }
@@ -131,10 +131,10 @@ bool PolhemusCoregistration::captureCurrentPenPositionAsHeadShape()
     const int n = m_pPoints->countOf(PointKind::HeadShape) + 1;
 
     DigitizedPoint dp;
-    dp.kind        = PointKind::HeadShape;
-    dp.label       = QStringLiteral("HSP-%1").arg(n);
+    dp.kind = PointKind::HeadShape;
+    dp.label = QStringLiteral("HSP-%1").arg(n);
     dp.identNumber = n;
-    dp.position    = m_penPosition;
+    dp.position = m_penPosition;
     m_pPoints->append(dp);
     return true;
 }
@@ -148,7 +148,8 @@ void PolhemusCoregistration::resetRegistration()
     m_headToDevice.setToIdentity();
     m_worldToModel.setToIdentity();
     m_hasPenVertex = false;
-    for (int i = 0; i < 4; ++i) m_hasPenFid[i] = false;
+    for (int i = 0; i < 4; ++i)
+        m_hasPenFid[i] = false;
     emit registrationChanged();
 }
 
@@ -185,7 +186,8 @@ bool PolhemusCoregistration::hasAllPenFiducials() const
 
 bool PolhemusCoregistration::captureCurrentPenPositionAsVertex()
 {
-    if (!m_havePenPos) return false;
+    if (!m_havePenPos)
+        return false;
     m_penVertex = m_penPosition;
     m_hasPenVertex = true;
     qInfo() << "Captured pen vertex (CZ) at" << m_penVertex * 1000.0f << "mm";
@@ -242,8 +244,8 @@ bool PolhemusCoregistration::computeRegistration()
         const float mNR = (mNas - mRpa).length() * 1000.0f;
         const float mLR = (mLpa - mRpa).length() * 1000.0f;
 
-        const float maxRatio = std::max({dNL/mNL, dNR/mNR, dLR/mLR});
-        const float minRatio = std::min({dNL/mNL, dNR/mNR, dLR/mLR});
+        const float maxRatio = std::max({dNL / mNL, dNR / mNR, dLR / mLR});
+        const float minRatio = std::min({dNL / mNL, dNR / mNR, dLR / mLR});
         if (maxRatio / minRatio > 2.0f) {
             qWarning() << "Registration: shape mismatch — pen fiducial triangle"
                        << "has very different proportions from model."
@@ -345,8 +347,8 @@ bool PolhemusCoregistration::computeRegistration()
         return false;
     }
 
-    m_headToWorld       = headFrame;
-    m_headToDevice      = m_deviceToWorld.inverted() * m_headToWorld;
+    m_headToWorld = headFrame;
+    m_headToDevice = m_deviceToWorld.inverted() * m_headToWorld;
     m_worldToModel.setToIdentity();
     m_registrationValid = true;
     qInfo() << "Registration succeeded (head-frame fallback).";
@@ -357,8 +359,8 @@ bool PolhemusCoregistration::computeRegistration()
 //=============================================================================================================
 
 void PolhemusCoregistration::onPointReceived(int station,
-                                              const QVector3D& position,
-                                              const QQuaternion& orientation)
+                                             const QVector3D& position,
+                                             const QQuaternion& orientation)
 {
     // Apply axis mirroring to compensate for transmitter placement
     const QVector3D pos(m_mirrorX ? -position.x() : position.x(),
@@ -372,17 +374,17 @@ void PolhemusCoregistration::onPointReceived(int station,
         // Gimbal-lock guard: for ZYX Euler, sin(el) = 2*(w*y - x*z).
         // When |el| > 80° the Euler→quaternion conversion is unreliable,
         // so freeze the pen pose at its last good value.
-        const float sinEl = 2.0f * (orientation.scalar() * orientation.y()
-                                  - orientation.x() * orientation.z());
+        const float sinEl = 2.0f * (orientation.scalar() * orientation.y() - orientation.x() * orientation.z());
         constexpr float kGimbalSinEl = 0.9848f; // sin(80°)
         const bool gimbalLock = (std::abs(sinEl) > kGimbalSinEl);
 
         if (!gimbalLock) {
             const QVector3D tipAdj = m_tipOffsetEnabled
-                ? orientation.rotatedVector(m_penTipOffset) : QVector3D();
-            m_penPosition    = pos + tipAdj;
+                ? orientation.rotatedVector(m_penTipOffset)
+                : QVector3D();
+            m_penPosition = pos + tipAdj;
             m_penOrientation = orientation;
-            m_havePenPos     = true;
+            m_havePenPos = true;
         }
 
         // Collect raw (un-offset) samples during pivot calibration.
@@ -391,12 +393,11 @@ void PolhemusCoregistration::onPointReceived(int station,
         // Also reject position jumps and gimbal-lock orientations.
         if (m_pivotState == PivotState::Collecting) {
             constexpr float kMinAngleDeg = 3.0f;
-            constexpr float kMaxPosJumpM = 0.05f; // 5 cm
+            constexpr float kMaxPosJumpM = 0.05f;    // 5 cm
             constexpr float kGimbalSinEl2 = 0.9848f; // sin(80°) — reject |el|>80°
 
             // Gimbal-lock check: for ZYX Euler, sin(el) = 2*(w*y - x*z)
-            const float sinEl2 = 2.0f * (orientation.scalar() * orientation.y()
-                                       - orientation.x() * orientation.z());
+            const float sinEl2 = 2.0f * (orientation.scalar() * orientation.y() - orientation.x() * orientation.z());
             if (std::abs(sinEl2) > kGimbalSinEl2) {
                 // Near gimbal lock — skip this sample silently
             } else {
@@ -419,7 +420,8 @@ void PolhemusCoregistration::onPointReceived(int station,
                         const auto& first = m_pivotOrientations.front();
                         for (size_t k = 1; k < m_pivotOrientations.size(); ++k) {
                             float d = std::abs(QQuaternion::dotProduct(first, m_pivotOrientations[k]));
-                            if (d < minDot) minDot = d;
+                            if (d < minDot)
+                                minDot = d;
                         }
                         spanDeg = 2.0f * std::acos(std::min(minDot, 1.0f)) * (180.0f / 3.14159265f);
                     }
@@ -430,16 +432,16 @@ void PolhemusCoregistration::onPointReceived(int station,
 
         emit penPoseChanged(m_penPosition, m_penOrientation);
     } else if (station == m_probeStation) {
-        m_probePosition    = pos;
+        m_probePosition = pos;
         m_probeOrientation = orientation;
-        m_haveProbePos     = true;
+        m_haveProbePos = true;
         emit probePoseChanged(m_probePosition, m_probeOrientation);
     }
 }
 
 void PolhemusCoregistration::onPenButtonPressedFromConn(int station,
-                                                         const QVector3D& position,
-                                                         const QQuaternion& orientation)
+                                                        const QVector3D& position,
+                                                        const QQuaternion& orientation)
 {
     if (station == m_penStation) {
         // Apply axis mirroring to compensate for transmitter placement
@@ -448,10 +450,11 @@ void PolhemusCoregistration::onPenButtonPressedFromConn(int station,
                             position.z());
 
         const QVector3D tipAdj = m_tipOffsetEnabled
-            ? orientation.rotatedVector(m_penTipOffset) : QVector3D();
-        m_penPosition    = pos + tipAdj;
+            ? orientation.rotatedVector(m_penTipOffset)
+            : QVector3D();
+        m_penPosition = pos + tipAdj;
         m_penOrientation = orientation;
-        m_havePenPos     = true;
+        m_havePenPos = true;
 
         // Pivot calibration state machine
         if (m_pivotState == PivotState::WaitingForStart) {
@@ -474,7 +477,7 @@ void PolhemusCoregistration::onPenButtonPressedFromConn(int station,
 //=============================================================================================================
 
 QMatrix4x4 PolhemusCoregistration::buildDevicePose(const QVector3D& trackerPos,
-                                                    const QQuaternion& trackerOri) const
+                                                   const QQuaternion& trackerOri) const
 {
     QMatrix4x4 trackerToWorld;
     trackerToWorld.setToIdentity();
@@ -496,18 +499,30 @@ QMatrix4x4 PolhemusCoregistration::buildHeadFrame() const
     const QVector3D rpa = m_pPoints->fiducial(FiducialId::RPA);
 
     const QVector3D origin = (lpa + rpa) * 0.5f;
-    const QVector3D ex     = (nas - origin).normalized();
+    const QVector3D ex = (nas - origin).normalized();
     const QVector3D eyApprox = (lpa - origin).normalized();
     // Gram-Schmidt: orthogonalize ey against ex, preserving LPA direction
-    const QVector3D ey     = (eyApprox - QVector3D::dotProduct(eyApprox, ex) * ex).normalized();
-    const QVector3D ez     = QVector3D::crossProduct(ex, ey).normalized();
+    const QVector3D ey = (eyApprox - QVector3D::dotProduct(eyApprox, ex) * ex).normalized();
+    const QVector3D ez = QVector3D::crossProduct(ex, ey).normalized();
 
     QMatrix4x4 frame;
     frame.setToIdentity();
-    frame(0, 0) = ex.x();  frame(0, 1) = ey.x();  frame(0, 2) = ez.x();  frame(0, 3) = origin.x();
-    frame(1, 0) = ex.y();  frame(1, 1) = ey.y();  frame(1, 2) = ez.y();  frame(1, 3) = origin.y();
-    frame(2, 0) = ex.z();  frame(2, 1) = ey.z();  frame(2, 2) = ez.z();  frame(2, 3) = origin.z();
-    frame(3, 0) = 0.0f;    frame(3, 1) = 0.0f;    frame(3, 2) = 0.0f;    frame(3, 3) = 1.0f;
+    frame(0, 0) = ex.x();
+    frame(0, 1) = ey.x();
+    frame(0, 2) = ez.x();
+    frame(0, 3) = origin.x();
+    frame(1, 0) = ex.y();
+    frame(1, 1) = ey.y();
+    frame(1, 2) = ez.y();
+    frame(1, 3) = origin.y();
+    frame(2, 0) = ex.z();
+    frame(2, 1) = ey.z();
+    frame(2, 2) = ez.z();
+    frame(2, 3) = origin.z();
+    frame(3, 0) = 0.0f;
+    frame(3, 1) = 0.0f;
+    frame(3, 2) = 0.0f;
+    frame(3, 3) = 1.0f;
     return frame;
 }
 
@@ -559,8 +574,8 @@ bool PolhemusCoregistration::solvePivotCalibration()
         const int row = 3 * i;
         for (int r = 0; r < 3; ++r) {
             for (int c = 0; c < 3; ++c) {
-                A(row + r, c)     = static_cast<double>(rm(r, c));   // R_i
-                A(row + r, 3 + c) = (r == c) ? -1.0 : 0.0;          // -I
+                A(row + r, c) = static_cast<double>(rm(r, c)); // R_i
+                A(row + r, 3 + c) = (r == c) ? -1.0 : 0.0;     // -I
             }
         }
         b(row + 0) = -static_cast<double>(p.x());
@@ -657,9 +672,9 @@ bool PolhemusCoregistration::captureOpticalCalibSample()
 
     qInfo().nospace()
         << "Optical calibration sample " << n << ":"
-        << "\n    tracker pos: (" << trackerPos.x()*1000.f << ", " << trackerPos.y()*1000.f << ", " << trackerPos.z()*1000.f << ") mm"
-        << "\n    focus point: (" << m_penPosition.x()*1000.f << ", " << m_penPosition.y()*1000.f << ", " << m_penPosition.z()*1000.f << ") mm"
-        << "\n    focus (local): (" << localFocus.x()*1000.f << ", " << localFocus.y()*1000.f << ", " << localFocus.z()*1000.f << ") mm"
+        << "\n    tracker pos: (" << trackerPos.x() * 1000.f << ", " << trackerPos.y() * 1000.f << ", " << trackerPos.z() * 1000.f << ") mm"
+        << "\n    focus point: (" << m_penPosition.x() * 1000.f << ", " << m_penPosition.y() * 1000.f << ", " << m_penPosition.z() * 1000.f << ") mm"
+        << "\n    focus (local): (" << localFocus.x() * 1000.f << ", " << localFocus.y() * 1000.f << ", " << localFocus.z() * 1000.f << ") mm"
         << "\n    distance tracker\u2194focus: " << distToTracker << " mm";
 
     // Log convergence angle between tracker→focus directions for successive samples.
@@ -668,13 +683,13 @@ bool PolhemusCoregistration::captureOpticalCalibSample()
     if (n >= 2) {
         const auto& prev = m_opticalCalibSamples[static_cast<size_t>(n - 2)];
         const QVector3D prevLocal = prev.trackerOri.inverted().rotatedVector(prev.focusPoint - prev.trackerPos);
-        const QVector3D curDir  = localFocus.normalized();
+        const QVector3D curDir = localFocus.normalized();
         const QVector3D prevDir = prevLocal.normalized();
         const float dot = std::clamp(QVector3D::dotProduct(curDir, prevDir), -1.0f, 1.0f);
         const float angleDeg = std::acos(dot) * (180.0f / 3.14159265f);
         const float prevDist = prevLocal.length() * 1000.0f;
         qInfo().nospace()
-            << "    convergence angle (sample " << n-1 << "\u2194" << n << "): " << angleDeg << "\u00b0"
+            << "    convergence angle (sample " << n - 1 << "\u2194" << n << "): " << angleDeg << "\u00b0"
             << "  (distances: " << prevDist << " / " << distToTracker << " mm)";
     }
 
@@ -755,7 +770,8 @@ bool PolhemusCoregistration::solveOpticalCalibration()
 
     // Step 2: PCA initial estimate — centroid + SVD for starting axis & center
     Eigen::Vector3d centroid = Eigen::Vector3d::Zero();
-    for (const auto& p : localPoints) centroid += p;
+    for (const auto& p : localPoints)
+        centroid += p;
     centroid /= static_cast<double>(N);
 
     Eigen::MatrixXd centered(3, N);
@@ -765,7 +781,8 @@ bool PolhemusCoregistration::solveOpticalCalibration()
 
     Eigen::JacobiSVD<Eigen::MatrixXd> svd(centered, Eigen::ComputeThinU);
     Eigen::Vector3d axisDir = svd.matrixU().col(0);
-    if (centroid.dot(axisDir) < 0.0) axisDir = -axisDir;
+    if (centroid.dot(axisDir) < 0.0)
+        axisDir = -axisDir;
 
     const double t0 = -centroid.dot(axisDir);
     Eigen::Vector3d opticalCenter = centroid + t0 * axisDir;
@@ -795,8 +812,10 @@ bool PolhemusCoregistration::solveOpticalCalibration()
         axisDir = raySvd.matrixU().col(0);
         // Axis must point from objective toward focus points
         Eigen::Vector3d meanRay = Eigen::Vector3d::Zero();
-        for (int i = 0; i < N; ++i) meanRay += rays.col(i);
-        if (meanRay.dot(axisDir) < 0.0) axisDir = -axisDir;
+        for (int i = 0; i < N; ++i)
+            meanRay += rays.col(i);
+        if (meanRay.dot(axisDir) < 0.0)
+            axisDir = -axisDir;
 
         qInfo().nospace()
             << "Optical calibration: using directly captured objective center, |O|="
@@ -821,7 +840,8 @@ bool PolhemusCoregistration::solveOpticalCalibration()
 
             Eigen::JacobiSVD<Eigen::MatrixXd> raySvd(rays, Eigen::ComputeThinU);
             Eigen::Vector3d d = raySvd.matrixU().col(0);
-            if (O.dot(d) < 0.0) d = -d;  // axis points away from tracker
+            if (O.dot(d) < 0.0)
+                d = -d; // axis points away from tracker
 
             // Compute gradient of cost w.r.t. O (on the tangent plane of the sphere)
             // Cost: E = sum_i |(F_i-O) - ((F_i-O).d)d|^2
@@ -841,10 +861,11 @@ bool PolhemusCoregistration::solveOpticalCalibration()
             Eigen::Vector3d tangentGrad = grad - grad.dot(normal) * normal;
 
             double gradNorm = tangentGrad.norm();
-            if (gradNorm < 1e-12) break;
+            if (gradNorm < 1e-12)
+                break;
 
             // Line search with backtracking
-            double step = 0.01 * R / gradNorm;  // conservative initial step
+            double step = 0.01 * R / gradNorm; // conservative initial step
             for (int ls = 0; ls < 10; ++ls) {
                 Eigen::Vector3d candidate = O - step * tangentGrad;
                 // Project back onto sphere
@@ -880,7 +901,8 @@ bool PolhemusCoregistration::solveOpticalCalibration()
             finalRays.col(i) = localPoints[static_cast<size_t>(i)] - opticalCenter;
         Eigen::JacobiSVD<Eigen::MatrixXd> finalSvd(finalRays, Eigen::ComputeThinU);
         axisDir = finalSvd.matrixU().col(0);
-        if (opticalCenter.dot(axisDir) < 0.0) axisDir = -axisDir;
+        if (opticalCenter.dot(axisDir) < 0.0)
+            axisDir = -axisDir;
 
         qInfo().nospace()
             << "Optical calibration: constrained refinement (R="
@@ -899,7 +921,7 @@ bool PolhemusCoregistration::solveOpticalCalibration()
     const double rms = std::sqrt(sumSq / static_cast<double>(N)) * 1000.0; // mm
 
     // Step 5: Depth spread along the optical axis from the refined center
-    double minDepth =  1e30, maxDepth = -1e30;
+    double minDepth = 1e30, maxDepth = -1e30;
     for (const auto& p : localPoints) {
         const double depth = (p - opticalCenter).dot(axisDir);
         minDepth = std::min(minDepth, depth);
@@ -907,9 +929,9 @@ bool PolhemusCoregistration::solveOpticalCalibration()
     }
     const double depthSpreadMm = (maxDepth - minDepth) * 1000.0;
 
-    m_opticalAxisLocal   = QVector3D(static_cast<float>(axisDir.x()),
-                                     static_cast<float>(axisDir.y()),
-                                     static_cast<float>(axisDir.z()));
+    m_opticalAxisLocal = QVector3D(static_cast<float>(axisDir.x()),
+                                   static_cast<float>(axisDir.y()),
+                                   static_cast<float>(axisDir.z()));
     m_opticalCenterLocal = QVector3D(static_cast<float>(opticalCenter.x()),
                                      static_cast<float>(opticalCenter.y()),
                                      static_cast<float>(opticalCenter.z()));
@@ -923,10 +945,10 @@ bool PolhemusCoregistration::solveOpticalCalibration()
         << "Optical calibration solved (" << N << " samples"
         << (knownDist > 0.0 ? ", constrained R=" + QString::number(knownDist * 1000.0, 'f', 1) + " mm" : QString()) << "):"
         << "\n    axis (local):   (" << m_opticalAxisLocal.x() << ", " << m_opticalAxisLocal.y() << ", " << m_opticalAxisLocal.z() << ")"
-        << "\n    center (local): (" << m_opticalCenterLocal.x()*1000.f << ", " << m_opticalCenterLocal.y()*1000.f << ", " << m_opticalCenterLocal.z()*1000.f << ") mm"
+        << "\n    center (local): (" << m_opticalCenterLocal.x() * 1000.f << ", " << m_opticalCenterLocal.y() * 1000.f << ", " << m_opticalCenterLocal.z() * 1000.f << ") mm"
         << "\n    tracker\u2194center: " << distMm << " mm"
         << "\n    RMS residual:   " << rms << " mm"
-        << "\n    depth spread:   " << depthSpreadMm << " mm (range " << minDepth*1000.0 << " .. " << maxDepth*1000.0 << " mm)";
+        << "\n    depth spread:   " << depthSpreadMm << " mm (range " << minDepth * 1000.0 << " .. " << maxDepth * 1000.0 << " mm)";
 
     // Per-sample: report convergence angle between tracker→focus direction
     // and fitted optical axis.  This angle shrinks as the OPMI moves farther
@@ -942,7 +964,7 @@ bool PolhemusCoregistration::solveOpticalCalibration()
         const Eigen::Vector3d diff = p - opticalCenter;
         const double perpDist = (diff - diff.dot(axisDir) * axisDir).norm() * 1000.0;
         qInfo().nospace()
-            << "      sample " << (i + 1) << ": depth=" << depth*1000.0
+            << "      sample " << (i + 1) << ": depth=" << depth * 1000.0
             << " mm, convergence angle=" << angleDeg << "\u00b0"
             << ", perp err=" << perpDist << " mm";
     }
@@ -961,8 +983,8 @@ bool PolhemusCoregistration::solveOpticalCalibration()
     // Plausibility check: when not using constrained mode, verify the
     // tracker-to-optical-center distance is in a plausible range.
     if (knownDist <= 0.0) {
-        constexpr float kMinPlausibleMm   = 100.0f;
-        constexpr float kMaxPlausibleMm   = 500.0f;
+        constexpr float kMinPlausibleMm = 100.0f;
+        constexpr float kMaxPlausibleMm = 500.0f;
         if (distMm < kMinPlausibleMm || distMm > kMaxPlausibleMm) {
             qWarning().nospace()
                 << "Optical calibration: tracker\u2194axis distance " << distMm
@@ -977,10 +999,12 @@ bool PolhemusCoregistration::solveOpticalCalibration()
 
 bool PolhemusCoregistration::opticalRayInWorld(QVector3D& origin, QVector3D& direction) const
 {
-    if (!m_opticalCalibValid) return false;
+    if (!m_opticalCalibValid)
+        return false;
 
     const QMatrix4x4& dev = m_deviceToWorld;
-    if (dev.isIdentity()) return false;
+    if (dev.isIdentity())
+        return false;
 
     // Recover raw tracker pose (before device offset)
     QMatrix4x4 offsetMat;
@@ -992,7 +1016,7 @@ bool PolhemusCoregistration::opticalRayInWorld(QVector3D& origin, QVector3D& dir
     const QVector3D trackerPos(trackerToWorld(0, 3), trackerToWorld(1, 3), trackerToWorld(2, 3));
     const QQuaternion trackerOri = QQuaternion::fromRotationMatrix(trackerToWorld.toGenericMatrix<3, 3>());
 
-    origin    = trackerPos + trackerOri.rotatedVector(m_opticalCenterLocal);
+    origin = trackerPos + trackerOri.rotatedVector(m_opticalCenterLocal);
     direction = trackerOri.rotatedVector(m_opticalAxisLocal).normalized();
     return true;
 }
@@ -1001,10 +1025,12 @@ bool PolhemusCoregistration::opticalRayInWorld(QVector3D& origin, QVector3D& dir
 
 bool PolhemusCoregistration::opticalUpInWorld(QVector3D& up) const
 {
-    if (!m_opticalCalibValid) return false;
+    if (!m_opticalCalibValid)
+        return false;
 
     const QMatrix4x4& dev = m_deviceToWorld;
-    if (dev.isIdentity()) return false;
+    if (dev.isIdentity())
+        return false;
 
     QMatrix4x4 offsetMat;
     offsetMat.setToIdentity();
@@ -1017,7 +1043,7 @@ bool PolhemusCoregistration::opticalUpInWorld(QVector3D& up) const
     // Tracker local Z axis = "up" in the microscope view.
     // Orthogonalise against the optical axis to remove any tilt component.
     const QVector3D rawUp = trackerOri.rotatedVector(QVector3D(0.0f, 0.0f, 1.0f));
-    const QVector3D axis  = trackerOri.rotatedVector(m_opticalAxisLocal).normalized();
+    const QVector3D axis = trackerOri.rotatedVector(m_opticalAxisLocal).normalized();
     up = (rawUp - QVector3D::dotProduct(rawUp, axis) * axis).normalized();
     return up.lengthSquared() > 0.5f; // degenerate if Y ≈ optical axis
 }
@@ -1028,11 +1054,13 @@ bool PolhemusCoregistration::applyOpticalAxisFineAdjust(const QVector3D& targetW
                                                         float& correctionDeg)
 {
     correctionDeg = 0.0f;
-    if (!m_opticalCalibValid) return false;
+    if (!m_opticalCalibValid)
+        return false;
 
     // Get tracker-to-world transform (same as opticalRayInWorld)
     const QMatrix4x4& dev = m_deviceToWorld;
-    if (dev.isIdentity()) return false;
+    if (dev.isIdentity())
+        return false;
 
     QMatrix4x4 offsetMat;
     offsetMat.setToIdentity();
@@ -1048,7 +1076,8 @@ bool PolhemusCoregistration::applyOpticalAxisFineAdjust(const QVector3D& targetW
 
     // Desired axis direction: from optical center to the target point
     const QVector3D toTarget = (targetWorldPos - optCenterWorld);
-    if (toTarget.length() < 0.001f) return false; // target too close to optical center
+    if (toTarget.length() < 0.001f)
+        return false; // target too close to optical center
 
     const QVector3D desiredDirWorld = toTarget.normalized();
 
@@ -1062,7 +1091,7 @@ bool PolhemusCoregistration::applyOpticalAxisFineAdjust(const QVector3D& targetW
     // Sanity: reject corrections > 10° — likely a user error
     if (correctionDeg > 10.0f) {
         qWarning().nospace() << "Optical fine adjust: correction " << correctionDeg
-            << "° exceeds 10° limit — rejected.";
+                             << "° exceeds 10° limit — rejected.";
         return false;
     }
 
@@ -1096,7 +1125,8 @@ bool PolhemusCoregistration::applyOpticalAxisFineAdjust(const QVector3D& targetW
 
 void PolhemusCoregistration::clearOpticalFineAdjust()
 {
-    if (!m_opticalFineAdjustApplied) return;
+    if (!m_opticalFineAdjustApplied)
+        return;
 
     m_opticalAxisLocal = m_opticalAxisPreFineAdjust;
     m_opticalFineAdjustApplied = false;
@@ -1110,16 +1140,17 @@ void PolhemusCoregistration::clearOpticalFineAdjust()
 // Session persistence helpers
 //=============================================================================================================
 
-namespace {
+namespace
+{
 
-void saveVec3(QSettings &s, const QString &key, const QVector3D &v)
+void saveVec3(QSettings& s, const QString& key, const QVector3D& v)
 {
     s.setValue(key + "/x", static_cast<double>(v.x()));
     s.setValue(key + "/y", static_cast<double>(v.y()));
     s.setValue(key + "/z", static_cast<double>(v.z()));
 }
 
-QVector3D loadVec3(const QSettings &s, const QString &key)
+QVector3D loadVec3(const QSettings& s, const QString& key)
 {
     return QVector3D(
         static_cast<float>(s.value(key + "/x", 0.0).toDouble()),
@@ -1127,13 +1158,13 @@ QVector3D loadVec3(const QSettings &s, const QString &key)
         static_cast<float>(s.value(key + "/z", 0.0).toDouble()));
 }
 
-void saveMat4(QSettings &s, const QString &key, const QMatrix4x4 &m)
+void saveMat4(QSettings& s, const QString& key, const QMatrix4x4& m)
 {
     QByteArray data(reinterpret_cast<const char*>(m.constData()), 16 * sizeof(float));
     s.setValue(key, data);
 }
 
-QMatrix4x4 loadMat4(const QSettings &s, const QString &key)
+QMatrix4x4 loadMat4(const QSettings& s, const QString& key)
 {
     QByteArray data = s.value(key).toByteArray();
     QMatrix4x4 m;
@@ -1142,7 +1173,7 @@ QMatrix4x4 loadMat4(const QSettings &s, const QString &key)
     return m;
 }
 
-void saveQuat(QSettings &s, const QString &key, const QQuaternion &q)
+void saveQuat(QSettings& s, const QString& key, const QQuaternion& q)
 {
     s.setValue(key + "/w", static_cast<double>(q.scalar()));
     s.setValue(key + "/x", static_cast<double>(q.x()));
@@ -1150,7 +1181,7 @@ void saveQuat(QSettings &s, const QString &key, const QQuaternion &q)
     s.setValue(key + "/z", static_cast<double>(q.z()));
 }
 
-QQuaternion loadQuat(const QSettings &s, const QString &key)
+QQuaternion loadQuat(const QSettings& s, const QString& key)
 {
     return QQuaternion(
         static_cast<float>(s.value(key + "/w", 1.0).toDouble()),
@@ -1163,7 +1194,7 @@ QQuaternion loadQuat(const QSettings &s, const QString &key)
 
 //=============================================================================================================
 
-void PolhemusCoregistration::saveSessionState(QSettings &settings, const QString &prefix) const
+void PolhemusCoregistration::saveSessionState(QSettings& settings, const QString& prefix) const
 {
     settings.beginGroup(prefix);
 
@@ -1190,9 +1221,11 @@ void PolhemusCoregistration::saveSessionState(QSettings &settings, const QString
 
     // Vertex
     settings.setValue("hasPenVertex", m_hasPenVertex);
-    if (m_hasPenVertex) saveVec3(settings, "penVertex", m_penVertex);
+    if (m_hasPenVertex)
+        saveVec3(settings, "penVertex", m_penVertex);
     settings.setValue("hasModelVertex", m_hasModelVertex);
-    if (m_hasModelVertex) saveVec3(settings, "modelVertex", m_modelVertex);
+    if (m_hasModelVertex)
+        saveVec3(settings, "modelVertex", m_modelVertex);
 
     // Calibration offset
     saveVec3(settings, "offsetTranslation", m_offsetTranslation);
@@ -1246,7 +1279,7 @@ void PolhemusCoregistration::saveSessionState(QSettings &settings, const QString
 
 //=============================================================================================================
 
-bool PolhemusCoregistration::restoreSessionState(QSettings &settings, const QString &prefix)
+bool PolhemusCoregistration::restoreSessionState(QSettings& settings, const QString& prefix)
 {
     settings.beginGroup(prefix);
     if (settings.allKeys().isEmpty()) {
@@ -1256,9 +1289,9 @@ bool PolhemusCoregistration::restoreSessionState(QSettings &settings, const QStr
 
     // Stations & axis mirror
     m_trackerStation = settings.value("trackerStation", 1).toInt();
-    m_penStation     = settings.value("penStation", 2).toInt();
-    m_mirrorX        = settings.value("mirrorX", false).toBool();
-    m_mirrorY        = settings.value("mirrorY", false).toBool();
+    m_penStation = settings.value("penStation", 2).toInt();
+    m_mirrorX = settings.value("mirrorX", false).toBool();
+    m_mirrorY = settings.value("mirrorY", false).toBool();
 
     // Pen fiducials
     const char* fidNames[] = {"LPA", "NAS", "RPA", "CZ"};
@@ -1277,17 +1310,19 @@ bool PolhemusCoregistration::restoreSessionState(QSettings &settings, const QStr
 
     // Vertex
     m_hasPenVertex = settings.value("hasPenVertex", false).toBool();
-    if (m_hasPenVertex) m_penVertex = loadVec3(settings, "penVertex");
+    if (m_hasPenVertex)
+        m_penVertex = loadVec3(settings, "penVertex");
     m_hasModelVertex = settings.value("hasModelVertex", false).toBool();
-    if (m_hasModelVertex) m_modelVertex = loadVec3(settings, "modelVertex");
+    if (m_hasModelVertex)
+        m_modelVertex = loadVec3(settings, "modelVertex");
 
     // Calibration offset
     m_offsetTranslation = loadVec3(settings, "offsetTranslation");
-    m_offsetRotation    = loadQuat(settings, "offsetRotation");
+    m_offsetRotation = loadQuat(settings, "offsetRotation");
 
     // Pen tip offset
-    m_penTipOffset      = loadVec3(settings, "penTipOffset");
-    m_tipOffsetEnabled  = settings.value("tipOffsetEnabled", false).toBool();
+    m_penTipOffset = loadVec3(settings, "penTipOffset");
+    m_tipOffsetEnabled = settings.value("tipOffsetEnabled", false).toBool();
 
     // Optical calibration
     m_knownTrackerToObjectiveDist = static_cast<float>(settings.value("knownTrackerToObjectiveDist", 0.200).toDouble());
@@ -1296,9 +1331,9 @@ bool PolhemusCoregistration::restoreSessionState(QSettings &settings, const QStr
         m_objectiveCenterLocal = loadVec3(settings, "objectiveCenterLocal");
     m_opticalCalibValid = settings.value("opticalCalibValid", false).toBool();
     if (m_opticalCalibValid) {
-        m_opticalAxisLocal         = loadVec3(settings, "opticalAxisLocal");
-        m_opticalCenterLocal       = loadVec3(settings, "opticalCenterLocal");
-        m_opticalCalibResidualMm   = static_cast<float>(settings.value("opticalCalibResidualMm", 0.0).toDouble());
+        m_opticalAxisLocal = loadVec3(settings, "opticalAxisLocal");
+        m_opticalCenterLocal = loadVec3(settings, "opticalCenterLocal");
+        m_opticalCalibResidualMm = static_cast<float>(settings.value("opticalCalibResidualMm", 0.0).toDouble());
         m_opticalCalibDepthSpreadMm = static_cast<float>(settings.value("opticalCalibDepthSpreadMm", 0.0).toDouble());
 
         // Fine adjustment
@@ -1326,7 +1361,7 @@ bool PolhemusCoregistration::restoreSessionState(QSettings &settings, const QStr
     m_registrationValid = settings.value("registrationValid", false).toBool();
     if (m_registrationValid) {
         m_headToDevice = loadMat4(settings, "headToDevice");
-        m_headToWorld  = loadMat4(settings, "headToWorld");
+        m_headToWorld = loadMat4(settings, "headToWorld");
         m_worldToModel = loadMat4(settings, "worldToModel");
     }
 
@@ -1335,14 +1370,14 @@ bool PolhemusCoregistration::restoreSessionState(QSettings &settings, const QStr
     // Re-populate the AcquiredPoints list so that countOf() / UI status
     // reflect the restored fiducials.
     if (m_pPoints) {
-        const char* fidLabels[] = { "", "LPA", "NAS", "RPA" };
+        const char* fidLabels[] = {"", "LPA", "NAS", "RPA"};
         for (int i = 1; i <= 3; ++i) {
             if (m_hasPenFid[i]) {
                 DigitizedPoint dp;
-                dp.kind        = PointKind::Fiducial;
-                dp.label       = QString::fromLatin1(fidLabels[i]);
+                dp.kind = PointKind::Fiducial;
+                dp.label = QString::fromLatin1(fidLabels[i]);
                 dp.identNumber = i;
-                dp.position    = m_penFid[i];
+                dp.position = m_penFid[i];
                 m_pPoints->append(dp);
             }
         }

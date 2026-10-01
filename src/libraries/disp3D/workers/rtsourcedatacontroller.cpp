@@ -28,8 +28,8 @@
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-RtSourceDataController::RtSourceDataController(QObject *parent)
-    : QObject(parent)
+RtSourceDataController::RtSourceDataController(QObject* parent)
+: QObject(parent)
 {
     // Create data worker
     m_pWorker = new DISP3DLIB::RtSourceDataWorker();
@@ -97,7 +97,7 @@ RtSourceDataController::~RtSourceDataController()
 
 //=============================================================================================================
 
-void RtSourceDataController::addData(const Eigen::VectorXd &data)
+void RtSourceDataController::addData(const Eigen::VectorXd& data)
 {
     if (m_pWorker) {
         // Direct call is thread-safe because RtSourceDataWorker uses a mutex
@@ -169,7 +169,7 @@ void RtSourceDataController::setNumberAverages(int numAvr)
 
 //=============================================================================================================
 
-void RtSourceDataController::setColormapType(const QString &name)
+void RtSourceDataController::setColormapType(const QString& name)
 {
     if (m_pWorker) {
         m_pWorker->setColormapType(name);
@@ -214,8 +214,8 @@ void RtSourceDataController::clearData()
 
 //=============================================================================================================
 
-void RtSourceDataController::setSurfaceColor(const QVector<uint32_t> &baseColorsLh,
-                                              const QVector<uint32_t> &baseColorsRh)
+void RtSourceDataController::setSurfaceColor(const QVector<uint32_t>& baseColorsLh,
+                                             const QVector<uint32_t>& baseColorsRh)
 {
     if (m_pWorker) {
         m_pWorker->setSurfaceColor(baseColorsLh, baseColorsRh);
@@ -233,7 +233,7 @@ void RtSourceDataController::setStreamSmoothedData(bool bStreamSmoothedData)
 
 //=============================================================================================================
 
-void RtSourceDataController::setInterpolationFunction(const QString &sInterpolationFunction)
+void RtSourceDataController::setInterpolationFunction(const QString& sInterpolationFunction)
 {
     if (m_pInterpWorker) {
         m_pInterpWorker->setInterpolationFunction(sInterpolationFunction);
@@ -251,9 +251,9 @@ void RtSourceDataController::setCancelDistance(double dCancelDist)
 
 //=============================================================================================================
 
-void RtSourceDataController::setInterpolationInfoLeft(const Eigen::MatrixX3f &matVertices,
-                                                       const std::vector<Eigen::VectorXi> &vecNeighborVertices,
-                                                       const Eigen::VectorXi &vecSourceVertices)
+void RtSourceDataController::setInterpolationInfoLeft(const Eigen::MatrixX3f& matVertices,
+                                                      const std::vector<Eigen::VectorXi>& vecNeighborVertices,
+                                                      const Eigen::VectorXi& vecSourceVertices)
 {
     if (m_pInterpWorker) {
         m_pInterpWorker->setInterpolationInfoLeft(matVertices, vecNeighborVertices, vecSourceVertices);
@@ -262,9 +262,9 @@ void RtSourceDataController::setInterpolationInfoLeft(const Eigen::MatrixX3f &ma
 
 //=============================================================================================================
 
-void RtSourceDataController::setInterpolationInfoRight(const Eigen::MatrixX3f &matVertices,
-                                                        const std::vector<Eigen::VectorXi> &vecNeighborVertices,
-                                                        const Eigen::VectorXi &vecSourceVertices)
+void RtSourceDataController::setInterpolationInfoRight(const Eigen::MatrixX3f& matVertices,
+                                                       const std::vector<Eigen::VectorXi>& vecNeighborVertices,
+                                                       const Eigen::VectorXi& vecSourceVertices)
 {
     if (m_pInterpWorker) {
         m_pInterpWorker->setInterpolationInfoRight(matVertices, vecNeighborVertices, vecSourceVertices);
@@ -315,9 +315,9 @@ void RtSourceDataController::setVisualizationType(int iVisType)
 
 //=============================================================================================================
 
-void RtSourceDataController::setAnnotationInfoLeft(const Eigen::VectorXi &vecLabelIds,
-                                                    const QList<FSLIB::FsLabel> &lLabels,
-                                                    const Eigen::VectorXi &vecVertNo)
+void RtSourceDataController::setAnnotationInfoLeft(const Eigen::VectorXi& vecLabelIds,
+                                                   const QList<FSLIB::FsLabel>& lLabels,
+                                                   const Eigen::VectorXi& vecVertNo)
 {
     if (m_pInterpWorker) {
         m_pInterpWorker->setAnnotationInfoLeft(vecLabelIds, lLabels, vecVertNo);
@@ -326,9 +326,9 @@ void RtSourceDataController::setAnnotationInfoLeft(const Eigen::VectorXi &vecLab
 
 //=============================================================================================================
 
-void RtSourceDataController::setAnnotationInfoRight(const Eigen::VectorXi &vecLabelIds,
-                                                     const QList<FSLIB::FsLabel> &lLabels,
-                                                     const Eigen::VectorXi &vecVertNo)
+void RtSourceDataController::setAnnotationInfoRight(const Eigen::VectorXi& vecLabelIds,
+                                                    const QList<FSLIB::FsLabel>& lLabels,
+                                                    const Eigen::VectorXi& vecVertNo)
 {
     if (m_pInterpWorker) {
         m_pInterpWorker->setAnnotationInfoRight(vecLabelIds, lLabels, vecVertNo);

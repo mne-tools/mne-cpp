@@ -55,7 +55,7 @@ using namespace Eigen;
 
 //=============================================================================================================
 
-int main(int argc, char *argv[])
+int main(int argc, char* argv[])
 {
     qInstallMessageHandler(MNELogger::customLogWriter);
     QCoreApplication app(argc, argv);
@@ -161,7 +161,7 @@ int main(int argc, char *argv[])
         return 1;
     }
 
-    const MNEBemSurface &surf = bem[surfIdx];
+    const MNEBemSurface& surf = bem[surfIdx];
 
     // Write output
     QFile outFile(outName);

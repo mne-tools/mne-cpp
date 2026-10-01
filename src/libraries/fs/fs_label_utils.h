@@ -82,8 +82,8 @@ public:
      * @return Grown label containing original + expanded vertices.
      */
     static FsLabel growLabel(const FsLabel& label,
-                              const FsSurface& surface,
-                              int nSteps);
+                             const FsSurface& surface,
+                             int nSteps);
 
     //=========================================================================================================
     /**
@@ -97,7 +97,7 @@ public:
      * @return List of sub-labels (connected components).
      */
     static QList<FsLabel> splitLabel(const FsLabel& label,
-                                      const FsSurface& surface);
+                                     const FsSurface& surface);
 
     //=========================================================================================================
     /**
@@ -115,10 +115,10 @@ public:
      * @return List of labels (connected components above threshold).
      */
     static QList<FsLabel> stcToLabel(const Eigen::MatrixXd& stcData,
-                                      const Eigen::VectorXi& vertices,
-                                      const FsSurface& surface,
-                                      double dThreshold = 0.0,
-                                      int iHemi = 0);
+                                     const Eigen::VectorXi& vertices,
+                                     const FsSurface& surface,
+                                     double dThreshold = 0.0,
+                                     int iHemi = 0);
 
     //=========================================================================================================
     /**
@@ -133,8 +133,8 @@ public:
      * @return Binary mask (n_vertices × n_times).
      */
     static Eigen::MatrixXd labelsToStc(const QList<FsLabel>& labels,
-                                        const Eigen::VectorXi& stcVertices,
-                                        int nTimes);
+                                       const Eigen::VectorXi& stcVertices,
+                                       int nTimes);
 
     //=========================================================================================================
     /**
@@ -146,7 +146,7 @@ public:
      * @return Adjacency list: for each vertex, the set of neighbor vertices.
      */
     static QList<QSet<int>> buildAdjacency(const Eigen::MatrixX3i& tris,
-                                            int nVerts);
+                                           int nVerts);
 };
 
 } // namespace FSLIB

@@ -40,8 +40,9 @@
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-namespace Ui {
-    class SpharaSettingsViewWidget;
+namespace Ui
+{
+class SpharaSettingsViewWidget;
 }
 
 //=============================================================================================================
@@ -68,8 +69,8 @@ class DISPSHARED_EXPORT SpharaSettingsView : public AbstractView
     Q_OBJECT
 
 public:
-    typedef QSharedPointer<SpharaSettingsView> SPtr;              /**< Shared pointer type for SpharaSettingsView. */
-    typedef QSharedPointer<const SpharaSettingsView> ConstSPtr;   /**< Const shared pointer type for SpharaSettingsView. */
+    typedef QSharedPointer<SpharaSettingsView> SPtr;            /**< Shared pointer type for SpharaSettingsView. */
+    typedef QSharedPointer<const SpharaSettingsView> ConstSPtr; /**< Const shared pointer type for SpharaSettingsView. */
 
     //=========================================================================================================
     /**
@@ -80,7 +81,7 @@ public:
      * @param[in] f Qt window flags passed to the QWidget constructor.
      */
     SpharaSettingsView(const QString& sSettingsPath = "",
-                       QWidget *parent = 0,
+                       QWidget* parent = 0,
                        Qt::WindowFlags f = Qt::Widget);
 
     //=========================================================================================================

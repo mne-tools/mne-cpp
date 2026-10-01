@@ -48,14 +48,14 @@ class AverageDelegate : public QItemDelegate
 {
     Q_OBJECT
 public:
-    AverageDelegate(QObject *parent = 0);
+    AverageDelegate(QObject* parent = 0);
 
     //=========================================================================================================
     /**
      * Reimplemented virtual functions
      *
      */
-    virtual void paint(QPainter * painter, const QStyleOptionViewItem & option, const QModelIndex & index) const;
+    virtual void paint(QPainter* painter, const QStyleOptionViewItem& option, const QModelIndex& index) const;
 
 protected:
     //=========================================================================================================
@@ -65,7 +65,7 @@ protected:
      * @param[in] index QModelIndex for accessing associated data and model object.
      * @param[in,out] path The QPointerPath to create for the data plot.
      */
-    void createPlotPath(const QModelIndex &index, const QStyleOptionViewItem &option, QPainterPath& path, QList<RowVectorPair>& listPairs) const;
+    void createPlotPath(const QModelIndex& index, const QStyleOptionViewItem& option, QPainterPath& path, QList<RowVectorPair>& listPairs) const;
 };
 
 } //NAMESPACE

@@ -41,7 +41,8 @@ using namespace MRISLICESPLUGIN;
 using namespace DISP3DLIB;
 using namespace MRILIB;
 
-namespace {
+namespace
+{
 
 QImage sliceImageToQImage(const MriSliceImage& slice)
 {
@@ -54,8 +55,10 @@ QImage sliceImageToQImage(const MriSliceImage& slice)
         uchar* row = img.scanLine(y);
         for (int x = 0; x < slice.width; ++x) {
             float v = slice.pixels(x, y);
-            if (v < 0.0f) v = 0.0f;
-            if (v > 1.0f) v = 1.0f;
+            if (v < 0.0f)
+                v = 0.0f;
+            if (v > 1.0f)
+                v = 1.0f;
             row[x] = static_cast<uchar>(v * 255.0f + 0.5f);
         }
     }
@@ -65,9 +68,12 @@ QImage sliceImageToQImage(const MriSliceImage& slice)
 DISP3DLIB::SliceOrientation toDispOrientation(MRILIB::SliceOrientation o)
 {
     switch (o) {
-        case MRILIB::SliceOrientation::Axial:    return DISP3DLIB::SliceOrientation::Axial;
-        case MRILIB::SliceOrientation::Coronal:  return DISP3DLIB::SliceOrientation::Coronal;
-        case MRILIB::SliceOrientation::Sagittal: return DISP3DLIB::SliceOrientation::Sagittal;
+        case MRILIB::SliceOrientation::Axial:
+            return DISP3DLIB::SliceOrientation::Axial;
+        case MRILIB::SliceOrientation::Coronal:
+            return DISP3DLIB::SliceOrientation::Coronal;
+        case MRILIB::SliceOrientation::Sagittal:
+            return DISP3DLIB::SliceOrientation::Sagittal;
     }
     return DISP3DLIB::SliceOrientation::Axial;
 }
@@ -77,7 +83,7 @@ DISP3DLIB::SliceOrientation toDispOrientation(MRILIB::SliceOrientation o)
 //=============================================================================================================
 
 MriSlicesPlugin::MriSlicesPlugin(QObject* parent)
-    : QObject(parent)
+: QObject(parent)
 {
 }
 
@@ -102,9 +108,9 @@ bool MriSlicesPlugin::loadVolume(const QString& path)
 {
     const QString lower = path.toLower();
     const bool supported =
-        lower.endsWith(QStringLiteral(".mgh"))    ||
-        lower.endsWith(QStringLiteral(".mgz"))    ||
-        lower.endsWith(QStringLiteral(".nii"))    ||
+        lower.endsWith(QStringLiteral(".mgh")) ||
+        lower.endsWith(QStringLiteral(".mgz")) ||
+        lower.endsWith(QStringLiteral(".nii")) ||
         lower.endsWith(QStringLiteral(".nii.gz"));
     if (!supported) {
         qWarning() << "MriSlicesPlugin::loadVolume: unsupported format" << path
@@ -203,9 +209,7 @@ float MriSlicesPlugin::intensityAt(const QVector3D& worldPosition) const
         return std::numeric_limits<float>::quiet_NaN();
     }
     const QVector<float> data = m_volume->voxelDataAsFloat();
-    const qsizetype idx = static_cast<qsizetype>(iz) * ny * nx
-                        + static_cast<qsizetype>(iy) * nx
-                        + ix;
+    const qsizetype idx = static_cast<qsizetype>(iz) * ny * nx + static_cast<qsizetype>(iy) * nx + ix;
     if (idx < 0 || idx >= data.size()) {
         return std::numeric_limits<float>::quiet_NaN();
     }
@@ -256,9 +260,9 @@ Eigen::Vector3f MriSlicesPlugin::volumeCenter() const
     }
     const Eigen::Matrix4f vox2ras = m_volume->computeVox2RasTkr();
     const Eigen::Vector4f vc(m_volume->dimX() * 0.5f,
-                              m_volume->dimY() * 0.5f,
-                              m_volume->dimZ() * 0.5f,
-                              1.0f);
+                             m_volume->dimY() * 0.5f,
+                             m_volume->dimZ() * 0.5f,
+                             1.0f);
     const Eigen::Vector4f ras = vox2ras * vc;
     return Eigen::Vector3f(ras.x(), ras.y(), ras.z());
 }
@@ -308,9 +312,8 @@ void MriSlicesPlugin::publishToScene()
     }
 
     const std::array<QString, 3> ids = sceneLayerIds();
-    const std::array<const char*, 3> names {
-        "MRI Axial", "MRI Coronal", "MRI Sagittal"
-    };
+    const std::array<const char*, 3> names{
+        "MRI Axial", "MRI Coronal", "MRI Sagittal"};
 
     for (int i = 0; i < 3; ++i) {
         if (!m_slices[i]) {
@@ -324,7 +327,7 @@ void MriSlicesPlugin::publishToScene()
         layer.drawOrder = i;
         // Non-owning shared_ptr: the plugin retains ownership of the object.
         SliceObject* raw = m_slices[i].get();
-        layer.payload = std::shared_ptr<void>(raw, [](void*){});
+        layer.payload = std::shared_ptr<void>(raw, [](void*) {});
         m_scene->addLayer(std::move(layer));
     }
 }

@@ -42,14 +42,14 @@ using namespace MNALIB;
 QJsonObject MnaVerificationCheck::toJson() const
 {
     QJsonObject json;
-    json[QStringLiteral("id")]          = id;
+    json[QStringLiteral("id")] = id;
     json[QStringLiteral("description")] = description;
-    json[QStringLiteral("phase")]       = phase;
-    json[QStringLiteral("expression")]  = expression;
+    json[QStringLiteral("phase")] = phase;
+    json[QStringLiteral("expression")] = expression;
     if (!script.code.isEmpty()) {
         json[QStringLiteral("script")] = script.toJson();
     }
-    json[QStringLiteral("severity")]    = severity;
+    json[QStringLiteral("severity")] = severity;
     if (!onFail.isEmpty()) {
         json[QStringLiteral("on_fail")] = onFail;
     }
@@ -61,15 +61,15 @@ QJsonObject MnaVerificationCheck::toJson() const
 MnaVerificationCheck MnaVerificationCheck::fromJson(const QJsonObject& json)
 {
     MnaVerificationCheck c;
-    c.id          = json.value(QStringLiteral("id")).toString();
+    c.id = json.value(QStringLiteral("id")).toString();
     c.description = json.value(QStringLiteral("description")).toString();
-    c.phase       = json.value(QStringLiteral("phase")).toString();
-    c.expression  = json.value(QStringLiteral("expression")).toString();
+    c.phase = json.value(QStringLiteral("phase")).toString();
+    c.expression = json.value(QStringLiteral("expression")).toString();
     if (json.contains(QStringLiteral("script"))) {
         c.script = MnaScript::fromJson(json.value(QStringLiteral("script")).toObject());
     }
-    c.severity    = json.value(QStringLiteral("severity")).toString();
-    c.onFail      = json.value(QStringLiteral("on_fail")).toString();
+    c.severity = json.value(QStringLiteral("severity")).toString();
+    c.onFail = json.value(QStringLiteral("on_fail")).toString();
     return c;
 }
 
@@ -78,14 +78,14 @@ MnaVerificationCheck MnaVerificationCheck::fromJson(const QJsonObject& json)
 QCborMap MnaVerificationCheck::toCbor() const
 {
     QCborMap cbor;
-    cbor.insert(QStringLiteral("id"),          id);
+    cbor.insert(QStringLiteral("id"), id);
     cbor.insert(QStringLiteral("description"), description);
-    cbor.insert(QStringLiteral("phase"),       phase);
-    cbor.insert(QStringLiteral("expression"),  expression);
+    cbor.insert(QStringLiteral("phase"), phase);
+    cbor.insert(QStringLiteral("expression"), expression);
     if (!script.code.isEmpty()) {
         cbor.insert(QStringLiteral("script"), script.toCbor());
     }
-    cbor.insert(QStringLiteral("severity"),    severity);
+    cbor.insert(QStringLiteral("severity"), severity);
     if (!onFail.isEmpty()) {
         cbor.insert(QStringLiteral("on_fail"), onFail);
     }
@@ -97,15 +97,15 @@ QCborMap MnaVerificationCheck::toCbor() const
 MnaVerificationCheck MnaVerificationCheck::fromCbor(const QCborMap& cbor)
 {
     MnaVerificationCheck c;
-    c.id          = cbor.value(QStringLiteral("id")).toString();
+    c.id = cbor.value(QStringLiteral("id")).toString();
     c.description = cbor.value(QStringLiteral("description")).toString();
-    c.phase       = cbor.value(QStringLiteral("phase")).toString();
-    c.expression  = cbor.value(QStringLiteral("expression")).toString();
+    c.phase = cbor.value(QStringLiteral("phase")).toString();
+    c.expression = cbor.value(QStringLiteral("expression")).toString();
     if (cbor.contains(QStringLiteral("script"))) {
         c.script = MnaScript::fromCbor(cbor.value(QStringLiteral("script")).toMap());
     }
-    c.severity    = cbor.value(QStringLiteral("severity")).toString();
-    c.onFail      = cbor.value(QStringLiteral("on_fail")).toString();
+    c.severity = cbor.value(QStringLiteral("severity")).toString();
+    c.onFail = cbor.value(QStringLiteral("on_fail")).toString();
     return c;
 }
 
@@ -116,10 +116,10 @@ MnaVerificationCheck MnaVerificationCheck::fromCbor(const QCborMap& cbor)
 QJsonObject MnaVerificationResult::toJson() const
 {
     QJsonObject json;
-    json[QStringLiteral("check_id")]     = checkId;
-    json[QStringLiteral("passed")]       = passed;
-    json[QStringLiteral("severity")]     = severity;
-    json[QStringLiteral("message")]      = message;
+    json[QStringLiteral("check_id")] = checkId;
+    json[QStringLiteral("passed")] = passed;
+    json[QStringLiteral("severity")] = severity;
+    json[QStringLiteral("message")] = message;
     json[QStringLiteral("actual_value")] = QJsonValue::fromVariant(actualValue);
     if (evaluatedAt.isValid()) {
         json[QStringLiteral("evaluated_at")] = evaluatedAt.toString(Qt::ISODateWithMs);
@@ -132,10 +132,10 @@ QJsonObject MnaVerificationResult::toJson() const
 MnaVerificationResult MnaVerificationResult::fromJson(const QJsonObject& json)
 {
     MnaVerificationResult r;
-    r.checkId     = json.value(QStringLiteral("check_id")).toString();
-    r.passed      = json.value(QStringLiteral("passed")).toBool(false);
-    r.severity    = json.value(QStringLiteral("severity")).toString();
-    r.message     = json.value(QStringLiteral("message")).toString();
+    r.checkId = json.value(QStringLiteral("check_id")).toString();
+    r.passed = json.value(QStringLiteral("passed")).toBool(false);
+    r.severity = json.value(QStringLiteral("severity")).toString();
+    r.message = json.value(QStringLiteral("message")).toString();
     r.actualValue = json.value(QStringLiteral("actual_value")).toVariant();
     r.evaluatedAt = QDateTime::fromString(json.value(QStringLiteral("evaluated_at")).toString(), Qt::ISODateWithMs);
     return r;
@@ -146,10 +146,10 @@ MnaVerificationResult MnaVerificationResult::fromJson(const QJsonObject& json)
 QCborMap MnaVerificationResult::toCbor() const
 {
     QCborMap cbor;
-    cbor.insert(QStringLiteral("check_id"),     checkId);
-    cbor.insert(QStringLiteral("passed"),       passed);
-    cbor.insert(QStringLiteral("severity"),     severity);
-    cbor.insert(QStringLiteral("message"),      message);
+    cbor.insert(QStringLiteral("check_id"), checkId);
+    cbor.insert(QStringLiteral("passed"), passed);
+    cbor.insert(QStringLiteral("severity"), severity);
+    cbor.insert(QStringLiteral("message"), message);
     cbor.insert(QStringLiteral("actual_value"), QCborValue::fromVariant(actualValue));
     if (evaluatedAt.isValid()) {
         cbor.insert(QStringLiteral("evaluated_at"), evaluatedAt.toString(Qt::ISODateWithMs));
@@ -162,10 +162,10 @@ QCborMap MnaVerificationResult::toCbor() const
 MnaVerificationResult MnaVerificationResult::fromCbor(const QCborMap& cbor)
 {
     MnaVerificationResult r;
-    r.checkId     = cbor.value(QStringLiteral("check_id")).toString();
-    r.passed      = cbor.value(QStringLiteral("passed")).toBool();
-    r.severity    = cbor.value(QStringLiteral("severity")).toString();
-    r.message     = cbor.value(QStringLiteral("message")).toString();
+    r.checkId = cbor.value(QStringLiteral("check_id")).toString();
+    r.passed = cbor.value(QStringLiteral("passed")).toBool();
+    r.severity = cbor.value(QStringLiteral("severity")).toString();
+    r.message = cbor.value(QStringLiteral("message")).toString();
     r.actualValue = cbor.value(QStringLiteral("actual_value")).toVariant();
     r.evaluatedAt = QDateTime::fromString(cbor.value(QStringLiteral("evaluated_at")).toString(), Qt::ISODateWithMs);
     return r;
@@ -195,18 +195,29 @@ QJsonObject MnaProvenance::toJson() const
         json[QStringLiteral("resolved_attributes")] = attrObj;
     }
 
-    if (!mneCppVersion.isEmpty()) json[QStringLiteral("mne_cpp_version")]  = mneCppVersion;
-    if (!qtVersion.isEmpty())     json[QStringLiteral("qt_version")]       = qtVersion;
-    if (!compilerInfo.isEmpty())  json[QStringLiteral("compiler_info")]    = compilerInfo;
-    if (!osInfo.isEmpty())        json[QStringLiteral("os_info")]          = osInfo;
-    if (!hostName.isEmpty())      json[QStringLiteral("host_name")]        = hostName;
-    if (!externalToolVersion.isEmpty()) json[QStringLiteral("external_tool_version")] = externalToolVersion;
+    if (!mneCppVersion.isEmpty())
+        json[QStringLiteral("mne_cpp_version")] = mneCppVersion;
+    if (!qtVersion.isEmpty())
+        json[QStringLiteral("qt_version")] = qtVersion;
+    if (!compilerInfo.isEmpty())
+        json[QStringLiteral("compiler_info")] = compilerInfo;
+    if (!osInfo.isEmpty())
+        json[QStringLiteral("os_info")] = osInfo;
+    if (!hostName.isEmpty())
+        json[QStringLiteral("host_name")] = hostName;
+    if (!externalToolVersion.isEmpty())
+        json[QStringLiteral("external_tool_version")] = externalToolVersion;
 
-    if (startedAt.isValid())  json[QStringLiteral("started_at")]  = startedAt.toString(Qt::ISODateWithMs);
-    if (finishedAt.isValid()) json[QStringLiteral("finished_at")] = finishedAt.toString(Qt::ISODateWithMs);
-    if (wallTimeMs > 0)       json[QStringLiteral("wall_time_ms")]       = wallTimeMs;
-    if (peakMemoryBytes > 0)  json[QStringLiteral("peak_memory_bytes")]  = peakMemoryBytes;
-    if (randomSeed >= 0)      json[QStringLiteral("random_seed")]        = randomSeed;
+    if (startedAt.isValid())
+        json[QStringLiteral("started_at")] = startedAt.toString(Qt::ISODateWithMs);
+    if (finishedAt.isValid())
+        json[QStringLiteral("finished_at")] = finishedAt.toString(Qt::ISODateWithMs);
+    if (wallTimeMs > 0)
+        json[QStringLiteral("wall_time_ms")] = wallTimeMs;
+    if (peakMemoryBytes > 0)
+        json[QStringLiteral("peak_memory_bytes")] = peakMemoryBytes;
+    if (randomSeed >= 0)
+        json[QStringLiteral("random_seed")] = randomSeed;
 
     return json;
 }
@@ -227,18 +238,18 @@ MnaProvenance MnaProvenance::fromJson(const QJsonObject& json)
         p.resolvedAttributes.insert(it.key(), it.value().toVariant());
     }
 
-    p.mneCppVersion       = json.value(QStringLiteral("mne_cpp_version")).toString();
-    p.qtVersion           = json.value(QStringLiteral("qt_version")).toString();
-    p.compilerInfo        = json.value(QStringLiteral("compiler_info")).toString();
-    p.osInfo              = json.value(QStringLiteral("os_info")).toString();
-    p.hostName            = json.value(QStringLiteral("host_name")).toString();
+    p.mneCppVersion = json.value(QStringLiteral("mne_cpp_version")).toString();
+    p.qtVersion = json.value(QStringLiteral("qt_version")).toString();
+    p.compilerInfo = json.value(QStringLiteral("compiler_info")).toString();
+    p.osInfo = json.value(QStringLiteral("os_info")).toString();
+    p.hostName = json.value(QStringLiteral("host_name")).toString();
     p.externalToolVersion = json.value(QStringLiteral("external_tool_version")).toString();
 
-    p.startedAt       = QDateTime::fromString(json.value(QStringLiteral("started_at")).toString(), Qt::ISODateWithMs);
-    p.finishedAt      = QDateTime::fromString(json.value(QStringLiteral("finished_at")).toString(), Qt::ISODateWithMs);
-    p.wallTimeMs      = static_cast<qint64>(json.value(QStringLiteral("wall_time_ms")).toDouble(0));
+    p.startedAt = QDateTime::fromString(json.value(QStringLiteral("started_at")).toString(), Qt::ISODateWithMs);
+    p.finishedAt = QDateTime::fromString(json.value(QStringLiteral("finished_at")).toString(), Qt::ISODateWithMs);
+    p.wallTimeMs = static_cast<qint64>(json.value(QStringLiteral("wall_time_ms")).toDouble(0));
     p.peakMemoryBytes = static_cast<qint64>(json.value(QStringLiteral("peak_memory_bytes")).toDouble(0));
-    p.randomSeed      = static_cast<qint64>(json.value(QStringLiteral("random_seed")).toDouble(-1));
+    p.randomSeed = static_cast<qint64>(json.value(QStringLiteral("random_seed")).toDouble(-1));
 
     return p;
 }
@@ -265,18 +276,29 @@ QCborMap MnaProvenance::toCbor() const
         cbor.insert(QStringLiteral("resolved_attributes"), attrMap);
     }
 
-    if (!mneCppVersion.isEmpty()) cbor.insert(QStringLiteral("mne_cpp_version"),  mneCppVersion);
-    if (!qtVersion.isEmpty())     cbor.insert(QStringLiteral("qt_version"),       qtVersion);
-    if (!compilerInfo.isEmpty())  cbor.insert(QStringLiteral("compiler_info"),    compilerInfo);
-    if (!osInfo.isEmpty())        cbor.insert(QStringLiteral("os_info"),          osInfo);
-    if (!hostName.isEmpty())      cbor.insert(QStringLiteral("host_name"),        hostName);
-    if (!externalToolVersion.isEmpty()) cbor.insert(QStringLiteral("external_tool_version"), externalToolVersion);
+    if (!mneCppVersion.isEmpty())
+        cbor.insert(QStringLiteral("mne_cpp_version"), mneCppVersion);
+    if (!qtVersion.isEmpty())
+        cbor.insert(QStringLiteral("qt_version"), qtVersion);
+    if (!compilerInfo.isEmpty())
+        cbor.insert(QStringLiteral("compiler_info"), compilerInfo);
+    if (!osInfo.isEmpty())
+        cbor.insert(QStringLiteral("os_info"), osInfo);
+    if (!hostName.isEmpty())
+        cbor.insert(QStringLiteral("host_name"), hostName);
+    if (!externalToolVersion.isEmpty())
+        cbor.insert(QStringLiteral("external_tool_version"), externalToolVersion);
 
-    if (startedAt.isValid())  cbor.insert(QStringLiteral("started_at"),  startedAt.toString(Qt::ISODateWithMs));
-    if (finishedAt.isValid()) cbor.insert(QStringLiteral("finished_at"), finishedAt.toString(Qt::ISODateWithMs));
-    if (wallTimeMs > 0)       cbor.insert(QStringLiteral("wall_time_ms"),       wallTimeMs);
-    if (peakMemoryBytes > 0)  cbor.insert(QStringLiteral("peak_memory_bytes"),  peakMemoryBytes);
-    if (randomSeed >= 0)      cbor.insert(QStringLiteral("random_seed"),        randomSeed);
+    if (startedAt.isValid())
+        cbor.insert(QStringLiteral("started_at"), startedAt.toString(Qt::ISODateWithMs));
+    if (finishedAt.isValid())
+        cbor.insert(QStringLiteral("finished_at"), finishedAt.toString(Qt::ISODateWithMs));
+    if (wallTimeMs > 0)
+        cbor.insert(QStringLiteral("wall_time_ms"), wallTimeMs);
+    if (peakMemoryBytes > 0)
+        cbor.insert(QStringLiteral("peak_memory_bytes"), peakMemoryBytes);
+    if (randomSeed >= 0)
+        cbor.insert(QStringLiteral("random_seed"), randomSeed);
 
     return cbor;
 }
@@ -297,18 +319,18 @@ MnaProvenance MnaProvenance::fromCbor(const QCborMap& cbor)
         p.resolvedAttributes.insert(it.key().toString(), it.value().toVariant());
     }
 
-    p.mneCppVersion       = cbor.value(QStringLiteral("mne_cpp_version")).toString();
-    p.qtVersion           = cbor.value(QStringLiteral("qt_version")).toString();
-    p.compilerInfo        = cbor.value(QStringLiteral("compiler_info")).toString();
-    p.osInfo              = cbor.value(QStringLiteral("os_info")).toString();
-    p.hostName            = cbor.value(QStringLiteral("host_name")).toString();
+    p.mneCppVersion = cbor.value(QStringLiteral("mne_cpp_version")).toString();
+    p.qtVersion = cbor.value(QStringLiteral("qt_version")).toString();
+    p.compilerInfo = cbor.value(QStringLiteral("compiler_info")).toString();
+    p.osInfo = cbor.value(QStringLiteral("os_info")).toString();
+    p.hostName = cbor.value(QStringLiteral("host_name")).toString();
     p.externalToolVersion = cbor.value(QStringLiteral("external_tool_version")).toString();
 
-    p.startedAt       = QDateTime::fromString(cbor.value(QStringLiteral("started_at")).toString(), Qt::ISODateWithMs);
-    p.finishedAt      = QDateTime::fromString(cbor.value(QStringLiteral("finished_at")).toString(), Qt::ISODateWithMs);
-    p.wallTimeMs      = cbor.value(QStringLiteral("wall_time_ms")).toInteger(0);
+    p.startedAt = QDateTime::fromString(cbor.value(QStringLiteral("started_at")).toString(), Qt::ISODateWithMs);
+    p.finishedAt = QDateTime::fromString(cbor.value(QStringLiteral("finished_at")).toString(), Qt::ISODateWithMs);
+    p.wallTimeMs = cbor.value(QStringLiteral("wall_time_ms")).toInteger(0);
     p.peakMemoryBytes = cbor.value(QStringLiteral("peak_memory_bytes")).toInteger(0);
-    p.randomSeed      = cbor.value(QStringLiteral("random_seed")).toInteger(-1);
+    p.randomSeed = cbor.value(QStringLiteral("random_seed")).toInteger(-1);
 
     return p;
 }

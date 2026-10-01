@@ -54,7 +54,10 @@ class TestFwdBemData : public QObject
 private:
     QString m_sDataPath;
 
-    bool hasData() const { return !m_sDataPath.isEmpty(); }
+    bool hasData() const
+    {
+        return !m_sDataPath.isEmpty();
+    }
 
 private slots:
 
@@ -62,8 +65,7 @@ private slots:
     void initTestCase()
     {
         qInstallMessageHandler(MNELogger::customLogWriter);
-        QString base = QCoreApplication::applicationDirPath()
-                       + "/../resources/data/mne-cpp-test-data";
+        QString base = QCoreApplication::applicationDirPath() + "/../resources/data/mne-cpp-test-data";
         if (QFile::exists(base + "/MEG/sample/sample_audvis_trunc_raw.fif"))
             m_sDataPath = base;
         if (m_sDataPath.isEmpty())
@@ -75,10 +77,12 @@ private slots:
     //=========================================================================
     void bemModel_loadSingleLayer()
     {
-        if (!hasData()) QSKIP("No test data");
+        if (!hasData())
+            QSKIP("No test data");
 
         QString path = m_sDataPath + "/subjects/sample/bem/sample-5120-bem.fif";
-        if (!QFile::exists(path)) QSKIP("BEM file not found");
+        if (!QFile::exists(path))
+            QSKIP("BEM file not found");
 
         auto model = FwdBemModel::fwd_bem_load_homog_surface(path);
         QVERIFY(model != nullptr);
@@ -98,10 +102,12 @@ private slots:
     //=========================================================================
     void bemModel_loadThreeLayer()
     {
-        if (!hasData()) QSKIP("No test data");
+        if (!hasData())
+            QSKIP("No test data");
 
         QString path = m_sDataPath + "/subjects/sample/bem/sample-1280-1280-1280-bem.fif";
-        if (!QFile::exists(path)) QSKIP("3-layer BEM file not found");
+        if (!QFile::exists(path))
+            QSKIP("3-layer BEM file not found");
 
         auto model = FwdBemModel::fwd_bem_load_three_layer_surfaces(path);
         QVERIFY(model != nullptr);
@@ -118,10 +124,12 @@ private slots:
     //=========================================================================
     void bemModel_loadSurfaces()
     {
-        if (!hasData()) QSKIP("No test data");
+        if (!hasData())
+            QSKIP("No test data");
 
         QString path = m_sDataPath + "/subjects/sample/bem/sample-5120-bem.fif";
-        if (!QFile::exists(path)) QSKIP("BEM file not found");
+        if (!QFile::exists(path))
+            QSKIP("BEM file not found");
 
         auto model = FwdBemModel::fwd_bem_load_surfaces(path, {FIFFV_BEM_SURF_ID_BRAIN});
         QVERIFY(model != nullptr);
@@ -133,11 +141,13 @@ private slots:
     //=========================================================================
     void bemModel_loadSolution()
     {
-        if (!hasData()) QSKIP("No test data");
+        if (!hasData())
+            QSKIP("No test data");
 
         QString bemPath = m_sDataPath + "/subjects/sample/bem/sample-5120-bem.fif";
         QString solPath = m_sDataPath + "/subjects/sample/bem/sample-5120-bem-sol.fif";
-        if (!QFile::exists(bemPath) || !QFile::exists(solPath)) QSKIP("BEM files not found");
+        if (!QFile::exists(bemPath) || !QFile::exists(solPath))
+            QSKIP("BEM files not found");
 
         auto model = FwdBemModel::fwd_bem_load_homog_surface(bemPath);
         QVERIFY(model != nullptr);
@@ -145,7 +155,7 @@ private slots:
         int result = model->fwd_bem_load_recompute_solution(
             solPath, FWD_BEM_LINEAR_COLL, 0);
 
-        QVERIFY(result == 0 || result == 1);  // 0=ok, 1=recomputed
+        QVERIFY(result == 0 || result == 1); // 0=ok, 1=recomputed
     }
 
     //=========================================================================
@@ -153,11 +163,13 @@ private slots:
     //=========================================================================
     void fwdSolution_readAndVerify()
     {
-        if (!hasData()) QSKIP("No test data");
+        if (!hasData())
+            QSKIP("No test data");
 
         QString path = m_sDataPath + "/Result/ref-sample_audvis-meg-eeg-oct-6-fwd.fif";
         QFile file(path);
-        if (!file.exists()) QSKIP("Forward solution file not found");
+        if (!file.exists())
+            QSKIP("Forward solution file not found");
 
         MNEForwardSolution fwd(file);
         QVERIFY(!fwd.isEmpty());
@@ -183,18 +195,22 @@ private slots:
     //=========================================================================
     void fwdSolution_pickMegOnly()
     {
-        if (!hasData()) QSKIP("No test data");
+        if (!hasData())
+            QSKIP("No test data");
 
         QString path = m_sDataPath + "/Result/ref-sample_audvis-meg-eeg-oct-6-fwd.fif";
         QFile file(path);
-        if (!file.exists()) QSKIP("Forward solution not found");
+        if (!file.exists())
+            QSKIP("Forward solution not found");
 
         MNEForwardSolution fwd(file);
-        if (fwd.isEmpty()) QSKIP("Fwd load failed");
+        if (fwd.isEmpty())
+            QSKIP("Fwd load failed");
 
         // Pick MEG channels
         RowVectorXi megIdx = fwd.info.pick_types(true, false, false);
-        if (megIdx.size() == 0) QSKIP("No MEG channels in fwd");
+        if (megIdx.size() == 0)
+            QSKIP("No MEG channels in fwd");
 
         QStringList megNames;
         for (int i = 0; i < megIdx.size(); ++i)
@@ -209,17 +225,21 @@ private slots:
     //=========================================================================
     void fwdSolution_pickEegOnly()
     {
-        if (!hasData()) QSKIP("No test data");
+        if (!hasData())
+            QSKIP("No test data");
 
         QString path = m_sDataPath + "/Result/ref-sample_audvis-meg-eeg-oct-6-fwd.fif";
         QFile file(path);
-        if (!file.exists()) QSKIP("Forward solution not found");
+        if (!file.exists())
+            QSKIP("Forward solution not found");
 
         MNEForwardSolution fwd(file);
-        if (fwd.isEmpty()) QSKIP("Fwd load failed");
+        if (fwd.isEmpty())
+            QSKIP("Fwd load failed");
 
         RowVectorXi eegIdx = fwd.info.pick_types(false, true, false);
-        if (eegIdx.size() == 0) QSKIP("No EEG channels");
+        if (eegIdx.size() == 0)
+            QSKIP("No EEG channels");
 
         QStringList eegNames;
         for (int i = 0; i < eegIdx.size(); ++i)
@@ -233,14 +253,17 @@ private slots:
     //=========================================================================
     void fwdSolution_computeOrientPrior()
     {
-        if (!hasData()) QSKIP("No test data");
+        if (!hasData())
+            QSKIP("No test data");
 
         QString path = m_sDataPath + "/Result/ref-sample_audvis-meg-eeg-oct-6-fwd.fif";
         QFile file(path);
-        if (!file.exists()) QSKIP("Forward solution not found");
+        if (!file.exists())
+            QSKIP("Forward solution not found");
 
         MNEForwardSolution fwd(file);
-        if (fwd.isEmpty()) QSKIP("Fwd load failed");
+        if (fwd.isEmpty())
+            QSKIP("Fwd load failed");
 
         FiffCov orientPrior = fwd.compute_orient_prior(0.2f);
         QVERIFY(orientPrior.data.rows() > 0);
@@ -251,16 +274,19 @@ private slots:
     //=========================================================================
     void fwdSolution_computeDepthPrior()
     {
-        if (!hasData()) QSKIP("No test data");
+        if (!hasData())
+            QSKIP("No test data");
 
         QString fwdPath = m_sDataPath + "/Result/ref-sample_audvis-meg-eeg-oct-6-fwd.fif";
         QString rawPath = m_sDataPath + "/MEG/sample/sample_audvis_trunc_raw.fif";
         QFile fwdFile(fwdPath);
         QFile rawFile(rawPath);
-        if (!fwdFile.exists() || !rawFile.exists()) QSKIP("Files not found");
+        if (!fwdFile.exists() || !rawFile.exists())
+            QSKIP("Files not found");
 
         MNEForwardSolution fwd(fwdFile);
-        if (fwd.isEmpty()) QSKIP("Fwd load failed");
+        if (fwd.isEmpty())
+            QSKIP("Fwd load failed");
 
         FiffRawData raw(rawFile);
 
@@ -276,11 +302,13 @@ private slots:
     //=========================================================================
     void sourceSpace_readVerify()
     {
-        if (!hasData()) QSKIP("No test data");
+        if (!hasData())
+            QSKIP("No test data");
 
         QString path = m_sDataPath + "/subjects/sample/bem/sample-oct-6-src.fif";
         QFile file(path);
-        if (!file.exists()) QSKIP("Source space not found");
+        if (!file.exists())
+            QSKIP("Source space not found");
 
         MNESourceSpaces srcSpace;
         FiffStream::SPtr srcStream(new FiffStream(&file));
@@ -305,11 +333,13 @@ private slots:
     //=========================================================================
     void mneBem_triangleDataFromFile()
     {
-        if (!hasData()) QSKIP("No test data");
+        if (!hasData())
+            QSKIP("No test data");
 
         QString path = m_sDataPath + "/subjects/sample/bem/sample-5120-bem.fif";
         QFile file(path);
-        if (!file.exists()) QSKIP("BEM file not found");
+        if (!file.exists())
+            QSKIP("BEM file not found");
 
         MNEBem bem(file);
         QVERIFY(bem.size() > 0);
@@ -337,11 +367,13 @@ private slots:
     //=========================================================================
     void bemSolution_readViaTags()
     {
-        if (!hasData()) QSKIP("No test data");
+        if (!hasData())
+            QSKIP("No test data");
 
         QString path = m_sDataPath + "/subjects/sample/bem/sample-5120-bem-sol.fif";
         QFile file(path);
-        if (!file.exists()) QSKIP("BEM solution not found");
+        if (!file.exists())
+            QSKIP("BEM solution not found");
 
         FiffStream::SPtr stream(new FiffStream(&file));
         QVERIFY(stream->open());
@@ -372,11 +404,13 @@ private slots:
     //=========================================================================
     void coordTrans_readFromFile()
     {
-        if (!hasData()) QSKIP("No test data");
+        if (!hasData())
+            QSKIP("No test data");
 
         QString path = m_sDataPath + "/MEG/sample/all-trans.fif";
         QFile file(path);
-        if (!file.exists()) QSKIP("Transform file not found");
+        if (!file.exists())
+            QSKIP("Transform file not found");
 
         FiffCoordTrans trans;
         FiffStream::SPtr stream(new FiffStream(&file));
@@ -414,7 +448,8 @@ private slots:
     //=========================================================================
     void computeFwdSettings_withRealPaths()
     {
-        if (!hasData()) QSKIP("No test data");
+        if (!hasData())
+            QSKIP("No test data");
 
         ComputeFwdSettings settings;
         settings.measname = m_sDataPath + "/MEG/sample/sample_audvis_trunc_raw.fif";
@@ -466,7 +501,9 @@ private slots:
     }
 
     //=========================================================================
-    void cleanupTestCase() {}
+    void cleanupTestCase()
+    {
+    }
 };
 
 QTEST_GUILESS_MAIN(TestFwdBemData)

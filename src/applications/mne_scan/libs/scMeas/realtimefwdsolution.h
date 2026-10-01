@@ -39,12 +39,14 @@
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-namespace FIFFLIB{
-    class FiffInfo;
+namespace FIFFLIB
+{
+class FiffInfo;
 }
 
-namespace MNELIB {
-    class MNEForwardSolution;
+namespace MNELIB
+{
+class MNEForwardSolution;
 }
 
 //=============================================================================================================
@@ -65,14 +67,14 @@ class SCMEASSHARED_EXPORT RealTimeFwdSolution : public Measurement
     Q_OBJECT
 
 public:
-    typedef QSharedPointer<RealTimeFwdSolution> SPtr;               /**< Shared pointer type for RealTimeFwdSolution. */
-    typedef QSharedPointer<const RealTimeFwdSolution> ConstSPtr;    /**< Const shared pointer type for RealTimeFwdSolution. */
+    typedef QSharedPointer<RealTimeFwdSolution> SPtr;            /**< Shared pointer type for RealTimeFwdSolution. */
+    typedef QSharedPointer<const RealTimeFwdSolution> ConstSPtr; /**< Const shared pointer type for RealTimeFwdSolution. */
 
     //=========================================================================================================
     /**
      * Constructs a RealTimeFwdSolution.
      */
-    explicit RealTimeFwdSolution(QObject *parent = 0);
+    explicit RealTimeFwdSolution(QObject* parent = 0);
 
     //=========================================================================================================
     /**
@@ -151,7 +153,7 @@ public:
      *
      * @return if Forward is Clustered.
      */
-    inline bool  isClustered();
+    inline bool isClustered();
 
     //=========================================================================================================
     /**
@@ -162,15 +164,15 @@ public:
     inline bool isInitialized() const;
 
 private:
-    mutable QMutex          m_qMutex;                                       /**< Mutex to ensure thread safety. */
-    bool                    m_bInitialized;                                 /**< If values are stored.*/
-    bool                    m_bClustered;                                   /**< If fwd is clustered.*/
+    mutable QMutex m_qMutex; /**< Mutex to ensure thread safety. */
+    bool m_bInitialized;     /**< If values are stored.*/
+    bool m_bClustered;       /**< If fwd is clustered.*/
 
-    QSharedPointer<MNELIB::MNEForwardSolution>      m_pFwdSolution;         /**< The Mne Forward Solution. */
-    QSharedPointer<FIFFLIB::FiffInfo>               m_pFiffInfo;            /**< The Fiff Info. */
+    QSharedPointer<MNELIB::MNEForwardSolution> m_pFwdSolution; /**< The Mne Forward Solution. */
+    QSharedPointer<FIFFLIB::FiffInfo> m_pFiffInfo;             /**< The Fiff Info. */
 
-    QSharedDataPointer<FIFFLIB::FiffNamedMatrix>    m_pNamedMatSol;         /**< The solution matrix (LF). */
-    QSharedDataPointer<FIFFLIB::FiffNamedMatrix>    m_pNamedMatSolGrad;     /**< The gradient solution matrix (LF). */
+    QSharedDataPointer<FIFFLIB::FiffNamedMatrix> m_pNamedMatSol;     /**< The solution matrix (LF). */
+    QSharedDataPointer<FIFFLIB::FiffNamedMatrix> m_pNamedMatSolGrad; /**< The gradient solution matrix (LF). */
 };
 
 //=============================================================================================================

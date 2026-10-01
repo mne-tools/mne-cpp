@@ -46,7 +46,7 @@ using namespace UTILSLIB;
 
 //=============================================================================================================
 
-static int processFile(const QString &name, bool doMagnes)
+static int processFile(const QString& name, bool doMagnes)
 {
     QFile file(name);
     FiffStream::SPtr stream = FiffStream::open_update(file);
@@ -118,7 +118,7 @@ static int processFile(const QString &name, bool doMagnes)
 
 //=============================================================================================================
 
-int main(int argc, char *argv[])
+int main(int argc, char* argv[])
 {
     qInstallMessageHandler(MNELogger::customLogWriter);
     QCoreApplication app(argc, argv);
@@ -129,13 +129,12 @@ int main(int argc, char *argv[])
     parser.setApplicationDescription(
         "Fix magnetometer coil types in FIFF files.\n\n"
         "Replaces FIFFV_COIL_VV_MAG_T1 with FIFFV_COIL_VV_MAG_T3.\n"
-        "Sets FIFFV_COIL_NONE for non-MEG/EEG channels."
-    );
+        "Sets FIFFV_COIL_NONE for non-MEG/EEG channels.");
     parser.addHelpOption();
     parser.addVersionOption();
 
     QCommandLineOption magnesOpt("magnes",
-        "Also fix Magnes WH magnetometer coil types.");
+                                 "Also fix Magnes WH magnetometer coil types.");
     parser.addOption(magnesOpt);
 
     parser.addPositionalArgument("files", "FIFF file(s) to process.", "<file> ...");
@@ -151,7 +150,7 @@ int main(int argc, char *argv[])
     }
 
     int failed = 0;
-    for (const QString &fname : files) {
+    for (const QString& fname : files) {
         fprintf(stderr, "%s ... ", qPrintable(fname));
         if (processFile(fname, doMagnes) != 0) {
             fprintf(stderr, "[failed]\n");

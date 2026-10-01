@@ -29,7 +29,8 @@ using namespace CORTICALSURFACEPLUGIN;
 using namespace FSLIB;
 using namespace INVLIB;
 
-namespace {
+namespace
+{
 
 FsLabel makeLabel(int hemi)
 {
@@ -37,8 +38,8 @@ FsLabel makeLabel(int hemi)
     v << 0, 1, 2;
     Eigen::MatrixX3f pos(3, 3);
     pos << 0.001f, 0.0f, 0.0f,
-           0.002f, 0.0f, 0.0f,
-           0.003f, 0.0f, 0.0f;
+        0.002f, 0.0f, 0.0f,
+        0.003f, 0.0f, 0.0f;
     Eigen::VectorXd vals = Eigen::VectorXd::Ones(3);
     return FsLabel(v, pos, vals, hemi, QStringLiteral("test-roi"));
 }
@@ -112,10 +113,10 @@ void TestCorticalSurfaceLabels::testExtractTimeCourseMean()
     QCOMPARE(plugin.pickedVertexCount(), 0);
 
     // All five reduction modes must succeed against the same STC.
-    const QStringList modes = { QStringLiteral("auto"),
-                                QStringLiteral("mean_flip"),
-                                QStringLiteral("pca_flip"),
-                                QStringLiteral("max") };
+    const QStringList modes = {QStringLiteral("auto"),
+                               QStringLiteral("mean_flip"),
+                               QStringLiteral("pca_flip"),
+                               QStringLiteral("max")};
     for (const QString& mode : modes) {
         QVERIFY2(plugin.extractLabelTimeCourse(lbl, mode),
                  qPrintable(QStringLiteral("mode '%1' failed").arg(mode)));

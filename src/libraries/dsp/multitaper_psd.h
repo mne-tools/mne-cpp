@@ -54,8 +54,8 @@ namespace UTILSLIB
  */
 struct DSPSHARED_EXPORT MultitaperPsdResult
 {
-    Eigen::MatrixXd    matPsd;    ///< n_channels × n_freqs; one-sided PSD in unit²/Hz
-    Eigen::RowVectorXd vecFreqs;  ///< Frequency axis in Hz, length nFft/2+1
+    Eigen::MatrixXd matPsd;      ///< n_channels × n_freqs; one-sided PSD in unit²/Hz
+    Eigen::RowVectorXd vecFreqs; ///< Frequency axis in Hz, length nFft/2+1
 };
 
 //=============================================================================================================
@@ -89,10 +89,10 @@ public:
      * @return                    MultitaperPsdResult with matPsd and vecFreqs.
      */
     static MultitaperPsdResult compute(const Eigen::MatrixXd& matData,
-                                        double                 sfreq,
-                                        double                 halfBandwidth = 4.0,
-                                        int                    nTapers = -1,
-                                        int                    nFft = -1);
+                                       double sfreq,
+                                       double halfBandwidth = 4.0,
+                                       int nTapers = -1,
+                                       int nFft = -1);
 };
 
 } // namespace UTILSLIB

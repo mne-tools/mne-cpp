@@ -38,8 +38,8 @@ using namespace Eigen;
 //=============================================================================================================
 
 FiffInfo MaxwellMovementComp::transformFiffInfo(const FiffInfo& fiffInfo,
-                                                 const HeadPosEntry& headPosRef,
-                                                 const HeadPosEntry& headPosCurrent)
+                                                const HeadPosEntry& headPosRef,
+                                                const HeadPosEntry& headPosCurrent)
 {
     FiffInfo info(fiffInfo);
 
@@ -85,10 +85,10 @@ FiffInfo MaxwellMovementComp::transformFiffInfo(const FiffInfo& fiffInfo,
 //=============================================================================================================
 
 MatrixXd MaxwellMovementComp::apply(const MatrixXd& matData,
-                                     const FiffInfo& fiffInfo,
-                                     const QList<HeadPosEntry>& headPos,
-                                     double dSFreq,
-                                     const MaxwellMoveCompParams& params)
+                                    const FiffInfo& fiffInfo,
+                                    const QList<HeadPosEntry>& headPos,
+                                    double dSFreq,
+                                    const MaxwellMoveCompParams& params)
 {
     if (headPos.isEmpty()) {
         qWarning() << "[MaxwellMovementComp::apply] No head positions provided.";
@@ -136,7 +136,8 @@ MatrixXd MaxwellMovementComp::apply(const MatrixXd& matData,
 
         iStart = qBound(0, iStart, nSamples);
         iEnd = qBound(iStart, iEnd, nSamples);
-        if (iStart >= iEnd) continue;
+        if (iStart >= iEnd)
+            continue;
 
         int nSegSamples = iEnd - iStart;
 
@@ -185,30 +186,46 @@ QList<HeadPosEntry> MaxwellMovementComp::readHeadPos(const QString& sPath)
     QTextStream in(&file);
     while (!in.atEnd()) {
         QString line = in.readLine().trimmed();
-        if (line.isEmpty() || line.startsWith('#')) continue;
+        if (line.isEmpty() || line.startsWith('#'))
+            continue;
 
         QStringList parts = line.split(QRegularExpression("\\s+"), Qt::SkipEmptyParts);
-        if (parts.size() < 7) continue;
+        if (parts.size() < 7)
+            continue;
 
         bool ok = false;
         HeadPosEntry entry;
-        entry.dTime = parts[0].toDouble(&ok); if (!ok) continue;
+        entry.dTime = parts[0].toDouble(&ok);
+        if (!ok)
+            continue;
 
         // Quaternion (scalar-last or scalar-first depends on convention)
-        double q1 = parts[1].toDouble(&ok); if (!ok) continue;
-        double q2 = parts[2].toDouble(&ok); if (!ok) continue;
-        double q3 = parts[3].toDouble(&ok); if (!ok) continue;
+        double q1 = parts[1].toDouble(&ok);
+        if (!ok)
+            continue;
+        double q2 = parts[2].toDouble(&ok);
+        if (!ok)
+            continue;
+        double q3 = parts[3].toDouble(&ok);
+        if (!ok)
+            continue;
 
-        double tx = parts[4].toDouble(&ok); if (!ok) continue;
-        double ty = parts[5].toDouble(&ok); if (!ok) continue;
-        double tz = parts[6].toDouble(&ok); if (!ok) continue;
+        double tx = parts[4].toDouble(&ok);
+        if (!ok)
+            continue;
+        double ty = parts[5].toDouble(&ok);
+        if (!ok)
+            continue;
+        double tz = parts[6].toDouble(&ok);
+        if (!ok)
+            continue;
 
         if (parts.size() >= 8) {
             entry.dGof = parts[7].toDouble();
         }
 
         // MNE convention: quaternion stored as (q1, q2, q3) with q0 computed
-        double q0sq = 1.0 - q1*q1 - q2*q2 - q3*q3;
+        double q0sq = 1.0 - q1 * q1 - q2 * q2 - q3 * q3;
         double q0 = (q0sq > 0.0) ? std::sqrt(q0sq) : 0.0;
         entry.rotation = Quaterniond(q0, q1, q2, q3);
         entry.translation = Vector3d(tx, ty, tz);
@@ -223,7 +240,7 @@ QList<HeadPosEntry> MaxwellMovementComp::readHeadPos(const QString& sPath)
 //=============================================================================================================
 
 bool MaxwellMovementComp::writeHeadPos(const QString& sPath,
-                                        const QList<HeadPosEntry>& headPos)
+                                       const QList<HeadPosEntry>& headPos)
 {
     QFile file(sPath);
     if (!file.open(QIODevice::WriteOnly | QIODevice::Text)) {

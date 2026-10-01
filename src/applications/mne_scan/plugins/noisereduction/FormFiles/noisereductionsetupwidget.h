@@ -52,7 +52,6 @@ class NoiseReductionSetupWidget : public QWidget
     Q_OBJECT
 
 public:
-
     //=========================================================================================================
     /**
      * Constructs a NoiseReductionSetupWidget which is a child of parent.
@@ -60,7 +59,7 @@ public:
      * @param[in] toolbox a pointer to the corresponding NoiseReduction.
      * @param[in] parent pointer to parent widget; If parent is 0, the new NoiseReductionSetupWidget becomes a window. If parent is another widget, NoiseReductionSetupWidget becomes a child window inside parent. NoiseReductionSetupWidget is deleted when its parent is deleted.
      */
-    NoiseReductionSetupWidget(NoiseReduction* toolbox, QWidget *parent = 0);
+    NoiseReductionSetupWidget(NoiseReduction* toolbox, QWidget* parent = 0);
 
     //=========================================================================================================
     /**
@@ -70,10 +69,9 @@ public:
     ~NoiseReductionSetupWidget();
 
 private:
+    NoiseReduction* m_pNoiseReduction; /**< Holds a pointer to corresponding NoiseReduction.*/
 
-    NoiseReduction* m_pNoiseReduction;	/**< Holds a pointer to corresponding NoiseReduction.*/
-
-    Ui::NoiseReductionSetupWidgetClass ui;	/**< Holds the user interface for the NoiseReductionSetupWidget.*/
+    Ui::NoiseReductionSetupWidgetClass ui; /**< Holds the user interface for the NoiseReductionSetupWidget.*/
 };
 } // NAMESPACE
 

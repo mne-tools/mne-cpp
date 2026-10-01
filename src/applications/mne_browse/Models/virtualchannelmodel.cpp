@@ -32,7 +32,7 @@ namespace
 
 QString kindToString(VirtualChannelKind kind)
 {
-    switch(kind) {
+    switch (kind) {
         case VirtualChannelKind::AverageReference:
             return QStringLiteral("average_reference");
         case VirtualChannelKind::WeightedReference:
@@ -46,11 +46,11 @@ QString kindToString(VirtualChannelKind kind)
 VirtualChannelKind stringToKind(const QString& text)
 {
     const QString normalizedText = text.trimmed();
-    if(normalizedText.compare(QStringLiteral("average_reference"), Qt::CaseInsensitive) == 0) {
+    if (normalizedText.compare(QStringLiteral("average_reference"), Qt::CaseInsensitive) == 0) {
         return VirtualChannelKind::AverageReference;
     }
 
-    if(normalizedText.compare(QStringLiteral("weighted_reference"), Qt::CaseInsensitive) == 0) {
+    if (normalizedText.compare(QStringLiteral("weighted_reference"), Qt::CaseInsensitive) == 0) {
         return VirtualChannelKind::WeightedReference;
     }
 
@@ -59,7 +59,7 @@ VirtualChannelKind stringToKind(const QString& text)
 
 QString kindToDisplayString(VirtualChannelKind kind)
 {
-    switch(kind) {
+    switch (kind) {
         case VirtualChannelKind::AverageReference:
             return QStringLiteral("Average Reference");
         case VirtualChannelKind::WeightedReference:
@@ -84,7 +84,7 @@ QString formatWeight(double weight)
 
 //=============================================================================================================
 
-VirtualChannelModel::VirtualChannelModel(QObject *parent)
+VirtualChannelModel::VirtualChannelModel(QObject* parent)
 : QAbstractTableModel(parent)
 {
 }
@@ -95,7 +95,7 @@ VirtualChannelModel::~VirtualChannelModel() = default;
 
 //=============================================================================================================
 
-int VirtualChannelModel::rowCount(const QModelIndex &parent) const
+int VirtualChannelModel::rowCount(const QModelIndex& parent) const
 {
     Q_UNUSED(parent)
     return m_virtualChannels.size();
@@ -103,7 +103,7 @@ int VirtualChannelModel::rowCount(const QModelIndex &parent) const
 
 //=============================================================================================================
 
-int VirtualChannelModel::columnCount(const QModelIndex &parent) const
+int VirtualChannelModel::columnCount(const QModelIndex& parent) const
 {
     Q_UNUSED(parent)
     return 5;
@@ -113,16 +113,16 @@ int VirtualChannelModel::columnCount(const QModelIndex &parent) const
 
 QVariant VirtualChannelModel::headerData(int section, Qt::Orientation orientation, int role) const
 {
-    if(role != Qt::DisplayRole && role != Qt::TextAlignmentRole) {
+    if (role != Qt::DisplayRole && role != Qt::TextAlignmentRole) {
         return QVariant();
     }
 
-    if(role == Qt::TextAlignmentRole) {
+    if (role == Qt::TextAlignmentRole) {
         return QVariant(Qt::AlignHCenter | Qt::AlignVCenter);
     }
 
-    if(orientation == Qt::Horizontal) {
-        switch(section) {
+    if (orientation == Qt::Horizontal) {
+        switch (section) {
             case 0:
                 return QStringLiteral("Name");
             case 1:
@@ -136,7 +136,7 @@ QVariant VirtualChannelModel::headerData(int section, Qt::Orientation orientatio
             default:
                 break;
         }
-    } else if(orientation == Qt::Vertical) {
+    } else if (orientation == Qt::Vertical) {
         return QStringLiteral("Virtual %1").arg(section + 1);
     }
 
@@ -145,30 +145,30 @@ QVariant VirtualChannelModel::headerData(int section, Qt::Orientation orientatio
 
 //=============================================================================================================
 
-QVariant VirtualChannelModel::data(const QModelIndex &index, int role) const
+QVariant VirtualChannelModel::data(const QModelIndex& index, int role) const
 {
-    if(!index.isValid() || index.row() < 0 || index.row() >= m_virtualChannels.size()) {
+    if (!index.isValid() || index.row() < 0 || index.row() >= m_virtualChannels.size()) {
         return QVariant();
     }
 
     const VirtualChannelDefinition& definition = m_virtualChannels.at(index.row());
 
-    if(role == Qt::TextAlignmentRole) {
+    if (role == Qt::TextAlignmentRole) {
         return QVariant(Qt::AlignCenter | Qt::AlignVCenter);
     }
 
-    if(role == Qt::BackgroundRole) {
+    if (role == Qt::BackgroundRole) {
         QBrush brush;
         brush.setStyle(Qt::SolidPattern);
         brush.setColor(QColor(40, 120, 180, 28));
         return QVariant(brush);
     }
 
-    if(role != Qt::DisplayRole && role != Qt::EditRole) {
+    if (role != Qt::DisplayRole && role != Qt::EditRole) {
         return QVariant();
     }
 
-    switch(index.column()) {
+    switch (index.column()) {
         case 0:
             return definition.name;
         case 1:
@@ -186,13 +186,13 @@ QVariant VirtualChannelModel::data(const QModelIndex &index, int role) const
 
 //=============================================================================================================
 
-Qt::ItemFlags VirtualChannelModel::flags(const QModelIndex &index) const
+Qt::ItemFlags VirtualChannelModel::flags(const QModelIndex& index) const
 {
-    if(!index.isValid()) {
+    if (!index.isValid()) {
         return Qt::NoItemFlags;
     }
 
-    if(index.column() == 0) {
+    if (index.column() == 0) {
         return Qt::ItemIsEnabled | Qt::ItemIsSelectable | Qt::ItemIsEditable;
     }
 
@@ -201,11 +201,9 @@ Qt::ItemFlags VirtualChannelModel::flags(const QModelIndex &index) const
 
 //=============================================================================================================
 
-bool VirtualChannelModel::setData(const QModelIndex &index, const QVariant &value, int role)
+bool VirtualChannelModel::setData(const QModelIndex& index, const QVariant& value, int role)
 {
-    if(role != Qt::EditRole || !index.isValid()
-       || index.row() < 0 || index.row() >= m_virtualChannels.size()
-       || index.column() != 0) {
+    if (role != Qt::EditRole || !index.isValid() || index.row() < 0 || index.row() >= m_virtualChannels.size() || index.column() != 0) {
         return false;
     }
 
@@ -224,16 +222,16 @@ bool VirtualChannelModel::setData(const QModelIndex &index, const QVariant &valu
 
 //=============================================================================================================
 
-bool VirtualChannelModel::removeRows(int position, int rows, const QModelIndex &parent)
+bool VirtualChannelModel::removeRows(int position, int rows, const QModelIndex& parent)
 {
     Q_UNUSED(parent)
 
-    if(position < 0 || rows <= 0 || position + rows > m_virtualChannels.size()) {
+    if (position < 0 || rows <= 0 || position + rows > m_virtualChannels.size()) {
         return false;
     }
 
     beginRemoveRows(QModelIndex(), position, position + rows - 1);
-    for(int index = 0; index < rows; ++index) {
+    for (int index = 0; index < rows; ++index) {
         m_virtualChannels.removeAt(position);
     }
     endRemoveRows();
@@ -268,22 +266,22 @@ int VirtualChannelModel::addVirtualChannel(const QString& name,
 int VirtualChannelModel::addReferenceSet(const QString& name, const QStringList& channels)
 {
     const VirtualReferenceSetDefinition definition = normalizeReferenceSet(name, channels);
-    if(definition.name.isEmpty() || definition.channels.isEmpty()) {
+    if (definition.name.isEmpty() || definition.channels.isEmpty()) {
         return -1;
     }
 
     beginResetModel();
 
     int setIndex = -1;
-    for(int index = 0; index < m_referenceSets.size(); ++index) {
-        if(m_referenceSets.at(index).name.compare(definition.name, Qt::CaseSensitive) == 0) {
+    for (int index = 0; index < m_referenceSets.size(); ++index) {
+        if (m_referenceSets.at(index).name.compare(definition.name, Qt::CaseSensitive) == 0) {
             m_referenceSets[index] = definition;
             setIndex = index;
             break;
         }
     }
 
-    if(setIndex < 0) {
+    if (setIndex < 0) {
         setIndex = m_referenceSets.size();
         m_referenceSets.append(definition);
     }
@@ -298,26 +296,26 @@ int VirtualChannelModel::addReferenceSet(const QString& name, const QStringList&
 bool VirtualChannelModel::removeReferenceSet(const QString& name)
 {
     const QString trimmedName = name.trimmed();
-    if(trimmedName.isEmpty()) {
+    if (trimmedName.isEmpty()) {
         return false;
     }
 
     int removeIndex = -1;
-    for(int index = 0; index < m_referenceSets.size(); ++index) {
-        if(m_referenceSets.at(index).name == trimmedName) {
+    for (int index = 0; index < m_referenceSets.size(); ++index) {
+        if (m_referenceSets.at(index).name == trimmedName) {
             removeIndex = index;
             break;
         }
     }
 
-    if(removeIndex < 0) {
+    if (removeIndex < 0) {
         return false;
     }
 
     beginResetModel();
     m_referenceSets.removeAt(removeIndex);
-    for(VirtualChannelDefinition& definition : m_virtualChannels) {
-        if(definition.referenceSetName == trimmedName) {
+    for (VirtualChannelDefinition& definition : m_virtualChannels) {
+        if (definition.referenceSetName == trimmedName) {
             definition.referenceSetName.clear();
         }
     }
@@ -332,7 +330,7 @@ bool VirtualChannelModel::removeReferenceSet(const QString& name)
 QVector<VirtualChannelDefinition> VirtualChannelModel::virtualChannels() const
 {
     QVector<VirtualChannelDefinition> resolvedDefinitions = m_virtualChannels;
-    for(VirtualChannelDefinition& definition : resolvedDefinitions) {
+    for (VirtualChannelDefinition& definition : resolvedDefinitions) {
         definition.referenceChannels = resolvedReferenceChannels(definition);
         definition.referenceWeights = resolvedReferenceWeights(definition, definition.referenceChannels.size());
     }
@@ -353,7 +351,7 @@ QStringList VirtualChannelModel::referenceSetNames() const
 {
     QStringList names;
     names.reserve(m_referenceSets.size());
-    for(const VirtualReferenceSetDefinition& referenceSet : m_referenceSets) {
+    for (const VirtualReferenceSetDefinition& referenceSet : m_referenceSets) {
         names.append(referenceSet.name);
     }
 
@@ -365,8 +363,8 @@ QStringList VirtualChannelModel::referenceSetNames() const
 VirtualReferenceSetDefinition VirtualChannelModel::referenceSet(const QString& name) const
 {
     const QString trimmedName = name.trimmed();
-    for(const VirtualReferenceSetDefinition& definition : m_referenceSets) {
-        if(definition.name == trimmedName) {
+    for (const VirtualReferenceSetDefinition& definition : m_referenceSets) {
+        if (definition.name == trimmedName) {
             return definition;
         }
     }
@@ -378,7 +376,7 @@ VirtualReferenceSetDefinition VirtualChannelModel::referenceSet(const QString& n
 
 bool VirtualChannelModel::loadVirtualChannels(QFile& qFile)
 {
-    if(!qFile.open(QIODevice::ReadOnly)) {
+    if (!qFile.open(QIODevice::ReadOnly)) {
         qWarning() << "VirtualChannelModel: could not open virtual-channel file" << qFile.fileName();
         return false;
     }
@@ -387,7 +385,7 @@ bool VirtualChannelModel::loadVirtualChannels(QFile& qFile)
     const QJsonDocument document = QJsonDocument::fromJson(qFile.readAll(), &parseError);
     qFile.close();
 
-    if(parseError.error != QJsonParseError::NoError || !document.isObject()) {
+    if (parseError.error != QJsonParseError::NoError || !document.isObject()) {
         qWarning() << "VirtualChannelModel: invalid virtual-channel json"
                    << qFile.fileName() << parseError.errorString();
         return false;
@@ -401,41 +399,41 @@ bool VirtualChannelModel::loadVirtualChannels(QFile& qFile)
     m_referenceSets.clear();
     m_virtualChannels.clear();
 
-    for(const QJsonValue& value : setArray) {
+    for (const QJsonValue& value : setArray) {
         const QJsonObject object = value.toObject();
-        if(object.isEmpty()) {
+        if (object.isEmpty()) {
             continue;
         }
 
         QStringList channels;
         const QJsonArray channelNameArray = object.value(QStringLiteral("channels")).toArray();
-        for(const QJsonValue& channelValue : channelNameArray) {
+        for (const QJsonValue& channelValue : channelNameArray) {
             const QString channelName = channelValue.toString().trimmed();
-            if(!channelName.isEmpty() && !channels.contains(channelName)) {
+            if (!channelName.isEmpty() && !channels.contains(channelName)) {
                 channels.append(channelName);
             }
         }
 
         const VirtualReferenceSetDefinition definition =
             normalizeReferenceSet(object.value(QStringLiteral("name")).toString(), channels);
-        if(!definition.name.isEmpty() && !definition.channels.isEmpty()) {
+        if (!definition.name.isEmpty() && !definition.channels.isEmpty()) {
             m_referenceSets.append(definition);
         }
     }
 
-    for(const QJsonValue& value : channelArray) {
+    for (const QJsonValue& value : channelArray) {
         const QJsonObject object = value.toObject();
-        if(object.isEmpty()) {
+        if (object.isEmpty()) {
             continue;
         }
 
         QStringList referenceChannels;
         const QJsonValue referenceValue = object.value(QStringLiteral("reference_channels"));
-        if(referenceValue.isArray()) {
+        if (referenceValue.isArray()) {
             const QJsonArray referenceArray = referenceValue.toArray();
-            for(const QJsonValue& referenceChannelValue : referenceArray) {
+            for (const QJsonValue& referenceChannelValue : referenceArray) {
                 const QString referenceChannel = referenceChannelValue.toString().trimmed();
-                if(!referenceChannel.isEmpty() && !referenceChannels.contains(referenceChannel)) {
+                if (!referenceChannel.isEmpty() && !referenceChannels.contains(referenceChannel)) {
                     referenceChannels.append(referenceChannel);
                 }
             }
@@ -443,10 +441,10 @@ bool VirtualChannelModel::loadVirtualChannels(QFile& qFile)
 
         QVector<double> referenceWeights;
         const QJsonValue weightsValue = object.value(QStringLiteral("reference_weights"));
-        if(weightsValue.isArray()) {
+        if (weightsValue.isArray()) {
             const QJsonArray weightsArray = weightsValue.toArray();
             referenceWeights.reserve(weightsArray.size());
-            for(const QJsonValue& weightValue : weightsArray) {
+            for (const QJsonValue& weightValue : weightsArray) {
                 referenceWeights.append(weightValue.toDouble(1.0));
             }
         }
@@ -456,13 +454,13 @@ bool VirtualChannelModel::loadVirtualChannels(QFile& qFile)
         QString referenceSetName = object.value(QStringLiteral("reference_set_name")).toString().trimmed();
 
         // Backward compatibility for the older bipolar-only sidecar format.
-        if(primaryChannel.isEmpty()) {
+        if (primaryChannel.isEmpty()) {
             primaryChannel = object.value(QStringLiteral("positive_channel")).toString();
         }
 
-        if(referenceChannels.isEmpty()) {
+        if (referenceChannels.isEmpty()) {
             const QString negativeChannel = object.value(QStringLiteral("negative_channel")).toString();
-            if(!negativeChannel.trimmed().isEmpty()) {
+            if (!negativeChannel.trimmed().isEmpty()) {
                 referenceChannels.append(negativeChannel.trimmed());
             }
         }
@@ -487,24 +485,24 @@ bool VirtualChannelModel::loadVirtualChannels(QFile& qFile)
 bool VirtualChannelModel::saveVirtualChannels(QFile& qFile) const
 {
     QFileInfo fileInfo(qFile);
-    if(!fileInfo.dir().exists()) {
+    if (!fileInfo.dir().exists()) {
         qWarning() << "VirtualChannelModel: virtual-channel directory does not exist"
                    << fileInfo.absolutePath();
         return false;
     }
 
-    if(!qFile.open(QIODevice::WriteOnly | QIODevice::Truncate)) {
+    if (!qFile.open(QIODevice::WriteOnly | QIODevice::Truncate)) {
         qWarning() << "VirtualChannelModel: could not write virtual-channel file" << qFile.fileName();
         return false;
     }
 
     QJsonArray setArray;
-    for(const VirtualReferenceSetDefinition& referenceSet : m_referenceSets) {
+    for (const VirtualReferenceSetDefinition& referenceSet : m_referenceSets) {
         QJsonObject object;
         object.insert(QStringLiteral("name"), referenceSet.name);
 
         QJsonArray channelArray;
-        for(const QString& channelName : referenceSet.channels) {
+        for (const QString& channelName : referenceSet.channels) {
             channelArray.append(channelName);
         }
         object.insert(QStringLiteral("channels"), channelArray);
@@ -512,7 +510,7 @@ bool VirtualChannelModel::saveVirtualChannels(QFile& qFile) const
     }
 
     QJsonArray channelArray;
-    for(const VirtualChannelDefinition& definition : m_virtualChannels) {
+    for (const VirtualChannelDefinition& definition : m_virtualChannels) {
         QJsonObject object;
         object.insert(QStringLiteral("name"), definition.name);
         object.insert(QStringLiteral("type"), kindToString(definition.kind));
@@ -520,18 +518,18 @@ bool VirtualChannelModel::saveVirtualChannels(QFile& qFile) const
         object.insert(QStringLiteral("reference_set_name"), definition.referenceSetName);
 
         QJsonArray referenceArray;
-        for(const QString& referenceChannel : definition.referenceChannels) {
+        for (const QString& referenceChannel : definition.referenceChannels) {
             referenceArray.append(referenceChannel);
         }
         object.insert(QStringLiteral("reference_channels"), referenceArray);
 
         QJsonArray weightsArray;
-        for(double weight : definition.referenceWeights) {
+        for (double weight : definition.referenceWeights) {
             weightsArray.append(weight);
         }
         object.insert(QStringLiteral("reference_weights"), weightsArray);
 
-        if(definition.kind == VirtualChannelKind::Bipolar && !definition.referenceChannels.isEmpty()) {
+        if (definition.kind == VirtualChannelKind::Bipolar && !definition.referenceChannels.isEmpty()) {
             object.insert(QStringLiteral("positive_channel"), definition.primaryChannel);
             object.insert(QStringLiteral("negative_channel"), definition.referenceChannels.first());
         }
@@ -576,11 +574,11 @@ bool VirtualChannelModel::isFileLoaded() const
 QString VirtualChannelModel::referenceSummaryForDefinition(const VirtualChannelDefinition& definition) const
 {
     const QStringList referenceChannels = resolvedReferenceChannels(definition);
-    if(definition.referenceSetName.isEmpty()) {
+    if (definition.referenceSetName.isEmpty()) {
         return joinedReferenceChannels(referenceChannels);
     }
 
-    if(referenceChannels.isEmpty()) {
+    if (referenceChannels.isEmpty()) {
         return QStringLiteral("@%1").arg(definition.referenceSetName);
     }
 
@@ -595,21 +593,21 @@ QString VirtualChannelModel::formulaForDefinition(const VirtualChannelDefinition
     const QStringList referenceChannels = resolvedReferenceChannels(definition);
     const QVector<double> referenceWeights = resolvedReferenceWeights(definition, referenceChannels.size());
 
-    if(referenceChannels.isEmpty()) {
+    if (referenceChannels.isEmpty()) {
         return QStringLiteral("%1 - ?").arg(definition.primaryChannel);
     }
 
-    if(definition.kind == VirtualChannelKind::AverageReference) {
+    if (definition.kind == VirtualChannelKind::AverageReference) {
         const QString rightHandSide = definition.referenceSetName.isEmpty()
             ? QStringLiteral("avg(%1)").arg(joinedReferenceChannels(referenceChannels))
             : QStringLiteral("avg(@%1)").arg(definition.referenceSetName);
         return QStringLiteral("%1 - %2").arg(definition.primaryChannel, rightHandSide);
     }
 
-    if(definition.kind == VirtualChannelKind::WeightedReference) {
+    if (definition.kind == VirtualChannelKind::WeightedReference) {
         QStringList weightedTerms;
         weightedTerms.reserve(referenceChannels.size());
-        for(int index = 0; index < referenceChannels.size(); ++index) {
+        for (int index = 0; index < referenceChannels.size(); ++index) {
             weightedTerms.append(QStringLiteral("%1*%2")
                                      .arg(formatWeight(referenceWeights.value(index, 1.0)),
                                           referenceChannels.at(index)));
@@ -629,17 +627,17 @@ QStringList VirtualChannelModel::resolvedReferenceChannels(const VirtualChannelD
 {
     QStringList channels = definition.referenceChannels;
 
-    if(!definition.referenceSetName.isEmpty()) {
+    if (!definition.referenceSetName.isEmpty()) {
         const VirtualReferenceSetDefinition preset = referenceSet(definition.referenceSetName);
-        if(!preset.name.isEmpty() && !preset.channels.isEmpty()) {
+        if (!preset.name.isEmpty() && !preset.channels.isEmpty()) {
             channels = preset.channels;
         }
     }
 
     QStringList resolvedChannels;
-    for(const QString& channel : channels) {
+    for (const QString& channel : channels) {
         const QString trimmed = channel.trimmed();
-        if(trimmed.isEmpty() || trimmed == definition.primaryChannel || resolvedChannels.contains(trimmed)) {
+        if (trimmed.isEmpty() || trimmed == definition.primaryChannel || resolvedChannels.contains(trimmed)) {
             continue;
         }
         resolvedChannels.append(trimmed);
@@ -656,16 +654,16 @@ QVector<double> VirtualChannelModel::resolvedReferenceWeights(const VirtualChann
     QVector<double> weights;
     weights.reserve(resolvedChannelCount);
 
-    if(definition.kind == VirtualChannelKind::WeightedReference) {
-        for(int index = 0; index < resolvedChannelCount; ++index) {
-            if(index < definition.referenceWeights.size()) {
+    if (definition.kind == VirtualChannelKind::WeightedReference) {
+        for (int index = 0; index < resolvedChannelCount; ++index) {
+            if (index < definition.referenceWeights.size()) {
                 weights.append(definition.referenceWeights.at(index));
             } else {
                 weights.append(1.0);
             }
         }
     } else {
-        for(int index = 0; index < resolvedChannelCount; ++index) {
+        for (int index = 0; index < resolvedChannelCount; ++index) {
             weights.append(1.0);
         }
     }
@@ -681,9 +679,9 @@ VirtualReferenceSetDefinition VirtualChannelModel::normalizeReferenceSet(const Q
     VirtualReferenceSetDefinition definition;
     definition.name = name.trimmed();
 
-    for(const QString& channel : channels) {
+    for (const QString& channel : channels) {
         const QString trimmed = channel.trimmed();
-        if(trimmed.isEmpty() || definition.channels.contains(trimmed)) {
+        if (trimmed.isEmpty() || definition.channels.contains(trimmed)) {
             continue;
         }
         definition.channels.append(trimmed);
@@ -707,42 +705,40 @@ VirtualChannelDefinition VirtualChannelModel::normalizeDefinition(const QString&
     definition.referenceSetName = referenceSetName.trimmed();
 
     QStringList effectiveReferenceChannels = referenceChannels;
-    if(effectiveReferenceChannels.isEmpty() && !definition.referenceSetName.isEmpty()) {
+    if (effectiveReferenceChannels.isEmpty() && !definition.referenceSetName.isEmpty()) {
         effectiveReferenceChannels = referenceSet(definition.referenceSetName).channels;
     }
 
-    for(int index = 0; index < effectiveReferenceChannels.size(); ++index) {
+    for (int index = 0; index < effectiveReferenceChannels.size(); ++index) {
         const QString trimmed = effectiveReferenceChannels.at(index).trimmed();
-        if(trimmed.isEmpty()
-           || trimmed == definition.primaryChannel
-           || definition.referenceChannels.contains(trimmed)) {
+        if (trimmed.isEmpty() || trimmed == definition.primaryChannel || definition.referenceChannels.contains(trimmed)) {
             continue;
         }
 
         definition.referenceChannels.append(trimmed);
-        if(kind == VirtualChannelKind::WeightedReference) {
+        if (kind == VirtualChannelKind::WeightedReference) {
             definition.referenceWeights.append(index < referenceWeights.size()
-                                               ? referenceWeights.at(index)
-                                               : 1.0);
+                                                   ? referenceWeights.at(index)
+                                                   : 1.0);
         }
     }
 
     definition.name = name.trimmed();
-    if(definition.name.isEmpty()) {
-        if(definition.kind == VirtualChannelKind::AverageReference) {
+    if (definition.name.isEmpty()) {
+        if (definition.kind == VirtualChannelKind::AverageReference) {
             definition.name = definition.referenceSetName.isEmpty()
                 ? QStringLiteral("%1-avgref").arg(definition.primaryChannel)
                 : QStringLiteral("%1-avgref-%2").arg(definition.primaryChannel, definition.referenceSetName);
-        } else if(definition.kind == VirtualChannelKind::WeightedReference) {
+        } else if (definition.kind == VirtualChannelKind::WeightedReference) {
             definition.name = definition.referenceSetName.isEmpty()
                 ? QStringLiteral("%1-wref").arg(definition.primaryChannel)
                 : QStringLiteral("%1-wref-%2").arg(definition.primaryChannel, definition.referenceSetName);
         } else {
             definition.name = QStringLiteral("%1-%2")
-                .arg(definition.primaryChannel,
-                     definition.referenceChannels.isEmpty()
-                         ? QStringLiteral("?")
-                         : definition.referenceChannels.first());
+                                  .arg(definition.primaryChannel,
+                                       definition.referenceChannels.isEmpty()
+                                           ? QStringLiteral("?")
+                                           : definition.referenceChannels.first());
         }
     }
 

@@ -45,11 +45,11 @@
 //=============================================================================================================
 
 #if defined(STATICBUILD)
-#  define MLSHARED_EXPORT
+#define MLSHARED_EXPORT
 #elif defined(MNE_ML_LIBRARY)
-#  define MLSHARED_EXPORT Q_DECL_EXPORT    /**< Q_DECL_EXPORT must be added to the declarations of symbols used when compiling a shared library. */
+#define MLSHARED_EXPORT Q_DECL_EXPORT /**< Q_DECL_EXPORT must be added to the declarations of symbols used when compiling a shared library. */
 #else
-#  define MLSHARED_EXPORT Q_DECL_IMPORT    /**< Q_DECL_IMPORT must be added to the declarations of symbols used when compiling a client that uses the shared library. */
+#define MLSHARED_EXPORT Q_DECL_IMPORT /**< Q_DECL_IMPORT must be added to the declarations of symbols used when compiling a client that uses the shared library. */
 #endif
 
 //=============================================================================================================
@@ -57,7 +57,8 @@
  * @namespace MLLIB
  * @brief Tensors, model abstraction, ONNX Runtime inference and Python training drivers used across mne-cpp.
  */
-namespace MLLIB{
+namespace MLLIB
+{
 
 //=============================================================================================================
 /**

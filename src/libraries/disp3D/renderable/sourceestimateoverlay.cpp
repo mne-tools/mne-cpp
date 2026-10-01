@@ -42,7 +42,7 @@ SourceEstimateOverlay::~SourceEstimateOverlay()
 
 //=============================================================================================================
 
-bool SourceEstimateOverlay::loadStc(const QString &path, int hemi)
+bool SourceEstimateOverlay::loadStc(const QString& path, int hemi)
 {
     QFile file(path);
     // Note: InvSourceEstimate::read() opens the file internally, don't open it here
@@ -56,12 +56,12 @@ bool SourceEstimateOverlay::loadStc(const QString &path, int hemi)
     if (hemi == 0) {
         m_stcLh = stc;
         m_hasLh = true;
-        qDebug() << "SourceEstimateOverlay: Loaded LH with" << stc.data.rows() << "vertices," 
+        qDebug() << "SourceEstimateOverlay: Loaded LH with" << stc.data.rows() << "vertices,"
                  << stc.data.cols() << "time points";
     } else {
         m_stcRh = stc;
         m_hasRh = true;
-        qDebug() << "SourceEstimateOverlay: Loaded RH with" << stc.data.rows() << "vertices," 
+        qDebug() << "SourceEstimateOverlay: Loaded RH with" << stc.data.rows() << "vertices,"
                  << stc.data.cols() << "time points";
     }
     invalidateColorCache();
@@ -88,12 +88,13 @@ bool SourceEstimateOverlay::isLoaded() const
 
 //=============================================================================================================
 
-void SourceEstimateOverlay::applyToSurface(BrainSurface *surface, int timeIndex)
+void SourceEstimateOverlay::applyToSurface(BrainSurface* surface, int timeIndex)
 {
-    if (!surface) return;
+    if (!surface)
+        return;
 
     int hemi = surface->hemi();
-    const INVLIB::InvSourceEstimate *stc = nullptr;
+    const INVLIB::InvSourceEstimate* stc = nullptr;
     QSharedPointer<Eigen::SparseMatrix<float>> interpMat;
 
     if (hemi == 0 && m_hasLh) {
@@ -106,7 +107,8 @@ void SourceEstimateOverlay::applyToSurface(BrainSurface *surface, int timeIndex)
         return; // No data for this hemisphere
     }
 
-    if (stc->isEmpty()) return;
+    if (stc->isEmpty())
+        return;
 
     // Clamp time index
     int tIdx = qBound(0, timeIndex, static_cast<int>(stc->data.cols()) - 1);
@@ -136,8 +138,8 @@ void SourceEstimateOverlay::applyToSurface(BrainSurface *surface, int timeIndex)
 
     // Determine if we have an interpolation matrix
     Eigen::VectorXf interpolatedData;
-    
-    if (interpMat && interpMat->rows() == static_cast<int>(vertexCount) && 
+
+    if (interpMat && interpMat->rows() == static_cast<int>(vertexCount) &&
         interpMat->cols() == sourceData.size()) {
         // Use interpolation to spread values to all vertices
         // Note: interpolateSignal returns by value, not QSharedPointer, so assignment matches
@@ -145,7 +147,7 @@ void SourceEstimateOverlay::applyToSurface(BrainSurface *surface, int timeIndex)
     } else {
         // Fall back to sparse visualization (direct mapping)
         interpolatedData = Eigen::VectorXf::Zero(vertexCount);
-        const Eigen::VectorXi &srcVertices = stc->vertices;
+        const Eigen::VectorXi& srcVertices = stc->vertices;
         for (int i = 0; i < srcVertices.size() && i < sourceData.size(); ++i) {
             int vertIdx = srcVertices(i);
             if (vertIdx >= 0 && vertIdx < static_cast<int>(vertexCount)) {
@@ -189,9 +191,10 @@ void SourceEstimateOverlay::applyToSurface(BrainSurface *surface, int timeIndex)
 
 //=============================================================================================================
 
-void SourceEstimateOverlay::setColormap(const QString &name)
+void SourceEstimateOverlay::setColormap(const QString& name)
 {
-    if (m_colormap == name) return;
+    if (m_colormap == name)
+        return;
     m_colormap = name;
     invalidateColorCache();
 }
@@ -200,7 +203,8 @@ void SourceEstimateOverlay::setColormap(const QString &name)
 
 void SourceEstimateOverlay::setThresholds(float min, float mid, float max)
 {
-    if (m_threshMin == min && m_threshMid == mid && m_threshMax == max) return;
+    if (m_threshMin == min && m_threshMid == mid && m_threshMax == max)
+        return;
     m_threshMin = min;
     m_threshMid = mid;
     m_threshMax = max;
@@ -211,8 +215,10 @@ void SourceEstimateOverlay::setThresholds(float min, float mid, float max)
 
 int SourceEstimateOverlay::numTimePoints() const
 {
-    if (m_hasLh) return m_stcLh.data.cols();
-    if (m_hasRh) return m_stcRh.data.cols();
+    if (m_hasLh)
+        return m_stcLh.data.cols();
+    if (m_hasRh)
+        return m_stcRh.data.cols();
     return 0;
 }
 
@@ -233,8 +239,10 @@ float SourceEstimateOverlay::timeAtIndex(int idx) const
 
 float SourceEstimateOverlay::tmin() const
 {
-    if (m_hasLh) return m_stcLh.tmin;
-    if (m_hasRh) return m_stcRh.tmin;
+    if (m_hasLh)
+        return m_stcLh.tmin;
+    if (m_hasRh)
+        return m_stcRh.tmin;
     return 0.0f;
 }
 
@@ -242,14 +250,16 @@ float SourceEstimateOverlay::tmin() const
 
 float SourceEstimateOverlay::tstep() const
 {
-    if (m_hasLh) return m_stcLh.tstep;
-    if (m_hasRh) return m_stcRh.tstep;
+    if (m_hasLh)
+        return m_stcLh.tstep;
+    if (m_hasRh)
+        return m_stcRh.tstep;
     return 0.0f;
 }
 
 //=============================================================================================================
 
-void SourceEstimateOverlay::getDataRange(double &minVal, double &maxVal) const
+void SourceEstimateOverlay::getDataRange(double& minVal, double& maxVal) const
 {
     minVal = std::numeric_limits<double>::max();
     maxVal = std::numeric_limits<double>::lowest();
@@ -291,12 +301,13 @@ uint32_t SourceEstimateOverlay::valueToColor(double value, uint8_t alpha) const
 
 //=============================================================================================================
 
-void SourceEstimateOverlay::computeInterpolationMatrix(BrainSurface *surface, int hemi, double cancelDist)
+void SourceEstimateOverlay::computeInterpolationMatrix(BrainSurface* surface, int hemi, double cancelDist)
 {
-    if (!surface) return;
+    if (!surface)
+        return;
 
-    const INVLIB::InvSourceEstimate *stc = nullptr;
-    QSharedPointer<Eigen::SparseMatrix<float>> *pMatPtr = nullptr;
+    const INVLIB::InvSourceEstimate* stc = nullptr;
+    QSharedPointer<Eigen::SparseMatrix<float>>* pMatPtr = nullptr;
 
     if (hemi == 0 && m_hasLh) {
         stc = &m_stcLh;
@@ -308,7 +319,8 @@ void SourceEstimateOverlay::computeInterpolationMatrix(BrainSurface *surface, in
         return;
     }
 
-    if (stc->isEmpty()) return;
+    if (stc->isEmpty())
+        return;
 
     qDebug() << "SourceEstimateOverlay: Computing interpolation matrix for hemi" << hemi;
 
@@ -321,7 +333,7 @@ void SourceEstimateOverlay::computeInterpolationMatrix(BrainSurface *surface, in
 
     qDebug() << "SourceEstimateOverlay: FsSurface has" << matVertices.rows() << "vertices,"
              << vecSourceVertices.size() << "sources";
-    
+
     if (vecSourceVertices.size() == 0) {
         qWarning() << "SourceEstimateOverlay: No source vertices found";
         return;
@@ -335,8 +347,7 @@ void SourceEstimateOverlay::computeInterpolationMatrix(BrainSurface *surface, in
         matVertices,
         vecNeighbors,
         vecSourceVertices,
-        cancelDist
-    );
+        cancelDist);
 
     if (!distTable || distTable->rows() == 0) {
         qWarning() << "SourceEstimateOverlay: Failed to compute distance table";
@@ -348,12 +359,11 @@ void SourceEstimateOverlay::computeInterpolationMatrix(BrainSurface *surface, in
     *pMatPtr = DISP3DLIB::Interpolation::createInterpolationMat(
         vecSourceVertices,
         distTable,
-        DISP3DLIB::Interpolation::cubic,  // Use cubic interpolation function
-        cancelDist
-    );
+        DISP3DLIB::Interpolation::cubic, // Use cubic interpolation function
+        cancelDist);
 
     if (*pMatPtr && (*pMatPtr)->rows() > 0) {
-        qDebug() << "SourceEstimateOverlay: Interpolation matrix created:" 
+        qDebug() << "SourceEstimateOverlay: Interpolation matrix created:"
                  << (*pMatPtr)->rows() << "x" << (*pMatPtr)->cols();
     } else {
         qWarning() << "SourceEstimateOverlay: Failed to compute interpolation matrix";
@@ -362,7 +372,7 @@ void SourceEstimateOverlay::computeInterpolationMatrix(BrainSurface *surface, in
 
 //=============================================================================================================
 
-void SourceEstimateOverlay::setStcData(const INVLIB::InvSourceEstimate &stc, int hemi)
+void SourceEstimateOverlay::setStcData(const INVLIB::InvSourceEstimate& stc, int hemi)
 {
     if (hemi == 0) {
         m_stcLh = stc;

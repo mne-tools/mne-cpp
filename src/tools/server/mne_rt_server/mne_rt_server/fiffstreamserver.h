@@ -48,15 +48,14 @@ class FiffStreamThread;
  *
  * @brief The FiffStreamServer class provides
  */
-class FiffStreamServer : public QTcpServer//, public ICommandParser //OLD remove this
+class FiffStreamServer : public QTcpServer //, public ICommandParser //OLD remove this
 {
     Q_OBJECT
 
     friend class FiffStreamThread;
 
 public:
-
-    FiffStreamServer(QObject *parent = 0);
+    FiffStreamServer(QObject* parent = 0);
 
     //=========================================================================================================
     /**
@@ -76,7 +75,7 @@ public:
      */
     void connectCommands();
 
-//public slots: --> in Qt 5 not anymore declared as slot
+    //public slots: --> in Qt 5 not anymore declared as slot
     void forwardMeasInfo(qint32 ID, const FIFFLIB::FiffInfo& p_fiffInfo);
     void forwardRawBuffer(QSharedPointer<Eigen::MatrixXf> m_pMatRawData);
 
@@ -118,7 +117,7 @@ private:
      *
      * @param[in] p_command  The start command.
      */
-    void comStart(COMLIB::Command p_command);//comMeas
+    void comStart(COMLIB::Command p_command); //comMeas
 
     //=========================================================================================================
     /**
@@ -139,7 +138,7 @@ private:
     QByteArray parseToId(QString& p_sRawId, qint32& p_iParsedId);
 
     QMap<qint32, FiffStreamThread*> m_qClientList;
-    qint32                          m_iNextClientId;
+    qint32 m_iNextClientId;
 };
 
 //=============================================================================================================

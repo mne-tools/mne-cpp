@@ -53,7 +53,7 @@ using namespace MNEBROWSE;
  *
  * @brief Checks the derivation rules of the mne_browse virtual channel model.
  */
-class TestBrowseVirtualChannels: public QObject
+class TestBrowseVirtualChannels : public QObject
 {
     Q_OBJECT
 
@@ -192,10 +192,10 @@ void TestBrowseVirtualChannels::weights_matchReferenceCount_data()
     // too many, or none, and after normalisation there must be exactly one
     // weight per surviving reference. Anything else pairs a weight with the
     // wrong channel, which is a wrong derivation that still plots.
-    QTest::newRow("exact")      << QStringList{"A", "B"}      << QVector<double>{0.5, 0.5} << 2;
-    QTest::newRow("too few")    << QStringList{"A", "B", "C"} << QVector<double>{0.5}      << 3;
-    QTest::newRow("too many")   << QStringList{"A"}           << QVector<double>{0.5, 0.25, 0.25} << 1;
-    QTest::newRow("none")       << QStringList{"A", "B"}      << QVector<double>()         << 2;
+    QTest::newRow("exact") << QStringList{"A", "B"} << QVector<double>{0.5, 0.5} << 2;
+    QTest::newRow("too few") << QStringList{"A", "B", "C"} << QVector<double>{0.5} << 3;
+    QTest::newRow("too many") << QStringList{"A"} << QVector<double>{0.5, 0.25, 0.25} << 1;
+    QTest::newRow("none") << QStringList{"A", "B"} << QVector<double>() << 2;
     QTest::newRow("with dupes") << QStringList{"A", "A", "B"} << QVector<double>{1.0, 2.0, 3.0} << 2;
 }
 
@@ -218,8 +218,8 @@ void TestBrowseVirtualChannels::weights_matchReferenceCount()
     QVERIFY2(definitions.at(0).referenceWeights.size() == definitions.at(0).referenceChannels.size(),
              qPrintable(QString("%1 references but %2 weights, so at least one weight applies to "
                                 "the wrong channel")
-                        .arg(definitions.at(0).referenceChannels.size())
-                        .arg(definitions.at(0).referenceWeights.size())));
+                            .arg(definitions.at(0).referenceChannels.size())
+                            .arg(definitions.at(0).referenceWeights.size())));
 }
 
 //=============================================================================================================
@@ -231,12 +231,12 @@ void TestBrowseVirtualChannels::removeRows_rejectsOutOfRange_data()
 
     // The model holds two rows in the test below. Every one of these would
     // index outside it, and a caller acts on the return value.
-    QTest::newRow("negative position") << -1 <<  1;
-    QTest::newRow("zero rows")         <<  0 <<  0;
-    QTest::newRow("negative rows")     <<  0 << -1;
-    QTest::newRow("past the end")      <<  2 <<  1;
-    QTest::newRow("straddles the end") <<  1 <<  5;
-    QTest::newRow("far past the end")  << 99 <<  1;
+    QTest::newRow("negative position") << -1 << 1;
+    QTest::newRow("zero rows") << 0 << 0;
+    QTest::newRow("negative rows") << 0 << -1;
+    QTest::newRow("past the end") << 2 << 1;
+    QTest::newRow("straddles the end") << 1 << 5;
+    QTest::newRow("far past the end") << 99 << 1;
 }
 
 //=============================================================================================================

@@ -17,8 +17,17 @@
 namespace CORTICALSURFACEPLUGIN
 {
 
-const char* buildDateTime() { return UTILSLIB::dateTimeNow(); }
-const char* buildHash()     { return UTILSLIB::gitHash();     }
-const char* buildHashLong() { return UTILSLIB::gitHashLong(); }
+const char* buildDateTime()
+{
+    return UTILSLIB::dateTimeNow();
+}
+const char* buildHash()
+{
+    return UTILSLIB::gitHash();
+}
+const char* buildHashLong()
+{
+    return UTILSLIB::gitHashLong();
+}
 
 } // namespace CORTICALSURFACEPLUGIN

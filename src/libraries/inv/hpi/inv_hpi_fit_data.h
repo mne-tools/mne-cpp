@@ -48,10 +48,11 @@
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-namespace FIFFLIB{
-    class FiffInfo;
-    class FiffCoordTrans;
-    class FiffDigPointSet;
+namespace FIFFLIB
+{
+class FiffInfo;
+class FiffCoordTrans;
+class FiffDigPointSet;
 }
 
 //=============================================================================================================
@@ -69,7 +70,8 @@ namespace INVLIB
  *
  * @brief Residual error and moment vector from a single magnetic dipole fit iteration
  */
-struct DipFitError {
+struct DipFitError
+{
     double error;
     Eigen::MatrixXd moment;
     int numIterations;
@@ -81,7 +83,8 @@ struct DipFitError {
  *
  * @brief Helper for sorting HPI coil dipole fits by matching each fit to the nearest expected coil position
  */
-struct HPISortStruct {
+struct HPISortStruct
+{
     double base_arr;
     int idx;
 };
@@ -102,10 +105,9 @@ struct HPISortStruct {
  */
 class INVSHARED_EXPORT InvHpiFitData
 {
-
 public:
-    typedef QSharedPointer<InvHpiFitData> SPtr;             /**< Shared pointer type for InvHpiFitData. */
-    typedef QSharedPointer<const InvHpiFitData> ConstSPtr;  /**< Const shared pointer type for InvHpiFitData. */
+    typedef QSharedPointer<InvHpiFitData> SPtr;            /**< Shared pointer type for InvHpiFitData. */
+    typedef QSharedPointer<const InvHpiFitData> ConstSPtr; /**< Const shared pointer type for InvHpiFitData. */
 
     //=========================================================================================================
     /**
@@ -119,14 +121,14 @@ public:
      */
     void doDipfitConcurrent();
 
-    Eigen::MatrixXd         m_coilPos;
-    Eigen::RowVectorXd      m_sensorData;
-    DipFitError             m_errorInfo;
-    InvSensorSet               m_sensors;
-    Eigen::MatrixXd         m_matProjector;
+    Eigen::MatrixXd m_coilPos;
+    Eigen::RowVectorXd m_sensorData;
+    DipFitError m_errorInfo;
+    InvSensorSet m_sensors;
+    Eigen::MatrixXd m_matProjector;
 
-    int                     m_iMaxIterations;
-    float                   m_fAbortError;
+    int m_iMaxIterations;
+    float m_fAbortError;
 
 protected:
     //=========================================================================================================
@@ -210,7 +212,7 @@ protected:
                                const Eigen::MatrixXd& matData,
                                const Eigen::MatrixXd& matProjectors,
                                const InvSensorSet& sensors,
-                               int &iSimplexNumitr);
+                               int& iSimplexNumitr);
 };
 
 //=============================================================================================================

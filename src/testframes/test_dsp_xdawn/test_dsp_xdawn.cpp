@@ -22,12 +22,13 @@ using namespace UTILSLIB;
 using namespace MNELIB;
 using namespace Eigen;
 
-namespace {
+namespace
+{
 
 struct SyntheticXdawnData
 {
     QVector<MNEEpochData> epochs;
-    MatrixXd              targetTemplate;
+    MatrixXd targetTemplate;
 };
 
 SyntheticXdawnData makeSyntheticEpochs()
@@ -151,12 +152,12 @@ private slots:
 
         QVERIFY2(firstScore >= secondScore,
                  qPrintable(QString("First xDAWN filter score (%1) should be >= second filter score (%2).")
-                            .arg(firstScore)
-                            .arg(secondScore)));
+                                .arg(firstScore)
+                                .arg(secondScore)));
         QVERIFY2(firstScore > meanRawScore,
                  qPrintable(QString("First xDAWN filter score (%1) did not exceed mean raw-channel score (%2).")
-                            .arg(firstScore)
-                            .arg(meanRawScore)));
+                                .arg(firstScore)
+                                .arg(meanRawScore)));
     }
 
     void fit_missingTarget_returnsInvalid()

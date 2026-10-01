@@ -60,7 +60,7 @@ public:
      *
      * @param [in] parent pointer to parent widget; If parent is 0, the new DataMarker becomes a window. If parent is another widget, DataMarker becomes a child window inside parent. DataWindow is deleted when its parent is deleted.
      */
-    DataMarker(QWidget *parent = 0);
+    DataMarker(QWidget* parent = 0);
 
     //=========================================================================================================
     /**
@@ -76,43 +76,43 @@ public:
      *
      * @param[in] color  Marker colour.
      */
-    void setMarkerColor(const QColor &color);
+    void setMarkerColor(const QColor& color);
 
 private:
     //=========================================================================================================
     /**
      * Reimplemnted mouse press event handler
      */
-    void mousePressEvent(QMouseEvent *event);
+    void mousePressEvent(QMouseEvent* event);
 
     //=========================================================================================================
     /**
      * Reimplemnted mouse move event handler
      */
-    void mouseMoveEvent(QMouseEvent *event);
+    void mouseMoveEvent(QMouseEvent* event);
 
     //=========================================================================================================
     /**
      * Reimplemnted enter event handler
      */
-    void enterEvent(QEnterEvent *event);
+    void enterEvent(QEnterEvent* event);
 
     //=========================================================================================================
     /**
      * Reimplemented leave event handler.
      */
-    void leaveEvent(QEvent *event);
+    void leaveEvent(QEvent* event);
 
     //=========================================================================================================
     /**
      * Reimplemnted move event handler
      */
-    void moveEvent(QMoveEvent *event);
+    void moveEvent(QMoveEvent* event);
 
-    QPoint      m_oldPos;               /**< The old mouse position */
-    QRegion     m_movableRegion;        /**< The movement boundary */
+    QPoint m_oldPos;         /**< The old mouse position */
+    QRegion m_movableRegion; /**< The movement boundary */
 
-    QSettings   m_qSettings;            /**< QSettings variable used to write or read from independent application sessions */
+    QSettings m_qSettings; /**< QSettings variable used to write or read from independent application sessions */
 
 
 signals:

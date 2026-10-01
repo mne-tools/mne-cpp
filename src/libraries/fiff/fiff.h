@@ -93,7 +93,9 @@ public:
     /**
      * dtor
      */
-    virtual ~Fiff(){ }
+    virtual ~Fiff()
+    {
+    }
 
     //Alphabetic ordered MNE Toolbox fiff_function
     //=========================================================================================================
@@ -289,7 +291,7 @@ public:
      * @return Info modified according to sel.
      */
     inline static FiffInfo pick_info(const FiffInfo& info,
-                                     const Eigen::RowVectorXi &sel = defaultVectorXi)
+                                     const Eigen::RowVectorXi& sel = defaultVectorXi)
     {
         return info.pick_info(sel);
     }
@@ -311,7 +313,7 @@ public:
      *
      * @return the selector matrix (row vector).
      */
-    inline static Eigen::RowVectorXi pick_types(FiffInfo &info,
+    inline static Eigen::RowVectorXi pick_types(FiffInfo& info,
                                                 bool meg,
                                                 bool eeg = false,
                                                 bool stim = false,
@@ -384,7 +386,7 @@ public:
     static inline bool read_evoked(QIODevice& p_IODevice,
                                    FiffEvoked& data,
                                    QVariant setno = 0,
-                                   QPair<float,float> baseline = defaultFloatPair,
+                                   QPair<float, float> baseline = defaultFloatPair,
                                    bool proj = true,
                                    fiff_int_t p_aspect_kind = FIFFV_ASPECT_AVERAGE)
     {
@@ -572,7 +574,7 @@ public:
      *
      * @return true if succeeded, false otherwise.
      */
-    inline static bool setup_read_raw(QIODevice &p_IODevice, FiffRawData& data, bool allow_maxshield = false)
+    inline static bool setup_read_raw(QIODevice& p_IODevice, FiffRawData& data, bool allow_maxshield = false)
     {
         return FiffStream::setup_read_raw(p_IODevice, data, allow_maxshield);
     }
@@ -642,7 +644,7 @@ public:
      *
      * @return the started fiff file.
      */
-    inline static FiffStream::SPtr start_writing_raw(QIODevice &p_IODevice,
+    inline static FiffStream::SPtr start_writing_raw(QIODevice& p_IODevice,
                                                      const FiffInfo& info,
                                                      Eigen::RowVectorXd& cals,
                                                      Eigen::MatrixXi sel = defaultMatrixXi)
@@ -816,7 +818,7 @@ public:
      * @param[in] kind       The tag kind to use for the data.
      * @param[in] mat        The data matrix.
      */
-    inline static void write_named_matrix(FiffStream* p_pStream, fiff_int_t kind,FiffNamedMatrix& mat)
+    inline static void write_named_matrix(FiffStream* p_pStream, fiff_int_t kind, FiffNamedMatrix& mat)
     {
         p_pStream->write_named_matrix(kind, mat);
     }

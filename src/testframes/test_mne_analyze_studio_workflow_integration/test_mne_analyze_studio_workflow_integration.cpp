@@ -50,23 +50,23 @@ QString sampleRawFifPath()
 {
     // Honour an explicit env-var override first.
     const QString envPath = QString::fromUtf8(qgetenv("MNE_CPP_TEST_DATA_PATH")).trimmed();
-    if(!envPath.isEmpty()) {
+    if (!envPath.isEmpty()) {
         const QString candidate = QDir(envPath).filePath(
             QStringLiteral("MEG/sample/sample_audvis_trunc_raw.fif"));
-        if(QFileInfo::exists(candidate)) {
+        if (QFileInfo::exists(candidate)) {
             return candidate;
         }
     }
 
     // Walk up from the test binary looking for resources/data/mne-cpp-test-data.
     QDir dir(QCoreApplication::applicationDirPath());
-    for(int depth = 0; depth < 10; ++depth) {
+    for (int depth = 0; depth < 10; ++depth) {
         const QString candidate = dir.filePath(
             QStringLiteral("resources/data/mne-cpp-test-data/MEG/sample/sample_audvis_trunc_raw.fif"));
-        if(QFileInfo::exists(candidate)) {
+        if (QFileInfo::exists(candidate)) {
             return QFileInfo(candidate).absoluteFilePath();
         }
-        if(!dir.cdUp()) {
+        if (!dir.cdUp()) {
             break;
         }
     }
@@ -76,30 +76,12 @@ QString sampleRawFifPath()
 // Build a minimal .mne JSON document with one temporal-filter node
 // that reads from |inputUri| (file:// URI or absolute path).
 QByteArray singleNodeWorkflowJson(const QString& inputUri,
-                                  double          highpass,
-                                  double          lowpass)
+                                  double highpass,
+                                  double lowpass)
 {
     const QJsonObject document{
-        {"resources", QJsonArray{
-            QJsonObject{
-                {"uid",  "raw_in"},
-                {"type", "fiff_raw"},
-                {"uri",  inputUri}
-            }
-        }},
-        {"pipeline", QJsonArray{
-            QJsonObject{
-                {"uid",      "filter_node"},
-                {"skill_id", "mne.skills.temporal_filter"},
-                {"inputs",   QJsonObject{{"raw_data", "raw_in"}}},
-                {"parameters", QJsonObject{
-                    {"highpass", highpass},
-                    {"lowpass",  lowpass}
-                }},
-                {"outputs", QJsonObject{{"filtered_data", "filtered_out"}}}
-            }
-        }}
-    };
+        {"resources", QJsonArray{QJsonObject{{"uid", "raw_in"}, {"type", "fiff_raw"}, {"uri", inputUri}}}},
+        {"pipeline", QJsonArray{QJsonObject{{"uid", "filter_node"}, {"skill_id", "mne.skills.temporal_filter"}, {"inputs", QJsonObject{{"raw_data", "raw_in"}}}, {"parameters", QJsonObject{{"highpass", highpass}, {"lowpass", lowpass}}}, {"outputs", QJsonObject{{"filtered_data", "filtered_out"}}}}}}};
     return QJsonDocument(document).toJson(QJsonDocument::Compact);
 }
 
@@ -107,26 +89,8 @@ QByteArray singleNodeWorkflowJson(const QString& inputUri,
 QByteArray twoNodeChainJson(const QString& inputUri)
 {
     const QJsonObject document{
-        {"resources", QJsonArray{
-            QJsonObject{{"uid", "raw_in"}, {"type", "fiff_raw"}, {"uri", inputUri}}
-        }},
-        {"pipeline", QJsonArray{
-            QJsonObject{
-                {"uid",      "preclean"},
-                {"skill_id", "mne.skills.temporal_filter"},
-                {"inputs",   QJsonObject{{"raw_data", "raw_in"}}},
-                {"parameters", QJsonObject{{"highpass", 1.0}, {"lowpass", 80.0}}},
-                {"outputs",  QJsonObject{{"filtered_data", "preclean_out"}}}
-            },
-            QJsonObject{
-                {"uid",      "alpha"},
-                {"skill_id", "mne.skills.temporal_filter"},
-                {"inputs",   QJsonObject{{"raw_data", "preclean_out"}}},
-                {"parameters", QJsonObject{{"highpass", 8.0}, {"lowpass", 13.0}}},
-                {"outputs",  QJsonObject{{"filtered_data", "alpha_out"}}}
-            }
-        }}
-    };
+        {"resources", QJsonArray{QJsonObject{{"uid", "raw_in"}, {"type", "fiff_raw"}, {"uri", inputUri}}}},
+        {"pipeline", QJsonArray{QJsonObject{{"uid", "preclean"}, {"skill_id", "mne.skills.temporal_filter"}, {"inputs", QJsonObject{{"raw_data", "raw_in"}}}, {"parameters", QJsonObject{{"highpass", 1.0}, {"lowpass", 80.0}}}, {"outputs", QJsonObject{{"filtered_data", "preclean_out"}}}}, QJsonObject{{"uid", "alpha"}, {"skill_id", "mne.skills.temporal_filter"}, {"inputs", QJsonObject{{"raw_data", "preclean_out"}}}, {"parameters", QJsonObject{{"highpass", 8.0}, {"lowpass", 13.0}}}, {"outputs", QJsonObject{{"filtered_data", "alpha_out"}}}}}}};
     return QJsonDocument(document).toJson(QJsonDocument::Compact);
 }
 
@@ -162,14 +126,14 @@ private slots:
 
 private:
     QString m_sampleFifPath;
-    bool    m_hasFifData = false;
+    bool m_hasFifData = false;
 };
 
 void TestWorkflowIntegration::initTestCase()
 {
     m_sampleFifPath = sampleRawFifPath();
-    m_hasFifData    = !m_sampleFifPath.isEmpty();
-    if(!m_hasFifData) {
+    m_hasFifData = !m_sampleFifPath.isEmpty();
+    if (!m_hasFifData) {
         qWarning("sample_audvis_trunc_raw.fif not found — execution tests will be skipped.");
         qWarning("Set MNE_CPP_TEST_DATA_PATH to the mne-cpp-test-data root to enable them.");
     }
@@ -215,25 +179,18 @@ void TestWorkflowIntegration::testParserAcceptsChainedNodes()
 void TestWorkflowIntegration::testParserRejectsMissingSkillId()
 {
     const QJsonObject document{
-        {"resources", QJsonArray{
-            QJsonObject{{"uid","raw_in"},{"type","fiff_raw"},{"uri","file:///tmp/x.fif"}}
-        }},
-        {"pipeline", QJsonArray{
-            QJsonObject{
-                {"uid",     "bad_node"},
-                // skill_id deliberately omitted
-                {"inputs",  QJsonObject{{"raw_data","raw_in"}}},
-                {"outputs", QJsonObject{{"filtered_data","out"}}}
-            }
-        }}
-    };
+        {"resources", QJsonArray{QJsonObject{{"uid", "raw_in"}, {"type", "fiff_raw"}, {"uri", "file:///tmp/x.fif"}}}},
+        {"pipeline", QJsonArray{QJsonObject{{"uid", "bad_node"},
+                                            // skill_id deliberately omitted
+                                            {"inputs", QJsonObject{{"raw_data", "raw_in"}}},
+                                            {"outputs", QJsonObject{{"filtered_data", "out"}}}}}}};
     const QByteArray json = QJsonDocument(document).toJson(QJsonDocument::Compact);
 
     PipelineParser parser;
     bool threw = false;
     try {
         parser.parseJson(json, QStringLiteral("test"));
-    } catch(const std::exception&) {
+    } catch (const std::exception&) {
         threw = true;
     }
     QVERIFY2(threw, "Parser must throw for a node missing skill_id.");
@@ -243,29 +200,15 @@ void TestWorkflowIntegration::testParserRejectsCyclicGraph()
 {
     // node A reads from output of B, node B reads from output of A → cycle.
     const QJsonObject document{
-        {"resources", QJsonArray{
-            QJsonObject{{"uid","raw_in"},{"type","fiff_raw"},{"uri","file:///tmp/x.fif"}}
-        }},
-        {"pipeline", QJsonArray{
-            QJsonObject{
-                {"uid","nodeA"},{"skill_id","mne.skills.temporal_filter"},
-                {"inputs",  QJsonObject{{"raw_data","out_b"}}},
-                {"outputs", QJsonObject{{"filtered_data","out_a"}}}
-            },
-            QJsonObject{
-                {"uid","nodeB"},{"skill_id","mne.skills.temporal_filter"},
-                {"inputs",  QJsonObject{{"raw_data","out_a"}}},
-                {"outputs", QJsonObject{{"filtered_data","out_b"}}}
-            }
-        }}
-    };
+        {"resources", QJsonArray{QJsonObject{{"uid", "raw_in"}, {"type", "fiff_raw"}, {"uri", "file:///tmp/x.fif"}}}},
+        {"pipeline", QJsonArray{QJsonObject{{"uid", "nodeA"}, {"skill_id", "mne.skills.temporal_filter"}, {"inputs", QJsonObject{{"raw_data", "out_b"}}}, {"outputs", QJsonObject{{"filtered_data", "out_a"}}}}, QJsonObject{{"uid", "nodeB"}, {"skill_id", "mne.skills.temporal_filter"}, {"inputs", QJsonObject{{"raw_data", "out_a"}}}, {"outputs", QJsonObject{{"filtered_data", "out_b"}}}}}}};
     const QByteArray json = QJsonDocument(document).toJson(QJsonDocument::Compact);
 
     PipelineParser parser;
     bool threw = false;
     try {
         parser.parseJson(json, QStringLiteral("test"));
-    } catch(const std::exception&) {
+    } catch (const std::exception&) {
         threw = true;
     }
     QVERIFY2(threw, "Parser must throw for a cyclic graph.");
@@ -291,7 +234,7 @@ void TestWorkflowIntegration::testManagerRejectsNullOperator()
     bool threw = false;
     try {
         manager.registerOperator(nullptr);
-    } catch(const std::exception&) {
+    } catch (const std::exception&) {
         threw = true;
     }
     QVERIFY2(threw, "registerOperator must throw for a null pointer.");
@@ -303,7 +246,7 @@ void TestWorkflowIntegration::testManagerRejectsNullOperator()
 
 void TestWorkflowIntegration::testSingleNodeFilterProducesOutputFile()
 {
-    if(!m_hasFifData) {
+    if (!m_hasFifData) {
         QSKIP("FIFF test data not available.");
     }
 
@@ -313,7 +256,7 @@ void TestWorkflowIntegration::testSingleNodeFilterProducesOutputFile()
     QVERIFY(tmp.open());
 
     const QString inputUri = QString("file://%1").arg(m_sampleFifPath);
-    const QByteArray json  = singleNodeWorkflowJson(inputUri, 1.0, 40.0);
+    const QByteArray json = singleNodeWorkflowJson(inputUri, 1.0, 40.0);
     tmp.write(json);
     tmp.flush();
     const QString tmpPath = tmp.fileName();
@@ -332,7 +275,7 @@ void TestWorkflowIntegration::testSingleNodeFilterProducesOutputFile()
     bool threw = false;
     try {
         manager.loadAnalysisFile(tmpPath);
-    } catch(const std::exception& e) {
+    } catch (const std::exception& e) {
         threw = true;
         QFAIL(QString("Unexpected exception: %1").arg(e.what()).toUtf8().constData());
     }
@@ -346,19 +289,19 @@ void TestWorkflowIntegration::testSingleNodeFilterProducesOutputFile()
     QVERIFY2(!produced.isEmpty(), "Expected a filtered FIFF output file on disk.");
 
     // Cleanup: remove any files we created to keep the test directory tidy.
-    for(const QString& fileName : produced) {
+    for (const QString& fileName : produced) {
         QFile::remove(inputDir.filePath(fileName));
     }
 }
 
 void TestWorkflowIntegration::testTwoNodeChainBothFilesProduced()
 {
-    if(!m_hasFifData) {
+    if (!m_hasFifData) {
         QSKIP("FIFF test data not available.");
     }
 
     const QString inputUri = QString("file://%1").arg(m_sampleFifPath);
-    const QByteArray json  = twoNodeChainJson(inputUri);
+    const QByteArray json = twoNodeChainJson(inputUri);
 
     PipelineParser parser;
     WorkflowGraph graph = parser.parseJson(json, QStringLiteral("test"));
@@ -388,12 +331,12 @@ void TestWorkflowIntegration::testTwoNodeChainBothFilesProduced()
         f.write(json);
         f.close();
         manager.loadAnalysisFile(analysisFilePath);
-    } catch(const std::exception& e) {
+    } catch (const std::exception& e) {
         threw = true;
         exceptionMessage = QString::fromUtf8(e.what());
     }
 
-    if(threw) {
+    if (threw) {
         QFAIL(QString("Two-node chain threw: %1").arg(exceptionMessage).toUtf8().constData());
     }
 
@@ -404,13 +347,15 @@ void TestWorkflowIntegration::testTwoNodeChainBothFilesProduced()
 
     // Check both nodes are completed in the final graph.
     const QJsonObject finalGraph = emissions.last();
-    const QJsonArray pipeline    = finalGraph.value(QStringLiteral("pipeline")).toArray();
+    const QJsonArray pipeline = finalGraph.value(QStringLiteral("pipeline")).toArray();
     int completedCount = 0;
-    for(const QJsonValue& v : pipeline) {
+    for (const QJsonValue& v : pipeline) {
         const QString status = v.toObject()
-                                   .value(QStringLiteral("runtime")).toObject()
-                                   .value(QStringLiteral("status")).toString();
-        if(status == QLatin1String("completed")) {
+                                   .value(QStringLiteral("runtime"))
+                                   .toObject()
+                                   .value(QStringLiteral("status"))
+                                   .toString();
+        if (status == QLatin1String("completed")) {
             ++completedCount;
         }
     }
@@ -421,19 +366,19 @@ void TestWorkflowIntegration::testTwoNodeChainBothFilesProduced()
     const QDir inputDir = inputInfo.dir();
     const QStringList produced = inputDir.entryList(
         QStringList() << QStringLiteral("*_hp*Hz_lp*Hz.fif"), QDir::Files);
-    for(const QString& fileName : produced) {
+    for (const QString& fileName : produced) {
         QFile::remove(inputDir.filePath(fileName));
     }
 }
 
 void TestWorkflowIntegration::testNodeStatusUpdatedAfterExecution()
 {
-    if(!m_hasFifData) {
+    if (!m_hasFifData) {
         QSKIP("FIFF test data not available.");
     }
 
     const QString inputUri = QString("file://%1").arg(m_sampleFifPath);
-    const QByteArray json  = singleNodeWorkflowJson(inputUri, 1.0, 40.0);
+    const QByteArray json = singleNodeWorkflowJson(inputUri, 1.0, 40.0);
 
     PipelineParser parser;
     WorkflowGraph graph = parser.parseJson(json, QStringLiteral("test"));
@@ -457,7 +402,7 @@ void TestWorkflowIntegration::testNodeStatusUpdatedAfterExecution()
     bool threw = false;
     try {
         manager.loadAnalysisFile(analysisFilePath);
-    } catch(const std::exception&) {
+    } catch (const std::exception&) {
         threw = true;
     }
     QVERIFY(!threw);
@@ -465,9 +410,7 @@ void TestWorkflowIntegration::testNodeStatusUpdatedAfterExecution()
 
     const QJsonArray pipeline = lastGraph.value(QStringLiteral("pipeline")).toArray();
     QCOMPARE(pipeline.size(), 1);
-    const QString status = pipeline.at(0).toObject()
-                               .value(QStringLiteral("runtime")).toObject()
-                               .value(QStringLiteral("status")).toString();
+    const QString status = pipeline.at(0).toObject().value(QStringLiteral("runtime")).toObject().value(QStringLiteral("status")).toString();
     QCOMPARE(status, QStringLiteral("completed"));
 
     // Cleanup.
@@ -475,21 +418,21 @@ void TestWorkflowIntegration::testNodeStatusUpdatedAfterExecution()
     const QDir inputDir = inputInfo.dir();
     const QStringList produced = inputDir.entryList(
         QStringList() << QStringLiteral("*_hp*Hz_lp*Hz.fif"), QDir::Files);
-    for(const QString& fileName : produced) {
+    for (const QString& fileName : produced) {
         QFile::remove(inputDir.filePath(fileName));
     }
 }
 
 void TestWorkflowIntegration::testHighpassAboveLowpassReturnsError()
 {
-    if(!m_hasFifData) {
+    if (!m_hasFifData) {
         QSKIP("FIFF test data not available.");
     }
 
     // highpass (50 Hz) > lowpass (10 Hz) → TemporalFilterSkill should return error
     // and WorkflowManager should propagate it as a WorkflowValidationError.
     const QString inputUri = QString("file://%1").arg(m_sampleFifPath);
-    const QByteArray json  = singleNodeWorkflowJson(inputUri, 50.0, 10.0);
+    const QByteArray json = singleNodeWorkflowJson(inputUri, 50.0, 10.0);
 
     PipelineParser parser;
     WorkflowGraph graph = parser.parseJson(json, QStringLiteral("test"));
@@ -509,7 +452,7 @@ void TestWorkflowIntegration::testHighpassAboveLowpassReturnsError()
     bool threw = false;
     try {
         manager.loadAnalysisFile(analysisFilePath);
-    } catch(const std::exception&) {
+    } catch (const std::exception&) {
         threw = true;
     }
     QVERIFY2(threw,

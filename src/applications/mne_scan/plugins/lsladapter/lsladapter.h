@@ -44,12 +44,14 @@
 
 class QListWidgetItem;
 
-namespace SCMEASLIB {
-    class RealTimeMultiSampleArray;
+namespace SCMEASLIB
+{
+class RealTimeMultiSampleArray;
 }
 
-namespace FIFFLIB {
-    class FiffInfo;
+namespace FIFFLIB
+{
+class FiffInfo;
 }
 
 //=============================================================================================================
@@ -177,21 +179,21 @@ private:
     inline static bool isValid(const LSLLIB::stream_info& s);
 
     // fiff info / data output
-    float                                           m_fSamplingFrequency;
-    int                                             m_iNumberChannels;
-    int                                             m_iOutputBlockSize;
-    QSharedPointer<FIFFLIB::FiffInfo>               m_pFiffInfo;
-    QSharedPointer<SCSHAREDLIB::PluginOutputData<SCMEASLIB::RealTimeMultiSampleArray> > m_pRTMSA;
+    float m_fSamplingFrequency;
+    int m_iNumberChannels;
+    int m_iOutputBlockSize;
+    QSharedPointer<FIFFLIB::FiffInfo> m_pFiffInfo;
+    QSharedPointer<SCSHAREDLIB::PluginOutputData<SCMEASLIB::RealTimeMultiSampleArray>> m_pRTMSA;
 
     // LSL stream management
-    QFutureWatcher<QVector<LSLLIB::stream_info> >      m_updateStreamsFutureWatcher;
-    QVector<LSLLIB::stream_info>                       m_vAvailableStreams;
-    LSLLIB::stream_info                                m_currentStream;
-    bool                                            m_bHasValidStream;
+    QFutureWatcher<QVector<LSLLIB::stream_info>> m_updateStreamsFutureWatcher;
+    QVector<LSLLIB::stream_info> m_vAvailableStreams;
+    LSLLIB::stream_info m_currentStream;
+    bool m_bHasValidStream;
 
     // producer management
-    QThread                                         m_producerThread;
-    LSLAdapterProducer*                             m_pProducer;
+    QThread m_producerThread;
+    LSLAdapterProducer* m_pProducer;
 
 signals:
     //=========================================================================================================
@@ -225,7 +227,7 @@ inline QString LSLAdapter::getName() const
 inline bool LSLAdapter::contains(const QVector<LSLLIB::stream_info>& v, const LSLLIB::stream_info& s)
 {
     bool result = false;
-    for(const auto& s2 : v)
+    for (const auto& s2 : v)
         result = result | (s2.uid() == s.uid());
     return result;
 }

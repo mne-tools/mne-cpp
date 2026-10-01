@@ -59,29 +59,30 @@ namespace EDF2FIFF
 * Enum that contains the LENGTHS of the header fields. Note that e.g. NUM_DATA_RECORDS = 8 does NOT mean that
 * that there are 8 data records in the file, but rather that you need to read 8 bytes to obtain the number of records.
 */
-enum EDFHEADERFIELDS {  // general fields for the EDF file
-                        EDF_VERSION = 8,
-                        LOCAL_PATIENT_INFO = 80,
-                        LOCAL_RECORD_INFO = 80,
-                        STARTDATE = 8,
-                        STARTTIME = 8,
-                        NUM_BYTES_USED_FOR_HEADER = 8,
-                        HEADER_RESERVED = 44,
-                        NUM_DATA_RECORDS = 8,
-                        DURATION_DATA_RECORDS = 8,
-                        NUM_SIGNALS = 4,
-                        // fields for individual signals / channels
-                        SIG_LABEL = 16,
-                        SIG_TRANSDUCER_TYPE = 80,
-                        SIG_PHYSICAL_DIMENSION = 8,
-                        SIG_PHYSICAL_MIN = 8,
-                        SIG_PHYSICAL_MAX = 8,
-                        SIG_DIGITAL_MIN = 8,
-                        SIG_DIGITAL_MAX = 8,
-                        SIG_PREFILTERING = 80,
-                        SIG_NUM_SAMPLES_PER_DATA_RECORD = 8,
-                        SIG_RESERVED = 32
-                    };
+enum EDFHEADERFIELDS
+{ // general fields for the EDF file
+    EDF_VERSION = 8,
+    LOCAL_PATIENT_INFO = 80,
+    LOCAL_RECORD_INFO = 80,
+    STARTDATE = 8,
+    STARTTIME = 8,
+    NUM_BYTES_USED_FOR_HEADER = 8,
+    HEADER_RESERVED = 44,
+    NUM_DATA_RECORDS = 8,
+    DURATION_DATA_RECORDS = 8,
+    NUM_SIGNALS = 4,
+    // fields for individual signals / channels
+    SIG_LABEL = 16,
+    SIG_TRANSDUCER_TYPE = 80,
+    SIG_PHYSICAL_DIMENSION = 8,
+    SIG_PHYSICAL_MIN = 8,
+    SIG_PHYSICAL_MAX = 8,
+    SIG_DIGITAL_MIN = 8,
+    SIG_DIGITAL_MAX = 8,
+    SIG_PREFILTERING = 80,
+    SIG_NUM_SAMPLES_PER_DATA_RECORD = 8,
+    SIG_RESERVED = 32
+};
 
 //=============================================================================================================
 /**
@@ -91,7 +92,6 @@ enum EDFHEADERFIELDS {  // general fields for the EDF file
 */
 class EDFInfo
 {
-
 public:
     //=========================================================================================================
     /**
@@ -137,24 +137,24 @@ public:
 
 private:
     // data fields for EDF header. The member order below does NOT correlate with the order in the EDF header
-    QString     m_sEDFVersionNo;
-    QString     m_sLocalPatientIdentification;
-    QString     m_sLocalRecordingIdentification;
-    QDateTime   m_startDateTime;
-    int         m_iNumBytesInHeader;
-    int         m_iNumDataRecords;
-    float       m_fDataRecordsDuration;
-    int         m_iNumChannels;
+    QString m_sEDFVersionNo;
+    QString m_sLocalPatientIdentification;
+    QString m_sLocalRecordingIdentification;
+    QDateTime m_startDateTime;
+    int m_iNumBytesInHeader;
+    int m_iNumDataRecords;
+    float m_fDataRecordsDuration;
+    int m_iNumChannels;
 
     // convenience field, calculated by using the EDF fields
-    int         m_iNumBytesPerDataRecord;
+    int m_iNumBytesPerDataRecord;
 
     // vector of all signals / channels contained in the file. We need to know the original order of signals when reading
     // raw data from data records, otherwise misalignments are inevitable.
     QVector<EDFChannelInfo> m_vAllChannels;
     // vector of all signals / channels that contain continuous measurement data (i.e. signals that have the
     // maximum frequency). This is redundant, but very convenient.
-    QVector<EDFChannelInfo>  m_vMeasChannels;
+    QVector<EDFChannelInfo> m_vMeasChannels;
 };
 
 //*************************************************************************************************************
@@ -192,7 +192,7 @@ inline int EDFInfo::getNumberOfAllChannels() const
 
 inline int EDFInfo::getSampleCount() const
 {
-    if(m_vMeasChannels.size()) {
+    if (m_vMeasChannels.size()) {
         return m_vMeasChannels[0].getSampleCount();
     } else {
         qDebug() << "[EDFInfo::getSampleCount] Warning, no measurement channels, return -1 for sample count...";
@@ -204,7 +204,7 @@ inline int EDFInfo::getSampleCount() const
 
 inline int EDFInfo::getNumSamplesPerRecord() const
 {
-    if(m_vMeasChannels.size()) {
+    if (m_vMeasChannels.size()) {
         return m_vMeasChannels[0].getNumberOfSamplesPerRecord();
     } else {
         qDebug() << "[EDFInfo::getNumSamplesPerRecord] Warning, no measurement channels, return -1 for record sample count...";
@@ -230,7 +230,7 @@ inline int EDFInfo::getNumberOfBytesPerDataRecord() const
 
 inline float EDFInfo::getFrequency() const
 {
-    if(m_vMeasChannels.size()) {
+    if (m_vMeasChannels.size()) {
         return m_vMeasChannels[0].getFrequency();
     } else {
         qDebug() << "[EDFInfo::getFrequency] Warning, no measurement channels, return -1 for frequency ...";

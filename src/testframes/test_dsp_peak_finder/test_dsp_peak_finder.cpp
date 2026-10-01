@@ -51,7 +51,9 @@ class TestDspPeakFinder : public QObject
     Q_OBJECT
 
 private slots:
-    void initTestCase() {}
+    void initTestCase()
+    {
+    }
 
     void testSineWavePeaks()
     {
@@ -81,7 +83,7 @@ private slots:
         params.dMinHeight = 1.5;
 
         auto peaks = peakFinder(data, params);
-        QCOMPARE(peaks.size(), 2);  // Only peaks at 2.0 and 3.0
+        QCOMPARE(peaks.size(), 2); // Only peaks at 2.0 and 3.0
         QCOMPARE(peaks[0].first, 5);
         QCOMPARE(peaks[1].first, 9);
     }
@@ -115,10 +117,10 @@ private slots:
         // Signal with peaks of varying prominence
         VectorXd data(30);
         data.setZero();
-        data(5) = 1.0;    // Low prominence (between zeros)
-        data(15) = 5.0;   // High prominence
-        data(14) = 4.5;   // Shoulder — makes prominence of peak at 15 = 5-0=5
-        data(25) = 0.5;   // Very low prominence
+        data(5) = 1.0;  // Low prominence (between zeros)
+        data(15) = 5.0; // High prominence
+        data(14) = 4.5; // Shoulder — makes prominence of peak at 15 = 5-0=5
+        data(25) = 0.5; // Very low prominence
 
         PeakFinderParams params;
         params.dProminence = 2.0;
@@ -128,7 +130,8 @@ private slots:
         // Only the high-prominence peak should remain
         bool foundBigPeak = false;
         for (const auto& peak : peaks) {
-            if (peak.first == 15) foundBigPeak = true;
+            if (peak.first == 15)
+                foundBigPeak = true;
         }
         QVERIFY2(foundBigPeak, "Should find the prominent peak at index 15");
     }
@@ -186,7 +189,9 @@ private slots:
         }
     }
 
-    void cleanupTestCase() {}
+    void cleanupTestCase()
+    {
+    }
 };
 
 //=============================================================================================================

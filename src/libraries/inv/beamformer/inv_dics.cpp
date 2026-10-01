@@ -50,13 +50,13 @@ using namespace FIFFLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-InvBeamformer InvDICS::makeDICS([[maybe_unused]] const FiffInfo &info,
-                                const MNEForwardSolution &forward,
-                                const std::vector<MatrixXd> &csdMatrices,
-                                const VectorXd &frequencies,
+InvBeamformer InvDICS::makeDICS([[maybe_unused]] const FiffInfo& info,
+                                const MNEForwardSolution& forward,
+                                const std::vector<MatrixXd>& csdMatrices,
+                                const VectorXd& frequencies,
                                 double reg,
                                 bool realFilter,
-                                const FiffCov &noiseCov,
+                                const FiffCov& noiseCov,
                                 BeamformerPickOri pickOri,
                                 BeamformerWeightNorm weightNorm,
                                 bool reduceRank,
@@ -66,11 +66,11 @@ InvBeamformer InvDICS::makeDICS([[maybe_unused]] const FiffInfo &info,
     result.kind = "DICS";
 
     const int nFreqs = static_cast<int>(csdMatrices.size());
-    if(nFreqs == 0) {
+    if (nFreqs == 0) {
         qWarning("InvDICS::makeDICS - No CSD matrices provided!");
         return result;
     }
-    if(frequencies.size() != nFreqs) {
+    if (frequencies.size() != nFreqs) {
         qWarning("InvDICS::makeDICS - Frequency vector size mismatch with CSD count!");
         return result;
     }
@@ -78,7 +78,7 @@ InvBeamformer InvDICS::makeDICS([[maybe_unused]] const FiffInfo &info,
     // -----------------------------------------------------------------------
     // Extract leadfield
     // -----------------------------------------------------------------------
-    if(!forward.sol || forward.sol->data.size() == 0) {
+    if (!forward.sol || forward.sol->data.size() == 0) {
         qWarning("InvDICS::makeDICS - Forward solution has no gain matrix!");
         return result;
     }
@@ -95,9 +95,9 @@ InvBeamformer InvDICS::makeDICS([[maybe_unused]] const FiffInfo &info,
     // Whitening matrix
     // -----------------------------------------------------------------------
     MatrixXd whitener;
-    if(noiseCov.data.size() > 0 && noiseCov.eig.size() > 0 && noiseCov.eigvec.size() > 0) {
+    if (noiseCov.data.size() > 0 && noiseCov.eig.size() > 0 && noiseCov.eigvec.size() > 0) {
         VectorXd invSqrtEig(noiseCov.eig.size());
-        for(int i = 0; i < noiseCov.eig.size(); ++i) {
+        for (int i = 0; i < noiseCov.eig.size(); ++i) {
             invSqrtEig(i) = (noiseCov.eig(i) > 1e-30)
                 ? 1.0 / std::sqrt(noiseCov.eig(i))
                 : 0.0;
@@ -118,16 +118,16 @@ InvBeamformer InvDICS::makeDICS([[maybe_unused]] const FiffInfo &info,
     // -----------------------------------------------------------------------
     // Compute filter for each frequency
     // -----------------------------------------------------------------------
-    for(int fi = 0; fi < nFreqs; ++fi) {
+    for (int fi = 0; fi < nFreqs; ++fi) {
         MatrixXd Cm = csdMatrices[fi];
 
-        if(Cm.rows() != nChannels || Cm.cols() != nChannels) {
+        if (Cm.rows() != nChannels || Cm.cols() != nChannels) {
             qWarning("InvDICS::makeDICS - CSD[%d] dimension mismatch!", fi);
             return InvBeamformer();
         }
 
         // Optional: take real part of CSD
-        if(realFilter) {
+        if (realFilter) {
             // CSD is provided as real-valued after user extracts real part,
             // or we ensure it here
             Cm = Cm.real();
@@ -135,7 +135,7 @@ InvBeamformer InvDICS::makeDICS([[maybe_unused]] const FiffInfo &info,
 
         // Whiten CSD
         MatrixXd CmW = whitener * Cm * whitener.transpose();
-        CmW = (CmW + CmW.transpose()) * 0.5;  // Ensure symmetry
+        CmW = (CmW + CmW.transpose()) * 0.5; // Ensure symmetry
 
         // Compute filter
         MatrixXd W;
@@ -146,7 +146,7 @@ InvBeamformer InvDICS::makeDICS([[maybe_unused]] const FiffInfo &info,
             weightNorm, pickOri, reduceRank, invMethod,
             nn, W, mpOri);
 
-        if(!ok) {
+        if (!ok) {
             qWarning("InvDICS::makeDICS - Filter computation failed at frequency %d (%.1f Hz)!",
                      fi, frequencies(fi));
             return InvBeamformer();
@@ -155,7 +155,7 @@ InvBeamformer InvDICS::makeDICS([[maybe_unused]] const FiffInfo &info,
         result.weights.push_back(W);
 
         // Store max-power orientation from first frequency
-        if(fi == 0 && pickOri == BeamformerPickOri::MaxPower) {
+        if (fi == 0 && pickOri == BeamformerPickOri::MaxPower) {
             result.maxPowerOri = mpOri;
         }
     }
@@ -166,8 +166,7 @@ InvBeamformer InvDICS::makeDICS([[maybe_unused]] const FiffInfo &info,
     result.whitener = whitener;
     result.proj = projMat;
     result.chNames = forward.sol->row_names;
-    result.isFreOri = (nOrient == 3 && pickOri != BeamformerPickOri::Normal
-                                    && pickOri != BeamformerPickOri::MaxPower);
+    result.isFreOri = (nOrient == 3 && pickOri != BeamformerPickOri::Normal && pickOri != BeamformerPickOri::MaxPower);
     result.nSourcesTotal = nSources;
     result.srcType = "surface";
     result.weightNorm = weightNorm;
@@ -179,14 +178,14 @@ InvBeamformer InvDICS::makeDICS([[maybe_unused]] const FiffInfo &info,
     result.frequencies = frequencies;
 
     VectorXi verts(0);
-    if(forward.src.size() >= 2) {
+    if (forward.src.size() >= 2) {
         verts.resize(forward.src[0].vertno.size() + forward.src[1].vertno.size());
         verts << forward.src[0].vertno, forward.src[1].vertno;
         // Keep where the left hemisphere ends. The concatenation above is the
         // only place that knows it, and without it the result cannot be
         // written as the -lh/-rh pair mne-python expects.
         result.nVerticesLh = static_cast<int>(forward.src[0].vertno.size());
-    } else if(forward.src.size() == 1) {
+    } else if (forward.src.size() == 1) {
         verts = forward.src[0].vertno;
     }
     result.vertices = verts;
@@ -198,11 +197,11 @@ InvBeamformer InvDICS::makeDICS([[maybe_unused]] const FiffInfo &info,
 
 //=============================================================================================================
 
-InvSourceEstimate InvDICS::applyDICSCsd(const std::vector<MatrixXd> &csdMatrices,
-                                        const VectorXd &frequencies,
-                                        const InvBeamformer &filters)
+InvSourceEstimate InvDICS::applyDICSCsd(const std::vector<MatrixXd>& csdMatrices,
+                                        const VectorXd& frequencies,
+                                        const InvBeamformer& filters)
 {
-    if(!filters.isValid() || filters.kind != "DICS") {
+    if (!filters.isValid() || filters.kind != "DICS") {
         qWarning("InvDICS::applyDICSCsd - Invalid or non-DICS filters!");
         return InvSourceEstimate();
     }
@@ -210,7 +209,7 @@ InvSourceEstimate InvDICS::applyDICSCsd(const std::vector<MatrixXd> &csdMatrices
     const int nFreqs = static_cast<int>(csdMatrices.size());
     const int nFilterFreqs = filters.nFreqs();
 
-    if(nFreqs != nFilterFreqs) {
+    if (nFreqs != nFilterFreqs) {
         qWarning("InvDICS::applyDICSCsd - CSD count (%d) does not match filter count (%d)!",
                  nFreqs, nFilterFreqs);
         return InvSourceEstimate();
@@ -223,11 +222,11 @@ InvSourceEstimate InvDICS::applyDICSCsd(const std::vector<MatrixXd> &csdMatrices
     // Power matrix: (nSources, nFreqs)
     MatrixXd powerMat(nSources, nFreqs);
 
-    for(int fi = 0; fi < nFreqs; ++fi) {
+    for (int fi = 0; fi < nFreqs; ++fi) {
         MatrixXd Cm = csdMatrices[fi];
 
         // Whiten CSD
-        if(filters.whitener.size() > 0) {
+        if (filters.whitener.size() > 0) {
             Cm = filters.whitener * Cm * filters.whitener.transpose();
         }
 
@@ -252,17 +251,17 @@ InvSourceEstimate InvDICS::applyDICSCsd(const std::vector<MatrixXd> &csdMatrices
 
 //=============================================================================================================
 
-InvSourceEstimate InvDICS::applyDICS(const MatrixXd &data,
+InvSourceEstimate InvDICS::applyDICS(const MatrixXd& data,
                                      float tmin,
                                      float tstep,
-                                     const InvBeamformer &filters,
+                                     const InvBeamformer& filters,
                                      int freqIdx)
 {
-    if(!filters.isValid() || filters.kind != "DICS") {
+    if (!filters.isValid() || filters.kind != "DICS") {
         qWarning("InvDICS::applyDICS - Invalid or non-DICS filters!");
         return InvSourceEstimate();
     }
-    if(freqIdx < 0 || freqIdx >= filters.nFreqs()) {
+    if (freqIdx < 0 || freqIdx >= filters.nFreqs()) {
         qWarning("InvDICS::applyDICS - freqIdx %d out of range (0..%d)!",
                  freqIdx, filters.nFreqs() - 1);
         return InvSourceEstimate();
@@ -270,10 +269,10 @@ InvSourceEstimate InvDICS::applyDICS(const MatrixXd &data,
 
     // Apply projection + whitening + spatial filter
     MatrixXd processed = data;
-    if(filters.proj.size() > 0 && filters.proj.rows() == data.rows()) {
+    if (filters.proj.size() > 0 && filters.proj.rows() == data.rows()) {
         processed = filters.proj * processed;
     }
-    if(filters.whitener.size() > 0 && filters.whitener.rows() == processed.rows()) {
+    if (filters.whitener.size() > 0 && filters.whitener.rows() == processed.rows()) {
         processed = filters.whitener * processed;
     }
 
@@ -281,11 +280,11 @@ InvSourceEstimate InvDICS::applyDICS(const MatrixXd &data,
 
     // Combine XYZ if needed
     const int nOrient = filters.nOrient();
-    if(nOrient == 3 && filters.pickOri != BeamformerPickOri::Vector) {
+    if (nOrient == 3 && filters.pickOri != BeamformerPickOri::Vector) {
         const int nSources = static_cast<int>(sol.rows()) / 3;
         const int nTimes = static_cast<int>(sol.cols());
         MatrixXd combined(nSources, nTimes);
-        for(int s = 0; s < nSources; ++s) {
+        for (int s = 0; s < nSources; ++s) {
             combined.row(s) = sol.middleRows(s * 3, 3).colwise().norm();
         }
         sol = combined;
@@ -302,11 +301,11 @@ InvSourceEstimate InvDICS::applyDICS(const MatrixXd &data,
 
 //=============================================================================================================
 
-QList<InvSourceEstimate> InvDICS::applyDICSEpochs(const QList<MatrixXd> &epochs,
-                                                    float tmin,
-                                                    float tstep,
-                                                    const InvBeamformer &filters,
-                                                    int freqIdx)
+QList<InvSourceEstimate> InvDICS::applyDICSEpochs(const QList<MatrixXd>& epochs,
+                                                  float tmin,
+                                                  float tstep,
+                                                  const InvBeamformer& filters,
+                                                  int freqIdx)
 {
     QList<InvSourceEstimate> results;
 

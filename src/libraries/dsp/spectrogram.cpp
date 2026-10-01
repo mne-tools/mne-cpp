@@ -50,25 +50,25 @@ MatrixXd Spectrogram::makeSpectrogram(VectorXd signal, qint32 windowSize = 0)
 
     signal.array() -= signal.mean();
     QList<SpectogramInputData> lData;
-    int iThreadSize = QThread::idealThreadCount()*2;
-    int iStepsSize = signal.rows()/iThreadSize;
-    int iResidual = signal.rows()%iThreadSize;
+    int iThreadSize = QThread::idealThreadCount() * 2;
+    int iStepsSize = signal.rows() / iThreadSize;
+    int iResidual = signal.rows() % iThreadSize;
 
     SpectogramInputData dataTemp;
     dataTemp.vecInputData = signal;
     dataTemp.window_size = windowSize;
-    if(dataTemp.window_size == 0) {
-        dataTemp.window_size = signal.rows()/15;
+    if (dataTemp.window_size == 0) {
+        dataTemp.window_size = signal.rows() / 15;
     }
 
     for (int i = 0; i < iThreadSize; ++i) {
-        dataTemp.iRangeLow = i*iStepsSize;
-        dataTemp.iRangeHigh = i*iStepsSize+iStepsSize;
+        dataTemp.iRangeLow = i * iStepsSize;
+        dataTemp.iRangeHigh = i * iStepsSize + iStepsSize;
         lData.append(dataTemp);
     }
 
-    dataTemp.iRangeLow = iThreadSize*iStepsSize;
-    dataTemp.iRangeHigh = iThreadSize*iStepsSize+iResidual;
+    dataTemp.iRangeLow = iThreadSize * iStepsSize;
+    dataTemp.iRangeHigh = iThreadSize * iStepsSize + iResidual;
     lData.append(dataTemp);
 
     QFuture<MatrixXd> resultMat = QtConcurrent::mappedReduced(lData,
@@ -86,10 +86,9 @@ VectorXd Spectrogram::gaussWindow(qint32 sample_count, qreal scale, quint32 tran
 {
     VectorXd gauss = VectorXd::Zero(sample_count);
 
-    for(qint32 n = 0; n < sample_count; n++)
-    {
+    for (qint32 n = 0; n < sample_count; n++) {
         qreal t = (qreal(n) - translation) / scale;
-        gauss[n] = exp(-3.14 * pow(t, 2))*pow(sqrt(scale),(-1))*pow(qreal(2),(0.25));
+        gauss[n] = exp(-3.14 * pow(t, 2)) * pow(sqrt(scale), (-1)) * pow(qreal(2), (0.25));
     }
 
     return gauss;
@@ -99,27 +98,27 @@ VectorXd Spectrogram::gaussWindow(qint32 sample_count, qreal scale, quint32 tran
 
 MatrixXd Spectrogram::compute(const SpectogramInputData& inputData)
 {
-    #ifdef EIGEN_FFTW_DEFAULT
-        fftw_make_planner_thread_safe();
-    #endif
+#ifdef EIGEN_FFTW_DEFAULT
+    fftw_make_planner_thread_safe();
+#endif
 
     Eigen::FFT<double> fft;
-    MatrixXd tf_matrix = MatrixXd::Zero(inputData.vecInputData.rows()/2, inputData.vecInputData.rows());
+    MatrixXd tf_matrix = MatrixXd::Zero(inputData.vecInputData.rows() / 2, inputData.vecInputData.rows());
     VectorXd envelope, windowed_sig, real_coeffs;
     VectorXcd fft_win_sig;
     qint32 window_size = inputData.window_size;
 
-    for(quint32 translate = inputData.iRangeLow; translate < inputData.iRangeHigh; translate++) {
+    for (quint32 translate = inputData.iRangeLow; translate < inputData.iRangeHigh; translate++) {
         envelope = gaussWindow(inputData.vecInputData.rows(), window_size, translate);
 
         windowed_sig = VectorXd::Zero(inputData.vecInputData.rows());
         fft_win_sig = VectorXcd::Zero(inputData.vecInputData.rows());
 
-        windowed_sig = inputData.vecInputData.array() * envelope.array();\
+        windowed_sig = inputData.vecInputData.array() * envelope.array();
 
         fft.fwd(fft_win_sig, windowed_sig);
 
-        real_coeffs = fft_win_sig.segment(0,inputData.vecInputData.rows()/2).array().abs2();
+        real_coeffs = fft_win_sig.segment(0, inputData.vecInputData.rows() / 2).array().abs2();
 
         tf_matrix.col(translate) = real_coeffs;
     }
@@ -129,10 +128,10 @@ MatrixXd Spectrogram::compute(const SpectogramInputData& inputData)
 
 //=============================================================================================================
 
-void Spectrogram::reduce(MatrixXd &resultData,
-                         const MatrixXd &data)
+void Spectrogram::reduce(MatrixXd& resultData,
+                         const MatrixXd& data)
 {
-    if(resultData.size() == 0) {
+    if (resultData.size() == 0) {
         resultData = data;
     } else {
         resultData += data;

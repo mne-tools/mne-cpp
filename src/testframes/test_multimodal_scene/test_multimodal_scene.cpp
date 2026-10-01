@@ -199,8 +199,8 @@ void TestMultimodalScene::testLayersSortedByKindThenDrawOrder()
 {
     MultimodalScene s;
     // Insertion order intentionally reversed against expected draw order.
-    s.addLayer(makeLayer("net",   SceneLayerKind::Network));
-    s.addLayer(makeLayer("seeg",  SceneLayerKind::Electrode));
+    s.addLayer(makeLayer("net", SceneLayerKind::Network));
+    s.addLayer(makeLayer("seeg", SceneLayerKind::Electrode));
     s.addLayer(makeLayer("cortex", SceneLayerKind::BrainSurface));
 
     const auto layers = s.layers();
@@ -218,7 +218,7 @@ void TestMultimodalScene::testDrawOrderTieBreaker()
 
     const auto layers = s.layers();
     QCOMPARE(layers.first().id, QString("seeg_a"));
-    QCOMPARE(layers.last().id,  QString("seeg_b"));
+    QCOMPARE(layers.last().id, QString("seeg_b"));
 }
 
 //=============================================================================================================
@@ -253,7 +253,7 @@ void TestMultimodalScene::testNoSignalOnUnchangedFlag()
     MultimodalScene s;
     s.addLayer(makeLayer("a"));
     QSignalSpy spy(&s, &MultimodalScene::layersChanged);
-    s.setLayerVisible("a", true);   // already true
+    s.setLayerVisible("a", true); // already true
     QCOMPARE(spy.count(), 0);
 }
 
@@ -323,7 +323,7 @@ void TestMultimodalScene::testWorldBoundsFallsBackToUnitCubeWhenEmpty()
     QVector3D mx;
     s.worldBounds(mn, mx);
     QCOMPARE(mn, QVector3D(-1, -1, -1));
-    QCOMPARE(mx, QVector3D( 1,  1,  1));
+    QCOMPARE(mx, QVector3D(1, 1, 1));
 }
 
 void TestMultimodalScene::testWorldBoundsUnionWithRegisteredFn()
@@ -334,22 +334,22 @@ void TestMultimodalScene::testWorldBoundsUnionWithRegisteredFn()
 
     // Each Custom layer reports a fixed AABB via the extras map.
     s.registerBoundsFn(SceneLayerKind::Custom,
-        [](const SceneLayer& l, QVector3D& mn, QVector3D& mx) {
-            if (l.id == QString("a")) {
-                mn = QVector3D(-1, -1, -1);
-                mx = QVector3D( 1,  1,  1);
-                return true;
-            }
-            mn = QVector3D(2, 2, 2);
-            mx = QVector3D(3, 3, 3);
-            return true;
-        });
+                       [](const SceneLayer& l, QVector3D& mn, QVector3D& mx) {
+                           if (l.id == QString("a")) {
+                               mn = QVector3D(-1, -1, -1);
+                               mx = QVector3D(1, 1, 1);
+                               return true;
+                           }
+                           mn = QVector3D(2, 2, 2);
+                           mx = QVector3D(3, 3, 3);
+                           return true;
+                       });
 
     QVector3D mn;
     QVector3D mx;
     s.worldBounds(mn, mx);
     QCOMPARE(mn, QVector3D(-1, -1, -1));
-    QCOMPARE(mx, QVector3D( 3,  3,  3));
+    QCOMPARE(mx, QVector3D(3, 3, 3));
 }
 
 //=============================================================================================================
@@ -380,10 +380,10 @@ void TestMultimodalScene::testStripLayoutSkipsCylinderGeometry()
     ElectrodeContact c1;
     c1.name = "S2";
     c1.position = QVector3D(1, 0, 0);
-    strip.contacts = { c0, c1 };
+    strip.contacts = {c0, c1};
 
     ElectrodeObject obj;
-    obj.setArrays({ strip });
+    obj.setArrays({strip});
 
     QVector<float> verts;
     QVector<unsigned int> idx;

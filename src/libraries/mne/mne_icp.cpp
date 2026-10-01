@@ -66,40 +66,39 @@ bool MNELIB::performIcp(const MNEProjectToSurface::SPtr mneSurfacePoints,
  * 239 - 255, 1992.
  */
 {
-    if(matPointCloud.rows() == 0){
+    if (matPointCloud.rows() == 0) {
         qWarning() << "[MNELIB::icp] Passed point cloud is empty.";
         return false;
     }
 
     // Initialization
-    int iNP = matPointCloud.rows();             // The number of points
+    int iNP = matPointCloud.rows(); // The number of points
     float fMSEPrev = 0.0f;
-    float fMSE = 0.0f;                  // The mean square error
+    float fMSE = 0.0f; // The mean square error
     float fScale = 1.0f;
     MatrixXf matP0 = matPointCloud;             // Initial Set of points
     MatrixXf matPk = matP0;                     // Transformed Set of points
-    MatrixXf matYk(matPk.rows(),matPk.cols());  // Iterative closest points on the surface
+    MatrixXf matYk(matPk.rows(), matPk.cols()); // Iterative closest points on the surface
     MatrixXf matDiff = matYk;
     VectorXf vecSE(matDiff.rows());
-    Matrix4f matTrans;                          // the transformation matrix
-    VectorXi vecNearest;                        // Triangle of the new point
-    VectorXf vecDist;                           // The Distance between matX and matP
+    Matrix4f matTrans;   // the transformation matrix
+    VectorXi vecNearest; // Triangle of the new point
+    VectorXf vecDist;    // The Distance between matX and matP
 
     // Initial transformation - From point cloud To surface
     FiffCoordTrans transICP = transFromTo;
     matPk = transICP.apply_trans(matPk);
 
     // Icp algorithm:
-    for(int iIter = 0; iIter < iMaxIter; ++iIter) {
-
+    for (int iIter = 0; iIter < iMaxIter; ++iIter) {
         // Step a: compute the closest point on the surface; eq 29
-        if(!mneSurfacePoints->find_closest_on_surface(matPk, iNP, matYk, vecNearest, vecDist)) {
+        if (!mneSurfacePoints->find_closest_on_surface(matPk, iNP, matYk, vecNearest, vecDist)) {
             qWarning() << "[MNELIB::icp] find_closest_on_surface was not successful.";
             return false;
         }
 
         // Step b: compute the registration; eq 30
-        if(!fitMatchedPoints(matP0, matYk, matTrans, fScale, bScale, vecWeights)) {
+        if (!fitMatchedPoints(matP0, matYk, matTrans, fScale, bScale, vecWeights)) {
             qWarning() << "[MNELIB::icp] point cloud registration not successful";
         }
 
@@ -112,9 +111,9 @@ bool MNELIB::performIcp(const MNEProjectToSurface::SPtr mneSurfacePoints,
         fMSE = vecDist.sum() / iNP;
         fRMSE = std::sqrt(fMSE);
 
-        if(std::sqrt(std::fabs(fMSE - fMSEPrev)) < fTol) {
+        if (std::sqrt(std::fabs(fMSE - fMSEPrev)) < fTol) {
             transFromTo = transICP;
-            qInfo() << "[MNELIB::icp] ICP was successful and converged after " << iIter +1 << " iterations with RMSE dist: " << fRMSE * 1000 << " mm.";
+            qInfo() << "[MNELIB::icp] ICP was successful and converged after " << iIter + 1 << " iterations with RMSE dist: " << fRMSE * 1000 << " mm.";
             return true;
         }
         fMSEPrev = fMSE;
@@ -146,27 +145,27 @@ bool MNELIB::fitMatchedPoints(const MatrixXf& matSrcPoint,
     MatrixXf matP = matSrcPoint;
     MatrixXf matX = matDstPoint;
     VectorXf vecW = vecWeights;
-    VectorXf vecMuP;                                // column wise mean - center of mass
-    VectorXf vecMuX;                                // column wise mean - center of mass
+    VectorXf vecMuP; // column wise mean - center of mass
+    VectorXf vecMuX; // column wise mean - center of mass
     MatrixXf matDot;
-    MatrixXf matSigmaPX;                            // cross-covariance
-    MatrixXf matAij;                                // Anti-Symmetric matrix
-    Vector3f vecDelta;                              // column vector, elements of matAij
-    Matrix4f matQ = Matrix4f::Identity(4,4);
-    Matrix3f matScale = Matrix3f::Identity(3,3);    // scaling matrix
-    Matrix3f matRot = Matrix3f::Identity(3,3);
+    MatrixXf matSigmaPX; // cross-covariance
+    MatrixXf matAij;     // Anti-Symmetric matrix
+    Vector3f vecDelta;   // column vector, elements of matAij
+    Matrix4f matQ = Matrix4f::Identity(4, 4);
+    Matrix3f matScale = Matrix3f::Identity(3, 3); // scaling matrix
+    Matrix3f matRot = Matrix3f::Identity(3, 3);
     Vector3f vecTrans;
     float fTrace = 0.0;
     fScale = 1.0;
 
     // test size of point clouds
-    if(matSrcPoint.size() != matDstPoint.size()) {
+    if (matSrcPoint.size() != matDstPoint.size()) {
         qWarning() << "[MNELIB::fitMatchedPoints] Point clouds do not match.";
         return false;
     }
 
     // get center of mass
-    if(vecWeights.isZero()) {
+    if (vecWeights.isZero()) {
         vecMuP = matP.colwise().mean(); // eq 23
         vecMuX = matX.colwise().mean();
         matDot = matP.transpose() * matX;
@@ -177,40 +176,42 @@ bool MNELIB::fitMatchedPoints(const MatrixXf& matSrcPoint,
         vecMuX = vecW.transpose() * matX;
 
         MatrixXf matXWeighted = matX;
-        for(int i = 0; i < (vecW.size()); ++i) {
+        for (int i = 0; i < (vecW.size()); ++i) {
             matXWeighted.row(i) = matXWeighted.row(i) * vecW(i);
         }
         matDot = matP.transpose() * (matXWeighted);
     }
 
     // get cross-covariance
-    matSigmaPX = matDot - (vecMuP * vecMuX.transpose());  // eq 24
+    matSigmaPX = matDot - (vecMuP * vecMuX.transpose()); // eq 24
     matAij = matSigmaPX - matSigmaPX.transpose();
-    vecDelta(0) = matAij(1,2); vecDelta(1) = matAij(2,0); vecDelta(2) = matAij(0,1);
+    vecDelta(0) = matAij(1, 2);
+    vecDelta(1) = matAij(2, 0);
+    vecDelta(2) = matAij(0, 1);
     fTrace = matSigmaPX.trace();
-    matQ(0,0) = fTrace; // eq 25
-    matQ.block(0,1,1,3) = vecDelta.transpose();
-    matQ.block(1,0,3,1) = vecDelta;
-    matQ.block(1,1,3,3) = matSigmaPX + matSigmaPX.transpose() - fTrace * MatrixXf::Identity(3,3);
+    matQ(0, 0) = fTrace; // eq 25
+    matQ.block(0, 1, 1, 3) = vecDelta.transpose();
+    matQ.block(1, 0, 3, 1) = vecDelta;
+    matQ.block(1, 1, 3, 3) = matSigmaPX + matSigmaPX.transpose() - fTrace * MatrixXf::Identity(3, 3);
 
     // unit eigenvector coresponding to maximum eigenvalue of matQ is selected as optimal rotation quaterions q0,q1,q2,q3
     SelfAdjointEigenSolver<MatrixXf> es(matQ);
-    Vector4f vecEigVec = es.eigenvectors().col(matQ.cols()-1);  // only take last Eigen-Vector since this corresponds to the maximum Eigenvalue
+    Vector4f vecEigVec = es.eigenvectors().col(matQ.cols() - 1); // only take last Eigen-Vector since this corresponds to the maximum Eigenvalue
 
     // quatRot(w,x,y,z)
-    Quaternionf quatRot(vecEigVec(0),vecEigVec(1),vecEigVec(2),vecEigVec(3));
+    Quaternionf quatRot(vecEigVec(0), vecEigVec(1), vecEigVec(2), vecEigVec(3));
     quatRot.normalize();
     matRot = quatRot.matrix();
 
     // get scaling factor and matrix
-    if(bScale) {
+    if (bScale) {
         MatrixXf matDevX = matX.rowwise() - vecMuX.transpose();
         MatrixXf matDevP = matP.rowwise() - vecMuP.transpose();
         matDevX = matDevX.cwiseProduct(matDevX);
         matDevP = matDevP.cwiseProduct(matDevP);
 
-        if(!vecWeights.isZero()) {
-            for(int i = 0; i < (vecW.size()); ++i) {
+        if (!vecWeights.isZero()) {
+            for (int i = 0; i < (vecW.size()); ++i) {
                 matDevX.row(i) = matDevX.row(i) * vecW(i);
                 matDevP.row(i) = matDevP.row(i) * vecW(i);
             }
@@ -224,28 +225,28 @@ bool MNELIB::fitMatchedPoints(const MatrixXf& matSrcPoint,
     vecTrans = vecMuX - fScale * matRot * vecMuP;
     matRot *= matScale;
 
-    matTrans.block<3,3>(0,0) = matRot;
-    matTrans.block<3,1>(0,3) = vecTrans;
-    matTrans(3,3) = 1.0f;
-    matTrans.block<1,3>(3,0) = MatrixXf::Zero(1,3);
+    matTrans.block<3, 3>(0, 0) = matRot;
+    matTrans.block<3, 1>(0, 3) = vecTrans;
+    matTrans(3, 3) = 1.0f;
+    matTrans.block<1, 3>(3, 0) = MatrixXf::Zero(1, 3);
     return true;
 }
 
 //=========================================================================================================
 
 bool MNELIB::discard3DPointOutliers(const QSharedPointer<MNELIB::MNEProjectToSurface> mneSurfacePoints,
-                                             const MatrixXf& matPointCloud,
-                                             const FiffCoordTrans& transFromTo,
-                                             VectorXi& vecTake,
-                                             MatrixXf& matTakePoint,
-                                             float fMaxDist)
+                                    const MatrixXf& matPointCloud,
+                                    const FiffCoordTrans& transFromTo,
+                                    VectorXi& vecTake,
+                                    MatrixXf& matTakePoint,
+                                    float fMaxDist)
 {
     // Initialization
-    int iNP = matPointCloud.rows();               // The number of points
-    MatrixXf matP = matPointCloud;                // Initial Set of points
-    MatrixXf matYk(matPointCloud.rows(),matPointCloud.cols());  // Iterative losest points on the surface
-    VectorXi vecNearest;                        // Triangle of the new point
-    VectorXf vecDist;                           // The Distance between matX and matP
+    int iNP = matPointCloud.rows();                             // The number of points
+    MatrixXf matP = matPointCloud;                              // Initial Set of points
+    MatrixXf matYk(matPointCloud.rows(), matPointCloud.cols()); // Iterative losest points on the surface
+    VectorXi vecNearest;                                        // Triangle of the new point
+    VectorXf vecDist;                                           // The Distance between matX and matP
 
     // Initial transformation - From point cloud To surface
     matP = transFromTo.apply_trans(matP);
@@ -253,18 +254,18 @@ bool MNELIB::discard3DPointOutliers(const QSharedPointer<MNELIB::MNEProjectToSur
     int iDiscarded = 0;
 
     // discard outliers if necessary
-    if(fMaxDist > 0.0) {
-        if(!mneSurfacePoints->find_closest_on_surface(matP, iNP, matYk, vecNearest, vecDist)) {
+    if (fMaxDist > 0.0) {
+        if (!mneSurfacePoints->find_closest_on_surface(matP, iNP, matYk, vecNearest, vecDist)) {
             qWarning() << "[MNELIB::icp] find_closest_on_surface was not successful.";
             return false;
         }
 
-        for(int i = 0; i < vecDist.size(); ++i) {
-            if(std::fabs(vecDist(i)) < fMaxDist) {
-                vecTake.conservativeResize(vecTake.size()+1);
-                vecTake(vecTake.size()-1) = i;
-                matTakePoint.conservativeResize(matTakePoint.rows()+1,3);
-                matTakePoint.row(matTakePoint.rows()-1) = matPointCloud.row(i);
+        for (int i = 0; i < vecDist.size(); ++i) {
+            if (std::fabs(vecDist(i)) < fMaxDist) {
+                vecTake.conservativeResize(vecTake.size() + 1);
+                vecTake(vecTake.size() - 1) = i;
+                matTakePoint.conservativeResize(matTakePoint.rows() + 1, 3);
+                matTakePoint.row(matTakePoint.rows() - 1) = matPointCloud.row(i);
             } else {
                 iDiscarded++;
             }

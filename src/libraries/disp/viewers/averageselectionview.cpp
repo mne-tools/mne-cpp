@@ -37,7 +37,7 @@
 // EIGEN INCLUDES
 //=============================================================================================================
 
-#include<Eigen/Core>
+#include <Eigen/Core>
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -51,12 +51,12 @@ using namespace Eigen;
 //=============================================================================================================
 
 AverageSelectionView::AverageSelectionView(const QString& sSettingsPath,
-                                           QWidget *parent,
+                                           QWidget* parent,
                                            Qt::WindowFlags f)
 : AbstractView(parent, f)
 , m_iMaxNumAverages(10)
-, m_qMapAverageColor(QSharedPointer<QMap<QString, QColor> >::create())
-, m_qMapAverageActivation(QSharedPointer<QMap<QString, bool> >::create())
+, m_qMapAverageColor(QSharedPointer<QMap<QString, QColor>>::create())
+, m_qMapAverageActivation(QSharedPointer<QMap<QString, bool>>::create())
 {
     m_sSettingsPath = sSettingsPath;
     this->setWindowTitle("Average Selection");
@@ -76,21 +76,21 @@ AverageSelectionView::~AverageSelectionView()
 
 //=============================================================================================================
 
-QSharedPointer<QMap<QString, QColor> > AverageSelectionView::getAverageColor() const
+QSharedPointer<QMap<QString, QColor>> AverageSelectionView::getAverageColor() const
 {
     return m_qMapAverageColor;
 }
 
 //=============================================================================================================
 
-QSharedPointer<QMap<QString, bool> > AverageSelectionView::getAverageActivation() const
+QSharedPointer<QMap<QString, bool>> AverageSelectionView::getAverageActivation() const
 {
     return m_qMapAverageActivation;
 }
 
 //=============================================================================================================
 
-void AverageSelectionView::setAverageColor(const QSharedPointer<QMap<QString, QColor> > qMapAverageColor)
+void AverageSelectionView::setAverageColor(const QSharedPointer<QMap<QString, QColor>> qMapAverageColor)
 {
     m_qMapAverageColor = qMapAverageColor;
     redrawGUI();
@@ -98,7 +98,7 @@ void AverageSelectionView::setAverageColor(const QSharedPointer<QMap<QString, QC
 
 //=============================================================================================================
 
-void AverageSelectionView::setAverageActivation(const QSharedPointer<QMap<QString, bool> > qMapAverageActivation)
+void AverageSelectionView::setAverageActivation(const QSharedPointer<QMap<QString, bool>> qMapAverageActivation)
 {
     m_qMapAverageActivation = qMapAverageActivation;
     redrawGUI();
@@ -108,7 +108,7 @@ void AverageSelectionView::setAverageActivation(const QSharedPointer<QMap<QStrin
 
 void AverageSelectionView::saveSettings()
 {
-    if(m_sSettingsPath.isEmpty()) {
+    if (m_sSettingsPath.isEmpty()) {
         return;
     }
 
@@ -117,16 +117,16 @@ void AverageSelectionView::saveSettings()
     settings.beginGroup(m_sSettingsPath + QString("/AverageSelectionView/averageColorMap"));
     QMap<QString, QColor>::const_iterator iColor = m_qMapAverageColor->constBegin();
     while (iColor != m_qMapAverageColor->constEnd()) {
-         settings.setValue(iColor.key(), iColor.value());
-         ++iColor;
+        settings.setValue(iColor.key(), iColor.value());
+        ++iColor;
     }
     settings.endGroup();
 
     settings.beginGroup(m_sSettingsPath + QString("/AverageSelectionView/averageActivationMap"));
     QMap<QString, bool>::const_iterator iActivation = m_qMapAverageActivation->constBegin();
     while (iActivation != m_qMapAverageActivation->constEnd()) {
-         settings.setValue(iActivation.key(), iActivation.value());
-         ++iActivation;
+        settings.setValue(iActivation.key(), iActivation.value());
+        ++iActivation;
     }
     settings.endGroup();
 }
@@ -135,7 +135,7 @@ void AverageSelectionView::saveSettings()
 
 void AverageSelectionView::loadSettings()
 {
-    if(m_sSettingsPath.isEmpty()) {
+    if (m_sSettingsPath.isEmpty()) {
         return;
     }
 
@@ -144,14 +144,14 @@ void AverageSelectionView::loadSettings()
     settings.beginGroup(m_sSettingsPath + QString("/AverageSelectionView/averageColorMap"));
     QStringList keys = settings.childKeys();
     foreach (QString key, keys) {
-         m_qMapAverageColor->insert(key, settings.value(key).value<QColor>());
+        m_qMapAverageColor->insert(key, settings.value(key).value<QColor>());
     }
     settings.endGroup();
 
     settings.beginGroup(m_sSettingsPath + QString("/AverageSelectionView/averageActivationMap"));
     keys = settings.childKeys();
     foreach (QString key, keys) {
-         m_qMapAverageActivation->insert(key, settings.value(key).toBool());
+        m_qMapAverageActivation->insert(key, settings.value(key).toBool());
     }
     settings.endGroup();
 }
@@ -160,7 +160,7 @@ void AverageSelectionView::loadSettings()
 
 void AverageSelectionView::updateGuiMode(GuiMode mode)
 {
-    switch(mode) {
+    switch (mode) {
         case GuiMode::Clinical:
             break;
         default: // default is research mode
@@ -172,7 +172,7 @@ void AverageSelectionView::updateGuiMode(GuiMode mode)
 
 void AverageSelectionView::updateProcessingMode(ProcessingMode mode)
 {
-    switch(mode) {
+    switch (mode) {
         case ProcessingMode::Offline:
             break;
         default: // default is realtime mode
@@ -184,18 +184,18 @@ void AverageSelectionView::updateProcessingMode(ProcessingMode mode)
 
 void AverageSelectionView::redrawGUI()
 {
-    if(m_qMapAverageColor->size() != m_qMapAverageActivation->size()) {
+    if (m_qMapAverageColor->size() != m_qMapAverageActivation->size()) {
         qDebug() << "AverageSelectionView::update - m_qMapAverageColor and m_qMapAverageActivation do not match in size. Returning.";
         return;
     }
 
     //Delete all widgets in the averages layout
     QGridLayout* topLayout = static_cast<QGridLayout*>(this->layout());
-    if(!topLayout) {
-       topLayout = new QGridLayout();
+    if (!topLayout) {
+        topLayout = new QGridLayout();
     }
 
-    QLayoutItem *child;
+    QLayoutItem* child;
     while ((child = topLayout->takeAt(0)) != 0) {
         delete child->widget();
         delete child;
@@ -204,8 +204,8 @@ void AverageSelectionView::redrawGUI()
     // Create new GUI elements
     QMapIterator<QString, QColor> itr(*m_qMapAverageColor);
     int count = 0;
-    while(itr.hasNext()) {
-        if(count >= m_iMaxNumAverages) {
+    while (itr.hasNext()) {
+        if (count >= m_iMaxNumAverages) {
             break;
         }
 
@@ -239,13 +239,13 @@ void AverageSelectionView::redrawGUI()
 void AverageSelectionView::onAverageSelectionColorChanged()
 {
     //Change color for average
-    if(QPointer<QPushButton> button = qobject_cast<QPushButton*>(sender())) {
+    if (QPointer<QPushButton> button = qobject_cast<QPushButton*>(sender())) {
         QString sObjectName = button->objectName();
 
         QColor color = QColorDialog::getColor(m_qMapAverageColor->value(sObjectName), this, "Set average color");
 
-        if(button) {
-            QPalette palette(QPalette::Button,color);
+        if (button) {
+            QPalette palette(QPalette::Button, color);
             button->setPalette(palette);
             button->update();
 
@@ -259,7 +259,7 @@ void AverageSelectionView::onAverageSelectionColorChanged()
     }
 
     //Change color for average
-    if(QPointer<QCheckBox> checkBox = qobject_cast<QCheckBox*>(sender())) {
+    if (QPointer<QCheckBox> checkBox = qobject_cast<QCheckBox*>(sender())) {
         QString sObjectName = checkBox->objectName();
 
         m_qMapAverageActivation->insert(sObjectName, checkBox->isChecked());
@@ -274,5 +274,4 @@ void AverageSelectionView::onAverageSelectionColorChanged()
 
 void AverageSelectionView::clearView()
 {
-
 }

@@ -63,7 +63,7 @@ MnaGraphExecutor::ProgressCallback MnaGraphExecutor::s_progressCallback;
 //=============================================================================================================
 
 MnaGraphExecutor::Context MnaGraphExecutor::execute(MnaGraph& graph,
-                                                      const QVariantMap& graphInputs)
+                                                    const QVariantMap& graphInputs)
 {
     Context ctx;
     ctx.graphInputs = graphInputs;
@@ -82,7 +82,7 @@ MnaGraphExecutor::Context MnaGraphExecutor::execute(MnaGraph& graph,
             // Path format: "nodeId/attrKey"
             int sep = path.indexOf(QLatin1Char('/'));
             if (sep > 0) {
-                QString nodeId  = path.left(sep);
+                QString nodeId = path.left(sep);
                 QString attrKey = path.mid(sep + 1);
                 if (nodeId == n.id) {
                     n.attributes.insert(attrKey, graph.paramTree.param(path));
@@ -133,7 +133,7 @@ MnaGraphExecutor::Context MnaGraphExecutor::execute(MnaGraph& graph,
 //=============================================================================================================
 
 MnaGraphExecutor::Context MnaGraphExecutor::executeIncremental(MnaGraph& graph,
-                                                                 Context& existing)
+                                                               Context& existing)
 {
     // Find dirty nodes and all their downstream dependents
     QStringList dirty = graph.dirtyNodes();
@@ -192,7 +192,7 @@ MnaGraphExecutor::Context MnaGraphExecutor::executeIncremental(MnaGraph& graph,
 //=============================================================================================================
 
 QVariantMap MnaGraphExecutor::executeNode(const MnaNode& node,
-                                            const QVariantMap& inputs)
+                                          const QVariantMap& inputs)
 {
     // Script execution — inline code via interpreter
     if (node.execMode == MnaNodeExecMode::Script) {
@@ -206,12 +206,18 @@ QVariantMap MnaGraphExecutor::executeNode(const MnaNode& node,
 
         // Determine file extension from language
         QString ext = QStringLiteral(".txt");
-        if (script.language == QLatin1String("python"))      ext = QStringLiteral(".py");
-        else if (script.language == QLatin1String("shell"))  ext = QStringLiteral(".sh");
-        else if (script.language == QLatin1String("r"))      ext = QStringLiteral(".R");
-        else if (script.language == QLatin1String("matlab")) ext = QStringLiteral(".m");
-        else if (script.language == QLatin1String("octave")) ext = QStringLiteral(".m");
-        else if (script.language == QLatin1String("julia"))  ext = QStringLiteral(".jl");
+        if (script.language == QLatin1String("python"))
+            ext = QStringLiteral(".py");
+        else if (script.language == QLatin1String("shell"))
+            ext = QStringLiteral(".sh");
+        else if (script.language == QLatin1String("r"))
+            ext = QStringLiteral(".R");
+        else if (script.language == QLatin1String("matlab"))
+            ext = QStringLiteral(".m");
+        else if (script.language == QLatin1String("octave"))
+            ext = QStringLiteral(".m");
+        else if (script.language == QLatin1String("julia"))
+            ext = QStringLiteral(".jl");
 
         // Substitute {{placeholder}} tokens in the code
         QString code = script.code;
@@ -239,12 +245,18 @@ QVariantMap MnaGraphExecutor::executeNode(const MnaNode& node,
         // Determine interpreter
         QString interpreter = script.interpreter;
         if (interpreter.isEmpty()) {
-            if (script.language == QLatin1String("python"))      interpreter = QStringLiteral("python3");
-            else if (script.language == QLatin1String("shell"))  interpreter = QStringLiteral("/bin/bash");
-            else if (script.language == QLatin1String("r"))      interpreter = QStringLiteral("Rscript");
-            else if (script.language == QLatin1String("matlab")) interpreter = QStringLiteral("matlab");
-            else if (script.language == QLatin1String("octave")) interpreter = QStringLiteral("octave");
-            else if (script.language == QLatin1String("julia"))  interpreter = QStringLiteral("julia");
+            if (script.language == QLatin1String("python"))
+                interpreter = QStringLiteral("python3");
+            else if (script.language == QLatin1String("shell"))
+                interpreter = QStringLiteral("/bin/bash");
+            else if (script.language == QLatin1String("r"))
+                interpreter = QStringLiteral("Rscript");
+            else if (script.language == QLatin1String("matlab"))
+                interpreter = QStringLiteral("matlab");
+            else if (script.language == QLatin1String("octave"))
+                interpreter = QStringLiteral("octave");
+            else if (script.language == QLatin1String("julia"))
+                interpreter = QStringLiteral("julia");
         }
 
         QStringList args = script.interpreterArgs;
@@ -335,7 +347,7 @@ void MnaGraphExecutor::setProgressCallback(ProgressCallback cb)
 //=============================================================================================================
 
 MnaGraphExecutor::StreamContext MnaGraphExecutor::startStream(MnaGraph& graph,
-                                                               PluginFactory factory)
+                                                              PluginFactory factory)
 {
     StreamContext ctx;
     ctx.graph = &graph;
@@ -355,7 +367,7 @@ MnaGraphExecutor::StreamContext MnaGraphExecutor::startStream(MnaGraph& graph,
         for (const QString& path : graph.paramTree.allPaths()) {
             int sep = path.indexOf(QLatin1Char('/'));
             if (sep > 0) {
-                QString nodeId  = path.left(sep);
+                QString nodeId = path.left(sep);
                 QString attrKey = path.mid(sep + 1);
                 if (nodeId == n.id) {
                     n.attributes.insert(attrKey, graph.paramTree.param(path));

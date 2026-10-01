@@ -27,6 +27,15 @@
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-const char* MRILIB::buildDateTime(){ return UTILSLIB::dateTimeNow();}
-const char* MRILIB::buildHash(){ return UTILSLIB::gitHash();}
-const char* MRILIB::buildHashLong(){ return UTILSLIB::gitHashLong();}
+const char* MRILIB::buildDateTime()
+{
+    return UTILSLIB::dateTimeNow();
+}
+const char* MRILIB::buildHash()
+{
+    return UTILSLIB::gitHash();
+}
+const char* MRILIB::buildHashLong()
+{
+    return UTILSLIB::gitHashLong();
+}

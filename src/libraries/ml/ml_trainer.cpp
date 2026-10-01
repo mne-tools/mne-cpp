@@ -52,14 +52,14 @@ using namespace UTILSLIB;
 //=============================================================================================================
 
 MLTrainer::MLTrainer()
-    : m_runner()
+: m_runner()
 {
 }
 
 //=============================================================================================================
 
 MLTrainer::MLTrainer(const PythonRunnerConfig& config)
-    : m_runner(config)
+: m_runner(config)
 {
 }
 
@@ -73,7 +73,7 @@ PythonRunner& MLTrainer::runner()
 //=============================================================================================================
 
 PythonRunnerResult MLTrainer::run(const QString& scriptPath,
-                                   const QStringList& args)
+                                  const QStringList& args)
 {
     if (!m_runner.isPythonAvailable()) {
         PythonRunnerResult result;

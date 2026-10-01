@@ -43,8 +43,8 @@ using namespace Eigen;
 //=============================================================================================================
 
 bool InvSourceEstimateIO::writeCsv(const InvSourceEstimate& stc,
-                                    const QString& sPath,
-                                    char cDelim)
+                                   const QString& sPath,
+                                   char cDelim)
 {
     if (stc.isEmpty()) {
         qWarning() << "[InvSourceEstimateIO::writeCsv] Source estimate is empty.";
@@ -84,7 +84,7 @@ bool InvSourceEstimateIO::writeCsv(const InvSourceEstimate& stc,
 //=============================================================================================================
 
 InvSourceEstimate InvSourceEstimateIO::readCsv(const QString& sPath,
-                                                char cDelim)
+                                               char cDelim)
 {
     QFile file(sPath);
     if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
@@ -116,10 +116,12 @@ InvSourceEstimate InvSourceEstimateIO::readCsv(const QString& sPath,
 
     while (!in.atEnd()) {
         QString line = in.readLine().trimmed();
-        if (line.isEmpty()) continue;
+        if (line.isEmpty())
+            continue;
 
         QStringList parts = line.split(delim, Qt::SkipEmptyParts);
-        if (parts.size() < nVertices + 1) continue;
+        if (parts.size() < nVertices + 1)
+            continue;
 
         times.append(parts[0].toDouble());
         VectorXd row(nVertices);
@@ -143,8 +145,8 @@ InvSourceEstimate InvSourceEstimateIO::readCsv(const QString& sPath,
 
     float tmin = static_cast<float>(times[0]);
     float tstep = (times.size() > 1)
-                  ? static_cast<float>(times[1] - times[0])
-                  : 0.001f;
+        ? static_cast<float>(times[1] - times[0])
+        : 0.001f;
 
     return InvSourceEstimate(data, vertices, tmin, tstep);
 }
@@ -152,7 +154,7 @@ InvSourceEstimate InvSourceEstimateIO::readCsv(const QString& sPath,
 //=============================================================================================================
 
 bool InvSourceEstimateIO::writeMatrix(const InvSourceEstimate& stc,
-                                       const QString& sPath)
+                                      const QString& sPath)
 {
     if (stc.isEmpty()) {
         qWarning() << "[InvSourceEstimateIO::writeMatrix] Source estimate is empty.";
@@ -168,7 +170,8 @@ bool InvSourceEstimateIO::writeMatrix(const InvSourceEstimate& stc,
     QTextStream out(&file);
     for (int v = 0; v < stc.data.rows(); ++v) {
         for (int t = 0; t < stc.data.cols(); ++t) {
-            if (t > 0) out << "\t";
+            if (t > 0)
+                out << "\t";
             out << QString::number(stc.data(v, t), 'e', 8);
         }
         out << "\n";

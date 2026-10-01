@@ -52,7 +52,7 @@ DummyToolbox::DummyToolbox()
 
 DummyToolbox::~DummyToolbox()
 {
-    if(this->isRunning()) {
+    if (this->isRunning()) {
         stop();
     }
 }
@@ -147,24 +147,24 @@ QWidget* DummyToolbox::setupWidget()
 
 void DummyToolbox::update(SCMEASLIB::Measurement::SPtr pMeasurement)
 {
-    if(QSharedPointer<RealTimeMultiSampleArray> pRTMSA = pMeasurement.dynamicCast<RealTimeMultiSampleArray>()) {
+    if (QSharedPointer<RealTimeMultiSampleArray> pRTMSA = pMeasurement.dynamicCast<RealTimeMultiSampleArray>()) {
         //Fiff information
-        if(!m_pFiffInfo) {
+        if (!m_pFiffInfo) {
             m_pFiffInfo = pRTMSA->info();
 
             m_pOutput->measurementData()->initFromFiffInfo(m_pFiffInfo);
             m_pOutput->measurementData()->setMultiArraySize(1);
         }
 
-        if(!m_bPluginControlWidgetsInit) {
+        if (!m_bPluginControlWidgetsInit) {
             initPluginControlWidgets();
         }
 
-        for(unsigned char i = 0; i < pRTMSA->getMultiArraySize(); ++i) {
+        for (unsigned char i = 0; i < pRTMSA->getMultiArraySize(); ++i) {
             // Please note that we do not need a copy here since this function will block until
             // the buffer accepts new data again. Hence, the data is not deleted in the actual
             // Mesaurement function after it emitted the notify signal.
-            while(!m_pCircularBuffer->push(pRTMSA->getMultiSampleArray()[i])) {
+            while (!m_pCircularBuffer->push(pRTMSA->getMultiSampleArray()[i])) {
                 //Do nothing until the circular buffer is ready to accept new data again
             }
         }
@@ -175,7 +175,7 @@ void DummyToolbox::update(SCMEASLIB::Measurement::SPtr pMeasurement)
 
 void DummyToolbox::initPluginControlWidgets()
 {
-    if(m_pFiffInfo) {
+    if (m_pFiffInfo) {
         QList<QWidget*> plControlWidgets;
 
         // The plugin's control widget
@@ -197,18 +197,18 @@ void DummyToolbox::run()
     MatrixXd matData;
 
     // Wait for Fiff Info
-    while(!m_pFiffInfo) {
+    while (!m_pFiffInfo) {
         msleep(10);
     }
 
-    while(!isInterruptionRequested()) {
+    while (!isInterruptionRequested()) {
         // Get the current data
-        if(m_pCircularBuffer->pop(matData)) {
+        if (m_pCircularBuffer->pop(matData)) {
             //ToDo: Implement your algorithm here
 
             //Send the data to the connected plugins and the online display
             //Unocmment this if you also uncommented the m_pOutput in the constructor above
-            if(!isInterruptionRequested()) {
+            if (!isInterruptionRequested()) {
                 m_pOutput->measurementData()->setValue(matData);
             }
         }

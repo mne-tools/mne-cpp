@@ -47,7 +47,7 @@ using namespace UTILSLIB;
 
 //=============================================================================================================
 
-int main(int argc, char *argv[])
+int main(int argc, char* argv[])
 {
     qInstallMessageHandler(MNELogger::customLogWriter);
     QCoreApplication app(argc, argv);
@@ -74,7 +74,10 @@ int main(int argc, char *argv[])
     QString solFile = parser.value(solOpt);
     QString methodStr = parser.value(methodOpt).toLower();
 
-    if (bemFile.isEmpty()) { qCritical("--bem is required."); parser.showHelp(1); }
+    if (bemFile.isEmpty()) {
+        qCritical("--bem is required.");
+        parser.showHelp(1);
+    }
 
     int bemMethod;
     if (methodStr == "linear")
@@ -90,10 +93,10 @@ int main(int argc, char *argv[])
     if (solFile.isEmpty())
         solFile = FwdBemModel::fwd_bem_make_bem_sol_name(bemFile);
 
-    qInfo("BEM model file:    %s" , qPrintable(bemFile));
-    qInfo("BEM solution file: %s" , qPrintable(solFile));
-    qInfo("BEM method:        %s" ,
-           qPrintable(FwdBemModel::fwd_bem_explain_method(bemMethod)));
+    qInfo("BEM model file:    %s", qPrintable(bemFile));
+    qInfo("BEM solution file: %s", qPrintable(solFile));
+    qInfo("BEM method:        %s",
+          qPrintable(FwdBemModel::fwd_bem_explain_method(bemMethod)));
 
     // Determine how many layers we have
     // Try three-layer first, fall back to single-layer
@@ -109,13 +112,13 @@ int main(int argc, char *argv[])
         return 1;
     }
 
-    qInfo("Loaded %d BEM surface(s)" , bemModel->nsurf);
+    qInfo("Loaded %d BEM surface(s)", bemModel->nsurf);
     for (int k = 0; k < bemModel->nsurf; ++k) {
-        qInfo("  Surface %d: %s  (%d vertices, %d triangles)" ,
-               k + 1,
-               qPrintable(FwdBemModel::fwd_bem_explain_surface(bemModel->surfs[k]->id)),
-               bemModel->surfs[k]->np,
-               bemModel->surfs[k]->ntri);
+        qInfo("  Surface %d: %s  (%d vertices, %d triangles)",
+              k + 1,
+              qPrintable(FwdBemModel::fwd_bem_explain_surface(bemModel->surfs[k]->id)),
+              bemModel->surfs[k]->np,
+              bemModel->surfs[k]->ntri);
     }
 
     // Compute the BEM solution
@@ -127,7 +130,7 @@ int main(int argc, char *argv[])
     qInfo("BEM solution computed successfully.");
 
     // Save the solution
-    qInfo("Writing solution to: %s" , qPrintable(solFile));
+    qInfo("Writing solution to: %s", qPrintable(solFile));
 
     QFile file(solFile);
     FiffStream::SPtr stream = FiffStream::start_file(file);

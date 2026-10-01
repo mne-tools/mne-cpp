@@ -66,9 +66,9 @@ namespace INVLIB
 class INVSHARED_EXPORT InvDipoleForward
 {
 public:
-    typedef QSharedPointer<InvDipoleForward> SPtr;              /**< Shared pointer type for InvDipoleForward. */
-    typedef QSharedPointer<const InvDipoleForward> ConstSPtr;   /**< Const shared pointer type for InvDipoleForward. */
-    typedef std::unique_ptr<InvDipoleForward> UPtr;             /**< Unique pointer type for InvDipoleForward. */
+    typedef QSharedPointer<InvDipoleForward> SPtr;            /**< Shared pointer type for InvDipoleForward. */
+    typedef QSharedPointer<const InvDipoleForward> ConstSPtr; /**< Const shared pointer type for InvDipoleForward. */
+    typedef std::unique_ptr<InvDipoleForward> UPtr;           /**< Unique pointer type for InvDipoleForward. */
 
     //=========================================================================================================
     /**
@@ -83,14 +83,14 @@ public:
     ~InvDipoleForward() = default;
 
 public:
-    Eigen::MatrixXf rd;             /**< Dipole locations (ndip x 3). */
-    int   ndip = 0;                 /**< Number of dipoles. */
-    Eigen::Matrix<float, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor> fwd;  /**< Forward solution, projected and whitened (3*ndip x nch, row-major). */
-    Eigen::VectorXf scales;         /**< Column normalization scales applied to fwd (3*ndip). */
-    Eigen::Matrix<float, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor> uu;   /**< Right singular vectors V^T of fwd (udim x nch, row-major). */
-    Eigen::Matrix<float, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor> vv;   /**< Left singular vectors U^T of fwd (udim x 3*ndip, row-major). */
-    Eigen::VectorXf sing;           /**< Singular values of the forward matrix (3*ndip). */
-    int   nch = 0;                  /**< Number of channels. */
+    Eigen::MatrixXf rd;                                                        /**< Dipole locations (ndip x 3). */
+    int ndip = 0;                                                              /**< Number of dipoles. */
+    Eigen::Matrix<float, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor> fwd; /**< Forward solution, projected and whitened (3*ndip x nch, row-major). */
+    Eigen::VectorXf scales;                                                    /**< Column normalization scales applied to fwd (3*ndip). */
+    Eigen::Matrix<float, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor> uu;  /**< Right singular vectors V^T of fwd (udim x nch, row-major). */
+    Eigen::Matrix<float, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor> vv;  /**< Left singular vectors U^T of fwd (udim x 3*ndip, row-major). */
+    Eigen::VectorXf sing;                                                      /**< Singular values of the forward matrix (3*ndip). */
+    int nch = 0;                                                               /**< Number of channels. */
 };
 
 //=============================================================================================================

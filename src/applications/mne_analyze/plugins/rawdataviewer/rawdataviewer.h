@@ -38,15 +38,17 @@
 
 class RawDataViewerControl;
 
-namespace DISPLIB {
-    class ScalingView;
-    class FiffRawViewSettings;
+namespace DISPLIB
+{
+class ScalingView;
+class FiffRawViewSettings;
 }
 
-namespace ANSHAREDLIB {
-    class Communicator;
-    class FiffRawViewModel;
-    class AbstractModel;
+namespace ANSHAREDLIB
+{
+class Communicator;
+class FiffRawViewModel;
+class AbstractModel;
 }
 
 //=============================================================================================================
@@ -55,8 +57,8 @@ namespace ANSHAREDLIB {
 
 namespace RAWDATAVIEWERPLUGIN
 {
-    class FiffRawView;
-    class FiffRawViewDelegate;
+class FiffRawView;
+class FiffRawViewDelegate;
 
 //=============================================================================================================
 /**
@@ -135,14 +137,14 @@ private:
     void onNewRealtimeData();
 
     // Control
-    QPointer<ANSHAREDLIB::Communicator>  m_pCommu;           /**< The communicator object to communicate with other plugins. */
+    QPointer<ANSHAREDLIB::Communicator> m_pCommu; /**< The communicator object to communicate with other plugins. */
 
     // Model
-    int                    m_iSamplesPerBlock; /**< The samples per data block. Default is set to sampling frequency. */
-    int                    m_iVisibleBlocks;   /**< The amount of visible data blocks. Default is set to 10. */
-    int                    m_iBufferBlocks;    /**< The amount of buffered data blocks. Default is set to 10. */
+    int m_iSamplesPerBlock; /**< The samples per data block. Default is set to sampling frequency. */
+    int m_iVisibleBlocks;   /**< The amount of visible data blocks. Default is set to 10. */
+    int m_iBufferBlocks;    /**< The amount of buffered data blocks. Default is set to 10. */
 
-    QPointer<FiffRawView>  m_pFiffRawView;     /**< View for Fiff data. */
+    QPointer<FiffRawView> m_pFiffRawView; /**< View for Fiff data. */
 };
 
 //=============================================================================================================

@@ -42,25 +42,27 @@ using namespace EVENTSLIB;
 //=============================================================================================================
 
 Event::Event()
-:Event(0,0,0)
-{ }
+: Event(0, 0, 0)
+{
+}
 
 //=============================================================================================================
 
-Event::Event(const idNum id,const  int sample, const idNum groupId)
+Event::Event(const idNum id, const int sample, const idNum groupId)
 : id(id)
 , sample(sample)
 , duration(0)
 , eventCode(1)
 , groupId(groupId)
-{ }
+{
+}
 
 //=============================================================================================================
 
 Event::Event(const EVENTSINTERNAL::EventINT& e)
 : Event(e.getId(), e.getSample(), e.getGroupId())
 {
-    duration  = e.getDuration();
+    duration = e.getDuration();
     eventCode = e.getEventCode();
 }
 
@@ -68,7 +70,8 @@ Event::Event(const EVENTSINTERNAL::EventINT& e)
 
 EVENTSINTERNAL::EventINT::EventINT(idNum id)
 : EventINT(id, 0, 0)
-{ }
+{
+}
 
 //=============================================================================================================
 
@@ -79,7 +82,8 @@ EVENTSINTERNAL::EventINT::EventINT(idNum id, int iSample, idNum groupId)
 , m_iEventCode(1)
 , m_iGroup(groupId)
 , m_sDescription("")
-{ }
+{
+}
 
 //=============================================================================================================
 
@@ -90,7 +94,8 @@ EVENTSINTERNAL::EventINT::EventINT(const EventINT& rhs)
 , m_iEventCode(rhs.getEventCode())
 , m_iGroup(rhs.getGroupId())
 , m_sDescription(rhs.getDescription())
-{ }
+{
+}
 
 //=============================================================================================================
 
@@ -101,7 +106,8 @@ EVENTSINTERNAL::EventINT::EventINT(EventINT&& other)
 , m_iEventCode(other.getEventCode())
 , m_iGroup(other.getGroupId())
 , m_sDescription(other.getDescription())
-{ }
+{
+}
 
 //=============================================================================================================
 

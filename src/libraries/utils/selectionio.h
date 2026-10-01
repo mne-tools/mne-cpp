@@ -84,7 +84,7 @@ public:
      *
      * @return True on success, false if the path lacks a .sel extension or the file cannot be opened.
      */
-    static bool readMNESelFile(QString path, QMultiMap<QString,QStringList> &selectionMap);
+    static bool readMNESelFile(QString path, QMultiMap<QString, QStringList>& selectionMap);
 
     //=========================================================================================================
     /**
@@ -94,7 +94,7 @@ public:
      *
      * @return True on success, false if the path lacks a .sel extension or the file cannot be opened.
      */
-    static bool readMNESelFile(const std::string& path, std::multimap<std::string,std::vector<std::string>>& selectionMap);
+    static bool readMNESelFile(const std::string& path, std::multimap<std::string, std::vector<std::string>>& selectionMap);
 
     //=========================================================================================================
     /**
@@ -104,7 +104,7 @@ public:
      *
      * @return True on success, false if the path lacks a .mon extension or the file cannot be opened.
      */
-    static bool readBrainstormMonFile(QString path, QMultiMap<QString,QStringList> &selectionMap);
+    static bool readBrainstormMonFile(QString path, QMultiMap<QString, QStringList>& selectionMap);
 
     //=========================================================================================================
     /**
@@ -114,7 +114,7 @@ public:
      *
      * @return True on success, false if the path lacks a .mon extension or the file cannot be opened.
      */
-    static bool readBrainstormMonFile(const std::string& path, std::multimap<std::string,std::vector<std::string>>& selectionMap);
+    static bool readBrainstormMonFile(const std::string& path, std::multimap<std::string, std::vector<std::string>>& selectionMap);
 
     //=========================================================================================================
     /**
@@ -124,7 +124,7 @@ public:
      *
      * @return True on success, false if the path lacks a .sel extension or the file cannot be opened for writing.
      */
-    static bool writeMNESelFile(QString path, const QMultiMap<QString,QStringList> &selectionMap);
+    static bool writeMNESelFile(QString path, const QMultiMap<QString, QStringList>& selectionMap);
 
     //=========================================================================================================
     /**
@@ -134,7 +134,7 @@ public:
      *
      * @return True on success, false if the path lacks a .sel extension or the file cannot be opened for writing.
      */
-    static bool writeMNESelFile(const std::string& path, const std::map<std::string,std::vector<std::string>>& selectionMap);
+    static bool writeMNESelFile(const std::string& path, const std::map<std::string, std::vector<std::string>>& selectionMap);
 
     //=========================================================================================================
     /**
@@ -144,7 +144,7 @@ public:
      *
      * @return True if all .mon files were written, false if any file could not be opened for writing.
      */
-    static bool writeBrainstormMonFiles(QString path, const QMultiMap<QString,QStringList> &selectionMap);
+    static bool writeBrainstormMonFiles(QString path, const QMultiMap<QString, QStringList>& selectionMap);
 
     //=========================================================================================================
     /**
@@ -154,7 +154,7 @@ public:
      *
      * @return True if all .mon files were written, false if any file could not be opened for writing.
      */
-    static bool writeBrainstormMonFiles(const std::string& path, const std::map<std::string,std::vector<std::string>>& selectionMap);
+    static bool writeBrainstormMonFiles(const std::string& path, const std::map<std::string, std::vector<std::string>>& selectionMap);
 };
 } // NAMESPACE
 

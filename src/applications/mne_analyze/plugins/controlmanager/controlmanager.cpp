@@ -87,14 +87,14 @@ QString ControlManager::getName() const
 
 //=============================================================================================================
 
-QMenu *ControlManager::getMenu()
+QMenu* ControlManager::getMenu()
 {
     return Q_NULLPTR;
 }
 
 //=============================================================================================================
 
-QDockWidget *ControlManager::getControl()
+QDockWidget* ControlManager::getControl()
 {
     QDockWidget* pControlDock = new QDockWidget(getName());
     pControlDock->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
@@ -174,7 +174,7 @@ QDockWidget *ControlManager::getControl()
 
 //=============================================================================================================
 
-QWidget *ControlManager::getView()
+QWidget* ControlManager::getView()
 {
     return Q_NULLPTR;
 }
@@ -184,23 +184,23 @@ QWidget *ControlManager::getView()
 void ControlManager::handleEvent(QSharedPointer<Event> e)
 {
     switch (e->getType()) {
-    case EVENT_TYPE::SELECTED_MODEL_CHANGED:
-        if(e->getData().value<QSharedPointer<ANSHAREDLIB::AbstractModel> >()->getType() != ANSHAREDLIB_BEMDATA_MODEL) {
-            onScalingChanged(m_ScalingParameters.m_mScalingMap);
-            m_ViewParameters.m_sViewsToApply = m_pApplyToView->getSelectedViews();
-            m_ViewParameters.m_sSettingsToApply = ANSHAREDLIB::ViewParameters::ViewSetting::all;
-            m_pCommu->publishEvent(EVENT_TYPE::VIEW_SETTINGS_CHANGED, QVariant::fromValue(m_ViewParameters));
-        }
-        break;
+        case EVENT_TYPE::SELECTED_MODEL_CHANGED:
+            if (e->getData().value<QSharedPointer<ANSHAREDLIB::AbstractModel>>()->getType() != ANSHAREDLIB_BEMDATA_MODEL) {
+                onScalingChanged(m_ScalingParameters.m_mScalingMap);
+                m_ViewParameters.m_sViewsToApply = m_pApplyToView->getSelectedViews();
+                m_ViewParameters.m_sSettingsToApply = ANSHAREDLIB::ViewParameters::ViewSetting::all;
+                m_pCommu->publishEvent(EVENT_TYPE::VIEW_SETTINGS_CHANGED, QVariant::fromValue(m_ViewParameters));
+            }
+            break;
 
 #ifdef MNE_DISP3D
-    case EVENT_TYPE::SET_DATA3D_TREE_MODEL:
-        init3DGui(e->getData().value<QSharedPointer<BrainTreeModel>>());
-        break;
+        case EVENT_TYPE::SET_DATA3D_TREE_MODEL:
+            init3DGui(e->getData().value<QSharedPointer<BrainTreeModel>>());
+            break;
 #endif
-    default:
-        qWarning() << "[ControlManager::handleEvent] received an Event that is not handled by switch-cases";
-        break;
+        default:
+            qWarning() << "[ControlManager::handleEvent] received an Event that is not handled by switch-cases";
+            break;
     }
 }
 
@@ -219,7 +219,7 @@ QVector<EVENT_TYPE> ControlManager::getEventSubscriptions(void) const
 
 //=============================================================================================================
 
-void ControlManager::onScalingChanged(const QMap<qint32, float> &scalingMap)
+void ControlManager::onScalingChanged(const QMap<qint32, float>& scalingMap)
 {
     m_ScalingParameters.m_sViewsToApply = m_pApplyToView->getSelectedViews();
 
@@ -306,7 +306,7 @@ void ControlManager::init3DGui(QSharedPointer<BrainTreeModel> pModel)
 
 //=============================================================================================================
 
-void ControlManager::onSceneColorChange(const QColor &color)
+void ControlManager::onSceneColorChange(const QColor& color)
 {
     m_View3DParameters.m_settingsToApply = ANSHAREDLIB::View3DParameters::View3DSetting::sceneColor;
     m_View3DParameters.m_sceneColor = color;
@@ -346,7 +346,7 @@ void ControlManager::onShowFullScreen(bool bShowFullScreen)
 
 //=============================================================================================================
 
-void ControlManager::onLightColorChanged(const QColor &color)
+void ControlManager::onLightColorChanged(const QColor& color)
 {
     m_View3DParameters.m_settingsToApply = ANSHAREDLIB::View3DParameters::View3DSetting::lightColor;
     m_View3DParameters.m_lightColor = color;
@@ -377,5 +377,5 @@ void ControlManager::onTakeScreenshotChanged()
 
 QString ControlManager::getBuildInfo()
 {
-    return QString(CONTROLMANAGERPLUGIN::buildDateTime()) + QString(" - ")  + QString(CONTROLMANAGERPLUGIN::buildHash());
+    return QString(CONTROLMANAGERPLUGIN::buildDateTime()) + QString(" - ") + QString(CONTROLMANAGERPLUGIN::buildHash());
 }

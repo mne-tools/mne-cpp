@@ -57,7 +57,7 @@ static QString humanSize(qint64 bytes)
 // MAIN
 //=============================================================================================================
 
-int main(int argc, char *argv[])
+int main(int argc, char* argv[])
 {
     QCoreApplication app(argc, argv);
     app.setApplicationName(QStringLiteral("mne_show_mna"));
@@ -72,14 +72,14 @@ int main(int argc, char *argv[])
     parser.addVersionOption();
 
     parser.addPositionalArgument(QStringLiteral("file"),
-        QStringLiteral("Path to a .mna or .mnx project file."));
+                                 QStringLiteral("Path to a .mna or .mnx project file."));
 
     QCommandLineOption verboseOpt(QStringList() << QStringLiteral("V") << QStringLiteral("verbose"),
-        QStringLiteral("Show extended details (SHA-256, format, size)."));
+                                  QStringLiteral("Show extended details (SHA-256, format, size)."));
     parser.addOption(verboseOpt);
 
     QCommandLineOption jsonOpt(QStringLiteral("json"),
-        QStringLiteral("Output the project as formatted JSON to stdout."));
+                               QStringLiteral("Output the project as formatted JSON to stdout."));
     parser.addOption(jsonOpt);
 
     parser.process(app);
@@ -140,20 +140,20 @@ int main(int argc, char *argv[])
         out << "  ───────────────────────────────────────────────────────────\n";
 
         for (int si = 0; si < proj.subjects.size(); ++si) {
-            const MnaSubject &subj = proj.subjects[si];
+            const MnaSubject& subj = proj.subjects[si];
             out << "  [Subject " << (si + 1) << "] " << subj.id << "\n";
 
             for (int sei = 0; sei < subj.sessions.size(); ++sei) {
-                const MnaSession &sess = subj.sessions[sei];
+                const MnaSession& sess = subj.sessions[sei];
                 out << "    [Session " << (sei + 1) << "] " << sess.id << "\n";
 
                 for (int ri = 0; ri < sess.recordings.size(); ++ri) {
-                    const MnaRecording &rec = sess.recordings[ri];
+                    const MnaRecording& rec = sess.recordings[ri];
                     out << "      [Recording " << (ri + 1) << "] " << rec.id
                         << " ─ " << rec.files.size() << " file(s)\n";
 
                     for (int fi2 = 0; fi2 < rec.files.size(); ++fi2) {
-                        const MnaFileRef &ref = rec.files[fi2];
+                        const MnaFileRef& ref = rec.files[fi2];
                         ++totalFiles;
 
                         QString embTag;
@@ -187,7 +187,7 @@ int main(int argc, char *argv[])
         out << "  ───────────────────────────────────────────────────────────\n";
 
         for (int ni = 0; ni < proj.pipeline.size(); ++ni) {
-            const MnaNode &node = proj.pipeline[ni];
+            const MnaNode& node = proj.pipeline[ni];
             out << "  [" << (ni + 1) << "] " << node.id
                 << "  op=" << node.opType;
             if (!node.toolVersion.isEmpty())
@@ -195,9 +195,9 @@ int main(int argc, char *argv[])
             out << "\n";
 
             if (verbose) {
-                for (const MnaPort &p : node.inputs)
+                for (const MnaPort& p : node.inputs)
                     out << "       IN  " << p.name << " (" << mnaDataKindToString(p.dataKind) << ")\n";
-                for (const MnaPort &p : node.outputs)
+                for (const MnaPort& p : node.outputs)
                     out << "       OUT " << p.name << " (" << mnaDataKindToString(p.dataKind) << ")\n";
             }
         }

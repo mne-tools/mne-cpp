@@ -92,14 +92,14 @@ private:
     QString planAgentIntent(const QString& commandText, QString& plannedCommand, bool& planned) const;
     QString resolvePlannerReferences(const QString& commandText) const;
     QJsonObject normalizedToolResultEnvelope(const QString& toolName,
-                                            const QJsonObject& result,
-                                            const QString& source = QString()) const;
+                                             const QJsonObject& result,
+                                             const QString& source = QString()) const;
     QJsonObject normalizedToolErrorEnvelope(const QString& toolName,
-                                           const QString& message,
-                                           const QString& source,
-                                           const QString& failureKind,
-                                           const QString& recoverability,
-                                           const QJsonObject& details = QJsonObject()) const;
+                                            const QString& message,
+                                            const QString& source,
+                                            const QString& failureKind,
+                                            const QString& recoverability,
+                                            const QJsonObject& details = QJsonObject()) const;
     void rememberToolResult(const QString& toolName, const QJsonObject& result);
     void updateActivePipelineArtifact(const QString& status, const QString& currentStep = QString());
     void failActivePipeline(const QString& failureMessage);
@@ -107,17 +107,17 @@ private:
     QJsonObject defaultInputsForPipeline(const QJsonObject& pipeline) const;
     QJsonValue pipelineTemplateValueToJson(const QString& resolvedText) const;
     QJsonObject resolvePipelineStepArguments(const QJsonObject& step,
-                                            const QJsonObject& pipelineInputs) const;
+                                             const QJsonObject& pipelineInputs) const;
     QString buildToolCallCommand(const QString& toolName, const QJsonObject& arguments) const;
     QJsonObject pipelineRunArtifact(const QString& runId) const;
     QString validateAnalysisPipelineContract(const QJsonObject& pipeline,
-                                            const QJsonObject& pipelineInputs) const;
+                                             const QJsonObject& pipelineInputs) const;
     QString rerunPipelineStepCommand(const QString& runId,
-                                    int stepNumber,
-                                    const QString& mode,
-                                    QString* errorMessage = nullptr) const;
+                                     int stepNumber,
+                                     const QString& mode,
+                                     QString* errorMessage = nullptr) const;
     QString resolvePipelineCommandTemplate(const QString& commandTemplate,
-                                          const QJsonObject& pipelineInputs) const;
+                                           const QJsonObject& pipelineInputs) const;
     bool executeAnalysisPipeline(const QString& pipelineId,
                                  const QJsonObject& pipelineInputs,
                                  const QJsonObject& inputOverrides = QJsonObject());
@@ -164,11 +164,11 @@ private:
     QString toolNameFromCommand(const QString& commandText) const;
     QJsonObject toolArgumentsFromCommand(const QString& commandText) const;
     QJsonObject plannerConfirmationPresentation(const QString& commandText,
-                                               int stepIndex,
-                                               int totalSteps,
-                                               const QString& fallbackDetails,
-                                               const QString& plannerSummary,
-                                               const QString& previousPlannedCommand) const;
+                                                int stepIndex,
+                                                int totalSteps,
+                                                const QString& fallbackDetails,
+                                                const QString& plannerSummary,
+                                                const QString& previousPlannedCommand) const;
     QJsonObject plannerConfirmationSnapshot(const QString& commandText) const;
     QJsonObject plannerConfirmationStaleness(const QJsonObject& confirmation) const;
     void refreshPlannerConfirmationsUi();

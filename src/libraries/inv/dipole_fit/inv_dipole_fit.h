@@ -66,8 +66,8 @@ namespace INVLIB
 class INVSHARED_EXPORT InvDipoleFit
 {
 public:
-    typedef QSharedPointer<InvDipoleFit> SPtr;             /**< Shared pointer type for InvDipoleFit. */
-    typedef QSharedPointer<const InvDipoleFit> ConstSPtr;  /**< Const shared pointer type for InvDipoleFit. */
+    typedef QSharedPointer<InvDipoleFit> SPtr;            /**< Shared pointer type for InvDipoleFit. */
+    typedef QSharedPointer<const InvDipoleFit> ConstSPtr; /**< Const shared pointer type for InvDipoleFit. */
 
     //=========================================================================================================
     /**
@@ -92,7 +92,6 @@ public:
     InvEcdSet calculateFit() const;
 
 public:
-
     //=========================================================================================================
     /**
      * Fit a single dipole to each time point of averaged data.
@@ -161,7 +160,7 @@ public:
     static bool fit_dipoles_raw(const QString& dataname, MNELIB::MNERawData* raw, MNELIB::mneChSelection sel, InvDipoleFitData* fit, InvGuessData* guess, float tmin, float tmax, float tstep, float integ, int verbose);
 
 private:
-    InvDipoleFitSettings* settings;     /**< Non-owning pointer to the dipole fit settings. */
+    InvDipoleFitSettings* settings; /**< Non-owning pointer to the dipole fit settings. */
 };
 
 //=============================================================================================================

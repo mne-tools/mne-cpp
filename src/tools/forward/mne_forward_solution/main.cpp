@@ -55,7 +55,7 @@ using namespace FWDLIB;
  * @param[in] argv  (argument vector) is an array of pointers to arrays of character objects. The array objects are null-terminated strings, representing the arguments that were entered on the command line when the program was started.
  * @return the value that was set to exit() (which is 0 if exit() is called via quit()).
  */
-int main(int argc, char *argv[])
+int main(int argc, char* argv[])
 {
     qInstallMessageHandler(UTILSLIB::MNELogger::customLogWriter);
     QApplication app(argc, argv);
@@ -69,8 +69,7 @@ int main(int argc, char *argv[])
     QCommandLineParser parser;
     parser.setApplicationDescription(
         "Compute the MEG/EEG forward solution.\n"
-        "Port of the original MNE-C mne_forward_solution by Matti Hamalainen."
-    );
+        "Port of the original MNE-C mne_forward_solution by Matti Hamalainen.");
     parser.addHelpOption();
     parser.addVersionOption();
 

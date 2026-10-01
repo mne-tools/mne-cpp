@@ -39,7 +39,8 @@
 #include <fiff/fiff_dig_point.h>
 #include <connectivity/network/network.h>
 
-namespace INVLIB {
+namespace INVLIB
+{
 class InvEcdSet;
 }
 
@@ -55,36 +56,36 @@ class DISP3DSHARED_EXPORT BrainTreeModel : public QStandardItemModel
 {
     Q_OBJECT
 public:
-    explicit BrainTreeModel(QObject *parent = nullptr);
+    explicit BrainTreeModel(QObject* parent = nullptr);
     ~BrainTreeModel() override = default;
 
     // Helper functions to populate the tree
-    SurfaceTreeItem* addSurface(const QString &subject, const QString &hemi, const QString &surfType, const FSLIB::FsSurface &surface);
-    
+    SurfaceTreeItem* addSurface(const QString& subject, const QString& hemi, const QString& surfType, const FSLIB::FsSurface& surface);
+
     // Add annotation to an existing surface item? Or separate item?
     // Usually annotation is property of a surface or child of surface.
     // Let's attach it to the surface item for now or find the surface item and update it.
-    bool addAnnotation(const QString &subject, const QString &hemi, const FSLIB::FsAnnotation &annotation);
+    bool addAnnotation(const QString& subject, const QString& hemi, const FSLIB::FsAnnotation& annotation);
 
     // Add BEM surface
-    BemTreeItem* addBemSurface(const QString &subject, const QString &bemName, const MNELIB::MNEBemSurface &bemSurf);
+    BemTreeItem* addBemSurface(const QString& subject, const QString& bemName, const MNELIB::MNEBemSurface& bemSurf);
 
     // Helpers to populate the tree
-    void addSensors(const QString &type, const QList<QStandardItem*> &items);
-    void addDipoles(const INVLIB::InvEcdSet &set);
+    void addSensors(const QString& type, const QList<QStandardItem*>& items);
+    void addDipoles(const INVLIB::InvEcdSet& set);
 
     // Add digitizer points with proper categorization (Cardinal, HPI, EEG, Extra)
-    void addDigitizerData(const QList<FIFFLIB::FiffDigPoint> &digitizerPoints);
+    void addDigitizerData(const QList<FIFFLIB::FiffDigPoint>& digitizerPoints);
 
     // Add source space points
-    void addSourceSpace(const MNELIB::MNESourceSpaces &srcSpace);
+    void addSourceSpace(const MNELIB::MNESourceSpaces& srcSpace);
 
     // Add connectivity network
-    NetworkTreeItem* addNetwork(const CONNECTIVITYLIB::Network &network, const QString &name = "Network");
+    NetworkTreeItem* addNetwork(const CONNECTIVITYLIB::Network& network, const QString& name = "Network");
 
 private:
-   // Helpers to find specific items
-   QStandardItem* getSubjectItem(const QString &subject);
+    // Helpers to find specific items
+    QStandardItem* getSubjectItem(const QString& subject);
 };
 
 #endif // BRAINTREEMODEL_H

@@ -34,7 +34,7 @@ using namespace MNEFLASHBEM;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-MNEFlashBemSettings::MNEFlashBemSettings(int *argc, char **argv)
+MNEFlashBemSettings::MNEFlashBemSettings(int* argc, char** argv)
 : m_bNoConvert(false)
 , m_bNoFlash30(false)
 {
@@ -60,52 +60,45 @@ MNEFlashBemSettings::MNEFlashBemSettings(int *argc, char **argv)
         "Before running:\n"
         "  1. Set FREESURFER_HOME, SUBJECTS_DIR, and SUBJECT environment variables\n"
         "  2. Create flash05/ (and optionally flash30/) directories with echo subdirectories\n"
-        "  3. Run from the directory containing the flash data, or use --flash-dir"
-    );
+        "  3. Run from the directory containing the flash data, or use --flash-dir");
     parser.addHelpOption();
     parser.addVersionOption();
 
     QCommandLineOption noFlash30Option(
         "noflash30",
         "Only 5-degree flash angle data is available. Flash-5 echoes will be averaged "
-        "instead of using parameter maps from both 5 and 30 degree data."
-    );
+        "instead of using parameter maps from both 5 and 30 degree data.");
     parser.addOption(noFlash30Option);
 
     QCommandLineOption noConvertOption(
         "noconvert",
         "Assume that the DICOM images have already been converted to MGZ format. "
-        "Skip the mri_convert step."
-    );
+        "Skip the mri_convert step.");
     parser.addOption(noConvertOption);
 
     QCommandLineOption unwarpOption(
         "unwarp",
         "Apply gradient distortion unwarping using grad_unwarp with this option.",
-        "option"
-    );
+        "option");
     parser.addOption(unwarpOption);
 
     QCommandLineOption subjectOption(
         "subject",
         "Subject name (overrides SUBJECT env var).",
-        "name"
-    );
+        "name");
     parser.addOption(subjectOption);
 
     QCommandLineOption subjectsDirOption(
         "subjects-dir",
         "Subjects directory (overrides SUBJECTS_DIR env var).",
-        "dir"
-    );
+        "dir");
     parser.addOption(subjectsDirOption);
 
     QCommandLineOption flashDirOption(
         "flash-dir",
         "Directory containing flash05/ and flash30/ subdirectories "
         "(default: current working directory).",
-        "dir"
-    );
+        "dir");
     parser.addOption(flashDirOption);
 
     // Build argument list from argc/argv

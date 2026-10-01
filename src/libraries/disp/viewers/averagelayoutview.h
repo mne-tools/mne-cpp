@@ -45,8 +45,9 @@
 class QGraphicsView;
 class QGraphicsItem;
 
-namespace FIFFLIB {
-    class FiffInfo;
+namespace FIFFLIB
+{
+class FiffInfo;
 }
 
 //=============================================================================================================
@@ -79,8 +80,8 @@ class DISPSHARED_EXPORT AverageLayoutView : public AbstractView
     Q_OBJECT
 
 public:
-    typedef QSharedPointer<AverageLayoutView> SPtr;              /**< Shared pointer type for AverageLayoutView. */
-    typedef QSharedPointer<const AverageLayoutView> ConstSPtr;   /**< Const shared pointer type for AverageLayoutView. */
+    typedef QSharedPointer<AverageLayoutView> SPtr;            /**< Shared pointer type for AverageLayoutView. */
+    typedef QSharedPointer<const AverageLayoutView> ConstSPtr; /**< Const shared pointer type for AverageLayoutView. */
 
     //=========================================================================================================
     /**
@@ -91,7 +92,7 @@ public:
      * @param[in] f Qt window flags passed to the QWidget constructor.
      */
     AverageLayoutView(const QString& sSettingsPath = "",
-                      QWidget *parent = 0,
+                      QWidget* parent = 0,
                       Qt::WindowFlags f = Qt::Widget);
 
     //=========================================================================================================
@@ -113,7 +114,7 @@ public:
      *
      * @param[in] pChannelInfoModel     The new channel info model.
      */
-    void setChannelInfoModel(QSharedPointer<ChannelInfoModel> &pChannelInfoModel);
+    void setChannelInfoModel(QSharedPointer<ChannelInfoModel>& pChannelInfoModel);
 
     //=========================================================================================================
     /**
@@ -161,7 +162,7 @@ public:
      *
      * @param[in] scaleMap map with all channel types and their current scaling value.
      */
-    void setScaleMap(const QMap<qint32, float> &scaleMap);
+    void setScaleMap(const QMap<qint32, float>& scaleMap);
 
     //=========================================================================================================
     /**
@@ -169,7 +170,7 @@ public:
      *
      * @return Pointer to the current average colors.
      */
-    QSharedPointer<QMap<QString, QColor> > getAverageColor() const;
+    QSharedPointer<QMap<QString, QColor>> getAverageColor() const;
 
     //=========================================================================================================
     /**
@@ -177,7 +178,7 @@ public:
      *
      * @return Pointer to the current average activations.
      */
-    QSharedPointer<QMap<QString, bool> > getAverageActivation() const;
+    QSharedPointer<QMap<QString, bool>> getAverageActivation() const;
 
     //=========================================================================================================
     /**
@@ -185,7 +186,7 @@ public:
      *
      * @param[in] qMapAverageColor      Pointer to the new average colors.
      */
-    void setAverageColor(const QSharedPointer<QMap<QString, QColor> > qMapAverageColor);
+    void setAverageColor(const QSharedPointer<QMap<QString, QColor>> qMapAverageColor);
 
     //=========================================================================================================
     /**
@@ -201,7 +202,7 @@ public:
      *
      * @param[in] qMapAverageActivation      Pointer to the new average activations.
      */
-    void setAverageActivation(const QSharedPointer<QMap<QString, bool> > qMapAverageActivation);
+    void setAverageActivation(const QSharedPointer<QMap<QString, bool>> qMapAverageActivation);
 
     //=========================================================================================================
     /**
@@ -217,7 +218,7 @@ public:
      *
      * * @param[in] selectedChannelItems list of selected graphic items
      */
-    void channelSelectionManagerChanged(const QList<QGraphicsItem *> &selectedChannelItems);
+    void channelSelectionManagerChanged(const QList<QGraphicsItem*>& selectedChannelItems);
 
     //=========================================================================================================
     /**
@@ -225,7 +226,7 @@ public:
      *
      * @param[in] selectionData     QVariant containing a SelectionItem object with selected channel information.
      */
-    void channelSelectionChanged(const QVariant &selectionData);
+    void channelSelectionChanged(const QVariant& selectionData);
 
     //=========================================================================================================
     /**
@@ -268,17 +269,17 @@ protected:
      */
     void updateProcessingMode(ProcessingMode mode);
 
-    QSharedPointer<AverageScene>                                m_pAverageScene;            /**< The pointer to the average scene. */
-    QSharedPointer<DISPLIB::EvokedSetModel>                     m_pEvokedSetModel;          /**< The data model. */
-    QSharedPointer<DISPLIB::ChannelInfoModel>                   m_pChannelInfoModel;        /**< Channel info model. */
+    QSharedPointer<AverageScene> m_pAverageScene;                  /**< The pointer to the average scene. */
+    QSharedPointer<DISPLIB::EvokedSetModel> m_pEvokedSetModel;     /**< The data model. */
+    QSharedPointer<DISPLIB::ChannelInfoModel> m_pChannelInfoModel; /**< Channel info model. */
 
-    QSharedPointer<FIFFLIB::FiffInfo>                           m_pFiffInfo;                /**< FiffInfo for currently loaded file. */
+    QSharedPointer<FIFFLIB::FiffInfo> m_pFiffInfo; /**< FiffInfo for currently loaded file. */
 
-    QPointer<QGraphicsView>                                     m_pAverageLayoutView;       /**< View for 2D average layout scene. */
+    QPointer<QGraphicsView> m_pAverageLayoutView; /**< View for 2D average layout scene. */
 
-    QSharedPointer<QMap<QString, QColor> >                      m_qMapAverageColor;         /**< Average colors. */
-    QSharedPointer<QMap<QString, bool> >                        m_qMapAverageActivation;    /**< Average activation status. */
-    QMap<qint32,float>                                          m_scaleMap;                 /**< The current scaling map. */
+    QSharedPointer<QMap<QString, QColor>> m_qMapAverageColor;    /**< Average colors. */
+    QSharedPointer<QMap<QString, bool>> m_qMapAverageActivation; /**< Average activation status. */
+    QMap<qint32, float> m_scaleMap;                              /**< The current scaling map. */
 };
 } // NAMESPACE
 

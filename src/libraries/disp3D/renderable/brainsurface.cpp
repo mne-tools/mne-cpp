@@ -20,13 +20,14 @@
 
 #include <set>
 
-namespace {
+namespace
+{
 uint32_t withAlpha(uint32_t color, uint32_t alpha)
 {
     return (color & 0x00FFFFFFu) | ((alpha & 0xFFu) << 24);
 }
 
-uint32_t curvatureGray(const QVector<float> &curvature, int index)
+uint32_t curvatureGray(const QVector<float>& curvature, int index)
 {
     return (index >= 0 && index < curvature.size() && curvature[index] > 0.0f)
         ? 0x40u
@@ -43,7 +44,7 @@ struct BrainSurface::GpuBuffers
     std::unique_ptr<QRhiBuffer> vertexBuffer;
     std::unique_ptr<QRhiBuffer> indexBuffer;
     bool dirty = true;
-    bool indexDirty = true;   // IBO needs (re-)upload (topology change)
+    bool indexDirty = true; // IBO needs (re-)upload (topology change)
 };
 
 //=============================================================================================================
@@ -63,7 +64,7 @@ void BrainSurface::markVertexDirty()
 //=============================================================================================================
 
 BrainSurface::BrainSurface()
-    : m_gpu(std::make_unique<GpuBuffers>())
+: m_gpu(std::make_unique<GpuBuffers>())
 {
 }
 
@@ -73,31 +74,38 @@ BrainSurface::~BrainSurface() = default;
 
 //=============================================================================================================
 
-QRhiBuffer* BrainSurface::vertexBuffer() const { return m_gpu->vertexBuffer.get(); }
-QRhiBuffer* BrainSurface::indexBuffer()  const { return m_gpu->indexBuffer.get(); }
+QRhiBuffer* BrainSurface::vertexBuffer() const
+{
+    return m_gpu->vertexBuffer.get();
+}
+QRhiBuffer* BrainSurface::indexBuffer() const
+{
+    return m_gpu->indexBuffer.get();
+}
 
 //=============================================================================================================
 
-void BrainSurface::fromSurface(const FSLIB::FsSurface &surf)
+void BrainSurface::fromSurface(const FSLIB::FsSurface& surf)
 {
     m_vertexData.clear();
     m_indexData.clear();
 
-    const Eigen::MatrixXf &rr = surf.rr();
-    const Eigen::MatrixXf &nn = surf.nn();
-    const Eigen::MatrixXi &tris = surf.tris();
-    const Eigen::VectorXf &curv = surf.curv();
+    const Eigen::MatrixXf& rr = surf.rr();
+    const Eigen::MatrixXf& nn = surf.nn();
+    const Eigen::MatrixXi& tris = surf.tris();
+    const Eigen::VectorXf& curv = surf.curv();
     m_curvature.resize(curv.size());
-    for(int i=0; i<curv.size(); ++i) m_curvature[i] = curv[i];
+    for (int i = 0; i < curv.size(); ++i)
+        m_curvature[i] = curv[i];
 
     // Populate vertex data
     m_vertexData.reserve(rr.rows());
-    
+
     for (int i = 0; i < rr.rows(); ++i) {
         VertexData v;
         v.pos = QVector3D(rr(i, 0), rr(i, 1), rr(i, 2));
         v.norm = QVector3D(nn(i, 0), nn(i, 1), nn(i, 2));
-        v.color = 0xFFFFFFFF; // Default white (overwritten by updateVertexColors)
+        v.color = 0xFFFFFFFF;           // Default white (overwritten by updateVertexColors)
         v.colorAnnotation = 0x00000000; // No annotation yet
         m_vertexData.append(v);
     }
@@ -109,10 +117,10 @@ void BrainSurface::fromSurface(const FSLIB::FsSurface &surf)
         m_indexData.append(tris(i, 2));
     }
     m_indexCount = m_indexData.size();
-    
+
     markVertexDirty();
     m_bAABBDirty = true;
-    
+
     // Initial coloring based on current visualization mode
     updateVertexColors();
 
@@ -123,7 +131,7 @@ void BrainSurface::fromSurface(const FSLIB::FsSurface &surf)
 
 //=============================================================================================================
 
-void BrainSurface::fromBemSurface(const MNELIB::MNEBemSurface &surf, const QColor &color)
+void BrainSurface::fromBemSurface(const MNELIB::MNEBemSurface& surf, const QColor& color)
 {
     m_vertexData.clear();
     m_indexData.clear();
@@ -131,13 +139,13 @@ void BrainSurface::fromBemSurface(const MNELIB::MNEBemSurface &surf, const QColo
 
     int nVerts = surf.rr.rows();
     m_vertexData.reserve(nVerts);
-    
+
     // Compute normals if missing
     Eigen::MatrixX3f nn = surf.nn;
     if (nn.rows() != nVerts) {
         nn = FSLIB::FsSurface::compute_normals(Eigen::MatrixX3f(surf.rr), Eigen::MatrixX3i(surf.itris));
     }
-    
+
     m_defaultColor = color;
     m_baseColor = color;
     uint32_t colorVal = packABGR(color.red(), color.green(), color.blue(), color.alpha());
@@ -159,17 +167,17 @@ void BrainSurface::fromBemSurface(const MNELIB::MNEBemSurface &surf, const QColo
         m_indexData.append(surf.itris(i, 2));
     }
     m_indexCount = m_indexData.size();
-    
+
     m_originalVertexData = m_vertexData;
     markVertexDirty();
 }
 
-void BrainSurface::createFromData(const Eigen::MatrixX3f &vertices, const Eigen::MatrixX3i &triangles, const QColor &color)
+void BrainSurface::createFromData(const Eigen::MatrixX3f& vertices, const Eigen::MatrixX3i& triangles, const QColor& color)
 {
     // Compute spherical normals (legacy behavior / fallback)
     // Note: detailed normals should be passed via the overload for specific shapes
     Eigen::MatrixX3f normals(vertices.rows(), 3);
-    for(int i=0; i<vertices.rows(); ++i) {
+    for (int i = 0; i < vertices.rows(); ++i) {
         QVector3D p(vertices(i, 0), vertices(i, 1), vertices(i, 2));
         QVector3D n = p.normalized();
         normals(i, 0) = n.x();
@@ -179,15 +187,15 @@ void BrainSurface::createFromData(const Eigen::MatrixX3f &vertices, const Eigen:
     createFromData(vertices, normals, triangles, color);
 }
 
-void BrainSurface::createFromData(const Eigen::MatrixX3f &vertices, const Eigen::MatrixX3f &normals, const Eigen::MatrixX3i &triangles, const QColor &color)
+void BrainSurface::createFromData(const Eigen::MatrixX3f& vertices, const Eigen::MatrixX3f& normals, const Eigen::MatrixX3i& triangles, const QColor& color)
 {
     m_vertexData.clear();
     m_indexData.clear();
-    m_curvature.clear(); 
+    m_curvature.clear();
 
     int nVerts = vertices.rows();
     m_vertexData.reserve(nVerts);
-    
+
     m_defaultColor = color;
     m_baseColor = color;
     uint32_t colorVal = packABGR(color.red(), color.green(), color.blue(), color.alpha());
@@ -209,7 +217,7 @@ void BrainSurface::createFromData(const Eigen::MatrixX3f &vertices, const Eigen:
         m_indexData.append(triangles(i, 2));
     }
     m_indexCount = m_indexData.size();
-    
+
     m_originalVertexData = m_vertexData;
     markVertexDirty();
 }
@@ -242,7 +250,7 @@ Eigen::MatrixX3f BrainSurface::vertexNormals() const
 
 //=============================================================================================================
 
-bool BrainSurface::loadAnnotation(const QString &path)
+bool BrainSurface::loadAnnotation(const QString& path)
 {
     if (!FSLIB::FsAnnotation::read(path, m_annotation)) {
         qWarning() << "BrainSurface: Failed to load annotation from" << path;
@@ -254,7 +262,7 @@ bool BrainSurface::loadAnnotation(const QString &path)
     return true;
 }
 
-void BrainSurface::addAnnotation(const FSLIB::FsAnnotation &annotation)
+void BrainSurface::addAnnotation(const FSLIB::FsAnnotation& annotation)
 {
     m_annotation = annotation;
     m_hasAnnotation = true;
@@ -289,18 +297,18 @@ void BrainSurface::setVisualizationMode(VisualizationMode mode)
 
 //=============================================================================================================
 
-void BrainSurface::applySourceEstimateColors(const QVector<uint32_t> &colors)
+void BrainSurface::applySourceEstimateColors(const QVector<uint32_t>& colors)
 {
     m_visMode = ModeSourceEstimate;
     m_stcColors = colors;
-    
+
     // Write STC colours into the primary color channel. Preserve neutral
     // curvature grey in alpha so Surface mode can still render the classic
     // light/dark cortex while RGB is occupied by source-estimate colours.
     for (int i = 0; i < qMin(colors.size(), m_vertexData.size()); ++i) {
         m_vertexData[i].color = withAlpha(colors[i], curvatureGray(m_curvature, i));
     }
-    
+
     markVertexDirty();
 }
 
@@ -357,14 +365,14 @@ void BrainSurface::updateVertexColors()
     }
 
     // ── 2. Populate colorAnnotation from loaded annotation data.
-    for (auto &v : m_vertexData) {
+    for (auto& v : m_vertexData) {
         v.colorAnnotation = 0x00000000;
     }
 
     if (m_hasAnnotation && !m_vertexData.isEmpty()) {
-        const Eigen::VectorXi &vertices = m_annotation.getVertices();
-        const Eigen::VectorXi &labelIds = m_annotation.getLabelIds();
-        const FSLIB::FsColortable &ct = m_annotation.getColortable();
+        const Eigen::VectorXi& vertices = m_annotation.getVertices();
+        const Eigen::VectorXi& labelIds = m_annotation.getLabelIds();
+        const FSLIB::FsColortable& ct = m_annotation.getColortable();
 
         for (int i = 0; i < labelIds.rows(); ++i) {
             int vertexIdx = vertices(i);
@@ -396,8 +404,8 @@ void BrainSurface::updateVertexColors()
         const uint32_t gold = packABGR(255, 200, 60);
         if (m_selectedRegionId != -1 && m_hasAnnotation) {
             // Highlight a specific annotation region
-            const Eigen::VectorXi &vertices = m_annotation.getVertices();
-            const Eigen::VectorXi &labelIds = m_annotation.getLabelIds();
+            const Eigen::VectorXi& vertices = m_annotation.getVertices();
+            const Eigen::VectorXi& labelIds = m_annotation.getLabelIds();
             for (int i = 0; i < labelIds.rows(); ++i) {
                 if (labelIds(i) == m_selectedRegionId) {
                     int idx = vertices(i);
@@ -425,8 +433,9 @@ void BrainSurface::updateVertexColors()
 float BrainSurface::minX() const
 {
     float minVal = std::numeric_limits<float>::max();
-    for (const auto &v : m_vertexData) {
-        if (v.pos.x() < minVal) minVal = v.pos.x();
+    for (const auto& v : m_vertexData) {
+        if (v.pos.x() < minVal)
+            minVal = v.pos.x();
     }
     return minVal;
 }
@@ -434,15 +443,16 @@ float BrainSurface::minX() const
 float BrainSurface::maxX() const
 {
     float maxVal = std::numeric_limits<float>::lowest();
-    for (const auto &v : m_vertexData) {
-        if (v.pos.x() > maxVal) maxVal = v.pos.x();
+    for (const auto& v : m_vertexData) {
+        if (v.pos.x() > maxVal)
+            maxVal = v.pos.x();
     }
     return maxVal;
 }
 
 void BrainSurface::translateX(float offset)
 {
-    for (auto &v : m_vertexData) {
+    for (auto& v : m_vertexData) {
         v.pos.setX(v.pos.x() + offset);
     }
     markVertexDirty();
@@ -451,31 +461,31 @@ void BrainSurface::translateX(float offset)
 
 //=============================================================================================================
 
-void BrainSurface::transform(const QMatrix4x4 &m)
+void BrainSurface::transform(const QMatrix4x4& m)
 {
     // Extract 3x3 normal matrix (inverse transpose of upper-left 3x3)
     // QMatrix4x4::normalMatrix() returns QMatrix3x3.
     QMatrix3x3 normalMat = m.normalMatrix();
 
-    for (auto &v : m_vertexData) {
+    for (auto& v : m_vertexData) {
         // Transform position
         v.pos = m.map(v.pos);
-        
+
         // Transform normal
         // Note: QMatrix3x3 * QVector3D isn't directly supported by some Qt versions conveniently,
         // but let's assume standard multiplication works or do manually.
         // Actually QVector3D operator*(QMatrix4x4) exists but is row-vector mul.
         // QMatrix4x4 operator*(QVector3D) is standard column-vector mul.
-        
+
         // Use generic map method or just manual multiply if needed.
         // Easier: mapVector for vectors (ignores translation) but needs to be normal matrix for non-uniform scales.
         // If scale is uniform, mapVector is fine.
-        
+
         // Let's do it manually to be safe with QMatrix3x3
-        const float *d = normalMat.constData();
-        float nx = d[0]*v.norm.x() + d[3]*v.norm.y() + d[6]*v.norm.z();
-        float ny = d[1]*v.norm.x() + d[4]*v.norm.y() + d[7]*v.norm.z();
-        float nz = d[2]*v.norm.x() + d[5]*v.norm.y() + d[8]*v.norm.z();
+        const float* d = normalMat.constData();
+        float nx = d[0] * v.norm.x() + d[3] * v.norm.y() + d[6] * v.norm.z();
+        float ny = d[1] * v.norm.x() + d[4] * v.norm.y() + d[7] * v.norm.z();
+        float nz = d[2] * v.norm.x() + d[5] * v.norm.y() + d[8] * v.norm.z();
         v.norm = QVector3D(nx, ny, nz).normalized();
     }
     markVertexDirty();
@@ -484,7 +494,7 @@ void BrainSurface::transform(const QMatrix4x4 &m)
 
 //=============================================================================================================
 
-void BrainSurface::applyTransform(const QMatrix4x4 &m)
+void BrainSurface::applyTransform(const QMatrix4x4& m)
 {
     m_vertexData = m_originalVertexData;
     if (!m.isIdentity()) {
@@ -497,7 +507,7 @@ void BrainSurface::applyTransform(const QMatrix4x4 &m)
 
 //=============================================================================================================
 
-void BrainSurface::updateBuffers(QRhi *rhi, QRhiResourceUpdateBatch *u)
+void BrainSurface::updateBuffers(QRhi* rhi, QRhiResourceUpdateBatch* u)
 {
     const bool needsCreate = !m_gpu->vertexBuffer || !m_gpu->indexBuffer;
 
@@ -520,7 +530,8 @@ void BrainSurface::updateBuffers(QRhi *rhi, QRhiResourceUpdateBatch *u)
     // new vertex data — this is intentional: an Immutable buffer cannot
     // be partially updated, and STC colour animation modifies the colour
     // channel of every vertex anyway.
-    if (!m_gpu->dirty && !needsCreate) return;
+    if (!m_gpu->dirty && !needsCreate)
+        return;
 #endif
 
     const quint32 vbufSize = static_cast<quint32>(m_vertexData.size() * sizeof(VertexData));
@@ -570,13 +581,13 @@ std::vector<Eigen::VectorXi> BrainSurface::computeNeighbors() const
 {
     // Use temporary std::vector<std::set<int>> for dedup during construction
     std::vector<std::set<int>> tempNeighbors(m_vertexData.size());
-    
+
     // Triangles are stored in m_indexData as triplets
     for (int i = 0; i + 2 < m_indexData.size(); i += 3) {
         int v0 = m_indexData[i];
         int v1 = m_indexData[i + 1];
         int v2 = m_indexData[i + 2];
-        
+
         // Add bidirectional edges (set handles dedup)
         tempNeighbors[v0].insert(v1);
         tempNeighbors[v0].insert(v2);
@@ -585,7 +596,7 @@ std::vector<Eigen::VectorXi> BrainSurface::computeNeighbors() const
         tempNeighbors[v2].insert(v0);
         tempNeighbors[v2].insert(v1);
     }
-    
+
     // Convert to std::vector<VectorXi>
     std::vector<Eigen::VectorXi> neighbors(tempNeighbors.size());
     for (size_t k = 0; k < tempNeighbors.size(); ++k) {
@@ -596,7 +607,7 @@ std::vector<Eigen::VectorXi> BrainSurface::computeNeighbors() const
             neighbors[k][idx++] = val;
         }
     }
-    
+
     return neighbors;
 }
 
@@ -616,7 +627,7 @@ Eigen::MatrixX3f BrainSurface::verticesAsMatrix() const
 
 //=============================================================================================================
 
-void BrainSurface::boundingBox(QVector3D &min, QVector3D &max) const
+void BrainSurface::boundingBox(QVector3D& min, QVector3D& max) const
 {
     if (!m_bAABBDirty) {
         min = m_aabbMin;
@@ -625,19 +636,19 @@ void BrainSurface::boundingBox(QVector3D &min, QVector3D &max) const
     }
 
     if (m_vertexData.isEmpty()) {
-        min = QVector3D(0,0,0);
-        max = QVector3D(0,0,0);
+        min = QVector3D(0, 0, 0);
+        max = QVector3D(0, 0, 0);
         return;
     }
 
     min = m_vertexData[0].pos;
     max = m_vertexData[0].pos;
 
-    for (const auto &v : m_vertexData) {
+    for (const auto& v : m_vertexData) {
         min.setX(std::min(min.x(), v.pos.x()));
         min.setY(std::min(min.y(), v.pos.y()));
         min.setZ(std::min(min.z(), v.pos.z()));
-        
+
         max.setX(std::max(max.x(), v.pos.x()));
         max.setY(std::max(max.y(), v.pos.y()));
         max.setZ(std::max(max.z(), v.pos.z()));
@@ -648,15 +659,16 @@ void BrainSurface::boundingBox(QVector3D &min, QVector3D &max) const
     m_bAABBDirty = false;
 }
 
-bool BrainSurface::intersects(const QVector3D &rayOrigin, const QVector3D &rayDir, float &dist, int &vertexIdx) const
+bool BrainSurface::intersects(const QVector3D& rayOrigin, const QVector3D& rayDir, float& dist, int& vertexIdx) const
 {
     vertexIdx = -1;
-    if (m_vertexData.isEmpty()) return false;
+    if (m_vertexData.isEmpty())
+        return false;
 
     // 1. AABB Check (Cached)
     QVector3D min, max;
     boundingBox(min, max);
-    
+
     // Ray-AABB slab method (Double Precision for stability)
     double eps = 1e-4;
     double origin[3] = {rayOrigin.x(), rayOrigin.y(), rayOrigin.z()};
@@ -673,61 +685,70 @@ bool BrainSurface::intersects(const QVector3D &rayOrigin, const QVector3D &rayDi
 
     for (int i = 0; i < 3; ++i) {
         if (std::abs(dir[i]) < 1e-15) {
-            if (origin[i] < minB[i] || origin[i] > maxB[i]) return false;
+            if (origin[i] < minB[i] || origin[i] > maxB[i])
+                return false;
         } else {
             double t1 = (minB[i] - origin[i]) / dir[i];
             double t2 = (maxB[i] - origin[i]) / dir[i];
-            if (t1 > t2) std::swap(t1, t2);
-            if (t1 > tmin) tmin = t1;
-            if (t2 < tmax) tmax = t2;
-            if (tmin > tmax) return false;
+            if (t1 > t2)
+                std::swap(t1, t2);
+            if (t1 > tmin)
+                tmin = t1;
+            if (t2 < tmax)
+                tmax = t2;
+            if (tmin > tmax)
+                return false;
         }
     }
-    
-    if (tmax < 1e-7) return false;
+
+    if (tmax < 1e-7)
+        return false;
 
     // 2. Triangle intersection
     double closestDist = std::numeric_limits<double>::max();
     bool hit = false;
     int closestVert = -1;
-    
+
     // Brute-force triangle intersection using Double Precision Möller–Trumbore
     // Note: For 100k+ vertices this is slow, ideally we'd use an Octree/BVH.
     // However, since we only do this on mouse-over, results are usually acceptable if not too many surfaces are active.
     for (int i = 0; i < m_indexData.size(); i += 3) {
         int i0 = m_indexData[i];
-        int i1 = m_indexData[i+1];
-        int i2 = m_indexData[i+2];
-        const QVector3D &v0q = m_vertexData[i0].pos;
-        const QVector3D &v1q = m_vertexData[i1].pos;
-        const QVector3D &v2q = m_vertexData[i2].pos;
+        int i1 = m_indexData[i + 1];
+        int i2 = m_indexData[i + 2];
+        const QVector3D& v0q = m_vertexData[i0].pos;
+        const QVector3D& v1q = m_vertexData[i1].pos;
+        const QVector3D& v2q = m_vertexData[i2].pos;
 
         double v0x = v0q.x(), v0y = v0q.y(), v0z = v0q.z();
         double v1x = v1q.x(), v1y = v1q.y(), v1z = v1q.z();
         double v2x = v2q.x(), v2y = v2q.y(), v2z = v2q.z();
-        
+
         double edge1x = v1x - v0x, edge1y = v1y - v0y, edge1z = v1z - v0z;
         double edge2x = v2x - v0x, edge2y = v2y - v0y, edge2z = v2z - v0z;
-        
+
         double hx = dirY * edge2z - dirZ * edge2y;
         double hy = dirZ * edge2x - dirX * edge2z;
         double hz = dirX * edge2y - dirY * edge2x;
-        
+
         double a = edge1x * hx + edge1y * hy + edge1z * hz;
-        if (std::abs(a) < 1e-18) continue; // Purely parallel
-        
+        if (std::abs(a) < 1e-18)
+            continue; // Purely parallel
+
         double f = 1.0 / a;
         double sx = originX - v0x, sy = originY - v0y, sz = originZ - v0z;
         double u = f * (sx * hx + sy * hy + sz * hz);
-        if (u < -1e-7 || u > 1.0000001) continue;
-        
+        if (u < -1e-7 || u > 1.0000001)
+            continue;
+
         double qx = sy * edge1z - sz * edge1y;
         double qy = sz * edge1x - sx * edge1z;
         double qz = sx * edge1y - sy * edge1x;
-        
+
         double v = f * (dirX * qx + dirY * qy + dirZ * qz);
-        if (v < -1e-7 || u + v > 1.0000001) continue;
-        
+        if (v < -1e-7 || u + v > 1.0000001)
+            continue;
+
         double t = f * (edge2x * qx + edge2y * qy + edge2z * qz);
         if (t > 1e-7 && t < closestDist) {
             // Check barycentric coordinates with Fixed Relative Tolerance (25%)
@@ -735,35 +756,38 @@ bool BrainSurface::intersects(const QVector3D &rayOrigin, const QVector3D &rayDi
             // - Large triangles (Helmet): Tolerates large gaps (~cm scale)
             // - Small triangles (Brain): Tolerates small errors (~mm scale)
             // This prevents clicking 'through' sparse meshes while staying precise on dense ones.
-            constexpr double tol = 0.25; 
-            
+            constexpr double tol = 0.25;
+
             if (u >= -tol && v >= -tol && u + v <= 1.0 + tol) {
                 closestDist = t;
                 hit = true;
-                
+
                 // Find closest vertex of the hit triangle to the hit point
                 // (Used for region lookup)
                 double hitX = originX + t * dirX;
                 double hitY = originY + t * dirY;
                 double hitZ = originZ + t * dirZ;
-                
-                double d0 = (v0x - hitX)*(v0x - hitX) + (v0y - hitY)*(v0y - hitY) + (v0z - hitZ)*(v0z - hitZ);
-                double d1 = (v1x - hitX)*(v1x - hitX) + (v1y - hitY)*(v1y - hitY) + (v1z - hitZ)*(v1z - hitZ);
-                double d2 = (v2x - hitX)*(v2x - hitX) + (v2y - hitY)*(v2y - hitY) + (v2z - hitZ)*(v2z - hitZ);
-                
-                if (d0 < d1 && d0 < d2) closestVert = i0;
-                else if (d1 < d2) closestVert = i1;
-                else closestVert = i2;
+
+                double d0 = (v0x - hitX) * (v0x - hitX) + (v0y - hitY) * (v0y - hitY) + (v0z - hitZ) * (v0z - hitZ);
+                double d1 = (v1x - hitX) * (v1x - hitX) + (v1y - hitY) * (v1y - hitY) + (v1z - hitZ) * (v1z - hitZ);
+                double d2 = (v2x - hitX) * (v2x - hitX) + (v2y - hitY) * (v2y - hitY) + (v2z - hitZ) * (v2z - hitZ);
+
+                if (d0 < d1 && d0 < d2)
+                    closestVert = i0;
+                else if (d1 < d2)
+                    closestVert = i1;
+                else
+                    closestVert = i2;
             }
         }
     }
-    
+
     if (hit) {
         dist = static_cast<float>(closestDist);
         vertexIdx = closestVert;
         return true;
     }
-    
+
     return false;
 }
 
@@ -775,11 +799,11 @@ QString BrainSurface::getAnnotationLabel(int vertexIdx) const
         return "";
     }
 
-    const Eigen::VectorXi &vertices = m_annotation.getVertices();
-    const Eigen::VectorXi &labelIds = m_annotation.getLabelIds();
-    const FSLIB::FsColortable &ct = m_annotation.getColortable();
+    const Eigen::VectorXi& vertices = m_annotation.getVertices();
+    const Eigen::VectorXi& labelIds = m_annotation.getLabelIds();
+    const FSLIB::FsColortable& ct = m_annotation.getColortable();
 
-    // The .annot file might not contain all vertices if it's sparse, 
+    // The .annot file might not contain all vertices if it's sparse,
     // but usually it contains a mapping for all.
     // Let's find the labelId for this vertex.
     int labelId = -1;
@@ -790,7 +814,8 @@ QString BrainSurface::getAnnotationLabel(int vertexIdx) const
         }
     }
 
-    if (labelId == -1) return "Unknown";
+    if (labelId == -1)
+        return "Unknown";
 
     // Find the name in colortable
     for (int i = 0; i < ct.numEntries; ++i) {
@@ -809,10 +834,11 @@ QString BrainSurface::getAnnotationLabel(int vertexIdx) const
 
 int BrainSurface::getAnnotationLabelId(int vertexIdx) const
 {
-    if (!m_hasAnnotation || vertexIdx < 0) return -1;
+    if (!m_hasAnnotation || vertexIdx < 0)
+        return -1;
 
-    const Eigen::VectorXi &vertices = m_annotation.getVertices();
-    const Eigen::VectorXi &labelIds = m_annotation.getLabelIds();
+    const Eigen::VectorXi& vertices = m_annotation.getVertices();
+    const Eigen::VectorXi& labelIds = m_annotation.getLabelIds();
 
     for (int i = 0; i < vertices.rows(); ++i) {
         if (vertices(i) == vertexIdx) {

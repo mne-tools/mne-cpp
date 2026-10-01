@@ -44,7 +44,7 @@ using namespace FSLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-RealTimeConnectivityEstimate::RealTimeConnectivityEstimate(QObject *parent)
+RealTimeConnectivityEstimate::RealTimeConnectivityEstimate(QObject* parent)
 : Measurement(QMetaType::fromName("RealTimeConnectivityEstimate::SPtr").id(), parent)
 , m_pAnnotSet(FsAnnotationSet::SPtr(new FsAnnotationSet))
 , m_pSurfSet(FsSurfaceSet::SPtr(new FsSurfaceSet))
@@ -62,7 +62,7 @@ RealTimeConnectivityEstimate::~RealTimeConnectivityEstimate()
 
 //=============================================================================================================
 
-QSharedPointer<Network> &RealTimeConnectivityEstimate::getValue()
+QSharedPointer<Network>& RealTimeConnectivityEstimate::getValue()
 {
     QMutexLocker locker(&m_qMutex);
     return m_pNetwork;
@@ -75,7 +75,7 @@ void RealTimeConnectivityEstimate::setValue(const Network& v)
     m_qMutex.lock();
 
     //Store
-     *m_pNetwork = v;
+    *m_pNetwork = v;
 
     m_bInitialized = true;
 
@@ -83,4 +83,3 @@ void RealTimeConnectivityEstimate::setValue(const Network& v)
 
     emit notify();
 }
-

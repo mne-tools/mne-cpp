@@ -76,7 +76,7 @@ public:
      *
      * @param [in] parent pointer to parent widget; If parent is 0, the new ChInfoWindow becomes a window. If parent is another widget, ChInfoWindow becomes a child window inside parent. ChInfoWindow is deleted when its parent is deleted.
      */
-    ChInfoWindow(QWidget *parent = 0);
+    ChInfoWindow(QWidget* parent = 0);
 
     //=========================================================================================================
     /**
@@ -106,9 +106,9 @@ private:
      */
     void initTableViews();
 
-    std::unique_ptr<Ui::ChInfoWindow> ui;               /**< Pointer to the qt designer generated ui class.*/
+    std::unique_ptr<Ui::ChInfoWindow> ui; /**< Pointer to the qt designer generated ui class.*/
 
-    ChannelInfoModel::SPtr   m_pChannelInfoModel;     /**< The channel info model.*/
+    ChannelInfoModel::SPtr m_pChannelInfoModel; /**< The channel info model.*/
 };
 
 } // NAMESPACE MNEBROWSE

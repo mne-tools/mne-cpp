@@ -57,19 +57,24 @@ namespace DISPLIB
  * @ref AverageScene and @ref ChannelSelectionView to limit display
  * to a subset of sensors.
  */
-class DISPSHARED_EXPORT SelectionItem{
+class DISPSHARED_EXPORT SelectionItem
+{
 public:
-    SelectionItem() {}
-    ~SelectionItem() {}
-    SelectionItem(const SelectionItem &);
+    SelectionItem()
+    {
+    }
+    ~SelectionItem()
+    {
+    }
+    SelectionItem(const SelectionItem&);
 
-    QList<QString>     m_sViewsToApply;
-    QList<QString>     m_sChannelName;             /**< The channel's name.*/
-    QList<int>         m_iChannelNumber;           /**< The channel number.*/
-    QList<int>         m_iChannelKind;             /**< The channel kind.*/
-    QList<int>         m_iChannelUnit;             /**< The channel unit.*/
-    QList<QPointF>     m_qpChannelPosition;        /**< The channel's 2D position in the scene.*/
-    bool               m_bShowAll;                 /**< Whether to show all channels. */
+    QList<QString> m_sViewsToApply;
+    QList<QString> m_sChannelName;      /**< The channel's name.*/
+    QList<int> m_iChannelNumber;        /**< The channel number.*/
+    QList<int> m_iChannelKind;          /**< The channel kind.*/
+    QList<int> m_iChannelUnit;          /**< The channel unit.*/
+    QList<QPointF> m_qpChannelPosition; /**< The channel's 2D position in the scene.*/
+    bool m_bShowAll;                    /**< Whether to show all channels. */
 };
 
 /**
@@ -77,10 +82,9 @@ public:
  */
 class DISPSHARED_EXPORT SelectionSceneItem : public QGraphicsItem
 {
-
 public:
-    typedef QSharedPointer<SelectionSceneItem> SPtr;              /**< Shared pointer type for SelectionSceneItem. */
-    typedef QSharedPointer<const SelectionSceneItem> ConstSPtr;   /**< Const shared pointer type for SelectionSceneItem. */
+    typedef QSharedPointer<SelectionSceneItem> SPtr;            /**< Shared pointer type for SelectionSceneItem. */
+    typedef QSharedPointer<const SelectionSceneItem> ConstSPtr; /**< Const shared pointer type for SelectionSceneItem. */
 
     //=========================================================================================================
     /**
@@ -118,16 +122,16 @@ public:
      * @param[in] option   Style options (unused).
      * @param[in] widget   Widget being painted on (unused).
      */
-    void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
+    void paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget);
 
-    QString     m_sChannelName;             /**< The channel's name.*/
-    int         m_iChannelNumber;           /**< The channel number.*/
-    int         m_iChannelKind;             /**< The channel kind.*/
-    int         m_iChannelUnit;             /**< The channel unit.*/
-    QPointF     m_qpChannelPosition;        /**< The channel's 2D position in the scene.*/
-    QColor      m_cChannelColor;            /**< The current channel color.*/
-    bool        m_bHighlightItem;           /**< Whether this item is to be highlighted.*/
-    bool        m_bIsBadChannel;            /**< Whether this item is a bad channel.*/
+    QString m_sChannelName;      /**< The channel's name.*/
+    int m_iChannelNumber;        /**< The channel number.*/
+    int m_iChannelKind;          /**< The channel kind.*/
+    int m_iChannelUnit;          /**< The channel unit.*/
+    QPointF m_qpChannelPosition; /**< The channel's 2D position in the scene.*/
+    QColor m_cChannelColor;      /**< The current channel color.*/
+    bool m_bHighlightItem;       /**< Whether this item is to be highlighted.*/
+    bool m_bIsBadChannel;        /**< Whether this item is a bad channel.*/
 };
 
 } // NAMESPACE DISPLIB

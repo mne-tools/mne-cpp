@@ -81,7 +81,6 @@ class FsSurface;
  */
 class FSSHARED_EXPORT FsAnnotation
 {
-
 public:
     typedef QSharedPointer<FsAnnotation> SPtr;            /**< Shared pointer type for FsAnnotation. */
     typedef QSharedPointer<const FsAnnotation> ConstSPtr; /**< Const shared pointer type for FsAnnotation. */
@@ -109,7 +108,7 @@ public:
      * @param[in] surf              Name of the atlas to load (eg. aparc.a2009s, aparc, aparc.DKTatlas40, BA, BA.thresh, ...).
      * @param[in] subjects_dir       Subjects directory.
      */
-    explicit FsAnnotation(const QString &subject_id, qint32 hemi, const QString &surf, const QString &subjects_dir);
+    explicit FsAnnotation(const QString& subject_id, qint32 hemi, const QString& surf, const QString& subjects_dir);
 
     //=========================================================================================================
     /**
@@ -119,7 +118,7 @@ public:
      * @param[in] hemi               Which hemisphere to load {0 -> lh, 1 -> rh}.
      * @param[in] surf              Name of the atlas to load (eg. aparc.a2009s, aparc, aparc.DKTatlas40, BA, BA.thresh, ...).
      */
-    explicit FsAnnotation(const QString &path, qint32 hemi, const QString &surf);
+    explicit FsAnnotation(const QString& path, qint32 hemi, const QString& surf);
 
     //=========================================================================================================
     /**
@@ -209,7 +208,7 @@ public:
      *
      * @return true if read sucessful, false otherwise.
      */
-    static bool read(const QString &subject_id, qint32 hemi, const QString &atlas, const QString &subjects_dir, FsAnnotation &p_Annotation);
+    static bool read(const QString& subject_id, qint32 hemi, const QString& atlas, const QString& subjects_dir, FsAnnotation& p_Annotation);
 
     //=========================================================================================================
     /**
@@ -222,7 +221,7 @@ public:
      *
      * @return true if read sucessful, false otherwise.
      */
-    static bool read(const QString &path, qint32 hemi, const QString &atlas, FsAnnotation &p_Annotation);
+    static bool read(const QString& path, qint32 hemi, const QString& atlas, FsAnnotation& p_Annotation);
 
     //=========================================================================================================
     /**
@@ -233,7 +232,7 @@ public:
      *
      * @return true if successful, false otherwise.
      */
-    static bool read(const QString &p_sFileName, FsAnnotation &p_Annotation);
+    static bool read(const QString& p_sFileName, FsAnnotation& p_Annotation);
 
     //=========================================================================================================
     /**
@@ -248,9 +247,9 @@ public:
      *
      * @return true if successful, false otherwise.
      */
-    bool toLabels(const FsSurface &p_surf,
-                  QList<FsLabel> &p_qListLabels,
-                  QList<Eigen::RowVector4i> &p_qListLabelRGBAs,
+    bool toLabels(const FsSurface& p_surf,
+                  QList<FsLabel>& p_qListLabels,
+                  QList<Eigen::RowVector4i>& p_qListLabelRGBAs,
                   const QStringList& lLabelPicks = QStringList()) const;
 
     //=========================================================================================================
@@ -270,14 +269,14 @@ public:
     inline QString fileName() const;
 
 private:
-    QString m_sFileName;        /**< FsAnnotation file name. */
-    QString m_sFilePath;        /**< FsAnnotation file path. */
+    QString m_sFileName; /**< FsAnnotation file name. */
+    QString m_sFilePath; /**< FsAnnotation file path. */
 
     qint32 m_iHemi;             /**< Hemisphere (lh = 0; rh = 1). */
-    Eigen::VectorXi m_Vertices;        /**< Vertice indeces. */
-    Eigen::VectorXi m_LabelIds;        /**< Vertice label ids. */
+    Eigen::VectorXi m_Vertices; /**< Vertice indeces. */
+    Eigen::VectorXi m_LabelIds; /**< Vertice label ids. */
 
-    FsColortable m_Colortable;    /**< Lookup table label colors & ids. */
+    FsColortable m_Colortable; /**< Lookup table label colors & ids. */
 };
 
 //=============================================================================================================

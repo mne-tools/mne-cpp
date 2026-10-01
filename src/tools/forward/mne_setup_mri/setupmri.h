@@ -42,7 +42,8 @@
 // DEFINE NAMESPACE MNESETUPMRI
 //=============================================================================================================
 
-namespace MNESETUPMRI {
+namespace MNESETUPMRI
+{
 
 //=============================================================================================================
 // FORWARD DECLARATIONS
@@ -98,7 +99,7 @@ private:
 
     //=========================================================================================================
 
-    const MNESetupMriSettings& m_settings;      /**< Command-line settings. */
+    const MNESetupMriSettings& m_settings; /**< Command-line settings. */
 };
 
 } // namespace MNESETUPMRI

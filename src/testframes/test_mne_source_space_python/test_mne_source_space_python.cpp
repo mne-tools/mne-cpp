@@ -95,15 +95,14 @@ private slots:
 
 QString TestMneSourceSpacePython::srcPath()
 {
-    return QCoreApplication::applicationDirPath()
-           + "/../resources/data/mne-cpp-test-data/subjects/sample/bem/sample-oct-6-src.fif";
+    return QCoreApplication::applicationDirPath() + "/../resources/data/mne-cpp-test-data/subjects/sample/bem/sample-oct-6-src.fif";
 }
 
 //=============================================================================================================
 
 void TestMneSourceSpacePython::initTestCase()
 {
-    if(!QFile::exists(srcPath())) {
+    if (!QFile::exists(srcPath())) {
         QSKIP("Source space test data not found");
     }
 
@@ -129,7 +128,7 @@ void TestMneSourceSpacePython::geometry_matchesPython_data()
 
     // From mne.read_source_spaces. FIFFV_MNE_SURF_LEFT_HEMI is 101 and
     // FIFFV_MNE_SURF_RIGHT_HEMI is 102; coord frame 5 is FIFFV_COORD_MRI.
-    QTest::newRow("left")  << 0 << 101 << 155407 << 310810 << 4098 << 5 << 318245580;
+    QTest::newRow("left") << 0 << 101 << 155407 << 310810 << 4098 << 5 << 318245580;
     QTest::newRow("right") << 1 << 102 << 156866 << 313728 << 4098 << 5 << 322212481;
 }
 
@@ -165,10 +164,10 @@ void TestMneSourceSpacePython::geometry_matchesPython()
 
     // inuse is the boolean form of vertno, so the two have to agree.
     QCOMPARE(static_cast<int>(s.inuse.sum()), nuse);
-    for(int i = 0; i < s.vertno.size(); ++i) {
+    for (int i = 0; i < s.vertno.size(); ++i) {
         QVERIFY2(s.inuse(s.vertno(i)) != 0,
                  qPrintable(QString("vertex %1 is in vertno but not marked in inuse")
-                            .arg(s.vertno(i))));
+                                .arg(s.vertno(i))));
     }
 }
 
@@ -241,7 +240,7 @@ void TestMneSourceSpacePython::firstVertex_matchesPython()
 
     // Normals must be unit length; a reader that swapped rr and nn would pass
     // the component checks above on a lucky file but not this.
-    for(int i = 0; i < std::min<int>(64, s.nn.rows()); ++i) {
+    for (int i = 0; i < std::min<int>(64, s.nn.rows()); ++i) {
         const double len = s.nn.row(i).cast<double>().norm();
         QVERIFY2(std::fabs(len - 1.0) < 1.0e-4,
                  qPrintable(QString("normal %1 has length %2").arg(i).arg(len)));
@@ -256,7 +255,7 @@ void TestMneSourceSpacePython::hemisphereIdentification_data()
     QTest::addColumn<int>("expectedHemiId");
     QTest::addColumn<bool>("expectedIsLeft");
 
-    QTest::newRow("left")  << 0 << 101 << true;
+    QTest::newRow("left") << 0 << 101 << true;
     QTest::newRow("right") << 1 << 102 << false;
 }
 
@@ -283,12 +282,12 @@ void TestMneSourceSpacePython::transform_isRigidAndUpdatesFrame()
 
     const MatrixX3f rrBefore = s.rr;
     const int frameBefore = s.coord_frame;
-    QCOMPARE(frameBefore, 5);   // FIFFV_COORD_MRI
+    QCOMPARE(frameBefore, 5); // FIFFV_COORD_MRI
 
     // A pure translation of 10 mm along x, expressed MRI to head.
     FiffCoordTrans t;
-    t.from = 5;    // FIFFV_COORD_MRI
-    t.to   = 4;    // FIFFV_COORD_HEAD
+    t.from = 5; // FIFFV_COORD_MRI
+    t.to = 4;   // FIFFV_COORD_HEAD
     t.trans = Matrix4f::Identity();
     t.trans(0, 3) = 0.01f;
 
@@ -305,10 +304,12 @@ void TestMneSourceSpacePython::transform_isRigidAndUpdatesFrame()
     QCOMPARE(s.coord_frame, 4);
 
     // Every vertex moves by exactly the translation.
-    for(int i = 0; i < std::min<int>(128, s.rr.rows()); ++i) {
+    for (int i = 0; i < std::min<int>(128, s.rr.rows()); ++i) {
         QVERIFY2(std::fabs(s.rr(i, 0) - (rrBefore(i, 0) + 0.01f)) < 1.0e-6f,
                  qPrintable(QString("vertex %1 x moved to %2, expected %3")
-                            .arg(i).arg(s.rr(i, 0)).arg(rrBefore(i, 0) + 0.01f)));
+                                .arg(i)
+                                .arg(s.rr(i, 0))
+                                .arg(rrBefore(i, 0) + 0.01f)));
         QVERIFY2(std::fabs(s.rr(i, 1) - rrBefore(i, 1)) < 1.0e-6f, "y should not move");
         QVERIFY2(std::fabs(s.rr(i, 2) - rrBefore(i, 2)) < 1.0e-6f, "z should not move");
     }

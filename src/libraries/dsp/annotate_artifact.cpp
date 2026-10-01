@@ -45,15 +45,16 @@ using namespace Eigen;
 // STATIC HELPERS
 //=============================================================================================================
 
-namespace {
+namespace
+{
 
 //=============================================================================================================
 /**
  * @brief Collect contiguous runs of true values into (start, end) pairs (inclusive).
  */
-QVector<QPair<int,int>> findContiguousSegments(const VectorXi& mask)
+QVector<QPair<int, int>> findContiguousSegments(const VectorXi& mask)
 {
-    QVector<QPair<int,int>> segs;
+    QVector<QPair<int, int>> segs;
     const int n = static_cast<int>(mask.size());
     int i = 0;
     while (i < n) {
@@ -73,11 +74,11 @@ QVector<QPair<int,int>> findContiguousSegments(const VectorXi& mask)
 /**
  * @brief Merge segments that are closer than gapSamples apart.
  */
-void mergeCloseSegments(QVector<QPair<int,int>>& segs, int gapSamples)
+void mergeCloseSegments(QVector<QPair<int, int>>& segs, int gapSamples)
 {
     if (segs.size() < 2)
         return;
-    QVector<QPair<int,int>> merged;
+    QVector<QPair<int, int>> merged;
     merged.append(segs.first());
     for (int i = 1; i < segs.size(); ++i) {
         if (segs[i].first - merged.last().second <= gapSamples) {
@@ -93,11 +94,11 @@ void mergeCloseSegments(QVector<QPair<int,int>>& segs, int gapSamples)
 /**
  * @brief Remove segments shorter than minSamples.
  */
-void removeShortSegments(QVector<QPair<int,int>>& segs, int minSamples)
+void removeShortSegments(QVector<QPair<int, int>>& segs, int minSamples)
 {
     if (minSamples <= 1)
         return;
-    QVector<QPair<int,int>> filtered;
+    QVector<QPair<int, int>> filtered;
     for (const auto& seg : segs) {
         if (seg.second - seg.first + 1 >= minSamples)
             filtered.append(seg);
@@ -227,7 +228,7 @@ FiffAnnotations UTILSLIB::annotateAmplitude(
 
     const bool checkPeakMax = std::isfinite(params.dPeakMax);
     const bool checkPeakMin = std::isfinite(params.dPeakMin);
-    const bool checkFlat    = params.dFlatMin > 0.0;
+    const bool checkFlat = params.dFlatMin > 0.0;
     const int minSamples = static_cast<int>(std::round(params.dMinDuration * sfreq));
 
     //--- Peak amplitude check per channel ---
@@ -239,7 +240,9 @@ FiffAnnotations UTILSLIB::annotateAmplitude(
             for (Eigen::Index s = 0; s < nTimes; ++s) {
                 const double val = data(ch, s);
                 mask(static_cast<int>(s)) = ((checkPeakMax && val > params.dPeakMax) ||
-                                              (checkPeakMin && val < params.dPeakMin)) ? 1 : 0;
+                                             (checkPeakMin && val < params.dPeakMin))
+                    ? 1
+                    : 0;
             }
 
             auto segs = findContiguousSegments(mask);

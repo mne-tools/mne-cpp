@@ -35,13 +35,15 @@
 
 class QTime;
 
-namespace SCMEASLIB {
-    class RealTimeSpectrum;
+namespace SCMEASLIB
+{
+class RealTimeSpectrum;
 }
 
-namespace DISPLIB {
-    class SpectrumSettingsView;
-    class SpectrumView;
+namespace DISPLIB
+{
+class SpectrumSettingsView;
+class SpectrumView;
 }
 
 //=============================================================================================================
@@ -75,7 +77,7 @@ public:
      * @param[in] parent        pointer to parent widget; If parent is 0, the new NumericWidget becomes a window. If parent is another widget, NumericWidget becomes a child window inside parent. NumericWidget is deleted when its parent is deleted.
      */
     RealTimeSpectrumWidget(QSharedPointer<SCMEASLIB::RealTimeSpectrum> pNE,
-                           QSharedPointer<QTime> &pTime,
+                           QSharedPointer<QTime>& pTime,
                            QWidget* parent = 0);
 
     //=========================================================================================================
@@ -88,7 +90,9 @@ public:
     /**
      * Initialise the MeasurementWidget.
      */
-    virtual void init(){}
+    virtual void init()
+    {
+    }
 
     //=========================================================================================================
     /**
@@ -110,7 +114,7 @@ public:
      */
     void initSettingsWidget();
 
-    bool eventFilter(QObject *object, QEvent *event);
+    bool eventFilter(QObject* object, QEvent* event);
 
 private:
     //=========================================================================================================
@@ -131,14 +135,14 @@ private:
      */
     void showSpectrumSettingsView();
 
-    QPointer<QAction>                                           m_pActionFrequencySettings;         /**< Frequency spectrum settings action. */
-    QPointer<DISPLIB::SpectrumView>                             m_pSpectrumView;                    /**< Frequency spectrum view. */
+    QPointer<QAction> m_pActionFrequencySettings;    /**< Frequency spectrum settings action. */
+    QPointer<DISPLIB::SpectrumView> m_pSpectrumView; /**< Frequency spectrum view. */
 
-    QSharedPointer<DISPLIB::SpectrumSettingsView>               m_pSpectrumSettingsView;            /**< Frequency spectrum settings modality widget. */
-    QSharedPointer<SCMEASLIB::RealTimeSpectrum>                 m_pFS;                              /**< The frequency spectrum measurement. */
+    QSharedPointer<DISPLIB::SpectrumSettingsView> m_pSpectrumSettingsView; /**< Frequency spectrum settings modality widget. */
+    QSharedPointer<SCMEASLIB::RealTimeSpectrum> m_pFS;                     /**< The frequency spectrum measurement. */
 
-    float m_fLowerFrqBound;         /**< Lower frequency bound. */
-    float m_fUpperFrqBound;         /**< Upper frequency bound. */
+    float m_fLowerFrqBound; /**< Lower frequency bound. */
+    float m_fUpperFrqBound; /**< Upper frequency bound. */
 };
 } // NAMESPACE
 

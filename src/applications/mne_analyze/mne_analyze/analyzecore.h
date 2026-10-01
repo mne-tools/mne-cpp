@@ -39,16 +39,17 @@ class QSplashScreen;
 
 namespace ANSHAREDLIB
 {
-    class AbstractPlugin;
-    class PluginManager;
-    class AnalyzeData;
+class AbstractPlugin;
+class PluginManager;
+class AnalyzeData;
 }
 
 //=============================================================================================================
 // DEFINE NAMESPACE MNEANALYZE
 //=============================================================================================================
 
-namespace MNEANALYZE {
+namespace MNEANALYZE
+{
 
 //=============================================================================================================
 // MNEANALYZE FORWARD DECLARATIONS
@@ -167,10 +168,10 @@ private:
      */
     void loadandInitPlugins();
 
-    QSharedPointer<ANSHAREDLIB::PluginManager>      m_pPluginManager;       /**< Holds plugin manager. */
-    QSharedPointer<ANSHAREDLIB::AnalyzeData>        m_pAnalyzeData;         /**< The global data base. */
-    QPointer<MainWindow>                            m_pMainWindow;          /**< The main window. */
-    QCommandLineParser                              m_cmdLineParser;        /**< The command line parser. */
+    QSharedPointer<ANSHAREDLIB::PluginManager> m_pPluginManager; /**< Holds plugin manager. */
+    QSharedPointer<ANSHAREDLIB::AnalyzeData> m_pAnalyzeData;     /**< The global data base. */
+    QPointer<MainWindow> m_pMainWindow;                          /**< The main window. */
+    QCommandLineParser m_cmdLineParser;                          /**< The command line parser. */
 };
 
 //=============================================================================================================

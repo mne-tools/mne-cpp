@@ -45,13 +45,13 @@ private slots:
 
     void bemModel_explainSurface()
     {
-        const QString &brain = FwdBemModel::fwd_bem_explain_surface(FIFFV_BEM_SURF_ID_BRAIN);
+        const QString& brain = FwdBemModel::fwd_bem_explain_surface(FIFFV_BEM_SURF_ID_BRAIN);
         QVERIFY(!brain.isEmpty());
 
-        const QString &skull = FwdBemModel::fwd_bem_explain_surface(FIFFV_BEM_SURF_ID_SKULL);
+        const QString& skull = FwdBemModel::fwd_bem_explain_surface(FIFFV_BEM_SURF_ID_SKULL);
         QVERIFY(!skull.isEmpty());
 
-        const QString &head = FwdBemModel::fwd_bem_explain_surface(FIFFV_BEM_SURF_ID_HEAD);
+        const QString& head = FwdBemModel::fwd_bem_explain_surface(FIFFV_BEM_SURF_ID_HEAD);
         QVERIFY(!head.isEmpty());
     }
 
@@ -116,7 +116,7 @@ private slots:
 
     void bemModel_setHeadMriT()
     {
-        FwdBemModel *model = new FwdBemModel();
+        FwdBemModel* model = new FwdBemModel();
         FiffCoordTrans trans;
         trans.from = FIFFV_COORD_HEAD;
         trans.to = FIFFV_COORD_MRI;
@@ -193,8 +193,7 @@ private slots:
     //=========================================================================
     void coilSet_readDefault()
     {
-        QString coilDefPath = QCoreApplication::applicationDirPath()
-                              + "/../resources/general/coilDefinitions/coil_def.dat";
+        QString coilDefPath = QCoreApplication::applicationDirPath() + "/../resources/general/coilDefinitions/coil_def.dat";
         if (!QFile::exists(coilDefPath)) {
             QSKIP("Coil definition file not found");
         }
@@ -209,10 +208,8 @@ private slots:
     //=========================================================================
     void bemModel_loadFromFile()
     {
-        QString bemPath = QCoreApplication::applicationDirPath()
-                          + "/../resources/data/mne-cpp-test-data/subjects/sample/bem/sample-5120-bem.fif";
-        QString solPath = QCoreApplication::applicationDirPath()
-                          + "/../resources/data/mne-cpp-test-data/subjects/sample/bem/sample-5120-bem-sol.fif";
+        QString bemPath = QCoreApplication::applicationDirPath() + "/../resources/data/mne-cpp-test-data/subjects/sample/bem/sample-5120-bem.fif";
+        QString solPath = QCoreApplication::applicationDirPath() + "/../resources/data/mne-cpp-test-data/subjects/sample/bem/sample-5120-bem-sol.fif";
         if (!QFile::exists(bemPath)) {
             QSKIP("BEM file not found");
         }

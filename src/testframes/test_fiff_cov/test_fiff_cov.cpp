@@ -40,12 +40,12 @@ using namespace FIFFLIB;
 using namespace UTILSLIB;
 using namespace Eigen;
 
-namespace {
+namespace
+{
 
 QString sampleDataPath()
 {
-    return QCoreApplication::applicationDirPath()
-           + "/../resources/data/mne-cpp-test-data/MEG/sample";
+    return QCoreApplication::applicationDirPath() + "/../resources/data/mne-cpp-test-data/MEG/sample";
 }
 
 MatrixXi deriveStimEvents(const FiffRawData& raw)
@@ -122,7 +122,7 @@ QList<int> uniqueEventCodes(const MatrixXi& events, int maxCodes = -1)
  * @brief The TestFiffCov class provides covariance reading verification tests
  *
  */
-class TestFiffCov: public QObject
+class TestFiffCov : public QObject
 {
     Q_OBJECT
 
@@ -180,42 +180,42 @@ void TestFiffCov::initTestCase()
 void TestFiffCov::compareData()
 {
     //Make the values a little bit bigger
-    MatrixXd mDataDiff = covResult.data*1000000 - covLoaded.data*1000000;
+    MatrixXd mDataDiff = covResult.data * 1000000 - covLoaded.data * 1000000;
 
-//    qDebug()<<"abs(covResult.data.sum()) "<<covResult.data.normalized().sum();
-//    qDebug()<<"abs(covLoaded.data.sum()) "<<covLoaded.data.normalized().sum();
-//    qDebug()<<"abs(mDataDiff.sum()) "<<abs(mDataDiff.sum());
-//    qDebug()<<"epsilon "<<epsilon;
+    //    qDebug()<<"abs(covResult.data.sum()) "<<covResult.data.normalized().sum();
+    //    qDebug()<<"abs(covLoaded.data.sum()) "<<covLoaded.data.normalized().sum();
+    //    qDebug()<<"abs(mDataDiff.sum()) "<<abs(mDataDiff.sum());
+    //    qDebug()<<"epsilon "<<epsilon;
 
-    QVERIFY( std::abs(mDataDiff.sum()) < dEpsilon );
+    QVERIFY(std::abs(mDataDiff.sum()) < dEpsilon);
 }
 
 //=============================================================================================================
 
 void TestFiffCov::compareKind()
 {
-    QVERIFY( covResult.kind == covLoaded.kind );
+    QVERIFY(covResult.kind == covLoaded.kind);
 }
 
 //=============================================================================================================
 
 void TestFiffCov::compareDiag()
 {
-    QVERIFY( covResult.diag == covLoaded.diag );
+    QVERIFY(covResult.diag == covLoaded.diag);
 }
 
 //=============================================================================================================
 
 void TestFiffCov::compareDim()
 {
-    QVERIFY( covResult.dim == covLoaded.dim );
+    QVERIFY(covResult.dim == covLoaded.dim);
 }
 
 //=============================================================================================================
 
 void TestFiffCov::compareNfree()
 {
-    QVERIFY( covResult.nfree == covLoaded.nfree );
+    QVERIFY(covResult.nfree == covLoaded.nfree);
 }
 
 //=============================================================================================================

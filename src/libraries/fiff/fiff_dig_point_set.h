@@ -57,7 +57,8 @@
 // DEFINE NAMESPACE FIFFLIB
 //=============================================================================================================
 
-namespace FIFFLIB {
+namespace FIFFLIB
+{
 
 //=============================================================================================================
 // FIFFLIB FORWARD DECLARATIONS
@@ -77,12 +78,11 @@ class FiffDirNode;
 
 class FIFFSHARED_EXPORT FiffDigPointSet
 {
-
 public:
-    using SPtr = QSharedPointer<FiffDigPointSet>;            /**< Shared pointer type for FiffDigPointSet. */
-    using ConstSPtr = QSharedPointer<const FiffDigPointSet>; /**< Const shared pointer type for FiffDigPointSet. */
-    using UPtr = std::unique_ptr<FiffDigPointSet>;             /**< Unique pointer type for FiffDigPointSet. */
-    using ConstUPtr = std::unique_ptr<const FiffDigPointSet>;  /**< Const unique pointer type for FiffDigPointSet. */
+    using SPtr = QSharedPointer<FiffDigPointSet>;             /**< Shared pointer type for FiffDigPointSet. */
+    using ConstSPtr = QSharedPointer<const FiffDigPointSet>;  /**< Const shared pointer type for FiffDigPointSet. */
+    using UPtr = std::unique_ptr<FiffDigPointSet>;            /**< Unique pointer type for FiffDigPointSet. */
+    using ConstUPtr = std::unique_ptr<const FiffDigPointSet>; /**< Const unique pointer type for FiffDigPointSet. */
 
     //=========================================================================================================
     /**
@@ -96,7 +96,7 @@ public:
      *
      * @param[in] p_FiffDigPointSet   FiffDigPointSet which should be copied.
      */
-    FiffDigPointSet(const FiffDigPointSet &p_FiffDigPointSet);
+    FiffDigPointSet(const FiffDigPointSet& p_FiffDigPointSet);
 
     //=========================================================================================================
     /**
@@ -125,7 +125,7 @@ public:
      *
      * @param[in] p_IODevice   IO device to read the digitizer point set from.
      */
-    FiffDigPointSet(QIODevice &p_IODevice);
+    FiffDigPointSet(QIODevice& p_IODevice);
 
     //=========================================================================================================
     /**
@@ -172,7 +172,7 @@ public:
      *
      * @param[in] p_IODevice   IO device to write the digitizer point set to.
      */
-    void write(QIODevice &p_IODevice);
+    void write(QIODevice& p_IODevice);
 
     //=========================================================================================================
     /**
@@ -204,7 +204,7 @@ public:
      *
      * @return FiffDigPoint related to the parameter index.
      */
-    const FiffDigPoint& operator[] (qint32 idx) const;
+    const FiffDigPoint& operator[](qint32 idx) const;
 
     //=========================================================================================================
     /**
@@ -214,7 +214,7 @@ public:
      *
      * @return FiffDigPoint related to the parameter index.
      */
-    FiffDigPoint& operator[] (qint32 idx);
+    FiffDigPoint& operator[](qint32 idx);
 
     //=========================================================================================================
     /**
@@ -234,7 +234,7 @@ public:
      *
      * @return FiffDigPointSet.
      */
-    FiffDigPointSet& operator<< (const FiffDigPoint& dig);
+    FiffDigPointSet& operator<<(const FiffDigPoint& dig);
 
     //=========================================================================================================
     /**
@@ -244,7 +244,7 @@ public:
      *
      * @return FiffDigPointSet.
      */
-    FiffDigPointSet& operator<< (const FiffDigPoint* dig);
+    FiffDigPointSet& operator<<(const FiffDigPoint* dig);
 
     //=========================================================================================================
     /**
@@ -264,9 +264,8 @@ public:
     QList<FiffDigPoint> getList();
 
 protected:
-
 private:
-    QList<FiffDigPoint> m_qListDigPoint;    /**< List of digitizer Points. */
+    QList<FiffDigPoint> m_qListDigPoint; /**< List of digitizer Points. */
 };
 
 //=============================================================================================================

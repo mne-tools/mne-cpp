@@ -75,15 +75,14 @@ namespace MNELIB
 
 class MNESHARED_EXPORT MNE
 {
-
 public:
-
     //=========================================================================================================
     /**
      * dtor
      */
     virtual ~MNE()
-    { }
+    {
+    }
 
     //=========================================================================================================
     /**
@@ -161,7 +160,7 @@ public:
      *
      * @return A sparse block diagonal, diagonalized from the elements in "A".
      */
-    static inline Eigen::SparseMatrix<double> make_block_diag(const Eigen::MatrixXd &A, qint32 n)
+    static inline Eigen::SparseMatrix<double> make_block_diag(const Eigen::MatrixXd& A, qint32 n)
     {
         return UTILSLIB::Linalg::make_block_diag(A, n);
     }
@@ -259,14 +258,14 @@ public:
      *
      * @return true if succeeded, false otherwise.
      */
-    static bool patch_info(MNEHemisphere &p_Hemisphere)
+    static bool patch_info(MNEHemisphere& p_Hemisphere)
     {
         return p_Hemisphere.compute_patch_info();
     }
 
-    inline static bool read_events(const QString &t_sEventName,
-                            const QString &t_fileRawName,
-                            Eigen::MatrixXi& events)
+    inline static bool read_events(const QString& t_sEventName,
+                                   const QString& t_fileRawName,
+                                   Eigen::MatrixXi& events)
     {
         FIFFLIB::FiffEvents fiffEvents;
         if (!FIFFLIB::FiffEvents::read(t_sEventName, t_fileRawName, fiffEvents))
@@ -286,8 +285,8 @@ public:
      *
      * @return true if succeeded, false otherwise.
      */
-    inline static bool read_events_from_fif(QIODevice &p_IODevice,
-                                     Eigen::MatrixXi& eventlist)
+    inline static bool read_events_from_fif(QIODevice& p_IODevice,
+                                            Eigen::MatrixXi& eventlist)
     {
         FIFFLIB::FiffEvents fiffEvents;
         if (!FIFFLIB::FiffEvents::read_from_fif(p_IODevice, fiffEvents))
@@ -307,8 +306,8 @@ public:
      *
      * @return true if succeeded, false otherwise.
      */
-    inline static bool read_events_from_ascii(QIODevice &p_IODevice,
-                                       Eigen::MatrixXi& eventlist)
+    inline static bool read_events_from_ascii(QIODevice& p_IODevice,
+                                              Eigen::MatrixXi& eventlist)
     {
         FIFFLIB::FiffEvents fiffEvents;
         if (!FIFFLIB::FiffEvents::read_from_ascii(p_IODevice, fiffEvents))
@@ -328,8 +327,8 @@ public:
      *
      * @return true if succeeded, false otherwise.
      */
-    inline static bool write_events_to_fif(QIODevice &p_IODevice,
-                                    const Eigen::MatrixXi& eventlist)
+    inline static bool write_events_to_fif(QIODevice& p_IODevice,
+                                           const Eigen::MatrixXi& eventlist)
     {
         FIFFLIB::FiffEvents fiffEvents;
         fiffEvents.events = eventlist;
@@ -348,9 +347,9 @@ public:
      *
      * @return true if succeeded, false otherwise.
      */
-    inline static bool write_events_to_ascii(QIODevice &p_IODevice,
-                                      const Eigen::MatrixXi& eventlist,
-                                      float sfreq = 0.0f)
+    inline static bool write_events_to_ascii(QIODevice& p_IODevice,
+                                             const Eigen::MatrixXi& eventlist,
+                                             float sfreq = 0.0f)
     {
         FIFFLIB::FiffEvents fiffEvents;
         fiffEvents.events = eventlist;
@@ -380,9 +379,9 @@ public:
      *
      * @return The computed noise covariance matrix, or empty FiffCov on failure.
      */
-    inline static FIFFLIB::FiffCov compute_epoch_covariance(const FIFFLIB::FiffRawData &raw,
-                                                            const Eigen::MatrixXi &events,
-                                                            const QList<int> &eventCodes,
+    inline static FIFFLIB::FiffCov compute_epoch_covariance(const FIFFLIB::FiffRawData& raw,
+                                                            const Eigen::MatrixXi& events,
+                                                            const QList<int>& eventCodes,
                                                             float tmin,
                                                             float tmax,
                                                             float bmin = 0.0f,
@@ -414,15 +413,15 @@ public:
      *
      * @return List of FiffProj items, or empty list on failure.
      */
-    inline static QList<FIFFLIB::FiffProj> compute_proj(const FIFFLIB::FiffRawData &raw,
-                                                  const Eigen::MatrixXi &events,
-                                                  int eventCode,
-                                                  float tmin,
-                                                  float tmax,
-                                                  int nGrad,
-                                                  int nMag,
-                                                  int nEeg,
-                                                  const QMap<QString,double> &mapReject = QMap<QString,double>())
+    inline static QList<FIFFLIB::FiffProj> compute_proj(const FIFFLIB::FiffRawData& raw,
+                                                        const Eigen::MatrixXi& events,
+                                                        int eventCode,
+                                                        float tmin,
+                                                        float tmax,
+                                                        int nGrad,
+                                                        int nMag,
+                                                        int nEeg,
+                                                        const QMap<QString, double>& mapReject = QMap<QString, double>())
     {
         return FIFFLIB::FiffProj::compute_from_raw(raw, events, eventCode, tmin, tmax, nGrad, nMag, nEeg, mapReject);
     }
@@ -447,9 +446,9 @@ public:
      *
      * @return true on success.
      */
-    inline static bool save_raw(const FIFFLIB::FiffRawData &raw,
-                                QIODevice &p_IODevice,
-                                const Eigen::RowVectorXi &picks = Eigen::RowVectorXi(),
+    inline static bool save_raw(const FIFFLIB::FiffRawData& raw,
+                                QIODevice& p_IODevice,
+                                const Eigen::RowVectorXi& picks = Eigen::RowVectorXi(),
                                 int decim = 1,
                                 int from = -1,
                                 int to = -1)
@@ -509,8 +508,8 @@ public:
                                    MNESourceSpaces& p_SourceSpace)
     {
         return MNESourceSpaces::readFromStream(p_pStream,
-                                              add_geom,
-                                              p_SourceSpace);
+                                               add_geom,
+                                               p_SourceSpace);
     }
 
     //ToDo FiffChInfoList Class
@@ -532,7 +531,7 @@ public:
      * @return the current compensation.
      */
     static QList<FIFFLIB::FiffChInfo> set_current_comp(QList<FIFFLIB::FiffChInfo>& chs,
-                                              FIFFLIB::fiff_int_t value)
+                                                       FIFFLIB::fiff_int_t value)
     {
         return FIFFLIB::FiffInfo::set_current_comp(chs,
                                                    value);
@@ -559,7 +558,7 @@ public:
                                                  FIFFLIB::FiffCoordTrans& trans)
     {
         return p_pMNESourceSpaces.transform_source_space_to(dest,
-                                                           trans);
+                                                            trans);
     }
 
     //=========================================================================================================

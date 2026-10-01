@@ -37,9 +37,10 @@
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-namespace FIFFLIB{
-    class FiffInfo;
-    class FiffDigitizerData;
+namespace FIFFLIB
+{
+class FiffInfo;
+class FiffDigitizerData;
 }
 
 //=============================================================================================================
@@ -60,14 +61,14 @@ class SCMEASSHARED_EXPORT RealTimeMultiSampleArray : public Measurement
     Q_OBJECT
 
 public:
-    typedef QSharedPointer<RealTimeMultiSampleArray> SPtr;               /**< Shared pointer type for RealTimeMultiSampleArray. */
-    typedef QSharedPointer<const RealTimeMultiSampleArray> ConstSPtr;    /**< Const shared pointer type for RealTimeMultiSampleArray. */
+    typedef QSharedPointer<RealTimeMultiSampleArray> SPtr;            /**< Shared pointer type for RealTimeMultiSampleArray. */
+    typedef QSharedPointer<const RealTimeMultiSampleArray> ConstSPtr; /**< Const shared pointer type for RealTimeMultiSampleArray. */
 
     //=========================================================================================================
     /**
      * Constructs a RealTimeMultiSampleArray.
      */
-    explicit RealTimeMultiSampleArray(QObject *parent = 0);
+    explicit RealTimeMultiSampleArray(QObject* parent = 0);
 
     //=========================================================================================================
     /**
@@ -87,7 +88,7 @@ public:
      *
      * @param[in] uiNumChannels     the number of channels to init.
      */
-    void init(QList<RealTimeSampleArrayChInfo> &chInfo);
+    void init(QList<RealTimeSampleArrayChInfo>& chInfo);
 
     //=========================================================================================================
     /**
@@ -210,16 +211,16 @@ public:
     void setDigitizerData(QSharedPointer<FIFFLIB::FiffDigitizerData> digData);
 
 private:
-    mutable QMutex              m_qMutex;           /**< Mutex to ensure thread safety. */
+    mutable QMutex m_qMutex; /**< Mutex to ensure thread safety. */
 
-    QSharedPointer<FIFFLIB::FiffInfo>               m_pFiffInfo_orig;           /**< Original Fiff Info if initialized by fiff info. */
-    QSharedPointer<FIFFLIB::FiffDigitizerData>      m_pFiffDigitizerData_orig;  /**< Original Fiff Digitizer Data */
+    QSharedPointer<FIFFLIB::FiffInfo> m_pFiffInfo_orig;                   /**< Original Fiff Info if initialized by fiff info. */
+    QSharedPointer<FIFFLIB::FiffDigitizerData> m_pFiffDigitizerData_orig; /**< Original Fiff Digitizer Data */
 
-    QString                     m_sXMLLayoutFile;   /**< Layout file name. */
-    float                       m_fSamplingRate;    /**< Sampling rate of the RealTimeSampleArray.*/
-    qint32                      m_iMultiArraySize;  /**< Sample size of the multi sample array.*/
-    QList<Eigen::MatrixXd>      m_matSamples;       /**< The multi sample array.*/
-    bool                        m_bChInfoIsInit;    /**< If channel info is initialized.*/
+    QString m_sXMLLayoutFile;            /**< Layout file name. */
+    float m_fSamplingRate;               /**< Sampling rate of the RealTimeSampleArray.*/
+    qint32 m_iMultiArraySize;            /**< Sample size of the multi sample array.*/
+    QList<Eigen::MatrixXd> m_matSamples; /**< The multi sample array.*/
+    bool m_bChInfoIsInit;                /**< If channel info is initialized.*/
 
     QList<RealTimeSampleArrayChInfo> m_qListChInfo; /**< Channel info list.*/
 };
@@ -310,10 +311,10 @@ inline void RealTimeMultiSampleArray::setMultiArraySize(qint32 iMultiArraySize)
 {
     QMutexLocker locker(&m_qMutex);
     //Obsolete unsigned char can't be bigger
-//    if(ucArraySize > 255)
-//        m_ucArraySize = 255;
-//    else
-        m_iMultiArraySize = iMultiArraySize;
+    //    if(ucArraySize > 255)
+    //        m_ucArraySize = 255;
+    //    else
+    m_iMultiArraySize = iMultiArraySize;
 }
 
 //=============================================================================================================

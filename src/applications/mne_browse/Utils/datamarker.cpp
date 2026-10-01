@@ -32,12 +32,12 @@ using namespace MNEBROWSE;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-DataMarker::DataMarker(QWidget *parent) :
-    QWidget(parent),
-    m_oldPos(QPoint(0,0)),
-    m_movableRegion(QRegion())
+DataMarker::DataMarker(QWidget* parent)
+: QWidget(parent)
+, m_oldPos(QPoint(0, 0))
+, m_movableRegion(QRegion())
 {
-    QColor color = m_qSettings.value("DataMarker/data_marker_color", QColor(93,177,47)).value<QColor>();
+    QColor color = m_qSettings.value("DataMarker/data_marker_color", QColor(93, 177, 47)).value<QColor>();
     setMarkerColor(color);
 }
 
@@ -51,7 +51,7 @@ void DataMarker::setMovementBoundary(QRegion rect)
 
 //*************************************************************************************************************
 
-void DataMarker::setMarkerColor(const QColor &color)
+void DataMarker::setMarkerColor(const QColor& color)
 {
     QPalette pal(palette());
     QColor alphaColor = color;
@@ -64,12 +64,12 @@ void DataMarker::setMarkerColor(const QColor &color)
 
 //*************************************************************************************************************
 
-void DataMarker::mousePressEvent(QMouseEvent *event)
+void DataMarker::mousePressEvent(QMouseEvent* event)
 {
-    if(event->button() == Qt::LeftButton) {
+    if (event->button() == Qt::LeftButton) {
         m_oldPos = event->position().toPoint();
         emit markerPressed();
-    } else if(event->button() == Qt::RightButton) {
+    } else if (event->button() == Qt::RightButton) {
         emit markerPressed();
         emit removeRequested();
     }
@@ -78,11 +78,11 @@ void DataMarker::mousePressEvent(QMouseEvent *event)
 
 //*************************************************************************************************************
 
-void DataMarker::mouseMoveEvent(QMouseEvent *event)
+void DataMarker::mouseMoveEvent(QMouseEvent* event)
 {
-    if(event->buttons() & Qt::LeftButton) {
+    if (event->buttons() & Qt::LeftButton) {
         const QRect boundaryRect = m_movableRegion.boundingRect();
-        if(boundaryRect.isEmpty()) {
+        if (boundaryRect.isEmpty()) {
             return;
         }
 
@@ -100,7 +100,7 @@ void DataMarker::mouseMoveEvent(QMouseEvent *event)
 
 //*************************************************************************************************************
 
-void DataMarker::enterEvent(QEnterEvent *event)
+void DataMarker::enterEvent(QEnterEvent* event)
 {
     Q_UNUSED(event);
     setCursor(QCursor(Qt::SizeHorCursor));
@@ -109,7 +109,7 @@ void DataMarker::enterEvent(QEnterEvent *event)
 
 //*************************************************************************************************************
 
-void DataMarker::leaveEvent(QEvent *event)
+void DataMarker::leaveEvent(QEvent* event)
 {
     Q_UNUSED(event);
     unsetCursor();
@@ -118,7 +118,7 @@ void DataMarker::leaveEvent(QEvent *event)
 
 //*************************************************************************************************************
 
-void DataMarker::moveEvent(QMoveEvent *event)
+void DataMarker::moveEvent(QMoveEvent* event)
 {
     Q_UNUSED(event);
     emit markerMoved();

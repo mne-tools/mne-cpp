@@ -69,7 +69,7 @@ namespace DISPLIB
  * emitted as data-space coordinates; otherwise the API mirrors
  * @ref Bar (@c setData / @c updatePlot templates).
  */
-class DISPSHARED_EXPORT Spline: public QWidget
+class DISPSHARED_EXPORT Spline : public QWidget
 {
     Q_OBJECT
 
@@ -116,7 +116,7 @@ public:
      *
      * @param[in] event      mouse press input.
      */
-    void mousePressEvent(QMouseEvent *event) override;
+    void mousePressEvent(QMouseEvent* event) override;
 
     //=========================================================================================================
     /**
@@ -167,11 +167,11 @@ public:
      *
      * @param[in] colorMap  qstring of the color gradient from user input.
      */
-    void setColorMap(const QString &colorMap);
+    void setColorMap(const QString& colorMap);
 
     Eigen::VectorXi m_vecResultExponentValues; /**< Common exponent values for the entire histogram*/
-    double          m_dMinAxisX;               /**< Display value of the smallest point of the series in x-axis. */
-    double          m_dMaxAxisX;               /**< Display value of the largest point on the series in x-axis. */
+    double m_dMinAxisX;                        /**< Display value of the smallest point of the series in x-axis. */
+    double m_dMaxAxisX;                        /**< Display value of the largest point on the series in x-axis. */
 
 protected:
     //=========================================================================================================
@@ -180,7 +180,7 @@ protected:
      *
      * @param[in] event  The paint event.
      */
-    void paintEvent(QPaintEvent *event) override;
+    void paintEvent(QPaintEvent* event) override;
 
     //=========================================================================================================
     /**
@@ -218,7 +218,10 @@ protected:
      *
      * @return Left plot margin in pixels (60).
      */
-    int leftMargin() const { return 60; }
+    int leftMargin() const
+    {
+        return 60;
+    }
 
     //=========================================================================================================
     /**
@@ -226,7 +229,10 @@ protected:
      *
      * @return Right plot margin in pixels (20).
      */
-    int rightMargin() const { return 20; }
+    int rightMargin() const
+    {
+        return 20;
+    }
 
     //=========================================================================================================
     /**
@@ -234,7 +240,10 @@ protected:
      *
      * @return Top plot margin in pixels (30).
      */
-    int topMargin() const { return 30; }
+    int topMargin() const
+    {
+        return 30;
+    }
 
     //=========================================================================================================
     /**
@@ -242,17 +251,20 @@ protected:
      *
      * @return Bottom plot margin in pixels (40).
      */
-    int bottomMargin() const { return 40; }
+    int bottomMargin() const
+    {
+        return 40;
+    }
 
-    QList<QPointF>  m_seriesData;           /**< Spline data points (classMark, frequency). */
-    double          m_dLeftThreshold;       /**< X-axis value of the left threshold line. */
-    double          m_dMiddleThreshold;     /**< X-axis value of the middle threshold line. */
-    double          m_dRightThreshold;      /**< X-axis value of the right threshold line. */
-    bool            m_bHasData;             /**< Whether data has been loaded. */
-    bool            m_bHasThresholds;       /**< Whether thresholds have been set. */
-    int             m_iMaximumFrequency;    /**< Highest value of frequency (y-axis). */
-    QString         m_colorMap;             /**< Color map name for background gradient. */
-    QVector3D       m_vecReturnVector;      /**< Cached return value for getThreshold. */
+    QList<QPointF> m_seriesData; /**< Spline data points (classMark, frequency). */
+    double m_dLeftThreshold;     /**< X-axis value of the left threshold line. */
+    double m_dMiddleThreshold;   /**< X-axis value of the middle threshold line. */
+    double m_dRightThreshold;    /**< X-axis value of the right threshold line. */
+    bool m_bHasData;             /**< Whether data has been loaded. */
+    bool m_bHasThresholds;       /**< Whether thresholds have been set. */
+    int m_iMaximumFrequency;     /**< Highest value of frequency (y-axis). */
+    QString m_colorMap;          /**< Color map name for background gradient. */
+    QVector3D m_vecReturnVector; /**< Cached return value for getThreshold. */
 
 signals:
     //=========================================================================================================
@@ -270,18 +282,18 @@ signals:
 // INLINE DEFINITIONS
 //=============================================================================================================
 
-template <typename T>
+template<typename T>
 void Spline::setData(const Eigen::Matrix<T, Eigen::Dynamic, 1>& matClassLimitData,
                      const Eigen::Matrix<int, Eigen::Dynamic, 1>& matClassFrequencyData)
 {
-    Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic> matrixName(matClassLimitData.rows(),1);
+    Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic> matrixName(matClassLimitData.rows(), 1);
     matrixName.col(0) = matClassLimitData;
     this->updatePlot(matrixName, matClassFrequencyData);
 }
 
 //=========================================================================================================
 
-template <typename T>
+template<typename T>
 void Spline::setData(const Eigen::Matrix<T, 1, Eigen::Dynamic>& matClassLimitData,
                      const Eigen::Matrix<int, 1, Eigen::Dynamic>& matClassFrequencyData)
 {
@@ -299,7 +311,8 @@ void Spline::updatePlot(const Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>& 
     Eigen::VectorXd resultDisplayValues;
     int iClassAmount = std::min(static_cast<int>(matClassFrequencyData.rows()),
                                 static_cast<int>(matClassLimitData.rows()) - 1);
-    if(iClassAmount < 1) return;
+    if (iClassAmount < 1)
+        return;
     this->splitCoefficientAndExponent(matClassLimitData, iClassAmount, resultDisplayValues, m_vecResultExponentValues);
 
     m_dMinAxisX = resultDisplayValues(0);
@@ -308,12 +321,10 @@ void Spline::updatePlot(const Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>& 
     m_seriesData.clear();
     m_iMaximumFrequency = 0;
 
-    for (int ir = 0; ir < iClassAmount; ++ir)
-    {
+    for (int ir = 0; ir < iClassAmount; ++ir) {
         double classMark = (resultDisplayValues(ir) + resultDisplayValues(ir + 1)) / 2.0;
         m_seriesData.append(QPointF(classMark, matClassFrequencyData(ir)));
-        if (matClassFrequencyData(ir) > m_iMaximumFrequency)
-        {
+        if (matClassFrequencyData(ir) > m_iMaximumFrequency) {
             m_iMaximumFrequency = matClassFrequencyData(ir);
         }
     }
@@ -329,27 +340,23 @@ void Spline::updatePlot(const Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>& 
 
 //=============================================================================================================
 
-template <typename T>
+template<typename T>
 void Spline::splitCoefficientAndExponent(const Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>& matClassLimitData,
-                                          int iClassAmount,
-                                          Eigen::VectorXd& vecCoefficientResults,
-                                          Eigen::VectorXi& vecExponentValues)
+                                         int iClassAmount,
+                                         Eigen::VectorXd& vecCoefficientResults,
+                                         Eigen::VectorXi& vecExponentValues)
 {
     vecCoefficientResults.resize(iClassAmount + 1);
     vecExponentValues.resize(iClassAmount + 1);
     double originalValue(0.0),
-         limitDisplayValue(0.0),
-         doubleExponentValue(0.0);
-    int    limitExponentValue(0);
-    for (int ir = 0; ir <= iClassAmount; ++ir)
-    {
+        limitDisplayValue(0.0),
+        doubleExponentValue(0.0);
+    int limitExponentValue(0);
+    for (int ir = 0; ir <= iClassAmount; ++ir) {
         originalValue = matClassLimitData(ir);
-        if (originalValue == 0.0)
-        {
+        if (originalValue == 0.0) {
             doubleExponentValue = 0.0;
-        }
-        else
-        {
+        } else {
             doubleExponentValue = log10(std::fabs(originalValue));
         }
 
@@ -360,38 +367,29 @@ void Spline::splitCoefficientAndExponent(const Eigen::Matrix<T, Eigen::Dynamic, 
     }
 
     int lowestExponentValue{0},
-    highestExponentValue{0};
+        highestExponentValue{0};
 
-    for (int ir = 0; ir <= iClassAmount; ++ir)
-    {
-        if (vecExponentValues(ir) < lowestExponentValue)
-        {
+    for (int ir = 0; ir <= iClassAmount; ++ir) {
+        if (vecExponentValues(ir) < lowestExponentValue) {
             lowestExponentValue = vecExponentValues(ir);
         }
-        if (vecExponentValues(ir) > highestExponentValue)
-        {
+        if (vecExponentValues(ir) > highestExponentValue) {
             highestExponentValue = vecExponentValues(ir);
         }
     }
 
-    if (highestExponentValue > 0)
-    {
-        for (int ir = 0; ir <= iClassAmount; ++ir)
-        {
-            while (vecExponentValues(ir) < highestExponentValue)
-            {
+    if (highestExponentValue > 0) {
+        for (int ir = 0; ir <= iClassAmount; ++ir) {
+            while (vecExponentValues(ir) < highestExponentValue) {
                 vecCoefficientResults(ir) = vecCoefficientResults(ir) / 10;
                 vecExponentValues(ir)++;
             }
         }
     }
 
-    if (lowestExponentValue < 0)
-    {
-        for (int ir = 0; ir <= iClassAmount; ++ir)
-        {
-            while (vecExponentValues(ir) > lowestExponentValue)
-            {
+    if (lowestExponentValue < 0) {
+        for (int ir = 0; ir <= iClassAmount; ++ir) {
+            while (vecExponentValues(ir) > lowestExponentValue) {
                 vecCoefficientResults(ir) = vecCoefficientResults(ir) * 10;
                 vecExponentValues(ir)--;
             }

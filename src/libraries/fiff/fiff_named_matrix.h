@@ -72,11 +72,11 @@ namespace FIFFLIB
 class FIFFSHARED_EXPORT FiffNamedMatrix : public QSharedData
 {
 public:
-    using SPtr = QSharedPointer<FiffNamedMatrix>;            /**< Shared pointer type for FiffNamedMatrix. */
-    using ConstSPtr = QSharedPointer<const FiffNamedMatrix>; /**< Const shared pointer type for FiffNamedMatrix. */
-    using UPtr = std::unique_ptr<FiffNamedMatrix>;             /**< Unique pointer type for FiffNamedMatrix. */
-    using ConstUPtr = std::unique_ptr<const FiffNamedMatrix>;  /**< Const unique pointer type for FiffNamedMatrix. */
-    using SDPtr = QSharedDataPointer<FiffNamedMatrix>;       /**< Shared data pointer type for FiffNamedMatrix. */
+    using SPtr = QSharedPointer<FiffNamedMatrix>;             /**< Shared pointer type for FiffNamedMatrix. */
+    using ConstSPtr = QSharedPointer<const FiffNamedMatrix>;  /**< Const shared pointer type for FiffNamedMatrix. */
+    using UPtr = std::unique_ptr<FiffNamedMatrix>;            /**< Unique pointer type for FiffNamedMatrix. */
+    using ConstUPtr = std::unique_ptr<const FiffNamedMatrix>; /**< Const unique pointer type for FiffNamedMatrix. */
+    using SDPtr = QSharedDataPointer<FiffNamedMatrix>;        /**< Shared data pointer type for FiffNamedMatrix. */
 
     //=========================================================================================================
     /**
@@ -135,13 +135,13 @@ public:
      */
     void transpose_named_matrix();
 
-//    //=========================================================================================================
-//    /**
-//    * Assignment Operator
-//    *
-//    * @return rhs   named matrix which hould be assigned.
-//    */
-//    inline FiffNamedMatrix& operator=(const FiffNamedMatrix& rhs);
+    //    //=========================================================================================================
+    //    /**
+    //    * Assignment Operator
+    //    *
+    //    * @return rhs   named matrix which hould be assigned.
+    //    */
+    //    inline FiffNamedMatrix& operator=(const FiffNamedMatrix& rhs);
 
     //=========================================================================================================
     /**
@@ -152,7 +152,7 @@ public:
      *
      * @return the stream with the attached fiff named matrix.
      */
-    friend std::ostream& operator<<(std::ostream& out, const FIFFLIB::FiffNamedMatrix &p_FiffNamedMatrix);
+    friend std::ostream& operator<<(std::ostream& out, const FIFFLIB::FiffNamedMatrix& p_FiffNamedMatrix);
 
     /**
      * Overloaded == operator to compare an object to this instance.
@@ -162,15 +162,14 @@ public:
      *
      * @return true if equal, false otherwise.
      */
-    friend bool operator==(const FiffNamedMatrix &a, const FiffNamedMatrix &b);
+    friend bool operator==(const FiffNamedMatrix& a, const FiffNamedMatrix& b);
 
 public:
-    fiff_int_t nrow;        /**< Number of rows. */
-    fiff_int_t  ncol;       /**< Number of columns. */
-    QStringList row_names;  /**< Row names. */
-    QStringList col_names;  /**< Column names. */
-    Eigen::MatrixXd data;   /**< Matrix data. */
-
+    fiff_int_t nrow;       /**< Number of rows. */
+    fiff_int_t ncol;       /**< Number of columns. */
+    QStringList row_names; /**< Row names. */
+    QStringList col_names; /**< Column names. */
+    Eigen::MatrixXd data;  /**< Matrix data. */
 };
 
 //=============================================================================================================
@@ -199,77 +198,68 @@ inline bool FiffNamedMatrix::isEmpty() const
 
 //=============================================================================================================
 
-inline std::ostream& operator<<(std::ostream& out, const FIFFLIB::FiffNamedMatrix &p_FiffNamedMatrix)
+inline std::ostream& operator<<(std::ostream& out, const FIFFLIB::FiffNamedMatrix& p_FiffNamedMatrix)
 {
     bool t_bIsShort = true;
     out << "#### Fiff Named Matrix ####\n";
     out << "\tnrow: " << p_FiffNamedMatrix.nrow << std::endl;
     out << "\tncol: " << p_FiffNamedMatrix.ncol << std::endl;
 
-    Eigen::MatrixXd data;          /**< Matrix data. */
+    Eigen::MatrixXd data; /**< Matrix data. */
 
     out << "\trow_names " << p_FiffNamedMatrix.row_names.size() << ":\n\t";
-    if(t_bIsShort)
-    {
+    if (t_bIsShort) {
         qint32 nchan = p_FiffNamedMatrix.row_names.size() > 6 ? 6 : p_FiffNamedMatrix.row_names.size();
-        for(qint32 i = 0; i < nchan/2; ++i)
+        for (qint32 i = 0; i < nchan / 2; ++i)
             out << p_FiffNamedMatrix.row_names[i].toUtf8().constData() << " ";
         out << "... ";
-        for(qint32 i = p_FiffNamedMatrix.row_names.size() - nchan/2; i < p_FiffNamedMatrix.row_names.size(); ++i)
+        for (qint32 i = p_FiffNamedMatrix.row_names.size() - nchan / 2; i < p_FiffNamedMatrix.row_names.size(); ++i)
             out << p_FiffNamedMatrix.row_names[i].toUtf8().constData() << " ";
         out << std::endl;
     }
 
     out << "\tcol_names " << p_FiffNamedMatrix.col_names.size() << ":\n\t";
-    if(t_bIsShort)
-    {
+    if (t_bIsShort) {
         qint32 nchan = p_FiffNamedMatrix.col_names.size() > 6 ? 6 : p_FiffNamedMatrix.col_names.size();
-        for(qint32 i = 0; i < nchan/2; ++i)
+        for (qint32 i = 0; i < nchan / 2; ++i)
             out << p_FiffNamedMatrix.col_names[i].toUtf8().constData() << " ";
         out << "... ";
-        for(qint32 i = p_FiffNamedMatrix.col_names.size() - nchan/2; i < p_FiffNamedMatrix.col_names.size(); ++i)
+        for (qint32 i = p_FiffNamedMatrix.col_names.size() - nchan / 2; i < p_FiffNamedMatrix.col_names.size(); ++i)
             out << p_FiffNamedMatrix.col_names[i].toUtf8().constData() << " ";
         out << std::endl;
     }
 
     out << "\tdata " << p_FiffNamedMatrix.data.rows() << " x " << p_FiffNamedMatrix.data.cols() << ":\n\t";
-    if(t_bIsShort)
-    {
+    if (t_bIsShort) {
         qint32 nrows = p_FiffNamedMatrix.data.rows() > 6 ? 6 : p_FiffNamedMatrix.data.rows();
         qint32 ncols = p_FiffNamedMatrix.data.cols() > 6 ? 6 : p_FiffNamedMatrix.data.cols();
-        if(nrows == 1)
-        {
-            for(qint32 i = 0; i < nrows; ++i)
-            {
-                for(qint32 j = 0; j < ncols/2; ++j)
-                    out << p_FiffNamedMatrix.data(i,j) << " ";
+        if (nrows == 1) {
+            for (qint32 i = 0; i < nrows; ++i) {
+                for (qint32 j = 0; j < ncols / 2; ++j)
+                    out << p_FiffNamedMatrix.data(i, j) << " ";
                 out << "... ";
-                for(qint32 j = p_FiffNamedMatrix.data.cols() - ncols/2; j < p_FiffNamedMatrix.data.cols(); ++j)
-                    out << p_FiffNamedMatrix.data(i,j) << " ";
+                for (qint32 j = p_FiffNamedMatrix.data.cols() - ncols / 2; j < p_FiffNamedMatrix.data.cols(); ++j)
+                    out << p_FiffNamedMatrix.data(i, j) << " ";
                 out << "\n\t";
             }
-        }
-        else
-        {
-        for(qint32 i = 0; i < nrows/2; ++i)
-        {
-            for(qint32 j = 0; j < ncols/2; ++j)
-                out << p_FiffNamedMatrix.data(i,j) << " ";
-            out << "... ";
-            for(qint32 j = p_FiffNamedMatrix.data.cols() - ncols/2; j < p_FiffNamedMatrix.data.cols(); ++j)
-                out << p_FiffNamedMatrix.data(i,j) << " ";
-            out << "\n\t";
-        }
-        out << "...\n\t";
-        for(qint32 i = p_FiffNamedMatrix.data.rows()-nrows/2; i < p_FiffNamedMatrix.data.rows(); ++i)
-        {
-            for(qint32 j = 0; j < ncols/2; ++j)
-                out << p_FiffNamedMatrix.data(i,j) << " ";
-            out << "... ";
-            for(qint32 j = p_FiffNamedMatrix.data.cols() - ncols/2; j < p_FiffNamedMatrix.data.cols(); ++j)
-                out << p_FiffNamedMatrix.data(i,j) << " ";
-            out << "\n\t";
-        }
+        } else {
+            for (qint32 i = 0; i < nrows / 2; ++i) {
+                for (qint32 j = 0; j < ncols / 2; ++j)
+                    out << p_FiffNamedMatrix.data(i, j) << " ";
+                out << "... ";
+                for (qint32 j = p_FiffNamedMatrix.data.cols() - ncols / 2; j < p_FiffNamedMatrix.data.cols(); ++j)
+                    out << p_FiffNamedMatrix.data(i, j) << " ";
+                out << "\n\t";
+            }
+            out << "...\n\t";
+            for (qint32 i = p_FiffNamedMatrix.data.rows() - nrows / 2; i < p_FiffNamedMatrix.data.rows(); ++i) {
+                for (qint32 j = 0; j < ncols / 2; ++j)
+                    out << p_FiffNamedMatrix.data(i, j) << " ";
+                out << "... ";
+                for (qint32 j = p_FiffNamedMatrix.data.cols() - ncols / 2; j < p_FiffNamedMatrix.data.cols(); ++j)
+                    out << p_FiffNamedMatrix.data(i, j) << " ";
+                out << "\n\t";
+            }
         }
         out << "\n";
     }
@@ -279,7 +269,7 @@ inline std::ostream& operator<<(std::ostream& out, const FIFFLIB::FiffNamedMatri
 
 //=============================================================================================================
 
-inline bool operator== (const FiffNamedMatrix &a, const FiffNamedMatrix &b)
+inline bool operator==(const FiffNamedMatrix& a, const FiffNamedMatrix& b)
 {
     return (a.nrow == b.nrow &&
             a.ncol == b.ncol &&

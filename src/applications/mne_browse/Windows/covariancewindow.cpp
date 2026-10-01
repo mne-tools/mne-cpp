@@ -44,11 +44,11 @@ namespace
 
 QString summarizeChannelNames(const QStringList& names, int limit = 8)
 {
-    if(names.isEmpty()) {
+    if (names.isEmpty()) {
         return QStringLiteral("none");
     }
 
-    if(names.size() <= limit) {
+    if (names.size() <= limit) {
         return names.join(QStringLiteral(", "));
     }
 
@@ -61,7 +61,7 @@ QString covarianceSummary(const FIFFLIB::FiffCov& covariance,
                           const QString& sourceDescription,
                           const FIFFLIB::FiffInfo::SPtr& fiffInfo)
 {
-    if(covariance.isEmpty()) {
+    if (covariance.isEmpty()) {
         return QStringLiteral("No covariance is currently loaded.\n\nCompute or load a covariance matrix to inspect it here and drive whitening from this manager.");
     }
 
@@ -70,20 +70,20 @@ QString covarianceSummary(const FIFFLIB::FiffCov& covariance,
     int eegCount = 0;
     int otherCount = 0;
 
-    if(fiffInfo) {
-        for(const QString& channelName : covariance.names) {
+    if (fiffInfo) {
+        for (const QString& channelName : covariance.names) {
             const int channelIndex = fiffInfo->ch_names.indexOf(channelName);
-            if(channelIndex < 0 || channelIndex >= fiffInfo->chs.size()) {
+            if (channelIndex < 0 || channelIndex >= fiffInfo->chs.size()) {
                 ++otherCount;
                 continue;
             }
 
             const auto& channelInfo = fiffInfo->chs.at(channelIndex);
-            if(channelInfo.kind == FIFFV_EEG_CH) {
+            if (channelInfo.kind == FIFFV_EEG_CH) {
                 ++eegCount;
-            } else if(channelInfo.kind == FIFFV_MEG_CH && channelInfo.unit == FIFF_UNIT_T) {
+            } else if (channelInfo.kind == FIFFV_MEG_CH && channelInfo.unit == FIFF_UNIT_T) {
                 ++magCount;
-            } else if(channelInfo.kind == FIFFV_MEG_CH && channelInfo.unit == FIFF_UNIT_T_M) {
+            } else if (channelInfo.kind == FIFFV_MEG_CH && channelInfo.unit == FIFF_UNIT_T_M) {
                 ++gradCount;
             } else {
                 ++otherCount;
@@ -92,15 +92,14 @@ QString covarianceSummary(const FIFFLIB::FiffCov& covariance,
     }
 
     QStringList lines;
-    if(!sourceDescription.isEmpty()) {
+    if (!sourceDescription.isEmpty()) {
         lines << QStringLiteral("Source: %1").arg(sourceDescription);
     }
-    lines << QStringLiteral("Storage: %1 covariance").arg(covariance.diag ? QStringLiteral("diagonal")
-                                                                          : QStringLiteral("full"));
+    lines << QStringLiteral("Storage: %1 covariance").arg(covariance.diag ? QStringLiteral("diagonal") : QStringLiteral("full"));
     lines << QStringLiteral("Dimensions: %1 x %1").arg(covariance.dim);
     lines << QStringLiteral("Degrees of freedom: %1").arg(covariance.nfree);
     lines << QStringLiteral("Channels: %1").arg(covariance.names.size());
-    if(fiffInfo) {
+    if (fiffInfo) {
         lines << QStringLiteral("Types: %1 grad, %2 mag, %3 EEG, %4 other")
                      .arg(gradCount)
                      .arg(magCount)
@@ -110,9 +109,7 @@ QString covarianceSummary(const FIFFLIB::FiffCov& covariance,
     lines << QStringLiteral("Projectors: %1").arg(covariance.projs.size());
     lines << QStringLiteral("Bad channels: %1").arg(summarizeChannelNames(covariance.bads, 6));
     lines << QStringLiteral("Channel preview: %1").arg(summarizeChannelNames(covariance.names, 10));
-    lines << QStringLiteral("Eigen decomposition: %1").arg((covariance.eig.size() > 0 && covariance.eigvec.size() > 0)
-                                                           ? QStringLiteral("available")
-                                                           : QStringLiteral("not stored"));
+    lines << QStringLiteral("Eigen decomposition: %1").arg((covariance.eig.size() > 0 && covariance.eigvec.size() > 0) ? QStringLiteral("available") : QStringLiteral("not stored"));
 
     return lines.join(QLatin1Char('\n'));
 }
@@ -121,7 +118,7 @@ QString covarianceSummary(const FIFFLIB::FiffCov& covariance,
 
 //=============================================================================================================
 
-CovarianceWindow::CovarianceWindow(QWidget *parent)
+CovarianceWindow::CovarianceWindow(QWidget* parent)
 : QDockWidget(parent)
 {
     setupUi();
@@ -310,7 +307,7 @@ void CovarianceWindow::initControls()
 
 void CovarianceWindow::updateSummary()
 {
-    if(!m_pSummaryTextEdit) {
+    if (!m_pSummaryTextEdit) {
         return;
     }
 
@@ -324,10 +321,10 @@ void CovarianceWindow::updateSummary()
 
 void CovarianceWindow::updateHeatmap()
 {
-    if(!m_pHeatmapLabel)
+    if (!m_pHeatmapLabel)
         return;
 
-    if(m_covariance.isEmpty() || m_covariance.dim <= 0) {
+    if (m_covariance.isEmpty() || m_covariance.dim <= 0) {
         m_pHeatmapLabel->setPixmap(QPixmap());
         m_pHeatmapLabel->setText(QStringLiteral("No covariance loaded."));
         return;
@@ -338,25 +335,23 @@ void CovarianceWindow::updateHeatmap()
     const QString filter = m_pHeatmapChannelType ? m_pHeatmapChannelType->currentText()
                                                  : QStringLiteral("All");
 
-    for(int i = 0; i < m_covariance.names.size(); ++i) {
-        if(filter == QStringLiteral("All")) {
+    for (int i = 0; i < m_covariance.names.size(); ++i) {
+        if (filter == QStringLiteral("All")) {
             indices.append(i);
             continue;
         }
 
-        if(m_pFiffInfo) {
+        if (m_pFiffInfo) {
             const int chIdx = m_pFiffInfo->ch_names.indexOf(m_covariance.names[i]);
-            if(chIdx < 0 || chIdx >= m_pFiffInfo->chs.size())
+            if (chIdx < 0 || chIdx >= m_pFiffInfo->chs.size())
                 continue;
 
             const auto& chInfo = m_pFiffInfo->chs.at(chIdx);
-            if(filter == QStringLiteral("MEG_grad")
-               && chInfo.kind == FIFFV_MEG_CH && chInfo.unit == FIFF_UNIT_T_M) {
+            if (filter == QStringLiteral("MEG_grad") && chInfo.kind == FIFFV_MEG_CH && chInfo.unit == FIFF_UNIT_T_M) {
                 indices.append(i);
-            } else if(filter == QStringLiteral("MEG_mag")
-                      && chInfo.kind == FIFFV_MEG_CH && chInfo.unit == FIFF_UNIT_T) {
+            } else if (filter == QStringLiteral("MEG_mag") && chInfo.kind == FIFFV_MEG_CH && chInfo.unit == FIFF_UNIT_T) {
                 indices.append(i);
-            } else if(filter == QStringLiteral("EEG") && chInfo.kind == FIFFV_EEG_CH) {
+            } else if (filter == QStringLiteral("EEG") && chInfo.kind == FIFFV_EEG_CH) {
                 indices.append(i);
             }
         } else {
@@ -365,7 +360,7 @@ void CovarianceWindow::updateHeatmap()
         }
     }
 
-    if(indices.isEmpty()) {
+    if (indices.isEmpty()) {
         m_pHeatmapLabel->setPixmap(QPixmap());
         m_pHeatmapLabel->setText(QStringLiteral("No channels of this type in covariance."));
         return;
@@ -380,28 +375,32 @@ void CovarianceWindow::updateHeatmap()
     // Build the values to display
     Eigen::MatrixXd subMatrix(n, n);
 
-    if(m_covariance.diag) {
+    if (m_covariance.diag) {
         subMatrix.setZero();
-        for(int i = 0; i < n; ++i) {
+        for (int i = 0; i < n; ++i) {
             double val = m_covariance.data(indices[i], 0);
             subMatrix(i, i) = val;
-            if(val < vMin) vMin = val;
-            if(val > vMax) vMax = val;
+            if (val < vMin)
+                vMin = val;
+            if (val > vMax)
+                vMax = val;
         }
     } else {
-        for(int i = 0; i < n; ++i) {
-            for(int j = 0; j < n; ++j) {
+        for (int i = 0; i < n; ++i) {
+            for (int j = 0; j < n; ++j) {
                 double val = m_covariance.data(indices[i], indices[j]);
                 subMatrix(i, j) = val;
-                if(val < vMin) vMin = val;
-                if(val > vMax) vMax = val;
+                if (val < vMin)
+                    vMin = val;
+                if (val > vMax)
+                    vMax = val;
             }
         }
     }
 
     // Use symmetric color range around zero
     const double absMax = qMax(qAbs(vMin), qAbs(vMax));
-    if(absMax < 1e-30) {
+    if (absMax < 1e-30) {
         m_pHeatmapLabel->setPixmap(QPixmap());
         m_pHeatmapLabel->setText(QStringLiteral("Covariance matrix is effectively zero."));
         return;
@@ -411,17 +410,17 @@ void CovarianceWindow::updateHeatmap()
     const int imgSize = qMin(n, 512); // cap image size
     QImage img(imgSize, imgSize, QImage::Format_RGB32);
 
-    for(int py = 0; py < imgSize; ++py) {
+    for (int py = 0; py < imgSize; ++py) {
         const int row = py * n / imgSize;
         QRgb* scanLine = reinterpret_cast<QRgb*>(img.scanLine(py));
-        for(int px = 0; px < imgSize; ++px) {
+        for (int px = 0; px < imgSize; ++px) {
             const int col = px * n / imgSize;
             const double val = subMatrix(row, col);
 
             // Blue-white-red diverging colormap
             const double t = val / absMax; // in [-1, 1]
             int r, g, b;
-            if(t >= 0) {
+            if (t >= 0) {
                 // White to red
                 r = 255;
                 g = static_cast<int>(255.0 * (1.0 - t));
@@ -439,8 +438,8 @@ void CovarianceWindow::updateHeatmap()
     // Scale to fit the label width
     const int displaySize = qMin(m_pHeatmapLabel->width() - 10, 400);
     QPixmap pixmap = QPixmap::fromImage(img).scaled(displaySize, displaySize,
-                                                     Qt::KeepAspectRatio,
-                                                     Qt::FastTransformation);
+                                                    Qt::KeepAspectRatio,
+                                                    Qt::FastTransformation);
     m_pHeatmapLabel->setPixmap(pixmap);
     m_pHeatmapLabel->setText(QString());
 }

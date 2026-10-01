@@ -51,7 +51,7 @@ using namespace Eigen;
  * @brief The TestSensorSet class provides tests for InvSensorSet
  *
  */
-class TestSensorSet: public QObject
+class TestSensorSet : public QObject
 {
     Q_OBJECT
 
@@ -74,7 +74,7 @@ private slots:
 private:
     // declare your thresholds, variables and error values here
     QList<FIFFLIB::FiffChInfo> m_lChannels;
-    QSharedPointer<FWDLIB::FwdCoilSet>  m_pCoilDefinitions{nullptr};
+    QSharedPointer<FWDLIB::FwdCoilSet> m_pCoilDefinitions{nullptr};
 };
 
 //=============================================================================================================
@@ -95,17 +95,17 @@ void TestSensorSet::initTestCase()
     // Setup for reading the raw data
     QFile t_fileIn(QCoreApplication::applicationDirPath() + "/../resources/data/mne-cpp-test-data/MEG/sample/test_hpiFit_raw.fif");
     FiffRawData raw = FiffRawData(t_fileIn);
-    FiffInfo::SPtr pFiffInfo =  FiffInfo::SPtr(new FiffInfo(raw.info));
+    FiffInfo::SPtr pFiffInfo = FiffInfo::SPtr(new FiffInfo(raw.info));
 
     // create meg channel list
     int iNumCh = pFiffInfo->nchan;
     for (int i = 0; i < iNumCh; ++i) {
-        if(pFiffInfo->chs[i].chpos.coil_type == FIFFV_COIL_BABY_MAG ||
+        if (pFiffInfo->chs[i].chpos.coil_type == FIFFV_COIL_BABY_MAG ||
             pFiffInfo->chs[i].chpos.coil_type == FIFFV_COIL_VV_PLANAR_T1 ||
             pFiffInfo->chs[i].chpos.coil_type == FIFFV_COIL_VV_PLANAR_T2 ||
             pFiffInfo->chs[i].chpos.coil_type == FIFFV_COIL_VV_PLANAR_T3) {
             // Check if the sensor is bad, if not append to innerind
-            if(!(pFiffInfo->bads.contains(pFiffInfo->ch_names.at(i)))) {
+            if (!(pFiffInfo->bads.contains(pFiffInfo->ch_names.at(i)))) {
                 m_lChannels.append(pFiffInfo->chs[i]);
             }
         }
@@ -127,12 +127,12 @@ void TestSensorSet::testSensorSet_defaultConstructor()
     InvSensorSet sensorsActual = InvSensorSet();
 
     /// assert
-    QVERIFY2(iNp == sensorsActual.np(),"Number of integration points does not match.");
-    QVERIFY2(iNChan == sensorsActual.ncoils(),"Number of channels does not match.");
-    QVERIFY2(iNRmag == sensorsActual.rmag().rows(),"Number of points for computation does not match.");
-    QVERIFY2(iNCosmag == sensorsActual.cosmag().rows(),"Number of points for computation does not match.");
-    QVERIFY2(iNTra == sensorsActual.tra().size(),"Size of square matrix does not match.");
-    QVERIFY2(iNW == sensorsActual.w().size(),"Number of iweights does not match");
+    QVERIFY2(iNp == sensorsActual.np(), "Number of integration points does not match.");
+    QVERIFY2(iNChan == sensorsActual.ncoils(), "Number of channels does not match.");
+    QVERIFY2(iNRmag == sensorsActual.rmag().rows(), "Number of points for computation does not match.");
+    QVERIFY2(iNCosmag == sensorsActual.cosmag().rows(), "Number of points for computation does not match.");
+    QVERIFY2(iNTra == sensorsActual.tra().size(), "Size of square matrix does not match.");
+    QVERIFY2(iNW == sensorsActual.w().size(), "Number of iweights does not match");
 }
 
 //=============================================================================================================
@@ -150,24 +150,24 @@ void TestSensorSet::testSensorSet_constructor_nullptr()
     InvSensorSet sensorsActual = InvSensorSet(nullptr);
 
     /// assert
-    QVERIFY2(iNp == sensorsActual.np(),"Number of integration points does not match.");
-    QVERIFY2(iNChan == sensorsActual.ncoils(),"Number of channels does not match.");
-    QVERIFY2(iNRmag == sensorsActual.rmag().rows(),"Number of points for computation does not match.");
-    QVERIFY2(iNCosmag == sensorsActual.cosmag().rows(),"Number of points for computation does not match.");
-    QVERIFY2(iNTra == sensorsActual.tra().size(),"Size of square matrix does not match.");
-    QVERIFY2(iNW == sensorsActual.w().size(),"Number of iweights does not match");
+    QVERIFY2(iNp == sensorsActual.np(), "Number of integration points does not match.");
+    QVERIFY2(iNChan == sensorsActual.ncoils(), "Number of channels does not match.");
+    QVERIFY2(iNRmag == sensorsActual.rmag().rows(), "Number of points for computation does not match.");
+    QVERIFY2(iNCosmag == sensorsActual.cosmag().rows(), "Number of points for computation does not match.");
+    QVERIFY2(iNTra == sensorsActual.tra().size(), "Size of square matrix does not match.");
+    QVERIFY2(iNW == sensorsActual.w().size(), "Number of iweights does not match");
 }
 
 //=============================================================================================================
 
 void TestSensorSet::testSensorSet_constructor_accuracyLow()
 {
-    int iNChan = 204;               // number of channels (204 gradiometers)
-    int iNp = 2;                    // 1 integration points for each coil (gradiometers -> x2) accuracy low
-    int iNRmag = iNp * iNChan;      // expected number of points for computation
-    int iNCosmag = iNp * iNChan;    // same as rmag
-    int iNTra = iNChan*iNChan;      // size square matrix 204*204
-    int iNW = iNp * iNChan;         // one weight for each point
+    int iNChan = 204;            // number of channels (204 gradiometers)
+    int iNp = 2;                 // 1 integration points for each coil (gradiometers -> x2) accuracy low
+    int iNRmag = iNp * iNChan;   // expected number of points for computation
+    int iNCosmag = iNp * iNChan; // same as rmag
+    int iNTra = iNChan * iNChan; // size square matrix 204*204
+    int iNW = iNp * iNChan;      // one weight for each point
     Accuracy accuracy = Accuracy::low;
     auto pCoilMeg = FwdCoilSet::SPtr(m_pCoilDefinitions->create_meg_coils(m_lChannels, static_cast<int>(m_lChannels.size()), static_cast<int>(accuracy)).release());
 
@@ -175,24 +175,24 @@ void TestSensorSet::testSensorSet_constructor_accuracyLow()
     InvSensorSet sensorsActual = InvSensorSet(pCoilMeg);
 
     /// assert
-    QVERIFY2(iNp == sensorsActual.np(),"Number of integration points does not match.");
-    QVERIFY2(iNChan == sensorsActual.ncoils(),"Number of channels does not match.");
-    QVERIFY2(iNRmag == sensorsActual.rmag().rows(),"Number of points for computation does not match.");
-    QVERIFY2(iNCosmag == sensorsActual.cosmag().rows(),"Number of points for computation does not match.");
-    QVERIFY2(iNTra == sensorsActual.tra().size(),"Size of square matrix does not match.");
-    QVERIFY2(iNW == sensorsActual.w().size(),"Number of iweights does not match");
+    QVERIFY2(iNp == sensorsActual.np(), "Number of integration points does not match.");
+    QVERIFY2(iNChan == sensorsActual.ncoils(), "Number of channels does not match.");
+    QVERIFY2(iNRmag == sensorsActual.rmag().rows(), "Number of points for computation does not match.");
+    QVERIFY2(iNCosmag == sensorsActual.cosmag().rows(), "Number of points for computation does not match.");
+    QVERIFY2(iNTra == sensorsActual.tra().size(), "Size of square matrix does not match.");
+    QVERIFY2(iNW == sensorsActual.w().size(), "Number of iweights does not match");
 }
 
 //=============================================================================================================
 
 void TestSensorSet::testSensorSet_constructor_accuracyMedium()
 {
-    int iNChan = 204;               // number of channels (204 gradiometers)
-    int iNp = 4;                    // 4 integration points for accuracy medium
-    int iNRmag = iNp * iNChan;      // expected number of points for computation
-    int iNCosmag = iNp * iNChan;    // same as rmag
-    int iNTra = iNChan*iNChan;      // size square matrix 204*204
-    int iNW = iNp * iNChan;         // one weight for each point
+    int iNChan = 204;            // number of channels (204 gradiometers)
+    int iNp = 4;                 // 4 integration points for accuracy medium
+    int iNRmag = iNp * iNChan;   // expected number of points for computation
+    int iNCosmag = iNp * iNChan; // same as rmag
+    int iNTra = iNChan * iNChan; // size square matrix 204*204
+    int iNW = iNp * iNChan;      // one weight for each point
     int iAcc = 1;
 
     auto pCoilMeg = FwdCoilSet::SPtr(m_pCoilDefinitions->create_meg_coils(m_lChannels, static_cast<int>(m_lChannels.size()), iAcc).release());
@@ -201,24 +201,24 @@ void TestSensorSet::testSensorSet_constructor_accuracyMedium()
     InvSensorSet sensorsActual = InvSensorSet(pCoilMeg);
 
     /// assert
-    QVERIFY2(iNp == sensorsActual.np(),"Number of integration points does not match.");
-    QVERIFY2(iNChan == sensorsActual.ncoils(),"Number of channels does not match.");
-    QVERIFY2(iNRmag == sensorsActual.rmag().rows(),"Number of points for computation does not match.");
-    QVERIFY2(iNCosmag == sensorsActual.cosmag().rows(),"Number of points for computation does not match.");
-    QVERIFY2(iNTra == sensorsActual.tra().size(),"Size of square matrix does not match.");
-    QVERIFY2(iNW == sensorsActual.w().size(),"Number of iweights does not match");
+    QVERIFY2(iNp == sensorsActual.np(), "Number of integration points does not match.");
+    QVERIFY2(iNChan == sensorsActual.ncoils(), "Number of channels does not match.");
+    QVERIFY2(iNRmag == sensorsActual.rmag().rows(), "Number of points for computation does not match.");
+    QVERIFY2(iNCosmag == sensorsActual.cosmag().rows(), "Number of points for computation does not match.");
+    QVERIFY2(iNTra == sensorsActual.tra().size(), "Size of square matrix does not match.");
+    QVERIFY2(iNW == sensorsActual.w().size(), "Number of iweights does not match");
 }
 
 //=============================================================================================================
 
 void TestSensorSet::testSensorSet_constructor_accuracyHigh()
 {
-    int iNChan = 204;               // number of channels (204 gradiometers)
-    int iNp = 8;                    // 8 integration points for accuracy high
-    int iNRmag = iNp * iNChan;      // expected number of points for computation, 8 for each sensor -> 8*204
-    int iNCosmag = iNp * iNChan;    // same as rmag
-    int iNTra = iNChan*iNChan;      // size square matrix 204*204
-    int iNW = iNp * iNChan;         // one weight for each point
+    int iNChan = 204;            // number of channels (204 gradiometers)
+    int iNp = 8;                 // 8 integration points for accuracy high
+    int iNRmag = iNp * iNChan;   // expected number of points for computation, 8 for each sensor -> 8*204
+    int iNCosmag = iNp * iNChan; // same as rmag
+    int iNTra = iNChan * iNChan; // size square matrix 204*204
+    int iNW = iNp * iNChan;      // one weight for each point
     Accuracy accuracy = Accuracy::high;
     auto pCoilMeg = FwdCoilSet::SPtr(m_pCoilDefinitions->create_meg_coils(m_lChannels, static_cast<int>(m_lChannels.size()), static_cast<int>(accuracy)).release());
 
@@ -226,12 +226,12 @@ void TestSensorSet::testSensorSet_constructor_accuracyHigh()
     InvSensorSet sensorsActual = InvSensorSet(pCoilMeg);
 
     /// assert
-    QVERIFY2(iNp == sensorsActual.np(),"Number of integration points does not match.");
-    QVERIFY2(iNChan == sensorsActual.ncoils(),"Number of channels does not match.");
-    QVERIFY2(iNRmag == sensorsActual.rmag().rows(),"Number of points for computation does not match.");
-    QVERIFY2(iNCosmag == sensorsActual.cosmag().rows(),"Number of points for computation does not match.");
-    QVERIFY2(iNTra == sensorsActual.tra().size(),"Size of square matrix does not match.");
-    QVERIFY2(iNW == sensorsActual.w().size(),"Number of iweights does not match");
+    QVERIFY2(iNp == sensorsActual.np(), "Number of integration points does not match.");
+    QVERIFY2(iNChan == sensorsActual.ncoils(), "Number of channels does not match.");
+    QVERIFY2(iNRmag == sensorsActual.rmag().rows(), "Number of points for computation does not match.");
+    QVERIFY2(iNCosmag == sensorsActual.cosmag().rows(), "Number of points for computation does not match.");
+    QVERIFY2(iNTra == sensorsActual.tra().size(), "Size of square matrix does not match.");
+    QVERIFY2(iNW == sensorsActual.w().size(), "Number of iweights does not match");
 }
 
 //=============================================================================================================
@@ -268,11 +268,11 @@ void TestSensorSet::testSensorSetCreator_channelList_empty()
     QList<FIFFLIB::FiffChInfo> lChannels;
     Accuracy accuracy = Accuracy::medium;
 
-    InvSensorSet sensorsActual = sensorSetCreator.updateSensorSet(lChannels,accuracy);
+    InvSensorSet sensorsActual = sensorSetCreator.updateSensorSet(lChannels, accuracy);
     InvSensorSet sensorsExpected = InvSensorSet();
 
     // assert
-    QVERIFY(sensorsActual==sensorsExpected);
+    QVERIFY(sensorsActual == sensorsExpected);
 }
 
 //=============================================================================================================
@@ -284,10 +284,10 @@ void TestSensorSet::testSensorSetCreator_channelList_medium()
     InvSensorSet sensorsExpected(pCoilMeg);
 
     InvSensorSetCreator sensorSetCreator;
-    InvSensorSet sensorsActual = sensorSetCreator.updateSensorSet(m_lChannels,accuracy);
+    InvSensorSet sensorsActual = sensorSetCreator.updateSensorSet(m_lChannels, accuracy);
 
     /// assert
-    QVERIFY(sensorsActual==sensorsExpected);
+    QVERIFY(sensorsActual == sensorsExpected);
 }
 
 //=============================================================================================================
@@ -302,4 +302,3 @@ void TestSensorSet::cleanupTestCase()
 
 QTEST_GUILESS_MAIN(TestSensorSet)
 #include "test_sensorSet.moc"
-

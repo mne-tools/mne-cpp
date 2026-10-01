@@ -71,7 +71,6 @@ void View3D::init()
 
 void View3D::unload()
 {
-
 }
 
 //=============================================================================================================
@@ -83,17 +82,17 @@ QString View3D::getName() const
 
 //=============================================================================================================
 
-QMenu *View3D::getMenu()
+QMenu* View3D::getMenu()
 {
     return Q_NULLPTR;
 }
 
 //=============================================================================================================
 
-QWidget *View3D::getView()
+QWidget* View3D::getView()
 {
     View3D* pView3D = new View3D();
-    QWidget *pWidgetContainer = QWidget::createWindowContainer(pView3D, Q_NULLPTR, Qt::Widget);
+    QWidget* pWidgetContainer = QWidget::createWindowContainer(pView3D, Q_NULLPTR, Qt::Widget);
 
     return pWidgetContainer;
 }

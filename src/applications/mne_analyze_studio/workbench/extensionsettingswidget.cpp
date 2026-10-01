@@ -87,10 +87,10 @@ QVariant ExtensionSettingsWidget::fieldDefaultValue(const QJsonObject& field) co
 
 void ExtensionSettingsWidget::buildForm()
 {
-    for(const QJsonValue& value : m_tab.fields) {
+    for (const QJsonValue& value : m_tab.fields) {
         const QJsonObject field = value.toObject();
         const QString id = field.value("id").toString().trimmed();
-        if(id.isEmpty()) {
+        if (id.isEmpty()) {
             continue;
         }
 
@@ -99,23 +99,23 @@ void ExtensionSettingsWidget::buildForm()
         const QString description = field.value("description").toString().trimmed();
 
         QWidget* editor = nullptr;
-        if(type == "boolean" || type == "bool") {
+        if (type == "boolean" || type == "bool") {
             editor = new QCheckBox(this);
-        } else if(type == "integer" || type == "int") {
+        } else if (type == "integer" || type == "int") {
             QSpinBox* spinBox = new QSpinBox(this);
             spinBox->setRange(field.value("minimum").toInt(-1000000),
                               field.value("maximum").toInt(1000000));
             editor = spinBox;
-        } else if(type == "number" || type == "double") {
+        } else if (type == "number" || type == "double") {
             QDoubleSpinBox* spinBox = new QDoubleSpinBox(this);
             spinBox->setDecimals(field.value("decimals").toInt(3));
             spinBox->setSingleStep(field.value("step").toDouble(0.1));
             spinBox->setRange(field.value("minimum").toDouble(-1e9),
                               field.value("maximum").toDouble(1e9));
             editor = spinBox;
-        } else if(type == "enum") {
+        } else if (type == "enum") {
             QComboBox* comboBox = new QComboBox(this);
-            for(const QJsonValue& option : field.value("options").toArray()) {
+            for (const QJsonValue& option : field.value("options").toArray()) {
                 comboBox->addItem(option.toString());
             }
             editor = comboBox;
@@ -135,26 +135,26 @@ void ExtensionSettingsWidget::loadSettings()
 {
     QSettings settings("MNE-CPP", "MNEAnalyzeStudio");
 
-    for(const QJsonValue& value : m_tab.fields) {
+    for (const QJsonValue& value : m_tab.fields) {
         const QJsonObject field = value.toObject();
         const QString id = field.value("id").toString().trimmed();
         QWidget* widget = m_fieldWidgets.value(id, nullptr);
-        if(!widget) {
+        if (!widget) {
             continue;
         }
 
         const QVariant storedValue = settings.value(QString("%1/%2").arg(settingsKeyPrefix(), id),
                                                     fieldDefaultValue(field));
-        if(QCheckBox* checkBox = qobject_cast<QCheckBox*>(widget)) {
+        if (QCheckBox* checkBox = qobject_cast<QCheckBox*>(widget)) {
             checkBox->setChecked(storedValue.toBool());
-        } else if(QSpinBox* spinBox = qobject_cast<QSpinBox*>(widget)) {
+        } else if (QSpinBox* spinBox = qobject_cast<QSpinBox*>(widget)) {
             spinBox->setValue(storedValue.toInt());
-        } else if(QDoubleSpinBox* doubleSpinBox = qobject_cast<QDoubleSpinBox*>(widget)) {
+        } else if (QDoubleSpinBox* doubleSpinBox = qobject_cast<QDoubleSpinBox*>(widget)) {
             doubleSpinBox->setValue(storedValue.toDouble());
-        } else if(QComboBox* comboBox = qobject_cast<QComboBox*>(widget)) {
+        } else if (QComboBox* comboBox = qobject_cast<QComboBox*>(widget)) {
             const int index = comboBox->findText(storedValue.toString(), Qt::MatchFixedString);
             comboBox->setCurrentIndex(index >= 0 ? index : 0);
-        } else if(QLineEdit* lineEdit = qobject_cast<QLineEdit*>(widget)) {
+        } else if (QLineEdit* lineEdit = qobject_cast<QLineEdit*>(widget)) {
             lineEdit->setText(storedValue.toString());
         }
     }
@@ -164,24 +164,24 @@ void ExtensionSettingsWidget::saveSettings()
 {
     QSettings settings("MNE-CPP", "MNEAnalyzeStudio");
 
-    for(const QJsonValue& value : m_tab.fields) {
+    for (const QJsonValue& value : m_tab.fields) {
         const QJsonObject field = value.toObject();
         const QString id = field.value("id").toString().trimmed();
         QWidget* widget = m_fieldWidgets.value(id, nullptr);
-        if(!widget) {
+        if (!widget) {
             continue;
         }
 
         QVariant storedValue;
-        if(QCheckBox* checkBox = qobject_cast<QCheckBox*>(widget)) {
+        if (QCheckBox* checkBox = qobject_cast<QCheckBox*>(widget)) {
             storedValue = checkBox->isChecked();
-        } else if(QSpinBox* spinBox = qobject_cast<QSpinBox*>(widget)) {
+        } else if (QSpinBox* spinBox = qobject_cast<QSpinBox*>(widget)) {
             storedValue = spinBox->value();
-        } else if(QDoubleSpinBox* doubleSpinBox = qobject_cast<QDoubleSpinBox*>(widget)) {
+        } else if (QDoubleSpinBox* doubleSpinBox = qobject_cast<QDoubleSpinBox*>(widget)) {
             storedValue = doubleSpinBox->value();
-        } else if(QComboBox* comboBox = qobject_cast<QComboBox*>(widget)) {
+        } else if (QComboBox* comboBox = qobject_cast<QComboBox*>(widget)) {
             storedValue = comboBox->currentText();
-        } else if(QLineEdit* lineEdit = qobject_cast<QLineEdit*>(widget)) {
+        } else if (QLineEdit* lineEdit = qobject_cast<QLineEdit*>(widget)) {
             storedValue = lineEdit->text();
         }
 
@@ -197,9 +197,9 @@ void ExtensionSettingsWidget::saveSettings()
 void ExtensionSettingsWidget::restoreDefaults()
 {
     QSettings settings("MNE-CPP", "MNEAnalyzeStudio");
-    for(const QJsonValue& value : m_tab.fields) {
+    for (const QJsonValue& value : m_tab.fields) {
         const QString id = value.toObject().value("id").toString().trimmed();
-        if(!id.isEmpty()) {
+        if (!id.isEmpty()) {
             settings.remove(QString("%1/%2").arg(settingsKeyPrefix(), id));
         }
     }

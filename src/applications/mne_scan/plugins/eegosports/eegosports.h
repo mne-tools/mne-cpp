@@ -48,13 +48,15 @@
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-namespace SCMEASLIB {
-    class RealTimeMultiSampleArray;
+namespace SCMEASLIB
+{
+class RealTimeMultiSampleArray;
 }
 
-namespace FIFFLIB {
-    class FiffStream;
-    class FiffInfo;
+namespace FIFFLIB
+{
+class FiffStream;
+class FiffInfo;
 }
 
 //=============================================================================================================
@@ -67,7 +69,7 @@ namespace EEGOSPORTSPLUGIN
 typedef unsigned long DWORD;
 
 #ifndef M_PI
-#define M_PI    3.14159265358979323846f
+#define M_PI 3.14159265358979323846f
 #endif
 
 //=============================================================================================================
@@ -153,7 +155,7 @@ public:
     /**
      * Set/Add received samples to the circular buffer.
      */
-    void setSampleData(Eigen::MatrixXd &matData);
+    void setSampleData(Eigen::MatrixXd& matData);
 
     //=========================================================================================================
 
@@ -205,40 +207,40 @@ protected:
     virtual void run();
 
 private:
-    SCSHAREDLIB::PluginOutputData<SCMEASLIB::RealTimeMultiSampleArray>::SPtr    m_pRMTSA_EEGoSports;                    /**< The RealTimeSampleArray to provide the EEG data.*/
-    QSharedPointer<EEGoSportsImpedanceWidget>                                   m_pEEGoSportsImpedanceWidget;           /**< Widget for checking the impedances*/
-    QSharedPointer<EEGoSportsSetupProjectWidget>                                m_pEEGoSportsSetupProjectWidget;        /**< Widget for checking the impedances*/
-    QSharedPointer<UTILSLIB::CircularBuffer_Matrix_double>                      m_pCircularBuffer;              /**< Holds incoming raw data. */
+    SCSHAREDLIB::PluginOutputData<SCMEASLIB::RealTimeMultiSampleArray>::SPtr m_pRMTSA_EEGoSports; /**< The RealTimeSampleArray to provide the EEG data.*/
+    QSharedPointer<EEGoSportsImpedanceWidget> m_pEEGoSportsImpedanceWidget;                       /**< Widget for checking the impedances*/
+    QSharedPointer<EEGoSportsSetupProjectWidget> m_pEEGoSportsSetupProjectWidget;                 /**< Widget for checking the impedances*/
+    QSharedPointer<UTILSLIB::CircularBuffer_Matrix_double> m_pCircularBuffer;                     /**< Holds incoming raw data. */
 
-    QString                             m_qStringResourcePath;              /**< The path to the EEG resource directory.*/
+    QString m_qStringResourcePath; /**< The path to the EEG resource directory.*/
 
-    int                                 m_iSamplingFreq;                    /**< The sampling frequency defined by the user via the GUI (in Hertz).*/
-    int                                 m_iNumberOfChannels;                /**< The number of channels.*/
-    int                                 m_iNumberOfEEGChannels;             /**< The number of EEG channels.*/
-    int                                 m_iNumberOfBipolarChannels;         /**< The number of Bipolar channels.*/
+    int m_iSamplingFreq;            /**< The sampling frequency defined by the user via the GUI (in Hertz).*/
+    int m_iNumberOfChannels;        /**< The number of channels.*/
+    int m_iNumberOfEEGChannels;     /**< The number of EEG channels.*/
+    int m_iNumberOfBipolarChannels; /**< The number of Bipolar channels.*/
 
-    int                                 m_iSamplesPerBlock;                 /**< The samples per block defined by the user via the GUI.*/
+    int m_iSamplesPerBlock; /**< The samples per block defined by the user via the GUI.*/
 
-    double                              m_dLPAShift;                        /**< The shift in m in to generate the LPA.*/
-    double                              m_dRPAShift;                        /**< The shift in m in to generate the RPA.*/
-    double                              m_dNasionShift;                     /**< The shift in m in to generate the Nasion.*/
+    double m_dLPAShift;    /**< The shift in m in to generate the LPA.*/
+    double m_dRPAShift;    /**< The shift in m in to generate the RPA.*/
+    double m_dNasionShift; /**< The shift in m in to generate the Nasion.*/
 
-    bool                                m_bWriteDriverDebugToFile;          /**< Flag for for writing driver debug informstions to a file. Defined by the user via the GUI.*/
-    bool                                m_bCheckImpedances;                 /**< Flag for checking the impedances of the EEG amplifier.*/
-    bool                                m_bUseTrackedCardinalMode;          /**< Flag for using the tracked cardinal mode.*/
-    bool                                m_bUseElectrodeShiftMode;           /**< Flag for using the electrode shift mode.*/
+    bool m_bWriteDriverDebugToFile; /**< Flag for for writing driver debug informstions to a file. Defined by the user via the GUI.*/
+    bool m_bCheckImpedances;        /**< Flag for checking the impedances of the EEG amplifier.*/
+    bool m_bUseTrackedCardinalMode; /**< Flag for using the tracked cardinal mode.*/
+    bool m_bUseElectrodeShiftMode;  /**< Flag for using the electrode shift mode.*/
 
-    QString                             m_sElcFilePath;                     /**< Holds the path for the .elc file (electrode positions). Defined by the user via the GUI.*/
-    QString                             m_sCardinalFilePath;                /**< Holds the path for the .elc file holding the cardinals/fiducials (electrode positions). Defined by the user via the GUI.*/
-    QString                             m_sLPA;                             /**< The electrode to take to function as the LPA.*/
-    QString                             m_sRPA;                             /**< The electrode to take to function as the RPA.*/
-    QString                             m_sNasion;                          /**< The electrode to take to function as the Nasion.*/
+    QString m_sElcFilePath;      /**< Holds the path for the .elc file (electrode positions). Defined by the user via the GUI.*/
+    QString m_sCardinalFilePath; /**< Holds the path for the .elc file holding the cardinals/fiducials (electrode positions). Defined by the user via the GUI.*/
+    QString m_sLPA;              /**< The electrode to take to function as the LPA.*/
+    QString m_sRPA;              /**< The electrode to take to function as the RPA.*/
+    QString m_sNasion;           /**< The electrode to take to function as the Nasion.*/
 
-    QSharedPointer<FIFFLIB::FiffInfo>   m_pFiffInfo;                        /**< Fiff measurement info.*/
+    QSharedPointer<FIFFLIB::FiffInfo> m_pFiffInfo; /**< Fiff measurement info.*/
 
-    QSharedPointer<EEGoSportsProducer>  m_pEEGoSportsProducer;              /**< The EEGoSportsProducer.*/
+    QSharedPointer<EEGoSportsProducer> m_pEEGoSportsProducer; /**< The EEGoSportsProducer.*/
 
-    QMutex                              m_mutex;                            /**< Holds the threads mutex.*/
+    QMutex m_mutex; /**< Holds the threads mutex.*/
 };
 } // NAMESPACE
 

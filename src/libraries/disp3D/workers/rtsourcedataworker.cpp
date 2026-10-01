@@ -28,14 +28,14 @@ using namespace DISP3DLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-RtSourceDataWorker::RtSourceDataWorker(QObject *parent)
-    : QObject(parent)
+RtSourceDataWorker::RtSourceDataWorker(QObject* parent)
+: QObject(parent)
 {
 }
 
 //=============================================================================================================
 
-void RtSourceDataWorker::addData(const Eigen::VectorXd &data)
+void RtSourceDataWorker::addData(const Eigen::VectorXd& data)
 {
     QMutexLocker locker(&m_mutex);
 
@@ -92,7 +92,7 @@ void RtSourceDataWorker::setNumberAverages(int numAvr)
 
 //=============================================================================================================
 
-void RtSourceDataWorker::setColormapType(const QString &name)
+void RtSourceDataWorker::setColormapType(const QString& name)
 {
     QMutexLocker locker(&m_mutex);
     m_sColormapType = name;
@@ -126,8 +126,8 @@ void RtSourceDataWorker::setSFreq(double sFreq)
 
 //=============================================================================================================
 
-void RtSourceDataWorker::setSurfaceColor(const QVector<uint32_t> &baseColorsLh,
-                                          const QVector<uint32_t> &baseColorsRh)
+void RtSourceDataWorker::setSurfaceColor(const QVector<uint32_t>& baseColorsLh,
+                                         const QVector<uint32_t>& baseColorsRh)
 {
     QMutexLocker locker(&m_mutex);
     m_baseColorsLh = baseColorsLh;
@@ -240,9 +240,9 @@ void RtSourceDataWorker::streamData()
 //=============================================================================================================
 
 QVector<uint32_t> RtSourceDataWorker::computeHemiColors(
-    const Eigen::VectorXf &sourceData,
-    const QSharedPointer<Eigen::SparseMatrix<float>> &interpMat,
-    const QVector<uint32_t> &baseColors) const
+    const Eigen::VectorXf& sourceData,
+    const QSharedPointer<Eigen::SparseMatrix<float>>& interpMat,
+    const QVector<uint32_t>& baseColors) const
 {
     if (sourceData.size() == 0 || !interpMat || interpMat->rows() == 0) {
         return QVector<uint32_t>();
@@ -257,7 +257,8 @@ QVector<uint32_t> RtSourceDataWorker::computeHemiColors(
     bool hasBaseColors = (baseColors.size() == nVertices);
 
     double range = m_dThreshMax - m_dThreshMin;
-    if (range <= 0.0) range = 1.0;
+    if (range <= 0.0)
+        range = 1.0;
 
     for (int i = 0; i < nVertices; ++i) {
         float value = interpolated(i);

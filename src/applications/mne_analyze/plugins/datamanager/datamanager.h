@@ -37,8 +37,9 @@
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-namespace ANSHAREDLIB {
-    class Communicator;
+namespace ANSHAREDLIB
+{
+class Communicator;
 }
 
 //=============================================================================================================
@@ -109,7 +110,7 @@ private:
      *
      * @param[in] index    model index of item to be removed.
      */
-    void onRemoveItem(const QModelIndex &index);
+    void onRemoveItem(const QModelIndex& index);
 
     QPointer<ANSHAREDLIB::Communicator> m_pCommu;
 };

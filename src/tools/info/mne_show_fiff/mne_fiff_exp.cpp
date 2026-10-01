@@ -51,13 +51,12 @@ MNEFiffExp::MNEFiffExp(const MNEFiffExp& p_MneFiffExp)
 
 MNEFiffExp::~MNEFiffExp()
 {
-
 }
 
 
 //*************************************************************************************************************
 
-bool MNEFiffExp::comp_exp(const MNEFiffExp &ex1, const MNEFiffExp &ex2)
+bool MNEFiffExp::comp_exp(const MNEFiffExp& ex1, const MNEFiffExp& ex2)
 {
     if (ex1.exclass == ex2.exclass) {
         if (ex1.kind > ex2.kind)
@@ -66,8 +65,7 @@ bool MNEFiffExp::comp_exp(const MNEFiffExp &ex1, const MNEFiffExp &ex2)
             return true;
         else
             return false;
-    }
-    else {
+    } else {
         if (ex1.exclass > ex2.exclass)
             return false;
         else

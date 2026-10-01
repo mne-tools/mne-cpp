@@ -73,11 +73,11 @@ namespace
 
 QString defaultEvokedFilePath(const QString& rawFilePath)
 {
-    if(rawFilePath.isEmpty()) {
+    if (rawFilePath.isEmpty()) {
         return QString();
     }
 
-    if(rawFilePath.endsWith(".fif", Qt::CaseInsensitive)) {
+    if (rawFilePath.endsWith(".fif", Qt::CaseInsensitive)) {
         return rawFilePath.left(rawFilePath.size() - 4) + "-ave.fif";
     }
 
@@ -86,11 +86,11 @@ QString defaultEvokedFilePath(const QString& rawFilePath)
 
 QString defaultCovFilePath(const QString& rawFilePath)
 {
-    if(rawFilePath.isEmpty()) {
+    if (rawFilePath.isEmpty()) {
         return QString();
     }
 
-    if(rawFilePath.endsWith(".fif", Qt::CaseInsensitive)) {
+    if (rawFilePath.endsWith(".fif", Qt::CaseInsensitive)) {
         return rawFilePath.left(rawFilePath.size() - 4) + "-cov.fif";
     }
 
@@ -104,23 +104,22 @@ QString defaultSourceEstimateDirectory(const QSettings& settings,
 {
     const QString savedDirectory =
         settings.value("MainWindow/SourceEstimate/outputDirectory").toString().trimmed();
-    if(!savedDirectory.isEmpty() && QDir(savedDirectory).exists()) {
+    if (!savedDirectory.isEmpty() && QDir(savedDirectory).exists()) {
         return savedDirectory;
     }
 
     const QStringList candidatePaths = {
         evokedFilePath,
         rawFilePath,
-        inverseOperatorPath
-    };
+        inverseOperatorPath};
 
-    for(const QString& candidatePath : candidatePaths) {
-        if(candidatePath.isEmpty()) {
+    for (const QString& candidatePath : candidatePaths) {
+        if (candidatePath.isEmpty()) {
             continue;
         }
 
         const QString absolutePath = QFileInfo(candidatePath).absolutePath();
-        if(QDir(absolutePath).exists()) {
+        if (QDir(absolutePath).exists()) {
             return absolutePath;
         }
     }
@@ -130,11 +129,11 @@ QString defaultSourceEstimateDirectory(const QSettings& settings,
 
 QString defaultAnnotationFilePath(const QString& rawFilePath)
 {
-    if(rawFilePath.isEmpty()) {
+    if (rawFilePath.isEmpty()) {
         return QString();
     }
 
-    if(rawFilePath.endsWith(".fif", Qt::CaseInsensitive)) {
+    if (rawFilePath.endsWith(".fif", Qt::CaseInsensitive)) {
         return rawFilePath.left(rawFilePath.size() - 4) + "-annot.json";
     }
 
@@ -144,19 +143,19 @@ QString defaultAnnotationFilePath(const QString& rawFilePath)
 QStringList defaultAnnotationCandidatePaths(const QString& rawFilePath)
 {
     const QString defaultJsonPath = defaultAnnotationFilePath(rawFilePath);
-    if(defaultJsonPath.isEmpty()) {
+    if (defaultJsonPath.isEmpty()) {
         return {};
     }
 
     QString basePath = defaultJsonPath;
-    if(basePath.endsWith(QStringLiteral(".json"), Qt::CaseInsensitive)) {
+    if (basePath.endsWith(QStringLiteral(".json"), Qt::CaseInsensitive)) {
         basePath.chop(5);
     }
 
     QStringList candidates = {defaultJsonPath,
                               basePath + QStringLiteral(".fif")};
 
-    if(rawFilePath.endsWith(QStringLiteral(".fif"), Qt::CaseInsensitive)) {
+    if (rawFilePath.endsWith(QStringLiteral(".fif"), Qt::CaseInsensitive)) {
         candidates.append(rawFilePath.left(rawFilePath.size() - 4) + QStringLiteral("_annot.fif"));
     }
 
@@ -167,11 +166,11 @@ QStringList defaultAnnotationCandidatePaths(const QString& rawFilePath)
 
 QString defaultVirtualChannelFilePath(const QString& rawFilePath)
 {
-    if(rawFilePath.isEmpty()) {
+    if (rawFilePath.isEmpty()) {
         return QString();
     }
 
-    if(rawFilePath.endsWith(".fif", Qt::CaseInsensitive)) {
+    if (rawFilePath.endsWith(".fif", Qt::CaseInsensitive)) {
         return rawFilePath.left(rawFilePath.size() - 4) + "-virtchan.json";
     }
 
@@ -181,15 +180,15 @@ QString defaultVirtualChannelFilePath(const QString& rawFilePath)
 void applySessionFilterToEpochList(MNELIB::MNEEpochDataList& epochList,
                                    const MNEBROWSE::SessionFilter& filter,
                                    const FIFFLIB::FiffInfo& info,
-                                   const QMap<QString,double>& rejectMap)
+                                   const QMap<QString, double>& rejectMap)
 {
-    for(const auto& epoch : epochList) {
-        if(epoch.isNull()) {
+    for (const auto& epoch : epochList) {
+        if (epoch.isNull()) {
             continue;
         }
 
         epoch->epoch = filter.applyToMatrix(epoch->epoch, info);
-        if(!rejectMap.isEmpty()) {
+        if (!rejectMap.isEmpty()) {
             epoch->bReject = MNELIB::MNEEpochDataList::checkForArtifact(epoch->epoch,
                                                                         info,
                                                                         rejectMap);
@@ -202,7 +201,7 @@ FIFFLIB::FiffCov computeCovarianceFromEpochLists(const QList<MNELIB::MNEEpochDat
                                                  bool removeMean)
 {
     FIFFLIB::FiffCov covariance;
-    if(epochLists.isEmpty()) {
+    if (epochLists.isEmpty()) {
         return covariance;
     }
 
@@ -211,14 +210,14 @@ FIFFLIB::FiffCov computeCovarianceFromEpochLists(const QList<MNELIB::MNEEpochDat
     int totalSamples = 0;
     int acceptedEpochs = 0;
 
-    for(const MNELIB::MNEEpochDataList& epochList : epochLists) {
-        for(const auto& epoch : epochList) {
-            if(epoch.isNull() || epoch->epoch.size() == 0) {
+    for (const MNELIB::MNEEpochDataList& epochList : epochLists) {
+        for (const auto& epoch : epochList) {
+            if (epoch.isNull() || epoch->epoch.size() == 0) {
                 continue;
             }
 
             covAccum += epoch->epoch * epoch->epoch.transpose();
-            if(removeMean) {
+            if (removeMean) {
                 meanAccum += epoch->epoch.rowwise().mean() * static_cast<double>(epoch->epoch.cols());
             }
 
@@ -227,15 +226,13 @@ FIFFLIB::FiffCov computeCovarianceFromEpochLists(const QList<MNELIB::MNEEpochDat
         }
     }
 
-    if(totalSamples < 2) {
+    if (totalSamples < 2) {
         return covariance;
     }
 
-    if(removeMean) {
+    if (removeMean) {
         const Eigen::VectorXd grandMean = meanAccum / static_cast<double>(totalSamples);
-        covariance.data = (covAccum / static_cast<double>(totalSamples - 1))
-                          - (grandMean * grandMean.transpose())
-                                * (static_cast<double>(totalSamples) / static_cast<double>(totalSamples - 1));
+        covariance.data = (covAccum / static_cast<double>(totalSamples - 1)) - (grandMean * grandMean.transpose()) * (static_cast<double>(totalSamples) / static_cast<double>(totalSamples - 1));
     } else {
         covariance.data = covAccum / static_cast<double>(totalSamples - 1);
     }
@@ -259,7 +256,7 @@ bool writeFilteredRawFile(const QString& rawFilePath,
 {
     QFile rawFile(rawFilePath);
     FIFFLIB::FiffRawData raw(rawFile);
-    if(raw.isEmpty()) {
+    if (raw.isEmpty()) {
         qWarning() << "[MainWindow] Could not reopen raw data for filtered write" << rawFilePath;
         return false;
     }
@@ -269,7 +266,7 @@ bool writeFilteredRawFile(const QString& rawFilePath,
     Eigen::RowVectorXi sel;
 
     FIFFLIB::FiffStream::SPtr outfid = FIFFLIB::FiffStream::start_writing_raw(*pIODevice, raw.info, cals);
-    if(!outfid) {
+    if (!outfid) {
         qWarning() << "[MainWindow] Could not open output stream for filtered write.";
         return false;
     }
@@ -280,14 +277,14 @@ bool writeFilteredRawFile(const QString& rawFilePath,
     const FIFFLIB::fiff_int_t quantum = static_cast<FIFFLIB::fiff_int_t>(std::ceil(10.0 * raw.info.sfreq));
 
     bool firstBuffer = true;
-    for(FIFFLIB::fiff_int_t first = from; first <= to; first += quantum) {
+    for (FIFFLIB::fiff_int_t first = from; first <= to; first += quantum) {
         const FIFFLIB::fiff_int_t last = std::min(first + quantum - 1, to);
         const FIFFLIB::fiff_int_t paddedFirst = std::max(from, first - padSamples);
         const FIFFLIB::fiff_int_t paddedLast = std::min(to, last + padSamples);
 
         Eigen::MatrixXd data;
         Eigen::MatrixXd times;
-        if(!raw.read_raw_segment(data, times, mult, paddedFirst, paddedLast, sel)) {
+        if (!raw.read_raw_segment(data, times, mult, paddedFirst, paddedLast, sel)) {
             qWarning() << "[MainWindow] Error during filtered read_raw_segment.";
             return false;
         }
@@ -300,8 +297,8 @@ bool writeFilteredRawFile(const QString& rawFilePath,
                                                                filteredData.rows(),
                                                                cropLength);
 
-        if(firstBuffer) {
-            if(first > 0) {
+        if (firstBuffer) {
+            if (first > 0) {
                 outfid->write_int(FIFF_FIRST_SAMPLE, &first);
             }
             firstBuffer = false;
@@ -318,13 +315,13 @@ QMap<int, int> countEventsByType(const MatrixXi& events)
 {
     QMap<int, int> counts;
 
-    if(events.cols() < 3) {
+    if (events.cols() < 3) {
         return counts;
     }
 
-    for(int row = 0; row < events.rows(); ++row) {
+    for (int row = 0; row < events.rows(); ++row) {
         const int eventCode = events(row, 2);
-        if(eventCode != 0) {
+        if (eventCode != 0) {
             counts[eventCode] = counts.value(eventCode) + 1;
         }
     }
@@ -346,16 +343,16 @@ bool detectFallbackStimEvents(const FIFFLIB::FiffRawData& raw,
     QStringList preferredStimChannels;
     QStringList fallbackStimChannels;
 
-    for(int channelIndex = 0; channelIndex < raw.info.nchan; ++channelIndex) {
-        if(raw.info.chs[channelIndex].kind != FIFFV_STIM_CH) {
+    for (int channelIndex = 0; channelIndex < raw.info.nchan; ++channelIndex) {
+        if (raw.info.chs[channelIndex].kind != FIFFV_STIM_CH) {
             continue;
         }
 
         const QString stimChannel = raw.info.ch_names.value(channelIndex);
         const QString normalizedName = normalizeStimChannelName(stimChannel);
 
-        if(normalizedName == QLatin1String("STI014") ||
-           normalizedName == QLatin1String("STI101")) {
+        if (normalizedName == QLatin1String("STI014") ||
+            normalizedName == QLatin1String("STI101")) {
             preferredStimChannels.append(stimChannel);
         } else {
             fallbackStimChannels.append(stimChannel);
@@ -363,9 +360,9 @@ bool detectFallbackStimEvents(const FIFFLIB::FiffRawData& raw,
     }
 
     const QStringList stimChannels = preferredStimChannels + fallbackStimChannels;
-    for(const QString& stimChannel : stimChannels) {
+    for (const QString& stimChannel : stimChannels) {
         FIFFLIB::FiffEvents detectedEvents;
-        if(FIFFLIB::FiffEvents::detect_from_raw(raw, detectedEvents, stimChannel)) {
+        if (FIFFLIB::FiffEvents::detect_from_raw(raw, detectedEvents, stimChannel)) {
             events = detectedEvents.events;
             sourceDescription = QString("Using trigger events detected from %1.").arg(stimChannel);
             return true;
@@ -379,18 +376,18 @@ bool populateEventModelFromRaw(const QString& rawFilePath,
                                MNEBROWSE::EventModel* eventModel,
                                QString& sourceDescription)
 {
-    if(!eventModel || rawFilePath.isEmpty() || !QFile::exists(rawFilePath)) {
+    if (!eventModel || rawFilePath.isEmpty() || !QFile::exists(rawFilePath)) {
         return false;
     }
 
     QFile rawFile(rawFilePath);
     FIFFLIB::FiffRawData raw(rawFile);
-    if(raw.isEmpty()) {
+    if (raw.isEmpty()) {
         return false;
     }
 
     MatrixXi events;
-    if(!detectFallbackStimEvents(raw, events, sourceDescription) || events.rows() == 0) {
+    if (!detectFallbackStimEvents(raw, events, sourceDescription) || events.rows() == 0) {
         return false;
     }
 
@@ -403,7 +400,7 @@ QStringList evokedEventCodesToSettingValue(const QList<int>& selectedEventCodes)
     QStringList codes;
     codes.reserve(selectedEventCodes.size());
 
-    for(int code : selectedEventCodes) {
+    for (int code : selectedEventCodes) {
         codes << QString::number(code);
     }
 
@@ -416,10 +413,10 @@ QList<int> evokedEventCodesFromSettings(const QSettings& settings)
     const QStringList savedCodes =
         settings.value("MainWindow/Averaging/eventCodes").toStringList();
 
-    for(const QString& codeText : savedCodes) {
+    for (const QString& codeText : savedCodes) {
         bool ok = false;
         const int code = codeText.toInt(&ok);
-        if(ok) {
+        if (ok) {
             selectedEventCodes.append(code);
         }
     }
@@ -433,28 +430,27 @@ QString sanitizeFileToken(const QString& text, const QString& fallback = QString
     sanitized.reserve(text.size());
 
     bool lastWasSeparator = false;
-    for(const QChar& ch : text.trimmed()) {
-        if(ch.isLetterOrNumber()) {
+    for (const QChar& ch : text.trimmed()) {
+        if (ch.isLetterOrNumber()) {
             sanitized.append(ch.toLower());
             lastWasSeparator = false;
-        } else if((ch == QLatin1Char('_') || ch == QLatin1Char('-') || ch == QLatin1Char('.'))
-                  && !lastWasSeparator) {
+        } else if ((ch == QLatin1Char('_') || ch == QLatin1Char('-') || ch == QLatin1Char('.')) && !lastWasSeparator) {
             sanitized.append(ch);
             lastWasSeparator = true;
-        } else if(!lastWasSeparator) {
+        } else if (!lastWasSeparator) {
             sanitized.append(QLatin1Char('_'));
             lastWasSeparator = true;
         }
     }
 
-    while(sanitized.startsWith(QLatin1Char('_')) || sanitized.startsWith(QLatin1Char('-'))) {
+    while (sanitized.startsWith(QLatin1Char('_')) || sanitized.startsWith(QLatin1Char('-'))) {
         sanitized.remove(0, 1);
     }
-    while(sanitized.endsWith(QLatin1Char('_')) || sanitized.endsWith(QLatin1Char('-'))) {
+    while (sanitized.endsWith(QLatin1Char('_')) || sanitized.endsWith(QLatin1Char('-'))) {
         sanitized.chop(1);
     }
 
-    if(sanitized.isEmpty()) {
+    if (sanitized.isEmpty()) {
         return fallback;
     }
 
@@ -467,11 +463,11 @@ QString defaultSourceEstimateStem(const QString& rawFilePath,
 {
     QString stem;
 
-    if(!evokedFilePath.isEmpty()) {
+    if (!evokedFilePath.isEmpty()) {
         stem = QFileInfo(evokedFilePath).completeBaseName();
-    } else if(!rawFilePath.isEmpty()) {
+    } else if (!rawFilePath.isEmpty()) {
         stem = QFileInfo(rawFilePath).completeBaseName();
-    } else if(!inverseOperatorPath.isEmpty()) {
+    } else if (!inverseOperatorPath.isEmpty()) {
         stem = QFileInfo(inverseOperatorPath).completeBaseName();
     }
 
@@ -481,11 +477,10 @@ QString defaultSourceEstimateStem(const QString& rawFilePath,
         QStringLiteral("-raw"),
         QStringLiteral("_raw"),
         QStringLiteral("-inv"),
-        QStringLiteral("_inv")
-    };
+        QStringLiteral("_inv")};
 
-    for(const QString& suffix : removableSuffixes) {
-        if(stem.endsWith(suffix, Qt::CaseInsensitive)) {
+    for (const QString& suffix : removableSuffixes) {
+        if (stem.endsWith(suffix, Qt::CaseInsensitive)) {
             stem.chop(suffix.size());
             break;
         }
@@ -496,7 +491,7 @@ QString defaultSourceEstimateStem(const QString& rawFilePath,
 
 QString uniqueStem(const QString& stem, QSet<QString>& usedStems)
 {
-    if(!usedStems.contains(stem)) {
+    if (!usedStems.contains(stem)) {
         usedStems.insert(stem);
         return stem;
     }
@@ -506,7 +501,7 @@ QString uniqueStem(const QString& stem, QSet<QString>& usedStems)
     do {
         candidateStem = QStringLiteral("%1_%2").arg(stem).arg(suffix);
         ++suffix;
-    } while(usedStems.contains(candidateStem));
+    } while (usedStems.contains(candidateStem));
 
     usedStems.insert(candidateStem);
     return candidateStem;
@@ -514,13 +509,13 @@ QString uniqueStem(const QString& stem, QSet<QString>& usedStems)
 
 INVLIB::InvEstimateMethod estimateMethodFromString(const QString& method)
 {
-    if(method.compare(QStringLiteral("MNE"), Qt::CaseInsensitive) == 0) {
+    if (method.compare(QStringLiteral("MNE"), Qt::CaseInsensitive) == 0) {
         return INVLIB::InvEstimateMethod::MNE;
     }
-    if(method.compare(QStringLiteral("sLORETA"), Qt::CaseInsensitive) == 0) {
+    if (method.compare(QStringLiteral("sLORETA"), Qt::CaseInsensitive) == 0) {
         return INVLIB::InvEstimateMethod::sLORETA;
     }
-    if(method.compare(QStringLiteral("eLORETA"), Qt::CaseInsensitive) == 0) {
+    if (method.compare(QStringLiteral("eLORETA"), Qt::CaseInsensitive) == 0) {
         return INVLIB::InvEstimateMethod::eLORETA;
     }
     return INVLIB::InvEstimateMethod::dSPM;
@@ -528,10 +523,10 @@ INVLIB::InvEstimateMethod estimateMethodFromString(const QString& method)
 
 INVLIB::InvOrientationType orientationTypeFromInverse(const MNELIB::MNEInverseOperator& inverseOperator)
 {
-    if(inverseOperator.source_ori == FIFFV_MNE_FREE_ORI) {
+    if (inverseOperator.source_ori == FIFFV_MNE_FREE_ORI) {
         return INVLIB::InvOrientationType::Free;
     }
-    if(inverseOperator.source_ori == FIFFV_MNE_FIXED_ORI) {
+    if (inverseOperator.source_ori == FIFFV_MNE_FIXED_ORI) {
         return INVLIB::InvOrientationType::Fixed;
     }
     return INVLIB::InvOrientationType::Unknown;
@@ -539,20 +534,20 @@ INVLIB::InvOrientationType orientationTypeFromInverse(const MNELIB::MNEInverseOp
 
 QString summarizeSelectedEvokeds(const QStringList& comments)
 {
-    if(comments.isEmpty()) {
+    if (comments.isEmpty()) {
         return QStringLiteral("No evoked sets selected.");
     }
 
     QStringList displayComments = comments;
-    for(QString& comment : displayComments) {
-        if(comment.trimmed().isEmpty()) {
+    for (QString& comment : displayComments) {
+        if (comment.trimmed().isEmpty()) {
             comment = QStringLiteral("<unnamed>");
         }
     }
 
     const int previewCount = std::min(3, static_cast<int>(displayComments.size()));
     const QString preview = displayComments.mid(0, previewCount).join(QStringLiteral(", "));
-    if(displayComments.size() > previewCount) {
+    if (displayComments.size() > previewCount) {
         return QStringLiteral("%1 selected (%2, ...)")
             .arg(displayComments.size())
             .arg(preview);
@@ -566,23 +561,21 @@ QString summarizeSelectedEvokeds(const QStringList& comments)
 int sourceEstimateSplitIndex(const INVLIB::InvSourceEstimate& sourceEstimate,
                              const MNELIB::MNEInverseOperator& inverseOperator)
 {
-    if(inverseOperator.src.size() >= 2) {
+    if (inverseOperator.src.size() >= 2) {
         int leftSourceCount = 0;
-        if(inverseOperator.src[0].vertno.size() > 0) {
+        if (inverseOperator.src[0].vertno.size() > 0) {
             leftSourceCount = inverseOperator.src[0].vertno.size();
-        } else if(inverseOperator.src[0].nuse > 0) {
+        } else if (inverseOperator.src[0].nuse > 0) {
             leftSourceCount = inverseOperator.src[0].nuse;
         }
 
-        if(leftSourceCount > 0
-           && leftSourceCount < sourceEstimate.data.rows()
-           && leftSourceCount < sourceEstimate.vertices.size()) {
+        if (leftSourceCount > 0 && leftSourceCount < sourceEstimate.data.rows() && leftSourceCount < sourceEstimate.vertices.size()) {
             return leftSourceCount;
         }
     }
 
-    for(int index = 1; index < sourceEstimate.vertices.size(); ++index) {
-        if(sourceEstimate.vertices(index) < sourceEstimate.vertices(index - 1)) {
+    for (int index = 1; index < sourceEstimate.vertices.size(); ++index) {
+        if (sourceEstimate.vertices(index) < sourceEstimate.vertices(index - 1)) {
             return index;
         }
     }
@@ -596,9 +589,7 @@ bool splitSourceEstimateByHemisphere(const INVLIB::InvSourceEstimate& sourceEsti
                                      INVLIB::InvSourceEstimate& rightHemisphere)
 {
     const int splitIndex = sourceEstimateSplitIndex(sourceEstimate, inverseOperator);
-    if(splitIndex <= 0
-       || splitIndex >= sourceEstimate.data.rows()
-       || splitIndex >= sourceEstimate.vertices.size()) {
+    if (splitIndex <= 0 || splitIndex >= sourceEstimate.data.rows() || splitIndex >= sourceEstimate.vertices.size()) {
         return false;
     }
 
@@ -638,15 +629,15 @@ Eigen::VectorXi reviewedEpochSelection(const MNELIB::MNEEpochDataList& epochList
     QList<int> selectedIndices;
     selectedIndices.reserve(epochList.size());
 
-    for(int index = 0; index < epochList.size(); ++index) {
+    for (int index = 0; index < epochList.size(); ++index) {
         const auto& epoch = epochList.at(index);
-        if(epoch && !epoch->isRejected(respectAutoRejects)) {
+        if (epoch && !epoch->isRejected(respectAutoRejects)) {
             selectedIndices.append(index);
         }
     }
 
     Eigen::VectorXi selection(selectedIndices.size());
-    for(int index = 0; index < selectedIndices.size(); ++index) {
+    for (int index = 0; index < selectedIndices.size(); ++index) {
         selection(index) = selectedIndices.at(index);
     }
 
@@ -695,7 +686,8 @@ bool showComputeEvokedDialog(QWidget* parent,
     baselineFromSpinBox->setSingleStep(10);
     baselineFromSpinBox->setRange(-preStimSpinBox->value(), postStimSpinBox->value());
     baselineFromSpinBox->setValue(settings.value("MainWindow/Averaging/baselineFromMs",
-                                                 -preStimSpinBox->value()).toInt());
+                                                 -preStimSpinBox->value())
+                                      .toInt());
 
     QSpinBox* baselineToSpinBox = new QSpinBox(timingGroup);
     baselineToSpinBox->setSingleStep(10);
@@ -720,7 +712,7 @@ bool showComputeEvokedDialog(QWidget* parent,
         baselineFromSpinBox->setRange(minValue, maxValue);
         baselineToSpinBox->setRange(minValue, maxValue);
 
-        if(baselineFromSpinBox->value() > baselineToSpinBox->value()) {
+        if (baselineFromSpinBox->value() > baselineToSpinBox->value()) {
             baselineFromSpinBox->setValue(minValue);
             baselineToSpinBox->setValue(0);
         }
@@ -748,7 +740,7 @@ bool showComputeEvokedDialog(QWidget* parent,
     QListWidget* eventListWidget = new QListWidget(eventGroup);
     eventListWidget->setSelectionMode(QAbstractItemView::MultiSelection);
 
-    for(auto it = eventCounts.constBegin(); it != eventCounts.constEnd(); ++it) {
+    for (auto it = eventCounts.constBegin(); it != eventCounts.constEnd(); ++it) {
         QListWidgetItem* item = new QListWidgetItem(QString("%1 (%2 epochs)").arg(it.key()).arg(it.value()),
                                                     eventListWidget);
         item->setData(Qt::UserRole, it.key());
@@ -765,19 +757,19 @@ bool showComputeEvokedDialog(QWidget* parent,
     QObject::connect(buttonBox, &QDialogButtonBox::rejected, &dialog, &QDialog::reject);
     mainLayout->addWidget(buttonBox);
 
-    if(dialog.exec() != QDialog::Accepted) {
+    if (dialog.exec() != QDialog::Accepted) {
         return false;
     }
 
     selectedEventCodes.clear();
-    for(int row = 0; row < eventListWidget->count(); ++row) {
+    for (int row = 0; row < eventListWidget->count(); ++row) {
         QListWidgetItem* item = eventListWidget->item(row);
-        if(item->isSelected()) {
+        if (item->isSelected()) {
             selectedEventCodes.append(item->data(Qt::UserRole).toInt());
         }
     }
 
-    if(selectedEventCodes.isEmpty()) {
+    if (selectedEventCodes.isEmpty()) {
         QMessageBox::warning(parent,
                              "Compute Evoked",
                              "Select at least one event type to compute an evoked response.");
@@ -862,7 +854,7 @@ bool showComputeCovarianceDialog(QWidget* parent,
     mainLayout->addWidget(timingGroup);
 
     auto syncRanges = [=]() {
-        if(fromSpinBox->value() > toSpinBox->value()) {
+        if (fromSpinBox->value() > toSpinBox->value()) {
             toSpinBox->setValue(fromSpinBox->value());
         }
 
@@ -871,7 +863,7 @@ bool showComputeCovarianceDialog(QWidget* parent,
         baselineToSpinBox->setMinimum(fromSpinBox->value());
         baselineToSpinBox->setMaximum(toSpinBox->value());
 
-        if(baselineFromSpinBox->value() > baselineToSpinBox->value()) {
+        if (baselineFromSpinBox->value() > baselineToSpinBox->value()) {
             baselineFromSpinBox->setValue(fromSpinBox->value());
             baselineToSpinBox->setValue(toSpinBox->value());
         }
@@ -900,7 +892,7 @@ bool showComputeCovarianceDialog(QWidget* parent,
     QListWidget* eventListWidget = new QListWidget(eventGroup);
     eventListWidget->setSelectionMode(QAbstractItemView::MultiSelection);
 
-    for(auto it = eventCounts.constBegin(); it != eventCounts.constEnd(); ++it) {
+    for (auto it = eventCounts.constBegin(); it != eventCounts.constEnd(); ++it) {
         QListWidgetItem* item = new QListWidgetItem(QString("%1 (%2 epochs)").arg(it.key()).arg(it.value()),
                                                     eventListWidget);
         item->setData(Qt::UserRole, it.key());
@@ -917,19 +909,19 @@ bool showComputeCovarianceDialog(QWidget* parent,
     QObject::connect(buttonBox, &QDialogButtonBox::rejected, &dialog, &QDialog::reject);
     mainLayout->addWidget(buttonBox);
 
-    if(dialog.exec() != QDialog::Accepted) {
+    if (dialog.exec() != QDialog::Accepted) {
         return false;
     }
 
     selectedEventCodes.clear();
-    for(int row = 0; row < eventListWidget->count(); ++row) {
+    for (int row = 0; row < eventListWidget->count(); ++row) {
         QListWidgetItem* item = eventListWidget->item(row);
-        if(item->isSelected()) {
+        if (item->isSelected()) {
             selectedEventCodes.append(item->data(Qt::UserRole).toInt());
         }
     }
 
-    if(selectedEventCodes.isEmpty()) {
+    if (selectedEventCodes.isEmpty()) {
         QMessageBox::warning(parent,
                              "Compute Covariance",
                              "Select at least one event type to compute a covariance matrix.");
@@ -1026,7 +1018,7 @@ bool showComputeSourceEstimateDialog(QWidget* parent,
         const QString directory = QFileDialog::getExistingDirectory(&dialog,
                                                                     QStringLiteral("Select output directory"),
                                                                     outputDirectoryEdit->text());
-        if(!directory.isEmpty()) {
+        if (!directory.isEmpty()) {
             outputDirectoryEdit->setText(directory);
         }
     });
@@ -1038,12 +1030,12 @@ bool showComputeSourceEstimateDialog(QWidget* parent,
     QObject::connect(buttonBox, &QDialogButtonBox::rejected, &dialog, &QDialog::reject);
     mainLayout->addWidget(buttonBox);
 
-    if(dialog.exec() != QDialog::Accepted) {
+    if (dialog.exec() != QDialog::Accepted) {
         return false;
     }
 
     outputDirectory = outputDirectoryEdit->text().trimmed();
-    if(outputDirectory.isEmpty()) {
+    if (outputDirectory.isEmpty()) {
         QMessageBox::warning(parent,
                              QStringLiteral("Compute Source Estimate"),
                              QStringLiteral("Choose an output directory for the exported source estimates."));
@@ -1070,7 +1062,7 @@ bool showComputeSourceEstimateDialog(QWidget* parent,
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-MainWindow::MainWindow(QWidget *parent)
+MainWindow::MainWindow(QWidget* parent)
 : QMainWindow(parent)
 //, m_qFileRaw(QCoreApplication::applicationDirPath() + "/MNE-sample-data/MEG/sample/sample_audvis_raw.fif")
 //, m_qEventFile(QCoreApplication::applicationDirPath() + "/MNE-sample-data/MEG/sample/sample_audvis_raw-eve.fif")
@@ -1142,12 +1134,12 @@ bool MainWindow::ensureLegacyRawModelLoaded(const QString& featureName)
     }
 
     QBuffer rawBuffer(&s_wasmByteArray);
-        if (!model->loadFiffData(&rawBuffer)) {
-            QMessageBox::warning(this,
+    if (!model->loadFiffData(&rawBuffer)) {
+        QMessageBox::warning(this,
                              dialogTitle,
                              QStringLiteral("The compatibility processing model could not be initialized from the loaded raw buffer."));
-            return false;
-        }
+        return false;
+    }
 #else
     if (m_qFileRaw.fileName().isEmpty() || !QFile::exists(m_qFileRaw.fileName())) {
         QMessageBox::warning(this,
@@ -1232,25 +1224,25 @@ WhiteningSettings MainWindow::covarianceWhiteningSettings() const
 
 void MainWindow::setCovarianceWhiteningSettings(const WhiteningSettings& settings, bool saveSettings)
 {
-    if(saveSettings) {
+    if (saveSettings) {
         saveWhiteningSettings(m_qSettings, settings);
     }
 
-    if(m_pAverageWindow) {
+    if (m_pAverageWindow) {
         m_pAverageWindow->setWhiteningSettings(settings);
     }
 
-    if(m_pCovarianceWindow) {
+    if (m_pCovarianceWindow) {
         m_pCovarianceWindow->setWhiteningSettings(settings);
     }
 
-    if(m_pWhitenButterflyAction) {
+    if (m_pWhitenButterflyAction) {
         QSignalBlocker blocker(m_pWhitenButterflyAction);
         m_pWhitenButterflyAction->setChecked(settings.enableButterfly);
     }
 
     // Recompute raw whitener when regularisation parameters change
-    if(m_pDataWindow && !m_covariance.isEmpty()) {
+    if (m_pDataWindow && !m_covariance.isEmpty()) {
         m_pDataWindow->updateRawWhitener(m_covariance, settings);
     }
 }
@@ -1386,7 +1378,7 @@ void MainWindow::setupWindowWidgets()
         const QVector<AnnotationSpanData> modelSpans =
             m_pAnnotationWindow->getAnnotationModel()->getAnnotationSpans();
         spans.reserve(modelSpans.size());
-        for(const AnnotationSpanData& modelSpan : modelSpans) {
+        for (const AnnotationSpanData& modelSpan : modelSpans) {
             if (!m_pAnnotationWindow->isDescriptionVisible(modelSpan.label))
                 continue;
             DISPLIB::ChannelRhiView::AnnotationSpan span;
@@ -1424,27 +1416,25 @@ void MainWindow::setupWindowWidgets()
     connect(m_pCovarianceWindow, &CovarianceWindow::whiteningSettingsChanged,
             this, [this](const WhiteningSettings& settings) {
                 setCovarianceWhiteningSettings(settings);
-                if((settings.enableButterfly || settings.enableLayout)
-                   && !m_covariance.isEmpty()
-                   && !m_pAverageWindow->isVisible()) {
+                if ((settings.enableButterfly || settings.enableLayout) && !m_covariance.isEmpty() && !m_pAverageWindow->isVisible()) {
                     showWindow(m_pAverageWindow);
                 }
             });
 
     connect(m_pIcaWindow, &IcaWindow::icaCleaned,
-            this, [this](const Eigen::MatrixXd &cleanedData) {
-                if(m_pDataWindow && m_pDataWindow->getChannelDataView()) {
+            this, [this](const Eigen::MatrixXd& cleanedData) {
+                if (m_pDataWindow && m_pDataWindow->getChannelDataView()) {
                     m_pDataWindow->getChannelDataView()->setData(cleanedData,
-                        m_pDataWindow->firstSample());
+                                                                 m_pDataWindow->firstSample());
                     statusBar()->showMessage(tr("ICA cleaning applied — data updated."), 5000);
                 }
             });
 
     connect(m_pIcaWindow, &IcaWindow::icaReset,
-            this, [this](const Eigen::MatrixXd &originalData) {
-                if(m_pDataWindow && m_pDataWindow->getChannelDataView()) {
+            this, [this](const Eigen::MatrixXd& originalData) {
+                if (m_pDataWindow && m_pDataWindow->getChannelDataView()) {
                     m_pDataWindow->getChannelDataView()->setData(originalData,
-                        m_pDataWindow->firstSample());
+                                                                 m_pDataWindow->firstSample());
                     statusBar()->showMessage(tr("ICA reset — original data restored."), 5000);
                 }
             });
@@ -1462,32 +1452,37 @@ void MainWindow::setupWindowWidgets()
     // The signal is forwarded: ChannelRhiView → ChannelDataView → here
     if (m_pDataWindow->getChannelDataView()) {
         connect(m_pDataWindow->getChannelDataView(), &DISPLIB::ChannelDataView::cursorDataChanged,
-                this, [this](float timeSec, float amplitude, const QString &channelName, const QString &unitLabel) {
-                    auto fmtAmp = [](float amp, const QString &unit) -> QString {
+                this, [this](float timeSec, float amplitude, const QString& channelName, const QString& unitLabel) {
+                    auto fmtAmp = [](float amp, const QString& unit) -> QString {
                         float absAmp = qAbs(amp);
-                        if (absAmp == 0.f) return QStringLiteral("0 ") + unit;
-                        if (absAmp < 1e-9f) return QString::number(amp * 1e12f, 'f', 1) + QStringLiteral(" p") + unit;
-                        if (absAmp < 1e-6f) return QString::number(amp * 1e9f, 'f', 1) + QStringLiteral(" n") + unit;
-                        if (absAmp < 1e-3f) return QString::number(amp * 1e6f, 'f', 1) + QStringLiteral(" µ") + unit;
-                        if (absAmp < 1.f) return QString::number(amp * 1e3f, 'f', 1) + QStringLiteral(" m") + unit;
+                        if (absAmp == 0.f)
+                            return QStringLiteral("0 ") + unit;
+                        if (absAmp < 1e-9f)
+                            return QString::number(amp * 1e12f, 'f', 1) + QStringLiteral(" p") + unit;
+                        if (absAmp < 1e-6f)
+                            return QString::number(amp * 1e9f, 'f', 1) + QStringLiteral(" n") + unit;
+                        if (absAmp < 1e-3f)
+                            return QString::number(amp * 1e6f, 'f', 1) + QStringLiteral(" µ") + unit;
+                        if (absAmp < 1.f)
+                            return QString::number(amp * 1e3f, 'f', 1) + QStringLiteral(" m") + unit;
                         return QString::number(amp, 'f', 3) + QStringLiteral(" ") + unit;
                     };
                     QString timeStr;
                     bool isClock = m_pDataWindow->getChannelDataView()->clockTimeFormat();
                     if (isClock && timeSec >= 0.f) {
                         int totalMs = static_cast<int>(timeSec * 1000.f + 0.5f);
-                        int m   = totalMs / 60000;
+                        int m = totalMs / 60000;
                         int sec = (totalMs % 60000) / 1000;
-                        int ms  = totalMs % 1000;
+                        int ms = totalMs % 1000;
                         timeStr = QString("%1:%2.%3")
-                            .arg(m, 2, 10, QChar('0'))
-                            .arg(sec, 2, 10, QChar('0'))
-                            .arg(ms, 3, 10, QChar('0'));
+                                      .arg(m, 2, 10, QChar('0'))
+                                      .arg(sec, 2, 10, QChar('0'))
+                                      .arg(ms, 3, 10, QChar('0'));
                     } else {
                         timeStr = QString::number(timeSec, 'f', 3) + QStringLiteral(" s");
                     }
                     QString msg = QString("  %1  |  t = %2  |  %3")
-                        .arg(channelName, timeStr, fmtAmp(amplitude, unitLabel));
+                                      .arg(channelName, timeStr, fmtAmp(amplitude, unitLabel));
                     statusBar()->showMessage(msg);
                 });
 
@@ -1511,7 +1506,7 @@ void MainWindow::setupWindowWidgets()
         connect(m_pDataWindow->getChannelDataView(), &DISPLIB::ChannelDataView::zScoreModeToggled,
                 m_pZScoreAction, &QAction::setChecked);
         connect(m_pDataWindow->getChannelDataView(), &DISPLIB::ChannelDataView::scrollSpeedChanged,
-                this, [this](float factor){
+                this, [this](float factor) {
                     statusBar()->showMessage(QString("Scroll speed: %1x").arg(factor, 0, 'f', 2), 2000);
                 });
     }
@@ -1523,8 +1518,9 @@ void MainWindow::setupWindowWidgets()
                     m_pDataWindow->getChannelDataView()->toggleTimeFormat();
                     bool isClock = m_pDataWindow->getChannelDataView()->clockTimeFormat();
                     statusBar()->showMessage(isClock
-                        ? QStringLiteral("Time format: mm:ss.ms")
-                        : QStringLiteral("Time format: seconds"), 3000);
+                                                 ? QStringLiteral("Time format: mm:ss.ms")
+                                                 : QStringLiteral("Time format: seconds"),
+                                             3000);
                 }
             });
 
@@ -1565,7 +1561,7 @@ void MainWindow::setupWindowWidgets()
                 }
             });
 
-    if(m_pDataWindow->isFiffFileLoaded()) {
+    if (m_pDataWindow->isFiffFileLoaded()) {
         auto fiffInfo = m_pDataWindow->fiffInfo();
         m_pScaleWindow->hideSpinBoxes(fiffInfo);
         m_pChInfoWindow->getDataModel()->setFiffInfo(fiffInfo);
@@ -1583,7 +1579,7 @@ void MainWindow::setupWindowWidgets()
 void MainWindow::createToolBar()
 {
     //Create toolbar
-    QToolBar *toolBar = new QToolBar(this);
+    QToolBar* toolBar = new QToolBar(this);
     toolBar->setOrientation(Qt::Vertical);
     toolBar->setMovable(true);
     // Suppress macOS default white-rectangle rendering for pressed/checked buttons
@@ -1591,22 +1587,20 @@ void MainWindow::createToolBar()
         "QToolButton { background: transparent; border: none; padding: 4px; }"
         "QToolButton:checked { background: rgba(60,140,220,40); border: 1px solid rgba(60,140,220,120); border-radius: 4px; }"
         "QToolButton:pressed { background: rgba(60,140,220,70); border: 1px solid rgba(60,140,220,160); border-radius: 4px; }"
-        "QToolButton:hover { background: rgba(0,0,0,15); border-radius: 4px; }"
-    ));
+        "QToolButton:hover { background: rgba(0,0,0,15); border-radius: 4px; }"));
 
     //Add DC removal action
-    m_pRemoveDCAction = new QAction(QIcon(":/Resources/Images/removeDC.png"),tr("Remove DC component"), this);
+    m_pRemoveDCAction = new QAction(QIcon(":/Resources/Images/removeDC.png"), tr("Remove DC component"), this);
     m_pRemoveDCAction->setStatusTip(tr("Remove the DC component by subtracting the channel mean"));
-    connect(m_pRemoveDCAction,&QAction::triggered, [this](){
-        if(m_pDataWindow->getDataDelegate()->isRemoveDC()) {
+    connect(m_pRemoveDCAction, &QAction::triggered, [this]() {
+        if (m_pDataWindow->getDataDelegate()->isRemoveDC()) {
             m_pRemoveDCAction->setIcon(QIcon(":/Resources/Images/removeDC.png"));
             m_pRemoveDCAction->setToolTip("Remove DC component");
             m_pDataWindow->setStatusTip(tr("Remove the DC component by subtracting the channel mean"));
             m_pDataWindow->getDataDelegate()->setRemoveDC(false);
             if (m_pDataWindow->getChannelDataView())
                 m_pDataWindow->getChannelDataView()->setRemoveDC(false);
-        }
-        else {
+        } else {
             m_pRemoveDCAction->setIcon(QIcon(":/Resources/Images/addDC.png"));
             m_pRemoveDCAction->setToolTip("Add DC component");
             m_pRemoveDCAction->setStatusTip(tr("Add the DC component"));
@@ -1620,16 +1614,15 @@ void MainWindow::createToolBar()
     toolBar->addAction(m_pRemoveDCAction);
 
     //Add show/hide bad channel button
-    m_pHideBadAction = new QAction(QIcon(":/Resources/Images/hideBad.png"),tr("Hide all bad channels"), this);
+    m_pHideBadAction = new QAction(QIcon(":/Resources/Images/hideBad.png"), tr("Hide all bad channels"), this);
     m_pHideBadAction->setStatusTip(tr("Hide all bad channels"));
-    connect(m_pHideBadAction,&QAction::triggered, [this](){
-        if(m_pHideBadAction->toolTip() == "Show all bad channels") {
+    connect(m_pHideBadAction, &QAction::triggered, [this]() {
+        if (m_pHideBadAction->toolTip() == "Show all bad channels") {
             m_pHideBadAction->setIcon(QIcon(":/Resources/Images/hideBad.png"));
             m_pHideBadAction->setToolTip("Hide all bad channels");
             m_pDataWindow->setStatusTip(tr("Hide all bad channels"));
             m_pDataWindow->hideBadChannels(false);
-        }
-        else {
+        } else {
             m_pHideBadAction->setIcon(QIcon(":/Resources/Images/showBad.png"));
             m_pHideBadAction->setToolTip("Show all bad channels");
             m_pHideBadAction->setStatusTip(tr("Show all bad channels"));
@@ -1664,12 +1657,12 @@ void MainWindow::createToolBar()
             p.setRenderHint(QPainter::Antialiasing);
             p.setPen(Qt::NoPen);
             p.setBrush(QColor(60, 140, 220, 50));
-            p.drawRoundedRect(4, 4, sz-8, sz-8, 12, 12);
+            p.drawRoundedRect(4, 4, sz - 8, sz - 8, 12, 12);
             paintFn(p, sz);
             // Thin highlight border
             p.setPen(QPen(QColor(60, 140, 220, 160), 4));
             p.setBrush(Qt::NoBrush);
-            p.drawRoundedRect(4, 4, sz-8, sz-8, 12, 12);
+            p.drawRoundedRect(4, 4, sz - 8, sz - 8, 12, 12);
             p.end();
             icon.addPixmap(QPixmap::fromImage(img), QIcon::Normal, QIcon::On);
         }
@@ -1677,33 +1670,33 @@ void MainWindow::createToolBar()
     };
 
     //Toggle crosshair (X)
-    QIcon crosshairIcon = makeIcon([](QPainter& p, int sz){
+    QIcon crosshairIcon = makeIcon([](QPainter& p, int sz) {
         QPen pen(QColor(0xd0, 0x40, 0x40), 3);
         p.setPen(pen);
-        p.drawLine(sz/2, 4, sz/2, sz-4);
-        p.drawLine(4, sz/2, sz-4, sz/2);
+        p.drawLine(sz / 2, 4, sz / 2, sz - 4);
+        p.drawLine(4, sz / 2, sz - 4, sz / 2);
     });
     m_pCrosshairAction = new QAction(crosshairIcon, tr("Toggle crosshair (X)"), this);
     m_pCrosshairAction->setCheckable(true);
     m_pCrosshairAction->setStatusTip(tr("Toggle crosshair cursor overlay"));
-    connect(m_pCrosshairAction, &QAction::triggered, [this](bool checked){
-        if(m_pDataWindow && m_pDataWindow->getChannelDataView())
+    connect(m_pCrosshairAction, &QAction::triggered, [this](bool checked) {
+        if (m_pDataWindow && m_pDataWindow->getChannelDataView())
             m_pDataWindow->getChannelDataView()->setCrosshairEnabled(checked);
     });
     toolBar->addAction(m_pCrosshairAction);
 
     //Toggle butterfly mode (B)
-    QIcon butterflyIcon = makeIcon([](QPainter& p, int sz){
+    QIcon butterflyIcon = makeIcon([](QPainter& p, int sz) {
         QPen pen(QColor(0x40, 0x80, 0xd0), 2);
         p.setPen(pen);
         // Simple butterfly-like overlapping sine curves
-        for(int k = 0; k < 3; ++k) {
+        for (int k = 0; k < 3; ++k) {
             QPainterPath path;
             double phase = k * 1.0;
-            path.moveTo(4, sz/2);
-            for(int x = 4; x <= sz-4; ++x) {
-                double t = double(x-4)/(sz-8) * 2.0 * M_PI;
-                double y = sz/2 + (sz/4) * std::sin(t + phase) * (1.0 - 0.2*k);
+            path.moveTo(4, sz / 2);
+            for (int x = 4; x <= sz - 4; ++x) {
+                double t = double(x - 4) / (sz - 8) * 2.0 * M_PI;
+                double y = sz / 2 + (sz / 4) * std::sin(t + phase) * (1.0 - 0.2 * k);
                 path.lineTo(x, y);
             }
             p.drawPath(path);
@@ -1712,190 +1705,190 @@ void MainWindow::createToolBar()
     m_pButterflyAction = new QAction(butterflyIcon, tr("Toggle butterfly mode (B)"), this);
     m_pButterflyAction->setCheckable(true);
     m_pButterflyAction->setStatusTip(tr("Overlay all channels of the same type"));
-    connect(m_pButterflyAction, &QAction::triggered, [this](bool checked){
-        if(m_pDataWindow && m_pDataWindow->getChannelDataView())
+    connect(m_pButterflyAction, &QAction::triggered, [this](bool checked) {
+        if (m_pDataWindow && m_pDataWindow->getChannelDataView())
             m_pDataWindow->getChannelDataView()->setButterflyMode(checked);
     });
     toolBar->addAction(m_pButterflyAction);
 
     //Toggle scalebars (S)
-    QIcon scalebarsIcon = makeIcon([](QPainter& p, int sz){
+    QIcon scalebarsIcon = makeIcon([](QPainter& p, int sz) {
         QPen pen(QColor(0x40, 0xa0, 0x40), 3);
         p.setPen(pen);
         // Vertical bar with horizontal ticks
-        int cx = sz/2, top = 8, bot = sz-8;
+        int cx = sz / 2, top = 8, bot = sz - 8;
         p.drawLine(cx, top, cx, bot);
-        p.drawLine(cx-8, top, cx+8, top);
-        p.drawLine(cx-8, bot, cx+8, bot);
-        p.drawLine(cx-6, sz/2, cx+6, sz/2);
+        p.drawLine(cx - 8, top, cx + 8, top);
+        p.drawLine(cx - 8, bot, cx + 8, bot);
+        p.drawLine(cx - 6, sz / 2, cx + 6, sz / 2);
     });
     m_pScalebarsAction = new QAction(scalebarsIcon, tr("Toggle scalebars (S)"), this);
     m_pScalebarsAction->setCheckable(true);
     m_pScalebarsAction->setStatusTip(tr("Show amplitude scalebars on the signal view"));
-    connect(m_pScalebarsAction, &QAction::triggered, [this](bool checked){
-        if(m_pDataWindow && m_pDataWindow->getChannelDataView())
+    connect(m_pScalebarsAction, &QAction::triggered, [this](bool checked) {
+        if (m_pDataWindow && m_pDataWindow->getChannelDataView())
             m_pDataWindow->getChannelDataView()->setScalebarsVisible(checked);
     });
     toolBar->addAction(m_pScalebarsAction);
 
     //Toggle event visibility (E)
-    QIcon eventsIcon = makeIcon([](QPainter& p, int sz){
+    QIcon eventsIcon = makeIcon([](QPainter& p, int sz) {
         QFont f = p.font();
         f.setPixelSize(sz * 0.45);
         f.setBold(true);
         p.setFont(f);
         p.setPen(QColor(0xd0, 0x60, 0x20));
-        p.drawText(QRect(0,0,sz,sz), Qt::AlignCenter, "E");
+        p.drawText(QRect(0, 0, sz, sz), Qt::AlignCenter, "E");
     });
     m_pEventsVisibleAction = new QAction(eventsIcon, tr("Toggle event markers (E)"), this);
     m_pEventsVisibleAction->setCheckable(true);
     m_pEventsVisibleAction->setChecked(true);
     m_pEventsVisibleAction->setStatusTip(tr("Show or hide event marker lines on the raw data"));
-    connect(m_pEventsVisibleAction, &QAction::triggered, [this](bool checked){
-        if(m_pDataWindow && m_pDataWindow->getChannelDataView())
+    connect(m_pEventsVisibleAction, &QAction::triggered, [this](bool checked) {
+        if (m_pDataWindow && m_pDataWindow->getChannelDataView())
             m_pDataWindow->getChannelDataView()->setEventsVisible(checked);
     });
     toolBar->addAction(m_pEventsVisibleAction);
 
     //Toggle annotation visibility (Shift+A)
-    QIcon annotIcon = makeIcon([](QPainter& p, int sz){
+    QIcon annotIcon = makeIcon([](QPainter& p, int sz) {
         // Filled translucent rectangle with "A" label
-        p.fillRect(6, 6, sz-12, sz-12, QColor(0x40, 0xa0, 0xd0, 80));
+        p.fillRect(6, 6, sz - 12, sz - 12, QColor(0x40, 0xa0, 0xd0, 80));
         QPen borderPen(QColor(0x40, 0xa0, 0xd0), 2);
         p.setPen(borderPen);
-        p.drawRect(6, 6, sz-12, sz-12);
+        p.drawRect(6, 6, sz - 12, sz - 12);
         QFont f = p.font();
         f.setPixelSize(sz * 0.35);
         f.setBold(true);
         p.setFont(f);
         p.setPen(QColor(0x20, 0x60, 0x90));
-        p.drawText(QRect(0,0,sz,sz), Qt::AlignCenter, "A");
+        p.drawText(QRect(0, 0, sz, sz), Qt::AlignCenter, "A");
     });
     m_pAnnotationsVisibleAction = new QAction(annotIcon, tr("Toggle annotation spans (Shift+A)"), this);
     m_pAnnotationsVisibleAction->setCheckable(true);
     m_pAnnotationsVisibleAction->setChecked(true);
     m_pAnnotationsVisibleAction->setStatusTip(tr("Show or hide annotation span overlays on the raw data"));
-    connect(m_pAnnotationsVisibleAction, &QAction::triggered, [this](bool checked){
-        if(m_pDataWindow && m_pDataWindow->getChannelDataView())
+    connect(m_pAnnotationsVisibleAction, &QAction::triggered, [this](bool checked) {
+        if (m_pDataWindow && m_pDataWindow->getChannelDataView())
             m_pDataWindow->getChannelDataView()->setAnnotationsVisible(checked);
     });
     toolBar->addAction(m_pAnnotationsVisibleAction);
 
     //Toggle epoch grid lines (G)
-    QIcon epochIcon = makeIcon([](QPainter& p, int sz){
+    QIcon epochIcon = makeIcon([](QPainter& p, int sz) {
         QFont f = p.font();
         f.setPixelSize(sz * 0.45);
         f.setBold(true);
         p.setFont(f);
         p.setPen(QColor(0x60, 0x60, 0x60));
-        p.drawText(QRect(0,0,sz,sz), Qt::AlignCenter, "G");
+        p.drawText(QRect(0, 0, sz, sz), Qt::AlignCenter, "G");
     });
     m_pEpochMarkersAction = new QAction(epochIcon, tr("Toggle epoch grid lines (G)"), this);
     m_pEpochMarkersAction->setCheckable(true);
     m_pEpochMarkersAction->setChecked(true);
     m_pEpochMarkersAction->setStatusTip(tr("Show or hide dashed epoch trigger lines"));
-    connect(m_pEpochMarkersAction, &QAction::triggered, [this](bool checked){
-        if(m_pDataWindow && m_pDataWindow->getChannelDataView())
+    connect(m_pEpochMarkersAction, &QAction::triggered, [this](bool checked) {
+        if (m_pDataWindow && m_pDataWindow->getChannelDataView())
             m_pDataWindow->getChannelDataView()->setEpochMarkersVisible(checked);
     });
     toolBar->addAction(m_pEpochMarkersAction);
 
     //Toggle clipping detection (C)
-    QIcon clipIcon = makeIcon([](QPainter& p, int sz){
+    QIcon clipIcon = makeIcon([](QPainter& p, int sz) {
         QFont f = p.font();
         f.setPixelSize(sz * 0.45);
         f.setBold(true);
         p.setFont(f);
         p.setPen(QColor(0xCC, 0x00, 0x00));
-        p.drawText(QRect(0,0,sz,sz), Qt::AlignCenter, "C");
+        p.drawText(QRect(0, 0, sz, sz), Qt::AlignCenter, "C");
     });
     m_pClippingAction = new QAction(clipIcon, tr("Toggle clipping detection (C)"), this);
     m_pClippingAction->setCheckable(true);
     m_pClippingAction->setChecked(true);
     m_pClippingAction->setStatusTip(tr("Highlight clipped / saturated signal segments in red"));
-    connect(m_pClippingAction, &QAction::triggered, [this](bool checked){
-        if(m_pDataWindow && m_pDataWindow->getChannelDataView())
+    connect(m_pClippingAction, &QAction::triggered, [this](bool checked) {
+        if (m_pDataWindow && m_pDataWindow->getChannelDataView())
             m_pDataWindow->getChannelDataView()->setClippingVisible(checked);
     });
     toolBar->addAction(m_pClippingAction);
 
     //Toggle z-score normalization (Z)
-    QIcon zscoreIcon = makeIcon([](QPainter& p, int sz){
+    QIcon zscoreIcon = makeIcon([](QPainter& p, int sz) {
         QFont f = p.font();
         f.setPixelSize(sz * 0.45);
         f.setBold(true);
         p.setFont(f);
         p.setPen(QColor(0x20, 0x60, 0xB0));
-        p.drawText(QRect(0,0,sz,sz), Qt::AlignCenter, "Z");
+        p.drawText(QRect(0, 0, sz, sz), Qt::AlignCenter, "Z");
     });
     m_pZScoreAction = new QAction(zscoreIcon, tr("Toggle z-score normalization (Z)"), this);
     m_pZScoreAction->setCheckable(true);
     m_pZScoreAction->setChecked(false);
     m_pZScoreAction->setStatusTip(tr("Normalize each channel by its z-score (mean/std) for uniform scaling"));
-    connect(m_pZScoreAction, &QAction::triggered, [this](bool checked){
-        if(m_pDataWindow && m_pDataWindow->getChannelDataView())
+    connect(m_pZScoreAction, &QAction::triggered, [this](bool checked) {
+        if (m_pDataWindow && m_pDataWindow->getChannelDataView())
             m_pDataWindow->getChannelDataView()->setZScoreMode(checked);
     });
     toolBar->addAction(m_pZScoreAction);
 
     //Toggle overview bar (O)
-    QIcon overviewIcon = makeIcon([](QPainter& p, int sz){
+    QIcon overviewIcon = makeIcon([](QPainter& p, int sz) {
         QFont f = p.font();
         f.setPixelSize(sz * 0.45);
         f.setBold(true);
         p.setFont(f);
         p.setPen(QColor(0x40, 0x80, 0x40));
-        p.drawText(QRect(0,0,sz,sz), Qt::AlignCenter, "O");
+        p.drawText(QRect(0, 0, sz, sz), Qt::AlignCenter, "O");
     });
     m_pOverviewBarAction = new QAction(overviewIcon, tr("Toggle overview bar (O)"), this);
     m_pOverviewBarAction->setCheckable(true);
     m_pOverviewBarAction->setChecked(true);
     m_pOverviewBarAction->setStatusTip(tr("Show or hide the overview navigation bar"));
-    connect(m_pOverviewBarAction, &QAction::triggered, [this](bool checked){
-        if(m_pDataWindow && m_pDataWindow->getChannelDataView())
+    connect(m_pOverviewBarAction, &QAction::triggered, [this](bool checked) {
+        if (m_pDataWindow && m_pDataWindow->getChannelDataView())
             m_pDataWindow->getChannelDataView()->setOverviewBarVisible(checked);
     });
     toolBar->addAction(m_pOverviewBarAction);
 
     //Toggle time format (T)
-    QIcon timeIcon = makeIcon([](QPainter& p, int sz){
+    QIcon timeIcon = makeIcon([](QPainter& p, int sz) {
         QFont f = p.font();
         f.setPixelSize(sz * 0.45);
         f.setBold(true);
         p.setFont(f);
         p.setPen(QColor(0x60, 0x60, 0xc0));
-        p.drawText(QRect(0,0,sz,sz), Qt::AlignCenter, "T");
+        p.drawText(QRect(0, 0, sz, sz), Qt::AlignCenter, "T");
     });
     QAction* timeFormatAction = new QAction(timeIcon, tr("Toggle time format (T)"), this);
     timeFormatAction->setCheckable(true);
     timeFormatAction->setStatusTip(tr("Switch between seconds and clock time display"));
-    connect(timeFormatAction, &QAction::triggered, [this](bool checked){
+    connect(timeFormatAction, &QAction::triggered, [this](bool checked) {
         Q_UNUSED(checked);
-        if(m_pDataWindow && m_pDataWindow->getChannelDataView())
+        if (m_pDataWindow && m_pDataWindow->getChannelDataView())
             m_pDataWindow->getChannelDataView()->toggleTimeFormat();
     });
     toolBar->addAction(timeFormatAction);
 
     //Sort channels by type
-    QIcon sortIcon = makeIcon([](QPainter& p, int sz){
+    QIcon sortIcon = makeIcon([](QPainter& p, int sz) {
         QFont f = p.font();
         f.setPixelSize(sz * 0.30);
         f.setBold(true);
         p.setFont(f);
         p.setPen(QColor(0x50, 0x50, 0xa0));
-        p.drawText(QRect(0, 0, sz, sz/2), Qt::AlignCenter, "A↓");
-        p.drawText(QRect(0, sz/2, sz, sz/2), Qt::AlignCenter, "Z");
+        p.drawText(QRect(0, 0, sz, sz / 2), Qt::AlignCenter, "A↓");
+        p.drawText(QRect(0, sz / 2, sz, sz / 2), Qt::AlignCenter, "Z");
     });
     QAction* sortByTypeAction = new QAction(sortIcon, tr("Sort channels by type"), this);
     sortByTypeAction->setStatusTip(tr("Group channels by type: MEG grad, MEG mag, EEG, EOG, ECG, ..."));
-    connect(sortByTypeAction, &QAction::triggered, [this](){
-        if(m_pDataWindow && m_pDataWindow->getChannelDataView())
+    connect(sortByTypeAction, &QAction::triggered, [this]() {
+        if (m_pDataWindow && m_pDataWindow->getChannelDataView())
             m_pDataWindow->getChannelDataView()->sortChannelsByType();
     });
     toolBar->addAction(sortByTypeAction);
 
     //Reset channel order
-    QIcon resetOrderIcon = makeIcon([](QPainter& p, int sz){
+    QIcon resetOrderIcon = makeIcon([](QPainter& p, int sz) {
         QFont f = p.font();
         f.setPixelSize(sz * 0.30);
         f.setBold(true);
@@ -1905,8 +1898,8 @@ void MainWindow::createToolBar()
     });
     QAction* resetOrderAction = new QAction(resetOrderIcon, tr("Reset channel order"), this);
     resetOrderAction->setStatusTip(tr("Restore original channel order from file"));
-    connect(resetOrderAction, &QAction::triggered, [this](){
-        if(m_pDataWindow && m_pDataWindow->getChannelDataView())
+    connect(resetOrderAction, &QAction::triggered, [this]() {
+        if (m_pDataWindow && m_pDataWindow->getChannelDataView())
             m_pDataWindow->getChannelDataView()->resetChannelOrder();
     });
     toolBar->addAction(resetOrderAction);
@@ -1914,55 +1907,55 @@ void MainWindow::createToolBar()
     toolBar->addSeparator();
 
     //Toggle visibility of the event manager
-    QAction* showEventManager = new QAction(QIcon(":/Resources/Images/showEventManager.png"),tr("Toggle event manager"), this);
+    QAction* showEventManager = new QAction(QIcon(":/Resources/Images/showEventManager.png"), tr("Toggle event manager"), this);
     showEventManager->setStatusTip(tr("Toggle the event manager"));
-    connect(showEventManager, &QAction::triggered, this, [this](){
+    connect(showEventManager, &QAction::triggered, this, [this]() {
         showWindow(m_pEventWindow);
     });
     toolBar->addAction(showEventManager);
 
     //Toggle visibility of the filter window
-    QAction* showFilterWindow = new QAction(QIcon(":/Resources/Images/showFilterWindow.png"),tr("Toggle filter window"), this);
+    QAction* showFilterWindow = new QAction(QIcon(":/Resources/Images/showFilterWindow.png"), tr("Toggle filter window"), this);
     showFilterWindow->setStatusTip(tr("Toggle filter window"));
-    connect(showFilterWindow, &QAction::triggered, this, [this](){
+    connect(showFilterWindow, &QAction::triggered, this, [this]() {
         showWindow(m_pFilterWindow);
     });
     toolBar->addAction(showFilterWindow);
 
     //Toggle visibility of the Selection manager
-    QAction* showSelectionManager = new QAction(QIcon(":/Resources/Images/showSelectionManager.png"),tr("Toggle selection manager"), this);
+    QAction* showSelectionManager = new QAction(QIcon(":/Resources/Images/showSelectionManager.png"), tr("Toggle selection manager"), this);
     showSelectionManager->setStatusTip(tr("Toggle the selection manager"));
-    connect(showSelectionManager, &QAction::triggered, this, [this](){
+    connect(showSelectionManager, &QAction::triggered, this, [this]() {
         showWindow(m_pChannelSelectionViewDock);
     });
     toolBar->addAction(showSelectionManager);
 
     //Toggle visibility of the scaling window
-    QAction* showScalingWindow = new QAction(QIcon(":/Resources/Images/showScalingWindow.png"),tr("Toggle scaling window"), this);
+    QAction* showScalingWindow = new QAction(QIcon(":/Resources/Images/showScalingWindow.png"), tr("Toggle scaling window"), this);
     showScalingWindow->setStatusTip(tr("Toggle the scaling window"));
-    connect(showScalingWindow, &QAction::triggered, this, [this](){
+    connect(showScalingWindow, &QAction::triggered, this, [this]() {
         showWindow(m_pScaleWindow);
     });
     toolBar->addAction(showScalingWindow);
 
     //Toggle visibility of the average manager
-    QAction* showAverageManager = new QAction(QIcon(":/Resources/Images/showAverageManager.png"),tr("Toggle average manager"), this);
+    QAction* showAverageManager = new QAction(QIcon(":/Resources/Images/showAverageManager.png"), tr("Toggle average manager"), this);
     showAverageManager->setStatusTip(tr("Toggle the average manager"));
-    connect(showAverageManager, &QAction::triggered, this, [this](){
+    connect(showAverageManager, &QAction::triggered, this, [this]() {
         showWindow(m_pAverageWindow);
     });
     toolBar->addAction(showAverageManager);
 
     //Toggle visibility of the noise reduction manager
-    QAction* showNoiseReductionManager = new QAction(QIcon(":/Resources/Images/showNoiseReductionWindow.png"),tr("Toggle noise reduction manager"), this);
+    QAction* showNoiseReductionManager = new QAction(QIcon(":/Resources/Images/showNoiseReductionWindow.png"), tr("Toggle noise reduction manager"), this);
     showNoiseReductionManager->setStatusTip(tr("Toggle the noise reduction manager"));
-    connect(showNoiseReductionManager, &QAction::triggered, this, [this](){
+    connect(showNoiseReductionManager, &QAction::triggered, this, [this]() {
         showWindow(m_pNoiseReductionWindow);
     });
     toolBar->addAction(showNoiseReductionManager);
 
     //Toggle visibility of the ICA browser
-    QIcon icaIcon = makeIcon([](QPainter& p, int sz){
+    QIcon icaIcon = makeIcon([](QPainter& p, int sz) {
         QFont f = p.font();
         f.setPixelSize(sz * 28 / 100);
         f.setBold(true);
@@ -1972,7 +1965,7 @@ void MainWindow::createToolBar()
     });
     QAction* showIcaBrowser = new QAction(icaIcon, tr("ICA browser (I)"), this);
     showIcaBrowser->setStatusTip(tr("Open ICA browser to compute and exclude components"));
-    connect(showIcaBrowser, &QAction::triggered, this, [this](){
+    connect(showIcaBrowser, &QAction::triggered, this, [this]() {
         computeIca();
     });
     toolBar->addAction(showIcaBrowser);
@@ -1980,22 +1973,22 @@ void MainWindow::createToolBar()
     toolBar->addSeparator();
 
     //Toggle visibility of the channel information window manager
-    QAction* showChInfo = new QAction(QIcon(":/Resources/Images/showChInformationWindow.png"),tr("Channel info"), this);
+    QAction* showChInfo = new QAction(QIcon(":/Resources/Images/showChInformationWindow.png"), tr("Channel info"), this);
     showChInfo->setStatusTip(tr("Toggle channel info window"));
-    connect(showChInfo, &QAction::triggered, this, [this](){
+    connect(showChInfo, &QAction::triggered, this, [this]() {
         showWindow(m_pChInfoWindow);
     });
     toolBar->addAction(showChInfo);
 
     //Toggle visibility of the information window
-//    QAction* showInformationWindow = new QAction(QIcon(":/Resources/Images/showInformationWindow.png"),tr("Toggle information window"), this);
-//    showInformationWindow->setStatusTip(tr("Toggle the information window"));
-//    connect(showInformationWindow, &QAction::triggered, this, [=](){
-//        showWindow(m_pInformationWindow);
-//    });
-//    toolBar->addAction(showInformationWindow);
+    //    QAction* showInformationWindow = new QAction(QIcon(":/Resources/Images/showInformationWindow.png"),tr("Toggle information window"), this);
+    //    showInformationWindow->setStatusTip(tr("Toggle the information window"));
+    //    connect(showInformationWindow, &QAction::triggered, this, [=](){
+    //        showWindow(m_pInformationWindow);
+    //    });
+    //    toolBar->addAction(showInformationWindow);
 
-    this->addToolBar(Qt::RightToolBarArea,toolBar);
+    this->addToolBar(Qt::RightToolBarArea, toolBar);
 }
 
 
@@ -2102,8 +2095,8 @@ void MainWindow::connectMenus()
     connect(ui->m_loadEvokedAction, &QAction::triggered, this, &MainWindow::loadEvoked);
     connect(saveEvokedAction, &QAction::triggered, this, &MainWindow::saveEvoked);
     connect(computeSourceEstimateAction, &QAction::triggered, this, &MainWindow::computeSourceEstimate);
-    connect(m_pWhitenButterflyAction, &QAction::toggled, this, [this](bool checked){
-        if(checked && m_covariance.isEmpty()) {
+    connect(m_pWhitenButterflyAction, &QAction::toggled, this, [this](bool checked) {
+        if (checked && m_covariance.isEmpty()) {
             QMessageBox::warning(this,
                                  "Whiten Butterfly Plot",
                                  "Load or compute a covariance matrix before enabling whitening.");
@@ -2115,105 +2108,105 @@ void MainWindow::connectMenus()
         settings.enableButterfly = checked;
         setCovarianceWhiteningSettings(settings);
 
-        if(checked && !m_pAverageWindow->isVisible()) {
+        if (checked && !m_pAverageWindow->isVisible()) {
             showWindow(m_pAverageWindow);
         }
     });
     connect(ui->m_quitAction, SIGNAL(triggered()), qApp, SLOT(quit()));
 
     //Adjust
-    connect(ui->m_filterAction, &QAction::triggered, this, [this](){
+    connect(ui->m_filterAction, &QAction::triggered, this, [this]() {
         showWindow(m_pFilterWindow);
     });
     connect(m_pAnnotationModeAction, &QAction::toggled, this, [this](bool checked) {
         m_pDataWindow->setAnnotationSelectionEnabled(checked);
         statusBar()->showMessage(checked
-                                 ? QStringLiteral("Annotation mode enabled: Right-drag in the raw browser to create spans.")
-                                 : QStringLiteral("Annotation mode disabled."),
+                                     ? QStringLiteral("Annotation mode enabled: Right-drag in the raw browser to create spans.")
+                                     : QStringLiteral("Annotation mode disabled."),
                                  4000);
     });
 
     //Windows
-    connect(ui->m_eventAction, &QAction::triggered, this, [this](){
+    connect(ui->m_eventAction, &QAction::triggered, this, [this]() {
         showWindow(m_pEventWindow);
     });
-    connect(annotationManagerAction, &QAction::triggered, this, [this](){
+    connect(annotationManagerAction, &QAction::triggered, this, [this]() {
         showWindow(m_pAnnotationWindow);
     });
-    connect(covarianceManagerAction, &QAction::triggered, this, [this](){
+    connect(covarianceManagerAction, &QAction::triggered, this, [this]() {
         showWindow(m_pCovarianceWindow);
     });
-    connect(icaBrowserAction, &QAction::triggered, this, [this](){
+    connect(icaBrowserAction, &QAction::triggered, this, [this]() {
         showWindow(m_pIcaWindow);
     });
-    connect(epochManagerAction, &QAction::triggered, this, [this](){
+    connect(epochManagerAction, &QAction::triggered, this, [this]() {
         showWindow(m_pEpochWindow);
     });
-    connect(virtualChannelManagerAction, &QAction::triggered, this, [this](){
+    connect(virtualChannelManagerAction, &QAction::triggered, this, [this]() {
         showWindow(m_pVirtualChannelWindow);
     });
-    connect(ui->m_informationAction, &QAction::triggered, this, [this](){
+    connect(ui->m_informationAction, &QAction::triggered, this, [this]() {
         showWindow(m_pInformationWindow);
     });
-    connect(ui->m_channelSelectionManagerAction, &QAction::triggered, this, [this](){
+    connect(ui->m_channelSelectionManagerAction, &QAction::triggered, this, [this]() {
         showWindow(m_pChannelSelectionViewDock);
     });
-    connect(ui->m_averageWindowAction, &QAction::triggered, this, [this](){
+    connect(ui->m_averageWindowAction, &QAction::triggered, this, [this]() {
         showWindow(m_pAverageWindow);
     });
-    connect(ui->m_scalingAction, &QAction::triggered, this, [this](){
+    connect(ui->m_scalingAction, &QAction::triggered, this, [this]() {
         showWindow(m_pScaleWindow);
     });
-    connect(ui->m_ChInformationAction, &QAction::triggered, this, [this](){
+    connect(ui->m_ChInformationAction, &QAction::triggered, this, [this]() {
         showWindow(m_pChInfoWindow);
     });
-    connect(ui->m_noiseReductionManagerAction, &QAction::triggered, this, [this](){
+    connect(ui->m_noiseReductionManagerAction, &QAction::triggered, this, [this]() {
         showWindow(m_pNoiseReductionWindow);
     });
 
     //Help
-    connect(ui->m_aboutAction, &QAction::triggered, this, [this](){
+    connect(ui->m_aboutAction, &QAction::triggered, this, [this]() {
         showWindow(m_pAboutWindow);
     });
 
-    connect(ui->m_keyboardShortcutsAction, &QAction::triggered, this, [this](){
+    connect(ui->m_keyboardShortcutsAction, &QAction::triggered, this, [this]() {
         QMessageBox::information(this, tr("Keyboard Shortcuts"),
-            tr("<b>Navigation:</b><br>"
-               "← / → — Scroll left/right (¼ page)<br>"
-               "Shift+← / → — Scroll left/right (full page)<br>"
-               "Home / End — Decrease/increase time window<br>"
-               "+/= — Increase amplitude scale<br>"
-               "- — Decrease amplitude scale<br>"
-               "<br>"
-               "<b>Display:</b><br>"
-               "B — Toggle butterfly mode<br>"
-               "D — Toggle DC removal<br>"
-               "E — Toggle event markers<br>"
-               "G — Toggle epoch grid lines<br>"
-               "O — Toggle overview bar<br>"
-               "S — Toggle scalebars<br>"
-               "T — Toggle time format (seconds / clock)<br>"
-               "X — Toggle crosshair cursor<br>"
-               "Shift+A — Toggle annotation spans<br>"
-               "[ / ] — Decrease/increase scroll speed<br>"
-               "Ctrl+D — Clear channel selection<br>"
-               "? — Show this help<br>"
-               "<br>"
-               "<b>Mouse (Data View):</b><br>"
-               "Left-drag — Pan through time<br>"
-               "Right-drag — Ruler measurement<br>"
-               "Alt+Left-drag — Pan (alternative)<br>"
-               "Double-click — Toggle channel bad/good<br>"
-               "Scroll wheel — Scroll through channels<br>"
-               "<br>"
-               "<b>Annotations:</b><br>"
-               "Enable Annotation Mode from toolbar<br>"
-               "Right-drag — Select time range for annotation<br>"
-               "Drag boundary — Resize annotation span<br>"
-               "<br>"
-               "<b>File:</b><br>"
-               "Ctrl+O — Open file<br>"
-               "Ctrl+S — Save file"));
+                                 tr("<b>Navigation:</b><br>"
+                                    "← / → — Scroll left/right (¼ page)<br>"
+                                    "Shift+← / → — Scroll left/right (full page)<br>"
+                                    "Home / End — Decrease/increase time window<br>"
+                                    "+/= — Increase amplitude scale<br>"
+                                    "- — Decrease amplitude scale<br>"
+                                    "<br>"
+                                    "<b>Display:</b><br>"
+                                    "B — Toggle butterfly mode<br>"
+                                    "D — Toggle DC removal<br>"
+                                    "E — Toggle event markers<br>"
+                                    "G — Toggle epoch grid lines<br>"
+                                    "O — Toggle overview bar<br>"
+                                    "S — Toggle scalebars<br>"
+                                    "T — Toggle time format (seconds / clock)<br>"
+                                    "X — Toggle crosshair cursor<br>"
+                                    "Shift+A — Toggle annotation spans<br>"
+                                    "[ / ] — Decrease/increase scroll speed<br>"
+                                    "Ctrl+D — Clear channel selection<br>"
+                                    "? — Show this help<br>"
+                                    "<br>"
+                                    "<b>Mouse (Data View):</b><br>"
+                                    "Left-drag — Pan through time<br>"
+                                    "Right-drag — Ruler measurement<br>"
+                                    "Alt+Left-drag — Pan (alternative)<br>"
+                                    "Double-click — Toggle channel bad/good<br>"
+                                    "Scroll wheel — Scroll through channels<br>"
+                                    "<br>"
+                                    "<b>Annotations:</b><br>"
+                                    "Enable Annotation Mode from toolbar<br>"
+                                    "Right-drag — Select time range for annotation<br>"
+                                    "Drag boundary — Resize annotation span<br>"
+                                    "<br>"
+                                    "<b>File:</b><br>"
+                                    "Ctrl+O — Open file<br>"
+                                    "Ctrl+S — Save file"));
     });
 }
 
@@ -2223,7 +2216,7 @@ void MainWindow::connectMenus()
 void MainWindow::setupMainWindow()
 {
     //set Window functions
-    resize(m_qSettings.value("MainWindow/size", QSize(RawSettingsConstants::MAINWINDOW_WINDOW_SIZE_W, RawSettingsConstants::MAINWINDOW_WINDOW_SIZE_H)).toSize()); //Resize to predefined default size
+    resize(m_qSettings.value("MainWindow/size", QSize(RawSettingsConstants::MAINWINDOW_WINDOW_SIZE_W, RawSettingsConstants::MAINWINDOW_WINDOW_SIZE_H)).toSize());             //Resize to predefined default size
     move(m_qSettings.value("MainWindow/position", QPoint(RawSettingsConstants::MAINWINDOW_WINDOW_POSITION_X, RawSettingsConstants::MAINWINDOW_WINDOW_POSITION_Y)).toPoint()); // Move this main window to position 50/50 on the screen
 
     // Restore dock widget layout (positions, sizes, docking areas)
@@ -2314,8 +2307,8 @@ void MainWindow::toggleZenMode()
     bool visible = statusBar()->isVisible();
     statusBar()->setVisible(!visible);
     menuBar()->setVisible(!visible);
-    const auto toolBars = findChildren<QToolBar *>();
-    for (QToolBar *tb : toolBars)
+    const auto toolBars = findChildren<QToolBar*>();
+    for (QToolBar* tb : toolBars)
         tb->setVisible(!visible);
 }
 
@@ -2324,7 +2317,7 @@ void MainWindow::toggleZenMode()
 
 void MainWindow::toggleNoiseReductionWindow()
 {
-    if(m_pNoiseReductionWindow->isVisible())
+    if (m_pNoiseReductionWindow->isVisible())
         m_pNoiseReductionWindow->hide();
     else {
         m_pNoiseReductionWindow->show();
@@ -2345,13 +2338,13 @@ void MainWindow::toggleAllProjectors()
 
 void MainWindow::toggleWhitening()
 {
-    if(m_pAverageWindow)
+    if (m_pAverageWindow)
         m_pAverageWindow->setButterflyWhiteningEnabled(!m_pAverageWindow->isButterflyWhiteningEnabled());
 
     // Also toggle raw-trace whitening
-    if(m_pDataWindow) {
+    if (m_pDataWindow) {
         const bool newState = !m_pDataWindow->isRawWhiteningEnabled();
-        if(newState && !m_covariance.isEmpty()) {
+        if (newState && !m_covariance.isEmpty()) {
             // Build whitener on first toggle if covariance is available
             m_pDataWindow->updateRawWhitener(m_covariance, covarianceWhiteningSettings());
         }
@@ -2364,7 +2357,7 @@ void MainWindow::toggleWhitening()
 
 void MainWindow::toggleGFP()
 {
-    if(m_pAverageWindow) {
+    if (m_pAverageWindow) {
         m_pAverageWindow->setShowGFP(!m_pAverageWindow->isShowGFP());
     }
 }
@@ -2378,21 +2371,21 @@ void MainWindow::toggleDarkMode()
     dark = !dark;
 
     QPalette pal;
-    if(dark) {
-        pal.setColor(QPalette::Window,          QColor(42, 42, 42));
-        pal.setColor(QPalette::WindowText,      QColor(220, 220, 220));
-        pal.setColor(QPalette::Base,            QColor(30, 30, 30));
-        pal.setColor(QPalette::AlternateBase,   QColor(50, 50, 50));
-        pal.setColor(QPalette::ToolTipBase,     QColor(60, 60, 60));
-        pal.setColor(QPalette::ToolTipText,     QColor(220, 220, 220));
-        pal.setColor(QPalette::Text,            QColor(220, 220, 220));
-        pal.setColor(QPalette::Button,          QColor(53, 53, 53));
-        pal.setColor(QPalette::ButtonText,      QColor(220, 220, 220));
-        pal.setColor(QPalette::BrightText,      Qt::red);
-        pal.setColor(QPalette::Link,            QColor(108, 92, 231));
-        pal.setColor(QPalette::Highlight,       QColor(108, 92, 231));
+    if (dark) {
+        pal.setColor(QPalette::Window, QColor(42, 42, 42));
+        pal.setColor(QPalette::WindowText, QColor(220, 220, 220));
+        pal.setColor(QPalette::Base, QColor(30, 30, 30));
+        pal.setColor(QPalette::AlternateBase, QColor(50, 50, 50));
+        pal.setColor(QPalette::ToolTipBase, QColor(60, 60, 60));
+        pal.setColor(QPalette::ToolTipText, QColor(220, 220, 220));
+        pal.setColor(QPalette::Text, QColor(220, 220, 220));
+        pal.setColor(QPalette::Button, QColor(53, 53, 53));
+        pal.setColor(QPalette::ButtonText, QColor(220, 220, 220));
+        pal.setColor(QPalette::BrightText, Qt::red);
+        pal.setColor(QPalette::Link, QColor(108, 92, 231));
+        pal.setColor(QPalette::Highlight, QColor(108, 92, 231));
         pal.setColor(QPalette::HighlightedText, Qt::white);
-        pal.setColor(QPalette::Disabled, QPalette::Text,       QColor(128, 128, 128));
+        pal.setColor(QPalette::Disabled, QPalette::Text, QColor(128, 128, 128));
         pal.setColor(QPalette::Disabled, QPalette::ButtonText, QColor(128, 128, 128));
     } else {
         pal = QApplication::style()->standardPalette();
@@ -2408,7 +2401,7 @@ void MainWindow::addToRecentFiles(const QString& filename)
 {
     m_recentFiles.removeAll(filename);
     m_recentFiles.prepend(filename);
-    while(m_recentFiles.size() > 10)
+    while (m_recentFiles.size() > 10)
         m_recentFiles.removeLast();
     m_qSettings.setValue("recentFiles", m_recentFiles);
     updateRecentFilesMenu();
@@ -2419,13 +2412,13 @@ void MainWindow::addToRecentFiles(const QString& filename)
 
 void MainWindow::updateRecentFilesMenu()
 {
-    if(!m_pRecentFilesMenu)
+    if (!m_pRecentFilesMenu)
         return;
 
     m_pRecentFilesMenu->clear();
 
-    for(const QString& path : m_recentFiles) {
-        if(!QFileInfo::exists(path))
+    for (const QString& path : m_recentFiles) {
+        if (!QFileInfo::exists(path))
             continue;
         QAction* action = m_pRecentFilesMenu->addAction(QFileInfo(path).fileName());
         action->setData(path);
@@ -2444,15 +2437,15 @@ void MainWindow::updateRecentFilesMenu()
 
 void MainWindow::showEpochHistogram()
 {
-    if(!m_pEpochWindow)
+    if (!m_pEpochWindow)
         return;
 
     EpochModel* em = m_pEpochWindow->getEpochModel();
-    if(!em || em->rowCount() == 0)
+    if (!em || em->rowCount() == 0)
         return;
 
     QVector<double> ptpValues = em->ptpAmplitudes();
-    if(ptpValues.isEmpty())
+    if (ptpValues.isEmpty())
         return;
 
     // --- compute histogram ---
@@ -2460,21 +2453,23 @@ void MainWindow::showEpochHistogram()
     double minVal = *std::min_element(ptpValues.begin(), ptpValues.end());
     double maxVal = *std::max_element(ptpValues.begin(), ptpValues.end());
 
-    if(qFuzzyCompare(minVal, maxVal)) {
+    if (qFuzzyCompare(minVal, maxVal)) {
         maxVal = minVal + 1.0;
     }
 
     const double binWidth = (maxVal - minVal) / nBins;
     QVector<int> bins(nBins, 0);
 
-    for(double v : ptpValues) {
+    for (double v : ptpValues) {
         int idx = static_cast<int>((v - minVal) / binWidth);
-        if(idx >= nBins) idx = nBins - 1;
+        if (idx >= nBins)
+            idx = nBins - 1;
         bins[idx]++;
     }
 
     int maxCount = *std::max_element(bins.begin(), bins.end());
-    if(maxCount == 0) maxCount = 1;
+    if (maxCount == 0)
+        maxCount = 1;
 
     // --- build dialog ---
     QDialog dlg(this);
@@ -2502,9 +2497,9 @@ void MainWindow::showEpochHistogram()
         // Draw bars
         const double barW = static_cast<double>(plotW) / nBins;
         p.setPen(Qt::NoPen);
-        p.setBrush(QColor(70, 130, 180));  // steel blue
+        p.setBrush(QColor(70, 130, 180)); // steel blue
 
-        for(int i = 0; i < nBins; ++i) {
+        for (int i = 0; i < nBins; ++i) {
             double barH = (static_cast<double>(bins[i]) / maxCount) * plotH;
             double x = plotLeft + i * barW;
             double y = plotBottom - barH;
@@ -2521,14 +2516,14 @@ void MainWindow::showEpochHistogram()
         font.setPointSize(8);
         p.setFont(font);
 
-        for(int i = 0; i <= 4; ++i) {
+        for (int i = 0; i <= 4; ++i) {
             double val = minVal + (maxVal - minVal) * i / 4.0;
             int x = plotLeft + plotW * i / 4;
             p.drawText(QRect(x - 30, plotBottom + 5, 60, 20), Qt::AlignHCenter, QString::number(val, 'e', 1));
         }
 
         // Y-axis labels
-        for(int i = 0; i <= 4; ++i) {
+        for (int i = 0; i <= 4; ++i) {
             int val = maxCount * i / 4;
             int y = plotBottom - plotH * i / 4;
             p.drawText(QRect(plotLeft - 45, y - 8, 40, 16), Qt::AlignRight | Qt::AlignVCenter, QString::number(val));
@@ -2575,39 +2570,38 @@ void MainWindow::setWindowStatus()
             ? QString("%1 min %2 s").arg(durMin).arg(durSec, 0, 'f', 1)
             : QString("%1 s").arg(dur, 0, 'f', 1);
         title = QString("Data file: %1  |  Duration: %2")
-            .arg(m_pDataWindow->fiffFileName(), durStr);
+                    .arg(m_pDataWindow->fiffFileName(), durStr);
     } else {
         title = QString("No data file");
     }
 
     //Set event file informations
-    if(m_pEventWindow->getEventModel()->isFileLoaded()) {
+    if (m_pEventWindow->getEventModel()->isFileLoaded()) {
         int idx = m_qEventFile.fileName().lastIndexOf("/");
-        QString filename = m_qEventFile.fileName().remove(0,idx+1);
+        QString filename = m_qEventFile.fileName().remove(0, idx + 1);
 
         title.append(QString("  -  Event file: %1").arg(filename));
-    }
-    else
+    } else
         title.append("  -  No event file");
 
-    if(m_pAnnotationWindow->getAnnotationModel()->rowCount() > 0) {
-        if(m_qAnnotationFile.fileName().isEmpty()) {
+    if (m_pAnnotationWindow->getAnnotationModel()->rowCount() > 0) {
+        if (m_qAnnotationFile.fileName().isEmpty()) {
             title.append("  -  Annotations: unsaved");
         } else {
             int idx = m_qAnnotationFile.fileName().lastIndexOf("/");
-            QString filename = m_qAnnotationFile.fileName().remove(0,idx+1);
+            QString filename = m_qAnnotationFile.fileName().remove(0, idx + 1);
             title.append(QString("  -  Annotations: %1").arg(filename));
         }
     } else {
         title.append("  -  No annotations");
     }
 
-    if(m_pVirtualChannelWindow->getVirtualChannelModel()->rowCount() > 0) {
-        if(m_qVirtualChannelFile.fileName().isEmpty()) {
+    if (m_pVirtualChannelWindow->getVirtualChannelModel()->rowCount() > 0) {
+        if (m_qVirtualChannelFile.fileName().isEmpty()) {
             title.append("  -  Virtual channels: unsaved");
         } else {
             int idx = m_qVirtualChannelFile.fileName().lastIndexOf("/");
-            QString filename = m_qVirtualChannelFile.fileName().remove(0,idx+1);
+            QString filename = m_qVirtualChannelFile.fileName().remove(0, idx + 1);
             title.append(QString("  -  Virtual channels: %1").arg(filename));
         }
     } else {
@@ -2615,43 +2609,42 @@ void MainWindow::setWindowStatus()
     }
 
     //Set evoked file informations
-    if(m_pAverageWindow->getAverageModel()->isFileLoaded()) {
-        if(m_qEvokedFile.fileName().isEmpty()) {
+    if (m_pAverageWindow->getAverageModel()->isFileLoaded()) {
+        if (m_qEvokedFile.fileName().isEmpty()) {
             title.append("  -  Evoked data: unsaved");
         } else {
             int idx = m_qEvokedFile.fileName().lastIndexOf("/");
-            QString filename = m_qEvokedFile.fileName().remove(0,idx+1);
+            QString filename = m_qEvokedFile.fileName().remove(0, idx + 1);
             title.append(QString("  -  Evoked file: %1").arg(filename));
         }
-    }
-    else
+    } else
         title.append("  -  No evoked file");
 
-    if(!m_covariance.isEmpty()) {
-        if(m_qCovFile.fileName().isEmpty()) {
+    if (!m_covariance.isEmpty()) {
+        if (m_qCovFile.fileName().isEmpty()) {
             title.append("  -  Covariance: unsaved");
         } else {
             int idx = m_qCovFile.fileName().lastIndexOf("/");
-            QString filename = m_qCovFile.fileName().remove(0,idx+1);
+            QString filename = m_qCovFile.fileName().remove(0, idx + 1);
             title.append(QString("  -  Covariance file: %1").arg(filename));
         }
     } else {
         title.append("  -  No covariance");
     }
 
-    if(m_inverseOperator.nsource > 0 && !m_inverseOperator.src.isEmpty()) {
-        if(m_qInverseOperatorFile.fileName().isEmpty()) {
+    if (m_inverseOperator.nsource > 0 && !m_inverseOperator.src.isEmpty()) {
+        if (m_qInverseOperatorFile.fileName().isEmpty()) {
             title.append("  -  Inverse: loaded");
         } else {
             int idx = m_qInverseOperatorFile.fileName().lastIndexOf("/");
-            QString filename = m_qInverseOperatorFile.fileName().remove(0,idx+1);
+            QString filename = m_qInverseOperatorFile.fileName().remove(0, idx + 1);
             title.append(QString("  -  Inverse file: %1").arg(filename));
         }
     } else {
         title.append("  -  No inverse");
     }
 
-    if(!m_pStatusLabel) {
+    if (!m_pStatusLabel) {
         m_pStatusLabel = new QLabel(this);
         statusBar()->addWidget(m_pStatusLabel, 1);
     }
@@ -2672,7 +2665,7 @@ void MainWindow::syncAuxWindowsToFiffInfo(FiffInfo::SPtr fiffInfo,
     m_pAnnotationWindow->getAnnotationModel()->setFiffInfo(fiffInfo);
     m_pAnnotationWindow->getAnnotationModel()->setFirstLastSample(firstSample, lastSample);
     m_pVirtualChannelWindow->setAvailableChannelNames(fiffInfo->ch_names);
-    if(!m_covariance.isEmpty()) {
+    if (!m_covariance.isEmpty()) {
         const QString covarianceSource = m_qCovFile.fileName().isEmpty()
             ? QStringLiteral("Computed during this session")
             : QStringLiteral("Loaded from %1").arg(QFileInfo(m_qCovFile.fileName()).fileName());
@@ -2712,27 +2705,27 @@ void MainWindow::setLogLevel(LogLevel lvl)
 void MainWindow::openFile()
 {
 #ifdef WASMBUILD
-    auto fileContentReady = [&](const QString &fileName, const QByteArray &fileContent) {
+    auto fileContentReady = [&](const QString& fileName, const QByteArray& fileContent) {
         if (!fileName.isEmpty()) {
             // Reset loaded project so standalone files don't contaminate next save
             m_mnxProject = MNALIB::MnaProject();
 
-            if(m_qFileRaw.isOpen())
+            if (m_qFileRaw.isOpen())
                 m_qFileRaw.close();
 
             m_qFileRaw.setFileName(fileName);
             m_covariance.clear();
-            if(m_qCovFile.isOpen())
+            if (m_qCovFile.isOpen())
                 m_qCovFile.close();
             m_qCovFile.setFileName(QString());
-            if(m_qInverseOperatorFile.isOpen())
+            if (m_qInverseOperatorFile.isOpen())
                 m_qInverseOperatorFile.close();
             m_qInverseOperatorFile.setFileName(QString());
             m_inverseOperator = MNELIB::MNEInverseOperator();
-            if(m_qAnnotationFile.isOpen())
+            if (m_qAnnotationFile.isOpen())
                 m_qAnnotationFile.close();
             m_qAnnotationFile.setFileName(QString());
-            if(m_qVirtualChannelFile.isOpen())
+            if (m_qVirtualChannelFile.isOpen())
                 m_qVirtualChannelFile.close();
             m_qVirtualChannelFile.setFileName(QString());
             m_pAverageWindow->clearNoiseCovariance();
@@ -2741,7 +2734,7 @@ void MainWindow::openFile()
             whiteningSettings.enableButterfly = false;
             whiteningSettings.enableLayout = false;
             setCovarianceWhiteningSettings(whiteningSettings, false);
-            if(m_pWhitenButterflyAction) {
+            if (m_pWhitenButterflyAction) {
                 m_pWhitenButterflyAction->setChecked(false);
             }
 
@@ -2758,7 +2751,7 @@ void MainWindow::openFile()
 
             s_wasmByteArray = fileContent;
             const bool ok = m_pDataWindow->loadFiffBuffer(fileContent, fileName);
-            if(ok)
+            if (ok)
                 qInfo() << "Fiff data file" << fileName << "loaded (ChannelDataView).";
             else
                 qWarning() << "ERROR loading fiff data file" << fileName;
@@ -2772,9 +2765,7 @@ void MainWindow::openFile()
                 FIFFLIB::FiffRawData raw(rawBuffer);
                 MatrixXi events;
                 QString detectedEventSource;
-                if(!raw.isEmpty()
-                   && detectFallbackStimEvents(raw, events, detectedEventSource)
-                   && events.rows() > 0) {
+                if (!raw.isEmpty() && detectFallbackStimEvents(raw, events, detectedEventSource) && events.rows() > 0) {
                     m_pEventWindow->getEventModel()->setEventMatrix(events, false);
                     statusBar()->showMessage(detectedEventSource, 5000);
                 }
@@ -2786,14 +2777,14 @@ void MainWindow::openFile()
             m_qFileRaw.close();
         }
     };
-    QFileDialog::getOpenFileContent("Fiff File (*.fif *.fiff)",  fileContentReady);
+    QFileDialog::getOpenFileContent("Fiff File (*.fif *.fiff)", fileContentReady);
 #else
     QString filename = QFileDialog::getOpenFileName(this,
                                                     QString("Open fiff data file"),
                                                     QString(QCoreApplication::applicationDirPath() + "/MNE-sample-data/MEG/sample/"),
                                                     tr("fif data files (*.fif)"));
 
-    if(filename.isEmpty())
+    if (filename.isEmpty())
         return;
 
     // Reset loaded project so standalone files don't contaminate next save
@@ -2836,10 +2827,10 @@ void MainWindow::openProject()
     // Collect resolved paths by role
     QString rawPath, eventPath, annotPath, virtChanPath, evokedPath, covPath, invPath;
 
-    for (const auto &subj : proj.subjects) {
-        for (const auto &sess : subj.sessions) {
-            for (const auto &rec : sess.recordings) {
-                for (const auto &ref : rec.files) {
+    for (const auto& subj : proj.subjects) {
+        for (const auto& sess : subj.sessions) {
+            for (const auto& rec : sess.recordings) {
+                for (const auto& ref : rec.files) {
                     QString filePath;
                     if (ref.embedded && !ref.data.isEmpty()) {
                         // Write embedded data to temp dir preserving BIDS path
@@ -2859,14 +2850,29 @@ void MainWindow::openProject()
                         continue;
 
                     switch (ref.role) {
-                    case MNALIB::MnaFileRole::Raw:            rawPath = filePath; break;
-                    case MNALIB::MnaFileRole::Event:          eventPath = filePath; break;
-                    case MNALIB::MnaFileRole::Annotation:     annotPath = filePath; break;
-                    case MNALIB::MnaFileRole::VirtualChannel: virtChanPath = filePath; break;
-                    case MNALIB::MnaFileRole::Evoked:         evokedPath = filePath; break;
-                    case MNALIB::MnaFileRole::Covariance:     covPath = filePath; break;
-                    case MNALIB::MnaFileRole::Inverse:        invPath = filePath; break;
-                    default: break;
+                        case MNALIB::MnaFileRole::Raw:
+                            rawPath = filePath;
+                            break;
+                        case MNALIB::MnaFileRole::Event:
+                            eventPath = filePath;
+                            break;
+                        case MNALIB::MnaFileRole::Annotation:
+                            annotPath = filePath;
+                            break;
+                        case MNALIB::MnaFileRole::VirtualChannel:
+                            virtChanPath = filePath;
+                            break;
+                        case MNALIB::MnaFileRole::Evoked:
+                            evokedPath = filePath;
+                            break;
+                        case MNALIB::MnaFileRole::Covariance:
+                            covPath = filePath;
+                            break;
+                        case MNALIB::MnaFileRole::Inverse:
+                            invPath = filePath;
+                            break;
+                        default:
+                            break;
                     }
                 }
             }
@@ -2907,17 +2913,18 @@ void MainWindow::openProject()
     }
 
     if (!evokedPath.isEmpty() && QFileInfo::exists(evokedPath)) {
-        if (m_qEvokedFile.isOpen()) m_qEvokedFile.close();
+        if (m_qEvokedFile.isOpen())
+            m_qEvokedFile.close();
         m_qEvokedFile.setFileName(evokedPath);
         m_pAverageWindow->getAverageModel()->loadEvokedData(m_qEvokedFile);
     }
 
     // Resolve all non-embedded file ref paths to absolute before storing,
     // so we can re-relativize correctly when saving to a different location.
-    for (auto &s : proj.subjects)
-        for (auto &se : s.sessions)
-            for (auto &r : se.recordings)
-                for (auto &f : r.files)
+    for (auto& s : proj.subjects)
+        for (auto& se : s.sessions)
+            for (auto& r : se.recordings)
+                for (auto& f : r.files)
                     if (!f.embedded)
                         f.path = QDir(projectDir).absoluteFilePath(f.path);
 
@@ -2943,8 +2950,7 @@ void MainWindow::saveProject()
         defaultPath = m_mnxFilePath;
     } else {
         const QString rawName = QFileInfo(m_qFileRaw.fileName()).completeBaseName();
-        defaultPath = QFileInfo(m_qFileRaw.fileName()).absolutePath()
-                      + QDir::separator() + rawName + QStringLiteral(".mnx");
+        defaultPath = QFileInfo(m_qFileRaw.fileName()).absolutePath() + QDir::separator() + rawName + QStringLiteral(".mnx");
     }
 
     const QString filename = QFileDialog::getSaveFileName(this,
@@ -2973,8 +2979,8 @@ void MainWindow::saveProject()
         if (m_qEventFile.fileName().isEmpty()) {
             const QString rawBase = m_qFileRaw.fileName();
             m_qEventFile.setFileName(rawBase.endsWith(QStringLiteral(".fif"), Qt::CaseInsensitive)
-                ? rawBase.left(rawBase.size() - 4) + QStringLiteral("-eve.fif")
-                : rawBase + QStringLiteral("-eve.fif"));
+                                         ? rawBase.left(rawBase.size() - 4) + QStringLiteral("-eve.fif")
+                                         : rawBase + QStringLiteral("-eve.fif"));
         }
         m_pEventWindow->getEventModel()->saveEventData(m_qEventFile);
     }
@@ -2992,8 +2998,7 @@ void MainWindow::saveProject()
         MNALIB::MnaFileRole::VirtualChannel,
         MNALIB::MnaFileRole::Evoked,
         MNALIB::MnaFileRole::Covariance,
-        MNALIB::MnaFileRole::Inverse
-    };
+        MNALIB::MnaFileRole::Inverse};
 
     MNALIB::MnaProject proj;
     const bool hasBase = !m_mnxProject.subjects.isEmpty();
@@ -3004,17 +3009,14 @@ void MainWindow::saveProject()
         proj.modified = QDateTime::currentDateTimeUtc();
 
         // Strip only our owned roles from the first recording; keep everything else
-        if (!proj.subjects.isEmpty()
-            && !proj.subjects[0].sessions.isEmpty()
-            && !proj.subjects[0].sessions[0].recordings.isEmpty())
-        {
-            auto &files = proj.subjects[0].sessions[0].recordings[0].files;
+        if (!proj.subjects.isEmpty() && !proj.subjects[0].sessions.isEmpty() && !proj.subjects[0].sessions[0].recordings.isEmpty()) {
+            auto& files = proj.subjects[0].sessions[0].recordings[0].files;
             files.erase(std::remove_if(files.begin(), files.end(),
-                [](const MNALIB::MnaFileRef &r){ return ownedRoles.contains(r.role); }),
-                files.end());
+                                       [](const MNALIB::MnaFileRef& r) { return ownedRoles.contains(r.role); }),
+                        files.end());
 
             // Re-serialize foreign embedded/external refs for the target format
-            for (auto &ref : files) {
+            for (auto& ref : files) {
                 if (embed) {
                     if (!ref.embedded && !ref.path.isEmpty()) {
                         // External → embed: read file data
@@ -3024,9 +3026,7 @@ void MainWindow::saveProject()
                             ref.sizeBytes = ref.data.size();
                             f.close();
                         }
-                        ref.path = proj.subjects[0].id + QStringLiteral("/")
-                                   + proj.subjects[0].sessions[0].id + QStringLiteral("/passthrough/")
-                                   + QFileInfo(ref.path).fileName();
+                        ref.path = proj.subjects[0].id + QStringLiteral("/") + proj.subjects[0].sessions[0].id + QStringLiteral("/passthrough/") + QFileInfo(ref.path).fileName();
                         ref.embedded = true;
                     }
                 } else {
@@ -3067,7 +3067,7 @@ void MainWindow::saveProject()
     }
 
     // Reference to the first recording where we add our files
-    auto &rec = proj.subjects[0].sessions[0].recordings[0];
+    auto& rec = proj.subjects[0].sessions[0].recordings[0];
 
     // Helper: add a file ref for an owned role
     auto addFileRef = [&](const QString& filePath, MNALIB::MnaFileRole role) {
@@ -3078,9 +3078,7 @@ void MainWindow::saveProject()
         ref.format = QFileInfo(filePath).suffix();
         ref.sizeBytes = QFileInfo(filePath).size();
         if (embed) {
-            ref.path = proj.subjects[0].id + QStringLiteral("/")
-                       + proj.subjects[0].sessions[0].id + QStringLiteral("/meg/")
-                       + QFileInfo(filePath).fileName();
+            ref.path = proj.subjects[0].id + QStringLiteral("/") + proj.subjects[0].sessions[0].id + QStringLiteral("/meg/") + QFileInfo(filePath).fileName();
             ref.embedded = true;
             QFile f(filePath);
             if (f.open(QIODevice::ReadOnly)) {
@@ -3094,12 +3092,12 @@ void MainWindow::saveProject()
         rec.files.append(ref);
     };
 
-    addFileRef(m_qFileRaw.fileName(),            MNALIB::MnaFileRole::Raw);
-    addFileRef(m_qEventFile.fileName(),           MNALIB::MnaFileRole::Event);
-    addFileRef(m_qAnnotationFile.fileName(),      MNALIB::MnaFileRole::Annotation);
-    addFileRef(m_qVirtualChannelFile.fileName(),  MNALIB::MnaFileRole::VirtualChannel);
-    addFileRef(m_qEvokedFile.fileName(),          MNALIB::MnaFileRole::Evoked);
-    addFileRef(m_qCovFile.fileName(),             MNALIB::MnaFileRole::Covariance);
+    addFileRef(m_qFileRaw.fileName(), MNALIB::MnaFileRole::Raw);
+    addFileRef(m_qEventFile.fileName(), MNALIB::MnaFileRole::Event);
+    addFileRef(m_qAnnotationFile.fileName(), MNALIB::MnaFileRole::Annotation);
+    addFileRef(m_qVirtualChannelFile.fileName(), MNALIB::MnaFileRole::VirtualChannel);
+    addFileRef(m_qEvokedFile.fileName(), MNALIB::MnaFileRole::Evoked);
+    addFileRef(m_qCovFile.fileName(), MNALIB::MnaFileRole::Covariance);
     addFileRef(m_qInverseOperatorFile.fileName(), MNALIB::MnaFileRole::Inverse);
 
     if (!MNALIB::MnaIO::write(proj, filename)) {
@@ -3117,7 +3115,7 @@ void MainWindow::saveProject()
 
 void MainWindow::writeFile()
 {
-    if(!ensureLegacyRawModelLoaded(QStringLiteral("Write FIFF File"))) {
+    if (!ensureLegacyRawModelLoaded(QStringLiteral("Write FIFF File"))) {
         return;
     }
 
@@ -3126,10 +3124,10 @@ void MainWindow::writeFile()
                                                     QString(QCoreApplication::applicationDirPath() + "/MNE-sample-data/MEG/sample/"),
                                                     tr("fif data files (*.fif)"));
 
-    if(filename.isEmpty())
+    if (filename.isEmpty())
         return;
 
-    if(filename == m_qFileRaw.fileName()) {
+    if (filename == m_qFileRaw.fileName()) {
         QMessageBox msgBox;
         msgBox.setText("You are trying to write to the file you are currently loading the data from. Please choose another file to write to.");
         msgBox.exec();
@@ -3137,8 +3135,8 @@ void MainWindow::writeFile()
     }
 
     //Create output file, progress dialog and future watcher
-    QFile qFileOutput (filename);
-    if(qFileOutput.isOpen())
+    QFile qFileOutput(filename);
+    if (qFileOutput.isOpen())
         qFileOutput.close();
 
     QFutureWatcher<bool> writeFileFutureWatcher;
@@ -3154,7 +3152,7 @@ void MainWindow::writeFile()
     connect(&progressDialog, &QProgressDialog::canceled,
             &writeFileFutureWatcher, &QFutureWatcher<bool>::cancel);
 
-    if(!useFilteredWrite) {
+    if (!useFilteredWrite) {
         connect(rawModel(), &RawModel::writeProgressRangeChanged,
                 &progressDialog, &QProgressDialog::setRange);
 
@@ -3163,8 +3161,8 @@ void MainWindow::writeFile()
     }
 
     //Run the file writing in seperate thread
-    writeFileFutureWatcher.setFuture(QtConcurrent::run([this, &qFileOutput, filterCopy, useFilteredWrite](){
-        if(useFilteredWrite) {
+    writeFileFutureWatcher.setFuture(QtConcurrent::run([this, &qFileOutput, filterCopy, useFilteredWrite]() {
+        if (useFilteredWrite) {
             return writeFilteredRawFile(m_qFileRaw.fileName(), &qFileOutput, filterCopy);
         }
 
@@ -3175,7 +3173,7 @@ void MainWindow::writeFile()
 
     writeFileFutureWatcher.waitForFinished();
 
-    if(!writeFileFutureWatcher.future().result())
+    if (!writeFileFutureWatcher.future().result())
         qWarning() << "MainWindow: ERROR writing fiff data file" << qFileOutput.fileName();
     else
         qInfo() << "MainWindow: Successfully written to" << qFileOutput.fileName();
@@ -3191,7 +3189,7 @@ void MainWindow::loadEvents()
                                                     QString(QCoreApplication::applicationDirPath() + "/MNE-sample-data/MEG/sample/"),
                                                     tr("fif event data files (*-eve.fif);;fif data files (*.fif)"));
 
-    if(filename.isEmpty())
+    if (filename.isEmpty())
         return;
 
     loadEventsFile(filename);
@@ -3206,14 +3204,14 @@ void MainWindow::saveEvents()
                                                     QString("Save fiff event data file"),
                                                     QString(QCoreApplication::applicationDirPath() + "/MNE-sample-data/MEG/sample/"),
                                                     tr("fif event data files (*-eve.fif);;fif data files (*.fif)"));
-    if(filename.isEmpty())
+    if (filename.isEmpty())
         return;
 
-    if(m_qEventFile.isOpen())
+    if (m_qEventFile.isOpen())
         m_qEventFile.close();
     m_qEventFile.setFileName(filename);
 
-    if(m_pEventWindow->getEventModel()->saveEventData(m_qEventFile))
+    if (m_pEventWindow->getEventModel()->saveEventData(m_qEventFile))
         qInfo() << "Fiff event data file" << filename << "saved.";
     else
         qWarning() << "ERROR saving fiff event data file" << filename;
@@ -3223,7 +3221,7 @@ void MainWindow::saveEvents()
 
 void MainWindow::loadAnnotations()
 {
-    if(m_qFileRaw.fileName().isEmpty()) {
+    if (m_qFileRaw.fileName().isEmpty()) {
         QMessageBox::warning(this,
                              "Load Annotations",
                              "Load a raw FIF file before opening annotations.");
@@ -3235,7 +3233,7 @@ void MainWindow::loadAnnotations()
                                                     QFileInfo(defaultAnnotationFilePath(m_qFileRaw.fileName())).absolutePath(),
                                                     tr("annotation files (*-annot.json *_annot.fif *-annot.fif *.json *.csv *.txt *.fif)"));
 
-    if(filename.isEmpty()) {
+    if (filename.isEmpty()) {
         return;
     }
 
@@ -3246,7 +3244,7 @@ void MainWindow::loadAnnotations()
 
 void MainWindow::saveAnnotations()
 {
-    if(m_pAnnotationWindow->getAnnotationModel()->rowCount() == 0) {
+    if (m_pAnnotationWindow->getAnnotationModel()->rowCount() == 0) {
         QMessageBox::warning(this,
                              "Save Annotations",
                              "Create or load at least one annotation before saving.");
@@ -3254,7 +3252,7 @@ void MainWindow::saveAnnotations()
     }
 
     QString defaultPath = m_qAnnotationFile.fileName();
-    if(defaultPath.isEmpty()) {
+    if (defaultPath.isEmpty()) {
         defaultPath = defaultAnnotationFilePath(m_qFileRaw.fileName());
     }
 
@@ -3263,16 +3261,16 @@ void MainWindow::saveAnnotations()
                                                     defaultPath,
                                                     tr("annotation files (*-annot.json *_annot.fif *-annot.fif *.json *.csv *.txt *.fif)"));
 
-    if(filename.isEmpty()) {
+    if (filename.isEmpty()) {
         return;
     }
 
-    if(m_qAnnotationFile.isOpen()) {
+    if (m_qAnnotationFile.isOpen()) {
         m_qAnnotationFile.close();
     }
     m_qAnnotationFile.setFileName(filename);
 
-    if(m_pAnnotationWindow->getAnnotationModel()->saveAnnotationData(m_qAnnotationFile)) {
+    if (m_pAnnotationWindow->getAnnotationModel()->saveAnnotationData(m_qAnnotationFile)) {
         qInfo() << "Annotation file" << filename << "saved.";
     } else {
         qWarning() << "ERROR saving annotation file" << filename;
@@ -3285,7 +3283,7 @@ void MainWindow::saveAnnotations()
 
 void MainWindow::loadVirtualChannels()
 {
-    if(m_qFileRaw.fileName().isEmpty()) {
+    if (m_qFileRaw.fileName().isEmpty()) {
         QMessageBox::warning(this,
                              "Load Virtual Channels",
                              "Load a raw FIF file before opening virtual channels.");
@@ -3297,7 +3295,7 @@ void MainWindow::loadVirtualChannels()
                                                           QFileInfo(defaultVirtualChannelFilePath(m_qFileRaw.fileName())).absolutePath(),
                                                           tr("virtual channel files (*-virtchan.json *.json)"));
 
-    if(filename.isEmpty()) {
+    if (filename.isEmpty()) {
         return;
     }
 
@@ -3308,7 +3306,7 @@ void MainWindow::loadVirtualChannels()
 
 void MainWindow::saveVirtualChannels()
 {
-    if(m_pVirtualChannelWindow->getVirtualChannelModel()->rowCount() == 0) {
+    if (m_pVirtualChannelWindow->getVirtualChannelModel()->rowCount() == 0) {
         QMessageBox::warning(this,
                              "Save Virtual Channels",
                              "Create or load at least one virtual channel before saving.");
@@ -3316,7 +3314,7 @@ void MainWindow::saveVirtualChannels()
     }
 
     QString defaultPath = m_qVirtualChannelFile.fileName();
-    if(defaultPath.isEmpty()) {
+    if (defaultPath.isEmpty()) {
         defaultPath = defaultVirtualChannelFilePath(m_qFileRaw.fileName());
     }
 
@@ -3325,16 +3323,16 @@ void MainWindow::saveVirtualChannels()
                                                           defaultPath,
                                                           tr("virtual channel files (*-virtchan.json *.json)"));
 
-    if(filename.isEmpty()) {
+    if (filename.isEmpty()) {
         return;
     }
 
-    if(m_qVirtualChannelFile.isOpen()) {
+    if (m_qVirtualChannelFile.isOpen()) {
         m_qVirtualChannelFile.close();
     }
     m_qVirtualChannelFile.setFileName(filename);
 
-    if(m_pVirtualChannelWindow->getVirtualChannelModel()->saveVirtualChannels(m_qVirtualChannelFile)) {
+    if (m_pVirtualChannelWindow->getVirtualChannelModel()->saveVirtualChannels(m_qVirtualChannelFile)) {
         qInfo() << "Virtual-channel file" << filename << "saved.";
         setWindowStatus();
     } else {
@@ -3347,22 +3345,22 @@ void MainWindow::saveVirtualChannels()
 
 bool MainWindow::loadRawFile(const QString& filename)
 {
-    if(m_qFileRaw.isOpen())
+    if (m_qFileRaw.isOpen())
         m_qFileRaw.close();
 
     m_qFileRaw.setFileName(filename);
     m_covariance.clear();
-    if(m_qCovFile.isOpen())
+    if (m_qCovFile.isOpen())
         m_qCovFile.close();
     m_qCovFile.setFileName(QString());
-    if(m_qInverseOperatorFile.isOpen())
+    if (m_qInverseOperatorFile.isOpen())
         m_qInverseOperatorFile.close();
     m_qInverseOperatorFile.setFileName(QString());
     m_inverseOperator = MNELIB::MNEInverseOperator();
-    if(m_qAnnotationFile.isOpen())
+    if (m_qAnnotationFile.isOpen())
         m_qAnnotationFile.close();
     m_qAnnotationFile.setFileName(QString());
-    if(m_qVirtualChannelFile.isOpen())
+    if (m_qVirtualChannelFile.isOpen())
         m_qVirtualChannelFile.close();
     m_qVirtualChannelFile.setFileName(QString());
     m_pAverageWindow->clearNoiseCovariance();
@@ -3371,7 +3369,7 @@ bool MainWindow::loadRawFile(const QString& filename)
     whiteningSettings.enableButterfly = false;
     whiteningSettings.enableLayout = false;
     setCovarianceWhiteningSettings(whiteningSettings, false);
-    if(m_pWhitenButterflyAction) {
+    if (m_pWhitenButterflyAction) {
         m_pWhitenButterflyAction->setChecked(false);
     }
 
@@ -3388,7 +3386,7 @@ bool MainWindow::loadRawFile(const QString& filename)
 
     // ── ChannelDataView path: demand-paged, opens header only (fast) ──
     const bool ok = m_pDataWindow->loadFiffFile(filename);
-    if(ok)
+    if (ok)
         qInfo() << "Fiff data file" << filename << "loaded (ChannelDataView).";
     else
         qWarning() << "ERROR loading fiff data file" << filename;
@@ -3400,22 +3398,22 @@ bool MainWindow::loadRawFile(const QString& filename)
 
     if (ok) {
         QString detectedEventSource;
-        if(populateEventModelFromRaw(filename, m_pEventWindow->getEventModel(), detectedEventSource)) {
+        if (populateEventModelFromRaw(filename, m_pEventWindow->getEventModel(), detectedEventSource)) {
             statusBar()->showMessage(detectedEventSource, 5000);
         }
     }
 
     if (ok) {
         const QStringList annotationCandidates = defaultAnnotationCandidatePaths(filename);
-        for(const QString& annotationCandidate : annotationCandidates) {
-            if(QFileInfo::exists(annotationCandidate)) {
+        for (const QString& annotationCandidate : annotationCandidates) {
+            if (QFileInfo::exists(annotationCandidate)) {
                 loadAnnotationsFile(annotationCandidate, false);
                 break;
             }
         }
 
         const QString defaultVirtualChannelPath = defaultVirtualChannelFilePath(filename);
-        if(QFileInfo::exists(defaultVirtualChannelPath)) {
+        if (QFileInfo::exists(defaultVirtualChannelPath)) {
             loadVirtualChannelsFile(defaultVirtualChannelPath, false);
         }
     }
@@ -3435,20 +3433,20 @@ bool MainWindow::loadRawFile(const QString& filename)
 
 bool MainWindow::loadEventsFile(const QString& filename)
 {
-    if(m_qEventFile.isOpen())
+    if (m_qEventFile.isOpen())
         m_qEventFile.close();
 
     m_qEventFile.setFileName(filename);
 
     const bool ok = m_pEventWindow->getEventModel()->loadEventData(m_qEventFile);
-    if(ok)
+    if (ok)
         qInfo() << "Fiff event data file" << filename << "loaded.";
     else
         qWarning() << "ERROR loading fiff event data file" << filename;
 
     setWindowStatus();
 
-    if(ok && !m_pEventWindow->isVisible())
+    if (ok && !m_pEventWindow->isVisible())
         m_pEventWindow->show();
 
     return ok;
@@ -3458,14 +3456,14 @@ bool MainWindow::loadEventsFile(const QString& filename)
 
 bool MainWindow::loadAnnotationsFile(const QString& filename, bool showWindow)
 {
-    if(m_qAnnotationFile.isOpen()) {
+    if (m_qAnnotationFile.isOpen()) {
         m_qAnnotationFile.close();
     }
 
     m_qAnnotationFile.setFileName(filename);
 
     const bool ok = m_pAnnotationWindow->getAnnotationModel()->loadAnnotationData(m_qAnnotationFile);
-    if(ok) {
+    if (ok) {
         qInfo() << "Annotation file" << filename << "loaded.";
     } else {
         qWarning() << "ERROR loading annotation file" << filename;
@@ -3473,7 +3471,7 @@ bool MainWindow::loadAnnotationsFile(const QString& filename, bool showWindow)
 
     setWindowStatus();
 
-    if(ok && showWindow && !m_pAnnotationWindow->isVisible()) {
+    if (ok && showWindow && !m_pAnnotationWindow->isVisible()) {
         m_pAnnotationWindow->show();
     }
 
@@ -3484,14 +3482,14 @@ bool MainWindow::loadAnnotationsFile(const QString& filename, bool showWindow)
 
 bool MainWindow::loadVirtualChannelsFile(const QString& filename, bool showWindow)
 {
-    if(m_qVirtualChannelFile.isOpen()) {
+    if (m_qVirtualChannelFile.isOpen()) {
         m_qVirtualChannelFile.close();
     }
 
     m_qVirtualChannelFile.setFileName(filename);
 
     const bool ok = m_pVirtualChannelWindow->getVirtualChannelModel()->loadVirtualChannels(m_qVirtualChannelFile);
-    if(ok) {
+    if (ok) {
         qInfo() << "Virtual-channel file" << filename << "loaded.";
     } else {
         qWarning() << "ERROR loading virtual-channel file" << filename;
@@ -3499,7 +3497,7 @@ bool MainWindow::loadVirtualChannelsFile(const QString& filename, bool showWindo
 
     setWindowStatus();
 
-    if(ok && showWindow && !m_pVirtualChannelWindow->isVisible()) {
+    if (ok && showWindow && !m_pVirtualChannelWindow->isVisible()) {
         m_pVirtualChannelWindow->show();
     }
 
@@ -3513,16 +3511,14 @@ bool MainWindow::loadInverseOperatorFile(const QString& filename)
     QFile inverseOperatorFile(filename);
     MNELIB::MNEInverseOperator inverseOperator;
 
-    if(!MNELIB::MNEInverseOperator::read_inverse_operator(inverseOperatorFile, inverseOperator)
-       || inverseOperator.nsource <= 0
-       || inverseOperator.src.isEmpty()) {
+    if (!MNELIB::MNEInverseOperator::read_inverse_operator(inverseOperatorFile, inverseOperator) || inverseOperator.nsource <= 0 || inverseOperator.src.isEmpty()) {
         QMessageBox::warning(this,
                              QStringLiteral("Load Inverse Operator"),
                              QStringLiteral("Could not load an inverse operator from %1.").arg(filename));
         return false;
     }
 
-    if(m_qInverseOperatorFile.isOpen()) {
+    if (m_qInverseOperatorFile.isOpen()) {
         m_qInverseOperatorFile.close();
     }
 
@@ -3543,15 +3539,15 @@ void MainWindow::loadInverseOperator()
     const QString defaultDirectory = !m_qInverseOperatorFile.fileName().isEmpty()
         ? QFileInfo(m_qInverseOperatorFile.fileName()).absolutePath()
         : !m_qFileRaw.fileName().isEmpty()
-            ? QFileInfo(m_qFileRaw.fileName()).absolutePath()
-            : QString(QCoreApplication::applicationDirPath() + "/MNE-sample-data/MEG/sample/");
+        ? QFileInfo(m_qFileRaw.fileName()).absolutePath()
+        : QString(QCoreApplication::applicationDirPath() + "/MNE-sample-data/MEG/sample/");
 
     const QString filename = QFileDialog::getOpenFileName(this,
                                                           QStringLiteral("Open inverse-operator file"),
                                                           defaultDirectory,
                                                           tr("fif inverse-operator files (*-inv.fif);;fif data files (*.fif)"));
 
-    if(filename.isEmpty()) {
+    if (filename.isEmpty()) {
         return;
     }
 
@@ -3562,16 +3558,17 @@ void MainWindow::loadInverseOperator()
 
 void MainWindow::handleAnnotationRangeSelected(int startSample, int endSample)
 {
-    if(startSample > endSample) {
+    if (startSample > endSample) {
         std::swap(startSample, endSample);
     }
 
-    if(startSample == endSample) {
+    if (startSample == endSample) {
         return;
     }
 
     const QString defaultLabel = m_qSettings.value("MainWindow/Annotations/defaultLabel",
-                                                   QStringLiteral("BAD_SEGMENT")).toString();
+                                                   QStringLiteral("BAD_SEGMENT"))
+                                     .toString();
 
     // Preset labels — common annotation types
     const QStringList presets = {
@@ -3581,42 +3578,41 @@ void MainWindow::handleAnnotationRangeSelected(int startSample, int endSample)
         QStringLiteral("BAD_blink"),
         QStringLiteral("BAD_muscle"),
         QStringLiteral("BAD_jump"),
-        QStringLiteral("EDGE_artifact")
-    };
+        QStringLiteral("EDGE_artifact")};
 
     // Build a dialog with an editable combo box
     QDialog dlg(this);
     dlg.setWindowTitle(QStringLiteral("Add Annotation"));
-    auto *layout = new QVBoxLayout(&dlg);
+    auto* layout = new QVBoxLayout(&dlg);
     layout->addWidget(new QLabel(QStringLiteral("Annotation description:")));
-    auto *combo = new QComboBox;
+    auto* combo = new QComboBox;
     combo->setEditable(true);
     combo->addItems(presets);
     // Set the last-used label as current text (even if it's custom)
     combo->setCurrentText(defaultLabel);
     layout->addWidget(combo);
-    auto *buttons = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel);
+    auto* buttons = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel);
     connect(buttons, &QDialogButtonBox::accepted, &dlg, &QDialog::accept);
     connect(buttons, &QDialogButtonBox::rejected, &dlg, &QDialog::reject);
     layout->addWidget(buttons);
 
-    if(dlg.exec() != QDialog::Accepted) {
+    if (dlg.exec() != QDialog::Accepted) {
         return;
     }
 
     QString label = combo->currentText().trimmed();
-    if(label.isEmpty()) {
+    if (label.isEmpty()) {
         label = defaultLabel;
     }
 
     m_qSettings.setValue("MainWindow/Annotations/defaultLabel", label);
 
     m_pAnnotationWindow->addAnnotation(startSample, endSample, label);
-    if(!m_pAnnotationWindow->isVisible()) {
+    if (!m_pAnnotationWindow->isVisible()) {
         showWindow(m_pAnnotationWindow);
     }
 
-    if(m_qAnnotationFile.fileName().isEmpty()) {
+    if (m_qAnnotationFile.fileName().isEmpty()) {
         setWindowStatus();
     }
 }
@@ -3629,9 +3625,9 @@ void MainWindow::clearEpochReviewSession()
     m_epochReviewEventCodes.clear();
     m_epochReviewComments.clear();
     m_pEpochReviewInfo.clear();
-    m_epochReviewBaseline = QPair<float,float>(0.0f, 0.0f);
+    m_epochReviewBaseline = QPair<float, float>(0.0f, 0.0f);
 
-    if(m_pEpochWindow) {
+    if (m_pEpochWindow) {
         m_pEpochWindow->setRespectAutoRejects(true);
         m_pEpochWindow->getEpochModel()->clearModel();
     }
@@ -3641,7 +3637,7 @@ void MainWindow::clearEpochReviewSession()
 
 bool MainWindow::refreshReviewedEvokedSet(const QString& statusMessage)
 {
-    if(!m_pEpochReviewInfo || m_epochReviewLists.isEmpty()) {
+    if (!m_pEpochReviewInfo || m_epochReviewLists.isEmpty()) {
         return false;
     }
 
@@ -3651,19 +3647,19 @@ bool MainWindow::refreshReviewedEvokedSet(const QString& statusMessage)
     const bool respectAutoRejects =
         m_pEpochWindow && m_pEpochWindow->getEpochModel()->respectAutoRejects();
 
-    for(int index = 0; index < m_epochReviewLists.size(); ++index) {
+    for (int index = 0; index < m_epochReviewLists.size(); ++index) {
         const MNELIB::MNEEpochDataList& epochList = m_epochReviewLists.at(index);
-        if(epochList.isEmpty()) {
+        if (epochList.isEmpty()) {
             continue;
         }
 
         const Eigen::VectorXi selection = reviewedEpochSelection(epochList, respectAutoRejects);
-        if(selection.size() == 0) {
+        if (selection.size() == 0) {
             continue;
         }
 
         const auto& firstEpoch = epochList.first();
-        if(!firstEpoch) {
+        if (!firstEpoch) {
             continue;
         }
 
@@ -3681,7 +3677,7 @@ bool MainWindow::refreshReviewedEvokedSet(const QString& statusMessage)
         evokedSet.evoked.append(evoked);
     }
 
-    if(m_qEvokedFile.isOpen()) {
+    if (m_qEvokedFile.isOpen()) {
         m_qEvokedFile.close();
     }
     m_qEvokedFile.setFileName(QString());
@@ -3690,15 +3686,15 @@ bool MainWindow::refreshReviewedEvokedSet(const QString& statusMessage)
     m_pAverageWindow->setRecomputeAvailable(true);
     setWindowStatus();
 
-    if(!statusMessage.isEmpty()) {
+    if (!statusMessage.isEmpty()) {
         const QString message = evokedSet.evoked.isEmpty()
             ? QStringLiteral("All reviewed epochs are currently excluded.")
             : statusMessage;
         statusBar()->showMessage(message, 4000);
     }
 
-    if(!evokedSet.evoked.isEmpty()) {
-        if(!m_pAverageWindow->isVisible()) {
+    if (!evokedSet.evoked.isEmpty()) {
+        if (!m_pAverageWindow->isVisible()) {
             m_pAverageWindow->show();
         }
         m_pAverageWindow->raise();
@@ -3739,10 +3735,10 @@ bool MainWindow::runEvokedComputation(bool promptForSettings)
     MatrixXi events = m_pEventWindow->getEventModel()->getEventMatrix();
     QString eventSourceDescription;
 
-    if(events.rows() > 0) {
+    if (events.rows() > 0) {
         eventSourceDescription = QString("Using %1 event(s) from the event manager.")
                                      .arg(events.rows());
-    } else if(!detectFallbackStimEvents(raw, events, eventSourceDescription)) {
+    } else if (!detectFallbackStimEvents(raw, events, eventSourceDescription)) {
         QMessageBox::warning(this,
                              title,
                              "No events were loaded, and no trigger events could be detected from STI 014 or STI 101.");
@@ -3750,7 +3746,7 @@ bool MainWindow::runEvokedComputation(bool promptForSettings)
     }
 
     const QMap<int, int> eventCounts = countEventsByType(events);
-    if(eventCounts.isEmpty()) {
+    if (eventCounts.isEmpty()) {
         QMessageBox::warning(this,
                              title,
                              "No non-zero event codes were found for averaging.");
@@ -3765,23 +3761,23 @@ bool MainWindow::runEvokedComputation(bool promptForSettings)
     float baselineTo = 0.0f;
     bool dropRejected = true;
 
-    if(promptForSettings) {
-        if(!showComputeEvokedDialog(this,
-                                    m_qSettings,
-                                    eventCounts,
-                                    eventSourceDescription,
-                                    selectedEventCodes,
-                                    tmin,
-                                    tmax,
-                                    applyBaseline,
-                                    baselineFrom,
-                                    baselineTo,
-                                    dropRejected)) {
+    if (promptForSettings) {
+        if (!showComputeEvokedDialog(this,
+                                     m_qSettings,
+                                     eventCounts,
+                                     eventSourceDescription,
+                                     selectedEventCodes,
+                                     tmin,
+                                     tmax,
+                                     applyBaseline,
+                                     baselineFrom,
+                                     baselineTo,
+                                     dropRejected)) {
             return false;
         }
     } else {
         selectedEventCodes = evokedEventCodesFromSettings(m_qSettings);
-        if(selectedEventCodes.isEmpty()) {
+        if (selectedEventCodes.isEmpty()) {
             statusBar()->showMessage(QStringLiteral("No saved evoked setup found. Opening the full evoked dialog instead."),
                                      4000);
             return runEvokedComputation(true);
@@ -3793,18 +3789,20 @@ bool MainWindow::runEvokedComputation(bool promptForSettings)
         tmax = static_cast<float>(postStimMs) / 1000.0f;
         applyBaseline = m_qSettings.value("MainWindow/Averaging/applyBaseline", true).toBool();
         baselineFrom = static_cast<float>(m_qSettings.value("MainWindow/Averaging/baselineFromMs",
-                                                            -preStimMs).toInt()) / 1000.0f;
+                                                            -preStimMs)
+                                              .toInt()) /
+            1000.0f;
         baselineTo = static_cast<float>(m_qSettings.value("MainWindow/Averaging/baselineToMs", 0).toInt()) / 1000.0f;
         dropRejected = m_qSettings.value("MainWindow/Averaging/dropRejected", true).toBool();
 
         QList<int> filteredEventCodes;
-        for(int eventCode : selectedEventCodes) {
-            if(eventCounts.contains(eventCode)) {
+        for (int eventCode : selectedEventCodes) {
+            if (eventCounts.contains(eventCode)) {
                 filteredEventCodes.append(eventCode);
             }
         }
 
-        if(filteredEventCodes.isEmpty()) {
+        if (filteredEventCodes.isEmpty()) {
             QMessageBox::information(this,
                                      title,
                                      "The last evoked setup references event codes that are not available for the current data. Choose a new setup.");
@@ -3814,8 +3812,8 @@ bool MainWindow::runEvokedComputation(bool promptForSettings)
         selectedEventCodes = filteredEventCodes;
     }
 
-    QMap<QString,double> rejectMap;
-    if(dropRejected) {
+    QMap<QString, double> rejectMap;
+    if (dropRejected) {
         rejectMap.insert("grad", 2000e-13);
         rejectMap.insert("mag", 3e-12);
         rejectMap.insert("eeg", 100e-6);
@@ -3834,28 +3832,28 @@ bool MainWindow::runEvokedComputation(bool promptForSettings)
     QStringList epochComments;
     const QSharedPointer<SessionFilter> activeFilter = m_pDataWindow->activeSessionFilter();
     const bool useSessionFilter = activeFilter && activeFilter->isValid();
-    const QMap<QString,double> epochRejectMap = useSessionFilter ? QMap<QString,double>() : rejectMap;
+    const QMap<QString, double> epochRejectMap = useSessionFilter ? QMap<QString, double>() : rejectMap;
 
-    for(int eventCode : selectedEventCodes) {
+    for (int eventCode : selectedEventCodes) {
         MNELIB::MNEEpochDataList epochList = MNELIB::MNEEpochDataList::readEpochs(raw,
-                                                                                   events,
-                                                                                   tmin,
-                                                                                   tmax,
-                                                                                   eventCode,
-                                                                                   epochRejectMap);
+                                                                                  events,
+                                                                                  tmin,
+                                                                                  tmax,
+                                                                                  eventCode,
+                                                                                  epochRejectMap);
 
-        if(epochList.isEmpty()) {
+        if (epochList.isEmpty()) {
             continue;
         }
 
-        if(useSessionFilter) {
+        if (useSessionFilter) {
             applySessionFilterToEpochList(epochList,
                                           *activeFilter,
                                           raw.info,
                                           rejectMap);
         }
 
-        if(applyBaseline) {
+        if (applyBaseline) {
             epochList.applyBaselineCorrection(baseline);
         }
 
@@ -3866,7 +3864,7 @@ bool MainWindow::runEvokedComputation(bool promptForSettings)
 
     QApplication::restoreOverrideCursor();
 
-    if(epochLists.isEmpty()) {
+    if (epochLists.isEmpty()) {
         QMessageBox::warning(this,
                              title,
                              "No evoked responses could be computed. The selected events may have been rejected or out of bounds.");
@@ -3878,7 +3876,7 @@ bool MainWindow::runEvokedComputation(bool promptForSettings)
     m_epochReviewEventCodes = epochEventCodes;
     m_epochReviewComments = epochComments;
     m_pEpochReviewInfo = FIFFLIB::FiffInfo::SPtr(new FIFFLIB::FiffInfo(raw.info));
-    m_epochReviewBaseline = applyBaseline ? baseline : QPair<float,float>(0.0f, 0.0f);
+    m_epochReviewBaseline = applyBaseline ? baseline : QPair<float, float>(0.0f, 0.0f);
     {
         QSignalBlocker blocker(m_pEpochWindow->getEpochModel());
         m_pEpochWindow->setRespectAutoRejects(dropRejected);
@@ -3899,15 +3897,15 @@ bool MainWindow::runEvokedComputation(bool promptForSettings)
         m_pDataWindow->getChannelDataView()->setEpochMarkers(triggers);
     }
 
-    if(!m_pEpochWindow->isVisible()) {
+    if (!m_pEpochWindow->isVisible()) {
         m_pEpochWindow->show();
     }
     m_pEpochWindow->raise();
 
     const bool refreshed = refreshReviewedEvokedSet(promptForSettings
-                                                    ? QStringLiteral("Evoked responses computed.")
-                                                    : QStringLiteral("Evoked responses recomputed from the last saved setup."));
-    if(!refreshed) {
+                                                        ? QStringLiteral("Evoked responses computed.")
+                                                        : QStringLiteral("Evoked responses recomputed from the last saved setup."));
+    if (!refreshed) {
         QMessageBox::warning(this,
                              title,
                              "All reviewed epochs are currently excluded.");
@@ -3922,7 +3920,7 @@ bool MainWindow::runEvokedComputation(bool promptForSettings)
 
 void MainWindow::saveEvoked()
 {
-    if(!m_pAverageWindow->getAverageModel()->isFileLoaded()) {
+    if (!m_pAverageWindow->getAverageModel()->isFileLoaded()) {
         QMessageBox::warning(this,
                              "Save Evoked",
                              "There is no evoked data to save.");
@@ -3938,16 +3936,16 @@ void MainWindow::saveEvoked()
                                                           defaultPath,
                                                           tr("fif evoked data files (*-ave.fif);;fif data files (*.fif)"));
 
-    if(filename.isEmpty()) {
+    if (filename.isEmpty()) {
         return;
     }
 
-    if(m_qEvokedFile.isOpen()) {
+    if (m_qEvokedFile.isOpen()) {
         m_qEvokedFile.close();
     }
     m_qEvokedFile.setFileName(filename);
 
-    if(m_pAverageWindow->getAverageModel()->saveEvokedData(m_qEvokedFile)) {
+    if (m_pAverageWindow->getAverageModel()->saveEvokedData(m_qEvokedFile)) {
         qInfo() << "Fiff evoked data file" << filename << "saved.";
         setWindowStatus();
     } else {
@@ -3964,41 +3962,41 @@ void MainWindow::saveEvoked()
 void MainWindow::computeSourceEstimate()
 {
     AverageModel* averageModel = m_pAverageWindow->getAverageModel();
-    if(!averageModel || !averageModel->isFileLoaded()) {
+    if (!averageModel || !averageModel->isFileLoaded()) {
         QMessageBox::warning(this,
                              QStringLiteral("Compute Source Estimate"),
                              QStringLiteral("Load or compute an evoked response before exporting source estimates."));
         return;
     }
 
-    if(m_inverseOperator.nsource <= 0 || m_inverseOperator.src.isEmpty()) {
+    if (m_inverseOperator.nsource <= 0 || m_inverseOperator.src.isEmpty()) {
         const QMessageBox::StandardButton answer =
             QMessageBox::question(this,
                                   QStringLiteral("Compute Source Estimate"),
                                   QStringLiteral("No inverse operator is loaded yet. Do you want to load one now?"),
                                   QMessageBox::Yes | QMessageBox::No,
                                   QMessageBox::Yes);
-        if(answer != QMessageBox::Yes) {
+        if (answer != QMessageBox::Yes) {
             return;
         }
 
         loadInverseOperator();
-        if(m_inverseOperator.nsource <= 0 || m_inverseOperator.src.isEmpty()) {
+        if (m_inverseOperator.nsource <= 0 || m_inverseOperator.src.isEmpty()) {
             return;
         }
     }
 
     QList<int> selectedRows = m_pAverageWindow->selectedSetRows();
-    if(selectedRows.isEmpty()) {
-        for(int row = 0; row < averageModel->rowCount(); ++row) {
+    if (selectedRows.isEmpty()) {
+        for (int row = 0; row < averageModel->rowCount(); ++row) {
             selectedRows.append(row);
         }
     }
 
     QStringList selectedComments;
-    for(int row : selectedRows) {
+    for (int row : selectedRows) {
         const FIFFLIB::FiffEvoked* evoked = averageModel->getEvoked(row);
-        if(!evoked) {
+        if (!evoked) {
             continue;
         }
 
@@ -4008,7 +4006,7 @@ void MainWindow::computeSourceEstimate()
         selectedComments.append(comment);
     }
 
-    if(selectedComments.isEmpty()) {
+    if (selectedComments.isEmpty()) {
         QMessageBox::warning(this,
                              QStringLiteral("Compute Source Estimate"),
                              QStringLiteral("Select at least one valid evoked set."));
@@ -4016,7 +4014,8 @@ void MainWindow::computeSourceEstimate()
     }
 
     QString method = m_qSettings.value("MainWindow/SourceEstimate/method",
-                                       QStringLiteral("dSPM")).toString();
+                                       QStringLiteral("dSPM"))
+                         .toString();
     double snr = m_qSettings.value("MainWindow/SourceEstimate/snr", 3.0).toDouble();
     bool pickNormal = m_qSettings.value("MainWindow/SourceEstimate/pickNormal", false).toBool();
     QString outputDirectory = defaultSourceEstimateDirectory(m_qSettings,
@@ -4025,25 +4024,25 @@ void MainWindow::computeSourceEstimate()
                                                              m_qInverseOperatorFile.fileName());
 
     const QString inverseDescription = QStringLiteral("Inverse operator: %1 (%2 sources, %3 channels).")
-        .arg(m_qInverseOperatorFile.fileName().isEmpty()
-                 ? QStringLiteral("loaded in memory")
-                 : QFileInfo(m_qInverseOperatorFile.fileName()).fileName())
-        .arg(m_inverseOperator.nsource)
-        .arg(m_inverseOperator.nchan);
+                                           .arg(m_qInverseOperatorFile.fileName().isEmpty()
+                                                    ? QStringLiteral("loaded in memory")
+                                                    : QFileInfo(m_qInverseOperatorFile.fileName()).fileName())
+                                           .arg(m_inverseOperator.nsource)
+                                           .arg(m_inverseOperator.nchan);
 
-    if(!showComputeSourceEstimateDialog(this,
-                                        m_qSettings,
-                                        inverseDescription,
-                                        selectedComments,
-                                        method,
-                                        snr,
-                                        pickNormal,
-                                        outputDirectory)) {
+    if (!showComputeSourceEstimateDialog(this,
+                                         m_qSettings,
+                                         inverseDescription,
+                                         selectedComments,
+                                         method,
+                                         snr,
+                                         pickNormal,
+                                         outputDirectory)) {
         return;
     }
 
     QDir outputDir(outputDirectory);
-    if(!outputDir.exists() && !QDir().mkpath(outputDirectory)) {
+    if (!outputDir.exists() && !QDir().mkpath(outputDirectory)) {
         QMessageBox::warning(this,
                              QStringLiteral("Compute Source Estimate"),
                              QStringLiteral("Could not create the output directory %1.").arg(outputDirectory));
@@ -4062,9 +4061,9 @@ void MainWindow::computeSourceEstimate()
     QApplication::setOverrideCursor(Qt::BusyCursor);
     qApp->processEvents();
 
-    for(int row : selectedRows) {
+    for (int row : selectedRows) {
         const FIFFLIB::FiffEvoked* evoked = averageModel->getEvoked(row);
-        if(!evoked) {
+        if (!evoked) {
             continue;
         }
 
@@ -4075,7 +4074,7 @@ void MainWindow::computeSourceEstimate()
         INVLIB::InvMinimumNorm minimumNorm(m_inverseOperator, lambda2, method);
         INVLIB::InvSourceEstimate sourceEstimate = minimumNorm.calculateInverse(*evoked, pickNormal);
 
-        if(sourceEstimate.isEmpty()) {
+        if (sourceEstimate.isEmpty()) {
             failedSets.append(comment);
             continue;
         }
@@ -4093,17 +4092,17 @@ void MainWindow::computeSourceEstimate()
 
         INVLIB::InvSourceEstimate leftHemisphere;
         INVLIB::InvSourceEstimate rightHemisphere;
-        if(splitSourceEstimateByHemisphere(sourceEstimate,
-                                           m_inverseOperator,
-                                           leftHemisphere,
-                                           rightHemisphere)) {
+        if (splitSourceEstimateByHemisphere(sourceEstimate,
+                                            m_inverseOperator,
+                                            leftHemisphere,
+                                            rightHemisphere)) {
             const QString leftPath = outputDir.filePath(stem + QStringLiteral("-lh.stc"));
             const QString rightPath = outputDir.filePath(stem + QStringLiteral("-rh.stc"));
 
             QFile leftFile(leftPath);
             QFile rightFile(rightPath);
 
-            if(!leftHemisphere.write(leftFile) || !rightHemisphere.write(rightFile)) {
+            if (!leftHemisphere.write(leftFile) || !rightHemisphere.write(rightFile)) {
                 failedSets.append(comment);
                 continue;
             }
@@ -4112,7 +4111,7 @@ void MainWindow::computeSourceEstimate()
         } else {
             const QString outputPath = outputDir.filePath(stem + QStringLiteral(".stc"));
             QFile outputFile(outputPath);
-            if(!sourceEstimate.write(outputFile)) {
+            if (!sourceEstimate.write(outputFile)) {
                 failedSets.append(comment);
                 continue;
             }
@@ -4123,7 +4122,7 @@ void MainWindow::computeSourceEstimate()
 
     QApplication::restoreOverrideCursor();
 
-    if(writtenFiles.isEmpty()) {
+    if (writtenFiles.isEmpty()) {
         QMessageBox::warning(this,
                              QStringLiteral("Compute Source Estimate"),
                              QStringLiteral("No source estimates could be exported. Check that the selected evoked sets match the inverse operator channels."));
@@ -4132,22 +4131,22 @@ void MainWindow::computeSourceEstimate()
 
     QStringList previewFiles;
     const int previewCount = std::min(4, static_cast<int>(writtenFiles.size()));
-    for(int index = 0; index < previewCount; ++index) {
+    for (int index = 0; index < previewCount; ++index) {
         previewFiles.append(QFileInfo(writtenFiles.at(index)).fileName());
     }
 
     QString resultText = QStringLiteral("Exported %1 source-estimate file(s) to %2.")
-        .arg(writtenFiles.size())
-        .arg(outputDirectory);
+                             .arg(writtenFiles.size())
+                             .arg(outputDirectory);
 
-    if(!previewFiles.isEmpty()) {
+    if (!previewFiles.isEmpty()) {
         resultText += QStringLiteral("\n\n%1").arg(previewFiles.join(QStringLiteral("\n")));
-        if(writtenFiles.size() > previewFiles.size()) {
+        if (writtenFiles.size() > previewFiles.size()) {
             resultText += QStringLiteral("\n...");
         }
     }
 
-    if(!failedSets.isEmpty()) {
+    if (!failedSets.isEmpty()) {
         resultText += QStringLiteral("\n\nFailed for: %1").arg(failedSets.join(QStringLiteral(", ")));
     }
 
@@ -4171,10 +4170,10 @@ void MainWindow::computeCovariance()
     MatrixXi events = m_pEventWindow->getEventModel()->getEventMatrix();
     QString eventSourceDescription;
 
-    if(events.rows() > 0) {
+    if (events.rows() > 0) {
         eventSourceDescription = QString("Using %1 event(s) from the event manager.")
                                      .arg(events.rows());
-    } else if(!detectFallbackStimEvents(raw, events, eventSourceDescription)) {
+    } else if (!detectFallbackStimEvents(raw, events, eventSourceDescription)) {
         QMessageBox::warning(this,
                              "Compute Covariance",
                              "No events were loaded, and no trigger events could be detected from STI 014 or STI 101.");
@@ -4182,7 +4181,7 @@ void MainWindow::computeCovariance()
     }
 
     const QMap<int, int> eventCounts = countEventsByType(events);
-    if(eventCounts.isEmpty()) {
+    if (eventCounts.isEmpty()) {
         QMessageBox::warning(this,
                              "Compute Covariance",
                              "No non-zero event codes were found for covariance computation.");
@@ -4197,17 +4196,17 @@ void MainWindow::computeCovariance()
     float baselineTo = 0.0f;
     bool removeMean = true;
 
-    if(!showComputeCovarianceDialog(this,
-                                    m_qSettings,
-                                    eventCounts,
-                                    eventSourceDescription,
-                                    selectedEventCodes,
-                                    tmin,
-                                    tmax,
-                                    applyBaseline,
-                                    baselineFrom,
-                                    baselineTo,
-                                    removeMean)) {
+    if (!showComputeCovarianceDialog(this,
+                                     m_qSettings,
+                                     eventCounts,
+                                     eventSourceDescription,
+                                     selectedEventCodes,
+                                     tmin,
+                                     tmax,
+                                     applyBaseline,
+                                     baselineFrom,
+                                     baselineTo,
+                                     removeMean)) {
         return;
     }
 
@@ -4217,16 +4216,16 @@ void MainWindow::computeCovariance()
     const QSharedPointer<SessionFilter> activeFilter = m_pDataWindow->activeSessionFilter();
     const bool useSessionFilter = activeFilter && activeFilter->isValid();
     FIFFLIB::FiffCov covariance;
-    if(useSessionFilter) {
+    if (useSessionFilter) {
         QList<MNELIB::MNEEpochDataList> epochLists;
-        for(int eventCode : selectedEventCodes) {
+        for (int eventCode : selectedEventCodes) {
             MNELIB::MNEEpochDataList epochList = MNELIB::MNEEpochDataList::readEpochs(raw,
-                                                                                       events,
-                                                                                       tmin,
-                                                                                       tmax,
-                                                                                       eventCode,
-                                                                                       {});
-            if(epochList.isEmpty()) {
+                                                                                      events,
+                                                                                      tmin,
+                                                                                      tmax,
+                                                                                      eventCode,
+                                                                                      {});
+            if (epochList.isEmpty()) {
                 continue;
             }
 
@@ -4235,7 +4234,7 @@ void MainWindow::computeCovariance()
                                           raw.info,
                                           {});
 
-            if(applyBaseline) {
+            if (applyBaseline) {
                 epochList.applyBaselineCorrection(QPair<float, float>(baselineFrom, baselineTo));
             }
 
@@ -4259,7 +4258,7 @@ void MainWindow::computeCovariance()
 
     QApplication::restoreOverrideCursor();
 
-    if(covariance.isEmpty()) {
+    if (covariance.isEmpty()) {
         QMessageBox::warning(this,
                              "Compute Covariance",
                              "No covariance matrix could be computed. Check the selected events and time window.");
@@ -4267,7 +4266,7 @@ void MainWindow::computeCovariance()
     }
 
     m_covariance = covariance;
-    if(m_qCovFile.isOpen()) {
+    if (m_qCovFile.isOpen()) {
         m_qCovFile.close();
     }
     m_qCovFile.setFileName(QString());
@@ -4277,7 +4276,7 @@ void MainWindow::computeCovariance()
                                        FIFFLIB::FiffInfo::SPtr(new FIFFLIB::FiffInfo(raw.info)));
 
     // Update raw-trace whitener
-    if(m_pDataWindow) {
+    if (m_pDataWindow) {
         m_pDataWindow->updateRawWhitener(m_covariance, covarianceWhiteningSettings());
     }
 
@@ -4289,7 +4288,7 @@ void MainWindow::computeCovariance()
                                  .arg(m_covariance.dim)
                                  .arg(m_covariance.nfree));
 
-    if(!m_pCovarianceWindow->isVisible()) {
+    if (!m_pCovarianceWindow->isVisible()) {
         m_pCovarianceWindow->show();
     }
     m_pCovarianceWindow->raise();
@@ -4311,7 +4310,7 @@ void MainWindow::computeIca()
     Eigen::RowVectorXi sel;
     raw.read_raw_segment(matData, times, mult, raw.first_samp, raw.last_samp, sel);
 
-    if(matData.rows() == 0 || matData.cols() == 0) {
+    if (matData.rows() == 0 || matData.cols() == 0) {
         statusBar()->showMessage(tr("No data could be read from the raw file for ICA."), 5000);
         return;
     }
@@ -4319,7 +4318,7 @@ void MainWindow::computeIca()
     QSharedPointer<FIFFLIB::FiffInfo> pInfo(new FIFFLIB::FiffInfo(raw.info));
     m_pIcaWindow->setRawData(matData, pInfo, raw.first_samp);
 
-    if(!m_pIcaWindow->isVisible()) {
+    if (!m_pIcaWindow->isVisible()) {
         m_pIcaWindow->show();
     }
     m_pIcaWindow->raise();
@@ -4335,21 +4334,21 @@ void MainWindow::loadCovariance()
                                                           QString(QCoreApplication::applicationDirPath() + "/MNE-sample-data/MEG/sample/"),
                                                           tr("fif covariance data files (*-cov.fif);;fif data files (*.fif)"));
 
-    if(filename.isEmpty()) {
+    if (filename.isEmpty()) {
         return;
     }
 
     QFile covarianceFile(filename);
     FIFFLIB::FiffCov covariance(covarianceFile);
 
-    if(covariance.isEmpty()) {
+    if (covariance.isEmpty()) {
         QMessageBox::warning(this,
                              "Load Covariance",
                              QString("Could not load covariance data from %1.").arg(filename));
         return;
     }
 
-    if(m_qCovFile.isOpen()) {
+    if (m_qCovFile.isOpen()) {
         m_qCovFile.close();
     }
 
@@ -4361,13 +4360,13 @@ void MainWindow::loadCovariance()
                                        m_pDataWindow->fiffInfo());
 
     // Update raw-trace whitener
-    if(m_pDataWindow) {
+    if (m_pDataWindow) {
         m_pDataWindow->updateRawWhitener(m_covariance, covarianceWhiteningSettings());
     }
 
     setWindowStatus();
 
-    if(!m_pCovarianceWindow->isVisible()) {
+    if (!m_pCovarianceWindow->isVisible()) {
         m_pCovarianceWindow->show();
     }
     m_pCovarianceWindow->raise();
@@ -4378,7 +4377,7 @@ void MainWindow::loadCovariance()
 
 void MainWindow::saveCovariance()
 {
-    if(m_covariance.isEmpty()) {
+    if (m_covariance.isEmpty()) {
         QMessageBox::warning(this,
                              "Save Covariance",
                              "There is no covariance matrix to save.");
@@ -4394,16 +4393,16 @@ void MainWindow::saveCovariance()
                                                           defaultPath,
                                                           tr("fif covariance data files (*-cov.fif);;fif data files (*.fif)"));
 
-    if(filename.isEmpty()) {
+    if (filename.isEmpty()) {
         return;
     }
 
-    if(m_qCovFile.isOpen()) {
+    if (m_qCovFile.isOpen()) {
         m_qCovFile.close();
     }
     m_qCovFile.setFileName(filename);
 
-    if(m_covariance.save(filename)) {
+    if (m_covariance.save(filename)) {
         qInfo() << "Fiff covariance data file" << filename << "saved.";
         setWindowStatus();
     } else {
@@ -4422,8 +4421,8 @@ void MainWindow::applyCommandLineOptions(const QString& rawFile,
                                          double highpass,
                                          double lowpass)
 {
-    if(!rawFile.isEmpty()) {
-        if(!QFile::exists(rawFile)) {
+    if (!rawFile.isEmpty()) {
+        if (!QFile::exists(rawFile)) {
             qWarning() << "[mne_browse] --raw: file not found:" << rawFile;
         } else {
             m_mnxProject = MNALIB::MnaProject();
@@ -4431,18 +4430,18 @@ void MainWindow::applyCommandLineOptions(const QString& rawFile,
         }
     }
 
-    if(!eventsFile.isEmpty()) {
-        if(!QFile::exists(eventsFile)) {
+    if (!eventsFile.isEmpty()) {
+        if (!QFile::exists(eventsFile)) {
             qWarning() << "[mne_browse] --events: file not found:" << eventsFile;
         } else {
             loadEventsFile(eventsFile);
         }
     }
 
-    if(highpass >= 0.0 || lowpass >= 0.0) {
+    if (highpass >= 0.0 || lowpass >= 0.0) {
         m_pFilterWindow->setFrequencies(highpass, lowpass);
         m_pFilterWindow->applyFilter();
-        if(!m_pFilterWindow->isVisible())
+        if (!m_pFilterWindow->isVisible())
             m_pFilterWindow->show();
     }
 }
@@ -4452,19 +4451,19 @@ void MainWindow::applyCommandLineOptions(const QString& rawFile,
 
 void MainWindow::loadEvoked()
 {
-    QString filename = QFileDialog::getOpenFileName(this,QString("Open evoked fiff data file"),QString(QCoreApplication::applicationDirPath() + "/MNE-sample-data/MEG/sample/"),tr("fif evoked data files (*-ave.fif);;fif data files (*.fif)"));
+    QString filename = QFileDialog::getOpenFileName(this, QString("Open evoked fiff data file"), QString(QCoreApplication::applicationDirPath() + "/MNE-sample-data/MEG/sample/"), tr("fif evoked data files (*-ave.fif);;fif data files (*.fif)"));
 
-    if(filename.isEmpty())
+    if (filename.isEmpty())
         return;
 
     clearEpochReviewSession();
 
-    if(m_qEvokedFile.isOpen())
+    if (m_qEvokedFile.isOpen())
         m_qEvokedFile.close();
 
     m_qEvokedFile.setFileName(filename);
 
-    if(m_pAverageWindow->getAverageModel()->loadEvokedData(m_qEvokedFile))
+    if (m_pAverageWindow->getAverageModel()->loadEvokedData(m_qEvokedFile))
         qInfo() << "Fiff evoked data file" << filename << "loaded.";
     else
         qWarning() << "ERROR loading evoked data file" << filename;
@@ -4479,22 +4478,20 @@ void MainWindow::loadEvoked()
 
 //*************************************************************************************************************
 
-void MainWindow::showWindow(QWidget *window)
+void MainWindow::showWindow(QWidget* window)
 {
     //Note: A widget that happens to be obscured by other windows on the screen is considered to be visible.
-    if(!window->isVisible())
-    {
+    if (!window->isVisible()) {
         window->show();
         window->raise();
-    }
-    else // if visible raise the widget to be sure that it is not obscured by other windows
+    } else // if visible raise the widget to be sure that it is not obscured by other windows
         window->hide();
 }
 
 
 //*************************************************************************************************************
 
-void MainWindow::closeEvent(QCloseEvent *event)
+void MainWindow::closeEvent(QCloseEvent* event)
 {
     // Save window geometry
     m_qSettings.setValue("MainWindow/size", size());
@@ -4542,13 +4539,13 @@ void MainWindow::closeEvent(QCloseEvent *event)
 
 //*************************************************************************************************************
 
-void MainWindow::dragEnterEvent(QDragEnterEvent *event)
+void MainWindow::dragEnterEvent(QDragEnterEvent* event)
 {
-    if(event->mimeData()->hasUrls()) {
-        for(const QUrl& url : event->mimeData()->urls()) {
+    if (event->mimeData()->hasUrls()) {
+        for (const QUrl& url : event->mimeData()->urls()) {
             const QString path = url.toLocalFile();
-            if(path.endsWith(".fif", Qt::CaseInsensitive) ||
-               path.endsWith(".fiff", Qt::CaseInsensitive)) {
+            if (path.endsWith(".fif", Qt::CaseInsensitive) ||
+                path.endsWith(".fiff", Qt::CaseInsensitive)) {
                 event->acceptProposedAction();
                 return;
             }
@@ -4559,15 +4556,15 @@ void MainWindow::dragEnterEvent(QDragEnterEvent *event)
 
 //*************************************************************************************************************
 
-void MainWindow::dropEvent(QDropEvent *event)
+void MainWindow::dropEvent(QDropEvent* event)
 {
-    if(!event->mimeData()->hasUrls())
+    if (!event->mimeData()->hasUrls())
         return;
 
-    for(const QUrl& url : event->mimeData()->urls()) {
+    for (const QUrl& url : event->mimeData()->urls()) {
         const QString path = url.toLocalFile();
-        if(path.endsWith(".fif", Qt::CaseInsensitive) ||
-           path.endsWith(".fiff", Qt::CaseInsensitive)) {
+        if (path.endsWith(".fif", Qt::CaseInsensitive) ||
+            path.endsWith(".fiff", Qt::CaseInsensitive)) {
             m_mnxProject = MNALIB::MnaProject();
             loadRawFile(path);
             return;

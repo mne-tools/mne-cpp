@@ -42,7 +42,7 @@ using namespace DISPLIB;
 //=============================================================================================================
 
 SpectrumSettingsView::SpectrumSettingsView(const QString& sSettingsPath,
-                                           QWidget *parent,
+                                           QWidget* parent,
                                            Qt::WindowFlags f)
 : AbstractView(parent, f)
 {
@@ -51,10 +51,10 @@ SpectrumSettingsView::SpectrumSettingsView(const QString& sSettingsPath,
 
     QGridLayout* t_pGridLayout = new QGridLayout;
 
-    QLabel *t_pLabelLower = new QLabel;
+    QLabel* t_pLabelLower = new QLabel;
     t_pLabelLower->setText("Lower Frequency");
     m_pSliderLowerBound = new QSlider(Qt::Horizontal);
-    QLabel *t_pLabelUpper = new QLabel;
+    QLabel* t_pLabelUpper = new QLabel;
     t_pLabelUpper->setText("Upper Frequency");
     m_pSliderUpperBound = new QSlider(Qt::Horizontal);
 
@@ -66,10 +66,10 @@ SpectrumSettingsView::SpectrumSettingsView(const QString& sSettingsPath,
     connect(m_pSliderUpperBound.data(), &QSlider::valueChanged,
             this, &SpectrumSettingsView::updateValue);
 
-    t_pGridLayout->addWidget(t_pLabelLower,0,0);
-    t_pGridLayout->addWidget(m_pSliderLowerBound,0,1);
-    t_pGridLayout->addWidget(t_pLabelUpper,1,0);
-    t_pGridLayout->addWidget(m_pSliderUpperBound,1,1);
+    t_pGridLayout->addWidget(t_pLabelLower, 0, 0);
+    t_pGridLayout->addWidget(m_pSliderLowerBound, 0, 1);
+    t_pGridLayout->addWidget(t_pLabelUpper, 1, 0);
+    t_pGridLayout->addWidget(m_pSliderUpperBound, 1, 1);
 
     this->setLayout(t_pGridLayout);
 
@@ -89,9 +89,9 @@ void SpectrumSettingsView::updateValue(qint32 value)
 {
     Q_UNUSED(value)
 
-    if(m_pSliderLowerBound->value() > m_pSliderUpperBound->value())
+    if (m_pSliderLowerBound->value() > m_pSliderUpperBound->value())
         m_pSliderLowerBound->setValue(m_pSliderUpperBound->value());
-    else if(m_pSliderUpperBound->value() < m_pSliderLowerBound->value())
+    else if (m_pSliderUpperBound->value() < m_pSliderLowerBound->value())
         m_pSliderUpperBound->setValue(m_pSliderLowerBound->value());
 
     emit settingsChanged();
@@ -101,7 +101,7 @@ void SpectrumSettingsView::updateValue(qint32 value)
 
 void SpectrumSettingsView::saveSettings()
 {
-    if(m_sSettingsPath.isEmpty()) {
+    if (m_sSettingsPath.isEmpty()) {
         return;
     }
 
@@ -113,7 +113,7 @@ void SpectrumSettingsView::saveSettings()
 
 void SpectrumSettingsView::loadSettings()
 {
-    if(m_sSettingsPath.isEmpty()) {
+    if (m_sSettingsPath.isEmpty()) {
         return;
     }
 
@@ -128,33 +128,33 @@ void SpectrumSettingsView::setBoundaries(float fSFreq,
                                          float fUpperBound)
 {
     m_pSliderLowerBound->setMinimum(0);
-    m_pSliderLowerBound->setMaximum((qint32)(fSFreq/2)*1000);
-    m_pSliderLowerBound->setValue((qint32)(fLowerBound*1000));
+    m_pSliderLowerBound->setMaximum((qint32)(fSFreq / 2) * 1000);
+    m_pSliderLowerBound->setValue((qint32)(fLowerBound * 1000));
 
     m_pSliderUpperBound->setMinimum(0);
-    m_pSliderUpperBound->setMaximum((qint32)(fSFreq/2)*1000);
-    m_pSliderUpperBound->setValue((qint32)(fUpperBound*1000));
+    m_pSliderUpperBound->setMaximum((qint32)(fSFreq / 2) * 1000);
+    m_pSliderUpperBound->setValue((qint32)(fUpperBound * 1000));
 }
 
 //=============================================================================================================
 
 float SpectrumSettingsView::getLowerBound()
 {
-    return m_pSliderLowerBound->value()/1000.0f;
+    return m_pSliderLowerBound->value() / 1000.0f;
 }
 
 //=============================================================================================================
 
 float SpectrumSettingsView::getUpperBound()
 {
-    return m_pSliderUpperBound->value()/1000.0f;
+    return m_pSliderUpperBound->value() / 1000.0f;
 }
 
 //=============================================================================================================
 
 void SpectrumSettingsView::updateGuiMode(GuiMode mode)
 {
-    switch(mode) {
+    switch (mode) {
         case GuiMode::Clinical:
             break;
         default: // default is research mode
@@ -166,7 +166,7 @@ void SpectrumSettingsView::updateGuiMode(GuiMode mode)
 
 void SpectrumSettingsView::updateProcessingMode(ProcessingMode mode)
 {
-    switch(mode) {
+    switch (mode) {
         case ProcessingMode::Offline:
             break;
         default: // default is realtime mode
@@ -178,5 +178,4 @@ void SpectrumSettingsView::updateProcessingMode(ProcessingMode mode)
 
 void SpectrumSettingsView::clearView()
 {
-
 }

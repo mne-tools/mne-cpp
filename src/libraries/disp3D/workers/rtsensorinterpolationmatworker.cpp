@@ -42,10 +42,11 @@ namespace
 /**
  * Apply a coordinate transform to a 3-D point using FiffCoordTrans.
  */
-Eigen::Vector3f applyTransform(const Eigen::Vector3f &point,
-                               const FiffCoordTrans &trans)
+Eigen::Vector3f applyTransform(const Eigen::Vector3f& point,
+                               const FiffCoordTrans& trans)
 {
-    if (trans.isEmpty()) return point;
+    if (trans.isEmpty())
+        return point;
     float r[3] = {point.x(), point.y(), point.z()};
     FiffCoordTrans::apply_trans(r, trans, FIFFV_MOVE);
     return Eigen::Vector3f(r[0], r[1], r[2]);
@@ -54,7 +55,7 @@ Eigen::Vector3f applyTransform(const Eigen::Vector3f &point,
 /**
  * Convert a 4×4 Eigen matrix to a QMatrix4x4.
  */
-QMatrix4x4 toQMatrix4x4(const Eigen::Matrix4f &m)
+QMatrix4x4 toQMatrix4x4(const Eigen::Matrix4f& m)
 {
     QMatrix4x4 q;
     for (int r = 0; r < 4; ++r)
@@ -69,14 +70,14 @@ QMatrix4x4 toQMatrix4x4(const Eigen::Matrix4f &m)
 // MEMBER METHODS
 //=============================================================================================================
 
-RtSensorInterpolationMatWorker::RtSensorInterpolationMatWorker(QObject *parent)
-    : QObject(parent)
+RtSensorInterpolationMatWorker::RtSensorInterpolationMatWorker(QObject* parent)
+: QObject(parent)
 {
 }
 
 //=============================================================================================================
 
-void RtSensorInterpolationMatWorker::setEvoked(const FiffEvoked &evoked)
+void RtSensorInterpolationMatWorker::setEvoked(const FiffEvoked& evoked)
 {
     QMutexLocker locker(&m_mutex);
     m_evoked = evoked;
@@ -85,8 +86,8 @@ void RtSensorInterpolationMatWorker::setEvoked(const FiffEvoked &evoked)
 
 //=============================================================================================================
 
-void RtSensorInterpolationMatWorker::setTransform(const FiffCoordTrans &trans,
-                                                    bool applySensorTrans)
+void RtSensorInterpolationMatWorker::setTransform(const FiffCoordTrans& trans,
+                                                  bool applySensorTrans)
 {
     QMutexLocker locker(&m_mutex);
     m_headToMriTrans = trans;
@@ -103,10 +104,10 @@ void RtSensorInterpolationMatWorker::setMegFieldMapOnHead(bool onHead)
 
 //=============================================================================================================
 
-void RtSensorInterpolationMatWorker::setMegSurface(const QString &surfaceKey,
-                                                     const Eigen::MatrixX3f &vertices,
-                                                     const Eigen::MatrixX3f &normals,
-                                                     const Eigen::MatrixX3i &triangles)
+void RtSensorInterpolationMatWorker::setMegSurface(const QString& surfaceKey,
+                                                   const Eigen::MatrixX3f& vertices,
+                                                   const Eigen::MatrixX3f& normals,
+                                                   const Eigen::MatrixX3i& triangles)
 {
     QMutexLocker locker(&m_mutex);
     m_megSurfaceKey = surfaceKey;
@@ -118,8 +119,8 @@ void RtSensorInterpolationMatWorker::setMegSurface(const QString &surfaceKey,
 
 //=============================================================================================================
 
-void RtSensorInterpolationMatWorker::setEegSurface(const QString &surfaceKey,
-                                                     const Eigen::MatrixX3f &vertices)
+void RtSensorInterpolationMatWorker::setEegSurface(const QString& surfaceKey,
+                                                   const Eigen::MatrixX3f& vertices)
 {
     QMutexLocker locker(&m_mutex);
     m_eegSurfaceKey = surfaceKey;
@@ -129,7 +130,7 @@ void RtSensorInterpolationMatWorker::setEegSurface(const QString &surfaceKey,
 
 //=============================================================================================================
 
-void RtSensorInterpolationMatWorker::setBadChannels(const QStringList &bads)
+void RtSensorInterpolationMatWorker::setBadChannels(const QStringList& bads)
 {
     QMutexLocker locker(&m_mutex);
     m_bads = bads;
@@ -179,8 +180,8 @@ void RtSensorInterpolationMatWorker::computeMapping()
     bool hasDevHead = false;
     QMatrix4x4 devHeadQt;
     if (!evoked.info.dev_head_t.isEmpty() &&
-         evoked.info.dev_head_t.from == FIFFV_COORD_DEVICE &&
-         evoked.info.dev_head_t.to   == FIFFV_COORD_HEAD &&
+        evoked.info.dev_head_t.from == FIFFV_COORD_DEVICE &&
+        evoked.info.dev_head_t.to == FIFFV_COORD_HEAD &&
         !evoked.info.dev_head_t.trans.isIdentity()) {
         hasDevHead = true;
         devHeadQt = toQMatrix4x4(evoked.info.dev_head_t.trans);
@@ -196,35 +197,41 @@ void RtSensorInterpolationMatWorker::computeMapping()
     QVector<int> megPick, eegPick;
 
     for (int k = 0; k < evoked.info.chs.size(); ++k) {
-        const auto &ch = evoked.info.chs[k];
-        if (bads.contains(ch.ch_name)) continue;
+        const auto& ch = evoked.info.chs[k];
+        if (bads.contains(ch.ch_name))
+            continue;
 
         QVector3D pos(ch.chpos.r0(0), ch.chpos.r0(1), ch.chpos.r0(2));
 
         if (ch.kind == FIFFV_MEG_CH) {
-            if (hasDevHead) pos = devHeadQt.map(pos);
-            if (applySensorTrans && !headToMriTrans.isEmpty()) pos = headToMri.map(pos);
+            if (hasDevHead)
+                pos = devHeadQt.map(pos);
+            if (applySensorTrans && !headToMriTrans.isEmpty())
+                pos = headToMri.map(pos);
             megPick.append(k);
             megChs.append(ch);
         } else if (ch.kind == FIFFV_EEG_CH) {
-            if (applySensorTrans && !headToMriTrans.isEmpty()) pos = headToMri.map(pos);
+            if (applySensorTrans && !headToMriTrans.isEmpty())
+                pos = headToMri.map(pos);
             eegPick.append(k);
             eegChs.append(ch);
         }
     }
 
     // ── Constants (matching MNE-Python) ────────────────────────────────
-    constexpr float kIntrad  = 0.06f;
+    constexpr float kIntrad = 0.06f;
     constexpr float kMegMiss = 1e-4f;
     constexpr float kEegMiss = 1e-3f;
     const Eigen::Vector3f defaultOrigin(0.0f, 0.0f, 0.04f);
 
     FiffCoordTrans headMri = (applySensorTrans && !headToMriTrans.isEmpty())
-        ? headToMriTrans : FiffCoordTrans();
+        ? headToMriTrans
+        : FiffCoordTrans();
     FiffCoordTrans devHead = (!evoked.info.dev_head_t.isEmpty() &&
-                        evoked.info.dev_head_t.from == FIFFV_COORD_DEVICE &&
-                        evoked.info.dev_head_t.to   == FIFFV_COORD_HEAD)
-        ? evoked.info.dev_head_t : FiffCoordTrans();
+                              evoked.info.dev_head_t.from == FIFFV_COORD_DEVICE &&
+                              evoked.info.dev_head_t.to == FIFFV_COORD_HEAD)
+        ? evoked.info.dev_head_t
+        : FiffCoordTrans();
 
     // ── MEG mapping ────────────────────────────────────────────────────
     if (hasMegSurface && !megChs.isEmpty()) {
@@ -238,8 +245,7 @@ void RtSensorInterpolationMatWorker::computeMapping()
         }
 
         if (megVerts.rows() > 0 && norms.rows() == megVerts.rows()) {
-            const QString coilPath = QCoreApplication::applicationDirPath()
-                + "/../resources/general/coilDefinitions/coil_def.dat";
+            const QString coilPath = QCoreApplication::applicationDirPath() + "/../resources/general/coilDefinitions/coil_def.dat";
             auto templates =
                 FWDLIB::FwdCoilSet::read_coil_defs(coilPath);
 
@@ -271,7 +277,7 @@ void RtSensorInterpolationMatWorker::computeMapping()
                         qDebug() << "RtSensorInterpolationMatWorker: MEG mapping computed:"
                                  << mat->rows() << "x" << mat->cols();
                         emit newMegMappingAvailable(megSurfaceKey,
-                            std::shared_ptr<Eigen::MatrixXf>(std::move(mat)), megPick);
+                                                    std::shared_ptr<Eigen::MatrixXf>(std::move(mat)), megPick);
                     }
                 }
             }
@@ -282,7 +288,8 @@ void RtSensorInterpolationMatWorker::computeMapping()
     if (hasEegSurface && !eegChs.isEmpty()) {
         if (eegVerts.rows() > 0) {
             Eigen::Vector3f origin = defaultOrigin;
-            if (!headMri.isEmpty()) origin = applyTransform(origin, headMri);
+            if (!headMri.isEmpty())
+                origin = applyTransform(origin, headMri);
 
             auto eegCoils =
                 FWDLIB::FwdCoilSet::create_eeg_els(
@@ -296,7 +303,7 @@ void RtSensorInterpolationMatWorker::computeMapping()
                     qDebug() << "RtSensorInterpolationMatWorker: EEG mapping computed:"
                              << mat->rows() << "x" << mat->cols();
                     emit newEegMappingAvailable(eegSurfaceKey,
-                        std::shared_ptr<Eigen::MatrixXf>(std::move(mat)), eegPick);
+                                                std::shared_ptr<Eigen::MatrixXf>(std::move(mat)), eegPick);
                 }
             }
         }

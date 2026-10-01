@@ -45,7 +45,7 @@ class CovarianceWindow : public QDockWidget
     Q_OBJECT
 
 public:
-    explicit CovarianceWindow(QWidget *parent = nullptr);
+    explicit CovarianceWindow(QWidget* parent = nullptr);
     ~CovarianceWindow() override;
 
     void init();
@@ -73,23 +73,23 @@ signals:
     void whiteningSettingsChanged(const MNEBROWSE::WhiteningSettings& settings);
 
 private:
-    QWidget*         m_pContents = nullptr;
-    QVBoxLayout*     m_pLayout = nullptr;
-    QLabel*          m_pHintLabel = nullptr;
-    QTextEdit*       m_pSummaryTextEdit = nullptr;
-    QLabel*          m_pHeatmapLabel = nullptr;
-    QComboBox*       m_pHeatmapChannelType = nullptr;
-    QToolBar*        m_pToolBar = nullptr;
-    QCheckBox*       m_pWhitenButterflyCheckBox = nullptr;
-    QCheckBox*       m_pWhitenLayoutCheckBox = nullptr;
-    QCheckBox*       m_pUseProjCheckBox = nullptr;
-    QDoubleSpinBox*  m_pRegMagSpinBox = nullptr;
-    QDoubleSpinBox*  m_pRegGradSpinBox = nullptr;
-    QDoubleSpinBox*  m_pRegEegSpinBox = nullptr;
+    QWidget* m_pContents = nullptr;
+    QVBoxLayout* m_pLayout = nullptr;
+    QLabel* m_pHintLabel = nullptr;
+    QTextEdit* m_pSummaryTextEdit = nullptr;
+    QLabel* m_pHeatmapLabel = nullptr;
+    QComboBox* m_pHeatmapChannelType = nullptr;
+    QToolBar* m_pToolBar = nullptr;
+    QCheckBox* m_pWhitenButterflyCheckBox = nullptr;
+    QCheckBox* m_pWhitenLayoutCheckBox = nullptr;
+    QCheckBox* m_pUseProjCheckBox = nullptr;
+    QDoubleSpinBox* m_pRegMagSpinBox = nullptr;
+    QDoubleSpinBox* m_pRegGradSpinBox = nullptr;
+    QDoubleSpinBox* m_pRegEegSpinBox = nullptr;
 
-    FIFFLIB::FiffCov        m_covariance;
+    FIFFLIB::FiffCov m_covariance;
     FIFFLIB::FiffInfo::SPtr m_pFiffInfo;
-    QString                 m_sSourceDescription;
+    QString m_sSourceDescription;
 };
 
 } // namespace MNEBROWSE

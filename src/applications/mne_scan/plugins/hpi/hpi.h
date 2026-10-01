@@ -43,23 +43,26 @@
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-namespace FIFFLIB {
-    class FiffInfo;
-    class FiffDigPoint;
-    class FiffCoordTrans;
-    class FiffDigitizerData;
+namespace FIFFLIB
+{
+class FiffInfo;
+class FiffDigPoint;
+class FiffCoordTrans;
+class FiffDigitizerData;
 }
 
-namespace INVLIB {
-    class InvHpiFit;
+namespace INVLIB
+{
+class InvHpiFit;
 }
 
-namespace SCMEASLIB{
-    class RealTimeMultiSampleArray;
-    class RealTimeHpiResult;
+namespace SCMEASLIB
+{
+class RealTimeMultiSampleArray;
+class RealTimeHpiResult;
 }
 
-#define MAX_DATA_LEN    2000000000L
+#define MAX_DATA_LEN 2000000000L
 
 //=============================================================================================================
 // DEFINE NAMESPACE HPIPLUGIN
@@ -273,34 +276,34 @@ private:
 
     void resetState();
 
-    QMutex                      m_mutex;                    /**< The threads mutex.*/
+    QMutex m_mutex; /**< The threads mutex.*/
 
-    QVector<int>                m_vCoilFreqs;               /**< Vector contains the HPI coil frequencies. */
+    QVector<int> m_vCoilFreqs; /**< Vector contains the HPI coil frequencies. */
 
-    QString                     m_sFilePathDigitzers;       /**< The file path to the current digitzers. */
+    QString m_sFilePathDigitzers; /**< The file path to the current digitzers. */
 
-    qint16                      m_iNumberBadChannels;       /**< The number of bad channels.*/
-    qint16                      m_iFittingWindowSize;       /**< The number of samples in each fitting window.*/
+    qint16 m_iNumberBadChannels; /**< The number of bad channels.*/
+    qint16 m_iFittingWindowSize; /**< The number of samples in each fitting window.*/
 
-    double                      m_dAllowedMeanErrorDist;    /**< The allowed error distance in order for the last fit to be counted as a good fit.*/
-    double                      m_dAllowedMovement;         /**< The allowed head movement regarding reference head position.*/
-    double                      m_dAllowedRotation;         /**< The allowed head rotation regarding reference head position in degree.*/
+    double m_dAllowedMeanErrorDist; /**< The allowed error distance in order for the last fit to be counted as a good fit.*/
+    double m_dAllowedMovement;      /**< The allowed head movement regarding reference head position.*/
+    double m_dAllowedRotation;      /**< The allowed head rotation regarding reference head position in degree.*/
 
-    bool                        m_bDoFreqOrder;             /**< Order Frequencies.*/
-    bool                        m_bDoSingleHpi;             /**< Do a single HPI fit.*/
-    bool                        m_bDoContinousHpi;          /**< Do continous HPI fitting.*/
-    bool                        m_bUseSSP;                  /**< Use SSP's.*/
-    bool                        m_bUseComp;                 /**< Use Comps's.*/
+    bool m_bDoFreqOrder;    /**< Order Frequencies.*/
+    bool m_bDoSingleHpi;    /**< Do a single HPI fit.*/
+    bool m_bDoContinousHpi; /**< Do continous HPI fitting.*/
+    bool m_bUseSSP;         /**< Use SSP's.*/
+    bool m_bUseComp;        /**< Use Comps's.*/
 
-    Eigen::MatrixXd             m_matData;                  /**< The last data block.*/
-    Eigen::MatrixXd             m_matCompProjectors;        /**< Holds the matrix with the SSP and compensator projectors.*/
+    Eigen::MatrixXd m_matData;           /**< The last data block.*/
+    Eigen::MatrixXd m_matCompProjectors; /**< Holds the matrix with the SSP and compensator projectors.*/
 
-    QSharedPointer<FIFFLIB::FiffInfo>                                           m_pFiffInfo;            /**< Fiff measurement info.*/
-    QSharedPointer<FIFFLIB::FiffDigitizerData>                                  m_pFiffDigitizerData;
-    QSharedPointer<UTILSLIB::CircularBuffer_Matrix_double>                      m_pCircularBuffer;      /**< Holds incoming raw data. */
+    QSharedPointer<FIFFLIB::FiffInfo> m_pFiffInfo; /**< Fiff measurement info.*/
+    QSharedPointer<FIFFLIB::FiffDigitizerData> m_pFiffDigitizerData;
+    QSharedPointer<UTILSLIB::CircularBuffer_Matrix_double> m_pCircularBuffer; /**< Holds incoming raw data. */
 
-    SCSHAREDLIB::PluginInputData<SCMEASLIB::RealTimeMultiSampleArray>::SPtr     m_pHpiInput;            /**< The RealTimeMultiSampleArray of the Hpi input.*/
-    SCSHAREDLIB::PluginOutputData<SCMEASLIB::RealTimeHpiResult>::SPtr           m_pHpiOutput;           /**< The RealTimeHpiResult of the Hpi output.*/
+    SCSHAREDLIB::PluginInputData<SCMEASLIB::RealTimeMultiSampleArray>::SPtr m_pHpiInput; /**< The RealTimeMultiSampleArray of the Hpi input.*/
+    SCSHAREDLIB::PluginOutputData<SCMEASLIB::RealTimeHpiResult>::SPtr m_pHpiOutput;      /**< The RealTimeHpiResult of the Hpi output.*/
 
 signals:
     void errorsChanged(const QVector<double>& vErrors,

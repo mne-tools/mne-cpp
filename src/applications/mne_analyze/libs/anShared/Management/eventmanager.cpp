@@ -47,12 +47,11 @@ EventManager::EventManager()
 , m_sleepTime(40l)
 , m_running(false)
 {
-
 }
 
 //=============================================================================================================
 
-void EventManager::addCommunicator(Communicator *commu)
+void EventManager::addCommunicator(Communicator* commu)
 {
     getEventManager().addCommunicatorInt(commu);
 }
@@ -63,8 +62,7 @@ void EventManager::addCommunicatorInt(Communicator* commu)
 {
     QMutexLocker temp(&m_routingTableMutex);
     const QVector<EVENT_TYPE>& subscriptions = commu->getSubscriptions();
-    for(const EVENT_TYPE& etype : subscriptions)
-    {
+    for (const EVENT_TYPE& etype : subscriptions) {
         m_routingTable.insert(etype, commu);
     }
 }
@@ -87,7 +85,7 @@ void EventManager::issueEventInt(QSharedPointer<Event> e)
 
 //=============================================================================================================
 
-void EventManager::addSubscriptions(Communicator *commu,
+void EventManager::addSubscriptions(Communicator* commu,
                                     QVector<EVENT_TYPE> newsubs)
 {
     getEventManager().addSubscriptionsInt(commu, newsubs);
@@ -98,8 +96,7 @@ void EventManager::addSubscriptionsInt(Communicator* commu,
                                        QVector<EVENT_TYPE> newsubs)
 {
     QMutexLocker temp(&m_routingTableMutex);
-    for(const EVENT_TYPE& etype : newsubs)
-    {
+    for (const EVENT_TYPE& etype : newsubs) {
         m_routingTable.insert(etype, commu);
     }
 }
@@ -107,7 +104,7 @@ void EventManager::addSubscriptionsInt(Communicator* commu,
 //=============================================================================================================
 
 void EventManager::updateSubscriptions(Communicator* commu,
-                                       const QVector<EVENT_TYPE> &subs)
+                                       const QVector<EVENT_TYPE>& subs)
 {
     getEventManager().updateSubscriptionsInt(commu, subs);
 }
@@ -115,7 +112,7 @@ void EventManager::updateSubscriptions(Communicator* commu,
 //=============================================================================================================
 
 void EventManager::updateSubscriptionsInt(Communicator* commu,
-                                       const QVector<EVENT_TYPE> &subs)
+                                          const QVector<EVENT_TYPE>& subs)
 {
     // remove all old subscriptions from EventManager routing table
     removeCommunicator(commu);
@@ -135,12 +132,10 @@ void EventManager::removeCommunicator(Communicator* commu)
 void EventManager::removeCommunicatorInt(Communicator* commu)
 {
     QMutexLocker temp(&m_routingTableMutex);
-    for(const EVENT_TYPE& etype : commu->getSubscriptions())
-    {
+    for (const EVENT_TYPE& etype : commu->getSubscriptions()) {
         int removed = m_routingTable.remove(etype, commu);
         // consistency check:
-        if (removed != 1)
-        {
+        if (removed != 1) {
             qDebug() << "[EventManager::removeCommunicator] WARNING ! Found " << removed << " entries instead of 1 for event type ";
             qDebug() << etype << " and communicator ID " << commu->getID();
         }
@@ -158,19 +153,16 @@ bool EventManager::startEventHandling(float frequency)
 
 bool EventManager::startEventHandlingInt(float frequency)
 {
-    if (m_running)
-    {
+    if (m_running) {
         qDebug() << "[EventManager::startEventHandling] WARNING ! somebody tried to call startEventHandling when already running...";
         return false;
-    }
-    else {
-        m_sleepTime = (long) (1000.0f / frequency);
+    } else {
+        m_sleepTime = (long)(1000.0f / frequency);
         m_running = true;
         // start qthread
         start();
         return true;
     }
-
 }
 
 //=============================================================================================================
@@ -184,15 +176,13 @@ bool EventManager::stopEventHandling()
 
 bool EventManager::stopEventHandlingInt()
 {
-    if (m_running)
-    {
+    if (m_running) {
         m_running = false;
         m_eventSemaphore.release();
         requestInterruption();
         wait();
         return true;
-    }
-    else {
+    } else {
         qDebug() << "[EventManager] WARNING ! Somebody tried to call stopEventHandling when already stopped...";
         return false;
     }
@@ -227,13 +217,11 @@ EventManager& EventManager::getEventManager()
 void EventManager::run()
 {
     // main loop
-    while (true)
-    {
+    while (true) {
         m_eventSemaphore.acquire();
         auto before = std::chrono::high_resolution_clock::now();
         // go through all buffered events:
-        while (hasBufferedEvents() == true)
-        {
+        while (hasBufferedEvents() == true) {
             // safely remove first queue element
             QMutexLocker eventQLock(&m_eventQMutex);
             const QSharedPointer<Event> e = m_eventQ.dequeue();
@@ -241,11 +229,9 @@ void EventManager::run()
             // safely extract list of subscribers
             QMutexLocker routingTableLock(&m_routingTableMutex);
             const QList<Communicator*> subscribers = m_routingTable.values(e->getType());
-            for(Communicator* commu : subscribers)
-            {
+            for (Communicator* commu : subscribers) {
                 // avoid self-messaging
-                if (commu->getID() != e->getSender()->getID())
-                {
+                if (commu->getID() != e->getSender()->getID()) {
                     // notify communicator about event
                     emit commu->receivedEvent(e);
                 }
@@ -254,19 +240,15 @@ void EventManager::run()
         }
         auto after = std::chrono::high_resolution_clock::now();
         long elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(after - before).count();
-        if (m_sleepTime - elapsed > 0)
-        {
+        if (m_sleepTime - elapsed > 0) {
             // still some time left in current cycle, sleep
             QThread::currentThread()->msleep(m_sleepTime - elapsed);
-        }
-        else
-        {
+        } else {
             // issue warning
             qDebug() << "[EventManager::run] WARNING ! Running behind on event handling...";
         }
         // check for shutdown requests
-        if (isInterruptionRequested())
-        {
+        if (isInterruptionRequested()) {
             return;
         }
     }

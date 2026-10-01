@@ -87,10 +87,10 @@ class FiffStream;
 class FIFFSHARED_EXPORT FiffInfo : public FiffInfoBase
 {
 public:
-    using SPtr = QSharedPointer<FiffInfo>;            /**< Shared pointer type for FiffInfo. */
-    using ConstSPtr = QSharedPointer<const FiffInfo>; /**< Const shared pointer type for FiffInfo. */
-    using UPtr = std::unique_ptr<FiffInfo>;             /**< Unique pointer type for FiffInfo. */
-    using ConstUPtr = std::unique_ptr<const FiffInfo>;  /**< Const unique pointer type for FiffInfo. */
+    using SPtr = QSharedPointer<FiffInfo>;             /**< Shared pointer type for FiffInfo. */
+    using ConstSPtr = QSharedPointer<const FiffInfo>;  /**< Const shared pointer type for FiffInfo. */
+    using UPtr = std::unique_ptr<FiffInfo>;            /**< Unique pointer type for FiffInfo. */
+    using ConstUPtr = std::unique_ptr<const FiffInfo>; /**< Const unique pointer type for FiffInfo. */
 
     //=========================================================================================================
     /**
@@ -191,7 +191,7 @@ public:
      *
      * @return Info modified according to sel.
      */
-    FiffInfo pick_info(const Eigen::RowVectorXi &sel = defaultVectorXi) const;
+    FiffInfo pick_info(const Eigen::RowVectorXi& sel = defaultVectorXi) const;
 
     //=========================================================================================================
     /**
@@ -270,28 +270,28 @@ private:
      */
     bool make_compensator(fiff_int_t kind, Eigen::MatrixXd& this_comp) const;
 
-public: //Public because it's a mne struct
-    FiffId file_id;                 /**< File ID. */
-    fiff_int_t  meas_date[2];       /**< Measurement date. */
-    float sfreq;                    /**< Sample frequency. */
-    float linefreq;                 /**< Power line frequency. */
-    float highpass;                 /**< Highpass frequency. */
-    float lowpass;                  /**< Lowpass frequency. */
-    int proj_id;                    /**< Project ID. */
-    QString proj_name;              /**< Project name. */
-    QString xplotter_layout;        /**< xplotter layout tag. */
-    QString experimenter;           /**< Experimenter name. */
-    QString description;            /**< (Textual) Description of an object.*/
-    QString utc_offset;             /**< UTC offset of related meas_date (sHH:MM).*/
-    fiff_int_t gantry_angle;        /**< Tilt angle of the dewar in degrees.*/
-    FiffCoordTrans dev_ctf_t;       /**< Device to CTF coordinate transformation. */
-    QList<FiffDigPoint> dig;        /**< List of all digitization point descriptors. */
-    FiffCoordTrans dig_trans;       /**< Digitizer coordinate transformation. */
-    QList<FiffProj> projs;          /**< List of available SSP projectors. */
-    QList<FiffCtfComp> comps;       /**< List of available CTF software compensators. */
-    QString acq_pars;               /**< Acquisition parameters. */
-    QString acq_stim;               /**< Acquisition stimulus information. */
-    QList<float> hpi_coil_freqs;    /**< Excitation frequencies of the HPI coils in Hz, in coil order. Empty when the file contains no HPI measurement block. */
+public:                          //Public because it's a mne struct
+    FiffId file_id;              /**< File ID. */
+    fiff_int_t meas_date[2];     /**< Measurement date. */
+    float sfreq;                 /**< Sample frequency. */
+    float linefreq;              /**< Power line frequency. */
+    float highpass;              /**< Highpass frequency. */
+    float lowpass;               /**< Lowpass frequency. */
+    int proj_id;                 /**< Project ID. */
+    QString proj_name;           /**< Project name. */
+    QString xplotter_layout;     /**< xplotter layout tag. */
+    QString experimenter;        /**< Experimenter name. */
+    QString description;         /**< (Textual) Description of an object.*/
+    QString utc_offset;          /**< UTC offset of related meas_date (sHH:MM).*/
+    fiff_int_t gantry_angle;     /**< Tilt angle of the dewar in degrees.*/
+    FiffCoordTrans dev_ctf_t;    /**< Device to CTF coordinate transformation. */
+    QList<FiffDigPoint> dig;     /**< List of all digitization point descriptors. */
+    FiffCoordTrans dig_trans;    /**< Digitizer coordinate transformation. */
+    QList<FiffProj> projs;       /**< List of available SSP projectors. */
+    QList<FiffCtfComp> comps;    /**< List of available CTF software compensators. */
+    QString acq_pars;            /**< Acquisition parameters. */
+    QString acq_stim;            /**< Acquisition stimulus information. */
+    QList<float> hpi_coil_freqs; /**< Excitation frequencies of the HPI coils in Hz, in coil order. Empty when the file contains no HPI measurement block. */
 };
 
 //=============================================================================================================
@@ -300,7 +300,7 @@ public: //Public because it's a mne struct
 
 inline qint32 FiffInfo::make_projector(Eigen::MatrixXd& proj) const
 {
-    return FiffProj::make_projector(this->projs,this->ch_names, proj, this->bads);
+    return FiffProj::make_projector(this->projs, this->ch_names, proj, this->bads);
 }
 
 //=============================================================================================================

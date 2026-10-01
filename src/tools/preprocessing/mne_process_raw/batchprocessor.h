@@ -49,7 +49,7 @@ public:
      * @param[in] settings  All processing settings from command line arguments.
      * @return 0 on success, non-zero on failure.
      */
-    static int run(const ProcessingSettings &settings);
+    static int run(const ProcessingSettings& settings);
 
     /**
      * Compose output file names based on the raw file name and a tag.
@@ -61,16 +61,16 @@ public:
      * @param[out] logName  Composed log file name.
      * @return true on success.
      */
-    static bool composeSaveNames(const QString &rawName,
-                                 const QString &tag,
+    static bool composeSaveNames(const QString& rawName,
+                                 const QString& tag,
                                  bool stripDir,
-                                 QString &saveName,
-                                 QString &logName);
+                                 QString& saveName,
+                                 QString& logName);
 
     /**
      * Write a log string to a log file.
      */
-    static bool writeLog(const QString &logFile, const QString &log);
+    static bool writeLog(const QString& logFile, const QString& log);
 };
 
 } // namespace

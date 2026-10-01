@@ -70,7 +70,8 @@ private slots:
 
     void testListBemHelp()
     {
-        if (!toolExists("mne_list_bem")) QSKIP("mne_list_bem not found");
+        if (!toolExists("mne_list_bem"))
+            QSKIP("mne_list_bem not found");
         QString output = runTool("mne_list_bem", {"--help"});
         QVERIFY(output.contains("help", Qt::CaseInsensitive) ||
                 output.contains("bem", Qt::CaseInsensitive) ||
@@ -79,9 +80,11 @@ private slots:
 
     void testListBemRun()
     {
-        if (!toolExists("mne_list_bem")) QSKIP("mne_list_bem not found");
+        if (!toolExists("mne_list_bem"))
+            QSKIP("mne_list_bem not found");
         QString bemFile = m_sResourcePath + "subjects/sample/bem/sample-5120-bem.fif";
-        if (!QFile::exists(bemFile)) QSKIP("BEM file not available");
+        if (!QFile::exists(bemFile))
+            QSKIP("BEM file not available");
 
         QString output = runTool("mne_list_bem", {"--bem", bemFile});
         QVERIFY(!output.isEmpty());
@@ -99,7 +102,8 @@ private slots:
 
     void testCheckSurfaceHelp()
     {
-        if (!toolExists("mne_check_surface")) QSKIP("mne_check_surface not found");
+        if (!toolExists("mne_check_surface"))
+            QSKIP("mne_check_surface not found");
         QString output = runTool("mne_check_surface", {"--help"});
         QVERIFY(output.contains("help", Qt::CaseInsensitive) ||
                 output.contains("surface", Qt::CaseInsensitive));
@@ -111,7 +115,8 @@ private slots:
 
     void testCompareFifHelp()
     {
-        if (!toolExists("mne_compare_fif_files")) QSKIP("mne_compare_fif_files not found");
+        if (!toolExists("mne_compare_fif_files"))
+            QSKIP("mne_compare_fif_files not found");
         QString output = runTool("mne_compare_fif_files", {"--help"});
         QVERIFY(output.contains("help", Qt::CaseInsensitive) ||
                 output.contains("compare", Qt::CaseInsensitive) ||
@@ -120,9 +125,11 @@ private slots:
 
     void testCompareFifSameFile()
     {
-        if (!toolExists("mne_compare_fif_files")) QSKIP("mne_compare_fif_files not found");
+        if (!toolExists("mne_compare_fif_files"))
+            QSKIP("mne_compare_fif_files not found");
         QString rawFile = m_sResourcePath + "MEG/sample/sample_audvis_trunc_raw.fif";
-        if (!QFile::exists(rawFile)) QSKIP("raw file not available");
+        if (!QFile::exists(rawFile))
+            QSKIP("raw file not available");
 
         // Compare a file with itself — should show no differences
         QString output = runTool("mne_compare_fif_files", {"--in1", rawFile, "--in2", rawFile});
@@ -136,7 +143,8 @@ private slots:
 
     void testCollectTransformsHelp()
     {
-        if (!toolExists("mne_collect_transforms")) QSKIP("mne_collect_transforms not found");
+        if (!toolExists("mne_collect_transforms"))
+            QSKIP("mne_collect_transforms not found");
         QString output = runTool("mne_collect_transforms", {"--help"});
         QVERIFY(output.contains("help", Qt::CaseInsensitive) ||
                 output.contains("transform", Qt::CaseInsensitive));
@@ -148,7 +156,8 @@ private slots:
 
     void testMarkBadChannelsHelp()
     {
-        if (!toolExists("mne_mark_bad_channels")) QSKIP("mne_mark_bad_channels not found");
+        if (!toolExists("mne_mark_bad_channels"))
+            QSKIP("mne_mark_bad_channels not found");
         QString output = runTool("mne_mark_bad_channels", {"--help"});
         QVERIFY(output.contains("help", Qt::CaseInsensitive) ||
                 output.contains("bad", Qt::CaseInsensitive) ||
@@ -161,7 +170,8 @@ private slots:
 
     void testMakeSourceSpaceHelp()
     {
-        if (!toolExists("mne_make_source_space")) QSKIP("mne_make_source_space not found");
+        if (!toolExists("mne_make_source_space"))
+            QSKIP("mne_make_source_space not found");
         QString output = runTool("mne_make_source_space", {"--help"});
         QVERIFY(output.contains("help", Qt::CaseInsensitive) ||
                 output.contains("source", Qt::CaseInsensitive) ||
@@ -174,7 +184,8 @@ private slots:
 
     void testCov2projHelp()
     {
-        if (!toolExists("mne_cov2proj")) QSKIP("mne_cov2proj not found");
+        if (!toolExists("mne_cov2proj"))
+            QSKIP("mne_cov2proj not found");
         QString output = runTool("mne_cov2proj", {"--help"});
         QVERIFY(output.contains("help", Qt::CaseInsensitive) ||
                 output.contains("cov", Qt::CaseInsensitive) ||
@@ -187,7 +198,8 @@ private slots:
 
     void testSensitivityMapHelp()
     {
-        if (!toolExists("mne_sensitivity_map")) QSKIP("mne_sensitivity_map not found");
+        if (!toolExists("mne_sensitivity_map"))
+            QSKIP("mne_sensitivity_map not found");
         QString output = runTool("mne_sensitivity_map", {"--help"});
         QVERIFY(output.contains("help", Qt::CaseInsensitive) ||
                 output.contains("sensitivity", Qt::CaseInsensitive) ||
@@ -200,7 +212,8 @@ private slots:
 
     void testVolumeSourceSpaceHelp()
     {
-        if (!toolExists("mne_volume_source_space")) QSKIP("mne_volume_source_space not found");
+        if (!toolExists("mne_volume_source_space"))
+            QSKIP("mne_volume_source_space not found");
         QString output = runTool("mne_volume_source_space", {"--help"});
         QVERIFY(output.contains("help", Qt::CaseInsensitive) ||
                 output.contains("volume", Qt::CaseInsensitive) ||
@@ -213,7 +226,8 @@ private slots:
 
     void testSmoothHelp()
     {
-        if (!toolExists("mne_smooth")) QSKIP("mne_smooth not found");
+        if (!toolExists("mne_smooth"))
+            QSKIP("mne_smooth not found");
         QString output = runTool("mne_smooth", {"--help"});
         QVERIFY(output.contains("help", Qt::CaseInsensitive) ||
                 output.contains("smooth", Qt::CaseInsensitive));
@@ -225,7 +239,8 @@ private slots:
 
     void testMakeEegLayoutHelp()
     {
-        if (!toolExists("mne_make_eeg_layout")) QSKIP("mne_make_eeg_layout not found");
+        if (!toolExists("mne_make_eeg_layout"))
+            QSKIP("mne_make_eeg_layout not found");
         QString output = runTool("mne_make_eeg_layout", {"--help"});
         QVERIFY(output.contains("help", Qt::CaseInsensitive) ||
                 output.contains("layout", Qt::CaseInsensitive) ||

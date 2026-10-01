@@ -110,13 +110,13 @@ static bool readAsciiMatrix(const QString& filename,
         }
     }
 
-    qInfo("Read matrix: %d x %d" , nrow, ncol);
+    qInfo("Read matrix: %d x %d", nrow, ncol);
     return true;
 }
 
 //=============================================================================================================
 
-int main(int argc, char *argv[])
+int main(int argc, char* argv[])
 {
     qInstallMessageHandler(MNELogger::customLogWriter);
     QCoreApplication app(argc, argv);
@@ -198,10 +198,10 @@ int main(int argc, char *argv[])
     stream->end_block(FIFFB_MNE_CTF_COMP);
     stream->end_file();
 
-    qInfo("Wrote CTF compensation data (kind=%d, %dx%d, %s) to %s" ,
-           ctfKind, nrow, ncol,
-           calibrated ? "calibrated" : "uncalibrated",
-           outFile.toUtf8().constData());
+    qInfo("Wrote CTF compensation data (kind=%d, %dx%d, %s) to %s",
+          ctfKind, nrow, ncol,
+          calibrated ? "calibrated" : "uncalibrated",
+          outFile.toUtf8().constData());
 
     return 0;
 }

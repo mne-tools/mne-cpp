@@ -41,11 +41,11 @@
 //=============================================================================================================
 
 #if defined(STATICBUILD)
-#  define STSSHARED_EXPORT
+#define STSSHARED_EXPORT
 #elif defined(MNE_STS_LIBRARY)
-#  define STSSHARED_EXPORT Q_DECL_EXPORT    /**< Q_DECL_EXPORT must be added to the declarations of symbols used when compiling a shared library. */
+#define STSSHARED_EXPORT Q_DECL_EXPORT /**< Q_DECL_EXPORT must be added to the declarations of symbols used when compiling a shared library. */
 #else
-#  define STSSHARED_EXPORT Q_DECL_IMPORT    /**< Q_DECL_IMPORT must be added to the declarations of symbols used when compiling a client that uses the shared library. */
+#define STSSHARED_EXPORT Q_DECL_IMPORT /**< Q_DECL_IMPORT must be added to the declarations of symbols used when compiling a client that uses the shared library. */
 #endif
 
 //=============================================================================================================
@@ -53,7 +53,8 @@
  * @namespace STSLIB
  * @brief     Statistical testing (t-tests, F-tests, cluster permutation, multiple comparison correction).
  */
-namespace STSLIB{
+namespace STSLIB
+{
 
 //=============================================================================================================
 /**

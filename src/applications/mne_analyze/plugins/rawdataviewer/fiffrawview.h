@@ -44,12 +44,14 @@
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-namespace ANSHAREDLIB {
-    class FiffRawViewModel;
+namespace ANSHAREDLIB
+{
+class FiffRawViewModel;
 }
 
-namespace UTILSLIB {
-    class FilterKernel;
+namespace UTILSLIB
+{
+class FilterKernel;
 }
 
 class QTableView;
@@ -59,7 +61,8 @@ class QLabel;
 // DEFINE NAMESPACE RAWDATAVIEWERPLUGIN
 //=============================================================================================================
 
-namespace RAWDATAVIEWERPLUGIN {
+namespace RAWDATAVIEWERPLUGIN
+{
 
 //=============================================================================================================
 // RAWDATAVIEWERPLUGIN FORWARD DECLARATIONS
@@ -85,7 +88,7 @@ public:
      *
      * @param[in] parent    The parent of widget.
      */
-    FiffRawView(QWidget *parent = nullptr);
+    FiffRawView(QWidget* parent = nullptr);
 
     //=========================================================================================================
     /**
@@ -182,7 +185,7 @@ public:
      * Brings up a menu for interacting with data events.
      * @param[in] pos   Position on screen where the menu will show up.
      */
-    void customContextMenuRequested(const QPoint &pos);
+    void customContextMenuRequested(const QPoint& pos);
 
     //=========================================================================================================
     /**
@@ -218,7 +221,7 @@ public:
      *
      * @param[in] filterData   the currently active filter.
      */
-    void setFilter(const UTILSLIB::FilterKernel &filterData);
+    void setFilter(const UTILSLIB::FilterKernel& filterData);
 
     //=========================================================================================================
     /**
@@ -309,7 +312,7 @@ private:
      *
      * @return                      true if handled by custom event handling, false if not.
      */
-    bool eventFilter(QObject *object, QEvent *event);
+    bool eventFilter(QObject* object, QEvent* event);
 
     //=========================================================================================================
     /**
@@ -363,28 +366,28 @@ private:
      */
     void initRightClickContextMenu();
 
-    QPointer<QTableView>                                m_pTableView;                   /**< Pointer to table view ui element. */
+    QPointer<QTableView> m_pTableView; /**< Pointer to table view ui element. */
 
-    QSharedPointer<ANSHAREDLIB::FiffRawViewModel>       m_pModel;                       /**< Pointer to associated Model. */
+    QSharedPointer<ANSHAREDLIB::FiffRawViewModel> m_pModel; /**< Pointer to associated Model. */
 
-    QSharedPointer<FiffRawViewDelegate>                 m_pDelegate;                    /**< Pointer to associated Delegate. */
+    QSharedPointer<FiffRawViewDelegate> m_pDelegate; /**< Pointer to associated Delegate. */
 
-    QMap<qint32,float>                                  m_qMapChScaling;                /**< Channel scaling values. */
+    QMap<qint32, float> m_qMapChScaling; /**< Channel scaling values. */
 
-    float                                               m_fDefaultSectionSize;          /**< Default row height */
-    float                                               m_fZoomFactor;                  /**< Zoom factor */
-    int                                                 m_iLastClickedSample;            /**< Stores last clicked sample on screen */
+    float m_fDefaultSectionSize; /**< Default row height */
+    float m_fZoomFactor;         /**< Zoom factor */
+    int m_iLastClickedSample;    /**< Stores last clicked sample on screen */
 
-    qint32                                              m_iT;                           /**< Display window size in seconds. */
+    qint32 m_iT; /**< Display window size in seconds. */
 
-    QScroller*                                          m_pKineticScroller;             /**< Used for kinetic scrolling through data view. */
+    QScroller* m_pKineticScroller; /**< Used for kinetic scrolling through data view. */
 
-    QLabel*                                             m_pInitialTimeLabel;            /**< Left 'Sample | Seconds' display label. */
-    QLabel*                                             m_pEndTimeLabel;                /**< Right 'Sample | Seconds' display label. */
-    QLabel*                                             m_pFileLabel;                   /**< File name and path, Fs and duration. */
-    QLabel*                                             m_pFilterLabel;                 /**< Short filter description to be shown under the time-series. */
-    QMenu*                                              m_pRightClickContextMenu;       /**< Hold the menu that appears when a right-click event occurs. */
-    QAction*                                            m_pAddEventAction;              /**< Hold the action for directing callback for adding a new event. */
+    QLabel* m_pInitialTimeLabel;     /**< Left 'Sample | Seconds' display label. */
+    QLabel* m_pEndTimeLabel;         /**< Right 'Sample | Seconds' display label. */
+    QLabel* m_pFileLabel;            /**< File name and path, Fs and duration. */
+    QLabel* m_pFilterLabel;          /**< Short filter description to be shown under the time-series. */
+    QMenu* m_pRightClickContextMenu; /**< Hold the menu that appears when a right-click event occurs. */
+    QAction* m_pAddEventAction;      /**< Hold the action for directing callback for adding a new event. */
 signals:
     void tableViewDataWidthChanged(int iWidth);
 

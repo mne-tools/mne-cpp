@@ -263,7 +263,7 @@ bool Surf2Bem::readFreeSurferSurface(const SurfaceInput& input, MNEBemSurface& b
     // Populate BEM surface
     // Vertices are in mm in the file, convert to meters (matching FSLIB::FsSurface behavior)
     //
-    verts.transposeInPlace();  // now nvert x 3
+    verts.transposeInPlace(); // now nvert x 3
     verts.array() *= 0.001f;
 
     bemSurf.np = nvert;
@@ -347,8 +347,8 @@ bool Surf2Bem::readAsciiTriSurface(const SurfaceInput& input, MNEBemSurface& bem
         }
         if (input.swap) {
             tris(k, 0) = v1 - 1;
-            tris(k, 1) = v3 - 1;   // Swapped
-            tris(k, 2) = v2 - 1;   // Swapped
+            tris(k, 1) = v3 - 1; // Swapped
+            tris(k, 2) = v2 - 1; // Swapped
         } else {
             tris(k, 0) = v1 - 1;
             tris(k, 1) = v2 - 1;

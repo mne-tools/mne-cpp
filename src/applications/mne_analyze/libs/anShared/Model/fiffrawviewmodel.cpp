@@ -63,7 +63,7 @@ using namespace UTILSLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-FiffRawViewModel::FiffRawViewModel(QObject *pParent)
+FiffRawViewModel::FiffRawViewModel(QObject* pParent)
 : AbstractModel(pParent)
 {
     qInfo() << "[FiffRawViewModel::FiffRawViewModel] Default constructor called !";
@@ -71,11 +71,11 @@ FiffRawViewModel::FiffRawViewModel(QObject *pParent)
 
 //=============================================================================================================
 
-FiffRawViewModel::FiffRawViewModel(const QString &sFilePath,
+FiffRawViewModel::FiffRawViewModel(const QString& sFilePath,
                                    const QByteArray& byteLoadedData,
                                    qint32 iVisibleWindowSize,
                                    qint32 iPreloadBufferSize,
-                                   QObject *pParent)
+                                   QObject* pParent)
 : AbstractModel(sFilePath, pParent)
 , m_dDx(1.0)
 , m_iSamplesPerBlock(1024)
@@ -103,7 +103,7 @@ FiffRawViewModel::FiffRawViewModel(const QString &sFilePath,
                 postBlockLoad(m_blockLoadFutureWatcher.future().result());
             });
 
-    if(byteLoadedData.isEmpty()) {
+    if (byteLoadedData.isEmpty()) {
         m_file.setFileName(sFilePath);
         initFiffData(m_file);
     } else {
@@ -119,7 +119,7 @@ FiffRawViewModel::FiffRawViewModel(const QString &sFilePath,
 
 FiffRawViewModel::~FiffRawViewModel()
 {
-    if(m_bRealtime){
+    if (m_bRealtime) {
         m_file.remove();
     }
 }
@@ -131,7 +131,7 @@ bool FiffRawViewModel::initFiffData(QIODevice& p_IODevice)
     // build FiffIO
     m_pFiffIO = QSharedPointer<FiffIO>::create(p_IODevice);
 
-    if(m_pFiffIO->m_qlistRaw.empty()) {
+    if (m_pFiffIO->m_qlistRaw.empty()) {
         qWarning() << "[FiffRawViewModel::loadFiffData] File does not contain any Fiff data";
         return false;
     }
@@ -139,7 +139,7 @@ bool FiffRawViewModel::initFiffData(QIODevice& p_IODevice)
     m_ChannelInfoList.clear();
 
     // load channel infos
-    for(qint32 i=0; i < m_pFiffIO->m_qlistRaw[0]->info.nchan; ++i) {
+    for (qint32 i = 0; i < m_pFiffIO->m_qlistRaw[0]->info.nchan; ++i) {
         m_ChannelInfoList.append(m_pFiffIO->m_qlistRaw[0]->info.chs[i]);
     }
 
@@ -154,7 +154,7 @@ bool FiffRawViewModel::initFiffData(QIODevice& p_IODevice)
     m_iSamplesPerBlock = m_pFiffInfo->sfreq;
     reloadAllData();
 
-    qInfo() << "[FiffRawViewModel::initFiffData] Loaded" << m_lData.size() << "blocks with size"<<data.rows()<<"x"<<m_iSamplesPerBlock;
+    qInfo() << "[FiffRawViewModel::initFiffData] Loaded" << m_lData.size() << "blocks with size" << data.rows() << "x" << m_iSamplesPerBlock;
 
     qDebug() << "FIRST SAMPLE OFFSET IN ANALYZE:" << m_pFiffIO->m_qlistRaw[0]->first_samp;
 
@@ -168,10 +168,10 @@ bool FiffRawViewModel::initFiffData(QIODevice& p_IODevice)
 
 //=============================================================================================================
 
-QVariant FiffRawViewModel::data(const QModelIndex &index,
+QVariant FiffRawViewModel::data(const QModelIndex& index,
                                 int role) const
 {
-    if(role != Qt::DisplayRole && role != Qt::BackgroundRole) {
+    if (role != Qt::DisplayRole && role != Qt::BackgroundRole) {
         //qInfo() << "[FiffRawViewModel::data] Role " << role << " not implemented yet.";
         return QVariant();
     }
@@ -182,7 +182,7 @@ QVariant FiffRawViewModel::data(const QModelIndex &index,
 
     if (index.isValid()) {
         // channel names
-        if(index.column() == 0) {
+        if (index.column() == 0) {
             return QVariant(m_ChannelInfoList[index.row()].ch_name);
         }
 
@@ -197,7 +197,7 @@ QVariant FiffRawViewModel::data(const QModelIndex &index,
                     m_dataMutex.lock();
 
                     // wrap in ChannelData container and then wrap into QVariant
-                    if(m_bPerformFiltering) {
+                    if (m_bPerformFiltering) {
                         result.setValue(ChannelData(m_lFilteredData, index.row()));
                     } else {
                         result.setValue(ChannelData(m_lData, index.row()));
@@ -211,7 +211,7 @@ QVariant FiffRawViewModel::data(const QModelIndex &index,
         }
 
         // whether channel is marked as bad
-        else if(index.column() == 2) {
+        else if (index.column() == 2) {
             return QVariant(m_pFiffInfo->bads.contains(m_pFiffInfo->ch_names[index.row()]));
         } else {
             qWarning() << "[FiffRawViewModel::data] Column " << index.column() << " not implemented !";
@@ -227,11 +227,11 @@ QVariant FiffRawViewModel::data(const QModelIndex &index,
 
 bool FiffRawViewModel::saveToFile(const QString& sPath)
 {
-    #ifdef WASMBUILD
+#ifdef WASMBUILD
     QBuffer* bufferOut = new QBuffer;
 
-    if(m_pFiffIO->m_qlistRaw.size() > 0) {
-        if(m_bPerformFiltering) {
+    if (m_pFiffIO->m_qlistRaw.size() > 0) {
+        if (m_bPerformFiltering) {
             return RTPROCESSINGLIB::filterFile(*bufferOut, m_pFiffIO->m_qlistRaw[0], m_filterKernel);
         } else {
             return m_pFiffIO->write_raw(*bufferOut, 0);
@@ -246,11 +246,11 @@ bool FiffRawViewModel::saveToFile(const QString& sPath)
     //bufferOut->deleteLater();
 
     return false;
-    #else
+#else
     QFile fFileOut(sPath);
 
-    if(m_pFiffIO->m_qlistRaw.size() > 0) {
-        if(m_bPerformFiltering) {
+    if (m_pFiffIO->m_qlistRaw.size() > 0) {
+        if (m_bPerformFiltering) {
             return RTPROCESSINGLIB::filterFile(fFileOut, m_pFiffIO->m_qlistRaw[0], m_filterKernel);
         } else {
             return m_pFiffIO->write_raw(fFileOut, 0);
@@ -258,7 +258,7 @@ bool FiffRawViewModel::saveToFile(const QString& sPath)
     }
 
     return false;
-    #endif
+#endif
 }
 
 //=============================================================================================================
@@ -267,14 +267,14 @@ QVariant FiffRawViewModel::headerData(int section,
                                       Qt::Orientation orientation,
                                       int role) const
 {
-    if(role != Qt::DisplayRole && role != Qt::TextAlignmentRole)
+    if (role != Qt::DisplayRole && role != Qt::TextAlignmentRole)
         return QVariant();
 
-    if(orientation == Qt::Vertical) {
-        QModelIndex chname = createIndex(section,0);
-        switch(role) {
-        case Qt::DisplayRole:
-            return QVariant(data(chname).toString());
+    if (orientation == Qt::Vertical) {
+        QModelIndex chname = createIndex(section, 0);
+        switch (role) {
+            case Qt::DisplayRole:
+                return QVariant(data(chname).toString());
         }
     }
 
@@ -283,7 +283,7 @@ QVariant FiffRawViewModel::headerData(int section,
 
 //=============================================================================================================
 
-Qt::ItemFlags FiffRawViewModel::flags(const QModelIndex &index) const
+Qt::ItemFlags FiffRawViewModel::flags(const QModelIndex& index) const
 {
     // TODO implement stuff
     return QAbstractItemModel::flags(index);
@@ -293,7 +293,7 @@ Qt::ItemFlags FiffRawViewModel::flags(const QModelIndex &index) const
 
 QModelIndex FiffRawViewModel::index(int row,
                                     int column,
-                                    const QModelIndex &parent) const
+                                    const QModelIndex& parent) const
 {
     Q_UNUSED(parent);
     return createIndex(row, column);
@@ -301,7 +301,7 @@ QModelIndex FiffRawViewModel::index(int row,
 
 //=============================================================================================================
 
-QModelIndex FiffRawViewModel::parent(const QModelIndex &index) const
+QModelIndex FiffRawViewModel::parent(const QModelIndex& index) const
 {
     Q_UNUSED(index);
     // TODO implement stuff
@@ -310,10 +310,10 @@ QModelIndex FiffRawViewModel::parent(const QModelIndex &index) const
 
 //=============================================================================================================
 
-int FiffRawViewModel::rowCount(const QModelIndex &parent) const
+int FiffRawViewModel::rowCount(const QModelIndex& parent) const
 {
     Q_UNUSED(parent);
-    if(m_ChannelInfoList.empty() == false)
+    if (m_ChannelInfoList.empty() == false)
         return m_ChannelInfoList.size();
 
     return 0;
@@ -321,7 +321,7 @@ int FiffRawViewModel::rowCount(const QModelIndex &parent) const
 
 //=============================================================================================================
 
-int FiffRawViewModel::columnCount(const QModelIndex &parent) const
+int FiffRawViewModel::columnCount(const QModelIndex& parent) const
 {
     Q_UNUSED(parent);
     // TODO implement stuff
@@ -330,7 +330,7 @@ int FiffRawViewModel::columnCount(const QModelIndex &parent) const
 
 //=============================================================================================================
 
-bool FiffRawViewModel::hasChildren(const QModelIndex &parent) const
+bool FiffRawViewModel::hasChildren(const QModelIndex& parent) const
 {
     Q_UNUSED(parent);
     // TODO implement stuff
@@ -346,7 +346,7 @@ QSharedPointer<FIFFLIB::FiffInfo> FiffRawViewModel::getFiffInfo() const
 
 //=============================================================================================================
 
-void FiffRawViewModel::setScaling(const QMap< qint32,float >& p_qMapChScaling)
+void FiffRawViewModel::setScaling(const QMap<qint32, float>& p_qMapChScaling)
 {
     beginResetModel();
     m_qMapChScaling = p_qMapChScaling;
@@ -400,7 +400,7 @@ void FiffRawViewModel::setWindowSize(int iNumSeconds,
 
 void FiffRawViewModel::distanceTimeSpacerChanged(int iNewValue)
 {
-    if(iNewValue <= 0) {
+    if (iNewValue <= 0) {
         m_iDistanceTimerSpacer = 1000;
     } else {
         m_iDistanceTimerSpacer = iNewValue;
@@ -418,7 +418,7 @@ float FiffRawViewModel::getNumberOfTimeSpacers() const
 
 int FiffRawViewModel::getTimeMarks(int iIndex) const
 {
-    if (m_pEventModel){
+    if (m_pEventModel) {
         return m_pEventModel->getEvent(iIndex);
     } else {
         return 0;
@@ -429,7 +429,7 @@ int FiffRawViewModel::getTimeMarks(int iIndex) const
 
 int FiffRawViewModel::getTimeListSize() const
 {
-    if(m_pEventModel){
+    if (m_pEventModel) {
         return m_pEventModel->getNumberOfEventsToDisplay();
     } else {
         return 0;
@@ -468,12 +468,11 @@ bool FiffRawViewModel::shouldDisplayEvent() const
 
 QSharedPointer<EventModel> FiffRawViewModel::getEventModel() const
 {
-    if(m_pEventModel){
+    if (m_pEventModel) {
         return m_pEventModel;
     } else {
         return QSharedPointer<EventModel>::create();
     }
-
 }
 
 //=============================================================================================================
@@ -482,7 +481,7 @@ void FiffRawViewModel::setFilter(const FilterKernel& filterData)
 {
     m_filterKernel = filterData;
 
-    if(m_bPerformFiltering) {
+    if (m_bPerformFiltering) {
         reloadAllData();
     }
 }
@@ -499,17 +498,17 @@ void FiffRawViewModel::setFilterActive(bool bState)
 {
     m_bPerformFiltering = bState;
 
-    if(m_bPerformFiltering) {
+    if (m_bPerformFiltering) {
         reloadAllData();
     }
-    emit dataChanged(createIndex(0,0), createIndex(rowCount(), columnCount()));
+    emit dataChanged(createIndex(0, 0), createIndex(rowCount(), columnCount()));
 }
 
 //=============================================================================================================
 
 void FiffRawViewModel::setFilterChannelType(const QString& channelType)
 {
-    if(!m_pFiffInfo) {
+    if (!m_pFiffInfo) {
         return;
     }
 
@@ -519,22 +518,21 @@ void FiffRawViewModel::setFilterChannelType(const QString& channelType)
     //Create channel filter list independent from channelNames
     m_lFilterChannelList.resize(0);
 
-    for(int i = 0; i < m_pFiffInfo->chs.size(); ++i) {
-        if((m_pFiffInfo->chs.at(i).kind == FIFFV_MEG_CH || m_pFiffInfo->chs.at(i).kind == FIFFV_EEG_CH ||
-            m_pFiffInfo->chs.at(i).kind == FIFFV_EOG_CH || m_pFiffInfo->chs.at(i).kind == FIFFV_ECG_CH ||
-            m_pFiffInfo->chs.at(i).kind == FIFFV_EMG_CH)/* && !m_pFiffInfo->bads.contains(m_pFiffInfo->chs.at(i).ch_name)*/) {
-
-            if(m_sFilterChannelType == "All") {
+    for (int i = 0; i < m_pFiffInfo->chs.size(); ++i) {
+        if ((m_pFiffInfo->chs.at(i).kind == FIFFV_MEG_CH || m_pFiffInfo->chs.at(i).kind == FIFFV_EEG_CH ||
+             m_pFiffInfo->chs.at(i).kind == FIFFV_EOG_CH || m_pFiffInfo->chs.at(i).kind == FIFFV_ECG_CH ||
+             m_pFiffInfo->chs.at(i).kind == FIFFV_EMG_CH) /* && !m_pFiffInfo->bads.contains(m_pFiffInfo->chs.at(i).ch_name)*/) {
+            if (m_sFilterChannelType == "All") {
                 m_lFilterChannelList.conservativeResize(m_lFilterChannelList.cols() + 1);
-                m_lFilterChannelList[m_lFilterChannelList.cols()-1] = i;
-            } else if(m_pFiffInfo->chs.at(i).ch_name.contains(m_sFilterChannelType)) {
+                m_lFilterChannelList[m_lFilterChannelList.cols() - 1] = i;
+            } else if (m_pFiffInfo->chs.at(i).ch_name.contains(m_sFilterChannelType)) {
                 m_lFilterChannelList.conservativeResize(m_lFilterChannelList.cols() + 1);
-                m_lFilterChannelList[m_lFilterChannelList.cols()-1] = i;
+                m_lFilterChannelList[m_lFilterChannelList.cols() - 1] = i;
             }
         }
     }
 
-    if(m_bPerformFiltering) {
+    if (m_bPerformFiltering) {
         reloadAllData();
     }
 }
@@ -566,15 +564,14 @@ void FiffRawViewModel::updateHorizontalScrollPosition(qint32 newScrollPosition)
     m_iScrollPos = newScrollPosition;
 
     // Convert scroll position to fiff sample space via m_dDx
-    qint32 targetCursor = (newScrollPosition / m_dDx) + absoluteFirstSample() ;
+    qint32 targetCursor = (newScrollPosition / m_dDx) + absoluteFirstSample();
 
-    if (targetCursor < m_iFiffCursorBegin + (m_iPreloadBufferSize - 1) * m_iSamplesPerBlock
-        && !m_bStartOfFileReached) {
+    if (targetCursor < m_iFiffCursorBegin + (m_iPreloadBufferSize - 1) * m_iSamplesPerBlock && !m_bStartOfFileReached) {
         // Calculate the amount of data we need to load
         qint32 sampleDist = (m_iFiffCursorBegin + (m_iPreloadBufferSize - 1) * m_iSamplesPerBlock) - targetCursor;
 
         // Calculate the needed blocks based on the amount of samples to load
-        qint32 blockDist = (qint32) ceil(((double) sampleDist) / ((double) m_iSamplesPerBlock));
+        qint32 blockDist = (qint32)ceil(((double)sampleDist) / ((double)m_iSamplesPerBlock));
 
         if (blockDist >= m_iTotalBlockCount) {
             // we must "jump" to the new cursor ...
@@ -587,13 +584,12 @@ void FiffRawViewModel::updateHorizontalScrollPosition(qint32 newScrollPosition)
             // simply load earlier blocks
             postBlockLoad(loadEarlierBlocks(blockDist));
         }
-    } else if (targetCursor + (m_iVisibleWindowSize * m_iSamplesPerBlock) >= m_iFiffCursorBegin + ((m_iPreloadBufferSize + 1) + m_iVisibleWindowSize) * m_iSamplesPerBlock
-               && !m_bEndOfFileReached) {
+    } else if (targetCursor + (m_iVisibleWindowSize * m_iSamplesPerBlock) >= m_iFiffCursorBegin + ((m_iPreloadBufferSize + 1) + m_iVisibleWindowSize) * m_iSamplesPerBlock && !m_bEndOfFileReached) {
         // Calculate the amount of data we need to load
         qint32 sampleDist = targetCursor + (m_iVisibleWindowSize * m_iSamplesPerBlock) - (m_iFiffCursorBegin + ((m_iPreloadBufferSize + 1) + m_iVisibleWindowSize) * m_iSamplesPerBlock);
 
         // Calculate the needed blocks based on the amount of samples to load
-        qint32 blockDist = (qint32) ceil(((double) sampleDist) / ((double) m_iSamplesPerBlock));
+        qint32 blockDist = (qint32)ceil(((double)sampleDist) / ((double)m_iSamplesPerBlock));
 
         if (blockDist >= m_iTotalBlockCount) {
             // we must "jump" to the new cursor ...
@@ -616,20 +612,20 @@ bool FiffRawViewModel::filterDataBlock(MatrixXd& matData,
                                        bool bFilterEnd,
                                        bool bKeepOverhead)
 {
-    if(!m_bPerformFiltering) {
+    if (!m_bPerformFiltering) {
         return false;
     }
 
-    if(m_lFilterChannelList.cols() == 0) {
+    if (m_lFilterChannelList.cols() == 0) {
         qWarning() << "[FiffRawViewModel::filterDataBlock] No channels to filter specified.";
         return false;
     }
 
     // In WASM mode do not use multithreading for filtering
     bool bUseThread = true;
-    #ifdef WASMBUILD
+#ifdef WASMBUILD
     bUseThread = false;
-    #endif
+#endif
 
     matData = m_pRtFilter->calculate(matData,
                                      m_filterKernel,
@@ -685,7 +681,7 @@ int FiffRawViewModel::loadEarlierBlocks(qint32 numBlocks)
     int end = m_iFiffCursorBegin - 1;
 
     // Update m_iFiffCursorBegin before we account for the filter delay
-    if(start <= absoluteFirstSample()) {
+    if (start <= absoluteFirstSample()) {
         m_iFiffCursorBegin = absoluteFirstSample();
     } else {
         m_iFiffCursorBegin = start;
@@ -695,52 +691,52 @@ int FiffRawViewModel::loadEarlierBlocks(qint32 numBlocks)
     int iFilterDelay = 0;
     bool bBeforeStartReached = false;
 
-    if(m_bPerformFiltering) {
-        iFilterDelay = m_filterKernel.getFilterOrder()/2;
-        end += m_filterKernel.getFilterOrder()/2;
+    if (m_bPerformFiltering) {
+        iFilterDelay = m_filterKernel.getFilterOrder() / 2;
+        end += m_filterKernel.getFilterOrder() / 2;
 
         // Check if we have reached the beginning/end of the file
-        if(start-iFilterDelay >= absoluteFirstSample()) {
-            start -= m_filterKernel.getFilterOrder()/2;
+        if (start - iFilterDelay >= absoluteFirstSample()) {
+            start -= m_filterKernel.getFilterOrder() / 2;
         } else {
             // Add another filter delay because we need enough data to sucessfully filter with arbiritary filter lengths
-            end += m_filterKernel.getFilterOrder()/2;
+            end += m_filterKernel.getFilterOrder() / 2;
             iFilterDelay = 0;
             bBeforeStartReached = true;
         }
     }
 
     // Read the raw data
-    if(m_pFiffIO->m_qlistRaw[0]->read_raw_segment(matData, matTimes, start, end)) {
+    if (m_pFiffIO->m_qlistRaw[0]->read_raw_segment(matData, matTimes, start, end)) {
         // qDebug() << "[FiffRawViewModel::loadFiffData] Successfully read a block ";
     } else {
         qWarning() << "[FiffRawViewModel::loadEarlierBlocks] Could not read block ";
         return -1;
     }
 
-    for(int i = 0; i < numBlocks; ++i) {
-        m_lNewData.push_front(QSharedPointer<QPair<MatrixXd, MatrixXd> >::create(qMakePair(matData.block(0, i*m_iSamplesPerBlock+iFilterDelay, matData.rows(), m_iSamplesPerBlock),
-                                                                                           matTimes.block(0, i*m_iSamplesPerBlock+iFilterDelay, matTimes.rows(), m_iSamplesPerBlock))));
+    for (int i = 0; i < numBlocks; ++i) {
+        m_lNewData.push_front(QSharedPointer<QPair<MatrixXd, MatrixXd>>::create(qMakePair(matData.block(0, i * m_iSamplesPerBlock + iFilterDelay, matData.rows(), m_iSamplesPerBlock),
+                                                                                          matTimes.block(0, i * m_iSamplesPerBlock + iFilterDelay, matTimes.rows(), m_iSamplesPerBlock))));
     }
 
     // Filter data if activated, otherwise set to raw data
-    if(m_bPerformFiltering) {
+    if (m_bPerformFiltering) {
         bool bFilterSuccess = false;
-        if(bBeforeStartReached) {
-            iFilterDelay = m_filterKernel.getFilterOrder()/4;
+        if (bBeforeStartReached) {
+            iFilterDelay = m_filterKernel.getFilterOrder() / 4;
             bFilterSuccess = filterDataBlock(matData, true, true);
         } else {
             bFilterSuccess = filterDataBlock(matData, true);
         }
 
-        if(!bFilterSuccess) {
+        if (!bFilterSuccess) {
             m_lFilteredNewData = m_lNewData;
             return 0;
         }
 
-        for(int i = 0; i < numBlocks; ++i) {
-            m_lFilteredNewData.push_front(QSharedPointer<QPair<MatrixXd, MatrixXd> >::create(qMakePair(matData.block(0, (i*m_iSamplesPerBlock)+(2*iFilterDelay), matData.rows(), m_iSamplesPerBlock),
-                                                                                                       matTimes.block(0, (i*m_iSamplesPerBlock)+(2*iFilterDelay), matTimes.rows(), m_iSamplesPerBlock))));
+        for (int i = 0; i < numBlocks; ++i) {
+            m_lFilteredNewData.push_front(QSharedPointer<QPair<MatrixXd, MatrixXd>>::create(qMakePair(matData.block(0, (i * m_iSamplesPerBlock) + (2 * iFilterDelay), matData.rows(), m_iSamplesPerBlock),
+                                                                                                      matTimes.block(0, (i * m_iSamplesPerBlock) + (2 * iFilterDelay), matTimes.rows(), m_iSamplesPerBlock))));
         }
     } else {
         m_lFilteredNewData = m_lNewData;
@@ -790,46 +786,46 @@ int FiffRawViewModel::loadLaterBlocks(qint32 numBlocks)
     // Account for filter delay of current filter kernel
     int iFilterDelay = 0;
 
-    if(m_bPerformFiltering) {
-        iFilterDelay = m_filterKernel.getFilterOrder()/2;
+    if (m_bPerformFiltering) {
+        iFilterDelay = m_filterKernel.getFilterOrder() / 2;
 
         // Check if we have reached the beginning/end of the file
-        if(start-iFilterDelay > absoluteFirstSample()) {
-            start -= m_filterKernel.getFilterOrder()/2;
+        if (start - iFilterDelay > absoluteFirstSample()) {
+            start -= m_filterKernel.getFilterOrder() / 2;
         } else {
             iFilterDelay = 0;
         }
 
-        if(end+iFilterDelay < m_pFiffIO->m_qlistRaw[0]->last_samp) {
-            end += m_filterKernel.getFilterOrder()/2;
+        if (end + iFilterDelay < m_pFiffIO->m_qlistRaw[0]->last_samp) {
+            end += m_filterKernel.getFilterOrder() / 2;
         } else {
             iFilterDelay = 0;
         }
     }
 
     // read data
-    if(m_pFiffIO->m_qlistRaw[0]->read_raw_segment(matData, matTimes, start, end)) {
+    if (m_pFiffIO->m_qlistRaw[0]->read_raw_segment(matData, matTimes, start, end)) {
         // qDebug() << "[FiffRawViewModel::loadFiffData] Successfully read a block ";
     } else {
         qWarning() << "[FiffRawViewModel::loadLaterBlocks] Could not read block ";
         return -1;
     }
 
-    for(int i = 0; i < numBlocks; ++i) {
-        m_lNewData.push_back(QSharedPointer<QPair<MatrixXd, MatrixXd> >::create(qMakePair(matData.block(0, i*m_iSamplesPerBlock+iFilterDelay, matData.rows(), m_iSamplesPerBlock),
-                                                                                          matTimes.block(0, i*m_iSamplesPerBlock+iFilterDelay, matTimes.rows(), m_iSamplesPerBlock))));
+    for (int i = 0; i < numBlocks; ++i) {
+        m_lNewData.push_back(QSharedPointer<QPair<MatrixXd, MatrixXd>>::create(qMakePair(matData.block(0, i * m_iSamplesPerBlock + iFilterDelay, matData.rows(), m_iSamplesPerBlock),
+                                                                                         matTimes.block(0, i * m_iSamplesPerBlock + iFilterDelay, matTimes.rows(), m_iSamplesPerBlock))));
     }
 
     // Filter data if activated, otherwise set to raw data
-    if(m_bPerformFiltering) {
-        if(!filterDataBlock(matData, true)) {
+    if (m_bPerformFiltering) {
+        if (!filterDataBlock(matData, true)) {
             m_lFilteredNewData = m_lNewData;
             return 1;
         }
 
-        for(int i = 0; i < numBlocks; ++i) {
-            m_lFilteredNewData.push_back(QSharedPointer<QPair<MatrixXd, MatrixXd> >::create(qMakePair(matData.block(0, i*m_iSamplesPerBlock+(2*iFilterDelay), matData.rows(), m_iSamplesPerBlock),
-                                                                                                      matTimes.block(0, i*m_iSamplesPerBlock+(2*iFilterDelay), matTimes.rows(), m_iSamplesPerBlock))));
+        for (int i = 0; i < numBlocks; ++i) {
+            m_lFilteredNewData.push_back(QSharedPointer<QPair<MatrixXd, MatrixXd>>::create(qMakePair(matData.block(0, i * m_iSamplesPerBlock + (2 * iFilterDelay), matData.rows(), m_iSamplesPerBlock),
+                                                                                                     matTimes.block(0, i * m_iSamplesPerBlock + (2 * iFilterDelay), matTimes.rows(), m_iSamplesPerBlock))));
         }
     } else {
         m_lFilteredNewData = m_lNewData;
@@ -843,12 +839,11 @@ int FiffRawViewModel::loadLaterBlocks(qint32 numBlocks)
 
 void FiffRawViewModel::postBlockLoad(int result)
 {
-    switch(result){
+    switch (result) {
         case -1:
             qWarning() << "[FiffRawViewModel::postBlockLoad] QFuture returned an error: " << result;
             break;
-        case 0:
-        {
+        case 0: {
             // insertion of earlier blocks
             int iNewBlocks = static_cast<int>(m_lNewData.size());
 
@@ -872,8 +867,7 @@ void FiffRawViewModel::postBlockLoad(int result)
 
             break;
         }
-        case 1:
-        {
+        case 1: {
             // insertion of later blocks
             int iNewBlocks = static_cast<int>(m_lNewData.size());
 
@@ -904,14 +898,14 @@ void FiffRawViewModel::postBlockLoad(int result)
     updateEndStartFlags();
     m_bCurrentlyLoading = false;
 
-    emit dataChanged(createIndex(0,0), createIndex(rowCount(), columnCount()));
+    emit dataChanged(createIndex(0, 0), createIndex(rowCount(), columnCount()));
 }
 
 //=============================================================================================================
 
 void FiffRawViewModel::reloadAllData()
 {
-    if(!m_pFiffInfo){
+    if (!m_pFiffInfo) {
         return;
     }
 
@@ -929,23 +923,23 @@ void FiffRawViewModel::reloadAllData()
     int iFilterDelay = 0;
     bool bBeforeStartReached = false;
 
-    if(m_bPerformFiltering) {
-        iFilterDelay = m_filterKernel.getFilterOrder()/2;
-        end += m_filterKernel.getFilterOrder()/2;
+    if (m_bPerformFiltering) {
+        iFilterDelay = m_filterKernel.getFilterOrder() / 2;
+        end += m_filterKernel.getFilterOrder() / 2;
 
         // Check if we have reached the beginning of the file
-        if(start-iFilterDelay >= m_pFiffIO->m_qlistRaw[0]->first_samp) {
-            start -= m_filterKernel.getFilterOrder()/2;
+        if (start - iFilterDelay >= m_pFiffIO->m_qlistRaw[0]->first_samp) {
+            start -= m_filterKernel.getFilterOrder() / 2;
         } else {
             // Add another filter delay because we need enough data to sucessfully filter with arbiritary filter lengths
-            end += m_filterKernel.getFilterOrder()/2;
+            end += m_filterKernel.getFilterOrder() / 2;
             iFilterDelay = 0;
             bBeforeStartReached = true;
         }
     }
 
     // read in all blocks
-    if(m_pFiffIO->m_qlistRaw[0]->read_raw_segment(matData, matTimes, start, end)) {
+    if (m_pFiffIO->m_qlistRaw[0]->read_raw_segment(matData, matTimes, start, end)) {
         // qDebug() << "[FiffRawmodel::loadFiffData] Successfully read a block ";
     } else {
         qWarning() << "[FiffRawViewModel::loadFiffData] Could not read samples " << start << " to " << end;
@@ -953,35 +947,35 @@ void FiffRawViewModel::reloadAllData()
     }
 
     // append a matrix pair for each block
-    for(int i = 0; i < m_iTotalBlockCount; ++i) {
-        m_lData.push_back(QSharedPointer<QPair<MatrixXd, MatrixXd> >::create(qMakePair(matData.block(0, i*m_iSamplesPerBlock+iFilterDelay, matData.rows(), m_iSamplesPerBlock),
-                                                                                       matTimes.block(0, i*m_iSamplesPerBlock+iFilterDelay, matTimes.rows(), m_iSamplesPerBlock))));
+    for (int i = 0; i < m_iTotalBlockCount; ++i) {
+        m_lData.push_back(QSharedPointer<QPair<MatrixXd, MatrixXd>>::create(qMakePair(matData.block(0, i * m_iSamplesPerBlock + iFilterDelay, matData.rows(), m_iSamplesPerBlock),
+                                                                                      matTimes.block(0, i * m_iSamplesPerBlock + iFilterDelay, matTimes.rows(), m_iSamplesPerBlock))));
     }
 
     // Filter data if activated, otherwise set to raw data
-    if(m_bPerformFiltering) {
+    if (m_bPerformFiltering) {
         bool bFilterSuccess = false;
-        if(bBeforeStartReached) {
-            iFilterDelay = m_filterKernel.getFilterOrder()/4;
+        if (bBeforeStartReached) {
+            iFilterDelay = m_filterKernel.getFilterOrder() / 4;
             bFilterSuccess = filterDataBlock(matData, true, true);
         } else {
             bFilterSuccess = filterDataBlock(matData, true);
         }
 
-        if(!bFilterSuccess) {
+        if (!bFilterSuccess) {
             m_lFilteredData = m_lData;
             return;
         }
 
-        for(int i = 0; i < m_iTotalBlockCount; ++i) {
-            m_lFilteredData.push_back(QSharedPointer<QPair<MatrixXd, MatrixXd> >::create(qMakePair(matData.block(0, (i*m_iSamplesPerBlock)+(2*iFilterDelay), matData.rows(), m_iSamplesPerBlock),
-                                                                                                   matTimes.block(0, (i*m_iSamplesPerBlock)+(2*iFilterDelay), matTimes.rows(), m_iSamplesPerBlock))));
+        for (int i = 0; i < m_iTotalBlockCount; ++i) {
+            m_lFilteredData.push_back(QSharedPointer<QPair<MatrixXd, MatrixXd>>::create(qMakePair(matData.block(0, (i * m_iSamplesPerBlock) + (2 * iFilterDelay), matData.rows(), m_iSamplesPerBlock),
+                                                                                                  matTimes.block(0, (i * m_iSamplesPerBlock) + (2 * iFilterDelay), matTimes.rows(), m_iSamplesPerBlock))));
         }
     } else {
         m_lFilteredData = m_lData;
     }
 
-    emit dataChanged(createIndex(0,0), createIndex(rowCount(), columnCount()));
+    emit dataChanged(createIndex(0, 0), createIndex(rowCount(), columnCount()));
 }
 
 //=============================================================================================================
@@ -1000,7 +994,8 @@ void FiffRawViewModel::setEventModel(QSharedPointer<ANSHAREDLIB::EventModel> pMo
 
 //=============================================================================================================
 
-void FiffRawViewModel::setScrollerSample(int iScrollerPos){
+void FiffRawViewModel::setScrollerSample(int iScrollerPos)
+{
     m_iScroller = iScrollerPos;
 }
 
@@ -1016,12 +1011,11 @@ int FiffRawViewModel::getScrollerPosition() const
 void FiffRawViewModel::setRealtime(bool bRealtime)
 {
     m_bRealtime = bRealtime;
-    if (m_bRealtime){
+    if (m_bRealtime) {
         m_FileSharer.initWatcher();
         connect(&m_FileSharer, &FIFFLIB::FiffFileSharer::newFileAtPath,
                 this, &FiffRawViewModel::readFromRealtimeFile, Qt::UniqueConnection);
     }
-
 }
 
 //=============================================================================================================
@@ -1033,12 +1027,12 @@ bool FiffRawViewModel::isRealtime()
 
 //=============================================================================================================
 
-void FiffRawViewModel::readFromRealtimeFile(const QString &path)
+void FiffRawViewModel::readFromRealtimeFile(const QString& path)
 {
     m_iLastFileEndSample = this->absoluteLastSample();
     m_file.remove();
     m_file.setFileName(path);
-    if (initFiffData(m_file)){
+    if (initFiffData(m_file)) {
         updateEndStartFlags();
         emit newRealtimeData();
     }

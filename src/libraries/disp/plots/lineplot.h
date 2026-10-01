@@ -81,7 +81,7 @@ public:
      *
      * @param[in] parent    If parent is nullptr, the new widget becomes a window.
      */
-    LinePlot(QWidget *parent = nullptr);
+    LinePlot(QWidget* parent = nullptr);
 
     //=========================================================================================================
     /**
@@ -93,7 +93,7 @@ public:
      */
     LinePlot(const QVector<double>& y,
              const QString& title = "",
-             QWidget *parent = nullptr);
+             QWidget* parent = nullptr);
 
     //=========================================================================================================
     /**
@@ -107,7 +107,7 @@ public:
     LinePlot(const QVector<double>& x,
              const QVector<double>& y,
              const QString& title = "",
-             QWidget *parent = nullptr);
+             QWidget* parent = nullptr);
 
     //=========================================================================================================
     /**
@@ -121,7 +121,7 @@ public:
      *
      * @param[in] p_sTitle   The title.
      */
-    void setTitle(const QString &p_sTitle);
+    void setTitle(const QString& p_sTitle);
 
     //=========================================================================================================
     /**
@@ -129,7 +129,7 @@ public:
      *
      * @param[in] p_sXLabel   The x axis label.
      */
-    void setXLabel(const QString &p_sXLabel);
+    void setXLabel(const QString& p_sXLabel);
 
     //=========================================================================================================
     /**
@@ -137,7 +137,7 @@ public:
      *
      * @param[in] p_sYLabel   The y axis label.
      */
-    void setYLabel(const QString &p_sYLabel);
+    void setYLabel(const QString& p_sYLabel);
 
     //=========================================================================================================
     /**
@@ -164,18 +164,18 @@ protected:
      *
      * @param[in] event  The paint event.
      */
-    void paintEvent(QPaintEvent *event) override;
+    void paintEvent(QPaintEvent* event) override;
 
 private:
-    QString                 m_sTitle;           /**< Title. */
-    QString                 m_sXLabel;          /**< X axis label. */
-    QString                 m_sYLabel;          /**< Y axis label. */
-    QVector<double>         m_vecXData;         /**< X data points. */
-    QVector<double>         m_vecYData;         /**< Y data points. */
-    double                  m_dMinX;            /**< Minimum X value. */
-    double                  m_dMaxX;            /**< Maximum X value. */
-    double                  m_dMinY;            /**< Minimum Y value. */
-    double                  m_dMaxY;            /**< Maximum Y value. */
+    QString m_sTitle;           /**< Title. */
+    QString m_sXLabel;          /**< X axis label. */
+    QString m_sYLabel;          /**< Y axis label. */
+    QVector<double> m_vecXData; /**< X data points. */
+    QVector<double> m_vecYData; /**< Y data points. */
+    double m_dMinX;             /**< Minimum X value. */
+    double m_dMaxX;             /**< Maximum X value. */
+    double m_dMinY;             /**< Minimum Y value. */
+    double m_dMaxY;             /**< Maximum Y value. */
 };
 
 //=============================================================================================================

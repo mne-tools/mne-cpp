@@ -60,7 +60,7 @@ FiffSimulatorProducer::FiffSimulatorProducer(FiffSimulator* p_pFiffSimulator)
 
 FiffSimulatorProducer::~FiffSimulatorProducer()
 {
-    if(this->isRunning()) {
+    if (this->isRunning()) {
         stop();
     }
 }
@@ -69,18 +69,18 @@ FiffSimulatorProducer::~FiffSimulatorProducer()
 
 void FiffSimulatorProducer::connectDataClient(QString p_sRtSeverIP)
 {
-    if(m_pRtDataClient.isNull()) {
+    if (m_pRtDataClient.isNull()) {
         m_pRtDataClient = QSharedPointer<RtDataClient>(new RtDataClient);
-    } else if(m_bDataClientIsConnected) {
+    } else if (m_bDataClientIsConnected) {
         return;
     }
 
     m_pRtDataClient->connectToHost(p_sRtSeverIP, m_iDefaultPortDataClient);
     m_pRtDataClient->waitForConnected(1000);
 
-    if(m_pRtDataClient->state() == QTcpSocket::ConnectedState) {
+    if (m_pRtDataClient->state() == QTcpSocket::ConnectedState) {
         m_producerMutex.lock();
-        if(!m_bDataClientIsConnected) {
+        if (!m_bDataClientIsConnected) {
             // get client ID
             m_iDataClientId = m_pRtDataClient->getClientId();
 
@@ -99,7 +99,7 @@ void FiffSimulatorProducer::connectDataClient(QString p_sRtSeverIP)
 
 void FiffSimulatorProducer::disconnectDataClient()
 {
-    if(m_bDataClientIsConnected) {
+    if (m_bDataClientIsConnected) {
         m_pRtDataClient->disconnectFromHost();
         if (m_pRtDataClient->state() != QAbstractSocket::UnconnectedState) {
             m_pRtDataClient->waitForDisconnected();
@@ -129,11 +129,11 @@ void FiffSimulatorProducer::run()
     connectDataClient(m_pFiffSimulator->m_sFiffSimulatorIP);
 
     qint32 count = 0;
-    while(!isInterruptionRequested() && (m_pRtDataClient->state() != QTcpSocket::ConnectedState)) {
+    while (!isInterruptionRequested() && (m_pRtDataClient->state() != QTcpSocket::ConnectedState)) {
         msleep(100);
         this->connectDataClient(m_pFiffSimulator->m_sFiffSimulatorIP);
         ++count;
-        if(count > 10) {
+        if (count > 10) {
             return;
         }
     }
@@ -142,9 +142,9 @@ void FiffSimulatorProducer::run()
     MatrixXf matData;
     fiff_int_t kind;
 
-    while(!isInterruptionRequested()) {
+    while (!isInterruptionRequested()) {
         m_producerMutex.lock();
-        if(m_bFlagInfoRequest) {
+        if (m_bFlagInfoRequest) {
             m_pFiffSimulator->m_qMutex.lock();
             auto metadata = m_pRtDataClient->readMetadata();
             m_pFiffSimulator->m_pFiffInfo = metadata.m_pInfo;
@@ -156,16 +156,16 @@ void FiffSimulatorProducer::run()
         m_producerMutex.unlock();
 
         // Only perform data reading if the measurement was started
-        if(m_pFiffSimulator->isRunning()) {
+        if (m_pFiffSimulator->isRunning()) {
             m_pRtDataClient->readRawBuffer(m_pFiffSimulator->m_pFiffInfo->nchan,
                                            matData,
                                            kind);
 
-            if(kind == FIFF_DATA_BUFFER) {
-                while(!m_pFiffSimulator->m_pCircularBuffer->push(matData) && !isInterruptionRequested()) {
+            if (kind == FIFF_DATA_BUFFER) {
+                while (!m_pFiffSimulator->m_pCircularBuffer->push(matData) && !isInterruptionRequested()) {
                     //Do nothing until the circular buffer is ready to accept new data again
                 }
-            } else if(FIFF_DATA_BUFFER == FIFF_BLOCK_END) {
+            } else if (FIFF_DATA_BUFFER == FIFF_BLOCK_END) {
                 break;
             }
         }

@@ -55,7 +55,8 @@
 // DEFINE NAMESPACE MLLIB
 //=============================================================================================================
 
-namespace MLLIB{
+namespace MLLIB
+{
 
 //=============================================================================================================
 /**
@@ -73,8 +74,8 @@ class MLSHARED_EXPORT MlTensor
 {
 public:
     //  --- type aliases used in the public API --------------------------------
-    using RowMajorMatrixXf      = Eigen::Matrix<float, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor>;
-    using RowMajorMatrixMap     = Eigen::Map<RowMajorMatrixXf>;
+    using RowMajorMatrixXf = Eigen::Matrix<float, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor>;
+    using RowMajorMatrixMap = Eigen::Map<RowMajorMatrixXf>;
     using ConstRowMajorMatrixMap = Eigen::Map<const RowMajorMatrixXf>;
 
     //=========================================================================================================
@@ -263,10 +264,10 @@ public:
 private:
     static int64_t computeSize(const std::vector<int64_t>& shape);
 
-    std::shared_ptr<std::vector<float>> m_storage;  /**< Ref-counted owned buffer (null for views). */
-    float*              m_data  = nullptr;           /**< Always points to valid data (owned or external). */
-    std::vector<int64_t> m_shape;                    /**< Dimension sizes. */
-    int64_t             m_size  = 0;                 /**< Cached total element count. */
+    std::shared_ptr<std::vector<float>> m_storage; /**< Ref-counted owned buffer (null for views). */
+    float* m_data = nullptr;                       /**< Always points to valid data (owned or external). */
+    std::vector<int64_t> m_shape;                  /**< Dimension sizes. */
+    int64_t m_size = 0;                            /**< Cached total element count. */
 };
 
 } // namespace MLLIB

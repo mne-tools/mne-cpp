@@ -46,7 +46,8 @@ using namespace Eigen;
 // STATIC HELPERS
 //=============================================================================================================
 
-namespace {
+namespace
+{
 
 // Log-cosh nonlinearity g(u) = tanh(u), g'(u) = 1 - tanh²(u)
 inline void logcoshNonlinearity(const VectorXd& u, VectorXd& g, double& gPrimeMean, int nSamples)
@@ -68,16 +69,16 @@ inline void logcoshNonlinearity(const VectorXd& u, VectorXd& g, double& gPrimeMe
 //=============================================================================================================
 
 IcaResult PicardIca::run(const MatrixXd& matData,
-                          int    nComponents,
-                          int    maxIter,
-                          double tol,
-                          [[maybe_unused]] int    lbfgsMemory,
-                          int    randomSeed)
+                         int nComponents,
+                         int maxIter,
+                         double tol,
+                         [[maybe_unused]] int lbfgsMemory,
+                         int randomSeed)
 {
     IcaResult result;
     result.bConverged = false;
 
-    const int nCh      = static_cast<int>(matData.rows());
+    const int nCh = static_cast<int>(matData.rows());
     const int nSamples = static_cast<int>(matData.cols());
 
     if (nComponents <= 0 || nComponents > nCh)
@@ -110,10 +111,10 @@ IcaResult PicardIca::run(const MatrixXd& matData,
 
     // Whitening matrix: K = D^(-1/2) * V'
     VectorXd Dinvsqrt = D.array().max(1e-15).sqrt().inverse().matrix();
-    MatrixXd K = Dinvsqrt.asDiagonal() * V.transpose();    // (nComp x nCh)
-    MatrixXd Kinv = V * D.array().sqrt().matrix().asDiagonal();  // (nCh x nComp) — dewhitening
+    MatrixXd K = Dinvsqrt.asDiagonal() * V.transpose();         // (nComp x nCh)
+    MatrixXd Kinv = V * D.array().sqrt().matrix().asDiagonal(); // (nCh x nComp) — dewhitening
 
-    MatrixXd Xw = K * X;  // (nComp x nSamples) whitened data
+    MatrixXd Xw = K * X; // (nComp x nSamples) whitened data
 
     // --- 3. Initialise the unmixing matrix W as random orthogonal ---
     std::mt19937 gen(static_cast<unsigned>(randomSeed));
@@ -137,7 +138,7 @@ IcaResult PicardIca::run(const MatrixXd& matData,
 
         for (int k = 0; k < nComponents; ++k) {
             // Current source
-            VectorXd yk = (W.row(k) * Xw).transpose();  // (nSamples)
+            VectorXd yk = (W.row(k) * Xw).transpose(); // (nSamples)
 
             // Nonlinearity
             VectorXd gk;
@@ -146,17 +147,14 @@ IcaResult PicardIca::run(const MatrixXd& matData,
 
             // FastICA-style Newton update (preconditioned by gPrimeMean)
             // w_new = E[x * g(w'x)] - E[g'(w'x)] * w
-            VectorXd wNew = (Xw * gk / static_cast<double>(nSamples))
-                           - gPrimeMean * W.row(k).transpose();
+            VectorXd wNew = (Xw * gk / static_cast<double>(nSamples)) - gPrimeMean * W.row(k).transpose();
 
             Wnew.row(k) = wNew.transpose();
         }
 
         // Symmetric orthogonalisation of Wnew
         SelfAdjointEigenSolver<MatrixXd> eigW(Wnew * Wnew.transpose());
-        MatrixXd sqrtInv = eigW.eigenvectors()
-                           * eigW.eigenvalues().array().max(1e-15).rsqrt().matrix().asDiagonal()
-                           * eigW.eigenvectors().transpose();
+        MatrixXd sqrtInv = eigW.eigenvectors() * eigW.eigenvalues().array().max(1e-15).rsqrt().matrix().asDiagonal() * eigW.eigenvectors().transpose();
         Wnew = sqrtInv * Wnew;
 
         // Check convergence: max change in W rows

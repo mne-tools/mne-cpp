@@ -59,7 +59,11 @@ class BrainSurface;
 class DipoleObject;
 class NetworkObject;
 class PolylineObject;
-namespace DISP3DLIB { class VideoOverlay; class SliceObject; }
+namespace DISP3DLIB
+{
+class VideoOverlay;
+class SliceObject;
+}
 
 //=============================================================================================================
 /**
@@ -85,12 +89,12 @@ public:
     // ShaderMode is defined in core/rendertypes.h for lightweight inclusion.
     // These aliases preserve backward compatibility.
     using ShaderMode = ::ShaderMode;
-    static constexpr ShaderMode Standard     = ::Standard;
-    static constexpr ShaderMode Holographic  = ::Holographic;
-    static constexpr ShaderMode Anatomical   = ::Anatomical;
-    static constexpr ShaderMode Dipole       = ::Dipole;
-    static constexpr ShaderMode XRay         = ::XRay;
-    static constexpr ShaderMode ShowNormals  = ::ShowNormals;
+    static constexpr ShaderMode Standard = ::Standard;
+    static constexpr ShaderMode Holographic = ::Holographic;
+    static constexpr ShaderMode Anatomical = ::Anatomical;
+    static constexpr ShaderMode Dipole = ::Dipole;
+    static constexpr ShaderMode XRay = ::XRay;
+    static constexpr ShaderMode ShowNormals = ::ShowNormals;
 
     /**
      * @brief Aggregated GPU resources and render state for the 3-D brain visualization scene.
@@ -100,19 +104,20 @@ public:
      * Viewport and scissor are stored as plain numbers so that this struct
      * does not pull in any Qt-private QRhi headers.
      */
-    struct SceneData {
+    struct SceneData
+    {
         QMatrix4x4 mvp;
         QVector3D cameraPos;
         QVector3D lightDir;
         bool lightingEnabled;
-        float overlayMode = 0.0f;       // 0=FsSurface, 1=FsAnnotation, 2=Scientific, 3=STC
+        float overlayMode = 0.0f; // 0=FsSurface, 1=FsAnnotation, 2=Scientific, 3=STC
 
         // Viewport rectangle (floating-point, pixels)
         float viewportX = 0, viewportY = 0, viewportW = 0, viewportH = 0;
         // Scissor rectangle (integer, pixels)
         int scissorX = 0, scissorY = 0, scissorW = 0, scissorH = 0;
     };
-    
+
     //=========================================================================================================
     /**
      * Initialize resources (shaders, pipelines) for the given RHI and render pass.
@@ -122,7 +127,7 @@ public:
      * @param[in] rp         Render pass descriptor.
      * @param[in] sampleCount  MSAA sample count.
      */
-    void initialize(QRhi *rhi, QRhiRenderPassDescriptor *rp, int sampleCount);
+    void initialize(QRhi* rhi, QRhiRenderPassDescriptor* rp, int sampleCount);
 
     //=========================================================================================================
     /**
@@ -141,18 +146,18 @@ public:
      * @param[in] colorTex   Color texture (owned by QRhiWidget or caller).
      * @param[in] pixelSize  Render target dimensions.
      */
-    void ensureRenderTargets(QRhi *rhi, QRhiTexture *colorTex, const QSize &pixelSize);
+    void ensureRenderTargets(QRhi* rhi, QRhiTexture* colorTex, const QSize& pixelSize);
 
     //=========================================================================================================
     /**
      * @return The clearing render target (pass 1).
      */
-    QRhiRenderTarget *rtClear() const;
+    QRhiRenderTarget* rtClear() const;
 
     /**
      * @return The preserving render target (passes 2+).
      */
-    QRhiRenderTarget *rtPreserve() const;
+    QRhiRenderTarget* rtPreserve() const;
 
     //=========================================================================================================
     /**
@@ -160,7 +165,7 @@ public:
      *
      * @param[in] cb         Command buffer to record to.
      */
-    void beginFrame(QRhiCommandBuffer *cb);
+    void beginFrame(QRhiCommandBuffer* cb);
 
     //=========================================================================================================
     /**
@@ -169,7 +174,7 @@ public:
      *
      * @param[in] cb         Command buffer.
      */
-    void beginPreservingPass(QRhiCommandBuffer *cb);
+    void beginPreservingPass(QRhiCommandBuffer* cb);
 
     //=========================================================================================================
     /**
@@ -178,7 +183,7 @@ public:
      * @param[in, out] rhi QRhi instance that owns the uniform buffers.
      * @param[in] data       Scene uniforms (MVP, light, etc).
      */
-    void updateSceneUniforms(QRhi *rhi, const SceneData &data);
+    void updateSceneUniforms(QRhi* rhi, const SceneData& data);
 
     //=========================================================================================================
     /**
@@ -190,7 +195,7 @@ public:
      * @param[in] surface    Pointer to surface to draw.
      * @param[in] mode       Shader mode to use for this surface.
      */
-    void renderSurface(QRhiCommandBuffer *cb, QRhi *rhi, const SceneData &data, BrainSurface *surface, ShaderMode mode);
+    void renderSurface(QRhiCommandBuffer* cb, QRhi* rhi, const SceneData& data, BrainSurface* surface, ShaderMode mode);
 
     //=========================================================================================================
     /**
@@ -205,7 +210,7 @@ public:
      * @param[in] surface    Pointer to surface.
      * @return Uniform buffer offset for this draw, or -1 on failure.
      */
-    int prepareSurfaceDraw(QRhiResourceUpdateBatch *u, const SceneData &data, BrainSurface *surface);
+    int prepareSurfaceDraw(QRhiResourceUpdateBatch* u, const SceneData& data, BrainSurface* surface);
 
     /**
      * Issue draw commands for a surface using a pre-computed uniform offset.
@@ -219,7 +224,7 @@ public:
      * @param[in] mode           Shader mode.
      * @param[in] uniformOffset  Offset returned by prepareSurfaceDraw().
      */
-    void issueSurfaceDraw(QRhiCommandBuffer *cb, BrainSurface *surface, ShaderMode mode, int uniformOffset);
+    void issueSurfaceDraw(QRhiCommandBuffer* cb, BrainSurface* surface, ShaderMode mode, int uniformOffset);
 
     //=========================================================================================================
     // ── WORKAROUND(QRhi-GLES2) ──────────────────────────────────────────
@@ -242,9 +247,9 @@ public:
      * @param[in] surfaces   Brain surfaces to merge.
      * @param[in] groupName  Category name (e.g. "brain", "bem", "srcsp").
      */
-    void prepareMergedSurfaces(QRhi *rhi, QRhiResourceUpdateBatch *u,
-                               const QVector<BrainSurface*> &surfaces,
-                               const QString &groupName = QStringLiteral("default"));
+    void prepareMergedSurfaces(QRhi* rhi, QRhiResourceUpdateBatch* u,
+                               const QVector<BrainSurface*>& surfaces,
+                               const QString& groupName = QStringLiteral("default"));
 
     /**
      * Mark a merged group as dirty so it is rebuilt on the next
@@ -253,7 +258,7 @@ public:
      *
      * @param[in] groupName  Category name to invalidate.
      */
-    void invalidateMergedGroup(const QString &groupName = QStringLiteral("default"));
+    void invalidateMergedGroup(const QString& groupName = QStringLiteral("default"));
 
     /**
      * Check if a merged group has drawable geometry (indexCount > 0).
@@ -263,7 +268,7 @@ public:
      * @param[in] groupName  Category name to check.
      * @return true if the group exists and has indices to draw.
      */
-    bool hasMergedContent(const QString &groupName) const;
+    bool hasMergedContent(const QString& groupName) const;
 
     /**
      * Draw previously prepared merged surfaces in a single drawIndexed.
@@ -275,9 +280,9 @@ public:
      * @param[in] mode       Shader mode.
      * @param[in] groupName Name of the merged surface group to draw.
      */
-    void drawMergedSurfaces(QRhiCommandBuffer *cb, QRhi *rhi,
-                            const SceneData &data, ShaderMode mode,
-                            const QString &groupName = QStringLiteral("default"));
+    void drawMergedSurfaces(QRhiCommandBuffer* cb, QRhi* rhi,
+                            const SceneData& data, ShaderMode mode,
+                            const QString& groupName = QStringLiteral("default"));
 
     //=========================================================================================================
     /**
@@ -288,7 +293,7 @@ public:
      * @param[in] data       Scene uniforms.
      * @param[in] dipoles    Pointer to DipoleObject.
      */
-    void renderDipoles(QRhiCommandBuffer *cb, QRhi *rhi, const SceneData &data, DipoleObject *dipoles);
+    void renderDipoles(QRhiCommandBuffer* cb, QRhi* rhi, const SceneData& data, DipoleObject* dipoles);
 
     //=========================================================================================================
     /**
@@ -300,7 +305,7 @@ public:
      * @param[in] data       Scene uniforms.
      * @param[in] network    Pointer to NetworkObject.
      */
-    void renderNetwork(QRhiCommandBuffer *cb, QRhi *rhi, const SceneData &data, NetworkObject *network);
+    void renderNetwork(QRhiCommandBuffer* cb, QRhi* rhi, const SceneData& data, NetworkObject* network);
 
     //=========================================================================================================
     /**
@@ -311,7 +316,7 @@ public:
      * @param[in] data       Scene uniforms.
      * @param[in] polyline   Pointer to PolylineObject.
      */
-    void renderPolyline(QRhiCommandBuffer *cb, QRhi *rhi, const SceneData &data, PolylineObject *polyline);
+    void renderPolyline(QRhiCommandBuffer* cb, QRhi* rhi, const SceneData& data, PolylineObject* polyline);
 
     //=========================================================================================================
     /**
@@ -325,9 +330,9 @@ public:
      * @param[in] u          Resource update batch owned by the caller.
      * @param[in] overlay    Pointer to VideoOverlay; ignored when null/disabled.
      */
-    void prepareVideoOverlay(QRhi *rhi,
-                             QRhiResourceUpdateBatch *u,
-                             DISP3DLIB::VideoOverlay *overlay);
+    void prepareVideoOverlay(QRhi* rhi,
+                             QRhiResourceUpdateBatch* u,
+                             DISP3DLIB::VideoOverlay* overlay);
 
     //=========================================================================================================
     /**
@@ -340,9 +345,9 @@ public:
      * @param[in] data       Scene uniforms (MVP, camera position).
      * @param[in] overlay    Pointer to VideoOverlay; ignored when null/disabled.
      */
-    void renderVideoOverlay(QRhiCommandBuffer *cb, QRhi *rhi,
-                             const SceneData &data,
-                             DISP3DLIB::VideoOverlay *overlay);
+    void renderVideoOverlay(QRhiCommandBuffer* cb, QRhi* rhi,
+                            const SceneData& data,
+                            DISP3DLIB::VideoOverlay* overlay);
 
     /**
      * Render a live video overlay projected onto an existing surface mesh.
@@ -353,10 +358,10 @@ public:
      * @param[in] overlay    Pointer to VideoOverlay; ignored when null/disabled.
      * @param[in] surface    Target surface mesh (typically scalp/head).
      */
-    void renderVideoOverlayOnSurface(QRhiCommandBuffer *cb, QRhi *rhi,
-                                     const SceneData &data,
-                                     DISP3DLIB::VideoOverlay *overlay,
-                                     BrainSurface *surface);
+    void renderVideoOverlayOnSurface(QRhiCommandBuffer* cb, QRhi* rhi,
+                                     const SceneData& data,
+                                     DISP3DLIB::VideoOverlay* overlay,
+                                     BrainSurface* surface);
 
     //=========================================================================================================
     /**
@@ -370,9 +375,9 @@ public:
      * @param[in] slice      Pointer to SliceObject; ignored when null.
      * @param[in] slotIndex  Slot index (0=axial, 1=coronal, 2=sagittal).
      */
-    void prepareSlice(QRhi *rhi,
-                      QRhiResourceUpdateBatch *u,
-                      DISP3DLIB::SliceObject *slice,
+    void prepareSlice(QRhi* rhi,
+                      QRhiResourceUpdateBatch* u,
+                      DISP3DLIB::SliceObject* slice,
                       int slotIndex);
 
     //=========================================================================================================
@@ -387,8 +392,8 @@ public:
      * @param[in] slotIndex  Slot index (0=axial, 1=coronal, 2=sagittal).
      * @return Uniform buffer offset for this draw, or -1 on failure.
      */
-    int prepareSliceDraw(QRhiResourceUpdateBatch *u,
-                         const SceneData &data,
+    int prepareSliceDraw(QRhiResourceUpdateBatch* u,
+                         const SceneData& data,
                          int slotIndex);
 
     //=========================================================================================================
@@ -402,7 +407,7 @@ public:
      * @param[in] slotIndex      Slot index matching the prepareSliceDraw call.
      * @param[in] uniformOffset  Offset returned by prepareSliceDraw().
      */
-    void issueSliceDraw(QRhiCommandBuffer *cb,
+    void issueSliceDraw(QRhiCommandBuffer* cb,
                         int slotIndex,
                         int uniformOffset);
 
@@ -412,8 +417,8 @@ public:
      *
      * @param[in] cb         Command buffer.
      */
-    void endPass(QRhiCommandBuffer *cb);
-    
+    void endPass(QRhiCommandBuffer* cb);
+
 private:
     /** @brief Private implementation holding QRhi pipelines, shader resources, and uniform buffers (PIMPL). */
     struct Impl;

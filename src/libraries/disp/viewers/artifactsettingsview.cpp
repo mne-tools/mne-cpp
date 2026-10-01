@@ -49,12 +49,12 @@ using namespace FIFFLIB;
 
 ArtifactSettingsView::ArtifactSettingsView(const QString& sSettingsPath,
                                            const QList<FiffChInfo>& fiffChInfoList,
-                                           QWidget *parent)
+                                           QWidget* parent)
 : AbstractView(parent)
 , m_fiffChInfoList(fiffChInfoList)
 {
     m_sSettingsPath = sSettingsPath;
-    qRegisterMetaType<QMap<QString,double> >("QMap<QString,double>");
+    qRegisterMetaType<QMap<QString, double>>("QMap<QString,double>");
 
     this->setWindowTitle("Artifact Rejection Settings");
     this->setMinimumWidth(330);
@@ -68,7 +68,6 @@ ArtifactSettingsView::ArtifactSettingsView(const QString& sSettingsPath,
 
 ArtifactSettingsView::~ArtifactSettingsView()
 {
-
     saveSettings();
 }
 
@@ -84,14 +83,14 @@ void ArtifactSettingsView::setChInfo(const QList<FIFFLIB::FiffChInfo>& fiffChInf
 
 //=============================================================================================================
 
-QMap<QString,double> ArtifactSettingsView::getThresholdMap()
+QMap<QString, double> ArtifactSettingsView::getThresholdMap()
 {
     return m_mapThresholds;
 }
 
 //=============================================================================================================
 
-void ArtifactSettingsView::setThresholdMap(const QMap<QString,double>& mapThresholds)
+void ArtifactSettingsView::setThresholdMap(const QMap<QString, double>& mapThresholds)
 {
     m_mapThresholds = mapThresholds;
 
@@ -114,7 +113,7 @@ bool ArtifactSettingsView::getDoArtifactThresholdRejection()
 
 void ArtifactSettingsView::saveSettings()
 {
-    if(m_sSettingsPath.isEmpty()) {
+    if (m_sSettingsPath.isEmpty()) {
         return;
     }
 
@@ -126,16 +125,16 @@ void ArtifactSettingsView::saveSettings()
     settings.beginGroup(m_sSettingsPath + QString("/ArtifactSettingsView/artifactThresholdsFirst"));
     QMap<QString, double>::const_iterator itrFirst = m_mapThresholdsFirst.constBegin();
     while (itrFirst != m_mapThresholdsFirst.constEnd()) {
-         settings.setValue(itrFirst.key(), itrFirst.value());
-         ++itrFirst;
+        settings.setValue(itrFirst.key(), itrFirst.value());
+        ++itrFirst;
     }
     settings.endGroup();
 
     settings.beginGroup(m_sSettingsPath + QString("/ArtifactSettingsView/artifactThresholdsSecond"));
     QMap<QString, int>::const_iterator itrSecond = m_mapThresholdsSecond.constBegin();
     while (itrSecond != m_mapThresholdsSecond.constEnd()) {
-         settings.setValue(itrSecond.key(), itrSecond.value());
-         ++itrSecond;
+        settings.setValue(itrSecond.key(), itrSecond.value());
+        ++itrSecond;
     }
     settings.endGroup();
 }
@@ -144,7 +143,7 @@ void ArtifactSettingsView::saveSettings()
 
 void ArtifactSettingsView::loadSettings()
 {
-    if(m_sSettingsPath.isEmpty()) {
+    if (m_sSettingsPath.isEmpty()) {
         return;
     }
 
@@ -153,7 +152,7 @@ void ArtifactSettingsView::loadSettings()
 
     m_bDoArtifactThresholdReduction = settings.value(m_sSettingsPath + QString("/ArtifactSettingsView/doArtifactThresholdReduction"), false).toBool();
 
-    if(m_bDoArtifactThresholdReduction) {
+    if (m_bDoArtifactThresholdReduction) {
         m_mapThresholds["Active"] = 1.0;
     } else {
         m_mapThresholds["Active"] = 0.0;
@@ -176,14 +175,14 @@ void ArtifactSettingsView::loadSettings()
     settings.beginGroup(m_sSettingsPath + QString("/ArtifactSettingsView/artifactThresholdsFirst"));
     QStringList keys = settings.childKeys();
     foreach (QString key, keys) {
-         m_mapThresholdsFirst.insert(key, settings.value(key, 1.0).toDouble());
+        m_mapThresholdsFirst.insert(key, settings.value(key, 1.0).toDouble());
     }
     settings.endGroup();
 
     settings.beginGroup(m_sSettingsPath + QString("/ArtifactSettingsView/artifactThresholdsSecond"));
     keys = settings.childKeys();
     foreach (QString key, keys) {
-         m_mapThresholdsSecond.insert(key, settings.value(key, -1).toInt());
+        m_mapThresholdsSecond.insert(key, settings.value(key, -1).toInt());
     }
     settings.endGroup();
 }
@@ -192,7 +191,7 @@ void ArtifactSettingsView::loadSettings()
 
 void ArtifactSettingsView::updateGuiMode(GuiMode mode)
 {
-    switch(mode) {
+    switch (mode) {
         case GuiMode::Clinical:
             break;
         default: // default is research mode
@@ -204,7 +203,7 @@ void ArtifactSettingsView::updateGuiMode(GuiMode mode)
 
 void ArtifactSettingsView::updateProcessingMode(ProcessingMode mode)
 {
-    switch(mode) {
+    switch (mode) {
         case ProcessingMode::Offline:
             break;
         default: // default is realtime mode
@@ -216,7 +215,7 @@ void ArtifactSettingsView::updateProcessingMode(ProcessingMode mode)
 
 void ArtifactSettingsView::redrawGUI()
 {
-    if(QLayout* layout = this->layout()) {
+    if (QLayout* layout = this->layout()) {
         delete layout;
     }
 
@@ -224,53 +223,53 @@ void ArtifactSettingsView::redrawGUI()
     this->setLayout(pGroupBoxArtifactRejection);
 
     //Artifact rejection
-    if(!m_fiffChInfoList.isEmpty()) {
+    if (!m_fiffChInfoList.isEmpty()) {
         QStringList channelTypes;
         int kind, unit;
 
-        for(int i = 0; i < m_fiffChInfoList.size(); ++i) {
+        for (int i = 0; i < m_fiffChInfoList.size(); ++i) {
             kind = m_fiffChInfoList.at(i).kind;
             unit = m_fiffChInfoList.at(i).unit;
 
-            if(kind == FIFFV_MEG_CH && unit == FIFF_UNIT_T_M && !channelTypes.contains("grad")) {
+            if (kind == FIFFV_MEG_CH && unit == FIFF_UNIT_T_M && !channelTypes.contains("grad")) {
                 channelTypes << "grad";
             }
-            if(kind == FIFFV_MEG_CH && unit == FIFF_UNIT_T && !channelTypes.contains("mag")) {
+            if (kind == FIFFV_MEG_CH && unit == FIFF_UNIT_T && !channelTypes.contains("mag")) {
                 channelTypes << "mag";
             }
-            if(kind == FIFFV_EEG_CH && !channelTypes.contains("eeg", Qt::CaseInsensitive)) {
+            if (kind == FIFFV_EEG_CH && !channelTypes.contains("eeg", Qt::CaseInsensitive)) {
                 channelTypes << "eeg";
             }
-            if(kind == FIFFV_EOG_CH && !channelTypes.contains("eog", Qt::CaseInsensitive)) {
+            if (kind == FIFFV_EOG_CH && !channelTypes.contains("eog", Qt::CaseInsensitive)) {
                 channelTypes << "eog";
             }
-            if(kind == FIFFV_EMG_CH && !channelTypes.contains("emg", Qt::CaseInsensitive)) {
+            if (kind == FIFFV_EMG_CH && !channelTypes.contains("emg", Qt::CaseInsensitive)) {
                 channelTypes << "emg";
             }
-            if(kind == FIFFV_ECG_CH && !channelTypes.contains("ecg", Qt::CaseInsensitive)) {
+            if (kind == FIFFV_ECG_CH && !channelTypes.contains("ecg", Qt::CaseInsensitive)) {
                 channelTypes << "ecg";
             }
         }
 
-        if(!channelTypes.isEmpty()) {
+        if (!channelTypes.isEmpty()) {
             m_pArtifactRejectionCheckBox = new QCheckBox("Activate artifact rejection");
-            pGroupBoxArtifactRejection->addWidget(m_pArtifactRejectionCheckBox,0,0,1,2);
+            pGroupBoxArtifactRejection->addWidget(m_pArtifactRejectionCheckBox, 0, 0, 1, 2);
             m_pArtifactRejectionCheckBox->setChecked(m_bDoArtifactThresholdReduction);
             connect(m_pArtifactRejectionCheckBox.data(), &QCheckBox::clicked,
                     this, &ArtifactSettingsView::onChangeArtifactThreshold);
 
-            for(int i = 0; i < channelTypes.size(); ++i) {
+            for (int i = 0; i < channelTypes.size(); ++i) {
                 QLabel* pLabel = new QLabel(channelTypes.at(i));
-                pGroupBoxArtifactRejection->addWidget(pLabel,i+1,0);
+                pGroupBoxArtifactRejection->addWidget(pLabel, i + 1, 0);
 
                 QDoubleSpinBox* pDoubleSpinBox = new QDoubleSpinBox();
                 pDoubleSpinBox->setPrefix("+/-");
                 pDoubleSpinBox->setMinimum(0.0);
                 pDoubleSpinBox->setMaximum(100000.0);
                 pDoubleSpinBox->setValue(m_mapThresholdsFirst[channelTypes.at(i)]);
-                pGroupBoxArtifactRejection->addWidget(pDoubleSpinBox,i+1,1);
+                pGroupBoxArtifactRejection->addWidget(pDoubleSpinBox, i + 1, 1);
                 connect(pDoubleSpinBox, static_cast<void (QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged),
-                            this, &ArtifactSettingsView::onChangeArtifactThreshold);
+                        this, &ArtifactSettingsView::onChangeArtifactThreshold);
                 m_mapChThresholdsDoubleSpinBoxes[channelTypes.at(i)] = pDoubleSpinBox;
 
                 QSpinBox* pSpinBox = new QSpinBox();
@@ -278,9 +277,9 @@ void ArtifactSettingsView::redrawGUI()
                 pSpinBox->setMaximum(0);
                 pSpinBox->setMinimum(-10000);
                 pSpinBox->setValue(m_mapThresholdsSecond[channelTypes.at(i)]);
-                pGroupBoxArtifactRejection->addWidget(pSpinBox,i+1,2);
+                pGroupBoxArtifactRejection->addWidget(pSpinBox, i + 1, 2);
                 connect(pSpinBox, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged),
-                            this, &ArtifactSettingsView::onChangeArtifactThreshold);
+                        this, &ArtifactSettingsView::onChangeArtifactThreshold);
                 m_mapChThresholdsSpinBoxes[channelTypes.at(i)] = pSpinBox;
             }
         }
@@ -295,8 +294,8 @@ void ArtifactSettingsView::onChangeArtifactThreshold()
     m_mapThresholdsFirst.clear();
     m_mapThresholdsSecond.clear();
 
-    if(m_pArtifactRejectionCheckBox) {
-        if(m_pArtifactRejectionCheckBox->isChecked()) {
+    if (m_pArtifactRejectionCheckBox) {
+        if (m_pArtifactRejectionCheckBox->isChecked()) {
             m_mapThresholds["Active"] = 1.0;
             m_bDoArtifactThresholdReduction = true;
         } else {
@@ -309,26 +308,26 @@ void ArtifactSettingsView::onChangeArtifactThreshold()
 
     while (i.hasNext()) {
         i.next();
-        if(i.value()) {
+        if (i.value()) {
             m_mapThresholdsFirst[i.key()] = i.value()->value();
             m_mapThresholdsSecond[i.key()] = m_mapChThresholdsSpinBoxes[i.key()]->value();
 
-            if(i.key().contains("grad", Qt::CaseInsensitive)) {
+            if (i.key().contains("grad", Qt::CaseInsensitive)) {
                 m_mapThresholds["grad"] = i.value()->value() * pow(10, m_mapChThresholdsSpinBoxes[i.key()]->value());
             }
-            if(i.key().contains("mag", Qt::CaseInsensitive)) {
+            if (i.key().contains("mag", Qt::CaseInsensitive)) {
                 m_mapThresholds["mag"] = i.value()->value() * pow(10, m_mapChThresholdsSpinBoxes[i.key()]->value());
             }
-            if(i.key().contains("eeg", Qt::CaseInsensitive)) {
+            if (i.key().contains("eeg", Qt::CaseInsensitive)) {
                 m_mapThresholds["eeg"] = i.value()->value() * pow(10, m_mapChThresholdsSpinBoxes[i.key()]->value());
             }
-            if(i.key().contains("ecg", Qt::CaseInsensitive)) {
+            if (i.key().contains("ecg", Qt::CaseInsensitive)) {
                 m_mapThresholds["ecg"] = i.value()->value() * pow(10, m_mapChThresholdsSpinBoxes[i.key()]->value());
             }
-            if(i.key().contains("eog", Qt::CaseInsensitive)) {
+            if (i.key().contains("eog", Qt::CaseInsensitive)) {
                 m_mapThresholds["eog"] = i.value()->value() * pow(10, m_mapChThresholdsSpinBoxes[i.key()]->value());
             }
-            if(i.key().contains("emg", Qt::CaseInsensitive)) {
+            if (i.key().contains("emg", Qt::CaseInsensitive)) {
                 m_mapThresholds["emg"] = i.value()->value() * pow(10, m_mapChThresholdsSpinBoxes[i.key()]->value());
             }
         }
@@ -343,5 +342,4 @@ void ArtifactSettingsView::onChangeArtifactThreshold()
 
 void ArtifactSettingsView::clearView()
 {
-
 }

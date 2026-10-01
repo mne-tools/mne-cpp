@@ -40,26 +40,25 @@ ViewManager::ViewManager(SceneContextRegistry* sceneRegistry,
 
 QJsonObject ViewManager::dispatchFileSelection(const QString& filePath, const QJsonObject& metadata) const
 {
-    if(m_viewProviderRegistry) {
+    if (m_viewProviderRegistry) {
         const QJsonObject provider = m_viewProviderRegistry->providerForFile(filePath, metadata);
-        if(!provider.isEmpty()) {
+        if (!provider.isEmpty()) {
             QJsonObject dispatch{
                 {"file", filePath},
                 {"view", "ExtensionView"},
-                {"mode", "extension_slot"}
-            };
+                {"mode", "extension_slot"}};
 
-            for(auto it = provider.constBegin(); it != provider.constEnd(); ++it) {
+            for (auto it = provider.constBegin(); it != provider.constEnd(); ++it) {
                 dispatch.insert(it.key(), it.value());
             }
 
-            if(provider.value("supports_scene_merging").toBool(false)) {
+            if (provider.value("supports_scene_merging").toBool(false)) {
                 const QString subjectId = inferSubjectId(filePath, metadata);
                 const QString sceneId = m_sceneRegistry
                     ? m_sceneRegistry->sceneForLayer(filePath)
                     : QString();
                 dispatch.insert("subjectId", subjectId);
-                if(!sceneId.isEmpty()) {
+                if (!sceneId.isEmpty()) {
                     dispatch.insert("sceneId", sceneId);
                 }
                 dispatch.insert("mode", sceneId.isEmpty() ? "merge_or_prompt" : "restore_scene");
@@ -71,10 +70,9 @@ QJsonObject ViewManager::dispatchFileSelection(const QString& filePath, const QJ
 
     const ViewKind kind = viewKindForFile(filePath);
     QJsonObject dispatch{
-        {"file", filePath}
-    };
+        {"file", filePath}};
 
-    switch(kind) {
+    switch (kind) {
         case ViewKind::SignalBrowser2D:
             dispatch.insert("view", "SignalBrowserView");
             dispatch.insert("buffer", "FiffBuffer");
@@ -85,7 +83,7 @@ QJsonObject ViewManager::dispatchFileSelection(const QString& filePath, const QJ
             const QString sceneId = m_sceneRegistry ? m_sceneRegistry->sceneForLayer(filePath) : QString();
             dispatch.insert("view", "ThreeDView");
             dispatch.insert("subjectId", subjectId);
-            if(!sceneId.isEmpty()) {
+            if (!sceneId.isEmpty()) {
                 dispatch.insert("sceneId", sceneId);
             }
             dispatch.insert("mode", sceneId.isEmpty() ? "merge_or_prompt" : "restore_scene");
@@ -110,10 +108,10 @@ ViewManager::ViewKind ViewManager::viewKindForFile(const QString& filePath)
     const QString suffix = QFileInfo(filePath).suffix().toLower();
     const QString extension = QString(".%1").arg(suffix);
 
-    if(kThreeDExtensions.contains(extension)) {
+    if (kThreeDExtensions.contains(extension)) {
         return ViewKind::ThreeDScene;
     }
-    if(kTextExtensions.contains(extension)) {
+    if (kTextExtensions.contains(extension)) {
         return ViewKind::TextEditor;
     }
 
@@ -123,7 +121,7 @@ ViewManager::ViewKind ViewManager::viewKindForFile(const QString& filePath)
 QString ViewManager::inferSubjectId(const QString& filePath, const QJsonObject& metadata) const
 {
     const QString subjectFromMetadata = metadata.value("subject").toString();
-    if(!subjectFromMetadata.isEmpty()) {
+    if (!subjectFromMetadata.isEmpty()) {
         return subjectFromMetadata;
     }
 

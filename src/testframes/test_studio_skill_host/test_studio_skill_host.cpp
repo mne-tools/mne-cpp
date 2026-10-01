@@ -22,10 +22,11 @@
 
 using namespace MNEANALYZESTUDIO;
 
-class TestStudioSkillHost : public QObject {
+class TestStudioSkillHost : public QObject
+{
     Q_OBJECT
 
-    private slots:
+private slots:
     void initTestCase();
     void malformedRequest();
     void listCapabilities();
@@ -33,7 +34,7 @@ class TestStudioSkillHost : public QObject {
     void viewSessions();
     void reloadExtensions();
 
-    private:
+private:
     void sendRequest(const QString& method, const QJsonObject& params, QJsonObject& result);
 
     SkillHostService m_service;
@@ -41,9 +42,9 @@ class TestStudioSkillHost : public QObject {
     QString m_dummySessionId;
 };
 
-void TestStudioSkillHost::initTestCase() {
-    const QString socketName = QStringLiteral("mne-sh-")
-                               + QUuid::createUuid().toString(QUuid::Id128).left(12);
+void TestStudioSkillHost::initTestCase()
+{
+    const QString socketName = QStringLiteral("mne-sh-") + QUuid::createUuid().toString(QUuid::Id128).left(12);
     QVERIFY(m_service.start(socketName, QStringLiteral(MNE_STUDIO_EXTENSIONS_DIR)));
     m_socket.connectToServer(socketName);
     QVERIFY(m_socket.waitForConnected(5000));
@@ -51,7 +52,8 @@ void TestStudioSkillHost::initTestCase() {
 
 void TestStudioSkillHost::sendRequest(const QString& method,
                                       const QJsonObject& params,
-                                      QJsonObject& result) {
+                                      QJsonObject& result)
+{
     const QJsonObject request = JsonRpcMessage::createRequest(QStringLiteral("request"), method, params);
     QVERIFY(m_socket.write(JsonRpcMessage::serialize(request)) > 0);
     m_socket.flush();
@@ -64,7 +66,8 @@ void TestStudioSkillHost::sendRequest(const QString& method,
     result = response.value(QStringLiteral("result")).toObject();
 }
 
-void TestStudioSkillHost::malformedRequest() {
+void TestStudioSkillHost::malformedRequest()
+{
     QVERIFY(m_socket.write("{bad json\n") > 0);
     m_socket.flush();
     QTRY_VERIFY_WITH_TIMEOUT(m_socket.canReadLine(), 5000);
@@ -76,7 +79,8 @@ void TestStudioSkillHost::malformedRequest() {
              -32700);
 }
 
-void TestStudioSkillHost::listCapabilities() {
+void TestStudioSkillHost::listCapabilities()
+{
     QJsonObject resources;
     sendRequest(QStringLiteral("resources/list"), {}, resources);
     QVERIFY(resources.value(QStringLiteral("resources")).toArray().size() >= 7);
@@ -92,7 +96,8 @@ void TestStudioSkillHost::listCapabilities() {
     QVERIFY(!missingResource.isEmpty());
 }
 
-void TestStudioSkillHost::toolCalls() {
+void TestStudioSkillHost::toolCalls()
+{
     auto callTool = [this](const QString& name, const QJsonObject& arguments) {
         QJsonObject result;
         sendRequest(QStringLiteral("tools/call"),
@@ -108,18 +113,19 @@ void TestStudioSkillHost::toolCalls() {
              QStringLiteral("error"));
     QCOMPARE(callTool(QStringLiteral("dummy3d.set_opacity"),
                       QJsonObject{{QStringLiteral("opacity"), 2.0}})
-             .value(QStringLiteral("opacity"))
-             .toDouble(),
+                 .value(QStringLiteral("opacity"))
+                 .toDouble(),
              1.0);
     QCOMPARE(callTool(QStringLiteral("fiffbrowser.reveal_active_state"), {})
-             .value(QStringLiteral("session_count"))
-             .toInt(),
+                 .value(QStringLiteral("session_count"))
+                 .toInt(),
              0);
     QCOMPARE(callTool(QStringLiteral("unknown.tool"), {}).value(QStringLiteral("status")).toString(),
              QStringLiteral("ignored"));
 }
 
-void TestStudioSkillHost::viewSessions() {
+void TestStudioSkillHost::viewSessions()
+{
     QJsonObject invalid;
     sendRequest(QStringLiteral("views/open"), {}, invalid);
     QCOMPARE(invalid.value(QStringLiteral("status")).toString(), QStringLiteral("error"));
@@ -183,7 +189,8 @@ void TestStudioSkillHost::viewSessions() {
     QCOMPARE(sessions.value(QStringLiteral("sessions")).toArray().size(), 2);
 }
 
-void TestStudioSkillHost::reloadExtensions() {
+void TestStudioSkillHost::reloadExtensions()
+{
     QJsonObject result;
     sendRequest(QStringLiteral("extensions.reload"),
                 QJsonObject{{QStringLiteral("disabled_extension_ids"),

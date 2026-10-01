@@ -58,7 +58,7 @@ Bar::Bar(const QString& title,
 
 //=============================================================================================================
 
-void Bar::paintEvent(QPaintEvent * /*event*/)
+void Bar::paintEvent(QPaintEvent* /*event*/)
 {
     QPainter painter(this);
     painter.setRenderHint(QPainter::Antialiasing);

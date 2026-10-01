@@ -83,14 +83,14 @@ public:
     // Graph-level ports
     //=========================================================================================================
 
-    QList<MnaPort> graphInputs;     ///< Named, typed entry points
-    QList<MnaPort> graphOutputs;    ///< Named, typed exit points
+    QList<MnaPort> graphInputs;  ///< Named, typed entry points
+    QList<MnaPort> graphOutputs; ///< Named, typed exit points
 
     //=========================================================================================================
     // Parameter tree
     //=========================================================================================================
 
-    MnaParamTree paramTree;         ///< Hierarchical parameter store with formula-driven bindings
+    MnaParamTree paramTree; ///< Hierarchical parameter store with formula-driven bindings
 
     //=========================================================================================================
     // Connection helper

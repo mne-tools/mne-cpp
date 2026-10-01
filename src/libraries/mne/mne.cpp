@@ -64,38 +64,34 @@ void MNE::setup_compensators(FiffRawData& raw,
             raw.info.projs[k].active = true;
         }
 
-        qInfo("%lld projection items activated\n",raw.info.projs.size());
+        qInfo("%lld projection items activated\n", raw.info.projs.size());
         // Create the projector
-//        fiff_int_t nproj = MNE::make_projector_info(raw.info, raw.proj); Using the member function instead
+        //        fiff_int_t nproj = MNE::make_projector_info(raw.info, raw.proj); Using the member function instead
         fiff_int_t nproj = raw.info.make_projector(raw.proj);
 
-        if (nproj == 0)  {
+        if (nproj == 0) {
             qInfo("The projection vectors do not apply to these channels\n");
         } else {
-            qInfo("Created an SSP operator (subspace dimension = %d)\n",nproj);
+            qInfo("Created an SSP operator (subspace dimension = %d)\n", nproj);
         }
     }
 
     // Set up the CTF compensator
-//    qint32 current_comp = MNE::get_current_comp(raw.info);
+    //    qint32 current_comp = MNE::get_current_comp(raw.info);
     qint32 current_comp = raw.info.get_current_comp();
     if (current_comp > 0)
-        qInfo("Current compensation grade : %d\n",current_comp);
+        qInfo("Current compensation grade : %d\n", current_comp);
 
     if (keep_comp)
         dest_comp = current_comp;
 
-    if (current_comp != dest_comp)
-    {
+    if (current_comp != dest_comp) {
         qDebug() << "This part needs to be debugged";
-        if(MNE::make_compensator(raw.info, current_comp, dest_comp, raw.comp))
-        {
-//            raw.info.chs = MNE::set_current_comp(raw.info.chs,dest_comp);
+        if (MNE::make_compensator(raw.info, current_comp, dest_comp, raw.comp)) {
+            //            raw.info.chs = MNE::set_current_comp(raw.info.chs,dest_comp);
             raw.info.set_current_comp(dest_comp);
-            qInfo("Appropriate compensator added to change to grade %d.\n",dest_comp);
-        }
-        else
-        {
+            qInfo("Appropriate compensator added to change to grade %d.\n", dest_comp);
+        } else {
             qCritical("Could not make the compensator\n");
             return;
         }

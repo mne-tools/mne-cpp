@@ -58,7 +58,7 @@ public:
      *
      * @param[in] parent pointer to potential parent widget.
      */
-    LSLAdapterSetup(int initialBlockSize, QWidget *parent = Q_NULLPTR);
+    LSLAdapterSetup(int initialBlockSize, QWidget* parent = Q_NULLPTR);
 
     //=========================================================================================================
     /**
@@ -80,7 +80,7 @@ private slots:
     // auto-generated slots:
     void on_refreshAvailableStreams_released();
 
-    void on_listLSLStreams_itemDoubleClicked(QListWidgetItem *pItem);
+    void on_listLSLStreams_itemDoubleClicked(QListWidgetItem* pItem);
 
     void on_blockSizeEdit_editingFinished();
 
@@ -91,10 +91,10 @@ private:
      */
     void updateTextFields();
 
-    QMap<QListWidgetItem*, LSLLIB::stream_info>    m_mItemToStreamInfo;
-    QListWidgetItem*                            m_pCurrentSelectedStream;
+    QMap<QListWidgetItem*, LSLLIB::stream_info> m_mItemToStreamInfo;
+    QListWidgetItem* m_pCurrentSelectedStream;
 
-    Ui::LSLSetupWidget                          ui;
+    Ui::LSLSetupWidget ui;
 
 signals:
     //=========================================================================================================

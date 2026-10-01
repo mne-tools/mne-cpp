@@ -24,7 +24,8 @@
 using namespace CORTICALSURFACEPLUGIN;
 using namespace INVLIB;
 
-namespace {
+namespace
+{
 
 InvSourceEstimate makeStubStc(int nVertices, int nTimes)
 {
@@ -93,18 +94,18 @@ void TestCorticalSurfaceStc::testColormapThresholdOrdering()
     // invariant fThresh <= fMid <= fMax always holds.
     plugin.setColormapThresholds(5.0f, 2.0f, 3.0f);
     QCOMPARE(plugin.fThresh(), 2.0f);
-    QCOMPARE(plugin.fMid(),    3.0f);
-    QCOMPARE(plugin.fMax(),    5.0f);
+    QCOMPARE(plugin.fMid(), 3.0f);
+    QCOMPARE(plugin.fMax(), 5.0f);
     QVERIFY(plugin.fThresh() <= plugin.fMid());
-    QVERIFY(plugin.fMid()    <= plugin.fMax());
+    QVERIFY(plugin.fMid() <= plugin.fMax());
 
     // Another permutation.
     plugin.setColormapThresholds(9.0f, -1.0f, 4.0f);
     QCOMPARE(plugin.fThresh(), -1.0f);
-    QCOMPARE(plugin.fMid(),     4.0f);
-    QCOMPARE(plugin.fMax(),     9.0f);
+    QCOMPARE(plugin.fMid(), 4.0f);
+    QCOMPARE(plugin.fMax(), 9.0f);
     QVERIFY(plugin.fThresh() <= plugin.fMid());
-    QVERIFY(plugin.fMid()    <= plugin.fMax());
+    QVERIFY(plugin.fMid() <= plugin.fMax());
 }
 
 //=============================================================================================================

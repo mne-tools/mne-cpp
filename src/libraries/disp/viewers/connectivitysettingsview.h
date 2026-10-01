@@ -43,8 +43,9 @@
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-namespace Ui {
-    class ConnectivitySettingsViewWidget;
+namespace Ui
+{
+class ConnectivitySettingsViewWidget;
 }
 
 //=============================================================================================================
@@ -72,8 +73,8 @@ class DISPSHARED_EXPORT ConnectivitySettingsView : public AbstractView
     Q_OBJECT
 
 public:
-    typedef QSharedPointer<ConnectivitySettingsView> SPtr;              /**< Shared pointer type for ConnectivitySettingsView. */
-    typedef QSharedPointer<const ConnectivitySettingsView> ConstSPtr;   /**< Const shared pointer type for ConnectivitySettingsView. */
+    typedef QSharedPointer<ConnectivitySettingsView> SPtr;            /**< Shared pointer type for ConnectivitySettingsView. */
+    typedef QSharedPointer<const ConnectivitySettingsView> ConstSPtr; /**< Const shared pointer type for ConnectivitySettingsView. */
 
     //=========================================================================================================
     /**
@@ -84,7 +85,7 @@ public:
      * @param[in] f Qt window flags passed to the QWidget constructor.
      */
     ConnectivitySettingsView(const QString& sSettingsPath = "",
-                             QWidget *parent = 0,
+                             QWidget* parent = 0,
                              Qt::WindowFlags f = Qt::Widget);
 
     //=========================================================================================================
@@ -240,8 +241,8 @@ protected:
 
     Ui::ConnectivitySettingsViewWidget* m_pUi;
 
-    QString         m_sSettingsPath;                /**< The settings path to store the GUI settings to. */
-    int             m_iNumberTrials;                /**< The number of trials are stored to check whether the number of trials actually changed. */
+    QString m_sSettingsPath; /**< The settings path to store the GUI settings to. */
+    int m_iNumberTrials;     /**< The number of trials are stored to check whether the number of trials actually changed. */
 
 signals:
     //=========================================================================================================

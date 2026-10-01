@@ -18,7 +18,7 @@
 //=============================================================================================================
 
 #include "gusbamp.h"
-#include "gusbampproducer.h"   
+#include "gusbampproducer.h"
 #include <fiff/fiff_ch_info.h>
 
 //=============================================================================================================
@@ -45,19 +45,19 @@ using namespace FIFFLIB;
 
 GUSBAmp::GUSBAmp()
 : m_pRTMSA_GUSBAmp(0)
-, m_qStringResourcePath(qApp->applicationDirPath()+"/../resources/mne_scan/plugins/gusbamp/")
+, m_qStringResourcePath(qApp->applicationDirPath() + "/../resources/mne_scan/plugins/gusbamp/")
 , m_pGUSBAmpProducer(new GUSBAmpProducer(this))
 , m_iNumberOfChannels(0)
 , m_iSamplesPerBlock(0)
 , m_iSampleRate(128)
 , m_pCircularBuffer(QSharedPointer<CircularBuffer_Matrix_float>(new CircularBuffer_Matrix_float(8)))
 {
-    m_viChannelsToAcquire = {1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16};
+    m_viChannelsToAcquire = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16};
 
-    m_viSizeOfSampleMatrix.resize(2,0);
+    m_viSizeOfSampleMatrix.resize(2, 0);
 
     m_vSerials.resize(1);
-    m_vSerials[0]= "UB-2015.05.16";
+    m_vSerials[0] = "UB-2015.05.16";
 }
 
 //=============================================================================================================
@@ -65,7 +65,7 @@ GUSBAmp::GUSBAmp()
 GUSBAmp::~GUSBAmp()
 {
     //If the program is closed while the sampling is in process
-    if(this->isRunning()){
+    if (this->isRunning()) {
         this->stop();
     }
 }
@@ -82,7 +82,7 @@ void GUSBAmp::setUpFiffInfo()
     m_pFiffInfo->nchan = m_iNumberOfChannels;
     m_pFiffInfo->sfreq = m_iSampleRate;
     m_pFiffInfo->highpass = (float)0.001;
-    m_pFiffInfo->lowpass = m_iSampleRate/2;
+    m_pFiffInfo->lowpass = m_iSampleRate / 2;
 
     int numberEEGCh = m_iNumberOfChannels;
 
@@ -90,23 +90,21 @@ void GUSBAmp::setUpFiffInfo()
     QStringList QSLChNames;
     m_pFiffInfo->chs.clear();
 
-    for(int i=0; i<m_iNumberOfChannels; i++)
-    {
+    for (int i = 0; i < m_iNumberOfChannels; i++) {
         //Create information for each channel
         QString sChType;
         FiffChInfo fChInfo;
 
         //EEG Channels
-        if(i<=numberEEGCh-1)
-        {
+        if (i <= numberEEGCh - 1) {
             //Set channel name
             //fChInfo.ch_name = elcChannelNames.at(i);
             sChType = QString("EEG ");
-            if(i<10){
+            if (i < 10) {
                 sChType.append("00");
             }
 
-            if(i>=10 && i<100){
+            if (i >= 10 && i < 100) {
                 sChType.append("0");
             }
 
@@ -156,7 +154,7 @@ QSharedPointer<AbstractPlugin> GUSBAmp::clone() const
 void GUSBAmp::init()
 {
     m_pRTMSA_GUSBAmp = PluginOutputData<RealTimeMultiSampleArray>::create(this, "GUSBAmp", "EEG output data");
-    m_pRTMSA_GUSBAmp->measurementData()->setName(this->getName());//Provide name to auto store widget settings
+    m_pRTMSA_GUSBAmp->measurementData()->setName(this->getName()); //Provide name to auto store widget settings
 
     m_outputConnectors.append(m_pRTMSA_GUSBAmp);
 }
@@ -179,7 +177,7 @@ bool GUSBAmp::start()
 
     //set the parameters for number of channels (rows of matrix) and samples (columns of matrix)
     m_iNumberOfChannels = m_viSizeOfSampleMatrix[0];
-    m_iSamplesPerBlock  = m_viSizeOfSampleMatrix[1];
+    m_iSamplesPerBlock = m_viSizeOfSampleMatrix[1];
 
     //Setup fiff info
     setUpFiffInfo();
@@ -190,10 +188,10 @@ bool GUSBAmp::start()
     m_pRTMSA_GUSBAmp->measurementData()->setSamplingRate(m_iSampleRate);
 
     //start the thread for ring buffer
-    if(m_pGUSBAmpProducer->isRunning())  {
+    if (m_pGUSBAmpProducer->isRunning()) {
         QThread::start();
         return true;
-    } else  {
+    } else {
         qWarning() << "Plugin GUSBAmp - ERROR - GUSBAmpProducer thread could not be started - Either the device is turned off (check your OS device manager) or the driver DLL (GUSBAmpSDK.dll / GUSBAmpSDK32bit.dll) is not installed in the system32 / SysWOW64 directory" << endl;
         return false;
     }
@@ -235,7 +233,7 @@ QString GUSBAmp::getName() const
 
 QWidget* GUSBAmp::setupWidget()
 {
-    GUSBAmpSetupWidget* pWidget = new GUSBAmpSetupWidget(this);//widget is later destroyed by CentralWidget - so it has to be created everytime new
+    GUSBAmpSetupWidget* pWidget = new GUSBAmpSetupWidget(this); //widget is later destroyed by CentralWidget - so it has to be created everytime new
 
     //init properties dialog
     pWidget->initGui();
@@ -250,17 +248,17 @@ void GUSBAmp::run()
     qint32 size = 0;
     MatrixXf matValue;
 
-    while(!isInterruptionRequested()) {
+    while (!isInterruptionRequested()) {
         //pop matrix only if the producer thread is running
-        if(m_pGUSBAmpProducer->isRunning()) {
+        if (m_pGUSBAmpProducer->isRunning()) {
             //pop matrix
-            if(m_pCircularBuffer->pop(matValue)) {
-                for(int i = 0; i < matValue.cols(); i++) {
-                    qDebug() << matValue(0,i);
+            if (m_pCircularBuffer->pop(matValue)) {
+                for (int i = 0; i < matValue.cols(); i++) {
+                    qDebug() << matValue(0, i);
                 }
 
                 //emit values to real time multi sample array
-                m_pRTMSA_GUSBAmp->measurementData()->setValue(matValue.cast<double>()/1000000);
+                m_pRTMSA_GUSBAmp->measurementData()->setValue(matValue.cast<double>() / 1000000);
             }
         }
     }
@@ -271,10 +269,10 @@ void GUSBAmp::run()
 void GUSBAmp::showSetupProjectDialog()
 {
     // Open setup project widget
-    if(m_pGUSBampSetupProjectWidget == NULL) {
+    if (m_pGUSBampSetupProjectWidget == NULL) {
         m_pGUSBampSetupProjectWidget = QSharedPointer<GUSBAmpSetupProjectWidget>(new GUSBAmpSetupProjectWidget(this));
     }
-    if(!m_pGUSBampSetupProjectWidget->isVisible()) {
+    if (!m_pGUSBampSetupProjectWidget->isVisible()) {
         m_pGUSBampSetupProjectWidget->setWindowTitle("GUSBAmp EEG Connector - Setup project");
         m_pGUSBampSetupProjectWidget->initGui();
         m_pGUSBampSetupProjectWidget->show();
@@ -288,17 +286,17 @@ bool GUSBAmp::dirExists(const std::string& dirName_in)
 {
     DWORD ftyp = GetFileAttributesA(dirName_in.c_str());
     if (ftyp == INVALID_FILE_ATTRIBUTES) {
-        return false;  //something is wrong with your path!
+        return false; //something is wrong with your path!
     }
     if (ftyp & FILE_ATTRIBUTE_DIRECTORY) {
-        return true;   // this is a directory!
+        return true; // this is a directory!
     }
-    return false;    // this is not a directory!
+    return false; // this is not a directory!
 }
 
 //=============================================================================================================
 
 QString GUSBAmp::getBuildInfo()
 {
-    return QString(GUSBAMPPLUGIN::buildDateTime()) + QString(" - ")  + QString(GUSBAMPPLUGIN::buildHash());
+    return QString(GUSBAMPPLUGIN::buildDateTime()) + QString(" - ") + QString(GUSBAMPPLUGIN::buildHash());
 }

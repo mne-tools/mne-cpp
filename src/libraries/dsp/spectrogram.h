@@ -50,7 +50,8 @@ namespace UTILSLIB
 /**
  * @brief Input parameters for short-time Fourier transform spectrogram computation.
  */
-struct SpectogramInputData {
+struct SpectogramInputData
+{
     Eigen::VectorXd vecInputData;
     quint32 iRangeLow;
     quint32 iRangeHigh;
@@ -62,7 +63,6 @@ struct SpectogramInputData {
  */
 class DSPSHARED_EXPORT Spectrogram
 {
-
 public:
     //=========================================================================================================
     /**
@@ -87,9 +87,9 @@ private:
      *
      * @return samples of window-vector.
      */
-    static Eigen::VectorXd gaussWindow (qint32 sample_count,
-                                        qreal scale,
-                                        quint32 translation);
+    static Eigen::VectorXd gaussWindow(qint32 sample_count,
+                                       qreal scale,
+                                       quint32 translation);
 
     //=========================================================================================================
     /**
@@ -108,10 +108,9 @@ private:
      * @param[out] resultData    The result data.
      * @param[in] data          The incoming, temporary result data.
      */
-    static void reduce(Eigen::MatrixXd &resultData,
-                       const Eigen::MatrixXd &data);
+    static void reduce(Eigen::MatrixXd& resultData,
+                       const Eigen::MatrixXd& data);
 };
-}//namespace
+} //namespace
 
 #endif // SPECTROGRAM_H
-

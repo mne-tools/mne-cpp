@@ -30,7 +30,7 @@ class TestToolInverseOperator : public QObject
 private:
     QString m_sBinDir;
     QString m_sResourcePath;
-    QString m_sInvFile;  // Inverse operator file created by testInverseOperatorCompute
+    QString m_sInvFile; // Inverse operator file created by testInverseOperatorCompute
 
     QString runTool(const QString& toolName, const QStringList& args, int timeoutMs = 30000)
     {
@@ -99,12 +99,7 @@ private slots:
         // Write inverse operator to a known path for reuse by mne_compute_mne test
         QString outPath = QDir::tempPath() + "/test_inv_operator.fif";
 
-        QString output = runTool("mne_inverse_operator", {
-            "--fwd", fwdFile,
-            "--noisecov", covFile,
-            "--meg",
-            "--inv", outPath
-        }, 60000);
+        QString output = runTool("mne_inverse_operator", {"--fwd", fwdFile, "--noisecov", covFile, "--meg", "--inv", outPath}, 60000);
 
         // Check the tool ran (output may indicate success or error)
         // If output file was created, the tool worked
@@ -152,13 +147,7 @@ private slots:
 
         QString stcPrefix = QDir::tempPath() + "/test_compute_mne";
 
-        QString output = runTool("mne_compute_mne", {
-            "--inv", m_sInvFile,
-            "--meas", aveFile,
-            "--method", "MNE",
-            "--snr", "3",
-            "--out", stcPrefix
-        }, 120000);
+        QString output = runTool("mne_compute_mne", {"--inv", m_sInvFile, "--meas", aveFile, "--method", "MNE", "--snr", "3", "--out", stcPrefix}, 120000);
 
         // Verify the tool ran
         QVERIFY(!output.isEmpty() ||
@@ -190,13 +179,7 @@ private slots:
 
         QString stcPrefix = QDir::tempPath() + "/test_compute_dspm";
 
-        QString output = runTool("mne_compute_mne", {
-            "--inv", m_sInvFile,
-            "--meas", aveFile,
-            "--spm",
-            "--snr", "3",
-            "--out", stcPrefix
-        }, 120000);
+        QString output = runTool("mne_compute_mne", {"--inv", m_sInvFile, "--meas", aveFile, "--spm", "--snr", "3", "--out", stcPrefix}, 120000);
 
         QVERIFY(!output.isEmpty() ||
                 QFile::exists(stcPrefix + "-lh.stc") ||
@@ -226,13 +209,7 @@ private slots:
 
         QString stcPrefix = QDir::tempPath() + "/test_compute_sloreta";
 
-        QString output = runTool("mne_compute_mne", {
-            "--inv", m_sInvFile,
-            "--meas", aveFile,
-            "--sLORETA",
-            "--snr", "3",
-            "--out", stcPrefix
-        }, 120000);
+        QString output = runTool("mne_compute_mne", {"--inv", m_sInvFile, "--meas", aveFile, "--sLORETA", "--snr", "3", "--out", stcPrefix}, 120000);
 
         QVERIFY(!output.isEmpty() ||
                 QFile::exists(stcPrefix + "-lh.stc") ||

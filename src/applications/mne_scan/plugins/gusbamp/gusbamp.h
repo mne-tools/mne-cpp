@@ -174,22 +174,22 @@ protected:
     virtual void run();
 
 private:
-    SCSHAREDLIB::PluginOutputData<SCMEASLIB::RealTimeMultiSampleArray>::SPtr    m_pRTMSA_GUSBAmp;               /**< The RealTimeSampleArray to provide the EEG data.*/
-    QSharedPointer<GUSBAmpSetupProjectWidget>                                   m_pGUSBampSetupProjectWidget;   /**< Widget for setup the project file*/
+    SCSHAREDLIB::PluginOutputData<SCMEASLIB::RealTimeMultiSampleArray>::SPtr m_pRTMSA_GUSBAmp; /**< The RealTimeSampleArray to provide the EEG data.*/
+    QSharedPointer<GUSBAmpSetupProjectWidget> m_pGUSBampSetupProjectWidget;                    /**< Widget for setup the project file*/
 
-    QSharedPointer<UTILSLIB::CircularBuffer_Matrix_float>                       m_pCircularBuffer;    /**< Holds incoming raw data.*/
+    QSharedPointer<UTILSLIB::CircularBuffer_Matrix_float> m_pCircularBuffer; /**< Holds incoming raw data.*/
 
-    QString                             m_qStringResourcePath;              /**< The path to the EEG resource directory.*/
-    QSharedPointer<GUSBAmpProducer>     m_pGUSBAmpProducer;                 /**< the GUSBAmpProducer.*/
-    QSharedPointer<FIFFLIB::FiffInfo>   m_pFiffInfo;                        /**< Fiff measurement info.*/
+    QString m_qStringResourcePath;                      /**< The path to the EEG resource directory.*/
+    QSharedPointer<GUSBAmpProducer> m_pGUSBAmpProducer; /**< the GUSBAmpProducer.*/
+    QSharedPointer<FIFFLIB::FiffInfo> m_pFiffInfo;      /**< Fiff measurement info.*/
 
-    std::vector<QString>        m_vSerials;                 /**< vector of all Serials (the first one is the master). */
-    int                         m_iSampleRate;              /**< the sample rate in Hz (see documentation of the g.USBamp API for details on this value and the NUMBER_OF_SCANS!)*/
-    int                         m_iSamplesPerBlock;         /**< The samples per block defined by the user via the GUI. */
-    UCHAR                       m_iNumberOfChannels;        /**< the channels that should be acquired from each device. */
-    std::vector<int>            m_viSizeOfSampleMatrix;     /**< vector including the size of the two dimensional sample Matrix. */
-    std::vector<int>            m_viChannelsToAcquire;      /**< vector of the calling numbers of the channels to be acquired. */
-    Eigen::RowVectorXd          m_cals;
+    std::vector<QString> m_vSerials;         /**< vector of all Serials (the first one is the master). */
+    int m_iSampleRate;                       /**< the sample rate in Hz (see documentation of the g.USBamp API for details on this value and the NUMBER_OF_SCANS!)*/
+    int m_iSamplesPerBlock;                  /**< The samples per block defined by the user via the GUI. */
+    UCHAR m_iNumberOfChannels;               /**< the channels that should be acquired from each device. */
+    std::vector<int> m_viSizeOfSampleMatrix; /**< vector including the size of the two dimensional sample Matrix. */
+    std::vector<int> m_viChannelsToAcquire;  /**< vector of the calling numbers of the channels to be acquired. */
+    Eigen::RowVectorXd m_cals;
 };
 } // NAMESPACE
 

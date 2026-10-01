@@ -45,7 +45,7 @@ using namespace FIFFLIB;
  * @brief The TestFiffCoordTrans class provides read write read fiff verification tests
  *
  */
-class TestFiffCoordTrans: public QObject
+class TestFiffCoordTrans : public QObject
 {
     Q_OBJECT
 
@@ -61,7 +61,6 @@ private slots:
 private:
     FiffCoordTrans m_transRef;
     FiffCoordTrans m_transTest;
-
 };
 
 //=============================================================================================================
@@ -112,4 +111,3 @@ void TestFiffCoordTrans::cleanupTestCase()
 
 QTEST_GUILESS_MAIN(TestFiffCoordTrans)
 #include "test_fiff_coord_trans.moc"
-

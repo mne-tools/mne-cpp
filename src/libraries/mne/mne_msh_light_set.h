@@ -52,8 +52,8 @@ namespace MNELIB
 class MNESHARED_EXPORT MNEMshLightSet
 {
 public:
-    typedef QSharedPointer<MNEMshLightSet> SPtr;              /**< Shared pointer type for MNEMshLightSet. */
-    typedef QSharedPointer<const MNEMshLightSet> ConstSPtr;   /**< Const shared pointer type for MNEMshLightSet. */
+    typedef QSharedPointer<MNEMshLightSet> SPtr;            /**< Shared pointer type for MNEMshLightSet. */
+    typedef QSharedPointer<const MNEMshLightSet> ConstSPtr; /**< Const shared pointer type for MNEMshLightSet. */
 
     //=========================================================================================================
     /**
@@ -62,7 +62,7 @@ public:
     MNEMshLightSet() = default;
 
     MNEMshLightSet(const MNEMshLightSet& other)
-        : name(other.name)
+    : name(other.name)
     {
         lights.reserve(other.lights.size());
         for (const auto& l : other.lights)
@@ -91,15 +91,18 @@ public:
     ~MNEMshLightSet() = default;
 
 public:
-    QString name;                                        /**< Name of this light set. */
-    std::vector<std::unique_ptr<MNEMshLight>> lights;    /**< Owned light objects. */
+    QString name;                                     /**< Name of this light set. */
+    std::vector<std::unique_ptr<MNEMshLight>> lights; /**< Owned light objects. */
 
     /**
      * @brief Returns the number of lights in the set.
      *
      * @return Number of owned light objects.
      */
-    int nlight() const { return static_cast<int>(lights.size()); }
+    int nlight() const
+    {
+        return static_cast<int>(lights.size());
+    }
 };
 
 //=============================================================================================================

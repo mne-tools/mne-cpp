@@ -69,12 +69,12 @@ using namespace UTILSLIB;
  * @param[in] argv (argument vector) is an array of pointers to arrays of character objects. The array objects are null-terminated strings, representing the arguments that were entered on the command line when the program was started.
  * @return the value that was set to exit() (which is 0 if exit() is called via quit()).
  */
-int main(int argc, char *argv[])
+int main(int argc, char* argv[])
 {
-    #ifdef STATICBUILD
-    // Q_INIT_RESOURCE(mne_disp3d);
-    #endif
-    
+#ifdef STATICBUILD
+// Q_INIT_RESOURCE(mne_disp3d);
+#endif
+
     qInstallMessageHandler(MNELogger::customLogWriter);
     QApplication app(argc, argv);
 
@@ -86,7 +86,7 @@ int main(int argc, char *argv[])
     QCommandLineOption evokedFileOption("ave", "Path to evoked <file>.", "file", QCoreApplication::applicationDirPath() + "/../resources/data/MNE-sample-data/MEG/sample/sample_audvis-ave.fif");
     QCommandLineOption subjectDirectoryOption("subjDir", "Path to subject <directory>.", "directory", QCoreApplication::applicationDirPath() + "/../resources/data/MNE-sample-data/subjects");
     QCommandLineOption subjectOption("subj", "Selected <subject>.", "subject", "sample");
-    QCommandLineOption stcFileOption("stcOut", "Path to stc <file>, which is to be written.", "file", "");//"InvRapMusic.stc");
+    QCommandLineOption stcFileOption("stcOut", "Path to stc <file>, which is to be written.", "file", ""); //"InvRapMusic.stc");
     QCommandLineOption numDipolePairsOption("numDip", "<number> of dipole pairs to localize.", "number", "1");
     QCommandLineOption doMovieOption("doMovie", "Create overlapping movie.", "doMovie", "false");
     QCommandLineOption annotOption("annotType", "FsAnnotation type <type>.", "type", "aparc.a2009s");
@@ -116,9 +116,9 @@ int main(int argc, char *argv[])
     qint32 numDipolePairs = parser.value(numDipolePairsOption).toInt();
 
     bool doMovie = false;
-    if(parser.value(doMovieOption) == "false" || parser.value(doMovieOption) == "0") {
+    if (parser.value(doMovieOption) == "false" || parser.value(doMovieOption) == "0") {
         doMovie = false;
-    } else if(parser.value(doMovieOption) == "true" || parser.value(doMovieOption) == "1") {
+    } else if (parser.value(doMovieOption) == "true" || parser.value(doMovieOption) == "1") {
         doMovie = true;
     }
 
@@ -128,13 +128,13 @@ int main(int argc, char *argv[])
     fiff_int_t setno = 0;
     QPair<float, float> baseline(-1.0f, -1.0f);
     FiffEvoked evoked(t_fileEvoked, setno, baseline);
-    if(evoked.isEmpty())
+    if (evoked.isEmpty())
         return 1;
 
     std::cout << "evoked first " << evoked.first << "; last " << evoked.last << std::endl;
 
     MNEForwardSolution t_Fwd(t_fileFwd);
-    if(t_Fwd.isEmpty())
+    if (t_Fwd.isEmpty())
         return 1;
 
     QStringList ch_sel_names = t_Fwd.info.ch_names;
@@ -143,26 +143,26 @@ int main(int argc, char *argv[])
     //
     // Cluster forward solution;
     //
-    MNEForwardSolution t_clusteredFwd = t_Fwd.cluster_forward_solution(t_annotationSet, 20);//40);
+    MNEForwardSolution t_clusteredFwd = t_Fwd.cluster_forward_solution(t_annotationSet, 20); //40);
 
-//    std::cout << "Size " << t_clusteredFwd.sol->data.rows() << " x " << t_clusteredFwd.sol->data.cols() << std::endl;
-//    std::cout << "Clustered Fwd:\n" << t_clusteredFwd.sol->data.row(0) << std::endl;
+    //    std::cout << "Size " << t_clusteredFwd.sol->data.rows() << " x " << t_clusteredFwd.sol->data.cols() << std::endl;
+    //    std::cout << "Clustered Fwd:\n" << t_clusteredFwd.sol->data.row(0) << std::endl;
 
     InvPwlRapMusic t_pwlRapMusic(t_clusteredFwd, false, numDipolePairs);
 
     int iWinSize = 200;
-    if(doMovie) {
+    if (doMovie) {
         t_pwlRapMusic.setStcAttr(iWinSize, 0.6f);
     }
 
     InvSourceEstimate sourceEstimate = t_pwlRapMusic.calculateInverse(pickedEvoked);
 
-    if(doMovie) {
+    if (doMovie) {
         //Select only the activations once
-        MatrixXd dataPicked(sourceEstimate.data.rows(), int(std::floor(sourceEstimate.data.cols()/iWinSize)));
+        MatrixXd dataPicked(sourceEstimate.data.rows(), int(std::floor(sourceEstimate.data.cols() / iWinSize)));
 
-        for(int i = 0; i < dataPicked.cols(); ++i) {
-            dataPicked.col(i) = sourceEstimate.data.col(i*iWinSize);
+        for (int i = 0; i < dataPicked.cols(); ++i) {
+            dataPicked.col(i) = sourceEstimate.data.col(i * iWinSize);
         }
 
         sourceEstimate.data = dataPicked;
@@ -170,7 +170,7 @@ int main(int argc, char *argv[])
 
     std::cout << "source estimated" << std::endl;
 
-    if(sourceEstimate.isEmpty())
+    if (sourceEstimate.isEmpty())
         return 1;
 
     // Write source estimate to temp files for visualization
@@ -195,8 +195,8 @@ int main(int argc, char *argv[])
     QFile rhStcFile(rhStcPath);
     stcRh.write(rhStcFile);
 
-    BrainView *pBrainView = new BrainView();
-    BrainTreeModel *pModel = new BrainTreeModel();
+    BrainView* pBrainView = new BrainView();
+    BrainTreeModel* pModel = new BrainTreeModel();
     pBrainView->setModel(pModel);
 
     for (auto it = t_surfSet.data().constBegin(); it != t_surfSet.data().constEnd(); ++it) {
@@ -217,8 +217,7 @@ int main(int argc, char *argv[])
     });
     pBrainView->loadSourceEstimate(lhStcPath, rhStcPath);
 
-    if(!t_sFileNameStc.isEmpty())
-    {
+    if (!t_sFileNameStc.isEmpty()) {
         QFile t_fileClusteredStc(t_sFileNameStc);
         sourceEstimate.write(t_fileClusteredStc);
     }

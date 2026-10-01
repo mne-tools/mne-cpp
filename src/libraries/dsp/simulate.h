@@ -39,16 +39,19 @@
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-namespace INVLIB {
-    class InvSourceEstimate;
+namespace INVLIB
+{
+class InvSourceEstimate;
 }
-namespace FIFFLIB {
-    class FiffEvoked;
-    class FiffInfo;
-    class FiffCov;
+namespace FIFFLIB
+{
+class FiffEvoked;
+class FiffInfo;
+class FiffCov;
 }
-namespace MNELIB {
-    class MNEForwardSolution;
+namespace MNELIB
+{
+class MNEForwardSolution;
 }
 
 //=============================================================================================================
@@ -64,10 +67,10 @@ namespace UTILSLIB
  */
 struct DSPSHARED_EXPORT SimulateStcParams
 {
-    float sfreq    = 1000.0f;  /**< Sampling frequency (Hz). */
-    float tmin     = 0.0f;     /**< Start time (seconds). */
-    float duration = 0.5f;     /**< Duration (seconds). */
-    int   seed     = 42;       /**< Random seed for reproducibility. */
+    float sfreq = 1000.0f; /**< Sampling frequency (Hz). */
+    float tmin = 0.0f;     /**< Start time (seconds). */
+    float duration = 0.5f; /**< Duration (seconds). */
+    int seed = 42;         /**< Random seed for reproducibility. */
 };
 
 //=============================================================================================================

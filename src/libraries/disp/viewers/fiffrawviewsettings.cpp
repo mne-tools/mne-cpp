@@ -42,8 +42,8 @@ using namespace DISPLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-FiffRawViewSettings::FiffRawViewSettings(const QString &sSettingsPath,
-                                         QWidget *parent,
+FiffRawViewSettings::FiffRawViewSettings(const QString& sSettingsPath,
+                                         QWidget* parent,
                                          Qt::WindowFlags f)
 : AbstractView(parent, f)
 , m_pUi(new Ui::FiffRawViewSettingsWidget)
@@ -71,7 +71,7 @@ FiffRawViewSettings::~FiffRawViewSettings()
 
 void FiffRawViewSettings::setWidgetList(const QStringList& lVisibleWidgets)
 {
-    if(lVisibleWidgets.contains("numberChannels", Qt::CaseInsensitive) || lVisibleWidgets.isEmpty()) {
+    if (lVisibleWidgets.contains("numberChannels", Qt::CaseInsensitive) || lVisibleWidgets.isEmpty()) {
         //Number of visible channels
         connect(m_pUi->m_doubleSpinBox_numberVisibleChannels, static_cast<void (QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged),
                 this, &FiffRawViewSettings::zoomChanged);
@@ -80,7 +80,7 @@ void FiffRawViewSettings::setWidgetList(const QStringList& lVisibleWidgets)
         m_pUi->label_numberChannels->hide();
     }
 
-    if(lVisibleWidgets.contains("windowSize", Qt::CaseInsensitive) || lVisibleWidgets.isEmpty()) {
+    if (lVisibleWidgets.contains("windowSize", Qt::CaseInsensitive) || lVisibleWidgets.isEmpty()) {
         //Window size
         connect(m_pUi->m_spinBox_windowSize, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged),
                 this, &FiffRawViewSettings::timeWindowChanged);
@@ -89,7 +89,7 @@ void FiffRawViewSettings::setWidgetList(const QStringList& lVisibleWidgets)
         m_pUi->label_windowSize->hide();
     }
 
-    if(lVisibleWidgets.contains("distanceSpacers", Qt::CaseInsensitive) || lVisibleWidgets.isEmpty()) {
+    if (lVisibleWidgets.contains("distanceSpacers", Qt::CaseInsensitive) || lVisibleWidgets.isEmpty()) {
         //Distance for timer spacer
         connect(m_pUi->m_comboBox_distaceTimeSpacer, static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged),
                 this, &FiffRawViewSettings::onDistanceTimeSpacerChanged);
@@ -98,7 +98,7 @@ void FiffRawViewSettings::setWidgetList(const QStringList& lVisibleWidgets)
         m_pUi->label_timeSpacers->hide();
     }
 
-    if(lVisibleWidgets.contains("backgroundColor", Qt::CaseInsensitive) || lVisibleWidgets.isEmpty()) {
+    if (lVisibleWidgets.contains("backgroundColor", Qt::CaseInsensitive) || lVisibleWidgets.isEmpty()) {
         //Background Colors
         connect(m_pUi->m_pushButton_backgroundColor, static_cast<void (QPushButton::*)(bool)>(&QPushButton::clicked),
                 this, &FiffRawViewSettings::onViewColorButtonClicked);
@@ -107,7 +107,7 @@ void FiffRawViewSettings::setWidgetList(const QStringList& lVisibleWidgets)
         m_pUi->label_backgroundColor->hide();
     }
 
-    if(lVisibleWidgets.contains("signalColor", Qt::CaseInsensitive) || lVisibleWidgets.isEmpty()) {
+    if (lVisibleWidgets.contains("signalColor", Qt::CaseInsensitive) || lVisibleWidgets.isEmpty()) {
         //Signal Colors
         connect(m_pUi->m_pushButton_signalColor, static_cast<void (QPushButton::*)(bool)>(&QPushButton::clicked),
                 this, &FiffRawViewSettings::onViewColorButtonClicked);
@@ -116,7 +116,7 @@ void FiffRawViewSettings::setWidgetList(const QStringList& lVisibleWidgets)
         m_pUi->label_signalColor->hide();
     }
 
-    if(lVisibleWidgets.contains("screenshot", Qt::CaseInsensitive) || lVisibleWidgets.isEmpty()) {
+    if (lVisibleWidgets.contains("screenshot", Qt::CaseInsensitive) || lVisibleWidgets.isEmpty()) {
         //Signal Colors
         connect(m_pUi->m_pushButton_makeScreenshot, static_cast<void (QPushButton::*)(bool)>(&QPushButton::clicked),
                 this, &FiffRawViewSettings::onMakeScreenshot);
@@ -206,7 +206,7 @@ int FiffRawViewSettings::getWindowSize()
 
 void FiffRawViewSettings::saveSettings()
 {
-    if(m_sSettingsPath.isEmpty()) {
+    if (m_sSettingsPath.isEmpty()) {
         return;
     }
 
@@ -223,7 +223,7 @@ void FiffRawViewSettings::saveSettings()
 
 void FiffRawViewSettings::loadSettings()
 {
-    if(m_sSettingsPath.isEmpty()) {
+    if (m_sSettingsPath.isEmpty()) {
         return;
     }
 
@@ -247,7 +247,7 @@ void FiffRawViewSettings::loadSettings()
 
 void FiffRawViewSettings::updateGuiMode(GuiMode mode)
 {
-    switch(mode) {
+    switch (mode) {
         case GuiMode::Clinical:
             break;
         default: // default is research mode
@@ -259,7 +259,7 @@ void FiffRawViewSettings::updateGuiMode(GuiMode mode)
 
 void FiffRawViewSettings::updateProcessingMode(ProcessingMode mode)
 {
-    switch(mode) {
+    switch (mode) {
         case ProcessingMode::Offline:
             break;
         default: // default is realtime mode
@@ -271,22 +271,22 @@ void FiffRawViewSettings::updateProcessingMode(ProcessingMode mode)
 
 void FiffRawViewSettings::onDistanceTimeSpacerChanged(qint32 value)
 {
-    switch(value) {
+    switch (value) {
         case 0:
             emit distanceTimeSpacerChanged(100);
-        break;
+            break;
 
         case 1:
             emit distanceTimeSpacerChanged(200);
-        break;
+            break;
 
         case 2:
             emit distanceTimeSpacerChanged(500);
-        break;
+            break;
 
         case 3:
             emit distanceTimeSpacerChanged(1000);
-        break;
+            break;
     }
 
     //emit updateConnectedView();
@@ -301,7 +301,7 @@ void FiffRawViewSettings::onViewColorButtonClicked()
     QColorDialog* pDialog = new QColorDialog(m_colCurrentSignalColor, this);
 
     QObject* obj = sender();
-    if(obj == m_pUi->m_pushButton_signalColor) {
+    if (obj == m_pUi->m_pushButton_signalColor) {
         pDialog->setCurrentColor(m_colCurrentSignalColor);
         pDialog->setWindowTitle("Signal Color");
 
@@ -314,7 +314,7 @@ void FiffRawViewSettings::onViewColorButtonClicked()
         emit signalColorChanged(m_colCurrentSignalColor);
     }
 
-    if( obj == m_pUi->m_pushButton_backgroundColor ) {
+    if (obj == m_pUi->m_pushButton_backgroundColor) {
         pDialog->setCurrentColor(m_colCurrentBackgroundColor);
         pDialog->setWindowTitle("Background Color");
 
@@ -359,5 +359,4 @@ void FiffRawViewSettings::onMakeScreenshot()
 
 void FiffRawViewSettings::clearView()
 {
-
 }

@@ -91,7 +91,7 @@ bool MriCorIO::read(const QString& dir,
 
         if (data.size() < nPixels) {
             qCritical() << "MriCorIO::read - COR file" << fileName << "is too small:"
-                         << data.size() << "bytes (expected" << nPixels << ")";
+                        << data.size() << "bytes (expected" << nPixels << ")";
             return false;
         }
 
@@ -113,9 +113,9 @@ bool MriCorIO::read(const QString& dir,
         //   move[X] = 0.128; move[Y] = -0.128 + k/1000.0; move[Z] = 0.128;
         //   rot = {{-1,0,0},{0,0,1},{0,1,0}};
         Matrix3f rot;
-        rot << -1.0f,  0.0f,  0.0f,
-                0.0f,  0.0f,  1.0f,
-                0.0f,  1.0f,  0.0f;
+        rot << -1.0f, 0.0f, 0.0f,
+            0.0f, 0.0f, 1.0f,
+            0.0f, 1.0f, 0.0f;
 
         Eigen::Vector3f move;
         move << 0.128f, -0.128f + static_cast<float>(k) / 1000.0f, 0.128f;

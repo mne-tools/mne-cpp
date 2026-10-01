@@ -69,12 +69,13 @@ namespace STSLIB
  *
  * @brief Per-call output of a cluster permutation test: observed statistic map, cluster masses, cluster p-values and cluster labels.
  */
-struct STSSHARED_EXPORT StatsClusterResult {
-    Eigen::MatrixXd matTObs;            /**< Observed t-statistic map (nChannels x nTimes). */
-    QVector<double> vecClusterStats;    /**< Sum of t-values for each observed cluster. */
-    QVector<double> vecClusterPvals;    /**< p-value for each observed cluster. */
-    Eigen::MatrixXi matClusterIds;      /**< Cluster label at each (channel, time) point; 0 = not in cluster. */
-    double clusterThreshold;            /**< t-threshold used for clustering. */
+struct STSSHARED_EXPORT StatsClusterResult
+{
+    Eigen::MatrixXd matTObs;         /**< Observed t-statistic map (nChannels x nTimes). */
+    QVector<double> vecClusterStats; /**< Sum of t-values for each observed cluster. */
+    QVector<double> vecClusterPvals; /**< p-value for each observed cluster. */
+    Eigen::MatrixXi matClusterIds;   /**< Cluster label at each (channel, time) point; 0 = not in cluster. */
+    double clusterThreshold;         /**< t-threshold used for clustering. */
 };
 
 //=============================================================================================================

@@ -33,7 +33,8 @@ class STUDIOCORESHARED_EXPORT ViewManager : public QObject
     Q_OBJECT
 
 public:
-    enum class ViewKind {
+    enum class ViewKind
+    {
         SignalBrowser2D,
         ThreeDScene,
         TextEditor,

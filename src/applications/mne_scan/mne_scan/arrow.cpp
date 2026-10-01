@@ -34,7 +34,7 @@ using namespace MNESCAN;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-Arrow::Arrow(PluginItem *startItem, PluginItem *endItem, SCSHAREDLIB::PluginConnectorConnection::SPtr &connection, QGraphicsItem *parent)
+Arrow::Arrow(PluginItem* startItem, PluginItem* endItem, SCSHAREDLIB::PluginConnectorConnection::SPtr& connection, QGraphicsItem* parent)
 : QGraphicsLineItem(parent)
 , m_StartItem(startItem)
 , m_EndItem(endItem)
@@ -54,8 +54,7 @@ QRectF Arrow::boundingRect() const
 
     qreal extra = (pen().width() + 20) / 2.0;
 
-    return QRectF(line().p1(), QSizeF(line().p2().x() - line().p1().x(),
-                                      line().p2().y() - line().p1().y()))
+    return QRectF(line().p1(), QSizeF(line().p2().x() - line().p1().x(), line().p2().y() - line().p1().y()))
         .normalized()
         .adjusted(-extra, -extra, extra, extra);
 }
@@ -81,7 +80,7 @@ QPainterPath Arrow::shape() const
 void Arrow::updatePosition()
 {
     QPointF startPt = mapFromItem(m_StartItem, m_StartItem->outputPortLocalPos());
-    QPointF endPt   = mapFromItem(m_EndItem,   m_EndItem->inputPortLocalPos());
+    QPointF endPt = mapFromItem(m_EndItem, m_EndItem->inputPortLocalPos());
 
     setLine(QLineF(startPt, endPt));
 
@@ -89,7 +88,7 @@ void Arrow::updatePosition()
     qreal dx = qAbs(endPt.x() - startPt.x());
     qreal offset = qMax(50.0, dx * 0.4);
     QPointF cp1(startPt.x() + offset, startPt.y());
-    QPointF cp2(endPt.x()   - offset, endPt.y());
+    QPointF cp2(endPt.x() - offset, endPt.y());
 
     m_bezierPath = QPainterPath();
     m_bezierPath.moveTo(startPt);
@@ -98,8 +97,8 @@ void Arrow::updatePosition()
 
 //=============================================================================================================
 
-void Arrow::paint(QPainter *painter, const QStyleOptionGraphicsItem *,
-          QWidget *)
+void Arrow::paint(QPainter* painter, const QStyleOptionGraphicsItem*,
+                  QWidget*)
 {
     if (m_StartItem->collidesWithItem(m_EndItem) || m_bezierPath.isEmpty())
         return;
@@ -122,10 +121,8 @@ void Arrow::paint(QPainter *painter, const QStyleOptionGraphicsItem *,
     QPointF nearEnd = m_bezierPath.pointAtPercent(0.97);
     qreal angle = qAtan2(-(endPt.y() - nearEnd.y()), endPt.x() - nearEnd.x());
 
-    QPointF arrowP1 = endPt + QPointF(qSin(angle + M_PI / 3.0) * arrowSize,
-                                       qCos(angle + M_PI / 3.0) * arrowSize);
-    QPointF arrowP2 = endPt + QPointF(qSin(angle + M_PI - M_PI / 3.0) * arrowSize,
-                                       qCos(angle + M_PI - M_PI / 3.0) * arrowSize);
+    QPointF arrowP1 = endPt + QPointF(qSin(angle + M_PI / 3.0) * arrowSize, qCos(angle + M_PI / 3.0) * arrowSize);
+    QPointF arrowP2 = endPt + QPointF(qSin(angle + M_PI - M_PI / 3.0) * arrowSize, qCos(angle + M_PI - M_PI / 3.0) * arrowSize);
 
     arrowHead.clear();
     arrowHead << endPt << arrowP1 << arrowP2;

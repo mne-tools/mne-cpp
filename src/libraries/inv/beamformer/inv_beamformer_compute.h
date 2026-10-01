@@ -60,7 +60,6 @@ namespace INVLIB
 class INVSHARED_EXPORT InvBeamformerCompute
 {
 public:
-
     //=========================================================================================================
     /**
      * Compute beamformer spatial filter weights from a leadfield and data covariance (or CSD).
@@ -87,17 +86,17 @@ public:
      *
      * @return True on success.
      */
-    static bool computeBeamformer(const Eigen::MatrixXd &G,
-                                  const Eigen::MatrixXd &Cm,
+    static bool computeBeamformer(const Eigen::MatrixXd& G,
+                                  const Eigen::MatrixXd& Cm,
                                   double reg,
                                   int nOrient,
                                   BeamformerWeightNorm weightNorm,
                                   BeamformerPickOri pickOri,
                                   bool reduceRank,
                                   BeamformerInversion invMethod,
-                                  const Eigen::MatrixX3d &nn,
-                                  Eigen::MatrixXd &W,
-                                  Eigen::MatrixX3d &maxPowerOri);
+                                  const Eigen::MatrixX3d& nn,
+                                  Eigen::MatrixXd& W,
+                                  Eigen::MatrixX3d& maxPowerOri);
 
     //=========================================================================================================
     /**
@@ -111,8 +110,8 @@ public:
      *
      * @return Source power vector (n_sources).
      */
-    static Eigen::VectorXd computePower(const Eigen::MatrixXd &Cm,
-                                        const Eigen::MatrixXd &W,
+    static Eigen::VectorXd computePower(const Eigen::MatrixXd& Cm,
+                                        const Eigen::MatrixXd& W,
                                         int nOrient);
 
     //=========================================================================================================
@@ -125,7 +124,7 @@ public:
      *
      * @return X^p.
      */
-    static Eigen::MatrixXd symMatPow(const Eigen::MatrixXd &X, double p, bool reduceRank = false);
+    static Eigen::MatrixXd symMatPow(const Eigen::MatrixXd& X, double p, bool reduceRank = false);
 
 private:
     //=========================================================================================================
@@ -141,11 +140,11 @@ private:
      * @param[out] loadingFactor  The noise floor added by regularization.
      * @param[out] rankOut      The detected rank.
      */
-    static void regPinv(const Eigen::MatrixXd &C,
+    static void regPinv(const Eigen::MatrixXd& C,
                         double reg,
-                        Eigen::MatrixXd &CInv,
-                        double &loadingFactor,
-                        int &rankOut);
+                        Eigen::MatrixXd& CInv,
+                        double& loadingFactor,
+                        int& rankOut);
 
     //=========================================================================================================
     /**
@@ -156,7 +155,7 @@ private:
      *
      * @param[in,out] Gk   Leadfield block (n_channels, n_orient). Modified in place.
      */
-    static void reduceLeadfieldRank(Eigen::MatrixXd &Gk);
+    static void reduceLeadfieldRank(Eigen::MatrixXd& Gk);
 };
 
 } // NAMESPACE INVLIB

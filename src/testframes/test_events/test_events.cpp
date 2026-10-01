@@ -345,7 +345,7 @@ void TestEvents::testGetEventsInSample()
 {
     EventManager mgr;
     mgr.addEvent(100);
-    mgr.addEvent(100);  // same sample
+    mgr.addEvent(100); // same sample
     mgr.addEvent(200);
 
     auto inSample = mgr.getEventsInSample(100);
@@ -369,7 +369,7 @@ void TestEvents::testGetEventsBetween()
     mgr.addEvent(400);
 
     auto between = mgr.getEventsBetween(150, 350);
-    QCOMPARE((int)between->size(), 2);  // 200 and 300
+    QCOMPARE((int)between->size(), 2); // 200 and 300
 
     auto all = mgr.getEventsBetween(0, 1000);
     QCOMPARE((int)all->size(), 4);
@@ -569,7 +569,7 @@ void TestEvents::testGetEventsInGroup()
     EventGroup g = mgr.addGroup("QueryGroup");
     mgr.addEvent(100, g.id);
     mgr.addEvent(200, g.id);
-    mgr.addEvent(300);  // default group
+    mgr.addEvent(300); // default group
 
     auto inGroup = mgr.getEventsInGroup(g.id);
     QCOMPARE((int)inGroup->size(), 2);
@@ -597,7 +597,7 @@ void TestEvents::testAddEventToGroup()
 {
     EventManager mgr;
     EventGroup g = mgr.addGroup("MoveToGroup");
-    Event e = mgr.addEvent(100);  // default group
+    Event e = mgr.addEvent(100); // default group
 
     QVERIFY(mgr.addEventToGroup(e.id, g.id));
 
@@ -670,10 +670,10 @@ void TestEvents::testDeleteEventsInGroup()
     EventGroup g = mgr.addGroup("DelEvents");
     mgr.addEvent(100, g.id);
     mgr.addEvent(200, g.id);
-    mgr.addEvent(300);  // different group
+    mgr.addEvent(300); // different group
 
     QVERIFY(mgr.deleteEventsInGroup(g.id));
-    QCOMPARE((int)mgr.getNumEvents(), 1);  // only the default-group event remains
+    QCOMPARE((int)mgr.getNumEvents(), 1); // only the default-group event remains
 }
 
 //=============================================================================================================

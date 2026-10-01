@@ -23,7 +23,6 @@
 #include <fiff/fiff_types.h>
 
 
-
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
@@ -58,11 +57,11 @@ constexpr int Z = 2;
 // DEFINE STATIC METHODS
 //=============================================================================================================
 
-static fiff_int_t swap_int (fiff_int_t source)
+static fiff_int_t swap_int(fiff_int_t source)
 {
-    unsigned char *csource =  (unsigned char *)(&source);
+    unsigned char* csource = (unsigned char*)(&source);
     fiff_int_t result;
-    unsigned char *cresult =  (unsigned char *)(&result);
+    unsigned char* cresult = (unsigned char*)(&result);
 
     cresult[0] = csource[3];
     cresult[1] = csource[2];
@@ -73,11 +72,11 @@ static fiff_int_t swap_int (fiff_int_t source)
 
 //=============================================================================================================
 
-static float swap_float (float source)
+static float swap_float(float source)
 {
-    unsigned char *csource =  (unsigned char *)(&source);
+    unsigned char* csource = (unsigned char*)(&source);
     float result;
-    unsigned char *cresult =  (unsigned char *)(&result);
+    unsigned char* cresult = (unsigned char*)(&result);
 
     cresult[0] = csource[3];
     cresult[1] = csource[2];
@@ -88,26 +87,28 @@ static float swap_float (float source)
 
 //=============================================================================================================
 
-namespace INVLIB {
+namespace INVLIB
+{
 
 /**
  * @brief Binary-format dipole record for file I/O, storing fitted dipole parameters and error estimates.
  */
-typedef struct {
-    int   dipole;               /* Which dipole in a multi-dipole set */
-    float begin,end;            /* Fitting time range */
-    float r0[3];                /* Sphere model origin */
-    float rd[3];                /* Dipole location */
-    float Q[3];                 /* InvDipole amplitude */
-    float goodness;             /* Goodness-of-fit */
-    int   errors_computed;      /* Have we computed the errors */
-    float noise_level;          /* Noise level used for error computations */
-    float single_errors[5];     /* Single parameter error limits */
-    float error_matrix[5][5];   /* This fully describes the conf. ellipsoid */
-    float conf_vol;             /* The xyz confidence volume */
-    float khi2;                 /* The khi^2 value */
-    float prob;                 /* Probability to exceed khi^2 by chance */
-    float noise_est;            /* Total noise estimate */
+typedef struct
+{
+    int dipole;               /* Which dipole in a multi-dipole set */
+    float begin, end;         /* Fitting time range */
+    float r0[3];              /* Sphere model origin */
+    float rd[3];              /* Dipole location */
+    float Q[3];               /* InvDipole amplitude */
+    float goodness;           /* Goodness-of-fit */
+    int errors_computed;      /* Have we computed the errors */
+    float noise_level;        /* Noise level used for error computations */
+    float single_errors[5];   /* Single parameter error limits */
+    float error_matrix[5][5]; /* This fully describes the conf. ellipsoid */
+    float conf_vol;           /* The xyz confidence volume */
+    float khi2;               /* The khi^2 value */
+    float prob;               /* Probability to exceed khi^2 by chance */
+    float noise_est;          /* Total noise estimate */
 } bdipEcdRec;
 using bdipEcd = bdipEcdRec*;
 
@@ -123,7 +124,7 @@ InvEcdSet::InvEcdSet()
 
 //=============================================================================================================
 
-InvEcdSet::InvEcdSet(const InvEcdSet &p_ECDSet)
+InvEcdSet::InvEcdSet(const InvEcdSet& p_ECDSet)
 : dataname(p_ECDSet.dataname)
 , m_qListDips(p_ECDSet.m_qListDips)
 {
@@ -146,22 +147,19 @@ void InvEcdSet::addEcd(const InvEcd& p_ecd)
 
 InvEcdSet InvEcdSet::read_dipoles_dip(const QString& fileName)
 {
-    InvEcdSet  set;
+    InvEcdSet set;
 
     QFile inputFile(fileName);
-    if (inputFile.open(QIODevice::ReadOnly|QIODevice::Text))
-    {
+    if (inputFile.open(QIODevice::ReadOnly | QIODevice::Text)) {
         QTextStream in(&inputFile);
-        while (!in.atEnd())
-        {
+        while (!in.atEnd()) {
             QString line = in.readLine();
             QStringList list = line.split(QRegularExpression("\\s+"));
 
-            if(list[0].contains("#") || list.size() != 11) {
+            if (list[0].contains("#") || list.size() != 11) {
                 continue;
-            }
-            else {
-                InvEcd     one;
+            } else {
+                InvEcd one;
                 one.valid = true;
                 one.time = list[1].toFloat() / 1000.0f;
                 one.rd[X] = list[3].toFloat() / 1000.0f;
@@ -176,9 +174,8 @@ InvEcdSet InvEcdSet::read_dipoles_dip(const QString& fileName)
         }
         inputFile.close();
 
-        qInfo("Read %d dipoles in dip format from %s\n",set.size(),fileName.toUtf8().data());
-    }
-    else {
+        qInfo("Read %d dipoles in dip format from %s\n", set.size(), fileName.toUtf8().data());
+    } else {
         qCritical("Not able to read from: %s\n", fileName.toUtf8().data());
     }
 
@@ -192,11 +189,11 @@ bool InvEcdSet::save_dipoles_bdip(const QString& fileName)
    * Save dipoles in the bdip format employed by xfit
    */
 {
-    QFile       out(fileName);
-    bdipEcdRec  one_out;
-    InvEcd         one;
-    int         k,p;
-    int         nsave;
+    QFile out(fileName);
+    bdipEcdRec one_out;
+    InvEcd one;
+    int k, p;
+    int nsave;
 
     if (fileName.isEmpty() || this->size() == 0)
         return true;
@@ -210,16 +207,16 @@ bool InvEcdSet::save_dipoles_bdip(const QString& fileName)
         one = m_qListDips[k];
         if (one.valid) {
             one_out.dipole = swap_int(1);
-            one_out.begin  = swap_float(one.time);
+            one_out.begin = swap_float(one.time);
             for (p = 0; p < 3; p++) {
                 one_out.r0[p] = swap_float(0.0);
                 one_out.rd[p] = swap_float(one.rd[p]);
-                one_out.Q[p]  = swap_float(one.Q[p]);
+                one_out.Q[p] = swap_float(one.Q[p]);
             }
             one_out.goodness = swap_float(one.good);
             one_out.errors_computed = swap_int(0);
-            one_out.khi2            = swap_float(one.khi2);
-            if (out.write(reinterpret_cast<const char*>(&one_out),sizeof(bdipEcdRec)) != sizeof(bdipEcdRec)) {
+            one_out.khi2 = swap_float(one.khi2);
+            if (out.write(reinterpret_cast<const char*>(&one_out), sizeof(bdipEcdRec)) != sizeof(bdipEcdRec)) {
                 qCritical("Failed to write a dipole");
                 out.close();
                 QFile::remove(fileName);
@@ -233,7 +230,7 @@ bool InvEcdSet::save_dipoles_bdip(const QString& fileName)
         return false;
     }
     out.close();
-    qInfo("Save %d dipoles in bdip format to %s\n",nsave,fileName.toUtf8().data());
+    qInfo("Save %d dipoles in bdip format to %s\n", nsave, fileName.toUtf8().data());
     return true;
 }
 
@@ -242,8 +239,8 @@ bool InvEcdSet::save_dipoles_bdip(const QString& fileName)
 bool InvEcdSet::save_dipoles_dip(const QString& fileName) const
 {
     QFile out(fileName);
-    int  k,nsave;
-    InvEcd  one;
+    int k, nsave;
+    InvEcd one;
 
     if (fileName.isEmpty() || this->size() == 0)
         return true;
@@ -258,46 +255,33 @@ bool InvEcdSet::save_dipoles_dip(const QString& fileName) const
     QTextStream stream(&out);
     stream << "# CoordinateSystem \"Head\"\n";
     stream << QString::asprintf("# %7s %7s %8s %8s %8s %8s %8s %8s %8s %6s\n",
-                                "begin","end","X (mm)","Y (mm)","Z (mm)","Q(nAm)","Qx(nAm)","Qy(nAm)","Qz(nAm)","g/%");
+                                "begin", "end", "X (mm)", "Y (mm)", "Z (mm)", "Q(nAm)", "Qx(nAm)", "Qy(nAm)", "Qz(nAm)", "g/%");
     for (k = 0, nsave = 0; k < this->size(); k++) {
         one = this->m_qListDips[k];
         if (one.valid) {
             stream << QString::asprintf("  %7.1f %7.1f %8.2f %8.2f %8.2f %8.3f %8.3f %8.3f %8.3f %6.1f\n",
-                                        1000*one.time,1000*one.time,
-                                        1000*one.rd[X],1000*one.rd[Y],1000*one.rd[Z],
-                                        1e9*one.Q.norm(),1e9*one.Q[X],1e9*one.Q[Y],1e9*one.Q[Z],100.0*one.good);
+                                        1000 * one.time, 1000 * one.time,
+                                        1000 * one.rd[X], 1000 * one.rd[Y], 1000 * one.rd[Z],
+                                        1e9 * one.Q.norm(), 1e9 * one.Q[X], 1e9 * one.Q[Y], 1e9 * one.Q[Z], 100.0 * one.good);
             nsave++;
         }
     }
-    stream << QString::asprintf("## Name \"%s dipoles\" Style \"Dipoles\"\n","ALL");
+    stream << QString::asprintf("## Name \"%s dipoles\" Style \"Dipoles\"\n", "ALL");
     stream.flush();
     if (!out.flush()) {
         qInfo("%s", fileName.toUtf8().constData());
         return false;
     }
     out.close();
-    qInfo("Save %d dipoles in dip format to %s\n",nsave,fileName.toUtf8().data());
+    qInfo("Save %d dipoles in dip format to %s\n", nsave, fileName.toUtf8().data());
     return true;
 }
 
 //=============================================================================================================
 
-const InvEcd& InvEcdSet::operator[] (int idx) const
+const InvEcd& InvEcdSet::operator[](int idx) const
 {
-    if (idx>=m_qListDips.length())
-    {
-        qWarning("Warning: Required InvEcd doesn't exist! Returning InvEcd '0'.");
-        idx=0;
-    }
-    return m_qListDips[idx];
-}
-
-//=============================================================================================================
-
-InvEcd& InvEcdSet::operator[] (int idx)
-{
-    if (idx >= m_qListDips.length())
-    {
+    if (idx >= m_qListDips.length()) {
         qWarning("Warning: Required InvEcd doesn't exist! Returning InvEcd '0'.");
         idx = 0;
     }
@@ -306,7 +290,18 @@ InvEcd& InvEcdSet::operator[] (int idx)
 
 //=============================================================================================================
 
-InvEcdSet &InvEcdSet::operator<<(const InvEcd &p_ecd)
+InvEcd& InvEcdSet::operator[](int idx)
+{
+    if (idx >= m_qListDips.length()) {
+        qWarning("Warning: Required InvEcd doesn't exist! Returning InvEcd '0'.");
+        idx = 0;
+    }
+    return m_qListDips[idx];
+}
+
+//=============================================================================================================
+
+InvEcdSet& InvEcdSet::operator<<(const InvEcd& p_ecd)
 {
     this->m_qListDips.append(p_ecd);
     return *this;

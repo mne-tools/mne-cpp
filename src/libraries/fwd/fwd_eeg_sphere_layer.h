@@ -63,7 +63,6 @@ namespace FWDLIB
 class FWDSHARED_EXPORT FwdEegSphereLayer
 {
 public:
-
     //=========================================================================================================
     /**
      * Constructs the Electric Current Dipole
@@ -91,9 +90,9 @@ public:
     }
 
 public:
-    float rad;          /**< The actual rads. */
-    float rel_rad;      /**< Relative rads. */
-    float sigma;        /**< Conductivity. */
+    float rad;     /**< The actual rads. */
+    float rel_rad; /**< Relative rads. */
+    float sigma;   /**< Conductivity. */
 };
 
 //=============================================================================================================

@@ -68,14 +68,14 @@ QRectF SelectionSceneItem::boundingRect() const
 
 //=============================================================================================================
 
-void SelectionSceneItem::paint(QPainter *painter,
-                               const QStyleOptionGraphicsItem *option,
-                               QWidget *widget)
+void SelectionSceneItem::paint(QPainter* painter,
+                               const QStyleOptionGraphicsItem* option,
+                               QWidget* widget)
 {
     Q_UNUSED(option);
     Q_UNUSED(widget);
 
-    this->setPos(10*m_qpChannelPosition.x(), -10*m_qpChannelPosition.y());
+    this->setPos(10 * m_qpChannelPosition.x(), -10 * m_qpChannelPosition.y());
 
     // Plot shadow
     painter->setPen(Qt::NoPen);
@@ -83,7 +83,7 @@ void SelectionSceneItem::paint(QPainter *painter,
     painter->drawEllipse(-12, -12, 30, 30);
 
     //Plot red if bad
-    if(m_bIsBadChannel) {
+    if (m_bIsBadChannel) {
         painter->setBrush(Qt::red);
         painter->drawEllipse(-15, -15, 30, 30);
     } else {
@@ -92,39 +92,39 @@ void SelectionSceneItem::paint(QPainter *painter,
     }
 
     //Plot selected item
-    if(this->isSelected()){
+    if (this->isSelected()) {
         //painter->setPen(QPen(QColor(255,84,22), 5));
         painter->setPen(QPen(Qt::red, 5));
         painter->drawEllipse(-15, -15, 30, 30);
     }
 
     //OLD
-//    //Plot selected item
-//    if(this->isSelected())
-//        painter->setBrush(QBrush(QColor(93,177,47)));
-//    else
-//        painter->setBrush(QBrush(m_cChannelColor));
+    //    //Plot selected item
+    //    if(this->isSelected())
+    //        painter->setBrush(QBrush(QColor(93,177,47)));
+    //    else
+    //        painter->setBrush(QBrush(m_cChannelColor));
 
-//    //Plot highlighted selected item
-//    if(m_bHighlightItem) {
-//        painter->setPen(QPen(Qt::red, 4));
-//        painter->drawEllipse(-15, -15, 30, 30);
-//    }
-//    else {
-//        painter->setPen(QPen(Qt::black, 1));
-//        painter->drawEllipse(-15, -15, 30, 30);
-//    }
+    //    //Plot highlighted selected item
+    //    if(m_bHighlightItem) {
+    //        painter->setPen(QPen(Qt::red, 4));
+    //        painter->drawEllipse(-15, -15, 30, 30);
+    //    }
+    //    else {
+    //        painter->setPen(QPen(Qt::black, 1));
+    //        painter->drawEllipse(-15, -15, 30, 30);
+    //    }
 
     // Plot electrode name
     painter->setPen(QPen(Qt::black, 1));
     QStaticText staticElectrodeName = QStaticText(m_sChannelName);
     QSizeF sizeText = staticElectrodeName.size();
-    painter->drawStaticText(-15+((30-sizeText.width())/2), -32, staticElectrodeName);
+    painter->drawStaticText(-15 + ((30 - sizeText.width()) / 2), -32, staticElectrodeName);
 }
 
 //=============================================================================================================
 
-SelectionItem::SelectionItem(const SelectionItem &other)
+SelectionItem::SelectionItem(const SelectionItem& other)
 {
     m_sChannelName = other.m_sChannelName;
     m_iChannelNumber = other.m_iChannelNumber;

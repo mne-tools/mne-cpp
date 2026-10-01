@@ -59,9 +59,9 @@ public:
      */
     int pick(const QStringList& names, int nnames, bool require_all, Eigen::Ref<Eigen::VectorXf> res) const;
 
-    int         nvec = 0;   /**< Number of elements. */
-    QStringList names;      /**< Name list for the elements. */
-    Eigen::VectorXf data;      /**< The data itself. */
+    int nvec = 0;         /**< Number of elements. */
+    QStringList names;    /**< Name list for the elements. */
+    Eigen::VectorXf data; /**< The data itself. */
 };
 
 } // namespace MNELIB

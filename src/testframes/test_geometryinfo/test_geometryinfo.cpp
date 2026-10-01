@@ -53,7 +53,7 @@ using namespace FIFFLIB;
  * @brief The TestGeometryInfo class provides basic verification tests
  *
  */
-class TestGeometryInfo: public QObject
+class TestGeometryInfo : public QObject
 {
     Q_OBJECT
 
@@ -78,12 +78,14 @@ private:
 
 //=============================================================================================================
 
-TestGeometryInfo::TestGeometryInfo() {
+TestGeometryInfo::TestGeometryInfo()
+{
 }
 
 //=============================================================================================================
 
-void TestGeometryInfo::initTestCase() {
+void TestGeometryInfo::initTestCase()
+{
     //acquire real surface data
     QFile t_filesensorSurfaceVV(QCoreApplication::applicationDirPath() + "/../resources/data/mne-cpp-test-data/subjects/sample/bem/sample-5120-bem.fif");
     MNEBem t_sensorSurfaceVV(t_filesensorSurfaceVV);
@@ -91,10 +93,10 @@ void TestGeometryInfo::initTestCase() {
 
     // generate small test mesh with 100 vertices:
     MatrixX3f mVertPos(100, 3);
-    for(qint8 i = 0; i < 100; i++) {
-        float x = static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
-        float y = static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
-        float z = static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
+    for (qint8 i = 0; i < 100; i++) {
+        float x = static_cast<float>(rand()) / static_cast<float>(RAND_MAX);
+        float y = static_cast<float>(rand()) / static_cast<float>(RAND_MAX);
+        float z = static_cast<float>(rand()) / static_cast<float>(RAND_MAX);
 
         mVertPos(i, 0) = x;
         mVertPos(i, 1) = y;
@@ -123,24 +125,25 @@ void TestGeometryInfo::initTestCase() {
 
 //=============================================================================================================
 
-void TestGeometryInfo::testBadChannelFiltering() {
+void TestGeometryInfo::testBadChannelFiltering()
+{
     //acquire real sensor positions
     QFile t_fileEvoked(QCoreApplication::applicationDirPath() + "/../resources/data/mne-cpp-test-data/MEG/sample/sample_audvis-ave.fif");
     fiff_int_t setno = 0;
     QPair<float, float> baseline(-1.0f, -1.0f);
     FiffEvoked evoked(t_fileEvoked, setno, baseline);
-    if(evoked.isEmpty())
-    {
+    if (evoked.isEmpty()) {
         return;
     }
     // Build sensor position matrix
     int nMegSensors = 0;
-    for (const FiffChInfo &info : evoked.info.chs) {
-        if (info.kind == FIFFV_MEG_CH) ++nMegSensors;
+    for (const FiffChInfo& info : evoked.info.chs) {
+        if (info.kind == FIFFV_MEG_CH)
+            ++nMegSensors;
     }
     MatrixX3f matMegSensors(nMegSensors, 3);
     int sIdx = 0;
-    for (const FiffChInfo &info : evoked.info.chs) {
+    for (const FiffChInfo& info : evoked.info.chs) {
         if (info.kind == FIFFV_MEG_CH) {
             matMegSensors.row(sIdx++) = info.chpos.r0.transpose();
         }
@@ -167,7 +170,8 @@ void TestGeometryInfo::testBadChannelFiltering() {
 
 //=============================================================================================================
 
-void TestGeometryInfo::testEmptyInputsForProjecting() {
+void TestGeometryInfo::testEmptyInputsForProjecting()
+{
     // sensor projecting:
     MatrixX3f matEmptySensors(0, 3);
     VectorXi vEmptyMapping = GeometryInfo::projectSensors(realSurface.rr, matEmptySensors);
@@ -176,7 +180,8 @@ void TestGeometryInfo::testEmptyInputsForProjecting() {
 
 //=============================================================================================================
 
-void TestGeometryInfo::testEmptyInputsForSCDC() {
+void TestGeometryInfo::testEmptyInputsForSCDC()
+{
     VectorXi vVertSubset;
     QSharedPointer<MatrixXd> pDistTable = GeometryInfo::scdc(smallSurface.rr, smallSurface.neighbor_vert, vVertSubset);
     QVERIFY(pDistTable->rows() == pDistTable->cols());
@@ -184,7 +189,8 @@ void TestGeometryInfo::testEmptyInputsForSCDC() {
 
 //=============================================================================================================
 
-void TestGeometryInfo::testDimensionsForSCDC() {
+void TestGeometryInfo::testDimensionsForSCDC()
+{
     QSharedPointer<MatrixXd> pDistTable = GeometryInfo::scdc(smallSurface.rr, smallSurface.neighbor_vert, vSmallSubset);
     QVERIFY(pDistTable->rows() == smallSurface.rr.rows());
     QVERIFY(pDistTable->cols() == vSmallSubset.size());
@@ -192,7 +198,8 @@ void TestGeometryInfo::testDimensionsForSCDC() {
 
 //=============================================================================================================
 
-void TestGeometryInfo::cleanupTestCase() {
+void TestGeometryInfo::cleanupTestCase()
+{
 }
 
 //=============================================================================================================

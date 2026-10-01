@@ -39,31 +39,31 @@ namespace
 QTreeWidgetItem* buildJsonTreeItem(const QString& key, const QJsonValue& value)
 {
     QString displayValue;
-    if(value.isObject()) {
+    if (value.isObject()) {
         displayValue = "{...}";
-    } else if(value.isArray()) {
+    } else if (value.isArray()) {
         displayValue = QString("[%1]").arg(value.toArray().size());
-    } else if(value.isString()) {
+    } else if (value.isString()) {
         displayValue = value.toString();
-    } else if(value.isDouble()) {
+    } else if (value.isDouble()) {
         displayValue = QString::number(value.toDouble(), 'g', 8);
-    } else if(value.isBool()) {
+    } else if (value.isBool()) {
         displayValue = value.toBool() ? QString("true") : QString("false");
-    } else if(value.isNull()) {
+    } else if (value.isNull()) {
         displayValue = "null";
     } else {
         displayValue = QString::fromUtf8(QJsonDocument::fromVariant(value.toVariant()).toJson(QJsonDocument::Compact));
     }
 
     QTreeWidgetItem* item = new QTreeWidgetItem(QStringList() << key << displayValue);
-    if(value.isObject()) {
+    if (value.isObject()) {
         const QJsonObject object = value.toObject();
-        for(auto it = object.constBegin(); it != object.constEnd(); ++it) {
+        for (auto it = object.constBegin(); it != object.constEnd(); ++it) {
             item->addChild(buildJsonTreeItem(it.key(), it.value()));
         }
-    } else if(value.isArray()) {
+    } else if (value.isArray()) {
         const QJsonArray array = value.toArray();
-        for(int i = 0; i < array.size(); ++i) {
+        for (int i = 0; i < array.size(); ++i) {
             item->addChild(buildJsonTreeItem(QString("[%1]").arg(i), array.at(i)));
         }
     }
@@ -87,10 +87,10 @@ public:
     QStringList supportedToolNames() const override
     {
         return QStringList()
-               << "neurokernel.channel_stats"
-               << "neurokernel.raw_stats"
-               << "neurokernel.find_peak_window"
-               << "studio.pipeline.run";
+            << "neurokernel.channel_stats"
+            << "neurokernel.raw_stats"
+            << "neurokernel.find_peak_window"
+            << "studio.pipeline.run";
     }
 
     QWidget* createRenderer(QWidget* parent = nullptr) const override
@@ -202,25 +202,25 @@ void AnalysisResultsWidget::setResult(const QString& toolName, const QJsonObject
     m_stack->setCurrentWidget(m_tree);
     m_titleLabel->setText(result.value("message").toString(toolName));
 
-    if(toolName == "studio.pipeline.run") {
+    if (toolName == "studio.pipeline.run") {
         setPipelineResult(result);
         return;
     }
 
-    if(toolName == "neurokernel.channel_stats" && result.value("channels").isArray()) {
+    if (toolName == "neurokernel.channel_stats" && result.value("channels").isArray()) {
         setChannelTable(result.value("channels").toArray(), true);
         return;
     }
 
-    if(toolName == "neurokernel.raw_stats" && result.value("top_channels").isArray()) {
+    if (toolName == "neurokernel.raw_stats" && result.value("top_channels").isArray()) {
         setChannelTable(result.value("top_channels").toArray(), true);
         return;
     }
 
-    if(toolName == "neurokernel.find_peak_window") {
+    if (toolName == "neurokernel.find_peak_window") {
         setTreeResult(result);
         const int peakSample = result.value("peak_sample").toInt(-1);
-        if(peakSample >= 0) {
+        if (peakSample >= 0) {
             m_primaryActionCommand = QString("tools.call view.raw.goto {\"sample\":%1}").arg(peakSample);
             m_primaryActionButton->setText(QString("Jump To Peak Sample %1").arg(peakSample));
             m_primaryActionButton->setVisible(true);
@@ -258,13 +258,13 @@ QJsonObject AnalysisResultsWidget::toolDefaults(const QString& toolName) const
 
 void AnalysisResultsWidget::updatePrimaryActionFromSelection()
 {
-    if(m_toolName != "neurokernel.channel_stats" && m_toolName != "neurokernel.raw_stats") {
+    if (m_toolName != "neurokernel.channel_stats" && m_toolName != "neurokernel.raw_stats") {
         emitSelectionContext();
         return;
     }
 
     const QList<QTableWidgetItem*> items = m_table->selectedItems();
-    if(items.isEmpty()) {
+    if (items.isEmpty()) {
         m_primaryActionCommand.clear();
         m_primaryActionButton->setVisible(true);
         m_primaryActionButton->setEnabled(false);
@@ -274,7 +274,7 @@ void AnalysisResultsWidget::updatePrimaryActionFromSelection()
     }
 
     QTableWidgetItem* nameItem = m_table->item(items.first()->row(), 0);
-    if(!nameItem || nameItem->text().trimmed().isEmpty()) {
+    if (!nameItem || nameItem->text().trimmed().isEmpty()) {
         m_primaryActionCommand.clear();
         m_primaryActionButton->setEnabled(false);
         emitSelectionContext();
@@ -283,7 +283,7 @@ void AnalysisResultsWidget::updatePrimaryActionFromSelection()
 
     const QString channelName = nameItem->text().trimmed();
     QJsonObject arguments = toolDefaults("neurokernel.find_peak_window");
-    if(arguments.isEmpty()) {
+    if (arguments.isEmpty()) {
         arguments.insert("window_samples", 4000);
     }
     arguments.insert("match", channelName);
@@ -297,7 +297,7 @@ void AnalysisResultsWidget::updatePrimaryActionFromSelection()
 
 void AnalysisResultsWidget::runPrimaryAction()
 {
-    if(!m_primaryActionCommand.trimmed().isEmpty()) {
+    if (!m_primaryActionCommand.trimmed().isEmpty()) {
         emit toolCommandRequested(m_primaryActionCommand);
     }
 }
@@ -311,7 +311,7 @@ void AnalysisResultsWidget::updatePipelineSelection()
     m_secondaryActionButton->setText("Run Selected Step");
 
     const QList<QTableWidgetItem*> items = m_pipelineStepsTable->selectedItems();
-    if(items.isEmpty()) {
+    if (items.isEmpty()) {
         emitSelectionContext();
         return;
     }
@@ -319,17 +319,17 @@ void AnalysisResultsWidget::updatePipelineSelection()
     const int row = items.first()->row();
     const QVariant payload = m_pipelineStepsTable->item(row, 0)->data(Qt::UserRole);
     const QJsonObject step = payload.toJsonObject();
-    for(auto it = step.constBegin(); it != step.constEnd(); ++it) {
+    for (auto it = step.constBegin(); it != step.constEnd(); ++it) {
         m_pipelineStepDetailsTree->addTopLevelItem(buildJsonTreeItem(it.key(), it.value()));
     }
     m_pipelineStepDetailsTree->expandToDepth(1);
-    for(int column = 0; column < m_pipelineStepDetailsTree->columnCount(); ++column) {
+    for (int column = 0; column < m_pipelineStepDetailsTree->columnCount(); ++column) {
         m_pipelineStepDetailsTree->resizeColumnToContents(column);
     }
 
     const QString runId = step.value("run_id").toString().trimmed();
     const int stepNumber = step.value("step_number").toInt(-1);
-    if(!runId.isEmpty() && stepNumber > 0) {
+    if (!runId.isEmpty() && stepNumber > 0) {
         m_secondaryActionCommand = QString("tools.call studio.pipeline.rerun_step {\"run_id\":\"%1\",\"step_number\":%2,\"mode\":\"rehydrate\"}")
                                        .arg(runId)
                                        .arg(stepNumber);
@@ -340,7 +340,7 @@ void AnalysisResultsWidget::updatePipelineSelection()
     }
 
     const QTableWidgetItem* commandItem = m_pipelineStepsTable->item(row, 5);
-    if(commandItem && !commandItem->text().trimmed().isEmpty()) {
+    if (commandItem && !commandItem->text().trimmed().isEmpty()) {
         m_secondaryActionCommand = commandItem->text().trimmed();
         m_secondaryActionButton->setText("Replay Exact Step");
         m_secondaryActionButton->setEnabled(true);
@@ -350,7 +350,7 @@ void AnalysisResultsWidget::updatePipelineSelection()
 
 void AnalysisResultsWidget::runSecondaryAction()
 {
-    if(!m_secondaryActionCommand.trimmed().isEmpty()) {
+    if (!m_secondaryActionCommand.trimmed().isEmpty()) {
         emit toolCommandRequested(m_secondaryActionCommand);
     }
 }
@@ -363,37 +363,35 @@ void AnalysisResultsWidget::emitSelectionContext()
         {"has_primary_action", !m_primaryActionCommand.trimmed().isEmpty()},
         {"has_secondary_action", !m_secondaryActionCommand.trimmed().isEmpty()},
         {"primary_action_command", m_primaryActionCommand},
-        {"secondary_action_command", m_secondaryActionCommand}
-    };
+        {"secondary_action_command", m_secondaryActionCommand}};
 
-    if(m_toolName == QLatin1String("neurokernel.channel_stats")
-       || m_toolName == QLatin1String("neurokernel.raw_stats")) {
+    if (m_toolName == QLatin1String("neurokernel.channel_stats") || m_toolName == QLatin1String("neurokernel.raw_stats")) {
         const QList<QTableWidgetItem*> items = m_table->selectedItems();
-        if(!items.isEmpty()) {
+        if (!items.isEmpty()) {
             const int row = items.first()->row();
-            if(QTableWidgetItem* nameItem = m_table->item(row, 0)) {
+            if (QTableWidgetItem* nameItem = m_table->item(row, 0)) {
                 const QString channelName = nameItem->text().trimmed();
-                if(!channelName.isEmpty()) {
+                if (!channelName.isEmpty()) {
                     context.insert("selection_kind", "channel");
                     context.insert("selected_channel_name", channelName);
                     context.insert("selected_channel_row", row);
                 }
             }
         }
-    } else if(m_toolName == QLatin1String("studio.pipeline.run")) {
+    } else if (m_toolName == QLatin1String("studio.pipeline.run")) {
         const QList<QTableWidgetItem*> items = m_pipelineStepsTable->selectedItems();
-        if(!items.isEmpty()) {
+        if (!items.isEmpty()) {
             const int row = items.first()->row();
             const QVariant payload = m_pipelineStepsTable->item(row, 0)->data(Qt::UserRole);
             const QJsonObject step = payload.toJsonObject();
-            if(!step.isEmpty()) {
+            if (!step.isEmpty()) {
                 context.insert("selection_kind", "pipeline_step");
                 context.insert("selected_pipeline_step", step);
                 context.insert("selected_step_number", step.value("step_number").toInt(row + 1));
                 context.insert("selected_pipeline_run_id", step.value("run_id").toString());
                 context.insert("selected_pipeline_id", step.value("pipeline_id").toString(m_result.value("pipeline_id").toString()));
             }
-        } else if(!m_result.isEmpty()) {
+        } else if (!m_result.isEmpty()) {
             context.insert("selection_kind", "pipeline_result");
             context.insert("selected_pipeline_run_id", m_result.value("run_id").toString());
             context.insert("selected_pipeline_id", m_result.value("pipeline_id").toString());
@@ -406,11 +404,11 @@ void AnalysisResultsWidget::emitSelectionContext()
 void AnalysisResultsWidget::setTreeResult(const QJsonObject& result)
 {
     m_stack->setCurrentWidget(m_tree);
-    for(auto it = result.constBegin(); it != result.constEnd(); ++it) {
+    for (auto it = result.constBegin(); it != result.constEnd(); ++it) {
         m_tree->addTopLevelItem(buildJsonTreeItem(it.key(), it.value()));
     }
     m_tree->expandToDepth(1);
-    for(int column = 0; column < m_tree->columnCount(); ++column) {
+    for (int column = 0; column < m_tree->columnCount(); ++column) {
         m_tree->resizeColumnToContents(column);
     }
 }
@@ -418,20 +416,16 @@ void AnalysisResultsWidget::setTreeResult(const QJsonObject& result)
 void AnalysisResultsWidget::setChannelTable(const QJsonArray& channels, bool allowPeakAction)
 {
     m_table->setRowCount(channels.size());
-    for(int row = 0; row < channels.size(); ++row) {
+    for (int row = 0; row < channels.size(); ++row) {
         const QJsonObject channel = channels.at(row).toObject();
         m_table->setItem(row, 0, new QTableWidgetItem(channel.value("name").toString()));
         m_table->setItem(row, 1, new QTableWidgetItem(QString::number(channel.value("rms").toDouble(), 'g', 8)));
-        m_table->setItem(row, 2, new QTableWidgetItem(channel.contains("mean_abs")
-                                                          ? QString::number(channel.value("mean_abs").toDouble(), 'g', 8)
-                                                          : QString("-")));
-        m_table->setItem(row, 3, new QTableWidgetItem(channel.contains("peak_abs")
-                                                          ? QString::number(channel.value("peak_abs").toDouble(), 'g', 8)
-                                                          : QString("-")));
+        m_table->setItem(row, 2, new QTableWidgetItem(channel.contains("mean_abs") ? QString::number(channel.value("mean_abs").toDouble(), 'g', 8) : QString("-")));
+        m_table->setItem(row, 3, new QTableWidgetItem(channel.contains("peak_abs") ? QString::number(channel.value("peak_abs").toDouble(), 'g', 8) : QString("-")));
     }
     m_stack->setCurrentWidget(m_table);
 
-    if(allowPeakAction) {
+    if (allowPeakAction) {
         m_primaryActionButton->setText("Find Peak For Selected Channel");
         m_primaryActionButton->setVisible(true);
         updatePrimaryActionFromSelection();
@@ -455,12 +449,12 @@ void AnalysisResultsWidget::setPipelineResult(const QJsonObject& result)
     const QString runId = result.value("run_id").toString().trimmed();
     const QString pipelineId = result.value("pipeline_id").toString().trimmed();
     const int pendingSteps = result.value("pending_steps").toInt();
-    if(!runId.isEmpty() && pendingSteps > 0) {
+    if (!runId.isEmpty() && pendingSteps > 0) {
         m_primaryActionCommand = QString("tools.call studio.pipeline.resume {\"run_id\":\"%1\"}").arg(runId);
         m_primaryActionButton->setText("Resume Remaining Steps");
         m_primaryActionButton->setVisible(true);
         m_primaryActionButton->setEnabled(true);
-    } else if(!pipelineId.isEmpty()) {
+    } else if (!pipelineId.isEmpty()) {
         QJsonObject arguments = toolDefaults("studio.pipeline.run");
         arguments.insert("pipeline_id", pipelineId);
         const QString argumentsText = QString::fromUtf8(QJsonDocument(arguments).toJson(QJsonDocument::Compact));
@@ -472,12 +466,12 @@ void AnalysisResultsWidget::setPipelineResult(const QJsonObject& result)
 
     const QJsonArray steps = result.value("steps").toArray();
     m_pipelineStepsTable->setRowCount(steps.size());
-    for(int row = 0; row < steps.size(); ++row) {
+    for (int row = 0; row < steps.size(); ++row) {
         QJsonObject step = steps.at(row).toObject();
-        if(!runId.isEmpty() && !step.contains("run_id")) {
+        if (!runId.isEmpty() && !step.contains("run_id")) {
             step.insert("run_id", runId);
         }
-        if(!pipelineId.isEmpty() && !step.contains("pipeline_id")) {
+        if (!pipelineId.isEmpty() && !step.contains("pipeline_id")) {
             step.insert("pipeline_id", pipelineId);
         }
         QTableWidgetItem* indexItem = new QTableWidgetItem(QString::number(step.value("step_number").toInt(row + 1)));
@@ -491,14 +485,14 @@ void AnalysisResultsWidget::setPipelineResult(const QJsonObject& result)
     }
 
     m_stack->setCurrentWidget(m_pipelineView);
-    if(m_pipelineStepsTable->rowCount() > 0) {
+    if (m_pipelineStepsTable->rowCount() > 0) {
         m_pipelineStepsTable->selectRow(m_pipelineStepsTable->rowCount() - 1);
         updatePipelineSelection();
     } else {
         m_pipelineStepDetailsTree->addTopLevelItem(new QTreeWidgetItem(QStringList()
                                                                        << "hint"
                                                                        << "No pipeline steps recorded yet."));
-        if(!m_secondaryActionButton->isVisible()) {
+        if (!m_secondaryActionButton->isVisible()) {
             m_secondaryActionButton->setVisible(true);
             m_secondaryActionButton->setEnabled(false);
         }

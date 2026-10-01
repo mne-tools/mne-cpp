@@ -68,8 +68,8 @@ public:
      * @param[in] text           Display text (e.g. "Digitizer").
      * @param[in] digitizerPoints List of FIFF digitizer points to categorize.
      */
-    explicit DigitizerSetTreeItem(const QString &text,
-                                  const QList<FIFFLIB::FiffDigPoint> &digitizerPoints);
+    explicit DigitizerSetTreeItem(const QString& text,
+                                  const QList<FIFFLIB::FiffDigPoint>& digitizerPoints);
     ~DigitizerSetTreeItem() = default;
 
     //=========================================================================================================

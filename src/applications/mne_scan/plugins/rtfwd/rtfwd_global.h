@@ -32,12 +32,13 @@
 //=============================================================================================================
 
 #if defined(SCAN_RTFWD_PLUGIN)
-#  define RTFWDSHARED_EXPORT Q_DECL_EXPORT    /**< Q_DECL_EXPORT must be added to the declarations of symbols used when compiling a shared library. */
+#define RTFWDSHARED_EXPORT Q_DECL_EXPORT /**< Q_DECL_EXPORT must be added to the declarations of symbols used when compiling a shared library. */
 #else
-#  define RTFWDSHARED_EXPORT Q_DECL_IMPORT    /**< Q_DECL_IMPORT must be added to the declarations of symbols used when compiling a client that uses the shared library. */
+#define RTFWDSHARED_EXPORT Q_DECL_IMPORT /**< Q_DECL_IMPORT must be added to the declarations of symbols used when compiling a client that uses the shared library. */
 #endif
 
-namespace RTFWDPLUGIN{
+namespace RTFWDPLUGIN
+{
 
 //=============================================================================================================
 /**

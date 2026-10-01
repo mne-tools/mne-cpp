@@ -173,8 +173,8 @@ void TestFsAtlasLookup::testBatchLookup()
     QVERIFY(lookup.load(m_parcPath));
 
     QVector<Vector3f> positions;
-    positions << Vector3f(0.0f, 0.0f, 0.0f)     // center
-              << Vector3f(0.0f, -25.0f, -15.0f)  // near hippocampus
+    positions << Vector3f(0.0f, 0.0f, 0.0f)        // center
+              << Vector3f(0.0f, -25.0f, -15.0f)    // near hippocampus
               << Vector3f(500.0f, 500.0f, 500.0f); // outside
 
     QStringList labels = lookup.labelsForPositions(positions);

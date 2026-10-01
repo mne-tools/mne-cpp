@@ -100,7 +100,7 @@ void TestInvCmne::testSettingsDefaults()
     QCOMPARE(settings.lookBack, 80);
     QCOMPARE(settings.numSources, 5124);
     QVERIFY(std::abs(settings.lambda2 - 1.0 / 9.0) < 1e-10);
-    QCOMPARE(settings.method, 1);  // dSPM
+    QCOMPARE(settings.method, 1); // dSPM
     QVERIFY(std::abs(settings.looseOriConstraint - 0.2) < 1e-10);
     QVERIFY(settings.onnxModelPath.isEmpty());
 }
@@ -113,7 +113,7 @@ void TestInvCmne::testSettingsCustom()
     settings.lookBack = 40;
     settings.numSources = 2562;
     settings.lambda2 = 0.5;
-    settings.method = 2;  // sLORETA
+    settings.method = 2; // sLORETA
     settings.looseOriConstraint = 0.0;
     settings.onnxModelPath = "/tmp/model.onnx";
 
@@ -151,7 +151,7 @@ void TestInvCmne::testDspmKernelDimensions()
     InvCMNESettings settings;
     settings.numSources = nSrc;
     settings.lambda2 = 1.0 / 9.0;
-    settings.onnxModelPath.clear();  // No ONNX model
+    settings.onnxModelPath.clear(); // No ONNX model
 
     // Call compute — without ONNX model, it should produce dSPM but CMNE
     // correction will be skipped or will be identity
@@ -321,7 +321,7 @@ void TestInvCmne::testFewTimeSamples()
     // Should return dSPM only without crashing
     int nCh = 10;
     int nSrc = 20;
-    int nTimes = 5;  // Much less than lookBack (80)
+    int nTimes = 5; // Much less than lookBack (80)
 
     MatrixXd gain = createSyntheticGain(nCh, nSrc);
     MatrixXd noiseCov = createDiagonalCov(nCh);

@@ -37,10 +37,10 @@ using namespace MNELIB;
 //=============================================================================================================
 
 FilterThreadArg::FilterThreadArg()
-:s          (nullptr)
-,limit      (-1)
-,filtered   (nullptr)
-,stat       (FAIL)
+: s(nullptr)
+, limit(-1)
+, filtered(nullptr)
+, stat(FAIL)
 {
 }
 

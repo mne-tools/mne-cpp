@@ -77,19 +77,18 @@
 using namespace DISPLIB;
 using namespace FIFFLIB;
 
-namespace {
+namespace
+{
 
 QSharedPointer<FiffInfo> createBrowserTestInfo()
 {
     QSharedPointer<FiffInfo> info(new FiffInfo);
     info->sfreq = 1000.0f;
     info->nchan = 4;
-    info->ch_names = QStringList({
-        QStringLiteral("MEG0111"),
-        QStringLiteral("MEG0112"),
-        QStringLiteral("MEG0113"),
-        QStringLiteral("STI014")
-    });
+    info->ch_names = QStringList({QStringLiteral("MEG0111"),
+                                  QStringLiteral("MEG0112"),
+                                  QStringLiteral("MEG0113"),
+                                  QStringLiteral("STI014")});
 
     info->chs.clear();
     info->chs.resize(info->nchan);
@@ -364,7 +363,9 @@ void TestDispViewers2::initTestCase()
 
 //=============================================================================================================
 
-void TestDispViewers2::cleanupTestCase() {}
+void TestDispViewers2::cleanupTestCase()
+{
+}
 
 //=============================================================================================================
 
@@ -525,8 +526,7 @@ void TestDispViewers2::bidsView_lifecycle()
 
 void TestDispViewers2::channelSelectionView_lifecycle()
 {
-    const QString layoutPath = QCoreApplication::applicationDirPath()
-        + QStringLiteral("/../resources/general/2DLayouts/Vectorview-all.lout");
+    const QString layoutPath = QCoreApplication::applicationDirPath() + QStringLiteral("/../resources/general/2DLayouts/Vectorview-all.lout");
     if (!QFile::exists(layoutPath)) {
         QSKIP("Vectorview-all.lout not available in test environment");
     }
@@ -559,8 +559,7 @@ void TestDispViewers2::channelSelectionView_lifecycle()
 
 void TestDispViewers2::channelSelectionView_initialLayoutLoads()
 {
-    const QString layoutPath = QCoreApplication::applicationDirPath()
-        + QStringLiteral("/../resources/general/2DLayouts/Vectorview-all.lout");
+    const QString layoutPath = QCoreApplication::applicationDirPath() + QStringLiteral("/../resources/general/2DLayouts/Vectorview-all.lout");
     if (!QFile::exists(layoutPath)) {
         QSKIP("Vectorview-all.lout not available in test environment");
     }
@@ -856,7 +855,7 @@ void TestDispViewers2::channelDataView_hideBadChannelsAndMapping()
         view.layout()->activate();
     }
 
-    auto *rhiView = view.findChild<ChannelRhiView*>();
+    auto* rhiView = view.findChild<ChannelRhiView*>();
     QVERIFY(rhiView != nullptr);
     QCOMPARE(rhiView->totalLogicalChannels(), 4);
 
@@ -894,7 +893,7 @@ void TestDispViewers2::channelRhiView_stateContracts()
         view.layout()->activate();
     }
 
-    auto *rhiView = view.findChild<ChannelRhiView*>();
+    auto* rhiView = view.findChild<ChannelRhiView*>();
     QVERIFY(rhiView != nullptr);
     rhiView->resize(640, 360);
 
@@ -1119,7 +1118,7 @@ void TestDispViewers2::evokedSetModel_extended()
     QCOMPARE(model.getNumSamples(), 0);
 
     // getIdxSelMap — returns empty map
-    const QMap<qint32, qint32> &selMap = model.getIdxSelMap();
+    const QMap<qint32, qint32>& selMap = model.getIdxSelMap();
     QVERIFY(selMap.isEmpty());
 
     // numVLines — 0 before data
@@ -1251,23 +1250,23 @@ void TestDispViewers2::bidsViewModel_basics()
     model.addSessionToSubject(subjectIdx, "Session1");
 
     // addData with invalid QModelIndex — creates sub-01/ses-01 automatically
-    QStandardItem *dataItem = new QStandardItem("scan.fif");
+    QStandardItem* dataItem = new QStandardItem("scan.fif");
     model.addData(QModelIndex(), dataItem, BIDS_FUNCTIONALDATA);
 
     // addData with invalid index + BIDS_ANATOMICALDATA
-    QStandardItem *anatItem = new QStandardItem("T1.nii");
+    QStandardItem* anatItem = new QStandardItem("T1.nii");
     model.addData(QModelIndex(), anatItem, BIDS_ANATOMICALDATA);
 
     // addData for BIDS_EVENT
-    QStandardItem *evtItem = new QStandardItem("events.tsv");
+    QStandardItem* evtItem = new QStandardItem("events.tsv");
     model.addData(QModelIndex(), evtItem, BIDS_EVENT);
 
     // addData for BIDS_AVERAGE
-    QStandardItem *avgItem = new QStandardItem("avg.fif");
+    QStandardItem* avgItem = new QStandardItem("avg.fif");
     model.addData(QModelIndex(), avgItem, BIDS_AVERAGE);
 
     // addDataToSession by index
-    QStandardItem *extra = new QStandardItem("extra.fif");
+    QStandardItem* extra = new QStandardItem("extra.fif");
     model.addDataToSession(sessionIdx, extra, BIDS_FUNCTIONALDATA);
 
     // removeItem with invalid index — returns false

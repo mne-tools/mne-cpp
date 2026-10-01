@@ -43,10 +43,10 @@ using namespace DISPLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-QuickControlView::QuickControlView(const QString &sSettingsPath,
+QuickControlView::QuickControlView(const QString& sSettingsPath,
                                    const QString& name,
                                    Qt::WindowFlags flags,
-                                   QWidget *parent,
+                                   QWidget* parent,
                                    bool bDraggable)
 : DraggableFramelessWidget(parent, flags, false, bDraggable, true)
 , m_sName(name)
@@ -59,7 +59,7 @@ QuickControlView::QuickControlView(const QString &sSettingsPath,
     m_pUi->m_pTabWidget->setTabPosition(QTabWidget::West);
     this->setWindowTitle("Quick Control");
 
-    if(!(windowFlags() & Qt::CustomizeWindowHint)) {
+    if (!(windowFlags() & Qt::CustomizeWindowHint)) {
         m_pUi->m_pushButton_close->hide();
     }
 
@@ -89,9 +89,9 @@ QuickControlView::~QuickControlView()
 
 void QuickControlView::clear()
 {
-    while(m_pUi->m_pTabWidget->count() != 0) {
-        QWidget* pTabWidget = m_pUi->m_pTabWidget->widget(m_pUi->m_pTabWidget->count()-1);
-        m_pUi->m_pTabWidget->removeTab(m_pUi->m_pTabWidget->count()-1);
+    while (m_pUi->m_pTabWidget->count() != 0) {
+        QWidget* pTabWidget = m_pUi->m_pTabWidget->widget(m_pUi->m_pTabWidget->count() - 1);
+        m_pUi->m_pTabWidget->removeTab(m_pUi->m_pTabWidget->count() - 1);
         delete pTabWidget;
     }
 }
@@ -102,17 +102,17 @@ QVBoxLayout* QuickControlView::findTabWidgetLayout(const QString& sTabName)
 {
     QVBoxLayout* pTabWidgetLayout = Q_NULLPTR;
 
-    if(QWidget* pTabWidget = m_pUi->m_pTabWidget->findChild<QWidget *>(sTabName + "TabWidget")) {
+    if (QWidget* pTabWidget = m_pUi->m_pTabWidget->findChild<QWidget*>(sTabName + "TabWidget")) {
         // Tab widget already exisits. Get the grid layout and return it.
-        pTabWidgetLayout = qobject_cast<QVBoxLayout *>(pTabWidget->layout());
+        pTabWidgetLayout = qobject_cast<QVBoxLayout*>(pTabWidget->layout());
     } else {
         // Tab widget does not exist yet. Create it and return grid lyout.
         pTabWidget = new QWidget();
         pTabWidget->setObjectName(sTabName + "TabWidget");
         pTabWidgetLayout = new QVBoxLayout();
-        pTabWidgetLayout->setContentsMargins(4,2,4,4);
+        pTabWidgetLayout->setContentsMargins(4, 2, 4, 4);
         pTabWidget->setLayout(pTabWidgetLayout);
-        m_pUi->m_pTabWidget->insertTab(0,pTabWidget, sTabName);
+        m_pUi->m_pTabWidget->insertTab(0, pTabWidget, sTabName);
     }
 
     return pTabWidgetLayout;
@@ -124,19 +124,19 @@ void QuickControlView::addWidgets(const QList<QWidget*>& lWidgets,
                                   const QString& sTabName,
                                   bool bAddToEnd)
 {
-    for(int i = 0; i < lWidgets.size(); ++i) {
+    for (int i = 0; i < lWidgets.size(); ++i) {
         QString sObjectName = lWidgets.at(i)->objectName();
 
-        if(sObjectName.contains("widget_", Qt::CaseInsensitive)) {
+        if (sObjectName.contains("widget_", Qt::CaseInsensitive)) {
             this->addWidget(lWidgets.at(i), sTabName, bAddToEnd);
         }
 
-        if(sObjectName.contains("group_", Qt::CaseInsensitive)) {
-            if(sObjectName.contains("group_tab_", Qt::CaseInsensitive)) {
+        if (sObjectName.contains("group_", Qt::CaseInsensitive)) {
+            if (sObjectName.contains("group_tab_", Qt::CaseInsensitive)) {
                 sObjectName.remove("group_tab_");
                 QStringList sList = sObjectName.split("_");
 
-                if(sList.size() >= 2) {
+                if (sList.size() >= 2) {
                     this->addGroupBoxWithTabs(lWidgets.at(i), sList.at(0), sList.at(1), sTabName, bAddToEnd);
                 } else {
                     this->addGroupBoxWithTabs(lWidgets.at(i), "", sObjectName, sTabName, bAddToEnd);
@@ -155,7 +155,7 @@ void QuickControlView::addWidget(QWidget* pWidget,
                                  const QString& sTabName,
                                  bool bAddToEnd)
 {
-    if(QVBoxLayout* pTabWidgetLayout = findTabWidgetLayout(sTabName)) {
+    if (QVBoxLayout* pTabWidgetLayout = findTabWidgetLayout(sTabName)) {
         int iPos = bAddToEnd ? -1 : 0;
         pTabWidgetLayout->insertWidget(iPos,
                                        pWidget,
@@ -170,14 +170,14 @@ void QuickControlView::addGroupBox(QWidget* pWidget,
                                    const QString& sTabName,
                                    bool bAddToEnd)
 {
-    if(QVBoxLayout* pTabWidgetLayout = findTabWidgetLayout(sTabName)) {
+    if (QVBoxLayout* pTabWidgetLayout = findTabWidgetLayout(sTabName)) {
         int iPos = bAddToEnd ? -1 : 0;
         QGroupBox* pGroupBox = new QGroupBox(sGroupBoxName);
         pGroupBox->setObjectName(sGroupBoxName);
 
-        QVBoxLayout *pVBox = new QVBoxLayout;
+        QVBoxLayout* pVBox = new QVBoxLayout;
 
-        pVBox->setContentsMargins(0,0,0,0);
+        pVBox->setContentsMargins(0, 0, 0, 0);
         pVBox->addWidget(pWidget);
         pGroupBox->setLayout(pVBox);
 
@@ -195,10 +195,10 @@ void QuickControlView::addGroupBoxWithTabs(QWidget* pWidget,
                                            const QString& sTabName,
                                            bool bAddToEnd)
 {
-    if(QVBoxLayout* pTabWidgetLayout = findTabWidgetLayout(sTabName)) {
-        QGroupBox* pGroupBox = pTabWidgetLayout->parentWidget()->findChild<QGroupBox *>(sGroupBoxName);
+    if (QVBoxLayout* pTabWidgetLayout = findTabWidgetLayout(sTabName)) {
+        QGroupBox* pGroupBox = pTabWidgetLayout->parentWidget()->findChild<QGroupBox*>(sGroupBoxName);
 
-        if(!pGroupBox) {
+        if (!pGroupBox) {
             int iPos = bAddToEnd ? -1 : 0;
             pGroupBox = new QGroupBox(sGroupBoxName);
             pGroupBox->setObjectName(sGroupBoxName);
@@ -207,20 +207,20 @@ void QuickControlView::addGroupBoxWithTabs(QWidget* pWidget,
                                            pGroupBox,
                                            0);
 
-            QVBoxLayout *pVBox = new QVBoxLayout;
+            QVBoxLayout* pVBox = new QVBoxLayout;
             QTabWidget* pTabWidget = new QTabWidget;
             pTabWidget->setTabBarAutoHide(false);
             pTabWidget->setMovable(true);
             pTabWidget->setObjectName(sGroupBoxName + "TabWidget");
 
             pTabWidget->addTab(pWidget, sTabNameGroupBox);
-            pVBox->setContentsMargins(4,2,4,4);
+            pVBox->setContentsMargins(4, 2, 4, 4);
             pVBox->addWidget(pTabWidget);
             pGroupBox->setLayout(pVBox);
         } else {
-            QTabWidget* pTabWidget = pGroupBox->findChild<QTabWidget *>(sGroupBoxName + "TabWidget");
+            QTabWidget* pTabWidget = pGroupBox->findChild<QTabWidget*>(sGroupBoxName + "TabWidget");
 
-            if(pTabWidget) {
+            if (pTabWidget) {
                 pTabWidget->addTab(pWidget, sTabNameGroupBox);
             }
         }
@@ -256,7 +256,7 @@ void QuickControlView::setVisiblityHideOpacityClose(bool bVisibility)
 
 void QuickControlView::saveSettings()
 {
-    if(m_sSettingsPath.isEmpty()) {
+    if (m_sSettingsPath.isEmpty()) {
         return;
     }
 
@@ -270,7 +270,7 @@ void QuickControlView::saveSettings()
 
 void QuickControlView::loadSettings()
 {
-    if(m_sSettingsPath.isEmpty()) {
+    if (m_sSettingsPath.isEmpty()) {
         return;
     }
 
@@ -278,11 +278,11 @@ void QuickControlView::loadSettings()
 
     setOpacityValue(settings.value(m_sSettingsPath + QString("/QuickControlView/ViewOpacity"), 100).toInt());
 
-    QPoint pos = settings.value(m_sSettingsPath + QString("/QuickControlView/ViewPos"), QPoint(100,100)).toPoint();
+    QPoint pos = settings.value(m_sSettingsPath + QString("/QuickControlView/ViewPos"), QPoint(100, 100)).toPoint();
 
     QRect screenRect = QApplication::primaryScreen()->geometry();
-    if(!screenRect.contains(pos) && QGuiApplication::screens().size() == 1) {
-        move(QPoint(100,100));
+    if (!screenRect.contains(pos) && QGuiApplication::screens().size() == 1) {
+        move(QPoint(100, 100));
     } else {
         move(pos);
     }
@@ -292,9 +292,9 @@ void QuickControlView::loadSettings()
 
 void QuickControlView::onOpacityChange(qint32 value)
 {
-    if(value <= 0) {
+    if (value <= 0) {
         this->setWindowOpacity(1);
     } else {
-        this->setWindowOpacity(1/(100.0/value));
+        this->setWindowOpacity(1 / (100.0 / value));
     }
 }

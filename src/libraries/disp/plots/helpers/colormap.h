@@ -56,7 +56,7 @@
 namespace DISPLIB
 {
 
-const Eigen::MatrixX3i m_matViridrisData = (Eigen::MatrixX3i(256,3) << 68, 1, 84,
+const Eigen::MatrixX3i m_matViridrisData = (Eigen::MatrixX3i(256, 3) << 68, 1, 84,
                                             68, 2, 86,
                                             69, 4, 87,
                                             69, 5, 89,
@@ -311,7 +311,8 @@ const Eigen::MatrixX3i m_matViridrisData = (Eigen::MatrixX3i(256,3) << 68, 1, 84
                                             246, 230, 32,
                                             248, 230, 33,
                                             251, 231, 35,
-                                            253, 231, 37).finished();
+                                            253, 231, 37)
+                                               .finished();
 
 //=============================================================================================================
 // DISPLIB FORWARD DECLARATIONS
@@ -332,13 +333,13 @@ class DISPSHARED_EXPORT ColorMap
 public:
     typedef QSharedPointer<ColorMap> SPtr;            /**< Shared pointer type for ColorMap class. */
     typedef QSharedPointer<const ColorMap> ConstSPtr; /**< Const shared pointer type for ColorMap class. */
-    
+
     //=========================================================================================================
     /**
      * Default constructor
      */
     ColorMap();
-    
+
     //=========================================================================================================
     /**
      * Destructs the ColorMap class.
@@ -671,7 +672,6 @@ protected:
     static int coolB(double v);
 
 private:
-    
 };
 
 //=============================================================================================================
@@ -680,35 +680,35 @@ private:
 
 inline QRgb ColorMap::valueToColor(double v, const QString& sMap)
 {
-    if(sMap == "Hot") {
+    if (sMap == "Hot") {
         return valueToHot(v);
     }
 
-    if(sMap == "HotNegative1") {
+    if (sMap == "HotNegative1") {
         return valueToHotNegative1(v);
     }
 
-    if(sMap == "HotNegative2") {
+    if (sMap == "HotNegative2") {
         return valueToHotNegative2(v);
     }
 
-    if(sMap == "Bone") {
+    if (sMap == "Bone") {
         return valueToBone(v);
     }
 
-    if(sMap == "RedBlue") {
+    if (sMap == "RedBlue") {
         return valueToRedBlue(v);
     }
 
-    if(sMap == "Cool") {
+    if (sMap == "Cool") {
         return valueToCool(v);
     }
 
-    if(sMap == "Viridis") {
+    if (sMap == "Viridis") {
         return valueToViridis(v);
     }
 
-    if(sMap == "ViridisNegated") {
+    if (sMap == "ViridisNegated") {
         return valueToViridisNegated(v);
     }
 
@@ -777,11 +777,11 @@ inline QRgb ColorMap::valueToCool(double v)
 inline QRgb ColorMap::valueToViridis(double v)
 {
     uint idx = static_cast<uint>(v * 255);
-    if(idx >= static_cast<uint>(m_matViridrisData.rows())) {
+    if (idx >= static_cast<uint>(m_matViridrisData.rows())) {
         return QRgb();
     }
 
-    QRgb p_qRgb = qRgb(m_matViridrisData(idx,0), m_matViridrisData(idx,1), m_matViridrisData(idx,2));
+    QRgb p_qRgb = qRgb(m_matViridrisData(idx, 0), m_matViridrisData(idx, 1), m_matViridrisData(idx, 2));
     return p_qRgb;
 }
 
@@ -790,14 +790,13 @@ inline QRgb ColorMap::valueToViridis(double v)
 inline QRgb ColorMap::valueToViridisNegated(double v)
 {
     uint idx = 255 - static_cast<uint>(v * 255);
-    if(idx >= static_cast<uint>(m_matViridrisData.rows())) {
+    if (idx >= static_cast<uint>(m_matViridrisData.rows())) {
         return QRgb();
     }
 
-    QRgb p_qRgb = qRgb(m_matViridrisData(idx,0), m_matViridrisData(idx,1), m_matViridrisData(idx,2));
+    QRgb p_qRgb = qRgb(m_matViridrisData(idx, 0), m_matViridrisData(idx, 1), m_matViridrisData(idx, 2));
     return p_qRgb;
 }
 } // NAMESPACE
 
 #endif // COLORMAP_H
-

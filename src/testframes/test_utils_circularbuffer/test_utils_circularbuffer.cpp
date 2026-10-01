@@ -59,7 +59,7 @@ void TestCircularBuffer::testBufferCreationDestruction()
         CircularBuffer<float> testBuffer(10);
     }
     {
-        CircularBuffer<int> *testBuffer = new CircularBuffer<int>(10);
+        CircularBuffer<int>* testBuffer = new CircularBuffer<int>(10);
         delete testBuffer;
     }
 }
@@ -81,12 +81,12 @@ void TestCircularBuffer::testBufferPushingPopping()
     int resultArray[3] = {0, 0, 0};
 
     QVERIFY(testBuffer.pop(resultVal));
-    for (int i = 0; i < 3; ++i){
+    for (int i = 0; i < 3; ++i) {
         QVERIFY(testBuffer.pop(resultArray[i]));
     }
 
     QVERIFY(resultVal == testVal);
-    for (int i = 0; i < 3; ++i){
+    for (int i = 0; i < 3; ++i) {
         QVERIFY(resultArray[i] == testArray[i]);
     }
 }

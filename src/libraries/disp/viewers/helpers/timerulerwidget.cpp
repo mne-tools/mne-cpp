@@ -39,21 +39,22 @@ using namespace DISPLIB;
 // CONSTANTS
 //=============================================================================================================
 
-namespace {
+namespace
+{
 // Same nice-interval table used by the render grid — guarantees perfect alignment.
-static const double kNiceIntervals[] = { 0.05, 0.1, 0.2, 0.5, 1.0, 2.0, 5.0, 10.0, 30.0, 60.0 };
+static const double kNiceIntervals[] = {0.05, 0.1, 0.2, 0.5, 1.0, 2.0, 5.0, 10.0, 30.0, 60.0};
 constexpr double kMinMajorPx = 80.0; // minimum px spacing between major ticks
-constexpr int    kMajorH     = 10;   // tick mark height in px (downward from bottom border)
-constexpr int    kMinorH     =  5;
-constexpr int    kLabelGap   =  3;   // gap between label bottom and tick top
+constexpr int kMajorH = 10;          // tick mark height in px (downward from bottom border)
+constexpr int kMinorH = 5;
+constexpr int kLabelGap = 3; // gap between label bottom and tick top
 } // namespace
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-TimeRulerWidget::TimeRulerWidget(QWidget *parent)
-    : QWidget(parent)
+TimeRulerWidget::TimeRulerWidget(QWidget* parent)
+: QWidget(parent)
 {
     setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
     setFixedHeight(kTotalH);
@@ -77,7 +78,7 @@ void TimeRulerWidget::setFirstFileSample(int firstFileSample)
 
 //=============================================================================================================
 
-void TimeRulerWidget::setEvents(const QVector<TimeRulerEventMark> &events)
+void TimeRulerWidget::setEvents(const QVector<TimeRulerEventMark>& events)
 {
     m_events = events;
     update();
@@ -85,7 +86,7 @@ void TimeRulerWidget::setEvents(const QVector<TimeRulerEventMark> &events)
 
 //=============================================================================================================
 
-void TimeRulerWidget::setReferenceMarkers(const QVector<TimeRulerReferenceMark> &markers)
+void TimeRulerWidget::setReferenceMarkers(const QVector<TimeRulerReferenceMark>& markers)
 {
     m_referenceMarkers = markers;
     update();
@@ -127,7 +128,7 @@ QString TimeRulerWidget::formatTime(double seconds)
             .arg(m, 2, 10, QChar('0'))
             .arg(s, 2, 10, QChar('0'));
     } else if (seconds >= 60.0) {
-        int    m = static_cast<int>(seconds) / 60;
+        int m = static_cast<int>(seconds) / 60;
         double s = seconds - m * 60.0;
         return QString("%1:%2").arg(m).arg(s, 4, 'f', 1, QChar('0'));
     } else if (seconds >= 10.0) {
@@ -166,8 +167,7 @@ void TimeRulerWidget::setClockTimeFormat(bool useClock)
 int TimeRulerWidget::sampleAtX(int x) const
 {
     const int clampedX = qBound(0, x, qMax(0, width() - 1));
-    const double sample = static_cast<double>(m_scrollSample)
-                        + static_cast<double>(clampedX) * static_cast<double>(m_spp);
+    const double sample = static_cast<double>(m_scrollSample) + static_cast<double>(clampedX) * static_cast<double>(m_spp);
     return qRound(sample);
 }
 
@@ -196,10 +196,10 @@ int TimeRulerWidget::nearestReferenceMarkerIndex(int sample, int tolerancePixels
 
 //=============================================================================================================
 
-void TimeRulerWidget::paintEvent(QPaintEvent */*event*/)
+void TimeRulerWidget::paintEvent(QPaintEvent* /*event*/)
 {
-    const int    W   = width();
-    const int    H   = height();   // == kTotalH == kStimZoneH + kTimeZoneH
+    const int W = width();
+    const int H = height(); // == kTotalH == kStimZoneH + kTimeZoneH
     const double spp = static_cast<double>(m_spp);
 
     if (W <= 0 || spp <= 0.0 || m_sfreq <= 0.0)
@@ -238,7 +238,7 @@ void TimeRulerWidget::paintEvent(QPaintEvent */*event*/)
         constexpr int kMarkerPadX = 5;
         const int markerChipY = 2;
 
-        for (const TimeRulerReferenceMark &marker : m_referenceMarkers) {
+        for (const TimeRulerReferenceMark& marker : m_referenceMarkers) {
             const float xF = (static_cast<float>(marker.sample) - m_scrollSample) / static_cast<float>(spp);
             if (xF < -2.f || xF > W + 2.f) {
                 continue;
@@ -251,8 +251,8 @@ void TimeRulerWidget::paintEvent(QPaintEvent */*event*/)
             p.drawLine(xi, 0, xi, H - 1);
 
             const QString label = marker.label.isEmpty()
-                                ? QString::number(marker.sample)
-                                : marker.label;
+                ? QString::number(marker.sample)
+                : marker.label;
             const int chipW = qMax(20, p.fontMetrics().horizontalAdvance(label) + 2 * kMarkerPadX);
             QRect chipRect(xi - chipW / 2, markerChipY, chipW, kMarkerChipH);
             chipRect.moveLeft(qBound(2, chipRect.left(), qMax(2, W - chipRect.width() - 2)));
@@ -282,7 +282,7 @@ void TimeRulerWidget::paintEvent(QPaintEvent */*event*/)
         // sorted by ascending sample for this to work correctly.
         int lastChipRight = -kChipW;
 
-        for (const TimeRulerEventMark &ev : m_events) {
+        for (const TimeRulerEventMark& ev : m_events) {
             float xF = (static_cast<float>(ev.sample) - m_scrollSample) / static_cast<float>(spp);
             if (xF < -2.f || xF > W + 2.f)
                 continue;
@@ -325,9 +325,9 @@ void TimeRulerWidget::paintEvent(QPaintEvent */*event*/)
             break;
     }
 
-    const double tickSamples   = tickIntervalS * m_sfreq;
-    const double minorSamples  = tickSamples / 5.0;
-    const double origin        = static_cast<double>(m_firstFileSample);
+    const double tickSamples = tickIntervalS * m_sfreq;
+    const double minorSamples = tickSamples / 5.0;
+    const double origin = static_cast<double>(m_firstFileSample);
 
     // ── Font ─────────────────────────────────────────────────────────
     QFont font = QFontDatabase::systemFont(QFontDatabase::FixedFont);
@@ -337,13 +337,14 @@ void TimeRulerWidget::paintEvent(QPaintEvent */*event*/)
 
     // ── Minor ticks (bottom of time zone, pointing down) ─────────────
     {
-        double firstMinorS = std::ceil((m_scrollSample - origin - minorSamples) / minorSamples)
-                             * minorSamples + origin;
+        double firstMinorS = std::ceil((m_scrollSample - origin - minorSamples) / minorSamples) * minorSamples + origin;
         p.setPen(QPen(QColor(165, 165, 175), 1));
-        for (double s = firstMinorS; ; s += minorSamples) {
+        for (double s = firstMinorS;; s += minorSamples) {
             double xPx = (s - m_scrollSample) / spp;
-            if (xPx > W + 2) break;
-            if (xPx < -2)    continue;
+            if (xPx > W + 2)
+                break;
+            if (xPx < -2)
+                continue;
             int xi = static_cast<int>(std::round(xPx));
             p.drawLine(xi, kTimeZoneH - 1 - kMinorH, xi, kTimeZoneH - 2);
         }
@@ -351,12 +352,13 @@ void TimeRulerWidget::paintEvent(QPaintEvent */*event*/)
 
     // ── Major ticks + labels ─────────────────────────────────────────
     {
-        double firstMajorS = std::ceil((m_scrollSample - origin - tickSamples) / tickSamples)
-                             * tickSamples + origin;
-        for (double s = firstMajorS; ; s += tickSamples) {
+        double firstMajorS = std::ceil((m_scrollSample - origin - tickSamples) / tickSamples) * tickSamples + origin;
+        for (double s = firstMajorS;; s += tickSamples) {
             double xPx = (s - m_scrollSample) / spp;
-            if (xPx > W + 2) break;
-            if (xPx < -2)    continue;
+            if (xPx > W + 2)
+                break;
+            if (xPx < -2)
+                continue;
 
             int xi = static_cast<int>(std::round(xPx));
 
@@ -368,17 +370,17 @@ void TimeRulerWidget::paintEvent(QPaintEvent */*event*/)
                 QString label;
                 if (m_useClockTime && elapsedSec >= 0.0) {
                     int totalMs = static_cast<int>(elapsedSec * 1000.0 + 0.5);
-                    int m   = totalMs / 60000;
+                    int m = totalMs / 60000;
                     int sec = (totalMs % 60000) / 1000;
-                    int ms  = totalMs % 1000;
+                    int ms = totalMs % 1000;
                     label = QString("%1:%2.%3")
-                        .arg(m, 2, 10, QChar('0'))
-                        .arg(sec, 2, 10, QChar('0'))
-                        .arg(ms, 3, 10, QChar('0'));
+                                .arg(m, 2, 10, QChar('0'))
+                                .arg(sec, 2, 10, QChar('0'))
+                                .arg(ms, 3, 10, QChar('0'));
                 } else {
                     label = formatTime(elapsedSec);
                 }
-                const int lw  = fm.horizontalAdvance(label);
+                const int lw = fm.horizontalAdvance(label);
 
                 int lx = xi - lw / 2;
                 lx = qBound(2, lx, W - lw - 2);
@@ -393,7 +395,7 @@ void TimeRulerWidget::paintEvent(QPaintEvent */*event*/)
 
 //=============================================================================================================
 
-void TimeRulerWidget::contextMenuEvent(QContextMenuEvent *event)
+void TimeRulerWidget::contextMenuEvent(QContextMenuEvent* event)
 {
     if (m_sfreq <= 0.0 || m_spp <= 0.0f) {
         QWidget::contextMenuEvent(event);
@@ -404,9 +406,9 @@ void TimeRulerWidget::contextMenuEvent(QContextMenuEvent *event)
     const int nearbyMarkerIndex = nearestReferenceMarkerIndex(sample);
 
     QMenu menu(this);
-    QAction *addMarkerAction = menu.addAction(tr("Add Marker Here"));
-    QAction *removeMarkerAction = nullptr;
-    QAction *clearMarkersAction = nullptr;
+    QAction* addMarkerAction = menu.addAction(tr("Add Marker Here"));
+    QAction* removeMarkerAction = nullptr;
+    QAction* clearMarkersAction = nullptr;
 
     if (nearbyMarkerIndex >= 0) {
         removeMarkerAction = menu.addAction(tr("Remove Nearest Marker"));
@@ -417,7 +419,7 @@ void TimeRulerWidget::contextMenuEvent(QContextMenuEvent *event)
         clearMarkersAction = menu.addAction(tr("Clear All Markers"));
     }
 
-    QAction *selectedAction = menu.exec(event->globalPos());
+    QAction* selectedAction = menu.exec(event->globalPos());
     if (!selectedAction) {
         return;
     }

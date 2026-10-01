@@ -54,7 +54,7 @@ public:
     QWidget* createView(const QJsonObject& sessionDescriptor, QWidget* parent) const override
     {
         RawDataBrowserWidget* rawBrowser = new RawDataBrowserWidget(parent);
-        if(!rawBrowser->loadFile(sessionDescriptor.value("file").toString())) {
+        if (!rawBrowser->loadFile(sessionDescriptor.value("file").toString())) {
             delete rawBrowser;
             return nullptr;
         }
@@ -112,7 +112,7 @@ protected:
     void paintEvent(QPaintEvent* event) override
     {
         Q_UNUSED(event)
-        if(m_sfreq <= 0.0 || m_pixelsPerSample <= 0.0) {
+        if (m_sfreq <= 0.0 || m_pixelsPerSample <= 0.0) {
             return;
         }
 
@@ -128,33 +128,38 @@ protected:
 
         const int dataAreaLeft = m_labelColumnWidth;
         const int dataAreaWidth = width() - dataAreaLeft;
-        if(dataAreaWidth <= 0) {
+        if (dataAreaWidth <= 0) {
             return;
         }
 
         // Determine visible time range
         const double firstVisibleSample = m_firstSample + m_scrollValue / m_pixelsPerSample;
-        const double lastVisibleSample  = firstVisibleSample + dataAreaWidth / m_pixelsPerSample;
-        const double firstVisibleSec    = firstVisibleSample / m_sfreq;
-        const double lastVisibleSec     = lastVisibleSample  / m_sfreq;
-        const double visibleDuration    = lastVisibleSec - firstVisibleSec;
+        const double lastVisibleSample = firstVisibleSample + dataAreaWidth / m_pixelsPerSample;
+        const double firstVisibleSec = firstVisibleSample / m_sfreq;
+        const double lastVisibleSec = lastVisibleSample / m_sfreq;
+        const double visibleDuration = lastVisibleSec - firstVisibleSec;
 
         // Choose a tick interval so we get ~5–10 ticks in view
         const double rawInterval = visibleDuration / 7.0;
-        const double magnitude   = std::pow(10.0, std::floor(std::log10(rawInterval)));
+        const double magnitude = std::pow(10.0, std::floor(std::log10(rawInterval)));
         double tickInterval = magnitude;
-        if(rawInterval / magnitude >= 5.0)      tickInterval = magnitude * 5.0;
-        else if(rawInterval / magnitude >= 2.0) tickInterval = magnitude * 2.0;
+        if (rawInterval / magnitude >= 5.0)
+            tickInterval = magnitude * 5.0;
+        else if (rawInterval / magnitude >= 2.0)
+            tickInterval = magnitude * 2.0;
 
-        if(tickInterval <= 0.0) {
+        if (tickInterval <= 0.0) {
             return;
         }
 
         // Decide label precision
         int decimals = 0;
-        if(tickInterval < 0.1)       decimals = 3;
-        else if(tickInterval < 1.0)  decimals = 2;
-        else if(tickInterval < 10.0) decimals = 1;
+        if (tickInterval < 0.1)
+            decimals = 3;
+        else if (tickInterval < 1.0)
+            decimals = 2;
+        else if (tickInterval < 10.0)
+            decimals = 1;
 
         const double firstTick = std::ceil(firstVisibleSec / tickInterval) * tickInterval;
 
@@ -163,11 +168,11 @@ protected:
         rulerFont.setPointSizeF(7.5);
         painter.setFont(rulerFont);
 
-        for(double t = firstTick; t <= lastVisibleSec + tickInterval * 0.5; t += tickInterval) {
+        for (double t = firstTick; t <= lastVisibleSec + tickInterval * 0.5; t += tickInterval) {
             const double samplePos = t * m_sfreq;
             const int x = dataAreaLeft + static_cast<int>((samplePos - m_firstSample) * m_pixelsPerSample) - m_scrollValue;
 
-            if(x < dataAreaLeft || x > width()) {
+            if (x < dataAreaLeft || x > width()) {
                 continue;
             }
 
@@ -183,11 +188,11 @@ protected:
     }
 
 private:
-    double m_sfreq           = 0.0;
-    int    m_firstSample     = 0;
+    double m_sfreq = 0.0;
+    int m_firstSample = 0;
     double m_pixelsPerSample = 1.0;
-    int    m_scrollValue     = 0;
-    int    m_labelColumnWidth = 0;
+    int m_scrollValue = 0;
+    int m_labelColumnWidth = 0;
 };
 
 RawDataBrowserWidget::RawDataBrowserWidget(QWidget* parent)
@@ -281,20 +286,20 @@ RawDataBrowserWidget::RawDataBrowserWidget(QWidget* parent)
 bool RawDataBrowserWidget::loadFile(const QString& filePath)
 {
     m_filePath = filePath;
-    if(m_file->isOpen()) {
+    if (m_file->isOpen()) {
         m_file->close();
     }
 
     m_file->setFileName(filePath);
 
-    if(!m_rawModel->loadFiffData(m_file)) {
+    if (!m_rawModel->loadFiffData(m_file)) {
         qWarning() << "[RawDataBrowserWidget] Failed to load raw model for" << filePath;
         emit outputMessage(QString("Raw browser failed to load %1").arg(filePath));
         return false;
     }
 
     updateScrollConfiguration();
-    if(m_tableView->selectionModel() && m_rawModel->rowCount() > 0) {
+    if (m_tableView->selectionModel() && m_rawModel->rowCount() > 0) {
         m_tableView->selectRow(0);
     }
     setMarkerSample(m_rawModel->firstSample());
@@ -305,14 +310,15 @@ bool RawDataBrowserWidget::loadFile(const QString& filePath)
     const QString stem = fi.completeBaseName();
     const QString eveCandidate = fi.absolutePath() + "/" + stem + "-eve.fif";
     QFile eveFile(eveCandidate);
-    if(eveFile.exists()) {
-        if(m_eventModel->loadEventData(eveFile)) {
+    if (eveFile.exists()) {
+        if (m_eventModel->loadEventData(eveFile)) {
             m_eventModel->setFiffInfo(m_rawModel->fiffInfo());
             m_eventModel->setFirstLastSample(m_rawModel->firstSample(), m_rawModel->lastSample());
             qInfo() << "[RawDataBrowserWidget] Loaded event file:" << eveCandidate
                     << "(" << m_eventModel->rowCount() << "events)";
             emit outputMessage(QString("Events loaded: %1 (%2 events)")
-                               .arg(eveCandidate).arg(m_eventModel->rowCount()));
+                                   .arg(eveCandidate)
+                                   .arg(m_eventModel->rowCount()));
         }
     }
 
@@ -332,7 +338,7 @@ QString RawDataBrowserWidget::filePath() const
 
 QString RawDataBrowserWidget::summaryText() const
 {
-    if(!m_rawModel->fiffInfo()) {
+    if (!m_rawModel->fiffInfo()) {
         return "No raw browser loaded.";
     }
 
@@ -355,7 +361,7 @@ QString RawDataBrowserWidget::stateText() const
 
 bool RawDataBrowserWidget::gotoSample(int sample)
 {
-    if(!m_rawModel->fiffInfo() || m_rawModel->fiffInfo()->sfreq <= 0.0) {
+    if (!m_rawModel->fiffInfo() || m_rawModel->fiffInfo()->sfreq <= 0.0) {
         return false;
     }
 
@@ -368,14 +374,14 @@ bool RawDataBrowserWidget::gotoSample(int sample)
 
 bool RawDataBrowserWidget::setZoomPixelsPerSample(double pixelsPerSample)
 {
-    if(pixelsPerSample <= 0.0) {
+    if (pixelsPerSample <= 0.0) {
         return false;
     }
 
     m_delegate->setPixelsPerSample(pixelsPerSample);
     updateScrollConfiguration();
     emit outputMessage(QString("Raw browser zoom set to %1 px/sample")
-                       .arg(QString::number(m_delegate->pixelsPerSample(), 'f', 2)));
+                           .arg(QString::number(m_delegate->pixelsPerSample(), 'f', 2)));
     return true;
 }
 
@@ -408,12 +414,11 @@ void RawDataBrowserWidget::updateScrollConfiguration()
 
 void RawDataBrowserWidget::updateTimeRuler()
 {
-    if(!m_rawModel->fiffInfo() || m_rawModel->fiffInfo()->sfreq <= 0.0) {
+    if (!m_rawModel->fiffInfo() || m_rawModel->fiffInfo()->sfreq <= 0.0) {
         return;
     }
 
-    const int labelColumnWidth = m_tableView->columnViewportPosition(1)
-                                 + m_tableView->frameWidth();
+    const int labelColumnWidth = m_tableView->columnViewportPosition(1) + m_tableView->frameWidth();
     m_timeRuler->update(m_rawModel->fiffInfo()->sfreq,
                         m_rawModel->firstSample(),
                         m_delegate->pixelsPerSample(),
@@ -429,15 +434,15 @@ QString RawDataBrowserWidget::formatSeconds(int sample) const
 
 bool RawDataBrowserWidget::eventFilter(QObject* watched, QEvent* event)
 {
-    if(watched == m_tableView->viewport()) {
-        if(event->type() == QEvent::MouseButtonPress) {
+    if (watched == m_tableView->viewport()) {
+        if (event->type() == QEvent::MouseButtonPress) {
             QMouseEvent* mouseEvent = static_cast<QMouseEvent*>(event);
-            if(mouseEvent->button() == Qt::LeftButton) {
+            if (mouseEvent->button() == Qt::LeftButton) {
                 const int dataColumnX = m_tableView->columnViewportPosition(1);
-                if(mouseEvent->position().x() < dataColumnX) {
+                if (mouseEvent->position().x() < dataColumnX) {
                     // Click in label column — toggle bad channel
                     const QModelIndex idx = m_tableView->indexAt(mouseEvent->pos());
-                    if(idx.isValid() && !m_rawModel->channelInfoList().isEmpty()) {
+                    if (idx.isValid() && !m_rawModel->channelInfoList().isEmpty()) {
                         const QString& chName = m_rawModel->channelInfoList().at(idx.row()).ch_name;
                         const bool isBad = m_rawModel->fiffInfo()->bads.contains(chName);
                         QModelIndexList colOneList;
@@ -448,38 +453,37 @@ bool RawDataBrowserWidget::eventFilter(QObject* watched, QEvent* event)
                     }
                 }
             }
-        } else if(event->type() == QEvent::MouseButtonDblClick) {
+        } else if (event->type() == QEvent::MouseButtonDblClick) {
             QMouseEvent* mouseEvent = static_cast<QMouseEvent*>(event);
             const int dataColumnX = m_tableView->columnViewportPosition(1);
-            if(mouseEvent->position().x() >= dataColumnX) {
+            if (mouseEvent->position().x() >= dataColumnX) {
                 const double pixelsPerSample = m_delegate->pixelsPerSample();
                 const int relativeX = static_cast<int>(mouseEvent->position().x()) - dataColumnX;
-                const int visibleStart = m_rawModel->firstSample()
-                                         + static_cast<int>(m_tableView->horizontalScrollBar()->value() / pixelsPerSample);
+                const int visibleStart = m_rawModel->firstSample() + static_cast<int>(m_tableView->horizontalScrollBar()->value() / pixelsPerSample);
                 setMarkerSample(visibleStart + static_cast<int>(relativeX / pixelsPerSample));
                 return true;
             }
-        } else if(event->type() == QEvent::Resize) {
+        } else if (event->type() == QEvent::Resize) {
             updateMarkerOverlay();
             updateTimeRuler();
-        } else if(event->type() == QEvent::Wheel) {
+        } else if (event->type() == QEvent::Wheel) {
             QWheelEvent* wheelEvent = static_cast<QWheelEvent*>(event);
-            if(wheelEvent->modifiers() & Qt::ControlModifier) {
+            if (wheelEvent->modifiers() & Qt::ControlModifier) {
                 const double factor = wheelEvent->angleDelta().y() > 0 ? 1.25 : 0.8;
                 adjustAmplitude(factor);
                 return true;
             }
         }
-    } else if(watched == m_tableView) {
-        if(event->type() == QEvent::KeyPress) {
+    } else if (watched == m_tableView) {
+        if (event->type() == QEvent::KeyPress) {
             QKeyEvent* keyEvent = static_cast<QKeyEvent*>(event);
-            if(keyEvent->key() == Qt::Key_Plus || keyEvent->key() == Qt::Key_Equal) {
+            if (keyEvent->key() == Qt::Key_Plus || keyEvent->key() == Qt::Key_Equal) {
                 adjustAmplitude(1.25);
                 return true;
-            } else if(keyEvent->key() == Qt::Key_Minus) {
+            } else if (keyEvent->key() == Qt::Key_Minus) {
                 adjustAmplitude(0.8);
                 return true;
-            } else if(keyEvent->key() == Qt::Key_D) {
+            } else if (keyEvent->key() == Qt::Key_D) {
                 m_dcButton->toggle();
                 return true;
             }
@@ -491,7 +495,7 @@ bool RawDataBrowserWidget::eventFilter(QObject* watched, QEvent* event)
 
 void RawDataBrowserWidget::setMarkerSample(int sample)
 {
-    if(!m_rawModel->fiffInfo() || m_rawModel->fiffInfo()->sfreq <= 0.0) {
+    if (!m_rawModel->fiffInfo() || m_rawModel->fiffInfo()->sfreq <= 0.0) {
         return;
     }
 
@@ -503,7 +507,7 @@ void RawDataBrowserWidget::setMarkerSample(int sample)
 
 void RawDataBrowserWidget::updateMarkerOverlay()
 {
-    if(m_markerSample < 0) {
+    if (m_markerSample < 0) {
         m_markerLine->hide();
         return;
     }
@@ -511,11 +515,9 @@ void RawDataBrowserWidget::updateMarkerOverlay()
     const double pixelsPerSample = m_delegate->pixelsPerSample();
     const int dataColumnX = m_tableView->columnViewportPosition(1);
     const int scrollValue = m_tableView->horizontalScrollBar()->value();
-    const int xPosition = dataColumnX
-                          + static_cast<int>((m_markerSample - m_rawModel->firstSample()) * pixelsPerSample)
-                          - scrollValue;
+    const int xPosition = dataColumnX + static_cast<int>((m_markerSample - m_rawModel->firstSample()) * pixelsPerSample) - scrollValue;
 
-    if(xPosition < dataColumnX || xPosition > m_tableView->viewport()->width()) {
+    if (xPosition < dataColumnX || xPosition > m_tableView->viewport()->width()) {
         m_markerLine->hide();
         return;
     }
@@ -538,7 +540,7 @@ void RawDataBrowserWidget::adjustAmplitude(double factor)
 
 QString RawDataBrowserWidget::currentVisibleRangeText() const
 {
-    if(!m_rawModel->fiffInfo() || m_rawModel->fiffInfo()->sfreq <= 0.0) {
+    if (!m_rawModel->fiffInfo() || m_rawModel->fiffInfo()->sfreq <= 0.0) {
         return "Visible range unavailable";
     }
 
@@ -555,7 +557,7 @@ QString RawDataBrowserWidget::currentVisibleRangeText() const
 
 QString RawDataBrowserWidget::currentCursorText() const
 {
-    if(m_markerSample < 0 || !m_rawModel->fiffInfo() || m_rawModel->fiffInfo()->sfreq <= 0.0) {
+    if (m_markerSample < 0 || !m_rawModel->fiffInfo() || m_rawModel->fiffInfo()->sfreq <= 0.0) {
         return "Cursor unavailable";
     }
 
@@ -570,14 +572,14 @@ void RawDataBrowserWidget::publishBrowserState(bool appendToOutput)
                                      .arg(currentVisibleRangeText(), currentCursorText());
     emit statusMessage(stateMessage);
 
-    if(appendToOutput && m_rawModel->fiffInfo()) {
+    if (appendToOutput && m_rawModel->fiffInfo()) {
         const int totalSamples = std::max<qint32>(0, m_rawModel->lastSample() - m_rawModel->firstSample() + 1);
         emit outputMessage(QString("Raw Data Browser: %1").arg(m_filePath));
         emit outputMessage(QString("Channels: %1 | Sampling rate: %2 Hz | Samples: %3 | First sample: %4 | Last sample: %5")
-                           .arg(m_rawModel->fiffInfo()->nchan)
-                           .arg(m_rawModel->fiffInfo()->sfreq, 0, 'f', 2)
-                           .arg(totalSamples)
-                           .arg(m_rawModel->firstSample())
-                           .arg(m_rawModel->lastSample()));
+                               .arg(m_rawModel->fiffInfo()->nchan)
+                               .arg(m_rawModel->fiffInfo()->sfreq, 0, 'f', 2)
+                               .arg(totalSamples)
+                               .arg(m_rawModel->firstSample())
+                               .arg(m_rawModel->lastSample()));
     }
 }

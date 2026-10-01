@@ -47,7 +47,7 @@ using namespace UTILSLIB;
 
 //=============================================================================================================
 
-int main(int argc, char *argv[])
+int main(int argc, char* argv[])
 {
     qInstallMessageHandler(MNELogger::customLogWriter);
     QCoreApplication app(argc, argv);
@@ -118,7 +118,7 @@ int main(int argc, char *argv[])
 
     // Append all tags at the end
     int nAdded = 0;
-    for (const FiffTag::UPtr &tag : tagsToAdd) {
+    for (const FiffTag::UPtr& tag : tagsToAdd) {
         destStream->write_tag(tag);
         nAdded++;
     }

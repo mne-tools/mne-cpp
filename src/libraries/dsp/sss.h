@@ -98,10 +98,10 @@ namespace UTILSLIB
 /** @brief Configuration parameters for SSS/tSSS (defined outside class to work around a Clang default-argument/nested-struct limitation). */
 struct DSPSHARED_EXPORT SSSParams
 {
-    int    iOrderIn  = 8;                      /**< Internal spherical-harmonic expansion order (default 8). N_in = iOrderIn*(iOrderIn+2) = 80. */
-    int    iOrderOut = 3;                      /**< External spherical-harmonic expansion order (default 3). N_out = iOrderOut*(iOrderOut+2) = 15. */
-    Eigen::Vector3d origin{0.0, 0.0, 0.04};   /**< Expansion origin in metres, head-coordinate frame (default: 4 cm superior to head origin). */
-    double dRegIn  = 1e-5;                     /**< Tikhonov regularisation for the combined-basis pseudoinverse. */
+    int iOrderIn = 8;                       /**< Internal spherical-harmonic expansion order (default 8). N_in = iOrderIn*(iOrderIn+2) = 80. */
+    int iOrderOut = 3;                      /**< External spherical-harmonic expansion order (default 3). N_out = iOrderOut*(iOrderOut+2) = 15. */
+    Eigen::Vector3d origin{0.0, 0.0, 0.04}; /**< Expansion origin in metres, head-coordinate frame (default: 4 cm superior to head origin). */
+    double dRegIn = 1e-5;                   /**< Tikhonov regularisation for the combined-basis pseudoinverse. */
 };
 
 class DSPSHARED_EXPORT SSS
@@ -117,15 +117,15 @@ public:
      */
     struct Basis
     {
-        Eigen::MatrixXd matSin;           /**< Internal basis S_in   (n_meg × N_in). */
-        Eigen::MatrixXd matSout;          /**< External basis S_out  (n_meg × N_out). */
-        Eigen::MatrixXd matProjIn;        /**< Internal-space projector P_in = S_in · pinv(S)[:N_in,:] (n_meg × n_meg). */
-        Eigen::MatrixXd matPinvAll;       /**< Pseudoinverse of [S_in | S_out], shape (N_in+N_out) × n_meg. */
-        QVector<int>    megChannelIdx;    /**< Original channel indices in FiffInfo for the MEG rows. */
-        int             iOrderIn  = 8;   /**< Internal order used. */
-        int             iOrderOut = 3;   /**< External order used. */
-        int             iNin      = 0;   /**< N_in  = iOrderIn*(iOrderIn+2). */
-        int             iNout     = 0;   /**< N_out = iOrderOut*(iOrderOut+2). */
+        Eigen::MatrixXd matSin;     /**< Internal basis S_in   (n_meg × N_in). */
+        Eigen::MatrixXd matSout;    /**< External basis S_out  (n_meg × N_out). */
+        Eigen::MatrixXd matProjIn;  /**< Internal-space projector P_in = S_in · pinv(S)[:N_in,:] (n_meg × n_meg). */
+        Eigen::MatrixXd matPinvAll; /**< Pseudoinverse of [S_in | S_out], shape (N_in+N_out) × n_meg. */
+        QVector<int> megChannelIdx; /**< Original channel indices in FiffInfo for the MEG rows. */
+        int iOrderIn = 8;           /**< Internal order used. */
+        int iOrderOut = 3;          /**< External order used. */
+        int iNin = 0;               /**< N_in  = iOrderIn*(iOrderIn+2). */
+        int iNout = 0;              /**< N_out = iOrderOut*(iOrderOut+2). */
     };
 
     //=========================================================================================================
@@ -141,7 +141,7 @@ public:
      * @return Basis struct containing all projectors needed for SSS and tSSS.
      */
     static Basis computeBasis(const FIFFLIB::FiffInfo& fiffInfo,
-                               const Params&            params = Params());
+                              const Params& params = Params());
 
     //=========================================================================================================
     /**
@@ -154,7 +154,7 @@ public:
      * @return SSS-cleaned data (n_channels × n_samples).
      */
     static Eigen::MatrixXd apply(const Eigen::MatrixXd& matData,
-                                  const Basis&           basis);
+                                 const Basis& basis);
 
     //=========================================================================================================
     /**
@@ -173,9 +173,9 @@ public:
      * @return tSSS-cleaned data (n_channels × n_samples).
      */
     static Eigen::MatrixXd applyTemporal(const Eigen::MatrixXd& matData,
-                                          const Basis&           basis,
-                                          int                    iBufferLength = 10000,
-                                          double                 dCorrLimit    = 0.98);
+                                         const Basis& basis,
+                                         int iBufferLength = 10000,
+                                         double dCorrLimit = 0.98);
 
 private:
     //=========================================================================================================
@@ -193,11 +193,11 @@ private:
      * @param[out] P         (lmax+2) × (lmax+2) normalised ALP table.
      * @param[out] dP        (lmax+2) × (lmax+2) normalised dP/dθ table.
      */
-    static void computeNormALP(int             lmax,
-                                double          cosTheta,
-                                double          sinTheta,
-                                Eigen::MatrixXd& P,
-                                Eigen::MatrixXd& dP);
+    static void computeNormALP(int lmax,
+                               double cosTheta,
+                               double sinTheta,
+                               Eigen::MatrixXd& P,
+                               Eigen::MatrixXd& dP);
 
     //=========================================================================================================
     /**
@@ -220,16 +220,16 @@ private:
      *
      * @return 3-vector gradient in Cartesian coordinates.
      */
-    static Eigen::Vector3d basisGradCart(int                     l,
-                                          int                     m,
-                                          bool                    bInternal,
-                                          const Eigen::Vector3d&  rPos,
-                                          const Eigen::MatrixXd&  P,
-                                          const Eigen::MatrixXd&  dP,
-                                          double                  cosTheta,
-                                          double                  sinTheta,
-                                          double                  cosPhi,
-                                          double                  sinPhi);
+    static Eigen::Vector3d basisGradCart(int l,
+                                         int m,
+                                         bool bInternal,
+                                         const Eigen::Vector3d& rPos,
+                                         const Eigen::MatrixXd& P,
+                                         const Eigen::MatrixXd& dP,
+                                         double cosTheta,
+                                         double sinTheta,
+                                         double cosPhi,
+                                         double sinPhi);
 };
 
 } // namespace UTILSLIB

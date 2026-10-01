@@ -242,33 +242,33 @@ public:
     //=========================================================================================================
 
     /** @return Root directory of the BIDS dataset, or an empty string if unset. */
-    QString root() const;               /**< BIDS dataset root path. */
+    QString root() const; /**< BIDS dataset root path. */
     /** @return Subject label without the "sub-" prefix, or an empty string if unset. */
-    QString subject() const;            /**< Subject label (without "sub-"). */
+    QString subject() const; /**< Subject label (without "sub-"). */
     /** @return Session label without the "ses-" prefix, or an empty string if unset. */
-    QString session() const;            /**< Session label (without "ses-"). */
+    QString session() const; /**< Session label (without "ses-"). */
     /** @return Task label, or an empty string if unset. */
-    QString task() const;               /**< Task label. */
+    QString task() const; /**< Task label. */
     /** @return Acquisition label, or an empty string if unset. */
-    QString acquisition() const;        /**< Acquisition label. */
+    QString acquisition() const; /**< Acquisition label. */
     /** @return Zero-padded run index, or an empty string if unset. */
-    QString run() const;                /**< Run index. */
+    QString run() const; /**< Run index. */
     /** @return Processing label, or an empty string if unset. */
-    QString processing() const;         /**< Processing label. */
+    QString processing() const; /**< Processing label. */
     /** @return Space label, or an empty string if unset. */
-    QString space() const;              /**< Space label. */
+    QString space() const; /**< Space label. */
     /** @return Recording label, or an empty string if unset. */
-    QString recording() const;          /**< Recording label. */
+    QString recording() const; /**< Recording label. */
     /** @return Zero-padded split index, or an empty string if unset. */
-    QString split() const;              /**< Split index. */
+    QString split() const; /**< Split index. */
     /** @return Description label, or an empty string if unset. */
-    QString description() const;        /**< Description label. */
+    QString description() const; /**< Description label. */
     /** @return BIDS datatype (e.g. "ieeg"), or an empty string if unset. */
-    QString datatype() const;           /**< BIDS datatype string. */
+    QString datatype() const; /**< BIDS datatype string. */
     /** @return Filename suffix, or an empty string if unset. */
-    QString suffix() const;             /**< Filename suffix. */
+    QString suffix() const; /**< Filename suffix. */
     /** @return File extension including the leading dot, or an empty string if unset. */
-    QString extension() const;          /**< File extension. */
+    QString extension() const; /**< File extension. */
 
     //=========================================================================================================
     // Path construction
@@ -385,20 +385,20 @@ public:
     friend bool operator==(const BIDSPath& a, const BIDSPath& b);
 
 private:
-    QString m_sRoot;            /**< BIDS dataset root directory. */
-    QString m_sSubject;         /**< Subject label. */
-    QString m_sSession;         /**< Session label. */
-    QString m_sTask;            /**< Task label. */
-    QString m_sAcquisition;     /**< Acquisition label. */
-    QString m_sRun;             /**< Run index. */
-    QString m_sProcessing;      /**< Processing label. */
-    QString m_sSpace;           /**< Space label. */
-    QString m_sRecording;       /**< Recording label. */
-    QString m_sSplit;           /**< Split index. */
-    QString m_sDescription;     /**< Description label. */
-    QString m_sDatatype;        /**< BIDS datatype (ieeg, eeg, meg, anat, ...). */
-    QString m_sSuffix;          /**< Filename suffix. */
-    QString m_sExtension;       /**< File extension (with dot). */
+    QString m_sRoot;        /**< BIDS dataset root directory. */
+    QString m_sSubject;     /**< Subject label. */
+    QString m_sSession;     /**< Session label. */
+    QString m_sTask;        /**< Task label. */
+    QString m_sAcquisition; /**< Acquisition label. */
+    QString m_sRun;         /**< Run index. */
+    QString m_sProcessing;  /**< Processing label. */
+    QString m_sSpace;       /**< Space label. */
+    QString m_sRecording;   /**< Recording label. */
+    QString m_sSplit;       /**< Split index. */
+    QString m_sDescription; /**< Description label. */
+    QString m_sDatatype;    /**< BIDS datatype (ieeg, eeg, meg, anat, ...). */
+    QString m_sSuffix;      /**< Filename suffix. */
+    QString m_sExtension;   /**< File extension (with dot). */
 
     /**
      * Zero-pads a numeric string to at least 2 characters.

@@ -66,12 +66,12 @@ int m_iNumberTrials;
 int m_iNumberChannels;
 int m_iNumberSamples;
 
-void customMessageHandler(QtMsgType type, const QMessageLogContext &context, const QString &msg)
+void customMessageHandler(QtMsgType type, const QMessageLogContext& context, const QString& msg)
 {
     Q_UNUSED(context);
 
     QString dt = QDateTime::currentDateTime().toString("dd/MM/yyyy hh:mm:ss");
-    QString txt;// = QString("[%1] ").arg(dt);
+    QString txt; // = QString("[%1] ").arg(dt);
 
     bool writeToLog = false;
 
@@ -79,13 +79,13 @@ void customMessageHandler(QtMsgType type, const QMessageLogContext &context, con
         case QtWarningMsg:
             //txt += QString("{Warning} \t %1").arg(msg);
             txt += QString("%1").arg(msg);
-            writeToLog=true;
+            writeToLog = true;
             break;
         default:
             break;
     }
 
-    if(!writeToLog) {
+    if (!writeToLog) {
         return;
     }
 
@@ -117,19 +117,19 @@ void customMessageHandler(QtMsgType type, const QMessageLogContext &context, con
  * @param[in] argv (argument vector) is an array of pointers to arrays of character objects. The array objects are null-terminated strings, representing the arguments that were entered on the command line when the program was started.
  * @return the value that was set to exit() (which is 0 if exit() is called via quit()).
  */
-int main(int argc, char *argv[])
+int main(int argc, char* argv[])
 {
-    #ifdef STATICBUILD
-    // Q_INIT_RESOURCE(mne_disp3d);
-    #endif
+#ifdef STATICBUILD
+// Q_INIT_RESOURCE(mne_disp3d);
+#endif
 
     qInstallMessageHandler(customMessageHandler);
     QCoreApplication a(argc, argv);
 
     m_sCurrentDir = QCoreApplication::applicationDirPath();
 
-//    printf("globalInstance()->maxThreadCount(): %d\n",QThreadPool::globalInstance()->maxThreadCount());
-//    QThreadPool::globalInstance()->setMaxThreadCount(24);
+    //    printf("globalInstance()->maxThreadCount(): %d\n",QThreadPool::globalInstance()->maxThreadCount());
+    //    QThreadPool::globalInstance()->setMaxThreadCount(24);
 
     //Parameters for performance test
     QStringList sConnectivityMethodList = QStringList() << "COR" << "XCOR" << "COH" << "IMAGCOH" << "PLI" << "WPLI" << "USPLI" << "DSWPLI" << "PLV";
@@ -157,7 +157,7 @@ int main(int argc, char *argv[])
 
     bool readSuccessful = false;
 
-    readSuccessful = raw.read_raw_segment(matDataOrig, times, raw.first_samp, raw.first_samp+100001);
+    readSuccessful = raw.read_raw_segment(matDataOrig, times, raw.first_samp, raw.first_samp + 100001);
 
     if (!readSuccessful) {
         qDebug() << "Could not read raw segment.";
@@ -170,13 +170,13 @@ int main(int argc, char *argv[])
     connectivitySettings.setSamplingFrequency(raw.info.sfreq);
     connectivitySettings.setWindowType("hanning");
 
-    QMap<int, QMap<int, MatrixXd > > matInputData;
+    QMap<int, QMap<int, MatrixXd>> matInputData;
 
-    for(int j = 0; j < lNumberChannels.size(); ++j) {
-        QMap<int, MatrixXd > mapChannelsSamples;
+    for (int j = 0; j < lNumberChannels.size(); ++j) {
+        QMap<int, MatrixXd> mapChannelsSamples;
 
-        for(int i = 0; i < lNumberSamples.size(); ++i) {
-            mapChannelsSamples[lNumberSamples.at(i)] = matDataOrig.block(0,0,lNumberChannels.at(j), lNumberSamples.at(i));
+        for (int i = 0; i < lNumberSamples.size(); ++i) {
+            mapChannelsSamples[lNumberSamples.at(i)] = matDataOrig.block(0, 0, lNumberChannels.at(j), lNumberSamples.at(i));
         }
 
         matInputData[lNumberChannels.at(j)] = mapChannelsSamples;
@@ -193,23 +193,23 @@ int main(int argc, char *argv[])
     qWarning() << "matInputData[64][100000].rows()" << matInputData[64][100000].rows();
     qWarning() << "matInputData[64][100000].cols()" << matInputData[64][100000].cols();
 
-    for(int j = 0; j < lNumberSamples.size(); ++j) {
-        for(int k = 0; k < lNumberChannels.size(); ++k) {
+    for (int j = 0; j < lNumberSamples.size(); ++j) {
+        for (int k = 0; k < lNumberChannels.size(); ++k) {
             connectivitySettings.clearAllData();
 
             matData = matInputData[lNumberChannels.at(k)][lNumberSamples.at(j)];
 
-            RowVectorXi picks = RowVectorXi::LinSpaced(lNumberChannels.at(k),1,lNumberChannels.at(k)+1);
+            RowVectorXi picks = RowVectorXi::LinSpaced(lNumberChannels.at(k), 1, lNumberChannels.at(k) + 1);
             connectivitySettings.setNodePositions(raw.info, picks);
 
-            for(int l = 0; l < lNumberTrials.size(); ++l) {
+            for (int l = 0; l < lNumberTrials.size(); ++l) {
                 //Create data to work on
 
-                while(connectivitySettings.size() < lNumberTrials.at(l)) {
+                while (connectivitySettings.size() < lNumberTrials.at(l)) {
                     connectivitySettings.append(matData);
                 }
 
-                for(int i = 0; i < sConnectivityMethodList.size(); ++i) {
+                for (int i = 0; i < sConnectivityMethodList.size(); ++i) {
                     m_iNumberTrials = lNumberTrials.at(l);
                     m_iNumberChannels = lNumberChannels.at(k);
                     m_iNumberSamples = lNumberSamples.at(j);
@@ -232,8 +232,8 @@ int main(int argc, char *argv[])
 
                     // Check that iNfft >= signal length
                     int iSignalLength = lNumberSamples.at(j);
-                    int iNfft = int(raw.info.sfreq/1.0);
-                    if(iNfft > iSignalLength) {
+                    int iNfft = int(raw.info.sfreq / 1.0);
+                    if (iNfft > iSignalLength) {
                         iNfft = iSignalLength;
                     }
 
@@ -245,7 +245,7 @@ int main(int argc, char *argv[])
                     connectivitySettings.setConnectivityMethods(QStringList() << sConnectivityMethodList.at(i));
 
                     m_iCurrentIteration = 0;
-                    for(int u = 0; u < iNumberRepeats; ++u) {
+                    for (int u = 0; u < iNumberRepeats; ++u) {
                         connectivitySettings.clearIntermediateData();
 
                         qWarning() << "iteration" << m_iCurrentIteration;

@@ -52,8 +52,8 @@
 
 namespace FIFFLIB
 {
-    class FiffStream;
-    class FiffDirNode;
+class FiffStream;
+class FiffDirNode;
 }
 
 //=============================================================================================================
@@ -72,8 +72,8 @@ namespace MNELIB
 class MNESHARED_EXPORT MNESssData
 {
 public:
-    typedef QSharedPointer<MNESssData> SPtr;              /**< Shared pointer type for MNESssData. */
-    typedef QSharedPointer<const MNESssData> ConstSPtr;   /**< Const shared pointer type for MNESssData. */
+    typedef QSharedPointer<MNESssData> SPtr;            /**< Shared pointer type for MNESssData. */
+    typedef QSharedPointer<const MNESssData> ConstSPtr; /**< Const shared pointer type for MNESssData. */
 
     //=========================================================================================================
     /**
@@ -117,7 +117,7 @@ public:
      *
      * @return   The read SSS data.
      */
-    static std::unique_ptr<MNESssData> read_from_node( QSharedPointer<FIFFLIB::FiffStream>& stream, const QSharedPointer<FIFFLIB::FiffDirNode>& start );
+    static std::unique_ptr<MNESssData> read_from_node(QSharedPointer<FIFFLIB::FiffStream>& stream, const QSharedPointer<FIFFLIB::FiffDirNode>& start);
 
     //=========================================================================================================
     /**
@@ -126,18 +126,18 @@ public:
      *
      * @param[in] out      The text stream to write the SSS diagnostics to (e.g. a QTextStream wrapping stderr).
      */
-    void print(QTextStream &out) const;
+    void print(QTextStream& out) const;
 
 public:
-    int   job;          /**< Value of FIFF_SSS_JOB tag. */
-    int   coord_frame;  /**< Coordinate frame. */
-    float origin[3];    /**< The expansion origin. */
-    int   nchan;        /**< How many channels. */
-    int   out_order;    /**< Order of the outside expansion. */
-    int   in_order;     /**< Order of the inside expansion. */
-    Eigen::VectorXi comp_info;  /**< Which components are included. */
-    int   in_nuse;      /**< How many components included in the inside expansion. */
-    int   out_nuse;     /**< How many components included in the outside expansion. */
+    int job;                   /**< Value of FIFF_SSS_JOB tag. */
+    int coord_frame;           /**< Coordinate frame. */
+    float origin[3];           /**< The expansion origin. */
+    int nchan;                 /**< How many channels. */
+    int out_order;             /**< Order of the outside expansion. */
+    int in_order;              /**< Order of the inside expansion. */
+    Eigen::VectorXi comp_info; /**< Which components are included. */
+    int in_nuse;               /**< How many components included in the inside expansion. */
+    int out_nuse;              /**< How many components included in the outside expansion. */
 };
 
 //=============================================================================================================

@@ -61,8 +61,8 @@ namespace MNELIB
 class MNESHARED_EXPORT MNETriangle
 {
 public:
-    typedef QSharedPointer<MNETriangle> SPtr;              /**< Shared pointer type for MNETriangle. */
-    typedef QSharedPointer<const MNETriangle> ConstSPtr;   /**< Const shared pointer type for MNETriangle. */
+    typedef QSharedPointer<MNETriangle> SPtr;            /**< Shared pointer type for MNETriangle. */
+    typedef QSharedPointer<const MNETriangle> ConstSPtr; /**< Const shared pointer type for MNETriangle. */
 
     //=========================================================================================================
     /**
@@ -84,17 +84,17 @@ public:
     void compute_data();
 
 public:
-    int              *vert = nullptr;  /**< Triangle vertex indices (non-owning; points into parent surface itris). */
-    Eigen::Vector3f  r1 = Eigen::Vector3f::Zero();   /**< Position of vertex 0. */
-    Eigen::Vector3f  r2 = Eigen::Vector3f::Zero();   /**< Position of vertex 1. */
-    Eigen::Vector3f  r3 = Eigen::Vector3f::Zero();   /**< Position of vertex 2. */
-    Eigen::Vector3f  r12 = Eigen::Vector3f::Zero();   /**< Edge vector from vertex 0 to vertex 1 (r2 - r1). */
-    Eigen::Vector3f  r13 = Eigen::Vector3f::Zero();   /**< Edge vector from vertex 0 to vertex 2 (r3 - r1). */
-    Eigen::Vector3f  nn  = Eigen::Vector3f::Zero();   /**< Unit normal vector. */
-    float            area = 0.0f;      /**< Triangle area. */
-    Eigen::Vector3f  cent = Eigen::Vector3f::Zero();  /**< Centroid position. */
-    Eigen::Vector3f  ex  = Eigen::Vector3f::Zero();   /**< In-plane unit vector (ey x nn; used by BEM). */
-    Eigen::Vector3f  ey  = Eigen::Vector3f::Zero();   /**< In-plane unit vector (normalized r13; used by BEM). */
+    int* vert = nullptr;                            /**< Triangle vertex indices (non-owning; points into parent surface itris). */
+    Eigen::Vector3f r1 = Eigen::Vector3f::Zero();   /**< Position of vertex 0. */
+    Eigen::Vector3f r2 = Eigen::Vector3f::Zero();   /**< Position of vertex 1. */
+    Eigen::Vector3f r3 = Eigen::Vector3f::Zero();   /**< Position of vertex 2. */
+    Eigen::Vector3f r12 = Eigen::Vector3f::Zero();  /**< Edge vector from vertex 0 to vertex 1 (r2 - r1). */
+    Eigen::Vector3f r13 = Eigen::Vector3f::Zero();  /**< Edge vector from vertex 0 to vertex 2 (r3 - r1). */
+    Eigen::Vector3f nn = Eigen::Vector3f::Zero();   /**< Unit normal vector. */
+    float area = 0.0f;                              /**< Triangle area. */
+    Eigen::Vector3f cent = Eigen::Vector3f::Zero(); /**< Centroid position. */
+    Eigen::Vector3f ex = Eigen::Vector3f::Zero();   /**< In-plane unit vector (ey x nn; used by BEM). */
+    Eigen::Vector3f ey = Eigen::Vector3f::Zero();   /**< In-plane unit vector (normalized r13; used by BEM). */
 };
 
 } // NAMESPACE MNELIB

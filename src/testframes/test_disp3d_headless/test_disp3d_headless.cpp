@@ -33,9 +33,10 @@ class TestDisp3dHeadless : public QObject
     Q_OBJECT
 
 private:
-    QString dataPath() const {
+    QString dataPath() const
+    {
         return QCoreApplication::applicationDirPath() +
-               "/../resources/data/mne-cpp-test-data/";
+            "/../resources/data/mne-cpp-test-data/";
     }
 
 private slots:
@@ -71,7 +72,7 @@ private slots:
         // square(x) = max(-(1/9)*x^2 + 1, 0); at x=1: 8/9
         // Note: implementation uses float (1.0f/9.0f), so tolerance must account for float precision
         double sq1 = Interpolation::square(1.0);
-        QVERIFY(qAbs(sq1 - 8.0/9.0) < 1e-5);
+        QVERIFY(qAbs(sq1 - 8.0 / 9.0) < 1e-5);
     }
 
     void interpolation_cubicFunction()
@@ -127,9 +128,9 @@ private slots:
         // Distance table: nVertices x nSensors (4 x 2)
         auto matDist = QSharedPointer<MatrixXd>::create(4, 2);
         (*matDist) << 0.0, 0.3,
-                      0.1, 0.2,
-                      0.2, 0.0,
-                      0.3, 0.1;
+            0.1, 0.2,
+            0.2, 0.0,
+            0.3, 0.1;
 
         auto mat = Interpolation::createInterpolationMat(
             projectedSensors, matDist, Interpolation::linear, 0.5);
@@ -147,14 +148,14 @@ private slots:
         // 4 vertices in a plane
         MatrixX3f verts(4, 3);
         verts << 0, 0, 0,
-                 1, 0, 0,
-                 0, 1, 0,
-                 1, 1, 0;
+            1, 0, 0,
+            0, 1, 0,
+            1, 1, 0;
 
         // 2 sensor positions
         MatrixX3f sensors(2, 3);
         sensors << 0.1f, 0.1f, 0.5f,
-                   0.9f, 0.9f, 0.5f;
+            0.9f, 0.9f, 0.5f;
 
         VectorXi projected = GeometryInfo::projectSensors(verts, sensors);
         QCOMPARE(projected.size(), (Index)2);
@@ -169,16 +170,24 @@ private slots:
         // Simple mesh: 4 vertices forming a square
         MatrixX3f verts(4, 3);
         verts << 0, 0, 0,
-                 1, 0, 0,
-                 0, 1, 0,
-                 1, 1, 0;
+            1, 0, 0,
+            0, 1, 0,
+            1, 1, 0;
 
         // Connectivity: each vertex connected to adjacent vertices
         std::vector<VectorXi> neighbors(4);
-        VectorXi n0(2); n0 << 1, 2; neighbors[0] = n0;
-        VectorXi n1(2); n1 << 0, 3; neighbors[1] = n1;
-        VectorXi n2(2); n2 << 0, 3; neighbors[2] = n2;
-        VectorXi n3(2); n3 << 1, 2; neighbors[3] = n3;
+        VectorXi n0(2);
+        n0 << 1, 2;
+        neighbors[0] = n0;
+        VectorXi n1(2);
+        n1 << 0, 3;
+        neighbors[1] = n1;
+        VectorXi n2(2);
+        n2 << 0, 3;
+        neighbors[2] = n2;
+        VectorXi n3(2);
+        n3 << 1, 2;
+        neighbors[3] = n3;
 
         VectorXi subset(2);
         subset << 0, 3;

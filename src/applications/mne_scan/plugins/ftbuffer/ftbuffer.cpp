@@ -78,7 +78,7 @@ void FtBuffer::init()
 {
     qInfo() << "[FtBuffer::init] Initializing FtBuffer plugin...";
     m_pRTMSA_BufferOutput = PluginOutputData<RealTimeMultiSampleArray>::create(this, "FtBuffer", "FtBuffer Output");
-    m_pRTMSA_BufferOutput->measurementData()->setName(this->getName());//Provide name to auto store widget settings
+    m_pRTMSA_BufferOutput->measurementData()->setName(this->getName()); //Provide name to auto store widget settings
     m_outputConnectors.append(m_pRTMSA_BufferOutput);
 }
 
@@ -137,9 +137,9 @@ bool FtBuffer::stop()
     //stops separate producer/client thread first
     m_pProducerThread.requestInterruption();
     int itries = 0;
-    while(m_pProducerThread.isRunning()) {
+    while (m_pProducerThread.isRunning()) {
         msleep(10);
-        if(itries > 10){
+        if (itries > 10) {
             break;
         }
         ++itries;
@@ -185,12 +185,12 @@ void FtBuffer::run()
 {
     MatrixXd matData;
 
-    while(!isInterruptionRequested()) {
+    while (!isInterruptionRequested()) {
         //qDebug() << "[FtBuffer::run] m_pFiffInfo->dig.size()" << m_pFiffInfo->dig.size();
         //pop matrix
-        if(m_pCircularBuffer->pop(matData)) {
+        if (m_pCircularBuffer->pop(matData)) {
             //emit values
-            if(!isInterruptionRequested()) {
+            if (!isInterruptionRequested()) {
                 m_pRTMSA_BufferOutput->measurementData()->setValue(matData);
             }
         }
@@ -199,9 +199,9 @@ void FtBuffer::run()
 
 //=============================================================================================================
 
-void FtBuffer::onNewDataAvailable(const Eigen::MatrixXd &matData)
+void FtBuffer::onNewDataAvailable(const Eigen::MatrixXd& matData)
 {
-    while(!m_pCircularBuffer->push(matData)) {
+    while (!m_pCircularBuffer->push(matData)) {
         //Do nothing until the circular buffer is ready to accept new data again
     }
 }
@@ -217,13 +217,13 @@ bool FtBuffer::setupRTMSA()
 
     QFile infile("neuromag2ft.fif");
 
-    if(!infile.open(QIODevice::ReadOnly)) {
+    if (!infile.open(QIODevice::ReadOnly)) {
         qInfo() << "[FtBuffer::setupRTMSA] Could not open file.  Plugin output won't be based on local fif parameters.";
     } else {
         qbuffInputSampleFif.write(infile.readAll());
 
         m_pNeuromagHeadChunkData = QSharedPointer<FIFFLIB::FiffRawData>(new FiffRawData(qbuffInputSampleFif));
-        m_pFiffInfo = QSharedPointer<FIFFLIB::FiffInfo>(new FiffInfo (m_pNeuromagHeadChunkData->info));
+        m_pFiffInfo = QSharedPointer<FIFFLIB::FiffInfo>(new FiffInfo(m_pNeuromagHeadChunkData->info));
 
         //Set the RMTSA parameters
         m_pRTMSA_BufferOutput->measurementData()->initFromFiffInfo(m_pFiffInfo);
@@ -248,7 +248,7 @@ bool FtBuffer::setupRTMSA(const FIFFLIB::FiffInfo& FiffInfo)
 
     std::cout << "attempting to init info\n";
 
-    m_pFiffInfo = QSharedPointer<FIFFLIB::FiffInfo>(new FIFFLIB::FiffInfo (FiffInfo));
+    m_pFiffInfo = QSharedPointer<FIFFLIB::FiffInfo>(new FIFFLIB::FiffInfo(FiffInfo));
 
     std::cout << "init info\n";
 
@@ -268,13 +268,13 @@ bool FtBuffer::setupRTMSA(const MetaData& metadata)
     if (metadata.info.sfreq < 0) {
         return false;
     } else {
-        m_pFiffInfo = QSharedPointer<FIFFLIB::FiffInfo>(new FIFFLIB::FiffInfo (metadata.info));
+        m_pFiffInfo = QSharedPointer<FIFFLIB::FiffInfo>(new FIFFLIB::FiffInfo(metadata.info));
 
         m_pRTMSA_BufferOutput->measurementData()->initFromFiffInfo(m_pFiffInfo);
         m_pRTMSA_BufferOutput->measurementData()->setMultiArraySize(1);
         m_pRTMSA_BufferOutput->measurementData()->setVisibility(true);
-        if(metadata.bFiffDigitizerData){
-            m_pRTMSA_BufferOutput->measurementData()->setDigitizerData(QSharedPointer<FIFFLIB::FiffDigitizerData>(new FIFFLIB::FiffDigitizerData (metadata.dig)));
+        if (metadata.bFiffDigitizerData) {
+            m_pRTMSA_BufferOutput->measurementData()->setDigitizerData(QSharedPointer<FIFFLIB::FiffDigitizerData>(new FIFFLIB::FiffDigitizerData(metadata.dig)));
         }
         m_bIsConfigured = true;
     }
@@ -284,7 +284,7 @@ bool FtBuffer::setupRTMSA(const MetaData& metadata)
 
 //=============================================================================================================
 
-void FtBuffer::setBufferAddress(const QString &sAddress)
+void FtBuffer::setBufferAddress(const QString& sAddress)
 {
     m_sBufferAddress = sAddress;
 }
@@ -300,5 +300,5 @@ void FtBuffer::setBufferPort(int iPort)
 
 QString FtBuffer::getBuildInfo()
 {
-    return QString(FTBUFFERPLUGIN::buildDateTime()) + QString(" - ")  + QString(FTBUFFERPLUGIN::buildHash());
+    return QString(FTBUFFERPLUGIN::buildDateTime()) + QString(" - ") + QString(FTBUFFERPLUGIN::buildHash());
 }

@@ -27,65 +27,70 @@
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-bool RayPicker::unproject(const QPoint &screenPos,
-                           const QRect &paneRect,
-                           const QMatrix4x4 &pvm,
-                           QVector3D &rayOrigin,
-                           QVector3D &rayDir)
+bool RayPicker::unproject(const QPoint& screenPos,
+                          const QRect& paneRect,
+                          const QMatrix4x4& pvm,
+                          QVector3D& rayOrigin,
+                          QVector3D& rayDir)
 {
     bool invertible = false;
     QMatrix4x4 invPVM = pvm.inverted(&invertible);
-    if (!invertible) return false;
+    if (!invertible)
+        return false;
 
     const float localX = static_cast<float>(screenPos.x() - paneRect.x());
     const float localY = static_cast<float>(screenPos.y() - paneRect.y());
-    const float paneW  = static_cast<float>(std::max(1, paneRect.width()));
-    const float paneH  = static_cast<float>(std::max(1, paneRect.height()));
+    const float paneW = static_cast<float>(std::max(1, paneRect.width()));
+    const float paneH = static_cast<float>(std::max(1, paneRect.height()));
 
     const float ndcX = (2.0f * localX) / paneW - 1.0f;
     const float ndcY = 1.0f - (2.0f * localY) / paneH;
 
     QVector4D vNear(ndcX, ndcY, -1.0f, 1.0f);
-    QVector4D vFar (ndcX, ndcY,  1.0f, 1.0f);
+    QVector4D vFar(ndcX, ndcY, 1.0f, 1.0f);
 
     QVector4D pNear = invPVM * vNear;
-    QVector4D pFar  = invPVM * vFar;
+    QVector4D pFar = invPVM * vFar;
     pNear /= pNear.w();
-    pFar  /= pFar.w();
+    pFar /= pFar.w();
 
     rayOrigin = pNear.toVector3D();
-    rayDir    = (pFar.toVector3D() - pNear.toVector3D()).normalized();
+    rayDir = (pFar.toVector3D() - pNear.toVector3D()).normalized();
     return true;
 }
 
 //=============================================================================================================
 
-PickResult RayPicker::pick(const QVector3D &rayOrigin,
-                            const QVector3D &rayDir,
-                            const SubView &subView,
-                            const QMap<QString, std::shared_ptr<BrainSurface>> &surfaces,
-                            const QMap<const QStandardItem*, std::shared_ptr<BrainSurface>> &itemSurfaceMap,
-                            const QMap<const QStandardItem*, std::shared_ptr<DipoleObject>> &itemDipoleMap)
+PickResult RayPicker::pick(const QVector3D& rayOrigin,
+                           const QVector3D& rayDir,
+                           const SubView& subView,
+                           const QMap<QString, std::shared_ptr<BrainSurface>>& surfaces,
+                           const QMap<const QStandardItem*, std::shared_ptr<BrainSurface>>& itemSurfaceMap,
+                           const QMap<const QStandardItem*, std::shared_ptr<DipoleObject>>& itemDipoleMap)
 {
     PickResult result;
     float closestDist = std::numeric_limits<float>::max();
 
     // ── Test surfaces ──────────────────────────────────────────────────
     for (auto it = surfaces.cbegin(); it != surfaces.cend(); ++it) {
-        const QString &key = it.key();
-        const auto &surf   = it.value();
+        const QString& key = it.key();
+        const auto& surf = it.value();
 
-        if (!surf->isVisible())               continue;
-        if (!subView.shouldRenderSurface(key)) continue;
-        if (key.startsWith("srcsp_"))          continue;  // skip source space for picking
+        if (!surf->isVisible())
+            continue;
+        if (!subView.shouldRenderSurface(key))
+            continue;
+        if (key.startsWith("srcsp_"))
+            continue; // skip source space for picking
 
         const bool isSensor = key.startsWith("sens_");
-        const bool isBem    = key.startsWith("bem_");
-        const bool isDig    = key.startsWith("dig_");
+        const bool isBem = key.startsWith("bem_");
+        const bool isDig = key.startsWith("dig_");
 
         // Brain surfaces: only pick if matching active surface type
         if (!isSensor && !isBem && !isDig) {
-            if (!subView.matchesSurfaceType(key)) continue;
+            if (!subView.matchesSurfaceType(key))
+                continue;
         }
 
         float dist = 0.0f;
@@ -93,13 +98,13 @@ PickResult RayPicker::pick(const QVector3D &rayOrigin,
         if (surf->intersects(rayOrigin, rayDir, dist, vertexIdx)) {
             if (dist < closestDist) {
                 closestDist = dist;
-                result.hit          = true;
-                result.distance     = dist;
-                result.hitPoint     = rayOrigin + dist * rayDir;
-                result.vertexIndex  = vertexIdx;
-                result.surfaceKey   = key;
-                result.isDipole     = false;
-                result.dipoleIndex  = -1;
+                result.hit = true;
+                result.distance = dist;
+                result.hitPoint = rayOrigin + dist * rayDir;
+                result.vertexIndex = vertexIdx;
+                result.surfaceKey = key;
+                result.isDipole = false;
+                result.dipoleIndex = -1;
 
                 // Reverse lookup: find tree item for this surface
                 result.item = nullptr;
@@ -113,7 +118,7 @@ PickResult RayPicker::pick(const QVector3D &rayOrigin,
                 // FsAnnotation info
                 if (result.item && itemSurfaceMap.contains(result.item)) {
                     result.regionName = itemSurfaceMap[result.item]->getAnnotationLabel(vertexIdx);
-                    result.regionId   = itemSurfaceMap[result.item]->getAnnotationLabelId(vertexIdx);
+                    result.regionId = itemSurfaceMap[result.item]->getAnnotationLabelId(vertexIdx);
                 } else {
                     result.regionName.clear();
                     result.regionId = -1;
@@ -124,23 +129,25 @@ PickResult RayPicker::pick(const QVector3D &rayOrigin,
 
     // ── Test dipoles ───────────────────────────────────────────────────
     for (auto it = itemDipoleMap.cbegin(); it != itemDipoleMap.cend(); ++it) {
-        if (!subView.visibility.dipoles) continue;
-        if (!it.value()->isVisible())    continue;
+        if (!subView.visibility.dipoles)
+            continue;
+        if (!it.value()->isVisible())
+            continue;
 
         float dist = 0.0f;
         int dipIdx = it.value()->intersect(rayOrigin, rayDir, dist);
         if (dipIdx != -1 && dist < closestDist) {
             closestDist = dist;
-            result.hit          = true;
-            result.distance     = dist;
-            result.hitPoint     = rayOrigin + dist * rayDir;
-            result.item         = const_cast<QStandardItem*>(it.key());
+            result.hit = true;
+            result.distance = dist;
+            result.hitPoint = rayOrigin + dist * rayDir;
+            result.item = const_cast<QStandardItem*>(it.key());
             result.surfaceKey.clear();
-            result.vertexIndex  = dipIdx;
-            result.isDipole     = true;
-            result.dipoleIndex  = dipIdx;
+            result.vertexIndex = dipIdx;
+            result.isDipole = true;
+            result.dipoleIndex = dipIdx;
             result.regionName.clear();
-            result.regionId     = -1;
+            result.regionId = -1;
         }
     }
 
@@ -149,19 +156,22 @@ PickResult RayPicker::pick(const QVector3D &rayOrigin,
 
 //=============================================================================================================
 
-QString RayPicker::buildLabel(const PickResult &result,
-                               [[maybe_unused]] const QMap<const QStandardItem*, std::shared_ptr<BrainSurface>> &itemSurfaceMap,
-                               [[maybe_unused]] const QMap<QString, std::shared_ptr<BrainSurface>> &surfaces)
+QString RayPicker::buildLabel(const PickResult& result,
+                              [[maybe_unused]] const QMap<const QStandardItem*, std::shared_ptr<BrainSurface>>& itemSurfaceMap,
+                              [[maybe_unused]] const QMap<QString, std::shared_ptr<BrainSurface>>& surfaces)
 {
-    if (!result.hit) return QString();
+    if (!result.hit)
+        return QString();
 
-    const QString &key = result.surfaceKey;
+    const QString& key = result.surfaceKey;
 
     // ── Brain surface with annotation ──────────────────────────────────
     if (!result.regionName.isEmpty()) {
         QString hemi;
-        if (key.startsWith("lh")) hemi = "lh";
-        else if (key.startsWith("rh")) hemi = "rh";
+        if (key.startsWith("lh"))
+            hemi = "lh";
+        else if (key.startsWith("rh"))
+            hemi = "rh";
 
         return hemi.isEmpty()
             ? QString("Region: %1").arg(result.regionName)
@@ -188,32 +198,36 @@ QString RayPicker::buildLabel(const PickResult &result,
         // Resolve individual point from batched mesh
         QString pointName;
         if (result.item && result.vertexIndex >= 0) {
-            AbstractTreeItem *abs = dynamic_cast<AbstractTreeItem*>(result.item);
+            AbstractTreeItem* abs = dynamic_cast<AbstractTreeItem*>(result.item);
             if (abs && abs->type() == AbstractTreeItem::itemTypeId(AbstractTreeItem::DigitizerItem)) {
-                auto *digItem = static_cast<DigitizerTreeItem*>(abs);
+                auto* digItem = static_cast<DigitizerTreeItem*>(abs);
                 constexpr int vertsPerSphere = 42;
                 int ptIdx = result.vertexIndex / vertsPerSphere;
-                const QStringList &names = digItem->pointNames();
+                const QStringList& names = digItem->pointNames();
                 if (ptIdx >= 0 && ptIdx < names.size())
                     pointName = names[ptIdx];
             }
         }
         QString category = key.mid(4);
-        if (!category.isEmpty()) category[0] = category[0].toUpper();
+        if (!category.isEmpty())
+            category[0] = category[0].toUpper();
         return pointName.isEmpty()
             ? QString("Digitizer (%1)").arg(category)
             : QString("Digitizer: %1 (%2)").arg(pointName, category);
     }
     if (key.startsWith("bem_")) {
         QString compartment = key.mid(4);
-        if (!compartment.isEmpty()) compartment[0] = compartment[0].toUpper();
+        if (!compartment.isEmpty())
+            compartment[0] = compartment[0].toUpper();
         compartment.replace("_", " ");
         return QString("BEM: %1").arg(compartment);
     }
 
     // ── Hemisphere fallback ────────────────────────────────────────────
-    if (key.startsWith("lh_")) return QStringLiteral("Left Hemisphere");
-    if (key.startsWith("rh_")) return QStringLiteral("Right Hemisphere");
+    if (key.startsWith("lh_"))
+        return QStringLiteral("Left Hemisphere");
+    if (key.startsWith("rh_"))
+        return QStringLiteral("Right Hemisphere");
 
     return QString();
 }
@@ -224,12 +238,15 @@ QString PickResult::displayLabel() const
 {
     // Delegated to the static builder in RayPicker; this method is a
     // convenience wrapper when the caller doesn't have the surface maps.
-    if (!hit) return QString();
+    if (!hit)
+        return QString();
 
     if (!regionName.isEmpty()) {
         QString hemi;
-        if (surfaceKey.startsWith("lh")) hemi = "lh";
-        else if (surfaceKey.startsWith("rh")) hemi = "rh";
+        if (surfaceKey.startsWith("lh"))
+            hemi = "lh";
+        else if (surfaceKey.startsWith("rh"))
+            hemi = "rh";
         return hemi.isEmpty()
             ? QString("Region: %1").arg(regionName)
             : QString("Region: %1 (%2)").arg(regionName, hemi);

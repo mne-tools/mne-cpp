@@ -66,10 +66,10 @@ class FiffCoordTrans;
 class FIFFSHARED_EXPORT FiffCoordTransSet
 {
 public:
-    using SPtr = QSharedPointer<FiffCoordTransSet>;            /**< Shared pointer type for FiffCoordTransSet. */
-    using ConstSPtr = QSharedPointer<const FiffCoordTransSet>; /**< Const shared pointer type for FiffCoordTransSet. */
-    using UPtr = std::unique_ptr<FiffCoordTransSet>;             /**< Unique pointer type for FiffCoordTransSet. */
-    using ConstUPtr = std::unique_ptr<const FiffCoordTransSet>;  /**< Const unique pointer type for FiffCoordTransSet. */
+    using SPtr = QSharedPointer<FiffCoordTransSet>;             /**< Shared pointer type for FiffCoordTransSet. */
+    using ConstSPtr = QSharedPointer<const FiffCoordTransSet>;  /**< Const shared pointer type for FiffCoordTransSet. */
+    using UPtr = std::unique_ptr<FiffCoordTransSet>;            /**< Unique pointer type for FiffCoordTransSet. */
+    using ConstUPtr = std::unique_ptr<const FiffCoordTransSet>; /**< Const unique pointer type for FiffCoordTransSet. */
 
     //=========================================================================================================
     /**
@@ -84,12 +84,11 @@ public:
     ~FiffCoordTransSet();
 
 public:
-    std::unique_ptr<FiffCoordTrans>    head_surf_RAS_t;   /**< Transform from MEG head coordinates to surface RAS. */
-    std::unique_ptr<FiffCoordTrans>    surf_RAS_RAS_t;    /**< Transform from surface RAS to RAS (nonzero origin) coordinates. */
-    std::unique_ptr<FiffCoordTrans>    RAS_MNI_tal_t;     /**< Transform from RAS (nonzero origin) to MNI Talairach coordinates. */
-    std::unique_ptr<FiffCoordTrans>    MNI_tal_tal_gtz_t; /**< Transform MNI Talairach to FreeSurfer Talairach coordinates (z > 0). */
-    std::unique_ptr<FiffCoordTrans>    MNI_tal_tal_ltz_t; /**< Transform MNI Talairach to FreeSurfer Talairach coordinates (z < 0). */
-
+    std::unique_ptr<FiffCoordTrans> head_surf_RAS_t;   /**< Transform from MEG head coordinates to surface RAS. */
+    std::unique_ptr<FiffCoordTrans> surf_RAS_RAS_t;    /**< Transform from surface RAS to RAS (nonzero origin) coordinates. */
+    std::unique_ptr<FiffCoordTrans> RAS_MNI_tal_t;     /**< Transform from RAS (nonzero origin) to MNI Talairach coordinates. */
+    std::unique_ptr<FiffCoordTrans> MNI_tal_tal_gtz_t; /**< Transform MNI Talairach to FreeSurfer Talairach coordinates (z > 0). */
+    std::unique_ptr<FiffCoordTrans> MNI_tal_tal_ltz_t; /**< Transform MNI Talairach to FreeSurfer Talairach coordinates (z < 0). */
 };
 
 //=============================================================================================================

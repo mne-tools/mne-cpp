@@ -41,7 +41,7 @@ using namespace DISP3DLIB;
 //=============================================================================================================
 
 PickReadoutModel::PickReadoutModel(QObject* parent)
-    : QObject(parent)
+: QObject(parent)
 {
     clearRows();
 }
@@ -133,9 +133,9 @@ void PickReadoutModel::clearRows()
 QString PickReadoutModel::formatVec(const QVector3D& v)
 {
     return QStringLiteral("(%1, %2, %3) m")
-            .arg(v.x(), 0, 'f', 4)
-            .arg(v.y(), 0, 'f', 4)
-            .arg(v.z(), 0, 'f', 4);
+        .arg(v.x(), 0, 'f', 4)
+        .arg(v.y(), 0, 'f', 4)
+        .arg(v.z(), 0, 'f', 4);
 }
 
 //=============================================================================================================
@@ -149,19 +149,19 @@ void PickReadoutModel::formatRows(const PickResult& pick)
 
     m_worldRow = QStringLiteral("World: %1").arg(formatVec(pick.world));
     m_valueRow = std::isnan(pick.value)
-            ? QStringLiteral("Value: —")
-            : QStringLiteral("Value: %1").arg(pick.value, 0, 'f', 4);
+        ? QStringLiteral("Value: —")
+        : QStringLiteral("Value: %1").arg(pick.value, 0, 'f', 4);
 
     switch (pick.kind) {
         case PickKind::ElectrodeContact: {
             m_labelRow = QStringLiteral("Contact: %1")
-                            .arg(pick.label.isEmpty() ? QStringLiteral("?") : pick.label);
+                             .arg(pick.label.isEmpty() ? QStringLiteral("?") : pick.label);
             if (m_mriSlices && m_mriSlices->volume()) {
                 const Eigen::Vector3f vox = m_mriSlices->voxelFromWorld(pick.world);
                 m_voxelRow = QStringLiteral("MRI voxel: (%1, %2, %3)")
-                                .arg(static_cast<int>(std::lround(vox.x())))
-                                .arg(static_cast<int>(std::lround(vox.y())))
-                                .arg(static_cast<int>(std::lround(vox.z())));
+                                 .arg(static_cast<int>(std::lround(vox.x())))
+                                 .arg(static_cast<int>(std::lround(vox.y())))
+                                 .arg(static_cast<int>(std::lround(vox.z())));
             } else {
                 m_voxelRow = QStringLiteral("MRI voxel: —");
             }
@@ -169,24 +169,25 @@ void PickReadoutModel::formatRows(const PickResult& pick)
         }
         case PickKind::CorticalVertex: {
             const QString hemi = (pick.hemisphere == 0) ? QStringLiteral("LH")
-                                : (pick.hemisphere == 1) ? QStringLiteral("RH")
-                                : QStringLiteral("?");
+                : (pick.hemisphere == 1)                ? QStringLiteral("RH")
+                                                        : QStringLiteral("?");
             m_labelRow = QStringLiteral("Cortex: %1 vertex %2")
-                            .arg(hemi).arg(pick.objectId);
+                             .arg(hemi)
+                             .arg(pick.objectId);
             m_voxelRow = QStringLiteral("Source: %1")
-                            .arg(pick.sourceId.isEmpty() ? QStringLiteral("—")
-                                                         : pick.sourceId);
+                             .arg(pick.sourceId.isEmpty() ? QStringLiteral("—")
+                                                          : pick.sourceId);
             break;
         }
         case PickKind::MriVoxel: {
             m_labelRow = QStringLiteral("MRI: %1")
-                            .arg(pick.sourceId.isEmpty() ? QStringLiteral("voxel")
-                                                         : pick.sourceId);
+                             .arg(pick.sourceId.isEmpty() ? QStringLiteral("voxel")
+                                                          : pick.sourceId);
             m_voxelRow = QStringLiteral("Voxel: (%1, %2, %3) ori=%4")
-                            .arg(static_cast<int>(std::lround(pick.voxel.x())))
-                            .arg(static_cast<int>(std::lround(pick.voxel.y())))
-                            .arg(static_cast<int>(std::lround(pick.voxel.z())))
-                            .arg(pick.sliceOrientation);
+                             .arg(static_cast<int>(std::lround(pick.voxel.x())))
+                             .arg(static_cast<int>(std::lround(pick.voxel.y())))
+                             .arg(static_cast<int>(std::lround(pick.voxel.z())))
+                             .arg(pick.sliceOrientation);
             break;
         }
         case PickKind::Sensor:
@@ -194,10 +195,10 @@ void PickReadoutModel::formatRows(const PickResult& pick)
         case PickKind::Bem:
         case PickKind::Custom:
             m_labelRow = QStringLiteral("%1: %2")
-                            .arg(pick.sourceId.isEmpty() ? QStringLiteral("Pick")
-                                                         : pick.sourceId)
-                            .arg(pick.label.isEmpty() ? QStringLiteral("(unnamed)")
-                                                      : pick.label);
+                             .arg(pick.sourceId.isEmpty() ? QStringLiteral("Pick")
+                                                          : pick.sourceId)
+                             .arg(pick.label.isEmpty() ? QStringLiteral("(unnamed)")
+                                                       : pick.label);
             m_voxelRow = QStringLiteral("ObjectId: %1").arg(pick.objectId);
             break;
         case PickKind::None:

@@ -47,10 +47,11 @@ using namespace UTILSLIB;
 
 //=============================================================================================================
 
-struct ChannelAlias {
+struct ChannelAlias
+{
     QString from;
     QString to;
-    int toKind;   // -1 means do not change kind
+    int toKind; // -1 means do not change kind
 };
 
 //=============================================================================================================
@@ -58,22 +59,32 @@ struct ChannelAlias {
 static QString explainKind(int kind)
 {
     switch (kind) {
-    case FIFFV_MEG_CH:  return "MEG";
-    case FIFFV_MCG_CH:  return "MCG";
-    case FIFFV_EEG_CH:  return "EEG";
-    case FIFFV_EOG_CH:  return "EOG";
-    case FIFFV_EMG_CH:  return "EMG";
-    case FIFFV_ECG_CH:  return "ECG";
-    case FIFFV_MISC_CH: return "MISC";
-    case FIFFV_STIM_CH: return "STI";
-    case FIFFV_RESP_CH: return "RESP";
-    default:            return "Unknown";
+        case FIFFV_MEG_CH:
+            return "MEG";
+        case FIFFV_MCG_CH:
+            return "MCG";
+        case FIFFV_EEG_CH:
+            return "EEG";
+        case FIFFV_EOG_CH:
+            return "EOG";
+        case FIFFV_EMG_CH:
+            return "EMG";
+        case FIFFV_ECG_CH:
+            return "ECG";
+        case FIFFV_MISC_CH:
+            return "MISC";
+        case FIFFV_STIM_CH:
+            return "STI";
+        case FIFFV_RESP_CH:
+            return "RESP";
+        default:
+            return "Unknown";
     }
 }
 
 //=============================================================================================================
 
-static QList<ChannelAlias> readAliases(const QString &filename, bool reverse)
+static QList<ChannelAlias> readAliases(const QString& filename, bool reverse)
 {
     QList<ChannelAlias> aliases;
     QFile file(filename);
@@ -130,7 +141,7 @@ static QList<ChannelAlias> readAliases(const QString &filename, bool reverse)
 
 //=============================================================================================================
 
-int main(int argc, char *argv[])
+int main(int argc, char* argv[])
 {
     qInstallMessageHandler(MNELogger::customLogWriter);
     QCoreApplication app(argc, argv);
@@ -191,7 +202,7 @@ int main(int argc, char *argv[])
             stream->read_tag(tag, stream->dir()[k]->pos);
             FiffChInfo ch = tag->toChInfo();
 
-            for (const ChannelAlias &a : aliases) {
+            for (const ChannelAlias& a : aliases) {
                 if (ch.ch_name == a.from) {
                     fprintf(stderr, "%s -> %s", qPrintable(ch.ch_name), qPrintable(a.to));
                     nMod++;

@@ -33,7 +33,7 @@ int g_signalPipe[2] = {-1, -1};
 void handleUnixSignal(int signalValue)
 {
     const char signalByte = static_cast<char>(signalValue);
-    if(g_signalPipe[1] >= 0) {
+    if (g_signalPipe[1] >= 0) {
         //
         // Only async-signal-safe calls are allowed here, so there is nothing
         // useful to do if the pipe is full or the write is interrupted: the
@@ -47,7 +47,7 @@ void handleUnixSignal(int signalValue)
 
 void installUnixSignalHandlers(QCoreApplication& application)
 {
-    if(::pipe(g_signalPipe) != 0) {
+    if (::pipe(g_signalPipe) != 0) {
         return;
     }
 
@@ -61,7 +61,7 @@ void installUnixSignalHandlers(QCoreApplication& application)
         // quitting on a spurious wakeup.
         //
         const ssize_t bytesRead = ::read(g_signalPipe[0], &signalByte, sizeof(signalByte));
-        if(bytesRead > 0) {
+        if (bytesRead > 0) {
             application.quit();
         }
         notifier->setEnabled(true);
@@ -84,7 +84,7 @@ int main(int argc, char* argv[])
     installUnixSignalHandlers(application);
 
     MNEANALYZESTUDIO::NeuroKernelService service;
-    if(!service.start("mne_analyze_studio.neuro_kernel")) {
+    if (!service.start("mne_analyze_studio.neuro_kernel")) {
         return 1;
     }
 

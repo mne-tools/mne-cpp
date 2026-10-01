@@ -116,15 +116,15 @@ void TestToolInverseComputation::initTestCase()
 void TestToolInverseComputation::testCollapseMax()
 {
     MatrixXd data(3, 4);
-    data << 1, -5, 3, 2,    // max abs = -5 at col 1
-            4,  1, 2, 3,    // max abs = 4 at col 0
-            1,  2, 3, -4;   // max abs = -4 at col 3
+    data << 1, -5, 3, 2, // max abs = -5 at col 1
+        4, 1, 2, 3,      // max abs = 4 at col 0
+        1, 2, 3, -4;     // max abs = -4 at col 3
 
     collapseData(data, COLLAPSE_MAX);
 
     // After collapse, all columns should be identical
     for (int t = 0; t < 4; t++) {
-        QCOMPARE(data(0, t), -5.0);  // Preserves sign
+        QCOMPARE(data(0, t), -5.0); // Preserves sign
         QCOMPARE(data(1, t), 4.0);
         QCOMPARE(data(2, t), -4.0);
     }
@@ -135,14 +135,14 @@ void TestToolInverseComputation::testCollapseMaxNegative()
     MatrixXd data(1, 3);
     data << -10, -3, -7;
     collapseData(data, COLLAPSE_MAX);
-    QCOMPARE(data(0, 0), -10.0);  // Max absolute, preserving sign
+    QCOMPARE(data(0, 0), -10.0); // Max absolute, preserving sign
 }
 
 void TestToolInverseComputation::testCollapseL1()
 {
     MatrixXd data(2, 4);
-    data << 1, -1, 3, -3,     // |1|+|1|+|3|+|3| = 8, /4 = 2
-            2, 2, 2, 2;       // |2|+|2|+|2|+|2| = 8, /4 = 2
+    data << 1, -1, 3, -3, // |1|+|1|+|3|+|3| = 8, /4 = 2
+        2, 2, 2, 2;       // |2|+|2|+|2|+|2| = 8, /4 = 2
 
     collapseData(data, COLLAPSE_L1);
 
@@ -205,7 +205,7 @@ void TestToolInverseComputation::testScaleDataScaleTo()
 {
     MatrixXd data(2, 3);
     data << 1, 2, 3,
-            4, 5, 6;
+        4, 5, 6;
     // Max abs = 6, scale to 100 → factor = 100/6
 
     scaleData(data, 100.0, 0.0, false);
@@ -236,7 +236,7 @@ void TestToolInverseComputation::testScaleDataSiCurrents()
     const double dExpected0 = data(0, 0);
     const double dExpected1 = data(0, 1);
 
-    scaleData(data, 100.0, 2.0, true);  // siCurrents → no change
+    scaleData(data, 100.0, 2.0, true); // siCurrents → no change
 
     QCOMPARE(data(0, 0), dExpected0);
     QCOMPARE(data(0, 1), dExpected1);
@@ -390,7 +390,7 @@ void TestToolInverseComputation::testFindLabelsInDirSorted()
     (void)QFile(labelDir + "/not_a_label.txt").open(QIODevice::WriteOnly);
 
     QStringList labels = findLabelsInDir(labelDir);
-    QCOMPARE(labels.size(), 3);  // Only .label files
+    QCOMPARE(labels.size(), 3); // Only .label files
     // Should be sorted
     QVERIFY(labels[0] < labels[1]);
     QVERIFY(labels[1] < labels[2]);
@@ -403,7 +403,7 @@ void TestToolInverseComputation::testFindLabelsInDirRealData()
         QSKIP("Label test data not available");
 
     QStringList labels = findLabelsInDir(labelDir);
-    QVERIFY(labels.size() >= 1);  // At least lh.V1.label
+    QVERIFY(labels.size() >= 1); // At least lh.V1.label
 }
 
 //=============================================================================================================
@@ -430,15 +430,18 @@ void TestToolInverseComputation::testReadWFileSynthetic()
 
     // Vertex 0
     out << (quint8)0 << (quint8)0 << (quint8)0;
-    float val0 = 1.5f; out << val0;
+    float val0 = 1.5f;
+    out << val0;
 
     // Vertex 100
     out << (quint8)0 << (quint8)0 << (quint8)100;
-    float val1 = 2.5f; out << val1;
+    float val1 = 2.5f;
+    out << val1;
 
     // Vertex 500
-    out << (quint8)0 << (quint8)1 << (quint8)244;  // 500 = 1*256 + 244
-    float val2 = 3.5f; out << val2;
+    out << (quint8)0 << (quint8)1 << (quint8)244; // 500 = 1*256 + 244
+    float val2 = 3.5f;
+    out << val2;
 
     file.close();
 
@@ -460,7 +463,7 @@ void TestToolInverseComputation::testReadStcFileSynthetic()
     QString stcPath = m_tempDir.path() + "/test.stc";
     MatrixXd inputData(2, 3);
     inputData << 1.0, 3.0, 5.0,
-                 2.0, 4.0, 6.0;
+        2.0, 4.0, 6.0;
     VectorXi inputVertices(2);
     inputVertices << 10, 20;
     InvSourceEstimate input(inputData, inputVertices, 0.0f, 0.001f);

@@ -58,7 +58,7 @@ using namespace Eigen;
  * @param[in] argv (argument vector) is an array of pointers to arrays of character objects. The array objects are null-terminated strings, representing the arguments that were entered on the command line when the program was started.
  * @return the value that was set to exit() (which is 0 if exit() is called via quit()).
  */
-int main(int argc, char *argv[])
+int main(int argc, char* argv[])
 {
     qInstallMessageHandler(MNELogger::customLogWriter);
     QCoreApplication a(argc, argv);
@@ -87,16 +87,16 @@ int main(int argc, char *argv[])
 
     // Filtering
     printf("Filtering...");
-    if(RTPROCESSINGLIB::filterFile(fileOut,
-                                   pRaw,
-                                   FilterKernel::m_filterTypes.indexOf(FilterParameter("BPF")),
-                                   10,
-                                   10,
-                                   0.1,
-                                   pRaw->info.sfreq,
-                                   1024,
-                                   UTILSLIB::FilterKernel::m_designMethods.indexOf(FilterParameter("Cosine")),
-                                   picks)) {
+    if (RTPROCESSINGLIB::filterFile(fileOut,
+                                    pRaw,
+                                    FilterKernel::m_filterTypes.indexOf(FilterParameter("BPF")),
+                                    10,
+                                    10,
+                                    0.1,
+                                    pRaw->info.sfreq,
+                                    1024,
+                                    UTILSLIB::FilterKernel::m_designMethods.indexOf(FilterParameter("Cosine")),
+                                    picks)) {
         printf("[done]\n");
     } else {
         printf("[failed]\n");

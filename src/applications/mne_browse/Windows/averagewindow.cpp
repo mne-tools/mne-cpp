@@ -59,15 +59,15 @@ namespace
 bool matchesButterflySelection(const FIFFLIB::FiffChInfo& channelInfo,
                                const QString& selectionText)
 {
-    if(selectionText == QLatin1String("EEG")) {
+    if (selectionText == QLatin1String("EEG")) {
         return channelInfo.kind == FIFFV_EEG_CH;
     }
 
-    if(channelInfo.kind != FIFFV_MEG_CH) {
+    if (channelInfo.kind != FIFFV_MEG_CH) {
         return false;
     }
 
-    if(selectionText == QLatin1String("MEG_mag")) {
+    if (selectionText == QLatin1String("MEG_mag")) {
         return channelInfo.unit == FIFF_UNIT_T;
     }
 
@@ -79,12 +79,12 @@ QStringList selectedButterflyChannels(const FIFFLIB::FiffInfo& info,
 {
     QStringList channelNames;
 
-    for(const auto& channelInfo : info.chs) {
-        if(info.bads.contains(channelInfo.ch_name)) {
+    for (const auto& channelInfo : info.chs) {
+        if (info.bads.contains(channelInfo.ch_name)) {
             continue;
         }
 
-        if(matchesButterflySelection(channelInfo, selectionText)) {
+        if (matchesButterflySelection(channelInfo, selectionText)) {
             channelNames << channelInfo.ch_name;
         }
     }
@@ -94,15 +94,15 @@ QStringList selectedButterflyChannels(const FIFFLIB::FiffInfo& info,
 
 Eigen::MatrixXd createWhitener(const FIFFLIB::FiffCov& covariance)
 {
-    if(covariance.dim <= 0) {
+    if (covariance.dim <= 0) {
         return Eigen::MatrixXd();
     }
 
-    if(covariance.diag) {
+    if (covariance.diag) {
         Eigen::MatrixXd whitener = Eigen::MatrixXd::Zero(covariance.dim, covariance.dim);
-        for(int i = 0; i < covariance.dim; ++i) {
+        for (int i = 0; i < covariance.dim; ++i) {
             const double variance = covariance.data(i, 0);
-            if(variance > 1e-30) {
+            if (variance > 1e-30) {
                 whitener(i, i) = 1.0 / std::sqrt(variance);
             }
         }
@@ -110,13 +110,13 @@ Eigen::MatrixXd createWhitener(const FIFFLIB::FiffCov& covariance)
         return whitener;
     }
 
-    if(covariance.eig.size() == 0 || covariance.eigvec.size() == 0) {
+    if (covariance.eig.size() == 0 || covariance.eigvec.size() == 0) {
         return Eigen::MatrixXd();
     }
 
     Eigen::MatrixXd whitener = Eigen::MatrixXd::Zero(covariance.dim, covariance.dim);
-    for(int i = 0; i < covariance.eig.size(); ++i) {
-        if(covariance.eig(i) > 1e-30) {
+    for (int i = 0; i < covariance.eig.size(); ++i) {
+        if (covariance.eig(i) > 1e-30) {
             whitener(i, i) = 1.0 / std::sqrt(covariance.eig(i));
         }
     }
@@ -129,7 +129,7 @@ bool whitenButterflyEvoked(FIFFLIB::FiffEvoked& evoked,
                            const FIFFLIB::FiffCov& covariance,
                            const WhiteningSettings& settings)
 {
-    if(covariance.isEmpty() || evoked.isEmpty() || evoked.data.rows() == 0) {
+    if (covariance.isEmpty() || evoked.isEmpty() || evoked.data.rows() == 0) {
         return false;
     }
 
@@ -143,12 +143,12 @@ bool whitenButterflyEvoked(FIFFLIB::FiffEvoked& evoked,
     const FIFFLIB::FiffCov preparedCov =
         regularizedCov.prepare_noise_cov(evoked.info, evoked.info.ch_names);
 
-    if(preparedCov.isEmpty() || preparedCov.dim != evoked.data.rows()) {
+    if (preparedCov.isEmpty() || preparedCov.dim != evoked.data.rows()) {
         return false;
     }
 
     const Eigen::MatrixXd whitener = createWhitener(preparedCov);
-    if(whitener.rows() != evoked.data.rows() || whitener.cols() != evoked.data.rows()) {
+    if (whitener.rows() != evoked.data.rows() || whitener.cols() != evoked.data.rows()) {
         return false;
     }
 
@@ -169,11 +169,11 @@ FIFFLIB::FiffEvoked buildButterflyEvoked(const FIFFLIB::FiffEvoked& sourceEvoked
         sourceEvoked.pick_channels(includeChannels, sourceEvoked.info.bads);
 
     bool didApplyWhitening = false;
-    if(whiten) {
+    if (whiten) {
         didApplyWhitening = whitenButterflyEvoked(displayEvoked, covariance, settings);
     }
 
-    if(whiteningApplied) {
+    if (whiteningApplied) {
         *whiteningApplied = didApplyWhitening;
     }
 
@@ -188,7 +188,7 @@ FIFFLIB::FiffEvoked buildButterflyEvoked(const FIFFLIB::FiffEvoked& sourceEvoked
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-AverageWindow::AverageWindow(QWidget *parent, QFile &file)
+AverageWindow::AverageWindow(QWidget* parent, QFile& file)
 : QDockWidget(parent)
 , ui(new Ui::AverageWindow)
 {
@@ -200,7 +200,7 @@ AverageWindow::AverageWindow(QWidget *parent, QFile &file)
 
 //*************************************************************************************************************
 
-AverageWindow::AverageWindow(QWidget *parent)
+AverageWindow::AverageWindow(QWidget* parent)
 : QDockWidget(parent)
 , ui(new Ui::AverageWindow)
 {
@@ -235,7 +235,7 @@ AverageModel* AverageWindow::getAverageModel()
 
 //*************************************************************************************************************
 
-void AverageWindow::channelSelectionManagerChanged(const QList<QGraphicsItem*> &selectedChannelItems)
+void AverageWindow::channelSelectionManagerChanged(const QList<QGraphicsItem*>& selectedChannelItems)
 {
     //Repaint the average items in the average scene based on the input parameter
     m_pAverageScene->repaintItems(selectedChannelItems);
@@ -251,10 +251,10 @@ void AverageWindow::channelSelectionManagerChanged(const QList<QGraphicsItem*> &
 
 //*************************************************************************************************************
 
-void AverageWindow::scaleAveragedData(const QMap<QString,double> &scaleMap)
+void AverageWindow::scaleAveragedData(const QMap<QString, double>& scaleMap)
 {
     //Set the scale map received from the scale window
-    QMap<qint32,float> newScaleMapIdx;
+    QMap<qint32, float> newScaleMapIdx;
 
     newScaleMapIdx[FIFF_UNIT_T_M] = scaleMap["MEG_grad"];
     newScaleMapIdx[FIFF_UNIT_T] = scaleMap["MEG_mag"];
@@ -269,9 +269,12 @@ void AverageWindow::scaleAveragedData(const QMap<QString,double> &scaleMap)
     m_pButterflyScene->setScaleMap(scaleMap);
 
     // Sync spinboxes with external scale changes
-    if(m_pSpinGrad) m_pSpinGrad->setValue(scaleMap.value("MEG_grad", 1e-10) / 1e-10);
-    if(m_pSpinMag)  m_pSpinMag->setValue(scaleMap.value("MEG_mag", 1e-11) / 1e-11);
-    if(m_pSpinEEG)  m_pSpinEEG->setValue(scaleMap.value("MEG_EEG", 1e-4) / 1e-4);
+    if (m_pSpinGrad)
+        m_pSpinGrad->setValue(scaleMap.value("MEG_grad", 1e-10) / 1e-10);
+    if (m_pSpinMag)
+        m_pSpinMag->setValue(scaleMap.value("MEG_mag", 1e-11) / 1e-11);
+    if (m_pSpinEEG)
+        m_pSpinEEG->setValue(scaleMap.value("MEG_EEG", 1e-4) / 1e-4);
 }
 
 
@@ -314,8 +317,8 @@ void AverageWindow::setWhiteningSettings(const WhiteningSettings& settings)
                              settings.regEeg != m_whiteningSettings.regEeg ||
                              settings.useProj != m_whiteningSettings.useProj);
     m_whiteningSettings = settings;
-    if(layoutChanged || butterflyChanged || regChanged) {
-        m_bAutoScaled = false;  // re-compute scale with new whitened amplitudes
+    if (layoutChanged || butterflyChanged || regChanged) {
+        m_bAutoScaled = false; // re-compute scale with new whitened amplitudes
         m_bButterflyAutoScaled = false;
     }
     refreshPlots();
@@ -334,12 +337,12 @@ WhiteningSettings AverageWindow::whiteningSettings() const
 
 void AverageWindow::setButterflyWhiteningEnabled(bool enabled)
 {
-    if(enabled && m_noiseCovariance.isEmpty()) {
+    if (enabled && m_noiseCovariance.isEmpty()) {
         return;
     }
 
     m_whiteningSettings.enableButterfly = enabled;
-    m_bAutoScaled = false;  // re-compute scale with whitened amplitudes
+    m_bAutoScaled = false; // re-compute scale with whitened amplitudes
     m_bButterflyAutoScaled = false;
     refreshPlots();
 }
@@ -357,7 +360,7 @@ bool AverageWindow::isButterflyWhiteningEnabled() const
 void AverageWindow::setShowGFP(bool show)
 {
     m_bShowGFP = show;
-    if(m_pButterflyScene)
+    if (m_pButterflyScene)
         m_pButterflyScene->setShowGFP(show);
 }
 
@@ -374,7 +377,7 @@ QList<int> AverageWindow::selectedSetRows() const
 {
     QList<int> rows;
 
-    if(!ui->m_tableView_loadedSets->selectionModel()) {
+    if (!ui->m_tableView_loadedSets->selectionModel()) {
         return rows;
     }
 
@@ -382,7 +385,7 @@ QList<int> AverageWindow::selectedSetRows() const
         ui->m_tableView_loadedSets->selectionModel()->selectedRows(0);
 
     rows.reserve(selectedRows.size());
-    for(const QModelIndex& index : selectedRows) {
+    for (const QModelIndex& index : selectedRows) {
         rows.append(index.row());
     }
 
@@ -393,7 +396,7 @@ QList<int> AverageWindow::selectedSetRows() const
 
 void AverageWindow::setRecomputeAvailable(bool available)
 {
-    if(m_pRecomputeAverageAction) {
+    if (m_pRecomputeAverageAction) {
         m_pRecomputeAverageAction->setEnabled(available);
     }
 }
@@ -416,7 +419,7 @@ void AverageWindow::init()
     connect(ui->tabWidget, &QTabWidget::currentChanged, this, [this](int) {
         QTimer::singleShot(0, this, [this]() {
             updateButterflySize();
-            if(m_pAverageScene && !m_pAverageScene->items().isEmpty()) {
+            if (m_pAverageScene && !m_pAverageScene->items().isEmpty()) {
                 ui->m_graphicsView_layout->fitInView(m_pAverageScene->itemsBoundingRect(), Qt::KeepAspectRatio);
             }
         });
@@ -426,10 +429,10 @@ void AverageWindow::init()
 
 //*************************************************************************************************************
 
-void AverageWindow::initMVC(QFile &file)
+void AverageWindow::initMVC(QFile& file)
 {
     //Setup average model
-    if(file.exists())
+    if (file.exists())
         m_pAverageModel = new AverageModel(file, this);
     else
         m_pAverageModel = new AverageModel(this);
@@ -457,7 +460,7 @@ void AverageWindow::initTableViewWidgets()
     //Set average model to list widget
     ui->m_tableView_loadedSets->setModel(m_pAverageModel);
     ui->m_tableView_loadedSets->setSelectionMode(QAbstractItemView::ExtendedSelection);
-    ui->m_tableView_loadedSets->setColumnHidden(5,true); //hide last column because the average model holds internal data handles here
+    ui->m_tableView_loadedSets->setColumnHidden(5, true); //hide last column because the average model holds internal data handles here
     ui->m_tableView_loadedSets->resizeColumnsToContents();
 
     ui->m_tableView_loadedSets->adjustSize();
@@ -468,19 +471,19 @@ void AverageWindow::initTableViewWidgets()
 
     connect(m_pAverageModel, &AverageModel::fileLoaded,
             this, [this](bool loaded) {
-        if(loaded) {
-            ui->m_tableView_loadedSets->resizeColumnsToContents();
-            m_pAverageScene->clear();
-            m_bAutoScaled = false;
-            m_bButterflyAutoScaled = false;
-            selectLoadedSets();
-            refreshPlots();
-        } else {
-            m_pAverageScene->update();
-            m_pButterflyScene->clear();
-            m_pButterflyScene->update();
-        }
-    });
+                if (loaded) {
+                    ui->m_tableView_loadedSets->resizeColumnsToContents();
+                    m_pAverageScene->clear();
+                    m_bAutoScaled = false;
+                    m_bButterflyAutoScaled = false;
+                    selectLoadedSets();
+                    refreshPlots();
+                } else {
+                    m_pAverageScene->update();
+                    m_pButterflyScene->clear();
+                    m_pButterflyScene->update();
+                }
+            });
 
     selectLoadedSets();
 }
@@ -499,32 +502,33 @@ void AverageWindow::initAverageSceneView()
     // (MAG=1e-12, GRAD=1e-15) are the unit amplitude, producing extreme
     // dScaleY values.  Here we use the same multiples that ScalingView
     // applies to its default slider positions.
-    QMap<qint32,float> defaultScaleMap;
-    defaultScaleMap[FIFF_UNIT_T]   = 1e-11f;   // MAG
-    defaultScaleMap[FIFF_UNIT_T_M] = 1e-10f;   // GRAD
-    defaultScaleMap[FIFFV_EEG_CH]  = 1e-4f;    // EEG
+    QMap<qint32, float> defaultScaleMap;
+    defaultScaleMap[FIFF_UNIT_T] = 1e-11f;   // MAG
+    defaultScaleMap[FIFF_UNIT_T_M] = 1e-10f; // GRAD
+    defaultScaleMap[FIFFV_EEG_CH] = 1e-4f;   // EEG
     m_pAverageScene->setScaleMap(defaultScaleMap);
 
     // --- Scale controls for the 2D Layout tab ---
     // The graphics view sits in gridLayout (inside gridLayout_2 on the tab page).
     // We add scale spinboxes to gridLayout row 2.
     QGridLayout* layoutGrid = nullptr;
-    if(auto* item = ui->m_graphicsView_layout->parentWidget()->layout()) {
+    if (auto* item = ui->m_graphicsView_layout->parentWidget()->layout()) {
         // gridLayout_2 wraps gridLayout; find the inner one containing the view
-        for(int i = 0; i < item->count(); ++i) {
-            if(auto* nested = qobject_cast<QGridLayout*>(item->itemAt(i)->layout())) {
+        for (int i = 0; i < item->count(); ++i) {
+            if (auto* nested = qobject_cast<QGridLayout*>(item->itemAt(i)->layout())) {
                 // Check if this grid contains our graphics view
-                for(int j = 0; j < nested->count(); ++j) {
-                    if(nested->itemAt(j)->widget() == ui->m_graphicsView_layout) {
+                for (int j = 0; j < nested->count(); ++j) {
+                    if (nested->itemAt(j)->widget() == ui->m_graphicsView_layout) {
                         layoutGrid = nested;
                         break;
                     }
                 }
-                if(layoutGrid) break;
+                if (layoutGrid)
+                    break;
             }
         }
     }
-    if(layoutGrid) {
+    if (layoutGrid) {
         QWidget* tabPage = ui->m_graphicsView_layout->parentWidget();
 
         auto makeSpinBox = [&](const QString& labelText, double defaultVal) -> QDoubleSpinBox* {
@@ -539,8 +543,8 @@ void AverageWindow::initAverageSceneView()
         };
 
         m_pSpinGrad = makeSpinBox("Grad", 1.0);
-        m_pSpinMag  = makeSpinBox("Mag", 1.0);
-        m_pSpinEEG  = makeSpinBox("EEG", 1.0);
+        m_pSpinMag = makeSpinBox("Mag", 1.0);
+        m_pSpinEEG = makeSpinBox("EEG", 1.0);
 
         QHBoxLayout* scaleLayout = new QHBoxLayout;
         scaleLayout->addStretch();
@@ -551,17 +555,17 @@ void AverageWindow::initAverageSceneView()
         layoutGrid->addLayout(scaleLayout, 2, 0, 1, 3);
 
         auto updateScales = [this]() {
-            QMap<qint32,float> scaleMap;
-            scaleMap[FIFF_UNIT_T]   = static_cast<float>(m_pSpinMag->value()  * 1e-11);
+            QMap<qint32, float> scaleMap;
+            scaleMap[FIFF_UNIT_T] = static_cast<float>(m_pSpinMag->value() * 1e-11);
             scaleMap[FIFF_UNIT_T_M] = static_cast<float>(m_pSpinGrad->value() * 1e-10);
-            scaleMap[FIFFV_EEG_CH]  = static_cast<float>(m_pSpinEEG->value()  * 1e-4);
+            scaleMap[FIFFV_EEG_CH] = static_cast<float>(m_pSpinEEG->value() * 1e-4);
             m_pAverageScene->setScaleMap(scaleMap);
 
             // Also propagate to butterfly scene (uses STRING keys)
-            QMap<QString,double> butterflyScale;
+            QMap<QString, double> butterflyScale;
             butterflyScale["MEG_grad"] = m_pSpinGrad->value() * 1e-10;
-            butterflyScale["MEG_mag"]  = m_pSpinMag->value()  * 1e-11;
-            butterflyScale["MEG_EEG"]  = m_pSpinEEG->value()  * 1e-4;
+            butterflyScale["MEG_mag"] = m_pSpinMag->value() * 1e-11;
+            butterflyScale["MEG_EEG"] = m_pSpinEEG->value() * 1e-4;
             m_pButterflyScene->setScaleMap(butterflyScale);
         };
 
@@ -581,8 +585,8 @@ void AverageWindow::initAverageSceneView()
     ui->m_graphicsView_butterflyPlot->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 
     //Generate random colors for plotting
-    for(int i = 0; i<500; i++)
-        m_lButterflyColors.append(QColor(QRandomGenerator::global()->generate()%256, QRandomGenerator::global()->generate()%256, QRandomGenerator::global()->generate()%256));
+    for (int i = 0; i < 500; i++)
+        m_lButterflyColors.append(QColor(QRandomGenerator::global()->generate() % 256, QRandomGenerator::global()->generate() % 256, QRandomGenerator::global()->generate() % 256));
 }
 
 
@@ -624,22 +628,22 @@ void AverageWindow::initComboBoxes()
 {
     // Butterfly tab combo
     connect(ui->m_comboBox_channelKind, &QComboBox::currentTextChanged,
-            this, [this](){
-        refreshPlots();
-    });
+            this, [this]() {
+                refreshPlots();
+            });
 
     // 2D Layout tab combo — clear scene so it re-populates with the new channel type
     connect(ui->m_comboBox_layoutChannelKind, &QComboBox::currentTextChanged,
-            this, [this](){
-        m_pAverageScene->clear();
-        refreshPlots();
-    });
+            this, [this]() {
+                m_pAverageScene->clear();
+                refreshPlots();
+            });
 }
 
 
 //*************************************************************************************************************
 
-void AverageWindow::onSelectionChanged(const QItemSelection &selected, const QItemSelection &deselected)
+void AverageWindow::onSelectionChanged(const QItemSelection& selected, const QItemSelection& deselected)
 {
     Q_UNUSED(deselected);
     Q_UNUSED(selected);
@@ -657,24 +661,24 @@ void AverageWindow::onSelectionChanged(const QItemSelection &selected, const QIt
 void AverageWindow::refreshPlots()
 {
     QModelIndexList selectedRows;
-    if(ui->m_tableView_loadedSets->selectionModel()) {
+    if (ui->m_tableView_loadedSets->selectionModel()) {
         selectedRows = ui->m_tableView_loadedSets->selectionModel()->selectedRows(0);
     }
 
     m_layoutDisplayEvokeds.clear();
     m_layoutDisplayEvokeds.reserve(selectedRows.size());
 
-    for(int rowIndex = 0; rowIndex < selectedRows.size(); ++rowIndex) {
+    for (int rowIndex = 0; rowIndex < selectedRows.size(); ++rowIndex) {
         const QModelIndex index = selectedRows.at(rowIndex);
         const FIFFLIB::FiffEvoked* sourceEvoked = m_pAverageModel->getEvoked(index.row());
 
-        if(!sourceEvoked) {
+        if (!sourceEvoked) {
             m_layoutDisplayEvokeds.append(FIFFLIB::FiffEvoked());
             continue;
         }
 
         FIFFLIB::FiffEvoked displayEvoked(*sourceEvoked);
-        if(m_whiteningSettings.enableLayout) {
+        if (m_whiteningSettings.enableLayout) {
             whitenButterflyEvoked(displayEvoked, m_noiseCovariance, m_whiteningSettings);
         }
 
@@ -682,28 +686,28 @@ void AverageWindow::refreshPlots()
     }
 
     // Auto-populate layout scene if empty but evoked data is available
-    if(m_pAverageScene->items().isEmpty() && !selectedRows.isEmpty()) {
+    if (m_pAverageScene->items().isEmpty() && !selectedRows.isEmpty()) {
         populateLayoutFromEvoked(selectedRows);
     }
 
     //Get current items from the average scene
-    QList<QGraphicsItem *> currentAverageSceneItems = m_pAverageScene->items();
+    QList<QGraphicsItem*> currentAverageSceneItems = m_pAverageScene->items();
 
     //Set new data for all averageSceneItems
-    for(int i = 0; i<currentAverageSceneItems.size(); i++) {
+    for (int i = 0; i < currentAverageSceneItems.size(); i++) {
         AverageSceneItem* averageSceneItemTemp = static_cast<AverageSceneItem*>(currentAverageSceneItems.at(i));
 
         averageSceneItemTemp->m_lAverageData.clear();
 
         //Do for all selected evoked sets
-        for(int u = 0; u < selectedRows.size(); ++u) {
-            if(u >= m_layoutDisplayEvokeds.size()) {
+        for (int u = 0; u < selectedRows.size(); ++u) {
+            if (u >= m_layoutDisplayEvokeds.size()) {
                 continue;
             }
 
             const QModelIndex index = selectedRows.at(u);
             const FIFFLIB::FiffEvoked& displayEvoked = m_layoutDisplayEvokeds.at(u);
-            if(displayEvoked.isEmpty() || displayEvoked.data.rows() == 0) {
+            if (displayEvoked.isEmpty() || displayEvoked.data.rows() == 0) {
                 continue;
             }
 
@@ -717,67 +721,71 @@ void AverageWindow::refreshPlots()
             //Get the averageScenItem specific data row
             int channelNumber = fiffInfo->ch_names.indexOf(averageSceneItemTemp->m_sChannelName);
 
-            if(channelNumber != -1) {
+            if (channelNumber != -1) {
                 averageSceneItemTemp->m_firstLastSample.first = first;
                 averageSceneItemTemp->m_firstLastSample.second = last;
                 averageSceneItemTemp->m_iChannelKind = fiffInfo->chs.at(channelNumber).kind;
-                averageSceneItemTemp->m_iChannelUnit = fiffInfo->chs.at(channelNumber).unit;;
+                averageSceneItemTemp->m_iChannelUnit = fiffInfo->chs.at(channelNumber).unit;
+                ;
                 averageSceneItemTemp->m_iChannelNumber = channelNumber;
                 averageSceneItemTemp->m_iTotalNumberChannels = fiffInfo->ch_names.size();
                 averageSceneItemTemp->m_lAverageData.append(QPair<QString, RowVectorPair>(index.data(Qt::DisplayRole).toString(),
-                                                                                           averageData));
+                                                                                          averageData));
             }
         }
     }
 
     // Auto-scale: compute optimal scale from data on first load
-    if(!m_bAutoScaled && !m_layoutDisplayEvokeds.isEmpty()) {
+    if (!m_bAutoScaled && !m_layoutDisplayEvokeds.isEmpty()) {
         double maxGrad = 0, maxMag = 0, maxEEG = 0;
 
-        for(const auto& evoked : m_layoutDisplayEvokeds) {
-            if(evoked.isEmpty() || evoked.data.rows() == 0)
+        for (const auto& evoked : m_layoutDisplayEvokeds) {
+            if (evoked.isEmpty() || evoked.data.rows() == 0)
                 continue;
             const auto& info = evoked.info;
-            for(int ch = 0; ch < info.chs.size() && ch < evoked.data.rows(); ++ch) {
-                if(info.bads.contains(info.chs[ch].ch_name))
+            for (int ch = 0; ch < info.chs.size() && ch < evoked.data.rows(); ++ch) {
+                if (info.bads.contains(info.chs[ch].ch_name))
                     continue;
                 double maxVal = evoked.data.row(ch).cwiseAbs().maxCoeff();
-                if(info.chs[ch].kind == FIFFV_MEG_CH) {
-                    if(info.chs[ch].unit == FIFF_UNIT_T_M)
+                if (info.chs[ch].kind == FIFFV_MEG_CH) {
+                    if (info.chs[ch].unit == FIFF_UNIT_T_M)
                         maxGrad = qMax(maxGrad, maxVal);
                     else
                         maxMag = qMax(maxMag, maxVal);
-                } else if(info.chs[ch].kind == FIFFV_EEG_CH) {
+                } else if (info.chs[ch].kind == FIFFV_EEG_CH) {
                     maxEEG = qMax(maxEEG, maxVal);
                 }
             }
         }
 
         // Set scale to ~1.4× the max to fill ~70% of item height
-        QMap<qint32,float> autoScale;
+        QMap<qint32, float> autoScale;
         autoScale[FIFF_UNIT_T_M] = maxGrad > 0 ? static_cast<float>(maxGrad * 1.4) : 1e-10f;
-        autoScale[FIFF_UNIT_T]   = maxMag  > 0 ? static_cast<float>(maxMag  * 1.4) : 1e-11f;
-        autoScale[FIFFV_EEG_CH]  = maxEEG  > 0 ? static_cast<float>(maxEEG  * 1.4) : 1e-4f;
+        autoScale[FIFF_UNIT_T] = maxMag > 0 ? static_cast<float>(maxMag * 1.4) : 1e-11f;
+        autoScale[FIFFV_EEG_CH] = maxEEG > 0 ? static_cast<float>(maxEEG * 1.4) : 1e-4f;
         m_pAverageScene->setScaleMap(autoScale);
 
         // Also update butterfly scene (STRING keys)
-        QMap<QString,double> bfAutoScale;
+        QMap<QString, double> bfAutoScale;
         bfAutoScale["MEG_grad"] = autoScale[FIFF_UNIT_T_M];
-        bfAutoScale["MEG_mag"]  = autoScale[FIFF_UNIT_T];
-        bfAutoScale["MEG_EEG"]  = autoScale[FIFFV_EEG_CH];
+        bfAutoScale["MEG_mag"] = autoScale[FIFF_UNIT_T];
+        bfAutoScale["MEG_EEG"] = autoScale[FIFFV_EEG_CH];
         m_pButterflyScene->setScaleMap(bfAutoScale);
 
         // Update spinboxes to reflect auto-scaled values
-        if(m_pSpinGrad) m_pSpinGrad->setValue(autoScale[FIFF_UNIT_T_M] / 1e-10);
-        if(m_pSpinMag)  m_pSpinMag->setValue(autoScale[FIFF_UNIT_T] / 1e-11);
-        if(m_pSpinEEG)  m_pSpinEEG->setValue(autoScale[FIFFV_EEG_CH] / 1e-4);
+        if (m_pSpinGrad)
+            m_pSpinGrad->setValue(autoScale[FIFF_UNIT_T_M] / 1e-10);
+        if (m_pSpinMag)
+            m_pSpinMag->setValue(autoScale[FIFF_UNIT_T] / 1e-11);
+        if (m_pSpinEEG)
+            m_pSpinEEG->setValue(autoScale[FIFFV_EEG_CH] / 1e-4);
 
         m_bAutoScaled = true;
     }
 
     m_pAverageScene->update();
 
-    if(!m_pAverageScene->items().isEmpty()) {
+    if (!m_pAverageScene->items().isEmpty()) {
         ui->m_graphicsView_layout->fitInView(m_pAverageScene->itemsBoundingRect(), Qt::KeepAspectRatio);
     }
 
@@ -786,22 +794,22 @@ void AverageWindow::refreshPlots()
 
     double bfMaxGrad = 0, bfMaxMag = 0, bfMaxEEG = 0;
 
-    for(int i = 0; i < selectedRows.size(); ++i) {
+    for (int i = 0; i < selectedRows.size(); ++i) {
         QModelIndex index = selectedRows.at(i);
         QString setName = m_pAverageModel->data(m_pAverageModel->index(index.row(), 0), Qt::DisplayRole).toString();
         const FIFFLIB::FiffEvoked* sourceEvoked = m_pAverageModel->getEvoked(index.row());
 
-        if(!sourceEvoked) {
+        if (!sourceEvoked) {
             continue;
         }
 
         fiff_int_t setUnit, setKind;
-        if(ui->m_comboBox_channelKind->currentText() == "MEG_grad")
+        if (ui->m_comboBox_channelKind->currentText() == "MEG_grad")
             setUnit = FIFF_UNIT_T_M;
         else
             setUnit = FIFF_UNIT_T;
 
-        if(ui->m_comboBox_channelKind->currentText() == "EEG")
+        if (ui->m_comboBox_channelKind->currentText() == "EEG")
             setKind = FIFFV_EEG_CH;
         else
             setKind = FIFFV_MEG_CH;
@@ -814,29 +822,29 @@ void AverageWindow::refreshPlots()
                                                                  m_whiteningSettings.enableButterfly,
                                                                  &whiteningApplied);
 
-        if(displayEvoked.data.rows() == 0 || displayEvoked.data.cols() == 0) {
+        if (displayEvoked.data.rows() == 0 || displayEvoked.data.cols() == 0) {
             continue;
         }
 
         // Collect max amplitudes for butterfly auto-scale
-        if(!m_bButterflyAutoScaled) {
+        if (!m_bButterflyAutoScaled) {
             const auto& info = displayEvoked.info;
-            for(int ch = 0; ch < info.chs.size() && ch < displayEvoked.data.rows(); ++ch) {
-                if(info.bads.contains(info.chs[ch].ch_name))
+            for (int ch = 0; ch < info.chs.size() && ch < displayEvoked.data.rows(); ++ch) {
+                if (info.bads.contains(info.chs[ch].ch_name))
                     continue;
                 double maxVal = displayEvoked.data.row(ch).cwiseAbs().maxCoeff();
-                if(info.chs[ch].kind == FIFFV_MEG_CH) {
-                    if(info.chs[ch].unit == FIFF_UNIT_T_M)
+                if (info.chs[ch].kind == FIFFV_MEG_CH) {
+                    if (info.chs[ch].unit == FIFF_UNIT_T_M)
                         bfMaxGrad = qMax(bfMaxGrad, maxVal);
                     else
                         bfMaxMag = qMax(bfMaxMag, maxVal);
-                } else if(info.chs[ch].kind == FIFFV_EEG_CH) {
+                } else if (info.chs[ch].kind == FIFFV_EEG_CH) {
                     bfMaxEEG = qMax(bfMaxEEG, maxVal);
                 }
             }
         }
 
-        if(whiteningApplied) {
+        if (whiteningApplied) {
             setName.append(" [whitened]");
         }
 
@@ -852,19 +860,19 @@ void AverageWindow::refreshPlots()
     }
 
     // Apply butterfly-specific auto-scale from the (possibly whitened) display data
-    if(!m_bButterflyAutoScaled && (bfMaxGrad > 0 || bfMaxMag > 0 || bfMaxEEG > 0)) {
-        QMap<QString,double> bfAutoScale;
+    if (!m_bButterflyAutoScaled && (bfMaxGrad > 0 || bfMaxMag > 0 || bfMaxEEG > 0)) {
+        QMap<QString, double> bfAutoScale;
         bfAutoScale["MEG_grad"] = bfMaxGrad > 0 ? bfMaxGrad * 1.4 : 4e-11;
-        bfAutoScale["MEG_mag"]  = bfMaxMag  > 0 ? bfMaxMag  * 1.4 : 1.2e-12;
-        bfAutoScale["MEG_EEG"]  = bfMaxEEG  > 0 ? bfMaxEEG  * 1.4 : 30e-6;
+        bfAutoScale["MEG_mag"] = bfMaxMag > 0 ? bfMaxMag * 1.4 : 1.2e-12;
+        bfAutoScale["MEG_EEG"] = bfMaxEEG > 0 ? bfMaxEEG * 1.4 : 30e-6;
         m_pButterflyScene->setScaleMap(bfAutoScale);
         m_bButterflyAutoScaled = true;
-    } else if(m_pSpinGrad && m_pSpinMag && m_pSpinEEG) {
+    } else if (m_pSpinGrad && m_pSpinMag && m_pSpinEEG) {
         // Re-apply current layout scale to newly created butterfly items
-        QMap<QString,double> bfScale;
+        QMap<QString, double> bfScale;
         bfScale["MEG_grad"] = m_pSpinGrad->value() * 1e-10;
-        bfScale["MEG_mag"]  = m_pSpinMag->value()  * 1e-11;
-        bfScale["MEG_EEG"]  = m_pSpinEEG->value()  * 1e-4;
+        bfScale["MEG_mag"] = m_pSpinMag->value() * 1e-11;
+        bfScale["MEG_EEG"] = m_pSpinEEG->value() * 1e-4;
         m_pButterflyScene->setScaleMap(bfScale);
     }
 
@@ -879,7 +887,7 @@ void AverageWindow::refreshPlots()
 
 void AverageWindow::selectLoadedSets()
 {
-    if(!ui->m_tableView_loadedSets->selectionModel() || m_pAverageModel->rowCount() <= 0) {
+    if (!ui->m_tableView_loadedSets->selectionModel() || m_pAverageModel->rowCount() <= 0) {
         return;
     }
 
@@ -900,12 +908,12 @@ void AverageWindow::selectLoadedSets()
 bool AverageWindow::populateLayoutFromEvoked(const QModelIndexList& selectedRows)
 {
     const FIFFLIB::FiffEvoked* firstEvoked = nullptr;
-    for(int i = 0; i < selectedRows.size(); ++i) {
+    for (int i = 0; i < selectedRows.size(); ++i) {
         firstEvoked = m_pAverageModel->getEvoked(selectedRows.at(i).row());
-        if(firstEvoked && !firstEvoked->isEmpty())
+        if (firstEvoked && !firstEvoked->isEmpty())
             break;
     }
-    if(!firstEvoked)
+    if (!firstEvoked)
         return false;
 
     // Determine which channel type to show based on the layout combo box
@@ -914,28 +922,28 @@ bool AverageWindow::populateLayoutFromEvoked(const QModelIndexList& selectedRows
 
     fiff_int_t filterKind = FIFFV_MEG_CH;
     fiff_int_t filterUnit = FIFF_UNIT_T_M; // gradiometers by default
-    if(selectionText == QLatin1String("MEG_mag")) {
+    if (selectionText == QLatin1String("MEG_mag")) {
         filterKind = FIFFV_MEG_CH;
         filterUnit = FIFF_UNIT_T;
-    } else if(selectionText == QLatin1String("EEG")) {
+    } else if (selectionText == QLatin1String("EEG")) {
         filterKind = FIFFV_EEG_CH;
         filterUnit = 0; // not used for EEG
     }
 
     SelectionItem selItem;
     const FIFFLIB::FiffInfo& info = firstEvoked->info;
-    for(int ch = 0; ch < info.chs.size(); ++ch) {
+    for (int ch = 0; ch < info.chs.size(); ++ch) {
         const FIFFLIB::FiffChInfo& chInfo = info.chs[ch];
 
-        if(!showAll) {
-            if(chInfo.kind != filterKind)
+        if (!showAll) {
+            if (chInfo.kind != filterKind)
                 continue;
             // For MEG, also filter by unit (magnetometer vs gradiometer)
-            if(filterKind == FIFFV_MEG_CH && chInfo.unit != filterUnit)
+            if (filterKind == FIFFV_MEG_CH && chInfo.unit != filterUnit)
                 continue;
         } else {
             // In "All" mode, accept MEG and EEG data channels
-            if(chInfo.kind != FIFFV_MEG_CH && chInfo.kind != FIFFV_EEG_CH)
+            if (chInfo.kind != FIFFV_MEG_CH && chInfo.kind != FIFFV_EEG_CH)
                 continue;
         }
 
@@ -947,39 +955,45 @@ bool AverageWindow::populateLayoutFromEvoked(const QModelIndexList& selectedRows
         selItem.m_qpChannelPosition.append(QPointF(chInfo.chpos.r0(0), chInfo.chpos.r0(1)));
     }
 
-    if(selItem.m_qpChannelPosition.isEmpty())
+    if (selItem.m_qpChannelPosition.isEmpty())
         return false;
 
     // ── Separate co-located channels (e.g. planar grad pairs, or
     //    mag+grad triplets in "All" mode) by applying small offsets ──
     // Group channels that share the same position (within 1mm tolerance)
     // The offset is applied AFTER normalization so it works in item-grid units.
-    const double posTol = 1e-3;  // 1mm in metres
-    struct ColocGroup { QVector<int> indices; };
+    const double posTol = 1e-3; // 1mm in metres
+    struct ColocGroup
+    {
+        QVector<int> indices;
+    };
     QVector<ColocGroup> colocGroups;
     QVector<bool> handled(selItem.m_qpChannelPosition.size(), false);
-    for(int i = 0; i < selItem.m_qpChannelPosition.size(); ++i) {
-        if(handled[i]) continue;
+    for (int i = 0; i < selItem.m_qpChannelPosition.size(); ++i) {
+        if (handled[i])
+            continue;
 
         ColocGroup group;
         group.indices.append(i);
-        for(int j = i + 1; j < selItem.m_qpChannelPosition.size(); ++j) {
-            if(handled[j]) continue;
+        for (int j = i + 1; j < selItem.m_qpChannelPosition.size(); ++j) {
+            if (handled[j])
+                continue;
             double dx = selItem.m_qpChannelPosition[j].x() - selItem.m_qpChannelPosition[i].x();
             double dy = selItem.m_qpChannelPosition[j].y() - selItem.m_qpChannelPosition[i].y();
-            if(std::sqrt(dx*dx + dy*dy) < posTol) {
+            if (std::sqrt(dx * dx + dy * dy) < posTol) {
                 group.indices.append(j);
                 handled[j] = true;
             }
         }
         handled[i] = true;
 
-        if(group.indices.size() > 1) {
+        if (group.indices.size() > 1) {
             // Sort within group: magnetometer first, then grads by name
             std::sort(group.indices.begin(), group.indices.end(), [&](int a, int b) {
                 int unitA = selItem.m_iChannelUnit[a];
                 int unitB = selItem.m_iChannelUnit[b];
-                if(unitA != unitB) return unitA < unitB;
+                if (unitA != unitB)
+                    return unitA < unitB;
                 return selItem.m_sChannelName[a] < selItem.m_sChannelName[b];
             });
             colocGroups.append(group);
@@ -991,23 +1005,27 @@ bool AverageWindow::populateLayoutFromEvoked(const QModelIndexList& selectedRows
     // metres (range ~±0.12 for MEG), giving scene coords far smaller
     // than the 120-pixel item width.
     double xMin = 1e10, xMax = -1e10, yMin = 1e10, yMax = -1e10;
-    for(const auto& p : selItem.m_qpChannelPosition) {
-        if(p.x() < xMin) xMin = p.x();
-        if(p.x() > xMax) xMax = p.x();
-        if(p.y() < yMin) yMin = p.y();
-        if(p.y() > yMax) yMax = p.y();
+    for (const auto& p : selItem.m_qpChannelPosition) {
+        if (p.x() < xMin)
+            xMin = p.x();
+        if (p.x() > xMax)
+            xMax = p.x();
+        if (p.y() < yMin)
+            yMin = p.y();
+        if (p.y() > yMax)
+            yMax = p.y();
     }
     double xRange = xMax - xMin;
     double yRange = yMax - yMin;
     double maxRange = qMax(xRange, yRange);
-    if(maxRange > 1e-10) {
+    if (maxRange > 1e-10) {
         double nSide = std::ceil(std::sqrt(
             static_cast<double>(selItem.m_qpChannelPosition.size())));
         double targetRange = nSide * 1.5;
         double scale = targetRange / maxRange;
         double xCenter = (xMin + xMax) / 2.0;
         double yCenter = (yMin + yMax) / 2.0;
-        for(int p = 0; p < selItem.m_qpChannelPosition.size(); ++p) {
+        for (int p = 0; p < selItem.m_qpChannelPosition.size(); ++p) {
             QPointF& pt = selItem.m_qpChannelPosition[p];
             pt = QPointF((pt.x() - xCenter) * scale,
                          (pt.y() - yCenter) * scale);
@@ -1016,19 +1034,19 @@ bool AverageWindow::populateLayoutFromEvoked(const QModelIndexList& selectedRows
 
     // Apply co-location offsets in normalized coordinates
     // Distribute co-located channels on a small circle around their center
-    for(const auto& group : colocGroups) {
-        const double radius = 0.35;  // ~56px in scene, enough to separate 120px items
+    for (const auto& group : colocGroups) {
+        const double radius = 0.35; // ~56px in scene, enough to separate 120px items
         int n = group.indices.size();
         // Compute group center
         double cx = 0, cy = 0;
-        for(int k = 0; k < n; ++k) {
+        for (int k = 0; k < n; ++k) {
             cx += selItem.m_qpChannelPosition[group.indices[k]].x();
             cy += selItem.m_qpChannelPosition[group.indices[k]].y();
         }
         cx /= n;
         cy /= n;
-        for(int k = 0; k < n; ++k) {
-            double angle = 2.0 * M_PI * k / n - M_PI / 2.0;  // Start from top
+        for (int k = 0; k < n; ++k) {
+            double angle = 2.0 * M_PI * k / n - M_PI / 2.0; // Start from top
             selItem.m_qpChannelPosition[group.indices[k]] =
                 QPointF(cx + radius * std::cos(angle),
                         cy + radius * std::sin(angle));
@@ -1052,11 +1070,9 @@ void AverageWindow::exportAverageLayoutPlot()
                                                     QString("%1/%2_%3_%4_AveragePlot").arg(QStandardPaths::writableLocation(QStandardPaths::DesktopLocation)).arg(date.currentDate().year()).arg(date.currentDate().month()).arg(date.currentDate().day()),
                                                     tr("Vector graphic(*.svg);;Images (*.png)"));
 
-    if(!fileName.isEmpty())
-    {
+    if (!fileName.isEmpty()) {
         // Generate screenshot
-        if(fileName.contains(".svg"))
-        {
+        if (fileName.contains(".svg")) {
             QSvgGenerator svgGen;
 
             svgGen.setFileName(fileName);
@@ -1068,11 +1084,10 @@ void AverageWindow::exportAverageLayoutPlot()
             m_pAverageScene->render(&painter);
         }
 
-        if(fileName.contains(".png"))
-        {
-            m_pAverageScene->setSceneRect(m_pAverageScene->itemsBoundingRect());                  // Re-shrink the scene to it's bounding contents
-            QImage image(m_pAverageScene->sceneRect().size().toSize(), QImage::Format_ARGB32);       // Create the image with the exact size of the shrunk scene
-            image.fill(Qt::transparent);                                                                // Start all pixels transparent
+        if (fileName.contains(".png")) {
+            m_pAverageScene->setSceneRect(m_pAverageScene->itemsBoundingRect());               // Re-shrink the scene to it's bounding contents
+            QImage image(m_pAverageScene->sceneRect().size().toSize(), QImage::Format_ARGB32); // Create the image with the exact size of the shrunk scene
+            image.fill(Qt::transparent);                                                       // Start all pixels transparent
 
             QPainter painter(&image);
             m_pAverageScene->render(&painter);
@@ -1093,11 +1108,9 @@ void AverageWindow::exportAverageButterflyPlot()
                                                     QString("%1/%2_%3_%4_ButterflyPlot").arg(QStandardPaths::writableLocation(QStandardPaths::DesktopLocation)).arg(date.currentDate().year()).arg(date.currentDate().month()).arg(date.currentDate().day()),
                                                     tr("Vector graphic(*.svg);;Images (*.png)"));
 
-    if(!fileName.isEmpty())
-    {
+    if (!fileName.isEmpty()) {
         // Generate screenshot
-        if(fileName.contains(".svg"))
-        {
+        if (fileName.contains(".svg")) {
             QSvgGenerator svgGen;
 
             svgGen.setFileName(fileName);
@@ -1109,11 +1122,10 @@ void AverageWindow::exportAverageButterflyPlot()
             m_pButterflyScene->render(&painter);
         }
 
-        if(fileName.contains(".png"))
-        {
-            m_pButterflyScene->setSceneRect(m_pButterflyScene->itemsBoundingRect());                  // Re-shrink the scene to it's bounding contents
-            QImage image(m_pButterflyScene->sceneRect().size().toSize(), QImage::Format_ARGB32);       // Create the image with the exact size of the shrunk scene
-            image.fill(Qt::transparent);                                                                // Start all pixels transparent
+        if (fileName.contains(".png")) {
+            m_pButterflyScene->setSceneRect(m_pButterflyScene->itemsBoundingRect());             // Re-shrink the scene to it's bounding contents
+            QImage image(m_pButterflyScene->sceneRect().size().toSize(), QImage::Format_ARGB32); // Create the image with the exact size of the shrunk scene
+            image.fill(Qt::transparent);                                                         // Start all pixels transparent
 
             QPainter painter(&image);
             m_pButterflyScene->render(&painter);
@@ -1125,11 +1137,11 @@ void AverageWindow::exportAverageButterflyPlot()
 
 //*************************************************************************************************************
 
-void AverageWindow::resizeEvent(QResizeEvent *event)
+void AverageWindow::resizeEvent(QResizeEvent* event)
 {
     Q_UNUSED(event);
 
-    if(m_pAverageScene && !m_pAverageScene->items().isEmpty()) {
+    if (m_pAverageScene && !m_pAverageScene->items().isEmpty()) {
         ui->m_graphicsView_layout->fitInView(m_pAverageScene->itemsBoundingRect(), Qt::KeepAspectRatio);
     }
     updateButterflySize();
@@ -1140,16 +1152,16 @@ void AverageWindow::resizeEvent(QResizeEvent *event)
 
 void AverageWindow::updateButterflySize()
 {
-    if(!m_pButterflyScene || m_pButterflyScene->items().isEmpty())
+    if (!m_pButterflyScene || m_pButterflyScene->items().isEmpty())
         return;
 
     // Calculate plot dimensions to fill the viewport exactly
     QSize vp = ui->m_graphicsView_butterflyPlot->viewport()->size();
-    int plotW = vp.width()  - ButterflySceneItem::kMarginLeft - ButterflySceneItem::kMarginRight;
-    int plotH = vp.height() - ButterflySceneItem::kMarginTop  - ButterflySceneItem::kMarginBottom;
+    int plotW = vp.width() - ButterflySceneItem::kMarginLeft - ButterflySceneItem::kMarginRight;
+    int plotH = vp.height() - ButterflySceneItem::kMarginTop - ButterflySceneItem::kMarginBottom;
 
-    for(auto* gi : m_pButterflyScene->items()) {
-        if(auto* bsi = dynamic_cast<ButterflySceneItem*>(gi))
+    for (auto* gi : m_pButterflyScene->items()) {
+        if (auto* bsi = dynamic_cast<ButterflySceneItem*>(gi))
             bsi->setPlotSize(plotW, plotH);
     }
 

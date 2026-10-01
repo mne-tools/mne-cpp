@@ -38,7 +38,8 @@
 // DEFINE NAMESPACE MRILIB
 //=============================================================================================================
 
-namespace MRILIB {
+namespace MRILIB
+{
 
 //=============================================================================================================
 /**
@@ -47,7 +48,7 @@ namespace MRILIB {
  */
 
 /** Current MGH file format version. */
-constexpr int MRI_MGH_VERSION   = 1;
+constexpr int MRI_MGH_VERSION = 1;
 
 /** @} */
 
@@ -65,13 +66,13 @@ constexpr int MRI_MGH_VERSION   = 1;
  * @{
  */
 
-constexpr int MRI_UCHAR   = 0;     /**< Unsigned char (8-bit). */
-constexpr int MRI_INT      = 1;     /**< Signed 32-bit integer. */
-constexpr int MRI_LONG     = 2;     /**< Long integer (unused in practice). */
-constexpr int MRI_FLOAT    = 3;     /**< 32-bit float. */
-constexpr int MRI_SHORT    = 4;     /**< Signed 16-bit short. */
-constexpr int MRI_BITMAP   = 5;     /**< Bitmap (unused in practice). */
-constexpr int MRI_TENSOR   = 6;     /**< Tensor (unused in practice). */
+constexpr int MRI_UCHAR = 0;  /**< Unsigned char (8-bit). */
+constexpr int MRI_INT = 1;    /**< Signed 32-bit integer. */
+constexpr int MRI_LONG = 2;   /**< Long integer (unused in practice). */
+constexpr int MRI_FLOAT = 3;  /**< 32-bit float. */
+constexpr int MRI_SHORT = 4;  /**< Signed 16-bit short. */
+constexpr int MRI_BITMAP = 5; /**< Bitmap (unused in practice). */
+constexpr int MRI_TENSOR = 6; /**< Tensor (unused in practice). */
 
 /** @} */
 
@@ -81,8 +82,8 @@ constexpr int MRI_TENSOR   = 6;     /**< Tensor (unused in practice). */
  * @{
  */
 
-constexpr int MRI_ALL_FRAMES   = -1;    /**< Load all frames. */
-constexpr int MRI_NO_FRAMES    = -2;    /**< Do not load data at all. */
+constexpr int MRI_ALL_FRAMES = -1; /**< Load all frames. */
+constexpr int MRI_NO_FRAMES = -2;  /**< Do not load data at all. */
 
 /** @} */
 
@@ -100,7 +101,7 @@ constexpr int MRI_NO_FRAMES    = -2;    /**< Do not load data at all. */
 constexpr int MRI_MGH_DATA_OFFSET = 284;
 
 /** Size of the fixed portion of the header (before RAS info). */
-constexpr int MRI_MGH_HEADER_FIXED_SIZE = 30;  // 7*int(4) + 1*short(2)
+constexpr int MRI_MGH_HEADER_FIXED_SIZE = 30; // 7*int(4) + 1*short(2)
 
 /** @} */
 
@@ -114,9 +115,9 @@ constexpr int MRI_MGH_HEADER_FIXED_SIZE = 30;  // 7*int(4) + 1*short(2)
  * @{
  */
 
-constexpr int MGH_TAG_OLD_SURF_GEOM     = 20;   /**< Old surface geometry tag. */
-constexpr int MGH_TAG_OLD_MGH_XFORM     = 30;   /**< Old MGH transform tag. */
-constexpr int MGH_TAG_MGH_XFORM         = 31;   /**< MGH Talairach transform tag (contains path to .xfm file). */
+constexpr int MGH_TAG_OLD_SURF_GEOM = 20; /**< Old surface geometry tag. */
+constexpr int MGH_TAG_OLD_MGH_XFORM = 30; /**< Old MGH transform tag. */
+constexpr int MGH_TAG_MGH_XFORM = 31;     /**< MGH Talairach transform tag (contains path to .xfm file). */
 
 /** @} */
 
@@ -130,10 +131,10 @@ constexpr int MGH_TAG_MGH_XFORM         = 31;   /**< MGH Talairach transform tag
  * @{
  */
 
-constexpr int COR_NSLICE       = 256;           /**< Number of COR slices. */
-constexpr int COR_WIDTH        = 256;           /**< Width of each COR slice in pixels. */
-constexpr int COR_HEIGHT       = 256;           /**< Height of each COR slice in pixels. */
-constexpr float COR_PIXEL_SIZE = 1e-3f;         /**< Pixel size for COR slices (1mm in meters). */
+constexpr int COR_NSLICE = 256;         /**< Number of COR slices. */
+constexpr int COR_WIDTH = 256;          /**< Width of each COR slice in pixels. */
+constexpr int COR_HEIGHT = 256;         /**< Height of each COR slice in pixels. */
+constexpr float COR_PIXEL_SIZE = 1e-3f; /**< Pixel size for COR slices (1mm in meters). */
 
 /** @} */
 

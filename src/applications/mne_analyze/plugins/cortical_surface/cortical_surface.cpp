@@ -104,18 +104,25 @@ using namespace MNELIB;
 // Inner widget: TimeCoursePlotter
 //=============================================================================================================
 
-namespace CORTICALSURFACEPLUGIN {
+namespace CORTICALSURFACEPLUGIN
+{
 
 class TimeCoursePlotter : public QWidget
 {
 public:
-    explicit TimeCoursePlotter(QWidget* parent = nullptr) : QWidget(parent)
+    explicit TimeCoursePlotter(QWidget* parent = nullptr)
+    : QWidget(parent)
     {
         setMinimumHeight(140);
         setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     }
 
-    struct Series { QString name; QColor color; QVector<double> data; };
+    struct Series
+    {
+        QString name;
+        QColor color;
+        QVector<double> data;
+    };
 
     void setSeries(const QVector<Series>& series, int currentSample)
     {
@@ -152,7 +159,7 @@ protected:
         }
 
         int nSamples = 0;
-        double dMin =  std::numeric_limits<double>::infinity();
+        double dMin = std::numeric_limits<double>::infinity();
         double dMax = -std::numeric_limits<double>::infinity();
         for (const Series& s : m_series) {
             nSamples = std::max(nSamples, static_cast<int>(s.data.size()));
@@ -199,7 +206,7 @@ protected:
 
 private:
     QVector<Series> m_series;
-    int             m_currentSample = -1;
+    int m_currentSample = -1;
 };
 
 } // namespace CORTICALSURFACEPLUGIN
@@ -207,7 +214,7 @@ private:
 //=============================================================================================================
 
 CorticalSurface::CorticalSurface()
-    : m_pScene(new MultimodalScene())
+: m_pScene(new MultimodalScene())
 {
 }
 
@@ -329,9 +336,9 @@ void CorticalSurface::buildControlDock()
     auto* form = new QFormLayout(container);
 
     m_pHemiCombo = new QComboBox(container);
-    m_pHemiCombo->addItem(QStringLiteral("Left only"),  static_cast<int>(HemisphereChoice::LeftOnly));
+    m_pHemiCombo->addItem(QStringLiteral("Left only"), static_cast<int>(HemisphereChoice::LeftOnly));
     m_pHemiCombo->addItem(QStringLiteral("Right only"), static_cast<int>(HemisphereChoice::RightOnly));
-    m_pHemiCombo->addItem(QStringLiteral("Both"),       static_cast<int>(HemisphereChoice::Both));
+    m_pHemiCombo->addItem(QStringLiteral("Both"), static_cast<int>(HemisphereChoice::Both));
     m_pHemiCombo->setCurrentIndex(2);
     connect(m_pHemiCombo.data(), QOverload<int>::of(&QComboBox::currentIndexChanged),
             this, &CorticalSurface::onHemisphereChoiceChanged);
@@ -339,8 +346,8 @@ void CorticalSurface::buildControlDock()
 
     m_pSurfaceTypeCombo = new QComboBox(container);
     m_pSurfaceTypeCombo->addItem(QStringLiteral("Inflated"), static_cast<int>(CorticalSurfaceType::Inflated));
-    m_pSurfaceTypeCombo->addItem(QStringLiteral("Pial"),     static_cast<int>(CorticalSurfaceType::Pial));
-    m_pSurfaceTypeCombo->addItem(QStringLiteral("White"),    static_cast<int>(CorticalSurfaceType::White));
+    m_pSurfaceTypeCombo->addItem(QStringLiteral("Pial"), static_cast<int>(CorticalSurfaceType::Pial));
+    m_pSurfaceTypeCombo->addItem(QStringLiteral("White"), static_cast<int>(CorticalSurfaceType::White));
     connect(m_pSurfaceTypeCombo.data(), QOverload<int>::of(&QComboBox::currentIndexChanged),
             this, &CorticalSurface::onSurfaceTypeChanged);
     form->addRow(QStringLiteral("Surface type"), m_pSurfaceTypeCombo);
@@ -351,7 +358,7 @@ void CorticalSurface::buildControlDock()
 
     // --- STC overlay controls -------------------------------------------------
     auto* overlayGroup = new QGroupBox(QStringLiteral("STC Overlay"), container);
-    auto* overlayForm  = new QFormLayout(overlayGroup);
+    auto* overlayForm = new QFormLayout(overlayGroup);
 
     auto* loadStcButton = new QPushButton(QStringLiteral("Load STC…"), overlayGroup);
     connect(loadStcButton, &QPushButton::clicked,
@@ -579,8 +586,7 @@ QString CorticalSurface::surfaceFilePath(const QString& subjectsDir,
 {
     const QString hemiPrefix = (hemiCode == 0) ? QStringLiteral("lh") : QStringLiteral("rh");
     const QString suffix = surfaceTypeSuffix(type);
-    return QDir::cleanPath(subjectsDir + QStringLiteral("/") + subjectId
-                           + QStringLiteral("/surf/") + hemiPrefix + QStringLiteral(".") + suffix);
+    return QDir::cleanPath(subjectsDir + QStringLiteral("/") + subjectId + QStringLiteral("/surf/") + hemiPrefix + QStringLiteral(".") + suffix);
 }
 
 //=============================================================================================================
@@ -588,9 +594,12 @@ QString CorticalSurface::surfaceFilePath(const QString& subjectsDir,
 QString CorticalSurface::surfaceTypeSuffix(CorticalSurfaceType type)
 {
     switch (type) {
-        case CorticalSurfaceType::Inflated: return QStringLiteral("inflated");
-        case CorticalSurfaceType::Pial:     return QStringLiteral("pial");
-        case CorticalSurfaceType::White:    return QStringLiteral("white");
+        case CorticalSurfaceType::Inflated:
+            return QStringLiteral("inflated");
+        case CorticalSurfaceType::Pial:
+            return QStringLiteral("pial");
+        case CorticalSurfaceType::White:
+            return QStringLiteral("white");
     }
     return QStringLiteral("inflated");
 }
@@ -630,7 +639,7 @@ void CorticalSurface::refreshSceneLayers()
         m_pScene->addLayer(std::move(layer));
     };
 
-    registerHemi(QStringLiteral("cortex_lh"), QStringLiteral("Cortex (left)"),  m_pSurfaceLh);
+    registerHemi(QStringLiteral("cortex_lh"), QStringLiteral("Cortex (left)"), m_pSurfaceLh);
     registerHemi(QStringLiteral("cortex_rh"), QStringLiteral("Cortex (right)"), m_pSurfaceRh);
 }
 
@@ -688,8 +697,8 @@ void CorticalSurface::setSourceEstimate(const InvSourceEstimate& stc)
         const double absMax = m_stc.data.cwiseAbs().maxCoeff();
         if (absMax > 0.0) {
             m_fThresh = static_cast<float>(absMax * 0.25);
-            m_fMid    = static_cast<float>(absMax * 0.5);
-            m_fMax    = static_cast<float>(absMax);
+            m_fMid = static_cast<float>(absMax * 0.5);
+            m_fMax = static_cast<float>(absMax);
             syncThresholdSpins();
             emit colormapThresholdsChanged(m_fThresh, m_fMid, m_fMax);
         }
@@ -787,14 +796,14 @@ void CorticalSurface::setCurrentTimeSample(int sample)
 
 void CorticalSurface::setColormapThresholds(float fthresh, float fmid, float fmax)
 {
-    float vals[3] = { fthresh, fmid, fmax };
+    float vals[3] = {fthresh, fmid, fmax};
     std::sort(std::begin(vals), std::end(vals));
     if (vals[0] == m_fThresh && vals[1] == m_fMid && vals[2] == m_fMax) {
         return;
     }
     m_fThresh = vals[0];
-    m_fMid    = vals[1];
-    m_fMax    = vals[2];
+    m_fMid = vals[1];
+    m_fMax = vals[2];
     syncThresholdSpins();
     refreshOverlayLayer();
     emit colormapThresholdsChanged(m_fThresh, m_fMid, m_fMax);
@@ -802,9 +811,18 @@ void CorticalSurface::setColormapThresholds(float fthresh, float fmid, float fma
 
 //=============================================================================================================
 
-float CorticalSurface::fThresh() const { return m_fThresh; }
-float CorticalSurface::fMid()    const { return m_fMid; }
-float CorticalSurface::fMax()    const { return m_fMax; }
+float CorticalSurface::fThresh() const
+{
+    return m_fThresh;
+}
+float CorticalSurface::fMid() const
+{
+    return m_fMid;
+}
+float CorticalSurface::fMax() const
+{
+    return m_fMax;
+}
 
 //=============================================================================================================
 
@@ -1062,11 +1080,11 @@ void CorticalSurface::buildTimeCourseDock()
 
     auto* btnRow = new QHBoxLayout();
     m_pTcRenameBtn = new QPushButton(QStringLiteral("Rename"), container);
-    m_pTcColorBtn  = new QPushButton(QStringLiteral("Colour..."), container);
+    m_pTcColorBtn = new QPushButton(QStringLiteral("Colour..."), container);
     m_pTcRemoveBtn = new QPushButton(QStringLiteral("Remove"), container);
     m_pTcExportBtn = new QPushButton(QStringLiteral("Export CSV..."), container);
     connect(m_pTcRenameBtn.data(), &QPushButton::clicked, this, &CorticalSurface::onTimeCourseRenameClicked);
-    connect(m_pTcColorBtn.data(),  &QPushButton::clicked, this, &CorticalSurface::onTimeCourseColorClicked);
+    connect(m_pTcColorBtn.data(), &QPushButton::clicked, this, &CorticalSurface::onTimeCourseColorClicked);
     connect(m_pTcRemoveBtn.data(), &QPushButton::clicked, this, &CorticalSurface::onTimeCourseRemoveClicked);
     connect(m_pTcExportBtn.data(), &QPushButton::clicked, this, &CorticalSurface::onTimeCourseExportClicked);
     btnRow->addWidget(m_pTcRenameBtn);
@@ -1099,7 +1117,7 @@ bool CorticalSurface::pickVertex(const QVector3D& worldPoint)
             const double d2 = dx * dx + dy * dy + dz * dz;
             if (d2 < bestDistSq) {
                 bestDistSq = d2;
-                bestHemi   = hemiCode;
+                bestHemi = hemiCode;
                 bestVertex = i;
             }
         }
@@ -1112,16 +1130,24 @@ bool CorticalSurface::pickVertex(const QVector3D& worldPoint)
     }
 
     static const QColor palette[] = {
-        QColor("#1f77b4"), QColor("#ff7f0e"), QColor("#2ca02c"),
-        QColor("#d62728"), QColor("#9467bd"), QColor("#8c564b"),
-        QColor("#e377c2"), QColor("#7f7f7f"), QColor("#bcbd22"),
+        QColor("#1f77b4"),
+        QColor("#ff7f0e"),
+        QColor("#2ca02c"),
+        QColor("#d62728"),
+        QColor("#9467bd"),
+        QColor("#8c564b"),
+        QColor("#e377c2"),
+        QColor("#7f7f7f"),
+        QColor("#bcbd22"),
         QColor("#17becf"),
     };
     const int idx = m_traces.size();
     const QColor color = palette[idx % (sizeof(palette) / sizeof(palette[0]))];
     const QString hemiStr = (bestHemi == 0) ? QStringLiteral("lh") : QStringLiteral("rh");
     const QString name = QStringLiteral("Pick %1 - %2 - vtx%3")
-                             .arg(idx + 1).arg(hemiStr).arg(bestVertex);
+                             .arg(idx + 1)
+                             .arg(hemiStr)
+                             .arg(bestVertex);
 
     QVector<double> trace = timeCourseAt(bestHemi, bestVertex);
     appendTrace(name, color, trace, bestHemi, bestVertex);
@@ -1131,11 +1157,11 @@ bool CorticalSurface::pickVertex(const QVector3D& worldPoint)
 
     if (m_pScene) {
         PickResult pr;
-        pr.kind        = PickKind::CorticalVertex;
-        pr.world       = worldPoint;
-        pr.objectId    = bestVertex;
-        pr.hemisphere  = bestHemi;
-        pr.sourceId    = (bestHemi == 0) ? QStringLiteral("cortex_lh") : QStringLiteral("cortex_rh");
+        pr.kind = PickKind::CorticalVertex;
+        pr.world = worldPoint;
+        pr.objectId = bestVertex;
+        pr.hemisphere = bestHemi;
+        pr.sourceId = (bestHemi == 0) ? QStringLiteral("cortex_lh") : QStringLiteral("cortex_rh");
         m_pScene->reportPick(pr);
     }
 
@@ -1166,10 +1192,10 @@ QVector<CorticalPickedVertex> CorticalSurface::pickedVertices() const
             continue;
         }
         CorticalPickedVertex p;
-        p.hemi   = t.hemi;
+        p.hemi = t.hemi;
         p.vertex = t.vertex;
-        p.name   = t.name;
-        p.color  = t.color;
+        p.name = t.name;
+        p.color = t.color;
         out.append(p);
     }
     return out;
@@ -1185,8 +1211,7 @@ int CorticalSurface::findStcRowFor(int hemi, int vertex) const
     // Convention used across mne-cpp / mne-python single-VectorXi stacking:
     //   rh vertex i is stored as (nLhVertices + i). When we do not know the
     //   lh vertex count, also accept a direct match (single-hemi STC).
-    const int target = (hemi == 1 && m_pSurfaceLh) ?
-        (vertex + static_cast<int>(m_pSurfaceLh->rr().rows())) : vertex;
+    const int target = (hemi == 1 && m_pSurfaceLh) ? (vertex + static_cast<int>(m_pSurfaceLh->rr().rows())) : vertex;
     for (int i = 0; i < m_stc.vertices.size(); ++i) {
         if (m_stc.vertices[i] == target || (hemi == 1 && m_stc.vertices[i] == vertex)) {
             return i;
@@ -1256,7 +1281,7 @@ void CorticalSurface::refreshPlotter()
     QVector<TimeCoursePlotter::Series> ss;
     ss.reserve(m_traces.size());
     for (const TraceEntry& t : m_traces) {
-        ss.append({ t.name, t.color, t.data });
+        ss.append({t.name, t.color, t.data});
     }
     m_pPlotter->setSeries(ss, m_currentSample);
 }
@@ -1309,25 +1334,31 @@ bool CorticalSurface::exportTimeCoursesCsv(const QString& path) const
 void CorticalSurface::onTimeCourseManagerSelectionChanged()
 {
     const bool any = m_pTimeCourseList && m_pTimeCourseList->currentRow() >= 0;
-    if (m_pTcRenameBtn) m_pTcRenameBtn->setEnabled(any);
-    if (m_pTcColorBtn)  m_pTcColorBtn->setEnabled(any);
-    if (m_pTcRemoveBtn) m_pTcRemoveBtn->setEnabled(any);
+    if (m_pTcRenameBtn)
+        m_pTcRenameBtn->setEnabled(any);
+    if (m_pTcColorBtn)
+        m_pTcColorBtn->setEnabled(any);
+    if (m_pTcRemoveBtn)
+        m_pTcRemoveBtn->setEnabled(any);
 }
 
 //=============================================================================================================
 
 void CorticalSurface::onTimeCourseRenameClicked()
 {
-    if (!m_pTimeCourseList) return;
+    if (!m_pTimeCourseList)
+        return;
     const int row = m_pTimeCourseList->currentRow();
-    if (row < 0 || row >= m_traces.size()) return;
+    if (row < 0 || row >= m_traces.size())
+        return;
     bool ok = false;
     const QString name = QInputDialog::getText(nullptr,
-        QStringLiteral("Rename trace"),
-        QStringLiteral("Name"),
-        QLineEdit::Normal,
-        m_traces[row].name, &ok);
-    if (!ok || name.isEmpty()) return;
+                                               QStringLiteral("Rename trace"),
+                                               QStringLiteral("Name"),
+                                               QLineEdit::Normal,
+                                               m_traces[row].name, &ok);
+    if (!ok || name.isEmpty())
+        return;
     m_traces[row].name = name;
     refreshTimeCourseManager();
     refreshPlotter();
@@ -1337,12 +1368,15 @@ void CorticalSurface::onTimeCourseRenameClicked()
 
 void CorticalSurface::onTimeCourseColorClicked()
 {
-    if (!m_pTimeCourseList) return;
+    if (!m_pTimeCourseList)
+        return;
     const int row = m_pTimeCourseList->currentRow();
-    if (row < 0 || row >= m_traces.size()) return;
+    if (row < 0 || row >= m_traces.size())
+        return;
     const QColor c = QColorDialog::getColor(m_traces[row].color, nullptr,
                                             QStringLiteral("Trace colour"));
-    if (!c.isValid()) return;
+    if (!c.isValid())
+        return;
     m_traces[row].color = c;
     refreshTimeCourseManager();
     refreshPlotter();
@@ -1352,9 +1386,11 @@ void CorticalSurface::onTimeCourseColorClicked()
 
 void CorticalSurface::onTimeCourseRemoveClicked()
 {
-    if (!m_pTimeCourseList) return;
+    if (!m_pTimeCourseList)
+        return;
     const int row = m_pTimeCourseList->currentRow();
-    if (row < 0 || row >= m_traces.size()) return;
+    if (row < 0 || row >= m_traces.size())
+        return;
     m_traces.remove(row);
     refreshTimeCourseManager();
     refreshPlotter();
@@ -1365,13 +1401,14 @@ void CorticalSurface::onTimeCourseRemoveClicked()
 void CorticalSurface::onTimeCourseExportClicked()
 {
     const QString path = QFileDialog::getSaveFileName(nullptr,
-        QStringLiteral("Export time courses"),
-        QString(),
-        QStringLiteral("CSV (*.csv)"));
-    if (path.isEmpty()) return;
+                                                      QStringLiteral("Export time courses"),
+                                                      QString(),
+                                                      QStringLiteral("CSV (*.csv)"));
+    if (path.isEmpty())
+        return;
     if (!exportTimeCoursesCsv(path)) {
         QMessageBox::warning(nullptr, getName(),
-            QStringLiteral("Failed to write CSV to '%1'.").arg(path));
+                             QStringLiteral("Failed to write CSV to '%1'.").arg(path));
     }
 }
 
@@ -1435,7 +1472,7 @@ bool CorticalSurface::runComputeSourceEstimate(const QString& fwdPath,
     InvSourceEstimate stc;
     const QString m = opts.method;
 
-    if (m == QStringLiteral("MNE")    || m == QStringLiteral("dSPM") ||
+    if (m == QStringLiteral("MNE") || m == QStringLiteral("dSPM") ||
         m == QStringLiteral("sLORETA") || m == QStringLiteral("eLORETA")) {
         MNEInverseOperator invOp = MNEInverseOperator::make_inverse_operator(
             evoked.info, fwd, noiseCov,
@@ -1506,16 +1543,16 @@ void CorticalSurface::onComputeSourceEstimateTriggered()
         return edit;
     };
 
-    QLineEdit* fwdEdit  = makePathRow(QStringLiteral("Forward (-fwd.fif)"),  QStringLiteral("FIFF (*.fif)"), &m_lastFwdDir);
-    QLineEdit* covEdit  = makePathRow(QStringLiteral("Noise cov (-cov.fif)"), QStringLiteral("FIFF (*.fif)"), &m_lastCovDir);
-    QLineEdit* aveEdit  = makePathRow(QStringLiteral("Evoked (-ave.fif)"),    QStringLiteral("FIFF (*.fif)"), &m_lastAveDir);
-    QLineEdit* onnxEdit = makePathRow(QStringLiteral("CMNE ONNX (optional)"),  QStringLiteral("ONNX (*.onnx)"), &m_lastAveDir);
+    QLineEdit* fwdEdit = makePathRow(QStringLiteral("Forward (-fwd.fif)"), QStringLiteral("FIFF (*.fif)"), &m_lastFwdDir);
+    QLineEdit* covEdit = makePathRow(QStringLiteral("Noise cov (-cov.fif)"), QStringLiteral("FIFF (*.fif)"), &m_lastCovDir);
+    QLineEdit* aveEdit = makePathRow(QStringLiteral("Evoked (-ave.fif)"), QStringLiteral("FIFF (*.fif)"), &m_lastAveDir);
+    QLineEdit* onnxEdit = makePathRow(QStringLiteral("CMNE ONNX (optional)"), QStringLiteral("ONNX (*.onnx)"), &m_lastAveDir);
 
     auto* methodCombo = new QComboBox(&dlg);
-    methodCombo->addItems({ QStringLiteral("MNE"), QStringLiteral("dSPM"),
-                            QStringLiteral("sLORETA"), QStringLiteral("eLORETA"),
-                            QStringLiteral("MxNE"), QStringLiteral("Gamma-MAP"),
-                            QStringLiteral("CMNE") });
+    methodCombo->addItems({QStringLiteral("MNE"), QStringLiteral("dSPM"),
+                           QStringLiteral("sLORETA"), QStringLiteral("eLORETA"),
+                           QStringLiteral("MxNE"), QStringLiteral("Gamma-MAP"),
+                           QStringLiteral("CMNE")});
     form->addRow(QStringLiteral("Method"), methodCombo);
 
     auto* snrSpin = new QDoubleSpinBox(&dlg);
@@ -1557,16 +1594,16 @@ void CorticalSurface::onComputeSourceEstimateTriggered()
     }
 
     ComputeSourceEstimateOptions opts;
-    opts.method   = methodCombo->currentText();
-    opts.snr      = snrSpin->value();
-    opts.alpha    = alphaSpin->value();
-    opts.loose    = looseSpin->value();
-    opts.depth    = depthSpin->value();
+    opts.method = methodCombo->currentText();
+    opts.snr = snrSpin->value();
+    opts.alpha = alphaSpin->value();
+    opts.loose = looseSpin->value();
+    opts.depth = depthSpin->value();
     opts.onnxPath = onnxEdit->text();
 
     if (!runComputeSourceEstimate(fwdEdit->text(), covEdit->text(), aveEdit->text(), opts)) {
         QMessageBox::warning(nullptr, getName(),
-            QStringLiteral("Compute Source Estimate failed (see log)."));
+                             QStringLiteral("Compute Source Estimate failed (see log)."));
     }
 }
 
@@ -1593,26 +1630,26 @@ void CorticalSurface::buildLabelsDock()
     auto* layout = new QVBoxLayout(container);
 
     auto* toolbar = new QToolBar(container);
-    m_pLoadLabelAction   = toolbar->addAction(QStringLiteral("Load .label..."));
-    m_pLoadAnnotAction   = toolbar->addAction(QStringLiteral("Load .annot..."));
-    m_pSaveLabelAction   = toolbar->addAction(QStringLiteral("Save Label..."));
+    m_pLoadLabelAction = toolbar->addAction(QStringLiteral("Load .label..."));
+    m_pLoadAnnotAction = toolbar->addAction(QStringLiteral("Load .annot..."));
+    m_pSaveLabelAction = toolbar->addAction(QStringLiteral("Save Label..."));
     m_pCreateLabelAction = toolbar->addAction(QStringLiteral("Create from Marked Vertices..."));
-    connect(m_pLoadLabelAction.data(),   &QAction::triggered, this, &CorticalSurface::onLoadLabelTriggered);
-    connect(m_pLoadAnnotAction.data(),   &QAction::triggered, this, &CorticalSurface::onLoadAnnotTriggered);
-    connect(m_pSaveLabelAction.data(),   &QAction::triggered, this, &CorticalSurface::onSaveLabelTriggered);
+    connect(m_pLoadLabelAction.data(), &QAction::triggered, this, &CorticalSurface::onLoadLabelTriggered);
+    connect(m_pLoadAnnotAction.data(), &QAction::triggered, this, &CorticalSurface::onLoadAnnotTriggered);
+    connect(m_pSaveLabelAction.data(), &QAction::triggered, this, &CorticalSurface::onSaveLabelTriggered);
     connect(m_pCreateLabelAction.data(), &QAction::triggered, this, &CorticalSurface::onCreateLabelFromMarkedTriggered);
     layout->addWidget(toolbar);
 
     m_pLabelTree = new QTreeWidget(container);
-    m_pLabelTree->setHeaderLabels({ QStringLiteral("Label"), QStringLiteral("#verts") });
+    m_pLabelTree->setHeaderLabels({QStringLiteral("Label"), QStringLiteral("#verts")});
     m_pLabelTree->setContextMenuPolicy(Qt::CustomContextMenu);
     connect(m_pLabelTree.data(), &QTreeWidget::customContextMenuRequested,
             this, &CorticalSurface::onLabelTreeContextMenu);
     connect(m_pLabelTree.data(), &QTreeWidget::itemChanged,
             this, &CorticalSurface::onLabelItemChanged);
 
-    m_pLabelRootLh = new QTreeWidgetItem(m_pLabelTree.data(), { QStringLiteral("Left hemisphere") });
-    m_pLabelRootRh = new QTreeWidgetItem(m_pLabelTree.data(), { QStringLiteral("Right hemisphere") });
+    m_pLabelRootLh = new QTreeWidgetItem(m_pLabelTree.data(), {QStringLiteral("Left hemisphere")});
+    m_pLabelRootRh = new QTreeWidgetItem(m_pLabelTree.data(), {QStringLiteral("Right hemisphere")});
     m_pLabelRootLh->setExpanded(true);
     m_pLabelRootRh->setExpanded(true);
 
@@ -1627,8 +1664,8 @@ QTreeWidgetItem* CorticalSurface::addLabelItem(const FsLabel& label)
     buildLabelsDock();
     QTreeWidgetItem* root = (label.hemi == 1) ? m_pLabelRootRh : m_pLabelRootLh;
     auto* item = new QTreeWidgetItem(root,
-        { label.name.isEmpty() ? QStringLiteral("(unnamed)") : label.name,
-          QString::number(label.vertices.size()) });
+                                     {label.name.isEmpty() ? QStringLiteral("(unnamed)") : label.name,
+                                      QString::number(label.vertices.size())});
     item->setFlags(item->flags() | Qt::ItemIsUserCheckable);
     item->setCheckState(0, Qt::Checked);
     item->setData(0, Qt::UserRole, QVariant::fromValue(label));
@@ -1659,8 +1696,9 @@ QList<FsLabel> CorticalSurface::labels() const
     if (!m_pLabelTree) {
         return out;
     }
-    for (QTreeWidgetItem* root : { m_pLabelRootLh, m_pLabelRootRh }) {
-        if (!root) continue;
+    for (QTreeWidgetItem* root : {m_pLabelRootLh, m_pLabelRootRh}) {
+        if (!root)
+            continue;
         for (int i = 0; i < root->childCount(); ++i) {
             FsLabel l = labelFromItem(root->child(i));
             if (!l.isEmpty()) {
@@ -1722,12 +1760,14 @@ bool CorticalSurface::extractLabelTimeCourse(const FsLabel& lbl, const QString& 
     if (lbl.isEmpty() || m_stc.isEmpty()) {
         return false;
     }
-    QList<FsLabel> single; single.append(lbl);
+    QList<FsLabel> single;
+    single.append(lbl);
     Eigen::MatrixXd tc = InvLabelTimeCourse::extract(m_stc, single, mode, /*bAllowEmpty=*/true);
     if (tc.rows() == 0) {
         return false;
     }
-    QVector<double> trace; trace.reserve(static_cast<int>(tc.cols()));
+    QVector<double> trace;
+    trace.reserve(static_cast<int>(tc.cols()));
     for (int i = 0; i < tc.cols(); ++i) {
         trace.append(tc(0, i));
     }
@@ -1773,9 +1813,10 @@ bool CorticalSurface::saveLabel(const FsLabel& lbl, const QString& path)
 void CorticalSurface::onLoadLabelTriggered()
 {
     const QString p = QFileDialog::getOpenFileName(nullptr,
-        QStringLiteral("Load FreeSurfer label"), m_lastLabelDir,
-        QStringLiteral("Label (*.label)"));
-    if (p.isEmpty()) return;
+                                                   QStringLiteral("Load FreeSurfer label"), m_lastLabelDir,
+                                                   QStringLiteral("Label (*.label)"));
+    if (p.isEmpty())
+        return;
     if (loadLabel(p) == 0) {
         QMessageBox::warning(nullptr, getName(), QStringLiteral("Failed to read label '%1'.").arg(p));
     }
@@ -1786,9 +1827,10 @@ void CorticalSurface::onLoadLabelTriggered()
 void CorticalSurface::onLoadAnnotTriggered()
 {
     const QString p = QFileDialog::getOpenFileName(nullptr,
-        QStringLiteral("Load FreeSurfer annotation"), m_lastLabelDir,
-        QStringLiteral("Annot (*.annot)"));
-    if (p.isEmpty()) return;
+                                                   QStringLiteral("Load FreeSurfer annotation"), m_lastLabelDir,
+                                                   QStringLiteral("Annot (*.annot)"));
+    if (p.isEmpty())
+        return;
     if (loadAnnot(p) == 0) {
         QMessageBox::warning(nullptr, getName(), QStringLiteral("Failed to read annot '%1'.").arg(p));
     }
@@ -1798,18 +1840,20 @@ void CorticalSurface::onLoadAnnotTriggered()
 
 void CorticalSurface::onSaveLabelTriggered()
 {
-    if (!m_pLabelTree) return;
+    if (!m_pLabelTree)
+        return;
     QTreeWidgetItem* item = m_pLabelTree->currentItem();
     FsLabel l = labelFromItem(item);
     if (l.isEmpty()) {
         QMessageBox::information(nullptr, getName(),
-            QStringLiteral("Select a label to save."));
+                                 QStringLiteral("Select a label to save."));
         return;
     }
     const QString p = QFileDialog::getSaveFileName(nullptr,
-        QStringLiteral("Save FreeSurfer label"), m_lastLabelDir,
-        QStringLiteral("Label (*.label)"));
-    if (p.isEmpty()) return;
+                                                   QStringLiteral("Save FreeSurfer label"), m_lastLabelDir,
+                                                   QStringLiteral("Label (*.label)"));
+    if (p.isEmpty())
+        return;
     if (!saveLabel(l, p)) {
         QMessageBox::warning(nullptr, getName(), QStringLiteral("Failed to write '%1'.").arg(p));
     }
@@ -1822,29 +1866,35 @@ void CorticalSurface::onCreateLabelFromMarkedTriggered()
     QVector<int> lhVerts;
     QVector<int> rhVerts;
     for (const TraceEntry& t : m_traces) {
-        if (!t.isPick || t.vertex < 0) continue;
-        if (t.hemi == 0) lhVerts.append(t.vertex);
-        else if (t.hemi == 1) rhVerts.append(t.vertex);
+        if (!t.isPick || t.vertex < 0)
+            continue;
+        if (t.hemi == 0)
+            lhVerts.append(t.vertex);
+        else if (t.hemi == 1)
+            rhVerts.append(t.vertex);
     }
     if (lhVerts.isEmpty() && rhVerts.isEmpty()) {
         QMessageBox::information(nullptr, getName(),
-            QStringLiteral("No picked vertices in the Time Course Manager."));
+                                 QStringLiteral("No picked vertices in the Time Course Manager."));
         return;
     }
     bool ok = false;
     const int nSteps = QInputDialog::getInt(nullptr,
-        QStringLiteral("Grow label"),
-        QStringLiteral("Surface steps:"), 3, 0, 200, 1, &ok);
-    if (!ok) return;
+                                            QStringLiteral("Grow label"),
+                                            QStringLiteral("Surface steps:"), 3, 0, 200, 1, &ok);
+    if (!ok)
+        return;
     const QString name = QInputDialog::getText(nullptr,
-        QStringLiteral("Label name"), QStringLiteral("Name"), QLineEdit::Normal,
-        QStringLiteral("custom"), &ok);
-    if (!ok || name.isEmpty()) return;
+                                               QStringLiteral("Label name"), QStringLiteral("Name"), QLineEdit::Normal,
+                                               QStringLiteral("custom"), &ok);
+    if (!ok || name.isEmpty())
+        return;
 
     auto buildSeed = [&](const QVector<int>& verts, int hemi,
                          const QSharedPointer<FsSurface>& surf) -> FsLabel {
         FsLabel seed;
-        if (verts.isEmpty() || !surf) return seed;
+        if (verts.isEmpty() || !surf)
+            return seed;
         Eigen::VectorXi v(verts.size());
         Eigen::MatrixX3f pos(verts.size(), 3);
         Eigen::VectorXd vals = Eigen::VectorXd::Ones(verts.size());
@@ -1862,23 +1912,22 @@ void CorticalSurface::onCreateLabelFromMarkedTriggered()
 
     if (!lhVerts.isEmpty() && m_pSurfaceLh) {
         FsLabel seed = buildSeed(lhVerts, 0, m_pSurfaceLh);
-        FsLabel grown = (nSteps > 0) ?
-            FsLabelUtils::growLabel(seed, *m_pSurfaceLh, nSteps) : seed;
+        FsLabel grown = (nSteps > 0) ? FsLabelUtils::growLabel(seed, *m_pSurfaceLh, nSteps) : seed;
         grown.name = name;
         addLabelItem(grown);
     }
     if (!rhVerts.isEmpty() && m_pSurfaceRh) {
         FsLabel seed = buildSeed(rhVerts, 1, m_pSurfaceRh);
-        FsLabel grown = (nSteps > 0) ?
-            FsLabelUtils::growLabel(seed, *m_pSurfaceRh, nSteps) : seed;
+        FsLabel grown = (nSteps > 0) ? FsLabelUtils::growLabel(seed, *m_pSurfaceRh, nSteps) : seed;
         grown.name = name;
         addLabelItem(grown);
     }
 
     const QString outPath = QFileDialog::getSaveFileName(nullptr,
-        QStringLiteral("Save new label"), m_lastLabelDir,
-        QStringLiteral("Label (*.label)"));
-    if (outPath.isEmpty()) return;
+                                                         QStringLiteral("Save new label"), m_lastLabelDir,
+                                                         QStringLiteral("Label (*.label)"));
+    if (outPath.isEmpty())
+        return;
     const QList<FsLabel> all = labels();
     if (!all.isEmpty()) {
         saveLabel(all.last(), outPath);
@@ -1896,22 +1945,26 @@ void CorticalSurface::onLabelItemChanged(QTreeWidgetItem* /*item*/, int /*column
 
 void CorticalSurface::onLabelTreeContextMenu(const QPoint& pos)
 {
-    if (!m_pLabelTree) return;
+    if (!m_pLabelTree)
+        return;
     QTreeWidgetItem* item = m_pLabelTree->itemAt(pos);
-    if (!item) return;
+    if (!item)
+        return;
     const FsLabel lbl = labelFromItem(item);
-    if (lbl.isEmpty()) return;
+    if (lbl.isEmpty())
+        return;
 
     QMenu menu;
     QMenu* extractMenu = menu.addMenu(QStringLiteral("Extract Time Course"));
-    const QStringList modes = { QStringLiteral("mean"), QStringLiteral("mean_flip"),
-                                QStringLiteral("pca_flip"), QStringLiteral("max"),
-                                QStringLiteral("auto") };
+    const QStringList modes = {QStringLiteral("mean"), QStringLiteral("mean_flip"),
+                               QStringLiteral("pca_flip"), QStringLiteral("max"),
+                               QStringLiteral("auto")};
     for (const QString& mode : modes) {
         QAction* a = extractMenu->addAction(mode);
         a->setData(mode);
     }
     QAction* picked = menu.exec(m_pLabelTree->viewport()->mapToGlobal(pos));
-    if (!picked) return;
+    if (!picked)
+        return;
     extractLabelTimeCourse(lbl, picked->data().toString());
 }

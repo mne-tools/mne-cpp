@@ -127,10 +127,10 @@ void TestMorletTfr::testPowerFinite()
 void TestMorletTfr::testSinePowerPeakFrequency()
 {
     // A sine at 20 Hz should produce maximum mean power at the 20 Hz row
-    const double dSFreq  = 500.0;
-    const double dFreq   = 20.0;
-    const int    nSamp   = 5000;
-    RowVectorXd  sig     = makeSine(dFreq, dSFreq, nSamp);
+    const double dSFreq = 500.0;
+    const double dFreq = 20.0;
+    const int nSamp = 5000;
+    RowVectorXd sig = makeSine(dFreq, dSFreq, nSamp);
 
     // Frequencies 5, 10, 15, 20, 25, 30, 35, 40 Hz
     RowVectorXd freqs = RowVectorXd::LinSpaced(8, 5.0, 40.0);
@@ -151,9 +151,9 @@ void TestMorletTfr::testSinePowerTemporalMean()
 {
     // For a stationary sine the mean power should not vary much over time
     const double dSFreq = 500.0;
-    const double dFreq  = 30.0;
-    const int    nSamp  = 5000;
-    RowVectorXd  sig    = makeSine(dFreq, dSFreq, nSamp);
+    const double dFreq = 30.0;
+    const int nSamp = 5000;
+    RowVectorXd sig = makeSine(dFreq, dSFreq, nSamp);
 
     RowVectorXd freqs(1);
     freqs << dFreq;
@@ -163,9 +163,9 @@ void TestMorletTfr::testSinePowerTemporalMean()
     RowVectorXd mid = r.matPower.row(0).segment(100, nSamp - 200);
     auto amp = mid.array().sqrt();
     double ampMean = amp.mean();
-    double ampStd  = std::sqrt((amp - ampMean).square().mean());
+    double ampStd = std::sqrt((amp - ampMean).square().mean());
     double cv = ampMean == 0.0 ? 0.0 : ampStd / ampMean;
-    QVERIFY(cv < 0.10);  // coefficient of variation < 10 %
+    QVERIFY(cv < 0.10); // coefficient of variation < 10 %
 }
 
 //=============================================================================================================
@@ -173,27 +173,26 @@ void TestMorletTfr::testSinePowerTemporalMean()
 void TestMorletTfr::testMoreCyclesBetterFrequencyResolution()
 {
     // Higher nCycles → sharper frequency peak
-    const double dSFreq  = 500.0;
-    const int    nSamp   = 8000;
+    const double dSFreq = 500.0;
+    const int nSamp = 8000;
     // Two close frequencies
     RowVectorXd sig(nSamp);
     for (int n = 0; n < nSamp; ++n)
-        sig[n] = std::sin(2.0 * M_PI * 20.0 * n / dSFreq)
-               + std::sin(2.0 * M_PI * 25.0 * n / dSFreq);
+        sig[n] = std::sin(2.0 * M_PI * 20.0 * n / dSFreq) + std::sin(2.0 * M_PI * 25.0 * n / dSFreq);
 
     RowVectorXd freqs = RowVectorXd::LinSpaced(20, 10.0, 40.0);
 
-    auto rFew  = MorletTfr::compute(sig, dSFreq, freqs, 3.0);
+    auto rFew = MorletTfr::compute(sig, dSFreq, freqs, 3.0);
     auto rMany = MorletTfr::compute(sig, dSFreq, freqs, 14.0);
 
     // Sharper peak → lower variance across mean-power bins (relative to total)
-    RowVectorXd powFew  = rFew.matPower.rowwise().mean().transpose();
+    RowVectorXd powFew = rFew.matPower.rowwise().mean().transpose();
     RowVectorXd powMany = rMany.matPower.rowwise().mean().transpose();
 
-    double varFew  = (powFew.array()  - powFew.mean()).square().mean();
+    double varFew = (powFew.array() - powFew.mean()).square().mean();
     double varMany = (powMany.array() - powMany.mean()).square().mean();
 
-    QVERIFY(varMany > varFew);  // more cycles → more pronounced frequency peaks
+    QVERIFY(varMany > varFew); // more cycles → more pronounced frequency peaks
 }
 
 //=============================================================================================================
@@ -203,9 +202,9 @@ void TestMorletTfr::testFewerCyclesBetterTimeResolution()
     // Fewer nCycles → shorter Gaussian envelope → power rises faster at burst onset.
     // Test: at a fixed time shortly after burst onset, the 3-cycle power (relative to
     // its own max) should be closer to maximum than the 14-cycle power.
-    const double dSFreq   = 500.0;
-    const int    nSamp    = 4000;
-    const int    onsetSmp = 1500;
+    const double dSFreq = 500.0;
+    const int nSamp = 4000;
+    const int onsetSmp = 1500;
 
     // 20 Hz burst from onsetSmp to end (long enough that both wavelets reach full power)
     RowVectorXd sig = RowVectorXd::Zero(nSamp);
@@ -217,15 +216,15 @@ void TestMorletTfr::testFewerCyclesBetterTimeResolution()
 
     // 3-cycle wavelet: sigma_t ≈ 24 ms → halfLen ≈ 48 samples at 500 Hz
     // 14-cycle wavelet: sigma_t ≈ 111 ms → halfLen ≈ 223 samples at 500 Hz
-    auto rFew  = MorletTfr::compute(sig, dSFreq, freqs, 3.0);
+    auto rFew = MorletTfr::compute(sig, dSFreq, freqs, 3.0);
     auto rMany = MorletTfr::compute(sig, dSFreq, freqs, 14.0);
 
-    const RowVectorXd& powFew  = rFew.matPower.row(0);
+    const RowVectorXd& powFew = rFew.matPower.row(0);
     const RowVectorXd& powMany = rMany.matPower.row(0);
 
     // Probe 80 samples after onset (well within the 3-cycle rise but mid-rise for 14-cycle)
     const int probeIdx = onsetSmp + 80;
-    double ratioFew  = powFew[probeIdx]  / powFew.maxCoeff();
+    double ratioFew = powFew[probeIdx] / powFew.maxCoeff();
     double ratioMany = powMany[probeIdx] / powMany.maxCoeff();
 
     // With fewer cycles the power reaches its peak faster → higher ratio at the probe point
@@ -236,10 +235,10 @@ void TestMorletTfr::testFewerCyclesBetterTimeResolution()
 
 void TestMorletTfr::testMultiChannelCount()
 {
-    const int    nCh    = 6;
-    const int    nSamp  = 2000;
-    MatrixXd     mat    = MatrixXd::Random(nCh, nSamp);
-    RowVectorXd  freqs  = RowVectorXd::LinSpaced(5, 5.0, 25.0);
+    const int nCh = 6;
+    const int nSamp = 2000;
+    MatrixXd mat = MatrixXd::Random(nCh, nSamp);
+    RowVectorXd freqs = RowVectorXd::LinSpaced(5, 5.0, 25.0);
 
     auto results = MorletTfr::computeMultiChannel(mat, 300.0, freqs);
     QCOMPARE(results.size(), nCh);
@@ -249,8 +248,8 @@ void TestMorletTfr::testMultiChannelCount()
 
 void TestMorletTfr::testMultiChannelPicks()
 {
-    const int   nCh   = 8;
-    MatrixXd    mat   = MatrixXd::Random(nCh, 2000);
+    const int nCh = 8;
+    MatrixXd mat = MatrixXd::Random(nCh, 2000);
     RowVectorXd freqs = RowVectorXd::LinSpaced(4, 4.0, 20.0);
 
     RowVectorXi picks(3);
@@ -263,9 +262,9 @@ void TestMorletTfr::testMultiChannelPicks()
 
 void TestMorletTfr::testMultiChannelMatchesSingle()
 {
-    const int   nCh   = 4;
-    const int   nSamp = 1500;
-    MatrixXd    mat   = MatrixXd::Random(nCh, nSamp);
+    const int nCh = 4;
+    const int nSamp = 1500;
+    MatrixXd mat = MatrixXd::Random(nCh, nSamp);
     RowVectorXd freqs = RowVectorXd::LinSpaced(5, 5.0, 25.0);
     const double sfreq = 300.0;
 

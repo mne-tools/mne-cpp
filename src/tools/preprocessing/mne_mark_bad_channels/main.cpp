@@ -54,7 +54,7 @@ using namespace UTILSLIB;
 
 //=============================================================================================================
 
-static QStringList readBadChannelList(const QString &filename)
+static QStringList readBadChannelList(const QString& filename)
 {
     QStringList bads;
     QFile file(filename);
@@ -73,7 +73,7 @@ static QStringList readBadChannelList(const QString &filename)
 
 //=============================================================================================================
 
-int main(int argc, char *argv[])
+int main(int argc, char* argv[])
 {
     qInstallMessageHandler(MNELogger::customLogWriter);
     QCoreApplication app(argc, argv);
@@ -115,9 +115,9 @@ int main(int argc, char *argv[])
         qWarning("Bad channel list is empty.");
     }
 
-    qInfo("Bad channels to mark (%lld):" , static_cast<long long>(bads.size()));
-    for (const QString &ch : bads) {
-        qInfo("  %s" , qPrintable(ch));
+    qInfo("Bad channels to mark (%lld):", static_cast<long long>(bads.size()));
+    for (const QString& ch : bads) {
+        qInfo("  %s", qPrintable(ch));
     }
 
     // Open the FIFF file and read raw data
@@ -135,9 +135,9 @@ int main(int argc, char *argv[])
     }
 
     // Update bad channels
-    qInfo("Previous bad channels: %lld" , static_cast<long long>(raw.info.bads.size()));
+    qInfo("Previous bad channels: %lld", static_cast<long long>(raw.info.bads.size()));
     raw.info.bads = bads;
-    qInfo("New bad channels: %lld" , static_cast<long long>(raw.info.bads.size()));
+    qInfo("New bad channels: %lld", static_cast<long long>(raw.info.bads.size()));
 
     // Read all data
     Eigen::MatrixXd data;
@@ -173,7 +173,7 @@ int main(int argc, char *argv[])
     QFile::remove(fifName);
     QFile::rename(tmpName, fifName);
 
-    qInfo("Successfully updated bad channels in %s" , qPrintable(fifName));
+    qInfo("Successfully updated bad channels in %s", qPrintable(fifName));
 
     return 0;
 }

@@ -51,16 +51,16 @@ QList<BidsElectrode> BidsElectrode::readTsv(const QString& sFilePath)
     QList<BidsElectrode> electrodes;
     electrodes.reserve(rawRows.size());
 
-    for(const auto& row : rawRows) {
+    for (const auto& row : rawRows) {
         BidsElectrode elec;
-        elec.name       = row.value(QStringLiteral("name"));
-        elec.x          = row.value(QStringLiteral("x"), NA);
-        elec.y          = row.value(QStringLiteral("y"), NA);
-        elec.z          = row.value(QStringLiteral("z"), NA);
-        elec.size       = naToEmpty(row.value(QStringLiteral("size")));
-        elec.type       = naToEmpty(row.value(QStringLiteral("type")));
-        elec.material   = naToEmpty(row.value(QStringLiteral("material")));
-        elec.impedance  = naToEmpty(row.value(QStringLiteral("impedance")));
+        elec.name = row.value(QStringLiteral("name"));
+        elec.x = row.value(QStringLiteral("x"), NA);
+        elec.y = row.value(QStringLiteral("y"), NA);
+        elec.z = row.value(QStringLiteral("z"), NA);
+        elec.size = naToEmpty(row.value(QStringLiteral("size")));
+        elec.type = naToEmpty(row.value(QStringLiteral("type")));
+        elec.material = naToEmpty(row.value(QStringLiteral("material")));
+        elec.impedance = naToEmpty(row.value(QStringLiteral("impedance")));
         electrodes.append(elec);
     }
 
@@ -86,15 +86,15 @@ bool BidsElectrode::writeTsv(const QString& sFilePath,
     QList<BidsTsvRow> rows;
     rows.reserve(electrodes.size());
 
-    for(const auto& elec : electrodes) {
+    for (const auto& elec : electrodes) {
         BidsTsvRow row;
-        row[QStringLiteral("name")]      = elec.name;
-        row[QStringLiteral("x")]         = elec.x;
-        row[QStringLiteral("y")]         = elec.y;
-        row[QStringLiteral("z")]         = elec.z;
-        row[QStringLiteral("size")]      = elec.size;
-        row[QStringLiteral("type")]      = elec.type;
-        row[QStringLiteral("material")]  = elec.material;
+        row[QStringLiteral("name")] = elec.name;
+        row[QStringLiteral("x")] = elec.x;
+        row[QStringLiteral("y")] = elec.y;
+        row[QStringLiteral("z")] = elec.z;
+        row[QStringLiteral("size")] = elec.size;
+        row[QStringLiteral("type")] = elec.type;
+        row[QStringLiteral("material")] = elec.material;
         row[QStringLiteral("impedance")] = elec.impedance;
         rows.append(row);
     }
@@ -127,17 +127,16 @@ FIFFLIB::FiffDigPointSet BidsElectrode::toFiffDigPoints(
         }
 
         FiffDigPoint point;
-        point.kind  = FIFFV_POINT_EEG;
+        point.kind = FIFFV_POINT_EEG;
         point.ident = ident++;
-        point.r[0]  = xVal;
-        point.r[1]  = yVal;
-        point.r[2]  = zVal;
+        point.r[0] = xVal;
+        point.r[1] = yVal;
+        point.r[2] = zVal;
 
         // Apply coordinate transform if provided
         if (hasTransform) {
             Eigen::Vector3f pos(point.r[0], point.r[1], point.r[2]);
-            Eigen::Vector3f transformed = (trans.trans.block<3,3>(0,0).cast<float>() * pos
-                                           + trans.trans.block<3,1>(0,3).cast<float>());
+            Eigen::Vector3f transformed = (trans.trans.block<3, 3>(0, 0).cast<float>() * pos + trans.trans.block<3, 1>(0, 3).cast<float>());
             point.r[0] = transformed(0);
             point.r[1] = transformed(1);
             point.r[2] = transformed(2);

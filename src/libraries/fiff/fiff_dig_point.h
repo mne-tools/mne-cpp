@@ -67,10 +67,10 @@ namespace FIFFLIB
 class FIFFSHARED_EXPORT FiffDigPoint
 {
 public:
-    using SPtr = QSharedPointer<FiffDigPoint>;            /**< Shared pointer type for FiffDigPoint. */
-    using ConstSPtr = QSharedPointer<const FiffDigPoint>; /**< Const shared pointer type for FiffDigPoint. */
-    using UPtr = std::unique_ptr<FiffDigPoint>;             /**< Unique pointer type for FiffDigPoint. */
-    using ConstUPtr = std::unique_ptr<const FiffDigPoint>;  /**< Const unique pointer type for FiffDigPoint. */
+    using SPtr = QSharedPointer<FiffDigPoint>;             /**< Shared pointer type for FiffDigPoint. */
+    using ConstSPtr = QSharedPointer<const FiffDigPoint>;  /**< Const shared pointer type for FiffDigPoint. */
+    using UPtr = std::unique_ptr<FiffDigPoint>;            /**< Unique pointer type for FiffDigPoint. */
+    using ConstUPtr = std::unique_ptr<const FiffDigPoint>; /**< Const unique pointer type for FiffDigPoint. */
 
     //=========================================================================================================
     /**
@@ -93,10 +93,10 @@ public:
     inline static qint32 storageSize();
 
 public:
-    fiff_int_t      kind;           /**< FIFFV_POINT_CARDINAL, FIFFV_POINT_HPI, FIFFV_POINT_EXTRA or FIFFV_POINT_EEG. */
-    fiff_int_t      ident;          /**< Number identifying this point. */
-    fiff_float_t    r[3];           /**< Point location. */
-    fiff_int_t      coord_frame;    /**< Newly added to stay consistent with fiff MATLAB implementation. */
+    fiff_int_t kind;        /**< FIFFV_POINT_CARDINAL, FIFFV_POINT_HPI, FIFFV_POINT_EXTRA or FIFFV_POINT_EEG. */
+    fiff_int_t ident;       /**< Number identifying this point. */
+    fiff_float_t r[3];      /**< Point location. */
+    fiff_int_t coord_frame; /**< Newly added to stay consistent with fiff MATLAB implementation. */
 };
 
 //=============================================================================================================
@@ -105,8 +105,7 @@ public:
 
 inline qint32 FiffDigPoint::storageSize()
 {
-    return sizeof(FiffDigPoint::kind) + sizeof(FiffDigPoint::ident)
-         + sizeof(FiffDigPoint::r);  // coord_frame is not part of on-disk format
+    return sizeof(FiffDigPoint::kind) + sizeof(FiffDigPoint::ident) + sizeof(FiffDigPoint::r); // coord_frame is not part of on-disk format
 }
 } // NAMESPACE
 

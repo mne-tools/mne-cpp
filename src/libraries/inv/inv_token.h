@@ -62,113 +62,113 @@ namespace INVLIB
 enum class InvTokenId : int32_t
 {
     // --- Special tokens ---
-    Pad              = 0,
-    Bos              = 1,       /**< Beginning of sequence. */
-    Eos              = 2,       /**< End of sequence. */
-    Sep              = 3,       /**< Separator (between modalities, optional). */
+    Pad = 0,
+    Bos = 1, /**< Beginning of sequence. */
+    Eos = 2, /**< End of sequence. */
+    Sep = 3, /**< Separator (between modalities, optional). */
 
     // --- Section markers (paired begin / end) ---
-    MetaBegin        = 10,
-    MetaEnd          = 11,
+    MetaBegin = 10,
+    MetaEnd = 11,
 
-    GridBegin        = 20,
-    GridEnd          = 21,
-    GridRow          = 22,      /**< Marks the start of one source's time-course. */
+    GridBegin = 20,
+    GridEnd = 21,
+    GridRow = 22, /**< Marks the start of one source's time-course. */
 
-    CouplingBegin    = 30,
-    CouplingEnd      = 31,
-    GroupBegin        = 32,     /**< Start of one N-tuple coupling group. */
-    GroupEnd          = 33,
+    CouplingBegin = 30,
+    CouplingEnd = 31,
+    GroupBegin = 32, /**< Start of one N-tuple coupling group. */
+    GroupEnd = 33,
 
-    FocalBegin       = 40,
-    FocalEnd         = 41,
-    DipoleBegin      = 42,     /**< Start of one focal dipole. */
-    DipoleEnd        = 43,
+    FocalBegin = 40,
+    FocalEnd = 41,
+    DipoleBegin = 42, /**< Start of one focal dipole. */
+    DipoleEnd = 43,
 
-    ConnBegin        = 50,
-    ConnEnd          = 51,
-    ConnEntryBegin   = 52,     /**< Start of one connectivity measure. */
-    ConnEntryEnd     = 53,
+    ConnBegin = 50,
+    ConnEnd = 51,
+    ConnEntryBegin = 52, /**< Start of one connectivity measure. */
+    ConnEntryEnd = 53,
 
-    PosBegin         = 60,
-    PosEnd           = 61,
+    PosBegin = 60,
+    PosEnd = 61,
 
     // --- Method labels (one-hot from InvEstimateMethod) ---
-    MethodUnknown    = 100,
-    MethodMNE        = 101,
-    MethodDSPM       = 102,
-    MethodSLORETA    = 103,
-    MethodELORETA    = 104,
-    MethodLCMV       = 105,
-    MethodDICS       = 106,
-    MethodSAM        = 107,
-    MethodMixedNorm  = 108,
-    MethodGammaMAP   = 109,
-    MethodDipoleFit  = 110,
-    MethodRapMusic   = 111,
-    MethodPwlRapMusic= 112,
+    MethodUnknown = 100,
+    MethodMNE = 101,
+    MethodDSPM = 102,
+    MethodSLORETA = 103,
+    MethodELORETA = 104,
+    MethodLCMV = 105,
+    MethodDICS = 106,
+    MethodSAM = 107,
+    MethodMixedNorm = 108,
+    MethodGammaMAP = 109,
+    MethodDipoleFit = 110,
+    MethodRapMusic = 111,
+    MethodPwlRapMusic = 112,
 
     // --- Source-space labels (one-hot from InvSourceSpaceType) ---
-    SpaceUnknown     = 150,
-    SpaceSurface     = 151,
-    SpaceVolume      = 152,
-    SpaceMixed       = 153,
-    SpaceDiscrete    = 154,
+    SpaceUnknown = 150,
+    SpaceSurface = 151,
+    SpaceVolume = 152,
+    SpaceMixed = 153,
+    SpaceDiscrete = 154,
 
     // --- Orientation labels (one-hot from InvOrientationType) ---
-    OrientUnknown    = 170,
-    OrientFixed      = 171,
-    OrientFree       = 172,
-    OrientLoose      = 173,
+    OrientUnknown = 170,
+    OrientFixed = 171,
+    OrientFree = 172,
+    OrientLoose = 173,
 
     // --- Value-carrier tokens (paired with float in InvToken::value) ---
-    Amplitude        = 200,     /**< Source amplitude at one (source, time) sample. */
-    Vertex           = 201,     /**< Vertex / grid index. */
-    TimeVal          = 202,     /**< Time in seconds. */
-    FreqVal          = 203,     /**< Frequency in Hz. */
-    PosX             = 204,     /**< 3-D position x component (m). */
-    PosY             = 205,     /**< 3-D position y component (m). */
-    PosZ             = 206,     /**< 3-D position z component (m). */
-    MomX             = 207,     /**< Dipole moment x component (Am). */
-    MomY             = 208,     /**< Dipole moment y component (Am). */
-    MomZ             = 209,     /**< Dipole moment z component (Am). */
-    Goodness         = 210,     /**< Goodness-of-fit (0..1). */
-    ChiSquared       = 211,     /**< Chi-squared fit quality. */
-    Correlation      = 212,     /**< Coupling correlation value. */
-    ConnValue        = 213,     /**< Pairwise connectivity value. */
-    GridIndex        = 214,     /**< Grid reference index inside a coupling group. */
+    Amplitude = 200,   /**< Source amplitude at one (source, time) sample. */
+    Vertex = 201,      /**< Vertex / grid index. */
+    TimeVal = 202,     /**< Time in seconds. */
+    FreqVal = 203,     /**< Frequency in Hz. */
+    PosX = 204,        /**< 3-D position x component (m). */
+    PosY = 205,        /**< 3-D position y component (m). */
+    PosZ = 206,        /**< 3-D position z component (m). */
+    MomX = 207,        /**< Dipole moment x component (Am). */
+    MomY = 208,        /**< Dipole moment y component (Am). */
+    MomZ = 209,        /**< Dipole moment z component (Am). */
+    Goodness = 210,    /**< Goodness-of-fit (0..1). */
+    ChiSquared = 211,  /**< Chi-squared fit quality. */
+    Correlation = 212, /**< Coupling correlation value. */
+    ConnValue = 213,   /**< Pairwise connectivity value. */
+    GridIndex = 214,   /**< Grid reference index inside a coupling group. */
 
     // --- Boolean tokens ---
-    ValidTrue        = 250,
-    ValidFalse       = 251,
-    DirectedTrue     = 252,
-    DirectedFalse    = 253,
+    ValidTrue = 250,
+    ValidFalse = 251,
+    DirectedTrue = 252,
+    DirectedFalse = 253,
 
     // --- Dimension tokens (carry size as int-in-float) ---
-    NSources         = 280,     /**< Number of grid sources. */
-    NTimes           = 281,     /**< Number of time samples. */
-    NGroups          = 282,     /**< Number of coupling groups. */
-    NDipoles         = 283,     /**< Number of focal dipoles. */
-    NMeasures        = 284,     /**< Number of connectivity measures. */
-    NIndices         = 285,     /**< Number of indices in a coupling group. */
-    NFreeDof         = 286,     /**< Degrees of freedom. */
-    TStep            = 287,     /**< Time step (s) — grid sampling interval. */
+    NSources = 280,  /**< Number of grid sources. */
+    NTimes = 281,    /**< Number of time samples. */
+    NGroups = 282,   /**< Number of coupling groups. */
+    NDipoles = 283,  /**< Number of focal dipoles. */
+    NMeasures = 284, /**< Number of connectivity measures. */
+    NIndices = 285,  /**< Number of indices in a coupling group. */
+    NFreeDof = 286,  /**< Degrees of freedom. */
+    TStep = 287,     /**< Time step (s) — grid sampling interval. */
 
     // --- Connectivity-measure name tokens ---
-    MeasCoh          = 300,
-    MeasImCoh        = 301,
-    MeasPlv          = 302,
-    MeasPli          = 303,
-    MeasWpli         = 304,
-    MeasGranger      = 305,
-    MeasPdc          = 306,
-    MeasDtf          = 307,
-    MeasCorrelation  = 308,
-    MeasCrossCorr    = 309,
-    MeasOther        = 310,     /**< Unrecognised metric (name not preserved in token stream). */
+    MeasCoh = 300,
+    MeasImCoh = 301,
+    MeasPlv = 302,
+    MeasPli = 303,
+    MeasWpli = 304,
+    MeasGranger = 305,
+    MeasPdc = 306,
+    MeasDtf = 307,
+    MeasCorrelation = 308,
+    MeasCrossCorr = 309,
+    MeasOther = 310, /**< Unrecognised metric (name not preserved in token stream). */
 
     // --- Quantization bin base (for fully discrete tokenisation) ---
-    QuantBinBase     = 1000     /**< Bins occupy IDs [QuantBinBase .. QuantBinBase + numBins - 1]. */
+    QuantBinBase = 1000 /**< Bins occupy IDs [QuantBinBase .. QuantBinBase + numBins - 1]. */
 };
 
 //=============================================================================================================
@@ -185,12 +185,24 @@ enum class InvTokenId : int32_t
  */
 struct InvToken
 {
-    InvTokenId id;      /**< Vocabulary token ID. */
-    float      value;   /**< Continuous value (0 for structural tokens). */
+    InvTokenId id; /**< Vocabulary token ID. */
+    float value;   /**< Continuous value (0 for structural tokens). */
 
-    InvToken() : id(InvTokenId::Pad), value(0.0f) {}
-    explicit InvToken(InvTokenId _id) : id(_id), value(0.0f) {}
-    InvToken(InvTokenId _id, float _val) : id(_id), value(_val) {}
+    InvToken()
+    : id(InvTokenId::Pad)
+    , value(0.0f)
+    {
+    }
+    explicit InvToken(InvTokenId _id)
+    : id(_id)
+    , value(0.0f)
+    {
+    }
+    InvToken(InvTokenId _id, float _val)
+    : id(_id)
+    , value(_val)
+    {
+    }
 };
 
 //=============================================================================================================
@@ -204,13 +216,13 @@ struct InvToken
  */
 struct InvTokenizeOptions
 {
-    bool includeGridData     = true;   /**< Emit grid amplitude data. */
-    bool includeCouplings    = true;   /**< Emit source coupling annotations. */
-    bool includeFocalDipoles = true;   /**< Emit focal dipole layer. */
-    bool includeConnectivity = true;   /**< Emit connectivity matrices. */
-    bool includePositions    = true;   /**< Emit explicit 3-D positions. */
-    int  maxSources          = -1;     /**< Sub-sample grid sources (-1 = all). */
-    int  maxTimePoints       = -1;     /**< Sub-sample time points  (-1 = all). */
+    bool includeGridData = true;     /**< Emit grid amplitude data. */
+    bool includeCouplings = true;    /**< Emit source coupling annotations. */
+    bool includeFocalDipoles = true; /**< Emit focal dipole layer. */
+    bool includeConnectivity = true; /**< Emit connectivity matrices. */
+    bool includePositions = true;    /**< Emit explicit 3-D positions. */
+    int maxSources = -1;             /**< Sub-sample grid sources (-1 = all). */
+    int maxTimePoints = -1;          /**< Sub-sample time points  (-1 = all). */
 };
 
 //=============================================================================================================

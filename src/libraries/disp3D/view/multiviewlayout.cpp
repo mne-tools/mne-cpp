@@ -23,7 +23,7 @@
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-QRect MultiViewLayout::slotRect(int slot, int numEnabled, const QSize &outputSize) const
+QRect MultiViewLayout::slotRect(int slot, int numEnabled, const QSize& outputSize) const
 {
     if (numEnabled <= 1) {
         return QRect(0, 0, outputSize.width(), outputSize.height());
@@ -64,9 +64,9 @@ QRect MultiViewLayout::slotRect(int slot, int numEnabled, const QSize &outputSiz
                                  m_minPanePx,
                                  std::max(m_minPanePx, w - m_minPanePx));
     const int rightW = std::max(1, w - leftW);
-    const int topH  = std::clamp(static_cast<int>(std::lround(h * m_splitY)),
-                                 m_minPanePx,
-                                 std::max(m_minPanePx, h - m_minPanePx));
+    const int topH = std::clamp(static_cast<int>(std::lround(h * m_splitY)),
+                                m_minPanePx,
+                                std::max(m_minPanePx, h - m_minPanePx));
     const int bottomH = std::max(1, h - topH);
 
     const int col = slot % 2;
@@ -74,14 +74,14 @@ QRect MultiViewLayout::slotRect(int slot, int numEnabled, const QSize &outputSiz
     return QRect((col == 0) ? 0 : leftW,
                  (row == 0) ? 0 : topH,
                  (col == 0) ? leftW : rightW,
-                 (row == 0) ? topH  : bottomH);
+                 (row == 0) ? topH : bottomH);
 }
 
 //=============================================================================================================
 
-SplitterHit MultiViewLayout::hitTestSplitter(const QPoint &pos,
-                                              int numEnabled,
-                                              const QSize &outputSize) const
+SplitterHit MultiViewLayout::hitTestSplitter(const QPoint& pos,
+                                             int numEnabled,
+                                             const QSize& outputSize) const
 {
     if (numEnabled <= 1) {
         return SplitterHit::None;
@@ -115,9 +115,12 @@ SplitterHit MultiViewLayout::hitTestSplitter(const QPoint &pos,
     const bool nearVertical = (std::abs(pos.x() - splitX) <= m_hitTolerancePx);
     const bool verticalActive = nearVertical && (numEnabled != 3 || inBottomHalf);
 
-    if (verticalActive && nearHorizontal) return SplitterHit::Both;
-    if (verticalActive)                   return SplitterHit::Vertical;
-    if (nearHorizontal)                   return SplitterHit::Horizontal;
+    if (verticalActive && nearHorizontal)
+        return SplitterHit::Both;
+    if (verticalActive)
+        return SplitterHit::Vertical;
+    if (nearHorizontal)
+        return SplitterHit::Horizontal;
 
     return SplitterHit::None;
 }
@@ -127,18 +130,22 @@ SplitterHit MultiViewLayout::hitTestSplitter(const QPoint &pos,
 Qt::CursorShape MultiViewLayout::cursorForHit(SplitterHit hit)
 {
     switch (hit) {
-    case SplitterHit::Vertical:    return Qt::SizeHorCursor;
-    case SplitterHit::Horizontal:  return Qt::SizeVerCursor;
-    case SplitterHit::Both:        return Qt::SizeAllCursor;
-    default:                       return Qt::ArrowCursor;
+        case SplitterHit::Vertical:
+            return Qt::SizeHorCursor;
+        case SplitterHit::Horizontal:
+            return Qt::SizeVerCursor;
+        case SplitterHit::Both:
+            return Qt::SizeAllCursor;
+        default:
+            return Qt::ArrowCursor;
     }
 }
 
 //=============================================================================================================
 
-int MultiViewLayout::viewportIndexAt(const QPoint &pos,
-                                      const QVector<int> &enabledViewports,
-                                      const QSize &outputSize) const
+int MultiViewLayout::viewportIndexAt(const QPoint& pos,
+                                     const QVector<int>& enabledViewports,
+                                     const QSize& outputSize) const
 {
     const int numEnabled = enabledViewports.size();
     for (int slot = 0; slot < numEnabled; ++slot) {
@@ -151,9 +158,9 @@ int MultiViewLayout::viewportIndexAt(const QPoint &pos,
 
 //=============================================================================================================
 
-QRect MultiViewLayout::insetForSeparator(const QRect &paneRect,
-                                          int slot,
-                                          int numEnabled) const
+QRect MultiViewLayout::insetForSeparator(const QRect& paneRect,
+                                         int slot,
+                                         int numEnabled) const
 {
     if (numEnabled <= 1) {
         return paneRect;
@@ -179,8 +186,7 @@ QRect MultiViewLayout::insetForSeparator(const QRect &paneRect,
     // 4 panes
     const int col = slot % 2;
     const int row = slot / 2;
-    const bool hasRightNeighbor  = (col == 0) && (slot + 1 < numEnabled)
-                                   && ((slot / 2) == ((slot + 1) / 2));
+    const bool hasRightNeighbor = (col == 0) && (slot + 1 < numEnabled) && ((slot / 2) == ((slot + 1) / 2));
     const bool hasBottomNeighbor = (row == 0) && (slot + 2 < numEnabled);
 
     if (hasRightNeighbor)
@@ -194,14 +200,15 @@ QRect MultiViewLayout::insetForSeparator(const QRect &paneRect,
 //=============================================================================================================
 
 void MultiViewLayout::separatorGeometries(int numEnabled,
-                                           const QSize &widgetSize,
-                                           QRect &verticalRect,
-                                           QRect &horizontalRect) const
+                                          const QSize& widgetSize,
+                                          QRect& verticalRect,
+                                          QRect& horizontalRect) const
 {
-    verticalRect   = QRect();
+    verticalRect = QRect();
     horizontalRect = QRect();
 
-    if (numEnabled <= 1) return;
+    if (numEnabled <= 1)
+        return;
 
     const int w = std::max(1, widgetSize.width());
     const int h = std::max(1, widgetSize.height());
@@ -244,9 +251,9 @@ void MultiViewLayout::separatorGeometries(int numEnabled,
 
 //=============================================================================================================
 
-void MultiViewLayout::dragSplitter(const QPoint &pos,
-                                    SplitterHit activeSplitter,
-                                    const QSize &widgetSize)
+void MultiViewLayout::dragSplitter(const QPoint& pos,
+                                   SplitterHit activeSplitter,
+                                   const QSize& widgetSize)
 {
     const int w = std::max(1, widgetSize.width());
     const int h = std::max(1, widgetSize.height());

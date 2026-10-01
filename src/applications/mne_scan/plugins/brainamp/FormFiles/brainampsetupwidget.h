@@ -52,7 +52,6 @@ class BrainAMPSetupWidget : public QWidget
     Q_OBJECT
 
 public:
-
     //=========================================================================================================
     /**
      * Constructs a BrainAMPSetupWidget which is a child of parent.
@@ -60,7 +59,7 @@ public:
      * @param[in] parent pointer to parent widget; If parent is 0, the new BrainAMPSetupWidget becomes a window. If parent is another widget, BrainAMPSetupWidget becomes a child window inside parent. BrainAMPSetupWidget is deleted when its parent is deleted.
      * @param[in] pBrainAMP a pointer to the corresponding ECGSimulator.
      */
-    BrainAMPSetupWidget(BrainAMP* pBrainAMP, QWidget *parent = 0);
+    BrainAMPSetupWidget(BrainAMP* pBrainAMP, QWidget* parent = 0);
 
     //=========================================================================================================
     /**
@@ -77,7 +76,6 @@ public:
     void initGui();
 
 private:
-
     //=========================================================================================================
     /**
      * Sets the device sampling properties.
@@ -106,8 +104,8 @@ private:
      */
     void showAboutDialog();
 
-    BrainAMP*               m_pBrainAMP;            /**< a pointer to corresponding BrainAMP.*/
-    Ui::BrainAMPSetupClass  ui;                     /**< the user interface for the BrainAMPSetupWidget.*/
+    BrainAMP* m_pBrainAMP;     /**< a pointer to corresponding BrainAMP.*/
+    Ui::BrainAMPSetupClass ui; /**< the user interface for the BrainAMPSetupWidget.*/
 };
 } // NAMESPACE
 

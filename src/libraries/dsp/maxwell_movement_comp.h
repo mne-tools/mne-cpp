@@ -55,10 +55,10 @@ namespace UTILSLIB
  */
 struct DSPSHARED_EXPORT HeadPosEntry
 {
-    double  dTime = 0.0;                       /**< Time in seconds. */
-    Eigen::Vector3d translation{0, 0, 0};      /**< Translation from device to head (metres). */
-    Eigen::Quaterniond rotation{1, 0, 0, 0};   /**< Rotation quaternion (device → head). */
-    double  dGof = 0.0;                        /**< Goodness of fit for this head position. */
+    double dTime = 0.0;                      /**< Time in seconds. */
+    Eigen::Vector3d translation{0, 0, 0};    /**< Translation from device to head (metres). */
+    Eigen::Quaterniond rotation{1, 0, 0, 0}; /**< Rotation quaternion (device → head). */
+    double dGof = 0.0;                       /**< Goodness of fit for this head position. */
 };
 
 //=============================================================================================================
@@ -67,11 +67,11 @@ struct DSPSHARED_EXPORT HeadPosEntry
  */
 struct DSPSHARED_EXPORT MaxwellMoveCompParams
 {
-    int     iOrderIn  = 8;                             /**< Internal SSS order. */
-    int     iOrderOut = 3;                             /**< External SSS order. */
-    Eigen::Vector3d origin{0.0, 0.0, 0.04};           /**< SSS expansion origin (metres). */
-    int     iRefIdx = 0;                               /**< Index of reference head position in headPos list. Use -1 for mean position. */
-    double  dRegIn = 1e-5;                             /**< Regularisation parameter. */
+    int iOrderIn = 8;                       /**< Internal SSS order. */
+    int iOrderOut = 3;                      /**< External SSS order. */
+    Eigen::Vector3d origin{0.0, 0.0, 0.04}; /**< SSS expansion origin (metres). */
+    int iRefIdx = 0;                        /**< Index of reference head position in headPos list. Use -1 for mean position. */
+    double dRegIn = 1e-5;                   /**< Regularisation parameter. */
 };
 
 //=============================================================================================================
@@ -106,10 +106,10 @@ public:
      * @return Movement-compensated data (n_channels × n_samples).
      */
     static Eigen::MatrixXd apply(const Eigen::MatrixXd& matData,
-                                  const FIFFLIB::FiffInfo& fiffInfo,
-                                  const QList<HeadPosEntry>& headPos,
-                                  double dSFreq,
-                                  const MaxwellMoveCompParams& params = MaxwellMoveCompParams());
+                                 const FIFFLIB::FiffInfo& fiffInfo,
+                                 const QList<HeadPosEntry>& headPos,
+                                 double dSFreq,
+                                 const MaxwellMoveCompParams& params = MaxwellMoveCompParams());
 
     //=========================================================================================================
     /**
@@ -134,15 +134,15 @@ public:
      * @return true if successful.
      */
     static bool writeHeadPos(const QString& sPath,
-                              const QList<HeadPosEntry>& headPos);
+                             const QList<HeadPosEntry>& headPos);
 
 private:
     /**
      * @brief Create a modified FiffInfo with sensor positions transformed by a head position.
      */
     static FIFFLIB::FiffInfo transformFiffInfo(const FIFFLIB::FiffInfo& fiffInfo,
-                                                const HeadPosEntry& headPosRef,
-                                                const HeadPosEntry& headPosCurrent);
+                                               const HeadPosEntry& headPosRef,
+                                               const HeadPosEntry& headPosCurrent);
 };
 
 } // namespace UTILSLIB

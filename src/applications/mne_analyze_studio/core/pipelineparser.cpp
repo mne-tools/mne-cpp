@@ -30,7 +30,7 @@ QString describeEntry(const QString& sourceName, const QString& sectionName, int
 
 QJsonObject ensureObject(const QJsonValue& value, const QString& fieldName, const QString& context)
 {
-    if(!value.isObject()) {
+    if (!value.isObject()) {
         throw WorkflowValidationError(QStringLiteral("%1 must define `%2` as an object.").arg(context, fieldName));
     }
 
@@ -47,7 +47,7 @@ PipelineParser::PipelineParser(QObject* parent)
 WorkflowGraph PipelineParser::parseFile(const QString& filePath) const
 {
     QFile file(filePath);
-    if(!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
+    if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
         throw WorkflowValidationError(QStringLiteral("Could not open workflow file `%1`.").arg(filePath));
     }
 
@@ -58,7 +58,7 @@ WorkflowGraph PipelineParser::parseJson(const QByteArray& jsonPayload, const QSt
 {
     QJsonParseError parseError;
     const QJsonDocument document = QJsonDocument::fromJson(jsonPayload, &parseError);
-    if(parseError.error != QJsonParseError::NoError || !document.isObject()) {
+    if (parseError.error != QJsonParseError::NoError || !document.isObject()) {
         throw WorkflowValidationError(QStringLiteral("Invalid .mne JSON in `%1`: %2")
                                           .arg(sourceName, parseError.errorString()));
     }
@@ -68,7 +68,7 @@ WorkflowGraph PipelineParser::parseJson(const QByteArray& jsonPayload, const QSt
 
 WorkflowGraph PipelineParser::parseDocument(const QJsonDocument& document, const QString& sourceName) const
 {
-    if(!document.isObject()) {
+    if (!document.isObject()) {
         throw WorkflowValidationError(QStringLiteral("Workflow document `%1` must be a JSON object.").arg(sourceName));
     }
 
@@ -77,11 +77,11 @@ WorkflowGraph PipelineParser::parseDocument(const QJsonDocument& document, const
     const QJsonArray pipeline = root.value(QStringLiteral("pipeline")).toArray();
 
     WorkflowGraph graph;
-    for(int i = 0; i < resources.size(); ++i) {
+    for (int i = 0; i < resources.size(); ++i) {
         graph.addResource(parseResource(resources.at(i).toObject(), i, sourceName));
     }
 
-    for(int i = 0; i < pipeline.size(); ++i) {
+    for (int i = 0; i < pipeline.size(); ++i) {
         graph.addNode(parseNode(pipeline.at(i).toObject(), i, sourceName));
     }
 
@@ -101,15 +101,15 @@ WorkflowResource PipelineParser::parseResource(const QJsonObject& object, int in
     resource.uri = object.value(QStringLiteral("uri")).toString().trimmed();
     resource.metadata = object.value(QStringLiteral("metadata")).toObject();
 
-    if(resource.uid.isEmpty()) {
+    if (resource.uid.isEmpty()) {
         throw WorkflowValidationError(QStringLiteral("%1 is missing `uid`.").arg(context));
     }
 
-    if(resource.type.isEmpty()) {
+    if (resource.type.isEmpty()) {
         throw WorkflowValidationError(QStringLiteral("%1 is missing `type`.").arg(context));
     }
 
-    if(resource.uri.isEmpty()) {
+    if (resource.uri.isEmpty()) {
         throw WorkflowValidationError(QStringLiteral("%1 is missing `uri`.").arg(context));
     }
 
@@ -130,11 +130,11 @@ WorkflowNode PipelineParser::parseNode(const QJsonObject& object, int index, con
     node.parameters = object.value(QStringLiteral("parameters")).toObject();
     node.outputs = ensureObject(object.value(QStringLiteral("outputs")), QStringLiteral("outputs"), context);
 
-    if(node.uid.isEmpty()) {
+    if (node.uid.isEmpty()) {
         throw WorkflowValidationError(QStringLiteral("%1 is missing `uid`.").arg(context));
     }
 
-    if(node.skillId.isEmpty()) {
+    if (node.skillId.isEmpty()) {
         throw WorkflowValidationError(QStringLiteral("%1 is missing `skill_id`.").arg(context));
     }
 

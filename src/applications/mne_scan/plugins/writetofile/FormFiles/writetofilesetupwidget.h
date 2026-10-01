@@ -52,7 +52,6 @@ class WriteToFileSetupWidget : public QWidget
     Q_OBJECT
 
 public:
-
     //=========================================================================================================
     /**
      * Constructs a WriteToFileSetupWidget which is a child of parent.
@@ -60,7 +59,7 @@ public:
      * @param[in] toolbox a pointer to the corresponding WriteToFile.
      * @param[in] parent pointer to parent widget; If parent is 0, the new WriteToFileSetupWidget becomes a window. If parent is another widget, WriteToFileSetupWidget becomes a child window inside parent. WriteToFileSetupWidget is deleted when its parent is deleted.
      */
-    WriteToFileSetupWidget(WriteToFile* toolbox, QWidget *parent = 0);
+    WriteToFileSetupWidget(WriteToFile* toolbox, QWidget* parent = 0);
 
     //=========================================================================================================
     /**
@@ -70,10 +69,9 @@ public:
     ~WriteToFileSetupWidget();
 
 private:
+    WriteToFile* m_pWriteToFile; /**< Holds a pointer to corresponding WriteToFile.*/
 
-    WriteToFile* m_pWriteToFile;	/**< Holds a pointer to corresponding WriteToFile.*/
-
-    Ui::WriteToFileSetupWidgetClass ui;	/**< Holds the user interface for the WriteToFileSetupWidget.*/
+    Ui::WriteToFileSetupWidgetClass ui; /**< Holds the user interface for the WriteToFileSetupWidget.*/
 };
 } // NAMESPACE
 

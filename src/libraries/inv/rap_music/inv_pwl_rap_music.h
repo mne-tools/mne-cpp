@@ -55,8 +55,8 @@ namespace INVLIB
 // SOME DEFINES
 //=============================================================================================================
 
-#define NOT_TRANSPOSED   0  /**< Defines NOT_TRANSPOSED. */
-#define IS_TRANSPOSED   1   /**< Defines IS_TRANSPOSED. */
+#define NOT_TRANSPOSED 0 /**< Defines NOT_TRANSPOSED. */
+#define IS_TRANSPOSED 1  /**< Defines IS_TRANSPOSED. */
 
 //=============================================================================================================
 /**
@@ -67,7 +67,6 @@ namespace INVLIB
 class INVSHARED_EXPORT InvPwlRapMusic : public InvRapMusic
 {
 public:
-
     //=========================================================================================================
     /**
      * Default constructor creates an empty POWELL RAP MUSIC algorithm which still needs to be initialized.
@@ -99,7 +98,7 @@ public:
      *
      * @return
      */
-    virtual InvSourceEstimate calculateInverse(const FIFFLIB::FiffEvoked &p_fiffEvoked, bool pick_normal = false);
+    virtual InvSourceEstimate calculateInverse(const FIFFLIB::FiffEvoked& p_fiffEvoked, bool pick_normal = false);
 
     //=========================================================================================================
     /**
@@ -114,9 +113,9 @@ public:
      *
      * @return
      */
-    virtual InvSourceEstimate calculateInverse(const Eigen::MatrixXd &data, float tmin, float tstep, bool pick_normal = false) const;
+    virtual InvSourceEstimate calculateInverse(const Eigen::MatrixXd& data, float tmin, float tstep, bool pick_normal = false) const;
 
-    virtual InvSourceEstimate calculateInverse(const Eigen::MatrixXd& p_matMeasurement, QList< InvDipolePair<double> > &p_RapDipoles) const;
+    virtual InvSourceEstimate calculateInverse(const Eigen::MatrixXd& p_matMeasurement, QList<InvDipolePair<double>>& p_RapDipoles) const;
 
     static int PowellOffset(int p_iRow, int p_iNumPoints);
 

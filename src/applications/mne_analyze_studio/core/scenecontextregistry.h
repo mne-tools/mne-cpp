@@ -26,7 +26,8 @@ namespace MNEANALYZESTUDIO
 /**
  * @brief Serializable description of a logical 3D scene instance.
  */
-struct SceneContext {
+struct SceneContext
+{
     QString id;
     QString subjectId;
     QString title;

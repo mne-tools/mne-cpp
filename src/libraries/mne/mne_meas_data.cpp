@@ -83,8 +83,8 @@ void MNEMeasData::adjust_baselines(float bmin, float bmax)
         return;
 
     const float currentSfreq = 1.0f / current->tstep;
-    const float tmin  = current->tmin;
-    const float tmax  = current->tmin + (current->np - 1) / currentSfreq;
+    const float tmin = current->tmin;
+    const float tmax = current->tmin + (current->np - 1) / currentSfreq;
 
     int b1, b2;
     if (bmin < tmin)
@@ -106,7 +106,7 @@ void MNEMeasData::adjust_baselines(float bmin, float bmax)
         b2 = qBound(0, b2, current->np);
     }
 
-    Eigen::MatrixXf &bdata = current->data;
+    Eigen::MatrixXf& bdata = current->data;
     if (b2 > b1) {
         for (int c = 0; c < nchan; c++) {
             float ave = 0.0f;
@@ -118,21 +118,21 @@ void MNEMeasData::adjust_baselines(float bmin, float bmax)
                 bdata(s, c) -= ave;
         }
         qInfo("\t%s : using baseline %7.1f ... %7.1f ms\n",
-                current->comment.toUtf8().constData() ? current->comment.toUtf8().constData() : "unknown",
-                1000 * (tmin + b1 / sfreq),
-                1000 * (tmin + b2 / sfreq));
+              current->comment.toUtf8().constData() ? current->comment.toUtf8().constData() : "unknown",
+              1000 * (tmin + b1 / sfreq),
+              1000 * (tmin + b2 / sfreq));
     }
 }
 
 //=============================================================================================================
 
-MNEMeasData *MNEMeasData::mne_read_meas_data_add(const QString &name,
+MNEMeasData* MNEMeasData::mne_read_meas_data_add(const QString& name,
                                                  int set,
                                                  MNEInverseOperator* op,
-                                                 MNENamedMatrix *fwd,
+                                                 MNENamedMatrix* fwd,
                                                  const QStringList& namesp,
                                                  int nnamesp,
-                                                 MNEMeasData *add_to)     /* Add to this */
+                                                 MNEMeasData* add_to) /* Add to this */
 /*
           * Read an evoked-response data file
           */
@@ -144,8 +144,7 @@ MNEMeasData *MNEMeasData::mne_read_meas_data_add(const QString &name,
     QFile file(name);
     FiffEvoked evoked;
     if (!FiffEvoked::read(file, evoked, set - 1,
-                          QPair<float,float>(-1.0f, -1.0f), false))
-    {
+                          QPair<float, float>(-1.0f, -1.0f), false)) {
         qCritical("Failed to read evoked data from %s\n", name.toUtf8().constData());
         return nullptr;
     }
@@ -153,37 +152,37 @@ MNEMeasData *MNEMeasData::mne_read_meas_data_add(const QString &name,
     /*
        * Extract fields from the FiffEvoked object
        */
-    const int nchan_file  = evoked.info.nchan;
-    const int nsamp       = evoked.last - evoked.first + 1;
-    const float sfreq     = evoked.info.sfreq;
-    const float dtmin     = static_cast<float>(evoked.first) / sfreq;
-    const float highpass  = evoked.info.highpass;
-    const float lowpass   = evoked.info.lowpass;
-    const int nave        = evoked.nave;
+    const int nchan_file = evoked.info.nchan;
+    const int nsamp = evoked.last - evoked.first + 1;
+    const float sfreq = evoked.info.sfreq;
+    const float dtmin = static_cast<float>(evoked.first) / sfreq;
+    const float highpass = evoked.info.highpass;
+    const float lowpass = evoked.info.lowpass;
+    const int nave = evoked.nave;
     const int aspect_kind = evoked.aspect_kind;
     const QList<FiffChInfo>& chs = evoked.info.chs;
-    const FiffId& id      = evoked.info.meas_id;
-    const MatrixXf data   = evoked.data.cast<float>();   /* nchan × nsamp, already calibrated */
+    const FiffId& id = evoked.info.meas_id;
+    const MatrixXf data = evoked.data.cast<float>(); /* nchan × nsamp, already calibrated */
     const FiffCoordTrans& devHeadT = evoked.info.dev_head_t;
 
-    QString        stim14_name;
+    QString stim14_name;
     /*
      * Desired channels
      */
-    QStringList         names;
-    int         nchan   = 0;
+    QStringList names;
+    int nchan = 0;
     /*
        * Selected channels
        */
     Eigen::VectorXi sel;
-    int         stim14 = -1;
+    int stim14 = -1;
     /*
        * Other stuff
        */
-    float       tmin,tmax;
-    int         k,p,c,np,n1,n2;
-    MNEMeasData*    res = nullptr;
-    MNEMeasData*    new_data = add_to;
+    float tmin, tmax;
+    int k, p, c, np, n1, n2;
+    MNEMeasData* res = nullptr;
+    MNEMeasData* new_data = add_to;
     MNEMeasDataSet* dataset = nullptr;
 
     stim14_name = qEnvironmentVariable(MNE_ENV_TRIGGER_CH);
@@ -194,17 +193,14 @@ MNEMeasData *MNEMeasData::mne_read_meas_data_add(const QString &name,
         for (int i = 0; i < add_to->nchan; i++)
             names.append(add_to->chs[i].ch_name);
         nchan = add_to->nchan;
-    }
-    else {
+    } else {
         if (op) {
             names = op->eigen_fields->col_names;
             nchan = op->nchan;
-        }
-        else if (fwd) {
+        } else if (fwd) {
             names = fwd->collist;
             nchan = fwd->ncol;
-        }
-        else {
+        } else {
             names = namesp;
             nchan = nnamesp;
         }
@@ -222,23 +218,23 @@ MNEMeasData *MNEMeasData::mne_read_meas_data_add(const QString &name,
         sel = Eigen::VectorXi::Constant(nchan, -1);
         for (c = 0; c < nchan_file; c++) {
             for (k = 0; k < nchan; k++) {
-                if (sel[k] == -1 && QString::compare(chs[c].ch_name,names[k]) == 0) {
+                if (sel[k] == -1 && QString::compare(chs[c].ch_name, names[k]) == 0) {
                     sel[k] = c;
                     break;
                 }
             }
-            if (QString::compare(stim14_name,chs[c].ch_name) == 0) {
+            if (QString::compare(stim14_name, chs[c].ch_name) == 0) {
                 stim14 = c;
             }
         }
         for (k = 0; k < nchan; k++)
             if (sel[k] == -1) {
                 qCritical("All channels needed were not in the MEG/EEG data file "
-                       "(first missing: %s).",names[k].toUtf8().constData());
+                          "(first missing: %s).",
+                          names[k].toUtf8().constData());
                 return nullptr;
             }
-    }
-    else {  /* Load all channels */
+    } else { /* Load all channels */
         sel.resize(nchan_file);
         sel.setZero();
         for (c = 0, nchan = 0; c < nchan_file; c++) {
@@ -246,7 +242,7 @@ MNEMeasData *MNEMeasData::mne_read_meas_data_add(const QString &name,
                 sel[nchan] = c;
                 nchan++;
             }
-            if (QString::compare(stim14_name,chs[c].ch_name) == 0) {
+            if (QString::compare(stim14_name, chs[c].ch_name) == 0) {
                 stim14 = c;
             }
         }
@@ -254,25 +250,25 @@ MNEMeasData *MNEMeasData::mne_read_meas_data_add(const QString &name,
     /*
        * Cut the data to the analysis time range
        */
-    n1    = 0;
-    n2    = nsamp;
-    np    = n2 - n1;
-    tmin  = dtmin;
-    tmax  = dtmin + (np-1)/sfreq;
-    qInfo("\tData time range: %8.1f ... %8.1f ms\n",1000*tmin,1000*tmax);
+    n1 = 0;
+    n2 = nsamp;
+    np = n2 - n1;
+    tmin = dtmin;
+    tmax = dtmin + (np - 1) / sfreq;
+    qInfo("\tData time range: %8.1f ... %8.1f ms\n", 1000 * tmin, 1000 * tmax);
     /*
        * Just put it together
        */
-    if (!new_data) {			/* We need a new meas data structure */
-        new_data     = new MNEMeasData;
-        new_data->filename  = name;
-        new_data->meas_id   = id;
+    if (!new_data) { /* We need a new meas data structure */
+        new_data = new MNEMeasData;
+        new_data->filename = name;
+        new_data->meas_id = id;
         /*
          * Getting starting time from measurement ID is not too accurate...
          */
         {
             FiffTime md;
-            md.secs  = evoked.info.meas_date[0];
+            md.secs = evoked.info.meas_date[0];
             md.usecs = evoked.info.meas_date[1];
             if (md.secs != 0)
                 new_data->meas_date = md;
@@ -283,10 +279,10 @@ MNEMeasData *MNEMeasData::mne_read_meas_data_add(const QString &name,
                 new_data->meas_date.usecs = 0;
             }
         }
-        new_data->lowpass   = lowpass;
-        new_data->highpass  = highpass;
-        new_data->nchan     = nchan;
-        new_data->sfreq     = sfreq;
+        new_data->lowpass = lowpass;
+        new_data->highpass = highpass;
+        new_data->nchan = nchan;
+        new_data->sfreq = sfreq;
 
         if (!devHeadT.isEmpty()) {
             new_data->meg_head_t = std::make_unique<FiffCoordTrans>(devHeadT);
@@ -304,20 +300,19 @@ MNEMeasData *MNEMeasData::mne_read_meas_data_add(const QString &name,
             new_data->chs[k] = chs[sel[k]];
         }
 
-        new_data->op  = op;		/* Attach inverse operator */
-        new_data->fwd = fwd;		/* ...or a fwd operator */
-        if (op) {			/* Attach the projection operator and CTF compensation info to the data, too */
+        new_data->op = op;   /* Attach inverse operator */
+        new_data->fwd = fwd; /* ...or a fwd operator */
+        if (op) {            /* Attach the projection operator and CTF compensation info to the data, too */
             new_data->proj = MNEProjOp::read(name);
             if (new_data->proj && new_data->proj->nitems > 0) {
-                qInfo("\tLoaded projection from %s:\n",name.toUtf8().data());
+                qInfo("\tLoaded projection from %s:\n", name.toUtf8().data());
                 QTextStream errStream(stderr);
                 new_data->proj->report(errStream, QStringLiteral("\t\t"));
             }
-        }
-        else {
+        } else {
             new_data->proj = MNEProjOp::read(name);
             if (new_data->proj && new_data->proj->nitems > 0) {
-                qInfo("\tLoaded projection from %s:\n",name.toUtf8().data());
+                qInfo("\tLoaded projection from %s:\n", name.toUtf8().data());
                 QTextStream errStream(stderr);
                 new_data->proj->report(errStream, QStringLiteral("\t\t"));
             }
@@ -327,29 +322,29 @@ MNEMeasData *MNEMeasData::mne_read_meas_data_add(const QString &name,
                 return nullptr;
             }
             if (new_data->comp->ncomp > 0)
-                qInfo("\tRead %d compensation data sets from %s\n",new_data->comp->ncomp,name.toUtf8().data());
+                qInfo("\tRead %d compensation data sets from %s\n", new_data->comp->ncomp, name.toUtf8().data());
         }
         /*
          * Bad channels — already read by FiffEvoked via FiffStream::read_meas_info()
          */
         {
             new_data->badlist = evoked.info.bads;
-            new_data->nbad    = new_data->badlist.size();
+            new_data->nbad = new_data->badlist.size();
             new_data->bad = Eigen::VectorXi::Zero(new_data->nchan);
 
             for (int b = 0; b < new_data->nbad; b++) {
                 for (k = 0; k < new_data->nchan; k++) {
-                    if (QString::compare(new_data->chs[k].ch_name,new_data->badlist[b],Qt::CaseInsensitive) == 0) {
+                    if (QString::compare(new_data->chs[k].ch_name, new_data->badlist[b], Qt::CaseInsensitive) == 0) {
                         new_data->bad[k] = 1;
                         break;
                     }
                 }
             }
-            qInfo("\t%d bad channels read from %s%s",new_data->nbad,name.toUtf8().data(),new_data->nbad > 0 ? ":\n" : "\n");
+            qInfo("\t%d bad channels read from %s%s", new_data->nbad, name.toUtf8().data(), new_data->nbad > 0 ? ":\n" : "\n");
             if (new_data->nbad > 0) {
                 qInfo("\t\t");
                 for (k = 0; k < new_data->nbad; k++)
-                    qInfo("%s%c",new_data->badlist[k].toUtf8().constData(),k < new_data->nbad-1 ? ' ' : '\n');
+                    qInfo("%s%c", new_data->badlist[k].toUtf8().constData(), k < new_data->nbad - 1 ? ' ' : '\n');
             }
         }
     }
@@ -357,14 +352,14 @@ MNEMeasData *MNEMeasData::mne_read_meas_data_add(const QString &name,
        * New data set is created anyway
        */
     dataset = new MNEMeasDataSet;
-    dataset->tmin      = tmin;
-    dataset->tstep     = 1.0/sfreq;
-    dataset->first     = n1;
-    dataset->np        = np;
-    dataset->nave      = nave;
-    dataset->kind      = aspect_kind;
-    dataset->data      = Eigen::MatrixXf::Zero(np, nchan);
-    dataset->comment   = evoked.comment;
+    dataset->tmin = tmin;
+    dataset->tstep = 1.0 / sfreq;
+    dataset->first = n1;
+    dataset->np = np;
+    dataset->nave = nave;
+    dataset->kind = aspect_kind;
+    dataset->data = Eigen::MatrixXf::Zero(np, nchan);
+    dataset->comment = evoked.comment;
     dataset->baselines = Eigen::VectorXf::Zero(nchan);
     /*
        * Pick data from all channels
@@ -381,17 +376,18 @@ MNEMeasData *MNEMeasData::mne_read_meas_data_add(const QString &name,
        */
     if (stim14 >= 0) {
         dataset->stim14 = Eigen::VectorXf(np);
-        for (p = 0; p < np; p++) 	/* Copy the data and correct for the possible non-unit calibration */
+        for (p = 0; p < np; p++) /* Copy the data and correct for the possible non-unit calibration */
             dataset->stim14[p] = data(stim14, p + n1) / chs[stim14].cal;
     }
-    new_data->sets.append(dataset); dataset = nullptr;
+    new_data->sets.append(dataset);
+    dataset = nullptr;
     new_data->nset++;
     if (!add_to)
         new_data->current = new_data->sets[0];
     res = new_data;
     qInfo("\t%s dataset %s from %s\n",
-            add_to ? "Added" : "Loaded",
-            new_data->sets[new_data->nset-1]->comment.toUtf8().constData() ? new_data->sets[new_data->nset-1]->comment.toUtf8().constData() : "unknown",name.toUtf8().data());
+          add_to ? "Added" : "Loaded",
+          new_data->sets[new_data->nset - 1]->comment.toUtf8().constData() ? new_data->sets[new_data->nset - 1]->comment.toUtf8().constData() : "unknown", name.toUtf8().data());
 
     if (res == nullptr && !add_to)
         delete new_data;
@@ -400,13 +396,13 @@ MNEMeasData *MNEMeasData::mne_read_meas_data_add(const QString &name,
 
 //=============================================================================================================
 
-MNEMeasData *MNEMeasData::mne_read_meas_data(const QString &name,
+MNEMeasData* MNEMeasData::mne_read_meas_data(const QString& name,
                                              int set,
                                              MNEInverseOperator* op,
-                                             MNENamedMatrix *fwd,
+                                             MNENamedMatrix* fwd,
                                              const QStringList& namesp,
                                              int nnamesp)
 
 {
-    return mne_read_meas_data_add(name,set,op,fwd,namesp,nnamesp,nullptr);
+    return mne_read_meas_data_add(name, set, op, fwd, namesp, nnamesp, nullptr);
 }

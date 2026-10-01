@@ -91,7 +91,7 @@ private slots:
     {
         auto sos = IirFilter::designButterworth(4, IirFilter::LowPass, 40.0, 0.0, 1000.0);
         RowVectorXd data = RowVectorXd::Random(512);
-        RowVectorXd out  = IirFilter::applySos(data, sos);
+        RowVectorXd out = IirFilter::applySos(data, sos);
         QCOMPARE(out.size(), data.size());
     }
 
@@ -99,7 +99,7 @@ private slots:
     {
         auto sos = IirFilter::designButterworth(4, IirFilter::LowPass, 40.0, 0.0, 1000.0);
         RowVectorXd data = RowVectorXd::Random(512);
-        RowVectorXd out  = IirFilter::applyZeroPhase(data, sos);
+        RowVectorXd out = IirFilter::applyZeroPhase(data, sos);
         QCOMPARE(out.size(), data.size());
     }
 
@@ -107,7 +107,7 @@ private slots:
     {
         auto sos = IirFilter::designButterworth(4, IirFilter::LowPass, 40.0, 0.0, 1000.0);
         MatrixXd data = MatrixXd::Random(6, 512);
-        MatrixXd out  = IirFilter::applyZeroPhaseMatrix(data, sos);
+        MatrixXd out = IirFilter::applyZeroPhaseMatrix(data, sos);
         QCOMPARE(out.rows(), data.rows());
         QCOMPARE(out.cols(), data.cols());
     }
@@ -117,24 +117,23 @@ private slots:
     //=========================================================================
     void lpFilter_passbandAttenuatesStopband()
     {
-        const double fs   = 1000.0;
-        const double fc   = 40.0;    // cutoff
-        const int    N    = 4096;
-        const double fLow = 10.0;    // well inside passband
-        const double fHi  = 200.0;   // well inside stopband
+        const double fs = 1000.0;
+        const double fc = 40.0; // cutoff
+        const int N = 4096;
+        const double fLow = 10.0; // well inside passband
+        const double fHi = 200.0; // well inside stopband
 
         auto sos = IirFilter::designButterworth(4, IirFilter::LowPass, fc, 0.0, fs);
 
         RowVectorXd sig(N);
         for (int i = 0; i < N; ++i) {
-            sig(i) = std::sin(2 * M_PI * fLow * i / fs)
-                   + std::sin(2 * M_PI * fHi  * i / fs);
+            sig(i) = std::sin(2 * M_PI * fLow * i / fs) + std::sin(2 * M_PI * fHi * i / fs);
         }
 
         RowVectorXd filtered = IirFilter::applyZeroPhase(sig, sos);
 
         double pLow = bandPower(filtered, fLow - 2.0, fLow + 2.0, fs);
-        double pHi  = bandPower(filtered, fHi  - 5.0, fHi  + 5.0, fs);
+        double pHi = bandPower(filtered, fHi - 5.0, fHi + 5.0, fs);
 
         QVERIFY2(pLow > pHi * 100.0,
                  qPrintable(QString("LP: passband power %1 should dominate stopband %2").arg(pLow).arg(pHi)));
@@ -145,22 +144,22 @@ private slots:
     //=========================================================================
     void hpFilter_passbandAttenuatesStopband()
     {
-        const double fs   = 1000.0;
-        const double fc   = 50.0;
-        const int    N    = 4096;
+        const double fs = 1000.0;
+        const double fc = 50.0;
+        const int N = 4096;
 
         auto sos = IirFilter::designButterworth(4, IirFilter::HighPass, fc, 0.0, fs);
 
         RowVectorXd sig(N);
         for (int i = 0; i < N; ++i) {
-            sig(i) = std::sin(2 * M_PI * 5.0   * i / fs)   // stopband (5 Hz)
-                   + std::sin(2 * M_PI * 200.0  * i / fs);  // passband (200 Hz)
+            sig(i) = std::sin(2 * M_PI * 5.0 * i / fs) // stopband (5 Hz)
+                + std::sin(2 * M_PI * 200.0 * i / fs); // passband (200 Hz)
         }
 
         RowVectorXd filtered = IirFilter::applyZeroPhase(sig, sos);
 
         double pPass = bandPower(filtered, 195.0, 205.0, fs);
-        double pStop = bandPower(filtered, 3.0,   7.0,   fs);
+        double pStop = bandPower(filtered, 3.0, 7.0, fs);
 
         QVERIFY2(pPass > pStop * 100.0,
                  qPrintable(QString("HP: passband %1 should dominate stopband %2").arg(pPass).arg(pStop)));
@@ -171,21 +170,21 @@ private slots:
     //=========================================================================
     void bpFilter_passbandAttenuatesOutside()
     {
-        const double fs   = 1000.0;
-        const int    N    = 4096;
+        const double fs = 1000.0;
+        const int N = 4096;
 
         auto sos = IirFilter::designButterworth(4, IirFilter::BandPass, 1.0, 40.0, fs);
 
         RowVectorXd sig(N);
         for (int i = 0; i < N; ++i) {
-            sig(i) = std::sin(2 * M_PI * 0.05  * i / fs)    // below passband (0.05 Hz)
-                   + std::sin(2 * M_PI * 10.0   * i / fs)    // inside passband (10 Hz)
-                   + std::sin(2 * M_PI * 200.0  * i / fs);   // above passband (200 Hz)
+            sig(i) = std::sin(2 * M_PI * 0.05 * i / fs) // below passband (0.05 Hz)
+                + std::sin(2 * M_PI * 10.0 * i / fs)    // inside passband (10 Hz)
+                + std::sin(2 * M_PI * 200.0 * i / fs);  // above passband (200 Hz)
         }
 
         RowVectorXd filtered = IirFilter::applyZeroPhase(sig, sos);
 
-        double pIn   = bandPower(filtered, 8.0,   12.0,  fs);
+        double pIn = bandPower(filtered, 8.0, 12.0, fs);
         double pHigh = bandPower(filtered, 195.0, 205.0, fs);
 
         QVERIFY2(pIn > pHigh * 10.0,
@@ -207,7 +206,7 @@ private slots:
     {
         QVector<IirBiquad> empty;
         RowVectorXd data = RowVectorXd::Random(128);
-        RowVectorXd out  = IirFilter::applyZeroPhase(data, empty);
+        RowVectorXd out = IirFilter::applyZeroPhase(data, empty);
         QCOMPARE((out - data).cwiseAbs().maxCoeff(), 0.0);
     }
 

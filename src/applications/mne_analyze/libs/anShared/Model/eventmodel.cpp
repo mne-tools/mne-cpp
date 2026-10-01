@@ -52,7 +52,8 @@ using namespace ANSHAREDLIB;
 // DEFINE STATIC METHODS
 //=============================================================================================================
 
-const double EventModel::m_dThreshold = 1e-2;;
+const double EventModel::m_dThreshold = 1e-2;
+;
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS
@@ -90,7 +91,7 @@ EventModel::EventModel(QSharedPointer<FiffRawViewModel> pFiffModel,
 
 //=============================================================================================================
 
-EventModel::EventModel(const QString &sFilePath,
+EventModel::EventModel(const QString& sFilePath,
                        const QByteArray& byteLoadedData,
                        float fSampFreq,
                        int iFirstSampOffst,
@@ -120,22 +121,22 @@ EventModel::~EventModel()
 
 bool EventModel::insertRows(int position,
                             int span,
-                            const QModelIndex & parent)
+                            const QModelIndex& parent)
 {
     Q_UNUSED(parent);
 
-    if(!m_selectedEventGroups.size()){
+    if (!m_selectedEventGroups.size()) {
         return false;
     }
 
     m_EventManager.addEvent(m_iSamplePos, m_selectedEventGroups.front());
 
-    beginInsertRows(QModelIndex(), position, position+span-1);
+    beginInsertRows(QModelIndex(), position, position + span - 1);
 
     endInsertRows();
 
-//    Update filtered event data
-//    setEventFilterType(m_sFilterEventType);
+    //    Update filtered event data
+    //    setEventFilterType(m_sFilterEventType);
 
     eventsUpdated();
 
@@ -151,7 +152,7 @@ void EventModel::setSamplePos(int iSamplePos)
 
 //=============================================================================================================
 
-int EventModel::rowCount(const QModelIndex &parent) const
+int EventModel::rowCount(const QModelIndex& parent) const
 {
     Q_UNUSED(parent);
     return static_cast<int>(m_EventManager.getEventsInGroups(m_selectedEventGroups)->size());
@@ -159,7 +160,7 @@ int EventModel::rowCount(const QModelIndex &parent) const
 
 //=============================================================================================================
 
-int EventModel::columnCount(const QModelIndex &parent) const
+int EventModel::columnCount(const QModelIndex& parent) const
 {
     Q_UNUSED(parent);
 
@@ -169,77 +170,77 @@ int EventModel::columnCount(const QModelIndex &parent) const
 
 //=============================================================================================================
 
-QVariant EventModel::data(const QModelIndex &index,
+QVariant EventModel::data(const QModelIndex& index,
                           int role) const
 {
-    if(role == Qt::TextAlignmentRole)
+    if (role == Qt::TextAlignmentRole)
         return QVariant(Qt::AlignCenter | Qt::AlignVCenter);
 
-    if(role != Qt::DisplayRole && role != Qt::BackgroundRole)
+    if (role != Qt::DisplayRole && role != Qt::BackgroundRole)
         return QVariant();
 
     auto events = m_EventManager.getEventsInGroups(m_selectedEventGroups);
 
-    if(index.row() >= static_cast<int>(events->size()))
+    if (index.row() >= static_cast<int>(events->size()))
         return QVariant();
 
     if (index.isValid()) {
         //******** first column (sample index) ********
-        if(index.column()==0) {
-            switch(role) {
-            case Qt::DisplayRole:{
-                return QVariant((*events)[index.row()].sample - m_iFirstSample);
-//                    return QVariant(m_dataSamplesFiltered.at(index.row())-m_iFirstSample);
-            }
-            case Qt::BackgroundRole:{
-                QBrush brush;
-                if(m_selectedEventGroups.size() < 2){
-                    brush.setStyle(Qt::SolidPattern);
-                    brush.setColor(Qt::white);
-                } else {
-                    auto groupColor = m_EventManager.getGroup(events->at(index.row()).groupId).color;
-                    brush.setStyle(Qt::SolidPattern);
-                    brush.setColor(QColor(groupColor.r, groupColor.g, groupColor.b));
+        if (index.column() == 0) {
+            switch (role) {
+                case Qt::DisplayRole: {
+                    return QVariant((*events)[index.row()].sample - m_iFirstSample);
+                    //                    return QVariant(m_dataSamplesFiltered.at(index.row())-m_iFirstSample);
                 }
-                QColor colorTemp = brush.color();
-                colorTemp.setAlpha(110);
-                brush.setColor(colorTemp);
-                return QVariant(brush);
-            }
+                case Qt::BackgroundRole: {
+                    QBrush brush;
+                    if (m_selectedEventGroups.size() < 2) {
+                        brush.setStyle(Qt::SolidPattern);
+                        brush.setColor(Qt::white);
+                    } else {
+                        auto groupColor = m_EventManager.getGroup(events->at(index.row()).groupId).color;
+                        brush.setStyle(Qt::SolidPattern);
+                        brush.setColor(QColor(groupColor.r, groupColor.g, groupColor.b));
+                    }
+                    QColor colorTemp = brush.color();
+                    colorTemp.setAlpha(110);
+                    brush.setColor(colorTemp);
+                    return QVariant(brush);
+                }
             }
         }
 
         //******** second column (event time plot) ********
-        if(index.column()==1){
-            switch(role) {
-            case Qt::DisplayRole: {
-                int iSample = (*events)[index.row()].sample - m_iFirstSample;
-                float fTime = static_cast<float>(iSample) / m_fFreq;
-                return QVariant(fTime);
-//                    int time = ((m_dataSamplesFiltered.at(index.row()) - m_iFirstSample) / m_fFreq) * 1000;
-//                    return QVariant((double)time / 1000);
-            }
-            case Qt::BackgroundRole:
-                QBrush brush;
-                if(m_selectedEventGroups.size() < 2){
-                    brush.setStyle(Qt::SolidPattern);
-                    brush.setColor(Qt::white);
-                } else {
-                    auto groupColor = m_EventManager.getGroup(events->at(index.row()).groupId).color;
-                    brush.setStyle(Qt::SolidPattern);
-                    brush.setColor(QColor(groupColor.r, groupColor.g, groupColor.b));
+        if (index.column() == 1) {
+            switch (role) {
+                case Qt::DisplayRole: {
+                    int iSample = (*events)[index.row()].sample - m_iFirstSample;
+                    float fTime = static_cast<float>(iSample) / m_fFreq;
+                    return QVariant(fTime);
+                    //                    int time = ((m_dataSamplesFiltered.at(index.row()) - m_iFirstSample) / m_fFreq) * 1000;
+                    //                    return QVariant((double)time / 1000);
                 }
+                case Qt::BackgroundRole:
+                    QBrush brush;
+                    if (m_selectedEventGroups.size() < 2) {
+                        brush.setStyle(Qt::SolidPattern);
+                        brush.setColor(Qt::white);
+                    } else {
+                        auto groupColor = m_EventManager.getGroup(events->at(index.row()).groupId).color;
+                        brush.setStyle(Qt::SolidPattern);
+                        brush.setColor(QColor(groupColor.r, groupColor.g, groupColor.b));
+                    }
 
-                QColor colorTemp = brush.color();
-                colorTemp.setAlpha(110);
-                brush.setColor(colorTemp);
-                return QVariant(brush);
+                    QColor colorTemp = brush.color();
+                    colorTemp.setAlpha(110);
+                    brush.setColor(colorTemp);
+                    return QVariant(brush);
             }
         }
 
         //******** third column (event type) ********
-        if(index.column()==2) {
-            switch(role) {
+        if (index.column() == 2) {
+            switch (role) {
                 case Qt::DisplayRole:
                     // The FIFF trigger code, i.e. which stimulus condition
                     // this event marks. Not the event's unique key.
@@ -260,8 +261,8 @@ QVariant EventModel::data(const QModelIndex &index,
         }
 
         //******** fourth column (event duration) ********
-        if(index.column()==3) {
-            switch(role) {
+        if (index.column() == 3) {
+            switch (role) {
                 case Qt::DisplayRole:
                     // Length of the event in seconds. Zero for an
                     // instantaneous event, non zero for a range such as a
@@ -281,24 +282,23 @@ QVariant EventModel::data(const QModelIndex &index,
                 }
             }
         }
-
     }
     return QVariant();
 }
 
 //=============================================================================================================
 
-bool EventModel::setData(const QModelIndex &index,
-                         const QVariant &value,
+bool EventModel::setData(const QModelIndex& index,
+                         const QVariant& value,
                          int role)
 {
-    if(index.row() >= rowCount() || index.column() >= columnCount())
+    if (index.row() >= rowCount() || index.column() >= columnCount())
         return false;
 
-    if(role == Qt::EditRole) {
+    if (role == Qt::EditRole) {
         int column = index.column();
         auto events = m_EventManager.getEventsInGroups(m_selectedEventGroups);
-        switch(column) {
+        switch (column) {
             case 0: //sample values
                 m_EventManager.moveEvent(events->at(index.row()).id, value.toInt() + m_iFirstSample);
                 break;
@@ -325,7 +325,7 @@ bool EventModel::setData(const QModelIndex &index,
 
 //=============================================================================================================
 
-Qt::ItemFlags EventModel::flags(const QModelIndex &index) const
+Qt::ItemFlags EventModel::flags(const QModelIndex& index) const
 {
     Q_UNUSED(index);
     return Qt::ItemIsEnabled | Qt::ItemIsSelectable | Qt::ItemIsEditable;
@@ -337,17 +337,17 @@ QVariant EventModel::headerData(int section,
                                 Qt::Orientation orientation,
                                 int role) const
 {
-    if(role != Qt::DisplayRole && role != Qt::TextAlignmentRole) {
+    if (role != Qt::DisplayRole && role != Qt::TextAlignmentRole) {
         return QVariant();
     }
 
-    if(role==Qt::TextAlignmentRole) {
+    if (role == Qt::TextAlignmentRole) {
         Qt::Alignment a = Qt::AlignHCenter | Qt::AlignVCenter;
         return QVariant(a);
     }
 
-    if(orientation == Qt::Horizontal) {
-        switch(section) {
+    if (orientation == Qt::Horizontal) {
+        switch (section) {
             case 0: //sample column
                 return QVariant("Sample");
             case 1: //onset time column
@@ -356,9 +356,8 @@ QVariant EventModel::headerData(int section,
                 return QVariant("Type");
             case 3: //duration column
                 return QVariant("Duration (s)");
-            }
-    }
-    else if(orientation == Qt::Vertical) {
+        }
+    } else if (orientation == Qt::Vertical) {
         return QString(" %1 ").arg(section);
     }
 
@@ -369,17 +368,17 @@ QVariant EventModel::headerData(int section,
 
 bool EventModel::removeRows(int position,
                             int span,
-                            const QModelIndex &parent)
+                            const QModelIndex& parent)
 {
     Q_UNUSED(parent);
 
-    beginRemoveRows(QModelIndex(), position, position+span-1);
+    beginRemoveRows(QModelIndex(), position, position + span - 1);
 
     auto events = m_EventManager.getEventsInGroups(m_selectedEventGroups);
 
     for (int i = 0; i < span; ++i) {
         m_EventManager.deleteEvent(events->at(position + i).id);
-    } 
+    }
 
     endRemoveRows();
 
@@ -397,7 +396,7 @@ void EventModel::setFirstLastSample(int firstSample,
 
 //=============================================================================================================
 
-QPair<int,int> EventModel::getFirstLastSample() const
+QPair<int, int> EventModel::getFirstLastSample() const
 {
     QPair<int, int> pair(m_iFirstSample, m_iLastSample);
     return pair;
@@ -466,13 +465,13 @@ bool EventModel::saveToFile(const QString& sPath)
 #if QT_VERSION > QT_VERSION_CHECK(6, 0, 0)
     using Qt::endl;
 #endif
-    #ifdef WASMBUILD
+#ifdef WASMBUILD
     //QBuffer* bufferOut = new QBuffer;
     QByteArray* bufferOut = new QByteArray;
 
     QTextStream out(bufferOut, QIODevice::ReadWrite);
     auto events = m_EventManager.getEventsInGroups(m_selectedEventGroups);
-    for (const auto& event : *events){
+    for (const auto& event : *events) {
         // .eve columns are sample, onset in seconds, before and after. The
         // last one is the trigger code and used to be hardcoded to 1, which
         // exported every event as the same condition.
@@ -484,10 +483,10 @@ bool EventModel::saveToFile(const QString& sPath)
     // Wee need to call the QFileDialog here instead of the data load plugin since we need access to the QByteArray
     QFileDialog::saveFileContent(bufferOut->data(), "events.eve");
 
-   // bufferOut->deleteLater();
+    // bufferOut->deleteLater();
 
     return true;
-    #else
+#else
     qInfo() << "EventView::saveToFile";
 
     QFile file(sPath);
@@ -498,7 +497,7 @@ bool EventModel::saveToFile(const QString& sPath)
 
     QTextStream out(&file);
     auto events = m_EventManager.getEventsInGroups(m_selectedEventGroups);
-    for (const auto& event : *events){
+    for (const auto& event : *events) {
         // .eve columns are sample, onset in seconds, before and after. The
         // last one is the trigger code and used to be hardcoded to 1, which
         // exported every event as the same condition.
@@ -508,7 +507,7 @@ bool EventModel::saveToFile(const QString& sPath)
     }
 
     return true;
-    #endif
+#endif
 }
 
 //=============================================================================================================
@@ -538,10 +537,10 @@ MatrixXi EventModel::getEventMatrix()
     // hardcoded to 1, which meant every event was exported as the same
     // condition and downstream averaging could not tell them apart.
     matEventDataMatrix.resize(events->size(), 3);
-    for (int i = 0; i < static_cast<int>(events->size()); i++){
-        matEventDataMatrix(i,0) = events->at(i).sample;
-        matEventDataMatrix(i,1) = 0;
-        matEventDataMatrix(i,2) = events->at(i).eventCode;
+    for (int i = 0; i < static_cast<int>(events->size()); i++) {
+        matEventDataMatrix(i, 0) = events->at(i).sample;
+        matEventDataMatrix(i, 1) = 0;
+        matEventDataMatrix(i, 2) = events->at(i).eventCode;
     }
 
     return matEventDataMatrix;
@@ -551,8 +550,7 @@ MatrixXi EventModel::getEventMatrix()
 
 void EventModel::setGroupColor(const QColor& groupColor)
 {
-    for(int group : m_selectedEventGroups){
-
+    for (int group : m_selectedEventGroups) {
         int red, green, blue;
         groupColor.getRgb(&red, &green, &blue);
         m_EventManager.setGroupColor(group, EVENTSLIB::RgbColor(red, green, blue));
@@ -563,7 +561,7 @@ void EventModel::setGroupColor(const QColor& groupColor)
 //=============================================================================================================
 
 void EventModel::setGroupName(int iGroupIndex,
-                              const QString &sGroupName)
+                              const QString& sGroupName)
 {
     m_EventManager.renameGroup(iGroupIndex, sGroupName.toStdString());
     emit eventGroupsUpdated();
@@ -571,7 +569,7 @@ void EventModel::setGroupName(int iGroupIndex,
 
 //=============================================================================================================
 
-void EventModel::setSelectedGroupName(const QString &sGroupName)
+void EventModel::setSelectedGroupName(const QString& sGroupName)
 {
     m_EventManager.renameGroup(m_selectedEventGroups.front(), sGroupName.toStdString());
 }
@@ -605,12 +603,12 @@ void EventModel::initFromFile(const QString& sFilePath)
 
     Eigen::MatrixXi eventList;
 
-    if(fileInfo.exists() && (fileInfo.completeSuffix() == "eve")){
-        QFile file(sFilePath);       
-        MNELIB::MNE::read_events_from_ascii(file, eventList); 
-    } else if(fileInfo.exists() && (fileInfo.completeSuffix() == "fif")){
+    if (fileInfo.exists() && (fileInfo.completeSuffix() == "eve")) {
         QFile file(sFilePath);
-        if (!file.open(QIODevice::ReadOnly | QIODevice::Text)){
+        MNELIB::MNE::read_events_from_ascii(file, eventList);
+    } else if (fileInfo.exists() && (fileInfo.completeSuffix() == "fif")) {
+        QFile file(sFilePath);
+        if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
             return;
         }
         MNELIB::MNE::read_events_from_fif(file, eventList);
@@ -625,8 +623,8 @@ void EventModel::initFromFile(const QString& sFilePath)
     // trigger code, which used to be dropped so every loaded event became
     // the same condition. Iterate rows, not size(), which counts every
     // element of the matrix rather than the number of events.
-    for(int i = 0; i < eventList.rows(); i++){
-        addEventWithCode(eventList(i,0), eventList(i,2));
+    for (int i = 0; i < eventList.rows(); i++) {
+        addEventWithCode(eventList(i, 0), eventList(i, 2));
     }
 }
 
@@ -642,7 +640,7 @@ void EventModel::addEvent(int iSample)
 
 void EventModel::addEventWithCode(int iSample, int iEventCode)
 {
-    if(m_selectedEventGroups.empty()){
+    if (m_selectedEventGroups.empty()) {
         return;
     }
 
@@ -678,8 +676,8 @@ void EventModel::addGroup(QString sName,
 
 //=============================================================================================================
 
-std::unique_ptr<std::vector<EVENTSLIB::Event> > EventModel::getEventsToDisplay(int iBegin,
-                                                                               int iEnd) const
+std::unique_ptr<std::vector<EVENTSLIB::Event>> EventModel::getEventsToDisplay(int iBegin,
+                                                                              int iEnd) const
 {
     // Events are keyed by their first sample, so asking for exactly the
     // visible range would miss one that starts earlier and reaches into it.
@@ -696,13 +694,13 @@ std::unique_ptr<std::vector<EVENTSLIB::Event> > EventModel::getEventsToDisplay(i
 
 void EventModel::eventsUpdated()
 {
-    emit dataChanged(createIndex(0,0), createIndex(rowCount(), columnCount()));
+    emit dataChanged(createIndex(0, 0), createIndex(rowCount(), columnCount()));
     emit headerDataChanged(Qt::Vertical, 0, static_cast<int>(m_EventManager.getAllEvents()->size()));
 }
 
 //=============================================================================================================
 
-std::unique_ptr<std::vector<EVENTSLIB::EventGroup> > EventModel::getGroupsToDisplay() const
+std::unique_ptr<std::vector<EVENTSLIB::EventGroup>> EventModel::getGroupsToDisplay() const
 {
     return m_EventManager.getAllGroups();
 }
@@ -744,8 +742,8 @@ std::vector<idNum> EventModel::getSelectedGroups() const
 
 void EventModel::deleteSelectedGroups()
 {
-    if (m_selectedEventGroups.size()){
-        for (int groupId : m_selectedEventGroups){
+    if (m_selectedEventGroups.size()) {
+        for (int groupId : m_selectedEventGroups) {
             m_EventManager.deleteEventsInGroup(groupId);
             m_EventManager.deleteGroup(groupId);
         }
@@ -759,7 +757,7 @@ void EventModel::deleteSelectedGroups()
 
 void EventModel::setSharedMemory(bool bState)
 {
-    if(bState){
+    if (bState) {
         m_EventManager.initSharedMemory(EVENTSLIB::SharedMemoryMode::READWRITE);
     } else {
         m_EventManager.stopSharedMemory();
@@ -775,11 +773,11 @@ std::vector<uint> EventModel::getEventSelection() const
 
 //=============================================================================================================
 
-void EventModel::updateSelectedGroups(const QList<QModelIndex> &indexList)
+void EventModel::updateSelectedGroups(const QList<QModelIndex>& indexList)
 {
     clearGroupSelection();
 
-    for(const auto& row : indexList){
+    for (const auto& row : indexList) {
         addToSelectedGroups(row.data(Qt::UserRole).toInt());
     }
 
@@ -797,42 +795,39 @@ void EventModel::getEventsFromNewData()
 
     std::list<int> stimChannelIndexList;
 
-    for(int i = 0; i < info->chs.size(); i++) {
-        if(info->chs[i].kind == FIFFV_STIM_CH) {
+    for (int i = 0; i < info->chs.size(); i++) {
+        if (info->chs[i].kind == FIFFV_STIM_CH) {
             stimChannelIndexList.push_back(i);
         }
     }
 
     Eigen::MatrixXd mSampleData, mSampleTimes;
 
-    if(previousLastSample > 0){
-        if(!raw->read_raw_segment(mSampleData,
-                              mSampleTimes,
-                                   previousLastSample))
-        {
+    if (previousLastSample > 0) {
+        if (!raw->read_raw_segment(mSampleData,
+                                   mSampleTimes,
+                                   previousLastSample)) {
+            qWarning() << "[EventModel::getEventsFromNewData] Could not read block ";
+            return;
+        }
+    } else {
+        if (!raw->read_raw_segment(mSampleData,
+                                   mSampleTimes)) {
             qWarning() << "[EventModel::getEventsFromNewData] Could not read block ";
             return;
         }
     }
-    else {
-        if(!raw->read_raw_segment(mSampleData,
-                                   mSampleTimes))
-        {
-            qWarning() << "[EventModel::getEventsFromNewData] Could not read block ";
-            return;
-        }
-    }
 
-    for (int iChannelIndex : stimChannelIndexList){
-        QList<QPair<int,double>> detectedTriggerSamples = RTPROCESSINGLIB::detectTriggerFlanksMax(mSampleData,
-                                                                                                  iChannelIndex,
-                                                                                                  0,
-                                                                                                  m_dThreshold,
-                                                                                                  0);
+    for (int iChannelIndex : stimChannelIndexList) {
+        QList<QPair<int, double>> detectedTriggerSamples = RTPROCESSINGLIB::detectTriggerFlanksMax(mSampleData,
+                                                                                                   iChannelIndex,
+                                                                                                   0,
+                                                                                                   m_dThreshold,
+                                                                                                   0);
 
-        QMap<double,QList<int>> mEventsinTypes;
+        QMap<double, QList<int>> mEventsinTypes;
 
-        for(const auto& sample : std::as_const(detectedTriggerSamples)){
+        for (const auto& sample : std::as_const(detectedTriggerSamples)) {
             mEventsinTypes[sample.second].append(sample.first);
         }
 
@@ -840,28 +835,26 @@ void EventModel::getEventsFromNewData()
 
         auto groups = m_EventManager.getAllGroups();
 
-        for (auto key : std::as_const(keyList)){
-            QString name =info->chs[iChannelIndex].ch_name + "_" + QString::number(static_cast<int>(key));
+        for (auto key : std::as_const(keyList)) {
+            QString name = info->chs[iChannelIndex].ch_name + "_" + QString::number(static_cast<int>(key));
             bool foundMatch = false;
             int groupID = 0;
-            for(auto& group : *groups){
-                if(name.toStdString() == group.name){
+            for (auto& group : *groups) {
+                if (name.toStdString() == group.name) {
                     foundMatch = true;
                     groupID = group.id;
                     break;
                 }
             }
 
-            if(!foundMatch){
+            if (!foundMatch) {
                 auto newGroup = m_EventManager.addGroup(name.toStdString());
                 groupID = newGroup.id;
             }
 
-            for (auto event : std::as_const(mEventsinTypes[key])){
+            for (auto event : std::as_const(mEventsinTypes[key])) {
                 m_EventManager.addEvent(event + iFirstSample, groupID);
             }
         }
-
     }
-
 }

@@ -111,10 +111,10 @@ public:
     inline Eigen::MatrixX4i getRGBAs() const;
 
 public:
-    QString orig_tab;           /**< FsColortable raw data. */
-    qint32 numEntries;          /**< Number of entries. */
-    QStringList struct_names;   /**< Anatomical ROI description. */
-    Eigen::MatrixXi table;      /**< labels and corresponing colorcode. */
+    QString orig_tab;         /**< FsColortable raw data. */
+    qint32 numEntries;        /**< Number of entries. */
+    QStringList struct_names; /**< Anatomical ROI description. */
+    Eigen::MatrixXi table;    /**< labels and corresponing colorcode. */
 };
 
 //=============================================================================================================
@@ -125,7 +125,7 @@ inline Eigen::VectorXi FsColortable::getLabelIds() const
 {
     Eigen::VectorXi p_vecIds;
     if (table.cols() == 5)
-        p_vecIds = table.block(0,4,table.rows(),1);
+        p_vecIds = table.block(0, 4, table.rows(), 1);
 
     return p_vecIds;
 }
@@ -143,7 +143,7 @@ inline Eigen::MatrixX4i FsColortable::getRGBAs() const
 {
     Eigen::MatrixX4i p_matRGBAs;
     if (table.cols() == 5)
-        p_matRGBAs = table.block(0,0,table.rows(),4);
+        p_matRGBAs = table.block(0, 0, table.rows(), 4);
 
     return p_matRGBAs;
 }

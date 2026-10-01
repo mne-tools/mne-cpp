@@ -28,9 +28,9 @@ using namespace SCSHAREDLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-PluginOutputConnector::PluginOutputConnector(AbstractPlugin *parent,
-                                             const QString &name,
-                                             const QString &descr)
+PluginOutputConnector::PluginOutputConnector(AbstractPlugin* parent,
+                                             const QString& name,
+                                             const QString& descr)
 : PluginConnector(parent, name, descr)
 {
 }
@@ -48,4 +48,3 @@ bool PluginOutputConnector::isOutputConnector() const
 {
     return true;
 }
-

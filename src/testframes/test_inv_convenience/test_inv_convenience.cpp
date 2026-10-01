@@ -66,7 +66,9 @@ class TestInvConvenience : public QObject
     Q_OBJECT
 
 private slots:
-    void initTestCase() {}
+    void initTestCase()
+    {
+    }
 
     //--- computeWhitener tests ---
 
@@ -383,7 +385,8 @@ private slots:
 
         QVERIFY2(result["alpha"](0) > result["beta"](0) * 10.0,
                  qPrintable(QString("Alpha=%1 should >> beta=%2")
-                            .arg(result["alpha"](0)).arg(result["beta"](0))));
+                                .arg(result["alpha"](0))
+                                .arg(result["beta"](0))));
     }
 
     void testBandPowerEmpty()
@@ -513,7 +516,9 @@ private slots:
         QVERIFY(!stc.writeHemispherePair(tmpDir.path() + "/estimate"));
     }
 
-    void cleanupTestCase() {}
+    void cleanupTestCase()
+    {
+    }
 };
 
 //=============================================================================================================

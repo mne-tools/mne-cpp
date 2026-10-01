@@ -51,20 +51,23 @@
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-namespace FIFFLIB {
-    class FiffInfo;
-    class FiffChInfo;
+namespace FIFFLIB
+{
+class FiffInfo;
+class FiffChInfo;
 }
 
-namespace RTPROCESSINGLIB {
-    class FilterOverlapAdd;
+namespace RTPROCESSINGLIB
+{
+class FilterOverlapAdd;
 }
 
 //=============================================================================================================
 // DEFINE NAMESPACE ANSHAREDLIB
 //=============================================================================================================
 
-namespace ANSHAREDLIB {
+namespace ANSHAREDLIB
+{
 
 //=============================================================================================================
 // ANSHAREDLIB FORWARD DECLARATIONS
@@ -82,14 +85,14 @@ class ANSHAREDSHARED_EXPORT FiffRawViewModel : public AbstractModel
     Q_OBJECT
 
 public:
-    typedef QSharedPointer<FiffRawViewModel> SPtr;              /**< Shared pointer type for FiffRawViewModel. */
-    typedef QSharedPointer<const FiffRawViewModel> ConstSPtr;   /**< Const shared pointer type for FiffRawViewModel. */
+    typedef QSharedPointer<FiffRawViewModel> SPtr;            /**< Shared pointer type for FiffRawViewModel. */
+    typedef QSharedPointer<const FiffRawViewModel> ConstSPtr; /**< Const shared pointer type for FiffRawViewModel. */
 
     //=========================================================================================================
     /**
      * Constructs a FiffRawViewModel object.
      */
-    FiffRawViewModel(QObject *pParent = Q_NULLPTR);
+    FiffRawViewModel(QObject* pParent = Q_NULLPTR);
 
     //=========================================================================================================
     /**
@@ -102,11 +105,11 @@ public:
      * @param[in] iPreloadBufferSize    The number of preloaded buffer windows. Default is set to 2.
      * @param[in] pParent               The parent model. Default is set to NULL.
      */
-    FiffRawViewModel(const QString &sFilePath,
+    FiffRawViewModel(const QString& sFilePath,
                      const QByteArray& byteLoadedData = QByteArray(),
                      qint32 iVisibleWindowSize = 10,
                      qint32 iPreloadBufferSize = 2,
-                     QObject *pParent = Q_NULLPTR);
+                     QObject* pParent = Q_NULLPTR);
 
     //=========================================================================================================
     /**
@@ -129,7 +132,7 @@ public:
      * @param[in] index   The index that referres to the requested item.
      * @param[in] role    The requested role.
      */
-    QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const override;
+    QVariant data(const QModelIndex& index, int role = Qt::DisplayRole) const override;
 
     //=========================================================================================================
     /**
@@ -159,7 +162,7 @@ public:
      *
      * @param[in] index   The index that referres to the requested item.
      */
-    Qt::ItemFlags flags(const QModelIndex &index) const override;
+    Qt::ItemFlags flags(const QModelIndex& index) const override;
 
     //=========================================================================================================
     /**
@@ -171,7 +174,7 @@ public:
      * @param[in] column   The specified column.
      * @param[in] parent   The parent index.
      */
-    QModelIndex index(int row, int column, const QModelIndex &parent = QModelIndex()) const override;
+    QModelIndex index(int row, int column, const QModelIndex& parent = QModelIndex()) const override;
 
     //=========================================================================================================
     /**
@@ -180,7 +183,7 @@ public:
      *
      * @param[in] index   The index that referres to the child.
      */
-    QModelIndex parent(const QModelIndex &index) const override;
+    QModelIndex parent(const QModelIndex& index) const override;
 
     //=========================================================================================================
     /**
@@ -188,7 +191,7 @@ public:
      *
      * @param[in] parent     The parent index.
      */
-    int rowCount(const QModelIndex &parent = QModelIndex()) const override;
+    int rowCount(const QModelIndex& parent = QModelIndex()) const override;
 
     //=========================================================================================================
     /**
@@ -196,7 +199,7 @@ public:
      *
      * @param[in] parent     The index of the requested node.
      */
-    int columnCount(const QModelIndex &parent = QModelIndex()) const override;
+    int columnCount(const QModelIndex& parent = QModelIndex()) const override;
 
     //=========================================================================================================
     /**
@@ -204,7 +207,7 @@ public:
      *
      * @param[in] parent     The index of the parent node.
      */
-    bool hasChildren(const QModelIndex &parent = QModelIndex()) const override;
+    bool hasChildren(const QModelIndex& parent = QModelIndex()) const override;
 
     //=========================================================================================================
     /**
@@ -274,7 +277,7 @@ public:
      *
      * @return the current scaling.
      */
-    inline const QMap< qint32,float >& getScaling() const;
+    inline const QMap<qint32, float>& getScaling() const;
 
     //=========================================================================================================
     /**
@@ -318,7 +321,7 @@ public:
      *
      * @param[in] p_qMapChScaling    Map of scaling factors.
      */
-    void setScaling(const QMap< qint32,float >& p_qMapChScaling);
+    void setScaling(const QMap<qint32, float>& p_qMapChScaling);
 
     //=========================================================================================================
     /**
@@ -460,7 +463,7 @@ public:
      *
      * @param[in] channelType    the channel type which is to be filtered (EEG, MEG, All).
      */
-    void setFilterChannelType(const QString &channelType);
+    void setFilterChannelType(const QString& channelType);
 
     //=========================================================================================================
     /**
@@ -577,31 +580,31 @@ private:
      *
      * @param[in] path      Path to new fiff file to read from
      */
-    void readFromRealtimeFile(const QString &path);
+    void readFromRealtimeFile(const QString& path);
 
-    std::list<QSharedPointer<QPair<MatrixXd, MatrixXd> > > m_lData;             /**< Data. */
-    std::list<QSharedPointer<QPair<MatrixXd, MatrixXd> > > m_lNewData;          /**< Data that is to be appended or prepended. */
-    std::list<QSharedPointer<QPair<MatrixXd, MatrixXd> > > m_lFilteredData;     /**< Filtered data. */
-    std::list<QSharedPointer<QPair<MatrixXd, MatrixXd> > > m_lFilteredNewData;  /**< Filtered data that is to be appended or prepended. */
+    std::list<QSharedPointer<QPair<MatrixXd, MatrixXd>>> m_lData;            /**< Data. */
+    std::list<QSharedPointer<QPair<MatrixXd, MatrixXd>>> m_lNewData;         /**< Data that is to be appended or prepended. */
+    std::list<QSharedPointer<QPair<MatrixXd, MatrixXd>>> m_lFilteredData;    /**< Filtered data. */
+    std::list<QSharedPointer<QPair<MatrixXd, MatrixXd>>> m_lFilteredNewData; /**< Filtered data that is to be appended or prepended. */
 
     // Display stuff
-    double      m_dDx;              /**< pixel difference to the next sample. */
+    double m_dDx; /**< pixel difference to the next sample. */
 
     // model config
-    qint32 m_iSamplesPerBlock;      /**< Number of samples per block. */
-    qint32 m_iVisibleWindowSize;    /**< Number of blocks per visible window. */
-    qint32 m_iPreloadBufferSize;    /**< Number of blocks that are preloaded left and right. */
-    qint32 m_iTotalBlockCount;      /**< Total block count ( =  m_iVisibleWindowSize + 2 * m_iPreloadBufferSize). */
+    qint32 m_iSamplesPerBlock;   /**< Number of samples per block. */
+    qint32 m_iVisibleWindowSize; /**< Number of blocks per visible window. */
+    qint32 m_iPreloadBufferSize; /**< Number of blocks that are preloaded left and right. */
+    qint32 m_iTotalBlockCount;   /**< Total block count ( =  m_iVisibleWindowSize + 2 * m_iPreloadBufferSize). */
 
     // management
-    qint32 m_iFiffCursorBegin;      /**< This always points to the very first sample that is currently held (in the earliest block). */
-    bool m_bStartOfFileReached;     /**< Flag for having reached the start of the file. */
-    bool m_bEndOfFileReached;       /**< Flag for having reached the end of the file. */
+    qint32 m_iFiffCursorBegin;  /**< This always points to the very first sample that is currently held (in the earliest block). */
+    bool m_bStartOfFileReached; /**< Flag for having reached the start of the file. */
+    bool m_bEndOfFileReached;   /**< Flag for having reached the end of the file. */
 
     // concurrent reloading
-    QFutureWatcher<int> m_blockLoadFutureWatcher;   /**< QFutureWatcher for watching process of reloading fiff data. */
-    bool m_bCurrentlyLoading;                       /**< Flag to indicate whether or not a background operation is going on. */
-    mutable QMutex m_dataMutex;                     /**< Using mutable is not a pretty solution. */
+    QFutureWatcher<int> m_blockLoadFutureWatcher; /**< QFutureWatcher for watching process of reloading fiff data. */
+    bool m_bCurrentlyLoading;                     /**< Flag to indicate whether or not a background operation is going on. */
+    mutable QMutex m_dataMutex;                   /**< Using mutable is not a pretty solution. */
 
     // data stuff
     QFile m_file;
@@ -609,35 +612,35 @@ private:
     QBuffer m_buffer;
 
     // Filter stuff
-    qint32                                      m_iMaxFilterLength;                         /**< Max order of the current filters. */
-    QString                                     m_sFilterChannelType;                       /**< Kind of channel which is to be filtered. */
-    QSharedPointer<RTPROCESSINGLIB::FilterOverlapAdd>     m_pRtFilter;                                /**< The filter object. */
-    Eigen::RowVectorXi                          m_lFilterChannelList;                       /**< The indices of the channels to be filtered.*/
-    bool                                        m_bPerformFiltering;                        /**< Flag whether to activate/deactivate filtering. */
-    UTILSLIB::FilterKernel               m_filterKernel;                             /**< List of currently active filters. */
+    qint32 m_iMaxFilterLength;                                     /**< Max order of the current filters. */
+    QString m_sFilterChannelType;                                  /**< Kind of channel which is to be filtered. */
+    QSharedPointer<RTPROCESSINGLIB::FilterOverlapAdd> m_pRtFilter; /**< The filter object. */
+    Eigen::RowVectorXi m_lFilterChannelList;                       /**< The indices of the channels to be filtered.*/
+    bool m_bPerformFiltering;                                      /**< Flag whether to activate/deactivate filtering. */
+    UTILSLIB::FilterKernel m_filterKernel;                         /**< List of currently active filters. */
 
     // fiff stuff
-    QSharedPointer<FIFFLIB::FiffIO>             m_pFiffIO;                                  /**< Fiff IO. */
-    QSharedPointer<FIFFLIB::FiffInfo>           m_pFiffInfo;                                /**< Fiff info of whole fiff file. */
-    QList<FIFFLIB::FiffChInfo>                  m_ChannelInfoList;                          /**< List of FiffChInfo objects that holds the corresponding channels information. */
+    QSharedPointer<FIFFLIB::FiffIO> m_pFiffIO;     /**< Fiff IO. */
+    QSharedPointer<FIFFLIB::FiffInfo> m_pFiffInfo; /**< Fiff info of whole fiff file. */
+    QList<FIFFLIB::FiffChInfo> m_ChannelInfoList;  /**< List of FiffChInfo objects that holds the corresponding channels information. */
 
-    QMap<qint32,float>                          m_qMapChScaling;                            /**< Channel scaling map. */
+    QMap<qint32, float> m_qMapChScaling; /**< Channel scaling map. */
 
-    QColor                                      m_colBackground;                            /**< The background color.*/
+    QColor m_colBackground; /**< The background color.*/
 
-    int                                         m_iDistanceTimerSpacer;                     /**< The distance for the horizontal time spacers in the view in ms. */
-    int                                         m_iScroller;
+    int m_iDistanceTimerSpacer; /**< The distance for the horizontal time spacers in the view in ms. */
+    int m_iScroller;
 
-    FIFFLIB::FiffFileSharer                     m_FileSharer;                               /**<  Handles receiving files from shared directory for receving from realtime recording. */
+    FIFFLIB::FiffFileSharer m_FileSharer; /**<  Handles receiving files from shared directory for receving from realtime recording. */
 
-    qint32                                      m_iScrollPos;                               /**< Position of the scrollbar */
+    qint32 m_iScrollPos; /**< Position of the scrollbar */
 
-    bool                                        m_bDispEvent;                               /**< Whether events wil be shown */
-    bool                                        m_bRealtime;                                /**< Whether this model cooreponds to a realtime mnescan session (fiff file can change) */
+    bool m_bDispEvent; /**< Whether events wil be shown */
+    bool m_bRealtime;  /**< Whether this model cooreponds to a realtime mnescan session (fiff file can change) */
 
-    QSharedPointer<EventModel>                  m_pEventModel;                              /**< Model to store events to be displayed. */
+    QSharedPointer<EventModel> m_pEventModel; /**< Model to store events to be displayed. */
 
-    int                                         m_iLastFileEndSample;
+    int m_iLastFileEndSample;
 signals:
     //=========================================================================================================
     /**
@@ -660,20 +663,21 @@ inline MODEL_TYPE FiffRawViewModel::getType() const
 
 //=============================================================================================================
 
-inline qint32 FiffRawViewModel::currentFirstSample() const {
+inline qint32 FiffRawViewModel::currentFirstSample() const
+{
     return m_iFiffCursorBegin;
 }
 
 //=============================================================================================================
 
-inline qint32 FiffRawViewModel::absoluteFirstSample() const {
+inline qint32 FiffRawViewModel::absoluteFirstSample() const
+{
     // The default constructor leaves m_pFiffIO null, which is the state the
     // model is in before a file is opened. Checking the raw list without
     // checking the pointer first dereferences null and crashes.
-    if(m_pFiffIO && m_pFiffIO->m_qlistRaw.empty() == false)
+    if (m_pFiffIO && m_pFiffIO->m_qlistRaw.empty() == false)
         return m_pFiffIO->m_qlistRaw[0]->first_samp;
-    else
-    {
+    else {
         qWarning() << "[FiffRawViewModel::firstSample] Raw list is empty, returning -1";
         return -1;
     }
@@ -681,18 +685,19 @@ inline qint32 FiffRawViewModel::absoluteFirstSample() const {
 
 //=============================================================================================================
 
-inline qint32 FiffRawViewModel::currentLastSample() const {
+inline qint32 FiffRawViewModel::currentLastSample() const
+{
     return m_iFiffCursorBegin + m_iTotalBlockCount * m_iSamplesPerBlock - 1;
 }
 
 //=============================================================================================================
 
-inline qint32 FiffRawViewModel::absoluteLastSample() const {
+inline qint32 FiffRawViewModel::absoluteLastSample() const
+{
     // Same null pointer case as absoluteFirstSample above.
-    if(m_pFiffIO && m_pFiffIO->m_qlistRaw.empty() == false)
+    if (m_pFiffIO && m_pFiffIO->m_qlistRaw.empty() == false)
         return m_pFiffIO->m_qlistRaw[0]->last_samp;
-    else
-    {
+    else {
         qWarning() << "[FiffRawViewModel::lastSample] Raw list is empty, returning -1";
         return -1;
     }
@@ -700,25 +705,28 @@ inline qint32 FiffRawViewModel::absoluteLastSample() const {
 
 //=============================================================================================================
 
-inline qint32 FiffRawViewModel::sampleWindowSize() const {
+inline qint32 FiffRawViewModel::sampleWindowSize() const
+{
     return m_iVisibleWindowSize * m_iSamplesPerBlock;
 }
 
 //=============================================================================================================
 
-inline void FiffRawViewModel::setDataColumnWidth(int iWidth) {
-    m_dDx = (double)iWidth / double(m_iVisibleWindowSize*m_iSamplesPerBlock);
+inline void FiffRawViewModel::setDataColumnWidth(int iWidth)
+{
+    m_dDx = (double)iWidth / double(m_iVisibleWindowSize * m_iSamplesPerBlock);
 }
 
 //=============================================================================================================
 
-inline double FiffRawViewModel::pixelDifference() const {
+inline double FiffRawViewModel::pixelDifference() const
+{
     return m_dDx;
 }
 
 //=============================================================================================================
 
-inline const QMap< qint32,float >& FiffRawViewModel::getScaling() const
+inline const QMap<qint32, float>& FiffRawViewModel::getScaling() const
 {
     return m_qMapChScaling;
 }
@@ -743,7 +751,7 @@ inline float FiffRawViewModel::getSamplingFrequency() const
 {
     float fFreq;
 
-    if(m_pFiffInfo){
+    if (m_pFiffInfo) {
         fFreq = m_pFiffInfo->sfreq;
     } else {
         fFreq = 0;
@@ -762,14 +770,12 @@ inline float FiffRawViewModel::getSamplingFrequency() const
  */
 class ChannelData
 {
-
 public:
     /**
      * This nested class enables the range-based looping.
      */
     class ChannelIterator
     {
-
     public:
         using iterator_category = std::random_access_iterator_tag;
         using value_type = const double;
@@ -777,13 +783,13 @@ public:
         using pointer = const double*;
         using reference = const double&;
 
-        const ChannelData* cd;  /**< Pointer to the associated ChannelData container. */
+        const ChannelData* cd; /**< Pointer to the associated ChannelData container. */
         // Remember at which point we are currently (this is NOT the absolute sample number,
         // but the index relative to all stored samples in the associated ChannelData container):
         qint32 currentIndex;
 
         // Remember which block we are currently in
-        std::list<QSharedPointer<QPair<MatrixXd, MatrixXd> > >::const_iterator currentBlockToAccess;
+        std::list<QSharedPointer<QPair<MatrixXd, MatrixXd>>>::const_iterator currentBlockToAccess;
         qint32 currentRelativeIndex; /**< Remember the relative sample in the current block. */
 
     public:
@@ -805,12 +811,12 @@ public:
             currentRelativeIndex = temp;
         }
 
-        ChannelIterator(const ChannelIterator &other)
+        ChannelIterator(const ChannelIterator& other)
         : ChannelIterator(other.cd, other.currentIndex)
         {
         }
 
-        ChannelIterator& operator ++ (int)
+        ChannelIterator& operator++(int)
         {
             currentIndex++;
             currentRelativeIndex++;
@@ -822,7 +828,7 @@ public:
             return *this;
         }
 
-        ChannelIterator& operator ++ ()
+        ChannelIterator& operator++()
         {
             currentIndex++;
             currentRelativeIndex++;
@@ -834,12 +840,12 @@ public:
             return *this;
         }
 
-        bool operator != (ChannelIterator rhs)
+        bool operator!=(ChannelIterator rhs)
         {
             return currentIndex != rhs.currentIndex;
         }
 
-        double operator * ()
+        double operator*()
         {
             const double* pointerToMatrix = (*currentBlockToAccess)->first.data();
 
@@ -865,7 +871,7 @@ public:
             it++;
         }
 
-        for (const auto &a : m_lData) {
+        for (const auto& a : m_lData) {
             m_iNumSamples += a->first.cols();
         }
     }
@@ -874,14 +880,12 @@ public:
                 unsigned long rowNumber)
     : ChannelData(data.begin(), static_cast<qint32>(data.size()), rowNumber)
     {
-
     }
 
     // we need a public copy constructor in order to register this as QMetaType
     ChannelData(const ChannelData& other)
     : ChannelData(other.m_lData, other.m_iRowNumber)
     {
-
     }
 
     // we need a public default constructor in order to register this as QMetaType
@@ -897,12 +901,11 @@ public:
     ~ChannelData() = default;
 
     // this is comparatively expensive to call, better use the range based for loop
-    double operator [] (unsigned long i)
+    double operator[](unsigned long i)
     {
         // see which block we have to access
         std::list<QSharedPointer<QPair<MatrixXd, MatrixXd>>>::const_iterator blockToAccess = m_lData.begin();
-        while (i >= (unsigned long)(*blockToAccess)->first.cols())
-        {
+        while (i >= (unsigned long)(*blockToAccess)->first.cols()) {
             i -= (*blockToAccess)->first.cols();
             blockToAccess++;
         }
@@ -944,7 +947,7 @@ public:
 private:
     // hold a list of smartpointers to the data that was in the model when the respective instance of ChannelData was created.
     // This prevents that pointers into the Eigen-matrices will become invalid when the background thread returns and changes the matrices.
-    std::list<QSharedPointer<QPair<MatrixXd, MatrixXd> > > m_lData;
+    std::list<QSharedPointer<QPair<MatrixXd, MatrixXd>>> m_lData;
     quint32 m_iRowNumber;
     qint64 m_iNumSamples;
 };

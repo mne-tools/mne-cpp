@@ -32,11 +32,11 @@ using namespace MNEBROWSE;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-AboutWindow::AboutWindow(QWidget *parent) :
-    QDockWidget(tr("About"), parent),
-    ui(new Ui::AboutWindow)
+AboutWindow::AboutWindow(QWidget* parent)
+: QDockWidget(tr("About"), parent)
+, ui(new Ui::AboutWindow)
 {
-    QWidget *content = new QWidget(this);
+    QWidget* content = new QWidget(this);
     ui->setupUi(content);
     setWidget(content);
 

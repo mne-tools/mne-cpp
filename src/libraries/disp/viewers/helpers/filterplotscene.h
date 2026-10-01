@@ -81,7 +81,7 @@ public:
      * @param[in] parent pointer to parent widget; If parent is 0, the new FilterPlotScene becomes a window. If parent is another widget, FilterPlotScene becomes a child window inside parent. FilterPlotScene is deleted when its parent is deleted.
      */
     FilterPlotScene(QGraphicsView* view,
-                    QObject *parent = 0);
+                    QObject* parent = 0);
 
     //=========================================================================================================
     /**
@@ -92,7 +92,7 @@ public:
      * @param[in] cutOffLow cut off frequqency lowpass or lower cut off when filter is a bandpass.
      * @param[in] cutOffHigh cut off frequqency highpass or higher cut off when filter is a bandpass.
      */
-    void updateFilter(const UTILSLIB::FilterKernel &operatorFilter,
+    void updateFilter(const UTILSLIB::FilterKernel& operatorFilter,
                       int samplingFreq,
                       int cutOffLow,
                       int cutOffHigh);
@@ -107,7 +107,7 @@ protected:
      *
      */
     void plotMagnitudeDiagram(int samplingFreq,
-                              const QString &filtername = QString());
+                              const QString& filtername = QString());
 
     //=========================================================================================================
     /**
@@ -115,22 +115,22 @@ protected:
      */
     void plotFilterFrequencyResponse();
 
-    UTILSLIB::FilterKernel    m_pCurrentFilter;       /**< Pointer to the filter operator. */
+    UTILSLIB::FilterKernel m_pCurrentFilter; /**< Pointer to the filter operator. */
 
-    QGraphicsPathItem*      m_pGraphicsItemPath;    /**< Pointer to the graphics path item in the filterplotscene. */
+    QGraphicsPathItem* m_pGraphicsItemPath; /**< Pointer to the graphics path item in the filterplotscene. */
 
-    int             m_iMaxMagnitude;                /**< the maximum magnitude shown in the diagram. */
-    int             m_iScalingFactor;               /**< Scales the db filter magnitudes by the specified factor in order to provide better plotting. */
-    int             m_iNumberHorizontalLines;       /**< number of plotted horizontal ()lines. */
-    int             m_iNumberVerticalLines;         /**< number of plotted vertical lines. */
-    int             m_iAxisTextSize;                /**< point size of the plotted text. */
-    int             m_iDiagramMarginsHoriz;         /**< horizontal space between the filter and diagram plot. */
-    int             m_iDiagramMarginsVert;          /**< vertical space between the filter and diagram plot. */
-    int             m_iCutOffLow;                   /**< cut off frequqency lowpass or lower cut off when filter is a bandpass. */
-    int             m_iCutOffHigh;                  /**< cut off frequqency highpass or higher cut off when filter is a bandpass. */
-    int             m_iCutOffMarkerWidth;           /**< cut off marker width. */
-    int             m_iPlotLength;                  /**< Length of current filter impulse response plot. */
-    QColor          m_cPenColor;                    /**< Color of the text and plot of the filter freq response plot. */
+    int m_iMaxMagnitude;          /**< the maximum magnitude shown in the diagram. */
+    int m_iScalingFactor;         /**< Scales the db filter magnitudes by the specified factor in order to provide better plotting. */
+    int m_iNumberHorizontalLines; /**< number of plotted horizontal ()lines. */
+    int m_iNumberVerticalLines;   /**< number of plotted vertical lines. */
+    int m_iAxisTextSize;          /**< point size of the plotted text. */
+    int m_iDiagramMarginsHoriz;   /**< horizontal space between the filter and diagram plot. */
+    int m_iDiagramMarginsVert;    /**< vertical space between the filter and diagram plot. */
+    int m_iCutOffLow;             /**< cut off frequqency lowpass or lower cut off when filter is a bandpass. */
+    int m_iCutOffHigh;            /**< cut off frequqency highpass or higher cut off when filter is a bandpass. */
+    int m_iCutOffMarkerWidth;     /**< cut off marker width. */
+    int m_iPlotLength;            /**< Length of current filter impulse response plot. */
+    QColor m_cPenColor;           /**< Color of the text and plot of the filter freq response plot. */
 };
 } // NAMESPACE DISPLIB
 

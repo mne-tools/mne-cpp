@@ -140,8 +140,8 @@ int SetupForwardModel::run()
     qInfo("%s", "");
     qInfo("Setting up the BEM with the following parameters:");
     qInfo("%s", "");
-    qInfo("SUBJECTS_DIR       = %s" , qPrintable(m_settings.subjectsDir()));
-    qInfo("Subject            = %s" , qPrintable(m_settings.subject()));
+    qInfo("SUBJECTS_DIR       = %s", qPrintable(m_settings.subjectsDir()));
+    qInfo("Subject            = %s", qPrintable(m_settings.subject()));
 
     // Read inner skull
     MNEBemSurface innerSkull;
@@ -158,8 +158,8 @@ int SetupForwardModel::run()
             return 1;
         }
     }
-    qInfo("Inner skull        = %s (%d triangles)" ,
-           qPrintable(innerSkullFile), innerSkull.ntri);
+    qInfo("Inner skull        = %s (%d triangles)",
+          qPrintable(innerSkullFile), innerSkull.ntri);
 
     MNEBemSurface outerSkull, outerSkin;
     if (!m_settings.homogeneous()) {
@@ -177,8 +177,8 @@ int SetupForwardModel::run()
                 return 1;
             }
         }
-        qInfo("Outer skull        = %s (%d triangles)" ,
-               qPrintable(outerSkullFile), outerSkull.ntri);
+        qInfo("Outer skull        = %s (%d triangles)",
+              qPrintable(outerSkullFile), outerSkull.ntri);
 
         // Read outer skin (scalp)
         if (m_settings.useSurfFormat()) {
@@ -194,14 +194,14 @@ int SetupForwardModel::run()
                 return 1;
             }
         }
-        qInfo("Scalp              = %s (%d triangles)" ,
-               qPrintable(outerSkinFile), outerSkin.ntri);
+        qInfo("Scalp              = %s (%d triangles)",
+              qPrintable(outerSkinFile), outerSkin.ntri);
     }
 
-    qInfo("brain conductivity = %g S/m" , m_settings.brainConductivity());
+    qInfo("brain conductivity = %g S/m", m_settings.brainConductivity());
     if (!m_settings.homogeneous()) {
-        qInfo("skull conductivity = %g S/m" , m_settings.skullConductivity());
-        qInfo("scalp conductivity = %g S/m" , m_settings.scalpConductivity());
+        qInfo("skull conductivity = %g S/m", m_settings.skullConductivity());
+        qInfo("scalp conductivity = %g S/m", m_settings.scalpConductivity());
     }
 
     //
@@ -211,22 +211,22 @@ int SetupForwardModel::run()
     if (m_settings.modelName().isEmpty()) {
         if (m_settings.homogeneous()) {
             modelFile = QString("%1/%2-%3-bem.fif")
-                .arg(bemDir)
-                .arg(m_settings.subject())
-                .arg(innerSkull.ntri);
+                            .arg(bemDir)
+                            .arg(m_settings.subject())
+                            .arg(innerSkull.ntri);
         } else {
             modelFile = QString("%1/%2-%3-%4-%5-bem.fif")
-                .arg(bemDir)
-                .arg(m_settings.subject())
-                .arg(innerSkull.ntri)
-                .arg(outerSkull.ntri)
-                .arg(outerSkin.ntri);
+                            .arg(bemDir)
+                            .arg(m_settings.subject())
+                            .arg(innerSkull.ntri)
+                            .arg(outerSkull.ntri)
+                            .arg(outerSkin.ntri);
         }
     } else {
         modelFile = bemDir + "/" + m_settings.modelName() + "-bem.fif";
     }
 
-    qInfo("Resulting BEM      = %s\n" , qPrintable(modelFile));
+    qInfo("Resulting BEM      = %s\n", qPrintable(modelFile));
 
     //
     // Check if file already exists
@@ -256,7 +256,7 @@ int SetupForwardModel::run()
         QFile file(modelFile);
         bem.write(file);
     }
-    qInfo("BEM geometry file written to %s\n" , qPrintable(modelFile));
+    qInfo("BEM geometry file written to %s\n", qPrintable(modelFile));
 
     //
     // >> 2. Creating ascii pnt files and surf files
@@ -265,44 +265,68 @@ int SetupForwardModel::run()
 
     if (m_settings.homogeneous()) {
         QString pntFile = QString("%1/%2-inner_skull-%3.pnt")
-            .arg(bemDir).arg(m_settings.subject()).arg(innerSkull.ntri);
+                              .arg(bemDir)
+                              .arg(m_settings.subject())
+                              .arg(innerSkull.ntri);
         QString surfFile = QString("%1/%2-inner_skull-%3.surf")
-            .arg(bemDir).arg(m_settings.subject()).arg(innerSkull.ntri);
+                               .arg(bemDir)
+                               .arg(m_settings.subject())
+                               .arg(innerSkull.ntri);
 
-        if (!exportPntFile(innerSkull, pntFile)) return 1;
-        if (!exportSurfFile(innerSkull, surfFile)) return 1;
+        if (!exportPntFile(innerSkull, pntFile))
+            return 1;
+        if (!exportSurfFile(innerSkull, surfFile))
+            return 1;
     } else {
         // Outer skin (scalp)
         {
             QString pntFile = QString("%1/%2-outer_skin-%3.pnt")
-                .arg(bemDir).arg(m_settings.subject()).arg(outerSkin.ntri);
+                                  .arg(bemDir)
+                                  .arg(m_settings.subject())
+                                  .arg(outerSkin.ntri);
             QString surfFile = QString("%1/%2-outer_skin-%3.surf")
-                .arg(bemDir).arg(m_settings.subject()).arg(outerSkin.ntri);
+                                   .arg(bemDir)
+                                   .arg(m_settings.subject())
+                                   .arg(outerSkin.ntri);
 
-            if (!exportPntFile(outerSkin, pntFile)) return 1;
-            if (!exportSurfFile(outerSkin, surfFile)) return 1;
+            if (!exportPntFile(outerSkin, pntFile))
+                return 1;
+            if (!exportSurfFile(outerSkin, surfFile))
+                return 1;
         }
 
         // Outer skull
         {
             QString pntFile = QString("%1/%2-outer_skull-%3.pnt")
-                .arg(bemDir).arg(m_settings.subject()).arg(outerSkull.ntri);
+                                  .arg(bemDir)
+                                  .arg(m_settings.subject())
+                                  .arg(outerSkull.ntri);
             QString surfFile = QString("%1/%2-outer_skull-%3.surf")
-                .arg(bemDir).arg(m_settings.subject()).arg(outerSkull.ntri);
+                                   .arg(bemDir)
+                                   .arg(m_settings.subject())
+                                   .arg(outerSkull.ntri);
 
-            if (!exportPntFile(outerSkull, pntFile)) return 1;
-            if (!exportSurfFile(outerSkull, surfFile)) return 1;
+            if (!exportPntFile(outerSkull, pntFile))
+                return 1;
+            if (!exportSurfFile(outerSkull, surfFile))
+                return 1;
         }
 
         // Inner skull
         {
             QString pntFile = QString("%1/%2-inner_skull-%3.pnt")
-                .arg(bemDir).arg(m_settings.subject()).arg(innerSkull.ntri);
+                                  .arg(bemDir)
+                                  .arg(m_settings.subject())
+                                  .arg(innerSkull.ntri);
             QString surfFile = QString("%1/%2-inner_skull-%3.surf")
-                .arg(bemDir).arg(m_settings.subject()).arg(innerSkull.ntri);
+                                   .arg(bemDir)
+                                   .arg(m_settings.subject())
+                                   .arg(innerSkull.ntri);
 
-            if (!exportPntFile(innerSkull, pntFile)) return 1;
-            if (!exportSurfFile(innerSkull, surfFile)) return 1;
+            if (!exportPntFile(innerSkull, pntFile))
+                return 1;
+            if (!exportSurfFile(innerSkull, surfFile))
+                return 1;
         }
     }
     qInfo("%s", "");
@@ -319,8 +343,8 @@ int SetupForwardModel::run()
         if (!prepareBemSolution(modelFile, solFile)) {
             qCritical() << "Model preparation failed.";
             return 1;
-        }  else {
-            qInfo("\nThe model %s is now ready for use" , qPrintable(solFile));
+        } else {
+            qInfo("\nThe model %s is now ready for use", qPrintable(solFile));
         }
     }
 
@@ -416,8 +440,8 @@ bool SetupForwardModel::readAsciiTriFile(const QString& fileName, int id, float 
         }
         if (m_settings.swap()) {
             tris(k, 0) = v1 - 1;
-            tris(k, 1) = v3 - 1;   // Swapped
-            tris(k, 2) = v2 - 1;   // Swapped
+            tris(k, 1) = v3 - 1; // Swapped
+            tris(k, 2) = v2 - 1; // Swapped
         } else {
             tris(k, 0) = v1 - 1;
             tris(k, 1) = v2 - 1;
@@ -449,7 +473,7 @@ bool SetupForwardModel::readAsciiTriFile(const QString& fileName, int id, float 
 
     // Shift vertices if requested
     if (shift != 0.0f) {
-        shiftVertices(surf, shift / 1000.0f);   // Convert mm to meters
+        shiftVertices(surf, shift / 1000.0f); // Convert mm to meters
     }
 
     return true;
@@ -474,7 +498,7 @@ bool SetupForwardModel::readFreeSurferSurf(const QString& fileName, int id, floa
 
     const qint32 TRIANGLE_FILE_MAGIC = 16777214;
 
-qint32 magic = FSLIB::FsSurface::fread3(stream);
+    qint32 magic = FSLIB::FsSurface::fread3(stream);
 
     if (magic != TRIANGLE_FILE_MAGIC) {
         qCritical() << "Unsupported surface file format (magic =" << magic << ") in" << fileName;
@@ -494,7 +518,7 @@ qint32 magic = FSLIB::FsSurface::fread3(stream);
     stream.readRawData(reinterpret_cast<char*>(verts.data()), nvert * 3 * sizeof(float));
     for (qint32 i = 0; i < 3; ++i)
         for (qint32 j = 0; j < nvert; ++j)
-FIFFLIB::swap_floatp(&verts(i, j));
+            FIFFLIB::swap_floatp(&verts(i, j));
 
     // Read faces (nface x 3, int32)
     MatrixX3i faces(nface, 3);
@@ -526,7 +550,7 @@ FIFFLIB::swap_floatp(&verts(i, j));
 
     // Shift vertices if requested
     if (shift != 0.0f) {
-        shiftVertices(surf, shift / 1000.0f);   // Convert mm to meters
+        shiftVertices(surf, shift / 1000.0f); // Convert mm to meters
     }
 
     return true;
@@ -545,7 +569,7 @@ void SetupForwardModel::shiftVertices(MNEBemSurface& surf, float shift) const
     // Recompute normals after shifting
     surf.nn = FsSurface::compute_normals(Eigen::MatrixX3f(surf.rr), Eigen::MatrixX3i(surf.itris));
 
-    qInfo("FsSurface vertices shifted by %6.1f mm." , 1000.0f * shift);
+    qInfo("FsSurface vertices shifted by %6.1f mm.", 1000.0f * shift);
 }
 
 //=============================================================================================================
@@ -569,12 +593,12 @@ bool SetupForwardModel::exportPntFile(const MNEBemSurface& surf,
     for (int k = 0; k < surf.np; ++k) {
         // Convert from meters to mm for output
         out << QString("%1 %2 %3\n")
-            .arg(static_cast<double>(surf.rr(k, 0)) * 1000.0, 0, 'f', 4)
-            .arg(static_cast<double>(surf.rr(k, 1)) * 1000.0, 0, 'f', 4)
-            .arg(static_cast<double>(surf.rr(k, 2)) * 1000.0, 0, 'f', 4);
+                   .arg(static_cast<double>(surf.rr(k, 0)) * 1000.0, 0, 'f', 4)
+                   .arg(static_cast<double>(surf.rr(k, 1)) * 1000.0, 0, 'f', 4)
+                   .arg(static_cast<double>(surf.rr(k, 2)) * 1000.0, 0, 'f', 4);
     }
     file.close();
-    qInfo("Written %s" , qPrintable(fileName));
+    qInfo("Written %s", qPrintable(fileName));
     return true;
 }
 
@@ -608,7 +632,7 @@ bool SetupForwardModel::exportSurfFile(const MNEBemSurface& surf,
     // Vertex coordinates (as float32 in mm — FreeSurfer convention)
     ds.setFloatingPointPrecision(QDataStream::SinglePrecision);
     for (int k = 0; k < surf.np; ++k) {
-        float x = surf.rr(k, 0) * 1000.0f;   // meters -> mm
+        float x = surf.rr(k, 0) * 1000.0f; // meters -> mm
         float y = surf.rr(k, 1) * 1000.0f;
         float z = surf.rr(k, 2) * 1000.0f;
         ds << x << y << z;
@@ -622,7 +646,7 @@ bool SetupForwardModel::exportSurfFile(const MNEBemSurface& surf,
     }
 
     file.close();
-    qInfo("Written %s" , qPrintable(fileName));
+    qInfo("Written %s", qPrintable(fileName));
     return true;
 }
 
@@ -747,7 +771,7 @@ bool SetupForwardModel::prepareBemSolution(const QString& bemFile,
         stream->end_file();
     }
 
-    qInfo("Saved the result to %s" , qPrintable(solFile));
+    qInfo("Saved the result to %s", qPrintable(solFile));
 
 
     return true;

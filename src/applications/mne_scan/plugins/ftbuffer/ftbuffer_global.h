@@ -31,14 +31,15 @@
 //=============================================================================================================
 
 #if defined(STATICBUILD)
-#  define FTBUFFER_EXPORT
+#define FTBUFFER_EXPORT
 #elif defined(SCAN_FTBUFFER_PLUGIN)
-#  define FTBUFFER_EXPORT Q_DECL_EXPORT
+#define FTBUFFER_EXPORT Q_DECL_EXPORT
 #else
-#  define FTBUFFER_EXPORT Q_DECL_IMPORT
+#define FTBUFFER_EXPORT Q_DECL_IMPORT
 #endif
 
-namespace FTBUFFERPLUGIN{
+namespace FTBUFFERPLUGIN
+{
 
 //=============================================================================================================
 /**

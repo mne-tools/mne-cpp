@@ -50,7 +50,7 @@ namespace
 
 QString kindToDisplayString(VirtualChannelKind kind)
 {
-    switch(kind) {
+    switch (kind) {
         case VirtualChannelKind::AverageReference:
             return QStringLiteral("Average Reference");
         case VirtualChannelKind::WeightedReference:
@@ -71,7 +71,7 @@ QString referenceSetDisplayText(const VirtualReferenceSetDefinition& definition)
 
 //=============================================================================================================
 
-VirtualChannelWindow::VirtualChannelWindow(QWidget *parent)
+VirtualChannelWindow::VirtualChannelWindow(QWidget* parent)
 : QDockWidget(parent)
 , m_pMainWindow(static_cast<MainWindow*>(parent))
 , m_pVirtualChannelModel(new VirtualChannelModel(this))
@@ -114,11 +114,11 @@ void VirtualChannelWindow::setAvailableChannelNames(const QStringList& channelNa
 
 //=============================================================================================================
 
-bool VirtualChannelWindow::event(QEvent *event)
+bool VirtualChannelWindow::event(QEvent* event)
 {
-    if(event->type() == QEvent::KeyPress && m_pTableView && m_pTableView->hasFocus()) {
-        QKeyEvent *keyEvent = static_cast<QKeyEvent*>(event);
-        if(keyEvent->key() == Qt::Key_Delete) {
+    if (event->type() == QEvent::KeyPress && m_pTableView && m_pTableView->hasFocus()) {
+        QKeyEvent* keyEvent = static_cast<QKeyEvent*>(event);
+        if (keyEvent->key() == Qt::Key_Delete) {
             removeSelectedVirtualChannels();
             return true;
         }
@@ -156,15 +156,13 @@ void VirtualChannelWindow::initTable()
     m_pTableView->setModel(m_pVirtualChannelModel);
     m_pTableView->setSelectionBehavior(QAbstractItemView::SelectRows);
     m_pTableView->setSelectionMode(QAbstractItemView::ExtendedSelection);
-    m_pTableView->setEditTriggers(QAbstractItemView::DoubleClicked
-                                  | QAbstractItemView::EditKeyPressed
-                                  | QAbstractItemView::AnyKeyPressed);
+    m_pTableView->setEditTriggers(QAbstractItemView::DoubleClicked | QAbstractItemView::EditKeyPressed | QAbstractItemView::AnyKeyPressed);
     m_pTableView->horizontalHeader()->setStretchLastSection(true);
     m_pTableView->verticalHeader()->setVisible(false);
     m_pTableView->resizeColumnsToContents();
 
     connect(m_pVirtualChannelModel, &VirtualChannelModel::virtualChannelsChanged, this, [this]() {
-        if(m_pTableView) {
+        if (m_pTableView) {
             m_pTableView->resizeColumnsToContents();
         }
     });
@@ -225,15 +223,15 @@ bool VirtualChannelWindow::promptForReferenceSet(VirtualReferenceSetDefinition& 
     QObject::connect(buttonBox, &QDialogButtonBox::rejected, &dialog, &QDialog::reject);
     mainLayout->addWidget(buttonBox);
 
-    if(dialog.exec() != QDialog::Accepted) {
+    if (dialog.exec() != QDialog::Accepted) {
         return false;
     }
 
     definition.name = nameEdit->text().trimmed();
     definition.channels.clear();
-    for(int row = 0; row < channelListWidget->count(); ++row) {
+    for (int row = 0; row < channelListWidget->count(); ++row) {
         QListWidgetItem* item = channelListWidget->item(row);
-        if(item->isSelected()) {
+        if (item->isSelected()) {
             definition.channels.append(item->text().trimmed());
         }
     }
@@ -270,7 +268,7 @@ bool VirtualChannelWindow::promptForVirtualChannel(VirtualChannelDefinition& def
     sourceComboBox->addItems(m_availableChannelNames);
 
     referenceSourceComboBox->addItem(QStringLiteral("Custom Selection"), QString());
-    for(const QString& referenceSetName : m_pVirtualChannelModel->referenceSetNames()) {
+    for (const QString& referenceSetName : m_pVirtualChannelModel->referenceSetNames()) {
         referenceSourceComboBox->addItem(QStringLiteral("Reference Set: %1").arg(referenceSetName), referenceSetName);
     }
 
@@ -282,9 +280,7 @@ bool VirtualChannelWindow::promptForVirtualChannel(VirtualChannelDefinition& def
     weightTable->horizontalHeader()->setStretchLastSection(true);
     weightTable->verticalHeader()->setVisible(false);
     weightTable->setSelectionMode(QAbstractItemView::NoSelection);
-    weightTable->setEditTriggers(QAbstractItemView::DoubleClicked
-                                 | QAbstractItemView::EditKeyPressed
-                                 | QAbstractItemView::AnyKeyPressed);
+    weightTable->setEditTriggers(QAbstractItemView::DoubleClicked | QAbstractItemView::EditKeyPressed | QAbstractItemView::AnyKeyPressed);
 
     hintLabel->setWordWrap(true);
 
@@ -313,12 +309,12 @@ bool VirtualChannelWindow::promptForVirtualChannel(VirtualChannelDefinition& def
     const auto currentReferenceChannels = [currentReferenceSet, referenceSourceComboBox, referenceListWidget, sourceComboBox]() {
         QStringList referenceChannels;
 
-        if(!referenceSourceComboBox->currentData().toString().isEmpty()) {
+        if (!referenceSourceComboBox->currentData().toString().isEmpty()) {
             referenceChannels = currentReferenceSet().channels;
         } else {
-            for(int row = 0; row < referenceListWidget->count(); ++row) {
+            for (int row = 0; row < referenceListWidget->count(); ++row) {
                 QListWidgetItem* item = referenceListWidget->item(row);
-                if(item->isSelected()) {
+                if (item->isSelected()) {
                     referenceChannels.append(item->text().trimmed());
                 }
             }
@@ -335,13 +331,13 @@ bool VirtualChannelWindow::promptForVirtualChannel(VirtualChannelDefinition& def
         const bool weighted = kind == VirtualChannelKind::WeightedReference;
 
         weightTable->setVisible(weighted);
-        if(!weighted) {
+        if (!weighted) {
             return;
         }
 
         QSignalBlocker blocker(weightTable);
         weightTable->setRowCount(referenceChannels.size());
-        for(int row = 0; row < referenceChannels.size(); ++row) {
+        for (int row = 0; row < referenceChannels.size(); ++row) {
             const QString channelName = referenceChannels.at(row);
 
             QTableWidgetItem* channelItem = new QTableWidgetItem(channelName);
@@ -362,29 +358,29 @@ bool VirtualChannelWindow::promptForVirtualChannel(VirtualChannelDefinition& def
 
         referenceListWidget->setEnabled(!useReferenceSet);
         referenceListWidget->setSelectionMode(kind == VirtualChannelKind::Bipolar
-                                              ? QAbstractItemView::SingleSelection
-                                              : QAbstractItemView::MultiSelection);
+                                                  ? QAbstractItemView::SingleSelection
+                                                  : QAbstractItemView::MultiSelection);
 
         bool selectedOne = false;
-        for(int row = 0; row < referenceListWidget->count(); ++row) {
+        for (int row = 0; row < referenceListWidget->count(); ++row) {
             QListWidgetItem* item = referenceListWidget->item(row);
             const bool isSourceItem = item->text().trimmed() == sourceChannel;
             Qt::ItemFlags flags = item->flags();
             flags.setFlag(Qt::ItemIsSelectable, !isSourceItem);
             item->setFlags(flags);
 
-            if(isSourceItem) {
+            if (isSourceItem) {
                 item->setSelected(false);
                 continue;
             }
 
-            if(useReferenceSet) {
+            if (useReferenceSet) {
                 item->setSelected(false);
                 continue;
             }
 
-            if(kind == VirtualChannelKind::Bipolar && item->isSelected()) {
-                if(!selectedOne) {
+            if (kind == VirtualChannelKind::Bipolar && item->isSelected()) {
+                if (!selectedOne) {
                     selectedOne = true;
                 } else {
                     item->setSelected(false);
@@ -392,10 +388,10 @@ bool VirtualChannelWindow::promptForVirtualChannel(VirtualChannelDefinition& def
             }
         }
 
-        if(!useReferenceSet && kind == VirtualChannelKind::Bipolar && !selectedOne) {
-            for(int row = 0; row < referenceListWidget->count(); ++row) {
+        if (!useReferenceSet && kind == VirtualChannelKind::Bipolar && !selectedOne) {
+            for (int row = 0; row < referenceListWidget->count(); ++row) {
                 QListWidgetItem* item = referenceListWidget->item(row);
-                if(item->flags().testFlag(Qt::ItemIsSelectable)) {
+                if (item->flags().testFlag(Qt::ItemIsSelectable)) {
                     item->setSelected(true);
                     break;
                 }
@@ -411,37 +407,37 @@ bool VirtualChannelWindow::promptForVirtualChannel(VirtualChannelDefinition& def
         const QString referenceSetName = referenceSourceComboBox->currentData().toString();
         const QStringList referenceChannels = currentReferenceChannels();
 
-        if(!nameEdit->isModified()) {
-            switch(kind) {
+        if (!nameEdit->isModified()) {
+            switch (kind) {
                 case VirtualChannelKind::AverageReference:
                     nameEdit->setText(referenceSetName.isEmpty()
-                        ? QStringLiteral("%1-avgref").arg(sourceChannel)
-                        : QStringLiteral("%1-avgref-%2").arg(sourceChannel, referenceSetName));
+                                          ? QStringLiteral("%1-avgref").arg(sourceChannel)
+                                          : QStringLiteral("%1-avgref-%2").arg(sourceChannel, referenceSetName));
                     break;
                 case VirtualChannelKind::WeightedReference:
                     nameEdit->setText(referenceSetName.isEmpty()
-                        ? QStringLiteral("%1-wref").arg(sourceChannel)
-                        : QStringLiteral("%1-wref-%2").arg(sourceChannel, referenceSetName));
+                                          ? QStringLiteral("%1-wref").arg(sourceChannel)
+                                          : QStringLiteral("%1-wref-%2").arg(sourceChannel, referenceSetName));
                     break;
                 case VirtualChannelKind::Bipolar:
                 default:
                     nameEdit->setText(QStringLiteral("%1-%2")
-                        .arg(sourceChannel,
-                             referenceChannels.isEmpty() ? QStringLiteral("?") : referenceChannels.first()));
+                                          .arg(sourceChannel,
+                                               referenceChannels.isEmpty() ? QStringLiteral("?") : referenceChannels.first()));
                     break;
             }
         }
 
-        switch(kind) {
+        switch (kind) {
             case VirtualChannelKind::AverageReference:
                 hintLabel->setText(referenceSetName.isEmpty()
-                    ? QStringLiteral("The virtual channel will be computed as Source - average(Reference(s)).")
-                    : QStringLiteral("The virtual channel will be computed as Source - average(Reference Set)."));
+                                       ? QStringLiteral("The virtual channel will be computed as Source - average(Reference(s)).")
+                                       : QStringLiteral("The virtual channel will be computed as Source - average(Reference Set)."));
                 break;
             case VirtualChannelKind::WeightedReference:
                 hintLabel->setText(referenceSetName.isEmpty()
-                    ? QStringLiteral("The virtual channel will be computed as Source - sum(weight_i * Reference_i).")
-                    : QStringLiteral("The virtual channel will reuse the selected reference set and apply editable weights to each reference channel."));
+                                       ? QStringLiteral("The virtual channel will be computed as Source - sum(weight_i * Reference_i).")
+                                       : QStringLiteral("The virtual channel will reuse the selected reference set and apply editable weights to each reference channel."));
                 break;
             case VirtualChannelKind::Bipolar:
             default:
@@ -471,18 +467,18 @@ bool VirtualChannelWindow::promptForVirtualChannel(VirtualChannelDefinition& def
     QObject::connect(referenceListWidget, &QListWidget::itemSelectionChanged, &dialog, rebuildWeightTable);
     QObject::connect(referenceListWidget, &QListWidget::itemSelectionChanged, &dialog, updateNameAndHint);
     QObject::connect(weightTable, &QTableWidget::itemChanged, &dialog, [&weightByChannel](QTableWidgetItem* item) {
-        if(!item || item->column() != 1) {
+        if (!item || item->column() != 1) {
             return;
         }
 
         bool ok = false;
         const double weight = item->text().trimmed().toDouble(&ok);
-        if(!ok) {
+        if (!ok) {
             item->setText(QStringLiteral("1"));
             return;
         }
 
-        if(QTableWidgetItem* channelItem = item->tableWidget()->item(item->row(), 0)) {
+        if (QTableWidgetItem* channelItem = item->tableWidget()->item(item->row(), 0)) {
             weightByChannel.insert(channelItem->text().trimmed(), weight);
         }
     });
@@ -490,7 +486,7 @@ bool VirtualChannelWindow::promptForVirtualChannel(VirtualChannelDefinition& def
     updateReferenceWidgets();
     updateNameAndHint();
 
-    if(dialog.exec() != QDialog::Accepted) {
+    if (dialog.exec() != QDialog::Accepted) {
         return false;
     }
 
@@ -501,9 +497,9 @@ bool VirtualChannelWindow::promptForVirtualChannel(VirtualChannelDefinition& def
     definition.referenceChannels = currentReferenceChannels();
     definition.referenceWeights.clear();
 
-    if(definition.kind == VirtualChannelKind::WeightedReference) {
+    if (definition.kind == VirtualChannelKind::WeightedReference) {
         definition.referenceWeights.reserve(definition.referenceChannels.size());
-        for(int index = 0; index < definition.referenceChannels.size(); ++index) {
+        for (int index = 0; index < definition.referenceChannels.size(); ++index) {
             definition.referenceWeights.append(weightByChannel.value(definition.referenceChannels.at(index), 1.0));
         }
     }
@@ -515,7 +511,7 @@ bool VirtualChannelWindow::promptForVirtualChannel(VirtualChannelDefinition& def
 
 void VirtualChannelWindow::addVirtualChannel()
 {
-    if(m_availableChannelNames.size() < 2) {
+    if (m_availableChannelNames.size() < 2) {
         QMessageBox::warning(this,
                              QStringLiteral("Add Virtual Channel"),
                              QStringLiteral("Load a raw file with at least two channels before creating a virtual channel."));
@@ -523,7 +519,7 @@ void VirtualChannelWindow::addVirtualChannel()
     }
 
     VirtualChannelDefinition definition;
-    if(!promptForVirtualChannel(definition)) {
+    if (!promptForVirtualChannel(definition)) {
         return;
     }
 
@@ -531,12 +527,9 @@ void VirtualChannelWindow::addVirtualChannel()
     definition.referenceChannels.removeDuplicates();
 
     const bool invalidReferenceCount =
-        (definition.kind == VirtualChannelKind::Bipolar && definition.referenceChannels.size() != 1)
-        || ((definition.kind == VirtualChannelKind::AverageReference
-             || definition.kind == VirtualChannelKind::WeightedReference)
-            && definition.referenceChannels.isEmpty());
+        (definition.kind == VirtualChannelKind::Bipolar && definition.referenceChannels.size() != 1) || ((definition.kind == VirtualChannelKind::AverageReference || definition.kind == VirtualChannelKind::WeightedReference) && definition.referenceChannels.isEmpty());
 
-    if(definition.primaryChannel.isEmpty() || invalidReferenceCount) {
+    if (definition.primaryChannel.isEmpty() || invalidReferenceCount) {
         QMessageBox::warning(this,
                              QStringLiteral("Add Virtual Channel"),
                              definition.kind == VirtualChannelKind::Bipolar
@@ -551,7 +544,7 @@ void VirtualChannelWindow::addVirtualChannel()
                                                               definition.referenceChannels,
                                                               definition.referenceWeights,
                                                               definition.referenceSetName);
-    if(row >= 0) {
+    if (row >= 0) {
         m_pTableView->selectRow(row);
         m_pTableView->scrollTo(m_pVirtualChannelModel->index(row, 0));
     }
@@ -575,7 +568,7 @@ void VirtualChannelWindow::manageReferenceSets()
 
     auto reloadSets = [this, setListWidget]() {
         setListWidget->clear();
-        for(const VirtualReferenceSetDefinition& definition : m_pVirtualChannelModel->referenceSets()) {
+        for (const VirtualReferenceSetDefinition& definition : m_pVirtualChannelModel->referenceSets()) {
             QListWidgetItem* item = new QListWidgetItem(referenceSetDisplayText(definition), setListWidget);
             item->setData(Qt::UserRole, definition.name);
         }
@@ -592,7 +585,7 @@ void VirtualChannelWindow::manageReferenceSets()
     mainLayout->addLayout(buttonRow);
 
     QObject::connect(addButton, &QPushButton::clicked, &dialog, [this, &reloadSets]() {
-        if(m_availableChannelNames.isEmpty()) {
+        if (m_availableChannelNames.isEmpty()) {
             QMessageBox::warning(this,
                                  QStringLiteral("Reference Sets"),
                                  QStringLiteral("Load a raw file before creating reference sets."));
@@ -600,11 +593,11 @@ void VirtualChannelWindow::manageReferenceSets()
         }
 
         VirtualReferenceSetDefinition definition;
-        if(!promptForReferenceSet(definition)) {
+        if (!promptForReferenceSet(definition)) {
             return;
         }
 
-        if(definition.name.isEmpty() || definition.channels.isEmpty()) {
+        if (definition.name.isEmpty() || definition.channels.isEmpty()) {
             QMessageBox::warning(this,
                                  QStringLiteral("Reference Sets"),
                                  QStringLiteral("Provide a set name and choose at least one channel."));
@@ -617,7 +610,7 @@ void VirtualChannelWindow::manageReferenceSets()
 
     QObject::connect(removeButton, &QPushButton::clicked, &dialog, [this, setListWidget, &reloadSets]() {
         QListWidgetItem* item = setListWidget->currentItem();
-        if(!item) {
+        if (!item) {
             return;
         }
 
@@ -639,7 +632,7 @@ void VirtualChannelWindow::manageReferenceSets()
 
 void VirtualChannelWindow::removeSelectedVirtualChannels()
 {
-    if(!m_pTableView || !m_pTableView->selectionModel()) {
+    if (!m_pTableView || !m_pTableView->selectionModel()) {
         return;
     }
 
@@ -649,7 +642,7 @@ void VirtualChannelWindow::removeSelectedVirtualChannels()
                   return left.row() > right.row();
               });
 
-    for(const QModelIndex& index : selectedRows) {
+    for (const QModelIndex& index : selectedRows) {
         m_pVirtualChannelModel->removeRow(index.row());
     }
 }

@@ -73,7 +73,7 @@ static std::vector<std::vector<std::pair<int, float>>> buildAdjacency(
     std::vector<std::vector<std::pair<int, float>>> adj(nVert);
 
     for (int t = 0; t < tris.rows(); ++t) {
-        int v[3] = { tris(t, 0), tris(t, 1), tris(t, 2) };
+        int v[3] = {tris(t, 0), tris(t, 1), tris(t, 2)};
         for (int e = 0; e < 3; ++e) {
             int a = v[e], b = v[(e + 1) % 3];
             float d = (rr.row(a) - rr.row(b)).norm();
@@ -140,7 +140,7 @@ static void multiSourceDijkstra(
 
 //=============================================================================================================
 
-int main(int argc, char *argv[])
+int main(int argc, char* argv[])
 {
     qInstallMessageHandler(MNELogger::customLogWriter);
     QCoreApplication app(argc, argv);
@@ -163,8 +163,14 @@ int main(int argc, char *argv[])
     QString srcFile = parser.value(srcOpt);
     QString outFile = parser.value(outOpt);
 
-    if (srcFile.isEmpty()) { qCritical("--src is required."); return 1; }
-    if (outFile.isEmpty()) { qCritical("--out is required."); return 1; }
+    if (srcFile.isEmpty()) {
+        qCritical("--src is required.");
+        return 1;
+    }
+    if (outFile.isEmpty()) {
+        qCritical("--out is required.");
+        return 1;
+    }
 
     // Read source space
     QFile file(srcFile);
@@ -180,13 +186,13 @@ int main(int argc, char *argv[])
     }
     stream->close();
 
-    qInfo("Read source space: %d hemispheres" , (int)src.size());
+    qInfo("Read source space: %d hemispheres", (int)src.size());
 
     // Process each hemisphere
     for (int h = 0; h < src.size(); ++h) {
         MNESourceSpace& sp = src[h];
-        qInfo("\nHemisphere %d: %d vertices, %d active, %d triangles" ,
-               h + 1, sp.np, sp.nuse, sp.ntri);
+        qInfo("\nHemisphere %d: %d vertices, %d active, %d triangles",
+              h + 1, sp.np, sp.nuse, sp.ntri);
 
         if (sp.ntri == 0 || sp.np == 0) {
             qInfo("  Skipping (no triangulation)");
@@ -207,7 +213,7 @@ int main(int argc, char *argv[])
         for (int i = 0; i < activeList.size(); ++i)
             sourceVerts(i) = activeList[i];
 
-        qInfo("  Running multi-source Dijkstra with %d source vertices..." , (int)sourceVerts.size());
+        qInfo("  Running multi-source Dijkstra with %d source vertices...", (int)sourceVerts.size());
 
         VectorXi nearest;
         VectorXf dist;
@@ -227,19 +233,21 @@ int main(int argc, char *argv[])
         int minPatch = sp.np, maxPatch = 0;
         double avgPatch = 0;
         for (auto it = patchSizes.begin(); it != patchSizes.end(); ++it) {
-            if (it.value() < minPatch) minPatch = it.value();
-            if (it.value() > maxPatch) maxPatch = it.value();
+            if (it.value() < minPatch)
+                minPatch = it.value();
+            if (it.value() > maxPatch)
+                maxPatch = it.value();
             avgPatch += it.value();
         }
         if (!patchSizes.isEmpty())
             avgPatch /= patchSizes.size();
 
-        qInfo("  Patch info: %d patches, size range %d..%d (avg %.1f)" ,
-               (int)patchSizes.size(), minPatch, maxPatch, avgPatch);
+        qInfo("  Patch info: %d patches, size range %d..%d (avg %.1f)",
+              (int)patchSizes.size(), minPatch, maxPatch, avgPatch);
     }
 
     // Write output
-    qInfo("\nWriting source space with patch info to: %s" , qPrintable(outFile));
+    qInfo("\nWriting source space with patch info to: %s", qPrintable(outFile));
 
     QFile outF(outFile);
     FiffStream::SPtr outStream = FiffStream::start_file(outF);

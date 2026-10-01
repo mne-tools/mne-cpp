@@ -69,8 +69,8 @@ namespace INVLIB
 class INVSHARED_EXPORT InvMinimumNorm
 {
 public:
-    typedef QSharedPointer<InvMinimumNorm> SPtr;             /**< Shared pointer type for InvMinimumNorm. */
-    typedef QSharedPointer<const InvMinimumNorm> ConstSPtr;  /**< Const shared pointer type for InvMinimumNorm. */
+    typedef QSharedPointer<InvMinimumNorm> SPtr;            /**< Shared pointer type for InvMinimumNorm. */
+    typedef QSharedPointer<const InvMinimumNorm> ConstSPtr; /**< Const shared pointer type for InvMinimumNorm. */
 
     //=========================================================================================================
     /**
@@ -80,7 +80,7 @@ public:
      * @param[in] lambda             The regularization factor.
      * @param[in] method             Use mininum norm, dSPM or sLORETA. ("MNE" | "dSPM" | "sLORETA").
      */
-    explicit InvMinimumNorm(const MNELIB::MNEInverseOperator &p_inverseOperator, float lambda, const QString method);
+    explicit InvMinimumNorm(const MNELIB::MNEInverseOperator& p_inverseOperator, float lambda, const QString method);
 
     //=========================================================================================================
     /**
@@ -91,9 +91,11 @@ public:
      * @param[in] dSPM               Compute the noise-normalization factors for dSPM?.
      * @param[in] sLORETA            Compute the noise-normalization factors for sLORETA?.
      */
-    explicit InvMinimumNorm(const MNELIB::MNEInverseOperator &p_inverseOperator, float lambda, bool dSPM, bool sLORETA);
+    explicit InvMinimumNorm(const MNELIB::MNEInverseOperator& p_inverseOperator, float lambda, bool dSPM, bool sLORETA);
 
-    virtual ~InvMinimumNorm(){}
+    virtual ~InvMinimumNorm()
+    {
+    }
 
     //=========================================================================================================
     /**
@@ -106,9 +108,9 @@ public:
      *
      * @return the calculated source estimation.
      */
-    virtual InvSourceEstimate calculateInverse(const FIFFLIB::FiffEvoked &p_fiffEvoked, bool pick_normal = false);
+    virtual InvSourceEstimate calculateInverse(const FIFFLIB::FiffEvoked& p_fiffEvoked, bool pick_normal = false);
 
-    virtual InvSourceEstimate calculateInverse(const Eigen::MatrixXd &data, float tmin, float tstep, bool pick_normal = false) const;
+    virtual InvSourceEstimate calculateInverse(const Eigen::MatrixXd& data, float tmin, float tstep, bool pick_normal = false) const;
 
     //=========================================================================================================
     /**
@@ -201,24 +203,24 @@ private:
      */
     void computeELoreta();
 
-    MNELIB::MNEInverseOperator m_inverseOperator;   /**< The inverse operator. */
-    float m_fLambda;                                /**< Regularization parameter. */
-    QString m_sMethod;                              /**< Selected method. */
-    bool m_bsLORETA;                                /**< Do sLORETA method. */
-    bool m_bdSPM;                                   /**< Do dSPM method. */
-    bool m_beLoreta;                                /**< Do eLORETA method. */
+    MNELIB::MNEInverseOperator m_inverseOperator; /**< The inverse operator. */
+    float m_fLambda;                              /**< Regularization parameter. */
+    QString m_sMethod;                            /**< Selected method. */
+    bool m_bsLORETA;                              /**< Do sLORETA method. */
+    bool m_bdSPM;                                 /**< Do dSPM method. */
+    bool m_beLoreta;                              /**< Do eLORETA method. */
 
     // eLORETA parameters
-    int m_iELoretaMaxIter;                          /**< eLORETA max iterations. */
-    double m_dELoretaEps;                           /**< eLORETA convergence threshold. */
-    bool m_bELoretaForceEqual;                      /**< eLORETA uniform orientation weights. */
+    int m_iELoretaMaxIter;     /**< eLORETA max iterations. */
+    double m_dELoretaEps;      /**< eLORETA convergence threshold. */
+    bool m_bELoretaForceEqual; /**< eLORETA uniform orientation weights. */
 
-    bool inverseSetup;                              /**< Inverse Setup Calculated. */
-    MNELIB::MNEInverseOperator inv;                 /**< The setup inverse operator. */
-    Eigen::SparseMatrix<double> noise_norm;         /**< The noise normalization. */
-    QList<Eigen::VectorXi> vertno;                  /**< The vertices numbers. */
-    FSLIB::FsLabel label;                             /**< The corresponding labels. */
-    Eigen::MatrixXd K;                              /**< Imaging kernel. */
+    bool inverseSetup;                      /**< Inverse Setup Calculated. */
+    MNELIB::MNEInverseOperator inv;         /**< The setup inverse operator. */
+    Eigen::SparseMatrix<double> noise_norm; /**< The noise normalization. */
+    QList<Eigen::VectorXi> vertno;          /**< The vertices numbers. */
+    FSLIB::FsLabel label;                   /**< The corresponding labels. */
+    Eigen::MatrixXd K;                      /**< Imaging kernel. */
 };
 
 //=============================================================================================================

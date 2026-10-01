@@ -40,7 +40,7 @@ using namespace MNESURF2BEM;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-MNESurf2BemSettings::MNESurf2BemSettings(int *argc, char **argv)
+MNESurf2BemSettings::MNESurf2BemSettings(int* argc, char** argv)
 : m_iCoordFrame(FIFFV_COORD_MRI)
 , m_bCheck(false)
 , m_bCheckMore(false)
@@ -61,7 +61,7 @@ MNESurf2BemSettings::MNESurf2BemSettings(int *argc, char **argv)
         const QString& arg = args[i];
 
         if (arg == "--help" || arg == "-h") {
-            qInfo("Usage: %s [options]" , qPrintable(args[0]));
+            qInfo("Usage: %s [options]", qPrintable(args[0]));
             qInfo("Convert FreeSurfer surfaces into BEM FIFF files.\n");
             qInfo("Ported from the original MNE C tool mne_surf2bem by Matti Hamalainen");
             qInfo("(SVN $Id: mne_surf2bem.c 3351 2012-03-05 12:03:50Z msh $).\n");
@@ -70,9 +70,9 @@ MNESurf2BemSettings::MNESurf2BemSettings(int *argc, char **argv)
             qInfo("  --tri name        Input ASCII triangle file.");
             qInfo("  --fif name        Output FIFF BEM surface file.");
             qInfo("  --id id           BEM surface id to assign:");
-            qInfo("                      %d = head (outer skin)" , FIFFV_BEM_SURF_ID_HEAD);
-            qInfo("                      %d = outer skull" , FIFFV_BEM_SURF_ID_SKULL);
-            qInfo("                      %d = inner skull (brain)" , FIFFV_BEM_SURF_ID_BRAIN);
+            qInfo("                      %d = head (outer skin)", FIFFV_BEM_SURF_ID_HEAD);
+            qInfo("                      %d = outer skull", FIFFV_BEM_SURF_ID_SKULL);
+            qInfo("                      %d = inner skull (brain)", FIFFV_BEM_SURF_ID_BRAIN);
             qInfo("  --swap            Swap vertex winding order (ASCII tri files).");
             qInfo("  --meters          Coordinates in meters (ASCII files only, default: mm).");
             qInfo("  --coordf no       Coordinate frame for ASCII file vertices.");
@@ -86,143 +86,173 @@ MNESurf2BemSettings::MNESurf2BemSettings(int *argc, char **argv)
             qInfo("  --version         Print version info.\n");
             qInfo("Note: --id, --swap, --meters, --shift, --ico, --sigma apply to the");
             qInfo("most recently specified --surf or --tri.\n");
-            m_bShouldExit = true; m_iExitCode = 0; return;
-        }
-        else if (arg == "--version") {
+            m_bShouldExit = true;
+            m_iExitCode = 0;
+            return;
+        } else if (arg == "--version") {
             qInfo("mne_surf2bem version 2.0 (mne-cpp port)");
             qInfo("Based on MNE C version 1.8 by Matti Hamalainen");
-            m_bShouldExit = true; m_iExitCode = 0; return;
-        }
-        else if (arg == "--surf" || arg == "--tri") {
+            m_bShouldExit = true;
+            m_iExitCode = 0;
+            return;
+        } else if (arg == "--surf" || arg == "--tri") {
             if (i + 1 >= args.size()) {
                 qCritical() << arg << ": argument required.";
-                m_bShouldExit = true; m_iExitCode = 1; return;
+                m_bShouldExit = true;
+                m_iExitCode = 1;
+                return;
             }
             SurfaceInput si;
             si.fileName = args[++i];
             si.isAsciiTri = (arg == "--tri");
             m_surfaces.append(si);
-        }
-        else if (arg == "--fif") {
+        } else if (arg == "--fif") {
             if (i + 1 >= args.size()) {
                 qCritical() << "--fif: argument required.";
-                m_bShouldExit = true; m_iExitCode = 1; return;
+                m_bShouldExit = true;
+                m_iExitCode = 1;
+                return;
             }
             m_sOutputFile = args[++i];
-        }
-        else if (arg == "--id") {
+        } else if (arg == "--id") {
             if (i + 1 >= args.size()) {
                 qCritical() << "--id: argument required.";
-                m_bShouldExit = true; m_iExitCode = 1; return;
+                m_bShouldExit = true;
+                m_iExitCode = 1;
+                return;
             }
             bool ok;
             int val = args[++i].toInt(&ok);
             if (!ok) {
                 qCritical() << "Illegal number:" << args[i];
-                m_bShouldExit = true; m_iExitCode = 1; return;
+                m_bShouldExit = true;
+                m_iExitCode = 1;
+                return;
             }
             if (m_surfaces.isEmpty()) {
                 qCritical() << "Specify surface before its id.";
-                m_bShouldExit = true; m_iExitCode = 1; return;
+                m_bShouldExit = true;
+                m_iExitCode = 1;
+                return;
             }
             m_surfaces.last().id = val;
-        }
-        else if (arg == "--swap") {
+        } else if (arg == "--swap") {
             if (m_surfaces.isEmpty()) {
                 qCritical() << "Specify surface before --swap.";
-                m_bShouldExit = true; m_iExitCode = 1; return;
+                m_bShouldExit = true;
+                m_iExitCode = 1;
+                return;
             }
             m_surfaces.last().swap = true;
-        }
-        else if (arg == "--meters") {
+        } else if (arg == "--meters") {
             if (m_surfaces.isEmpty()) {
                 qCritical() << "Specify surface before --meters.";
-                m_bShouldExit = true; m_iExitCode = 1; return;
+                m_bShouldExit = true;
+                m_iExitCode = 1;
+                return;
             }
             m_surfaces.last().mm = false;
-        }
-        else if (arg == "--coordf") {
+        } else if (arg == "--coordf") {
             if (i + 1 >= args.size()) {
                 qCritical() << "--coordf: argument required.";
-                m_bShouldExit = true; m_iExitCode = 1; return;
+                m_bShouldExit = true;
+                m_iExitCode = 1;
+                return;
             }
             bool ok;
             int val = args[++i].toInt(&ok);
             if (!ok) {
                 qCritical() << "Illegal number:" << args[i];
-                m_bShouldExit = true; m_iExitCode = 1; return;
+                m_bShouldExit = true;
+                m_iExitCode = 1;
+                return;
             }
             m_iCoordFrame = val;
-        }
-        else if (arg == "--ico") {
+        } else if (arg == "--ico") {
             if (i + 1 >= args.size()) {
                 qCritical() << "--ico: argument required.";
-                m_bShouldExit = true; m_iExitCode = 1; return;
+                m_bShouldExit = true;
+                m_iExitCode = 1;
+                return;
             }
             bool ok;
             int val = args[++i].toInt(&ok);
             if (!ok) {
                 qCritical() << "Illegal number:" << args[i];
-                m_bShouldExit = true; m_iExitCode = 1; return;
+                m_bShouldExit = true;
+                m_iExitCode = 1;
+                return;
             }
             if (m_surfaces.isEmpty()) {
                 qCritical() << "Specify surface before --ico.";
-                m_bShouldExit = true; m_iExitCode = 1; return;
+                m_bShouldExit = true;
+                m_iExitCode = 1;
+                return;
             }
             if (val < 0 || val > 6) {
                 qCritical() << "--ico value should be between 0 and 6.";
-                m_bShouldExit = true; m_iExitCode = 1; return;
+                m_bShouldExit = true;
+                m_iExitCode = 1;
+                return;
             }
             m_surfaces.last().ico = val;
-        }
-        else if (arg == "--sigma") {
+        } else if (arg == "--sigma") {
             if (i + 1 >= args.size()) {
                 qCritical() << "--sigma: argument required.";
-                m_bShouldExit = true; m_iExitCode = 1; return;
+                m_bShouldExit = true;
+                m_iExitCode = 1;
+                return;
             }
             bool ok;
             float val = args[++i].toFloat(&ok);
             if (!ok) {
                 qCritical() << "Illegal number:" << args[i];
-                m_bShouldExit = true; m_iExitCode = 1; return;
+                m_bShouldExit = true;
+                m_iExitCode = 1;
+                return;
             }
             if (m_surfaces.isEmpty()) {
                 qCritical() << "Specify surface before its conductivity.";
-                m_bShouldExit = true; m_iExitCode = 1; return;
+                m_bShouldExit = true;
+                m_iExitCode = 1;
+                return;
             }
             m_surfaces.last().sigma = val;
-        }
-        else if (arg == "--shift") {
+        } else if (arg == "--shift") {
             if (i + 1 >= args.size()) {
                 qCritical() << "--shift: argument required.";
-                m_bShouldExit = true; m_iExitCode = 1; return;
+                m_bShouldExit = true;
+                m_iExitCode = 1;
+                return;
             }
             bool ok;
             float val = args[++i].toFloat(&ok);
             if (!ok) {
                 qCritical() << "Incomprehensible value:" << args[i];
-                m_bShouldExit = true; m_iExitCode = 1; return;
+                m_bShouldExit = true;
+                m_iExitCode = 1;
+                return;
             }
             if (m_surfaces.isEmpty()) {
                 qCritical() << "Specify the surface before the vertex shift.";
-                m_bShouldExit = true; m_iExitCode = 1; return;
+                m_bShouldExit = true;
+                m_iExitCode = 1;
+                return;
             }
             // Convert mm to meters (matching original C code)
             m_surfaces.last().shift = val / 1000.0f;
-        }
-        else if (arg == "--force") {
+        } else if (arg == "--force") {
             m_bForce = true;
-        }
-        else if (arg == "--check") {
+        } else if (arg == "--check") {
             m_bCheck = true;
-        }
-        else if (arg == "--checkmore") {
+        } else if (arg == "--checkmore") {
             m_bCheck = true;
             m_bCheckMore = true;
-        }
-        else {
+        } else {
             qCritical() << "Unrecognized argument:" << arg;
-            m_bShouldExit = true; m_iExitCode = 1; return;
+            m_bShouldExit = true;
+            m_iExitCode = 1;
+            return;
         }
     }
 }

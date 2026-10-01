@@ -43,8 +43,15 @@
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-namespace MNELIB { class MNEForwardSolution; }
-namespace FIFFLIB { class FiffEvoked; class FiffInfo; }
+namespace MNELIB
+{
+class MNEForwardSolution;
+}
+namespace FIFFLIB
+{
+class FiffEvoked;
+class FiffInfo;
+}
 
 //=============================================================================================================
 // DEFINE NAMESPACE INVLIB
@@ -75,7 +82,6 @@ namespace INVLIB
 class INVSHARED_EXPORT InvLCMV
 {
 public:
-
     //=========================================================================================================
     /**
      * Compute LCMV beamformer spatial filters.
@@ -92,11 +98,11 @@ public:
      *
      * @return The computed beamformer containing spatial filter weights.
      */
-    static InvBeamformer makeLCMV(const FIFFLIB::FiffInfo &info,
-                                  const MNELIB::MNEForwardSolution &forward,
-                                  const FIFFLIB::FiffCov &dataCov,
+    static InvBeamformer makeLCMV(const FIFFLIB::FiffInfo& info,
+                                  const MNELIB::MNEForwardSolution& forward,
+                                  const FIFFLIB::FiffCov& dataCov,
                                   double reg = 0.05,
-                                  const FIFFLIB::FiffCov &noiseCov = FIFFLIB::FiffCov(),
+                                  const FIFFLIB::FiffCov& noiseCov = FIFFLIB::FiffCov(),
                                   BeamformerPickOri pickOri = BeamformerPickOri::None,
                                   BeamformerWeightNorm weightNorm = BeamformerWeightNorm::UnitNoiseGain,
                                   bool reduceRank = false,
@@ -113,8 +119,8 @@ public:
      *
      * @return Source estimate with time courses at each source point.
      */
-    static InvSourceEstimate applyLCMV(const FIFFLIB::FiffEvoked &evoked,
-                                       const InvBeamformer &filters);
+    static InvSourceEstimate applyLCMV(const FIFFLIB::FiffEvoked& evoked,
+                                       const InvBeamformer& filters);
 
     //=========================================================================================================
     /**
@@ -127,10 +133,10 @@ public:
      *
      * @return Source estimate with time courses.
      */
-    static InvSourceEstimate applyLCMVRaw(const Eigen::MatrixXd &data,
+    static InvSourceEstimate applyLCMVRaw(const Eigen::MatrixXd& data,
                                           float tmin,
                                           float tstep,
-                                          const InvBeamformer &filters);
+                                          const InvBeamformer& filters);
 
     //=========================================================================================================
     /**
@@ -143,8 +149,8 @@ public:
      *
      * @return Source estimate where data column 0 contains power at each source.
      */
-    static InvSourceEstimate applyLCMVCov(const FIFFLIB::FiffCov &dataCov,
-                                          const InvBeamformer &filters);
+    static InvSourceEstimate applyLCMVCov(const FIFFLIB::FiffCov& dataCov,
+                                          const InvBeamformer& filters);
 
     //=========================================================================================================
     /**
@@ -157,10 +163,10 @@ public:
      *
      * @return List of source estimates, one per epoch.
      */
-    static QList<InvSourceEstimate> applyLCMVEpochs(const QList<Eigen::MatrixXd> &epochs,
-                                                     float tmin,
-                                                     float tstep,
-                                                     const InvBeamformer &filters);
+    static QList<InvSourceEstimate> applyLCMVEpochs(const QList<Eigen::MatrixXd>& epochs,
+                                                    float tmin,
+                                                    float tstep,
+                                                    const InvBeamformer& filters);
 
     //=========================================================================================================
     /**
@@ -179,18 +185,18 @@ public:
      * @return Resolution matrix (n_sources x n_sources).
      */
     static Eigen::MatrixXd makeLCMVResolutionMatrix(
-        const MNELIB::MNEForwardSolution &forward,
-        const FIFFLIB::FiffInfo &info,
-        const FIFFLIB::FiffCov &dataCov,
+        const MNELIB::MNEForwardSolution& forward,
+        const FIFFLIB::FiffInfo& info,
+        const FIFFLIB::FiffCov& dataCov,
         double reg = 0.05,
-        const FIFFLIB::FiffCov &noiseCov = FIFFLIB::FiffCov());
+        const FIFFLIB::FiffCov& noiseCov = FIFFLIB::FiffCov());
 
 private:
     /**
      * Apply whitening and projection to data, then project through spatial filter.
      */
-    static Eigen::MatrixXd applyFilter(const Eigen::MatrixXd &data,
-                                       const InvBeamformer &filters);
+    static Eigen::MatrixXd applyFilter(const Eigen::MatrixXd& data,
+                                       const InvBeamformer& filters);
 };
 
 } // NAMESPACE INVLIB

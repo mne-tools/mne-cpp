@@ -137,13 +137,13 @@ double StatsTtest::tToPval(double t, int df, StatsTailType tail)
 {
     double cdf = tCdf(t, df);
     switch (tail) {
-    case StatsTailType::Left:
-        return cdf;
-    case StatsTailType::Right:
-        return 1.0 - cdf;
-    case StatsTailType::Both:
-    default:
-        return 2.0 * std::min(cdf, 1.0 - cdf);
+        case StatsTailType::Left:
+            return cdf;
+        case StatsTailType::Right:
+            return 1.0 - cdf;
+        case StatsTailType::Both:
+        default:
+            return 2.0 * std::min(cdf, 1.0 - cdf);
     }
 }
 
@@ -154,8 +154,10 @@ double StatsTtest::regularizedBeta(double x, double a, double b)
     // I_x(a,b) = x^a * (1-x)^b / (a * B(a,b)) * CF(x,a,b)
     // where CF is the continued fraction expansion.
     // For x > (a+1)/(a+b+2), use the identity I_x(a,b) = 1 - I_{1-x}(b,a).
-    if (x <= 0.0) return 0.0;
-    if (x >= 1.0) return 1.0;
+    if (x <= 0.0)
+        return 0.0;
+    if (x >= 1.0)
+        return 1.0;
 
     if (x > (a + 1.0) / (a + b + 2.0)) {
         return 1.0 - regularizedBeta(1.0 - x, b, a);
@@ -180,7 +182,8 @@ double StatsTtest::betaCf(double x, double a, double b)
 
     double c = 1.0;
     double d = 1.0 - qab * x / qap;
-    if (std::fabs(d) < tiny) d = tiny;
+    if (std::fabs(d) < tiny)
+        d = tiny;
     d = 1.0 / d;
     double h = d;
 
@@ -190,23 +193,28 @@ double StatsTtest::betaCf(double x, double a, double b)
         // Even step
         double aa = m * (b - m) * x / ((qam + m2) * (a + m2));
         d = 1.0 + aa * d;
-        if (std::fabs(d) < tiny) d = tiny;
+        if (std::fabs(d) < tiny)
+            d = tiny;
         c = 1.0 + aa / c;
-        if (std::fabs(c) < tiny) c = tiny;
+        if (std::fabs(c) < tiny)
+            c = tiny;
         d = 1.0 / d;
         h *= d * c;
 
         // Odd step
         aa = -(a + m) * (qab + m) * x / ((a + m2) * (qap + m2));
         d = 1.0 + aa * d;
-        if (std::fabs(d) < tiny) d = tiny;
+        if (std::fabs(d) < tiny)
+            d = tiny;
         c = 1.0 + aa / c;
-        if (std::fabs(c) < tiny) c = tiny;
+        if (std::fabs(c) < tiny)
+            c = tiny;
         d = 1.0 / d;
         double del = d * c;
         h *= del;
 
-        if (std::fabs(del - 1.0) < eps) break;
+        if (std::fabs(del - 1.0) < eps)
+            break;
     }
     return h;
 }

@@ -58,7 +58,7 @@ using namespace UTILSLIB;
 //=============================================================================================================
 
 FilterDesignView::FilterDesignView(const QString& sSettingsPath,
-                                   QWidget *parent,
+                                   QWidget* parent,
                                    Qt::WindowFlags f)
 : AbstractView(parent, f)
 , m_pUi(new Ui::FilterDesignViewWidget)
@@ -90,7 +90,7 @@ FilterDesignView::~FilterDesignView()
 
 void FilterDesignView::setMaxAllowedFilterTaps(int iMaxNumberFilterTaps)
 {
-    if(iMaxNumberFilterTaps%2 != 0) {
+    if (iMaxNumberFilterTaps % 2 != 0) {
         iMaxNumberFilterTaps--;
     }
 
@@ -112,24 +112,24 @@ int FilterDesignView::getFilterTaps()
 
 void FilterDesignView::setSamplingRate(double dSamplingRate)
 {
-    if(dSamplingRate <= 0) {
+    if (dSamplingRate <= 0) {
         qWarning() << "[FilterDesignView::setSamplingRate] Sampling frequency is <= 0. Returning.";
     }
 
     m_dSFreq = dSamplingRate;
 
     //Update min max of spin boxes to nyquist
-    double nyquistFrequency = m_dSFreq/2;
+    double nyquistFrequency = m_dSFreq / 2;
 
     m_pUi->m_doubleSpinBox_to->setMaximum(nyquistFrequency);
     m_pUi->m_doubleSpinBox_from->setMaximum(nyquistFrequency);
 
-    if(m_pUi->m_doubleSpinBox_to->value()>m_dSFreq/2) {
-        m_pUi->m_doubleSpinBox_to->setValue(m_dSFreq/2);
+    if (m_pUi->m_doubleSpinBox_to->value() > m_dSFreq / 2) {
+        m_pUi->m_doubleSpinBox_to->setValue(m_dSFreq / 2);
     }
 
-    if(m_pUi->m_doubleSpinBox_from->value()>m_dSFreq/2) {
-        m_pUi->m_doubleSpinBox_from->setValue(m_dSFreq/2);
+    if (m_pUi->m_doubleSpinBox_from->value() > m_dSFreq / 2) {
+        m_pUi->m_doubleSpinBox_from->setValue(m_dSFreq / 2);
     }
 
     filterParametersChanged();
@@ -179,7 +179,7 @@ void FilterDesignView::setChannelType(const QString& sType)
 
 void FilterDesignView::saveSettings()
 {
-    if(m_sSettingsPath.isEmpty()) {
+    if (m_sSettingsPath.isEmpty()) {
         return;
     }
 
@@ -189,7 +189,7 @@ void FilterDesignView::saveSettings()
     settings.setValue(m_sSettingsPath + QString("/FilterDesignView/filterTo"), m_filterKernel.getLowpassFreq());
     settings.setValue(m_sSettingsPath + QString("/FilterDesignView/filterOrder"), m_filterKernel.getFilterOrder());
     settings.setValue(m_sSettingsPath + QString("/FilterDesignView/filterDesignMethod"), FilterKernel::m_designMethods.indexOf(m_filterKernel.getDesignMethod()));
-    settings.setValue(m_sSettingsPath + QString("/FilterDesignView/filterTransition"), m_filterKernel.getParksWidth()*(m_filterKernel.getSamplingFrequency()/2));
+    settings.setValue(m_sSettingsPath + QString("/FilterDesignView/filterTransition"), m_filterKernel.getParksWidth() * (m_filterKernel.getSamplingFrequency() / 2));
     settings.setValue(m_sSettingsPath + QString("/FilterDesignView/filterChannelType"), getChannelType());
     settings.setValue(m_sSettingsPath + QString("/FilterDesignView/Position"), this->pos());
 }
@@ -198,7 +198,7 @@ void FilterDesignView::saveSettings()
 
 void FilterDesignView::loadSettings()
 {
-    if(m_sSettingsPath.isEmpty()) {
+    if (m_sSettingsPath.isEmpty()) {
         return;
     }
 
@@ -212,11 +212,11 @@ void FilterDesignView::loadSettings()
     m_pUi->m_doubleSpinBox_transitionband->setValue(settings.value(m_sSettingsPath + QString("/FilterDesignView/filterTransition"), 0.1).toDouble());
     m_pUi->m_comboBox_filterApplyTo->setCurrentText(settings.value(m_sSettingsPath + QString("/FilterDesignView/filterChannelType"), "All").toString());
 
-    QPoint pos = settings.value(m_sSettingsPath + QString("/FilterDesignView/Position"), QPoint(100,100)).toPoint();
+    QPoint pos = settings.value(m_sSettingsPath + QString("/FilterDesignView/Position"), QPoint(100, 100)).toPoint();
 
     QRect screenRect = QApplication::primaryScreen()->geometry();
-    if(!screenRect.contains(pos) && QGuiApplication::screens().size() == 1) {
-        move(QPoint(100,100));
+    if (!screenRect.contains(pos) && QGuiApplication::screens().size() == 1) {
+        move(QPoint(100, 100));
     } else {
         move(pos);
     }
@@ -226,7 +226,7 @@ void FilterDesignView::loadSettings()
 
 void FilterDesignView::updateGuiMode(GuiMode mode)
 {
-    switch(mode) {
+    switch (mode) {
         case GuiMode::Clinical:
             break;
         default: // default is research mode
@@ -238,7 +238,7 @@ void FilterDesignView::updateGuiMode(GuiMode mode)
 
 void FilterDesignView::updateProcessingMode(ProcessingMode mode)
 {
-    switch(mode) {
+    switch (mode) {
         case ProcessingMode::Offline:
             break;
         default: // default is realtime mode
@@ -251,16 +251,16 @@ void FilterDesignView::updateProcessingMode(ProcessingMode mode)
 void FilterDesignView::initSpinBoxes()
 {
     connect(m_pUi->m_doubleSpinBox_from, &QDoubleSpinBox::editingFinished,
-                this, &FilterDesignView::filterParametersChanged);
+            this, &FilterDesignView::filterParametersChanged);
 
     connect(m_pUi->m_doubleSpinBox_to, &QDoubleSpinBox::editingFinished,
-                this,&FilterDesignView::filterParametersChanged);
+            this, &FilterDesignView::filterParametersChanged);
 
     connect(m_pUi->m_doubleSpinBox_transitionband, &QDoubleSpinBox::editingFinished,
-                this,&FilterDesignView::filterParametersChanged);
+            this, &FilterDesignView::filterParametersChanged);
 
     connect(m_pUi->m_spinBox_filterTaps, &QSpinBox::editingFinished,
-                this,&FilterDesignView::filterParametersChanged);
+            this, &FilterDesignView::filterParametersChanged);
 
     //Intercept events from the spin boxes to get control over key events
     m_pUi->m_doubleSpinBox_from->installEventFilter(this);
@@ -272,26 +272,26 @@ void FilterDesignView::initSpinBoxes()
 
 void FilterDesignView::initButtons()
 {
-    connect(m_pUi->m_pushButton_exportPlot,&QPushButton::released,
-                this,&FilterDesignView::onBtnExportFilterPlot);
+    connect(m_pUi->m_pushButton_exportPlot, &QPushButton::released,
+            this, &FilterDesignView::onBtnExportFilterPlot);
 
-    connect(m_pUi->m_pushButton_exportFilter,&QPushButton::released,
-                this,&FilterDesignView::onBtnExportFilterCoefficients);
+    connect(m_pUi->m_pushButton_exportFilter, &QPushButton::released,
+            this, &FilterDesignView::onBtnExportFilterCoefficients);
 
-    connect(m_pUi->m_pushButton_loadFilter,&QPushButton::released,
-                this,&FilterDesignView::onBtnLoadFilter);
+    connect(m_pUi->m_pushButton_loadFilter, &QPushButton::released,
+            this, &FilterDesignView::onBtnLoadFilter);
 }
 
 //=============================================================================================================
 
 void FilterDesignView::initComboBoxes()
 {
-    for(FilterParameter filterMethod : FilterKernel::m_designMethods){
+    for (FilterParameter filterMethod : FilterKernel::m_designMethods) {
         m_pUi->m_comboBox_designMethod->addItem(filterMethod.getName());
     }
 
-    connect(m_pUi->m_comboBox_designMethod,static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged),
-                this,&FilterDesignView::changeStateSpinBoxes);
+    connect(m_pUi->m_comboBox_designMethod, static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged),
+            this, &FilterDesignView::changeStateSpinBoxes);
 
     //Initial selection is a bandpass and Cosine design method
     m_pUi->m_doubleSpinBox_from->setVisible(true);
@@ -330,13 +330,13 @@ void FilterDesignView::resizeEvent(QResizeEvent* event)
 
 //=============================================================================================================
 
-void FilterDesignView::keyPressEvent(QKeyEvent * event)
+void FilterDesignView::keyPressEvent(QKeyEvent* event)
 {
-    if(event->key() == Qt::Key_Enter || event->key() == Qt::Key_Return) {
+    if (event->key() == Qt::Key_Enter || event->key() == Qt::Key_Return) {
         emit filterChannelTypeChanged(m_pUi->m_comboBox_filterApplyTo->currentText());
     }
 
-    if((event->modifiers() == Qt::ControlModifier && event->key() == Qt::Key_Z) || event->key() == Qt::Key_Delete) {
+    if ((event->modifiers() == Qt::ControlModifier && event->key() == Qt::Key_Z) || event->key() == Qt::Key_Delete) {
         emit filterChannelTypeChanged(m_pUi->m_comboBox_filterApplyTo->currentText());
     }
 }
@@ -361,10 +361,8 @@ void FilterDesignView::changeStateSpinBoxes(int currentIndex)
     Q_UNUSED(currentIndex);
 
     //Change visibility of filter tap spin boxes depending on filter design method
-    switch(m_pUi->m_comboBox_designMethod->currentIndex()) {
+    switch (m_pUi->m_comboBox_designMethod->currentIndex()) {
         case 0: //Cosine
-//            m_pUi->m_spinBox_filterTaps->setVisible(false);
-//            m_pUi->m_label_filterTaps->setVisible(false);
             m_pUi->m_spinBox_filterTaps->setVisible(true);
             m_pUi->m_label_filterTaps->setVisible(true);
             break;
@@ -391,14 +389,14 @@ void FilterDesignView::filterParametersChanged()
 
     double trans_width = m_pUi->m_doubleSpinBox_transitionband->value();
 
-    double bw = to-from;
-    double center = from+bw/2;
+    double bw = to - from;
+    double center = from + bw / 2;
 
-    double nyquistFrequency = m_dSFreq/2;
+    double nyquistFrequency = m_dSFreq / 2;
 
     //Calculate the needed fft length
     m_iFilterTaps = m_pUi->m_spinBox_filterTaps->value();
-    if(m_pUi->m_spinBox_filterTaps->value()%2 != 0) {
+    if (m_pUi->m_spinBox_filterTaps->value() % 2 != 0) {
         m_iFilterTaps--;
     }
 
@@ -408,7 +406,7 @@ void FilterDesignView::filterParametersChanged()
     m_pUi->m_doubleSpinBox_to->setMinimum(0);
     m_pUi->m_doubleSpinBox_from->setMinimum(0);
 
-    if((m_pUi->m_doubleSpinBox_to->value() < m_pUi->m_doubleSpinBox_from->value())) {
+    if ((m_pUi->m_doubleSpinBox_to->value() < m_pUi->m_doubleSpinBox_from->value())) {
         m_pUi->m_doubleSpinBox_to->setValue(m_pUi->m_doubleSpinBox_from->value() + 1);
     }
 
@@ -421,9 +419,9 @@ void FilterDesignView::filterParametersChanged()
     m_filterKernel = FilterKernel("Designed Filter",
                                   FilterKernel::m_filterTypes.indexOf(FilterParameter("BPF")),
                                   m_iFilterTaps,
-                                  (double)center/nyquistFrequency,
-                                  (double)bw/nyquistFrequency,
-                                  (double)trans_width/nyquistFrequency,
+                                  (double)center / nyquistFrequency,
+                                  (double)bw / nyquistFrequency,
+                                  (double)trans_width / nyquistFrequency,
                                   m_dSFreq,
                                   iMethod);
 
@@ -453,9 +451,9 @@ void FilterDesignView::onBtnExportFilterPlot()
                                                     QString("%1/%2_%3_%4_FilterPlot").arg(QStandardPaths::writableLocation(QStandardPaths::DesktopLocation)).arg(date.currentDate().year()).arg(date.currentDate().month()).arg(date.currentDate().day()),
                                                     tr("Vector graphic(*.svg);;Images (*.png)"));
 
-    if(!fileName.isEmpty()) {
+    if (!fileName.isEmpty()) {
         // Generate screenshot
-        if(fileName.contains(".svg")) {
+        if (fileName.contains(".svg")) {
             QSvgGenerator svgGen;
 
             svgGen.setFileName(fileName);
@@ -467,10 +465,10 @@ void FilterDesignView::onBtnExportFilterPlot()
             m_pFilterPlotScene->render(&painter);
         }
 
-        if(fileName.contains(".png")) {
-            m_pFilterPlotScene->setSceneRect(m_pFilterPlotScene->itemsBoundingRect());                  // Re-shrink the scene to it's bounding contents
-            QImage image(m_pFilterPlotScene->sceneRect().size().toSize(), QImage::Format_ARGB32);       // Create the image with the exact size of the shrunk scene
-            image.fill(Qt::transparent);                                                                // Start all pixels transparent
+        if (fileName.contains(".png")) {
+            m_pFilterPlotScene->setSceneRect(m_pFilterPlotScene->itemsBoundingRect());            // Re-shrink the scene to it's bounding contents
+            QImage image(m_pFilterPlotScene->sceneRect().size().toSize(), QImage::Format_ARGB32); // Create the image with the exact size of the shrunk scene
+            image.fill(Qt::transparent);                                                          // Start all pixels transparent
 
             QPainter painter(&image);
             m_pFilterPlotScene->render(&painter);
@@ -509,11 +507,11 @@ void FilterDesignView::onBtnLoadFilter()
                                                 QString("./"),
                                                 tr("txt files (*.txt)"));
 
-    if(!path.isEmpty()) {
+    if (!path.isEmpty()) {
         //Replace old with new filter operator
         FilterKernel filterLoadTemp;
 
-        if(!FilterIO::readFilter(path, filterLoadTemp)) {
+        if (!FilterIO::readFilter(path, filterLoadTemp)) {
             return;
         }
         updateGuiFromFilter(filterLoadTemp);
@@ -523,7 +521,7 @@ void FilterDesignView::onBtnLoadFilter()
         filterParametersChanged();
 
     } else {
-        qDebug()<<"Could not load filter.";
+        qDebug() << "Could not load filter.";
     }
 }
 
@@ -531,7 +529,6 @@ void FilterDesignView::onBtnLoadFilter()
 
 void FilterDesignView::clearView()
 {
-
 }
 
 //=============================================================================================================
@@ -555,7 +552,7 @@ void FilterDesignView::updateGuiFromFilter(const UTILSLIB::FilterKernel& filter)
     m_pUi->m_doubleSpinBox_from->setValue(filter.getHighpassFreq());
     m_pUi->m_doubleSpinBox_to->setValue(filter.getLowpassFreq());
     m_pUi->m_spinBox_filterTaps->setValue(filter.getFilterOrder());
-    m_pUi->m_doubleSpinBox_transitionband->setValue(filter.getParksWidth()*(filter.getSamplingFrequency()/2));
+    m_pUi->m_doubleSpinBox_transitionband->setValue(filter.getParksWidth() * (filter.getSamplingFrequency() / 2));
 
     m_pUi->m_comboBox_designMethod->setCurrentIndex(FilterKernel::m_designMethods.indexOf(filter.getDesignMethod()));
 }

@@ -77,7 +77,7 @@ public:
      *
      * @param[in] parent     Parent QObject (optional).
      */
-    explicit Plot(QWidget *parent = Q_NULLPTR);
+    explicit Plot(QWidget* parent = Q_NULLPTR);
 
     //=========================================================================================================
     /**
@@ -86,8 +86,8 @@ public:
      * @param[in] p_dVec     The double data vector.
      * @param[in] parent     Parent QObject (optional).
      */
-    explicit Plot(Eigen::VectorXd &p_dVec,
-                  QWidget *parent = 0);
+    explicit Plot(Eigen::VectorXd& p_dVec,
+                  QWidget* parent = 0);
 
     //=========================================================================================================
     /**
@@ -107,7 +107,7 @@ public:
      *
      * @param[in] p_dVec     The double data vector.
      */
-    void updateData(Eigen::VectorXd &p_dVec);
+    void updateData(Eigen::VectorXd& p_dVec);
 
 protected:
     //=========================================================================================================
@@ -118,13 +118,13 @@ protected:
      */
     void paintEvent(QPaintEvent* event);
 
-    QList<QVector<QPointF> > m_qListVecPointFPaths;     /**< List of point series. */
+    QList<QVector<QPointF>> m_qListVecPointFPaths; /**< List of point series. */
 
-    bool    m_bHoldOn;          /**< If multiple plots. */
-    double  m_dMinX;            /**< Minimal X value. */
-    double  m_dMaxX;            /**< Maximal X value. */
-    double  m_dMinY;            /**< Minimal Y value. */
-    double  m_dMaxY;            /**< Maximal Y value. */
+    bool m_bHoldOn; /**< If multiple plots. */
+    double m_dMinX; /**< Minimal X value. */
+    double m_dMaxX; /**< Maximal X value. */
+    double m_dMinY; /**< Minimal Y value. */
+    double m_dMaxY; /**< Maximal Y value. */
 };
 
 //=============================================================================================================

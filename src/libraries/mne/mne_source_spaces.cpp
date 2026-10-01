@@ -53,7 +53,7 @@ MNESourceSpaces::MNESourceSpaces()
 
 //=============================================================================================================
 
-MNESourceSpaces::MNESourceSpaces(const MNESourceSpaces &p_MNESourceSpaces)
+MNESourceSpaces::MNESourceSpaces(const MNESourceSpaces& p_MNESourceSpaces)
 {
     m_sourceSpaces.reserve(p_MNESourceSpaces.m_sourceSpaces.size());
     for (const auto& sp : p_MNESourceSpaces.m_sourceSpaces)
@@ -85,17 +85,17 @@ void MNESourceSpaces::append(const MNESourceSpace& space)
 QList<VectorXi> MNESourceSpaces::get_vertno() const
 {
     QList<VectorXi> p_vertices;
-    for(qint32 i = 0; i < static_cast<qint32>(m_sourceSpaces.size()); ++i)
+    for (qint32 i = 0; i < static_cast<qint32>(m_sourceSpaces.size()); ++i)
         p_vertices.push_back(m_sourceSpaces[i]->vertno);
     return p_vertices;
 }
 
 //=============================================================================================================
 
-QList<VectorXi> MNESourceSpaces::label_src_vertno_sel(const FsLabel &p_label, VectorXi &src_sel) const
+QList<VectorXi> MNESourceSpaces::label_src_vertno_sel(const FsLabel& p_label, VectorXi& src_sel) const
 {
-//    if(src[0].['type'] != 'surf')
-//        return Exception('FsLabel are only supported with surface source spaces')
+    //    if(src[0].['type'] != 'surf')
+    //        return Exception('FsLabel are only supported with surface source spaces')
 
     QList<VectorXi> vertno;
     vertno << this->m_sourceSpaces[0]->vertno << this->m_sourceSpaces[1]->vertno;
@@ -105,8 +105,7 @@ QList<VectorXi> MNESourceSpaces::label_src_vertno_sel(const FsLabel &p_label, Ve
         VectorXi vertno_sel = Linalg::intersect(vertno[0], p_label.vertices, src_sel);
         vertno[0] = vertno_sel;
         vertno[1] = VectorXi();
-    }
-    else if (p_label.hemi == 1) //rh
+    } else if (p_label.hemi == 1) //rh
     {
         VectorXi vertno_sel = Linalg::intersect(vertno[1], p_label.vertices, src_sel);
         src_sel.array() += p_label.vertices.size();
@@ -114,32 +113,31 @@ QList<VectorXi> MNESourceSpaces::label_src_vertno_sel(const FsLabel &p_label, Ve
         vertno[1] = vertno_sel;
     }
 
-//    if (p_label.hemi == 0) //lh
-//    {
-//        VectorXi vertno_sel = Linalg::intersect(vertno[0], p_label.vertices[0], src_sel);
-//        vertno[0] = vertno_sel;
-//        vertno[1] = VectorXi();
-//    }
-//    else if (p_label.hemi == 1) //rh
-//    {
-//        VectorXi vertno_sel = Linalg::intersect(vertno[1], p_label.vertices[1], src_sel);
-//        src_sel.array() += p_label.vertices[0].size();
-//        vertno[0] = VectorXi();
-//        vertno[1] = vertno_sel;
-//    }
-//    else if (p_label.hemi == 2) //both
-//    {
-//        VectorXi src_sel_lh, src_sel_rh;
-//        VectorXi vertno_sel_lh = Linalg::intersect(vertno[0], p_label.vertices[0], src_sel_lh);
-//        VectorXi vertno_sel_rh = Linalg::intersect(vertno[1], p_label.vertices[1], src_sel_rh);
-//        src_sel.resize(src_sel_lh.size() + src_sel_rh.size());
-//        src_sel.block(0,0,src_sel_lh.size(),1) = src_sel_lh;
-//        src_sel.block(src_sel_lh.size(),0,src_sel_rh.size(),1) = src_sel_rh;
-//        vertno[0] = vertno_sel_lh;
-//        vertno[0] = vertno_sel_rh;
-//    }
-    else
-    {
+    //    if (p_label.hemi == 0) //lh
+    //    {
+    //        VectorXi vertno_sel = Linalg::intersect(vertno[0], p_label.vertices[0], src_sel);
+    //        vertno[0] = vertno_sel;
+    //        vertno[1] = VectorXi();
+    //    }
+    //    else if (p_label.hemi == 1) //rh
+    //    {
+    //        VectorXi vertno_sel = Linalg::intersect(vertno[1], p_label.vertices[1], src_sel);
+    //        src_sel.array() += p_label.vertices[0].size();
+    //        vertno[0] = VectorXi();
+    //        vertno[1] = vertno_sel;
+    //    }
+    //    else if (p_label.hemi == 2) //both
+    //    {
+    //        VectorXi src_sel_lh, src_sel_rh;
+    //        VectorXi vertno_sel_lh = Linalg::intersect(vertno[0], p_label.vertices[0], src_sel_lh);
+    //        VectorXi vertno_sel_rh = Linalg::intersect(vertno[1], p_label.vertices[1], src_sel_rh);
+    //        src_sel.resize(src_sel_lh.size() + src_sel_rh.size());
+    //        src_sel.block(0,0,src_sel_lh.size(),1) = src_sel_lh;
+    //        src_sel.block(src_sel_lh.size(),0,src_sel_rh.size(),1) = src_sel_rh;
+    //        vertno[0] = vertno_sel_lh;
+    //        vertno[0] = vertno_sel_rh;
+    //    }
+    else {
         qWarning("Unknown hemisphere type\n");
         vertno[0] = VectorXi::Zero(0);
         vertno[1] = VectorXi::Zero(0);
@@ -150,14 +148,13 @@ QList<VectorXi> MNESourceSpaces::label_src_vertno_sel(const FsLabel &p_label, Ve
 
 //=============================================================================================================
 
-MNESourceSpaces MNESourceSpaces::pick_regions(const QList<FsLabel> &p_qListLabels) const
+MNESourceSpaces MNESourceSpaces::pick_regions(const QList<FsLabel>& p_qListLabels) const
 {
     Q_UNUSED(p_qListLabels);
 
     MNESourceSpaces selectedSrc(*this);
 
-    for(qint32 h = 0; h < 2; ++h)
-    {
+    for (qint32 h = 0; h < 2; ++h) {
         auto& srcSpace = *selectedSrc.m_sourceSpaces[h];
         const auto& origSpace = *this->m_sourceSpaces[h];
         auto* selHemi = dynamic_cast<MNEHemisphere*>(&srcSpace);
@@ -167,16 +164,14 @@ MNESourceSpaces MNESourceSpaces::pick_regions(const QList<FsLabel> &p_qListLabel
 
         //get vertices indeces for new selection
         qint32 iSize = 0;
-        for(qint32 i = 0; i < p_qListLabels.size(); ++i)
-        {
-            if(p_qListLabels[i].hemi == h)
-            {
+        for (qint32 i = 0; i < p_qListLabels.size(); ++i) {
+            if (p_qListLabels[i].hemi == h) {
                 VectorXi currentSelection;
 
                 Linalg::intersect(origSpace.vertno, p_qListLabels[i].vertices, currentSelection);
 
-                selVertices.conservativeResize(iSize+currentSelection.size());
-                selVertices.block(iSize,0,currentSelection.size(),1) = currentSelection;
+                selVertices.conservativeResize(iSize + currentSelection.size());
+                selVertices.block(iSize, 0, currentSelection.size(), 1) = currentSelection;
                 iSize = selVertices.size();
             }
         }
@@ -187,8 +182,7 @@ MNESourceSpaces MNESourceSpaces::pick_regions(const QList<FsLabel> &p_qListLabel
 
         srcSpace.inuse = VectorXi::Zero(srcSpace.np);
 
-        for(qint32 i = 0; i < selVertices.size(); ++i)
-        {
+        for (qint32 i = 0; i < selVertices.size(); ++i) {
             srcSpace.inuse[selVertices[i]] = 1;
             newVertno[i] = origSpace.vertno[selVertices[i]];
         }
@@ -200,33 +194,30 @@ MNESourceSpaces MNESourceSpaces::pick_regions(const QList<FsLabel> &p_qListLabel
         // Tris
         //
         VectorXi idx_select = VectorXi::Zero(origSpace.use_itris.rows());
-        for(qint32 i = 0; i < 3; ++i)
-        {
+        for (qint32 i = 0; i < 3; ++i) {
             VectorXi tri_dim = origSpace.use_itris.col(i);
             VectorXi idx_dim;
             Linalg::intersect(tri_dim, newVertno, idx_dim);
 
-            for(qint32 j = 0; j < idx_dim.size(); ++j)
+            for (qint32 j = 0; j < idx_dim.size(); ++j)
                 idx_select[idx_dim[j]] = 1;
         }
 
         qint32 countSel = 0;
-        for(qint32 i = 0; i < idx_select.size(); ++i)
-            if(idx_select[i] == 1)
+        for (qint32 i = 0; i < idx_select.size(); ++i)
+            if (idx_select[i] == 1)
                 ++countSel;
 
         srcSpace.nuse_tri = countSel;
 
-        MatrixX3i use_tris_new(countSel,3);
-        MatrixX3d use_tri_cent_new(countSel,3);
-        MatrixX3d use_tri_nn_new(countSel,3);
+        MatrixX3i use_tris_new(countSel, 3);
+        MatrixX3d use_tri_cent_new(countSel, 3);
+        MatrixX3d use_tri_nn_new(countSel, 3);
         VectorXd use_tri_area_new(countSel);
 
         countSel = 0;
-        for(qint32 i = 0; i < idx_select.size(); ++i)
-        {
-            if(idx_select[i] == 1)
-            {
+        for (qint32 i = 0; i < idx_select.size(); ++i) {
+            if (idx_select[i] == 1) {
                 use_tris_new.row(countSel) = origSpace.use_itris.row(i);
                 if (origHemi && selHemi) {
                     use_tri_cent_new.row(countSel) = origHemi->use_tri_cent.row(i);
@@ -251,60 +242,57 @@ MNESourceSpaces MNESourceSpaces::pick_regions(const QList<FsLabel> &p_qListLabel
 //=============================================================================================================
 
 bool MNESourceSpaces::readFromStream(FiffStream::SPtr& p_pStream,
-                                    bool add_geom,
-                                    MNESourceSpaces& p_SourceSpace)
+                                     bool add_geom,
+                                     MNESourceSpaces& p_SourceSpace)
 {
-//    if (p_pSourceSpace != NULL)
-//        delete p_pSourceSpace;
+    //    if (p_pSourceSpace != NULL)
+    //        delete p_pSourceSpace;
     p_SourceSpace = MNESourceSpaces();
 
     //
     //   Open the file, create directory
     //
     bool open_here = false;
-    QFile t_file;//ToDo TCPSocket;
+    QFile t_file; //ToDo TCPSocket;
 
-    if (!p_pStream->device()->isOpen())
-    {
+    if (!p_pStream->device()->isOpen()) {
         QString t_sFileName = p_pStream->streamName();
 
         t_file.setFileName(t_sFileName);
         p_pStream = FiffStream::SPtr(new FiffStream(&t_file));
-        if(!p_pStream->open())
+        if (!p_pStream->open())
             return false;
         open_here = true;
-//        if(t_pDir)
-//            delete t_pDir;
+        //        if(t_pDir)
+        //            delete t_pDir;
     }
     //
     //   Find all source spaces
     //
     QList<FiffDirNode::SPtr> spaces = p_pStream->dirtree()->dir_tree_find(FIFFB_MNE_SOURCE_SPACE);
-    if (spaces.size() == 0)
-    {
-        if(open_here)
+    if (spaces.size() == 0) {
+        if (open_here)
             p_pStream->close();
         qWarning() << "No source spaces found";
         return false;
     }
 
-    for(int k = 0; k < spaces.size(); ++k)
-    {
+    for (int k = 0; k < spaces.size(); ++k) {
         auto p_Hemisphere = std::make_shared<MNEHemisphere>();
         qInfo("\tReading a source space...");
         MNESourceSpaces::read_source_space(p_pStream, spaces[k], *p_Hemisphere);
-        qInfo("\t[done]\n" );
+        qInfo("\t[done]\n");
         if (add_geom)
             p_Hemisphere->complete_source_space_info();
 
         p_SourceSpace.m_sourceSpaces.push_back(p_Hemisphere);
 
-//           src(k) = this;
+        //           src(k) = this;
     }
 
     qInfo("\t%lld source spaces read\n", spaces.size());
 
-    if(open_here)
+    if (open_here)
         p_pStream->close();
 
     return true;
@@ -321,12 +309,10 @@ qint32 MNESourceSpaces::find_source_space_hemi(MNESourceSpace& p_SourceSpace)
 
 bool MNESourceSpaces::transform_source_space_to(fiff_int_t dest, FiffCoordTrans& trans)
 {
-    for(size_t k = 0; k < this->m_sourceSpaces.size(); ++k)
-    {
+    for (size_t k = 0; k < this->m_sourceSpaces.size(); ++k) {
         auto* hemi = dynamic_cast<MNEHemisphere*>(m_sourceSpaces[k].get());
-        if(hemi) {
-            if(!hemi->transform_hemisphere_to(dest,trans))
-            {
+        if (hemi) {
+            if (!hemi->transform_hemisphere_to(dest, trans)) {
                 qWarning("Could not transform source space.");
                 return false;
             }
@@ -344,69 +330,61 @@ bool MNESourceSpaces::read_source_space(FiffStream::SPtr& p_pStream, const FiffD
     FiffTag::UPtr t_pTag;
 
     //=====================================================================
-    if(!p_Tree->find_tag(p_pStream, FIFF_MNE_SOURCE_SPACE_ID, t_pTag))
+    if (!p_Tree->find_tag(p_pStream, FIFF_MNE_SOURCE_SPACE_ID, t_pTag))
         p_Hemisphere.id = FIFFV_MNE_SURF_UNKNOWN;
     else
         p_Hemisphere.id = *t_pTag->toInt();
 
-//        qDebug() << "Read SourceSpace ID; type:" << t_pTag->getType() << "value:" << *t_pTag->toInt();
+    //        qDebug() << "Read SourceSpace ID; type:" << t_pTag->getType() << "value:" << *t_pTag->toInt();
 
     //=====================================================================
-    if(!p_Tree->find_tag(p_pStream, FIFF_MNE_SOURCE_SPACE_NPOINTS, t_pTag))
-    {
+    if (!p_Tree->find_tag(p_pStream, FIFF_MNE_SOURCE_SPACE_NPOINTS, t_pTag)) {
         p_pStream->close();
         throw std::runtime_error("error: Number of vertices not found.");
     }
-//        qDebug() << "Number of vertice; type:" << t_pTag->getType() << "value:" << *t_pTag->toInt();
+    //        qDebug() << "Number of vertice; type:" << t_pTag->getType() << "value:" << *t_pTag->toInt();
     p_Hemisphere.np = *t_pTag->toInt();
 
     //=====================================================================
-    if(!p_Tree->find_tag(p_pStream, FIFF_BEM_SURF_NTRI, t_pTag))
-    {
-        if(!p_Tree->find_tag(p_pStream, FIFF_MNE_SOURCE_SPACE_NTRI, t_pTag))
+    if (!p_Tree->find_tag(p_pStream, FIFF_BEM_SURF_NTRI, t_pTag)) {
+        if (!p_Tree->find_tag(p_pStream, FIFF_MNE_SOURCE_SPACE_NTRI, t_pTag))
             p_Hemisphere.ntri = 0;
         else
             p_Hemisphere.ntri = *t_pTag->toInt();
-    }
-    else
-    {
+    } else {
         p_Hemisphere.ntri = *t_pTag->toInt();
     }
-//        qDebug() << "Number of Tris; type:" << t_pTag->getType() << "value:" << *t_pTag->toInt();
+    //        qDebug() << "Number of Tris; type:" << t_pTag->getType() << "value:" << *t_pTag->toInt();
 
     //=====================================================================
-    if(!p_Tree->find_tag(p_pStream, FIFF_MNE_COORD_FRAME, t_pTag))
-    {
+    if (!p_Tree->find_tag(p_pStream, FIFF_MNE_COORD_FRAME, t_pTag)) {
         p_pStream->close();
         throw std::runtime_error("Coordinate frame information not found.");
     }
     p_Hemisphere.coord_frame = *t_pTag->toInt();
-//        qDebug() << "Coord Frame; type:" << t_pTag->getType() << "value:" << *t_pTag->toInt();
+    //        qDebug() << "Coord Frame; type:" << t_pTag->getType() << "value:" << *t_pTag->toInt();
 
     //=====================================================================
     //
     //   Vertices, normals, and triangles
     //
-    if(!p_Tree->find_tag(p_pStream, FIFF_MNE_SOURCE_SPACE_POINTS, t_pTag))
-    {
+    if (!p_Tree->find_tag(p_pStream, FIFF_MNE_SOURCE_SPACE_POINTS, t_pTag)) {
         p_pStream->close();
         throw std::runtime_error("Vertex data not found.");
     }
 
     p_Hemisphere.rr = t_pTag->toFloatMatrix().transpose();
     qint32 rows_rr = p_Hemisphere.rr.rows();
-//        qDebug() << "last element rr: " << p_Hemisphere.rr(rows_rr-1, 0) << p_Hemisphere.rr(rows_rr-1, 1) << p_Hemisphere.rr(rows_rr-1, 2);
+    //        qDebug() << "last element rr: " << p_Hemisphere.rr(rows_rr-1, 0) << p_Hemisphere.rr(rows_rr-1, 1) << p_Hemisphere.rr(rows_rr-1, 2);
 
-    if (rows_rr != p_Hemisphere.np)
-    {
+    if (rows_rr != p_Hemisphere.np) {
         p_pStream->close();
         throw std::runtime_error("Vertex information is incorrect.");
     }
-//        qDebug() << "Source Space Points; type:" << t_pTag->getType();
+    //        qDebug() << "Source Space Points; type:" << t_pTag->getType();
 
     //=====================================================================
-    if(!p_Tree->find_tag(p_pStream, FIFF_MNE_SOURCE_SPACE_NORMALS, t_pTag))
-    {
+    if (!p_Tree->find_tag(p_pStream, FIFF_MNE_SOURCE_SPACE_NORMALS, t_pTag)) {
         p_pStream->close();
         throw std::runtime_error("Vertex normals not found.");
     }
@@ -414,131 +392,104 @@ bool MNESourceSpaces::read_source_space(FiffStream::SPtr& p_pStream, const FiffD
     p_Hemisphere.nn = t_pTag->toFloatMatrix().transpose();
     qint32 rows_nn = p_Hemisphere.nn.rows();
 
-    if (rows_nn != p_Hemisphere.np)
-    {
+    if (rows_nn != p_Hemisphere.np) {
         p_pStream->close();
         throw std::runtime_error("Vertex normal information is incorrect.");
     }
-//        qDebug() << "Source Space Normals; type:" << t_pTag->getType();
+    //        qDebug() << "Source Space Normals; type:" << t_pTag->getType();
 
     //=====================================================================
-    if (p_Hemisphere.ntri > 0)
-    {
-        if(!p_Tree->find_tag(p_pStream, FIFF_BEM_SURF_TRIANGLES, t_pTag))
-        {
-            if(!p_Tree->find_tag(p_pStream, FIFF_MNE_SOURCE_SPACE_TRIANGLES, t_pTag))
-            {
+    if (p_Hemisphere.ntri > 0) {
+        if (!p_Tree->find_tag(p_pStream, FIFF_BEM_SURF_TRIANGLES, t_pTag)) {
+            if (!p_Tree->find_tag(p_pStream, FIFF_MNE_SOURCE_SPACE_TRIANGLES, t_pTag)) {
                 p_pStream->close();
                 throw std::runtime_error("Triangulation not found.");
-            }
-            else
-            {
+            } else {
                 p_Hemisphere.itris = t_pTag->toIntMatrix().transpose();
-                p_Hemisphere.itris.array() -= 1;//0 based indizes
+                p_Hemisphere.itris.array() -= 1; //0 based indizes
             }
-        }
-        else
-        {
+        } else {
             p_Hemisphere.itris = t_pTag->toIntMatrix().transpose();
-            p_Hemisphere.itris.array() -= 1;//0 based indizes
+            p_Hemisphere.itris.array() -= 1; //0 based indizes
         }
-        if (p_Hemisphere.itris.rows() != p_Hemisphere.ntri)
-        {
+        if (p_Hemisphere.itris.rows() != p_Hemisphere.ntri) {
             p_pStream->close();
             throw std::runtime_error("Triangulation information is incorrect.");
         }
-    }
-    else
-    {
+    } else {
         p_Hemisphere.itris.resize(0, 3);
     }
-//        qDebug() << "Triangles; type:" << t_pTag->getType() << "rows:" << p_Hemisphere.itris.rows() << "cols:" << p_Hemisphere.itris.cols();
+    //        qDebug() << "Triangles; type:" << t_pTag->getType() << "rows:" << p_Hemisphere.itris.rows() << "cols:" << p_Hemisphere.itris.cols();
 
     //
     //   Which vertices are active
     //
-    if(!p_Tree->find_tag(p_pStream, FIFF_MNE_SOURCE_SPACE_NUSE, t_pTag))
-    {
-        p_Hemisphere.nuse   = 0;
-        p_Hemisphere.inuse  = VectorXi::Zero(p_Hemisphere.nuse);
+    if (!p_Tree->find_tag(p_pStream, FIFF_MNE_SOURCE_SPACE_NUSE, t_pTag)) {
+        p_Hemisphere.nuse = 0;
+        p_Hemisphere.inuse = VectorXi::Zero(p_Hemisphere.nuse);
         VectorXi p_defaultVector;
         p_Hemisphere.vertno = p_defaultVector;
-    }
-    else
-    {
+    } else {
         p_Hemisphere.nuse = *t_pTag->toInt();
-        if(!p_Tree->find_tag(p_pStream, FIFF_MNE_SOURCE_SPACE_SELECTION, t_pTag))
-        {
+        if (!p_Tree->find_tag(p_pStream, FIFF_MNE_SOURCE_SPACE_SELECTION, t_pTag)) {
             p_pStream->close();
             throw std::runtime_error("Source selection information missing.");
         }
-        p_Hemisphere.inuse = VectorXi(Map<VectorXi>(t_pTag->toInt(), t_pTag->size()/4, 1));//use copy constructor, for the sake of easy memory management
+        p_Hemisphere.inuse = VectorXi(Map<VectorXi>(t_pTag->toInt(), t_pTag->size() / 4, 1)); //use copy constructor, for the sake of easy memory management
 
         p_Hemisphere.vertno = VectorXi::Zero(p_Hemisphere.nuse);
-        if (p_Hemisphere.inuse.rows() != p_Hemisphere.np)
-        {
+        if (p_Hemisphere.inuse.rows() != p_Hemisphere.np) {
             p_pStream->close();
             throw std::runtime_error("Incorrect number of entries in source space selection.");
         }
         int pp = 0;
-        for (int p = 0; p < p_Hemisphere.np; ++p)
-        {
-            if(p_Hemisphere.inuse(p) == 1)
-            {
+        for (int p = 0; p < p_Hemisphere.np; ++p) {
+            if (p_Hemisphere.inuse(p) == 1) {
                 p_Hemisphere.vertno(pp) = p;
                 ++pp;
             }
         }
     }
-//        qDebug() << "Vertices; type:" << t_pTag->getType() << "nuse:" << p_Hemisphere.nuse;
+    //        qDebug() << "Vertices; type:" << t_pTag->getType() << "nuse:" << p_Hemisphere.nuse;
 
     //
     //   Use triangulation
     //
     FiffTag::UPtr t_pTag1;
     FiffTag::UPtr t_pTag2;
-    if(!p_Tree->find_tag(p_pStream, FIFF_MNE_SOURCE_SPACE_NUSE_TRI, t_pTag1) || !p_Tree->find_tag(p_pStream, FIFF_MNE_SOURCE_SPACE_USE_TRIANGLES, t_pTag2))
-    {
+    if (!p_Tree->find_tag(p_pStream, FIFF_MNE_SOURCE_SPACE_NUSE_TRI, t_pTag1) || !p_Tree->find_tag(p_pStream, FIFF_MNE_SOURCE_SPACE_USE_TRIANGLES, t_pTag2)) {
         MatrixX3i p_defaultMatrix;
         p_Hemisphere.nuse_tri = 0;
         p_Hemisphere.use_itris = p_defaultMatrix;
-    }
-    else
-    {
+    } else {
         p_Hemisphere.nuse_tri = *t_pTag1->toInt();
         p_Hemisphere.use_itris = t_pTag2->toIntMatrix().transpose();
         p_Hemisphere.use_itris.array() -= 1; //0 based indizes
     }
-//        qDebug() << "triangulation; type:" << t_pTag2->getType() << "use_itris:" << p_Hemisphere.use_itris.rows()<< "x" << p_Hemisphere.use_itris.cols();
+    //        qDebug() << "triangulation; type:" << t_pTag2->getType() << "use_itris:" << p_Hemisphere.use_itris.rows()<< "x" << p_Hemisphere.use_itris.cols();
 
     //
     //   Patch-related information
     //
-    if(!p_Tree->find_tag(p_pStream, FIFF_MNE_SOURCE_SPACE_NEAREST, t_pTag1) || !p_Tree->find_tag(p_pStream, FIFF_MNE_SOURCE_SPACE_NEAREST_DIST, t_pTag2))
-    {
+    if (!p_Tree->find_tag(p_pStream, FIFF_MNE_SOURCE_SPACE_NEAREST, t_pTag1) || !p_Tree->find_tag(p_pStream, FIFF_MNE_SOURCE_SPACE_NEAREST_DIST, t_pTag2)) {
         p_Hemisphere.nearest.clear();
-    }
-    else
-    {
-       //res.nearest = tag1.data + 1;
-       VectorXi nearestIdx = VectorXi(Map<VectorXi>(t_pTag1->toInt(), t_pTag1->size()/4, 1));
-       VectorXd nearestDist = VectorXd((Map<const VectorXf>(t_pTag2->toFloat(), t_pTag2->size()/4, 1)).cast<double>());
-       p_Hemisphere.setNearestData(nearestIdx, nearestDist);
+    } else {
+        //res.nearest = tag1.data + 1;
+        VectorXi nearestIdx = VectorXi(Map<VectorXi>(t_pTag1->toInt(), t_pTag1->size() / 4, 1));
+        VectorXd nearestDist = VectorXd((Map<const VectorXf>(t_pTag2->toFloat(), t_pTag2->size() / 4, 1)).cast<double>());
+        p_Hemisphere.setNearestData(nearestIdx, nearestDist);
     }
 
-//    patch_info(p_Hemisphere.nearest, p_Hemisphere.pinfo);
+    //    patch_info(p_Hemisphere.nearest, p_Hemisphere.pinfo);
     if (p_Hemisphere.compute_patch_info())
-       qInfo("\tPatch information added...");
+        qInfo("\tPatch information added...");
     //
     // Distances
     //
-    if(!p_Tree->find_tag(p_pStream, FIFF_MNE_SOURCE_SPACE_DIST, t_pTag1) || !p_Tree->find_tag(p_pStream, FIFF_MNE_SOURCE_SPACE_DIST_LIMIT, t_pTag2))
-    {
-       p_Hemisphere.dist = FiffSparseMatrix();
-       p_Hemisphere.dist_limit = 0;
-    }
-    else
-    {
+    if (!p_Tree->find_tag(p_pStream, FIFF_MNE_SOURCE_SPACE_DIST, t_pTag1) || !p_Tree->find_tag(p_pStream, FIFF_MNE_SOURCE_SPACE_DIST_LIMIT, t_pTag2)) {
+        p_Hemisphere.dist = FiffSparseMatrix();
+        p_Hemisphere.dist_limit = 0;
+    } else {
         auto dist_lower = FiffSparseMatrix::fiff_get_float_sparse_matrix(t_pTag1);
         if (dist_lower) {
             auto dist_full = dist_lower->mne_add_upper_triangle_rcs();
@@ -554,7 +505,7 @@ bool MNESourceSpaces::read_source_space(FiffStream::SPtr& p_pStream, const FiffD
 
 //=============================================================================================================
 
-bool MNESourceSpaces::patch_info(MNEHemisphere &p_Hemisphere)
+bool MNESourceSpaces::patch_info(MNEHemisphere& p_Hemisphere)
 {
     return p_Hemisphere.compute_patch_info();
 }
@@ -570,8 +521,7 @@ bool MNESourceSpaces::complete_source_space_info(MNEHemisphere& p_Hemisphere)
 
 void MNESourceSpaces::writeToStream(FiffStream* p_pStream)
 {
-    for(size_t h = 0; h < m_sourceSpaces.size(); ++h)
-    {
+    for (size_t h = 0; h < m_sourceSpaces.size(); ++h) {
         qInfo("\tWrite a source space... ");
         p_pStream->start_block(FIFFB_MNE_SOURCE_SPACE);
         auto* hemi = dynamic_cast<MNEHemisphere*>(m_sourceSpaces[h].get());
@@ -585,12 +535,11 @@ void MNESourceSpaces::writeToStream(FiffStream* p_pStream)
 
 //=============================================================================================================
 
-MNESourceSpace& MNESourceSpaces::operator[] (qint32 idx)
+MNESourceSpace& MNESourceSpaces::operator[](qint32 idx)
 {
-    if(static_cast<qint32>(m_sourceSpaces.size()) > idx)
+    if (static_cast<qint32>(m_sourceSpaces.size()) > idx)
         return *m_sourceSpaces[idx];
-    else
-    {
+    else {
         qWarning("Warning: Index out of bound! Returning last element.");
         return *m_sourceSpaces.back();
     }
@@ -598,12 +547,11 @@ MNESourceSpace& MNESourceSpaces::operator[] (qint32 idx)
 
 //=============================================================================================================
 
-const MNESourceSpace& MNESourceSpaces::operator[] (qint32 idx) const
+const MNESourceSpace& MNESourceSpaces::operator[](qint32 idx) const
 {
-    if(static_cast<qint32>(m_sourceSpaces.size()) > idx)
+    if (static_cast<qint32>(m_sourceSpaces.size()) > idx)
         return *m_sourceSpaces[idx];
-    else
-    {
+    else {
         qWarning("Warning: Index out of bound! Returning last element.");
         return *m_sourceSpaces.back();
     }
@@ -611,14 +559,13 @@ const MNESourceSpace& MNESourceSpaces::operator[] (qint32 idx) const
 
 //=============================================================================================================
 
-MNESourceSpace& MNESourceSpaces::operator[] (QString idt)
+MNESourceSpace& MNESourceSpaces::operator[](QString idt)
 {
-    if(idt.compare("lh") == 0)
+    if (idt.compare("lh") == 0)
         return *m_sourceSpaces[0];
-    else if(idt.compare("rh") == 0)
+    else if (idt.compare("rh") == 0)
         return *m_sourceSpaces[1];
-    else
-    {
+    else {
         qWarning("Warning: Identifier is not 'lh' or 'rh'! Returning 'lh'.");
         return *m_sourceSpaces[0];
     }
@@ -626,14 +573,13 @@ MNESourceSpace& MNESourceSpaces::operator[] (QString idt)
 
 //=============================================================================================================
 
-const MNESourceSpace& MNESourceSpaces::operator[] (QString idt) const
+const MNESourceSpace& MNESourceSpaces::operator[](QString idt) const
 {
-    if(idt.compare("lh") == 0)
+    if (idt.compare("lh") == 0)
         return *m_sourceSpaces[0];
-    else if(idt.compare("rh") == 0)
+    else if (idt.compare("rh") == 0)
         return *m_sourceSpaces[1];
-    else
-    {
+    else {
         qWarning("Warning: Identifier is not 'lh' or 'rh'! Returning 'lh'.");
         return *m_sourceSpaces[0];
     }
@@ -643,7 +589,7 @@ const MNESourceSpace& MNESourceSpaces::operator[] (QString idt) const
 
 MNEHemisphere* MNESourceSpaces::hemisphereAt(qint32 idx)
 {
-    if(idx >= 0 && idx < static_cast<qint32>(m_sourceSpaces.size()))
+    if (idx >= 0 && idx < static_cast<qint32>(m_sourceSpaces.size()))
         return dynamic_cast<MNEHemisphere*>(m_sourceSpaces[idx].get());
     return nullptr;
 }
@@ -652,7 +598,7 @@ MNEHemisphere* MNESourceSpaces::hemisphereAt(qint32 idx)
 
 const MNEHemisphere* MNESourceSpaces::hemisphereAt(qint32 idx) const
 {
-    if(idx >= 0 && idx < static_cast<qint32>(m_sourceSpaces.size()))
+    if (idx >= 0 && idx < static_cast<qint32>(m_sourceSpaces.size()))
         return dynamic_cast<const MNEHemisphere*>(m_sourceSpaces[idx].get());
     return nullptr;
 }

@@ -59,10 +59,11 @@ namespace STSLIB
  *
  * @brief Per-call output of a Student t-test: t-statistics, p-values and degrees of freedom.
  */
-struct STSSHARED_EXPORT StatsTtestResult {
-    Eigen::MatrixXd matTstat;       /**< t-statistics (same shape as input columns). */
-    Eigen::MatrixXd matPval;        /**< p-values. */
-    int degreesOfFreedom;           /**< Degrees of freedom. */
+struct STSSHARED_EXPORT StatsTtestResult
+{
+    Eigen::MatrixXd matTstat; /**< t-statistics (same shape as input columns). */
+    Eigen::MatrixXd matPval;  /**< p-values. */
+    int degreesOfFreedom;     /**< Degrees of freedom. */
 };
 
 //=============================================================================================================
@@ -140,7 +141,6 @@ public:
     static double regularizedBeta(double x, double a, double b);
 
 private:
-
     //=========================================================================================================
     /**
      * Continued fraction expansion for regularized incomplete beta function.

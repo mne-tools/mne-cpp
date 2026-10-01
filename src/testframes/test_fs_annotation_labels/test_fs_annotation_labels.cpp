@@ -35,7 +35,7 @@ private slots:
         VectorXi verts(3);
         verts << 0, 1, 2;
         MatrixX3f pos(3, 3);
-        pos << 0, 0, 0,  1, 0, 0,  0, 1, 0;
+        pos << 0, 0, 0, 1, 0, 0, 0, 1, 0;
         VectorXd vals = VectorXd::Ones(3);
 
         FsLabel l(verts, pos, vals, 0, "test-lh", 42);
@@ -51,7 +51,7 @@ private slots:
         VectorXi verts(2);
         verts << 0, 1;
         MatrixX3f pos(2, 3);
-        pos << 0, 0, 0,  1, 0, 0;
+        pos << 0, 0, 0, 1, 0, 0;
         VectorXd vals = VectorXd::Ones(2);
 
         FsLabel l(verts, pos, vals, 0, "test", 1);
@@ -66,14 +66,14 @@ private slots:
         VectorXi verts(2);
         verts << 0, 2;
         MatrixX3f pos(2, 3);
-        pos << 0, 0, 0,  0, 1, 0;
+        pos << 0, 0, 0, 0, 1, 0;
         VectorXd vals = VectorXd::Ones(2);
         FsLabel l(verts, pos, vals, 0, "test", 1);
 
         // triangles: only tri(0,1,2) contains both label vertices
         MatrixX3i tris(2, 3);
         tris << 0, 1, 2,
-                3, 4, 5;
+            3, 4, 5;
 
         MatrixX3i sel = l.selectTris(tris);
         // At least one triangle should be selected (0,1,2 includes vertex 0 and 2)
@@ -95,8 +95,8 @@ private slots:
         // Simple triangle: three vertices, one triangle
         MatrixX3f rr(3, 3);
         rr << 0, 0, 0,
-              1, 0, 0,
-              0, 1, 0;
+            1, 0, 0,
+            0, 1, 0;
         MatrixX3i tris(1, 3);
         tris << 0, 1, 2;
 
@@ -115,12 +115,12 @@ private slots:
         // Two triangles forming a quad
         MatrixX3f rr(4, 3);
         rr << 0, 0, 0,
-              1, 0, 0,
-              1, 1, 0,
-              0, 1, 0;
+            1, 0, 0,
+            1, 1, 0,
+            0, 1, 0;
         MatrixX3i tris(2, 3);
         tris << 0, 1, 2,
-                0, 2, 3;
+            0, 2, 3;
 
         MatrixX3f nn = FsSurface::compute_normals(rr, tris);
         QCOMPARE(nn.rows(), (Eigen::Index)4);
@@ -228,8 +228,7 @@ private slots:
     //=========================================================================
     void surface_readFile()
     {
-        QString testData = QCoreApplication::applicationDirPath()
-                           + "/../resources/data/mne-cpp-test-data/subjects/sample/surf/lh.white";
+        QString testData = QCoreApplication::applicationDirPath() + "/../resources/data/mne-cpp-test-data/subjects/sample/surf/lh.white";
         if (!QFileInfo::exists(testData)) {
             QSKIP("Test data not available");
         }
@@ -241,8 +240,7 @@ private slots:
 
     void annotation_readFile()
     {
-        QString testData = QCoreApplication::applicationDirPath()
-                           + "/../resources/data/mne-cpp-test-data/subjects/sample/label/lh.aparc.annot";
+        QString testData = QCoreApplication::applicationDirPath() + "/../resources/data/mne-cpp-test-data/subjects/sample/label/lh.aparc.annot";
         if (!QFileInfo::exists(testData)) {
             QSKIP("Test data not available");
         }
@@ -255,10 +253,8 @@ private slots:
     //=========================================================================
     void annotation_toLabels_withFile()
     {
-        QString surfFile = QCoreApplication::applicationDirPath()
-                           + "/../resources/data/mne-cpp-test-data/subjects/sample/surf/lh.white";
-        QString annotFile = QCoreApplication::applicationDirPath()
-                            + "/../resources/data/mne-cpp-test-data/subjects/sample/label/lh.aparc.annot";
+        QString surfFile = QCoreApplication::applicationDirPath() + "/../resources/data/mne-cpp-test-data/subjects/sample/surf/lh.white";
+        QString annotFile = QCoreApplication::applicationDirPath() + "/../resources/data/mne-cpp-test-data/subjects/sample/label/lh.aparc.annot";
         if (!QFileInfo::exists(surfFile) || !QFileInfo::exists(annotFile)) {
             QSKIP("Test data not available");
         }

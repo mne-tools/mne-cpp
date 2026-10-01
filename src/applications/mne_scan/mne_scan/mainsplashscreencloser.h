@@ -55,8 +55,8 @@ class MainSplashScreenCloser : public QThread
 {
     Q_OBJECT
 public:
-    typedef QSharedPointer<MainSplashScreenCloser> SPtr;               /**< Shared pointer type for MainSplashScreenHider. */
-    typedef QSharedPointer<const MainSplashScreenCloser> ConstSPtr;    /**< Const shared pointer type for MainSplashScreenHider. */
+    typedef QSharedPointer<MainSplashScreenCloser> SPtr;            /**< Shared pointer type for MainSplashScreenHider. */
+    typedef QSharedPointer<const MainSplashScreenCloser> ConstSPtr; /**< Const shared pointer type for MainSplashScreenHider. */
     //=========================================================================================================
     MainSplashScreenCloser(MainSplashScreen& splashScreen);
 
@@ -81,8 +81,8 @@ protected:
      */
     void run();
 
-    MainSplashScreen& m_pSplashScreenToHide;       /**< Reference to the slpash screen to hide.*/
-    unsigned long   m_iSecondsToSleep;             /**< Time to wait before hiding the splash window.*/
+    MainSplashScreen& m_pSplashScreenToHide; /**< Reference to the slpash screen to hide.*/
+    unsigned long m_iSecondsToSleep;         /**< Time to wait before hiding the splash window.*/
 };
 
 } // namespace MNESCAN

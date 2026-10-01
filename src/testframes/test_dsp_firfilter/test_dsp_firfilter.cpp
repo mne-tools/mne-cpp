@@ -40,7 +40,8 @@ using namespace Eigen;
 // HELPERS
 //=============================================================================================================
 
-namespace {
+namespace
+{
 
 /**
  * @brief Compute the power of a signal in a frequency band [fLow, fHigh] Hz using a simple DFT.
@@ -52,7 +53,8 @@ double bandPower(const RowVectorXd& sig, double sFreq, double fLow, double fHigh
 
     for (int k = 0; k < N / 2; ++k) {
         double freq = static_cast<double>(k) * sFreq / static_cast<double>(N);
-        if (freq < fLow || freq > fHigh) continue;
+        if (freq < fLow || freq > fHigh)
+            continue;
 
         double re = 0.0, im = 0.0;
         for (int n = 0; n < N; ++n) {
@@ -173,7 +175,7 @@ void TestDspFirFilter::applyZeroPhaseMatrix_preservesDimensions()
     FilterKernel k = FirFilter::design(64, FirFilter::BandPass, 1.0, 40.0, 500.0);
 
     MatrixXd data = MatrixXd::Random(nCh, nSamp);
-    MatrixXd out  = FirFilter::applyZeroPhaseMatrix(data, k);
+    MatrixXd out = FirFilter::applyZeroPhaseMatrix(data, k);
 
     QCOMPARE(out.rows(), nCh);
     QCOMPARE(out.cols(), nSamp);
@@ -184,9 +186,9 @@ void TestDspFirFilter::applyZeroPhaseMatrix_preservesDimensions()
 void TestDspFirFilter::lowPass_frequencySelectivity()
 {
     // Signal: 5 Hz (pass) + 200 Hz (stop) at 1000 Hz sampling
-    const double sFreq   = 1000.0;
-    const int    nSamp   = 4096;
-    const double cutoff  = 40.0;
+    const double sFreq = 1000.0;
+    const int nSamp = 4096;
+    const double cutoff = 40.0;
 
     RowVectorXd sig = makeSine(5.0, sFreq, nSamp) + makeSine(200.0, sFreq, nSamp);
 
@@ -205,9 +207,9 @@ void TestDspFirFilter::lowPass_frequencySelectivity()
 void TestDspFirFilter::highPass_frequencySelectivity()
 {
     // Signal: 5 Hz (stop) + 200 Hz (pass) at 1000 Hz sampling
-    const double sFreq   = 1000.0;
-    const int    nSamp   = 4096;
-    const double cutoff  = 40.0;
+    const double sFreq = 1000.0;
+    const int nSamp = 4096;
+    const double cutoff = 40.0;
 
     RowVectorXd sig = makeSine(5.0, sFreq, nSamp) + makeSine(200.0, sFreq, nSamp);
 
@@ -226,23 +228,21 @@ void TestDspFirFilter::highPass_frequencySelectivity()
 void TestDspFirFilter::bandPass_frequencySelectivity()
 {
     // Signal: 5 Hz (stop) + 40 Hz (pass) + 200 Hz (stop) at 1000 Hz sampling
-    const double sFreq  = 1000.0;
-    const int    nSamp  = 4096;
-    const double fLow   = 20.0;
-    const double fHigh  = 80.0;
+    const double sFreq = 1000.0;
+    const int nSamp = 4096;
+    const double fLow = 20.0;
+    const double fHigh = 80.0;
 
-    RowVectorXd sig = makeSine(5.0, sFreq, nSamp)
-                    + makeSine(40.0, sFreq, nSamp)
-                    + makeSine(200.0, sFreq, nSamp);
+    RowVectorXd sig = makeSine(5.0, sFreq, nSamp) + makeSine(40.0, sFreq, nSamp) + makeSine(200.0, sFreq, nSamp);
 
     FilterKernel k = FirFilter::design(256, FirFilter::BandPass, fLow, fHigh, sFreq, 5.0, FirFilter::ParksMcClellan);
     RowVectorXd filtered = FirFilter::applyZeroPhase(sig, k);
 
-    double passband  = bandPower(filtered, sFreq, fLow + 5.0, fHigh - 5.0);
-    double stopLow   = bandPower(filtered, sFreq, 0.0,         fLow - 10.0);
-    double stopHigh  = bandPower(filtered, sFreq, fHigh + 30.0, sFreq / 2.0);
+    double passband = bandPower(filtered, sFreq, fLow + 5.0, fHigh - 5.0);
+    double stopLow = bandPower(filtered, sFreq, 0.0, fLow - 10.0);
+    double stopHigh = bandPower(filtered, sFreq, fHigh + 30.0, sFreq / 2.0);
 
-    QVERIFY2(passband > stopLow  * 10.0,
+    QVERIFY2(passband > stopLow * 10.0,
              qPrintable(QString("BP lower stop: passband %1 vs stopLow %2").arg(passband).arg(stopLow)));
     QVERIFY2(passband > stopHigh * 10.0,
              qPrintable(QString("BP upper stop: passband %1 vs stopHigh %2").arg(passband).arg(stopHigh)));
@@ -280,8 +280,8 @@ void TestDspFirFilter::applyZeroPhaseMatrix_emptyPicks_filtersAllRows()
     // A pure-sinusoid input at the pass-band centre should survive; a stop-band sinusoid
     // should be attenuated in ALL rows when no picks are specified.
     const double sFreq = 1000.0;
-    const int    nCh   = 3;
-    const int    nSamp = 2048;
+    const int nCh = 3;
+    const int nSamp = 2048;
 
     FilterKernel k = FirFilter::design(256, FirFilter::LowPass, 40.0, 0.0, sFreq, 5.0, FirFilter::Cosine);
 
@@ -294,7 +294,7 @@ void TestDspFirFilter::applyZeroPhaseMatrix_emptyPicks_filtersAllRows()
 
     for (int ch = 0; ch < nCh; ++ch) {
         double powerOut = out.row(ch).squaredNorm() / nSamp;
-        double powerIn  = data.row(ch).squaredNorm() / nSamp;
+        double powerIn = data.row(ch).squaredNorm() / nSamp;
         // Stop-band signal should be strongly attenuated
         QVERIFY2(powerOut < powerIn * 0.01,
                  qPrintable(QString("Row %1 not filtered: powerOut=%2 powerIn=%3").arg(ch).arg(powerOut).arg(powerIn)));
@@ -306,8 +306,8 @@ void TestDspFirFilter::applyZeroPhaseMatrix_emptyPicks_filtersAllRows()
 void TestDspFirFilter::design_parksMcClellan_producesValidKernel()
 {
     FilterKernel k = FirFilter::design(128, FirFilter::BandPass,
-                                        1.0, 40.0, 600.0,
-                                        3.0, FirFilter::ParksMcClellan);
+                                       1.0, 40.0, 600.0,
+                                       3.0, FirFilter::ParksMcClellan);
     QCOMPARE(k.getFilterOrder(), 128);
     // Coefficient vector must be non-zero
     QVERIFY(k.getCoefficients().norm() > 1e-12);

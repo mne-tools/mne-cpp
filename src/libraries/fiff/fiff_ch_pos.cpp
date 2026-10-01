@@ -35,8 +35,7 @@ using namespace FIFFLIB;
 FiffChPos::FiffChPos()
 : coil_type(0)
 {
-    for(qint32 i = 0; i < 3; ++i)
-    {
+    for (qint32 i = 0; i < 3; ++i) {
         r0[i] = 0.0f;
         ex[i] = 0.0f;
         ey[i] = 0.0f;
@@ -46,11 +45,10 @@ FiffChPos::FiffChPos()
 
 //=============================================================================================================
 
-FiffChPos::FiffChPos(const FiffChPos &p_FiffChPos)
+FiffChPos::FiffChPos(const FiffChPos& p_FiffChPos)
 : coil_type(p_FiffChPos.coil_type)
 {
-    for(qint32 i = 0; i < 3; ++i)
-    {
+    for (qint32 i = 0; i < 3; ++i) {
         r0[i] = p_FiffChPos.r0[i];
         ex[i] = p_FiffChPos.ex[i];
         ey[i] = p_FiffChPos.ey[i];
@@ -63,4 +61,3 @@ FiffChPos::FiffChPos(const FiffChPos &p_FiffChPos)
 FiffChPos::~FiffChPos()
 {
 }
-

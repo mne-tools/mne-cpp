@@ -50,14 +50,14 @@ namespace BIDSLIB
 //=============================================================================================================
 
 /** BIDS datatype strings used in directory and filename construction. */
-const QString BIDS_DATATYPE_MEG   = QStringLiteral("meg");
-const QString BIDS_DATATYPE_EEG   = QStringLiteral("eeg");
-const QString BIDS_DATATYPE_IEEG  = QStringLiteral("ieeg");
-const QString BIDS_DATATYPE_ANAT  = QStringLiteral("anat");
-const QString BIDS_DATATYPE_FUNC  = QStringLiteral("func");
-const QString BIDS_DATATYPE_DWI   = QStringLiteral("dwi");
-const QString BIDS_DATATYPE_PERF  = QStringLiteral("perf");
-const QString BIDS_DATATYPE_BEH   = QStringLiteral("beh");
+const QString BIDS_DATATYPE_MEG = QStringLiteral("meg");
+const QString BIDS_DATATYPE_EEG = QStringLiteral("eeg");
+const QString BIDS_DATATYPE_IEEG = QStringLiteral("ieeg");
+const QString BIDS_DATATYPE_ANAT = QStringLiteral("anat");
+const QString BIDS_DATATYPE_FUNC = QStringLiteral("func");
+const QString BIDS_DATATYPE_DWI = QStringLiteral("dwi");
+const QString BIDS_DATATYPE_PERF = QStringLiteral("perf");
+const QString BIDS_DATATYPE_BEH = QStringLiteral("beh");
 
 /**
  * All allowed BIDS electrophysiology datatypes.
@@ -92,11 +92,11 @@ inline QStringList allowedDatatypes()
  */
 inline QStringList ieegAllowedExtensions()
 {
-    return {QStringLiteral(".vhdr"),    // BrainVision header
-            QStringLiteral(".edf"),     // European Data Format
-            QStringLiteral(".set"),     // EEGLAB
-            QStringLiteral(".mef"),     // MEF3
-            QStringLiteral(".nwb")};    // NWB
+    return {QStringLiteral(".vhdr"), // BrainVision header
+            QStringLiteral(".edf"),  // European Data Format
+            QStringLiteral(".set"),  // EEGLAB
+            QStringLiteral(".mef"),  // MEF3
+            QStringLiteral(".nwb")}; // NWB
 }
 
 /**
@@ -126,18 +126,18 @@ inline QStringList eegAllowedExtensions()
 inline QMap<int, QString> fiffKindToBidsType()
 {
     return {
-        {FIFFV_MEG_CH,      QStringLiteral("MEGMAG")},
-        {FIFFV_EEG_CH,      QStringLiteral("EEG")},
-        {FIFFV_STIM_CH,     QStringLiteral("TRIG")},
-        {FIFFV_EOG_CH,      QStringLiteral("EOG")},
-        {FIFFV_ECG_CH,      QStringLiteral("ECG")},
-        {FIFFV_EMG_CH,      QStringLiteral("EMG")},
-        {FIFFV_MISC_CH,     QStringLiteral("MISC")},
-        {FIFFV_RESP_CH,     QStringLiteral("RESP")},
-        {FIFFV_REF_MEG_CH,  QStringLiteral("MEGREF")},
-        {FIFFV_ECOG_CH,     QStringLiteral("ECOG")},
-        {FIFFV_SEEG_CH,     QStringLiteral("SEEG")},
-        {FIFFV_DBS_CH,      QStringLiteral("DBS")},
+        {FIFFV_MEG_CH, QStringLiteral("MEGMAG")},
+        {FIFFV_EEG_CH, QStringLiteral("EEG")},
+        {FIFFV_STIM_CH, QStringLiteral("TRIG")},
+        {FIFFV_EOG_CH, QStringLiteral("EOG")},
+        {FIFFV_ECG_CH, QStringLiteral("ECG")},
+        {FIFFV_EMG_CH, QStringLiteral("EMG")},
+        {FIFFV_MISC_CH, QStringLiteral("MISC")},
+        {FIFFV_RESP_CH, QStringLiteral("RESP")},
+        {FIFFV_REF_MEG_CH, QStringLiteral("MEGREF")},
+        {FIFFV_ECOG_CH, QStringLiteral("ECOG")},
+        {FIFFV_SEEG_CH, QStringLiteral("SEEG")},
+        {FIFFV_DBS_CH, QStringLiteral("DBS")},
     };
 }
 
@@ -150,19 +150,19 @@ inline QMap<int, QString> fiffKindToBidsType()
 inline QMap<QString, int> bidsTypeToFiffKind()
 {
     return {
-        {QStringLiteral("MEGMAG"),  FIFFV_MEG_CH},
+        {QStringLiteral("MEGMAG"), FIFFV_MEG_CH},
         {QStringLiteral("MEGGRAD"), FIFFV_MEG_CH},
-        {QStringLiteral("MEGREF"),  FIFFV_REF_MEG_CH},
-        {QStringLiteral("EEG"),     FIFFV_EEG_CH},
-        {QStringLiteral("ECOG"),    FIFFV_ECOG_CH},
-        {QStringLiteral("SEEG"),    FIFFV_SEEG_CH},
-        {QStringLiteral("DBS"),     FIFFV_DBS_CH},
-        {QStringLiteral("EOG"),     FIFFV_EOG_CH},
-        {QStringLiteral("ECG"),     FIFFV_ECG_CH},
-        {QStringLiteral("EMG"),     FIFFV_EMG_CH},
-        {QStringLiteral("TRIG"),    FIFFV_STIM_CH},
-        {QStringLiteral("MISC"),    FIFFV_MISC_CH},
-        {QStringLiteral("RESP"),    FIFFV_RESP_CH},
+        {QStringLiteral("MEGREF"), FIFFV_REF_MEG_CH},
+        {QStringLiteral("EEG"), FIFFV_EEG_CH},
+        {QStringLiteral("ECOG"), FIFFV_ECOG_CH},
+        {QStringLiteral("SEEG"), FIFFV_SEEG_CH},
+        {QStringLiteral("DBS"), FIFFV_DBS_CH},
+        {QStringLiteral("EOG"), FIFFV_EOG_CH},
+        {QStringLiteral("ECG"), FIFFV_ECG_CH},
+        {QStringLiteral("EMG"), FIFFV_EMG_CH},
+        {QStringLiteral("TRIG"), FIFFV_STIM_CH},
+        {QStringLiteral("MISC"), FIFFV_MISC_CH},
+        {QStringLiteral("RESP"), FIFFV_RESP_CH},
     };
 }
 
@@ -179,14 +179,14 @@ inline QMap<QString, int> bidsTypeToFiffKind()
 inline QMap<QString, int> bidsCoordToFiffFrame()
 {
     return {
-        {QStringLiteral("CTF"),           FIFFV_COORD_HEAD},
+        {QStringLiteral("CTF"), FIFFV_COORD_HEAD},
         {QStringLiteral("ElektaNeuromag"), FIFFV_COORD_HEAD},
-        {QStringLiteral("CapTrak"),       FIFFV_COORD_HEAD},
-        {QStringLiteral("ACPC"),          FIFFV_COORD_MRI},
-        {QStringLiteral("fsaverage"),     FIFFV_MNE_COORD_MNI_TAL},
-        {QStringLiteral("MNI305"),        FIFFV_MNE_COORD_MNI_TAL},
+        {QStringLiteral("CapTrak"), FIFFV_COORD_HEAD},
+        {QStringLiteral("ACPC"), FIFFV_COORD_MRI},
+        {QStringLiteral("fsaverage"), FIFFV_MNE_COORD_MNI_TAL},
+        {QStringLiteral("MNI305"), FIFFV_MNE_COORD_MNI_TAL},
         {QStringLiteral("fsaverageSymm"), FIFFV_MNE_COORD_MNI_TAL},
-        {QStringLiteral("Other"),         FIFFV_COORD_UNKNOWN},
+        {QStringLiteral("Other"), FIFFV_COORD_UNKNOWN},
     };
 }
 
@@ -198,10 +198,10 @@ inline QMap<QString, int> bidsCoordToFiffFrame()
 inline QMap<int, QString> fiffFrameToBidsCoord()
 {
     return {
-        {FIFFV_COORD_HEAD,          QStringLiteral("CapTrak")},
-        {FIFFV_COORD_MRI,          QStringLiteral("ACPC")},
+        {FIFFV_COORD_HEAD, QStringLiteral("CapTrak")},
+        {FIFFV_COORD_MRI, QStringLiteral("ACPC")},
         {FIFFV_MNE_COORD_MNI_TAL, QStringLiteral("MNI305")},
-        {FIFFV_COORD_UNKNOWN,      QStringLiteral("Other")},
+        {FIFFV_COORD_UNKNOWN, QStringLiteral("Other")},
     };
 }
 

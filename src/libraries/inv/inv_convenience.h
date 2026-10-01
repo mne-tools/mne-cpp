@@ -51,20 +51,23 @@
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-namespace MNELIB {
-    class MNEInverseOperator;
+namespace MNELIB
+{
+class MNEInverseOperator;
 }
-namespace FIFFLIB {
-    class FiffEvoked;
-    class FiffRawData;
-    class FiffCov;
+namespace FIFFLIB
+{
+class FiffEvoked;
+class FiffRawData;
+class FiffCov;
 }
 
 //=============================================================================================================
 // DEFINE NAMESPACE INVLIB
 //=============================================================================================================
 
-namespace INVLIB {
+namespace INVLIB
+{
 
 //=============================================================================================================
 /**

@@ -70,13 +70,12 @@ namespace MNEBROWSE
  */
 class ButterflySceneItem : public QGraphicsItem
 {
-
 public:
     //=========================================================================================================
     /**
      * Constructs a ButterflySceneItem.
      */
-    ButterflySceneItem(QString setName, int setKind = FIFFV_MEG_CH, int setUnit = FIFF_UNIT_T_M, const QList<QColor> &defaultColors = QList<QColor>());
+    ButterflySceneItem(QString setName, int setKind = FIFFV_MEG_CH, int setUnit = FIFF_UNIT_T_M, const QList<QColor>& defaultColors = QList<QColor>());
 
     //=========================================================================================================
     /**
@@ -88,7 +87,7 @@ public:
     /**
      * Reimplemented paint function.
      */
-    virtual void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
+    virtual void paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget);
 
     //=========================================================================================================
     /**
@@ -116,17 +115,17 @@ public:
      */
     double yToAmplitude(double sceneY) const;
 
-    QString                 m_sSetName;                 /**< The set name.*/
-    fiff_int_t              m_iSetKind;                 /**< The set kind which is to be plotted (MEG or EEG).*/
-    fiff_int_t              m_iSetUnit;                 /**< The set unit. Used to determine whether mag or grad channels are to be plotted.*/
-    const FiffInfo*         m_pFiffInfo;                /**< The fiff info.*/
-    FIFFLIB::FiffEvoked     m_displayEvoked;            /**< Owned evoked data for stable plotting pointers. */
+    QString m_sSetName;                  /**< The set name.*/
+    fiff_int_t m_iSetKind;               /**< The set kind which is to be plotted (MEG or EEG).*/
+    fiff_int_t m_iSetUnit;               /**< The set unit. Used to determine whether mag or grad channels are to be plotted.*/
+    const FiffInfo* m_pFiffInfo;         /**< The fiff info.*/
+    FIFFLIB::FiffEvoked m_displayEvoked; /**< Owned evoked data for stable plotting pointers. */
 
-    QList<QColor>           m_cAverageColors;           /**< The current average color.*/
-    RowVectorPair           m_lAverageData;             /**< The channels average data which is to be plotted.*/
-    QPair<int,int>          m_firstLastSample;          /**< The first and last sample.*/
-    QMap<QString,double>    m_scaleMap;                 /**< Map with all channel types and their current scaling value.*/
-    bool                    m_bShowGFP = false;         /**< Whether to paint the GFP (Global Field Power) trace. */
+    QList<QColor> m_cAverageColors;    /**< The current average color.*/
+    RowVectorPair m_lAverageData;      /**< The channels average data which is to be plotted.*/
+    QPair<int, int> m_firstLastSample; /**< The first and last sample.*/
+    QMap<QString, double> m_scaleMap;  /**< Map with all channel types and their current scaling value.*/
+    bool m_bShowGFP = false;           /**< Whether to paint the GFP (Global Field Power) trace. */
 
     //=========================================================================================================
     /**
@@ -134,11 +133,11 @@ public:
      */
     void setPlotSize(int plotW, int plotH);
 
-    int m_plotWidth  = 800;
+    int m_plotWidth = 800;
     int m_plotHeight = 400;
-    static constexpr int kMarginLeft  = 70;
+    static constexpr int kMarginLeft = 70;
     static constexpr int kMarginRight = 20;
-    static constexpr int kMarginTop   = 30;
+    static constexpr int kMarginTop = 30;
     static constexpr int kMarginBottom = 40;
 
 protected:
@@ -148,19 +147,19 @@ protected:
      *
      * @param [in] painter The painter used to plot in this item.
      */
-    void paintAveragePaths(QPainter *painter);
+    void paintAveragePaths(QPainter* painter);
 
     //=========================================================================================================
     /**
      * Paint the GFP (Global Field Power) trace as a filled area.
      */
-    void paintGFP(QPainter *painter);
+    void paintGFP(QPainter* painter);
 
     //=========================================================================================================
     /**
      * Paint the axes, stim line, tick marks, and labels.
      */
-    void paintAxes(QPainter *painter);
+    void paintAxes(QPainter* painter);
 };
 
 } // NAMESPACE MNEBROWSE

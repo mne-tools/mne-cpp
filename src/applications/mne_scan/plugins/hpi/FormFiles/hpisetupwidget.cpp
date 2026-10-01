@@ -34,7 +34,7 @@ using namespace HPIPLUGIN;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-HpiSetupWidget::HpiSetupWidget(Hpi* toolbox, QWidget *parent)
+HpiSetupWidget::HpiSetupWidget(Hpi* toolbox, QWidget* parent)
 : QWidget(parent)
 , m_pHpi(toolbox)
 {
@@ -46,4 +46,3 @@ HpiSetupWidget::HpiSetupWidget(Hpi* toolbox, QWidget *parent)
 HpiSetupWidget::~HpiSetupWidget()
 {
 }
-

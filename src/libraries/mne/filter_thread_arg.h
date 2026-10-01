@@ -44,7 +44,10 @@
 
 #include <memory>
 
-namespace FIFFLIB { class FiffCoordTrans; }
+namespace FIFFLIB
+{
+class FiffCoordTrans;
+}
 
 //=============================================================================================================
 // DEFINE NAMESPACE MNELIB
@@ -62,8 +65,8 @@ namespace MNELIB
 class MNESHARED_EXPORT FilterThreadArg
 {
 public:
-    typedef QSharedPointer<FilterThreadArg> SPtr;              /**< Shared pointer type for FilterThreadArg. */
-    typedef QSharedPointer<const FilterThreadArg> ConstSPtr;   /**< Const shared pointer type for FilterThreadArg. */
+    typedef QSharedPointer<FilterThreadArg> SPtr;            /**< Shared pointer type for FilterThreadArg. */
+    typedef QSharedPointer<const FilterThreadArg> ConstSPtr; /**< Const shared pointer type for FilterThreadArg. */
 
     //=========================================================================================================
     /**
@@ -80,22 +83,22 @@ public:
     ~FilterThreadArg();
 
 public:
-    MNESourceSpace* s;           /**< The source space to process. */
-    std::unique_ptr<FIFFLIB::FiffCoordTrans> mri_head_t;  /**< MRI-to-head coordinate transformation. */
-    QWeakPointer<MNESurface> surf;  /**< Non-owning reference to the inner skull BEM surface (caller holds QSharedPointer). */
-    float          limit;           /**< Distance limit for filtering (meters). */
-    QTextStream    *filtered;       /**< Optional stream to log omitted point locations (may be NULL). */
-    int            stat;            /**< Status code indicating whether filtering succeeded. */
+    MNESourceSpace* s;                                   /**< The source space to process. */
+    std::unique_ptr<FIFFLIB::FiffCoordTrans> mri_head_t; /**< MRI-to-head coordinate transformation. */
+    QWeakPointer<MNESurface> surf;                       /**< Non-owning reference to the inner skull BEM surface (caller holds QSharedPointer). */
+    float limit;                                         /**< Distance limit for filtering (meters). */
+    QTextStream* filtered;                               /**< Optional stream to log omitted point locations (may be NULL). */
+    int stat;                                            /**< Status code indicating whether filtering succeeded. */
 
-// ### OLD STRUCT ###
-//typedef struct {
-//    MNESourceSpace* s;           /* The source space to process */
-//    FiffCoordTransOld* mri_head_t;  /* Coordinate transformation */
-//    MNESurface*   surf;          /* The inner skull surface */
-//    float          limit;           /* Distance limit */
-//    FILE           *filtered;       /* Log omitted point locations here */
-//    int            stat;            /* How was it? */
-//} *filterThreadArg,filterThreadArgRec;
+    // ### OLD STRUCT ###
+    //typedef struct {
+    //    MNESourceSpace* s;           /* The source space to process */
+    //    FiffCoordTransOld* mri_head_t;  /* Coordinate transformation */
+    //    MNESurface*   surf;          /* The inner skull surface */
+    //    float          limit;           /* Distance limit */
+    //    FILE           *filtered;       /* Log omitted point locations here */
+    //    int            stat;            /* How was it? */
+    //} *filterThreadArg,filterThreadArgRec;
 };
 
 //=============================================================================================================

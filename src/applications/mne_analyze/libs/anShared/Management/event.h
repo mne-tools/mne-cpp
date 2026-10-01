@@ -90,7 +90,7 @@ public:
      *
      * @return Sender of the Event.
      */
-    inline const Communicator *getSender() const;
+    inline const Communicator* getSender() const;
 
     //=========================================================================================================
     /**
@@ -101,9 +101,9 @@ public:
     inline QVariant getData() const;
 
 private:
-    EVENT_TYPE m_eventType;             /**< Type of the respective Event instance. */
-    const Communicator* m_sender;       /**< Sender of the Event. */
-    const QVariant m_data;              /**< Attached Data (can be empty). */
+    EVENT_TYPE m_eventType;       /**< Type of the respective Event instance. */
+    const Communicator* m_sender; /**< Sender of the Event. */
+    const QVariant m_data;        /**< Attached Data (can be empty). */
 };
 
 //=============================================================================================================

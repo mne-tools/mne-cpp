@@ -92,7 +92,7 @@ FiffId FiffId::new_file_id()
      * are randomized to insure uniqueness.
      */
     {
-        id.time.secs = QDateTime::currentMSecsSinceEpoch()/1000;
+        id.time.secs = QDateTime::currentMSecsSinceEpoch() / 1000;
         id.time.usecs = rand() % 1000;
     }
     return id;
@@ -111,38 +111,40 @@ void FiffId::clear()
 
 //=============================================================================================================
 
-bool FiffId::get_machid(int *fixed_id)
+bool FiffId::get_machid(int* fixed_id)
 {
     QList<QString> possibleHardwareAdresses;
 
-    #ifndef __EMSCRIPTEN__
+#ifndef __EMSCRIPTEN__
     QList<QNetworkInterface> ifaces = QNetworkInterface::allInterfaces();
 
     fixed_id[0] = 0;
     fixed_id[1] = 0;
-    if ( !ifaces.isEmpty() ) {
-        for(int i = 0; i < ifaces.size(); ++i) {
+    if (!ifaces.isEmpty()) {
+        for (int i = 0; i < ifaces.size(); ++i) {
             unsigned int flags = ifaces[i].flags();
             bool isLoopback = static_cast<bool>(flags & QNetworkInterface::IsLoopBack);
             bool isP2P = static_cast<bool>(flags & QNetworkInterface::IsPointToPoint);
             bool isRunning = static_cast<bool>(flags & QNetworkInterface::IsRunning);
             // If this interface isn't running, we don't care about it
-            if ( !isRunning ) continue;
+            if (!isRunning)
+                continue;
             // We only want valid interfaces that aren't loopback/virtual and not point to point
-            if ( !ifaces[i].isValid() || isLoopback || isP2P ) continue;
+            if (!ifaces[i].isValid() || isLoopback || isP2P)
+                continue;
             possibleHardwareAdresses << ifaces[i].hardwareAddress();
         }
         if (possibleHardwareAdresses.size() > 0) {
             // We take the first address as machine identifier
             QStringList hexPresentation = possibleHardwareAdresses[0].split(":");
-            if(hexPresentation.size() == 6) {
-                fixed_id[0] = QString(hexPresentation[0] + hexPresentation[1] + hexPresentation[2]).toInt(nullptr,16);
-                fixed_id[1] = QString(hexPresentation[3] + hexPresentation[4] + hexPresentation[5]).toInt(nullptr,16);
+            if (hexPresentation.size() == 6) {
+                fixed_id[0] = QString(hexPresentation[0] + hexPresentation[1] + hexPresentation[2]).toInt(nullptr, 16);
+                fixed_id[1] = QString(hexPresentation[3] + hexPresentation[4] + hexPresentation[5]).toInt(nullptr, 16);
                 return true;
             }
         }
     }
-    #endif
+#endif
 
     return false;
 }
@@ -151,8 +153,8 @@ bool FiffId::get_machid(int *fixed_id)
 
 void FiffId::print() const
 {
-    if(!isEmpty()) {
-        qInfo("\t%d.%d 0x%x%x %d %d\n",this->version>>16,this->version & 0xFFFF,this->machid[0],this->machid[1],this->time.secs,this->time.usecs);
+    if (!isEmpty()) {
+        qInfo("\t%d.%d 0x%x%x %d %d\n", this->version >> 16, this->version & 0xFFFF, this->machid[0], this->machid[1], this->time.secs, this->time.usecs);
     }
 }
 
@@ -160,32 +162,31 @@ void FiffId::print() const
 
 QString FiffId::toMachidString() const
 {
-    QString strOut = QString("%1%2").arg(machid[0],8,16,QChar('0')).arg(machid[1],8,16,QChar('0'));
+    QString strOut = QString("%1%2").arg(machid[0], 8, 16, QChar('0')).arg(machid[1], 8, 16, QChar('0'));
 
-//    to do...
-//    macid is 6 bytes of data->12 chars.
-//    here macid is stored in two integers --> 8 bytes --> 16 chars.
-//    some versions of sinuhe store the significant chars at the beginning of the 16 chars.
-//    other versions sotre the at the end. I don't know on what it depends on.
-//    clue 1: version 1.3 stores it at the beginning. (padding with 4 '0' chars at the end).
-//    clue 2: version 1.2 stores it at the ending chars. (padding with 4 '0' chars at the beginning of the 16).
-//    I've no idea if this behaviour is solid...
-//    int thresholdMayorVersion(1);
-//    int thresholdMinorVersion(2);
+    //    to do...
+    //    macid is 6 bytes of data->12 chars.
+    //    here macid is stored in two integers --> 8 bytes --> 16 chars.
+    //    some versions of sinuhe store the significant chars at the beginning of the 16 chars.
+    //    other versions sotre the at the end. I don't know on what it depends on.
+    //    clue 1: version 1.3 stores it at the beginning. (padding with 4 '0' chars at the end).
+    //    clue 2: version 1.2 stores it at the ending chars. (padding with 4 '0' chars at the beginning of the 16).
+    //    I've no idea if this behaviour is solid...
+    //    int thresholdMayorVersion(1);
+    //    int thresholdMinorVersion(2);
 
-//    int thresholdVersionInt(static_cast<int>(thresholdMayorVersion*pow(2.,16))+thresholdMinorVersion);
-//    if(version > thresholdVersionInt) //if this.version > 65538
-//    {
-//        strOut.chop(4);
-//    } else
-//    {
-//        strOut.right(strOut.size()-4);
-//    }
+    //    int thresholdVersionInt(static_cast<int>(thresholdMayorVersion*pow(2.,16))+thresholdMinorVersion);
+    //    if(version > thresholdVersionInt) //if this.version > 65538
+    //    {
+    //        strOut.chop(4);
+    //    } else
+    //    {
+    //        strOut.right(strOut.size()-4);
+    //    }
 
-    int step=2;
-    for(int i=step;i < strOut.size(); i+=step+1)
-    {
-        strOut.insert(i,QChar(':'));
+    int step = 2;
+    for (int i = step; i < strOut.size(); i += step + 1) {
+        strOut.insert(i, QChar(':'));
     }
 
     return strOut.toUpper();
@@ -209,7 +210,7 @@ QString FiffId::toString() const
     // formatting an id at once can corrupt each other's result. Use the
     // reentrant variant, which writes into a caller-supplied struct. MSVC
     // spells it localtime_s and reverses the argument order.
-    struct tm ltime {};
+    struct tm ltime{};
 #ifdef _WIN32
     const bool bTimeValid = (localtime_s(&ltime, &secs) == 0);
 #else

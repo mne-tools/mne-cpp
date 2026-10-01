@@ -58,9 +58,9 @@ class DISPSHARED_EXPORT ChannelLabelPanel : public QWidget
     Q_OBJECT
 
 public:
-    explicit ChannelLabelPanel(QWidget *parent = nullptr);
+    explicit ChannelLabelPanel(QWidget* parent = nullptr);
 
-    void setModel(ChannelDataModel *model);
+    void setModel(ChannelDataModel* model);
 
     //=========================================================================================================
     /**
@@ -86,7 +86,7 @@ public:
      *
      * @param[in] indices  Ordered list of model channel indices to display.
      */
-    void setChannelIndices(const QVector<int> &indices);
+    void setChannelIndices(const QVector<int>& indices);
 
     //=========================================================================================================
     /**
@@ -116,7 +116,7 @@ public:
      */
     void setVisibleSampleRange(int firstSample, int lastSample);
 
-    QSize sizeHint()        const override;
+    QSize sizeHint() const override;
     QSize minimumSizeHint() const override;
 
 signals:
@@ -129,29 +129,29 @@ signals:
     void channelBadToggled(int channelIndex, bool bad);
 
 protected:
-    void paintEvent(QPaintEvent *event) override;
-    void mousePressEvent(QMouseEvent *event) override;
-    void mouseMoveEvent(QMouseEvent *event) override;
-    void mouseReleaseEvent(QMouseEvent *event) override;
-    bool event(QEvent *e) override;   // for QEvent::ToolTip
+    void paintEvent(QPaintEvent* event) override;
+    void mousePressEvent(QMouseEvent* event) override;
+    void mouseMoveEvent(QMouseEvent* event) override;
+    void mouseReleaseEvent(QMouseEvent* event) override;
+    bool event(QEvent* e) override; // for QEvent::ToolTip
 
 private:
     QVector<int> effectiveChannelIndices() const;
 
     QPointer<ChannelDataModel> m_model;
-    int  m_firstVisibleChannel = 0;
-    int  m_visibleChannelCount = 12;
+    int m_firstVisibleChannel = 0;
+    int m_visibleChannelCount = 12;
 
     QVector<int> m_channelIndices; // empty = identity (all channels)
-    bool  m_hideBadChannels = false;
-    bool  m_butterflyMode   = false;
-    int   m_visSampleFirst  = 0;
-    int   m_visSampleLast   = 0;
+    bool m_hideBadChannels = false;
+    bool m_butterflyMode = false;
+    int m_visSampleFirst = 0;
+    int m_visSampleLast = 0;
 
-    bool  m_dragging       = false;
-    bool  m_dragActivated  = false;
-    int   m_dragStartY     = 0;
-    int   m_dragStartFirst = 0;
+    bool m_dragging = false;
+    bool m_dragActivated = false;
+    int m_dragStartY = 0;
+    int m_dragStartFirst = 0;
 };
 
 } // namespace DISPLIB

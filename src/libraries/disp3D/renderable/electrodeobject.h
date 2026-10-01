@@ -64,12 +64,12 @@ namespace DISP3DLIB
  */
 struct DISP3DSHARED_EXPORT ElectrodeContact
 {
-    QString     name;           /**< Contact label, e.g. "LH1", "LH2". */
-    QVector3D   position;       /**< 3-D position in MRI (surface RAS) coords. */
-    float       radius = 0.5f;  /**< Contact radius in mm. */
-    QColor      color = Qt::yellow; /**< Display color. */
-    bool        selected = false;   /**< Whether the contact is selected/highlighted. */
-    float       value = 0.0f;   /**< Optional scalar for colormap overlay. */
+    QString name;              /**< Contact label, e.g. "LH1", "LH2". */
+    QVector3D position;        /**< 3-D position in MRI (surface RAS) coords. */
+    float radius = 0.5f;       /**< Contact radius in mm. */
+    QColor color = Qt::yellow; /**< Display color. */
+    bool selected = false;     /**< Whether the contact is selected/highlighted. */
+    float value = 0.0f;        /**< Optional scalar for colormap overlay. */
 };
 
 //=============================================================================================================
@@ -87,10 +87,11 @@ struct DISP3DSHARED_EXPORT ElectrodeContact
  *             DISP3DLIB::ElectrodeArray::gridCols "gridCols" lattice, optionally with a translucent quad mesh
  *             linking the contacts as a visual reference.
  */
-enum class ElectrodeLayout {
-    Depth = 0,  /**< Stereotactic depth electrode (cylinder + contacts). */
-    Strip,       /**< 1×N ECoG strip — spheres only. */
-    Grid         /**< gridRows × gridCols ECoG grid — spheres + optional mesh. */
+enum class ElectrodeLayout
+{
+    Depth = 0, /**< Stereotactic depth electrode (cylinder + contacts). */
+    Strip,     /**< 1×N ECoG strip — spheres only. */
+    Grid       /**< gridRows × gridCols ECoG grid — spheres + optional mesh. */
 };
 
 //=============================================================================================================
@@ -104,13 +105,13 @@ enum class ElectrodeLayout {
  */
 struct DISP3DSHARED_EXPORT ElectrodeArray
 {
-    QString                     label;                  /**< Array label: "LH", "GridA", etc. */
-    ElectrodeLayout             layout = ElectrodeLayout::Depth; /**< Geometry kind. */
-    int                         gridRows = 1;           /**< Grid only: number of rows. */
-    int                         gridCols = 1;           /**< Grid only: number of cols (Strip uses Cols = N, Rows = 1). */
-    QVector<ElectrodeContact>   contacts;               /**< Contacts in array-local order. */
-    float                       shaftRadius = 0.4f;     /**< Depth only: cylinder radius in mm. */
-    QColor                      shaftColor = Qt::gray;  /**< Depth only: shaft body color. */
+    QString label;                                   /**< Array label: "LH", "GridA", etc. */
+    ElectrodeLayout layout = ElectrodeLayout::Depth; /**< Geometry kind. */
+    int gridRows = 1;                                /**< Grid only: number of rows. */
+    int gridCols = 1;                                /**< Grid only: number of cols (Strip uses Cols = N, Rows = 1). */
+    QVector<ElectrodeContact> contacts;              /**< Contacts in array-local order. */
+    float shaftRadius = 0.4f;                        /**< Depth only: cylinder radius in mm. */
+    QColor shaftColor = Qt::gray;                    /**< Depth only: shaft body color. */
 };
 
 //=============================================================================================================
@@ -219,7 +220,7 @@ public:
      * @param[in] rhi        Pointer to QRhi instance.
      * @param[in] u          Resource update batch.
      */
-    void updateBuffers(QRhi *rhi, QRhiResourceUpdateBatch *u);
+    void updateBuffers(QRhi* rhi, QRhiResourceUpdateBatch* u);
 
     //=========================================================================================================
     /**
@@ -252,10 +253,10 @@ public:
     uint32_t contactInstanceCount() const;
 
 private:
-    QVector<ElectrodeArray> m_arrays;            /**< All electrode arrays. */
-    QString                 m_selectedContact;   /**< Currently selected contact name. */
-    QVector3D               m_bbMin;             /**< Cached bounding box min. */
-    QVector3D               m_bbMax;             /**< Cached bounding box max. */
+    QVector<ElectrodeArray> m_arrays; /**< All electrode arrays. */
+    QString m_selectedContact;        /**< Currently selected contact name. */
+    QVector3D m_bbMin;                /**< Cached bounding box min. */
+    QVector3D m_bbMax;                /**< Cached bounding box max. */
 
     //=========================================================================================================
     /**

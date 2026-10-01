@@ -147,7 +147,8 @@ void TestMlTrainer::testRunTrivialScript()
 
     QVERIFY2(result.success,
              qPrintable(QString("Script failed: exit=%1, stderr=%2")
-                       .arg(result.exitCode).arg(result.stdErr)));
+                            .arg(result.exitCode)
+                            .arg(result.stdErr)));
     QVERIFY(result.stdOut.contains("hello from trainer"));
 #endif
 }

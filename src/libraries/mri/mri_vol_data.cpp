@@ -61,10 +61,10 @@ MriVolData::MriVolData()
 , xsize(1.0f)
 , ysize(1.0f)
 , zsize(1.0f)
-, x_ras(-1.0f,  0.0f,  0.0f)   // FreeSurfer defaults when goodRASflag is false
-, y_ras( 0.0f,  0.0f, -1.0f)   // See: https://surfer.nmr.mgh.harvard.edu/fswiki/FsTutorial/MghFormat
-, z_ras( 0.0f,  1.0f,  0.0f)
-, c_ras( 0.0f,  0.0f,  0.0f)
+, x_ras(-1.0f, 0.0f, 0.0f) // FreeSurfer defaults when goodRASflag is false
+, y_ras(0.0f, 0.0f, -1.0f) // See: https://surfer.nmr.mgh.harvard.edu/fswiki/FsTutorial/MghFormat
+, z_ras(0.0f, 1.0f, 0.0f)
+, c_ras(0.0f, 0.0f, 0.0f)
 , TR(0.0f)
 , flipAngle(0.0f)
 , TE(0.0f)
@@ -159,9 +159,9 @@ Matrix4f MriVolData::computeVox2Ras() const
     M.col(2) = z_ras * zsize;
 
     // Compute center voxel
-    Vector3f center(static_cast<float>(width)  / 2.0f,
+    Vector3f center(static_cast<float>(width) / 2.0f,
                     static_cast<float>(height) / 2.0f,
-                    static_cast<float>(depth)  / 2.0f);
+                    static_cast<float>(depth) / 2.0f);
 
     // Compute P0 = c_ras - M * center
     Vector3f P0 = c_ras - M * center;
@@ -186,11 +186,11 @@ Matrix4f MriVolData::computeVox2RasTkr() const
     M.col(1) = y_ras * ysize;
     M.col(2) = z_ras * zsize;
 
-    Vector3f center(static_cast<float>(width)  / 2.0f,
+    Vector3f center(static_cast<float>(width) / 2.0f,
                     static_cast<float>(height) / 2.0f,
-                    static_cast<float>(depth)  / 2.0f);
+                    static_cast<float>(depth) / 2.0f);
 
-    Vector3f P0 = -M * center;  // c_ras = (0,0,0) for tkRAS
+    Vector3f P0 = -M * center; // c_ras = (0,0,0) for tkRAS
 
     Matrix4f vox2ras_tkr = Matrix4f::Identity();
     vox2ras_tkr.block<3, 3>(0, 0) = M / 1000.0f;

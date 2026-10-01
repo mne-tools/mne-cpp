@@ -66,22 +66,24 @@ public:
      */
     enum PluginType
     {
-        _ISensor,       /**< Type for a sensor plugin. */
-        _IAlgorithm,    /**< Type for a real-time algorithm plugin. */
-        _PluginSet      /**< Type for a plugin set which holds different types of plugins. */
+        _ISensor,    /**< Type for a sensor plugin. */
+        _IAlgorithm, /**< Type for a real-time algorithm plugin. */
+        _PluginSet   /**< Type for a plugin set which holds different types of plugins. */
     };
 
-    typedef QSharedPointer<AbstractPlugin> SPtr;               /**< Shared pointer type for AbstractPlugin. */
-    typedef QSharedPointer<const AbstractPlugin> ConstSPtr;    /**< Const shared pointer type for AbstractPlugin. */
+    typedef QSharedPointer<AbstractPlugin> SPtr;            /**< Shared pointer type for AbstractPlugin. */
+    typedef QSharedPointer<const AbstractPlugin> ConstSPtr; /**< Const shared pointer type for AbstractPlugin. */
 
-    typedef QVector< QSharedPointer< PluginInputConnector > > InputConnectorList;  /**< List of input connectors. */
-    typedef QVector< QSharedPointer< PluginOutputConnector > > OutputConnectorList; /**< List of output connectors. */
+    typedef QVector<QSharedPointer<PluginInputConnector>> InputConnectorList;   /**< List of input connectors. */
+    typedef QVector<QSharedPointer<PluginOutputConnector>> OutputConnectorList; /**< List of output connectors. */
 
     //=========================================================================================================
     /**
      * Destroys the AbstractPlugin.
      */
-    virtual ~AbstractPlugin() {}
+    virtual ~AbstractPlugin()
+    {
+    }
 
     //=========================================================================================================
     /**
@@ -99,7 +101,7 @@ public:
     /**
      * Is called when plugin is detached of the stage. Can be used to safe settings.
      */
-    virtual void unload() = 0;// = 0 call is not longer possible - it has to be reimplemented in child;
+    virtual void unload() = 0; // = 0 call is not longer possible - it has to be reimplemented in child;
 
     //=========================================================================================================
     /**
@@ -125,7 +127,7 @@ public:
      *
      * @return a list of plugin actions.
      */
-    inline QList< QAction* > getPluginActions();
+    inline QList<QAction*> getPluginActions();
 
     //=========================================================================================================
     /**
@@ -169,7 +171,10 @@ public:
      * connection state, etc.). Default implementation returns nullptr.
      * Caller takes ownership of the returned widget.
      */
-    virtual QWidget* getStatusWidget() { return nullptr; }
+    virtual QWidget* getStatusWidget()
+    {
+        return nullptr;
+    }
 
     //=========================================================================================================
     /**
@@ -186,7 +191,10 @@ public:
      *
      * @return a QVariantMap of attribute name → value.
      */
-    virtual QVariantMap getAttributes() const { return {}; }
+    virtual QVariantMap getAttributes() const
+    {
+        return {};
+    }
 
     //=========================================================================================================
     /**
@@ -195,10 +203,19 @@ public:
      *
      * @param[in] attributes   The key-value pairs to apply.
      */
-    virtual void setAttributes(const QVariantMap& attributes) { Q_UNUSED(attributes); }
+    virtual void setAttributes(const QVariantMap& attributes)
+    {
+        Q_UNUSED(attributes);
+    }
 
-    inline InputConnectorList& getInputConnectors(){return m_inputConnectors;}
-    inline OutputConnectorList& getOutputConnectors(){return m_outputConnectors;}
+    inline InputConnectorList& getInputConnectors()
+    {
+        return m_inputConnectors;
+    }
+    inline OutputConnectorList& getOutputConnectors()
+    {
+        return m_outputConnectors;
+    }
 
 signals:
     //=========================================================================================================
@@ -237,13 +254,13 @@ protected:
      */
     inline void addPluginAction(QAction* pAction);
 
-    InputConnectorList m_inputConnectors;       /**< Set of input connectors associated with this plug-in. */
-    OutputConnectorList m_outputConnectors;     /**< Set of output connectors associated with this plug-in. */
+    InputConnectorList m_inputConnectors;   /**< Set of input connectors associated with this plug-in. */
+    OutputConnectorList m_outputConnectors; /**< Set of output connectors associated with this plug-in. */
 
-    bool m_bPluginControlWidgetsInit = false;   /**< Flag to indicate if the plugin control widgets were initialized already. */
+    bool m_bPluginControlWidgetsInit = false; /**< Flag to indicate if the plugin control widgets were initialized already. */
 
 private:
-    QList< QAction* >   m_qListPluginActions;  /**< List of plugin actions. */
+    QList<QAction*> m_qListPluginActions; /**< List of plugin actions. */
 };
 
 //=============================================================================================================
@@ -257,7 +274,7 @@ inline bool AbstractPlugin::multiInstanceAllowed() const
 
 //=============================================================================================================
 
-inline QList< QAction* > AbstractPlugin::getPluginActions()
+inline QList<QAction*> AbstractPlugin::getPluginActions()
 {
     return m_qListPluginActions;
 }

@@ -50,12 +50,18 @@
 
 #include <memory>
 
-namespace FIFFLIB { class FiffCoordTrans; }
-namespace MNELIB { class MNEMeasData; }
+namespace FIFFLIB
+{
+class FiffCoordTrans;
+}
+namespace MNELIB
+{
+class MNEMeasData;
+}
 
-constexpr int COLUMN_NORM_NONE = 0;     /**< No column normalization requested. */
-constexpr int COLUMN_NORM_COMP = 1;     /**< Componentwise normalization. */
-constexpr int COLUMN_NORM_LOC  = 2;     /**< Dipole locationwise normalization. */
+constexpr int COLUMN_NORM_NONE = 0; /**< No column normalization requested. */
+constexpr int COLUMN_NORM_COMP = 1; /**< Componentwise normalization. */
+constexpr int COLUMN_NORM_LOC = 2;  /**< Dipole locationwise normalization. */
 
 //=============================================================================================================
 // DEFINE NAMESPACE INVLIB
@@ -69,22 +75,24 @@ namespace INVLIB
 /**
  * @brief Forward field computation function pointers and client data for MEG and EEG dipole fitting.
  */
-struct dipoleFitFuncsRec {
-  ~dipoleFitFuncsRec() {
-      if (meg_client_free && meg_client)
-          meg_client_free(meg_client);
-      if (eeg_client_free && eeg_client)
-          eeg_client_free(eeg_client);
-  }
-  fwdFieldFunc    meg_field = nullptr;       /**< MEG forward calculation function. */
-  fwdVecFieldFunc meg_vec_field = nullptr;   /**< MEG vectorized forward calculation function. */
-  void            *meg_client = nullptr;     /**< Client data for MEG field computations. */
-  MNELIB::mneUserFreeFunc meg_client_free = nullptr;  /**< Destructor for MEG client data. */
+struct dipoleFitFuncsRec
+{
+    ~dipoleFitFuncsRec()
+    {
+        if (meg_client_free && meg_client)
+            meg_client_free(meg_client);
+        if (eeg_client_free && eeg_client)
+            eeg_client_free(eeg_client);
+    }
+    fwdFieldFunc meg_field = nullptr;                  /**< MEG forward calculation function. */
+    fwdVecFieldFunc meg_vec_field = nullptr;           /**< MEG vectorized forward calculation function. */
+    void* meg_client = nullptr;                        /**< Client data for MEG field computations. */
+    MNELIB::mneUserFreeFunc meg_client_free = nullptr; /**< Destructor for MEG client data. */
 
-  fwdFieldFunc    eeg_pot = nullptr;         /**< EEG forward calculation function. */
-  fwdVecFieldFunc eeg_vec_pot = nullptr;     /**< EEG vectorized forward calculation function. */
-  void            *eeg_client = nullptr;     /**< Client data for EEG field computations. */
-  MNELIB::mneUserFreeFunc eeg_client_free = nullptr;  /**< Destructor for EEG client data. */
+    fwdFieldFunc eeg_pot = nullptr;                    /**< EEG forward calculation function. */
+    fwdVecFieldFunc eeg_vec_pot = nullptr;             /**< EEG vectorized forward calculation function. */
+    void* eeg_client = nullptr;                        /**< Client data for EEG field computations. */
+    MNELIB::mneUserFreeFunc eeg_client_free = nullptr; /**< Destructor for EEG client data. */
 };
 
 /**
@@ -95,12 +103,13 @@ using dipoleFitFuncs = dipoleFitFuncsRec*;
 /**
  * @brief Workspace for the dipole fitting objective function, holding forward model, measured field, and fit limits.
  */
-struct FitDipUserRec {
-    float          limit;
-    int            report_dim;
-    float          *B;
-    double         B2;
-    InvDipoleForward*  fwd;
+struct FitDipUserRec
+{
+    float limit;
+    int report_dim;
+    float* B;
+    double B2;
+    InvDipoleForward* fwd;
 };
 
 //=============================================================================================================
@@ -127,8 +136,8 @@ class InvEcd;
 class INVSHARED_EXPORT InvDipoleFitData
 {
 public:
-    typedef QSharedPointer<InvDipoleFitData> SPtr;             /**< Shared pointer type for InvDipoleFitData. */
-    typedef QSharedPointer<const InvDipoleFitData> ConstSPtr;  /**< Const shared pointer type for InvDipoleFitData. */
+    typedef QSharedPointer<InvDipoleFitData> SPtr;            /**< Shared pointer type for InvDipoleFitData. */
+    typedef QSharedPointer<const InvDipoleFitData> ConstSPtr; /**< Const shared pointer type for InvDipoleFitData. */
 
     //=========================================================================================================
     /**
@@ -178,10 +187,10 @@ public:
      * @return The noise-covariance matrix, or nullptr on error.
      */
     static std::unique_ptr<MNELIB::MNECovMatrix> ad_hoc_noise(FWDLIB::FwdCoilSet* meg,
-                                     FWDLIB::FwdCoilSet* eeg,
-                                     float      grad_std,
-                                     float      mag_std,
-                                     float      eeg_std);
+                                                              FWDLIB::FwdCoilSet* eeg,
+                                                              float grad_std,
+                                                              float mag_std,
+                                                              float eeg_std);
 
     //=========================================================================================================
     /**
@@ -269,24 +278,24 @@ public:
      * @return Fully initialised fit data, or nullptr on error. Caller takes ownership.
      */
     static InvDipoleFitData* setup_dipole_fit_data(
-                                            const QString& mriname,
-                                            const QString& measname,
-                                            const QString& bemname,
-                                            Eigen::Vector3f *r0,
-                                            FWDLIB::FwdEegSphereModel* eeg_model,
-                                            int   accurate_coils,
-                                            const QString& badname,
-                                            const QString& noisename,
-                                            float grad_std,
-                                            float mag_std,
-                                            float eeg_std,
-                                            float mag_reg,
-                                            float grad_reg,
-                                            float eeg_reg,
-                                            int   diagnoise,
-                                            const QList<QString>& projnames,
-                                            int   include_meg,
-                                            int   include_eeg);
+        const QString& mriname,
+        const QString& measname,
+        const QString& bemname,
+        Eigen::Vector3f* r0,
+        FWDLIB::FwdEegSphereModel* eeg_model,
+        int accurate_coils,
+        const QString& badname,
+        const QString& noisename,
+        float grad_std,
+        float mag_std,
+        float eeg_std,
+        float mag_reg,
+        float grad_reg,
+        float eeg_reg,
+        int diagnoise,
+        const QList<QString>& projnames,
+        int include_meg,
+        int include_eeg);
 
     //=========================================================================================================
     /**
@@ -340,39 +349,39 @@ public:
      * @return The populated forward object, or nullptr on error.
      */
     static InvDipoleForward* dipole_forward_one(InvDipoleFitData* d,
-                                     const Eigen::Vector3f& rd,
-                                     InvDipoleForward* old);
+                                                const Eigen::Vector3f& rd,
+                                                InvDipoleForward* old);
 
 public:
-      std::unique_ptr<FIFFLIB::FiffCoordTrans>    mri_head_t; /**< MRI <-> head coordinate transformation. */
-      std::unique_ptr<FIFFLIB::FiffCoordTrans>    meg_head_t; /**< MEG <-> head coordinate transformation. */
-      int               coord_frame;        /**< Common coordinate frame. */
-      QList<FIFFLIB::FiffChInfo>        chs;       /**< Channels. */
-      int               nmeg;               /**< How many MEG. */
-      int               neeg;               /**< How many EEG. */
-      QStringList       ch_names;           /**< List of all channel names. */
-      std::unique_ptr<FIFFLIB::FiffSparseMatrix> pick;   /**< Matrix to pick data from the full data set which may contain channels we are not interested in (currently unused). */
-      std::unique_ptr<FWDLIB::FwdCoilSet>        meg_coils;         /**< MEG coil definitions. */
-      std::unique_ptr<FWDLIB::FwdCoilSet>        eeg_els;           /**< EEG electrode definitions. */
-      Eigen::Vector3f     r0;                /**< Sphere model origin. */
-      QString           bemname;           /**< Using a BEM? */
+    std::unique_ptr<FIFFLIB::FiffCoordTrans> mri_head_t; /**< MRI <-> head coordinate transformation. */
+    std::unique_ptr<FIFFLIB::FiffCoordTrans> meg_head_t; /**< MEG <-> head coordinate transformation. */
+    int coord_frame;                                     /**< Common coordinate frame. */
+    QList<FIFFLIB::FiffChInfo> chs;                      /**< Channels. */
+    int nmeg;                                            /**< How many MEG. */
+    int neeg;                                            /**< How many EEG. */
+    QStringList ch_names;                                /**< List of all channel names. */
+    std::unique_ptr<FIFFLIB::FiffSparseMatrix> pick;     /**< Matrix to pick data from the full data set which may contain channels we are not interested in (currently unused). */
+    std::unique_ptr<FWDLIB::FwdCoilSet> meg_coils;       /**< MEG coil definitions. */
+    std::unique_ptr<FWDLIB::FwdCoilSet> eeg_els;         /**< EEG electrode definitions. */
+    Eigen::Vector3f r0;                                  /**< Sphere model origin. */
+    QString bemname;                                     /**< Using a BEM? */
 
-      std::unique_ptr<FWDLIB::FwdEegSphereModel> eeg_model;         /**< EEG sphere model definition. */
-      std::unique_ptr<FWDLIB::FwdBemModel>       bem_model;         /**< BEM model definition. */
+    std::unique_ptr<FWDLIB::FwdEegSphereModel> eeg_model; /**< EEG sphere model definition. */
+    std::unique_ptr<FWDLIB::FwdBemModel> bem_model;       /**< BEM model definition. */
 
-      std::unique_ptr<dipoleFitFuncsRec>    sphere_funcs;       /**< These are the sphere model forward functions. */
-      std::unique_ptr<dipoleFitFuncsRec>    bem_funcs;          /**< These are the BEM forward functions. */
-      dipoleFitFuncsRec*    funcs = nullptr;    /**< Non-owning alias — points to one of the two above. */
-      std::unique_ptr<dipoleFitFuncsRec>    mag_dipole_funcs;   /**< Functions to fit a magnetic dipole. */
+    std::unique_ptr<dipoleFitFuncsRec> sphere_funcs;     /**< These are the sphere model forward functions. */
+    std::unique_ptr<dipoleFitFuncsRec> bem_funcs;        /**< These are the BEM forward functions. */
+    dipoleFitFuncsRec* funcs = nullptr;                  /**< Non-owning alias — points to one of the two above. */
+    std::unique_ptr<dipoleFitFuncsRec> mag_dipole_funcs; /**< Functions to fit a magnetic dipole. */
 
-      int               fixed_noise;        /**< Were fixed noise values used rather than a noise-covariance matrix read from a file. */
-      std::unique_ptr<MNELIB::MNECovMatrix>      noise_orig;         /**< Noise covariance matrix (original, currently unused). */
-      std::unique_ptr<MNELIB::MNECovMatrix>      noise;              /**< Noise covariance matrix (weighted to take the selection into account). */
-      int               nave;               /**< How many averages does this correspond to? */
-      std::unique_ptr<MNELIB::MNEProjOp>        proj;               /**< The projection operator to use. */
-      int               column_norm;        /**< What kind of column normalization to apply to the forward solution. */
-      int               fit_mag_dipoles;    /**< Fit magnetic dipoles? */
-      FitDipUserRec     *user;              /**< Non-owning pointer to dipole fit workspace (set during fit_one). */
+    int fixed_noise;                                  /**< Were fixed noise values used rather than a noise-covariance matrix read from a file. */
+    std::unique_ptr<MNELIB::MNECovMatrix> noise_orig; /**< Noise covariance matrix (original, currently unused). */
+    std::unique_ptr<MNELIB::MNECovMatrix> noise;      /**< Noise covariance matrix (weighted to take the selection into account). */
+    int nave;                                         /**< How many averages does this correspond to? */
+    std::unique_ptr<MNELIB::MNEProjOp> proj;          /**< The projection operator to use. */
+    int column_norm;                                  /**< What kind of column normalization to apply to the forward solution. */
+    int fit_mag_dipoles;                              /**< Fit magnetic dipoles? */
+    FitDipUserRec* user;                              /**< Non-owning pointer to dipole fit workspace (set during fit_one). */
 };
 
 //=============================================================================================================

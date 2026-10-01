@@ -199,7 +199,7 @@ void TestDispPlots::testViridisLUT()
     double b1 = (qRed(c1) + qGreen(c1) + qBlue(c1)) / 3.0;
 
     QVERIFY(b1 > b0);
-    QVERIFY(qRed(c1) > 200);    // Should be yellow-ish
+    QVERIFY(qRed(c1) > 200); // Should be yellow-ish
     QVERIFY(qGreen(c1) > 200);
 }
 
@@ -387,8 +387,8 @@ void TestDispPlots::testImageScDoubleMatrix()
 {
     MatrixXd mat(3, 4);
     mat << 1, 2, 3, 4,
-           5, 6, 7, 8,
-           9, 10, 11, 12;
+        5, 6, 7, 8,
+        9, 10, 11, 12;
     ImageSc img(mat);
     QVERIFY(img.minimumWidth() > 0);
 }
@@ -399,7 +399,7 @@ void TestDispPlots::testImageScFloatMatrix()
 {
     MatrixXf mat(2, 3);
     mat << 1.0f, 2.0f, 3.0f,
-           4.0f, 5.0f, 6.0f;
+        4.0f, 5.0f, 6.0f;
     ImageSc img(mat);
     QVERIFY(img.minimumWidth() > 0);
 }

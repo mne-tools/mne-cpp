@@ -61,7 +61,7 @@ using namespace FIFFLIB;
 //=============================================================================================================
 
 CoRegistration::CoRegistration()
-    : m_pCoregSettingsView(Q_NULLPTR)
+: m_pCoregSettingsView(Q_NULLPTR)
 {
     m_vecBemDataModels = QVector<QSharedPointer<ANSHAREDLIB::AbstractModel>>();
 
@@ -121,14 +121,14 @@ QString CoRegistration::getName() const
 
 //=============================================================================================================
 
-QMenu *CoRegistration::getMenu()
+QMenu* CoRegistration::getMenu()
 {
     return Q_NULLPTR;
 }
 
 //=============================================================================================================
 
-QDockWidget *CoRegistration::getControl()
+QDockWidget* CoRegistration::getControl()
 {
     // Coregistration Settings
     m_pCoregSettingsView = new CoregSettingsView(QString("MNEANALYZE/%1").arg(this->getName()));
@@ -168,7 +168,7 @@ QDockWidget *CoRegistration::getControl()
     onChangeSelectedBem(m_pCoregSettingsView->getCurrentSelectedBem());
 
     // Thread handling
-    connect(&m_FutureWatcher, &QFutureWatcher<QMap<double,QList<int>>>::finished,
+    connect(&m_FutureWatcher, &QFutureWatcher<QMap<double, QList<int>>>::finished,
             this, &CoRegistration::createNewTrans, Qt::UniqueConnection);
 
     return pControlDock;
@@ -176,7 +176,7 @@ QDockWidget *CoRegistration::getControl()
 
 //=============================================================================================================
 
-QWidget *CoRegistration::getView()
+QWidget* CoRegistration::getView()
 {
     return Q_NULLPTR;
 }
@@ -190,7 +190,7 @@ void CoRegistration::handleEvent(QSharedPointer<Event> e)
             onSetFiducial(e->getData().value<QVector3D>());
             break;
         case EVENT_TYPE::SELECTED_MODEL_CHANGED:
-            onModelChanged(e->getData().value<QSharedPointer<ANSHAREDLIB::AbstractModel> >());
+            onModelChanged(e->getData().value<QSharedPointer<ANSHAREDLIB::AbstractModel>>());
             break;
         case EVENT_TYPE::MODEL_REMOVED:
             onModelRemoved(e->getData().value<QSharedPointer<ANSHAREDLIB::AbstractModel>>());
@@ -217,10 +217,10 @@ QVector<EVENT_TYPE> CoRegistration::getEventSubscriptions(void) const
 void CoRegistration::updateBemList(QSharedPointer<ANSHAREDLIB::AbstractModel> pNewModel)
 {
     // check first if model was already added and if the passed model is actually a BemDataModel
-    if(!m_vecBemDataModels.contains(pNewModel) && pNewModel->getType() == ANSHAREDLIB_BEMDATA_MODEL) {
+    if (!m_vecBemDataModels.contains(pNewModel) && pNewModel->getType() == ANSHAREDLIB_BEMDATA_MODEL) {
         m_pCoregSettingsView->clearSelectionBem();
         m_vecBemDataModels.append(pNewModel);
-        for(auto& pBemDataModel : m_vecBemDataModels) {
+        for (auto& pBemDataModel : m_vecBemDataModels) {
             m_pCoregSettingsView->addSelectionBem(pBemDataModel->getModelName());
         }
     }
@@ -228,12 +228,12 @@ void CoRegistration::updateBemList(QSharedPointer<ANSHAREDLIB::AbstractModel> pN
 
 //=============================================================================================================
 
-void CoRegistration::onChangeSelectedBem(const QString &sText)
+void CoRegistration::onChangeSelectedBem(const QString& sText)
 {
     QSharedPointer<ANSHAREDLIB::BemDataModel> pBemDataModel;
 
     for (auto& bemDataModel : m_vecBemDataModels) {
-        if(bemDataModel->getModelName() == sText && sText != m_sCurrentSelectedBem){
+        if (bemDataModel->getModelName() == sText && sText != m_sCurrentSelectedBem) {
             // update current selected Bem
             pBemDataModel = qSharedPointerCast<BemDataModel>(bemDataModel);
             m_pBem = QSharedPointer<MNEBem>(pBemDataModel->getBem());
@@ -252,7 +252,7 @@ void CoRegistration::onChangeSelectedBem(const QString &sText)
 void CoRegistration::onPickFiducials(const bool bActivatePicking)
 {
     // rotate camera to recently selected fiducial in 3DView
-    if(bActivatePicking) {
+    if (bActivatePicking) {
         onPickedFiducialChanged(m_pCoregSettingsView->getCurrentFiducial());
     }
 
@@ -265,12 +265,12 @@ void CoRegistration::onPickFiducials(const bool bActivatePicking)
 void CoRegistration::onSetFiducial(const QVector3D vecResult)
 {
     // Connect to 3DView and activate ObjectPicking
-    fiff_float_t    r[3];           /**< Point location. */
-    for(int i = 0; i < 3; i++) {
+    fiff_float_t r[3]; /**< Point location. */
+    for (int i = 0; i < 3; i++) {
         r[i] = vecResult[i];
     }
     fiff_int_t iFiducial = m_pCoregSettingsView->getCurrentFiducial();
-    switch(iFiducial) {
+    switch (iFiducial) {
         case FIFFV_POINT_LPA:
             m_digFidMri[0].r[0] = r[0];
             m_digFidMri[0].r[1] = r[1];
@@ -319,7 +319,7 @@ void CoRegistration::onDigitizersChanged(const QString& sFilePath)
     m_pCommu->publishEvent(EVENT_TYPE::NEW_DIGITIZER_ADDED, data);
 
     // set transformation if not empty
-    if(!m_transHeadMri.isEmpty()) {
+    if (!m_transHeadMri.isEmpty()) {
         QVariant transData = QVariant::fromValue(m_transHeadMri);
         m_pCommu->publishEvent(EVENT_TYPE::NEW_TRANS_AVAILABE, transData);
     }
@@ -362,13 +362,13 @@ void CoRegistration::onLoadTrans(const QString& sFilePath)
     Vector3f vecTrans;
 
     // check for type of transformation
-    if(transTemp.from == FIFFV_COORD_HEAD && transTemp.to == FIFFV_COORD_MRI) {
+    if (transTemp.from == FIFFV_COORD_HEAD && transTemp.to == FIFFV_COORD_MRI) {
         m_transHeadMri.clear();
         m_transHeadMri = FiffCoordTrans(transTemp);
 
         // Update Widget
-        getParamFromTrans(m_transHeadMri.trans,vecRot,vecTrans,vecScale);
-        m_pCoregSettingsView->setTransParams(vecTrans,vecRot,vecScale);
+        getParamFromTrans(m_transHeadMri.trans, vecRot, vecTrans, vecScale);
+        m_pCoregSettingsView->setTransParams(vecTrans, vecRot, vecScale);
 
         // Send event
         QVariant data = QVariant::fromValue(m_transHeadMri);
@@ -379,8 +379,8 @@ void CoRegistration::onLoadTrans(const QString& sFilePath)
         m_transHeadMri = FiffCoordTrans(transTemp);
 
         // Update Widget
-        getParamFromTrans(m_transHeadMri.trans,vecRot,vecTrans,vecScale);
-        m_pCoregSettingsView->setTransParams(vecTrans,vecRot,vecScale);
+        getParamFromTrans(m_transHeadMri.trans, vecRot, vecTrans, vecScale);
+        m_pCoregSettingsView->setTransParams(vecTrans, vecRot, vecScale);
 
         // send event
         QVariant data = QVariant::fromValue(m_transHeadMri);
@@ -397,7 +397,7 @@ void CoRegistration::onStoreTrans(const QString& sFilePath)
 {
     QFile fileTrans(sFilePath);
 
-    if(!m_transHeadMri.isEmpty()){
+    if (!m_transHeadMri.isEmpty()) {
         m_transHeadMri.write(fileTrans);
     }
     return;
@@ -407,7 +407,7 @@ void CoRegistration::onStoreTrans(const QString& sFilePath)
 
 void CoRegistration::onFitFiducials()
 {
-    if(m_digSetHead.isEmpty() || m_digFidMri.isEmpty() || m_pBem->isEmpty()) {
+    if (m_digSetHead.isEmpty() || m_digFidMri.isEmpty() || m_pBem->isEmpty()) {
         qWarning() << "[CoRegistration::onFitFiducials] Make sure to load all the necessary data.";
         return;
     }
@@ -422,33 +422,37 @@ void CoRegistration::onFitFiducials()
     FiffDigPointSet digSetFidHead = m_digSetHead.pickTypes({FIFFV_POINT_CARDINAL});
     FiffDigPointSet digSetFidMRI = m_digFidMri.pickTypes({FIFFV_POINT_CARDINAL});
 
-    Matrix3f matHead(digSetFidHead.size(),3);
-    Matrix3f matMri(digSetFidMRI.size(),3);
+    Matrix3f matHead(digSetFidHead.size(), 3);
+    Matrix3f matMri(digSetFidMRI.size(), 3);
     Matrix4f matTrans;
     Vector3f vecWeights; // LPA, Nasion, RPA
     float fScale = 0.0;
 
     // get coordinates
-    for(int i = 0; i< digSetFidHead.size(); ++i) {
-        matHead(i,0) = digSetFidHead[i].r[0]; matHead(i,1) = digSetFidHead[i].r[1]; matHead(i,2) = digSetFidHead[i].r[2];
-        matMri(i,0) = digSetFidMRI[i].r[0]; matMri(i,1) = digSetFidMRI[i].r[1]; matMri(i,2) = digSetFidMRI[i].r[2];
+    for (int i = 0; i < digSetFidHead.size(); ++i) {
+        matHead(i, 0) = digSetFidHead[i].r[0];
+        matHead(i, 1) = digSetFidHead[i].r[1];
+        matHead(i, 2) = digSetFidHead[i].r[2];
+        matMri(i, 0) = digSetFidMRI[i].r[0];
+        matMri(i, 1) = digSetFidMRI[i].r[1];
+        matMri(i, 2) = digSetFidMRI[i].r[2];
 
         // set weights
         switch (digSetFidHead[i].ident) {
-        case FIFFV_POINT_NASION:
-            vecWeights(i) = fWeightNAS;
-            break;
-        case FIFFV_POINT_LPA:
-            vecWeights(i) = fWeightLPA;
-            break;
-        case FIFFV_POINT_RPA:
-            vecWeights(i) = fWeightRPA;
-            break;
+            case FIFFV_POINT_NASION:
+                vecWeights(i) = fWeightNAS;
+                break;
+            case FIFFV_POINT_LPA:
+                vecWeights(i) = fWeightLPA;
+                break;
+            case FIFFV_POINT_RPA:
+                vecWeights(i) = fWeightRPA;
+                break;
         }
     }
 
     // align fiducials
-    if(!MNELIB::fitMatchedPoints(matHead,matMri,matTrans,fScale,bScale,vecWeights)) {
+    if (!MNELIB::fitMatchedPoints(matHead, matMri, matTrans, fScale, bScale, vecWeights)) {
         qWarning() << "Point cloud registration not succesfull.";
     }
 
@@ -461,8 +465,8 @@ void CoRegistration::onFitFiducials()
     Vector3f vecRot;
     Vector3f vecScale;
     Vector3f vecTrans;
-    getParamFromTrans(m_transHeadMri.trans,vecRot,vecTrans,vecScale);
-    m_pCoregSettingsView->setTransParams(vecTrans,vecRot,vecScale);
+    getParamFromTrans(m_transHeadMri.trans, vecRot, vecTrans, vecScale);
+    m_pCoregSettingsView->setTransParams(vecTrans, vecRot, vecScale);
 
     // send event
     QVariant data = QVariant::fromValue(m_transHeadMri);
@@ -489,12 +493,12 @@ void CoRegistration::triggerLoadingEnd(QString sMessage)
 
 void CoRegistration::onFitICP()
 {
-    if(m_digSetHead.isEmpty() || m_digFidMri.isEmpty() || m_pBem->isEmpty()) {
+    if (m_digSetHead.isEmpty() || m_digFidMri.isEmpty() || m_pBem->isEmpty()) {
         qWarning() << "[CoRegistration::onFitICP] Make sure to load all the necessary data.";
         return;
     }
 
-    if (m_FutureWatcher.isRunning()){
+    if (m_FutureWatcher.isRunning()) {
         qWarning() << "ICP computation already taking place.";
         return;
     }
@@ -504,7 +508,7 @@ void CoRegistration::onFitICP()
 
     triggerLoadingStart("Performing ICP ...");
 
-    // start icp  
+    // start icp
     m_Future = QtConcurrent::run([&, this] {
         return this->computeICP(m_transHeadMri,
                                 m_digSetHead,
@@ -564,34 +568,36 @@ FiffCoordTrans CoRegistration::computeICP(FiffCoordTrans transInit,
     FiffDigPointSet digSetHSP = digSetHead.pickTypes(lPickHSP);
 
     VectorXf vecWeightsICP(digSetHSP.size()); // Weigths vector
-    MatrixXf matHsp(digSetHSP.size(),3);
+    MatrixXf matHsp(digSetHSP.size(), 3);
 
-    for(int i = 0; i < digSetHSP.size(); ++i) {
-        matHsp(i,0) = digSetHSP[i].r[0]; matHsp(i,1) = digSetHSP[i].r[1]; matHsp(i,2) = digSetHSP[i].r[2];
+    for (int i = 0; i < digSetHSP.size(); ++i) {
+        matHsp(i, 0) = digSetHSP[i].r[0];
+        matHsp(i, 1) = digSetHSP[i].r[1];
+        matHsp(i, 2) = digSetHSP[i].r[2];
         // set weights
-        switch (digSetHSP[i].kind){
-        case FIFFV_POINT_CARDINAL:
-            switch (digSetHSP[i].ident) {
-            case FIFFV_POINT_NASION:
-                vecWeightsICP(i) = fWeightNAS;
+        switch (digSetHSP[i].kind) {
+            case FIFFV_POINT_CARDINAL:
+                switch (digSetHSP[i].ident) {
+                    case FIFFV_POINT_NASION:
+                        vecWeightsICP(i) = fWeightNAS;
+                        break;
+                    case FIFFV_POINT_LPA:
+                        vecWeightsICP(i) = fWeightLPA;
+                        break;
+                    case FIFFV_POINT_RPA:
+                        vecWeightsICP(i) = fWeightRPA;
+                        break;
+                }
                 break;
-            case FIFFV_POINT_LPA:
-                vecWeightsICP(i) = fWeightLPA;
+            case FIFFV_POINT_EEG:
+                vecWeightsICP(i) = fWeightEEG;
                 break;
-            case FIFFV_POINT_RPA:
-                vecWeightsICP(i) = fWeightRPA;
+            case FIFFV_POINT_HPI:
+                vecWeightsICP(i) = fWeightHPI;
                 break;
-            }
-            break;
-        case FIFFV_POINT_EEG:
-            vecWeightsICP(i) = fWeightEEG;
-            break;
-        case FIFFV_POINT_HPI:
-            vecWeightsICP(i) = fWeightHPI;
-            break;
-        case FIFFV_POINT_EXTRA:
-            vecWeightsICP(i) = fWeightHSP;
-            break;
+            case FIFFV_POINT_EXTRA:
+                vecWeightsICP(i) = fWeightHSP;
+                break;
         }
     }
 
@@ -599,7 +605,7 @@ FiffCoordTrans CoRegistration::computeICP(FiffCoordTrans transInit,
     MatrixXf matHspClean;
     VectorXi vecTake;
 
-    if(!MNELIB::discard3DPointOutliers(mneSurfacePoints,
+    if (!MNELIB::discard3DPointOutliers(mneSurfacePoints,
                                         matHsp,
                                         transInit,
                                         vecTake,
@@ -611,7 +617,7 @@ FiffCoordTrans CoRegistration::computeICP(FiffCoordTrans transInit,
     m_pCoregSettingsView->setOmittedPoints(iNDiscarded);
 
     VectorXf vecWeightsICPClean(vecTake.size());
-    for(int i = 0; i < vecTake.size(); ++i) {
+    for (int i = 0; i < vecTake.size(); ++i) {
         vecWeightsICPClean(i) = vecWeightsICP(vecTake(i));
     }
 
@@ -619,11 +625,11 @@ FiffCoordTrans CoRegistration::computeICP(FiffCoordTrans transInit,
     MNELIB::performIcp(mneSurfacePoints,
                        matHspClean,
                        transInit,
-                                fRMSE,
-                                bScale,
-                                iMaxIter,
-                                fTol,
-                                vecWeightsICPClean);
+                       fRMSE,
+                       bScale,
+                       iMaxIter,
+                       fTol,
+                       vecWeightsICPClean);
 
     FiffCoordTrans transHeadMri = transInit;
 
@@ -631,8 +637,8 @@ FiffCoordTrans CoRegistration::computeICP(FiffCoordTrans transInit,
     Vector3f vecRot;
     Vector3f vecScale;
     Vector3f vecTrans;
-    getParamFromTrans(transHeadMri.trans,vecRot,vecTrans,vecScale);
-    m_pCoregSettingsView->setTransParams(vecTrans,vecRot,vecScale);
+    getParamFromTrans(transHeadMri.trans, vecRot, vecTrans, vecScale);
+    m_pCoregSettingsView->setTransParams(vecTrans, vecRot, vecScale);
     m_pCoregSettingsView->setRMSE(fRMSE);
 
     return transHeadMri;
@@ -648,8 +654,8 @@ void CoRegistration::createNewTrans()
     Vector3f vecRot;
     Vector3f vecScale;
     Vector3f vecTrans;
-    getParamFromTrans(m_transHeadMri.trans,vecRot,vecTrans,vecScale);
-    m_pCoregSettingsView->setTransParams(vecTrans,vecRot,vecScale);
+    getParamFromTrans(m_transHeadMri.trans, vecRot, vecTrans, vecScale);
+    m_pCoregSettingsView->setTransParams(vecTrans, vecRot, vecScale);
 
     // send event
     QVariant data = QVariant::fromValue(m_transHeadMri);
@@ -668,8 +674,8 @@ void CoRegistration::onUpdateTrans()
     Matrix4f matTrans;
 
     // update transformation
-    m_pCoregSettingsView->getTransParams(vecRot,vecTrans,vecScale);
-    getTransFromParam(matTrans,vecRot,vecTrans,vecScale);
+    m_pCoregSettingsView->getTransParams(vecRot, vecTrans, vecScale);
+    getTransFromParam(matTrans, vecRot, vecTrans, vecScale);
 
     // send event
     m_transHeadMri.trans = matTrans;
@@ -686,18 +692,18 @@ void CoRegistration::getParamFromTrans(const Matrix4f& matTrans,
                                        Vector3f& vecTrans,
                                        Vector3f& vecScale)
 {
-    Matrix3f matRot = matTrans.block(0,0,3,3);
+    Matrix3f matRot = matTrans.block(0, 0, 3, 3);
 
     // get scaling factor and normalize rotation
-    for(int i = 0; i < 3; i++) {
+    for (int i = 0; i < 3; i++) {
         vecScale(i) = matRot.col(i).norm();
         matRot.col(i) = matRot.col(i) / vecScale(i);
     }
     // get rotation in rad - z,y,x
-    vecRot = matRot.canonicalEulerAngles(2,1,0);
+    vecRot = matRot.canonicalEulerAngles(2, 1, 0);
 
     // get translation vector
-    vecTrans = m_transHeadMri.trans.block(0,3,3,1);
+    vecTrans = m_transHeadMri.trans.block(0, 3, 3, 1);
 }
 
 //=============================================================================================================
@@ -718,16 +724,16 @@ void CoRegistration::getTransFromParam(Matrix4f& matTrans,
 
     Eigen::Quaternion<float> quat = zAngle * yAngle * xAngle;
     quat.normalize();
-    matTrans.block(0,0,3,3) = quat.matrix();
+    matTrans.block(0, 0, 3, 3) = quat.matrix();
 
     // apply translation part
-    matTrans.block(0,3,3,1) = vecTrans;
+    matTrans.block(0, 3, 3, 1) = vecTrans;
 
     // apply scaling
     Matrix4f matScale = Matrix4f::Identity();
-    matScale(0,0) = vecScale(0);
-    matScale(1,1) = vecScale(1);
-    matScale(2,2) = vecScale(2);
+    matScale(0, 0) = vecScale(0);
+    matScale(1, 1) = vecScale(1);
+    matScale(2, 2) = vecScale(2);
     matTrans = matTrans * matScale;
 
     return;
@@ -740,7 +746,7 @@ void CoRegistration::deleteModels()
     QVector<QSharedPointer<AbstractModel>> vecModels = m_pAnalyzeData->getModelsByType(ANSHAREDLIB_BEMDATA_MODEL);
     m_pCoregSettingsView->clearSelectionBem();
 
-    if(m_vecBemDataModels != vecModels) {
+    if (m_vecBemDataModels != vecModels) {
         m_vecBemDataModels = vecModels;
         if (m_vecBemDataModels.isEmpty()) {
             // empty bem and string
@@ -749,7 +755,7 @@ void CoRegistration::deleteModels()
             m_sCurrentSelectedBem = "";
         } else {
             // update new bem list
-            for(auto& pBemDataModel : m_vecBemDataModels) {
+            for (auto& pBemDataModel : m_vecBemDataModels) {
                 m_pCoregSettingsView->addSelectionBem(pBemDataModel->getModelName());
             }
         }
@@ -760,7 +766,7 @@ void CoRegistration::deleteModels()
 
 void CoRegistration::onModelChanged(QSharedPointer<ANSHAREDLIB::AbstractModel> pNewModel)
 {
-    if(pNewModel->getType() == MODEL_TYPE::ANSHAREDLIB_BEMDATA_MODEL){
+    if (pNewModel->getType() == MODEL_TYPE::ANSHAREDLIB_BEMDATA_MODEL) {
         updateBemList(pNewModel);
     }
 }
@@ -769,7 +775,7 @@ void CoRegistration::onModelChanged(QSharedPointer<ANSHAREDLIB::AbstractModel> p
 
 void CoRegistration::onModelRemoved(QSharedPointer<ANSHAREDLIB::AbstractModel> pRemovedModel)
 {
-    if(pRemovedModel->getType() == MODEL_TYPE::ANSHAREDLIB_BEMDATA_MODEL){
+    if (pRemovedModel->getType() == MODEL_TYPE::ANSHAREDLIB_BEMDATA_MODEL) {
         removeFromBemList(pRemovedModel);
     }
 }
@@ -778,15 +784,15 @@ void CoRegistration::onModelRemoved(QSharedPointer<ANSHAREDLIB::AbstractModel> p
 
 bool CoRegistration::removeFromBemList(QSharedPointer<ANSHAREDLIB::AbstractModel> pNewModel)
 {
-    while(m_vecBemDataModels.contains(pNewModel)){
+    while (m_vecBemDataModels.contains(pNewModel)) {
         int iIndex = m_vecBemDataModels.indexOf(pNewModel);
         m_vecBemDataModels.remove(iIndex);
-        if(m_sCurrentSelectedBem == QFileInfo(pNewModel->getModelPath()).fileName()){
+        if (m_sCurrentSelectedBem == QFileInfo(pNewModel->getModelPath()).fileName()) {
             m_sCurrentSelectedBem = "";
         }
 
         m_pCoregSettingsView->clearSelectionBem();
-        for(auto& pBemDataModel : m_vecBemDataModels) {
+        for (auto& pBemDataModel : m_vecBemDataModels) {
             m_pCoregSettingsView->addSelectionBem(pBemDataModel->getModelName());
         }
         return true;
@@ -798,5 +804,5 @@ bool CoRegistration::removeFromBemList(QSharedPointer<ANSHAREDLIB::AbstractModel
 
 QString CoRegistration::getBuildInfo()
 {
-    return QString(COREGISTRATIONPLUGIN::buildDateTime()) + QString(" - ")  + QString(COREGISTRATIONPLUGIN::buildHash());
+    return QString(COREGISTRATIONPLUGIN::buildDateTime()) + QString(" - ") + QString(COREGISTRATIONPLUGIN::buildHash());
 }

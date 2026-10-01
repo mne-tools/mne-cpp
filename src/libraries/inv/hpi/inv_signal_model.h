@@ -59,7 +59,6 @@ namespace INVLIB
  */
 class INVSHARED_EXPORT InvSignalModel
 {
-
 public:
     typedef QSharedPointer<InvSignalModel> SPtr;            /**< Shared pointer type for InvSignalModel. */
     typedef QSharedPointer<const InvSignalModel> ConstSPtr; /**< Const shared pointer type for InvSignalModel. */
@@ -127,7 +126,7 @@ private:
      */
     bool checkEmpty(const InvHpiModelParameters& hpiModelParameters);
 
-    Eigen::MatrixXd m_matInverseSignalModel{Eigen::MatrixXd(0,0)};
+    Eigen::MatrixXd m_matInverseSignalModel{Eigen::MatrixXd(0, 0)};
     int m_iCurrentModelCols{0};
     InvHpiModelParameters m_modelParameters{InvHpiModelParameters()};
 };
@@ -139,4 +138,3 @@ private:
 } // namespace INVLIB
 
 #endif // SignalModel_H
-

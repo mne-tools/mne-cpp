@@ -105,8 +105,7 @@ public:
             QString err = m_pSocket->errorString();
             delete m_pSocket;
             m_pSocket = nullptr;
-            throw std::runtime_error(std::string("[lsl::stream_inlet] Failed to connect to outlet: ")
-                                     + err.toStdString());
+            throw std::runtime_error(std::string("[lsl::stream_inlet] Failed to connect to outlet: ") + err.toStdString());
         }
 
         // Read the handshake header: "LSL1" (4 bytes) + channel_count (4 bytes, little-endian)
@@ -230,12 +229,12 @@ public:
         return chunk;
     }
 
-    stream_info     m_info;             /**< The stream info for this inlet. */
-    QTcpSocket*     m_pSocket;          /**< TCP socket for data reception. */
-    bool            m_bIsOpen;          /**< Whether the stream is currently open. */
-    int             m_iChannelCount;    /**< Number of channels. */
-    int             m_iBytesPerSample;  /**< Bytes per sample (channels * sizeof(float)). */
-    QByteArray      m_rawBuffer;        /**< Raw byte buffer for incoming TCP data. */
+    stream_info m_info;     /**< The stream info for this inlet. */
+    QTcpSocket* m_pSocket;  /**< TCP socket for data reception. */
+    bool m_bIsOpen;         /**< Whether the stream is currently open. */
+    int m_iChannelCount;    /**< Number of channels. */
+    int m_iBytesPerSample;  /**< Bytes per sample (channels * sizeof(float)). */
+    QByteArray m_rawBuffer; /**< Raw byte buffer for incoming TCP data. */
 };
 
 //=============================================================================================================

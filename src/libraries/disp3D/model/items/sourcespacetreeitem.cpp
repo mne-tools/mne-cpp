@@ -20,14 +20,14 @@
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-SourceSpaceTreeItem::SourceSpaceTreeItem(const QString &text,
-                                         const QVector<QVector3D> &positions,
-                                         const QColor &color,
+SourceSpaceTreeItem::SourceSpaceTreeItem(const QString& text,
+                                         const QVector<QVector3D>& positions,
+                                         const QColor& color,
                                          float scale,
                                          int type)
-    : AbstractTreeItem(text, type)
-    , m_positions(positions)
-    , m_scale(scale)
+: AbstractTreeItem(text, type)
+, m_positions(positions)
+, m_scale(scale)
 {
     setColor(color);
 }

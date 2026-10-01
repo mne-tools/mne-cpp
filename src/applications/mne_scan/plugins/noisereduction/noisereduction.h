@@ -43,16 +43,19 @@
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-namespace FIFFLIB{
-    class FiffInfo;
+namespace FIFFLIB
+{
+class FiffInfo;
 }
 
-namespace RTPROCESSINGLIB{
-    class Filter;
+namespace RTPROCESSINGLIB
+{
+class Filter;
 }
 
-namespace SCMEASLIB{
-    class RealTimeMultiSampleArray;
+namespace SCMEASLIB
+{
+class RealTimeMultiSampleArray;
 }
 
 //=============================================================================================================
@@ -198,49 +201,49 @@ protected:
     void createSpharaOperator();
 
 private:
-    QMutex                          m_mutex;                                    /**< The threads mutex.*/
+    QMutex m_mutex; /**< The threads mutex.*/
 
-    bool                            m_bCompActivated;                           /**< Compensator activated. */
-    bool                            m_bSpharaActive;                            /**< Flag whether thread is running.*/
-    bool                            m_bProjActivated;                           /**< Projections activated. */
-    bool                            m_bFilterActivated;                         /**< Projections activated. */
+    bool m_bCompActivated;   /**< Compensator activated. */
+    bool m_bSpharaActive;    /**< Flag whether thread is running.*/
+    bool m_bProjActivated;   /**< Projections activated. */
+    bool m_bFilterActivated; /**< Projections activated. */
 
-    int                             m_iNBaseFctsFirst;                          /**< The number of grad/inner base functions to use for calculating the sphara opreator.*/
-    int                             m_iNBaseFctsSecond;                         /**< The number of grad/outer base functions to use for calculating the sphara opreator.*/
-    int                             m_iMaxFilterLength;                         /**< Max order of the current filters. */
-    int                             m_iMaxFilterTapSize;                        /**< maximum number of allowed filter taps. This number depends on the size of the receiving blocks. */
+    int m_iNBaseFctsFirst;   /**< The number of grad/inner base functions to use for calculating the sphara opreator.*/
+    int m_iNBaseFctsSecond;  /**< The number of grad/outer base functions to use for calculating the sphara opreator.*/
+    int m_iMaxFilterLength;  /**< Max order of the current filters. */
+    int m_iMaxFilterTapSize; /**< maximum number of allowed filter taps. This number depends on the size of the receiving blocks. */
 
-    QString                         m_sCurrentSystem;                           /**< The current acquisition system (EEG, babyMEG, VectorView).*/
-    QString                         m_sFilterChannelType;                       /**< Kind of channel which is to be filtered. */
+    QString m_sCurrentSystem;     /**< The current acquisition system (EEG, babyMEG, VectorView).*/
+    QString m_sFilterChannelType; /**< Kind of channel which is to be filtered. */
 
-    UTILSLIB::FilterKernel     m_filterKernel;                             /**< The currently active filter. */
+    UTILSLIB::FilterKernel m_filterKernel; /**< The currently active filter. */
 
-    Eigen::VectorXi                 m_vecIndicesFirstVV;                        /**< The indices of the channels to pick for the first SPHARA oerpator in case of a VectorView system.*/
-    Eigen::VectorXi                 m_vecIndicesSecondVV;                       /**< The indices of the channels to pick for the second SPHARA oerpator in case of a VectorView system.*/
-    Eigen::VectorXi                 m_vecIndicesFirstBabyMEG;                   /**< The indices of the channels to pick for the first SPHARA oerpator in case of a BabyMEG system.*/
-    Eigen::VectorXi                 m_vecIndicesSecondBabyMEG;                  /**< The indices of the channels to pick for the second SPHARA oerpator in case of a BabyMEG system.*/
-    Eigen::VectorXi                 m_vecIndicesFirstEEG;                       /**< The indices of the channels to pick for the second SPHARA operator in case of an EEG system.*/
+    Eigen::VectorXi m_vecIndicesFirstVV;       /**< The indices of the channels to pick for the first SPHARA oerpator in case of a VectorView system.*/
+    Eigen::VectorXi m_vecIndicesSecondVV;      /**< The indices of the channels to pick for the second SPHARA oerpator in case of a VectorView system.*/
+    Eigen::VectorXi m_vecIndicesFirstBabyMEG;  /**< The indices of the channels to pick for the first SPHARA oerpator in case of a BabyMEG system.*/
+    Eigen::VectorXi m_vecIndicesSecondBabyMEG; /**< The indices of the channels to pick for the second SPHARA oerpator in case of a BabyMEG system.*/
+    Eigen::VectorXi m_vecIndicesFirstEEG;      /**< The indices of the channels to pick for the second SPHARA operator in case of an EEG system.*/
 
-    Eigen::SparseMatrix<double>     m_matSparseSpharaMult;                      /**< The final sparse SPHARA operator .*/
-    Eigen::SparseMatrix<double>     m_matSparseProjCompMult;                    /**< The final sparse projection + compensator operator.*/
-    Eigen::SparseMatrix<double>     m_matSparseProjMult;                        /**< The final sparse SSP projector. */
-    Eigen::SparseMatrix<double>     m_matSparseCompMult;                        /**< The final sparse compensator matrix. */
-    Eigen::SparseMatrix<double>     m_matSparseFull;                            /**< The final sparse full multiplication matrix . */
+    Eigen::SparseMatrix<double> m_matSparseSpharaMult;   /**< The final sparse SPHARA operator .*/
+    Eigen::SparseMatrix<double> m_matSparseProjCompMult; /**< The final sparse projection + compensator operator.*/
+    Eigen::SparseMatrix<double> m_matSparseProjMult;     /**< The final sparse SSP projector. */
+    Eigen::SparseMatrix<double> m_matSparseCompMult;     /**< The final sparse compensator matrix. */
+    Eigen::SparseMatrix<double> m_matSparseFull;         /**< The final sparse full multiplication matrix . */
 
-    Eigen::MatrixXd                 m_matSpharaVVGradLoaded;                    /**< The loaded VectorView gradiometer basis functions.*/
-    Eigen::MatrixXd                 m_matSpharaVVMagLoaded;                     /**< The loaded VectorView magnetometer basis functions.*/
-    Eigen::MatrixXd                 m_matSpharaBabyMEGInnerLoaded;              /**< The loaded babyMEG inner layer basis functions.*/
-    Eigen::MatrixXd                 m_matSpharaBabyMEGOuterLoaded;              /**< The loaded babyMEG outer layer basis functions.*/
-    Eigen::MatrixXd                 m_matSpharaEEGLoaded;                       /**< The loaded EEG basis functions.*/
+    Eigen::MatrixXd m_matSpharaVVGradLoaded;       /**< The loaded VectorView gradiometer basis functions.*/
+    Eigen::MatrixXd m_matSpharaVVMagLoaded;        /**< The loaded VectorView magnetometer basis functions.*/
+    Eigen::MatrixXd m_matSpharaBabyMEGInnerLoaded; /**< The loaded babyMEG inner layer basis functions.*/
+    Eigen::MatrixXd m_matSpharaBabyMEGOuterLoaded; /**< The loaded babyMEG outer layer basis functions.*/
+    Eigen::MatrixXd m_matSpharaEEGLoaded;          /**< The loaded EEG basis functions.*/
 
-    Eigen::RowVectorXi              m_lFilterChannelList;                       /**< The indices of the channels to be filtered.*/
+    Eigen::RowVectorXi m_lFilterChannelList; /**< The indices of the channels to be filtered.*/
 
-    QSharedPointer<FIFFLIB::FiffInfo>                               m_pFiffInfo;            /**< Fiff measurement info.*/
+    QSharedPointer<FIFFLIB::FiffInfo> m_pFiffInfo; /**< Fiff measurement info.*/
 
-    QSharedPointer<UTILSLIB::CircularBuffer_Matrix_double>          m_pCircularBuffer;      /**< Holds incoming raw data. */
+    QSharedPointer<UTILSLIB::CircularBuffer_Matrix_double> m_pCircularBuffer; /**< Holds incoming raw data. */
 
-    SCSHAREDLIB::PluginInputData<SCMEASLIB::RealTimeMultiSampleArray>::SPtr      m_pNoiseReductionInput;      /**< The RealTimeMultiSampleArray of the NoiseReduction input.*/
-    SCSHAREDLIB::PluginOutputData<SCMEASLIB::RealTimeMultiSampleArray>::SPtr     m_pNoiseReductionOutput;     /**< The RealTimeMultiSampleArray of the NoiseReduction output.*/
+    SCSHAREDLIB::PluginInputData<SCMEASLIB::RealTimeMultiSampleArray>::SPtr m_pNoiseReductionInput;   /**< The RealTimeMultiSampleArray of the NoiseReduction input.*/
+    SCSHAREDLIB::PluginOutputData<SCMEASLIB::RealTimeMultiSampleArray>::SPtr m_pNoiseReductionOutput; /**< The RealTimeMultiSampleArray of the NoiseReduction output.*/
 
 signals:
 };

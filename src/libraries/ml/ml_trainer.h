@@ -116,7 +116,7 @@ public:
     QStringList checkPrerequisites(const QStringList& packages) const;
 
 private:
-    UTILSLIB::PythonRunner m_runner;    /**< Underlying Python process launcher. */
+    UTILSLIB::PythonRunner m_runner; /**< Underlying Python process launcher. */
 };
 
 } // namespace MLLIB

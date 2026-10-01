@@ -111,8 +111,8 @@ void TestDecodingSsd::testFitAndIsFitted()
 
     QCOMPARE(ssd.filters().rows(), 4);
     QCOMPARE(ssd.filters().cols(), 6);
-    QCOMPARE(ssd.patterns().rows(), 6);   // n_channels
-    QCOMPARE(ssd.patterns().cols(), 4);   // n_components
+    QCOMPARE(ssd.patterns().rows(), 6); // n_channels
+    QCOMPARE(ssd.patterns().cols(), 4); // n_components
     QCOMPARE(ssd.eigenvalues().size(), 4);
 }
 
@@ -179,11 +179,11 @@ void TestDecodingSsd::testNotFittedThrows()
     MatrixXd data = MatrixXd::Random(6, 500);
 
     QVERIFY_THROWS_EXCEPTION(std::runtime_error,
-        static_cast<void>(ssd.transform(data)));
+                             static_cast<void>(ssd.transform(data)));
     QVERIFY_THROWS_EXCEPTION(std::runtime_error,
-        static_cast<void>(ssd.apply(data)));
+                             static_cast<void>(ssd.apply(data)));
     QVERIFY_THROWS_EXCEPTION(std::runtime_error,
-        static_cast<void>(ssd.filters()));
+                             static_cast<void>(ssd.filters()));
 }
 
 //=============================================================================================================
@@ -195,11 +195,11 @@ void TestDecodingSsd::testInvalidBandsThrows()
 
     // noise_low > signal_low → invalid
     QVERIFY_THROWS_EXCEPTION(std::invalid_argument,
-        ssd.fit(data, 256.0, 8.0, 12.0, 9.0, 14.0));
+                             ssd.fit(data, 256.0, 8.0, 12.0, 9.0, 14.0));
 
     // signal_high > noise_high → invalid
     QVERIFY_THROWS_EXCEPTION(std::invalid_argument,
-        ssd.fit(data, 256.0, 8.0, 15.0, 6.0, 14.0));
+                             ssd.fit(data, 256.0, 8.0, 15.0, 6.0, 14.0));
 }
 
 //=============================================================================================================

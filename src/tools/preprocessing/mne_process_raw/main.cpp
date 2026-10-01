@@ -172,7 +172,7 @@ static void printHelp()
  * @param[in] argv  Array of command-line argument strings.
  * @return Application exit code.
  */
-int main(int argc, char *argv[])
+int main(int argc, char* argv[])
 {
     qInstallMessageHandler(MNELogger::customLogWriter);
     QCoreApplication app(argc, argv);
@@ -343,7 +343,7 @@ int main(int argc, char *argv[])
 
     // Report unknown options
     if (!parser.unknownOptionNames().isEmpty()) {
-        for (const QString &opt : parser.unknownOptionNames())
+        for (const QString& opt : parser.unknownOptionNames())
             qCritical() << "Unknown option:" << opt;
         printHelp();
         return 1;
@@ -366,7 +366,7 @@ int main(int argc, char *argv[])
     settings.rawFiles = parser.values(rawOpt);
 
     // Event files
-    settings.eventFiles    = parser.values(eventsOpt);
+    settings.eventFiles = parser.values(eventsOpt);
     settings.eventsOutFiles = parser.values(eventsOutOpt);
 
     // Trigger settings
@@ -390,16 +390,16 @@ int main(int argc, char *argv[])
     else if (parser.isSet(projOffOpt))
         settings.projOn = 0;
 
-    settings.makeProj    = parser.isSet(makeProjOpt);
-    settings.projEvent   = parser.value(projEventOpt).toInt();
-    settings.projTmin    = parser.value(projTminOpt).toFloat();
-    settings.projTmax    = parser.value(projTmaxOpt).toFloat();
-    settings.projNGrad   = parser.value(projNGradOpt).toInt();
-    settings.projNMag    = parser.value(projNMagOpt).toInt();
-    settings.projNEeg    = parser.value(projNEegOpt).toInt();
+    settings.makeProj = parser.isSet(makeProjOpt);
+    settings.projEvent = parser.value(projEventOpt).toInt();
+    settings.projTmin = parser.value(projTminOpt).toFloat();
+    settings.projTmax = parser.value(projTmaxOpt).toFloat();
+    settings.projNGrad = parser.value(projNGradOpt).toInt();
+    settings.projNMag = parser.value(projNMagOpt).toInt();
+    settings.projNEeg = parser.value(projNEegOpt).toInt();
     settings.projGradReject = parser.value(projGradRejOpt).toFloat() * 1e-13f;
-    settings.projMagReject  = parser.value(projMagRejOpt).toFloat() * 1e-15f;
-    settings.projEegReject  = parser.value(projEegRejOpt).toFloat() * 1e-6f;
+    settings.projMagReject = parser.value(projMagRejOpt).toFloat() * 1e-15f;
+    settings.projEegReject = parser.value(projEegRejOpt).toFloat() * 1e-6f;
     settings.saveProjTag = parser.value(saveProjTagOpt);
     if (!settings.saveProjTag.isEmpty())
         settings.makeProj = true;
@@ -423,12 +423,12 @@ int main(int argc, char *argv[])
         settings.splitSize = static_cast<qint64>(parser.value(splitOpt).toFloat() * 1024 * 1024);
 
     // Averaging settings
-    settings.aveFiles   = parser.values(aveOpt);
+    settings.aveFiles = parser.values(aveOpt);
     settings.saveAveTag = parser.value(saveAveTagOpt);
     settings.grandAveFile = parser.value(gaveOpt);
 
     // Covariance settings
-    settings.covFiles   = parser.values(covOpt);
+    settings.covFiles = parser.values(covOpt);
     settings.saveCovTag = parser.value(saveCovTagOpt);
     settings.grandCovFile = parser.value(gcovOpt);
 

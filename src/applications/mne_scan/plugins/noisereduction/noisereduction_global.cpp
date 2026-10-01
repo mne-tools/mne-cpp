@@ -22,12 +22,21 @@
 // DEFINE METHODS
 //=============================================================================================================
 
-const char* NOISEREDUCTIONPLUGIN::buildDateTime(){ return UTILSLIB::dateTimeNow();}
+const char* NOISEREDUCTIONPLUGIN::buildDateTime()
+{
+    return UTILSLIB::dateTimeNow();
+}
 
 //=============================================================================================================
 
-const char* NOISEREDUCTIONPLUGIN::buildHash(){ return UTILSLIB::gitHash();}
+const char* NOISEREDUCTIONPLUGIN::buildHash()
+{
+    return UTILSLIB::gitHash();
+}
 
 //=============================================================================================================
 
-const char* NOISEREDUCTIONPLUGIN::buildHashLong(){ return UTILSLIB::gitHashLong();}
+const char* NOISEREDUCTIONPLUGIN::buildHashLong()
+{
+    return UTILSLIB::gitHashLong();
+}

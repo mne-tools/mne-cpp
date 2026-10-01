@@ -35,23 +35,23 @@ QString envValue(const char* name)
 
 QString jsonValueToCompactString(const QJsonValue& value)
 {
-    if(value.isString()) {
+    if (value.isString()) {
         return value.toString();
     }
 
-    if(value.isDouble()) {
+    if (value.isDouble()) {
         return QString::number(value.toDouble(), 'g', 8);
     }
 
-    if(value.isBool()) {
+    if (value.isBool()) {
         return value.toBool() ? QString("true") : QString("false");
     }
 
-    if(value.isArray()) {
+    if (value.isArray()) {
         return QString::fromUtf8(QJsonDocument(value.toArray()).toJson(QJsonDocument::Compact));
     }
 
-    if(value.isObject()) {
+    if (value.isObject()) {
         return QString::fromUtf8(QJsonDocument(value.toObject()).toJson(QJsonDocument::Compact));
     }
 
@@ -62,7 +62,7 @@ QString formatToolContracts(const QJsonArray& toolDefinitions)
 {
     QStringList lines;
 
-    for(const QJsonValue& value : toolDefinitions) {
+    for (const QJsonValue& value : toolDefinitions) {
         const QJsonObject tool = value.toObject();
         const QString name = tool.value("name").toString();
         const QString description = tool.value("description").toString();
@@ -81,86 +81,86 @@ QString formatToolContracts(const QJsonArray& toolDefinitions)
         const QJsonObject outputProperties = outputSchema.value("properties").toObject();
 
         QStringList propertyParts;
-        for(auto it = properties.constBegin(); it != properties.constEnd(); ++it) {
+        for (auto it = properties.constBegin(); it != properties.constEnd(); ++it) {
             const QJsonObject property = it.value().toObject();
             QString part = QString("%1:%2").arg(it.key(), property.value("type").toString("string"));
             const QString sectionName = property.value("x_workflow_section").toString().trimmed();
-            if(!sectionName.isEmpty()) {
+            if (!sectionName.isEmpty()) {
                 part += QString(" section=%1").arg(sectionName);
             }
-            if(property.contains("default")) {
+            if (property.contains("default")) {
                 part += QString(" default=%1").arg(jsonValueToCompactString(property.value("default")));
             }
             const QString descriptionText = property.value("description").toString();
-            if(!descriptionText.isEmpty()) {
+            if (!descriptionText.isEmpty()) {
                 part += QString(" [%1]").arg(descriptionText);
             }
             propertyParts << part;
         }
 
         QStringList resultParts;
-        for(auto it = outputProperties.constBegin(); it != outputProperties.constEnd(); ++it) {
+        for (auto it = outputProperties.constBegin(); it != outputProperties.constEnd(); ++it) {
             const QJsonObject property = it.value().toObject();
             QString part = QString("%1:%2").arg(it.key(), property.value("type").toString("string"));
             const QString descriptionText = property.value("description").toString();
-            if(!descriptionText.isEmpty()) {
+            if (!descriptionText.isEmpty()) {
                 part += QString(" [%1]").arg(descriptionText);
             }
             resultParts << part;
         }
 
         QStringList requiredFields;
-        for(const QJsonValue& requiredValue : required) {
+        for (const QJsonValue& requiredValue : required) {
             requiredFields << requiredValue.toString();
         }
 
         QStringList aliasValues;
-        for(const QJsonValue& aliasValue : aliases) {
+        for (const QJsonValue& aliasValue : aliases) {
             const QString alias = aliasValue.toString().trimmed();
-            if(!alias.isEmpty()) {
+            if (!alias.isEmpty()) {
                 aliasValues << alias;
             }
         }
 
         QStringList lookupAliasValues;
-        for(const QJsonValue& aliasValue : lookupAliases) {
+        for (const QJsonValue& aliasValue : lookupAliases) {
             const QString alias = aliasValue.toString().trimmed();
-            if(!alias.isEmpty()) {
+            if (!alias.isEmpty()) {
                 lookupAliasValues << alias;
             }
         }
 
         QStringList sharedAliasValues;
-        for(const QJsonValue& aliasValue : sharedAliases) {
+        for (const QJsonValue& aliasValue : sharedAliases) {
             const QString alias = aliasValue.toString().trimmed();
-            if(!alias.isEmpty()) {
+            if (!alias.isEmpty()) {
                 sharedAliasValues << alias;
             }
         }
 
         QStringList capabilityParts;
-        if(!capabilitySource.isEmpty()) {
+        if (!capabilitySource.isEmpty()) {
             capabilityParts << QString("source=%1").arg(capabilitySource);
         }
-        if(!capabilityKind.isEmpty()) {
+        if (!capabilityKind.isEmpty()) {
             capabilityParts << QString("kind=%1").arg(capabilityKind);
         }
-        if(!capabilityId.isEmpty()) {
+        if (!capabilityId.isEmpty()) {
             capabilityParts << QString("id=%1").arg(capabilityId);
         }
-        if(!skillId.isEmpty()) {
+        if (!skillId.isEmpty()) {
             capabilityParts << QString("skill=%1").arg(skillId);
         }
-        if(!pipelineId.isEmpty()) {
+        if (!pipelineId.isEmpty()) {
             capabilityParts << QString("pipeline=%1").arg(pipelineId);
         }
-        if(!aliasValues.isEmpty()) {
+        if (!aliasValues.isEmpty()) {
             capabilityParts << QString("aliases=%1").arg(aliasValues.join(", "));
         }
-        if(!lookupAliasValues.isEmpty()) {
+        if (!lookupAliasValues.isEmpty()) {
             capabilityParts << QString("lookup_aliases=%1").arg(lookupAliasValues.join(", "));
         }
-        if(!sharedAliasValues.isEmpty()) {
+        if (!sharedAliasValues.isEmpty()) {
             capabilityParts << QString("shared_aliases=%1").arg(sharedAliasValues.join(", "));
         }
 
@@ -196,11 +196,11 @@ LlmPlannerConfig LlmToolPlanner::configuration() const
 
 bool LlmToolPlanner::isConfigured() const
 {
-    if(isMockMode()) {
+    if (isMockMode()) {
         return true;
     }
 
-    if(isOpenAIResponsesMode() || isGeminiOpenAICompatMode() || isGitHubModelsMode() || isAnthropicMessagesMode()) {
+    if (isOpenAIResponsesMode() || isGeminiOpenAICompatMode() || isGitHubModelsMode() || isAnthropicMessagesMode()) {
         return !apiKey().isEmpty() && !model().isEmpty();
     }
 
@@ -215,20 +215,20 @@ bool LlmToolPlanner::isMockMode() const
 QString LlmToolPlanner::providerName() const
 {
     const QString configured = configOrEnv(m_config.providerName, "MNE_ANALYZE_STUDIO_LLM_PROVIDER");
-    if(!configured.isEmpty()) {
+    if (!configured.isEmpty()) {
         return configured;
     }
 
-    if(isOpenAIResponsesMode()) {
+    if (isOpenAIResponsesMode()) {
         return QString("OpenAI");
     }
-    if(isGeminiOpenAICompatMode()) {
+    if (isGeminiOpenAICompatMode()) {
         return QString("Google Gemini");
     }
-    if(isGitHubModelsMode()) {
+    if (isGitHubModelsMode()) {
         return QString("GitHub Models");
     }
-    if(isAnthropicMessagesMode()) {
+    if (isAnthropicMessagesMode()) {
         return QString("Anthropic");
     }
 
@@ -237,35 +237,35 @@ QString LlmToolPlanner::providerName() const
 
 QString LlmToolPlanner::statusSummary() const
 {
-    if(isMockMode()) {
+    if (isMockMode()) {
         return QString("LLM: Mock mode | Model: %1").arg(model().isEmpty() ? QString("planner-mock") : model());
     }
 
-    if(isConfigured()) {
+    if (isConfigured()) {
         QString modeLabel = QString("HTTP");
-        if(isOpenAIResponsesMode()) {
+        if (isOpenAIResponsesMode()) {
             modeLabel = QString("Responses API");
-        } else if(isGeminiOpenAICompatMode()) {
+        } else if (isGeminiOpenAICompatMode()) {
             modeLabel = QString("Gemini OpenAI Compat");
-        } else if(isGitHubModelsMode()) {
+        } else if (isGitHubModelsMode()) {
             modeLabel = QString("GitHub Models");
-        } else if(isAnthropicMessagesMode()) {
+        } else if (isAnthropicMessagesMode()) {
             modeLabel = QString("Anthropic Messages");
         }
         return QString("LLM: Connected | Provider: %1 | Mode: %2 | Model: %3")
             .arg(providerName(), modeLabel, model());
     }
 
-    if(isOpenAIResponsesMode()) {
+    if (isOpenAIResponsesMode()) {
         return "LLM: Deterministic fallback only | Set MNE_ANALYZE_STUDIO_LLM_API_KEY and MNE_ANALYZE_STUDIO_LLM_MODEL.";
     }
-    if(isGeminiOpenAICompatMode()) {
+    if (isGeminiOpenAICompatMode()) {
         return "LLM: Deterministic fallback only | Set Gemini API key and model.";
     }
-    if(isGitHubModelsMode()) {
+    if (isGitHubModelsMode()) {
         return "LLM: Deterministic fallback only | Set GitHub token and model for GitHub Models.";
     }
-    if(isAnthropicMessagesMode()) {
+    if (isAnthropicMessagesMode()) {
         return "LLM: Deterministic fallback only | Set Anthropic API key and model.";
     }
 
@@ -279,33 +279,33 @@ LlmPlanResult LlmToolPlanner::plan(const QString& userCommand,
     LlmPlanResult result;
     result.providerName = providerName();
 
-    if(!isConfigured()) {
+    if (!isConfigured()) {
         result.errorMessage = "LLM planner is not configured.";
         return result;
     }
 
-    if(isMockMode()) {
+    if (isMockMode()) {
         const QString lower = userCommand.toLower();
         result.usedModel = true;
         result.success = true;
         result.summary = "Mock planner generated a local test plan.";
 
-        if(lower.contains("strongest") && lower.contains("burst")) {
+        if (lower.contains("strongest") && lower.contains("burst")) {
             const QString match = lower.contains("eeg") ? "EEG" : (lower.contains("meg") ? "MEG" : "EOG");
             result.plannedCommands
                 << QString("tools.call neurokernel.find_peak_window {\"window_samples\":4000,\"match\":\"%1\"}").arg(match)
                 << "tools.call view.raw.goto {\"sample\":${last_peak_sample}}";
-            if(lower.contains("stat")) {
+            if (lower.contains("stat")) {
                 result.plannedCommands << "tools.call neurokernel.raw_stats {\"window_samples\":600}";
             }
             return result;
         }
 
-        if(lower.contains("top") && lower.contains("channel")) {
+        if (lower.contains("top") && lower.contains("channel")) {
             const QString match = lower.contains("eeg") ? "EEG" : (lower.contains("meg") ? "MEG" : "");
             QStringList argumentParts;
             argumentParts << "\"window_samples\":1200";
-            if(!match.isEmpty()) {
+            if (!match.isEmpty()) {
                 argumentParts << QString("\"match\":\"%1\"").arg(match);
             }
             argumentParts << "\"limit\":5";
@@ -314,7 +314,7 @@ LlmPlanResult LlmToolPlanner::plan(const QString& userCommand,
             return result;
         }
 
-        if(lower.contains("summary")) {
+        if (lower.contains("summary")) {
             result.plannedCommands << "tools.call view.raw.summary {}";
             return result;
         }
@@ -349,78 +349,43 @@ LlmPlanResult LlmToolPlanner::plan(const QString& userCommand,
         {"request", userCommand},
         {"tools", toolDefinitions},
         {"tool_contracts", formatToolContracts(toolDefinitions)},
-        {"context", context}
-    };
+        {"context", context}};
 
     const QJsonObject planSchema{
         {"type", "object"},
         {"additionalProperties", false},
-        {"properties", QJsonObject{
-             {"summary", QJsonObject{{"type", "string"}}},
-             {"steps", QJsonObject{
-                  {"type", "array"},
-                  {"items", QJsonObject{
-                       {"type", "object"},
-                       {"additionalProperties", false},
-                       {"properties", QJsonObject{
-                            {"tool_name", QJsonObject{{"type", "string"}}},
-                            {"description", QJsonObject{{"type", "string"}}},
-                            {"arguments", QJsonObject{{"type", "object"}}}
-                        }},
-                       {"required", QJsonArray{"tool_name", "description", "arguments"}}
-                   }}
-              }}
-         }},
-        {"required", QJsonArray{"summary", "steps"}}
-    };
+        {"properties", QJsonObject{{"summary", QJsonObject{{"type", "string"}}}, {"steps", QJsonObject{{"type", "array"}, {"items", QJsonObject{{"type", "object"}, {"additionalProperties", false}, {"properties", QJsonObject{{"tool_name", QJsonObject{{"type", "string"}}}, {"description", QJsonObject{{"type", "string"}}}, {"arguments", QJsonObject{{"type", "object"}}}}}, {"required", QJsonArray{"tool_name", "description", "arguments"}}}}}}}},
+        {"required", QJsonArray{"summary", "steps"}}};
 
     QJsonObject payload;
-    if(isOpenAIResponsesMode()) {
+    if (isOpenAIResponsesMode()) {
         payload = QJsonObject{
             {"model", model()},
             {"instructions", systemPrompt},
             {"input", QString::fromUtf8(QJsonDocument(userPayload).toJson(QJsonDocument::Compact))},
-            {"text", QJsonObject{
-                 {"format", QJsonObject{
-                      {"type", "json_schema"},
-                      {"name", "studio_plan"},
-                      {"strict", true},
-                      {"schema", planSchema}
-                  }}
-             }}
-        };
-    } else if(isAnthropicMessagesMode()) {
+            {"text", QJsonObject{{"format", QJsonObject{{"type", "json_schema"}, {"name", "studio_plan"}, {"strict", true}, {"schema", planSchema}}}}}};
+    } else if (isAnthropicMessagesMode()) {
         payload = QJsonObject{
             {"model", model()},
             {"max_tokens", 2000},
             {"system", systemPrompt},
-            {"messages", QJsonArray{
-                QJsonObject{
-                    {"role", "user"},
-                    {"content", QString::fromUtf8(QJsonDocument(userPayload).toJson(QJsonDocument::Compact))}
-                }
-            }}
-        };
+            {"messages", QJsonArray{QJsonObject{{"role", "user"}, {"content", QString::fromUtf8(QJsonDocument(userPayload).toJson(QJsonDocument::Compact))}}}}};
     } else {
         payload = QJsonObject{
             {"model", model()},
             {"temperature", 0.0},
-            {"messages", QJsonArray{
-                QJsonObject{{"role", "system"}, {"content", systemPrompt}},
-                QJsonObject{{"role", "user"}, {"content", QString::fromUtf8(QJsonDocument(userPayload).toJson(QJsonDocument::Compact))}}
-            }}
-        };
+            {"messages", QJsonArray{QJsonObject{{"role", "system"}, {"content", systemPrompt}}, QJsonObject{{"role", "user"}, {"content", QString::fromUtf8(QJsonDocument(userPayload).toJson(QJsonDocument::Compact))}}}}};
     }
 
     QNetworkRequest request{QUrl(endpoint())};
     request.setHeader(QNetworkRequest::ContentTypeHeader, "application/json");
-    if(isAnthropicMessagesMode()) {
+    if (isAnthropicMessagesMode()) {
         request.setRawHeader("x-api-key", apiKey().toUtf8());
         request.setRawHeader("anthropic-version", "2023-06-01");
-    } else if(!apiKey().isEmpty()) {
+    } else if (!apiKey().isEmpty()) {
         request.setRawHeader("Authorization", QString("Bearer %1").arg(apiKey()).toUtf8());
     }
-    if(isGitHubModelsMode()) {
+    if (isGitHubModelsMode()) {
         request.setRawHeader("Accept", "application/vnd.github+json");
         request.setRawHeader("X-GitHub-Api-Version", "2022-11-28");
     }
@@ -441,9 +406,9 @@ LlmPlanResult LlmToolPlanner::plan(const QString& userCommand,
         ? responseDocument.object()
         : QJsonObject();
 
-    if(reply->error() != QNetworkReply::NoError) {
+    if (reply->error() != QNetworkReply::NoError) {
         result.errorMessage = extractApiErrorMessage(responseObject, &result.providerErrorType);
-        if(result.errorMessage.isEmpty()) {
+        if (result.errorMessage.isEmpty()) {
             result.errorMessage = reply->errorString();
         }
         reply->deleteLater();
@@ -452,25 +417,23 @@ LlmPlanResult LlmToolPlanner::plan(const QString& userCommand,
 
     reply->deleteLater();
 
-    if(responseError.error != QJsonParseError::NoError || !responseDocument.isObject()) {
+    if (responseError.error != QJsonParseError::NoError || !responseDocument.isObject()) {
         result.errorMessage = responseError.errorString();
         return result;
     }
 
     result.errorMessage = extractApiErrorMessage(responseObject, &result.providerErrorType);
-    if(!result.errorMessage.isEmpty()) {
+    if (!result.errorMessage.isEmpty()) {
         return result;
     }
 
     const QString responseStatus = responseObject.value("status").toString().trimmed();
-    if(isOpenAIResponsesMode()
-       && !responseStatus.isEmpty()
-       && responseStatus != QLatin1String("completed")) {
+    if (isOpenAIResponsesMode() && !responseStatus.isEmpty() && responseStatus != QLatin1String("completed")) {
         QString statusMessage = QString("OpenAI response status is `%1`.").arg(responseStatus);
         const QJsonObject incompleteDetails = responseObject.value("incomplete_details").toObject();
-        if(!incompleteDetails.isEmpty()) {
+        if (!incompleteDetails.isEmpty()) {
             statusMessage += QString(" Details: %1")
-                .arg(QString::fromUtf8(QJsonDocument(incompleteDetails).toJson(QJsonDocument::Compact)));
+                                 .arg(QString::fromUtf8(QJsonDocument(incompleteDetails).toJson(QJsonDocument::Compact)));
         }
         result.errorMessage = statusMessage;
         return result;
@@ -478,14 +441,14 @@ LlmPlanResult LlmToolPlanner::plan(const QString& userCommand,
 
     const QString contentString = extractContentString(responseObject);
     const QString jsonPayload = extractJsonPayload(contentString);
-    if(jsonPayload.isEmpty()) {
+    if (jsonPayload.isEmpty()) {
         result.errorMessage = "LLM response did not contain a JSON plan.";
         return result;
     }
 
     QJsonParseError planError;
     const QJsonDocument planDocument = QJsonDocument::fromJson(jsonPayload.toUtf8(), &planError);
-    if(planError.error != QJsonParseError::NoError || !planDocument.isObject()) {
+    if (planError.error != QJsonParseError::NoError || !planDocument.isObject()) {
         result.errorMessage = planError.errorString();
         return result;
     }
@@ -493,10 +456,10 @@ LlmPlanResult LlmToolPlanner::plan(const QString& userCommand,
     const QJsonObject planObject = planDocument.object();
     result.summary = planObject.value("summary").toString();
     const QJsonArray steps = planObject.value("steps").toArray();
-    for(const QJsonValue& stepValue : steps) {
+    for (const QJsonValue& stepValue : steps) {
         const QJsonObject step = stepValue.toObject();
         const QString toolName = step.value("tool_name").toString().trimmed();
-        if(toolName.isEmpty()) {
+        if (toolName.isEmpty()) {
             continue;
         }
 
@@ -506,7 +469,7 @@ LlmPlanResult LlmToolPlanner::plan(const QString& userCommand,
     }
 
     result.success = !result.plannedCommands.isEmpty();
-    if(!result.success && result.errorMessage.isEmpty()) {
+    if (!result.success && result.errorMessage.isEmpty()) {
         result.errorMessage = "LLM returned no executable steps.";
     }
 
@@ -541,20 +504,20 @@ bool LlmToolPlanner::isAnthropicMessagesMode() const
 QString LlmToolPlanner::endpoint() const
 {
     const QString resolvedEndpoint = configOrEnv(m_config.endpoint, "MNE_ANALYZE_STUDIO_LLM_ENDPOINT");
-    if(!resolvedEndpoint.isEmpty()) {
+    if (!resolvedEndpoint.isEmpty()) {
         return resolvedEndpoint;
     }
 
-    if(isOpenAIResponsesMode()) {
+    if (isOpenAIResponsesMode()) {
         return QString("https://api.openai.com/v1/responses");
     }
-    if(isGeminiOpenAICompatMode()) {
+    if (isGeminiOpenAICompatMode()) {
         return QString("https://generativelanguage.googleapis.com/v1beta/openai/chat/completions");
     }
-    if(isGitHubModelsMode()) {
+    if (isGitHubModelsMode()) {
         return QString("https://models.inference.ai.azure.com/chat/completions");
     }
-    if(isAnthropicMessagesMode()) {
+    if (isAnthropicMessagesMode()) {
         return QString("https://api.anthropic.com/v1/messages");
     }
 
@@ -573,43 +536,43 @@ QString LlmToolPlanner::model() const
 
 QString LlmToolPlanner::extractApiErrorMessage(const QJsonObject& response, QString* errorType) const
 {
-    if(errorType) {
+    if (errorType) {
         *errorType = QString();
     }
 
     const QJsonObject errorObject = response.value("error").toObject();
-    if(!errorObject.isEmpty()) {
-        if(errorType) {
+    if (!errorObject.isEmpty()) {
+        if (errorType) {
             *errorType = errorObject.value("type").toString().trimmed();
         }
         return errorObject.value("message").toString().trimmed();
     }
 
     const QString refusal = response.value("refusal").toString().trimmed();
-    if(!refusal.isEmpty()) {
-        if(errorType) {
+    if (!refusal.isEmpty()) {
+        if (errorType) {
             *errorType = QString("refusal");
         }
         return refusal;
     }
 
     const QJsonArray output = response.value("output").toArray();
-    for(const QJsonValue& itemValue : output) {
+    for (const QJsonValue& itemValue : output) {
         const QJsonObject item = itemValue.toObject();
         const QString itemType = item.value("type").toString().trimmed();
-        if(itemType == QLatin1String("refusal")) {
-            if(errorType) {
+        if (itemType == QLatin1String("refusal")) {
+            if (errorType) {
                 *errorType = QString("refusal");
             }
             const QJsonArray content = item.value("content").toArray();
-            for(const QJsonValue& contentValue : content) {
+            for (const QJsonValue& contentValue : content) {
                 const QJsonObject contentPart = contentValue.toObject();
                 const QString refusalText = contentPart.value("refusal").toString().trimmed();
-                if(!refusalText.isEmpty()) {
+                if (!refusalText.isEmpty()) {
                     return refusalText;
                 }
                 const QString text = contentPart.value("text").toString().trimmed();
-                if(!text.isEmpty()) {
+                if (!text.isEmpty()) {
                     return text;
                 }
             }
@@ -627,60 +590,60 @@ QString LlmToolPlanner::configOrEnv(const QString& configuredValue, const char* 
 QString LlmToolPlanner::extractContentString(const QJsonObject& response) const
 {
     const QJsonArray anthropicContent = response.value("content").toArray();
-    if(!anthropicContent.isEmpty()) {
+    if (!anthropicContent.isEmpty()) {
         QStringList textParts;
-        for(const QJsonValue& partValue : anthropicContent) {
+        for (const QJsonValue& partValue : anthropicContent) {
             const QJsonObject part = partValue.toObject();
-            if(part.value("type").toString() == QLatin1String("text")) {
+            if (part.value("type").toString() == QLatin1String("text")) {
                 textParts << part.value("text").toString();
             }
         }
-        if(!textParts.isEmpty()) {
+        if (!textParts.isEmpty()) {
             return textParts.join("\n");
         }
     }
 
     const QString outputText = response.value("output_text").toString().trimmed();
-    if(!outputText.isEmpty()) {
+    if (!outputText.isEmpty()) {
         return outputText;
     }
 
     const QJsonArray output = response.value("output").toArray();
-    if(!output.isEmpty()) {
+    if (!output.isEmpty()) {
         QStringList textParts;
-        for(const QJsonValue& itemValue : output) {
+        for (const QJsonValue& itemValue : output) {
             const QJsonObject item = itemValue.toObject();
             const QJsonArray content = item.value("content").toArray();
-            for(const QJsonValue& contentValue : content) {
+            for (const QJsonValue& contentValue : content) {
                 const QJsonObject contentPart = contentValue.toObject();
-                if(contentPart.value("type").toString() == QLatin1String("output_text")) {
+                if (contentPart.value("type").toString() == QLatin1String("output_text")) {
                     textParts << contentPart.value("text").toString();
                 }
             }
         }
 
-        if(!textParts.isEmpty()) {
+        if (!textParts.isEmpty()) {
             return textParts.join("\n");
         }
     }
 
     const QJsonArray choices = response.value("choices").toArray();
-    if(choices.isEmpty()) {
+    if (choices.isEmpty()) {
         return QString();
     }
 
     const QJsonObject message = choices.first().toObject().value("message").toObject();
     const QJsonValue contentValue = message.value("content");
-    if(contentValue.isString()) {
+    if (contentValue.isString()) {
         return contentValue.toString();
     }
 
-    if(contentValue.isArray()) {
+    if (contentValue.isArray()) {
         QStringList textParts;
         const QJsonArray contentParts = contentValue.toArray();
-        for(const QJsonValue& partValue : contentParts) {
+        for (const QJsonValue& partValue : contentParts) {
             const QJsonObject part = partValue.toObject();
-            if(part.value("type").toString() == "text") {
+            if (part.value("type").toString() == "text") {
                 textParts << part.value("text").toString();
             }
         }
@@ -694,7 +657,7 @@ QString LlmToolPlanner::extractJsonPayload(const QString& text) const
 {
     const int firstBrace = text.indexOf('{');
     const int lastBrace = text.lastIndexOf('}');
-    if(firstBrace < 0 || lastBrace <= firstBrace) {
+    if (firstBrace < 0 || lastBrace <= firstBrace) {
         return QString();
     }
 

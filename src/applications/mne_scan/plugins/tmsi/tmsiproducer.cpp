@@ -43,7 +43,7 @@ TMSIProducer::TMSIProducer(TMSI* pTMSI)
 
 TMSIProducer::~TMSIProducer()
 {
-    if(this->isRunning()) {
+    if (this->isRunning()) {
         stop();
     }
 }
@@ -61,15 +61,15 @@ void TMSIProducer::start(int iNumberOfChannels,
                          bool bMeasureImpedance)
 {
     //Initialise device
-    if(m_pTMSIDriver->initDevice(iNumberOfChannels,
-                              iSamplingFrequency,
-                              iSamplesPerBlock,
-                              bUseChExponent,
-                              bUseUnitGain,
-                              bUseUnitOffset,
-                              bWriteDriverDebugToFile,
-                              bUseCommonAverage,
-                              bMeasureImpedance)) {
+    if (m_pTMSIDriver->initDevice(iNumberOfChannels,
+                                  iSamplingFrequency,
+                                  iSamplesPerBlock,
+                                  bUseChExponent,
+                                  bUseUnitGain,
+                                  bUseUnitOffset,
+                                  bWriteDriverDebugToFile,
+                                  bUseCommonAverage,
+                                  bMeasureImpedance)) {
         QThread::start();
     }
 }
@@ -88,9 +88,9 @@ void TMSIProducer::run()
 {
     MatrixXf matData(m_pTMSI->m_iNumberOfChannels, m_pTMSI->m_iSamplesPerBlock);
 
-    while(!isInterruptionRequested()) {
-        if(m_pTMSIDriver->getSampleMatrixValue(matData)) {
-            while(!m_pTMSI->m_pCircularBuffer->push(matData) && !isInterruptionRequested()) {
+    while (!isInterruptionRequested()) {
+        if (m_pTMSIDriver->getSampleMatrixValue(matData)) {
+            while (!m_pTMSI->m_pCircularBuffer->push(matData) && !isInterruptionRequested()) {
                 //Do nothing until the circular buffer is ready to accept new data again
             }
         }

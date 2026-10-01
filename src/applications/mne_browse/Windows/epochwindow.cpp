@@ -37,7 +37,7 @@ using namespace MNEBROWSE;
 
 //=============================================================================================================
 
-EpochWindow::EpochWindow(QWidget *parent)
+EpochWindow::EpochWindow(QWidget* parent)
 : QDockWidget(parent)
 , m_pMainWindow(static_cast<MainWindow*>(parent))
 , m_pEpochModel(new EpochModel(this))
@@ -69,7 +69,7 @@ EpochModel* EpochWindow::getEpochModel() const
 
 void EpochWindow::setRespectAutoRejects(bool enabled)
 {
-    if(!m_pAutoRejectCheckBox) {
+    if (!m_pAutoRejectCheckBox) {
         return;
     }
 
@@ -82,7 +82,7 @@ void EpochWindow::setRespectAutoRejects(bool enabled)
 
 void EpochWindow::refreshFromModel()
 {
-    if(m_pTableView) {
+    if (m_pTableView) {
         m_pTableView->resizeColumnsToContents();
     }
 
@@ -91,13 +91,13 @@ void EpochWindow::refreshFromModel()
 
 //=============================================================================================================
 
-bool EpochWindow::event(QEvent *event)
+bool EpochWindow::event(QEvent* event)
 {
-    if(event->type() == QEvent::KeyPress && m_pTableView && m_pTableView->hasFocus()) {
-        QKeyEvent *keyEvent = static_cast<QKeyEvent*>(event);
-        if(keyEvent->key() == Qt::Key_Space) {
+    if (event->type() == QEvent::KeyPress && m_pTableView && m_pTableView->hasFocus()) {
+        QKeyEvent* keyEvent = static_cast<QKeyEvent*>(event);
+        if (keyEvent->key() == Qt::Key_Space) {
             const QModelIndex current = m_pTableView->currentIndex();
-            if(current.isValid()) {
+            if (current.isValid()) {
                 const QModelIndex checkboxIndex = m_pEpochModel->index(current.row(), 0);
                 const bool checked =
                     m_pEpochModel->data(checkboxIndex, Qt::CheckStateRole).toInt() == Qt::Checked;
@@ -158,7 +158,7 @@ void EpochWindow::initTable()
             this, &EpochWindow::jumpToEpoch);
 
     connect(m_pEpochModel, &EpochModel::epochsChanged, this, [this]() {
-        if(m_pTableView) {
+        if (m_pTableView) {
             m_pTableView->resizeColumnsToContents();
         }
         updateSummary();
@@ -187,7 +187,7 @@ void EpochWindow::initToolBar()
 
 void EpochWindow::updateSummary()
 {
-    if(!m_pSummaryLabel) {
+    if (!m_pSummaryLabel) {
         return;
     }
 
@@ -203,12 +203,11 @@ void EpochWindow::resetManualExclusions()
 
 //=============================================================================================================
 
-void EpochWindow::jumpToEpoch(const QModelIndex &current, const QModelIndex &previous)
+void EpochWindow::jumpToEpoch(const QModelIndex& current, const QModelIndex& previous)
 {
     Q_UNUSED(previous)
 
-    if(!current.isValid() || !m_pMainWindow || !m_pMainWindow->dataWindow()
-       || !m_pMainWindow->dataWindow()->getChannelDataView()) {
+    if (!current.isValid() || !m_pMainWindow || !m_pMainWindow->dataWindow() || !m_pMainWindow->dataWindow()->getChannelDataView()) {
         return;
     }
 

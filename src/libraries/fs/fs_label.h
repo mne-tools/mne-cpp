@@ -55,7 +55,7 @@
 namespace FSLIB
 {
 
-const static Eigen::MatrixX3i defaultTris(0,3);
+const static Eigen::MatrixX3i defaultTris(0, 3);
 
 //=============================================================================================================
 // FORWARD DECLARATIONS
@@ -80,7 +80,7 @@ class FSSHARED_EXPORT FsLabel
 public:
     typedef QSharedPointer<FsLabel> SPtr;            /**< Shared pointer type for FsLabel class. */
     typedef QSharedPointer<const FsLabel> ConstSPtr; /**< Const shared pointer type for FsLabel class. */
-    
+
     //=========================================================================================================
     /**
      * Default constructor
@@ -98,12 +98,12 @@ public:
      * @param[in] p_name         label names.
      * @param[in] p_id           label id (optional, default = -1).
      */
-    FsLabel(const Eigen::VectorXi &p_vertices,
-          const Eigen::MatrixX3f &p_pos,
-          const Eigen::VectorXd &p_values,
-          qint32 p_hemi, const QString &p_name,
-          qint32 p_id = -1);
-    
+    FsLabel(const Eigen::VectorXi& p_vertices,
+            const Eigen::MatrixX3f& p_pos,
+            const Eigen::VectorXd& p_values,
+            qint32 p_hemi, const QString& p_name,
+            qint32 p_id = -1);
+
     //=========================================================================================================
     /**
      * Destroys the FsLabel class.
@@ -132,7 +132,7 @@ public:
      *
      * @return the generated tris.
      */
-    Eigen::MatrixX3i selectTris(const FsSurface & p_Surface);
+    Eigen::MatrixX3i selectTris(const FsSurface& p_Surface);
 
     //=========================================================================================================
     /**
@@ -142,7 +142,7 @@ public:
      *
      * @return the generated tris.
      */
-    Eigen::MatrixX3i selectTris(const Eigen::MatrixX3i &p_matTris);
+    Eigen::MatrixX3i selectTris(const Eigen::MatrixX3i& p_matTris);
 
     //=========================================================================================================
     /**
@@ -157,22 +157,22 @@ public:
      *
      * @return true if successful, false otherwise.
      */
-    static bool read(const QString& p_sFileName, FsLabel &p_Label);
+    static bool read(const QString& p_sFileName, FsLabel& p_Label);
 
 public:
-    QString comment;            /**< Comment from the first line of the label file. */
-    Eigen::VectorXi vertices;   /**< Vertex indices (0 based). */
-    Eigen::MatrixX3f pos;       /**< Locations in meters. */
-    Eigen::VectorXd values;     /**< Values at the vertices. */
-    qint32 hemi;                /**< Hemisphere (lh = 0; rh = 1). */
-//    qint32 hemi;                        /**< Hemisphere (lh = 0; rh = 1; both = 2). */ Don't mix both hemis - KISS principle
-    QString name;               /**< Name of the label. */
-    qint32 label_id;            /**< FsLabel id (optional). */
-//    Eigen::MatrixX3i tris;     /**< Tris for plotting (optional). */
+    QString comment;          /**< Comment from the first line of the label file. */
+    Eigen::VectorXi vertices; /**< Vertex indices (0 based). */
+    Eigen::MatrixX3f pos;     /**< Locations in meters. */
+    Eigen::VectorXd values;   /**< Values at the vertices. */
+    qint32 hemi;              /**< Hemisphere (lh = 0; rh = 1). */
+                              //    qint32 hemi;                        /**< Hemisphere (lh = 0; rh = 1; both = 2). */ Don't mix both hemis - KISS principle
+    QString name;             /**< Name of the label. */
+    qint32 label_id;          /**< FsLabel id (optional). */
+    //    Eigen::MatrixX3i tris;     /**< Tris for plotting (optional). */
 
-//    QMap<qint32, VectorXi> vertices;    /**< Vertex indices (0 based). */
-//    QMap<qint32, Eigen::MatrixX3d> pos;        /**< Locations in meters. */
-//    QMap<qint32, VectorXd> values;      /**< Values at the vertices. */
+    //    QMap<qint32, VectorXi> vertices;    /**< Vertex indices (0 based). */
+    //    QMap<qint32, Eigen::MatrixX3d> pos;        /**< Locations in meters. */
+    //    QMap<qint32, VectorXd> values;      /**< Values at the vertices. */
 };
 
 //=============================================================================================================

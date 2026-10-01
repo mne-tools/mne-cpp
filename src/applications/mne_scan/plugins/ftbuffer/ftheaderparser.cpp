@@ -44,7 +44,7 @@ using FTBUFFERPLUGIN::MetaData;
 void FTBUFFERPLUGIN::parseNeuromagHeader(MetaData& data, QBuffer& neuromagBuffer)
 {
     qint32_be iIntToChar;
-    char cCharFromInt[sizeof (qint32)];
+    char cCharFromInt[sizeof(qint32)];
 
     //Pad buffer because the fiff file we receive is missing an end tag
     iIntToChar = -1;
@@ -59,10 +59,10 @@ void FTBUFFERPLUGIN::parseNeuromagHeader(MetaData& data, QBuffer& neuromagBuffer
     FIFFLIB::FiffStream::SPtr pStream(new FIFFLIB::FiffStream(&neuromagBuffer));
     pStream->setByteOrder(QDataStream::LittleEndian);
 
-    if(pStream->open()){
+    if (pStream->open()) {
         FIFFLIB::FiffInfo FifInfo;
         FIFFLIB::FiffDirNode::SPtr DirNode;
-        if(pStream->read_meas_info(pStream->dirtree(), FifInfo, DirNode)){
+        if (pStream->read_meas_info(pStream->dirtree(), FifInfo, DirNode)) {
             data.setFiffinfo(FifInfo);
         }
     }
@@ -77,7 +77,7 @@ void FTBUFFERPLUGIN::parseIsotrakHeader(MetaData& data, QBuffer& isotrakBuffer)
     FIFFLIB::FiffStream stream(&isotrakBuffer);
     FIFFLIB::FiffDigitizerData digData;
 
-    if(stream.open()){
+    if (stream.open()) {
         stream.read_digitizer_data(stream.dirtree(), digData);
         stream.close();
 
@@ -96,10 +96,10 @@ FtHeaderParser::FtHeaderParser()
 
 //=============================================================================================================
 
-MetaData FtHeaderParser::parseHeader(QBuffer &buffer)
+MetaData FtHeaderParser::parseHeader(QBuffer& buffer)
 {
     MetaData data;
-    while(!buffer.atEnd()){
+    while (!buffer.atEnd()) {
         processChunk(data, buffer);
     }
 
@@ -116,7 +116,7 @@ void FtHeaderParser::registerMembers()
 
 //=============================================================================================================
 
-void FtHeaderParser::processChunk(MetaData& data , QBuffer& buffer)
+void FtHeaderParser::processChunk(MetaData& data, QBuffer& buffer)
 {
     auto chunkType = getChunkType(buffer);
     auto function = functionMap.find(chunkType);
@@ -124,14 +124,14 @@ void FtHeaderParser::processChunk(MetaData& data , QBuffer& buffer)
     QBuffer headerChunk;
     getSingleHeaderChunk(buffer, headerChunk);
 
-    if (function != functionMap.end()){
+    if (function != functionMap.end()) {
         function->second(data, headerChunk);
     }
 }
 
 //=============================================================================================================
 
-void FtHeaderParser::getSingleHeaderChunk(QBuffer &source, QBuffer &dest)
+void FtHeaderParser::getSingleHeaderChunk(QBuffer& source, QBuffer& dest)
 {
     qint32 iSize;
     char cSize[sizeof(qint32)];
@@ -147,7 +147,7 @@ void FtHeaderParser::getSingleHeaderChunk(QBuffer &source, QBuffer &dest)
 
 //=============================================================================================================
 
-HeaderChunk FtHeaderParser::getChunkType(QBuffer &buffer)
+HeaderChunk FtHeaderParser::getChunkType(QBuffer& buffer)
 {
     qint32 iType;
     char cType[sizeof(qint32)];
@@ -158,4 +158,3 @@ HeaderChunk FtHeaderParser::getChunkType(QBuffer &buffer)
     std::cout << "Read header of type" << iType << "\n";
     return static_cast<HeaderChunk>(iType);
 }
-

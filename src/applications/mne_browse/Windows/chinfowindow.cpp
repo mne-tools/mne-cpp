@@ -32,7 +32,7 @@ using namespace MNEBROWSE;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-ChInfoWindow::ChInfoWindow(QWidget *parent)
+ChInfoWindow::ChInfoWindow(QWidget* parent)
 : QDockWidget(parent)
 , ui(new Ui::ChInfoWindow)
 {
@@ -76,6 +76,3 @@ void ChInfoWindow::initTableViews()
     connect(m_pChannelInfoModel.data(), &ChannelInfoModel::dataChanged,
             ui->m_tableView_chInfos, &QTableView::resizeColumnsToContents);
 }
-
-
-

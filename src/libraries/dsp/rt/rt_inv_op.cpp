@@ -46,9 +46,9 @@ using namespace FIFFLIB;
 // DEFINE MEMBER METHODS RtInvOpWorker
 //=============================================================================================================
 
-void RtInvOpWorker::doWork(const RtInvOpInput &inputData)
+void RtInvOpWorker::doWork(const RtInvOpInput& inputData)
 {
-    if(this->thread()->isInterruptionRequested()) {
+    if (this->thread()->isInterruptionRequested()) {
         return;
     }
 
@@ -68,14 +68,14 @@ void RtInvOpWorker::doWork(const RtInvOpInput &inputData)
 // DEFINE MEMBER METHODS RtInvOp
 //=============================================================================================================
 
-RtInvOp::RtInvOp(FiffInfo::SPtr &p_pFiffInfo,
-                 MNEForwardSolution::SPtr &p_pFwd,
-                 QObject *parent)
+RtInvOp::RtInvOp(FiffInfo::SPtr& p_pFiffInfo,
+                 MNEForwardSolution::SPtr& p_pFwd,
+                 QObject* parent)
 : QObject(parent)
 , m_pFiffInfo(p_pFiffInfo)
 , m_pFwd(p_pFwd)
 {
-    RtInvOpWorker *worker = new RtInvOpWorker;
+    RtInvOpWorker* worker = new RtInvOpWorker;
     worker->moveToThread(&m_workerThread);
 
     connect(&m_workerThread, &QThread::finished,
@@ -101,7 +101,7 @@ RtInvOp::~RtInvOp()
 
 //=============================================================================================================
 
-void RtInvOp::append(const FIFFLIB::FiffCov &noiseCov)
+void RtInvOp::append(const FIFFLIB::FiffCov& noiseCov)
 {
     RtInvOpInput inputData;
     inputData.noiseCov = noiseCov;
@@ -131,7 +131,7 @@ void RtInvOp::restart()
 {
     stop();
 
-    RtInvOpWorker *worker = new RtInvOpWorker;
+    RtInvOpWorker* worker = new RtInvOpWorker;
     worker->moveToThread(&m_workerThread);
 
     connect(&m_workerThread, &QThread::finished,

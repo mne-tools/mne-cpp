@@ -37,7 +37,8 @@
 class DISP3DSHARED_EXPORT AbstractTreeItem : public QStandardItem
 {
 public:
-    enum ItemRole {
+    enum ItemRole
+    {
         TypeRole = Qt::UserRole + 100,
         VisibleRole,
         TransformRole,
@@ -45,7 +46,8 @@ public:
         AlphaRole
     };
 
-    enum ItemType {
+    enum ItemType
+    {
         AbstractItem = 0,
         SurfaceItem,
         BemItem,
@@ -61,7 +63,7 @@ public:
         return QStandardItem::UserType + static_cast<int>(type);
     }
 
-    explicit AbstractTreeItem(const QString &text = "", int type = AbstractItem);
+    explicit AbstractTreeItem(const QString& text = "", int type = AbstractItem);
     virtual ~AbstractTreeItem() = default;
 
     int type() const override;
@@ -70,10 +72,10 @@ public:
     void setVisible(bool visible);
     bool isVisible() const;
 
-    void setTransform(const QMatrix4x4 &transform);
+    void setTransform(const QMatrix4x4& transform);
     QMatrix4x4 transform() const;
 
-    void setColor(const QColor &color);
+    void setColor(const QColor& color);
     QColor color() const;
 
     void setAlpha(float alpha);

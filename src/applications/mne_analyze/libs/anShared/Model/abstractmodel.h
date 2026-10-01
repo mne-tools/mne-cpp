@@ -46,7 +46,8 @@
 // DEFINE NAMESPACE ANSHAREDLIB
 //=============================================================================================================
 
-namespace ANSHAREDLIB {
+namespace ANSHAREDLIB
+{
 
 //=============================================================================================================
 // ANSHAREDLIB FORWARD DECLARATIONS
@@ -68,17 +69,21 @@ class ANSHAREDSHARED_EXPORT AbstractModel : public QAbstractItemModel
      * The path has uses the following pattern:
      *   sDirectoryPath/sModelName
      */
-    struct ModelPath {
-        ModelPath() {
+    struct ModelPath
+    {
+        ModelPath()
+        {
             sDirectoryPath = QStringLiteral("");
             sModelName = QStringLiteral("");
         }
 
-        ModelPath(const QString &sCompletePath) {
+        ModelPath(const QString& sCompletePath)
+        {
             setCompleteModelPath(sCompletePath);
         }
 
-        void setCompleteModelPath(const QString &sCompleteModelPath) {
+        void setCompleteModelPath(const QString& sCompleteModelPath)
+        {
             sModelName = sCompleteModelPath.section('/', -1);
             sDirectoryPath = sCompleteModelPath.left(sCompleteModelPath.size() - sModelName.size());
         }
@@ -96,16 +101,20 @@ public:
     /**
      * Constructs a AbstractModel object. Simply pass potential parent object to super class.
      */
-    AbstractModel(QObject *pParent = nullptr)
-    : QAbstractItemModel(pParent) {}
+    AbstractModel(QObject* pParent = nullptr)
+    : QAbstractItemModel(pParent)
+    {
+    }
 
     //=========================================================================================================
     /**
      * Constructs a AbstractModel object. It initializes the model path and passes potential parent object to super class.
      */
-    AbstractModel(const QString &sPath, QObject *pParent = nullptr)
+    AbstractModel(const QString& sPath, QObject* pParent = nullptr)
     : QAbstractItemModel(pParent)
-    , m_modelPath(ModelPath(sPath)) {}
+    , m_modelPath(ModelPath(sPath))
+    {
+    }
 
     //=========================================================================================================
     /**
@@ -133,7 +142,7 @@ public:
     /**
      * Sets a new path for the model.
      */
-    virtual inline void setModelPath(const QString &sNewPath);
+    virtual inline void setModelPath(const QString& sNewPath);
 
     //=========================================================================================================
     /**
@@ -161,17 +170,17 @@ public:
 
     //=========================================================================================================
     // Inherited by QAbstractItemModel:
-    virtual QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const override = 0;
-    virtual Qt::ItemFlags flags(const QModelIndex &index) const override = 0;
-    virtual QModelIndex index(int row, int column, const QModelIndex &parent = QModelIndex()) const override = 0;
-    virtual QModelIndex parent(const QModelIndex &index) const override = 0;
-    virtual int rowCount(const QModelIndex &parent = QModelIndex()) const override = 0;
-    virtual int columnCount(const QModelIndex &parent = QModelIndex()) const override = 0;
+    virtual QVariant data(const QModelIndex& index, int role = Qt::DisplayRole) const override = 0;
+    virtual Qt::ItemFlags flags(const QModelIndex& index) const override = 0;
+    virtual QModelIndex index(int row, int column, const QModelIndex& parent = QModelIndex()) const override = 0;
+    virtual QModelIndex parent(const QModelIndex& index) const override = 0;
+    virtual int rowCount(const QModelIndex& parent = QModelIndex()) const override = 0;
+    virtual int columnCount(const QModelIndex& parent = QModelIndex()) const override = 0;
 
 protected:
-    ModelPath                   m_modelPath;                /**< Path to model data in file structure. */
+    ModelPath m_modelPath; /**< Path to model data in file structure. */
 
-    bool                        m_bIsInit = false;          /**< Whether the model has been initialized. */
+    bool m_bIsInit = false; /**< Whether the model has been initialized. */
 };
 
 //=============================================================================================================
@@ -185,7 +194,7 @@ QString AbstractModel::getModelPath() const
 
 //=============================================================================================================
 
-void AbstractModel::setModelPath(const QString &sNewPath)
+void AbstractModel::setModelPath(const QString& sNewPath)
 {
     m_modelPath.setCompleteModelPath(sNewPath);
 }

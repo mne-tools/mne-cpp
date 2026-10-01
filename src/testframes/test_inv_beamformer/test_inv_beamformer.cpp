@@ -70,11 +70,11 @@ class TestInvBeamformer : public QObject
     Q_OBJECT
 
 private:
-    QString            m_sDataPath;   /**< Path to the test data directory. */
-    MNEForwardSolution m_fwd;         /**< Forward solution loaded for data-driven tests. */
-    FiffCov            m_noiseCov;    /**< Noise covariance matrix loaded for data-driven tests. */
-    FiffInfo           m_info;        /**< Measurement info loaded from the raw file. */
-    bool               m_bDataLoaded; /**< True if all required test data was successfully loaded. */
+    QString m_sDataPath;      /**< Path to the test data directory. */
+    MNEForwardSolution m_fwd; /**< Forward solution loaded for data-driven tests. */
+    FiffCov m_noiseCov;       /**< Noise covariance matrix loaded for data-driven tests. */
+    FiffInfo m_info;          /**< Measurement info loaded from the raw file. */
+    bool m_bDataLoaded;       /**< True if all required test data was successfully loaded. */
 
     //=========================================================================================================
     /**
@@ -82,7 +82,10 @@ private:
      *
      * @return true if test data is available, false otherwise.
      */
-    bool hasData() const { return m_bDataLoaded; }
+    bool hasData() const
+    {
+        return m_bDataLoaded;
+    }
 
 private slots:
 
@@ -196,8 +199,7 @@ void TestInvBeamformer::initTestCase()
 {
     qInstallMessageHandler(MNELogger::customLogWriter);
     m_bDataLoaded = false;
-    QString base = QCoreApplication::applicationDirPath()
-                   + "/../resources/data/mne-cpp-test-data";
+    QString base = QCoreApplication::applicationDirPath() + "/../resources/data/mne-cpp-test-data";
     if (!QFile::exists(base + "/MEG/sample/sample_audvis_trunc_raw.fif")) {
         qWarning() << "Test data not found at" << base;
         return;
@@ -222,24 +224,20 @@ void TestInvBeamformer::initTestCase()
 
 //=============================================================================================================
 
-void TestInvBeamformer::cleanupTestCase() {}
+void TestInvBeamformer::cleanupTestCase()
+{
+}
 
 //=============================================================================================================
 
 void TestInvBeamformer::beamformerSettings_enums()
 {
-    QVERIFY(static_cast<int>(BeamformerWeightNorm::None)
-          != static_cast<int>(BeamformerWeightNorm::UnitNoiseGain));
-    QVERIFY(static_cast<int>(BeamformerWeightNorm::UnitNoiseGain)
-          != static_cast<int>(BeamformerWeightNorm::NAI));
-    QVERIFY(static_cast<int>(BeamformerPickOri::None)
-          != static_cast<int>(BeamformerPickOri::Normal));
-    QVERIFY(static_cast<int>(BeamformerPickOri::Normal)
-          != static_cast<int>(BeamformerPickOri::MaxPower));
-    QVERIFY(static_cast<int>(BeamformerPickOri::MaxPower)
-          != static_cast<int>(BeamformerPickOri::Vector));
-    QVERIFY(static_cast<int>(BeamformerInversion::Matrix)
-          != static_cast<int>(BeamformerInversion::Single));
+    QVERIFY(static_cast<int>(BeamformerWeightNorm::None) != static_cast<int>(BeamformerWeightNorm::UnitNoiseGain));
+    QVERIFY(static_cast<int>(BeamformerWeightNorm::UnitNoiseGain) != static_cast<int>(BeamformerWeightNorm::NAI));
+    QVERIFY(static_cast<int>(BeamformerPickOri::None) != static_cast<int>(BeamformerPickOri::Normal));
+    QVERIFY(static_cast<int>(BeamformerPickOri::Normal) != static_cast<int>(BeamformerPickOri::MaxPower));
+    QVERIFY(static_cast<int>(BeamformerPickOri::MaxPower) != static_cast<int>(BeamformerPickOri::Vector));
+    QVERIFY(static_cast<int>(BeamformerInversion::Matrix) != static_cast<int>(BeamformerInversion::Single));
 }
 
 //=============================================================================================================
@@ -276,9 +274,9 @@ void TestInvBeamformer::beamformerCompute_symMatPow_diagonal()
     D(2, 2) = 16.0;
     // D^(-0.5) = diag(1/2, 1/3, 1/4)
     MatrixXd result = InvBeamformerCompute::symMatPow(D, -0.5);
-    QVERIFY(qAbs(result(0, 0) - 0.5)     < 1e-10);
-    QVERIFY(qAbs(result(1, 1) - 1.0/3.0) < 1e-10);
-    QVERIFY(qAbs(result(2, 2) - 0.25)    < 1e-10);
+    QVERIFY(qAbs(result(0, 0) - 0.5) < 1e-10);
+    QVERIFY(qAbs(result(1, 1) - 1.0 / 3.0) < 1e-10);
+    QVERIFY(qAbs(result(2, 2) - 0.25) < 1e-10);
     QVERIFY(qAbs(result(0, 1)) < 1e-10);
     QVERIFY(qAbs(result(0, 2)) < 1e-10);
     QVERIFY(qAbs(result(1, 2)) < 1e-10);
@@ -303,7 +301,7 @@ void TestInvBeamformer::beamformerCompute_computePower()
 {
     MatrixXd W(2, 3);
     W << 1.0, 0.0, 0.0,
-         0.0, 1.0, 0.0;
+        0.0, 1.0, 0.0;
     MatrixXd Cm = MatrixXd::Identity(3, 3);
     Cm(0, 0) = 4.0;
     Cm(1, 1) = 9.0;
@@ -318,19 +316,19 @@ void TestInvBeamformer::beamformerCompute_computePower()
 
 void TestInvBeamformer::beamformerCompute_synthetic()
 {
-    const int nChan   = 4;
-    const int nSrc    = 2;
+    const int nChan = 4;
+    const int nSrc = 2;
     const int nOrient = 1;
     MatrixXd G(nChan, nSrc * nOrient);
     G << 1.0, 0.5,
-         0.3, 1.2,
-         0.7, 0.1,
-         0.2, 0.8;
+        0.3, 1.2,
+        0.7, 0.1,
+        0.2, 0.8;
     MatrixXd Cm = G * G.transpose() + 0.1 * MatrixXd::Identity(nChan, nChan);
     MatrixX3d nn = MatrixX3d::Zero(nSrc, 3);
     nn(0, 2) = 1.0;
     nn(1, 2) = 1.0;
-    MatrixXd  W;
+    MatrixXd W;
     MatrixX3d mpOri;
     bool ok = InvBeamformerCompute::computeBeamformer(
         G, Cm, 0.05, nOrient,
@@ -353,15 +351,15 @@ void TestInvBeamformer::beamformerCompute_synthetic()
 
 void TestInvBeamformer::beamformerCompute_freeOrient()
 {
-    const int nChan   = 5;
-    const int nSrc    = 2;
+    const int nChan = 5;
+    const int nSrc = 2;
     const int nOrient = 3;
     MatrixXd G = MatrixXd::Random(nChan, nSrc * nOrient);
     MatrixXd Cm = G * G.transpose() + 0.1 * MatrixXd::Identity(nChan, nChan);
     MatrixX3d nn = MatrixX3d::Zero(nSrc, 3);
     nn(0, 2) = 1.0;
     nn(1, 0) = 1.0;
-    MatrixXd  W;
+    MatrixXd W;
     MatrixX3d mpOri;
     bool ok = InvBeamformerCompute::computeBeamformer(
         G, Cm, 0.05, nOrient,
@@ -385,10 +383,12 @@ void TestInvBeamformer::beamformerCompute_freeOrient()
 
 void TestInvBeamformer::lcmv_makeAndApply()
 {
-    if (!hasData()) QSKIP("Required data not loaded");
+    if (!hasData())
+        QSKIP("Required data not loaded");
     QString evkPath = m_sDataPath + "/MEG/sample/sample_audvis-ave.fif";
     QFile evkFile(evkPath);
-    if (!evkFile.exists()) QSKIP("Evoked file not found");
+    if (!evkFile.exists())
+        QSKIP("Evoked file not found");
     QPair<float, float> noBaseline(-1.0f, -1.0f);
     FiffEvoked evoked(evkFile, 0, noBaseline);
     QVERIFY(evoked.data.rows() > 0);
@@ -416,7 +416,8 @@ void TestInvBeamformer::lcmv_makeAndApply()
 
 void TestInvBeamformer::lcmv_noNoiseCov()
 {
-    if (!hasData()) QSKIP("Required data not loaded");
+    if (!hasData())
+        QSKIP("Required data not loaded");
     InvBeamformer filters = InvLCMV::makeLCMV(
         m_info, m_fwd, m_noiseCov, 0.05, FiffCov(),
         BeamformerPickOri::None,
@@ -430,12 +431,14 @@ void TestInvBeamformer::lcmv_noNoiseCov()
 
 void TestInvBeamformer::lcmv_applyLCMVCov()
 {
-    if (!hasData()) QSKIP("Required data not loaded");
+    if (!hasData())
+        QSKIP("Required data not loaded");
     InvBeamformer filters = InvLCMV::makeLCMV(
         m_info, m_fwd, m_noiseCov, 0.05, m_noiseCov,
         BeamformerPickOri::None,
         BeamformerWeightNorm::UnitNoiseGain);
-    if (!filters.isValid()) QSKIP("Failed to compute LCMV filters");
+    if (!filters.isValid())
+        QSKIP("Failed to compute LCMV filters");
     InvSourceEstimate stcPower = InvLCMV::applyLCMVCov(m_noiseCov, filters);
     QVERIFY(!stcPower.isEmpty());
     QVERIFY(stcPower.data.rows() > 0);
@@ -451,7 +454,8 @@ void TestInvBeamformer::lcmv_applyLCMVCov()
 
 void TestInvBeamformer::dics_makeAndApplyCsd()
 {
-    if (!hasData()) QSKIP("Required data not loaded");
+    if (!hasData())
+        QSKIP("Required data not loaded");
     std::vector<MatrixXd> csdMatrices;
     csdMatrices.push_back(m_noiseCov.data);
     VectorXd frequencies(1);
@@ -481,7 +485,8 @@ void TestInvBeamformer::dics_makeAndApplyCsd()
 
 void TestInvBeamformer::dics_multiFreq()
 {
-    if (!hasData()) QSKIP("Required data not loaded");
+    if (!hasData())
+        QSKIP("Required data not loaded");
     std::vector<MatrixXd> csdMatrices;
     csdMatrices.push_back(m_noiseCov.data);
     csdMatrices.push_back(m_noiseCov.data * 2.0);

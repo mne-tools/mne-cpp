@@ -41,7 +41,7 @@ using namespace MNELIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-BemDataModel::BemDataModel(QObject *pParent)
+BemDataModel::BemDataModel(QObject* pParent)
 : AbstractModel(pParent)
 {
     qInfo() << "[BemDataModel::BemDataModel] Default constructor called !";
@@ -49,13 +49,13 @@ BemDataModel::BemDataModel(QObject *pParent)
 
 //=============================================================================================================
 
-BemDataModel::BemDataModel(const QString &sFilePath,
+BemDataModel::BemDataModel(const QString& sFilePath,
                            const QByteArray& byteLoadedData,
-                           QObject *pParent)
+                           QObject* pParent)
 : AbstractModel(sFilePath, pParent)
 , m_pBem(MNEBem::SPtr::create())
 {
-    if(byteLoadedData.isEmpty()) {
+    if (byteLoadedData.isEmpty()) {
         m_file.setFileName(sFilePath);
         initBemData(m_file);
     } else {
@@ -69,7 +69,6 @@ BemDataModel::BemDataModel(const QString &sFilePath,
 
 BemDataModel::~BemDataModel()
 {
-
 }
 
 //=============================================================================================================
@@ -79,7 +78,7 @@ void BemDataModel::initBemData(QIODevice& qIODevice)
     // build Bem
     m_pBem = MNEBem::SPtr::create(qIODevice);
 
-    if(m_pBem->isEmpty()) {
+    if (m_pBem->isEmpty()) {
         qWarning() << "[BemDataModel::initBemData] File does not contain any Bem data";
         return;
     }
@@ -93,7 +92,7 @@ void BemDataModel::initBemData(QIODevice& qIODevice)
 
 //=============================================================================================================
 
-QVariant BemDataModel::data([[maybe_unused]] const QModelIndex &index,
+QVariant BemDataModel::data([[maybe_unused]] const QModelIndex& index,
                             [[maybe_unused]] int role) const
 {
     return QVariant();
@@ -101,7 +100,7 @@ QVariant BemDataModel::data([[maybe_unused]] const QModelIndex &index,
 
 //=============================================================================================================
 
-Qt::ItemFlags BemDataModel::flags(const QModelIndex &index) const
+Qt::ItemFlags BemDataModel::flags(const QModelIndex& index) const
 {
     return QAbstractItemModel::flags(index);
 }
@@ -110,7 +109,7 @@ Qt::ItemFlags BemDataModel::flags(const QModelIndex &index) const
 
 QModelIndex BemDataModel::index(int row,
                                 int column,
-                                const QModelIndex &parent) const
+                                const QModelIndex& parent) const
 {
     Q_UNUSED(parent);
     return createIndex(row, column);
@@ -118,7 +117,7 @@ QModelIndex BemDataModel::index(int row,
 
 //=============================================================================================================
 
-QModelIndex BemDataModel::parent(const QModelIndex &index) const
+QModelIndex BemDataModel::parent(const QModelIndex& index) const
 {
     Q_UNUSED(index);
     return QModelIndex();
@@ -126,7 +125,7 @@ QModelIndex BemDataModel::parent(const QModelIndex &index) const
 
 //=============================================================================================================
 
-int BemDataModel::rowCount(const QModelIndex &parent) const
+int BemDataModel::rowCount(const QModelIndex& parent) const
 {
     Q_UNUSED(parent);
     return 0;
@@ -134,7 +133,7 @@ int BemDataModel::rowCount(const QModelIndex &parent) const
 
 //=============================================================================================================
 
-int BemDataModel::columnCount(const QModelIndex &parent) const
+int BemDataModel::columnCount(const QModelIndex& parent) const
 {
     Q_UNUSED(parent);
     return 0;

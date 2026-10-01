@@ -45,8 +45,9 @@
 
 class QCheckBox;
 
-namespace FIFFLIB {
-    class FiffCtfComp;
+namespace FIFFLIB
+{
+class FiffCtfComp;
 }
 
 //=============================================================================================================
@@ -73,8 +74,8 @@ class DISPSHARED_EXPORT CompensatorView : public AbstractView
     Q_OBJECT
 
 public:
-    typedef QSharedPointer<CompensatorView> SPtr;              /**< Shared pointer type for CompensatorView. */
-    typedef QSharedPointer<const CompensatorView> ConstSPtr;   /**< Const shared pointer type for CompensatorView. */
+    typedef QSharedPointer<CompensatorView> SPtr;            /**< Shared pointer type for CompensatorView. */
+    typedef QSharedPointer<const CompensatorView> ConstSPtr; /**< Const shared pointer type for CompensatorView. */
 
     //=========================================================================================================
     /**
@@ -85,7 +86,7 @@ public:
      * @param[in] f Qt window flags passed to the QWidget constructor.
      */
     CompensatorView(const QString& sSettingsPath = "",
-                    QWidget *parent = 0,
+                    QWidget* parent = 0,
                     Qt::WindowFlags f = Qt::Widget);
 
     //=========================================================================================================
@@ -165,15 +166,15 @@ protected:
      */
     void onCheckCompStatusChanged();
 
-    QList<QCheckBox*>                                   m_qListCompCheckBox;            /**< List of compensator CheckBox. */
+    QList<QCheckBox*> m_qListCompCheckBox; /**< List of compensator CheckBox. */
 
-    QList<FIFFLIB::FiffCtfComp>                         m_pComps;                       /**< The current compensators. */
+    QList<FIFFLIB::FiffCtfComp> m_pComps; /**< The current compensators. */
 
-    QString                                             m_sSettingsPath;                /**< The settings path to store the GUI settings to. */
+    QString m_sSettingsPath; /**< The settings path to store the GUI settings to. */
 
-    int                                                 m_iLastTo;
+    int m_iLastTo;
 
-    QMap<int,bool>                                      m_mapCompActive;
+    QMap<int, bool> m_mapCompActive;
 
 signals:
     //=========================================================================================================

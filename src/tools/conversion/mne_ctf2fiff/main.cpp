@@ -57,52 +57,55 @@ using namespace Eigen;
 #define PROGRAM_VERSION MNE_CPP_VERSION
 
 // CTF sensor types (from res4 file)
-#define CTF_SEN_TYPE_MEG        5     // MEG magnetometer/gradiometer
-#define CTF_SEN_TYPE_REF_MAG    0     // Reference magnetometer
-#define CTF_SEN_TYPE_REF_GRAD   1     // Reference gradiometer
-#define CTF_SEN_TYPE_EEG        9     // EEG channel
-#define CTF_SEN_TYPE_STIM      11     // Stimulus/trigger
-#define CTF_SEN_TYPE_ADC       18     // ADC channel
-#define CTF_SEN_TYPE_DAC       17     // DAC channel
+#define CTF_SEN_TYPE_MEG 5      // MEG magnetometer/gradiometer
+#define CTF_SEN_TYPE_REF_MAG 0  // Reference magnetometer
+#define CTF_SEN_TYPE_REF_GRAD 1 // Reference gradiometer
+#define CTF_SEN_TYPE_EEG 9      // EEG channel
+#define CTF_SEN_TYPE_STIM 11    // Stimulus/trigger
+#define CTF_SEN_TYPE_ADC 18     // ADC channel
+#define CTF_SEN_TYPE_DAC 17     // DAC channel
 
 // CTF res4 structure sizes
-#define CTF_RES4_HEADER_SIZE    1844
-#define CTF_SENSOR_RECORD_SIZE  1328
-#define CTF_SENSOR_NAME_SIZE    32
-#define CTF_MAX_COILS           8
-#define CTF_COIL_POS_SIZE       56    // 7 doubles per coil
+#define CTF_RES4_HEADER_SIZE 1844
+#define CTF_SENSOR_RECORD_SIZE 1328
+#define CTF_SENSOR_NAME_SIZE 32
+#define CTF_MAX_COILS 8
+#define CTF_COIL_POS_SIZE 56 // 7 doubles per coil
 
 //=============================================================================================================
 // CTF data structures
 //=============================================================================================================
 
-struct CtfCoilPos {
-    double x, y, z;            // position in m
-    double ox, oy, oz;         // orientation
-    double area;               // coil area in m^2
+struct CtfCoilPos
+{
+    double x, y, z;    // position in m
+    double ox, oy, oz; // orientation
+    double area;       // coil area in m^2
 };
 
-struct CtfSensorInfo {
+struct CtfSensorInfo
+{
     char name[CTF_SENSOR_NAME_SIZE];
     int sensorType;
     int nCoils;
     CtfCoilPos coils[CTF_MAX_COILS];
-    double properGain;         // sensor gain
-    double qGain;              // electronics gain
-    double ioGain;             // I/O unit gain
+    double properGain; // sensor gain
+    double qGain;      // electronics gain
+    double ioGain;     // I/O unit gain
     double ioOffset;
 };
 
-struct CtfDatasetInfo {
+struct CtfDatasetInfo
+{
     QString dsPath;
     QString res4Path;
     QString meg4Path;
 
     int nChannels;
-    int nSamples;              // total samples per channel per trial
+    int nSamples; // total samples per channel per trial
     int nTrials;
     double sfreq;
-    int dataFormat;            // 1=short, 4=int, 8=double
+    int dataFormat; // 1=short, 4=int, 8=double
 
     QList<CtfSensorInfo> sensors;
 };
@@ -111,14 +114,14 @@ struct CtfDatasetInfo {
 // Read big-endian integers/doubles from QDataStream
 //=============================================================================================================
 
-static qint32 readInt32BE(QDataStream &ds)
+static qint32 readInt32BE(QDataStream& ds)
 {
     qint32 val;
     ds >> val;
     return val;
 }
 
-static double readFloat64BE(QDataStream &ds)
+static double readFloat64BE(QDataStream& ds)
 {
     double val;
     ds >> val;
@@ -129,7 +132,7 @@ static double readFloat64BE(QDataStream &ds)
 // Parse CTF res4 header
 //=============================================================================================================
 
-static bool parseRes4(CtfDatasetInfo &info)
+static bool parseRes4(CtfDatasetInfo& info)
 {
     QFile file(info.res4Path);
     if (!file.open(QIODevice::ReadOnly)) {
@@ -144,7 +147,7 @@ static bool parseRes4(CtfDatasetInfo &info)
     // Skip header identifier (8 bytes: "MEG41RS" or "MEG42RS")
     char headerTag[9] = {0};
     ds.readRawData(headerTag, 8);
-    qInfo("Res4 tag: %s" , headerTag);
+    qInfo("Res4 tag: %s", headerTag);
 
     // Skip appName (256 bytes), DataOrigin (256 bytes), DataDescription (256 bytes)
     ds.skipRawData(256 + 256 + 256);
@@ -188,8 +191,8 @@ static bool parseRes4(CtfDatasetInfo &info)
             info.nSamples = static_cast<int>(epochTime * info.sfreq);
     }
 
-    qInfo("Res4: %d channels, %d samples/trial, %d trials, %.1f Hz" ,
-           info.nChannels, info.nSamples, info.nTrials, info.sfreq);
+    qInfo("Res4: %d channels, %d samples/trial, %d trials, %.1f Hz",
+          info.nChannels, info.nSamples, info.nTrials, info.sfreq);
 
     // Seek to sensor records (at fixed offset after general header)
     file.seek(CTF_RES4_HEADER_SIZE);
@@ -254,7 +257,7 @@ static bool parseRes4(CtfDatasetInfo &info)
 // Read CTF meg4 data
 //=============================================================================================================
 
-static bool readMeg4Data(const CtfDatasetInfo &info, MatrixXd &data)
+static bool readMeg4Data(const CtfDatasetInfo& info, MatrixXd& data)
 {
     QFile file(info.meg4Path);
     if (!file.open(QIODevice::ReadOnly)) {
@@ -279,7 +282,7 @@ static bool readMeg4Data(const CtfDatasetInfo &info, MatrixXd &data)
         // Data is stored channel-major within each trial
         for (int c = 0; c < nChan; ++c) {
             double gainFactor = 1.0;
-            const CtfSensorInfo &sen = info.sensors[c];
+            const CtfSensorInfo& sen = info.sensors[c];
 
             // Total gain: properGain * qGain * ioGain
             if (sen.properGain != 0.0 && sen.qGain != 0.0 && sen.ioGain != 0.0)
@@ -297,7 +300,7 @@ static bool readMeg4Data(const CtfDatasetInfo &info, MatrixXd &data)
     }
 
     file.close();
-    qInfo("Read %d channels x %d samples" , nChan, totalSamples);
+    qInfo("Read %d channels x %d samples", nChan, totalSamples);
     return true;
 }
 
@@ -305,50 +308,50 @@ static bool readMeg4Data(const CtfDatasetInfo &info, MatrixXd &data)
 // Map CTF sensor type to FIFF channel kind
 //=============================================================================================================
 
-static void mapCtfToFiff(const CtfSensorInfo &sen, FiffChInfo &ch)
+static void mapCtfToFiff(const CtfSensorInfo& sen, FiffChInfo& ch)
 {
     ch.ch_name = QString::fromLatin1(sen.name, static_cast<int>(strnlen(sen.name, CTF_SENSOR_NAME_SIZE)));
 
     switch (sen.sensorType) {
-    case CTF_SEN_TYPE_MEG:
-        ch.kind = FIFFV_MEG_CH;
-        // CTF axial gradiometers have 2 coils, magnetometers have 1
-        if (sen.nCoils >= 2)
-            ch.chpos.coil_type = FIFFV_COIL_CTF_GRAD;
-        else
+        case CTF_SEN_TYPE_MEG:
+            ch.kind = FIFFV_MEG_CH;
+            // CTF axial gradiometers have 2 coils, magnetometers have 1
+            if (sen.nCoils >= 2)
+                ch.chpos.coil_type = FIFFV_COIL_CTF_GRAD;
+            else
+                ch.chpos.coil_type = FIFFV_COIL_CTF_REF_MAG;
+            ch.unit = FIFF_UNIT_T;
+            break;
+
+        case CTF_SEN_TYPE_REF_MAG:
+            ch.kind = FIFFV_REF_MEG_CH;
             ch.chpos.coil_type = FIFFV_COIL_CTF_REF_MAG;
-        ch.unit = FIFF_UNIT_T;
-        break;
+            ch.unit = FIFF_UNIT_T;
+            break;
 
-    case CTF_SEN_TYPE_REF_MAG:
-        ch.kind = FIFFV_REF_MEG_CH;
-        ch.chpos.coil_type = FIFFV_COIL_CTF_REF_MAG;
-        ch.unit = FIFF_UNIT_T;
-        break;
+        case CTF_SEN_TYPE_REF_GRAD:
+            ch.kind = FIFFV_REF_MEG_CH;
+            ch.chpos.coil_type = FIFFV_COIL_CTF_REF_GRAD;
+            ch.unit = FIFF_UNIT_T;
+            break;
 
-    case CTF_SEN_TYPE_REF_GRAD:
-        ch.kind = FIFFV_REF_MEG_CH;
-        ch.chpos.coil_type = FIFFV_COIL_CTF_REF_GRAD;
-        ch.unit = FIFF_UNIT_T;
-        break;
+        case CTF_SEN_TYPE_EEG:
+            ch.kind = FIFFV_EEG_CH;
+            ch.chpos.coil_type = FIFFV_COIL_EEG;
+            ch.unit = FIFF_UNIT_V;
+            break;
 
-    case CTF_SEN_TYPE_EEG:
-        ch.kind = FIFFV_EEG_CH;
-        ch.chpos.coil_type = FIFFV_COIL_EEG;
-        ch.unit = FIFF_UNIT_V;
-        break;
+        case CTF_SEN_TYPE_STIM:
+            ch.kind = FIFFV_STIM_CH;
+            ch.chpos.coil_type = FIFFV_COIL_NONE;
+            ch.unit = FIFF_UNIT_V;
+            break;
 
-    case CTF_SEN_TYPE_STIM:
-        ch.kind = FIFFV_STIM_CH;
-        ch.chpos.coil_type = FIFFV_COIL_NONE;
-        ch.unit = FIFF_UNIT_V;
-        break;
-
-    default:
-        ch.kind = FIFFV_MISC_CH;
-        ch.chpos.coil_type = FIFFV_COIL_NONE;
-        ch.unit = FIFF_UNIT_V;
-        break;
+        default:
+            ch.kind = FIFFV_MISC_CH;
+            ch.chpos.coil_type = FIFFV_COIL_NONE;
+            ch.unit = FIFF_UNIT_V;
+            break;
     }
 
     // Set coil location from first coil
@@ -369,7 +372,7 @@ static void mapCtfToFiff(const CtfSensorInfo &sen, FiffChInfo &ch)
 
 //=============================================================================================================
 
-int main(int argc, char *argv[])
+int main(int argc, char* argv[])
 {
     qInstallMessageHandler(MNELogger::customLogWriter);
     QCoreApplication app(argc, argv);
@@ -392,8 +395,14 @@ int main(int argc, char *argv[])
     QString dsPath = parser.value(dsOpt);
     QString outFile = parser.value(outOpt);
 
-    if (dsPath.isEmpty()) { qCritical("--ds is required."); return 1; }
-    if (outFile.isEmpty()) { qCritical("--out is required."); return 1; }
+    if (dsPath.isEmpty()) {
+        qCritical("--ds is required.");
+        return 1;
+    }
+    if (outFile.isEmpty()) {
+        qCritical("--out is required.");
+        return 1;
+    }
 
     // Locate res4 and meg4 files in .ds directory
     QDir dsDir(dsPath);
@@ -421,9 +430,9 @@ int main(int argc, char *argv[])
     }
     info.meg4Path = dsDir.filePath(meg4Files.first());
 
-    qInfo("CTF dataset: %s" , qPrintable(dsPath));
-    qInfo("  res4: %s" , qPrintable(info.res4Path));
-    qInfo("  meg4: %s" , qPrintable(info.meg4Path));
+    qInfo("CTF dataset: %s", qPrintable(dsPath));
+    qInfo("  res4: %s", qPrintable(info.res4Path));
+    qInfo("  meg4: %s", qPrintable(info.meg4Path));
 
     // Parse res4 header
     if (!parseRes4(info))
@@ -439,7 +448,8 @@ int main(int argc, char *argv[])
     FiffInfo fiffInfo;
     fiffInfo.sfreq = info.sfreq;
     fiffInfo.nchan = nChan;
-    fiffInfo.meas_date[0] = static_cast<fiff_int_t>(QDateTime::currentDateTime().toSecsSinceEpoch()); fiffInfo.meas_date[1] = 0;
+    fiffInfo.meas_date[0] = static_cast<fiff_int_t>(QDateTime::currentDateTime().toSecsSinceEpoch());
+    fiffInfo.meas_date[1] = 0;
 
     // Set coordinate transform (CTF device -> head, identity for now)
     FiffCoordTrans devHeadTrans;
@@ -476,8 +486,8 @@ int main(int argc, char *argv[])
     }
 
     stream->finish_writing_raw();
-    qInfo("Written FIFF: %s (%d channels, %d samples, %.1f Hz)" ,
-           qPrintable(outFile), nChan, nSamples, info.sfreq);
+    qInfo("Written FIFF: %s (%d channels, %d samples, %.1f Hz)",
+          qPrintable(outFile), nChan, nSamples, info.sfreq);
 
     return 0;
 }

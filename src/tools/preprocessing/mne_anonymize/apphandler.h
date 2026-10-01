@@ -40,7 +40,8 @@
 // DEFINE NAMESPACE MNEANONYMIZE
 //=============================================================================================================
 
-namespace MNEANONYMIZE {
+namespace MNEANONYMIZE
+{
 
 //=============================================================================================================
 // MNEANONYMIZE FORWARD DECLARATIONS
@@ -55,7 +56,6 @@ namespace MNEANONYMIZE {
  */
 class AppHandler
 {
-
 public:
     typedef QSharedPointer<AppHandler> SPtr;            /**< Shared pointer type for AppHandler. */
     typedef QSharedPointer<const AppHandler> ConstSPtr; /**< Const shared pointer type for AppHandler. */
@@ -83,7 +83,7 @@ public:
      *
      * @return Pointer to a QCoreApplication.
      */
-    QCoreApplication* createApplication(int& argc, char * argv[]);
+    QCoreApplication* createApplication(int& argc, char* argv[]);
 
     //=========================================================================================================
     /**
@@ -104,11 +104,8 @@ public:
     SettingsControllerCl* createController(const QStringList& args);
 
 protected:
-
 private:
-
-bool m_bGuiMode;  /**< GUI based app, or a command line one.*/
-
+    bool m_bGuiMode; /**< GUI based app, or a command line one.*/
 };
 
 //=============================================================================================================

@@ -183,9 +183,9 @@ void TestToolPreprocHelpers::testProcrustesIdentity()
 {
     MatrixX3f src(4, 3);
     src << 1, 0, 0,
-           0, 1, 0,
-           0, 0, 1,
-           1, 1, 1;
+        0, 1, 0,
+        0, 0, 1,
+        1, 1, 1;
 
     Matrix4f T = procrustes(src, src);
     // Should be identity
@@ -198,8 +198,8 @@ void TestToolPreprocHelpers::testProcrustesTranslation()
 {
     MatrixX3f src(3, 3);
     src << 0, 0, 0,
-           1, 0, 0,
-           0, 1, 0;
+        1, 0, 0,
+        0, 1, 0;
 
     Vector3f offset(5.0f, 10.0f, 15.0f);
     MatrixX3f tgt = src.rowwise() + offset.transpose();
@@ -216,13 +216,13 @@ void TestToolPreprocHelpers::testProcrustesRotation()
     // 90 degree rotation about Z axis
     MatrixX3f src(3, 3);
     src << 1, 0, 0,
-           0, 1, 0,
-           0, 0, 1;
+        0, 1, 0,
+        0, 0, 1;
 
     MatrixX3f tgt(3, 3);
     tgt << 0, 1, 0,
-          -1, 0, 0,
-           0, 0, 1;
+        -1, 0, 0,
+        0, 0, 1;
 
     Matrix4f T = procrustes(src, tgt);
 
@@ -239,15 +239,15 @@ void TestToolPreprocHelpers::testProcrustesOrthogonal()
     // Result rotation matrix should be orthogonal (R^T * R = I)
     MatrixX3f src(4, 3);
     src << 1, 0, 0,
-           0, 2, 0,
-           0, 0, 3,
-           1, 1, 1;
+        0, 2, 0,
+        0, 0, 3,
+        1, 1, 1;
 
     MatrixX3f tgt(4, 3);
     tgt << 0, 1, 0,
-          -2, 0, 0,
-           0, 0, 3,
-          -1, 1, 1;
+        -2, 0, 0,
+        0, 0, 3,
+        -1, 1, 1;
 
     Matrix4f T = procrustes(src, tgt);
     Matrix3f R = T.block<3, 3>(0, 0);
@@ -411,7 +411,7 @@ void TestToolPreprocHelpers::testReadAliasesWithKind()
     QFile f(fname);
     QVERIFY(f.open(QIODevice::WriteOnly | QIODevice::Text));
     QTextStream out(&f);
-    out << "STI014:TRIGGER:3" << "\n";  // kind = 3 (STIM)
+    out << "STI014:TRIGGER:3" << "\n"; // kind = 3 (STIM)
     f.close();
 
     QList<ChannelAlias> aliases = readAliases(fname, false);

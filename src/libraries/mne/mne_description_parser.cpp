@@ -34,7 +34,7 @@ using namespace MNELIB;
 // STATIC HELPERS
 //=============================================================================================================
 
-void MNEDescriptionParser::skipComments(QTextStream &in)
+void MNEDescriptionParser::skipComments(QTextStream& in)
 {
     while (!in.atEnd()) {
         QChar c;
@@ -51,7 +51,7 @@ void MNEDescriptionParser::skipComments(QTextStream &in)
 
 //=============================================================================================================
 
-QString MNEDescriptionParser::nextWord(QTextStream &in)
+QString MNEDescriptionParser::nextWord(QTextStream& in)
 {
     skipComments(in);
 
@@ -65,7 +65,8 @@ QString MNEDescriptionParser::nextWord(QTextStream &in)
                 QString word;
                 while (!in.atEnd()) {
                     in >> c;
-                    if (c == '"') break;
+                    if (c == '"')
+                        break;
                     word.append(c);
                 }
                 return word;
@@ -75,7 +76,8 @@ QString MNEDescriptionParser::nextWord(QTextStream &in)
             word.append(c);
             while (!in.atEnd()) {
                 in >> c;
-                if (c.isSpace()) break;
+                if (c.isSpace())
+                    break;
                 if (c == '#') {
                     in.readLine();
                     break;
@@ -90,7 +92,7 @@ QString MNEDescriptionParser::nextWord(QTextStream &in)
 
 //=============================================================================================================
 
-bool MNEDescriptionParser::getInt(QTextStream &in, int &val)
+bool MNEDescriptionParser::getInt(QTextStream& in, int& val)
 {
     QString word = nextWord(in);
     if (word.isEmpty()) {
@@ -108,7 +110,7 @@ bool MNEDescriptionParser::getInt(QTextStream &in, int &val)
 
 //=============================================================================================================
 
-bool MNEDescriptionParser::getFloat(QTextStream &in, float &val)
+bool MNEDescriptionParser::getFloat(QTextStream& in, float& val)
 {
     QString word = nextWord(in);
     if (word.isEmpty()) {
@@ -126,34 +128,56 @@ bool MNEDescriptionParser::getFloat(QTextStream &in, float &val)
 
 //=============================================================================================================
 
-bool MNEDescriptionParser::parseRejectionParam(const QString &keyword, QTextStream &in,
-                                               RejectionParams &rej, bool &ok)
+bool MNEDescriptionParser::parseRejectionParam(const QString& keyword, QTextStream& in,
+                                               RejectionParams& rej, bool& ok)
 {
     ok = true;
     float fval;
 
     if (keyword.compare("gradReject", Qt::CaseInsensitive) == 0) {
-        ok = getFloat(in, fval); if (ok) rej.megGradReject = fval;
+        ok = getFloat(in, fval);
+        if (ok)
+            rej.megGradReject = fval;
     } else if (keyword.compare("magReject", Qt::CaseInsensitive) == 0) {
-        ok = getFloat(in, fval); if (ok) rej.megMagReject = fval;
+        ok = getFloat(in, fval);
+        if (ok)
+            rej.megMagReject = fval;
     } else if (keyword.compare("eegReject", Qt::CaseInsensitive) == 0) {
-        ok = getFloat(in, fval); if (ok) rej.eegReject = fval;
+        ok = getFloat(in, fval);
+        if (ok)
+            rej.eegReject = fval;
     } else if (keyword.compare("eogReject", Qt::CaseInsensitive) == 0) {
-        ok = getFloat(in, fval); if (ok) rej.eogReject = fval;
+        ok = getFloat(in, fval);
+        if (ok)
+            rej.eogReject = fval;
     } else if (keyword.compare("ecgReject", Qt::CaseInsensitive) == 0) {
-        ok = getFloat(in, fval); if (ok) rej.ecgReject = fval;
+        ok = getFloat(in, fval);
+        if (ok)
+            rej.ecgReject = fval;
     } else if (keyword.compare("gradFlat", Qt::CaseInsensitive) == 0) {
-        ok = getFloat(in, fval); if (ok) rej.megGradFlat = fval;
+        ok = getFloat(in, fval);
+        if (ok)
+            rej.megGradFlat = fval;
     } else if (keyword.compare("magFlat", Qt::CaseInsensitive) == 0) {
-        ok = getFloat(in, fval); if (ok) rej.megMagFlat = fval;
+        ok = getFloat(in, fval);
+        if (ok)
+            rej.megMagFlat = fval;
     } else if (keyword.compare("eegFlat", Qt::CaseInsensitive) == 0) {
-        ok = getFloat(in, fval); if (ok) rej.eegFlat = fval;
+        ok = getFloat(in, fval);
+        if (ok)
+            rej.eegFlat = fval;
     } else if (keyword.compare("eogFlat", Qt::CaseInsensitive) == 0) {
-        ok = getFloat(in, fval); if (ok) rej.eogFlat = fval;
+        ok = getFloat(in, fval);
+        if (ok)
+            rej.eogFlat = fval;
     } else if (keyword.compare("ecgFlat", Qt::CaseInsensitive) == 0) {
-        ok = getFloat(in, fval); if (ok) rej.ecgFlat = fval;
+        ok = getFloat(in, fval);
+        if (ok)
+            rej.ecgFlat = fval;
     } else if (keyword.compare("stimIgnore", Qt::CaseInsensitive) == 0) {
-        ok = getFloat(in, fval); if (ok) rej.stimIgnore = std::fabs(fval);
+        ok = getFloat(in, fval);
+        if (ok)
+            rej.stimIgnore = std::fabs(fval);
     } else {
         return false; // not a rejection keyword
     }
@@ -164,7 +188,7 @@ bool MNEDescriptionParser::parseRejectionParam(const QString &keyword, QTextStre
 // AVERAGE DESCRIPTION PARSER
 //=============================================================================================================
 
-bool MNEDescriptionParser::parseAverageFile(const QString &fileName, AverageDescription &desc)
+bool MNEDescriptionParser::parseAverageFile(const QString& fileName, AverageDescription& desc)
 {
     QFile file(fileName);
     if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
@@ -214,14 +238,17 @@ bool MNEDescriptionParser::parseAverageFile(const QString &fileName, AverageDesc
                     qWarning() << "MNEDescriptionParser: no events for" << currentCat.comment;
                     return false;
                 }
-                if (!currentCat.prevIgnore) currentCat.prevIgnore = currentCat.ignore;
-                if (!currentCat.nextIgnore) currentCat.nextIgnore = currentCat.ignore;
+                if (!currentCat.prevIgnore)
+                    currentCat.prevIgnore = currentCat.ignore;
+                if (!currentCat.nextIgnore)
+                    currentCat.nextIgnore = currentCat.ignore;
                 desc.categories.append(currentCat);
                 currentCat = AverageCategory();
                 inCategory = false;
                 bminSet = bmaxSet = false;
             } else if (inAverage) {
-                if (desc.comment.isEmpty()) desc.comment = "Average";
+                if (desc.comment.isEmpty())
+                    desc.comment = "Average";
                 inAverage = false;
                 break; // done
             }
@@ -255,153 +282,302 @@ bool MNEDescriptionParser::parseAverageFile(const QString &fileName, AverageDesc
         // "name" keyword
         if (word.compare("name", Qt::CaseInsensitive) == 0) {
             QString val = nextWord(in);
-            if (val.isEmpty()) { qWarning() << "MNEDescriptionParser: name requires a value"; return false; }
-            if (inCategory) currentCat.comment = val;
-            else if (inAverage) desc.comment = val;
-            else { qWarning() << "MNEDescriptionParser: misplaced name"; return false; }
+            if (val.isEmpty()) {
+                qWarning() << "MNEDescriptionParser: name requires a value";
+                return false;
+            }
+            if (inCategory)
+                currentCat.comment = val;
+            else if (inAverage)
+                desc.comment = val;
+            else {
+                qWarning() << "MNEDescriptionParser: misplaced name";
+                return false;
+            }
             continue;
         }
 
         // "outfile" keyword
         if (word.compare("outfile", Qt::CaseInsensitive) == 0) {
             QString val = nextWord(in);
-            if (val.isEmpty()) { qWarning() << "MNEDescriptionParser: outfile requires a value"; return false; }
-            if (inAverage && !inCategory) desc.filename = val;
-            else { qWarning() << "MNEDescriptionParser: misplaced outfile"; return false; }
+            if (val.isEmpty()) {
+                qWarning() << "MNEDescriptionParser: outfile requires a value";
+                return false;
+            }
+            if (inAverage && !inCategory)
+                desc.filename = val;
+            else {
+                qWarning() << "MNEDescriptionParser: misplaced outfile";
+                return false;
+            }
             continue;
         }
 
         // "eventfile" keyword
         if (word.compare("eventfile", Qt::CaseInsensitive) == 0) {
             QString val = nextWord(in);
-            if (val.isEmpty()) { qWarning() << "MNEDescriptionParser: eventfile requires a value"; return false; }
-            if (inAverage && !inCategory) desc.eventFile = val;
-            else { qWarning() << "MNEDescriptionParser: misplaced eventfile"; return false; }
+            if (val.isEmpty()) {
+                qWarning() << "MNEDescriptionParser: eventfile requires a value";
+                return false;
+            }
+            if (inAverage && !inCategory)
+                desc.eventFile = val;
+            else {
+                qWarning() << "MNEDescriptionParser: misplaced eventfile";
+                return false;
+            }
             continue;
         }
 
         // "logfile" keyword
         if (word.compare("logfile", Qt::CaseInsensitive) == 0) {
             QString val = nextWord(in);
-            if (val.isEmpty()) { qWarning() << "MNEDescriptionParser: logfile requires a value"; return false; }
-            if (inAverage && !inCategory) desc.logFile = val;
-            else { qWarning() << "MNEDescriptionParser: misplaced logfile"; return false; }
+            if (val.isEmpty()) {
+                qWarning() << "MNEDescriptionParser: logfile requires a value";
+                return false;
+            }
+            if (inAverage && !inCategory)
+                desc.logFile = val;
+            else {
+                qWarning() << "MNEDescriptionParser: misplaced logfile";
+                return false;
+            }
             continue;
         }
 
         // "fixskew" keyword
         if (word.compare("fixskew", Qt::CaseInsensitive) == 0) {
-            if (inAverage && !inCategory) desc.fixSkew = true;
-            else { qWarning() << "MNEDescriptionParser: misplaced fixskew"; return false; }
+            if (inAverage && !inCategory)
+                desc.fixSkew = true;
+            else {
+                qWarning() << "MNEDescriptionParser: misplaced fixskew";
+                return false;
+            }
             continue;
         }
 
         // --- Category-level keywords ---
         if (word.compare("tmin", Qt::CaseInsensitive) == 0) {
-            float fval; if (!getFloat(in, fval)) return false;
-            if (inCategory) currentCat.tmin = fval;
-            else { qWarning() << "MNEDescriptionParser: misplaced tmin"; return false; }
+            float fval;
+            if (!getFloat(in, fval))
+                return false;
+            if (inCategory)
+                currentCat.tmin = fval;
+            else {
+                qWarning() << "MNEDescriptionParser: misplaced tmin";
+                return false;
+            }
             continue;
         }
         if (word.compare("tmax", Qt::CaseInsensitive) == 0) {
-            float fval; if (!getFloat(in, fval)) return false;
-            if (inCategory) currentCat.tmax = fval;
-            else { qWarning() << "MNEDescriptionParser: misplaced tmax"; return false; }
+            float fval;
+            if (!getFloat(in, fval))
+                return false;
+            if (inCategory)
+                currentCat.tmax = fval;
+            else {
+                qWarning() << "MNEDescriptionParser: misplaced tmax";
+                return false;
+            }
             continue;
         }
         if (word.compare("basemin", Qt::CaseInsensitive) == 0 ||
             word.compare("bmin", Qt::CaseInsensitive) == 0) {
-            float fval; if (!getFloat(in, fval)) return false;
-            if (inCategory) { currentCat.bmin = fval; bminSet = true; }
-            else { qWarning() << "MNEDescriptionParser: misplaced basemin"; return false; }
+            float fval;
+            if (!getFloat(in, fval))
+                return false;
+            if (inCategory) {
+                currentCat.bmin = fval;
+                bminSet = true;
+            } else {
+                qWarning() << "MNEDescriptionParser: misplaced basemin";
+                return false;
+            }
             continue;
         }
         if (word.compare("basemax", Qt::CaseInsensitive) == 0 ||
             word.compare("bmax", Qt::CaseInsensitive) == 0) {
-            float fval; if (!getFloat(in, fval)) return false;
-            if (inCategory) { currentCat.bmax = fval; bmaxSet = true; }
-            else { qWarning() << "MNEDescriptionParser: misplaced basemax"; return false; }
+            float fval;
+            if (!getFloat(in, fval))
+                return false;
+            if (inCategory) {
+                currentCat.bmax = fval;
+                bmaxSet = true;
+            } else {
+                qWarning() << "MNEDescriptionParser: misplaced basemax";
+                return false;
+            }
             continue;
         }
         if (word.compare("event", Qt::CaseInsensitive) == 0) {
-            int ival; if (!getInt(in, ival)) return false;
-            if (ival <= 0) { qWarning() << "MNEDescriptionParser: event numbers must be positive"; return false; }
-            if (inCategory) currentCat.events.append(static_cast<unsigned int>(ival));
-            else { qWarning() << "MNEDescriptionParser: misplaced event"; return false; }
+            int ival;
+            if (!getInt(in, ival))
+                return false;
+            if (ival <= 0) {
+                qWarning() << "MNEDescriptionParser: event numbers must be positive";
+                return false;
+            }
+            if (inCategory)
+                currentCat.events.append(static_cast<unsigned int>(ival));
+            else {
+                qWarning() << "MNEDescriptionParser: misplaced event";
+                return false;
+            }
             continue;
         }
         if (word.compare("nextevent", Qt::CaseInsensitive) == 0) {
-            int ival; if (!getInt(in, ival)) return false;
-            if (ival <= 0) { qWarning() << "MNEDescriptionParser: nextevent must be positive"; return false; }
-            if (inCategory) currentCat.nextEvent = static_cast<unsigned int>(ival);
-            else { qWarning() << "MNEDescriptionParser: misplaced nextevent"; return false; }
+            int ival;
+            if (!getInt(in, ival))
+                return false;
+            if (ival <= 0) {
+                qWarning() << "MNEDescriptionParser: nextevent must be positive";
+                return false;
+            }
+            if (inCategory)
+                currentCat.nextEvent = static_cast<unsigned int>(ival);
+            else {
+                qWarning() << "MNEDescriptionParser: misplaced nextevent";
+                return false;
+            }
             continue;
         }
         if (word.compare("prevevent", Qt::CaseInsensitive) == 0) {
-            int ival; if (!getInt(in, ival)) return false;
-            if (ival <= 0) { qWarning() << "MNEDescriptionParser: prevevent must be positive"; return false; }
-            if (inCategory) currentCat.prevEvent = static_cast<unsigned int>(ival);
-            else { qWarning() << "MNEDescriptionParser: misplaced prevevent"; return false; }
+            int ival;
+            if (!getInt(in, ival))
+                return false;
+            if (ival <= 0) {
+                qWarning() << "MNEDescriptionParser: prevevent must be positive";
+                return false;
+            }
+            if (inCategory)
+                currentCat.prevEvent = static_cast<unsigned int>(ival);
+            else {
+                qWarning() << "MNEDescriptionParser: misplaced prevevent";
+                return false;
+            }
             continue;
         }
         if (word.compare("ignore", Qt::CaseInsensitive) == 0) {
-            int ival; if (!getInt(in, ival)) return false;
-            if (inCategory) currentCat.ignore = static_cast<unsigned int>(ival);
-            else { qWarning() << "MNEDescriptionParser: misplaced ignore"; return false; }
+            int ival;
+            if (!getInt(in, ival))
+                return false;
+            if (inCategory)
+                currentCat.ignore = static_cast<unsigned int>(ival);
+            else {
+                qWarning() << "MNEDescriptionParser: misplaced ignore";
+                return false;
+            }
             continue;
         }
         if (word.compare("prevignore", Qt::CaseInsensitive) == 0) {
-            int ival; if (!getInt(in, ival)) return false;
-            if (inCategory) currentCat.prevIgnore = static_cast<unsigned int>(ival);
-            else { qWarning() << "MNEDescriptionParser: misplaced prevignore"; return false; }
+            int ival;
+            if (!getInt(in, ival))
+                return false;
+            if (inCategory)
+                currentCat.prevIgnore = static_cast<unsigned int>(ival);
+            else {
+                qWarning() << "MNEDescriptionParser: misplaced prevignore";
+                return false;
+            }
             continue;
         }
         if (word.compare("nextignore", Qt::CaseInsensitive) == 0) {
-            int ival; if (!getInt(in, ival)) return false;
-            if (inCategory) currentCat.nextIgnore = static_cast<unsigned int>(ival);
-            else { qWarning() << "MNEDescriptionParser: misplaced nextignore"; return false; }
+            int ival;
+            if (!getInt(in, ival))
+                return false;
+            if (inCategory)
+                currentCat.nextIgnore = static_cast<unsigned int>(ival);
+            else {
+                qWarning() << "MNEDescriptionParser: misplaced nextignore";
+                return false;
+            }
             continue;
         }
         if (word.compare("mask", Qt::CaseInsensitive) == 0) {
-            int ival; if (!getInt(in, ival)) return false;
-            if (ival <= 0) { qWarning() << "MNEDescriptionParser: mask must be positive"; return false; }
-            if (inCategory) { currentCat.ignore = static_cast<unsigned int>(ival); currentCat.ignore = ~currentCat.ignore; }
-            else { qWarning() << "MNEDescriptionParser: misplaced mask"; return false; }
+            int ival;
+            if (!getInt(in, ival))
+                return false;
+            if (ival <= 0) {
+                qWarning() << "MNEDescriptionParser: mask must be positive";
+                return false;
+            }
+            if (inCategory) {
+                currentCat.ignore = static_cast<unsigned int>(ival);
+                currentCat.ignore = ~currentCat.ignore;
+            } else {
+                qWarning() << "MNEDescriptionParser: misplaced mask";
+                return false;
+            }
             continue;
         }
         if (word.compare("prevmask", Qt::CaseInsensitive) == 0) {
-            int ival; if (!getInt(in, ival)) return false;
-            if (inCategory) { currentCat.prevIgnore = static_cast<unsigned int>(ival); currentCat.prevIgnore = ~currentCat.prevIgnore; }
-            else { qWarning() << "MNEDescriptionParser: misplaced prevmask"; return false; }
+            int ival;
+            if (!getInt(in, ival))
+                return false;
+            if (inCategory) {
+                currentCat.prevIgnore = static_cast<unsigned int>(ival);
+                currentCat.prevIgnore = ~currentCat.prevIgnore;
+            } else {
+                qWarning() << "MNEDescriptionParser: misplaced prevmask";
+                return false;
+            }
             continue;
         }
         if (word.compare("nextmask", Qt::CaseInsensitive) == 0) {
-            int ival; if (!getInt(in, ival)) return false;
-            if (inCategory) { currentCat.nextIgnore = static_cast<unsigned int>(ival); currentCat.nextIgnore = ~currentCat.nextIgnore; }
-            else { qWarning() << "MNEDescriptionParser: misplaced nextmask"; return false; }
+            int ival;
+            if (!getInt(in, ival))
+                return false;
+            if (inCategory) {
+                currentCat.nextIgnore = static_cast<unsigned int>(ival);
+                currentCat.nextIgnore = ~currentCat.nextIgnore;
+            } else {
+                qWarning() << "MNEDescriptionParser: misplaced nextmask";
+                return false;
+            }
             continue;
         }
         if (word.compare("delay", Qt::CaseInsensitive) == 0) {
-            float fval; if (!getFloat(in, fval)) return false;
-            if (inCategory) currentCat.delay = fval;
-            else { qWarning() << "MNEDescriptionParser: misplaced delay"; return false; }
+            float fval;
+            if (!getFloat(in, fval))
+                return false;
+            if (inCategory)
+                currentCat.delay = fval;
+            else {
+                qWarning() << "MNEDescriptionParser: misplaced delay";
+                return false;
+            }
             continue;
         }
         if (word.compare("stderr", Qt::CaseInsensitive) == 0) {
-            if (inCategory) currentCat.doStdErr = true;
-            else { qWarning() << "MNEDescriptionParser: misplaced stderr"; return false; }
+            if (inCategory)
+                currentCat.doStdErr = true;
+            else {
+                qWarning() << "MNEDescriptionParser: misplaced stderr";
+                return false;
+            }
             continue;
         }
         if (word.compare("abs", Qt::CaseInsensitive) == 0) {
-            if (inCategory) currentCat.doAbs = true;
-            else { qWarning() << "MNEDescriptionParser: misplaced abs"; return false; }
+            if (inCategory)
+                currentCat.doAbs = true;
+            else {
+                qWarning() << "MNEDescriptionParser: misplaced abs";
+                return false;
+            }
             continue;
         }
         if (word.compare("color", Qt::CaseInsensitive) == 0) {
             float r, g, b;
-            if (!getFloat(in, r) || !getFloat(in, g) || !getFloat(in, b)) return false;
-            if (inCategory) { currentCat.color[0] = r; currentCat.color[1] = g; currentCat.color[2] = b; }
-            else { qWarning() << "MNEDescriptionParser: misplaced color"; return false; }
+            if (!getFloat(in, r) || !getFloat(in, g) || !getFloat(in, b))
+                return false;
+            if (inCategory) {
+                currentCat.color[0] = r;
+                currentCat.color[1] = g;
+                currentCat.color[2] = b;
+            } else {
+                qWarning() << "MNEDescriptionParser: misplaced color";
+                return false;
+            }
             continue;
         }
 
@@ -409,7 +585,8 @@ bool MNEDescriptionParser::parseAverageFile(const QString &fileName, AverageDesc
         if (inAverage && !inCategory) {
             bool parseOk;
             if (parseRejectionParam(word, in, desc.rej, parseOk)) {
-                if (!parseOk) return false;
+                if (!parseOk)
+                    return false;
                 continue;
             }
         }
@@ -429,7 +606,7 @@ bool MNEDescriptionParser::parseAverageFile(const QString &fileName, AverageDesc
 // COVARIANCE DESCRIPTION PARSER
 //=============================================================================================================
 
-bool MNEDescriptionParser::parseCovarianceFile(const QString &fileName, CovDescription &desc)
+bool MNEDescriptionParser::parseCovarianceFile(const QString& fileName, CovDescription& desc)
 {
     QFile file(fileName);
     if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
@@ -505,83 +682,157 @@ bool MNEDescriptionParser::parseCovarianceFile(const QString &fileName, CovDescr
         // Cov-level keywords
         if (word.compare("outfile", Qt::CaseInsensitive) == 0) {
             QString val = nextWord(in);
-            if (inCov && !inDef) desc.filename = val;
-            else { qWarning() << "MNEDescriptionParser: misplaced outfile"; return false; }
+            if (inCov && !inDef)
+                desc.filename = val;
+            else {
+                qWarning() << "MNEDescriptionParser: misplaced outfile";
+                return false;
+            }
             continue;
         }
         if (word.compare("eventfile", Qt::CaseInsensitive) == 0) {
             QString val = nextWord(in);
-            if (inCov && !inDef) desc.eventFile = val;
-            else { qWarning() << "MNEDescriptionParser: misplaced eventfile"; return false; }
+            if (inCov && !inDef)
+                desc.eventFile = val;
+            else {
+                qWarning() << "MNEDescriptionParser: misplaced eventfile";
+                return false;
+            }
             continue;
         }
         if (word.compare("logfile", Qt::CaseInsensitive) == 0) {
             QString val = nextWord(in);
-            if (inCov && !inDef) desc.logFile = val;
-            else { qWarning() << "MNEDescriptionParser: misplaced logfile"; return false; }
+            if (inCov && !inDef)
+                desc.logFile = val;
+            else {
+                qWarning() << "MNEDescriptionParser: misplaced logfile";
+                return false;
+            }
             continue;
         }
         if (word.compare("keepsamplemean", Qt::CaseInsensitive) == 0) {
-            if (inCov && !inDef) desc.removeSampleMean = false;
-            else { qWarning() << "MNEDescriptionParser: misplaced keepsamplemean"; return false; }
+            if (inCov && !inDef)
+                desc.removeSampleMean = false;
+            else {
+                qWarning() << "MNEDescriptionParser: misplaced keepsamplemean";
+                return false;
+            }
             continue;
         }
         if (word.compare("fixskew", Qt::CaseInsensitive) == 0) {
-            if (inCov && !inDef) desc.fixSkew = true;
-            else { qWarning() << "MNEDescriptionParser: misplaced fixskew"; return false; }
+            if (inCov && !inDef)
+                desc.fixSkew = true;
+            else {
+                qWarning() << "MNEDescriptionParser: misplaced fixskew";
+                return false;
+            }
             continue;
         }
 
         // Def-level keywords
         if (word.compare("tmin", Qt::CaseInsensitive) == 0) {
-            float fval; if (!getFloat(in, fval)) return false;
-            if (inDef) currentDef.tmin = fval;
-            else { qWarning() << "MNEDescriptionParser: misplaced tmin"; return false; }
+            float fval;
+            if (!getFloat(in, fval))
+                return false;
+            if (inDef)
+                currentDef.tmin = fval;
+            else {
+                qWarning() << "MNEDescriptionParser: misplaced tmin";
+                return false;
+            }
             continue;
         }
         if (word.compare("tmax", Qt::CaseInsensitive) == 0) {
-            float fval; if (!getFloat(in, fval)) return false;
-            if (inDef) currentDef.tmax = fval;
-            else { qWarning() << "MNEDescriptionParser: misplaced tmax"; return false; }
+            float fval;
+            if (!getFloat(in, fval))
+                return false;
+            if (inDef)
+                currentDef.tmax = fval;
+            else {
+                qWarning() << "MNEDescriptionParser: misplaced tmax";
+                return false;
+            }
             continue;
         }
         if (word.compare("basemin", Qt::CaseInsensitive) == 0 ||
             word.compare("bmin", Qt::CaseInsensitive) == 0) {
-            float fval; if (!getFloat(in, fval)) return false;
-            if (inDef) { currentDef.bmin = fval; bminSet = true; }
-            else { qWarning() << "MNEDescriptionParser: misplaced basemin"; return false; }
+            float fval;
+            if (!getFloat(in, fval))
+                return false;
+            if (inDef) {
+                currentDef.bmin = fval;
+                bminSet = true;
+            } else {
+                qWarning() << "MNEDescriptionParser: misplaced basemin";
+                return false;
+            }
             continue;
         }
         if (word.compare("basemax", Qt::CaseInsensitive) == 0 ||
             word.compare("bmax", Qt::CaseInsensitive) == 0) {
-            float fval; if (!getFloat(in, fval)) return false;
-            if (inDef) { currentDef.bmax = fval; bmaxSet = true; }
-            else { qWarning() << "MNEDescriptionParser: misplaced basemax"; return false; }
+            float fval;
+            if (!getFloat(in, fval))
+                return false;
+            if (inDef) {
+                currentDef.bmax = fval;
+                bmaxSet = true;
+            } else {
+                qWarning() << "MNEDescriptionParser: misplaced basemax";
+                return false;
+            }
             continue;
         }
         if (word.compare("event", Qt::CaseInsensitive) == 0) {
-            int ival; if (!getInt(in, ival)) return false;
-            if (ival <= 0) { qWarning() << "MNEDescriptionParser: event must be positive"; return false; }
-            if (inDef) currentDef.events.append(static_cast<unsigned int>(ival));
-            else { qWarning() << "MNEDescriptionParser: misplaced event"; return false; }
+            int ival;
+            if (!getInt(in, ival))
+                return false;
+            if (ival <= 0) {
+                qWarning() << "MNEDescriptionParser: event must be positive";
+                return false;
+            }
+            if (inDef)
+                currentDef.events.append(static_cast<unsigned int>(ival));
+            else {
+                qWarning() << "MNEDescriptionParser: misplaced event";
+                return false;
+            }
             continue;
         }
         if (word.compare("ignore", Qt::CaseInsensitive) == 0) {
-            int ival; if (!getInt(in, ival)) return false;
-            if (inDef) currentDef.ignore = static_cast<unsigned int>(ival);
-            else { qWarning() << "MNEDescriptionParser: misplaced ignore"; return false; }
+            int ival;
+            if (!getInt(in, ival))
+                return false;
+            if (inDef)
+                currentDef.ignore = static_cast<unsigned int>(ival);
+            else {
+                qWarning() << "MNEDescriptionParser: misplaced ignore";
+                return false;
+            }
             continue;
         }
         if (word.compare("mask", Qt::CaseInsensitive) == 0) {
-            int ival; if (!getInt(in, ival)) return false;
-            if (inDef) { currentDef.ignore = static_cast<unsigned int>(ival); currentDef.ignore = ~currentDef.ignore; }
-            else { qWarning() << "MNEDescriptionParser: misplaced mask"; return false; }
+            int ival;
+            if (!getInt(in, ival))
+                return false;
+            if (inDef) {
+                currentDef.ignore = static_cast<unsigned int>(ival);
+                currentDef.ignore = ~currentDef.ignore;
+            } else {
+                qWarning() << "MNEDescriptionParser: misplaced mask";
+                return false;
+            }
             continue;
         }
         if (word.compare("delay", Qt::CaseInsensitive) == 0) {
-            float fval; if (!getFloat(in, fval)) return false;
-            if (inDef) currentDef.delay = fval;
-            else { qWarning() << "MNEDescriptionParser: misplaced delay"; return false; }
+            float fval;
+            if (!getFloat(in, fval))
+                return false;
+            if (inDef)
+                currentDef.delay = fval;
+            else {
+                qWarning() << "MNEDescriptionParser: misplaced delay";
+                return false;
+            }
             continue;
         }
 
@@ -589,7 +840,8 @@ bool MNEDescriptionParser::parseCovarianceFile(const QString &fileName, CovDescr
         if (inCov && !inDef) {
             bool parseOk;
             if (parseRejectionParam(word, in, desc.rej, parseOk)) {
-                if (!parseOk) return false;
+                if (!parseOk)
+                    return false;
                 continue;
             }
         }

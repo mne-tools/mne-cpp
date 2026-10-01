@@ -42,8 +42,9 @@
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-namespace Ui {
-    class EEGoSportsImpedanceWidget;
+namespace Ui
+{
+class EEGoSportsImpedanceWidget;
 }
 
 //=============================================================================================================
@@ -78,7 +79,7 @@ class EEGoSportsImpedanceWidget : public QWidget
     Q_OBJECT
 
 public:
-    explicit EEGoSportsImpedanceWidget(EEGoSports* pEEGoSports, QWidget *parent = 0);
+    explicit EEGoSportsImpedanceWidget(EEGoSports* pEEGoSports, QWidget* parent = 0);
     ~EEGoSportsImpedanceWidget();
 
     //=========================================================================================================
@@ -131,7 +132,7 @@ private:
     /**
     * Reimplemnted closing event handler. Used to stop the measurement when closing the widget.
     */
-    void closeEvent(QCloseEvent *event);
+    void closeEvent(QCloseEvent* event);
 
     //=========================================================================================================
     /**
@@ -152,18 +153,18 @@ private:
     * Open a help dialog.
     */
     void helpDialog();
-    
-    EEGoSports*                                 m_pEEGoSports;              /**< The pointer back to the EEGoSports plugin.*/
 
-    EEGoSportsImpedanceScene*                   m_qGScene;                  /**< The QGraphicScene.*/
+    EEGoSports* m_pEEGoSports; /**< The pointer back to the EEGoSports plugin.*/
 
-    QMap< QString, int >                        m_qmElectrodeNameIndex;     /**< Lookup table for electrode name and their corresponding index in the received data matrix.*/
+    EEGoSportsImpedanceScene* m_qGScene; /**< The QGraphicScene.*/
 
-    Ui::EEGoSportsImpedanceWidget*              m_pUi;                      /**< The user interface for the EEGoSportsImpedanceWidget.*/
+    QMap<QString, int> m_qmElectrodeNameIndex; /**< Lookup table for electrode name and their corresponding index in the received data matrix.*/
 
-    QSharedPointer<ColorMap>                    m_cbColorMap;               /**< The pointer the colormap object.*/
+    Ui::EEGoSportsImpedanceWidget* m_pUi; /**< The user interface for the EEGoSportsImpedanceWidget.*/
 
-    double                                      m_dMaxImpedance;            /**< Maximum impedance value. This is a fixed value to scale the color map.*/
+    QSharedPointer<ColorMap> m_cbColorMap; /**< The pointer the colormap object.*/
+
+    double m_dMaxImpedance; /**< Maximum impedance value. This is a fixed value to scale the color map.*/
 };
 } // NAMESPACE
 

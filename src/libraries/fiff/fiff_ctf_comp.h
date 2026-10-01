@@ -70,13 +70,13 @@ namespace FIFFLIB
  * matrix was stored already-calibrated (and therefore must not be
  * re-multiplied by the channel cals on apply).
  */
-class FIFFSHARED_EXPORT FiffCtfComp {
-
+class FIFFSHARED_EXPORT FiffCtfComp
+{
 public:
-    using SPtr = QSharedPointer<FiffCtfComp>;            /**< Shared pointer type for FiffCtfComp. */
-    using ConstSPtr = QSharedPointer<const FiffCtfComp>; /**< Const shared pointer type for FiffCtfComp. */
-    using UPtr = std::unique_ptr<FiffCtfComp>;             /**< Unique pointer type for FiffCtfComp. */
-    using ConstUPtr = std::unique_ptr<const FiffCtfComp>;  /**< Const unique pointer type for FiffCtfComp. */
+    using SPtr = QSharedPointer<FiffCtfComp>;             /**< Shared pointer type for FiffCtfComp. */
+    using ConstSPtr = QSharedPointer<const FiffCtfComp>;  /**< Const shared pointer type for FiffCtfComp. */
+    using UPtr = std::unique_ptr<FiffCtfComp>;            /**< Unique pointer type for FiffCtfComp. */
+    using ConstUPtr = std::unique_ptr<const FiffCtfComp>; /**< Const unique pointer type for FiffCtfComp. */
 
     //=========================================================================================================
     /**
@@ -90,7 +90,7 @@ public:
      *
      * @param[in] p_FiffCtfComp   CTF software compensation data which should be copied.
      */
-    FiffCtfComp(const FiffCtfComp &p_FiffCtfComp);
+    FiffCtfComp(const FiffCtfComp& p_FiffCtfComp);
 
     //=========================================================================================================
     /**
@@ -118,12 +118,12 @@ public:
     void clear();
 
 public:
-    fiff_int_t ctfkind;             /**< CTF kind. */
-    fiff_int_t kind;                /**< Fiff kind -> fiff_constants.h. */
-    bool save_calibrated;           /**< If data should be saved calibrated. */
-    Eigen::MatrixXd rowcals;        /**< Row calibrations. */
-    Eigen::MatrixXd colcals;        /**< Column calibrations. */
-    FiffNamedMatrix::SDPtr data;    /**< Compensation data. */
+    fiff_int_t ctfkind;          /**< CTF kind. */
+    fiff_int_t kind;             /**< Fiff kind -> fiff_constants.h. */
+    bool save_calibrated;        /**< If data should be saved calibrated. */
+    Eigen::MatrixXd rowcals;     /**< Row calibrations. */
+    Eigen::MatrixXd colcals;     /**< Column calibrations. */
+    FiffNamedMatrix::SDPtr data; /**< Compensation data. */
 };
 } // NAMESPACE
 

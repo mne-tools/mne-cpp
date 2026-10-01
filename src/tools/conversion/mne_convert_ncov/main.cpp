@@ -55,7 +55,7 @@ using namespace Eigen;
 
 //=============================================================================================================
 
-int main(int argc, char *argv[])
+int main(int argc, char* argv[])
 {
     qInstallMessageHandler(MNELogger::customLogWriter);
     QCoreApplication app(argc, argv);
@@ -93,8 +93,14 @@ int main(int argc, char *argv[])
     bool includeMeg = parser.isSet(megOpt);
     bool includeEeg = parser.isSet(eegOpt);
 
-    if (ncovFile.isEmpty()) { qCritical("--ncov is required."); return 1; }
-    if (measFile.isEmpty()) { qCritical("--meas is required."); return 1; }
+    if (ncovFile.isEmpty()) {
+        qCritical("--ncov is required.");
+        return 1;
+    }
+    if (measFile.isEmpty()) {
+        qCritical("--meas is required.");
+        return 1;
+    }
 
     // Default: include both if neither specified
     if (!includeMeg && !includeEeg) {
@@ -130,8 +136,8 @@ int main(int argc, char *argv[])
         }
     }
 
-    qInfo("Measurement: %lld MEG channels, %lld EEG channels, %d total" ,
-           static_cast<long long>(megIdx.size()), static_cast<long long>(eegIdx.size()), info.nchan);
+    qInfo("Measurement: %lld MEG channels, %lld EEG channels, %d total",
+          static_cast<long long>(megIdx.size()), static_cast<long long>(eegIdx.size()), info.nchan);
 
     //=========================================================================
     // Read ncov ASCII file
@@ -163,8 +169,8 @@ int main(int argc, char *argv[])
     int nFree = dims[2].toInt();
     int nTotal = nMegFile + nEegFile;
 
-    qInfo("Ncov file: %d MEG + %d EEG = %d channels, nfree = %d" ,
-           nMegFile, nEegFile, nTotal, nFree);
+    qInfo("Ncov file: %d MEG + %d EEG = %d channels, nfree = %d",
+          nMegFile, nEegFile, nTotal, nFree);
 
     // Validate dimensions
     if (nMegFile != megIdx.size()) {
@@ -191,13 +197,13 @@ int main(int argc, char *argv[])
     }
     ncFile.close();
 
-    qInfo("Read %dx%d covariance matrix" , nTotal, nTotal);
+    qInfo("Read %dx%d covariance matrix", nTotal, nTotal);
 
     //=========================================================================
     // Extract requested submatrix
     //=========================================================================
-    QList<int> selectedFileIdx;   // Indices into the file's matrix
-    QList<int> selectedMeasIdx;   // Indices into the measurement info
+    QList<int> selectedFileIdx; // Indices into the file's matrix
+    QList<int> selectedMeasIdx; // Indices into the measurement info
 
     if (includeMeg) {
         for (int i = 0; i < nMegFile; ++i) {
@@ -223,9 +229,9 @@ int main(int argc, char *argv[])
     // Symmetrize
     selCov = (selCov + selCov.transpose()) / 2.0;
 
-    qInfo("Selected %d channels (%s%s)" , nSel,
-           includeMeg ? "MEG" : "",
-           (includeMeg && includeEeg) ? "+EEG" : (includeEeg ? "EEG" : ""));
+    qInfo("Selected %d channels (%s%s)", nSel,
+          includeMeg ? "MEG" : "",
+          (includeMeg && includeEeg) ? "+EEG" : (includeEeg ? "EEG" : ""));
 
     //=========================================================================
     // Build and write FIFF covariance
@@ -248,6 +254,6 @@ int main(int argc, char *argv[])
         return 1;
     }
 
-    qInfo("Written FIFF covariance (%d channels) to: %s" , nSel, qPrintable(covFile));
+    qInfo("Written FIFF covariance (%d channels) to: %s", nSel, qPrintable(covFile));
     return 0;
 }

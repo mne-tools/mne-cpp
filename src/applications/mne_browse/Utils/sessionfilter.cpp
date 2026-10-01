@@ -47,7 +47,8 @@ using namespace UTILSLIB;
 using namespace FIFFLIB;
 using namespace Eigen;
 
-namespace {
+namespace
+{
 
 QString normalizedScope(const QString& scope)
 {
@@ -58,30 +59,30 @@ QString normalizedScope(const QString& scope)
 bool channelMatchesScope(const FiffInfo& info, int channelIndex, const QString& scope)
 {
     const QString normalized = normalizedScope(scope);
-    if(normalized == QLatin1String("ALL")) {
+    if (normalized == QLatin1String("ALL")) {
         return true;
     }
 
-    if(channelIndex < 0 || channelIndex >= info.ch_names.size() || channelIndex >= info.chs.size()) {
+    if (channelIndex < 0 || channelIndex >= info.ch_names.size() || channelIndex >= info.chs.size()) {
         return false;
     }
 
     const QString channelName = info.ch_names.at(channelIndex).trimmed().toUpper();
     const int kind = info.chs.at(channelIndex).kind;
 
-    if(normalized == QLatin1String("MEG")) {
+    if (normalized == QLatin1String("MEG")) {
         return kind == FIFFV_MEG_CH;
     }
-    if(normalized == QLatin1String("EEG")) {
+    if (normalized == QLatin1String("EEG")) {
         return kind == FIFFV_EEG_CH;
     }
-    if(normalized == QLatin1String("ECG")) {
+    if (normalized == QLatin1String("ECG")) {
         return kind == FIFFV_ECG_CH || channelName.contains(QLatin1String("ECG"));
     }
-    if(normalized == QLatin1String("EOG")) {
+    if (normalized == QLatin1String("EOG")) {
         return kind == FIFFV_EOG_CH || channelName.contains(QLatin1String("EOG"));
     }
-    if(normalized == QLatin1String("EMG")) {
+    if (normalized == QLatin1String("EMG")) {
         return kind == FIFFV_EMG_CH || channelName.contains(QLatin1String("EMG"));
     }
 
@@ -90,7 +91,7 @@ bool channelMatchesScope(const FiffInfo& info, int channelIndex, const QString& 
 
 QString filterTypeText(SessionFilter::FilterType type)
 {
-    switch(type) {
+    switch (type) {
         case SessionFilter::FilterType::LowPass:
             return QStringLiteral("Low-pass");
         case SessionFilter::FilterType::HighPass:
@@ -106,7 +107,7 @@ QString filterTypeText(SessionFilter::FilterType type)
 
 QString designMethodText(SessionFilter::DesignMethod method)
 {
-    switch(method) {
+    switch (method) {
         case SessionFilter::DesignMethod::Cosine:
             return QStringLiteral("Cosine FIR");
         case SessionFilter::DesignMethod::Tschebyscheff:
@@ -121,7 +122,7 @@ QString designMethodText(SessionFilter::DesignMethod method)
 int nextPowerOfTwo(int value)
 {
     int power = 1;
-    while(power < value) {
+    while (power < value) {
         power <<= 1;
     }
 
@@ -133,7 +134,7 @@ std::complex<double> evalIirResponse(const QVector<IirBiquad>& sos, double omega
     std::complex<double> z(std::cos(omega), std::sin(omega));
     std::complex<double> response(1.0, 0.0);
 
-    for(const IirBiquad& biquad : sos) {
+    for (const IirBiquad& biquad : sos) {
         const std::complex<double> zinv = 1.0 / z;
         const std::complex<double> zinv2 = zinv * zinv;
         const std::complex<double> numerator = biquad.b0 + biquad.b1 * zinv + biquad.b2 * zinv2;
@@ -190,21 +191,20 @@ SessionFilter::SessionFilter(const QString& sName,
 
 bool SessionFilter::isValid() const
 {
-    if(m_dSamplingFrequencyHz <= 0.0 || m_iOrder <= 0) {
+    if (m_dSamplingFrequencyHz <= 0.0 || m_iOrder <= 0) {
         return false;
     }
 
     const double nyquist = m_dSamplingFrequencyHz / 2.0;
-    if(m_dCutoffLowHz <= 0.0 || m_dCutoffLowHz >= nyquist) {
+    if (m_dCutoffLowHz <= 0.0 || m_dCutoffLowHz >= nyquist) {
         return false;
     }
 
-    if((m_filterType == FilterType::BandPass || m_filterType == FilterType::BandStop)
-       && (m_dCutoffHighHz <= m_dCutoffLowHz || m_dCutoffHighHz >= nyquist)) {
+    if ((m_filterType == FilterType::BandPass || m_filterType == FilterType::BandStop) && (m_dCutoffHighHz <= m_dCutoffLowHz || m_dCutoffHighHz >= nyquist)) {
         return false;
     }
 
-    if(isFir() && m_dTransitionHz <= 0.0) {
+    if (isFir() && m_dTransitionHz <= 0.0) {
         return false;
     }
 
@@ -230,7 +230,7 @@ bool SessionFilter::isIir() const
 QString SessionFilter::displayName() const
 {
     QString rangeText;
-    if(m_filterType == FilterType::LowPass || m_filterType == FilterType::HighPass) {
+    if (m_filterType == FilterType::LowPass || m_filterType == FilterType::HighPass) {
         rangeText = QString::number(m_dCutoffLowHz, 'f', 2) + QStringLiteral(" Hz");
     } else {
         rangeText = QStringLiteral("%1-%2 Hz")
@@ -255,11 +255,11 @@ QString SessionFilter::applyTo() const
 
 bool SessionFilter::appliesToChannel(const FiffInfo& info, int channelIndex) const
 {
-    if(channelIndex < 0 || channelIndex >= info.chs.size()) {
+    if (channelIndex < 0 || channelIndex >= info.chs.size()) {
         return false;
     }
 
-    if(info.chs.at(channelIndex).kind == FIFFV_STIM_CH) {
+    if (info.chs.at(channelIndex).kind == FIFFV_STIM_CH) {
         return false;
     }
 
@@ -271,7 +271,7 @@ bool SessionFilter::appliesToChannel(const FiffInfo& info, int channelIndex) con
 FilterKernel SessionFilter::createFirKernel() const
 {
     FirFilter::FilterType type = FirFilter::BandPass;
-    switch(m_filterType) {
+    switch (m_filterType) {
         case FilterType::LowPass:
             type = FirFilter::LowPass;
             break;
@@ -304,7 +304,7 @@ FilterKernel SessionFilter::createFirKernel() const
 QVector<IirBiquad> SessionFilter::createIirSections() const
 {
     IirFilter::FilterType type = IirFilter::BandPass;
-    switch(m_filterType) {
+    switch (m_filterType) {
         case FilterType::LowPass:
             type = IirFilter::LowPass;
             break;
@@ -330,22 +330,22 @@ QVector<IirBiquad> SessionFilter::createIirSections() const
 
 void SessionFilter::ensureDesigned(int iDataSizeHint) const
 {
-    if(!isValid()) {
+    if (!isValid()) {
         return;
     }
 
-    if(isFir()) {
-        if(!m_bFirDesigned) {
+    if (isFir()) {
+        if (!m_bFirDesigned) {
             m_firKernel = createFirKernel();
             m_iPreparedDataSize = 0;
             m_bFirDesigned = true;
         }
 
-        if(iDataSizeHint > 0 && iDataSizeHint != m_iPreparedDataSize) {
+        if (iDataSizeHint > 0 && iDataSizeHint != m_iPreparedDataSize) {
             m_firKernel.prepareFilter(iDataSizeHint);
             m_iPreparedDataSize = iDataSizeHint;
         }
-    } else if(!m_bIirDesigned) {
+    } else if (!m_bIirDesigned) {
         m_iirSections = createIirSections();
         m_bIirDesigned = true;
     }
@@ -355,13 +355,13 @@ void SessionFilter::ensureDesigned(int iDataSizeHint) const
 
 RowVectorXd SessionFilter::applyToVector(const RowVectorXd& data) const
 {
-    if(!isValid() || data.size() == 0) {
+    if (!isValid() || data.size() == 0) {
         return data;
     }
 
     ensureDesigned(static_cast<int>(data.size()));
 
-    if(isFir()) {
+    if (isFir()) {
         FilterKernel kernel = m_firKernel;
         return FirFilter::applyZeroPhase(data, kernel);
     }
@@ -374,19 +374,19 @@ RowVectorXd SessionFilter::applyToVector(const RowVectorXd& data) const
 MatrixXd SessionFilter::applyToMatrix(const MatrixXd& data,
                                       const FiffInfo& info) const
 {
-    if(!isValid() || data.size() == 0) {
+    if (!isValid() || data.size() == 0) {
         return data;
     }
 
     ensureDesigned(static_cast<int>(data.cols()));
 
     MatrixXd filtered = data;
-    for(int row = 0; row < filtered.rows(); ++row) {
-        if(!appliesToChannel(info, row)) {
+    for (int row = 0; row < filtered.rows(); ++row) {
+        if (!appliesToChannel(info, row)) {
             continue;
         }
 
-        if(row < info.chs.size() && info.chs.at(row).kind == FIFFV_STIM_CH) {
+        if (row < info.chs.size() && info.chs.at(row).kind == FIFFV_STIM_CH) {
             continue;
         }
 
@@ -401,14 +401,14 @@ MatrixXd SessionFilter::applyToMatrix(const MatrixXd& data,
 VectorXcd SessionFilter::frequencyResponse(int iPoints) const
 {
     VectorXcd response = VectorXcd::Zero(std::max(2, iPoints));
-    if(!isValid()) {
+    if (!isValid()) {
         return response;
     }
 
-    if(isFir()) {
+    if (isFir()) {
         ensureDesigned();
         const RowVectorXd coefficients = m_firKernel.getCoefficients();
-        if(coefficients.size() == 0) {
+        if (coefficients.size() == 0) {
             return response;
         }
 
@@ -425,7 +425,7 @@ VectorXcd SessionFilter::frequencyResponse(int iPoints) const
         RowVectorXcd fftCoefficients;
         fft.fwd(fftCoefficients, padded, fftLength);
 
-        for(int index = 0; index < response.size(); ++index) {
+        for (int index = 0; index < response.size(); ++index) {
             const double position = static_cast<double>(index) / static_cast<double>(response.size() - 1);
             const int spectrumIndex = std::min(static_cast<int>(std::round(position * (fftCoefficients.size() - 1))),
                                                static_cast<int>(fftCoefficients.size() - 1));
@@ -436,7 +436,7 @@ VectorXcd SessionFilter::frequencyResponse(int iPoints) const
     }
 
     ensureDesigned();
-    for(int index = 0; index < response.size(); ++index) {
+    for (int index = 0; index < response.size(); ++index) {
         const double omega = M_PI * static_cast<double>(index) / static_cast<double>(response.size() - 1);
         response(index) = evalIirResponse(m_iirSections, omega);
     }
@@ -450,7 +450,7 @@ VectorXd SessionFilter::magnitudeResponse(int iPoints) const
 {
     const VectorXcd complexResponse = frequencyResponse(iPoints);
     VectorXd magnitude(complexResponse.size());
-    for(int index = 0; index < complexResponse.size(); ++index) {
+    for (int index = 0; index < complexResponse.size(); ++index) {
         magnitude(index) = std::abs(complexResponse(index));
     }
 
@@ -463,7 +463,7 @@ VectorXd SessionFilter::phaseResponse(int iPoints) const
 {
     const VectorXcd complexResponse = frequencyResponse(iPoints);
     VectorXd phase(complexResponse.size());
-    for(int index = 0; index < complexResponse.size(); ++index) {
+    for (int index = 0; index < complexResponse.size(); ++index) {
         phase(index) = std::arg(complexResponse(index)) * 180.0 / M_PI;
     }
 
@@ -474,7 +474,7 @@ VectorXd SessionFilter::phaseResponse(int iPoints) const
 
 QString SessionFilter::coefficientExportText() const
 {
-    if(!isValid()) {
+    if (!isValid()) {
         return QString();
     }
 
@@ -483,16 +483,16 @@ QString SessionFilter::coefficientExportText() const
     QString output;
     QTextStream stream(&output);
 
-    if(isFir()) {
+    if (isFir()) {
         const RowVectorXd coefficients = m_firKernel.getCoefficients();
-        for(Index index = 0; index < coefficients.cols(); ++index) {
+        for (Index index = 0; index < coefficients.cols(); ++index) {
             stream << coefficients(index) << '\n';
         }
         return output;
     }
 
     stream << "# section b0 b1 b2 a1 a2\n";
-    for(int section = 0; section < m_iirSections.size(); ++section) {
+    for (int section = 0; section < m_iirSections.size(); ++section) {
         const IirBiquad& biquad = m_iirSections.at(section);
         stream << section << ' '
                << biquad.b0 << ' '
@@ -509,7 +509,7 @@ QString SessionFilter::coefficientExportText() const
 
 int SessionFilter::responseSizeHint() const
 {
-    if(isFir()) {
+    if (isFir()) {
         return nextPowerOfTwo(std::max(4096, m_iOrder * 4));
     }
 
@@ -520,12 +520,12 @@ int SessionFilter::responseSizeHint() const
 
 int SessionFilter::recommendedPaddingSamples() const
 {
-    if(!isValid()) {
+    if (!isValid()) {
         return 0;
     }
 
     const int basePadding = static_cast<int>(std::ceil(m_dSamplingFrequencyHz));
-    if(isFir()) {
+    if (isFir()) {
         return std::max(basePadding, m_iOrder * 2);
     }
 

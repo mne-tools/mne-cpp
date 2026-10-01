@@ -40,12 +40,12 @@ namespace SCSHAREDLIB
  *
  * @brief PluginOutputConnector with specified Measurement
  */
-template <class T>
+template<class T>
 class PluginOutputData : public PluginOutputConnector
 {
 public:
-    typedef QSharedPointer<PluginOutputData<T> > SPtr;               /**< Shared pointer type for PluginOutputData. */
-    typedef QSharedPointer<const PluginOutputData<T> > ConstSPtr;    /**< Const shared pointer type for PluginOutputData. */
+    typedef QSharedPointer<PluginOutputData<T>> SPtr;            /**< Shared pointer type for PluginOutputData. */
+    typedef QSharedPointer<const PluginOutputData<T>> ConstSPtr; /**< Const shared pointer type for PluginOutputData. */
 
     //=========================================================================================================
     /**
@@ -55,15 +55,17 @@ public:
      * @param[in] name       connection name.
      * @param[in] descr      connection description.
      */
-    PluginOutputData(AbstractPlugin *parent,
-                     const QString &name,
-                     const QString &descr);
+    PluginOutputData(AbstractPlugin* parent,
+                     const QString& name,
+                     const QString& descr);
 
     //=========================================================================================================
     /**
      * Destructor
      */
-    virtual ~PluginOutputData(){}
+    virtual ~PluginOutputData()
+    {
+    }
 
     //=========================================================================================================
     /**
@@ -75,9 +77,9 @@ public:
      *
      * @return the created PluginOutputData.
      */
-    static inline QSharedPointer< PluginOutputData<T> > create(AbstractPlugin *parent,
-                                                               const QString &name,
-                                                               const QString &descr);
+    static inline QSharedPointer<PluginOutputData<T>> create(AbstractPlugin* parent,
+                                                             const QString& name,
+                                                             const QString& descr);
 
     //=========================================================================================================
     /**
@@ -97,16 +99,16 @@ private:
 // INLINE DEFINITIONS
 //=============================================================================================================
 
-template <class T>
-inline QSharedPointer< PluginOutputData<T> > PluginOutputData<T>::create(AbstractPlugin *parent, const QString &name, const QString &descr)
+template<class T>
+inline QSharedPointer<PluginOutputData<T>> PluginOutputData<T>::create(AbstractPlugin* parent, const QString& name, const QString& descr)
 {
-    QSharedPointer< PluginOutputData<T> > pPluginOutputData(new PluginOutputData<T>(parent, name, descr));
+    QSharedPointer<PluginOutputData<T>> pPluginOutputData(new PluginOutputData<T>(parent, name, descr));
     return pPluginOutputData;
 }
 
 //=============================================================================================================
 
-template <class T>
+template<class T>
 inline QSharedPointer<T> PluginOutputData<T>::measurementData()
 {
     return m_pMeasurement;

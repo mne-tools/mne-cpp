@@ -34,7 +34,8 @@
 // DEFINE NAMESPACE ANSHAREDLIB
 //=============================================================================================================
 
-namespace ANSHAREDLIB {
+namespace ANSHAREDLIB
+{
 
 //=============================================================================================================
 class ANSHAREDSHARED_EXPORT MriCoordModel : public AbstractModel
@@ -42,10 +43,10 @@ class ANSHAREDSHARED_EXPORT MriCoordModel : public AbstractModel
     Q_OBJECT
 
 public:
-    typedef QSharedPointer<MriCoordModel> SPtr;              /**< Shared pointer type for EventModel. */
-    typedef QSharedPointer<const MriCoordModel> ConstSPtr;   /**< Const shared pointer type for EventModel. */
+    typedef QSharedPointer<MriCoordModel> SPtr;            /**< Shared pointer type for EventModel. */
+    typedef QSharedPointer<const MriCoordModel> ConstSPtr; /**< Const shared pointer type for EventModel. */
 
-    MriCoordModel(const QString &sFilePath,
+    MriCoordModel(const QString& sFilePath,
                   const QByteArray& byteLoadedData = QByteArray(),
                   QObject* parent = Q_NULLPTR);
 
@@ -55,7 +56,7 @@ public:
      *
      * @param[in] parent     The parent index.
      */
-    virtual int rowCount(const QModelIndex &parent = QModelIndex()) const override;
+    virtual int rowCount(const QModelIndex& parent = QModelIndex()) const override;
 
     //=========================================================================================================
     /**
@@ -63,7 +64,7 @@ public:
      *
      * @param[in] parent     The parent index.
      */
-    virtual int columnCount(const QModelIndex &parent = QModelIndex()) const override;
+    virtual int columnCount(const QModelIndex& parent = QModelIndex()) const override;
 
     //=========================================================================================================
     /**
@@ -72,7 +73,7 @@ public:
      * @param[in] index   The index that referres to the requested item.
      * @param[in] role    The requested role.
      */
-    virtual QVariant data(const QModelIndex &index,
+    virtual QVariant data(const QModelIndex& index,
                           int role = Qt::DisplayRole) const override;
 
     //=========================================================================================================
@@ -81,7 +82,7 @@ public:
      *
      * @param[in] index   The index that referres to the requested item.
      */
-    Qt::ItemFlags flags(const QModelIndex & index) const override;
+    Qt::ItemFlags flags(const QModelIndex& index) const override;
 
     //=========================================================================================================
     /**
@@ -103,7 +104,7 @@ public:
      */
     inline QModelIndex index(int row,
                              int column,
-                             const QModelIndex &parent = QModelIndex()) const override;
+                             const QModelIndex& parent = QModelIndex()) const override;
 
     //=========================================================================================================
     /**
@@ -112,7 +113,7 @@ public:
      *
      * @param[in] index   The index that referres to the child.
      */
-    inline QModelIndex parent(const QModelIndex &index) const override;
+    inline QModelIndex parent(const QModelIndex& index) const override;
 };
 
 //=============================================================================================================
@@ -126,7 +127,7 @@ inline MODEL_TYPE MriCoordModel::getType() const
 
 //=============================================================================================================
 
-QModelIndex MriCoordModel::parent(const QModelIndex &index) const
+QModelIndex MriCoordModel::parent(const QModelIndex& index) const
 {
     Q_UNUSED(index);
     return QModelIndex();
@@ -134,11 +135,11 @@ QModelIndex MriCoordModel::parent(const QModelIndex &index) const
 
 //=============================================================================================================
 
-QModelIndex MriCoordModel::index(int row, int column, const QModelIndex &parent) const
+QModelIndex MriCoordModel::index(int row, int column, const QModelIndex& parent) const
 {
     Q_UNUSED(parent);
     return createIndex(row, column);
 }
 
-}//namespace
+} //namespace
 #endif // MRICOORDMODEL_H

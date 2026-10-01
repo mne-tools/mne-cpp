@@ -54,8 +54,8 @@ namespace MNELIB
 class MNESHARED_EXPORT MNEMshPicked
 {
 public:
-    typedef QSharedPointer<MNEMshPicked> SPtr;              /**< Shared pointer type for MNEMshPicked. */
-    typedef QSharedPointer<const MNEMshPicked> ConstSPtr;   /**< Const shared pointer type for MNEMshPicked. */
+    typedef QSharedPointer<MNEMshPicked> SPtr;            /**< Shared pointer type for MNEMshPicked. */
+    typedef QSharedPointer<const MNEMshPicked> ConstSPtr; /**< Const shared pointer type for MNEMshPicked. */
 
     //=========================================================================================================
     /**
@@ -70,14 +70,14 @@ public:
     ~MNEMshPicked();
 
 public:
-    int   vert;			/* Vertex # */
-    bool  sparse;			/* Is this a isolated point? */
+    int vert;    /* Vertex # */
+    bool sparse; /* Is this a isolated point? */
 
-// ### OLD STRUCT ###
-//    typedef struct {
-//      int   vert;			/* Vertex # */
-//      int   sparse;			/* Is this a isolated point? */
-//    } *mshPicked,mshPickedRec;
+    // ### OLD STRUCT ###
+    //    typedef struct {
+    //      int   vert;			/* Vertex # */
+    //      int   sparse;			/* Is this a isolated point? */
+    //    } *mshPicked,mshPickedRec;
 };
 
 //=============================================================================================================

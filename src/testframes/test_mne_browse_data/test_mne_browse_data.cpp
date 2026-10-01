@@ -270,8 +270,9 @@ void TestMneBrowseData::testFiffBlockReaderReadBlock()
     QVERIFY(reader.isOpen());
 
     int from = reader.firstSample();
-    int to = from + 999;  // Read 1000 samples
-    if (to > reader.lastSample()) to = reader.lastSample();
+    int to = from + 999; // Read 1000 samples
+    if (to > reader.lastSample())
+        to = reader.lastSample();
 
     MatrixXd block = reader.readBlockSync(from, to);
     QVERIFY(block.rows() > 0);
@@ -709,8 +710,8 @@ void TestMneBrowseData::testEventModelSetEventMatrix()
     // Create event matrix (N x 3): [sample, prev_value, event_code]
     MatrixXi events(3, 3);
     events << 1000, 0, 1,
-              2000, 0, 2,
-              3000, 0, 1;
+        2000, 0, 2,
+        3000, 0, 1;
     model.setEventMatrix(events);
 
     QCOMPARE(model.rowCount(), 3);
@@ -723,7 +724,7 @@ void TestMneBrowseData::testEventModelRowColumnCount()
 
     MatrixXi events(2, 3);
     events << 1000, 0, 1,
-              2000, 0, 2;
+        2000, 0, 2;
     model.setEventMatrix(events);
 
     QCOMPARE(model.rowCount(), 2);
@@ -787,8 +788,8 @@ void TestMneBrowseData::testEventModelEventTypes()
 
     MatrixXi events(3, 3);
     events << 1000, 0, 1,
-              2000, 0, 2,
-              3000, 0, 3;
+        2000, 0, 2,
+        3000, 0, 3;
     model.setEventMatrix(events);
 
     QStringList types = model.getEventTypeList();
@@ -805,8 +806,8 @@ void TestMneBrowseData::testEventModelFilterType()
 
     MatrixXi events(3, 3);
     events << 1000, 0, 1,
-              2000, 0, 2,
-              3000, 0, 1;
+        2000, 0, 2,
+        3000, 0, 1;
     model.setEventMatrix(events);
 
     // Filter to show only event type 1
@@ -823,7 +824,7 @@ void TestMneBrowseData::testEventModelClear()
 
     MatrixXi events(2, 3);
     events << 1000, 0, 1,
-              2000, 0, 2;
+        2000, 0, 2;
     model.setEventMatrix(events);
 
     model.clearModel();
@@ -837,7 +838,7 @@ void TestMneBrowseData::testEventModelSaveLoadEvents()
 
     MatrixXi events(2, 3);
     events << 1000, 0, 1,
-              2000, 0, 2;
+        2000, 0, 2;
     model.setEventMatrix(events);
 
     // Save as .eve (ASCII format — fif format has a write/read format mismatch)
@@ -1138,14 +1139,14 @@ void TestMneBrowseData::testFilterOperatorLPF()
     int order = 128;
 
     FilterOperator filter("LPF_40Hz",
-                         FilterOperator::LPF,
-                         order,
-                         centerFreq,
-                         0.0,          // bandwidth (not used for LPF)
-                         0.1,          // parks width
-                         sFreq,
-                         4096,
-                         FilterOperator::Cosine);
+                          FilterOperator::LPF,
+                          order,
+                          centerFreq,
+                          0.0, // bandwidth (not used for LPF)
+                          0.1, // parks width
+                          sFreq,
+                          4096,
+                          FilterOperator::Cosine);
 
     QCOMPARE(filter.m_Type, FilterOperator::LPF);
     QVERIFY(filter.m_iFilterOrder > 0);
@@ -1159,14 +1160,14 @@ void TestMneBrowseData::testFilterOperatorHPF()
     int order = 128;
 
     FilterOperator filter("HPF_1Hz",
-                         FilterOperator::HPF,
-                         order,
-                         centerFreq,
-                         0.0,
-                         0.1,
-                         sFreq,
-                         4096,
-                         FilterOperator::Cosine);
+                          FilterOperator::HPF,
+                          order,
+                          centerFreq,
+                          0.0,
+                          0.1,
+                          sFreq,
+                          4096,
+                          FilterOperator::Cosine);
 
     QCOMPARE(filter.m_Type, FilterOperator::HPF);
     QVERIFY(filter.m_dCoeffA.size() > 0);
@@ -1180,14 +1181,14 @@ void TestMneBrowseData::testFilterOperatorBPF()
     int order = 128;
 
     FilterOperator filter("BPF_5-35Hz",
-                         FilterOperator::BPF,
-                         order,
-                         centerFreq,
-                         bandwidth,
-                         0.1,
-                         sFreq,
-                         4096,
-                         FilterOperator::Cosine);
+                          FilterOperator::BPF,
+                          order,
+                          centerFreq,
+                          bandwidth,
+                          0.1,
+                          sFreq,
+                          4096,
+                          FilterOperator::Cosine);
 
     QCOMPARE(filter.m_Type, FilterOperator::BPF);
     QVERIFY(filter.m_dCoeffA.size() > 0);
@@ -1199,14 +1200,14 @@ void TestMneBrowseData::testFilterOperatorApplyFFTFilter()
     int order = 128;
 
     FilterOperator filter("LPF_40Hz",
-                         FilterOperator::LPF,
-                         order,
-                         40.0 / sFreq,
-                         0.0,
-                         0.1,
-                         sFreq,
-                         4096,
-                         FilterOperator::Cosine);
+                          FilterOperator::LPF,
+                          order,
+                          40.0 / sFreq,
+                          0.0,
+                          0.1,
+                          sFreq,
+                          4096,
+                          FilterOperator::Cosine);
 
     // Create a test signal: 10 Hz sine + 100 Hz sine
     int nSamples = 4096;

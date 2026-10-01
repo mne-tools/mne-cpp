@@ -41,11 +41,11 @@
 //=============================================================================================================
 
 #if defined(STATICBUILD)
-#  define CONNECTIVITYSHARED_EXPORT
+#define CONNECTIVITYSHARED_EXPORT
 #elif defined(MNE_CONNECTIVITY_LIBRARY)
-#  define CONNECTIVITYSHARED_EXPORT Q_DECL_EXPORT    /**< Q_DECL_EXPORT must be added to the declarations of symbols used when compiling a shared library. */
+#define CONNECTIVITYSHARED_EXPORT Q_DECL_EXPORT /**< Q_DECL_EXPORT must be added to the declarations of symbols used when compiling a shared library. */
 #else
-#  define CONNECTIVITYSHARED_EXPORT Q_DECL_IMPORT    /**< Q_DECL_IMPORT must be added to the declarations of symbols used when compiling a client that uses the shared library. */
+#define CONNECTIVITYSHARED_EXPORT Q_DECL_IMPORT /**< Q_DECL_IMPORT must be added to the declarations of symbols used when compiling a client that uses the shared library. */
 #endif
 
 //=============================================================================================================
@@ -53,7 +53,8 @@
  * @namespace CONNECTIVITYLIB
  * @brief     Functional connectivity metrics (coherence, PLV, cross-correlation, etc.).
  */
-namespace CONNECTIVITYLIB{
+namespace CONNECTIVITYLIB
+{
 
 //=============================================================================================================
 /**

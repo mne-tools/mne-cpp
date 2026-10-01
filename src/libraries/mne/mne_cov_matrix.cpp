@@ -43,14 +43,14 @@ using namespace FIFFLIB;
 using namespace MNELIB;
 
 constexpr int FAIL = -1;
-constexpr int OK   =  0;
+constexpr int OK = 0;
 
 //============================= mne_decompose.c =============================
 
-int mne_decompose_eigen (const VectorXd& mat,
-                         VectorXd& lambda,
-                         Eigen::Matrix<float, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor>& vectors,
-                         int    dim)
+int mne_decompose_eigen(const VectorXd& mat,
+                        VectorXd& lambda,
+                        Eigen::Matrix<float, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor>& vectors,
+                        int dim)
 /*
       * Compute the eigenvalue decomposition of
       * a symmetric matrix using the LAPACK routines
@@ -58,35 +58,35 @@ int mne_decompose_eigen (const VectorXd& mat,
       * 'mat' contains the lower triangle of the matrix
       */
 {
-    int    np  =   dim*(dim+1)/2;
-    int    maxi;
+    int np = dim * (dim + 1) / 2;
+    int maxi;
     double scale;
 
-// idamax workaround begin
+    // idamax workaround begin
     maxi = 0;
-    for(int i = 0; i < np; ++i)
+    for (int i = 0; i < np; ++i)
         if (std::fabs(mat[i]) > std::fabs(mat[maxi]))
             maxi = i;
-// idamax workaround end
+    // idamax workaround end
 
-    scale = 1.0/mat[maxi];
+    scale = 1.0 / mat[maxi];
 
-// dspev workaround begin
-    MatrixXd dmat_full = MatrixXd::Zero(dim,dim);
+    // dspev workaround begin
+    MatrixXd dmat_full = MatrixXd::Zero(dim, dim);
     int idx = 0;
     for (int i = 0; i < dim; ++i) {
-        for(int j = 0; j <= i; ++j) {
-            double val = mat[idx]*scale;
-            dmat_full(i,j) = val;
-            dmat_full(j,i) = val;
+        for (int j = 0; j <= i; ++j) {
+            double val = mat[idx] * scale;
+            dmat_full(i, j) = val;
+            dmat_full(j, i) = val;
             ++idx;
         }
     }
     SelfAdjointEigenSolver<MatrixXd> es;
     es.compute(dmat_full);
-// dspev workaround end
+    // dspev workaround end
 
-    scale = 1.0/scale;
+    scale = 1.0 / scale;
     lambda = es.eigenvalues() * scale;
     vectors = es.eigenvectors().transpose().cast<float>();
 
@@ -103,18 +103,18 @@ MNECovMatrix::MNECovMatrix(int p_kind,
                            const VectorXd& p_cov,
                            const VectorXd& p_cov_diag,
                            FiffSparseMatrix* p_cov_sparse)
-:kind(p_kind)
-,ncov(p_ncov)
-,nfree(1)
-,nproj(0)
-,nzero(0)
-,names(p_names)
-,cov(p_cov)
-,cov_diag(p_cov_diag)
-,cov_sparse(p_cov_sparse)
-,proj(nullptr)
-,sss(nullptr)
-,nbad(0)
+: kind(p_kind)
+, ncov(p_ncov)
+, nfree(1)
+, nproj(0)
+, nzero(0)
+, names(p_names)
+, cov(p_cov)
+, cov_diag(p_cov_diag)
+, cov_sparse(p_cov_sparse)
+, proj(nullptr)
+, sss(nullptr)
+, nbad(0)
 {
 }
 
@@ -135,23 +135,23 @@ std::unique_ptr<MNECovMatrix> MNECovMatrix::read(const QString& name, int kind)
     QList<FiffDirNode::SPtr> nodes;
     FiffDirNode::SPtr covnode;
 
-    QStringList     names;
-    int             nnames     = 0;
+    QStringList names;
+    int nnames = 0;
     Eigen::VectorXd cov;
     Eigen::VectorXd cov_diag;
     std::unique_ptr<FiffSparseMatrix> cov_sparse_owner;
     Eigen::VectorXd lambda;
     Eigen::Matrix<float, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor> eigen;
-    MatrixXf        tmp_eigen;
-    QStringList     bads;
-    int             nbad       = 0;
-    int             ncov       = 0;
-    int             nfree      = 1;
+    MatrixXf tmp_eigen;
+    QStringList bads;
+    int nbad = 0;
+    int ncov = 0;
+    int nfree = 1;
     std::unique_ptr<MNECovMatrix> res;
 
-    int            k,p,nn;
-    const float    *f;
-    const double   *d;
+    int k, p, nn;
+    const float* f;
+    const double* d;
     std::unique_ptr<MNEProjOp> op;
     std::unique_ptr<MNESssData> sss;
 
@@ -258,7 +258,7 @@ std::unique_ptr<MNECovMatrix> MNECovMatrix::read(const QString& name, int kind)
         }
 
         if (nodes[k]->find_tag(stream, FIFF_MNE_COV_EIGENVALUES, t_pTag)) {
-            const double *lambda_data = static_cast<const double *>(t_pTag->toDouble());
+            const double* lambda_data = static_cast<const double*>(t_pTag->toDouble());
             lambda = Eigen::Map<const Eigen::VectorXd>(lambda_data, ncov);
             if (nodes[k]->find_tag(stream, FIFF_MNE_COV_EIGENVECTORS, t_pTag)) {
                 stream->close();
@@ -304,11 +304,11 @@ std::unique_ptr<MNECovMatrix> MNECovMatrix::read(const QString& name, int kind)
         stream->close();
         return nullptr;
     }
-    res->eigen  = std::move(eigen);
+    res->eigen = std::move(eigen);
     res->lambda = std::move(lambda);
-    res->nfree  = nfree;
-    res->bads   = bads;
-    res->nbad   = nbad;
+    res->nfree = nfree;
+    res->bads = bads;
+    res->nbad = nbad;
     /*
      * Count the non-zero eigenvalues
      */
@@ -335,8 +335,8 @@ std::unique_ptr<MNECovMatrix> MNECovMatrix::read(const QString& name, int kind)
 std::unique_ptr<MNECovMatrix> MNECovMatrix::dup() const
 {
     auto res = cov_diag.size() > 0
-        ? create(kind,ncov,names,VectorXd(),VectorXd(cov_diag))
-        : create(kind,ncov,names,VectorXd(cov),VectorXd());
+        ? create(kind, ncov, names, VectorXd(), VectorXd(cov_diag))
+        : create(kind, ncov, names, VectorXd(cov), VectorXd());
     /*
         * Duplicate additional items
         */
@@ -378,7 +378,7 @@ int MNECovMatrix::add_inv()
         if (src[k] <= 0.0)
             inv_lambda[k] = 0.0;
         else
-            inv_lambda[k] = 1.0/sqrt(src[k]);
+            inv_lambda[k] = 1.0 / sqrt(src[k]);
     }
     return OK;
 }
@@ -392,10 +392,10 @@ int MNECovMatrix::condition(float rank_threshold, int use_rank)
     VectorXd lambda_local;
     Eigen::Matrix<float, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor> local_eigen;
     MatrixXd data1;
-    double magscale,gradscale,eegscale;
-    int    nmag,ngrad,neeg,nok;
-    int    j,k;
-    int    res = FAIL;
+    double magscale, gradscale, eegscale;
+    int nmag, ngrad, neeg, nok;
+    int j, k;
+    int res = FAIL;
 
     if (cov_diag.size() > 0)
         return OK;
@@ -407,31 +407,32 @@ int MNECovMatrix::condition(float rank_threshold, int use_rank)
     nmag = ngrad = neeg = 0;
     for (k = 0; k < ncov; k++) {
         if (ch_class[k] == MNE_COV_CH_MEG_MAG) {
-            magscale += this->cov[lt_packed_index(k,k)]; nmag++;
-        }
-        else if (ch_class[k] == MNE_COV_CH_MEG_GRAD) {
-            gradscale += this->cov[lt_packed_index(k,k)]; ngrad++;
-        }
-        else if (ch_class[k] == MNE_COV_CH_EEG) {
-            eegscale += this->cov[lt_packed_index(k,k)]; neeg++;
+            magscale += this->cov[lt_packed_index(k, k)];
+            nmag++;
+        } else if (ch_class[k] == MNE_COV_CH_MEG_GRAD) {
+            gradscale += this->cov[lt_packed_index(k, k)];
+            ngrad++;
+        } else if (ch_class[k] == MNE_COV_CH_EEG) {
+            eegscale += this->cov[lt_packed_index(k, k)];
+            neeg++;
         }
 #ifdef DEBUG
-        fprintf(stdout,"%d ",ch_class[k]);
+        fprintf(stdout, "%d ", ch_class[k]);
 #endif
     }
 #ifdef DEBUG
-    fprintf(stdout,"\n");
+    fprintf(stdout, "\n");
 #endif
     if (nmag > 0)
-        magscale = magscale > 0.0 ? sqrt(nmag/magscale) : 0.0;
+        magscale = magscale > 0.0 ? sqrt(nmag / magscale) : 0.0;
     if (ngrad > 0)
-        gradscale = gradscale > 0.0 ? sqrt(ngrad/gradscale) : 0.0;
+        gradscale = gradscale > 0.0 ? sqrt(ngrad / gradscale) : 0.0;
     if (neeg > 0)
-        eegscale = eegscale > 0.0 ? sqrt(neeg/eegscale) : 0.0;
+        eegscale = eegscale > 0.0 ? sqrt(neeg / eegscale) : 0.0;
 #ifdef DEBUG
-    fprintf(stdout,"%d %g\n",nmag,magscale);
-    fprintf(stdout,"%d %g\n",ngrad,gradscale);
-    fprintf(stdout,"%d %g\n",neeg,eegscale);
+    fprintf(stdout, "%d %g\n", nmag, magscale);
+    fprintf(stdout, "%d %g\n", ngrad, gradscale);
+    fprintf(stdout, "%d %g\n", neeg, eegscale);
 #endif
     scale_vec.resize(ncov);
     for (k = 0; k < ncov; k++) {
@@ -444,48 +445,48 @@ int MNECovMatrix::condition(float rank_threshold, int use_rank)
         else
             scale_vec[k] = 1.0;
     }
-    cov_local.resize(ncov*(ncov+1)/2);
+    cov_local.resize(ncov * (ncov + 1) / 2);
     lambda_local.resize(ncov);
-    local_eigen.resize(ncov,ncov);
+    local_eigen.resize(ncov, ncov);
     for (j = 0; j < ncov; j++)
         for (k = 0; k <= j; k++)
-            cov_local[lt_packed_index(j,k)] = this->cov[lt_packed_index(j,k)]*scale_vec[j]*scale_vec[k];
-    if (mne_decompose_eigen(cov_local,lambda_local,local_eigen,ncov) == 0) {
+            cov_local[lt_packed_index(j, k)] = this->cov[lt_packed_index(j, k)] * scale_vec[j] * scale_vec[k];
+    if (mne_decompose_eigen(cov_local, lambda_local, local_eigen, ncov) == 0) {
 #ifdef DEBUG
         for (k = 0; k < ncov; k++)
-            fprintf(stdout,"%g ",lambda_local[k]/lambda_local[ncov-1]);
-        fprintf(stdout,"\n");
+            fprintf(stdout, "%g ", lambda_local[k] / lambda_local[ncov - 1]);
+        fprintf(stdout, "\n");
 #endif
         nok = 0;
-        for (k = ncov-1; k >= 0; k--) {
-            if (lambda_local[k] >= rank_threshold*lambda_local[ncov-1])
+        for (k = ncov - 1; k >= 0; k--) {
+            if (lambda_local[k] >= rank_threshold * lambda_local[ncov - 1])
                 nok++;
             else
                 break;
         }
-        qInfo("\n\tEstimated covariance matrix rank = %d (%g)\n",nok,lambda_local[ncov-nok]/lambda_local[ncov-1]);
+        qInfo("\n\tEstimated covariance matrix rank = %d (%g)\n", nok, lambda_local[ncov - nok] / lambda_local[ncov - 1]);
         if (use_rank > 0 && use_rank < nok) {
             nok = use_rank;
-            qInfo("\tUser-selected covariance matrix rank = %d (%g)\n",nok,lambda_local[ncov-nok]/lambda_local[ncov-1]);
+            qInfo("\tUser-selected covariance matrix rank = %d (%g)\n", nok, lambda_local[ncov - nok] / lambda_local[ncov - 1]);
         }
         /*
          * Put it back together
          */
-        for (j = 0; j < ncov-nok; j++)
+        for (j = 0; j < ncov - nok; j++)
             lambda_local[j] = 0.0;
-        data1.resize(ncov,ncov);
+        data1.resize(ncov, ncov);
         for (j = 0; j < ncov; j++) {
 #ifdef DEBUG
-            mne_print_vector(stdout,nullptr,local_eigen.row(j).data(),ncov);
+            mne_print_vector(stdout, nullptr, local_eigen.row(j).data(), ncov);
 #endif
             for (k = 0; k < ncov; k++)
-                data1(j,k) = sqrt(lambda_local[j])*local_eigen(j,k);
+                data1(j, k) = sqrt(lambda_local[j]) * local_eigen(j, k);
         }
         MatrixXd data2 = data1.transpose() * data1;
 #ifdef DEBUG
         qInfo(">>>\n");
         for (j = 0; j < ncov; j++)
-            mne_print_dvector(stdout,nullptr,data2.row(j).data(),ncov);
+            mne_print_dvector(stdout, nullptr, data2.row(j).data(), ncov);
         qInfo(">>>\n");
 #endif
         /*
@@ -493,11 +494,11 @@ int MNECovMatrix::condition(float rank_threshold, int use_rank)
          */
         for (k = 0; k < ncov; k++)
             if (scale_vec[k] > 0.0)
-                scale_vec[k] = 1.0/scale_vec[k];
+                scale_vec[k] = 1.0 / scale_vec[k];
         for (j = 0; j < ncov; j++)
             for (k = 0; k <= j; k++)
-                if (this->cov[lt_packed_index(j,k)] != 0.0)
-                    this->cov[lt_packed_index(j,k)] = scale_vec[j]*scale_vec[k]*data2(j,k);
+                if (this->cov[lt_packed_index(j, k)] != 0.0)
+                    this->cov[lt_packed_index(j, k)] = scale_vec[j] * scale_vec[k] * data2(j, k);
         res = nok;
     }
     return res;
@@ -510,7 +511,7 @@ int MNECovMatrix::decompose_eigen_small(float p_small, int use_rank)
           * Do the eigenvalue decomposition
           */
 {
-    int   k,p,rank;
+    int k, p, rank;
     float rank_threshold = 1e-6f;
 
     if (p_small < 0)
@@ -524,19 +525,18 @@ int MNECovMatrix::decompose_eigen_small(float p_small, int use_rank)
         for (k = 0; k < ncov; k++, nzero++)
             if (lambda[k] > 0)
                 break;
-    }
-    else {
+    } else {
         lambda.resize(0);
-        eigen.resize(0,0);
+        eigen.resize(0, 0);
 
-        if ((rank = condition(rank_threshold,use_rank)) < 0)
+        if ((rank = condition(rank_threshold, use_rank)) < 0)
             return FAIL;
 
         lambda.resize(ncov);
-        eigen.resize(ncov,ncov);
-        if (mne_decompose_eigen (cov,lambda,eigen,ncov) != 0) {
+        eigen.resize(ncov, ncov);
+        if (mne_decompose_eigen(cov, lambda, eigen, ncov) != 0) {
             lambda.resize(0);
-            eigen.resize(0,0);
+            eigen.resize(0, 0);
             return FAIL;
         }
         nzero = ncov - rank;
@@ -546,24 +546,24 @@ int MNECovMatrix::decompose_eigen_small(float p_small, int use_rank)
          * Find which eigenvectors correspond to EEG/MEG
          */
         {
-            float meglike,eeglike;
-            int   nmeg,neeg;
+            float meglike, eeglike;
+            int nmeg, neeg;
 
             nmeg = neeg = 0;
             for (k = nzero; k < ncov; k++) {
                 meglike = eeglike = 0.0;
-                for (p = 0; p < ncov; p++)  {
+                for (p = 0; p < ncov; p++) {
                     if (ch_class[p] == MNE_COV_CH_EEG)
-                        eeglike += std::fabs(eigen(k,p));
+                        eeglike += std::fabs(eigen(k, p));
                     else if (ch_class[p] == MNE_COV_CH_MEG_MAG || ch_class[p] == MNE_COV_CH_MEG_GRAD)
-                        meglike += std::fabs(eigen(k,p));
+                        meglike += std::fabs(eigen(k, p));
                 }
                 if (meglike > eeglike)
                     nmeg++;
                 else
                     neeg++;
             }
-            qInfo("\t%d MEG and %d EEG-like channels remain in the whitened data\n",nmeg,neeg);
+            qInfo("\t%d MEG and %d EEG-like channels remain in the whitened data\n", nmeg, neeg);
         }
     }
     return add_inv();
@@ -574,7 +574,7 @@ int MNECovMatrix::decompose_eigen_small(float p_small, int use_rank)
 int MNECovMatrix::decompose_eigen()
 
 {
-    return decompose_eigen_small(-1.0,-1);
+    return decompose_eigen_small(-1.0, -1);
 }
 
 //=============================================================================================================
@@ -583,16 +583,16 @@ int MNECovMatrix::lt_packed_index(int j, int k)
 
 {
     if (j >= k)
-        return k + j*(j+1)/2;
+        return k + j * (j + 1) / 2;
     else
-        return j + k*(k+1)/2;
+        return j + k * (k + 1) / 2;
 }
 
 //=============================================================================================================
 
 int MNECovMatrix::classify_channels(const QList<FiffChInfo>& chs, int nchan)
 {
-    int k,p;
+    int k, p;
     FiffChInfo ch;
 
     if (chs.isEmpty()) {
@@ -603,15 +603,14 @@ int MNECovMatrix::classify_channels(const QList<FiffChInfo>& chs, int nchan)
     for (k = 0; k < ncov; k++) {
         ch_class[k] = MNE_COV_CH_UNKNOWN;
         for (p = 0; p < nchan; p++) {
-            if (QString::compare(chs[p].ch_name,names[k]) == 0) {
+            if (QString::compare(chs[p].ch_name, names[k]) == 0) {
                 ch = chs[p];
                 if (ch.kind == FIFFV_MEG_CH) {
                     if (ch.unit == FIFF_UNIT_T)
                         ch_class[k] = MNE_COV_CH_MEG_MAG;
                     else
                         ch_class[k] = MNE_COV_CH_MEG_GRAD;
-                }
-                else if (ch.kind == FIFFV_EEG_CH)
+                } else if (ch.kind == FIFFV_EEG_CH)
                     ch_class[k] = MNE_COV_CH_EEG;
                 break;
             }
@@ -628,19 +627,18 @@ int MNECovMatrix::whiten_vector(Eigen::Ref<Eigen::VectorXf> data, Eigen::Ref<Eig
         qWarning("Incompatible covariance matrix. Cannot whiten the data.");
         return FAIL;
     }
-    const double *inv = inv_lambda.data();
+    const double* inv = inv_lambda.data();
     if (is_diag()) {
         for (int k = 0; k < nchan; k++)
-            whitened_data[k] = data[k]*inv[k];
-    }
-    else {
+            whitened_data[k] = data[k] * inv[k];
+    } else {
         Eigen::VectorXf tmp(nchan);
         for (int k = nzero; k < nchan; k++)
             tmp[k] = eigen.row(k).dot(data.cast<float>());
         for (int k = 0; k < nzero; k++)
             whitened_data[k] = 0.0;
         for (int k = nzero; k < nchan; k++)
-            whitened_data[k] = tmp[k]*inv[k];
+            whitened_data[k] = tmp[k] * inv[k];
     }
     return OK;
 }
@@ -649,39 +647,39 @@ int MNECovMatrix::whiten_vector(Eigen::Ref<Eigen::VectorXf> data, Eigen::Ref<Eig
 
 void MNECovMatrix::regularize(const Eigen::Vector3f& regs)
 {
-    int    j;
-    float  sums[3],nn[3];
-    int    nkind = 3;
+    int j;
+    float sums[3], nn[3];
+    int nkind = 3;
 
     if (cov.size() == 0 || ch_class.size() == 0)
         return;
 
     for (j = 0; j < nkind; j++) {
         sums[j] = 0.0;
-        nn[j]   = 0;
+        nn[j] = 0;
     }
     for (j = 0; j < ncov; j++) {
         if (ch_class[j] >= 0) {
-            sums[ch_class[j]] += cov[lt_packed_index(j,j)];
+            sums[ch_class[j]] += cov[lt_packed_index(j, j)];
             nn[ch_class[j]]++;
         }
     }
     qInfo("Average noise-covariance matrix diagonals:");
     for (j = 0; j < nkind; j++) {
         if (nn[j] > 0) {
-            sums[j] = sums[j]/nn[j];
+            sums[j] = sums[j] / nn[j];
             if (j == MNE_COV_CH_MEG_MAG)
-                qInfo("\tMagnetometers       : %-7.2f fT    reg = %-6.2f",1e15*sqrt(sums[j]),regs[j]);
+                qInfo("\tMagnetometers       : %-7.2f fT    reg = %-6.2f", 1e15 * sqrt(sums[j]), regs[j]);
             else if (j == MNE_COV_CH_MEG_GRAD)
-                qInfo("\tPlanar gradiometers : %-7.2f fT/cm reg = %-6.2f",1e13*sqrt(sums[j]),regs[j]);
+                qInfo("\tPlanar gradiometers : %-7.2f fT/cm reg = %-6.2f", 1e13 * sqrt(sums[j]), regs[j]);
             else
-                qInfo("\tEEG                 : %-7.2f uV    reg = %-6.2f",1e6*sqrt(sums[j]),regs[j]);
-            sums[j] = regs[j]*sums[j];
+                qInfo("\tEEG                 : %-7.2f uV    reg = %-6.2f", 1e6 * sqrt(sums[j]), regs[j]);
+            sums[j] = regs[j] * sums[j];
         }
     }
     for (j = 0; j < ncov; j++)
         if (ch_class[j] >= 0)
-            cov[lt_packed_index(j,j)] += sums[ch_class[j]];
+            cov[lt_packed_index(j, j)] += sums[ch_class[j]];
 
     qInfo("Noise-covariance regularized as requested.");
 }
@@ -690,7 +688,7 @@ void MNECovMatrix::regularize(const Eigen::Vector3f& regs)
 
 void MNECovMatrix::revert_to_diag()
 {
-    int k,p;
+    int k, p;
     if (cov.size() == 0)
         return;
 
@@ -703,21 +701,21 @@ void MNECovMatrix::revert_to_diag()
     cov.resize(0);
 
     lambda.resize(0);
-    eigen.resize(0,0);
+    eigen.resize(0, 0);
 }
 
 //=============================================================================================================
 
 std::unique_ptr<MNECovMatrix> MNECovMatrix::pick_chs_omit(const QStringList& new_names,
-                                                           int new_ncov,
-                                                           int omit_meg_eeg,
-                                                           const QList<FiffChInfo>& chs) const
+                                                          int new_ncov,
+                                                          int omit_meg_eeg,
+                                                          const QList<FiffChInfo>& chs) const
 {
-    int j,k;
+    int j, k;
     Eigen::VectorXd cov_local;
     Eigen::VectorXd cov_diag_local;
     QStringList picked_names;
-    int   from,to;
+    int from, to;
     std::unique_ptr<MNECovMatrix> res;
 
     if (new_ncov == 0) {
@@ -731,7 +729,7 @@ std::unique_ptr<MNECovMatrix> MNECovMatrix::pick_chs_omit(const QStringList& new
     Eigen::VectorXi pickVec = Eigen::VectorXi::Constant(new_ncov, -1);
     for (j = 0; j < new_ncov; j++)
         for (k = 0; k < ncov; k++)
-            if (QString::compare(names[k],new_names[j]) == 0) {
+            if (QString::compare(names[k], new_names[j]) == 0) {
                 pickVec[j] = k;
                 break;
             }
@@ -750,8 +748,7 @@ std::unique_ptr<MNECovMatrix> MNECovMatrix::pick_chs_omit(const QStringList& new
                     isMegVec[j] = true;
                 else
                     isMegVec[j] = false;
-        }
-        else {
+        } else {
             for (j = 0; j < new_ncov; j++)
                 if (new_names[j].startsWith("MEG"))
                     isMegVec[j] = true;
@@ -765,20 +762,19 @@ std::unique_ptr<MNECovMatrix> MNECovMatrix::pick_chs_omit(const QStringList& new
             cov_diag_local[j] = cov_diag[pickVec[j]];
             picked_names.append(names[pickVec[j]]);
         }
-    }
-    else {
-        cov_local.resize(new_ncov*(new_ncov+1)/2);
+    } else {
+        cov_local.resize(new_ncov * (new_ncov + 1) / 2);
         for (j = 0; j < new_ncov; j++) {
             picked_names.append(names[pickVec[j]]);
             for (k = 0; k <= j; k++) {
-                from = lt_packed_index(pickVec[j],pickVec[k]);
-                to   = lt_packed_index(j,k);
-                if (to < 0 || to > new_ncov*(new_ncov+1)/2-1) {
-                    qCritical("Wrong destination index in pick_chs_omit : %d %d %d",j,k,to);
+                from = lt_packed_index(pickVec[j], pickVec[k]);
+                to = lt_packed_index(j, k);
+                if (to < 0 || to > new_ncov * (new_ncov + 1) / 2 - 1) {
+                    qCritical("Wrong destination index in pick_chs_omit : %d %d %d", j, k, to);
                     return nullptr;
                 }
-                if (from < 0 || from > ncov*(ncov+1)/2-1) {
-                    qCritical("Wrong source index in pick_chs_omit : %d %d %d",pickVec[j],pickVec[k],from);
+                if (from < 0 || from > ncov * (ncov + 1) / 2 - 1) {
+                    qCritical("Wrong source index in pick_chs_omit : %d %d %d", pickVec[j], pickVec[k], from);
                     return nullptr;
                 }
                 cov_local[to] = cov[from];
@@ -789,7 +785,7 @@ std::unique_ptr<MNECovMatrix> MNECovMatrix::pick_chs_omit(const QStringList& new
         }
     }
 
-    res = MNECovMatrix::create(kind,new_ncov,picked_names,cov_local,cov_diag_local);
+    res = MNECovMatrix::create(kind, new_ncov, picked_names, cov_local, cov_diag_local);
 
     res->bads = bads;
     res->nbad = nbad;

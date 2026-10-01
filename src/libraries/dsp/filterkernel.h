@@ -70,8 +70,8 @@ namespace UTILSLIB
 /**
  * @brief Named filter-design parameter descriptor holding a human-readable name and description (e.g. design method or filter type).
  */
-class DSPSHARED_EXPORT FilterParameter{
-
+class DSPSHARED_EXPORT FilterParameter
+{
 public:
     //=========================================================================================================
     /**
@@ -104,13 +104,15 @@ public:
      */
     QString getName() const;
 
-    friend bool operator == (const FilterParameter& in1, const FilterParameter& in2){
+    friend bool operator==(const FilterParameter& in1, const FilterParameter& in2)
+    {
         //qDebug() << in1.getName() << in2.getName();
         return (in1.getName() == in2.getName());
     }
+
 protected:
-    QString m_sName;            /**< Item name. */
-    QString m_sDescription;     /**< Item description. */
+    QString m_sName;        /**< Item name. */
+    QString m_sDescription; /**< Item description. */
 };
 
 //=============================================================================================================
@@ -121,7 +123,6 @@ protected:
  */
 class DSPSHARED_EXPORT FilterKernel
 {
-
 public:
     //=========================================================================================================
     /**
@@ -142,8 +143,8 @@ public:
      * @param[in] dSFreq           The sampling frequency.
      * @param[in] iDesignMethod     Specifies the design method to use. Choose between Cosind and Tschebyscheff.
      **/
-    FilterKernel(const QString &sFilterName,
-                 int  iFilterType,
+    FilterKernel(const QString& sFilterName,
+                 int iFilterType,
                  int iOrder,
                  double dCenterfreq,
                  double dBandwidth,
@@ -225,8 +226,8 @@ public:
 
     QString getShortDescription() const;
 
-    static QVector<FilterParameter> m_designMethods;  /**< Vector of possible filter design methods. */
-    static QVector<FilterParameter> m_filterTypes;    /**< Vector of possible filter design types. */
+    static QVector<FilterParameter> m_designMethods; /**< Vector of possible filter design methods. */
+    static QVector<FilterParameter> m_filterTypes;   /**< Vector of possible filter design types. */
 
 private:
     //=========================================================================================================
@@ -243,22 +244,22 @@ private:
      */
     void designFilter();
 
-    double          m_sFreq;                /**< the sampling frequency. */
-    double          m_dCenterFreq;          /**< contains center freq of the filter. */
-    double          m_dBandwidth;           /**< contains bandwidth of the filter. */
-    double          m_dParksWidth;          /**< contains the parksmcallen width. */
-    double          m_dLowpassFreq;         /**< lowpass freq (higher cut off) of the filter. */
-    double          m_dHighpassFreq;        /**< highpass freq (lower cut off) of the filter. */
+    double m_sFreq;         /**< the sampling frequency. */
+    double m_dCenterFreq;   /**< contains center freq of the filter. */
+    double m_dBandwidth;    /**< contains bandwidth of the filter. */
+    double m_dParksWidth;   /**< contains the parksmcallen width. */
+    double m_dLowpassFreq;  /**< lowpass freq (higher cut off) of the filter. */
+    double m_dHighpassFreq; /**< highpass freq (lower cut off) of the filter. */
 
-    int             m_iFilterOrder;         /**< represents the order of the filter instance. */
-    int             m_iDesignMethod;        /**< represents the design method of the filter instance.*/
-    int             m_iFilterType;          /**< represents the type of the filter instance.*/
+    int m_iFilterOrder;  /**< represents the order of the filter instance. */
+    int m_iDesignMethod; /**< represents the design method of the filter instance.*/
+    int m_iFilterType;   /**< represents the type of the filter instance.*/
 
-    QString         m_sFilterName;          /**< contains name of the filter. */
-    QString         m_sFilterShortDescription; /**< contains a short string describign some filter parameters. */
+    QString m_sFilterName;             /**< contains name of the filter. */
+    QString m_sFilterShortDescription; /**< contains a short string describign some filter parameters. */
 
-    Eigen::RowVectorXd     m_vecCoeff;       /**< contains the forward filter coefficient set. */
-    Eigen::RowVectorXcd    m_vecFftCoeff;    /**< the FFT-transformed forward filter coefficient set, required for frequency-domain filtering, zero-padded to m_iFftLength. */
+    Eigen::RowVectorXd m_vecCoeff;     /**< contains the forward filter coefficient set. */
+    Eigen::RowVectorXcd m_vecFftCoeff; /**< the FFT-transformed forward filter coefficient set, required for frequency-domain filtering, zero-padded to m_iFftLength. */
 };
 
 } // NAMESPACE UTILSLIB

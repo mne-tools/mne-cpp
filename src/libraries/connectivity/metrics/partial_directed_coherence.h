@@ -62,7 +62,8 @@
 // DEFINE NAMESPACE CONNECTIVITYLIB
 //=============================================================================================================
 
-namespace CONNECTIVITYLIB {
+namespace CONNECTIVITYLIB
+{
 
 //=============================================================================================================
 // CONNECTIVITYLIB FORWARD DECLARATIONS
@@ -87,7 +88,6 @@ class ConnectivitySettings;
  */
 class CONNECTIVITYSHARED_EXPORT PartialDirectedCoherence : public AbstractMetric
 {
-
 public:
     typedef QSharedPointer<PartialDirectedCoherence> SPtr;            /**< Shared pointer type for PartialDirectedCoherence. */
     typedef QSharedPointer<const PartialDirectedCoherence> ConstSPtr; /**< Const shared pointer type for PartialDirectedCoherence. */
@@ -108,7 +108,7 @@ public:
      *
      * @since 2.2.0
      */
-    static Network calculate(ConnectivitySettings &connectivitySettings);
+    static Network calculate(ConnectivitySettings& connectivitySettings);
 };
 
 //=============================================================================================================

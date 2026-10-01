@@ -38,7 +38,7 @@ using namespace SCMEASLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-MeasurementTypes::MeasurementTypes(QObject *parent)
+MeasurementTypes::MeasurementTypes(QObject* parent)
 : QObject(parent)
 {
 }
@@ -47,13 +47,13 @@ MeasurementTypes::MeasurementTypes(QObject *parent)
 
 void MeasurementTypes::registerTypes()
 {
-    qRegisterMetaType< Measurement::SPtr >("Measurement::SPtr");
-    qRegisterMetaType< RealTimeMultiSampleArray::SPtr >("RealTimeMultiSampleArray::SPtr");
-    qRegisterMetaType< Numeric::SPtr >("Numeric::SPtr");
-    qRegisterMetaType< RealTimeSpectrum::SPtr >("RealTimeSpectrum::SPtr");
-    qRegisterMetaType< RealTimeSourceEstimate::SPtr >("RealTimeSourceEstimate::SPtr");
-    qRegisterMetaType< RealTimeConnectivityEstimate::SPtr >("RealTimeConnectivityEstimate::SPtr");
-    qRegisterMetaType< RealTimeCov::SPtr >("RealTimeCov::SPtr");
-    qRegisterMetaType< RealTimeEvokedSet::SPtr >("RealTimeEvokedSet::SPtr");
-    qRegisterMetaType< RealTimeSampleArrayChInfo::SPtr >("RealTimeSampleArrayChInfo::SPtr");
+    qRegisterMetaType<Measurement::SPtr>("Measurement::SPtr");
+    qRegisterMetaType<RealTimeMultiSampleArray::SPtr>("RealTimeMultiSampleArray::SPtr");
+    qRegisterMetaType<Numeric::SPtr>("Numeric::SPtr");
+    qRegisterMetaType<RealTimeSpectrum::SPtr>("RealTimeSpectrum::SPtr");
+    qRegisterMetaType<RealTimeSourceEstimate::SPtr>("RealTimeSourceEstimate::SPtr");
+    qRegisterMetaType<RealTimeConnectivityEstimate::SPtr>("RealTimeConnectivityEstimate::SPtr");
+    qRegisterMetaType<RealTimeCov::SPtr>("RealTimeCov::SPtr");
+    qRegisterMetaType<RealTimeEvokedSet::SPtr>("RealTimeEvokedSet::SPtr");
+    qRegisterMetaType<RealTimeSampleArrayChInfo::SPtr>("RealTimeSampleArrayChInfo::SPtr");
 }

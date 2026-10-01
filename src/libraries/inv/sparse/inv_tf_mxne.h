@@ -61,11 +61,11 @@ namespace INVLIB
  */
 struct INVSHARED_EXPORT InvTfMxneResult
 {
-    InvSourceEstimate stc;                      /**< Sparse source estimate (time domain). */
-    QVector<int> activeVertices;                /**< Indices of active sources. */
-    int nIterations = 0;                        /**< Number of iterations performed. */
-    double residualNorm = 0.0;                  /**< Final residual norm. */
-    Eigen::MatrixXd tfCoefficients;            /**< Time-frequency coefficients of active sources (n_active*n_freqs × n_times). */
+    InvSourceEstimate stc;          /**< Sparse source estimate (time domain). */
+    QVector<int> activeVertices;    /**< Indices of active sources. */
+    int nIterations = 0;            /**< Number of iterations performed. */
+    double residualNorm = 0.0;      /**< Final residual norm. */
+    Eigen::MatrixXd tfCoefficients; /**< Time-frequency coefficients of active sources (n_active*n_freqs × n_times). */
 };
 
 //=============================================================================================================
@@ -74,15 +74,15 @@ struct INVSHARED_EXPORT InvTfMxneResult
  */
 struct INVSHARED_EXPORT InvTfMxneParams
 {
-    double dAlphaSpace = 0.5;           /**< Spatial regularization (L21 penalty on source groups). */
-    double dAlphaTime = 0.1;            /**< Temporal regularization (L1 penalty on TF coefficients). */
-    int iMaxIterations = 100;           /**< Maximum number of iterations. */
-    double dTolerance = 1e-6;           /**< Convergence tolerance. */
-    int iNFreqs = 8;                    /**< Number of frequency bins for Gabor dictionary. */
-    double dFMin = 1.0;                 /**< Minimum frequency (Hz) for Gabor atoms. */
-    double dFMax = 40.0;                /**< Maximum frequency (Hz) for Gabor atoms. */
-    double dSFreq = 1000.0;            /**< Sampling frequency (Hz). */
-    bool bDebias = true;                /**< Whether to debias the final solution. */
+    double dAlphaSpace = 0.5; /**< Spatial regularization (L21 penalty on source groups). */
+    double dAlphaTime = 0.1;  /**< Temporal regularization (L1 penalty on TF coefficients). */
+    int iMaxIterations = 100; /**< Maximum number of iterations. */
+    double dTolerance = 1e-6; /**< Convergence tolerance. */
+    int iNFreqs = 8;          /**< Number of frequency bins for Gabor dictionary. */
+    double dFMin = 1.0;       /**< Minimum frequency (Hz) for Gabor atoms. */
+    double dFMax = 40.0;      /**< Maximum frequency (Hz) for Gabor atoms. */
+    double dSFreq = 1000.0;   /**< Sampling frequency (Hz). */
+    bool bDebias = true;      /**< Whether to debias the final solution. */
 };
 
 //=============================================================================================================
@@ -119,8 +119,8 @@ public:
      * @return TF-MxNE result with sparse source estimate.
      */
     static InvTfMxneResult compute(const Eigen::MatrixXd& matGain,
-                                    const Eigen::MatrixXd& matData,
-                                    const InvTfMxneParams& params = InvTfMxneParams());
+                                   const Eigen::MatrixXd& matData,
+                                   const InvTfMxneParams& params = InvTfMxneParams());
 
     //=========================================================================================================
     /**
@@ -135,8 +135,8 @@ public:
      * @return Gabor dictionary matrix (n_atoms × n_samples), where n_atoms = n_freqs * n_samples.
      */
     static Eigen::MatrixXd buildGaborDictionary(int iNSamples, int iNFreqs,
-                                                 double dFMin, double dFMax,
-                                                 double dSFreq);
+                                                double dFMin, double dFMax,
+                                                double dSFreq);
 };
 
 } // namespace INVLIB

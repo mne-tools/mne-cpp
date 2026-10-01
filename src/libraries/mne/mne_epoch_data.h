@@ -59,10 +59,9 @@ namespace MNELIB
  */
 class MNESHARED_EXPORT MNEEpochData
 {
-
 public:
-    typedef QSharedPointer<MNEEpochData> SPtr;              /**< Shared pointer type for MNEEpochData. */
-    typedef QSharedPointer<const MNEEpochData> ConstSPtr;   /**< Const shared pointer type for MNEEpochData. */
+    typedef QSharedPointer<MNEEpochData> SPtr;            /**< Shared pointer type for MNEEpochData. */
+    typedef QSharedPointer<const MNEEpochData> ConstSPtr; /**< Const shared pointer type for MNEEpochData. */
 
     //=========================================================================================================
     /**
@@ -76,7 +75,7 @@ public:
      *
      * @param[in] p_MNEEpochData     MNE epoch data.
      */
-    MNEEpochData(const MNEEpochData &p_MNEEpochData);
+    MNEEpochData(const MNEEpochData& p_MNEEpochData);
 
     //=========================================================================================================
     /**
@@ -103,9 +102,9 @@ public:
      *
      * @param[in] baseline     time definition of the baseline in seconds [from, to].
      */
-    void applyBaselineCorrection(const QPair<float,float>& baseline);
+    void applyBaselineCorrection(const QPair<float, float>& baseline);
 
-        //=========================================================================================================
+    //=========================================================================================================
     /**
      * Reduces the data to the selected rows.
      *
@@ -121,13 +120,13 @@ public:
      *
      * @return true if equal; false otherwise.
      */
-    friend bool operator== (const MNEEpochData &a, const MNEEpochData &b)
+    friend bool operator==(const MNEEpochData& a, const MNEEpochData& b)
     {
         return (a.epoch == b.epoch &&
-                a.event == b.event&&
+                a.event == b.event &&
                 a.eventSample == b.eventSample &&
-                a.tmin == b.tmin&&
-                a.tmax == b.tmax&&
+                a.tmin == b.tmin &&
+                a.tmax == b.tmax &&
                 a.bReject == b.bReject &&
                 a.bUserReject == b.bUserReject);
     }
@@ -146,13 +145,13 @@ public:
     }
 
 public:
-    Eigen::MatrixXd     epoch;          /**< The data. */
-    FIFFLIB::fiff_int_t event;          /**< The event code. */
-    FIFFLIB::fiff_int_t eventSample;    /**< The sample index of the triggering event. */
-    float               tmin;           /**< New start time (must be >= 0). */
-    float               tmax;           /**< New end time of the data (cannot exceed data duration). */
-    bool                bReject;        /**< Whether this epoch is to be rejected. */
-    bool                bUserReject;    /**< Whether this epoch was manually excluded by the user. */
+    Eigen::MatrixXd epoch;           /**< The data. */
+    FIFFLIB::fiff_int_t event;       /**< The event code. */
+    FIFFLIB::fiff_int_t eventSample; /**< The sample index of the triggering event. */
+    float tmin;                      /**< New start time (must be >= 0). */
+    float tmax;                      /**< New end time of the data (cannot exceed data duration). */
+    bool bReject;                    /**< Whether this epoch is to be rejected. */
+    bool bUserReject;                /**< Whether this epoch was manually excluded by the user. */
 };
 } // NAMESPACE
 

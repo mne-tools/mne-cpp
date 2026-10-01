@@ -36,14 +36,15 @@
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-namespace ANSHAREDLIB {
-    class AbstractModel;
-    class FiffRawViewModel;
-    class BemDataModel;
-    class MriCoordModel;
-    class CovarianceModel;
-    class AveragingDataModel;
-    class Communicator;
+namespace ANSHAREDLIB
+{
+class AbstractModel;
+class FiffRawViewModel;
+class BemDataModel;
+class MriCoordModel;
+class CovarianceModel;
+class AveragingDataModel;
+class Communicator;
 }
 
 //=============================================================================================================
@@ -92,7 +93,6 @@ public:
     virtual QVector<ANSHAREDLIB::EVENT_TYPE> getEventSubscriptions() const override;
 
 private:
-
     //=========================================================================================================
     /**
      * Performs dipole fit calculations
@@ -269,16 +269,16 @@ private:
      */
     void triggerLoadingEnd(QString sMessage);
 
-    QList<QSharedPointer<ANSHAREDLIB::AbstractModel>>       m_ModelList;            /**< List of models used in dipole fitting. Usded for storing for later selection. */
-    INVLIB::InvDipoleFitSettings                           m_DipoleSettings;       /**< Settings for dipole fit. */
-    QString                                                 m_sFitName;             /**< Fit name for dipole fit. */
+    QList<QSharedPointer<ANSHAREDLIB::AbstractModel>> m_ModelList; /**< List of models used in dipole fitting. Usded for storing for later selection. */
+    INVLIB::InvDipoleFitSettings m_DipoleSettings;                 /**< Settings for dipole fit. */
+    QString m_sFitName;                                            /**< Fit name for dipole fit. */
 
-    QPointer<ANSHAREDLIB::Communicator>                     m_pCommu;               /**< Communicator for sending events. */
+    QPointer<ANSHAREDLIB::Communicator> m_pCommu; /**< Communicator for sending events. */
 
-    QMutex                                                  m_FitMutex;             /**< Mutex for thread-safing. */
+    QMutex m_FitMutex; /**< Mutex for thread-safing. */
 
-    QFutureWatcher<INVLIB::InvEcdSet>                      m_FutureWatcher;        /**< Future watcher for notifing of completed fit calculations. */
-    QFuture<INVLIB::InvEcdSet>                             m_Future;               /**< Future for performing fit calculations of separate thread. */
+    QFutureWatcher<INVLIB::InvEcdSet> m_FutureWatcher; /**< Future watcher for notifing of completed fit calculations. */
+    QFuture<INVLIB::InvEcdSet> m_Future;               /**< Future for performing fit calculations of separate thread. */
 
 signals:
 

@@ -56,7 +56,7 @@ using namespace Eigen;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-RealTimeCovWidget::RealTimeCovWidget(QSharedPointer<QTime> &pTime,
+RealTimeCovWidget::RealTimeCovWidget(QSharedPointer<QTime>& pTime,
                                      QWidget* parent)
 : MeasurementWidget(parent)
 {
@@ -65,13 +65,15 @@ RealTimeCovWidget::RealTimeCovWidget(QSharedPointer<QTime> &pTime,
     //set vertical layout
     m_pRtcLayout = new QVBoxLayout(this);
 
-    m_pLabelInit= new QLabel(this);
+    m_pLabelInit = new QLabel(this);
     m_pLabelInit->setText("Acquiring Data");
     m_pLabelInit->setAlignment(Qt::AlignCenter);
-    QFont font;font.setBold(true);font.setPointSize(20);
+    QFont font;
+    font.setBold(true);
+    font.setPointSize(20);
     m_pLabelInit->setFont(font);
     m_pRtcLayout->addWidget(m_pLabelInit);
-    m_pRtcLayout->setContentsMargins(3,0,3,0);
+    m_pRtcLayout->setContentsMargins(3, 0, 3, 0);
 
     m_pImageSc = new ImageSc;
     m_pRtcLayout->addWidget(m_pImageSc);
@@ -96,18 +98,18 @@ void RealTimeCovWidget::update(SCMEASLIB::Measurement::SPtr pMeasurement)
 {
     m_pRTC = qSharedPointerDynamicCast<RealTimeCov>(pMeasurement);
 
-    if(m_pRTC->isInitialized()) {
+    if (m_pRTC->isInitialized()) {
         m_pFiffInfo = m_pRTC->getFiffInfo();
 
-        if(!m_bDisplayWidgetsInitialized) {
+        if (!m_bDisplayWidgetsInitialized) {
             initDisplayControllWidgets();
         }
 
         MatrixXd matData(m_qListSelChannel.size(), m_qListSelChannel.size());
 
-        for(int i = 0; i < m_qListSelChannel.size(); i++) {
-            for(int j = 0; j < m_qListSelChannel.size(); j++) {
-                matData(i,j) = m_pRTC->getValue()->data(m_qListSelChannel.at(i),m_qListSelChannel.at(j));
+        for (int i = 0; i < m_qListSelChannel.size(); i++) {
+            for (int j = 0; j < m_qListSelChannel.size(); j++) {
+                matData(i, j) = m_pRTC->getValue()->data(m_qListSelChannel.at(i), m_qListSelChannel.at(j));
             }
         }
 
@@ -119,7 +121,7 @@ void RealTimeCovWidget::update(SCMEASLIB::Measurement::SPtr pMeasurement)
 
 void RealTimeCovWidget::initDisplayControllWidgets()
 {
-    if(m_pFiffInfo) {
+    if (m_pFiffInfo) {
         m_pRtcLayout->removeWidget(m_pLabelInit);
         m_pLabelInit->hide();
 
@@ -148,27 +150,24 @@ void RealTimeCovWidget::initDisplayControllWidgets()
 
 //=============================================================================================================
 
-void RealTimeCovWidget::onNewModalitySelection(const QMap<QString, bool> &modalityMap)
+void RealTimeCovWidget::onNewModalitySelection(const QMap<QString, bool>& modalityMap)
 {
-    if(m_pRTC && m_pFiffInfo) {
+    if (m_pRTC && m_pFiffInfo) {
         QStringList chNames = m_pRTC->getValue()->names;
         m_qListSelChannel.clear();
 
-        for(qint32 i = 0; i < chNames.size(); ++i) {
+        for (qint32 i = 0; i < chNames.size(); ++i) {
             int unit = m_pFiffInfo->chs.at(m_pFiffInfo->ch_names.indexOf(chNames.at(i))).unit;
 
-            if(unit == FIFF_UNIT_T && modalityMap["MAG"]) {
+            if (unit == FIFF_UNIT_T && modalityMap["MAG"]) {
                 m_qListSelChannel.append(i);
             }
 
-            if(unit == FIFF_UNIT_T_M && modalityMap["GRAD"]) {
+            if (unit == FIFF_UNIT_T_M && modalityMap["GRAD"]) {
                 m_qListSelChannel.append(i);
             }
 
-            if(unit == FIFF_UNIT_V && (modalityMap["EEG"] ||
-                                      modalityMap["EOG"] ||
-                                      modalityMap["STIM"] ||
-                                      modalityMap["MISC"])) {
+            if (unit == FIFF_UNIT_V && (modalityMap["EEG"] || modalityMap["EOG"] || modalityMap["STIM"] || modalityMap["MISC"])) {
                 m_qListSelChannel.append(i);
             }
         }

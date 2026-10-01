@@ -52,7 +52,8 @@
 // DEFINE NAMESPACE MNELIB
 //=============================================================================================================
 
-namespace MNELIB {
+namespace MNELIB
+{
 
 //=============================================================================================================
 // TYPEDEFS
@@ -65,7 +66,7 @@ namespace MNELIB {
  * with a matching @c mneUserFreeFunc that is called when the owning
  * object is destroyed.
  */
-typedef void (*mneUserFreeFunc)(void *);
+typedef void (*mneUserFreeFunc)(void*);
 
 //=============================================================================================================
 // SOURCE-SPACE TYPE CONSTANTS
@@ -76,10 +77,10 @@ typedef void (*mneUserFreeFunc)(void *);
  * Discriminators for the @c type field in MNESurfaceOrVolume / MNESourceSpace.
  * @{
  */
-#define MNE_SOURCE_SPACE_UNKNOWN  -1  /**< Type not yet determined. */
-#define MNE_SOURCE_SPACE_SURFACE   1  /**< FsSurface-based source space. */
-#define MNE_SOURCE_SPACE_VOLUME    2  /**< Volumetric (3-D grid) source space. */
-#define MNE_SOURCE_SPACE_DISCRETE  3  /**< Discrete point set. */
+#define MNE_SOURCE_SPACE_UNKNOWN -1 /**< Type not yet determined. */
+#define MNE_SOURCE_SPACE_SURFACE 1  /**< FsSurface-based source space. */
+#define MNE_SOURCE_SPACE_VOLUME 2   /**< Volumetric (3-D grid) source space. */
+#define MNE_SOURCE_SPACE_DISCRETE 3 /**< Discrete point set. */
 /** @} */
 
 //=============================================================================================================
@@ -91,9 +92,9 @@ typedef void (*mneUserFreeFunc)(void *);
  * Origin tag for MNEChSelection records.
  * @{
  */
-#define MNE_CH_SELECTION_UNKNOWN  0  /**< Unknown origin. */
-#define MNE_CH_SELECTION_FILE     1  /**< Loaded from file. */
-#define MNE_CH_SELECTION_USER     2  /**< Created interactively. */
+#define MNE_CH_SELECTION_UNKNOWN 0 /**< Unknown origin. */
+#define MNE_CH_SELECTION_FILE 1    /**< Loaded from file. */
+#define MNE_CH_SELECTION_USER 2    /**< Created interactively. */
 /** @} */
 
 //=============================================================================================================
@@ -105,17 +106,17 @@ typedef void (*mneUserFreeFunc)(void *);
  * Software gradient-compensation levels for CTF systems.
  * @{
  */
-#define MNE_CTFV_NOGRAD  0  /**< No gradient compensation. */
-#define MNE_CTFV_GRAD1   1  /**< 1st-order gradient compensation. */
-#define MNE_CTFV_GRAD2   2  /**< 2nd-order gradient compensation. */
-#define MNE_CTFV_GRAD3   3  /**< 3rd-order gradient compensation. */
+#define MNE_CTFV_NOGRAD 0 /**< No gradient compensation. */
+#define MNE_CTFV_GRAD1 1  /**< 1st-order gradient compensation. */
+#define MNE_CTFV_GRAD2 2  /**< 2nd-order gradient compensation. */
+#define MNE_CTFV_GRAD3 3  /**< 3rd-order gradient compensation. */
 /** @} */
 
 /**
  * @name 4D Neuroimaging compensation
  * @{
  */
-#define MNE_4DV_COMP1  101  /**< 4D Neuroimaging 1st-order compensation. */
+#define MNE_4DV_COMP1 101 /**< 4D Neuroimaging 1st-order compensation. */
 /** @} */
 
 //=============================================================================================================
@@ -123,13 +124,13 @@ typedef void (*mneUserFreeFunc)(void *);
 //=============================================================================================================
 
 /** @brief Default digital trigger channel name. */
-#define MNE_DEFAULT_TRIGGER_CH  "STI 014"
+#define MNE_DEFAULT_TRIGGER_CH "STI 014"
 
 /** @brief Environment variable overriding the trigger channel name. */
-#define MNE_ENV_TRIGGER_CH      "MNE_TRIGGER_CH_NAME"
+#define MNE_ENV_TRIGGER_CH "MNE_TRIGGER_CH_NAME"
 
 /** @brief Environment variable pointing to the MNE installation root. */
-#define MNE_ENV_ROOT            "MNE_ROOT"
+#define MNE_ENV_ROOT "MNE_ROOT"
 
 } // namespace MNELIB
 

@@ -55,10 +55,11 @@ namespace INVLIB
 /**
  * Result structure for the Gamma-MAP solver.
  */
-struct INVSHARED_EXPORT InvGammaMapResult {
+struct INVSHARED_EXPORT InvGammaMapResult
+{
     InvSourceEstimate stc;
     QVector<int> activeVertices;
-    Eigen::VectorXd vecGamma;       /**< Source variance hyperparameters. */
+    Eigen::VectorXd vecGamma; /**< Source variance hyperparameters. */
     int nIterations;
     double residualNorm;
 };

@@ -34,33 +34,34 @@
 
 // ─── Vertex data: 3 triangles, each with position + color ───────────────────
 
-struct Vertex {
+struct Vertex
+{
     float pos[3];
     float col[3];
 };
 
 // Pass 1: Red triangle — left half
 static const Vertex triangleA[] = {
-    {{ -0.9f, -0.5f, 0.0f }, { 1, 0, 0 }},
-    {{ -0.1f, -0.5f, 0.0f }, { 1, 0, 0 }},
-    {{ -0.5f,  0.5f, 0.0f }, { 1, 0, 0 }},
+    {{-0.9f, -0.5f, 0.0f}, {1, 0, 0}},
+    {{-0.1f, -0.5f, 0.0f}, {1, 0, 0}},
+    {{-0.5f, 0.5f, 0.0f}, {1, 0, 0}},
 };
 
 // Pass 2: Green triangle — right half
 static const Vertex triangleB[] = {
-    {{  0.1f, -0.5f, 0.0f }, { 0, 1, 0 }},
-    {{  0.9f, -0.5f, 0.0f }, { 0, 1, 0 }},
-    {{  0.5f,  0.5f, 0.0f }, { 0, 1, 0 }},
+    {{0.1f, -0.5f, 0.0f}, {0, 1, 0}},
+    {{0.9f, -0.5f, 0.0f}, {0, 1, 0}},
+    {{0.5f, 0.5f, 0.0f}, {0, 1, 0}},
 };
 
 // Pass 3: Blue triangle — top center
 static const Vertex triangleC[] = {
-    {{ -0.3f,  0.0f, 0.0f }, { 0, 0, 1 }},
-    {{  0.3f,  0.0f, 0.0f }, { 0, 0, 1 }},
-    {{  0.0f,  0.8f, 0.0f }, { 0, 0, 1 }},
+    {{-0.3f, 0.0f, 0.0f}, {0, 0, 1}},
+    {{0.3f, 0.0f, 0.0f}, {0, 0, 1}},
+    {{0.0f, 0.8f, 0.0f}, {0, 0, 1}},
 };
 
-static const uint32_t indices[] = { 0, 1, 2 };
+static const uint32_t indices[] = {0, 1, 2};
 
 // ─── Widget ─────────────────────────────────────────────────────────────────
 
@@ -69,15 +70,16 @@ class MultiPassWidget : public QRhiWidget
 public:
     MultiPassWidget()
     {
-        setAutoRenderTarget(false);  // We manage our own render targets
+        setAutoRenderTarget(false); // We manage our own render targets
     }
 
 private:
-    void initialize(QRhiCommandBuffer *) override;
-    void render(QRhiCommandBuffer *cb) override;
+    void initialize(QRhiCommandBuffer*) override;
+    void render(QRhiCommandBuffer* cb) override;
 
     // One VBO + IBO per triangle (deliberate — each drawn in its own pass)
-    struct TriMesh {
+    struct TriMesh
+    {
         std::unique_ptr<QRhiBuffer> vbuf;
         std::unique_ptr<QRhiBuffer> ibuf;
         bool uploaded = false;
@@ -88,7 +90,7 @@ private:
     std::unique_ptr<QRhiShaderResourceBindings> m_srb;
 
     // Two render targets sharing the same color texture + depth buffer:
-    std::unique_ptr<QRhiRenderBuffer> m_ds;          // depth-stencil
+    std::unique_ptr<QRhiRenderBuffer> m_ds;                // depth-stencil
     std::unique_ptr<QRhiTextureRenderTarget> m_rtClear;    // pass 1: clears
     std::unique_ptr<QRhiTextureRenderTarget> m_rtPreserve; // passes 2+: preserves
     std::unique_ptr<QRhiRenderPassDescriptor> m_rpClear;
@@ -120,10 +122,10 @@ static QShader loadShader(QShader::Stage stage)
 
 // ─── Initialization ─────────────────────────────────────────────────────────
 
-void MultiPassWidget::initialize(QRhiCommandBuffer *)
+void MultiPassWidget::initialize(QRhiCommandBuffer*)
 {
-    QRhi *rhi = this->rhi();
-    QRhiTexture *tex = colorTexture();
+    QRhi* rhi = this->rhi();
+    QRhiTexture* tex = colorTexture();
     const QSize sz = tex->pixelSize();
 
     // Rebuild render targets when size changes or on first call
@@ -146,8 +148,7 @@ void MultiPassWidget::initialize(QRhiCommandBuffer *)
 
         // RT 2: Preserving (load previous contents)
         m_rtPreserve.reset(rhi->newTextureRenderTarget(desc,
-            QRhiTextureRenderTarget::PreserveColorContents
-            | QRhiTextureRenderTarget::PreserveDepthStencilContents));
+                                                       QRhiTextureRenderTarget::PreserveColorContents | QRhiTextureRenderTarget::PreserveDepthStencilContents));
         m_rpPreserve.reset(m_rtPreserve->newCompatibleRenderPassDescriptor());
         m_rtPreserve->setRenderPassDescriptor(m_rpPreserve.get());
         m_rtPreserve->create();
@@ -159,7 +160,7 @@ void MultiPassWidget::initialize(QRhiCommandBuffer *)
 
     // Create mesh buffers once
     if (!m_tri[0].vbuf) {
-        auto makeMesh = [&](TriMesh &mesh) {
+        auto makeMesh = [&](TriMesh& mesh) {
             mesh.vbuf.reset(rhi->newBuffer(QRhiBuffer::Immutable,
                                            QRhiBuffer::VertexBuffer,
                                            3 * sizeof(Vertex)));
@@ -178,25 +179,23 @@ void MultiPassWidget::initialize(QRhiCommandBuffer *)
         m_ubuf->create();
 
         m_srb.reset(rhi->newShaderResourceBindings());
-        m_srb->setBindings({
-            QRhiShaderResourceBinding::uniformBuffer(
-                0, QRhiShaderResourceBinding::VertexStage, m_ubuf.get())
-        });
+        m_srb->setBindings({QRhiShaderResourceBinding::uniformBuffer(
+            0, QRhiShaderResourceBinding::VertexStage, m_ubuf.get())});
         m_srb->create();
     }
 
     if (!m_pipeline) {
         m_pipeline.reset(rhi->newGraphicsPipeline());
         m_pipeline->setShaderStages({
-            { QRhiShaderStage::Vertex,   loadShader(QShader::VertexStage) },
-            { QRhiShaderStage::Fragment, loadShader(QShader::FragmentStage) },
+            {QRhiShaderStage::Vertex, loadShader(QShader::VertexStage)},
+            {QRhiShaderStage::Fragment, loadShader(QShader::FragmentStage)},
         });
 
         QRhiVertexInputLayout layout;
-        layout.setBindings({ { sizeof(Vertex) } });
+        layout.setBindings({{sizeof(Vertex)}});
         layout.setAttributes({
-            { 0, 0, QRhiVertexInputAttribute::Float3, offsetof(Vertex, pos) },
-            { 0, 1, QRhiVertexInputAttribute::Float3, offsetof(Vertex, col) },
+            {0, 0, QRhiVertexInputAttribute::Float3, offsetof(Vertex, pos)},
+            {0, 1, QRhiVertexInputAttribute::Float3, offsetof(Vertex, col)},
         });
         m_pipeline->setVertexInputLayout(layout);
         m_pipeline->setShaderResourceBindings(m_srb.get());
@@ -210,15 +209,15 @@ void MultiPassWidget::initialize(QRhiCommandBuffer *)
 
 // ─── Render ─────────────────────────────────────────────────────────────────
 
-void MultiPassWidget::render(QRhiCommandBuffer *cb)
+void MultiPassWidget::render(QRhiCommandBuffer* cb)
 {
-    QRhi *rhi = this->rhi();
+    QRhi* rhi = this->rhi();
     const QSize sz = m_lastSize;
 
     // Upload vertex/index data on first frame
     {
-        QRhiResourceUpdateBatch *u = rhi->nextResourceUpdateBatch();
-        auto uploadMesh = [&](TriMesh &mesh, const Vertex *data) {
+        QRhiResourceUpdateBatch* u = rhi->nextResourceUpdateBatch();
+        auto uploadMesh = [&](TriMesh& mesh, const Vertex* data) {
             if (!mesh.uploaded) {
                 u->uploadStaticBuffer(mesh.vbuf.get(), data);
                 u->uploadStaticBuffer(mesh.ibuf.get(), indices);
@@ -234,7 +233,7 @@ void MultiPassWidget::render(QRhiCommandBuffer *cb)
         cb->resourceUpdate(u);
     }
 
-    auto drawTriangle = [&](TriMesh &mesh) {
+    auto drawTriangle = [&](TriMesh& mesh) {
         cb->setGraphicsPipeline(m_pipeline.get());
         cb->setShaderResources(m_srb.get());
         const QRhiCommandBuffer::VertexInput vbuf(mesh.vbuf.get(), 0);
@@ -244,21 +243,21 @@ void MultiPassWidget::render(QRhiCommandBuffer *cb)
     };
 
     // ── Pass 1: Red triangle (clear framebuffer) ────────────────────────
-    cb->beginPass(m_rtClear.get(), QColor(30, 30, 30), { 1.0f, 0 });
+    cb->beginPass(m_rtClear.get(), QColor(30, 30, 30), {1.0f, 0});
     cb->setViewport(QRhiViewport(0, 0, sz.width(), sz.height()));
     cb->setScissor(QRhiScissor(0, 0, sz.width(), sz.height()));
     drawTriangle(m_tri[0]);
     cb->endPass();
 
     // ── Pass 2: Green triangle (preserve pass 1) ────────────────────────
-    cb->beginPass(m_rtPreserve.get(), QColor(0, 0, 0), { 1.0f, 0 });
+    cb->beginPass(m_rtPreserve.get(), QColor(0, 0, 0), {1.0f, 0});
     cb->setViewport(QRhiViewport(0, 0, sz.width(), sz.height()));
     cb->setScissor(QRhiScissor(0, 0, sz.width(), sz.height()));
     drawTriangle(m_tri[1]);
     cb->endPass();
 
     // ── Pass 3: Blue triangle (preserve passes 1+2) ────────────────────
-    cb->beginPass(m_rtPreserve.get(), QColor(0, 0, 0), { 1.0f, 0 });
+    cb->beginPass(m_rtPreserve.get(), QColor(0, 0, 0), {1.0f, 0});
     cb->setViewport(QRhiViewport(0, 0, sz.width(), sz.height()));
     cb->setScissor(QRhiScissor(0, 0, sz.width(), sz.height()));
     drawTriangle(m_tri[2]);
@@ -267,7 +266,7 @@ void MultiPassWidget::render(QRhiCommandBuffer *cb)
 
 // ─── Main ───────────────────────────────────────────────────────────────────
 
-int main(int argc, char *argv[])
+int main(int argc, char* argv[])
 {
     QApplication app(argc, argv);
 

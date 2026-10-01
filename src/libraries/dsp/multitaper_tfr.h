@@ -59,9 +59,9 @@ namespace UTILSLIB
  */
 struct DSPSHARED_EXPORT MultitaperTfrResult
 {
-    QVector<Eigen::MatrixXd> tfrData;   ///< One matrix per channel, each: n_freqs × n_times
-    Eigen::RowVectorXd       vecFreqs;  ///< Frequency axis in Hz
-    Eigen::RowVectorXd       vecTimes;  ///< Time axis in seconds (window centres)
+    QVector<Eigen::MatrixXd> tfrData; ///< One matrix per channel, each: n_freqs × n_times
+    Eigen::RowVectorXd vecFreqs;      ///< Frequency axis in Hz
+    Eigen::RowVectorXd vecTimes;      ///< Time axis in seconds (window centres)
 };
 
 //=============================================================================================================
@@ -93,11 +93,11 @@ public:
      * @return                    MultitaperTfrResult with tfrData, vecFreqs, vecTimes.
      */
     static MultitaperTfrResult compute(const Eigen::MatrixXd& matData,
-                                        double                 sfreq,
-                                        int                    windowSize = 256,
-                                        int                    stepSize = -1,
-                                        double                 halfBandwidth = 4.0,
-                                        int                    nTapers = -1);
+                                       double sfreq,
+                                       int windowSize = 256,
+                                       int stepSize = -1,
+                                       double halfBandwidth = 4.0,
+                                       int nTapers = -1);
 };
 
 } // namespace UTILSLIB

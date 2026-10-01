@@ -97,10 +97,10 @@ private:
     QString findGenerateScript();
 
     /** Run the application with the given arguments. Returns exit code. */
-    int runApp(const QStringList &args, QString &stdoutStr, int timeoutMs = 300000);
+    int runApp(const QStringList& args, QString& stdoutStr, int timeoutMs = 300000);
 
     /** Read an STC file and return a InvSourceEstimate. */
-    static bool readStc(const QString &path, InvSourceEstimate &stc);
+    static bool readStc(const QString& path, InvSourceEstimate& stc);
 
     /**
      * Discover the LH/RH STC file pair produced by an application run.
@@ -120,21 +120,21 @@ private:
      * @param[out] rhPath   Receives the discovered RH path.
      * @return true if both files were found.
      */
-    static bool findStcPair(const QString &outBase, QString &lhPath, QString &rhPath);
+    static bool findStcPair(const QString& outBase, QString& lhPath, QString& rhPath);
 
-    QString m_sDataPath;       /**< Path to MNE-sample-data. */
-    QString m_sEvokedFile;     /**< sample_audvis-ave.fif */
-    QString m_sInvFile;        /**< Inverse operator file. */
-    QString m_sExecutable;     /**< Path to mne_compute_raw_inverse binary. */
-    bool m_bDataAvailable;     /**< Whether sample data was found. */
-    bool m_bExeAvailable;      /**< Whether the executable was found. */
+    QString m_sDataPath;   /**< Path to MNE-sample-data. */
+    QString m_sEvokedFile; /**< sample_audvis-ave.fif */
+    QString m_sInvFile;    /**< Inverse operator file. */
+    QString m_sExecutable; /**< Path to mne_compute_raw_inverse binary. */
+    bool m_bDataAvailable; /**< Whether sample data was found. */
+    bool m_bExeAvailable;  /**< Whether the executable was found. */
 };
 
 //=============================================================================================================
 
 TestMneComputeRawInverse::TestMneComputeRawInverse()
-    : m_bDataAvailable(false)
-    , m_bExeAvailable(false)
+: m_bDataAvailable(false)
+, m_bExeAvailable(false)
 {
 }
 
@@ -160,7 +160,7 @@ QString TestMneComputeRawInverse::findDataPath()
         candidates.prepend(envPath);
     }
 
-    for (const QString &path : candidates) {
+    for (const QString& path : candidates) {
         QString evokedFile = path + "/MEG/sample/sample_audvis-ave.fif";
         QString invFile = path + "/MEG/sample/sample_audvis-meg-eeg-oct-6-meg-eeg-inv.fif";
         if (QFile::exists(evokedFile) && QFile::exists(invFile)) {
@@ -187,13 +187,13 @@ QString TestMneComputeRawInverse::findExecutable()
     // Relative to test binary
     candidates << appDir + "/../apps/" + exeName;
     candidates << appDir + "/../bin/" + exeName;
-    candidates << appDir + "/" + exeName;    // Windows: tests and apps share same dir
+    candidates << appDir + "/" + exeName; // Windows: tests and apps share same dir
 
     // Absolute fallbacks
     candidates << appDir + "/../../Release/apps/" + exeName;
     candidates << QDir::homePath() + "/Programming/mne-cpp/out/Release/apps/" + exeName;
 
-    for (const QString &path : candidates) {
+    for (const QString& path : candidates) {
         if (QFile::exists(path)) {
             return QFileInfo(path).absoluteFilePath();
         }
@@ -209,7 +209,7 @@ QString TestMneComputeRawInverse::findPython()
     candidates << "python3" << "python" << "python3.14" << "python3.13"
                << "python3.12" << "python3.11" << "python3.10";
 
-    for (const QString &py : candidates) {
+    for (const QString& py : candidates) {
         QProcess proc;
         proc.start(py, QStringList() << "-c" << "import mne; print(mne.__version__)");
         proc.waitForFinished(10000);
@@ -239,7 +239,7 @@ QString TestMneComputeRawInverse::findGenerateScript()
     // Absolute fallback
     candidates << QDir::homePath() + "/Programming/mne-cpp/src/testframes/test_compute_raw_inverse/generate_reference_stc.py";
 
-    for (const QString &path : candidates) {
+    for (const QString& path : candidates) {
         if (QFile::exists(path)) {
             return QFileInfo(path).absoluteFilePath();
         }
@@ -249,7 +249,7 @@ QString TestMneComputeRawInverse::findGenerateScript()
 
 //=============================================================================================================
 
-int TestMneComputeRawInverse::runApp(const QStringList &args, QString &stdoutStr, int timeoutMs)
+int TestMneComputeRawInverse::runApp(const QStringList& args, QString& stdoutStr, int timeoutMs)
 {
     QProcess proc;
     proc.setProcessChannelMode(QProcess::MergedChannels);
@@ -273,7 +273,7 @@ int TestMneComputeRawInverse::runApp(const QStringList &args, QString &stdoutStr
 
 //=============================================================================================================
 
-bool TestMneComputeRawInverse::readStc(const QString &path, InvSourceEstimate &stc)
+bool TestMneComputeRawInverse::readStc(const QString& path, InvSourceEstimate& stc)
 {
     QFile f(path);
     return InvSourceEstimate::read(f, stc);
@@ -310,11 +310,11 @@ void TestMneComputeRawInverse::initTestCase()
 
 //=============================================================================================================
 
-bool TestMneComputeRawInverse::findStcPair(const QString &outBase, QString &lhPath, QString &rhPath)
+bool TestMneComputeRawInverse::findStcPair(const QString& outBase, QString& lhPath, QString& rhPath)
 {
     QFileInfo fi(outBase);
     QString dir = fi.absolutePath();
-    QString prefix = fi.fileName();          // e.g. "dspm_out"
+    QString prefix = fi.fileName(); // e.g. "dspm_out"
 
     QDir d(dir);
     QStringList lhFiles = d.entryList(QStringList() << (prefix + "*-lh.stc"), QDir::Files);
@@ -332,7 +332,8 @@ bool TestMneComputeRawInverse::findStcPair(const QString &outBase, QString &lhPa
 
 void TestMneComputeRawInverse::testDSPM()
 {
-    if (!m_bDataAvailable || !m_bExeAvailable) QSKIP("Prerequisites missing");
+    if (!m_bDataAvailable || !m_bExeAvailable)
+        QSKIP("Prerequisites missing");
 
     printf(">>>>>>>>>>>>>>>>>>>>>>>>> Test dSPM (application) >>>>>>>>>>>>>>>>>>>>>>>>>\n");
 
@@ -393,7 +394,8 @@ void TestMneComputeRawInverse::testDSPM()
 
 void TestMneComputeRawInverse::testSLORETA()
 {
-    if (!m_bDataAvailable || !m_bExeAvailable) QSKIP("Prerequisites missing");
+    if (!m_bDataAvailable || !m_bExeAvailable)
+        QSKIP("Prerequisites missing");
 
     printf(">>>>>>>>>>>>>>>>>>>>>>>>> Test sLORETA (application) >>>>>>>>>>>>>>>>>>>>>>>>>\n");
 
@@ -440,7 +442,8 @@ void TestMneComputeRawInverse::testSLORETA()
 
 void TestMneComputeRawInverse::testMNE()
 {
-    if (!m_bDataAvailable || !m_bExeAvailable) QSKIP("Prerequisites missing");
+    if (!m_bDataAvailable || !m_bExeAvailable)
+        QSKIP("Prerequisites missing");
 
     printf(">>>>>>>>>>>>>>>>>>>>>>>>> Test MNE (application) >>>>>>>>>>>>>>>>>>>>>>>>>\n");
 
@@ -490,7 +493,8 @@ void TestMneComputeRawInverse::testMNE()
 
 void TestMneComputeRawInverse::testWithBaseline()
 {
-    if (!m_bDataAvailable || !m_bExeAvailable) QSKIP("Prerequisites missing");
+    if (!m_bDataAvailable || !m_bExeAvailable)
+        QSKIP("Prerequisites missing");
 
     printf(">>>>>>>>>>>>>>>>>>>>>>>>> Test dSPM with Baseline (application) >>>>>>>>>>>>>>>>>>>>>>>>>\n");
 
@@ -558,7 +562,8 @@ void TestMneComputeRawInverse::testWithBaseline()
 
 void TestMneComputeRawInverse::testHelp()
 {
-    if (!m_bExeAvailable) QSKIP("Executable not found");
+    if (!m_bExeAvailable)
+        QSKIP("Executable not found");
 
     printf(">>>>>>>>>>>>>>>>>>>>>>>>> Test --help >>>>>>>>>>>>>>>>>>>>>>>>>\n");
 
@@ -583,7 +588,8 @@ void TestMneComputeRawInverse::testHelp()
 
 void TestMneComputeRawInverse::testMissingArgs()
 {
-    if (!m_bExeAvailable) QSKIP("Executable not found");
+    if (!m_bExeAvailable)
+        QSKIP("Executable not found");
 
     printf(">>>>>>>>>>>>>>>>>>>>>>>>> Test Missing Arguments >>>>>>>>>>>>>>>>>>>>>>>>>\n");
 
@@ -618,7 +624,8 @@ void TestMneComputeRawInverse::testMissingArgs()
 
 void TestMneComputeRawInverse::testMatchesMnePython()
 {
-    if (!m_bDataAvailable || !m_bExeAvailable) QSKIP("Prerequisites missing");
+    if (!m_bDataAvailable || !m_bExeAvailable)
+        QSKIP("Prerequisites missing");
 
     printf(">>>>>>>>>>>>>>>>>>>>>>>>> Test Matches MNE-Python >>>>>>>>>>>>>>>>>>>>>>>>>\n");
 
@@ -673,7 +680,7 @@ void TestMneComputeRawInverse::testMatchesMnePython()
         proc.start(python, QStringList() << script << pyDir << m_sDataPath);
         bool finished = proc.waitForFinished(120000);
         QString pyOut = QString::fromUtf8(proc.readAll());
-        for (const QString &line : pyOut.split('\n')) {
+        for (const QString& line : pyOut.split('\n')) {
             printf("    %s\n", line.toUtf8().constData());
         }
         if (!finished || proc.exitCode() != 0) {

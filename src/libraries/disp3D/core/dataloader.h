@@ -76,19 +76,19 @@ public:
      */
     struct SensorLoadResult
     {
-        bool                        hasInfo     = false;
-        bool                        hasDigitizer = false;
+        bool hasInfo = false;
+        bool hasDigitizer = false;
 
-        FIFFLIB::FiffInfo           info;          ///< Channel / dig info
-        QList<QStandardItem*>       megGradItems;  ///< Ownership passes to caller
-        QList<QStandardItem*>       megMagItems;
-        QList<QStandardItem*>       eegItems;
+        FIFFLIB::FiffInfo info;             ///< Channel / dig info
+        QList<QStandardItem*> megGradItems; ///< Ownership passes to caller
+        QList<QStandardItem*> megMagItems;
+        QList<QStandardItem*> eegItems;
         QList<FIFFLIB::FiffDigPoint> digitizerPoints;
 
         std::shared_ptr<BrainSurface> helmetSurface; ///< May be null
 
-        QMatrix4x4                  devHeadTrans;  ///< Device→Head transform (identity if absent)
-        bool                        hasDevHead = false; ///< Whether a valid dev→head transform was found
+        QMatrix4x4 devHeadTrans; ///< Device→Head transform (identity if absent)
+        bool hasDevHead = false; ///< Whether a valid dev→head transform was found
     };
 
     // ── Static I/O methods ────────────────────────────────────────────
@@ -100,8 +100,8 @@ public:
      * @param[in] megHelmetOverridePath  Optional override for the helmet surface file.
      * @return Populated SensorLoadResult.
      */
-    static SensorLoadResult loadSensors(const QString &fifPath,
-                                        const QString &megHelmetOverridePath = {});
+    static SensorLoadResult loadSensors(const QString& fifPath,
+                                        const QString& megHelmetOverridePath = {});
 
     /**
      * Load a standalone MEG helmet surface from a BEM FIF file.
@@ -112,8 +112,8 @@ public:
      * @return Shared pointer to the loaded BrainSurface, or nullptr on failure.
      */
     static std::shared_ptr<BrainSurface> loadHelmetSurface(
-        const QString &helmetFilePath,
-        const QMatrix4x4 &devHeadTrans = QMatrix4x4(),
+        const QString& helmetFilePath,
+        const QMatrix4x4& devHeadTrans = QMatrix4x4(),
         bool applyTrans = false);
 
     /**
@@ -122,7 +122,7 @@ public:
      * @param[in] dipPath  Path to the dipole file.
      * @return The loaded InvEcdSet (may be empty on failure).
      */
-    static INVLIB::InvEcdSet loadDipoles(const QString &dipPath);
+    static INVLIB::InvEcdSet loadDipoles(const QString& dipPath);
 
     /**
      * Load source space from a forward-solution FIF file.
@@ -130,7 +130,7 @@ public:
      * @param[in] fwdPath  Path to the FIF file with source space.
      * @return The loaded source space (may be empty on failure).
      */
-    static MNELIB::MNESourceSpaces loadSourceSpace(const QString &fwdPath);
+    static MNELIB::MNESourceSpaces loadSourceSpace(const QString& fwdPath);
 
     /**
      * Load a coordinate transformation from a FIF file and normalise it
@@ -140,8 +140,8 @@ public:
      * @param[out] trans     The resulting transform (Head → MRI).
      * @return true on success.
      */
-    static bool loadHeadToMriTransform(const QString &transPath,
-                                       FIFFLIB::FiffCoordTrans &trans);
+    static bool loadHeadToMriTransform(const QString& transPath,
+                                       FIFFLIB::FiffCoordTrans& trans);
 
     /**
      * Load an FiffEvoked from a FIF file.
@@ -150,7 +150,7 @@ public:
      * @param[in] aveIndex    Set index to load.
      * @return The loaded FiffEvoked (may be empty on failure).
      */
-    static FIFFLIB::FiffEvoked loadEvoked(const QString &evokedPath, int aveIndex = 0);
+    static FIFFLIB::FiffEvoked loadEvoked(const QString& evokedPath, int aveIndex = 0);
 
     /**
      * Probe a FIF file for the available evoked data sets.
@@ -158,7 +158,7 @@ public:
      * @param[in] evokedPath  Path to the FIF file.
      * @return List of human-readable labels for each set.
      */
-    static QStringList probeEvokedSets(const QString &evokedPath);
+    static QStringList probeEvokedSets(const QString& evokedPath);
 };
 
 #endif // DATALOADER_H

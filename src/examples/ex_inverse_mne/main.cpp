@@ -63,7 +63,7 @@ using namespace UTILSLIB;
  * @param[in] argv (argument vector) is an array of pointers to arrays of character objects. The array objects are null-terminated strings, representing the arguments that were entered on the command line when the program was started.
  * @return the value that was set to exit() (which is 0 if exit() is called via quit()).
  */
-int main(int argc, char *argv[])
+int main(int argc, char* argv[])
 {
     qInstallMessageHandler(MNELogger::customLogWriter);
     QCoreApplication app(argc, argv);
@@ -102,7 +102,7 @@ int main(int argc, char *argv[])
     fiff_int_t setno = 0;
     QPair<float, float> baseline(-1.0f, -1.0f);
     FiffEvoked evoked(t_fileEvoked, setno, baseline);
-    if(evoked.isEmpty())
+    if (evoked.isEmpty())
         return 1;
 
     //
@@ -119,22 +119,23 @@ int main(int argc, char *argv[])
     //
     //Results
     //
-    std::cout << "\npart ( block( 0, 0, 10, 10) ) of the inverse solution:\n" << sourceEstimate.data.block(0,0,10,10) << std::endl;
+    std::cout << "\npart ( block( 0, 0, 10, 10) ) of the inverse solution:\n"
+              << sourceEstimate.data.block(0, 0, 10, 10) << std::endl;
     printf("tmin = %f s\n", sourceEstimate.tmin);
     printf("tstep = %f s\n", sourceEstimate.tstep);
 
-    if(!t_sFileNameStc.isEmpty())
-    {
+    if (!t_sFileNameStc.isEmpty()) {
         QFile t_fileStc(t_sFileNameStc);
         sourceEstimate.write(t_fileStc);
 
         //test if everything was written correctly
         InvSourceEstimate readSourceEstimate(t_fileStc);
 
-        std::cout << "\npart ( block( 0, 0, 10, 10) ) of the inverse solution:\n" << readSourceEstimate.data.block(0,0,10,10) << std::endl;
+        std::cout << "\npart ( block( 0, 0, 10, 10) ) of the inverse solution:\n"
+                  << readSourceEstimate.data.block(0, 0, 10, 10) << std::endl;
         printf("tmin = %f s\n", readSourceEstimate.tmin);
         printf("tstep = %f s\n", readSourceEstimate.tstep);
     }
 
-    return 0;//app.exec();
+    return 0; //app.exec();
 }

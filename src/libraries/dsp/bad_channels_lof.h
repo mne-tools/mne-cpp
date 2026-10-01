@@ -49,15 +49,17 @@
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-namespace FIFFLIB {
-    class FiffInfo;
+namespace FIFFLIB
+{
+class FiffInfo;
 }
 
 //=============================================================================================================
 // DEFINE NAMESPACE UTILSLIB
 //=============================================================================================================
 
-namespace UTILSLIB {
+namespace UTILSLIB
+{
 
 //=============================================================================================================
 /**
@@ -65,10 +67,10 @@ namespace UTILSLIB {
  */
 struct DSPSHARED_EXPORT LofBadChannelParams
 {
-    int iNNeighbors = 20;       /**< Number of neighbours for LOF (k parameter). */
-    double dThreshold = 2.0;    /**< LOF score threshold for marking a channel as bad. */
-    bool bMegOnly = false;      /**< If true, only check MEG channels. */
-    bool bEegOnly = false;      /**< If true, only check EEG channels. */
+    int iNNeighbors = 20;    /**< Number of neighbours for LOF (k parameter). */
+    double dThreshold = 2.0; /**< LOF score threshold for marking a channel as bad. */
+    bool bMegOnly = false;   /**< If true, only check MEG channels. */
+    bool bEegOnly = false;   /**< If true, only check EEG channels. */
 };
 
 //=============================================================================================================
@@ -87,8 +89,8 @@ struct DSPSHARED_EXPORT LofBadChannelParams
  * @return List of bad channel names.
  */
 DSPSHARED_EXPORT QStringList findBadChannelsLof(const Eigen::MatrixXd& data,
-                                                 const FIFFLIB::FiffInfo& info,
-                                                 const LofBadChannelParams& params = LofBadChannelParams());
+                                                const FIFFLIB::FiffInfo& info,
+                                                const LofBadChannelParams& params = LofBadChannelParams());
 
 //=============================================================================================================
 /**
@@ -102,7 +104,7 @@ DSPSHARED_EXPORT QStringList findBadChannelsLof(const Eigen::MatrixXd& data,
  * @return LOF score for each point (n_points x 1). Values > 1 indicate outliers.
  */
 DSPSHARED_EXPORT Eigen::VectorXd computeLofScores(const Eigen::MatrixXd& features,
-                                                    int k);
+                                                  int k);
 
 } // namespace UTILSLIB
 

@@ -74,7 +74,7 @@ ExtensionHostedViewWidget::ExtensionHostedViewWidget(QWidget* parent)
 
     connect(m_opacitySlider, &QSlider::sliderReleased, this, [this]() {
         const QString currentSessionId = sessionId();
-        if(currentSessionId.isEmpty()) {
+        if (currentSessionId.isEmpty()) {
             return;
         }
 
@@ -108,7 +108,7 @@ QString ExtensionHostedViewWidget::filePath() const
 
 void ExtensionHostedViewWidget::applySessionUpdate(const QJsonObject& update)
 {
-    for(auto it = update.constBegin(); it != update.constEnd(); ++it) {
+    for (auto it = update.constBegin(); it != update.constEnd(); ++it) {
         m_descriptor.insert(it.key(), it.value());
     }
 
@@ -130,10 +130,10 @@ void ExtensionHostedViewWidget::rebuildUi()
                           .arg(extensionName,
                                sessionName.isEmpty() ? QString("pending") : sessionName,
                                slotName);
-    if(!fileName.isEmpty()) {
+    if (!fileName.isEmpty()) {
         summary += QString(" | File: %1").arg(fileName);
     }
-    if(!sceneId.isEmpty()) {
+    if (!sceneId.isEmpty()) {
         summary += QString(" | Scene: %1").arg(sceneId);
     }
     m_summaryLabel->setText(summary);
@@ -144,14 +144,14 @@ void ExtensionHostedViewWidget::rebuildUi()
     const QJsonObject state = m_descriptor.value("state").toObject();
     QStringList stateParts;
     const QString hemisphere = state.value("hemisphere").toString().trimmed();
-    if(!hemisphere.isEmpty()) {
+    if (!hemisphere.isEmpty()) {
         stateParts << QString("Hemisphere: %1").arg(hemisphere);
     }
     const QString camera = state.value("camera").toString().trimmed();
-    if(!camera.isEmpty()) {
+    if (!camera.isEmpty()) {
         stateParts << QString("Camera: %1").arg(camera);
     }
-    if(state.contains("opacity")) {
+    if (state.contains("opacity")) {
         stateParts << QString("Opacity: %1").arg(QString::number(state.value("opacity").toDouble(), 'f', 2));
     }
     m_stateLabel->setText(stateParts.isEmpty()
@@ -159,10 +159,9 @@ void ExtensionHostedViewWidget::rebuildUi()
                               : QString("State | %1").arg(stateParts.join(" | ")));
 
     const double opacity = state.value("opacity").toDouble(m_descriptor.value("opacity").toDouble(0.8));
-    const bool canControlOpacity = m_descriptor.value("controls").toObject().contains("opacity")
-                                   || m_descriptor.value("capabilities").toObject().value("set_opacity").toBool(false);
+    const bool canControlOpacity = m_descriptor.value("controls").toObject().contains("opacity") || m_descriptor.value("capabilities").toObject().value("set_opacity").toBool(false);
     m_opacitySlider->parentWidget()->setVisible(canControlOpacity);
-    if(canControlOpacity) {
+    if (canControlOpacity) {
         m_opacitySlider->setValue(static_cast<int>(opacity * 100.0));
         m_opacityValueLabel->setText(QString::number(opacity, 'f', 2));
     }
@@ -173,14 +172,14 @@ void ExtensionHostedViewWidget::rebuildUi()
 
 void ExtensionHostedViewWidget::rebuildActionButtons(const QJsonArray& actions)
 {
-    while(QLayoutItem* item = m_actionsLayout->takeAt(0)) {
-        if(QWidget* widget = item->widget()) {
+    while (QLayoutItem* item = m_actionsLayout->takeAt(0)) {
+        if (QWidget* widget = item->widget()) {
             widget->deleteLater();
         }
         delete item;
     }
 
-    if(actions.isEmpty()) {
+    if (actions.isEmpty()) {
         m_actionsWidget->setVisible(false);
         return;
     }
@@ -196,10 +195,10 @@ void ExtensionHostedViewWidget::rebuildActionButtons(const QJsonArray& actions)
     buttonLayout->setSpacing(8);
 
     const QString currentSessionId = sessionId();
-    for(const QJsonValue& value : actions) {
+    for (const QJsonValue& value : actions) {
         const QJsonObject action = value.toObject();
         const QString commandName = action.value("command").toString().trimmed();
-        if(commandName.isEmpty()) {
+        if (commandName.isEmpty()) {
             continue;
         }
 
@@ -207,7 +206,7 @@ void ExtensionHostedViewWidget::rebuildActionButtons(const QJsonArray& actions)
         button->setToolTip(action.value("description").toString());
         const QJsonObject arguments = action.value("arguments").toObject();
         connect(button, &QPushButton::clicked, this, [this, currentSessionId, commandName, arguments]() {
-            if(currentSessionId.isEmpty()) {
+            if (currentSessionId.isEmpty()) {
                 return;
             }
 

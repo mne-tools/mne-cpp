@@ -63,7 +63,8 @@
 // DEFINE NAMESPACE STSLIB
 //=============================================================================================================
 
-namespace STSLIB {
+namespace STSLIB
+{
 
 //=============================================================================================================
 /**
@@ -121,7 +122,7 @@ public:
      * @return std::pair containing the regularised covariance and dReg.
      */
     static std::pair<Eigen::MatrixXd, double> diagonalFixed(const Eigen::MatrixXd& matData,
-                                                             double dReg = 0.1);
+                                                            double dReg = 0.1);
 
     //=========================================================================================================
     /**
@@ -138,7 +139,7 @@ public:
      *         the effective rank used.
      */
     static std::pair<Eigen::MatrixXd, double> pca(const Eigen::MatrixXd& matData,
-                                                   int iRank = 0);
+                                                  int iRank = 0);
 
     //=========================================================================================================
     /**
@@ -157,9 +158,9 @@ public:
      *         the final log-likelihood.
      */
     static std::pair<Eigen::MatrixXd, double> factorAnalysis(const Eigen::MatrixXd& matData,
-                                                              int iNFactors = 0,
-                                                              int iMaxIter = 200,
-                                                              double dTol = 1e-6);
+                                                             int iNFactors = 0,
+                                                             int iMaxIter = 200,
+                                                             double dTol = 1e-6);
 
     //=========================================================================================================
     /**
@@ -177,7 +178,7 @@ public:
      *         3=diagonal_fixed, 4=pca, 5=factor_analysis).
      */
     static std::pair<Eigen::MatrixXd, double> autoSelect(const Eigen::MatrixXd& matData,
-                                                          int iNFolds = 3);
+                                                         int iNFolds = 3);
 
     //=========================================================================================================
     /**
@@ -192,7 +193,7 @@ public:
      * @return Average log-likelihood per sample.
      */
     static double gaussianLogLikelihood(const Eigen::MatrixXd& matTestData,
-                                         const Eigen::MatrixXd& matCov);
+                                        const Eigen::MatrixXd& matCov);
 };
 
 } // namespace STSLIB

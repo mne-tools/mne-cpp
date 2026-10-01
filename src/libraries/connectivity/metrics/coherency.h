@@ -68,7 +68,8 @@
 // DEFINE NAMESPACE CONNECTIVITYLIB
 //=============================================================================================================
 
-namespace CONNECTIVITYLIB {
+namespace CONNECTIVITYLIB
+{
 
 //=============================================================================================================
 // CONNECTIVITYLIB FORWARD DECLARATIONS
@@ -92,7 +93,6 @@ class Network;
  */
 class CONNECTIVITYSHARED_EXPORT Coherency : public AbstractMetric
 {
-
 public:
     typedef QSharedPointer<Coherency> SPtr;            /**< Shared pointer type for Coherency. */
     typedef QSharedPointer<const Coherency> ConstSPtr; /**< Const shared pointer type for Coherency. */
@@ -111,7 +111,7 @@ public:
      * @param[in]   connectivitySettings  The input data and parameters.
      */
     static void calculateAbs(Network& finalNetwork,
-                             ConnectivitySettings &connectivitySettings);
+                             ConnectivitySettings& connectivitySettings);
 
     //=========================================================================================================
     /**
@@ -121,7 +121,7 @@ public:
      * @param[in]   connectivitySettings  The input data and parameters.
      */
     static void calculateImag(Network& finalNetwork,
-                              ConnectivitySettings &connectivitySettings);
+                              ConnectivitySettings& connectivitySettings);
 
 private:
     //=========================================================================================================
@@ -139,7 +139,7 @@ private:
      */
     static void compute(ConnectivitySettings::IntermediateTrialData& inputData,
                         Eigen::MatrixXd& matPsdSum,
-                        QVector<QPair<int,Eigen::MatrixXcd> >& vecPairCsdSum,
+                        QVector<QPair<int, Eigen::MatrixXcd>>& vecPairCsdSum,
                         QMutex& mutex,
                         int iNRows,
                         int iNFreqs,
@@ -152,11 +152,11 @@ private:
      */
     static void computePSDCSDAbs(QMutex& mutex,
                                  Network& finalNetwork,
-                                 const QPair<int,Eigen::MatrixXcd>& pairInput,
+                                 const QPair<int, Eigen::MatrixXcd>& pairInput,
                                  const Eigen::MatrixXd& matPsdSum);
     static void computePSDCSDImag(QMutex& mutex,
                                   Network& finalNetwork,
-                                  const QPair<int,Eigen::MatrixXcd>& pairInput,
+                                  const QPair<int, Eigen::MatrixXcd>& pairInput,
                                   const Eigen::MatrixXd& matPsdSum);
 };
 

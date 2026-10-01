@@ -48,7 +48,8 @@
 // DEFINE NAMESPACE MLLIB
 //=============================================================================================================
 
-namespace MLLIB{
+namespace MLLIB
+{
 
 //=============================================================================================================
 /**
@@ -57,7 +58,7 @@ namespace MLLIB{
 class MLSHARED_EXPORT MlModel
 {
 public:
-    typedef QSharedPointer<MlModel> SPtr;   /**< Shared pointer type for MlModel. */
+    typedef QSharedPointer<MlModel> SPtr; /**< Shared pointer type for MlModel. */
 
     //=========================================================================================================
     /**

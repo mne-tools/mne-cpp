@@ -66,8 +66,8 @@ class Subject;
 class UTILSSHARED_EXPORT IObserver
 {
 public:
-    typedef QSharedPointer<IObserver> SPtr;             /**< Shared pointer type for IObserver. */
-    typedef QSharedPointer<const IObserver> ConstSPtr;  /**< Const shared pointer type for IObserver. */
+    typedef QSharedPointer<IObserver> SPtr;            /**< Shared pointer type for IObserver. */
+    typedef QSharedPointer<const IObserver> ConstSPtr; /**< Const shared pointer type for IObserver. */
 
     //=========================================================================================================
     /**
@@ -93,10 +93,10 @@ public:
 class UTILSSHARED_EXPORT Subject
 {
 public:
-    typedef QSharedPointer<Subject> SPtr;               /**< Shared pointer type for Subject. */
-    typedef QSharedPointer<const Subject> ConstSPtr;    /**< Const shared pointer type for Subject. */
+    typedef QSharedPointer<Subject> SPtr;            /**< Shared pointer type for Subject. */
+    typedef QSharedPointer<const Subject> ConstSPtr; /**< Const shared pointer type for Subject. */
 
-    typedef QSet<IObserver*>    t_Observers;            /**< Defines a new IObserver set type. */
+    typedef QSet<IObserver*> t_Observers; /**< Defines a new IObserver set type. */
 
     //=========================================================================================================
     /**
@@ -142,13 +142,13 @@ public:
      */
     inline t_Observers& observers();
 
-//    //=========================================================================================================
-//    /**
-//     * Returns attached observers.
+    //    //=========================================================================================================
+    //    /**
+    //     * Returns attached observers.
 
-//     * @return attached observers.
-//     */
-//    inline std::set<IObserver*>& observers();
+    //     * @return attached observers.
+    //     */
+    //    inline std::set<IObserver*>& observers();
 
     //=========================================================================================================
     /**
@@ -156,7 +156,10 @@ public:
      *
      * @return the number of attached observers.
      */
-    int observerNumDebug(){return m_Observers.size();};
+    int observerNumDebug()
+    {
+        return m_Observers.size();
+    };
 
 protected:
     //=========================================================================================================
@@ -166,8 +169,8 @@ protected:
     Subject() {};
 
 private:
-    t_Observers                 m_Observers;    /**< Holds the attached observers.*/
-//    std::set<IObserver*>        m_Observers;    /**< Holds the attached observers.*/
+    t_Observers m_Observers; /**< Holds the attached observers.*/
+    //    std::set<IObserver*>        m_Observers;    /**< Holds the attached observers.*/
 };
 
 //=============================================================================================================

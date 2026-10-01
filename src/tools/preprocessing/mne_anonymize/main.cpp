@@ -35,8 +35,9 @@
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-namespace MNEANONYMIZE {
-    class SettingsControllerCl;
+namespace MNEANONYMIZE
+{
+class SettingsControllerCl;
 }
 
 //=============================================================================================================
@@ -72,8 +73,7 @@ int main(int argc, char* argv[])
 
     QScopedPointer<MNEANONYMIZE::SettingsControllerCl> controller(h->createController(qtApp->arguments()));
 
-    if(controller->run())
-    {
+    if (controller->run()) {
         return 1;
     }
 

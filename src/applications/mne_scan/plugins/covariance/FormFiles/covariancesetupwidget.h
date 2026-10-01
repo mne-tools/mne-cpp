@@ -58,7 +58,7 @@ public:
      * @param[in] toolbox a pointer to the corresponding Covariance toolbox.
      * @param[in] parent pointer to parent widget; If parent is 0, the new CovarianceSetupWidget becomes a window. If parent is another widget, CovarianceSetupWidget becomes a child window inside parent. CovarianceSetupWidget is deleted when its parent is deleted.
      */
-    CovarianceSetupWidget(Covariance* toolbox, QWidget *parent = 0);
+    CovarianceSetupWidget(Covariance* toolbox, QWidget* parent = 0);
 
     //=========================================================================================================
     /**
@@ -68,10 +68,9 @@ public:
     ~CovarianceSetupWidget();
 
 private:
+    Covariance* m_pCovariance; /**< Holds a pointer to corresponding Covariance.*/
 
-    Covariance* m_pCovariance;        /**< Holds a pointer to corresponding Covariance.*/
-
-    Ui::CovarianceSetupWidgetClass ui;   /**< Holds the user interface for the CovarianceSetupWidget.*/
+    Ui::CovarianceSetupWidgetClass ui; /**< Holds the user interface for the CovarianceSetupWidget.*/
 };
 } // NAMESPACE
 

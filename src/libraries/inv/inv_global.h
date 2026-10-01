@@ -35,11 +35,11 @@
 //=============================================================================================================
 
 #if defined(STATICBUILD)
-#  define INVSHARED_EXPORT
+#define INVSHARED_EXPORT
 #elif defined(MNE_INV_LIBRARY)
-#  define INVSHARED_EXPORT Q_DECL_EXPORT    /**< Q_DECL_EXPORT must be added to the declarations of symbols used when compiling a shared library. */
+#define INVSHARED_EXPORT Q_DECL_EXPORT /**< Q_DECL_EXPORT must be added to the declarations of symbols used when compiling a shared library. */
 #else
-#  define INVSHARED_EXPORT Q_DECL_IMPORT    /**< Q_DECL_IMPORT must be added to the declarations of symbols used when compiling a client that uses the shared library. */
+#define INVSHARED_EXPORT Q_DECL_IMPORT /**< Q_DECL_IMPORT must be added to the declarations of symbols used when compiling a client that uses the shared library. */
 #endif
 
 //=============================================================================================================
@@ -47,7 +47,8 @@
  * @namespace INVLIB
  * @brief     Inverse source estimation (MNE, dSPM, sLORETA, dipole fitting).
  */
-namespace INVLIB{
+namespace INVLIB
+{
 
 //=============================================================================================================
 /**

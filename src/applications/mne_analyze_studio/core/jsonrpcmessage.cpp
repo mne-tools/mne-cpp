@@ -27,8 +27,7 @@ QJsonObject JsonRpcMessage::createRequest(const QString& id,
         {"jsonrpc", "2.0"},
         {"id", id},
         {"method", method},
-        {"params", params}
-    };
+        {"params", params}};
 }
 
 QJsonObject JsonRpcMessage::createResponse(const QJsonValue& id,
@@ -37,8 +36,7 @@ QJsonObject JsonRpcMessage::createResponse(const QJsonValue& id,
     return QJsonObject{
         {"jsonrpc", "2.0"},
         {"id", id},
-        {"result", result}
-    };
+        {"result", result}};
 }
 
 QJsonObject JsonRpcMessage::createError(const QJsonValue& id,
@@ -48,11 +46,7 @@ QJsonObject JsonRpcMessage::createError(const QJsonValue& id,
     return QJsonObject{
         {"jsonrpc", "2.0"},
         {"id", id},
-        {"error", QJsonObject{
-            {"code", code},
-            {"message", message}
-        }}
-    };
+        {"error", QJsonObject{{"code", code}, {"message", message}}}};
 }
 
 QByteArray JsonRpcMessage::serialize(const QJsonObject& message)
@@ -66,7 +60,7 @@ bool JsonRpcMessage::deserialize(const QByteArray& payload, QJsonObject& message
 {
     QJsonParseError error;
     const QJsonDocument document = QJsonDocument::fromJson(payload.trimmed(), &error);
-    if(error.error != QJsonParseError::NoError || !document.isObject()) {
+    if (error.error != QJsonParseError::NoError || !document.isObject()) {
         errorString = error.errorString();
         return false;
     }

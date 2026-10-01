@@ -53,7 +53,7 @@ QString llmKeychainService()
 
 QString readSecretFromKeychain(const QString& accountName)
 {
-    if(accountName.trimmed().isEmpty()) {
+    if (accountName.trimmed().isEmpty()) {
         return QString();
     }
 
@@ -64,7 +64,7 @@ QString readSecretFromKeychain(const QString& accountName)
                                 << "-a" << accountName.trimmed()
                                 << "-w");
     process.waitForFinished();
-    if(process.exitStatus() != QProcess::NormalExit || process.exitCode() != 0) {
+    if (process.exitStatus() != QProcess::NormalExit || process.exitCode() != 0) {
         return QString();
     }
 
@@ -73,7 +73,7 @@ QString readSecretFromKeychain(const QString& accountName)
 
 bool writeSecretToKeychain(const QString& accountName, const QString& secret)
 {
-    if(accountName.trimmed().isEmpty()) {
+    if (accountName.trimmed().isEmpty()) {
         return false;
     }
 
@@ -90,7 +90,7 @@ bool writeSecretToKeychain(const QString& accountName, const QString& secret)
 
 void deleteSecretFromKeychain(const QString& accountName)
 {
-    if(accountName.trimmed().isEmpty()) {
+    if (accountName.trimmed().isEmpty()) {
         return;
     }
 
@@ -126,16 +126,15 @@ QString formatToolInventory(const QJsonArray& toolDefinitions)
 {
     QStringList lines;
 
-    for(const QJsonValue& value : toolDefinitions) {
+    for (const QJsonValue& value : toolDefinitions) {
         const QJsonObject tool = value.toObject();
         const QString name = tool.value("name").toString().trimmed();
         const QString description = tool.value("description").toString().trimmed();
-        if(name.isEmpty()) {
+        if (name.isEmpty()) {
             continue;
         }
 
-        lines << QString("%1\n  %2").arg(name,
-                                          description.isEmpty() ? QString("No description.") : description);
+        lines << QString("%1\n  %2").arg(name, description.isEmpty() ? QString("No description.") : description);
     }
 
     return lines.isEmpty() ? QString("No tools available.") : lines.join("\n\n");
@@ -143,26 +142,26 @@ QString formatToolInventory(const QJsonArray& toolDefinitions)
 
 [[maybe_unused]] QStringList suggestedModelsForMode(const QString& mode)
 {
-    if(mode == QLatin1String("openai_responses")) {
+    if (mode == QLatin1String("openai_responses")) {
         return QStringList() << "gpt-5-mini" << "gpt-5" << "gpt-4.1-mini";
     }
 
-    if(mode == QLatin1String("gemini_openai")) {
+    if (mode == QLatin1String("gemini_openai")) {
         return QStringList() << "gemini-2.5-flash" << "gemini-2.5-pro" << "gemini-2.0-flash";
     }
 
-    if(mode == QLatin1String("github_models")) {
+    if (mode == QLatin1String("github_models")) {
         return QStringList() << "openai/gpt-4.1-mini"
                              << "openai/gpt-4.1"
                              << "anthropic/claude-sonnet-4"
                              << "meta/llama-3.3-70b-instruct";
     }
 
-    if(mode == QLatin1String("anthropic_messages")) {
+    if (mode == QLatin1String("anthropic_messages")) {
         return QStringList() << "claude-sonnet-4-5" << "claude-opus-4-1" << "claude-haiku-3-5";
     }
 
-    if(mode == QLatin1String("http")) {
+    if (mode == QLatin1String("http")) {
         return QStringList() << "gpt-4.1-mini" << "llama3.1:8b" << "qwen2.5-coder:7b";
     }
 
@@ -171,16 +170,16 @@ QString formatToolInventory(const QJsonArray& toolDefinitions)
 
 QString providerConsoleUrl(const QString& mode)
 {
-    if(mode == QLatin1String("openai_responses")) {
+    if (mode == QLatin1String("openai_responses")) {
         return QString("https://platform.openai.com/api-keys");
     }
-    if(mode == QLatin1String("gemini_openai")) {
+    if (mode == QLatin1String("gemini_openai")) {
         return QString("https://aistudio.google.com/apikey");
     }
-    if(mode == QLatin1String("github_models")) {
+    if (mode == QLatin1String("github_models")) {
         return QString("https://github.com/settings/tokens");
     }
-    if(mode == QLatin1String("anthropic_messages")) {
+    if (mode == QLatin1String("anthropic_messages")) {
         return QString("https://console.anthropic.com/settings/keys");
     }
 
@@ -189,10 +188,10 @@ QString providerConsoleUrl(const QString& mode)
 
 QString providerNameForMode(const QString& mode)
 {
-    if(mode == QLatin1String("openai_responses")) {
+    if (mode == QLatin1String("openai_responses")) {
         return QString("OpenAI");
     }
-    if(mode == QLatin1String("gemini_openai")) {
+    if (mode == QLatin1String("gemini_openai")) {
         return QString("Google Gemini");
     }
 
@@ -201,10 +200,10 @@ QString providerNameForMode(const QString& mode)
 
 QString endpointForMode(const QString& mode)
 {
-    if(mode == QLatin1String("openai_responses")) {
+    if (mode == QLatin1String("openai_responses")) {
         return QString("https://api.openai.com/v1/responses");
     }
-    if(mode == QLatin1String("gemini_openai")) {
+    if (mode == QLatin1String("gemini_openai")) {
         return QString("https://generativelanguage.googleapis.com/v1beta/openai/chat/completions");
     }
 
@@ -213,16 +212,16 @@ QString endpointForMode(const QString& mode)
 
 QString providerDocsUrl(const QString& mode)
 {
-    if(mode == QLatin1String("openai_responses")) {
+    if (mode == QLatin1String("openai_responses")) {
         return QString("https://platform.openai.com/docs/quickstart/authentication");
     }
-    if(mode == QLatin1String("gemini_openai")) {
+    if (mode == QLatin1String("gemini_openai")) {
         return QString("https://ai.google.dev/gemini-api/docs/openai");
     }
-    if(mode == QLatin1String("github_models")) {
+    if (mode == QLatin1String("github_models")) {
         return QString("https://docs.github.com/en/enterprise-cloud@latest/github-models/quickstart");
     }
-    if(mode == QLatin1String("anthropic_messages")) {
+    if (mode == QLatin1String("anthropic_messages")) {
         return QString("https://docs.anthropic.com/en/api/getting-started");
     }
 
@@ -231,16 +230,16 @@ QString providerDocsUrl(const QString& mode)
 
 QString providerInstructionsHtml(const QString& mode)
 {
-    if(mode == QLatin1String("openai_responses")) {
+    if (mode == QLatin1String("openai_responses")) {
         return "<b>OpenAI</b><br/>1. Open the API keys page.<br/>2. Create a new secret key.<br/>3. Paste it here. Studio stores it in macOS Keychain when available.<br/>4. Pick a model like <code>gpt-5-mini</code>.<br/>5. Click <b>Validate Connection</b>.";
     }
-    if(mode == QLatin1String("gemini_openai")) {
+    if (mode == QLatin1String("gemini_openai")) {
         return "<b>Google Gemini</b><br/>1. Open Google AI Studio.<br/>2. Create a Gemini API key.<br/>3. Paste it here. Studio stores it in macOS Keychain when available.<br/>4. Pick a model like <code>gemini-2.5-flash</code>.<br/>5. Click <b>Validate Connection</b>.";
     }
-    if(mode == QLatin1String("github_models")) {
+    if (mode == QLatin1String("github_models")) {
         return "<b>GitHub Models</b><br/>1. Create a GitHub token with model access.<br/>2. Paste it here. Studio stores it in macOS Keychain when available.<br/>3. Use <b>Browse Models</b> or a suggestion.<br/>4. Click <b>Validate Connection</b>.";
     }
-    if(mode == QLatin1String("anthropic_messages")) {
+    if (mode == QLatin1String("anthropic_messages")) {
         return "<b>Anthropic Claude</b><br/>1. Open the Anthropic console keys page.<br/>2. Create an API key.<br/>3. Paste it here. Studio stores it in macOS Keychain when available.<br/>4. Pick a Claude model.<br/>5. Click <b>Validate Connection</b>.";
     }
 
@@ -291,8 +290,7 @@ LlmSettingsDialog::LlmSettingsDialog(const LlmPlannerConfig& config, QWidget* pa
     m_modeSelector->setItems(QList<QPair<QString, QString>>{
         qMakePair(QString("Rule-Based"), QString("disabled")),
         qMakePair(QString("OpenAI"), QString("openai_responses")),
-        qMakePair(QString("Gemini"), QString("gemini_openai"))
-    });
+        qMakePair(QString("Gemini"), QString("gemini_openai"))});
 
     const QString mode = config.mode.trimmed().isEmpty() ? QString("disabled") : config.mode.trimmed().toLower();
     m_modeSelector->setCurrentValue(mode);
@@ -410,8 +408,7 @@ LlmPlannerConfig LlmSettingsDialog::configuration() const
         providerNameForMode(m_modeSelector->currentValue()),
         endpointForMode(m_modeSelector->currentValue()),
         m_apiKeyLineEdit->text().trimmed(),
-        m_modelLineEdit->text().trimmed()
-    };
+        m_modelLineEdit->text().trimmed()};
 }
 
 bool LlmSettingsDialog::hasValidationResult() const
@@ -453,8 +450,7 @@ void LlmSettingsDialog::runPlannerTest()
               QJsonObject{{"name", "view.raw.summary"}, {"description", "Return summary metadata for the active raw browser."}},
               QJsonObject{{"name", "neurokernel.channel_stats"}, {"description", "Compute per-channel statistics for a raw sample window."}},
               QJsonObject{{"name", "neurokernel.psd_summary"}, {"description", "Compute a Welch PSD summary for a raw sample window."}},
-              QJsonObject{{"name", "neurokernel.find_peak_window"}, {"description", "Find the strongest absolute-amplitude sample inside a raw window."}}
-          }
+              QJsonObject{{"name", "neurokernel.find_peak_window"}, {"description", "Find the strongest absolute-amplitude sample inside a raw window."}}}
         : m_testToolDefinitions;
 
     const QJsonObject context = m_testContext.isEmpty()
@@ -463,31 +459,30 @@ void LlmSettingsDialog::runPlannerTest()
               {"active_file", "sample_audvis_raw.fif"},
               {"raw_summary", "Raw Data Browser: sample_audvis_raw.fif | Channels: 376 | Sampling rate: 600.61 Hz"},
               {"raw_state", "Visible range: 25800 to 26500 samples | Cursor: 26100"},
-              {"cursor_sample", 26100}
-          }
+              {"cursor_sample", 26100}}
         : m_testContext;
 
     const LlmPlanResult result = planner.plan(prompt, tools, context);
 
-    if(result.success) {
+    if (result.success) {
         m_hasValidationResult = true;
         m_lastValidationSucceeded = true;
         m_lastValidationMessage = QString("Validated successfully");
         m_testStatusLabel->setText(QString("Planner OK: %1 | Steps: %2")
-                                   .arg(result.summary.isEmpty() ? QString("plan generated") : result.summary,
-                                        result.plannedCommands.join(" | ")));
+                                       .arg(result.summary.isEmpty() ? QString("plan generated") : result.summary,
+                                            result.plannedCommands.join(" | ")));
         return;
     }
 
     QString failureText = QString("Planner failed: %1")
                               .arg(result.errorMessage.isEmpty() ? QString("unknown error") : result.errorMessage);
-    if(result.httpStatusCode > 0) {
+    if (result.httpStatusCode > 0) {
         failureText += QString(" | HTTP %1").arg(result.httpStatusCode);
     }
-    if(!result.providerErrorType.isEmpty()) {
+    if (!result.providerErrorType.isEmpty()) {
         failureText += QString(" | type=%1").arg(result.providerErrorType);
     }
-    if(!result.rawResponse.trimmed().isEmpty()) {
+    if (!result.rawResponse.trimmed().isEmpty()) {
         const QString compactResponse = result.rawResponse.simplified();
         failureText += QString(" | response=%1").arg(compactResponse.left(220));
     }
@@ -503,7 +498,7 @@ void LlmSettingsDialog::updateModeDefaults()
     const bool modeChanged = m_lastAppliedMode != mode;
     m_lastAppliedMode = mode;
 
-    if(modeChanged) {
+    if (modeChanged) {
         m_modelLineEdit->clear();
         m_hasValidationResult = false;
         m_lastValidationSucceeded = false;
@@ -513,14 +508,14 @@ void LlmSettingsDialog::updateModeDefaults()
 
     refreshSuggestedModels();
     refreshProviderInstructions();
-    if(mode == QLatin1String("openai_responses")) {
+    if (mode == QLatin1String("openai_responses")) {
         m_modelLineEdit->setPlaceholderText("gpt-5-mini");
         m_apiKeyLineEdit->setPlaceholderText("Required for OpenAI");
         updateDialogVisibility();
         return;
     }
 
-    if(mode == QLatin1String("gemini_openai")) {
+    if (mode == QLatin1String("gemini_openai")) {
         m_modelLineEdit->setPlaceholderText("gemini-2.5-flash");
         m_apiKeyLineEdit->setPlaceholderText("Required for Gemini");
         updateDialogVisibility();
@@ -537,7 +532,7 @@ void LlmSettingsDialog::updateModeDefaults()
 void LlmSettingsDialog::openProviderConsole()
 {
     const QString url = providerConsoleUrl(m_modeSelector->currentValue());
-    if(!url.isEmpty()) {
+    if (!url.isEmpty()) {
         QDesktopServices::openUrl(QUrl(url));
     }
 }
@@ -545,7 +540,7 @@ void LlmSettingsDialog::openProviderConsole()
 void LlmSettingsDialog::openProviderDocs()
 {
     const QString url = providerDocsUrl(m_modeSelector->currentValue());
-    if(!url.isEmpty()) {
+    if (!url.isEmpty()) {
         QDesktopServices::openUrl(QUrl(url));
     }
 }
@@ -559,8 +554,9 @@ void LlmSettingsDialog::saveCurrentProfile()
                                                       "Profile name",
                                                       QLineEdit::Normal,
                                                       initialName,
-                                                      &accepted).trimmed();
-    if(!accepted || profileName.isEmpty()) {
+                                                      &accepted)
+                                    .trimmed();
+    if (!accepted || profileName.isEmpty()) {
         return;
     }
 
@@ -569,10 +565,10 @@ void LlmSettingsDialog::saveCurrentProfile()
     settings.setValue(QString("%1/mode").arg(baseKey), m_modeSelector->currentValue());
     settings.setValue(QString("%1/model").arg(baseKey), m_modelLineEdit->text().trimmed());
     const QString apiKey = m_apiKeyLineEdit->text().trimmed();
-    if(!apiKey.isEmpty() && writeSecretToKeychain(providerSecretAccountName(profileName), apiKey)) {
+    if (!apiKey.isEmpty() && writeSecretToKeychain(providerSecretAccountName(profileName), apiKey)) {
         settings.remove(QString("%1/api_key").arg(baseKey));
     } else {
-        if(apiKey.isEmpty()) {
+        if (apiKey.isEmpty()) {
             deleteSecretFromKeychain(providerSecretAccountName(profileName));
         }
         settings.setValue(QString("%1/api_key").arg(baseKey), apiKey);
@@ -586,14 +582,14 @@ void LlmSettingsDialog::saveCurrentProfile()
 void LlmSettingsDialog::deleteCurrentProfile()
 {
     const QString profileName = m_profileSelector->currentValue().trimmed();
-    if(profileName.isEmpty()) {
+    if (profileName.isEmpty()) {
         return;
     }
 
     QSettings settings("MNE-CPP", "MNEAnalyzeStudio");
     settings.remove(QString("agent/profiles/%1").arg(profileName));
     deleteSecretFromKeychain(providerSecretAccountName(profileName));
-    if(settings.value("agent/selected_profile").toString() == profileName) {
+    if (settings.value("agent/selected_profile").toString() == profileName) {
         settings.remove("agent/selected_profile");
     }
     refreshProfiles();
@@ -603,7 +599,7 @@ void LlmSettingsDialog::deleteCurrentProfile()
 void LlmSettingsDialog::applySelectedProfile(const QString& profileName)
 {
     const QString trimmedProfile = profileName.trimmed();
-    if(trimmedProfile.isEmpty()) {
+    if (trimmedProfile.isEmpty()) {
         return;
     }
 
@@ -624,7 +620,7 @@ void LlmSettingsDialog::applySelectedProfile(const QString& profileName)
 void LlmSettingsDialog::applySuggestedModel()
 {
     const QString modelName = m_suggestedModelSelector->currentValue().trimmed();
-    if(modelName.isEmpty()) {
+    if (modelName.isEmpty()) {
         return;
     }
 
@@ -639,8 +635,9 @@ void LlmSettingsDialog::editModelManually()
                                                     "Model name",
                                                     QLineEdit::Normal,
                                                     m_modelLineEdit->text().trimmed(),
-                                                    &accepted).trimmed();
-    if(!accepted) {
+                                                    &accepted)
+                                  .trimmed();
+    if (!accepted) {
         return;
     }
 
@@ -651,7 +648,7 @@ void LlmSettingsDialog::browseModels()
 {
     QString errorMessage;
     const QStringList models = fetchAvailableModels(&errorMessage);
-    if(models.isEmpty()) {
+    if (models.isEmpty()) {
         m_testStatusLabel->setText(errorMessage.isEmpty()
                                        ? QString("No models were returned by the selected provider.")
                                        : QString("Browse Models failed: %1").arg(errorMessage));
@@ -659,12 +656,12 @@ void LlmSettingsDialog::browseModels()
     }
 
     QList<QPair<QString, QString>> modelItems;
-    for(const QString& modelName : models) {
+    for (const QString& modelName : models) {
         modelItems.append(qMakePair(modelName, modelName));
     }
     m_suggestedModelSelector->setItems(modelItems);
     m_suggestedModelSelector->setCurrentValue(m_modelLineEdit->text().trimmed());
-    if(m_suggestedModelSelector->currentValue().isEmpty() && !models.isEmpty()) {
+    if (m_suggestedModelSelector->currentValue().isEmpty() && !models.isEmpty()) {
         m_suggestedModelSelector->setCurrentValue(models.first());
     }
 
@@ -681,9 +678,9 @@ void LlmSettingsDialog::refreshProfiles()
     settings.endGroup();
 
     QList<QPair<QString, QString>> profileItems;
-    for(const QString& groupName : profileNames) {
+    for (const QString& groupName : profileNames) {
         const QString profileName = groupName.trimmed();
-        if(profileName.isEmpty()) {
+        if (profileName.isEmpty()) {
             continue;
         }
         profileItems.append(qMakePair(profileName, profileName));
@@ -725,12 +722,12 @@ void LlmSettingsDialog::updateDialogVisibility()
 QString LlmSettingsDialog::resolvedEndpointForMode(const QString& mode) const
 {
     const QString configuredEndpoint = endpointForMode(mode);
-    if(mode == QLatin1String("openai_responses")) {
-        if(configuredEndpoint.isEmpty()) {
+    if (mode == QLatin1String("openai_responses")) {
+        if (configuredEndpoint.isEmpty()) {
             return QString("https://api.openai.com/v1/models");
         }
         const QUrl configuredUrl(configuredEndpoint);
-        if(configuredUrl.isValid() && !configuredUrl.scheme().isEmpty() && !configuredUrl.host().isEmpty()) {
+        if (configuredUrl.isValid() && !configuredUrl.scheme().isEmpty() && !configuredUrl.host().isEmpty()) {
             QUrl modelsUrl = configuredUrl;
             modelsUrl.setPath("/v1/models");
             modelsUrl.setQuery(QString());
@@ -739,12 +736,12 @@ QString LlmSettingsDialog::resolvedEndpointForMode(const QString& mode) const
         return QString("https://api.openai.com/v1/models");
     }
 
-    if(mode == QLatin1String("gemini_openai")) {
-        if(configuredEndpoint.isEmpty()) {
+    if (mode == QLatin1String("gemini_openai")) {
+        if (configuredEndpoint.isEmpty()) {
             return QString("https://generativelanguage.googleapis.com/v1beta/openai/models");
         }
         const QUrl configuredUrl(configuredEndpoint);
-        if(configuredUrl.isValid() && !configuredUrl.scheme().isEmpty() && !configuredUrl.host().isEmpty()) {
+        if (configuredUrl.isValid() && !configuredUrl.scheme().isEmpty() && !configuredUrl.host().isEmpty()) {
             QUrl modelsUrl = configuredUrl;
             modelsUrl.setPath("/v1beta/openai/models");
             modelsUrl.setQuery(QString());
@@ -758,31 +755,29 @@ QString LlmSettingsDialog::resolvedEndpointForMode(const QString& mode) const
 
 QStringList LlmSettingsDialog::fetchAvailableModels(QString* errorMessage) const
 {
-    if(errorMessage) {
+    if (errorMessage) {
         *errorMessage = QString();
     }
 
     const QString mode = m_modeSelector->currentValue();
     const QString endpoint = resolvedEndpointForMode(mode);
     const QString apiKey = m_apiKeyLineEdit->text().trimmed();
-    if(endpoint.isEmpty()) {
-        if(errorMessage) {
+    if (endpoint.isEmpty()) {
+        if (errorMessage) {
             *errorMessage = "No model catalog endpoint is configured for this provider.";
         }
         return QStringList();
     }
 
-    if((mode == QLatin1String("openai_responses")
-        || mode == QLatin1String("gemini_openai"))
-       && apiKey.isEmpty()) {
-        if(errorMessage) {
+    if ((mode == QLatin1String("openai_responses") || mode == QLatin1String("gemini_openai")) && apiKey.isEmpty()) {
+        if (errorMessage) {
             *errorMessage = "This provider requires an API key before models can be fetched.";
         }
         return QStringList();
     }
 
     QNetworkRequest request{QUrl(endpoint)};
-    if(!apiKey.isEmpty()) {
+    if (!apiKey.isEmpty()) {
         request.setRawHeader("Authorization", QString("Bearer %1").arg(apiKey).toUtf8());
     }
 
@@ -800,9 +795,9 @@ QStringList LlmSettingsDialog::fetchAvailableModels(QString* errorMessage) const
     const QJsonDocument document = QJsonDocument::fromJson(responseBytes, &parseError);
     const QJsonObject responseObject = document.isObject() ? document.object() : QJsonObject();
 
-    if(!networkError.isEmpty()) {
+    if (!networkError.isEmpty()) {
         const QString providerMessage = responseObject.value("error").toObject().value("message").toString().trimmed();
-        if(errorMessage) {
+        if (errorMessage) {
             *errorMessage = providerMessage.isEmpty()
                 ? QString("%1 (HTTP %2)").arg(networkError).arg(httpStatus)
                 : QString("%1 (HTTP %2)").arg(providerMessage).arg(httpStatus);
@@ -810,8 +805,8 @@ QStringList LlmSettingsDialog::fetchAvailableModels(QString* errorMessage) const
         return QStringList();
     }
 
-    if(parseError.error != QJsonParseError::NoError) {
-        if(errorMessage) {
+    if (parseError.error != QJsonParseError::NoError) {
+        if (errorMessage) {
             *errorMessage = parseError.errorString();
         }
         return QStringList();
@@ -820,12 +815,12 @@ QStringList LlmSettingsDialog::fetchAvailableModels(QString* errorMessage) const
     const QJsonArray modelsArray = responseObject.value("data").toArray();
 
     QStringList models;
-    for(const QJsonValue& value : modelsArray) {
+    for (const QJsonValue& value : modelsArray) {
         const QJsonObject object = value.toObject();
         const QString id = object.value("id").toString().trimmed();
         const QString name = object.value("name").toString().trimmed();
         const QString modelName = id.isEmpty() ? name : id;
-        if(!modelName.isEmpty() && !models.contains(modelName)) {
+        if (!modelName.isEmpty() && !models.contains(modelName)) {
             models.append(modelName);
         }
     }

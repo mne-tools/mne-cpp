@@ -46,12 +46,14 @@
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-namespace Ui {
-    class CoregSettingsViewWidget;
+namespace Ui
+{
+class CoregSettingsViewWidget;
 }
 
-namespace FIFFLIB {
-    class FiffCoordTrans;
+namespace FIFFLIB
+{
+class FiffCoordTrans;
 }
 //=============================================================================================================
 // DEFINE NAMESPACE NAMESPACE
@@ -90,7 +92,7 @@ public:
     * @param[in] f              Window flags passed to the widget (default Qt::Widget).
     */
     explicit CoregSettingsView(const QString& sSettingsPath = "",
-                               QWidget *parent = 0,
+                               QWidget* parent = 0,
                                Qt::WindowFlags f = Qt::Widget);
 
     ~CoregSettingsView();
@@ -329,12 +331,12 @@ private:
      */
     void setToolTipInfo();
 
-    Ui::CoregSettingsViewWidget*    m_pUi;                  /**< The CoregSettingsViewWidget.*/
-    QString                         m_sSettingsPath;        /**< The settings path to store the GUI settings to. */
+    Ui::CoregSettingsViewWidget* m_pUi; /**< The CoregSettingsViewWidget.*/
+    QString m_sSettingsPath;            /**< The settings path to store the GUI settings to. */
 
-    QVector3D                       m_vecLPA;               /**< contains LPA position. */
-    QVector3D                       m_vecNAS;               /**< contains Nasion position. */
-    QVector3D                       m_vecRPA;               /**< contains RPA position. */
+    QVector3D m_vecLPA; /**< contains LPA position. */
+    QVector3D m_vecNAS; /**< contains Nasion position. */
+    QVector3D m_vecRPA; /**< contains RPA position. */
 
 signals:
     //=========================================================================================================
@@ -403,7 +405,7 @@ signals:
      *
      * @param[in] sText    The file name of the currently selected Bem.
      */
-    void changeSelectedBem(const QString &sText);
+    void changeSelectedBem(const QString& sText);
 
     //=========================================================================================================
     /**
@@ -425,4 +427,3 @@ signals:
 } // NAMESPACE
 
 #endif // COREGSETTINGSVIEW_H
-

@@ -70,20 +70,22 @@ public:
     /**
      * @brief FIR filter type — mirrors IirFilter::FilterType for a uniform API.
      */
-    enum FilterType {
-        LowPass  = 0,   /**< Low-pass filter. */
-        HighPass = 1,   /**< High-pass filter. */
-        BandPass = 2,   /**< Band-pass filter. */
-        BandStop = 3    /**< Band-stop (notch) filter. */
+    enum FilterType
+    {
+        LowPass = 0,  /**< Low-pass filter. */
+        HighPass = 1, /**< High-pass filter. */
+        BandPass = 2, /**< Band-pass filter. */
+        BandStop = 3  /**< Band-stop (notch) filter. */
     };
 
     //=========================================================================================================
     /**
      * @brief FIR design method — wraps FilterKernel's iDesignMethod integer codes.
      */
-    enum DesignMethod {
-        Cosine          = 0,  /**< Cosine window (fast, moderate roll-off). */
-        ParksMcClellan  = 1   /**< Equiripple Parks-McClellan (optimal minimax). */
+    enum DesignMethod
+    {
+        Cosine = 0,        /**< Cosine window (fast, moderate roll-off). */
+        ParksMcClellan = 1 /**< Equiripple Parks-McClellan (optimal minimax). */
     };
 
     //=========================================================================================================
@@ -106,13 +108,13 @@ public:
      *
      * @return A ready-to-use FilterKernel object.
      */
-    static FilterKernel design(int          iOrder,
-                                FilterType   type,
-                                double       dCutoffLow,
-                                double       dCutoffHigh,
-                                double       dSFreq,
-                                double       dTransition = 5.0,
-                                DesignMethod method      = Cosine);
+    static FilterKernel design(int iOrder,
+                               FilterType type,
+                               double dCutoffLow,
+                               double dCutoffHigh,
+                               double dSFreq,
+                               double dTransition = 5.0,
+                               DesignMethod method = Cosine);
 
     //=========================================================================================================
     /**
@@ -128,7 +130,7 @@ public:
      * @return Filtered row vector (same length as input).
      */
     static Eigen::RowVectorXd apply(const Eigen::RowVectorXd& vecData,
-                                     FilterKernel&             kernel);
+                                    FilterKernel& kernel);
 
     //=========================================================================================================
     /**
@@ -143,7 +145,7 @@ public:
      * @return Zero-phase filtered row vector.
      */
     static Eigen::RowVectorXd applyZeroPhase(const Eigen::RowVectorXd& vecData,
-                                              FilterKernel&             kernel);
+                                             FilterKernel& kernel);
 
     //=========================================================================================================
     /**
@@ -155,9 +157,9 @@ public:
      *
      * @return Zero-phase filtered matrix (same dimensions as input).
      */
-    static Eigen::MatrixXd applyZeroPhaseMatrix(const Eigen::MatrixXd&       matData,
-                                                 FilterKernel&                kernel,
-                                                 const Eigen::RowVectorXi&    vecPicks = Eigen::RowVectorXi());
+    static Eigen::MatrixXd applyZeroPhaseMatrix(const Eigen::MatrixXd& matData,
+                                                FilterKernel& kernel,
+                                                const Eigen::RowVectorXi& vecPicks = Eigen::RowVectorXi());
 };
 
 } // namespace UTILSLIB

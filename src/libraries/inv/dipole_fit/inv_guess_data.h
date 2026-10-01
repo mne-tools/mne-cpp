@@ -65,8 +65,8 @@ class InvDipoleFitData;
 class INVSHARED_EXPORT InvGuessData
 {
 public:
-    typedef QSharedPointer<InvGuessData> SPtr;              /**< Shared pointer type for InvGuessData. */
-    typedef QSharedPointer<const InvGuessData> ConstSPtr;   /**< Const shared pointer type for InvGuessData. */
+    typedef QSharedPointer<InvGuessData> SPtr;            /**< Shared pointer type for InvGuessData. */
+    typedef QSharedPointer<const InvGuessData> ConstSPtr; /**< Const shared pointer type for InvGuessData. */
 
     //=========================================================================================================
     /**
@@ -92,7 +92,7 @@ public:
      * @param[in, out] f Dipole fit data providing the forward model.
      *
      */
-    InvGuessData( const QString& guessname, const QString& guess_surfname, float mindist, float exclude, float grid, InvDipoleFitData* f);
+    InvGuessData(const QString& guessname, const QString& guess_surfname, float mindist, float exclude, float grid, InvDipoleFitData* f);
 
     //=========================================================================================================
     /**
@@ -108,7 +108,7 @@ public:
      * @param[in, out] guess_save_name File to save the guess points to (nullptr = do not save; saving is not implemented yet).
      *
      */
-    InvGuessData( const QString& guessname, const QString& guess_surfname, float mindist, float exclude, float grid, InvDipoleFitData* f, char *guess_save_name);
+    InvGuessData(const QString& guessname, const QString& guess_surfname, float mindist, float exclude, float grid, InvDipoleFitData* f, char* guess_save_name);
 
     //=========================================================================================================
     /**
@@ -130,8 +130,8 @@ public:
 
 public:
     Eigen::Matrix<float, Eigen::Dynamic, 3, Eigen::RowMajor> rr; /**< Guess dipole locations (nguess x 3, row-major). */
-    std::vector<InvDipoleForward::UPtr> guess_fwd; /**< Forward solutions for the guesses. */
-    int            nguess;          /**< How many sources. */
+    std::vector<InvDipoleForward::UPtr> guess_fwd;               /**< Forward solutions for the guesses. */
+    int nguess;                                                  /**< How many sources. */
 };
 
 //=============================================================================================================

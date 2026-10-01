@@ -70,7 +70,7 @@ public:
     /**
      * Constructs a BabyMEG.
      */
-    explicit BabyMEGClient(int myPort, QObject *parent = 0);
+    explicit BabyMEGClient(int myPort, QObject* parent = 0);
 
     ~BabyMEGClient();
 
@@ -190,30 +190,30 @@ public:
     void SendCommandToBabyMEGShortConnection(QByteArray s);
 
     void run();
-    void DisplayError(int socketError, const QString &message);
+    void DisplayError(int socketError, const QString& message);
     inline bool isConnected() const;
 
-    QString                     name;
+    QString name;
 
-    quint16                     port;
-    int                         numBlock;
+    quint16 port;
+    int numBlock;
 
-    bool                        SkipLoop;
-    bool                        DataAcqStartFlag;
-    bool                        DataACK;
+    bool SkipLoop;
+    bool DataAcqStartFlag;
+    bool DataACK;
 
     QSharedPointer<BabyMEGInfo> myBabyMEGInfo;
-    QByteArray                  buffer;
+    QByteArray buffer;
 
 private:
-    bool                        m_bSocketIsConnected;
-    QTcpSocket*                 tcpSocket;
+    bool m_bSocketIsConnected;
+    QTcpSocket* tcpSocket;
 
-    QMutex                      m_qMutex;
+    QMutex m_qMutex;
 
 signals:
     void DataAcq();
-    void error(int socketError, const QString &message);
+    void error(int socketError, const QString& message);
 };
 
 //=============================================================================================================

@@ -40,8 +40,9 @@
 class QVBoxLayout;
 class QHBoxLayout;
 
-namespace SCDISPLIB {
-    class RealTime3DWidget;
+namespace SCDISPLIB
+{
+class RealTime3DWidget;
 }
 
 //=============================================================================================================
@@ -62,8 +63,8 @@ class SCSHAREDSHARED_EXPORT DisplayManager : public QObject
     Q_OBJECT
 
 public:
-    typedef QSharedPointer<DisplayManager> SPtr;               /**< Shared pointer type for DisplayManager. */
-    typedef QSharedPointer<const DisplayManager> ConstSPtr;    /**< Const shared pointer type for DisplayManager. */
+    typedef QSharedPointer<DisplayManager> SPtr;            /**< Shared pointer type for DisplayManager. */
+    typedef QSharedPointer<const DisplayManager> ConstSPtr; /**< Const shared pointer type for DisplayManager. */
 
     //=========================================================================================================
     /**
@@ -87,7 +88,7 @@ public:
      *
      * @return a pointer to the widget containing all measurement widgets.
      */
-    QWidget* show(AbstractPlugin::OutputConnectorList &outputConnectorList,
+    QWidget* show(AbstractPlugin::OutputConnectorList& outputConnectorList,
                   QSharedPointer<QTime>& pT,
                   QList<QAction*>& qListActions);
 
@@ -98,9 +99,9 @@ public:
     void clean();
 
 private:
-    QList<QMetaObject::Connection>              m_pListWidgetConnections;       /**< all widget connections.*/
+    QList<QMetaObject::Connection> m_pListWidgetConnections; /**< all widget connections.*/
 
-    QPointer<SCDISPLIB::RealTime3DWidget>       m_pRealTime3DWidget;
+    QPointer<SCDISPLIB::RealTime3DWidget> m_pRealTime3DWidget;
 };
 } // NAMESPACE
 

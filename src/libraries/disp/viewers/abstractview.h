@@ -71,20 +71,23 @@ class DISPSHARED_EXPORT AbstractView : public QWidget
     Q_OBJECT
 
 public:
-    typedef QSharedPointer<AbstractView> SPtr;              /**< Shared pointer type for AbstractView. */
-    typedef QSharedPointer<const AbstractView> ConstSPtr;   /**< Const shared pointer type for AbstractView. */
+    typedef QSharedPointer<AbstractView> SPtr;            /**< Shared pointer type for AbstractView. */
+    typedef QSharedPointer<const AbstractView> ConstSPtr; /**< Const shared pointer type for AbstractView. */
 
-    enum StyleMode {
+    enum StyleMode
+    {
         Default,
         Dark
     };
 
-    enum GuiMode {
+    enum GuiMode
+    {
         Clinical,
         Research
     };
 
-    enum ProcessingMode {
+    enum ProcessingMode
+    {
         RealTime,
         Offline
     };
@@ -96,7 +99,7 @@ public:
      * @param[in] parent        parent of widget.
      * @param[in] f Qt window flags passed to the QWidget constructor.
      */
-    AbstractView(QWidget *parent = 0,
+    AbstractView(QWidget* parent = 0,
                  Qt::WindowFlags f = Qt::Widget);
 
     //=========================================================================================================
@@ -157,12 +160,10 @@ signals:
     void guiStyleChanged(DISPLIB::AbstractView::StyleMode style);
 
 protected:
+    bool m_bResearchModeIsActive; /**< The flag describing whether the research mode of the view is active or not. */
+    bool m_bOfflineModeIsActive;  /**< The flag describing whether offline mode of the view is active or not. */
 
-    bool            m_bResearchModeIsActive;  /**< The flag describing whether the research mode of the view is active or not. */
-    bool            m_bOfflineModeIsActive;  /**< The flag describing whether offline mode of the view is active or not. */
-
-    QString         m_sSettingsPath;            /**< The settings path to store the GUI settings to. */
-
+    QString m_sSettingsPath; /**< The settings path to store the GUI settings to. */
 };
 } // NAMESPACE
 

@@ -41,10 +41,10 @@ namespace INVLIB
  */
 enum class BeamformerWeightNorm
 {
-    None = 0,           /**< No normalization (raw unit-gain filter). */
-    UnitNoiseGain,      /**< Normalize by sqrt(diag(W @ W^H)), Sekihara 2008. */
-    NAI,                /**< Neural Activity Index: unit-noise-gain + noise subspace normalization. */
-    UnitNoiseGainInv    /**< Rotation-invariant unit-noise-gain via sqrtm(inner)^{-0.5}. */
+    None = 0,        /**< No normalization (raw unit-gain filter). */
+    UnitNoiseGain,   /**< Normalize by sqrt(diag(W @ W^H)), Sekihara 2008. */
+    NAI,             /**< Neural Activity Index: unit-noise-gain + noise subspace normalization. */
+    UnitNoiseGainInv /**< Rotation-invariant unit-noise-gain via sqrtm(inner)^{-0.5}. */
 };
 
 //=============================================================================================================
@@ -53,10 +53,10 @@ enum class BeamformerWeightNorm
  */
 enum class BeamformerPickOri
 {
-    None = 0,           /**< Keep all orientations (3 per source for free, 1 for fixed). */
-    Normal,             /**< Extract surface normal component only (Z in local coords). */
-    MaxPower,           /**< Optimal orientation via max eigenvalue of power matrix. */
-    Vector              /**< Return the full 3-component vector solution. */
+    None = 0, /**< Keep all orientations (3 per source for free, 1 for fixed). */
+    Normal,   /**< Extract surface normal component only (Z in local coords). */
+    MaxPower, /**< Optimal orientation via max eigenvalue of power matrix. */
+    Vector    /**< Return the full 3-component vector solution. */
 };
 
 //=============================================================================================================
@@ -65,8 +65,8 @@ enum class BeamformerPickOri
  */
 enum class BeamformerInversion
 {
-    Matrix = 0,         /**< Full matrix inversion per source. */
-    Single              /**< Scalar (diagonal) inversion per source. */
+    Matrix = 0, /**< Full matrix inversion per source. */
+    Single      /**< Scalar (diagonal) inversion per source. */
 };
 
 } // NAMESPACE INVLIB

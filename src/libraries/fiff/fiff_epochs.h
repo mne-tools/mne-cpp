@@ -59,9 +59,9 @@ namespace FIFFLIB
  */
 struct FIFFSHARED_EXPORT FiffEpochData
 {
-    Eigen::MatrixXd data;           /**< Epoch data (n_channels × n_times_per_epoch). */
-    double tmin = 0.0;              /**< Start time of this epoch in seconds. */
-    double tmax = 0.0;              /**< End time of this epoch in seconds. */
+    Eigen::MatrixXd data; /**< Epoch data (n_channels × n_times_per_epoch). */
+    double tmin = 0.0;    /**< Start time of this epoch in seconds. */
+    double tmax = 0.0;    /**< End time of this epoch in seconds. */
 };
 
 //=============================================================================================================
@@ -91,10 +91,10 @@ public:
      * @return List of epoch data structures.
      */
     static QList<FiffEpochData> makeFixedLengthEpochs(const Eigen::MatrixXd& matData,
-                                                        double dSFreq,
-                                                        double dDuration,
-                                                        double dOverlap = 0.0,
-                                                        bool bDropLast = true);
+                                                      double dSFreq,
+                                                      double dDuration,
+                                                      double dOverlap = 0.0,
+                                                      bool bDropLast = true);
 
     //=========================================================================================================
     /**

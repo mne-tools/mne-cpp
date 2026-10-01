@@ -73,15 +73,15 @@
 namespace FWDLIB
 {
 
-constexpr int    FWD_BEM_UNKNOWN           = -1;
-constexpr int    FWD_BEM_CONSTANT_COLL     =  1;
-constexpr int    FWD_BEM_LINEAR_COLL       =  2;
+constexpr int FWD_BEM_UNKNOWN = -1;
+constexpr int FWD_BEM_CONSTANT_COLL = 1;
+constexpr int FWD_BEM_LINEAR_COLL = 2;
 
 constexpr float FWD_BEM_IP_APPROACH_LIMIT = 0.1f;
 
-constexpr int    FWD_BEM_LIN_FIELD_SIMPLE    = 1;
-constexpr int    FWD_BEM_LIN_FIELD_FERGUSON  = 2;
-constexpr int    FWD_BEM_LIN_FIELD_URANKAR   = 3;
+constexpr int FWD_BEM_LIN_FIELD_SIMPLE = 1;
+constexpr int FWD_BEM_LIN_FIELD_FERGUSON = 2;
+constexpr int FWD_BEM_LIN_FIELD_URANKAR = 3;
 
 } // namespace FWDLIB
 
@@ -91,15 +91,16 @@ constexpr int    FWD_BEM_LIN_FIELD_URANKAR   = 3;
 
 namespace MNELIB
 {
-    class MNETriangle;
-    class MNESurface;
-    class MNESourceSpace;
-    class MNECTFCompDataSet;
-    class MNENamedMatrix;
+class MNETriangle;
+class MNESurface;
+class MNESourceSpace;
+class MNECTFCompDataSet;
+class MNENamedMatrix;
 }
 
-namespace FIFFLIB {
-    class FiffNamedMatrix;
+namespace FIFFLIB
+{
+class FiffNamedMatrix;
 }
 //=============================================================================================================
 // DEFINE NAMESPACE FWDLIB
@@ -132,7 +133,7 @@ class FwdThreadArg;
 class FWDSHARED_EXPORT FwdBemModel
 {
 public:
-    typedef std::unique_ptr<FwdBemModel> UPtr;            /**< Unique pointer type for FwdBemModel. */
+    typedef std::unique_ptr<FwdBemModel> UPtr; /**< Unique pointer type for FwdBemModel. */
 
     //=========================================================================================================
     /**
@@ -196,7 +197,7 @@ public:
      * @param[out] res    Receives the integer value on success.
      * @return OK if the tag was found and is of type FIFFT_INT, FAIL otherwise.
      */
-    static int get_int( FIFFLIB::FiffStream::SPtr& stream, const FIFFLIB::FiffDirNode::SPtr& node,int what,int *res);
+    static int get_int(FIFFLIB::FiffStream::SPtr& stream, const FIFFLIB::FiffDirNode::SPtr& node, int what, int* res);
 
     /**
      * @brief Find a surface of the given kind in this BEM model.
@@ -215,7 +216,7 @@ public:
      * @return BEM model containing the requested surfaces, or nullptr on failure.
      */
     static FwdBemModel::UPtr fwd_bem_load_surfaces(const QString& name,
-                                              const std::vector<int>& kinds);
+                                                   const std::vector<int>& kinds);
 
     //=========================================================================================================
     /**
@@ -277,11 +278,11 @@ public:
      * @return FsSurface containing the guess locations, or nullptr on failure.
      */
     static std::unique_ptr<MNELIB::MNESurface> make_guesses(MNELIB::MNESurface* guess_surf,
-                                            float guessrad,
-                                            const Eigen::Vector3f& guess_r0,
-                                            float grid,
-                                            float exclude,
-                                            float mindist);
+                                                            float guessrad,
+                                                            const Eigen::Vector3f& guess_r0,
+                                                            float grid,
+                                                            float exclude,
+                                                            float mindist);
 
     //============================= fwd_bem_linear_collocation.c =============================
 
@@ -358,9 +359,9 @@ public:
      * @return Solution matrix, or empty matrix on error.
      */
     static Eigen::MatrixXf fwd_bem_multi_solution(Eigen::MatrixXf& solids,
-                                          const Eigen::MatrixXf *gamma,
-                                          int nsurf,
-                                          const Eigen::VectorXi& ntri);
+                                                  const Eigen::MatrixXf* gamma,
+                                                  int nsurf,
+                                                  const Eigen::VectorXi& ntri);
 
     //=========================================================================================================
     /**
@@ -385,11 +386,11 @@ public:
      * @param[in]     nsurf        Number of surfaces.
      * @param[in]     ntri         Triangle or node count per surface.
      */
-    static void fwd_bem_ip_modify_solution(Eigen::MatrixXf &solution,
+    static void fwd_bem_ip_modify_solution(Eigen::MatrixXf& solution,
                                            Eigen::MatrixXf& ip_solution,
                                            float ip_mult,
                                            int nsurf,
-                                           const Eigen::VectorXi &ntri);
+                                           const Eigen::VectorXi& ntri);
 
     //============================= fwd_bem_constant_collocation.c =============================
 
@@ -566,7 +567,7 @@ public:
      */
     static int fwd_bem_pot_els(const Eigen::Vector3f& rd, const Eigen::Vector3f& Q,
                                FwdCoilSet& els, Eigen::Ref<Eigen::VectorXf> pot,
-                               void *client);
+                               void* client);
 
     //=========================================================================================================
     /**
@@ -587,7 +588,7 @@ public:
     static int fwd_bem_pot_grad_els(const Eigen::Vector3f& rd, const Eigen::Vector3f& Q,
                                     FwdCoilSet& els, Eigen::Ref<Eigen::VectorXf> pot,
                                     Eigen::Ref<Eigen::VectorXf> xgrad, Eigen::Ref<Eigen::VectorXf> ygrad, Eigen::Ref<Eigen::VectorXf> zgrad,
-                                    void *client);
+                                    void* client);
 
     //============================= fwd_bem_field.c =============================
 
@@ -753,7 +754,7 @@ public:
      */
     int fwd_bem_specify_coils(FwdCoilSet* coils);
 
-    static constexpr double MAG_FACTOR = 1e-7;  /**< Magnetic constant mu_0 / (4 * pi). */
+    static constexpr double MAG_FACTOR = 1e-7; /**< Magnetic constant mu_0 / (4 * pi). */
 
     //=========================================================================================================
     /**
@@ -854,7 +855,7 @@ public:
      */
     static int fwd_bem_field(const Eigen::Vector3f& rd, const Eigen::Vector3f& Q,
                              FwdCoilSet& coils, Eigen::Ref<Eigen::VectorXf> B,
-                             void *client);
+                             void* client);
 
     //=========================================================================================================
     /**
@@ -875,7 +876,7 @@ public:
     static int fwd_bem_field_grad(const Eigen::Vector3f& rd, const Eigen::Vector3f& Q,
                                   FwdCoilSet& coils, Eigen::Ref<Eigen::VectorXf> Bval,
                                   Eigen::Ref<Eigen::VectorXf> xgrad, Eigen::Ref<Eigen::VectorXf> ygrad, Eigen::Ref<Eigen::VectorXf> zgrad,
-                                  void *client);
+                                  void* client);
 
     //============================= compute_forward.c =============================
 
@@ -907,15 +908,15 @@ public:
      * @return OK on success, FAIL on error.
      */
     int compute_forward_meg(std::vector<std::unique_ptr<MNELIB::MNESourceSpace>>& spaces,
-                            FwdCoilSet*                 coils,
-                            FwdCoilSet*                 comp_coils,
-                            MNELIB::MNECTFCompDataSet*  comp_data,
-                            bool                        fixed_ori,
-                            const Eigen::Vector3f&      r0,
-                            bool                        use_threads,
-                            FIFFLIB::FiffNamedMatrix&   resp,
-                            FIFFLIB::FiffNamedMatrix&   resp_grad,
-                            bool                        bDoGRad);
+                            FwdCoilSet* coils,
+                            FwdCoilSet* comp_coils,
+                            MNELIB::MNECTFCompDataSet* comp_data,
+                            bool fixed_ori,
+                            const Eigen::Vector3f& r0,
+                            bool use_threads,
+                            FIFFLIB::FiffNamedMatrix& resp,
+                            FIFFLIB::FiffNamedMatrix& resp_grad,
+                            bool bDoGRad);
 
     //=========================================================================================================
     /**
@@ -932,13 +933,13 @@ public:
      * @return OK on success, FAIL on error.
      */
     int compute_forward_eeg(std::vector<std::unique_ptr<MNELIB::MNESourceSpace>>& spaces,
-                            FwdCoilSet*                 els,
-                            bool                        fixed_ori,
-                            FwdEegSphereModel*          eeg_model,
-                            bool                        use_threads,
-                            FIFFLIB::FiffNamedMatrix&   resp,
-                            FIFFLIB::FiffNamedMatrix&   resp_grad,
-                            bool                        bDoGrad);
+                            FwdCoilSet* els,
+                            bool fixed_ori,
+                            FwdEegSphereModel* eeg_model,
+                            bool use_threads,
+                            FIFFLIB::FiffNamedMatrix& resp,
+                            FIFFLIB::FiffNamedMatrix& resp_grad,
+                            bool bDoGrad);
 
     //============================= fwd_spherefield.c =============================
 
@@ -957,7 +958,7 @@ public:
      */
     static int fwd_sphere_field(const Eigen::Vector3f& rd, const Eigen::Vector3f& Q,
                                 FwdCoilSet& coils, Eigen::Ref<Eigen::VectorXf> Bval,
-                                void *client);
+                                void* client);
 
     //=========================================================================================================
     /**
@@ -974,7 +975,7 @@ public:
      */
     static int fwd_sphere_field_vec(const Eigen::Vector3f& rd,
                                     FwdCoilSet& coils, Eigen::Ref<Eigen::MatrixXf> Bval,
-                                    void *client);
+                                    void* client);
 
     //=========================================================================================================
     /**
@@ -995,7 +996,7 @@ public:
     static int fwd_sphere_field_grad(const Eigen::Vector3f& rd, const Eigen::Vector3f& Q,
                                      FwdCoilSet& coils, Eigen::Ref<Eigen::VectorXf> Bval,
                                      Eigen::Ref<Eigen::VectorXf> xgrad, Eigen::Ref<Eigen::VectorXf> ygrad, Eigen::Ref<Eigen::VectorXf> zgrad,
-                                     void *client);
+                                     void* client);
 
     //============================= fwd_mag_dipole_field.c =============================
 
@@ -1012,7 +1013,7 @@ public:
      */
     static int fwd_mag_dipole_field(const Eigen::Vector3f& rm, const Eigen::Vector3f& M,
                                     FwdCoilSet& coils, Eigen::Ref<Eigen::VectorXf> Bval,
-                                    void *client);
+                                    void* client);
 
     //=========================================================================================================
     /**
@@ -1028,33 +1029,33 @@ public:
      */
     static int fwd_mag_dipole_field_vec(const Eigen::Vector3f& rm,
                                         FwdCoilSet& coils, Eigen::Ref<Eigen::MatrixXf> Bval,
-                                        void *client);
+                                        void* client);
 
 public:
-    QString     surf_name;              /**< File from which surfaces were loaded. */
+    QString surf_name; /**< File from which surfaces were loaded. */
 
-    std::vector<std::shared_ptr<MNELIB::MNESurface>> surfs;  /**< Interface surfaces, outermost first. */
+    std::vector<std::shared_ptr<MNELIB::MNESurface>> surfs; /**< Interface surfaces, outermost first. */
 
-    Eigen::VectorXi ntri;               /**< Triangle count per surface (length nsurf). */
-    Eigen::VectorXi np;                 /**< Vertex count per surface (length nsurf). */
-    int             nsurf;              /**< Number of interface surfaces. */
+    Eigen::VectorXi ntri; /**< Triangle count per surface (length nsurf). */
+    Eigen::VectorXi np;   /**< Vertex count per surface (length nsurf). */
+    int nsurf;            /**< Number of interface surfaces. */
 
-    Eigen::VectorXf sigma;              /**< Conductivity of each layer (length nsurf). */
-    Eigen::MatrixXf gamma;              /**< Conductivity-ratio coupling matrix (nsurf x nsurf). */
-    Eigen::VectorXf source_mult;        /**< Infinite-medium potential multipliers (length nsurf). */
-    Eigen::VectorXf field_mult;         /**< Magnetic-field multipliers (length nsurf). */
+    Eigen::VectorXf sigma;       /**< Conductivity of each layer (length nsurf). */
+    Eigen::MatrixXf gamma;       /**< Conductivity-ratio coupling matrix (nsurf x nsurf). */
+    Eigen::VectorXf source_mult; /**< Infinite-medium potential multipliers (length nsurf). */
+    Eigen::VectorXf field_mult;  /**< Magnetic-field multipliers (length nsurf). */
 
-    int             bem_method;         /**< Approximation method (FWD_BEM_CONSTANT_COLL or FWD_BEM_LINEAR_COLL). */
-    QString         sol_name;           /**< File from which the solution was loaded. */
+    int bem_method;   /**< Approximation method (FWD_BEM_CONSTANT_COLL or FWD_BEM_LINEAR_COLL). */
+    QString sol_name; /**< File from which the solution was loaded. */
 
-    Eigen::MatrixXf solution;           /**< Potential solution matrix (nsol x nsol). */
-    Eigen::VectorXf v0;                 /**< Workspace for infinite-medium potentials (length nsol). */
-    int             nsol;               /**< Dimension of the solution matrix. */
+    Eigen::MatrixXf solution; /**< Potential solution matrix (nsol x nsol). */
+    Eigen::VectorXf v0;       /**< Workspace for infinite-medium potentials (length nsol). */
+    int nsol;                 /**< Dimension of the solution matrix. */
 
     FIFFLIB::FiffCoordTrans head_mri_t; /**< Head-to-MRI coordinate transform. */
 
-    float           ip_approach_limit;  /**< Threshold for isolated-problem approach. */
-    bool            use_ip_approach;    /**< Whether the isolated-problem approach is active. */
+    float ip_approach_limit; /**< Threshold for isolated-problem approach. */
+    bool use_ip_approach;    /**< Whether the isolated-problem approach is active. */
 };
 
 //=============================================================================================================

@@ -35,7 +35,7 @@ using namespace FIFFLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-RealTimeCov::RealTimeCov(QObject *parent)
+RealTimeCov::RealTimeCov(QObject* parent)
 : Measurement(QMetaType::fromName("RealTimeCov::SPtr").id(), parent)
 , m_pFiffCov(FiffCov::SPtr::create())
 , m_pFiffInfo(FiffInfo::SPtr::create())
@@ -77,10 +77,9 @@ void RealTimeCov::setValue(const FiffCov& v)
 {
     m_qMutex.lock();
     //Store
-     *m_pFiffCov = v;
+    *m_pFiffCov = v;
     m_bInitialized = true;
     m_qMutex.unlock();
 
     emit notify();
 }
-

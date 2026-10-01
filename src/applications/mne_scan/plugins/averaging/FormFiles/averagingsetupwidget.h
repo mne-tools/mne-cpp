@@ -51,7 +51,6 @@ class AveragingSetupWidget : public QWidget
     Q_OBJECT
 
 public:
-
     //=========================================================================================================
     /**
      * Constructs a AveragingSetupWidget which is a child of parent.
@@ -59,7 +58,7 @@ public:
      * @param[in] toolbox a pointer to the corresponding Averaging toolbox.
      * @param[in] parent pointer to parent widget; If parent is 0, the new AveragingSetupWidget becomes a window. If parent is another widget, AveragingSetupWidget becomes a child window inside parent. AveragingSetupWidget is deleted when its parent is deleted.
      */
-    AveragingSetupWidget(Averaging* toolbox, QWidget *parent = 0);
+    AveragingSetupWidget(Averaging* toolbox, QWidget* parent = 0);
 
     //=========================================================================================================
     /**
@@ -69,10 +68,9 @@ public:
     ~AveragingSetupWidget();
 
 private:
+    Averaging* m_pAveraging; /**< Holds a pointer to corresponding Averaging.*/
 
-    Averaging* m_pAveraging;        /**< Holds a pointer to corresponding Averaging.*/
-
-    Ui::AveragingSetupWidgetClass ui;   /**< Holds the user interface for the AveragingSetupWidget.*/
+    Ui::AveragingSetupWidgetClass ui; /**< Holds the user interface for the AveragingSetupWidget.*/
 };
 } // NAMESPACE
 

@@ -61,8 +61,8 @@ class ANSHAREDSHARED_EXPORT AbstractPlugin : public QObject
     Q_OBJECT
 
 public:
-    typedef QSharedPointer<AbstractPlugin> SPtr;               /**< Shared pointer type for AbstractPlugin. */
-    typedef QSharedPointer<const AbstractPlugin> ConstSPtr;    /**< Const shared pointer type for AbstractPlugin. */
+    typedef QSharedPointer<AbstractPlugin> SPtr;            /**< Shared pointer type for AbstractPlugin. */
+    typedef QSharedPointer<const AbstractPlugin> ConstSPtr; /**< Const shared pointer type for AbstractPlugin. */
 
     //=========================================================================================================
     /**
@@ -257,13 +257,12 @@ signals:
     void guiStyleChanged(DISPLIB::AbstractView::StyleMode style);
 
 protected:
-    QSharedPointer<AnalyzeData>     m_pAnalyzeData;         /**< Pointer to the global data base */
-    bool m_bInitialized;                                    /**< Store the initialization state of the plugin. */
-    bool m_bMenuAlreadyLoaded;                              /**< Store if the plugin view has already been docked into the GUI. */
-    bool m_bViewAlreadyLoaded;                              /**< Store if the plugin view has already been docked into the GUI. */
-    bool m_bControlAlreadyLoaded;                           /**< Store if the plugin control has already been docked into the GUI. */
-    int m_iOrder;                                           /**< Hint to order the control in the list of controls. */
-
+    QSharedPointer<AnalyzeData> m_pAnalyzeData; /**< Pointer to the global data base */
+    bool m_bInitialized;                        /**< Store the initialization state of the plugin. */
+    bool m_bMenuAlreadyLoaded;                  /**< Store if the plugin view has already been docked into the GUI. */
+    bool m_bViewAlreadyLoaded;                  /**< Store if the plugin view has already been docked into the GUI. */
+    bool m_bControlAlreadyLoaded;               /**< Store if the plugin control has already been docked into the GUI. */
+    int m_iOrder;                               /**< Hint to order the control in the list of controls. */
 };
 
 } //Namespace

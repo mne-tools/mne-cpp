@@ -57,7 +57,7 @@ using namespace UTILSLIB;
  * @param[in] argv (argument vector) is an array of pointers to arrays of character objects. The array objects are null-terminated strings, representing the arguments that were entered on the command line when the program was started.
  * @return the value that was set to exit() (which is 0 if exit() is called via quit()).
  */
-int main(int argc, char *argv[])
+int main(int argc, char* argv[])
 {
     qInstallMessageHandler(MNELogger::customLogWriter);
     QApplication a(argc, argv);
@@ -67,11 +67,11 @@ int main(int argc, char *argv[])
     double dSampFreq = 23.0;
     MatrixXd inputData = MatrixXd::Random(2, iNSamples);
     for (int n = 0; n < iNSamples; n++) {
-        inputData(0, n) += 10.0 * sin(2.0 * M_PI *  10. * n / iNSamples );
+        inputData(0, n) += 10.0 * sin(2.0 * M_PI * 10. * n / iNSamples);
         inputData(0, n) += 10.0 * sin(2.0 * M_PI * 100. * n / iNSamples);
         inputData(0, n) += 10.0 * sin(2.0 * M_PI * 200. * n / iNSamples);
 
-        inputData(1, n) += 10.0 * sin(2.0 * M_PI *  50. * n / iNSamples);
+        inputData(1, n) += 10.0 * sin(2.0 * M_PI * 50. * n / iNSamples);
         inputData(1, n) += 10.0 * sin(2.0 * M_PI * 100. * n / iNSamples);
         inputData(1, n) += 10.0 * sin(2.0 * M_PI * 150. * n / iNSamples);
     }
@@ -110,7 +110,7 @@ int main(int argc, char *argv[])
     VectorXd psdTest = matTapSpectrumSeed.row(0).cwiseAbs2().transpose();
     psdTest *= 2.0;
     psdTest(0) /= 2.0;
-    if (iNfft % 2 == 0){
+    if (iNfft % 2 == 0) {
         psdTest.tail(1) /= 2.0;
     }
     //Normalization
@@ -138,11 +138,11 @@ int main(int argc, char *argv[])
     plotPsdTest2.show();
 
     //Check that sums of different psds of the same signal are equal
-    qDebug()<<psd.sum();
-    qDebug()<<psdTest.sum();
-    qDebug()<<psdTest2.sum();
+    qDebug() << psd.sum();
+    qDebug() << psdTest.sum();
+    qDebug() << psdTest2.sum();
     RowVectorXd data_hann = inputData.row(0).cwiseProduct(matTaps.row(0));
-    qDebug()<<data_hann.row(0).cwiseAbs2().sum() * double(iNSamples) / dSampFreq;
+    qDebug() << data_hann.row(0).cwiseAbs2().sum() * double(iNSamples) / dSampFreq;
 
     //Compute Spectrum of second row of input data
     MatrixXcd matTapSpectrumTarget = Spectral::computeTaperedSpectraRow(inputData.row(1), matTaps, iNfft);

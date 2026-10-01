@@ -34,19 +34,20 @@
 // DEFINE NAMESPACE ANSHAREDLIB
 //=============================================================================================================
 
-namespace ANSHAREDLIB {
+namespace ANSHAREDLIB
+{
 
 //=============================================================================================================
 class ANSHAREDSHARED_EXPORT CovarianceModel : public AbstractModel
 {
     Q_OBJECT
 public:
-    typedef QSharedPointer<CovarianceModel> SPtr;              /**< Shared pointer type for CovarianceModel. */
-    typedef QSharedPointer<const CovarianceModel> ConstSPtr;   /**< Const shared pointer type for CovarianceModel. */
+    typedef QSharedPointer<CovarianceModel> SPtr;            /**< Shared pointer type for CovarianceModel. */
+    typedef QSharedPointer<const CovarianceModel> ConstSPtr; /**< Const shared pointer type for CovarianceModel. */
 
-    CovarianceModel(const QString &sFilePath,
-               const QByteArray& byteLoadedData = QByteArray(),
-               QObject* parent = Q_NULLPTR);
+    CovarianceModel(const QString& sFilePath,
+                    const QByteArray& byteLoadedData = QByteArray(),
+                    QObject* parent = Q_NULLPTR);
 
     //=========================================================================================================
     /**
@@ -54,7 +55,7 @@ public:
      *
      * @param[in] parent     The parent index.
      */
-    virtual int rowCount(const QModelIndex &parent = QModelIndex()) const override;
+    virtual int rowCount(const QModelIndex& parent = QModelIndex()) const override;
 
     //=========================================================================================================
     /**
@@ -62,7 +63,7 @@ public:
      *
      * @param[in] parent     The parent index.
      */
-    virtual int columnCount(const QModelIndex &parent = QModelIndex()) const override;
+    virtual int columnCount(const QModelIndex& parent = QModelIndex()) const override;
 
     //=========================================================================================================
     /**
@@ -71,7 +72,7 @@ public:
      * @param[in] index   The index that referres to the requested item.
      * @param[in] role    The requested role.
      */
-    virtual QVariant data(const QModelIndex &index,
+    virtual QVariant data(const QModelIndex& index,
                           int role = Qt::DisplayRole) const override;
 
     //=========================================================================================================
@@ -80,7 +81,7 @@ public:
      *
      * @param[in] index   The index that referres to the requested item.
      */
-    Qt::ItemFlags flags(const QModelIndex & index) const override;
+    Qt::ItemFlags flags(const QModelIndex& index) const override;
 
     //=========================================================================================================
     /**
@@ -102,7 +103,7 @@ public:
      */
     inline QModelIndex index(int row,
                              int column,
-                             const QModelIndex &parent = QModelIndex()) const override;
+                             const QModelIndex& parent = QModelIndex()) const override;
 
     //=========================================================================================================
     /**
@@ -111,8 +112,7 @@ public:
      *
      * @param[in] index   The index that referres to the child.
      */
-    inline QModelIndex parent(const QModelIndex &index) const override;
-
+    inline QModelIndex parent(const QModelIndex& index) const override;
 };
 
 //=============================================================================================================
@@ -126,7 +126,7 @@ inline MODEL_TYPE CovarianceModel::getType() const
 
 //=============================================================================================================
 
-QModelIndex CovarianceModel::parent(const QModelIndex &index) const
+QModelIndex CovarianceModel::parent(const QModelIndex& index) const
 {
     Q_UNUSED(index);
     return QModelIndex();
@@ -134,11 +134,11 @@ QModelIndex CovarianceModel::parent(const QModelIndex &index) const
 
 //=============================================================================================================
 
-QModelIndex CovarianceModel::index(int row, int column, const QModelIndex &parent) const
+QModelIndex CovarianceModel::index(int row, int column, const QModelIndex& parent) const
 {
     Q_UNUSED(parent);
     return createIndex(row, column);
 }
 
-}//namespace
+} //namespace
 #endif // COVARIANCEMODEL_H

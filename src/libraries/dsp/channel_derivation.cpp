@@ -80,7 +80,7 @@ QVector<DerivationRule> ChannelDerivation::buildBipolar(const QStringList& chann
         for (int i = 0; i < group.size() - 1; ++i) {
             DerivationRule rule;
             rule.outputName = group[i] + "-" + group[i + 1];
-            rule.inputWeights[group[i]]     =  1.0;
+            rule.inputWeights[group[i]] = 1.0;
             rule.inputWeights[group[i + 1]] = -1.0;
             rules.append(rule);
         }

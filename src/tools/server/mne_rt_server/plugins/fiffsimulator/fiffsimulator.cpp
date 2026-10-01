@@ -53,11 +53,11 @@ using namespace COMLIB;
 // DEFINE MEMBER CONSTANTS
 //=============================================================================================================
 
-const QString FiffSimulator::Commands::BUFSIZE      = "bufsize";
-const QString FiffSimulator::Commands::GETBUFSIZE   = "getbufsize";
-const QString FiffSimulator::Commands::ACCEL        = "accel";
-const QString FiffSimulator::Commands::GETACCEL     = "getaccel";
-const QString FiffSimulator::Commands::SIMFILE      = "simfile";
+const QString FiffSimulator::Commands::BUFSIZE = "bufsize";
+const QString FiffSimulator::Commands::GETBUFSIZE = "getbufsize";
+const QString FiffSimulator::Commands::ACCEL = "accel";
+const QString FiffSimulator::Commands::GETACCEL = "getaccel";
+const QString FiffSimulator::Commands::SIMFILE = "simfile";
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS
@@ -67,7 +67,7 @@ FiffSimulator::FiffSimulator()
 : m_pFiffProducer(new FiffProducer(this))
 , m_pRawMatrixBuffer(nullptr)
 , m_sResourceDataPath(QString("%1/../resources/data/MNE-sample-data/MEG/sample/sample_audvis_raw.fif").arg(QCoreApplication::applicationDirPath()))
-, m_uiBufferSampleSize(200)//(4)
+, m_uiBufferSampleSize(200) //(4)
 , m_AccelerationFactor(1.0)
 , m_TrueSamplingRate(0.0)
 , m_bIsRunning(false)
@@ -93,28 +93,25 @@ void FiffSimulator::comBufsize(Command p_command)
     //ToDO JSON
     quint32 t_uiBuffSize = p_command.pValues()[0].toUInt();
 
-    if(t_uiBuffSize > 0)
-    {
-//        printf("bufsize %d\n", t_uiBuffSize);
+    if (t_uiBuffSize > 0) {
+        //        printf("bufsize %d\n", t_uiBuffSize);
 
         bool t_bWasRunning = m_bIsRunning;
 
-        if(m_bIsRunning)
-        {
+        if (m_bIsRunning) {
             m_pFiffProducer->stop();
             this->stop();
         }
 
         m_uiBufferSampleSize = t_uiBuffSize;
 
-        if(t_bWasRunning)
+        if (t_bWasRunning)
             this->start();
 
         QString str = QString("\tSet %1 buffer sample size to %2 samples\r\n\n").arg(getName()).arg(t_uiBuffSize);
 
         m_commandManager[Commands::BUFSIZE].reply(str);
-    }
-    else {
+    } else {
         m_commandManager[Commands::BUFSIZE].reply("Buffer size not set\r\n");
     }
 }
@@ -124,8 +121,7 @@ void FiffSimulator::comBufsize(Command p_command)
 void FiffSimulator::comGetBufsize(Command p_command)
 {
     bool t_bCommandIsJson = p_command.isJson();
-    if(t_bCommandIsJson)
-    {
+    if (t_bCommandIsJson) {
         //
         //create JSON help object
         //
@@ -134,9 +130,7 @@ void FiffSimulator::comGetBufsize(Command p_command)
         QJsonDocument p_qJsonDocument(t_qJsonObjectRoot);
 
         m_commandManager[Commands::GETBUFSIZE].reply(p_qJsonDocument.toJson());
-    }
-    else
-    {
+    } else {
         QString str = QString("\t%1\r\n\n").arg(m_uiBufferSampleSize);
         m_commandManager[Commands::GETBUFSIZE].reply(str);
     }
@@ -150,28 +144,24 @@ void FiffSimulator::comAccel(Command p_command)
 
     float t_uiAccel = p_command.pValues()[0].toFloat();
 
-    if(t_uiAccel > 0)
-    {
+    if (t_uiAccel > 0) {
+        bool t_bWasRunning = m_bIsRunning;
 
-            bool t_bWasRunning = m_bIsRunning;
+        if (m_bIsRunning) {
+            m_pFiffProducer->stop();
+            this->stop();
+        }
 
-            if(m_bIsRunning)
-            {
-                m_pFiffProducer->stop();
-                this->stop();
-            }
+        m_AccelerationFactor = t_uiAccel;
+        m_RawInfo.info.sfreq = m_AccelerationFactor * m_TrueSamplingRate;
 
-            m_AccelerationFactor = t_uiAccel;
-            m_RawInfo.info.sfreq = m_AccelerationFactor * m_TrueSamplingRate;
-
-            if(t_bWasRunning)
-                this->start();
+        if (t_bWasRunning)
+            this->start();
 
         QString str = QString("\tSet acceleration factor to %0.3f\r\n\n").arg(t_uiAccel);
 
         m_commandManager[Commands::ACCEL].reply(str);
-    }
-    else
+    } else
         m_commandManager[Commands::ACCEL].reply("Acceleration facor not set\r\n");
 }
 
@@ -180,8 +170,7 @@ void FiffSimulator::comAccel(Command p_command)
 void FiffSimulator::comGetAccel(Command p_command)
 {
     bool t_bCommandIsJson = p_command.isJson();
-    if(t_bCommandIsJson)
-    {
+    if (t_bCommandIsJson) {
         //
         //create JSON help object
         //
@@ -190,9 +179,7 @@ void FiffSimulator::comGetAccel(Command p_command)
         QJsonDocument p_qJsonDocument(t_qJsonObjectRoot);
 
         m_commandManager[Commands::GETACCEL].reply(p_qJsonDocument.toJson());
-    }
-    else
-    {
+    } else {
         QString str = QString("\t%0.3f\r\n\n").arg(m_AccelerationFactor);
         m_commandManager[Commands::GETACCEL].reply(str);
     }
@@ -209,28 +196,22 @@ void FiffSimulator::comSimfile(Command p_command)
 
     QString t_sResourceDataPathOld = m_sResourceDataPath;
 
-    if(t_file.exists())
-    {
+    if (t_file.exists()) {
         m_sResourceDataPath = p_command.pValues()[0].toString();
         m_RawInfo = FiffRawData();
 
-        if (this->readRawInfo())
-        {
+        if (this->readRawInfo()) {
             m_pFiffProducer->stop();
             this->stop();
 
             m_commandManager[Commands::SIMFILE].reply("New simulation file set succefully.\r\n");
-        }
-        else
-        {
+        } else {
             qDebug() << "Didn't set new file";
             m_sResourceDataPath = t_sResourceDataPathOld;
 
             m_commandManager[Commands::SIMFILE].reply("Simulation file not set.\r\n");
         }
-    }
-    else
-    {
+    } else {
         qDebug() << "File does not exist on server!";
         m_sResourceDataPath = t_sResourceDataPathOld;
         m_commandManager[Commands::SIMFILE].reply("Simulation file not set.\r\n");
@@ -271,23 +252,20 @@ void FiffSimulator::init()
     // Read cfg file
     //
     QFile t_qFile(QString("%1/../resources/mne_rt_server/plugins/fiffsimulator/FiffSimulation.cfg").arg(QCoreApplication::applicationDirPath()));
-    if (t_qFile.open(QIODevice::ReadOnly | QIODevice::Text))
-    {
+    if (t_qFile.open(QIODevice::ReadOnly | QIODevice::Text)) {
         QTextStream in(&t_qFile);
         QString key = "simFile = ";
         while (!in.atEnd()) {
             QString line = in.readLine();
-            if(line.contains(key, Qt::CaseInsensitive))
-            {
+            if (line.contains(key, Qt::CaseInsensitive)) {
                 qint32 idx = line.indexOf(key);
                 idx += key.size();
 
-                QString sFileName = line.mid(idx, line.size()-idx);
+                QString sFileName = line.mid(idx, line.size() - idx);
 
                 QFile t_qFileMeas(sFileName);
 
-                if (t_qFileMeas.open(QIODevice::ReadOnly))
-                {
+                if (t_qFileMeas.open(QIODevice::ReadOnly)) {
                     m_sResourceDataPath = sFileName;
                     qInfo() << "[FiffSimulator::init] Load simulation file " << sFileName;
                     t_qFileMeas.close();
@@ -302,7 +280,7 @@ void FiffSimulator::init()
     delete m_pRawMatrixBuffer;
     m_pRawMatrixBuffer = nullptr;
 
-    if(!m_RawInfo.isEmpty())
+    if (!m_RawInfo.isEmpty())
         m_pRawMatrixBuffer = new CircularBuffer_Matrix_float(RAW_BUFFFER_SIZE);
 }
 
@@ -335,11 +313,10 @@ bool FiffSimulator::stop()
 
 void FiffSimulator::info(qint32 ID)
 {
-
-    if(m_RawInfo.isEmpty())
+    if (m_RawInfo.isEmpty())
         readRawInfo();
 
-    if(!m_RawInfo.isEmpty())
+    if (!m_RawInfo.isEmpty())
         emit remitMeasInfo(ID, m_RawInfo.info);
 }
 
@@ -347,14 +324,12 @@ void FiffSimulator::info(qint32 ID)
 
 bool FiffSimulator::readRawInfo()
 {
-    if(m_RawInfo.isEmpty())
-    {
+    if (m_RawInfo.isEmpty()) {
         QFile t_File(m_sResourceDataPath);
 
         mutex.lock();
 
-        if(!FiffStream::setup_read_raw(t_File, m_RawInfo))
-        {
+        if (!FiffStream::setup_read_raw(t_File, m_RawInfo)) {
             qInfo("Error: Not able to read raw info!");
             m_RawInfo.clear();
             return false;
@@ -363,86 +338,86 @@ bool FiffSimulator::readRawInfo()
         m_TrueSamplingRate = m_RawInfo.info.sfreq;
         m_RawInfo.info.sfreq *= m_AccelerationFactor;
 
-//        bool in_samples = false;
-//
-//        bool keep_comp = true;
-//
-//        //
-//        //   Set up pick list: MEG + STI 014 - bad channels
-//        //
-//        //
-//        QStringList include;
-//        include << "STI 014";
-//        bool want_meg   = true;
-//        bool want_eeg   = true;
-//        bool want_stim  = true;
+        //        bool in_samples = false;
+        //
+        //        bool keep_comp = true;
+        //
+        //        //
+        //        //   Set up pick list: MEG + STI 014 - bad channels
+        //        //
+        //        //
+        //        QStringList include;
+        //        include << "STI 014";
+        //        bool want_meg   = true;
+        //        bool want_eeg   = true;
+        //        bool want_stim  = true;
 
-//    //    MatrixXi picks = Fiff::pick_types(m_RawInfo.info, want_meg, want_eeg, want_stim, include, m_RawInfo.info.bads);
-//        MatrixXi picks = m_RawInfo.info.pick_types(want_meg, want_eeg, want_stim, include, m_RawInfo.info.bads); //Prefer member function
+        //    //    MatrixXi picks = Fiff::pick_types(m_RawInfo.info, want_meg, want_eeg, want_stim, include, m_RawInfo.info.bads);
+        //        MatrixXi picks = m_RawInfo.info.pick_types(want_meg, want_eeg, want_stim, include, m_RawInfo.info.bads); //Prefer member function
 
-//        //
-//        //   Set up projection
-//        //
-//        qint32 k = 0;
-//        if (m_RawInfo.info.projs.size() == 0)
-//            printf("No projector specified for these data\n");
-//        else
-//        {
-//            //
-//            //   Activate the projection items
-//            //
-//            for (k = 0; k < m_RawInfo.info.projs.size(); ++k)
-//                m_RawInfo.info.projs[k].active = true;
+        //        //
+        //        //   Set up projection
+        //        //
+        //        qint32 k = 0;
+        //        if (m_RawInfo.info.projs.size() == 0)
+        //            printf("No projector specified for these data\n");
+        //        else
+        //        {
+        //            //
+        //            //   Activate the projection items
+        //            //
+        //            for (k = 0; k < m_RawInfo.info.projs.size(); ++k)
+        //                m_RawInfo.info.projs[k].active = true;
 
-//            printf("%d projection items activated\n",m_RawInfo.info.projs.size());
-//            //
-//            //   Create the projector
-//            //
-//    //        fiff_int_t nproj = MNE::make_projector_info(m_RawInfo.info, m_RawInfo.proj); Using the member function instead
-//            fiff_int_t nproj = m_RawInfo.info.make_projector_info(m_RawInfo.proj);
+        //            printf("%d projection items activated\n",m_RawInfo.info.projs.size());
+        //            //
+        //            //   Create the projector
+        //            //
+        //    //        fiff_int_t nproj = MNE::make_projector_info(m_RawInfo.info, m_RawInfo.proj); Using the member function instead
+        //            fiff_int_t nproj = m_RawInfo.info.make_projector_info(m_RawInfo.proj);
 
-//    //        qDebug() << m_RawInfo.proj.data->data.rows();
-//    //        qDebug() << m_RawInfo.proj.data->data.cols();
-//    //        std::cout << "proj: \n" << m_RawInfo.proj.data->data.block(0,0,10,10);
+        //    //        qDebug() << m_RawInfo.proj.data->data.rows();
+        //    //        qDebug() << m_RawInfo.proj.data->data.cols();
+        //    //        std::cout << "proj: \n" << m_RawInfo.proj.data->data.block(0,0,10,10);
 
-//            if (nproj == 0)
-//            {
-//                printf("The projection vectors do not apply to these channels\n");
-//            }
-//            else
-//            {
-//                printf("Created an SSP operator (subspace dimension = %d)\n",nproj);
-//            }
-//        }
+        //            if (nproj == 0)
+        //            {
+        //                printf("The projection vectors do not apply to these channels\n");
+        //            }
+        //            else
+        //            {
+        //                printf("Created an SSP operator (subspace dimension = %d)\n",nproj);
+        //            }
+        //        }
 
-//        //
-//        //   Set up the CTF compensator
-//        //
-//    //    qint32 current_comp = MNE::get_current_comp(m_RawInfo.info);
-//        qint32 current_comp = m_RawInfo.info.get_current_comp();
-//        qint32 dest_comp = -1;
+        //        //
+        //        //   Set up the CTF compensator
+        //        //
+        //    //    qint32 current_comp = MNE::get_current_comp(m_RawInfo.info);
+        //        qint32 current_comp = m_RawInfo.info.get_current_comp();
+        //        qint32 dest_comp = -1;
 
-//        if (current_comp > 0)
-//            printf("Current compensation grade : %d\n",current_comp);
+        //        if (current_comp > 0)
+        //            printf("Current compensation grade : %d\n",current_comp);
 
-//        if (keep_comp)
-//            dest_comp = current_comp;
+        //        if (keep_comp)
+        //            dest_comp = current_comp;
 
-//        if (current_comp != dest_comp)
-//        {
-//            qDebug() << "This part needs to be debugged";
-//            if(MNE::make_compensator(*m_RawInfo.info.data(), current_comp, dest_comp, m_RawInfo.comp))
-//            {
-//    //            m_RawInfo.info.chs = MNE::set_current_comp(m_RawInfo.info.chs,dest_comp);
-//                m_RawInfo.info.set_current_comp(dest_comp);
-//                printf("Appropriate compensator added to change to grade %d.\n",dest_comp);
-//            }
-//            else
-//            {
-//                printf("Could not make the compensator\n");
-//                return -1;
-//            }
-//        }
+        //        if (current_comp != dest_comp)
+        //        {
+        //            qDebug() << "This part needs to be debugged";
+        //            if(MNE::make_compensator(*m_RawInfo.info.data(), current_comp, dest_comp, m_RawInfo.comp))
+        //            {
+        //    //            m_RawInfo.info.chs = MNE::set_current_comp(m_RawInfo.info.chs,dest_comp);
+        //                m_RawInfo.info.set_current_comp(dest_comp);
+        //                printf("Appropriate compensator added to change to grade %d.\n",dest_comp);
+        //            }
+        //            else
+        //            {
+        //                printf("Could not make the compensator\n");
+        //                return -1;
+        //            }
+        //        }
 
         //
         // Create circular buffer to transfer data form producer to simulator
@@ -465,14 +440,13 @@ void FiffSimulator::run()
     float t_fSamplingFrequency = m_RawInfo.info.sfreq;
     float t_fBuffSampleSize = (float)m_uiBufferSampleSize;
 
-    quint32 uiSamplePeriod = (unsigned int) ((t_fBuffSampleSize/t_fSamplingFrequency)*1000000.0f);
+    quint32 uiSamplePeriod = (unsigned int)((t_fBuffSampleSize / t_fSamplingFrequency) * 1000000.0f);
 
-//    quint32 count = 0;
+    //    quint32 count = 0;
     Eigen::MatrixXf matData;
 
-    while(m_bIsRunning)
-    {
-        if(m_pRawMatrixBuffer->pop(matData) ) {
+    while (m_bIsRunning) {
+        if (m_pRawMatrixBuffer->pop(matData)) {
             QSharedPointer<Eigen::MatrixXf> t_pRawBuffer(new Eigen::MatrixXf(matData));
             //        ++count;
             //        printf("%d raw buffer (%d x %d) generated\r\n", count, t_pRawBuffer->rows(), t_pRawBuffer->cols());

@@ -55,7 +55,7 @@ namespace DISPLIB
 // DEFINE TYPEDEFS
 //=============================================================================================================
 
-typedef QPair<const double*,qint32> RowVectorPair;
+typedef QPair<const double*, qint32> RowVectorPair;
 
 //=============================================================================================================
 /**
@@ -95,9 +95,9 @@ public:
      * @return Fixed 120 x 60 bounding rectangle centred on the item origin.
      */
     QRectF boundingRect() const;
-    void mousePressEvent(QGraphicsSceneMouseEvent *event);
-    void mouseReleaseEvent(QGraphicsSceneMouseEvent *event);
-    virtual void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
+    void mousePressEvent(QGraphicsSceneMouseEvent* event);
+    void mouseReleaseEvent(QGraphicsSceneMouseEvent* event);
+    virtual void paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget);
 
     //=========================================================================================================
     /**
@@ -107,29 +107,29 @@ public:
      */
     void setDefaultColor(const QColor& viewColor);
 
-    QString                                         m_sChannelName;             /**< The channel name.*/
-    int                                             m_iChannelNumber;           /**< The channel number.*/
-    int                                             m_iChannelKind;             /**< The channel kind.*/
-    int                                             m_iChannelUnit;             /**< The channel unit.*/
-    int                                             m_iTotalNumberChannels;     /**< The total number of channels loaded in the curent evoked data set.*/
-    int                                             m_iFontTextSize;            /**< The font text size of the electrode names.*/
-    int                                             m_iMaxWidth;                /**< The max width. */
-    int                                             m_iMaxHeigth;               /**< The max heigth. */
+    QString m_sChannelName;     /**< The channel name.*/
+    int m_iChannelNumber;       /**< The channel number.*/
+    int m_iChannelKind;         /**< The channel kind.*/
+    int m_iChannelUnit;         /**< The channel unit.*/
+    int m_iTotalNumberChannels; /**< The total number of channels loaded in the curent evoked data set.*/
+    int m_iFontTextSize;        /**< The font text size of the electrode names.*/
+    int m_iMaxWidth;            /**< The max width. */
+    int m_iMaxHeigth;           /**< The max heigth. */
 
-    bool                                            m_bIsBad;                   /**< Whether this channel is bad. */
+    bool m_bIsBad; /**< Whether this channel is bad. */
 
-    QPointF                                         m_qpChannelPosition;        /**< The channels 2D position in the scene.*/
-    QList<QPair<QString, RowVectorPair> >           m_lAverageData;             /**< The channels average data which is to be plotted.*/
+    QPointF m_qpChannelPosition;                         /**< The channels 2D position in the scene.*/
+    QList<QPair<QString, RowVectorPair>> m_lAverageData; /**< The channels average data which is to be plotted.*/
 
-    QPair<int,int>                                  m_firstLastSample;          /**< The first and last sample.*/
+    QPair<int, int> m_firstLastSample; /**< The first and last sample.*/
 
-    QMap<qint32,float>                              m_scaleMap;                 /**< Map with all channel types and their current scaling value.*/
-    QMap<QString, bool>                             m_qMapAverageActivation;    /**< The average activation information.*/
-    QMap<QString, QColor>                           m_qMapAverageColor;         /**< The average color information.*/
+    QMap<qint32, float> m_scaleMap;              /**< Map with all channel types and their current scaling value.*/
+    QMap<QString, bool> m_qMapAverageActivation; /**< The average activation information.*/
+    QMap<QString, QColor> m_qMapAverageColor;    /**< The average color information.*/
 
-    QRectF                                          m_rectBoundingRect;         /**< The bounding rect. */
+    QRectF m_rectBoundingRect; /**< The bounding rect. */
 
-    QColor                                          m_colorDefault;             /**< The color for the avergaed signal. */
+    QColor m_colorDefault; /**< The color for the avergaed signal. */
 
 protected:
     //=========================================================================================================
@@ -138,7 +138,7 @@ protected:
      *
      * @param[in] painter The painter used to plot in this item.
      */
-    void paintAveragePath(QPainter *painter);
+    void paintAveragePath(QPainter* painter);
 
     //=========================================================================================================
     /**
@@ -146,7 +146,7 @@ protected:
      *
      * @param[in] painter The painter used to plot in this item.
      */
-    void paintStimLine(QPainter *painter);
+    void paintStimLine(QPainter* painter);
 
 signals:
     //=========================================================================================================

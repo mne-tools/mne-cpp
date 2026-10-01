@@ -50,8 +50,9 @@
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-namespace FIFFLIB {
-    class FiffInfo;
+namespace FIFFLIB
+{
+class FiffInfo;
 }
 
 //=============================================================================================================
@@ -65,23 +66,25 @@ namespace DISPLIB
 /**
  * @brief Channel display metadata (read-only from the renderer's perspective).
  */
-enum class DetrendMode {
-    None   = 0,  /**< No detrending. */
-    Mean   = 1,  /**< Remove DC offset (mean subtraction). */
-    Linear = 2   /**< Remove linear trend (least-squares line). */
+enum class DetrendMode
+{
+    None = 0,  /**< No detrending. */
+    Mean = 1,  /**< Remove DC offset (mean subtraction). */
+    Linear = 2 /**< Remove linear trend (least-squares line). */
 };
 
 //=============================================================================================================
 /**
  * @brief Channel display metadata (read-only from the renderer's perspective).
  */
-struct ChannelDisplayInfo {
-    QString name;           /**< Channel name for the label. */
-    QString typeLabel;      /**< Short type string: "MEG grad", "MEG mag", "EEG", "EOG", "ECG", "EMG", "STIM", "MISC". */
-    QColor  color;          /**< Line colour to use in the GPU renderer. */
-    float   amplitudeMax;   /**< Amplitude value (physical units) that maps to full row height. */
-    bool    bad;            /**< Whether the channel is currently marked bad. */
-    bool    isVirtualChannel = false; /**< Browser-level derived channel without a direct FIFF row. */
+struct ChannelDisplayInfo
+{
+    QString name;                  /**< Channel name for the label. */
+    QString typeLabel;             /**< Short type string: "MEG grad", "MEG mag", "EEG", "EOG", "ECG", "EMG", "STIM", "MISC". */
+    QColor color;                  /**< Line colour to use in the GPU renderer. */
+    float amplitudeMax;            /**< Amplitude value (physical units) that maps to full row height. */
+    bool bad;                      /**< Whether the channel is currently marked bad. */
+    bool isVirtualChannel = false; /**< Browser-level derived channel without a direct FIFF row. */
 };
 
 //=============================================================================================================
@@ -99,10 +102,10 @@ class DISPSHARED_EXPORT ChannelDataModel : public QObject
     Q_OBJECT
 
 public:
-    typedef QSharedPointer<ChannelDataModel>       SPtr;
+    typedef QSharedPointer<ChannelDataModel> SPtr;
     typedef QSharedPointer<const ChannelDataModel> ConstSPtr;
 
-    explicit ChannelDataModel(QObject *parent = nullptr);
+    explicit ChannelDataModel(QObject* parent = nullptr);
 
     //=========================================================================================================
     /**
@@ -120,7 +123,7 @@ public:
      * @param[in] data         Channels × samples matrix (double precision).
      * @param[in] firstSample  Absolute sample index of column 0.
      */
-    void setData(const Eigen::MatrixXd &data, int firstSample = 0);
+    void setData(const Eigen::MatrixXd& data, int firstSample = 0);
 
     //=========================================================================================================
     /**
@@ -129,7 +132,7 @@ public:
      *
      * @param[in] data  Channels × newSamples matrix.
      */
-    void appendData(const Eigen::MatrixXd &data);
+    void appendData(const Eigen::MatrixXd& data);
 
     //=========================================================================================================
     /**
@@ -138,7 +141,7 @@ public:
      *
      * @param[in] scaleMap  Map from FIFF kind to amplitude max.
      */
-    void setScaleMap(const QMap<qint32, float> &scaleMap);
+    void setScaleMap(const QMap<qint32, float>& scaleMap);
 
     //=============================================================================================================
     /**
@@ -146,7 +149,7 @@ public:
      *
      * @param[in] scaleMap  Map from channel-type name (e.g. "MEG_grad") to amplitude max.
      */
-    void setScaleMapFromStrings(const QMap<QString, double> &scaleMap);
+    void setScaleMapFromStrings(const QMap<QString, double>& scaleMap);
 
     //=============================================================================================================
     /**
@@ -162,7 +165,7 @@ public:
      *
      * @param[in] virtualChannels  Display metadata for each appended virtual channel.
      */
-    void setVirtualChannels(const QVector<ChannelDisplayInfo> &virtualChannels);
+    void setVirtualChannels(const QVector<ChannelDisplayInfo>& virtualChannels);
 
     //=========================================================================================================
     /**
@@ -171,7 +174,7 @@ public:
      *
      * @param[in] color  The base signal colour.
      */
-    void setSignalColor(const QColor &color);
+    void setSignalColor(const QColor& color);
 
     //=========================================================================================================
     /**
@@ -200,20 +203,26 @@ public:
      * @param[in] remove  true = subtract mean, false = raw data.
      */
     void setRemoveDC(bool remove);
-    bool removeDC() const { return m_detrendMode != DetrendMode::None; }
+    bool removeDC() const
+    {
+        return m_detrendMode != DetrendMode::None;
+    }
 
     void setDetrendMode(DetrendMode mode);
-    DetrendMode detrendMode() const { return m_detrendMode; }
+    DetrendMode detrendMode() const
+    {
+        return m_detrendMode;
+    }
 
     // ── Accessors (all thread-safe read) ──────────────────────────────
 
-    int     channelCount()  const;
-    int     firstSample()   const;
-    int     totalSamples()  const;
+    int channelCount() const;
+    int firstSample() const;
+    int totalSamples() const;
     /**
      * @return Sampling frequency in Hz; 0 if no FiffInfo attached.
      */
-    float   sfreq()         const;
+    float sfreq() const;
 
     //=========================================================================================================
     /**
@@ -254,11 +263,11 @@ public:
      *                            (= firstSample, returned for the UBO uniform).
      * @return Flat float array: [x0, y0,  x1, y1, ...] where x is offset from vboFirstSample.
      */
-    QVector<float> decimatedVertices(int   channelIdx,
-                                     int   firstSample,
-                                     int   lastSample,
-                                     int   pixelWidth,
-                                     int  &vboFirstSample) const;
+    QVector<float> decimatedVertices(int channelIdx,
+                                     int firstSample,
+                                     int lastSample,
+                                     int pixelWidth,
+                                     int& vboFirstSample) const;
 
     //=========================================================================================================
     /**
@@ -285,24 +294,24 @@ signals:
     void metaChanged();
 
 private:
-    void    rebuildDisplayInfo();
-    float   amplitudeMaxForChannel(int ch) const;
-    QColor  colorForChannel(int ch) const;
+    void rebuildDisplayInfo();
+    float amplitudeMaxForChannel(int ch) const;
+    QColor colorForChannel(int ch) const;
     QString typeLabelForChannel(int ch) const;
 
-    mutable QReadWriteLock                    m_lock;
+    mutable QReadWriteLock m_lock;
 
-    QSharedPointer<FIFFLIB::FiffInfo>         m_pFiffInfo;
-    QVector<QVector<float>>                   m_channelData;   // [ch][sample]
-    int                                       m_firstSample = 0;
-    int                                       m_maxStoredSamples = 0; // 0 = unlimited
+    QSharedPointer<FIFFLIB::FiffInfo> m_pFiffInfo;
+    QVector<QVector<float>> m_channelData; // [ch][sample]
+    int m_firstSample = 0;
+    int m_maxStoredSamples = 0; // 0 = unlimited
 
-    QMap<qint32, float>                       m_scaleMap;
-    QColor                                    m_signalColor { Qt::darkGreen };
+    QMap<qint32, float> m_scaleMap;
+    QColor m_signalColor{Qt::darkGreen};
 
-    QVector<ChannelDisplayInfo>               m_virtualDisplayInfo;
-    QVector<ChannelDisplayInfo>               m_displayInfo;  // pre-computed, rebuild on meta change
-    DetrendMode                                m_detrendMode = DetrendMode::None;
+    QVector<ChannelDisplayInfo> m_virtualDisplayInfo;
+    QVector<ChannelDisplayInfo> m_displayInfo; // pre-computed, rebuild on meta change
+    DetrendMode m_detrendMode = DetrendMode::None;
 };
 
 } // namespace DISPLIB

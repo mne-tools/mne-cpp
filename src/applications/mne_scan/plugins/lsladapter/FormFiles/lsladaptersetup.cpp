@@ -65,7 +65,7 @@ void LSLAdapterSetup::onLSLScanResults(const QVector<LSLLIB::stream_info>& vStre
         buildString << streamInfo.name() << ", " << streamInfo.type() << ", " << streamInfo.hostname();
         QListWidgetItem* pItem = new QListWidgetItem;
         // select the current stream
-        if(currentStream.uid() == streamInfo.uid()) {
+        if (currentStream.uid() == streamInfo.uid()) {
             pItem->setSelected(true);
             m_pCurrentSelectedStream = pItem;
         } else {
@@ -92,17 +92,16 @@ void LSLAdapterSetup::on_refreshAvailableStreams_released()
 
 //=============================================================================================================
 
-void LSLAdapterSetup::on_listLSLStreams_itemDoubleClicked(QListWidgetItem *pItem)
+void LSLAdapterSetup::on_listLSLStreams_itemDoubleClicked(QListWidgetItem* pItem)
 {
     m_pCurrentSelectedStream = pItem;
 
     updateTextFields();
 
     // tell adapter:
-    if(m_pCurrentSelectedStream && m_mItemToStreamInfo.contains(m_pCurrentSelectedStream)) {
+    if (m_pCurrentSelectedStream && m_mItemToStreamInfo.contains(m_pCurrentSelectedStream)) {
         emit streamSelectionChanged(m_mItemToStreamInfo.value(m_pCurrentSelectedStream));
-    }
-    else {
+    } else {
         // this should not happen
         qDebug() << "[LSLAdapterSetup] CRITICAL: Major inconsistency in UI!";
     }
@@ -113,7 +112,7 @@ void LSLAdapterSetup::on_listLSLStreams_itemDoubleClicked(QListWidgetItem *pItem
 void LSLAdapterSetup::updateTextFields()
 {
     // current stream label:
-    if(m_pCurrentSelectedStream) {
+    if (m_pCurrentSelectedStream) {
         ui.currentStreamDescription->setText(m_pCurrentSelectedStream->text());
     } else {
         ui.currentStreamDescription->setText(QString("None"));
@@ -127,10 +126,9 @@ void LSLAdapterSetup::on_blockSizeEdit_editingFinished()
 {
     QString sInput = ui.blockSizeEdit->text();
     int iBlockSize = sInput.toInt();
-    if(iBlockSize <= 1) {
+    if (iBlockSize <= 1) {
         qDebug() << "[LSLAdapterSetup: blockSizeEdit: Not a valid block size: " << sInput;
-    }
-    else {
+    } else {
         emit blockSizeChanged(iBlockSize);
     }
 }

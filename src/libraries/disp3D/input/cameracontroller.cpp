@@ -23,11 +23,11 @@
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-CameraResult CameraController::computeForRotation(const QQuaternion &effectiveRotation,
-                                                    float vpZoom,
-                                                    const QVector2D &pan,
-                                                    bool applyPan,
-                                                    float aspectRatio) const
+CameraResult CameraController::computeForRotation(const QQuaternion& effectiveRotation,
+                                                  float vpZoom,
+                                                  const QVector2D& pan,
+                                                  bool applyPan,
+                                                  float aspectRatio) const
 {
     CameraResult result;
 
@@ -37,17 +37,17 @@ CameraResult CameraController::computeForRotation(const QQuaternion &effectiveRo
 
     // Camera position from rotation + zoom
     float baseDistance = m_sceneSize * 1.5f;
-    result.distance    = baseDistance - vpZoom * (m_sceneSize * 0.05f);
-    result.cameraPos   = effectiveRotation.rotatedVector(QVector3D(0, 0, result.distance));
-    result.upVector    = effectiveRotation.rotatedVector(QVector3D(0, 1, 0));
-    result.lookAt      = QVector3D(0, 0, 0);
+    result.distance = baseDistance - vpZoom * (m_sceneSize * 0.05f);
+    result.cameraPos = effectiveRotation.rotatedVector(QVector3D(0, 0, result.distance));
+    result.upVector = effectiveRotation.rotatedVector(QVector3D(0, 1, 0));
+    result.lookAt = QVector3D(0, 0, 0);
 
     // Pan: shift look-at and camera position along the view plane
     if (applyPan && (pan.x() != 0.0f || pan.y() != 0.0f)) {
         const QVector3D right = effectiveRotation.rotatedVector(QVector3D(1, 0, 0)).normalized();
-        const QVector3D up    = result.upVector.normalized();
+        const QVector3D up = result.upVector.normalized();
         const QVector3D offset = right * pan.x() + up * pan.y();
-        result.lookAt    += offset;
+        result.lookAt += offset;
         result.cameraPos += offset;
     }
 
@@ -64,7 +64,7 @@ CameraResult CameraController::computeForRotation(const QQuaternion &effectiveRo
 
 CameraResult CameraController::computeSingleView(float aspectRatio) const
 {
-    const QQuaternion preset    = perspectivePresetRotation();
+    const QQuaternion preset = perspectivePresetRotation();
     const QQuaternion effective = m_cameraRotation * preset;
 
     return computeForRotation(effective, m_zoom, QVector2D(), false, aspectRatio);
@@ -72,7 +72,7 @@ CameraResult CameraController::computeSingleView(float aspectRatio) const
 
 //=============================================================================================================
 
-CameraResult CameraController::computeMultiView(const SubView &subView, float aspectRatio) const
+CameraResult CameraController::computeMultiView(const SubView& subView, float aspectRatio) const
 {
     const int preset = std::clamp(subView.preset, 0, 6);
     const QQuaternion presetOffset = multiViewPresetOffset(preset);
@@ -92,29 +92,29 @@ CameraResult CameraController::computeMultiView(const SubView &subView, float as
 
 //=============================================================================================================
 
-void CameraController::applyMouseRotation(const QPoint &delta,
-                                           QQuaternion &rotation,
-                                           float speed)
+void CameraController::applyMouseRotation(const QPoint& delta,
+                                          QQuaternion& rotation,
+                                          float speed)
 {
     const QQuaternion preset = perspectivePresetRotation();
-    QQuaternion effective    = rotation * preset;
+    QQuaternion effective = rotation * preset;
 
-    const QVector3D upAxis    = effective.rotatedVector(QVector3D(0, 1, 0)).normalized();
+    const QVector3D upAxis = effective.rotatedVector(QVector3D(0, 1, 0)).normalized();
     const QVector3D rightAxis = effective.rotatedVector(QVector3D(1, 0, 0)).normalized();
 
-    QQuaternion yaw   = QQuaternion::fromAxisAndAngle(upAxis,    -delta.x() * speed);
+    QQuaternion yaw = QQuaternion::fromAxisAndAngle(upAxis, -delta.x() * speed);
     QQuaternion pitch = QQuaternion::fromAxisAndAngle(rightAxis, -delta.y() * speed);
 
     effective = yaw * pitch * effective;
-    rotation  = effective * preset.conjugated();
+    rotation = effective * preset.conjugated();
     rotation.normalize();
 }
 
 //=============================================================================================================
 
-void CameraController::applyMousePan(const QPoint &delta,
-                                      QVector2D &pan,
-                                      float sceneSize)
+void CameraController::applyMousePan(const QPoint& delta,
+                                     QVector2D& pan,
+                                     float sceneSize)
 {
     const float panSpeed = sceneSize * 0.002f;
     pan += QVector2D(-delta.x() * panSpeed, delta.y() * panSpeed);

@@ -65,10 +65,11 @@ using namespace LSLLIB;
 // CONSTANTS
 //=============================================================================================================
 
-namespace {
-    const QHostAddress  DISCOVERY_MULTICAST_GROUP("239.255.172.215");
-    const quint16       DISCOVERY_PORT = 16571;
-    const int           BROADCAST_INTERVAL_MS = 500;
+namespace
+{
+const QHostAddress DISCOVERY_MULTICAST_GROUP("239.255.172.215");
+const quint16 DISCOVERY_PORT = 16571;
+const int BROADCAST_INTERVAL_MS = 500;
 }
 
 //=============================================================================================================
@@ -275,13 +276,13 @@ private:
         udpSocket.close();
     }
 
-    stream_info                         m_info;         /**< Stream description. */
-    std::atomic<bool>                   m_bRunning;     /**< Background thread running flag. */
-    std::thread                         m_bgThread;     /**< Background thread. */
+    stream_info m_info;           /**< Stream description. */
+    std::atomic<bool> m_bRunning; /**< Background thread running flag. */
+    std::thread m_bgThread;       /**< Background thread. */
 
-    std::mutex                          m_queueMutex;   /**< Protects the sample queue. */
-    std::queue<std::vector<float>>      m_sampleQueue;  /**< Queue of samples for transmission. */
-    std::atomic<int>                    m_nClients{0};  /**< Number of connected clients. */
+    std::mutex m_queueMutex;                      /**< Protects the sample queue. */
+    std::queue<std::vector<float>> m_sampleQueue; /**< Queue of samples for transmission. */
+    std::atomic<int> m_nClients{0};               /**< Number of connected clients. */
 };
 
 //=============================================================================================================

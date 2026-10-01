@@ -36,8 +36,8 @@ namespace SCSHAREDLIB
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-template <class T>
-PluginInputData<T>::PluginInputData(AbstractPlugin *parent, const QString &name, const QString &descr)
+template<class T>
+PluginInputData<T>::PluginInputData(AbstractPlugin* parent, const QString& name, const QString& descr)
 : PluginInputConnector(parent, name, descr)
 , m_pFunc(NULL)
 {
@@ -45,7 +45,7 @@ PluginInputData<T>::PluginInputData(AbstractPlugin *parent, const QString &name,
 
 //=============================================================================================================
 
-template <class T>
+template<class T>
 void PluginInputData<T>::setCallbackMethod(callback_function pFunc)
 {
     m_pFunc = pFunc;
@@ -55,17 +55,16 @@ void PluginInputData<T>::setCallbackMethod(callback_function pFunc)
 
 //=============================================================================================================
 
-template <class T>
+template<class T>
 void PluginInputData<T>::notifyCallbackFunction(SCMEASLIB::Measurement::SPtr pMeasurement)
 {
     //qDebug() << "Here in input data.";
-    if(m_pFunc)
-    {
+    if (m_pFunc) {
         QSharedPointer<T> measurement = pMeasurement.dynamicCast<T>();
 
         (*m_pFunc)(measurement);
     }
 }
-}//Namespace
+} //Namespace
 
 #endif //PLUGININPUTDATA_CPP

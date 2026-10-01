@@ -20,18 +20,18 @@
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-DigitizerTreeItem::DigitizerTreeItem(const QString &text,
+DigitizerTreeItem::DigitizerTreeItem(const QString& text,
                                      PointKind kind,
-                                     const QVector<QVector3D> &positions,
-                                     const QStringList &names,
-                                     const QColor &color,
+                                     const QVector<QVector3D>& positions,
+                                     const QStringList& names,
+                                     const QColor& color,
                                      float scale,
                                      int type)
-    : AbstractTreeItem(text, type)
-    , m_kind(kind)
-    , m_positions(positions)
-    , m_names(names)
-    , m_scale(scale)
+: AbstractTreeItem(text, type)
+, m_kind(kind)
+, m_positions(positions)
+, m_names(names)
+, m_scale(scale)
 {
     setColor(color);
 }

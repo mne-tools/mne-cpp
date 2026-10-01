@@ -40,4 +40,3 @@ FiffCoordTransSet::FiffCoordTransSet()
 FiffCoordTransSet::~FiffCoordTransSet()
 {
 }
-

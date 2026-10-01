@@ -56,8 +56,9 @@
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-namespace FIFFLIB {
-    class FiffRawData;
+namespace FIFFLIB
+{
+class FiffRawData;
 }
 
 //=============================================================================================================
@@ -70,7 +71,8 @@ namespace RTPROCESSINGLIB
 /**
  * @brief Lightweight filter configuration holding kernel coefficients and overlap-add state for one channel.
  */
-struct FilterObject {
+struct FilterObject
+{
     UTILSLIB::FilterKernel filterKernel;
     int iRow;
     Eigen::RowVectorXd vecData;
@@ -95,16 +97,16 @@ struct FilterObject {
  * @return Returns true if successful, false otherwise.
  */
 DSPSHARED_EXPORT bool filterFile(QIODevice& pIODevice,
-                                         QSharedPointer<FIFFLIB::FiffRawData> pFiffRawData,
-                                         int type,
-                                         double dCenterfreq,
-                                         double dBandwidth,
-                                         double dTransition,
-                                         double dSFreq,
-                                         int iOrder = 4096,
-                                         int designMethod = UTILSLIB::FilterKernel::m_designMethods.indexOf(UTILSLIB::FilterParameter("Cosine")),
-                                         const Eigen::RowVectorXi &vecPicks = Eigen::RowVectorXi(),
-                                         bool bUseThreads = true);
+                                 QSharedPointer<FIFFLIB::FiffRawData> pFiffRawData,
+                                 int type,
+                                 double dCenterfreq,
+                                 double dBandwidth,
+                                 double dTransition,
+                                 double dSFreq,
+                                 int iOrder = 4096,
+                                 int designMethod = UTILSLIB::FilterKernel::m_designMethods.indexOf(UTILSLIB::FilterParameter("Cosine")),
+                                 const Eigen::RowVectorXi& vecPicks = Eigen::RowVectorXi(),
+                                 bool bUseThreads = true);
 
 //=========================================================================================================
 /**
@@ -120,10 +122,10 @@ DSPSHARED_EXPORT bool filterFile(QIODevice& pIODevice,
  * @return Returns true if successful, false otherwise.
  */
 DSPSHARED_EXPORT bool filterFile(QIODevice& pIODevice,
-                                         QSharedPointer<FIFFLIB::FiffRawData> pFiffRawData,
-                                         const UTILSLIB::FilterKernel& filterKernel,
-                                         const Eigen::RowVectorXi &vecPicks = Eigen::RowVectorXi(),
-                                         bool bUseThreads = false);
+                                 QSharedPointer<FIFFLIB::FiffRawData> pFiffRawData,
+                                 const UTILSLIB::FilterKernel& filterKernel,
+                                 const Eigen::RowVectorXi& vecPicks = Eigen::RowVectorXi(),
+                                 bool bUseThreads = false);
 
 //=========================================================================================================
 /**
@@ -145,16 +147,16 @@ DSPSHARED_EXPORT bool filterFile(QIODevice& pIODevice,
  * @return The filtered data in form of a matrix.
  */
 DSPSHARED_EXPORT Eigen::MatrixXd filterData(const Eigen::MatrixXd& matData,
-                                                    int type,
-                                                    double dCenterfreq,
-                                                    double dBandwidth,
-                                                    double dTransition,
-                                                    double dSFreq,
-                                                    int iOrder = 1024,
-                                                    int designMethod = UTILSLIB::FilterKernel::m_designMethods.indexOf(UTILSLIB::FilterParameter("Cosine")),
-                                                    const Eigen::RowVectorXi &vecPicks = Eigen::RowVectorXi(),
-                                                    bool bUseThreads = true,
-                                                    bool bKeepOverhead = false);
+                                            int type,
+                                            double dCenterfreq,
+                                            double dBandwidth,
+                                            double dTransition,
+                                            double dSFreq,
+                                            int iOrder = 1024,
+                                            int designMethod = UTILSLIB::FilterKernel::m_designMethods.indexOf(UTILSLIB::FilterParameter("Cosine")),
+                                            const Eigen::RowVectorXi& vecPicks = Eigen::RowVectorXi(),
+                                            bool bUseThreads = true,
+                                            bool bKeepOverhead = false);
 
 //=========================================================================================================
 /**
@@ -170,10 +172,10 @@ DSPSHARED_EXPORT Eigen::MatrixXd filterData(const Eigen::MatrixXd& matData,
  * @return The filtered data in form of a matrix.
  */
 DSPSHARED_EXPORT Eigen::MatrixXd filterData(const Eigen::MatrixXd& matData,
-                                                    const UTILSLIB::FilterKernel& filterKernel,
-                                                    const Eigen::RowVectorXi& vecPicks = Eigen::RowVectorXi(),
-                                                    bool bUseThreads = true,
-                                                    bool bKeepOverhead = false);
+                                            const UTILSLIB::FilterKernel& filterKernel,
+                                            const Eigen::RowVectorXi& vecPicks = Eigen::RowVectorXi(),
+                                            bool bUseThreads = true,
+                                            bool bKeepOverhead = false);
 
 //=========================================================================================================
 /**
@@ -188,9 +190,9 @@ DSPSHARED_EXPORT Eigen::MatrixXd filterData(const Eigen::MatrixXd& matData,
  * @return The filtered data in form of a matrix with half the filter length delay in the front and back.
  */
 DSPSHARED_EXPORT Eigen::MatrixXd filterDataBlock(const Eigen::MatrixXd& matData,
-                                                         const Eigen::RowVectorXi& vecPicks,
-                                                         const UTILSLIB::FilterKernel& filterKernel,
-                                                         bool bUseThreads = true);
+                                                 const Eigen::RowVectorXi& vecPicks,
+                                                 const UTILSLIB::FilterKernel& filterKernel,
+                                                 bool bUseThreads = true);
 
 //=========================================================================================================
 /**
@@ -198,7 +200,7 @@ DSPSHARED_EXPORT Eigen::MatrixXd filterDataBlock(const Eigen::MatrixXd& matData,
  *
  * @param[in] channelDataTime  The channel data to perform the filtering on.
  */
-DSPSHARED_EXPORT void filterChannel(FilterObject &channelDataTime);
+DSPSHARED_EXPORT void filterChannel(FilterObject& channelDataTime);
 
 //=========================================================================================================
 /**
@@ -222,17 +224,17 @@ DSPSHARED_EXPORT void filterChannel(FilterObject &channelDataTime);
  * @return The filtered, averaged evoked data.
  */
 DSPSHARED_EXPORT FIFFLIB::FiffEvoked computeFilteredAverage(const FIFFLIB::FiffRawData& raw,
-                                                                    const Eigen::MatrixXi& matEvents,
-                                                                    float fTMinS,
-                                                                    float fTMaxS,
-                                                                    qint32 eventType,
-                                                                    bool bApplyBaseline,
-                                                                    float fTBaselineFromS,
-                                                                    float fTBaselineToS,
-                                                                    const QMap<QString,double>& mapReject,
-                                                                    const UTILSLIB::FilterKernel& filterKernel,
-                                                                    const QStringList &lExcludeChs = QStringList(),
-                                                                    const Eigen::RowVectorXi& vecPicks = Eigen::RowVectorXi());
+                                                            const Eigen::MatrixXi& matEvents,
+                                                            float fTMinS,
+                                                            float fTMaxS,
+                                                            qint32 eventType,
+                                                            bool bApplyBaseline,
+                                                            float fTBaselineFromS,
+                                                            float fTBaselineToS,
+                                                            const QMap<QString, double>& mapReject,
+                                                            const UTILSLIB::FilterKernel& filterKernel,
+                                                            const QStringList& lExcludeChs = QStringList(),
+                                                            const Eigen::RowVectorXi& vecPicks = Eigen::RowVectorXi());
 
 //=============================================================================================================
 /**
@@ -244,8 +246,8 @@ DSPSHARED_EXPORT FIFFLIB::FiffEvoked computeFilteredAverage(const FIFFLIB::FiffR
 class DSPSHARED_EXPORT FilterOverlapAdd
 {
 public:
-    typedef QSharedPointer<FilterOverlapAdd> SPtr;             /**< Shared pointer type for FilterOverlapAdd. */
-    typedef QSharedPointer<const FilterOverlapAdd> ConstSPtr;  /**< Const shared pointer type for FilterOverlapAdd. */
+    typedef QSharedPointer<FilterOverlapAdd> SPtr;            /**< Shared pointer type for FilterOverlapAdd. */
+    typedef QSharedPointer<const FilterOverlapAdd> ConstSPtr; /**< Const shared pointer type for FilterOverlapAdd. */
 
     //=========================================================================================================
     /**
@@ -274,7 +276,7 @@ public:
                               double dSFreq,
                               int iOrder = 1024,
                               int designMethod = UTILSLIB::FilterKernel::m_designMethods.indexOf(UTILSLIB::FilterParameter("Cosine")),
-                              const Eigen::RowVectorXi &vecPicks = Eigen::RowVectorXi(),
+                              const Eigen::RowVectorXi& vecPicks = Eigen::RowVectorXi(),
                               bool bFilterEnd = true,
                               bool bUseThreads = true,
                               bool bKeepOverhead = false);
@@ -306,8 +308,8 @@ public:
     void reset();
 
 private:
-    Eigen::MatrixXd                 m_matOverlapBack;                   /**< Overlap block for the end of the data block. */
-    Eigen::MatrixXd                 m_matOverlapFront;                  /**< Overlap block for the beginning of the data block. */
+    Eigen::MatrixXd m_matOverlapBack;  /**< Overlap block for the end of the data block. */
+    Eigen::MatrixXd m_matOverlapFront; /**< Overlap block for the beginning of the data block. */
 };
 
 //=============================================================================================================

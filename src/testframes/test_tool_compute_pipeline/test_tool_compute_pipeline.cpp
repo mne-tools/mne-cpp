@@ -84,12 +84,7 @@ private slots:
 
         m_sInvFile = QDir::tempPath() + "/test_pipeline_inv.fif";
 
-        QString output = runTool("mne_inverse_operator", {
-            "--fwd", fwdFile,
-            "--noisecov", covFile,
-            "--meg",
-            "--inv", m_sInvFile
-        }, 120000);
+        QString output = runTool("mne_inverse_operator", {"--fwd", fwdFile, "--noisecov", covFile, "--meg", "--inv", m_sInvFile}, 120000);
 
         if (!QFile::exists(m_sInvFile) || QFileInfo(m_sInvFile).size() == 0) {
             m_sInvFile.clear();
@@ -105,22 +100,18 @@ private slots:
 
     void testComputeMNE()
     {
-        if (!toolExists("mne_compute_mne")) QSKIP("mne_compute_mne not found");
-        if (m_sInvFile.isEmpty()) QSKIP("No inverse operator");
+        if (!toolExists("mne_compute_mne"))
+            QSKIP("mne_compute_mne not found");
+        if (m_sInvFile.isEmpty())
+            QSKIP("No inverse operator");
 
         QString aveFile = m_sResourcePath + "MEG/sample/sample_audvis-ave.fif";
-        if (!QFile::exists(aveFile)) QSKIP("Evoked file not available");
+        if (!QFile::exists(aveFile))
+            QSKIP("Evoked file not available");
 
         QString stcPrefix = QDir::tempPath() + "/test_pipeline_mne";
 
-        QString output = runTool("mne_compute_mne", {
-            "--inv", m_sInvFile,
-            "--meas", aveFile,
-            "--method", "MNE",
-            "--snr", "3",
-            "--out", stcPrefix,
-            "--nomatch"
-        }, 120000);
+        QString output = runTool("mne_compute_mne", {"--inv", m_sInvFile, "--meas", aveFile, "--method", "MNE", "--snr", "3", "--out", stcPrefix, "--nomatch"}, 120000);
 
         // Check output produced
         QVERIFY(!output.isEmpty());
@@ -135,22 +126,18 @@ private slots:
 
     void testComputeDSPM()
     {
-        if (!toolExists("mne_compute_mne")) QSKIP("mne_compute_mne not found");
-        if (m_sInvFile.isEmpty()) QSKIP("No inverse operator");
+        if (!toolExists("mne_compute_mne"))
+            QSKIP("mne_compute_mne not found");
+        if (m_sInvFile.isEmpty())
+            QSKIP("No inverse operator");
 
         QString aveFile = m_sResourcePath + "MEG/sample/sample_audvis-ave.fif";
-        if (!QFile::exists(aveFile)) QSKIP("Evoked file not available");
+        if (!QFile::exists(aveFile))
+            QSKIP("Evoked file not available");
 
         QString stcPrefix = QDir::tempPath() + "/test_pipeline_dspm";
 
-        QString output = runTool("mne_compute_mne", {
-            "--inv", m_sInvFile,
-            "--meas", aveFile,
-            "--spm",
-            "--snr", "3",
-            "--out", stcPrefix,
-            "--nomatch"
-        }, 120000);
+        QString output = runTool("mne_compute_mne", {"--inv", m_sInvFile, "--meas", aveFile, "--spm", "--snr", "3", "--out", stcPrefix, "--nomatch"}, 120000);
 
         QVERIFY(!output.isEmpty());
         QFile::remove(stcPrefix + "-lh.stc");
@@ -163,22 +150,18 @@ private slots:
 
     void testComputeSloreta()
     {
-        if (!toolExists("mne_compute_mne")) QSKIP("mne_compute_mne not found");
-        if (m_sInvFile.isEmpty()) QSKIP("No inverse operator");
+        if (!toolExists("mne_compute_mne"))
+            QSKIP("mne_compute_mne not found");
+        if (m_sInvFile.isEmpty())
+            QSKIP("No inverse operator");
 
         QString aveFile = m_sResourcePath + "MEG/sample/sample_audvis-ave.fif";
-        if (!QFile::exists(aveFile)) QSKIP("Evoked file not available");
+        if (!QFile::exists(aveFile))
+            QSKIP("Evoked file not available");
 
         QString stcPrefix = QDir::tempPath() + "/test_pipeline_sloreta";
 
-        QString output = runTool("mne_compute_mne", {
-            "--inv", m_sInvFile,
-            "--meas", aveFile,
-            "--sLORETA",
-            "--snr", "3",
-            "--out", stcPrefix,
-            "--nomatch"
-        }, 120000);
+        QString output = runTool("mne_compute_mne", {"--inv", m_sInvFile, "--meas", aveFile, "--sLORETA", "--snr", "3", "--out", stcPrefix, "--nomatch"}, 120000);
 
         QVERIFY(!output.isEmpty());
         QFile::remove(stcPrefix + "-lh.stc");
@@ -191,22 +174,18 @@ private slots:
 
     void testComputeWithForwardMode()
     {
-        if (!toolExists("mne_compute_mne")) QSKIP("mne_compute_mne not found");
-        if (m_sInvFile.isEmpty()) QSKIP("No inverse operator");
+        if (!toolExists("mne_compute_mne"))
+            QSKIP("mne_compute_mne not found");
+        if (m_sInvFile.isEmpty())
+            QSKIP("No inverse operator");
 
         QString fwdFile = m_sResourcePath + "Result/ref-sample_audvis-meg-eeg-oct-6-fwd.fif";
-        if (!QFile::exists(fwdFile)) QSKIP("Forward solution not available");
+        if (!QFile::exists(fwdFile))
+            QSKIP("Forward solution not available");
 
         QString stcPrefix = QDir::tempPath() + "/test_pipeline_fwdmode";
 
-        QString output = runTool("mne_compute_mne", {
-            "--inv", m_sInvFile,
-            "--fwd", fwdFile,
-            "--fwdamp", "50",
-            "--method", "MNE",
-            "--snr", "3",
-            "--out", stcPrefix
-        }, 120000);
+        QString output = runTool("mne_compute_mne", {"--inv", m_sInvFile, "--fwd", fwdFile, "--fwdamp", "50", "--method", "MNE", "--snr", "3", "--out", stcPrefix}, 120000);
 
         QVERIFY(!output.isEmpty());
         QFile::remove(stcPrefix + "-lh.stc");
@@ -219,24 +198,18 @@ private slots:
 
     void testComputeAbsAndPick()
     {
-        if (!toolExists("mne_compute_mne")) QSKIP("mne_compute_mne not found");
-        if (m_sInvFile.isEmpty()) QSKIP("No inverse operator");
+        if (!toolExists("mne_compute_mne"))
+            QSKIP("mne_compute_mne not found");
+        if (m_sInvFile.isEmpty())
+            QSKIP("No inverse operator");
 
         QString aveFile = m_sResourcePath + "MEG/sample/sample_audvis-ave.fif";
-        if (!QFile::exists(aveFile)) QSKIP("Evoked file not available");
+        if (!QFile::exists(aveFile))
+            QSKIP("Evoked file not available");
 
         QString stcPrefix = QDir::tempPath() + "/test_pipeline_abs";
 
-        QString output = runTool("mne_compute_mne", {
-            "--inv", m_sInvFile,
-            "--meas", aveFile,
-            "--method", "MNE",
-            "--snr", "3",
-            "--abs",
-            "--pick", "100",
-            "--out", stcPrefix,
-            "--nomatch"
-        }, 120000);
+        QString output = runTool("mne_compute_mne", {"--inv", m_sInvFile, "--meas", aveFile, "--method", "MNE", "--snr", "3", "--abs", "--pick", "100", "--out", stcPrefix, "--nomatch"}, 120000);
 
         QVERIFY(!output.isEmpty());
         QFile::remove(stcPrefix + "-lh.stc");
@@ -249,10 +222,12 @@ private slots:
 
     void testCheckSurface()
     {
-        if (!toolExists("mne_check_surface")) QSKIP("mne_check_surface not found");
+        if (!toolExists("mne_check_surface"))
+            QSKIP("mne_check_surface not found");
 
         QString surfFile = m_sResourcePath + "subjects/sample/bem/sample-inner_skull-5120.surf";
-        if (!QFile::exists(surfFile)) QSKIP("Surface file not available");
+        if (!QFile::exists(surfFile))
+            QSKIP("Surface file not available");
 
         QString output = runTool("mne_check_surface", {"--surf", surfFile});
         // Should produce surface check output
@@ -265,10 +240,12 @@ private slots:
 
     void testListBemMultiLayer()
     {
-        if (!toolExists("mne_list_bem")) QSKIP("mne_list_bem not found");
+        if (!toolExists("mne_list_bem"))
+            QSKIP("mne_list_bem not found");
 
         QString bemFile = m_sResourcePath + "subjects/sample/bem/sample-1280-1280-1280-bem.fif";
-        if (!QFile::exists(bemFile)) QSKIP("Multi-layer BEM not available");
+        if (!QFile::exists(bemFile))
+            QSKIP("Multi-layer BEM not available");
 
         QString output = runTool("mne_list_bem", {"--bem", bemFile});
         QVERIFY(!output.isEmpty());
@@ -284,10 +261,12 @@ private slots:
 
     void testCollectTransforms()
     {
-        if (!toolExists("mne_collect_transforms")) QSKIP("mne_collect_transforms not found");
+        if (!toolExists("mne_collect_transforms"))
+            QSKIP("mne_collect_transforms not found");
 
         QString rawFile = m_sResourcePath + "MEG/sample/sample_audvis_trunc_raw.fif";
-        if (!QFile::exists(rawFile)) QSKIP("Raw file not available");
+        if (!QFile::exists(rawFile))
+            QSKIP("Raw file not available");
 
         QString output = runTool("mne_collect_transforms", {"--meas", rawFile});
         QVERIFY(!output.isEmpty());

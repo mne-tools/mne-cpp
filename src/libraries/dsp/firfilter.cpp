@@ -39,13 +39,13 @@ using namespace Eigen;
 // STATIC DEFINITIONS
 //=============================================================================================================
 
-FilterKernel FirFilter::design(int          iOrder,
-                                FilterType   type,
-                                double       dCutoffLow,
-                                double       dCutoffHigh,
-                                double       dSFreq,
-                                double       dTransition,
-                                DesignMethod method)
+FilterKernel FirFilter::design(int iOrder,
+                               FilterType type,
+                               double dCutoffLow,
+                               double dCutoffHigh,
+                               double dSFreq,
+                               double dTransition,
+                               DesignMethod method)
 {
     // FilterKernel frequency encoding (all values normalised to Nyquist = sFreq/2):
     //
@@ -58,31 +58,39 @@ FilterKernel FirFilter::design(int          iOrder,
 
     const double nyquist = dSFreq / 2.0;
 
-    double dCenterfreq  = 0.0;
-    double dBandwidth   = 0.0;
+    double dCenterfreq = 0.0;
+    double dBandwidth = 0.0;
     const double dParkswidth = dTransition / nyquist;
 
-    int iFilterType = static_cast<int>(type);  // LPF=0, HPF=1, BPF=2, NOTCH=3
+    int iFilterType = static_cast<int>(type); // LPF=0, HPF=1, BPF=2, NOTCH=3
 
     switch (type) {
-    case LowPass:
-    case HighPass:
-        dCenterfreq = dCutoffLow / nyquist;
-        dBandwidth  = 0.0;
-        break;
-    case BandPass:
-    case BandStop:
-        dCenterfreq = (dCutoffLow + dCutoffHigh) / dSFreq;   // = centre / nyquist normalised to [0,1]
-        dBandwidth  = (dCutoffHigh - dCutoffLow) / nyquist;
-        break;
+        case LowPass:
+        case HighPass:
+            dCenterfreq = dCutoffLow / nyquist;
+            dBandwidth = 0.0;
+            break;
+        case BandPass:
+        case BandStop:
+            dCenterfreq = (dCutoffLow + dCutoffHigh) / dSFreq; // = centre / nyquist normalised to [0,1]
+            dBandwidth = (dCutoffHigh - dCutoffLow) / nyquist;
+            break;
     }
 
     QString sName;
     switch (type) {
-    case LowPass:   sName = QStringLiteral("LP_%1Hz").arg(dCutoffLow);  break;
-    case HighPass:  sName = QStringLiteral("HP_%1Hz").arg(dCutoffLow);  break;
-    case BandPass:  sName = QStringLiteral("BP_%1-%2Hz").arg(dCutoffLow).arg(dCutoffHigh); break;
-    case BandStop:  sName = QStringLiteral("BS_%1-%2Hz").arg(dCutoffLow).arg(dCutoffHigh); break;
+        case LowPass:
+            sName = QStringLiteral("LP_%1Hz").arg(dCutoffLow);
+            break;
+        case HighPass:
+            sName = QStringLiteral("HP_%1Hz").arg(dCutoffLow);
+            break;
+        case BandPass:
+            sName = QStringLiteral("BP_%1-%2Hz").arg(dCutoffLow).arg(dCutoffHigh);
+            break;
+        case BandStop:
+            sName = QStringLiteral("BS_%1-%2Hz").arg(dCutoffLow).arg(dCutoffHigh);
+            break;
     }
 
     return FilterKernel(sName,
@@ -98,7 +106,7 @@ FilterKernel FirFilter::design(int          iOrder,
 //=============================================================================================================
 
 RowVectorXd FirFilter::apply(const RowVectorXd& vecData,
-                               FilterKernel&     kernel)
+                             FilterKernel& kernel)
 {
     RowVectorXd work = vecData;
     kernel.applyFftFilter(work, /*bKeepOverhead=*/false);
@@ -108,7 +116,7 @@ RowVectorXd FirFilter::apply(const RowVectorXd& vecData,
 //=============================================================================================================
 
 RowVectorXd FirFilter::applyZeroPhase(const RowVectorXd& vecData,
-                                       FilterKernel&     kernel)
+                                      FilterKernel& kernel)
 {
     // Forward pass
     RowVectorXd work = vecData;
@@ -123,9 +131,9 @@ RowVectorXd FirFilter::applyZeroPhase(const RowVectorXd& vecData,
 
 //=============================================================================================================
 
-MatrixXd FirFilter::applyZeroPhaseMatrix(const MatrixXd&    matData,
-                                          FilterKernel&      kernel,
-                                          const RowVectorXi& vecPicks)
+MatrixXd FirFilter::applyZeroPhaseMatrix(const MatrixXd& matData,
+                                         FilterKernel& kernel,
+                                         const RowVectorXi& vecPicks)
 {
     MatrixXd result = matData;
 
@@ -138,7 +146,8 @@ MatrixXd FirFilter::applyZeroPhaseMatrix(const MatrixXd&    matData,
     } else {
         for (int k = 0; k < vecPicks.size(); ++k) {
             int i = vecPicks(k);
-            if (i < 0 || i >= result.rows()) continue;
+            if (i < 0 || i >= result.rows())
+                continue;
             RowVectorXd row = result.row(i);
             result.row(i) = applyZeroPhase(row, kernel);
         }

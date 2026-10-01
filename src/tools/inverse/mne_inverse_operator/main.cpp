@@ -83,18 +83,18 @@ using namespace UTILSLIB;
  * and populates SSP projectors from the noise covariance and/or --proj files.
  * This mirrors the original MNE-C approach where no measurement file is needed.
  */
-static FiffInfo buildInfoFromForward(const MNEForwardSolution &forward,
-                                     const FiffCov &noiseCov,
-                                     const QList<FiffProj> &extraProjs)
+static FiffInfo buildInfoFromForward(const MNEForwardSolution& forward,
+                                     const FiffCov& noiseCov,
+                                     const QList<FiffProj>& extraProjs)
 {
     FiffInfo info;
 
     // Copy all FiffInfoBase members from the forward solution
-    info.chs        = forward.info.chs;
-    info.nchan      = forward.info.nchan;
-    info.ch_names   = forward.info.ch_names;
-    info.bads       = forward.info.bads;
-    info.meas_id    = forward.info.meas_id;
+    info.chs = forward.info.chs;
+    info.nchan = forward.info.nchan;
+    info.ch_names = forward.info.ch_names;
+    info.bads = forward.info.bads;
+    info.meas_id = forward.info.meas_id;
     info.dev_head_t = forward.info.dev_head_t;
     info.ctf_head_t = forward.info.ctf_head_t;
 
@@ -103,16 +103,16 @@ static FiffInfo buildInfoFromForward(const MNEForwardSolution &forward,
     //   1. Projectors embedded in the noise covariance file
     //   2. Projectors from explicit --proj files (only if noise cov had none)
     if (!noiseCov.projs.isEmpty()) {
-        qInfo("  Using %lld SSP projectors from noise covariance file." ,
-               noiseCov.projs.size());
+        qInfo("  Using %lld SSP projectors from noise covariance file.",
+              noiseCov.projs.size());
         info.projs = noiseCov.projs;
         FiffProj::activate_projs(info.projs);
         if (!extraProjs.isEmpty()) {
             qInfo("  NOTE: Noise covariance already contains projectors; ignoring --proj files.");
         }
     } else if (!extraProjs.isEmpty()) {
-        qInfo("  Using %lld SSP projectors from --proj files." ,
-               extraProjs.size());
+        qInfo("  Using %lld SSP projectors from --proj files.",
+              extraProjs.size());
         info.projs = extraProjs;
         FiffProj::activate_projs(info.projs);
     }
@@ -159,7 +159,7 @@ static FiffInfo buildInfoFromForward(const MNEForwardSolution &forward,
 /**
  * Read SSP projectors from a FIFF file.
  */
-static QList<FiffProj> readProjFile(const QString &fileName)
+static QList<FiffProj> readProjFile(const QString& fileName)
 {
     QList<FiffProj> projs;
     QFile file(fileName);
@@ -176,7 +176,7 @@ static QList<FiffProj> readProjFile(const QString &fileName)
 /**
  * Read bad channel names from a text file (one channel name per line).
  */
-static QStringList readBadFile(const QString &fileName)
+static QStringList readBadFile(const QString& fileName)
 {
     QStringList bads;
     QFile file(fileName);
@@ -213,7 +213,7 @@ static QStringList readBadFile(const QString &fileName)
  * @param[in] argv  (argument vector)
  * @return exit code (0 on success).
  */
-int main(int argc, char *argv[])
+int main(int argc, char* argv[])
 {
     qInstallMessageHandler(MNELogger::customLogWriter);
     QCoreApplication app(argc, argv);
@@ -232,110 +232,109 @@ int main(int argc, char *argv[])
         "fixed, loose, or free source orientations and depth weighting.\n\n"
         "Channel information is obtained from the forward solution.\n"
         "SSP projectors are read from the noise covariance file (or --proj files).\n"
-        "No measurement file is required (same as the original MNE-C tool)."
-    );
+        "No measurement file is required (same as the original MNE-C tool).");
     parser.addHelpOption();
     parser.addVersionOption();
 
     // --fwd: Forward solution file
     QCommandLineOption fwdOpt(QStringList() << "fwd",
-        "The forward solution file.", "file");
+                              "The forward solution file.", "file");
     parser.addOption(fwdOpt);
 
     // --noisecov / --senscov: Noise covariance matrix file
     QCommandLineOption noisecovOpt(QStringList() << "noisecov" << "senscov",
-        "The noise (sensor) covariance matrix file.", "file");
+                                   "The noise (sensor) covariance matrix file.", "file");
     parser.addOption(noisecovOpt);
 
     // --srccov: Source covariance matrix file (optional, defaults to identity)
     QCommandLineOption srccovOpt(QStringList() << "srccov",
-        "Source covariance matrix file (default: identity).", "file");
+                                 "Source covariance matrix file (default: identity).", "file");
     parser.addOption(srccovOpt);
 
     // --meg: Use MEG channels
     QCommandLineOption megOpt(QStringList() << "meg",
-        "Use MEG channels.");
+                              "Use MEG channels.");
     parser.addOption(megOpt);
 
     // --eeg: Use EEG channels
     QCommandLineOption eegOpt(QStringList() << "eeg",
-        "Use EEG channels (specify both --meg and --eeg for a combined solution).");
+                              "Use EEG channels (specify both --meg and --eeg for a combined solution).");
     parser.addOption(eegOpt);
 
     // --fixed: Use fixed source orientations
     QCommandLineOption fixedOpt(QStringList() << "fixed",
-        "Use fixed source orientations normal to the cortical surface.");
+                                "Use fixed source orientations normal to the cortical surface.");
     parser.addOption(fixedOpt);
 
     // --loose: Loose orientation constraint amount
     QCommandLineOption looseOpt(QStringList() << "loose",
-        "Amount of loose orientation constraint (0.0-1.0, default: 0.2).",
-        "amount", "0.2");
+                                "Amount of loose orientation constraint (0.0-1.0, default: 0.2).",
+                                "amount", "0.2");
     parser.addOption(looseOpt);
 
     // --depth: Enable depth weighting (flag, like SVN MNE-C)
     QCommandLineOption depthOpt(QStringList() << "depth",
-        "Enable depth weighting.");
+                                "Enable depth weighting.");
     parser.addOption(depthOpt);
 
     // --weightexp: Depth weighting exponent
     QCommandLineOption weightexpOpt(QStringList() << "weightexp",
-        "Depth weighting exponent (0.0-1.0, default: 0.8).",
-        "value", "0.8");
+                                    "Depth weighting exponent (0.0-1.0, default: 0.8).",
+                                    "value", "0.8");
     parser.addOption(weightexpOpt);
 
     // --weightlimit: Depth weighting maximum
     QCommandLineOption weightlimitOpt(QStringList() << "weightlimit",
-        "Depth weighting upper limit (default: 10.0).",
-        "value", "10.0");
+                                      "Depth weighting upper limit (default: 10.0).",
+                                      "value", "10.0");
     parser.addOption(weightlimitOpt);
 
     // --nodepth: Disable depth weighting
     QCommandLineOption noDepthOpt(QStringList() << "nodepth",
-        "Disable depth weighting.");
+                                  "Disable depth weighting.");
     parser.addOption(noDepthOpt);
 
     // --reg: Regularization factor (same for all channel types)
     QCommandLineOption regOpt(QStringList() << "reg",
-        "Regularization factor for all channel types.", "amount");
+                              "Regularization factor for all channel types.", "amount");
     parser.addOption(regOpt);
 
     // --magreg: Regularization for magnetometers
     QCommandLineOption magregOpt(QStringList() << "magreg",
-        "Regularization factor for magnetometers (default: 0.1).",
-        "amount", "0.1");
+                                 "Regularization factor for magnetometers (default: 0.1).",
+                                 "amount", "0.1");
     parser.addOption(magregOpt);
 
     // --gradreg: Regularization for gradiometers
     QCommandLineOption gradregOpt(QStringList() << "gradreg",
-        "Regularization factor for gradiometers (default: 0.1).",
-        "amount", "0.1");
+                                  "Regularization factor for gradiometers (default: 0.1).",
+                                  "amount", "0.1");
     parser.addOption(gradregOpt);
 
     // --eegreg: Regularization for EEG channels
     QCommandLineOption eegregOpt(QStringList() << "eegreg",
-        "Regularization factor for EEG channels (default: 0.1).",
-        "amount", "0.1");
+                                 "Regularization factor for EEG channels (default: 0.1).",
+                                 "amount", "0.1");
     parser.addOption(eegregOpt);
 
     // --diagnoise: Use only diagonal noise covariance
     QCommandLineOption diagnoiseOpt(QStringList() << "diagnoise",
-        "Omit off-diagonal terms from the noise covariance matrix.");
+                                    "Omit off-diagonal terms from the noise covariance matrix.");
     parser.addOption(diagnoiseOpt);
 
     // --proj: SSP projection file (can be repeated)
     QCommandLineOption projOpt(QStringList() << "proj",
-        "Load SSP projectors from file (can be repeated).", "file");
+                               "Load SSP projectors from file (can be repeated).", "file");
     parser.addOption(projOpt);
 
     // --bad: Bad channels file (one channel name per line)
     QCommandLineOption badOpt(QStringList() << "bad",
-        "Bad channels file (one name per line, can be repeated).", "file");
+                              "Bad channels file (one name per line, can be repeated).", "file");
     parser.addOption(badOpt);
 
     // --inv: Output inverse operator file
     QCommandLineOption invOpt(QStringList() << "inv",
-        "Output file for the inverse operator (default: <fwd>-inv.fif).", "file");
+                              "Output file for the inverse operator (default: <fwd>-inv.fif).", "file");
     parser.addOption(invOpt);
 
     parser.process(app);
@@ -365,8 +364,8 @@ int main(int argc, char *argv[])
     bool useFixed = parser.isSet(fixedOpt);
     float loose = parser.value(looseOpt).toFloat();
     float depth = parser.isSet(noDepthOpt) ? 0.0f
-                : parser.isSet(depthOpt)   ? parser.value(weightexpOpt).toFloat()
-                :                            0.8f;
+        : parser.isSet(depthOpt)           ? parser.value(weightexpOpt).toFloat()
+                                           : 0.8f;
     bool diagNoise = parser.isSet(diagnoiseOpt);
 
     // Regularization parameters
@@ -401,7 +400,7 @@ int main(int argc, char *argv[])
 
     qInfo("%s", "");
     qInfo("========================================");
-    qInfo("Reading forward solution from %s..." , fwdName.toUtf8().constData());
+    qInfo("Reading forward solution from %s...", fwdName.toUtf8().constData());
 
     QFile fwdFile(fwdName);
     MNEForwardSolution forward(fwdFile, false, true);
@@ -411,45 +410,45 @@ int main(int argc, char *argv[])
         return 1;
     }
 
-    qInfo("  Forward solution: %d sources, %d channels" ,
-           forward.nsource, forward.nchan);
-    qInfo("  Source orientation: %s" ,
-           forward.isFixedOrient() ? "fixed" : "free");
-    qInfo("  Source space type: %d hemispheres" , forward.src.size());
+    qInfo("  Forward solution: %d sources, %d channels",
+          forward.nsource, forward.nchan);
+    qInfo("  Source orientation: %s",
+          forward.isFixedOrient() ? "fixed" : "free");
+    qInfo("  Source space type: %d hemispheres", forward.src.size());
 
     // Pick channel types according to --meg/--eeg options
     if (!(useMeg && useEeg)) {
-        qInfo("Restricting forward solution to %s channels..." ,
-               useMeg ? "MEG" : "EEG");
+        qInfo("Restricting forward solution to %s channels...",
+              useMeg ? "MEG" : "EEG");
         forward = forward.pick_types(useMeg, useEeg);
         if (forward.isEmpty()) {
             qCritical() << "Error: No channels remaining after channel type restriction.";
             return 1;
         }
-        qInfo("  After restriction: %d channels" , forward.nchan);
+        qInfo("  After restriction: %d channels", forward.nchan);
     }
 
     //=========================================================================================================
     // Read noise covariance
     //=========================================================================================================
 
-    qInfo("\nReading noise covariance from %s..." ,
-           parser.value(noisecovOpt).toUtf8().constData());
+    qInfo("\nReading noise covariance from %s...",
+          parser.value(noisecovOpt).toUtf8().constData());
 
     QFile covFile(parser.value(noisecovOpt));
     FiffCov noiseCov(covFile);
 
     if (noiseCov.data.rows() == 0) {
         qCritical() << "Error: Could not read noise covariance from"
-                     << parser.value(noisecovOpt);
+                    << parser.value(noisecovOpt);
         return 1;
     }
 
-    qInfo("  Noise covariance: %d x %d" ,
-           (int)noiseCov.data.rows(), (int)noiseCov.data.cols());
+    qInfo("  Noise covariance: %d x %d",
+          (int)noiseCov.data.rows(), (int)noiseCov.data.cols());
     if (!noiseCov.projs.isEmpty()) {
-        qInfo("  Noise covariance contains %lld SSP projectors." ,
-               noiseCov.projs.size());
+        qInfo("  Noise covariance contains %lld SSP projectors.",
+              noiseCov.projs.size());
     }
 
     //=========================================================================================================
@@ -458,11 +457,11 @@ int main(int argc, char *argv[])
 
     QList<FiffProj> extraProjs;
     QStringList projFiles = parser.values(projOpt);
-    for (const QString &projFileName : projFiles) {
-        qInfo("Reading SSP projectors from %s..." ,
-               projFileName.toUtf8().constData());
+    for (const QString& projFileName : projFiles) {
+        qInfo("Reading SSP projectors from %s...",
+              projFileName.toUtf8().constData());
         QList<FiffProj> fileProjs = readProjFile(projFileName);
-        qInfo("  Found %lld projectors." , fileProjs.size());
+        qInfo("  Found %lld projectors.", fileProjs.size());
         extraProjs.append(fileProjs);
     }
 
@@ -473,25 +472,25 @@ int main(int argc, char *argv[])
 
     qInfo("\nBuilding measurement info from forward solution...");
     FiffInfo info = buildInfoFromForward(forward, noiseCov, extraProjs);
-    qInfo("  Info: %d channels, %lld projectors" ,
-           info.nchan, info.projs.size());
+    qInfo("  Info: %d channels, %lld projectors",
+          info.nchan, info.projs.size());
 
     //=========================================================================================================
     // Merge bad channels from --bad files
     //=========================================================================================================
 
     QStringList badFiles = parser.values(badOpt);
-    for (const QString &badFileName : badFiles) {
-        qInfo("Reading bad channels from %s..." ,
-               badFileName.toUtf8().constData());
+    for (const QString& badFileName : badFiles) {
+        qInfo("Reading bad channels from %s...",
+              badFileName.toUtf8().constData());
         QStringList fileBads = readBadFile(badFileName);
-        for (const QString &bad : fileBads) {
+        for (const QString& bad : fileBads) {
             if (!info.bads.contains(bad))
                 info.bads << bad;
         }
     }
     // Also merge bad channels from the noise covariance
-    for (const QString &bad : noiseCov.bads) {
+    for (const QString& bad : noiseCov.bads) {
         if (!info.bads.contains(bad))
             info.bads << bad;
     }
@@ -505,8 +504,8 @@ int main(int argc, char *argv[])
     // Regularize noise covariance
     //=========================================================================================================
 
-    qInfo("\nRegularizing noise covariance (mag=%.3f, grad=%.3f, eeg=%.3f)..." ,
-           magReg, gradReg, eegReg);
+    qInfo("\nRegularizing noise covariance (mag=%.3f, grad=%.3f, eeg=%.3f)...",
+          magReg, gradReg, eegReg);
     noiseCov = noiseCov.regularize(info, magReg, gradReg, eegReg, true);
 
     // If --diagnoise, zero out off-diagonal elements
@@ -522,9 +521,9 @@ int main(int argc, char *argv[])
     //=========================================================================================================
 
     qInfo("\nAssembling inverse operator...");
-    qInfo("  Fixed orientation: %s" , useFixed ? "yes" : "no");
+    qInfo("  Fixed orientation: %s", useFixed ? "yes" : "no");
     if (!useFixed) {
-        qInfo("  Loose constraint: %.2f" , loose);
+        qInfo("  Loose constraint: %.2f", loose);
     }
     if (depth > 0.0f) {
         qInfo("  Depth weighting:  yes (%.2f)", depth);
@@ -539,14 +538,14 @@ int main(int argc, char *argv[])
         return 1;
     }
 
-    qInfo("  Inverse operator: %d sources, %d channels" ,
-           invOp.nsource, invOp.nchan);
+    qInfo("  Inverse operator: %d sources, %d channels",
+          invOp.nsource, invOp.nchan);
 
     //=========================================================================================================
     // Write the inverse operator
     //=========================================================================================================
 
-    qInfo("\nWriting inverse operator to %s..." , invName.toUtf8().constData());
+    qInfo("\nWriting inverse operator to %s...", invName.toUtf8().constData());
 
     QFile invFile(invName);
     invOp.write(invFile);

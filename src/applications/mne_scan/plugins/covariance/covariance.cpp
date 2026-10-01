@@ -68,7 +68,7 @@ Covariance::Covariance()
 
 Covariance::~Covariance()
 {
-    if(this->isRunning())
+    if (this->isRunning())
         stop();
 }
 
@@ -96,7 +96,7 @@ void Covariance::init()
 
     // Output
     m_pCovarianceOutput = PluginOutputData<RealTimeCov>::create(this, "CovarianceOut", "Covariance output data");
-    m_pCovarianceOutput->measurementData()->setName(this->getName());//Provide name to auto store widget settings
+    m_pCovarianceOutput->measurementData()->setName(this->getName()); //Provide name to auto store widget settings
     m_outputConnectors.append(m_pCovarianceOutput);
 }
 
@@ -104,7 +104,7 @@ void Covariance::init()
 
 void Covariance::initPluginControlWidgets()
 {
-    if(m_pFiffInfo) {
+    if (m_pFiffInfo) {
         QList<QWidget*> plControlWidgets;
 
         CovarianceSettingsView* pCovarianceWidget = new CovarianceSettingsView(QString("MNESCAN/%1").arg(this->getName()));
@@ -178,7 +178,7 @@ void Covariance::showCovarianceWidget()
 
 QWidget* Covariance::setupWidget()
 {
-    CovarianceSetupWidget* setupWidget = new CovarianceSetupWidget(this);//widget is later distroyed by CentralWidget - so it has to be created everytime new
+    CovarianceSetupWidget* setupWidget = new CovarianceSetupWidget(this); //widget is later distroyed by CentralWidget - so it has to be created everytime new
     return setupWidget;
 }
 
@@ -186,23 +186,23 @@ QWidget* Covariance::setupWidget()
 
 void Covariance::update(SCMEASLIB::Measurement::SPtr pMeasurement)
 {
-    if(QSharedPointer<RealTimeMultiSampleArray> pRTMSA = pMeasurement.dynamicCast<RealTimeMultiSampleArray>()) {
+    if (QSharedPointer<RealTimeMultiSampleArray> pRTMSA = pMeasurement.dynamicCast<RealTimeMultiSampleArray>()) {
         //Fiff information
-        if(!m_pFiffInfo) {
+        if (!m_pFiffInfo) {
             m_pFiffInfo = pRTMSA->info();
 
             m_pCovarianceOutput->measurementData()->setFiffInfo(m_pFiffInfo);
         }
 
-        if(!m_bPluginControlWidgetsInit) {
+        if (!m_bPluginControlWidgetsInit) {
             initPluginControlWidgets();
         }
 
-        for(qint32 i = 0; i < pRTMSA->getMultiArraySize(); ++i) {
+        for (qint32 i = 0; i < pRTMSA->getMultiArraySize(); ++i) {
             // Please note that we do not need a copy here since this function will block until
             // the buffer accepts new data again. Hence, the data is not deleted in the actual
             // Measurement function after it emitted the notify signal.
-            while(!m_pCircularBuffer->push(pRTMSA->getMultiSampleArray()[i])) {
+            while (!m_pCircularBuffer->push(pRTMSA->getMultiSampleArray()[i])) {
                 //Do nothing until the circular buffer is ready to accept new data again
             }
         }
@@ -221,9 +221,9 @@ void Covariance::changeSamples(qint32 samples)
 void Covariance::run()
 {
     // Wait for fiff info
-    while(true) {
+    while (true) {
         m_mutex.lock();
-        if(m_pFiffInfo) {
+        if (m_pFiffInfo) {
             m_mutex.unlock();
             break;
         }
@@ -239,15 +239,15 @@ void Covariance::run()
     RTPROCESSINGLIB::RtCov rtCov(m_pFiffInfo);
 
     // Start processing data
-    while(!isInterruptionRequested()) {
+    while (!isInterruptionRequested()) {
         // Get the current data
-        if(m_pCircularBuffer->pop(matData)) {
+        if (m_pCircularBuffer->pop(matData)) {
             m_mutex.lock();
             iEstimationSamples = m_iEstimationSamples;
             m_mutex.unlock();
 
             fiffCov = rtCov.estimateCovariance(matData, iEstimationSamples);
-            if(!fiffCov.names.isEmpty()) {
+            if (!fiffCov.names.isEmpty()) {
                 m_pCovarianceOutput->measurementData()->setValue(fiffCov);
             }
         }
@@ -258,7 +258,7 @@ void Covariance::run()
 
 QString Covariance::getBuildInfo()
 {
-    return QString(COVARIANCEPLUGIN::buildDateTime()) + QString(" - ")  + QString(COVARIANCEPLUGIN::buildHash());
+    return QString(COVARIANCEPLUGIN::buildDateTime()) + QString(" - ") + QString(COVARIANCEPLUGIN::buildHash());
 }
 
 //=============================================================================================================

@@ -59,7 +59,7 @@ using namespace Eigen;
  *
  * @return the value that was set to exit() (which is 0 if exit() is called via quit()).
  */
-int main(int argc, char *argv[])
+int main(int argc, char* argv[])
 {
     QCoreApplication a(argc, argv);
 
@@ -68,13 +68,13 @@ int main(int argc, char *argv[])
     //
     MatrixXf sourceLm(8, 3);
     sourceLm << 0.f, 0.f, 0.f,
-                1.f, 0.f, 0.f,
-                0.f, 1.f, 0.f,
-                1.f, 1.f, 0.f,
-                0.f, 0.f, 1.f,
-                1.f, 0.f, 1.f,
-                0.f, 1.f, 1.f,
-                1.f, 1.f, 1.f;
+        1.f, 0.f, 0.f,
+        0.f, 1.f, 0.f,
+        1.f, 1.f, 0.f,
+        0.f, 0.f, 1.f,
+        1.f, 0.f, 1.f,
+        0.f, 1.f, 1.f,
+        1.f, 1.f, 1.f;
 
     //
     // Destination landmarks: an affine stretch (x2 along x, x1.5 along y) plus a
@@ -84,8 +84,8 @@ int main(int argc, char *argv[])
     MatrixXf destLm = sourceLm;
     destLm.col(0) *= 2.0f;
     destLm.col(1) *= 1.5f;
-    for(int i = 0; i < destLm.rows(); ++i) {
-        destLm(i, 2) += 0.25f * sourceLm(i, 2);     // lift proportional to height
+    for (int i = 0; i < destLm.rows(); ++i) {
+        destLm(i, 2) += 0.25f * sourceLm(i, 2); // lift proportional to height
     }
 
     //
@@ -95,12 +95,12 @@ int main(int argc, char *argv[])
     const int iN = 3;
     MatrixXf sourceVert(iN * iN * iN, 3);
     int iRow = 0;
-    for(int ix = 0; ix < iN; ++ix) {
-        for(int iy = 0; iy < iN; ++iy) {
-            for(int iz = 0; iz < iN; ++iz) {
+    for (int ix = 0; ix < iN; ++ix) {
+        for (int iy = 0; iy < iN; ++iy) {
+            for (int iz = 0; iz < iN; ++iz) {
                 sourceVert.row(iRow++) << ix / float(iN - 1),
-                                          iy / float(iN - 1),
-                                          iz / float(iN - 1);
+                    iy / float(iN - 1),
+                    iz / float(iN - 1);
             }
         }
     }
@@ -124,7 +124,7 @@ int main(int argc, char *argv[])
     qInfo() << "  warped vertices  :" << warpedVert.rows();
     qInfo() << "  max landmark interpolation error :" << fMaxLmError;
 
-    if(fMaxLmError < 1e-3f) {
+    if (fMaxLmError < 1e-3f) {
         qInfo() << "  -> landmarks reproduced exactly (TPS interpolation property holds).";
     } else {
         qWarning() << "  -> unexpected landmark error; the warp did not interpolate the landmarks.";

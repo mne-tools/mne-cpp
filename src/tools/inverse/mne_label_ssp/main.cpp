@@ -58,7 +58,7 @@ using namespace Eigen;
 // MAIN
 //=============================================================================================================
 
-int main(int argc, char *argv[])
+int main(int argc, char* argv[])
 {
     qInstallMessageHandler(MNELogger::customLogWriter);
     QCoreApplication app(argc, argv);
@@ -128,7 +128,7 @@ int main(int argc, char *argv[])
     //
     // Get the gain matrix and channel names
     //
-    const MatrixXd& G = fwd.sol->data;       // nchan x nsource (or nsource*3 for free ori)
+    const MatrixXd& G = fwd.sol->data; // nchan x nsource (or nsource*3 for free ori)
     const QStringList& chNames = fwd.sol->row_names;
 
     //
@@ -214,8 +214,8 @@ int main(int argc, char *argv[])
 
             QStringList rowNames;
             rowNames << QString("Label-SSP-%1-comp-%2")
-                        .arg(QFileInfo(labelFile).baseName())
-                        .arg(k + 1);
+                            .arg(QFileInfo(labelFile).baseName())
+                            .arg(k + 1);
 
             FiffNamedMatrix namedMat(1, fwd.nchan, rowNames, chNames, projData);
             FiffProj proj(FIFFV_PROJ_ITEM_FIELD, false,

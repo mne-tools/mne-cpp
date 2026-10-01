@@ -41,8 +41,9 @@
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-namespace ANSHAREDLIB {
-    class Communicator;
+namespace ANSHAREDLIB
+{
+class Communicator;
 }
 
 //=============================================================================================================
@@ -71,8 +72,8 @@ class ANSHAREDSHARED_EXPORT AnalyzeData : public QObject
     Q_OBJECT
 
 public:
-    typedef QSharedPointer<AnalyzeData> SPtr;               /**< Shared pointer type for AnalyzeData. */
-    typedef QSharedPointer<const AnalyzeData> ConstSPtr;    /**< Const shared pointer type for AnalyzeData. */
+    typedef QSharedPointer<AnalyzeData> SPtr;            /**< Shared pointer type for AnalyzeData. */
+    typedef QSharedPointer<const AnalyzeData> ConstSPtr; /**< Const shared pointer type for AnalyzeData. */
 
     //=========================================================================================================
     /**
@@ -94,7 +95,7 @@ public:
      *
      * @return                       Vector of all models
      */
-    QVector<QSharedPointer<AbstractModel> > getAllModels(QModelIndex parent = QModelIndex()) const;
+    QVector<QSharedPointer<AbstractModel>> getAllModels(QModelIndex parent = QModelIndex()) const;
 
     //=========================================================================================================
     /**
@@ -105,8 +106,8 @@ public:
      *
      * @return                       Vector of models that have the specified type
      */
-    QVector<QSharedPointer<AbstractModel> > getModelsByType(MODEL_TYPE mtype,
-                                                            QModelIndex parent = QModelIndex()) const;
+    QVector<QSharedPointer<AbstractModel>> getModelsByType(MODEL_TYPE mtype,
+                                                           QModelIndex parent = QModelIndex()) const;
 
     //=========================================================================================================
     /**
@@ -117,7 +118,7 @@ public:
      *
      * @return                       Pointer to the model
      */
-    QSharedPointer<AbstractModel> getModelByName(const QString &sName) const;
+    QSharedPointer<AbstractModel> getModelByName(const QString& sName) const;
 
     //=========================================================================================================
     /**
@@ -146,7 +147,7 @@ public:
      *
      * @return              Returns true if successful
      */
-    bool removeModel(const QModelIndex &index);
+    bool removeModel(const QModelIndex& index);
 
     //=========================================================================================================
     /**
@@ -156,7 +157,7 @@ public:
      *
      * @return returns pointer to new subject item
      */
-    QStandardItem* addSubject(const QString &sSubjectName);
+    QStandardItem* addSubject(const QString& sSubjectName);
 
     //=========================================================================================================
     /**
@@ -164,7 +165,7 @@ public:
      *
      * @param[in] index    index of the new selected item.
      */
-    void newSelection(const QModelIndex &index);
+    void newSelection(const QModelIndex& index);
 
     //=========================================================================================================
     /**
@@ -176,7 +177,7 @@ public:
                                 const QByteArray& byteLoadedData = QByteArray())
     {
         // check if model was already loaded
-        if(QSharedPointer<AbstractModel> pModel = getModelByPath(sPath)) {
+        if (QSharedPointer<AbstractModel> pModel = getModelByPath(sPath)) {
             qInfo() << "[AnalyzeData::loadModel] Data has been loaded already.";
             return qSharedPointerDynamicCast<T>(pModel);
         }
@@ -189,33 +190,33 @@ public:
         int iType;
         QModelIndex index;
 
-        switch(temp->getType()){
-        case ANSHAREDLIB_FIFFRAW_MODEL:
-        case ANSHAREDLIB_NOISE_MODEL: {
-            iType = BIDS_FUNCTIONALDATA;
-            index = m_SelectedItem;
-            break;
-        }
-        case ANSHAREDLIB_BEMDATA_MODEL:
-        case ANSHAREDLIB_MRICOORD_MODEL: {
-            iType = BIDS_ANATOMICALDATA;
-            index = m_SelectedItem;
-            break;
-        }
-        case ANSHAREDLIB_EVENT_MODEL: {
-            iType = BIDS_EVENT;
-            index = m_SelectedFunctionalData;
-            break;
-        }
-        case ANSHAREDLIB_AVERAGING_MODEL: {
-            iType = BIDS_AVERAGE;
-            index = m_SelectedFunctionalData;
-            break;
-        }
-        default: {
-            iType = BIDS_UNKNOWN;
-            index = m_SelectedItem;
-        }
+        switch (temp->getType()) {
+            case ANSHAREDLIB_FIFFRAW_MODEL:
+            case ANSHAREDLIB_NOISE_MODEL: {
+                iType = BIDS_FUNCTIONALDATA;
+                index = m_SelectedItem;
+                break;
+            }
+            case ANSHAREDLIB_BEMDATA_MODEL:
+            case ANSHAREDLIB_MRICOORD_MODEL: {
+                iType = BIDS_ANATOMICALDATA;
+                index = m_SelectedItem;
+                break;
+            }
+            case ANSHAREDLIB_EVENT_MODEL: {
+                iType = BIDS_EVENT;
+                index = m_SelectedFunctionalData;
+                break;
+            }
+            case ANSHAREDLIB_AVERAGING_MODEL: {
+                iType = BIDS_AVERAGE;
+                index = m_SelectedFunctionalData;
+                break;
+            }
+            default: {
+                iType = BIDS_UNKNOWN;
+                index = m_SelectedItem;
+            }
         }
 
         QStandardItem* pItem = new QStandardItem(temp->getModelName());
@@ -230,13 +231,13 @@ public:
                          pItem,
                          iType);
         return sm;
-
     }
 
     //=========================================================================================================
     template<class T>
     QSharedPointer<T> addModel(QSharedPointer<T> pNewModel,
-                               const QString& sModelName){
+                               const QString& sModelName)
+    {
         QSharedPointer<AbstractModel> temp = qSharedPointerCast<AbstractModel>(pNewModel);
         QStandardItem* pItem = new QStandardItem(sModelName);
         pItem->setEditable(true);
@@ -246,46 +247,45 @@ public:
         QVariant data;
         data.setValue(temp);
 
-        switch(temp->getType()){
-        case ANSHAREDLIB_AVERAGING_MODEL:{
-            pItem->setData(data);
-            m_pData->addToData(pItem,
-                               m_SelectedFunctionalData,
-                               BIDS_AVERAGE);
-            break;
-        }
-        case ANSHAREDLIB_EVENT_MODEL: {
-            pItem->setData(data);
-            m_pData->addToData(pItem,
-                               m_SelectedFunctionalData,
-                               BIDS_EVENT);
-            break;
-        }
-        case ANSHAREDLIB_DIPOLEFIT_MODEL:{
-            pItem->setData(data);
-            m_pData->addToData(pItem,
-                               m_SelectedFunctionalData,
-                               BIDS_DIPOLE);
-            break;
-        }
-        case ANSHAREDLIB_FIFFRAW_MODEL: {
-            pItem->setData(data);
-            QModelIndex index = m_SelectedItem;
-            m_pData->addData(index,
-                             pItem,
-                             BIDS_FUNCTIONALDATA);
-            break;
-        }
-        default:{
-            qWarning() << "[AnalyzeData::addModel] Model type not supported";
-            break;
-        }
+        switch (temp->getType()) {
+            case ANSHAREDLIB_AVERAGING_MODEL: {
+                pItem->setData(data);
+                m_pData->addToData(pItem,
+                                   m_SelectedFunctionalData,
+                                   BIDS_AVERAGE);
+                break;
+            }
+            case ANSHAREDLIB_EVENT_MODEL: {
+                pItem->setData(data);
+                m_pData->addToData(pItem,
+                                   m_SelectedFunctionalData,
+                                   BIDS_EVENT);
+                break;
+            }
+            case ANSHAREDLIB_DIPOLEFIT_MODEL: {
+                pItem->setData(data);
+                m_pData->addToData(pItem,
+                                   m_SelectedFunctionalData,
+                                   BIDS_DIPOLE);
+                break;
+            }
+            case ANSHAREDLIB_FIFFRAW_MODEL: {
+                pItem->setData(data);
+                QModelIndex index = m_SelectedItem;
+                m_pData->addData(index,
+                                 pItem,
+                                 BIDS_FUNCTIONALDATA);
+                break;
+            }
+            default: {
+                qWarning() << "[AnalyzeData::addModel] Model type not supported";
+                break;
+            }
         }
         return pNewModel;
     }
 
 private:
-
     //=========================================================================================================
     /**
      * Returns a list of all items (including child items) in the BidsViewModel;
@@ -296,12 +296,12 @@ private:
      */
     QList<QStandardItem*> getAllItems(QModelIndex parent = QModelIndex()) const;
 
-    QPointer<DISPLIB::BidsViewModel>        m_pData;                    /**< The BidsViewModel that holds all the subject, session, and data items. */
+    QPointer<DISPLIB::BidsViewModel> m_pData; /**< The BidsViewModel that holds all the subject, session, and data items. */
 
-    QPointer<ANSHAREDLIB::Communicator>     m_pCommu;                   /**< Used to send events. */
+    QPointer<ANSHAREDLIB::Communicator> m_pCommu; /**< Used to send events. */
 
-    QModelIndex                             m_SelectedItem;             /**< Index of currently selected item. */
-    QModelIndex                             m_SelectedFunctionalData;   /**< Index of currently selected data item. */
+    QModelIndex m_SelectedItem;           /**< Index of currently selected item. */
+    QModelIndex m_SelectedFunctionalData; /**< Index of currently selected data item. */
 
 signals:
 
@@ -314,8 +314,8 @@ signals:
      * @param[in] sNewModelPath      New model path.
      */
     void modelPathChanged(QSharedPointer<AbstractModel> pModel,
-                          const QString &sOldModelPath,
-                          const QString &sNewModelPath);
+                          const QString& sOldModelPath,
+                          const QString& sNewModelPath);
 };
 
 } //Namespace

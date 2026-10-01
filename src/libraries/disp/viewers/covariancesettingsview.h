@@ -62,11 +62,11 @@ class DISPSHARED_EXPORT CovarianceSettingsView : public AbstractView
     Q_OBJECT
 
 public:
-    typedef QSharedPointer<CovarianceSettingsView> SPtr;         /**< Shared pointer type for CovarianceAdjustmentWidget. */
-    typedef QSharedPointer<CovarianceSettingsView> ConstSPtr;    /**< Const shared pointer type for CovarianceAdjustmentWidget. */
+    typedef QSharedPointer<CovarianceSettingsView> SPtr;      /**< Shared pointer type for CovarianceAdjustmentWidget. */
+    typedef QSharedPointer<CovarianceSettingsView> ConstSPtr; /**< Const shared pointer type for CovarianceAdjustmentWidget. */
 
     explicit CovarianceSettingsView(const QString& sSettingsPath = "",
-                                    QWidget *parent = 0);
+                                    QWidget* parent = 0);
 
     //=========================================================================================================
     /**
@@ -129,9 +129,8 @@ signals:
     void samplesChanged(int iSamples);
 
 private:
-    QSpinBox*       m_pSpinBoxNumSamples;
-    QString         m_sSettingsPath;            /**< The settings path to store the GUI settings to. */
-
+    QSpinBox* m_pSpinBoxNumSamples;
+    QString m_sSettingsPath; /**< The settings path to store the GUI settings to. */
 };
 } // NAMESPACE DISPLIB
 

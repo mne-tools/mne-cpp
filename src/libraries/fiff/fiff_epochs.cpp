@@ -45,10 +45,10 @@ using namespace Eigen;
 //=============================================================================================================
 
 QList<FiffEpochData> FiffEpochs::makeFixedLengthEpochs(const MatrixXd& matData,
-                                                          double dSFreq,
-                                                          double dDuration,
-                                                          double dOverlap,
-                                                          bool bDropLast)
+                                                       double dSFreq,
+                                                       double dDuration,
+                                                       double dOverlap,
+                                                       bool bDropLast)
 {
     QList<FiffEpochData> epochs;
 

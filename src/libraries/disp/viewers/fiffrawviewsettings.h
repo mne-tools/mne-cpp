@@ -44,8 +44,9 @@
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-namespace Ui {
-    class FiffRawViewSettingsWidget;
+namespace Ui
+{
+class FiffRawViewSettingsWidget;
 }
 
 //=============================================================================================================
@@ -73,8 +74,8 @@ class DISPSHARED_EXPORT FiffRawViewSettings : public AbstractView
     Q_OBJECT
 
 public:
-    typedef QSharedPointer<FiffRawViewSettings> SPtr;              /**< Shared pointer type for FiffRawViewSettings. */
-    typedef QSharedPointer<const FiffRawViewSettings> ConstSPtr;   /**< Const shared pointer type for FiffRawViewSettings. */
+    typedef QSharedPointer<FiffRawViewSettings> SPtr;            /**< Shared pointer type for FiffRawViewSettings. */
+    typedef QSharedPointer<const FiffRawViewSettings> ConstSPtr; /**< Const shared pointer type for FiffRawViewSettings. */
 
     //=========================================================================================================
     /**
@@ -85,7 +86,7 @@ public:
      * @param[in] f Qt window flags passed to the QWidget constructor.
      */
     FiffRawViewSettings(const QString& sSettingsPath = "",
-                        QWidget *parent = 0,
+                        QWidget* parent = 0,
                         Qt::WindowFlags f = Qt::Widget);
 
     //=========================================================================================================
@@ -101,7 +102,7 @@ public:
      * @param[in] lVisibleWidgets       The widgets to be visible: numberChannels, windowSize, distanceSpacers,.
      *                                   backgroundcolor, signalColor, screenshot
      */
-    void setWidgetList(const QStringList &lVisibleWidgets = QStringList());
+    void setWidgetList(const QStringList& lVisibleWidgets = QStringList());
 
     //=========================================================================================================
     /**
@@ -256,9 +257,9 @@ protected:
 
     Ui::FiffRawViewSettingsWidget* m_pUi;
 
-    QColor      m_colCurrentSignalColor;        /**< Current color of the signal. */
-    QColor      m_colCurrentBackgroundColor;    /**< Current color of the background. */
-    QString     m_sSettingsPath;                /**< The settings path to store the GUI settings to. */
+    QColor m_colCurrentSignalColor;     /**< Current color of the signal. */
+    QColor m_colCurrentBackgroundColor; /**< Current color of the background. */
+    QString m_sSettingsPath;            /**< The settings path to store the GUI settings to. */
 
 signals:
     //=========================================================================================================

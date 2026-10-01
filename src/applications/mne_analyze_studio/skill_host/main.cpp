@@ -35,7 +35,7 @@ int g_signalPipe[2] = {-1, -1};
 void handleUnixSignal(int signalValue)
 {
     const char signalByte = static_cast<char>(signalValue);
-    if(g_signalPipe[1] >= 0) {
+    if (g_signalPipe[1] >= 0) {
         //
         // Only async-signal-safe calls are allowed here, so there is nothing
         // useful to do if the pipe is full or the write is interrupted: the
@@ -49,7 +49,7 @@ void handleUnixSignal(int signalValue)
 
 void installUnixSignalHandlers(QCoreApplication& application)
 {
-    if(::pipe(g_signalPipe) != 0) {
+    if (::pipe(g_signalPipe) != 0) {
         return;
     }
 
@@ -63,7 +63,7 @@ void installUnixSignalHandlers(QCoreApplication& application)
         // quitting on a spurious wakeup.
         //
         const ssize_t bytesRead = ::read(g_signalPipe[0], &signalByte, sizeof(signalByte));
-        if(bytesRead > 0) {
+        if (bytesRead > 0) {
             application.quit();
         }
         notifier->setEnabled(true);
@@ -83,19 +83,18 @@ QString resolveStudioExtensionsDirectory()
     const QString relativePath = "src/applications/mne_analyze_studio/extensions";
     const QStringList seedDirectories{
         QDir::currentPath(),
-        QCoreApplication::applicationDirPath()
-    };
+        QCoreApplication::applicationDirPath()};
 
-    for(const QString& seedDirectory : seedDirectories) {
+    for (const QString& seedDirectory : seedDirectories) {
         QDir searchDir(seedDirectory);
-        for(int depth = 0; depth < 8; ++depth) {
+        for (int depth = 0; depth < 8; ++depth) {
             const QString candidate = searchDir.filePath(relativePath);
             QFileInfo candidateInfo(candidate);
-            if(candidateInfo.exists() && candidateInfo.isDir()) {
+            if (candidateInfo.exists() && candidateInfo.isDir()) {
                 return candidateInfo.absoluteFilePath();
             }
 
-            if(!searchDir.cdUp()) {
+            if (!searchDir.cdUp()) {
                 break;
             }
         }
@@ -113,7 +112,7 @@ int main(int argc, char* argv[])
     MNEANALYZESTUDIO::SkillHostService service;
 
     const QString extensionsDirectory = resolveStudioExtensionsDirectory();
-    if(!service.start("mne_analyze_studio.extension_host", extensionsDirectory)) {
+    if (!service.start("mne_analyze_studio.extension_host", extensionsDirectory)) {
         return 1;
     }
 

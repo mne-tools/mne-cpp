@@ -42,7 +42,7 @@ class EpochWindow : public QDockWidget
     Q_OBJECT
 
 public:
-    explicit EpochWindow(QWidget *parent = nullptr);
+    explicit EpochWindow(QWidget* parent = nullptr);
     ~EpochWindow() override;
 
     void init();
@@ -53,7 +53,7 @@ public:
     void refreshFromModel();
 
 protected:
-    bool event(QEvent *event) override;
+    bool event(QEvent* event) override;
 
 private:
     void setupUi();
@@ -63,18 +63,18 @@ private:
 
 private slots:
     void resetManualExclusions();
-    void jumpToEpoch(const QModelIndex &current, const QModelIndex &previous);
+    void jumpToEpoch(const QModelIndex& current, const QModelIndex& previous);
 
 private:
-    MainWindow*  m_pMainWindow = nullptr;
-    QWidget*     m_pContents = nullptr;
+    MainWindow* m_pMainWindow = nullptr;
+    QWidget* m_pContents = nullptr;
     QVBoxLayout* m_pLayout = nullptr;
-    QLabel*      m_pHintLabel = nullptr;
-    QCheckBox*   m_pAutoRejectCheckBox = nullptr;
-    QLabel*      m_pSummaryLabel = nullptr;
-    QToolBar*    m_pToolBar = nullptr;
-    QTableView*  m_pTableView = nullptr;
-    EpochModel*  m_pEpochModel = nullptr;
+    QLabel* m_pHintLabel = nullptr;
+    QCheckBox* m_pAutoRejectCheckBox = nullptr;
+    QLabel* m_pSummaryLabel = nullptr;
+    QToolBar* m_pToolBar = nullptr;
+    QTableView* m_pTableView = nullptr;
+    EpochModel* m_pEpochModel = nullptr;
 };
 
 } // namespace MNEBROWSE

@@ -124,9 +124,9 @@ MlTensor MlTensor::view(float* data, std::vector<int64_t> shape)
 {
     MlTensor t;
     t.m_shape = std::move(shape);
-    t.m_size  = computeSize(t.m_shape);
-    t.m_storage = nullptr;     // non-owning
-    t.m_data    = data;
+    t.m_size = computeSize(t.m_shape);
+    t.m_storage = nullptr; // non-owning
+    t.m_data = data;
     return t;
 }
 
@@ -241,10 +241,10 @@ MlTensor MlTensor::reshape(std::vector<int64_t> newShape) const
     }
 
     MlTensor t;
-    t.m_storage = m_storage;   // share ownership (or null for views)
-    t.m_data    = m_data;
-    t.m_shape   = std::move(newShape);
-    t.m_size    = newSize;
+    t.m_storage = m_storage; // share ownership (or null for views)
+    t.m_data = m_data;
+    t.m_shape = std::move(newShape);
+    t.m_size = newSize;
     return t;
 }
 

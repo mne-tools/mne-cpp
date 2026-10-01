@@ -65,11 +65,11 @@ namespace UTILSLIB
  */
 struct DSPSHARED_EXPORT IcaResult
 {
-    Eigen::MatrixXd matMixing;    /**< Mixing matrix A  (n_channels x n_components). Column k is the spatial pattern of component k. */
-    Eigen::MatrixXd matUnmixing;  /**< Unmixing matrix W (n_components x n_channels). Row k is the spatial filter of component k. */
-    Eigen::MatrixXd matSources;   /**< Source time series S (n_components x n_samples). */
-    Eigen::VectorXd vecMean;      /**< Per-channel mean removed during centering (n_channels). */
-    bool            bConverged;   /**< True if all components converged within maxIter. */
+    Eigen::MatrixXd matMixing;   /**< Mixing matrix A  (n_channels x n_components). Column k is the spatial pattern of component k. */
+    Eigen::MatrixXd matUnmixing; /**< Unmixing matrix W (n_components x n_channels). Row k is the spatial filter of component k. */
+    Eigen::MatrixXd matSources;  /**< Source time series S (n_components x n_samples). */
+    Eigen::VectorXd vecMean;     /**< Per-channel mean removed during centering (n_channels). */
+    bool bConverged;             /**< True if all components converged within maxIter. */
 };
 
 //=============================================================================================================
@@ -103,10 +103,10 @@ public:
      * @return IcaResult containing mixing/unmixing matrices and source time series.
      */
     static IcaResult run(const Eigen::MatrixXd& matData,
-                         int    nComponents = -1,
-                         int    maxIter     = 200,
-                         double tol         = 1e-4,
-                         int    randomSeed  = 42);
+                         int nComponents = -1,
+                         int maxIter = 200,
+                         double tol = 1e-4,
+                         int randomSeed = 42);
 
     //=========================================================================================================
     /**
@@ -119,7 +119,7 @@ public:
      * @return Source matrix (n_components x n_samples).
      */
     static Eigen::MatrixXd applyUnmixing(const Eigen::MatrixXd& matData,
-                                          const IcaResult&       result);
+                                         const IcaResult& result);
 
     //=========================================================================================================
     /**
@@ -133,8 +133,8 @@ public:
      * @return Cleaned sensor data (n_channels x n_samples).
      */
     static Eigen::MatrixXd excludeComponents(const Eigen::MatrixXd& matData,
-                                              const IcaResult&       result,
-                                              const QVector<int>&    excludedComponents);
+                                             const IcaResult& result,
+                                             const QVector<int>& excludedComponents);
 
 private:
     //=========================================================================================================
@@ -150,9 +150,9 @@ private:
      * @return Whitened data (n_components x n_samples).
      */
     static Eigen::MatrixXd whiten(const Eigen::MatrixXd& matCentered,
-                                   int                    nComponents,
-                                   Eigen::MatrixXd&       matWhitening,
-                                   Eigen::MatrixXd&       matDewhitening);
+                                  int nComponents,
+                                  Eigen::MatrixXd& matWhitening,
+                                  Eigen::MatrixXd& matDewhitening);
 };
 
 } // namespace UTILSLIB

@@ -109,9 +109,9 @@ private:
     QString findTestDataPath() const;
 
     MnaProject m_project;
-    MnaGraph   m_graph;
-    QString    m_mnaFilePath;
-    QString    m_testDataPath;
+    MnaGraph m_graph;
+    QString m_mnaFilePath;
+    QString m_testDataPath;
 };
 
 //=============================================================================================================
@@ -133,8 +133,7 @@ void TestMnaInversePipeline::initTestCase()
 
 QString TestMnaInversePipeline::findTestDataPath() const
 {
-    QString base = QCoreApplication::applicationDirPath()
-                   + QStringLiteral("/../resources/data/mne-cpp-test-data");
+    QString base = QCoreApplication::applicationDirPath() + QStringLiteral("/../resources/data/mne-cpp-test-data");
     if (QFile::exists(base + QStringLiteral("/MEG/sample/sample_audvis_trunc_raw.fif")))
         return base;
     return {};
@@ -168,111 +167,110 @@ void TestMnaInversePipeline::registerRealOps()
     // load_fiff_raw — reads raw FIFF and outputs FiffInfo
     //
     reg.registerOpFunc(QStringLiteral("load_fiff_raw"),
-        [dataPath](const QVariantMap& /*inputs*/, const QVariantMap& attrs) -> QVariantMap {
-            QString rawPath = attrs.value(QStringLiteral("raw_path")).toString();
-            rawPath.replace(QLatin1String("${TEST_DATA}"), dataPath);
+                       [dataPath](const QVariantMap& /*inputs*/, const QVariantMap& attrs) -> QVariantMap {
+                           QString rawPath = attrs.value(QStringLiteral("raw_path")).toString();
+                           rawPath.replace(QLatin1String("${TEST_DATA}"), dataPath);
 
-            QFile rawFile(rawPath);
-            FiffRawData raw(rawFile);
-            auto info = QSharedPointer<FiffInfo>::create(raw.info);
+                           QFile rawFile(rawPath);
+                           FiffRawData raw(rawFile);
+                           auto info = QSharedPointer<FiffInfo>::create(raw.info);
 
-            return {
-                {QStringLiteral("raw_data"), QVariant()},
-                {QStringLiteral("info"),     QVariant::fromValue(info)}
-            };
-        });
+                           return {
+                               {QStringLiteral("raw_data"), QVariant()},
+                               {QStringLiteral("info"), QVariant::fromValue(info)}};
+                       });
 
     //
     // load_fiff_evoked — reads evoked response
     //
     reg.registerOpFunc(QStringLiteral("load_fiff_evoked"),
-        [dataPath](const QVariantMap& /*inputs*/, const QVariantMap& attrs) -> QVariantMap {
-            QString evkPath = attrs.value(QStringLiteral("evoked_path")).toString();
-            evkPath.replace(QLatin1String("${TEST_DATA}"), dataPath);
-            int setno = attrs.value(QStringLiteral("setno"), 0).toInt();
+                       [dataPath](const QVariantMap& /*inputs*/, const QVariantMap& attrs) -> QVariantMap {
+                           QString evkPath = attrs.value(QStringLiteral("evoked_path")).toString();
+                           evkPath.replace(QLatin1String("${TEST_DATA}"), dataPath);
+                           int setno = attrs.value(QStringLiteral("setno"), 0).toInt();
 
-            QFile evkFile(evkPath);
-            QPair<float, float> noBaseline(-1.0f, -1.0f);
-            auto evoked = QSharedPointer<FiffEvoked>::create(evkFile, setno, noBaseline);
+                           QFile evkFile(evkPath);
+                           QPair<float, float> noBaseline(-1.0f, -1.0f);
+                           auto evoked = QSharedPointer<FiffEvoked>::create(evkFile, setno, noBaseline);
 
-            return {{QStringLiteral("evoked"), QVariant::fromValue(evoked)}};
-        });
+                           return {{QStringLiteral("evoked"), QVariant::fromValue(evoked)}};
+                       });
 
     //
     // load_fiff_cov — reads noise covariance matrix
     //
     reg.registerOpFunc(QStringLiteral("load_fiff_cov"),
-        [dataPath](const QVariantMap& /*inputs*/, const QVariantMap& attrs) -> QVariantMap {
-            QString covPath = attrs.value(QStringLiteral("cov_path")).toString();
-            covPath.replace(QLatin1String("${TEST_DATA}"), dataPath);
+                       [dataPath](const QVariantMap& /*inputs*/, const QVariantMap& attrs) -> QVariantMap {
+                           QString covPath = attrs.value(QStringLiteral("cov_path")).toString();
+                           covPath.replace(QLatin1String("${TEST_DATA}"), dataPath);
 
-            QFile covFile(covPath);
-            auto cov = QSharedPointer<FiffCov>::create(covFile);
+                           QFile covFile(covPath);
+                           auto cov = QSharedPointer<FiffCov>::create(covFile);
 
-            return {{QStringLiteral("noise_cov"), QVariant::fromValue(cov)}};
-        });
+                           return {{QStringLiteral("noise_cov"), QVariant::fromValue(cov)}};
+                       });
 
     //
     // load_forward — reads pre-computed forward solution
     //
     reg.registerOpFunc(QStringLiteral("load_forward"),
-        [dataPath](const QVariantMap& /*inputs*/, const QVariantMap& attrs) -> QVariantMap {
-            QString fwdPath = attrs.value(QStringLiteral("fwd_path")).toString();
-            fwdPath.replace(QLatin1String("${TEST_DATA}"), dataPath);
+                       [dataPath](const QVariantMap& /*inputs*/, const QVariantMap& attrs) -> QVariantMap {
+                           QString fwdPath = attrs.value(QStringLiteral("fwd_path")).toString();
+                           fwdPath.replace(QLatin1String("${TEST_DATA}"), dataPath);
 
-            QFile fwdFile(fwdPath);
-            auto fwd = QSharedPointer<MNEForwardSolution>::create(fwdFile);
+                           QFile fwdFile(fwdPath);
+                           auto fwd = QSharedPointer<MNEForwardSolution>::create(fwdFile);
 
-            return {{QStringLiteral("forward"), QVariant::fromValue(fwd)}};
-        });
+                           return {{QStringLiteral("forward"), QVariant::fromValue(fwd)}};
+                       });
 
     //
     // make_inverse_operator — builds MNEInverseOperator from FiffInfo + forward + covariance
     //
     reg.registerOpFunc(QStringLiteral("make_inverse_operator"),
-        [](const QVariantMap& inputs, const QVariantMap& attrs) -> QVariantMap {
-            auto info = inputs.value(QStringLiteral("info")).value<QSharedPointer<FiffInfo>>();
-            auto fwd  = inputs.value(QStringLiteral("forward")).value<QSharedPointer<MNEForwardSolution>>();
-            auto cov  = inputs.value(QStringLiteral("noise_cov")).value<QSharedPointer<FiffCov>>();
+                       [](const QVariantMap& inputs, const QVariantMap& attrs) -> QVariantMap {
+                           auto info = inputs.value(QStringLiteral("info")).value<QSharedPointer<FiffInfo>>();
+                           auto fwd = inputs.value(QStringLiteral("forward")).value<QSharedPointer<MNEForwardSolution>>();
+                           auto cov = inputs.value(QStringLiteral("noise_cov")).value<QSharedPointer<FiffCov>>();
 
-            float loose = attrs.value(QStringLiteral("loose"), 0.2).toFloat();
-            float depth = attrs.value(QStringLiteral("depth"), 0.8).toFloat();
+                           float loose = attrs.value(QStringLiteral("loose"), 0.2).toFloat();
+                           float depth = attrs.value(QStringLiteral("depth"), 0.8).toFloat();
 
-            MNEInverseOperator invOpLocal = MNEInverseOperator::make_inverse_operator(
-                *info, *fwd, *cov, loose, depth, false, true);
+                           MNEInverseOperator invOpLocal = MNEInverseOperator::make_inverse_operator(
+                               *info, *fwd, *cov, loose, depth, false, true);
 
-            auto invOp = QSharedPointer<MNEInverseOperator>::create(invOpLocal);
+                           auto invOp = QSharedPointer<MNEInverseOperator>::create(invOpLocal);
 
-            return {{QStringLiteral("inverse_operator"), QVariant::fromValue(invOp)}};
-        });
+                           return {{QStringLiteral("inverse_operator"), QVariant::fromValue(invOp)}};
+                       });
 
     //
     // apply_inverse — applies dSPM/MNE/sLORETA to evoked data, produces source estimate
     //
     reg.registerOpFunc(QStringLiteral("apply_inverse"),
-        [](const QVariantMap& inputs, const QVariantMap& attrs) -> QVariantMap {
-            auto invOp  = inputs.value(QStringLiteral("inverse_operator")).value<QSharedPointer<MNEInverseOperator>>();
-            auto evoked = inputs.value(QStringLiteral("evoked")).value<QSharedPointer<FiffEvoked>>();
+                       [](const QVariantMap& inputs, const QVariantMap& attrs) -> QVariantMap {
+                           auto invOp = inputs.value(QStringLiteral("inverse_operator")).value<QSharedPointer<MNEInverseOperator>>();
+                           auto evoked = inputs.value(QStringLiteral("evoked")).value<QSharedPointer<FiffEvoked>>();
 
-            QString method  = attrs.value(QStringLiteral("method"), QStringLiteral("dSPM")).toString();
-            float snr       = attrs.value(QStringLiteral("snr"), 3.0).toFloat();
-            float lambda2   = 1.0f / (snr * snr);
-            bool pickNormal = attrs.value(QStringLiteral("pick_normal"), false).toBool();
+                           QString method = attrs.value(QStringLiteral("method"), QStringLiteral("dSPM")).toString();
+                           float snr = attrs.value(QStringLiteral("snr"), 3.0).toFloat();
+                           float lambda2 = 1.0f / (snr * snr);
+                           bool pickNormal = attrs.value(QStringLiteral("pick_normal"), false).toBool();
 
-            // Pick channels that match the inverse operator's noise covariance
-            FiffEvoked picked = evoked->pick_channels(invOp->noise_cov->names);
+                           // Pick channels that match the inverse operator's noise covariance
+                           FiffEvoked picked = evoked->pick_channels(invOp->noise_cov->names);
 
-            float tmin  = picked.times(0);
-            float tstep = 1.0f / picked.info.sfreq;
+                           float tmin = picked.times(0);
+                           float tstep = 1.0f / picked.info.sfreq;
 
-            InvMinimumNorm mn(*invOp, lambda2, method);
-            mn.doInverseSetup(evoked->nave, pickNormal);
+                           InvMinimumNorm mn(*invOp, lambda2, method);
+                           mn.doInverseSetup(evoked->nave, pickNormal);
 
-            InvSourceEstimate stcLocal = mn.calculateInverse(picked.data, tmin, tstep, pickNormal);
-            auto stc = QSharedPointer<InvSourceEstimate>::create(stcLocal);
+                           InvSourceEstimate stcLocal = mn.calculateInverse(picked.data, tmin, tstep, pickNormal);
+                           auto stc = QSharedPointer<InvSourceEstimate>::create(stcLocal);
 
-            return {{QStringLiteral("source_estimate"), QVariant::fromValue(stc)}};
-        });
+                           return {{QStringLiteral("source_estimate"), QVariant::fromValue(stc)}};
+                       });
 }
 
 //=============================================================================================================
@@ -327,12 +325,12 @@ void TestMnaInversePipeline::testGraphTopology()
     QStringList order = m_graph.topologicalSort();
     QCOMPARE(order.size(), 6);
 
-    int idxLoadRaw    = order.indexOf(QStringLiteral("load_raw"));
+    int idxLoadRaw = order.indexOf(QStringLiteral("load_raw"));
     int idxLoadEvoked = order.indexOf(QStringLiteral("load_evoked"));
-    int idxLoadCov    = order.indexOf(QStringLiteral("load_cov"));
-    int idxLoadFwd    = order.indexOf(QStringLiteral("load_fwd"));
-    int idxMakeInv    = order.indexOf(QStringLiteral("make_inv"));
-    int idxApplyDspm  = order.indexOf(QStringLiteral("apply_dspm"));
+    int idxLoadCov = order.indexOf(QStringLiteral("load_cov"));
+    int idxLoadFwd = order.indexOf(QStringLiteral("load_fwd"));
+    int idxMakeInv = order.indexOf(QStringLiteral("make_inv"));
+    int idxApplyDspm = order.indexOf(QStringLiteral("apply_dspm"));
 
     // All nodes present
     QVERIFY(idxLoadRaw >= 0);
@@ -401,7 +399,7 @@ void TestMnaInversePipeline::testExecuteRealPipeline()
         QVERIFY2(!cov.isNull(), "FiffCov is null");
         QVERIFY2(!cov->isEmpty(), "Noise covariance is empty");
         QVERIFY2(cov->data.rows() > 0, "Covariance matrix has 0 rows");
-        QCOMPARE(cov->data.rows(), cov->data.cols());   // must be square
+        QCOMPARE(cov->data.rows(), cov->data.cols()); // must be square
         QVERIFY(cov->names.size() > 0);
         QCOMPARE(cov->names.size(), (int)cov->data.rows());
         qInfo() << "        " << cov->data.rows() << "x" << cov->data.cols()
@@ -495,9 +493,9 @@ void TestMnaInversePipeline::testMnaFileRoundTrip()
     QCOMPARE(loaded.pipeline.size(), m_project.pipeline.size());
 
     for (int i = 0; i < m_project.pipeline.size(); ++i) {
-        QCOMPARE(loaded.pipeline[i].id,     m_project.pipeline[i].id);
+        QCOMPARE(loaded.pipeline[i].id, m_project.pipeline[i].id);
         QCOMPARE(loaded.pipeline[i].opType, m_project.pipeline[i].opType);
-        QCOMPARE(loaded.pipeline[i].inputs.size(),  m_project.pipeline[i].inputs.size());
+        QCOMPARE(loaded.pipeline[i].inputs.size(), m_project.pipeline[i].inputs.size());
         QCOMPARE(loaded.pipeline[i].outputs.size(), m_project.pipeline[i].outputs.size());
     }
 }

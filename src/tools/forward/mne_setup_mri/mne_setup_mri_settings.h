@@ -28,7 +28,8 @@
 // DEFINE NAMESPACE MNESETUPMRI
 //=============================================================================================================
 
-namespace MNESETUPMRI {
+namespace MNESETUPMRI
+{
 
 //=============================================================================================================
 /**
@@ -46,7 +47,7 @@ public:
      * @param[in] argc  Number of arguments.
      * @param[in] argv  Argument array.
      */
-    MNESetupMriSettings(int *argc, char **argv);
+    MNESetupMriSettings(int* argc, char** argv);
 
     //=========================================================================================================
     /**
@@ -89,11 +90,11 @@ public:
     bool verbose() const;
 
 private:
-    QString     m_sSubject;         /**< Subject name. */
-    QString     m_sSubjectsDir;     /**< Subjects directory path. */
-    QStringList m_slMriSets;        /**< MRI set names to process. */
-    bool        m_bOverwrite;       /**< Whether to overwrite existing data. */
-    bool        m_bVerbose;         /**< Verbose output. */
+    QString m_sSubject;      /**< Subject name. */
+    QString m_sSubjectsDir;  /**< Subjects directory path. */
+    QStringList m_slMriSets; /**< MRI set names to process. */
+    bool m_bOverwrite;       /**< Whether to overwrite existing data. */
+    bool m_bVerbose;         /**< Verbose output. */
 };
 
 } // namespace MNESETUPMRI

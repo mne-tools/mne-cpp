@@ -46,13 +46,13 @@ using namespace INVLIB;
 //=============================================================================================================
 
 InvHpiModelParameters::InvHpiModelParameters(const QVector<int> vecHpiFreqs,
-                                       const int iSampleFreq,
-                                       const int iLineFreq,
-                                       const bool bBasic)
-    : m_vecHpiFreqs(vecHpiFreqs),
-      m_iSampleFreq(iSampleFreq),
-      m_iLineFreq(iLineFreq),
-      m_bBasic(bBasic)
+                                             const int iSampleFreq,
+                                             const int iLineFreq,
+                                             const bool bBasic)
+: m_vecHpiFreqs(vecHpiFreqs)
+, m_iSampleFreq(iSampleFreq)
+, m_iLineFreq(iLineFreq)
+, m_bBasic(bBasic)
 {
     computeNumberOfCoils();
     checkForLineFreq();
@@ -61,11 +61,11 @@ InvHpiModelParameters::InvHpiModelParameters(const QVector<int> vecHpiFreqs,
 //=============================================================================================================
 
 InvHpiModelParameters::InvHpiModelParameters(const InvHpiModelParameters& hpiModelParameter)
-    : m_vecHpiFreqs(hpiModelParameter.vecHpiFreqs()),
-      m_iNHpiCoils(hpiModelParameter.iNHpiCoils()),
-      m_iSampleFreq(hpiModelParameter.iSampleFreq()),
-      m_iLineFreq(hpiModelParameter.iLineFreq()),
-      m_bBasic(hpiModelParameter.bBasic())
+: m_vecHpiFreqs(hpiModelParameter.vecHpiFreqs())
+, m_iNHpiCoils(hpiModelParameter.iNHpiCoils())
+, m_iSampleFreq(hpiModelParameter.iSampleFreq())
+, m_iLineFreq(hpiModelParameter.iLineFreq())
+, m_bBasic(hpiModelParameter.bBasic())
 {
 }
 
@@ -78,14 +78,14 @@ void InvHpiModelParameters::computeNumberOfCoils()
 
 void InvHpiModelParameters::checkForLineFreq()
 {
-    if(m_iLineFreq == 0) {
+    if (m_iLineFreq == 0) {
         m_bBasic = true;
     }
 }
 
 //=============================================================================================================
 
-InvHpiModelParameters InvHpiModelParameters::operator= (const InvHpiModelParameters& other)
+InvHpiModelParameters InvHpiModelParameters::operator=(const InvHpiModelParameters& other)
 {
     if (this != &other) {
         m_vecHpiFreqs = other.vecHpiFreqs();

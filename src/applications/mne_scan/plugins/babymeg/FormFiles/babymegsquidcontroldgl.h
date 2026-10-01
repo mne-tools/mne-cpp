@@ -46,7 +46,7 @@ class PlotSettings;
 
 namespace Ui
 {
-    class BabyMEGSQUIDControlDgl;
+class BabyMEGSQUIDControlDgl;
 }
 
 //=============================================================================================================
@@ -66,7 +66,8 @@ class PlotSettings;
 //=============================================================================================================
 // Structure definitions
 //=============================================================================================================
-struct FLLPara{
+struct FLLPara
+{
     int Bias;
     int Mod;
     int Mode;
@@ -83,15 +84,17 @@ struct FLLPara{
     QString channame;
 };
 
-struct FLLConfig{
-    QList < FLLPara > m_Fll;
+struct FLLConfig
+{
+    QList<FLLPara> m_Fll;
 };
 
 //=============================================================================================================
 // GUI Status Machine Structure definitions
 //=============================================================================================================
 
-struct GUIStatMachine{
+struct GUIStatMachine
+{
     int CommType;
     int ChannelSel;
     int ChannelStat;
@@ -128,7 +131,7 @@ struct GUIStatMachine{
 
     int BarGraphSelect;
 
-    QVector <double> ParaGraph;
+    QVector<double> ParaGraph;
 };
 
 //=============================================================================================================
@@ -142,9 +145,9 @@ class BABYMEGSHARED_EXPORT BabyMEGSQUIDControlDgl : public QDialog
     Q_OBJECT
 
 public:
-    explicit BabyMEGSQUIDControlDgl(BabyMEG* p_pBabyMEG,QWidget *parent = 0);
+    explicit BabyMEGSQUIDControlDgl(BabyMEG* p_pBabyMEG, QWidget* parent = 0);
     ~BabyMEGSQUIDControlDgl();
-    
+
     void SendCMD(QString CMDSTR);
     void InitChannels(QString sReply);
     void InitGUIConfig(QString sFLLPara);
@@ -156,8 +159,8 @@ public:
     void InitTuneGraph();
     void TuneGraphDispProc(Eigen::MatrixXf tmp);
     void UpdateParaGraph();
-    float mmin(Eigen::MatrixXf tmp,int chan);
-    float mmax(Eigen::MatrixXf tmp,int chan);
+    float mmin(Eigen::MatrixXf tmp, int chan);
+    float mmax(Eigen::MatrixXf tmp, int chan);
 
     void RcvCMDData(QByteArray DATA);
 
@@ -200,27 +203,27 @@ public:
     void AdjuBias();
     void AdjuModu();
 
-    BabyMEG*                        m_pBabyMEG;
-    FLLConfig                       m_FLLConfig;
-    GUIStatMachine                  m_GUISM;
-    QVector <QGraphicsLineItem*>    PolyLinePtr;
-    bool                            initplotflag;
-    QVector <QGraphicsRectItem*>    PolyRectPtr;
+    BabyMEG* m_pBabyMEG;
+    FLLConfig m_FLLConfig;
+    GUIStatMachine m_GUISM;
+    QVector<QGraphicsLineItem*> PolyLinePtr;
+    bool initplotflag;
+    QVector<QGraphicsRectItem*> PolyRectPtr;
 
-    PlotSettings                    settings;
-    PlotSettings                    settings_tune;
+    PlotSettings settings;
+    PlotSettings settings_tune;
 
-    Plotter*                        d_timeplot;
+    Plotter* d_timeplot;
 
-    int                             TableRows;
-    int                             TableCols;
-    QList<QString>                  chanNames;
+    int TableRows;
+    int TableCols;
+    QList<QString> chanNames;
 
 protected:
-     virtual void closeEvent( QCloseEvent * event );
+    virtual void closeEvent(QCloseEvent* event);
 
 private:
-    Ui::BabyMEGSQUIDControlDgl*     ui;
+    Ui::BabyMEGSQUIDControlDgl* ui;
 
 signals:
     void SendCMDToMEGSource(QString CMDSTR);

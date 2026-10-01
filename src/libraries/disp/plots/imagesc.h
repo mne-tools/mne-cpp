@@ -80,7 +80,7 @@ public:
      *
      * @param[in] parent     Parent QObject (optional).
      */
-    explicit ImageSc(QWidget *parent = 0);
+    explicit ImageSc(QWidget* parent = 0);
 
     //=========================================================================================================
     /**
@@ -89,8 +89,8 @@ public:
      * @param[in] p_dMat     The double data matrix.
      * @param[in] parent     Parent QObject (optional).
      */
-    explicit ImageSc(Eigen::MatrixXd &p_dMat,
-                     QWidget *parent = 0);
+    explicit ImageSc(Eigen::MatrixXd& p_dMat,
+                     QWidget* parent = 0);
 
     //=========================================================================================================
     /**
@@ -99,8 +99,8 @@ public:
      * @param[in] p_fMat     The float data matrix.
      * @param[in] parent     Parent QObject (optional).
      */
-    explicit ImageSc(Eigen::MatrixXf &p_fMat,
-                     QWidget *parent = 0);
+    explicit ImageSc(Eigen::MatrixXf& p_fMat,
+                     QWidget* parent = 0);
 
     //=========================================================================================================
     /**
@@ -109,8 +109,8 @@ public:
      * @param[in] p_iMat     The integer data matrix.
      * @param[in] parent     Parent QObject (optional).
      */
-    explicit ImageSc(Eigen::MatrixXi &p_iMat,
-                     QWidget *parent = 0);
+    explicit ImageSc(Eigen::MatrixXi& p_iMat,
+                     QWidget* parent = 0);
 
     //=========================================================================================================
     /**
@@ -130,7 +130,7 @@ public:
      *
      * @param[in] p_dMat     The double data matrix.
      */
-    void updateData(Eigen::MatrixXd &p_dMat);
+    void updateData(Eigen::MatrixXd& p_dMat);
 
     //=========================================================================================================
     /**
@@ -138,14 +138,14 @@ public:
      *
      * @param[in] p_fMat     The float data matrix.
      */
-    void updateData(Eigen::MatrixXf &p_fMat);
+    void updateData(Eigen::MatrixXf& p_fMat);
     //=========================================================================================================
     /**
      * Updates the scaled image view with a given integer matrix.
      *
      * @param[in] p_iMat     The integer data matrix.
      */
-    void updateData(Eigen::MatrixXi &p_iMat);
+    void updateData(Eigen::MatrixXi& p_iMat);
 
     //=========================================================================================================
     /**
@@ -153,7 +153,7 @@ public:
      *
      * @param[in] p_sColorMap    The colormap to use.
      */
-    void setColorMap(const QString &p_sColorMap);
+    void setColorMap(const QString& p_sColorMap);
 
 protected:
     //=========================================================================================================
@@ -170,25 +170,25 @@ protected:
      */
     void paintEvent(QPaintEvent* event);
 
-    QPixmap*            m_pPixmapData;              /**< data pixmap. */
-    QPixmap*            m_pPixmapColorbar;          /**< colorbar pixmap. */
+    QPixmap* m_pPixmapData;     /**< data pixmap. */
+    QPixmap* m_pPixmapColorbar; /**< colorbar pixmap. */
 
-    QString             m_sColorMap;                /**< The colorbar. */
+    QString m_sColorMap; /**< The colorbar. */
 
-    Eigen::MatrixXd     m_matCentNormData;          /**< centralized and normalized data. */
+    Eigen::MatrixXd m_matCentNormData; /**< centralized and normalized data. */
 
-    double              m_dMinValue;                /**< Minimal data value. */
-    double              m_dMaxValue;                /**< Maximal data value. */
+    double m_dMinValue; /**< Minimal data value. */
+    double m_dMaxValue; /**< Maximal data value. */
 
-    bool                m_bColorbar;                /**< If colorbar is visible. */
-    QVector<double>     m_qVecScaleValues;          /**< Scale values. */
-    qint32              m_iColorbarWidth;           /**< Colorbar width. */
-    qint32              m_iColorbarSteps;           /**< Number of colorbar vaues to display. */
-    qint32              m_iColorbarGradSteps;       /**< Gradient steps of the colorbar. */
-    QFont               m_qFontColorbar;            /**< Colorbar font. */
-    QPen                m_qPenColorbar;             /**< Colorbar pen. */
+    bool m_bColorbar;                  /**< If colorbar is visible. */
+    QVector<double> m_qVecScaleValues; /**< Scale values. */
+    qint32 m_iColorbarWidth;           /**< Colorbar width. */
+    qint32 m_iColorbarSteps;           /**< Number of colorbar vaues to display. */
+    qint32 m_iColorbarGradSteps;       /**< Gradient steps of the colorbar. */
+    QFont m_qFontColorbar;             /**< Colorbar font. */
+    QPen m_qPenColorbar;               /**< Colorbar pen. */
 
-    QRgb                (*pColorMapper)(double, const QString&);    /**< Function pointer to current colormap. */
+    QRgb (*pColorMapper)(double, const QString&); /**< Function pointer to current colormap. */
 };
 
 //=============================================================================================================

@@ -50,10 +50,10 @@ using namespace Eigen;
 namespace MNEBROWSE
 {
 
-typedef Matrix<double,Dynamic,Dynamic,RowMajor> MatrixXdR;
-typedef QPair<const double*,qint32> RowVectorPair;
-typedef QPair<const float*,qint32> RowVectorPairF;
-typedef QPair<int,int> QPairInts;
+typedef Matrix<double, Dynamic, Dynamic, RowMajor> MatrixXdR;
+typedef QPair<const double*, qint32> RowVectorPair;
+typedef QPair<const float*, qint32> RowVectorPairF;
+typedef QPair<int, int> QPairInts;
 
 struct WhiteningSettings
 {
@@ -67,44 +67,56 @@ struct WhiteningSettings
 
 namespace RawModelRoles
 {
-    enum ItemRole{GetChannelMean = Qt::UserRole + 1000};
+enum ItemRole
+{
+    GetChannelMean = Qt::UserRole + 1000
+};
 }
 
 namespace AverageModelRoles
 {
-    enum ItemRole{GetAverageData = Qt::UserRole + 1001,
-                  GetFiffInfo = Qt::UserRole + 1002,
-                  GetAspectKind = Qt::UserRole + 1003,
-                  GetFirstSample = Qt::UserRole + 1004,
-                  GetLastSample = Qt::UserRole + 1005,
-                  GetComment = Qt::UserRole + 1006,
-                  GetTimeData = Qt::UserRole + 1007,
-                  GetProjections = Qt::UserRole + 1008,
-                  GetNumAverages = Qt::UserRole + 1009,
-                  GetBaselineText = Qt::UserRole + 1010};
+enum ItemRole
+{
+    GetAverageData = Qt::UserRole + 1001,
+    GetFiffInfo = Qt::UserRole + 1002,
+    GetAspectKind = Qt::UserRole + 1003,
+    GetFirstSample = Qt::UserRole + 1004,
+    GetLastSample = Qt::UserRole + 1005,
+    GetComment = Qt::UserRole + 1006,
+    GetTimeData = Qt::UserRole + 1007,
+    GetProjections = Qt::UserRole + 1008,
+    GetNumAverages = Qt::UserRole + 1009,
+    GetBaselineText = Qt::UserRole + 1010
+};
 }
 
 namespace ChannelInfoModelRoles
 {
-    enum ItemRole{GetOrigChName = Qt::UserRole + 1009,
-                  GetMappedLayoutChName = Qt::UserRole + 1010,
-                  GetChNumber = Qt::UserRole + 1011,
-                  GetChKind = Qt::UserRole + 1012,
-                  GetMEGType = Qt::UserRole + 1013,
-                  GetChUnit = Qt::UserRole + 1014,
-                  GetChAlias = Qt::UserRole + 1015,
-                  GetChPosition = Qt::UserRole + 1016,
-                  GetChDigitizer = Qt::UserRole + 1017,
-                  GetChActiveFilter = Qt::UserRole + 1018,
-                  GetChCoilType = Qt::UserRole + 1019};
+enum ItemRole
+{
+    GetOrigChName = Qt::UserRole + 1009,
+    GetMappedLayoutChName = Qt::UserRole + 1010,
+    GetChNumber = Qt::UserRole + 1011,
+    GetChKind = Qt::UserRole + 1012,
+    GetMEGType = Qt::UserRole + 1013,
+    GetChUnit = Qt::UserRole + 1014,
+    GetChAlias = Qt::UserRole + 1015,
+    GetChPosition = Qt::UserRole + 1016,
+    GetChDigitizer = Qt::UserRole + 1017,
+    GetChActiveFilter = Qt::UserRole + 1018,
+    GetChCoilType = Qt::UserRole + 1019
+};
 }
 
 namespace ProjectionModelRoles
 {
-    enum ItemRole{GetProjectionData = Qt::UserRole + 1019,
-                  GetProjectionName = Qt::UserRole + 1020,
-                  GetProjectionState = Qt::UserRole + 1021,
-                  GetProjectionDimension = Qt::UserRole + 1022};
+enum ItemRole
+{
+    GetProjectionData = Qt::UserRole + 1019,
+    GetProjectionName = Qt::UserRole + 1020,
+    GetProjectionState = Qt::UserRole + 1021,
+    GetProjectionDimension = Qt::UserRole + 1022
+};
 }
 
 } //NAMESPACE

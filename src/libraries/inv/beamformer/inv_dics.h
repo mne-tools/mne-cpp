@@ -54,8 +54,14 @@
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-namespace MNELIB { class MNEForwardSolution; }
-namespace FIFFLIB { class FiffInfo; }
+namespace MNELIB
+{
+class MNEForwardSolution;
+}
+namespace FIFFLIB
+{
+class FiffInfo;
+}
 
 //=============================================================================================================
 // DEFINE NAMESPACE INVLIB
@@ -87,7 +93,6 @@ namespace INVLIB
 class INVSHARED_EXPORT InvDICS
 {
 public:
-
     //=========================================================================================================
     /**
      * Compute DICS beamformer spatial filters for one or more frequencies.
@@ -107,13 +112,13 @@ public:
      *
      * @return Beamformer with one filter weight matrix per frequency.
      */
-    static InvBeamformer makeDICS(const FIFFLIB::FiffInfo &info,
-                                  const MNELIB::MNEForwardSolution &forward,
-                                  const std::vector<Eigen::MatrixXd> &csdMatrices,
-                                  const Eigen::VectorXd &frequencies,
+    static InvBeamformer makeDICS(const FIFFLIB::FiffInfo& info,
+                                  const MNELIB::MNEForwardSolution& forward,
+                                  const std::vector<Eigen::MatrixXd>& csdMatrices,
+                                  const Eigen::VectorXd& frequencies,
                                   double reg = 0.05,
                                   bool realFilter = true,
-                                  const FIFFLIB::FiffCov &noiseCov = FIFFLIB::FiffCov(),
+                                  const FIFFLIB::FiffCov& noiseCov = FIFFLIB::FiffCov(),
                                   BeamformerPickOri pickOri = BeamformerPickOri::None,
                                   BeamformerWeightNorm weightNorm = BeamformerWeightNorm::UnitNoiseGain,
                                   bool reduceRank = false,
@@ -131,9 +136,9 @@ public:
      *
      * @return Source estimate where data has shape (n_sources, n_freqs) with power values.
      */
-    static InvSourceEstimate applyDICSCsd(const std::vector<Eigen::MatrixXd> &csdMatrices,
-                                          const Eigen::VectorXd &frequencies,
-                                          const InvBeamformer &filters);
+    static InvSourceEstimate applyDICSCsd(const std::vector<Eigen::MatrixXd>& csdMatrices,
+                                          const Eigen::VectorXd& frequencies,
+                                          const InvBeamformer& filters);
 
     //=========================================================================================================
     /**
@@ -150,10 +155,10 @@ public:
      *
      * @return Source time-course estimate.
      */
-    static InvSourceEstimate applyDICS(const Eigen::MatrixXd &data,
+    static InvSourceEstimate applyDICS(const Eigen::MatrixXd& data,
                                        float tmin,
                                        float tstep,
-                                       const InvBeamformer &filters,
+                                       const InvBeamformer& filters,
                                        int freqIdx = 0);
 
     //=========================================================================================================
@@ -168,11 +173,11 @@ public:
      *
      * @return List of source estimates, one per epoch.
      */
-    static QList<InvSourceEstimate> applyDICSEpochs(const QList<Eigen::MatrixXd> &epochs,
-                                                     float tmin,
-                                                     float tstep,
-                                                     const InvBeamformer &filters,
-                                                     int freqIdx = 0);
+    static QList<InvSourceEstimate> applyDICSEpochs(const QList<Eigen::MatrixXd>& epochs,
+                                                    float tmin,
+                                                    float tstep,
+                                                    const InvBeamformer& filters,
+                                                    int freqIdx = 0);
 };
 
 } // NAMESPACE INVLIB

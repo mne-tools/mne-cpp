@@ -62,8 +62,8 @@ private slots:
         Vector3d pos;
         QVERIFY(StandardMontage::findElectrode("Cz", pos));
         // Cz should be at midline, superior position
-        QVERIFY(std::abs(pos.x()) < 0.001);  // midline
-        QVERIFY(pos.z() > 0.05);              // superior
+        QVERIFY(std::abs(pos.x()) < 0.001); // midline
+        QVERIFY(pos.z() > 0.05);            // superior
     }
 
     void testFindElectrodeCaseInsensitive()
@@ -98,9 +98,9 @@ private slots:
         QVERIFY(StandardMontage::findElectrode("Fp1", fp1));
         QVERIFY(StandardMontage::findElectrode("Fp2", fp2));
 
-        QVERIFY(std::abs(fp1.x() + fp2.x()) < 0.005);  // x symmetric
-        QVERIFY(std::abs(fp1.y() - fp2.y()) < 0.005);   // y same
-        QVERIFY(std::abs(fp1.z() - fp2.z()) < 0.005);   // z same
+        QVERIFY(std::abs(fp1.x() + fp2.x()) < 0.005); // x symmetric
+        QVERIFY(std::abs(fp1.y() - fp2.y()) < 0.005); // y same
+        QVERIFY(std::abs(fp1.z() - fp2.z()) < 0.005); // z same
     }
 
     void testElectrodeCountMethod()

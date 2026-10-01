@@ -49,7 +49,8 @@ using namespace Eigen;
 // HELPERS
 //=============================================================================================================
 
-namespace {
+namespace
+{
 
 /**
  * @brief Build a minimal FiffInfo with nCh MEG channels at given sfreq.
@@ -374,12 +375,11 @@ void TestDspAnnotateArtifact::testAnnotationTiming()
     // Find annotation covering the 100-109 block
     bool foundTiming = false;
     for (int i = 0; i < annot.size(); ++i) {
-        const double expectedOnset = 100.0 / sfreq;     // 0.1 s
-        const double expectedDur   = 10.0 / sfreq;      // 0.01 s
+        const double expectedOnset = 100.0 / sfreq; // 0.1 s
+        const double expectedDur = 10.0 / sfreq;    // 0.01 s
 
         if (std::abs(annot[i].onset - expectedOnset) < 1e-6 &&
-            std::abs(annot[i].duration - expectedDur) < 1e-6)
-        {
+            std::abs(annot[i].duration - expectedDur) < 1e-6) {
             foundTiming = true;
         }
     }

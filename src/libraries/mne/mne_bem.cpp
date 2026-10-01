@@ -56,27 +56,26 @@ MNEBem::MNEBem()
 
 //=============================================================================================================
 
-MNEBem::MNEBem(const MNEBem &p_MNEBem)
+MNEBem::MNEBem(const MNEBem& p_MNEBem)
 : m_qListBemSurface(p_MNEBem.m_qListBemSurface)
 {
 }
 
 //=============================================================================================================
 
-MNEBem::MNEBem(QIODevice &p_IODevice)   //const MNEBem &p_MNEBem
+MNEBem::MNEBem(QIODevice& p_IODevice) //const MNEBem &p_MNEBem
 //: m_qListBemSurface()
 {
     FiffStream::SPtr t_pStream(new FiffStream(&p_IODevice));
 
-    if(!MNEBem::readFromStream(t_pStream, true, *this))
-    {
+    if (!MNEBem::readFromStream(t_pStream, true, *this)) {
         t_pStream->close();
         throw std::runtime_error("Could not read the bem surfaces\n");
         //ToDo error(me,'Could not read the bem surfaces (%s)',mne_omit_first_line(lasterr));
-//        return false;
+        //        return false;
     }
 
-//    bool testStream =t_pStream->device()->isOpen();
+    //    bool testStream =t_pStream->device()->isOpen();
 }
 
 //=============================================================================================================
@@ -100,21 +99,19 @@ bool MNEBem::readFromStream(FiffStream::SPtr& p_pStream, bool add_geom, MNEBem& 
     //   Open the file, create directory
     //
     bool open_here = false;
-    QFile t_file;//ToDo TCPSocket;
+    QFile t_file; //ToDo TCPSocket;
 
-    if (!p_pStream->device()->isOpen())
-    {
+    if (!p_pStream->device()->isOpen()) {
         QString t_sFileName = p_pStream->streamName();
 
         t_file.setFileName(t_sFileName);
         p_pStream = FiffStream::SPtr(new FiffStream(&t_file));
-        if(!p_pStream->open())
-        {
+        if (!p_pStream->open()) {
             return false;
         }
         open_here = true;
-//        if(t_pDir)
-//            delete t_pDir;
+        //        if(t_pDir)
+        //            delete t_pDir;
     }
 
     //
@@ -122,47 +119,40 @@ bool MNEBem::readFromStream(FiffStream::SPtr& p_pStream, bool add_geom, MNEBem& 
     //
 
     QList<FiffDirNode::SPtr> bem = p_pStream->dirtree()->dir_tree_find(FIFFB_BEM);
-    if(bem.isEmpty())
-    {
+    if (bem.isEmpty()) {
         qCritical() << "No BEM block found!";
-        if(open_here)
-        {
+        if (open_here) {
             p_pStream->close();
         }
         return false;
     }
 
     QList<FiffDirNode::SPtr> bemsurf = p_pStream->dirtree()->dir_tree_find(FIFFB_BEM_SURF);
-    if(bemsurf.isEmpty())
-    {
+    if (bemsurf.isEmpty()) {
         qCritical() << "No BEM surfaces found!";
-        if(open_here)
-        {
+        if (open_here) {
             p_pStream->close();
         }
         return false;
     }
 
-    for(int k = 0; k < bemsurf.size(); ++k)
-    {
-        MNEBemSurface  p_BemSurface;
+    for (int k = 0; k < bemsurf.size(); ++k) {
+        MNEBemSurface p_BemSurface;
         qInfo("\tReading a BEM surface...");
         MNEBem::readBemSurface(p_pStream, bemsurf[k], p_BemSurface);
         p_BemSurface.addTriangleData();
-        if (add_geom)
-        {
-           p_BemSurface.addVertexNormals();
+        if (add_geom) {
+            p_BemSurface.addVertexNormals();
         }
-        qInfo("\t[done]\n" );
+        qInfo("\t[done]\n");
 
         p_Bem.m_qListBemSurface.append(p_BemSurface);
-//           src(k) = this;
+        //           src(k) = this;
     }
 
     qInfo("\t%lld bem surfaces read\n", bemsurf.size());
 
-    if(open_here)
-    {
+    if (open_here) {
         p_pStream->close();
     }
     return true;
@@ -170,92 +160,73 @@ bool MNEBem::readFromStream(FiffStream::SPtr& p_pStream, bool add_geom, MNEBem& 
 
 //=============================================================================================================
 
-bool MNEBem::readBemSurface(FiffStream::SPtr& p_pStream, const FiffDirNode::SPtr &p_Tree, MNEBemSurface &p_BemSurface)
+bool MNEBem::readBemSurface(FiffStream::SPtr& p_pStream, const FiffDirNode::SPtr& p_Tree, MNEBemSurface& p_BemSurface)
 {
     p_BemSurface.clear();
 
     FiffTag::UPtr t_pTag;
 
     //=====================================================================
-    if(!p_Tree->find_tag(p_pStream, FIFF_BEM_SURF_ID, t_pTag))
-    {
-         p_BemSurface.id = FIFFV_BEM_SURF_ID_UNKNOWN;
-    }
-    else
-    {
-         p_BemSurface.id = *t_pTag->toInt();
+    if (!p_Tree->find_tag(p_pStream, FIFF_BEM_SURF_ID, t_pTag)) {
+        p_BemSurface.id = FIFFV_BEM_SURF_ID_UNKNOWN;
+    } else {
+        p_BemSurface.id = *t_pTag->toInt();
     }
 
-//    qDebug() << "Read BemSurface ID; type:" << t_pTag->getType() << "value:" << *t_pTag->toInt();
+    //    qDebug() << "Read BemSurface ID; type:" << t_pTag->getType() << "value:" << *t_pTag->toInt();
 
     //=====================================================================
-    if(!p_Tree->find_tag(p_pStream, FIFF_BEM_SIGMA, t_pTag))
-    {
-         p_BemSurface.sigma = 1.0;
-    }
-    else
-    {
-         p_BemSurface.sigma = *t_pTag->toFloat();
+    if (!p_Tree->find_tag(p_pStream, FIFF_BEM_SIGMA, t_pTag)) {
+        p_BemSurface.sigma = 1.0;
+    } else {
+        p_BemSurface.sigma = *t_pTag->toFloat();
     }
 
-//    qDebug() <<
+    //    qDebug() <<
 
     //=====================================================================
-    if(!p_Tree->find_tag(p_pStream, FIFF_BEM_SURF_NNODE, t_pTag))
-    {
+    if (!p_Tree->find_tag(p_pStream, FIFF_BEM_SURF_NNODE, t_pTag)) {
         p_pStream->close();
         qWarning() << "np not found!";
         return false;
-    }
-    else
-    {
-         p_BemSurface.np = *t_pTag->toInt();
+    } else {
+        p_BemSurface.np = *t_pTag->toInt();
     }
 
-//    qDebug() <<
+    //    qDebug() <<
 
     //=====================================================================
-    if(!p_Tree->find_tag(p_pStream, FIFF_BEM_SURF_NTRI, t_pTag))
-    {
+    if (!p_Tree->find_tag(p_pStream, FIFF_BEM_SURF_NTRI, t_pTag)) {
         p_pStream->close();
         qWarning() << "ntri not found!";
         return false;
-    }
-    else
-    {
-         p_BemSurface.ntri = *t_pTag->toInt();
+    } else {
+        p_BemSurface.ntri = *t_pTag->toInt();
     }
 
-//    qDebug() <<
+    //    qDebug() <<
 
     //=====================================================================
-    if(!p_Tree->find_tag(p_pStream, FIFF_MNE_COORD_FRAME, t_pTag))
-    {
+    if (!p_Tree->find_tag(p_pStream, FIFF_MNE_COORD_FRAME, t_pTag)) {
         qWarning() << "FIFF_MNE_COORD_FRAME not found, trying FIFF_BEM_COORD_FRAME.";
-        if(!p_Tree->find_tag(p_pStream, FIFF_BEM_COORD_FRAME, t_pTag))
-        {
+        if (!p_Tree->find_tag(p_pStream, FIFF_BEM_COORD_FRAME, t_pTag)) {
             p_pStream->close();
             throw std::runtime_error("Coordinate frame information not found.");
-        }
-        else
-        {
+        } else {
             p_BemSurface.coord_frame = *t_pTag->toInt();
         }
-    }
-    else
-    {
-         p_BemSurface.coord_frame = *t_pTag->toInt();
+    } else {
+        p_BemSurface.coord_frame = *t_pTag->toInt();
     }
 
-//    qDebug() <<
+    //    qDebug() <<
 
     //=====================================================================
     //
     //   Vertices, normals, and triangles
     //
     //=====================================================================
-    if(!p_Tree->find_tag(p_pStream, FIFF_BEM_SURF_NODES, t_pTag))
-    {
+    if (!p_Tree->find_tag(p_pStream, FIFF_BEM_SURF_NODES, t_pTag)) {
         p_pStream->close();
         throw std::runtime_error("Vertex data not found.");
     }
@@ -263,68 +234,52 @@ bool MNEBem::readBemSurface(FiffStream::SPtr& p_pStream, const FiffDirNode::SPtr
     p_BemSurface.rr = t_pTag->toFloatMatrix().transpose();
     qint32 rows_rr = p_BemSurface.rr.rows();
 
-    if (rows_rr != p_BemSurface.np)
-    {
+    if (rows_rr != p_BemSurface.np) {
         p_pStream->close();
         throw std::runtime_error("Vertex information is incorrect.");
     }
 
-//    qDebug() << "Surf Nodes; type:" << t_pTag->getType();
+    //    qDebug() << "Surf Nodes; type:" << t_pTag->getType();
 
     //=====================================================================
-    if(!p_Tree->find_tag(p_pStream, FIFF_BEM_SURF_NORMALS, t_pTag))
-    {
-        if(!p_Tree->find_tag(p_pStream, FIFF_MNE_SOURCE_SPACE_NORMALS, t_pTag))
-        {
+    if (!p_Tree->find_tag(p_pStream, FIFF_BEM_SURF_NORMALS, t_pTag)) {
+        if (!p_Tree->find_tag(p_pStream, FIFF_MNE_SOURCE_SPACE_NORMALS, t_pTag)) {
             p_pStream->close();
             throw std::runtime_error("Vertex normals not found.");
         }
 
         p_BemSurface.nn = t_pTag->toFloatMatrix().transpose();
-    }
-    else
-    {
+    } else {
         p_BemSurface.nn = t_pTag->toFloatMatrix().transpose();
     }
 
-    if (p_BemSurface.nn.rows() != p_BemSurface.np)
-    {
+    if (p_BemSurface.nn.rows() != p_BemSurface.np) {
         p_pStream->close();
         throw std::runtime_error("Vertex normal information is incorrect.");
     }
 
-//    qDebug() << "Bem Vertex Normals; type:" << t_pTag->getType();
+    //    qDebug() << "Bem Vertex Normals; type:" << t_pTag->getType();
 
     //=====================================================================
-    if (p_BemSurface.ntri > 0)
-    {
-        if(!p_Tree->find_tag(p_pStream, FIFF_BEM_SURF_TRIANGLES, t_pTag))
-        {
-            if(!p_Tree->find_tag(p_pStream, FIFF_MNE_SOURCE_SPACE_TRIANGLES, t_pTag))
-            {
+    if (p_BemSurface.ntri > 0) {
+        if (!p_Tree->find_tag(p_pStream, FIFF_BEM_SURF_TRIANGLES, t_pTag)) {
+            if (!p_Tree->find_tag(p_pStream, FIFF_MNE_SOURCE_SPACE_TRIANGLES, t_pTag)) {
                 p_pStream->close();
                 throw std::runtime_error("Triangulation not found.");
-            }
-            else
-            {
+            } else {
                 p_BemSurface.itris = t_pTag->toIntMatrix().transpose();
-                p_BemSurface.itris -= MatrixXi::Constant(p_BemSurface.itris.rows(),3,1);//0 based indizes
+                p_BemSurface.itris -= MatrixXi::Constant(p_BemSurface.itris.rows(), 3, 1); //0 based indizes
             }
-        }
-        else
-        {
+        } else {
             p_BemSurface.itris = t_pTag->toIntMatrix().transpose();
-            p_BemSurface.itris -= MatrixXi::Constant(p_BemSurface.itris.rows(),3,1);//0 based indizes
+            p_BemSurface.itris -= MatrixXi::Constant(p_BemSurface.itris.rows(), 3, 1); //0 based indizes
         }
 
-        if (p_BemSurface.itris.rows() != p_BemSurface.ntri)
-        {
+        if (p_BemSurface.itris.rows() != p_BemSurface.ntri) {
             p_pStream->close();
             throw std::runtime_error("Triangulation information is incorrect.");
         }
-    }
-    else
-    {
+    } else {
         p_BemSurface.itris.resize(0, 3);
     }
 
@@ -333,7 +288,7 @@ bool MNEBem::readBemSurface(FiffStream::SPtr& p_pStream, const FiffDirNode::SPtr
 
 //=============================================================================================================
 
-void MNEBem::write(QIODevice &p_IODevice)
+void MNEBem::write(QIODevice& p_IODevice)
 {
     //
     //   Open the file, create directory
@@ -351,8 +306,7 @@ void MNEBem::write(QIODevice &p_IODevice)
 void MNEBem::writeToStream(FiffStream* p_pStream)
 {
     p_pStream->start_block(FIFFB_BEM);
-    for(qint32 h = 0; h < m_qListBemSurface.size(); ++h)
-    {
+    for (qint32 h = 0; h < m_qListBemSurface.size(); ++h) {
         qInfo("\tWrite a bem surface... ");
         p_pStream->start_block(FIFFB_BEM_SURF);
         m_qListBemSurface[h].writeToStream(p_pStream);
@@ -365,7 +319,7 @@ void MNEBem::writeToStream(FiffStream* p_pStream)
 
 //=============================================================================================================
 
-const MNEBemSurface& MNEBem::operator[] (qint32 idx) const
+const MNEBemSurface& MNEBem::operator[](qint32 idx) const
 {
     //
     // Falling back to surface 0 is no help when there are no surfaces at all:
@@ -373,8 +327,7 @@ const MNEBemSurface& MNEBem::operator[] (qint32 idx) const
     // otherwise. Hand back a default surface instead, which callers can spot
     // through its empty vertex list.
     //
-    if (m_qListBemSurface.isEmpty())
-    {
+    if (m_qListBemSurface.isEmpty()) {
         qWarning("Warning: No BEM surfaces available! Returning an empty surface.");
 
         static const MNEBemSurface defaultSurface;
@@ -382,34 +335,7 @@ const MNEBemSurface& MNEBem::operator[] (qint32 idx) const
         return defaultSurface;
     }
 
-    if (idx < 0 || idx >= m_qListBemSurface.length())
-    {
-        qWarning("Warning: Required surface doesn't exist! Returning surface '0'.");
-        idx=0;
-    }
-    return m_qListBemSurface[idx];
-}
-
-//=============================================================================================================
-
-MNEBemSurface& MNEBem::operator[] (qint32 idx)
-{
-    //
-    // See the const overload: an empty list has no surface 0 to fall back to,
-    // so keep one default surface around rather than indexing out of bounds.
-    //
-    if (m_qListBemSurface.isEmpty())
-    {
-        qWarning("Warning: No BEM surfaces available! Returning an empty surface.");
-
-        static MNEBemSurface defaultSurface;
-        defaultSurface = MNEBemSurface();
-
-        return defaultSurface;
-    }
-
-    if (idx < 0 || idx >= m_qListBemSurface.length())
-    {
+    if (idx < 0 || idx >= m_qListBemSurface.length()) {
         qWarning("Warning: Required surface doesn't exist! Returning surface '0'.");
         idx = 0;
     }
@@ -418,7 +344,31 @@ MNEBemSurface& MNEBem::operator[] (qint32 idx)
 
 //=============================================================================================================
 
-MNEBem &MNEBem::operator<<(const MNEBemSurface &surf)
+MNEBemSurface& MNEBem::operator[](qint32 idx)
+{
+    //
+    // See the const overload: an empty list has no surface 0 to fall back to,
+    // so keep one default surface around rather than indexing out of bounds.
+    //
+    if (m_qListBemSurface.isEmpty()) {
+        qWarning("Warning: No BEM surfaces available! Returning an empty surface.");
+
+        static MNEBemSurface defaultSurface;
+        defaultSurface = MNEBemSurface();
+
+        return defaultSurface;
+    }
+
+    if (idx < 0 || idx >= m_qListBemSurface.length()) {
+        qWarning("Warning: Required surface doesn't exist! Returning surface '0'.");
+        idx = 0;
+    }
+    return m_qListBemSurface[idx];
+}
+
+//=============================================================================================================
+
+MNEBem& MNEBem::operator<<(const MNEBemSurface& surf)
 {
     this->m_qListBemSurface.append(surf);
     return *this;
@@ -426,7 +376,7 @@ MNEBem &MNEBem::operator<<(const MNEBemSurface &surf)
 
 //=============================================================================================================
 
-MNEBem &MNEBem::operator<<(const MNEBemSurface *surf)
+MNEBem& MNEBem::operator<<(const MNEBemSurface* surf)
 {
     this->m_qListBemSurface.append(*surf);
     return *this;
@@ -434,19 +384,17 @@ MNEBem &MNEBem::operator<<(const MNEBemSurface *surf)
 
 //=============================================================================================================
 
-void MNEBem::warp(const MatrixXf & sLm, const MatrixXf &dLm)
+void MNEBem::warp(const MatrixXf& sLm, const MatrixXf& dLm)
 {
     Warp help;
     QList<MatrixXf> vertList;
-    for (int i=0; i<this->m_qListBemSurface.size(); i++)
-    {
+    for (int i = 0; i < this->m_qListBemSurface.size(); i++) {
         vertList.append(this->m_qListBemSurface[i].rr);
     }
 
     help.calculate(sLm, dLm, vertList);
 
-    for (int i=0; i<this->m_qListBemSurface.size(); i++)
-    {
+    for (int i = 0; i < this->m_qListBemSurface.size(); i++) {
         this->m_qListBemSurface[i].rr = vertList.at(i);
     }
     return;
@@ -457,8 +405,7 @@ void MNEBem::warp(const MatrixXf & sLm, const MatrixXf &dLm)
 void MNEBem::transform(const FiffCoordTrans& trans)
 {
     MatrixX3f vert;
-    for (int i=0; i<this->m_qListBemSurface.size(); i++)
-    {
+    for (int i = 0; i < this->m_qListBemSurface.size(); i++) {
         vert = this->m_qListBemSurface[i].rr;
         vert = trans.apply_trans(vert);
         this->m_qListBemSurface[i].rr = vert;
@@ -471,8 +418,7 @@ void MNEBem::transform(const FiffCoordTrans& trans)
 void MNEBem::invtransform(const FiffCoordTrans& trans)
 {
     MatrixX3f vert;
-    for (int i=0; i<this->m_qListBemSurface.size(); i++)
-    {
+    for (int i = 0; i < this->m_qListBemSurface.size(); i++) {
         vert = this->m_qListBemSurface[i].rr;
         vert = trans.apply_inverse_trans(vert);
         this->m_qListBemSurface[i].rr = vert;

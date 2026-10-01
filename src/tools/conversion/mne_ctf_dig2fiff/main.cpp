@@ -57,10 +57,11 @@ using namespace Eigen;
 
 //=============================================================================================================
 
-struct DigPoint {
-    int kind;       // FIFFV_POINT_CARDINAL, FIFFV_POINT_HPI, FIFFV_POINT_EXTRA, FIFFV_POINT_EEG
+struct DigPoint
+{
+    int kind; // FIFFV_POINT_CARDINAL, FIFFV_POINT_HPI, FIFFV_POINT_EXTRA, FIFFV_POINT_EEG
     int ident;
-    float r[3];     // position in meters
+    float r[3]; // position in meters
 };
 
 //=============================================================================================================
@@ -70,7 +71,7 @@ struct DigPoint {
  * Format: one point per line with x y z coordinates in cm.
  * First three points are fiducials (nasion, left ear, right ear).
  */
-static QList<DigPoint> readCtfDig(const QString &filename, bool numFids)
+static QList<DigPoint> readCtfDig(const QString& filename, bool numFids)
 {
     QList<DigPoint> points;
     QFile file(filename);
@@ -111,9 +112,12 @@ static QList<DigPoint> readCtfDig(const QString &filename, bool numFids)
                 p.ident = lineNo + 1;
             } else {
                 // Standard order: nasion, left ear, right ear
-                if (lineNo == 0) p.ident = FIFFV_POINT_NASION;
-                else if (lineNo == 1) p.ident = FIFFV_POINT_LPA;
-                else p.ident = FIFFV_POINT_RPA;
+                if (lineNo == 0)
+                    p.ident = FIFFV_POINT_NASION;
+                else if (lineNo == 1)
+                    p.ident = FIFFV_POINT_LPA;
+                else
+                    p.ident = FIFFV_POINT_RPA;
             }
         } else {
             p.kind = FIFFV_POINT_EXTRA;
@@ -137,8 +141,8 @@ static QList<DigPoint> readCtfDig(const QString &filename, bool numFids)
  *   Z axis up (y x z = right hand)
  *   Y axis toward LPA
  */
-static bool computeHeadTransform(const DigPoint &nasion, const DigPoint &lpa, const DigPoint &rpa,
-                                  Matrix4f &trans)
+static bool computeHeadTransform(const DigPoint& nasion, const DigPoint& lpa, const DigPoint& rpa,
+                                 Matrix4f& trans)
 {
     Vector3f n(nasion.r[0], nasion.r[1], nasion.r[2]);
     Vector3f l(lpa.r[0], lpa.r[1], lpa.r[2]);
@@ -151,9 +155,15 @@ static bool computeHeadTransform(const DigPoint &nasion, const DigPoint &lpa, co
     Vector3f ez = ex.cross(ey).normalized();
 
     trans = Matrix4f::Identity();
-    trans(0, 0) = ex(0); trans(0, 1) = ex(1); trans(0, 2) = ex(2);
-    trans(1, 0) = ey(0); trans(1, 1) = ey(1); trans(1, 2) = ey(2);
-    trans(2, 0) = ez(0); trans(2, 1) = ez(1); trans(2, 2) = ez(2);
+    trans(0, 0) = ex(0);
+    trans(0, 1) = ex(1);
+    trans(0, 2) = ex(2);
+    trans(1, 0) = ey(0);
+    trans(1, 1) = ey(1);
+    trans(1, 2) = ey(2);
+    trans(2, 0) = ez(0);
+    trans(2, 1) = ez(1);
+    trans(2, 2) = ez(2);
     trans(0, 3) = -ex.dot(origin);
     trans(1, 3) = -ey.dot(origin);
     trans(2, 3) = -ez.dot(origin);
@@ -163,7 +173,7 @@ static bool computeHeadTransform(const DigPoint &nasion, const DigPoint &lpa, co
 
 //=============================================================================================================
 
-int main(int argc, char *argv[])
+int main(int argc, char* argv[])
 {
     qInstallMessageHandler(MNELogger::customLogWriter);
     QCoreApplication app(argc, argv);
@@ -217,7 +227,7 @@ int main(int argc, char *argv[])
     computeHeadTransform(points[0], points[1], points[2], headTrans);
 
     // Transform all points to head coordinates
-    for (DigPoint &p : points) {
+    for (DigPoint& p : points) {
         Vector3f r(p.r[0], p.r[1], p.r[2]);
         Vector3f rt = headTrans.block<3, 3>(0, 0) * r + headTrans.block<3, 1>(0, 3);
         p.r[0] = rt(0);
@@ -235,7 +245,7 @@ int main(int argc, char *argv[])
         }
 
         outStream->start_block(FIFFB_ISOTRAK);
-        for (const DigPoint &p : points) {
+        for (const DigPoint& p : points) {
             FiffDigPoint dp;
             dp.kind = p.kind;
             dp.ident = p.ident;
@@ -258,17 +268,21 @@ int main(int argc, char *argv[])
             return 1;
         }
         QTextStream out(&hptsFile);
-        for (const DigPoint &p : points) {
+        for (const DigPoint& p : points) {
             QString cat;
-            if (p.kind == FIFFV_POINT_CARDINAL) cat = "cardinal";
-            else if (p.kind == FIFFV_POINT_HPI) cat = "hpi";
-            else if (p.kind == FIFFV_POINT_EEG) cat = "eeg";
-            else cat = "extra";
+            if (p.kind == FIFFV_POINT_CARDINAL)
+                cat = "cardinal";
+            else if (p.kind == FIFFV_POINT_HPI)
+                cat = "hpi";
+            else if (p.kind == FIFFV_POINT_EEG)
+                cat = "eeg";
+            else
+                cat = "extra";
 
-        out << cat << " " << p.ident << " "
-            << QString::number(1000.0f * p.r[0], 'f', 1) << " "
-            << QString::number(1000.0f * p.r[1], 'f', 1) << " "
-            << QString::number(1000.0f * p.r[2], 'f', 1) << "\n";
+            out << cat << " " << p.ident << " "
+                << QString::number(1000.0f * p.r[0], 'f', 1) << " "
+                << QString::number(1000.0f * p.r[1], 'f', 1) << " "
+                << QString::number(1000.0f * p.r[2], 'f', 1) << "\n";
         }
         hptsFile.close();
         fprintf(stderr, "Wrote %lld points to %s\n", pointCount, qPrintable(hptsName));

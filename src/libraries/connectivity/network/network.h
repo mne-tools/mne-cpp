@@ -61,7 +61,8 @@
 // DEFINE NAMESPACE CONNECTIVITYLIB
 //=============================================================================================================
 
-namespace CONNECTIVITYLIB {
+namespace CONNECTIVITYLIB
+{
 
 //=============================================================================================================
 // CONNECTIVITYLIB FORWARD DECLARATIONS
@@ -73,9 +74,10 @@ class NetworkNode;
 /**
  * @brief Per-network rendering hints: colour-map name or fixed RGBA for nodes and edges.
  */
-struct VisualizationInfo {
+struct VisualizationInfo
+{
     QString sMethod = "Map";                                    /**< The color method: Map (uses sColormap parameter) or Color (uses colNodes and colEdges).*/
-    QString sColormap = "Viridis";                                 /**< The colormap.*/
+    QString sColormap = "Viridis";                              /**< The colormap.*/
     Eigen::Vector4i colNodes = Eigen::Vector4i(255, 0, 0, 255); /**< The node color.*/
     Eigen::Vector4i colEdges = Eigen::Vector4i(255, 0, 0, 255); /**< The edge color.*/
 };
@@ -96,7 +98,6 @@ struct VisualizationInfo {
 
 class CONNECTIVITYSHARED_EXPORT Network
 {
-
 public:
     typedef QSharedPointer<Network> SPtr;            /**< Shared pointer type for Network. */
     typedef QSharedPointer<const Network> ConstSPtr; /**< Const shared pointer type for Network. */
@@ -141,7 +142,7 @@ public:
      *
      * @return Returns the network edges.
      */
-    const QList<QSharedPointer<NetworkEdge> >& getFullEdges() const;
+    const QList<QSharedPointer<NetworkEdge>>& getFullEdges() const;
 
     //=========================================================================================================
     /**
@@ -149,7 +150,7 @@ public:
      *
      * @return Returns the network edges.
      */
-    const QList<QSharedPointer<NetworkEdge> >& getThresholdedEdges() const;
+    const QList<QSharedPointer<NetworkEdge>>& getThresholdedEdges() const;
 
     //=========================================================================================================
     /**
@@ -157,7 +158,7 @@ public:
      *
      * @return Returns the network nodes.
      */
-    const QList<QSharedPointer<NetworkNode> >& getNodes() const;
+    const QList<QSharedPointer<NetworkNode>>& getNodes() const;
 
     //=========================================================================================================
     /**
@@ -233,7 +234,7 @@ public:
      *
      * @return   The minimum and maximum degree of the entire network.
      */
-    QPair<int,int> getMinMaxFullDegrees() const;
+    QPair<int, int> getMinMaxFullDegrees() const;
 
     //=========================================================================================================
     /**
@@ -241,7 +242,7 @@ public:
      *
      * @return   The minimum and maximum degree of the entire network.
      */
-    QPair<int,int> getMinMaxThresholdedDegrees() const;
+    QPair<int, int> getMinMaxThresholdedDegrees() const;
 
     //=========================================================================================================
     /**
@@ -249,7 +250,7 @@ public:
      *
      * @return   The minimum and maximum indegree of the entire network.
      */
-    QPair<int,int> getMinMaxFullIndegrees() const;
+    QPair<int, int> getMinMaxFullIndegrees() const;
 
     //=========================================================================================================
     /**
@@ -257,7 +258,7 @@ public:
      *
      * @return   The minimum and maximum indegree of the entire network.
      */
-    QPair<int,int> getMinMaxThresholdedIndegrees() const;
+    QPair<int, int> getMinMaxThresholdedIndegrees() const;
 
     //=========================================================================================================
     /**
@@ -265,7 +266,7 @@ public:
      *
      * @return   The minimum and maximum outdegree of the entire network.
      */
-    QPair<int,int> getMinMaxFullOutdegrees() const;
+    QPair<int, int> getMinMaxFullOutdegrees() const;
 
     //=========================================================================================================
     /**
@@ -273,7 +274,7 @@ public:
      *
      * @return   The minimum and maximum outdegree of the entire network.
      */
-    QPair<int,int> getMinMaxThresholdedOutdegrees() const;
+    QPair<int, int> getMinMaxThresholdedOutdegrees() const;
 
     //=========================================================================================================
     /**
@@ -306,7 +307,7 @@ public:
      *
      * @return The current upper/lower frequency edge to average from/to.
      */
-    const QPair<float,float>& getFrequencyRange() const;
+    const QPair<float, float>& getFrequencyRange() const;
 
     //=========================================================================================================
     /**
@@ -403,25 +404,25 @@ public:
     int getFFTSize();
 
 protected:
-    QList<QSharedPointer<NetworkEdge> >     m_lFullEdges;               /**< List with all edges of the network.*/
-    QList<QSharedPointer<NetworkEdge> >     m_lThresholdedEdges;        /**< List with all the active (thresholded) edges of the network.*/
+    QList<QSharedPointer<NetworkEdge>> m_lFullEdges;        /**< List with all edges of the network.*/
+    QList<QSharedPointer<NetworkEdge>> m_lThresholdedEdges; /**< List with all the active (thresholded) edges of the network.*/
 
-    QList<QSharedPointer<NetworkNode> >     m_lNodes;                   /**< List with all nodes of the network.*/
+    QList<QSharedPointer<NetworkNode>> m_lNodes; /**< List with all nodes of the network.*/
 
-    Eigen::MatrixXd                         m_matDistMatrix;            /**< The distance matrix.*/
+    Eigen::MatrixXd m_matDistMatrix; /**< The distance matrix.*/
 
-    QString                                 m_sConnectivityMethod;      /**< The connectivity measure method used to create the data of this network structure.*/
+    QString m_sConnectivityMethod; /**< The connectivity measure method used to create the data of this network structure.*/
 
-    QPair<double,double>                    m_minMaxFullWeights;        /**< The minimum and maximum weight strength of the entire network.*/
-    QPair<double,double>                    m_minMaxThresholdedWeights; /**< The minimum and maximum weight strength of the active edges.*/
-    QPair<float,float>                      m_minMaxFrequency;          /**< The minimum and maximum frequency bins to average from/to.*/
+    QPair<double, double> m_minMaxFullWeights;        /**< The minimum and maximum weight strength of the entire network.*/
+    QPair<double, double> m_minMaxThresholdedWeights; /**< The minimum and maximum weight strength of the active edges.*/
+    QPair<float, float> m_minMaxFrequency;            /**< The minimum and maximum frequency bins to average from/to.*/
 
-    double                                  m_dThreshold;               /**< The current value which was used to threshold the edge weigths.*/
-    float                                   m_fSFreq;                   /**< The sampling frequency used to collect the data which this network is based on.*/
-    int                                     m_iNumberFreqBins;          /**< The number of used frequency bins.*/
-    int                                     m_iFFTSize;                 /**< The used FFT size (number of total frequency bins for a half spectrum - only positive frequencies).*/
+    double m_dThreshold;   /**< The current value which was used to threshold the edge weigths.*/
+    float m_fSFreq;        /**< The sampling frequency used to collect the data which this network is based on.*/
+    int m_iNumberFreqBins; /**< The number of used frequency bins.*/
+    int m_iFFTSize;        /**< The used FFT size (number of total frequency bins for a half spectrum - only positive frequencies).*/
 
-    VisualizationInfo                       m_visualizationInfo;        /**< The current visualization info used to plot the network later on.*/
+    VisualizationInfo m_visualizationInfo; /**< The current visualization info used to plot the network later on.*/
 };
 
 //=============================================================================================================

@@ -96,14 +96,14 @@ private:
     QString findPython();
     QString findGenerateScript();
 
-    QString m_sDataPath;           /**< Path to MNE sample data directory. */
-    QString m_sEvokedFile;         /**< Path to sample_audvis-ave.fif. */
-    QString m_sInvFile;            /**< Path to inverse operator file. */
-    bool m_bDataAvailable;         /**< Whether test data was found. */
+    QString m_sDataPath;   /**< Path to MNE sample data directory. */
+    QString m_sEvokedFile; /**< Path to sample_audvis-ave.fif. */
+    QString m_sInvFile;    /**< Path to inverse operator file. */
+    bool m_bDataAvailable; /**< Whether test data was found. */
 
     // Shared results for multi-test use
-    MNEInverseOperator m_invOp;    /**< Inverse operator. */
-    InvSourceEstimate m_stcDSPM;   /**< dSPM result for reuse. */
+    MNEInverseOperator m_invOp;  /**< Inverse operator. */
+    InvSourceEstimate m_stcDSPM; /**< dSPM result for reuse. */
 
     static const float s_fSNR;
     static const float s_fLambda2;
@@ -116,7 +116,7 @@ private:
 
 const float TestComputeRawInverse::s_fSNR = 3.0f;
 const float TestComputeRawInverse::s_fLambda2 = 1.0f / (s_fSNR * s_fSNR);
-const int TestComputeRawInverse::s_iSetNo = 0;   // "Left Auditory"
+const int TestComputeRawInverse::s_iSetNo = 0; // "Left Auditory"
 
 //=============================================================================================================
 
@@ -148,7 +148,7 @@ QString TestComputeRawInverse::findDataPath()
         candidates.prepend(envPath);
     }
 
-    for (const QString &path : candidates) {
+    for (const QString& path : candidates) {
         QString evokedFile = path + "/MEG/sample/sample_audvis-ave.fif";
         QString invFile = path + "/MEG/sample/sample_audvis-meg-eeg-oct-6-meg-eeg-inv.fif";
         if (QFile::exists(evokedFile) && QFile::exists(invFile)) {
@@ -167,7 +167,7 @@ QString TestComputeRawInverse::findPython()
     candidates << "python3" << "python" << "python3.14" << "python3.13"
                << "python3.12" << "python3.11" << "python3.10";
 
-    for (const QString &py : candidates) {
+    for (const QString& py : candidates) {
         QProcess proc;
         proc.start(py, QStringList() << "-c" << "import mne; print(mne.__version__)");
         proc.waitForFinished(10000);
@@ -199,7 +199,7 @@ QString TestComputeRawInverse::findGenerateScript()
     // Absolute fallback
     candidates << QDir::homePath() + "/Programming/mne-cpp/src/testframes/test_compute_raw_inverse/generate_reference_stc.py";
 
-    for (const QString &path : candidates) {
+    for (const QString& path : candidates) {
         if (QFile::exists(path)) {
             return QFileInfo(path).absoluteFilePath();
         }
@@ -240,7 +240,8 @@ void TestComputeRawInverse::initTestCase()
 
 void TestComputeRawInverse::testInverseDSPM()
 {
-    if (!m_bDataAvailable) QSKIP("No test data");
+    if (!m_bDataAvailable)
+        QSKIP("No test data");
 
     printf(">>>>>>>>>>>>>>>>>>>>>>>>> Test dSPM Inverse >>>>>>>>>>>>>>>>>>>>>>>>>\n");
 
@@ -321,7 +322,8 @@ void TestComputeRawInverse::testInverseDSPM()
 
 void TestComputeRawInverse::testInverseSLORETA()
 {
-    if (!m_bDataAvailable) QSKIP("No test data");
+    if (!m_bDataAvailable)
+        QSKIP("No test data");
 
     printf(">>>>>>>>>>>>>>>>>>>>>>>>> Test sLORETA Inverse >>>>>>>>>>>>>>>>>>>>>>>>>\n");
 
@@ -356,7 +358,8 @@ void TestComputeRawInverse::testInverseSLORETA()
 
 void TestComputeRawInverse::testInverseMNE()
 {
-    if (!m_bDataAvailable) QSKIP("No test data");
+    if (!m_bDataAvailable)
+        QSKIP("No test data");
 
     printf(">>>>>>>>>>>>>>>>>>>>>>>>> Test MNE Inverse >>>>>>>>>>>>>>>>>>>>>>>>>\n");
 
@@ -390,7 +393,8 @@ void TestComputeRawInverse::testInverseMNE()
 
 void TestComputeRawInverse::testBaselineNotAppliedByDefault()
 {
-    if (!m_bDataAvailable) QSKIP("No test data");
+    if (!m_bDataAvailable)
+        QSKIP("No test data");
 
     printf(">>>>>>>>>>>>>>>>>>>>>>>>> Test Baseline Not Applied By Default >>>>>>>>>>>>>>>>>>>>>>>>>\n");
 
@@ -419,14 +423,15 @@ void TestComputeRawInverse::testBaselineNotAppliedByDefault()
     double relDiff = diffNorm / noBaselineNorm;
     printf("  Relative difference:   %.6e\n", relDiff);
     QVERIFY2(relDiff > 1e-6,
-        "No-baseline and baseline-corrected data are identical - "
-        "baseline correction may be incorrectly applied by default");
+             "No-baseline and baseline-corrected data are identical - "
+             "baseline correction may be incorrectly applied by default");
 
     // Baseline correction operates PER-CHANNEL: it subtracts each channel's
     // mean in the baseline window. Verify per-channel prestimulus means.
     int nPreStim = 0;
     for (int i = 0; i < evokedNoBaseline.times.size(); ++i) {
-        if (evokedNoBaseline.times(i) < 0.0f) nPreStim++;
+        if (evokedNoBaseline.times(i) < 0.0f)
+            nPreStim++;
     }
     QVERIFY2(nPreStim > 10, "Not enough prestimulus samples for baseline test");
 
@@ -439,11 +444,13 @@ void TestComputeRawInverse::testBaselineNotAppliedByDefault()
         double blMean = evokedWithBaseline.data.row(ch).head(nPreStim).mean();
         QVERIFY2(std::abs(blMean) < 1e-10,
                  qPrintable(QString("Channel %1: baseline-corrected prestim mean %2 not near zero")
-                            .arg(ch).arg(blMean, 0, 'e', 6)));
+                                .arg(ch)
+                                .arg(blMean, 0, 'e', 6)));
 
         // No-baseline channel: prestimulus mean may be nonzero
         double noblMean = evokedNoBaseline.data.row(ch).head(nPreStim).mean();
-        if (std::abs(noblMean) > 1e-15) nChannelsWithNonzeroMean++;
+        if (std::abs(noblMean) > 1e-15)
+            nChannelsWithNonzeroMean++;
     }
 
     printf("  Channels with nonzero prestim mean (no baseline): %d / %d\n",
@@ -458,7 +465,8 @@ void TestComputeRawInverse::testBaselineNotAppliedByDefault()
 
 void TestComputeRawInverse::testBaselineAppliedWhenRequested()
 {
-    if (!m_bDataAvailable) QSKIP("No test data");
+    if (!m_bDataAvailable)
+        QSKIP("No test data");
 
     printf(">>>>>>>>>>>>>>>>>>>>>>>>> Test Baseline Applied When Requested >>>>>>>>>>>>>>>>>>>>>>>>>\n");
 
@@ -471,7 +479,8 @@ void TestComputeRawInverse::testBaselineAppliedWhenRequested()
     // Find prestimulus samples for the baseline window
     int nBaselineSamples = 0;
     for (int i = 0; i < evoked.times.size(); ++i) {
-        if (evoked.times(i) >= -0.2f && evoked.times(i) <= 0.0f) nBaselineSamples++;
+        if (evoked.times(i) >= -0.2f && evoked.times(i) <= 0.0f)
+            nBaselineSamples++;
     }
     QVERIFY2(nBaselineSamples > 10, "Not enough samples in baseline window");
 
@@ -492,7 +501,8 @@ void TestComputeRawInverse::testBaselineAppliedWhenRequested()
         // The channel mean in the baseline window should be very close to zero
         QVERIFY2(std::abs(channelBaselineMean) < 1e-10,
                  qPrintable(QString("Channel %1: baseline mean %2 not near zero")
-                            .arg(ch).arg(channelBaselineMean, 0, 'e', 6)));
+                                .arg(ch)
+                                .arg(channelBaselineMean, 0, 'e', 6)));
     }
 
     printf("  Baseline correctly applied: per-channel baseline means ~ 0\n");
@@ -516,8 +526,10 @@ void TestComputeRawInverse::testBaselineAppliedWhenRequested()
 
 void TestComputeRawInverse::testStcWriteReadRoundtrip()
 {
-    if (!m_bDataAvailable) QSKIP("No test data");
-    if (m_stcDSPM.isEmpty()) QSKIP("dSPM result not available (testInverseDSPM must run first)");
+    if (!m_bDataAvailable)
+        QSKIP("No test data");
+    if (m_stcDSPM.isEmpty())
+        QSKIP("dSPM result not available (testInverseDSPM must run first)");
 
     printf(">>>>>>>>>>>>>>>>>>>>>>>>> Test STC Write/Read Roundtrip >>>>>>>>>>>>>>>>>>>>>>>>>\n");
 
@@ -572,7 +584,8 @@ void TestComputeRawInverse::testStcWriteReadRoundtrip()
     for (int r = 0; r < m_stcDSPM.data.rows(); ++r) {
         for (int c = 0; c < m_stcDSPM.data.cols(); ++c) {
             double err = std::abs(m_stcDSPM.data(r, c) - stcRead.data(r, c));
-            if (err > maxAbsError) maxAbsError = err;
+            if (err > maxAbsError)
+                maxAbsError = err;
         }
     }
     double maxOrigVal = m_stcDSPM.data.cwiseAbs().maxCoeff();
@@ -601,7 +614,8 @@ void TestComputeRawInverse::testStcWriteReadRoundtrip()
 
 void TestComputeRawInverse::testLabelRestrictedInverse()
 {
-    if (!m_bDataAvailable) QSKIP("No test data");
+    if (!m_bDataAvailable)
+        QSKIP("No test data");
 
     printf(">>>>>>>>>>>>>>>>>>>>>>>>> Test FsLabel-Restricted Inverse >>>>>>>>>>>>>>>>>>>>>>>>>\n");
 
@@ -614,7 +628,7 @@ void TestComputeRawInverse::testLabelRestrictedInverse()
                     << QDir::homePath() + "/mne_data/MNE-sample-data/MEG/sample/labels/Aud-lh.label";
 
     QString labelFile;
-    for (const QString &c : labelCandidates) {
+    for (const QString& c : labelCandidates) {
         if (QFile::exists(c)) {
             labelFile = c;
             break;
@@ -680,8 +694,10 @@ void TestComputeRawInverse::testLabelRestrictedInverse()
 
 void TestComputeRawInverse::testStcMatchesMnePython()
 {
-    if (!m_bDataAvailable) QSKIP("No test data");
-    if (m_stcDSPM.isEmpty()) QSKIP("dSPM result not available (testInverseDSPM must run first)");
+    if (!m_bDataAvailable)
+        QSKIP("No test data");
+    if (m_stcDSPM.isEmpty())
+        QSKIP("dSPM result not available (testInverseDSPM must run first)");
 
     printf(">>>>>>>>>>>>>>>>>>>>>>>>> Test STC Matches MNE-Python >>>>>>>>>>>>>>>>>>>>>>>>>\n");
 
@@ -738,11 +754,11 @@ void TestComputeRawInverse::testStcMatchesMnePython()
     QProcess proc;
     proc.setProcessChannelMode(QProcess::MergedChannels);
     proc.start(python, QStringList() << script << pyDir << m_sDataPath);
-    bool finished = proc.waitForFinished(120000);  // 2 min timeout
+    bool finished = proc.waitForFinished(120000); // 2 min timeout
 
     QString pyOutput = QString::fromUtf8(proc.readAll());
     printf("  Python output:\n");
-    for (const QString &line : pyOutput.split('\n')) {
+    for (const QString& line : pyOutput.split('\n')) {
         printf("    %s\n", line.toUtf8().constData());
     }
 

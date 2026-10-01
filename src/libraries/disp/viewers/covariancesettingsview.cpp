@@ -38,7 +38,7 @@ using namespace DISPLIB;
 //=============================================================================================================
 
 CovarianceSettingsView::CovarianceSettingsView(const QString& sSettingsPath,
-                                               QWidget *parent)
+                                               QWidget* parent)
 : AbstractView(parent)
 , m_sSettingsPath(sSettingsPath)
 {
@@ -50,17 +50,17 @@ CovarianceSettingsView::CovarianceSettingsView(const QString& sSettingsPath,
 
     QLabel* t_pLabelNumSamples = new QLabel;
     t_pLabelNumSamples->setText("Number of Samples");
-    t_pGridLayout->addWidget(t_pLabelNumSamples,0,0,1,1);
+    t_pGridLayout->addWidget(t_pLabelNumSamples, 0, 0, 1, 1);
 
     qint32 minSamples = 600;
 
     m_pSpinBoxNumSamples = new QSpinBox;
     m_pSpinBoxNumSamples->setMinimum(minSamples);
-    m_pSpinBoxNumSamples->setMaximum(minSamples*60);
+    m_pSpinBoxNumSamples->setMaximum(minSamples * 60);
     m_pSpinBoxNumSamples->setSingleStep(minSamples);
     connect(m_pSpinBoxNumSamples, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged),
             this, &CovarianceSettingsView::samplesChanged);
-    t_pGridLayout->addWidget(m_pSpinBoxNumSamples,0,1,1,1);
+    t_pGridLayout->addWidget(m_pSpinBoxNumSamples, 0, 1, 1, 1);
     this->setLayout(t_pGridLayout);
 
     loadSettings();
@@ -85,14 +85,14 @@ void CovarianceSettingsView::setCurrentSamples(int iSamples)
 void CovarianceSettingsView::setMinSamples(int iSamples)
 {
     m_pSpinBoxNumSamples->setMinimum(iSamples);
-    m_pSpinBoxNumSamples->setMaximum(iSamples*60);
+    m_pSpinBoxNumSamples->setMaximum(iSamples * 60);
 }
 
 //=============================================================================================================
 
 void CovarianceSettingsView::saveSettings()
 {
-    if(m_sSettingsPath.isEmpty()) {
+    if (m_sSettingsPath.isEmpty()) {
         return;
     }
 
@@ -104,7 +104,7 @@ void CovarianceSettingsView::saveSettings()
 
 void CovarianceSettingsView::loadSettings()
 {
-    if(m_sSettingsPath.isEmpty()) {
+    if (m_sSettingsPath.isEmpty()) {
         return;
     }
 
@@ -116,7 +116,7 @@ void CovarianceSettingsView::loadSettings()
 
 void CovarianceSettingsView::updateGuiMode(GuiMode mode)
 {
-    switch(mode) {
+    switch (mode) {
         case GuiMode::Clinical:
             break;
         default: // default is research mode
@@ -128,7 +128,7 @@ void CovarianceSettingsView::updateGuiMode(GuiMode mode)
 
 void CovarianceSettingsView::updateProcessingMode(ProcessingMode mode)
 {
-    switch(mode) {
+    switch (mode) {
         case ProcessingMode::Offline:
             break;
         default: // default is realtime mode
@@ -140,5 +140,4 @@ void CovarianceSettingsView::updateProcessingMode(ProcessingMode mode)
 
 void CovarianceSettingsView::clearView()
 {
-
 }

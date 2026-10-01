@@ -53,7 +53,7 @@ FiffEvents::FiffEvents()
 
 //=============================================================================================================
 
-FiffEvents::FiffEvents(QIODevice &p_IODevice)
+FiffEvents::FiffEvents(QIODevice& p_IODevice)
 {
     // Try FIFF first, then ASCII
     if (!read_from_fif(p_IODevice, *this)) {
@@ -63,9 +63,9 @@ FiffEvents::FiffEvents(QIODevice &p_IODevice)
 
 //=============================================================================================================
 
-bool FiffEvents::read(const QString &t_sEventName,
-                      const QString &t_fileRawName,
-                      FiffEvents &p_Events)
+bool FiffEvents::read(const QString& t_sEventName,
+                      const QString& t_fileRawName,
+                      FiffEvents& p_Events)
 {
     QString eventName = t_sEventName;
     QFile t_EventFile;
@@ -82,25 +82,24 @@ bool FiffEvents::read(const QString &t_sEventName,
         }
 
         t_EventFile.setFileName(eventName);
-        if(!read_from_fif(t_EventFile, p_Events)) {
+        if (!read_from_fif(t_EventFile, p_Events)) {
             qWarning("Error while read events.\n");
             return false;
         }
-        qInfo("Events read from %s\n",eventName.toUtf8().constData());
+        qInfo("Events read from %s\n", eventName.toUtf8().constData());
     } else {
         // Binary file
         if (eventName.contains(".fif")) {
             t_EventFile.setFileName(eventName);
-            if(!read_from_fif(t_EventFile, p_Events)) {
+            if (!read_from_fif(t_EventFile, p_Events)) {
                 qWarning("Error while read events.\n");
                 return false;
             }
-            qInfo("Binary event file %s read\n",eventName.toUtf8().constData());
-        } else if(eventName.contains(".eve")){
-
+            qInfo("Binary event file %s read\n", eventName.toUtf8().constData());
+        } else if (eventName.contains(".eve")) {
         } else {
             // Text file
-            qWarning("Text file %s is not supported jet.\n",eventName.toUtf8().constData());
+            qWarning("Text file %s is not supported jet.\n", eventName.toUtf8().constData());
         }
     }
 
@@ -109,15 +108,15 @@ bool FiffEvents::read(const QString &t_sEventName,
 
 //=============================================================================================================
 
-bool FiffEvents::read_from_fif(QIODevice &p_IODevice,
-                               FiffEvents &p_Events)
+bool FiffEvents::read_from_fif(QIODevice& p_IODevice,
+                               FiffEvents& p_Events)
 {
     //
     // Open file
     //
     FiffStream::SPtr t_pStream(new FiffStream(&p_IODevice));
 
-    if(!t_pStream->open()) {
+    if (!t_pStream->open()) {
         return false;
     }
 
@@ -126,8 +125,7 @@ bool FiffEvents::read_from_fif(QIODevice &p_IODevice,
     //
     QList<FiffDirNode::SPtr> eventsBlocks = t_pStream->dirtree()->dir_tree_find(FIFFB_MNE_EVENTS);
 
-    if (eventsBlocks.size() == 0)
-    {
+    if (eventsBlocks.size() == 0) {
         qWarning("Could not find event data\n");
         return false;
     }
@@ -141,53 +139,44 @@ bool FiffEvents::read_from_fif(QIODevice &p_IODevice,
     quint32* serial_eventlist_uint = nullptr;
     qint32* serial_eventlist_int = nullptr;
 
-    for(k = 0; k < eventsBlocks[0]->nent(); ++k)
-    {
+    for (k = 0; k < eventsBlocks[0]->nent(); ++k) {
         kind = eventsBlocks[0]->dir[k]->kind;
-        pos  = eventsBlocks[0]->dir[k]->pos;
-        if (kind == FIFF_MNE_EVENT_LIST)
-        {
-            t_pStream->read_tag(t_pTag,pos);
-            if(t_pTag->type == FIFFT_UINT)
-            {
+        pos = eventsBlocks[0]->dir[k]->pos;
+        if (kind == FIFF_MNE_EVENT_LIST) {
+            t_pStream->read_tag(t_pTag, pos);
+            if (t_pTag->type == FIFFT_UINT) {
                 serial_eventlist_uint = t_pTag->toUnsignedInt();
-                nelem = t_pTag->size()/4;
+                nelem = t_pTag->size() / 4;
             }
 
-            if(t_pTag->type == FIFFT_INT)
-            {
+            if (t_pTag->type == FIFFT_INT) {
                 serial_eventlist_int = t_pTag->toInt();
-                nelem = t_pTag->size()/4;
+                nelem = t_pTag->size() / 4;
             }
 
             break;
         }
     }
 
-    if(serial_eventlist_uint == nullptr && serial_eventlist_int == nullptr)
-    {
+    if (serial_eventlist_uint == nullptr && serial_eventlist_int == nullptr) {
         qWarning("Could not find any events\n");
         return false;
     }
 
-    p_Events.events.resize(nelem/3,3);
-    if(serial_eventlist_uint != nullptr)
-    {
-        for(k = 0; k < nelem/3; ++k)
-        {
-            p_Events.events(k,0) = serial_eventlist_uint[k*3];
-            p_Events.events(k,1) = serial_eventlist_uint[k*3+1];
-            p_Events.events(k,2) = serial_eventlist_uint[k*3+2];
+    p_Events.events.resize(nelem / 3, 3);
+    if (serial_eventlist_uint != nullptr) {
+        for (k = 0; k < nelem / 3; ++k) {
+            p_Events.events(k, 0) = serial_eventlist_uint[k * 3];
+            p_Events.events(k, 1) = serial_eventlist_uint[k * 3 + 1];
+            p_Events.events(k, 2) = serial_eventlist_uint[k * 3 + 2];
         }
     }
 
-    if(serial_eventlist_int != nullptr)
-    {
-        for(k = 0; k < nelem/3; ++k)
-        {
-            p_Events.events(k,0) = serial_eventlist_int[k*3];
-            p_Events.events(k,1) = serial_eventlist_int[k*3+1];
-            p_Events.events(k,2) = serial_eventlist_int[k*3+2];
+    if (serial_eventlist_int != nullptr) {
+        for (k = 0; k < nelem / 3; ++k) {
+            p_Events.events(k, 0) = serial_eventlist_int[k * 3];
+            p_Events.events(k, 1) = serial_eventlist_int[k * 3 + 1];
+            p_Events.events(k, 2) = serial_eventlist_int[k * 3 + 2];
         }
     }
 
@@ -196,10 +185,10 @@ bool FiffEvents::read_from_fif(QIODevice &p_IODevice,
 
 //=============================================================================================================
 
-bool FiffEvents::read_from_ascii(QIODevice &p_IODevice,
-                                 FiffEvents &p_Events)
+bool FiffEvents::read_from_ascii(QIODevice& p_IODevice,
+                                 FiffEvents& p_Events)
 {
-    if (!p_IODevice.open(QIODevice::ReadOnly | QIODevice::Text)){
+    if (!p_IODevice.open(QIODevice::ReadOnly | QIODevice::Text)) {
         return false;
     }
     QTextStream textStream(&p_IODevice);
@@ -208,7 +197,7 @@ bool FiffEvents::read_from_ascii(QIODevice &p_IODevice,
     QList<int> beforeList;
     QList<int> afterList;
 
-    while(!textStream.atEnd()){
+    while (!textStream.atEnd()) {
         QString line = textStream.readLine().trimmed();
         if (line.isEmpty())
             continue;
@@ -229,7 +218,7 @@ bool FiffEvents::read_from_ascii(QIODevice &p_IODevice,
 
         int iSample = fields.at(0).toInt();
         int iBefore = (fields.size() > 1 + iOffset) ? fields.at(1 + iOffset).toInt() : 0;
-        int iAfter  = (fields.size() > 2 + iOffset) ? fields.at(2 + iOffset).toInt() : 0;
+        int iAfter = (fields.size() > 2 + iOffset) ? fields.at(2 + iOffset).toInt() : 0;
 
         sampleList.append(iSample);
         beforeList.append(iBefore);
@@ -238,17 +227,17 @@ bool FiffEvents::read_from_ascii(QIODevice &p_IODevice,
 
     p_Events.events.resize(sampleList.size(), 3);
 
-    for(int i = 0; i < sampleList.size(); i++){
-        p_Events.events(i,0) = sampleList[i];
-        p_Events.events(i,1) = beforeList[i];
-        p_Events.events(i,2) = afterList[i];
+    for (int i = 0; i < sampleList.size(); i++) {
+        p_Events.events(i, 0) = sampleList[i];
+        p_Events.events(i, 1) = beforeList[i];
+        p_Events.events(i, 2) = afterList[i];
     }
     return true;
 }
 
 //=============================================================================================================
 
-bool FiffEvents::write_to_fif(QIODevice &p_IODevice) const
+bool FiffEvents::write_to_fif(QIODevice& p_IODevice) const
 {
     if (events.rows() == 0 || events.cols() < 3)
         return false;
@@ -267,7 +256,7 @@ bool FiffEvents::write_to_fif(QIODevice &p_IODevice) const
 
 //=============================================================================================================
 
-bool FiffEvents::write_to_ascii(QIODevice &p_IODevice,
+bool FiffEvents::write_to_ascii(QIODevice& p_IODevice,
                                 float sfreq) const
 {
     if (!p_IODevice.open(QIODevice::WriteOnly | QIODevice::Text))
@@ -276,14 +265,14 @@ bool FiffEvents::write_to_ascii(QIODevice &p_IODevice,
     for (int k = 0; k < events.rows(); ++k) {
         int sample = events(k, 0);
         int before = (events.cols() > 1) ? events(k, 1) : 0;
-        int after  = (events.cols() > 2) ? events(k, 2) : 0;
+        int after = (events.cols() > 2) ? events(k, 2) : 0;
         float time = (sfreq > 0.0f) ? static_cast<float>(sample) / sfreq : 0.0f;
         QTextStream out(&p_IODevice);
         out << QString("%1 %2 %3 %4\n")
-               .arg(sample, 6)
-               .arg(time, -10, 'f', 3)
-               .arg(before, 3)
-               .arg(after, 3);
+                   .arg(sample, 6)
+                   .arg(time, -10, 'f', 3)
+                   .arg(before, 3)
+                   .arg(after, 3);
     }
 
     p_IODevice.close();
@@ -292,9 +281,9 @@ bool FiffEvents::write_to_ascii(QIODevice &p_IODevice,
 
 //=============================================================================================================
 
-bool FiffEvents::detect_from_raw(const FiffRawData &raw,
-                                 FiffEvents &p_Events,
-                                 const QString &triggerCh,
+bool FiffEvents::detect_from_raw(const FiffRawData& raw,
+                                 FiffEvents& p_Events,
+                                 const QString& triggerCh,
                                  unsigned int triggerMask,
                                  bool leadingEdge)
 {
@@ -356,15 +345,15 @@ bool FiffEvents::detect_from_raw(const FiffRawData &raw,
 
 //=============================================================================================================
 
-bool FiffEvents::matchEvent(const AverageCategory &cat,
-                            const MatrixXi &events,
+bool FiffEvents::matchEvent(const AverageCategory& cat,
+                            const MatrixXi& events,
                             int eventIdx)
 {
     if (eventIdx < 0 || eventIdx >= events.rows())
         return false;
 
     int evFrom = events(eventIdx, 1);
-    int evTo   = events(eventIdx, 2);
+    int evTo = events(eventIdx, 2);
 
     // Check if any of the category's event codes match
     bool match = false;

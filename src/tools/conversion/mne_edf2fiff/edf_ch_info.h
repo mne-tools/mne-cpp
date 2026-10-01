@@ -51,7 +51,6 @@ namespace EDF2FIFF
 */
 class EDFChannelInfo
 {
-
 public:
     //=========================================================================================================
     /**
@@ -110,15 +109,15 @@ private:
     int m_iChanNo;
 
     // data fields for EDF channels. The member order below does NOT correlate with the order in the EDF header.
-    QString m_sLabel;                   // e.g. "EEG Fpz-Cz" or "Body temp"
-    QString m_sTransducerType;          // e.g. "AgAgCl electrode"
-    QString m_sPhysicalDimension;       // e.g. "uV" or "degreeC"
-    QString m_sPrefiltering;            // e.g. "HP: 0.1Hz LP: 75Hz"
-    float m_fPhysicalMinimum;           // e.g. -500 or 34
-    float m_fPhysicalMaximum;           // e.g. -500 or 34
-    long m_iDigitalMinimum;             // e.g. -2048
-    long m_iDigitalMaximum;             // e.g. 2047
-    long m_iNumberOfSamplesPerRecord;   // e.g. 250 or 1
+    QString m_sLabel;                 // e.g. "EEG Fpz-Cz" or "Body temp"
+    QString m_sTransducerType;        // e.g. "AgAgCl electrode"
+    QString m_sPhysicalDimension;     // e.g. "uV" or "degreeC"
+    QString m_sPrefiltering;          // e.g. "HP: 0.1Hz LP: 75Hz"
+    float m_fPhysicalMinimum;         // e.g. -500 or 34
+    float m_fPhysicalMaximum;         // e.g. -500 or 34
+    long m_iDigitalMinimum;           // e.g. -2048
+    long m_iDigitalMaximum;           // e.g. 2047
+    long m_iNumberOfSamplesPerRecord; // e.g. 250 or 1
 
     // convenience fields, calculated using the EDF fields
     long m_iNumberOfSamplesTotal;

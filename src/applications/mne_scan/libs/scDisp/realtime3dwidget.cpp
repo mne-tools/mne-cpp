@@ -101,11 +101,11 @@ RealTime3DWidget::~RealTime3DWidget()
 void RealTime3DWidget::createGUI()
 {
     m_p3DView->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-    m_p3DView->setMinimumSize(400,400);
+    m_p3DView->setMinimumSize(400, 400);
 
     QGridLayout* pMainLayoutView = new QGridLayout();
-    pMainLayoutView->addWidget(m_p3DView,0,0);
-    pMainLayoutView->setContentsMargins(0,0,0,0);
+    pMainLayoutView->addWidget(m_p3DView, 0, 0);
+    pMainLayoutView->setContentsMargins(0, 0, 0, 0);
 
     this->setLayout(pMainLayoutView);
 }
@@ -114,23 +114,23 @@ void RealTime3DWidget::createGUI()
 
 void RealTime3DWidget::update(SCMEASLIB::Measurement::SPtr pMeasurement)
 {
-    if(!m_bDisplayWidgetsInitialized) {
+    if (!m_bDisplayWidgetsInitialized) {
         initDisplayControllWidgets();
     }
 
-    if(RealTimeConnectivityEstimate::SPtr pRTCE = qSharedPointerDynamicCast<RealTimeConnectivityEstimate>(pMeasurement)) {
-        if(pRTCE->getValue().data()->isEmpty()) {
+    if (RealTimeConnectivityEstimate::SPtr pRTCE = qSharedPointerDynamicCast<RealTimeConnectivityEstimate>(pMeasurement)) {
+        if (pRTCE->getValue().data()->isEmpty()) {
             return;
         }
 
         // Add rt connectivity data
-        if(!m_pRtConnectivityItem) {
+        if (!m_pRtConnectivityItem) {
             m_pRtConnectivityItem = m_pData3DModel->addNetwork(*(pRTCE->getValue().data()),
                                                                "Functional Data");
 
-            if(pRTCE->getSurfSet() && pRTCE->getAnnotSet()) {
-                for(int i = 0; i < pRTCE->getSurfSet()->size(); ++i) {
-                    const FSLIB::FsSurface &surf = (*pRTCE->getSurfSet())[i];
+            if (pRTCE->getSurfSet() && pRTCE->getAnnotSet()) {
+                for (int i = 0; i < pRTCE->getSurfSet()->size(); ++i) {
+                    const FSLIB::FsSurface& surf = (*pRTCE->getSurfSet())[i];
                     QString hemi = (surf.hemi() == 0) ? "lh" : "rh";
                     QString surfType = surf.surf().isEmpty() ? "inflated" : surf.surf();
                     m_pData3DModel->addSurface("Subject", hemi, surfType, surf);
@@ -144,27 +144,27 @@ void RealTime3DWidget::update(SCMEASLIB::Measurement::SPtr pMeasurement)
             m_iNumberBadChannels = pRTCE->getFiffInfo() ? pRTCE->getFiffInfo()->bads.size() : 0;
         } else {
             // Update existing connectivity data - replace with new network
-            QPair<float,float> freqs = pRTCE->getValue()->getFrequencyRange();
+            QPair<float, float> freqs = pRTCE->getValue()->getFrequencyRange();
             QString sItemName = QString("%1_%2_%3").arg(pRTCE->getValue()->getConnectivityMethod(), QString::number(freqs.first), QString::number(freqs.second));
             m_pRtConnectivityItem->setText(sItemName);
 
-            if(pRTCE->getSensorSurface() && pRTCE->getFiffInfo()) {
-                if(m_iNumberBadChannels != pRTCE->getFiffInfo()->bads.size()) {
+            if (pRTCE->getSensorSurface() && pRTCE->getFiffInfo()) {
+                if (m_iNumberBadChannels != pRTCE->getFiffInfo()->bads.size()) {
                     // Note: Sensor update from in-memory FiffChInfo/MNEBem not
                     // directly supported in disp3D.
                     m_iNumberBadChannels = pRTCE->getFiffInfo()->bads.size();
                 }
             }
         }
-    } else if(RealTimeSourceEstimate::SPtr pRTSE = qSharedPointerDynamicCast<RealTimeSourceEstimate>(pMeasurement)) {
+    } else if (RealTimeSourceEstimate::SPtr pRTSE = qSharedPointerDynamicCast<RealTimeSourceEstimate>(pMeasurement)) {
         QList<InvSourceEstimate::SPtr> lMNEData = pRTSE->getValue();
 
         // Add source estimate data via BrainView's realtime streaming
-        if(!lMNEData.isEmpty()) {
-            if(!m_bRtSourceActive && pRTSE->getAnnotSet() && pRTSE->getSurfSet() && pRTSE->getFwdSolution()) {
+        if (!lMNEData.isEmpty()) {
+            if (!m_bRtSourceActive && pRTSE->getAnnotSet() && pRTSE->getSurfSet() && pRTSE->getFwdSolution()) {
                 // Add surfaces first
-                for(int i = 0; i < pRTSE->getSurfSet()->size(); ++i) {
-                    const FSLIB::FsSurface &surf = (*pRTSE->getSurfSet())[i];
+                for (int i = 0; i < pRTSE->getSurfSet()->size(); ++i) {
+                    const FSLIB::FsSurface& surf = (*pRTSE->getSurfSet())[i];
                     QString hemi = (surf.hemi() == 0) ? "lh" : "rh";
                     QString surfType = surf.surf().isEmpty() ? "inflated" : surf.surf();
                     m_pData3DModel->addSurface("Subject", hemi, surfType, surf);
@@ -176,38 +176,38 @@ void RealTime3DWidget::update(SCMEASLIB::Measurement::SPtr pMeasurement)
                 m_bRtSourceActive = true;
                 m_mriHeadTrans = pRTSE->getMriHeadTrans();
             } else {
-                if(m_bRtSourceActive) {
+                if (m_bRtSourceActive) {
                     // Extract data column from InvSourceEstimate
-                    const InvSourceEstimate &stc = *lMNEData.first();
-                    if(stc.data.cols() > 0) {
+                    const InvSourceEstimate& stc = *lMNEData.first();
+                    if (stc.data.cols() > 0) {
                         m_p3DView->pushRealtimeSourceData(stc.data.col(0));
                     }
                 }
             }
         }
-    } else if(RealTimeHpiResult::SPtr pRTHR = qSharedPointerDynamicCast<RealTimeHpiResult>(pMeasurement)) {
-        if(!m_pBemHeadAvr) {
+    } else if (RealTimeHpiResult::SPtr pRTHR = qSharedPointerDynamicCast<RealTimeHpiResult>(pMeasurement)) {
+        if (!m_pBemHeadAvr) {
             // Note: Loading sensor surfaces from in-memory MNEBem is not directly
             // supported by disp3D's addSensors API. Sensor surfaces skipped.
 
             // Add average head surface
             QFile t_fileHeadAvr(QCoreApplication::applicationDirPath() + "/../resources/general/hpiAlignment/fsaverage-head.fif");
             MNEBem t_BemHeadAvr(t_fileHeadAvr);
-            if(!t_BemHeadAvr.isEmpty()) {
+            if (!t_BemHeadAvr.isEmpty()) {
                 m_pBemHeadAvr = m_pData3DModel->addBemSurface("Subject", "Average head", t_BemHeadAvr[0]);
             }
         }
 
-        if(QSharedPointer<HpiFitResult> pHpiFitResult = pRTHR->getValue()) {
-            if(m_sFilePathDigitizers != pHpiFitResult->sFilePathDigitzers && m_pBemHeadAvr) {
+        if (QSharedPointer<HpiFitResult> pHpiFitResult = pRTHR->getValue()) {
+            if (m_sFilePathDigitizers != pHpiFitResult->sFilePathDigitzers && m_pBemHeadAvr) {
                 //Add all digitizer but additional points to the 3D view
                 QFile fileDig(pHpiFitResult->sFilePathDigitzers);
                 FiffDigPointSet digSet(fileDig);
                 addDigSetToView(digSet);
                 alignFiducials(pHpiFitResult->sFilePathDigitzers);
             }
-            if (!m_pFiffDigitizerData && m_pBemHeadAvr){
-                if (auto pDigData = pRTHR->digitizerData()){
+            if (!m_pFiffDigitizerData && m_pBemHeadAvr) {
+                if (auto pDigData = pRTHR->digitizerData()) {
                     m_pFiffDigitizerData = pDigData;
                     FiffDigPointSet digSet(pDigData->points);
                     addDigSetToView(digSet);
@@ -217,7 +217,7 @@ void RealTime3DWidget::update(SCMEASLIB::Measurement::SPtr pMeasurement)
 
             //Add fitted digitizers to 3D view
             m_pData3DModel->addDigitizerData(
-                                             pHpiFitResult->fittedCoils.pickTypes(QList<int>()<<FIFFV_POINT_EEG).getList());
+                pHpiFitResult->fittedCoils.pickTypes(QList<int>() << FIFFV_POINT_EEG).getList());
 
             // Draw where the subject's head has been over the course of the
             // measurement, so drift is visible rather than just the current
@@ -235,7 +235,7 @@ void RealTime3DWidget::update(SCMEASLIB::Measurement::SPtr pMeasurement)
 
 void RealTime3DWidget::addDigSetToView(const FIFFLIB::FiffDigPointSet& digSet)
 {
-    FiffDigPointSet digSetWithoutAdditional = digSet.pickTypes(QList<int>()<<FIFFV_POINT_HPI<<FIFFV_POINT_CARDINAL<<FIFFV_POINT_EEG<<FIFFV_POINT_EXTRA);
+    FiffDigPointSet digSetWithoutAdditional = digSet.pickTypes(QList<int>() << FIFFV_POINT_HPI << FIFFV_POINT_CARDINAL << FIFFV_POINT_EEG << FIFFV_POINT_EXTRA);
     m_pData3DModel->addDigitizerData(digSetWithoutAdditional.getList());
 }
 
@@ -257,10 +257,10 @@ void RealTime3DWidget::alignFiducials(QSharedPointer<FIFFLIB::FiffDigitizerData>
 {
     std::unique_ptr<MNEMshDisplaySurfaceSet> pMneMshDisplaySurfaceSet = std::make_unique<MNEMshDisplaySurfaceSet>();
     pMneMshDisplaySurfaceSet->add_bem_surface(QCoreApplication::applicationDirPath() + "/../resources/general/hpiAlignment/fsaverage-head.fif",
-                                             FIFFV_BEM_SURF_ID_HEAD,
-                                             "head",
-                                             1,
-                                             1);
+                                              FIFFV_BEM_SURF_ID_HEAD,
+                                              "head",
+                                              1,
+                                              1);
 
     MNEMshDisplaySurface* surface = pMneMshDisplaySurfaceSet->surfs[0].get();
 
@@ -269,11 +269,11 @@ void RealTime3DWidget::alignFiducials(QSharedPointer<FIFFLIB::FiffDigitizerData>
     Eigen::Vector3f scales;
     QScopedPointer<FiffDigitizerData> t_digDataReference(new FiffDigitizerData(t_fileDigDataReference));
     surface->align_fiducials(*pDigData,
-                            *t_digDataReference,
-                            10,
-                            1,
-                            0,
-                            scales);
+                             *t_digDataReference,
+                             10,
+                             1,
+                             0,
+                             scales);
 
     QMatrix4x4 invMat = calculateInverseMatrix(pDigData, scales[0]);
 
@@ -287,7 +287,7 @@ void RealTime3DWidget::applyAlignmentTransform(QMatrix4x4& invMat)
     m_tAlignment = invMat;
 
     // Apply alignment transform to the BEM tree item
-    if(m_pBemHeadAvr) {
+    if (m_pBemHeadAvr) {
         m_pBemHeadAvr->setTransform(m_tAlignment);
     }
 }
@@ -300,15 +300,15 @@ QMatrix4x4 RealTime3DWidget::calculateInverseMatrix(const QSharedPointer<FIFFLIB
     QMatrix4x4 invMat;
 
     // use inverse transform
-    for(int r = 0; r < 3; ++r) {
-        for(int c = 0; c < 3; ++c) {
+    for (int r = 0; r < 3; ++r) {
+        for (int c = 0; c < 3; ++c) {
             // also apply scaling factor
-            invMat(r,c) = pDigData->head_mri_t_adj->invrot()(r,c) * scale;
+            invMat(r, c) = pDigData->head_mri_t_adj->invrot()(r, c) * scale;
         }
     }
-    invMat(0,3) = pDigData->head_mri_t_adj->invmove()(0);
-    invMat(1,3) = pDigData->head_mri_t_adj->invmove()(1);
-    invMat(2,3) = pDigData->head_mri_t_adj->invmove()(2);
+    invMat(0, 3) = pDigData->head_mri_t_adj->invmove()(0);
+    invMat(1, 3) = pDigData->head_mri_t_adj->invmove()(1);
+    invMat(2, 3) = pDigData->head_mri_t_adj->invmove()(2);
 
     return invMat;
 }

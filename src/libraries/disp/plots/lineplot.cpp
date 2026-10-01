@@ -42,7 +42,7 @@ using namespace Eigen;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-LinePlot::LinePlot(QWidget *parent)
+LinePlot::LinePlot(QWidget* parent)
 : QWidget(parent)
 , m_dMinX(0)
 , m_dMaxX(0)
@@ -56,9 +56,9 @@ LinePlot::LinePlot(QWidget *parent)
 
 //=============================================================================================================
 
-LinePlot::LinePlot(const QVector<double> &y,
+LinePlot::LinePlot(const QVector<double>& y,
                    const QString& title,
-                   QWidget *parent)
+                   QWidget* parent)
 : QWidget(parent)
 , m_sTitle(title)
 , m_dMinX(0)
@@ -74,10 +74,10 @@ LinePlot::LinePlot(const QVector<double> &y,
 
 //=============================================================================================================
 
-LinePlot::LinePlot(const QVector<double> &x,
-                   const QVector<double> &y,
+LinePlot::LinePlot(const QVector<double>& x,
+                   const QVector<double>& y,
                    const QString& title,
-                   QWidget *parent)
+                   QWidget* parent)
 : QWidget(parent)
 , m_sTitle(title)
 , m_dMinX(0)
@@ -99,7 +99,7 @@ LinePlot::~LinePlot()
 
 //=============================================================================================================
 
-void LinePlot::setTitle(const QString &p_sTitle)
+void LinePlot::setTitle(const QString& p_sTitle)
 {
     m_sTitle = p_sTitle;
     QWidget::update();
@@ -107,7 +107,7 @@ void LinePlot::setTitle(const QString &p_sTitle)
 
 //=============================================================================================================
 
-void LinePlot::setXLabel(const QString &p_sXLabel)
+void LinePlot::setXLabel(const QString& p_sXLabel)
 {
     m_sXLabel = p_sXLabel;
     QWidget::update();
@@ -115,7 +115,7 @@ void LinePlot::setXLabel(const QString &p_sXLabel)
 
 //=============================================================================================================
 
-void LinePlot::setYLabel(const QString &p_sYLabel)
+void LinePlot::setYLabel(const QString& p_sYLabel)
 {
     m_sYLabel = p_sYLabel;
     QWidget::update();
@@ -123,10 +123,10 @@ void LinePlot::setYLabel(const QString &p_sYLabel)
 
 //=============================================================================================================
 
-void LinePlot::updateData(const QVector<double> &y)
+void LinePlot::updateData(const QVector<double>& y)
 {
     QVector<double> x(y.size());
-    for(int i = 0; i < x.size(); ++i) {
+    for (int i = 0; i < x.size(); ++i) {
         x[i] = static_cast<double>(i);
     }
     updateData(x, y);
@@ -134,8 +134,8 @@ void LinePlot::updateData(const QVector<double> &y)
 
 //=============================================================================================================
 
-void LinePlot::updateData(const QVector<double> &x,
-                          const QVector<double> &y)
+void LinePlot::updateData(const QVector<double>& x,
+                          const QVector<double>& y)
 {
     m_vecXData = x;
     m_vecYData = y;
@@ -144,8 +144,10 @@ void LinePlot::updateData(const QVector<double> &x,
         m_dMinX = x[0];
         m_dMaxX = x[0];
         for (int i = 1; i < x.size(); ++i) {
-            if (x[i] < m_dMinX) m_dMinX = x[i];
-            if (x[i] > m_dMaxX) m_dMaxX = x[i];
+            if (x[i] < m_dMinX)
+                m_dMinX = x[i];
+            if (x[i] > m_dMaxX)
+                m_dMaxX = x[i];
         }
     }
 
@@ -153,8 +155,10 @@ void LinePlot::updateData(const QVector<double> &x,
         m_dMinY = y[0];
         m_dMaxY = y[0];
         for (int i = 1; i < y.size(); ++i) {
-            if (y[i] < m_dMinY) m_dMinY = y[i];
-            if (y[i] > m_dMaxY) m_dMaxY = y[i];
+            if (y[i] < m_dMinY)
+                m_dMinY = y[i];
+            if (y[i] > m_dMaxY)
+                m_dMaxY = y[i];
         }
     }
 
@@ -164,7 +168,7 @@ void LinePlot::updateData(const QVector<double> &x,
 
 //=============================================================================================================
 
-void LinePlot::paintEvent(QPaintEvent * /*event*/)
+void LinePlot::paintEvent(QPaintEvent* /*event*/)
 {
     QPainter painter(this);
     painter.setRenderHint(QPainter::Antialiasing);
@@ -213,8 +217,10 @@ void LinePlot::paintEvent(QPaintEvent * /*event*/)
 
     double rangeX = m_dMaxX - m_dMinX;
     double rangeY = m_dMaxY - m_dMinY;
-    if (rangeX == 0) rangeX = 1.0;
-    if (rangeY == 0) rangeY = 1.0;
+    if (rangeX == 0)
+        rangeX = 1.0;
+    if (rangeY == 0)
+        rangeY = 1.0;
 
     // Y-axis ticks
     const int nYTicks = 5;

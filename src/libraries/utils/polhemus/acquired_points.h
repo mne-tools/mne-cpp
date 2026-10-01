@@ -48,10 +48,11 @@ namespace UTILSLIB
  * Maps onto the FIFF point-kind constants on export
  * (`FIFFV_POINT_CARDINAL` / `FIFFV_POINT_EEG` / `FIFFV_POINT_EXTRA`).
  */
-enum class PointKind {
-    Fiducial = 0,    ///< Anatomical landmark (NAS / LPA / RPA).
-    Eeg,             ///< Named EEG electrode contact.
-    HeadShape        ///< Free head-shape point (continuous mode).
+enum class PointKind
+{
+    Fiducial = 0, ///< Anatomical landmark (NAS / LPA / RPA).
+    Eeg,          ///< Named EEG electrode contact.
+    HeadShape     ///< Free head-shape point (continuous mode).
 };
 
 //=============================================================================================================
@@ -61,7 +62,8 @@ enum class PointKind {
  * Numerically aligned with the FIFF `ident` field used for cardinal points
  * (1 = LPA, 2 = NAS, 3 = RPA).
  */
-enum class FiducialId {
+enum class FiducialId
+{
     LPA = 1,
     NAS = 2,
     RPA = 3
@@ -73,10 +75,10 @@ enum class FiducialId {
  */
 struct UTILSSHARED_EXPORT DigitizedPoint
 {
-    PointKind   kind = PointKind::HeadShape;
-    QString     label;            ///< Human label ("NAS", "Cz", "HSP-42", …).
-    int         identNumber = 0;  ///< 1-based id used by FIFF on export.
-    QVector3D   position;         ///< Position in metres, sensor frame.
+    PointKind kind = PointKind::HeadShape;
+    QString label;       ///< Human label ("NAS", "Cz", "HSP-42", …).
+    int identNumber = 0; ///< 1-based id used by FIFF on export.
+    QVector3D position;  ///< Position in metres, sensor frame.
 };
 
 //=============================================================================================================
@@ -90,16 +92,23 @@ class UTILSSHARED_EXPORT AcquiredPoints : public QObject
 {
     Q_OBJECT
 public:
-    explicit AcquiredPoints(QObject* parent = nullptr) : QObject(parent) {}
+    explicit AcquiredPoints(QObject* parent = nullptr)
+    : QObject(parent)
+    {
+    }
 
-    const QVector<DigitizedPoint>& points() const { return m_points; }
+    const QVector<DigitizedPoint>& points() const
+    {
+        return m_points;
+    }
 
     /**
      * Append a new point and emit @c UTILSLIB::AcquiredPoints::pointsChanged "pointsChanged".
      *
      * @param[in] p Captured point to append.
      */
-    void append(const DigitizedPoint& p) {
+    void append(const DigitizedPoint& p)
+    {
         m_points.append(p);
         emit pointsChanged();
     }
@@ -109,7 +118,8 @@ public:
      *
      * @param[in] kind Point kind whose most recent entry is removed.
      */
-    void undoLast(PointKind kind) {
+    void undoLast(PointKind kind)
+    {
         for (int i = m_points.size() - 1; i >= 0; --i) {
             if (m_points[i].kind == kind) {
                 m_points.removeAt(i);
@@ -120,8 +130,10 @@ public:
     }
 
     /** Drop every captured point. */
-    void clear() {
-        if (m_points.isEmpty()) return;
+    void clear()
+    {
+        if (m_points.isEmpty())
+            return;
         m_points.clear();
         emit pointsChanged();
     }
@@ -133,7 +145,8 @@ public:
      *
      * @return Captured fiducial position, or a zero vector if not yet captured.
      */
-    QVector3D fiducial(FiducialId id) const {
+    QVector3D fiducial(FiducialId id) const
+    {
         for (const auto& p : m_points) {
             if (p.kind == PointKind::Fiducial && p.identNumber == static_cast<int>(id)) {
                 return p.position;
@@ -149,7 +162,8 @@ public:
      *
      * @return True if the fiducial has been captured, false otherwise.
      */
-    bool hasFiducial(FiducialId id) const {
+    bool hasFiducial(FiducialId id) const
+    {
         for (const auto& p : m_points) {
             if (p.kind == PointKind::Fiducial && p.identNumber == static_cast<int>(id)) {
                 return true;
@@ -163,10 +177,10 @@ public:
      *
      * @param[in] id Fiducial whose captured points are all removed.
      */
-    void removeFiducial(FiducialId id) {
+    void removeFiducial(FiducialId id)
+    {
         for (int i = m_points.size() - 1; i >= 0; --i) {
-            if (m_points[i].kind == PointKind::Fiducial
-                && m_points[i].identNumber == static_cast<int>(id)) {
+            if (m_points[i].kind == PointKind::Fiducial && m_points[i].identNumber == static_cast<int>(id)) {
                 m_points.removeAt(i);
             }
         }
@@ -178,49 +192,58 @@ public:
      *
      * @return True if NAS, LPA, and RPA have all been captured.
      */
-    bool hasAllFiducials() const {
-        return hasFiducial(FiducialId::NAS)
-            && hasFiducial(FiducialId::LPA)
-            && hasFiducial(FiducialId::RPA);
+    bool hasAllFiducials() const
+    {
+        return hasFiducial(FiducialId::NAS) && hasFiducial(FiducialId::LPA) && hasFiducial(FiducialId::RPA);
     }
 
-    int countOf(PointKind kind) const {
+    int countOf(PointKind kind) const
+    {
         int n = 0;
-        for (const auto& p : m_points) if (p.kind == kind) ++n;
+        for (const auto& p : m_points)
+            if (p.kind == kind)
+                ++n;
         return n;
     }
 
-    void setPosition(int index, const QVector3D& pos) {
+    void setPosition(int index, const QVector3D& pos)
+    {
         if (index >= 0 && index < m_points.size())
             m_points[index].position = pos;
     }
 
-    void emitChanged() { emit pointsChanged(); }
+    void emitChanged()
+    {
+        emit pointsChanged();
+    }
 
     // ── Twin (BEM-space) fiducials — clicked on digital twin surface ──
 
-    void setTwinFiducial(FiducialId id, const QVector3D& pos) {
+    void setTwinFiducial(FiducialId id, const QVector3D& pos)
+    {
         m_twinFiducials[static_cast<int>(id)] = pos;
         emit pointsChanged();
     }
 
-    void clearTwinFiducial(FiducialId id) {
+    void clearTwinFiducial(FiducialId id)
+    {
         m_twinFiducials.remove(static_cast<int>(id));
         emit pointsChanged();
     }
 
-    bool hasTwinFiducial(FiducialId id) const {
+    bool hasTwinFiducial(FiducialId id) const
+    {
         return m_twinFiducials.contains(static_cast<int>(id));
     }
 
-    QVector3D twinFiducial(FiducialId id) const {
+    QVector3D twinFiducial(FiducialId id) const
+    {
         return m_twinFiducials.value(static_cast<int>(id));
     }
 
-    bool hasAllTwinFiducials() const {
-        return hasTwinFiducial(FiducialId::NAS)
-            && hasTwinFiducial(FiducialId::LPA)
-            && hasTwinFiducial(FiducialId::RPA);
+    bool hasAllTwinFiducials() const
+    {
+        return hasTwinFiducial(FiducialId::NAS) && hasTwinFiducial(FiducialId::LPA) && hasTwinFiducial(FiducialId::RPA);
     }
 
 signals:

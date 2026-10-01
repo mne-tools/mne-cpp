@@ -135,15 +135,14 @@ QStringList MnaParamTree::evaluate(const QMap<QString, QVariant>& results)
 //=============================================================================================================
 
 QVariant MnaParamTree::evaluateExpression(const QString& expr,
-                                           const QMap<QString, QVariant>& results) const
+                                          const QMap<QString, QVariant>& results) const
 {
     // Built-in function: ref('path') — look up a parameter or result value
     static const QRegularExpression refRe(QStringLiteral("ref\\('([^']+)'\\)"));
 
     // Simple case: bare ref('path')
     QRegularExpressionMatch refMatch = refRe.match(expr.trimmed());
-    if (refMatch.hasMatch() && refMatch.capturedStart() == 0
-        && refMatch.capturedEnd() == expr.trimmed().length()) {
+    if (refMatch.hasMatch() && refMatch.capturedStart() == 0 && refMatch.capturedEnd() == expr.trimmed().length()) {
         const QString path = refMatch.captured(1);
         if (m_params.contains(path)) {
             return m_params.value(path);
@@ -158,8 +157,8 @@ QVariant MnaParamTree::evaluateExpression(const QString& expr,
     if (clampMatch.hasMatch()) {
         QVariant inner = evaluateExpression(clampMatch.captured(1).trimmed(), results);
         double val = inner.toDouble();
-        double lo  = clampMatch.captured(2).toDouble();
-        double hi  = clampMatch.captured(3).toDouble();
+        double lo = clampMatch.captured(2).toDouble();
+        double hi = clampMatch.captured(3).toDouble();
         return QVariant(std::clamp(val, lo, hi));
     }
 
@@ -179,10 +178,10 @@ QVariant MnaParamTree::evaluateExpression(const QString& expr,
     QRegularExpressionMatch threshMatch = threshRe.match(expr.trimmed());
     if (threshMatch.hasMatch()) {
         QVariant inner = evaluateExpression(threshMatch.captured(1).trimmed(), results);
-        double val     = inner.toDouble();
-        double thresh  = threshMatch.captured(2).toDouble();
-        double above   = threshMatch.captured(3).toDouble();
-        double below   = threshMatch.captured(4).toDouble();
+        double val = inner.toDouble();
+        double thresh = threshMatch.captured(2).toDouble();
+        double above = threshMatch.captured(3).toDouble();
+        double below = threshMatch.captured(4).toDouble();
         return QVariant(val > thresh ? above : below);
     }
 

@@ -74,10 +74,10 @@ namespace FIFFLIB
 class FIFFSHARED_EXPORT FiffEvoked
 {
 public:
-    using SPtr = QSharedPointer<FiffEvoked>;            /**< Shared pointer type for FiffEvoked. */
-    using ConstSPtr = QSharedPointer<const FiffEvoked>; /**< Const shared pointer type for FiffEvoked. */
-    using UPtr = std::unique_ptr<FiffEvoked>;             /**< Unique pointer type for FiffEvoked. */
-    using ConstUPtr = std::unique_ptr<const FiffEvoked>;  /**< Const unique pointer type for FiffEvoked. */
+    using SPtr = QSharedPointer<FiffEvoked>;             /**< Shared pointer type for FiffEvoked. */
+    using ConstSPtr = QSharedPointer<const FiffEvoked>;  /**< Const shared pointer type for FiffEvoked. */
+    using UPtr = std::unique_ptr<FiffEvoked>;            /**< Unique pointer type for FiffEvoked. */
+    using ConstUPtr = std::unique_ptr<const FiffEvoked>; /**< Const unique pointer type for FiffEvoked. */
 
     //=========================================================================================================
     /**
@@ -100,7 +100,7 @@ public:
      */
     FiffEvoked(QIODevice& p_IODevice,
                QVariant setno = 0,
-               QPair<float,float> t_baseline = defaultFloatPair,
+               QPair<float, float> t_baseline = defaultFloatPair,
                bool proj = true,
                fiff_int_t p_aspect_kind = FIFFV_ASPECT_AVERAGE);
 
@@ -200,7 +200,7 @@ public:
      */
     static bool read(QIODevice& p_IODevice,
                      FiffEvoked& p_FiffEvoked,
-                     QVariant setno = 0, QPair<float,float> t_baseline = defaultFloatPair,
+                     QVariant setno = 0, QPair<float, float> t_baseline = defaultFloatPair,
                      bool proj = true,
                      fiff_int_t p_aspect_kind = FIFFV_ASPECT_AVERAGE);
 
@@ -211,7 +211,7 @@ public:
      * @param[in] p_info     Info to set.
      * @param[in] applyProj       Apply SSP projection vectors (optional, default = true).
      */
-    void setInfo(const FiffInfo &p_info,
+    void setInfo(const FiffInfo& p_info,
                  bool applyProj = true);
 
     //=========================================================================================================
@@ -222,7 +222,7 @@ public:
      *
      * @return the updated FiffEvoked.
      */
-    FiffEvoked & operator+=(const Eigen::MatrixXd &newData);
+    FiffEvoked& operator+=(const Eigen::MatrixXd& newData);
 
     //=========================================================================================================
     /**
@@ -230,19 +230,19 @@ public:
      *
      * @param[in] p_baseline     time definition of the baseline in seconds [from, to].
      */
-    void applyBaselineCorrection(QPair<float,float>& p_baseline);
+    void applyBaselineCorrection(QPair<float, float>& p_baseline);
 
 public:
-    FiffInfo                    info;               /**< Measurement info. */
-    fiff_int_t                  nave;               /**< Number of averaged epochs. */
-    fiff_int_t                  aspect_kind;        /**< Aspect identifier, either FIFFV_ASPECT_AVERAGE or FIFFV_ASPECT_STD_ERR. */
-    fiff_int_t                  first;              /**< First time sample. */
-    fiff_int_t                  last;               /**< Last time sample. */
-    QString                     comment;            /**< Comment on dataset. Can be the condition. */
-    Eigen::RowVectorXf          times;              /**< Vector of time instants in seconds. */
-    Eigen::MatrixXd             data;               /**< 2D array of shape [n_channels x n_times]; Evoked response. */
-    Eigen::MatrixXd             proj;               /**< SSP projection. */
-    QPair<float,float>          baseline;           /**< Baseline information in seconds form where the seconds are seen relative to the trigger, meaning they can also be negative [from to]*/
+    FiffInfo info;                /**< Measurement info. */
+    fiff_int_t nave;              /**< Number of averaged epochs. */
+    fiff_int_t aspect_kind;       /**< Aspect identifier, either FIFFV_ASPECT_AVERAGE or FIFFV_ASPECT_STD_ERR. */
+    fiff_int_t first;             /**< First time sample. */
+    fiff_int_t last;              /**< Last time sample. */
+    QString comment;              /**< Comment on dataset. Can be the condition. */
+    Eigen::RowVectorXf times;     /**< Vector of time instants in seconds. */
+    Eigen::MatrixXd data;         /**< 2D array of shape [n_channels x n_times]; Evoked response. */
+    Eigen::MatrixXd proj;         /**< SSP projection. */
+    QPair<float, float> baseline; /**< Baseline information in seconds form where the seconds are seen relative to the trigger, meaning they can also be negative [from to]*/
 };
 
 //=============================================================================================================
@@ -258,9 +258,9 @@ inline QStringList FiffEvoked::ch_names()
 
 inline QString FiffEvoked::aspectKindToString() const
 {
-    if(aspect_kind == FIFFV_ASPECT_AVERAGE)
+    if (aspect_kind == FIFFV_ASPECT_AVERAGE)
         return QString("Average");
-    else if(aspect_kind == FIFFV_ASPECT_STD_ERR)
+    else if (aspect_kind == FIFFV_ASPECT_STD_ERR)
         return QString("Standard_error");
     else
         return QString("Unknown");
@@ -277,12 +277,12 @@ inline bool FiffEvoked::isEmpty() const
 
 #ifndef metatype_fiffevoked
 #define metatype_fiffevoked
-Q_DECLARE_METATYPE(FIFFLIB::FiffEvoked);/**< Provides QT META type declaration of the FIFFLIB::FiffEvoked type. For signal/slot and QVariant usage.*/
+Q_DECLARE_METATYPE(FIFFLIB::FiffEvoked); /**< Provides QT META type declaration of the FIFFLIB::FiffEvoked type. For signal/slot and QVariant usage.*/
 #endif
 
 #ifndef metatype_fiffevokedsptr
 #define metatype_fiffevokedsptr
-Q_DECLARE_METATYPE(FIFFLIB::FiffEvoked::SPtr);/**< Provides QT META type declaration of the FIFFLIB::FiffEvoked type. For signal/slot and QVariant usage.*/
+Q_DECLARE_METATYPE(FIFFLIB::FiffEvoked::SPtr); /**< Provides QT META type declaration of the FIFFLIB::FiffEvoked type. For signal/slot and QVariant usage.*/
 #endif
 
 #endif // FIFF_EVOKED_H

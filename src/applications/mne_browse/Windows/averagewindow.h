@@ -87,7 +87,7 @@ public:
      * @param [in] parent pointer to parent widget; If parent is 0, the new AverageWindow becomes a window. If parent is another widget, AverageWindow becomes a child window inside parent. AverageWindow is deleted when its parent is deleted.
      * @param [in] file default file used to read the evoked data from.
      */
-    AverageWindow(QWidget *parent, QFile &file);
+    AverageWindow(QWidget* parent, QFile& file);
 
     //=========================================================================================================
     /**
@@ -95,13 +95,13 @@ public:
      *
      * @param [in] parent pointer to parent widget; If parent is 0, the new AverageWindow becomes a window. If parent is another widget, AverageWindow becomes a child window inside parent. AverageWindow is deleted when its parent is deleted.
      */
-    AverageWindow(QWidget *parent);
+    AverageWindow(QWidget* parent);
 
     //=========================================================================================================
     /**
      * Constructs a AverageWindow which is a child of parent.
      */
-//    AverageWindow();
+    //    AverageWindow();
 
     //=========================================================================================================
     /**
@@ -122,7 +122,7 @@ public:
      *
      * * @param [in] selectedChannelItems list of selected graphic items
      */
-    void channelSelectionManagerChanged(const QList<QGraphicsItem *> &selectedChannelItems);
+    void channelSelectionManagerChanged(const QList<QGraphicsItem*>& selectedChannelItems);
 
     //=========================================================================================================
     /**
@@ -130,7 +130,7 @@ public:
      *
      * @param [in] scaleMap map with all channel types and their current scaling value
      */
-    void scaleAveragedData(const QMap<QString,double> &scaleMap);
+    void scaleAveragedData(const QMap<QString, double>& scaleMap);
 
     //=========================================================================================================
     /**
@@ -217,7 +217,6 @@ public:
     void setRecomputeAvailable(bool available);
 
 private:
-
     //=========================================================================================================
     /**
      * called by constructor to perform common initialization step
@@ -230,7 +229,7 @@ private:
      *
      * @param [in] file holds the file which is to be loaded on startup
      */
-    void initMVC(QFile &file);
+    void initMVC(QFile& file);
 
     //=========================================================================================================
     /**
@@ -266,7 +265,7 @@ private:
     /**
      * call this function whenever a selection was made in teh evoked data set list
      */
-    void onSelectionChanged(const QItemSelection &selected, const QItemSelection &deselected);
+    void onSelectionChanged(const QItemSelection& selected, const QItemSelection& deselected);
 
     //=========================================================================================================
     /**
@@ -305,26 +304,26 @@ private:
     /**
      * reimplemented resize event.
      */
-    void resizeEvent(QResizeEvent * event);
+    void resizeEvent(QResizeEvent* event);
 
     /**
      * Resize butterfly scene items to fill the viewport at 1:1 pixel scale.
      */
     void updateButterflySize();
 
-    std::unique_ptr<Ui::AverageWindow> ui;                  /**< Pointer to the qt designer generated ui class.*/
+    std::unique_ptr<Ui::AverageWindow> ui; /**< Pointer to the qt designer generated ui class.*/
 
-    QList<QColor>           m_lButterflyColors;     /**< List which holds 500 randomly generated colors.*/
+    QList<QColor> m_lButterflyColors; /**< List which holds 500 randomly generated colors.*/
 
-    QStringList             m_mappedChannelNames;   /**< List which holds the mapped channel names.*/
+    QStringList m_mappedChannelNames; /**< List which holds the mapped channel names.*/
 
-    AverageModel*           m_pAverageModel;        /**< The QAbstractTable average model being part of the model/view framework of Qt. */
-    AverageDelegate*        m_pAverageDelegate;     /**< The QItemDelegateaverage delegate being part of the model/view framework of Qt. */
-    AverageScene*           m_pAverageScene;        /**< The pointer to the average scene. */
+    AverageModel* m_pAverageModel;       /**< The QAbstractTable average model being part of the model/view framework of Qt. */
+    AverageDelegate* m_pAverageDelegate; /**< The QItemDelegateaverage delegate being part of the model/view framework of Qt. */
+    AverageScene* m_pAverageScene;       /**< The pointer to the average scene. */
 
-    ButterflyScene*         m_pButterflyScene;      /**< The pointer to the butterfly scene. */
-    FIFFLIB::FiffCov        m_noiseCovariance;      /**< Optional covariance used to whiten butterfly plots. */
-    WhiteningSettings       m_whiteningSettings;    /**< Whitening controls shared with the covariance manager. */
+    ButterflyScene* m_pButterflyScene;                   /**< The pointer to the butterfly scene. */
+    FIFFLIB::FiffCov m_noiseCovariance;                  /**< Optional covariance used to whiten butterfly plots. */
+    WhiteningSettings m_whiteningSettings;               /**< Whitening controls shared with the covariance manager. */
     QVector<FIFFLIB::FiffEvoked> m_layoutDisplayEvokeds; /**< Cached display evokeds so layout plots can reference transformed data. */
 
 signals:
@@ -341,15 +340,15 @@ signals:
     void recomputeAverageRequested();
 
 private:
-    QAction*                m_pComputeAverageAction = nullptr; /**< Default evoked-compute action shown by the add button. */
-    QAction*                m_pRecomputeAverageAction = nullptr; /**< Quick recompute action using the last saved settings. */
+    QAction* m_pComputeAverageAction = nullptr;   /**< Default evoked-compute action shown by the add button. */
+    QAction* m_pRecomputeAverageAction = nullptr; /**< Quick recompute action using the last saved settings. */
 
-    QDoubleSpinBox*         m_pSpinGrad = nullptr;
-    QDoubleSpinBox*         m_pSpinMag  = nullptr;
-    QDoubleSpinBox*         m_pSpinEEG  = nullptr;
-    bool                    m_bAutoScaled = false;
-    bool                    m_bButterflyAutoScaled = false;
-    bool                    m_bShowGFP = false;
+    QDoubleSpinBox* m_pSpinGrad = nullptr;
+    QDoubleSpinBox* m_pSpinMag = nullptr;
+    QDoubleSpinBox* m_pSpinEEG = nullptr;
+    bool m_bAutoScaled = false;
+    bool m_bButterflyAutoScaled = false;
+    bool m_bShowGFP = false;
 };
 
 } // NAMESPACE MNEBROWSE

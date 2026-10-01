@@ -54,8 +54,8 @@ namespace SHOWFIFF
 class MNEFiffExp
 {
 public:
-    typedef QSharedPointer<MNEFiffExp> SPtr;              /**< Shared pointer type for MNEFiffExp. */
-    typedef QSharedPointer<const MNEFiffExp> ConstSPtr;   /**< Const shared pointer type for MNEFiffExp. */
+    typedef QSharedPointer<MNEFiffExp> SPtr;            /**< Shared pointer type for MNEFiffExp. */
+    typedef QSharedPointer<const MNEFiffExp> ConstSPtr; /**< Const shared pointer type for MNEFiffExp. */
 
     //=========================================================================================================
     /**
@@ -87,16 +87,16 @@ public:
     static bool comp_exp(const MNEFiffExp& ex1, const MNEFiffExp& ex2);
 
 public:
-    int  exclass;   /**< Class of this explanation */
-    int  kind;      /**< Kind of object */
-    QString text;   /**< Explanation text */
+    int exclass;  /**< Class of this explanation */
+    int kind;     /**< Kind of object */
+    QString text; /**< Explanation text */
 
-// ### OLD STRUCT ###
-//    typedef struct {
-//        int  class;     /* Class of this explanation */
-//        int  kind;      /* Kind of object */
-//        char *text;     /* Explanation text */
-//    } *mneFiffExp,mneFiffExpRec;
+    // ### OLD STRUCT ###
+    //    typedef struct {
+    //        int  class;     /* Class of this explanation */
+    //        int  kind;      /* Kind of object */
+    //        char *text;     /* Explanation text */
+    //    } *mneFiffExp,mneFiffExpRec;
 };
 
 

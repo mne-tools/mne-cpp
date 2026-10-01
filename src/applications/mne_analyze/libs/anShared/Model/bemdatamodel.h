@@ -43,15 +43,17 @@
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-namespace MNELIB {
-    class MNEBem;
+namespace MNELIB
+{
+class MNEBem;
 }
 
 //=============================================================================================================
 // DEFINE NAMESPACE ANSHAREDLIB
 //=============================================================================================================
 
-namespace ANSHAREDLIB {
+namespace ANSHAREDLIB
+{
 
 //=============================================================================================================
 // ANSHAREDLIB FORWARD DECLARATIONS
@@ -74,7 +76,7 @@ public:
     /**
     * Constructs a BemDataModel object.
     */
-    explicit BemDataModel(QObject *parent = Q_NULLPTR);
+    explicit BemDataModel(QObject* parent = Q_NULLPTR);
 
     //=========================================================================================================
     /**
@@ -83,9 +85,9 @@ public:
      * @param[in] sFilePath             The file path of the model. This is usually also the file path.
      * @param[in] pParent               The parent model. Default is set to NULL.
      */
-    BemDataModel(const QString &sFilePath,
+    BemDataModel(const QString& sFilePath,
                  const QByteArray& byteLoadedData = QByteArray(),
-                 QObject *pParent = Q_NULLPTR);
+                 QObject* pParent = Q_NULLPTR);
 
     //=========================================================================================================
     /**
@@ -119,28 +121,26 @@ public:
 
     //=========================================================================================================
     // Inherited by QAbstractItemModel:
-    virtual QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const override;
-    virtual Qt::ItemFlags flags(const QModelIndex &index) const override;
-    virtual QModelIndex index(int row, int column, const QModelIndex &parent = QModelIndex()) const override;
-    virtual QModelIndex parent(const QModelIndex &index) const override;
-    virtual int rowCount(const QModelIndex &parent = QModelIndex()) const override;
-    virtual int columnCount(const QModelIndex &parent = QModelIndex()) const override;
+    virtual QVariant data(const QModelIndex& index, int role = Qt::DisplayRole) const override;
+    virtual Qt::ItemFlags flags(const QModelIndex& index) const override;
+    virtual QModelIndex index(int row, int column, const QModelIndex& parent = QModelIndex()) const override;
+    virtual QModelIndex parent(const QModelIndex& index) const override;
+    virtual int rowCount(const QModelIndex& parent = QModelIndex()) const override;
+    virtual int columnCount(const QModelIndex& parent = QModelIndex()) const override;
 
 protected:
-
 private:
-
     //=========================================================================================================
     /**
      * Helper function for initialization
      */
     void initBemData(QIODevice& p_IODevice);
 
-    QFile                   m_file;                 /**< The IO file. */
-    QByteArray              m_byteLoadedData;
-    QBuffer                 m_buffer;
+    QFile m_file; /**< The IO file. */
+    QByteArray m_byteLoadedData;
+    QBuffer m_buffer;
 
-    MNELIB::MNEBem::SPtr    m_pBem;                 /**< Data. */
+    MNELIB::MNEBem::SPtr m_pBem; /**< Data. */
 
 signals:
     //=========================================================================================================
@@ -174,4 +174,3 @@ inline MNELIB::MNEBem::SPtr BemDataModel::getBem()
 } // namespace ANSHAREDLIB
 
 #endif // ANSHAREDLIB_BEMDATAMODEL_H
-

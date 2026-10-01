@@ -8,7 +8,8 @@
 
 #include <utils/polhemus/polhemus_connection.h>
 
-namespace MNEALIGN {
+namespace MNEALIGN
+{
 using UTILSLIB::PolhemusSerialConfig;
 using UTILSLIB::PolhemusConnection;
 } // namespace MNEALIGN

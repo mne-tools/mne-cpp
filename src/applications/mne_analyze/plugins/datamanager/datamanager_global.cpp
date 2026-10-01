@@ -22,12 +22,21 @@
 // DEFINE METHODS
 //=============================================================================================================
 
-const char* DATAMANAGERPLUGIN::buildDateTime(){ return UTILSLIB::dateTimeNow();}
+const char* DATAMANAGERPLUGIN::buildDateTime()
+{
+    return UTILSLIB::dateTimeNow();
+}
 
 //=============================================================================================================
 
-const char* DATAMANAGERPLUGIN::buildHash(){ return UTILSLIB::gitHash();}
+const char* DATAMANAGERPLUGIN::buildHash()
+{
+    return UTILSLIB::gitHash();
+}
 
 //=============================================================================================================
 
-const char* DATAMANAGERPLUGIN::buildHashLong(){ return UTILSLIB::gitHashLong();}
+const char* DATAMANAGERPLUGIN::buildHashLong()
+{
+    return UTILSLIB::gitHashLong();
+}

@@ -68,12 +68,12 @@ class TestInvLoreta : public QObject
     Q_OBJECT
 
 private:
-    QString            m_sDataPath;   /**< Path to the test data directory. */
-    MNEForwardSolution m_fwd;         /**< Forward solution loaded for data-driven tests. */
-    FiffCov            m_noiseCov;    /**< Noise covariance matrix loaded for data-driven tests. */
-    FiffInfo           m_info;        /**< Measurement info loaded from the raw file. */
-    MNEInverseOperator m_invOp;       /**< Inverse operator pre-computed in initTestCase. */
-    bool               m_bDataLoaded; /**< True if all required test data was successfully loaded. */
+    QString m_sDataPath;        /**< Path to the test data directory. */
+    MNEForwardSolution m_fwd;   /**< Forward solution loaded for data-driven tests. */
+    FiffCov m_noiseCov;         /**< Noise covariance matrix loaded for data-driven tests. */
+    FiffInfo m_info;            /**< Measurement info loaded from the raw file. */
+    MNEInverseOperator m_invOp; /**< Inverse operator pre-computed in initTestCase. */
+    bool m_bDataLoaded;         /**< True if all required test data was successfully loaded. */
 
     //=========================================================================================================
     /**
@@ -81,7 +81,10 @@ private:
      *
      * @return true if test data is available, false otherwise.
      */
-    bool hasData() const { return m_bDataLoaded; }
+    bool hasData() const
+    {
+        return m_bDataLoaded;
+    }
 
 private slots:
 
@@ -135,8 +138,7 @@ void TestInvLoreta::initTestCase()
     qInstallMessageHandler(MNELogger::customLogWriter);
     m_bDataLoaded = false;
 
-    QString base = QCoreApplication::applicationDirPath()
-                   + "/../resources/data/mne-cpp-test-data";
+    QString base = QCoreApplication::applicationDirPath() + "/../resources/data/mne-cpp-test-data";
     if (!QFile::exists(base + "/MEG/sample/sample_audvis_trunc_raw.fif")) {
         qWarning() << "Test data not found at" << base;
         return;
@@ -170,14 +172,18 @@ void TestInvLoreta::initTestCase()
 
 //=============================================================================================================
 
-void TestInvLoreta::cleanupTestCase() {}
+void TestInvLoreta::cleanupTestCase()
+{
+}
 
 //=============================================================================================================
 
 void TestInvLoreta::eloreta_setMethod()
 {
-    if (!hasData()) QSKIP("Required data not loaded");
-    if (m_invOp.nchan == 0) QSKIP("Failed to build inverse operator");
+    if (!hasData())
+        QSKIP("Required data not loaded");
+    if (m_invOp.nchan == 0)
+        QSKIP("Failed to build inverse operator");
 
     float lambda2 = 1.0f / 9.0f;
     InvMinimumNorm mn(m_invOp, lambda2, QString("eLORETA"));
@@ -196,12 +202,15 @@ void TestInvLoreta::eloreta_setMethod()
 
 void TestInvLoreta::eloreta_fromEvoked()
 {
-    if (!hasData()) QSKIP("Required data not loaded");
-    if (m_invOp.nchan == 0) QSKIP("Failed to build inverse operator");
+    if (!hasData())
+        QSKIP("Required data not loaded");
+    if (m_invOp.nchan == 0)
+        QSKIP("Failed to build inverse operator");
 
     QString evkPath = m_sDataPath + "/MEG/sample/sample_audvis-ave.fif";
     QFile evkFile(evkPath);
-    if (!evkFile.exists()) QSKIP("Evoked file not found");
+    if (!evkFile.exists())
+        QSKIP("Evoked file not found");
 
     QPair<float, float> noBaseline(-1.0f, -1.0f);
     FiffEvoked evoked(evkFile, 0, noBaseline);
@@ -210,8 +219,8 @@ void TestInvLoreta::eloreta_fromEvoked()
     FiffEvoked pickedEvoked = evoked.pick_channels(m_invOp.noise_cov->names);
     QVERIFY(pickedEvoked.data.rows() > 0);
 
-    float tmin   = pickedEvoked.times(0);
-    float tstep  = 1.0f / pickedEvoked.info.sfreq;
+    float tmin = pickedEvoked.times(0);
+    float tstep = 1.0f / pickedEvoked.info.sfreq;
     float lambda2 = 1.0f / 9.0f;
 
     InvMinimumNorm mn(m_invOp, lambda2, QString("eLORETA"));
@@ -236,19 +245,22 @@ void TestInvLoreta::eloreta_fromEvoked()
 
 void TestInvLoreta::eloreta_forceEqual()
 {
-    if (!hasData()) QSKIP("Required data not loaded");
-    if (m_invOp.nchan == 0) QSKIP("Failed to build inverse operator");
+    if (!hasData())
+        QSKIP("Required data not loaded");
+    if (m_invOp.nchan == 0)
+        QSKIP("Failed to build inverse operator");
 
     QString evkPath = m_sDataPath + "/MEG/sample/sample_audvis-ave.fif";
     QFile evkFile(evkPath);
-    if (!evkFile.exists()) QSKIP("Evoked file not found");
+    if (!evkFile.exists())
+        QSKIP("Evoked file not found");
 
     QPair<float, float> noBaseline(-1.0f, -1.0f);
     FiffEvoked evoked(evkFile, 0, noBaseline);
     FiffEvoked pickedEvoked = evoked.pick_channels(m_invOp.noise_cov->names);
 
-    float tmin    = pickedEvoked.times(0);
-    float tstep   = 1.0f / pickedEvoked.info.sfreq;
+    float tmin = pickedEvoked.times(0);
+    float tstep = 1.0f / pickedEvoked.info.sfreq;
     float lambda2 = 1.0f / 9.0f;
 
     InvMinimumNorm mn(m_invOp, lambda2, QString("eLORETA"));
@@ -267,19 +279,22 @@ void TestInvLoreta::eloreta_forceEqual()
 
 void TestInvLoreta::eloreta_vs_dSPM()
 {
-    if (!hasData()) QSKIP("Required data not loaded");
-    if (m_invOp.nchan == 0) QSKIP("Failed to build inverse operator");
+    if (!hasData())
+        QSKIP("Required data not loaded");
+    if (m_invOp.nchan == 0)
+        QSKIP("Failed to build inverse operator");
 
     QString evkPath = m_sDataPath + "/MEG/sample/sample_audvis-ave.fif";
     QFile evkFile(evkPath);
-    if (!evkFile.exists()) QSKIP("Evoked file not found");
+    if (!evkFile.exists())
+        QSKIP("Evoked file not found");
 
     QPair<float, float> noBaseline(-1.0f, -1.0f);
     FiffEvoked evoked(evkFile, 0, noBaseline);
     FiffEvoked pickedEvoked = evoked.pick_channels(m_invOp.noise_cov->names);
 
-    float tmin    = pickedEvoked.times(0);
-    float tstep   = 1.0f / pickedEvoked.info.sfreq;
+    float tmin = pickedEvoked.times(0);
+    float tstep = 1.0f / pickedEvoked.info.sfreq;
     float lambda2 = 1.0f / 9.0f;
 
     InvMinimumNorm mnDspm(m_invOp, lambda2, QString("dSPM"));

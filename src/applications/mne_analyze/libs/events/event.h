@@ -32,14 +32,16 @@
 // NAMESPACE EVENTSLIB
 //=============================================================================================================
 
-namespace EVENTSLIB {
+namespace EVENTSLIB
+{
 
 //=============================================================================================================
 // EVENTSINTERNAL FORWARD DECLARATIONS
 //=============================================================================================================
 
-namespace EVENTSINTERNAL {
-    class EventINT;
+namespace EVENTSINTERNAL
+{
+class EventINT;
 }
 
 //=============================================================================================================
@@ -65,7 +67,7 @@ struct EVENTS_EXPORT Event
      * @param[in] sample Sample number of the event to be created.
      * @param[in] groupId GroupId of the EventGroupINT to which the event will belong to.
      */
-    Event(const idNum id,const  int sample, const idNum groupId);
+    Event(const idNum id, const int sample, const idNum groupId);
 
     //=========================================================================================================
     /**
@@ -75,14 +77,15 @@ struct EVENTS_EXPORT Event
      */
     Event(const EVENTSINTERNAL::EventINT& e);
 
-    idNum  id;      /**< Unique key of this event object. Not the trigger code, see eventCode. */
-    int  sample;    /**< First sample covered by the event. */
-    int  duration;  /**< Length in samples. Zero for an instantaneous event. */
-    int  eventCode; /**< FIFF trigger code identifying the kind of event. */
-    idNum  groupId; /**< GroupId of this event. */
+    idNum id;      /**< Unique key of this event object. Not the trigger code, see eventCode. */
+    int sample;    /**< First sample covered by the event. */
+    int duration;  /**< Length in samples. Zero for an instantaneous event. */
+    int eventCode; /**< FIFF trigger code identifying the kind of event. */
+    idNum groupId; /**< GroupId of this event. */
 };
 
-namespace EVENTSINTERNAL {
+namespace EVENTSINTERNAL
+{
 // The fact that we go with int for sample is a fundamental limitation of this
 // whole architecture. With a Fs = 1kHz, we could have a maximum of aprox. 25 days.
 // Yes not a big limitation... if we keep using 1kHz...
@@ -299,12 +302,12 @@ public:
     EventINT operator=(const EventINT& rhs);
 
 private:
-    idNum       m_iId;                      /**< Placeholder for sample Id */
-    int         m_iSample;                  /**< First sample covered by the event */
-    int         m_iDuration;                /**< Length in samples. Zero for an instantaneous event. */
-    int         m_iEventCode;               /**< FIFF trigger code identifying the kind of event. */
-    idNum       m_iGroup;                   /**< Group this event belongs to */
-    std::string m_sDescription;             /**< Short string describing info */
+    idNum m_iId;                /**< Placeholder for sample Id */
+    int m_iSample;              /**< First sample covered by the event */
+    int m_iDuration;            /**< Length in samples. Zero for an instantaneous event. */
+    int m_iEventCode;           /**< FIFF trigger code identifying the kind of event. */
+    idNum m_iGroup;             /**< Group this event belongs to */
+    std::string m_sDescription; /**< Short string describing info */
 };
 
 //=========================================================================================================
@@ -320,15 +323,16 @@ inline EventINT EventINT::fromSample(int sample)
     return EventINT(0, sample, 0);
 }
 
-}//namespace EVENTSINTERNAL
-}//namespace EVENTSLIB
+} //namespace EVENTSINTERNAL
+} //namespace EVENTSLIB
 
 //=========================================================================================================
 
 /**
  * Template specialization for the EventINT class. Helpful when dealing with std library containers.
  */
-namespace std {
+namespace std
+{
 template<>
 struct hash<EVENTSLIB::EVENTSINTERNAL::EventINT>
 {
@@ -341,4 +345,3 @@ struct hash<EVENTSLIB::EVENTSINTERNAL::EventINT>
 }
 
 #endif // EVENT_H
-

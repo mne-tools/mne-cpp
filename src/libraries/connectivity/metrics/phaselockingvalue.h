@@ -69,7 +69,8 @@
 // DEFINE NAMESPACE CONNECTIVITYLIB
 //=============================================================================================================
 
-namespace CONNECTIVITYLIB {
+namespace CONNECTIVITYLIB
+{
 
 //=============================================================================================================
 // CONNECTIVITYLIB FORWARD DECLARATIONS
@@ -93,7 +94,6 @@ class Network;
  */
 class CONNECTIVITYSHARED_EXPORT PhaseLockingValue : public AbstractMetric
 {
-
 public:
     typedef QSharedPointer<PhaseLockingValue> SPtr;            /**< Shared pointer type for PhaseLockingValue. */
     typedef QSharedPointer<const PhaseLockingValue> ConstSPtr; /**< Const shared pointer type for PhaseLockingValue. */
@@ -112,7 +112,7 @@ public:
      *
      * @return                   The connectivity information in form of a network structure.
      */
-    static Network calculate(ConnectivitySettings &connectivitySettings);
+    static Network calculate(ConnectivitySettings& connectivitySettings);
 
 protected:
     //=========================================================================================================
@@ -129,8 +129,8 @@ protected:
      * @param[in] tapers                     The taper information.
      */
     static void compute(ConnectivitySettings::IntermediateTrialData& inputData,
-                        QVector<QPair<int,Eigen::MatrixXcd> >& vecPairCsdSum,
-                        QVector<QPair<int,Eigen::MatrixXcd> >& vecPairCsdNormalizedSum,
+                        QVector<QPair<int, Eigen::MatrixXcd>>& vecPairCsdSum,
+                        QVector<QPair<int, Eigen::MatrixXcd>>& vecPairCsdNormalizedSum,
                         QMutex& mutex,
                         int iNRows,
                         int iNFreqs,
@@ -144,7 +144,7 @@ protected:
      * @param[out] connectivitySettings   The input data.
      * @param[in] finalNetwork           The final network.
      */
-    static void computePLV(ConnectivitySettings &connectivitySettings,
+    static void computePLV(ConnectivitySettings& connectivitySettings,
                            Network& finalNetwork);
 };
 

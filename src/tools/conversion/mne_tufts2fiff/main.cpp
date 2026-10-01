@@ -57,7 +57,8 @@ using namespace Eigen;
 // Tufts raw file header structure
 //=============================================================================================================
 
-struct TuftsHeader {
+struct TuftsHeader
+{
     qint32 nChannels;
     qint32 nSamples;
     float sFreq;
@@ -93,8 +94,8 @@ static bool readTuftsHeader(QFile& file, TuftsHeader& header)
 
     header.dataOffset = 512; // typical header size
 
-    qInfo("Tufts header: %d channels, %d samples, %.1f Hz" ,
-           header.nChannels, header.nSamples, header.sFreq);
+    qInfo("Tufts header: %d channels, %d samples, %.1f Hz",
+          header.nChannels, header.nSamples, header.sFreq);
     return true;
 }
 
@@ -128,8 +129,8 @@ static bool readElpFile(const QString& filename, MatrixX3f& positions, QStringLi
     for (int i = 0; i < posVec.size(); i++) {
         positions.row(i) = posVec[i].transpose();
     }
-    qInfo("Read %d electrode positions from %s" ,
-           static_cast<int>(posVec.size()), filename.toUtf8().constData());
+    qInfo("Read %d electrode positions from %s",
+          static_cast<int>(posVec.size()), filename.toUtf8().constData());
     return true;
 }
 
@@ -156,13 +157,13 @@ static bool readCalibration(const QString& filename, VectorXf& cals)
     cals.resize(calVec.size());
     for (int i = 0; i < calVec.size(); i++)
         cals(i) = calVec[i];
-    qInfo("Read %d calibration values" , static_cast<int>(calVec.size()));
+    qInfo("Read %d calibration values", static_cast<int>(calVec.size()));
     return true;
 }
 
 //=============================================================================================================
 
-int main(int argc, char *argv[])
+int main(int argc, char* argv[])
 {
     qInstallMessageHandler(MNELogger::customLogWriter);
     QCoreApplication app(argc, argv);
@@ -350,8 +351,8 @@ int main(int argc, char *argv[])
     stream->end_block(FIFFB_MEAS);
     stream->end_file();
 
-    qInfo("Wrote FIFF: %d channels, %d samples at %.1f Hz to %s" ,
-           nch, nSamples, header.sFreq, outFile.toUtf8().constData());
+    qInfo("Wrote FIFF: %d channels, %d samples at %.1f Hz to %s",
+          nch, nSamples, header.sFreq, outFile.toUtf8().constData());
 
     return 0;
 }

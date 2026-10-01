@@ -81,48 +81,48 @@ private:
     void updateHeaderForPage(int pageIndex);
 
     // Header
-    QLabel*      m_titleLabel;
+    QLabel* m_titleLabel;
     QPushButton* m_newChatButton;
     QPushButton* m_historyButton;
 
     // Main stacked area: 0=current chat, 1=history list, 2=session detail
     QStackedWidget* m_mainStack;
-    QWidget*        m_currentConversationPage;
-    QWidget*        m_historyListPage;
-    QWidget*        m_historyDetailPage;
+    QWidget* m_currentConversationPage;
+    QWidget* m_historyListPage;
+    QWidget* m_historyDetailPage;
 
     // Current conversation page
-    QLabel*          m_confirmationLabel;
-    QWidget*         m_confirmationPanel;
-    QVBoxLayout*     m_confirmationLayout;
-    QTextEdit*       m_transcript;
+    QLabel* m_confirmationLabel;
+    QWidget* m_confirmationPanel;
+    QVBoxLayout* m_confirmationLayout;
+    QTextEdit* m_transcript;
 
     // History list page
-    QScrollArea*  m_archivedSessionsScrollArea;
-    QWidget*      m_archivedSessionsPanel;
-    QVBoxLayout*  m_archivedSessionsLayout;
+    QScrollArea* m_archivedSessionsScrollArea;
+    QWidget* m_archivedSessionsPanel;
+    QVBoxLayout* m_archivedSessionsLayout;
 
     // History detail page
-    QLabel*       m_archivedTranscriptContextLabel;
-    QPushButton*  m_backToSessionsButton;
-    QTextEdit*    m_archivedTranscript;
+    QLabel* m_archivedTranscriptContextLabel;
+    QPushButton* m_backToSessionsButton;
+    QTextEdit* m_archivedTranscript;
 
     // Composer footer
     PillSelectorWidget* m_modeSelector;
     PillSelectorWidget* m_modelSelector;
     PillSelectorWidget* m_safetySelector;
     PillSelectorWidget* m_profileSelector;
-    QPushButton*        m_connectionSettingsButton;
-    QLabel*             m_validationHintLabel;
-    QLabel*             m_statusLabel;
-    QLineEdit*          m_input;
-    QPushButton*        m_sendButton;
+    QPushButton* m_connectionSettingsButton;
+    QLabel* m_validationHintLabel;
+    QLabel* m_statusLabel;
+    QLineEdit* m_input;
+    QPushButton* m_sendButton;
 
     // State
     QJsonArray m_pendingConfirmations;
     QJsonArray m_currentConversationEntries;
     QJsonArray m_archivedConversationSessions;
-    int        m_activeArchivedSessionIndex = -1;
+    int m_activeArchivedSessionIndex = -1;
 };
 
 } // namespace MNEANALYZESTUDIO

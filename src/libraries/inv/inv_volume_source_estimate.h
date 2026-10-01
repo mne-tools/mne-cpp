@@ -67,8 +67,8 @@ public:
      * @param[in] p_tstep     Time step.
      */
     InvVolumeSourceEstimate(const Eigen::MatrixXd& p_sol,
-                             const Eigen::VectorXi& p_vertices,
-                             float p_tmin, float p_tstep);
+                            const Eigen::VectorXi& p_vertices,
+                            float p_tmin, float p_tstep);
 
     //=========================================================================================================
     /**
@@ -84,7 +84,10 @@ public:
      *
      * @return Grid dimensions {nx, ny, nz}; empty if no shape was set.
      */
-    const QVector<int>& shape() const { return m_shape; }
+    const QVector<int>& shape() const
+    {
+        return m_shape;
+    }
 
     //=========================================================================================================
     /**
@@ -92,7 +95,10 @@ public:
      *
      * @return True if the shape holds exactly three dimensions.
      */
-    bool hasShape() const { return m_shape.size() == 3; }
+    bool hasShape() const
+    {
+        return m_shape.size() == 3;
+    }
 
     //=========================================================================================================
     /**
@@ -116,7 +122,7 @@ public:
     Eigen::Vector3d centreOfMass(int timeIdx) const;
 
 private:
-    QVector<int> m_shape;  // {nx, ny, nz}
+    QVector<int> m_shape; // {nx, ny, nz}
 };
 
 } // namespace INVLIB

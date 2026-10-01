@@ -35,7 +35,7 @@ using namespace MNESETUPFORWARDMODEL;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-MNESetupForwardModelSettings::MNESetupForwardModelSettings(int *argc, char **argv)
+MNESetupForwardModelSettings::MNESetupForwardModelSettings(int* argc, char** argv)
 : m_fScalpConductivity(0.3f)
 , m_fSkullConductivity(0.006f)
 , m_fBrainConductivity(0.3f)
@@ -67,78 +67,79 @@ MNESetupForwardModelSettings::MNESetupForwardModelSettings(int *argc, char **arg
         "and .surf files for visualization, and optionally computes the BEM solution.\n\n"
         "Ported from the original MNE shell script mne_setup_forward_model by\n"
         "Matti Hamalainen (SVN $Id: mne_setup_forward_model 3282 2011-02-02 14:28:16Z gramfort $).\n\n"
-        "Cross-referenced with MNE-Python's mne.make_bem_model() and mne.make_bem_solution()."
-    );
+        "Cross-referenced with MNE-Python's mne.make_bem_model() and mne.make_bem_solution().");
     parser.addHelpOption();
     parser.addVersionOption();
 
     QCommandLineOption subjectOpt("subject",
-        "Subject name (defaults to $SUBJECT environment variable).", "name");
+                                  "Subject name (defaults to $SUBJECT environment variable).", "name");
     parser.addOption(subjectOpt);
 
     QCommandLineOption subjectsDirOpt("subjects-dir",
-        "Subjects directory (defaults to $SUBJECTS_DIR environment variable).", "dir");
+                                      "Subjects directory (defaults to $SUBJECTS_DIR environment variable).", "dir");
     parser.addOption(subjectsDirOpt);
 
     QCommandLineOption scalpcOpt("scalpc",
-        "Scalp conductivity [S/m] (default: 0.3).", "value");
+                                 "Scalp conductivity [S/m] (default: 0.3).", "value");
     parser.addOption(scalpcOpt);
 
     QCommandLineOption skullcOpt("skullc",
-        "Skull conductivity [S/m] (default: 0.006).", "value");
+                                 "Skull conductivity [S/m] (default: 0.006).", "value");
     parser.addOption(skullcOpt);
 
     QCommandLineOption braincOpt("brainc",
-        "Brain conductivity [S/m] (default: 0.3).", "value");
+                                 "Brain conductivity [S/m] (default: 0.3).", "value");
     parser.addOption(braincOpt);
 
     QCommandLineOption modelOpt("model",
-        "BEM model name (without -bem.fif suffix). If omitted, an auto-generated\n"
-        "name based on triangle counts is used.", "name");
+                                "BEM model name (without -bem.fif suffix). If omitted, an auto-generated\n"
+                                "name based on triangle counts is used.",
+                                "name");
     parser.addOption(modelOpt);
 
     QCommandLineOption homogOpt("homog",
-        "Create a single-compartment (homogeneous) model using only the inner skull surface.");
+                                "Create a single-compartment (homogeneous) model using only the inner skull surface.");
     parser.addOption(homogOpt);
 
     QCommandLineOption surfOpt("surf",
-        "Use FreeSurfer binary surface files (.surf) as input instead of ASCII\n"
-        "triangle files (.tri).");
+                               "Use FreeSurfer binary surface files (.surf) as input instead of ASCII\n"
+                               "triangle files (.tri).");
     parser.addOption(surfOpt);
 
     QCommandLineOption icoOpt("ico",
-        "Downsample surfaces to icosahedron subdivision level (0-6). Requires that\n"
-        "surfaces are isomorphic with a higher-level subdivision. Mainly useful for\n"
-        "downsampling surfaces produced by mri_watershed.", "number");
+                              "Downsample surfaces to icosahedron subdivision level (0-6). Requires that\n"
+                              "surfaces are isomorphic with a higher-level subdivision. Mainly useful for\n"
+                              "downsampling surfaces produced by mri_watershed.",
+                              "number");
     parser.addOption(icoOpt);
 
     QCommandLineOption nosolOpt("nosol",
-        "Omit the BEM solution preparation step.");
+                                "Omit the BEM solution preparation step.");
     parser.addOption(nosolOpt);
 
     QCommandLineOption noswapOpt("noswap",
-        "Do not swap triangle vertex winding order (assume counterclockwise ordering).\n"
-        "Only effective for ASCII .tri files.");
+                                 "Do not swap triangle vertex winding order (assume counterclockwise ordering).\n"
+                                 "Only effective for ASCII .tri files.");
     parser.addOption(noswapOpt);
 
     QCommandLineOption metersOpt("meters",
-        "Triangulation coordinates are in meters. Only effective for ASCII .tri files.");
+                                 "Triangulation coordinates are in meters. Only effective for ASCII .tri files.");
     parser.addOption(metersOpt);
 
     QCommandLineOption innerShiftOpt("innershift",
-        "Shift inner skull surface outward by this amount [mm].", "mm");
+                                     "Shift inner skull surface outward by this amount [mm].", "mm");
     parser.addOption(innerShiftOpt);
 
     QCommandLineOption outerShiftOpt("outershift",
-        "Shift outer skull surface outward by this amount [mm].", "mm");
+                                     "Shift outer skull surface outward by this amount [mm].", "mm");
     parser.addOption(outerShiftOpt);
 
     QCommandLineOption scalpShiftOpt("scalpshift",
-        "Shift scalp surface outward by this amount [mm].", "mm");
+                                     "Shift scalp surface outward by this amount [mm].", "mm");
     parser.addOption(scalpShiftOpt);
 
     QCommandLineOption overwriteOpt("overwrite",
-        "Overwrite existing output files.");
+                                    "Overwrite existing output files.");
     parser.addOption(overwriteOpt);
 
     // Build argument list from argc/argv

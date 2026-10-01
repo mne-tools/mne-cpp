@@ -71,7 +71,7 @@ public:
      *
      * @param [in] parent pointer to parent widget; If parent is 0, the new ScaleWindow becomes a window. If parent is another widget, ScaleWindow becomes a child window inside parent. ScaleWindow is deleted when its parent is deleted.
      */
-    ScaleWindow(QWidget *parent = 0);
+    ScaleWindow(QWidget* parent = 0);
 
     //=========================================================================================================
     /**
@@ -109,7 +109,7 @@ signals:
      *
      * @param [in] QMap<QString,double> map with all channel types and their current scaling value
      */
-    void scalingChannelValueChanged(QMap<QString,double>);
+    void scalingChannelValueChanged(QMap<QString, double>);
 
     //=========================================================================================================
     /**
@@ -120,7 +120,7 @@ signals:
     void scalingViewValueChanged(int);
 
 private:
-    std::unique_ptr<Ui::ScaleWindow> ui;                    /**< Pointer to the qt designer generated ui class.*/
+    std::unique_ptr<Ui::ScaleWindow> ui; /**< Pointer to the qt designer generated ui class.*/
 
     //=========================================================================================================
     /**
@@ -128,7 +128,7 @@ private:
      *
      * @return the generated scale value map for each channel type
      */
-    QMap<QString,double> genereateScalingMap();
+    QMap<QString, double> genereateScalingMap();
 
     //=========================================================================================================
     /**
@@ -141,7 +141,6 @@ private:
      * scaleViewValueChanged is called whenever a view spin box value changed.
      */
     void scaleViewValueChanged();
-
 };
 
 } // NAMESPACE MNEBROWSE

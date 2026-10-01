@@ -54,8 +54,8 @@ namespace MNELIB
 class MNESHARED_EXPORT MNEMeasDataSet
 {
 public:
-    typedef QSharedPointer<MNEMeasDataSet> SPtr;              /**< Shared pointer type for MNEMeasDataSet. */
-    typedef QSharedPointer<const MNEMeasDataSet> ConstSPtr;   /**< Const shared pointer type for MNEMeasDataSet. */
+    typedef QSharedPointer<MNEMeasDataSet> SPtr;            /**< Shared pointer type for MNEMeasDataSet. */
+    typedef QSharedPointer<const MNEMeasDataSet> ConstSPtr; /**< Const shared pointer type for MNEMeasDataSet. */
 
     //=========================================================================================================
     /**
@@ -89,7 +89,7 @@ public:
      * @param[out] value    Output array of picked values (nch elements).
      * @return 0 on success, -1 on error.
      */
-    int getValuesAtTime(float time, float integ, int nch, bool use_abs, float *value) const;
+    int getValuesAtTime(float time, float integ, int nch, bool use_abs, float* value) const;
 
     //=========================================================================================================
     /**
@@ -110,23 +110,23 @@ public:
      * @param[out] value    Output array of picked values (nch elements).
      * @return 0 on success, -1 on error.
      */
-    static int getValuesFromChannelData(float time, float integ, float **data, int nsamp, int nch,
-                                        float tmin, float sfreq, bool use_abs, float *value);
+    static int getValuesFromChannelData(float time, float integ, float** data, int nsamp, int nch,
+                                        float tmin, float sfreq, bool use_abs, float* value);
 
 public:
-    QString              comment;       /**< Comment / description associated with this data set. */
-    Eigen::MatrixXf      data;          /**< Measured data matrix [np x nchan] (time-major layout). */
-    Eigen::MatrixXf      data_proj;     /**< Data after SSP projection (kept separately for some programs). */
-    Eigen::MatrixXf      data_filt;     /**< Optionally filtered copy of the data. */
-    Eigen::MatrixXf      data_white;    /**< Whitened data (noise-normalised). */
-    Eigen::VectorXf      stim14;        /**< Samples from the digital stimulus / trigger channel. */
-    int                  first;         /**< First sample index (for raw-data processing). */
-    int                  np;            /**< Number of time samples. */
-    int                  nave;          /**< Number of averaged responses. */
-    int                  kind;          /**< FIFF aspect kind (e.g. FIFFV_ASPECT_AVERAGE). */
-    float                tmin;          /**< Start time of the epoch (seconds). */
-    float                tstep;         /**< Sampling interval (seconds). */
-    Eigen::VectorXf      baselines;     /**< Per-channel baseline offsets currently applied. */
+    QString comment;            /**< Comment / description associated with this data set. */
+    Eigen::MatrixXf data;       /**< Measured data matrix [np x nchan] (time-major layout). */
+    Eigen::MatrixXf data_proj;  /**< Data after SSP projection (kept separately for some programs). */
+    Eigen::MatrixXf data_filt;  /**< Optionally filtered copy of the data. */
+    Eigen::MatrixXf data_white; /**< Whitened data (noise-normalised). */
+    Eigen::VectorXf stim14;     /**< Samples from the digital stimulus / trigger channel. */
+    int first;                  /**< First sample index (for raw-data processing). */
+    int np;                     /**< Number of time samples. */
+    int nave;                   /**< Number of averaged responses. */
+    int kind;                   /**< FIFF aspect kind (e.g. FIFFV_ASPECT_AVERAGE). */
+    float tmin;                 /**< Start time of the epoch (seconds). */
+    float tstep;                /**< Sampling interval (seconds). */
+    Eigen::VectorXf baselines;  /**< Per-channel baseline offsets currently applied. */
 };
 
 //=============================================================================================================

@@ -45,14 +45,14 @@ using namespace Eigen;
 //=============================================================================================================
 
 MultitaperTfrResult MultitaperTfr::compute(const MatrixXd& matData,
-                                            double          sfreq,
-                                            int             windowSize,
-                                            int             stepSize,
-                                            double          halfBandwidth,
-                                            int             nTapers)
+                                           double sfreq,
+                                           int windowSize,
+                                           int stepSize,
+                                           double halfBandwidth,
+                                           int nTapers)
 {
     const int nChannels = static_cast<int>(matData.rows());
-    const int nTimes    = static_cast<int>(matData.cols());
+    const int nTimes = static_cast<int>(matData.cols());
 
     if (stepSize < 0)
         stepSize = windowSize / 2;
@@ -104,8 +104,7 @@ MultitaperTfrResult MultitaperTfr::compute(const MatrixXd& matData,
             RowVectorXd psd = RowVectorXd::Zero(nFreqs);
 
             for (int t = 0; t < nTap; ++t) {
-                VectorXd tapered = segment.array()
-                                 * dpss.matTapers.row(t).transpose().array();
+                VectorXd tapered = segment.array() * dpss.matTapers.row(t).transpose().array();
 
                 VectorXcd spec;
                 fft.fwd(spec, tapered);

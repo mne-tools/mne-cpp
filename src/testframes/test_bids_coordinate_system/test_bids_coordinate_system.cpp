@@ -145,9 +145,15 @@ void TestBidsCoordinateSystem::testTransformValues()
     cs.units = "mm";
     cs.transform = Matrix4d::Identity();
     // Set a rotation + translation
-    cs.transform(0, 0) = 0.0;   cs.transform(0, 1) = -1.0;  cs.transform(0, 2) = 0.0;
-    cs.transform(1, 0) = 1.0;   cs.transform(1, 1) = 0.0;   cs.transform(1, 2) = 0.0;
-    cs.transform(2, 0) = 0.0;   cs.transform(2, 1) = 0.0;   cs.transform(2, 2) = 1.0;
+    cs.transform(0, 0) = 0.0;
+    cs.transform(0, 1) = -1.0;
+    cs.transform(0, 2) = 0.0;
+    cs.transform(1, 0) = 1.0;
+    cs.transform(1, 1) = 0.0;
+    cs.transform(1, 2) = 0.0;
+    cs.transform(2, 0) = 0.0;
+    cs.transform(2, 1) = 0.0;
+    cs.transform(2, 2) = 1.0;
     cs.transform(0, 3) = 100.0;
     cs.transform(1, 3) = 200.0;
     cs.transform(2, 3) = 300.0;
@@ -201,10 +207,14 @@ QString TestBidsCoordinateSystem::writeSampleCoordSystemJson(const QString& dir)
 
     // 4x4 identity + offset
     QJsonArray transform;
-    QJsonArray row0; row0 << 1.0 << 0.0 << 0.0 << 5.0;
-    QJsonArray row1; row1 << 0.0 << 1.0 << 0.0 << 10.0;
-    QJsonArray row2; row2 << 0.0 << 0.0 << 1.0 << 15.0;
-    QJsonArray row3; row3 << 0.0 << 0.0 << 0.0 << 1.0;
+    QJsonArray row0;
+    row0 << 1.0 << 0.0 << 0.0 << 5.0;
+    QJsonArray row1;
+    row1 << 0.0 << 1.0 << 0.0 << 10.0;
+    QJsonArray row2;
+    row2 << 0.0 << 0.0 << 1.0 << 15.0;
+    QJsonArray row3;
+    row3 << 0.0 << 0.0 << 0.0 << 1.0;
     transform << row0 << row1 << row2 << row3;
     obj["iEEGCoordinateProcessingDescription"] = transform;
 

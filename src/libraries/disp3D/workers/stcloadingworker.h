@@ -66,12 +66,12 @@ public:
      * @param[in] cancelDist     Cancel distance for interpolation.
      * @param[in] parent         Parent object.
      */
-    StcLoadingWorker(const QString &lhPath,
-                     const QString &rhPath,
-                     BrainSurface *lhSurface,
-                     BrainSurface *rhSurface,
+    StcLoadingWorker(const QString& lhPath,
+                     const QString& rhPath,
+                     BrainSurface* lhSurface,
+                     BrainSurface* rhSurface,
                      double cancelDist = 0.05,
-                     QObject *parent = nullptr);
+                     QObject* parent = nullptr);
 
     //=========================================================================================================
     /**
@@ -85,7 +85,10 @@ public:
      *
      * @return The left hemisphere source estimate.
      */
-    const INVLIB::InvSourceEstimate& stcLh() const { return m_stcLh; }
+    const INVLIB::InvSourceEstimate& stcLh() const
+    {
+        return m_stcLh;
+    }
 
     //=========================================================================================================
     /**
@@ -93,7 +96,10 @@ public:
      *
      * @return The right hemisphere source estimate.
      */
-    const INVLIB::InvSourceEstimate& stcRh() const { return m_stcRh; }
+    const INVLIB::InvSourceEstimate& stcRh() const
+    {
+        return m_stcRh;
+    }
 
     //=========================================================================================================
     /**
@@ -101,7 +107,10 @@ public:
      *
      * @return Shared pointer to the interpolation matrix.
      */
-    QSharedPointer<Eigen::SparseMatrix<float>> interpolationMatLh() const { return m_interpMatLh; }
+    QSharedPointer<Eigen::SparseMatrix<float>> interpolationMatLh() const
+    {
+        return m_interpMatLh;
+    }
 
     //=========================================================================================================
     /**
@@ -109,7 +118,10 @@ public:
      *
      * @return Shared pointer to the interpolation matrix.
      */
-    QSharedPointer<Eigen::SparseMatrix<float>> interpolationMatRh() const { return m_interpMatRh; }
+    QSharedPointer<Eigen::SparseMatrix<float>> interpolationMatRh() const
+    {
+        return m_interpMatRh;
+    }
 
     //=========================================================================================================
     /**
@@ -117,7 +129,10 @@ public:
      *
      * @return True if LH data is loaded.
      */
-    bool hasLh() const { return m_hasLh; }
+    bool hasLh() const
+    {
+        return m_hasLh;
+    }
 
     //=========================================================================================================
     /**
@@ -125,17 +140,26 @@ public:
      *
      * @return True if RH data is loaded.
      */
-    bool hasRh() const { return m_hasRh; }
+    bool hasRh() const
+    {
+        return m_hasRh;
+    }
 
     //=========================================================================================================
     /**
      * Request cancellation of the current loading/interpolation.
      * Thread-safe; takes effect at the next progress check.
      */
-    void requestCancel() { m_cancelled.store(true, std::memory_order_relaxed); }
+    void requestCancel()
+    {
+        m_cancelled.store(true, std::memory_order_relaxed);
+    }
 
     /** @return true if cancellation has been requested. */
-    bool isCancelled() const { return m_cancelled.load(std::memory_order_relaxed); }
+    bool isCancelled() const
+    {
+        return m_cancelled.load(std::memory_order_relaxed);
+    }
 
 public slots:
     //=========================================================================================================
@@ -153,7 +177,7 @@ signals:
      * @param[in] percent    Progress percentage (0-100).
      * @param[in] message    Status message describing current operation.
      */
-    void progress(int percent, const QString &message);
+    void progress(int percent, const QString& message);
 
     //=========================================================================================================
     /**
@@ -169,31 +193,31 @@ signals:
      *
      * @param[in] message    Error description.
      */
-    void error(const QString &message);
+    void error(const QString& message);
 
 private:
     QSharedPointer<Eigen::SparseMatrix<float>> computeInterpolationMatrix(
-        const Eigen::MatrixX3f &matVertices,
-        Eigen::VectorXi &vecSourceVertices,
+        const Eigen::MatrixX3f& matVertices,
+        Eigen::VectorXi& vecSourceVertices,
         double cancelDist,
-        const QString &hemiLabel,
+        const QString& hemiLabel,
         int progressStart,
         int progressEnd);
 
-    QString m_lhPath;                                          /**< Path to LH STC file. */
-    QString m_rhPath;                                          /**< Path to RH STC file. */
-    BrainSurface *m_lhSurface;                                 /**< Pointer to LH surface. */
-    BrainSurface *m_rhSurface;                                 /**< Pointer to RH surface. */
-    double m_cancelDist;                                       /**< Cancel distance for interpolation. */
+    QString m_lhPath;          /**< Path to LH STC file. */
+    QString m_rhPath;          /**< Path to RH STC file. */
+    BrainSurface* m_lhSurface; /**< Pointer to LH surface. */
+    BrainSurface* m_rhSurface; /**< Pointer to RH surface. */
+    double m_cancelDist;       /**< Cancel distance for interpolation. */
 
-    INVLIB::InvSourceEstimate m_stcLh;                         /**< Loaded LH source estimate. */
-    INVLIB::InvSourceEstimate m_stcRh;                         /**< Loaded RH source estimate. */
-    bool m_hasLh = false;                                      /**< Flag indicating LH data loaded. */
-    bool m_hasRh = false;                                      /**< Flag indicating RH data loaded. */
+    INVLIB::InvSourceEstimate m_stcLh; /**< Loaded LH source estimate. */
+    INVLIB::InvSourceEstimate m_stcRh; /**< Loaded RH source estimate. */
+    bool m_hasLh = false;              /**< Flag indicating LH data loaded. */
+    bool m_hasRh = false;              /**< Flag indicating RH data loaded. */
 
-    QSharedPointer<Eigen::SparseMatrix<float>> m_interpMatLh;  /**< LH interpolation matrix. */
-    QSharedPointer<Eigen::SparseMatrix<float>> m_interpMatRh;  /**< RH interpolation matrix. */
-    std::atomic<bool> m_cancelled{false};                       /**< Cancellation flag. */
+    QSharedPointer<Eigen::SparseMatrix<float>> m_interpMatLh; /**< LH interpolation matrix. */
+    QSharedPointer<Eigen::SparseMatrix<float>> m_interpMatRh; /**< RH interpolation matrix. */
+    std::atomic<bool> m_cancelled{false};                     /**< Cancellation flag. */
 };
 
 #endif // STCLOADINGWORKER_H

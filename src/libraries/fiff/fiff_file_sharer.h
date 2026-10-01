@@ -52,7 +52,6 @@ class FIFFSHARED_EXPORT FiffFileSharer : public QObject
 {
     Q_OBJECT
 public:
-
     //=========================================================================================================
     /**
      * Constructs a FiffFileSharer with default paramaters (based on m_sDefaultDirectory and m_sDefaultFileName)
@@ -73,7 +72,7 @@ public:
      *
      * @param[in] sSourcePath   source file to ber copied
      */
-    void copyRealtimeFile(const QString &sSourcePath);
+    void copyRealtimeFile(const QString& sSourcePath);
 
     //=========================================================================================================
     /**
@@ -82,7 +81,6 @@ public:
     void initWatcher();
 
 private:
-
     //=========================================================================================================
     /**
      * Creates specified shared directory if it does not exist.
@@ -104,7 +102,7 @@ private:
      *
      * @param[in] sPath     Path of directory that was changed.
      */
-    void onDirectoryChanged(const QString &sPath);
+    void onDirectoryChanged(const QString& sPath);
 
     //=========================================================================================================
     /**
@@ -113,12 +111,12 @@ private:
      *
      * @param sPath
      */
-    void onFileChanged(const QString &sPath);
+    void onFileChanged(const QString& sPath);
 
-    QFileSystemWatcher      m_fileWatcher;          /**< Watches m_sDirectory for new files. */
+    QFileSystemWatcher m_fileWatcher; /**< Watches m_sDirectory for new files. */
 
-    QString                 m_sDirectory;           /**< Directory where files will be saved to / read from. */
-    int                     m_iFileIndex;           /**< File counter to give files unique name */
+    QString m_sDirectory; /**< Directory where files will be saved to / read from. */
+    int m_iFileIndex;     /**< File counter to give files unique name */
 
 signals:
 
@@ -129,7 +127,6 @@ signals:
      * @param[in] sPath     Path of new shared fiff file.
      */
     void newFileAtPath(const QString& sPath);
-
 };
 } //namespace
 

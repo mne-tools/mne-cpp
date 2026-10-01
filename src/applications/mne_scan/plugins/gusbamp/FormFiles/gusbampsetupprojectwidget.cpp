@@ -31,7 +31,7 @@ using namespace GUSBAMPPLUGIN;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-GUSBAmpSetupProjectWidget::GUSBAmpSetupProjectWidget(GUSBAmp* pGUSBAmp, QWidget *parent)
+GUSBAmpSetupProjectWidget::GUSBAmpSetupProjectWidget(GUSBAmp* pGUSBAmp, QWidget* parent)
 : QWidget(parent)
 , ui(new Ui::GUSBAmpSetupProjectWidget)
 , m_pGUSBAmp(pGUSBAmp)
@@ -42,7 +42,7 @@ GUSBAmpSetupProjectWidget::GUSBAmpSetupProjectWidget(GUSBAmp* pGUSBAmp, QWidget 
     connect(ui->m_qPushButton_EEGCap, &QPushButton::released, this, &GUSBAmpSetupProjectWidget::changeCap);
 
     // Connect QLineEdit's
-    connect(ui->m_qLineEdit_EEGCap, static_cast<void (QLineEdit::*)(const QString &)>(&QLineEdit::textEdited),
+    connect(ui->m_qLineEdit_EEGCap, static_cast<void (QLineEdit::*)(const QString&)>(&QLineEdit::textEdited),
             this, &GUSBAmpSetupProjectWidget::changeQLineEdits);
 }
 
@@ -66,9 +66,9 @@ void GUSBAmpSetupProjectWidget::changeCap()
     QString path = QFileDialog::getOpenFileName(this,
                                                 "Change EEG cap layout",
                                                 "../resources/mne_scan/plugins/gusbamp/loc_files",
-                                                 tr("Electrode location files (*.elc)"));
+                                                tr("Electrode location files (*.elc)"));
 
-    if(path==NULL){
+    if (path == NULL) {
         path = ui->m_qLineEdit_EEGCap->text();
     }
 

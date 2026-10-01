@@ -56,11 +56,11 @@ void FtBuffProducer::runMainLoop()
 {
     qInfo() << "[FtBuffProducer::runMainLoop] Running producer...";
 
-    while(!m_pFtConnector->connect()) {
+    while (!m_pFtConnector->connect()) {
         QThread::usleep(50000);
     }
 
-    while(!m_pFtConnector->getHeader()) {
+    while (!m_pFtConnector->getHeader()) {
         QThread::usleep(50000);
     }
 
@@ -68,7 +68,7 @@ void FtBuffProducer::runMainLoop()
 
     qInfo() << "[FtBuffProducer::runMainLoop] Connected to buffer and ready to receive data.";
 
-    while(!this->thread()->isInterruptionRequested()) {
+    while (!this->thread()->isInterruptionRequested()) {
         m_pFtConnector->getData();
 
         //Sends up new data when FtConnector flags new data
@@ -103,9 +103,9 @@ void FtBuffProducer::connectToBuffer(QString addr,
     m_pFtConnector->setPort(port);
 
     //Try to get info from buffer first, then resort to file
-    if(m_pFtConnector->connect()) {
+    if (m_pFtConnector->connect()) {
         auto metadata = m_pFtConnector->parseBufferHeaders();
-        if (m_pFtBuffer->setupRTMSA(metadata)){
+        if (m_pFtBuffer->setupRTMSA(metadata)) {
             emit connecStatus(true);
             return;
         }

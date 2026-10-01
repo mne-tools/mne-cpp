@@ -30,8 +30,9 @@
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-namespace Ui {
-    class EEGoSportsSetupProjectWidget;
+namespace Ui
+{
+class EEGoSportsSetupProjectWidget;
 }
 
 //=============================================================================================================
@@ -65,7 +66,7 @@ public:
      * @param[in] parent pointer to parent widget; If parent is 0, the new EEGoSportsSetupProjectWidget becomes a window. If parent is another widget, EEGoSportsSetupWidget becomes a child window inside parent. EEGoSportsSetupWidget is deleted when its parent is deleted.
      * @param[in] pEEGoSports a pointer to the corresponding ECGSimulator.
      */
-    explicit EEGoSportsSetupProjectWidget(EEGoSports* pEEGoSports, QWidget *parent = 0);
+    explicit EEGoSportsSetupProjectWidget(EEGoSports* pEEGoSports, QWidget* parent = 0);
 
     //=========================================================================================================
     /**
@@ -82,15 +83,15 @@ public:
     void initGui();
 
 private:
-    EEGoSports*                           m_pEEGoSports;        /**< a pointer to corresponding EEGoSports.*/
+    EEGoSports* m_pEEGoSports; /**< a pointer to corresponding EEGoSports.*/
 
-    Ui::EEGoSportsSetupProjectWidget*     m_pUi;                /**< the user interface for the EEGoSportsSetupWidget.*/
+    Ui::EEGoSportsSetupProjectWidget* m_pUi; /**< the user interface for the EEGoSportsSetupWidget.*/
 
     //=========================================================================================================
     /**
      * Sets the project dir
      */
-    void changeCardinalMode(const QString &text);
+    void changeCardinalMode(const QString& text);
 
     //=========================================================================================================
     /**

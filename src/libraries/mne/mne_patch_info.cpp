@@ -39,9 +39,9 @@ using namespace MNELIB;
 //=============================================================================================================
 
 MNEPatchInfo::MNEPatchInfo()
-    :vert (-1)
-    ,area (0)
-    ,dev_nn (0)
+: vert(-1)
+, area(0)
+, dev_nn(0)
 {
     ave_nn[0] = 0;
     ave_nn[1] = 0;
@@ -56,7 +56,7 @@ MNEPatchInfo::~MNEPatchInfo() = default;
 
 void MNEPatchInfo::calculate_area(MNESourceSpace* s)
 {
-    int k,q;
+    int k, q;
     int nneigh;
 
     area = 0.0;
@@ -64,16 +64,16 @@ void MNEPatchInfo::calculate_area(MNESourceSpace* s)
         nneigh = s->nneighbor_tri[memb_vert[k]];
         const Eigen::VectorXi& neigh = s->neighbor_tri[memb_vert[k]];
         for (q = 0; q < nneigh; q++)
-            area += s->tris[neigh[q]].area/3.0;
+            area += s->tris[neigh[q]].area / 3.0;
     }
 }
 
 //=============================================================================================================
 
-void MNEPatchInfo::calculate_normal_stats(MNESourceSpace *s)
+void MNEPatchInfo::calculate_normal_stats(MNESourceSpace* s)
 {
     int k;
-    float cos_theta,size;
+    float cos_theta, size;
 
     Eigen::Map<Eigen::Vector3f> ave(ave_nn);
     ave.setZero();
@@ -93,7 +93,7 @@ void MNEPatchInfo::calculate_normal_stats(MNESourceSpace *s)
             cos_theta = 1.0;
         dev_nn += acos(cos_theta);
     }
-    dev_nn = dev_nn/memb_vert.size();
+    dev_nn = dev_nn / memb_vert.size();
 
     return;
 }

@@ -26,12 +26,13 @@
 //=============================================================================================================
 
 #if defined(SCAN_DUMMYTOOLBOX_PLUGIN)
-#  define DUMMYTOOLBOXSHARED_EXPORT Q_DECL_EXPORT    /**< Q_DECL_EXPORT must be added to the declarations of symbols used when compiling a shared library. */
+#define DUMMYTOOLBOXSHARED_EXPORT Q_DECL_EXPORT /**< Q_DECL_EXPORT must be added to the declarations of symbols used when compiling a shared library. */
 #else
-#  define DUMMYTOOLBOXSHARED_EXPORT Q_DECL_IMPORT    /**< Q_DECL_IMPORT must be added to the declarations of symbols used when compiling a client that uses the shared library. */
+#define DUMMYTOOLBOXSHARED_EXPORT Q_DECL_IMPORT /**< Q_DECL_IMPORT must be added to the declarations of symbols used when compiling a client that uses the shared library. */
 #endif
 
-namespace DUMMYTOOLBOXPLUGIN {
+namespace DUMMYTOOLBOXPLUGIN
+{
 
 //=============================================================================================================
 /**

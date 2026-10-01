@@ -63,13 +63,13 @@ namespace FIFFLIB
  * reconstructible.
  */
 
-class FIFFSHARED_EXPORT FiffId {
-
+class FIFFSHARED_EXPORT FiffId
+{
 public:
-    using SPtr = QSharedPointer<FiffId>;            /**< Shared pointer type for FiffId. */
-    using ConstSPtr = QSharedPointer<const FiffId>; /**< Const shared pointer type for FiffId. */
-    using UPtr = std::unique_ptr<FiffId>;             /**< Unique pointer type for FiffId. */
-    using ConstUPtr = std::unique_ptr<const FiffId>;  /**< Const unique pointer type for FiffId. */
+    using SPtr = QSharedPointer<FiffId>;             /**< Shared pointer type for FiffId. */
+    using ConstSPtr = QSharedPointer<const FiffId>;  /**< Const shared pointer type for FiffId. */
+    using UPtr = std::unique_ptr<FiffId>;            /**< Unique pointer type for FiffId. */
+    using ConstUPtr = std::unique_ptr<const FiffId>; /**< Const unique pointer type for FiffId. */
 
     //=========================================================================================================
     /**
@@ -126,7 +126,7 @@ public:
      *
      * @return true if succeeded, false otherwise.
      */
-    static bool get_machid(int *fixed_id);
+    static bool get_machid(int* fixed_id);
 
     //=========================================================================================================
     /**
@@ -184,13 +184,12 @@ public:
      *
      * @return true if both IDs are equal, false otherwise.
      */
-    friend bool operator== (const FiffId &a, const FiffId &b);
+    friend bool operator==(const FiffId& a, const FiffId& b);
 
 public:
-    fiff_int_t version;     /**< File version. */
-    fiff_int_t machid[2];   /**< Unique machine ID. */
-    FiffTime time;           /**< Time of the ID creation. */
-
+    fiff_int_t version;   /**< File version. */
+    fiff_int_t machid[2]; /**< Unique machine ID. */
+    FiffTime time;        /**< Time of the ID creation. */
 };
 
 //=============================================================================================================
@@ -211,7 +210,7 @@ inline qint32 FiffId::storageSize()
 
 //=============================================================================================================
 
-inline bool operator== (const FiffId &a, const FiffId &b)
+inline bool operator==(const FiffId& a, const FiffId& b)
 {
     return (a.version == b.version &&
             a.machid[0] == b.machid[0] &&

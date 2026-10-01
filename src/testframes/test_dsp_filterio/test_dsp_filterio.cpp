@@ -48,7 +48,7 @@ private slots:
         QCOMPARE(restored.getSamplingFrequency(), original.getSamplingFrequency());
         QCOMPARE(restored.getCoefficients().size(), original.getCoefficients().size());
 
-        for(int i = 0; i < restored.getCoefficients().size(); ++i) {
+        for (int i = 0; i < restored.getCoefficients().size(); ++i) {
             QVERIFY(qAbs(restored.getCoefficients()(i) - original.getCoefficients()(i)) < 1e-9);
         }
     }

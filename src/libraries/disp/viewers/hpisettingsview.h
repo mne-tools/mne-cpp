@@ -48,12 +48,14 @@
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-namespace Ui {
-    class HpiSettingsViewWidget;
+namespace Ui
+{
+class HpiSettingsViewWidget;
 }
 
-namespace FIFFLIB {
-    class FiffDigPointSet;
+namespace FIFFLIB
+{
+class FiffDigPointSet;
 }
 
 //=============================================================================================================
@@ -85,7 +87,7 @@ public:
      * @param[in] f Qt window flags passed to the QWidget constructor.
      */
     HpiSettingsView(const QString& sSettingsPath = "",
-                    QWidget *parent = 0,
+                    QWidget* parent = 0,
                     Qt::WindowFlags f = Qt::Widget);
 
     ~HpiSettingsView();
@@ -108,7 +110,7 @@ public:
      * @param[in] dMeanGof    the mean gof value.
      */
 
-    void setGoFLabels(const Eigen::VectorXd & vGoF,
+    void setGoFLabels(const Eigen::VectorXd& vGoF,
                       const double dMeanGof);
 
     //=========================================================================================================
@@ -324,13 +326,13 @@ protected:
      */
     void updateDigitizerInfoGUI(const FIFFLIB::FiffDigPointSet& digSet);
 
-    Ui::HpiSettingsViewWidget*                  m_pUi;                  /**< The HPI dialog. */
+    Ui::HpiSettingsViewWidget* m_pUi; /**< The HPI dialog. */
 
-    QVector<int>                                m_vCoilFreqs;           /**< Vector contains the HPI coil frequencies. */
+    QVector<int> m_vCoilFreqs; /**< Vector contains the HPI coil frequencies. */
 
-    QString                                     m_sSettingsPath;        /**< The settings path to store the GUI settings to. */
+    QString m_sSettingsPath; /**< The settings path to store the GUI settings to. */
 
-    QJsonDocument                               m_CoilPresets;          /**< Loaded coil frequency presets */
+    QJsonDocument m_CoilPresets; /**< Loaded coil frequency presets */
 
 signals:
     //=========================================================================================================

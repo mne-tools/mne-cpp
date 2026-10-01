@@ -67,7 +67,6 @@ struct AverageCategory;
  */
 class FIFFSHARED_EXPORT FiffEvents
 {
-
 public:
     //=========================================================================================================
     /**
@@ -83,7 +82,7 @@ public:
      *
      * @param[in] p_IODevice    The I/O device to read from.
      */
-    explicit FiffEvents(QIODevice &p_IODevice);
+    explicit FiffEvents(QIODevice& p_IODevice);
 
     //=========================================================================================================
     /**
@@ -98,9 +97,9 @@ public:
      *
      * @return true if succeeded, false otherwise.
      */
-    static bool read(const QString &t_sEventName,
-                     const QString &t_fileRawName,
-                     FiffEvents &p_Events);
+    static bool read(const QString& t_sEventName,
+                     const QString& t_fileRawName,
+                     FiffEvents& p_Events);
 
     //=========================================================================================================
     /**
@@ -111,8 +110,8 @@ public:
      *
      * @return true if succeeded, false otherwise.
      */
-    static bool read_from_fif(QIODevice &p_IODevice,
-                              FiffEvents &p_Events);
+    static bool read_from_fif(QIODevice& p_IODevice,
+                              FiffEvents& p_Events);
 
     //=========================================================================================================
     /**
@@ -123,8 +122,8 @@ public:
      *
      * @return true if succeeded, false otherwise.
      */
-    static bool read_from_ascii(QIODevice &p_IODevice,
-                                FiffEvents &p_Events);
+    static bool read_from_ascii(QIODevice& p_IODevice,
+                                FiffEvents& p_Events);
 
     //=========================================================================================================
     /**
@@ -134,7 +133,7 @@ public:
      *
      * @return true if succeeded, false otherwise.
      */
-    bool write_to_fif(QIODevice &p_IODevice) const;
+    bool write_to_fif(QIODevice& p_IODevice) const;
 
     //=========================================================================================================
     /**
@@ -145,7 +144,7 @@ public:
      *
      * @return true if succeeded, false otherwise.
      */
-    bool write_to_ascii(QIODevice &p_IODevice,
+    bool write_to_ascii(QIODevice& p_IODevice,
                         float sfreq = 0.0f) const;
 
     //=========================================================================================================
@@ -161,9 +160,9 @@ public:
      *
      * @return true if events were detected, false otherwise.
      */
-    static bool detect_from_raw(const FiffRawData &raw,
-                                FiffEvents &p_Events,
-                                const QString &triggerCh = QString("STI 014"),
+    static bool detect_from_raw(const FiffRawData& raw,
+                                FiffEvents& p_Events,
+                                const QString& triggerCh = QString("STI 014"),
                                 unsigned int triggerMask = 0xFFFFFFFF,
                                 bool leadingEdge = true);
 
@@ -192,11 +191,11 @@ public:
      * @param[in] eventIdx  Index of the current event row.
      * @return true if the event matches.
      */
-    static bool matchEvent(const AverageCategory &cat,
-                           const Eigen::MatrixXi &events,
+    static bool matchEvent(const AverageCategory& cat,
+                           const Eigen::MatrixXi& events,
                            int eventIdx);
 
-    Eigen::MatrixXi events;     /**< Event matrix (nEvents x 3): [sample, before, after]. */
+    Eigen::MatrixXi events; /**< Event matrix (nEvents x 3): [sample, before, after]. */
 };
 
 } // NAMESPACE

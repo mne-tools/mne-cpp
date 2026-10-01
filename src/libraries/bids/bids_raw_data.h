@@ -106,10 +106,10 @@ public:
      */
     struct WriteOptions
     {
-        bool    overwrite{false};   /**< Overwrite existing files if true. */
-        bool    copyData{true};     /**< Copy the raw data file into the BIDS directory.
+        bool overwrite{false}; /**< Overwrite existing files if true. */
+        bool copyData{true};   /**< Copy the raw data file into the BIDS directory.
                                          If false, only sidecars are written. */
-        QString datasetName;        /**< Name for dataset_description.json (defaults to "[Unspecified]"). */
+        QString datasetName;   /**< Name for dataset_description.json (defaults to "[Unspecified]"). */
     };
 
     //=========================================================================================================
@@ -202,14 +202,20 @@ public:
      *
      * @return True if the data is valid, false otherwise.
      */
-    bool isValid() const { return m_bIsValid; }
+    bool isValid() const
+    {
+        return m_bIsValid;
+    }
 
     /**
      * @brief Marks the data as valid or invalid.
      *
      * @param[in] bValid True to mark the data as valid, false to mark it invalid.
      */
-    void setValid(bool bValid) { m_bIsValid = bValid; }
+    void setValid(bool bValid)
+    {
+        m_bIsValid = bValid;
+    }
 
     /**
      * @brief Clears all data members and resets to invalid state.
@@ -233,12 +239,12 @@ public:
     // Core data members (public, following mne-cpp convention)
     //=========================================================================================================
 
-    FIFFLIB::FiffRawData                raw;            /**< Raw data with fully populated FiffInfo. */
-    QList<BidsEvent>                    events;         /**< Events from *_events.tsv. */
-    QMap<QString, int>                  eventIdMap;     /**< trial_type string → numeric value mapping. */
-    QList<BidsElectrode>                electrodes;     /**< Electrode positions from *_electrodes.tsv. */
-    BidsCoordinateSystem                coordinateSystem; /**< Coordinate system from *_coordsystem.json. */
-    AbstractFormatReader::UPtr          reader;         /**< The underlying format reader (keeps file open). */
+    FIFFLIB::FiffRawData raw;              /**< Raw data with fully populated FiffInfo. */
+    QList<BidsEvent> events;               /**< Events from *_events.tsv. */
+    QMap<QString, int> eventIdMap;         /**< trial_type string → numeric value mapping. */
+    QList<BidsElectrode> electrodes;       /**< Electrode positions from *_electrodes.tsv. */
+    BidsCoordinateSystem coordinateSystem; /**< Coordinate system from *_coordsystem.json. */
+    AbstractFormatReader::UPtr reader;     /**< The underlying format reader (keeps file open). */
 
     //=========================================================================================================
     // iEEG sidecar metadata (integrated from *_{datatype}.json)
@@ -246,15 +252,15 @@ public:
     // they are computed on write and applied on read.
     //=========================================================================================================
 
-    QString ieegReference;              /**< Reference electrode name (RECOMMENDED). */
-    QString taskDescription;            /**< Task description (OPTIONAL). */
-    QString manufacturer;               /**< Amplifier manufacturer (RECOMMENDED). */
-    QString manufacturerModelName;      /**< Amplifier model (RECOMMENDED). */
-    QString softwareVersions;           /**< Recording software versions (RECOMMENDED). */
-    QString recordingType;              /**< "continuous", "epoched", or "discontinuous" (RECOMMENDED). */
+    QString ieegReference;         /**< Reference electrode name (RECOMMENDED). */
+    QString taskDescription;       /**< Task description (OPTIONAL). */
+    QString manufacturer;          /**< Amplifier manufacturer (RECOMMENDED). */
+    QString manufacturerModelName; /**< Amplifier model (RECOMMENDED). */
+    QString softwareVersions;      /**< Recording software versions (RECOMMENDED). */
+    QString recordingType;         /**< "continuous", "epoched", or "discontinuous" (RECOMMENDED). */
 
 private:
-    bool m_bIsValid{false};     /**< True if the data was loaded successfully. */
+    bool m_bIsValid{false}; /**< True if the data was loaded successfully. */
 };
 
 } // namespace BIDSLIB

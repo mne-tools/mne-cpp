@@ -65,7 +65,7 @@ using namespace DISPLIB;
  *
  * @brief Construction and lifecycle checks for the remaining display viewers.
  */
-class TestDispViewers3: public QObject
+class TestDispViewers3 : public QObject
 {
     Q_OBJECT
 
@@ -192,8 +192,8 @@ void TestDispViewers3::construct_artifactSettingsView()
     // An empty channel list is the interesting case: it is what the view gets
     // before any data is loaded, and it is where an unguarded index would fault.
     ArtifactSettingsView* pView = new ArtifactSettingsView(settingsPath(),
-                                                          QList<FIFFLIB::FiffChInfo>(),
-                                                          m_pHolder.data());
+                                                           QList<FIFFLIB::FiffChInfo>(),
+                                                           m_pHolder.data());
     QVERIFY(pView != nullptr);
 
     pView->resize(320, 240);

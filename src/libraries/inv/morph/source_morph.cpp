@@ -42,8 +42,8 @@ using namespace Eigen;
 //=============================================================================================================
 
 void SourceMorph::compute(const VectorXi& verticesFrom,
-                           const VectorXi& verticesTo,
-                           const SparseMatrix<double>& morphMap)
+                          const VectorXi& verticesTo,
+                          const SparseMatrix<double>& morphMap)
 {
     if (verticesFrom.size() == 0 || verticesTo.size() == 0) {
         qWarning() << "[SourceMorph::compute] Empty vertex vectors.";

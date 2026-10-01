@@ -107,7 +107,7 @@ void TestMneInspectMultimodal::twoPluginsShareSceneAndToggleIndependently()
     fake.id = QStringLiteral("mri_axial");
     fake.displayName = QStringLiteral("MRI Axial");
     fake.kind = SceneLayerKind::MriSlice;
-    fake.payload = std::shared_ptr<void>(reinterpret_cast<void*>(0x1), [](void*){});
+    fake.payload = std::shared_ptr<void>(reinterpret_cast<void*>(0x1), [](void*) {});
     scene.addLayer(fake);
     QVERIFY(scene.findLayer(fake.id) != nullptr);
 
@@ -248,7 +248,7 @@ void TestMneInspectMultimodal::pickMriVoxelHighlightsNearestContact()
 
     PickResult pick;
     pick.kind = PickKind::MriVoxel;
-    pick.world = QVector3D(0.0f, 0.0f, 0.011f);  // closest to LA1 (z=0.01)
+    pick.world = QVector3D(0.0f, 0.0f, 0.011f); // closest to LA1 (z=0.01)
     pick.voxel = QVector3D(10.0f, 20.0f, 30.0f);
     pick.sliceOrientation = 0;
     pick.sourceId = QStringLiteral("mri_axial");

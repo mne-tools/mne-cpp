@@ -58,7 +58,8 @@ namespace DISPLIB
 // DISPLIB FORWARD DECLARATIONS
 //=============================================================================================================
 
-enum ColorMaps {
+enum ColorMaps
+{
     Hot,
     HotNeg1,
     HotNeg2,
@@ -132,7 +133,7 @@ protected:
                    qreal lower_frq,
                    qreal upper_frq);
 
-    virtual void resizeEvent(QResizeEvent *event);
+    virtual void resizeEvent(QResizeEvent* event);
 };
 } // NAMESPACE
 

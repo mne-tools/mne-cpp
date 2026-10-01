@@ -30,7 +30,8 @@ class TestFiffExtended : public QObject
 private:
     QString dataPath;
 
-    FiffInfo createSyntheticInfo(int nCh = 10) {
+    FiffInfo createSyntheticInfo(int nCh = 10)
+    {
         FiffInfo info;
         info.sfreq = 1000.0f;
         info.highpass = 0.1f;
@@ -52,7 +53,8 @@ private:
         return info;
     }
 
-    FiffCov createSyntheticCov(int dim = 5) {
+    FiffCov createSyntheticCov(int dim = 5)
+    {
         FiffCov cov;
         cov.kind = FIFFV_MNE_NOISE_COV;
         cov.dim = dim;
@@ -72,7 +74,8 @@ private:
     }
 
 private slots:
-    void initTestCase() {
+    void initTestCase()
+    {
         dataPath = QCoreApplication::applicationDirPath() + "/../resources/data/mne-cpp-test-data";
     }
 
@@ -216,8 +219,8 @@ private slots:
         // Must also exclude bad channels since prepare_noise_cov excludes them internally
         RowVectorXi picks = raw.info.pick_types(true, true, false, QStringList(), raw.info.bads);
         QStringList chNames;
-        for(int i = 0; i < picks.size(); ++i) {
-            if(cov.names.contains(raw.info.ch_names[picks(i)]))
+        for (int i = 0; i < picks.size(); ++i) {
+            if (cov.names.contains(raw.info.ch_names[picks(i)]))
                 chNames << raw.info.ch_names[picks(i)];
         }
         FiffCov prepared = cov.prepare_noise_cov(raw.info, chNames);
@@ -236,8 +239,8 @@ private slots:
         // Create events
         MatrixXi eventData(3, 3);
         eventData << 100, 0, 1,
-                     200, 0, 2,
-                     300, 0, 1;
+            200, 0, 2,
+            300, 0, 1;
 
         FiffEvents events;
         events.events = eventData;
@@ -259,10 +262,10 @@ private slots:
         // the event marks, so the values have to survive the round trip too.
         QCOMPARE(eventsRead.events.rows(), 3);
         QCOMPARE(eventsRead.events.cols(), 3);
-        for(int k = 0; k < eventData.rows(); ++k){
-            QCOMPARE(eventsRead.events(k,0), eventData(k,0));
-            QCOMPARE(eventsRead.events(k,1), eventData(k,1));
-            QCOMPARE(eventsRead.events(k,2), eventData(k,2));
+        for (int k = 0; k < eventData.rows(); ++k) {
+            QCOMPARE(eventsRead.events(k, 0), eventData(k, 0));
+            QCOMPARE(eventsRead.events(k, 1), eventData(k, 1));
+            QCOMPARE(eventsRead.events(k, 2), eventData(k, 2));
         }
     }
 
@@ -278,18 +281,18 @@ private slots:
         FiffEvents eventsRead;
         QVERIFY(FiffEvents::read_from_ascii(buffer, eventsRead));
         QCOMPARE(eventsRead.num_events(), 2);
-        QCOMPARE(eventsRead.events(0,0), 100);
-        QCOMPARE(eventsRead.events(0,2), 1);
-        QCOMPARE(eventsRead.events(1,0), 200);
-        QCOMPARE(eventsRead.events(1,2), 2);
+        QCOMPARE(eventsRead.events(0, 0), 100);
+        QCOMPARE(eventsRead.events(0, 2), 1);
+        QCOMPARE(eventsRead.events(1, 0), 200);
+        QCOMPARE(eventsRead.events(1, 2), 2);
     }
 
     void testFiffEventsWriteReadFifRoundTrip()
     {
         MatrixXi eventData(3, 3);
         eventData << 100, 0, 1,
-                     200, 0, 2,
-                     300, 0, 1;
+            200, 0, 2,
+            300, 0, 1;
 
         FiffEvents events;
         events.events = eventData;

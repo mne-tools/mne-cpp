@@ -43,7 +43,8 @@
 // DEFINE NAMESPACE MNESURF2BEM
 //=============================================================================================================
 
-namespace MNESURF2BEM {
+namespace MNESURF2BEM
+{
 
 //=============================================================================================================
 // FORWARD DECLARATIONS
@@ -134,7 +135,7 @@ private:
 
     //=========================================================================================================
 
-    const MNESurf2BemSettings& m_settings;  /**< Command-line settings. */
+    const MNESurf2BemSettings& m_settings; /**< Command-line settings. */
 };
 
 } // namespace MNESURF2BEM

@@ -38,13 +38,15 @@
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-namespace ANSHAREDLIB {
-    class Communicator;
-    class AbstractModel;
+namespace ANSHAREDLIB
+{
+class Communicator;
+class AbstractModel;
 }
 
-namespace DISPLIB {
-    class ProgressView;
+namespace DISPLIB
+{
+class ProgressView;
 }
 
 //=============================================================================================================
@@ -73,7 +75,13 @@ class DATALOADERSHARED_EXPORT DataLoader : public ANSHAREDLIB::AbstractPlugin
     // Use the Q_INTERFACES() macro to tell Qt's meta-object system about the interfaces
     Q_INTERFACES(ANSHAREDLIB::AbstractPlugin)
 
-    enum FileType {DATA_FILE, AVERAGE_FILE, EVENT_FILE};
+    enum FileType
+    {
+        DATA_FILE,
+        AVERAGE_FILE,
+        EVENT_FILE
+    };
+
 public:
     //=========================================================================================================
     /**
@@ -188,13 +196,13 @@ private:
      */
     void onModelChanged(QSharedPointer<ANSHAREDLIB::AbstractModel> pNewModel);
 
-    QPointer<ANSHAREDLIB::Communicator>             m_pCommu;                   /**< Used for sending events. */
-    QPointer<DISPLIB::ProgressView>                 m_pProgressView;            /**< Holds loading bar and loading message. */
-    QPointer<QWidget>                               m_pProgressViewWidget;      /**< Window for ProgressView. */
+    QPointer<ANSHAREDLIB::Communicator> m_pCommu;    /**< Used for sending events. */
+    QPointer<DISPLIB::ProgressView> m_pProgressView; /**< Holds loading bar and loading message. */
+    QPointer<QWidget> m_pProgressViewWidget;         /**< Window for ProgressView. */
 
-    QSharedPointer<ANSHAREDLIB::FiffRawViewModel>   m_pSelectedModel;           /**< Pointer to currently selected Fiff model. */
-    QString                                         m_sSettingsPath;            /**< Variable that stores the key where to store settings for this plugin.*/
-    QString                                         m_sLastDir;                 /**< Variable to store the last directory from where data were loaded.*/
+    QSharedPointer<ANSHAREDLIB::FiffRawViewModel> m_pSelectedModel; /**< Pointer to currently selected Fiff model. */
+    QString m_sSettingsPath;                                        /**< Variable that stores the key where to store settings for this plugin.*/
+    QString m_sLastDir;                                             /**< Variable to store the last directory from where data were loaded.*/
 };
 
 //=============================================================================================================

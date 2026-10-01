@@ -33,9 +33,10 @@ class TestMneExtended : public QObject
     Q_OBJECT
 
 private:
-    QString dataPath() const {
+    QString dataPath() const
+    {
         return QCoreApplication::applicationDirPath() +
-               "/../resources/data/mne-cpp-test-data/";
+            "/../resources/data/mne-cpp-test-data/";
     }
 
 private slots:
@@ -93,8 +94,8 @@ private slots:
         QStringList cols = {"c0", "c1", "c2", "c3"};
         MatrixXf data(3, 4);
         data << 1, 2, 3, 4,
-                5, 6, 7, 8,
-                9, 10, 11, 12;
+            5, 6, 7, 8,
+            9, 10, 11, 12;
 
         auto mat = MNENamedMatrix::build(3, 4, rows, cols, data);
 
@@ -219,7 +220,7 @@ private slots:
         a.tmax = 0.5f;
         a.bReject = false;
 
-        b = a; // shallow copy
+        b = a;             // shallow copy
         b.epoch = a.epoch; // same data
         QVERIFY(a == b);
 

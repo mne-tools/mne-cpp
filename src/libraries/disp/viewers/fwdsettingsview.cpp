@@ -53,7 +53,7 @@ using namespace FSLIB;
 //=============================================================================================================
 
 FwdSettingsView::FwdSettingsView(const QString& sSettingsPath,
-                                 QWidget *parent,
+                                 QWidget* parent,
                                  Qt::WindowFlags f)
 : AbstractView(parent, f)
 , m_bAnnotaionsLoaded(false)
@@ -78,16 +78,13 @@ FwdSettingsView::FwdSettingsView(const QString& sSettingsPath,
     QString t_sAtlasDir = QCoreApplication::applicationDirPath() + "/../resources/data/MNE-sample-data/subjects/sample/label";
     m_pUi->m_qLineEdit_AtlasDirName->setText(t_sAtlasDir);
 
-    FsAnnotationSet::SPtr t_pAnnotationSet = FsAnnotationSet::SPtr(new FsAnnotationSet(t_sAtlasDir+"/lh.aparc.a2009s.annot", t_sAtlasDir+"/rh.aparc.a2009s.annot"));
+    FsAnnotationSet::SPtr t_pAnnotationSet = FsAnnotationSet::SPtr(new FsAnnotationSet(t_sAtlasDir + "/lh.aparc.a2009s.annot", t_sAtlasDir + "/rh.aparc.a2009s.annot"));
 
-    if(!t_pAnnotationSet->isEmpty() && t_pAnnotationSet->size() == 2)
-    {
-        emit atlasDirChanged(t_sAtlasDir,t_pAnnotationSet);
+    if (!t_pAnnotationSet->isEmpty() && t_pAnnotationSet->size() == 2) {
+        emit atlasDirChanged(t_sAtlasDir, t_pAnnotationSet);
         m_pUi->m_qLabel_atlasStat->setText("loaded");
         m_bAnnotaionsLoaded = true;
-    }
-    else
-    {
+    } else {
         m_pUi->m_qLabel_atlasStat->setText("not loaded");
     }
 
@@ -120,7 +117,7 @@ FwdSettingsView::~FwdSettingsView()
 
 void FwdSettingsView::saveSettings()
 {
-    if(m_sSettingsPath.isEmpty()) {
+    if (m_sSettingsPath.isEmpty()) {
         return;
     }
 
@@ -131,7 +128,7 @@ void FwdSettingsView::saveSettings()
 
 void FwdSettingsView::loadSettings()
 {
-    if(m_sSettingsPath.isEmpty()) {
+    if (m_sSettingsPath.isEmpty()) {
         return;
     }
 
@@ -143,7 +140,7 @@ void FwdSettingsView::loadSettings()
 
 void FwdSettingsView::updateGuiMode(GuiMode mode)
 {
-    switch(mode) {
+    switch (mode) {
         case GuiMode::Clinical:
             break;
         default: // default is research mode
@@ -155,7 +152,7 @@ void FwdSettingsView::updateGuiMode(GuiMode mode)
 
 void FwdSettingsView::updateProcessingMode(ProcessingMode mode)
 {
-    switch(mode) {
+    switch (mode) {
         case ProcessingMode::Offline:
             break;
         default: // default is realtime mode
@@ -174,10 +171,10 @@ bool FwdSettingsView::getRecomputationStatusChanged()
 
 void FwdSettingsView::setRecomputationStatus(int iStatus)
 {
-    if(iStatus == 0) {
+    if (iStatus == 0) {
         m_pUi->m_label_recomputationFeedback->setText("Initializing");
         m_pUi->m_label_recomputationFeedback->setStyleSheet("QLabel { background-color : red;}");
-    } else if(iStatus == 1) {
+    } else if (iStatus == 1) {
         m_pUi->m_label_recomputationFeedback->setText("Computing");
         m_pUi->m_label_recomputationFeedback->setStyleSheet("QLabel { background-color : red;}");
     } else if (iStatus == 2) {
@@ -207,16 +204,16 @@ void FwdSettingsView::setSolutionInformation(FIFFLIB::fiff_int_t iSourceOri,
                                              int iNSpaces)
 {
     // set source orientation
-    if(iSourceOri == 0) {
+    if (iSourceOri == 0) {
         m_pUi->m_lineEdit_sSourceOri->setText("fixed");
     } else {
         m_pUi->m_lineEdit_sSourceOri->setText("free");
     }
 
     // set coordinate frame
-    if(iCoordFrame == FIFFV_COORD_HEAD) {
+    if (iCoordFrame == FIFFV_COORD_HEAD) {
         m_pUi->m_lineEdit_sCoordFrame->setText("Head Space");
-    } else if (iCoordFrame == FIFFV_COORD_MRI){
+    } else if (iCoordFrame == FIFFV_COORD_MRI) {
         m_pUi->m_lineEdit_sCoordFrame->setText("MRI Space");
     } else {
         m_pUi->m_lineEdit_sCoordFrame->setText("Unknown");
@@ -253,7 +250,7 @@ int FwdSettingsView::getClusterNumber()
 
 void FwdSettingsView::onClusteringStatusChanged(bool bChecked)
 {
-    if(!m_bAnnotaionsLoaded) {
+    if (!m_bAnnotaionsLoaded) {
         QMessageBox msgBox;
         msgBox.setText("Please load an annotation set before clustering.");
         msgBox.exec();
@@ -278,21 +275,17 @@ void FwdSettingsView::showAtlasDirDialog()
 {
     QString t_sAtlasDir = QFileDialog::getExistingDirectory(this, tr("Open Atlas Directory"),
                                                             QCoreApplication::applicationDirPath(),
-                                                            QFileDialog::ShowDirsOnly
-                                                            | QFileDialog::DontResolveSymlinks);
+                                                            QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks);
 
     m_pUi->m_qLineEdit_AtlasDirName->setText(t_sAtlasDir);
 
-    FsAnnotationSet::SPtr t_pAnnotationSet = FsAnnotationSet::SPtr(new FsAnnotationSet(t_sAtlasDir+"/lh.aparc.a2009s.annot", t_sAtlasDir+"/rh.aparc.a2009s.annot"));
+    FsAnnotationSet::SPtr t_pAnnotationSet = FsAnnotationSet::SPtr(new FsAnnotationSet(t_sAtlasDir + "/lh.aparc.a2009s.annot", t_sAtlasDir + "/rh.aparc.a2009s.annot"));
 
-    if(!t_pAnnotationSet->isEmpty() && t_pAnnotationSet->size() == 2)
-    {
-        emit atlasDirChanged(t_sAtlasDir,t_pAnnotationSet);
+    if (!t_pAnnotationSet->isEmpty() && t_pAnnotationSet->size() == 2) {
+        emit atlasDirChanged(t_sAtlasDir, t_pAnnotationSet);
         m_pUi->m_qLabel_atlasStat->setText("loaded");
         m_bAnnotaionsLoaded = true;
-    }
-    else
-    {
+    } else {
         m_pUi->m_qLabel_atlasStat->setText("not loaded");
     }
 }
@@ -301,5 +294,4 @@ void FwdSettingsView::showAtlasDirDialog()
 
 void FwdSettingsView::clearView()
 {
-
 }

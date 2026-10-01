@@ -53,8 +53,8 @@ class SCSHAREDSHARED_EXPORT PluginConnector : public QObject
     Q_OBJECT
 
 public:
-    typedef QSharedPointer<PluginConnector> SPtr;               /**< Shared pointer type for PluginConnector. */
-    typedef QSharedPointer<const PluginConnector> ConstSPtr;    /**< Const shared pointer type for PluginConnector. */
+    typedef QSharedPointer<PluginConnector> SPtr;            /**< Shared pointer type for PluginConnector. */
+    typedef QSharedPointer<const PluginConnector> ConstSPtr; /**< Const shared pointer type for PluginConnector. */
 
     //=========================================================================================================
     /**
@@ -64,13 +64,15 @@ public:
      * @param[in] name       connection name.
      * @param[in] descr      connection description.
      */
-    PluginConnector(AbstractPlugin *parent, const QString &name, const QString &descr);
-    
+    PluginConnector(AbstractPlugin* parent, const QString& name, const QString& descr);
+
     //=========================================================================================================
     /**
      * Destructor
      */
-    virtual ~PluginConnector(){}
+    virtual ~PluginConnector()
+    {
+    }
 
     //=========================================================================================================
     /**
@@ -99,7 +101,7 @@ public:
 signals:
 
 protected:
-    AbstractPlugin* m_pPlugin;  /**< Plugin to which connector belongs to. */
+    AbstractPlugin* m_pPlugin; /**< Plugin to which connector belongs to. */
 
     //actual obeserver pattern - think of an other implementation --> currently similiar to OpenWalnut
     //figure out how to Qt signal/slot

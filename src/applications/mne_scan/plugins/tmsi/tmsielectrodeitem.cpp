@@ -47,7 +47,7 @@ QRectF TMSIElectrodeItem::boundingRect() const
 
 //=============================================================================================================
 
-void TMSIElectrodeItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
+void TMSIElectrodeItem::paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget)
 {
     Q_UNUSED(option);
     Q_UNUSED(widget);
@@ -65,13 +65,13 @@ void TMSIElectrodeItem::paint(QPainter *painter, const QStyleOptionGraphicsItem 
     // Plot electrode name
     QStaticText staticElectrodeName = QStaticText(m_sElectrodeName);
     QSizeF sizeText = staticElectrodeName.size();
-    painter->drawStaticText(-15+((30-sizeText.width())/2), -32, staticElectrodeName);
+    painter->drawStaticText(-15 + ((30 - sizeText.width()) / 2), -32, staticElectrodeName);
 
     // Plot electrodes impedance value
     QString impedanceValueToString;
-    QStaticText staticElectrodeValue = QStaticText(QString("%1 %2").arg(impedanceValueToString.setNum(m_dImpedanceValue/1000)).arg(/*"kOhm"*/"k")); // transform to kilo ohm (divide by 1000)
+    QStaticText staticElectrodeValue = QStaticText(QString("%1 %2").arg(impedanceValueToString.setNum(m_dImpedanceValue / 1000)).arg(/*"kOhm"*/ "k")); // transform to kilo ohm (divide by 1000)
     QSizeF sizeValue = staticElectrodeValue.size();
-    painter->drawStaticText(-15+((30-sizeValue.width())/2), 19, staticElectrodeValue);
+    painter->drawStaticText(-15 + ((30 - sizeValue.width()) / 2), 19, staticElectrodeValue);
 
     this->setPos(m_qpElectrodePosition);
 }
@@ -124,4 +124,3 @@ int TMSIElectrodeItem::getChannelIndex()
 {
     return m_iChannelIndex;
 }
-

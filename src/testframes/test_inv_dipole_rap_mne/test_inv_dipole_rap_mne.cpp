@@ -76,10 +76,22 @@ private:
     FiffInfo m_info;
     MNEInverseOperator m_invOp;
 
-    QString rawPath() const { return m_sTestDataPath + "/MEG/sample/sample_audvis_trunc_raw.fif"; }
-    QString avePath() const { return m_sTestDataPath + "/MEG/sample/sample_audvis-ave.fif"; }
-    QString covPath() const { return m_sTestDataPath + "/MEG/sample/sample_audvis-cov.fif"; }
-    QString fwdPath() const { return m_sTestDataPath + "/Result/ref-sample_audvis-meg-eeg-oct-6-fwd.fif"; }
+    QString rawPath() const
+    {
+        return m_sTestDataPath + "/MEG/sample/sample_audvis_trunc_raw.fif";
+    }
+    QString avePath() const
+    {
+        return m_sTestDataPath + "/MEG/sample/sample_audvis-ave.fif";
+    }
+    QString covPath() const
+    {
+        return m_sTestDataPath + "/MEG/sample/sample_audvis-cov.fif";
+    }
+    QString fwdPath() const
+    {
+        return m_sTestDataPath + "/Result/ref-sample_audvis-meg-eeg-oct-6-fwd.fif";
+    }
 
 private slots:
     void initTestCase();
@@ -167,8 +179,7 @@ void TestInvDipoleRapMne::initTestCase()
 {
     qInstallMessageHandler(MNELogger::customLogWriter);
 
-    m_sTestDataPath = QCoreApplication::applicationDirPath()
-                      + "/../resources/data/mne-cpp-test-data";
+    m_sTestDataPath = QCoreApplication::applicationDirPath() + "/../resources/data/mne-cpp-test-data";
     QVERIFY2(QFile::exists(rawPath()),
              qPrintable(QString("Test data not found: %1").arg(rawPath())));
 
@@ -205,7 +216,9 @@ void TestInvDipoleRapMne::initTestCase()
     QVERIFY2(m_info.nchan > 0, "Failed to load measurement info");
 }
 
-void TestInvDipoleRapMne::cleanupTestCase() {}
+void TestInvDipoleRapMne::cleanupTestCase()
+{
+}
 
 //=============================================================================================================
 // InvSourceEstimate extended tests
@@ -215,7 +228,8 @@ void TestInvDipoleRapMne::sourceEstimate_gridData()
 {
     MatrixXd data = MatrixXd::Random(10, 5);
     VectorXi verts(10);
-    for (int i = 0; i < 10; i++) verts(i) = i;
+    for (int i = 0; i < 10; i++)
+        verts(i) = i;
 
     InvSourceEstimate stc(data, verts, 0.0f, 0.001f);
     QCOMPARE(stc.data.rows(), (Index)10);
@@ -301,7 +315,8 @@ void TestInvDipoleRapMne::sourceEstimate_reduce()
 {
     MatrixXd data = MatrixXd::Random(10, 20);
     VectorXi verts(10);
-    for (int i = 0; i < 10; i++) verts(i) = i;
+    for (int i = 0; i < 10; i++)
+        verts(i) = i;
     InvSourceEstimate stc(data, verts, 0.0f, 0.001f);
 
     // Reduce to samples 5 to 14 (10 samples)
@@ -348,7 +363,7 @@ void TestInvDipoleRapMne::sourceEstimate_writeReadRoundTrip()
 void TestInvDipoleRapMne::token_defaultConstruction()
 {
     InvToken tok;
-    QVERIFY(tok.value == 0.0f || true);  // Just verify construction doesn't crash
+    QVERIFY(tok.value == 0.0f || true); // Just verify construction doesn't crash
 
     InvToken tok2(InvTokenId::Bos);
     QCOMPARE(tok2.id, InvTokenId::Bos);
@@ -363,22 +378,22 @@ void TestInvDipoleRapMne::token_tokenizeEmptyEstimate()
     InvSourceEstimate stc;
     auto tokens = tokenize(stc);
     // Empty estimate should still produce a valid (possibly minimal) token sequence
-    QVERIFY(tokens.size() >= 2);  // At least STC_BEGIN and STC_END
+    QVERIFY(tokens.size() >= 2); // At least STC_BEGIN and STC_END
 }
 
 void TestInvDipoleRapMne::token_tokenizeGridData()
 {
     MatrixXd data(3, 2);
     data << 1.0, 2.0,
-            3.0, 4.0,
-            5.0, 6.0;
+        3.0, 4.0,
+        5.0, 6.0;
     VectorXi verts(3);
     verts << 100, 200, 300;
 
     InvSourceEstimate stc(data, verts, 0.0f, 0.001f);
 
     auto tokens = tokenize(stc);
-    QVERIFY(tokens.size() > 10);  // Should have metadata + grid data tokens
+    QVERIFY(tokens.size() > 10); // Should have metadata + grid data tokens
 
     // Verify token sequence starts with Bos
     QCOMPARE(tokens.front().id, InvTokenId::Bos);
@@ -391,9 +406,9 @@ void TestInvDipoleRapMne::token_tokenizeAndReconstruct()
     // Create source estimate with known data
     MatrixXd data(4, 3);
     data << 1.0, 2.0, 3.0,
-            4.0, 5.0, 6.0,
-            7.0, 8.0, 9.0,
-            10.0, 11.0, 12.0;
+        4.0, 5.0, 6.0,
+        7.0, 8.0, 9.0,
+        10.0, 11.0, 12.0;
     VectorXi verts(4);
     verts << 0, 10, 20, 30;
     InvSourceEstimate stcOrig(data, verts, -0.1f, 0.001f);
@@ -670,7 +685,7 @@ void TestInvDipoleRapMne::dipoleFitSettings_checkIntegrity()
     settings.measname = "/tmp/test.fif";
     // checkIntegrity should not crash on valid settings
     settings.checkIntegrity();
-    QVERIFY(true);  // If we get here, no crash
+    QVERIFY(true); // If we get here, no crash
 }
 
 //=============================================================================================================
@@ -693,10 +708,10 @@ void TestInvDipoleRapMne::dipoleFitData_adHocNoise()
     float eeg_std = 0.2e-6f;
 
     auto noise = InvDipoleFitData::ad_hoc_noise(nullptr, nullptr,
-                                                  grad_std, mag_std, eeg_std);
+                                                grad_std, mag_std, eeg_std);
     // With no coils, should return nullptr or empty
     // This mainly exercises the code path
-    QVERIFY(true);  // If we get here without crash, the test passes
+    QVERIFY(true); // If we get here without crash, the test passes
 }
 
 //=============================================================================================================
@@ -846,7 +861,7 @@ void TestInvDipoleRapMne::minimumNorm_dSPM()
     QVERIFY2(!evokedSet.evoked.isEmpty(), "No evoked data loaded");
 
     FiffEvoked evoked = evokedSet.evoked.first();
-    InvMinimumNorm mn(m_invOp, 1.0f / 9.0f, true, false);  // dSPM=true, sLORETA=false
+    InvMinimumNorm mn(m_invOp, 1.0f / 9.0f, true, false); // dSPM=true, sLORETA=false
     InvSourceEstimate stc = mn.calculateInverse(evoked);
 
     QVERIFY(!stc.isEmpty());
@@ -867,7 +882,7 @@ void TestInvDipoleRapMne::minimumNorm_sLORETA()
     QVERIFY2(!evokedSet.evoked.isEmpty(), "No evoked data loaded");
 
     FiffEvoked evoked = evokedSet.evoked.first();
-    InvMinimumNorm mn(m_invOp, 1.0f / 9.0f, false, true);  // dSPM=false, sLORETA=true
+    InvMinimumNorm mn(m_invOp, 1.0f / 9.0f, false, true); // dSPM=false, sLORETA=true
     InvSourceEstimate stc = mn.calculateInverse(evoked);
 
     QVERIFY(!stc.isEmpty());
@@ -910,7 +925,8 @@ void TestInvDipoleRapMne::sourceEstimate_assignment()
 {
     Eigen::MatrixXd data = Eigen::MatrixXd::Random(20, 5);
     Eigen::VectorXi vertices(20);
-    for (int i = 0; i < 20; ++i) vertices(i) = i;
+    for (int i = 0; i < 20; ++i)
+        vertices(i) = i;
 
     InvSourceEstimate stc(data, vertices, 0.0f, 0.001f);
     QVERIFY(!stc.isEmpty());
@@ -933,8 +949,8 @@ void TestInvDipoleRapMne::tokenize_simpleEstimate()
     // Create a small source estimate
     Eigen::MatrixXd data(3, 2);
     data << 1.0, 2.0,
-            3.0, 4.0,
-            5.0, 6.0;
+        3.0, 4.0,
+        5.0, 6.0;
     Eigen::VectorXi vertices(3);
     vertices << 10, 20, 30;
 
@@ -955,9 +971,9 @@ void TestInvDipoleRapMne::tokenize_roundtrip()
 {
     Eigen::MatrixXd data(4, 3);
     data << 1, 2, 3,
-            4, 5, 6,
-            7, 8, 9,
-            10, 11, 12;
+        4, 5, 6,
+        7, 8, 9,
+        10, 11, 12;
     Eigen::VectorXi vertices(4);
     vertices << 0, 1, 2, 3;
 
@@ -974,7 +990,7 @@ void TestInvDipoleRapMne::tokenize_roundtrip()
     // Check data values match
     for (int r = 0; r < stc.data.rows(); ++r) {
         for (int c = 0; c < stc.data.cols(); ++c) {
-            QVERIFY(qAbs(recovered.data(r,c) - stc.data(r,c)) < 1e-4);
+            QVERIFY(qAbs(recovered.data(r, c) - stc.data(r, c)) < 1e-4);
         }
     }
     QCOMPARE(recovered.method, InvEstimateMethod::dSPM);
@@ -1004,7 +1020,10 @@ void TestInvDipoleRapMne::tokenize_metadataOnly()
     // Should not contain amplitude tokens
     bool hasAmp = false;
     for (const auto& t : tokens) {
-        if (t.id == InvTokenId::Amplitude) { hasAmp = true; break; }
+        if (t.id == InvTokenId::Amplitude) {
+            hasAmp = true;
+            break;
+        }
     }
     QVERIFY(!hasAmp);
 }
@@ -1030,7 +1049,10 @@ void TestInvDipoleRapMne::tokenize_withCouplings()
     // Should contain coupling section
     bool hasCouplingBegin = false;
     for (const auto& t : tokens) {
-        if (t.id == InvTokenId::CouplingBegin) { hasCouplingBegin = true; break; }
+        if (t.id == InvTokenId::CouplingBegin) {
+            hasCouplingBegin = true;
+            break;
+        }
     }
     QVERIFY(hasCouplingBegin);
 }
@@ -1058,7 +1080,10 @@ void TestInvDipoleRapMne::tokenize_withFocalDipoles()
 
     bool hasFocalBegin = false;
     for (const auto& t : tokens) {
-        if (t.id == InvTokenId::FocalBegin) { hasFocalBegin = true; break; }
+        if (t.id == InvTokenId::FocalBegin) {
+            hasFocalBegin = true;
+            break;
+        }
     }
     QVERIFY(hasFocalBegin);
 }
@@ -1078,8 +1103,8 @@ void TestInvDipoleRapMne::tokenize_withConnectivity()
     conn.directed = false;
     Eigen::MatrixXd cmat(3, 3);
     cmat << 1.0, 0.5, 0.3,
-            0.5, 1.0, 0.7,
-            0.3, 0.7, 1.0;
+        0.5, 1.0, 0.7,
+        0.3, 0.7, 1.0;
     conn.matrix = cmat;
     stc.connectivity.push_back(conn);
 
@@ -1088,7 +1113,10 @@ void TestInvDipoleRapMne::tokenize_withConnectivity()
 
     bool hasConnBegin = false;
     for (const auto& t : tokens) {
-        if (t.id == InvTokenId::ConnBegin) { hasConnBegin = true; break; }
+        if (t.id == InvTokenId::ConnBegin) {
+            hasConnBegin = true;
+            break;
+        }
     }
     QVERIFY(hasConnBegin);
 
@@ -1102,7 +1130,8 @@ void TestInvDipoleRapMne::tokenize_subsampling()
     Eigen::MatrixXd data(10, 5);
     data.setRandom();
     Eigen::VectorXi vertices(10);
-    for (int i = 0; i < 10; ++i) vertices(i) = i;
+    for (int i = 0; i < 10; ++i)
+        vertices(i) = i;
 
     InvSourceEstimate stc(data, vertices, 0.0f, 0.001f);
 
@@ -1116,7 +1145,8 @@ void TestInvDipoleRapMne::tokenize_subsampling()
     // Count amplitude tokens - should be reduced from full 10*5=50
     int ampCount = 0;
     for (const auto& t : tokens) {
-        if (t.id == InvTokenId::Amplitude) ampCount++;
+        if (t.id == InvTokenId::Amplitude)
+            ampCount++;
     }
     // stride(10,3)=3 → effSrc=(10+2)/3=4; stride(5,2)=2 → effTime=(5+1)/2=3
     // 4 sources * 3 timepoints = 12 amplitude tokens

@@ -40,11 +40,11 @@
 //=============================================================================================================
 
 #if defined(STATICBUILD)
-#  define BIDSSHARED_EXPORT
+#define BIDSSHARED_EXPORT
 #elif defined(MNE_BIDS_LIBRARY)
-#  define BIDSSHARED_EXPORT Q_DECL_EXPORT    /**< Q_DECL_EXPORT must be added to the declarations of symbols used when compiling a shared library. */
+#define BIDSSHARED_EXPORT Q_DECL_EXPORT /**< Q_DECL_EXPORT must be added to the declarations of symbols used when compiling a shared library. */
 #else
-#  define BIDSSHARED_EXPORT Q_DECL_IMPORT    /**< Q_DECL_IMPORT must be added to the declarations of symbols used when compiling a client that uses the shared library. */
+#define BIDSSHARED_EXPORT Q_DECL_IMPORT /**< Q_DECL_IMPORT must be added to the declarations of symbols used when compiling a client that uses the shared library. */
 #endif
 
 //=============================================================================================================
@@ -52,7 +52,8 @@
  * @namespace BIDSLIB
  * @brief     BIDS dataset reading, writing, path construction, and sidecar metadata handling for iEEG/EEG/MEG.
  */
-namespace BIDSLIB{
+namespace BIDSLIB
+{
 
 //=============================================================================================================
 /**

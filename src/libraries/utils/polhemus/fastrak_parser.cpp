@@ -24,15 +24,16 @@
 
 using namespace UTILSLIB;
 
-namespace {
+namespace
+{
 
-constexpr float kInchToMetre       = 0.0254f;
+constexpr float kInchToMetre = 0.0254f;
 constexpr float kCentimetreToMetre = 0.01f;
 
 float linearScale(FastrakParser::Units units)
 {
     return (units == FastrakParser::Units::Inches) ? kInchToMetre
-                                                    : kCentimetreToMetre;
+                                                   : kCentimetreToMetre;
 }
 
 } // namespace
@@ -47,7 +48,7 @@ bool FastrakParser::parseRecord(const QByteArray& record, Units units, FastrakSa
     // every '-' that is preceded by a digit so tokenisation works.
     QByteArray fixed = record.simplified();
     for (int i = fixed.size() - 1; i > 0; --i) {
-        const char c  = fixed.at(i);
+        const char c = fixed.at(i);
         const char pc = fixed.at(i - 1);
         if (c == '-' && pc >= '0' && pc <= '9') {
             fixed.insert(i, ' ');
@@ -81,10 +82,10 @@ bool FastrakParser::parseRecord(const QByteArray& record, Units units, FastrakSa
     }
 
     const float scale = linearScale(units);
-    out.station        = station;
-    out.position       = QVector3D(x * scale, y * scale, z * scale);
+    out.station = station;
+    out.position = QVector3D(x * scale, y * scale, z * scale);
     out.hasOrientation = false;
-    out.orientation    = QQuaternion();
+    out.orientation = QQuaternion();
 
     if (tokens.size() >= 8) {
         // Quaternion output (O-item 11): q0 q1 q2 q3 (scalar-first).
@@ -94,7 +95,7 @@ bool FastrakParser::parseRecord(const QByteArray& record, Units units, FastrakSa
         const float q2 = parseFloat(tokens[6]);
         const float q3 = parseFloat(tokens[7]);
         if (ok) {
-            out.orientation    = QQuaternion(q0, q1, q2, q3).normalized();
+            out.orientation = QQuaternion(q0, q1, q2, q3).normalized();
             out.hasOrientation = true;
         }
     } else if (tokens.size() >= 7) {
@@ -107,7 +108,7 @@ bool FastrakParser::parseRecord(const QByteArray& record, Units units, FastrakSa
             const QQuaternion qZ = QQuaternion::fromAxisAndAngle(0.0f, 0.0f, 1.0f, az);
             const QQuaternion qY = QQuaternion::fromAxisAndAngle(0.0f, 1.0f, 0.0f, el);
             const QQuaternion qX = QQuaternion::fromAxisAndAngle(1.0f, 0.0f, 0.0f, ro);
-            out.orientation    = qZ * qY * qX;
+            out.orientation = qZ * qY * qX;
             out.hasOrientation = true;
         }
     }

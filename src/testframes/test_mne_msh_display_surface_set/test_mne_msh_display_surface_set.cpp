@@ -45,7 +45,7 @@ using namespace MNELIB;
  * @brief The TestMneMshDisplaySurfaceSet class provides display surface set reading verification tests
  *
  */
-class TestMneMshDisplaySurfaceSet: public QObject
+class TestMneMshDisplaySurfaceSet : public QObject
 {
     Q_OBJECT
 
@@ -81,21 +81,21 @@ void TestMneMshDisplaySurfaceSet::initTestCase()
     //Calculate the alignment of the fiducials
     m_pSurfSetBemLoaded = MNEMshDisplaySurfaceSet::SPtr(new MNEMshDisplaySurfaceSet());
     m_pSurfSetBemLoaded->add_bem_surface(QCoreApplication::applicationDirPath() + "/../resources/data/mne-cpp-test-data/subjects/sample/bem/sample-5120-bem.fif",
-                                             FIFFV_BEM_SURF_ID_BRAIN,
-                                             "5120",
-                                             1,
-                                             1);
+                                         FIFFV_BEM_SURF_ID_BRAIN,
+                                         "5120",
+                                         1,
+                                         1);
 
-    QVERIFY( m_pSurfSetBemLoaded->nsurf == 1 );
+    QVERIFY(m_pSurfSetBemLoaded->nsurf == 1);
 }
 
 //=============================================================================================================
 
 void TestMneMshDisplaySurfaceSet::compareSurface()
 {
-    if(m_pSurfSetBemLoaded->nsurf >= 1) {
-        QVERIFY( m_pSurfSetBemLoaded->surfs[0]->np == 2562 );
-        QVERIFY( m_pSurfSetBemLoaded->surfs[0]->ntri == 5120 );
+    if (m_pSurfSetBemLoaded->nsurf >= 1) {
+        QVERIFY(m_pSurfSetBemLoaded->surfs[0]->np == 2562);
+        QVERIFY(m_pSurfSetBemLoaded->surfs[0]->ntri == 5120);
     }
 }
 

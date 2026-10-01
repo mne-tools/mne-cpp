@@ -91,7 +91,7 @@ std::pair<MatrixXd, double> StsCovEstimators::oas(const MatrixXd& matData)
 //=============================================================================================================
 
 std::pair<MatrixXd, double> StsCovEstimators::diagonalFixed(const MatrixXd& matData,
-                                                             double dReg)
+                                                            double dReg)
 {
     const int p = static_cast<int>(matData.rows());
     const int n = static_cast<int>(matData.cols());
@@ -109,7 +109,7 @@ std::pair<MatrixXd, double> StsCovEstimators::diagonalFixed(const MatrixXd& matD
 //=============================================================================================================
 
 std::pair<MatrixXd, double> StsCovEstimators::pca(const MatrixXd& matData,
-                                                   int iRank)
+                                                  int iRank)
 {
     const int p = static_cast<int>(matData.rows());
     const int n = static_cast<int>(matData.cols());
@@ -131,7 +131,8 @@ std::pair<MatrixXd, double> StsCovEstimators::pca(const MatrixXd& matData,
             if (evals(i) > threshold)
                 ++iRank;
         }
-        if (iRank == 0) iRank = 1;  // at least 1
+        if (iRank == 0)
+            iRank = 1; // at least 1
     }
     iRank = std::min(iRank, p);
 
@@ -150,9 +151,9 @@ std::pair<MatrixXd, double> StsCovEstimators::pca(const MatrixXd& matData,
 //=============================================================================================================
 
 std::pair<MatrixXd, double> StsCovEstimators::factorAnalysis(const MatrixXd& matData,
-                                                              int iNFactors,
-                                                              int iMaxIter,
-                                                              double dTol)
+                                                             int iNFactors,
+                                                             int iMaxIter,
+                                                             double dTol)
 {
     // matData is (p × n), already zero-centred; skigen expects (n × p)
     Skigen::FactorAnalysis<double> fa(iNFactors, iMaxIter, dTol);
@@ -163,7 +164,7 @@ std::pair<MatrixXd, double> StsCovEstimators::factorAnalysis(const MatrixXd& mat
 //=============================================================================================================
 
 double StsCovEstimators::gaussianLogLikelihood(const MatrixXd& matTestData,
-                                                const MatrixXd& matCov)
+                                               const MatrixXd& matCov)
 {
     const int p = static_cast<int>(matTestData.rows());
     const int n = static_cast<int>(matTestData.cols());
@@ -192,12 +193,14 @@ double StsCovEstimators::gaussianLogLikelihood(const MatrixXd& matTestData,
 //=============================================================================================================
 
 std::pair<MatrixXd, double> StsCovEstimators::autoSelect(const MatrixXd& matData,
-                                                          int iNFolds)
+                                                         int iNFolds)
 {
     const int n = static_cast<int>(matData.cols());
 
-    if (iNFolds < 2) iNFolds = 2;
-    if (iNFolds > n) iNFolds = n;
+    if (iNFolds < 2)
+        iNFolds = 2;
+    if (iNFolds > n)
+        iNFolds = n;
 
     // Create fold indices (simple sequential split)
     std::vector<int> indices(static_cast<size_t>(n));
@@ -293,18 +296,36 @@ std::pair<MatrixXd, double> StsCovEstimators::autoSelect(const MatrixXd& matData
     // Re-fit best method on full data
     std::pair<MatrixXd, double> result;
     switch (bestMethod) {
-    case 0: {
-        MatrixXd cov = (matData * matData.transpose()) / static_cast<double>(n);
-        cov.diagonal().array() += 1e-10 * cov.trace() / static_cast<double>(cov.rows());
-        result = {cov, static_cast<double>(bestMethod)};
-        break;
-    }
-    case 1: result = ledoitWolf(matData); result.second = static_cast<double>(bestMethod); break;
-    case 2: result = oas(matData); result.second = static_cast<double>(bestMethod); break;
-    case 3: result = diagonalFixed(matData); result.second = static_cast<double>(bestMethod); break;
-    case 4: result = pca(matData); result.second = static_cast<double>(bestMethod); break;
-    case 5: result = factorAnalysis(matData); result.second = static_cast<double>(bestMethod); break;
-    default: result = ledoitWolf(matData); result.second = 1.0; break;
+        case 0: {
+            MatrixXd cov = (matData * matData.transpose()) / static_cast<double>(n);
+            cov.diagonal().array() += 1e-10 * cov.trace() / static_cast<double>(cov.rows());
+            result = {cov, static_cast<double>(bestMethod)};
+            break;
+        }
+        case 1:
+            result = ledoitWolf(matData);
+            result.second = static_cast<double>(bestMethod);
+            break;
+        case 2:
+            result = oas(matData);
+            result.second = static_cast<double>(bestMethod);
+            break;
+        case 3:
+            result = diagonalFixed(matData);
+            result.second = static_cast<double>(bestMethod);
+            break;
+        case 4:
+            result = pca(matData);
+            result.second = static_cast<double>(bestMethod);
+            break;
+        case 5:
+            result = factorAnalysis(matData);
+            result.second = static_cast<double>(bestMethod);
+            break;
+        default:
+            result = ledoitWolf(matData);
+            result.second = 1.0;
+            break;
     }
 
     return result;

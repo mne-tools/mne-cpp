@@ -43,7 +43,7 @@ using namespace COMLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-CommandServer::CommandServer(QObject *parent)
+CommandServer::CommandServer(QObject* parent)
 : QTcpServer(parent)
 , m_iThreadCount(0)
 , m_iCurrentCommandThreadID(0)
@@ -66,8 +66,7 @@ void CommandServer::incommingCommand(QString p_sCommand, qint32 p_iThreadID)
 
     m_iCurrentCommandThreadID = p_iThreadID;
 
-    if(!m_commandParser.parse(p_sCommand, t_qListParsedCommands))
-    {
+    if (!m_commandParser.parse(p_sCommand, t_qListParsedCommands)) {
         QByteArray t_blockReply;
         t_blockReply.append("command unknown\r\n");
         qWarning("[CommandServer::incommingCommand] command unknown: %s",
@@ -102,12 +101,12 @@ void CommandServer::incomingConnection(qintptr socketDescriptor)
 
 //=============================================================================================================
 
-void CommandServer::registerCommandManager(CommandManager &p_commandManager)
+void CommandServer::registerCommandManager(CommandManager& p_commandManager)
 {
     //Attach Observer to Subject
     m_commandParser.attach(&p_commandManager);
     //Register Reply Channel
-//    p_commandManager.registerResponseChannel(&m_commandParser, &CommandParser::response);
+    //    p_commandManager.registerResponseChannel(&m_commandParser, &CommandParser::response);
     QObject::connect(&p_commandManager, &CommandManager::response, &m_commandParser, &CommandParser::response);
 }
 
@@ -116,17 +115,17 @@ void CommandServer::registerCommandManager(CommandManager &p_commandManager)
 void CommandServer::prepareReply(QString p_sReply, Command p_command)
 {
     //Only when multi threaded command parsing is applied
-//    qDebug() << m_qMultiMapCommandThreadID;
-//    QMultiMap<QString, qint32>::iterator it = m_qMultiMapCommandThreadID.find(p_command.command());
-//    qint32 t_iThreadID = it.value(); //Remove this id from stored set
-//    m_qMultiMapCommandThreadID.remove(p_command.command(), t_iThreadID);
-//    qDebug() << QThread::currentThreadId();
+    //    qDebug() << m_qMultiMapCommandThreadID;
+    //    QMultiMap<QString, qint32>::iterator it = m_qMultiMapCommandThreadID.find(p_command.command());
+    //    qint32 t_iThreadID = it.value(); //Remove this id from stored set
+    //    m_qMultiMapCommandThreadID.remove(p_command.command(), t_iThreadID);
+    //    qDebug() << QThread::currentThreadId();
 
     //Currently only one parsing thread per time
     qint32 t_iThreadID = m_iCurrentCommandThreadID;
 
     //print
-//    printf("%s",p_sReply.toUtf8().constData());
+    //    printf("%s",p_sReply.toUtf8().constData());
 
     emit replyCommand(p_sReply, t_iThreadID);
 

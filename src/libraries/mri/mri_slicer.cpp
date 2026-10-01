@@ -42,7 +42,8 @@
 using namespace MRILIB;
 using namespace Eigen;
 
-namespace {
+namespace
+{
 
 struct PlaneSpec
 {
@@ -54,9 +55,12 @@ struct PlaneSpec
 Vector3f anatomicalNormal(SliceOrientation orientation)
 {
     switch (orientation) {
-    case SliceOrientation::Axial:    return Vector3f::UnitZ();
-    case SliceOrientation::Coronal:  return Vector3f::UnitY();
-    case SliceOrientation::Sagittal: return Vector3f::UnitX();
+        case SliceOrientation::Axial:
+            return Vector3f::UnitZ();
+        case SliceOrientation::Coronal:
+            return Vector3f::UnitY();
+        case SliceOrientation::Sagittal:
+            return Vector3f::UnitX();
     }
     return Vector3f::UnitZ();
 }
@@ -64,9 +68,12 @@ Vector3f anatomicalNormal(SliceOrientation orientation)
 Vector3f anatomicalColumnDirection(SliceOrientation orientation)
 {
     switch (orientation) {
-    case SliceOrientation::Axial:    return Vector3f::UnitX();
-    case SliceOrientation::Coronal:  return Vector3f::UnitX();
-    case SliceOrientation::Sagittal: return Vector3f::UnitY();
+        case SliceOrientation::Axial:
+            return Vector3f::UnitX();
+        case SliceOrientation::Coronal:
+            return Vector3f::UnitX();
+        case SliceOrientation::Sagittal:
+            return Vector3f::UnitY();
     }
     return Vector3f::UnitX();
 }
@@ -74,9 +81,12 @@ Vector3f anatomicalColumnDirection(SliceOrientation orientation)
 Vector3f anatomicalRowDirection(SliceOrientation orientation)
 {
     switch (orientation) {
-    case SliceOrientation::Axial:    return Vector3f::UnitY();
-    case SliceOrientation::Coronal:  return Vector3f::UnitZ();
-    case SliceOrientation::Sagittal: return Vector3f::UnitZ();
+        case SliceOrientation::Axial:
+            return Vector3f::UnitY();
+        case SliceOrientation::Coronal:
+            return Vector3f::UnitZ();
+        case SliceOrientation::Sagittal:
+            return Vector3f::UnitZ();
     }
     return Vector3f::UnitY();
 }
@@ -201,7 +211,7 @@ MriSliceImage MriSlicer::extractSlice(
 //=============================================================================================================
 
 int MriSlicer::voxelAxisForOrientation(const Matrix4f& vox2ras,
-                                        SliceOrientation orientation)
+                                       SliceOrientation orientation)
 {
     return planeSpecForOrientation(vox2ras, orientation).fixedAxis;
 }
@@ -249,7 +259,7 @@ QVector<MriSliceImage> MriSlicer::extractOrthogonal(
 //=============================================================================================================
 
 Vector3i MriSlicer::rasToVoxel(const Matrix4f& vox2ras,
-                                const Vector3f& rasPoint)
+                               const Vector3f& rasPoint)
 {
     Matrix4f ras2vox = vox2ras.inverse();
     Vector4f rasH;
@@ -259,20 +269,19 @@ Vector3i MriSlicer::rasToVoxel(const Matrix4f& vox2ras,
     return Vector3i(
         static_cast<int>(std::round(voxH.x())),
         static_cast<int>(std::round(voxH.y())),
-        static_cast<int>(std::round(voxH.z()))
-    );
+        static_cast<int>(std::round(voxH.z())));
 }
 
 //=============================================================================================================
 
 Vector3f MriSlicer::voxelToRas(const Matrix4f& vox2ras,
-                                const Vector3i& voxel)
+                               const Vector3i& voxel)
 {
     Vector4f voxH;
     voxH << static_cast<float>(voxel.x()),
-             static_cast<float>(voxel.y()),
-             static_cast<float>(voxel.z()),
-             1.0f;
+        static_cast<float>(voxel.y()),
+        static_cast<float>(voxel.z()),
+        1.0f;
     Vector4f rasH = vox2ras * voxH;
 
     return rasH.head<3>();
@@ -283,8 +292,8 @@ Vector3f MriSlicer::voxelToRas(const Matrix4f& vox2ras,
 //=============================================================================================================
 
 MriSliceImage MriSlicer::extractSlice(const MriVolData& vol,
-                                       SliceOrientation orientation,
-                                       int sliceIndex)
+                                      SliceOrientation orientation,
+                                      int sliceIndex)
 {
     return extractSlice(vol.voxelDataAsFloat(), vol.dims(),
                         vol.computeVox2RasTkr(), orientation, sliceIndex);
@@ -318,7 +327,7 @@ int MriSlicer::sliceIndexForOrientation(const MriVolData& vol,
 //=============================================================================================================
 
 QVector<MriSliceImage> MriSlicer::extractOrthogonal(const MriVolData& vol,
-                                                     const Vector3f& rasPoint)
+                                                    const Vector3f& rasPoint)
 {
     return extractOrthogonal(vol.voxelDataAsFloat(), vol.dims(),
                              vol.computeVox2RasTkr(), rasPoint);
@@ -327,7 +336,7 @@ QVector<MriSliceImage> MriSlicer::extractOrthogonal(const MriVolData& vol,
 //=============================================================================================================
 
 Vector3i MriSlicer::rasToVoxel(const MriVolData& vol,
-                                const Vector3f& rasPoint)
+                               const Vector3f& rasPoint)
 {
     return rasToVoxel(vol.computeVox2RasTkr(), rasPoint);
 }
@@ -335,7 +344,7 @@ Vector3i MriSlicer::rasToVoxel(const MriVolData& vol,
 //=============================================================================================================
 
 Vector3f MriSlicer::voxelToRas(const MriVolData& vol,
-                                const Vector3i& voxel)
+                               const Vector3i& voxel)
 {
     return voxelToRas(vol.computeVox2RasTkr(), voxel);
 }

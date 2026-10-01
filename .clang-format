@@ -1,78 +1,89 @@
-# .clang-format  (Qt-Creator-ish / MNE-CPP-ish)
+# .clang-format — MNE-CPP code style (clang-format 21.1.8, pinned in tools/quality/check_format.py).
+# Follows the class templates in resources/wizards/mnecpp and the conventions in
+# doc/website/docs/development/contr-style.mdx.
 Language: Cpp
+BasedOnStyle: LLVM
+Standard: c++17
 
-# --- Indentation / tabs ---
+# --- Indentation ---
 IndentWidth: 4
 TabWidth: 4
 UseTab: Never
+ContinuationIndentWidth: 4
+AccessModifierOffset: -4          # public:/protected:/private: at the class brace column
+NamespaceIndentation: None
+IndentCaseLabels: true
+IndentPPDirectives: None
 
-# --- Braces / blocks ---
-BreakBeforeBraces: Attach        # class {, function {, namespace { on same line
+# --- Braces: Allman for types and functions, attached for control flow ---
+BreakBeforeBraces: Custom
 BraceWrapping:
-  IndentBraces: false
-  AfterClass: false
-  AfterControlStatement: false
-  AfterEnum: false
-  AfterFunction: false
-  AfterNamespace: false
-  AfterStruct: false
-  AfterUnion: false
+  AfterClass: true
+  AfterStruct: true
+  AfterUnion: true
+  AfterEnum: true
+  AfterNamespace: true
+  AfterFunction: true
+  AfterControlStatement: Never
+  AfterCaseLabel: false
+  AfterExternBlock: false
   BeforeCatch: false
   BeforeElse: false
-  SplitEmptyFunction: false
-  SplitEmptyRecord: false
-  SplitEmptyNamespace: false
+  BeforeLambdaBody: false
+  BeforeWhile: false
+  IndentBraces: false
+  SplitEmptyFunction: true
+  SplitEmptyRecord: true
+  SplitEmptyNamespace: true
 
-# --- Namespaces ---
-NamespaceIndentation: None
-CompactNamespaces: false
+# --- Constructor initializers: leading colon and commas, one per line ---
+BreakConstructorInitializers: BeforeComma
+PackConstructorInitializers: Never
+ConstructorInitializerIndentWidth: 0
 
-# --- Access specifiers ---
-IndentAccessModifiers: false
-AccessModifierOffset: 0
+# --- Lines and wrapping: never re-wrap long lines or comments ---
+ColumnLimit: 0
+ReflowComments: false
+CommentPragmas: '^ *(//=+|/\*\*<)'
+MaxEmptyLinesToKeep: 2
+KeepEmptyLines:
+  AtStartOfBlock: false
+  AtStartOfFile: false
 
-# --- switch/case ---
-IndentCaseLabels: false
-
-# --- Alignment ---
-AlignConsecutiveAssignments: false
-AlignConsecutiveDeclarations: false
+# --- Alignment (contr-style: align parameters and member columns) ---
+AlignAfterOpenBracket: Align
 AlignOperands: DontAlign
-AlignTrailingComments: false
+AlignConsecutiveAssignments: None
+AlignConsecutiveDeclarations: None
+AlignTrailingComments:
+  Kind: Always
+  OverEmptyLines: 0
+BinPackParameters: true
+BinPackArguments: true
 
 # --- Spacing ---
-# NOTE: clang-format cannot enforce a space before the parentheses in function
-# declarations/definitions like: MainSplashScreen::MainSplashScreen ()
-# That part would require a separate tool (e.g., clang-tidy custom check) or manual.
-SpaceBeforeParens: ControlStatements  # if (x), while (x), for (x)
-SpacesInParentheses: false
+PointerAlignment: Left            # Type* var, Type& var (contr-style examples)
+ReferenceAlignment: Pointer
+DerivePointerAlignment: false
+SpaceBeforeParens: ControlStatements
+SpaceAfterTemplateKeyword: false
+SpaceAfterCStyleCast: false
+SpacesInParens: Never
 SpacesInSquareBrackets: false
-SpaceInEmptyParentheses: false
+SpaceBeforeCpp11BracedList: false
+Cpp11BracedListStyle: true
 
-# Pointer/reference spacing: match "const QPixmap & pixmap"
-PointerAlignment: Left          # affects '*' placement (Type* var)
-ReferenceAlignment: Left        # puts '&' with type, not variable
-SpaceAroundPointerQualifiers: Default
-
-# --- Constructor initializer lists (your style) ---
-BreakConstructorInitializers: BeforeColon
-ConstructorInitializerIndentWidth: 0
-ContinuationIndentWidth: 0
-PackConstructorInitializers: Never
-ConstructorInitializerAllOnOneLineOrOnePerLine: true
-# results in:
-# Foo::Foo()
-# : Bar(...)
-# {
-# }
-
-# --- Line breaking / wrapping ---
-ColumnLimit: 0                  # do not wrap (keeps your long license lines)
-ReflowComments: false           # do not reflow Doxygen/license blocks
-CommentPragmas: '^//={5,}.*$'   # treat your "====" separators as pragmas (helps keep them intact)
-SortIncludes: false
-
-# --- Short statements ---
+# --- Short forms: always expand ---
 AllowShortIfStatementsOnASingleLine: Never
 AllowShortLoopsOnASingleLine: false
 AllowShortFunctionsOnASingleLine: None
+AllowShortBlocksOnASingleLine: Never
+AllowShortCaseLabelsOnASingleLine: false
+AllowShortLambdasOnASingleLine: Inline
+AllowShortEnumsOnASingleLine: false
+
+# --- Includes and comments ---
+SortIncludes: Never               # include order is grouped by banner sections
+SortUsingDeclarations: Never
+FixNamespaceComments: false
+SpacesBeforeTrailingComments: 1

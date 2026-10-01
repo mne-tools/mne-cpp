@@ -72,10 +72,10 @@ class FiffCoordTrans;
 class FIFFSHARED_EXPORT FiffDigitizerData
 {
 public:
-    using SPtr = QSharedPointer<FiffDigitizerData>;            /**< Shared pointer type for FiffDigitizerData. */
-    using ConstSPtr = QSharedPointer<const FiffDigitizerData>; /**< Const shared pointer type for FiffDigitizerData. */
-    using UPtr = std::unique_ptr<FiffDigitizerData>;             /**< Unique pointer type for FiffDigitizerData. */
-    using ConstUPtr = std::unique_ptr<const FiffDigitizerData>;  /**< Const unique pointer type for FiffDigitizerData. */
+    using SPtr = QSharedPointer<FiffDigitizerData>;             /**< Shared pointer type for FiffDigitizerData. */
+    using ConstSPtr = QSharedPointer<const FiffDigitizerData>;  /**< Const shared pointer type for FiffDigitizerData. */
+    using UPtr = std::unique_ptr<FiffDigitizerData>;            /**< Unique pointer type for FiffDigitizerData. */
+    using ConstUPtr = std::unique_ptr<const FiffDigitizerData>; /**< Const unique pointer type for FiffDigitizerData. */
 
     //=========================================================================================================
     /**
@@ -106,7 +106,7 @@ public:
      *
      * @param[in] p_IODevice   Input device to read data from.
      */
-    FiffDigitizerData(QIODevice &p_IODevice);
+    FiffDigitizerData(QIODevice& p_IODevice);
 
     //=========================================================================================================
     /**
@@ -145,22 +145,21 @@ public:
 
 
 public:
-    QString        filename;                 /**< Source file path. */
-    std::unique_ptr<FiffCoordTrans> head_mri_t;            /**< Head to MRI coordinate transformation. */
-    std::unique_ptr<FiffCoordTrans> head_mri_t_adj;        /**< Adjusted head to MRI transformation. */
-    QList<FIFFLIB::FiffDigPoint>   points;           /**< The digitizer points. */
-    int            coord_frame;               /**< The coordinate frame of the above points. */
-    QList<int>     active;                   /**< Which points are active. */
-    QList<int>     discard;                  /**< Which points should be discarded. */
-    int            npoint;                    /**< Number of points. */
-    QList<FIFFLIB::FiffDigPoint> mri_fids;      /**< MRI coordinate system fiducials. */
-    bool           show;                      /**< Whether the digitizer data should be shown. */
-    bool           show_minimal;              /**< Show fiducials and coils only. */
-    Eigen::VectorXf dist;                     /**< Distance of each point from the head surface. */
-    Eigen::VectorXi closest;                  /**< Closest vertex number on the head surface. */
+    QString filename;                                                       /**< Source file path. */
+    std::unique_ptr<FiffCoordTrans> head_mri_t;                             /**< Head to MRI coordinate transformation. */
+    std::unique_ptr<FiffCoordTrans> head_mri_t_adj;                         /**< Adjusted head to MRI transformation. */
+    QList<FIFFLIB::FiffDigPoint> points;                                    /**< The digitizer points. */
+    int coord_frame;                                                        /**< The coordinate frame of the above points. */
+    QList<int> active;                                                      /**< Which points are active. */
+    QList<int> discard;                                                     /**< Which points should be discarded. */
+    int npoint;                                                             /**< Number of points. */
+    QList<FIFFLIB::FiffDigPoint> mri_fids;                                  /**< MRI coordinate system fiducials. */
+    bool show;                                                              /**< Whether the digitizer data should be shown. */
+    bool show_minimal;                                                      /**< Show fiducials and coils only. */
+    Eigen::VectorXf dist;                                                   /**< Distance of each point from the head surface. */
+    Eigen::VectorXi closest;                                                /**< Closest vertex number on the head surface. */
     Eigen::Matrix<float, Eigen::Dynamic, 3, Eigen::RowMajor> closest_point; /**< Closest vertex locations on the head surface (npoint x 3). */
-    bool           dist_valid;                /**< Whether the above distance data is valid. */
-
+    bool dist_valid;                                                        /**< Whether the above distance data is valid. */
 };
 
 //=============================================================================================================

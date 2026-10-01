@@ -49,13 +49,13 @@ using namespace ANSHAREDLIB;
 // CONST
 //=============================================================================================================
 
-const char* pluginsDir = "/mne_analyze_plugins";        /**< Holds path to the plugins.*/
+const char* pluginsDir = "/mne_analyze_plugins"; /**< Holds path to the plugins.*/
 
 //=============================================================================================================
 // GLOBAL DEFINES
 //=============================================================================================================
 
-QPointer<MainWindow> appMainWindowHandler(Q_NULLPTR);          /**< The main window. */
+QPointer<MainWindow> appMainWindowHandler(Q_NULLPTR); /**< The main window. */
 
 //=============================================================================================================
 /**
@@ -65,9 +65,8 @@ QPointer<MainWindow> appMainWindowHandler(Q_NULLPTR);          /**< The main win
  * @param[in] context   additional information about a log message.
  * @param[in] msg       the message to log.
  */
-void customMessageHandler(QtMsgType type, const
-                          QMessageLogContext &context,
-                          const QString &msg)
+void customMessageHandler(QtMsgType type, const QMessageLogContext& context,
+                          const QString& msg)
 {
     appMainWindowHandler->writeToLog(type, context, msg);
 }
@@ -112,7 +111,6 @@ AnalyzeCore::AnalyzeCore(QObject* parent)
 
 AnalyzeCore::~AnalyzeCore()
 {
-
 }
 
 //=============================================================================================================
@@ -123,8 +121,8 @@ void AnalyzeCore::initCmdLineParser()
     m_cmdLineParser.addHelpOption();
 
     QCommandLineOption inFileOpt(QStringList() << "f" << "file",
-                                 QCoreApplication::translate("main","File to load."),
-                                 QCoreApplication::translate("main","filePath"));
+                                 QCoreApplication::translate("main", "File to load."),
+                                 QCoreApplication::translate("main", "filePath"));
 
     m_cmdLineParser.addOption(inFileOpt);
 
@@ -135,13 +133,13 @@ void AnalyzeCore::initCmdLineParser()
 
 void AnalyzeCore::parseCmdLineInputs()
 {
-    if(!m_pPluginManager) {
+    if (!m_pPluginManager) {
         return;
     }
 
-    if(m_cmdLineParser.isSet("file")) {
-        for(int i = 0; i < m_pPluginManager->getPlugins().size(); i++) {
-            if(m_pPluginManager->getPlugins().at(i)->getName() == "Data Loader") {
+    if (m_cmdLineParser.isSet("file")) {
+        for (int i = 0; i < m_pPluginManager->getPlugins().size(); i++) {
+            if (m_pPluginManager->getPlugins().at(i)->getName() == "Data Loader") {
                 m_pPluginManager->getPlugins().at(i)->cmdLineStartup(QStringList() << "file" << m_cmdLineParser.value("file"));
             }
         }
@@ -175,11 +173,11 @@ void AnalyzeCore::initPluginManager(QSplashScreen* pSplash)
 {
     m_pPluginManager = QSharedPointer<PluginManager>::create();
 
-    if(pSplash) {
+    if (pSplash) {
         QObject::connect(m_pPluginManager.data(), &PluginManager::pluginLoaded,
                          pSplash, [pSplash](const QString& msg) {
-            pSplash->showMessage(msg, Qt::AlignLeft, Qt::black);
-        });
+                             pSplash->showMessage(msg, Qt::AlignLeft, Qt::black);
+                         });
     }
     loadandInitPlugins();
 }

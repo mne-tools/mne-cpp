@@ -47,16 +47,18 @@
 
 class TestWriteToFileStatus;
 
-namespace FIFFLIB{
-    class FiffInfo;
-    class FiffStream;
+namespace FIFFLIB
+{
+class FiffInfo;
+class FiffStream;
 }
 
-namespace SCMEASLIB{
-    class RealTimeMultiSampleArray;
+namespace SCMEASLIB
+{
+class RealTimeMultiSampleArray;
 }
 
-#define MAX_DATA_LEN    2000000000L
+#define MAX_DATA_LEN 2000000000L
 
 //=============================================================================================================
 // DEFINE NAMESPACE WRITETOFILEPLUGIN
@@ -136,7 +138,6 @@ signals:
     void recordingActiveChanged(bool bActive);
 
 public:
-
     //=========================================================================================================
     /**
      * Udates the pugin with new (incoming) data.
@@ -287,23 +288,23 @@ private:
     int popUpYesNo(const QString& sText,
                    const QString& sInfoText);
 
-    bool                                    m_bWriteToFile;                 /**< Flag for for writing the received samples to a file. Defined by the user via the GUI.*/
-    bool                                    m_bUseRecordTimer;              /**< Flag whether to use data recording timer.*/
-    bool                                    m_bContinuous;                  /**< Flag for whether to start plugin in continuous save mode */
+    bool m_bWriteToFile;    /**< Flag for for writing the received samples to a file. Defined by the user via the GUI.*/
+    bool m_bUseRecordTimer; /**< Flag whether to use data recording timer.*/
+    bool m_bContinuous;     /**< Flag for whether to start plugin in continuous save mode */
 
-    qint16                                  m_iBlinkStatus;                 /**< The blink status of the recording button.*/
-    qint32                                  m_iSplitCount;                  /**< File split count. */
-    int                                     m_iRecordingMSeconds;           /**< Recording length in mseconds.*/
+    qint16 m_iBlinkStatus;    /**< The blink status of the recording button.*/
+    qint32 m_iSplitCount;     /**< File split count. */
+    int m_iRecordingMSeconds; /**< Recording length in mseconds.*/
 
-    QMutex                                  m_mutex;                        /**< The threads mutex.*/
+    QMutex m_mutex; /**< The threads mutex.*/
 
-    QSharedPointer<FIFFLIB::FiffInfo>       m_pFiffInfo;                    /**< Fiff measurement info.*/
-    QSharedPointer<FIFFLIB::FiffStream>     m_pOutfid;                      /**< FiffStream to write to.*/
+    QSharedPointer<FIFFLIB::FiffInfo> m_pFiffInfo; /**< Fiff measurement info.*/
+    QSharedPointer<FIFFLIB::FiffStream> m_pOutfid; /**< FiffStream to write to.*/
 
-    QSharedPointer<QTimer>                  m_pUpdateTimeInfoTimer;         /**< timer to control remaining time. */
-    QSharedPointer<QTimer>                  m_pBlinkingRecordButtonTimer;   /**< timer to control blinking recording button. */
-    QSharedPointer<QTimer>                  m_pRecordTimer;                 /**< timer to control recording time. */
-    QSharedPointer<QTimer>                  m_pStatusEmitTimer;             /**< 1 Hz timer that emits recordingStatus while recording.*/
+    QSharedPointer<QTimer> m_pUpdateTimeInfoTimer;       /**< timer to control remaining time. */
+    QSharedPointer<QTimer> m_pBlinkingRecordButtonTimer; /**< timer to control blinking recording button. */
+    QSharedPointer<QTimer> m_pRecordTimer;               /**< timer to control recording time. */
+    QSharedPointer<QTimer> m_pStatusEmitTimer;           /**< 1 Hz timer that emits recordingStatus while recording.*/
 
     //=========================================================================================================
     /**
@@ -325,22 +326,22 @@ private:
      */
     static QString formatElapsed(qint64 iMSecs);
 
-    QFile                                   m_qFileOut;                     /**< QFile for writing to fif file.*/
-    QString                                 m_sRecordFileName;              /**< Current record file. */
-    QElapsedTimer                           m_recordingStartedTime;         /**< The time when the recording started.*/
+    QFile m_qFileOut;                     /**< QFile for writing to fif file.*/
+    QString m_sRecordFileName;            /**< Current record file. */
+    QElapsedTimer m_recordingStartedTime; /**< The time when the recording started.*/
 
-    QPointer<QAction>                       m_pActionRecordFile;            /**< start recording action. */
-    QPointer<QAction>                       m_pActionClipRecording;
+    QPointer<QAction> m_pActionRecordFile; /**< start recording action. */
+    QPointer<QAction> m_pActionClipRecording;
 
-    QSharedPointer<UTILSLIB::CircularBuffer_Matrix_double>                      m_pCircularBuffer;      /**< Holds incoming raw data. */
+    QSharedPointer<UTILSLIB::CircularBuffer_Matrix_double> m_pCircularBuffer; /**< Holds incoming raw data. */
 
-    SCSHAREDLIB::PluginInputData<SCMEASLIB::RealTimeMultiSampleArray>::SPtr      m_pWriteToFileInput;   /**< The RealTimeMultiSampleArray of the WriteToFile input.*/
+    SCSHAREDLIB::PluginInputData<SCMEASLIB::RealTimeMultiSampleArray>::SPtr m_pWriteToFileInput; /**< The RealTimeMultiSampleArray of the WriteToFile input.*/
 
-    Eigen::RowVectorXd                      m_mCals;                        /**< Row vector with channel calibration values. */
+    Eigen::RowVectorXd m_mCals; /**< Row vector with channel calibration values. */
 
-    FIFFLIB::FiffFileSharer                 m_FileSharer;                   /**< Handles copying recording file and saving copy to shared directory. */
+    FIFFLIB::FiffFileSharer m_FileSharer; /**< Handles copying recording file and saving copy to shared directory. */
 
-    QStringList                             m_lFileNames;                   /**< List of file names of latest recording */
+    QStringList m_lFileNames; /**< List of file names of latest recording */
 };
 } // NAMESPACE
 

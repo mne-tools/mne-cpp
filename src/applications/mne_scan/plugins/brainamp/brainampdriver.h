@@ -55,19 +55,24 @@ class BrainAMPProducer;
 //=============================================================================================================
 
 // Number of ELements
-#define NEL(x)  (sizeof(x) / sizeof(x[0]))
+#define NEL(x) (sizeof(x) / sizeof(x[0]))
 
 // Device names, in case that more than one device is used
 //    (PCI systems with more than 128 channels),
 //    the second device is named "\\\\.\\BrainAmp2".
 // #define DEVICE_PCI		"\\\\.\\BrainAmp1"		// ISA/PCI device
-#define DEVICE_PCI		"\\\\.\\BrainAmp"			// ISA/PCI device
-#define DEVICE_USB		"\\\\.\\BrainAmpUSB1"		// USB device
+#define DEVICE_PCI "\\\\.\\BrainAmp"     // ISA/PCI device
+#define DEVICE_USB "\\\\.\\BrainAmpUSB1" // USB device
 
 // Different amplifier types
 enum AmpTypes
 {
-    None = 0, Standard = 1, MR = 2, DCMRplus = 3, ExG_8 = 4, ExG_16 = 5
+    None = 0,
+    Standard = 1,
+    MR = 2,
+    DCMRplus = 3,
+    ExG_8 = 4,
+    ExG_16 = 5
 };
 
 //=============================================================================================================
@@ -78,7 +83,6 @@ enum AmpTypes
  */
 class BRAINAMPSHARED_EXPORT BrainAMPDriver
 {
-
 public:
     //=========================================================================================================
     /**
@@ -137,22 +141,22 @@ public:
     bool uninitDevice();
 
 private:
-    BrainAMPProducer*           m_pBrainAmpProducer;                /**< A pointer to the corresponding BrainAmpProducer class.*/
+    BrainAMPProducer* m_pBrainAmpProducer; /**< A pointer to the corresponding BrainAmpProducer class.*/
 
-    bool                        m_bInitDeviceSuccess;               /**< Flag which defines if the device initialisation was successfull.*/
-    bool                        m_bDllLoaded;                       /**< Flag which defines if the driver DLL was loaded successfully.*/
+    bool m_bInitDeviceSuccess; /**< Flag which defines if the device initialisation was successfull.*/
+    bool m_bDllLoaded;         /**< Flag which defines if the driver DLL was loaded successfully.*/
 
-    uint                        m_uiDownsample;                     /**< The number of channels defined by the user via the GUI.*/
-    uint                        m_uiSamplingFrequency;              /**< The sampling frequency defined by the user via the GUI (in Hertz).*/
-    uint                        m_uiSamplesPerBlock;                /**< The samples per block defined by the user via the GUI.*/
+    uint m_uiDownsample;        /**< The number of channels defined by the user via the GUI.*/
+    uint m_uiSamplingFrequency; /**< The sampling frequency defined by the user via the GUI (in Hertz).*/
+    uint m_uiSamplesPerBlock;   /**< The samples per block defined by the user via the GUI.*/
 
-    HANDLE                      DeviceAmp;                          /**< Amplifier device.*/
+    HANDLE DeviceAmp; /**< Amplifier device.*/
 
-    bool                        UsbDevice;                          /**< If true, the connected device is an USB box, otherwise a PCI/ISA host adapter.*/
+    bool UsbDevice; /**< If true, the connected device is an USB box, otherwise a PCI/ISA host adapter.*/
 
-    int                         DriverVersion;                      /**< Driver version.*/
+    int DriverVersion; /**< Driver version.*/
 
-    BA_SETUP                    Setup;                              /**< Setup structure.*/
+    BA_SETUP Setup; /**< Setup structure.*/
 };
 } // NAMESPACE
 

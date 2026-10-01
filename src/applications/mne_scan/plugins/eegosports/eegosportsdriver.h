@@ -40,11 +40,13 @@
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-namespace eemagine {
-    namespace sdk {
-        class stream;
-        class amplifier;
-    }
+namespace eemagine
+{
+namespace sdk
+{
+class stream;
+class amplifier;
+}
 }
 
 //=============================================================================================================
@@ -74,7 +76,6 @@ class EEGoSportsProducer;
  */
 class EEGoSportsDriver
 {
-
 public:
     //=========================================================================================================
     /**
@@ -147,26 +148,26 @@ public:
     QList<uint> getChannellist();
 
 private:
-    EEGoSportsProducer*         m_pEEGoSportsProducer;          /**< A pointer to the corresponding EEGoSportsProducer class.*/
+    EEGoSportsProducer* m_pEEGoSportsProducer; /**< A pointer to the corresponding EEGoSportsProducer class.*/
 
-    bool                        m_bInitDeviceSuccess;           /**< Flag which defines if the device initialisation was successfully.*/
-    bool                        m_bStartRecordingSuccess;       /**< Flag which defines if the recording was started successfully.*/
-    bool                        m_bDllLoaded;                   /**< Flag which defines if the driver DLL was loaded successfully.*/
+    bool m_bInitDeviceSuccess;     /**< Flag which defines if the device initialisation was successfully.*/
+    bool m_bStartRecordingSuccess; /**< Flag which defines if the recording was started successfully.*/
+    bool m_bDllLoaded;             /**< Flag which defines if the driver DLL was loaded successfully.*/
 
-    uint                        m_uiNumberOfChannels;           /**< The number of channels.*/
-    uint                        m_uiNumberOfEEGChannels;        /**< The number of EEG channels.*/
-    uint                        m_uiNumberOfBipolarChannels;    /**< The number of Bipolar channels.*/
-    uint                        m_uiSamplingFrequency;          /**< The sampling frequency defined by the user via the GUI (in Hertz).*/
-    uint                        m_uiSamplesPerBlock;            /**< The samples per block defined by the user via the GUI.*/
-    bool                        m_bWriteDriverDebugToFile;      /**< Flag for for writing driver debug informstions to a file. Defined by the user via the GUI.*/
-    bool                        m_bMeasureImpedances;           /**< Flag for impedance measuring mode.*/
+    uint m_uiNumberOfChannels;        /**< The number of channels.*/
+    uint m_uiNumberOfEEGChannels;     /**< The number of EEG channels.*/
+    uint m_uiNumberOfBipolarChannels; /**< The number of Bipolar channels.*/
+    uint m_uiSamplingFrequency;       /**< The sampling frequency defined by the user via the GUI (in Hertz).*/
+    uint m_uiSamplesPerBlock;         /**< The samples per block defined by the user via the GUI.*/
+    bool m_bWriteDriverDebugToFile;   /**< Flag for for writing driver debug informstions to a file. Defined by the user via the GUI.*/
+    bool m_bMeasureImpedances;        /**< Flag for impedance measuring mode.*/
 
-    QList<Eigen::VectorXd>      m_lSampleBlockBuffer;           /**< Buffer to store all the incoming smaples. This is the buffer which is getting read from.*/
+    QList<Eigen::VectorXd> m_lSampleBlockBuffer; /**< Buffer to store all the incoming smaples. This is the buffer which is getting read from.*/
 
-    eemagine::sdk::stream*      m_pDataStream;                  /**< The EEG/Impedance data stream.*/
-    eemagine::sdk::amplifier*   m_pAmplifier;                   /**< Interface to the amplifier.*/
+    eemagine::sdk::stream* m_pDataStream;   /**< The EEG/Impedance data stream.*/
+    eemagine::sdk::amplifier* m_pAmplifier; /**< Interface to the amplifier.*/
 
-    std::ofstream               m_outputFileStream;             /**< fstream for writing the driver debug informations to a txt file.*/
+    std::ofstream m_outputFileStream; /**< fstream for writing the driver debug informations to a txt file.*/
 };
 } // NAMESPACE
 

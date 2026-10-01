@@ -59,8 +59,8 @@ class MNESourceSpace;
 class MNESHARED_EXPORT MNEPatchInfo
 {
 public:
-    typedef QSharedPointer<MNEPatchInfo> SPtr;              /**< Shared pointer type for MNEPatchInfo. */
-    typedef QSharedPointer<const MNEPatchInfo> ConstSPtr;   /**< Const shared pointer type for MNEPatchInfo. */
+    typedef QSharedPointer<MNEPatchInfo> SPtr;            /**< Shared pointer type for MNEPatchInfo. */
+    typedef QSharedPointer<const MNEPatchInfo> ConstSPtr; /**< Const shared pointer type for MNEPatchInfo. */
 
     //=========================================================================================================
     /**
@@ -107,11 +107,11 @@ public:
     void calculate_normal_stats(MNESourceSpace* s);
 
 public:
-    int   vert;                    /**< Source vertex index this patch applies to. */
-    Eigen::VectorXi memb_vert;     /**< Vertex indices that constitute the patch. */
-    float area;                    /**< Total surface area of the patch (m^2). */
-    float ave_nn[3];               /**< Average outward surface normal of the patch. */
-    float dev_nn;                  /**< Average angular deviation of member normals from ave_nn (radians). */
+    int vert;                  /**< Source vertex index this patch applies to. */
+    Eigen::VectorXi memb_vert; /**< Vertex indices that constitute the patch. */
+    float area;                /**< Total surface area of the patch (m^2). */
+    float ave_nn[3];           /**< Average outward surface normal of the patch. */
+    float dev_nn;              /**< Average angular deviation of member normals from ave_nn (radians). */
 };
 
 //=============================================================================================================

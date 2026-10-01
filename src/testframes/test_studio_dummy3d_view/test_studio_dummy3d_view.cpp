@@ -48,7 +48,7 @@ using namespace MNEANALYZESTUDIO;
  *
  * @brief Checks the hosted 3D view's handling of session descriptors.
  */
-class TestStudioDummy3DView: public QObject
+class TestStudioDummy3DView : public QObject
 {
     Q_OBJECT
 
@@ -106,8 +106,7 @@ void TestStudioDummy3DView::descriptorFields_roundTrip()
     const QJsonObject descriptor{
         {"session_id", "session-42"},
         {"scene_id", "scene-7"},
-        {"title", "Left hemisphere"}
-    };
+        {"title", "Left hemisphere"}};
 
     widget.setSessionDescriptor(descriptor);
 
@@ -134,8 +133,7 @@ void TestStudioDummy3DView::descriptor_missingFileIsSurvivable()
     // than taking the workbench down while restoring a session.
     widget.setSessionDescriptor(QJsonObject{
         {"session_id", "session-1"},
-        {"file", "/no/such/directory/missing-scene.fif"}
-    });
+        {"file", "/no/such/directory/missing-scene.fif"}});
 
     // The descriptor is still readable afterwards, so the workbench can report
     // which session failed rather than losing track of it.
@@ -151,14 +149,14 @@ void TestStudioDummy3DView::descriptor_wrongFieldTypesAreSurvivable_data()
 
     // A descriptor is read back from a session file, so its fields can be any
     // JSON type rather than the strings the widget expects.
-    QTest::newRow("empty")          << QJsonObject{};
-    QTest::newRow("numeric ids")    << QJsonObject{{"session_id", 42}, {"scene_id", 7}};
-    QTest::newRow("array file")     << QJsonObject{{"file", QJsonArray{"a", "b"}}};
-    QTest::newRow("object title")   << QJsonObject{{"title", QJsonObject{{"nested", true}}}};
-    QTest::newRow("null fields")    << QJsonObject{{"session_id", QJsonValue::Null},
-                                                   {"file", QJsonValue::Null}};
-    QTest::newRow("bool file")      << QJsonObject{{"file", true}};
-    QTest::newRow("blank strings")  << QJsonObject{{"session_id", "  "}, {"file", "   "}};
+    QTest::newRow("empty") << QJsonObject{};
+    QTest::newRow("numeric ids") << QJsonObject{{"session_id", 42}, {"scene_id", 7}};
+    QTest::newRow("array file") << QJsonObject{{"file", QJsonArray{"a", "b"}}};
+    QTest::newRow("object title") << QJsonObject{{"title", QJsonObject{{"nested", true}}}};
+    QTest::newRow("null fields") << QJsonObject{{"session_id", QJsonValue::Null},
+                                                {"file", QJsonValue::Null}};
+    QTest::newRow("bool file") << QJsonObject{{"file", true}};
+    QTest::newRow("blank strings") << QJsonObject{{"session_id", "  "}, {"file", "   "}};
 }
 
 //=============================================================================================================
@@ -175,7 +173,7 @@ void TestStudioDummy3DView::descriptor_wrongFieldTypesAreSurvivable()
     // A field that was not a string reads back as empty rather than as some
     // coerced nonsense, which is what stops the workbench matching this view
     // to a session named "42" that does not exist.
-    if(!descriptor.value("session_id").isString()) {
+    if (!descriptor.value("session_id").isString()) {
         QVERIFY2(widget.sessionId().isEmpty(),
                  "a non string session_id should not produce a session name");
     }

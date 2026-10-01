@@ -208,7 +208,9 @@ void TestDispViewers::initTestCase()
 
 //=============================================================================================================
 
-void TestDispViewers::cleanupTestCase() {}
+void TestDispViewers::cleanupTestCase()
+{
+}
 
 //=============================================================================================================
 
@@ -262,7 +264,7 @@ void TestDispViewers::compensatorView_setAndGet()
     // Non-empty list
     FiffCtfComp comp;
     comp.ctfkind = 101;
-    comp.kind    = FIFF_MNE_CTF_COMP_KIND;
+    comp.kind = FIFF_MNE_CTF_COMP_KIND;
     view.setCompensators(QList<FiffCtfComp>() << comp);
 
     view.setGuiMode(AbstractView::GuiMode::Research);
@@ -286,9 +288,9 @@ void TestDispViewers::projectorsView_setAndGet()
 
     // Non-empty list
     FiffProj proj;
-    proj.kind   = FIFFV_PROJ_ITEM_EEG_AVREF;
+    proj.kind = FIFFV_PROJ_ITEM_EEG_AVREF;
     proj.active = false;
-    proj.desc   = "Test projector";
+    proj.desc = "Test projector";
     view.setProjectors(QList<FiffProj>() << proj);
     QCOMPARE(view.getProjectors().size(), 1);
     QVERIFY(!view.getProjectors().first().active);
@@ -308,14 +310,14 @@ void TestDispViewers::projectorsView_setAndGet()
 void TestDispViewers::modalitySelectionView_setAndGet()
 {
     FiffChInfo megCh;
-    megCh.kind    = FIFFV_MEG_CH;
+    megCh.kind = FIFFV_MEG_CH;
     megCh.ch_name = "MEG 0001";
-    megCh.unit    = FIFF_UNIT_T;
+    megCh.unit = FIFF_UNIT_T;
 
     FiffChInfo eegCh;
-    eegCh.kind    = FIFFV_EEG_CH;
+    eegCh.kind = FIFFV_EEG_CH;
     eegCh.ch_name = "EEG 001";
-    eegCh.unit    = FIFF_UNIT_V;
+    eegCh.unit = FIFF_UNIT_V;
 
     QList<FiffChInfo> chList;
     chList << megCh << eegCh;
@@ -327,12 +329,12 @@ void TestDispViewers::modalitySelectionView_setAndGet()
 
     // Flip all to false and round-trip
     QMap<QString, bool> allOff;
-    for(auto it = modalMap.constBegin(); it != modalMap.constEnd(); ++it)
+    for (auto it = modalMap.constBegin(); it != modalMap.constEnd(); ++it)
         allOff[it.key()] = false;
     view.setModalityMap(allOff);
 
     QMap<QString, bool> returned = view.getModalityMap();
-    for(auto it = returned.constBegin(); it != returned.constEnd(); ++it)
+    for (auto it = returned.constBegin(); it != returned.constEnd(); ++it)
         QVERIFY(!it.value());
 
     view.setGuiMode(AbstractView::GuiMode::Research);

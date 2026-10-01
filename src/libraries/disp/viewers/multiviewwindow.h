@@ -73,7 +73,7 @@ public:
      * @param[in] parent  Parent widget (default Q_NULLPTR).
      * @param[in] flags   Window flags passed to the dock widget (default none).
      */
-    explicit MultiViewWindow(QWidget *parent = Q_NULLPTR,
+    explicit MultiViewWindow(QWidget* parent = Q_NULLPTR,
                              Qt::WindowFlags flags = Qt::WindowFlags());
 
     //=========================================================================================================
@@ -85,6 +85,6 @@ public:
 private:
 };
 
-}// NAMESPACE
+} // NAMESPACE
 
 #endif // MULTIVIEWWINDOW_H

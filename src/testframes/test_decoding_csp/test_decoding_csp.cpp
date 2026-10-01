@@ -196,7 +196,7 @@ void TestDecodingCsp::testInverseTransform()
     MatrixXd reconstructed = csp.inverseTransform(features);
 
     QCOMPARE(reconstructed.rows(), static_cast<int>(epochs.size()));
-    QCOMPARE(reconstructed.cols(), 8);  // n_channels
+    QCOMPARE(reconstructed.cols(), 8); // n_channels
 }
 
 //=============================================================================================================
@@ -215,8 +215,13 @@ void TestDecodingCsp::testClassSeparability()
     double mean0 = 0.0, mean1 = 0.0;
     int n0 = 0, n1 = 0;
     for (int i = 0; i < y.size(); ++i) {
-        if (y(i) == 0) { mean0 += features(i, 0); ++n0; }
-        else           { mean1 += features(i, 0); ++n1; }
+        if (y(i) == 0) {
+            mean0 += features(i, 0);
+            ++n0;
+        } else {
+            mean1 += features(i, 0);
+            ++n1;
+        }
     }
     mean0 /= n0;
     mean1 /= n1;
@@ -229,43 +234,43 @@ void TestDecodingCsp::testClassSeparability()
 void TestDecodingCsp::testNotFittedThrows()
 {
     DecodingCsp csp;
-    std::vector<MatrixXd> epochs = { MatrixXd::Random(8, 100) };
+    std::vector<MatrixXd> epochs = {MatrixXd::Random(8, 100)};
 
     QVERIFY_THROWS_EXCEPTION(std::runtime_error,
-        static_cast<void>(csp.transform(epochs)));
+                             static_cast<void>(csp.transform(epochs)));
     QVERIFY_THROWS_EXCEPTION(std::runtime_error,
-        static_cast<void>(csp.filters()));
+                             static_cast<void>(csp.filters()));
     QVERIFY_THROWS_EXCEPTION(std::runtime_error,
-        static_cast<void>(csp.patterns()));
+                             static_cast<void>(csp.patterns()));
 }
 
 //=============================================================================================================
 
 void TestDecodingCsp::testMismatchedLabelsThrows()
 {
-    std::vector<MatrixXd> epochs = { MatrixXd::Random(8, 100),
-                                     MatrixXd::Random(8, 100) };
+    std::vector<MatrixXd> epochs = {MatrixXd::Random(8, 100),
+                                    MatrixXd::Random(8, 100)};
     VectorXi y(3);
     y << 0, 1, 0;
 
     DecodingCsp csp;
     QVERIFY_THROWS_EXCEPTION(std::invalid_argument,
-        csp.fit(epochs, y));
+                             csp.fit(epochs, y));
 }
 
 //=============================================================================================================
 
 void TestDecodingCsp::testNonBinaryClassThrows()
 {
-    std::vector<MatrixXd> epochs = { MatrixXd::Random(8, 100),
-                                     MatrixXd::Random(8, 100),
-                                     MatrixXd::Random(8, 100) };
+    std::vector<MatrixXd> epochs = {MatrixXd::Random(8, 100),
+                                    MatrixXd::Random(8, 100),
+                                    MatrixXd::Random(8, 100)};
     VectorXi y(3);
     y << 0, 1, 2;
 
     DecodingCsp csp;
     QVERIFY_THROWS_EXCEPTION(std::invalid_argument,
-        csp.fit(epochs, y));
+                             csp.fit(epochs, y));
 }
 
 //=============================================================================================================

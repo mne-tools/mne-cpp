@@ -32,8 +32,9 @@
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-namespace Ui {
-    class RtFwdSetupWidgetClass;
+namespace Ui
+{
+class RtFwdSetupWidgetClass;
 }
 
 //=============================================================================================================
@@ -60,7 +61,6 @@ class RtFwdSetupWidget : public QWidget
     Q_OBJECT
 
 public:
-
     //=========================================================================================================
     /**
      * Constructs a RtFwdSetupWidget which is a child of parent.
@@ -68,7 +68,7 @@ public:
      * @param[in] toolbox a pointer to the corresponding RtFwd.
      * @param[in] parent pointer to parent widget; If parent is 0, the new RtFwdSetupWidget becomes a window. If parent is another widget, RtFwdSetupWidget becomes a child window inside parent. RtFwdSetupWidget is deleted when its parent is deleted.
      */
-    RtFwdSetupWidget(RtFwd* toolbox, QWidget *parent = 0);
+    RtFwdSetupWidget(RtFwd* toolbox, QWidget* parent = 0);
 
     //=========================================================================================================
     /**
@@ -120,7 +120,7 @@ private:
      */
     void showMinDistDirDialog();
 
-    QString     m_sMinDistDir;
+    QString m_sMinDistDir;
 
     //=========================================================================================================
     /**
@@ -166,9 +166,9 @@ private:
 
     //=========================================================================================================
 
-    RtFwd*                     m_pRtFwd;        /**< Holds a pointer to corresponding RtFwd.*/
+    RtFwd* m_pRtFwd; /**< Holds a pointer to corresponding RtFwd.*/
 
-    Ui::RtFwdSetupWidgetClass  m_ui;            /**< Holds the user interface for the RtFwdSetupWidget.*/
+    Ui::RtFwdSetupWidgetClass m_ui; /**< Holds the user interface for the RtFwdSetupWidget.*/
 };
 } // NAMESPACE
 

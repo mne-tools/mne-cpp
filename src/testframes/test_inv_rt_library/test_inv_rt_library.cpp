@@ -64,10 +64,19 @@ class TestInvRtLibrary : public QObject
 
 private:
     QString m_sDataPath;
-    bool hasData() const { return !m_sDataPath.isEmpty(); }
+    bool hasData() const
+    {
+        return !m_sDataPath.isEmpty();
+    }
 
-    QString rawPath() const { return m_sDataPath + "/MEG/sample/sample_audvis_trunc_raw.fif"; }
-    QString fwdPath() const { return m_sDataPath + "/Result/ref-sample_audvis-meg-eeg-oct-6-fwd.fif"; }
+    QString rawPath() const
+    {
+        return m_sDataPath + "/MEG/sample/sample_audvis_trunc_raw.fif";
+    }
+    QString fwdPath() const
+    {
+        return m_sDataPath + "/Result/ref-sample_audvis-meg-eeg-oct-6-fwd.fif";
+    }
 
 private slots:
     void initTestCase();
@@ -142,13 +151,14 @@ private slots:
 void TestInvRtLibrary::initTestCase()
 {
     qInstallMessageHandler(UTILSLIB::MNELogger::customLogWriter);
-    QString base = QCoreApplication::applicationDirPath()
-                   + "/../resources/data/mne-cpp-test-data";
+    QString base = QCoreApplication::applicationDirPath() + "/../resources/data/mne-cpp-test-data";
     if (QFile::exists(base + "/MEG/sample/sample_audvis_trunc_raw.fif"))
         m_sDataPath = base;
 }
 
-void TestInvRtLibrary::cleanupTestCase() {}
+void TestInvRtLibrary::cleanupTestCase()
+{
+}
 
 //=============================================================================================================
 // Inverse: InvDipoleFitSettings
@@ -249,12 +259,15 @@ void TestInvRtLibrary::rapMusic_defaultCtorAndBasics()
 
 void TestInvRtLibrary::rapMusic_mathHelpers()
 {
-    if (!hasData()) QSKIP("No test data");
-    if (!QFile::exists(fwdPath())) QSKIP("Forward file not found");
+    if (!hasData())
+        QSKIP("No test data");
+    if (!QFile::exists(fwdPath()))
+        QSKIP("Forward file not found");
 
     QFile fwdFile(fwdPath());
     MNEForwardSolution fwd(fwdFile);
-    if (fwd.isEmpty()) QSKIP("Could not read forward");
+    if (fwd.isEmpty())
+        QSKIP("Could not read forward");
 
     InvRapMusic rap;
     bool initOk = rap.init(fwd, false, 2, 0.5);
@@ -277,15 +290,21 @@ void TestInvRtLibrary::dipole_fullExercise()
     QCOMPARE(dip.phi_y(), 0.0);
     QCOMPARE(dip.phi_z(), 0.0);
 
-    dip.x() = 1.0; dip.y() = 2.0; dip.z() = 3.0;
-    dip.phi_x() = 0.5; dip.phi_y() = 0.6; dip.phi_z() = 0.7;
+    dip.x() = 1.0;
+    dip.y() = 2.0;
+    dip.z() = 3.0;
+    dip.phi_x() = 0.5;
+    dip.phi_y() = 0.6;
+    dip.phi_z() = 0.7;
     QCOMPARE(dip.x(), 1.0);
     QCOMPARE(dip.y(), 2.0);
     QCOMPARE(dip.z(), 3.0);
     QCOMPARE(dip.phi_x(), 0.5);
 
     InvDipolePair<double> pair;
-    pair.m_iIdx1 = 0; pair.m_iIdx2 = 5; pair.m_vCorrelation = 0.95;
+    pair.m_iIdx1 = 0;
+    pair.m_iIdx2 = 5;
+    pair.m_vCorrelation = 0.95;
 
     InvDipole<float> dipF;
     dipF.x() = 1.0f;
@@ -340,7 +359,8 @@ void TestInvRtLibrary::rtHpi_lifecycle()
 void TestInvRtLibrary::rtInvOp_lifecycle()
 {
     auto pInfo = QSharedPointer<FiffInfo>::create();
-    pInfo->sfreq = 1000.0; pInfo->nchan = 10;
+    pInfo->sfreq = 1000.0;
+    pInfo->nchan = 10;
 
     auto pFwd = QSharedPointer<MNEForwardSolution>::create();
 
@@ -362,7 +382,8 @@ void TestInvRtLibrary::rtInvOp_lifecycle()
 void TestInvRtLibrary::rtAveraging_moreWorkerOps()
 {
     auto pInfo = FiffInfo::SPtr::create();
-    pInfo->sfreq = 1000.0; pInfo->nchan = 10;
+    pInfo->sfreq = 1000.0;
+    pInfo->nchan = 10;
     for (int i = 0; i < 10; i++) {
         FiffChInfo ch;
         ch.ch_name = QString("Ch%1").arg(i);
@@ -404,7 +425,8 @@ void TestInvRtLibrary::rtAveraging_moreWorkerOps()
 void TestInvRtLibrary::rtNoise_hanningWindow()
 {
     auto pInfo = FiffInfo::SPtr::create();
-    pInfo->sfreq = 1000.0; pInfo->nchan = 5;
+    pInfo->sfreq = 1000.0;
+    pInfo->nchan = 5;
     for (int i = 0; i < 5; i++) {
         FiffChInfo ch;
         ch.ch_name = QString("MEG%1").arg(i);
@@ -425,7 +447,8 @@ void TestInvRtLibrary::rtNoise_hanningWindow()
 void TestInvRtLibrary::rtNoise_lifecycle()
 {
     auto pInfo = FiffInfo::SPtr::create();
-    pInfo->sfreq = 600.0; pInfo->nchan = 3;
+    pInfo->sfreq = 600.0;
+    pInfo->nchan = 3;
     for (int i = 0; i < 3; i++) {
         FiffChInfo ch;
         ch.ch_name = QString("CH%1").arg(i);
@@ -453,7 +476,8 @@ void TestInvRtLibrary::rtNoise_lifecycle()
 
 void TestInvRtLibrary::rtprocessing_filterFile()
 {
-    if (!hasData()) QSKIP("No test data");
+    if (!hasData())
+        QSKIP("No test data");
     QFile rawFile(rawPath());
     FiffRawData::SPtr pRaw(new FiffRawData(rawFile));
 
@@ -473,7 +497,8 @@ void TestInvRtLibrary::rtprocessing_filterFile()
 
 void TestInvRtLibrary::hpiFit_constructWithSensorSet()
 {
-    if (!hasData()) QSKIP("No test data");
+    if (!hasData())
+        QSKIP("No test data");
     QFile rawFile(rawPath());
     FiffRawData raw(rawFile);
     InvSensorSetCreator creator;
@@ -500,7 +525,8 @@ void TestInvRtLibrary::hpiFit_storeHeadPosition()
 
 void TestInvRtLibrary::hpiFit_fitWithSyntheticData()
 {
-    if (!hasData()) QSKIP("No test data");
+    if (!hasData())
+        QSKIP("No test data");
     QFile rawFile(rawPath());
     FiffRawData raw(rawFile);
     InvSensorSetCreator creator;
@@ -604,7 +630,8 @@ void TestInvRtLibrary::filterKernel_design_bpf()
 
 void TestInvRtLibrary::filter_applyToRawData()
 {
-    if (!hasData()) QSKIP("No test data");
+    if (!hasData())
+        QSKIP("No test data");
     QFile rawFile(rawPath());
     FiffRawData raw(rawFile);
     MatrixXd data, times;
@@ -618,7 +645,8 @@ void TestInvRtLibrary::filter_applyToRawData()
 
 void TestInvRtLibrary::filter_applyWithChannelSelection()
 {
-    if (!hasData()) QSKIP("No test data");
+    if (!hasData())
+        QSKIP("No test data");
     QFile rawFile(rawPath());
     FiffRawData raw(rawFile);
     MatrixXd data, times;
@@ -635,7 +663,8 @@ void TestInvRtLibrary::filter_applyWithChannelSelection()
 
 void TestInvRtLibrary::rtNoise_appendData()
 {
-    if (!hasData()) QSKIP("No test data");
+    if (!hasData())
+        QSKIP("No test data");
     QFile rawFile(rawPath());
     FiffRawData raw(rawFile);
     FiffInfo::SPtr pInfo = FiffInfo::SPtr(new FiffInfo(raw.info));
@@ -674,7 +703,8 @@ void TestInvRtLibrary::rtAveragingWorker_doWork()
         MatrixXd data = MatrixXd::Zero(2, 200);
         for (int j = 0; j < 200; ++j)
             data(0, j) = std::sin(2.0 * M_PI * 10.0 * j / 1000.0);
-        if (block % 2 == 0) data(1, 100) = 5.0;
+        if (block % 2 == 0)
+            data(1, 100) = 5.0;
         worker.doWork(data);
     }
     QVERIFY(true);
@@ -703,7 +733,7 @@ void TestInvRtLibrary::filterData_paramOverload()
     RowVectorXi picks(3);
     picks << 0, 1, 2;
     MatrixXd result = RTPROCESSINGLIB::filterData(data, 0, 40.0, 0.0, 5.0, 1000.0, 128, 0,
-                                                   picks, false, false);
+                                                  picks, false, false);
     QVERIFY(result.rows() == data.rows());
     QVERIFY(result.cols() > 0);
 }

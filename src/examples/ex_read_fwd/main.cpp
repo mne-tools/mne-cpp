@@ -51,7 +51,7 @@ using namespace FSLIB;
  * @param[in] argv (argument vector) is an array of pointers to arrays of character objects. The array objects are null-terminated strings, representing the arguments that were entered on the command line when the program was started.
  * @return the value that was set to exit() (which is 0 if exit() is called via quit()).
  */
-int main(int argc, char *argv[])
+int main(int argc, char* argv[])
 {
     qInstallMessageHandler(MNELogger::customLogWriter);
     QCoreApplication app(argc, argv);
@@ -81,20 +81,22 @@ int main(int argc, char *argv[])
     QFile t_fileForwardSolution(parser.value(fwdFileOption));
     MNEForwardSolution t_Fwd(t_fileForwardSolution);
 
-    if(t_Fwd.source_ori != -1)
-    {
-        std::cout << "\nfirst 10 rows and columns of the Gain Matrix:\n" << t_Fwd.sol->data.block(0,0,10,10) << std::endl;
-        std::cout << "\nfirst 10 dipole coordinates:\n" << t_Fwd.source_rr.block(0,0,10,3) << std::endl ;
-        std::cout << "\nfirst 10 dipole normales:\n" << t_Fwd.source_nn.block(0,0,10,3) << std::endl ;
+    if (t_Fwd.source_ori != -1) {
+        std::cout << "\nfirst 10 rows and columns of the Gain Matrix:\n"
+                  << t_Fwd.sol->data.block(0, 0, 10, 10) << std::endl;
+        std::cout << "\nfirst 10 dipole coordinates:\n"
+                  << t_Fwd.source_rr.block(0, 0, 10, 3) << std::endl;
+        std::cout << "\nfirst 10 dipole normales:\n"
+                  << t_Fwd.source_nn.block(0, 0, 10, 3) << std::endl;
     }
 
     // === Option to cluster forward solution ===
-    FsAnnotationSet t_annotationSet (parser.value(subjectOption), parser.value(hemiOption).toInt(), parser.value(annotOption), parser.value(subjectPathOption));
+    FsAnnotationSet t_annotationSet(parser.value(subjectOption), parser.value(hemiOption).toInt(), parser.value(annotOption), parser.value(subjectPathOption));
 
     //
     // Cluster forward solution;
     //
-    MNEForwardSolution t_clusteredFwd = t_Fwd.cluster_forward_solution(t_annotationSet, 20);//40);
+    MNEForwardSolution t_clusteredFwd = t_Fwd.cluster_forward_solution(t_annotationSet, 20); //40);
 
     qDebug() << "==== Results ====";
     qDebug() << "nrow: " << t_clusteredFwd.sol->nrow;

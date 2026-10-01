@@ -55,11 +55,11 @@ using namespace FSLIB;
  * @param[in] argv (argument vector) is an array of pointers to arrays of character objects. The array objects are null-terminated strings, representing the arguments that were entered on the command line when the program was started.
  * @return the value that was set to exit() (which is 0 if exit() is called via quit()).
  */
-int main(int argc, char *argv[])
+int main(int argc, char* argv[])
 {
-    #ifdef STATICBUILD
-    // Q_INIT_RESOURCE(mne_disp3d);
-    #endif
+#ifdef STATICBUILD
+// Q_INIT_RESOURCE(mne_disp3d);
+#endif
 
     qInstallMessageHandler(MNELogger::customLogWriter);
     QApplication a(argc, argv);
@@ -89,8 +89,8 @@ int main(int argc, char *argv[])
     QFile t_File(parser.value(fwdFileOption));
     MNEForwardSolution t_forwardSolution(t_File);
 
-    BrainView *pBrainView = new BrainView();
-    BrainTreeModel *pModel = new BrainTreeModel();
+    BrainView* pBrainView = new BrainView();
+    BrainTreeModel* pModel = new BrainTreeModel();
     pBrainView->setModel(pModel);
 
     // Load surfaces from subject directory

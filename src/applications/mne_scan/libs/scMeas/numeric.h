@@ -48,14 +48,14 @@ class SCMEASSHARED_EXPORT Numeric : public Measurement
     Q_OBJECT
 
 public:
-    typedef QSharedPointer<Numeric> SPtr;               /**< Shared pointer type for Numeric. */
-    typedef QSharedPointer<const Numeric> ConstSPtr;    /**< Const shared pointer type for Numeric. */
+    typedef QSharedPointer<Numeric> SPtr;            /**< Shared pointer type for Numeric. */
+    typedef QSharedPointer<const Numeric> ConstSPtr; /**< Const shared pointer type for Numeric. */
 
     //=========================================================================================================
     /**
      * Constructs a Numeric.
      */
-    Numeric(QObject *parent = 0);
+    Numeric(QObject* parent = 0);
 
     //=========================================================================================================
     /**
@@ -98,10 +98,10 @@ public:
     virtual double getValue() const;
 
 private:
-    mutable QMutex  m_qMutex;   /**< Mutex to ensure thread safety. */
+    mutable QMutex m_qMutex; /**< Mutex to ensure thread safety. */
 
-    QString m_qString_Unit;     /**< Holds unit of the data of the measurement.*/
-    double  m_dValue;           /**< Holds current set value.*/
+    QString m_qString_Unit; /**< Holds unit of the data of the measurement.*/
+    double m_dValue;        /**< Holds current set value.*/
 };
 
 //=============================================================================================================

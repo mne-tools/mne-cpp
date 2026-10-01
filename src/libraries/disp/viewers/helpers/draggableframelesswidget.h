@@ -67,8 +67,8 @@ class DISPSHARED_EXPORT DraggableFramelessWidget : public QWidget
     Q_OBJECT
 
 public:
-    typedef QSharedPointer<DraggableFramelessWidget> SPtr;              /**< Shared pointer type for DraggableFramelessWidget. */
-    typedef QSharedPointer<const DraggableFramelessWidget> ConstSPtr;   /**< Const shared pointer type for DraggableFramelessWidget. */
+    typedef QSharedPointer<DraggableFramelessWidget> SPtr;            /**< Shared pointer type for DraggableFramelessWidget. */
+    typedef QSharedPointer<const DraggableFramelessWidget> ConstSPtr; /**< Const shared pointer type for DraggableFramelessWidget. */
 
     //=========================================================================================================
     /**
@@ -80,7 +80,7 @@ public:
      * @param[in] bDraggable    Flag specifying whether this widget is draggable.
      * @param[in] bFrameless    Flag specifying whether this widget is frameless.
      */
-    DraggableFramelessWidget(QWidget *parent = 0,
+    DraggableFramelessWidget(QWidget* parent = 0,
                              Qt::WindowFlags flags = Qt::Window,
                              bool bRoundEdges = false,
                              bool bDraggable = true,
@@ -107,7 +107,7 @@ protected:
      *
      * @param[in] event  The mouse event; moves the widget while dragging with the left button.
      */
-    void mouseMoveEvent(QMouseEvent *event);
+    void mouseMoveEvent(QMouseEvent* event);
 
     //=========================================================================================================
     /**
@@ -115,7 +115,7 @@ protected:
      *
      * @param[in] event  The mouse event; a left press stores the drag offset.
      */
-    void mousePressEvent(QMouseEvent *event);
+    void mousePressEvent(QMouseEvent* event);
 
     //=========================================================================================================
     /**
@@ -123,7 +123,7 @@ protected:
      *
      * @param[in] event  The mouse event; a left release ends dragging.
      */
-    void mouseReleaseEvent(QMouseEvent *event);
+    void mouseReleaseEvent(QMouseEvent* event);
 
     //=========================================================================================================
     /**
@@ -131,7 +131,7 @@ protected:
      *
      * @param[in] event  The resize event (unused; the rounded-edge mask is recomputed).
      */
-    void resizeEvent(QResizeEvent *event);
+    void resizeEvent(QResizeEvent* event);
 
     //=========================================================================================================
     /**
@@ -144,10 +144,10 @@ protected:
     QRegion roundedRect(const QRect& rect, int r);
 
 private:
-    QPoint      m_dragPosition;     /**< The drag position of the window. */
-    bool        m_bRoundEdges;      /**< Flag specifying whether to round the edges. */
-    bool        m_bDraggable;       /**< Flag specifying whether this widget is draggable. */
-    bool        m_bMousePressed;       /**< Flag specifying whether this widget is draggable. */
+    QPoint m_dragPosition; /**< The drag position of the window. */
+    bool m_bRoundEdges;    /**< Flag specifying whether to round the edges. */
+    bool m_bDraggable;     /**< Flag specifying whether this widget is draggable. */
+    bool m_bMousePressed;  /**< Flag specifying whether this widget is draggable. */
 };
 } // NAMESPACE DISPLIB
 

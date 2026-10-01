@@ -47,7 +47,8 @@ static constexpr double PI = M_PI;
 // PRIVATE HELPERS
 //=============================================================================================================
 
-namespace {
+namespace
+{
 
 //=============================================================================================================
 /**
@@ -59,10 +60,10 @@ double evalMagnitude(const QVector<IirBiquad>& sos, double omega)
     std::complex<double> H(1.0, 0.0);
 
     for (const IirBiquad& bq : sos) {
-        std::complex<double> zinv  = 1.0 / z;
+        std::complex<double> zinv = 1.0 / z;
         std::complex<double> zinv2 = zinv * zinv;
         std::complex<double> num = bq.b0 + bq.b1 * zinv + bq.b2 * zinv2;
-        std::complex<double> den = 1.0   + bq.a1 * zinv + bq.a2 * zinv2;
+        std::complex<double> den = 1.0 + bq.a1 * zinv + bq.a2 * zinv2;
         H *= num / den;
     }
     return std::abs(H);
@@ -91,8 +92,8 @@ QVector<std::complex<double>> IirFilter::butterworthPrototypePoles(int n)
 //=============================================================================================================
 
 IirBiquad IirFilter::poleToDigitalBiquad(std::complex<double> pole,
-                                           double               dC,
-                                           double               dGain)
+                                         double dC,
+                                         double dGain)
 {
     // Given complex conjugate pole pair (pole, conj(pole)), the analogue biquad is:
     //   H_a(s) = gain * omega0^2 / (s^2 - 2*Re(pole)*s + |pole|^2)
@@ -113,17 +114,17 @@ IirBiquad IirFilter::poleToDigitalBiquad(std::complex<double> pole,
     //   a2 = (c^2 - 2*alpha*c + omega0^2) / d0
 
     double omega0 = std::abs(pole);
-    double alpha  = -pole.real();   // positive for stable (left-half-plane) poles
+    double alpha = -pole.real(); // positive for stable (left-half-plane) poles
 
     double omega0sq = omega0 * omega0;
     double d0 = dC * dC + 2.0 * alpha * dC + omega0sq;
 
     IirBiquad bq;
-    bq.b0 =  dGain * omega0sq / d0;
-    bq.b1 =  2.0 * dGain * omega0sq / d0;
-    bq.b2 =  dGain * omega0sq / d0;
-    bq.a1 =  2.0 * (omega0sq - dC * dC) / d0;
-    bq.a2 =  (dC * dC - 2.0 * alpha * dC + omega0sq) / d0;
+    bq.b0 = dGain * omega0sq / d0;
+    bq.b1 = 2.0 * dGain * omega0sq / d0;
+    bq.b2 = dGain * omega0sq / d0;
+    bq.a1 = 2.0 * (omega0sq - dC * dC) / d0;
+    bq.a2 = (dC * dC - 2.0 * alpha * dC + omega0sq) / d0;
     return bq;
 }
 
@@ -137,7 +138,7 @@ IirBiquad IirFilter::realPoleToDigitalSection(double dPoleReal, double dC, doubl
     //         = [gain*|pole|/(dC+|pole|)] * (1 + z^{-1}) / (1 - [(dC-|pole|)/(dC+|pole|)]*z^{-1})
 
     double absPole = std::abs(dPoleReal);
-    double sum     = dC + absPole;
+    double sum = dC + absPole;
 
     IirBiquad bq;
     bq.b0 = dGain * absPole / sum;
@@ -150,24 +151,24 @@ IirBiquad IirFilter::realPoleToDigitalSection(double dPoleReal, double dC, doubl
 
 //=============================================================================================================
 
-QVector<IirBiquad> IirFilter::designButterworth(int        iOrder,
-                                                  FilterType type,
-                                                  double     dCutoffLow,
-                                                  double     dCutoffHigh,
-                                                  double     dSFreq)
+QVector<IirBiquad> IirFilter::designButterworth(int iOrder,
+                                                FilterType type,
+                                                double dCutoffLow,
+                                                double dCutoffHigh,
+                                                double dSFreq)
 {
     if (iOrder < 1) {
         qWarning() << "IirFilter::designButterworth: order must be >= 1, got" << iOrder;
         return {};
     }
 
-    const double dC = 2.0 * dSFreq;   // bilinear pre-warp constant
+    const double dC = 2.0 * dSFreq; // bilinear pre-warp constant
 
     // Pre-warp analogue cutoff frequencies
-    double dOmegaLow  = dC * std::tan(PI * dCutoffLow  / dSFreq);
+    double dOmegaLow = dC * std::tan(PI * dCutoffLow / dSFreq);
     double dOmegaHigh = (type == BandPass || type == BandStop)
-                        ? dC * std::tan(PI * dCutoffHigh / dSFreq)
-                        : 0.0;
+        ? dC * std::tan(PI * dCutoffHigh / dSFreq)
+        : 0.0;
 
     // Butterworth normalised LP prototype poles
     QVector<std::complex<double>> protoPoles = butterworthPrototypePoles(iOrder);
@@ -193,8 +194,8 @@ QVector<IirBiquad> IirFilter::designButterworth(int        iOrder,
             if (std::abs(proto.imag()) < 1e-10) {
                 // Real pole (only for odd order, proto ≈ -1)
                 double analogPole = (type == LowPass)
-                                    ? dOmegaLow * proto.real()
-                                    : dOmegaLow / proto.real();
+                    ? dOmegaLow * proto.real()
+                    : dOmegaLow / proto.real();
 
                 // Evaluate passband gain at DC (LP) or Nyquist (HP) for normalisation.
                 // For a single first-order section: |H(0)| = |b0+b1|/|1+a1|
@@ -203,8 +204,8 @@ QVector<IirBiquad> IirFilter::designButterworth(int        iOrder,
 
                 // Normalise so passband gain ~ 1
                 double w_pb = (type == LowPass) ? 0.0 : PI;
-                double num = std::abs(bq.b0 + bq.b1 * std::cos(-w_pb));  // rough, imaginary part 0
-                double den = std::abs(1.0   + bq.a1 * std::cos(-w_pb));
+                double num = std::abs(bq.b0 + bq.b1 * std::cos(-w_pb)); // rough, imaginary part 0
+                double den = std::abs(1.0 + bq.a1 * std::cos(-w_pb));
                 double gain = (den > 1e-12 && num > 1e-12) ? den / num : 1.0;
                 bq.b0 *= gain;
                 bq.b1 *= gain;
@@ -216,12 +217,12 @@ QVector<IirBiquad> IirFilter::designButterworth(int        iOrder,
                 double sectionGain;
 
                 if (type == LowPass) {
-                    analogPole  = dOmegaLow * proto;
-                    sectionGain = dOmegaLow * dOmegaLow;   // LP: constant numerator = omega0^2
+                    analogPole = dOmegaLow * proto;
+                    sectionGain = dOmegaLow * dOmegaLow; // LP: constant numerator = omega0^2
                 } else {
                     // HP: s -> Omega_c / s  transforms pole p to Omega_c / p
-                    analogPole  = dOmegaLow / proto;
-                    sectionGain = 1.0;                      // HP: numerator has s^2 -> gain handled below
+                    analogPole = dOmegaLow / proto;
+                    sectionGain = 1.0; // HP: numerator has s^2 -> gain handled below
                 }
 
                 if (type == LowPass) {
@@ -231,7 +232,9 @@ QVector<IirBiquad> IirFilter::designButterworth(int        iOrder,
                     double hDC = (bq.b0 + bq.b1 + bq.b2) / (1.0 + bq.a1 + bq.a2);
                     if (std::abs(hDC) > 1e-12) {
                         double scale = 1.0 / std::abs(hDC);
-                        bq.b0 *= scale; bq.b1 *= scale; bq.b2 *= scale;
+                        bq.b0 *= scale;
+                        bq.b1 *= scale;
+                        bq.b2 *= scale;
                     }
                     sos.append(bq);
                 } else {
@@ -239,23 +242,25 @@ QVector<IirBiquad> IirFilter::designButterworth(int        iOrder,
                     // b2_a=1, b1_a=0, b0_a=0; a2_a=1, a1_a=-2*Re(p), a0_a=|p|^2
                     // General bilinear for (b2_a=1, b1_a=0, b0_a=0):
                     double omega0 = std::abs(analogPole);
-                    double alpha  = -analogPole.real();
+                    double alpha = -analogPole.real();
                     double omega0sq = omega0 * omega0;
                     double d0 = dC * dC + 2.0 * alpha * dC + omega0sq;
 
                     IirBiquad bq;
-                    bq.b0 =  dC * dC / d0;
+                    bq.b0 = dC * dC / d0;
                     bq.b1 = -2.0 * dC * dC / d0;
-                    bq.b2 =  dC * dC / d0;
-                    bq.a1 =  2.0 * (omega0sq - dC * dC) / d0;
-                    bq.a2 =  (dC * dC - 2.0 * alpha * dC + omega0sq) / d0;
+                    bq.b2 = dC * dC / d0;
+                    bq.a1 = 2.0 * (omega0sq - dC * dC) / d0;
+                    bq.a2 = (dC * dC - 2.0 * alpha * dC + omega0sq) / d0;
 
                     // Normalise: HP passband gain at Nyquist (z=-1, omega=pi) should be 1
                     // At z=-1: H = (b0-b1+b2)/(1-a1+a2)
                     double hNy = (bq.b0 - bq.b1 + bq.b2) / (1.0 - bq.a1 + bq.a2);
                     if (std::abs(hNy) > 1e-12) {
                         double scale = 1.0 / std::abs(hNy);
-                        bq.b0 *= scale; bq.b1 *= scale; bq.b2 *= scale;
+                        bq.b0 *= scale;
+                        bq.b1 *= scale;
+                        bq.b2 *= scale;
                     }
                     sos.append(bq);
                 }
@@ -270,7 +275,7 @@ QVector<IirBiquad> IirFilter::designButterworth(int        iOrder,
         // This doubles the order, producing 2*iOrder poles → iOrder biquad sections.
 
         double dOmega0 = std::sqrt(dOmegaLow * dOmegaHigh);
-        double dBw     = dOmegaHigh - dOmegaLow;
+        double dBw = dOmegaHigh - dOmegaLow;
 
         for (int k = 0; k < iOrder; ++k) {
             std::complex<double> proto = protoPoles[k];
@@ -286,7 +291,7 @@ QVector<IirBiquad> IirFilter::designButterworth(int        iOrder,
             }
 
             std::complex<double> discriminant = mid * mid - 4.0 * dOmega0 * dOmega0;
-            std::complex<double> sqrtDisc     = std::sqrt(discriminant);
+            std::complex<double> sqrtDisc = std::sqrt(discriminant);
             std::complex<double> pole1 = (mid + sqrtDisc) / 2.0;
             std::complex<double> pole2 = (mid - sqrtDisc) / 2.0;
 
@@ -299,25 +304,25 @@ QVector<IirBiquad> IirFilter::designButterworth(int        iOrder,
                     // BP analogue biquad numerator: Bw*s  (zero at origin, zero at infinity)
                     // i.e., b2_a=0, b1_a=Bw, b0_a=0
                     // Bilinear of (b2_a=0, b1_a=Bw, b0_a=0) / (s^2 - 2Re(p)s + |p|^2):
-                    double omega0  = std::abs(pole);
-                    double alpha   = -pole.real();
+                    double omega0 = std::abs(pole);
+                    double alpha = -pole.real();
                     double omega0sq = omega0 * omega0;
                     double d0 = dC * dC + 2.0 * alpha * dC + omega0sq;
 
                     IirBiquad bq;
                     // num from bilinear(b1_a=Bw): b0=Bw*c, b1=0, b2=-Bw*c
-                    bq.b0 =  dBw * dC / d0;
-                    bq.b1 =  0.0;
+                    bq.b0 = dBw * dC / d0;
+                    bq.b1 = 0.0;
                     bq.b2 = -dBw * dC / d0;
-                    bq.a1 =  2.0 * (omega0sq - dC * dC) / d0;
-                    bq.a2 =  (dC * dC - 2.0 * alpha * dC + omega0sq) / d0;
+                    bq.a1 = 2.0 * (omega0sq - dC * dC) / d0;
+                    bq.a2 = (dC * dC - 2.0 * alpha * dC + omega0sq) / d0;
                     sos.append(bq);
                 } else {
                     // BS analogue biquad numerator: s^2 + Omega0^2  (zeros at ±j*Omega0)
                     // b2_a=1, b1_a=0, b0_a=Omega0^2
                     // Bilinear:
-                    double omega0  = std::abs(pole);
-                    double alpha   = -pole.real();
+                    double omega0 = std::abs(pole);
+                    double alpha = -pole.real();
                     double omega0sq = omega0 * omega0;
                     double dOmega0sq = dOmega0 * dOmega0;
                     double d0 = dC * dC + 2.0 * alpha * dC + omega0sq;
@@ -326,10 +331,10 @@ QVector<IirBiquad> IirFilter::designButterworth(int        iOrder,
                     // num from bilinear(b2_a=1, b1_a=0, b0_a=Omega0^2):
                     //   b0 = (c^2 + Omega0^2)/d0, b1 = 2*(Omega0^2-c^2)/d0, b2 = (c^2+Omega0^2)/d0
                     bq.b0 = (dC * dC + dOmega0sq) / d0;
-                    bq.b1 =  2.0 * (dOmega0sq - dC * dC) / d0;
+                    bq.b1 = 2.0 * (dOmega0sq - dC * dC) / d0;
                     bq.b2 = (dC * dC + dOmega0sq) / d0;
-                    bq.a1 =  2.0 * (omega0sq - dC * dC) / d0;
-                    bq.a2 =  (dC * dC - 2.0 * alpha * dC + omega0sq) / d0;
+                    bq.a1 = 2.0 * (omega0sq - dC * dC) / d0;
+                    bq.a2 = (dC * dC - 2.0 * alpha * dC + omega0sq) / d0;
                     sos.append(bq);
                 }
             }
@@ -339,8 +344,8 @@ QVector<IirBiquad> IirFilter::designButterworth(int        iOrder,
         // For BP: evaluate at centre frequency Omega0 (digital: omega_0 = Omega0 / fs * 2pi... use prewarped)
         // For BS: evaluate at DC (omega = 0)
         double omegaCheck = (type == BandPass)
-                            ? 2.0 * std::atan(dOmega0 / dC)   // bilinear inverse: omega_d = 2*atan(Omega_a/c)
-                            : 0.0;
+            ? 2.0 * std::atan(dOmega0 / dC) // bilinear inverse: omega_d = 2*atan(Omega_a/c)
+            : 0.0;
         double totalGain = evalMagnitude(sos, omegaCheck);
         if (totalGain > 1e-12) {
             double scale = 1.0 / totalGain;

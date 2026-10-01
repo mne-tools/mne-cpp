@@ -54,8 +54,8 @@ public:
      * Default constructor. Initializes both fields to zero.
      */
     FiffTime()
-        : secs(0)
-        , usecs(0)
+    : secs(0)
+    , usecs(0)
     {
     }
 
@@ -67,8 +67,8 @@ public:
      * @param[in] p_usecs   Fraction of seconds in microseconds.
      */
     FiffTime(qint32 p_secs, qint32 p_usecs)
-        : secs(p_secs)
-        , usecs(p_usecs)
+    : secs(p_secs)
+    , usecs(p_usecs)
     {
     }
 
@@ -87,8 +87,8 @@ public:
     inline static qint32 storageSize();
 
 public:
-    qint32 secs;    /**< GMT time in seconds since epoch. */
-    qint32 usecs;   /**< Fraction of seconds in microseconds. */
+    qint32 secs;  /**< GMT time in seconds since epoch. */
+    qint32 usecs; /**< Fraction of seconds in microseconds. */
 };
 
 //=============================================================================================================

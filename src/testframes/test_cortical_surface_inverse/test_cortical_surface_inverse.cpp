@@ -28,7 +28,8 @@
 
 using namespace CORTICALSURFACEPLUGIN;
 
-namespace {
+namespace
+{
 
 QString findSampleDataPath()
 {
@@ -40,9 +41,7 @@ QString findSampleDataPath()
         candidates.prepend(QString::fromLocal8Bit(env) + "/MNE-sample-data");
     }
     for (const QString& p : candidates) {
-        if (QFileInfo::exists(p + "/MEG/sample/sample_audvis-meg-eeg-oct-6-fwd.fif")
-            && QFileInfo::exists(p + "/MEG/sample/sample_audvis-cov.fif")
-            && QFileInfo::exists(p + "/MEG/sample/sample_audvis-ave.fif")) {
+        if (QFileInfo::exists(p + "/MEG/sample/sample_audvis-meg-eeg-oct-6-fwd.fif") && QFileInfo::exists(p + "/MEG/sample/sample_audvis-cov.fif") && QFileInfo::exists(p + "/MEG/sample/sample_audvis-ave.fif")) {
             return p;
         }
     }
@@ -75,9 +74,10 @@ void TestCorticalSurfaceInverse::testMissingForwardReturnsFalse()
     ComputeSourceEstimateOptions opts;
     opts.method = QStringLiteral("MNE");
     QCOMPARE(plugin.runComputeSourceEstimate(
-        QStringLiteral("/does/not/exist-fwd.fif"),
-        QStringLiteral("/does/not/exist-cov.fif"),
-        QStringLiteral("/does/not/exist-ave.fif"), opts), false);
+                 QStringLiteral("/does/not/exist-fwd.fif"),
+                 QStringLiteral("/does/not/exist-cov.fif"),
+                 QStringLiteral("/does/not/exist-ave.fif"), opts),
+             false);
     QCOMPARE(spy.count(), 0);
 }
 
@@ -94,7 +94,8 @@ void TestCorticalSurfaceInverse::testUnknownMethodReturnsFalse()
     opts.method = QStringLiteral("MAGIC");
     QCOMPARE(plugin.runComputeSourceEstimate(QStringLiteral("a"),
                                              QStringLiteral("b"),
-                                             QStringLiteral("c"), opts), false);
+                                             QStringLiteral("c"), opts),
+             false);
 }
 
 //=============================================================================================================

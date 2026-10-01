@@ -67,7 +67,6 @@ void SourceLocalization::init()
 
 void SourceLocalization::unload()
 {
-
 }
 
 //=============================================================================================================
@@ -79,14 +78,14 @@ QString SourceLocalization::getName() const
 
 //=============================================================================================================
 
-QMenu *SourceLocalization::getMenu()
+QMenu* SourceLocalization::getMenu()
 {
     return Q_NULLPTR;
 }
 
 //=============================================================================================================
 
-QWidget *SourceLocalization::getView()
+QWidget* SourceLocalization::getView()
 {
     return Q_NULLPTR;
 }
@@ -124,5 +123,5 @@ QVector<EVENT_TYPE> SourceLocalization::getEventSubscriptions(void) const
 
 QString SourceLocalization::getBuildInfo()
 {
-    return QString(SOURCELOCALIZATIONPLUGIN::buildDateTime()) + QString(" - ")  + QString(SOURCELOCALIZATIONPLUGIN::buildHash());
+    return QString(SOURCELOCALIZATIONPLUGIN::buildDateTime()) + QString(" - ") + QString(SOURCELOCALIZATIONPLUGIN::buildHash());
 }

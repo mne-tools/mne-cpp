@@ -50,29 +50,29 @@
 // Helper: build an icosahedron mesh for testing
 //=============================================================================================================
 
-static void buildTestIcosahedron(MatrixX3f &rr, MatrixX3i &tris, float radius = 1.0f)
+static void buildTestIcosahedron(MatrixX3f& rr, MatrixX3i& tris, float radius = 1.0f)
 {
     const float phi = (1.0f + std::sqrt(5.0f)) / 2.0f;
 
     rr.resize(12, 3);
-    rr.row(0)  = Vector3f(-1,  phi, 0).normalized() * radius;
-    rr.row(1)  = Vector3f( 1,  phi, 0).normalized() * radius;
-    rr.row(2)  = Vector3f(-1, -phi, 0).normalized() * radius;
-    rr.row(3)  = Vector3f( 1, -phi, 0).normalized() * radius;
-    rr.row(4)  = Vector3f(0, -1,  phi).normalized() * radius;
-    rr.row(5)  = Vector3f(0,  1,  phi).normalized() * radius;
-    rr.row(6)  = Vector3f(0, -1, -phi).normalized() * radius;
-    rr.row(7)  = Vector3f(0,  1, -phi).normalized() * radius;
-    rr.row(8)  = Vector3f( phi, 0, -1).normalized() * radius;
-    rr.row(9)  = Vector3f( phi, 0,  1).normalized() * radius;
+    rr.row(0) = Vector3f(-1, phi, 0).normalized() * radius;
+    rr.row(1) = Vector3f(1, phi, 0).normalized() * radius;
+    rr.row(2) = Vector3f(-1, -phi, 0).normalized() * radius;
+    rr.row(3) = Vector3f(1, -phi, 0).normalized() * radius;
+    rr.row(4) = Vector3f(0, -1, phi).normalized() * radius;
+    rr.row(5) = Vector3f(0, 1, phi).normalized() * radius;
+    rr.row(6) = Vector3f(0, -1, -phi).normalized() * radius;
+    rr.row(7) = Vector3f(0, 1, -phi).normalized() * radius;
+    rr.row(8) = Vector3f(phi, 0, -1).normalized() * radius;
+    rr.row(9) = Vector3f(phi, 0, 1).normalized() * radius;
     rr.row(10) = Vector3f(-phi, 0, -1).normalized() * radius;
-    rr.row(11) = Vector3f(-phi, 0,  1).normalized() * radius;
+    rr.row(11) = Vector3f(-phi, 0, 1).normalized() * radius;
 
     tris.resize(20, 3);
-    tris <<  0,11,5,  0,5,1,   0,1,7,   0,7,10,  0,10,11,
-             1,5,9,   5,11,4,  11,10,2, 10,7,6,  7,1,8,
-             3,9,4,   3,4,2,   3,2,6,   3,6,8,   3,8,9,
-             4,9,5,   2,4,11,  6,2,10,  8,6,7,   9,8,1;
+    tris << 0, 11, 5, 0, 5, 1, 0, 1, 7, 0, 7, 10, 0, 10, 11,
+        1, 5, 9, 5, 11, 4, 11, 10, 2, 10, 7, 6, 7, 1, 8,
+        3, 9, 4, 3, 4, 2, 3, 2, 6, 3, 6, 8, 3, 8, 9,
+        4, 9, 5, 2, 4, 11, 6, 2, 10, 8, 6, 7, 9, 8, 1;
 }
 
 //=============================================================================================================
@@ -141,7 +141,7 @@ void TestToolSurfaceMath::testBuildAdjacencyIcosahedron()
     buildTestIcosahedron(rr, tris);
 
     auto adj = buildAdjacency(rr, tris);
-    QCOMPARE((int)adj.size(), 12);  // 12 vertices
+    QCOMPARE((int)adj.size(), 12); // 12 vertices
 
     // Each vertex of an icosahedron has exactly 5 neighbors
     for (int i = 0; i < 12; i++) {
@@ -153,7 +153,7 @@ void TestToolSurfaceMath::testBuildAdjacencyVertexDegrees()
 {
     // Simple triangle: 3 vertices, 1 triangle
     MatrixX3f rr(3, 3);
-    rr << 0, 0, 0,   1, 0, 0,   0, 1, 0;
+    rr << 0, 0, 0, 1, 0, 0, 0, 1, 0;
     MatrixX3i tris(1, 3);
     tris << 0, 1, 2;
 
@@ -169,7 +169,7 @@ void TestToolSurfaceMath::testBuildAdjacencyTriangle()
 {
     // Verify edge weights are Euclidean distances
     MatrixX3f rr(3, 3);
-    rr << 0, 0, 0,   3, 0, 0,   0, 4, 0;
+    rr << 0, 0, 0, 3, 0, 0, 0, 4, 0;
     MatrixX3i tris(1, 3);
     tris << 0, 1, 2;
 
@@ -226,7 +226,7 @@ void TestToolSurfaceMath::testDijkstraMultipleSource()
     auto adj = buildAdjacency(rr, tris);
 
     VectorXi sourceVerts(2);
-    sourceVerts << 0, 3;  // Two source vertices on opposite sides
+    sourceVerts << 0, 3; // Two source vertices on opposite sides
 
     VectorXi nearest;
     VectorXf dist;
@@ -265,7 +265,8 @@ void TestToolSurfaceMath::testDijkstraDistances()
     for (int i = 0; i < 12; i++) {
         bool isNeighbor = false;
         for (auto& [neighbor, edgeDist] : adj[0]) {
-            if (neighbor == i) isNeighbor = true;
+            if (neighbor == i)
+                isNeighbor = true;
         }
         if (!isNeighbor && i != 0) {
             QVERIFY(dist(i) >= maxNeighborDist - 1e-5f);
@@ -282,7 +283,8 @@ void TestToolSurfaceMath::testDijkstraAllVertices()
     auto adj = buildAdjacency(rr, tris);
 
     VectorXi sourceVerts(12);
-    for (int i = 0; i < 12; i++) sourceVerts(i) = i;
+    for (int i = 0; i < 12; i++)
+        sourceVerts(i) = i;
 
     VectorXi nearest;
     VectorXf dist;
@@ -302,7 +304,7 @@ void TestToolSurfaceMath::testBuildNearestMapIdentity()
 {
     // Same source and destination → each vertex maps to itself
     MatrixX3f sphere(4, 3);
-    sphere << 1, 0, 0,   0, 1, 0,   0, 0, 1,   -1, 0, 0;
+    sphere << 1, 0, 0, 0, 1, 0, 0, 0, 1, -1, 0, 0;
 
     VectorXi nearestMap = buildNearestMap(sphere, sphere);
     QCOMPARE(nearestMap.size(), (Eigen::Index)4);
@@ -315,10 +317,10 @@ void TestToolSurfaceMath::testBuildNearestMapScaled()
 {
     // Scaled sphere → same nearest mapping
     MatrixX3f src(3, 3);
-    src << 1, 0, 0,   0, 1, 0,   0, 0, 1;
+    src << 1, 0, 0, 0, 1, 0, 0, 0, 1;
 
     MatrixX3f dst(3, 3);
-    dst << 2, 0, 0,   0, 2, 0,   0, 0, 2;  // Same directions, different magnitudes
+    dst << 2, 0, 0, 0, 2, 0, 0, 0, 2; // Same directions, different magnitudes
 
     VectorXi nearestMap = buildNearestMap(src, dst);
     QCOMPARE(nearestMap.size(), (Eigen::Index)3);
@@ -330,10 +332,10 @@ void TestToolSurfaceMath::testBuildNearestMapScaled()
 void TestToolSurfaceMath::testBuildNearestMapOffset()
 {
     MatrixX3f src(2, 3);
-    src << 1, 0, 0,   -1, 0, 0;   // Two dipolar sources
+    src << 1, 0, 0, -1, 0, 0; // Two dipolar sources
 
     MatrixX3f dst(3, 3);
-    dst << 0.9f, 0.1f, 0,   -0.8f, 0.2f, 0,   0, 0, 1;  // 3 destinations
+    dst << 0.9f, 0.1f, 0, -0.8f, 0.2f, 0, 0, 0, 1; // 3 destinations
 
     VectorXi nearestMap = buildNearestMap(src, dst);
     // dst[0] is closest to src[0], dst[1] to src[1]
@@ -349,7 +351,7 @@ void TestToolSurfaceMath::testComputeMorphMapIdentity()
 {
     // Same src and dst on unit sphere → should morph to identity
     MatrixX3f sphere(4, 3);
-    sphere << 1, 0, 0,   0, 1, 0,   0, 0, 1,   -1, 0, 0;
+    sphere << 1, 0, 0, 0, 1, 0, 0, 0, 1, -1, 0, 0;
     sphere.rowwise().normalize();
 
     SparseMatrix<double> M = computeMorphMap(sphere, sphere, 3);
@@ -365,12 +367,12 @@ void TestToolSurfaceMath::testComputeMorphMapIdentity()
 void TestToolSurfaceMath::testComputeMorphMapSparse()
 {
     MatrixX3f src(6, 3);
-    src << 1, 0, 0,   0, 1, 0,   0, 0, 1,
-          -1, 0, 0,   0, -1, 0,  0, 0, -1;
+    src << 1, 0, 0, 0, 1, 0, 0, 0, 1,
+        -1, 0, 0, 0, -1, 0, 0, 0, -1;
     src.rowwise().normalize();
 
     MatrixX3f dst(3, 3);
-    dst << 1, 0, 0,   0, 1, 0,   0, 0, 1;
+    dst << 1, 0, 0, 0, 1, 0, 0, 0, 1;
     dst.rowwise().normalize();
 
     SparseMatrix<double> M = computeMorphMap(src, dst, 2);
@@ -406,7 +408,7 @@ void TestToolSurfaceMath::testAzimuthalProjectionNorthPole()
 {
     // Point at the "north pole" of a sphere → should project to center
     Vector3f center(0, 0, 0);
-    Vector3f pos(0, 0, 1);  // Top of unit sphere
+    Vector3f pos(0, 0, 1); // Top of unit sphere
     float radius = 1.0f;
     float x, y;
     azimuthalProjection(pos, center, radius, x, y);
@@ -492,11 +494,11 @@ void TestToolSurfaceMath::testSmoothingOperatorConnectivity()
     SparseMatrix<double> S = buildSmoothingOperator(tris, 12);
 
     for (int i = 0; i < 12; i++) {
-        QVERIFY(qAbs(S.coeff(i, i)) < 1e-10);  // No self-weight
+        QVERIFY(qAbs(S.coeff(i, i)) < 1e-10); // No self-weight
     }
 
     // Non-zero off-diagonals should correspond to mesh edges
-    QVERIFY(S.nonZeros() == 12 * 5);  // 12 vertices × 5 neighbors each
+    QVERIFY(S.nonZeros() == 12 * 5); // 12 vertices × 5 neighbors each
 }
 
 void TestToolSurfaceMath::testSmoothingOperatorIteration()
@@ -509,14 +511,14 @@ void TestToolSurfaceMath::testSmoothingOperatorIteration()
     SparseMatrix<double> S = buildSmoothingOperator(tris, 12);
 
     VectorXd data = VectorXd::Zero(12);
-    data(0) = 1.0;  // Delta at vertex 0
+    data(0) = 1.0; // Delta at vertex 0
 
     VectorXd smoothed = S * data;
 
     // Vertex 0 should now be 0 (no self-weight)
     QVERIFY(qAbs(smoothed(0)) < 1e-10);
     // Neighbors of vertex 0 should have 1/5 each
-    QVERIFY(smoothed.sum() > 0.99);  // Total mass preserved
+    QVERIFY(smoothed.sum() > 0.99); // Total mass preserved
 }
 
 //=============================================================================================================

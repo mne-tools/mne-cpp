@@ -54,7 +54,8 @@ public:
     int updateCount = 0;
     Subject* lastSubject = nullptr;
 
-    void update(Subject* pSubject) override {
+    void update(Subject* pSubject) override
+    {
         ++updateCount;
         lastSubject = pSubject;
     }
@@ -66,7 +67,10 @@ public:
 class TestSubject : public Subject
 {
 public:
-    TestSubject() : Subject() {}
+    TestSubject()
+    : Subject()
+    {
+    }
 };
 
 //=============================================================================================================

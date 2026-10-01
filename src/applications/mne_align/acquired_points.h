@@ -8,7 +8,8 @@
 
 #include <utils/polhemus/acquired_points.h>
 
-namespace MNEALIGN {
+namespace MNEALIGN
+{
 using UTILSLIB::PointKind;
 using UTILSLIB::FiducialId;
 using UTILSLIB::DigitizedPoint;

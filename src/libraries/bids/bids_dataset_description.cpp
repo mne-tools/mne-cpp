@@ -40,7 +40,7 @@ BidsDatasetDescription BidsDatasetDescription::read(const QString& sFilePath)
     BidsDatasetDescription desc;
 
     QFile file(sFilePath);
-    if(!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
+    if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
         qWarning() << "[BidsDatasetDescription::read] Cannot open" << sFilePath;
         return desc;
     }
@@ -49,17 +49,17 @@ BidsDatasetDescription BidsDatasetDescription::read(const QString& sFilePath)
     QJsonDocument doc = QJsonDocument::fromJson(file.readAll(), &error);
     file.close();
 
-    if(error.error != QJsonParseError::NoError) {
+    if (error.error != QJsonParseError::NoError) {
         qWarning() << "[BidsDatasetDescription::read] Parse error in" << sFilePath
-                    << ":" << error.errorString();
+                   << ":" << error.errorString();
         return desc;
     }
 
     QJsonObject json = doc.object();
-    desc.name        = json.value(QStringLiteral("Name")).toString();
+    desc.name = json.value(QStringLiteral("Name")).toString();
     desc.bidsVersion = json.value(QStringLiteral("BIDSVersion")).toString();
     desc.datasetType = json.value(QStringLiteral("DatasetType")).toString();
-    desc.license     = json.value(QStringLiteral("License")).toString();
+    desc.license = json.value(QStringLiteral("License")).toString();
 
     return desc;
 }
@@ -67,20 +67,20 @@ BidsDatasetDescription BidsDatasetDescription::read(const QString& sFilePath)
 //=============================================================================================================
 
 bool BidsDatasetDescription::write(const QString& sFilePath,
-                                    const BidsDatasetDescription& desc)
+                                   const BidsDatasetDescription& desc)
 {
     QJsonObject json;
 
     json[QStringLiteral("Name")] = desc.name;
     json[QStringLiteral("BIDSVersion")] = desc.bidsVersion;
 
-    if(!desc.datasetType.isEmpty())
+    if (!desc.datasetType.isEmpty())
         json[QStringLiteral("DatasetType")] = desc.datasetType;
-    if(!desc.license.isEmpty())
+    if (!desc.license.isEmpty())
         json[QStringLiteral("License")] = desc.license;
 
     QFile file(sFilePath);
-    if(!file.open(QIODevice::WriteOnly | QIODevice::Text)) {
+    if (!file.open(QIODevice::WriteOnly | QIODevice::Text)) {
         qWarning() << "[BidsDatasetDescription::write] Cannot open" << sFilePath << "for writing";
         return false;
     }

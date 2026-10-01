@@ -42,7 +42,7 @@ using namespace DISPLIB;
 //=============================================================================================================
 
 ConnectivitySettingsView::ConnectivitySettingsView(const QString& sSettingsPath,
-                                                   QWidget *parent,
+                                                   QWidget* parent,
                                                    Qt::WindowFlags f)
 : AbstractView(parent, f)
 , m_pUi(new Ui::ConnectivitySettingsViewWidget)
@@ -58,8 +58,8 @@ ConnectivitySettingsView::ConnectivitySettingsView(const QString& sSettingsPath,
     connect(m_pUi->m_comboBox_windowType, static_cast<void (QComboBox::*)(const QString&)>(&QComboBox::currentTextChanged),
             this, &ConnectivitySettingsView::onWindowTypeChanged);
 
-//    connect(m_pUi->m_spinBox_numberTrials, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged),
-//            this, &ConnectivitySettingsView::onNumberTrialsChanged);
+    //    connect(m_pUi->m_spinBox_numberTrials, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged),
+    //            this, &ConnectivitySettingsView::onNumberTrialsChanged);
 
     connect(m_pUi->m_spinBox_numberTrials, &QSpinBox::editingFinished,
             this, &ConnectivitySettingsView::onNumberTrialsChanged);
@@ -67,11 +67,11 @@ ConnectivitySettingsView::ConnectivitySettingsView(const QString& sSettingsPath,
     connect(m_pUi->m_comboBox_triggerType, static_cast<void (QComboBox::*)(const QString&)>(&QComboBox::currentTextChanged),
             this, &ConnectivitySettingsView::onTriggerTypeChanged);
 
-//    connect(m_pUi->m_spinBox_freqLow, &QDoubleSpinBox::editingFinished,
-//            this, &ConnectivitySettingsView::onFrequencyBandChanged);
+    //    connect(m_pUi->m_spinBox_freqLow, &QDoubleSpinBox::editingFinished,
+    //            this, &ConnectivitySettingsView::onFrequencyBandChanged);
 
-//    connect(m_pUi->m_spinBox_freqHigh, &QDoubleSpinBox::editingFinished,
-//            this, &ConnectivitySettingsView::onFrequencyBandChanged);
+    //    connect(m_pUi->m_spinBox_freqHigh, &QDoubleSpinBox::editingFinished,
+    //            this, &ConnectivitySettingsView::onFrequencyBandChanged);
 
     connect(m_pUi->m_spinBox_freqLow, static_cast<void (QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged),
             this, &ConnectivitySettingsView::onFrequencyBandChanged);
@@ -97,8 +97,8 @@ ConnectivitySettingsView::~ConnectivitySettingsView()
 
 void ConnectivitySettingsView::setTriggerTypes(const QStringList& lTriggerTypes)
 {
-    for(const QString &sTriggerType : lTriggerTypes) {
-        if(m_pUi->m_comboBox_triggerType->findText(sTriggerType) == -1) {
+    for (const QString& sTriggerType : lTriggerTypes) {
+        if (m_pUi->m_comboBox_triggerType->findText(sTriggerType) == -1) {
             m_pUi->m_comboBox_triggerType->addItem(sTriggerType);
         }
     }
@@ -165,7 +165,7 @@ double ConnectivitySettingsView::getUpperFreq()
 
 void ConnectivitySettingsView::saveSettings()
 {
-    if(m_sSettingsPath.isEmpty()) {
+    if (m_sSettingsPath.isEmpty()) {
         return;
     }
 
@@ -183,7 +183,7 @@ void ConnectivitySettingsView::saveSettings()
 
 void ConnectivitySettingsView::loadSettings()
 {
-    if(m_sSettingsPath.isEmpty()) {
+    if (m_sSettingsPath.isEmpty()) {
         return;
     }
 
@@ -202,7 +202,7 @@ void ConnectivitySettingsView::loadSettings()
 
 void ConnectivitySettingsView::updateGuiMode(GuiMode mode)
 {
-    switch(mode) {
+    switch (mode) {
         case GuiMode::Clinical:
             break;
         default: // default is research mode
@@ -214,7 +214,7 @@ void ConnectivitySettingsView::updateGuiMode(GuiMode mode)
 
 void ConnectivitySettingsView::updateProcessingMode(ProcessingMode mode)
 {
-    switch(mode) {
+    switch (mode) {
         case ProcessingMode::Offline:
             break;
         default: // default is realtime mode
@@ -242,7 +242,7 @@ void ConnectivitySettingsView::onWindowTypeChanged(const QString& sWindowType)
 
 void ConnectivitySettingsView::onNumberTrialsChanged()
 {
-    if(m_iNumberTrials == m_pUi->m_spinBox_numberTrials->value()) {
+    if (m_iNumberTrials == m_pUi->m_spinBox_numberTrials->value()) {
         return;
     }
 
@@ -274,5 +274,4 @@ void ConnectivitySettingsView::onFrequencyBandChanged()
 
 void ConnectivitySettingsView::clearView()
 {
-
 }

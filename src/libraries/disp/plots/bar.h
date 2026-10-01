@@ -140,14 +140,14 @@ protected:
      *
      * @param[in] event  The paint event.
      */
-    void paintEvent(QPaintEvent *event) override;
+    void paintEvent(QPaintEvent* event) override;
 
 private:
-    QString         m_sTitle;           /**< Chart title. */
-    QString         m_sLegend;          /**< Legend text (exponent scale info). */
-    QStringList     m_categories;       /**< Category labels for x-axis. */
-    QList<int>      m_frequencies;      /**< Frequency values for each bar. */
-    int             m_iMaxFrequency;    /**< Maximum frequency value (for y-axis scaling). */
+    QString m_sTitle;         /**< Chart title. */
+    QString m_sLegend;        /**< Legend text (exponent scale info). */
+    QStringList m_categories; /**< Category labels for x-axis. */
+    QList<int> m_frequencies; /**< Frequency values for each bar. */
+    int m_iMaxFrequency;      /**< Maximum frequency value (for y-axis scaling). */
 };
 
 //=============================================================================================================
@@ -159,7 +159,7 @@ void Bar::setData(const Eigen::Matrix<T, Eigen::Dynamic, 1>& matClassLimitData,
                   const Eigen::Matrix<int, Eigen::Dynamic, 1>& matClassFrequencyData,
                   int iPrecisionValue)
 {
-    Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic> matrixName(matClassLimitData.rows(),1);
+    Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic> matrixName(matClassLimitData.rows(), 1);
     matrixName.col(0) = matClassLimitData;
     this->updatePlot(matrixName, matClassFrequencyData, iPrecisionValue);
 }
@@ -187,7 +187,8 @@ void Bar::updatePlot(const Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>& mat
     Eigen::VectorXi resultExponentValues;
     int iClassAmount = std::min(static_cast<int>(matClassFrequencyData.rows()),
                                 static_cast<int>(matClassLimitData.rows()) - 1);
-    if(iClassAmount < 1) return;
+    if (iClassAmount < 1)
+        return;
     this->splitCoefficientAndExponent(matClassLimitData, iClassAmount, resultDisplayValues, resultExponentValues);
 
     // Setup legend text
@@ -198,12 +199,9 @@ void Bar::updatePlot(const Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>& mat
     m_frequencies.clear();
     m_iMaxFrequency = 0;
 
-    for (int kr = 0; kr < iClassAmount; ++kr)
-    {
+    for (int kr = 0; kr < iClassAmount; ++kr) {
         int classFreq = matClassFrequencyData(kr);
-        QString currentLimits = QString::number(resultDisplayValues(kr), 'g', iPrecisionValue)
-                              + " to "
-                              + QString::number(resultDisplayValues(kr + 1), 'g', iPrecisionValue);
+        QString currentLimits = QString::number(resultDisplayValues(kr), 'g', iPrecisionValue) + " to " + QString::number(resultDisplayValues(kr + 1), 'g', iPrecisionValue);
         m_categories << currentLimits;
         m_frequencies << classFreq;
         if (classFreq > m_iMaxFrequency) {
@@ -216,26 +214,22 @@ void Bar::updatePlot(const Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>& mat
 
 //=============================================================================================================
 
-template <typename T>
+template<typename T>
 void Bar::splitCoefficientAndExponent(const Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>& matClassLimitData,
-                                       int iClassAmount,
-                                       Eigen::VectorXd& vecCoefficientResults, Eigen::VectorXi& vecExponentValues)
+                                      int iClassAmount,
+                                      Eigen::VectorXd& vecCoefficientResults, Eigen::VectorXi& vecExponentValues)
 {
     vecCoefficientResults.resize(iClassAmount + 1);
     vecExponentValues.resize(iClassAmount + 1);
     double originalValue(0.0),
-         limitDisplayValue(0.0),
-         doubleExponentValue(0.0);
-    int    limitExponentValue(0);
-    for (int ir = 0; ir <= iClassAmount; ++ir)
-    {
+        limitDisplayValue(0.0),
+        doubleExponentValue(0.0);
+    int limitExponentValue(0);
+    for (int ir = 0; ir <= iClassAmount; ++ir) {
         originalValue = matClassLimitData(ir);
-        if (originalValue == 0.0)
-        {
+        if (originalValue == 0.0) {
             doubleExponentValue = 0.0;
-        }
-        else
-        {
+        } else {
             doubleExponentValue = log10(std::fabs(originalValue));
         }
 
@@ -246,38 +240,29 @@ void Bar::splitCoefficientAndExponent(const Eigen::Matrix<T, Eigen::Dynamic, Eig
     }
 
     int lowestExponentValue{0},
-    highestExponentValue{0};
+        highestExponentValue{0};
 
-    for (int ir = 0; ir <= iClassAmount; ++ir)
-    {
-        if (vecExponentValues(ir) < lowestExponentValue)
-        {
+    for (int ir = 0; ir <= iClassAmount; ++ir) {
+        if (vecExponentValues(ir) < lowestExponentValue) {
             lowestExponentValue = vecExponentValues(ir);
         }
-        if (vecExponentValues(ir) > highestExponentValue)
-        {
+        if (vecExponentValues(ir) > highestExponentValue) {
             highestExponentValue = vecExponentValues(ir);
         }
     }
 
-    if (highestExponentValue > 0)
-    {
-        for (int ir = 0; ir <= iClassAmount; ++ir)
-        {
-            while (vecExponentValues(ir) < highestExponentValue)
-            {
+    if (highestExponentValue > 0) {
+        for (int ir = 0; ir <= iClassAmount; ++ir) {
+            while (vecExponentValues(ir) < highestExponentValue) {
                 vecCoefficientResults(ir) = vecCoefficientResults(ir) / 10;
                 vecExponentValues(ir)++;
             }
         }
     }
 
-    if (lowestExponentValue < 0)
-    {
-        for (int ir = 0; ir <= iClassAmount; ++ir)
-        {
-            while (vecExponentValues(ir) > lowestExponentValue)
-            {
+    if (lowestExponentValue < 0) {
+        for (int ir = 0; ir <= iClassAmount; ++ir) {
+            while (vecExponentValues(ir) > lowestExponentValue) {
                 vecCoefficientResults(ir) = vecCoefficientResults(ir) * 10;
                 vecExponentValues(ir)--;
             }

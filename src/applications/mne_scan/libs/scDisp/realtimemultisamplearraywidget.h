@@ -40,19 +40,22 @@
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-namespace DISPLIB {
-    class ChannelSelectionView;
-    class ChannelInfoModel;
-    class RtFiffRawView;
-    class ChannelDataViewNew;
+namespace DISPLIB
+{
+class ChannelSelectionView;
+class ChannelInfoModel;
+class RtFiffRawView;
+class ChannelDataViewNew;
 }
 
-namespace FIFFLIB {
-    class FiffInfo;
+namespace FIFFLIB
+{
+class FiffInfo;
 }
 
-namespace SCMEASLIB{
-    class RealTimeMultiSampleArray;
+namespace SCMEASLIB
+{
+class RealTimeMultiSampleArray;
 }
 
 //=============================================================================================================
@@ -84,7 +87,7 @@ public:
      * @param[in] pTime         pointer to application time.
      * @param[in] parent        pointer to parent widget; If parent is 0, the new NumericWidget becomes a window. If parent is another widget, NumericWidget becomes a child window inside parent. NumericWidget is deleted when its parent is deleted.
      */
-    RealTimeMultiSampleArrayWidget(QSharedPointer<QTime> &pTime,
+    RealTimeMultiSampleArrayWidget(QSharedPointer<QTime>& pTime,
                                    QWidget* parent = 0);
 
     //=========================================================================================================
@@ -97,7 +100,9 @@ public:
     /**
      * Initialise the MeasurementWidget.
      */
-    virtual void init(){}
+    virtual void init()
+    {
+    }
 
     //=========================================================================================================
     /**
@@ -142,18 +147,18 @@ private:
     void onHideBadChannels();
 
 private:
-    QSharedPointer<SCMEASLIB::RealTimeMultiSampleArray>     m_pRTMSA;                       /**< The real-time sample array measurement. */
+    QSharedPointer<SCMEASLIB::RealTimeMultiSampleArray> m_pRTMSA; /**< The real-time sample array measurement. */
 
-    QSharedPointer<DISPLIB::QuickControlView>               m_pQuickControlView;            /**< quick control widget. */
-    QSharedPointer<DISPLIB::ChannelInfoModel>               m_pChannelInfoModel;            /**< channel info model. */
-    QSharedPointer<DISPLIB::ChannelSelectionView>           m_pChannelSelectionView;        /**< ChannelSelectionView. */
-    QPointer<DISPLIB::RtFiffRawView>                        m_pChannelDataView;             /**< the QTableView being part of the model/view framework of Qt. */
+    QSharedPointer<DISPLIB::QuickControlView> m_pQuickControlView;         /**< quick control widget. */
+    QSharedPointer<DISPLIB::ChannelInfoModel> m_pChannelInfoModel;         /**< channel info model. */
+    QSharedPointer<DISPLIB::ChannelSelectionView> m_pChannelSelectionView; /**< ChannelSelectionView. */
+    QPointer<DISPLIB::RtFiffRawView> m_pChannelDataView;                   /**< the QTableView being part of the model/view framework of Qt. */
 
-    QSharedPointer<FIFFLIB::FiffInfo>                       m_pFiffInfo;                    /**< FiffInfo, which is used insteadd of ListChInfo*/
+    QSharedPointer<FIFFLIB::FiffInfo> m_pFiffInfo; /**< FiffInfo, which is used insteadd of ListChInfo*/
 
-    QPointer<QAction>                                       m_pActionHideBad;               /**< Hide bad channels. */
+    QPointer<QAction> m_pActionHideBad; /**< Hide bad channels. */
 
-    qint32                                                  m_iMaxFilterTapSize;            /**< Maximum number of allowed filter taps. This number depends on the size of the receiving blocks. */
+    qint32 m_iMaxFilterTapSize; /**< Maximum number of allowed filter taps. This number depends on the size of the receiving blocks. */
 };
 } // NAMESPACE SCDISPLIB
 

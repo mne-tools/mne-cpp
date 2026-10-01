@@ -81,7 +81,9 @@ private:
     }
 
 private slots:
-    void initTestCase() {}
+    void initTestCase()
+    {
+    }
 
     void testLofScoresNormalData()
     {
@@ -127,7 +129,8 @@ private slots:
         // Outlier should have highest LOF score
         int maxIdx = 0;
         for (int i = 1; i < 21; ++i) {
-            if (lof(i) > lof(maxIdx)) maxIdx = i;
+            if (lof(i) > lof(maxIdx))
+                maxIdx = i;
         }
         QCOMPARE(maxIdx, 20);
         QVERIFY2(lof(20) > 2.0,
@@ -178,7 +181,7 @@ private slots:
 
         LofBadChannelParams params;
         params.iNNeighbors = 5;
-        params.dThreshold = 3.0;  // High threshold
+        params.dThreshold = 3.0; // High threshold
 
         QStringList bads = findBadChannelsLof(data, info, params);
         // With uniform data and high threshold, should find few/no bads
@@ -264,7 +267,9 @@ private slots:
                  qPrintable(QString("Expected flat EEG4 in bads, got: %1").arg(bads.join(", "))));
     }
 
-    void cleanupTestCase() {}
+    void cleanupTestCase()
+    {
+    }
 };
 
 //=============================================================================================================

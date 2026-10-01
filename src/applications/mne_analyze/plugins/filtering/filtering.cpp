@@ -87,14 +87,14 @@ QString Filtering::getName() const
 
 //=============================================================================================================
 
-QMenu *Filtering::getMenu()
+QMenu* Filtering::getMenu()
 {
     return Q_NULLPTR;
 }
 
 //=============================================================================================================
 
-QDockWidget *Filtering::getControl()
+QDockWidget* Filtering::getControl()
 {
     m_pFilterSettingsView = new FilterSettingsView("MNEANALYZE");
 
@@ -125,7 +125,7 @@ QDockWidget *Filtering::getControl()
 
 //=============================================================================================================
 
-QWidget *Filtering::getView()
+QWidget* Filtering::getView()
 {
     return Q_NULLPTR;
 }
@@ -135,24 +135,24 @@ QWidget *Filtering::getView()
 void Filtering::handleEvent(QSharedPointer<Event> e)
 {
     switch (e->getType()) {
-    case SELECTED_MODEL_CHANGED:
-        if(e->getData().value<QSharedPointer<AbstractModel> >()->getType() == MODEL_TYPE::ANSHAREDLIB_FIFFRAW_MODEL) {
-            if(QSharedPointer<FiffRawViewModel> pModel = qSharedPointerCast<FiffRawViewModel>(e->getData().value<QSharedPointer<AbstractModel> >())) {
-                if(m_pFilterSettingsView) {
-                    setFilterActive(m_pFilterSettingsView->getFilterActive());
-                    if(auto info = pModel->getFiffInfo()){
-                        m_pFilterSettingsView->getFilterView()->setSamplingRate(info->sfreq);
-                        //m_pFilterSettingsView->getFilterView()->setMaxAllowedFilterTaps(pModel->getFiffInfo()->sfreq);
-                        setFilterChannelType(m_pFilterSettingsView->getFilterView()->getChannelType());
-                        setFilter(m_pFilterSettingsView->getFilterView()->getCurrentFilter());
+        case SELECTED_MODEL_CHANGED:
+            if (e->getData().value<QSharedPointer<AbstractModel>>()->getType() == MODEL_TYPE::ANSHAREDLIB_FIFFRAW_MODEL) {
+                if (QSharedPointer<FiffRawViewModel> pModel = qSharedPointerCast<FiffRawViewModel>(e->getData().value<QSharedPointer<AbstractModel>>())) {
+                    if (m_pFilterSettingsView) {
+                        setFilterActive(m_pFilterSettingsView->getFilterActive());
+                        if (auto info = pModel->getFiffInfo()) {
+                            m_pFilterSettingsView->getFilterView()->setSamplingRate(info->sfreq);
+                            //m_pFilterSettingsView->getFilterView()->setMaxAllowedFilterTaps(pModel->getFiffInfo()->sfreq);
+                            setFilterChannelType(m_pFilterSettingsView->getFilterView()->getChannelType());
+                            setFilter(m_pFilterSettingsView->getFilterView()->getCurrentFilter());
+                        }
                     }
                 }
             }
-        }
-        break;
+            break;
 
-    default:
-        qWarning() << "[Filtering::handleEvent] received an Event that is not handled by switch-cases";
+        default:
+            qWarning() << "[Filtering::handleEvent] received an Event that is not handled by switch-cases";
     }
 }
 
@@ -197,5 +197,5 @@ void Filtering::setFilterActive(bool state)
 
 QString Filtering::getBuildInfo()
 {
-    return QString(FILTERINGPLUGIN::buildDateTime()) + QString(" - ")  + QString(FILTERINGPLUGIN::buildHash());
+    return QString(FILTERINGPLUGIN::buildDateTime()) + QString(" - ") + QString(FILTERINGPLUGIN::buildHash());
 }

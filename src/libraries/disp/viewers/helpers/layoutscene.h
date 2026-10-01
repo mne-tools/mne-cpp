@@ -79,7 +79,7 @@ public:
      * @param[in] parent  Parent QObject (default 0).
      */
     LayoutScene(QGraphicsView* view,
-                QObject *parent = 0);
+                QObject* parent = 0);
 
 protected:
     //=========================================================================================================
@@ -104,7 +104,7 @@ protected:
      *
      * @param[in] mouseEvent  The mouse event; left starts rubber-band selection, right starts panning.
      */
-    void mousePressEvent(QGraphicsSceneMouseEvent *mouseEvent);
+    void mousePressEvent(QGraphicsSceneMouseEvent* mouseEvent);
 
     //=========================================================================================================
     /**
@@ -112,7 +112,7 @@ protected:
      *
      * @param[in] mouseEvent  The mouse event; pans the view while in drag mode.
      */
-    void mouseMoveEvent(QGraphicsSceneMouseEvent *mouseEvent);
+    void mouseMoveEvent(QGraphicsSceneMouseEvent* mouseEvent);
 
     //=========================================================================================================
     /**
@@ -120,7 +120,7 @@ protected:
      *
      * @param[in] mouseEvent  The mouse event; ends drag mode.
      */
-    void mouseReleaseEvent(QGraphicsSceneMouseEvent *mouseEvent);
+    void mouseReleaseEvent(QGraphicsSceneMouseEvent* mouseEvent);
 
     //=========================================================================================================
     /**
@@ -128,7 +128,7 @@ protected:
      *
      * @param[in] keyEvent  The key event, forwarded to QGraphicsScene.
      */
-    void keyPressEvent(QKeyEvent *keyEvent);
+    void keyPressEvent(QKeyEvent* keyEvent);
 
     //=========================================================================================================
     /**
@@ -136,7 +136,7 @@ protected:
      *
      * @param[in] keyEvent  The key event, forwarded to QGraphicsScene.
      */
-    void keyReleaseEvent(QKeyEvent *keyEvent);
+    void keyReleaseEvent(QKeyEvent* keyEvent);
 
     //=========================================================================================================
     /**
@@ -146,7 +146,7 @@ protected:
      *
      * @return True if the event was a gesture and was handled, otherwise the QGraphicsScene result.
      */
-    bool event(QEvent *event);
+    bool event(QEvent* event);
 
     //=========================================================================================================
     /**
@@ -156,7 +156,7 @@ protected:
      *
      * @return Always true.
      */
-    bool gestureEvent(QGestureEvent *event);
+    bool gestureEvent(QGestureEvent* event);
 
     //=========================================================================================================
     /**
@@ -185,14 +185,14 @@ protected:
      *
      * @return True if a gesture event on the view was handled, false otherwise.
      */
-    bool eventFilter(QObject *object, QEvent *event);
+    bool eventFilter(QObject* object, QEvent* event);
 
-    QGraphicsView*                  m_qvView;                       /**< The view which visualizes this scene.*/
+    QGraphicsView* m_qvView; /**< The view which visualizes this scene.*/
     //QList<QGraphicsItem *>          m_selectedItems;                /**< The currently selected items during extended selection mode.*/
 
-    bool                            m_bDragMode;                    /**< Flag whether the drag mode is activated.*/
+    bool m_bDragMode; /**< Flag whether the drag mode is activated.*/
     //bool                            m_bExtendedSelectionMode;       /**< Flag whether the extended selection mode.*/
-    QPointF                         m_mousePressPosition;           /**< The current mouse press location.*/
+    QPointF m_mousePressPosition; /**< The current mouse press location.*/
 };
 } // NAMESPACE DISPLIB
 

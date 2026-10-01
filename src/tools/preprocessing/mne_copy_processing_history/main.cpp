@@ -48,7 +48,7 @@ using namespace UTILSLIB;
 /**
  * Recursively copy all tags from a FIFF directory node into the destination stream.
  */
-static bool copyBlock(FiffStream::SPtr &src, FiffStream::SPtr &dst, const FiffDirNode::SPtr &node)
+static bool copyBlock(FiffStream::SPtr& src, FiffStream::SPtr& dst, const FiffDirNode::SPtr& node)
 {
     // Start block
     dst->start_block(node->type);
@@ -83,7 +83,7 @@ static bool copyBlock(FiffStream::SPtr &src, FiffStream::SPtr &dst, const FiffDi
 /**
  * Find FIFFB_PROCESSING_HISTORY nodes in the tree.
  */
-static QList<FiffDirNode::SPtr> findProcessingHistory(const FiffDirNode::SPtr &node)
+static QList<FiffDirNode::SPtr> findProcessingHistory(const FiffDirNode::SPtr& node)
 {
     QList<FiffDirNode::SPtr> result;
     if (node->type == FIFFB_PROCESSING_HISTORY) {
@@ -97,7 +97,7 @@ static QList<FiffDirNode::SPtr> findProcessingHistory(const FiffDirNode::SPtr &n
 
 //=============================================================================================================
 
-int main(int argc, char *argv[])
+int main(int argc, char* argv[])
 {
     qInstallMessageHandler(MNELogger::customLogWriter);
     QCoreApplication app(argc, argv);
@@ -120,8 +120,14 @@ int main(int argc, char *argv[])
     QString fromFile = parser.value(fromOpt);
     QString toFile = parser.value(toOpt);
 
-    if (fromFile.isEmpty()) { qCritical("--from is required."); return 1; }
-    if (toFile.isEmpty()) { qCritical("--to is required."); return 1; }
+    if (fromFile.isEmpty()) {
+        qCritical("--from is required.");
+        return 1;
+    }
+    if (toFile.isEmpty()) {
+        qCritical("--to is required.");
+        return 1;
+    }
 
     // Open source file
     QFile srcFile(fromFile);
@@ -138,8 +144,8 @@ int main(int argc, char *argv[])
         srcStream->close();
         return 1;
     }
-    qInfo("Found %lld processing history block(s) in source." ,
-           static_cast<long long>(histNodes.size()));
+    qInfo("Found %lld processing history block(s) in source.",
+          static_cast<long long>(histNodes.size()));
 
     // Open destination file for update
     QFile dstFile(toFile);
@@ -153,7 +159,7 @@ int main(int argc, char *argv[])
     // Seek to end of file (before closing tags) and copy all history blocks
     dstStream->device()->seek(dstStream->device()->size());
 
-    for (const FiffDirNode::SPtr &histNode : histNodes) {
+    for (const FiffDirNode::SPtr& histNode : histNodes) {
         if (!copyBlock(srcStream, dstStream, histNode)) {
             qCritical("Failed to copy processing history block.");
             srcStream->close();
@@ -165,7 +171,7 @@ int main(int argc, char *argv[])
     srcStream->close();
     dstStream->close();
 
-    qInfo("Successfully copied processing history from %s to %s" ,
-           qPrintable(fromFile), qPrintable(toFile));
+    qInfo("Successfully copied processing history from %s to %s",
+          qPrintable(fromFile), qPrintable(toFile));
     return 0;
 }

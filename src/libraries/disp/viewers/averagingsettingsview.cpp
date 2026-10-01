@@ -43,8 +43,8 @@ using namespace FIFFLIB;
 //=============================================================================================================
 
 AveragingSettingsView::AveragingSettingsView(const QString& sSettingsPath,
-                                             const QMap<QString, int> &mapStimChsIndexNames,
-                                             QWidget *parent)
+                                             const QMap<QString, int>& mapStimChsIndexNames,
+                                             QWidget* parent)
 : AbstractView(parent)
 , m_pUi(new Ui::AverageSettingsViewWidget)
 , m_mapStimChsIndexNames(mapStimChsIndexNames)
@@ -70,9 +70,9 @@ AveragingSettingsView::~AveragingSettingsView()
 
 //=============================================================================================================
 
-void AveragingSettingsView::setStimChannels(const QMap<QString,int>& mapStimChsIndexNames)
+void AveragingSettingsView::setStimChannels(const QMap<QString, int>& mapStimChsIndexNames)
 {
-    if(!mapStimChsIndexNames.isEmpty()) {
+    if (!mapStimChsIndexNames.isEmpty()) {
         m_mapStimChsIndexNames = mapStimChsIndexNames;
 
         m_pUi->m_pComboBoxChSelection->clear();
@@ -80,7 +80,7 @@ void AveragingSettingsView::setStimChannels(const QMap<QString,int>& mapStimChsI
         QMapIterator<QString, int> i(mapStimChsIndexNames);
         while (i.hasNext()) {
             i.next();
-            m_pUi->m_pComboBoxChSelection->insertItem(m_pUi->m_pComboBoxChSelection->count(),i.key());
+            m_pUi->m_pComboBoxChSelection->insertItem(m_pUi->m_pComboBoxChSelection->count(), i.key());
         }
 
         m_pUi->m_pComboBoxChSelection->setCurrentText(m_sCurrentStimChan);
@@ -150,13 +150,13 @@ int AveragingSettingsView::getStimChannelIdx()
 
 void AveragingSettingsView::redrawGUI()
 {
-    if(!m_mapStimChsIndexNames.isEmpty()) {
+    if (!m_mapStimChsIndexNames.isEmpty()) {
         m_pUi->m_pComboBoxChSelection->clear();
 
         QMapIterator<QString, int> i(m_mapStimChsIndexNames);
         while (i.hasNext()) {
             i.next();
-            m_pUi->m_pComboBoxChSelection->insertItem(m_pUi->m_pComboBoxChSelection->count(),i.key());
+            m_pUi->m_pComboBoxChSelection->insertItem(m_pUi->m_pComboBoxChSelection->count(), i.key());
         }
 
         m_pUi->m_pComboBoxChSelection->setCurrentText(m_sCurrentStimChan);
@@ -183,13 +183,13 @@ void AveragingSettingsView::redrawGUI()
     connect(m_pUi->m_pcheckBoxBaselineCorrection, &QCheckBox::clicked,
             this, &AveragingSettingsView::changeBaselineActive);
 
-    m_pUi->m_pSpinBoxBaselineFromMSeconds->setMinimum(m_pUi->m_pSpinBoxPreStimMSeconds->value()*-1);
+    m_pUi->m_pSpinBoxBaselineFromMSeconds->setMinimum(m_pUi->m_pSpinBoxPreStimMSeconds->value() * -1);
     m_pUi->m_pSpinBoxBaselineFromMSeconds->setMaximum(m_pUi->m_pSpinBoxPostStimMSeconds->value());
     m_pUi->m_pSpinBoxBaselineFromMSeconds->setValue(m_iBaselineFromSeconds);
     connect(m_pUi->m_pSpinBoxBaselineFromMSeconds, static_cast<void (QSpinBox::*)()>(&QSpinBox::editingFinished),
             this, &AveragingSettingsView::onChangeBaselineFrom);
 
-    m_pUi->m_pSpinBoxBaselineToMSeconds->setMinimum(m_pUi->m_pSpinBoxPreStimMSeconds->value()*-1);
+    m_pUi->m_pSpinBoxBaselineToMSeconds->setMinimum(m_pUi->m_pSpinBoxPreStimMSeconds->value() * -1);
     m_pUi->m_pSpinBoxBaselineToMSeconds->setMaximum(m_pUi->m_pSpinBoxPostStimMSeconds->value());
     m_pUi->m_pSpinBoxBaselineToMSeconds->setValue(m_iBaselineToSeconds);
     connect(m_pUi->m_pSpinBoxBaselineToMSeconds, static_cast<void (QSpinBox::*)()>(&QSpinBox::editingFinished),
@@ -219,7 +219,7 @@ void AveragingSettingsView::redrawGUI()
 
 void AveragingSettingsView::setDetectedEpochs(const FiffEvokedSet& evokedSet)
 {
-    if(evokedSet.evoked.isEmpty()) {
+    if (evokedSet.evoked.isEmpty()) {
         m_pUi->m_groupBox_detectedTrials->hide();
         return;
     } else {
@@ -227,24 +227,24 @@ void AveragingSettingsView::setDetectedEpochs(const FiffEvokedSet& evokedSet)
     }
 
     QGridLayout* topLayout = static_cast<QGridLayout*>(m_pUi->m_groupBox_detectedTrials->layout());
-    if(!topLayout) {
-       topLayout = new QGridLayout();
+    if (!topLayout) {
+        topLayout = new QGridLayout();
     }
 
-    QLayoutItem *child;
+    QLayoutItem* child;
     while ((child = topLayout->takeAt(0)) != 0) {
         delete child->widget();
         delete child;
     }
 
-    topLayout->addWidget(new QLabel("Type"),0,0);
-    topLayout->addWidget(new QLabel("#"),0,1);
+    topLayout->addWidget(new QLabel("Type"), 0, 0);
+    topLayout->addWidget(new QLabel("#"), 0, 1);
 
-    for(int i = 0; i < evokedSet.evoked.size(); i++) {
-        if(i < 10) {
+    for (int i = 0; i < evokedSet.evoked.size(); i++) {
+        if (i < 10) {
             // Show only a maximum of 10 average types
-            topLayout->addWidget(new QLabel(evokedSet.evoked.at(i).comment),i+1,0);
-            topLayout->addWidget(new QLabel(QString::number(evokedSet.evoked.at(i).nave)),i+1,1);
+            topLayout->addWidget(new QLabel(evokedSet.evoked.at(i).comment), i + 1, 0);
+            topLayout->addWidget(new QLabel(QString::number(evokedSet.evoked.at(i).nave)), i + 1, 1);
         }
     }
 
@@ -256,7 +256,7 @@ void AveragingSettingsView::setDetectedEpochs(const FiffEvokedSet& evokedSet)
 
 void AveragingSettingsView::saveSettings()
 {
-    if(m_sSettingsPath.isEmpty()) {
+    if (m_sSettingsPath.isEmpty()) {
         return;
     }
 
@@ -276,7 +276,7 @@ void AveragingSettingsView::saveSettings()
 
 void AveragingSettingsView::loadSettings()
 {
-    if(m_sSettingsPath.isEmpty()) {
+    if (m_sSettingsPath.isEmpty()) {
         return;
     }
 
@@ -288,11 +288,11 @@ void AveragingSettingsView::loadSettings()
     m_iBaselineFromSeconds = settings.value(m_sSettingsPath + QString("/AveragingSettingsView/baselineFromSeconds"), 0).toInt();
     m_iBaselineToSeconds = settings.value(m_sSettingsPath + QString("/AveragingSettingsView/baselineToSeconds"), 0).toInt();
 
-    if(m_iBaselineFromSeconds < -1 * m_iPreStimSeconds || m_iBaselineFromSeconds > m_iPostStimSeconds) {
+    if (m_iBaselineFromSeconds < -1 * m_iPreStimSeconds || m_iBaselineFromSeconds > m_iPostStimSeconds) {
         m_iBaselineFromSeconds = -1 * m_iPreStimSeconds;
     }
 
-    if(m_iBaselineToSeconds > m_iPostStimSeconds  || m_iBaselineToSeconds < m_iPreStimSeconds) {
+    if (m_iBaselineToSeconds > m_iPostStimSeconds || m_iBaselineToSeconds < m_iPreStimSeconds) {
         m_iBaselineToSeconds = 0;
     }
 
@@ -305,7 +305,7 @@ void AveragingSettingsView::loadSettings()
 
 void AveragingSettingsView::updateGuiMode(GuiMode mode)
 {
-    switch(mode) {
+    switch (mode) {
         case GuiMode::Clinical:
             break;
         default: // default is research mode
@@ -317,7 +317,7 @@ void AveragingSettingsView::updateGuiMode(GuiMode mode)
 
 void AveragingSettingsView::updateProcessingMode(ProcessingMode mode)
 {
-    switch(mode) {
+    switch (mode) {
         case ProcessingMode::Offline:
             m_pUi->m_pSpinBoxNumAverages->hide();
             m_pUi->m_pComboBoxChSelection->hide();
@@ -345,8 +345,8 @@ void AveragingSettingsView::updateProcessingMode(ProcessingMode mode)
 void AveragingSettingsView::onChangePreStim()
 {
     qint32 mSeconds = m_pUi->m_pSpinBoxPreStimMSeconds->value();
-    m_pUi->m_pSpinBoxBaselineToMSeconds->setMinimum(m_pUi->m_pSpinBoxPreStimMSeconds->value()*-1);
-    m_pUi->m_pSpinBoxBaselineFromMSeconds->setMinimum(m_pUi->m_pSpinBoxPreStimMSeconds->value()*-1);
+    m_pUi->m_pSpinBoxBaselineToMSeconds->setMinimum(m_pUi->m_pSpinBoxPreStimMSeconds->value() * -1);
+    m_pUi->m_pSpinBoxBaselineFromMSeconds->setMinimum(m_pUi->m_pSpinBoxPreStimMSeconds->value() * -1);
 
     m_iPreStimSeconds = mSeconds;
 
@@ -424,7 +424,6 @@ void AveragingSettingsView::onChangeStimChannel()
 
 void AveragingSettingsView::clearView()
 {
-
 }
 
 //=============================================================================================================

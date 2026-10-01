@@ -59,12 +59,12 @@ inline uint32_t packABGR(uint32_t r, uint32_t g, uint32_t b, uint32_t a = 0xFF)
  */
 enum ShaderMode
 {
-    Standard,       /**< Default Phong-style shading. */
-    Holographic,    /**< Two-sided holographic effect. */
-    Anatomical,     /**< Anatomical / curvature-based coloring. */
-    Dipole,         /**< Specialized dipole rendering. */
-    XRay,           /**< Semi-transparent X-ray effect. */
-    ShowNormals     /**< Visualise surface normals as colour. */
+    Standard,    /**< Default Phong-style shading. */
+    Holographic, /**< Two-sided holographic effect. */
+    Anatomical,  /**< Anatomical / curvature-based coloring. */
+    Dipole,      /**< Specialized dipole rendering. */
+    XRay,        /**< Semi-transparent X-ray effect. */
+    ShowNormals  /**< Visualise surface normals as colour. */
 };
 
 //=============================================================================================================
@@ -76,10 +76,10 @@ enum ShaderMode
  */
 enum VisualizationMode
 {
-    ModeSurface,         /**< Plain surface colours (curvature-derived). */
-    ModeAnnotation,      /**< Atlas / parcellation annotation colours. */
-    ModeScientific,      /**< Scientific colourmap (curvature). */
-    ModeSourceEstimate   /**< Source-estimate overlay colours. */
+    ModeSurface,       /**< Plain surface colours (curvature-derived). */
+    ModeAnnotation,    /**< Atlas / parcellation annotation colours. */
+    ModeScientific,    /**< Scientific colourmap (curvature). */
+    ModeSourceEstimate /**< Source-estimate overlay colours. */
 };
 
 #endif // RENDERTYPES_H

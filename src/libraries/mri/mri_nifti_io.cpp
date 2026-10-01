@@ -69,19 +69,20 @@ using namespace MRILIB;
 using namespace FIFFLIB;
 using namespace Eigen;
 
-namespace {
+namespace
+{
 
 // NIfTI-1 datatype codes (subset that we map onto MRI_* types).
-constexpr qint16 DT_UINT8    = 2;
-constexpr qint16 DT_INT16    = 4;
-constexpr qint16 DT_INT32    = 8;
-constexpr qint16 DT_FLOAT32  = 16;
-constexpr qint16 DT_INT8     = 256;
-constexpr qint16 DT_UINT16   = 512;
+constexpr qint16 DT_UINT8 = 2;
+constexpr qint16 DT_INT16 = 4;
+constexpr qint16 DT_INT32 = 8;
+constexpr qint16 DT_FLOAT32 = 16;
+constexpr qint16 DT_INT8 = 256;
+constexpr qint16 DT_UINT16 = 512;
 
 constexpr int NIFTI_HDR_SIZE = 348;
 
-template <typename T>
+template<typename T>
 T readLE(const char* p)
 {
     T v;
@@ -89,7 +90,7 @@ T readLE(const char* p)
     return qFromLittleEndian(v);
 }
 
-template <typename T>
+template<typename T>
 T readBE(const char* p)
 {
     T v;
@@ -122,7 +123,7 @@ bool MriNiftiIO::decompress(const QString& gzFile, QByteArray& rawData)
         return false;
     }
 
-    strm.next_in  = reinterpret_cast<Bytef*>(const_cast<char*>(compressed.data()));
+    strm.next_in = reinterpret_cast<Bytef*>(const_cast<char*>(compressed.data()));
     strm.avail_in = static_cast<uInt>(compressed.size());
 
     const int chunkSize = 256 * 1024;
@@ -131,7 +132,7 @@ bool MriNiftiIO::decompress(const QString& gzFile, QByteArray& rawData)
     int ret = Z_OK;
     do {
         rawData.resize(rawData.size() + chunkSize);
-        strm.next_out  = reinterpret_cast<Bytef*>(rawData.data() + rawData.size() - chunkSize);
+        strm.next_out = reinterpret_cast<Bytef*>(rawData.data() + rawData.size() - chunkSize);
         strm.avail_out = chunkSize;
 
         ret = inflate(&strm, Z_NO_FLUSH);
@@ -207,17 +208,17 @@ bool MriNiftiIO::read(const QString& niiFile, MriVolData& volData, bool verbose)
 
     // dim[0..7] starts at offset 40; dim[0] = ndim, dim[1..3] = nx,ny,nz, dim[4] = nt.
     qint16 ndim = i16(40);
-    qint16 nx   = i16(42);
-    qint16 ny   = i16(44);
-    qint16 nz   = i16(46);
-    qint16 nt   = i16(48);
+    qint16 nx = i16(42);
+    qint16 ny = i16(44);
+    qint16 nz = i16(46);
+    qint16 nt = i16(48);
     if (ndim < 3 || nx <= 0 || ny <= 0 || nz <= 0) {
         qCritical() << "MriNiftiIO::read - degenerate dims" << ndim << nx << ny << nz;
         return false;
     }
 
     qint16 datatype = i16(70);
-    qint16 bitpix   = i16(72);
+    qint16 bitpix = i16(72);
     Q_UNUSED(bitpix);
 
     // pixdim[0..7] starts at offset 76. pixdim[1..3] = spacing in mm; pixdim[0] is the qfac sign.
@@ -230,8 +231,8 @@ bool MriNiftiIO::read(const QString& niiFile, MriVolData& volData, bool verbose)
     const float dz = std::fabs(f32(88));
 
     const float voxOffset = f32(108);
-    const float sclSlope  = f32(112);
-    const float sclInter  = f32(116);
+    const float sclSlope = f32(112);
+    const float sclInter = f32(116);
 
     const qint16 qformCode = i16(252);
     const qint16 sformCode = i16(254);
@@ -240,12 +241,30 @@ bool MriNiftiIO::read(const QString& niiFile, MriVolData& volData, bool verbose)
     int mriType = MRI_UCHAR;
     int bpv = 1;
     switch (datatype) {
-        case DT_UINT8:   mriType = MRI_UCHAR; bpv = 1; break;
-        case DT_INT8:    mriType = MRI_UCHAR; bpv = 1; break;  // promoted to unsigned, negatives clamped
-        case DT_INT16:   mriType = MRI_SHORT; bpv = 2; break;
-        case DT_UINT16:  mriType = MRI_SHORT; bpv = 2; break;
-        case DT_INT32:   mriType = MRI_INT;   bpv = 4; break;
-        case DT_FLOAT32: mriType = MRI_FLOAT; bpv = 4; break;
+        case DT_UINT8:
+            mriType = MRI_UCHAR;
+            bpv = 1;
+            break;
+        case DT_INT8:
+            mriType = MRI_UCHAR;
+            bpv = 1;
+            break; // promoted to unsigned, negatives clamped
+        case DT_INT16:
+            mriType = MRI_SHORT;
+            bpv = 2;
+            break;
+        case DT_UINT16:
+            mriType = MRI_SHORT;
+            bpv = 2;
+            break;
+        case DT_INT32:
+            mriType = MRI_INT;
+            bpv = 4;
+            break;
+        case DT_FLOAT32:
+            mriType = MRI_FLOAT;
+            bpv = 4;
+            break;
         default:
             qCritical() << "MriNiftiIO::read - unsupported datatype" << datatype;
             return false;
@@ -266,9 +285,9 @@ bool MriNiftiIO::read(const QString& niiFile, MriVolData& volData, bool verbose)
         const float aSq = 1.0f - (b * b + c * c + d * d);
         const float a = aSq > 0.0f ? std::sqrt(aSq) : 0.0f;
         Matrix3f R;
-        R << a*a + b*b - c*c - d*d, 2.0f*(b*c - a*d),       2.0f*(b*d + a*c),
-             2.0f*(b*c + a*d),       a*a + c*c - b*b - d*d, 2.0f*(c*d - a*b),
-             2.0f*(b*d - a*c),       2.0f*(c*d + a*b),       a*a + d*d - b*b - c*c;
+        R << a * a + b * b - c * c - d * d, 2.0f * (b * c - a * d), 2.0f * (b * d + a * c),
+            2.0f * (b * c + a * d), a * a + c * c - b * b - d * d, 2.0f * (c * d - a * b),
+            2.0f * (b * d - a * c), 2.0f * (c * d + a * b), a * a + d * d - b * b - c * c;
         Matrix3f S = Matrix3f::Zero();
         S(0, 0) = dx;
         S(1, 1) = dy;
@@ -295,9 +314,12 @@ bool MriNiftiIO::read(const QString& niiFile, MriVolData& volData, bool verbose)
     float sx = col0.norm();
     float sy = col1.norm();
     float sz = col2.norm();
-    if (sx <= 0.0f) sx = dx > 0.0f ? dx : 1.0f;
-    if (sy <= 0.0f) sy = dy > 0.0f ? dy : 1.0f;
-    if (sz <= 0.0f) sz = dz > 0.0f ? dz : 1.0f;
+    if (sx <= 0.0f)
+        sx = dx > 0.0f ? dx : 1.0f;
+    if (sy <= 0.0f)
+        sy = dy > 0.0f ? dy : 1.0f;
+    if (sz <= 0.0f)
+        sz = dz > 0.0f ? dz : 1.0f;
 
     Vector3f xRas = col0 / sx;
     Vector3f yRas = col1 / sy;
@@ -306,21 +328,21 @@ bool MriNiftiIO::read(const QString& niiFile, MriVolData& volData, bool verbose)
     Vector4f centreVox(nx * 0.5f, ny * 0.5f, nz * 0.5f, 1.0f);
     Vector4f cRas4 = vox2ras * centreVox;
 
-    volData.version = MRI_MGH_VERSION;  // mark as a valid volume for isValid()
-    volData.width   = nx;
-    volData.height  = ny;
-    volData.depth   = nz;
+    volData.version = MRI_MGH_VERSION; // mark as a valid volume for isValid()
+    volData.width = nx;
+    volData.height = ny;
+    volData.depth = nz;
     volData.nframes = nt > 0 ? nt : 1;
-    volData.type    = mriType;
-    volData.dof     = 0;
+    volData.type = mriType;
+    volData.dof = 0;
     volData.rasGood = true;
-    volData.xsize   = sx;
-    volData.ysize   = sy;
-    volData.zsize   = sz;
-    volData.x_ras   = xRas;
-    volData.y_ras   = yRas;
-    volData.z_ras   = zRas;
-    volData.c_ras   = cRas4.head<3>();
+    volData.xsize = sx;
+    volData.ysize = sy;
+    volData.zsize = sz;
+    volData.x_ras = xRas;
+    volData.y_ras = yRas;
+    volData.z_ras = zRas;
+    volData.c_ras = cRas4.head<3>();
     volData.voxelSurfRasT = FiffCoordTrans(
         FIFFV_COORD_MRI_SLICE, FIFFV_COORD_MRI, volData.computeVox2Ras(), true);
 
@@ -347,11 +369,11 @@ bool MriNiftiIO::read(const QString& niiFile, MriVolData& volData, bool verbose)
 
     for (int k = 0; k < nslice; ++k) {
         MriSlice& slice = volData.slices[k];
-        slice.width  = nx;
+        slice.width = nx;
         slice.height = ny;
-        slice.dimx   = sx / 1000.0f;
-        slice.dimy   = sy / 1000.0f;
-        slice.scale  = 1.0f;
+        slice.dimx = sx / 1000.0f;
+        slice.dimy = sy / 1000.0f;
+        slice.scale = 1.0f;
 
         switch (mriType) {
             case MRI_UCHAR: {

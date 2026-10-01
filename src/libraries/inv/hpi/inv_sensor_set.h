@@ -47,15 +47,17 @@
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-namespace FWDLIB{
-    class FwdCoil;
-    class FwdCoilSet;
+namespace FWDLIB
+{
+class FwdCoil;
+class FwdCoilSet;
 }
 
-namespace FIFFLIB{
-    class FiffCoordTrans;
-    class FiffDigPointSet;
-    class FiffChInfo;
+namespace FIFFLIB
+{
+class FiffCoordTrans;
+class FiffDigPointSet;
+class FiffChInfo;
 }
 
 //=============================================================================================================
@@ -64,13 +66,18 @@ namespace FIFFLIB{
 
 namespace INVLIB
 {
-enum class Accuracy : int{high = 2, medium = 1, low = 0};
+enum class Accuracy : int
+{
+    high = 2,
+    medium = 1,
+    low = 0
+};
 
 /**
  * @brief Stores MEG sensor geometry (positions, orientations, weights, coil count) for a single sensor type
  */
-class INVSHARED_EXPORT InvSensorSet {
-
+class INVSHARED_EXPORT InvSensorSet
+{
 public:
     typedef QSharedPointer<InvSensorSet> SPtr;            /**< Shared pointer type for InvSensorSet. */
     typedef QSharedPointer<const InvSensorSet> ConstSPtr; /**< Const shared pointer type for InvSensorSet. */
@@ -110,8 +117,8 @@ public:
     inline Eigen::RowVectorXd w(int iSensor) const;
     inline Eigen::RowVectorXd w() const;
 
-    inline bool operator== (const InvSensorSet &b) const;
-    inline bool operator!= (const InvSensorSet &b) const;
+    inline bool operator==(const InvSensorSet& b) const;
+    inline bool operator!=(const InvSensorSet& b) const;
 
 private:
     //=========================================================================================================
@@ -131,11 +138,11 @@ private:
      */
     void initMatrices(int iNchan, int iNp);
 
-    Eigen::MatrixXd m_ez{Eigen::MatrixXd(0,0)};
-    Eigen::MatrixXd m_r0{Eigen::MatrixXd(0,0)};
-    Eigen::MatrixXd m_rmag{Eigen::MatrixXd(0,0)};
-    Eigen::MatrixXd m_cosmag{Eigen::MatrixXd(0,0)};
-    Eigen::MatrixXd m_tra{Eigen::MatrixXd(0,0)};
+    Eigen::MatrixXd m_ez{Eigen::MatrixXd(0, 0)};
+    Eigen::MatrixXd m_r0{Eigen::MatrixXd(0, 0)};
+    Eigen::MatrixXd m_rmag{Eigen::MatrixXd(0, 0)};
+    Eigen::MatrixXd m_cosmag{Eigen::MatrixXd(0, 0)};
+    Eigen::MatrixXd m_tra{Eigen::MatrixXd(0, 0)};
     Eigen::RowVectorXd m_w{Eigen::RowVectorXd(0)};
     int m_ncoils{0};
     int m_np{0};
@@ -177,7 +184,7 @@ inline Eigen::MatrixXd InvSensorSet::r0() const
 
 inline Eigen::RowVectorXd InvSensorSet::w(int iSensor) const
 {
-    return m_w.segment(iSensor*m_np,m_np);
+    return m_w.segment(iSensor * m_np, m_np);
 }
 
 inline Eigen::RowVectorXd InvSensorSet::w() const
@@ -187,7 +194,7 @@ inline Eigen::RowVectorXd InvSensorSet::w() const
 
 inline Eigen::MatrixXd InvSensorSet::rmag(int iSensor) const
 {
-    return m_rmag.block(iSensor*m_np,0,m_np,3);
+    return m_rmag.block(iSensor * m_np, 0, m_np, 3);
 }
 
 inline Eigen::MatrixXd InvSensorSet::rmag() const
@@ -197,7 +204,7 @@ inline Eigen::MatrixXd InvSensorSet::rmag() const
 
 inline Eigen::MatrixXd InvSensorSet::cosmag(int iSensor) const
 {
-    return m_cosmag.block(iSensor*m_np,0,m_np,3);
+    return m_cosmag.block(iSensor * m_np, 0, m_np, 3);
 }
 
 inline Eigen::MatrixXd InvSensorSet::cosmag() const
@@ -211,7 +218,7 @@ inline Eigen::MatrixXd InvSensorSet::tra() const
 }
 //=============================================================================================================
 
-inline bool InvSensorSet::operator== (const InvSensorSet &b) const
+inline bool InvSensorSet::operator==(const InvSensorSet& b) const
 {
     return (this->ez() == b.ez() &&
             this->r0() == b.r0() &&
@@ -225,9 +232,9 @@ inline bool InvSensorSet::operator== (const InvSensorSet &b) const
 
 //=============================================================================================================
 
-inline bool InvSensorSet::operator!= (const InvSensorSet &b) const
+inline bool InvSensorSet::operator!=(const InvSensorSet& b) const
 {
-    bool equal = this==&b;
+    bool equal = this == &b;
     return !(equal);
 }
 
@@ -239,7 +246,6 @@ inline bool InvSensorSet::operator!= (const InvSensorSet &b) const
  */
 class INVSHARED_EXPORT InvSensorSetCreator
 {
-
 public:
     typedef QSharedPointer<InvSensorSetCreator> SPtr;            /**< Shared pointer type for InvSensorSet. */
     typedef QSharedPointer<const InvSensorSetCreator> ConstSPtr; /**< Const shared pointer type for InvSensorSet. */
@@ -260,10 +266,10 @@ public:
      * @return Sensor set built from the MEG coil definitions, or an empty set if channelList is empty.
      */
     InvSensorSet updateSensorSet(const QList<FIFFLIB::FiffChInfo>& channelList,
-                              const Accuracy& accuracy);
+                                 const Accuracy& accuracy);
 
 private:
-    QSharedPointer<FWDLIB::FwdCoilSet>  m_pCoilDefinitions{nullptr};    // the coil definitions as template
+    QSharedPointer<FWDLIB::FwdCoilSet> m_pCoilDefinitions{nullptr}; // the coil definitions as template
 };
 
 //=============================================================================================================
@@ -273,4 +279,3 @@ private:
 } // namespace INVLIB
 
 #endif // INV_SENSOR_SET_H
-

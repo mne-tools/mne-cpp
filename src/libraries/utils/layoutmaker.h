@@ -69,10 +69,11 @@ namespace UTILSLIB
 //=============================================================================================================
 
 /** @brief Workspace for sphere-fitting used by the layout maker, holding 3-D point coordinates and fit parameters. */
-struct fitUserRec {
-  Eigen::MatrixXf rr;
-  int   np;
-  int   report;
+struct fitUserRec
+{
+    Eigen::MatrixXf rr;
+    int np;
+    int report;
 };
 using fitUser = fitUserRec*;
 
@@ -85,7 +86,6 @@ using fitUser = fitUserRec*;
 class UTILSSHARED_EXPORT LayoutMaker
 {
 public:
-
     //=========================================================================================================
     /**
      * Reads the specified ANT elc-layout file.
@@ -103,10 +103,10 @@ public:
      *
      * @return true if making layout was successful, false otherwise.
      */
-    static bool makeLayout(const QList<QVector<float> > &inputPoints,
-                           QList<QVector<float> > &outputPoints,
-                           const QStringList &names,
-                           QFile &outFile,
+    static bool makeLayout(const QList<QVector<float>>& inputPoints,
+                           QList<QVector<float>>& outputPoints,
+                           const QStringList& names,
+                           QFile& outFile,
                            bool do_fit,
                            float prad,
                            float w,
@@ -132,9 +132,9 @@ public:
      *
      * @return true if making layout was successful, false otherwise.
      */
-    static bool makeLayout(const std::vector<std::vector<float> > &inputPoints,
-                           std::vector<std::vector<float> > &outputPoints,
-                           const std::vector<std::string> &names,
+    static bool makeLayout(const std::vector<std::vector<float>>& inputPoints,
+                           std::vector<std::vector<float>>& outputPoints,
+                           const std::vector<std::string>& names,
                            const std::string& outFilePath,
                            bool do_fit,
                            float prad,
@@ -146,11 +146,11 @@ public:
 
 private:
     static void sphere_coord(float x,
-                      float y,
-                      float z,
-                      float *r,
-                      float *theta,
-                      float *phi);
+                             float y,
+                             float z,
+                             float* r,
+                             float* theta,
+                             float* phi);
 };
 } //NAMESPACE
 

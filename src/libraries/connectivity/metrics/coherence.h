@@ -66,7 +66,8 @@
 // DEFINE NAMESPACE CONNECTIVITYLIB
 //=============================================================================================================
 
-namespace CONNECTIVITYLIB {
+namespace CONNECTIVITYLIB
+{
 
 //=============================================================================================================
 // CONNECTIVITYLIB FORWARD DECLARATIONS
@@ -88,7 +89,6 @@ class ConnectivitySettings;
  */
 class CONNECTIVITYSHARED_EXPORT Coherence : public AbstractMetric
 {
-
 public:
     typedef QSharedPointer<Coherence> SPtr;            /**< Shared pointer type for Coherence. */
     typedef QSharedPointer<const Coherence> ConstSPtr; /**< Const shared pointer type for Coherence. */
@@ -107,7 +107,7 @@ public:
      *
      * @return                   The connectivity information in form of a network structure.
      */
-    static Network calculate(ConnectivitySettings &connectivitySettings);
+    static Network calculate(ConnectivitySettings& connectivitySettings);
 };
 
 //=============================================================================================================

@@ -137,15 +137,13 @@ MatrixXd InvLabelTimeCourse::extract(const InvSourceEstimate& stc,
 
         if (mode == "mean") {
             result.row(oi) = labelData.colwise().mean();
-        }
-        else if (mode == "mean_flip") {
+        } else if (mode == "mean_flip") {
             VectorXd signs = computeSignFlip(labelData);
             MatrixXd flipped = labelData;
             for (int i = 0; i < nVerts; ++i)
                 flipped.row(i) *= signs[i];
             result.row(oi) = flipped.colwise().mean();
-        }
-        else if (mode == "pca_flip") {
+        } else if (mode == "pca_flip") {
             // Demean across time
             RowVectorXd meanTime = labelData.colwise().mean();
             MatrixXd centered = labelData.rowwise() - meanTime;
@@ -165,8 +163,7 @@ MatrixXd InvLabelTimeCourse::extract(const InvSourceEstimate& stc,
                 pc1 = -pc1;
 
             result.row(oi) = pc1;
-        }
-        else if (mode == "max") {
+        } else if (mode == "max") {
             // Maximum absolute value at each time point
             for (int t = 0; t < nTimes; ++t) {
                 double maxVal = 0.0;
@@ -180,10 +177,9 @@ MatrixXd InvLabelTimeCourse::extract(const InvSourceEstimate& stc,
                 }
                 result(oi, t) = maxVal;
             }
-        }
-        else {
+        } else {
             qWarning() << "[InvLabelTimeCourse::extract] Unknown mode:" << mode
-                        << "— using mean.";
+                       << "— using mean.";
             result.row(oi) = labelData.colwise().mean();
         }
     }

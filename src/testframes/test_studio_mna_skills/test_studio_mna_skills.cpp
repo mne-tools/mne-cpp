@@ -52,7 +52,7 @@ using namespace MNEANALYZESTUDIO;
  *
  * @brief Checks the MNA workflow skill definitions and their failure handling.
  */
-class TestStudioMnaSkills: public QObject
+class TestStudioMnaSkills : public QObject
 {
     Q_OBJECT
 
@@ -84,7 +84,7 @@ void TestStudioMnaSkills::verifyDefinitionShape(const QJsonObject& definition, c
     const QStringList required{"skill_id", "tool_name", "display_name",
                                "description", "extension_id"};
 
-    for(const QString& key : required) {
+    for (const QString& key : required) {
         QVERIFY2(definition.contains(key),
                  qPrintable(QString("%1 definition has no %2").arg(skillName, key)));
         QVERIFY2(!definition.value(key).toString().isEmpty(),
@@ -104,9 +104,9 @@ void TestStudioMnaSkills::definitions_haveTheFieldsTheManagerReads_data()
     // The identifiers are pinned rather than only checked for presence. They
     // are what a saved workflow refers to, so renaming one silently breaks
     // every stored graph that used it.
-    QTest::newRow("write") << 0 << "WriteMnaSkill"    << "mne.skills.write_mna"     << "write_mna_project";
-    QTest::newRow("read")  << 1 << "ReadMnaSkill"     << "mne.skills.read_mna"      << "read_mna_project";
-    QTest::newRow("run")   << 2 << "RunMnaGraphSkill" << "mne.skills.run_mna_graph" << "run_mna_graph";
+    QTest::newRow("write") << 0 << "WriteMnaSkill" << "mne.skills.write_mna" << "write_mna_project";
+    QTest::newRow("read") << 1 << "ReadMnaSkill" << "mne.skills.read_mna" << "read_mna_project";
+    QTest::newRow("run") << 2 << "RunMnaGraphSkill" << "mne.skills.run_mna_graph" << "run_mna_graph";
 }
 
 //=============================================================================================================
@@ -119,11 +119,24 @@ void TestStudioMnaSkills::definitions_haveTheFieldsTheManagerReads()
     QFETCH(QString, expectedToolName);
 
     QJsonObject definition;
-    switch(skillIndex) {
-        case 0: { WriteMnaSkill skill;    definition = skill.getOperatorDefinition(); break; }
-        case 1: { ReadMnaSkill skill;     definition = skill.getOperatorDefinition(); break; }
-        case 2: { RunMnaGraphSkill skill; definition = skill.getOperatorDefinition(); break; }
-        default: QFAIL("unknown skill index");
+    switch (skillIndex) {
+        case 0: {
+            WriteMnaSkill skill;
+            definition = skill.getOperatorDefinition();
+            break;
+        }
+        case 1: {
+            ReadMnaSkill skill;
+            definition = skill.getOperatorDefinition();
+            break;
+        }
+        case 2: {
+            RunMnaGraphSkill skill;
+            definition = skill.getOperatorDefinition();
+            break;
+        }
+        default:
+            QFAIL("unknown skill index");
     }
 
     verifyDefinitionShape(definition, skillName);
@@ -149,7 +162,7 @@ void TestStudioMnaSkills::definitions_haveDistinctIdentifiers()
     QSet<QString> skillIds;
     QSet<QString> toolNames;
 
-    for(const QJsonObject& definition : definitions) {
+    for (const QJsonObject& definition : definitions) {
         const QString skillId = definition.value("skill_id").toString();
         const QString toolName = definition.value("tool_name").toString();
 
@@ -187,7 +200,7 @@ void TestStudioMnaSkills::writeSkill_rejectsNodeWithoutOutputPath()
     // The message names the node, which is what makes a failed graph readable.
     QVERIFY2(result.value("message").toString().contains("node-1"),
              qPrintable(QString("error does not identify the node: %1")
-                        .arg(result.value("message").toString())));
+                            .arg(result.value("message").toString())));
 }
 
 //=============================================================================================================

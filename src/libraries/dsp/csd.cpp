@@ -53,14 +53,14 @@ constexpr double CSD_PI = 3.14159265358979323846;
 //=============================================================================================================
 
 CsdResult Csd::computeMultitaper(const MatrixXd& matData,
-                                 double          sfreq,
-                                 double          fmin,
-                                 double          fmax,
-                                 double          halfBandwidth,
-                                 int             nTapers)
+                                 double sfreq,
+                                 double fmin,
+                                 double fmax,
+                                 double halfBandwidth,
+                                 int nTapers)
 {
     const int nChannels = static_cast<int>(matData.rows());
-    const int nTimes    = static_cast<int>(matData.cols());
+    const int nTimes = static_cast<int>(matData.cols());
     const int nFreqsFull = nTimes / 2 + 1;
 
     if (fmax < 0.0)
@@ -97,8 +97,7 @@ CsdResult Csd::computeMultitaper(const MatrixXd& matData,
         MatrixXcd spectra(nChannels, nFreqsFull);
 
         for (int ch = 0; ch < nChannels; ++ch) {
-            VectorXd tapered = matData.row(ch).transpose().array()
-                             * dpss.matTapers.row(t).transpose().array();
+            VectorXd tapered = matData.row(ch).transpose().array() * dpss.matTapers.row(t).transpose().array();
 
             VectorXcd spec;
             fft.fwd(spec, tapered);
@@ -138,14 +137,14 @@ CsdResult Csd::computeMultitaper(const MatrixXd& matData,
 //=============================================================================================================
 
 CsdResult Csd::computeFourier(const MatrixXd& matData,
-                               double          sfreq,
-                               double          fmin,
-                               double          fmax,
-                               int             nFft,
-                               double          overlap)
+                              double sfreq,
+                              double fmin,
+                              double fmax,
+                              int nFft,
+                              double overlap)
 {
     const int nChannels = static_cast<int>(matData.rows());
-    const int nTimes    = static_cast<int>(matData.cols());
+    const int nTimes = static_cast<int>(matData.cols());
 
     if (nFft > nTimes)
         nFft = nTimes;
@@ -168,8 +167,7 @@ CsdResult Csd::computeFourier(const MatrixXd& matData,
     }
     const double winPow = hannWin.squaredNorm();
 
-    const int iStep = std::max(1, static_cast<int>(std::round(
-                          static_cast<double>(nFft) * (1.0 - overlap))));
+    const int iStep = std::max(1, static_cast<int>(std::round(static_cast<double>(nFft) * (1.0 - overlap))));
 
     // Initialize per-frequency CSD accumulators
     std::vector<MatrixXcd> csdAccum(static_cast<std::size_t>(nFreqsSel),
@@ -184,8 +182,7 @@ CsdResult Csd::computeFourier(const MatrixXd& matData,
         MatrixXcd spectra(nChannels, nFreqsFull);
 
         for (int ch = 0; ch < nChannels; ++ch) {
-            VectorXd seg = matData.row(ch).segment(start, nFft).transpose().array()
-                         * hannWin.array();
+            VectorXd seg = matData.row(ch).segment(start, nFft).transpose().array() * hannWin.array();
 
             VectorXcd spec;
             fft.fwd(spec, seg);
@@ -228,14 +225,14 @@ CsdResult Csd::computeFourier(const MatrixXd& matData,
 
 //=============================================================================================================
 
-CsdResult Csd::computeMorlet(const MatrixXd&      matData,
-                              double               sfreq,
-                              const RowVectorXd&   frequencies,
-                              int                  nCycles)
+CsdResult Csd::computeMorlet(const MatrixXd& matData,
+                             double sfreq,
+                             const RowVectorXd& frequencies,
+                             int nCycles)
 {
     const int nChannels = static_cast<int>(matData.rows());
-    const int nTimes    = static_cast<int>(matData.cols());
-    const int nFreqs    = static_cast<int>(frequencies.size());
+    const int nTimes = static_cast<int>(matData.cols());
+    const int nFreqs = static_cast<int>(frequencies.size());
 
     CsdResult result;
     result.vecFreqs = frequencies;
@@ -249,7 +246,7 @@ CsdResult Csd::computeMorlet(const MatrixXd&      matData,
 
         // Determine wavelet length: ±3σ in samples
         const int halfLen = static_cast<int>(std::ceil(3.0 * sigma * sfreq));
-        const int wavLen  = 2 * halfLen + 1;
+        const int wavLen = 2 * halfLen + 1;
 
         // Build Morlet wavelet
         VectorXcd wavelet(wavLen);

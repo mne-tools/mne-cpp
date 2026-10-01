@@ -68,7 +68,7 @@ using namespace UTILSLIB;
  * @param[in] argv (argument vector) is an array of pointers to arrays of character objects. The array objects are null-terminated strings, representing the arguments that were entered on the command line when the program was started.
  * @return the value that was set to exit() (which is 0 if exit() is called via quit()).
  */
-int main(int argc, char *argv[])
+int main(int argc, char* argv[])
 {
     qInstallMessageHandler(MNELogger::customLogWriter);
     QApplication a(argc, argv);
@@ -98,16 +98,16 @@ int main(int argc, char *argv[])
     float to = parser.value(toOption).toFloat();
 
     bool in_samples = false;
-    if(parser.value(inSamplesOption) == "false" || parser.value(inSamplesOption) == "0") {
+    if (parser.value(inSamplesOption) == "false" || parser.value(inSamplesOption) == "0") {
         in_samples = false;
-    } else if(parser.value(inSamplesOption) == "true" || parser.value(inSamplesOption) == "1") {
+    } else if (parser.value(inSamplesOption) == "true" || parser.value(inSamplesOption) == "1") {
         in_samples = true;
     }
 
     bool keep_comp = false;
-    if(parser.value(keepCompOption) == "false" || parser.value(keepCompOption) == "0") {
+    if (parser.value(keepCompOption) == "false" || parser.value(keepCompOption) == "0") {
         keep_comp = false;
-    } else if(parser.value(keepCompOption) == "true" || parser.value(keepCompOption) == "1") {
+    } else if (parser.value(keepCompOption) == "true" || parser.value(keepCompOption) == "1") {
         keep_comp = true;
     }
 
@@ -122,9 +122,9 @@ int main(int argc, char *argv[])
     //
     QStringList include;
     include << "STI 014";
-    bool want_meg   = true;
-    bool want_eeg   = false;
-    bool want_stim  = false;
+    bool want_meg = true;
+    bool want_eeg = false;
+    bool want_stim = false;
 
     RowVectorXi picks = raw.info.pick_types(want_meg, want_eeg, want_stim, include, raw.info.bads);
 
@@ -134,8 +134,7 @@ int main(int argc, char *argv[])
     qint32 k = 0;
     if (raw.info.projs.size() == 0)
         printf("No projector specified for these data\n");
-    else
-    {
+    else {
         //
         //   Activate the projection items
         //
@@ -152,7 +151,7 @@ int main(int argc, char *argv[])
         if (nproj == 0)
             printf("The projection vectors do not apply to these channels\n");
         else
-            printf("Created an SSP operator (subspace dimension = %d)\n",nproj);
+            printf("Created an SSP operator (subspace dimension = %d)\n", nproj);
     }
 
     //
@@ -162,21 +161,17 @@ int main(int argc, char *argv[])
     qint32 dest_comp = -1;
 
     if (current_comp > 0)
-        printf("Current compensation grade : %d\n",current_comp);
+        printf("Current compensation grade : %d\n", current_comp);
 
     if (keep_comp)
         dest_comp = current_comp;
 
-    if (current_comp != dest_comp)
-    {
+    if (current_comp != dest_comp) {
         qDebug() << "This part needs to be debugged";
-        if(MNE::make_compensator(raw.info, current_comp, dest_comp, raw.comp))
-        {
+        if (MNE::make_compensator(raw.info, current_comp, dest_comp, raw.comp)) {
             raw.info.set_current_comp(dest_comp);
-            printf("Appropriate compensator added to change to grade %d.\n",dest_comp);
-        }
-        else
-        {
+            printf("Appropriate compensator added to change to grade %d.\n", dest_comp);
+        } else {
             printf("Could not make the compensator\n");
             //return -1;
         }
@@ -194,20 +189,19 @@ int main(int argc, char *argv[])
     else
         readSuccessful = raw.read_raw_segment_times(data, times, from, to, picks);
 
-    if (!readSuccessful)
-    {
+    if (!readSuccessful) {
         printf("Could not read raw segment.\n");
         return -1;
     }
 
-    printf("Read %d samples.\n",(qint32)data.cols());
+    printf("Read %d samples.\n", (qint32)data.cols());
 
     //ImageSc example
     ImageSc imagesc(data);
     imagesc.setTitle("Data ImageSc");
     imagesc.setXLabel("X Axes");
     imagesc.setYLabel("Y Axes");
-    imagesc.setColorMap("Hot");//imagesc.setColorMap("Jet");//imagesc.setColorMap("RedBlue");//imagesc.setColorMap("Bone");//imagesc.setColorMap("Jet");//imagesc.setColorMap("Hot");
+    imagesc.setColorMap("Hot"); //imagesc.setColorMap("Jet");//imagesc.setColorMap("RedBlue");//imagesc.setColorMap("Bone");//imagesc.setColorMap("Jet");//imagesc.setColorMap("Hot");
     imagesc.show();
 
     //Plot example
@@ -222,7 +216,7 @@ int main(int argc, char *argv[])
     //ToDo: Debug tfplot
     //tf plot example
     dataCol = data.row(0).transpose();
-    MatrixXd dataSpectrum = Spectrogram::makeSpectrogram(dataCol, raw.info.sfreq*0.2);
+    MatrixXd dataSpectrum = Spectrogram::makeSpectrogram(dataCol, raw.info.sfreq * 0.2);
 
     TFplot tfplot(dataSpectrum, raw.info.sfreq, 0, 100, ColorMaps::Jet);
     tfplot.show();

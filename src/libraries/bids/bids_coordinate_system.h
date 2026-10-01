@@ -67,12 +67,12 @@ namespace BIDSLIB
  */
 struct BIDSSHARED_EXPORT BidsCoordinateSystem
 {
-    QString system;                     /**< e.g. "ACPC", "MNI305", "Other" (REQUIRED for iEEG). */
-    QString units;                      /**< "m", "mm", or "cm" (REQUIRED for iEEG). */
-    QString description;                /**< Description of the coordinate system (RECOMMENDED). */
-    QString processingDescription;      /**< How coordinates were obtained (RECOMMENDED). */
-    QString associatedImagePath;        /**< Relative path to associated T1w image (OPTIONAL). */
-    Eigen::Matrix4d transform;          /**< 4x4 affine transform (identity if not provided). */
+    QString system;                /**< e.g. "ACPC", "MNI305", "Other" (REQUIRED for iEEG). */
+    QString units;                 /**< "m", "mm", or "cm" (REQUIRED for iEEG). */
+    QString description;           /**< Description of the coordinate system (RECOMMENDED). */
+    QString processingDescription; /**< How coordinates were obtained (RECOMMENDED). */
+    QString associatedImagePath;   /**< Relative path to associated T1w image (OPTIONAL). */
+    Eigen::Matrix4d transform;     /**< 4x4 affine transform (identity if not provided). */
 
     /**
      * @brief Read a BIDS *_coordsystem.json file.
@@ -97,7 +97,7 @@ struct BIDSSHARED_EXPORT BidsCoordinateSystem
      * @return FiffCoordTrans populated with the parsed 4x4 matrix.
      */
     FIFFLIB::FiffCoordTrans toFiffCoordTrans(int fromFrame = FIFFV_COORD_MRI,
-                                              int toFrame = FIFFV_COORD_HEAD) const;
+                                             int toFrame = FIFFV_COORD_HEAD) const;
 };
 
 } // namespace BIDSLIB

@@ -38,20 +38,23 @@
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-namespace ANSHAREDLIB {
-    class ChannelData;
-    class EventModel;
+namespace ANSHAREDLIB
+{
+class ChannelData;
+class EventModel;
 }
 
-namespace EVENTSLIB {
-    struct Event;
+namespace EVENTSLIB
+{
+struct Event;
 }
 
 //=============================================================================================================
 // DEFINE NAMESPACE RAWDATAVIEWERPLUGIN
 //=============================================================================================================
 
-namespace RAWDATAVIEWERPLUGIN {
+namespace RAWDATAVIEWERPLUGIN
+{
 
 //=============================================================================================================
 // RAWDATAVIEWERPLUGIN FORWARD DECLARATIONS
@@ -70,8 +73,8 @@ class RAWDATAVIEWERSHARED_EXPORT FiffRawViewDelegate : public QAbstractItemDeleg
     Q_OBJECT
 
 public:
-    typedef QSharedPointer<FiffRawViewDelegate> SPtr;              /**< Shared pointer type for FiffRawViewDelegate. */
-    typedef QSharedPointer<const FiffRawViewDelegate> ConstSPtr;   /**< Const shared pointer type for FiffRawViewDelegate. */
+    typedef QSharedPointer<FiffRawViewDelegate> SPtr;            /**< Shared pointer type for FiffRawViewDelegate. */
+    typedef QSharedPointer<const FiffRawViewDelegate> ConstSPtr; /**< Const shared pointer type for FiffRawViewDelegate. */
 
     //=========================================================================================================
     /**
@@ -79,7 +82,7 @@ public:
      *
      * @param[in] parent     Parent of the delegate.
      */
-    FiffRawViewDelegate(QObject *parent = 0);
+    FiffRawViewDelegate(QObject* parent = 0);
 
     //=========================================================================================================
     /**
@@ -90,7 +93,7 @@ public:
      */
     void setUpperItemIndex(int iUpperItemIndex);
 
-       //=========================================================================================================
+    //=========================================================================================================
     /**
      * Use the painter and style option to render the item specified by the item index.
      *
@@ -100,9 +103,9 @@ public:
      * @param[in] option     Describes the parameters used to draw an item in a view widget.
      * @param[in] index      Used to locate data in a data model.
      */
-    virtual void paint(QPainter *painter,
-                       const QStyleOptionViewItem &option,
-                       const QModelIndex &index) const override;
+    virtual void paint(QPainter* painter,
+                       const QStyleOptionViewItem& option,
+                       const QModelIndex& index) const override;
 
     //=========================================================================================================
     /**
@@ -111,8 +114,8 @@ public:
      * @param[in] option     Describes the parameters used to draw an item in a view widget.
      * @param[in] index      Used to locate data in a data model.
      */
-    virtual QSize sizeHint(const QStyleOptionViewItem &option,
-                           const QModelIndex &index) const override;
+    virtual QSize sizeHint(const QStyleOptionViewItem& option,
+                           const QModelIndex& index) const override;
 
     //=========================================================================================================
     /**
@@ -132,11 +135,11 @@ private:
      * @param[in] data       Current data for the given row.
      * @param[in] dDx        pixel difference to the next sample in pixels.
      */
-    void createPlotPath(const QStyleOptionViewItem &option,
+    void createPlotPath(const QStyleOptionViewItem& option,
                         QPainterPath& path,
-                        ANSHAREDLIB::ChannelData &data,
+                        ANSHAREDLIB::ChannelData& data,
                         double dDx,
-                        const QModelIndex &index) const;
+                        const QModelIndex& index) const;
 
     //=========================================================================================================
     /**
@@ -147,10 +150,10 @@ private:
      * @param[in, out] path   The QPointerPath to create for the data plot.
      * @param[in] data       Data for the given row.
      */
-    void createTimeSpacersPath(const QModelIndex &index,
-                               const QStyleOptionViewItem &option,
+    void createTimeSpacersPath(const QModelIndex& index,
+                               const QStyleOptionViewItem& option,
                                QPainterPath& path,
-                               ANSHAREDLIB::ChannelData &data) const;
+                               ANSHAREDLIB::ChannelData& data) const;
 
     //=========================================================================================================
     /**
@@ -162,11 +165,11 @@ private:
      * @param[in] data              Data for the given row.
      * @param[in, out] painter      Used for drawing the events.
      */
-    void createEventsPath(const QModelIndex &index,
-                               const QStyleOptionViewItem &option,
-                               QPainterPath& path,
-                               ANSHAREDLIB::ChannelData &data,
-                               QPainter* painter) const;
+    void createEventsPath(const QModelIndex& index,
+                          const QStyleOptionViewItem& option,
+                          QPainterPath& path,
+                          ANSHAREDLIB::ChannelData& data,
+                          QPainter* painter) const;
 
     //=========================================================================================================
     /**
@@ -192,19 +195,18 @@ private:
                     double dDx) const;
 
     //=========================================================================================================
-    void createScroller(const QModelIndex &index,
-                        const QStyleOptionViewItem &option,
+    void createScroller(const QModelIndex& index,
+                        const QStyleOptionViewItem& option,
                         QPainterPath& path,
                         QPainter* painter) const;
 
-    int         m_iUpperItemIndex;          /**< The current upper item index visible in the QTableView. */
+    int m_iUpperItemIndex; /**< The current upper item index visible in the QTableView. */
 
-    QPen        m_penGrid;                  /**< Pen for drawing the data grid. */
-    QPen        m_penNormal;                /**< Pen for drawing the data when data is plotted normally without freeze on. */
-    QPen        m_penNormalSelected;        /**< Pen for drawing the data when data is plotted normally without freeze on and channel is selected. */
-    QPen        m_penNormalBad;             /**< Pen for drawing the data when bad data is plotted normally without freeze on. */
-    QPen        m_penNormalSelectedBad;     /**< Pen for drawing the data when bad data is plotted normally without freeze on and channel is selected. */
-
+    QPen m_penGrid;              /**< Pen for drawing the data grid. */
+    QPen m_penNormal;            /**< Pen for drawing the data when data is plotted normally without freeze on. */
+    QPen m_penNormalSelected;    /**< Pen for drawing the data when data is plotted normally without freeze on and channel is selected. */
+    QPen m_penNormalBad;         /**< Pen for drawing the data when bad data is plotted normally without freeze on. */
+    QPen m_penNormalSelectedBad; /**< Pen for drawing the data when bad data is plotted normally without freeze on and channel is selected. */
 };
 
 } // NAMESPACE RAWDATAVIEWERPLUGIN

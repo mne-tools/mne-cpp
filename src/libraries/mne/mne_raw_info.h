@@ -51,7 +51,10 @@
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-namespace FIFFLIB { class FiffCoordTrans; }
+namespace FIFFLIB
+{
+class FiffCoordTrans;
+}
 
 //=============================================================================================================
 // DEFINE NAMESPACE MNELIB
@@ -67,8 +70,8 @@ namespace MNELIB
 class MNESHARED_EXPORT MNERawInfo
 {
 public:
-    typedef QSharedPointer<MNERawInfo> SPtr;              /**< Shared pointer type for MNERawInfo. */
-    typedef QSharedPointer<const MNERawInfo> ConstSPtr;   /**< Const shared pointer type for MNERawInfo. */
+    typedef QSharedPointer<MNERawInfo> SPtr;            /**< Shared pointer type for MNERawInfo. */
+    typedef QSharedPointer<const MNERawInfo> ConstSPtr; /**< Const shared pointer type for MNERawInfo. */
 
     //=========================================================================================================
     /**
@@ -93,7 +96,7 @@ public:
      * @return Shared pointer to the enclosing FIFFB_MEAS node, or an empty
      *         shared pointer if no such node is found.
      */
-    static FIFFLIB::FiffDirNode::SPtr find_meas (const FIFFLIB::FiffDirNode::SPtr& node);
+    static FIFFLIB::FiffDirNode::SPtr find_meas(const FIFFLIB::FiffDirNode::SPtr& node);
 
     /**
      * Finds the FIFFB_MEAS_INFO child node within the nearest FIFFB_MEAS block.
@@ -107,7 +110,7 @@ public:
      * @return Shared pointer to the FIFFB_MEAS_INFO node, or an empty shared
      *         pointer if not found.
      */
-    static FIFFLIB::FiffDirNode::SPtr find_meas_info (const FIFFLIB::FiffDirNode::SPtr& node);
+    static FIFFLIB::FiffDirNode::SPtr find_meas_info(const FIFFLIB::FiffDirNode::SPtr& node);
 
     /**
      * Finds the raw data block in the FIFF directory tree.
@@ -120,7 +123,7 @@ public:
      * @return Shared pointer to the raw data directory node, or an empty shared
      *         pointer if neither raw nor continuous data blocks are found.
      */
-    static FIFFLIB::FiffDirNode::SPtr find_raw (const FIFFLIB::FiffDirNode::SPtr& node);
+    static FIFFLIB::FiffDirNode::SPtr find_raw(const FIFFLIB::FiffDirNode::SPtr& node);
 
     /**
      * Finds the MaxShield raw data block in the FIFF directory tree.
@@ -133,7 +136,7 @@ public:
      * @return Shared pointer to the MaxShield raw data directory node, or an
      *         empty shared pointer if no such block is found.
      */
-    static FIFFLIB::FiffDirNode::SPtr find_maxshield (const FIFFLIB::FiffDirNode::SPtr& node);
+    static FIFFLIB::FiffDirNode::SPtr find_maxshield(const FIFFLIB::FiffDirNode::SPtr& node);
 
     /**
      * Reads measurement information from the nearest FIFFB_MEAS_INFO parent of a node.
@@ -158,16 +161,16 @@ public:
      *
      * @return 0 on success, -1 on failure.
      */
-    static int get_meas_info (FIFFLIB::FiffStream::SPtr& stream,
-                              FIFFLIB::FiffDirNode::SPtr& node,
-                              std::unique_ptr<FIFFLIB::FiffId>& id,
-                              int *nchan,
-                              float *sfreq,
-                              float *highpass,
-                              float *lowpass,
-                              QList<FIFFLIB::FiffChInfo>& chp,
-                              FIFFLIB::FiffCoordTrans& trans,
-                              FIFFLIB::FiffTime& start_time);
+    static int get_meas_info(FIFFLIB::FiffStream::SPtr& stream,
+                             FIFFLIB::FiffDirNode::SPtr& node,
+                             std::unique_ptr<FIFFLIB::FiffId>& id,
+                             int* nchan,
+                             float* sfreq,
+                             float* highpass,
+                             float* lowpass,
+                             QList<FIFFLIB::FiffChInfo>& chp,
+                             FIFFLIB::FiffCoordTrans& trans,
+                             FIFFLIB::FiffTime& start_time);
 
     /**
      * @overload
@@ -185,15 +188,15 @@ public:
      *
      * @return 0 on success, -1 on failure.
      */
-    static int get_meas_info (FIFFLIB::FiffStream::SPtr& stream,
-                              FIFFLIB::FiffDirNode::SPtr& node,
-                              std::unique_ptr<FIFFLIB::FiffId>& id,
-                              int *nchan,
-                              float *sfreq,
-                              float *highpass,
-                              float *lowpass,
-                              QList<FIFFLIB::FiffChInfo>& chp,
-                              FIFFLIB::FiffCoordTrans& trans);
+    static int get_meas_info(FIFFLIB::FiffStream::SPtr& stream,
+                             FIFFLIB::FiffDirNode::SPtr& node,
+                             std::unique_ptr<FIFFLIB::FiffId>& id,
+                             int* nchan,
+                             float* sfreq,
+                             float* highpass,
+                             float* lowpass,
+                             QList<FIFFLIB::FiffChInfo>& chp,
+                             FIFFLIB::FiffCoordTrans& trans);
 
     /**
      * Loads raw data information from a FIFF file.
@@ -214,22 +217,22 @@ public:
     static int load(const QString& name, int allow_maxshield, std::unique_ptr<MNERawInfo>& infop);
 
 public:
-    QString             filename;      /**< The name of the file this comes from. */
-    std::unique_ptr<FIFFLIB::FiffId> id;  /**< Measurement id from the file. */
-    int                 nchan;          /**< Number of channels. */
-    QList<FIFFLIB::FiffChInfo> chInfo;         /**< Channel info data . */
-    int                 coord_frame;    /**< Which coordinate frame are the
+    QString filename;                               /**< The name of the file this comes from. */
+    std::unique_ptr<FIFFLIB::FiffId> id;            /**< Measurement id from the file. */
+    int nchan;                                      /**< Number of channels. */
+    QList<FIFFLIB::FiffChInfo> chInfo;              /**< Channel info data . */
+    int coord_frame;                                /**< Which coordinate frame are the
                                          * positions defined in?
                                          */
-    std::unique_ptr<FIFFLIB::FiffCoordTrans> trans;  /**< Coordinate transformation FIFF_COORD_HEAD <-> FIFF_COORD_DEVICE. */
-    float         sfreq;          /**< Sampling frequency. */
-    float         lowpass;        /**< Lowpass filter setting. */
-    float         highpass;       /**< Highpass filter setting. */
-    FIFFLIB::FiffTime      start_time;    /**< Acquisition start time (from meas date or block id). */
-    int         buf_size;       /**< Buffer size in samples. */
-    int         maxshield_data; /**< Are these unprocessed MaxShield data. */
-    QList<FIFFLIB::FiffDirEntry::SPtr>  rawDir; /**< Directory of raw data tags (FIFF_DATA_BUFFER, FIFF_DATA_SKIP, etc.). */
-    int           ndir;       /**< Number of tags in the above directory. */
+    std::unique_ptr<FIFFLIB::FiffCoordTrans> trans; /**< Coordinate transformation FIFF_COORD_HEAD <-> FIFF_COORD_DEVICE. */
+    float sfreq;                                    /**< Sampling frequency. */
+    float lowpass;                                  /**< Lowpass filter setting. */
+    float highpass;                                 /**< Highpass filter setting. */
+    FIFFLIB::FiffTime start_time;                   /**< Acquisition start time (from meas date or block id). */
+    int buf_size;                                   /**< Buffer size in samples. */
+    int maxshield_data;                             /**< Are these unprocessed MaxShield data. */
+    QList<FIFFLIB::FiffDirEntry::SPtr> rawDir;      /**< Directory of raw data tags (FIFF_DATA_BUFFER, FIFF_DATA_SKIP, etc.). */
+    int ndir;                                       /**< Number of tags in the above directory. */
 };
 
 //=============================================================================================================

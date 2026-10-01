@@ -55,7 +55,7 @@
 
 namespace FIFFLIB
 {
-    class FiffIO;
+class FiffIO;
 }
 
 
@@ -83,22 +83,22 @@ class AverageModel : public QAbstractTableModel
 {
     Q_OBJECT
 public:
-    AverageModel(QObject *parent = 0);
-    AverageModel(QFile& qFile, QObject *parent);
+    AverageModel(QObject* parent = 0);
+    AverageModel(QFile& qFile, QObject* parent);
 
     //=========================================================================================================
     /**
      * Reimplemented virtual functions
      *
      */
-    virtual int rowCount(const QModelIndex & parent = QModelIndex()) const;
-    virtual int columnCount(const QModelIndex &parent = QModelIndex()) const;
+    virtual int rowCount(const QModelIndex& parent = QModelIndex()) const;
+    virtual int columnCount(const QModelIndex& parent = QModelIndex()) const;
     virtual QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const;
-    virtual QVariant data(const QModelIndex & index, int role = Qt::DisplayRole) const;
-    virtual bool setData(const QModelIndex & index, const QVariant & value, int role = Qt::EditRole);
-    virtual Qt::ItemFlags flags(const QModelIndex & index) const;
-    virtual bool insertRows(int position, int span, const QModelIndex & parent = QModelIndex());
-    virtual bool removeRows(int position, int span, const QModelIndex & parent = QModelIndex());
+    virtual QVariant data(const QModelIndex& index, int role = Qt::DisplayRole) const;
+    virtual bool setData(const QModelIndex& index, const QVariant& value, int role = Qt::EditRole);
+    virtual Qt::ItemFlags flags(const QModelIndex& index) const;
+    virtual bool insertRows(int position, int span, const QModelIndex& parent = QModelIndex());
+    virtual bool removeRows(int position, int span, const QModelIndex& parent = QModelIndex());
 
     //=========================================================================================================
     /**
@@ -142,12 +142,15 @@ public:
      */
     const FiffInfo getFiffInfo();
 
-    bool isFileLoaded() const { return m_bFileloaded; }
+    bool isFileLoaded() const
+    {
+        return m_bFileloaded;
+    }
 
 protected:
-    bool                        m_bFileloaded;          /**< true when a Fiff evoked file is loaded. */
-    FiffEvokedSet::SPtr         m_pEvokedDataSet;       /**< QList<FiffEvoked> that holds the evoked data sets which are to be organised and handled by this model. */
-    QSharedPointer<FiffIO>      m_pfiffIO;              /**< FiffIO objects, which holds all the information of the fiff data (excluding the samples!). */
+    bool m_bFileloaded;                   /**< true when a Fiff evoked file is loaded. */
+    FiffEvokedSet::SPtr m_pEvokedDataSet; /**< QList<FiffEvoked> that holds the evoked data sets which are to be organised and handled by this model. */
+    QSharedPointer<FiffIO> m_pfiffIO;     /**< FiffIO objects, which holds all the information of the fiff data (excluding the samples!). */
 
     //=========================================================================================================
     /**
@@ -164,7 +167,6 @@ signals:
 };
 
 } // NAMESPACE
-
 
 
 #endif // AVERAGEMODEL_H

@@ -31,9 +31,9 @@ using namespace MNEBROWSE;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-RawSettings::RawSettings(QObject *parent)
+RawSettings::RawSettings(QObject* parent)
 : QObject(parent)
-, m_qSettings("mne-cpp","mne_analyze_studio_fiff_browser")
+, m_qSettings("mne-cpp", "mne_analyze_studio_fiff_browser")
 {
     init();
 }
@@ -63,14 +63,14 @@ void RawSettings::writeEventColors()
 {
     m_qSettings.beginGroup("EventDesignParameters");
     m_qSettings.setValue("event_color_default", QVariant(m_event_color_default));
-    m_qSettings.setValue("event_color_1",       QVariant(m_event_color_1));
-    m_qSettings.setValue("event_color_2",       QVariant(m_event_color_2));
-    m_qSettings.setValue("event_color_3",       QVariant(m_event_color_3));
-    m_qSettings.setValue("event_color_4",       QVariant(m_event_color_4));
-    m_qSettings.setValue("event_color_5",       QVariant(m_event_color_5));
-    m_qSettings.setValue("event_color_32",      QVariant(m_event_color_32));
-    m_qSettings.setValue("event_color_998",     QVariant(m_event_color_998));
-    m_qSettings.setValue("event_color_999",     QVariant(m_event_color_999));
+    m_qSettings.setValue("event_color_1", QVariant(m_event_color_1));
+    m_qSettings.setValue("event_color_2", QVariant(m_event_color_2));
+    m_qSettings.setValue("event_color_3", QVariant(m_event_color_3));
+    m_qSettings.setValue("event_color_4", QVariant(m_event_color_4));
+    m_qSettings.setValue("event_color_5", QVariant(m_event_color_5));
+    m_qSettings.setValue("event_color_32", QVariant(m_event_color_32));
+    m_qSettings.setValue("event_color_998", QVariant(m_event_color_998));
+    m_qSettings.setValue("event_color_999", QVariant(m_event_color_999));
     m_qSettings.endGroup();
 }
 
@@ -116,6 +116,6 @@ void RawSettings::init()
     m_event_color_32 = Qt::yellow;
     m_event_color_998 = Qt::darkBlue;
     m_event_color_999 = Qt::darkCyan;
-    m_data_marker_color = QColor (93,177,47); //green
+    m_data_marker_color = QColor(93, 177, 47); //green
     //m_data_marker_color = QColor (227,6,19); //red
 }

@@ -93,7 +93,7 @@ class FSSHARED_EXPORT FsSurface
 public:
     typedef QSharedPointer<FsSurface> SPtr;            /**< Shared pointer type for FsSurface class. */
     typedef QSharedPointer<const FsSurface> ConstSPtr; /**< Const shared pointer type for FsSurface class. */
-    
+
     //=========================================================================================================
     /**
      * Default constructor
@@ -117,7 +117,7 @@ public:
      * @param[in] surf               Name of the surface to load (eg. inflated, orig ...).
      * @param[in] subjects_dir       Subjects directory.
      */
-    explicit FsSurface(const QString &subject_id, qint32 hemi, const QString &surf, const QString &subjects_dir);
+    explicit FsSurface(const QString& subject_id, qint32 hemi, const QString& surf, const QString& subjects_dir);
 
     //=========================================================================================================
     /**
@@ -127,14 +127,14 @@ public:
      * @param[in] hemi               Which hemisphere to load {0 -> lh, 1 -> rh}.
      * @param[in] surf               Name of the surface to load (eg. inflated, orig ...).
      */
-    explicit FsSurface(const QString &path, qint32 hemi, const QString &surf);
+    explicit FsSurface(const QString& path, qint32 hemi, const QString& surf);
 
     //=========================================================================================================
     /**
      * Destroys the FsSurface class.
      */
     ~FsSurface();
-    
+
     //=========================================================================================================
     /**
      * Initializes the FsSurface.
@@ -180,7 +180,7 @@ public:
      *
      * @return true if read sucessful, false otherwise.
      */
-    static bool read(const QString &subject_id, qint32 hemi, const QString &surf, const QString &subjects_dir, FsSurface &p_Surface, bool p_bLoadCurvature = true);
+    static bool read(const QString& subject_id, qint32 hemi, const QString& surf, const QString& subjects_dir, FsSurface& p_Surface, bool p_bLoadCurvature = true);
 
     //=========================================================================================================
     /**
@@ -196,7 +196,7 @@ public:
      *
      * @return true if read sucessful, false otherwise.
      */
-    static bool read(const QString &path, qint32 hemi, const QString &surf, FsSurface &p_Surface, bool p_bLoadCurvature = true);
+    static bool read(const QString& path, qint32 hemi, const QString& surf, FsSurface& p_Surface, bool p_bLoadCurvature = true);
 
     //=========================================================================================================
     /**
@@ -210,7 +210,7 @@ public:
      *
      * @return true if read sucessful, false otherwise.
      */
-    static bool read(const QString &p_sFileName, FsSurface &p_Surface, bool p_bLoadCurvature = true);
+    static bool read(const QString& p_sFileName, FsSurface& p_Surface, bool p_bLoadCurvature = true);
 
     //=========================================================================================================
     /**
@@ -220,7 +220,7 @@ public:
      *
      * @return the read curvature.
      */
-    static Eigen::VectorXf read_curv(const QString &p_sFileName);
+    static Eigen::VectorXf read_curv(const QString& p_sFileName);
 
     //=========================================================================================================
     /**
@@ -304,7 +304,7 @@ public:
      * @param[in] stream  Stream to read from.
      * @return the read 3-byte integer.
      */
-    static qint32 fread3(QDataStream &stream);
+    static qint32 fread3(QDataStream& stream);
 
     //=========================================================================================================
     /**
@@ -313,7 +313,7 @@ public:
      * @param[in] stream  Stream to read from.
      * @return the read 3-byte integer.
      */
-    static qint32 fread3(std::iostream &stream);
+    static qint32 fread3(std::iostream& stream);
 
     //=========================================================================================================
     /**
@@ -323,7 +323,7 @@ public:
      * @param[in] count   Number of elements to read.
      * @return the read 3-byte integers.
      */
-    static Eigen::VectorXi fread3_many(QDataStream &stream, qint32 count);
+    static Eigen::VectorXi fread3_many(QDataStream& stream, qint32 count);
 
     //=========================================================================================================
     /**
@@ -333,17 +333,17 @@ public:
      * @param[in] count   Number of elements to read.
      * @return the read 3-byte integers.
      */
-    static Eigen::VectorXi fread3_many(std::iostream &stream, qint32 count);
+    static Eigen::VectorXi fread3_many(std::iostream& stream, qint32 count);
 
 private:
-    QString m_sFilePath;    /**< Path to surf directory. */
-    QString m_sFileName;    /**< FsSurface file name. */
-    qint32 m_iHemi;         /**< Hemisphere (lh = 0; rh = 1). */
-    QString m_sSurf;        /**< Loaded surface (eg. inflated, orig ...). */
-    Eigen::MatrixX3f m_matRR;      /**< alias verts. Vertex coordinates in meters. */
-    Eigen::MatrixX3i m_matTris;    /**< alias faces. The triangle descriptions. */
-    Eigen::MatrixX3f m_matNN;      /**< Normalized surface normals for each vertex. -> not needed since qglbuilder is doing that for us. */
-    Eigen::VectorXf m_vecCurv;     /**< FreeSurfer curvature data. */
+    QString m_sFilePath;        /**< Path to surf directory. */
+    QString m_sFileName;        /**< FsSurface file name. */
+    qint32 m_iHemi;             /**< Hemisphere (lh = 0; rh = 1). */
+    QString m_sSurf;            /**< Loaded surface (eg. inflated, orig ...). */
+    Eigen::MatrixX3f m_matRR;   /**< alias verts. Vertex coordinates in meters. */
+    Eigen::MatrixX3i m_matTris; /**< alias faces. The triangle descriptions. */
+    Eigen::MatrixX3f m_matNN;   /**< Normalized surface normals for each vertex. -> not needed since qglbuilder is doing that for us. */
+    Eigen::VectorXf m_vecCurv;  /**< FreeSurfer curvature data. */
 
     Eigen::Vector3f m_vecOffset; /**< FsSurface offset. */
 };

@@ -22,9 +22,11 @@ class TestFilterData : public QObject
     Q_OBJECT
 
 private:
-    RowVectorXi makePicks(int nCh) {
+    RowVectorXi makePicks(int nCh)
+    {
         RowVectorXi picks(nCh);
-        for (int i = 0; i < nCh; ++i) picks(i) = i;
+        for (int i = 0; i < nCh; ++i)
+            picks(i) = i;
         return picks;
     }
 
@@ -180,8 +182,7 @@ private slots:
     //=========================================================================
     void filterFile_fromRawData()
     {
-        QString rawPath = QCoreApplication::applicationDirPath()
-                          + "/../resources/data/mne-cpp-test-data/MEG/sample/sample_audvis_trunc_raw.fif";
+        QString rawPath = QCoreApplication::applicationDirPath() + "/../resources/data/mne-cpp-test-data/MEG/sample/sample_audvis_trunc_raw.fif";
         if (!QFile::exists(rawPath)) {
             QSKIP("Sample raw file not found");
         }

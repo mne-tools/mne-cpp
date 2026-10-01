@@ -54,10 +54,10 @@ using namespace FIFFLIB;
 //=============================================================================================================
 
 View3D::View3D()
-    : m_pCommu(Q_NULLPTR)
-    , m_pBemTreeCoreg(Q_NULLPTR)
-    , m_pView3D(Q_NULLPTR)
-    , m_bPickingActivated(false)
+: m_pCommu(Q_NULLPTR)
+, m_pBemTreeCoreg(Q_NULLPTR)
+, m_pView3D(Q_NULLPTR)
+, m_bPickingActivated(false)
 {
     m_iFiducial = 1;
 }
@@ -88,7 +88,6 @@ void View3D::init()
 
 void View3D::unload()
 {
-
 }
 
 //=============================================================================================================
@@ -100,16 +99,16 @@ QString View3D::getName() const
 
 //=============================================================================================================
 
-QMenu *View3D::getMenu()
+QMenu* View3D::getMenu()
 {
     return Q_NULLPTR;
 }
 
 //=============================================================================================================
 
-QWidget *View3D::getView()
+QWidget* View3D::getView()
 {
-    if(!m_pView3D) {
+    if (!m_pView3D) {
         m_pView3D = new BrainView();
     }
 
@@ -193,14 +192,14 @@ QVector<EVENT_TYPE> View3D::getEventSubscriptions(void) const
 
 void View3D::updateCoregBem(QSharedPointer<ANSHAREDLIB::BemDataModel> pNewModel)
 {
-    if(!pNewModel){
+    if (!pNewModel) {
         qWarning() << "[View3D::updateCoregBem] Null Bem Model pointer.";
         return;
-    } else if(!m_p3DModel){
+    } else if (!m_p3DModel) {
         std::cout << "[View3D::updateCoregBem] Null BrainTreeModel";
         return;
-    } else if(pNewModel->getType() == ANSHAREDLIB_BEMDATA_MODEL) {
-        if(!pNewModel->getBem().data()->isEmpty()) {
+    } else if (pNewModel->getType() == ANSHAREDLIB_BEMDATA_MODEL) {
+        if (!pNewModel->getBem().data()->isEmpty()) {
             m_pBemTreeCoreg = m_p3DModel->addBemSurface("Co-Registration",
                                                         QFileInfo(pNewModel->getModelPath()).fileName(),
                                                         (*pNewModel->getBem().data())[0]);
@@ -241,14 +240,14 @@ void View3D::fiducialPicking(const bool bActivatePicking)
 {
     m_bPickingActivated = bActivatePicking;
 
-    if(bActivatePicking) {
+    if (bActivatePicking) {
         onFiducialChanged(m_iFiducial);
     }
 }
 
 //=============================================================================================================
 
-void View3D::newPickingEvent(const QVector3D &worldIntersection)
+void View3D::newPickingEvent(const QVector3D& worldIntersection)
 {
     QVariant data = QVariant::fromValue(worldIntersection);
     m_pCommu->publishEvent(EVENT_TYPE::NEW_FIDUCIAL_PICKED, data);
@@ -275,36 +274,36 @@ void View3D::new3DModel(QSharedPointer<BrainTreeModel> pModel)
 
 void View3D::settingsChanged(ANSHAREDLIB::View3DParameters viewParameters)
 {
-    switch (viewParameters.m_settingsToApply){
-    case ANSHAREDLIB::View3DParameters::View3DSetting::sceneColor:
-        emit sceneColorChanged(viewParameters.m_sceneColor);
-        break;
-    case ANSHAREDLIB::View3DParameters::View3DSetting::rotation:
-        emit rotationChanged(viewParameters.m_bToggleRotation);
-        break;
-    case ANSHAREDLIB::View3DParameters::View3DSetting::coordAxis:
-        emit showCoordAxis(viewParameters.m_bToogleCoordAxis);
-        break;
-    case ANSHAREDLIB::View3DParameters::View3DSetting::fullscreen:
-        emit showFullScreen(viewParameters.m_bToggleFullscreen);
-        break;
-    case ANSHAREDLIB::View3DParameters::View3DSetting::lightColor:
-        emit lightColorChanged(viewParameters.m_lightColor);
-        break;
-    case ANSHAREDLIB::View3DParameters::View3DSetting::lightIntensity:
-        emit lightIntensityChanged(viewParameters.m_dLightIntensity);
-        break;
-    case ANSHAREDLIB::View3DParameters::View3DSetting::screenshot:
-        emit takeScreenshotChanged();
-        break;
-    default:
-        qInfo() << "[View3D::settingsChanged] Unknown setting";
+    switch (viewParameters.m_settingsToApply) {
+        case ANSHAREDLIB::View3DParameters::View3DSetting::sceneColor:
+            emit sceneColorChanged(viewParameters.m_sceneColor);
+            break;
+        case ANSHAREDLIB::View3DParameters::View3DSetting::rotation:
+            emit rotationChanged(viewParameters.m_bToggleRotation);
+            break;
+        case ANSHAREDLIB::View3DParameters::View3DSetting::coordAxis:
+            emit showCoordAxis(viewParameters.m_bToogleCoordAxis);
+            break;
+        case ANSHAREDLIB::View3DParameters::View3DSetting::fullscreen:
+            emit showFullScreen(viewParameters.m_bToggleFullscreen);
+            break;
+        case ANSHAREDLIB::View3DParameters::View3DSetting::lightColor:
+            emit lightColorChanged(viewParameters.m_lightColor);
+            break;
+        case ANSHAREDLIB::View3DParameters::View3DSetting::lightIntensity:
+            emit lightIntensityChanged(viewParameters.m_dLightIntensity);
+            break;
+        case ANSHAREDLIB::View3DParameters::View3DSetting::screenshot:
+            emit takeScreenshotChanged();
+            break;
+        default:
+            qInfo() << "[View3D::settingsChanged] Unknown setting";
     }
 }
 
 //=============================================================================================================
 
-void View3D::newDipoleFit(const INVLIB::InvEcdSet &ecdSet)
+void View3D::newDipoleFit(const INVLIB::InvEcdSet& ecdSet)
 {
     m_p3DModel->addDipoles(ecdSet);
 }
@@ -313,7 +312,7 @@ void View3D::newDipoleFit(const INVLIB::InvEcdSet &ecdSet)
 
 void View3D::onModelChanged(QSharedPointer<ANSHAREDLIB::AbstractModel> pNewModel)
 {
-    if(pNewModel->getType() == MODEL_TYPE::ANSHAREDLIB_DIPOLEFIT_MODEL) {
+    if (pNewModel->getType() == MODEL_TYPE::ANSHAREDLIB_DIPOLEFIT_MODEL) {
         newDipoleFit(qSharedPointerCast<DipoleFitModel>(pNewModel)->data(QModelIndex()).value<INVLIB::InvEcdSet>());
     }
 }
@@ -322,10 +321,10 @@ void View3D::onModelChanged(QSharedPointer<ANSHAREDLIB::AbstractModel> pNewModel
 
 void View3D::onModelRemoved(QSharedPointer<ANSHAREDLIB::AbstractModel> pRemovedModel)
 {
-    if(pRemovedModel->getType() == MODEL_TYPE::ANSHAREDLIB_DIPOLEFIT_MODEL) {
-        QList<QStandardItem *> lItemList = m_p3DModel->findItems("InvDipole Fit");
-        if(!lItemList.isEmpty()){
-            for(QStandardItem * pItem : lItemList){
+    if (pRemovedModel->getType() == MODEL_TYPE::ANSHAREDLIB_DIPOLEFIT_MODEL) {
+        QList<QStandardItem*> lItemList = m_p3DModel->findItems("InvDipole Fit");
+        if (!lItemList.isEmpty()) {
+            for (QStandardItem* pItem : lItemList) {
                 QModelIndex index = m_p3DModel->indexFromItem(pItem);
                 m_p3DModel->removeRows(index.row(),
                                        1,
@@ -333,13 +332,13 @@ void View3D::onModelRemoved(QSharedPointer<ANSHAREDLIB::AbstractModel> pRemovedM
             }
         }
 
-        if(m_pView3D) {
+        if (m_pView3D) {
             m_pView3D->hide();
             m_pView3D->show();
         }
 
-    } else if(pRemovedModel->getType() == MODEL_TYPE::ANSHAREDLIB_BEMDATA_MODEL){
-        if(!m_pBemTreeCoreg){
+    } else if (pRemovedModel->getType() == MODEL_TYPE::ANSHAREDLIB_BEMDATA_MODEL) {
+        if (!m_pBemTreeCoreg) {
             return;
         }
 
@@ -359,7 +358,7 @@ void View3D::onModelRemoved(QSharedPointer<ANSHAREDLIB::AbstractModel> pRemovedM
 
         m_pBemTreeCoreg = Q_NULLPTR;
 
-        if(m_pView3D) {
+        if (m_pView3D) {
             m_pView3D->hide();
             m_pView3D->show();
         }

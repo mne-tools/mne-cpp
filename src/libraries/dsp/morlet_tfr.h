@@ -60,8 +60,8 @@ namespace UTILSLIB
  */
 struct DSPSHARED_EXPORT MorletTfrResult
 {
-    Eigen::MatrixXd    matPower;   ///< n_freqs × n_times, instantaneous power (amplitude²)
-    Eigen::RowVectorXd vecFreqs;   ///< Centre frequencies in Hz, length n_freqs
+    Eigen::MatrixXd matPower;    ///< n_freqs × n_times, instantaneous power (amplitude²)
+    Eigen::RowVectorXd vecFreqs; ///< Centre frequencies in Hz, length n_freqs
 };
 
 //=============================================================================================================
@@ -94,9 +94,9 @@ public:
      * @return              MorletTfrResult with matPower (n_freqs × n_samples).
      */
     static MorletTfrResult compute(const Eigen::RowVectorXd& vecData,
-                                    double                    dSFreq,
-                                    const Eigen::RowVectorXd& vecFreqs,
-                                    double                    dNCycles = 7.0);
+                                   double dSFreq,
+                                   const Eigen::RowVectorXd& vecFreqs,
+                                   double dNCycles = 7.0);
 
     //=========================================================================================================
     /**
@@ -110,11 +110,11 @@ public:
      * @return              One MorletTfrResult per selected channel.
      */
     static QVector<MorletTfrResult> computeMultiChannel(
-            const Eigen::MatrixXd&    matData,
-            double                    dSFreq,
-            const Eigen::RowVectorXd& vecFreqs,
-            double                    dNCycles = 7.0,
-            const Eigen::RowVectorXi& vecPicks = Eigen::RowVectorXi());
+        const Eigen::MatrixXd& matData,
+        double dSFreq,
+        const Eigen::RowVectorXd& vecFreqs,
+        double dNCycles = 7.0,
+        const Eigen::RowVectorXi& vecPicks = Eigen::RowVectorXi());
 
 private:
     //=========================================================================================================

@@ -26,31 +26,31 @@
 //=============================================================================================================
 
 //USER ROLES
-#define BIDS_ITEM_TYPE              Qt::UserRole+2
-#define BIDS_ITEM_SUBJECT           Qt::UserRole+3
-#define BIDS_ITEM_SESSION           Qt::UserRole+4
+#define BIDS_ITEM_TYPE Qt::UserRole + 2
+#define BIDS_ITEM_SUBJECT Qt::UserRole + 3
+#define BIDS_ITEM_SESSION Qt::UserRole + 4
 
 //ITEM TYPES
 
 //CONTAINERS
-#define BIDS_SUBJECT                01
-#define BIDS_SESSION                02
-#define BIDS_FOLDER                 03
+#define BIDS_SUBJECT 01
+#define BIDS_SESSION 02
+#define BIDS_FOLDER 03
 
 //DATA TYPES
-#define BIDS_FUNCTIONALDATA         10
-#define BIDS_ANATOMICALDATA         11
-#define BIDS_BEHAVIORALDATA         12
-#define BIDS_IEEGDATA               13
+#define BIDS_FUNCTIONALDATA 10
+#define BIDS_ANATOMICALDATA 11
+#define BIDS_BEHAVIORALDATA 12
+#define BIDS_IEEGDATA 13
 
 //SUB-ITEMS
-#define BIDS_AVERAGE                20
-#define BIDS_EVENT             21
-#define BIDS_DIPOLE                 22
-#define BIDS_ELECTRODES             23
-#define BIDS_COORDSYSTEM            24
+#define BIDS_AVERAGE 20
+#define BIDS_EVENT 21
+#define BIDS_DIPOLE 22
+#define BIDS_ELECTRODES 23
+#define BIDS_COORDSYSTEM 24
 
-#define BIDS_UNKNOWN                99
+#define BIDS_UNKNOWN 99
 
 //=============================================================================================================
 // INCLUDES
@@ -97,8 +97,8 @@ class DISPSHARED_EXPORT BidsViewModel : public QStandardItemModel
     Q_OBJECT
 
 public:
-    typedef QSharedPointer<BidsViewModel> SPtr;               /**< Shared pointer type for BidsViewModel. */
-    typedef QSharedPointer<const BidsViewModel> ConstSPtr;    /**< Const shared pointer type for BidsViewModel. */
+    typedef QSharedPointer<BidsViewModel> SPtr;            /**< Shared pointer type for BidsViewModel. */
+    typedef QSharedPointer<const BidsViewModel> ConstSPtr; /**< Const shared pointer type for BidsViewModel. */
 
     //=========================================================================================================
     /**
@@ -125,7 +125,7 @@ public slots:
      *
      */
     void addData(QModelIndex selectedItem,
-                 QStandardItem *pNewItem,
+                 QStandardItem* pNewItem,
                  int iDataType);
 
     //=========================================================================================================
@@ -135,8 +135,8 @@ public slots:
      * @param[in] pNewItem     item to be added.
      * @param[in] parentIndex  index of where the nitem should be added.
      */
-    void addToData(QStandardItem *pNewItem,
-                   const QModelIndex &parentIndex,
+    void addToData(QStandardItem* pNewItem,
+                   const QModelIndex& parentIndex,
                    int iDataType);
 
     //=========================================================================================================
@@ -147,7 +147,7 @@ public slots:
      *
      * @return  index of newly added item.
      */
-    QModelIndex addSubject(const QString &sSubjectName);
+    QModelIndex addSubject(const QString& sSubjectName);
 
     //=========================================================================================================
     /**
@@ -158,8 +158,8 @@ public slots:
      *
      * @return  index of newly added item.
      */
-    QModelIndex addSessionToSubject(const QString &sSubjectName,
-                                    const QString &sSessionName);
+    QModelIndex addSessionToSubject(const QString& sSubjectName,
+                                    const QString& sSessionName);
 
     //=========================================================================================================
     /**
@@ -171,7 +171,7 @@ public slots:
      * @return  index of newly added item.
      */
     QModelIndex addSessionToSubject(QModelIndex subjectIndex,
-                                    const QString &sSessionName);
+                                    const QString& sSessionName);
 
     //=========================================================================================================
     /**
@@ -228,7 +228,6 @@ signals:
      * @param[in] itemIndex    index of new item.
      */
     void newItemIndex(QModelIndex itemIndex);
-
 };
 
 } //Namespace

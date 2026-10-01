@@ -73,32 +73,32 @@ namespace MNALIB
  */
 struct MNASHARED_EXPORT MnaNode
 {
-    QString     id;                     ///< Unique node identifier
-    QString     opType;                 ///< Operation type (looked up in MnaOpRegistry)
-    QVariantMap attributes;             ///< Operation parameters
+    QString id;             ///< Unique node identifier
+    QString opType;         ///< Operation type (looked up in MnaOpRegistry)
+    QVariantMap attributes; ///< Operation parameters
 
-    QList<MnaPort> inputs;              ///< Input ports
-    QList<MnaPort> outputs;             ///< Output ports
+    QList<MnaPort> inputs;  ///< Input ports
+    QList<MnaPort> outputs; ///< Output ports
 
     MnaNodeExecMode execMode = MnaNodeExecMode::Batch; ///< Execution mode
 
     // IPC configuration (used when execMode == Ipc)
-    QString     ipcCommand;             ///< External executable command
-    QStringList ipcArgs;                ///< Command-line arguments (supports {{placeholder}} tokens)
-    QString     ipcWorkDir;             ///< Working directory for external process
-    QString     ipcTransport;           ///< "stdio", "tcp", "shm", "file"
+    QString ipcCommand;   ///< External executable command
+    QStringList ipcArgs;  ///< Command-line arguments (supports {{placeholder}} tokens)
+    QString ipcWorkDir;   ///< Working directory for external process
+    QString ipcTransport; ///< "stdio", "tcp", "shm", "file"
 
     // Script configuration (used when execMode == Script)
-    MnaScript   script;                 ///< Inline source code, interpreter, language
+    MnaScript script; ///< Inline source code, interpreter, language
 
     // Verification & provenance
-    MnaVerification verification;       ///< Explanation, checks, results, and provenance snapshot
+    MnaVerification verification; ///< Explanation, checks, results, and provenance snapshot
 
     // Execution metadata
-    QString     toolVersion;            ///< Version of tool that last executed this node
-    QDateTime   executedAt;             ///< Timestamp of last execution
-    bool        dirty = true;           ///< Whether node needs re-execution
-    QJsonObject extras;                 ///< Unknown keys preserved for lossless round-trip
+    QString toolVersion;  ///< Version of tool that last executed this node
+    QDateTime executedAt; ///< Timestamp of last execution
+    bool dirty = true;    ///< Whether node needs re-execution
+    QJsonObject extras;   ///< Unknown keys preserved for lossless round-trip
 
     QJsonObject toJson() const;
     static MnaNode fromJson(const QJsonObject& json);

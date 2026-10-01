@@ -61,13 +61,13 @@ namespace MNALIB
  */
 struct MNASHARED_EXPORT MnaPort
 {
-    QString     name;               ///< Port name (unique within a node)
-    MnaDataKind dataKind = MnaDataKind::Custom;  ///< Data kind flowing through this port
-    MnaPortDir  direction = MnaPortDir::Input;   ///< Input or Output
+    QString name;                               ///< Port name (unique within a node)
+    MnaDataKind dataKind = MnaDataKind::Custom; ///< Data kind flowing through this port
+    MnaPortDir direction = MnaPortDir::Input;   ///< Input or Output
 
     // Connection (for input ports — identifies the upstream source)
-    QString     sourceNodeId;       ///< Which node produces this input? (empty → graph-level input)
-    QString     sourcePortName;     ///< Which output port on that node?
+    QString sourceNodeId;   ///< Which node produces this input? (empty → graph-level input)
+    QString sourcePortName; ///< Which output port on that node?
 
     // Real-time stream binding (used when dataKind == RealTimeStream)
     //
@@ -78,14 +78,14 @@ struct MNASHARED_EXPORT MnaPort
     //   "shm"       — Shared memory transport (single-machine, zero-copy)
     //   ""          — Internal Qt signal/slot wiring (in-process, default)
     //
-    QString     streamProtocol;     ///< "fiff-rt", "lsl", "ftbuffer", "shm", "" = internal signal/slot
-    QString     streamEndpoint;     ///< Protocol-specific address (e.g. "localhost:4218" for fiff-rt)
-    int         streamBufferMs = 0; ///< Ring-buffer length in ms (0 = unbounded)
+    QString streamProtocol; ///< "fiff-rt", "lsl", "ftbuffer", "shm", "" = internal signal/slot
+    QString streamEndpoint; ///< Protocol-specific address (e.g. "localhost:4218" for fiff-rt)
+    int streamBufferMs = 0; ///< Ring-buffer length in ms (0 = unbounded)
 
     // Cached result reference (for output ports)
-    QString     cachedResultPath;   ///< Relative path to cached result
-    QString     cachedResultHash;   ///< SHA-256 for invalidation
-    QJsonObject extras;             ///< Unknown keys preserved for lossless round-trip
+    QString cachedResultPath; ///< Relative path to cached result
+    QString cachedResultHash; ///< SHA-256 for invalidation
+    QJsonObject extras;       ///< Unknown keys preserved for lossless round-trip
 
     QJsonObject toJson() const;
     static MnaPort fromJson(const QJsonObject& json);

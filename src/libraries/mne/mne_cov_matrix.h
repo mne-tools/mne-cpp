@@ -48,10 +48,10 @@
 /**
  * Channel-type classification constants for the ch_class field in MNECovMatrix.
  */
-#define MNE_COV_CH_UNKNOWN  -1  /**< Unknown channel type. */
-#define MNE_COV_CH_MEG_MAG   0  /**< Axial gradiometer or magnetometer [T]. */
-#define MNE_COV_CH_MEG_GRAD  1  /**< Planar gradiometer [T/m]. */
-#define MNE_COV_CH_EEG       2  /**< EEG [V]. */
+#define MNE_COV_CH_UNKNOWN -1 /**< Unknown channel type. */
+#define MNE_COV_CH_MEG_MAG 0  /**< Axial gradiometer or magnetometer [T]. */
+#define MNE_COV_CH_MEG_GRAD 1 /**< Planar gradiometer [T/m]. */
+#define MNE_COV_CH_EEG 2      /**< EEG [V]. */
 
 //=============================================================================================================
 // FORWARD DECLARATIONS
@@ -59,8 +59,8 @@
 
 namespace FIFFLIB
 {
-    class FiffSparseMatrix;
-    class FiffChInfo;
+class FiffSparseMatrix;
+class FiffChInfo;
 }
 
 //=============================================================================================================
@@ -88,8 +88,8 @@ class MNESssData;
 class MNESHARED_EXPORT MNECovMatrix
 {
 public:
-    typedef QSharedPointer<MNECovMatrix> SPtr;              /**< Shared pointer type for MNECovMatrix. */
-    typedef QSharedPointer<const MNECovMatrix> ConstSPtr;   /**< Const shared pointer type for MNECovMatrix. */
+    typedef QSharedPointer<MNECovMatrix> SPtr;            /**< Shared pointer type for MNECovMatrix. */
+    typedef QSharedPointer<const MNECovMatrix> ConstSPtr; /**< Const shared pointer type for MNECovMatrix. */
 
     //=========================================================================================================
     /**
@@ -130,12 +130,12 @@ public:
      *
      * @return A new covariance matrix.
      */
-    static std::unique_ptr<MNECovMatrix> create_dense(int    kind,
-                                   int    ncov,
-                                   const QStringList& names,
-                                   const Eigen::VectorXd& cov)
+    static std::unique_ptr<MNECovMatrix> create_dense(int kind,
+                                                      int ncov,
+                                                      const QStringList& names,
+                                                      const Eigen::VectorXd& cov)
     {
-        return std::unique_ptr<MNECovMatrix>(new MNECovMatrix(kind,ncov,names,cov,Eigen::VectorXd(),nullptr));
+        return std::unique_ptr<MNECovMatrix>(new MNECovMatrix(kind, ncov, names, cov, Eigen::VectorXd(), nullptr));
     }
 
     //=========================================================================================================
@@ -149,12 +149,12 @@ public:
      *
      * @return A new covariance matrix.
      */
-    static std::unique_ptr<MNECovMatrix> create_diag(int    kind,
-                                  int    ncov,
-                                  const QStringList& names,
-                                  const Eigen::VectorXd& cov_diag)
+    static std::unique_ptr<MNECovMatrix> create_diag(int kind,
+                                                     int ncov,
+                                                     const QStringList& names,
+                                                     const Eigen::VectorXd& cov_diag)
     {
-        return std::unique_ptr<MNECovMatrix>(new MNECovMatrix(kind,ncov,names,Eigen::VectorXd(),cov_diag,nullptr));
+        return std::unique_ptr<MNECovMatrix>(new MNECovMatrix(kind, ncov, names, Eigen::VectorXd(), cov_diag, nullptr));
     }
 
     //=========================================================================================================
@@ -168,12 +168,12 @@ public:
      *
      * @return A new covariance matrix.
      */
-    static std::unique_ptr<MNECovMatrix> create_sparse(    int kind,
-                                                int ncov,
-                                                const QStringList& names,
-                                                FIFFLIB::FiffSparseMatrix* cov_sparse)
+    static std::unique_ptr<MNECovMatrix> create_sparse(int kind,
+                                                       int ncov,
+                                                       const QStringList& names,
+                                                       FIFFLIB::FiffSparseMatrix* cov_sparse)
     {
-        return std::unique_ptr<MNECovMatrix>(new MNECovMatrix(kind,ncov,names,Eigen::VectorXd(),Eigen::VectorXd(),cov_sparse));
+        return std::unique_ptr<MNECovMatrix>(new MNECovMatrix(kind, ncov, names, Eigen::VectorXd(), Eigen::VectorXd(), cov_sparse));
     }
 
     //=========================================================================================================
@@ -188,13 +188,13 @@ public:
      *
      * @return A new covariance matrix.
      */
-    static std::unique_ptr<MNECovMatrix> create(   int kind,
-                                        int ncov,
-                                        const QStringList& names,
-                                        const Eigen::VectorXd& cov,
-                                        const Eigen::VectorXd& cov_diag)
+    static std::unique_ptr<MNECovMatrix> create(int kind,
+                                                int ncov,
+                                                const QStringList& names,
+                                                const Eigen::VectorXd& cov,
+                                                const Eigen::VectorXd& cov_diag)
     {
-        return std::unique_ptr<MNECovMatrix>(new MNECovMatrix(kind,ncov,names,cov,cov_diag,nullptr));
+        return std::unique_ptr<MNECovMatrix>(new MNECovMatrix(kind, ncov, names, cov, cov_diag, nullptr));
     }
 
     //=========================================================================================================
@@ -329,23 +329,23 @@ public:
                                                 int omit_meg_eeg,
                                                 const QList<FIFFLIB::FiffChInfo>& chs) const;
 
-    int         kind;                           /**< Covariance kind: sensor or source. */
-    int         ncov;                           /**< Dimension (number of channels). */
-    int         nfree;                          /**< Number of degrees of freedom used in estimation. */
-    int         nproj;                          /**< Number of dimensions projected out. */
-    int         nzero;                          /**< Number of zero or small eigenvalues. */
-    QStringList names;                          /**< Channel names (optional). */
-    Eigen::VectorXd cov;                        /**< Packed lower-triangle covariance data (ncov*(ncov+1)/2 elements). */
-    Eigen::VectorXd cov_diag;                   /**< Diagonal covariance data (ncov elements). */
-    std::unique_ptr<FIFFLIB::FiffSparseMatrix> cov_sparse;   /**< Sparse covariance matrix (note: data are floats). */
-    Eigen::VectorXd lambda;                     /**< Eigenvalues of the covariance matrix. */
-    Eigen::VectorXd inv_lambda;                 /**< Inverse square-roots of eigenvalues (for whitening). */
-    Eigen::Matrix<float, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor> eigen;  /**< Eigenvectors of the covariance matrix (nzero columns removed). */
-    std::unique_ptr<MNEProjOp> proj;            /**< The projection operator active when this matrix was computed. */
-    std::unique_ptr<MNESssData> sss;            /**< SSS data from the associated raw data file. */
-    Eigen::VectorXi ch_class;                   /**< Per-channel type classification for regularization (MEG grad, MEG mag, EEG). */
-    QStringList bads;                           /**< Channel names designated bad during computation. */
-    int         nbad;                           /**< Number of bad channels. */
+    int kind;                                                                    /**< Covariance kind: sensor or source. */
+    int ncov;                                                                    /**< Dimension (number of channels). */
+    int nfree;                                                                   /**< Number of degrees of freedom used in estimation. */
+    int nproj;                                                                   /**< Number of dimensions projected out. */
+    int nzero;                                                                   /**< Number of zero or small eigenvalues. */
+    QStringList names;                                                           /**< Channel names (optional). */
+    Eigen::VectorXd cov;                                                         /**< Packed lower-triangle covariance data (ncov*(ncov+1)/2 elements). */
+    Eigen::VectorXd cov_diag;                                                    /**< Diagonal covariance data (ncov elements). */
+    std::unique_ptr<FIFFLIB::FiffSparseMatrix> cov_sparse;                       /**< Sparse covariance matrix (note: data are floats). */
+    Eigen::VectorXd lambda;                                                      /**< Eigenvalues of the covariance matrix. */
+    Eigen::VectorXd inv_lambda;                                                  /**< Inverse square-roots of eigenvalues (for whitening). */
+    Eigen::Matrix<float, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor> eigen; /**< Eigenvectors of the covariance matrix (nzero columns removed). */
+    std::unique_ptr<MNEProjOp> proj;                                             /**< The projection operator active when this matrix was computed. */
+    std::unique_ptr<MNESssData> sss;                                             /**< SSS data from the associated raw data file. */
+    Eigen::VectorXi ch_class;                                                    /**< Per-channel type classification for regularization (MEG grad, MEG mag, EEG). */
+    QStringList bads;                                                            /**< Channel names designated bad during computation. */
+    int nbad;                                                                    /**< Number of bad channels. */
 };
 
 //=============================================================================================================

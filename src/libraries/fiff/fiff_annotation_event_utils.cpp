@@ -60,7 +60,7 @@ FiffAnnotations FIFFLIB::annotationsFromEvents(
     }
 
     for (int i = 0; i < static_cast<int>(events.rows()); ++i) {
-        const int sample  = events(i, 0);
+        const int sample = events(i, 0);
         const int eventId = events(i, 2);
 
         const double onset = static_cast<double>(sample - firstSample) / sfreq;

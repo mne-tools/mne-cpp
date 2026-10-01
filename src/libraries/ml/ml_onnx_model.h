@@ -57,14 +57,21 @@
 //=============================================================================================================
 
 #ifdef MNE_USE_ONNXRUNTIME
-namespace Ort { class Env; class Session; class MemoryInfo; class RunOptions; }
+namespace Ort
+{
+class Env;
+class Session;
+class MemoryInfo;
+class RunOptions;
+}
 #endif
 
 //=============================================================================================================
 // DEFINE NAMESPACE MLLIB
 //=============================================================================================================
 
-namespace MLLIB{
+namespace MLLIB
+{
 
 //=============================================================================================================
 /**
@@ -109,15 +116,15 @@ private:
     static Ort::Env& ortEnv();
 #endif
 
-    QString     m_modelPath;                                /**< Path to ONNX model file. */
-    MlTaskType  m_taskType = MlTaskType::Classification;    /**< Task type.               */
+    QString m_modelPath;                                /**< Path to ONNX model file. */
+    MlTaskType m_taskType = MlTaskType::Classification; /**< Task type.               */
 
 #ifdef MNE_USE_ONNXRUNTIME
-    std::unique_ptr<Ort::Session>    m_session;              /**< ORT inference session.              */
-    std::unique_ptr<Ort::MemoryInfo> m_memoryInfo;           /**< CPU memory info (reused).            */
-    std::vector<std::string>         m_inputNames;           /**< Cached input node names.             */
-    std::vector<std::string>         m_outputNames;          /**< Cached output node names.            */
-    std::vector<std::vector<int64_t>> m_inputShapes;         /**< Cached input node shapes.            */
+    std::unique_ptr<Ort::Session> m_session;         /**< ORT inference session.              */
+    std::unique_ptr<Ort::MemoryInfo> m_memoryInfo;   /**< CPU memory info (reused).            */
+    std::vector<std::string> m_inputNames;           /**< Cached input node names.             */
+    std::vector<std::string> m_outputNames;          /**< Cached output node names.            */
+    std::vector<std::vector<int64_t>> m_inputShapes; /**< Cached input node shapes.            */
 #endif
 };
 

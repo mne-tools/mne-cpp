@@ -30,8 +30,8 @@ namespace
 
 bool jsonArrayContainsString(const QJsonArray& values, const QString& expected)
 {
-    for(const QJsonValue& value : values) {
-        if(value.toString() == expected) {
+    for (const QJsonValue& value : values) {
+        if (value.toString() == expected) {
             return true;
         }
     }
@@ -45,19 +45,18 @@ QJsonObject objectSchema(const QJsonObject& properties = QJsonObject(),
     return QJsonObject{
         {"type", "object"},
         {"properties", properties},
-        {"required", required}
-    };
+        {"required", required}};
 }
 
 bool writeJsonFile(const QString& filePath, const QJsonObject& document)
 {
     const QFileInfo info(filePath);
-    if(!QDir().mkpath(info.absolutePath())) {
+    if (!QDir().mkpath(info.absolutePath())) {
         return false;
     }
 
     QFile file(filePath);
-    if(!file.open(QIODevice::WriteOnly | QIODevice::Text | QIODevice::Truncate)) {
+    if (!file.open(QIODevice::WriteOnly | QIODevice::Text | QIODevice::Truncate)) {
         return false;
     }
 
@@ -75,29 +74,7 @@ QJsonObject pipelineManifest(const QString& extensionId,
     return QJsonObject{
         {"id", extensionId},
         {"display_name", displayName},
-        {"contributes", QJsonObject{
-             {"analysis_pipelines", QJsonArray{
-                  QJsonObject{
-                      {"id", pipelineId},
-                      {"display_name", QStringLiteral("Duplicate Pipeline")},
-                      {"description", QStringLiteral("Fixture pipeline for registry duplicate tests.")},
-                      {"input_schema", objectSchema(QJsonObject{
-                           {"subject_id", QJsonObject{
-                                {"type", "string"},
-                                {"title", "Subject"}
-                            }}
-                       }, requiredInputs)},
-                      {"output_schema", objectSchema(QJsonObject{
-                           {"report_path", QJsonObject{
-                                {"type", "string"},
-                                {"title", "Report Path"}
-                            }}
-                       })},
-                      {"steps", QJsonArray()}
-                  }
-              }}
-         }}
-    };
+        {"contributes", QJsonObject{{"analysis_pipelines", QJsonArray{QJsonObject{{"id", pipelineId}, {"display_name", QStringLiteral("Duplicate Pipeline")}, {"description", QStringLiteral("Fixture pipeline for registry duplicate tests.")}, {"input_schema", objectSchema(QJsonObject{{"subject_id", QJsonObject{{"type", "string"}, {"title", "Subject"}}}}, requiredInputs)}, {"output_schema", objectSchema(QJsonObject{{"report_path", QJsonObject{{"type", "string"}, {"title", "Report Path"}}}})}, {"steps", QJsonArray()}}}}}}};
 }
 
 } // namespace
@@ -139,10 +116,7 @@ void TestMneAnalyzeStudioCoreCapabilities::testCapabilityCatalogLookupAndSharedA
         QJsonArray{
             QJsonObject{
                 {"name", "studio.pipeline.run"},
-                {"description", "Generic pipeline runner."}
-            }
-        }
-    });
+                {"description", "Generic pipeline runner."}}}});
     sources.append(CapabilityCatalogSource{
         QStringLiteral("analysis_pipeline"),
         QStringLiteral("Analysis Pipelines"),
@@ -151,10 +125,7 @@ void TestMneAnalyzeStudioCoreCapabilities::testCapabilityCatalogLookupAndSharedA
                 {"name", pipelineToolName},
                 {"pipeline_id", pipelineId},
                 {"description", "Run the PSD summary pipeline."},
-                {"capability_aliases", QJsonArray{QStringLiteral("studio.pipeline.run")}}
-            }
-        }
-    });
+                {"capability_aliases", QJsonArray{QStringLiteral("studio.pipeline.run")}}}}});
 
     QStringList warnings;
     const QJsonArray catalog = buildCapabilityCatalog(sources, &warnings);
@@ -182,8 +153,7 @@ void TestMneAnalyzeStudioCoreCapabilities::testAnnotateWorkflowCapability()
     const QJsonObject annotated = annotateCapabilityMetadata(QJsonObject{
         {"name", "workflow.temporal_filter"},
         {"skill_id", "temporal.filter"},
-        {"workflow_operator", true}
-    });
+        {"workflow_operator", true}});
 
     QCOMPARE(annotated.value("capability_id").toString(), QStringLiteral("workflow_skill:temporal.filter"));
     QCOMPARE(annotated.value("capability_kind").toString(), QStringLiteral("workflow_skill"));
@@ -196,8 +166,7 @@ void TestMneAnalyzeStudioCoreCapabilities::testAnnotateWorkflowCapability()
 void TestMneAnalyzeStudioCoreCapabilities::testAnnotateNeuroKernelAndPipelineCapabilities()
 {
     const QJsonObject kernelTool = annotateCapabilityMetadata(QJsonObject{
-        {"name", "neurokernel.raw_stats"}
-    });
+        {"name", "neurokernel.raw_stats"}});
 
     QCOMPARE(kernelTool.value("capability_id").toString(), QStringLiteral("tool:neurokernel.raw_stats"));
     QCOMPARE(kernelTool.value("capability_kind").toString(), QStringLiteral("neurokernel_tool"));
@@ -206,8 +175,7 @@ void TestMneAnalyzeStudioCoreCapabilities::testAnnotateNeuroKernelAndPipelineCap
 
     const QJsonObject workflowIoTool = annotateCapabilityMetadata(QJsonObject{
         {"name", "studio.workflow.load"},
-        {"capability_kind", "workflow_io"}
-    });
+        {"capability_kind", "workflow_io"}});
 
     QCOMPARE(workflowIoTool.value("capability_id").toString(), QStringLiteral("tool:studio.workflow.load"));
     QCOMPARE(workflowIoTool.value("capability_kind").toString(), QStringLiteral("workflow_io"));
@@ -219,8 +187,7 @@ void TestMneAnalyzeStudioCoreCapabilities::testAnnotateNeuroKernelAndPipelineCap
     const QJsonObject pipelineTool = annotateCapabilityMetadata(QJsonObject{
         {"name", aliasToolName},
         {"pipeline_id", pipelineId},
-        {"capability_aliases", QJsonArray{QStringLiteral("legacy.pipeline.alias")}}
-    });
+        {"capability_aliases", QJsonArray{QStringLiteral("legacy.pipeline.alias")}}});
 
     QCOMPARE(pipelineTool.value("capability_id").toString(), QStringLiteral("pipeline:analysis.psd_summary"));
     QCOMPARE(pipelineTool.value("capability_kind").toString(), QStringLiteral("analysis_pipeline"));
@@ -238,10 +205,8 @@ void TestMneAnalyzeStudioCoreCapabilities::testRegistryRejectsDuplicatePipelineI
     QTemporaryDir temporaryDirectory;
     QVERIFY2(temporaryDirectory.isValid(), "Temporary test directory should be created.");
 
-    const QString firstManifestPath = temporaryDirectory.path()
-                                      + QStringLiteral("/ext_one/manifest.json");
-    const QString secondManifestPath = temporaryDirectory.path()
-                                       + QStringLiteral("/ext_two/manifest.json");
+    const QString firstManifestPath = temporaryDirectory.path() + QStringLiteral("/ext_one/manifest.json");
+    const QString secondManifestPath = temporaryDirectory.path() + QStringLiteral("/ext_two/manifest.json");
     QVERIFY(writeJsonFile(firstManifestPath,
                           pipelineManifest(QStringLiteral("ext.one"),
                                            QStringLiteral("duplicate.pipeline"),
@@ -275,8 +240,7 @@ void TestMneAnalyzeStudioCoreCapabilities::testRegistryBuildsPipelineToolDefinit
     QTemporaryDir temporaryDirectory;
     QVERIFY2(temporaryDirectory.isValid(), "Temporary test directory should be created.");
 
-    const QString manifestPath = temporaryDirectory.path()
-                                 + QStringLiteral("/ext_pipeline/manifest.json");
+    const QString manifestPath = temporaryDirectory.path() + QStringLiteral("/ext_pipeline/manifest.json");
     QVERIFY(writeJsonFile(manifestPath,
                           pipelineManifest(QStringLiteral("ext.pipeline"),
                                            QStringLiteral("analysis.psd_summary"),

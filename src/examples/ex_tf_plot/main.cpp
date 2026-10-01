@@ -53,7 +53,7 @@ using namespace Eigen;
  * @param[in] argv (argument vector) is an array of pointers to arrays of character objects. The array objects are null-terminated strings, representing the arguments that were entered on the command line when the program was started.
  * @return the value that was set to exit() (which is 0 if exit() is called via quit()).
  */
-int main(int argc, char *argv[])
+int main(int argc, char* argv[])
 {
     qInstallMessageHandler(MNELogger::customLogWriter);
     QApplication a(argc, argv);
@@ -73,11 +73,11 @@ int main(int argc, char *argv[])
 
     //generate FiffEvoked object
     QFile t_sampleFile(parser.value(evokedFileOption));
-    FiffEvoked p_FiffEvoked(t_sampleFile,QVariant(parser.value(evokedIdxOption)));
+    FiffEvoked p_FiffEvoked(t_sampleFile, QVariant(parser.value(evokedIdxOption)));
 
     //tf plot
     VectorXd dataCol = p_FiffEvoked.data.row(83).transpose();
-    MatrixXd dataSpectrum = Spectrogram::makeSpectrogram(dataCol, p_FiffEvoked.info.sfreq*0.1);
+    MatrixXd dataSpectrum = Spectrogram::makeSpectrogram(dataCol, p_FiffEvoked.info.sfreq * 0.1);
 
     TFplot tfplot(dataSpectrum, p_FiffEvoked.info.sfreq, 1, 50, ColorMaps::Jet);
     tfplot.show();

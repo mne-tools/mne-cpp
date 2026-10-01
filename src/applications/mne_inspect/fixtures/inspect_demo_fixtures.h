@@ -67,6 +67,6 @@ QVector<DISP3DLIB::ElectrodeArray> demoFourArrayMontage();
  */
 std::unique_ptr<MRILIB::MriVolData> demoMriSlab(int dim = 32);
 
-}  // namespace MNEINSPECT
+} // namespace MNEINSPECT
 
-#endif  // MNEINSPECT_DEMO_FIXTURES_H
+#endif // MNEINSPECT_DEMO_FIXTURES_H

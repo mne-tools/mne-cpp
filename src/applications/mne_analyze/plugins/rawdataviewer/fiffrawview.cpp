@@ -46,7 +46,6 @@
 #include <QRhiWidget>
 
 
-
 //=============================================================================================================
 // USED NAMESPACES
 //=============================================================================================================
@@ -60,14 +59,13 @@ using namespace UTILSLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-FiffRawView::FiffRawView(QWidget *parent)
+FiffRawView::FiffRawView(QWidget* parent)
 : DISPLIB::AbstractView(parent)
 , m_pTableView(new QTableView())
 , m_fDefaultSectionSize(80.0f)
 {
-
     //set vertical layout
-    QVBoxLayout *neLayout = new QVBoxLayout(this);
+    QVBoxLayout* neLayout = new QVBoxLayout(this);
     neLayout->setContentsMargins(0, 0, 0, 0);
     neLayout->addWidget(m_pTableView);
 
@@ -92,7 +90,7 @@ FiffRawView::FiffRawView(QWidget *parent)
 
 void FiffRawView::reset()
 {
-    if(m_pModel){
+    if (m_pModel) {
         disconnectModel();
 
         m_pTableView->setModel(Q_NULLPTR);
@@ -104,7 +102,7 @@ void FiffRawView::reset()
 
 void FiffRawView::setDelegate(const QSharedPointer<FiffRawViewDelegate>& pDelegate)
 {
-    if(!pDelegate) {
+    if (!pDelegate) {
         qWarning() << "[FiffRawView::setDelegate] Passed delegate is NULL.";
         return;
     }
@@ -131,7 +129,7 @@ QSharedPointer<FiffRawViewModel> FiffRawView::getModel()
 
 void FiffRawView::setModel(const QSharedPointer<FiffRawViewModel>& pModel)
 {
-    if(!pModel) {
+    if (!pModel) {
         qWarning() << "[FiffRawView::setModel] Passed model is NULL.";
         return;
     }
@@ -141,7 +139,7 @@ void FiffRawView::setModel(const QSharedPointer<FiffRawViewModel>& pModel)
 
     m_pTableView->setModel(m_pModel.data());
 
-    auto *rhiViewport = new QRhiWidget;
+    auto* rhiViewport = new QRhiWidget;
 #if defined(WASMBUILD) || defined(__EMSCRIPTEN__)
     rhiViewport->setApi(QRhiWidget::Api::OpenGL);
 #elif defined(Q_OS_MACOS) || defined(Q_OS_IOS)
@@ -170,8 +168,8 @@ void FiffRawView::setModel(const QSharedPointer<FiffRawViewModel>& pModel)
     m_pTableView->horizontalHeader()->setVisible(false);
 
     //m_pTableView->verticalHeader()->setDefaultSectionSize(m_pRawDelegate->m_iDefaultPlotHeight);
-    m_pTableView->setColumnHidden(0,true); //because content is plotted jointly with column=1
-    m_pTableView->setColumnHidden(2,true); //because we do not want to plot the mean values
+    m_pTableView->setColumnHidden(0, true); //because content is plotted jointly with column=1
+    m_pTableView->setColumnHidden(2, true); //because we do not want to plot the mean values
 
     //Install event filter to overcome QGrabGesture and QScrollBar/QHeader problem
     m_pTableView->horizontalScrollBar()->installEventFilter(this);
@@ -184,7 +182,7 @@ void FiffRawView::setModel(const QSharedPointer<FiffRawViewModel>& pModel)
 
     QScroller::grabGesture(m_pTableView, QScroller::LeftMouseButtonGesture);
     m_pKineticScroller = QScroller::scroller(m_pTableView);
-    m_pKineticScroller->setSnapPositionsX(100,100);
+    m_pKineticScroller->setSnapPositionsX(100, 100);
 
     //Enable event fitlering for the viewport in order to intercept mouse events
     m_pTableView->viewport()->installEventFilter(this);
@@ -200,17 +198,17 @@ void FiffRawView::setModel(const QSharedPointer<FiffRawViewModel>& pModel)
     connect(this, &FiffRawView::tableViewDataWidthChanged,
             m_pModel.data(), &FiffRawViewModel::setDataColumnWidth, Qt::UniqueConnection);
 
-    pModel->setDataColumnWidth(m_pTableView->width()-m_pTableView->columnWidth(0));
+    pModel->setDataColumnWidth(m_pTableView->width() - m_pTableView->columnWidth(0));
     m_pTableView->resizeColumnsToContents();
 
-//    m_pTableView->setColumnHidden(0,true);
-//    m_pTableView->setColumnHidden(2,true);
-//    m_pTableView->setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Expanding);
-//    m_pTableView->horizontalHeader()->setSectionResizeMode(1, QHeaderView::ResizeToContents); //Stretch 2 column to maximal width
-//    m_pTableView->horizontalHeader()->hide();
-//    m_pTableView->resizeColumnsToContents();
-//    m_pTableView->setVerticalScrollMode(QAbstractItemView::ScrollPerPixel);
-//    m_pTableView->setHorizontalScrollMode(QAbstractItemView::ScrollPerPixel);
+    //    m_pTableView->setColumnHidden(0,true);
+    //    m_pTableView->setColumnHidden(2,true);
+    //    m_pTableView->setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Expanding);
+    //    m_pTableView->horizontalHeader()->setSectionResizeMode(1, QHeaderView::ResizeToContents); //Stretch 2 column to maximal width
+    //    m_pTableView->horizontalHeader()->hide();
+    //    m_pTableView->resizeColumnsToContents();
+    //    m_pTableView->setVerticalScrollMode(QAbstractItemView::ScrollPerPixel);
+    //    m_pTableView->setHorizontalScrollMode(QAbstractItemView::ScrollPerPixel);
     m_iT = 10;
 
     m_pTableView->setContextMenuPolicy(Qt::CustomContextMenu);
@@ -220,9 +218,9 @@ void FiffRawView::setModel(const QSharedPointer<FiffRawViewModel>& pModel)
     connect(m_pModel.data(), &FiffRawViewModel::newRealtimeData,
             this, &FiffRawView::onNewRealtimeData, Qt::UniqueConnection);
 
-//    //Gestures
-//    m_pTableView->grabGesture(Qt::PinchGesture);
-//    m_pTableView->grabGesture(Qt::TapAndHoldGesture);
+    //    //Gestures
+    //    m_pTableView->grabGesture(Qt::PinchGesture);
+    //    m_pTableView->grabGesture(Qt::TapAndHoldGesture);
     updateTimeLabels(0);
     updateFileLabel();
     updateFilterLabel();
@@ -230,10 +228,10 @@ void FiffRawView::setModel(const QSharedPointer<FiffRawViewModel>& pModel)
 
 //=============================================================================================================
 
-void FiffRawView::resizeEvent(QResizeEvent * event)
+void FiffRawView::resizeEvent(QResizeEvent* event)
 {
-    if(m_pTableView) {
-        emit tableViewDataWidthChanged(m_pTableView->width()-m_pTableView->columnWidth(0));
+    if (m_pTableView) {
+        emit tableViewDataWidthChanged(m_pTableView->width() - m_pTableView->columnWidth(0));
         m_pTableView->resizeColumnsToContents();
         setWindowSize(m_iT);
         setZoom(m_fZoomFactor);
@@ -246,7 +244,7 @@ void FiffRawView::resizeEvent(QResizeEvent * event)
 
 void FiffRawView::setScalingMap(const QMap<qint32, float>& scaleMap)
 {
-    if(!m_pModel) {
+    if (!m_pModel) {
         return;
     }
 
@@ -266,7 +264,7 @@ void FiffRawView::setSignalColor(const QColor& signalColor)
 
 void FiffRawView::setBackgroundColor(const QColor& backgroundColor)
 {
-    if(!m_pModel) {
+    if (!m_pModel) {
         return;
     }
 
@@ -279,10 +277,10 @@ void FiffRawView::setZoom(double dZoomFac)
 {
     m_fZoomFactor = dZoomFac;
 
-    m_pTableView->verticalHeader()->setDefaultSectionSize(m_pTableView->height() / m_fZoomFactor/**m_fDefaultSectionSize*/);//Row Height
+    m_pTableView->verticalHeader()->setDefaultSectionSize(m_pTableView->height() / m_fZoomFactor /**m_fDefaultSectionSize*/); //Row Height
 
     QFont font = m_pTableView->font();
-    font.setPointSize(std::min((m_pTableView->height() / m_fZoomFactor) / 4.,  12.));
+    font.setPointSize(std::min((m_pTableView->height() / m_fZoomFactor) / 4., 12.));
     m_pTableView->setFont(font);
 
     updateView();
@@ -292,7 +290,7 @@ void FiffRawView::setZoom(double dZoomFac)
 
 void FiffRawView::setWindowSize(int iT)
 {
-    if(!m_pModel) {
+    if (!m_pModel) {
         return;
     }
 
@@ -306,7 +304,7 @@ void FiffRawView::setWindowSize(int iT)
     m_iT = iT;
 
     m_pModel->setWindowSize(iT,
-                            m_pTableView->width() - (m_pTableView->verticalHeader()->width()/* + m_pTableView->verticalScrollBar()->width()*/) /*- m_pTableView->columnWidth(0)*/,
+                            m_pTableView->width() - (m_pTableView->verticalHeader()->width() /* + m_pTableView->verticalScrollBar()->width()*/) /*- m_pTableView->columnWidth(0)*/,
                             iNewPos);
 
     m_pTableView->resizeRowsToContents();
@@ -321,15 +319,15 @@ void FiffRawView::setWindowSize(int iT)
 
 void FiffRawView::setDistanceTimeSpacer(int iValue)
 {
-    if(!m_pModel) {
+    if (!m_pModel) {
         return;
     }
 
     m_pModel->distanceTimeSpacerChanged(iValue);
 
     //Wiggle view area to trigger update (there's probably a better way of doing this)
-    m_pTableView->horizontalScrollBar()->setValue(m_pTableView->horizontalScrollBar()->value()+1);
-    m_pTableView->horizontalScrollBar()->setValue(m_pTableView->horizontalScrollBar()->value()-1);
+    m_pTableView->horizontalScrollBar()->setValue(m_pTableView->horizontalScrollBar()->value() + 1);
+    m_pTableView->horizontalScrollBar()->setValue(m_pTableView->horizontalScrollBar()->value() - 1);
 }
 
 //=============================================================================================================
@@ -341,11 +339,11 @@ void FiffRawView::onMakeScreenshot(const QString& imageType)
     QString sDate = QDate::currentDate().toString("yyyy_MM_dd");
     QString sTime = QTime::currentTime().toString("hh_mm_ss");
 
-    if(!QDir("./Screenshots").exists()) {
+    if (!QDir("./Screenshots").exists()) {
         QDir().mkdir("./Screenshots");
     }
 
-    if(imageType.contains("SVG")) {
+    if (imageType.contains("SVG")) {
         fileName = QString("./Screenshots/%1-%2-AnalyzeDataView.svg").arg(sDate).arg(sTime);
 
         QSvgGenerator svgGen;
@@ -355,7 +353,7 @@ void FiffRawView::onMakeScreenshot(const QString& imageType)
 
         m_pTableView->render(&svgGen);
         qInfo() << "[FiffRawView::onMakeScreenshot] Saving SVG Screenshot";
-    } else if(imageType.contains("PNG")) {
+    } else if (imageType.contains("PNG")) {
         fileName = QString("./Screenshots/%1-%2-AnalyzeDataView.png").arg(sDate).arg(sTime);
 
         QPixmap pixMap = m_pTableView->grab();
@@ -377,9 +375,9 @@ void FiffRawView::initRightClickContextMenu()
 
 //=============================================================================================================
 
-void FiffRawView::customContextMenuRequested(const QPoint &pos)
+void FiffRawView::customContextMenuRequested(const QPoint& pos)
 {
-    if(!m_pModel || m_pModel->isEmpty()) {
+    if (!m_pModel || m_pModel->isEmpty()) {
         return;
     }
 
@@ -398,7 +396,7 @@ void FiffRawView::addTimeMark(bool con)
 {
     Q_UNUSED(con);
 
-    if(!m_pModel) {
+    if (!m_pModel) {
         return;
     }
 
@@ -409,7 +407,7 @@ void FiffRawView::addTimeMark(bool con)
 
 void FiffRawView::toggleDisplayEvent(const int& iToggle)
 {
-    if(!m_pModel) {
+    if (!m_pModel) {
         return;
     }
 
@@ -428,55 +426,54 @@ void FiffRawView::updateView()
 
 //=============================================================================================================
 
-bool FiffRawView::eventFilter(QObject *object, QEvent *event)
+bool FiffRawView::eventFilter(QObject* object, QEvent* event)
 {
     if ((object == m_pTableView->horizontalScrollBar() ||
          object == m_pTableView->verticalScrollBar() ||
-         object == m_pTableView->verticalHeader())
-        && event->type() == QEvent::Enter) {
+         object == m_pTableView->verticalHeader()) &&
+        event->type() == QEvent::Enter) {
         QScroller::ungrabGesture(m_pTableView);
         return true;
     } else
 
-    //Activate grabbing gesture when scrollbars or vertical header are deselected
-    if ((object == m_pTableView->horizontalScrollBar() ||
-         object == m_pTableView->verticalScrollBar() ||
-         object == m_pTableView->verticalHeader())
-        && event->type() == QEvent::Leave) {
-        QScroller::grabGesture(m_pTableView, QScroller::LeftMouseButtonGesture);
-        return true;
-    } else
+        //Activate grabbing gesture when scrollbars or vertical header are deselected
+        if ((object == m_pTableView->horizontalScrollBar() ||
+             object == m_pTableView->verticalScrollBar() ||
+             object == m_pTableView->verticalHeader()) &&
+            event->type() == QEvent::Leave) {
+            QScroller::grabGesture(m_pTableView, QScroller::LeftMouseButtonGesture);
+            return true;
+        } else
 
-    if(event->type() == QEvent::KeyPress){
-        qDebug() << "Key Press";
-        QKeyEvent *keyEvent = static_cast<QKeyEvent *>(event);
-        switch(keyEvent->key()){
-        case Qt::Key_E :{
-            if(m_pModel){
-                m_iLastClickedSample = m_pModel->getScrollerPosition();
-                addTimeMark(true);
+            if (event->type() == QEvent::KeyPress) {
+            qDebug() << "Key Press";
+            QKeyEvent* keyEvent = static_cast<QKeyEvent*>(event);
+            switch (keyEvent->key()) {
+                case Qt::Key_E: {
+                    if (m_pModel) {
+                        m_iLastClickedSample = m_pModel->getScrollerPosition();
+                        addTimeMark(true);
+                    }
+                }
             }
         }
-        }
-    }
 
-    if(event->type() == QEvent::MouseButtonPress){
-        QMouseEvent *mouseEvent = static_cast<QMouseEvent *>(event);
-        switch(mouseEvent->button()){
-        case Qt::LeftButton:{
-            if(m_pModel && object == m_pTableView->viewport()){
-            QPoint pos = mouseEvent->pos();
-            m_pModel->setScrollerSample(static_cast<int>(floor((float)m_pModel->absoluteFirstSample() + //accounting for first sample offset
-                                     (m_pTableView->horizontalScrollBar()->value() / m_pModel->pixelDifference()) + //accounting for scroll offset
-                                     ((float)pos.x() / m_pModel->pixelDifference())))); //accounting for mouse position offset
-            m_pTableView->viewport()->repaint();
+    if (event->type() == QEvent::MouseButtonPress) {
+        QMouseEvent* mouseEvent = static_cast<QMouseEvent*>(event);
+        switch (mouseEvent->button()) {
+            case Qt::LeftButton: {
+                if (m_pModel && object == m_pTableView->viewport()) {
+                    QPoint pos = mouseEvent->pos();
+                    m_pModel->setScrollerSample(static_cast<int>(floor((float)m_pModel->absoluteFirstSample() +                                       //accounting for first sample offset
+                                                                       (m_pTableView->horizontalScrollBar()->value() / m_pModel->pixelDifference()) + //accounting for scroll offset
+                                                                       ((float)pos.x() / m_pModel->pixelDifference()))));                             //accounting for mouse position offset
+                    m_pTableView->viewport()->repaint();
+                }
+                break;
             }
-            break;
+            default:
+                break;
         }
-        default:
-            break;
-        }
-
     }
 
     return QWidget::eventFilter(object, event);
@@ -486,7 +483,7 @@ bool FiffRawView::eventFilter(QObject *object, QEvent *event)
 
 void FiffRawView::updateScrollPositionToEvent()
 {
-    if(!m_pModel) {
+    if (!m_pModel) {
         return;
     }
 
@@ -496,7 +493,7 @@ void FiffRawView::updateScrollPositionToEvent()
 
     //qDebug() << "Div:" << iSample * dDx;
     int iPos = static_cast<int>(iSample * dDx) - static_cast<int>(m_pTableView->width() / 2);
-    if(iPos < 0){
+    if (iPos < 0) {
         iPos = 0;
     }
     //qDebug() << "Current scroll:" << m_pTableView->horizontalScrollBar()->value();
@@ -508,7 +505,7 @@ void FiffRawView::updateScrollPositionToEvent()
 
 void FiffRawView::setFilter(const FilterKernel& filterData)
 {
-    if(!m_pModel) {
+    if (!m_pModel) {
         return;
     }
 
@@ -520,7 +517,7 @@ void FiffRawView::setFilter(const FilterKernel& filterData)
 
 void FiffRawView::setFilterActive(bool state)
 {
-    if(!m_pModel) {
+    if (!m_pModel) {
         return;
     }
     m_pModel->setFilterActive(state);
@@ -529,9 +526,9 @@ void FiffRawView::setFilterActive(bool state)
 
 //=============================================================================================================
 
-void FiffRawView::setFilterChannelType(const QString &channelType)
+void FiffRawView::setFilterChannelType(const QString& channelType)
 {
-    if(!m_pModel) {
+    if (!m_pModel) {
         return;
     }
 
@@ -542,7 +539,7 @@ void FiffRawView::setFilterChannelType(const QString &channelType)
 
 void FiffRawView::createBottomLabels()
 {
-    QHBoxLayout *LabelLayout = new QHBoxLayout(this);
+    QHBoxLayout* LabelLayout = new QHBoxLayout(this);
     QWidget* labelBar = new QWidget(this);
 
     m_pInitialTimeLabel = new QLabel(this);
@@ -580,7 +577,7 @@ void FiffRawView::updateTimeLabels(int iValue)
 {
     Q_UNUSED(iValue);
 
-    if(m_pModel->isEmpty()) {
+    if (m_pModel->isEmpty()) {
         m_pEndTimeLabel->setText("0 | 0 sec");
         m_pInitialTimeLabel->setText("0 | 0 sec");
         return;
@@ -611,7 +608,7 @@ void FiffRawView::disconnectModel()
 
     // Disconnect resizing of the table view to the MVC
     disconnect(this, &FiffRawView::tableViewDataWidthChanged,
-            m_pModel.data(), &FiffRawViewModel::setDataColumnWidth);
+               m_pModel.data(), &FiffRawViewModel::setDataColumnWidth);
 
     disconnect(m_pModel.data(), &FiffRawViewModel::newRealtimeData,
                this, &FiffRawView::onNewRealtimeData);
@@ -622,7 +619,7 @@ void FiffRawView::disconnectModel()
 void FiffRawView::updateVerticalScrollPosition(qint32 newScrollPosition)
 {
     Q_UNUSED(newScrollPosition);
-    if(FiffRawViewDelegate *pDelegate = qobject_cast<FiffRawViewDelegate *>(m_pTableView->itemDelegate())) {
+    if (FiffRawViewDelegate* pDelegate = qobject_cast<FiffRawViewDelegate*>(m_pTableView->itemDelegate())) {
         pDelegate->setUpperItemIndex(m_pTableView->rowAt(0));
     }
 }
@@ -643,7 +640,7 @@ void FiffRawView::loadSettings()
 
 void FiffRawView::updateGuiMode(GuiMode mode)
 {
-    switch(mode) {
+    switch (mode) {
         case GuiMode::Clinical:
             break;
         default: // default is research mode
@@ -655,7 +652,7 @@ void FiffRawView::updateGuiMode(GuiMode mode)
 
 void FiffRawView::updateProcessingMode(ProcessingMode mode)
 {
-    switch(mode) {
+    switch (mode) {
         case ProcessingMode::Offline:
             break;
         default: // default is realtime mode
@@ -667,13 +664,13 @@ void FiffRawView::updateProcessingMode(ProcessingMode mode)
 
 void FiffRawView::showSelectedChannelsOnly(const QList<int> selectedChannelsIndexes)
 {
-    if (selectedChannelsIndexes.contains(-1)){
-        for(int i = 0; i<m_pModel->rowCount(); i++) {
+    if (selectedChannelsIndexes.contains(-1)) {
+        for (int i = 0; i < m_pModel->rowCount(); i++) {
             m_pTableView->showRow(i);
         }
     } else {
-        for(int i = 0; i<m_pModel->rowCount(); i++) {
-            if (selectedChannelsIndexes.contains(i)){
+        for (int i = 0; i < m_pModel->rowCount(); i++) {
+            if (selectedChannelsIndexes.contains(i)) {
                 m_pTableView->showRow(i);
             } else {
                 m_pTableView->hideRow(i);
@@ -681,7 +678,7 @@ void FiffRawView::showSelectedChannelsOnly(const QList<int> selectedChannelsInde
         }
     }
 
-    if(FiffRawViewDelegate *pDelegate = qobject_cast<FiffRawViewDelegate *>(m_pTableView->itemDelegate())) {
+    if (FiffRawViewDelegate* pDelegate = qobject_cast<FiffRawViewDelegate*>(m_pTableView->itemDelegate())) {
         pDelegate->setUpperItemIndex(m_pTableView->rowAt(0));
     }
 }
@@ -690,11 +687,11 @@ void FiffRawView::showSelectedChannelsOnly(const QList<int> selectedChannelsInde
 
 void FiffRawView::showAllChannels()
 {
-    for(int i = 0; i<m_pModel->rowCount(); i++) {
+    for (int i = 0; i < m_pModel->rowCount(); i++) {
         m_pTableView->showRow(i);
     }
 
-    if(FiffRawViewDelegate *pDelegate = qobject_cast<FiffRawViewDelegate *>(m_pTableView->itemDelegate())) {
+    if (FiffRawViewDelegate* pDelegate = qobject_cast<FiffRawViewDelegate*>(m_pTableView->itemDelegate())) {
         pDelegate->setUpperItemIndex(m_pTableView->rowAt(0));
     }
 }
@@ -703,8 +700,7 @@ void FiffRawView::showAllChannels()
 
 void FiffRawView::clearView()
 {
-    if(parentWidget())
-    {
+    if (parentWidget()) {
         parentWidget()->setWindowTitle("Signal Viewer");
     }
     reset();
@@ -714,8 +710,7 @@ void FiffRawView::clearView()
 
 void FiffRawView::updateFileLabel()
 {
-    if(parentWidget())
-    {
+    if (parentWidget()) {
         QString label;
 
         float fFrequency = m_pModel->getSamplingFrequency();
@@ -723,13 +718,13 @@ void FiffRawView::updateFileLabel()
         int iFileLengthInSamples = m_pModel->absoluteLastSample() - m_pModel->absoluteFirstSample();
         float fFileLengthInSeconds = static_cast<float>(iFileLengthInSamples) / fFrequency;
 
-        if(m_pModel->isRealtime()){
+        if (m_pModel->isRealtime()) {
             label += "   |   MNE Scan Session";
         } else {
             label += "   |   " + m_pModel->getModelName();
         }
-        label += "  -  Sampling Freq. " + QString::number(m_pModel->getSamplingFrequency(),'g',5) + "Hz";
-        label += "  -  Length: " + QString::number(fFileLengthInSeconds,'g',5) + "s.";
+        label += "  -  Sampling Freq. " + QString::number(m_pModel->getSamplingFrequency(), 'g', 5) + "Hz";
+        label += "  -  Length: " + QString::number(fFileLengthInSeconds, 'g', 5) + "s.";
         m_pFileLabel->setText(label);
     }
 }
@@ -739,11 +734,9 @@ void FiffRawView::updateFileLabel()
 void FiffRawView::updateFilterLabel()
 {
     QString label;
-    if(m_pModel->isFilterActive())
-    {
+    if (m_pModel->isFilterActive()) {
         label += "   |   Filter ON";
-    } else
-    {
+    } else {
         label += "   |   Filter OFF";
     }
     label += "  -  " + m_pModel->getFilter().getShortDescription() + "  |";

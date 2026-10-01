@@ -50,8 +50,8 @@ public:
      * @param[in] parent         Parent widget.
      * @param[in] f              Window flags.
      */
-    explicit RawView(const QString &sSettingsPath = QString(),
-                     QWidget *parent = nullptr,
+    explicit RawView(const QString& sSettingsPath = QString(),
+                     QWidget* parent = nullptr,
                      Qt::WindowFlags f = Qt::Widget);
 
     //=========================================================================================================

@@ -63,18 +63,18 @@ namespace UTILSLIB
  */
 struct UTILSSHARED_EXPORT PolhemusSerialConfig
 {
-    int                       baudRate = 115200;
-    FastrakParser::Units     units    = FastrakParser::Units::Inches;
+    int baudRate = 115200;
+    FastrakParser::Units units = FastrakParser::Units::Inches;
     /** Hemisphere vector for all stations. The Fastrak tracks sensors
      *  within the half-space defined by this direction from the transmitter.
      *  Example: (0,0,1) = +Z (superior), (0,0,-1) = -Z (inferior).
      *  Set to a non-zero vector to send Fastrak "H<n>,x,y,z\r" for
      *  stations 1-4 at connect time. Default (0,0,0) = don't change. */
-    QVector3D                 hemisphere = QVector3D(0, 0, 0);
+    QVector3D hemisphere = QVector3D(0, 0, 0);
     /** Stream control command sent right after opening the port. The
      *  factory default for Fastrak is `"C\r"` (continuous ASCII output);
      *  use `"P\r"` if the application drives polled mode itself. */
-    QByteArray                streamCommand = QByteArrayLiteral("C\r");
+    QByteArray streamCommand = QByteArrayLiteral("C\r");
 };
 
 //=============================================================================================================
@@ -98,13 +98,13 @@ public:
      *
      * @return True if connected (or already connected), false if the backend failed to open.
      */
-    bool    open(const QString& portName,
-                 const PolhemusSerialConfig& cfg = PolhemusSerialConfig{});
+    bool open(const QString& portName,
+              const PolhemusSerialConfig& cfg = PolhemusSerialConfig{});
 
     /** Close the active connection. Safe to call when already closed. */
-    void    close();
+    void close();
 
-    bool    isConnected() const;
+    bool isConnected() const;
     QString backendName() const;
 
     //=========================================================================================================
@@ -132,7 +132,7 @@ public:
      *
      * @return Port name of a Polhemus-vendor port, else the first FTDI port, else an empty string.
      */
-    static QString  autoDetectPortName();
+    static QString autoDetectPortName();
 
 signals:
     /**
@@ -172,20 +172,24 @@ private:
     void closeSerial();
     void drainParser();
 
-    bool        m_isConnected = false;
-    QString     m_backendName;
+    bool m_isConnected = false;
+    QString m_backendName;
 
     // Mock backend ------------------------------------------------------------
-    QTimer      m_mockTimer;
-    int         m_mockSampleIdx = 0;
+    QTimer m_mockTimer;
+    int m_mockSampleIdx = 0;
 
     // Serial backend ----------------------------------------------------------
-    QSerialPort*    m_pSerial = nullptr;
-    FastrakParser  m_parser;
+    QSerialPort* m_pSerial = nullptr;
+    FastrakParser m_parser;
 
     // Pen-button detection (stream-pause timeout) -----------------------------
-    QTimer      m_streamPauseTimer;
-    struct StationSample { QVector3D position; QQuaternion orientation; };
+    QTimer m_streamPauseTimer;
+    struct StationSample
+    {
+        QVector3D position;
+        QQuaternion orientation;
+    };
     QMap<int, StationSample> m_lastSamples;
 };
 

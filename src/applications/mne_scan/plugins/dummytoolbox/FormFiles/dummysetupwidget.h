@@ -31,8 +31,9 @@
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-namespace Ui {
-    class DummySetupWidgetClass;
+namespace Ui
+{
+class DummySetupWidgetClass;
 }
 
 //=============================================================================================================
@@ -59,7 +60,6 @@ class DummySetupWidget : public QWidget
     Q_OBJECT
 
 public:
-
     //=========================================================================================================
     /**
      * Constructs a DummySetupWidget which is a child of parent.
@@ -67,7 +67,7 @@ public:
      * @param [in] toolbox a pointer to the corresponding DummyToolbox.
      * @param [in] parent pointer to parent widget; If parent is 0, the new DummySetupWidget becomes a window. If parent is another widget, DummySetupWidget becomes a child window inside parent. DummySetupWidget is deleted when its parent is deleted.
      */
-    DummySetupWidget(DummyToolbox* toolbox, QWidget *parent = 0);
+    DummySetupWidget(DummyToolbox* toolbox, QWidget* parent = 0);
 
     //=========================================================================================================
     /**
@@ -77,9 +77,9 @@ public:
     ~DummySetupWidget();
 
 private:
-    DummyToolbox*               m_pDummyToolbox;	/**< Holds a pointer to corresponding DummyToolbox.*/
+    DummyToolbox* m_pDummyToolbox; /**< Holds a pointer to corresponding DummyToolbox.*/
 
-    Ui::DummySetupWidgetClass*  m_pUi;              /**< Holds the user interface for the DummySetupWidget.*/
+    Ui::DummySetupWidgetClass* m_pUi; /**< Holds the user interface for the DummySetupWidget.*/
 };
 } // NAMESPACE
 

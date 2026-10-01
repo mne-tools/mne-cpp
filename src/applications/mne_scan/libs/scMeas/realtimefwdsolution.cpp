@@ -36,7 +36,7 @@ using namespace MNELIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-RealTimeFwdSolution::RealTimeFwdSolution(QObject *parent)
+RealTimeFwdSolution::RealTimeFwdSolution(QObject* parent)
 : Measurement(QMetaType::fromName("RealTimeFwdSolution::SPtr").id(), parent)
 , m_bInitialized(false)
 , m_bClustered(false)

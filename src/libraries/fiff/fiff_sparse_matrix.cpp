@@ -61,7 +61,7 @@ std::vector<int> fiff_get_matrix_dims(const FiffTag::UPtr& tag)
       */
 {
     int ndim;
-    int *dims;
+    int* dims;
     unsigned int tsize = tag->size();
     /*
    * Initial checks
@@ -81,38 +81,36 @@ std::vector<int> fiff_get_matrix_dims(const FiffTag::UPtr& tag)
     /*
    * Get the number of dimensions and check
    */
-    ndim = *((fiff_int_t *)((fiff_byte_t *)(tag->data())+tag->size()-sizeof(fiff_int_t)));
+    ndim = *((fiff_int_t*)((fiff_byte_t*)(tag->data()) + tag->size() - sizeof(fiff_int_t)));
     if (ndim <= 0 || ndim > FIFFC_MATRIX_MAX_DIM) {
         qCritical("fiff_get_matrix_dims: unreasonable # of dimensions!");
         return {};
     }
     if (fiff_type_matrix_coding(tag->type) == FIFFTS_MC_DENSE) {
-        if (tsize < (ndim+1)*sizeof(fiff_int_t)) {
+        if (tsize < (ndim + 1) * sizeof(fiff_int_t)) {
             qCritical("fiff_get_matrix_dims: too small matrix data!");
             return {};
         }
         std::vector<int> res(ndim + 1);
         res[0] = ndim;
-        dims = ((fiff_int_t *)((fiff_byte_t *)(tag->data())+tag->size())) - ndim - 1;
+        dims = ((fiff_int_t*)((fiff_byte_t*)(tag->data()) + tag->size())) - ndim - 1;
         for (int k = 0; k < ndim; k++)
-            res[k+1] = dims[k];
+            res[k + 1] = dims[k];
         return res;
-    }
-    else if (fiff_type_matrix_coding(tag->type) == FIFFTS_MC_CCS ||
-             fiff_type_matrix_coding(tag->type) == FIFFTS_MC_RCS) {
-        if (tsize < (ndim+2)*sizeof(fiff_int_t)) {
+    } else if (fiff_type_matrix_coding(tag->type) == FIFFTS_MC_CCS ||
+               fiff_type_matrix_coding(tag->type) == FIFFTS_MC_RCS) {
+        if (tsize < (ndim + 2) * sizeof(fiff_int_t)) {
             qCritical("fiff_get_matrix_sparse_dims: too small matrix data!");
             return {};
         }
         std::vector<int> res(ndim + 2);
         res[0] = ndim;
-        dims = ((fiff_int_t *)((fiff_byte_t *)(tag->data())+tag->size())) - ndim - 1;
+        dims = ((fiff_int_t*)((fiff_byte_t*)(tag->data()) + tag->size())) - ndim - 1;
         for (int k = 0; k < ndim; k++)
-            res[k+1] = dims[k];
-        res[ndim+1] = dims[-1];
+            res[k + 1] = dims[k];
+        res[ndim + 1] = dims[-1];
         return res;
-    }
-    else {
+    } else {
         qCritical("fiff_get_matrix_dims: unknown matrix coding.");
         return {};
     }
@@ -147,13 +145,13 @@ std::vector<int> FiffSparseMatrix::fiff_get_matrix_sparse_dims(const FiffTag::UP
 
 FiffSparseMatrix::UPtr FiffSparseMatrix::fiff_get_float_sparse_matrix(const FiffTag::UPtr& tag)
 {
-    int   m,n,nz;
-    int   cod,correct_size;
+    int m, n, nz;
+    int cod, correct_size;
 
-    if ( fiff_type_fundamental(tag->type)   != FIFFT_MATRIX ||
-         fiff_type_base(tag->type)          != FIFFT_FLOAT ||
-         (fiff_type_matrix_coding(tag->type) != FIFFTS_MC_CCS &&
-          fiff_type_matrix_coding(tag->type) != FIFFTS_MC_RCS) ) {
+    if (fiff_type_fundamental(tag->type) != FIFFT_MATRIX ||
+        fiff_type_base(tag->type) != FIFFT_FLOAT ||
+        (fiff_type_matrix_coding(tag->type) != FIFFTS_MC_CCS &&
+         fiff_type_matrix_coding(tag->type) != FIFFTS_MC_RCS)) {
         qWarning("[FiffSparseMatrix::fiff_get_float_sparse_matrix] wrong data type!");
         return nullptr;
     }
@@ -167,17 +165,17 @@ FiffSparseMatrix::UPtr FiffSparseMatrix::fiff_get_float_sparse_matrix(const Fiff
         return nullptr;
     }
 
-    m   = dims[1];
-    n   = dims[2];
-    nz  = dims[3];
+    m = dims[1];
+    n = dims[2];
+    nz = dims[3];
 
     cod = fiff_type_matrix_coding(tag->type);
     if (cod == FIFFTS_MC_CCS)
-        correct_size = nz*(sizeof(fiff_float_t) + sizeof(fiff_int_t)) +
-                (n+1+dims[0]+2)*(sizeof(fiff_int_t));
+        correct_size = nz * (sizeof(fiff_float_t) + sizeof(fiff_int_t)) +
+            (n + 1 + dims[0] + 2) * (sizeof(fiff_int_t));
     else if (cod == FIFFTS_MC_RCS)
-        correct_size = nz*(sizeof(fiff_float_t) + sizeof(fiff_int_t)) +
-                (m+1+dims[0]+2)*(sizeof(fiff_int_t));
+        correct_size = nz * (sizeof(fiff_float_t) + sizeof(fiff_int_t)) +
+            (m + 1 + dims[0] + 2) * (sizeof(fiff_int_t));
     else {
         qWarning("[FiffSparseMatrix::fiff_get_float_sparse_matrix] Incomprehensible sparse matrix coding");
         return nullptr;
@@ -190,8 +188,8 @@ FiffSparseMatrix::UPtr FiffSparseMatrix::fiff_get_float_sparse_matrix(const Fiff
      * Parse tag data into triplets and build Eigen sparse matrix directly
      */
     const float* src_data = reinterpret_cast<const float*>(tag->data());
-    const int*   src_inds = reinterpret_cast<const int*>(src_data + nz);
-    const int*   src_ptrs = src_inds + nz;
+    const int* src_inds = reinterpret_cast<const int*>(src_data + nz);
+    const int* src_ptrs = src_inds + nz;
 
     using T = Eigen::Triplet<float>;
     std::vector<T> triplets;
@@ -221,9 +219,9 @@ FiffSparseMatrix::UPtr FiffSparseMatrix::fiff_get_float_sparse_matrix(const Fiff
 
 //=============================================================================================================
 
-FiffSparseMatrix::UPtr FiffSparseMatrix::create_sparse_rcs(int nrow, int ncol, int *nnz, int **colindex, float **vals)
+FiffSparseMatrix::UPtr FiffSparseMatrix::create_sparse_rcs(int nrow, int ncol, int* nnz, int** colindex, float** vals)
 {
-    int j,k,totalNz;
+    int j, k, totalNz;
 
     for (j = 0, totalNz = 0; j < nrow; j++)
         totalNz = totalNz + nnz[j];
@@ -334,7 +332,7 @@ FiffSparseMatrix::UPtr FiffSparseMatrix::pickLowerTriangleRcs() const
 
     for (int k = 0; k < m_eigen.outerSize(); ++k) {
         for (Eigen::SparseMatrix<float>::InnerIterator it(m_eigen, k); it; ++it) {
-            if (it.row() >= it.col()) {  // lower triangle including diagonal
+            if (it.row() >= it.col()) { // lower triangle including diagonal
                 triplets.push_back(T(it.row(), it.col(), it.value()));
             }
         }

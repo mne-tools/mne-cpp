@@ -62,12 +62,12 @@ Network Coherence::calculate(ConnectivitySettings& connectivitySettings)
 {
     Network finalNetwork("COH");
 
-    if(connectivitySettings.isEmpty()) {
+    if (connectivitySettings.isEmpty()) {
         qDebug() << "Coherence::calculate - Input data is empty";
         return finalNetwork;
     }
 
-    if(AbstractMetric::m_bStorageModeIsActive == false) {
+    if (AbstractMetric::m_bStorageModeIsActive == false) {
         connectivitySettings.clearIntermediateData();
     }
 
@@ -77,11 +77,11 @@ Network Coherence::calculate(ConnectivitySettings& connectivitySettings)
     int iNfft = connectivitySettings.getFFTSize();
     int iNFreqs = int(floor(iNfft / 2.0)) + 1;
 
-    if(m_iNumberBinStart == -1 ||
-       m_iNumberBinAmount == -1 ||
-       m_iNumberBinStart > iNFreqs ||
-       m_iNumberBinAmount > iNFreqs ||
-       m_iNumberBinAmount + m_iNumberBinStart > iNFreqs) {
+    if (m_iNumberBinStart == -1 ||
+        m_iNumberBinAmount == -1 ||
+        m_iNumberBinStart > iNFreqs ||
+        m_iNumberBinAmount > iNFreqs ||
+        m_iNumberBinAmount + m_iNumberBinStart > iNFreqs) {
         qDebug() << "Coherence::calculate - Resetting to full spectrum";
         AbstractMetric::m_iNumberBinStart = 0;
         AbstractMetric::m_iNumberBinAmount = iNFreqs;
@@ -95,10 +95,10 @@ Network Coherence::calculate(ConnectivitySettings& connectivitySettings)
     int rows = connectivitySettings.at(0).matData.rows();
     RowVectorXf rowVert = RowVectorXf::Zero(3);
 
-    for(int i = 0; i < rows; ++i) {
+    for (int i = 0; i < rows; ++i) {
         rowVert = RowVectorXf::Zero(3);
 
-        if(connectivitySettings.getNodePositions().rows() != 0 && i < connectivitySettings.getNodePositions().rows()) {
+        if (connectivitySettings.getNodePositions().rows() != 0 && i < connectivitySettings.getNodePositions().rows()) {
             rowVert(0) = connectivitySettings.getNodePositions().row(i)(0);
             rowVert(1) = connectivitySettings.getNodePositions().row(i)(1);
             rowVert(2) = connectivitySettings.getNodePositions().row(i)(2);
@@ -109,7 +109,8 @@ Network Coherence::calculate(ConnectivitySettings& connectivitySettings)
 
     //Calculate all-to-all coherence matrix over epochs
     Coherency::calculateAbs(finalNetwork,
-                             connectivitySettings);;
+                            connectivitySettings);
+    ;
 
     return finalNetwork;
 }

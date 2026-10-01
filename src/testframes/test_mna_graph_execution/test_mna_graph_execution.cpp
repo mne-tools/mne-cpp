@@ -42,7 +42,8 @@ using namespace MNALIB;
 // HELPERS
 //=============================================================================================================
 
-namespace {
+namespace
+{
 
 /**
  * @brief Create a minimal node with one input port and one output port.
@@ -50,19 +51,19 @@ namespace {
 MnaNode makeNode(const QString& id, const QString& opType)
 {
     MnaNode node;
-    node.id     = id;
+    node.id = id;
     node.opType = opType;
-    node.dirty  = true;
+    node.dirty = true;
 
     MnaPort in;
-    in.name      = "in";
-    in.dataKind  = MnaDataKind::Matrix;
+    in.name = "in";
+    in.dataKind = MnaDataKind::Matrix;
     in.direction = MnaPortDir::Input;
     node.inputs.append(in);
 
     MnaPort out;
-    out.name      = "out";
-    out.dataKind  = MnaDataKind::Matrix;
+    out.name = "out";
+    out.dataKind = MnaDataKind::Matrix;
     out.direction = MnaPortDir::Output;
     node.outputs.append(out);
 
@@ -75,13 +76,13 @@ MnaNode makeNode(const QString& id, const QString& opType)
 MnaNode makeSourceNode(const QString& id, const QString& opType)
 {
     MnaNode node;
-    node.id     = id;
+    node.id = id;
     node.opType = opType;
-    node.dirty  = true;
+    node.dirty = true;
 
     MnaPort out;
-    out.name      = "out";
-    out.dataKind  = MnaDataKind::Matrix;
+    out.name = "out";
+    out.dataKind = MnaDataKind::Matrix;
     out.direction = MnaPortDir::Output;
     node.outputs.append(out);
 
@@ -94,13 +95,13 @@ MnaNode makeSourceNode(const QString& id, const QString& opType)
 MnaNode makeSinkNode(const QString& id, const QString& opType)
 {
     MnaNode node;
-    node.id     = id;
+    node.id = id;
     node.opType = opType;
-    node.dirty  = true;
+    node.dirty = true;
 
     MnaPort in;
-    in.name      = "in";
-    in.dataKind  = MnaDataKind::Matrix;
+    in.name = "in";
+    in.dataKind = MnaDataKind::Matrix;
     in.direction = MnaPortDir::Input;
     node.inputs.append(in);
 
@@ -172,17 +173,16 @@ void TestMnaGraphExecution::registerTestOps()
     // "test_source" — generates a constant matrix value
     if (!reg.hasOp("test_source")) {
         MnaOpSchema sourceSchema;
-        sourceSchema.opType  = "test_source";
+        sourceSchema.opType = "test_source";
         sourceSchema.description = "Emit a constant value";
 
         MnaOpSchemaPort outPort;
-        outPort.name     = "out";
+        outPort.name = "out";
         outPort.dataKind = MnaDataKind::Matrix;
         sourceSchema.outputPorts.append(outPort);
 
         reg.registerOp(sourceSchema);
-        reg.registerOpFunc("test_source", [](const QVariantMap& /*inputs*/,
-                                              const QVariantMap& attrs) -> QVariantMap {
+        reg.registerOpFunc("test_source", [](const QVariantMap& /*inputs*/, const QVariantMap& attrs) -> QVariantMap {
             double value = attrs.value("value", 1.0).toDouble();
             return {{"out", value}};
         });
@@ -191,23 +191,22 @@ void TestMnaGraphExecution::registerTestOps()
     // "test_double" — doubles the input
     if (!reg.hasOp("test_double")) {
         MnaOpSchema dblSchema;
-        dblSchema.opType  = "test_double";
+        dblSchema.opType = "test_double";
         dblSchema.description = "Double the input value";
 
         MnaOpSchemaPort inPort;
-        inPort.name     = "in";
+        inPort.name = "in";
         inPort.dataKind = MnaDataKind::Matrix;
         inPort.required = true;
         dblSchema.inputPorts.append(inPort);
 
         MnaOpSchemaPort outPort;
-        outPort.name     = "out";
+        outPort.name = "out";
         outPort.dataKind = MnaDataKind::Matrix;
         dblSchema.outputPorts.append(outPort);
 
         reg.registerOp(dblSchema);
-        reg.registerOpFunc("test_double", [](const QVariantMap& inputs,
-                                              const QVariantMap& /*attrs*/) -> QVariantMap {
+        reg.registerOpFunc("test_double", [](const QVariantMap& inputs, const QVariantMap& /*attrs*/) -> QVariantMap {
             double val = inputs.value("in", 0.0).toDouble();
             return {{"out", val * 2.0}};
         });
@@ -216,23 +215,22 @@ void TestMnaGraphExecution::registerTestOps()
     // "test_add_one" — adds 1 to the input
     if (!reg.hasOp("test_add_one")) {
         MnaOpSchema addSchema;
-        addSchema.opType  = "test_add_one";
+        addSchema.opType = "test_add_one";
         addSchema.description = "Add one to input";
 
         MnaOpSchemaPort inPort;
-        inPort.name     = "in";
+        inPort.name = "in";
         inPort.dataKind = MnaDataKind::Matrix;
         inPort.required = true;
         addSchema.inputPorts.append(inPort);
 
         MnaOpSchemaPort outPort;
-        outPort.name     = "out";
+        outPort.name = "out";
         outPort.dataKind = MnaDataKind::Matrix;
         addSchema.outputPorts.append(outPort);
 
         reg.registerOp(addSchema);
-        reg.registerOpFunc("test_add_one", [](const QVariantMap& inputs,
-                                               const QVariantMap& /*attrs*/) -> QVariantMap {
+        reg.registerOpFunc("test_add_one", [](const QVariantMap& inputs, const QVariantMap& /*attrs*/) -> QVariantMap {
             double val = inputs.value("in", 0.0).toDouble();
             return {{"out", val + 1.0}};
         });
@@ -241,18 +239,17 @@ void TestMnaGraphExecution::registerTestOps()
     // "test_sink" — consumes input, produces nothing
     if (!reg.hasOp("test_sink")) {
         MnaOpSchema sinkSchema;
-        sinkSchema.opType  = "test_sink";
+        sinkSchema.opType = "test_sink";
         sinkSchema.description = "Consume input";
 
         MnaOpSchemaPort inPort;
-        inPort.name     = "in";
+        inPort.name = "in";
         inPort.dataKind = MnaDataKind::Matrix;
         inPort.required = true;
         sinkSchema.inputPorts.append(inPort);
 
         reg.registerOp(sinkSchema);
-        reg.registerOpFunc("test_sink", [](const QVariantMap& inputs,
-                                            const QVariantMap& /*attrs*/) -> QVariantMap {
+        reg.registerOpFunc("test_sink", [](const QVariantMap& inputs, const QVariantMap& /*attrs*/) -> QVariantMap {
             Q_UNUSED(inputs);
             return {};
         });
@@ -362,12 +359,12 @@ void TestMnaGraphExecution::testValidateTypeMismatch()
 
     // Create source with Epochs output
     MnaNode src;
-    src.id     = "src";
+    src.id = "src";
     src.opType = "test_source";
     {
         MnaPort out;
-        out.name      = "out";
-        out.dataKind  = MnaDataKind::Epochs;
+        out.name = "out";
+        out.dataKind = MnaDataKind::Epochs;
         out.direction = MnaPortDir::Output;
         src.outputs.append(out);
     }

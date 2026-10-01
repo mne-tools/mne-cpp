@@ -36,7 +36,7 @@ using namespace FTBUFFERPLUGIN;
 
 FtBufferSetupWidget::FtBufferSetupWidget(FtBuffer* toolbox,
                                          const QString& sSettingsPath,
-                                         QWidget *parent)
+                                         QWidget* parent)
 : QWidget(parent)
 , m_pFtBuffer(toolbox)
 , m_sSettingsPath(sSettingsPath)
@@ -76,7 +76,7 @@ FtBufferSetupWidget::~FtBufferSetupWidget()
 
 void FtBufferSetupWidget::saveSettings()
 {
-    if(m_sSettingsPath.isEmpty()) {
+    if (m_sSettingsPath.isEmpty()) {
         return;
     }
 
@@ -90,7 +90,7 @@ void FtBufferSetupWidget::saveSettings()
 
 void FtBufferSetupWidget::loadSettings()
 {
-    if(m_sSettingsPath.isEmpty()) {
+    if (m_sSettingsPath.isEmpty()) {
         return;
     }
 

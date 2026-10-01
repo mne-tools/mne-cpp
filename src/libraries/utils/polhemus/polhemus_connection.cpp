@@ -25,17 +25,18 @@
 
 using namespace UTILSLIB;
 
-namespace {
-constexpr int    kMockTickIntervalMs = 100;
-constexpr float  kMockSphereRadiusM  = 0.10f;   // 10 cm (typical adult head)
-constexpr int    kMockPointsPerLap   = 60;
-constexpr int    kStreamPauseMs      = 300;      // pen-button pause threshold
+namespace
+{
+constexpr int kMockTickIntervalMs = 100;
+constexpr float kMockSphereRadiusM = 0.10f; // 10 cm (typical adult head)
+constexpr int kMockPointsPerLap = 60;
+constexpr int kStreamPauseMs = 300; // pen-button pause threshold
 }
 
 //=============================================================================================================
 
 PolhemusConnection::PolhemusConnection(QObject* parent)
-    : QObject(parent)
+: QObject(parent)
 {
     m_mockTimer.setInterval(kMockTickIntervalMs);
     connect(&m_mockTimer, &QTimer::timeout, this, &PolhemusConnection::onMockTick);
@@ -126,7 +127,7 @@ QStringList PolhemusConnection::availablePorts()
 QString PolhemusConnection::autoDetectPortName()
 {
     constexpr quint16 kPolhemusVid = 0x0F44;
-    constexpr quint16 kFtdiVid     = 0x0403;
+    constexpr quint16 kFtdiVid = 0x0403;
 
     QString ftdiCandidate;
     for (const auto& info : QSerialPortInfo::availablePorts()) {
@@ -150,7 +151,7 @@ QString PolhemusConnection::autoDetectPortName()
 
 bool PolhemusConnection::openMock()
 {
-    m_backendName   = QStringLiteral("mock");
+    m_backendName = QStringLiteral("mock");
     m_mockSampleIdx = 0;
     m_mockTimer.start();
     return true;
@@ -163,8 +164,7 @@ void PolhemusConnection::closeMock()
 
 void PolhemusConnection::onMockTick()
 {
-    const double phase = (2.0 * M_PI * (m_mockSampleIdx % kMockPointsPerLap))
-                         / static_cast<double>(kMockPointsPerLap);
+    const double phase = (2.0 * M_PI * (m_mockSampleIdx % kMockPointsPerLap)) / static_cast<double>(kMockPointsPerLap);
     const double elevation = 0.3 * std::sin(phase * 3.0);
     const QVector3D pos(
         kMockSphereRadiusM * static_cast<float>(std::cos(phase)),
@@ -231,9 +231,11 @@ bool PolhemusConnection::openSerial(const QString& portName, const PolhemusSeria
         const QVector3D& h = cfg.hemisphere;
         for (int st = 1; st <= 4; ++st) {
             const QByteArray cmd = QStringLiteral("H%1,%2,%3,%4\r")
-                .arg(st)
-                .arg(h.x(), 0, 'f', 1).arg(h.y(), 0, 'f', 1).arg(h.z(), 0, 'f', 1)
-                .toLatin1();
+                                       .arg(st)
+                                       .arg(h.x(), 0, 'f', 1)
+                                       .arg(h.y(), 0, 'f', 1)
+                                       .arg(h.z(), 0, 'f', 1)
+                                       .toLatin1();
             m_pSerial->write(cmd);
         }
         m_pSerial->flush();
@@ -306,7 +308,8 @@ void PolhemusConnection::drainParser()
 
 void PolhemusConnection::onStreamPauseTimeout()
 {
-    if (!m_pSerial || !m_isConnected) return;
+    if (!m_pSerial || !m_isConnected)
+        return;
 
     for (auto it = m_lastSamples.constBegin(); it != m_lastSamples.constEnd(); ++it) {
         emit penButtonPressed(it.key(), it.value().position, it.value().orientation);

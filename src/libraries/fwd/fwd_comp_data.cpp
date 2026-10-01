@@ -22,9 +22,10 @@
 #include <mne/mne_ctf_comp_data_set.h>
 #include <fiff/fiff_types.h>
 
-namespace {
+namespace
+{
 constexpr int FAIL = -1;
-constexpr int OK   =  0;
+constexpr int OK = 0;
 }
 
 //=============================================================================================================
@@ -41,12 +42,12 @@ using namespace FWDLIB;
 //=============================================================================================================
 
 FwdCompData::FwdCompData()
-:set        (nullptr)
-,comp_coils (nullptr)
-,field      (nullptr)
-,vec_field  (nullptr)
-,field_grad (nullptr)
-,client     (nullptr)
+: set(nullptr)
+, comp_coils(nullptr)
+, field(nullptr)
+, vec_field(nullptr)
+, field_grad(nullptr)
+, client(nullptr)
 {
 }
 
@@ -60,7 +61,7 @@ FwdCompData::~FwdCompData()
 
 //=============================================================================================================
 
-int FwdCompData::fwd_comp_field(const Eigen::Vector3f& rd, const Eigen::Vector3f& Q, FwdCoilSet &coils, Eigen::Ref<Eigen::VectorXf> res, void *client)
+int FwdCompData::fwd_comp_field(const Eigen::Vector3f& rd, const Eigen::Vector3f& Q, FwdCoilSet& coils, Eigen::Ref<Eigen::VectorXf> res, void* client)
 {
     FwdCompData* comp = static_cast<FwdCompData*>(client);
 
@@ -71,7 +72,7 @@ int FwdCompData::fwd_comp_field(const Eigen::Vector3f& rd, const Eigen::Vector3f
     /*
        * First compute the field in the primary set of coils
        */
-    if (comp->field(rd,Q,coils,res,comp->client) == FAIL)
+    if (comp->field(rd, Q, coils, res, comp->client) == FAIL)
         return FAIL;
     /*
        * Compensation needed?
@@ -86,7 +87,7 @@ int FwdCompData::fwd_comp_field(const Eigen::Vector3f& rd, const Eigen::Vector3f
     /*
        * Compute the field in the compensation coils
        */
-    if (comp->field(rd,Q,*comp->comp_coils,comp->work,comp->client) == FAIL)
+    if (comp->field(rd, Q, *comp->comp_coils, comp->work, comp->client) == FAIL)
         return FAIL;
     /*
        * Compute the compensated field
@@ -96,15 +97,15 @@ int FwdCompData::fwd_comp_field(const Eigen::Vector3f& rd, const Eigen::Vector3f
 
 //=============================================================================================================
 
-int FwdCompData::fwd_make_ctf_comp_coils(MNECTFCompDataSet *set,
-                                         FwdCoilSet *coils,
-                                         FwdCoilSet *comp_coils)
+int FwdCompData::fwd_make_ctf_comp_coils(MNECTFCompDataSet* set,
+                                         FwdCoilSet* coils,
+                                         FwdCoilSet* comp_coils)
 {
     QList<FiffChInfo> chs;
     QList<FiffChInfo> compchs;
-    int        nchan   = 0;
-    int        ncomp   = 0;
-    int k,res;
+    int nchan = 0;
+    int ncomp = 0;
+    int k, res;
 
     if (!set)
         return OK;
@@ -131,54 +132,52 @@ int FwdCompData::fwd_make_ctf_comp_coils(MNECTFCompDataSet *set,
         }
         ncomp = comp_coils->ncoil();
     }
-    res = set->make_comp(chs,nchan,compchs,ncomp);
+    res = set->make_comp(chs, nchan, compchs, ncomp);
 
     return res;
 }
 
 //=============================================================================================================
 
-FwdCompData *FwdCompData::fwd_make_comp_data(MNECTFCompDataSet *set,
-                                             FwdCoilSet *coils,
-                                             FwdCoilSet *comp_coils,
+FwdCompData* FwdCompData::fwd_make_comp_data(MNECTFCompDataSet* set,
+                                             FwdCoilSet* coils,
+                                             FwdCoilSet* comp_coils,
                                              fwdFieldFunc field,
                                              fwdVecFieldFunc vec_field,
                                              fwdFieldGradFunc field_grad,
-                                             void *client)
+                                             void* client)
 {
     FwdCompData* comp = new FwdCompData();
 
-    if(set)
+    if (set)
         comp->set = new MNECTFCompDataSet(*set);
     else
         comp->set = nullptr;
 
     if (comp_coils) {
         comp->comp_coils = comp_coils->dup_coil_set().release();
-    }
-    else {
+    } else {
         qWarning("No coils to duplicate");
         comp->comp_coils = nullptr;
     }
-    comp->field       = field;
-    comp->vec_field   = vec_field;
-    comp->field_grad  = field_grad;
-    comp->client      = client;
+    comp->field = field;
+    comp->vec_field = vec_field;
+    comp->field_grad = field_grad;
+    comp->client = client;
 
     if (fwd_make_ctf_comp_coils(comp->set,
                                 coils,
                                 comp->comp_coils) != OK) {
         delete comp;
         return nullptr;
-    }
-    else {
+    } else {
         return comp;
     }
 }
 
 //=============================================================================================================
 
-int FwdCompData::fwd_comp_field_vec(const Eigen::Vector3f& rd, FwdCoilSet &coils, Eigen::Ref<Eigen::MatrixXf> res, void *client)
+int FwdCompData::fwd_comp_field_vec(const Eigen::Vector3f& rd, FwdCoilSet& coils, Eigen::Ref<Eigen::MatrixXf> res, void* client)
 {
     FwdCompData* comp = static_cast<FwdCompData*>(client);
 
@@ -189,7 +188,7 @@ int FwdCompData::fwd_comp_field_vec(const Eigen::Vector3f& rd, FwdCoilSet &coils
     /*
        * First compute the field in the primary set of coils
        */
-    if (comp->vec_field(rd,coils,res,comp->client) == FAIL)
+    if (comp->vec_field(rd, coils, res, comp->client) == FAIL)
         return FAIL;
     /*
        * Compensation needed?
@@ -204,7 +203,7 @@ int FwdCompData::fwd_comp_field_vec(const Eigen::Vector3f& rd, FwdCoilSet &coils
     /*
        * Compute the field at the compensation sensors
        */
-    if (comp->vec_field(rd,*comp->comp_coils,comp->vec_work,comp->client) == FAIL)
+    if (comp->vec_field(rd, *comp->comp_coils, comp->vec_work, comp->client) == FAIL)
         return FAIL;
     /*
        * Compute the compensated field of three orthogonal dipoles
@@ -221,7 +220,7 @@ int FwdCompData::fwd_comp_field_vec(const Eigen::Vector3f& rd, FwdCoilSet &coils
 
 //=============================================================================================================
 
-int FwdCompData::fwd_comp_field_grad(const Eigen::Vector3f& rd, const Eigen::Vector3f& Q, FwdCoilSet& coils, Eigen::Ref<Eigen::VectorXf> res, Eigen::Ref<Eigen::VectorXf> xgrad, Eigen::Ref<Eigen::VectorXf> ygrad, Eigen::Ref<Eigen::VectorXf> zgrad, void *client)
+int FwdCompData::fwd_comp_field_grad(const Eigen::Vector3f& rd, const Eigen::Vector3f& Q, FwdCoilSet& coils, Eigen::Ref<Eigen::VectorXf> res, Eigen::Ref<Eigen::VectorXf> xgrad, Eigen::Ref<Eigen::VectorXf> ygrad, Eigen::Ref<Eigen::VectorXf> zgrad, void* client)
 {
     FwdCompData* comp = static_cast<FwdCompData*>(client);
 
@@ -232,7 +231,7 @@ int FwdCompData::fwd_comp_field_grad(const Eigen::Vector3f& rd, const Eigen::Vec
     /*
      * First compute the field in the primary set of coils
      */
-    if (comp->field_grad(rd,Q,coils,res,xgrad,ygrad,zgrad,comp->client) == FAIL)
+    if (comp->field_grad(rd, Q, coils, res, xgrad, ygrad, zgrad, comp->client) == FAIL)
         return FAIL;
     /*
      * Compensation needed?
@@ -252,7 +251,7 @@ int FwdCompData::fwd_comp_field_grad(const Eigen::Vector3f& rd, const Eigen::Vec
     Eigen::VectorXf vw0 = comp->vec_work.row(0).transpose();
     Eigen::VectorXf vw1 = comp->vec_work.row(1).transpose();
     Eigen::VectorXf vw2 = comp->vec_work.row(2).transpose();
-    if (comp->field_grad(rd,Q,*comp->comp_coils,comp->work,vw0,vw1,vw2,comp->client) == FAIL)
+    if (comp->field_grad(rd, Q, *comp->comp_coils, comp->work, vw0, vw1, vw2, comp->client) == FAIL)
         return FAIL;
     comp->vec_work.row(0) = vw0.transpose();
     comp->vec_work.row(1) = vw1.transpose();

@@ -42,7 +42,7 @@ using namespace DISPLIB;
 //=============================================================================================================
 
 TfSettingsView::TfSettingsView(const QString& sSettingsPath,
-                               QWidget *parent,
+                               QWidget* parent,
                                Qt::WindowFlags f)
 : AbstractView(parent, f)
 , m_pUi(new Ui::TfSettingsViewWidget)
@@ -76,7 +76,7 @@ TfSettingsView::~TfSettingsView()
 
 void TfSettingsView::saveSettings()
 {
-    if(m_sSettingsPath.isEmpty()) {
+    if (m_sSettingsPath.isEmpty()) {
         return;
     }
 
@@ -87,7 +87,7 @@ void TfSettingsView::saveSettings()
 
 void TfSettingsView::loadSettings()
 {
-    if(m_sSettingsPath.isEmpty()) {
+    if (m_sSettingsPath.isEmpty()) {
         return;
     }
 
@@ -98,7 +98,7 @@ void TfSettingsView::loadSettings()
 
 void TfSettingsView::updateGuiMode(GuiMode mode)
 {
-    switch(mode) {
+    switch (mode) {
         case GuiMode::Clinical:
             break;
         default: // default is research mode
@@ -110,7 +110,7 @@ void TfSettingsView::updateGuiMode(GuiMode mode)
 
 void TfSettingsView::updateProcessingMode(ProcessingMode mode)
 {
-    switch(mode) {
+    switch (mode) {
         case ProcessingMode::Offline:
             break;
         default: // default is realtime mode
@@ -130,5 +130,4 @@ void TfSettingsView::onNumberTrialRowChanged()
 
 void TfSettingsView::clearView()
 {
-
 }

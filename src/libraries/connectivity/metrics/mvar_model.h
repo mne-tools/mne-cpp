@@ -63,7 +63,8 @@
 // DEFINE NAMESPACE CONNECTIVITYLIB
 //=============================================================================================================
 
-namespace CONNECTIVITYLIB {
+namespace CONNECTIVITYLIB
+{
 
 //=============================================================================================================
 // CONNECTIVITYLIB FORWARD DECLARATIONS
@@ -87,7 +88,6 @@ namespace CONNECTIVITYLIB {
  */
 class CONNECTIVITYSHARED_EXPORT MvarModel
 {
-
 public:
     //=========================================================================================================
     /**
@@ -183,10 +183,10 @@ private:
      */
     int selectOrderBIC(const Eigen::MatrixXd& data, int maxOrder = 20) const;
 
-    QVector<Eigen::MatrixXd>    m_coeffs;       /**< Coefficient matrices A_1..A_p. */
-    Eigen::MatrixXd             m_noiseCov;     /**< Noise covariance matrix. */
-    int                         m_order = 0;    /**< Model order. */
-    int                         m_nChannels = 0;/**< Number of channels. */
+    QVector<Eigen::MatrixXd> m_coeffs; /**< Coefficient matrices A_1..A_p. */
+    Eigen::MatrixXd m_noiseCov;        /**< Noise covariance matrix. */
+    int m_order = 0;                   /**< Model order. */
+    int m_nChannels = 0;               /**< Number of channels. */
 };
 
 //=============================================================================================================

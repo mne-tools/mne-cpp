@@ -45,12 +45,11 @@ AveragingDataModel::AveragingDataModel(QSharedPointer<FIFFLIB::FiffEvokedSet> pE
 , m_pFiffEvokedSet(pEvokedSet)
 , m_bFromFile(false)
 {
-
 }
 
 //=============================================================================================================
 
-AveragingDataModel::AveragingDataModel(const QString &sFilePath,
+AveragingDataModel::AveragingDataModel(const QString& sFilePath,
                                        const QByteArray& byteLoadedData,
                                        QObject* parent)
 : AbstractModel(sFilePath, parent)
@@ -66,12 +65,11 @@ AveragingDataModel::AveragingDataModel(const QString &sFilePath,
 
 AveragingDataModel::~AveragingDataModel()
 {
-
 }
 
 //=============================================================================================================
 
-QVariant AveragingDataModel::data(const QModelIndex &index,
+QVariant AveragingDataModel::data(const QModelIndex& index,
                                   int role) const
 {
     Q_UNUSED(index);
@@ -82,14 +80,14 @@ QVariant AveragingDataModel::data(const QModelIndex &index,
 
 //=============================================================================================================
 
-Qt::ItemFlags AveragingDataModel::flags(const QModelIndex &index) const
+Qt::ItemFlags AveragingDataModel::flags(const QModelIndex& index) const
 {
     return QAbstractItemModel::flags(index);
 }
 
 //=============================================================================================================
 
-int AveragingDataModel::rowCount(const QModelIndex &parent) const
+int AveragingDataModel::rowCount(const QModelIndex& parent) const
 {
     Q_UNUSED(parent);
     return 1;
@@ -97,7 +95,7 @@ int AveragingDataModel::rowCount(const QModelIndex &parent) const
 
 //=============================================================================================================
 
-int AveragingDataModel::columnCount(const QModelIndex &parent) const
+int AveragingDataModel::columnCount(const QModelIndex& parent) const
 {
     Q_UNUSED(parent);
     return 1;

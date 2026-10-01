@@ -46,7 +46,6 @@
 //=============================================================================================================
 
 
-
 //=============================================================================================================
 // DEFINE NAMESPACE MNELIB
 //=============================================================================================================
@@ -71,8 +70,8 @@ class MNESurfacePatch;
 class MNESHARED_EXPORT MNEMshDisplaySurfaceSet
 {
 public:
-    typedef QSharedPointer<MNEMshDisplaySurfaceSet> SPtr;              /**< Shared pointer type for MNEMshDisplaySurfaceSet. */
-    typedef QSharedPointer<const MNEMshDisplaySurfaceSet> ConstSPtr;   /**< Const shared pointer type for MNEMshDisplaySurfaceSet. */
+    typedef QSharedPointer<MNEMshDisplaySurfaceSet> SPtr;            /**< Shared pointer type for MNEMshDisplaySurfaceSet. */
+    typedef QSharedPointer<const MNEMshDisplaySurfaceSet> ConstSPtr; /**< Const shared pointer type for MNEMshDisplaySurfaceSet. */
 
     //=========================================================================================================
     /**
@@ -98,8 +97,7 @@ public:
      *
      * @return A new display surface set, or NULL on failure. Caller takes ownership.
      */
-    static std::unique_ptr<MNEMshDisplaySurfaceSet> load(const QString &subject_id, const QString &surf, const QString &subjects_dir);
-
+    static std::unique_ptr<MNEMshDisplaySurfaceSet> load(const QString& subject_id, const QString& surf, const QString& subjects_dir);
 
 
     /**
@@ -114,11 +112,11 @@ public:
      *
      * @return OK on success, FAIL on error.
      */
-    int add_bem_surface(const QString&       filepath,
-                        int                  kind,
-                        const QString&       bemname,
-                        int                  full_geom,
-                        int                  check);
+    int add_bem_surface(const QString& filepath,
+                        int kind,
+                        const QString& bemname,
+                        int full_geom,
+                        int check);
 
     /**
      * Add a new surface to the set, or replace an existing surface with the
@@ -129,9 +127,8 @@ public:
      * @param[in] isDrawable   Whether the surface should be marked as drawable.
      */
     void add_replace_surface(std::unique_ptr<MNEMshDisplaySurface> newSurf,
-                             bool                  replace,
-                             bool                  isDrawable);
-
+                             bool replace,
+                             bool isDrawable);
 
 
     /**
@@ -176,24 +173,24 @@ public:
     void setup_lights(const MNEMshLightSet& set);
 
 public:
-    QString           subj;	       /**< The name of the subject. */
-    QString           morph_subj;       /**< The subject we are morphing to. */
+    QString subj;                                             /**< The name of the subject. */
+    QString morph_subj;                                       /**< The subject we are morphing to. */
     std::vector<std::unique_ptr<MNEMshDisplaySurface>> surfs; /**< Array of display surfaces (owned). */
-    std::vector<std::unique_ptr<MNESurfacePatch>>  patches;    /**< Optional flat patches for display (owned). */
-    std::vector<float>            patch_rot;            /**< Rotation angles for the (flat) patches. */
-    int               nsurf;	       /**< Number of surfaces. */
-    bool              use_patches;       /**< Whether to use patches for display. */
-    Eigen::VectorXi   active;	       /**< Boolean array indicating which surfaces are currently active. */
-    Eigen::VectorXi   drawable;	       /**< Boolean array indicating which surfaces could be drawn. */
-    std::unique_ptr<MNEMshLightSet> lights;  /**< Current active lighting configuration. */
-    float             rot[3];            /**< Rotation angles of the MRI (in radians). */
-    float             move[3];	       /**< Translation offset for the origin. */
-    float             fov;	       /**< Field of view (extent of the surface). */
-    float             fov_scale;	       /**< Scale factor for extra space around FOV. */
-    float             eye[3];	       /**< Eye position for viewing (used in composite views). */
-    float             up[3];	       /**< Up vector for viewing. */
-    float             bg_color[3];       /**< Background color (RGB). */
-    float             text_color[3];     /**< Text color (RGB). */
+    std::vector<std::unique_ptr<MNESurfacePatch>> patches;    /**< Optional flat patches for display (owned). */
+    std::vector<float> patch_rot;                             /**< Rotation angles for the (flat) patches. */
+    int nsurf;                                                /**< Number of surfaces. */
+    bool use_patches;                                         /**< Whether to use patches for display. */
+    Eigen::VectorXi active;                                   /**< Boolean array indicating which surfaces are currently active. */
+    Eigen::VectorXi drawable;                                 /**< Boolean array indicating which surfaces could be drawn. */
+    std::unique_ptr<MNEMshLightSet> lights;                   /**< Current active lighting configuration. */
+    float rot[3];                                             /**< Rotation angles of the MRI (in radians). */
+    float move[3];                                            /**< Translation offset for the origin. */
+    float fov;                                                /**< Field of view (extent of the surface). */
+    float fov_scale;                                          /**< Scale factor for extra space around FOV. */
+    float eye[3];                                             /**< Eye position for viewing (used in composite views). */
+    float up[3];                                              /**< Up vector for viewing. */
+    float bg_color[3];                                        /**< Background color (RGB). */
+    float text_color[3];                                      /**< Text color (RGB). */
 };
 
 //=============================================================================================================

@@ -46,8 +46,9 @@
 //=============================================================================================================
 
 class QCheckBox;
-namespace Ui {
-    class ScalingViewWidget;
+namespace Ui
+{
+class ScalingViewWidget;
 }
 
 //=============================================================================================================
@@ -107,8 +108,8 @@ class DISPSHARED_EXPORT ScalingView : public AbstractView
     Q_OBJECT
 
 public:
-    typedef QSharedPointer<ScalingView> SPtr;              /**< Shared pointer type for ScalingView. */
-    typedef QSharedPointer<const ScalingView> ConstSPtr;   /**< Const shared pointer type for ScalingView. */
+    typedef QSharedPointer<ScalingView> SPtr;            /**< Shared pointer type for ScalingView. */
+    typedef QSharedPointer<const ScalingView> ConstSPtr; /**< Const shared pointer type for ScalingView. */
 
     //=========================================================================================================
     /**
@@ -120,7 +121,7 @@ public:
      * @param[in] lChannelsToShow Channel types to show scaling controls for ("all" = every type).
      */
     ScalingView(const QString& sSettingsPath = "",
-                QWidget *parent = 0,
+                QWidget* parent = 0,
                 Qt::WindowFlags f = Qt::Widget,
                 const QStringList& lChannelsToShow = QStringList() << "all");
 
@@ -136,7 +137,7 @@ public:
      *
      * @return The current scaling map.
      */
-    QMap<qint32,float> getScaleMap() const;
+    QMap<qint32, float> getScaleMap() const;
 
     //=========================================================================================================
     /**
@@ -144,7 +145,7 @@ public:
      *
      * @param[in] qMapChScaling  Map from FIFF channel kind/unit key to amplitude scale.
      */
-    void setScaleMap(const QMap<qint32, float> &qMapChScaling);
+    void setScaleMap(const QMap<qint32, float>& qMapChScaling);
 
     //=========================================================================================================
     /**
@@ -183,7 +184,6 @@ signals:
     void scalingChanged(const QMap<qint32, float>& scalingMap);
 
 private:
-
     //=============================================================================================================
     /**
      * Emit signal to save scale status and update views.
@@ -330,20 +330,20 @@ private:
      */
     void keyPressEvent(QKeyEvent* event) override;
 
-    QMap<qint32, float>                     m_qMapChScaling;                /**< Channel scaling values. */
-    QMap<qint32, QPointer<ScaleControl> >   m_qMapScaleControls;            /**< Map of channel scaling controls. */
+    QMap<qint32, float> m_qMapChScaling;                      /**< Channel scaling values. */
+    QMap<qint32, QPointer<ScaleControl>> m_qMapScaleControls; /**< Map of channel scaling controls. */
 
-    QString                                 m_sSettingsPath;                /**< The settings path to store the GUI settings to. */
+    QString m_sSettingsPath; /**< The settings path to store the GUI settings to. */
 
-    QStringList                             m_lChannelTypesToShow;          /**< The channel types as strings to show the sliders for. */
+    QStringList m_lChannelTypesToShow; /**< The channel types as strings to show the sliders for. */
 
-    Ui::ScalingViewWidget*                  m_pUi;                          /**< Pointer to the user interface object. */
-    bool                                    m_bLinkMAGtoGRAD;               /**< If this member is set, we link MAGs and GRad scales. */
-    bool                                    m_bIsShiftKeyPressed;           /**< Bool member value to store the use of the shiftkey. */
-    bool                                    m_bManagingSpinBoxChange;       /**< Bool member mutex the state of the spinbox. */
-    bool                                    m_bManagingSliderChange;        /**< Bool member mutex the state of the slider. */
-    bool                                    m_bManagingLinkMagToGrad;       /**< Bool member mutex the link between MAGs and GRADs. */
-    QPointer<QCheckBox>                     m_pCheckBox;                    /**< Stores the conversion ratio between MAGs and GRADs. */
+    Ui::ScalingViewWidget* m_pUi;    /**< Pointer to the user interface object. */
+    bool m_bLinkMAGtoGRAD;           /**< If this member is set, we link MAGs and GRad scales. */
+    bool m_bIsShiftKeyPressed;       /**< Bool member value to store the use of the shiftkey. */
+    bool m_bManagingSpinBoxChange;   /**< Bool member mutex the state of the spinbox. */
+    bool m_bManagingSliderChange;    /**< Bool member mutex the state of the slider. */
+    bool m_bManagingLinkMagToGrad;   /**< Bool member mutex the link between MAGs and GRADs. */
+    QPointer<QCheckBox> m_pCheckBox; /**< Stores the conversion ratio between MAGs and GRADs. */
 };
 
 } // NAMESPACE

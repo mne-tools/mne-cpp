@@ -47,7 +47,8 @@ using namespace ELECTRODESPLUGIN;
 using namespace DISP3DLIB;
 using namespace FIFFLIB;
 
-namespace {
+namespace
+{
 
 ElectrodeLayout parseLayout(const QString& raw)
 {
@@ -66,8 +67,8 @@ ElectrodeLayout parseLayout(const QString& raw)
 //=============================================================================================================
 
 ElectrodesPlugin::ElectrodesPlugin(QObject* parent)
-    : QObject(parent)
-    , m_object(std::make_unique<ElectrodeObject>())
+: QObject(parent)
+, m_object(std::make_unique<ElectrodeObject>())
 {
 }
 
@@ -172,7 +173,7 @@ bool ElectrodesPlugin::loadFiff(const QString& path)
         }
     }
 
-    const QList<int> keepKinds {FIFFV_POINT_EEG, FIFFV_POINT_EXTRA};
+    const QList<int> keepKinds{FIFFV_POINT_EEG, FIFFV_POINT_EXTRA};
     const FiffDigPointSet picked = dig.pickTypes(keepKinds);
 
     if (picked.isEmpty()) {
@@ -247,11 +248,11 @@ bool ElectrodesPlugin::loadCsv(const QString& path)
 
         const QString name = parts[0].trimmed();
         const QString arrayLabel = (parts.size() >= 5 && !parts[4].trimmed().isEmpty())
-                                    ? parts[4].trimmed()
-                                    : fallbackLabel;
+            ? parts[4].trimmed()
+            : fallbackLabel;
         const ElectrodeLayout layout = (parts.size() >= 6)
-                                        ? parseLayout(parts[5])
-                                        : ElectrodeLayout::Depth;
+            ? parseLayout(parts[5])
+            : ElectrodeLayout::Depth;
 
         if (!byLabel.contains(arrayLabel)) {
             ElectrodeArray arr;
@@ -268,8 +269,8 @@ bool ElectrodesPlugin::loadCsv(const QString& path)
 
         ElectrodeContact contact;
         contact.name = name.isEmpty()
-                        ? QStringLiteral("%1_%2").arg(arrayLabel).arg(byLabel[arrayLabel].contacts.size())
-                        : name;
+            ? QStringLiteral("%1_%2").arg(arrayLabel).arg(byLabel[arrayLabel].contacts.size())
+            : name;
         contact.position = QVector3D(x, y, z);
         byLabel[arrayLabel].contacts.append(contact);
         ++contacts;
@@ -359,6 +360,6 @@ void ElectrodesPlugin::publishToScene()
     layer.displayName = QStringLiteral("Electrodes");
     layer.kind = SceneLayerKind::Electrode;
     // Non-owning shared_ptr: the plugin retains ownership of the object.
-    layer.payload = std::shared_ptr<void>(m_object.get(), [](void*){});
+    layer.payload = std::shared_ptr<void>(m_object.get(), [](void*) {});
     m_scene->addLayer(std::move(layer));
 }

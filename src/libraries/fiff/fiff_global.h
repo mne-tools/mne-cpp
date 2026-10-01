@@ -41,11 +41,11 @@
 //=============================================================================================================
 
 #if defined(STATICBUILD)
-#  define FIFFSHARED_EXPORT
+#define FIFFSHARED_EXPORT
 #elif defined(MNE_FIFF_LIBRARY)
-#  define FIFFSHARED_EXPORT Q_DECL_EXPORT    /**< Q_DECL_EXPORT must be added to the declarations of symbols used when compiling a shared library. */
+#define FIFFSHARED_EXPORT Q_DECL_EXPORT /**< Q_DECL_EXPORT must be added to the declarations of symbols used when compiling a shared library. */
 #else
-#  define FIFFSHARED_EXPORT Q_DECL_IMPORT    /**< Q_DECL_IMPORT must be added to the declarations of symbols used when compiling a client that uses the shared library. */
+#define FIFFSHARED_EXPORT Q_DECL_IMPORT /**< Q_DECL_IMPORT must be added to the declarations of symbols used when compiling a client that uses the shared library. */
 #endif
 
 //=============================================================================================================
@@ -61,7 +61,8 @@
  * @ref FiffNamedMatrix, @ref FiffSparseMatrix) and the convenience facade
  * @c FIFF. Surface-level parity with @c mne.io.fiff in MNE-Python.
  */
-namespace FIFFLIB{
+namespace FIFFLIB
+{
 
 //=============================================================================================================
 /**

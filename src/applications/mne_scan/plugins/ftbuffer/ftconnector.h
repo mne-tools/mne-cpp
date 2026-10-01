@@ -55,12 +55,13 @@
 namespace FTBUFFERPLUGIN
 {
 
-struct BufferInfo{
-    int     iNumSamples;                          /**< Number of samples we've read from the buffer. */
-    int     iNumNewSamples;                       /**< Number of total samples (read and unread) in the buffer. */
-    int     iMsgSamples;                          /**< Number of samples in the latest buffer transmission receied. */
-    int     iNumChannels;                         /**< Number of channels in the buffer data. */
-    int     iDataType;                            /**< Type of data in the buffer. */
+struct BufferInfo
+{
+    int iNumSamples;    /**< Number of samples we've read from the buffer. */
+    int iNumNewSamples; /**< Number of total samples (read and unread) in the buffer. */
+    int iMsgSamples;    /**< Number of samples in the latest buffer transmission receied. */
+    int iNumChannels;   /**< Number of channels in the buffer data. */
+    int iDataType;      /**< Type of data in the buffer. */
 };
 
 //=============================================================================================================
@@ -134,7 +135,7 @@ public:
      *
      * @return true if successful, false if unsuccessful.
      */
-    bool setAddr(const QString &sNewAddress);
+    bool setAddr(const QString& sNewAddress);
 
     //=========================================================================================================
     /**
@@ -205,7 +206,7 @@ private:
      *
      * @param[in] messagedef    request structure with the appropriate command and bufszie paramters set.
      */
-    void sendRequest(messagedef_t &messagedef);
+    void sendRequest(messagedef_t& messagedef);
 
     //=========================================================================================================
     /**
@@ -213,7 +214,7 @@ private:
      *
      * @param[in] datasel   Formattd first and last sample index we are requesting from the buffer.
      */
-    void sendDataSel(datasel_t &datasel);
+    void sendDataSel(datasel_t& datasel);
 
     //=========================================================================================================
     /**
@@ -221,7 +222,7 @@ private:
      *
      * @param[in] threshold     Buffer will respond once sample/event numbers reach the thresholds.
      */
-    void sendSampleEvents(samples_events_t &threshold);
+    void sendSampleEvents(samples_events_t& threshold);
 
     //=========================================================================================================
     /**
@@ -231,7 +232,7 @@ private:
      *
      * @return true if successful, false if unsuccessful.
      */
-    bool parseHeaderDef(QBuffer &readBuffer);
+    bool parseHeaderDef(QBuffer& readBuffer);
 
     //=========================================================================================================
     /**
@@ -241,7 +242,7 @@ private:
      *
      * @return returns messagedef_t.bufsize.
      */
-    int parseMessageDef(QBuffer &readBuffer);
+    int parseMessageDef(QBuffer& readBuffer);
 
     //=========================================================================================================
     /**
@@ -251,7 +252,7 @@ private:
      *
      * @return returns datadef_t.bufsize.
      */
-    int parseDataDef(QBuffer &dataBuffer);
+    int parseDataDef(QBuffer& dataBuffer);
 
     //=========================================================================================================
     /**
@@ -262,7 +263,7 @@ private:
      *
      * @return true if successful, false if unsuccessful.
      */
-    bool parseData(QBuffer &datasampBuffer,
+    bool parseData(QBuffer& datasampBuffer,
                    int bufsize);
 
     //=========================================================================================================
@@ -272,7 +273,7 @@ private:
      * @param[out] buffer       QBuffer to which daa will be written.
      * @param[in] numBytes      How many bytes to read from socket.
      */
-    void prepBuffer(QBuffer &buffer,
+    void prepBuffer(QBuffer& buffer,
                     int numBytes);
 
     //=========================================================================================================
@@ -291,26 +292,26 @@ private:
      */
     FIFFLIB::FiffInfo infoFromSimpleHeader();
 
-    int                                     m_iMinSampleRead;                       /**< Number of samples that need to be added t obuffer before we try to read. */
-    int                                     m_iNumSamples;                          /**< Number of samples we've read from the buffer. */
-    int                                     m_iNumNewSamples;                       /**< Number of total samples (read and unread) in the buffer. */
-    int                                     m_iMsgSamples;                          /**< Number of samples in the latest buffer transmission receied. */
-    int                                     m_iNumChannels;                         /**< Number of channels in the buffer data. */
-    int                                     m_iDataType;                            /**< Type of data in the buffer. */
-    int                                     m_iExtendedHeaderSize;                  /**< Size of extended header chunks. */
-    quint16                                 m_iPort;                                /**< Port where the ft bufferis found. */
+    int m_iMinSampleRead;      /**< Number of samples that need to be added t obuffer before we try to read. */
+    int m_iNumSamples;         /**< Number of samples we've read from the buffer. */
+    int m_iNumNewSamples;      /**< Number of total samples (read and unread) in the buffer. */
+    int m_iMsgSamples;         /**< Number of samples in the latest buffer transmission receied. */
+    int m_iNumChannels;        /**< Number of channels in the buffer data. */
+    int m_iDataType;           /**< Type of data in the buffer. */
+    int m_iExtendedHeaderSize; /**< Size of extended header chunks. */
+    quint16 m_iPort;           /**< Port where the ft bufferis found. */
 
-    bool                                    m_bNewData;                             /**< Indicate whether we've received new data. */
+    bool m_bNewData; /**< Indicate whether we've received new data. */
 
-    float                                   m_fSampleFreq;                          /**< Sampling frequency of data in the buffer. */
+    float m_fSampleFreq; /**< Sampling frequency of data in the buffer. */
 
-    QString                                 m_sAddress;                             /**< Address where the ft buffer is found. */
+    QString m_sAddress; /**< Address where the ft buffer is found. */
 
-    QTcpSocket*                             m_pSocket;                              /**< Socket that manages the connection to the ft buffer. */
+    QTcpSocket* m_pSocket; /**< Socket that manages the connection to the ft buffer. */
 
-    Eigen::MatrixXd*                        m_pMatEmit;                             /**< Container to format data to tansmit to FtBuffProducer. */
+    Eigen::MatrixXd* m_pMatEmit; /**< Container to format data to tansmit to FtBuffProducer. */
 };
 
-}//namespace end bracket
+} //namespace end bracket
 
 #endif // FTCONNECTOR_H

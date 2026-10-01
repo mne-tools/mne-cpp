@@ -46,20 +46,22 @@ namespace DISPLIB
 /**
  * @brief Lightweight event mark passed to TimeRulerWidget for the stim lane.
  */
-struct TimeRulerEventMark {
-    int     sample = 0;   ///< Absolute sample index.
-    QColor  color;        ///< Display colour.
-    QString label;        ///< Short text (event type number).
+struct TimeRulerEventMark
+{
+    int sample = 0; ///< Absolute sample index.
+    QColor color;   ///< Display colour.
+    QString label;  ///< Short text (event type number).
 };
 
 //=============================================================================================================
 /**
  * @brief Lightweight reference/sample marker passed to TimeRulerWidget.
  */
-struct TimeRulerReferenceMark {
-    int     sample = 0;   ///< Absolute sample index.
-    QColor  color;        ///< Display colour.
-    QString label;        ///< Short text identifier, e.g. M1.
+struct TimeRulerReferenceMark
+{
+    int sample = 0; ///< Absolute sample index.
+    QColor color;   ///< Display colour.
+    QString label;  ///< Short text identifier, e.g. M1.
 };
 
 //=============================================================================================================
@@ -76,7 +78,7 @@ class DISPSHARED_EXPORT TimeRulerWidget : public QWidget
     Q_OBJECT
 
 public:
-    explicit TimeRulerWidget(QWidget *parent = nullptr);
+    explicit TimeRulerWidget(QWidget* parent = nullptr);
 
     //=========================================================================================================
     /**
@@ -95,12 +97,18 @@ public:
      */
     void setFirstFileSample(int firstFileSample);
 
-    static constexpr int kStimZoneH = 16;  ///< Height of the stimulus lane (px).
-    static constexpr int kTimeZoneH = 28;  ///< Height of the time-tick zone (px).
-    static constexpr int kTotalH    = kStimZoneH + kTimeZoneH; ///< Total widget height (px).
+    static constexpr int kStimZoneH = 16;                   ///< Height of the stimulus lane (px).
+    static constexpr int kTimeZoneH = 28;                   ///< Height of the time-tick zone (px).
+    static constexpr int kTotalH = kStimZoneH + kTimeZoneH; ///< Total widget height (px).
 
-    QSize sizeHint() const override { return QSize(100, kTotalH); }
-    QSize minimumSizeHint() const override { return QSize(50, kTotalH); }
+    QSize sizeHint() const override
+    {
+        return QSize(100, kTotalH);
+    }
+    QSize minimumSizeHint() const override
+    {
+        return QSize(50, kTotalH);
+    }
 
     //=========================================================================================================
     /**
@@ -109,7 +117,7 @@ public:
      *
      * @param[in] events  Event marks (sample position + colour + label).
      */
-    void setEvents(const QVector<TimeRulerEventMark> &events);
+    void setEvents(const QVector<TimeRulerEventMark>& events);
 
     //=========================================================================================================
     /**
@@ -117,7 +125,7 @@ public:
      *
      * @param[in] markers  Reference/sample markers.
      */
-    void setReferenceMarkers(const QVector<TimeRulerReferenceMark> &markers);
+    void setReferenceMarkers(const QVector<TimeRulerReferenceMark>& markers);
 
     //=========================================================================================================
     /**
@@ -132,7 +140,10 @@ public:
      * @param[in] useClock  true = HH:MM:SS, false = float seconds.
      */
     void setClockTimeFormat(bool useClock);
-    bool clockTimeFormat() const { return m_useClockTime; }
+    bool clockTimeFormat() const
+    {
+        return m_useClockTime;
+    }
 
 public slots:
     //=========================================================================================================
@@ -171,8 +182,8 @@ signals:
     void clearReferenceMarkersRequested();
 
 protected:
-    void paintEvent(QPaintEvent *event) override;
-    void contextMenuEvent(QContextMenuEvent *event) override;
+    void paintEvent(QPaintEvent* event) override;
+    void contextMenuEvent(QContextMenuEvent* event) override;
 
 private:
     //=========================================================================================================
@@ -213,11 +224,11 @@ private:
      */
     int nearestReferenceMarkerIndex(int sample, int tolerancePixels = 8) const;
 
-    double m_sfreq           = 1.0;
-    int    m_firstFileSample = 0;
-    float  m_scrollSample    = 0.f;
-    float  m_spp             = 1.f;     // samples per pixel
-    bool   m_useClockTime    = false;   // false = float seconds, true = HH:MM:SS
+    double m_sfreq = 1.0;
+    int m_firstFileSample = 0;
+    float m_scrollSample = 0.f;
+    float m_spp = 1.f;           // samples per pixel
+    bool m_useClockTime = false; // false = float seconds, true = HH:MM:SS
 
     QVector<TimeRulerEventMark> m_events;
     QVector<TimeRulerReferenceMark> m_referenceMarkers;

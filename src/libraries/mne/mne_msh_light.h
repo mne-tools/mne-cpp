@@ -57,8 +57,8 @@ namespace MNELIB
 class MNESHARED_EXPORT MNEMshLight
 {
 public:
-    typedef QSharedPointer<MNEMshLight> SPtr;              /**< Shared pointer type for MNEMshLight. */
-    typedef QSharedPointer<const MNEMshLight> ConstSPtr;   /**< Const shared pointer type for MNEMshLight. */
+    typedef QSharedPointer<MNEMshLight> SPtr;            /**< Shared pointer type for MNEMshLight. */
+    typedef QSharedPointer<const MNEMshLight> ConstSPtr; /**< Const shared pointer type for MNEMshLight. */
 
     //=========================================================================================================
     /**
@@ -72,7 +72,7 @@ public:
      *
      * @param[in] p_mneMshLight  Light to copy.
      */
-    MNEMshLight(const MNEMshLight &p_mneMshLight);
+    MNEMshLight(const MNEMshLight& p_mneMshLight);
 
     //=========================================================================================================
     /**
@@ -86,7 +86,7 @@ public:
      * @param[in] diffY  Diffuse intensity, green component.
      * @param[in] diffZ  Diffuse intensity, blue component.
      */
-    MNEMshLight(int state, float posX, float posY,float posZ,float diffX,float diffY,float diffZ);
+    MNEMshLight(int state, float posX, float posY, float posZ, float diffX, float diffY, float diffZ);
 
     //=========================================================================================================
     /**
@@ -95,16 +95,16 @@ public:
     ~MNEMshLight();
 
 public:
-    bool  state;			/* On or off? */
-    float pos[3];			/* Where is the light? */
-    float diff[3];		/* Diffuse intensity */
+    bool state;    /* On or off? */
+    float pos[3];  /* Where is the light? */
+    float diff[3]; /* Diffuse intensity */
 
-// ### OLD STRUCT ###
-//    typedef struct {		/* Definition of lighting */
-//      int   state;			/* On or off? */
-//      float pos[3];			/* Where is the light? */
-//      float diff[3];		/* Diffuse intensity */
-//    } *mshLight,mshLightRec;	/* We are only using diffuse lights here */
+    // ### OLD STRUCT ###
+    //    typedef struct {		/* Definition of lighting */
+    //      int   state;			/* On or off? */
+    //      float pos[3];			/* Where is the light? */
+    //      float diff[3];		/* Diffuse intensity */
+    //    } *mshLight,mshLightRec;	/* We are only using diffuse lights here */
 };
 
 //=============================================================================================================

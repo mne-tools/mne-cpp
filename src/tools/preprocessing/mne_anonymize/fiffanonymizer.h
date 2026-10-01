@@ -94,7 +94,7 @@ public:
      *
      * @param[in] A FiffAnonyzer object.
      */
-    FiffAnonymizer& operator = (const FiffAnonymizer &t) = delete;
+    FiffAnonymizer& operator=(const FiffAnonymizer& t) = delete;
 
     //=========================================================================================================
     /**
@@ -102,7 +102,7 @@ public:
      *
      * @param[in] a FiffAnonymizer object.
      */
-    FiffAnonymizer(FiffAnonymizer &&obj);
+    FiffAnonymizer(FiffAnonymizer&& obj);
 
     //=========================================================================================================
     /**
@@ -434,7 +434,7 @@ public slots:
      * @param[in] sFilePathIn  String containing the input file name including its path. Can be a relative or.
      * an absolute path.
      */
-    int setInFile(const QString &sFilePathIn);
+    int setInFile(const QString& sFilePathIn);
 
     //=========================================================================================================
     /**
@@ -443,7 +443,7 @@ public slots:
      * @param[in] sFilePathOut String containing the output file name. Can be a relative or.
      * an absolute path.
      */
-    int setOutFile(const QString &sFilePathOut);
+    int setOutFile(const QString& sFilePathOut);
 
     //=========================================================================================================
     /**
@@ -618,7 +618,7 @@ public:
     /**
      * Get value of Subjects's birthday offset.
      */
-    int  getSubjectBirthdayOffset();
+    int getSubjectBirthdayOffset();
 
     //=========================================================================================================
     /**
@@ -717,7 +717,7 @@ private:
      * @param[in] str String to print.
      *
      */
-    inline void printIfVerbose(const QString &str) const;
+    inline void printIfVerbose(const QString& str) const;
 
     //=========================================================================================================
     /**
@@ -760,53 +760,53 @@ private:
     FIFFLIB::FiffStream::SPtr m_pOutStream; /**< Pointer to FiffStream object for writing the result.*/
     FIFFLIB::FiffTag::UPtr m_pTag;          /**< Pointer to FiffTag used for reading and writing each tag.*/
 
-    FIFFLIB::fiff_int_t m_BDfltMAC[2];  /**< MAC addresss substitutor.*/
+    FIFFLIB::fiff_int_t m_BDfltMAC[2]; /**< MAC addresss substitutor.*/
 
-    QSharedPointer<QStack<int32_t> > m_pBlockTypeList;          /**< Pointer to Stack storing info related to the blocks of tags in the file.*/
+    QSharedPointer<QStack<int32_t>> m_pBlockTypeList; /**< Pointer to Stack storing info related to the blocks of tags in the file.*/
 
-    QFile m_fFileIn;                    /**< Input file.*/
-    QFile m_fFileOut;                   /**< Output file.*/
+    QFile m_fFileIn;  /**< Input file.*/
+    QFile m_fFileOut; /**< Output file.*/
 
-    bool m_bFileInSet;                  /**< Input file set.*/
-    bool m_bFileOutSet;                 /**< Output file set.*/
+    bool m_bFileInSet;  /**< Input file set.*/
+    bool m_bFileOutSet; /**< Output file set.*/
 
     bool m_bVerboseMode;                /**< Verbosity mode enabler.*/
     bool m_bBruteMode;                  /**< Advanced anonymization. Anonymize also weight, height and some other fields.*/
     bool m_bMNEEnvironmentMode;         /**< User's request to anonymize info related to the MNE toolbox.*/
     const double m_dMaxValidFiffVerion; /**< Maximum version of the Fiff file standard compatible with this application.*/
 
-    QString m_sDefaultString;           /**< String to be used as substitution of other strings in a fiff file. */
-    QString m_sDefaultShortString;      /**< Short string to be used as substitution of protected short strings in a fiff file. */
-    QDateTime m_dDefaultDate;           /**< Date to be used as substitution of dates found in a fiff file. */
+    QString m_sDefaultString;      /**< String to be used as substitution of other strings in a fiff file. */
+    QString m_sDefaultShortString; /**< Short string to be used as substitution of protected short strings in a fiff file. */
+    QDateTime m_dDefaultDate;      /**< Date to be used as substitution of dates found in a fiff file. */
 
-    QDateTime m_dMeasurementDate;       /**< Date to substitute the measuremnt date appearing in the file.*/
-    int  m_iMeasurementDateOffset;      /**< Number of days to subtract from the measurement date.*/
-    bool m_bUseMeasurementDateOffset;   /**< Flags use Measurement-date days offset.*/
+    QDateTime m_dMeasurementDate;     /**< Date to substitute the measuremnt date appearing in the file.*/
+    int m_iMeasurementDateOffset;     /**< Number of days to subtract from the measurement date.*/
+    bool m_bUseMeasurementDateOffset; /**< Flags use Measurement-date days offset.*/
 
-    QString m_sFiffComment;             /**< Fiff comment string substitutor.*/
-    QString m_sFiffExperimenter;        /**< Fiff experimenter string substitutor.*/
+    QString m_sFiffComment;      /**< Fiff comment string substitutor.*/
+    QString m_sFiffExperimenter; /**< Fiff experimenter string substitutor.*/
 
-    int m_iSubjectId;                   /**< Subject's id substitutor.*/
-    QString m_sSubjectFirstName;        /**< Subject's first name substitutor.*/
-    QString m_sSubjectMidName;          /**< Subject's middle name substitutor.*/
-    QString m_sSubjectLastName;         /**< Subject's last name substitutor.*/
-    QDate m_dSubjectBirthday;       /**< Subject's birthday substitutor.*/
-    int m_iSubjectBirthdayOffset;       /**< Subjects's birthday offset.*/
-    bool m_bUseSubjectBirthdayOffset;   /**< Flags use of Subject's birthday offset.*/
-    QString m_sSubjectComment;          /**< Subject's comment substitutor.*/
-    int m_iSubjectSex;                  /**< Subject's sex substitutor.*/
-    int m_iSubjectHand;                 /**< Subject's hand substitutor.*/
-    float m_fSubjectWeight;             /**< Subject's weight substitutor.*/
-    float m_fSubjectHeight;             /**< Subject's height substitutor.*/
-    QString m_sSubjectHisId;            /**< Subject's HIS ID substitutor.*/
+    int m_iSubjectId;                 /**< Subject's id substitutor.*/
+    QString m_sSubjectFirstName;      /**< Subject's first name substitutor.*/
+    QString m_sSubjectMidName;        /**< Subject's middle name substitutor.*/
+    QString m_sSubjectLastName;       /**< Subject's last name substitutor.*/
+    QDate m_dSubjectBirthday;         /**< Subject's birthday substitutor.*/
+    int m_iSubjectBirthdayOffset;     /**< Subjects's birthday offset.*/
+    bool m_bUseSubjectBirthdayOffset; /**< Flags use of Subject's birthday offset.*/
+    QString m_sSubjectComment;        /**< Subject's comment substitutor.*/
+    int m_iSubjectSex;                /**< Subject's sex substitutor.*/
+    int m_iSubjectHand;               /**< Subject's hand substitutor.*/
+    float m_fSubjectWeight;           /**< Subject's weight substitutor.*/
+    float m_fSubjectHeight;           /**< Subject's height substitutor.*/
+    QString m_sSubjectHisId;          /**< Subject's HIS ID substitutor.*/
 
-    int m_iProjectId;                   /**< Project's id# substitutor.*/
-    QString m_sProjectName;             /**< Project's name substitutor.*/
-    QString m_sProjectAim;              /**< Project's aim substitutor.*/
-    QString m_sProjectPersons;          /**< Project's Persons substitutor.*/
-    QString m_sProjectComment;          /**< Project's comment substitutor.*/
-    QString m_sMNEWorkingDir;           /**< MNE Toolbox working directory used while processing the file.*/
-    QString m_sMNECommand;              /**< MNE Toolbox command line used used while processing the file.*/
+    int m_iProjectId;          /**< Project's id# substitutor.*/
+    QString m_sProjectName;    /**< Project's name substitutor.*/
+    QString m_sProjectAim;     /**< Project's aim substitutor.*/
+    QString m_sProjectPersons; /**< Project's Persons substitutor.*/
+    QString m_sProjectComment; /**< Project's comment substitutor.*/
+    QString m_sMNEWorkingDir;  /**< MNE Toolbox working directory used while processing the file.*/
+    QString m_sMNECommand;     /**< MNE Toolbox command line used used while processing the file.*/
 };
 
 //=============================================================================================================
@@ -816,14 +816,12 @@ private:
 inline QString FiffAnonymizer::subjectSexToString(int sexCode) const
 {
     static QStringList subjectSexRefList =
-    {
-        "unknown" ,
-        "male" ,
-        "female"
-    };
+        {
+            "unknown",
+            "male",
+            "female"};
 
-    if (sexCode > -1 && sexCode < subjectSexRefList.size())
-    {
+    if (sexCode > -1 && sexCode < subjectSexRefList.size()) {
         return subjectSexRefList.at(sexCode);
     } else {
         qCritical() << "Invalid subject sex code. [0 = unknown, 1 = male, 2 = female]. The code of the subject is: " << QString::number(sexCode);
@@ -836,15 +834,13 @@ inline QString FiffAnonymizer::subjectSexToString(int sexCode) const
 inline QString FiffAnonymizer::subjectHandToString(int handCode) const
 {
     static QStringList subjectHandRefList =
-    {
-        "unknown",
-        "right",
-        "left",
-        "ambidextrous"
-    };
+        {
+            "unknown",
+            "right",
+            "left",
+            "ambidextrous"};
 
-    if ((handCode > -1) && (handCode < subjectHandRefList.size()))
-    {
+    if ((handCode > -1) && (handCode < subjectHandRefList.size())) {
         return subjectHandRefList.at(handCode);
     } else {
         qCritical() << "Invalid subject handedness code. [0 = unknown, 1 = right, 2 = left, 3 = ambidextrous]. The code of the subject is: " << QString::number(handCode);
@@ -856,8 +852,7 @@ inline QString FiffAnonymizer::subjectHandToString(int handCode) const
 
 inline void FiffAnonymizer::printIfVerbose(const QString& str) const
 {
-    if(m_bVerboseMode)
-    {
+    if (m_bVerboseMode) {
         std::printf("\n%s", str.toUtf8().data());
     }
 }

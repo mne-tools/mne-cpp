@@ -71,7 +71,7 @@ using namespace UTILSLIB;
  * @param[in] argv  (argument vector) is an array of pointers to arrays of character objects. The array objects are null-terminated strings, representing the arguments that were entered on the command line when the program was started.
  * @return the value that was set to exit() (which is 0 if exit() is called via quit()).
  */
-int main(int argc, char *argv[])
+int main(int argc, char* argv[])
 {
     // #ifdef STATICBUILD
     // Q_INIT_RESOURCE(mne_disp3d);
@@ -94,10 +94,8 @@ int main(int argc, char *argv[])
     QCoreApplication::setApplicationName("mne_dipole_fit");
     QCoreApplication::setApplicationVersion(PROGRAM_VERSION);
 
-    InvDipoleFitSettings settings(&argc,argv);
-    if (settings.measname.isEmpty()
-        || (settings.dipname.isEmpty() && settings.bdipname.isEmpty())
-        || (!settings.include_meg && !settings.include_eeg)) {
+    InvDipoleFitSettings settings(&argc, argv);
+    if (settings.measname.isEmpty() || (settings.dipname.isEmpty() && settings.bdipname.isEmpty()) || (!settings.include_meg && !settings.include_eeg)) {
         return 1;
     }
     if (!QFileInfo(settings.measname).isReadable()) {
@@ -112,17 +110,17 @@ int main(int argc, char *argv[])
         return 1;
     }
 
-    BrainView *pViewer = nullptr;
-    if(settings.gui) {
+    BrainView* pViewer = nullptr;
+    if (settings.gui) {
         pViewer = new BrainView();
-        BrainTreeModel *pModel = new BrainTreeModel();
+        BrainTreeModel* pModel = new BrainTreeModel();
         pModel->addDipoles(set);
 
         // Load brain surface if available
-        if(!settings.bemname.isEmpty()) {
+        if (!settings.bemname.isEmpty()) {
             QFile bemFile(settings.bemname);
             MNEBem bem(bemFile);
-            for(int i = 0; i < bem.size(); ++i) {
+            for (int i = 0; i < bem.size(); ++i) {
                 pModel->addBemSurface("Subject", "BEM", bem[i]);
             }
         }

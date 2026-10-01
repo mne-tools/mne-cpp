@@ -62,15 +62,15 @@ namespace MNALIB
  */
 struct MNASHARED_EXPORT MnaScript
 {
-    QString     language;           ///< "python", "shell", "r", "matlab", "octave", "julia"
-    QString     interpreter;        ///< Interpreter command (e.g. "python3", "/bin/bash", "Rscript")
-                                    ///< Empty → auto-detect from language
-    QStringList interpreterArgs;    ///< Extra args before the script file (e.g. ["-u"] for unbuffered Python)
-    QString     code;               ///< The inline source code (resolved at save-time if sourceUri is set)
-    QString     sourceUri;          ///< Optional authoring-time reference (e.g. "file:///lab/scripts/bandpass.py")
-                                    ///< Tooling resolves this into `code` at serialization; consumers use `code`.
-    QString     codeSha256;         ///< SHA-256 of `code` for integrity verification
-    bool        keepTempFile = false; ///< true → preserve temp script file after execution (debug aid)
+    QString language;            ///< "python", "shell", "r", "matlab", "octave", "julia"
+    QString interpreter;         ///< Interpreter command (e.g. "python3", "/bin/bash", "Rscript")
+                                 ///< Empty → auto-detect from language
+    QStringList interpreterArgs; ///< Extra args before the script file (e.g. ["-u"] for unbuffered Python)
+    QString code;                ///< The inline source code (resolved at save-time if sourceUri is set)
+    QString sourceUri;           ///< Optional authoring-time reference (e.g. "file:///lab/scripts/bandpass.py")
+                                 ///< Tooling resolves this into `code` at serialization; consumers use `code`.
+    QString codeSha256;          ///< SHA-256 of `code` for integrity verification
+    bool keepTempFile = false;   ///< true → preserve temp script file after execution (debug aid)
 
     QJsonObject toJson() const;
     static MnaScript fromJson(const QJsonObject& json);

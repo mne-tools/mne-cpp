@@ -50,13 +50,13 @@ using namespace UTILSLIB;
  * arranged on a circle in the XY plane at z=0, with edge weights
  * proportional to the reciprocal of Euclidean distance.
  */
-static Network buildTestNetwork(int nNodes, const QString &method = "TestMethod")
+static Network buildTestNetwork(int nNodes, const QString& method = "TestMethod")
 {
     Network net;
     net.setConnectivityMethod(method);
 
     // Create nodes on a circle (radius 50 mm, simulating brain scale)
-    const float radius = 0.05f;  // 50 mm in metres
+    const float radius = 0.05f; // 50 mm in metres
     QList<QSharedPointer<NetworkNode>> nodes;
     for (int i = 0; i < nNodes; ++i) {
         float angle = 2.0f * M_PI * i / nNodes;
@@ -70,8 +70,8 @@ static Network buildTestNetwork(int nNodes, const QString &method = "TestMethod"
     // Create edges between all pairs (fully connected, upper triangle)
     for (int i = 0; i < nNodes; ++i) {
         for (int j = i + 1; j < nNodes; ++j) {
-            const RowVectorXf &pi = nodes[i]->getVert();
-            const RowVectorXf &pj = nodes[j]->getVert();
+            const RowVectorXf& pi = nodes[i]->getVert();
+            const RowVectorXf& pj = nodes[j]->getVert();
             float dist = (pi - pj).norm();
 
             // Weight = 1/distance (normalised so max edge ≈ 1.0)
@@ -99,9 +99,12 @@ static Network buildLinearNetwork(double w01, double w12)
     Network net;
     net.setConnectivityMethod("Linear");
 
-    RowVectorXf v0(3); v0 << -0.05f, 0.0f, 0.0f;
-    RowVectorXf v1(3); v1 <<  0.0f,  0.0f, 0.0f;
-    RowVectorXf v2(3); v2 <<  0.05f, 0.0f, 0.0f;
+    RowVectorXf v0(3);
+    v0 << -0.05f, 0.0f, 0.0f;
+    RowVectorXf v1(3);
+    v1 << 0.0f, 0.0f, 0.0f;
+    RowVectorXf v2(3);
+    v2 << 0.05f, 0.0f, 0.0f;
 
     auto n0 = QSharedPointer<NetworkNode>::create(0, v0);
     auto n1 = QSharedPointer<NetworkNode>::create(1, v1);
@@ -111,13 +114,15 @@ static Network buildLinearNetwork(double w01, double w12)
     net.append(n1);
     net.append(n2);
 
-    MatrixXd mw01(1, 1); mw01(0, 0) = w01;
+    MatrixXd mw01(1, 1);
+    mw01(0, 0) = w01;
     auto e01 = QSharedPointer<NetworkEdge>::create(0, 1, mw01);
     net.append(e01);
     n0->append(e01);
     n1->append(e01);
 
-    MatrixXd mw12(1, 1); mw12(0, 0) = w12;
+    MatrixXd mw12(1, 1);
+    mw12(0, 0) = w12;
     auto e12 = QSharedPointer<NetworkEdge>::create(1, 2, mw12);
     net.append(e12);
     n1->append(e12);
@@ -175,9 +180,9 @@ private slots:
 
 private:
     // Reused across tests
-    Network m_fullNet4;     // 4-node fully connected
-    Network m_fullNet10;    // 10-node fully connected
-    Network m_linearNet;    // 3-node chain
+    Network m_fullNet4;  // 4-node fully connected
+    Network m_fullNet10; // 10-node fully connected
+    Network m_linearNet; // 3-node chain
 };
 
 //=============================================================================================================
@@ -192,12 +197,12 @@ void TestNetworkVisualization::initTestCase()
 {
     qInstallMessageHandler(MNELogger::customLogWriter);
 
-    m_fullNet4  = buildTestNetwork(4);
+    m_fullNet4 = buildTestNetwork(4);
     m_fullNet10 = buildTestNetwork(10);
     m_linearNet = buildLinearNetwork(0.8, 0.3);
 
     qDebug() << "TestNetworkVisualization::initTestCase - Networks built";
-    qDebug() << "  4-node:  " << m_fullNet4.getNodes().size()  << "nodes";
+    qDebug() << "  4-node:  " << m_fullNet4.getNodes().size() << "nodes";
     qDebug() << "  10-node: " << m_fullNet10.getNodes().size() << "nodes";
     qDebug() << "  linear:  " << m_linearNet.getNodes().size() << "nodes";
 }
@@ -217,9 +222,9 @@ void TestNetworkVisualization::testNetworkConstruction_data()
     QTest::addColumn<int>("expectedEdges");
 
     // n*(n-1)/2 edges for fully connected
-    QTest::newRow("3 nodes")  << 3  << 3;
-    QTest::newRow("4 nodes")  << 4  << 6;
-    QTest::newRow("5 nodes")  << 5  << 10;
+    QTest::newRow("3 nodes") << 3 << 3;
+    QTest::newRow("4 nodes") << 4 << 6;
+    QTest::newRow("5 nodes") << 5 << 10;
     QTest::newRow("10 nodes") << 10 << 45;
     QTest::newRow("20 nodes") << 20 << 190;
 }
@@ -241,7 +246,8 @@ void TestNetworkVisualization::testNetworkConstruction()
     int edgeCount = 0;
     for (int i = 0; i < connMat.rows(); ++i) {
         for (int j = i + 1; j < connMat.cols(); ++j) {
-            if (connMat(i, j) > 0) edgeCount++;
+            if (connMat(i, j) > 0)
+                edgeCount++;
         }
     }
     QCOMPARE(edgeCount, expectedEdges);
@@ -251,12 +257,12 @@ void TestNetworkVisualization::testNetworkConstruction()
 
 void TestNetworkVisualization::testNodePositions()
 {
-    const auto &nodes = m_fullNet4.getNodes();
+    const auto& nodes = m_fullNet4.getNodes();
     QCOMPARE(nodes.size(), 4);
 
     // Nodes are on a circle of radius 0.05m
     for (int i = 0; i < nodes.size(); ++i) {
-        const RowVectorXf &vert = nodes[i]->getVert();
+        const RowVectorXf& vert = nodes[i]->getVert();
         QCOMPARE(vert.size(), 3);
 
         float r = std::sqrt(vert(0) * vert(0) + vert(1) * vert(1) + vert(2) * vert(2));
@@ -281,7 +287,9 @@ void TestNetworkVisualization::testEdgeWeights()
         for (int j = i + 1; j < connMat.cols(); ++j) {
             QVERIFY2(connMat(i, j) > 0.0,
                      qPrintable(QString("Edge (%1,%2) weight %3 should be > 0")
-                                .arg(i).arg(j).arg(connMat(i, j))));
+                                    .arg(i)
+                                    .arg(j)
+                                    .arg(connMat(i, j))));
         }
     }
 }
@@ -299,7 +307,10 @@ void TestNetworkVisualization::testFullConnectivityMatrix()
         for (int j = 0; j < mirrored.cols(); ++j) {
             QVERIFY2(std::abs(mirrored(i, j) - mirrored(j, i)) < 1e-10,
                      qPrintable(QString("Asymmetric at (%1,%2): %3 vs %4")
-                                .arg(i).arg(j).arg(mirrored(i, j)).arg(mirrored(j, i))));
+                                    .arg(i)
+                                    .arg(j)
+                                    .arg(mirrored(i, j))
+                                    .arg(mirrored(j, i))));
         }
     }
 
@@ -319,10 +330,11 @@ void TestNetworkVisualization::testThresholdZero()
     net.setThreshold(0.0);
 
     // At threshold 0, all edges should be active
-    const auto &edges = net.getThresholdedEdges();
+    const auto& edges = net.getThresholdedEdges();
     int activeCount = 0;
-    for (const auto &edge : edges) {
-        if (edge->isActive()) activeCount++;
+    for (const auto& edge : edges) {
+        if (edge->isActive())
+            activeCount++;
     }
 
     // 5 nodes -> 10 edges
@@ -344,13 +356,13 @@ void TestNetworkVisualization::testThresholdMax()
 
     // Set threshold above max weight -> no edges should survive
     net.setThreshold(minMax.second + 1.0);
-    const auto &edges = net.getThresholdedEdges();
+    const auto& edges = net.getThresholdedEdges();
     QCOMPARE(edges.size(), 0);
 
     // Set threshold between min and max -> some edges filtered
     double midThresh = (minMax.first + minMax.second) / 2.0;
     net.setThreshold(midThresh);
-    const auto &edgesMid = net.getThresholdedEdges();
+    const auto& edgesMid = net.getThresholdedEdges();
     int activeMid = edgesMid.size();
     qDebug() << "  Mid threshold" << midThresh << "-> active:" << activeMid;
     QVERIFY2(activeMid > 0 && activeMid < 10,
@@ -361,13 +373,13 @@ void TestNetworkVisualization::testThresholdMax()
 
 void TestNetworkVisualization::testThresholdProgressive()
 {
-    Network net = buildTestNetwork(6);  // 15 edges
+    Network net = buildTestNetwork(6); // 15 edges
 
     // Threshold operates in absolute weight units; sweep from 0 to max+epsilon
     QPair<double, double> minMax = net.getMinMaxFullWeights();
     double step = (minMax.second - minMax.first) / 10.0;
 
-    int prevActive = 15;  // Start: all must be active at threshold 0
+    int prevActive = 15; // Start: all must be active at threshold 0
     for (int s = 0; s <= 10; ++s) {
         double t = minMax.first + step * s;
         net.setThreshold(t);
@@ -378,7 +390,9 @@ void TestNetworkVisualization::testThresholdProgressive()
         // Active count should be monotonically non-increasing as threshold rises
         QVERIFY2(activeCount <= prevActive,
                  qPrintable(QString("Active edges increased from %1 to %2 at threshold %3")
-                            .arg(prevActive).arg(activeCount).arg(t)));
+                                .arg(prevActive)
+                                .arg(activeCount)
+                                .arg(t)));
         prevActive = activeCount;
     }
 
@@ -399,7 +413,7 @@ void TestNetworkVisualization::testThresholdDegreeUpdate()
 
     // At threshold 0, all nodes should have degree 3 (connected to all others)
     net.setThreshold(0.0);
-    const auto &nodes = net.getNodes();
+    const auto& nodes = net.getNodes();
     for (int i = 0; i < nodes.size(); ++i) {
         QCOMPARE(nodes[i]->getThresholdedDegree(), static_cast<qint16>(3));
     }
@@ -418,7 +432,9 @@ void TestNetworkVisualization::testThresholdDegreeUpdate()
     }
     QVERIFY2(anyDecreased,
              qPrintable(QString("At threshold %1 (mid of %2–%3), some degrees should decrease")
-                        .arg(midThresh).arg(minMax.first).arg(minMax.second)));
+                            .arg(midThresh)
+                            .arg(minMax.first)
+                            .arg(minMax.second)));
 }
 
 //=============================================================================================================
@@ -461,7 +477,7 @@ void TestNetworkVisualization::testLinearNetworkDegrees()
     // Node 1: degree 2 (connected to 0 and 2)
     // Node 2: degree 1 (connected to 1)
     m_linearNet.setThreshold(0.0);
-    const auto &nodes = m_linearNet.getNodes();
+    const auto& nodes = m_linearNet.getNodes();
 
     QCOMPARE(nodes[0]->getThresholdedDegree(), static_cast<qint16>(1));
     QCOMPARE(nodes[1]->getThresholdedDegree(), static_cast<qint16>(2));
@@ -473,17 +489,19 @@ void TestNetworkVisualization::testLinearNetworkDegrees()
 void TestNetworkVisualization::testLinearNetworkEdgeIds()
 {
     m_linearNet.setThreshold(0.0);
-    const auto &edges = m_linearNet.getThresholdedEdges();
+    const auto& edges = m_linearNet.getThresholdedEdges();
 
     QCOMPARE(edges.size(), 2);
 
     // Verify edge endpoint IDs
     bool foundEdge01 = false, foundEdge12 = false;
-    for (const auto &edge : edges) {
+    for (const auto& edge : edges) {
         int s = edge->getStartNodeID();
         int e = edge->getEndNodeID();
-        if ((s == 0 && e == 1) || (s == 1 && e == 0)) foundEdge01 = true;
-        if ((s == 1 && e == 2) || (s == 2 && e == 1)) foundEdge12 = true;
+        if ((s == 0 && e == 1) || (s == 1 && e == 0))
+            foundEdge01 = true;
+        if ((s == 1 && e == 2) || (s == 2 && e == 1))
+            foundEdge12 = true;
     }
 
     QVERIFY2(foundEdge01, "Edge 0-1 should exist");
@@ -524,8 +542,10 @@ void TestNetworkVisualization::testSingleNode()
 void TestNetworkVisualization::testTwoNodes()
 {
     Network net;
-    RowVectorXf v0(3); v0 << 0.0f, 0.0f, 0.0f;
-    RowVectorXf v1(3); v1 << 0.1f, 0.0f, 0.0f;
+    RowVectorXf v0(3);
+    v0 << 0.0f, 0.0f, 0.0f;
+    RowVectorXf v1(3);
+    v1 << 0.1f, 0.0f, 0.0f;
 
     auto n0 = QSharedPointer<NetworkNode>::create(0, v0);
     auto n1 = QSharedPointer<NetworkNode>::create(1, v1);

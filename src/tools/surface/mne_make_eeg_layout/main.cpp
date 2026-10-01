@@ -57,15 +57,15 @@ using namespace Eigen;
  * Azimuthal equidistant projection from 3D electrode positions on a sphere.
  * Projects to a 2D plane preserving angles from the center.
  */
-static void azimuthalProjection(const Vector3f &pos, const Vector3f &center,
-                                 [[maybe_unused]] float radius, float &x, float &y)
+static void azimuthalProjection(const Vector3f& pos, const Vector3f& center,
+                                [[maybe_unused]] float radius, float& x, float& y)
 {
     Vector3f d = pos - center;
     d.normalize();
 
     // Convert to spherical
-    float theta = acos(std::max(-1.0f, std::min(1.0f, d(2))));  // polar angle from z-axis
-    float phi = atan2(d(1), d(0));     // azimuthal angle
+    float theta = acos(std::max(-1.0f, std::min(1.0f, d(2)))); // polar angle from z-axis
+    float phi = atan2(d(1), d(0));                             // azimuthal angle
 
     // Azimuthal equidistant projection
     float r = theta;
@@ -75,7 +75,7 @@ static void azimuthalProjection(const Vector3f &pos, const Vector3f &center,
 
 //=============================================================================================================
 
-int main(int argc, char *argv[])
+int main(int argc, char* argv[])
 {
     qInstallMessageHandler(MNELogger::customLogWriter);
     QCoreApplication app(argc, argv);
@@ -120,7 +120,8 @@ int main(int argc, char *argv[])
     }
 
     // Collect EEG channel positions
-    struct EegCh {
+    struct EegCh
+    {
         QString name;
         Vector3f pos;
     };
@@ -147,14 +148,14 @@ int main(int argc, char *argv[])
 
     // Compute center of mass for a simple sphere fit
     Vector3f center = Vector3f::Zero();
-    for (const EegCh &ch : eegChannels) {
+    for (const EegCh& ch : eegChannels) {
         center += ch.pos;
     }
     center /= eegChannels.size();
 
     // Compute average radius
     float radius = 0.0f;
-    for (const EegCh &ch : eegChannels) {
+    for (const EegCh& ch : eegChannels) {
         radius += (ch.pos - center).norm();
     }
     radius /= eegChannels.size();
@@ -164,7 +165,7 @@ int main(int argc, char *argv[])
 
     // Project to 2D
     QList<float> xs, ys;
-    for (const EegCh &ch : eegChannels) {
+    for (const EegCh& ch : eegChannels) {
         float x, y;
         azimuthalProjection(ch.pos, center, radius, x, y);
         xs.append(x);
@@ -179,8 +180,10 @@ int main(int argc, char *argv[])
 
     float xrange = xmax - xmin;
     float yrange = ymax - ymin;
-    if (xrange < 1e-10f) xrange = 1.0f;
-    if (yrange < 1e-10f) yrange = 1.0f;
+    if (xrange < 1e-10f)
+        xrange = 1.0f;
+    if (yrange < 1e-10f)
+        yrange = 1.0f;
 
     // Write layout file
     QFile outFile(outName);

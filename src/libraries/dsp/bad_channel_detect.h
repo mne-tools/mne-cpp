@@ -59,14 +59,14 @@ namespace UTILSLIB
 struct DSPSHARED_EXPORT BadChannelDetectParams
 {
     // Flat signal
-    double dFlatThreshold = 1e-13;  /**< Peak-to-peak below this -> flat (SI units; ~0.1 fT for MEG). */
+    double dFlatThreshold = 1e-13; /**< Peak-to-peak below this -> flat (SI units; ~0.1 fT for MEG). */
 
     // High variance
-    double dVarZThresh    = 4.0;    /**< Z-score of std-dev above this -> noisy. */
+    double dVarZThresh = 4.0; /**< Z-score of std-dev above this -> noisy. */
 
     // Low correlation
-    double dCorrThresh    = 0.4;    /**< Mean absolute neighbour correlation below this -> isolated. */
-    int    iNeighbours    = 5;      /**< Number of channels on each side to use as neighbours. */
+    double dCorrThresh = 0.4; /**< Mean absolute neighbour correlation below this -> isolated. */
+    int iNeighbours = 5;      /**< Number of channels on each side to use as neighbours. */
 };
 
 //=============================================================================================================
@@ -101,7 +101,7 @@ public:
      * @return Sorted list of bad channel row indices (0-based).
      */
     static QVector<int> detect(const Eigen::MatrixXd& matData,
-                                const Params&          params = Params());
+                               const Params& params = Params());
 
     //=========================================================================================================
     /**
@@ -115,7 +115,7 @@ public:
      * @return Row indices of flat channels.
      */
     static QVector<int> detectFlat(const Eigen::MatrixXd& matData,
-                                    double                 dThreshold = 1e-13);
+                                   double dThreshold = 1e-13);
 
     //=========================================================================================================
     /**
@@ -131,7 +131,7 @@ public:
      * @return Row indices of high-variance channels.
      */
     static QVector<int> detectHighVariance(const Eigen::MatrixXd& matData,
-                                            double                 dZThresh = 4.0);
+                                           double dZThresh = 4.0);
 
     //=========================================================================================================
     /**
@@ -152,8 +152,8 @@ public:
      * @return Row indices of low-correlation channels.
      */
     static QVector<int> detectLowCorrelation(const Eigen::MatrixXd& matData,
-                                              double                 dCorrThresh = 0.4,
-                                              int                    iNeighbours = 5);
+                                             double dCorrThresh = 0.4,
+                                             int iNeighbours = 5);
 
 private:
     //=========================================================================================================

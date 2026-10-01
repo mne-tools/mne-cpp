@@ -26,9 +26,10 @@ class TestFwdExtended : public QObject
     Q_OBJECT
 
 private:
-    QString dataPath() const {
+    QString dataPath() const
+    {
         return QCoreApplication::applicationDirPath() +
-               "/../resources/data/mne-cpp-test-data/";
+            "/../resources/data/mne-cpp-test-data/";
     }
 
 private slots:
@@ -69,7 +70,7 @@ private slots:
     {
         // 3-layer sphere model: brain, skull, scalp
         VectorXf rads(3);
-        rads << 0.070f, 0.080f, 0.090f;  // meters
+        rads << 0.070f, 0.080f, 0.090f; // meters
         VectorXf sigmas(3);
         sigmas << 0.33f, 0.0042f, 0.33f;
 
@@ -83,9 +84,9 @@ private slots:
 
         // Check layers - radii are normalized by outermost layer (R=0.090)
         // After normalization: 0.070/0.090, 0.080/0.090, 0.090/0.090
-        QVERIFY(qAbs(model->layers[0].rad - 0.070f/0.090f) < 1e-5f);
+        QVERIFY(qAbs(model->layers[0].rad - 0.070f / 0.090f) < 1e-5f);
         QVERIFY(qAbs(model->layers[0].sigma - 0.33f) < 1e-6f);
-        QVERIFY(qAbs(model->layers[1].rad - 0.080f/0.090f) < 1e-5f);
+        QVERIFY(qAbs(model->layers[1].rad - 0.080f / 0.090f) < 1e-5f);
         QVERIFY(qAbs(model->layers[2].rad - 1.0f) < 1e-5f);
     }
 
@@ -192,9 +193,9 @@ private slots:
     void sphereModel_legendreNext()
     {
         // Test next_legen for a few values
-        double p0 = 1.0;  // P0(0) = 1
+        double p0 = 1.0; // P0(0) = 1
         double p01 = 0.0;
-        double p1 = 0.0;  // P1(0) = 0
+        double p1 = 0.0; // P1(0) = 0
         double p11 = 0.0;
         double x = 0.5;
 
@@ -244,10 +245,18 @@ private slots:
         int neeg = 4;
         Eigen::Matrix<float, Eigen::Dynamic, 3, Eigen::RowMajor> el(neeg, 3);
         // Place electrodes at various points on the outer sphere
-        el(0,0) = 0.0f; el(0,1) = 0.0f; el(0,2) = 0.09f;
-        el(1,0) = 0.09f; el(1,1) = 0.0f; el(1,2) = 0.0f;
-        el(2,0) = 0.0f; el(2,1) = 0.09f; el(2,2) = 0.0f;
-        el(3,0) = 0.0f; el(3,1) = 0.0f; el(3,2) = -0.09f;
+        el(0, 0) = 0.0f;
+        el(0, 1) = 0.0f;
+        el(0, 2) = 0.09f;
+        el(1, 0) = 0.09f;
+        el(1, 1) = 0.0f;
+        el(1, 2) = 0.0f;
+        el(2, 0) = 0.0f;
+        el(2, 1) = 0.09f;
+        el(2, 2) = 0.0f;
+        el(3, 0) = 0.0f;
+        el(3, 1) = 0.0f;
+        el(3, 2) = -0.09f;
 
         VectorXf Vval(neeg);
         Vval.setZero();

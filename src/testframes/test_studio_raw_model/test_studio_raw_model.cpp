@@ -17,10 +17,11 @@
 
 using namespace MNEBROWSE;
 
-class TestStudioRawModel : public QObject {
+class TestStudioRawModel : public QObject
+{
     Q_OBJECT
 
-    private slots:
+private slots:
     void construction();
     void loadFailures();
     void loadAndInspect();
@@ -28,12 +29,14 @@ class TestStudioRawModel : public QObject {
     void writeAndReopen();
 };
 
-QString rawFilePath() {
+QString rawFilePath()
+{
     return QCoreApplication::applicationDirPath() + QStringLiteral("/../resources/data/mne-cpp-test-data/MEG/sample/"
                                                                    "sample_audvis_trunc_raw.fif");
 }
 
-void TestStudioRawModel::construction() {
+void TestStudioRawModel::construction()
+{
     RawModel model(nullptr);
 
     QVERIFY(!model.isFileLoaded());
@@ -47,7 +50,8 @@ void TestStudioRawModel::construction() {
     QCOMPARE(model.rowCount(), 0);
 }
 
-void TestStudioRawModel::loadFailures() {
+void TestStudioRawModel::loadFailures()
+{
     RawModel model(nullptr);
     QVERIFY(!model.loadFiffData(nullptr));
 
@@ -56,7 +60,8 @@ void TestStudioRawModel::loadFailures() {
     QVERIFY(!model.isFileLoaded());
 }
 
-void TestStudioRawModel::loadAndInspect() {
+void TestStudioRawModel::loadAndInspect()
+{
     const QString rawPath = rawFilePath();
     if (!QFile::exists(rawPath)) {
         QSKIP("Sample raw data not available");
@@ -104,7 +109,8 @@ void TestStudioRawModel::loadAndInspect() {
     QCOMPARE(model.rowCount(), 0);
 }
 
-void TestStudioRawModel::bufferLoad() {
+void TestStudioRawModel::bufferLoad()
+{
     QFile sourceFile(rawFilePath());
     if (!sourceFile.open(QIODevice::ReadOnly)) {
         QSKIP("Sample raw data not available");
@@ -118,7 +124,8 @@ void TestStudioRawModel::bufferLoad() {
     QCOMPARE(model.rowCount(), model.fiffInfo()->nchan);
 }
 
-void TestStudioRawModel::writeAndReopen() {
+void TestStudioRawModel::writeAndReopen()
+{
     QFile sourceFile(rawFilePath());
     if (!sourceFile.exists()) {
         QSKIP("Sample raw data not available");

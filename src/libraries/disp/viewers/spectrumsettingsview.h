@@ -63,8 +63,8 @@ class DISPSHARED_EXPORT SpectrumSettingsView : public AbstractView
     Q_OBJECT
 
 public:
-    typedef QSharedPointer<SpectrumSettingsView> SPtr;              /**< Shared pointer type for SpectrumSettingsView. */
-    typedef QSharedPointer<const SpectrumSettingsView> ConstSPtr;   /**< Const shared pointer type for SpectrumSettingsView. */
+    typedef QSharedPointer<SpectrumSettingsView> SPtr;            /**< Shared pointer type for SpectrumSettingsView. */
+    typedef QSharedPointer<const SpectrumSettingsView> ConstSPtr; /**< Const shared pointer type for SpectrumSettingsView. */
 
     //=========================================================================================================
     /**
@@ -75,7 +75,7 @@ public:
      * @param[in] f Qt window flags passed to the QWidget constructor.
      */
     SpectrumSettingsView(const QString& sSettingsPath = "",
-                         QWidget *parent = Q_NULLPTR,
+                         QWidget* parent = Q_NULLPTR,
                          Qt::WindowFlags f = Qt::Widget);
 
     //=========================================================================================================
@@ -155,8 +155,8 @@ protected:
      */
     void updateProcessingMode(ProcessingMode mode);
 
-    QPointer<QSlider>   m_pSliderLowerBound;    /**< Lower bound frequency. */
-    QPointer<QSlider>   m_pSliderUpperBound;    /**< Upper bound frequency. */
+    QPointer<QSlider> m_pSliderLowerBound; /**< Lower bound frequency. */
+    QPointer<QSlider> m_pSliderUpperBound; /**< Upper bound frequency. */
 
 signals:
     //=========================================================================================================

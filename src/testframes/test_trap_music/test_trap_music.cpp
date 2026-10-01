@@ -64,8 +64,8 @@ private slots:
     void cleanupTestCase();
 
 private:
-    MatrixXd m_leadField;    // nCh × nSrc*3
-    MatrixXd m_sourcePos;    // nSrc × 3
+    MatrixXd m_leadField; // nCh × nSrc*3
+    MatrixXd m_sourcePos; // nSrc × 3
     int m_nCh;
     int m_nSrc;
 };
@@ -208,7 +208,7 @@ void TestTrapMusic::testScanCorrelations()
     VectorXd signal = lfSrc * orient;
     signal.normalize();
 
-    MatrixXd signalSubspace = signal;  // nCh × 1
+    MatrixXd signalSubspace = signal; // nCh × 1
 
     VectorXd corrs = InvTrapMusic::scanCorrelations(m_leadField, signalSubspace, 3);
 
@@ -228,7 +228,7 @@ void TestTrapMusic::testFixedOrient()
     MatrixXd lfFixed = MatrixXd::Zero(m_nCh, m_nSrc);
     for (int i = 0; i < m_nCh; ++i)
         for (int j = 0; j < m_nSrc; ++j)
-            lfFixed(i, j) = m_leadField(i, j * 3);  // Take first orientation
+            lfFixed(i, j) = m_leadField(i, j * 3); // Take first orientation
 
     int srcIdx = 8;
     int nTimes = 50;
@@ -280,7 +280,7 @@ void TestTrapMusic::testEmptyInput()
 
 void TestTrapMusic::testDimensionMismatch()
 {
-    MatrixXd badData(5, 10);  // Wrong number of channels
+    MatrixXd badData(5, 10); // Wrong number of channels
     InvTrapMusic trap;
 
     QList<TrapMusicDipole> dipoles = trap.compute(m_leadField, badData, m_sourcePos, 3);

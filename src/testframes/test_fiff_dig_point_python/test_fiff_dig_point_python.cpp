@@ -66,7 +66,7 @@ using namespace FIFFLIB;
  *
  * @brief The TestFiffDigPointPython class checks the digitizer reader against mne-python.
  */
-class TestFiffDigPointPython: public QObject
+class TestFiffDigPointPython : public QObject
 {
     Q_OBJECT
 
@@ -94,15 +94,14 @@ private slots:
 
 QString TestFiffDigPointPython::rawPath()
 {
-    return QCoreApplication::applicationDirPath()
-           + "/../resources/data/mne-cpp-test-data/MEG/sample/sample_audvis_trunc_raw.fif";
+    return QCoreApplication::applicationDirPath() + "/../resources/data/mne-cpp-test-data/MEG/sample/sample_audvis_trunc_raw.fif";
 }
 
 //=============================================================================================================
 
 void TestFiffDigPointPython::initTestCase()
 {
-    if(!QFile::exists(rawPath())) {
+    if (!QFile::exists(rawPath())) {
         QSKIP("Raw test data not found");
     }
 
@@ -122,10 +121,10 @@ void TestFiffDigPointPython::countByKind_matchesPython_data()
     // A reader that silently dropped one class of point still returns a
     // plausible looking set, so the counts are checked per kind rather than
     // only in total.
-    QTest::newRow("cardinal") << static_cast<int>(FIFFV_POINT_CARDINAL) <<  3;
-    QTest::newRow("hpi")      << static_cast<int>(FIFFV_POINT_HPI)      <<  4;
-    QTest::newRow("eeg")      << static_cast<int>(FIFFV_POINT_EEG)      << 61;
-    QTest::newRow("extra")    << static_cast<int>(FIFFV_POINT_EXTRA)    << 78;
+    QTest::newRow("cardinal") << static_cast<int>(FIFFV_POINT_CARDINAL) << 3;
+    QTest::newRow("hpi") << static_cast<int>(FIFFV_POINT_HPI) << 4;
+    QTest::newRow("eeg") << static_cast<int>(FIFFV_POINT_EEG) << 61;
+    QTest::newRow("extra") << static_cast<int>(FIFFV_POINT_EXTRA) << 78;
 }
 
 //=============================================================================================================
@@ -136,8 +135,8 @@ void TestFiffDigPointPython::countByKind_matchesPython()
     QFETCH(int, count);
 
     int found = 0;
-    for(qint32 i = 0; i < m_dig.size(); ++i) {
-        if(m_dig[i].kind == kind) {
+    for (qint32 i = 0; i < m_dig.size(); ++i) {
+        if (m_dig[i].kind == kind) {
             ++found;
         }
     }
@@ -159,11 +158,11 @@ void TestFiffDigPointPython::cardinals_matchPython_data()
     // rather than through a sum is deliberate: swapping two cardinals leaves
     // any aggregate unchanged while mirroring the head.
     QTest::newRow("nasion") << 1 << "nasion"
-        << -0.07137660682201385 << 0.0                  << 5.122274160385132e-09;
-    QTest::newRow("lpa")    << 2 << "LPA"
-        <<  3.725290298461914e-09 << 0.10260561108589172 << 4.190951585769653e-09;
-    QTest::newRow("rpa")    << 3 << "RPA"
-        <<  0.07526767998933792 << 0.0                  << 5.587935447692871e-09;
+                            << -0.07137660682201385 << 0.0 << 5.122274160385132e-09;
+    QTest::newRow("lpa") << 2 << "LPA"
+                         << 3.725290298461914e-09 << 0.10260561108589172 << 4.190951585769653e-09;
+    QTest::newRow("rpa") << 3 << "RPA"
+                         << 0.07526767998933792 << 0.0 << 5.587935447692871e-09;
 }
 
 //=============================================================================================================
@@ -177,9 +176,9 @@ void TestFiffDigPointPython::cardinals_matchPython()
     QFETCH(double, z);
 
     bool found = false;
-    for(qint32 i = 0; i < m_dig.size(); ++i) {
+    for (qint32 i = 0; i < m_dig.size(); ++i) {
         const FiffDigPoint& p = m_dig[i];
-        if(p.kind != FIFFV_POINT_CARDINAL || p.ident != ident) {
+        if (p.kind != FIFFV_POINT_CARDINAL || p.ident != ident) {
             continue;
         }
 
@@ -198,11 +197,13 @@ void TestFiffDigPointPython::cardinals_matchPython()
 
         QVERIFY2(dx == 0.0 && dy == 0.0 && dz == 0.0,
                  qPrintable(QString("%1 is at (%2, %3, %4), mne-python says (%5, %6, %7)")
-                            .arg(name)
-                            .arg(static_cast<double>(p.r[0]), 0, 'e', 17)
-                            .arg(static_cast<double>(p.r[1]), 0, 'e', 17)
-                            .arg(static_cast<double>(p.r[2]), 0, 'e', 17)
-                            .arg(x, 0, 'e', 17).arg(y, 0, 'e', 17).arg(z, 0, 'e', 17)));
+                                .arg(name)
+                                .arg(static_cast<double>(p.r[0]), 0, 'e', 17)
+                                .arg(static_cast<double>(p.r[1]), 0, 'e', 17)
+                                .arg(static_cast<double>(p.r[2]), 0, 'e', 17)
+                                .arg(x, 0, 'e', 17)
+                                .arg(y, 0, 'e', 17)
+                                .arg(z, 0, 'e', 17)));
         break;
     }
 
@@ -217,18 +218,17 @@ void TestFiffDigPointPython::allPoints_matchPython()
     // checked individually above, so a point read at the wrong offset shows up.
     double rSum = 0.0;
     int identSum = 0;
-    for(qint32 i = 0; i < m_dig.size(); ++i) {
+    for (qint32 i = 0; i < m_dig.size(); ++i) {
         const FiffDigPoint& p = m_dig[i];
-        rSum += static_cast<double>(p.r[0])
-              + static_cast<double>(p.r[1])
-              + static_cast<double>(p.r[2]);
+        rSum += static_cast<double>(p.r[0]) + static_cast<double>(p.r[1]) + static_cast<double>(p.r[2]);
         identSum += static_cast<int>(p.ident);
     }
 
     const double expRSum = 13.621201586968;
     QVERIFY2(std::fabs(rSum - expRSum) < 1.0e-6,
              qPrintable(QString("coordinates sum to %1, mne-python says %2")
-                        .arg(rSum, 0, 'f', 12).arg(expRSum, 0, 'f', 12)));
+                            .arg(rSum, 0, 'f', 12)
+                            .arg(expRSum, 0, 'f', 12)));
 
     // The idents distinguish points of the same kind. If they were lost or
     // renumbered the coordinates could still be right while the points became
@@ -243,11 +243,13 @@ void TestFiffDigPointPython::coordFrame_isHeadEverywhere()
     // Every point in this file is in head coordinates. A point left in device
     // or unknown coordinates would be silently combined with the rest and
     // shift the coregistration.
-    for(qint32 i = 0; i < m_dig.size(); ++i) {
+    for (qint32 i = 0; i < m_dig.size(); ++i) {
         const FiffDigPoint& p = m_dig[i];
         QVERIFY2(p.coord_frame == FIFFV_COORD_HEAD,
                  qPrintable(QString("point %1 is in coordinate frame %2, expected %3 (head)")
-                            .arg(i).arg(p.coord_frame).arg(FIFFV_COORD_HEAD)));
+                                .arg(i)
+                                .arg(p.coord_frame)
+                                .arg(FIFFV_COORD_HEAD)));
     }
 }
 

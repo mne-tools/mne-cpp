@@ -48,11 +48,11 @@
 //=============================================================================================================
 
 #if defined(STATICBUILD)
-#  define MATHSHARED_EXPORT
+#define MATHSHARED_EXPORT
 #elif defined(MNE_MATH_LIBRARY)
-#  define MATHSHARED_EXPORT Q_DECL_EXPORT    /**< Q_DECL_EXPORT must be added to the declarations of symbols used when compiling a shared library. */
+#define MATHSHARED_EXPORT Q_DECL_EXPORT /**< Q_DECL_EXPORT must be added to the declarations of symbols used when compiling a shared library. */
 #else
-#  define MATHSHARED_EXPORT Q_DECL_IMPORT    /**< Q_DECL_IMPORT must be added to the declarations of symbols used when compiling a client that uses the shared library. */
+#define MATHSHARED_EXPORT Q_DECL_IMPORT /**< Q_DECL_IMPORT must be added to the declarations of symbols used when compiling a client that uses the shared library. */
 #endif
 
 //=============================================================================================================
@@ -60,7 +60,8 @@
  * @namespace MATHLIB
  * @brief     Mathematical algorithms and geometry (linear algebra, optimization, spectral estimation).
  */
-namespace MATHLIB{
+namespace MATHLIB
+{
 
 //=============================================================================================================
 /**

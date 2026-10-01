@@ -62,13 +62,13 @@ using namespace Eigen;
 //=============================================================================================================
 
 FiffDigPointSet::FiffDigPointSet()
-    :m_qListDigPoint()
+: m_qListDigPoint()
 {
 }
 
 //=============================================================================================================
 
-FiffDigPointSet::FiffDigPointSet(const FiffDigPointSet &p_FiffDigPointSet)
+FiffDigPointSet::FiffDigPointSet(const FiffDigPointSet& p_FiffDigPointSet)
 : m_qListDigPoint(p_FiffDigPointSet.m_qListDigPoint)
 {
 }
@@ -82,14 +82,14 @@ FiffDigPointSet::FiffDigPointSet(QList<FIFFLIB::FiffDigPoint> pointList)
 
 //=============================================================================================================
 
-FiffDigPointSet::FiffDigPointSet(QIODevice &p_IODevice)   //const FiffDigPointSet &p_FiffDigPointSet
+FiffDigPointSet::FiffDigPointSet(QIODevice& p_IODevice) //const FiffDigPointSet &p_FiffDigPointSet
 {
     //
     //   Open the file
     //
     FiffStream::SPtr t_pStream(new FiffStream(&p_IODevice));
 
-    if(!FiffDigPointSet::readFromStream(t_pStream, *this)) {
+    if (!FiffDigPointSet::readFromStream(t_pStream, *this)) {
         t_pStream->close();
         throw std::runtime_error("Could not read the FiffDigPointSet");
     }
@@ -105,7 +105,7 @@ FiffDigPointSet::~FiffDigPointSet()
 
 //=============================================================================================================
 
-bool FiffDigPointSet::readFromStream(FiffStream::SPtr &p_pStream, FiffDigPointSet &p_Dig)
+bool FiffDigPointSet::readFromStream(FiffStream::SPtr& p_pStream, FiffDigPointSet& p_Dig)
 {
     //
     //   Open the file, create directory
@@ -115,10 +115,10 @@ bool FiffDigPointSet::readFromStream(FiffStream::SPtr &p_pStream, FiffDigPointSe
     if (!p_pStream->device()->isOpen()) {
         QString t_sFileName = p_pStream->streamName();
 
-        if(!p_pStream->open())
+        if (!p_pStream->open())
             return false;
 
-        qInfo("Opening header data %s...\n",t_sFileName.toUtf8().constData());
+        qInfo("Opening header data %s...\n", t_sFileName.toUtf8().constData());
 
         open_here = true;
     }
@@ -140,27 +140,19 @@ bool FiffDigPointSet::readFromStream(FiffStream::SPtr &p_pStream, FiffDigPointSe
     FiffCoordTrans dig_trans;
     qint32 k = 0;
 
-    if (isotrak.size() == 1)
-    {
-        for (k = 0; k < isotrak[0]->nent(); ++k)
-        {
+    if (isotrak.size() == 1) {
+        for (k = 0; k < isotrak[0]->nent(); ++k) {
             kind = isotrak[0]->dir[k]->kind;
-            pos  = isotrak[0]->dir[k]->pos;
-            if (kind == FIFF_DIG_POINT)
-            {
+            pos = isotrak[0]->dir[k]->pos;
+            if (kind == FIFF_DIG_POINT) {
                 p_pStream->read_tag(t_pTag, pos);
                 p_Dig.m_qListDigPoint.append(t_pTag->toDigPoint());
-            }
-            else
-            {
-                if (kind == FIFF_MNE_COORD_FRAME)
-                {
+            } else {
+                if (kind == FIFF_MNE_COORD_FRAME) {
                     p_pStream->read_tag(t_pTag, pos);
                     qDebug() << "NEEDS To BE DEBBUGED: FIFF_MNE_COORD_FRAME" << t_pTag->getType();
                     coord_frame = *t_pTag->toInt();
-                }
-                else if (kind == FIFF_COORD_TRANS)
-                {
+                } else if (kind == FIFF_COORD_TRANS) {
                     p_pStream->read_tag(t_pTag, pos);
                     qDebug() << "NEEDS To BE DEBBUGED: FIFF_COORD_TRANS" << t_pTag->getType();
                     dig_trans = t_pTag->toCoordTrans();
@@ -168,16 +160,14 @@ bool FiffDigPointSet::readFromStream(FiffStream::SPtr &p_pStream, FiffDigPointSe
             }
         }
     }
-    for(k = 0; k < p_Dig.size(); ++k)
-    {
+    for (k = 0; k < p_Dig.size(); ++k) {
         p_Dig[k].coord_frame = coord_frame;
     }
 
     //
     //   All kinds of auxliary stuff
     //
-    if(open_here)
-    {
+    if (open_here) {
         p_pStream->close();
     }
     return true;
@@ -185,7 +175,7 @@ bool FiffDigPointSet::readFromStream(FiffStream::SPtr &p_pStream, FiffDigPointSe
 
 //=============================================================================================================
 
-void FiffDigPointSet::write(QIODevice &p_IODevice)
+void FiffDigPointSet::write(QIODevice& p_IODevice)
 {
     //
     //   Open the file, create directory
@@ -203,7 +193,8 @@ void FiffDigPointSet::write(QIODevice &p_IODevice)
 bool FiffDigPointSet::write(const QString& filePath, QString* errorMessage)
 {
     if (filePath.isEmpty()) {
-        if (errorMessage) *errorMessage = QStringLiteral("Output path is empty.");
+        if (errorMessage)
+            *errorMessage = QStringLiteral("Output path is empty.");
         return false;
     }
 
@@ -246,8 +237,7 @@ void FiffDigPointSet::writeToStream(FiffStream* p_pStream)
     p_pStream->start_block(FIFFB_MEAS_INFO);
     p_pStream->start_block(FIFFB_ISOTRAK);
 
-    for(qint32 h = 0; h < m_qListDigPoint.size(); ++h)
-    {
+    for (qint32 h = 0; h < m_qListDigPoint.size(); ++h) {
         p_pStream->write_dig_point(m_qListDigPoint[h]);
     }
 
@@ -259,22 +249,20 @@ void FiffDigPointSet::writeToStream(FiffStream* p_pStream)
 
 //=============================================================================================================
 
-const FiffDigPoint& FiffDigPointSet::operator[] (qint32 idx) const
+const FiffDigPoint& FiffDigPointSet::operator[](qint32 idx) const
 {
-    if (idx>=m_qListDigPoint.length())
-    {
+    if (idx >= m_qListDigPoint.length()) {
         qWarning("Warning: Required DigPoint doesn't exist! Returning DigPoint '0'.");
-        idx=0;
+        idx = 0;
     }
     return m_qListDigPoint[idx];
 }
 
 //=============================================================================================================
 
-FiffDigPoint& FiffDigPointSet::operator[] (qint32 idx)
+FiffDigPoint& FiffDigPointSet::operator[](qint32 idx)
 {
-    if (idx >= m_qListDigPoint.length())
-    {
+    if (idx >= m_qListDigPoint.length()) {
         qWarning("Warning: Required DigPoint doesn't exist! Returning DigPoint '0'.");
         idx = 0;
     }
@@ -287,8 +275,8 @@ FiffDigPointSet FiffDigPointSet::pickTypes(QList<int> includeTypes) const
 {
     FiffDigPointSet pickedSet;
 
-    for(int i = 0; i < m_qListDigPoint.size(); ++i) {
-        if(includeTypes.contains(m_qListDigPoint[i].kind)) {
+    for (int i = 0; i < m_qListDigPoint.size(); ++i) {
+        if (includeTypes.contains(m_qListDigPoint[i].kind)) {
             pickedSet << m_qListDigPoint[i];
         }
     }
@@ -298,7 +286,7 @@ FiffDigPointSet FiffDigPointSet::pickTypes(QList<int> includeTypes) const
 
 //=============================================================================================================
 
-FiffDigPointSet &FiffDigPointSet::operator<<(const FiffDigPoint &dig)
+FiffDigPointSet& FiffDigPointSet::operator<<(const FiffDigPoint& dig)
 {
     this->m_qListDigPoint.append(dig);
     return *this;
@@ -306,7 +294,7 @@ FiffDigPointSet &FiffDigPointSet::operator<<(const FiffDigPoint &dig)
 
 //=============================================================================================================
 
-FiffDigPointSet &FiffDigPointSet::operator<<(const FiffDigPoint *dig)
+FiffDigPointSet& FiffDigPointSet::operator<<(const FiffDigPoint* dig)
 {
     this->m_qListDigPoint.append(*dig);
     return *this;
@@ -317,12 +305,12 @@ FiffDigPointSet &FiffDigPointSet::operator<<(const FiffDigPoint *dig)
 void FiffDigPointSet::applyTransform(const FiffCoordTrans& coordTrans, bool bApplyInverse)
 {
     Vector4f tempvec;
-    for(int i = 0; i < m_qListDigPoint.size(); ++i) {
+    for (int i = 0; i < m_qListDigPoint.size(); ++i) {
         tempvec(0) = m_qListDigPoint.at(i).r[0];
         tempvec(1) = m_qListDigPoint.at(i).r[1];
         tempvec(2) = m_qListDigPoint.at(i).r[2];
         tempvec(3) = 1.0f;
-        if(bApplyInverse) {
+        if (bApplyInverse) {
             tempvec = coordTrans.invtrans * tempvec;
         } else {
             tempvec = coordTrans.trans * tempvec;

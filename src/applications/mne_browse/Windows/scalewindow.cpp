@@ -32,9 +32,9 @@ using namespace MNEBROWSE;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-ScaleWindow::ScaleWindow(QWidget *parent) :
-    QDockWidget(parent),
-    ui(new Ui::ScaleWindow)
+ScaleWindow::ScaleWindow(QWidget* parent)
+: QDockWidget(parent)
+, ui(new Ui::ScaleWindow)
 {
     ui->setupUi(this);
 }
@@ -52,34 +52,34 @@ ScaleWindow::~ScaleWindow()
 void ScaleWindow::init()
 {
     //Connect data scaling spin boxes
-    connect(ui->m_doubleSpinBox_MEG_grad,static_cast<void (QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged),
-            this,&ScaleWindow::scaleChannelValueChanged);
-    connect(ui->m_doubleSpinBox_MEG_mag,static_cast<void (QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged),
-            this,&ScaleWindow::scaleChannelValueChanged);
-    connect(ui->m_doubleSpinBox_EEG,static_cast<void (QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged),
-            this,&ScaleWindow::scaleChannelValueChanged);
-    connect(ui->m_doubleSpinBox_EOG,static_cast<void (QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged),
-            this,&ScaleWindow::scaleChannelValueChanged);
-    connect(ui->m_doubleSpinBox_EMG,static_cast<void (QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged),
-            this,&ScaleWindow::scaleChannelValueChanged);
-    connect(ui->m_doubleSpinBox_ECG,static_cast<void (QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged),
-            this,&ScaleWindow::scaleChannelValueChanged);
-    connect(ui->m_doubleSpinBox_MISC,static_cast<void (QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged),
-            this,&ScaleWindow::scaleChannelValueChanged);
-    connect(ui->m_doubleSpinBox_STIM,static_cast<void (QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged),
-            this,&ScaleWindow::scaleChannelValueChanged);
+    connect(ui->m_doubleSpinBox_MEG_grad, static_cast<void (QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged),
+            this, &ScaleWindow::scaleChannelValueChanged);
+    connect(ui->m_doubleSpinBox_MEG_mag, static_cast<void (QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged),
+            this, &ScaleWindow::scaleChannelValueChanged);
+    connect(ui->m_doubleSpinBox_EEG, static_cast<void (QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged),
+            this, &ScaleWindow::scaleChannelValueChanged);
+    connect(ui->m_doubleSpinBox_EOG, static_cast<void (QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged),
+            this, &ScaleWindow::scaleChannelValueChanged);
+    connect(ui->m_doubleSpinBox_EMG, static_cast<void (QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged),
+            this, &ScaleWindow::scaleChannelValueChanged);
+    connect(ui->m_doubleSpinBox_ECG, static_cast<void (QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged),
+            this, &ScaleWindow::scaleChannelValueChanged);
+    connect(ui->m_doubleSpinBox_MISC, static_cast<void (QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged),
+            this, &ScaleWindow::scaleChannelValueChanged);
+    connect(ui->m_doubleSpinBox_STIM, static_cast<void (QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged),
+            this, &ScaleWindow::scaleChannelValueChanged);
 
     //Connect view scaling spin boxes
-    connect(ui->m_SpinBox_channelHeight,static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged),
-            this,&ScaleWindow::scaleViewValueChanged);
+    connect(ui->m_SpinBox_channelHeight, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged),
+            this, &ScaleWindow::scaleViewValueChanged);
 }
 
 
 //*************************************************************************************************************
 
-QMap<QString,double> ScaleWindow::genereateScalingMap()
+QMap<QString, double> ScaleWindow::genereateScalingMap()
 {
-    QMap<QString,double> scaleMap;
+    QMap<QString, double> scaleMap;
 
     scaleMap["MEG_grad"] = ui->m_doubleSpinBox_MEG_grad->value() * 1e-15 * 100; //*100 because data in fiff files is stored as fT/m not fT/cm
     scaleMap["MEG_mag"] = ui->m_doubleSpinBox_MEG_mag->value() * 1e-12;
@@ -119,60 +119,58 @@ void ScaleWindow::hideSpinBoxes(FiffInfo::SPtr& pCurrentFiffInfo)
 
     //Show only spin boxes and labels which type are present in the current loaded fiffinfo
     QList<FiffChInfo> channelList = pCurrentFiffInfo->chs;
-    for(int i = 0; i<channelList.size(); i++) {
-        switch(channelList.at(i).kind) {
-        case FIFFV_MEG_CH: {
-            qint32 unit = channelList.at(i).unit;
-            if(unit == FIFF_UNIT_T_M) {
-                //Gradiometers
-                ui->m_doubleSpinBox_MEG_grad->show();
-                ui->m_label_MEG_grad->show();
+    for (int i = 0; i < channelList.size(); i++) {
+        switch (channelList.at(i).kind) {
+            case FIFFV_MEG_CH: {
+                qint32 unit = channelList.at(i).unit;
+                if (unit == FIFF_UNIT_T_M) {
+                    //Gradiometers
+                    ui->m_doubleSpinBox_MEG_grad->show();
+                    ui->m_label_MEG_grad->show();
+                } else if (unit == FIFF_UNIT_T) {
+                    //Magnitometers
+                    ui->m_doubleSpinBox_MEG_mag->show();
+                    ui->m_label_MEG_mag->show();
+                }
+
+                break;
             }
-            else if(unit == FIFF_UNIT_T) {
-                //Magnitometers
-                ui->m_doubleSpinBox_MEG_mag->show();
-                ui->m_label_MEG_mag->show();
+
+            case FIFFV_EEG_CH: {
+                ui->m_label_EEG->show();
+                ui->m_doubleSpinBox_EEG->show();
+                break;
             }
 
-            break;
-        }
+            case FIFFV_EOG_CH: {
+                ui->m_label_EOG->show();
+                ui->m_doubleSpinBox_EOG->show();
+                break;
+            }
 
-        case FIFFV_EEG_CH: {
-            ui->m_label_EEG->show();
-            ui->m_doubleSpinBox_EEG->show();
-            break;
-        }
+            case FIFFV_EMG_CH: {
+                ui->m_label_EMG->show();
+                ui->m_doubleSpinBox_EMG->show();
+                break;
+            }
 
-        case FIFFV_EOG_CH: {
-            ui->m_label_EOG->show();
-            ui->m_doubleSpinBox_EOG->show();
-            break;
-        }
+            case FIFFV_ECG_CH: {
+                ui->m_label_ECG->show();
+                ui->m_doubleSpinBox_ECG->show();
+                break;
+            }
 
-        case FIFFV_EMG_CH: {
-            ui->m_label_EMG->show();
-            ui->m_doubleSpinBox_EMG->show();
-            break;
-        }
+            case FIFFV_MISC_CH: {
+                ui->m_label_MISC->show();
+                ui->m_doubleSpinBox_MISC->show();
+                break;
+            }
 
-        case FIFFV_ECG_CH: {
-            ui->m_label_ECG->show();
-            ui->m_doubleSpinBox_ECG->show();
-            break;
-        }
-
-        case FIFFV_MISC_CH: {
-            ui->m_label_MISC->show();
-            ui->m_doubleSpinBox_MISC->show();
-            break;
-        }
-
-        case FIFFV_STIM_CH: {
-            ui->m_label_STIM->show();
-            ui->m_doubleSpinBox_STIM->show();
-            break;
-        }
-
+            case FIFFV_STIM_CH: {
+                ui->m_label_STIM->show();
+                ui->m_doubleSpinBox_STIM->show();
+                break;
+            }
         }
     }
 }
@@ -182,16 +180,16 @@ void ScaleWindow::hideSpinBoxes(FiffInfo::SPtr& pCurrentFiffInfo)
 
 void ScaleWindow::scaleAllChannels(double scaleValue)
 {
-    scaleValue = (scaleValue - 1)*-4;
+    scaleValue = (scaleValue - 1) * -4;
 
-    ui->m_doubleSpinBox_MEG_grad->setValue((scaleValue*ui->m_doubleSpinBox_MEG_grad->singleStep()) + ui->m_doubleSpinBox_MEG_grad->value());
-    ui->m_doubleSpinBox_MEG_mag->setValue((scaleValue*ui->m_doubleSpinBox_MEG_mag->singleStep()) + ui->m_doubleSpinBox_MEG_mag->value());
-    ui->m_doubleSpinBox_EEG->setValue((scaleValue*ui->m_doubleSpinBox_EEG->singleStep()) + ui->m_doubleSpinBox_EEG->value());
-    ui->m_doubleSpinBox_EOG->setValue((scaleValue*ui->m_doubleSpinBox_EOG->singleStep()) + ui->m_doubleSpinBox_EOG->value());
-    ui->m_doubleSpinBox_EMG->setValue((scaleValue*ui->m_doubleSpinBox_EMG->singleStep()) + ui->m_doubleSpinBox_EMG->value());
-    ui->m_doubleSpinBox_ECG->setValue((scaleValue*ui->m_doubleSpinBox_ECG->singleStep()) + ui->m_doubleSpinBox_ECG->value());
-    ui->m_doubleSpinBox_MISC->setValue((scaleValue*ui->m_doubleSpinBox_MISC->singleStep()) + ui->m_doubleSpinBox_MISC->value());
-    ui->m_doubleSpinBox_STIM->setValue((scaleValue*ui->m_doubleSpinBox_STIM->singleStep()) + ui->m_doubleSpinBox_STIM->value());
+    ui->m_doubleSpinBox_MEG_grad->setValue((scaleValue * ui->m_doubleSpinBox_MEG_grad->singleStep()) + ui->m_doubleSpinBox_MEG_grad->value());
+    ui->m_doubleSpinBox_MEG_mag->setValue((scaleValue * ui->m_doubleSpinBox_MEG_mag->singleStep()) + ui->m_doubleSpinBox_MEG_mag->value());
+    ui->m_doubleSpinBox_EEG->setValue((scaleValue * ui->m_doubleSpinBox_EEG->singleStep()) + ui->m_doubleSpinBox_EEG->value());
+    ui->m_doubleSpinBox_EOG->setValue((scaleValue * ui->m_doubleSpinBox_EOG->singleStep()) + ui->m_doubleSpinBox_EOG->value());
+    ui->m_doubleSpinBox_EMG->setValue((scaleValue * ui->m_doubleSpinBox_EMG->singleStep()) + ui->m_doubleSpinBox_EMG->value());
+    ui->m_doubleSpinBox_ECG->setValue((scaleValue * ui->m_doubleSpinBox_ECG->singleStep()) + ui->m_doubleSpinBox_ECG->value());
+    ui->m_doubleSpinBox_MISC->setValue((scaleValue * ui->m_doubleSpinBox_MISC->singleStep()) + ui->m_doubleSpinBox_MISC->value());
+    ui->m_doubleSpinBox_STIM->setValue((scaleValue * ui->m_doubleSpinBox_STIM->singleStep()) + ui->m_doubleSpinBox_STIM->value());
 }
 
 

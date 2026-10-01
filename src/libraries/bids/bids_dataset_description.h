@@ -57,10 +57,10 @@ namespace BIDSLIB
  */
 struct BIDSSHARED_EXPORT BidsDatasetDescription
 {
-    QString name;           /**< Human-readable dataset name (REQUIRED). */
-    QString bidsVersion;    /**< BIDS specification version, e.g. "1.9.0" (REQUIRED). */
-    QString datasetType;    /**< "raw" or "derivative" (RECOMMENDED). */
-    QString license;        /**< License identifier (RECOMMENDED). */
+    QString name;        /**< Human-readable dataset name (REQUIRED). */
+    QString bidsVersion; /**< BIDS specification version, e.g. "1.9.0" (REQUIRED). */
+    QString datasetType; /**< "raw" or "derivative" (RECOMMENDED). */
+    QString license;     /**< License identifier (RECOMMENDED). */
 
     /**
      * @brief Read a dataset_description.json file.

@@ -39,7 +39,7 @@ QString FiffBuffer::uri() const
 
 bool FiffBuffer::open()
 {
-    if(m_stream) {
+    if (m_stream) {
         return true;
     }
 
@@ -48,22 +48,22 @@ bool FiffBuffer::open()
     // failed on an already open QFile, so no file ever loaded through here and
     // the third attempt threw. Only FiffRawData is needed: setup_read_raw opens
     // the device and leaves the stream on the object.
-    if(!m_file.exists()) {
+    if (!m_file.exists()) {
         return false;
     }
 
-    if(m_file.isOpen()) {
+    if (m_file.isOpen()) {
         m_file.close();
     }
 
     try {
         m_rawData = FIFFLIB::FiffRawData(m_file);
-    } catch(const std::exception& e) {
+    } catch (const std::exception& e) {
         // FiffRawData reports a bad file by throwing. A buffer that cannot be
         // read is an ordinary outcome for a caller handed an arbitrary path,
         // so it is turned back into a false rather than unwinding into the UI.
         qWarning() << "[FiffBuffer::open] could not read" << m_filePath << ":" << e.what();
-        if(m_file.isOpen()) {
+        if (m_file.isOpen()) {
             m_file.close();
         }
         return false;
@@ -106,7 +106,7 @@ void FiffBuffer::loadHeaderMetadata()
     const FIFFLIB::FiffInfo& info = m_rawData.info;
 
     QJsonArray channels;
-    for(const QString& channelName : info.ch_names) {
+    for (const QString& channelName : info.ch_names) {
         channels.append(channelName);
     }
 
@@ -120,6 +120,5 @@ void FiffBuffer::loadHeaderMetadata()
         {"channelCount", info.nchan},
         {"channels", channels},
         {"samplingRate", info.sfreq},
-        {"bids", bidsInfo}
-    };
+        {"bids", bidsInfo}};
 }

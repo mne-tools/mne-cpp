@@ -56,18 +56,18 @@ using namespace Eigen;
  * @param[in] argv (argument vector) is an array of pointers to arrays of character objects. The array objects are null-terminated strings, representing the arguments that were entered on the command line when the program was started.
  * @return the value that was set to exit() (which is 0 if exit() is called via quit()).
  */
-int main(int argc, char *argv[])
+int main(int argc, char* argv[])
 {
     QCoreApplication a(argc, argv);
 
     //create list of fiff data to read
     QList<QIODevice*> t_listSampleFilesIn;
     t_listSampleFilesIn.append(new QFile(QCoreApplication::applicationDirPath() + "/../resources/data/MNE-sample-data/MEG/sample/sample_audvis_raw.fif"));
-//    t_listSampleFilesIn.append(new QFile(QCoreApplication::applicationDirPath() + "/../resources/data/MNE-sample-data/MEG/sample/sample_audvis_raw.fif"));
-//    t_listSampleFilesIn.append(new QFile(QCoreApplication::applicationDirPath() + "/../resources/data/MNE-sample-data/MEG/sample/sample_audvis-ave.fif"));
-//    t_listSampleFilesIn.append(new QFile(QCoreApplication::applicationDirPath() + "/../resources/data/MNE-sample-data/MEG/sample/sample_audvis-no-filter-ave.fif"));
-//    t_listSampleFilesIn.append(new QFile(QCoreApplication::applicationDirPath() + "/../resources/data/MNE-sample-data/MEG/sample/sample_audvis-meg-eeg-oct-6-fwd.fif"));
-//    t_listSampleFilesIn.append(new QFile(QCoreApplication::applicationDirPath() + "/../resources/data/MNE-sample-data/MEG/sample/sample_audvis-cov.fif"));
+    //    t_listSampleFilesIn.append(new QFile(QCoreApplication::applicationDirPath() + "/../resources/data/MNE-sample-data/MEG/sample/sample_audvis_raw.fif"));
+    //    t_listSampleFilesIn.append(new QFile(QCoreApplication::applicationDirPath() + "/../resources/data/MNE-sample-data/MEG/sample/sample_audvis-ave.fif"));
+    //    t_listSampleFilesIn.append(new QFile(QCoreApplication::applicationDirPath() + "/../resources/data/MNE-sample-data/MEG/sample/sample_audvis-no-filter-ave.fif"));
+    //    t_listSampleFilesIn.append(new QFile(QCoreApplication::applicationDirPath() + "/../resources/data/MNE-sample-data/MEG/sample/sample_audvis-meg-eeg-oct-6-fwd.fif"));
+    //    t_listSampleFilesIn.append(new QFile(QCoreApplication::applicationDirPath() + "/../resources/data/MNE-sample-data/MEG/sample/sample_audvis-cov.fif"));
 
     FiffIO p_fiffIO(t_listSampleFilesIn);
 
@@ -76,13 +76,13 @@ int main(int argc, char *argv[])
     bool readSuccessful = false;
 
     //Read raw data samples
-    MatrixXd data,times;
-    readSuccessful= p_fiffIO.m_qlistRaw[0]->read_raw_segment_times(data,times,100,102);
+    MatrixXd data, times;
+    readSuccessful = p_fiffIO.m_qlistRaw[0]->read_raw_segment_times(data, times, 100, 102);
 
-    if (readSuccessful){
+    if (readSuccessful) {
         //Write some raw data
         QFile t_fileToWrite(QCoreApplication::applicationDirPath() + "/../resources/data/MNE-sample-data/MEG/sample/sample_write/sample_out.fif");
-        p_fiffIO.write(t_fileToWrite,FIFFB_RAW_DATA,-1);
+        p_fiffIO.write(t_fileToWrite, FIFFB_RAW_DATA, -1);
     } else {
         qDebug() << "Could not read raw segment.";
     }

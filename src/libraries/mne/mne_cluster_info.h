@@ -106,16 +106,16 @@ public:
      *
      * @return true if equal, false otherwise.
      */
-    friend bool operator== (const MNEClusterInfo &a, const MNEClusterInfo &b);
+    friend bool operator==(const MNEClusterInfo& a, const MNEClusterInfo& b);
 
 public:
-    QList<QString>              clusterLabelNames;  /**< FsLabel name of the cluster. Entries can be non unique, since some FsLabel consist of more than one cluster.*/
-    QList<qint32>               clusterLabelIds;    /**< Id (FsLabel/ROI id) of the cluster. Entries can be non unique, since some FsLabel/ROI consist of more than one cluster.*/
-    QList<qint32>               centroidVertno;     /**< Id (FsLabel/ROI id) of the centroid. */
-    QList<Eigen::Vector3f>     centroidSource_rr;   /**< Centroid location. */
-    QList<Eigen::VectorXi>     clusterVertnos;      /**< Vertnos which belong to corresponding cluster. */
-    QList<Eigen::MatrixX3f>    clusterSource_rr;    /**< Cluster source locations. */
-    QList<Eigen::VectorXd>     clusterDistances;    /**< Distances to clusters centroid. */
+    QList<QString> clusterLabelNames;         /**< FsLabel name of the cluster. Entries can be non unique, since some FsLabel consist of more than one cluster.*/
+    QList<qint32> clusterLabelIds;            /**< Id (FsLabel/ROI id) of the cluster. Entries can be non unique, since some FsLabel/ROI consist of more than one cluster.*/
+    QList<qint32> centroidVertno;             /**< Id (FsLabel/ROI id) of the centroid. */
+    QList<Eigen::Vector3f> centroidSource_rr; /**< Centroid location. */
+    QList<Eigen::VectorXi> clusterVertnos;    /**< Vertnos which belong to corresponding cluster. */
+    QList<Eigen::MatrixX3f> clusterSource_rr; /**< Cluster source locations. */
+    QList<Eigen::VectorXd> clusterDistances;  /**< Distances to clusters centroid. */
 };
 
 //=============================================================================================================
@@ -136,11 +136,11 @@ inline qint32 MNEClusterInfo::numClust() const
 
 //=============================================================================================================
 
-inline bool operator== (const MNEClusterInfo &a, const MNEClusterInfo &b)
+inline bool operator==(const MNEClusterInfo& a, const MNEClusterInfo& b)
 {
-    if(a.centroidSource_rr.size() == b.centroidSource_rr.size()) {
-        for(int i = 0; i < a.centroidSource_rr.size(); ++i) {
-            if(!a.centroidSource_rr.at(i).isApprox(b.centroidSource_rr.at(i), 0.0001f)) {
+    if (a.centroidSource_rr.size() == b.centroidSource_rr.size()) {
+        for (int i = 0; i < a.centroidSource_rr.size(); ++i) {
+            if (!a.centroidSource_rr.at(i).isApprox(b.centroidSource_rr.at(i), 0.0001f)) {
                 return false;
             }
         }
@@ -148,9 +148,9 @@ inline bool operator== (const MNEClusterInfo &a, const MNEClusterInfo &b)
         return false;
     }
 
-    if(a.clusterVertnos.size() == b.clusterVertnos.size()) {
-        for(int i = 0; i < a.clusterVertnos.size(); ++i) {
-            if(!a.clusterVertnos.at(i).isApprox(b.clusterVertnos.at(i))) {
+    if (a.clusterVertnos.size() == b.clusterVertnos.size()) {
+        for (int i = 0; i < a.clusterVertnos.size(); ++i) {
+            if (!a.clusterVertnos.at(i).isApprox(b.clusterVertnos.at(i))) {
                 return false;
             }
         }
@@ -158,9 +158,9 @@ inline bool operator== (const MNEClusterInfo &a, const MNEClusterInfo &b)
         return false;
     }
 
-    if(a.clusterSource_rr.size() == b.clusterSource_rr.size()) {
-        for(int i = 0; i < a.clusterSource_rr.size(); ++i) {
-            if(!a.clusterSource_rr.at(i).isApprox(b.clusterSource_rr.at(i), 0.0001f)) {
+    if (a.clusterSource_rr.size() == b.clusterSource_rr.size()) {
+        for (int i = 0; i < a.clusterSource_rr.size(); ++i) {
+            if (!a.clusterSource_rr.at(i).isApprox(b.clusterSource_rr.at(i), 0.0001f)) {
                 return false;
             }
         }
@@ -168,9 +168,9 @@ inline bool operator== (const MNEClusterInfo &a, const MNEClusterInfo &b)
         return false;
     }
 
-    if(a.clusterDistances.size() == b.clusterDistances.size()) {
-        for(int i = 0; i < a.clusterDistances.size(); ++i) {
-            if(!a.clusterDistances.at(i).isApprox(b.clusterDistances.at(i))) {
+    if (a.clusterDistances.size() == b.clusterDistances.size()) {
+        for (int i = 0; i < a.clusterDistances.size(); ++i) {
+            if (!a.clusterDistances.at(i).isApprox(b.clusterDistances.at(i))) {
                 return false;
             }
         }

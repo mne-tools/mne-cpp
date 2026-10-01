@@ -62,36 +62,36 @@ static MNEBemSurface createIcosahedron(float radius, int surfId)
     surf.np = 12;
     surf.rr.resize(12, 3);
 
-    surf.rr.row(0)  = Vector3f(-1,  phi, 0).normalized() * radius;
-    surf.rr.row(1)  = Vector3f( 1,  phi, 0).normalized() * radius;
-    surf.rr.row(2)  = Vector3f(-1, -phi, 0).normalized() * radius;
-    surf.rr.row(3)  = Vector3f( 1, -phi, 0).normalized() * radius;
-    surf.rr.row(4)  = Vector3f(0, -1,  phi).normalized() * radius;
-    surf.rr.row(5)  = Vector3f(0,  1,  phi).normalized() * radius;
-    surf.rr.row(6)  = Vector3f(0, -1, -phi).normalized() * radius;
-    surf.rr.row(7)  = Vector3f(0,  1, -phi).normalized() * radius;
-    surf.rr.row(8)  = Vector3f( phi, 0, -1).normalized() * radius;
-    surf.rr.row(9)  = Vector3f( phi, 0,  1).normalized() * radius;
+    surf.rr.row(0) = Vector3f(-1, phi, 0).normalized() * radius;
+    surf.rr.row(1) = Vector3f(1, phi, 0).normalized() * radius;
+    surf.rr.row(2) = Vector3f(-1, -phi, 0).normalized() * radius;
+    surf.rr.row(3) = Vector3f(1, -phi, 0).normalized() * radius;
+    surf.rr.row(4) = Vector3f(0, -1, phi).normalized() * radius;
+    surf.rr.row(5) = Vector3f(0, 1, phi).normalized() * radius;
+    surf.rr.row(6) = Vector3f(0, -1, -phi).normalized() * radius;
+    surf.rr.row(7) = Vector3f(0, 1, -phi).normalized() * radius;
+    surf.rr.row(8) = Vector3f(phi, 0, -1).normalized() * radius;
+    surf.rr.row(9) = Vector3f(phi, 0, 1).normalized() * radius;
     surf.rr.row(10) = Vector3f(-phi, 0, -1).normalized() * radius;
-    surf.rr.row(11) = Vector3f(-phi, 0,  1).normalized() * radius;
+    surf.rr.row(11) = Vector3f(-phi, 0, 1).normalized() * radius;
 
     // 20 triangular faces
     surf.ntri = 20;
     surf.itris.resize(20, 3);
 
     // Top cap
-    surf.itris.row(0)  = Vector3i(0, 11, 5);
-    surf.itris.row(1)  = Vector3i(0, 5, 1);
-    surf.itris.row(2)  = Vector3i(0, 1, 7);
-    surf.itris.row(3)  = Vector3i(0, 7, 10);
-    surf.itris.row(4)  = Vector3i(0, 10, 11);
+    surf.itris.row(0) = Vector3i(0, 11, 5);
+    surf.itris.row(1) = Vector3i(0, 5, 1);
+    surf.itris.row(2) = Vector3i(0, 1, 7);
+    surf.itris.row(3) = Vector3i(0, 7, 10);
+    surf.itris.row(4) = Vector3i(0, 10, 11);
 
     // Adjacent faces
-    surf.itris.row(5)  = Vector3i(1, 5, 9);
-    surf.itris.row(6)  = Vector3i(5, 11, 4);
-    surf.itris.row(7)  = Vector3i(11, 10, 2);
-    surf.itris.row(8)  = Vector3i(10, 7, 6);
-    surf.itris.row(9)  = Vector3i(7, 1, 8);
+    surf.itris.row(5) = Vector3i(1, 5, 9);
+    surf.itris.row(6) = Vector3i(5, 11, 4);
+    surf.itris.row(7) = Vector3i(11, 10, 2);
+    surf.itris.row(8) = Vector3i(10, 7, 6);
+    surf.itris.row(9) = Vector3i(7, 1, 8);
 
     // Bottom cap adjacent
     surf.itris.row(10) = Vector3i(3, 9, 4);
@@ -223,7 +223,7 @@ void TestSurfaceChecks::testIsCompleteWithRealBemData()
 void TestSurfaceChecks::testCheckSurfaces()
 {
     // Create nested surfaces: brain inside skull inside skin
-    MNEBemSurface skin  = createIcosahedron(0.10f, FIFFV_BEM_SURF_ID_HEAD);
+    MNEBemSurface skin = createIcosahedron(0.10f, FIFFV_BEM_SURF_ID_HEAD);
     MNEBemSurface skull = createIcosahedron(0.08f, FIFFV_BEM_SURF_ID_SKULL);
     MNEBemSurface brain = createIcosahedron(0.06f, FIFFV_BEM_SURF_ID_BRAIN);
 
@@ -236,7 +236,7 @@ void TestSurfaceChecks::testCheckSurfaces()
 void TestSurfaceChecks::testCheckSurfacesWrongOrder()
 {
     // Create surfaces in wrong order: brain outside skull
-    MNEBemSurface skin  = createIcosahedron(0.10f, FIFFV_BEM_SURF_ID_HEAD);
+    MNEBemSurface skin = createIcosahedron(0.10f, FIFFV_BEM_SURF_ID_HEAD);
     MNEBemSurface skull = createIcosahedron(0.08f, FIFFV_BEM_SURF_ID_SKULL);
     MNEBemSurface brain = createIcosahedron(0.12f, FIFFV_BEM_SURF_ID_BRAIN); // bigger than skin!
 
@@ -267,7 +267,7 @@ void TestSurfaceChecks::testCheckSurfaceSizeTooSmall()
 
 void TestSurfaceChecks::testCheckThicknesses()
 {
-    MNEBemSurface skin  = createIcosahedron(0.10f, FIFFV_BEM_SURF_ID_HEAD);
+    MNEBemSurface skin = createIcosahedron(0.10f, FIFFV_BEM_SURF_ID_HEAD);
     MNEBemSurface skull = createIcosahedron(0.08f, FIFFV_BEM_SURF_ID_SKULL);
 
     QVector<MNEBemSurface> surfs;

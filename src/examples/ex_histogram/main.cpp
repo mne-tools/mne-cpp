@@ -82,23 +82,22 @@ using namespace Eigen;
 //sineWaveGenerator function - used to create synthetic data to test histogram functionality
 Eigen::VectorXd sineWaveGenerator(double amplitude, double xStep, int xNow, int xEnd)
 {
-    unsigned int iterateAmount = ceil((xEnd-xNow)/xStep);
+    unsigned int iterateAmount = ceil((xEnd - xNow) / xStep);
     Eigen::VectorXd sineWaveResultOriginal;
-    sineWaveResultOriginal.resize(iterateAmount+1);
+    sineWaveResultOriginal.resize(iterateAmount + 1);
     Eigen::VectorXd sineWaveResult = sineWaveResultOriginal.transpose();
     double sineResult;
-    double omega = 2.0*M_PI;
+    double omega = 2.0 * M_PI;
     int iterateCount = 0;
-    for (double step = xNow; step < xEnd; step +=xStep)
-    {
-        sineResult = amplitude* (sin(omega * step));
+    for (double step = xNow; step < xEnd; step += xStep) {
+        sineResult = amplitude * (sin(omega * step));
         sineWaveResult(iterateCount) = sineResult;
         iterateCount++;
     }
     return sineWaveResult;
 }
 
-int main(int argc, char *argv[])
+int main(int argc, char* argv[])
 {
     //code to generate source localization data
     qInstallMessageHandler(MNELogger::customLogWriter);
@@ -111,8 +110,8 @@ int main(int argc, char *argv[])
     QCommandLineOption sampleFwdFileOption("fwd", "Path to forward solution <file>.", "file", QCoreApplication::applicationDirPath() + "/../resources/data/MNE-sample-data/MEG/sample/sample_audvis-meg-eeg-oct-6-fwd.fif");
     QCommandLineOption sampleCovFileOption("cov", "Path to covariance <file>.", "file", QCoreApplication::applicationDirPath() + "/../resources/data/MNE-sample-data/MEG/sample/sample_audvis-cov.fif");
     QCommandLineOption sampleEvokedFileOption("ave", "Path to evoked <file>.", "file", QCoreApplication::applicationDirPath() + "/../resources/data/MNE-sample-data/MEG/sample/sample_audvis-ave.fif");
-    QCommandLineOption methodOption("method", "Inverse estimation <method>, i.e., 'MNE', 'dSPM' or 'sLORETA'.", "method", "dSPM");//"MNE" | "dSPM" | "sLORETA"
-    QCommandLineOption snrOption("snr", "The SNR value used for computation <snr>.", "snr", "1.0");//3.0;//0.1;//3.0;
+    QCommandLineOption methodOption("method", "Inverse estimation <method>, i.e., 'MNE', 'dSPM' or 'sLORETA'.", "method", "dSPM"); //"MNE" | "dSPM" | "sLORETA"
+    QCommandLineOption snrOption("snr", "The SNR value used for computation <snr>.", "snr", "1.0");                                //3.0;//0.1;//3.0;
     QCommandLineOption stcFileOption("stcOut", "Path to stc <file>, which is to be written.", "file", "");
     QCommandLineOption invFileOption("invOut", "Path to inverse <file>, which is to be written.", "file", "");
 
@@ -144,13 +143,13 @@ int main(int argc, char *argv[])
     fiff_int_t setno = 0;
     QPair<float, float> baseline(-1.0f, -1.0f);
     FiffEvoked evoked(t_fileEvoked, setno, baseline);
-    if(evoked.isEmpty())
+    if (evoked.isEmpty())
         return 1;
 
     std::cout << "evoked first " << evoked.first << "; last " << evoked.last << std::endl;
 
     MNEForwardSolution t_Fwd(t_fileFwd);
-    if(t_Fwd.isEmpty())
+    if (t_Fwd.isEmpty())
         return 1;
 
     FsAnnotationSet t_annotationSet("sample", 2, "aparc.a2009s", QCoreApplication::applicationDirPath() + "/../resources/data/MNE-sample-data/subjects");
@@ -163,10 +162,10 @@ int main(int argc, char *argv[])
     //
     // Cluster forward solution;
     //
-    MNEForwardSolution t_clusteredFwd = t_Fwd.cluster_forward_solution(t_annotationSet, 20);//40);
+    MNEForwardSolution t_clusteredFwd = t_Fwd.cluster_forward_solution(t_annotationSet, 20); //40);
 
-//    std::cout << "Size " << t_clusteredFwd.sol->data.rows() << " x " << t_clusteredFwd.sol->data.cols() << std::endl;
-//    std::cout << "Clustered Fwd:\n" << t_clusteredFwd.sol->data.row(0) << std::endl;
+    //    std::cout << "Size " << t_clusteredFwd.sol->data.rows() << " x " << t_clusteredFwd.sol->data.cols() << std::endl;
+    //    std::cout << "Clustered Fwd:\n" << t_clusteredFwd.sol->data.row(0) << std::endl;
 
     //
     // make an inverse operators
@@ -178,8 +177,7 @@ int main(int argc, char *argv[])
     //
     // save clustered inverse
     //
-    if(!t_sFileNameClusteredInv.isEmpty())
-    {
+    if (!t_sFileNameClusteredInv.isEmpty()) {
         QFile t_fileClusteredInverse(t_sFileNameClusteredInv);
         inverse_operator.write(t_fileClusteredInverse);
     }
@@ -192,8 +190,8 @@ int main(int argc, char *argv[])
     VectorXd sourceEstimateData = sourceEstimate.data.col(10);
 
     bool bMakeSymmetrical;
-    bMakeSymmetrical = false;       //bMakeSymmetrical option: false means data is unchanged, true means histogram x axis is symmetrical to the right and left
-    int classAmount = 10;           //initialize the amount of classes and class frequencies
+    bMakeSymmetrical = false; //bMakeSymmetrical option: false means data is unchanged, true means histogram x axis is symmetrical to the right and left
+    int classAmount = 10;     //initialize the amount of classes and class frequencies
     double inputGlobalMin = 0.0,
            inputGlobalMax = 0.0;
     Eigen::VectorXd resultClassLimit;
@@ -203,13 +201,13 @@ int main(int argc, char *argv[])
     QElapsedTimer myTimerHistCounts;
     myTimerHistCounts.start();
     Eigen::VectorXd dataSine;
-    dataSine = sineWaveGenerator(1.0e-6,(1.0/1.0e6), 0.0, 1.0);  //creates synthetic data using sineWaveGenerator function
-    qDebug()<< "sourceEstimateData.rows = " << sourceEstimateData.rows();
-    qDebug()<< "sourceEstaimateData.cols = " << sourceEstimateData.cols();
-    Numerics::histcounts(sourceEstimateData, bMakeSymmetrical, classAmount, resultClassLimit, resultFrequency, inputGlobalMin, inputGlobalMax);   //user input to normalize and sort the data matrix
+    dataSine = sineWaveGenerator(1.0e-6, (1.0 / 1.0e6), 0.0, 1.0); //creates synthetic data using sineWaveGenerator function
+    qDebug() << "sourceEstimateData.rows = " << sourceEstimateData.rows();
+    qDebug() << "sourceEstaimateData.cols = " << sourceEstimateData.cols();
+    Numerics::histcounts(sourceEstimateData, bMakeSymmetrical, classAmount, resultClassLimit, resultFrequency, inputGlobalMin, inputGlobalMax); //user input to normalize and sort the data matrix
     std::cout << "resultClassLimits = " << resultClassLimit << std::endl;
     std::cout << "resultFrequency = " << resultFrequency << std::endl;
-    qDebug()<<"HistCounts timer:"<<myTimerHistCounts.elapsed();
+    qDebug() << "HistCounts timer:" << myTimerHistCounts.elapsed();
 
     //displayObj can be in either Bar or Spline form; uncomment the preferred one and comment the other
     Spline* displayObj = new Spline(0, "MNE-CPP Histogram Example (Spline)");
@@ -221,9 +219,9 @@ int main(int argc, char *argv[])
     QVector3D thresholdLines1(2.1e-10f, 5.0e-8f, 6.0e-7f);
     displayObj->setThreshold(thresholdLines1);
 
-    qDebug()<<"Histogram timer:"<<myTimerHistogram.elapsed();
+    qDebug() << "Histogram timer:" << myTimerHistogram.elapsed();
 
-    displayObj->resize(800,600);
+    displayObj->resize(800, 600);
     displayObj->show();
 
     //std::cout << data.block(0,0,10,10);

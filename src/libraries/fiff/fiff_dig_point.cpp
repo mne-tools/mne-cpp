@@ -43,6 +43,6 @@ FiffDigPoint::FiffDigPoint()
 , ident(-1)
 , coord_frame(-1)
 {
-    for(qint32 i = 0; i < 3; ++i)
+    for (qint32 i = 0; i < 3; ++i)
         r[i] = -1;
 }

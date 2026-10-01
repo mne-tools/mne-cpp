@@ -104,12 +104,12 @@ bool MnxProject::open(const QString& mnxPath)
 //=============================================================================================================
 
 bool MnxProject::create(const QString& rawPath,
-                          const QString& eventPath,
-                          const QString& annotationPath,
-                          const QString& virtualChanPath,
-                          const QString& evokedPath,
-                          const QString& covPath,
-                          const QString& inversePath)
+                        const QString& eventPath,
+                        const QString& annotationPath,
+                        const QString& virtualChanPath,
+                        const QString& evokedPath,
+                        const QString& covPath,
+                        const QString& inversePath)
 {
     close();
 
@@ -145,12 +145,12 @@ bool MnxProject::create(const QString& rawPath,
         }
     };
 
-    copyOptional(eventPath,       QStringLiteral("-eve.fif"));
-    copyOptional(annotationPath,  QStringLiteral("-annot.json"));
+    copyOptional(eventPath, QStringLiteral("-eve.fif"));
+    copyOptional(annotationPath, QStringLiteral("-annot.json"));
     copyOptional(virtualChanPath, QStringLiteral("-virtchan.json"));
-    copyOptional(evokedPath,      QStringLiteral("-ave.fif"));
-    copyOptional(covPath,         QStringLiteral("-cov.fif"));
-    copyOptional(inversePath,     QStringLiteral("-inv.fif"));
+    copyOptional(evokedPath, QStringLiteral("-ave.fif"));
+    copyOptional(covPath, QStringLiteral("-cov.fif"));
+    copyOptional(inversePath, QStringLiteral("-inv.fif"));
 
     discoverFiles();
     qInfo() << "MnxProject: Created from" << rawPath << "→" << m_tempDir->path();
@@ -226,7 +226,7 @@ bool MnxProject::isOpen() const
 
 void MnxProject::close()
 {
-    m_tempDir.reset();     // QTemporaryDir destructor removes the directory
+    m_tempDir.reset(); // QTemporaryDir destructor removes the directory
     m_mnxFilePath.clear();
     m_settings = {};
     m_rawPath.clear();
@@ -240,13 +240,34 @@ void MnxProject::close()
 
 //=============================================================================================================
 
-QString MnxProject::rawPath() const         { return m_rawPath; }
-QString MnxProject::eventPath() const       { return m_eventPath; }
-QString MnxProject::annotationPath() const  { return m_annotationPath; }
-QString MnxProject::virtualChannelPath() const { return m_virtualChanPath; }
-QString MnxProject::evokedPath() const      { return m_evokedPath; }
-QString MnxProject::covariancePath() const  { return m_covPath; }
-QString MnxProject::inversePath() const     { return m_inversePath; }
+QString MnxProject::rawPath() const
+{
+    return m_rawPath;
+}
+QString MnxProject::eventPath() const
+{
+    return m_eventPath;
+}
+QString MnxProject::annotationPath() const
+{
+    return m_annotationPath;
+}
+QString MnxProject::virtualChannelPath() const
+{
+    return m_virtualChanPath;
+}
+QString MnxProject::evokedPath() const
+{
+    return m_evokedPath;
+}
+QString MnxProject::covariancePath() const
+{
+    return m_covPath;
+}
+QString MnxProject::inversePath() const
+{
+    return m_inversePath;
+}
 
 //=============================================================================================================
 
@@ -259,7 +280,8 @@ QString MnxProject::tempDir() const
 
 void MnxProject::discoverFiles()
 {
-    if (!isOpen()) return;
+    if (!isOpen())
+        return;
 
     const QString base = m_tempDir->path();
 
@@ -280,18 +302,14 @@ void MnxProject::discoverFiles()
                 m_covPath = path;
             } else if (name.endsWith(QStringLiteral("-inv.fif"), Qt::CaseInsensitive)) {
                 m_inversePath = path;
-            } else if (name.endsWith(QStringLiteral("_annot.fif"), Qt::CaseInsensitive)
-                       || name.endsWith(QStringLiteral("-annot.fif"), Qt::CaseInsensitive)) {
+            } else if (name.endsWith(QStringLiteral("_annot.fif"), Qt::CaseInsensitive) || name.endsWith(QStringLiteral("-annot.fif"), Qt::CaseInsensitive)) {
                 m_annotationPath = path;
             } else if (m_rawPath.isEmpty()) {
                 // First unclassified .fif is the raw file
                 m_rawPath = path;
             }
-        } else if (name.endsWith(QStringLiteral("-annot.json"), Qt::CaseInsensitive)
-                   || name.endsWith(QStringLiteral(".json"), Qt::CaseInsensitive)) {
-            if (name.contains(QStringLiteral("annot"), Qt::CaseInsensitive)
-                && !name.contains(QStringLiteral("virtchan"), Qt::CaseInsensitive)
-                && !name.contains(QStringLiteral("manifest"), Qt::CaseInsensitive)) {
+        } else if (name.endsWith(QStringLiteral("-annot.json"), Qt::CaseInsensitive) || name.endsWith(QStringLiteral(".json"), Qt::CaseInsensitive)) {
+            if (name.contains(QStringLiteral("annot"), Qt::CaseInsensitive) && !name.contains(QStringLiteral("virtchan"), Qt::CaseInsensitive) && !name.contains(QStringLiteral("manifest"), Qt::CaseInsensitive)) {
                 m_annotationPath = path;
             } else if (name.contains(QStringLiteral("virtchan"), Qt::CaseInsensitive)) {
                 m_virtualChanPath = path;

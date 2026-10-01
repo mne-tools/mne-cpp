@@ -35,7 +35,7 @@ MNEMshLight::MNEMshLight()
 
 //=============================================================================================================
 
-MNEMshLight::MNEMshLight(const MNEMshLight &p_mneMshLight)
+MNEMshLight::MNEMshLight(const MNEMshLight& p_mneMshLight)
 : state(p_mneMshLight.state)
 {
     this->pos[0] = p_mneMshLight.pos[0];
@@ -48,7 +48,7 @@ MNEMshLight::MNEMshLight(const MNEMshLight &p_mneMshLight)
 
 //=============================================================================================================
 
-MNEMshLight::MNEMshLight(int state, float posX, float posY,float posZ, float diffX,float diffY,float diffZ)
+MNEMshLight::MNEMshLight(int state, float posX, float posY, float posZ, float diffX, float diffY, float diffZ)
 {
     this->state = state;
     this->pos[0] = posX;

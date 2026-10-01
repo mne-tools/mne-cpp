@@ -42,14 +42,16 @@ using namespace Eigen;
 
 double BadChannelDetect::pearsonCorr(const RowVectorXd& a, const RowVectorXd& b)
 {
-    if (a.size() != b.size() || a.size() == 0) return 0.0;
+    if (a.size() != b.size() || a.size() == 0)
+        return 0.0;
 
     RowVectorXd ac = a.array() - a.mean();
     RowVectorXd bc = b.array() - b.mean();
 
     double normA = ac.norm();
     double normB = bc.norm();
-    if (normA < 1e-30 || normB < 1e-30) return 0.0;
+    if (normA < 1e-30 || normB < 1e-30)
+        return 0.0;
 
     return ac.dot(bc) / (normA * normB);
 }
@@ -58,10 +60,12 @@ double BadChannelDetect::pearsonCorr(const RowVectorXd& a, const RowVectorXd& b)
 
 double BadChannelDetect::median(QVector<double> values)
 {
-    if (values.isEmpty()) return 0.0;
+    if (values.isEmpty())
+        return 0.0;
     std::sort(values.begin(), values.end());
     const int n = values.size();
-    if (n % 2 == 1) return values[n / 2];
+    if (n % 2 == 1)
+        return values[n / 2];
     return 0.5 * (values[n / 2 - 1] + values[n / 2]);
 }
 
@@ -70,21 +74,28 @@ double BadChannelDetect::median(QVector<double> values)
 //=============================================================================================================
 
 QVector<int> BadChannelDetect::detect(const MatrixXd& matData,
-                                       const Params&   params)
+                                      const Params& params)
 {
-    QVector<int> flat  = detectFlat(matData, params.dFlatThreshold);
+    QVector<int> flat = detectFlat(matData, params.dFlatThreshold);
     QVector<int> noisy = detectHighVariance(matData, params.dVarZThresh);
-    QVector<int> low   = detectLowCorrelation(matData, params.dCorrThresh, params.iNeighbours);
+    QVector<int> low = detectLowCorrelation(matData, params.dCorrThresh, params.iNeighbours);
 
     // Union without duplicates
     QVector<bool> flagged(static_cast<int>(matData.rows()), false);
-    for (int i : flat)  if (i >= 0 && i < matData.rows()) flagged[i] = true;
-    for (int i : noisy) if (i >= 0 && i < matData.rows()) flagged[i] = true;
-    for (int i : low)   if (i >= 0 && i < matData.rows()) flagged[i] = true;
+    for (int i : flat)
+        if (i >= 0 && i < matData.rows())
+            flagged[i] = true;
+    for (int i : noisy)
+        if (i >= 0 && i < matData.rows())
+            flagged[i] = true;
+    for (int i : low)
+        if (i >= 0 && i < matData.rows())
+            flagged[i] = true;
 
     QVector<int> result;
     for (int i = 0; i < static_cast<int>(matData.rows()); ++i) {
-        if (flagged[i]) result.append(i);
+        if (flagged[i])
+            result.append(i);
     }
     return result;
 }
@@ -92,13 +103,14 @@ QVector<int> BadChannelDetect::detect(const MatrixXd& matData,
 //=============================================================================================================
 
 QVector<int> BadChannelDetect::detectFlat(const MatrixXd& matData,
-                                           double          dThreshold)
+                                          double dThreshold)
 {
     QVector<int> bad;
     for (int ch = 0; ch < matData.rows(); ++ch) {
         const RowVectorXd row = matData.row(ch);
         double ptp = row.maxCoeff() - row.minCoeff();
-        if (ptp < dThreshold) bad.append(ch);
+        if (ptp < dThreshold)
+            bad.append(ch);
     }
     return bad;
 }
@@ -106,18 +118,19 @@ QVector<int> BadChannelDetect::detectFlat(const MatrixXd& matData,
 //=============================================================================================================
 
 QVector<int> BadChannelDetect::detectHighVariance(const MatrixXd& matData,
-                                                   double          dZThresh)
+                                                  double dZThresh)
 {
     const int nCh = static_cast<int>(matData.rows());
-    if (nCh < 3) return {};  // Cannot compute meaningful statistics with < 3 channels
+    if (nCh < 3)
+        return {}; // Cannot compute meaningful statistics with < 3 channels
 
     // Compute per-channel standard deviation
     QVector<double> stds(nCh);
     for (int ch = 0; ch < nCh; ++ch) {
         const RowVectorXd row = matData.row(ch);
         double mean = row.mean();
-        double var  = (row.array() - mean).square().mean();
-        stds[ch]    = std::sqrt(var);
+        double var = (row.array() - mean).square().mean();
+        stds[ch] = std::sqrt(var);
     }
 
     // Median and MAD of std across channels
@@ -148,12 +161,14 @@ QVector<int> BadChannelDetect::detectHighVariance(const MatrixXd& matData,
         sigma = std::sqrt(varStd / static_cast<double>(nCh));
     }
 
-    if (sigma < 1e-30) return {};  // All channels identical (e.g. all zeros)
+    if (sigma < 1e-30)
+        return {}; // All channels identical (e.g. all zeros)
 
     QVector<int> bad;
     for (int ch = 0; ch < nCh; ++ch) {
         double z = (stds[ch] - med) / sigma;
-        if (z > dZThresh) bad.append(ch);
+        if (z > dZThresh)
+            bad.append(ch);
     }
     return bad;
 }
@@ -161,32 +176,36 @@ QVector<int> BadChannelDetect::detectHighVariance(const MatrixXd& matData,
 //=============================================================================================================
 
 QVector<int> BadChannelDetect::detectLowCorrelation(const MatrixXd& matData,
-                                                     double          dCorrThresh,
-                                                     int             iNeighbours)
+                                                    double dCorrThresh,
+                                                    int iNeighbours)
 {
     const int nCh = static_cast<int>(matData.rows());
-    if (nCh < 2) return {};
+    if (nCh < 2)
+        return {};
 
     QVector<int> bad;
 
     for (int ch = 0; ch < nCh; ++ch) {
-        int nValid  = 0;
+        int nValid = 0;
         double sumC = 0.0;
 
         int lo = std::max(0, ch - iNeighbours);
         int hi = std::min(nCh - 1, ch + iNeighbours);
 
         for (int nb = lo; nb <= hi; ++nb) {
-            if (nb == ch) continue;
+            if (nb == ch)
+                continue;
             double c = std::abs(pearsonCorr(matData.row(ch), matData.row(nb)));
             sumC += c;
             ++nValid;
         }
 
-        if (nValid == 0) continue;
+        if (nValid == 0)
+            continue;
 
         double meanCorr = sumC / static_cast<double>(nValid);
-        if (meanCorr < dCorrThresh) bad.append(ch);
+        if (meanCorr < dCorrThresh)
+            bad.append(ch);
     }
 
     return bad;

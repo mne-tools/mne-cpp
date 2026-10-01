@@ -58,7 +58,7 @@ Network GrangerCausality::calculate(ConnectivitySettings& connectivitySettings)
 {
     Network finalNetwork("GC");
 
-    if(connectivitySettings.isEmpty()) {
+    if (connectivitySettings.isEmpty()) {
         qDebug() << "GrangerCausality::calculate - Input data is empty";
         return finalNetwork;
     }
@@ -68,7 +68,7 @@ Network GrangerCausality::calculate(ConnectivitySettings& connectivitySettings)
     // Average trial data for MVAR fitting
     const int nTrials = connectivitySettings.size();
     MatrixXd matDataAvg = connectivitySettings.at(0).matData;
-    for(int t = 1; t < nTrials; ++t) {
+    for (int t = 1; t < nTrials; ++t) {
         matDataAvg += connectivitySettings.at(t).matData;
     }
     matDataAvg /= static_cast<double>(nTrials);
@@ -82,9 +82,9 @@ Network GrangerCausality::calculate(ConnectivitySettings& connectivitySettings)
 
     // Create nodes
     RowVectorXf rowVert = RowVectorXf::Zero(3);
-    for(int i = 0; i < nCh; ++i) {
+    for (int i = 0; i < nCh; ++i) {
         rowVert = RowVectorXf::Zero(3);
-        if(connectivitySettings.getNodePositions().rows() != 0 && i < connectivitySettings.getNodePositions().rows()) {
+        if (connectivitySettings.getNodePositions().rows() != 0 && i < connectivitySettings.getNodePositions().rows()) {
             rowVert(0) = connectivitySettings.getNodePositions().row(i)(0);
             rowVert(1) = connectivitySettings.getNodePositions().row(i)(1);
             rowVert(2) = connectivitySettings.getNodePositions().row(i)(2);
@@ -105,9 +105,9 @@ Network GrangerCausality::calculate(ConnectivitySettings& connectivitySettings)
     // Compute spectral Granger causality for each directed pair
     // GC_{j->i}(f) = ln( S_{ii}(f) / (S_{ii}(f) - gamma_{ij} * |H_{ij}(f)|^2) )
     // where gamma_{ij} = Sigma_{jj} - Sigma_{ij}^2 / Sigma_{ii}
-    for(int i = 0; i < nCh; ++i) {
-        for(int j = 0; j < nCh; ++j) {
-            if(i == j) {
+    for (int i = 0; i < nCh; ++i) {
+        for (int j = 0; j < nCh; ++j) {
+            if (i == j) {
                 continue;
             }
 
@@ -115,12 +115,12 @@ Network GrangerCausality::calculate(ConnectivitySettings& connectivitySettings)
 
             const double gammaIJ = matSigma(j, j) - (matSigma(i, j) * matSigma(i, j)) / matSigma(i, i);
 
-            for(int fi = 0; fi < iNFreqs; ++fi) {
+            for (int fi = 0; fi < iNFreqs; ++fi) {
                 const double sII = vecS[fi](i, i).real();
                 const double hIJ2 = std::norm(vecH[fi](i, j));
                 const double denom = sII - gammaIJ * hIJ2;
 
-                if(denom > 0.0 && sII > 0.0) {
+                if (denom > 0.0 && sII > 0.0) {
                     matWeight(fi, 0) = std::log(sII / denom);
                 } else {
                     matWeight(fi, 0) = 0.0;

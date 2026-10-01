@@ -50,8 +50,8 @@
 
 namespace FIFFLIB
 {
-    class FiffStream;
-    class FiffDirNode;
+class FiffStream;
+class FiffDirNode;
 }
 
 //=============================================================================================================
@@ -83,8 +83,8 @@ namespace MNELIB
 class MNESHARED_EXPORT MNENamedMatrix
 {
 public:
-    typedef QSharedPointer<MNENamedMatrix> SPtr;              /**< Shared pointer type for MNENamedMatrix. */
-    typedef QSharedPointer<const MNENamedMatrix> ConstSPtr;   /**< Const shared pointer type for MNENamedMatrix. */
+    typedef QSharedPointer<MNENamedMatrix> SPtr;            /**< Shared pointer type for MNENamedMatrix. */
+    typedef QSharedPointer<const MNENamedMatrix> ConstSPtr; /**< Const shared pointer type for MNENamedMatrix. */
 
     //=========================================================================================================
     /**
@@ -176,11 +176,11 @@ public:
                                          int pickncol) const;
 
 public:
-    int   nrow;             /**< Number of rows in @ref data. */
-    int   ncol;             /**< Number of columns in @ref data. */
-    QStringList rowlist;    /**< Name list for the rows (may be empty if unnamed). */
-    QStringList collist;    /**< Name list for the columns (may be empty if unnamed). */
-    Eigen::MatrixXf data;  /**< Dense data matrix of dimension @ref nrow x @ref ncol. */
+    int nrow;             /**< Number of rows in @ref data. */
+    int ncol;             /**< Number of columns in @ref data. */
+    QStringList rowlist;  /**< Name list for the rows (may be empty if unnamed). */
+    QStringList collist;  /**< Name list for the columns (may be empty if unnamed). */
+    Eigen::MatrixXf data; /**< Dense data matrix of dimension @ref nrow x @ref ncol. */
 };
 
 } // NAMESPACE MNELIB

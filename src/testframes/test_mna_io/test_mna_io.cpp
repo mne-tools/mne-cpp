@@ -236,8 +236,7 @@ void TestMnaIo::testFileRoleEnumRoundTrip()
         MnaFileRole::Raw, MnaFileRole::Forward, MnaFileRole::Inverse,
         MnaFileRole::Covariance, MnaFileRole::SourceEstimate,
         MnaFileRole::Bem, MnaFileRole::Surface, MnaFileRole::Annotation,
-        MnaFileRole::Custom
-    };
+        MnaFileRole::Custom};
 
     for (MnaFileRole role : roles) {
         QString str = mnaFileRoleToString(role);

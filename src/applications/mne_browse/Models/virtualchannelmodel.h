@@ -36,32 +36,35 @@ namespace MNEBROWSE
 /**
  * @brief Supported virtual-channel derivation types.
  */
-enum class VirtualChannelKind {
-    Bipolar = 0,          /**< Classic source minus reference derivation. */
-    AverageReference,     /**< Source minus the arithmetic mean of all references. */
-    WeightedReference     /**< Source minus a weighted sum of references. */
+enum class VirtualChannelKind
+{
+    Bipolar = 0,      /**< Classic source minus reference derivation. */
+    AverageReference, /**< Source minus the arithmetic mean of all references. */
+    WeightedReference /**< Source minus a weighted sum of references. */
 };
 
 //=============================================================================================================
 /**
  * @brief Named collection of reference channels that can be reused by multiple virtual channels.
  */
-struct VirtualReferenceSetDefinition {
-    QString     name;       /**< User-visible name of the reference set. */
-    QStringList channels;   /**< Ordered list of reference channel names. */
+struct VirtualReferenceSetDefinition
+{
+    QString name;         /**< User-visible name of the reference set. */
+    QStringList channels; /**< Ordered list of reference channel names. */
 };
 
 //=============================================================================================================
 /**
  * @brief Serializable description of one derived browser channel.
  */
-struct VirtualChannelDefinition {
-    QString            name;                /**< User-visible name of the derived channel. */
+struct VirtualChannelDefinition
+{
+    QString name;                                          /**< User-visible name of the derived channel. */
     VirtualChannelKind kind = VirtualChannelKind::Bipolar; /**< Derivation type. */
-    QString            primaryChannel;      /**< Source channel that is shown as the main signal. */
-    QStringList        referenceChannels;   /**< Explicit reference channels used by the definition. */
-    QVector<double>    referenceWeights;    /**< Optional per-reference weights for weighted derivations. */
-    QString            referenceSetName;    /**< Optional named reference set resolved at runtime. */
+    QString primaryChannel;                                /**< Source channel that is shown as the main signal. */
+    QStringList referenceChannels;                         /**< Explicit reference channels used by the definition. */
+    QVector<double> referenceWeights;                      /**< Optional per-reference weights for weighted derivations. */
+    QString referenceSetName;                              /**< Optional named reference set resolved at runtime. */
 };
 
 //=============================================================================================================
@@ -82,7 +85,7 @@ public:
      *
      * @param[in] parent    Parent QObject.
      */
-    explicit VirtualChannelModel(QObject *parent = nullptr);
+    explicit VirtualChannelModel(QObject* parent = nullptr);
 
     //=========================================================================================================
     /**
@@ -97,7 +100,7 @@ public:
      * @param[in] parent    Parent index supplied by Qt.
      * @return Number of virtual channels shown in the table.
      */
-    int rowCount(const QModelIndex &parent = QModelIndex()) const override;
+    int rowCount(const QModelIndex& parent = QModelIndex()) const override;
 
     //=========================================================================================================
     /**
@@ -106,7 +109,7 @@ public:
      * @param[in] parent    Parent index supplied by Qt.
      * @return Number of virtual-channel columns.
      */
-    int columnCount(const QModelIndex &parent = QModelIndex()) const override;
+    int columnCount(const QModelIndex& parent = QModelIndex()) const override;
 
     //=========================================================================================================
     /**
@@ -127,7 +130,7 @@ public:
      * @param[in] role      Requested Qt role.
      * @return Cell data for the requested role.
      */
-    QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const override;
+    QVariant data(const QModelIndex& index, int role = Qt::DisplayRole) const override;
 
     //=========================================================================================================
     /**
@@ -136,7 +139,7 @@ public:
      * @param[in] index     Requested model index.
      * @return Supported item flags.
      */
-    Qt::ItemFlags flags(const QModelIndex &index) const override;
+    Qt::ItemFlags flags(const QModelIndex& index) const override;
 
     //=========================================================================================================
     /**
@@ -147,7 +150,7 @@ public:
      * @param[in] role      Edit role.
      * @return True on success.
      */
-    bool setData(const QModelIndex &index, const QVariant &value, int role = Qt::EditRole) override;
+    bool setData(const QModelIndex& index, const QVariant& value, int role = Qt::EditRole) override;
 
     //=========================================================================================================
     /**
@@ -158,7 +161,7 @@ public:
      * @param[in] parent    Parent index supplied by Qt.
      * @return True on success.
      */
-    bool removeRows(int position, int rows, const QModelIndex &parent = QModelIndex()) override;
+    bool removeRows(int position, int rows, const QModelIndex& parent = QModelIndex()) override;
 
     //=========================================================================================================
     /**
@@ -345,9 +348,9 @@ private:
      */
     void notifyVirtualChannelsChanged();
 
-    QVector<VirtualChannelDefinition>      m_virtualChannels;   /**< Stored virtual-channel definitions. */
-    QVector<VirtualReferenceSetDefinition> m_referenceSets;     /**< Stored reusable reference sets. */
-    bool                                   m_bFileLoaded = false; /**< True if the model state came from disk. */
+    QVector<VirtualChannelDefinition> m_virtualChannels;    /**< Stored virtual-channel definitions. */
+    QVector<VirtualReferenceSetDefinition> m_referenceSets; /**< Stored reusable reference sets. */
+    bool m_bFileLoaded = false;                             /**< True if the model state came from disk. */
 };
 
 } // namespace MNEBROWSE

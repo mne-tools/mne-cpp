@@ -73,7 +73,8 @@ namespace FWDLIB
 /**
  * @brief Workspace for the linear least-squares fit of Berg-Scherg parameters in the EEG sphere model (SVD matrices, residuals, weights).
  */
-struct fitUserRec {
+struct fitUserRec
+{
     Eigen::VectorXd y;
     Eigen::VectorXd resi;
     Eigen::MatrixXd M;
@@ -82,8 +83,8 @@ struct fitUserRec {
     Eigen::VectorXd sing;
     Eigen::VectorXd fn;
     Eigen::VectorXd w;
-    int    nfit;
-    int    nterms;
+    int nfit;
+    int nterms;
 };
 using fitUser = fitUserRec*;
 
@@ -96,7 +97,7 @@ using fitUser = fitUserRec*;
 class FWDSHARED_EXPORT FwdEegSphereModel
 {
 public:
-    typedef std::unique_ptr<FwdEegSphereModel> UPtr;      /**< Unique pointer type for FwdEegSphereModel. */
+    typedef std::unique_ptr<FwdEegSphereModel> UPtr; /**< Unique pointer type for FwdEegSphereModel. */
 
     //=========================================================================================================
     /**
@@ -127,9 +128,9 @@ public:
      * @return Pointer to the newly created sphere model.
      */
     static FwdEegSphereModel::UPtr fwd_create_eeg_sphere_model(const QString& name,
-                                                         int nlayer,
-                                                         const Eigen::VectorXf& rads,
-                                                         const Eigen::VectorXf& sigmas);
+                                                               int nlayer,
+                                                               const Eigen::VectorXf& rads,
+                                                               const Eigen::VectorXf& sigmas);
 
     //=========================================================================================================
     /**
@@ -183,12 +184,12 @@ public:
      * @param[out] p1     Legendre polynomial of the second kind.
      * @param[out] p11    Previous value of p1.
      */
-    static void next_legen (int n,
-                double x,
-                double &p0,
-                double &p01,
-                double &p1,
-                double &p11);
+    static void next_legen(int n,
+                           double x,
+                           double& p0,
+                           double& p01,
+                           double& p1,
+                           double& p11);
 
     //=========================================================================================================
     /**
@@ -203,11 +204,11 @@ public:
      * @param[in]  nterms     Maximum number of terms in the series.
      */
     static void calc_pot_components(double beta,
-                    double cgamma,
-                    double &Vrp,
-                    double &Vtp,
-                    const Eigen::VectorXd& fn,
-                    int    nterms);
+                                    double cgamma,
+                                    double& Vrp,
+                                    double& Vtp,
+                                    const Eigen::VectorXd& fn,
+                                    int nterms);
 
     //=========================================================================================================
     /**
@@ -226,11 +227,11 @@ public:
      * @return OK on success, FAIL otherwise.
      */
     static int fwd_eeg_multi_spherepot(const Eigen::Vector3f& rd,
-                       const Eigen::Vector3f& Q,
-                       const Eigen::Matrix<float, Eigen::Dynamic, 3, Eigen::RowMajor>& el,
-                       int     neeg,
-                       Eigen::VectorXf& Vval,
-                       void    *client);
+                                       const Eigen::Vector3f& Q,
+                                       const Eigen::Matrix<float, Eigen::Dynamic, 3, Eigen::RowMajor>& el,
+                                       int neeg,
+                                       Eigen::VectorXf& Vval,
+                                       void* client);
 
     //=========================================================================================================
     /**
@@ -246,10 +247,10 @@ public:
      * @return OK on success, FAIL otherwise.
      */
     static int fwd_eeg_multi_spherepot_coil1(const Eigen::Vector3f& rd,
-                      const Eigen::Vector3f& Q,
-                      FwdCoilSet& els,
-                      Eigen::Ref<Eigen::VectorXf> Vval,
-                      void       *client);
+                                             const Eigen::Vector3f& Q,
+                                             FwdCoilSet& els,
+                                             Eigen::Ref<Eigen::VectorXf> Vval,
+                                             void* client);
 
     //=========================================================================================================
     /**
@@ -276,7 +277,7 @@ public:
      *
      * @return true when successful.
      */
-    static bool fwd_eeg_spherepot_vec (const Eigen::Vector3f& rd, const Eigen::Matrix<float, Eigen::Dynamic, 3, Eigen::RowMajor>& el, int neeg, Eigen::MatrixXf& Vval_vec, void *client);
+    static bool fwd_eeg_spherepot_vec(const Eigen::Vector3f& rd, const Eigen::Matrix<float, Eigen::Dynamic, 3, Eigen::RowMajor>& el, int neeg, Eigen::MatrixXf& Vval_vec, void* client);
 
     //=========================================================================================================
     /**
@@ -296,7 +297,7 @@ public:
      *
      * @return true when successful.
      */
-    static int fwd_eeg_spherepot_coil_vec(const Eigen::Vector3f& rd, FwdCoilSet& els, Eigen::Ref<Eigen::MatrixXf> Vval_vec, void *client);
+    static int fwd_eeg_spherepot_coil_vec(const Eigen::Vector3f& rd, FwdCoilSet& els, Eigen::Ref<Eigen::MatrixXf> Vval_vec, void* client);
 
     //=========================================================================================================
     /**
@@ -314,14 +315,14 @@ public:
      *
      * @return OK on success, FAIL otherwise.
      */
-    static int fwd_eeg_spherepot_grad_coil( const Eigen::Vector3f& rd,
-                                            const Eigen::Vector3f& Q,
-                                            FwdCoilSet&  coils,
-                                            Eigen::Ref<Eigen::VectorXf> Vval,
-                                            Eigen::Ref<Eigen::VectorXf> xgrad,
-                                            Eigen::Ref<Eigen::VectorXf> ygrad,
-                                            Eigen::Ref<Eigen::VectorXf> zgrad,
-                                            void         *client);
+    static int fwd_eeg_spherepot_grad_coil(const Eigen::Vector3f& rd,
+                                           const Eigen::Vector3f& Q,
+                                           FwdCoilSet& coils,
+                                           Eigen::Ref<Eigen::VectorXf> Vval,
+                                           Eigen::Ref<Eigen::VectorXf> xgrad,
+                                           Eigen::Ref<Eigen::VectorXf> ygrad,
+                                           Eigen::Ref<Eigen::VectorXf> zgrad,
+                                           void* client);
 
     //=========================================================================================================
     /**
@@ -341,7 +342,7 @@ public:
      *
      * @return true when successful.
      */
-    static int fwd_eeg_spherepot( const Eigen::Vector3f& rd, const Eigen::Vector3f& Q, const Eigen::Matrix<float, Eigen::Dynamic, 3, Eigen::RowMajor>& el, int neeg, Eigen::VectorXf& Vval, void *client);
+    static int fwd_eeg_spherepot(const Eigen::Vector3f& rd, const Eigen::Vector3f& Q, const Eigen::Matrix<float, Eigen::Dynamic, 3, Eigen::RowMajor>& el, int neeg, Eigen::VectorXf& Vval, void* client);
 
     //=========================================================================================================
     /**
@@ -358,7 +359,7 @@ public:
      *
      * @return true when successful.
      */
-    static int fwd_eeg_spherepot_coil(const Eigen::Vector3f& rd, const Eigen::Vector3f& Q, FwdCoilSet& els, Eigen::Ref<Eigen::VectorXf> Vval, void *client);
+    static int fwd_eeg_spherepot_coil(const Eigen::Vector3f& rd, const Eigen::Vector3f& Q, FwdCoilSet& els, Eigen::Ref<Eigen::VectorXf> Vval, void* client);
 
     //=========================================================================================================
     /**
@@ -382,7 +383,7 @@ public:
      * @param[in]  mu     Distance multipliers for the equivalent dipoles.
      * @param[in]  u      Fitting workspace (M and y are populated on output).
      */
-    static void compose_linear_fitting_data(const Eigen::VectorXd& mu,fitUser u);
+    static void compose_linear_fitting_data(const Eigen::VectorXd& mu, fitUser u);
 
     //=========================================================================================================
     /**
@@ -407,7 +408,7 @@ public:
      *
      * @return Sum of squared residuals; 1.0 if any mu exceeds +/-1.
      */
-    static double one_step (const Eigen::VectorXd& mu, const void *user_data);
+    static double one_step(const Eigen::VectorXd& mu, const void* user_data);
 
     //=========================================================================================================
     /**
@@ -423,28 +424,28 @@ public:
      *
      * @return true if fitting succeeded, false otherwise.
      */
-    bool fwd_eeg_fit_berg_scherg(int   nTerms,
-                                int   nFit,
-                                float &rv);
+    bool fwd_eeg_fit_berg_scherg(int nTerms,
+                                 int nFit,
+                                 float& rv);
 
-/**< Number of layers. */
-    int   nlayer() const
+    /**< Number of layers. */
+    int nlayer() const
     {
         return static_cast<int>(layers.size());
     }
 
 public:
-    QString                     name;   /**< Textual identifier. */
+    QString name;                          /**< Textual identifier. */
     std::vector<FwdEegSphereLayer> layers; /**< An array of layers. */
-    Eigen::Vector3f             r0;     /**< The origin. */
+    Eigen::Vector3f r0;                    /**< The origin. */
 
-    Eigen::VectorXd fn;                 /**< Coefficients saved to speed up the computations. */
-    int             nterms;             /**< How many? */
+    Eigen::VectorXd fn; /**< Coefficients saved to speed up the computations. */
+    int nterms;         /**< How many? */
 
-    Eigen::VectorXf mu;             /**< The Berg-Scherg equivalence parameters. */
+    Eigen::VectorXf mu; /**< The Berg-Scherg equivalence parameters. */
     Eigen::VectorXf lambda;
-    int             nfit;           /**< How many? */
-    int             scale_pos;      /**< Scale the positions to the surface of the sphere? */
+    int nfit;      /**< How many? */
+    int scale_pos; /**< Scale the positions to the surface of the sphere? */
 };
 
 //=============================================================================================================

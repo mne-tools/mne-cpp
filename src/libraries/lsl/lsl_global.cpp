@@ -29,12 +29,21 @@
 // DEFINE METHODS
 //=============================================================================================================
 
-const char* LSLLIB::buildDateTime(){ return UTILSLIB::dateTimeNow();}
+const char* LSLLIB::buildDateTime()
+{
+    return UTILSLIB::dateTimeNow();
+}
 
 //=============================================================================================================
 
-const char* LSLLIB::buildHash(){ return UTILSLIB::gitHash();}
+const char* LSLLIB::buildHash()
+{
+    return UTILSLIB::gitHash();
+}
 
 //=============================================================================================================
 
-const char* LSLLIB::buildHashLong(){ return UTILSLIB::gitHashLong();}
+const char* LSLLIB::buildHashLong()
+{
+    return UTILSLIB::gitHashLong();
+}

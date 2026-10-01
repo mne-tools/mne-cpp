@@ -39,7 +39,7 @@ using namespace Eigen;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-AverageDelegate::AverageDelegate(QObject *parent)
+AverageDelegate::AverageDelegate(QObject* parent)
 : QItemDelegate(parent)
 {
 }
@@ -47,13 +47,13 @@ AverageDelegate::AverageDelegate(QObject *parent)
 
 //*************************************************************************************************************
 
-void AverageDelegate::paint([[maybe_unused]] QPainter *painter, [[maybe_unused]] const QStyleOptionViewItem &option, [[maybe_unused]] const QModelIndex &index) const
+void AverageDelegate::paint([[maybe_unused]] QPainter* painter, [[maybe_unused]] const QStyleOptionViewItem& option, [[maybe_unused]] const QModelIndex& index) const
 {
 }
 
 
 //*************************************************************************************************************
 
-void AverageDelegate::createPlotPath([[maybe_unused]] const QModelIndex &index, [[maybe_unused]] const QStyleOptionViewItem &option, [[maybe_unused]] QPainterPath& path, [[maybe_unused]] QList<RowVectorPair>& listPairs) const
+void AverageDelegate::createPlotPath([[maybe_unused]] const QModelIndex& index, [[maybe_unused]] const QStyleOptionViewItem& option, [[maybe_unused]] QPainterPath& path, [[maybe_unused]] QList<RowVectorPair>& listPairs) const
 {
 }

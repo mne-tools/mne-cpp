@@ -47,7 +47,7 @@ using namespace UTILSLIB;
 // MAIN
 //=============================================================================================================
 
-int main(int argc, char *argv[])
+int main(int argc, char* argv[])
 {
     QCoreApplication app(argc, argv);
     QCoreApplication::setApplicationName(QStringLiteral("mne_inverse_pipeline"));

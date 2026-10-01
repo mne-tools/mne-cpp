@@ -38,7 +38,7 @@ using namespace UTILSLIB;
  * @brief The TestUtilsLogger class provides tests for MNELogger file output.
  *
  */
-class TestUtilsLogger: public QObject
+class TestUtilsLogger : public QObject
 {
     Q_OBJECT
 
@@ -68,7 +68,7 @@ TestUtilsLogger::TestUtilsLogger()
 QString TestUtilsLogger::readLog() const
 {
     QFile file(m_sLogFile);
-    if(!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
+    if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
         return QString();
     }
 

@@ -52,26 +52,26 @@ public:
     /**
      *  Constructs a EEGoSportsImpedanceScene.
      */
-    explicit EEGoSportsImpedanceScene(QGraphicsView* view, QObject *parent = 0);
+    explicit EEGoSportsImpedanceScene(QGraphicsView* view, QObject* parent = 0);
 
 private:
     //=========================================================================================================
     /**
      *  Reimplemented mouse press event handler.
      */
-    void mousePressEvent(QGraphicsSceneMouseEvent * event);
+    void mousePressEvent(QGraphicsSceneMouseEvent* event);
 
     //=========================================================================================================
     /**
      *  Reimplemented mouse move event handler.
      */
-    void mouseMoveEvent(QGraphicsSceneMouseEvent * event);
+    void mouseMoveEvent(QGraphicsSceneMouseEvent* event);
 
     //=========================================================================================================
     /**
      *  Reimplemented mouse release event handler.
      */
-    void mouseReleaseEvent(QGraphicsSceneMouseEvent * event);
+    void mouseReleaseEvent(QGraphicsSceneMouseEvent* event);
 
     //=========================================================================================================
     /**
@@ -79,9 +79,9 @@ private:
      */
     void scaleElectrodePositions(double scaleFactor);
 
-    QPointF         m_mousePosition;                /**< Holds the mouse position.*/
-    bool            m_bRightMouseKeyPressed;        /**< Whether the right mouse button was pressed.*/
-    QGraphicsView*  m_qvView;                       /**< Holds the view which visualizes this scene.*/
+    QPointF m_mousePosition;      /**< Holds the mouse position.*/
+    bool m_bRightMouseKeyPressed; /**< Whether the right mouse button was pressed.*/
+    QGraphicsView* m_qvView;      /**< Holds the view which visualizes this scene.*/
 };
 } // NAMESPACE
 

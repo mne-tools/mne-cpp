@@ -71,7 +71,7 @@ public:
      *
      * @param[in] parent     Parent widget.
      */
-    explicit MainWindow(QWidget *parent = nullptr);
+    explicit MainWindow(QWidget* parent = nullptr);
 
     //=========================================================================================================
     /**
@@ -92,16 +92,16 @@ public:
      * @param[in] srcSpacePath   Optional source space file path.
      * @param[in] atlasPath      Optional atlas annotation file path.
      */
-    void loadInitialData(const QString &subjectPath,
-                         const QString &subjectName,
-                         const QString &bemPath = QString(),
-                         const QString &transPath = QString(),
-                         const QStringList &stcPaths = QStringList(),
-                         const QString &digitizerPath = QString(),
-                         const QString &srcSpacePath = QString(),
-                         const QString &atlasPath = QString(),
-                         const QString &evokedPath = QString(),
-                         const QString &mriPath = QString());
+    void loadInitialData(const QString& subjectPath,
+                         const QString& subjectName,
+                         const QString& bemPath = QString(),
+                         const QString& transPath = QString(),
+                         const QStringList& stcPaths = QStringList(),
+                         const QString& digitizerPath = QString(),
+                         const QString& srcSpacePath = QString(),
+                         const QString& atlasPath = QString(),
+                         const QString& evokedPath = QString(),
+                         const QString& mriPath = QString());
 
     //=========================================================================================================
     /**
@@ -112,18 +112,36 @@ public:
      * not go through these — they exist solely so we can drive the real
      * widget tree from a documentation / test harness.
      */
-    DISP3DLIB::MultimodalScene&         scene()             { return m_scene; }
-    ELECTRODESPLUGIN::ElectrodesPlugin& electrodesPlugin()  { return m_electrodesPlugin; }
-    MRISLICESPLUGIN::MriSlicesPlugin&   mriSlicesPlugin()   { return m_mriSlicesPlugin; }
-    QDockWidget*                        pickDock()          { return m_pickDock; }
-    QDockWidget*                        layersDock()        { return m_layersDock; }
-    QDockWidget*                        overlayDock()       { return m_overlayDock; }
+    DISP3DLIB::MultimodalScene& scene()
+    {
+        return m_scene;
+    }
+    ELECTRODESPLUGIN::ElectrodesPlugin& electrodesPlugin()
+    {
+        return m_electrodesPlugin;
+    }
+    MRISLICESPLUGIN::MriSlicesPlugin& mriSlicesPlugin()
+    {
+        return m_mriSlicesPlugin;
+    }
+    QDockWidget* pickDock()
+    {
+        return m_pickDock;
+    }
+    QDockWidget* layersDock()
+    {
+        return m_layersDock;
+    }
+    QDockWidget* overlayDock()
+    {
+        return m_overlayDock;
+    }
 
 private:
     void setupUI();
     void setupConnections();
-    void loadHemisphere(const QString &subjectPath, const QString &subjectName, const QString &hemi);
-    void loadBem(const QString &subjectName, const QString &bemPath);
+    void loadHemisphere(const QString& subjectPath, const QString& subjectName, const QString& hemi);
+    void loadBem(const QString& subjectName, const QString& bemPath);
     void syncUIToEditTarget(int target);
     void updateViewportCheckboxes(int count);
     void enableNetworkControls();
@@ -133,35 +151,35 @@ private:
      * STC combo box.  When @p activate is true the new entry is also selected,
      * triggering a load.
      */
-    void addStcEntry(const QString &stcPath, bool activate = true);
+    void addStcEntry(const QString& stcPath, bool activate = true);
 
     /**
      * Import an MNA/MNX project file — extract embedded files and load them.
      */
-    void importMnaProject(const QString &path);
+    void importMnaProject(const QString& path);
 
     /**
      * Export the currently loaded data as an MNA (JSON) or MNX (CBOR) project file.
      * When embedData is true, all referenced files are embedded in the container.
      */
-    void exportMnaProject(const QString &path, bool embedData);
+    void exportMnaProject(const QString& path, bool embedData);
 
     /**
      * Track a loaded file path and its role for later export.
      */
-    void trackLoadedFile(const QString &path, int role);
+    void trackLoadedFile(const QString& path, int role);
 
     /**
      * Unload data of the given role from the 3D scene.
      */
-    void unloadFileFromScene(MNALIB::MnaFileRole role, const QString &path = QString());
+    void unloadFileFromScene(MNALIB::MnaFileRole role, const QString& path = QString());
 
     /**
      * Handle close event — save settings before closing.
      *
      * @param[in] event     Close event.
      */
-    void closeEvent(QCloseEvent *event) override;
+    void closeEvent(QCloseEvent* event) override;
 
     /**
      * Create menu bar with File, View, Tools, Help menus.
@@ -181,7 +199,7 @@ private:
     /**
      * Add an entry to the Loaded Files tree widget.
      */
-    void addLoadedFileEntry(const QString &path, int role);
+    void addLoadedFileEntry(const QString& path, int role);
 
     /**
      * Save window geometry, dock state, and recent files to QSettings.
@@ -201,7 +219,7 @@ private:
     /**
      * Add a path to the recent files list.
      */
-    void addRecentFile(const QString &path);
+    void addRecentFile(const QString& path);
 
     //=========================================================================================================
     // Multimodal scene wiring: pick readout, layer toggles, source overlay
@@ -245,134 +263,134 @@ private:
 
 private:
     // Core components
-    BrainView *m_brainView = nullptr;
-    BrainTreeModel *m_model = nullptr;
+    BrainView* m_brainView = nullptr;
+    BrainTreeModel* m_model = nullptr;
 
     // Group boxes (disabled until data is loaded)
-    QGroupBox *m_surfGroup = nullptr;
-    QGroupBox *m_bemGroup = nullptr;
-    QGroupBox *m_stcGroup = nullptr;
-    QGroupBox *m_dipoleGroup = nullptr;
-    QGroupBox *m_srcSpaceGroup = nullptr;
-    QGroupBox *m_networkGroup = nullptr;
-    QGroupBox *m_evokedGroup = nullptr;
-    QGroupBox *m_sensorStreamGroup = nullptr;
-    QGroupBox *m_sensorGroup = nullptr;
+    QGroupBox* m_surfGroup = nullptr;
+    QGroupBox* m_bemGroup = nullptr;
+    QGroupBox* m_stcGroup = nullptr;
+    QGroupBox* m_dipoleGroup = nullptr;
+    QGroupBox* m_srcSpaceGroup = nullptr;
+    QGroupBox* m_networkGroup = nullptr;
+    QGroupBox* m_evokedGroup = nullptr;
+    QGroupBox* m_sensorStreamGroup = nullptr;
+    QGroupBox* m_sensorGroup = nullptr;
 
     // Control widgets - FsSurface
-    QComboBox *m_surfCombo = nullptr;
-    QComboBox *m_overlayCombo = nullptr;
-    QComboBox *m_shaderCombo = nullptr;
-    QComboBox *m_bemShaderCombo = nullptr;
-    QCheckBox *m_linkShadersCheck = nullptr;
-    QCheckBox *m_bemColorCheck = nullptr;
+    QComboBox* m_surfCombo = nullptr;
+    QComboBox* m_overlayCombo = nullptr;
+    QComboBox* m_shaderCombo = nullptr;
+    QComboBox* m_bemShaderCombo = nullptr;
+    QCheckBox* m_linkShadersCheck = nullptr;
+    QCheckBox* m_bemColorCheck = nullptr;
 
     // Control widgets - Hemisphere
-    QCheckBox *m_lhCheck = nullptr;
-    QCheckBox *m_rhCheck = nullptr;
+    QCheckBox* m_lhCheck = nullptr;
+    QCheckBox* m_rhCheck = nullptr;
 
     // Control widgets - BEM
-    QCheckBox *m_headCheck = nullptr;
-    QCheckBox *m_outerCheck = nullptr;
-    QCheckBox *m_innerCheck = nullptr;
+    QCheckBox* m_headCheck = nullptr;
+    QCheckBox* m_outerCheck = nullptr;
+    QCheckBox* m_innerCheck = nullptr;
 
     // Control widgets - View
-    QComboBox *m_viewCountCombo = nullptr;
-    QComboBox *m_editTargetCombo = nullptr;
-    QComboBox *m_cameraPresetCombo = nullptr;
-    QLabel *m_editTargetLabel = nullptr;
-    QLabel *m_cameraPresetLabel = nullptr;
+    QComboBox* m_viewCountCombo = nullptr;
+    QComboBox* m_editTargetCombo = nullptr;
+    QComboBox* m_cameraPresetCombo = nullptr;
+    QLabel* m_editTargetLabel = nullptr;
+    QLabel* m_cameraPresetLabel = nullptr;
 
     // Control widgets - Brain FsSurface
 
     // Control widgets - STC
-    QComboBox *m_stcCombo = nullptr;
-    QLabel *m_stcStatusLabel = nullptr;
-    QProgressBar *m_stcProgressBar = nullptr;
-    QComboBox *m_colormapCombo = nullptr;
-    QSlider *m_timeSlider = nullptr;
-    QLabel *m_timeLabel = nullptr;
-    QDoubleSpinBox *m_minThresh = nullptr;
-    QDoubleSpinBox *m_midThresh = nullptr;
-    QDoubleSpinBox *m_maxThresh = nullptr;
-    QPushButton *m_playButton = nullptr;
-    QComboBox *m_speedCombo = nullptr;
-    QTimer *m_stcTimer = nullptr;
+    QComboBox* m_stcCombo = nullptr;
+    QLabel* m_stcStatusLabel = nullptr;
+    QProgressBar* m_stcProgressBar = nullptr;
+    QComboBox* m_colormapCombo = nullptr;
+    QSlider* m_timeSlider = nullptr;
+    QLabel* m_timeLabel = nullptr;
+    QDoubleSpinBox* m_minThresh = nullptr;
+    QDoubleSpinBox* m_midThresh = nullptr;
+    QDoubleSpinBox* m_maxThresh = nullptr;
+    QPushButton* m_playButton = nullptr;
+    QComboBox* m_speedCombo = nullptr;
+    QTimer* m_stcTimer = nullptr;
 
     // Control widgets - Sensors
-    QCheckBox *m_showMegCheck = nullptr;
-    QCheckBox *m_showEegCheck = nullptr;
-    QCheckBox *m_showDigCheck = nullptr;
-    QCheckBox *m_showDigCardinalCheck = nullptr;
-    QCheckBox *m_showDigHpiCheck = nullptr;
-    QCheckBox *m_showDigEegCheck = nullptr;
-    QCheckBox *m_showDigExtraCheck = nullptr;
-    QCheckBox *m_applyTransCheck = nullptr;
+    QCheckBox* m_showMegCheck = nullptr;
+    QCheckBox* m_showEegCheck = nullptr;
+    QCheckBox* m_showDigCheck = nullptr;
+    QCheckBox* m_showDigCardinalCheck = nullptr;
+    QCheckBox* m_showDigHpiCheck = nullptr;
+    QCheckBox* m_showDigEegCheck = nullptr;
+    QCheckBox* m_showDigExtraCheck = nullptr;
+    QCheckBox* m_applyTransCheck = nullptr;
 
     // Control widgets - Dipoles
-    QCheckBox *m_showDipoleCheck = nullptr;
+    QCheckBox* m_showDipoleCheck = nullptr;
 
     // Control widgets - Source Space
-    QCheckBox *m_showSrcSpaceCheck = nullptr;
+    QCheckBox* m_showSrcSpaceCheck = nullptr;
 
     // Control widgets - Network
-    QCheckBox *m_showNetworkCheck = nullptr;
-    QSlider *m_networkThresholdSlider = nullptr;
-    QComboBox *m_networkColormapCombo = nullptr;
+    QCheckBox* m_showNetworkCheck = nullptr;
+    QSlider* m_networkThresholdSlider = nullptr;
+    QComboBox* m_networkColormapCombo = nullptr;
 
     // Control widgets - Evoked / Sensor Field
-    QComboBox *m_evokedSetCombo = nullptr;
-    QCheckBox *m_showMegFieldCheck = nullptr;
-    QCheckBox *m_showEegFieldCheck = nullptr;
-    QCheckBox *m_showMegContourCheck = nullptr;
-    QCheckBox *m_showEegContourCheck = nullptr;
-    QCheckBox *m_showHelmetCheck = nullptr;
-    QComboBox *m_helmetShapeCombo = nullptr;
-    QComboBox *m_megHelmetCombo = nullptr;
-    QSlider *m_sensorFieldTimeSlider = nullptr;
-    QLabel *m_sensorFieldTimeLabel = nullptr;
-    QCheckBox *m_syncTimesCheck = nullptr;
+    QComboBox* m_evokedSetCombo = nullptr;
+    QCheckBox* m_showMegFieldCheck = nullptr;
+    QCheckBox* m_showEegFieldCheck = nullptr;
+    QCheckBox* m_showMegContourCheck = nullptr;
+    QCheckBox* m_showEegContourCheck = nullptr;
+    QCheckBox* m_showHelmetCheck = nullptr;
+    QComboBox* m_helmetShapeCombo = nullptr;
+    QComboBox* m_megHelmetCombo = nullptr;
+    QSlider* m_sensorFieldTimeSlider = nullptr;
+    QLabel* m_sensorFieldTimeLabel = nullptr;
+    QCheckBox* m_syncTimesCheck = nullptr;
 
     // Control widgets - Sensor Streaming
-    QPushButton *m_sensorStreamBtn = nullptr;
-    QComboBox *m_sensorStreamModalityCombo = nullptr;
-    QCheckBox *m_sensorStreamLoopCheck = nullptr;
-    QSpinBox *m_sensorStreamAvgSpin = nullptr;
-    QComboBox *m_sensorStreamColormapCombo = nullptr;
+    QPushButton* m_sensorStreamBtn = nullptr;
+    QComboBox* m_sensorStreamModalityCombo = nullptr;
+    QCheckBox* m_sensorStreamLoopCheck = nullptr;
+    QSpinBox* m_sensorStreamAvgSpin = nullptr;
+    QComboBox* m_sensorStreamColormapCombo = nullptr;
 
     // Control widgets - STC Playback
-    QCheckBox *m_realtimeCheck = nullptr;
-    QCheckBox *m_loopCheck = nullptr;
+    QCheckBox* m_realtimeCheck = nullptr;
+    QCheckBox* m_loopCheck = nullptr;
 
     // Control widgets - MRI Volume
-    QGroupBox *m_mriGroup = nullptr;
-    QComboBox *m_mriVolumeCombo = nullptr;
-    QCheckBox *m_mriShowAllCheck = nullptr;
-    QLabel *m_mriFileLabel = nullptr;
-    QSlider *m_mriAxialSlider = nullptr;
-    QSlider *m_mriCoronalSlider = nullptr;
-    QSlider *m_mriSagittalSlider = nullptr;
-    QLabel *m_mriAxialLabel = nullptr;
-    QLabel *m_mriCoronalLabel = nullptr;
-    QLabel *m_mriSagittalLabel = nullptr;
-    QCheckBox *m_mriAxialCheck = nullptr;
-    QCheckBox *m_mriCoronalCheck = nullptr;
-    QCheckBox *m_mriSagittalCheck = nullptr;
-    QSlider *m_mriWindowCenterSlider = nullptr;
-    QSlider *m_mriWindowWidthSlider = nullptr;
-    QSlider *m_mriOpacitySlider = nullptr;
-    QLabel *m_mriWindowCenterLabel = nullptr;
-    QLabel *m_mriWindowWidthLabel = nullptr;
-    QLabel *m_mriOpacityLabel = nullptr;
+    QGroupBox* m_mriGroup = nullptr;
+    QComboBox* m_mriVolumeCombo = nullptr;
+    QCheckBox* m_mriShowAllCheck = nullptr;
+    QLabel* m_mriFileLabel = nullptr;
+    QSlider* m_mriAxialSlider = nullptr;
+    QSlider* m_mriCoronalSlider = nullptr;
+    QSlider* m_mriSagittalSlider = nullptr;
+    QLabel* m_mriAxialLabel = nullptr;
+    QLabel* m_mriCoronalLabel = nullptr;
+    QLabel* m_mriSagittalLabel = nullptr;
+    QCheckBox* m_mriAxialCheck = nullptr;
+    QCheckBox* m_mriCoronalCheck = nullptr;
+    QCheckBox* m_mriSagittalCheck = nullptr;
+    QSlider* m_mriWindowCenterSlider = nullptr;
+    QSlider* m_mriWindowWidthSlider = nullptr;
+    QSlider* m_mriOpacitySlider = nullptr;
+    QLabel* m_mriWindowCenterLabel = nullptr;
+    QLabel* m_mriWindowWidthLabel = nullptr;
+    QLabel* m_mriOpacityLabel = nullptr;
     bool m_mriSliderUpdating = false;
     QStringList m_mriVolumePaths;
 
     // Control widgets - View (additional)
-    QCheckBox *m_showInfoCheck = nullptr;
+    QCheckBox* m_showInfoCheck = nullptr;
 
     // Playback stepping (for real-time accurate playback)
-    QElapsedTimer m_playbackClock;          //!< Wall-clock for measuring actual elapsed time
-    double m_stcStepAccum = 0.0;            //!< Fractional sample accumulator
+    QElapsedTimer m_playbackClock; //!< Wall-clock for measuring actual elapsed time
+    double m_stcStepAccum = 0.0;   //!< Fractional sample accumulator
 
     // Loaded file tracking for MNA export (path → MnaFileRole int)
     QList<QPair<QString, int>> m_loadedFiles;
@@ -384,46 +402,46 @@ private:
     bool m_isSyncing = false;
 
     // Dock widgets
-    QDockWidget *m_controlsDock = nullptr;
-    QDockWidget *m_loadedFilesDock = nullptr;
+    QDockWidget* m_controlsDock = nullptr;
+    QDockWidget* m_loadedFilesDock = nullptr;
 
     // Loaded files tree
-    QTreeWidget *m_loadedFilesTree = nullptr;
+    QTreeWidget* m_loadedFilesTree = nullptr;
 
     // Status bar labels
-    QLabel *m_statusLabel = nullptr;
-    QLabel *m_statusTimeLabel = nullptr;
+    QLabel* m_statusLabel = nullptr;
+    QLabel* m_statusTimeLabel = nullptr;
 
     // Menu bar menus
-    QMenu *m_fileMenu = nullptr;
-    QMenu *m_viewMenu = nullptr;
-    QMenu *m_toolsMenu = nullptr;
-    QMenu *m_helpMenu = nullptr;
-    QMenu *m_recentFilesMenu = nullptr;
-    QMenu *m_cameraPresetsMenu = nullptr;
-    QMenu *m_playbackMenu = nullptr;
+    QMenu* m_fileMenu = nullptr;
+    QMenu* m_viewMenu = nullptr;
+    QMenu* m_toolsMenu = nullptr;
+    QMenu* m_helpMenu = nullptr;
+    QMenu* m_recentFilesMenu = nullptr;
+    QMenu* m_cameraPresetsMenu = nullptr;
+    QMenu* m_playbackMenu = nullptr;
 
     // Actions
-    QAction *m_actOpenProject = nullptr;
-    QAction *m_actExportProject = nullptr;
-    QAction *m_actLoadSurface = nullptr;
-    QAction *m_actLoadAtlas = nullptr;
-    QAction *m_actLoadBem = nullptr;
-    QAction *m_actLoadStc = nullptr;
-    QAction *m_actLoadDipoles = nullptr;
-    QAction *m_actLoadSrcSpace = nullptr;
-    QAction *m_actLoadEvoked = nullptr;
-    QAction *m_actLoadDigitizer = nullptr;
-    QAction *m_actLoadTransform = nullptr;
-    QAction *m_actQuit = nullptr;
-    QAction *m_actShowControls = nullptr;
-    QAction *m_actShowLoadedFiles = nullptr;
-    QAction *m_actResetCamera = nullptr;
-    QAction *m_actPlayPause = nullptr;
-    QAction *m_actStepFwd = nullptr;
-    QAction *m_actStepBack = nullptr;
-    QAction *m_actRealtimeToggle = nullptr;
-    QAction *m_actSyncLock = nullptr;
+    QAction* m_actOpenProject = nullptr;
+    QAction* m_actExportProject = nullptr;
+    QAction* m_actLoadSurface = nullptr;
+    QAction* m_actLoadAtlas = nullptr;
+    QAction* m_actLoadBem = nullptr;
+    QAction* m_actLoadStc = nullptr;
+    QAction* m_actLoadDipoles = nullptr;
+    QAction* m_actLoadSrcSpace = nullptr;
+    QAction* m_actLoadEvoked = nullptr;
+    QAction* m_actLoadDigitizer = nullptr;
+    QAction* m_actLoadTransform = nullptr;
+    QAction* m_actQuit = nullptr;
+    QAction* m_actShowControls = nullptr;
+    QAction* m_actShowLoadedFiles = nullptr;
+    QAction* m_actResetCamera = nullptr;
+    QAction* m_actPlayPause = nullptr;
+    QAction* m_actStepFwd = nullptr;
+    QAction* m_actStepBack = nullptr;
+    QAction* m_actRealtimeToggle = nullptr;
+    QAction* m_actSyncLock = nullptr;
 
     // Recent files
     QStringList m_recentFiles;
@@ -431,43 +449,43 @@ private:
     //=========================================================================================================
     // Multimodal scene + co-located inspection plugins (electrodes, MRI slices)
     //=========================================================================================================
-    DISP3DLIB::MultimodalScene             m_scene;
-    ELECTRODESPLUGIN::ElectrodesPlugin     m_electrodesPlugin;
-    MRISLICESPLUGIN::MriSlicesPlugin       m_mriSlicesPlugin;
-    MNEINSPECT::PickReadoutModel           m_pickReadout;
+    DISP3DLIB::MultimodalScene m_scene;
+    ELECTRODESPLUGIN::ElectrodesPlugin m_electrodesPlugin;
+    MRISLICESPLUGIN::MriSlicesPlugin m_mriSlicesPlugin;
+    MNEINSPECT::PickReadoutModel m_pickReadout;
 
     // Pick dock
-    QDockWidget *m_pickDock = nullptr;
-    QLabel      *m_pickLabelLine = nullptr;
-    QLabel      *m_pickWorldLine = nullptr;
-    QLabel      *m_pickVoxelLine = nullptr;
-    QLabel      *m_pickValueLine = nullptr;
+    QDockWidget* m_pickDock = nullptr;
+    QLabel* m_pickLabelLine = nullptr;
+    QLabel* m_pickWorldLine = nullptr;
+    QLabel* m_pickVoxelLine = nullptr;
+    QLabel* m_pickValueLine = nullptr;
 
     // Layers dock
-    QDockWidget *m_layersDock = nullptr;
-    QCheckBox   *m_layerBrainCheck = nullptr;
-    QCheckBox   *m_layerElectrodesCheck = nullptr;
-    QCheckBox   *m_layerMriCheck = nullptr;
-    QCheckBox   *m_layerSensorsCheck = nullptr;
-    QCheckBox   *m_layerSourceOverlayCheck = nullptr;
+    QDockWidget* m_layersDock = nullptr;
+    QCheckBox* m_layerBrainCheck = nullptr;
+    QCheckBox* m_layerElectrodesCheck = nullptr;
+    QCheckBox* m_layerMriCheck = nullptr;
+    QCheckBox* m_layerSensorsCheck = nullptr;
+    QCheckBox* m_layerSourceOverlayCheck = nullptr;
 
     // Overlay dock
-    QDockWidget    *m_overlayDock = nullptr;
-    QComboBox      *m_overlaySourceCombo = nullptr;
-    QComboBox      *m_overlayCmapCombo = nullptr;
-    QDoubleSpinBox *m_overlayFminSpin = nullptr;
-    QDoubleSpinBox *m_overlayFmidSpin = nullptr;
-    QDoubleSpinBox *m_overlayFmaxSpin = nullptr;
-    QSlider        *m_overlayTimeSlider = nullptr;
-    QLabel         *m_overlayTimeLabel = nullptr;
-    OverlayColorBar *m_overlayColorBar = nullptr;
+    QDockWidget* m_overlayDock = nullptr;
+    QComboBox* m_overlaySourceCombo = nullptr;
+    QComboBox* m_overlayCmapCombo = nullptr;
+    QDoubleSpinBox* m_overlayFminSpin = nullptr;
+    QDoubleSpinBox* m_overlayFmidSpin = nullptr;
+    QDoubleSpinBox* m_overlayFmaxSpin = nullptr;
+    QSlider* m_overlayTimeSlider = nullptr;
+    QLabel* m_overlayTimeLabel = nullptr;
+    OverlayColorBar* m_overlayColorBar = nullptr;
 
     // Multimodal menu actions
-    QAction *m_actLoadElectrodes = nullptr;
-    QAction *m_actLoadMri = nullptr;
-    QAction *m_actShowPick = nullptr;
-    QAction *m_actShowLayers = nullptr;
-    QAction *m_actShowOverlay = nullptr;
+    QAction* m_actLoadElectrodes = nullptr;
+    QAction* m_actLoadMri = nullptr;
+    QAction* m_actShowPick = nullptr;
+    QAction* m_actShowLayers = nullptr;
+    QAction* m_actShowOverlay = nullptr;
 };
 
 #endif // MAINWINDOW_H

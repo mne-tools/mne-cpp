@@ -51,7 +51,8 @@
 // DEFINE NAMESPACE UTILSLIB
 //=============================================================================================================
 
-namespace UTILSLIB {
+namespace UTILSLIB
+{
 
 //=============================================================================================================
 /**
@@ -59,9 +60,9 @@ namespace UTILSLIB {
  */
 struct DSPSHARED_EXPORT PeakFinderParams
 {
-    double dMinHeight = -std::numeric_limits<double>::infinity();   /**< Minimum peak height. */
-    int iMinDistance = 1;                                            /**< Minimum distance between peaks (samples). */
-    double dProminence = 0.0;                                       /**< Minimum peak prominence. */
+    double dMinHeight = -std::numeric_limits<double>::infinity(); /**< Minimum peak height. */
+    int iMinDistance = 1;                                         /**< Minimum distance between peaks (samples). */
+    double dProminence = 0.0;                                     /**< Minimum peak prominence. */
 };
 
 //=============================================================================================================
@@ -76,7 +77,7 @@ struct DSPSHARED_EXPORT PeakFinderParams
  *
  * @return List of (peak_index, peak_value) pairs, sorted by index.
  */
-DSPSHARED_EXPORT QList<QPair<int,double>> peakFinder(const Eigen::VectorXd& data,
+DSPSHARED_EXPORT QList<QPair<int, double>> peakFinder(const Eigen::VectorXd& data,
                                                       const PeakFinderParams& params = PeakFinderParams());
 
 //=============================================================================================================
@@ -92,7 +93,7 @@ DSPSHARED_EXPORT QList<QPair<int,double>> peakFinder(const Eigen::VectorXd& data
  * @return Prominence value for each peak.
  */
 DSPSHARED_EXPORT Eigen::VectorXd peakProminences(const Eigen::VectorXd& data,
-                                                   const QList<int>& peakIndices);
+                                                 const QList<int>& peakIndices);
 
 } // namespace UTILSLIB
 

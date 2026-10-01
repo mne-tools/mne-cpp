@@ -44,10 +44,14 @@ using namespace MNALIB;
 static QString execModeToString(MnaNodeExecMode mode)
 {
     switch (mode) {
-    case MnaNodeExecMode::Batch:  return QStringLiteral("batch");
-    case MnaNodeExecMode::Stream: return QStringLiteral("stream");
-    case MnaNodeExecMode::Ipc:    return QStringLiteral("ipc");
-    case MnaNodeExecMode::Script: return QStringLiteral("script");
+        case MnaNodeExecMode::Batch:
+            return QStringLiteral("batch");
+        case MnaNodeExecMode::Stream:
+            return QStringLiteral("stream");
+        case MnaNodeExecMode::Ipc:
+            return QStringLiteral("ipc");
+        case MnaNodeExecMode::Script:
+            return QStringLiteral("script");
     }
     return QStringLiteral("batch");
 }
@@ -56,9 +60,12 @@ static QString execModeToString(MnaNodeExecMode mode)
 
 static MnaNodeExecMode execModeFromString(const QString& str)
 {
-    if (str == QLatin1String("stream")) return MnaNodeExecMode::Stream;
-    if (str == QLatin1String("ipc"))    return MnaNodeExecMode::Ipc;
-    if (str == QLatin1String("script")) return MnaNodeExecMode::Script;
+    if (str == QLatin1String("stream"))
+        return MnaNodeExecMode::Stream;
+    if (str == QLatin1String("ipc"))
+        return MnaNodeExecMode::Ipc;
+    if (str == QLatin1String("script"))
+        return MnaNodeExecMode::Script;
     return MnaNodeExecMode::Batch;
 }
 
@@ -69,8 +76,8 @@ static MnaNodeExecMode execModeFromString(const QString& str)
 QJsonObject MnaNode::toJson() const
 {
     QJsonObject json = extras;
-    json[QLatin1String("id")]        = id;
-    json[QLatin1String("op_type")]   = opType;
+    json[QLatin1String("id")] = id;
+    json[QLatin1String("op_type")] = opType;
     json[QLatin1String("exec_mode")] = execModeToString(execMode);
 
     // Attributes
@@ -89,12 +96,12 @@ QJsonObject MnaNode::toJson() const
 
     // IPC config
     if (execMode == MnaNodeExecMode::Ipc) {
-        json[QLatin1String("ipc_command")]   = ipcCommand;
+        json[QLatin1String("ipc_command")] = ipcCommand;
         QJsonArray argsArr;
         for (const QString& arg : ipcArgs)
             argsArr.append(arg);
-        json[QLatin1String("ipc_args")]      = argsArr;
-        json[QLatin1String("ipc_work_dir")]  = ipcWorkDir;
+        json[QLatin1String("ipc_args")] = argsArr;
+        json[QLatin1String("ipc_work_dir")] = ipcWorkDir;
         json[QLatin1String("ipc_transport")] = ipcTransport;
     }
 
@@ -124,8 +131,8 @@ QJsonObject MnaNode::toJson() const
 MnaNode MnaNode::fromJson(const QJsonObject& json)
 {
     MnaNode node;
-    node.id       = json[QLatin1String("id")].toString();
-    node.opType   = json[QLatin1String("op_type")].toString();
+    node.id = json[QLatin1String("id")].toString();
+    node.opType = json[QLatin1String("op_type")].toString();
     node.execMode = execModeFromString(json[QLatin1String("exec_mode")].toString());
 
     node.attributes = json[QLatin1String("attributes")].toObject().toVariantMap();
@@ -140,11 +147,11 @@ MnaNode MnaNode::fromJson(const QJsonObject& json)
         node.outputs.append(MnaPort::fromJson(v.toObject()));
 
     // IPC
-    node.ipcCommand   = json[QLatin1String("ipc_command")].toString();
+    node.ipcCommand = json[QLatin1String("ipc_command")].toString();
     QJsonArray argsArr = json[QLatin1String("ipc_args")].toArray();
     for (const QJsonValue& v : argsArr)
         node.ipcArgs.append(v.toString());
-    node.ipcWorkDir   = json[QLatin1String("ipc_work_dir")].toString();
+    node.ipcWorkDir = json[QLatin1String("ipc_work_dir")].toString();
     node.ipcTransport = json[QLatin1String("ipc_transport")].toString();
 
     // Script
@@ -159,7 +166,7 @@ MnaNode MnaNode::fromJson(const QJsonObject& json)
 
     // Metadata
     node.toolVersion = json[QLatin1String("tool_version")].toString();
-    QString execStr  = json[QLatin1String("executed_at")].toString();
+    QString execStr = json[QLatin1String("executed_at")].toString();
     if (!execStr.isEmpty())
         node.executedAt = QDateTime::fromString(execStr, Qt::ISODate);
     node.dirty = json[QLatin1String("dirty")].toBool(true);
@@ -172,8 +179,7 @@ MnaNode MnaNode::fromJson(const QJsonObject& json)
         QStringLiteral("ipc_work_dir"), QStringLiteral("ipc_transport"),
         QStringLiteral("script"), QStringLiteral("verification"),
         QStringLiteral("tool_version"), QStringLiteral("executed_at"),
-        QStringLiteral("dirty")
-    };
+        QStringLiteral("dirty")};
     for (auto it = json.constBegin(); it != json.constEnd(); ++it) {
         if (!knownKeys.contains(it.key()))
             node.extras.insert(it.key(), it.value());
@@ -187,8 +193,8 @@ MnaNode MnaNode::fromJson(const QJsonObject& json)
 QCborMap MnaNode::toCbor() const
 {
     QCborMap cbor = QCborMap::fromJsonObject(extras);
-    cbor[QLatin1String("id")]        = id;
-    cbor[QLatin1String("op_type")]   = opType;
+    cbor[QLatin1String("id")] = id;
+    cbor[QLatin1String("op_type")] = opType;
     cbor[QLatin1String("exec_mode")] = execModeToString(execMode);
 
     cbor[QLatin1String("attributes")] = QCborMap::fromJsonObject(QJsonObject::fromVariantMap(attributes));
@@ -204,12 +210,12 @@ QCborMap MnaNode::toCbor() const
     cbor[QLatin1String("outputs")] = outputArr;
 
     if (execMode == MnaNodeExecMode::Ipc) {
-        cbor[QLatin1String("ipc_command")]   = ipcCommand;
+        cbor[QLatin1String("ipc_command")] = ipcCommand;
         QCborArray argsArr;
         for (const QString& arg : ipcArgs)
             argsArr.append(arg);
-        cbor[QLatin1String("ipc_args")]      = argsArr;
-        cbor[QLatin1String("ipc_work_dir")]  = ipcWorkDir;
+        cbor[QLatin1String("ipc_args")] = argsArr;
+        cbor[QLatin1String("ipc_work_dir")] = ipcWorkDir;
         cbor[QLatin1String("ipc_transport")] = ipcTransport;
     }
 
@@ -236,8 +242,8 @@ QCborMap MnaNode::toCbor() const
 MnaNode MnaNode::fromCbor(const QCborMap& cbor)
 {
     MnaNode node;
-    node.id       = cbor[QLatin1String("id")].toString();
-    node.opType   = cbor[QLatin1String("op_type")].toString();
+    node.id = cbor[QLatin1String("id")].toString();
+    node.opType = cbor[QLatin1String("op_type")].toString();
     node.execMode = execModeFromString(cbor[QLatin1String("exec_mode")].toString());
 
     QCborMap attrCbor = cbor[QLatin1String("attributes")].toMap();
@@ -251,11 +257,11 @@ MnaNode MnaNode::fromCbor(const QCborMap& cbor)
     for (const QCborValue& v : outputArr)
         node.outputs.append(MnaPort::fromCbor(v.toMap()));
 
-    node.ipcCommand   = cbor[QLatin1String("ipc_command")].toString();
+    node.ipcCommand = cbor[QLatin1String("ipc_command")].toString();
     QCborArray argsArr = cbor[QLatin1String("ipc_args")].toArray();
     for (const QCborValue& v : argsArr)
         node.ipcArgs.append(v.toString());
-    node.ipcWorkDir   = cbor[QLatin1String("ipc_work_dir")].toString();
+    node.ipcWorkDir = cbor[QLatin1String("ipc_work_dir")].toString();
     node.ipcTransport = cbor[QLatin1String("ipc_transport")].toString();
 
     if (cbor.contains(QLatin1String("script"))) {
@@ -266,7 +272,7 @@ MnaNode MnaNode::fromCbor(const QCborMap& cbor)
     }
 
     node.toolVersion = cbor[QLatin1String("tool_version")].toString();
-    QString execStr  = cbor[QLatin1String("executed_at")].toString();
+    QString execStr = cbor[QLatin1String("executed_at")].toString();
     if (!execStr.isEmpty())
         node.executedAt = QDateTime::fromString(execStr, Qt::ISODate);
     node.dirty = cbor[QLatin1String("dirty")].toBool(true);
@@ -279,8 +285,7 @@ MnaNode MnaNode::fromCbor(const QCborMap& cbor)
         QStringLiteral("ipc_work_dir"), QStringLiteral("ipc_transport"),
         QStringLiteral("script"), QStringLiteral("verification"),
         QStringLiteral("tool_version"), QStringLiteral("executed_at"),
-        QStringLiteral("dirty")
-    };
+        QStringLiteral("dirty")};
     QJsonObject cborJson = cbor.toJsonObject();
     for (auto it = cborJson.constBegin(); it != cborJson.constEnd(); ++it) {
         if (!knownKeys.contains(it.key()))

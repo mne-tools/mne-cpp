@@ -82,7 +82,6 @@ signals:
     void closeServer();
 
 private:
-
     //SLOTS
     //=========================================================================================================
     /**
@@ -96,12 +95,12 @@ private:
      */
     void comHelp(COMLIB::Command p_command);
 
-    FiffStreamServer                    m_fiffStreamServer;     /**< Fiff stream server. */
-    CommandServer                       m_commandServer;        /**< Command server. */
+    FiffStreamServer m_fiffStreamServer; /**< Fiff stream server. */
+    CommandServer m_commandServer;       /**< Command server. */
 
-    ConnectorManager                    m_connectorManager;     /**< Connector manager. */
+    ConnectorManager m_connectorManager; /**< Connector manager. */
 
-    COMLIB::CommandManager    m_commandManager;       /**< The command manager of the mne_rt_server. */
+    COMLIB::CommandManager m_commandManager; /**< The command manager of the mne_rt_server. */
 };
 
 //=============================================================================================================
@@ -116,7 +115,7 @@ inline COMLIB::CommandManager& MNERTServer::getCommandManager()
 
 #ifndef metatype_matrixxf
 #define metatype_matrixxf
-Q_DECLARE_METATYPE(Eigen::MatrixXf);    /**< Provides QT META type declaration of the Eigen::MatrixXf type. For signal/slot usage.*/
+Q_DECLARE_METATYPE(Eigen::MatrixXf); /**< Provides QT META type declaration of the Eigen::MatrixXf type. For signal/slot usage.*/
 #endif
 
 #endif // MNE_RT_SERVER_H

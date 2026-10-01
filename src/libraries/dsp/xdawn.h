@@ -51,13 +51,13 @@ namespace UTILSLIB
  */
 struct DSPSHARED_EXPORT XdawnResult
 {
-    Eigen::MatrixXd matFilters;       /**< Spatial filters W (n_channels x n_components). */
-    Eigen::MatrixXd matPatterns;      /**< Spatial patterns A (n_channels x n_components). */
-    Eigen::MatrixXd matSignalCov;     /**< Target-evoked covariance (n_channels x n_channels). */
-    Eigen::MatrixXd matNoiseCov;      /**< Residual-noise covariance (n_channels x n_channels). */
-    Eigen::MatrixXd matTargetEvoked;  /**< Average target evoked response (n_channels x n_samples). */
-    int             iTargetEvent = 1; /**< Event code used as the target class. */
-    bool            bValid       = false; /**< True if fit() produced a usable decomposition. */
+    Eigen::MatrixXd matFilters;      /**< Spatial filters W (n_channels x n_components). */
+    Eigen::MatrixXd matPatterns;     /**< Spatial patterns A (n_channels x n_components). */
+    Eigen::MatrixXd matSignalCov;    /**< Target-evoked covariance (n_channels x n_channels). */
+    Eigen::MatrixXd matNoiseCov;     /**< Residual-noise covariance (n_channels x n_channels). */
+    Eigen::MatrixXd matTargetEvoked; /**< Average target evoked response (n_channels x n_samples). */
+    int iTargetEvent = 1;            /**< Event code used as the target class. */
+    bool bValid = false;             /**< True if fit() produced a usable decomposition. */
 };
 
 //=============================================================================================================
@@ -90,9 +90,9 @@ public:
      * @return XdawnResult containing filters, patterns, and covariances.
      */
     static XdawnResult fit(const QVector<MNELIB::MNEEpochData>& epochs,
-                           int                                  iTargetEvent = 1,
-                           int                                  nComponents  = 2,
-                           double                               dReg         = 1e-6);
+                           int iTargetEvent = 1,
+                           int nComponents = 2,
+                           double dReg = 1e-6);
 
     //=========================================================================================================
     /**
@@ -104,7 +104,7 @@ public:
      * @return Component activations (n_components x n_samples).
      */
     static Eigen::MatrixXd apply(const Eigen::MatrixXd& matEpoch,
-                                 const XdawnResult&     result);
+                                 const XdawnResult& result);
 
     //=========================================================================================================
     /**
@@ -119,8 +119,8 @@ public:
      * @return Denoised epoch (n_channels x n_samples).
      */
     static Eigen::MatrixXd denoise(const Eigen::MatrixXd& matEpoch,
-                                   const XdawnResult&     result,
-                                   int                    nComponents = -1);
+                                   const XdawnResult& result,
+                                   int nComponents = -1);
 
     //=========================================================================================================
     /**
@@ -133,8 +133,8 @@ public:
      * @return Copy of the input epochs with denoised epoch matrices.
      */
     static QVector<MNELIB::MNEEpochData> denoiseEpochs(const QVector<MNELIB::MNEEpochData>& epochs,
-                                                       const XdawnResult&                   result,
-                                                       int                                  nComponents = -1);
+                                                       const XdawnResult& result,
+                                                       int nComponents = -1);
 };
 
 } // namespace UTILSLIB

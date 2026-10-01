@@ -27,15 +27,15 @@
 using namespace MNEANALYZESTUDIO;
 using namespace MNALIB;
 
-namespace {
+namespace
+{
 
 QJsonObject objectSchema(const QJsonObject& properties, const QJsonArray& required = QJsonArray())
 {
     return QJsonObject{
         {"type", "object"},
         {"properties", properties},
-        {"required", required}
-    };
+        {"required", required}};
 }
 
 QString resolveUri(const QString& uri)
@@ -49,7 +49,7 @@ QString resolveUri(const QString& uri)
 } // namespace
 
 WriteMnaSkill::WriteMnaSkill(QObject* parent)
-    : ISkillOperator(parent)
+: ISkillOperator(parent)
 {
 }
 
@@ -62,36 +62,9 @@ QJsonObject WriteMnaSkill::getOperatorDefinition() const
         {"description", "Persist a (possibly newly created) MNA project to disk as .mna (JSON) or .mnx (CBOR)."},
         {"extension_id", "mna-skills"},
         {"extension_display_name", "MNA Project Skills"},
-        {"inputs_schema", objectSchema(QJsonObject{
-            {"source_project", QJsonObject{
-                {"type", "string"},
-                {"title", "Source project path"},
-                {"description", "Optional input project to round-trip; if omitted a new empty project is created."}
-            }}
-        })},
-        {"parameters_schema", objectSchema(QJsonObject{
-            {"output_path", QJsonObject{
-                {"type", "string"},
-                {"title", "Output path"}
-            }},
-            {"format", QJsonObject{
-                {"type", "string"},
-                {"title", "Format"},
-                {"enum", QJsonArray{"mna", "mnx", "auto"}},
-                {"default", "auto"}
-            }},
-            {"project_name", QJsonObject{
-                {"type", "string"},
-                {"title", "Project name (when creating new)"}
-            }}
-        }, QJsonArray{"output_path"})},
-        {"outputs_schema", objectSchema(QJsonObject{
-            {"output_path", QJsonObject{
-                {"type", "string"},
-                {"title", "Written file path"}
-            }}
-        }, QJsonArray{"output_path"})}
-    };
+        {"inputs_schema", objectSchema(QJsonObject{{"source_project", QJsonObject{{"type", "string"}, {"title", "Source project path"}, {"description", "Optional input project to round-trip; if omitted a new empty project is created."}}}})},
+        {"parameters_schema", objectSchema(QJsonObject{{"output_path", QJsonObject{{"type", "string"}, {"title", "Output path"}}}, {"format", QJsonObject{{"type", "string"}, {"title", "Format"}, {"enum", QJsonArray{"mna", "mnx", "auto"}}, {"default", "auto"}}}, {"project_name", QJsonObject{{"type", "string"}, {"title", "Project name (when creating new)"}}}}, QJsonArray{"output_path"})},
+        {"outputs_schema", objectSchema(QJsonObject{{"output_path", QJsonObject{{"type", "string"}, {"title", "Written file path"}}}}, QJsonArray{"output_path"})}};
 }
 
 QJsonObject WriteMnaSkill::executeSkill(const WorkflowNode& nodeState)
@@ -100,8 +73,7 @@ QJsonObject WriteMnaSkill::executeSkill(const WorkflowNode& nodeState)
     if (outputPath.isEmpty()) {
         return QJsonObject{
             {"status", "error"},
-            {"message", QStringLiteral("Write MNA node `%1`: missing `output_path` parameter.").arg(nodeState.uid)}
-        };
+            {"message", QStringLiteral("Write MNA node `%1`: missing `output_path` parameter.").arg(nodeState.uid)}};
     }
 
     MnaProject project;
@@ -116,13 +88,11 @@ QJsonObject WriteMnaSkill::executeSkill(const WorkflowNode& nodeState)
         if (!QFileInfo::exists(path)) {
             return QJsonObject{
                 {"status", "error"},
-                {"message", QStringLiteral("Write MNA node `%1`: source `%2` not found.").arg(nodeState.uid, path)}
-            };
+                {"message", QStringLiteral("Write MNA node `%1`: source `%2` not found.").arg(nodeState.uid, path)}};
         }
         project = MnaIO::read(path);
     } else {
-        project.name = nodeState.parameters.value("project_name").toString(
-            QStringLiteral("Untitled MNA Project"));
+        project.name = nodeState.parameters.value("project_name").toString(QStringLiteral("Untitled MNA Project"));
         project.mnaVersion = QString::fromLatin1(MnaProject::CURRENT_SCHEMA_VERSION);
         project.created = QDateTime::currentDateTimeUtc();
     }
@@ -144,13 +114,11 @@ QJsonObject WriteMnaSkill::executeSkill(const WorkflowNode& nodeState)
     if (!ok) {
         return QJsonObject{
             {"status", "error"},
-            {"message", QStringLiteral("Write MNA node `%1`: failed to write `%2`.").arg(nodeState.uid, writePath)}
-        };
+            {"message", QStringLiteral("Write MNA node `%1`: failed to write `%2`.").arg(nodeState.uid, writePath)}};
     }
 
     return QJsonObject{
         {"status", "completed"},
         {"message", QStringLiteral("Wrote MNA project to `%1`.").arg(writePath)},
-        {"outputs", QJsonObject{{"output_path", writePath}}}
-    };
+        {"outputs", QJsonObject{{"output_path", writePath}}}};
 }

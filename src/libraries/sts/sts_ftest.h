@@ -62,11 +62,12 @@ namespace STSLIB
  *
  * @brief Per-call output of a one-way ANOVA F-test: F-statistics, p-values, and between/within degrees of freedom.
  */
-struct STSSHARED_EXPORT StatsFtestResult {
-    Eigen::MatrixXd matFstat;   /**< F-statistics. */
-    Eigen::MatrixXd matPval;    /**< p-values. */
-    int dfBetween;              /**< Between-groups degrees of freedom. */
-    int dfWithin;               /**< Within-groups degrees of freedom. */
+struct STSSHARED_EXPORT StatsFtestResult
+{
+    Eigen::MatrixXd matFstat; /**< F-statistics. */
+    Eigen::MatrixXd matPval;  /**< p-values. */
+    int dfBetween;            /**< Between-groups degrees of freedom. */
+    int dfWithin;             /**< Within-groups degrees of freedom. */
 };
 
 //=============================================================================================================

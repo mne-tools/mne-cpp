@@ -146,7 +146,7 @@ public:
      *
      * @param[in] mapThresholds       The new map including the current thresholds for the channels.
      */
-    void setArtifactReduction(const QMap<QString, double> &mapThresholds);
+    void setArtifactReduction(const QMap<QString, double>& mapThresholds);
 
     //=========================================================================================================
     /**
@@ -238,35 +238,35 @@ protected:
      */
     inline bool controlValuesChanged();
 
-    qint32                                          m_iNumAverages;             /**< Number of averages. */
+    qint32 m_iNumAverages; /**< Number of averages. */
 
-    qint32                                          m_iPreStimSamples;          /**< Amount of samples averaged before the stimulus. */
-    qint32                                          m_iNewPreStimSamples;       /**< New amount of samples averaged before the stimulus. */
+    qint32 m_iPreStimSamples;    /**< Amount of samples averaged before the stimulus. */
+    qint32 m_iNewPreStimSamples; /**< New amount of samples averaged before the stimulus. */
 
-    qint32                                          m_iPostStimSamples;         /**< Amount of samples averaged after the stimulus, including the stimulus sample.*/
-    qint32                                          m_iNewPostStimSamples;      /**< New amount of samples averaged after the stimulus, including the stimulus sample.*/
+    qint32 m_iPostStimSamples;    /**< Amount of samples averaged after the stimulus, including the stimulus sample.*/
+    qint32 m_iNewPostStimSamples; /**< New amount of samples averaged after the stimulus, including the stimulus sample.*/
 
-    qint32                                          m_iTriggerChIndex;          /**< Current row index of the data matrix which is to be scanned for triggers. */
-    qint32                                          m_iNewTriggerIndex;         /**< Old row index of the data matrix which is to be scanned for triggers. */
+    qint32 m_iTriggerChIndex;  /**< Current row index of the data matrix which is to be scanned for triggers. */
+    qint32 m_iNewTriggerIndex; /**< Old row index of the data matrix which is to be scanned for triggers. */
 
-    float                                           m_fTriggerThreshold;        /**< Threshold to detect trigger. */
+    float m_fTriggerThreshold; /**< Threshold to detect trigger. */
 
-    bool                                            m_bActivateThreshold;       /**< Whether to do threshold artifact reduction or not. */
+    bool m_bActivateThreshold; /**< Whether to do threshold artifact reduction or not. */
 
-    bool                                            m_bDoBaselineCorrection;    /**< Whether to perform baseline correction. */
+    bool m_bDoBaselineCorrection; /**< Whether to perform baseline correction. */
 
-    QPair<float,float>                              m_pairBaselineSec;          /**< Baseline information in seconds form where the seconds are seen relative to the trigger, meaning they can also be negative [from to]*/
-    QPair<float,float>                              m_pairBaselineSamp;         /**< Baseline information in samples form where the seconds are seen relative to the trigger, meaning they can also be negative [from to]*/
+    QPair<float, float> m_pairBaselineSec;  /**< Baseline information in seconds form where the seconds are seen relative to the trigger, meaning they can also be negative [from to]*/
+    QPair<float, float> m_pairBaselineSamp; /**< Baseline information in samples form where the seconds are seen relative to the trigger, meaning they can also be negative [from to]*/
 
-    FIFFLIB::FiffInfo::SPtr                         m_pFiffInfo;                /**< Holds the fiff measurement information. */
-    FIFFLIB::FiffEvokedSet                          m_stimEvokedSet;            /**< Holds the evoked information. */
+    FIFFLIB::FiffInfo::SPtr m_pFiffInfo;    /**< Holds the fiff measurement information. */
+    FIFFLIB::FiffEvokedSet m_stimEvokedSet; /**< Holds the evoked information. */
 
-    QMap<QString,double>                            m_mapThresholds;            /**< Holds the current thresholds for artifact rejection. */
-    QMap<double,QList<Eigen::MatrixXd> >            m_mapStimAve;               /**< the current stimulus average buffer. Holds m_iNumAverages vectors. */
-    QMap<double,Eigen::MatrixXd>                    m_mapDataPre;               /**< The matrix holding pre stim data. */
-    QMap<double,Eigen::MatrixXd>                    m_mapDataPost;              /**< The matrix holding post stim data. */
-    QMap<double,qint32>                             m_mapMatDataPostIdx;        /**< Current index inside of the matrix m_matDataPost. */
-    QMap<double,bool>                               m_mapFillingBackBuffer;     /**< Whether the back buffer is currently getting filled. */
+    QMap<QString, double> m_mapThresholds;             /**< Holds the current thresholds for artifact rejection. */
+    QMap<double, QList<Eigen::MatrixXd>> m_mapStimAve; /**< the current stimulus average buffer. Holds m_iNumAverages vectors. */
+    QMap<double, Eigen::MatrixXd> m_mapDataPre;        /**< The matrix holding pre stim data. */
+    QMap<double, Eigen::MatrixXd> m_mapDataPost;       /**< The matrix holding post stim data. */
+    QMap<double, qint32> m_mapMatDataPostIdx;          /**< Current index inside of the matrix m_matDataPost. */
+    QMap<double, bool> m_mapFillingBackBuffer;         /**< Whether the back buffer is currently getting filled. */
 
 signals:
     //=========================================================================================================
@@ -291,8 +291,8 @@ class DSPSHARED_EXPORT RtAveraging : public QObject
     Q_OBJECT
 
 public:
-    typedef QSharedPointer<RtAveraging> SPtr;             /**< Shared pointer type for RtAveraging. */
-    typedef QSharedPointer<const RtAveraging> ConstSPtr;  /**< Const shared pointer type for RtAveraging. */
+    typedef QSharedPointer<RtAveraging> SPtr;            /**< Shared pointer type for RtAveraging. */
+    typedef QSharedPointer<const RtAveraging> ConstSPtr; /**< Const shared pointer type for RtAveraging. */
 
     //=========================================================================================================
     /**
@@ -314,7 +314,7 @@ public:
                          quint32 iBaselineToSecs,
                          quint32 iTriggerIndex,
                          FIFFLIB::FiffInfo::SPtr pFiffInfo,
-                         QObject *parent = 0);
+                         QObject* parent = 0);
 
     //=========================================================================================================
     /**
@@ -328,7 +328,7 @@ public:
      *
      * @param[in] data  Data to calculate the average from.
      */
-    void append(const Eigen::MatrixXd &data);
+    void append(const Eigen::MatrixXd& data);
 
     //=========================================================================================================
     /**
@@ -398,7 +398,7 @@ public:
      *
      * @param[in] mapThresholds       The new map including the current thresholds for the channels.
      */
-    void setArtifactReduction(const QMap<QString, double> &mapThresholds);
+    void setArtifactReduction(const QMap<QString, double>& mapThresholds);
 
     //=========================================================================================================
     /**
@@ -445,7 +445,7 @@ protected:
     void handleResults(const FIFFLIB::FiffEvokedSet& evokedStimSet,
                        const QStringList& lResponsibleTriggerTypes);
 
-    QThread             m_workerThread;         /**< The worker thread. */
+    QThread m_workerThread; /**< The worker thread. */
 
 signals:
     void evokedStim(const FIFFLIB::FiffEvokedSet& evokedStimSet,
@@ -457,7 +457,7 @@ signals:
     void averagePostStimChanged(qint32 samples,
                                 qint32 secs);
     void averageTriggerChIdxChanged(qint32 idx);
-    void averageArtifactReductionChanged(const QMap<QString, double> &mapThresholds);
+    void averageArtifactReductionChanged(const QMap<QString, double>& mapThresholds);
     void averageBaselineActiveChanged(bool activate);
     void averageBaselineFromChanged(int fromSamp,
                                     int fromMSec);
@@ -474,9 +474,7 @@ inline bool RtAveragingWorker::controlValuesChanged()
 {
     bool result = false;
 
-    if(m_iNewPreStimSamples != m_iPreStimSamples
-       || m_iNewPostStimSamples != m_iPostStimSamples
-       || m_iNewTriggerIndex != m_iTriggerChIndex) {
+    if (m_iNewPreStimSamples != m_iPreStimSamples || m_iNewPostStimSamples != m_iPostStimSamples || m_iNewTriggerIndex != m_iTriggerChIndex) {
         result = true;
     }
 

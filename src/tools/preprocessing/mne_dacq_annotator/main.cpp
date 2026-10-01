@@ -54,7 +54,8 @@ using namespace Eigen;
 
 //=============================================================================================================
 
-struct EventEntry {
+struct EventEntry
+{
     int sample;
     int before;
     int after;
@@ -67,15 +68,18 @@ static QList<EventEntry> readEventFile(const QString& fileName)
 {
     QList<EventEntry> events;
     QFile file(fileName);
-    if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) return events;
+    if (!file.open(QIODevice::ReadOnly | QIODevice::Text))
+        return events;
 
     QTextStream in(&file);
     while (!in.atEnd()) {
         QString line = in.readLine().trimmed();
-        if (line.isEmpty() || line.startsWith('#')) continue;
+        if (line.isEmpty() || line.startsWith('#'))
+            continue;
 
         QStringList parts = line.split(QRegularExpression("\\s+"));
-        if (parts.size() < 3) continue;
+        if (parts.size() < 3)
+            continue;
 
         EventEntry ev;
         ev.sample = parts[0].toInt();
@@ -113,7 +117,7 @@ static bool writeEventFile(const QString& fileName, const QList<EventEntry>& eve
 
 //=============================================================================================================
 
-int main(int argc, char *argv[])
+int main(int argc, char* argv[])
 {
     qInstallMessageHandler(MNELogger::customLogWriter);
     QCoreApplication app(argc, argv);
@@ -170,7 +174,7 @@ int main(int argc, char *argv[])
             return 1;
         }
         sfreq = rawData.info.sfreq;
-        qInfo("Measurement: %d channels, sfreq = %.1f Hz" , rawData.info.nchan, sfreq);
+        qInfo("Measurement: %d channels, sfreq = %.1f Hz", rawData.info.nchan, sfreq);
 
         // Default events file
         if (eventsFile.isEmpty()) {
@@ -233,17 +237,19 @@ int main(int argc, char *argv[])
             }
         }
 
-        qInfo("Found %lld events from stimulus channel '%s'" ,
-               static_cast<long long>(events.size()), qPrintable(stimName));
+        qInfo("Found %lld events from stimulus channel '%s'",
+              static_cast<long long>(events.size()), qPrintable(stimName));
 
-        if (outFile.isEmpty()) outFile = eventsFile;
+        if (outFile.isEmpty())
+            outFile = eventsFile;
         if (outFile.isEmpty()) {
             qCritical("Specify --out for output event file.");
             return 1;
         }
 
-        if (!writeEventFile(outFile, events)) return 1;
-        qInfo("Written events to: %s" , qPrintable(outFile));
+        if (!writeEventFile(outFile, events))
+            return 1;
+        qInfo("Written events to: %s", qPrintable(outFile));
         return 0;
     }
 
@@ -253,7 +259,7 @@ int main(int argc, char *argv[])
     QList<EventEntry> events;
     if (!eventsFile.isEmpty() && QFile::exists(eventsFile)) {
         events = readEventFile(eventsFile);
-        qInfo("Loaded %lld existing events from: %s" , static_cast<long long>(events.size()), qPrintable(eventsFile));
+        qInfo("Loaded %lld existing events from: %s", static_cast<long long>(events.size()), qPrintable(eventsFile));
     }
 
     //=========================================================================
@@ -274,9 +280,9 @@ int main(int argc, char *argv[])
         ev.comment = (parts.size() > 3) ? parts.mid(3).join(":") : QString();
 
         events.append(ev);
-        qInfo("Added event: sample=%d, before=%d, after=%d%s" ,
-               ev.sample, ev.before, ev.after,
-               ev.comment.isEmpty() ? "" : qPrintable(QString(", comment=%1").arg(ev.comment)));
+        qInfo("Added event: sample=%d, before=%d, after=%d%s",
+              ev.sample, ev.before, ev.after,
+              ev.comment.isEmpty() ? "" : qPrintable(QString(", comment=%1").arg(ev.comment)));
 
         // Sort by sample
         std::sort(events.begin(), events.end(),
@@ -295,15 +301,15 @@ int main(int argc, char *argv[])
                 removed++;
             }
         }
-        qInfo("Removed %d event(s) at sample %d" , removed, removeSample);
+        qInfo("Removed %d event(s) at sample %d", removed, removeSample);
     }
 
     //=========================================================================
     // List events
     //=========================================================================
     if (doList) {
-        qInfo("\n%-10s  %-8s  %-8s  %s" , "Sample", "Before", "After", "Comment");
-        qInfo("%-10s  %-8s  %-8s  %s" , "------", "------", "-----", "-------");
+        qInfo("\n%-10s  %-8s  %-8s  %s", "Sample", "Before", "After", "Comment");
+        qInfo("%-10s  %-8s  %-8s  %s", "------", "------", "-----", "-------");
         for (const EventEntry& ev : events) {
             QString line = QString::asprintf("%-10d  %-8d  %-8d",
                                              ev.sample, ev.before, ev.after);
@@ -316,21 +322,23 @@ int main(int argc, char *argv[])
             }
             qInfo("%s", qPrintable(line));
         }
-        qInfo("\nTotal: %lld event(s)" , static_cast<long long>(events.size()));
+        qInfo("\nTotal: %lld event(s)", static_cast<long long>(events.size()));
     }
 
     //=========================================================================
     // Write output
     //=========================================================================
     if (parser.isSet(addOpt) || parser.isSet(removeOpt)) {
-        if (outFile.isEmpty()) outFile = eventsFile;
+        if (outFile.isEmpty())
+            outFile = eventsFile;
         if (outFile.isEmpty()) {
             qCritical("Specify --out for output event file.");
             return 1;
         }
 
-        if (!writeEventFile(outFile, events)) return 1;
-        qInfo("Written %lld events to: %s" , static_cast<long long>(events.size()), qPrintable(outFile));
+        if (!writeEventFile(outFile, events))
+            return 1;
+        qInfo("Written %lld events to: %s", static_cast<long long>(events.size()), qPrintable(outFile));
     }
 
     return 0;

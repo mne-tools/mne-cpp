@@ -47,7 +47,8 @@
 // DEFINE NAMESPACE INVLIB
 //=============================================================================================================
 
-namespace INVLIB {
+namespace INVLIB
+{
 
 //=============================================================================================================
 // FIFFLIB FORWARD DECLARATIONS
@@ -62,7 +63,6 @@ namespace INVLIB {
 
 class INVSHARED_EXPORT InvEcdSet
 {
-
 public:
     typedef QSharedPointer<InvEcdSet> SPtr;            /**< Shared pointer type for InvEcdSet. */
     typedef QSharedPointer<const InvEcdSet> ConstSPtr; /**< Const shared pointer type for InvEcdSet. */
@@ -79,7 +79,7 @@ public:
      *
      * @param[in] p_ECDSet       Electric Current Dipole Set which should be copied.
      */
-    InvEcdSet(const InvEcdSet &p_ECDSet);
+    InvEcdSet(const InvEcdSet& p_ECDSet);
 
     //=========================================================================================================
     /**
@@ -154,7 +154,7 @@ public:
      *
      * @return InvEcd related to the parameter index.
      */
-    const InvEcd& operator[] (int idx) const;
+    const InvEcd& operator[](int idx) const;
 
     //=========================================================================================================
     /**
@@ -164,7 +164,7 @@ public:
      *
      * @return InvEcd related to the parameter index.
      */
-    InvEcd& operator[] (int idx);
+    InvEcd& operator[](int idx);
 
     //=========================================================================================================
     /**
@@ -174,13 +174,13 @@ public:
      *
      * @return InvEcdSet.
      */
-    InvEcdSet& operator<< (const InvEcd& p_ecd);
+    InvEcdSet& operator<<(const InvEcd& p_ecd);
 
 public:
-    QString dataname;   /**< The associated data file. */
+    QString dataname; /**< The associated data file. */
 
 private:
-    QList<InvEcd> m_qListDips;     /**< List of Electric Current Dipoles. */
+    QList<InvEcd> m_qListDips; /**< List of Electric Current Dipoles. */
 };
 
 //=============================================================================================================

@@ -60,19 +60,23 @@ using namespace Eigen;
 static QString nameOf(int id)
 {
     switch (id) {
-        case FIFFV_BEM_SURF_ID_HEAD:  return "outer skin ";
-        case FIFFV_BEM_SURF_ID_SKULL: return "outer skull";
-        case FIFFV_BEM_SURF_ID_BRAIN: return "inner skull";
-        default:                      return "unknown    ";
+        case FIFFV_BEM_SURF_ID_HEAD:
+            return "outer skin ";
+        case FIFFV_BEM_SURF_ID_SKULL:
+            return "outer skull";
+        case FIFFV_BEM_SURF_ID_BRAIN:
+            return "inner skull";
+        default:
+            return "unknown    ";
     }
 }
 
 //=============================================================================================================
 
 static double solidAngle(const Vector3f& from,
-                          const Vector3f& v0,
-                          const Vector3f& v1,
-                          const Vector3f& v2)
+                         const Vector3f& v0,
+                         const Vector3f& v1,
+                         const Vector3f& v2)
 {
     Vector3d d1 = (v0 - from).cast<double>();
     Vector3d d2 = (v1 - from).cast<double>();
@@ -83,10 +87,7 @@ static double solidAngle(const Vector3f& from,
     double l3 = d3.norm();
 
     double triple = d1.cross(d2).dot(d3);
-    double s = l1 * l2 * l3
-             + d1.dot(d2) * l3
-             + d1.dot(d3) * l2
-             + d2.dot(d3) * l1;
+    double s = l1 * l2 * l3 + d1.dot(d2) * l3 + d1.dot(d3) * l2 + d2.dot(d3) * l1;
 
     return 2.0 * atan2(triple, s);
 }
@@ -114,17 +115,17 @@ static bool isCompleteSurface(const MNEBemSurface& surf)
         cm += surf.rr.row(k).transpose();
     cm /= static_cast<float>(surf.np);
 
-    qInfo("%s CM is %6.2f %6.2f %6.2f mm" ,
-           qPrintable(nameOf(surf.id)),
-           1000.0f * cm(0), 1000.0f * cm(1), 1000.0f * cm(2));
+    qInfo("%s CM is %6.2f %6.2f %6.2f mm",
+          qPrintable(nameOf(surf.id)),
+          1000.0f * cm(0), 1000.0f * cm(1), 1000.0f * cm(2));
 
     double totAngle = sumSolids(cm, surf) / (4.0 * M_PI);
     if (fabs(totAngle - 1.0) > 1e-5) {
-        qInfo("Surface %s is NOT complete (solid angle = %g * 4*PI instead of 1.0)" ,
-               qPrintable(nameOf(surf.id)), totAngle);
+        qInfo("Surface %s is NOT complete (solid angle = %g * 4*PI instead of 1.0)",
+              qPrintable(nameOf(surf.id)), totAngle);
         return false;
     }
-    qInfo("Surface %s is complete." , qPrintable(nameOf(surf.id)));
+    qInfo("Surface %s is complete.", qPrintable(nameOf(surf.id)));
     return true;
 }
 
@@ -160,13 +161,15 @@ static void reportTriangleAreas(const MNEBemSurface& surf, const QString& name)
         Vector3f v1 = surf.rr.row(surf.itris(k, 1));
         Vector3f v2 = surf.rr.row(surf.itris(k, 2));
         double area = 0.5 * ((v1 - v0).cross(v2 - v0)).cast<double>().norm();
-        if (area < minArea) minArea = area;
-        if (area > maxArea) maxArea = area;
+        if (area < minArea)
+            minArea = area;
+        if (area > maxArea)
+            maxArea = area;
         totalArea += area;
     }
-    qInfo("%s: %d triangles, area %7.1f ... %7.1f mm^2 (total %10.1f mm^2)" ,
-           qPrintable(name), surf.ntri,
-           1e6 * minArea, 1e6 * maxArea, 1e6 * totalArea);
+    qInfo("%s: %d triangles, area %7.1f ... %7.1f mm^2 (total %10.1f mm^2)",
+          qPrintable(name), surf.ntri,
+          1e6 * minArea, 1e6 * maxArea, 1e6 * totalArea);
 }
 
 //=============================================================================================================
@@ -177,7 +180,8 @@ static float minSurfaceDist(const MNEBemSurface& s1, const MNEBemSurface& s2)
     for (int k1 = 0; k1 < s1.np; ++k1) {
         for (int k2 = 0; k2 < s2.np; ++k2) {
             float dist = (s1.rr.row(k1) - s2.rr.row(k2)).norm();
-            if (dist < minDist) minDist = dist;
+            if (dist < minDist)
+                minDist = dist;
         }
     }
     return minDist;
@@ -187,7 +191,7 @@ static float minSurfaceDist(const MNEBemSurface& s1, const MNEBemSurface& s2)
 // MAIN
 //=============================================================================================================
 
-int main(int argc, char *argv[])
+int main(int argc, char* argv[])
 {
     qInstallMessageHandler(MNELogger::customLogWriter);
     QCoreApplication app(argc, argv);
@@ -233,7 +237,7 @@ int main(int argc, char *argv[])
             qCritical("Cannot read BEM from: %s", qPrintable(bemFile));
             return 1;
         }
-        qInfo("Read %d surfaces from %s\n" , bem.size(), qPrintable(bemFile));
+        qInfo("Read %d surfaces from %s\n", bem.size(), qPrintable(bemFile));
         for (int i = 0; i < bem.size(); ++i)
             surfs.append(bem[i]);
     } else {
@@ -252,8 +256,8 @@ int main(int argc, char *argv[])
         bemSurf.nn = surface.nn();
         bemSurf.coord_frame = FIFFV_COORD_MRI;
         surfs.append(bemSurf);
-        qInfo("Read surface: %s (%d vertices, %d triangles)\n" ,
-               qPrintable(surfFile), bemSurf.np, bemSurf.ntri);
+        qInfo("Read surface: %s (%d vertices, %d triangles)\n",
+              qPrintable(surfFile), bemSurf.np, bemSurf.ntri);
     }
 
     // Check completeness
@@ -276,10 +280,10 @@ int main(int argc, char *argv[])
         qInfo("%s", "");
         for (int k = 0; k < surfs.size() - 1; ++k) {
             float dist = minSurfaceDist(surfs[k], surfs[k + 1]);
-            qInfo("Minimum distance between %s and %s: %6.1f mm" ,
-                   qPrintable(nameOf(surfs[k].id)),
-                   qPrintable(nameOf(surfs[k + 1].id)),
-                   1000.0f * dist);
+            qInfo("Minimum distance between %s and %s: %6.1f mm",
+                  qPrintable(nameOf(surfs[k].id)),
+                  qPrintable(nameOf(surfs[k + 1].id)),
+                  1000.0f * dist);
         }
     }
 

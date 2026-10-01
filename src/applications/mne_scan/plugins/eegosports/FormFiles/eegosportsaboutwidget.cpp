@@ -33,7 +33,7 @@ using namespace EEGOSPORTSPLUGIN;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-EEGoSportsAboutWidget::EEGoSportsAboutWidget(QWidget *parent)
+EEGoSportsAboutWidget::EEGoSportsAboutWidget(QWidget* parent)
 : QDialog(parent)
 {
     m_ui.setupUi(this);

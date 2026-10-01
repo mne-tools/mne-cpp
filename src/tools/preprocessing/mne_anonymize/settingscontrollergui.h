@@ -35,14 +35,15 @@
 //=============================================================================================================
 namespace MNEANONYMIZE
 {
-    class MainWindow;
-    class SettingsControllerCl;
+class MainWindow;
+class SettingsControllerCl;
 }
 //=============================================================================================================
 // DEFINE NAMESPACE MNEANONYMIZE
 //=============================================================================================================
 
-namespace MNEANONYMIZE {
+namespace MNEANONYMIZE
+{
 
 //=============================================================================================================
 // MNEANONYMIZE FORWARD DECLARATIONS
@@ -132,7 +133,7 @@ private:
     void setupCommunication();
 
 private:
-    QSharedPointer<MainWindow> m_pWin;      /**< A QShared pointer to the address of the MainWindow object containing the GUI.*/
+    QSharedPointer<MainWindow> m_pWin; /**< A QShared pointer to the address of the MainWindow object containing the GUI.*/
 };
 
 //=============================================================================================================
@@ -142,4 +143,3 @@ private:
 } // namespace MNEANONYMIZE
 
 #endif // MNEANONYMIZE_SETTINGSCONTROLLERGUI_H
-

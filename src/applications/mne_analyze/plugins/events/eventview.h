@@ -38,21 +38,25 @@
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-namespace DISPLIB {
-    class TriggerDetectionView;
+namespace DISPLIB
+{
+class TriggerDetectionView;
 }
 
-namespace ANSHAREDLIB {
-    class FiffRawViewModel;
+namespace ANSHAREDLIB
+{
+class FiffRawViewModel;
 }
 
-namespace Ui {
-    class EventWindowDockWidget;
+namespace Ui
+{
+class EventWindowDockWidget;
 }
 
-namespace FIFFLIB {
-    class FiffInfo;
-    class FiffRawData;
+namespace FIFFLIB
+{
+class FiffInfo;
+class FiffRawData;
 }
 
 //=============================================================================================================
@@ -271,7 +275,7 @@ private:
      */
     bool newStimGroup(const QString& sName,
                       int iType,
-                      const QColor &groupColor = Qt::black);
+                      const QColor& groupColor = Qt::black);
 
     //=========================================================================================================
     /**
@@ -289,7 +293,7 @@ private:
     /**
      * Prompts user to rename selected group
      */
-    void renameGroup(const QString &currentText);
+    void renameGroup(const QString& currentText);
 
     //=========================================================================================================
     /**
@@ -303,7 +307,7 @@ private:
      *
      * @param[in] pos   Position on screen where the menu will show up.
      */
-    void customEventContextMenuRequested(const QPoint &pos);
+    void customEventContextMenuRequested(const QPoint& pos);
 
     //=========================================================================================================
     /**
@@ -311,7 +315,7 @@ private:
      *
      * @param[in] pos   Position on screen where the menu will show up.
      */
-    void customGroupContextMenuRequested(const QPoint &pos);
+    void customGroupContextMenuRequested(const QPoint& pos);
 
     //=========================================================================================================
     /**
@@ -350,10 +354,10 @@ private:
      *
      * @return      returns map of events sorted by groups based on threshold.
      */
-    QMap<double,QList<int>> detectTriggerCalculations(const QString& sChannelName,
-                                                      double dThreshold,
-                                                      FIFFLIB::FiffInfo fiffInfo,
-                                                      FIFFLIB::FiffRawData fiffRaw);
+    QMap<double, QList<int>> detectTriggerCalculations(const QString& sChannelName,
+                                                       double dThreshold,
+                                                       FIFFLIB::FiffInfo fiffInfo,
+                                                       FIFFLIB::FiffRawData fiffRaw);
 
     //=========================================================================================================
     /**
@@ -361,29 +365,29 @@ private:
      *
      * @param[in] item      Item whose name was changed
      */
-    void onGroupItemNameChanged(QListWidgetItem *item);
+    void onGroupItemNameChanged(QListWidgetItem* item);
 
     void createContextMenu();
 
-    Ui::EventWindowDockWidget*                      m_pUi;                          /** < Pointer to GUI elements */
+    Ui::EventWindowDockWidget* m_pUi; /** < Pointer to GUI elements */
 
-    int                                             m_iCheckState;                  /** < State of show events checkbox (0 unchecked, 2 checked) */
-    int                                             m_iCheckSelectedState;          /** < State of the show selected checkbox (0 unchecked, 2 checked) */
-    int                                             m_iLastSampClicked;             /** < Number of the last sample clicked */
+    int m_iCheckState;         /** < State of show events checkbox (0 unchecked, 2 checked) */
+    int m_iCheckSelectedState; /** < State of the show selected checkbox (0 unchecked, 2 checked) */
+    int m_iLastSampClicked;    /** < Number of the last sample clicked */
 
-    QSharedPointer<EventDelegate>                   m_pAnnDelegate;                 /** < Pointer to associated delegate */
-    QSharedPointer<ANSHAREDLIB::EventModel>         m_pEventModel;                  /** < Pointer to associated model. Points to currently loaded. */
-    QSharedPointer<ANSHAREDLIB::FiffRawViewModel>   m_pFiffRawModel;                /** < Pointer to currently loaded FIffRawViewModel */
+    QSharedPointer<EventDelegate> m_pAnnDelegate;                  /** < Pointer to associated delegate */
+    QSharedPointer<ANSHAREDLIB::EventModel> m_pEventModel;         /** < Pointer to associated model. Points to currently loaded. */
+    QSharedPointer<ANSHAREDLIB::FiffRawViewModel> m_pFiffRawModel; /** < Pointer to currently loaded FIffRawViewModel */
 
-    QSharedPointer<DISPLIB::TriggerDetectionView>   m_pTriggerDetectView;           /** < Pointer to viewer to control GUI for detecting triggers */
+    QSharedPointer<DISPLIB::TriggerDetectionView> m_pTriggerDetectView; /** < Pointer to viewer to control GUI for detecting triggers */
 
-    QColorDialog*                                   m_pColordialog;                 /** < Used for Prompting users for event type colors */
+    QColorDialog* m_pColordialog; /** < Used for Prompting users for event type colors */
 
-    QFutureWatcher <QMap<double,QList<int>>>        m_FutureWatcher;                /** < Watches m_Future and signals when calculations are done */
-    QFuture<QMap<double,QList<int>>>                m_Future;                       /** < Used to perfom trigger detection on a separate thread */
+    QFutureWatcher<QMap<double, QList<int>>> m_FutureWatcher; /** < Watches m_Future and signals when calculations are done */
+    QFuture<QMap<double, QList<int>>> m_Future;               /** < Used to perfom trigger detection on a separate thread */
 
-    QPointer<QMenu>                                 m_pEventContexMenu;
-    QPointer<QMenu>                                 m_pGroupContexMenu;
+    QPointer<QMenu> m_pEventContexMenu;
+    QPointer<QMenu> m_pGroupContexMenu;
 };
 
 #endif // EVENTVIEW_H

@@ -51,7 +51,7 @@ using namespace MNELIB;
 
 //=============================================================================================================
 
-constexpr int OK   =  0;
+constexpr int OK = 0;
 
 // Return code and axis indices (kept for documentation).
 [[maybe_unused]] constexpr int FAIL = -1;
@@ -90,7 +90,7 @@ double MNESurface::sum_solids(const Eigen::Vector3f& from) const
 
 //=============================================================================================================
 
-void MNESurface::triangle_coords(const Eigen::Vector3f& r, int tri, float &x, float &y, float &z) const
+void MNESurface::triangle_coords(const Eigen::Vector3f& r, int tri, float& x, float& y, float& z) const
 {
     double a, b, c, v1, v2, det;
     const MNETriangle* this_tri;
@@ -115,7 +115,7 @@ void MNESurface::triangle_coords(const Eigen::Vector3f& r, int tri, float &x, fl
 
 //=============================================================================================================
 
-int MNESurface::nearest_triangle_point(const Eigen::Vector3f& r, const MNEProjData *user, int tri, float &x, float &y, float &z) const
+int MNESurface::nearest_triangle_point(const Eigen::Vector3f& r, const MNEProjData* user, int tri, float& x, float& y, float& z) const
 {
     double p, q, p0, q0, t0;
     double a, b, c, v1, v2, det;
@@ -133,8 +133,7 @@ int MNESurface::nearest_triangle_point(const Eigen::Vector3f& r, const MNEProjDa
         a = pd->a[tri];
         b = pd->b[tri];
         c = pd->c[tri];
-    }
-    else {
+    } else {
         a = this_tri->r12.cast<double>().squaredNorm();
         b = this_tri->r13.cast<double>().squaredNorm();
         c = this_tri->r12.cast<double>().dot(this_tri->r13.cast<double>());
@@ -149,8 +148,8 @@ int MNESurface::nearest_triangle_point(const Eigen::Vector3f& r, const MNEProjDa
     q = (a * v2 - c * v1) / det;
 
     if (p >= 0.0 && p <= 1.0 &&
-            q >= 0.0 && q <= 1.0 &&
-            q <= 1.0 - p) {
+        q >= 0.0 && q <= 1.0 &&
+        q <= 1.0 - p) {
         x = p;
         y = q;
         z = distance;
@@ -160,8 +159,10 @@ int MNESurface::nearest_triangle_point(const Eigen::Vector3f& r, const MNEProjDa
      * Side 1 -> 2
      */
     p0 = p + 0.5 * (q * c) / a;
-    if (p0 < 0.0) p0 = 0.0;
-    else if (p0 > 1.0) p0 = 1.0;
+    if (p0 < 0.0)
+        p0 = 0.0;
+    else if (p0 > 1.0)
+        p0 = 1.0;
     q0 = 0.0;
     dist0 = sqrt((p - p0) * (p - p0) * a +
                  (q - q0) * (q - q0) * b +
@@ -175,8 +176,10 @@ int MNESurface::nearest_triangle_point(const Eigen::Vector3f& r, const MNEProjDa
      * Side 2 -> 3
      */
     t0 = 0.5 * ((2.0 * a - c) * (1.0 - p) + (2.0 * b - c) * q) / (a + b - c);
-    if (t0 < 0.0) t0 = 0.0;
-    else if (t0 > 1.0) t0 = 1.0;
+    if (t0 < 0.0)
+        t0 = 0.0;
+    else if (t0 > 1.0)
+        t0 = 1.0;
     p0 = 1.0 - t0;
     q0 = t0;
     dist0 = sqrt((p - p0) * (p - p0) * a +
@@ -194,8 +197,10 @@ int MNESurface::nearest_triangle_point(const Eigen::Vector3f& r, const MNEProjDa
      */
     p0 = 0.0;
     q0 = q + 0.5 * (p * c) / b;
-    if (q0 < 0.0) q0 = 0.0;
-    else if (q0 > 1.0) q0 = 1.0;
+    if (q0 < 0.0)
+        q0 = 0.0;
+    else if (q0 > 1.0)
+        q0 = 1.0;
     dist0 = sqrt((p - p0) * (p - p0) * a +
                  (q - q0) * (q - q0) * b +
                  (p - p0) * (q - q0) * c +
@@ -211,7 +216,7 @@ int MNESurface::nearest_triangle_point(const Eigen::Vector3f& r, const MNEProjDa
 
 //=============================================================================================================
 
-int MNESurface::nearest_triangle_point(const Eigen::Vector3f& r, int tri, float &x, float &y, float &z) const
+int MNESurface::nearest_triangle_point(const Eigen::Vector3f& r, int tri, float& x, float& y, float& z) const
 {
     return nearest_triangle_point(r, nullptr, tri, x, y, z);
 }
@@ -223,8 +228,7 @@ Eigen::Vector3f MNESurface::project_to_triangle(int tri, float p, float q) const
     const MNETriangle* this_tri = &tris[tri];
 
     return Eigen::Vector3f(
-        this_tri->r1 + p * this_tri->r12 + q * this_tri->r13
-    );
+        this_tri->r1 + p * this_tri->r12 + q * this_tri->r13);
 }
 
 //=============================================================================================================
@@ -238,7 +242,7 @@ Eigen::Vector3f MNESurface::project_to_triangle(int best, const Eigen::Vector3f&
 
 //=============================================================================================================
 
-int MNESurface::project_to_surface(const MNEProjData *proj_data, const Eigen::Vector3f& r, float &distp) const
+int MNESurface::project_to_surface(const MNEProjData* proj_data, const Eigen::Vector3f& r, float& distp) const
 {
     float distance;
     float p, q;
@@ -262,8 +266,8 @@ int MNESurface::project_to_surface(const MNEProjData *proj_data, const Eigen::Ve
 //=============================================================================================================
 
 void MNESurface::find_closest_on_surface_approx(const PointsT& r, int np_points,
-                                                 Eigen::VectorXi& nearest_tri,
-                                                 Eigen::VectorXf& distances, int nstep) const
+                                                Eigen::VectorXi& nearest_tri,
+                                                Eigen::VectorXf& distances, int nstep) const
 {
     auto p = std::make_unique<MNEProjData>(this);
     int k, was;
@@ -311,8 +315,7 @@ void MNESurface::decide_search_restriction(MNEProjData& p,
                 minvert = k;
             }
         }
-    }
-    else {
+    } else {
         const MNETriangle* this_tri = &tris[approx_best];
         diff_vec = this_tri->r1 - r;
         mindist = diff_vec.norm();
@@ -341,7 +344,7 @@ void MNESurface::decide_search_restriction(MNEProjData& p,
 
 //=============================================================================================================
 
-void MNESurface::activate_neighbors(int start, Eigen::VectorXi &act, int nstep) const
+void MNESurface::activate_neighbors(int start, Eigen::VectorXi& act, int nstep) const
 {
     int k;
 
@@ -391,8 +394,8 @@ std::unique_ptr<MNESurface> MNESurface::read_bem_surface(const QString& name, in
     FiffDirNode::SPtr node;
     FiffTag::UPtr t_pTag;
 
-    int     id = -1;
-    int     nnode, ntri_count;
+    int id = -1;
+    int nnode, ntri_count;
     MNESurface* s = nullptr;
     std::unique_ptr<MNESurface> s_ptr;
     int k;
@@ -415,7 +418,8 @@ std::unique_ptr<MNESurface> MNESurface::read_bem_surface(const QString& name, in
     surfs = stream->dirtree()->dir_tree_find(FIFFB_BEM_SURF);
     if (surfs.size() == 0) {
         qCritical("No BEM surfaces found in %s", name.toUtf8().constData());
-        stream->close(); return nullptr;
+        stream->close();
+        return nullptr;
     }
     if (which >= 0) {
         for (k = 0; k < surfs.size(); ++k) {
@@ -428,24 +432,27 @@ std::unique_ptr<MNESurface> MNESurface::read_bem_surface(const QString& name, in
         }
         if (id != which) {
             qCritical("Desired surface not found in %s", name.toUtf8().constData());
-            stream->close(); return nullptr;
+            stream->close();
+            return nullptr;
         }
-    }
-    else
+    } else
         node = surfs[0];
 
     if (!node->find_tag(stream, FIFF_BEM_SURF_NNODE, t_pTag)) {
-        stream->close(); return nullptr;
+        stream->close();
+        return nullptr;
     }
     nnode = *t_pTag->toInt();
 
     if (!node->find_tag(stream, FIFF_BEM_SURF_NTRI, t_pTag)) {
-        stream->close(); return nullptr;
+        stream->close();
+        return nullptr;
     }
     ntri_count = *t_pTag->toInt();
 
     if (!node->find_tag(stream, FIFF_BEM_SURF_NODES, t_pTag)) {
-        stream->close(); return nullptr;
+        stream->close();
+        return nullptr;
     }
     tmp_nodes = t_pTag->toFloatMatrix().transpose();
 
@@ -454,14 +461,14 @@ std::unique_ptr<MNESurface> MNESurface::read_bem_surface(const QString& name, in
     }
 
     if (!node->find_tag(stream, FIFF_BEM_SURF_TRIANGLES, t_pTag)) {
-        stream->close(); return nullptr;
+        stream->close();
+        return nullptr;
     }
     tmp_triangles = t_pTag->toIntMatrix().transpose();
 
     if (node->find_tag(stream, FIFF_MNE_COORD_FRAME, t_pTag)) {
         coord_frame = *t_pTag->toInt();
-    }
-    else if (node->find_tag(stream, FIFF_BEM_COORD_FRAME, t_pTag)) {
+    } else if (node->find_tag(stream, FIFF_BEM_COORD_FRAME, t_pTag)) {
         coord_frame = *t_pTag->toInt();
     }
     if (node->find_tag(stream, FIFF_BEM_SIGMA, t_pTag)) {
@@ -473,19 +480,19 @@ std::unique_ptr<MNESurface> MNESurface::read_bem_surface(const QString& name, in
     s_ptr = std::make_unique<MNESurface>();
     s = s_ptr.get();
     tmp_triangles.array() -= 1;
-    s->itris       = tmp_triangles;
-    s->id          = which;
-    s->sigma       = sigmaLocal;
+    s->itris = tmp_triangles;
+    s->id = which;
+    s->sigma = sigmaLocal;
     s->coord_frame = coord_frame;
-    s->rr          = tmp_nodes;
+    s->rr = tmp_nodes;
     if (tmp_node_normals.rows() > 0)
-        s->nn          = tmp_node_normals;
-    s->ntri        = ntri_count;
-    s->np          = nnode;
-    s->type        = FIFFV_MNE_SPACE_SURFACE;
-    s->nuse_tri    = 0;
-    s->tot_area    = 0.0;
-    s->dist_limit  = -1.0;
+        s->nn = tmp_node_normals;
+    s->ntri = ntri_count;
+    s->np = nnode;
+    s->type = FIFFV_MNE_SPACE_SURFACE;
+    s->nuse_tri = 0;
+    s->tot_area = 0.0;
+    s->dist_limit = -1.0;
     s->vol_dims[0] = s->vol_dims[1] = s->vol_dims[2] = 0;
     s->MRI_vol_dims[0] = s->MRI_vol_dims[1] = s->MRI_vol_dims[2] = 0;
     s->cm[0] = s->cm[1] = s->cm[2] = 0.0;
@@ -495,23 +502,20 @@ std::unique_ptr<MNESurface> MNESurface::read_bem_surface(const QString& name, in
             if (s->add_geometry_info(s->nn.rows() == 0) != OK) {
                 return nullptr;
             }
-        }
-        else {
+        } else {
             if (s->add_geometry_info2(s->nn.rows() == 0) != OK) {
                 return nullptr;
             }
         }
-    }
-    else if (s->nn.rows() == 0) {
+    } else if (s->nn.rows() == 0) {
         if (s->add_vertex_normals() != OK) {
             return nullptr;
         }
-    }
-    else
+    } else
         s->add_triangle_data();
 
-    s->nuse   = s->np;
-    s->inuse  = Eigen::VectorXi::Ones(s->np);
+    s->nuse = s->np;
+    s->inuse = Eigen::VectorXi::Ones(s->np);
     s->vertno = Eigen::VectorXi::LinSpaced(s->np, 0, s->np - 1);
     sigma = sigmaLocal;
 

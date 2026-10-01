@@ -49,7 +49,7 @@ using namespace Eigen;
  * @brief The TestMNEProjectToSurface class provides MNEProjectToSurface verification tests
  *
  */
-class TestMNEProjectToSurface: public QObject
+class TestMNEProjectToSurface : public QObject
 {
     Q_OBJECT
 
@@ -66,13 +66,12 @@ private:
     double dEpsilon;
     MatrixXf matResult;
     MatrixXd matRef;
-
 };
 
 //=============================================================================================================
 
 TestMNEProjectToSurface::TestMNEProjectToSurface()
-    : dEpsilon(0.00001)
+: dEpsilon(0.00001)
 {
 }
 
@@ -87,16 +86,16 @@ void TestMNEProjectToSurface::initTestCase()
     MNEBemSurface::SPtr bemSurface = MNEBemSurface::SPtr::create(bemHead[0]);
     MNEProjectToSurface::SPtr mneSurfacePoints = MNEProjectToSurface::SPtr::create(*bemSurface);
 
-    VectorXi vecNearest;    // Triangle of the new point
-    VectorXf vecDist;       // The Distance between matX and matP
+    VectorXi vecNearest; // Triangle of the new point
+    VectorXf vecDist;    // The Distance between matX and matP
 
-    MatrixXf matPointsShifted = bemSurface->rr.cast<float>() * 1.1;     // Move all points with same amout from surface
+    MatrixXf matPointsShifted = bemSurface->rr.cast<float>() * 1.1; // Move all points with same amout from surface
     int iNP = matPointsShifted.rows();
 
     mneSurfacePoints->find_closest_on_surface(matPointsShifted, iNP, matResult, vecNearest, vecDist);
 
     // read reference
-    UTILSLIB::IOUtils::read_eigen_matrix(matRef,sRef);
+    UTILSLIB::IOUtils::read_eigen_matrix(matRef, sRef);
 }
 
 //=============================================================================================================
@@ -121,4 +120,3 @@ void TestMNEProjectToSurface::cleanupTestCase()
 
 QTEST_GUILESS_MAIN(TestMNEProjectToSurface)
 #include "test_mne_project_to_surface.moc"
-

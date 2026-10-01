@@ -44,8 +44,9 @@
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-namespace Ui {
-    class QuickControlViewWidget;
+namespace Ui
+{
+class QuickControlViewWidget;
 }
 
 class QVBoxLayout;
@@ -75,8 +76,8 @@ class DISPSHARED_EXPORT QuickControlView : public DISPLIB::DraggableFramelessWid
     Q_OBJECT
 
 public:
-    typedef QSharedPointer<QuickControlView> SPtr;              /**< Shared pointer type for QuickControlView. */
-    typedef QSharedPointer<const QuickControlView> ConstSPtr;   /**< Const shared pointer type for QuickControlView. */
+    typedef QSharedPointer<QuickControlView> SPtr;            /**< Shared pointer type for QuickControlView. */
+    typedef QSharedPointer<const QuickControlView> ConstSPtr; /**< Const shared pointer type for QuickControlView. */
 
     //=========================================================================================================
     /**
@@ -91,7 +92,7 @@ public:
     QuickControlView(const QString& sSettingsPath = "",
                      const QString& name = "",
                      Qt::WindowFlags flags = Qt::Window | Qt::WindowStaysOnTopHint,
-                     QWidget *parent = Q_NULLPTR,
+                     QWidget* parent = Q_NULLPTR,
                      bool bDraggable = true);
 
     //=========================================================================================================
@@ -215,9 +216,9 @@ protected:
     void onOpacityChange(qint32 value);
 
 private:
-    QString                                             m_sSettingsPath;                /**< The settings path to store the GUI settings to. */
-    QString                                             m_sName;                        /**< Name of the widget which uses this quick control. */
-    Ui::QuickControlViewWidget*                         m_pUi;                          /**< The generated UI file. */
+    QString m_sSettingsPath;           /**< The settings path to store the GUI settings to. */
+    QString m_sName;                   /**< Name of the widget which uses this quick control. */
+    Ui::QuickControlViewWidget* m_pUi; /**< The generated UI file. */
 
 signals:
 };

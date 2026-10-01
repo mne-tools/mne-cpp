@@ -60,7 +60,8 @@
 // DEFINE NAMESPACE MRILIB
 //=============================================================================================================
 
-namespace MRILIB {
+namespace MRILIB
+{
 
 //=============================================================================================================
 // FORWARD DECLARATIONS
@@ -72,7 +73,12 @@ class MriVolData;
 /**
  * Slice orientation for orthogonal MRI volume slicing.
  */
-enum class SliceOrientation { Axial, Coronal, Sagittal };
+enum class SliceOrientation
+{
+    Axial,
+    Coronal,
+    Sagittal
+};
 
 //=============================================================================================================
 /**
@@ -85,12 +91,12 @@ enum class SliceOrientation { Axial, Coronal, Sagittal };
  */
 struct MRISHARED_EXPORT MriSliceImage
 {
-    Eigen::MatrixXf pixels;          /**< 2D pixel data, normalised 0-1. */
-    int width;                       /**< Width of the slice image in pixels. */
-    int height;                      /**< Height of the slice image in pixels. */
-    SliceOrientation orientation;    /**< Orientation of the slice. */
-    int sliceIndex;                  /**< Voxel index along the anatomical orientation's slicing axis. */
-    Eigen::Matrix4f sliceToRas;      /**< 4x4 transform placing the slice in RAS space. */
+    Eigen::MatrixXf pixels;       /**< 2D pixel data, normalised 0-1. */
+    int width;                    /**< Width of the slice image in pixels. */
+    int height;                   /**< Height of the slice image in pixels. */
+    SliceOrientation orientation; /**< Orientation of the slice. */
+    int sliceIndex;               /**< Voxel index along the anatomical orientation's slicing axis. */
+    Eigen::Matrix4f sliceToRas;   /**< 4x4 transform placing the slice in RAS space. */
 };
 
 //=============================================================================================================
@@ -197,7 +203,7 @@ public:
      * @return Voxel index (rounded to nearest integer).
      */
     static Eigen::Vector3i rasToVoxel(const Eigen::Matrix4f& vox2ras,
-                                       const Eigen::Vector3f& rasPoint);
+                                      const Eigen::Vector3f& rasPoint);
 
     //=========================================================================================================
     /**
@@ -209,7 +215,7 @@ public:
      * @return RAS coordinate.
      */
     static Eigen::Vector3f voxelToRas(const Eigen::Matrix4f& vox2ras,
-                                       const Eigen::Vector3i& voxel);
+                                      const Eigen::Vector3i& voxel);
 
     //=========================================================================================================
     // MriVolData convenience overloads
@@ -225,8 +231,8 @@ public:
      * @return The extracted slice image.
      */
     static MriSliceImage extractSlice(const MriVolData& vol,
-                                       SliceOrientation orientation,
-                                       int sliceIndex);
+                                      SliceOrientation orientation,
+                                      int sliceIndex);
 
     /**
      * Return the voxel axis used as the fixed slicing axis for an anatomical orientation.
@@ -269,7 +275,7 @@ public:
      * @return Vector of three MriSliceImage (axial, coronal, sagittal).
      */
     static QVector<MriSliceImage> extractOrthogonal(const MriVolData& vol,
-                                                     const Eigen::Vector3f& rasPoint);
+                                                    const Eigen::Vector3f& rasPoint);
 
     /**
      * Convert RAS coordinate to voxel index using a volume's transform.
@@ -280,7 +286,7 @@ public:
      * @return Voxel index (rounded to nearest integer).
      */
     static Eigen::Vector3i rasToVoxel(const MriVolData& vol,
-                                       const Eigen::Vector3f& rasPoint);
+                                      const Eigen::Vector3f& rasPoint);
 
     /**
      * Convert voxel index to RAS coordinate using a volume's transform.
@@ -291,7 +297,7 @@ public:
      * @return RAS coordinate.
      */
     static Eigen::Vector3f voxelToRas(const MriVolData& vol,
-                                       const Eigen::Vector3i& voxel);
+                                      const Eigen::Vector3i& voxel);
 };
 
 } // namespace MRILIB

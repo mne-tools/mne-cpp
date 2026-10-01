@@ -48,8 +48,9 @@ class QDockWidget;
 class QGridLayout;
 QT_END_NAMESPACE
 
-namespace DISPLIB {
-    class MultiView;
+namespace DISPLIB
+{
+class MultiView;
 }
 
 //=============================================================================================================
@@ -74,8 +75,8 @@ class MainWindow : public QMainWindow
     Q_OBJECT
 
 public:
-    typedef QSharedPointer<MainWindow> SPtr;               /**< Shared pointer type for MainWindow. */
-    typedef QSharedPointer<const MainWindow> ConstSPtr;    /**< Const shared pointer type for MainWindow. */
+    typedef QSharedPointer<MainWindow> SPtr;            /**< Shared pointer type for MainWindow. */
+    typedef QSharedPointer<const MainWindow> ConstSPtr; /**< Const shared pointer type for MainWindow. */
 
     //=========================================================================================================
     /**
@@ -87,7 +88,7 @@ public:
      *
      */
     MainWindow(AnalyzeCore* pAnalyzeCore,
-               QWidget *parent = Q_NULLPTR);
+               QWidget* parent = Q_NULLPTR);
 
     //=========================================================================================================
     /**
@@ -102,7 +103,7 @@ public:
      *
      * @param[in] event The event that has happened.
      */
-    void closeEvent(QCloseEvent *event) override;
+    void closeEvent(QCloseEvent* event) override;
 
     //=============================================================================================================
     /**
@@ -113,8 +114,8 @@ public:
      * @param[in] msg       the message to log.
      */
     void writeToLog(QtMsgType type,
-                    const QMessageLogContext &context,
-                    const QString &msg);
+                    const QMessageLogContext& context,
+                    const QString& msg);
 
     //=========================================================================================================
     /**
@@ -232,7 +233,7 @@ private:
      * Creates the menu actions.
      */
     void initMenuBar();
-\
+
     //=========================================================================================================
     /**
      * Initialize this window's name size and some properties.
@@ -269,36 +270,36 @@ private:
      */
     void deleteMenus();
 
-    QPointer<DISPLIB::MultiView>        m_pMultiView;               /**< The central View.*/
-    QPointer<AnalyzeCore>               m_pAnalyzeCoreController;   /**< Pointer to the application controller Obj.*/
-    QPointer<QGridLayout>               m_pGridLayout;              /**< Grid Layout is used for MainWindow, so that the MultiView can always fit the size of MainWindow */
+    QPointer<DISPLIB::MultiView> m_pMultiView;      /**< The central View.*/
+    QPointer<AnalyzeCore> m_pAnalyzeCoreController; /**< Pointer to the application controller Obj.*/
+    QPointer<QGridLayout> m_pGridLayout;            /**< Grid Layout is used for MainWindow, so that the MultiView can always fit the size of MainWindow */
 
     // MainWindow actions
-    QPointer<QAction>                   m_pActionExit;              /**< Exit application action. */
-    QPointer<QAction>                   m_pActionReloadPlugins;     /**< Reload plugins action. */
-    QPointer<QAction>                   m_pActionAbout;             /**< Show about dialog action. */
-    QPointer<QAction>                   m_pActionResearchMode;      /**< Toggle research mode action. */
-    QPointer<QAction>                   m_pActionClinicalMode;      /**< Toggle clinical mode action. */
-    QPointer<QAction>                   m_pActionDarkMode;          /**< Toggle dark mode. */
+    QPointer<QAction> m_pActionExit;          /**< Exit application action. */
+    QPointer<QAction> m_pActionReloadPlugins; /**< Reload plugins action. */
+    QPointer<QAction> m_pActionAbout;         /**< Show about dialog action. */
+    QPointer<QAction> m_pActionResearchMode;  /**< Toggle research mode action. */
+    QPointer<QAction> m_pActionClinicalMode;  /**< Toggle clinical mode action. */
+    QPointer<QAction> m_pActionDarkMode;      /**< Toggle dark mode. */
 
     // MainWindow menus
-    QPointer<QMenu>                     m_pMenuFile;                /**< Holds the file menu.*/
-    QPointer<QMenu>                     m_pMenuView;                /**< Holds the view menu.*/
-    QPointer<QMenu>                     m_pMenuPlugins;             /**< Holds the plugin view sub menu.*/
-    QPointer<QMenu>                     m_pMenuControl;             /**< Holds the control menu. */
-    QPointer<QMenu>                     m_pMenuAppearance;          /**< Holds the appearance menu.*/
-    QPointer<QMenu>                     m_pMenuHelp;                /**< Holds the help menu.*/
+    QPointer<QMenu> m_pMenuFile;       /**< Holds the file menu.*/
+    QPointer<QMenu> m_pMenuView;       /**< Holds the view menu.*/
+    QPointer<QMenu> m_pMenuPlugins;    /**< Holds the plugin view sub menu.*/
+    QPointer<QMenu> m_pMenuControl;    /**< Holds the control menu. */
+    QPointer<QMenu> m_pMenuAppearance; /**< Holds the appearance menu.*/
+    QPointer<QMenu> m_pMenuHelp;       /**< Holds the help menu.*/
 
-    QPointer<QTextBrowser>              m_pTextBrowser_Log;         /**< Holds the text browser for the log.*/
+    QPointer<QTextBrowser> m_pTextBrowser_Log; /**< Holds the text browser for the log.*/
 
-    QSharedPointer<QWidget>             m_pAboutWindow;             /**< Holds the widget containing the about information.*/
+    QSharedPointer<QWidget> m_pAboutWindow; /**< Holds the widget containing the about information.*/
 
-    QString                             m_sSettingsPath;            /**< The settings path to store the GUI settings to. */
-    QString                             m_sCurrentStyle;            /**< The currently selected style (dark mode, default mode). */
+    QString m_sSettingsPath; /**< The settings path to store the GUI settings to. */
+    QString m_sCurrentStyle; /**< The currently selected style (dark mode, default mode). */
 
-    QMutex                              m_Mutex;                    /**< Thread-safing for printing messages. */
+    QMutex m_Mutex; /**< Thread-safing for printing messages. */
 };
 
-}// NAMESPACE
+} // NAMESPACE
 
 #endif // ANMAINWINDOW_H

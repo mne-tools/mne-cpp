@@ -23,12 +23,21 @@
 // DEFINE METHODS
 //=============================================================================================================
 
-const char* DUMMYTOOLBOXPLUGIN::buildDateTime(){ return UTILSLIB::dateTimeNow();};
+const char* DUMMYTOOLBOXPLUGIN::buildDateTime()
+{
+    return UTILSLIB::dateTimeNow();
+};
 
 //=============================================================================================================
 
-const char* DUMMYTOOLBOXPLUGIN::buildHash(){ return UTILSLIB::gitHash();};
+const char* DUMMYTOOLBOXPLUGIN::buildHash()
+{
+    return UTILSLIB::gitHash();
+};
 
 //=============================================================================================================
 
-const char* DUMMYTOOLBOXPLUGIN::buildHashLong(){ return UTILSLIB::gitHashLong();};
+const char* DUMMYTOOLBOXPLUGIN::buildHashLong()
+{
+    return UTILSLIB::gitHashLong();
+};

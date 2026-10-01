@@ -32,12 +32,13 @@
 //=============================================================================================================
 
 #if defined(SCAN_TMSI_PLUGIN)
-#  define TMSISHARED_EXPORT Q_DECL_EXPORT   /**< Q_DECL_EXPORT must be added to the declarations of symbols used when compiling a shared library. */
+#define TMSISHARED_EXPORT Q_DECL_EXPORT /**< Q_DECL_EXPORT must be added to the declarations of symbols used when compiling a shared library. */
 #else
-#  define TMSISHARED_EXPORT Q_DECL_IMPORT   /**< Q_DECL_IMPORT must be added to the declarations of symbols used when compiling a client that uses the shared library. */
+#define TMSISHARED_EXPORT Q_DECL_IMPORT /**< Q_DECL_IMPORT must be added to the declarations of symbols used when compiling a client that uses the shared library. */
 #endif
 
-namespace TMSIPLUGIN{
+namespace TMSIPLUGIN
+{
 
 //=============================================================================================================
 /**

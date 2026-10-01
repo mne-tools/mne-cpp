@@ -35,7 +35,8 @@ using namespace Eigen;
 // STATIC HELPERS
 //=============================================================================================================
 
-namespace {
+namespace
+{
 
 // Simple DFT-based Hilbert transform (no external FFT library needed)
 // For production use, this should be replaced with an FFT-based implementation

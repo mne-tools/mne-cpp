@@ -67,11 +67,11 @@ using namespace UTILSLIB;
  * @param[in] argv (argument vector) is an array of pointers to arrays of character objects. The array objects are null-terminated strings, representing the arguments that were entered on the command line when the program was started.
  * @return the value that was set to exit() (which is 0 if exit() is called via quit()).
  */
-int main(int argc, char *argv[])
+int main(int argc, char* argv[])
 {
-    #ifdef STATICBUILD
-    // Q_INIT_RESOURCE(mne_disp3d);
-    #endif
+#ifdef STATICBUILD
+// Q_INIT_RESOURCE(mne_disp3d);
+#endif
     qInstallMessageHandler(MNELogger::customLogWriter);
     QApplication a(argc, argv);
 
@@ -110,8 +110,8 @@ int main(int argc, char *argv[])
     QFile t_fileRaw(parser.value(inputOption));
     QFile t_fileFwd(parser.value(fwdOption));
 
-    FsSurfaceSet t_surfSet (parser.value(subjectOption), parser.value(hemiOption).toInt(), parser.value(surfOption), parser.value(subjectPathOption));
-    FsAnnotationSet t_annotationSet (parser.value(subjectOption), parser.value(hemiOption).toInt(), parser.value(annotOption), parser.value(subjectPathOption));
+    FsSurfaceSet t_surfSet(parser.value(subjectOption), parser.value(hemiOption).toInt(), parser.value(surfOption), parser.value(subjectPathOption));
+    FsAnnotationSet t_annotationSet(parser.value(subjectOption), parser.value(hemiOption).toInt(), parser.value(annotOption), parser.value(subjectPathOption));
 
     QString t_sFileNameStc(parser.value(stcFileOption));
 
@@ -124,16 +124,16 @@ int main(int argc, char *argv[])
     qint32 numSample = 40000;
 
     bool in_samples = false;
-    if(parser.value(inSamplesOption) == "false" || parser.value(inSamplesOption) == "0") {
+    if (parser.value(inSamplesOption) == "false" || parser.value(inSamplesOption) == "0") {
         in_samples = false;
-    } else if(parser.value(inSamplesOption) == "true" || parser.value(inSamplesOption) == "1") {
+    } else if (parser.value(inSamplesOption) == "true" || parser.value(inSamplesOption) == "1") {
         in_samples = true;
     }
 
     bool keep_comp = false;
-    if(parser.value(keepCompOption) == "false" || parser.value(keepCompOption) == "0") {
+    if (parser.value(keepCompOption) == "false" || parser.value(keepCompOption) == "0") {
         keep_comp = false;
-    } else if(parser.value(keepCompOption) == "true" || parser.value(keepCompOption) == "1") {
+    } else if (parser.value(keepCompOption) == "true" || parser.value(keepCompOption) == "1") {
         keep_comp = true;
     }
 
@@ -141,7 +141,7 @@ int main(int argc, char *argv[])
     // Read raw data
     //
     MNEForwardSolution t_Fwd(t_fileFwd);
-    if(t_Fwd.isEmpty())
+    if (t_Fwd.isEmpty())
         return 1;
 
     QList<FsLabel> t_qListLabels;
@@ -155,15 +155,15 @@ int main(int argc, char *argv[])
     //LH
     t_qListLabelSelection << t_qListLabels[28] << t_qListLabels[29] << t_qListLabels[45] << t_qListLabels[66];
     //RH
-    t_qListLabelSelection << t_qListLabels[103] << t_qListLabels[104] << t_qListLabels[120]<< t_qListLabels[141];
+    t_qListLabelSelection << t_qListLabels[103] << t_qListLabels[104] << t_qListLabels[120] << t_qListLabels[141];
 
-//    std::cout << "t_qListLabels.size " << t_qListLabels.size() << std::endl;
+    //    std::cout << "t_qListLabels.size " << t_qListLabels.size() << std::endl;
 
-//    for(qint32 i = 0; i < t_qListLabels.size(); ++i)
-//    {
-//        qDebug() << "Num" << i << t_qListLabels[i].name;
-//        std::cout << t_qListLabels[i].hemi << std::endl;
-//    }
+    //    for(qint32 i = 0; i < t_qListLabels.size(); ++i)
+    //    {
+    //        qDebug() << "Num" << i << t_qListLabels[i].name;
+    //        std::cout << t_qListLabels[i].hemi << std::endl;
+    //    }
 
     MNEForwardSolution t_SelectFwd = t_Fwd.pick_regions(t_qListLabelSelection);
 
@@ -179,12 +179,12 @@ int main(int argc, char *argv[])
     //   Set up pick list: MEG + STI 014 - bad channels
     //
     QStringList include;
-//    include << "STI 014";
-    bool want_meg   = false;
-    bool want_eeg   = true;
-    bool want_stim  = false;
+    //    include << "STI 014";
+    bool want_meg = false;
+    bool want_eeg = true;
+    bool want_stim = false;
 
-    RowVectorXi picks = raw.info.pick_types(want_meg, want_eeg, want_stim, include);//, raw.info.bads);
+    RowVectorXi picks = raw.info.pick_types(want_meg, want_eeg, want_stim, include); //, raw.info.bads);
 
     //
     //   Set up projection
@@ -192,8 +192,7 @@ int main(int argc, char *argv[])
     qint32 k = 0;
     if (raw.info.projs.size() == 0)
         printf("No projector specified for these data\n");
-    else
-    {
+    else {
         //
         //   Activate the projection items
         //
@@ -210,7 +209,7 @@ int main(int argc, char *argv[])
         if (nproj == 0)
             printf("The projection vectors do not apply to these channels\n");
         else
-            printf("Created an SSP operator (subspace dimension = %d)\n",nproj);
+            printf("Created an SSP operator (subspace dimension = %d)\n", nproj);
     }
 
     //
@@ -220,21 +219,17 @@ int main(int argc, char *argv[])
     qint32 dest_comp = -1;
 
     if (current_comp > 0)
-        printf("Current compensation grade : %d\n",current_comp);
+        printf("Current compensation grade : %d\n", current_comp);
 
     if (keep_comp)
         dest_comp = current_comp;
 
-    if (current_comp != dest_comp)
-    {
+    if (current_comp != dest_comp) {
         qDebug() << "This part needs to be debugged";
-        if(MNE::make_compensator(raw.info, current_comp, dest_comp, raw.comp))
-        {
+        if (MNE::make_compensator(raw.info, current_comp, dest_comp, raw.comp)) {
             raw.info.set_current_comp(dest_comp);
-            printf("Appropriate compensator added to change to grade %d.\n",dest_comp);
-        }
-        else
-        {
+            printf("Appropriate compensator added to change to grade %d.\n", dest_comp);
+        } else {
             printf("Could not make the compensator\n");
             return -1;
         }
@@ -251,13 +246,12 @@ int main(int argc, char *argv[])
     else
         readSuccessful = raw.read_raw_segment_times(data, times, from, to, picks);
 
-    if (!readSuccessful)
-    {
+    if (!readSuccessful) {
         printf("Could not read raw segment.\n");
         return -1;
     }
 
-    printf("Read %d samples.\n",(qint32)data.cols());
+    printf("Read %d samples.\n", (qint32)data.cols());
 
     //########################################################################################
     // RAP MUSIC Source Estimate
@@ -265,7 +259,7 @@ int main(int argc, char *argv[])
     //
     // Cluster forward solution;
     //
-    MNEForwardSolution t_clusteredFwd = t_SelectFwd.cluster_forward_solution(t_annotationSet, 20);//t_Fwd.cluster_forward_solution_ccr(t_annotationSet, 20);//40);
+    MNEForwardSolution t_clusteredFwd = t_SelectFwd.cluster_forward_solution(t_annotationSet, 20); //t_Fwd.cluster_forward_solution_ccr(t_annotationSet, 20);//40);
 
     //
     // Compute inverse solution
@@ -274,10 +268,10 @@ int main(int argc, char *argv[])
 
     InvSourceEstimate sourceEstimate;
 
-    float tstep = 1.0f/raw.info.sfreq;
+    float tstep = 1.0f / raw.info.sfreq;
 
     float tmin;
-    if(in_samples)
+    if (in_samples)
         tmin = from * tstep;
     else
         tmin = from;
@@ -293,8 +287,8 @@ int main(int argc, char *argv[])
 
     sourceEstimate.times = RowVectorXf::Zero(data.cols());
     sourceEstimate.times[0] = tmin;
-    for(qint32 i = 1; i < sourceEstimate.times.size(); ++i)
-        sourceEstimate.times[i] = sourceEstimate.times[i-1] + tstep;
+    for (qint32 i = 1; i < sourceEstimate.times.size(); ++i)
+        sourceEstimate.times[i] = sourceEstimate.times[i - 1] + tstep;
     sourceEstimate.tmin = tmin;
     sourceEstimate.tstep = tstep;
 
@@ -304,52 +298,49 @@ int main(int argc, char *argv[])
     qint32 t_iNumSensors = data.rows();
     qint32 t_iNumSteps = data.cols();
 
-    qint32 t_iSamplesOverlap = (qint32)floor(((float)samplesStcWindow)*stcOverlap);
-    qint32 t_iSamplesDiscard = t_iSamplesOverlap/2;
+    qint32 t_iSamplesOverlap = (qint32)floor(((float)samplesStcWindow) * stcOverlap);
+    qint32 t_iSamplesDiscard = t_iSamplesOverlap / 2;
 
     MatrixXd measData = MatrixXd::Zero(t_iNumSensors, samplesStcWindow);
 
     qint32 curSample = 0;
     qint32 curResultSample = 0;
-    qint32 stcWindowSize = samplesStcWindow - 2*t_iSamplesDiscard;
+    qint32 stcWindowSize = samplesStcWindow - 2 * t_iSamplesDiscard;
 
-    while(!last)
-    {
+    while (!last) {
         //Data
-        if(curSample + samplesStcWindow >= t_iNumSteps) //last
+        if (curSample + samplesStcWindow >= t_iNumSteps) //last
         {
             last = true;
-            measData = data.block(0, data.cols()-samplesStcWindow, t_iNumSensors, samplesStcWindow);
-        }
-        else
+            measData = data.block(0, data.cols() - samplesStcWindow, t_iNumSensors, samplesStcWindow);
+        } else
             measData = data.block(0, curSample, t_iNumSensors, samplesStcWindow);
 
         curSample += (samplesStcWindow - t_iSamplesOverlap);
-        if(first)
+        if (first)
             curSample -= t_iSamplesDiscard; //shift on start t_iSamplesDiscard backwards
 
         //Calculate
         InvSourceEstimate stcData = t_pwlRapMusic.calculateInverse(measData, 0.0f, tstep);
 
         //Assign Result
-        if(last)
+        if (last)
             stcWindowSize = stcData.data.cols() - curResultSample;
 
-        sourceEstimate.data.block(0,curResultSample,sourceEstimate.data.rows(),stcWindowSize) =
-                                            stcData.data.block(0,0,stcData.data.rows(),stcWindowSize);
+        sourceEstimate.data.block(0, curResultSample, sourceEstimate.data.rows(), stcWindowSize) =
+            stcData.data.block(0, 0, stcData.data.rows(), stcWindowSize);
 
         curResultSample += stcWindowSize;
 
-        if(first)
+        if (first)
             first = false;
     }
 
-    if(sourceEstimate.isEmpty())
+    if (sourceEstimate.isEmpty())
         return 1;
 
     // Write stc to file
-    if(!t_sFileNameStc.isEmpty())
-    {
+    if (!t_sFileNameStc.isEmpty()) {
         QFile t_fileClusteredStc(t_sFileNameStc);
         sourceEstimate.write(t_fileClusteredStc);
     }
@@ -379,8 +370,8 @@ int main(int argc, char *argv[])
     QFile rhStcFile(rhStcPath);
     stcRh.write(rhStcFile);
 
-    BrainView *pBrainView = new BrainView();
-    BrainTreeModel *pModel = new BrainTreeModel();
+    BrainView* pBrainView = new BrainView();
+    BrainTreeModel* pModel = new BrainTreeModel();
     pBrainView->setModel(pModel);
 
     for (auto it = t_surfSet.data().constBegin(); it != t_surfSet.data().constEnd(); ++it) {
@@ -397,8 +388,7 @@ int main(int argc, char *argv[])
     });
     pBrainView->loadSourceEstimate(lhStcPath, rhStcPath);
 
-    if(!t_sFileNameStc.isEmpty())
-    {
+    if (!t_sFileNameStc.isEmpty()) {
         QFile t_fileClusteredStc(t_sFileNameStc);
         sourceEstimate.write(t_fileClusteredStc);
     }

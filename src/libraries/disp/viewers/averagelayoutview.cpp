@@ -53,18 +53,18 @@ using namespace FIFFLIB;
 //=============================================================================================================
 
 AverageLayoutView::AverageLayoutView(const QString& sSettingsPath,
-                                     QWidget *parent,
+                                     QWidget* parent,
                                      Qt::WindowFlags f)
 : AbstractView(parent, f)
-, m_qMapAverageColor(QSharedPointer<QMap<QString, QColor> >::create())
-, m_qMapAverageActivation(QSharedPointer<QMap<QString, bool> >::create())
+, m_qMapAverageColor(QSharedPointer<QMap<QString, QColor>>::create())
+, m_qMapAverageActivation(QSharedPointer<QMap<QString, bool>>::create())
 {
     m_sSettingsPath = sSettingsPath;
     this->setWindowTitle("Average Layout");
 
     m_pAverageLayoutView = new QGraphicsView();
 
-    auto *rhiViewport = new QRhiWidget;
+    auto* rhiViewport = new QRhiWidget;
 #if defined(WASMBUILD) || defined(__EMSCRIPTEN__)
     rhiViewport->setApi(QRhiWidget::Api::OpenGL);
 #elif defined(Q_OS_MACOS) || defined(Q_OS_IOS)
@@ -85,8 +85,8 @@ AverageLayoutView::AverageLayoutView(const QString& sSettingsPath,
     m_pAverageLayoutView->setScene(m_pAverageScene.data());
 
     //set layouts
-    QVBoxLayout *neLayout = new QVBoxLayout(this);
-    neLayout->setContentsMargins(0,0,0,0);
+    QVBoxLayout* neLayout = new QVBoxLayout(this);
+    neLayout->setContentsMargins(0, 0, 0, 0);
     neLayout->addWidget(m_pAverageLayoutView);
     this->setLayout(neLayout);
     loadSettings();
@@ -103,8 +103,8 @@ AverageLayoutView::~AverageLayoutView()
 
 void AverageLayoutView::updateViewport()
 {
-    if(m_pAverageLayoutView) {
-        auto *rhiViewport = new QRhiWidget;
+    if (m_pAverageLayoutView) {
+        auto* rhiViewport = new QRhiWidget;
 #if defined(WASMBUILD) || defined(__EMSCRIPTEN__)
         rhiViewport->setApi(QRhiWidget::Api::OpenGL);
 #elif defined(Q_OS_MACOS) || defined(Q_OS_IOS)
@@ -120,7 +120,7 @@ void AverageLayoutView::updateViewport()
 
 //=============================================================================================================
 
-void AverageLayoutView::setChannelInfoModel(QSharedPointer<ChannelInfoModel> &pChannelInfoModel)
+void AverageLayoutView::setChannelInfoModel(QSharedPointer<ChannelInfoModel>& pChannelInfoModel)
 {
     m_pChannelInfoModel = pChannelInfoModel;
 }
@@ -129,9 +129,9 @@ void AverageLayoutView::setChannelInfoModel(QSharedPointer<ChannelInfoModel> &pC
 
 void AverageLayoutView::setEvokedSetModel(QSharedPointer<EvokedSetModel> pEvokedSetModel)
 {
-    if (pEvokedSetModel){
-    connect(pEvokedSetModel.data(), &EvokedSetModel::dataChanged,
-            this, &AverageLayoutView::updateData, Qt::UniqueConnection);
+    if (pEvokedSetModel) {
+        connect(pEvokedSetModel.data(), &EvokedSetModel::dataChanged,
+                this, &AverageLayoutView::updateData, Qt::UniqueConnection);
     }
 
     m_pEvokedSetModel = pEvokedSetModel;
@@ -141,7 +141,7 @@ void AverageLayoutView::setEvokedSetModel(QSharedPointer<EvokedSetModel> pEvoked
 
 void AverageLayoutView::setBackgroundColor(const QColor& backgroundColor)
 {
-    if(!m_pAverageScene) {
+    if (!m_pAverageScene) {
         qDebug() << "AverageLayoutView::setBackgroundColor - m_pAverageScene is NULL. Returning. ";
         return;
     }
@@ -155,7 +155,7 @@ void AverageLayoutView::setBackgroundColor(const QColor& backgroundColor)
 
 QColor AverageLayoutView::getBackgroundColor()
 {
-    if(!m_pAverageScene) {
+    if (!m_pAverageScene) {
         qDebug() << "AverageLayoutView::getBackgroundColor - m_pAverageScene is NULL. Returning. ";
         return QColor();
     }
@@ -167,13 +167,12 @@ QColor AverageLayoutView::getBackgroundColor()
 
 void AverageLayoutView::takeScreenshot(const QString& fileName)
 {
-    if(!m_pAverageScene) {
+    if (!m_pAverageScene) {
         qDebug() << "AverageLayoutView::takeScreenshot - m_pAverageScene is NULL. Returning. ";
         return;
     }
 
-    if(fileName.contains(".svg", Qt::CaseInsensitive))
-    {
+    if (fileName.contains(".svg", Qt::CaseInsensitive)) {
         // Generate screenshot
         QSvgGenerator svgGen;
         svgGen.setFileName(fileName);
@@ -184,8 +183,7 @@ void AverageLayoutView::takeScreenshot(const QString& fileName)
         m_pAverageScene->render(&painter);
     }
 
-    if(fileName.contains(".png", Qt::CaseInsensitive))
-    {
+    if (fileName.contains(".png", Qt::CaseInsensitive)) {
         QRect rect = m_pAverageLayoutView->frameRect();
         QPixmap pixMap = QWidget::grab(rect);
         pixMap.save(fileName);
@@ -194,9 +192,9 @@ void AverageLayoutView::takeScreenshot(const QString& fileName)
 
 //=============================================================================================================
 
-void AverageLayoutView::setScaleMap(const QMap<qint32,float> &scaleMap)
+void AverageLayoutView::setScaleMap(const QMap<qint32, float>& scaleMap)
 {
-    if(!m_pAverageScene) {
+    if (!m_pAverageScene) {
         qDebug() << "AverageLayoutView::setScaleMap - m_pAverageScene is NULL. Returning. ";
         return;
     }
@@ -210,23 +208,23 @@ void AverageLayoutView::setScaleMap(const QMap<qint32,float> &scaleMap)
 
 //=============================================================================================================
 
-QSharedPointer<QMap<QString, QColor> > AverageLayoutView::getAverageColor() const
+QSharedPointer<QMap<QString, QColor>> AverageLayoutView::getAverageColor() const
 {
     return m_qMapAverageColor;
 }
 
 //=============================================================================================================
 
-QSharedPointer<QMap<QString, bool> > AverageLayoutView::getAverageActivation() const
+QSharedPointer<QMap<QString, bool>> AverageLayoutView::getAverageActivation() const
 {
     return m_qMapAverageActivation;
 }
 
 //=============================================================================================================
 
-void AverageLayoutView::setAverageColor(const QSharedPointer<QMap<QString, QColor> > qMapAverageColor)
+void AverageLayoutView::setAverageColor(const QSharedPointer<QMap<QString, QColor>> qMapAverageColor)
 {
-    if(!m_pAverageScene) {
+    if (!m_pAverageScene) {
         qDebug() << "AverageLayoutView::setAverageColor - m_pAverageScene is NULL. Returning. ";
         return;
     }
@@ -239,7 +237,7 @@ void AverageLayoutView::setAverageColor(const QSharedPointer<QMap<QString, QColo
 
 void AverageLayoutView::setSingleAverageColor(const QColor& avgColor)
 {
-    for (QString mapKey : m_qMapAverageColor->keys()){
+    for (QString mapKey : m_qMapAverageColor->keys()) {
         m_qMapAverageColor->insert(mapKey, avgColor);
     }
 
@@ -249,9 +247,9 @@ void AverageLayoutView::setSingleAverageColor(const QColor& avgColor)
 
 //=============================================================================================================
 
-void AverageLayoutView::setAverageActivation(const QSharedPointer<QMap<QString, bool> > qMapAverageActivation)
+void AverageLayoutView::setAverageActivation(const QSharedPointer<QMap<QString, bool>> qMapAverageActivation)
 {
-    if(!m_pAverageScene) {
+    if (!m_pAverageScene) {
         qDebug() << "AverageLayoutView::setAverageActivation - m_pAverageScene is NULL. Returning. ";
         return;
     }
@@ -262,9 +260,9 @@ void AverageLayoutView::setAverageActivation(const QSharedPointer<QMap<QString, 
 
 //=============================================================================================================
 
-void AverageLayoutView::channelSelectionManagerChanged(const QList<QGraphicsItem*> &selectedChannelItems)
+void AverageLayoutView::channelSelectionManagerChanged(const QList<QGraphicsItem*>& selectedChannelItems)
 {
-    if(!m_pAverageScene) {
+    if (!m_pAverageScene) {
         qDebug() << "AverageLayoutView::channelSelectionManagerChanged - m_pAverageScene is NULL. Returning. ";
         return;
     }
@@ -278,9 +276,9 @@ void AverageLayoutView::channelSelectionManagerChanged(const QList<QGraphicsItem
 
 //=============================================================================================================
 
-void AverageLayoutView::channelSelectionChanged(const QVariant &selectionData)
+void AverageLayoutView::channelSelectionChanged(const QVariant& selectionData)
 {
-    if(!m_pAverageScene) {
+    if (!m_pAverageScene) {
         qDebug() << "AverageLayoutView::channelSelectionManagerChanged - m_pAverageScene is NULL. Returning. ";
         return;
     }
@@ -299,28 +297,28 @@ void AverageLayoutView::channelSelectionChanged(const QVariant &selectionData)
 
 void AverageLayoutView::updateData()
 {
-    if(m_pFiffInfo) {
-        QList<QGraphicsItem *> currentAverageSceneItems = m_pAverageScene->items();
+    if (m_pFiffInfo) {
+        QList<QGraphicsItem*> currentAverageSceneItems = m_pAverageScene->items();
 
         //Set new data for all averageSceneItems
-        for(int i = 0; i < currentAverageSceneItems.size(); i++) {
+        for (int i = 0; i < currentAverageSceneItems.size(); i++) {
             AverageSceneItem* averageSceneItemTemp = static_cast<AverageSceneItem*>(currentAverageSceneItems.at(i));
 
             averageSceneItemTemp->m_lAverageData.clear();
 
-            if (m_pEvokedSetModel){
+            if (m_pEvokedSetModel) {
                 //Get only the necessary data from the average model (use column 2)
-                QList<QPair<QString, DISPLIB::RowVectorPair> > averageData = m_pEvokedSetModel->data(0, 2, EvokedSetModelRoles::GetAverageData).value<QList<QPair<QString, DISPLIB::RowVectorPair> > >();
+                QList<QPair<QString, DISPLIB::RowVectorPair>> averageData = m_pEvokedSetModel->data(0, 2, EvokedSetModelRoles::GetAverageData).value<QList<QPair<QString, DISPLIB::RowVectorPair>>>();
 
                 //Get the averageScenItem specific data row
                 int channelNumber = averageSceneItemTemp->m_iChannelNumber;
 
-                if(channelNumber != -1) {
+                if (channelNumber != -1) {
                     averageSceneItemTemp->m_iChannelKind = m_pFiffInfo->chs.at(channelNumber).kind;
                     averageSceneItemTemp->m_iChannelUnit = m_pFiffInfo->chs.at(channelNumber).unit;
-                    averageSceneItemTemp->m_firstLastSample.first = (-1)*m_pEvokedSetModel->getNumPreStimSamples();
+                    averageSceneItemTemp->m_firstLastSample.first = (-1) * m_pEvokedSetModel->getNumPreStimSamples();
 
-                    if(!averageData.isEmpty()) {
+                    if (!averageData.isEmpty()) {
                         averageSceneItemTemp->m_firstLastSample.second = averageData.first().second.second - m_pEvokedSetModel->getNumPreStimSamples();
                     }
 
@@ -335,33 +333,33 @@ void AverageLayoutView::updateData()
         return;
     }
 
-    if(!m_pAverageScene || !m_pEvokedSetModel || !m_pChannelInfoModel) {
+    if (!m_pAverageScene || !m_pEvokedSetModel || !m_pChannelInfoModel) {
         qDebug() << "AverageLayoutView::updateData - m_pAverageScene, m_pEvokedSetModel or m_pChannelInfoModel are NULL. Returning. ";
         return;
     }
     //Get current items from the average scene
-    QList<QGraphicsItem *> currentAverageSceneItems = m_pAverageScene->items();
+    QList<QGraphicsItem*> currentAverageSceneItems = m_pAverageScene->items();
 
     //Set new data for all averageSceneItems
-    for(int i = 0; i < currentAverageSceneItems.size(); i++) {
+    for (int i = 0; i < currentAverageSceneItems.size(); i++) {
         AverageSceneItem* averageSceneItemTemp = static_cast<AverageSceneItem*>(currentAverageSceneItems.at(i));
 
         averageSceneItemTemp->m_lAverageData.clear();
 
         //Get only the necessary data from the average model (use column 2)
-        QList<QPair<QString, DISPLIB::RowVectorPair> > averageData = m_pEvokedSetModel->data(0, 2, EvokedSetModelRoles::GetAverageData).value<QList<QPair<QString, DISPLIB::RowVectorPair> > >();
+        QList<QPair<QString, DISPLIB::RowVectorPair>> averageData = m_pEvokedSetModel->data(0, 2, EvokedSetModelRoles::GetAverageData).value<QList<QPair<QString, DISPLIB::RowVectorPair>>>();
 
         //Get the averageScenItem specific data row
         int channelNumber = m_pChannelInfoModel->getIndexFromMappedChName(averageSceneItemTemp->m_sChannelName);
 
-        if(channelNumber != -1) {
+        if (channelNumber != -1) {
             //qDebug() << "Change data for" << channelNumber << "" << averageSceneItemTemp->m_sChannelName;
 
             averageSceneItemTemp->m_iChannelKind = m_pChannelInfoModel->data(m_pChannelInfoModel->index(channelNumber, 4), ChannelInfoModelRoles::GetChKind).toInt();
             averageSceneItemTemp->m_iChannelUnit = m_pChannelInfoModel->data(m_pChannelInfoModel->index(channelNumber, 6), ChannelInfoModelRoles::GetChUnit).toInt();
-            averageSceneItemTemp->m_firstLastSample.first = (-1)*m_pEvokedSetModel->getNumPreStimSamples();
+            averageSceneItemTemp->m_firstLastSample.first = (-1) * m_pEvokedSetModel->getNumPreStimSamples();
 
-            if(!averageData.isEmpty()) {
+            if (!averageData.isEmpty()) {
                 averageSceneItemTemp->m_firstLastSample.second = averageData.first().second.second - m_pEvokedSetModel->getNumPreStimSamples();
             }
 
@@ -379,7 +377,7 @@ void AverageLayoutView::updateData()
 
 void AverageLayoutView::saveSettings()
 {
-    if(m_sSettingsPath.isEmpty()) {
+    if (m_sSettingsPath.isEmpty()) {
         return;
     }
 
@@ -390,7 +388,7 @@ void AverageLayoutView::saveSettings()
 
 void AverageLayoutView::loadSettings()
 {
-    if(m_sSettingsPath.isEmpty()) {
+    if (m_sSettingsPath.isEmpty()) {
         return;
     }
 
@@ -401,7 +399,7 @@ void AverageLayoutView::loadSettings()
 
 void AverageLayoutView::updateGuiMode(GuiMode mode)
 {
-    switch(mode) {
+    switch (mode) {
         case GuiMode::Clinical:
             break;
         default: // default is research mode
@@ -413,7 +411,7 @@ void AverageLayoutView::updateGuiMode(GuiMode mode)
 
 void AverageLayoutView::updateProcessingMode(ProcessingMode mode)
 {
-    switch(mode) {
+    switch (mode) {
         case ProcessingMode::Offline:
             break;
         default: // default is realtime mode

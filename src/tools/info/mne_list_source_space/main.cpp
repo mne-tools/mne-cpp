@@ -54,32 +54,41 @@ using namespace Eigen;
 
 //=============================================================================================================
 
-static const char *coordFrameName(int frame)
+static const char* coordFrameName(int frame)
 {
     switch (frame) {
-    case FIFFV_COORD_MRI:     return "MRI (surface RAS)";
-    case FIFFV_COORD_HEAD:    return "Head";
-    case FIFFV_COORD_DEVICE:  return "Device";
-    case FIFFV_COORD_UNKNOWN: return "Unknown";
-    default: return "Other";
+        case FIFFV_COORD_MRI:
+            return "MRI (surface RAS)";
+        case FIFFV_COORD_HEAD:
+            return "Head";
+        case FIFFV_COORD_DEVICE:
+            return "Device";
+        case FIFFV_COORD_UNKNOWN:
+            return "Unknown";
+        default:
+            return "Other";
     }
 }
 
 //=============================================================================================================
 
-static const char *spaceTypeName(int type)
+static const char* spaceTypeName(int type)
 {
     switch (type) {
-    case FIFFV_MNE_SPACE_SURFACE: return "Surface";
-    case FIFFV_MNE_SPACE_VOLUME:  return "Volume";
-    case FIFFV_MNE_SPACE_DISCRETE: return "Discrete";
-    default: return "Unknown";
+        case FIFFV_MNE_SPACE_SURFACE:
+            return "Surface";
+        case FIFFV_MNE_SPACE_VOLUME:
+            return "Volume";
+        case FIFFV_MNE_SPACE_DISCRETE:
+            return "Discrete";
+        default:
+            return "Unknown";
     }
 }
 
 //=============================================================================================================
 
-int main(int argc, char *argv[])
+int main(int argc, char* argv[])
 {
     qInstallMessageHandler(MNELogger::customLogWriter);
     QCoreApplication app(argc, argv);
@@ -118,9 +127,14 @@ int main(int argc, char *argv[])
     bool listAll = parser.isSet(allOpt);
     [[maybe_unused]] int coordFrame = FIFFV_COORD_MRI;
     QString coordStr = parser.value(coordOpt);
-    if (coordStr == "head") coordFrame = FIFFV_COORD_HEAD;
-    else if (coordStr == "mri") coordFrame = FIFFV_COORD_MRI;
-    else { qCritical("Unknown coordinate frame: %s (use head or mri)", qPrintable(coordStr)); return 1; }
+    if (coordStr == "head")
+        coordFrame = FIFFV_COORD_HEAD;
+    else if (coordStr == "mri")
+        coordFrame = FIFFV_COORD_MRI;
+    else {
+        qCritical("Unknown coordinate frame: %s (use head or mri)", qPrintable(coordStr));
+        return 1;
+    }
 
     if (srcName.isEmpty()) {
         qCritical("--src is required.");
@@ -148,15 +162,15 @@ int main(int argc, char *argv[])
     }
 
     // Print summary
-    qInfo("Source space file : %s" , qPrintable(srcName));
-    qInfo("Number of spaces  : %d" , sourceSpaces.size());
+    qInfo("Source space file : %s", qPrintable(srcName));
+    qInfo("Number of spaces  : %d", sourceSpaces.size());
     qInfo("%s", "");
 
     int totalActive = 0;
     int totalVerts = 0;
 
     for (int s = 0; s < sourceSpaces.size(); s++) {
-        const MNESourceSpace &space = sourceSpaces[s];
+        const MNESourceSpace& space = sourceSpaces[s];
 
         int nvert = space.np;
         int nuse = space.nuse;
@@ -164,12 +178,12 @@ int main(int argc, char *argv[])
         totalActive += nuse;
         totalVerts += nvert;
 
-        qInfo("--- Space %d ---" , s + 1);
-        qInfo("  Type            : %s" , spaceTypeName(space.type));
-        qInfo("  Vertices        : %d" , nvert);
-        qInfo("  Active vertices : %d" , nuse);
-        qInfo("  Triangles       : %d" , ntri);
-        qInfo("  Coord frame     : %s" , coordFrameName(space.coord_frame));
+        qInfo("--- Space %d ---", s + 1);
+        qInfo("  Type            : %s", spaceTypeName(space.type));
+        qInfo("  Vertices        : %d", nvert);
+        qInfo("  Active vertices : %d", nuse);
+        qInfo("  Triangles       : %d", ntri);
+        qInfo("  Coord frame     : %s", coordFrameName(space.coord_frame));
 
         if (space.id == FIFFV_MNE_SURF_LEFT_HEMI)
             qInfo("  Hemisphere      : Left");
@@ -188,20 +202,26 @@ int main(int argc, char *argv[])
                 float x = space.rr(v, 0) * 1000.0f;
                 float y = space.rr(v, 1) * 1000.0f;
                 float z = space.rr(v, 2) * 1000.0f;
-                if (x < xmin) xmin = x;
-                if (x > xmax) xmax = x;
-                if (y < ymin) ymin = y;
-                if (y > ymax) ymax = y;
-                if (z < zmin) zmin = z;
-                if (z > zmax) zmax = z;
+                if (x < xmin)
+                    xmin = x;
+                if (x > xmax)
+                    xmax = x;
+                if (y < ymin)
+                    ymin = y;
+                if (y > ymax)
+                    ymax = y;
+                if (z < zmin)
+                    zmin = z;
+                if (z > zmax)
+                    zmax = z;
             }
-            qInfo("  Extent (mm)     : x [%.1f, %.1f] y [%.1f, %.1f] z [%.1f, %.1f]" ,
-                   xmin, xmax, ymin, ymax, zmin, zmax);
+            qInfo("  Extent (mm)     : x [%.1f, %.1f] y [%.1f, %.1f] z [%.1f, %.1f]",
+                  xmin, xmax, ymin, ymax, zmin, zmax);
         }
         qInfo("%s", "");
     }
 
-    qInfo("Total active vertices : %d / %d" , totalActive, totalVerts);
+    qInfo("Total active vertices : %d / %d", totalActive, totalVerts);
 
     // Write point file (MRIlab format)
     if (!pntName.isEmpty()) {
@@ -213,16 +233,17 @@ int main(int argc, char *argv[])
         QTextStream pnt(&pntFile);
 
         for (int s = 0; s < sourceSpaces.size(); s++) {
-            const MNESourceSpace &space = sourceSpaces[s];
+            const MNESourceSpace& space = sourceSpaces[s];
             for (int v = 0; v < space.np; v++) {
-                if (!listAll && space.inuse(v) == 0) continue;
+                if (!listAll && space.inuse(v) == 0)
+                    continue;
                 pnt << QString::asprintf("%10.4f %10.4f %10.4f\n",
-                    space.rr(v, 0) * 1000.0f,
-                    space.rr(v, 1) * 1000.0f,
-                    space.rr(v, 2) * 1000.0f);
+                                         space.rr(v, 0) * 1000.0f,
+                                         space.rr(v, 1) * 1000.0f,
+                                         space.rr(v, 2) * 1000.0f);
             }
         }
-        qInfo("Wrote point file: %s" , qPrintable(pntName));
+        qInfo("Wrote point file: %s", qPrintable(pntName));
     }
 
     // Write dipole file (MRIlab format: position + orientation)
@@ -236,16 +257,17 @@ int main(int argc, char *argv[])
 
         int dipNum = 1;
         for (int s = 0; s < sourceSpaces.size(); s++) {
-            const MNESourceSpace &space = sourceSpaces[s];
+            const MNESourceSpace& space = sourceSpaces[s];
             for (int v = 0; v < space.np; v++) {
-                if (!listAll && space.inuse(v) == 0) continue;
+                if (!listAll && space.inuse(v) == 0)
+                    continue;
                 dip << QString::asprintf("%5d %8.3f %8.3f %8.3f  %7.4f %7.4f %7.4f\n",
-                    dipNum++,
-                    space.rr(v, 0) * 1000.0f, space.rr(v, 1) * 1000.0f, space.rr(v, 2) * 1000.0f,
-                    space.nn(v, 0), space.nn(v, 1), space.nn(v, 2));
+                                         dipNum++,
+                                         space.rr(v, 0) * 1000.0f, space.rr(v, 1) * 1000.0f, space.rr(v, 2) * 1000.0f,
+                                         space.nn(v, 0), space.nn(v, 1), space.nn(v, 2));
             }
         }
-        qInfo("Wrote dipole file: %s" , qPrintable(dipName));
+        qInfo("Wrote dipole file: %s", qPrintable(dipName));
     }
 
     // Write vertex file (text: vertex_number x y z)
@@ -258,15 +280,16 @@ int main(int argc, char *argv[])
         QTextStream vert(&vertFile);
 
         for (int s = 0; s < sourceSpaces.size(); s++) {
-            const MNESourceSpace &space = sourceSpaces[s];
+            const MNESourceSpace& space = sourceSpaces[s];
             for (int v = 0; v < space.np; v++) {
-                if (!listAll && space.inuse(v) == 0) continue;
+                if (!listAll && space.inuse(v) == 0)
+                    continue;
                 vert << QString::asprintf("%6d %10.4f %10.4f %10.4f\n",
-                    v,
-                    space.rr(v, 0) * 1000.0f, space.rr(v, 1) * 1000.0f, space.rr(v, 2) * 1000.0f);
+                                          v,
+                                          space.rr(v, 0) * 1000.0f, space.rr(v, 1) * 1000.0f, space.rr(v, 2) * 1000.0f);
             }
         }
-        qInfo("Wrote vertex file: %s" , qPrintable(vertName));
+        qInfo("Wrote vertex file: %s", qPrintable(vertName));
     }
 
     return 0;

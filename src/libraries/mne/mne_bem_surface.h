@@ -73,8 +73,8 @@ namespace MNELIB
 class MNESHARED_EXPORT MNEBemSurface : public MNESurface
 {
 public:
-    typedef QSharedPointer<MNEBemSurface> SPtr;             /**< Shared pointer type for MNEBemSurface. */
-    typedef QSharedPointer<const MNEBemSurface> ConstSPtr;  /**< Const shared pointer type for MNEBemSurface. */
+    typedef QSharedPointer<MNEBemSurface> SPtr;            /**< Shared pointer type for MNEBemSurface. */
+    typedef QSharedPointer<const MNEBemSurface> ConstSPtr; /**< Const shared pointer type for MNEBemSurface. */
 
     //=========================================================================================================
     /**
@@ -178,9 +178,9 @@ public:
         const QList<int>& targetVertices = {2562, 10242, 40962});
 
 public:
-    Eigen::MatrixX3d tri_cent;         /**< Triangle centers. */
-    Eigen::MatrixX3d tri_nn;           /**< Triangle normals. */
-    Eigen::VectorXd tri_area;          /**< Triangle areas. */
+    Eigen::MatrixX3d tri_cent; /**< Triangle centers. */
+    Eigen::MatrixX3d tri_nn;   /**< Triangle normals. */
+    Eigen::VectorXd tri_area;  /**< Triangle areas. */
 };
 
 //=============================================================================================================

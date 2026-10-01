@@ -50,9 +50,9 @@ public:
      * @param[in] scale      Radius/size of each rendered sphere.
      * @param[in] type       Item type identifier.
      */
-    explicit SourceSpaceTreeItem(const QString &text,
-                                 const QVector<QVector3D> &positions,
-                                 const QColor &color,
+    explicit SourceSpaceTreeItem(const QString& text,
+                                 const QVector<QVector3D>& positions,
+                                 const QColor& color,
                                  float scale,
                                  int type = AbstractTreeItem::SourceSpaceItem);
     ~SourceSpaceTreeItem() = default;
@@ -74,8 +74,8 @@ public:
     float scale() const;
 
 private:
-    QVector<QVector3D> m_positions;  /**< 3D positions of all source points. */
-    float m_scale;                   /**< Radius/size for rendering. */
+    QVector<QVector3D> m_positions; /**< 3D positions of all source points. */
+    float m_scale;                  /**< Radius/size for rendering. */
 };
 
 #endif // SOURCESPACETREEITEM_H

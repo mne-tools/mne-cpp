@@ -40,8 +40,8 @@ using namespace FIFFLIB;
 
 MNEBemSurface::MNEBemSurface()
 : MNESurface()
-, tri_cent(MatrixX3d::Zero(0,3))
-, tri_nn(MatrixX3d::Zero(0,3))
+, tri_cent(MatrixX3d::Zero(0, 3))
+, tri_nn(MatrixX3d::Zero(0, 3))
 , tri_area(VectorXd::Zero(0))
 {
     id = -1;
@@ -59,15 +59,15 @@ MNEBemSurface::MNEBemSurface(const MNEBemSurface& p_MNEBemSurface)
 , tri_nn(p_MNEBemSurface.tri_nn)
 , tri_area(p_MNEBemSurface.tri_area)
 {
-    id           = p_MNEBemSurface.id;
-    np           = p_MNEBemSurface.np;
-    ntri         = p_MNEBemSurface.ntri;
-    coord_frame  = p_MNEBemSurface.coord_frame;
-    sigma        = p_MNEBemSurface.sigma;
-    rr           = p_MNEBemSurface.rr;
-    nn           = p_MNEBemSurface.nn;
-    itris        = p_MNEBemSurface.itris;
-    neighbor_tri  = p_MNEBemSurface.neighbor_tri;
+    id = p_MNEBemSurface.id;
+    np = p_MNEBemSurface.np;
+    ntri = p_MNEBemSurface.ntri;
+    coord_frame = p_MNEBemSurface.coord_frame;
+    sigma = p_MNEBemSurface.sigma;
+    rr = p_MNEBemSurface.rr;
+    nn = p_MNEBemSurface.nn;
+    itris = p_MNEBemSurface.itris;
+    neighbor_tri = p_MNEBemSurface.neighbor_tri;
     neighbor_vert = p_MNEBemSurface.neighbor_vert;
 }
 
@@ -89,8 +89,8 @@ void MNEBemSurface::clear()
     rr.resize(0, 3);
     nn.resize(0, 3);
     itris.resize(0, 3);
-    tri_cent = MatrixX3d::Zero(0,3);
-    tri_nn = MatrixX3d::Zero(0,3);
+    tri_cent = MatrixX3d::Zero(0, 3);
+    tri_nn = MatrixX3d::Zero(0, 3);
     tri_area = VectorXd::Zero(0);
     neighbor_tri.clear();
     neighbor_vert.clear();
@@ -104,23 +104,21 @@ bool MNEBemSurface::addTriangleData()
     //   Main triangulation
     //
     qInfo("\tCompleting triangulation info...");
-    this->tri_cent = MatrixX3d::Zero(this->ntri,3);
-    this->tri_nn = MatrixX3d::Zero(this->ntri,3);
+    this->tri_cent = MatrixX3d::Zero(this->ntri, 3);
+    this->tri_nn = MatrixX3d::Zero(this->ntri, 3);
     this->tri_area = VectorXd::Zero(this->ntri);
 
     Matrix3d r;
     Vector3d a, b;
     int k = 0;
     float size = 0;
-    for (qint32 i = 0; i < this->ntri; ++i)
-    {
-        for ( qint32 j = 0; j < 3; ++j)
-        {
+    for (qint32 i = 0; i < this->ntri; ++i) {
+        for (qint32 j = 0; j < 3; ++j) {
             k = this->itris(i, j);
 
-            r(j,0) = this->rr(k, 0);
-            r(j,1) = this->rr(k, 1);
-            r(j,2) = this->rr(k, 2);
+            r(j, 0) = this->rr(k, 0);
+            r(j, 1) = this->rr(k, 1);
+            r(j, 2) = this->rr(k, 2);
 
             this->tri_cent(i, 0) += this->rr(k, 0);
             this->tri_cent(i, 1) += this->rr(k, 1);
@@ -129,26 +127,26 @@ bool MNEBemSurface::addTriangleData()
         this->tri_cent.row(i) /= 3.0f;
 
         //cross product {cross((r2-r1),(r3-r1))}
-        a = (r.row(1) - r.row(0 )).transpose();
+        a = (r.row(1) - r.row(0)).transpose();
         b = (r.row(2) - r.row(0)).transpose();
-        this->tri_nn(i,0) = a(1)*b(2)-a(2)*b(1);
-        this->tri_nn(i,1) = a(2)*b(0)-a(0)*b(2);
-        this->tri_nn(i,2) = a(0)*b(1)-a(1)*b(0);
+        this->tri_nn(i, 0) = a(1) * b(2) - a(2) * b(1);
+        this->tri_nn(i, 1) = a(2) * b(0) - a(0) * b(2);
+        this->tri_nn(i, 2) = a(0) * b(1) - a(1) * b(0);
 
         //area
-        size = this->tri_nn.row(i)*this->tri_nn.row(i).transpose();
-        size = std::pow(size, 0.5f );
+        size = this->tri_nn.row(i) * this->tri_nn.row(i).transpose();
+        size = std::pow(size, 0.5f);
 
-        this->tri_area(i) = size/2.0f;
+        this->tri_area(i) = size / 2.0f;
         this->tri_nn.row(i) /= size;
     }
 
     std::fstream doc("./Output/tri_area.dat", std::ofstream::out | std::ofstream::trunc);
-    if(doc)  // if succesfully opened
+    if (doc) // if succesfully opened
     {
-      // instructions
-      doc << this->tri_area << "\n";
-      doc.close();
+        // instructions
+        doc << this->tri_area << "\n";
+        doc.close();
     }
 
     qInfo("Adding additional geometry info\n");
@@ -163,7 +161,7 @@ bool MNEBemSurface::addTriangleData()
 
 bool MNEBemSurface::add_geometry_info()
 {
-    int k,c,p,q;
+    int k, c, p, q;
     bool found;
 
     //Create neighboring triangle vector using temporary std::vector for efficient appending
@@ -171,7 +169,7 @@ bool MNEBemSurface::add_geometry_info()
         std::vector<std::vector<int>> temp_ntri(this->itris.rows());
         for (p = 0; p < this->itris.rows(); p++) {
             for (k = 0; k < 3; k++) {
-                temp_ntri[this->itris(p,k)].push_back(p);
+                temp_ntri[this->itris(p, k)].push_back(p);
             }
         }
         neighbor_tri.resize(this->itris.rows());
@@ -199,7 +197,7 @@ bool MNEBemSurface::add_geometry_info()
                             }
                         }
 
-                        if(!found) {
+                        if (!found) {
                             temp_nvert[k].push_back(vert);
                         }
                     }
@@ -219,44 +217,41 @@ bool MNEBemSurface::add_geometry_info()
 
 bool MNEBemSurface::addVertexNormals()
 {
-
     //
     //   Accumulate the vertex normals
     //
 
-//    this->nn.resize(this->np,3);
+    //    this->nn.resize(this->np,3);
 
-    for (qint32 p = 0; p < this->ntri; ++p)         //check each triangle
+    for (qint32 p = 0; p < this->ntri; ++p) //check each triangle
     {
-        for (qint32 j = 0; j < 3 ; ++j)
-        {
+        for (qint32 j = 0; j < 3; ++j) {
             int nodenr;
-            nodenr = this->itris(p,j);               //find the corners(nodes) of the triangles
-            this->nn(nodenr,0) += this->tri_nn(p,0);  //add the triangle normal to the nodenormal
-            this->nn(nodenr,1) += this->tri_nn(p,1);
-            this->nn(nodenr,2) += this->tri_nn(p,2);
+            nodenr = this->itris(p, j);                //find the corners(nodes) of the triangles
+            this->nn(nodenr, 0) += this->tri_nn(p, 0); //add the triangle normal to the nodenormal
+            this->nn(nodenr, 1) += this->tri_nn(p, 1);
+            this->nn(nodenr, 2) += this->tri_nn(p, 2);
         }
     }
 
     // normalize
-    for (qint32 p = 0; p < this->np; ++p)
-    {
+    for (qint32 p = 0; p < this->np; ++p) {
         float size = 0;
-        size = this->nn.row(p)*this->nn.row(p).transpose();
-        size = std::pow(size, 0.5f );
+        size = this->nn.row(p) * this->nn.row(p).transpose();
+        size = std::pow(size, 0.5f);
         this->nn.row(p) /= size;
     }
 
-return true;
+    return true;
 }
 
 //=============================================================================================================
 
-void MNEBemSurface::writeToStream(FiffStream *p_pStream)
+void MNEBemSurface::writeToStream(FiffStream* p_pStream)
 {
-    if(this->id <=0)
-        this->id=FIFFV_MNE_SURF_UNKNOWN;
-    if(this->sigma>0.0)
+    if (this->id <= 0)
+        this->id = FIFFV_MNE_SURF_UNKNOWN;
+    if (this->sigma > 0.0)
         p_pStream->write_float(FIFF_BEM_SIGMA, &this->sigma);
     p_pStream->write_int(FIFF_BEM_SURF_ID, &this->id);
     p_pStream->write_int(FIFF_MNE_COORD_FRAME, &this->coord_frame);
@@ -272,12 +267,17 @@ void MNEBemSurface::writeToStream(FiffStream *p_pStream)
 
 QString MNEBemSurface::id_name(int id)
 {
-    switch(id) {
-        case FIFFV_BEM_SURF_ID_BRAIN: return "Brain";
-        case FIFFV_BEM_SURF_ID_SKULL: return "Skull";
-        case FIFFV_BEM_SURF_ID_HEAD: return "Head";
-        case FIFFV_BEM_SURF_ID_UNKNOWN: return "Unknown";
-        default: return "Unknown";
+    switch (id) {
+        case FIFFV_BEM_SURF_ID_BRAIN:
+            return "Brain";
+        case FIFFV_BEM_SURF_ID_SKULL:
+            return "Skull";
+        case FIFFV_BEM_SURF_ID_HEAD:
+            return "Head";
+        case FIFFV_BEM_SURF_ID_UNKNOWN:
+            return "Unknown";
+        default:
+            return "Unknown";
     }
 }
 
@@ -321,7 +321,7 @@ QList<MNEBemSurface> MNEBemSurface::makeScalpSurfaces(
 
         // Build triangle list as std::vector for easy manipulation
         int nTri = surf.ntri;
-        std::vector<std::array<int,3>> tris(nTri);
+        std::vector<std::array<int, 3>> tris(nTri);
         for (int i = 0; i < nTri; ++i) {
             tris[i] = {surf.itris(i, 0), surf.itris(i, 1), surf.itris(i, 2)};
         }
@@ -358,9 +358,21 @@ QList<MNEBemSurface> MNEBemSurface::makeScalpSurfaces(
                 double d12 = edgeLenSq(rr, v1, v2);
                 double d20 = edgeLenSq(rr, v2, v0);
 
-                if (d01 < bestLen) { bestLen = d01; bestTri = t; bestEdge = 0; }
-                if (d12 < bestLen) { bestLen = d12; bestTri = t; bestEdge = 1; }
-                if (d20 < bestLen) { bestLen = d20; bestTri = t; bestEdge = 2; }
+                if (d01 < bestLen) {
+                    bestLen = d01;
+                    bestTri = t;
+                    bestEdge = 0;
+                }
+                if (d12 < bestLen) {
+                    bestLen = d12;
+                    bestTri = t;
+                    bestEdge = 1;
+                }
+                if (d20 < bestLen) {
+                    bestLen = d20;
+                    bestTri = t;
+                    bestEdge = 2;
+                }
             }
 
             if (bestTri < 0)
@@ -408,7 +420,7 @@ QList<MNEBemSurface> MNEBemSurface::makeScalpSurfaces(
         decimated.nn = newNn;
 
         // Rebuild triangles
-        std::vector<std::array<int,3>> newTris;
+        std::vector<std::array<int, 3>> newTris;
         for (const auto& tri : tris) {
             int a = oldToNew[resolve(tri[0])];
             int b = oldToNew[resolve(tri[1])];

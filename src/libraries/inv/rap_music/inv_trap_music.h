@@ -56,8 +56,8 @@ namespace INVLIB
  */
 struct INVSHARED_EXPORT TrapMusicDipole
 {
-    int     sourceIdx = -1;      /**< Index in the lead field grid. */
-    double  correlation = 0.0;   /**< Subspace correlation value (0..1). */
+    int sourceIdx = -1;          /**< Index in the lead field grid. */
+    double correlation = 0.0;    /**< Subspace correlation value (0..1). */
     Eigen::Vector3d position;    /**< 3D position (meters). */
     Eigen::Vector3d orientation; /**< Dipole orientation (unit vector). */
 };
@@ -98,9 +98,9 @@ public:
      * @return List of found dipoles, ordered by descending correlation.
      */
     QList<TrapMusicDipole> compute(const Eigen::MatrixXd& matLeadField,
-                                    const Eigen::MatrixXd& matData,
-                                    const Eigen::MatrixXd& matSourcePos,
-                                    int iNOrient = 3) const;
+                                   const Eigen::MatrixXd& matData,
+                                   const Eigen::MatrixXd& matSourcePos,
+                                   int iNOrient = 3) const;
 
     //=========================================================================================================
     /**
@@ -113,12 +113,12 @@ public:
      * @return Correlation vector (n_sources).
      */
     static Eigen::VectorXd scanCorrelations(const Eigen::MatrixXd& matLeadField,
-                                             const Eigen::MatrixXd& matSignalSubspace,
-                                             int iNOrient);
+                                            const Eigen::MatrixXd& matSignalSubspace,
+                                            int iNOrient);
 
 private:
-    int     m_iMaxSources;
-    double  m_dThreshold;
+    int m_iMaxSources;
+    double m_dThreshold;
 };
 
 } // namespace INVLIB

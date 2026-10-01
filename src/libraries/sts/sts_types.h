@@ -34,10 +34,11 @@ namespace STSLIB
  *
  * @brief Direction of the alternative hypothesis for a t- or F-test (left, right, or two-sided).
  */
-enum class StatsTailType {
-    Left,       /**< Left-tailed test. */
-    Right,      /**< Right-tailed test. */
-    Both        /**< Two-tailed test. */
+enum class StatsTailType
+{
+    Left,  /**< Left-tailed test. */
+    Right, /**< Right-tailed test. */
+    Both   /**< Two-tailed test. */
 };
 
 //=============================================================================================================
@@ -46,11 +47,12 @@ enum class StatsTailType {
  *
  * @brief Strategy used to control false positives when a test is repeated across many (channel, time) or (vertex, time) samples.
  */
-enum class StatsCorrection {
-    None,               /**< No correction. */
-    Bonferroni,         /**< Bonferroni correction. */
-    Fdr,                /**< False Discovery Rate (Benjamini-Hochberg). */
-    ClusterPermutation  /**< Cluster-based permutation test. */
+enum class StatsCorrection
+{
+    None,              /**< No correction. */
+    Bonferroni,        /**< Bonferroni correction. */
+    Fdr,               /**< False Discovery Rate (Benjamini-Hochberg). */
+    ClusterPermutation /**< Cluster-based permutation test. */
 };
 
 } // namespace STSLIB

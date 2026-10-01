@@ -65,8 +65,8 @@ class DISPSHARED_EXPORT SelectionScene : public LayoutScene
     Q_OBJECT
 
 public:
-    typedef QSharedPointer<SelectionScene> SPtr;              /**< Shared pointer type for SelectionScene. */
-    typedef QSharedPointer<const SelectionScene> ConstSPtr;   /**< Const shared pointer type for SelectionScene. */
+    typedef QSharedPointer<SelectionScene> SPtr;            /**< Shared pointer type for SelectionScene. */
+    typedef QSharedPointer<const SelectionScene> ConstSPtr; /**< Const shared pointer type for SelectionScene. */
 
     //=========================================================================================================
     /**
@@ -75,7 +75,7 @@ public:
      * @param[in] view    Graphics view that displays this scene.
      * @param[in] parent  Parent QObject (default 0).
      */
-    explicit SelectionScene(QGraphicsView* view, QObject *parent = 0);
+    explicit SelectionScene(QGraphicsView* view, QObject* parent = 0);
 
     //=========================================================================================================
     /**
@@ -84,7 +84,7 @@ public:
      * @param[in] layoutMap layout data map.
      * @param[in] badChannels Names of the bad channels.
      */
-    void repaintItems(const QMap<QString, QPointF> &layoutMap,
+    void repaintItems(const QMap<QString, QPointF>& layoutMap,
                       QStringList badChannels);
 
     //=========================================================================================================
@@ -95,7 +95,7 @@ public:
      */
     void hideItems(QStringList visibleItems);
 
-    int         m_iChannelTypeMode;     /**< The channel type mode. */
+    int m_iChannelTypeMode; /**< The channel type mode. */
 };
 } // NAMESPACE DISPLIB
 

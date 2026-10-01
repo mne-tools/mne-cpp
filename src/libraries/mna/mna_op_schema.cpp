@@ -60,7 +60,8 @@ bool MnaOpSchema::validate(const MnaNode& node, QStringList* errors) const
                 if (np.dataKind != sp.dataKind) {
                     if (errors)
                         errors->append(QString("Input port '%1': expected data kind '%2'")
-                                       .arg(sp.name).arg(static_cast<int>(sp.dataKind)));
+                                           .arg(sp.name)
+                                           .arg(static_cast<int>(sp.dataKind)));
                     valid = false;
                 }
                 break;

@@ -48,7 +48,7 @@ using namespace UTILSLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-BrainAMPSetupProjectWidget::BrainAMPSetupProjectWidget(BrainAMP* pBrainAMP, QWidget *parent)
+BrainAMPSetupProjectWidget::BrainAMPSetupProjectWidget(BrainAMP* pBrainAMP, QWidget* parent)
 : QWidget(parent)
 , ui(new Ui::BrainAMPSetupProjectWidget)
 , m_pBrainAMP(pBrainAMP)
@@ -72,7 +72,7 @@ BrainAMPSetupProjectWidget::BrainAMPSetupProjectWidget(BrainAMP* pBrainAMP, QWid
     connect(ui->m_pushButton_cardinalFile, &QPushButton::released, this, &BrainAMPSetupProjectWidget::changeCardinalFile);
 
     // Connect QLineEdit's
-    connect(ui->m_qLineEdit_EEGCap, static_cast<void (QLineEdit::*)(const QString &)>(&QLineEdit::textEdited),
+    connect(ui->m_qLineEdit_EEGCap, static_cast<void (QLineEdit::*)(const QString&)>(&QLineEdit::textEdited),
             this, &BrainAMPSetupProjectWidget::changeQLineEdits);
 
     initGui();
@@ -94,9 +94,9 @@ void BrainAMPSetupProjectWidget::initGui()
 
     updateCardinalComboBoxes(m_pBrainAMP->m_sElcFilePath);
 
-    ui->m_doubleSpinBox_LPA->setValue(1e2*m_pBrainAMP->m_dLPAShift);
-    ui->m_doubleSpinBox_RPA->setValue(1e2*m_pBrainAMP->m_dRPAShift);
-    ui->m_doubleSpinBox_Nasion->setValue(1e2*m_pBrainAMP->m_dNasionShift);
+    ui->m_doubleSpinBox_LPA->setValue(1e2 * m_pBrainAMP->m_dLPAShift);
+    ui->m_doubleSpinBox_RPA->setValue(1e2 * m_pBrainAMP->m_dRPAShift);
+    ui->m_doubleSpinBox_Nasion->setValue(1e2 * m_pBrainAMP->m_dNasionShift);
 
     ui->m_comboBox_LPA->setCurrentText(m_pBrainAMP->m_sLPA);
     ui->m_comboBox_RPA->setCurrentText(m_pBrainAMP->m_sRPA);
@@ -105,7 +105,7 @@ void BrainAMPSetupProjectWidget::initGui()
     ui->m_lineEdit_cardinalFile->setText(m_pBrainAMP->m_sCardinalFilePath);
 
     //Init cardinal support
-    if(m_pBrainAMP->m_bUseTrackedCardinalMode) {
+    if (m_pBrainAMP->m_bUseTrackedCardinalMode) {
         ui->m_comboBox_cardinalMode->setCurrentText("Use tracked cardinals");
         changeCardinalMode("Use tracked cardinals");
     } else if (m_pBrainAMP->m_bUseElectrodeShiftMode) {
@@ -118,7 +118,7 @@ void BrainAMPSetupProjectWidget::initGui()
 
 void BrainAMPSetupProjectWidget::changeCardinalMode(const QString& text)
 {
-    if(text == "Use tracked cardinals") {
+    if (text == "Use tracked cardinals") {
         ui->m_label_cardinal->show();
         ui->m_lineEdit_cardinalFile->show();
         ui->m_pushButton_cardinalFile->show();
@@ -135,7 +135,7 @@ void BrainAMPSetupProjectWidget::changeCardinalMode(const QString& text)
 
         m_pBrainAMP->m_bUseTrackedCardinalMode = true;
         m_pBrainAMP->m_bUseElectrodeShiftMode = false;
-    } else if(text == "Use electrode shift") {
+    } else if (text == "Use electrode shift") {
         ui->m_label_cardinal->hide();
         ui->m_lineEdit_cardinalFile->hide();
         ui->m_pushButton_cardinalFile->hide();
@@ -162,11 +162,11 @@ void BrainAMPSetupProjectWidget::changeCardinalMode(const QString& text)
 void BrainAMPSetupProjectWidget::onCardinalComboBoxChanged()
 {
     QString sLPA = ui->m_comboBox_LPA->currentText();
-    double dLPAShift = ui->m_doubleSpinBox_LPA->value()*1e-2;
+    double dLPAShift = ui->m_doubleSpinBox_LPA->value() * 1e-2;
     QString sRPA = ui->m_comboBox_RPA->currentText();
-    double dRPAShift = ui->m_doubleSpinBox_RPA->value()*1e-2;
+    double dRPAShift = ui->m_doubleSpinBox_RPA->value() * 1e-2;
     QString sNasion = ui->m_comboBox_Nasion->currentText();
-    double dNasionShift = ui->m_doubleSpinBox_Nasion->value()*1e-2;
+    double dNasionShift = ui->m_doubleSpinBox_Nasion->value() * 1e-2;
 
     emit cardinalPointsChanged(sLPA, dLPAShift, sRPA, dRPAShift, sNasion, dNasionShift);
 }
@@ -175,12 +175,12 @@ void BrainAMPSetupProjectWidget::onCardinalComboBoxChanged()
 
 void BrainAMPSetupProjectWidget::updateCardinalComboBoxes(const QString& sPath)
 {
-    QList<QVector<float> > elcLocation3D;
-    QList<QVector<float> > elcLocation2D;
+    QList<QVector<float>> elcLocation3D;
+    QList<QVector<float>> elcLocation2D;
     QString unit;
     QStringList elcChannelNames;
 
-    if(!LayoutLoader::readAsaElcFile(sPath, elcChannelNames, elcLocation3D, elcLocation2D, unit)) {
+    if (!LayoutLoader::readAsaElcFile(sPath, elcChannelNames, elcLocation3D, elcLocation2D, unit)) {
         qDebug() << "Error: Reading elc file.";
         return;
     }
@@ -200,9 +200,9 @@ void BrainAMPSetupProjectWidget::changeCap()
     QString path = QFileDialog::getOpenFileName(this,
                                                 "Change EEG cap layout",
                                                 "../resources/mne_scan/plugins/tmsi/loc_files",
-                                                 tr("Electrode location files (*.elc)"));
+                                                tr("Electrode location files (*.elc)"));
 
-    if(path==NULL){
+    if (path == NULL) {
         path = ui->m_qLineEdit_EEGCap->text();
     }
 
@@ -217,9 +217,9 @@ void BrainAMPSetupProjectWidget::changeCardinalFile()
     QString path = QFileDialog::getOpenFileName(this,
                                                 "Change cardinal file",
                                                 "../resources/mne_scan/plugins/tmsi/loc_files",
-                                                 tr("Electrode location files (*.elc)"));
+                                                tr("Electrode location files (*.elc)"));
 
-    if(path==NULL)
+    if (path == NULL)
         path = ui->m_lineEdit_cardinalFile->text();
 
     ui->m_lineEdit_cardinalFile->setText(path);

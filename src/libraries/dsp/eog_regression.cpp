@@ -114,10 +114,10 @@ void EogRegression::fit(const MatrixXd& data,
     //
     // More numerically stable: solve (E * E^T) * X = E * T^T, then beta = X^T
     //
-    MatrixXd EET = E * E.transpose();   // n_eog x n_eog
-    MatrixXd ETT = E * T.transpose();   // n_eog x n_targets
+    MatrixXd EET = E * E.transpose(); // n_eog x n_eog
+    MatrixXd ETT = E * T.transpose(); // n_eog x n_targets
 
-    m_matBeta = EET.ldlt().solve(ETT).transpose();  // n_targets x n_eog
+    m_matBeta = EET.ldlt().solve(ETT).transpose(); // n_targets x n_eog
 
     m_bFitted = true;
 }

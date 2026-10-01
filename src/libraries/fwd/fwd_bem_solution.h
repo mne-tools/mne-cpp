@@ -63,7 +63,7 @@ namespace FWDLIB
 class FWDSHARED_EXPORT FwdBemSolution
 {
 public:
-    typedef std::unique_ptr<FwdBemSolution> UPtr;         /**< Unique pointer type for FwdBemSolution. */
+    typedef std::unique_ptr<FwdBemSolution> UPtr; /**< Unique pointer type for FwdBemSolution. */
 
     //=========================================================================================================
     /**
@@ -78,9 +78,9 @@ public:
     ~FwdBemSolution();
 
 public:
-    Eigen::MatrixXf solution;          /**< Solution matrix (ncoil x np). */
-    int   ncoil;                        /**< Number of sensors. */
-    int   np;                           /**< Number of potential solution points. */
+    Eigen::MatrixXf solution; /**< Solution matrix (ncoil x np). */
+    int ncoil;                /**< Number of sensors. */
+    int np;                   /**< Number of potential solution points. */
 };
 
 //=============================================================================================================

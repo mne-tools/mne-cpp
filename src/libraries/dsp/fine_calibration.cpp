@@ -62,14 +62,22 @@ FineCalibration FineCalibration::read(const QString& sPath)
         FineCalEntry entry;
         bool ok = false;
         entry.chNumber = parts[0].toInt(&ok);
-        if (!ok) continue;
+        if (!ok)
+            continue;
 
         entry.dGain = parts[1].toDouble(&ok);
-        if (!ok) continue;
+        if (!ok)
+            continue;
 
-        double ix = parts[2].toDouble(&ok); if (!ok) continue;
-        double iy = parts[3].toDouble(&ok); if (!ok) continue;
-        double iz = parts[4].toDouble(&ok); if (!ok) continue;
+        double ix = parts[2].toDouble(&ok);
+        if (!ok)
+            continue;
+        double iy = parts[3].toDouble(&ok);
+        if (!ok)
+            continue;
+        double iz = parts[4].toDouble(&ok);
+        if (!ok)
+            continue;
         entry.imbalance = Vector3d(ix, iy, iz);
 
         cal.addEntry(entry);

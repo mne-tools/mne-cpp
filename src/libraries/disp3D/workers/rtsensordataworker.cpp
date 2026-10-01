@@ -28,14 +28,14 @@ using namespace DISP3DLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-RtSensorDataWorker::RtSensorDataWorker(QObject *parent)
-    : QObject(parent)
+RtSensorDataWorker::RtSensorDataWorker(QObject* parent)
+: QObject(parent)
 {
 }
 
 //=============================================================================================================
 
-void RtSensorDataWorker::addData(const Eigen::VectorXf &data)
+void RtSensorDataWorker::addData(const Eigen::VectorXf& data)
 {
     QMutexLocker locker(&m_mutex);
 
@@ -84,7 +84,7 @@ void RtSensorDataWorker::setNumberAverages(int numAvr)
 
 //=============================================================================================================
 
-void RtSensorDataWorker::setColormapType(const QString &name)
+void RtSensorDataWorker::setColormapType(const QString& name)
 {
     QMutexLocker locker(&m_mutex);
     m_sColormapType = name;
@@ -191,7 +191,7 @@ void RtSensorDataWorker::streamData()
 
 //=============================================================================================================
 
-QVector<uint32_t> RtSensorDataWorker::computeSurfaceColors(const Eigen::VectorXf &sensorData) const
+QVector<uint32_t> RtSensorDataWorker::computeSurfaceColors(const Eigen::VectorXf& sensorData) const
 {
     if (sensorData.size() == 0 || !m_mappingMat || m_mappingMat->rows() == 0) {
         return QVector<uint32_t>();
@@ -217,14 +217,16 @@ QVector<uint32_t> RtSensorDataWorker::computeSurfaceColors(const Eigen::VectorXf
         for (int i = 0; i < nVertices; ++i) {
             maxAbs = std::max(maxAbs, std::abs(mapped(i)));
         }
-        if (maxAbs <= 0.0f) maxAbs = 1.0f;
+        if (maxAbs <= 0.0f)
+            maxAbs = 1.0f;
         normMin = -maxAbs;
         normMax = maxAbs;
     } else {
         // Explicit thresholds
         normMin = static_cast<float>(m_dThreshMin);
         normMax = static_cast<float>(m_dThreshMax);
-        if (normMax <= normMin) normMax = normMin + 1.0f;
+        if (normMax <= normMin)
+            normMax = normMin + 1.0f;
     }
 
     float range = normMax - normMin;

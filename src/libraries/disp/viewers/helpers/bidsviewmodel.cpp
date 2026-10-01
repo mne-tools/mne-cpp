@@ -34,10 +34,9 @@ using namespace DISPLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-BidsViewModel::BidsViewModel(QObject *pParent)
+BidsViewModel::BidsViewModel(QObject* pParent)
 : QStandardItemModel(pParent)
 {
-
 }
 
 //=============================================================================================================
@@ -52,48 +51,48 @@ void BidsViewModel::addData(QModelIndex selectedItem,
                             QStandardItem* pNewItem,
                             int iDataType)
 {
-    switch(iDataType){
-    case BIDS_FUNCTIONALDATA:
-    case BIDS_ANATOMICALDATA:
-    case BIDS_BEHAVIORALDATA: {
-        if(!selectedItem.isValid()) {
-            addDataToSession(addSessionToSubject(addSubject("sub-01"), "ses-01"), pNewItem, iDataType);
-        } else {
-            if (itemFromIndex(selectedItem)->data(BIDS_ITEM_TYPE).value<int>() != BIDS_SUBJECT){
-                addDataToSession(itemFromIndex(selectedItem)->data(BIDS_ITEM_SESSION).value<QModelIndex>(),
-                                 pNewItem,
-                                 iDataType);
+    switch (iDataType) {
+        case BIDS_FUNCTIONALDATA:
+        case BIDS_ANATOMICALDATA:
+        case BIDS_BEHAVIORALDATA: {
+            if (!selectedItem.isValid()) {
+                addDataToSession(addSessionToSubject(addSubject("sub-01"), "ses-01"), pNewItem, iDataType);
             } else {
-                qDebug() << "[BidsViewModel::addData] Prompt user to select a session";
+                if (itemFromIndex(selectedItem)->data(BIDS_ITEM_TYPE).value<int>() != BIDS_SUBJECT) {
+                    addDataToSession(itemFromIndex(selectedItem)->data(BIDS_ITEM_SESSION).value<QModelIndex>(),
+                                     pNewItem,
+                                     iDataType);
+                } else {
+                    qDebug() << "[BidsViewModel::addData] Prompt user to select a session";
+                }
             }
+            break;
         }
-        break;
-    }
-    case BIDS_EVENT:
-    case BIDS_AVERAGE: {
-        if(!selectedItem.isValid()) {
-            QStandardItem* pItem = new QStandardItem("Unknown");
-            pItem->setEditable(false);
-            pItem->setDragEnabled(true);
+        case BIDS_EVENT:
+        case BIDS_AVERAGE: {
+            if (!selectedItem.isValid()) {
+                QStandardItem* pItem = new QStandardItem("Unknown");
+                pItem->setEditable(false);
+                pItem->setDragEnabled(true);
 
-            addDataToSession(addSessionToSubject(addSubject("sub-01"), "ses-01"), pItem, BIDS_UNKNOWN);
-            addToData(pNewItem,
-                      indexFromItem(pItem),
-                      iDataType);
-        } else {
-        addToData(pNewItem,
-                  selectedItem,
-                  iDataType);
+                addDataToSession(addSessionToSubject(addSubject("sub-01"), "ses-01"), pItem, BIDS_UNKNOWN);
+                addToData(pNewItem,
+                          indexFromItem(pItem),
+                          iDataType);
+            } else {
+                addToData(pNewItem,
+                          selectedItem,
+                          iDataType);
+            }
+            break;
         }
-        break;
-    }
     }
 }
 
 //=============================================================================================================
 
-void BidsViewModel::addToData(QStandardItem *pNewAvgItem,
-                              const QModelIndex &parentIndex,
+void BidsViewModel::addToData(QStandardItem* pNewAvgItem,
+                              const QModelIndex& parentIndex,
                               int iDataType)
 {
     QStandardItem* selectedData = itemFromIndex(parentIndex);
@@ -109,12 +108,12 @@ void BidsViewModel::addToData(QStandardItem *pNewAvgItem,
 
 //=============================================================================================================
 
-QModelIndex BidsViewModel::addSubject(const QString &sSubjectName)
+QModelIndex BidsViewModel::addSubject(const QString& sSubjectName)
 {
     //Ensure subject name follow BIDS format
     QString sNewSubjectName;
 
-    if(!sSubjectName.startsWith("sub-")){
+    if (!sSubjectName.startsWith("sub-")) {
         sNewSubjectName = "sub-" + sSubjectName;
     } else {
         sNewSubjectName = sSubjectName;
@@ -136,13 +135,13 @@ QModelIndex BidsViewModel::addSubject(const QString &sSubjectName)
 
 //=============================================================================================================
 
-QModelIndex BidsViewModel::addSessionToSubject(const QString &sSubjectName,
-                                               const QString &sSessionName)
+QModelIndex BidsViewModel::addSessionToSubject(const QString& sSubjectName,
+                                               const QString& sSessionName)
 {
     //Ensure session name follow BIDS format
     QString sNewSessionName;
 
-    if(!sSessionName.startsWith("ses-")){
+    if (!sSessionName.startsWith("ses-")) {
         sNewSessionName = "ses-" + sSessionName;
     } else {
         sNewSessionName = sSessionName;
@@ -167,10 +166,10 @@ QModelIndex BidsViewModel::addSessionToSubject(const QString &sSubjectName,
     QStandardItem* pNewSessionItem = nullptr;
 
     //Add session to subjects with mathcing names. Renames them if multiple.
-    for (int i = 0; i < listItems.size(); i++){
+    for (int i = 0; i < listItems.size(); i++) {
         QStandardItem* pSubjectItem = listItems.at(i);
 
-        if(bRepeat){
+        if (bRepeat) {
             pSubjectItem->setText(pSubjectItem->text() + QString::number(i + 1));
         }
 
@@ -185,7 +184,7 @@ QModelIndex BidsViewModel::addSessionToSubject(const QString &sSubjectName,
         emit newItemIndex(pNewSessionItem->index());
     }
 
-    if(!pNewSessionItem) {
+    if (!pNewSessionItem) {
         return QModelIndex();
     }
 
@@ -195,12 +194,12 @@ QModelIndex BidsViewModel::addSessionToSubject(const QString &sSubjectName,
 //=============================================================================================================
 
 QModelIndex BidsViewModel::addSessionToSubject(QModelIndex subjectIndex,
-                                               const QString &sSessionName)
+                                               const QString& sSessionName)
 {
     //Ensure session name follow BIDS format
     QString sNewSessionName;
 
-    if(!sSessionName.startsWith("ses-")){
+    if (!sSessionName.startsWith("ses-")) {
         sNewSessionName = "ses-" + sSessionName;
     } else {
         sNewSessionName = sSessionName;
@@ -225,7 +224,7 @@ QModelIndex BidsViewModel::addSessionToSubject(QModelIndex subjectIndex,
 //=============================================================================================================
 
 QModelIndex BidsViewModel::addDataToSession(QModelIndex sessionIndex,
-                                            QStandardItem *pNewItem,
+                                            QStandardItem* pNewItem,
                                             int iDataType)
 {
     QStandardItem* pSessionItem = itemFromIndex(sessionIndex);
@@ -234,7 +233,7 @@ QModelIndex BidsViewModel::addDataToSession(QModelIndex sessionIndex,
 
     QString sFolderName;
 
-    switch (iDataType){
+    switch (iDataType) {
         case BIDS_FUNCTIONALDATA:
             sFolderName = "func";
             break;
@@ -248,14 +247,14 @@ QModelIndex BidsViewModel::addDataToSession(QModelIndex sessionIndex,
             sFolderName = "unknown";
     }
 
-    for(iFolder = 0; iFolder < pSessionItem->rowCount(); iFolder++){
-        if (pSessionItem->child(iFolder)->text() == sFolderName){
+    for (iFolder = 0; iFolder < pSessionItem->rowCount(); iFolder++) {
+        if (pSessionItem->child(iFolder)->text() == sFolderName) {
             bFolder = true;
             break;
         }
     }
 
-    if(!bFolder) {
+    if (!bFolder) {
         QStandardItem* pFunctionalItem = new QStandardItem(sFolderName);
         pFunctionalItem->setData(QVariant::fromValue(BIDS_FOLDER), BIDS_ITEM_TYPE);
         pFunctionalItem->setData(QVariant::fromValue(sessionIndex), BIDS_ITEM_SESSION);
@@ -264,10 +263,10 @@ QModelIndex BidsViewModel::addDataToSession(QModelIndex sessionIndex,
         pSessionItem->setChild(pSessionItem->rowCount(),
                                pFunctionalItem);
         pFunctionalItem->setChild(pFunctionalItem->rowCount(),
-                           pNewItem);
+                                  pNewItem);
     } else {
         pSessionItem->child(iFolder)->setChild(pSessionItem->child(iFolder)->rowCount(),
-                                                  pNewItem);
+                                               pNewItem);
     }
 
     pNewItem->setData(QVariant::fromValue(iDataType), BIDS_ITEM_TYPE);
@@ -294,7 +293,7 @@ QModelIndex BidsViewModel::moveSessionToSubject(QModelIndex subjectIndex,
     subjectItem->setChild(subjectItem->rowCount(), sessionItem);
     subjectItem->setData(subjectIndex, BIDS_ITEM_SUBJECT);
 
-    for (int i = 0; i < sessionItem->rowCount(); i++){
+    for (int i = 0; i < sessionItem->rowCount(); i++) {
         sessionItem->child(i)->setData(subjectIndex, BIDS_ITEM_SUBJECT);
         for (int j = 0; j < sessionItem->child(i)->rowCount(); j++) {
             sessionItem->child(i)->child(j)->setData(subjectIndex, BIDS_ITEM_SUBJECT);
@@ -317,7 +316,7 @@ QModelIndex BidsViewModel::moveDataToSession(QModelIndex sessionIndex,
 
     QStandardItem* dataItem = itemFromIndex(dataIndex);
 
-    if(dataItem->parent()->rowCount() < 2){
+    if (dataItem->parent()->rowCount() < 2) {
         QStandardItem* parent = dataItem->parent();
 
         dataItem->parent()->takeRow(dataItem->row()).first();
@@ -327,17 +326,17 @@ QModelIndex BidsViewModel::moveDataToSession(QModelIndex sessionIndex,
     }
 
     QModelIndex newIndex;
-//    switch(dataItem->data(ITEM_TYPE).value<int>()){
-//        case FUNCTIONALDATA:{
-//            newIndex = addDataToSession(sessionIndex,
-//                                        dataItem,
-//                                        FUNCTIONALDATA);
-//            break;
-//        }
-//        default:{
-//            qWarning() << "[BidsViewModel::moveDataToSession] Move not supported for this type of data";
-//        }
-//    }
+    //    switch(dataItem->data(ITEM_TYPE).value<int>()){
+    //        case FUNCTIONALDATA:{
+    //            newIndex = addDataToSession(sessionIndex,
+    //                                        dataItem,
+    //                                        FUNCTIONALDATA);
+    //            break;
+    //        }
+    //        default:{
+    //            qWarning() << "[BidsViewModel::moveDataToSession] Move not supported for this type of data";
+    //        }
+    //    }
 
     newIndex = addDataToSession(sessionIndex,
                                 dataItem,
@@ -355,7 +354,7 @@ QModelIndex BidsViewModel::moveDataToSession(QModelIndex sessionIndex,
 
 bool BidsViewModel::removeItem(QModelIndex itemIndex)
 {
-    if(!itemIndex.isValid()){
+    if (!itemIndex.isValid()) {
         return false;
     }
 
@@ -365,33 +364,33 @@ bool BidsViewModel::removeItem(QModelIndex itemIndex)
 
     qInfo() << "Deleting" << pItem->text();
 
-    switch(pItem->data(BIDS_ITEM_TYPE).value<int>()){
+    switch (pItem->data(BIDS_ITEM_TYPE).value<int>()) {
         case BIDS_SUBJECT:
-            if(removeRows(itemIndex.row(), 1, itemIndex.parent())){
+            if (removeRows(itemIndex.row(), 1, itemIndex.parent())) {
                 endResetModel();
             }
             return true;
         case BIDS_SESSION:
-            if(removeRows(itemIndex.row(), 1, itemIndex.parent())){
+            if (removeRows(itemIndex.row(), 1, itemIndex.parent())) {
                 endResetModel();
             }
             return true;
         case BIDS_BEHAVIORALDATA:
         case BIDS_ANATOMICALDATA:
         case BIDS_FUNCTIONALDATA:
-            if(removeRows(itemIndex.row(), 1, itemIndex.parent())){
+            if (removeRows(itemIndex.row(), 1, itemIndex.parent())) {
                 endResetModel();
             }
             return true;
         case BIDS_AVERAGE:
         case BIDS_EVENT:
         case BIDS_DIPOLE:
-            if(removeRows(itemIndex.row(), 1, itemIndex.parent())){
+            if (removeRows(itemIndex.row(), 1, itemIndex.parent())) {
                 endResetModel();
             }
             return true;
         default:
-            if(removeRows(itemIndex.row(), 1, itemIndex.parent())){
+            if (removeRows(itemIndex.row(), 1, itemIndex.parent())) {
                 endResetModel();
             }
             return true;

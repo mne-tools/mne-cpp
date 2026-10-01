@@ -52,26 +52,31 @@ namespace BABYMEGPLUGIN
  */
 class BABYMEGSHARED_EXPORT PlotSettings
 {
-
 public:
     PlotSettings();
 
     void scroll(int dx, int dy);
     void adjust();
-    double spanX() const { return maxX - minX; }
-    double spanY() const { return maxY - minY; }
+    double spanX() const
+    {
+        return maxX - minX;
+    }
+    double spanY() const
+    {
+        return maxY - minY;
+    }
 
-    double      minX;
-    double      maxX;
-    int         numXTicks;
-    int         numYTicks;
-    double      minY;
-    double      maxY;
-    QString     xlabel;
-    QString     ylabel;
+    double minX;
+    double maxX;
+    int numXTicks;
+    int numYTicks;
+    double minY;
+    double maxY;
+    QString xlabel;
+    QString ylabel;
 
 private:
-    static void adjustAxis(double &min, double &max, int &numTicks);
+    static void adjustAxis(double& min, double& max, int& numTicks);
 };
 
 //=============================================================================================================
@@ -85,41 +90,45 @@ class BABYMEGSHARED_EXPORT Plotter : public QWidget
     Q_OBJECT
 
 public:
-    Plotter(QWidget *parent=0);
+    Plotter(QWidget* parent = 0);
 
-    void setPlotSettings(const PlotSettings &settings);
-    void setCurveData(int id, const QVector <QPointF>  &curveData);
+    void setPlotSettings(const PlotSettings& settings);
+    void setCurveData(int id, const QVector<QPointF>& curveData);
     void clearCurve(int id);
 
     QSize minimumSizeHint() const;
     QSize sizeHint() const;
 
-//public slots:
-//    void zoomIn();
-//    void zoomOut();
+    //public slots:
+    //    void zoomIn();
+    //    void zoomOut();
 
 protected:
-    void paintEvent(QPaintEvent *event);
-    void resizeEvent(QResizeEvent *event);
+    void paintEvent(QPaintEvent* event);
+    void resizeEvent(QResizeEvent* event);
 
 private:
     void updateRubberBandRegion();
     void refreshPixmap();
-    void drawGrid(QPainter *painter);
-    void drawCurve(QPainter *painter);
-    void drawRotatedText(QPainter *painter, int x, int y, const QString &text);
+    void drawGrid(QPainter* painter);
+    void drawCurve(QPainter* painter);
+    void drawRotatedText(QPainter* painter, int x, int y, const QString& text);
 
-    enum {Margin = 30, xMargin = 80};
+    enum
+    {
+        Margin = 30,
+        xMargin = 80
+    };
 
-//    QToolButton *zoomInButton;
-//    QToolButton *zoomOutButton;
+    //    QToolButton *zoomInButton;
+    //    QToolButton *zoomOutButton;
 
-    QMap<int, QVector<QPointF> >    curveMap;
-    QVector<PlotSettings>           zoomStack;
-    int                             curZoom;
-    bool                            rubberBandIsShown;
-    QRect                           rubberBandRect;
-    QPixmap                         pixmap;
+    QMap<int, QVector<QPointF>> curveMap;
+    QVector<PlotSettings> zoomStack;
+    int curZoom;
+    bool rubberBandIsShown;
+    QRect rubberBandRect;
+    QPixmap pixmap;
 };
 } // NAMESPACE
 

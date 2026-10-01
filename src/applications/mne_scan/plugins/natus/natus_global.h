@@ -32,12 +32,13 @@
 //=============================================================================================================
 
 #if defined(SCAN_NATUS_PLUGIN)
-#  define NATUSSHARED_EXPORT Q_DECL_EXPORT    /**< Q_DECL_EXPORT must be added to the declarations of symbols used when compiling a shared library. */
+#define NATUSSHARED_EXPORT Q_DECL_EXPORT /**< Q_DECL_EXPORT must be added to the declarations of symbols used when compiling a shared library. */
 #else
-#  define NATUSSHARED_EXPORT Q_DECL_IMPORT    /**< Q_DECL_IMPORT must be added to the declarations of symbols used when compiling a client that uses the shared library. */
+#define NATUSSHARED_EXPORT Q_DECL_IMPORT /**< Q_DECL_IMPORT must be added to the declarations of symbols used when compiling a client that uses the shared library. */
 #endif
 
-namespace NATUSPLUGIN{
+namespace NATUSPLUGIN
+{
 
 //=============================================================================================================
 /**

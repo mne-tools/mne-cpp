@@ -58,27 +58,30 @@ using namespace Eigen;
 class RulerHeaderWidget : public QWidget
 {
 public:
-    explicit RulerHeaderWidget(QWidget *parent = nullptr) : QWidget(parent)
+    explicit RulerHeaderWidget(QWidget* parent = nullptr)
+    : QWidget(parent)
     {
         setFixedHeight(TimeRulerWidget::kTotalH);
         setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
     }
 
-    void setClockTimeFormat(bool useClock) {
-        if (m_useClock == useClock) return;
+    void setClockTimeFormat(bool useClock)
+    {
+        if (m_useClock == useClock)
+            return;
         m_useClock = useClock;
         update();
     }
 
 protected:
-    void paintEvent(QPaintEvent *) override
+    void paintEvent(QPaintEvent*) override
     {
         QPainter p(this);
         p.setRenderHint(QPainter::TextAntialiasing, true);
 
         const int kStimH = TimeRulerWidget::kStimZoneH;
         const int kTimeH = TimeRulerWidget::kTimeZoneH;
-        const int W      = width();
+        const int W = width();
 
         // Time zone background (top) — matches ruler time lane
         p.fillRect(QRect(0, 0, W, kTimeH), QColor(245, 245, 247));
@@ -129,12 +132,12 @@ private:
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-ChannelDataView::ChannelDataView(const QString &sSettingsPath,
-                                 QWidget *parent,
+ChannelDataView::ChannelDataView(const QString& sSettingsPath,
+                                 QWidget* parent,
                                  Qt::WindowFlags f)
-    : AbstractView(parent, f)
-    , m_sSettingsPath(sSettingsPath)
-    , m_pModel(new ChannelDataModel(this))
+: AbstractView(parent, f)
+, m_sSettingsPath(sSettingsPath)
+, m_pModel(new ChannelDataModel(this))
 {
     setupLayout();
     loadSettings();
@@ -151,7 +154,7 @@ ChannelDataView::~ChannelDataView()
 
 void ChannelDataView::setupLayout()
 {
-    auto *outerLayout = new QVBoxLayout(this);
+    auto* outerLayout = new QVBoxLayout(this);
     outerLayout->setContentsMargins(0, 0, 0, 0);
     outerLayout->setSpacing(0);
 
@@ -162,12 +165,12 @@ void ChannelDataView::setupLayout()
     //     traceCol (VBox): [stimStrip(22px) | ruler(28px) | rhiView(flex)]
     //     rightCol (VBox): [spacer(22px) | scrollModeBtn(28px) | chanSB   ]
 
-    auto *renderRow = new QHBoxLayout();
+    auto* renderRow = new QHBoxLayout();
     renderRow->setContentsMargins(0, 0, 0, 0);
     renderRow->setSpacing(0);
 
     // ── Left column ───────────────────────────────────────────────────────
-    auto *leftCol = new QVBoxLayout();
+    auto* leftCol = new QVBoxLayout();
     leftCol->setContentsMargins(0, 0, 0, 0);
     leftCol->setSpacing(0);
 
@@ -181,7 +184,7 @@ void ChannelDataView::setupLayout()
     renderRow->addLayout(leftCol, 0);
 
     // ── Centre column: unified ruler (stim+time) + RHI view ──────────────
-    auto *traceColumn = new QVBoxLayout();
+    auto* traceColumn = new QVBoxLayout();
     traceColumn->setContentsMargins(0, 0, 0, 0);
     traceColumn->setSpacing(0);
 
@@ -198,13 +201,13 @@ void ChannelDataView::setupLayout()
     renderRow->addLayout(traceColumn, 1);
 
     // ── Right column: spacer (ruler height) + channel scrollbar ─────────
-    auto *rightCol = new QVBoxLayout();
+    auto* rightCol = new QVBoxLayout();
     rightCol->setContentsMargins(0, 0, 0, 0);
     rightCol->setSpacing(0);
 
     // Spacer that aligns with the ruler height so the channel scrollbar
     // starts exactly where the channel area begins.
-    auto *rulerSpacer = new QWidget(this);
+    auto* rulerSpacer = new QWidget(this);
     rulerSpacer->setFixedHeight(TimeRulerWidget::kTotalH);
     rulerSpacer->setVisible(true);
     rightCol->addWidget(rulerSpacer, 0);
@@ -230,7 +233,7 @@ void ChannelDataView::setupLayout()
     // ── Bottom row: horizontal scroll bar + scroll-mode toggle ───────────
     // The scroll-mode button lives at the bottom-right corner, between the
     // horizontal and vertical scrollbars, so it doesn't crowd the ruler area.
-    auto *bottomRow = new QHBoxLayout();
+    auto* bottomRow = new QHBoxLayout();
     bottomRow->setContentsMargins(0, 0, 0, 0);
     bottomRow->setSpacing(0);
 
@@ -245,7 +248,7 @@ void ChannelDataView::setupLayout()
 
     m_pScrollModeButton = new QToolButton(this);
     m_pScrollModeButton->setCheckable(true);
-    m_pScrollModeButton->setChecked(true);  // default: ↕ = channels
+    m_pScrollModeButton->setChecked(true); // default: ↕ = channels
     m_pScrollModeButton->setText(QStringLiteral("\u2195 Ch"));
     m_pScrollModeButton->setToolTip(QStringLiteral(
         "Vertical mouse wheel:\n"
@@ -406,7 +409,7 @@ void ChannelDataView::init(QSharedPointer<FiffInfo> pInfo)
 void ChannelDataView::setFileBounds(int first, int last)
 {
     m_firstFileSample = first;
-    m_lastFileSample  = last;
+    m_lastFileSample = last;
     if (m_pRhiView) {
         m_pRhiView->setFirstFileSample(first);
         m_pRhiView->setLastFileSample(last);
@@ -422,7 +425,7 @@ void ChannelDataView::setFileBounds(int first, int last)
 
 //=============================================================================================================
 
-void ChannelDataView::setData(const MatrixXd &matData, int firstSample)
+void ChannelDataView::setData(const MatrixXd& matData, int firstSample)
 {
     m_pModel->setData(matData, firstSample);
     updateScrollBarRange();
@@ -430,7 +433,7 @@ void ChannelDataView::setData(const MatrixXd &matData, int firstSample)
 
 //=============================================================================================================
 
-void ChannelDataView::addData(const MatrixXd &matData)
+void ChannelDataView::addData(const MatrixXd& matData)
 {
     m_pModel->appendData(matData);
     updateScrollBarRange();
@@ -477,7 +480,7 @@ double ChannelDataView::zoom() const
 
 //=============================================================================================================
 
-void ChannelDataView::setBackgroundColor(const QColor &color)
+void ChannelDataView::setBackgroundColor(const QColor& color)
 {
     m_bgColor = color;
     if (m_pRhiView)
@@ -494,7 +497,7 @@ QColor ChannelDataView::backgroundColor() const
 
 //=============================================================================================================
 
-void ChannelDataView::setSignalColor(const QColor &color)
+void ChannelDataView::setSignalColor(const QColor& color)
 {
     m_signalColor = color;
     m_pModel->setSignalColor(color);
@@ -510,7 +513,7 @@ QColor ChannelDataView::signalColor() const
 
 //=============================================================================================================
 
-void ChannelDataView::setScalingMap(const QMap<qint32, float> &scaleMap)
+void ChannelDataView::setScalingMap(const QMap<qint32, float>& scaleMap)
 {
     m_scaleMap = scaleMap;
     m_pModel->setScaleMap(scaleMap);
@@ -544,7 +547,7 @@ bool ChannelDataView::badChannelsHidden() const
 
 //=============================================================================================================
 
-void ChannelDataView::setChannelFilter(const QStringList &names)
+void ChannelDataView::setChannelFilter(const QStringList& names)
 {
     QVector<int> indices;
     if (!names.isEmpty() && m_pModel) {
@@ -588,7 +591,7 @@ DetrendMode ChannelDataView::detrendMode() const
 
 //=============================================================================================================
 
-void ChannelDataView::setEvents(const QVector<ChannelRhiView::EventMarker> &events)
+void ChannelDataView::setEvents(const QVector<ChannelRhiView::EventMarker>& events)
 {
     if (m_pRhiView)
         m_pRhiView->setEvents(events);
@@ -599,7 +602,7 @@ void ChannelDataView::setEvents(const QVector<ChannelRhiView::EventMarker> &even
     if (m_pTimeRuler) {
         QVector<TimeRulerEventMark> rulerMarks;
         rulerMarks.reserve(events.size());
-        for (const auto &ev : events)
+        for (const auto& ev : events)
             rulerMarks.append({ev.sample, ev.color, ev.label});
         m_pTimeRuler->setEvents(rulerMarks);
     }
@@ -607,7 +610,7 @@ void ChannelDataView::setEvents(const QVector<ChannelRhiView::EventMarker> &even
 
 //=============================================================================================================
 
-void ChannelDataView::setEpochMarkers(const QVector<int> &triggerSamples)
+void ChannelDataView::setEpochMarkers(const QVector<int>& triggerSamples)
 {
     if (m_pRhiView)
         m_pRhiView->setEpochMarkers(triggerSamples);
@@ -648,7 +651,7 @@ bool ChannelDataView::zScoreMode() const
 
 //=============================================================================================================
 
-void ChannelDataView::setReferenceMarkers(const QVector<TimeRulerReferenceMark> &markers)
+void ChannelDataView::setReferenceMarkers(const QVector<TimeRulerReferenceMark>& markers)
 {
     if (m_pTimeRuler)
         m_pTimeRuler->setReferenceMarkers(markers);
@@ -656,7 +659,7 @@ void ChannelDataView::setReferenceMarkers(const QVector<TimeRulerReferenceMark> 
 
 //=============================================================================================================
 
-void ChannelDataView::setAnnotations(const QVector<ChannelRhiView::AnnotationSpan> &annotations)
+void ChannelDataView::setAnnotations(const QVector<ChannelRhiView::AnnotationSpan>& annotations)
 {
     if (m_pRhiView)
         m_pRhiView->setAnnotations(annotations);
@@ -733,8 +736,7 @@ void ChannelDataView::sortChannelsByType()
 
     // Define a canonical type ordering
     static const QStringList typeOrder = {
-        "MEG grad", "MEG mag", "EEG", "EOG", "ECG", "EMG", "STIM", "MISC"
-    };
+        "MEG grad", "MEG mag", "EEG", "EOG", "ECG", "EMG", "STIM", "MISC"};
 
     const int n = m_pModel->channelCount();
     QVector<int> indices(n);
@@ -743,8 +745,10 @@ void ChannelDataView::sortChannelsByType()
     std::stable_sort(indices.begin(), indices.end(), [&](int a, int b) {
         int ia = typeOrder.indexOf(m_pModel->channelInfo(a).typeLabel);
         int ib = typeOrder.indexOf(m_pModel->channelInfo(b).typeLabel);
-        if (ia < 0) ia = typeOrder.size();
-        if (ib < 0) ib = typeOrder.size();
+        if (ia < 0)
+            ia = typeOrder.size();
+        if (ib < 0)
+            ib = typeOrder.size();
         return ia < ib;
     });
 
@@ -861,16 +865,14 @@ int ChannelDataView::sampleToViewportX(int sample) const
     const QRect viewportRect = signalViewportRect();
     const int visibleSamples = qMax(1, visibleSampleCount());
 
-    if(viewportRect.width() <= 0) {
+    if (viewportRect.width() <= 0) {
         return viewportRect.left();
     }
 
-    const double samplesPerPixel = static_cast<double>(visibleSamples)
-                                 / static_cast<double>(viewportRect.width());
+    const double samplesPerPixel = static_cast<double>(visibleSamples) / static_cast<double>(viewportRect.width());
     const double xOffset = static_cast<double>(sample - firstVisibleSample()) / samplesPerPixel;
 
-    return viewportRect.left()
-           + qBound(0, qRound(xOffset), viewportRect.width() - 1);
+    return viewportRect.left() + qBound(0, qRound(xOffset), viewportRect.width() - 1);
 }
 
 //=============================================================================================================
@@ -880,16 +882,14 @@ int ChannelDataView::viewportXToSample(int x) const
     const QRect viewportRect = signalViewportRect();
     const int visibleSamples = qMax(1, visibleSampleCount());
 
-    if(viewportRect.width() <= 0) {
+    if (viewportRect.width() <= 0) {
         return firstVisibleSample();
     }
 
     const int clampedX = qBound(viewportRect.left(), x, viewportRect.right());
-    const double samplesPerPixel = static_cast<double>(visibleSamples)
-                                 / static_cast<double>(viewportRect.width());
+    const double samplesPerPixel = static_cast<double>(visibleSamples) / static_cast<double>(viewportRect.width());
 
-    return firstVisibleSample()
-           + qRound(static_cast<double>(clampedX - viewportRect.left()) * samplesPerPixel);
+    return firstVisibleSample() + qRound(static_cast<double>(clampedX - viewportRect.left()) * samplesPerPixel);
 }
 
 //=============================================================================================================
@@ -900,9 +900,9 @@ void ChannelDataView::saveSettings()
         return;
     QSettings s;
     s.setValue(m_sSettingsPath + "/windowSizeSeconds", m_windowSizeSeconds);
-    s.setValue(m_sSettingsPath + "/zoomFactor",        m_zoomFactor);
-    s.setValue(m_sSettingsPath + "/backgroundColor",   m_bgColor);
-    s.setValue(m_sSettingsPath + "/signalColor",       m_signalColor);
+    s.setValue(m_sSettingsPath + "/zoomFactor", m_zoomFactor);
+    s.setValue(m_sSettingsPath + "/backgroundColor", m_bgColor);
+    s.setValue(m_sSettingsPath + "/signalColor", m_signalColor);
 }
 
 //=============================================================================================================
@@ -912,15 +912,15 @@ void ChannelDataView::loadSettings()
     if (m_sSettingsPath.isEmpty())
         return;
     QSettings s;
-    float rawWindowSec  = s.value(m_sSettingsPath + "/windowSizeSeconds", 10.f).toFloat();
+    float rawWindowSec = s.value(m_sSettingsPath + "/windowSizeSeconds", 10.f).toFloat();
     m_windowSizeSeconds = qBound(0.5f, rawWindowSec, 120.f);
     // Remove stale out-of-range value so next session starts clean.
     if (rawWindowSec != m_windowSizeSeconds)
         s.remove(m_sSettingsPath + "/windowSizeSeconds");
 
-    m_zoomFactor  = s.value(m_sSettingsPath + "/zoomFactor",        1.0).toDouble();
-    m_bgColor     = s.value(m_sSettingsPath + "/backgroundColor",   QColor(250, 250, 250)).value<QColor>();
-    m_signalColor = s.value(m_sSettingsPath + "/signalColor",       QColor(Qt::darkGreen)).value<QColor>();
+    m_zoomFactor = s.value(m_sSettingsPath + "/zoomFactor", 1.0).toDouble();
+    m_bgColor = s.value(m_sSettingsPath + "/backgroundColor", QColor(250, 250, 250)).value<QColor>();
+    m_signalColor = s.value(m_sSettingsPath + "/signalColor", QColor(Qt::darkGreen)).value<QColor>();
 
     // Propagate loaded colors to the sub-views (they may have been created
     // with defaults in setupLayout() before loadSettings() ran).
@@ -950,13 +950,17 @@ void ChannelDataView::clearView()
 
 //=============================================================================================================
 
-void ChannelDataView::updateGuiMode(GuiMode /*mode*/) {}
+void ChannelDataView::updateGuiMode(GuiMode /*mode*/)
+{
+}
 
-void ChannelDataView::updateProcessingMode(ProcessingMode /*mode*/) {}
+void ChannelDataView::updateProcessingMode(ProcessingMode /*mode*/)
+{
+}
 
 //=============================================================================================================
 
-void ChannelDataView::keyPressEvent(QKeyEvent *event)
+void ChannelDataView::keyPressEvent(QKeyEvent* event)
 {
     if (!m_pRhiView) {
         QWidget::keyPressEvent(event);
@@ -967,108 +971,111 @@ void ChannelDataView::keyPressEvent(QKeyEvent *event)
     float page = m_pRhiView->visibleSampleCount() * 0.9f;
 
     switch (event->key()) {
-    case Qt::Key_Left:
-        m_pRhiView->scrollTo(m_pRhiView->scrollSample() - step, 150);
-        break;
-    case Qt::Key_Right:
-        m_pRhiView->scrollTo(m_pRhiView->scrollSample() + step, 150);
-        break;
-    case Qt::Key_PageUp:
-        m_pRhiView->scrollTo(m_pRhiView->scrollSample() - page, 200);
-        break;
-    case Qt::Key_PageDown:
-        m_pRhiView->scrollTo(m_pRhiView->scrollSample() + page, 200);
-        break;
-    case Qt::Key_Home:
-        m_pRhiView->scrollTo(static_cast<float>(m_pModel->firstSample()), 300);
-        break;
-    case Qt::Key_End:
-        {
+        case Qt::Key_Left:
+            m_pRhiView->scrollTo(m_pRhiView->scrollSample() - step, 150);
+            break;
+        case Qt::Key_Right:
+            m_pRhiView->scrollTo(m_pRhiView->scrollSample() + step, 150);
+            break;
+        case Qt::Key_PageUp:
+            m_pRhiView->scrollTo(m_pRhiView->scrollSample() - page, 200);
+            break;
+        case Qt::Key_PageDown:
+            m_pRhiView->scrollTo(m_pRhiView->scrollSample() + page, 200);
+            break;
+        case Qt::Key_Home:
+            m_pRhiView->scrollTo(static_cast<float>(m_pModel->firstSample()), 300);
+            break;
+        case Qt::Key_End: {
             float lastStart = static_cast<float>(
-                m_pModel->firstSample() + m_pModel->totalSamples()
-                - m_pRhiView->visibleSampleCount());
+                m_pModel->firstSample() + m_pModel->totalSamples() - m_pRhiView->visibleSampleCount());
             m_pRhiView->scrollTo(qMax(lastStart, 0.f), 300);
-        }
-        break;
-    case Qt::Key_Plus:
-    case Qt::Key_Equal:
-        m_pRhiView->zoomTo(m_pRhiView->samplesPerPixel() * 0.75f, 200);
-        break;
-    case Qt::Key_Minus:
-        m_pRhiView->zoomTo(m_pRhiView->samplesPerPixel() * 1.33f, 200);
-        break;
-    case Qt::Key_B:
-        setButterflyMode(!butterflyMode());
-        emit butterflyToggled(butterflyMode());
-        break;
-    case Qt::Key_D:
-        if (m_pModel) {
-            // Cycle: None → Mean → Linear → None
-            switch (m_pModel->detrendMode()) {
-            case DetrendMode::None:   m_pModel->setDetrendMode(DetrendMode::Mean);   break;
-            case DetrendMode::Mean:   m_pModel->setDetrendMode(DetrendMode::Linear); break;
-            case DetrendMode::Linear: m_pModel->setDetrendMode(DetrendMode::None);   break;
+        } break;
+        case Qt::Key_Plus:
+        case Qt::Key_Equal:
+            m_pRhiView->zoomTo(m_pRhiView->samplesPerPixel() * 0.75f, 200);
+            break;
+        case Qt::Key_Minus:
+            m_pRhiView->zoomTo(m_pRhiView->samplesPerPixel() * 1.33f, 200);
+            break;
+        case Qt::Key_B:
+            setButterflyMode(!butterflyMode());
+            emit butterflyToggled(butterflyMode());
+            break;
+        case Qt::Key_D:
+            if (m_pModel) {
+                // Cycle: None → Mean → Linear → None
+                switch (m_pModel->detrendMode()) {
+                    case DetrendMode::None:
+                        m_pModel->setDetrendMode(DetrendMode::Mean);
+                        break;
+                    case DetrendMode::Mean:
+                        m_pModel->setDetrendMode(DetrendMode::Linear);
+                        break;
+                    case DetrendMode::Linear:
+                        m_pModel->setDetrendMode(DetrendMode::None);
+                        break;
+                }
             }
-        }
-        break;
-    case Qt::Key_S:
-        setScalebarsVisible(!scalebarsVisible());
-        emit scalebarsToggled(scalebarsVisible());
-        break;
-    case Qt::Key_X:
-        setCrosshairEnabled(!crosshairEnabled());
-        emit crosshairToggled(crosshairEnabled());
-        break;
-    case Qt::Key_E:
-        setEventsVisible(!eventsVisible());
-        emit eventsVisibleToggled(eventsVisible());
-        break;
-    case Qt::Key_G:
-        setEpochMarkersVisible(!epochMarkersVisible());
-        emit epochMarkersToggled(epochMarkersVisible());
-        break;
-    case Qt::Key_C:
-        setClippingVisible(!clippingVisible());
-        emit clippingToggled(clippingVisible());
-        break;
-    case Qt::Key_Z:
-        setZScoreMode(!zScoreMode());
-        emit zScoreModeToggled(zScoreMode());
-        break;
-    case Qt::Key_A:
-        if (event->modifiers() & Qt::ShiftModifier) {
-            setAnnotationsVisible(!annotationsVisible());
-            emit annotationsVisibleToggled(annotationsVisible());
-        } else {
+            break;
+        case Qt::Key_S:
+            setScalebarsVisible(!scalebarsVisible());
+            emit scalebarsToggled(scalebarsVisible());
+            break;
+        case Qt::Key_X:
+            setCrosshairEnabled(!crosshairEnabled());
+            emit crosshairToggled(crosshairEnabled());
+            break;
+        case Qt::Key_E:
+            setEventsVisible(!eventsVisible());
+            emit eventsVisibleToggled(eventsVisible());
+            break;
+        case Qt::Key_G:
+            setEpochMarkersVisible(!epochMarkersVisible());
+            emit epochMarkersToggled(epochMarkersVisible());
+            break;
+        case Qt::Key_C:
+            setClippingVisible(!clippingVisible());
+            emit clippingToggled(clippingVisible());
+            break;
+        case Qt::Key_Z:
+            setZScoreMode(!zScoreMode());
+            emit zScoreModeToggled(zScoreMode());
+            break;
+        case Qt::Key_A:
+            if (event->modifiers() & Qt::ShiftModifier) {
+                setAnnotationsVisible(!annotationsVisible());
+                emit annotationsVisibleToggled(annotationsVisible());
+            } else {
+                QWidget::keyPressEvent(event);
+                return;
+            }
+            break;
+        case Qt::Key_O:
+            setOverviewBarVisible(!overviewBarVisible());
+            emit overviewBarToggled(overviewBarVisible());
+            break;
+        case Qt::Key_BracketRight:
+            setScrollSpeedFactor(scrollSpeedFactor() * 1.5f);
+            emit scrollSpeedChanged(scrollSpeedFactor());
+            break;
+        case Qt::Key_BracketLeft:
+            setScrollSpeedFactor(scrollSpeedFactor() / 1.5f);
+            emit scrollSpeedChanged(scrollSpeedFactor());
+            break;
+        case Qt::Key_T:
+            toggleTimeFormat();
+            break;
+        default:
             QWidget::keyPressEvent(event);
             return;
-        }
-        break;
-    case Qt::Key_O:
-        setOverviewBarVisible(!overviewBarVisible());
-        emit overviewBarToggled(overviewBarVisible());
-        break;
-    case Qt::Key_BracketRight:
-        setScrollSpeedFactor(scrollSpeedFactor() * 1.5f);
-        emit scrollSpeedChanged(scrollSpeedFactor());
-        break;
-    case Qt::Key_BracketLeft:
-        setScrollSpeedFactor(scrollSpeedFactor() / 1.5f);
-        emit scrollSpeedChanged(scrollSpeedFactor());
-        break;
-    case Qt::Key_T:
-        toggleTimeFormat();
-        break;
-    default:
-        QWidget::keyPressEvent(event);
-        return;
     }
     event->accept();
 }
 
 //=============================================================================================================
 
-void ChannelDataView::resizeEvent(QResizeEvent *event)
+void ChannelDataView::resizeEvent(QResizeEvent* event)
 {
     AbstractView::resizeEvent(event);
     updateSamplesPerPixel();
@@ -1115,7 +1122,7 @@ void ChannelDataView::updateScrollBarRange()
     } else {
         // Fall back to ring-buffer bounds
         int firstSamp = m_pModel->firstSample();
-        int total     = m_pModel->totalSamples();
+        int total = m_pModel->totalSamples();
         minVal = firstSamp;
         maxVal = qMax(firstSamp, firstSamp + total - visible);
     }
@@ -1134,8 +1141,8 @@ void ChannelDataView::updateSamplesPerPixel()
     if (!m_pRhiView || !m_pFiffInfo)
         return;
 
-    float sfreq   = static_cast<float>(m_pFiffInfo->sfreq);
-    int   viewPx  = m_pRhiView->width();
+    float sfreq = static_cast<float>(m_pFiffInfo->sfreq);
+    int viewPx = m_pRhiView->width();
     if (viewPx <= 0)
         return;
 
@@ -1173,10 +1180,10 @@ void ChannelDataView::updateChannelScrollBarRange()
         return;
 
     // Use the view's logical channel count (respects active filter)
-    int totalCh    = m_pRhiView ? m_pRhiView->totalLogicalChannels()
-                                : m_pModel->channelCount();
+    int totalCh = m_pRhiView ? m_pRhiView->totalLogicalChannels()
+                             : m_pModel->channelCount();
     int visibleCnt = m_pRhiView->visibleChannelCount();
-    int maxVal     = qMax(0, totalCh - visibleCnt);
+    int maxVal = qMax(0, totalCh - visibleCnt);
 
     m_channelScrollBarUpdating = true;
     m_pChannelScrollBar->setMaximum(maxVal);

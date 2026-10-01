@@ -89,8 +89,8 @@ class COMSHARED_EXPORT RtClient : public QThread
     Q_OBJECT
 
 public:
-    typedef QSharedPointer<RtClient> SPtr;               /**< Shared pointer type for MNERtClient. */
-    typedef QSharedPointer<const RtClient> ConstSPtr;    /**< Const shared pointer type for MNERtClient. */
+    typedef QSharedPointer<RtClient> SPtr;            /**< Shared pointer type for MNERtClient. */
+    typedef QSharedPointer<const RtClient> ConstSPtr; /**< Const shared pointer type for MNERtClient. */
 
     //=========================================================================================================
     /**
@@ -100,8 +100,8 @@ public:
      * @param[in] p_sClientAlias         The client alias of the data client.
      * @param[in] parent                 Parent QObject (optional).
      */
-    explicit RtClient(QString p_sRtServerHostname, QString p_sClientAlias = "rtclient", QObject *parent = 0);
-    
+    explicit RtClient(QString p_sRtServerHostname, QString p_sClientAlias = "rtclient", QObject* parent = 0);
+
     //=========================================================================================================
     /**
      * Destroys the real time client.
@@ -142,14 +142,14 @@ protected:
     virtual void run();
 
 private:
-    QMutex      mutex;                      /**< Provides access serialization between threads*/
-    bool        m_bIsConnected;             /**< Is Connected. */
-    bool        m_bIsMeasuring;             /**< Is Measuring. */
-    bool        m_bIsRunning;               /**< Holds whether RtClient is running.*/
-    QString     m_sClientAlias;             /**< The clien alias of the data client. */
-    QString     m_sRtServerHostName;        /**< The IP Adress of mne_rt_server.*/
-    FIFFLIB::FiffInfo::SPtr  m_pFiffInfo;   /**< Fiff measurement info.*/
-    quint16      m_iDefaultPort;
+    QMutex mutex;                        /**< Provides access serialization between threads*/
+    bool m_bIsConnected;                 /**< Is Connected. */
+    bool m_bIsMeasuring;                 /**< Is Measuring. */
+    bool m_bIsRunning;                   /**< Holds whether RtClient is running.*/
+    QString m_sClientAlias;              /**< The clien alias of the data client. */
+    QString m_sRtServerHostName;         /**< The IP Adress of mne_rt_server.*/
+    FIFFLIB::FiffInfo::SPtr m_pFiffInfo; /**< Fiff measurement info.*/
+    quint16 m_iDefaultPort;
 signals:
     //=========================================================================================================
     /**
@@ -180,7 +180,7 @@ inline FIFFLIB::FiffInfo::SPtr& RtClient::getFiffInfo()
 
 #ifndef metatype_matrixxf
 #define metatype_matrixxf
-Q_DECLARE_METATYPE(Eigen::MatrixXf);    /**< Provides QT META type declaration of the Eigen::MatrixXf type. For signal/slot usage.*/
+Q_DECLARE_METATYPE(Eigen::MatrixXf); /**< Provides QT META type declaration of the Eigen::MatrixXf type. For signal/slot usage.*/
 #endif
 
 #endif // RTCLIENT_H

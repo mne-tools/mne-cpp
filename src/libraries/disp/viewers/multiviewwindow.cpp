@@ -38,7 +38,7 @@ using namespace DISPLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-MultiViewWindow::MultiViewWindow(QWidget *parent,
+MultiViewWindow::MultiViewWindow(QWidget* parent,
                                  Qt::WindowFlags flags)
 : QDockWidget(parent, flags)
 {
@@ -49,5 +49,4 @@ MultiViewWindow::MultiViewWindow(QWidget *parent,
 
 MultiViewWindow::~MultiViewWindow()
 {
-
 }

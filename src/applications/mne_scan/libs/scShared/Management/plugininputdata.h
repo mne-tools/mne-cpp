@@ -31,14 +31,14 @@
 namespace SCSHAREDLIB
 {
 
-template <class T>
+template<class T>
 class PluginInputData : public PluginInputConnector
 {
 public:
-    typedef void (*callback_function)(QSharedPointer<T>);       /**< Callback function type. */
+    typedef void (*callback_function)(QSharedPointer<T>); /**< Callback function type. */
 
-    typedef QSharedPointer<PluginInputData> SPtr;               /**< Shared pointer type for PluginInputData. */
-    typedef QSharedPointer<const PluginInputData> ConstSPtr;    /**< Const shared pointer type for PluginInputData. */
+    typedef QSharedPointer<PluginInputData> SPtr;            /**< Shared pointer type for PluginInputData. */
+    typedef QSharedPointer<const PluginInputData> ConstSPtr; /**< Const shared pointer type for PluginInputData. */
 
     //=========================================================================================================
     /**
@@ -48,13 +48,15 @@ public:
      * @param[in] name       connection name.
      * @param[in] descr      connection description.
      */
-    PluginInputData(AbstractPlugin *parent, const QString &name, const QString &descr);
+    PluginInputData(AbstractPlugin* parent, const QString& name, const QString& descr);
 
     //=========================================================================================================
     /**
      * Destructor
      */
-    virtual ~PluginInputData(){}
+    virtual ~PluginInputData()
+    {
+    }
 
     //=========================================================================================================
     /**
@@ -66,7 +68,7 @@ public:
      *
      * @return the created PluginInputData.
      */
-    static inline QSharedPointer< PluginInputData<T> > create(AbstractPlugin *parent, const QString &name, const QString &descr);
+    static inline QSharedPointer<PluginInputData<T>> create(AbstractPlugin* parent, const QString& name, const QString& descr);
 
     //=========================================================================================================
     /**
@@ -87,17 +89,17 @@ protected:
     void notifyCallbackFunction(SCMEASLIB::Measurement::SPtr pMeasurement);
 
 private:
-    callback_function m_pFunc;  /**< registered callback function. */
+    callback_function m_pFunc; /**< registered callback function. */
 };
 
 //=============================================================================================================
 // INLINE DEFINITIONS
 //=============================================================================================================
 
-template <class T>
-inline QSharedPointer< PluginInputData<T> > PluginInputData<T>::create(AbstractPlugin *parent, const QString &name, const QString &descr)
+template<class T>
+inline QSharedPointer<PluginInputData<T>> PluginInputData<T>::create(AbstractPlugin* parent, const QString& name, const QString& descr)
 {
-    QSharedPointer< PluginInputData<T> > pPluginInputData(new PluginInputData<T>(parent, name, descr));
+    QSharedPointer<PluginInputData<T>> pPluginInputData(new PluginInputData<T>(parent, name, descr));
     return pPluginInputData;
 }
 } // NAMESPACE

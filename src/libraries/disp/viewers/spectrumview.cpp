@@ -46,7 +46,7 @@ using namespace Eigen;
 //=============================================================================================================
 
 SpectrumView::SpectrumView(const QString& sSettingsPath,
-                           QWidget *parent,
+                           QWidget* parent,
                            Qt::WindowFlags f)
 : AbstractView(parent, f)
 {
@@ -58,7 +58,7 @@ SpectrumView::SpectrumView(const QString& sSettingsPath,
     m_pTableView->viewport()->installEventFilter(this);
 
     //set vertical layout
-    QVBoxLayout *neLayout = new QVBoxLayout(this);
+    QVBoxLayout* neLayout = new QVBoxLayout(this);
 
     neLayout->addWidget(m_pTableView);
 
@@ -76,7 +76,7 @@ SpectrumView::~SpectrumView()
 
 //=============================================================================================================
 
-void SpectrumView::init(FiffInfo::SPtr &info,
+void SpectrumView::init(FiffInfo::SPtr& info,
                         int iScaleType)
 {
     m_pFSModel = new FrequencySpectrumModel(this);
@@ -98,16 +98,16 @@ void SpectrumView::init(FiffInfo::SPtr &info,
     m_pTableView->setItemDelegate(m_pFSDelegate);
 
     //set some size settings for m_pTableView
-    m_pTableView->setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Expanding);
+    m_pTableView->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 
     m_pTableView->setShowGrid(false);
 
     m_pTableView->horizontalHeader()->setSectionResizeMode(1, QHeaderView::Stretch); //Stretch 2 column to maximal width
     m_pTableView->horizontalHeader()->hide();
-    m_pTableView->verticalHeader()->setDefaultSectionSize(140);//m_fZoomFactor*m_fDefaultSectionSize);//Row Height
+    m_pTableView->verticalHeader()->setDefaultSectionSize(140); //m_fZoomFactor*m_fDefaultSectionSize);//Row Height
 
     m_pTableView->setAutoScroll(false);
-    m_pTableView->setColumnHidden(0,true); //because content is plotted jointly with column=1
+    m_pTableView->setColumnHidden(0, true); //because content is plotted jointly with column=1
 
     m_pTableView->resizeColumnsToContents();
 
@@ -120,13 +120,13 @@ void SpectrumView::init(FiffInfo::SPtr &info,
 
 //=============================================================================================================
 
-void SpectrumView::addData(const MatrixXd &matData)
+void SpectrumView::addData(const MatrixXd& matData)
 {
     // The model is only created by init, and mne_scan pushes data through here
     // as soon as a measurement arrives, which can be before init has run. There
     // is nowhere to put the data in that case, so it is dropped rather than
     // dereferencing a model that does not exist yet.
-    if(!m_pFSModel) {
+    if (!m_pFSModel) {
         return;
     }
 
@@ -140,7 +140,7 @@ void SpectrumView::setBoundaries(int iLower,
 {
     // Same ordering as addData: the bounds can be set from a settings widget
     // before the model exists.
-    if(!m_pFSModel) {
+    if (!m_pFSModel) {
         return;
     }
 
@@ -149,11 +149,11 @@ void SpectrumView::setBoundaries(int iLower,
 
 //=============================================================================================================
 
-bool SpectrumView::eventFilter(QObject * watched,
-                               QEvent * event)
+bool SpectrumView::eventFilter(QObject* watched,
+                               QEvent* event)
 {
-    if(event->type() == QEvent::MouseMove){
-        QMouseEvent *mouseEvent = static_cast <QMouseEvent*>( event );
+    if (event->type() == QEvent::MouseMove) {
+        QMouseEvent* mouseEvent = static_cast<QMouseEvent*>(event);
         //qDebug()<<"MouseMove event!@"<<mouseEvent->x()<<":"<<mouseEvent->y();
 
         int currentRow = m_pTableView->rowAt(static_cast<int>(mouseEvent->position().y()));
@@ -161,7 +161,7 @@ bool SpectrumView::eventFilter(QObject * watched,
 
         QModelIndex item = m_pTableView->currentIndex();
 
-        emit sendMouseLoc(item.row(), static_cast<int>(mouseEvent->position().x()), static_cast<int>(mouseEvent->position().y()),m_pTableView->visualRect(item) );
+        emit sendMouseLoc(item.row(), static_cast<int>(mouseEvent->position().x()), static_cast<int>(mouseEvent->position().y()), m_pTableView->visualRect(item));
 
         return true;
     } else {
@@ -173,7 +173,7 @@ bool SpectrumView::eventFilter(QObject * watched,
 
 void SpectrumView::saveSettings()
 {
-    if(m_sSettingsPath.isEmpty()) {
+    if (m_sSettingsPath.isEmpty()) {
         return;
     }
 
@@ -185,7 +185,7 @@ void SpectrumView::saveSettings()
 
 void SpectrumView::loadSettings()
 {
-    if(m_sSettingsPath.isEmpty()) {
+    if (m_sSettingsPath.isEmpty()) {
         return;
     }
 
@@ -197,7 +197,7 @@ void SpectrumView::loadSettings()
 
 void SpectrumView::updateGuiMode(GuiMode mode)
 {
-    switch(mode) {
+    switch (mode) {
         case GuiMode::Clinical:
             break;
         default: // default is research mode
@@ -209,7 +209,7 @@ void SpectrumView::updateGuiMode(GuiMode mode)
 
 void SpectrumView::updateProcessingMode(ProcessingMode mode)
 {
-    switch(mode) {
+    switch (mode) {
         case ProcessingMode::Offline:
             break;
         default: // default is realtime mode
@@ -221,5 +221,4 @@ void SpectrumView::updateProcessingMode(ProcessingMode mode)
 
 void SpectrumView::clearView()
 {
-
 }

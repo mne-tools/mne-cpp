@@ -56,8 +56,8 @@ namespace MNELIB
 class MNESHARED_EXPORT MNEMshColorScaleDef
 {
 public:
-    typedef QSharedPointer<MNEMshColorScaleDef> SPtr;              /**< Shared pointer type for MNEMshColorScaleDef. */
-    typedef QSharedPointer<const MNEMshColorScaleDef> ConstSPtr;   /**< Const shared pointer type for MNEMshColorScaleDef. */
+    typedef QSharedPointer<MNEMshColorScaleDef> SPtr;            /**< Shared pointer type for MNEMshColorScaleDef. */
+    typedef QSharedPointer<const MNEMshColorScaleDef> ConstSPtr; /**< Const shared pointer type for MNEMshColorScaleDef. */
 
     //=========================================================================================================
     /**
@@ -72,13 +72,13 @@ public:
     ~MNEMshColorScaleDef();
 
 public:
-    int   type;                     /* What is this scale setting good for? */
-    float mult;                     /* Convenience multiplier from internal units to displayed numbers */
-    float fthresh;                  /* Threshold */
-    float fmid;                     /* This is in the middle */
-    float fslope;                   /* We still use the slope internally (sigh) */
-    float tc_mult;                  /* Multiply the scales by this value for timecourses */
-    bool  relative;                 /* Are fthresh and fmid relative to the maximum value over the surface? */
+    int type;      /* What is this scale setting good for? */
+    float mult;    /* Convenience multiplier from internal units to displayed numbers */
+    float fthresh; /* Threshold */
+    float fmid;    /* This is in the middle */
+    float fslope;  /* We still use the slope internally (sigh) */
+    float tc_mult; /* Multiply the scales by this value for timecourses */
+    bool relative; /* Are fthresh and fmid relative to the maximum value over the surface? */
 };
 
 //=============================================================================================================

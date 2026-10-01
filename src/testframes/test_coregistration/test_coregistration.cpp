@@ -61,7 +61,7 @@ using namespace MNELIB;
  * @brief The TestCoregistration class provides a coregistration verification tests
  *
  */
-class TestCoregistration: public QObject
+class TestCoregistration : public QObject
 {
     Q_OBJECT
 
@@ -86,7 +86,7 @@ private:
 //=============================================================================================================
 
 TestCoregistration::TestCoregistration()
-    : dEpsilon(0.000001)
+: dEpsilon(0.000001)
 {
 }
 
@@ -100,7 +100,7 @@ void TestCoregistration::initTestCase()
     QFile t_fileTransRefFit(QCoreApplication::applicationDirPath() + "/../resources/data/mne-cpp-test-data/MEG/sample/all-trans.fif");
     QFile t_fileTransRefIcp(QCoreApplication::applicationDirPath() + "/../resources/data/mne-cpp-test-data/Result/icp-trans.fif");
 
-    float fTol = 0.01f/1000.0f;
+    float fTol = 0.01f / 1000.0f;
     float fMaxDist = 0.02f;
 
     // read reference Transformation
@@ -116,28 +116,32 @@ void TestCoregistration::initTestCase()
 
     // read digitizer data
     QList<int> lPickFiducials({FIFFV_POINT_CARDINAL});
-    QList<int> lPickHSP({FIFFV_POINT_CARDINAL,FIFFV_POINT_HPI,FIFFV_POINT_EXTRA});
-    FiffDigPointSet digSetSrc = FiffDigPointSet(t_fileDig).pickTypes(lPickFiducials);   // Fiducials Head-Space
+    QList<int> lPickHSP({FIFFV_POINT_CARDINAL, FIFFV_POINT_HPI, FIFFV_POINT_EXTRA});
+    FiffDigPointSet digSetSrc = FiffDigPointSet(t_fileDig).pickTypes(lPickFiducials); // Fiducials Head-Space
     FiffDigPointSet digSetDst = FiffDigPointSet(t_fileDig).pickTypes(lPickFiducials);
-    digSetDst.applyTransform(transFitMatchedRef, false);                                   // Fiducials MRI-Space
-    FiffDigPointSet digSetHsp = FiffDigPointSet(t_fileDig).pickTypes(lPickHSP);         // Head shape points Head-Space
+    digSetDst.applyTransform(transFitMatchedRef, false);                        // Fiducials MRI-Space
+    FiffDigPointSet digSetHsp = FiffDigPointSet(t_fileDig).pickTypes(lPickHSP); // Head shape points Head-Space
 
     // Initial Fiducial Alignment
     // Declare variables
-    Matrix3f matSrc(digSetSrc.size(),3);
-    Matrix3f matDst(digSetDst.size(),3);
+    Matrix3f matSrc(digSetSrc.size(), 3);
+    Matrix3f matDst(digSetDst.size(), 3);
     Matrix4f matTrans;
     Vector3f vecWeights(digSetSrc.size()); // LPA, Nasion, RPA
     float fScale = 1.0f;
     bool bScale = true;
 
     // get coordinates
-    for(int i = 0; i< digSetSrc.size(); ++i) {
-        matSrc(i,0) = digSetSrc[i].r[0]; matSrc(i,1) = digSetSrc[i].r[1]; matSrc(i,2) = digSetSrc[i].r[2];
-        matDst(i,0) = digSetDst[i].r[0]; matDst(i,1) = digSetDst[i].r[1]; matDst(i,2) = digSetDst[i].r[2];
+    for (int i = 0; i < digSetSrc.size(); ++i) {
+        matSrc(i, 0) = digSetSrc[i].r[0];
+        matSrc(i, 1) = digSetSrc[i].r[1];
+        matSrc(i, 2) = digSetSrc[i].r[2];
+        matDst(i, 0) = digSetDst[i].r[0];
+        matDst(i, 1) = digSetDst[i].r[1];
+        matDst(i, 2) = digSetDst[i].r[2];
 
         // set standart weights
-        if(digSetSrc[i].ident == FIFFV_POINT_NASION) {
+        if (digSetSrc[i].ident == FIFFV_POINT_NASION) {
             vecWeights(i) = 10.0;
         } else {
             vecWeights(i) = 1.0;
@@ -145,7 +149,7 @@ void TestCoregistration::initTestCase()
     }
 
     // align fiducials
-    if(!MNELIB::fitMatchedPoints(matSrc,matDst,matTrans,fScale,bScale,vecWeights)) {
+    if (!MNELIB::fitMatchedPoints(matSrc, matDst, matTrans, fScale, bScale, vecWeights)) {
         qWarning() << "Point cloud registration not succesfull.";
     }
 
@@ -157,12 +161,14 @@ void TestCoregistration::initTestCase()
     // Prepare Icp:
     VectorXf vecWeightsICP(digSetHsp.size()); // Weigths vector
     int iMaxIter = 20;
-    MatrixXf matHsp(digSetHsp.size(),3);
+    MatrixXf matHsp(digSetHsp.size(), 3);
 
-    for(int i = 0; i < digSetHsp.size(); ++i) {
-        matHsp(i,0) = digSetHsp[i].r[0]; matHsp(i,1) = digSetHsp[i].r[1]; matHsp(i,2) = digSetHsp[i].r[2];
+    for (int i = 0; i < digSetHsp.size(); ++i) {
+        matHsp(i, 0) = digSetHsp[i].r[0];
+        matHsp(i, 1) = digSetHsp[i].r[1];
+        matHsp(i, 2) = digSetHsp[i].r[2];
         // set standart weights
-        if((digSetHsp[i].kind == FIFFV_POINT_CARDINAL) && (digSetHsp[i].ident == FIFFV_POINT_NASION)) {
+        if ((digSetHsp[i].kind == FIFFV_POINT_CARDINAL) && (digSetHsp[i].ident == FIFFV_POINT_NASION)) {
             vecWeightsICP(i) = 10.0;
         } else {
             vecWeightsICP(i) = 1.0;
@@ -173,17 +179,17 @@ void TestCoregistration::initTestCase()
     VectorXi vecTake;
 
     // discard outliers
-    if(!MNELIB::discard3DPointOutliers(mneSurfacePoints, matHsp, transPerformICP, vecTake, matHspClean, fMaxDist)) {
+    if (!MNELIB::discard3DPointOutliers(mneSurfacePoints, matHsp, transPerformICP, vecTake, matHspClean, fMaxDist)) {
         qWarning() << "Discard outliers was not succesfull.";
     }
     VectorXf vecWeightsICPClean(vecTake.size());
-    for(int i = 0; i < vecTake.size(); ++i) {
+    for (int i = 0; i < vecTake.size(); ++i) {
         vecWeightsICPClean(i) = vecWeightsICP(vecTake(i));
     }
 
     // icp
     float fRMSE = 0.0;
-    if(!MNELIB::performIcp(mneSurfacePoints, matHspClean, transPerformICP, fRMSE, bScale, iMaxIter, fTol, vecWeightsICPClean)) {
+    if (!MNELIB::performIcp(mneSurfacePoints, matHspClean, transPerformICP, fRMSE, bScale, iMaxIter, fTol, vecWeightsICPClean)) {
         qWarning() << "ICP was not succesfull.";
     }
     transPerformICPRef = FiffCoordTrans(t_fileTransRefIcp);
@@ -215,4 +221,3 @@ void TestCoregistration::cleanupTestCase()
 
 QTEST_GUILESS_MAIN(TestCoregistration);
 #include "test_coregistration.moc"
-

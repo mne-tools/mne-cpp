@@ -128,7 +128,7 @@ void TestDspStimArtifact::testEventIdFilter()
     // Two events: id=1 at sample 5, id=2 at sample 20
     MatrixXi events(2, 3);
     events << 5, 0, 1,
-              20, 0, 2;
+        20, 0, 2;
 
     // Only process event id 2
     fixStimArtifact(data, events, 1000.0, 2, 0.0, 0.003, StimArtifactMode::Window);
@@ -154,7 +154,7 @@ void TestDspStimArtifact::testAllEvents()
 
     MatrixXi events(2, 3);
     events << 5, 0, 1,
-              20, 0, 2;
+        20, 0, 2;
 
     // eventId = -1 processes all events
     fixStimArtifact(data, events, 1000.0, -1, 0.0, 0.002, StimArtifactMode::Window);
@@ -187,11 +187,11 @@ void TestDspStimArtifact::testNegativeTmin()
     // tmin = -0.003, tmax = 0.002 => offsets: -3..+2 => window [7..12]
     fixStimArtifact(data, events, 1000.0, -1, -0.003, 0.002, StimArtifactMode::Window);
 
-    QCOMPARE(data(0, 6), 1.0);   // before window
+    QCOMPARE(data(0, 6), 1.0); // before window
     for (int s = 7; s <= 12; ++s) {
         QCOMPARE(data(0, s), 0.0);
     }
-    QCOMPARE(data(0, 13), 1.0);  // after window
+    QCOMPARE(data(0, 13), 1.0); // after window
 }
 
 //=============================================================================================================
@@ -233,8 +233,8 @@ void TestDspStimArtifact::testMultipleEvents()
     // Three events at samples 5, 20, 35
     MatrixXi events(3, 3);
     events << 5, 0, 1,
-              20, 0, 1,
-              35, 0, 1;
+        20, 0, 1,
+        35, 0, 1;
 
     fixStimArtifact(data, events, 1000.0, -1, 0.0, 0.003, StimArtifactMode::Window);
 
@@ -335,13 +335,16 @@ void TestDspStimArtifact::testMultiChannel()
     // Verify linear interpolation for each channel
     for (int ch = 0; ch < 3; ++ch) {
         const double dStart = static_cast<double>((ch + 1) * 10);
-        const double dEnd   = static_cast<double>((ch + 1) * 15);
+        const double dEnd = static_cast<double>((ch + 1) * 15);
         const int iWindowLen = 6; // [10..15]
         for (int s = 0; s < iWindowLen; ++s) {
             const double dExpected = dStart + static_cast<double>(s) / static_cast<double>(iWindowLen - 1) * (dEnd - dStart);
             QVERIFY2(std::abs(data(ch, 10 + s) - dExpected) < 1e-12,
-                      qPrintable(QString("Channel %1, sample %2: expected %3, got %4")
-                                 .arg(ch).arg(10 + s).arg(dExpected).arg(data(ch, 10 + s))));
+                     qPrintable(QString("Channel %1, sample %2: expected %3, got %4")
+                                    .arg(ch)
+                                    .arg(10 + s)
+                                    .arg(dExpected)
+                                    .arg(data(ch, 10 + s))));
         }
     }
 }

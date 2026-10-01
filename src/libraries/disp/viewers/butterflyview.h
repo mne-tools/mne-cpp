@@ -77,8 +77,8 @@ class DISPSHARED_EXPORT ButterflyView : public QRhiWidget
     Q_OBJECT
 
 public:
-    typedef QSharedPointer<ButterflyView> SPtr;              /**< Shared pointer type for ButterflyView. */
-    typedef QSharedPointer<const ButterflyView> ConstSPtr;   /**< Const shared pointer type for ButterflyView. */
+    typedef QSharedPointer<ButterflyView> SPtr;            /**< Shared pointer type for ButterflyView. */
+    typedef QSharedPointer<const ButterflyView> ConstSPtr; /**< Const shared pointer type for ButterflyView. */
 
     //=========================================================================================================
     /**
@@ -89,7 +89,7 @@ public:
      * @param[in] f              Window flags passed to the widget (default Qt::Widget).
      */
     explicit ButterflyView(const QString& sSettingsPath = "",
-                           QWidget *parent = 0,
+                           QWidget* parent = 0,
                            Qt::WindowFlags f = Qt::Widget);
 
     //=========================================================================================================
@@ -149,7 +149,7 @@ public:
      *
      * @param[in] scaleMap map with all channel types and their current scaling value.
      */
-    void setScaleMap(const QMap<qint32, float> &scaleMap);
+    void setScaleMap(const QMap<qint32, float>& scaleMap);
 
     //=========================================================================================================
     /**
@@ -157,7 +157,7 @@ public:
      *
      * @param[in] selectedChannels     The new selected channels.
      */
-    void setSelectedChannels(const QList<int> &selectedChannels);
+    void setSelectedChannels(const QList<int>& selectedChannels);
 
     //=========================================================================================================
     /**
@@ -195,7 +195,7 @@ public:
      *
      * @return Pointer to the current average colors.
      */
-    QSharedPointer<QMap<QString, QColor> > getAverageColor() const;
+    QSharedPointer<QMap<QString, QColor>> getAverageColor() const;
 
     //=========================================================================================================
     /**
@@ -203,7 +203,7 @@ public:
      *
      * @return Pointer to the current average activations.
      */
-    QSharedPointer<QMap<QString, bool> > getAverageActivation() const;
+    QSharedPointer<QMap<QString, bool>> getAverageActivation() const;
 
     //=========================================================================================================
     /**
@@ -211,7 +211,7 @@ public:
      *
      * @param[in] qMapAverageColor      Pointer to the new average colors.
      */
-    void setAverageColor(const QSharedPointer<QMap<QString, QColor> > qMapAverageColor);
+    void setAverageColor(const QSharedPointer<QMap<QString, QColor>> qMapAverageColor);
 
     //=========================================================================================================
     /**
@@ -227,7 +227,7 @@ public:
      *
      * @param[in] qMapAverageActivation      Pointer to the new average activations.
      */
-    void setAverageActivation(const QSharedPointer<QMap<QString, bool> > qMapAverageActivation);
+    void setAverageActivation(const QSharedPointer<QMap<QString, bool>> qMapAverageActivation);
 
     //=========================================================================================================
     /**
@@ -235,7 +235,7 @@ public:
      *
      * @param[in] pChannelInfoModel     The new channel info model.
      */
-    void setChannelInfoModel(QSharedPointer<ChannelInfoModel> &pChannelInfoModel);
+    void setChannelInfoModel(QSharedPointer<ChannelInfoModel>& pChannelInfoModel);
 
     //=========================================================================================================
     /**
@@ -285,7 +285,7 @@ protected:
      *
      * @param[in] event pointer to PaintEvent -> not used.
      */
-    virtual void paintEvent(QPaintEvent *event);
+    virtual void paintEvent(QPaintEvent* event);
 
     //=========================================================================================================
     /**
@@ -297,27 +297,27 @@ protected:
      */
     void createPlotPath(qint32 row, QPainter& painter) const;
 
-    bool        m_bShowMAG;                     /**< Show Magnetometers channels. */
-    bool        m_bShowGRAD;                    /**< Show Gradiometers channels. */
-    bool        m_bShowEEG;                     /**< Show EEG channels. */
-    bool        m_bShowEOG;                     /**< Show EEG channels. */
-    bool        m_bShowMISC;                    /**< Show Miscellaneous channels. */
-    bool        m_bIsInit;                      /**< Whether this class has been initialized. */
+    bool m_bShowMAG;  /**< Show Magnetometers channels. */
+    bool m_bShowGRAD; /**< Show Gradiometers channels. */
+    bool m_bShowEEG;  /**< Show EEG channels. */
+    bool m_bShowEOG;  /**< Show EEG channels. */
+    bool m_bShowMISC; /**< Show Miscellaneous channels. */
+    bool m_bIsInit;   /**< Whether this class has been initialized. */
 
-    QString     m_sSettingsPath;                /**< The settings path to store the GUI settings to. */
+    QString m_sSettingsPath; /**< The settings path to store the GUI settings to. */
 
-    QColor      m_colCurrentBackgroundColor;    /**< The current background color. */
+    QColor m_colCurrentBackgroundColor; /**< The current background color. */
 
-    QList<int>  m_lSelectedChannels;            /**< The currently selected channels. */
+    QList<int> m_lSelectedChannels; /**< The currently selected channels. */
 
-    QMap<QString, bool>                     m_modalityMap;                  /**< Map of different modalities. */
-    QMap<qint32,float>                      m_scaleMap;                     /**< Map with all channel types and their current scaling value.*/
+    QMap<QString, bool> m_modalityMap; /**< Map of different modalities. */
+    QMap<qint32, float> m_scaleMap;    /**< Map with all channel types and their current scaling value.*/
 
-    QSharedPointer<EvokedSetModel>          m_pEvokedSetModel;              /**< The evoked model. */
-    QSharedPointer<ChannelInfoModel>        m_pChannelInfoModel;            /**< The channel info model. */
+    QSharedPointer<EvokedSetModel> m_pEvokedSetModel;     /**< The evoked model. */
+    QSharedPointer<ChannelInfoModel> m_pChannelInfoModel; /**< The channel info model. */
 
-    QSharedPointer<QMap<QString, bool> >    m_qMapAverageActivation;        /**< Average activation status. */
-    QSharedPointer<QMap<QString, QColor> >  m_qMapAverageColor;             /**< Average colors. */
+    QSharedPointer<QMap<QString, bool>> m_qMapAverageActivation; /**< Average activation status. */
+    QSharedPointer<QMap<QString, QColor>> m_qMapAverageColor;    /**< Average colors. */
 };
 
 //=============================================================================================================

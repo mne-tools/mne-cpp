@@ -68,16 +68,16 @@ namespace MNALIB
  */
 struct MNASHARED_EXPORT MnaVerificationCheck
 {
-    QString     id;             ///< Unique check identifier within the node (e.g. "cov_posdef")
-    QString     description;    ///< Human-readable: "Covariance matrix must be positive-definite"
-    QString     phase;          ///< "pre" (before execution) or "post" (after execution)
-    QString     expression;     ///< Simple evaluable expression: "rank(covariance) > 0"
-    MnaScript   script;         ///< Optional script for complex checks (exit code 0 = pass).
-                                ///< When script.code is non-empty, the executor runs the script
-                                ///< instead of evaluating `expression`. Supports {{placeholder}}
-                                ///< substitution for node inputs and attributes.
-    QString     severity;       ///< "error" (abort), "warning" (log + continue), "info" (always continue)
-    QString     onFail;         ///< Optional remediation hint
+    QString id;          ///< Unique check identifier within the node (e.g. "cov_posdef")
+    QString description; ///< Human-readable: "Covariance matrix must be positive-definite"
+    QString phase;       ///< "pre" (before execution) or "post" (after execution)
+    QString expression;  ///< Simple evaluable expression: "rank(covariance) > 0"
+    MnaScript script;    ///< Optional script for complex checks (exit code 0 = pass).
+                         ///< When script.code is non-empty, the executor runs the script
+                         ///< instead of evaluating `expression`. Supports {{placeholder}}
+                         ///< substitution for node inputs and attributes.
+    QString severity;    ///< "error" (abort), "warning" (log + continue), "info" (always continue)
+    QString onFail;      ///< Optional remediation hint
 
     QJsonObject toJson() const;
     static MnaVerificationCheck fromJson(const QJsonObject& json);
@@ -93,12 +93,12 @@ struct MNASHARED_EXPORT MnaVerificationCheck
  */
 struct MNASHARED_EXPORT MnaVerificationResult
 {
-    QString     checkId;        ///< References MnaVerificationCheck::id
-    bool        passed = false; ///< true if the expression evaluated to true
-    QString     severity;       ///< Echoed from the check definition
-    QString     message;        ///< Formatted message: "PASS: ..." or "FAIL [error]: ..."
-    QVariant    actualValue;    ///< The evaluated expression result
-    QDateTime   evaluatedAt;    ///< When this check was evaluated
+    QString checkId;       ///< References MnaVerificationCheck::id
+    bool passed = false;   ///< true if the expression evaluated to true
+    QString severity;      ///< Echoed from the check definition
+    QString message;       ///< Formatted message: "PASS: ..." or "FAIL [error]: ..."
+    QVariant actualValue;  ///< The evaluated expression result
+    QDateTime evaluatedAt; ///< When this check was evaluated
 
     QJsonObject toJson() const;
     static MnaVerificationResult fromJson(const QJsonObject& json);
@@ -116,29 +116,29 @@ struct MNASHARED_EXPORT MnaVerificationResult
 struct MNASHARED_EXPORT MnaProvenance
 {
     // Input snapshot
-    QMap<QString, QString> inputHashes;     ///< portName → SHA-256
+    QMap<QString, QString> inputHashes; ///< portName → SHA-256
 
     // Resolved attributes at execution time (after param-tree evaluation)
     QVariantMap resolvedAttributes;
 
     // Software environment
-    QString     mneCppVersion;              ///< e.g. "2.2.0"
-    QString     qtVersion;                  ///< e.g. "6.11.0"
-    QString     compilerInfo;               ///< e.g. "AppleClang 16.0.0"
-    QString     osInfo;                     ///< e.g. "macOS 15.4 arm64"
-    QString     hostName;                   ///< Machine name (for cluster provenance)
+    QString mneCppVersion; ///< e.g. "2.2.0"
+    QString qtVersion;     ///< e.g. "6.11.0"
+    QString compilerInfo;  ///< e.g. "AppleClang 16.0.0"
+    QString osInfo;        ///< e.g. "macOS 15.4 arm64"
+    QString hostName;      ///< Machine name (for cluster provenance)
 
     // For IPC/Script nodes
-    QString     externalToolVersion;        ///< e.g. "FreeSurfer 7.4.1", "Python 3.11.5"
+    QString externalToolVersion; ///< e.g. "FreeSurfer 7.4.1", "Python 3.11.5"
 
     // Timing
-    QDateTime   startedAt;
-    QDateTime   finishedAt;
-    qint64      wallTimeMs = 0;             ///< Wall-clock duration in milliseconds
-    qint64      peakMemoryBytes = 0;        ///< Peak RSS (if measurable), 0 otherwise
+    QDateTime startedAt;
+    QDateTime finishedAt;
+    qint64 wallTimeMs = 0;      ///< Wall-clock duration in milliseconds
+    qint64 peakMemoryBytes = 0; ///< Peak RSS (if measurable), 0 otherwise
 
     // Random seed (if stochastic operations were used)
-    qint64      randomSeed = -1;            ///< -1 if not applicable
+    qint64 randomSeed = -1; ///< -1 if not applicable
 
     QJsonObject toJson() const;
     static MnaProvenance fromJson(const QJsonObject& json);
@@ -157,7 +157,7 @@ struct MNASHARED_EXPORT MnaProvenance
 struct MNASHARED_EXPORT MnaVerification
 {
     /// Human-readable explanation of what this node does and why
-    QString     explanation;
+    QString explanation;
 
     /// Declarative checks (authored by user, evaluated by executor)
     QList<MnaVerificationCheck> checks;

@@ -52,7 +52,7 @@ using namespace Eigen;
 
 //=============================================================================================================
 
-int main(int argc, char *argv[])
+int main(int argc, char* argv[])
 {
     qInstallMessageHandler(MNELogger::customLogWriter);
     QCoreApplication app(argc, argv);
@@ -77,8 +77,14 @@ int main(int argc, char *argv[])
     QString inFile = parser.value(inOpt);
     QString outFile = parser.value(outOpt);
 
-    if (inFile.isEmpty()) { qCritical("--in is required."); return 1; }
-    if (outFile.isEmpty()) { qCritical("--out is required."); return 1; }
+    if (inFile.isEmpty()) {
+        qCritical("--in is required.");
+        return 1;
+    }
+    if (outFile.isEmpty()) {
+        qCritical("--out is required.");
+        return 1;
+    }
 
     // Read derivation rules using ChannelDerivation utility
     QVector<DerivationRule> rules = ChannelDerivation::readDefinitionFile(inFile);
@@ -86,12 +92,12 @@ int main(int argc, char *argv[])
         qCritical("No derivation rules read from: %s", qPrintable(inFile));
         return 1;
     }
-    qInfo("Read %lld derivation rule(s) from %s" ,
-           static_cast<long long>(rules.size()), qPrintable(inFile));
+    qInfo("Read %lld derivation rule(s) from %s",
+          static_cast<long long>(rules.size()), qPrintable(inFile));
 
     // Collect all unique input channel names (columns)
     QStringList colNames;
-    for (const DerivationRule &rule : rules) {
+    for (const DerivationRule& rule : rules) {
         for (auto it = rule.inputWeights.constBegin(); it != rule.inputWeights.constEnd(); ++it) {
             if (!colNames.contains(it.key()))
                 colNames.append(it.key());
@@ -101,7 +107,7 @@ int main(int argc, char *argv[])
 
     // Build row names (derived channel names)
     QStringList rowNames;
-    for (const DerivationRule &rule : rules) {
+    for (const DerivationRule& rule : rules) {
         rowNames.append(rule.outputName);
     }
 
@@ -115,8 +121,8 @@ int main(int argc, char *argv[])
         }
     }
 
-    qInfo("Derivation matrix: %lld x %lld" ,
-           static_cast<long long>(mat.rows()), static_cast<long long>(mat.cols()));
+    qInfo("Derivation matrix: %lld x %lld",
+          static_cast<long long>(mat.rows()), static_cast<long long>(mat.cols()));
 
     // Create FiffNamedMatrix
     FiffNamedMatrix namedMat(mat.rows(), mat.cols(), rowNames, colNames, mat);
@@ -134,6 +140,6 @@ int main(int argc, char *argv[])
     stream->end_block(FIFFB_MNE);
     stream->end_file();
 
-    qInfo("Written derivation matrix to: %s" , qPrintable(outFile));
+    qInfo("Written derivation matrix to: %s", qPrintable(outFile));
     return 0;
 }

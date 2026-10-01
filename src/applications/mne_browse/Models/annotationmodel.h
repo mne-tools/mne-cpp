@@ -42,13 +42,14 @@ namespace MNEBROWSE
 /**
  * @brief Lightweight span information used by the raw browser overlay renderer.
  */
-struct AnnotationSpanData {
-    int     startSample = 0;         /**< Inclusive span start sample. */
-    int     endSample   = 0;         /**< Inclusive span end sample. */
-    QColor  color;                   /**< Display color derived from the annotation label. */
-    QString label;                   /**< Short label rendered into the browser overlay. */
-    QString comment;                 /**< Optional free-form annotation comment. */
-    QStringList channelNames;        /**< Optional channel list the annotation applies to. */
+struct AnnotationSpanData
+{
+    int startSample = 0;      /**< Inclusive span start sample. */
+    int endSample = 0;        /**< Inclusive span end sample. */
+    QColor color;             /**< Display color derived from the annotation label. */
+    QString label;            /**< Short label rendered into the browser overlay. */
+    QString comment;          /**< Optional free-form annotation comment. */
+    QStringList channelNames; /**< Optional channel list the annotation applies to. */
 };
 
 //=============================================================================================================
@@ -66,7 +67,7 @@ public:
      *
      * @param[in] parent    Parent QObject.
      */
-    explicit AnnotationModel(QObject *parent = nullptr);
+    explicit AnnotationModel(QObject* parent = nullptr);
 
     //=========================================================================================================
     /**
@@ -81,7 +82,7 @@ public:
      * @param[in] parent    Parent index supplied by Qt.
      * @return Number of annotations shown in the table.
      */
-    int rowCount(const QModelIndex &parent = QModelIndex()) const override;
+    int rowCount(const QModelIndex& parent = QModelIndex()) const override;
 
     //=========================================================================================================
     /**
@@ -90,7 +91,7 @@ public:
      * @param[in] parent    Parent index supplied by Qt.
      * @return Number of model columns.
      */
-    int columnCount(const QModelIndex &parent = QModelIndex()) const override;
+    int columnCount(const QModelIndex& parent = QModelIndex()) const override;
 
     //=========================================================================================================
     /**
@@ -111,7 +112,7 @@ public:
      * @param[in] role      Requested Qt role.
      * @return Cell data for the requested role.
      */
-    QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const override;
+    QVariant data(const QModelIndex& index, int role = Qt::DisplayRole) const override;
 
     //=========================================================================================================
     /**
@@ -120,7 +121,7 @@ public:
      * @param[in] index     Requested model index.
      * @return Supported item flags.
      */
-    Qt::ItemFlags flags(const QModelIndex &index) const override;
+    Qt::ItemFlags flags(const QModelIndex& index) const override;
 
     //=========================================================================================================
     /**
@@ -131,7 +132,7 @@ public:
      * @param[in] role      Edit role.
      * @return True on success.
      */
-    bool setData(const QModelIndex &index, const QVariant &value, int role = Qt::EditRole) override;
+    bool setData(const QModelIndex& index, const QVariant& value, int role = Qt::EditRole) override;
 
     //=========================================================================================================
     /**
@@ -142,7 +143,7 @@ public:
      * @param[in] parent    Parent index supplied by Qt.
      * @return True on success.
      */
-    bool removeRows(int position, int rows, const QModelIndex &parent = QModelIndex()) override;
+    bool removeRows(int position, int rows, const QModelIndex& parent = QModelIndex()) override;
 
     //=========================================================================================================
     /**
@@ -266,13 +267,14 @@ private:
     /**
      * @brief Internal editable representation of one annotation row.
      */
-    struct AnnotationEntry {
-        int     startSample = 0;         /**< Inclusive annotation start sample. */
-        int     endSample   = 0;         /**< Inclusive annotation end sample. */
-        QString description;             /**< Annotation label or description. */
-        QStringList channelNames;        /**< Optional affected channels. */
-        QString comment;                 /**< Optional free-form comment. */
-        QVariantMap extras;              /**< Format-specific metadata retained for round-tripping. */
+    struct AnnotationEntry
+    {
+        int startSample = 0;      /**< Inclusive annotation start sample. */
+        int endSample = 0;        /**< Inclusive annotation end sample. */
+        QString description;      /**< Annotation label or description. */
+        QStringList channelNames; /**< Optional affected channels. */
+        QString comment;          /**< Optional free-form comment. */
+        QVariantMap extras;       /**< Format-specific metadata retained for round-tripping. */
     };
 
     //=========================================================================================================
@@ -400,7 +402,7 @@ private:
      * @param[out] ok  Set to true if the timestamp could be derived.
      * @return Measurement start time in microseconds since epoch.
      */
-    qint64 measurementStartUsecsSinceEpoch(bool *ok = nullptr) const;
+    qint64 measurementStartUsecsSinceEpoch(bool* ok = nullptr) const;
 
     //=========================================================================================================
     /**
@@ -440,11 +442,11 @@ private:
      */
     QVector<AnnotationEntry> exportEntries() const;
 
-    FIFFLIB::FiffAnnotations       m_fiffAnnotations; /**< Canonical annotation storage (time-based). */
-    FIFFLIB::FiffInfo::SPtr   m_pFiffInfo;     /**< Measurement info used for sample/time conversion. */
-    int                       m_iFirstSample = 0; /**< First sample of the loaded raw file. */
-    int                       m_iLastSample  = 0; /**< Last sample of the loaded raw file. */
-    bool                      m_bFileLoaded  = false; /**< True if annotations were loaded from disk. */
+    FIFFLIB::FiffAnnotations m_fiffAnnotations; /**< Canonical annotation storage (time-based). */
+    FIFFLIB::FiffInfo::SPtr m_pFiffInfo;        /**< Measurement info used for sample/time conversion. */
+    int m_iFirstSample = 0;                     /**< First sample of the loaded raw file. */
+    int m_iLastSample = 0;                      /**< Last sample of the loaded raw file. */
+    bool m_bFileLoaded = false;                 /**< True if annotations were loaded from disk. */
 };
 
 } // namespace MNEBROWSE

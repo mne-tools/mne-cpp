@@ -35,23 +35,23 @@ using namespace Eigen;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-FiffBlockReader::FiffBlockReader(QObject *parent)
-    : QObject(parent)
-    , m_file(new QFile(this))
-    , m_buffer(new QBuffer(this))
+FiffBlockReader::FiffBlockReader(QObject* parent)
+: QObject(parent)
+, m_file(new QFile(this))
+, m_buffer(new QBuffer(this))
 {
     connect(&m_watcher, &QFutureWatcher<MatrixXd>::finished, this, [this]() {
-        bool shouldEmit  = m_loading;
-        int  emitFrom    = m_inFlightFrom;
+        bool shouldEmit = m_loading;
+        int emitFrom = m_inFlightFrom;
         m_loading = false;
 
         if (m_hasPending) {
             // A newer request arrived while we were reading — start it now.
             int from = m_pendingFrom;
-            int to   = m_pendingTo;
-            m_hasPending   = false;
+            int to = m_pendingTo;
+            m_hasPending = false;
             m_inFlightFrom = from;
-            m_loading      = true;
+            m_loading = true;
             m_watcher.setFuture(QtConcurrent::run([this, from, to]() {
                 return doRead(from, to);
             }));
@@ -77,7 +77,7 @@ FiffBlockReader::~FiffBlockReader()
 
 //=============================================================================================================
 
-bool FiffBlockReader::open(const QString &path)
+bool FiffBlockReader::open(const QString& path)
 {
     close();
 
@@ -91,7 +91,7 @@ bool FiffBlockReader::open(const QString &path)
 
     try {
         m_raw = QSharedPointer<FiffRawData>(new FiffRawData(*m_file));
-    } catch (const std::exception &e) {
+    } catch (const std::exception& e) {
         qWarning() << "[FiffBlockReader] Exception constructing FiffRawData:" << e.what();
         return false;
     }
@@ -101,9 +101,9 @@ bool FiffBlockReader::open(const QString &path)
         return false;
     }
 
-    m_fiffInfo   = QSharedPointer<FiffInfo>(new FiffInfo(m_raw->info));
+    m_fiffInfo = QSharedPointer<FiffInfo>(new FiffInfo(m_raw->info));
     m_firstSample = m_raw->first_samp;
-    m_lastSample  = m_raw->last_samp;
+    m_lastSample = m_raw->last_samp;
 
     qInfo() << "[FiffBlockReader] Opened" << path
             << "| channels:" << m_fiffInfo->nchan
@@ -115,7 +115,7 @@ bool FiffBlockReader::open(const QString &path)
 
 //=============================================================================================================
 
-bool FiffBlockReader::openBuffer(const QByteArray &data, const QString &displayName)
+bool FiffBlockReader::openBuffer(const QByteArray& data, const QString& displayName)
 {
     Q_UNUSED(displayName)
 
@@ -132,7 +132,7 @@ bool FiffBlockReader::openBuffer(const QByteArray &data, const QString &displayN
 
     try {
         m_raw = QSharedPointer<FiffRawData>(new FiffRawData(*m_buffer));
-    } catch (const std::exception &e) {
+    } catch (const std::exception& e) {
         qWarning() << "[FiffBlockReader] Exception constructing FiffRawData from buffer:" << e.what();
         m_buffer->close();
         m_bufferData.clear();
@@ -147,9 +147,9 @@ bool FiffBlockReader::openBuffer(const QByteArray &data, const QString &displayN
         return false;
     }
 
-    m_fiffInfo    = QSharedPointer<FiffInfo>(new FiffInfo(m_raw->info));
+    m_fiffInfo = QSharedPointer<FiffInfo>(new FiffInfo(m_raw->info));
     m_firstSample = m_raw->first_samp;
-    m_lastSample  = m_raw->last_samp;
+    m_lastSample = m_raw->last_samp;
 
     qInfo() << "[FiffBlockReader] Opened in-memory raw buffer"
             << "| channels:" << m_fiffInfo->nchan
@@ -170,7 +170,7 @@ void FiffBlockReader::close()
     m_raw.reset();
     m_fiffInfo.reset();
     m_firstSample = 0;
-    m_lastSample  = 0;
+    m_lastSample = 0;
     if (m_file->isOpen())
         m_file->close();
     if (m_buffer->isOpen())
@@ -182,25 +182,27 @@ void FiffBlockReader::close()
 
 void FiffBlockReader::loadBlockAsync(int from, int to)
 {
-    if (!m_raw) return;
+    if (!m_raw)
+        return;
 
     from = qBound(m_firstSample, from, m_lastSample);
-    to   = qBound(m_firstSample, to,   m_lastSample);
-    if (from > to) return;
+    to = qBound(m_firstSample, to, m_lastSample);
+    if (from > to)
+        return;
 
     if (m_watcher.isRunning()) {
         // A read is already in flight — queue this request instead of blocking.
         // The finished handler will start it immediately when the current read ends.
         m_pendingFrom = from;
-        m_pendingTo   = to;
-        m_hasPending  = true;
-        m_loading     = false; // discard the in-flight result
+        m_pendingTo = to;
+        m_hasPending = true;
+        m_loading = false; // discard the in-flight result
         return;
     }
 
-    m_hasPending   = false;
+    m_hasPending = false;
     m_inFlightFrom = from;
-    m_loading      = true;
+    m_loading = true;
     m_watcher.setFuture(QtConcurrent::run([this, from, to]() {
         return doRead(from, to);
     }));
@@ -210,10 +212,12 @@ void FiffBlockReader::loadBlockAsync(int from, int to)
 
 MatrixXd FiffBlockReader::readBlockSync(int from, int to)
 {
-    if (!m_raw) return {};
+    if (!m_raw)
+        return {};
     from = qBound(m_firstSample, from, m_lastSample);
-    to   = qBound(m_firstSample, to,   m_lastSample);
-    if (from > to) return {};
+    to = qBound(m_firstSample, to, m_lastSample);
+    if (from > to)
+        return {};
     return doRead(from, to);
 }
 
@@ -287,7 +291,7 @@ void FiffBlockReader::updateProjections()
                    << matProj.rows() << "x" << matProj.cols()
                    << "off-identity norm:" << offDiagNorm;
     } else {
-        m_raw->proj.resize(0, 0);   // Clear — no active projectors
+        m_raw->proj.resize(0, 0); // Clear — no active projectors
         qWarning() << "[FiffBlockReader] Projections cleared (0 active).";
     }
 }

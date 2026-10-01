@@ -44,31 +44,46 @@ class Arrow;
 class PluginItem : public QGraphicsPolygonItem
 {
 public:
-    enum { Type = UserType + 15 };
-    PluginItem(SCSHAREDLIB::AbstractPlugin::SPtr pPlugin, QMenu *contextMenu, QGraphicsItem *parent = 0);
+    enum
+    {
+        Type = UserType + 15
+    };
+    PluginItem(SCSHAREDLIB::AbstractPlugin::SPtr pPlugin, QMenu* contextMenu, QGraphicsItem* parent = 0);
 
     ~PluginItem();
 
-    void removeArrow(Arrow *arrow);
+    void removeArrow(Arrow* arrow);
     void removeArrows();
-    SCSHAREDLIB::AbstractPlugin::PluginType diagramType() const { return m_pPlugin->getType(); }
-    SCSHAREDLIB::AbstractPlugin::SPtr plugin() { return m_pPlugin; }
+    SCSHAREDLIB::AbstractPlugin::PluginType diagramType() const
+    {
+        return m_pPlugin->getType();
+    }
+    SCSHAREDLIB::AbstractPlugin::SPtr plugin()
+    {
+        return m_pPlugin;
+    }
 
-    QPolygonF polygon() const { return m_qPolygon; }
-    void addArrow(Arrow *arrow);
+    QPolygonF polygon() const
+    {
+        return m_qPolygon;
+    }
+    void addArrow(Arrow* arrow);
     QPixmap image() const;
 
     QRectF boundingRect() const override;
     QPointF outputPortLocalPos() const;
     QPointF inputPortLocalPos() const;
 
-    int type() const override { return Type;}
+    int type() const override
+    {
+        return Type;
+    }
 
-    void paint(QPainter * painter, const QStyleOptionGraphicsItem * option, QWidget * widget = 0) override;
+    void paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget = 0) override;
 
 protected:
-    void contextMenuEvent(QGraphicsSceneContextMenuEvent *event) override;
-    QVariant itemChange(GraphicsItemChange change, const QVariant &value) override;
+    void contextMenuEvent(QGraphicsSceneContextMenuEvent* event) override;
+    QVariant itemChange(GraphicsItemChange change, const QVariant& value) override;
     void resizeAsRectangle(int width, int height);
 
 private:
@@ -92,8 +107,8 @@ private:
     static constexpr int MIN_WIDTH = 120;
     static constexpr int MIN_HEIGHT = 48;
 
-    QMenu *m_contextMenu;
-    QList<Arrow *> arrows;
+    QMenu* m_contextMenu;
+    QList<Arrow*> arrows;
 };
 } //NAMESPACE
 

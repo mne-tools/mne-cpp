@@ -59,8 +59,8 @@ class MNESurface;
 class MNESHARED_EXPORT MNEProjData
 {
 public:
-    typedef QSharedPointer<MNEProjData> SPtr;              /**< Shared pointer type for MNEProjData. */
-    typedef QSharedPointer<const MNEProjData> ConstSPtr;   /**< Const shared pointer type for MNEProjData. */
+    typedef QSharedPointer<MNEProjData> SPtr;            /**< Shared pointer type for MNEProjData. */
+    typedef QSharedPointer<const MNEProjData> ConstSPtr; /**< Const shared pointer type for MNEProjData. */
 
     //=========================================================================================================
     /**
@@ -77,11 +77,11 @@ public:
     ~MNEProjData() = default;
 
 public:
-    Eigen::VectorXf a;      /**< Triangle-local dot product r12 . r12 for each triangle. */
-    Eigen::VectorXf b;      /**< Triangle-local dot product r13 . r13 for each triangle. */
-    Eigen::VectorXf c;      /**< Triangle-local dot product r12 . r13 for each triangle. */
-    Eigen::VectorXi act;    /**< Per-triangle boolean flag: 1 if this triangle is active. */
-    int   nactive = 0;      /**< Number of currently active triangles. */
+    Eigen::VectorXf a;   /**< Triangle-local dot product r12 . r12 for each triangle. */
+    Eigen::VectorXf b;   /**< Triangle-local dot product r13 . r13 for each triangle. */
+    Eigen::VectorXf c;   /**< Triangle-local dot product r12 . r13 for each triangle. */
+    Eigen::VectorXi act; /**< Per-triangle boolean flag: 1 if this triangle is active. */
+    int nactive = 0;     /**< Number of currently active triangles. */
 };
 
 //=============================================================================================================

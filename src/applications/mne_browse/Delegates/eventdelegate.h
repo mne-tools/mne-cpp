@@ -53,20 +53,20 @@ class EventDelegate : public QItemDelegate
     Q_OBJECT
 
 public:
-    EventDelegate(QObject *parent = 0);
+    EventDelegate(QObject* parent = 0);
 
     //=========================================================================================================
     /**
      * Reimplemented virtual functions
      *
      */
-    QWidget *createEditor(QWidget *parent, const QStyleOptionViewItem &option, const QModelIndex &index) const;
-    void setEditorData(QWidget *editor, const QModelIndex &index) const;
-    void setModelData(QWidget *editor, QAbstractItemModel *model, const QModelIndex &index) const;
-    void updateEditorGeometry(QWidget *editor, const QStyleOptionViewItem &option, const QModelIndex &index) const;
+    QWidget* createEditor(QWidget* parent, const QStyleOptionViewItem& option, const QModelIndex& index) const;
+    void setEditorData(QWidget* editor, const QModelIndex& index) const;
+    void setModelData(QWidget* editor, QAbstractItemModel* model, const QModelIndex& index) const;
+    void updateEditorGeometry(QWidget* editor, const QStyleOptionViewItem& option, const QModelIndex& index) const;
 
 private:
-    QSettings       m_qSettings;            /**< QSettings variable used to write or read from independent application sessions. */
+    QSettings m_qSettings; /**< QSettings variable used to write or read from independent application sessions. */
 };
 
 } //NAMESPACE

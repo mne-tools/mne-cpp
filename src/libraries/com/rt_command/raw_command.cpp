@@ -33,7 +33,7 @@ using namespace COMLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-RawCommand::RawCommand(QObject *parent)
+RawCommand::RawCommand(QObject* parent)
 : QObject(parent)
 , m_bIsJson(false)
 {
@@ -41,7 +41,7 @@ RawCommand::RawCommand(QObject *parent)
 
 //=============================================================================================================
 
-RawCommand::RawCommand(const QString &p_sCommand, bool p_bIsJson, QObject *parent)
+RawCommand::RawCommand(const QString& p_sCommand, bool p_bIsJson, QObject* parent)
 : QObject(parent)
 , m_sCommand(p_sCommand)
 , m_bIsJson(p_bIsJson)
@@ -50,7 +50,7 @@ RawCommand::RawCommand(const QString &p_sCommand, bool p_bIsJson, QObject *paren
 
 //=============================================================================================================
 
-RawCommand::RawCommand(const RawCommand &p_rawCommand)
+RawCommand::RawCommand(const RawCommand& p_rawCommand)
 : QObject(p_rawCommand.parent())
 , m_sCommand(p_rawCommand.m_sCommand)
 , m_bIsJson(p_rawCommand.m_bIsJson)
@@ -67,7 +67,7 @@ void RawCommand::execute()
 
 //=============================================================================================================
 
-RawCommand& RawCommand::operator= (const RawCommand &rhs)
+RawCommand& RawCommand::operator=(const RawCommand& rhs)
 {
     if (this != &rhs) // protect against invalid self-assignment
     {

@@ -34,7 +34,8 @@
 // DEFINE NAMESPACE MNESETUPFORWARDMODEL
 //=============================================================================================================
 
-namespace MNESETUPFORWARDMODEL {
+namespace MNESETUPFORWARDMODEL
+{
 
 //=============================================================================================================
 /**
@@ -52,7 +53,7 @@ public:
      * @param[in] argc  Number of arguments.
      * @param[in] argv  Argument array.
      */
-    MNESetupForwardModelSettings(int *argc, char **argv);
+    MNESetupForwardModelSettings(int* argc, char** argv);
 
     //=========================================================================================================
     /**
@@ -186,22 +187,22 @@ public:
     bool overwrite() const;
 
 private:
-    QString m_sSubject;             /**< Subject name. */
-    QString m_sSubjectsDir;         /**< Subjects directory path. */
-    float   m_fScalpConductivity;   /**< Scalp conductivity [S/m]. */
-    float   m_fSkullConductivity;   /**< Skull conductivity [S/m]. */
-    float   m_fBrainConductivity;   /**< Brain conductivity [S/m]. */
-    QString m_sModelName;           /**< BEM model name (empty = auto). */
-    bool    m_bHomogeneous;         /**< Single-compartment model. */
-    bool    m_bUseSurfFormat;       /**< Use .surf instead of .tri. */
-    int     m_iIcoLevel;            /**< ICO subdivision level, -1 = not used. */
-    bool    m_bNoSolution;          /**< Skip solution preparation. */
-    bool    m_bSwap;                /**< Swap triangle winding order. */
-    bool    m_bMeters;              /**< Coordinates in meters. */
-    float   m_fInnerShift;          /**< Inner skull shift [mm]. */
-    float   m_fOuterShift;          /**< Outer skull shift [mm]. */
-    float   m_fScalpShift;          /**< Scalp shift [mm]. */
-    bool    m_bOverwrite;           /**< Overwrite existing files. */
+    QString m_sSubject;         /**< Subject name. */
+    QString m_sSubjectsDir;     /**< Subjects directory path. */
+    float m_fScalpConductivity; /**< Scalp conductivity [S/m]. */
+    float m_fSkullConductivity; /**< Skull conductivity [S/m]. */
+    float m_fBrainConductivity; /**< Brain conductivity [S/m]. */
+    QString m_sModelName;       /**< BEM model name (empty = auto). */
+    bool m_bHomogeneous;        /**< Single-compartment model. */
+    bool m_bUseSurfFormat;      /**< Use .surf instead of .tri. */
+    int m_iIcoLevel;            /**< ICO subdivision level, -1 = not used. */
+    bool m_bNoSolution;         /**< Skip solution preparation. */
+    bool m_bSwap;               /**< Swap triangle winding order. */
+    bool m_bMeters;             /**< Coordinates in meters. */
+    float m_fInnerShift;        /**< Inner skull shift [mm]. */
+    float m_fOuterShift;        /**< Outer skull shift [mm]. */
+    float m_fScalpShift;        /**< Scalp shift [mm]. */
+    bool m_bOverwrite;          /**< Overwrite existing files. */
 };
 
 } // namespace MNESETUPFORWARDMODEL

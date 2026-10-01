@@ -78,11 +78,11 @@ class FiffRawData;
 class FIFFSHARED_EXPORT FiffCov : public QSharedData
 {
 public:
-    using SPtr = QSharedPointer<FiffCov>;            /**< Shared pointer type for FiffCov. */
-    using ConstSPtr = QSharedPointer<const FiffCov>; /**< Const shared pointer type for FiffCov. */
-    using UPtr = std::unique_ptr<FiffCov>;             /**< Unique pointer type for FiffCov. */
-    using ConstUPtr = std::unique_ptr<const FiffCov>;  /**< Const unique pointer type for FiffCov. */
-    using SDPtr = QSharedDataPointer<FiffCov>;       /**< Shared data pointer type for FiffCov. */
+    using SPtr = QSharedPointer<FiffCov>;             /**< Shared pointer type for FiffCov. */
+    using ConstSPtr = QSharedPointer<const FiffCov>;  /**< Const shared pointer type for FiffCov. */
+    using UPtr = std::unique_ptr<FiffCov>;            /**< Unique pointer type for FiffCov. */
+    using ConstUPtr = std::unique_ptr<const FiffCov>; /**< Const unique pointer type for FiffCov. */
+    using SDPtr = QSharedDataPointer<FiffCov>;        /**< Shared data pointer type for FiffCov. */
 
     //=========================================================================================================
     /**
@@ -96,7 +96,7 @@ public:
      *
      * @param[in] p_IODevice     IO device to read from the evoked data set.
      */
-    FiffCov(QIODevice &p_IODevice);
+    FiffCov(QIODevice& p_IODevice);
 
     //=========================================================================================================
     /**
@@ -104,7 +104,7 @@ public:
      *
      * @param[in] p_FiffCov   Covariance data matrix which should be copied.
      */
-    FiffCov(const FiffCov &p_FiffCov);
+    FiffCov(const FiffCov& p_FiffCov);
 
     //=========================================================================================================
     /**
@@ -137,7 +137,7 @@ public:
      *
      * @return Covariance solution restricted to selected channels.
      */
-    FiffCov pick_channels(const QStringList &p_include = defaultQStringList, const QStringList &p_exclude = defaultQStringList);
+    FiffCov pick_channels(const QStringList& p_include = defaultQStringList, const QStringList& p_exclude = defaultQStringList);
 
     //=========================================================================================================
     /**
@@ -187,9 +187,9 @@ public:
      *
      * @return The computed noise covariance matrix, or empty FiffCov on failure.
      */
-    static FiffCov compute_from_epochs(const FiffRawData &raw,
-                                       const Eigen::MatrixXi &events,
-                                       const QList<int> &eventCodes,
+    static FiffCov compute_from_epochs(const FiffRawData& raw,
+                                       const Eigen::MatrixXi& events,
+                                       const QList<int>& eventCodes,
                                        float tmin,
                                        float tmax,
                                        float bmin = 0.0f,
@@ -206,7 +206,7 @@ public:
      * @param[in] fileName  Output file path.
      * @return true on success.
      */
-    bool save(const QString &fileName) const;
+    bool save(const QString& fileName) const;
 
     //=========================================================================================================
     /**
@@ -216,7 +216,7 @@ public:
      * @param[in] covs      List of covariance matrices to combine.
      * @return The grand-average covariance matrix, or empty FiffCov if covs is empty.
      */
-    static FiffCov computeGrandAverage(const QList<FiffCov> &covs);
+    static FiffCov computeGrandAverage(const QList<FiffCov>& covs);
 
     //=========================================================================================================
     /**
@@ -226,7 +226,7 @@ public:
      *
      * @return the copied covariance matrix.
      */
-    FiffCov& operator= (const FiffCov &rhs);
+    FiffCov& operator=(const FiffCov& rhs);
 
     //=========================================================================================================
     /**
@@ -237,21 +237,20 @@ public:
      *
      * @return the stream with the attached fiff covariance matrix.
      */
-    friend std::ostream& operator<<(std::ostream& out, const FIFFLIB::FiffCov &p_FiffCov);
+    friend std::ostream& operator<<(std::ostream& out, const FIFFLIB::FiffCov& p_FiffCov);
 
 public:
-    fiff_int_t  kind;       /**< Covariance kind -> fiff_constants.h. */
-    Eigen::VectorXi chClass;    /**< Channel classification vector. */
-    bool diag;              /**< If the covariance is stored in a diagonal order. */
-    fiff_int_t dim;         /**< Dimension of the covariance (dim x dim). */
-    QStringList names;      /**< Channel names. */
-    Eigen::MatrixXd data;   /**< Covariance data. */
-    QList<FiffProj> projs;  /**< List of available ssp projectors. */
-    QStringList bads;       /**< List of bad channels. */
-    fiff_int_t nfree;       /**< Number of degrees of freedom. */
-    Eigen::VectorXd eig;    /**< Vector of eigenvalues. */
-    Eigen::MatrixXd eigvec; /**< Matrix of eigenvectors (each row represents an eigenvector). */
-
+    fiff_int_t kind;         /**< Covariance kind -> fiff_constants.h. */
+    Eigen::VectorXi chClass; /**< Channel classification vector. */
+    bool diag;               /**< If the covariance is stored in a diagonal order. */
+    fiff_int_t dim;          /**< Dimension of the covariance (dim x dim). */
+    QStringList names;       /**< Channel names. */
+    Eigen::MatrixXd data;    /**< Covariance data. */
+    QList<FiffProj> projs;   /**< List of available ssp projectors. */
+    QStringList bads;        /**< List of bad channels. */
+    fiff_int_t nfree;        /**< Number of degrees of freedom. */
+    Eigen::VectorXd eig;     /**< Vector of eigenvalues. */
+    Eigen::MatrixXd eigvec;  /**< Matrix of eigenvectors (each row represents an eigenvector). */
 };
 
 //=============================================================================================================
@@ -265,7 +264,7 @@ inline bool FiffCov::isEmpty() const
 
 //=============================================================================================================
 
-inline std::ostream& operator<<(std::ostream& out, const FIFFLIB::FiffCov &p_FiffCov)
+inline std::ostream& operator<<(std::ostream& out, const FIFFLIB::FiffCov& p_FiffCov)
 {
     bool t_bIsShort = true;
     out << "#### Fiff Covariance ####\n";
@@ -274,89 +273,81 @@ inline std::ostream& operator<<(std::ostream& out, const FIFFLIB::FiffCov &p_Fif
     out << "\tdim: " << p_FiffCov.dim << std::endl;
     out << "\tnames " << p_FiffCov.names.size() << ":\n\t";
 
-    if(t_bIsShort)
-    {
+    if (t_bIsShort) {
         qint32 nchan = p_FiffCov.names.size() > 6 ? 6 : p_FiffCov.names.size();
-        for(qint32 i = 0; i < nchan/2; ++i)
+        for (qint32 i = 0; i < nchan / 2; ++i)
             out << p_FiffCov.names[i].toUtf8().constData() << " ";
         out << "... ";
-        for(qint32 i = p_FiffCov.names.size() - nchan/2; i < p_FiffCov.names.size(); ++i)
+        for (qint32 i = p_FiffCov.names.size() - nchan / 2; i < p_FiffCov.names.size(); ++i)
             out << p_FiffCov.names[i].toUtf8().constData() << " ";
         out << std::endl;
     }
 
     out << "\tdata " << p_FiffCov.data.rows() << " x " << p_FiffCov.data.cols() << ":\n\t";
-    if(t_bIsShort)
-    {
+    if (t_bIsShort) {
         qint32 nrows = p_FiffCov.data.rows() > 6 ? 6 : p_FiffCov.data.rows();
         qint32 ncols = p_FiffCov.data.cols() > 6 ? 6 : p_FiffCov.data.cols();
-        for(qint32 i = 0; i < nrows/2; ++i)
-        {
-            for(qint32 j = 0; j < ncols/2; ++j)
-                out << p_FiffCov.data(i,j) << " ";
+        for (qint32 i = 0; i < nrows / 2; ++i) {
+            for (qint32 j = 0; j < ncols / 2; ++j)
+                out << p_FiffCov.data(i, j) << " ";
             out << "... ";
-            for(qint32 j = p_FiffCov.data.cols() - ncols/2; j < p_FiffCov.data.cols(); ++j)
-                out << p_FiffCov.data(i,j) << " ";
+            for (qint32 j = p_FiffCov.data.cols() - ncols / 2; j < p_FiffCov.data.cols(); ++j)
+                out << p_FiffCov.data(i, j) << " ";
             out << "\n\t";
         }
         out << "...\n\t";
-        for(qint32 i = p_FiffCov.data.rows()-nrows/2; i < p_FiffCov.data.rows(); ++i)
-        {
-            for(qint32 j = 0; j < ncols/2; ++j)
-                out << p_FiffCov.data(i,j) << " ";
+        for (qint32 i = p_FiffCov.data.rows() - nrows / 2; i < p_FiffCov.data.rows(); ++i) {
+            for (qint32 j = 0; j < ncols / 2; ++j)
+                out << p_FiffCov.data(i, j) << " ";
             out << "... ";
-            for(qint32 j = p_FiffCov.data.cols() - ncols/2; j < p_FiffCov.data.cols(); ++j)
-                out << p_FiffCov.data(i,j) << " ";
+            for (qint32 j = p_FiffCov.data.cols() - ncols / 2; j < p_FiffCov.data.cols(); ++j)
+                out << p_FiffCov.data(i, j) << " ";
             out << "\n\t";
         }
         out << "\n";
     }
     //Projectors
     out << "\tprojectors " << p_FiffCov.projs.size() << ":\n";
-    for(qint32 i = 0; i < p_FiffCov.projs.size(); ++i)
+    for (qint32 i = 0; i < p_FiffCov.projs.size(); ++i)
         out << "\t" << p_FiffCov.projs[i];
 
     //Bads
     out << "\tbads " << p_FiffCov.bads.size() << ":\n\t";
-    for(qint32 i = 0; i < p_FiffCov.bads.size(); ++i)
+    for (qint32 i = 0; i < p_FiffCov.bads.size(); ++i)
         out << p_FiffCov.bads[i].toUtf8().constData() << " ";
 
     out << "\n\tfree: " << p_FiffCov.nfree << std::endl;
 
     out << "\teig " << p_FiffCov.eig.size() << ":\n\t";
-    if(t_bIsShort)
-    {
+    if (t_bIsShort) {
         qint32 nrows = p_FiffCov.eig.size() > 6 ? 6 : p_FiffCov.eig.size();
-        for(qint32 i = 0; i < nrows/2; ++i)
+        for (qint32 i = 0; i < nrows / 2; ++i)
             out << p_FiffCov.eig[i] << " ";
         out << "... ";
-        for(qint32 i = p_FiffCov.eig.size() - nrows/2; i < p_FiffCov.eig.size(); ++i)
+        for (qint32 i = p_FiffCov.eig.size() - nrows / 2; i < p_FiffCov.eig.size(); ++i)
             out << p_FiffCov.eig[i] << " ";
         out << "\n\t";
     }
 
     out << "\n\teigvec " << p_FiffCov.eigvec.rows() << " x " << p_FiffCov.eigvec.cols() << ":\n\t";
-    if(t_bIsShort)
-    {
+    if (t_bIsShort) {
         qint32 nrows = p_FiffCov.eigvec.rows() > 6 ? 6 : p_FiffCov.eigvec.rows();
         qint32 ncols = p_FiffCov.eigvec.cols() > 6 ? 6 : p_FiffCov.eigvec.cols();
-        for(qint32 i = 0; i < nrows/2; ++i)
-        {
-            for(qint32 j = 0; j < ncols/2; ++j)
-                out << p_FiffCov.eigvec(i,j) << " ";
+        for (qint32 i = 0; i < nrows / 2; ++i) {
+            for (qint32 j = 0; j < ncols / 2; ++j)
+                out << p_FiffCov.eigvec(i, j) << " ";
             out << "... ";
-            for(qint32 j = p_FiffCov.eigvec.cols() - ncols/2; j < p_FiffCov.eigvec.cols(); ++j)
-                out << p_FiffCov.eigvec(i,j) << " ";
+            for (qint32 j = p_FiffCov.eigvec.cols() - ncols / 2; j < p_FiffCov.eigvec.cols(); ++j)
+                out << p_FiffCov.eigvec(i, j) << " ";
             out << "\n\t";
         }
         out << "...\n\t";
-        for(qint32 i = p_FiffCov.eigvec.rows() - nrows/2; i < p_FiffCov.eigvec.rows(); ++i)
-        {
-            for(qint32 j = 0; j < ncols/2; ++j)
-                out << p_FiffCov.eigvec(i,j) << " ";
+        for (qint32 i = p_FiffCov.eigvec.rows() - nrows / 2; i < p_FiffCov.eigvec.rows(); ++i) {
+            for (qint32 j = 0; j < ncols / 2; ++j)
+                out << p_FiffCov.eigvec(i, j) << " ";
             out << "... ";
-            for(qint32 j = p_FiffCov.eigvec.cols() - ncols/2; j < p_FiffCov.eigvec.cols(); ++j)
-                out << p_FiffCov.eigvec(i,j) << " ";
+            for (qint32 j = p_FiffCov.eigvec.cols() - ncols / 2; j < p_FiffCov.eigvec.cols(); ++j)
+                out << p_FiffCov.eigvec(i, j) << " ";
             out << "\n\t";
         }
         out << "\n";

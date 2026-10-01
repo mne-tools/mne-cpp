@@ -62,8 +62,8 @@ namespace UTILSLIB
  */
 struct UTILSSHARED_EXPORT ElectrodePosition
 {
-    QString name;              /**< Electrode name (e.g. "Cz", "Fp1"). */
-    Eigen::Vector3d pos;       /**< Position in metres (MNI head coords). */
+    QString name;        /**< Electrode name (e.g. "Cz", "Fp1"). */
+    Eigen::Vector3d pos; /**< Position in metres (MNI head coords). */
 };
 
 //=============================================================================================================
@@ -77,10 +77,11 @@ public:
     /**
      * @brief Supported standard montage systems.
      */
-    enum class System {
-        Standard_1020,    /**< 10-20 system (21 electrodes). */
-        Standard_1010,    /**< 10-10 system (81 electrodes). */
-        Standard_1005     /**< 10-05 system (345 electrodes). */
+    enum class System
+    {
+        Standard_1020, /**< 10-20 system (21 electrodes). */
+        Standard_1010, /**< 10-10 system (81 electrodes). */
+        Standard_1005  /**< 10-05 system (345 electrodes). */
     };
 
     //=========================================================================================================

@@ -40,7 +40,7 @@ using namespace BABYMEGPLUGIN;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-Plotter::Plotter(QWidget *parent)
+Plotter::Plotter(QWidget* parent)
 : QWidget(parent)
 {
     setBackgroundRole(QPalette::Dark);
@@ -49,26 +49,26 @@ Plotter::Plotter(QWidget *parent)
     setFocusPolicy(Qt::StrongFocus);
     rubberBandIsShown = false;
 
-//    zoomInButton = new QToolButton(this);
-//    zoomInButton->adjustSize();
-//    connect(zoomInButton,SIGNAL(clicked()), this, SLOT(zoomIn()));
+    //    zoomInButton = new QToolButton(this);
+    //    zoomInButton->adjustSize();
+    //    connect(zoomInButton,SIGNAL(clicked()), this, SLOT(zoomIn()));
 
-//    zoomOutButton = new QToolButton(this);
-//    zoomOutButton->adjustSize();
-//    connect(zoomOutButton,SIGNAL(clicked()), this, SLOT(zoomOut()));
+    //    zoomOutButton = new QToolButton(this);
+    //    zoomOutButton->adjustSize();
+    //    connect(zoomOutButton,SIGNAL(clicked()), this, SLOT(zoomOut()));
 
     setPlotSettings(PlotSettings());
 }
 
 //=============================================================================================================
 
-void Plotter::setPlotSettings(const PlotSettings &settings)
+void Plotter::setPlotSettings(const PlotSettings& settings)
 {
     zoomStack.clear();
     zoomStack.append(settings);
     curZoom = 0;
-//    zoomInButton->hide();
-//    zoomOutButton->hide();
+    //    zoomInButton->hide();
+    //    zoomOutButton->hide();
     refreshPixmap();
 }
 
@@ -100,7 +100,7 @@ void Plotter::setPlotSettings(const PlotSettings &settings)
 
 //=============================================================================================================
 
-void Plotter::setCurveData(int id, const QVector<QPointF> &curveData)
+void Plotter::setCurveData(int id, const QVector<QPointF>& curveData)
 {
     curveMap[id] = curveData;
     refreshPixmap();
@@ -118,45 +118,45 @@ void Plotter::clearCurve(int id)
 
 QSize Plotter::minimumSizeHint() const
 {
-    return QSize(6*Margin,4*Margin);
+    return QSize(6 * Margin, 4 * Margin);
 }
 
 //=============================================================================================================
 
 QSize Plotter::sizeHint() const
 {
-    return QSize(12*Margin, 8*Margin);
+    return QSize(12 * Margin, 8 * Margin);
 }
 
 //=============================================================================================================
 
-void Plotter::paintEvent(QPaintEvent * /*event*/)
+void Plotter::paintEvent(QPaintEvent* /*event*/)
 {
     QStylePainter painter(this);
-    painter.drawPixmap(0,0,pixmap);
+    painter.drawPixmap(0, 0, pixmap);
 
-//    if(rubberBandIsShown){
-//        painter.setPen(palette().light().color());
-//        painter.drawRect(rubberBandRect.normalized().adjusted(0,0,-1,-1));
-//    }
+    //    if(rubberBandIsShown){
+    //        painter.setPen(palette().light().color());
+    //        painter.drawRect(rubberBandRect.normalized().adjusted(0,0,-1,-1));
+    //    }
 
-//    if(hasFocus())
-//    {
-//        QStyleOptionFocusRect option;
-//        option.initFrom(this);
-//        option.backgroundColor = palette().dark().color();
-//        painter.drawPrimitive(QStyle::PE_FrameFocusRect, option);
-//    }
+    //    if(hasFocus())
+    //    {
+    //        QStyleOptionFocusRect option;
+    //        option.initFrom(this);
+    //        option.backgroundColor = palette().dark().color();
+    //        painter.drawPrimitive(QStyle::PE_FrameFocusRect, option);
+    //    }
 }
 
 //=============================================================================================================
 
-void Plotter::resizeEvent(QResizeEvent * /*event*/)
+void Plotter::resizeEvent(QResizeEvent* /*event*/)
 {
-//    int x = width() - (zoomInButton->width() + zoomOutButton->width() + 10);
+    //    int x = width() - (zoomInButton->width() + zoomOutButton->width() + 10);
 
-//    zoomInButton->move(x,5);
-//    zoomOutButton->move(x + zoomInButton->width() +5, 5);
+    //    zoomInButton->move(x,5);
+    //    zoomOutButton->move(x + zoomInButton->width() +5, 5);
     refreshPixmap();
 }
 
@@ -176,49 +176,48 @@ void Plotter::refreshPixmap()
 
 //=============================================================================================================
 
-void Plotter::drawGrid(QPainter *painter)
+void Plotter::drawGrid(QPainter* painter)
 {
-    QRect rect(xMargin+20, Margin-10, width()-2*xMargin, height() -2*Margin);
-    if(!rect.isValid()) return;
+    QRect rect(xMargin + 20, Margin - 10, width() - 2 * xMargin, height() - 2 * Margin);
+    if (!rect.isValid())
+        return;
 
     PlotSettings settings = zoomStack[curZoom];
     QPen quiteDark = palette().dark().color().lighter();
     QPen light = palette().light().color();
 
-    for(int i=0; i<=settings.numXTicks;++i)
-    {
-        int x = rect.left() + (i*(rect.width()-1)/settings.numXTicks);
-        double label = settings.minX + (i*settings.spanX()/settings.numXTicks);
+    for (int i = 0; i <= settings.numXTicks; ++i) {
+        int x = rect.left() + (i * (rect.width() - 1) / settings.numXTicks);
+        double label = settings.minX + (i * settings.spanX() / settings.numXTicks);
         painter->setPen(quiteDark);
-        painter->drawLine(x,rect.top(),x,rect.bottom());
+        painter->drawLine(x, rect.top(), x, rect.bottom());
         painter->setPen(light);
-        painter->drawLine(x,rect.bottom(),x,rect.bottom()-5);
-        painter->drawText(x,rect.bottom()+5,100,20,Qt::AlignLeft, QString::number(label));
+        painter->drawLine(x, rect.bottom(), x, rect.bottom() - 5);
+        painter->drawText(x, rect.bottom() + 5, 100, 20, Qt::AlignLeft, QString::number(label));
     }
 
-    painter->drawText(rect.left(),rect.bottom()+20,rect.width(),20,Qt::AlignCenter, settings.xlabel);
+    painter->drawText(rect.left(), rect.bottom() + 20, rect.width(), 20, Qt::AlignCenter, settings.xlabel);
 
-    for(int j=0; j<=settings.numYTicks;++j)
-    {
-        int y = rect.bottom() - (j*(rect.height()-1)/settings.numYTicks);
-        double label = settings.minY + (j*settings.spanY()/settings.numYTicks);
+    for (int j = 0; j <= settings.numYTicks; ++j) {
+        int y = rect.bottom() - (j * (rect.height() - 1) / settings.numYTicks);
+        double label = settings.minY + (j * settings.spanY() / settings.numYTicks);
         painter->setPen(quiteDark);
-        painter->drawLine(rect.left(),y,rect.right(),y);
+        painter->drawLine(rect.left(), y, rect.right(), y);
         painter->setPen(light);
-        painter->drawLine(rect.left()+5 ,y, rect.left(),y);
-        painter->drawText(rect.left()- xMargin -30, y-10, 100,20,
-                          Qt::AlignVCenter|Qt::AlignRight, QString::number(label));
+        painter->drawLine(rect.left() + 5, y, rect.left(), y);
+        painter->drawText(rect.left() - xMargin - 30, y - 10, 100, 20,
+                          Qt::AlignVCenter | Qt::AlignRight, QString::number(label));
     }
 
     //painter->drawText(rect.left()-10, rect.bottom(), rect.height(),20,Qt::AlignVCenter|Qt::AlignCenter, settings.ylabel);
 
-    drawRotatedText(painter, rect.left()-80, rect.bottom()-40, settings.ylabel);
-    painter->drawRect(rect.adjusted(0,0,-1,-1));
+    drawRotatedText(painter, rect.left() - 80, rect.bottom() - 40, settings.ylabel);
+    painter->drawRect(rect.adjusted(0, 0, -1, -1));
 }
 
 //=============================================================================================================
 
-void Plotter::drawRotatedText(QPainter *painter, int x, int y, const QString &text)
+void Plotter::drawRotatedText(QPainter* painter, int x, int y, const QString& text)
 {
     painter->save();
     painter->translate(x, y);
@@ -229,30 +228,31 @@ void Plotter::drawRotatedText(QPainter *painter, int x, int y, const QString &te
 
 //=============================================================================================================
 
-void Plotter::drawCurve(QPainter *painter)
+void Plotter::drawCurve(QPainter* painter)
 {
-    static const QColor colorForIds[6] = {Qt::red,Qt::green,Qt::blue,Qt::cyan,Qt::magenta,Qt::yellow};
+    static const QColor colorForIds[6] = {Qt::red, Qt::green, Qt::blue, Qt::cyan, Qt::magenta, Qt::yellow};
 
     PlotSettings settings = zoomStack[curZoom];
-    QRect rect(xMargin+20, Margin-10, width()-2*xMargin, height()-2*Margin);
-    if(!rect.isValid()) return;
+    QRect rect(xMargin + 20, Margin - 10, width() - 2 * xMargin, height() - 2 * Margin);
+    if (!rect.isValid())
+        return;
 
-    painter->setClipRect(rect.adjusted(+1,+1,-1,-1));
-    QMapIterator <int, QVector<QPointF> > i(curveMap);
+    painter->setClipRect(rect.adjusted(+1, +1, -1, -1));
+    QMapIterator<int, QVector<QPointF>> i(curveMap);
     while (i.hasNext()) {
-       i.next();
-       int id = i.key();
-       QVector<QPointF> curveData = i.value();
-       QPolygonF polyline(curveData.count());
-       for(int j=0; j<curveData.count(); ++j){
-           double dx = curveData[j].x() - settings.minX;
-           double dy = curveData[j].y() - settings.minY;
-           double x = rect.left() + (dx*(rect.width()-1)/settings.spanX());
-           double y = rect.bottom() - (dy *(rect.height()-1)/settings.spanY());
-           polyline[j] = QPointF(x,y);
-       }
-       painter->setPen(colorForIds[uint(id) % 6]);
-       painter->drawPolyline(polyline);
+        i.next();
+        int id = i.key();
+        QVector<QPointF> curveData = i.value();
+        QPolygonF polyline(curveData.count());
+        for (int j = 0; j < curveData.count(); ++j) {
+            double dx = curveData[j].x() - settings.minX;
+            double dy = curveData[j].y() - settings.minY;
+            double x = rect.left() + (dx * (rect.width() - 1) / settings.spanX());
+            double y = rect.bottom() - (dy * (rect.height() - 1) / settings.spanY());
+            polyline[j] = QPointF(x, y);
+        }
+        painter->setPen(colorForIds[uint(id) % 6]);
+        painter->drawPolyline(polyline);
     }
 }
 
@@ -271,23 +271,21 @@ PlotSettings::PlotSettings()
 
 //=============================================================================================================
 
-void PlotSettings::adjustAxis(double &min, double &max, int &numTicks)
+void PlotSettings::adjustAxis(double& min, double& max, int& numTicks)
 {
     const int MinTicks = 4;
-    double grossStep = (max-min)/ MinTicks;
+    double grossStep = (max - min) / MinTicks;
     double step = std::pow(10.0, std::floor(std::log10(grossStep)));
 
-    if(5*step<grossStep){
+    if (5 * step < grossStep) {
         step *= 5;
-    }
-    else if(2*step < grossStep){
+    } else if (2 * step < grossStep) {
         step *= 2;
     }
 
-    numTicks = int(std::ceil(max/step) - std::floor(min/step));
-    if(numTicks < MinTicks)
+    numTicks = int(std::ceil(max / step) - std::floor(min / step));
+    if (numTicks < MinTicks)
         numTicks = MinTicks;
-    min = std::floor(min/step)*step;
-    max = std::ceil(max/step)*step;
+    min = std::floor(min / step) * step;
+    max = std::ceil(max / step) * step;
 }
-

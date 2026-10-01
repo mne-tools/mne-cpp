@@ -32,7 +32,7 @@ using namespace MNEBROWSE;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-EventWindow::EventWindow(QWidget *parent)
+EventWindow::EventWindow(QWidget* parent)
 : QDockWidget(parent)
 , ui(new Ui::EventWindowDockWidget)
 , m_pMainWindow(static_cast<MainWindow*>(parent))
@@ -47,7 +47,7 @@ EventWindow::EventWindow(QWidget *parent)
     //------------------------
     //--- Setup data model ---
     //------------------------
-    if(m_pMainWindow->eventFile().exists())
+    if (m_pMainWindow->eventFile().exists())
         m_pEventModel = new EventModel(m_pMainWindow->eventFile(), this);
     else
         m_pEventModel = new EventModel(this);
@@ -119,12 +119,12 @@ void EventWindow::initMVCSettings()
     ui->m_tableView_eventTableView->adjustSize();
 
     //Connect selection in event window to jumpEvent slot
-    connect(ui->m_tableView_eventTableView->selectionModel(),&QItemSelectionModel::currentRowChanged,
-                this,&EventWindow::jumpToEvent);
+    connect(ui->m_tableView_eventTableView->selectionModel(), &QItemSelectionModel::currentRowChanged,
+            this, &EventWindow::jumpToEvent);
 
     //Update the data views whenever the data in the event model changes
-    connect(m_pEventModel,&EventModel::dataChanged,
-                m_pMainWindow->dataWindow(),&DataWindow::updateDataTableViews);
+    connect(m_pEventModel, &EventModel::dataChanged,
+            m_pMainWindow->dataWindow(), &DataWindow::updateDataTableViews);
 }
 
 
@@ -132,13 +132,13 @@ void EventWindow::initMVCSettings()
 
 void EventWindow::initCheckBoxes()
 {
-    connect(ui->m_checkBox_activateEvents,&QCheckBox::checkStateChanged, [this](Qt::CheckState state){
+    connect(ui->m_checkBox_activateEvents, &QCheckBox::checkStateChanged, [this](Qt::CheckState state) {
         m_pMainWindow->dataWindow()->getDataDelegate()->setActivateEvents(state == Qt::Checked);
         jumpToEvent(ui->m_tableView_eventTableView->selectionModel()->currentIndex(), QModelIndex());
         m_pMainWindow->dataWindow()->updateDataTableViews();
     });
 
-    connect(ui->m_checkBox_showSelectedEventsOnly,&QCheckBox::checkStateChanged, [this](Qt::CheckState state){
+    connect(ui->m_checkBox_showSelectedEventsOnly, &QCheckBox::checkStateChanged, [this](Qt::CheckState state) {
         m_pMainWindow->dataWindow()->getDataDelegate()->setShowSelectedEventsOnly(state == Qt::Checked);
         jumpToEvent(ui->m_tableView_eventTableView->selectionModel()->currentIndex(), QModelIndex());
         m_pMainWindow->dataWindow()->updateDataTableViews();
@@ -155,12 +155,12 @@ void EventWindow::initComboBoxes()
     ui->m_comboBox_filterTypes->setCurrentText("All");
 
     //Connect filter types to event model
-    connect(ui->m_comboBox_filterTypes, &QComboBox::currentTextChanged,[this](QString string){
+    connect(ui->m_comboBox_filterTypes, &QComboBox::currentTextChanged, [this](QString string) {
         m_pEventModel->setEventFilterType(string);
         m_pMainWindow->dataWindow()->updateDataTableViews();
     });
 
-    connect(m_pEventModel,&EventModel::updateEventTypes,
+    connect(m_pEventModel, &EventModel::updateEventTypes,
             this, &EventWindow::updateComboBox);
 }
 
@@ -169,25 +169,25 @@ void EventWindow::initComboBoxes()
 
 void EventWindow::initToolButtons()
 {
-    QToolBar *toolBar = new QToolBar(this);
+    QToolBar* toolBar = new QToolBar(this);
     toolBar->setOrientation(Qt::Vertical);
     toolBar->setMovable(false);
 
     //Add event
-    QAction* addEventAction = new QAction(QIcon(":/Resources/Images/addEvent.png"),tr("Add event"), this);
+    QAction* addEventAction = new QAction(QIcon(":/Resources/Images/addEvent.png"), tr("Add event"), this);
     addEventAction->setStatusTip(tr("Add an event to the event list"));
     toolBar->addAction(addEventAction);
     connect(addEventAction, &QAction::triggered,
             this, &EventWindow::addEventToEventModel);
 
     //Remove event
-    QAction* removeEvent = new QAction(QIcon(":/Resources/Images/removeEvent.png"),tr("Remove event"), this);
+    QAction* removeEvent = new QAction(QIcon(":/Resources/Images/removeEvent.png"), tr("Remove event"), this);
     removeEvent->setStatusTip(tr("Remove an event from the event list"));
     toolBar->addAction(removeEvent);
     connect(removeEvent, &QAction::triggered,
             this, &EventWindow::removeEventfromEventModel);
 
-    ui->m_gridLayout_Main->addWidget(toolBar,0,1,1,1);
+    ui->m_gridLayout_Main->addWidget(toolBar, 0, 1, 1, 1);
 }
 
 
@@ -202,29 +202,29 @@ void EventWindow::initPushButtons()
 
 //*************************************************************************************************************
 
-void EventWindow::updateComboBox(const QString &currentEventType)
+void EventWindow::updateComboBox(const QString& currentEventType)
 {
     ui->m_comboBox_filterTypes->clear();
     ui->m_comboBox_filterTypes->addItem("All");
     ui->m_comboBox_filterTypes->addItems(m_pEventModel->getEventTypeList());
-    if(m_pEventModel->getEventTypeList().contains(currentEventType))
+    if (m_pEventModel->getEventTypeList().contains(currentEventType))
         ui->m_comboBox_filterTypes->setCurrentText(currentEventType);
 }
 
 
 //*************************************************************************************************************
 
-bool EventWindow::event(QEvent * event)
+bool EventWindow::event(QEvent* event)
 {
     //On resize event center marker again
-    if(event->type() == QEvent::Resize) {
+    if (event->type() == QEvent::Resize) {
         jumpToEvent(ui->m_tableView_eventTableView->selectionModel()->currentIndex(), QModelIndex());
     }
 
     //Delete selected row on delete key press event
-    if(event->type() == QEvent::KeyPress && ui->m_tableView_eventTableView->hasFocus()) {
-        QKeyEvent *keyEvent = static_cast<QKeyEvent *>(event);
-        if(keyEvent->key() == Qt::Key_Delete)
+    if (event->type() == QEvent::KeyPress && ui->m_tableView_eventTableView->hasFocus()) {
+        QKeyEvent* keyEvent = static_cast<QKeyEvent*>(event);
+        if (keyEvent->key() == Qt::Key_Delete)
             removeEventfromEventModel();
     }
 
@@ -234,18 +234,18 @@ bool EventWindow::event(QEvent * event)
 
 //*************************************************************************************************************
 
-void EventWindow::jumpToEvent(const QModelIndex & current, const QModelIndex & previous)
+void EventWindow::jumpToEvent(const QModelIndex& current, const QModelIndex& previous)
 {
     Q_UNUSED(previous);
 
-    if(ui->m_checkBox_activateEvents->isChecked()) {
+    if (ui->m_checkBox_activateEvents->isChecked()) {
         //Always get the first column 0 (sample) of the model - Note: Need to map index from sorting model back to source model
         QModelIndex index = m_pEventModel->index(current.row(), 0);
 
         const int relativeSample = m_pEventModel->data(index, Qt::DisplayRole).toInt();
         const int absoluteSample = relativeSample + m_pEventModel->getFirstLastSample().first;
 
-        if(auto* channelView = m_pMainWindow->dataWindow()->getChannelDataView()) {
+        if (auto* channelView = m_pMainWindow->dataWindow()->getChannelDataView()) {
             const int visibleSamples = qMax(1, channelView->visibleSampleCount());
             const int firstFileSample = m_pMainWindow->dataWindow()->firstSample();
             const int lastFileSample = m_pMainWindow->dataWindow()->lastSample();
@@ -266,7 +266,7 @@ void EventWindow::removeEventfromEventModel()
 {
     QModelIndexList indexList = ui->m_tableView_eventTableView->selectionModel()->selectedIndexes();
 
-    for(int i = 0; i<indexList.size(); i++)
+    for (int i = 0; i < indexList.size(); i++)
         m_pEventModel->removeRow(indexList.at(i).row() - i); // - i because the internal data structure gets smaller by one with each succession in this for statement
 }
 

@@ -61,8 +61,8 @@ private slots:
     void cleanupTestCase();
 
 private:
-    MatrixXd m_kernel;      // n_sources × n_channels
-    MatrixXd m_leadField;   // n_channels × n_sources
+    MatrixXd m_kernel;    // n_sources × n_channels
+    MatrixXd m_leadField; // n_channels × n_sources
     MatrixXd m_resolution;
     int m_nSrc;
     int m_nCh;
@@ -228,7 +228,7 @@ void TestResolutionMatrix::testPeakLocalisationError()
 void TestResolutionMatrix::testDimensionMismatch()
 {
     MatrixXd K(3, 5);
-    MatrixXd L(4, 3);  // Mismatch: K.cols()=5 != L.rows()=4
+    MatrixXd L(4, 3); // Mismatch: K.cols()=5 != L.rows()=4
 
     MatrixXd R = InvResolutionMatrix::compute(K, L);
     QVERIFY(R.size() == 0);

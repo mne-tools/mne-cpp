@@ -55,7 +55,8 @@ namespace INVLIB
 /**
  * Result structure for the MxNE solver.
  */
-struct INVSHARED_EXPORT InvMxneResult {
+struct INVSHARED_EXPORT InvMxneResult
+{
     InvSourceEstimate stc;
     QVector<int> activeVertices;
     int nIterations;

@@ -49,7 +49,7 @@ using namespace UTILSLIB;
 
 //=============================================================================================================
 
-int main(int argc, char *argv[])
+int main(int argc, char* argv[])
 {
     qInstallMessageHandler(MNELogger::customLogWriter);
     QCoreApplication app(argc, argv);
@@ -78,10 +78,22 @@ int main(int argc, char *argv[])
     QString measFile = parser.value(measOpt);
     QString outFile = parser.value(outOpt);
 
-    if (measFile.isEmpty()) { qCritical("--meas is required."); return 1; }
-    if (!parser.isSet(bminOpt)) { qCritical("--bmin is required."); return 1; }
-    if (!parser.isSet(bmaxOpt)) { qCritical("--bmax is required."); return 1; }
-    if (outFile.isEmpty()) { qCritical("--out is required."); return 1; }
+    if (measFile.isEmpty()) {
+        qCritical("--meas is required.");
+        return 1;
+    }
+    if (!parser.isSet(bminOpt)) {
+        qCritical("--bmin is required.");
+        return 1;
+    }
+    if (!parser.isSet(bmaxOpt)) {
+        qCritical("--bmax is required.");
+        return 1;
+    }
+    if (outFile.isEmpty()) {
+        qCritical("--out is required.");
+        return 1;
+    }
 
     float bmin = parser.value(bminOpt).toFloat();
     float bmax = parser.value(bmaxOpt).toFloat();
@@ -89,21 +101,21 @@ int main(int argc, char *argv[])
     // Read evoked data without baseline correction
     QFile file(measFile);
     FiffEvokedSet evokedSet;
-    QPair<float,float> noBl(0.0f, 0.0f);
+    QPair<float, float> noBl(0.0f, 0.0f);
     if (!FiffEvokedSet::read(file, evokedSet, noBl, false)) {
         qCritical("Cannot read evoked data from: %s", qPrintable(measFile));
         return 1;
     }
 
-    qInfo("Read %lld evoked data set(s) from %s" ,
-           static_cast<long long>(evokedSet.evoked.size()), qPrintable(measFile));
-    qInfo("Applying baseline correction [%g, %g] s" , bmin, bmax);
+    qInfo("Read %lld evoked data set(s) from %s",
+          static_cast<long long>(evokedSet.evoked.size()), qPrintable(measFile));
+    qInfo("Applying baseline correction [%g, %g] s", bmin, bmax);
 
     // Apply baseline correction to each evoked dataset
-    QPair<float,float> baseline(bmin, bmax);
+    QPair<float, float> baseline(bmin, bmax);
     for (int i = 0; i < evokedSet.evoked.size(); ++i) {
         evokedSet.evoked[i].applyBaselineCorrection(baseline);
-        qInfo("  Set %d (%s): baseline corrected" , i, qPrintable(evokedSet.evoked[i].comment));
+        qInfo("  Set %d (%s): baseline corrected", i, qPrintable(evokedSet.evoked[i].comment));
     }
 
     // Save
@@ -112,6 +124,6 @@ int main(int argc, char *argv[])
         return 1;
     }
 
-    qInfo("Written baseline-corrected evoked data to: %s" , qPrintable(outFile));
+    qInfo("Written baseline-corrected evoked data to: %s", qPrintable(outFile));
     return 0;
 }

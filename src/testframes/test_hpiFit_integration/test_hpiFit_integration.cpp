@@ -61,7 +61,7 @@ using namespace Eigen;
  * @brief The TestHpiFitIntegration class provides hpi fit verifivcation tests
  *
  */
-class TestHpiFitIntegration: public QObject
+class TestHpiFitIntegration : public QObject
 {
     Q_OBJECT
 
@@ -95,11 +95,11 @@ private:
 //=============================================================================================================
 
 TestHpiFitIntegration::TestHpiFitIntegration()
-    : dErrorTrans(0.0003),
-      dErrorQuat(0.002),
-      dErrorTime(0.00000001),
-      dErrorAngle(0.1),
-      dErrorDetect(0.0)
+: dErrorTrans(0.0003)
+, dErrorQuat(0.002)
+, dErrorTime(0.00000001)
+, dErrorAngle(0.1)
+, dErrorDetect(0.0)
 {
 }
 
@@ -136,8 +136,8 @@ void TestHpiFitIntegration::initTestCase()
     fiff_int_t last = raw.last_samp;
     MatrixXd mData, mTimes;
 
-    float quantum_sec = 0.2f;   //read and write in 200 ms junks
-    fiff_int_t quantum = ceil(quantum_sec*pFiffInfo->sfreq);
+    float quantum_sec = 0.2f; //read and write in 200 ms junks
+    fiff_int_t quantum = ceil(quantum_sec * pFiffInfo->sfreq);
 
     // Read Quaternion File from maxfilter and calculated movements/rotations with python
     IOUtils::read_eigen_matrix(mRefPos, QCoreApplication::applicationDirPath() + "/../resources/data/mne-cpp-test-data/Result/ref_hpiFit_pos.txt");
@@ -150,7 +150,7 @@ void TestHpiFitIntegration::initTestCase()
     float threshTrans = 0.002f;
 
     // Setup informations for HPI fit
-    vFreqs = {154,158,161,166};
+    vFreqs = {154, 158, 161, 166};
     Eigen::MatrixXd mProjectors = Eigen::MatrixXd::Identity(pFiffInfo->chs.size(), pFiffInfo->chs.size());
     QString sHPIResourceDir = QCoreApplication::applicationDirPath() + "/HPIFittingDebug";
 
@@ -159,44 +159,44 @@ void TestHpiFitIntegration::initTestCase()
     int iSampleFreq = pFiffInfo->sfreq;
     int iLineFreq = pFiffInfo->linefreq;
     InvHpiModelParameters hpiModelParameters(vFreqs,
-                                          iSampleFreq,
-                                          iLineFreq,
-                                          true);
+                                             iSampleFreq,
+                                             iLineFreq,
+                                             true);
 
-    from = first + mRefPos(0,0)*pFiffInfo->sfreq;
+    from = first + mRefPos(0, 0) * pFiffInfo->sfreq;
     to = from + quantum;
-    if(!raw.read_raw_segment(mData, mTimes, from, to)) {
+    if (!raw.read_raw_segment(mData, mTimes, from, to)) {
         qCritical("error during read_raw_segment");
     }
 
     qInfo() << "Order Frequecies: ...";
-    hpiDataUpdater.prepareDataAndProjectors(mData,mProjectors);
+    hpiDataUpdater.prepareDataAndProjectors(mData, mProjectors);
     const auto& matProjectedData = hpiDataUpdater.getProjectedData();
     const auto& matPreparedProjectors = hpiDataUpdater.getProjectors();
     const auto& matCoilsHead = hpiDataUpdater.getHpiDigitizer();
 
     HpiFitResult hpiFitResult;
-    HPI.fit(matProjectedData,matPreparedProjectors,hpiModelParameters,matCoilsHead,true,hpiFitResult);
+    HPI.fit(matProjectedData, matPreparedProjectors, hpiModelParameters, matCoilsHead, true, hpiFitResult);
     hpiModelParameters = InvHpiModelParameters(hpiFitResult.hpiFreqs,
-                                            pFiffInfo->sfreq,
-                                            pFiffInfo->linefreq,
-                                            true);
+                                               pFiffInfo->sfreq,
+                                               pFiffInfo->linefreq,
+                                               true);
     vFreqs = hpiFitResult.hpiFreqs;
 
     qInfo() << "[done]";
 
-    for(int i = 0; i < mRefPos.rows(); i++) {
-        from = first + mRefPos(i,0)*pFiffInfo->sfreq;
+    for (int i = 0; i < mRefPos.rows(); i++) {
+        from = first + mRefPos(i, 0) * pFiffInfo->sfreq;
         to = from + quantum;
         if (to > last) {
             to = last;
         }
 
-        if(!raw.read_raw_segment(mData, mTimes, from, to)) {
+        if (!raw.read_raw_segment(mData, mTimes, from, to)) {
             qWarning("error during read_raw_segment\n");
         }
 
-        hpiDataUpdater.prepareDataAndProjectors(mData,mProjectors);
+        hpiDataUpdater.prepareDataAndProjectors(mData, mProjectors);
         const auto& matProjectedDataLoop = hpiDataUpdater.getProjectedData();
         const auto& matPreparedProjectorsLoop = hpiDataUpdater.getProjectors();
         HPI.fit(matProjectedDataLoop,
@@ -205,14 +205,13 @@ void TestHpiFitIntegration::initTestCase()
                 matCoilsHead,
                 hpiFitResult);
 
-        if(InvHpiFit::compareTransformation(devHeadT.trans, hpiFitResult.devHeadTrans.trans, threshRot, threshTrans)) {
-            mHpiResult(i,2) = 1;
+        if (InvHpiFit::compareTransformation(devHeadT.trans, hpiFitResult.devHeadTrans.trans, threshRot, threshTrans)) {
+            mHpiResult(i, 2) = 1;
         }
 
-        InvHpiFit::storeHeadPosition(mRefPos(i,0), hpiFitResult.devHeadTrans.trans, mHpiPos, hpiFitResult.GoF, hpiFitResult.errorDistances);
-        mHpiResult(i,0) = devHeadT.translationTo(hpiFitResult.devHeadTrans.trans);
-        mHpiResult(i,1) = devHeadT.angleTo(hpiFitResult.devHeadTrans.trans);
-
+        InvHpiFit::storeHeadPosition(mRefPos(i, 0), hpiFitResult.devHeadTrans.trans, mHpiPos, hpiFitResult.GoF, hpiFitResult.errorDistances);
+        mHpiResult(i, 0) = devHeadT.translationTo(hpiFitResult.devHeadTrans.trans);
+        mHpiResult(i, 1) = devHeadT.angleTo(hpiFitResult.devHeadTrans.trans);
     }
     // For debug: position file for InvHpiFit
     //    UTILSLIB::IOUtils::write_eigen_matrix(mHpiPos, QCoreApplication::applicationDirPath() + "/../resources/data/MNE-sample-data/mHpiPos.txt");
@@ -222,7 +221,7 @@ void TestHpiFitIntegration::initTestCase()
 
 void TestHpiFitIntegration::compareFrequencies()
 {
-    QVector<int> vFreqRef {166, 154, 161, 158};
+    QVector<int> vFreqRef{166, 154, 161, 158};
     QVERIFY(vFreqRef == vFreqs);
 }
 
@@ -231,9 +230,9 @@ void TestHpiFitIntegration::compareFrequencies()
 void TestHpiFitIntegration::compareTranslation()
 {
     RowVector3d vDiffTrans;
-    vDiffTrans(0) = (mRefPos.col(4)-mHpiPos.col(4)).mean();
-    vDiffTrans(1) = (mRefPos.col(5)-mHpiPos.col(5)).mean();
-    vDiffTrans(2) = (mRefPos.col(6)-mHpiPos.col(6)).mean();
+    vDiffTrans(0) = (mRefPos.col(4) - mHpiPos.col(4)).mean();
+    vDiffTrans(1) = (mRefPos.col(5) - mHpiPos.col(5)).mean();
+    vDiffTrans(2) = (mRefPos.col(6) - mHpiPos.col(6)).mean();
     qDebug() << "ErrorTrans x: " << std::abs(vDiffTrans(0));
     qDebug() << "ErrorTrans y: " << std::abs(vDiffTrans(1));
     qDebug() << "ErrorTrans z: " << std::abs(vDiffTrans(2));
@@ -247,12 +246,12 @@ void TestHpiFitIntegration::compareTranslation()
 void TestHpiFitIntegration::compareRotation()
 {
     RowVector3d vDiffQuat;
-    vDiffQuat(0) = (mRefPos.col(1)-mHpiPos.col(1)).mean();
-    vDiffQuat(1) = (mRefPos.col(2)-mHpiPos.col(2)).mean();
-    vDiffQuat(2) = (mRefPos.col(3)-mHpiPos.col(3)).mean();
-    qDebug() << "ErrorQuat q1: " <<std::abs(vDiffQuat(0));
-    qDebug() << "ErrorQuat q2: " <<std::abs(vDiffQuat(1));
-    qDebug() << "ErrorQuat q3: " <<std::abs(vDiffQuat(2));
+    vDiffQuat(0) = (mRefPos.col(1) - mHpiPos.col(1)).mean();
+    vDiffQuat(1) = (mRefPos.col(2) - mHpiPos.col(2)).mean();
+    vDiffQuat(2) = (mRefPos.col(3) - mHpiPos.col(3)).mean();
+    qDebug() << "ErrorQuat q1: " << std::abs(vDiffQuat(0));
+    qDebug() << "ErrorQuat q2: " << std::abs(vDiffQuat(1));
+    qDebug() << "ErrorQuat q3: " << std::abs(vDiffQuat(2));
     QVERIFY(std::abs(vDiffQuat(0)) < dErrorQuat);
     QVERIFY(std::abs(vDiffQuat(1)) < dErrorQuat);
     QVERIFY(std::abs(vDiffQuat(2)) < dErrorQuat);
@@ -262,7 +261,7 @@ void TestHpiFitIntegration::compareRotation()
 
 void TestHpiFitIntegration::compareMove()
 {
-    float fDiffMove = (mRefResult.col(0)-mHpiResult.col(0)).mean();
+    float fDiffMove = (mRefResult.col(0) - mHpiResult.col(0)).mean();
     fDiffMove = std::abs(fDiffMove);
 
     qDebug() << "DiffMove: [m]" << fDiffMove;
@@ -273,7 +272,7 @@ void TestHpiFitIntegration::compareMove()
 
 void TestHpiFitIntegration::compareAngle()
 {
-    float fDiffAngle = (mRefResult.col(1)-mHpiResult.col(1)).mean();
+    float fDiffAngle = (mRefResult.col(1) - mHpiResult.col(1)).mean();
     fDiffAngle = std::abs(fDiffAngle);
 
     qDebug() << "DiffAngle: [degree]" << fDiffAngle;
@@ -284,7 +283,7 @@ void TestHpiFitIntegration::compareAngle()
 
 void TestHpiFitIntegration::compareDetect()
 {
-    float fDiffCompare = (mRefResult.col(2)-mHpiResult.col(2)).mean();
+    float fDiffCompare = (mRefResult.col(2) - mHpiResult.col(2)).mean();
     fDiffCompare = std::abs(fDiffCompare);
 
     qDebug() << "DiffCompare: " << fDiffCompare;
@@ -295,8 +294,8 @@ void TestHpiFitIntegration::compareDetect()
 
 void TestHpiFitIntegration::compareTime()
 {
-    MatrixXd mDiff = MatrixXd::Zero(mRefPos.rows(),1);
-    mDiff.col(0) = mRefPos.col(0)-mHpiPos.col(0);
+    MatrixXd mDiff = MatrixXd::Zero(mRefPos.rows(), 1);
+    mDiff.col(0) = mRefPos.col(0) - mHpiPos.col(0);
     float fDiffTime = mDiff.col(0).mean();
 
     qDebug() << "ErrorTime: " << fDiffTime;

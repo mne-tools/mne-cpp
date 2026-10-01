@@ -50,24 +50,27 @@ public:
     MNELayout() = default;
     ~MNELayout() = default;
 
-    QString   name;              /**< Source file name this layout was loaded from. */
-    float     xmin = 0;          /**< VDC left limit. */
-    float     xmax = 0;          /**< VDC right limit. */
-    float     ymin = 0;          /**< VDC bottom limit. */
-    float     ymax = 0;          /**< VDC top limit. */
-    float     cxmin = 0;         /**< Confined VDC left limit. */
-    float     cxmax = 0;         /**< Confined VDC right limit. */
-    float     cymin = 0;         /**< Confined VDC bottom limit. */
-    float     cymax = 0;         /**< Confined VDC top limit. */
+    QString name;                     /**< Source file name this layout was loaded from. */
+    float xmin = 0;                   /**< VDC left limit. */
+    float xmax = 0;                   /**< VDC right limit. */
+    float ymin = 0;                   /**< VDC bottom limit. */
+    float ymax = 0;                   /**< VDC top limit. */
+    float cxmin = 0;                  /**< Confined VDC left limit. */
+    float cxmax = 0;                  /**< Confined VDC right limit. */
+    float cymin = 0;                  /**< Confined VDC bottom limit. */
+    float cymax = 0;                  /**< Confined VDC top limit. */
     std::vector<MNELayoutPort> ports; /**< Viewports. */
-    Eigen::MatrixXi match;       /**< Channel-to-port matching matrix (nchan x nport). */
+    Eigen::MatrixXi match;            /**< Channel-to-port matching matrix (nchan x nport). */
 
     /**
      * @brief Returns the number of channels (rows in match matrix).
      *
      * @return Number of rows of the channel-to-port matching matrix.
      */
-    int nmatch() const { return match.rows(); }
+    int nmatch() const
+    {
+        return match.rows();
+    }
 };
 
 } // namespace MNELIB

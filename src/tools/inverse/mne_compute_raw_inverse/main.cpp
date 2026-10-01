@@ -81,7 +81,7 @@ using namespace UTILSLIB;
 // HELPER: detect whether a FIFF file is raw or evoked
 //=============================================================================================================
 
-static bool isRawFile(const QString &fileName)
+static bool isRawFile(const QString& fileName)
 {
     QFile file(fileName);
     FiffStream::SPtr stream(new FiffStream(&file));
@@ -99,7 +99,7 @@ static bool isRawFile(const QString &fileName)
     }
 
     bool hasRaw = dirTree->has_kind(FIFFB_RAW_DATA) ||
-                  dirTree->has_kind(FIFFB_CONTINUOUS_DATA);
+        dirTree->has_kind(FIFFB_CONTINUOUS_DATA);
     stream->close();
     return hasRaw;
 }
@@ -108,12 +108,13 @@ static bool isRawFile(const QString &fileName)
 // HELPER: sanitize a string for safe use as part of a filename
 //=============================================================================================================
 
-static QString sanitizeForFilename(const QString &s)
+static QString sanitizeForFilename(const QString& s)
 {
     QString result = s.simplified().toLower();
     result.replace(' ', '_');
     result.replace(QRegularExpression("[^a-z0-9_-]"), "");
-    if (result.isEmpty()) result = "unknown";
+    if (result.isEmpty())
+        result = "unknown";
     return result;
 }
 
@@ -121,7 +122,7 @@ static QString sanitizeForFilename(const QString &s)
 // HELPER: compose output file name from label file name
 //=============================================================================================================
 
-[[maybe_unused]] static QString composeOutName(const QString &labelName, const QString &tag, bool raw)
+[[maybe_unused]] static QString composeOutName(const QString& labelName, const QString& tag, bool raw)
 {
     QFileInfo fi(labelName);
     QString base = fi.completeBaseName();
@@ -138,7 +139,7 @@ static QString sanitizeForFilename(const QString &s)
 // HELPER: detect label hemisphere from file name
 //=============================================================================================================
 
-static int labelHemisphere(const QString &name)
+static int labelHemisphere(const QString& name)
 {
     QFileInfo fi(name);
     QString base = fi.fileName();
@@ -155,7 +156,7 @@ static int labelHemisphere(const QString &name)
 // HELPER: find label files in a directory
 //=============================================================================================================
 
-static QStringList findLabelsInDir(const QString &dir)
+static QStringList findLabelsInDir(const QString& dir)
 {
     QStringList labels;
     QDirIterator it(dir, QStringList() << "*.label", QDir::Files);
@@ -170,13 +171,13 @@ static QStringList findLabelsInDir(const QString &dir)
 // Process a single label: compute source estimate for the label vertices
 //=============================================================================================================
 
-static InvSourceEstimate processLabel(const QString &labelFile,
-                                      const MNEInverseOperator &invOp,
-                                      const MatrixXd &data,
+static InvSourceEstimate processLabel(const QString& labelFile,
+                                      const MNEInverseOperator& invOp,
+                                      const MatrixXd& data,
                                       float tmin,
                                       float tstep,
                                       float lambda2,
-                                      const QString &method,
+                                      const QString& method,
                                       bool pickNormal)
 {
     // Read the label
@@ -193,10 +194,10 @@ static InvSourceEstimate processLabel(const QString &labelFile,
     }
     label.hemi = hemi;
 
-    qInfo("  FsLabel %s: %ld vertices (%s hemisphere)" ,
-           labelFile.toUtf8().constData(),
-           (long)label.vertices.size(),
-           hemi == 0 ? "left" : "right");
+    qInfo("  FsLabel %s: %ld vertices (%s hemisphere)",
+          labelFile.toUtf8().constData(),
+          (long)label.vertices.size(),
+          hemi == 0 ? "left" : "right");
 
     // Set up minimum norm with label restriction
     InvMinimumNorm minimumNorm(invOp, lambda2, method);
@@ -233,14 +234,14 @@ static InvSourceEstimate processLabel(const QString &labelFile,
 // Process label directory: compute average waveform per label
 //=============================================================================================================
 
-static InvSourceEstimate processLabelDir(const QString &labelDir,
-                                         const MNEInverseOperator &invOp,
-                                         const MatrixXd &data,
+static InvSourceEstimate processLabelDir(const QString& labelDir,
+                                         const MNEInverseOperator& invOp,
+                                         const MatrixXd& data,
                                          float tmin,
                                          float tstep,
                                          float lambda2,
-                                         const QString &method,
-                                         QStringList &labelNames)
+                                         const QString& method,
+                                         QStringList& labelNames)
 {
     QStringList labelFiles = findLabelsInDir(labelDir);
     if (labelFiles.isEmpty()) {
@@ -248,7 +249,7 @@ static InvSourceEstimate processLabelDir(const QString &labelDir,
         return InvSourceEstimate();
     }
 
-    qInfo("Found %lld label files in %s" , (long long)labelFiles.size(), labelDir.toUtf8().constData());
+    qInfo("Found %lld label files in %s", (long long)labelFiles.size(), labelDir.toUtf8().constData());
 
     // Compute full inverse solution first (with pickNormal=true for labeldir)
     InvMinimumNorm minimumNorm(invOp, lambda2, method);
@@ -303,8 +304,8 @@ static InvSourceEstimate processLabelDir(const QString &labelDir,
         QFileInfo fi(labelFiles[i]);
         labelNames.append(fi.fileName());
 
-        qInfo("  FsLabel %s: %ld vertices, averaged" ,
-               fi.fileName().toUtf8().constData(), (long)labelIndices.size());
+        qInfo("  FsLabel %s: %ld vertices, averaged",
+              fi.fileName().toUtf8().constData(), (long)labelIndices.size());
 
         validLabels++;
     }
@@ -337,7 +338,7 @@ static InvSourceEstimate processLabelDir(const QString &labelDir,
  * @param[in] argv  (argument vector)
  * @return exit code (0 on success).
  */
-int main(int argc, char *argv[])
+int main(int argc, char* argv[])
 {
     qInstallMessageHandler(MNELogger::customLogWriter);
     QCoreApplication app(argc, argv);
@@ -352,94 +353,93 @@ int main(int argc, char *argv[])
     parser.setApplicationDescription(
         "Compute raw/evoked inverse solution (MNE/dSPM/sLORETA) restricted to labels.\n"
         "Port of the original MNE-C mne_compute_raw_inverse by Matti Hamalainen.\n\n"
-        "Produces source waveforms from labels. Output the results as STC files."
-    );
+        "Produces source waveforms from labels. Output the results as STC files.");
     parser.addHelpOption();
     parser.addVersionOption();
 
     // --in: Input raw or evoked FIFF file
     QCommandLineOption inOpt(QStringList() << "in",
-        "The raw or evoked data input file.", "file");
+                             "The raw or evoked data input file.", "file");
     parser.addOption(inOpt);
 
     // --inv: Inverse operator file
     QCommandLineOption invOpt(QStringList() << "inv",
-        "The inverse operator file.", "file");
+                              "The inverse operator file.", "file");
     parser.addOption(invOpt);
 
     // --snr: SNR estimate
     QCommandLineOption snrOpt(QStringList() << "snr",
-        "SNR to use (default: 1.0).", "value", "1.0");
+                              "SNR to use (default: 1.0).", "value", "1.0");
     parser.addOption(snrOpt);
 
     // --nave: Number of averages
     QCommandLineOption naveOpt(QStringList() << "nave",
-        "Number of averages (default: 1 for raw, from data for evoked).", "number");
+                               "Number of averages (default: 1 for raw, from data for evoked).", "number");
     parser.addOption(naveOpt);
 
     // --set: Evoked data set number (-1 or omitted = process all sets)
     QCommandLineOption setOpt(QStringList() << "set",
-        "Evoked data set number to use (default: process all sets).", "number");
+                              "Evoked data set number to use (default: process all sets).", "number");
     parser.addOption(setOpt);
 
     // --bmin: Baseline start time in ms
     QCommandLineOption bminOpt(QStringList() << "bmin",
-        "Baseline starting time in ms.", "time/ms");
+                               "Baseline starting time in ms.", "time/ms");
     parser.addOption(bminOpt);
 
     // --bmax: Baseline end time in ms
     QCommandLineOption bmaxOpt(QStringList() << "bmax",
-        "Baseline ending time in ms.", "time/ms");
+                               "Baseline ending time in ms.", "time/ms");
     parser.addOption(bmaxOpt);
 
     // --label: FsLabel file(s) to process (can be specified multiple times)
     QCommandLineOption labelOpt(QStringList() << "label",
-        "FsLabel file to process (can have multiple).", "file");
+                                "FsLabel file to process (can have multiple).", "file");
     parser.addOption(labelOpt);
 
     // --labeldir: Process all labels in this directory
     QCommandLineOption labeldirOpt(QStringList() << "labeldir",
-        "Create file with average waveform for each label in this directory.", "dir");
+                                   "Create file with average waveform for each label in this directory.", "dir");
     parser.addOption(labeldirOpt);
 
     // --out: Output file name
     QCommandLineOption outOpt(QStringList() << "out",
-        "Output file name (needed for --labeldir, optional otherwise).", "file");
+                              "Output file name (needed for --labeldir, optional otherwise).", "file");
     parser.addOption(outOpt);
 
     // --picknormalcomp: Pick normal component
     QCommandLineOption pickNormalOpt(QStringList() << "picknormalcomp",
-        "Pick the current component normal to the cortex.");
+                                     "Pick the current component normal to the cortex.");
     parser.addOption(pickNormalOpt);
 
     // --spm / --dSPM: Use dSPM
     QCommandLineOption spmOpt(QStringList() << "spm",
-        "Use dSPM method.");
+                              "Use dSPM method.");
     parser.addOption(spmOpt);
 
     // --sloreta: Use sLORETA
     QCommandLineOption sloretaOpt(QStringList() << "sloreta",
-        "Use sLORETA method.");
+                                  "Use sLORETA method.");
     parser.addOption(sloretaOpt);
 
     // --mricoord: Use MRI coordinates
     QCommandLineOption mriCoordOpt(QStringList() << "mricoord",
-        "List source locations in MRI coordinates instead of head coordinates.");
+                                   "List source locations in MRI coordinates instead of head coordinates.");
     parser.addOption(mriCoordOpt);
 
     // --orignames: Use original label file names
     QCommandLineOption origNamesOpt(QStringList() << "orignames",
-        "Use original label file names in channel names with --labeldir.");
+                                    "Use original label file names in channel names with --labeldir.");
     parser.addOption(origNamesOpt);
 
     // --align_z: Align waveform signs
     QCommandLineOption alignZOpt(QStringList() << "align_z",
-        "Try to align waveform signs using normal information.");
+                                 "Try to align waveform signs using normal information.");
     parser.addOption(alignZOpt);
 
     // --labellist: Output label name list
     QCommandLineOption labelListOpt(QStringList() << "labellist",
-        "Output the names of labels used from --labeldir to this file.", "file");
+                                    "Output the names of labels used from --labeldir to this file.", "file");
     parser.addOption(labelListOpt);
 
     parser.process(app);
@@ -513,26 +513,26 @@ int main(int argc, char *argv[])
     //=========================================================================================================
 
     qInfo("%s", "");
-    qInfo("mne_compute_raw_inverse v%s" , PROGRAM_VERSION);
+    qInfo("mne_compute_raw_inverse v%s", PROGRAM_VERSION);
     qInfo("========================================");
-    qInfo("Input file             : %s" , inName.toUtf8().constData());
+    qInfo("Input file             : %s", inName.toUtf8().constData());
     if (doBaseline) {
-        qInfo("Baseline               : %10.2f ... %10.2f ms" , 1000.0f * bmin, 1000.0f * bmax);
+        qInfo("Baseline               : %10.2f ... %10.2f ms", 1000.0f * bmin, 1000.0f * bmax);
     }
-    qInfo("Inverse operator file  : %s" , invName.toUtf8().constData());
-    qInfo("SNR                    : %f" , snr);
-    qInfo("Method                 : %s" , method.toUtf8().constData());
+    qInfo("Inverse operator file  : %s", invName.toUtf8().constData());
+    qInfo("SNR                    : %f", snr);
+    qInfo("Method                 : %s", method.toUtf8().constData());
     if (pickNormal) {
         qInfo("Picking normal component to cortex");
     }
 
     if (!labelFiles.isEmpty()) {
         qInfo("FsLabel files to process :");
-        for (const QString &label : labelFiles) {
-            qInfo("  %s" , label.toUtf8().constData());
+        for (const QString& label : labelFiles) {
+            qInfo("  %s", label.toUtf8().constData());
         }
     } else if (!labelDir.isEmpty()) {
-        qInfo("FsLabel directory        : %s" , labelDir.toUtf8().constData());
+        qInfo("FsLabel directory        : %s", labelDir.toUtf8().constData());
     } else {
         qInfo("Full source space inverse (no label restriction)");
     }
@@ -550,7 +550,7 @@ int main(int argc, char *argv[])
         return 1;
     }
     qInfo("  Inverse operator read successfully.");
-    qInfo("  %d channels, %d sources" , inverseOperator.nchan, inverseOperator.nsource);
+    qInfo("  %d channels, %d sources", inverseOperator.nchan, inverseOperator.nsource);
 
     // Pre-extract label list name for use in processing
     QString labelListName = parser.value(labelListOpt);
@@ -560,179 +560,182 @@ int main(int argc, char *argv[])
     //=========================================================================================================
 
     auto processInverseResults = [&inverseOperator, &lambda2, &method, &pickNormal,
-                                   &labelDir, &labelFiles, &labelListName, &inName]
-                                  (const MatrixXd &inputData, float tmin, float tstep,
-                                   int curNave, const QString &curOutName) -> int
-    {
+                                  &labelDir, &labelFiles, &labelListName, &inName](const MatrixXd& inputData, float tmin, float tstep,
+                                                                                   int curNave, const QString& curOutName) -> int {
         if (!labelDir.isEmpty()) {
-        //-----------------------------------------------------------------------------------------------------
-        // FsLabel directory mode: compute average waveform for each label
-        //-----------------------------------------------------------------------------------------------------
-        qInfo("\nProcessing label directory: %s" , labelDir.toUtf8().constData());
+            //-----------------------------------------------------------------------------------------------------
+            // FsLabel directory mode: compute average waveform for each label
+            //-----------------------------------------------------------------------------------------------------
+            qInfo("\nProcessing label directory: %s", labelDir.toUtf8().constData());
 
-        QStringList labelNames;
-        InvSourceEstimate stc = processLabelDir(labelDir, inverseOperator,
-                                                inputData, tmin, tstep,
-                                                lambda2, method, labelNames);
-
-        if (stc.isEmpty()) {
-            fprintf(stderr, "Error: FsLabel directory processing failed.\n");
-            return 1;
-        }
-
-        // Write the STC result
-        // Ensure output has proper extension
-        QString stcOut = curOutName;
-        if (!stcOut.endsWith(".stc") && !stcOut.endsWith(".fif")) {
-            stcOut += "-lh.stc";
-        }
-
-        QFile stcFile(stcOut);
-        if (!stc.write(stcFile)) {
-            fprintf(stderr, "Error: Failed to write STC file: %s\n", stcOut.toUtf8().constData());
-            return 1;
-        }
-        qInfo("\nWrote %s (%d labels, %d time points)" ,
-               stcOut.toUtf8().constData(), (int)stc.data.rows(), (int)stc.data.cols());
-
-        // Write label list if requested
-        if (!labelListName.isEmpty() && !labelNames.isEmpty()) {
-            QFile labelListFile(labelListName);
-            if (labelListFile.open(QIODevice::WriteOnly | QIODevice::Text)) {
-                QTextStream out(&labelListFile);
-                for (const QString &name : labelNames) {
-                    out << name << "\n";
-                }
-                labelListFile.close();
-                qInfo("FsLabel names output to %s" , labelListName.toUtf8().constData());
-            }
-        }
-
-    } else if (!labelFiles.isEmpty()) {
-        //-----------------------------------------------------------------------------------------------------
-        // Individual label mode: process each label file separately
-        //-----------------------------------------------------------------------------------------------------
-        for (const QString &labelFile : labelFiles) {
-            qInfo("\nProcessing label: %s" , labelFile.toUtf8().constData());
-
-            InvSourceEstimate stc = processLabel(labelFile, inverseOperator,
-                                                 inputData, tmin, tstep,
-                                                 lambda2, method, pickNormal);
+            QStringList labelNames;
+            InvSourceEstimate stc = processLabelDir(labelDir, inverseOperator,
+                                                    inputData, tmin, tstep,
+                                                    lambda2, method, labelNames);
 
             if (stc.isEmpty()) {
-                fprintf(stderr, "Warning: Skipping label %s (no result).\n", labelFile.toUtf8().constData());
-                continue;
+                fprintf(stderr, "Error: FsLabel directory processing failed.\n");
+                return 1;
             }
 
-            // Compose output file name
-            QString tag = (method == "dSPM") ? "spm" : "mne";
-            if (method == "sLORETA") tag = "sloreta";
-            QString stcOut;
-            if (!curOutName.isEmpty() && labelFiles.size() == 1) {
-                stcOut = curOutName;
-            } else {
-                QFileInfo fi(labelFile);
-                stcOut = fi.path() + "/" + fi.completeBaseName() + "-" + tag;
-                // Determine hemisphere suffix
-                int hemi = labelHemisphere(labelFile);
-                if (hemi == 0) {
-                    stcOut += "-lh.stc";
-                } else {
-                    stcOut += "-rh.stc";
-                }
+            // Write the STC result
+            // Ensure output has proper extension
+            QString stcOut = curOutName;
+            if (!stcOut.endsWith(".stc") && !stcOut.endsWith(".fif")) {
+                stcOut += "-lh.stc";
             }
 
             QFile stcFile(stcOut);
             if (!stc.write(stcFile)) {
                 fprintf(stderr, "Error: Failed to write STC file: %s\n", stcOut.toUtf8().constData());
-                continue;
-            }
-            qInfo("  Wrote %s (%d sources, %d time points)" ,
-                   stcOut.toUtf8().constData(), (int)stc.data.rows(), (int)stc.data.cols());
-        }
-
-    } else {
-        //-----------------------------------------------------------------------------------------------------
-        // Full source space mode: compute inverse for all sources
-        //-----------------------------------------------------------------------------------------------------
-        qInfo("\nComputing full source space inverse...");
-
-        InvMinimumNorm minimumNorm(inverseOperator, lambda2, method);
-        minimumNorm.doInverseSetup(curNave, pickNormal);
-
-        InvSourceEstimate stc = minimumNorm.calculateInverse(inputData, tmin, tstep, pickNormal);
-
-        if (stc.isEmpty()) {
-            fprintf(stderr, "Error: Full source space inverse computation failed.\n");
-            return 1;
-        }
-
-        // Compose output base name
-        QString stcOut;
-        if (!curOutName.isEmpty()) {
-            stcOut = curOutName;
-            // Strip hemisphere suffix if user provided one
-            if (stcOut.endsWith("-lh.stc")) stcOut.chop(7);
-            else if (stcOut.endsWith("-rh.stc")) stcOut.chop(7);
-        } else {
-            QFileInfo fi(inName);
-            QString tag = (method == "dSPM") ? "spm" : "mne";
-            if (method == "sLORETA") tag = "sloreta";
-            stcOut = fi.path() + "/" + fi.completeBaseName() + "-" + tag;
-        }
-
-        // Split the combined source estimate into lh and rh hemispheres.
-        // The inverse operator's source space tells us how many sources
-        // belong to each hemisphere.
-        int nSrcLh = inverseOperator.src[0].nuse;
-        int nSrcRh = inverseOperator.src[1].nuse;
-        int nSrcTotal = (int)stc.data.rows();
-
-        if (nSrcLh + nSrcRh != nSrcTotal) {
-            fprintf(stderr, "Warning: Source count mismatch (lh=%d + rh=%d != %d). "
-                    "Writing combined STC to lh file.\n", nSrcLh, nSrcRh, nSrcTotal);
-
-            QString stcOutLh = stcOut + "-lh.stc";
-            QFile stcFileLh(stcOutLh);
-            if (!stc.write(stcFileLh)) {
-                fprintf(stderr, "Error: Failed to write STC file: %s\n", stcOutLh.toUtf8().constData());
                 return 1;
             }
-            qInfo("  Wrote %s (%d sources, %d time points)" ,
-                   stcOutLh.toUtf8().constData(), nSrcTotal, (int)stc.data.cols());
+            qInfo("\nWrote %s (%d labels, %d time points)",
+                  stcOut.toUtf8().constData(), (int)stc.data.rows(), (int)stc.data.cols());
+
+            // Write label list if requested
+            if (!labelListName.isEmpty() && !labelNames.isEmpty()) {
+                QFile labelListFile(labelListName);
+                if (labelListFile.open(QIODevice::WriteOnly | QIODevice::Text)) {
+                    QTextStream out(&labelListFile);
+                    for (const QString& name : labelNames) {
+                        out << name << "\n";
+                    }
+                    labelListFile.close();
+                    qInfo("FsLabel names output to %s", labelListName.toUtf8().constData());
+                }
+            }
+
+        } else if (!labelFiles.isEmpty()) {
+            //-----------------------------------------------------------------------------------------------------
+            // Individual label mode: process each label file separately
+            //-----------------------------------------------------------------------------------------------------
+            for (const QString& labelFile : labelFiles) {
+                qInfo("\nProcessing label: %s", labelFile.toUtf8().constData());
+
+                InvSourceEstimate stc = processLabel(labelFile, inverseOperator,
+                                                     inputData, tmin, tstep,
+                                                     lambda2, method, pickNormal);
+
+                if (stc.isEmpty()) {
+                    fprintf(stderr, "Warning: Skipping label %s (no result).\n", labelFile.toUtf8().constData());
+                    continue;
+                }
+
+                // Compose output file name
+                QString tag = (method == "dSPM") ? "spm" : "mne";
+                if (method == "sLORETA")
+                    tag = "sloreta";
+                QString stcOut;
+                if (!curOutName.isEmpty() && labelFiles.size() == 1) {
+                    stcOut = curOutName;
+                } else {
+                    QFileInfo fi(labelFile);
+                    stcOut = fi.path() + "/" + fi.completeBaseName() + "-" + tag;
+                    // Determine hemisphere suffix
+                    int hemi = labelHemisphere(labelFile);
+                    if (hemi == 0) {
+                        stcOut += "-lh.stc";
+                    } else {
+                        stcOut += "-rh.stc";
+                    }
+                }
+
+                QFile stcFile(stcOut);
+                if (!stc.write(stcFile)) {
+                    fprintf(stderr, "Error: Failed to write STC file: %s\n", stcOut.toUtf8().constData());
+                    continue;
+                }
+                qInfo("  Wrote %s (%d sources, %d time points)",
+                      stcOut.toUtf8().constData(), (int)stc.data.rows(), (int)stc.data.cols());
+            }
+
         } else {
-            // Write left hemisphere STC
-            if (nSrcLh > 0) {
-                InvSourceEstimate stcLh(stc.data.topRows(nSrcLh),
-                                        stc.vertices.head(nSrcLh),
-                                        stc.tmin, stc.tstep);
+            //-----------------------------------------------------------------------------------------------------
+            // Full source space mode: compute inverse for all sources
+            //-----------------------------------------------------------------------------------------------------
+            qInfo("\nComputing full source space inverse...");
+
+            InvMinimumNorm minimumNorm(inverseOperator, lambda2, method);
+            minimumNorm.doInverseSetup(curNave, pickNormal);
+
+            InvSourceEstimate stc = minimumNorm.calculateInverse(inputData, tmin, tstep, pickNormal);
+
+            if (stc.isEmpty()) {
+                fprintf(stderr, "Error: Full source space inverse computation failed.\n");
+                return 1;
+            }
+
+            // Compose output base name
+            QString stcOut;
+            if (!curOutName.isEmpty()) {
+                stcOut = curOutName;
+                // Strip hemisphere suffix if user provided one
+                if (stcOut.endsWith("-lh.stc"))
+                    stcOut.chop(7);
+                else if (stcOut.endsWith("-rh.stc"))
+                    stcOut.chop(7);
+            } else {
+                QFileInfo fi(inName);
+                QString tag = (method == "dSPM") ? "spm" : "mne";
+                if (method == "sLORETA")
+                    tag = "sloreta";
+                stcOut = fi.path() + "/" + fi.completeBaseName() + "-" + tag;
+            }
+
+            // Split the combined source estimate into lh and rh hemispheres.
+            // The inverse operator's source space tells us how many sources
+            // belong to each hemisphere.
+            int nSrcLh = inverseOperator.src[0].nuse;
+            int nSrcRh = inverseOperator.src[1].nuse;
+            int nSrcTotal = (int)stc.data.rows();
+
+            if (nSrcLh + nSrcRh != nSrcTotal) {
+                fprintf(stderr, "Warning: Source count mismatch (lh=%d + rh=%d != %d). "
+                                "Writing combined STC to lh file.\n",
+                        nSrcLh, nSrcRh, nSrcTotal);
 
                 QString stcOutLh = stcOut + "-lh.stc";
                 QFile stcFileLh(stcOutLh);
-                if (!stcLh.write(stcFileLh)) {
-                    fprintf(stderr, "Error: Failed to write LH STC file: %s\n", stcOutLh.toUtf8().constData());
+                if (!stc.write(stcFileLh)) {
+                    fprintf(stderr, "Error: Failed to write STC file: %s\n", stcOutLh.toUtf8().constData());
                     return 1;
                 }
-                qInfo("  Wrote %s (%d sources, %d time points)" ,
-                       stcOutLh.toUtf8().constData(), nSrcLh, (int)stc.data.cols());
-            }
+                qInfo("  Wrote %s (%d sources, %d time points)",
+                      stcOutLh.toUtf8().constData(), nSrcTotal, (int)stc.data.cols());
+            } else {
+                // Write left hemisphere STC
+                if (nSrcLh > 0) {
+                    InvSourceEstimate stcLh(stc.data.topRows(nSrcLh),
+                                            stc.vertices.head(nSrcLh),
+                                            stc.tmin, stc.tstep);
 
-            // Write right hemisphere STC
-            if (nSrcRh > 0) {
-                InvSourceEstimate stcRh(stc.data.bottomRows(nSrcRh),
-                                        stc.vertices.tail(nSrcRh),
-                                        stc.tmin, stc.tstep);
-
-                QString stcOutRh = stcOut + "-rh.stc";
-                QFile stcFileRh(stcOutRh);
-                if (!stcRh.write(stcFileRh)) {
-                    fprintf(stderr, "Error: Failed to write RH STC file: %s\n", stcOutRh.toUtf8().constData());
-                    return 1;
+                    QString stcOutLh = stcOut + "-lh.stc";
+                    QFile stcFileLh(stcOutLh);
+                    if (!stcLh.write(stcFileLh)) {
+                        fprintf(stderr, "Error: Failed to write LH STC file: %s\n", stcOutLh.toUtf8().constData());
+                        return 1;
+                    }
+                    qInfo("  Wrote %s (%d sources, %d time points)",
+                          stcOutLh.toUtf8().constData(), nSrcLh, (int)stc.data.cols());
                 }
-                qInfo("  Wrote %s (%d sources, %d time points)" ,
-                       stcOutRh.toUtf8().constData(), nSrcRh, (int)stc.data.cols());
+
+                // Write right hemisphere STC
+                if (nSrcRh > 0) {
+                    InvSourceEstimate stcRh(stc.data.bottomRows(nSrcRh),
+                                            stc.vertices.tail(nSrcRh),
+                                            stc.tmin, stc.tstep);
+
+                    QString stcOutRh = stcOut + "-rh.stc";
+                    QFile stcFileRh(stcOutRh);
+                    if (!stcRh.write(stcFileRh)) {
+                        fprintf(stderr, "Error: Failed to write RH STC file: %s\n", stcOutRh.toUtf8().constData());
+                        return 1;
+                    }
+                    qInfo("  Wrote %s (%d sources, %d time points)",
+                          stcOutRh.toUtf8().constData(), nSrcRh, (int)stc.data.cols());
+                }
             }
-        }
         }
 
         return 0;
@@ -745,10 +748,11 @@ int main(int argc, char *argv[])
     bool isRaw = isRawFile(inName);
 
     if (isRaw) {
-        qInfo("\nReading raw data file: %s" , inName.toUtf8().constData());
+        qInfo("\nReading raw data file: %s", inName.toUtf8().constData());
 
-        if (nave <= 0) nave = 1;
-        qInfo("  nave = %d" , nave);
+        if (nave <= 0)
+            nave = 1;
+        qInfo("  nave = %d", nave);
 
         QFile rawFile(inName);
         FiffRawData raw(rawFile);
@@ -765,7 +769,7 @@ int main(int argc, char *argv[])
             return 1;
         }
 
-        qInfo("  Picked %d channels from raw data" , (int)picks.size());
+        qInfo("  Picked %d channels from raw data", (int)picks.size());
 
         // Activate projectors
         for (int k = 0; k < raw.info.projs.size(); ++k) {
@@ -783,17 +787,18 @@ int main(int argc, char *argv[])
         float tstep = 1.0f / raw.info.sfreq;
         float tmin = static_cast<float>(raw.first_samp) * tstep;
 
-        qInfo("  Read %d samples (%d channels)" ,
-               (int)inputData.cols(), (int)inputData.rows());
+        qInfo("  Read %d samples (%d channels)",
+              (int)inputData.cols(), (int)inputData.rows());
 
         int result = processInverseResults(inputData, tmin, tstep, nave, outName);
-        if (result != 0) return result;
+        if (result != 0)
+            return result;
 
     } else {
         //-----------------------------------------------------------------------------------------------------
         // Read all evoked data sets
         //-----------------------------------------------------------------------------------------------------
-        qInfo("\nReading evoked data file: %s" , inName.toUtf8().constData());
+        qInfo("\nReading evoked data file: %s", inName.toUtf8().constData());
 
         QFile evokedFile(inName);
         QPair<float, float> baseline;
@@ -817,9 +822,9 @@ int main(int argc, char *argv[])
         // Determine which sets to process
         QList<int> setsToProcess;
         if (processAllSets) {
-            qInfo("  Found %d evoked data set(s):" , (int)evokedSet.evoked.size());
+            qInfo("  Found %d evoked data set(s):", (int)evokedSet.evoked.size());
             for (int i = 0; i < evokedSet.evoked.size(); ++i) {
-                qInfo("    [%d] %s" , i, evokedSet.evoked[i].comment.toUtf8().constData());
+                qInfo("    [%d] %s", i, evokedSet.evoked[i].comment.toUtf8().constData());
                 setsToProcess.append(i);
             }
         } else {
@@ -833,21 +838,21 @@ int main(int argc, char *argv[])
 
         // Process each selected evoked set
         for (int setIdx : setsToProcess) {
-            const FiffEvoked &evoked = evokedSet.evoked[setIdx];
+            const FiffEvoked& evoked = evokedSet.evoked[setIdx];
             QString setComment = evoked.comment;
             QString commentTag = sanitizeForFilename(setComment);
 
-            qInfo("\n=== Evoked set %d: \"%s\" ===" , setIdx, setComment.toUtf8().constData());
+            qInfo("\n=== Evoked set %d: \"%s\" ===", setIdx, setComment.toUtf8().constData());
 
             int curNave = (nave > 0) ? nave : evoked.nave;
-            qInfo("  nave = %d" , curNave);
+            qInfo("  nave = %d", curNave);
 
             // Pick channels matching inverse operator
             FiffEvoked pickedEvoked = evoked.pick_channels(inverseOperator.noise_cov->names);
-            qInfo("  Picked %d channels from evoked data" , pickedEvoked.info.nchan);
+            qInfo("  Picked %d channels from evoked data", pickedEvoked.info.nchan);
 
             if (doBaseline) {
-                qInfo("  Baseline correction: %10.2f ... %10.2f ms" , 1000.0f * bmin, 1000.0f * bmax);
+                qInfo("  Baseline correction: %10.2f ... %10.2f ms", 1000.0f * bmin, 1000.0f * bmax);
             } else {
                 qInfo("  No baseline setting in effect.");
             }
@@ -856,8 +861,8 @@ int main(int argc, char *argv[])
             float tmin = pickedEvoked.times(0);
             float tstep = 1.0f / pickedEvoked.info.sfreq;
 
-            qInfo("  Read %d time points (%d channels)" ,
-                   (int)inputData.cols(), (int)inputData.rows());
+            qInfo("  Read %d time points (%d channels)",
+                  (int)inputData.cols(), (int)inputData.rows());
 
             // Compose per-set output name with set description
             QString setOutName;
@@ -866,12 +871,14 @@ int main(int argc, char *argv[])
             } else {
                 QFileInfo fi(inName);
                 QString tag = (method == "dSPM") ? "spm" : "mne";
-                if (method == "sLORETA") tag = "sloreta";
+                if (method == "sLORETA")
+                    tag = "sloreta";
                 setOutName = fi.path() + "/" + fi.completeBaseName() + "-" + tag + "-" + commentTag;
             }
 
             int result = processInverseResults(inputData, tmin, tstep, curNave, setOutName);
-            if (result != 0) return result;
+            if (result != 0)
+                return result;
         }
     }
 

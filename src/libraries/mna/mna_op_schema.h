@@ -52,7 +52,10 @@
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-namespace MNALIB { struct MnaNode; }
+namespace MNALIB
+{
+struct MnaNode;
+}
 
 //=============================================================================================================
 // DEFINE NAMESPACE MNALIB
@@ -67,10 +70,10 @@ namespace MNALIB
  */
 struct MNASHARED_EXPORT MnaOpSchemaPort
 {
-    QString     name;           ///< Port name
-    MnaDataKind dataKind;       ///< Expected data kind
-    bool        required = true;///< Must be connected?
-    QString     description;    ///< Human-readable description
+    QString name;         ///< Port name
+    MnaDataKind dataKind; ///< Expected data kind
+    bool required = true; ///< Must be connected?
+    QString description;  ///< Human-readable description
 };
 
 //=============================================================================================================
@@ -79,11 +82,11 @@ struct MNASHARED_EXPORT MnaOpSchemaPort
  */
 struct MNASHARED_EXPORT MnaOpSchemaAttr
 {
-    QString          name;          ///< Attribute key
-    QMetaType::Type  type;          ///< Expected value type
-    bool             required = false; ///< Must be set?
-    QVariant         defaultValue;  ///< Default when not set
-    QString          description;   ///< Human-readable description
+    QString name;          ///< Attribute key
+    QMetaType::Type type;  ///< Expected value type
+    bool required = false; ///< Must be set?
+    QVariant defaultValue; ///< Default when not set
+    QString description;   ///< Human-readable description
 };
 
 //=============================================================================================================
@@ -95,18 +98,18 @@ struct MNASHARED_EXPORT MnaOpSchemaAttr
 class MNASHARED_EXPORT MnaOpSchema
 {
 public:
-    QString     opType;         ///< Operation type string
-    QString     version;        ///< Version of the operation (e.g. "2.2.0")
-    QString     binding;        ///< Binding type: "internal", "cli", or "script"
-    QString     category;       ///< Category: "io", "preprocessing", "source_estimation", etc.
-    QString     description;    ///< What the operation does
-    QString     library;        ///< Which library provides the implementation
-    QString     executable;     ///< For CLI ops: executable name (e.g. "recon-all")
-    QString     cliTemplate;    ///< For CLI ops: command template with {{placeholder}} tokens
+    QString opType;      ///< Operation type string
+    QString version;     ///< Version of the operation (e.g. "2.2.0")
+    QString binding;     ///< Binding type: "internal", "cli", or "script"
+    QString category;    ///< Category: "io", "preprocessing", "source_estimation", etc.
+    QString description; ///< What the operation does
+    QString library;     ///< Which library provides the implementation
+    QString executable;  ///< For CLI ops: executable name (e.g. "recon-all")
+    QString cliTemplate; ///< For CLI ops: command template with {{placeholder}} tokens
 
-    QList<MnaOpSchemaPort> inputPorts;   ///< Expected input ports
-    QList<MnaOpSchemaPort> outputPorts;  ///< Expected output ports
-    QList<MnaOpSchemaAttr> attributes;   ///< Expected attributes
+    QList<MnaOpSchemaPort> inputPorts;  ///< Expected input ports
+    QList<MnaOpSchemaPort> outputPorts; ///< Expected output ports
+    QList<MnaOpSchemaAttr> attributes;  ///< Expected attributes
 
     /**
      * Validate that a node conforms to this schema.

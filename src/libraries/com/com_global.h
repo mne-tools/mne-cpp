@@ -50,11 +50,11 @@
 //=============================================================================================================
 
 #if defined(STATICBUILD)
-#  define COMSHARED_EXPORT
+#define COMSHARED_EXPORT
 #elif defined(MNE_COM_LIBRARY)
-#  define COMSHARED_EXPORT Q_DECL_EXPORT    /**< Q_DECL_EXPORT must be added to the declarations of symbols used when compiling a shared library. */
+#define COMSHARED_EXPORT Q_DECL_EXPORT /**< Q_DECL_EXPORT must be added to the declarations of symbols used when compiling a shared library. */
 #else
-#  define COMSHARED_EXPORT Q_DECL_IMPORT    /**< Q_DECL_IMPORT must be added to the declarations of symbols used when compiling a client that uses the shared library. */
+#define COMSHARED_EXPORT Q_DECL_IMPORT /**< Q_DECL_IMPORT must be added to the declarations of symbols used when compiling a client that uses the shared library. */
 #endif
 
 //=============================================================================================================
@@ -74,7 +74,8 @@
  * managers, and @ref CommandManager is a per-component registry of the
  * commands that component understands.
  */
-namespace COMLIB{
+namespace COMLIB
+{
 
 //=============================================================================================================
 /**

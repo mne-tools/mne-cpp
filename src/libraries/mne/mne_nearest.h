@@ -60,8 +60,8 @@ class MNEPatchInfo;
 class MNESHARED_EXPORT MNENearest
 {
 public:
-    typedef QSharedPointer<MNENearest> SPtr;              /**< Shared pointer type for MNENearest. */
-    typedef QSharedPointer<const MNENearest> ConstSPtr;   /**< Const shared pointer type for MNENearest. */
+    typedef QSharedPointer<MNENearest> SPtr;            /**< Shared pointer type for MNENearest. */
+    typedef QSharedPointer<const MNENearest> ConstSPtr; /**< Const shared pointer type for MNENearest. */
 
     //=========================================================================================================
     /**
@@ -77,10 +77,10 @@ public:
     ~MNENearest();
 
 public:
-    int   vert;             /**< Vertex index in the full surface mesh. */
-    int   nearest;          /**< Index of the nearest 'inuse' vertex. */
-    float dist;             /**< Distance to the nearest 'inuse' vertex (meters). */
-    MNEPatchInfo* patch;    /**< Non-owning pointer to the patch this vertex belongs to.
+    int vert;            /**< Vertex index in the full surface mesh. */
+    int nearest;         /**< Index of the nearest 'inuse' vertex. */
+    float dist;          /**< Distance to the nearest 'inuse' vertex (meters). */
+    MNEPatchInfo* patch; /**< Non-owning pointer to the patch this vertex belongs to.
                              *   Owned by MNESourceSpace::patches (unique_ptr).
                              *   Multiple MNENearest objects share the same MNEPatchInfo. */
 };

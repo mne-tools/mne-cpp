@@ -42,7 +42,7 @@ BidsCoordinateSystem BidsCoordinateSystem::readJson(const QString& sFilePath)
     cs.transform = Eigen::Matrix4d::Identity();
 
     QFile file(sFilePath);
-    if(!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
+    if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
         qWarning() << "[BidsCoordinateSystem::readJson] Cannot open" << sFilePath;
         return cs;
     }
@@ -51,9 +51,9 @@ BidsCoordinateSystem BidsCoordinateSystem::readJson(const QString& sFilePath)
     QJsonDocument doc = QJsonDocument::fromJson(file.readAll(), &error);
     file.close();
 
-    if(error.error != QJsonParseError::NoError) {
+    if (error.error != QJsonParseError::NoError) {
         qWarning() << "[BidsCoordinateSystem::readJson] Parse error in" << sFilePath
-                    << ":" << error.errorString();
+                   << ":" << error.errorString();
         return cs;
     }
 
@@ -61,37 +61,37 @@ BidsCoordinateSystem BidsCoordinateSystem::readJson(const QString& sFilePath)
 
     // Try iEEG fields first, fall back to EEG fields
     cs.system = json.value(QStringLiteral("iEEGCoordinateSystem")).toString();
-    if(cs.system.isEmpty())
+    if (cs.system.isEmpty())
         cs.system = json.value(QStringLiteral("EEGCoordinateSystem")).toString();
 
     cs.units = json.value(QStringLiteral("iEEGCoordinateUnits")).toString();
-    if(cs.units.isEmpty())
+    if (cs.units.isEmpty())
         cs.units = json.value(QStringLiteral("EEGCoordinateUnits")).toString();
 
     cs.description = json.value(QStringLiteral("iEEGCoordinateSystemDescription")).toString();
-    if(cs.description.isEmpty())
+    if (cs.description.isEmpty())
         cs.description = json.value(QStringLiteral("EEGCoordinateSystemDescription")).toString();
 
     cs.processingDescription = json.value(QStringLiteral("iEEGCoordinateProcessingDescription")).toString();
-    if(cs.processingDescription.isEmpty())
+    if (cs.processingDescription.isEmpty())
         cs.processingDescription = json.value(QStringLiteral("EEGCoordinateProcessingDescription")).toString();
 
     cs.associatedImagePath = json.value(QStringLiteral("IntendedFor")).toString();
 
     // Parse 4x4 transform if provided as "iEEGCoordinateProcessingTransform" or "Transform"
     QString transformKey;
-    if(json.contains(QStringLiteral("iEEGCoordinateProcessingTransform")))
+    if (json.contains(QStringLiteral("iEEGCoordinateProcessingTransform")))
         transformKey = QStringLiteral("iEEGCoordinateProcessingTransform");
-    else if(json.contains(QStringLiteral("Transform")))
+    else if (json.contains(QStringLiteral("Transform")))
         transformKey = QStringLiteral("Transform");
 
-    if(!transformKey.isEmpty()) {
+    if (!transformKey.isEmpty()) {
         QJsonArray rows = json.value(transformKey).toArray();
-        if(rows.size() == 4) {
-            for(int r = 0; r < 4; ++r) {
+        if (rows.size() == 4) {
+            for (int r = 0; r < 4; ++r) {
                 QJsonArray cols = rows[r].toArray();
-                if(cols.size() == 4) {
-                    for(int c = 0; c < 4; ++c)
+                if (cols.size() == 4) {
+                    for (int c = 0; c < 4; ++c)
                         cs.transform(r, c) = cols[c].toDouble();
                 }
             }
@@ -109,21 +109,21 @@ bool BidsCoordinateSystem::writeJson(const QString& sFilePath,
     QJsonObject json;
 
     json[QStringLiteral("iEEGCoordinateSystem")] = cs.system;
-    json[QStringLiteral("iEEGCoordinateUnits")]  = cs.units;
+    json[QStringLiteral("iEEGCoordinateUnits")] = cs.units;
 
-    if(!cs.description.isEmpty())
+    if (!cs.description.isEmpty())
         json[QStringLiteral("iEEGCoordinateSystemDescription")] = cs.description;
-    if(!cs.processingDescription.isEmpty())
+    if (!cs.processingDescription.isEmpty())
         json[QStringLiteral("iEEGCoordinateProcessingDescription")] = cs.processingDescription;
-    if(!cs.associatedImagePath.isEmpty())
+    if (!cs.associatedImagePath.isEmpty())
         json[QStringLiteral("IntendedFor")] = cs.associatedImagePath;
 
     // Serialize the 4x4 transform matrix
-    if(!cs.transform.isIdentity(1e-15)) {
+    if (!cs.transform.isIdentity(1e-15)) {
         QJsonArray rows;
-        for(int r = 0; r < 4; ++r) {
+        for (int r = 0; r < 4; ++r) {
             QJsonArray cols;
-            for(int c = 0; c < 4; ++c)
+            for (int c = 0; c < 4; ++c)
                 cols.append(cs.transform(r, c));
             rows.append(cols);
         }
@@ -131,7 +131,7 @@ bool BidsCoordinateSystem::writeJson(const QString& sFilePath,
     }
 
     QFile file(sFilePath);
-    if(!file.open(QIODevice::WriteOnly | QIODevice::Text)) {
+    if (!file.open(QIODevice::WriteOnly | QIODevice::Text)) {
         qWarning() << "[BidsCoordinateSystem::writeJson] Cannot open" << sFilePath << "for writing";
         return false;
     }

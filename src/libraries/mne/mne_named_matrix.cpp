@@ -50,7 +50,7 @@ MNENamedMatrix::MNENamedMatrix()
 
 //=============================================================================================================
 
-MNENamedMatrix::MNENamedMatrix(const MNENamedMatrix &p_MneNamedMatrix)
+MNENamedMatrix::MNENamedMatrix(const MNENamedMatrix& p_MneNamedMatrix)
 : nrow(p_MneNamedMatrix.nrow)
 , ncol(p_MneNamedMatrix.ncol)
 , rowlist(p_MneNamedMatrix.rowlist)
@@ -74,11 +74,11 @@ std::unique_ptr<MNENamedMatrix> MNENamedMatrix::build(int nrow,
                                                       const Eigen::MatrixXf& data)
 {
     auto mat = std::make_unique<MNENamedMatrix>();
-    mat->nrow    = nrow;
-    mat->ncol    = ncol;
+    mat->nrow = nrow;
+    mat->ncol = ncol;
     mat->rowlist = rowlist;
     mat->collist = collist;
-    mat->data    = data;
+    mat->data = data;
     return mat;
 }
 
@@ -188,8 +188,8 @@ std::unique_ptr<MNENamedMatrix> MNENamedMatrix::read(FiffStream::SPtr& stream,
 {
     QStringList colnames;
     QStringList rownames;
-    int  ncol = 0;
-    int  nrow = 0;
+    int ncol = 0;
+    int nrow = 0;
     qint32 ndim;
     QVector<qint32> dims;
     MatrixXf data;

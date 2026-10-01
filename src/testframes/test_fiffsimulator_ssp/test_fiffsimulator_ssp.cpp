@@ -35,7 +35,8 @@
 
 using namespace FIFFLIB;
 
-namespace {
+namespace
+{
 
 QString locateSampleRaw()
 {
@@ -109,7 +110,7 @@ void TestFiffSimulatorSsp::sspAndBadsRoundTripThroughFiffWrite()
         QVERIFY2(!pOut.isNull(), "start_writing_raw returned null");
 
         const fiff_int_t firstSamp = srcRaw.first_samp;
-        const fiff_int_t lastSamp  = std::min<fiff_int_t>(
+        const fiff_int_t lastSamp = std::min<fiff_int_t>(
             srcRaw.last_samp, firstSamp + static_cast<fiff_int_t>(srcInfo.sfreq) - 1);
 
         Eigen::MatrixXd block;
@@ -137,13 +138,13 @@ void TestFiffSimulatorSsp::sspAndBadsRoundTripThroughFiffWrite()
     for (int i = 0; i < outInfo.projs.size(); ++i) {
         const FiffProj& a = infoForWrite.projs.at(i);
         const FiffProj& b = outInfo.projs.at(i);
-        QCOMPARE(b.kind,   a.kind);
+        QCOMPARE(b.kind, a.kind);
         QCOMPARE(b.active, a.active);
-        QCOMPARE(b.desc,   a.desc);
+        QCOMPARE(b.desc, a.desc);
         QVERIFY(a.data);
         QVERIFY(b.data);
-        QCOMPARE(b.data->nrow,     a.data->nrow);
-        QCOMPARE(b.data->ncol,     a.data->ncol);
+        QCOMPARE(b.data->nrow, a.data->nrow);
+        QCOMPARE(b.data->ncol, a.data->ncol);
         QCOMPARE(b.data->col_names, a.data->col_names);
         QCOMPARE(b.data->row_names, a.data->row_names);
         // Byte-equivalent numeric coefficients (FIFF preserves float32 exactly).

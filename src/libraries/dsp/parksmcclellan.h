@@ -68,7 +68,13 @@ class DSPSHARED_EXPORT ParksMcClellan : public QObject
     Q_ENUMS(TPassType) //makes enum available to the class' Qt meta object
 
 public:
-    enum TPassType {LPF, HPF, BPF, NOTCH };
+    enum TPassType
+    {
+        LPF,
+        HPF,
+        BPF,
+        NOTCH
+    };
 
     ParksMcClellan();
 
@@ -170,7 +176,7 @@ public:
     bool ErrTest(int k,
                  int Nut,
                  double Comp,
-                 double *Err);
+                 double* Err);
 
     //=========================================================================================================
     /**

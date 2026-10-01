@@ -43,12 +43,12 @@ using namespace Eigen;
 //=============================================================================================================
 
 MatrixXd InvTfMxne::buildGaborDictionary(int iNSamples, int iNFreqs,
-                                          double dFMin, double dFMax,
-                                          double dSFreq)
+                                         double dFMin, double dFMax,
+                                         double dSFreq)
 {
     // Build a set of Gabor atoms: windowed complex exponentials at different frequencies
     // Returns real-valued matrix: for each frequency, we store cos and sin rows
-    const int nAtoms = 2 * iNFreqs;  // cos + sin per frequency
+    const int nAtoms = 2 * iNFreqs; // cos + sin per frequency
     MatrixXd dict = MatrixXd::Zero(nAtoms, iNSamples);
 
     VectorXd timeVec(iNSamples);
@@ -75,16 +75,18 @@ MatrixXd InvTfMxne::buildGaborDictionary(int iNSamples, int iNFreqs,
         for (int t = 0; t < iNSamples; ++t) {
             double dt = timeVec(t) - tCenter;
             double envelope = std::exp(-0.5 * dt * dt / (sigma * sigma));
-            dict(2 * f,     t) = envelope * std::cos(2.0 * M_PI * freq * timeVec(t));
+            dict(2 * f, t) = envelope * std::cos(2.0 * M_PI * freq * timeVec(t));
             dict(2 * f + 1, t) = envelope * std::sin(2.0 * M_PI * freq * timeVec(t));
         }
 
         // Normalize each atom to unit norm
         double normCos = dict.row(2 * f).norm();
-        if (normCos > 1e-12) dict.row(2 * f) /= normCos;
+        if (normCos > 1e-12)
+            dict.row(2 * f) /= normCos;
 
         double normSin = dict.row(2 * f + 1).norm();
-        if (normSin > 1e-12) dict.row(2 * f + 1) /= normSin;
+        if (normSin > 1e-12)
+            dict.row(2 * f + 1) /= normSin;
     }
 
     return dict;
@@ -93,8 +95,8 @@ MatrixXd InvTfMxne::buildGaborDictionary(int iNSamples, int iNFreqs,
 //=============================================================================================================
 
 InvTfMxneResult InvTfMxne::compute(const MatrixXd& matGain,
-                                    const MatrixXd& matData,
-                                    const InvTfMxneParams& params)
+                                   const MatrixXd& matData,
+                                   const InvTfMxneParams& params)
 {
     InvTfMxneResult result;
 
@@ -115,8 +117,8 @@ InvTfMxneResult InvTfMxne::compute(const MatrixXd& matGain,
 
     // Build Gabor dictionary: (nAtoms × nTimes)
     MatrixXd Phi = buildGaborDictionary(nTimes, params.iNFreqs,
-                                         params.dFMin, params.dFMax,
-                                         params.dSFreq);
+                                        params.dFMin, params.dFMax,
+                                        params.dSFreq);
 
     // TF coefficients: Z (nSources × nAtoms)
     // The model is: M = G * X, where X = Z * Phi (each source has TF representation)
@@ -145,7 +147,7 @@ InvTfMxneResult InvTfMxne::compute(const MatrixXd& matGain,
 
     for (int iter = 0; iter < params.iMaxIterations; ++iter) {
         // Compute residual: R = M - G * (Z * Phi)
-        MatrixXd X = Z * Phi;  // (nSources × nTimes)
+        MatrixXd X = Z * Phi; // (nSources × nTimes)
         residual = matData - matGain * X;
 
         // Compute objective: ||R||^2_F + alpha_space * ||Z||_21 + alpha_time * ||Z||_1
@@ -168,11 +170,12 @@ InvTfMxneResult InvTfMxne::compute(const MatrixXd& matGain,
 
         // Gradient step + proximal operator for each source
         // Gradient of data term w.r.t. Z_j: -G_j^T * R * Phi^T
-        MatrixXd GtR = matGain.transpose() * residual;  // (nSources × nTimes)
-        MatrixXd grad = GtR * Phi.transpose();           // (nSources × nAtoms)
+        MatrixXd GtR = matGain.transpose() * residual; // (nSources × nTimes)
+        MatrixXd grad = GtR * Phi.transpose();         // (nSources × nAtoms)
 
         for (int j = 0; j < nSources; ++j) {
-            if (lipschitz(j) < 1e-12) continue;
+            if (lipschitz(j) < 1e-12)
+                continue;
 
             double stepSize = 1.0 / lipschitz(j);
 
@@ -202,7 +205,7 @@ InvTfMxneResult InvTfMxne::compute(const MatrixXd& matGain,
     }
 
     // Reconstruct time-domain source estimate from TF coefficients
-    MatrixXd X = Z * Phi;  // (nSources × nTimes)
+    MatrixXd X = Z * Phi; // (nSources × nTimes)
 
     // Find active sources
     QVector<int> activeVertices;
@@ -237,7 +240,7 @@ InvTfMxneResult InvTfMxne::compute(const MatrixXd& matGain,
     }
 
     result.stc = InvSourceEstimate(finalX, vertices, 0.0f,
-                                    static_cast<float>(1.0 / params.dSFreq));
+                                   static_cast<float>(1.0 / params.dSFreq));
     result.stc.method = InvEstimateMethod::MixedNorm;
     result.activeVertices = activeVertices;
     result.residualNorm = residual.norm();

@@ -69,9 +69,9 @@ class FwdBemSolution;
 class FWDSHARED_EXPORT FwdCoilSet
 {
 public:
-    typedef QSharedPointer<FwdCoilSet> SPtr;              /**< Shared pointer type for FwdCoilSet. */
-    typedef QSharedPointer<const FwdCoilSet> ConstSPtr;   /**< Const shared pointer type for FwdCoilSet. */
-    typedef std::unique_ptr<FwdCoilSet> UPtr;             /**< Unique pointer type for FwdCoilSet. */
+    typedef QSharedPointer<FwdCoilSet> SPtr;            /**< Shared pointer type for FwdCoilSet. */
+    typedef QSharedPointer<const FwdCoilSet> ConstSPtr; /**< Const shared pointer type for FwdCoilSet. */
+    typedef std::unique_ptr<FwdCoilSet> UPtr;           /**< Unique pointer type for FwdCoilSet. */
 
     //=========================================================================================================
     /**
@@ -111,9 +111,9 @@ public:
      * @return   The created meg coil set.
      */
     FwdCoilSet::UPtr create_meg_coils(const QList<FIFFLIB::FiffChInfo>& chs,
-                                 int nch,
-                                 int acc,
-                                 const FIFFLIB::FiffCoordTrans& t = FIFFLIB::FiffCoordTrans());
+                                      int nch,
+                                      int acc,
+                                      const FIFFLIB::FiffCoordTrans& t = FIFFLIB::FiffCoordTrans());
 
     //=========================================================================================================
     /**
@@ -127,8 +127,8 @@ public:
      * @return   The created meg coil set.
      */
     static FwdCoilSet::UPtr create_eeg_els(const QList<FIFFLIB::FiffChInfo>& chs,
-                                      int nch,
-                                      const FIFFLIB::FiffCoordTrans& t = FIFFLIB::FiffCoordTrans());
+                                           int nch,
+                                           const FIFFLIB::FiffCoordTrans& t = FIFFLIB::FiffCoordTrans());
 
     //=========================================================================================================
     /**
@@ -208,16 +208,19 @@ private:
     FwdCoil* fwd_add_coil_to_set(int type, int coil_class, int acc, int np, float size, float base, const QString& desc);
 
 public:
-    std::vector<FwdCoil::UPtr> coils;  /**< The coil or electrode positions. */
-    int     coord_frame;            /**< Common coordinate frame. */
-    std::unique_ptr<FwdBemSolution> user_data;  /**< Coil-specific BEM solution. */
+    std::vector<FwdCoil::UPtr> coils;          /**< The coil or electrode positions. */
+    int coord_frame;                           /**< Common coordinate frame. */
+    std::unique_ptr<FwdBemSolution> user_data; /**< Coil-specific BEM solution. */
 
     /**
      * Number of coils (convenience accessor).
      *
      * @return Number of coils or electrodes in this set.
      */
-    inline int ncoil() const { return static_cast<int>(coils.size()); }
+    inline int ncoil() const
+    {
+        return static_cast<int>(coils.size());
+    }
 };
 
 //=============================================================================================================

@@ -56,9 +56,10 @@
 // CONSTANTS
 //=============================================================================================================
 
-namespace {
-    const QHostAddress  DISCOVERY_MULTICAST_GROUP("239.255.172.215");
-    const quint16       DISCOVERY_PORT = 16571;
+namespace
+{
+const QHostAddress DISCOVERY_MULTICAST_GROUP("239.255.172.215");
+const quint16 DISCOVERY_PORT = 16571;
 }
 
 //=============================================================================================================
@@ -68,7 +69,7 @@ namespace {
 std::vector<LSLLIB::stream_info> LSLLIB::resolve_streams(double timeout)
 {
     std::vector<stream_info> results;
-    std::set<std::string> seenUIDs;  // track unique streams by UID
+    std::set<std::string> seenUIDs; // track unique streams by UID
 
     // Create a UDP socket and join the multicast group
     QUdpSocket udpSocket;
@@ -147,8 +148,8 @@ std::vector<LSLLIB::stream_info> LSLLIB::resolve_streams(double timeout)
 //=============================================================================================================
 
 std::vector<LSLLIB::stream_info> LSLLIB::resolve_stream(const std::string& prop,
-                                                   const std::string& value,
-                                                   double timeout)
+                                                        const std::string& value,
+                                                        double timeout)
 {
     // First get all streams
     std::vector<stream_info> all = resolve_streams(timeout);
@@ -168,7 +169,7 @@ std::vector<LSLLIB::stream_info> LSLLIB::resolve_stream(const std::string& prop,
         } else if (prop == "hostname") {
             actual = info.hostname();
         } else {
-            continue;  // unknown property
+            continue; // unknown property
         }
 
         if (actual == value) {

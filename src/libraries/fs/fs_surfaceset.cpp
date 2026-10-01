@@ -39,19 +39,16 @@ FsSurfaceSet::FsSurfaceSet()
 
 //=============================================================================================================
 
-FsSurfaceSet::FsSurfaceSet(const QString &subject_id, qint32 hemi, const QString &surf, const QString &subjects_dir)
+FsSurfaceSet::FsSurfaceSet(const QString& subject_id, qint32 hemi, const QString& surf, const QString& subjects_dir)
 {
     FsSurface t_Surface;
-    if(hemi == 0 || hemi == 1)
-    {
-        if(FsSurface::read(subject_id, hemi, surf, subjects_dir, t_Surface))
+    if (hemi == 0 || hemi == 1) {
+        if (FsSurface::read(subject_id, hemi, surf, subjects_dir, t_Surface))
             insert(t_Surface);
-    }
-    else if(hemi == 2)
-    {
-        if(FsSurface::read(subject_id, 0, surf, subjects_dir, t_Surface))
+    } else if (hemi == 2) {
+        if (FsSurface::read(subject_id, 0, surf, subjects_dir, t_Surface))
             insert(t_Surface);
-        if(FsSurface::read(subject_id, 1, surf, subjects_dir, t_Surface))
+        if (FsSurface::read(subject_id, 1, surf, subjects_dir, t_Surface))
             insert(t_Surface);
     }
 
@@ -60,19 +57,16 @@ FsSurfaceSet::FsSurfaceSet(const QString &subject_id, qint32 hemi, const QString
 
 //=============================================================================================================
 
-FsSurfaceSet::FsSurfaceSet(const QString &path, qint32 hemi, const QString &surf)
+FsSurfaceSet::FsSurfaceSet(const QString& path, qint32 hemi, const QString& surf)
 {
     FsSurface t_Surface;
-    if(hemi == 0 || hemi == 1)
-    {
-        if(FsSurface::read(path, hemi, surf, t_Surface))
+    if (hemi == 0 || hemi == 1) {
+        if (FsSurface::read(path, hemi, surf, t_Surface))
             insert(t_Surface);
-    }
-    else if(hemi == 2)
-    {
-        if(FsSurface::read(path, 0, surf, t_Surface))
+    } else if (hemi == 2) {
+        if (FsSurface::read(path, 0, surf, t_Surface))
             insert(t_Surface);
-        if(FsSurface::read(path, 1, surf, t_Surface))
+        if (FsSurface::read(path, 1, surf, t_Surface))
             insert(t_Surface);
     }
 
@@ -83,12 +77,12 @@ FsSurfaceSet::FsSurfaceSet(const QString &path, qint32 hemi, const QString &surf
 
 FsSurfaceSet::FsSurfaceSet(const FsSurface& p_LHSurface, const FsSurface& p_RHSurface)
 {
-    if(p_LHSurface.hemi() == 0)
+    if (p_LHSurface.hemi() == 0)
         m_qMapSurfs.insert(0, p_LHSurface);
     else
         qWarning("Left hemisphere id is not 0. LH surface not assigned!");
 
-    if(p_RHSurface.hemi() == 1)
+    if (p_RHSurface.hemi() == 1)
         m_qMapSurfs.insert(1, p_RHSurface);
     else
         qWarning("Right hemisphere id is not 1. RH surface not assigned!");
@@ -101,7 +95,7 @@ FsSurfaceSet::FsSurfaceSet(const FsSurface& p_LHSurface, const FsSurface& p_RHSu
 FsSurfaceSet::FsSurfaceSet(const QString& p_sLHFileName, const QString& p_sRHFileName)
 {
     FsSurfaceSet t_SurfaceSet;
-    if(FsSurfaceSet::read(p_sLHFileName, p_sRHFileName, t_SurfaceSet))
+    if (FsSurfaceSet::read(p_sLHFileName, p_sRHFileName, t_SurfaceSet))
         *this = t_SurfaceSet;
 }
 
@@ -122,7 +116,7 @@ void FsSurfaceSet::clear()
 
 void FsSurfaceSet::insert(const FsSurface& p_Surface)
 {
-    if(p_Surface.isEmpty())
+    if (p_Surface.isEmpty())
         return;
 
     qint32 hemi = p_Surface.hemi();
@@ -133,28 +127,26 @@ void FsSurfaceSet::insert(const FsSurface& p_Surface)
 
 //=============================================================================================================
 
-bool FsSurfaceSet::read(const QString& p_sLHFileName, const QString& p_sRHFileName, FsSurfaceSet &p_SurfaceSet)
+bool FsSurfaceSet::read(const QString& p_sLHFileName, const QString& p_sRHFileName, FsSurfaceSet& p_SurfaceSet)
 {
     p_SurfaceSet.clear();
 
     QStringList t_qListFileName;
     t_qListFileName << p_sLHFileName << p_sRHFileName;
 
-    for(qint32 i = 0; i < t_qListFileName.size(); ++i)
-    {
+    for (qint32 i = 0; i < t_qListFileName.size(); ++i) {
         FsSurface t_Surface;
-        if(FsSurface::read(t_qListFileName[i], t_Surface))
-        {
-            if(t_qListFileName[i].contains("lh."))
+        if (FsSurface::read(t_qListFileName[i], t_Surface)) {
+            if (t_qListFileName[i].contains("lh."))
                 p_SurfaceSet.m_qMapSurfs.insert(0, t_Surface);
-            else if(t_qListFileName[i].contains("rh."))
+            else if (t_qListFileName[i].contains("rh."))
                 p_SurfaceSet.m_qMapSurfs.insert(1, t_Surface);
             else
                 return false;
         }
     }
 
-    if(p_SurfaceSet.m_qMapSurfs.isEmpty())
+    if (p_SurfaceSet.m_qMapSurfs.isEmpty())
         return false;
 
     p_SurfaceSet.calcOffset();
@@ -164,14 +156,13 @@ bool FsSurfaceSet::read(const QString& p_sLHFileName, const QString& p_sRHFileNa
 
 //=============================================================================================================
 
-const FsSurface& FsSurfaceSet::operator[] (qint32 idx) const
+const FsSurface& FsSurfaceSet::operator[](qint32 idx) const
 {
-    if(idx == 0)
+    if (idx == 0)
         return m_qMapSurfs.find(idx).value();
-    else if(idx == 1)
+    else if (idx == 1)
         return m_qMapSurfs.find(idx).value();
-    else
-    {
+    else {
         qWarning("Warning: Index is not '0' or '1'! Returning '0'.");
         return m_qMapSurfs.find(0).value();
     }
@@ -179,14 +170,13 @@ const FsSurface& FsSurfaceSet::operator[] (qint32 idx) const
 
 //=============================================================================================================
 
-FsSurface& FsSurfaceSet::operator[] (qint32 idx)
+FsSurface& FsSurfaceSet::operator[](qint32 idx)
 {
-    if(idx == 0)
+    if (idx == 0)
         return m_qMapSurfs.find(idx).value();
-    else if(idx == 1)
+    else if (idx == 1)
         return m_qMapSurfs.find(idx).value();
-    else
-    {
+    else {
         qWarning("Warning: Index is not '0' or '1'! Returning '0'.");
         return m_qMapSurfs.find(0).value();
     }
@@ -194,14 +184,13 @@ FsSurface& FsSurfaceSet::operator[] (qint32 idx)
 
 //=============================================================================================================
 
-const FsSurface& FsSurfaceSet::operator[] (QString idt) const
+const FsSurface& FsSurfaceSet::operator[](QString idt) const
 {
-    if(idt.compare("lh") == 0)
+    if (idt.compare("lh") == 0)
         return m_qMapSurfs.find(0).value();
-    else if(idt.compare("rh") == 0)
+    else if (idt.compare("rh") == 0)
         return m_qMapSurfs.find(1).value();
-    else
-    {
+    else {
         qWarning("Warning: Identifier is not 'lh' or 'rh'! Returning 'lh'.");
         return m_qMapSurfs.find(0).value();
     }
@@ -209,14 +198,13 @@ const FsSurface& FsSurfaceSet::operator[] (QString idt) const
 
 //=============================================================================================================
 
-FsSurface& FsSurfaceSet::operator[] (QString idt)
+FsSurface& FsSurfaceSet::operator[](QString idt)
 {
-    if(idt.compare("lh") == 0)
+    if (idt.compare("lh") == 0)
         return m_qMapSurfs.find(0).value();
-    else if(idt.compare("rh") == 0)
+    else if (idt.compare("rh") == 0)
         return m_qMapSurfs.find(1).value();
-    else
-    {
+    else {
         qWarning("Warning: Identifier is not 'lh' or 'rh'! Returning 'lh'.");
         return m_qMapSurfs.find(0).value();
     }
@@ -229,12 +217,11 @@ void FsSurfaceSet::calcOffset()
     //
     // Correct inflated offset
     //
-    if(m_qMapSurfs.size() == 2 && QString::compare(m_qMapSurfs.begin().value().surf(),"inflated") == 0)
-    {
+    if (m_qMapSurfs.size() == 2 && QString::compare(m_qMapSurfs.begin().value().surf(), "inflated") == 0) {
         float xOffset = m_qMapSurfs.find(0).value().rr().col(0).maxCoeff() - m_qMapSurfs.find(1).value().rr().col(0).minCoeff();
         Vector3f vecLhOffset, vecRhOffset;
-        vecLhOffset << (xOffset/2.0f), 0, 0;
-        vecRhOffset << (-xOffset/2.0f), 0, 0;
+        vecLhOffset << (xOffset / 2.0f), 0, 0;
+        vecRhOffset << (-xOffset / 2.0f), 0, 0;
         m_qMapSurfs.find(0).value().offset() = vecLhOffset;
         m_qMapSurfs.find(1).value().offset() = vecRhOffset;
     }

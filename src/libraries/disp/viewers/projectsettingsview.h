@@ -41,8 +41,9 @@
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-namespace Ui {
-    class ProjectSettingsViewWidget;
+namespace Ui
+{
+class ProjectSettingsViewWidget;
 }
 
 //=============================================================================================================
@@ -74,7 +75,7 @@ public:
                                  const QString& sCurrentProject = "TestProject",
                                  const QString& sCurrentSubject = "TestSubject",
                                  const QString& sCurrentParadigm = "UnknownParadigm",
-                                 QWidget *parent = 0);
+                                 QWidget* parent = 0);
     ~ProjectSettingsView();
 
     //=========================================================================================================
@@ -167,13 +168,13 @@ private:
     void deleteProject();
     void deleteSubject();
 
-    void paradigmChanged(const QString &sNewParadigm);
+    void paradigmChanged(const QString& sNewParadigm);
 
     void scanForProjects();
     void scanForSubjects();
 
-    void selectNewProject(const QString &sNewProject);
-    void selectNewSubject(const QString &sNewSubject);
+    void selectNewProject(const QString& sNewProject);
+    void selectNewSubject(const QString& sNewSubject);
 
     void updateFileName(bool currentTime = true);
 
@@ -182,18 +183,18 @@ private:
 
     void browseDirectories();
 
-    Ui::ProjectSettingsViewWidget*   m_pUi;
+    Ui::ProjectSettingsViewWidget* m_pUi;
 
-    QStringList         m_sListProjects;
-    QStringList         m_sListSubjects;
+    QStringList m_sListProjects;
+    QStringList m_sListSubjects;
 
-    QString             m_sDataPath;
-    QString             m_sCurrentProject;
-    QString             m_sCurrentSubject;
-    QString             m_sCurrentParadigm;
-    QString             m_sFileName;
+    QString m_sDataPath;
+    QString m_sCurrentProject;
+    QString m_sCurrentSubject;
+    QString m_sCurrentParadigm;
+    QString m_sFileName;
 
-    int                 m_iRecordingTime;       /**< recording time in ms.*/
+    int m_iRecordingTime; /**< recording time in ms.*/
 
 signals:
     void timerChanged(int secs);

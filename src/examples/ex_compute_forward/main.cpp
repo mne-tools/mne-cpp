@@ -64,7 +64,7 @@ using namespace Eigen;
  * @param[in] argv (argument vector) is an array of pointers to arrays of character objects. The array objects are null-terminated strings, representing the arguments that were entered on the command line when the program was started.
  * @return the value that was set to exit() (which is 0 if exit() is called via quit()).
  */
-int main(int argc, char *argv[])
+int main(int argc, char* argv[])
 {
     qInstallMessageHandler(UTILSLIB::MNELogger::customLogWriter);
     QCoreApplication a(argc, argv);
@@ -96,7 +96,7 @@ int main(int argc, char *argv[])
     pSettings->mriname = QCoreApplication::applicationDirPath() + "/../resources/data/mne-cpp-test-data/MEG/sample/all-trans.fif";
     pSettings->transname.clear();
     pSettings->bemname = QCoreApplication::applicationDirPath() + "/../resources/data/MNE-sample-data/subjects/sample/bem/sample-5120-5120-5120-bem.fif";
-    pSettings->mindist = 5.0f/1000.0f;
+    pSettings->mindist = 5.0f / 1000.0f;
     pSettings->solname = QCoreApplication::applicationDirPath() + "/../resources/data/mne-cpp-test-data/Result/sample_audvis-meg-eeg-oct-6-fwd.fif";
 
     // bring in dev_head transformation and FiffInfo
@@ -139,8 +139,8 @@ int main(int argc, char *argv[])
     fTime4 = timer4.elapsed();
 
     // Print timer results
-    qInfo() << "The initialization took: " << fTime0  << " ms.";
-    qInfo() << "The computation took: " << fTime1  << " ms.";
+    qInfo() << "The initialization took: " << fTime0 << " ms.";
+    qInfo() << "The computation took: " << fTime1 << " ms.";
     qInfo() << "Storing the fwd solution took: " << fTime2 << " ms.";
     qInfo() << "Reading the fwd solution took: " << fTime3 << " ms.";
     qInfo() << "The recomputation took: " << fTime4 << " ms.";

@@ -87,8 +87,8 @@ void FiffProducer::run()
     //
     fiff_int_t from = m_pFiffSimulator->m_RawInfo.first_samp;
     fiff_int_t to = m_pFiffSimulator->m_RawInfo.last_samp;
-//    float quantum_sec = (float)uiSamplePeriod/1000000.0f; //read and write in 10 sec junks
-    fiff_int_t quantum = m_pFiffSimulator->m_uiBufferSampleSize;//ceil(quantum_sec*m_pFiffSimulator->m_pRawInfo->info.sfreq);
+    //    float quantum_sec = (float)uiSamplePeriod/1000000.0f; //read and write in 10 sec junks
+    fiff_int_t quantum = m_pFiffSimulator->m_uiBufferSampleSize; //ceil(quantum_sec*m_pFiffSimulator->m_pRawInfo->info.sfreq);
 
     qDebug() << "quantum " << quantum;
 
@@ -107,12 +107,12 @@ void FiffProducer::run()
 
     first = from;
 
-//    //Calibration - Is taken care of during read_raw_segment(...) later in the code
-//    qint32 nchan = m_pFiffSimulator->m_RawInfo.info.nchan;
-//    MatrixXd cals(1,nchan);
-//    SparseMatrix<double> inv_calsMat(nchan, nchan);
-//    for(qint32 i = 0; i < nchan; ++i)
-//        inv_calsMat.insert(i, i) = 1.0f/m_pFiffSimulator->m_RawInfo.info.chs[i].cal;
+    //    //Calibration - Is taken care of during read_raw_segment(...) later in the code
+    //    qint32 nchan = m_pFiffSimulator->m_RawInfo.info.nchan;
+    //    MatrixXd cals(1,nchan);
+    //    SparseMatrix<double> inv_calsMat(nchan, nchan);
+    //    for(qint32 i = 0; i < nchan; ++i)
+    //        inv_calsMat.insert(i, i) = 1.0f/m_pFiffSimulator->m_RawInfo.info.chs[i].cal;
 
     //Not good cause production time is not accurate
     //loading and thread sleep is longer than thread sleep time - better to have a extra loading thread
@@ -122,63 +122,56 @@ void FiffProducer::run()
     fiff_int_t t_iDiff = 0;
     bool t_bRestart = false;
 
-    while(m_bIsRunning)
-    {
-        last = first+quantum-1;
-        if (last > to)
-        {
+    while (m_bIsRunning) {
+        last = first + quantum - 1;
+        if (last > to) {
             t_iDiff = last - to;
             t_bRestart = true;
 
             last = to;
         }
 
-        if (!m_pFiffSimulator->m_RawInfo.read_raw_segment(data,times,first,last))
-        {
+        if (!m_pFiffSimulator->m_RawInfo.read_raw_segment(data, times, first, last)) {
             qInfo("error during read_raw_segment");
         }
 
-        MatrixXf tmp = data.cast<float>();//(inv_calsMat*data).cast<float>();
+        MatrixXf tmp = data.cast<float>(); //(inv_calsMat*data).cast<float>();
 
-        if(t_bRestart)
-        {
+        if (t_bRestart) {
             //
             // Case end of Simulation: restart file from the beginning and read remaining bytes
             //
             qInfo("### RESTART Simulation File ###\r");
 
             first = from;
-            last = first+t_iDiff-1;
+            last = first + t_iDiff - 1;
 
-            if (!m_pFiffSimulator->m_RawInfo.read_raw_segment(data,times,first,last))
-            {
+            if (!m_pFiffSimulator->m_RawInfo.read_raw_segment(data, times, first, last)) {
                 qInfo("error during read_raw_segment");
             }
 
-            MatrixXf tmp2 = data.cast<float>();//(inv_calsMat*data).cast<float>();
+            MatrixXf tmp2 = data.cast<float>(); //(inv_calsMat*data).cast<float>();
 
-            MatrixXf tmp3(tmp.rows(), tmp.cols()+tmp2.cols());
+            MatrixXf tmp3(tmp.rows(), tmp.cols() + tmp2.cols());
 
-            tmp3.block(0,0,tmp.rows(),tmp.cols()) = tmp;
-            tmp3.block(0,tmp.cols(),tmp.rows(),tmp2.cols()) = tmp2;
+            tmp3.block(0, 0, tmp.rows(), tmp.cols()) = tmp;
+            tmp3.block(0, tmp.cols(), tmp.rows(), tmp2.cols()) = tmp2;
 
             tmp = tmp3;
 
             t_bRestart = false;
             first += t_iDiff;
-        }
-        else
-        {
+        } else {
             first += quantum;
         }
 
         // call blocks until there is free space in the buffer
-        while(!m_pFiffSimulator->m_pRawMatrixBuffer->push(tmp) && m_bIsRunning) {
+        while (!m_pFiffSimulator->m_pRawMatrixBuffer->push(tmp) && m_bIsRunning) {
             //Do nothing until the circular buffer is ready to accept new data again
         }
     }
 
     // close datastream in this thread
-//    delete m_pFiffSimulator->m_RawInfo.file;
-//    m_pFiffSimulator->m_RawInfo.file = NULL;
+    //    delete m_pFiffSimulator->m_RawInfo.file;
+    //    m_pFiffSimulator->m_RawInfo.file = NULL;
 }

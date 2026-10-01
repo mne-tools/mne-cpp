@@ -29,12 +29,12 @@ using namespace SCMEASLIB;
 //=============================================================================================================
 
 Measurement::Measurement(int type,
-                         QObject *parent)
+                         QObject* parent)
 : QObject(parent)
 , m_iMetaTypeId(type)
 , m_bVisibility(true)
 {
-//    qWarning() << "QMetaType" << type;
+    //    qWarning() << "QMetaType" << type;
 }
 
 //=============================================================================================================

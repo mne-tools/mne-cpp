@@ -48,20 +48,20 @@ using namespace FSLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-RtcMneSetupWidget::RtcMneSetupWidget(RtcMne* toolbox, QWidget *parent)
+RtcMneSetupWidget::RtcMneSetupWidget(RtcMne* toolbox, QWidget* parent)
 : QWidget(parent)
 , m_pMNE(toolbox)
 {
     ui.setupUi(this);
 
     ui.m_qLineEdit_AtlasDirName->setText(m_pMNE->m_sAtlasDir);
-    if(m_pMNE->m_pAnnotationSet->isEmpty())
+    if (m_pMNE->m_pAnnotationSet->isEmpty())
         ui.m_qLabel_atlasStat->setText("not loaded");
     else
         ui.m_qLabel_atlasStat->setText("loaded");
 
     ui.m_qLineEdit_SurfaceDirName->setText(m_pMNE->m_sSurfaceDir);
-    if(m_pMNE->m_pSurfaceSet->isEmpty())
+    if (m_pMNE->m_pSurfaceSet->isEmpty())
         ui.m_qLabel_surfaceStat->setText("not loaded");
     else
         ui.m_qLabel_surfaceStat->setText("loaded");
@@ -85,17 +85,15 @@ void RtcMneSetupWidget::showAtlasDirDialog()
 {
     QString t_sAtlasDir = QFileDialog::getExistingDirectory(this, tr("Open Atlas Directory"),
                                                             QString(),
-                                                            QFileDialog::ShowDirsOnly
-                                                            | QFileDialog::DontResolveSymlinks);
+                                                            QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks);
 
     m_pMNE->m_sAtlasDir = t_sAtlasDir;
 
     ui.m_qLineEdit_AtlasDirName->setText(m_pMNE->m_sAtlasDir);
 
-    FsAnnotationSet::SPtr t_pAnnotationSet = FsAnnotationSet::SPtr(new FsAnnotationSet(t_sAtlasDir+"/lh.aparc.a2009s.annot", t_sAtlasDir+"/rh.aparc.a2009s.annot"));
+    FsAnnotationSet::SPtr t_pAnnotationSet = FsAnnotationSet::SPtr(new FsAnnotationSet(t_sAtlasDir + "/lh.aparc.a2009s.annot", t_sAtlasDir + "/rh.aparc.a2009s.annot"));
 
-    if(!t_pAnnotationSet->isEmpty() && t_pAnnotationSet->size() == 2)
-    {
+    if (!t_pAnnotationSet->isEmpty() && t_pAnnotationSet->size() == 2) {
         m_pMNE->m_pAnnotationSet = t_pAnnotationSet;
 
         m_pMNE->m_sAtlasDir = t_sAtlasDir;
@@ -103,9 +101,7 @@ void RtcMneSetupWidget::showAtlasDirDialog()
         m_pMNE->m_pRTSEOutput->measurementData()->setAnnotSet(t_pAnnotationSet);
 
         ui.m_qLabel_atlasStat->setText("loaded");
-    }
-    else
-    {
+    } else {
         m_pMNE->m_pAnnotationSet = FsAnnotationSet::SPtr(new FsAnnotationSet());
         ui.m_qLabel_atlasStat->setText("not loaded");
     }
@@ -115,17 +111,15 @@ void RtcMneSetupWidget::showAtlasDirDialog()
 
 void RtcMneSetupWidget::showSurfaceDirDialog()
 {
-    QString t_sSurfaceDir = QFileDialog::getExistingDirectory(  this, tr("Open FsSurface Directory"),
-                                                                QString(),
-                                                                QFileDialog::ShowDirsOnly
-                                                                | QFileDialog::DontResolveSymlinks);
+    QString t_sSurfaceDir = QFileDialog::getExistingDirectory(this, tr("Open FsSurface Directory"),
+                                                              QString(),
+                                                              QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks);
 
-    FsSurfaceSet::SPtr t_pSurfaceSet = FsSurfaceSet::SPtr(new FsSurfaceSet(t_sSurfaceDir+"/lh.orig", t_sSurfaceDir+"/rh.orig"));
+    FsSurfaceSet::SPtr t_pSurfaceSet = FsSurfaceSet::SPtr(new FsSurfaceSet(t_sSurfaceDir + "/lh.orig", t_sSurfaceDir + "/rh.orig"));
 
     ui.m_qLineEdit_SurfaceDirName->setText(t_sSurfaceDir);
 
-    if(!t_pSurfaceSet->isEmpty() && t_pSurfaceSet->size() == 2)
-    {
+    if (!t_pSurfaceSet->isEmpty() && t_pSurfaceSet->size() == 2) {
         m_pMNE->m_pSurfaceSet = t_pSurfaceSet;
 
         m_pMNE->m_sSurfaceDir = t_sSurfaceDir;
@@ -133,9 +127,7 @@ void RtcMneSetupWidget::showSurfaceDirDialog()
         m_pMNE->m_pRTSEOutput->measurementData()->setSurfSet(t_pSurfaceSet);
 
         ui.m_qLabel_surfaceStat->setText("loaded");
-    }
-    else
-    {
+    } else {
         m_pMNE->m_pSurfaceSet = FsSurfaceSet::SPtr(new FsSurfaceSet());
         ui.m_qLabel_surfaceStat->setText("not loaded");
     }
@@ -154,7 +146,7 @@ void RtcMneSetupWidget::showMriHeadFileDialog()
 
     FIFFLIB::FiffCoordTrans mriHeadTrans = FIFFLIB::FiffCoordTrans(file);
 
-    if(!mriHeadTrans.isEmpty()) {
+    if (!mriHeadTrans.isEmpty()) {
         m_pMNE->m_mriHeadTrans = mriHeadTrans;
         ui.m_qLineEdit_MriHeadTrans->setText(t_sMriHeadFile);
     }

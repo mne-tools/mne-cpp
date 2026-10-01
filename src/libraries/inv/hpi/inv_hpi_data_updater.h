@@ -45,10 +45,11 @@
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-namespace FIFFLIB{
-    class FiffInfo;
-    class FiffChInfo;
-    class FiffDigPointSet;
+namespace FIFFLIB
+{
+class FiffInfo;
+class FiffChInfo;
+class FiffDigPointSet;
 }
 
 //=============================================================================================================
@@ -74,7 +75,6 @@ namespace INVLIB
  */
 class INVSHARED_EXPORT InvHpiDataUpdater
 {
-
 public:
     typedef QSharedPointer<InvHpiDataUpdater> SPtr;            /**< Shared pointer type for InvHpiDataUpdater. */
     typedef QSharedPointer<const InvHpiDataUpdater> ConstSPtr; /**< Const shared pointer type for InvHpiDataUpdater. */
@@ -191,9 +191,8 @@ private:
     Eigen::MatrixXd m_matProjectors;        /**< The projectors ready to use*/
     Eigen::MatrixXd m_matInnerdata;         /**< The data ready to use*/
     Eigen::MatrixXd m_matDataProjected;     /**< The data with projectros applied*/
-    InvSensorSetCreator m_sensorSetCreator;    /**< ThesensorSetCreator to create a sensorset*/
-    InvSensorSet m_sensors;                    /**< The most recent InvSensorSet*/
-
+    InvSensorSetCreator m_sensorSetCreator; /**< ThesensorSetCreator to create a sensorset*/
+    InvSensorSet m_sensors;                 /**< The most recent InvSensorSet*/
 };
 
 //=============================================================================================================
@@ -233,4 +232,3 @@ inline const InvSensorSet& InvHpiDataUpdater::getSensors()
 } // namespace INVLIB
 
 #endif // INV_HPI_DATA_UPDATER_H
-

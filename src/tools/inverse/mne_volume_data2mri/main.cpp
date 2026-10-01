@@ -114,7 +114,7 @@ static bool readStcFile(const QString& filename, MatrixXd& data, VectorXi& verti
 
 //=============================================================================================================
 
-int main(int argc, char *argv[])
+int main(int argc, char* argv[])
 {
     qInstallMessageHandler(MNELogger::customLogWriter);
     QCoreApplication app(argc, argv);
@@ -189,14 +189,14 @@ int main(int argc, char *argv[])
             return 1;
         }
         values = stcData.col(tpoint);
-        qInfo("Read STC: %ld vertices, %ld time points, using tpoint %d" ,
-               static_cast<long>(stcData.rows()), static_cast<long>(stcData.cols()), tpoint);
+        qInfo("Read STC: %ld vertices, %ld time points, using tpoint %d",
+              static_cast<long>(stcData.rows()), static_cast<long>(stcData.cols()), tpoint);
     } else {
         if (!readWFile(wFile, values, vertices)) {
             fprintf(stderr, "Failed to read w file.\n");
             return 1;
         }
-        qInfo("Read W: %ld vertices" , static_cast<long>(values.size()));
+        qInfo("Read W: %ld vertices", static_cast<long>(values.size()));
     }
 
     //
@@ -242,8 +242,8 @@ int main(int argc, char *argv[])
                     << vertValues(i) << "\n";
             }
         }
-        qInfo("Wrote %d non-zero vertex values to %s" ,
-               nonZero, outFile.toUtf8().constData());
+        qInfo("Wrote %d non-zero vertex values to %s",
+              nonZero, outFile.toUtf8().constData());
         break;
     }
 

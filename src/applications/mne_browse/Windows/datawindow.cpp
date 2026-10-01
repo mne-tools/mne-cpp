@@ -34,7 +34,8 @@
 
 using namespace MNEBROWSE;
 
-namespace {
+namespace
+{
 
 int resolveStimChannelIndex(const FIFFLIB::FiffInfo& info)
 {
@@ -60,8 +61,7 @@ int resolveStimChannelIndex(const FIFFLIB::FiffInfo& info)
 
 quint64 makeStimEventKey(int sample, int type)
 {
-    return (static_cast<quint64>(static_cast<quint32>(sample)) << 32)
-           | static_cast<quint32>(type);
+    return (static_cast<quint64>(static_cast<quint32>(sample)) << 32) | static_cast<quint32>(type);
 }
 
 QColor markerColorForIndex(int index)
@@ -72,8 +72,7 @@ QColor markerColorForIndex(int index)
         QColor(231, 126, 35),
         QColor(155, 89, 182),
         QColor(231, 76, 60),
-        QColor(26, 188, 156)
-    };
+        QColor(26, 188, 156)};
 
     if (kMarkerColors.isEmpty()) {
         return QColor(93, 177, 47);
@@ -82,10 +81,10 @@ QColor markerColorForIndex(int index)
     return kMarkerColors.at(index % kMarkerColors.size());
 }
 
-QMultiMap<int, QSharedPointer<MNEOperator> > browserAssignedOperators(const QSharedPointer<FIFFLIB::FiffInfo>& info,
-                                                                      const QSharedPointer<SessionFilter>& filterDefinition)
+QMultiMap<int, QSharedPointer<MNEOperator>> browserAssignedOperators(const QSharedPointer<FIFFLIB::FiffInfo>& info,
+                                                                     const QSharedPointer<SessionFilter>& filterDefinition)
 {
-    QMultiMap<int, QSharedPointer<MNEOperator> > assignedOperators;
+    QMultiMap<int, QSharedPointer<MNEOperator>> assignedOperators;
     if (!info || filterDefinition.isNull()) {
         return assignedOperators;
     }
@@ -109,7 +108,7 @@ QMultiMap<int, QSharedPointer<MNEOperator> > browserAssignedOperators(const QSha
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-DataWindow::DataWindow(QWidget *parent)
+DataWindow::DataWindow(QWidget* parent)
 : QWidget(parent)
 , ui(new Ui::DataWindowDockWidget)
 , m_pMainWindow(static_cast<MainWindow*>(parent))
@@ -165,7 +164,7 @@ RawDelegate* DataWindow::getDataDelegate()
 
 //*************************************************************************************************************
 
-void DataWindow::scaleData(const QMap<QString,double> &scaleMap)
+void DataWindow::scaleData(const QMap<QString, double>& scaleMap)
 {
     m_pRawDelegate->setScaleMap(scaleMap);
     updateDataTableViews();
@@ -202,7 +201,7 @@ void DataWindow::computeAutoScale()
 
     // Read a short sample (up to 2 seconds) synchronously from the file start
     const int first = m_pFiffReader->firstSample();
-    const int last  = m_pFiffReader->lastSample();
+    const int last = m_pFiffReader->lastSample();
     const int sampleCount = qMin(static_cast<int>(2.0 * fiffInfo->sfreq),
                                  last - first + 1);
     if (sampleCount <= 0)
@@ -214,9 +213,10 @@ void DataWindow::computeAutoScale()
 
     // Accumulate per-channel-type RMS
     // Channel types: MEG_grad, MEG_mag, EEG, EOG, EMG, ECG, STIM, MISC
-    struct TypeStats {
+    struct TypeStats
+    {
         double sumSq = 0.0;
-        int    count = 0;         // number of (channel × sample) values
+        int count = 0; // number of (channel × sample) values
     };
 
     QMap<qint32, TypeStats> typeStats;
@@ -225,7 +225,7 @@ void DataWindow::computeAutoScale()
         if (fiffInfo->bads.contains(fiffInfo->ch_names[ch]))
             continue;
 
-        const auto &chInfo = fiffInfo->chs[ch];
+        const auto& chInfo = fiffInfo->chs[ch];
         qint32 typeKey;
         if (chInfo.kind == FIFFV_MEG_CH) {
             typeKey = (chInfo.unit == FIFF_UNIT_T_M) ? -1 : -2; // grad vs mag
@@ -280,17 +280,17 @@ void DataWindow::showSelectedChannelsOnly(QStringList selectedChannels)
     m_slSelectedChannels = selectedChannels;
 
     //Hide non selected channels/rows in the data views
-    for(int i = 0; i<m_pRawModel->rowCount(); i++) {
+    for (int i = 0; i < m_pRawModel->rowCount(); i++) {
         QString channel = m_pRawModel->data(m_pRawModel->index(i, 0), Qt::DisplayRole).toString();
-        QVariant v = m_pRawModel->data(m_pRawModel->index(i,1), Qt::BackgroundRole);
+        QVariant v = m_pRawModel->data(m_pRawModel->index(i, 1), Qt::BackgroundRole);
 
-        if(!selectedChannels.contains(channel))
+        if (!selectedChannels.contains(channel))
             ui->m_tableView_rawTableView->hideRow(i);
         else
             ui->m_tableView_rawTableView->showRow(i);
 
         //if channel is a bad channel and bad channels are to be hidden -> do not show
-        if(v.canConvert<QBrush>() && m_bHideBadChannels)
+        if (v.canConvert<QBrush>() && m_bHideBadChannels)
             ui->m_tableView_rawTableView->hideRow(i);
     }
 
@@ -306,7 +306,7 @@ void DataWindow::showSelectedChannelsOnly(QStringList selectedChannels)
 
 void DataWindow::changeRowHeight(int height)
 {
-    for(int i = 0; i<ui->m_tableView_rawTableView->verticalHeader()->count(); i++)
+    for (int i = 0; i < ui->m_tableView_rawTableView->verticalHeader()->count(); i++)
         ui->m_tableView_rawTableView->setRowHeight(i, height);
 
     updateDataTableViews();
@@ -320,14 +320,14 @@ void DataWindow::hideBadChannels(bool hideChannels)
     m_bHideBadChannels = hideChannels;
 
     //Hide non selected channels/rows in the data views
-    for(int i = 0; i<m_pRawModel->rowCount(); i++) {
-        QVariant v = m_pRawModel->data(m_pRawModel->index(i,1),Qt::BackgroundRole);
-        QString chName = m_pRawModel->data(m_pRawModel->index(i,0),Qt::DisplayRole).toString();
+    for (int i = 0; i < m_pRawModel->rowCount(); i++) {
+        QVariant v = m_pRawModel->data(m_pRawModel->index(i, 1), Qt::BackgroundRole);
+        QString chName = m_pRawModel->data(m_pRawModel->index(i, 0), Qt::DisplayRole).toString();
 
         //Check if channel is marked as bad
-        if(v.canConvert<QBrush>() && m_bHideBadChannels)
+        if (v.canConvert<QBrush>() && m_bHideBadChannels)
             ui->m_tableView_rawTableView->hideRow(i);
-        else if(m_slSelectedChannels.contains(chName))
+        else if (m_slSelectedChannels.contains(chName))
             ui->m_tableView_rawTableView->showRow(i);
     }
 
@@ -339,9 +339,9 @@ void DataWindow::hideBadChannels(bool hideChannels)
 
 //*************************************************************************************************************
 
-void DataWindow::setAnnotations(const QVector<DISPLIB::ChannelRhiView::AnnotationSpan> &annotations)
+void DataWindow::setAnnotations(const QVector<DISPLIB::ChannelRhiView::AnnotationSpan>& annotations)
 {
-    if(m_pChannelDataView) {
+    if (m_pChannelDataView) {
         m_pChannelDataView->setAnnotations(annotations);
     }
 }
@@ -350,7 +350,7 @@ void DataWindow::setAnnotations(const QVector<DISPLIB::ChannelRhiView::Annotatio
 
 void DataWindow::setAnnotationSelectionEnabled(bool enabled)
 {
-    if(m_pChannelDataView) {
+    if (m_pChannelDataView) {
         m_pChannelDataView->setAnnotationSelectionEnabled(enabled);
     }
 }
@@ -386,7 +386,7 @@ void DataWindow::addMarkerAtSample(int sample)
 
     const int markerId = marker.id;
     connect(marker.line, &DataMarker::markerMoved, this, [this, markerId]() {
-        PersistentMarker *m = findMarker(markerId);
+        PersistentMarker* m = findMarker(markerId);
         if (!m || !m->line || !m_pChannelDataView) {
             return;
         }
@@ -456,7 +456,7 @@ void DataWindow::removeMarkerNearSample(int sample)
 
     int nearestMarkerId = -1;
     int nearestDistance = std::numeric_limits<int>::max();
-    for (const PersistentMarker &marker : std::as_const(m_dataMarkers)) {
+    for (const PersistentMarker& marker : std::as_const(m_dataMarkers)) {
         const int distance = qAbs(marker.sample - sample);
         if (distance < nearestDistance) {
             nearestDistance = distance;
@@ -498,7 +498,7 @@ void DataWindow::setActiveMarker(int markerId)
 
 int DataWindow::activeMarkerSample() const
 {
-    const PersistentMarker *marker = findMarker(m_iActiveMarkerId);
+    const PersistentMarker* marker = findMarker(m_iActiveMarkerId);
     if (marker) {
         return marker->sample;
     }
@@ -515,7 +515,7 @@ void DataWindow::syncMarkersToViewport()
         return;
     }
 
-    for (PersistentMarker &marker : m_dataMarkers) {
+    for (PersistentMarker& marker : m_dataMarkers) {
         if (!marker.line || !marker.label) {
             continue;
         }
@@ -528,8 +528,7 @@ void DataWindow::syncMarkersToViewport()
         if (m_pChannelDataView) {
             const int localViewportX = m_pChannelDataView->sampleToViewportX(marker.sample);
             markerX = m_pChannelDataView->mapTo(this, QPoint(localViewportX, 0)).x() - (RawSettingsConstants::DATA_MARKER_WIDTH / 2);
-            visible = marker.sample >= m_pChannelDataView->firstVisibleSample()
-                   && marker.sample <= (m_pChannelDataView->firstVisibleSample() + m_pChannelDataView->visibleSampleCount());
+            visible = marker.sample >= m_pChannelDataView->firstVisibleSample() && marker.sample <= (m_pChannelDataView->firstVisibleSample() + m_pChannelDataView->visibleSampleCount());
         }
 
         const int maxMarkerX = qMax(viewportRect.left(), viewportRect.right() - RawSettingsConstants::DATA_MARKER_WIDTH + 1);
@@ -562,7 +561,7 @@ void DataWindow::updateTimeRulerMarkers()
 
     QVector<DISPLIB::TimeRulerReferenceMark> marks;
     marks.reserve(m_dataMarkers.size());
-    for (const PersistentMarker &marker : std::as_const(m_dataMarkers)) {
+    for (const PersistentMarker& marker : std::as_const(m_dataMarkers)) {
         QString label = QStringLiteral("M%1").arg(marker.id);
         if (marker.id == m_iActiveMarkerId) {
             label.append(QLatin1Char('*'));
@@ -577,7 +576,7 @@ void DataWindow::updateTimeRulerMarkers()
 
 DataWindow::PersistentMarker* DataWindow::findMarker(int markerId)
 {
-    for (PersistentMarker &marker : m_dataMarkers) {
+    for (PersistentMarker& marker : m_dataMarkers) {
         if (marker.id == markerId) {
             return &marker;
         }
@@ -590,7 +589,7 @@ DataWindow::PersistentMarker* DataWindow::findMarker(int markerId)
 
 const DataWindow::PersistentMarker* DataWindow::findMarker(int markerId) const
 {
-    for (const PersistentMarker &marker : m_dataMarkers) {
+    for (const PersistentMarker& marker : m_dataMarkers) {
         if (marker.id == markerId) {
             return &marker;
         }
@@ -601,22 +600,22 @@ const DataWindow::PersistentMarker* DataWindow::findMarker(int markerId) const
 
 //*************************************************************************************************************
 
-void DataWindow::setVirtualChannels(const QVector<VirtualChannelDefinition> &virtualChannels,
+void DataWindow::setVirtualChannels(const QVector<VirtualChannelDefinition>& virtualChannels,
                                     bool reloadIfOpen)
 {
     m_virtualChannelDefinitions = virtualChannels;
     m_resolvedVirtualChannels.clear();
 
-    if(!m_pChannelDataView || !m_pChannelDataView->model()) {
+    if (!m_pChannelDataView || !m_pChannelDataView->model()) {
         return;
     }
 
-    if(!reloadIfOpen) {
+    if (!reloadIfOpen) {
         m_pChannelDataView->model()->setVirtualChannels({});
         return;
     }
 
-    if(!m_pFiffReader || !m_pFiffReader->isOpen()) {
+    if (!m_pFiffReader || !m_pFiffReader->isOpen()) {
         return;
     }
 
@@ -665,7 +664,7 @@ void DataWindow::clearUserDefinedFilter()
 void DataWindow::setRawWhiteningEnabled(bool enabled)
 {
     if (enabled && m_rawWhitener.rows() == 0) {
-        return;   // no whitener available — silently ignore
+        return; // no whitener available — silently ignore
     }
 
     if (m_bRawWhiteningEnabled == enabled) {
@@ -685,7 +684,7 @@ void DataWindow::setRawWhiteningEnabled(bool enabled)
 
 void DataWindow::updateRawWhitener(const FIFFLIB::FiffCov& cov, const WhiteningSettings& settings)
 {
-    m_rawWhitener = Eigen::MatrixXd();   // clear old
+    m_rawWhitener = Eigen::MatrixXd(); // clear old
 
     auto info = m_pFiffReader ? m_pFiffReader->fiffInfo() : nullptr;
     if (!info || cov.isEmpty()) {
@@ -821,8 +820,8 @@ void DataWindow::initMVCSettings()
 
     //set some settings for m_pRawTableView
     ui->m_tableView_rawTableView->verticalHeader()->setDefaultSectionSize(m_pRawDelegate->defaultPlotHeight());
-    ui->m_tableView_rawTableView->setColumnHidden(0,true);
-    ui->m_tableView_rawTableView->setColumnHidden(2,true);
+    ui->m_tableView_rawTableView->setColumnHidden(0, true);
+    ui->m_tableView_rawTableView->setColumnHidden(2, true);
     ui->m_tableView_rawTableView->resizeColumnsToContents();
 
     //connect QScrollBar with model in order to reload data samples (keeps filter/event logic alive)
@@ -886,7 +885,7 @@ QString DataWindow::fiffFileName() const
 
 //=============================================================================================================
 
-bool DataWindow::loadFiffFile(const QString &path)
+bool DataWindow::loadFiffFile(const QString& path)
 {
     if (!m_pFiffReader->open(path)) {
         return false;
@@ -904,7 +903,7 @@ bool DataWindow::loadFiffFile(const QString &path)
 
 //=============================================================================================================
 
-bool DataWindow::loadFiffBuffer(const QByteArray &baData, const QString &displayName)
+bool DataWindow::loadFiffBuffer(const QByteArray& baData, const QString& displayName)
 {
     if (!m_pFiffReader->openBuffer(baData, displayName)) {
         return false;
@@ -923,7 +922,7 @@ bool DataWindow::loadFiffBuffer(const QByteArray &baData, const QString &display
 
 //=============================================================================================================
 
-void DataWindow::onBlockLoaded(const Eigen::MatrixXd &matData, int firstSample)
+void DataWindow::onBlockLoaded(const Eigen::MatrixXd& matData, int firstSample)
 {
     m_bLoadingBlock = false;
 
@@ -935,11 +934,11 @@ void DataWindow::onBlockLoaded(const Eigen::MatrixXd &matData, int firstSample)
     // Apply raw-trace whitening if enabled and whitener is available
     const Eigen::MatrixXd whitenedData =
         (m_bRawWhiteningEnabled && m_rawWhitener.rows() == filteredData.rows())
-            ? (m_rawWhitener * filteredData).eval()
-            : filteredData;
+        ? (m_rawWhitener * filteredData).eval()
+        : filteredData;
 
     const Eigen::MatrixXd displayData = appendVirtualChannels(whitenedData);
-    auto *model = m_pChannelDataView->model();
+    auto* model = m_pChannelDataView->model();
 
     // Determine whether this block is contiguous with existing model matData.
     // If not (e.g. jump happened while the block was in-flight), start fresh
@@ -962,14 +961,14 @@ void DataWindow::onBlockLoaded(const Eigen::MatrixXd &matData, int firstSample)
     if (fiffInfo && m_iStimChannel >= 0) {
         // Fixed colour palette for event types (cycled by type index)
         static const QColor kEventPalette[] = {
-            QColor(220, 50,  50),   // red
-            QColor( 50, 140, 220),  // blue
-            QColor( 50, 180,  80),  // green
-            QColor(210, 130,  30),  // orange
-            QColor(140,  60, 200),  // purple
-            QColor( 30, 180, 180),  // teal
-            QColor(200,  50, 160),  // pink
-            QColor(100, 160,  40),  // olive
+            QColor(220, 50, 50),  // red
+            QColor(50, 140, 220), // blue
+            QColor(50, 180, 80),  // green
+            QColor(210, 130, 30), // orange
+            QColor(140, 60, 200), // purple
+            QColor(30, 180, 180), // teal
+            QColor(200, 50, 160), // pink
+            QColor(100, 160, 40), // olive
         };
         constexpr int kPaletteSize = static_cast<int>(sizeof(kEventPalette) / sizeof(kEventPalette[0]));
 
@@ -995,9 +994,9 @@ void DataWindow::onBlockLoaded(const Eigen::MatrixXd &matData, int firstSample)
                 const int currValue = qRound(matData(m_iStimChannel, s));
 
                 if (currValue > 0 && prevValue <= 0) {
-                    const int type      = currValue;
+                    const int type = currValue;
                     const int absSample = firstSample + s;
-                    const quint64 key   = makeStimEventKey(absSample, type);
+                    const quint64 key = makeStimEventKey(absSample, type);
 
                     if (!m_seenStimEventKeys.contains(key)) {
                         if (!m_eventTypeColors.contains(type)) {
@@ -1007,9 +1006,9 @@ void DataWindow::onBlockLoaded(const Eigen::MatrixXd &matData, int firstSample)
 
                         DISPLIB::ChannelRhiView::EventMarker ev;
                         ev.sample = absSample;
-                        ev.type   = type;
-                        ev.color  = m_eventTypeColors[type];
-                        ev.label  = QString::number(type);
+                        ev.type = type;
+                        ev.color = m_eventTypeColors[type];
+                        ev.label = QString::number(type);
 
                         m_seenStimEventKeys.insert(key);
                         m_stimEvents.append(ev);
@@ -1021,12 +1020,12 @@ void DataWindow::onBlockLoaded(const Eigen::MatrixXd &matData, int firstSample)
             }
 
             m_iStimLastSample = firstSample + matData.cols() - 1;
-            m_iStimLastValue  = prevValue;
+            m_iStimLastValue = prevValue;
 
             if (eventsChanged && m_pChannelDataView) {
                 std::sort(m_stimEvents.begin(), m_stimEvents.end(),
-                          [](const DISPLIB::ChannelRhiView::EventMarker &a,
-                             const DISPLIB::ChannelRhiView::EventMarker &b) {
+                          [](const DISPLIB::ChannelRhiView::EventMarker& a,
+                             const DISPLIB::ChannelRhiView::EventMarker& b) {
                               return a.sample < b.sample;
                           });
                 m_pChannelDataView->setEvents(m_stimEvents);
@@ -1050,46 +1049,44 @@ void DataWindow::rebuildVirtualChannels()
 {
     m_resolvedVirtualChannels.clear();
 
-    if(!m_pFiffReader || !m_pFiffReader->isOpen() || !m_pChannelDataView || !m_pChannelDataView->model()) {
+    if (!m_pFiffReader || !m_pFiffReader->isOpen() || !m_pChannelDataView || !m_pChannelDataView->model()) {
         return;
     }
 
     const auto fiffInfo = m_pFiffReader->fiffInfo();
-    if(!fiffInfo) {
+    if (!fiffInfo) {
         return;
     }
 
     QHash<QString, int> channelIndexByName;
-    for(int channelIndex = 0; channelIndex < fiffInfo->ch_names.size(); ++channelIndex) {
+    for (int channelIndex = 0; channelIndex < fiffInfo->ch_names.size(); ++channelIndex) {
         channelIndexByName.insert(fiffInfo->ch_names.at(channelIndex).trimmed(), channelIndex);
     }
 
     QVector<DISPLIB::ChannelDisplayInfo> virtualDisplayInfo;
     virtualDisplayInfo.reserve(m_virtualChannelDefinitions.size());
 
-    for(const VirtualChannelDefinition& definition : std::as_const(m_virtualChannelDefinitions)) {
+    for (const VirtualChannelDefinition& definition : std::as_const(m_virtualChannelDefinitions)) {
         const int primaryChannel = channelIndexByName.value(definition.primaryChannel.trimmed(), -1);
         QVector<int> referenceChannels;
         QVector<double> referenceWeights;
         referenceChannels.reserve(definition.referenceChannels.size());
         referenceWeights.reserve(definition.referenceChannels.size());
-        for(int referenceIndex = 0; referenceIndex < definition.referenceChannels.size(); ++referenceIndex) {
+        for (int referenceIndex = 0; referenceIndex < definition.referenceChannels.size(); ++referenceIndex) {
             const QString& referenceName = definition.referenceChannels.at(referenceIndex);
             const int referenceChannel = channelIndexByName.value(referenceName.trimmed(), -1);
-            if(referenceChannel >= 0 && referenceChannel != primaryChannel && !referenceChannels.contains(referenceChannel)) {
+            if (referenceChannel >= 0 && referenceChannel != primaryChannel && !referenceChannels.contains(referenceChannel)) {
                 referenceChannels.append(referenceChannel);
                 referenceWeights.append(referenceIndex < definition.referenceWeights.size()
-                                        ? definition.referenceWeights.at(referenceIndex)
-                                        : 1.0);
+                                            ? definition.referenceWeights.at(referenceIndex)
+                                            : 1.0);
             }
         }
 
         const bool invalidDefinition =
-            primaryChannel < 0
-            || referenceChannels.isEmpty()
-            || (definition.kind == VirtualChannelKind::Bipolar && referenceChannels.size() != 1);
+            primaryChannel < 0 || referenceChannels.isEmpty() || (definition.kind == VirtualChannelKind::Bipolar && referenceChannels.size() != 1);
 
-        if(invalidDefinition) {
+        if (invalidDefinition) {
             qWarning() << "DataWindow: could not resolve virtual channel"
                        << definition.name
                        << definition.primaryChannel
@@ -1100,7 +1097,7 @@ void DataWindow::rebuildVirtualChannels()
         const auto& primaryChannelInfo = fiffInfo->chs.at(primaryChannel);
 
         const auto amplitudeForChannel = [](const FIFFLIB::FiffChInfo& channelInfo) -> float {
-            switch(channelInfo.kind) {
+            switch (channelInfo.kind) {
                 case FIFFV_MEG_CH:
                     return channelInfo.unit == FIFF_UNIT_T_M ? 400e-13f : 1.2e-12f;
                 case FIFFV_EEG_CH:
@@ -1118,7 +1115,7 @@ void DataWindow::rebuildVirtualChannels()
         };
 
         const auto colorForKind = [](qint32 kind) -> QColor {
-            switch(kind) {
+            switch (kind) {
                 case FIFFV_MEG_CH:
                     return QColor(20, 90, 180);
                 case FIFFV_EEG_CH:
@@ -1137,7 +1134,7 @@ void DataWindow::rebuildVirtualChannels()
         };
 
         const auto typeLabelForKind = [](qint32 kind) -> QString {
-            switch(kind) {
+            switch (kind) {
                 case FIFFV_MEG_CH:
                     return QStringLiteral("MEG");
                 case FIFFV_EEG_CH:
@@ -1164,7 +1161,7 @@ void DataWindow::rebuildVirtualChannels()
         resolvedChannel.displayInfo.name = definition.name;
         bool sameKind = true;
         float amplitudeMax = amplitudeForChannel(primaryChannelInfo);
-        for(int referenceChannel : referenceChannels) {
+        for (int referenceChannel : referenceChannels) {
             const auto& referenceChannelInfo = fiffInfo->chs.at(referenceChannel);
             sameKind = sameKind && (referenceChannelInfo.kind == primaryChannelInfo.kind);
             amplitudeMax = qMax(amplitudeMax, amplitudeForChannel(referenceChannelInfo));
@@ -1174,7 +1171,7 @@ void DataWindow::rebuildVirtualChannels()
             : QStringLiteral("MISC");
         resolvedChannel.displayInfo.color = colorForKind(primaryChannelInfo.kind).darker(115);
         resolvedChannel.displayInfo.amplitudeMax = amplitudeMax;
-        if(resolvedChannel.displayInfo.amplitudeMax <= 0.f) {
+        if (resolvedChannel.displayInfo.amplitudeMax <= 0.f) {
             resolvedChannel.displayInfo.amplitudeMax = 1.f;
         }
         resolvedChannel.displayInfo.bad = false;
@@ -1189,29 +1186,27 @@ void DataWindow::rebuildVirtualChannels()
 
 //=============================================================================================================
 
-Eigen::MatrixXd DataWindow::appendVirtualChannels(const Eigen::MatrixXd &matData) const
+Eigen::MatrixXd DataWindow::appendVirtualChannels(const Eigen::MatrixXd& matData) const
 {
-    if(m_resolvedVirtualChannels.isEmpty()) {
+    if (m_resolvedVirtualChannels.isEmpty()) {
         return matData;
     }
 
     Eigen::MatrixXd displayData(matData.rows() + m_resolvedVirtualChannels.size(), matData.cols());
     displayData.topRows(matData.rows()) = matData;
 
-    for(int row = 0; row < m_resolvedVirtualChannels.size(); ++row) {
+    for (int row = 0; row < m_resolvedVirtualChannels.size(); ++row) {
         const ResolvedVirtualChannel& virtualChannel = m_resolvedVirtualChannels.at(row);
-        if(virtualChannel.primaryChannel < 0
-           || virtualChannel.primaryChannel >= matData.rows()
-           || virtualChannel.referenceChannels.isEmpty()) {
+        if (virtualChannel.primaryChannel < 0 || virtualChannel.primaryChannel >= matData.rows() || virtualChannel.referenceChannels.isEmpty()) {
             displayData.row(matData.rows() + row).setZero();
             continue;
         }
 
         Eigen::RowVectorXd referenceSignal = Eigen::RowVectorXd::Zero(matData.cols());
         bool validReferences = true;
-        for(int index = 0; index < virtualChannel.referenceChannels.size(); ++index) {
+        for (int index = 0; index < virtualChannel.referenceChannels.size(); ++index) {
             const int referenceChannel = virtualChannel.referenceChannels.at(index);
-            if(referenceChannel < 0 || referenceChannel >= matData.rows()) {
+            if (referenceChannel < 0 || referenceChannel >= matData.rows()) {
                 validReferences = false;
                 break;
             }
@@ -1222,12 +1217,12 @@ Eigen::MatrixXd DataWindow::appendVirtualChannels(const Eigen::MatrixXd &matData
             referenceSignal += weight * matData.row(referenceChannel);
         }
 
-        if(!validReferences) {
+        if (!validReferences) {
             displayData.row(matData.rows() + row).setZero();
             continue;
         }
 
-        if(virtualChannel.kind == VirtualChannelKind::AverageReference) {
+        if (virtualChannel.kind == VirtualChannelKind::AverageReference) {
             referenceSignal /= static_cast<double>(virtualChannel.referenceChannels.size());
         }
 
@@ -1240,7 +1235,7 @@ Eigen::MatrixXd DataWindow::appendVirtualChannels(const Eigen::MatrixXd &matData
 
 //=============================================================================================================
 
-Eigen::MatrixXd DataWindow::applyUserDefinedFilter(const Eigen::MatrixXd &matData) const
+Eigen::MatrixXd DataWindow::applyUserDefinedFilter(const Eigen::MatrixXd& matData) const
 {
     if (m_pUserDefinedFilter.isNull() || !m_pFiffReader || !m_pFiffReader->fiffInfo()) {
         return matData;
@@ -1254,12 +1249,12 @@ Eigen::MatrixXd DataWindow::applyUserDefinedFilter(const Eigen::MatrixXd &matDat
 
 void DataWindow::restartChannelView(int initialSample, bool clearAnnotations)
 {
-    if(!m_pFiffReader || !m_pFiffReader->isOpen() || !m_pChannelDataView) {
+    if (!m_pFiffReader || !m_pFiffReader->isOpen() || !m_pChannelDataView) {
         return;
     }
 
     auto fiffInfo = m_pFiffReader->fiffInfo();
-    if(!fiffInfo) {
+    if (!fiffInfo) {
         return;
     }
 
@@ -1272,7 +1267,7 @@ void DataWindow::restartChannelView(int initialSample, bool clearAnnotations)
     m_iStimLastValue = 0;
 
     m_pChannelDataView->setEvents({});
-    if(clearAnnotations) {
+    if (clearAnnotations) {
         m_pChannelDataView->setAnnotations({});
         clearMarkers();
     }
@@ -1309,7 +1304,7 @@ void DataWindow::onChannelViewScrollChanged(int sample)
     m_iCurrentScrollSample = sample;
     setRangeSampleLabels();
     syncMarkersToViewport();
-    if(m_dataMarkers.isEmpty()) {
+    if (m_dataMarkers.isEmpty()) {
         m_pMainWindow->eventWindow()->getEventModel()->setCurrentMarkerPos(sample);
     }
 
@@ -1319,10 +1314,10 @@ void DataWindow::onChannelViewScrollChanged(int sample)
     // block will complete, onBlockLoaded will detect non-contiguity and call
     // setData, and scheduleNextLoad will then load from the redirected position.
     if (m_pFiffReader && m_pFiffReader->isOpen()) {
-        auto *model = m_pChannelDataView->model();
+        auto* model = m_pChannelDataView->model();
         if (model && model->totalSamples() > 0) {
             int modelFirst = model->firstSample();
-            int modelEnd   = modelFirst + model->totalSamples();
+            int modelEnd = modelFirst + model->totalSamples();
             // Jump detected when scroll is outside the loaded range
             if (sample < modelFirst || sample >= modelEnd) {
                 m_iNextLoadSample = qBound(m_pFiffReader->firstSample(),
@@ -1344,15 +1339,15 @@ void DataWindow::scheduleNextLoad()
     if (m_iNextLoadSample > m_pFiffReader->lastSample())
         return; // entire file already loaded into the ring buffer
 
-    const float sfreq        = static_cast<float>(m_pFiffReader->fiffInfo()->sfreq);
-    const int   blockSamples = static_cast<int>(kBlockSeconds * sfreq);
-    const int   lookahead    = static_cast<int>(kLookaheadBlocks * blockSamples);
+    const float sfreq = static_cast<float>(m_pFiffReader->fiffInfo()->sfreq);
+    const int blockSamples = static_cast<int>(kBlockSeconds * sfreq);
+    const int lookahead = static_cast<int>(kLookaheadBlocks * blockSamples);
 
     // Fire a load whenever the unloaded frontier is inside our lookahead window.
     // kLookaheadBlocks × kBlockSeconds = 3 × 60 s = 3 min ahead — enough headroom
     // for any realistic inertial scroll speed.
     if (m_iNextLoadSample < m_iCurrentScrollSample + lookahead) {
-        m_bLoadingBlock  = true;
+        m_bLoadingBlock = true;
         const int blockEnd = qMin(m_iNextLoadSample + blockSamples - 1,
                                   m_pFiffReader->lastSample());
         m_pFiffReader->loadBlockAsync(m_iNextLoadSample, blockEnd);
@@ -1364,7 +1359,7 @@ void DataWindow::scheduleNextLoad()
 
 void DataWindow::initMarker()
 {
-    if(!isFiffFileLoaded()) {
+    if (!isFiffFileLoaded()) {
         ui->m_label_sampleMin->hide();
         ui->m_label_sampleMax->hide();
     }
@@ -1387,7 +1382,7 @@ void DataWindow::initLabels()
 
 //*************************************************************************************************************
 
-void DataWindow::resizeEvent(QResizeEvent * event)
+void DataWindow::resizeEvent(QResizeEvent* event)
 {
     //On every resize update marker position
     syncMarkersToViewport();
@@ -1404,201 +1399,207 @@ void DataWindow::resizeEvent(QResizeEvent * event)
 void DataWindow::keyPressEvent(QKeyEvent* event)
 {
     if (m_pChannelDataView) {
-        switch(event->key()) {
-        case Qt::Key_Left:
-            if (event->modifiers() & Qt::ShiftModifier)
-                m_pChannelDataView->scrollToSample(m_pChannelDataView->firstVisibleSample() - m_pChannelDataView->visibleSampleCount(), false);
-            else
-                m_pChannelDataView->scrollToSample(m_pChannelDataView->firstVisibleSample() - static_cast<int>(RawSettingsConstants::RAWVIEW_KEYBOARD_SCROLL_STEP * m_pChannelDataView->scrollSpeedFactor()), false);
-            break;
-        case Qt::Key_Right:
-            if (event->modifiers() & Qt::ShiftModifier)
-                m_pChannelDataView->scrollToSample(m_pChannelDataView->firstVisibleSample() + m_pChannelDataView->visibleSampleCount(), false);
-            else
-                m_pChannelDataView->scrollToSample(m_pChannelDataView->firstVisibleSample() + static_cast<int>(RawSettingsConstants::RAWVIEW_KEYBOARD_SCROLL_STEP * m_pChannelDataView->scrollSpeedFactor()), false);
-            break;
-        case Qt::Key_Plus:
-        case Qt::Key_Equal:
-            // Increase amplitude scale (zoom in vertically)
-            m_pChannelDataView->setZoom(m_pChannelDataView->zoom() * 1.25);
-            break;
-        case Qt::Key_Minus:
-            // Decrease amplitude scale (zoom out vertically)
-            m_pChannelDataView->setZoom(m_pChannelDataView->zoom() / 1.25);
-            break;
-        case Qt::Key_Home:
-            // Decrease visible time window (show less time = zoom in)
-            m_pChannelDataView->setWindowSize(m_pChannelDataView->windowSize() / 1.25f);
-            break;
-        case Qt::Key_End:
-            // Increase visible time window (show more time = zoom out)
-            m_pChannelDataView->setWindowSize(m_pChannelDataView->windowSize() * 1.25f);
-            break;
-        case Qt::Key_B:
-            // Toggle butterfly mode
-            m_pChannelDataView->setButterflyMode(!m_pChannelDataView->butterflyMode());
-            break;
-        case Qt::Key_D:
-            if (event->modifiers() & Qt::ControlModifier) {
-                ui->m_tableView_rawTableView->clearSelection();
-            } else if (event->modifiers() & Qt::ShiftModifier) {
-                // Toggle dark mode
-                if (m_pMainWindow)
-                    m_pMainWindow->toggleDarkMode();
-            } else {
-                // Cycle detrending: None → Mean → Linear → None
-                auto mode = m_pChannelDataView->detrendMode();
-                switch (mode) {
-                case DISPLIB::DetrendMode::None:   m_pChannelDataView->setDetrendMode(DISPLIB::DetrendMode::Mean);   break;
-                case DISPLIB::DetrendMode::Mean:   m_pChannelDataView->setDetrendMode(DISPLIB::DetrendMode::Linear); break;
-                case DISPLIB::DetrendMode::Linear: m_pChannelDataView->setDetrendMode(DISPLIB::DetrendMode::None);   break;
+        switch (event->key()) {
+            case Qt::Key_Left:
+                if (event->modifiers() & Qt::ShiftModifier)
+                    m_pChannelDataView->scrollToSample(m_pChannelDataView->firstVisibleSample() - m_pChannelDataView->visibleSampleCount(), false);
+                else
+                    m_pChannelDataView->scrollToSample(m_pChannelDataView->firstVisibleSample() - static_cast<int>(RawSettingsConstants::RAWVIEW_KEYBOARD_SCROLL_STEP * m_pChannelDataView->scrollSpeedFactor()), false);
+                break;
+            case Qt::Key_Right:
+                if (event->modifiers() & Qt::ShiftModifier)
+                    m_pChannelDataView->scrollToSample(m_pChannelDataView->firstVisibleSample() + m_pChannelDataView->visibleSampleCount(), false);
+                else
+                    m_pChannelDataView->scrollToSample(m_pChannelDataView->firstVisibleSample() + static_cast<int>(RawSettingsConstants::RAWVIEW_KEYBOARD_SCROLL_STEP * m_pChannelDataView->scrollSpeedFactor()), false);
+                break;
+            case Qt::Key_Plus:
+            case Qt::Key_Equal:
+                // Increase amplitude scale (zoom in vertically)
+                m_pChannelDataView->setZoom(m_pChannelDataView->zoom() * 1.25);
+                break;
+            case Qt::Key_Minus:
+                // Decrease amplitude scale (zoom out vertically)
+                m_pChannelDataView->setZoom(m_pChannelDataView->zoom() / 1.25);
+                break;
+            case Qt::Key_Home:
+                // Decrease visible time window (show less time = zoom in)
+                m_pChannelDataView->setWindowSize(m_pChannelDataView->windowSize() / 1.25f);
+                break;
+            case Qt::Key_End:
+                // Increase visible time window (show more time = zoom out)
+                m_pChannelDataView->setWindowSize(m_pChannelDataView->windowSize() * 1.25f);
+                break;
+            case Qt::Key_B:
+                // Toggle butterfly mode
+                m_pChannelDataView->setButterflyMode(!m_pChannelDataView->butterflyMode());
+                break;
+            case Qt::Key_D:
+                if (event->modifiers() & Qt::ControlModifier) {
+                    ui->m_tableView_rawTableView->clearSelection();
+                } else if (event->modifiers() & Qt::ShiftModifier) {
+                    // Toggle dark mode
+                    if (m_pMainWindow)
+                        m_pMainWindow->toggleDarkMode();
+                } else {
+                    // Cycle detrending: None → Mean → Linear → None
+                    auto mode = m_pChannelDataView->detrendMode();
+                    switch (mode) {
+                        case DISPLIB::DetrendMode::None:
+                            m_pChannelDataView->setDetrendMode(DISPLIB::DetrendMode::Mean);
+                            break;
+                        case DISPLIB::DetrendMode::Mean:
+                            m_pChannelDataView->setDetrendMode(DISPLIB::DetrendMode::Linear);
+                            break;
+                        case DISPLIB::DetrendMode::Linear:
+                            m_pChannelDataView->setDetrendMode(DISPLIB::DetrendMode::None);
+                            break;
+                    }
                 }
-            }
-            break;
-        case Qt::Key_S:
-            // Toggle scalebars
-            m_pChannelDataView->setScalebarsVisible(!m_pChannelDataView->scalebarsVisible());
-            break;
-        case Qt::Key_X:
-            // Toggle crosshair cursor
-            m_pChannelDataView->setCrosshairEnabled(!m_pChannelDataView->crosshairEnabled());
-            break;
-        case Qt::Key_E:
-            // Toggle event marker visibility
-            m_pChannelDataView->setEventsVisible(!m_pChannelDataView->eventsVisible());
-            break;
-        case Qt::Key_G:
-            // Toggle epoch grid lines
-            m_pChannelDataView->setEpochMarkersVisible(!m_pChannelDataView->epochMarkersVisible());
-            break;
-        case Qt::Key_C:
-            // Toggle clipping detection
-            m_pChannelDataView->setClippingVisible(!m_pChannelDataView->clippingVisible());
-            break;
-        case Qt::Key_Z:
-            // Toggle z-score normalization
-            m_pChannelDataView->setZScoreMode(!m_pChannelDataView->zScoreMode());
-            break;
-        case Qt::Key_A:
-            if (event->modifiers() & Qt::ShiftModifier) {
-                // Toggle annotation span visibility
-                m_pChannelDataView->setAnnotationsVisible(!m_pChannelDataView->annotationsVisible());
-            }
-            break;
-        case Qt::Key_O:
-            // Toggle overview bar visibility
-            m_pChannelDataView->setOverviewBarVisible(!m_pChannelDataView->overviewBarVisible());
-            break;
-        case Qt::Key_BracketRight:
-            // Increase scroll speed
-            m_pChannelDataView->setScrollSpeedFactor(m_pChannelDataView->scrollSpeedFactor() * 1.5f);
-            break;
-        case Qt::Key_BracketLeft:
-            // Decrease scroll speed
-            m_pChannelDataView->setScrollSpeedFactor(m_pChannelDataView->scrollSpeedFactor() / 1.5f);
-            break;
-        case Qt::Key_T:
-            // Toggle time format
-            if (m_pChannelDataView) {
-                emit timeFormatToggleRequested();
-            }
-            break;
-        case Qt::Key_F11:
-            // Toggle fullscreen
-            if (m_pMainWindow)
-                m_pMainWindow->toggleFullscreen();
-            break;
-        case Qt::Key_F:
-            // Toggle zen mode (hide toolbar, statusbar, menubar)
-            if (m_pMainWindow)
-                m_pMainWindow->toggleZenMode();
-            break;
-        case Qt::Key_H:
-            // Show epoch PTP histogram
-            if (m_pMainWindow)
-                m_pMainWindow->showEpochHistogram();
-            break;
-        case Qt::Key_J:
-            if (event->modifiers() & Qt::ShiftModifier) {
-                // Toggle all projectors
+                break;
+            case Qt::Key_S:
+                // Toggle scalebars
+                m_pChannelDataView->setScalebarsVisible(!m_pChannelDataView->scalebarsVisible());
+                break;
+            case Qt::Key_X:
+                // Toggle crosshair cursor
+                m_pChannelDataView->setCrosshairEnabled(!m_pChannelDataView->crosshairEnabled());
+                break;
+            case Qt::Key_E:
+                // Toggle event marker visibility
+                m_pChannelDataView->setEventsVisible(!m_pChannelDataView->eventsVisible());
+                break;
+            case Qt::Key_G:
+                // Toggle epoch grid lines
+                m_pChannelDataView->setEpochMarkersVisible(!m_pChannelDataView->epochMarkersVisible());
+                break;
+            case Qt::Key_C:
+                // Toggle clipping detection
+                m_pChannelDataView->setClippingVisible(!m_pChannelDataView->clippingVisible());
+                break;
+            case Qt::Key_Z:
+                // Toggle z-score normalization
+                m_pChannelDataView->setZScoreMode(!m_pChannelDataView->zScoreMode());
+                break;
+            case Qt::Key_A:
+                if (event->modifiers() & Qt::ShiftModifier) {
+                    // Toggle annotation span visibility
+                    m_pChannelDataView->setAnnotationsVisible(!m_pChannelDataView->annotationsVisible());
+                }
+                break;
+            case Qt::Key_O:
+                // Toggle overview bar visibility
+                m_pChannelDataView->setOverviewBarVisible(!m_pChannelDataView->overviewBarVisible());
+                break;
+            case Qt::Key_BracketRight:
+                // Increase scroll speed
+                m_pChannelDataView->setScrollSpeedFactor(m_pChannelDataView->scrollSpeedFactor() * 1.5f);
+                break;
+            case Qt::Key_BracketLeft:
+                // Decrease scroll speed
+                m_pChannelDataView->setScrollSpeedFactor(m_pChannelDataView->scrollSpeedFactor() / 1.5f);
+                break;
+            case Qt::Key_T:
+                // Toggle time format
+                if (m_pChannelDataView) {
+                    emit timeFormatToggleRequested();
+                }
+                break;
+            case Qt::Key_F11:
+                // Toggle fullscreen
                 if (m_pMainWindow)
-                    m_pMainWindow->toggleAllProjectors();
-            } else {
-                // Show/hide noise reduction (projector) window
+                    m_pMainWindow->toggleFullscreen();
+                break;
+            case Qt::Key_F:
+                // Toggle zen mode (hide toolbar, statusbar, menubar)
                 if (m_pMainWindow)
-                    m_pMainWindow->toggleNoiseReductionWindow();
-            }
-            break;
-        case Qt::Key_I:
-            // Open ICA browser
-            if (m_pMainWindow)
-                m_pMainWindow->computeIca();
-            break;
-        case Qt::Key_W:
-            // Toggle whitening on butterfly averages
-            if (m_pMainWindow)
-                m_pMainWindow->toggleWhitening();
-            break;
-        case Qt::Key_P:
-            // Toggle GFP (Global Field Power) on butterfly plot
-            if (m_pMainWindow)
-                m_pMainWindow->toggleGFP();
-            break;
-        case Qt::Key_Question:
-            // Show keyboard shortcut help
-            {
-                QMessageBox::information(this, tr("Keyboard Shortcuts"),
-                    tr("<b>Navigation:</b><br>"
-                       "← / → — Scroll left/right (¼ page)<br>"
-                       "Shift+← / → — Scroll left/right (full page)<br>"
-                       "Home / End — Decrease/increase time window<br>"
-                       "+/= — Increase amplitude scale<br>"
-                       "- — Decrease amplitude scale<br>"
-                       "<br>"
-                       "<b>Display:</b><br>"
-                       "B — Toggle butterfly mode<br>"
-                       "C — Toggle clipping detection<br>"
-                       "D — Cycle detrending (None → DC → Linear)<br>"
-                       "E — Toggle event markers<br>"
-                       "F — Toggle zen mode (hide UI chrome)<br>"
-                       "F11 — Toggle fullscreen<br>"
-                       "G — Toggle epoch grid lines<br>"
-                       "H — Show epoch PTP histogram<br>"
-                       "I — Open ICA browser<br>"
-                       "J — Show/hide projector window<br>"
-                       "O — Toggle overview bar<br>"
-                       "P — Toggle GFP overlay (butterfly)<br>"
-                       "S — Toggle scalebars<br>"
-                       "T — Toggle time format (seconds / clock)<br>"
-                       "W — Toggle whitening (raw traces + butterfly)<br>"
-                       "X — Toggle crosshair cursor<br>"
-                       "Z — Toggle z-score normalization<br>"
-                       "Shift+A — Toggle annotation spans<br>"
-                       "Shift+D — Toggle dark mode<br>"
-                       "Shift+J — Toggle all projectors on/off<br>"
-                       "[ / ] — Decrease/increase scroll speed<br>"
-                       "Ctrl+D — Clear channel selection<br>"
-                       "? — Show this help<br>"
-                       "<br>"
-                       "<b>Mouse (Data View):</b><br>"
-                       "Left-drag — Pan through time<br>"
-                       "Right-drag — Ruler measurement<br>"
-                       "Alt+Left-drag — Pan (alternative)<br>"
-                       "Double-click — Toggle channel bad/good<br>"
-                       "Scroll wheel — Scroll through channels<br>"
-                       "<br>"
-                       "<b>Annotations:</b><br>"
-                       "Enable Annotation Mode from toolbar<br>"
-                       "Right-drag — Select time range for annotation<br>"
-                       "Drag boundary — Resize annotation span<br>"
-                       "<br>"
-                       "<b>File:</b><br>"
-                       "Ctrl+O — Open file<br>"
-                       "Ctrl+S — Save file"));
-            }
-            break;
-        default:
-            break;
+                    m_pMainWindow->toggleZenMode();
+                break;
+            case Qt::Key_H:
+                // Show epoch PTP histogram
+                if (m_pMainWindow)
+                    m_pMainWindow->showEpochHistogram();
+                break;
+            case Qt::Key_J:
+                if (event->modifiers() & Qt::ShiftModifier) {
+                    // Toggle all projectors
+                    if (m_pMainWindow)
+                        m_pMainWindow->toggleAllProjectors();
+                } else {
+                    // Show/hide noise reduction (projector) window
+                    if (m_pMainWindow)
+                        m_pMainWindow->toggleNoiseReductionWindow();
+                }
+                break;
+            case Qt::Key_I:
+                // Open ICA browser
+                if (m_pMainWindow)
+                    m_pMainWindow->computeIca();
+                break;
+            case Qt::Key_W:
+                // Toggle whitening on butterfly averages
+                if (m_pMainWindow)
+                    m_pMainWindow->toggleWhitening();
+                break;
+            case Qt::Key_P:
+                // Toggle GFP (Global Field Power) on butterfly plot
+                if (m_pMainWindow)
+                    m_pMainWindow->toggleGFP();
+                break;
+            case Qt::Key_Question:
+                // Show keyboard shortcut help
+                {
+                    QMessageBox::information(this, tr("Keyboard Shortcuts"),
+                                             tr("<b>Navigation:</b><br>"
+                                                "← / → — Scroll left/right (¼ page)<br>"
+                                                "Shift+← / → — Scroll left/right (full page)<br>"
+                                                "Home / End — Decrease/increase time window<br>"
+                                                "+/= — Increase amplitude scale<br>"
+                                                "- — Decrease amplitude scale<br>"
+                                                "<br>"
+                                                "<b>Display:</b><br>"
+                                                "B — Toggle butterfly mode<br>"
+                                                "C — Toggle clipping detection<br>"
+                                                "D — Cycle detrending (None → DC → Linear)<br>"
+                                                "E — Toggle event markers<br>"
+                                                "F — Toggle zen mode (hide UI chrome)<br>"
+                                                "F11 — Toggle fullscreen<br>"
+                                                "G — Toggle epoch grid lines<br>"
+                                                "H — Show epoch PTP histogram<br>"
+                                                "I — Open ICA browser<br>"
+                                                "J — Show/hide projector window<br>"
+                                                "O — Toggle overview bar<br>"
+                                                "P — Toggle GFP overlay (butterfly)<br>"
+                                                "S — Toggle scalebars<br>"
+                                                "T — Toggle time format (seconds / clock)<br>"
+                                                "W — Toggle whitening (raw traces + butterfly)<br>"
+                                                "X — Toggle crosshair cursor<br>"
+                                                "Z — Toggle z-score normalization<br>"
+                                                "Shift+A — Toggle annotation spans<br>"
+                                                "Shift+D — Toggle dark mode<br>"
+                                                "Shift+J — Toggle all projectors on/off<br>"
+                                                "[ / ] — Decrease/increase scroll speed<br>"
+                                                "Ctrl+D — Clear channel selection<br>"
+                                                "? — Show this help<br>"
+                                                "<br>"
+                                                "<b>Mouse (Data View):</b><br>"
+                                                "Left-drag — Pan through time<br>"
+                                                "Right-drag — Ruler measurement<br>"
+                                                "Alt+Left-drag — Pan (alternative)<br>"
+                                                "Double-click — Toggle channel bad/good<br>"
+                                                "Scroll wheel — Scroll through channels<br>"
+                                                "<br>"
+                                                "<b>Annotations:</b><br>"
+                                                "Enable Annotation Mode from toolbar<br>"
+                                                "Right-drag — Select time range for annotation<br>"
+                                                "Drag boundary — Resize annotation span<br>"
+                                                "<br>"
+                                                "<b>File:</b><br>"
+                                                "Ctrl+O — Open file<br>"
+                                                "Ctrl+S — Save file"));
+                }
+                break;
+            default:
+                break;
         }
     }
 
@@ -1608,13 +1609,13 @@ void DataWindow::keyPressEvent(QKeyEvent* event)
 
 //*************************************************************************************************************
 
-bool DataWindow::eventFilter(QObject *object, QEvent *event)
-{    
+bool DataWindow::eventFilter(QObject* object, QEvent* event)
+{
     //Deactivate grabbing gesture when scrollbars or vertical header are selected
     if ((object == ui->m_tableView_rawTableView->horizontalScrollBar() ||
          object == ui->m_tableView_rawTableView->verticalScrollBar() ||
-         object == ui->m_tableView_rawTableView->verticalHeader())
-        && event->type() == QEvent::Enter) {
+         object == ui->m_tableView_rawTableView->verticalHeader()) &&
+        event->type() == QEvent::Enter) {
         QScroller::ungrabGesture(ui->m_tableView_rawTableView);
         return true;
     }
@@ -1622,8 +1623,8 @@ bool DataWindow::eventFilter(QObject *object, QEvent *event)
     //Activate grabbing gesture when scrollbars or vertical header are deselected
     if ((object == ui->m_tableView_rawTableView->horizontalScrollBar() ||
          object == ui->m_tableView_rawTableView->verticalScrollBar() ||
-         object == ui->m_tableView_rawTableView->verticalHeader())
-        && event->type() == QEvent::Leave) {
+         object == ui->m_tableView_rawTableView->verticalHeader()) &&
+        event->type() == QEvent::Leave) {
         QScroller::grabGesture(ui->m_tableView_rawTableView, QScroller::LeftMouseButtonGesture);
         return true;
     }
@@ -1641,7 +1642,7 @@ bool DataWindow::eventFilter(QObject *object, QEvent *event)
 
 void DataWindow::customContextMenuRequested(QPoint pos)
 {
-    if(!m_pMainWindow->ensureLegacyRawModelLoaded(QStringLiteral("Raw Browser Context Menu"))) {
+    if (!m_pMainWindow->ensureLegacyRawModelLoaded(QStringLiteral("Raw Browser Context Menu"))) {
         return;
     }
 
@@ -1652,58 +1653,58 @@ void DataWindow::customContextMenuRequested(QPoint pos)
     QModelIndexList selected = ui->m_tableView_rawTableView->selectionModel()->selectedIndexes();
 
     //create custom context menu and actions
-    QMenu *menu = new QMenu(this);
+    QMenu* menu = new QMenu(this);
 
     //**************** Marking ****************
-    QMenu *markingSubMenu = new QMenu("Mark channels",menu);
+    QMenu* markingSubMenu = new QMenu("Mark channels", menu);
 
     QAction* doMarkChBad = markingSubMenu->addAction(tr("Mark as bad"));
-    connect(doMarkChBad,&QAction::triggered, [this, selected](){
-        m_pRawModel->markChBad(selected,1);
+    connect(doMarkChBad, &QAction::triggered, [this, selected]() {
+        m_pRawModel->markChBad(selected, 1);
     });
 
     QAction* doMarkChGood = markingSubMenu->addAction(tr("Mark as good"));
-    connect(doMarkChGood,&QAction::triggered, [this, selected](){
-        m_pRawModel->markChBad(selected,0);
+    connect(doMarkChGood, &QAction::triggered, [this, selected]() {
+        m_pRawModel->markChBad(selected, 0);
     });
 
     //**************** FilterOperators ****************
     //selected channels
-    QMenu *filtOpSubMenu = new QMenu("Apply FilterOperator to selected channel",menu);
-    QMutableMapIterator<QString,QSharedPointer<MNEOperator> > it(m_pRawModel->operators());
-    while(it.hasNext()) {
+    QMenu* filtOpSubMenu = new QMenu("Apply FilterOperator to selected channel", menu);
+    QMutableMapIterator<QString, QSharedPointer<MNEOperator>> it(m_pRawModel->operators());
+    while (it.hasNext()) {
         it.next();
         QAction* doApplyFilter = filtOpSubMenu->addAction(tr("%1").arg(it.key()));
 
-        connect(doApplyFilter,&QAction::triggered, [this, selected, it](){
-            m_pRawModel->applyOperator(selected,it.value());
+        connect(doApplyFilter, &QAction::triggered, [this, selected, it]() {
+            m_pRawModel->applyOperator(selected, it.value());
         });
     }
 
     //all channels
-    QMenu *filtOpAllSubMenu = new QMenu("Apply FilterOperator to all channels",menu);
+    QMenu* filtOpAllSubMenu = new QMenu("Apply FilterOperator to all channels", menu);
     it.toFront();
-    while(it.hasNext()) {
+    while (it.hasNext()) {
         it.next();
         QAction* doApplyFilter = filtOpAllSubMenu->addAction(tr("%1").arg(it.key()));
 
-        connect(doApplyFilter,&QAction::triggered, [this, it](){
-            m_pRawModel->applyOperator(QModelIndexList(),it.value());
+        connect(doApplyFilter, &QAction::triggered, [this, it]() {
+            m_pRawModel->applyOperator(QModelIndexList(), it.value());
         });
     }
 
     //undoing filtering
-    QMenu *undoFiltOpSubMenu = new QMenu("Undo filtering",menu);
-    QMenu *undoFiltOpSelSubMenu = new QMenu("to selected channels",undoFiltOpSubMenu);
+    QMenu* undoFiltOpSubMenu = new QMenu("Undo filtering", menu);
+    QMenu* undoFiltOpSelSubMenu = new QMenu("to selected channels", undoFiltOpSubMenu);
 
     //undo certain FilterOperators to selected channels
     it.toFront();
-    while(it.hasNext()) {
+    while (it.hasNext()) {
         it.next();
         QAction* undoApplyFilter = undoFiltOpSelSubMenu->addAction(tr("%1").arg(it.key()));
 
-        connect(undoApplyFilter,&QAction::triggered, [this, selected, it](){
-            m_pRawModel->undoFilter(selected,it.value());
+        connect(undoApplyFilter, &QAction::triggered, [this, selected, it]() {
+            m_pRawModel->undoFilter(selected, it.value());
         });
     }
 
@@ -1711,13 +1712,13 @@ void DataWindow::customContextMenuRequested(QPoint pos)
 
     //undo all filterting to selected channels
     QAction* undoApplyFilterSel = undoFiltOpSubMenu->addAction(tr("Undo FilterOperators to selected channels"));
-    connect(undoApplyFilterSel,&QAction::triggered, [this, selected](){
+    connect(undoApplyFilterSel, &QAction::triggered, [this, selected]() {
         m_pRawModel->undoFilter(selected);
     });
 
     //undo all filtering to all channels
     QAction* undoApplyFilterAll = undoFiltOpSubMenu->addAction(tr("Undo FilterOperators to all channels"));
-    connect(undoApplyFilterAll,&QAction::triggered, [this](){
+    connect(undoApplyFilterAll, &QAction::triggered, [this]() {
         m_pRawModel->undoFilter();
     });
 
@@ -1740,18 +1741,17 @@ void DataWindow::setRangeSampleLabels()
     ui->m_horizontalSpacer_Max->setFixedWidth(0);
 
     const int minSampleRange = m_pChannelDataView ? m_pChannelDataView->firstVisibleSample() : 0;
-    const int maxSampleRange = minSampleRange
-        + (m_pChannelDataView ? m_pChannelDataView->visibleSampleCount() : 0);
+    const int maxSampleRange = minSampleRange + (m_pChannelDataView ? m_pChannelDataView->visibleSampleCount() : 0);
 
     //Set values as string
     auto fiffInfo = m_pFiffReader ? m_pFiffReader->fiffInfo() : QSharedPointer<FIFFLIB::FiffInfo>();
     if (!fiffInfo)
         return;
     QString stringTemp;
-    int minSampleRangeSec = (minSampleRange/fiffInfo->sfreq)*1000;
-    ui->m_label_sampleMin->setText(QString("%1 / %2 sec").arg(stringTemp.number(minSampleRange)).arg(stringTemp.number((double)minSampleRangeSec/1000,'g')));
-    int maxSampleRangeSec = (maxSampleRange/fiffInfo->sfreq)*1000;
-    ui->m_label_sampleMax->setText(QString("%1 / %2 sec").arg(stringTemp.number(maxSampleRange)).arg(stringTemp.number((double)maxSampleRangeSec/1000,'g')));
+    int minSampleRangeSec = (minSampleRange / fiffInfo->sfreq) * 1000;
+    ui->m_label_sampleMin->setText(QString("%1 / %2 sec").arg(stringTemp.number(minSampleRange)).arg(stringTemp.number((double)minSampleRangeSec / 1000, 'g')));
+    int maxSampleRangeSec = (maxSampleRange / fiffInfo->sfreq) * 1000;
+    ui->m_label_sampleMax->setText(QString("%1 / %2 sec").arg(stringTemp.number(maxSampleRange)).arg(stringTemp.number((double)maxSampleRangeSec / 1000, 'g')));
 }
 
 
@@ -1760,7 +1760,7 @@ void DataWindow::setRangeSampleLabels()
 void DataWindow::setMarkerSampleLabel()
 {
     const QRect viewportRect = markerViewportRect();
-    if(viewportRect.isEmpty()) {
+    if (viewportRect.isEmpty()) {
         return;
     }
 
@@ -1769,7 +1769,7 @@ void DataWindow::setMarkerSampleLabel()
         return;
 
     for (int i = 0; i < m_dataMarkers.size(); ++i) {
-        PersistentMarker &marker = m_dataMarkers[i];
+        PersistentMarker& marker = m_dataMarkers[i];
         if (!marker.line || !marker.label) {
             continue;
         }
@@ -1803,16 +1803,16 @@ void DataWindow::setMarkerSampleLabel()
         marker.label->move(labelX, labelY);
 
         marker.label->setStyleSheet(QStringLiteral(
-            "QLabel {"
-            " color: %1;"
-            " background-color: rgba(255, 255, 255, 220);"
-            " border: 1px solid %1;"
-            " border-radius: 3px;"
-            " font-weight: %2;"
-            " }")
-            .arg(marker.color.name())
-            .arg(marker.id == m_iActiveMarkerId ? QStringLiteral("700")
-                                                : QStringLiteral("500")));
+                                        "QLabel {"
+                                        " color: %1;"
+                                        " background-color: rgba(255, 255, 255, 220);"
+                                        " border: 1px solid %1;"
+                                        " border-radius: 3px;"
+                                        " font-weight: %2;"
+                                        " }")
+                                        .arg(marker.color.name())
+                                        .arg(marker.id == m_iActiveMarkerId ? QStringLiteral("700")
+                                                                            : QStringLiteral("500")));
     }
 
     m_pMainWindow->eventWindow()->getEventModel()->setCurrentMarkerPos(activeMarkerSample());
@@ -1828,7 +1828,7 @@ void DataWindow::moveMarkerToSample(int sample)
         return;
     }
 
-    PersistentMarker *marker = findMarker(m_iActiveMarkerId);
+    PersistentMarker* marker = findMarker(m_iActiveMarkerId);
     if (!marker) {
         addMarkerAtSample(sample);
         return;
@@ -1854,9 +1854,9 @@ void DataWindow::updateMarkerPosition()
 
 QRect DataWindow::markerViewportRect() const
 {
-    if(m_pChannelDataView) {
+    if (m_pChannelDataView) {
         const QRect localViewportRect = m_pChannelDataView->signalViewportRect();
-        if(!localViewportRect.isEmpty()) {
+        if (!localViewportRect.isEmpty()) {
             return QRect(m_pChannelDataView->mapTo(const_cast<DataWindow*>(this), localViewportRect.topLeft()),
                          localViewportRect.size());
         }
@@ -1869,7 +1869,7 @@ QRect DataWindow::markerViewportRect() const
 
 void DataWindow::highlightChannelsInSelectionManager()
 {
-    if(m_pMainWindow->channelSelectionView()->isVisible()) {
+    if (m_pMainWindow->channelSelectionView()->isVisible()) {
         QModelIndexList selectedIndexes = ui->m_tableView_rawTableView->selectionModel()->selectedIndexes();
 
         m_pMainWindow->channelSelectionView()->highlightChannels(selectedIndexes);
@@ -1879,11 +1879,11 @@ void DataWindow::highlightChannelsInSelectionManager()
 
 //*************************************************************************************************************
 
-bool DataWindow::gestureEvent(QGestureEvent *event)
+bool DataWindow::gestureEvent(QGestureEvent* event)
 {
     //Pinch event
-    if (QGesture *pinch = event->gesture(Qt::PinchGesture))
-        pinchTriggered(static_cast<QPinchGesture *>(pinch));
+    if (QGesture* pinch = event->gesture(Qt::PinchGesture))
+        pinchTriggered(static_cast<QPinchGesture*>(pinch));
 
     return true;
 }
@@ -1891,7 +1891,7 @@ bool DataWindow::gestureEvent(QGestureEvent *event)
 
 //*************************************************************************************************************
 
-bool DataWindow::pinchTriggered(QPinchGesture *gesture)
+bool DataWindow::pinchTriggered(QPinchGesture* gesture)
 {
     QPinchGesture::ChangeFlags changeFlags = gesture->changeFlags();
     if (changeFlags & QPinchGesture::ScaleFactorChanged) {

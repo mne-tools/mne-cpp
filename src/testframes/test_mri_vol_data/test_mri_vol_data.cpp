@@ -56,7 +56,7 @@ private slots:
         MriSlice slice;
         QCOMPARE(slice.width, 0);
         QCOMPARE(slice.height, 0);
-        QCOMPARE(slice.pixelFormat, 1);  // FIFFV_MRI_PIXEL_BYTE
+        QCOMPARE(slice.pixelFormat, 1); // FIFFV_MRI_PIXEL_BYTE
         QVERIFY(qAbs(slice.scale - 1.0f) < 1e-6f);
     }
 
@@ -127,21 +127,21 @@ private slots:
         QCOMPARE(V.cols(), 4);
 
         // Bottom row should be (0,0,0,1)
-        QVERIFY(qAbs(V(3,0)) < 1e-6f);
-        QVERIFY(qAbs(V(3,1)) < 1e-6f);
-        QVERIFY(qAbs(V(3,2)) < 1e-6f);
-        QVERIFY(qAbs(V(3,3) - 1.0f) < 1e-6f);
+        QVERIFY(qAbs(V(3, 0)) < 1e-6f);
+        QVERIFY(qAbs(V(3, 1)) < 1e-6f);
+        QVERIFY(qAbs(V(3, 2)) < 1e-6f);
+        QVERIFY(qAbs(V(3, 3) - 1.0f) < 1e-6f);
 
         // Rotation part: M = Mdc * diag(xsize, ysize, zsize) in meters
         // x_ras * xsize/1000 = (-0.001, 0, 0), etc.
-        QVERIFY(qAbs(V(0,0) - (-0.001f)) < 1e-7f);
+        QVERIFY(qAbs(V(0, 0) - (-0.001f)) < 1e-7f);
 
         // Translation P0 should place center voxel at c_ras
         // Center voxel (128,128,128) should map to c_ras (0,0,0)
         Vector4f center;
         center << 128.0f, 128.0f, 128.0f, 1.0f;
         Vector4f ras = V * center;
-        QVERIFY(qAbs(ras(0)) < 1e-3f);  // Should be ~0
+        QVERIFY(qAbs(ras(0)) < 1e-3f); // Should be ~0
         QVERIFY(qAbs(ras(1)) < 1e-3f);
         QVERIFY(qAbs(ras(2)) < 1e-3f);
     }
@@ -191,9 +191,9 @@ private slots:
         vol.depth = 64;
         vol.nframes = 1;
         vol.rasGood = true;
-        vol.xsize = 2.0f;   // 2mm
-        vol.ysize = 2.0f;   // 2mm
-        vol.zsize = 3.0f;   // 3mm
+        vol.xsize = 2.0f; // 2mm
+        vol.ysize = 2.0f; // 2mm
+        vol.zsize = 3.0f; // 3mm
         vol.x_ras = Vector3f(-1.0f, 0.0f, 0.0f);
         vol.y_ras = Vector3f(0.0f, 0.0f, -1.0f);
         vol.z_ras = Vector3f(0.0f, 1.0f, 0.0f);
@@ -203,7 +203,7 @@ private slots:
 
         // Voxel spacing should scale the direction cosines
         // x_ras * 2mm/1000 = (-0.002, 0, 0)
-        QVERIFY(qAbs(V(0,0) - (-0.002f)) < 1e-7f);
+        QVERIFY(qAbs(V(0, 0) - (-0.002f)) < 1e-7f);
     }
 };
 

@@ -68,8 +68,8 @@ class MNECovMatrix;
 class MNESHARED_EXPORT MNEProjOp
 {
 public:
-    typedef QSharedPointer<MNEProjOp> SPtr;              /**< Shared pointer type for MNEProjOp. */
-    typedef QSharedPointer<const MNEProjOp> ConstSPtr;   /**< Const shared pointer type for MNEProjOp. */
+    typedef QSharedPointer<MNEProjOp> SPtr;            /**< Shared pointer type for MNEProjOp. */
+    typedef QSharedPointer<const MNEProjOp> ConstSPtr; /**< Const shared pointer type for MNEProjOp. */
 
     //=========================================================================================================
     /**
@@ -115,7 +115,7 @@ public:
      * @param[in] desc       Human-readable description of the projection.
      * @param[in] is_active  Whether the item is active on load.
      */
-    void add_item_active(const MNENamedMatrix* vecs, int kind, const  QString& desc, bool is_active);
+    void add_item_active(const MNENamedMatrix* vecs, int kind, const QString& desc, bool is_active);
 
     /**
      * @brief Add a projection item that is active by default.
@@ -173,7 +173,7 @@ public:
      *
      * @return Number of affecting projection vectors (0 if none or nch == 0).
      */
-    int affect_chs(const QList<FIFFLIB::FiffChInfo> &chs, int nChan);
+    int affect_chs(const QList<FIFFLIB::FiffChInfo>& chs, int nChan);
 
     /**
      * Apply the compiled projection operator to a data vector in-place.
@@ -199,7 +199,7 @@ public:
      *         or NULL on error. Caller takes ownership.
      */
     static std::unique_ptr<MNEProjOp> read_from_node(FIFFLIB::FiffStream::SPtr& stream,
-                                     const FIFFLIB::FiffDirNode::SPtr& start);
+                                                     const FIFFLIB::FiffDirNode::SPtr& start);
 
     /**
      * Read a projection operator from a FIFF file by path.
@@ -245,7 +245,7 @@ public:
      * @param[in]      list_data  If true, print full vector data.
      * @param[in]      exclude    Channel names to exclude from the display.
      */
-    void report_data(QTextStream &out, const QString &tag, bool list_data, const QStringList &exclude);
+    void report_data(QTextStream& out, const QString& tag, bool list_data, const QStringList& exclude);
 
     /**
      * Write a one-line-per-item summary of all projection items to a text
@@ -254,7 +254,7 @@ public:
      * @param[in, out] out   The text stream to write to.
      * @param[in]      tag   Prefix string printed before each line.
      */
-    void report(QTextStream &out, const QString &tag);
+    void report(QTextStream& out, const QString& tag);
 
     //=========================================================================================================
     /**
@@ -313,11 +313,11 @@ public:
     int apply_cov(MNECovMatrix* c);
 
 public:
-    QList<MNELIB::MNEProjItem> items;  /**< The projection items. */
-    int         nitems;                 /**< Number of items. */
-    QStringList names;                  /**< Names of the channels in the final compiled projector. */
-    int         nch;                    /**< Number of channels in the final projector. */
-    int         nvec;                   /**< Number of orthogonalized vectors in the final projector. */
+    QList<MNELIB::MNEProjItem> items;                                                /**< The projection items. */
+    int nitems;                                                                      /**< Number of items. */
+    QStringList names;                                                               /**< Names of the channels in the final compiled projector. */
+    int nch;                                                                         /**< Number of channels in the final projector. */
+    int nvec;                                                                        /**< Number of orthogonalized vectors in the final projector. */
     Eigen::Matrix<float, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor> proj_data; /**< The compiled projector: orthogonalized projection vectors (nvec x nch). */
 };
 

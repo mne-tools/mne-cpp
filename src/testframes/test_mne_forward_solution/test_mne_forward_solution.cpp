@@ -114,7 +114,7 @@ void TestMneForwardSolution::computeForward()
     pSettingsMEGEEG->mriname = QCoreApplication::applicationDirPath() + "/../resources/data/mne-cpp-test-data/MEG/sample/all-trans.fif";
     pSettingsMEGEEG->transname.clear();
     pSettingsMEGEEG->bemname = QCoreApplication::applicationDirPath() + "/../resources/data/mne-cpp-test-data/subjects/sample/bem/sample-1280-1280-1280-bem.fif";
-    pSettingsMEGEEG->mindist = 5.0f/1000.0f;
+    pSettingsMEGEEG->mindist = 5.0f / 1000.0f;
     pSettingsMEGEEG->solname = QCoreApplication::applicationDirPath() + "/../resources/data/mne-cpp-test-data/Result/sample_audvis-meg-eeg-oct-6-fwd.fif";
 
     QFile t_name(pSettingsMEGEEG->measname);

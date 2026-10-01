@@ -76,7 +76,6 @@ namespace MNELIB
  */
 class MNESHARED_EXPORT MNEBem
 {
-
 public:
     typedef QSharedPointer<MNEBem> SPtr;            /**< Shared pointer type for MNEBem. */
     typedef QSharedPointer<const MNEBem> ConstSPtr; /**< Const shared pointer type for MNEBem. */
@@ -93,7 +92,7 @@ public:
      *
      * @param[in] p_MNEBem   MNE BEM.
      */
-    MNEBem(const MNEBem &p_MNEBem);
+    MNEBem(const MNEBem& p_MNEBem);
 
     //=========================================================================================================
     /**
@@ -101,7 +100,7 @@ public:
      *
      * @param[in] p_IODevice   IO device (e.g. a FIFF file) to read the BEM surfaces from; throws std::runtime_error on failure.
      */
-    MNEBem(QIODevice &p_IODevice);
+    MNEBem(QIODevice& p_IODevice);
 
     //=========================================================================================================
     /**
@@ -135,7 +134,7 @@ public:
      *
      * @return true if succeeded, false otherwise.
      */
-    static bool readFromStream(FIFFLIB::FiffStream::SPtr& p_pStream, bool add_geom, MNEBem &p_Bem);
+    static bool readFromStream(FIFFLIB::FiffStream::SPtr& p_pStream, bool add_geom, MNEBem& p_Bem);
 
     //=========================================================================================================
     /**
@@ -153,7 +152,7 @@ public:
      *
      * @param[in] p_IODevice   IO device to write the bem to.
      */
-    void write(QIODevice &p_IODevice);
+    void write(QIODevice& p_IODevice);
 
     //=========================================================================================================
     /**
@@ -163,7 +162,7 @@ public:
      *
      * @param[in] p_pStream  The stream to write to.
      */
-    void writeToStream(FIFFLIB::FiffStream *p_pStream);
+    void writeToStream(FIFFLIB::FiffStream* p_pStream);
 
     //=========================================================================================================
     /**
@@ -173,7 +172,7 @@ public:
      *
      * @return MNEBemSurface related to the parameter index.
      */
-    const MNEBemSurface& operator[] (qint32 idx) const;
+    const MNEBemSurface& operator[](qint32 idx) const;
 
     //=========================================================================================================
     /**
@@ -183,7 +182,7 @@ public:
      *
      * @return MNEBemSurface related to the parameter index.
      */
-    MNEBemSurface& operator[] (qint32 idx);
+    MNEBemSurface& operator[](qint32 idx);
 
     //=========================================================================================================
     /**
@@ -193,7 +192,7 @@ public:
      *
      * @return MNEBem.
      */
-    MNEBem& operator<< (const MNEBemSurface& surf);
+    MNEBem& operator<<(const MNEBemSurface& surf);
 
     //=========================================================================================================
     /**
@@ -203,7 +202,7 @@ public:
      *
      * @return MNEBem.
      */
-    MNEBem& operator<< (const MNEBemSurface* surf);
+    MNEBem& operator<<(const MNEBemSurface* surf);
 
     //=========================================================================================================
     /**
@@ -212,7 +211,7 @@ public:
      * @param[in] sLm       3D Landmarks of the source geometry.
      * @param[in] dLm       3D Landmarks of the destination geometry.
      */
-    void warp(const Eigen::MatrixXf &sLm, const Eigen::MatrixXf &dLm);
+    void warp(const Eigen::MatrixXf& sLm, const Eigen::MatrixXf& dLm);
 
     //=========================================================================================================
     /**
@@ -245,7 +244,7 @@ protected:
     static bool readBemSurface(FIFFLIB::FiffStream::SPtr& p_pStream, const FIFFLIB::FiffDirNode::SPtr& p_Tree, MNEBemSurface& p_BemSurface);
 
 private:
-    QList<MNEBemSurface> m_qListBemSurface;    /**< List of the BEM Surfaces. */
+    QList<MNEBemSurface> m_qListBemSurface; /**< List of the BEM Surfaces. */
 };
 
 //=============================================================================================================

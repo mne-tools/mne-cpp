@@ -62,7 +62,7 @@ public:
      *
      * @param [in] parent pointer to parent widget; If parent is 0, the new InformationWindow becomes a window. If parent is another widget, InformationWindow becomes a child window inside parent. InformationWindow is deleted when its parent is deleted.
      */
-    InformationWindow(QWidget *parent = 0);
+    InformationWindow(QWidget* parent = 0);
 
     //=========================================================================================================
     /**
@@ -90,12 +90,11 @@ public:
     void setLogLevel(LogLevel lvl);
 
 private:
-    std::unique_ptr<Ui::InformationWindowWidget> ui;        /**< Pointer to the qt designer generated ui class.*/
+    std::unique_ptr<Ui::InformationWindowWidget> ui; /**< Pointer to the qt designer generated ui class.*/
 
     //Log
-    QTextBrowser*           m_pTextBrowser_Log;         /** A textbox being part of the log feature. */
-    LogLevel                m_eLogLevelCurrent;         /**< Holds the current log level.*/
-
+    QTextBrowser* m_pTextBrowser_Log; /** A textbox being part of the log feature. */
+    LogLevel m_eLogLevelCurrent;      /**< Holds the current log level.*/
 };
 
 } // NAMESPACE MNEBROWSE

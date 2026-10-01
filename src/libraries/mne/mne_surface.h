@@ -65,9 +65,9 @@ class MNEProjData;
 class MNESHARED_EXPORT MNESurface : public MNESurfaceOrVolume
 {
 public:
-    typedef std::shared_ptr<MNESurface> SPtr;              /**< Shared pointer type for MNESurface. */
-    typedef std::shared_ptr<const MNESurface> ConstSPtr;   /**< Const shared pointer type for MNESurface. */
-    typedef std::unique_ptr<MNESurface> UPtr;              /**< Unique pointer type for MNESurface. */
+    typedef std::shared_ptr<MNESurface> SPtr;            /**< Shared pointer type for MNESurface. */
+    typedef std::shared_ptr<const MNESurface> ConstSPtr; /**< Const shared pointer type for MNESurface. */
+    typedef std::unique_ptr<MNESurface> UPtr;            /**< Unique pointer type for MNESurface. */
 
     //=========================================================================================================
     /**
@@ -104,7 +104,7 @@ public:
      * @param[out] z     Signed perpendicular distance from the plane.
      */
     void triangle_coords(const Eigen::Vector3f& r, int tri,
-                          float &x, float &y, float &z) const;
+                         float& x, float& y, float& z) const;
 
     /**
      * Find the nearest point on a triangle to a given point.
@@ -118,9 +118,9 @@ public:
      * @return TRUE if the triangle is active, FALSE if inactive.
      */
     int nearest_triangle_point(const Eigen::Vector3f& r,
-                               const MNEProjData *user,
+                               const MNEProjData* user,
                                int tri,
-                               float &x, float &y, float &z) const;
+                               float& x, float& y, float& z) const;
 
     /**
      * Find the nearest point on a triangle (simplified, no projection data).
@@ -134,7 +134,7 @@ public:
      */
     int nearest_triangle_point(const Eigen::Vector3f& r,
                                int tri,
-                               float &x, float &y, float &z) const;
+                               float& x, float& y, float& z) const;
 
     /**
      * Compute 3D position on a triangle from barycentric coordinates.
@@ -163,9 +163,9 @@ public:
      * @param[out] distp      Receives the signed distance to the surface.
      * @return Index of the closest triangle, or -1 if none found.
      */
-    int project_to_surface(const MNEProjData *proj_data,
+    int project_to_surface(const MNEProjData* proj_data,
                            const Eigen::Vector3f& r,
-                           float &distp) const;
+                           float& distp) const;
 
     /**
      * For each point, find the closest point on the surface using
@@ -202,7 +202,7 @@ public:
      * @param[in,out] act     Triangle activation array.
      * @param[in]     nstep   Recursive expansion steps.
      */
-    void activate_neighbors(int start, Eigen::VectorXi &act, int nstep) const;
+    void activate_neighbors(int start, Eigen::VectorXi& act, int nstep) const;
 
     //=========================================================================================================
     // Non-const mutator
@@ -221,7 +221,7 @@ public:
      * @return The loaded surface, or nullptr on failure. Caller takes ownership.
      */
     static std::unique_ptr<MNESurface> read_bem_surface(const QString& name, int which,
-                                        bool add_geometry);
+                                                        bool add_geometry);
 
     /**
      * Read a BEM surface from a FIFF file (excess-neighbor checking enabled).
@@ -233,7 +233,7 @@ public:
      * @return The loaded surface, or nullptr on failure. Caller takes ownership.
      */
     static std::unique_ptr<MNESurface> read_bem_surface(const QString& name, int which,
-                                        bool add_geometry, float& sigma);
+                                                        bool add_geometry, float& sigma);
 
     /**
      * Read a BEM surface from a FIFF file (excess-neighbor checking disabled).
@@ -244,7 +244,7 @@ public:
      * @return The loaded surface, or nullptr on failure. Caller takes ownership.
      */
     static std::unique_ptr<MNESurface> read_bem_surface2(const QString& name, int which,
-                                         bool add_geometry);
+                                                         bool add_geometry);
 
     /**
      * Read a BEM surface from a FIFF file.
@@ -257,8 +257,8 @@ public:
      * @return The loaded surface, or nullptr on failure. Caller takes ownership.
      */
     static std::unique_ptr<MNESurface> read_bem_surface(const QString& name, int which,
-                                        bool add_geometry, float& sigma,
-                                        bool check_too_many_neighbors);
+                                                        bool add_geometry, float& sigma,
+                                                        bool check_too_many_neighbors);
 };
 
 //=============================================================================================================

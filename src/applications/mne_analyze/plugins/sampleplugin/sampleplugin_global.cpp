@@ -23,12 +23,21 @@
 // DEFINE METHODS
 //=============================================================================================================
 
-const char* SAMPLEPLUGINPLUGIN::buildDateTime(){ return UTILSLIB::dateTimeNow();};
+const char* SAMPLEPLUGINPLUGIN::buildDateTime()
+{
+    return UTILSLIB::dateTimeNow();
+};
 
 //=============================================================================================================
 
-const char* SAMPLEPLUGINPLUGIN::buildHash(){ return UTILSLIB::gitHash();};
+const char* SAMPLEPLUGINPLUGIN::buildHash()
+{
+    return UTILSLIB::gitHash();
+};
 
 //=============================================================================================================
 
-const char* SAMPLEPLUGINPLUGIN::buildHashLong(){ return UTILSLIB::gitHashLong();};
+const char* SAMPLEPLUGINPLUGIN::buildHashLong()
+{
+    return UTILSLIB::gitHashLong();
+};

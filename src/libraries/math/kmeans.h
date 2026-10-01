@@ -75,27 +75,27 @@ namespace UTILSLIB
 /** @brief Distance metric for K-Means clustering. */
 enum class KMeansDistance
 {
-    SquaredEuclidean,   /**< Squared Euclidean distance (default). */
-    CityBlock,          /**< Manhattan / city-block distance. */
-    Cosine,             /**< Cosine distance. */
-    Correlation,        /**< Correlation distance. */
-    Hamming             /**< Hamming distance (binary data only). */
+    SquaredEuclidean, /**< Squared Euclidean distance (default). */
+    CityBlock,        /**< Manhattan / city-block distance. */
+    Cosine,           /**< Cosine distance. */
+    Correlation,      /**< Correlation distance. */
+    Hamming           /**< Hamming distance (binary data only). */
 };
 
 /** @brief Initialization strategy for K-Means clustering. */
 enum class KMeansStart
 {
-    Sample,             /**< Random sample of data points (default). */
-    Uniform,            /**< Uniform random within data range. */
-    Cluster             /**< Sub-sample then cluster. */
+    Sample,  /**< Random sample of data points (default). */
+    Uniform, /**< Uniform random within data range. */
+    Cluster  /**< Sub-sample then cluster. */
 };
 
 /** @brief Action to take when a K-Means cluster becomes empty. */
 enum class KMeansEmptyAction
 {
-    Error,              /**< Treat as an error (default). */
-    Drop,               /**< Drop the empty cluster. */
-    Singleton           /**< Replace with the farthest point from its centroid. */
+    Error,    /**< Treat as an error (default). */
+    Drop,     /**< Drop the empty cluster. */
+    Singleton /**< Replace with the farthest point from its centroid. */
 };
 
 //=============================================================================================================
@@ -252,28 +252,28 @@ private:
      */
     static KMeansEmptyAction emptyactFromString(const std::string& name);
 
-    KMeansDistance     m_distance;    /**< Distance metric to use. */
-    KMeansStart        m_start;       /**< Initialization strategy. */
-    KMeansEmptyAction  m_emptyact;    /**< Empty-cluster action. */
-    qint32 m_iReps;                   /**< Number of replicates. */
-    qint32 m_iMaxit;                  /**< Max iterations per replicate. */
-    bool   m_bOnline;                 /**< Whether to perform online updates. */
+    KMeansDistance m_distance;    /**< Distance metric to use. */
+    KMeansStart m_start;          /**< Initialization strategy. */
+    KMeansEmptyAction m_emptyact; /**< Empty-cluster action. */
+    qint32 m_iReps;               /**< Number of replicates. */
+    qint32 m_iMaxit;              /**< Max iterations per replicate. */
+    bool m_bOnline;               /**< Whether to perform online updates. */
 
-    std::mt19937 m_rng;               /**< Mersenne Twister random number generator. */
+    std::mt19937 m_rng; /**< Mersenne Twister random number generator. */
 
-    qint32 emptyErrCnt;               /**< Empty-cluster error count. */
-    qint32 iter;                      /**< Current iteration. */
-    qint32 k;                         /**< Number of clusters. */
-    qint32 n;                         /**< Number of data points. */
-    qint32 p;                         /**< Dimensionality of the data space. */
+    qint32 emptyErrCnt; /**< Empty-cluster error count. */
+    qint32 iter;        /**< Current iteration. */
+    qint32 k;           /**< Number of clusters. */
+    qint32 n;           /**< Number of data points. */
+    qint32 p;           /**< Dimensionality of the data space. */
 
-    Eigen::MatrixXd Del;              /**< Reassignment cost matrix (n x k). */
-    Eigen::VectorXd d;                /**< Minimal distance of each point to its centroid. */
-    Eigen::VectorXi m;                /**< Number of points in each cluster. */
+    Eigen::MatrixXd Del; /**< Reassignment cost matrix (n x k). */
+    Eigen::VectorXd d;   /**< Minimal distance of each point to its centroid. */
+    Eigen::VectorXi m;   /**< Number of points in each cluster. */
 
-    double totsumD;                   /**< Total sum of distances for current assignment. */
-    double prevtotsumD;               /**< Total sum of distances from previous iteration. */
-    Eigen::VectorXi previdx;          /**< Previous cluster indices. */
+    double totsumD;          /**< Total sum of distances for current assignment. */
+    double prevtotsumD;      /**< Total sum of distances from previous iteration. */
+    Eigen::VectorXi previdx; /**< Previous cluster indices. */
 };
 } // NAMESPACE
 

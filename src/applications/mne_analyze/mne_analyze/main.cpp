@@ -58,32 +58,32 @@ Q_IMPORT_PLUGIN(ControlManager)
 Q_IMPORT_PLUGIN(ChannelSelection)
 Q_IMPORT_PLUGIN(CoRegistration)
 #ifdef MNE_DISP3D
-    Q_IMPORT_PLUGIN(View3D)
+Q_IMPORT_PLUGIN(View3D)
 #endif
 #endif
 
 //=============================================================================================================
 
-int main(int argc, char *argv[])
+int main(int argc, char* argv[])
 {
-    // When building a static version of MNE Analyze we have to init all resource (.qrc) files here manually
-    #ifdef STATICBUILD
-        #ifdef MNE_DISP3D
-            // Q_INIT_RESOURCE(mne_disp3d);
-            // Q_INIT_RESOURCE(analyze_view3d);
-            // Q_INIT_RESOURCE(analyze_dipolefit);
-            // Q_INIT_RESOURCE(analyze_coregistration);
-            // Q_INIT_RESOURCE(analyze_sourcelocalization);
-        #endif
-        // Q_INIT_RESOURCE(analyze_averaging);
-        // Q_INIT_RESOURCE(analyze_channelselection);
-        // Q_INIT_RESOURCE(analyze_controlmanager);
-        // Q_INIT_RESOURCE(analyze_dataloader);
-        // Q_INIT_RESOURCE(analyze_datamanager);
-        // Q_INIT_RESOURCE(analyze_events);
-        // Q_INIT_RESOURCE(analyze_filtering);
-        // Q_INIT_RESOURCE(analyze_rawdataviewer);
-    #endif
+// When building a static version of MNE Analyze we have to init all resource (.qrc) files here manually
+#ifdef STATICBUILD
+#ifdef MNE_DISP3D
+    // Q_INIT_RESOURCE(mne_disp3d);
+    // Q_INIT_RESOURCE(analyze_view3d);
+    // Q_INIT_RESOURCE(analyze_dipolefit);
+    // Q_INIT_RESOURCE(analyze_coregistration);
+    // Q_INIT_RESOURCE(analyze_sourcelocalization);
+#endif
+    // Q_INIT_RESOURCE(analyze_averaging);
+    // Q_INIT_RESOURCE(analyze_channelselection);
+    // Q_INIT_RESOURCE(analyze_controlmanager);
+    // Q_INIT_RESOURCE(analyze_dataloader);
+    // Q_INIT_RESOURCE(analyze_datamanager);
+    // Q_INIT_RESOURCE(analyze_events);
+    // Q_INIT_RESOURCE(analyze_filtering);
+    // Q_INIT_RESOURCE(analyze_rawdataviewer);
+#endif
 
     // Enable crisp fractional scaling on high-DPI monitors. Must be set before
     // the QApplication is constructed. (Qt6 enables high-DPI pixmaps by default.)
@@ -100,7 +100,7 @@ int main(int argc, char *argv[])
     QSurfaceFormat::setDefaultFormat(fmt);
 
     //New AnalyzeCore instance
-    QScopedPointer<AnalyzeCore> pAnalyzeCore (new AnalyzeCore);
+    QScopedPointer<AnalyzeCore> pAnalyzeCore(new AnalyzeCore);
     pAnalyzeCore->showMainWindow();
 
     return app.exec();

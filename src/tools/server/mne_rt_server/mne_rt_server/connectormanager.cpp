@@ -55,7 +55,7 @@ using namespace COMLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-ConnectorManager::ConnectorManager(FiffStreamServer* p_pFiffStreamServer, QObject *parent)
+ConnectorManager::ConnectorManager(FiffStreamServer* p_pFiffStreamServer, QObject* parent)
 : QPluginLoader(parent)
 , m_pFiffStreamServer(p_pFiffStreamServer)
 {
@@ -66,7 +66,7 @@ ConnectorManager::ConnectorManager(FiffStreamServer* p_pFiffStreamServer, QObjec
 ConnectorManager::~ConnectorManager()
 {
     QVector<IConnector*>::const_iterator it = s_vecConnectors.begin();
-    for( ; it != s_vecConnectors.end(); ++it)
+    for (; it != s_vecConnectors.end(); ++it)
         delete (*it);
 }
 
@@ -75,11 +75,10 @@ ConnectorManager::~ConnectorManager()
 void ConnectorManager::clearConnectorActivation()
 {
     // deactivate activated connectors
-    if(s_vecConnectors.size() > 0)
-    {
+    if (s_vecConnectors.size() > 0) {
         QVector<IConnector*>::const_iterator it = s_vecConnectors.begin();
-        for( ; it != s_vecConnectors.end(); ++it)
-            if((*it)->isActive())
+        for (; it != s_vecConnectors.end(); ++it)
+            if ((*it)->isActive())
                 (*it)->setStatus(false);
     }
 }
@@ -90,9 +89,9 @@ void ConnectorManager::comConlist(Command p_command)
 {
     bool t_bCommandIsJson = p_command.isJson();
 
-    MNERTServer* t_pMNERTServer = qobject_cast<MNERTServer*> (this->parent());
+    MNERTServer* t_pMNERTServer = qobject_cast<MNERTServer*>(this->parent());
 
-    if(!t_bCommandIsJson)
+    if (!t_bCommandIsJson)
         t_pMNERTServer->getCommandManager()["conlist"].reply(this->getConnectorList());
     else
         t_pMNERTServer->getCommandManager()["conlist"].reply(this->getConnectorList(true));
@@ -105,25 +104,24 @@ void ConnectorManager::comSelcon(Command p_command)
     bool t_bIsInt;
 
     qint32 t_id = p_command.pValues()[0].toInt(&t_bIsInt);
-    if(t_bIsInt)
-    {
-//        qobject_cast<MNERTServer*> (this->parent())->getCommandManager()["selcon"].reply(this->setActiveConnector(t_id));
+    if (t_bIsInt) {
+        //        qobject_cast<MNERTServer*> (this->parent())->getCommandManager()["selcon"].reply(this->setActiveConnector(t_id));
         QString t_sActivated = this->setActiveConnector(t_id);
 
         qDebug() << t_sActivated;
 
         bool t_bCommandIsJson = p_command.isJson();
 
-        if(!t_bCommandIsJson)
-            qobject_cast<MNERTServer*> (this->parent())->getCommandManager()["selcon"].reply(this->getConnectorList());
+        if (!t_bCommandIsJson)
+            qobject_cast<MNERTServer*>(this->parent())->getCommandManager()["selcon"].reply(this->getConnectorList());
         else
-            qobject_cast<MNERTServer*> (this->parent())->getCommandManager()["selcon"].reply(this->getConnectorList(true));
+            qobject_cast<MNERTServer*>(this->parent())->getCommandManager()["selcon"].reply(this->getConnectorList(true));
     }
 }
 
 //=============================================================================================================
 
-void ConnectorManager::comStart(Command p_command)//comMeas
+void ConnectorManager::comStart(Command p_command) //comMeas
 {
     getActiveConnector()->start();
     qobject_cast<MNERTServer*>(this->parent())->getCommandManager()["start"].reply("Starting active connector.\n");
@@ -147,8 +145,7 @@ void ConnectorManager::connectActiveConnector()
 {
     IConnector* t_activeConnector = ConnectorManager::getActiveConnector();
 
-    if(t_activeConnector)
-    {
+    if (t_activeConnector) {
         // use signal slots instead of call backs
         //Consulting the Signal/Slot documentation describes why the Signal/Slot approach is better:
         //    Callbacks have two fundamental flaws: Firstly, they are not type-safe. We can never be certain
@@ -165,12 +162,12 @@ void ConnectorManager::connectActiveConnector()
         // Meas Info
         //
         // connect command server and connector manager
-        QObject::connect(   this->m_pFiffStreamServer, &FiffStreamServer::requestMeasInfo,
-                            t_activeConnector, &IConnector::info);
+        QObject::connect(this->m_pFiffStreamServer, &FiffStreamServer::requestMeasInfo,
+                         t_activeConnector, &IConnector::info);
 
         // connect connector manager and fiff stream server
-        QObject::connect(   t_activeConnector, &IConnector::remitMeasInfo,
-                            this->m_pFiffStreamServer, &FiffStreamServer::forwardMeasInfo);
+        QObject::connect(t_activeConnector, &IConnector::remitMeasInfo,
+                         this->m_pFiffStreamServer, &FiffStreamServer::forwardMeasInfo);
 
         //
         // Raw Data
@@ -178,11 +175,9 @@ void ConnectorManager::connectActiveConnector()
         // connect command server and connector manager
 
         // connect connector manager and fiff stream server
-        QObject::connect(   t_activeConnector, &IConnector::remitRawBuffer,
-                            this->m_pFiffStreamServer, &FiffStreamServer::forwardRawBuffer);
-    }
-    else
-    {
+        QObject::connect(t_activeConnector, &IConnector::remitRawBuffer,
+                         this->m_pFiffStreamServer, &FiffStreamServer::forwardRawBuffer);
+    } else {
         qInfo("Error: Can't connect, no connector active!");
     }
 }
@@ -193,8 +188,7 @@ void ConnectorManager::disconnectActiveConnector()
 {
     IConnector* t_activeConnector = ConnectorManager::getActiveConnector();
 
-    if(t_activeConnector)
-    {
+    if (t_activeConnector) {
         // use signal slots instead of call backs
         //Consulting the Signal/Slot documentation describes why the Signal/Slot approach is better:
         //    Callbacks have two fundamental flaws: Firstly, they are not type-safe. We can never be certain
@@ -219,19 +213,17 @@ void ConnectorManager::disconnectActiveConnector()
         //
         // Raw Data
         //
-//        t_pMNERTServer->m_pCommandServer->disconnect(t_activeConnector);
+        //        t_pMNERTServer->m_pCommandServer->disconnect(t_activeConnector);
         //
-//        t_activeConnector->disconnect(t_pMNERTServer->m_pFiffStreamServer);
+        //        t_activeConnector->disconnect(t_pMNERTServer->m_pFiffStreamServer);
         // connect command server and connector manager
-//        t_pMNERTServer->m_pCommandServer->disconnect(t_activeConnector);
+        //        t_pMNERTServer->m_pCommandServer->disconnect(t_activeConnector);
 
         //
         // Reset Raw Buffer
         //
-//        t_pMNERTServer->m_pCommandServer->disconnect(t_activeConnector);
-    }
-    else
-    {
+        //        t_pMNERTServer->m_pCommandServer->disconnect(t_activeConnector);
+    } else {
         qInfo("Error: Can't connect, no connector active!");
     }
 }
@@ -241,9 +233,8 @@ void ConnectorManager::disconnectActiveConnector()
 IConnector* ConnectorManager::getActiveConnector()
 {
     QVector<IConnector*>::const_iterator it = s_vecConnectors.begin();
-    for( ; it != s_vecConnectors.end(); ++it)
-    {
-        if((*it)->isActive())
+    for (; it != s_vecConnectors.end(); ++it) {
+        if ((*it)->isActive())
             return *it;
     }
 
@@ -256,13 +247,11 @@ QByteArray ConnectorManager::getConnectorList(bool p_bFlagJSON) const
 {
     QByteArray t_blockConnectorList;
 
-    if(p_bFlagJSON)
-    {
+    if (p_bFlagJSON) {
         QJsonObject t_qJsonObjectConnectors;
 
         QVector<IConnector*>::const_iterator it = s_vecConnectors.begin();
-        for( ; it != s_vecConnectors.end(); ++it)
-        {
+        for (; it != s_vecConnectors.end(); ++it) {
             QJsonObject t_qJsonObjectConnector;
 
             //insert id
@@ -272,8 +261,7 @@ QByteArray ConnectorManager::getConnectorList(bool p_bFlagJSON) const
             t_qJsonObjectConnector.insert(QString("active"), QJsonValue((*it)->isActive()));
 
             //insert Connector JsonObject
-            t_qJsonObjectConnectors.insert((*it)->getName(),t_qJsonObjectConnector);//QJsonObject());//QJsonValue());
-
+            t_qJsonObjectConnectors.insert((*it)->getName(), t_qJsonObjectConnector); //QJsonObject());//QJsonValue());
         }
 
         QJsonObject t_qJsonObjectRoot;
@@ -281,21 +269,16 @@ QByteArray ConnectorManager::getConnectorList(bool p_bFlagJSON) const
         QJsonDocument p_qJsonDocument(t_qJsonObjectRoot);
 
         t_blockConnectorList.append(p_qJsonDocument.toJson());
-    }
-    else
-    {
-        if(s_vecConnectors.size() > 0)
-        {
+    } else {
+        if (s_vecConnectors.size() > 0) {
             QVector<IConnector*>::const_iterator it = s_vecConnectors.begin();
-            for( ; it != s_vecConnectors.end(); ++it)
-            {
-                if((*it)->isActive())
+            for (; it != s_vecConnectors.end(); ++it) {
+                if ((*it)->isActive())
                     t_blockConnectorList.append(QString("  *  (%1) %2\r\n").arg((*it)->getConnectorID()).arg((*it)->getName()).toUtf8());
                 else
                     t_blockConnectorList.append(QString("     (%1) %2\r\n").arg((*it)->getConnectorID()).arg((*it)->getName()).toUtf8());
             }
-        }
-        else
+        } else
             t_blockConnectorList.append(" - no connector loaded - \r\n");
         t_blockConnectorList.append("\r\n");
     }
@@ -307,7 +290,7 @@ QByteArray ConnectorManager::getConnectorList(bool p_bFlagJSON) const
 void ConnectorManager::connectCommands()
 {
     //Connect slots
-    MNERTServer* t_pMNERTServer = qobject_cast<MNERTServer*> (this->parent());
+    MNERTServer* t_pMNERTServer = qobject_cast<MNERTServer*>(this->parent());
 
     QObject::connect(&t_pMNERTServer->getCommandManager()["conlist"], &Command::executed, this, &ConnectorManager::comConlist);
     QObject::connect(&t_pMNERTServer->getCommandManager()["selcon"], &Command::executed, this, &ConnectorManager::comSelcon);
@@ -328,10 +311,10 @@ void ConnectorManager::loadConnectors(const QString& dir)
     const auto staticInstances = QPluginLoader::staticPlugins();
     QString sJSONFile;
 
-    for(QStaticPlugin plugin : staticInstances) {
+    for (QStaticPlugin plugin : staticInstances) {
         // AbstractPlugin
-        if(plugin.instance()) {
-            if(IConnector* t_pIConnector = qobject_cast<IConnector*>(plugin.instance())) {
+        if (plugin.instance()) {
+            if (IConnector* t_pIConnector = qobject_cast<IConnector*>(plugin.instance())) {
                 t_pIConnector->setStatus(false);
 
                 //Add the curent plugin meta data
@@ -351,21 +334,19 @@ void ConnectorManager::loadConnectors(const QString& dir)
 #else
     QDir ConnectorsDir(dir);
 
-    qInfo("Loading connectors in directory... %s" , ConnectorsDir.path().toUtf8().constData() );
+    qInfo("Loading connectors in directory... %s", ConnectorsDir.path().toUtf8().constData());
 
-    foreach(QString fileName, ConnectorsDir.entryList(QDir::Files))
-    {
-        if(fileName.compare("README") == 0 || fileName.compare("plugin.cfg") == 0)
+    foreach (QString fileName, ConnectorsDir.entryList(QDir::Files)) {
+        if (fileName.compare("README") == 0 || fileName.compare("plugin.cfg") == 0)
             continue;
 
         this->setFileName(ConnectorsDir.absoluteFilePath(fileName));
-        QObject *pConnector = this->instance();
+        QObject* pConnector = this->instance();
 
         qInfo("\tLoading %s...", fileName.toUtf8().constData());
 
         // IModule
-        if(pConnector)
-        {
+        if (pConnector) {
             IConnector* t_pIConnector = qobject_cast<IConnector*>(pConnector);
             t_pIConnector->setStatus(false);
 
@@ -390,12 +371,10 @@ void ConnectorManager::loadConnectors(const QString& dir)
     //
     qint32 configConnector = -1;
     QString configFileName("plugin.cfg");
-    QFile configFile(QString("%1/../resources/mne_rt_server/plugins/"+configFileName).arg(QCoreApplication::applicationDirPath()));
-    if(!configFile.open(QIODevice::ReadOnly)) {
-        qInfo("Not able to read config file... %s" , configFile.fileName().toUtf8().constData());
-    }
-    else
-    {
+    QFile configFile(QString("%1/../resources/mne_rt_server/plugins/" + configFileName).arg(QCoreApplication::applicationDirPath()));
+    if (!configFile.open(QIODevice::ReadOnly)) {
+        qInfo("Not able to read config file... %s", configFile.fileName().toUtf8().constData());
+    } else {
         qInfo("\tReading %s...", configFileName.toUtf8().constData());
 
         QTextStream in(&configFile);
@@ -404,25 +383,19 @@ void ConnectorManager::loadConnectors(const QString& dir)
         while (!line.isNull()) {
             list = line.split(":");
 
-            if(list[0].simplified().compare("defaultConnector") == 0)
-            {
+            if (list[0].simplified().compare("defaultConnector") == 0) {
                 configConnector = list[1].simplified().toInt();
                 break;
             }
             line = in.readLine();
         }
     }
-    if(s_vecConnectors.size() > 0)
-    {
-
+    if (s_vecConnectors.size() > 0) {
         bool activated = false;
 
-        if( configConnector != -1)
-        {
-            for(qint32 i = 0; i < s_vecConnectors.size(); ++i)
-            {
-                if(s_vecConnectors[i]->getConnectorID() == configConnector)
-                {
+        if (configConnector != -1) {
+            for (qint32 i = 0; i < s_vecConnectors.size(); ++i) {
+                if (s_vecConnectors[i]->getConnectorID() == configConnector) {
                     s_vecConnectors[i]->setStatus(true);
                     qInfo("activate %s... [done]", s_vecConnectors[i]->getName());
                     activated = true;
@@ -432,7 +405,7 @@ void ConnectorManager::loadConnectors(const QString& dir)
         }
 
         //default
-        if(!activated)
+        if (!activated)
             s_vecConnectors[0]->setStatus(true);
     }
 
@@ -448,40 +421,33 @@ QByteArray ConnectorManager::setActiveConnector(qint32 ID)
     QByteArray p_blockClientList;
     QString str;
 
-    if(ID != getActiveConnector()->getConnectorID())
-    {
+    if (ID != getActiveConnector()->getConnectorID()) {
         IConnector* t_pNewActiveConnector = NULL;
         QVector<IConnector*>::const_iterator it = s_vecConnectors.begin();
-        for( ; it != s_vecConnectors.end(); ++it)
-            if((*it)->getConnectorID() == ID)
+        for (; it != s_vecConnectors.end(); ++it)
+            if ((*it)->getConnectorID() == ID)
                 t_pNewActiveConnector = *it;
 
-        if (t_pNewActiveConnector)
-        {
+        if (t_pNewActiveConnector) {
+            IConnector* t_pActiveConnector = getActiveConnector();
 
-           IConnector* t_pActiveConnector = getActiveConnector();
+            //Stop and disconnect active connector
+            t_pActiveConnector->stop();
+            this->disconnectActiveConnector();
+            t_pActiveConnector->setStatus(false);
 
-           //Stop and disconnect active connector
-           t_pActiveConnector->stop();
-           this->disconnectActiveConnector();
-           t_pActiveConnector->setStatus(false);
-
-           //set new active connector
-           t_pNewActiveConnector->setStatus(true);
-           this->connectActiveConnector();
+            //set new active connector
+            t_pNewActiveConnector->setStatus(true);
+            this->connectActiveConnector();
 
             str = QString("\t%1 activated.\r\n\n").arg(t_pNewActiveConnector->getName());
             p_blockClientList.append(str.toUtf8());
-        }
-        else
-        {
+        } else {
             str = QString("\tID %1 doesn't match a connector ID.\r\n\n").arg(ID);
             p_blockClientList.append(str.toUtf8());
             p_blockClientList.append(getConnectorList());
         }
-    }
-    else
-    {
+    } else {
         str = QString("\t%1 is already active.\r\n\n").arg(getActiveConnector()->getName());
         p_blockClientList.append(str.toUtf8());
     }
@@ -493,4 +459,4 @@ QByteArray ConnectorManager::setActiveConnector(qint32 ID)
 // STATIC DEFINITIONS
 //=============================================================================================================
 
-QVector<IConnector*>    ConnectorManager::  s_vecConnectors;
+QVector<IConnector*> ConnectorManager::s_vecConnectors;

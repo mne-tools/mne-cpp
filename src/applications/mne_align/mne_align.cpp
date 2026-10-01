@@ -46,12 +46,12 @@ using namespace MNEALIGN;
 //=============================================================================================================
 
 MneAlign::MneAlign(QWidget* parent)
-    : QMainWindow(parent)
+: QMainWindow(parent)
 {
     setWindowTitle(QStringLiteral("MNE Align"));
     resize(1100, 720);
 
-    m_pPoints    = new AcquiredPoints(this);
+    m_pPoints = new AcquiredPoints(this);
     m_pDigitizer = new PolhemusConnection(this);
 
     buildUi();
@@ -74,7 +74,7 @@ MneAlign::MneAlign(QWidget* parent)
             this, &MneAlign::onWizardDigitisationLoaded);
     connect(m_pWizard, &AlignWizard::bemPathChanged,
             this, &MneAlign::onWizardBemPathChanged);
-        connect(m_pWizard, &AlignWizard::stepChanged,
+    connect(m_pWizard, &AlignWizard::stepChanged,
             this, &MneAlign::onWizardStepChanged);
 
     onDigitizerConnectedChanged(false);
@@ -116,7 +116,7 @@ void MneAlign::buildUi()
     m_pSplitter->setSizes({280, 920});
     setCentralWidget(m_pSplitter);
 
-    m_pStatusBem       = new QLabel(QStringLiteral("BEM: (none)"), this);
+    m_pStatusBem = new QLabel(QStringLiteral("BEM: (none)"), this);
     m_pStatusDigitizer = new QLabel(QStringLiteral("Digitizer: disconnected"), this);
     statusBar()->addPermanentWidget(m_pStatusBem);
     statusBar()->addPermanentWidget(m_pStatusDigitizer);
@@ -131,7 +131,7 @@ void MneAlign::buildUi()
         connect(m_pView3d, &Align3DView::surfacePointDoubleClicked,
                 m_pWizard, &AlignWizard::onSurfaceDoubleClicked);
         // Push updated tracker→MRI transform to the wizard whenever points change
-        connect(m_pPoints, &AcquiredPoints::pointsChanged, this, [this]{
+        connect(m_pPoints, &AcquiredPoints::pointsChanged, this, [this] {
             if (m_pWizard && m_pView3d)
                 m_pWizard->setTrackerTransform(m_pView3d->trackerToMri());
         });
@@ -146,8 +146,8 @@ void MneAlign::buildMenus()
     fileMenu->addAction(QStringLiteral("E&xit"), this, &QWidget::close);
 
     auto* digMenu = menuBar()->addMenu(QStringLiteral("&Digitizer"));
-    digMenu->addAction(QStringLiteral("&Connect…"),    this, &MneAlign::onConnectDigitizer);
-    digMenu->addAction(QStringLiteral("&Disconnect"),  this, &MneAlign::onDisconnectDigitizer);
+    digMenu->addAction(QStringLiteral("&Connect…"), this, &MneAlign::onConnectDigitizer);
+    digMenu->addAction(QStringLiteral("&Disconnect"), this, &MneAlign::onDisconnectDigitizer);
 
     auto* helpMenu = menuBar()->addMenu(QStringLiteral("&Help"));
     helpMenu->addAction(QStringLiteral("&About"), this, &MneAlign::onAbout);
@@ -167,15 +167,13 @@ void MneAlign::buildMenus()
     navToolBar->addWidget(m_pViewCountCombo);
     navToolBar->addWidget(new QLabel(QStringLiteral("Camera:"), this));
     m_pCameraPresetCombo = new QComboBox(this);
-    m_pCameraPresetCombo->addItems({
-        QStringLiteral("Top"),
-        QStringLiteral("Perspective"),
-        QStringLiteral("Front"),
-        QStringLiteral("Left"),
-        QStringLiteral("Bottom"),
-        QStringLiteral("Back"),
-        QStringLiteral("Right")
-    });
+    m_pCameraPresetCombo->addItems({QStringLiteral("Top"),
+                                    QStringLiteral("Perspective"),
+                                    QStringLiteral("Front"),
+                                    QStringLiteral("Left"),
+                                    QStringLiteral("Bottom"),
+                                    QStringLiteral("Back"),
+                                    QStringLiteral("Right")});
     m_pCameraPresetCombo->setCurrentIndex(1);
     navToolBar->addWidget(m_pCameraPresetCombo);
     navToolBar->addWidget(new QLabel(QStringLiteral("Render:"), this));
@@ -219,8 +217,10 @@ void MneAlign::buildMenus()
     connect(m_pPenStationCombo, QOverload<int>::of(&QComboBox::currentIndexChanged),
             this, [this](int index) {
                 const int station = index + 1;
-                if (m_pView3d) m_pView3d->setPenStation(station);
-                if (m_pWizard) m_pWizard->setPenStation(station);
+                if (m_pView3d)
+                    m_pView3d->setPenStation(station);
+                if (m_pWizard)
+                    m_pWizard->setPenStation(station);
             });
 
     // Push-based UI sync: when BrainView changes its persisted state —
@@ -231,15 +231,18 @@ void MneAlign::buildMenus()
     if (m_pView3d) {
         connect(m_pView3d, &Align3DView::viewCountChanged,
                 this, [this](int count) {
-                    if (!m_pViewCountCombo) return;
+                    if (!m_pViewCountCombo)
+                        return;
                     QSignalBlocker block(m_pViewCountCombo);
                     m_pViewCountCombo->setCurrentIndex(qBound(1, count, 4) - 1);
                 });
         connect(m_pView3d, &Align3DView::renderModeChanged,
                 this, [this](const QString& mode) {
-                    if (!m_pRenderModeCombo) return;
+                    if (!m_pRenderModeCombo)
+                        return;
                     const int idx = m_pRenderModeCombo->findText(mode);
-                    if (idx < 0) return;
+                    if (idx < 0)
+                        return;
                     QSignalBlocker block(m_pRenderModeCombo);
                     m_pRenderModeCombo->setCurrentIndex(idx);
                 });
@@ -275,7 +278,7 @@ void MneAlign::loadSettings()
     // no BrainView equivalent — BrainView stores the resulting camera
     // quaternion) and the last BEM path.
     const int cameraPreset = qBound(0, s.value(QStringLiteral("cameraPreset"), 1).toInt(), 6);
-    const QString bemPath  = s.value(QStringLiteral("lastBemPath")).toString();
+    const QString bemPath = s.value(QStringLiteral("lastBemPath")).toString();
     s.endGroup();
 
     if (m_pCameraPresetCombo) {
@@ -296,7 +299,7 @@ void MneAlign::saveSettings()
 {
     QSettings s;
     s.beginGroup(QStringLiteral("MneAlign"));
-    s.setValue(QStringLiteral("geometry"),      saveGeometry());
+    s.setValue(QStringLiteral("geometry"), saveGeometry());
     if (m_pSplitter)
         s.setValue(QStringLiteral("splitterState"), m_pSplitter->saveState());
     if (m_pCameraPresetCombo)
@@ -311,7 +314,8 @@ void MneAlign::onOpenBem()
     const QString path = QFileDialog::getOpenFileName(
         this, QStringLiteral("Open BEM surface"),
         QString(), QStringLiteral("FIFF BEM (*.fif *.fif.gz);;All files (*)"));
-    if (path.isEmpty()) return;
+    if (path.isEmpty())
+        return;
     if (m_pWizard) {
         m_pWizard->setBemPath(path);
     }
@@ -320,17 +324,19 @@ void MneAlign::onOpenBem()
 
 void MneAlign::onWizardBemPathChanged(const QString& path)
 {
-    if (path.isEmpty()) return;
+    if (path.isEmpty())
+        return;
 
     QFile file(path);
     if (!file.exists()) {
         QMessageBox::warning(this, windowTitle(),
-                              QStringLiteral("BEM file does not exist:\n%1").arg(path));
+                             QStringLiteral("BEM file does not exist:\n%1").arg(path));
         return;
     }
 
     auto bem = std::make_shared<MNELIB::MNEBem>(file);
-    if (m_pView3d) m_pView3d->setBem(bem);
+    if (m_pView3d)
+        m_pView3d->setBem(bem);
     if (m_pStatusBem) {
         m_pStatusBem->setText(QStringLiteral("BEM: %1").arg(QFileInfo(path).fileName()));
     }
@@ -367,14 +373,15 @@ void MneAlign::onConnectDigitizer()
             this, QStringLiteral("Connect digitizer"),
             QStringLiteral("No Fastrak auto-detected. Pick a serial port:"),
             items, /*current*/ 0, /*editable*/ false, &ok);
-        if (!ok) return;
+        if (!ok)
+            return;
         port = (choice == items.first()) ? QString() : choice;
     }
 
     if (!m_pDigitizer->open(port)) {
         QMessageBox::warning(this, windowTitle(),
-                              QStringLiteral("Failed to open digitizer on '%1'.")
-                                  .arg(port.isEmpty() ? QStringLiteral("mock") : port));
+                             QStringLiteral("Failed to open digitizer on '%1'.")
+                                 .arg(port.isEmpty() ? QStringLiteral("mock") : port));
     }
 }
 
@@ -385,19 +392,20 @@ void MneAlign::onDisconnectDigitizer()
 
 void MneAlign::onDigitizerConnectedChanged(bool connected)
 {
-    if (!m_pStatusDigitizer) return;
+    if (!m_pStatusDigitizer)
+        return;
     m_pStatusDigitizer->setText(connected
-        ? QStringLiteral("Digitizer: %1").arg(m_pDigitizer->backendName())
-        : QStringLiteral("Digitizer: disconnected"));
+                                    ? QStringLiteral("Digitizer: %1").arg(m_pDigitizer->backendName())
+                                    : QStringLiteral("Digitizer: disconnected"));
 }
 
 void MneAlign::onWizardStepChanged(MNEALIGN::AlignStep step)
 {
     if (m_pStepLabel) {
         m_pStepLabel->setText(QStringLiteral("Step %1/%2 — %3")
-            .arg(static_cast<int>(step) + 1)
-            .arg(AlignWizard::stepCount())
-            .arg(AlignWizard::titleFor(step)));
+                                  .arg(static_cast<int>(step) + 1)
+                                  .arg(AlignWizard::stepCount())
+                                  .arg(AlignWizard::titleFor(step)));
     }
 
     if (m_pBackAction) {
@@ -425,15 +433,15 @@ void MneAlign::onWizardSaveDigitisation(const QString& outPath)
         dig.r[2] = p.position.z();
         switch (p.kind) {
             case PointKind::Fiducial:
-                dig.kind  = FIFFV_POINT_CARDINAL;
+                dig.kind = FIFFV_POINT_CARDINAL;
                 dig.ident = p.identNumber;
                 break;
             case PointKind::Eeg:
-                dig.kind  = FIFFV_POINT_EEG;
+                dig.kind = FIFFV_POINT_EEG;
                 dig.ident = eegIdent++;
                 break;
             case PointKind::HeadShape:
-                dig.kind  = FIFFV_POINT_EXTRA;
+                dig.kind = FIFFV_POINT_EXTRA;
                 dig.ident = hspIdent++;
                 break;
         }
@@ -443,7 +451,7 @@ void MneAlign::onWizardSaveDigitisation(const QString& outPath)
     QString err;
     if (!set.write(outPath, &err)) {
         QMessageBox::warning(this, windowTitle(),
-                              QStringLiteral("Save digitisation failed:\n%1").arg(err));
+                             QStringLiteral("Save digitisation failed:\n%1").arg(err));
         return;
     }
     statusBar()->showMessage(
@@ -454,7 +462,8 @@ void MneAlign::onWizardSaveTrans(const QString& outPath)
 {
     using namespace FIFFLIB;
 
-    if (!m_pView3d) return;
+    if (!m_pView3d)
+        return;
 
     // Compose the FiffCoordTrans for head→MRI from the 3D view.
     const QMatrix4x4 h2m = m_pView3d->headToMri();
@@ -469,14 +478,15 @@ void MneAlign::onWizardSaveTrans(const QString& outPath)
     QFile file(outPath);
     if (!file.open(QIODevice::WriteOnly | QIODevice::Truncate)) {
         QMessageBox::warning(this, windowTitle(),
-            QStringLiteral("Cannot open %1 for writing.").arg(outPath));
+                             QStringLiteral("Cannot open %1 for writing.").arg(outPath));
         return;
     }
-    trans.write(file);   // closes the device
+    trans.write(file); // closes the device
     statusBar()->showMessage(
         QStringLiteral("Wrote head→MRI transform to %1").arg(outPath), 5000);
 
-    if (m_pWizard) m_pWizard->setLastSavedTrans(outPath);
+    if (m_pWizard)
+        m_pWizard->setLastSavedTrans(outPath);
 }
 
 void MneAlign::onWizardDigitisationLoaded(const QString& path)
@@ -490,11 +500,11 @@ void MneAlign::onWizardDigitisationLoaded(const QString& path)
 void MneAlign::onAbout()
 {
     QMessageBox::about(this, windowTitle(),
-        QStringLiteral(
-            "<h3>MNE Align</h3>"
-            "<p>Stripped-down <b>mne_inspect</b> variant for Polhemus Fastrak "
-            "digitisation against a head BEM and an EEG cap.</p>"
-            "<p>v2.3.0</p>"));
+                       QStringLiteral(
+                           "<h3>MNE Align</h3>"
+                           "<p>Stripped-down <b>mne_inspect</b> variant for Polhemus Fastrak "
+                           "digitisation against a head BEM and an EEG cap.</p>"
+                           "<p>v2.3.0</p>"));
 }
 
 void MneAlign::onIcpFit()
@@ -502,7 +512,8 @@ void MneAlign::onIcpFit()
     using namespace MNELIB;
     using namespace FIFFLIB;
 
-    if (!m_pPoints || !m_pView3d) return;
+    if (!m_pPoints || !m_pView3d)
+        return;
     auto bem = m_pView3d->bem();
     if (!bem || bem->isEmpty()) {
         QMessageBox::warning(this, windowTitle(), QStringLiteral("No BEM surface loaded."));
@@ -512,14 +523,12 @@ void MneAlign::onIcpFit()
     // Require all 3 twin fiducials and all 3 captured fiducials
     if (!m_pPoints->hasAllTwinFiducials()) {
         QMessageBox::warning(this, windowTitle(),
-            QStringLiteral("Twin fiducials incomplete. Click NAS, LPA, RPA on the BEM surface in Step 1."));
+                             QStringLiteral("Twin fiducials incomplete. Click NAS, LPA, RPA on the BEM surface in Step 1."));
         return;
     }
-    if (!m_pPoints->hasFiducial(FiducialId::NAS)
-        || !m_pPoints->hasFiducial(FiducialId::LPA)
-        || !m_pPoints->hasFiducial(FiducialId::RPA)) {
+    if (!m_pPoints->hasFiducial(FiducialId::NAS) || !m_pPoints->hasFiducial(FiducialId::LPA) || !m_pPoints->hasFiducial(FiducialId::RPA)) {
         QMessageBox::warning(this, windowTitle(),
-            QStringLiteral("Captured fiducials incomplete. Capture NAS, LPA, RPA with the pen in Step 2."));
+                             QStringLiteral("Captured fiducials incomplete. Capture NAS, LPA, RPA with the pen in Step 2."));
         return;
     }
 
@@ -536,7 +545,8 @@ void MneAlign::onIcpFit()
 
     // Build point cloud from all captured points (raw tracker space)
     const auto& pts = m_pPoints->points();
-    if (pts.isEmpty()) return;
+    if (pts.isEmpty())
+        return;
 
     Eigen::MatrixXf cloud(pts.size(), 3);
     for (int i = 0; i < pts.size(); ++i) {
@@ -575,9 +585,10 @@ void MneAlign::onIcpFit()
     // Per-fiducial residuals in head space (after applying refined transform).
     QVector<QPair<QString, float>> residuals;
     auto residualFor = [&](FiducialId id, const QString& label) {
-        if (!m_pPoints->hasFiducial(id) || !m_pPoints->hasTwinFiducial(id)) return;
-        const QVector3D cap     = m_pPoints->fiducial(id);            // device space
-        const QVector3D mriRef  = m_pPoints->twinFiducial(id);        // MRI space
+        if (!m_pPoints->hasFiducial(id) || !m_pPoints->hasTwinFiducial(id))
+            return;
+        const QVector3D cap = m_pPoints->fiducial(id);        // device space
+        const QVector3D mriRef = m_pPoints->twinFiducial(id); // MRI space
         const QVector3D mriPred = (refinedHeadToMri * deviceToHead).map(cap);
         residuals.append({label, (mriPred - mriRef).length()});
     };

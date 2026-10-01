@@ -41,17 +41,17 @@ namespace SCSHAREDLIB
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-template <class T>
-PluginOutputData<T>::PluginOutputData(AbstractPlugin *parent,
-                                      const QString &name,
-                                      const QString &descr)
+template<class T>
+PluginOutputData<T>::PluginOutputData(AbstractPlugin* parent,
+                                      const QString& name,
+                                      const QString& descr)
 : PluginOutputConnector(parent, name, descr)
 {
     m_pMeasurement = QSharedPointer<T>(new T);
 
     QSharedPointer<SCMEASLIB::Measurement> t_measurement = qSharedPointerDynamicCast<SCMEASLIB::Measurement>(m_pMeasurement);
 
-    if(t_measurement.isNull())
+    if (t_measurement.isNull())
         qFatal("Template type is not a measurement and therefor not supported!");
     else
         connect(t_measurement.data(), &SCMEASLIB::Measurement::notify,
@@ -60,11 +60,11 @@ PluginOutputData<T>::PluginOutputData(AbstractPlugin *parent,
 
 //=============================================================================================================
 
-template <class T>
+template<class T>
 void PluginOutputData<T>::update()
 {
     emit notify(qSharedPointerDynamicCast<SCMEASLIB::Measurement>(m_pMeasurement));
 }
-}//Namespace
+} //Namespace
 
 #endif //PLUGINOUTPUTDATA_CPP

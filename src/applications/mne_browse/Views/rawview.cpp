@@ -21,8 +21,8 @@ using namespace MNEBROWSE;
 
 //=============================================================================================================
 
-RawView::RawView(const QString &sSettingsPath,
-                 QWidget *parent,
+RawView::RawView(const QString& sSettingsPath,
+                 QWidget* parent,
                  Qt::WindowFlags f)
 : DISPLIB::ChannelDataView(sSettingsPath, parent, f)
 {
@@ -31,4 +31,3 @@ RawView::RawView(const QString &sSettingsPath,
 //=============================================================================================================
 
 RawView::~RawView() = default;
-

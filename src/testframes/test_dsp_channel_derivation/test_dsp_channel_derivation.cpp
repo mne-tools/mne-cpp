@@ -120,7 +120,7 @@ void TestDspChannelDerivation::testBipolarApply()
     QVector<DerivationRule> rules = ChannelDerivation::buildBipolar(channels);
     auto [derived, names] = ChannelDerivation::apply(data, channels, rules);
 
-    QCOMPARE(derived.rows(), 2);     // 2 bipolar pairs
+    QCOMPARE(derived.rows(), 2); // 2 bipolar pairs
     QCOMPARE(derived.cols(), nSamples);
     QCOMPARE(names.size(), 2);
 

@@ -47,7 +47,6 @@ class GUSBAmpSetupWidget : public QWidget
     Q_OBJECT
 
 public:
-
     //=========================================================================================================
     /**
      * Constructs a GUSBAmpSetupWidget which is a child of parent.
@@ -55,7 +54,7 @@ public:
      * @param[in] parent pointer to parent widget; If parent is 0, the new GUSBAmpSetupWidget becomes a window. If parent is another widget, GUSBAmpSetupWidget becomes a child window inside parent. GUSBAmpSetupWidget is deleted when its parent is deleted.
      * @param[in] pGUSBAmp a pointer to the corresponding ECGSimulator.
      */
-    GUSBAmpSetupWidget(GUSBAmp* pGUSBAmp, QWidget *parent = 0);
+    GUSBAmpSetupWidget(GUSBAmp* pGUSBAmp, QWidget* parent = 0);
 
     //=========================================================================================================
     /**
@@ -194,7 +193,7 @@ private slots:
     /**
      * combo box for adjusting the sample rate
      */
-    void on_comboBox_currentIndexChanged(const QString &arg1);
+    void on_comboBox_currentIndexChanged(const QString& arg1);
 
 private:
     //=========================================================================================================
@@ -204,8 +203,8 @@ private:
      */
     void showAboutDialog();
 
-    GUSBAmp*               m_pGUSBAmp;              /**< a pointer to corresponding GUSBAmp.*/
-    Ui::GUSBAmpSetupClass  ui;                      /**< the user interface for the GUSBAmpSetupWidget.*/
+    GUSBAmp* m_pGUSBAmp;      /**< a pointer to corresponding GUSBAmp.*/
+    Ui::GUSBAmpSetupClass ui; /**< the user interface for the GUSBAmpSetupWidget.*/
 };
 } // NAMESPACE
 

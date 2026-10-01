@@ -34,7 +34,7 @@ using namespace NEURONALCONNECTIVITYPLUGIN;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-NeuronalConnectivitySetupWidget::NeuronalConnectivitySetupWidget(NeuronalConnectivity* toolbox, QWidget *parent)
+NeuronalConnectivitySetupWidget::NeuronalConnectivitySetupWidget(NeuronalConnectivity* toolbox, QWidget* parent)
 : QWidget(parent)
 , m_pNeuronalConnectivity(toolbox)
 {

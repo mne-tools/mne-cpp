@@ -64,9 +64,9 @@ class MNEHemisphere;
 class MNESHARED_EXPORT MNESourceSpace : public MNESurfaceOrVolume
 {
 public:
-    using SPtr = std::shared_ptr<MNESourceSpace>;              /**< Shared pointer type for MNESourceSpace. */
-    using ConstSPtr = std::shared_ptr<const MNESourceSpace>;   /**< Const shared pointer type for MNESourceSpace. */
-    using UPtr = std::unique_ptr<MNESourceSpace>;              /**< Unique pointer type for MNESourceSpace. */
+    using SPtr = std::shared_ptr<MNESourceSpace>;            /**< Shared pointer type for MNESourceSpace. */
+    using ConstSPtr = std::shared_ptr<const MNESourceSpace>; /**< Const shared pointer type for MNESourceSpace. */
+    using UPtr = std::unique_ptr<MNESourceSpace>;            /**< Unique pointer type for MNESourceSpace. */
 
     //=========================================================================================================
     /**
@@ -209,15 +209,15 @@ public:
                                     float limit,
                                     const FIFFLIB::FiffCoordTrans& mri_head_t,
                                     std::vector<std::unique_ptr<MNESourceSpace>>& spaces,
-                                    QTextStream *filtered);
+                                    QTextStream* filtered);
 
-    static void filter_source_space(FilterThreadArg *arg);
+    static void filter_source_space(FilterThreadArg* arg);
 
     static int filter_source_spaces(float limit,
                                     const QString& bemfile,
                                     const FIFFLIB::FiffCoordTrans& mri_head_t,
                                     std::vector<std::unique_ptr<MNESourceSpace>>& spaces,
-                                    QTextStream *filtered,
+                                    QTextStream* filtered,
                                     bool use_threads);
 
     static int read_source_spaces(const QString& name,

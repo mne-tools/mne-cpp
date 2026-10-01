@@ -87,8 +87,8 @@ void TestIOUtils::testWriteReadEigenMatrixQString()
 
     MatrixXd A(3, 4);
     A << 1.1, 2.2, 3.3, 4.4,
-         5.5, 6.6, 7.7, 8.8,
-         9.9, 10.1, 11.2, 12.3;
+        5.5, 6.6, 7.7, 8.8,
+        9.9, 10.1, 11.2, 12.3;
 
     QVERIFY(IOUtils::write_eigen_matrix(A, path));
 
@@ -108,7 +108,7 @@ void TestIOUtils::testWriteReadEigenMatrixStdString()
 
     MatrixXd A(2, 3);
     A << 1.0, 2.0, 3.0,
-         4.0, 5.0, 6.0;
+        4.0, 5.0, 6.0;
 
     QVERIFY(IOUtils::write_eigen_matrix(A, path));
 

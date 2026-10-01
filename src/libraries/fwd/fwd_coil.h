@@ -63,20 +63,23 @@ namespace FWDLIB
 // COIL TYPE AND ACCURACY CONSTANTS
 //=============================================================================================================
 
-constexpr int FWD_COIL_UNKNOWN      = 0;
+constexpr int FWD_COIL_UNKNOWN = 0;
 
-constexpr int FWD_COILC_UNKNOWN     = 0;
-constexpr int FWD_COILC_EEG         = 1000;
-constexpr int FWD_COILC_MAG         = 1;
-constexpr int FWD_COILC_AXIAL_GRAD  = 2;
+constexpr int FWD_COILC_UNKNOWN = 0;
+constexpr int FWD_COILC_EEG = 1000;
+constexpr int FWD_COILC_MAG = 1;
+constexpr int FWD_COILC_AXIAL_GRAD = 2;
 constexpr int FWD_COILC_PLANAR_GRAD = 3;
 constexpr int FWD_COILC_AXIAL_GRAD2 = 4;
 
-constexpr int FWD_COIL_ACCURACY_POINT    = 0;
-constexpr int FWD_COIL_ACCURACY_NORMAL   = 1;
+constexpr int FWD_COIL_ACCURACY_POINT = 0;
+constexpr int FWD_COIL_ACCURACY_NORMAL = 1;
 constexpr int FWD_COIL_ACCURACY_ACCURATE = 2;
 
-inline constexpr bool FWD_IS_MEG_COIL(int x) { return (x != FWD_COILC_EEG && x != FWD_COILC_UNKNOWN); }
+inline constexpr bool FWD_IS_MEG_COIL(int x)
+{
+    return (x != FWD_COILC_EEG && x != FWD_COILC_UNKNOWN);
+}
 
 //=============================================================================================================
 /**
@@ -87,7 +90,7 @@ inline constexpr bool FWD_IS_MEG_COIL(int x) { return (x != FWD_COILC_EEG && x !
 class FWDSHARED_EXPORT FwdCoil
 {
 public:
-    typedef std::unique_ptr<FwdCoil> UPtr;                /**< Unique pointer type for FwdCoil. */
+    typedef std::unique_ptr<FwdCoil> UPtr; /**< Unique pointer type for FwdCoil. */
 
     //=========================================================================================================
     /**
@@ -121,7 +124,7 @@ public:
      * @return   The created coil.
      */
     static FwdCoil::UPtr create_eeg_el(const FIFFLIB::FiffChInfo& ch,
-                                        const FIFFLIB::FiffCoordTrans& t = FIFFLIB::FiffCoordTrans());
+                                       const FIFFLIB::FiffCoordTrans& t = FIFFLIB::FiffCoordTrans());
 
     //=========================================================================================================
     /**
@@ -156,22 +159,22 @@ public:
     bool is_eeg_electrode() const;
 
 public:
-    QString chname;         /**< Name of this channel. */
-    int     coord_frame;    /**< Which coordinate frame are we in? */
-    QString desc;           /**< Description for this type of a coil. */
-    int     coil_class;     /**< Coil class. */
-    int     type;           /**< Coil type. */
-    int     accuracy;       /**< Accuracy. */
-    float   size;           /**< Coil size. */
-    float   base;           /**< Baseline. */
-    Eigen::Vector3f r0;     /**< Coil coordinate system origin. */
-    Eigen::Vector3f ex;     /**< Coil coordinate system x unit vector. */
-    Eigen::Vector3f ey;     /**< Coil coordinate system y unit vector. */
-    Eigen::Vector3f ez;     /**< Coil coordinate system z unit vector. */
-    int     np;             /**< Number of integration points. */
-    Eigen::Matrix<float, Eigen::Dynamic, 3, Eigen::RowMajor> rmag;    /**< The field point locations (np x 3). */
-    Eigen::Matrix<float, Eigen::Dynamic, 3, Eigen::RowMajor> cosmag;  /**< The corresponding direction cosines (np x 3). */
-    Eigen::VectorXf w;              /**< The weighting coefficients. */
+    QString chname;                                                  /**< Name of this channel. */
+    int coord_frame;                                                 /**< Which coordinate frame are we in? */
+    QString desc;                                                    /**< Description for this type of a coil. */
+    int coil_class;                                                  /**< Coil class. */
+    int type;                                                        /**< Coil type. */
+    int accuracy;                                                    /**< Accuracy. */
+    float size;                                                      /**< Coil size. */
+    float base;                                                      /**< Baseline. */
+    Eigen::Vector3f r0;                                              /**< Coil coordinate system origin. */
+    Eigen::Vector3f ex;                                              /**< Coil coordinate system x unit vector. */
+    Eigen::Vector3f ey;                                              /**< Coil coordinate system y unit vector. */
+    Eigen::Vector3f ez;                                              /**< Coil coordinate system z unit vector. */
+    int np;                                                          /**< Number of integration points. */
+    Eigen::Matrix<float, Eigen::Dynamic, 3, Eigen::RowMajor> rmag;   /**< The field point locations (np x 3). */
+    Eigen::Matrix<float, Eigen::Dynamic, 3, Eigen::RowMajor> cosmag; /**< The corresponding direction cosines (np x 3). */
+    Eigen::VectorXf w;                                               /**< The weighting coefficients. */
 
     /**
      * Return a read-only map to the j-th integration point position (3 contiguous floats).
@@ -179,14 +182,20 @@ public:
      * @param[in] j      Integration point index (0 to np - 1).
      * @return Read-only view of row j of rmag, in m.
      */
-    Eigen::Map<const Eigen::Vector3f> pos(int j) const { return Eigen::Map<const Eigen::Vector3f>(rmag.row(j).data()); }
+    Eigen::Map<const Eigen::Vector3f> pos(int j) const
+    {
+        return Eigen::Map<const Eigen::Vector3f>(rmag.row(j).data());
+    }
     /**
      * Return a read-only map to the j-th integration point direction cosine.
      *
      * @param[in] j      Integration point index (0 to np - 1).
      * @return Read-only view of row j of cosmag (unit direction vector).
      */
-    Eigen::Map<const Eigen::Vector3f> dir(int j) const { return Eigen::Map<const Eigen::Vector3f>(cosmag.row(j).data()); }
+    Eigen::Map<const Eigen::Vector3f> dir(int j) const
+    {
+        return Eigen::Map<const Eigen::Vector3f>(cosmag.row(j).data());
+    }
 };
 
 //=============================================================================================================

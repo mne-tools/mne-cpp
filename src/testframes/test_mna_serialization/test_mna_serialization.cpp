@@ -182,19 +182,19 @@ void TestMnaSerialization::testFileRoleToString_data()
     QTest::addColumn<int>("role");
     QTest::addColumn<QString>("expected");
 
-    QTest::newRow("Raw")            << static_cast<int>(MnaFileRole::Raw)            << "raw";
-    QTest::newRow("Forward")        << static_cast<int>(MnaFileRole::Forward)        << "forward";
-    QTest::newRow("Inverse")        << static_cast<int>(MnaFileRole::Inverse)        << "inverse";
-    QTest::newRow("Covariance")     << static_cast<int>(MnaFileRole::Covariance)     << "covariance";
+    QTest::newRow("Raw") << static_cast<int>(MnaFileRole::Raw) << "raw";
+    QTest::newRow("Forward") << static_cast<int>(MnaFileRole::Forward) << "forward";
+    QTest::newRow("Inverse") << static_cast<int>(MnaFileRole::Inverse) << "inverse";
+    QTest::newRow("Covariance") << static_cast<int>(MnaFileRole::Covariance) << "covariance";
     QTest::newRow("SourceEstimate") << static_cast<int>(MnaFileRole::SourceEstimate) << "source_estimate";
-    QTest::newRow("Bem")            << static_cast<int>(MnaFileRole::Bem)            << "bem";
-    QTest::newRow("Surface")        << static_cast<int>(MnaFileRole::Surface)        << "surface";
-    QTest::newRow("Annotation")     << static_cast<int>(MnaFileRole::Annotation)     << "annotation";
-    QTest::newRow("Digitizer")      << static_cast<int>(MnaFileRole::Digitizer)      << "digitizer";
-    QTest::newRow("Transform")      << static_cast<int>(MnaFileRole::Transform)      << "transform";
-    QTest::newRow("SourceSpace")    << static_cast<int>(MnaFileRole::SourceSpace)    << "source_space";
-    QTest::newRow("Evoked")         << static_cast<int>(MnaFileRole::Evoked)         << "evoked";
-    QTest::newRow("Custom")         << static_cast<int>(MnaFileRole::Custom)         << "custom";
+    QTest::newRow("Bem") << static_cast<int>(MnaFileRole::Bem) << "bem";
+    QTest::newRow("Surface") << static_cast<int>(MnaFileRole::Surface) << "surface";
+    QTest::newRow("Annotation") << static_cast<int>(MnaFileRole::Annotation) << "annotation";
+    QTest::newRow("Digitizer") << static_cast<int>(MnaFileRole::Digitizer) << "digitizer";
+    QTest::newRow("Transform") << static_cast<int>(MnaFileRole::Transform) << "transform";
+    QTest::newRow("SourceSpace") << static_cast<int>(MnaFileRole::SourceSpace) << "source_space";
+    QTest::newRow("Evoked") << static_cast<int>(MnaFileRole::Evoked) << "evoked";
+    QTest::newRow("Custom") << static_cast<int>(MnaFileRole::Custom) << "custom";
 }
 
 void TestMnaSerialization::testFileRoleToString()
@@ -209,19 +209,19 @@ void TestMnaSerialization::testFileRoleFromString_data()
     QTest::addColumn<QString>("input");
     QTest::addColumn<int>("expected");
 
-    QTest::newRow("Raw")            << "raw"               << static_cast<int>(MnaFileRole::Raw);
-    QTest::newRow("Forward")        << "forward"           << static_cast<int>(MnaFileRole::Forward);
-    QTest::newRow("Inverse")        << "inverse"           << static_cast<int>(MnaFileRole::Inverse);
-    QTest::newRow("Covariance")     << "covariance"        << static_cast<int>(MnaFileRole::Covariance);
-    QTest::newRow("SourceEstimate") << "source_estimate"   << static_cast<int>(MnaFileRole::SourceEstimate);
-    QTest::newRow("Bem")            << "bem"               << static_cast<int>(MnaFileRole::Bem);
-    QTest::newRow("Surface")        << "surface"           << static_cast<int>(MnaFileRole::Surface);
-    QTest::newRow("Annotation")     << "annotation"        << static_cast<int>(MnaFileRole::Annotation);
-    QTest::newRow("Digitizer")      << "digitizer"         << static_cast<int>(MnaFileRole::Digitizer);
-    QTest::newRow("Transform")      << "transform"         << static_cast<int>(MnaFileRole::Transform);
-    QTest::newRow("SourceSpace")    << "source_space"      << static_cast<int>(MnaFileRole::SourceSpace);
-    QTest::newRow("Evoked")         << "evoked"            << static_cast<int>(MnaFileRole::Evoked);
-    QTest::newRow("Custom")         << "custom"            << static_cast<int>(MnaFileRole::Custom);
+    QTest::newRow("Raw") << "raw" << static_cast<int>(MnaFileRole::Raw);
+    QTest::newRow("Forward") << "forward" << static_cast<int>(MnaFileRole::Forward);
+    QTest::newRow("Inverse") << "inverse" << static_cast<int>(MnaFileRole::Inverse);
+    QTest::newRow("Covariance") << "covariance" << static_cast<int>(MnaFileRole::Covariance);
+    QTest::newRow("SourceEstimate") << "source_estimate" << static_cast<int>(MnaFileRole::SourceEstimate);
+    QTest::newRow("Bem") << "bem" << static_cast<int>(MnaFileRole::Bem);
+    QTest::newRow("Surface") << "surface" << static_cast<int>(MnaFileRole::Surface);
+    QTest::newRow("Annotation") << "annotation" << static_cast<int>(MnaFileRole::Annotation);
+    QTest::newRow("Digitizer") << "digitizer" << static_cast<int>(MnaFileRole::Digitizer);
+    QTest::newRow("Transform") << "transform" << static_cast<int>(MnaFileRole::Transform);
+    QTest::newRow("SourceSpace") << "source_space" << static_cast<int>(MnaFileRole::SourceSpace);
+    QTest::newRow("Evoked") << "evoked" << static_cast<int>(MnaFileRole::Evoked);
+    QTest::newRow("Custom") << "custom" << static_cast<int>(MnaFileRole::Custom);
 }
 
 void TestMnaSerialization::testFileRoleFromString()
@@ -245,21 +245,21 @@ void TestMnaSerialization::testDataKindToString_data()
     QTest::addColumn<int>("kind");
     QTest::addColumn<QString>("expected");
 
-    QTest::newRow("FiffRaw")        << static_cast<int>(MnaDataKind::FiffRaw)        << "FiffRaw";
-    QTest::newRow("Forward")        << static_cast<int>(MnaDataKind::Forward)        << "Forward";
-    QTest::newRow("Inverse")        << static_cast<int>(MnaDataKind::Inverse)        << "Inverse";
-    QTest::newRow("Covariance")     << static_cast<int>(MnaDataKind::Covariance)     << "Covariance";
+    QTest::newRow("FiffRaw") << static_cast<int>(MnaDataKind::FiffRaw) << "FiffRaw";
+    QTest::newRow("Forward") << static_cast<int>(MnaDataKind::Forward) << "Forward";
+    QTest::newRow("Inverse") << static_cast<int>(MnaDataKind::Inverse) << "Inverse";
+    QTest::newRow("Covariance") << static_cast<int>(MnaDataKind::Covariance) << "Covariance";
     QTest::newRow("SourceEstimate") << static_cast<int>(MnaDataKind::SourceEstimate) << "SourceEstimate";
-    QTest::newRow("Epochs")         << static_cast<int>(MnaDataKind::Epochs)         << "Epochs";
-    QTest::newRow("Evoked")         << static_cast<int>(MnaDataKind::Evoked)         << "Evoked";
-    QTest::newRow("Matrix")         << static_cast<int>(MnaDataKind::Matrix)         << "Matrix";
-    QTest::newRow("Volume")         << static_cast<int>(MnaDataKind::Volume)         << "Volume";
-    QTest::newRow("Surface")        << static_cast<int>(MnaDataKind::Surface)        << "Surface";
-    QTest::newRow("Bem")            << static_cast<int>(MnaDataKind::Bem)            << "Bem";
-    QTest::newRow("Annotation")     << static_cast<int>(MnaDataKind::Annotation)     << "Annotation";
-    QTest::newRow("Label")          << static_cast<int>(MnaDataKind::Label)          << "Label";
+    QTest::newRow("Epochs") << static_cast<int>(MnaDataKind::Epochs) << "Epochs";
+    QTest::newRow("Evoked") << static_cast<int>(MnaDataKind::Evoked) << "Evoked";
+    QTest::newRow("Matrix") << static_cast<int>(MnaDataKind::Matrix) << "Matrix";
+    QTest::newRow("Volume") << static_cast<int>(MnaDataKind::Volume) << "Volume";
+    QTest::newRow("Surface") << static_cast<int>(MnaDataKind::Surface) << "Surface";
+    QTest::newRow("Bem") << static_cast<int>(MnaDataKind::Bem) << "Bem";
+    QTest::newRow("Annotation") << static_cast<int>(MnaDataKind::Annotation) << "Annotation";
+    QTest::newRow("Label") << static_cast<int>(MnaDataKind::Label) << "Label";
     QTest::newRow("RealTimeStream") << static_cast<int>(MnaDataKind::RealTimeStream) << "RealTimeStream";
-    QTest::newRow("Custom")         << static_cast<int>(MnaDataKind::Custom)         << "Custom";
+    QTest::newRow("Custom") << static_cast<int>(MnaDataKind::Custom) << "Custom";
 }
 
 void TestMnaSerialization::testDataKindToString()
@@ -274,21 +274,21 @@ void TestMnaSerialization::testDataKindFromString_data()
     QTest::addColumn<QString>("input");
     QTest::addColumn<int>("expected");
 
-    QTest::newRow("FiffRaw")        << "FiffRaw"        << static_cast<int>(MnaDataKind::FiffRaw);
-    QTest::newRow("Forward")        << "Forward"        << static_cast<int>(MnaDataKind::Forward);
-    QTest::newRow("Inverse")        << "Inverse"        << static_cast<int>(MnaDataKind::Inverse);
-    QTest::newRow("Covariance")     << "Covariance"     << static_cast<int>(MnaDataKind::Covariance);
+    QTest::newRow("FiffRaw") << "FiffRaw" << static_cast<int>(MnaDataKind::FiffRaw);
+    QTest::newRow("Forward") << "Forward" << static_cast<int>(MnaDataKind::Forward);
+    QTest::newRow("Inverse") << "Inverse" << static_cast<int>(MnaDataKind::Inverse);
+    QTest::newRow("Covariance") << "Covariance" << static_cast<int>(MnaDataKind::Covariance);
     QTest::newRow("SourceEstimate") << "SourceEstimate" << static_cast<int>(MnaDataKind::SourceEstimate);
-    QTest::newRow("Epochs")         << "Epochs"         << static_cast<int>(MnaDataKind::Epochs);
-    QTest::newRow("Evoked")         << "Evoked"         << static_cast<int>(MnaDataKind::Evoked);
-    QTest::newRow("Matrix")         << "Matrix"         << static_cast<int>(MnaDataKind::Matrix);
-    QTest::newRow("Volume")         << "Volume"         << static_cast<int>(MnaDataKind::Volume);
-    QTest::newRow("Surface")        << "Surface"        << static_cast<int>(MnaDataKind::Surface);
-    QTest::newRow("Bem")            << "Bem"            << static_cast<int>(MnaDataKind::Bem);
-    QTest::newRow("Annotation")     << "Annotation"     << static_cast<int>(MnaDataKind::Annotation);
-    QTest::newRow("Label")          << "Label"          << static_cast<int>(MnaDataKind::Label);
+    QTest::newRow("Epochs") << "Epochs" << static_cast<int>(MnaDataKind::Epochs);
+    QTest::newRow("Evoked") << "Evoked" << static_cast<int>(MnaDataKind::Evoked);
+    QTest::newRow("Matrix") << "Matrix" << static_cast<int>(MnaDataKind::Matrix);
+    QTest::newRow("Volume") << "Volume" << static_cast<int>(MnaDataKind::Volume);
+    QTest::newRow("Surface") << "Surface" << static_cast<int>(MnaDataKind::Surface);
+    QTest::newRow("Bem") << "Bem" << static_cast<int>(MnaDataKind::Bem);
+    QTest::newRow("Annotation") << "Annotation" << static_cast<int>(MnaDataKind::Annotation);
+    QTest::newRow("Label") << "Label" << static_cast<int>(MnaDataKind::Label);
     QTest::newRow("RealTimeStream") << "RealTimeStream" << static_cast<int>(MnaDataKind::RealTimeStream);
-    QTest::newRow("Custom")         << "Custom"         << static_cast<int>(MnaDataKind::Custom);
+    QTest::newRow("Custom") << "Custom" << static_cast<int>(MnaDataKind::Custom);
 }
 
 void TestMnaSerialization::testDataKindFromString()
@@ -824,9 +824,9 @@ void TestMnaSerialization::testNodeExecModeCbor_data()
     QTest::addColumn<int>("execMode");
     QTest::addColumn<QString>("label");
 
-    QTest::newRow("Batch")  << static_cast<int>(MnaNodeExecMode::Batch)  << "Batch";
+    QTest::newRow("Batch") << static_cast<int>(MnaNodeExecMode::Batch) << "Batch";
     QTest::newRow("Stream") << static_cast<int>(MnaNodeExecMode::Stream) << "Stream";
-    QTest::newRow("Ipc")    << static_cast<int>(MnaNodeExecMode::Ipc)    << "Ipc";
+    QTest::newRow("Ipc") << static_cast<int>(MnaNodeExecMode::Ipc) << "Ipc";
     QTest::newRow("Script") << static_cast<int>(MnaNodeExecMode::Script) << "Script";
 }
 
@@ -1050,8 +1050,14 @@ void TestMnaSerialization::testOpSchemaValidateValidNode()
     // Build a valid node
     MnaNode node;
     node.opType = "my_filter";
-    MnaPort in; in.name = "raw"; in.dataKind = MnaDataKind::FiffRaw; in.direction = MnaPortDir::Input;
-    MnaPort out; out.name = "filtered"; out.dataKind = MnaDataKind::FiffRaw; out.direction = MnaPortDir::Output;
+    MnaPort in;
+    in.name = "raw";
+    in.dataKind = MnaDataKind::FiffRaw;
+    in.direction = MnaPortDir::Input;
+    MnaPort out;
+    out.name = "filtered";
+    out.dataKind = MnaDataKind::FiffRaw;
+    out.direction = MnaPortDir::Output;
     node.inputs.append(in);
     node.outputs.append(out);
     node.attributes["cutoff_hz"] = 40.0;
@@ -1241,7 +1247,7 @@ void TestMnaSerialization::testProjectEmbeddedMnxRoundTrip()
     QCOMPARE(restored.subjects.size(), 1);
     QCOMPARE(restored.subjects[0].sessions[0].recordings[0].files.size(), 1);
 
-    const MnaFileRef &rRef = restored.subjects[0].sessions[0].recordings[0].files[0];
+    const MnaFileRef& rRef = restored.subjects[0].sessions[0].recordings[0].files[0];
     QCOMPARE(rRef.embedded, true);
     QCOMPARE(rRef.data.size(), 512);
     QCOMPARE(rRef.data, QByteArray(512, '\xAA'));
@@ -1335,7 +1341,7 @@ void TestMnaSerialization::testProjectMultiSubjectRoundTrip()
         QCOMPARE(restored.subjects[si].sessions.size(), 2);
         for (int sei = 0; sei < 2; ++sei) {
             QCOMPARE(restored.subjects[si].sessions[sei].recordings[0].files.size(), 2);
-            const auto &files = restored.subjects[si].sessions[sei].recordings[0].files;
+            const auto& files = restored.subjects[si].sessions[sei].recordings[0].files;
             QCOMPARE(files[0].role, MnaFileRole::Raw);
             QCOMPARE(files[0].data.size(), 64);
             QCOMPARE(files[1].role, MnaFileRole::SourceEstimate);
@@ -1389,9 +1395,9 @@ void TestMnaSerialization::testNodeWithAllExecModes_data()
     QTest::addColumn<int>("mode");
     QTest::addColumn<QString>("modeStr");
 
-    QTest::newRow("Batch")  << static_cast<int>(MnaNodeExecMode::Batch)  << "Batch";
+    QTest::newRow("Batch") << static_cast<int>(MnaNodeExecMode::Batch) << "Batch";
     QTest::newRow("Stream") << static_cast<int>(MnaNodeExecMode::Stream) << "Stream";
-    QTest::newRow("Ipc")    << static_cast<int>(MnaNodeExecMode::Ipc)    << "Ipc";
+    QTest::newRow("Ipc") << static_cast<int>(MnaNodeExecMode::Ipc) << "Ipc";
     QTest::newRow("Script") << static_cast<int>(MnaNodeExecMode::Script) << "Script";
 }
 

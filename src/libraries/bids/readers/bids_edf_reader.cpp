@@ -45,35 +45,35 @@ FiffChInfo EDFChannelInfo::toFiffChInfo() const
     info.logNo = channelNumber;
 
     QString sLabelUpper = label.toUpper();
-    if(!isMeasurement) {
+    if (!isMeasurement) {
         info.kind = sLabelUpper.contains("STIM") ? FIFFV_STIM_CH : FIFFV_MISC_CH;
     } else {
-        if(sLabelUpper.contains("ECOG"))
+        if (sLabelUpper.contains("ECOG"))
             info.kind = FIFFV_ECOG_CH;
-        else if(sLabelUpper.contains("SEEG"))
+        else if (sLabelUpper.contains("SEEG"))
             info.kind = FIFFV_SEEG_CH;
-        else if(sLabelUpper.contains("EEG"))
+        else if (sLabelUpper.contains("EEG"))
             info.kind = FIFFV_EEG_CH;
-        else if(sLabelUpper.contains("MEG"))
+        else if (sLabelUpper.contains("MEG"))
             info.kind = FIFFV_MEG_CH;
-        else if(sLabelUpper.contains("ECG"))
+        else if (sLabelUpper.contains("ECG"))
             info.kind = FIFFV_ECG_CH;
-        else if(sLabelUpper.contains("EOG"))
+        else if (sLabelUpper.contains("EOG"))
             info.kind = FIFFV_EOG_CH;
-        else if(sLabelUpper.contains("EMG"))
+        else if (sLabelUpper.contains("EMG"))
             info.kind = FIFFV_EMG_CH;
         else
             info.kind = FIFFV_MISC_CH;
     }
 
     QString sUnitUpper = physicalDimension.toUpper();
-    if(sUnitUpper.endsWith("V") || sUnitUpper.endsWith("VOLT")) {
+    if (sUnitUpper.endsWith("V") || sUnitUpper.endsWith("VOLT")) {
         info.unit = FIFF_UNIT_V;
-        if(sUnitUpper.startsWith("U") || sUnitUpper.startsWith("MICRO"))
+        if (sUnitUpper.startsWith("U") || sUnitUpper.startsWith("MICRO"))
             info.unit_mul = FIFF_UNITM_MU;
-        else if(sUnitUpper.startsWith("M") || sUnitUpper.startsWith("MILLI"))
+        else if (sUnitUpper.startsWith("M") || sUnitUpper.startsWith("MILLI"))
             info.unit_mul = FIFF_UNITM_M;
-        else if(sUnitUpper.startsWith("N") || sUnitUpper.startsWith("NANO"))
+        else if (sUnitUpper.startsWith("N") || sUnitUpper.startsWith("NANO"))
             info.unit_mul = FIFF_UNITM_N;
         else
             info.unit_mul = FIFF_UNITM_NONE;
@@ -94,7 +94,7 @@ FiffChInfo EDFChannelInfo::toFiffChInfo() const
 //=============================================================================================================
 
 EDFReader::EDFReader(float fScaleFactor)
-    : m_fScaleFactor(fScaleFactor)
+: m_fScaleFactor(fScaleFactor)
 {
 }
 
@@ -102,7 +102,7 @@ EDFReader::EDFReader(float fScaleFactor)
 
 EDFReader::~EDFReader()
 {
-    if(m_file.isOpen()) {
+    if (m_file.isOpen()) {
         m_file.close();
     }
 }
@@ -114,7 +114,7 @@ bool EDFReader::open(const QString& sFilePath)
     m_sFilePath = sFilePath;
     m_file.setFileName(sFilePath);
 
-    if(!m_file.open(QIODevice::ReadOnly)) {
+    if (!m_file.open(QIODevice::ReadOnly)) {
         qWarning() << "[EDFReader::open] Could not open file:" << sFilePath;
         return false;
     }
@@ -128,7 +128,7 @@ bool EDFReader::open(const QString& sFilePath)
 
 void EDFReader::parseHeader(QIODevice* pDev)
 {
-    if(pDev->pos() != 0) {
+    if (pDev->pos() != 0) {
         pDev->seek(0);
     }
 
@@ -150,30 +150,30 @@ void EDFReader::parseHeader(QIODevice* pDev)
     QVector<float> vPhysMins, vPhysMaxs;
     QVector<long> vDigMins, vDigMaxs, vSamplesPerRecord;
 
-    for(int i = 0; i < m_iNumChannels; ++i)
+    for (int i = 0; i < m_iNumChannels; ++i)
         vLabels.push_back(QString::fromLatin1(pDev->read(SIG_LABEL)).trimmed());
-    for(int i = 0; i < m_iNumChannels; ++i)
+    for (int i = 0; i < m_iNumChannels; ++i)
         vTransducers.push_back(QString::fromLatin1(pDev->read(SIG_TRANSDUCER)).trimmed());
-    for(int i = 0; i < m_iNumChannels; ++i)
+    for (int i = 0; i < m_iNumChannels; ++i)
         vPhysDims.push_back(QString::fromLatin1(pDev->read(SIG_PHYS_DIM)).trimmed());
-    for(int i = 0; i < m_iNumChannels; ++i)
+    for (int i = 0; i < m_iNumChannels; ++i)
         vPhysMins.push_back(QString::fromLatin1(pDev->read(SIG_PHYS_MIN)).toFloat());
-    for(int i = 0; i < m_iNumChannels; ++i)
+    for (int i = 0; i < m_iNumChannels; ++i)
         vPhysMaxs.push_back(QString::fromLatin1(pDev->read(SIG_PHYS_MAX)).toFloat());
-    for(int i = 0; i < m_iNumChannels; ++i)
+    for (int i = 0; i < m_iNumChannels; ++i)
         vDigMins.push_back(QString::fromLatin1(pDev->read(SIG_DIG_MIN)).toLong());
-    for(int i = 0; i < m_iNumChannels; ++i)
+    for (int i = 0; i < m_iNumChannels; ++i)
         vDigMaxs.push_back(QString::fromLatin1(pDev->read(SIG_DIG_MAX)).toLong());
-    for(int i = 0; i < m_iNumChannels; ++i)
+    for (int i = 0; i < m_iNumChannels; ++i)
         vPrefilterings.push_back(QString::fromLatin1(pDev->read(SIG_PREFILTERING)).trimmed());
-    for(int i = 0; i < m_iNumChannels; ++i)
+    for (int i = 0; i < m_iNumChannels; ++i)
         vSamplesPerRecord.push_back(QString::fromLatin1(pDev->read(SIG_NUM_SAMPLES)).toLong());
-    for(int i = 0; i < m_iNumChannels; ++i)
+    for (int i = 0; i < m_iNumChannels; ++i)
         pDev->read(SIG_RESERVED);
 
     // Build channel info structs
     m_vAllChannels.clear();
-    for(int i = 0; i < m_iNumChannels; ++i) {
+    for (int i = 0; i < m_iNumChannels; ++i) {
         EDFChannelInfo ch;
         ch.channelNumber = i;
         ch.label = vLabels[i];
@@ -187,35 +187,35 @@ void EDFReader::parseHeader(QIODevice* pDev)
         ch.samplesPerRecord = vSamplesPerRecord[i];
         ch.sampleCount = vSamplesPerRecord[i] * m_iNumDataRecords;
         ch.frequency = (m_fDataRecordsDuration > 0.0f)
-                         ? vSamplesPerRecord[i] / m_fDataRecordsDuration
-                         : 0.0f;
+            ? vSamplesPerRecord[i] / m_fDataRecordsDuration
+            : 0.0f;
         ch.isMeasurement = false;
         m_vAllChannels.push_back(ch);
     }
 
     // Verify header size consistency
-    if(pDev->pos() != m_iNumBytesInHeader) {
+    if (pDev->pos() != m_iNumBytesInHeader) {
         qWarning() << "[EDFReader::parseHeader] Header byte count mismatch: read"
-                    << pDev->pos() << "expected" << m_iNumBytesInHeader;
+                   << pDev->pos() << "expected" << m_iNumBytesInHeader;
     }
 
     // Calculate bytes per data record
     m_iNumBytesPerDataRecord = 0;
-    for(const auto& ch : m_vAllChannels) {
-        m_iNumBytesPerDataRecord += ch.samplesPerRecord * 2;  // 16-bit integers
+    for (const auto& ch : m_vAllChannels) {
+        m_iNumBytesPerDataRecord += ch.samplesPerRecord * 2; // 16-bit integers
     }
 
     // Identify measurement channels (those with the highest sample rate)
     long iMaxSamplesPerRecord = -1;
-    for(const auto& ch : m_vAllChannels) {
-        if(ch.samplesPerRecord > iMaxSamplesPerRecord) {
+    for (const auto& ch : m_vAllChannels) {
+        if (ch.samplesPerRecord > iMaxSamplesPerRecord) {
             iMaxSamplesPerRecord = ch.samplesPerRecord;
         }
     }
 
     m_vMeasChannels.clear();
-    for(int i = 0; i < m_vAllChannels.size(); ++i) {
-        if(m_vAllChannels[i].samplesPerRecord == iMaxSamplesPerRecord) {
+    for (int i = 0; i < m_vAllChannels.size(); ++i) {
+        if (m_vAllChannels[i].samplesPerRecord == iMaxSamplesPerRecord) {
             m_vAllChannels[i].isMeasurement = true;
             m_vMeasChannels.push_back(m_vAllChannels[i]);
         }
@@ -229,7 +229,7 @@ FiffInfo EDFReader::getInfo() const
     FiffInfo info;
     info.nchan = m_vMeasChannels.size();
 
-    for(const auto& ch : m_vMeasChannels) {
+    for (const auto& ch : m_vMeasChannels) {
         FiffChInfo fiffCh = ch.toFiffChInfo();
         info.chs.append(fiffCh);
         info.ch_names.append(fiffCh.ch_name);
@@ -243,26 +243,26 @@ FiffInfo EDFReader::getInfo() const
 
 MatrixXf EDFReader::readRawSegment(int iStartSampleIdx, int iEndSampleIdx) const
 {
-    if(!m_bIsOpen) {
+    if (!m_bIsOpen) {
         qWarning() << "[EDFReader::readRawSegment] File not open";
         return MatrixXf();
     }
 
     long totalSamples = getSampleCount();
-    if(iStartSampleIdx < 0 || iStartSampleIdx >= totalSamples ||
-       iEndSampleIdx < 0 || iEndSampleIdx > totalSamples) {
+    if (iStartSampleIdx < 0 || iStartSampleIdx >= totalSamples ||
+        iEndSampleIdx < 0 || iEndSampleIdx > totalSamples) {
         qWarning() << "[EDFReader::readRawSegment] Index out of bounds:"
-                    << iStartSampleIdx << "-" << iEndSampleIdx;
+                   << iStartSampleIdx << "-" << iEndSampleIdx;
         return MatrixXf();
     }
 
     int iNumSamples = iEndSampleIdx - iStartSampleIdx;
-    if(iNumSamples <= 0) {
+    if (iNumSamples <= 0) {
         return MatrixXf();
     }
 
     int iSamplesPerRecord = m_vMeasChannels.isEmpty() ? 0 : m_vMeasChannels[0].samplesPerRecord;
-    if(iSamplesPerRecord <= 0) {
+    if (iSamplesPerRecord <= 0) {
         return MatrixXf();
     }
 
@@ -278,18 +278,18 @@ MatrixXf EDFReader::readRawSegment(int iStartSampleIdx, int iEndSampleIdx) const
     // Read needed data records
     QVector<QByteArray> vRecords;
     vRecords.reserve(iNumRecords);
-    for(int i = 0; i < iNumRecords; ++i) {
+    for (int i = 0; i < iNumRecords; ++i) {
         vRecords.push_back(m_file.read(m_iNumBytesPerDataRecord));
     }
 
     // Demultiplex: channels are interleaved within each record
     QVector<QVector<int>> vRawPatches(m_vAllChannels.size());
-    for(int iRec = 0; iRec < vRecords.size(); ++iRec) {
+    for (int iRec = 0; iRec < vRecords.size(); ++iRec) {
         int iOffset = 0;
-        for(int iCh = 0; iCh < m_vAllChannels.size(); ++iCh) {
+        for (int iCh = 0; iCh < m_vAllChannels.size(); ++iCh) {
             int nSamp = m_vAllChannels[iCh].samplesPerRecord;
             QVector<int> patch(nSamp);
-            for(int s = 0; s < nSamp; ++s) {
+            for (int s = 0; s < nSamp; ++s) {
                 int byteIdx = (iOffset + s) * 2;
                 // 16-bit little-endian signed integer
                 patch[s] = static_cast<int16_t>(
@@ -304,8 +304,8 @@ MatrixXf EDFReader::readRawSegment(int iStartSampleIdx, int iEndSampleIdx) const
     // Filter to measurement channels only
     QVector<QVector<int>> vMeasPatches;
     vMeasPatches.reserve(m_vMeasChannels.size());
-    for(int iCh = 0; iCh < m_vAllChannels.size(); ++iCh) {
-        if(m_vAllChannels[iCh].isMeasurement) {
+    for (int iCh = 0; iCh < m_vAllChannels.size(); ++iCh) {
+        if (m_vAllChannels[iCh].isMeasurement) {
             vMeasPatches.push_back(vRawPatches[iCh]);
         }
     }
@@ -313,16 +313,15 @@ MatrixXf EDFReader::readRawSegment(int iStartSampleIdx, int iEndSampleIdx) const
     // Scale and copy to result matrix
     MatrixXf result(vMeasPatches.size(), iNumSamples);
 
-    for(int iCh = 0; iCh < vMeasPatches.size(); ++iCh) {
+    for (int iCh = 0; iCh < vMeasPatches.size(); ++iCh) {
         const EDFChannelInfo& ch = m_vMeasChannels[iCh];
         float digRange = static_cast<float>(ch.digitalMax - ch.digitalMin);
         float physRange = ch.physicalMax - ch.physicalMin;
 
-        for(int s = 0; s < iNumSamples; ++s) {
+        for (int s = 0; s < iNumSamples; ++s) {
             int rawIdx = s + iRelativeFirst;
-            float physVal = static_cast<float>(vMeasPatches[iCh][rawIdx] - ch.digitalMin) / digRange
-                            * physRange + ch.physicalMin;
-            if(ch.isMeasurement) {
+            float physVal = static_cast<float>(vMeasPatches[iCh][rawIdx] - ch.digitalMin) / digRange * physRange + ch.physicalMin;
+            if (ch.isMeasurement) {
                 physVal /= m_fScaleFactor;
             }
             result(iCh, s) = physVal;
@@ -336,7 +335,7 @@ MatrixXf EDFReader::readRawSegment(int iStartSampleIdx, int iEndSampleIdx) const
 
 long EDFReader::getSampleCount() const
 {
-    if(!m_vMeasChannels.isEmpty()) {
+    if (!m_vMeasChannels.isEmpty()) {
         return m_vMeasChannels[0].sampleCount;
     }
     return 0;
@@ -346,7 +345,7 @@ long EDFReader::getSampleCount() const
 
 float EDFReader::getFrequency() const
 {
-    if(!m_vMeasChannels.isEmpty()) {
+    if (!m_vMeasChannels.isEmpty()) {
         return m_vMeasChannels[0].frequency;
     }
     return 0.0f;
@@ -369,7 +368,7 @@ FiffRawData EDFReader::toFiffRawData() const
     raw.last_samp = getSampleCount();
 
     RowVectorXd cals(raw.info.nchan);
-    for(int i = 0; i < raw.info.chs.size(); ++i) {
+    for (int i = 0; i < raw.info.chs.size(); ++i) {
         cals[i] = static_cast<double>(raw.info.chs[i].cal);
     }
     raw.cals = cals;

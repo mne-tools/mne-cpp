@@ -52,7 +52,7 @@ using namespace MNEANALYZESTUDIO;
  *
  * @brief Checks the studio extension result widgets against malformed input.
  */
-class TestStudioExtensionWidgets: public QObject
+class TestStudioExtensionWidgets : public QObject
 {
     Q_OBJECT
 
@@ -129,13 +129,13 @@ void TestStudioExtensionWidgets::spectrumPlot_mismatchedArrayLengths_data()
     // The two arrays are parallel but nothing enforces that at the setter, so
     // every disagreement a caller can produce is checked. Painting indexes
     // both, and reading past the end of the shorter one is the failure.
-    QTest::newRow("equal")            << 16 << 16;
-    QTest::newRow("more frequencies") << 16 <<  4;
-    QTest::newRow("more values")      <<  4 << 16;
-    QTest::newRow("frequencies only") << 16 <<  0;
-    QTest::newRow("values only")      <<  0 << 16;
-    QTest::newRow("both empty")       <<  0 <<  0;
-    QTest::newRow("single point")     <<  1 <<  1;
+    QTest::newRow("equal") << 16 << 16;
+    QTest::newRow("more frequencies") << 16 << 4;
+    QTest::newRow("more values") << 4 << 16;
+    QTest::newRow("frequencies only") << 16 << 0;
+    QTest::newRow("values only") << 0 << 16;
+    QTest::newRow("both empty") << 0 << 0;
+    QTest::newRow("single point") << 1 << 1;
 }
 
 //=============================================================================================================
@@ -146,12 +146,12 @@ void TestStudioExtensionWidgets::spectrumPlot_mismatchedArrayLengths()
     QFETCH(int, valueCount);
 
     QVector<double> frequencies;
-    for(int i = 0; i < frequencyCount; ++i) {
+    for (int i = 0; i < frequencyCount; ++i) {
         frequencies.append(1.0 + i);
     }
 
     QVector<double> values;
-    for(int i = 0; i < valueCount; ++i) {
+    for (int i = 0; i < valueCount; ++i) {
         values.append(0.5 * i);
     }
 
@@ -247,16 +247,16 @@ void TestStudioExtensionWidgets::analysisResults_malformedResultIsSurvivable_dat
     // Everything here is something a skill can really return: a failure, a
     // result with no payload, one whose fields are the wrong type. The widget
     // does not construct these objects so it cannot assume their shape.
-    QTest::newRow("empty")            << QJsonObject{};
-    QTest::newRow("error status")     << QJsonObject{{"status", "error"},
-                                                     {"message", "something failed"}};
-    QTest::newRow("status only")      << QJsonObject{{"status", "ok"}};
-    QTest::newRow("wrong types")      << QJsonObject{{"status", 42},
-                                                     {"message", QJsonArray{1, 2, 3}}};
-    QTest::newRow("null payload")     << QJsonObject{{"status", "ok"},
-                                                     {"payload", QJsonValue::Null}};
-    QTest::newRow("nested empty")     << QJsonObject{{"status", "ok"},
-                                                     {"payload", QJsonObject{}}};
+    QTest::newRow("empty") << QJsonObject{};
+    QTest::newRow("error status") << QJsonObject{{"status", "error"},
+                                                 {"message", "something failed"}};
+    QTest::newRow("status only") << QJsonObject{{"status", "ok"}};
+    QTest::newRow("wrong types") << QJsonObject{{"status", 42},
+                                                {"message", QJsonArray{1, 2, 3}}};
+    QTest::newRow("null payload") << QJsonObject{{"status", "ok"},
+                                                 {"payload", QJsonValue::Null}};
+    QTest::newRow("nested empty") << QJsonObject{{"status", "ok"},
+                                                 {"payload", QJsonObject{}}};
 }
 
 //=============================================================================================================
@@ -308,8 +308,7 @@ void TestStudioExtensionWidgets::psdResult_malformedResultIsSurvivable()
     const QJsonObject mismatched{
         {"status", "ok"},
         {"frequencies", QJsonArray{1.0, 2.0, 3.0, 4.0}},
-        {"values", QJsonArray{0.1, 0.2}}
-    };
+        {"values", QJsonArray{0.1, 0.2}}};
     widget.setResult("neurokernel.psd", mismatched);
     paintOffscreen(&widget);
 
@@ -317,8 +316,7 @@ void TestStudioExtensionWidgets::psdResult_malformedResultIsSurvivable()
     widget.setComparisonResult(QJsonObject{
         {"status", "ok"},
         {"frequencies", QJsonArray{1.0}},
-        {"values", QJsonArray{0.1, 0.2, 0.3}}
-    });
+        {"values", QJsonArray{0.1, 0.2, 0.3}}});
     paintOffscreen(&widget);
 
     // And an object with none of the expected keys at all.

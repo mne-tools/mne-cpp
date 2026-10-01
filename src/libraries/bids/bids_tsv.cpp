@@ -58,13 +58,13 @@ BidsTsv::~BidsTsv()
 //=============================================================================================================
 
 QList<BidsTsvRow> BidsTsv::readTsv(const QString& sFilePath,
-                                    QStringList& headers)
+                                   QStringList& headers)
 {
     QList<BidsTsvRow> rows;
     headers.clear();
 
     QFile file(sFilePath);
-    if(!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
+    if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
         qWarning() << "[BidsTsv::readTsv] Cannot open" << sFilePath;
         return rows;
     }
@@ -72,21 +72,21 @@ QList<BidsTsvRow> BidsTsv::readTsv(const QString& sFilePath,
     QTextStream in(&file);
     bool firstLine = true;
 
-    while(!in.atEnd()) {
+    while (!in.atEnd()) {
         QString line = in.readLine().trimmed();
-        if(line.isEmpty())
+        if (line.isEmpty())
             continue;
 
         QStringList fields = line.split(QLatin1Char('\t'));
 
-        if(firstLine) {
+        if (firstLine) {
             headers = fields;
             firstLine = false;
             continue;
         }
 
         BidsTsvRow row;
-        for(int i = 0; i < headers.size() && i < fields.size(); ++i) {
+        for (int i = 0; i < headers.size() && i < fields.size(); ++i) {
             row[headers[i]] = fields[i];
         }
         rows.append(row);
@@ -99,11 +99,11 @@ QList<BidsTsvRow> BidsTsv::readTsv(const QString& sFilePath,
 //=============================================================================================================
 
 bool BidsTsv::writeTsv(const QString& sFilePath,
-                        const QStringList& headers,
-                        const QList<BidsTsvRow>& rows)
+                       const QStringList& headers,
+                       const QList<BidsTsvRow>& rows)
 {
     QFile file(sFilePath);
-    if(!file.open(QIODevice::WriteOnly | QIODevice::Text)) {
+    if (!file.open(QIODevice::WriteOnly | QIODevice::Text)) {
         qWarning() << "[BidsTsv::writeTsv] Cannot open" << sFilePath << "for writing";
         return false;
     }
@@ -114,10 +114,10 @@ bool BidsTsv::writeTsv(const QString& sFilePath,
     out << headers.join(QLatin1Char('\t')) << QLatin1Char('\n');
 
     // Data rows
-    for(const auto& row : rows) {
+    for (const auto& row : rows) {
         QStringList fields;
         fields.reserve(headers.size());
-        for(const auto& header : headers) {
+        for (const auto& header : headers) {
             fields << valOrNA(row.value(header));
         }
         out << fields.join(QLatin1Char('\t')) << QLatin1Char('\n');

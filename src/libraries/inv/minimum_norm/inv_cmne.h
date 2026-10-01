@@ -46,7 +46,10 @@
 //=============================================================================================================
 
 #ifndef WASMBUILD
-namespace UTILSLIB { struct PythonRunnerResult; }
+namespace UTILSLIB
+{
+struct PythonRunnerResult;
+}
 #endif
 
 //=============================================================================================================
@@ -64,10 +67,10 @@ namespace INVLIB
  */
 struct INVSHARED_EXPORT InvCMNEResult
 {
-    InvSourceEstimate stcDspm;       /**< Uncorrected dSPM estimate. */
-    InvSourceEstimate stcCmne;       /**< CMNE-corrected estimate. */
-    InvSourceEstimate stcLstmPredict;/**< Raw LSTM prediction (diagnostics). */
-    Eigen::MatrixXd matKernelDspm;   /**< Static dSPM kernel (n_sources x n_channels). */
+    InvSourceEstimate stcDspm;        /**< Uncorrected dSPM estimate. */
+    InvSourceEstimate stcCmne;        /**< CMNE-corrected estimate. */
+    InvSourceEstimate stcLstmPredict; /**< Raw LSTM prediction (diagnostics). */
+    Eigen::MatrixXd matKernelDspm;    /**< Static dSPM kernel (n_sources x n_channels). */
 };
 
 //=============================================================================================================

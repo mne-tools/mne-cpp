@@ -51,9 +51,9 @@ using namespace ANSHAREDLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-StatusBar::StatusBar(QWidget *pParent)
-    : QStatusBar(pParent)
-    , m_iMsgTimeout(20000)
+StatusBar::StatusBar(QWidget* pParent)
+: QStatusBar(pParent)
+, m_iMsgTimeout(20000)
 {
     QVector<EVENT_TYPE> vSubs = {EVENT_TYPE::STATUS_BAR_MSG, EVENT_TYPE::LOADING_START, EVENT_TYPE::LOADING_END};
     m_pCommunicator = new Communicator(std::move(vSubs));
@@ -81,44 +81,44 @@ StatusBar::~StatusBar()
 
 void StatusBar::onNewMessageReceived(const QSharedPointer<Event> pEvent)
 {
-    switch(pEvent->getType()) {
+    switch (pEvent->getType()) {
         case EVENT_TYPE::STATUS_BAR_MSG: {
-            if(pEvent->getData().canConvert<QString>()) {
+            if (pEvent->getData().canConvert<QString>()) {
                 showMessage(pEvent->getData().toString(), m_iMsgTimeout);
                 break;
             }
             qWarning() << "[StatusBar::onNewMessageReceived] Received a message/event that cannot be parsed";
             break;
         }
-        case EVENT_TYPE::LOADING_START : {
-            if(pEvent->getData().canConvert<QString>()) {
+        case EVENT_TYPE::LOADING_START: {
+            if (pEvent->getData().canConvert<QString>()) {
                 m_LoadingStack.push(pEvent->getData().toString());
                 m_pProgressView->setMessage(m_LoadingStack.top());
             }
             m_pProgressView->show();
             break;
         }
-        case EVENT_TYPE::LOADING_END : {
-            if(pEvent->getData().canConvert<QString>()){
-                if(m_LoadingStack.contains(pEvent->getData().toString())){
+        case EVENT_TYPE::LOADING_END: {
+            if (pEvent->getData().canConvert<QString>()) {
+                if (m_LoadingStack.contains(pEvent->getData().toString())) {
                     m_LoadingStack[m_LoadingStack.indexOf(pEvent->getData().toString())] = "";
                 }
             }
-            if(!m_LoadingStack.isEmpty()){
-                while(m_LoadingStack.top() == ""){
+            if (!m_LoadingStack.isEmpty()) {
+                while (m_LoadingStack.top() == "") {
                     m_LoadingStack.pop();
-                    if(m_LoadingStack.isEmpty()){
+                    if (m_LoadingStack.isEmpty()) {
                         m_pProgressView->hide();
                         m_pProgressView->setMessage("");
-                        if (m_pHoverWidget){
+                        if (m_pHoverWidget) {
                             m_pHoverWidget->hide();
-                            delete  m_pHoverWidget;
+                            delete m_pHoverWidget;
                         }
                         break;
                     }
                 }
             }
-            if(!m_LoadingStack.isEmpty()){
+            if (!m_LoadingStack.isEmpty()) {
                 m_pProgressView->setMessage(m_LoadingStack.top());
             }
             break;
@@ -137,7 +137,7 @@ void StatusBar::enterEvent(QEvent* event)
 void StatusBar::enterEvent(QEnterEvent* event)
 #endif
 {
-    if(m_LoadingStack.isEmpty()){
+    if (m_LoadingStack.isEmpty()) {
         return;
     }
 
@@ -149,8 +149,8 @@ void StatusBar::enterEvent(QEnterEvent* event)
 
     QLabel* pMessageHeader = new QLabel("<u><b>Current Processes:</b></u>");
     layout->addWidget(pMessageHeader);
-    for (auto& message : m_LoadingStack){
-        if(message != ""){
+    for (auto& message : m_LoadingStack) {
+        if (message != "") {
             layout->addWidget(new QLabel(message));
         }
     }
@@ -163,14 +163,14 @@ void StatusBar::enterEvent(QEnterEvent* event)
 
 //=============================================================================================================
 
-void StatusBar::leaveEvent(QEvent *event)
+void StatusBar::leaveEvent(QEvent* event)
 {
-    if (!m_pHoverWidget){
+    if (!m_pHoverWidget) {
         return;
     }
 
     m_pHoverWidget->hide();
-    delete  m_pHoverWidget;
+    delete m_pHoverWidget;
     QWidget::leaveEvent(event);
 }
 

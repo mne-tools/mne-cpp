@@ -51,18 +51,16 @@ using namespace Eigen;
 // INIT STATIC MEMBERS
 //=============================================================================================================
 
-QVector<UTILSLIB::FilterParameter> FilterKernel::m_designMethods ({
+QVector<UTILSLIB::FilterParameter> FilterKernel::m_designMethods({
     FilterParameter(QString("Cosine"), QString("A cosine filter")),
     FilterParameter(QString("Tschebyscheff"), QString("A tschebyscheff filter"))
-//    FilterParameter(QString("External"), QString("An external filter"))
+    //    FilterParameter(QString("External"), QString("An external filter"))
 });
-QVector<UTILSLIB::FilterParameter> FilterKernel::m_filterTypes ({
-    FilterParameter(QString("LPF"), QString("An LPF filter")),
-    FilterParameter(QString("HPF"), QString("An HPF filter")),
-    FilterParameter(QString("BPF"), QString("A BPF filter")),
-    FilterParameter(QString("NOTCH"), QString("A NOTCH filter")),
-    FilterParameter(QString("UNKNOWN"), QString("An UNKNOWN filter"))
-});
+QVector<UTILSLIB::FilterParameter> FilterKernel::m_filterTypes({FilterParameter(QString("LPF"), QString("An LPF filter")),
+                                                                FilterParameter(QString("HPF"), QString("An HPF filter")),
+                                                                FilterParameter(QString("BPF"), QString("A BPF filter")),
+                                                                FilterParameter(QString("NOTCH"), QString("A NOTCH filter")),
+                                                                FilterParameter(QString("UNKNOWN"), QString("An UNKNOWN filter"))});
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS
@@ -104,8 +102,8 @@ FilterKernel::FilterKernel(const QString& sFilterName,
 , m_sFilterName(sFilterName)
 , m_sFilterShortDescription()
 {
-    if(iOrder < 9) {
-       qWarning() << "[FilterKernel::FilterKernel] Less than 9 taps were provided. Setting number of taps to 9.";
+    if (iOrder < 9) {
+        qWarning() << "[FilterKernel::FilterKernel] Less than 9 taps were provided. Setting number of taps to 9.";
     }
 
     designFilter();
@@ -122,7 +120,7 @@ void FilterKernel::prepareFilter(int iDataSize)
     iFftLength = pow(2, exp);
 
     // Transform coefficients anew if needed
-    if(m_vecCoeff.cols() != (iFftLength/2+1)) {
+    if (m_vecCoeff.cols() != (iFftLength / 2 + 1)) {
         fftTransformCoeffs(iFftLength);
     }
 }
@@ -133,22 +131,22 @@ RowVectorXd FilterKernel::applyConvFilter(const RowVectorXd& vecData,
                                           bool bKeepOverhead) const
 {
     //Do zero padding or mirroring depending on user input
-    RowVectorXd vecDataZeroPad = RowVectorXd::Zero(2*m_vecCoeff.cols() + vecData.cols());
-    RowVectorXd vecFilteredTime = RowVectorXd::Zero(2*m_vecCoeff.cols() + vecData.cols());
+    RowVectorXd vecDataZeroPad = RowVectorXd::Zero(2 * m_vecCoeff.cols() + vecData.cols());
+    RowVectorXd vecFilteredTime = RowVectorXd::Zero(2 * m_vecCoeff.cols() + vecData.cols());
 
     vecDataZeroPad.segment(m_vecCoeff.cols(), vecData.cols()) = vecData;
 
     //Do the convolution
-    for(int i = m_vecCoeff.cols(); i < vecFilteredTime.cols(); i++) {
-        vecFilteredTime(i-m_vecCoeff.cols()) = vecDataZeroPad.segment(i-m_vecCoeff.cols(),m_vecCoeff.cols()) * m_vecCoeff.transpose();
+    for (int i = m_vecCoeff.cols(); i < vecFilteredTime.cols(); i++) {
+        vecFilteredTime(i - m_vecCoeff.cols()) = vecDataZeroPad.segment(i - m_vecCoeff.cols(), m_vecCoeff.cols()) * m_vecCoeff.transpose();
     }
 
     //Return filtered data
-    if(!bKeepOverhead) {
-        return vecFilteredTime.segment(m_vecCoeff.cols()/2, vecData.cols());
+    if (!bKeepOverhead) {
+        return vecFilteredTime.segment(m_vecCoeff.cols() / 2, vecData.cols());
     }
 
-    return vecFilteredTime.head(vecData.cols()+m_vecCoeff.cols());
+    return vecFilteredTime.head(vecData.cols() + m_vecCoeff.cols());
 }
 
 //=============================================================================================================
@@ -156,9 +154,9 @@ RowVectorXd FilterKernel::applyConvFilter(const RowVectorXd& vecData,
 void FilterKernel::applyFftFilter(RowVectorXd& vecData,
                                   bool bKeepOverhead)
 {
-    #ifdef EIGEN_FFTW_DEFAULT
+#ifdef EIGEN_FFTW_DEFAULT
     fftw_make_planner_thread_safe();
-    #endif
+#endif
 
     // Make sure we always have the correct FFT length for the given input data and filter overlap
     int iFftLength = vecData.cols() + m_vecCoeff.cols();
@@ -166,7 +164,7 @@ void FilterKernel::applyFftFilter(RowVectorXd& vecData,
     iFftLength = pow(2, exp);
 
     // Transform coefficients anew if needed
-    if(m_vecFftCoeff.cols() != (iFftLength/2+1)) {
+    if (m_vecFftCoeff.cols() != (iFftLength / 2 + 1)) {
         fftTransformCoeffs(iFftLength);
     }
 
@@ -193,8 +191,8 @@ void FilterKernel::applyFftFilter(RowVectorXd& vecData,
     fft.inv(vecData, vecFreqData);
 
     //Return filtered data
-    if(!bKeepOverhead) {
-        vecData = vecData.segment(m_vecCoeff.cols()/2, iOriginalSize).eval();
+    if (!bKeepOverhead) {
+        vecData = vecData.segment(m_vecCoeff.cols() / 2, iOriginalSize).eval();
     } else {
         vecData = vecData.head(iOriginalSize + m_vecCoeff.cols()).eval();
     }
@@ -344,12 +342,12 @@ void FilterKernel::setFftCoefficients(const Eigen::RowVectorXcd& vecFftCoeff)
 
 bool FilterKernel::fftTransformCoeffs(int iFftLength)
 {
-    #ifdef EIGEN_FFTW_DEFAULT
-        fftw_make_planner_thread_safe();
-    #endif
+#ifdef EIGEN_FFTW_DEFAULT
+    fftw_make_planner_thread_safe();
+#endif
 
-    if(m_vecCoeff.cols() > iFftLength) {
-        std::cout <<"[FilterKernel::fftTransformCoeffs] The number of filter taps is bigger than the FFT length."<< std::endl;
+    if (m_vecCoeff.cols() > iFftLength) {
+        std::cout << "[FilterKernel::fftTransformCoeffs] The number of filter taps is bigger than the FFT length." << std::endl;
         return false;
     }
 
@@ -361,7 +359,7 @@ bool FilterKernel::fftTransformCoeffs(int iFftLength)
     RowVectorXd vecInputFft;
     if (m_vecCoeff.cols() < iFftLength) {
         vecInputFft.setZero(iFftLength);
-        vecInputFft.block(0,0,1,m_vecCoeff.cols()) = m_vecCoeff;
+        vecInputFft.block(0, 0, 1, m_vecCoeff.cols()) = m_vecCoeff;
     } else {
         vecInputFft = m_vecCoeff;
     }
@@ -369,7 +367,8 @@ bool FilterKernel::fftTransformCoeffs(int iFftLength)
     //fft-transform filter coeffs
     RowVectorXcd vecFreqData;
     fft.fwd(vecFreqData, vecInputFft, iFftLength);
-    m_vecFftCoeff = vecFreqData;;
+    m_vecFftCoeff = vecFreqData;
+    ;
 
     return true;
 }
@@ -383,21 +382,21 @@ void FilterKernel::designFilter()
     int exp = ceil(Numerics::log2(iFftLength));
     iFftLength = pow(2, exp);
 
-    if(m_iDesignMethod == 0) {
+    if (m_iDesignMethod == 0) {
         double dSmallestFeatureHz = m_dParksWidth * (m_sFreq / 2.0);
         const double dLowEdgeHz = std::max(0.0, (m_dCenterFreq - m_dBandwidth / 2.0) * (m_sFreq / 2.0));
         const double dHighEdgeHz = std::max(0.0, (m_dCenterFreq + m_dBandwidth / 2.0) * (m_sFreq / 2.0));
         const double dSingleCutoffHz = std::max(0.0, m_dCenterFreq * (m_sFreq / 2.0));
 
-        if(m_iFilterType == 0 || m_iFilterType == 1) {
-            if(dSingleCutoffHz > 0.0) {
+        if (m_iFilterType == 0 || m_iFilterType == 1) {
+            if (dSingleCutoffHz > 0.0) {
                 dSmallestFeatureHz = std::min(dSmallestFeatureHz, dSingleCutoffHz);
             }
         } else {
-            if(dLowEdgeHz > 0.0) {
+            if (dLowEdgeHz > 0.0) {
                 dSmallestFeatureHz = std::min(dSmallestFeatureHz, dLowEdgeHz);
             }
-            if(dHighEdgeHz > 0.0) {
+            if (dHighEdgeHz > 0.0) {
                 dSmallestFeatureHz = std::min(dSmallestFeatureHz, dHighEdgeHz);
             }
         }
@@ -405,13 +404,13 @@ void FilterKernel::designFilter()
         dSmallestFeatureHz = std::max(0.5, dSmallestFeatureHz);
 
         const int iRecommendedFftLength = static_cast<int>(std::ceil((m_sFreq / dSmallestFeatureHz) * 8.0));
-        if(iRecommendedFftLength > iFftLength) {
+        if (iRecommendedFftLength > iFftLength) {
             int iRecommendedExp = ceil(Numerics::log2(iRecommendedFftLength));
             iFftLength = pow(2, iRecommendedExp);
         }
     }
 
-    switch(m_iDesignMethod) {
+    switch (m_iDesignMethod) {
         case 1: {
             ParksMcClellan filter(m_iFilterOrder,
                                   m_dCenterFreq,
@@ -429,13 +428,13 @@ void FilterKernel::designFilter()
         case 0: {
             CosineFilter filtercos;
 
-            switch(m_iFilterType) {
+            switch (m_iFilterType) {
                 case 0:
                     filtercos = CosineFilter(iFftLength,
-                                             (m_dCenterFreq)*(m_sFreq/2.),
-                                             m_dParksWidth*(m_sFreq/2),
-                                             (m_dCenterFreq)*(m_sFreq/2),
-                                             m_dParksWidth*(m_sFreq/2),
+                                             (m_dCenterFreq) * (m_sFreq / 2.),
+                                             m_dParksWidth * (m_sFreq / 2),
+                                             (m_dCenterFreq) * (m_sFreq / 2),
+                                             m_dParksWidth * (m_sFreq / 2),
                                              m_sFreq,
                                              static_cast<CosineFilter::TPassType>(m_iFilterType));
 
@@ -443,10 +442,10 @@ void FilterKernel::designFilter()
 
                 case 1:
                     filtercos = CosineFilter(iFftLength,
-                                             (m_dCenterFreq)*(m_sFreq/2),
-                                             m_dParksWidth*(m_sFreq/2),
-                                             (m_dCenterFreq)*(m_sFreq/2),
-                                             m_dParksWidth*(m_sFreq/2),
+                                             (m_dCenterFreq) * (m_sFreq / 2),
+                                             m_dParksWidth * (m_sFreq / 2),
+                                             (m_dCenterFreq) * (m_sFreq / 2),
+                                             m_dParksWidth * (m_sFreq / 2),
                                              m_sFreq,
                                              static_cast<CosineFilter::TPassType>(m_iFilterType));
 
@@ -454,10 +453,10 @@ void FilterKernel::designFilter()
 
                 case 2:
                     filtercos = CosineFilter(iFftLength,
-                                             (m_dCenterFreq + m_dBandwidth/2)*(m_sFreq/2),
-                                             m_dParksWidth*(m_sFreq/2),
-                                             (m_dCenterFreq - m_dBandwidth/2)*(m_sFreq/2),
-                                             m_dParksWidth*(m_sFreq/2),
+                                             (m_dCenterFreq + m_dBandwidth / 2) * (m_sFreq / 2),
+                                             m_dParksWidth * (m_sFreq / 2),
+                                             (m_dCenterFreq - m_dBandwidth / 2) * (m_sFreq / 2),
+                                             m_dParksWidth * (m_sFreq / 2),
                                              m_sFreq,
                                              static_cast<CosineFilter::TPassType>(m_iFilterType));
 
@@ -467,8 +466,8 @@ void FilterKernel::designFilter()
             //This filter is designed in the frequency domain, hence the time domain impulse response need to be shortend by the users dependent number of taps
             m_vecCoeff.resize(m_iFilterOrder);
 
-            m_vecCoeff.head(m_iFilterOrder/2) = filtercos.m_vecCoeff.tail(m_iFilterOrder/2);
-            m_vecCoeff.tail(m_iFilterOrder/2) = filtercos.m_vecCoeff.head(m_iFilterOrder/2);
+            m_vecCoeff.head(m_iFilterOrder / 2) = filtercos.m_vecCoeff.tail(m_iFilterOrder / 2);
+            m_vecCoeff.tail(m_iFilterOrder / 2) = filtercos.m_vecCoeff.head(m_iFilterOrder / 2);
 
             //Now generate the fft version of the shortened impulse response
             fftTransformCoeffs(iFftLength);
@@ -477,21 +476,21 @@ void FilterKernel::designFilter()
         }
     }
 
-    switch(m_iFilterType) {
+    switch (m_iFilterType) {
         case 0:
             m_dLowpassFreq = 0;
-            m_dHighpassFreq = m_dCenterFreq*(m_sFreq/2);
-        break;
+            m_dHighpassFreq = m_dCenterFreq * (m_sFreq / 2);
+            break;
 
         case 1:
-            m_dLowpassFreq = m_dCenterFreq*(m_sFreq/2);
+            m_dLowpassFreq = m_dCenterFreq * (m_sFreq / 2);
             m_dHighpassFreq = 0;
-        break;
+            break;
 
         case 2:
-            m_dLowpassFreq = (m_dCenterFreq + m_dBandwidth/2)*(m_sFreq/2);
-            m_dHighpassFreq = (m_dCenterFreq - m_dBandwidth/2)*(m_sFreq/2);
-        break;
+            m_dLowpassFreq = (m_dCenterFreq + m_dBandwidth / 2) * (m_sFreq / 2);
+            m_dHighpassFreq = (m_dCenterFreq - m_dBandwidth / 2) * (m_sFreq / 2);
+            break;
     }
     getShortDescription();
 }
@@ -500,9 +499,10 @@ void FilterKernel::designFilter()
 
 QString FilterKernel::getShortDescription() const
 {
-    QString description(m_designMethods.at(m_iDesignMethod).getName() + "  -  " + \
-                                QString::number(m_dHighpassFreq,'g',4) + "Hz to " + QString::number(m_dLowpassFreq,'g',4) + "Hz  -  " \
-                                "Ord: " + QString::number(m_iFilterOrder));
+    QString description(m_designMethods.at(m_iDesignMethod).getName() + "  -  " +
+                        QString::number(m_dHighpassFreq, 'g', 4) + "Hz to " + QString::number(m_dLowpassFreq, 'g', 4) + "Hz  -  "
+                                                                                                                        "Ord: " +
+                        QString::number(m_iFilterOrder));
     return description;
 }
 
@@ -510,7 +510,7 @@ QString FilterKernel::getShortDescription() const
 
 UTILSLIB::FilterParameter FilterKernel::getDesignMethod() const
 {
-    if(m_iDesignMethod < 0){
+    if (m_iDesignMethod < 0) {
         return m_designMethods.at(0);
     }
     return m_designMethods.at(m_iDesignMethod);
@@ -520,7 +520,7 @@ UTILSLIB::FilterParameter FilterKernel::getDesignMethod() const
 
 UTILSLIB::FilterParameter FilterKernel::getFilterType() const
 {
-    if(m_iFilterType < 0){
+    if (m_iFilterType < 0) {
         return m_filterTypes.at(0);
     }
     return m_filterTypes.at(m_iFilterType);
@@ -530,7 +530,7 @@ UTILSLIB::FilterParameter FilterKernel::getFilterType() const
 
 void FilterKernel::setDesignMethod(int iDesignMethod)
 {
-    if(iDesignMethod < 0){
+    if (iDesignMethod < 0) {
         m_iDesignMethod = 0;
     } else {
         m_iDesignMethod = iDesignMethod;
@@ -541,7 +541,7 @@ void FilterKernel::setDesignMethod(int iDesignMethod)
 
 void FilterKernel::setFilterType(int iFilterType)
 {
-    if(iFilterType < 0){
+    if (iFilterType < 0) {
         m_iFilterType = 0;
     } else {
         m_iFilterType = iFilterType;
@@ -551,25 +551,24 @@ void FilterKernel::setFilterType(int iFilterType)
 //=============================================================================================================
 
 FilterParameter::FilterParameter()
-:FilterParameter("Unknown", "")
+: FilterParameter("Unknown", "")
 {
 }
 
 //=============================================================================================================
 
 FilterParameter::FilterParameter(QString sName)
-:FilterParameter(sName,"")
+: FilterParameter(sName, "")
 {
 }
 
 //=============================================================================================================
 
 FilterParameter::FilterParameter(QString sName,
-                           QString sDescription)
+                                 QString sDescription)
 : m_sName(sName)
 , m_sDescription(sDescription)
 {
-
 }
 
 //=============================================================================================================

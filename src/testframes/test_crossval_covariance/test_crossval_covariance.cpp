@@ -96,23 +96,23 @@ private:
     void computePythonCovariance();
 
     // Shared test state
-    QString          m_sDataPath;
-    QString          m_sRawFile;
-    QTemporaryDir    m_tempDir;
+    QString m_sDataPath;
+    QString m_sRawFile;
+    QTemporaryDir m_tempDir;
 
     PythonTestHelper m_pyHelper;
-    bool             m_bPythonAvailable = false;
+    bool m_bPythonAvailable = false;
 
     // C++ results
     MatrixXd m_cppCov;
-    double   m_cppAlpha = -1.0;
+    double m_cppAlpha = -1.0;
 
     // Python results
     MatrixXd m_pyCov;
-    double   m_pyAlpha  = -1.0;
+    double m_pyAlpha = -1.0;
 
     // Number of MEG channels used (for sanity checks)
-    int      m_nChannels = 0;
+    int m_nChannels = 0;
 };
 
 //=============================================================================================================
@@ -121,7 +121,7 @@ void TestCrossvalCovariance::initTestCase()
 {
     // --- Paths ---
     m_sDataPath = PythonTestHelper::testDataPath();
-    m_sRawFile  = m_sDataPath + "MEG/sample/sample_audvis_trunc_raw.fif";
+    m_sRawFile = m_sDataPath + "MEG/sample/sample_audvis_trunc_raw.fif";
 
     QVERIFY2(QFile::exists(m_sRawFile),
              qPrintable(QString("Test data not found: %1").arg(m_sRawFile)));
@@ -130,7 +130,7 @@ void TestCrossvalCovariance::initTestCase()
     // --- Python availability ---
     // Report status explicitly so test output always shows what was found.
     bool hasPython = m_pyHelper.isPythonAvailable();
-    bool hasMne    = hasPython && m_pyHelper.hasPackage("mne");
+    bool hasMne = hasPython && m_pyHelper.hasPackage("mne");
     bool hasSklearn = hasPython && m_pyHelper.hasPackage("sklearn");
     m_bPythonAvailable = hasMne && hasSklearn;
 
@@ -157,16 +157,16 @@ void TestCrossvalCovariance::computeCppCovariance()
     FiffRawData raw(file);
 
     // 2. Pick MEG channels only
-    RowVectorXi picks = raw.info.pick_types(true  /*meg*/,
-                                             false /*eeg*/,
-                                             false /*stim*/);
+    RowVectorXi picks = raw.info.pick_types(true /*meg*/,
+                                            false /*eeg*/,
+                                            false /*stim*/);
     m_nChannels = picks.size();
     QVERIFY2(m_nChannels > 0, "No MEG channels found in raw file");
 
     // 3. Read ~1 second of data (enough for stable covariance, fast in CI)
     fiff_int_t from = raw.first_samp;
-    fiff_int_t to   = qMin(raw.first_samp + static_cast<fiff_int_t>(raw.info.sfreq),
-                           raw.last_samp);
+    fiff_int_t to = qMin(raw.first_samp + static_cast<fiff_int_t>(raw.info.sfreq),
+                         raw.last_samp);
 
     MatrixXd data, times;
     raw.read_raw_segment(data, times, from, to, picks);
@@ -179,7 +179,7 @@ void TestCrossvalCovariance::computeCppCovariance()
 
     // 5. Compute Ledoit-Wolf covariance
     auto [cov, alpha] = StsCovEstimators::ledoitWolf(data);
-    m_cppCov   = cov;
+    m_cppCov = cov;
     m_cppAlpha = alpha;
 
     QCOMPARE(m_cppCov.rows(), m_nChannels);
@@ -209,37 +209,38 @@ void TestCrossvalCovariance::computePythonCovariance()
     // to stdout for evalDouble-style capture.
     //
     QString pyCode = QString(
-        "import mne\n"
-        "import numpy as np\n"
-        "from sklearn.covariance import ledoit_wolf\n"
-        "\n"
-        "raw = mne.io.read_raw_fif('%1', preload=True, verbose=False)\n"
-        "raw.pick('meg')\n"
-        "sfreq = raw.info['sfreq']\n"
-        "first = raw.first_samp\n"
-        "last  = min(first + int(sfreq), raw.last_samp)\n"
-        "\n"
-        "# Extract the same segment as C++: first_samp .. first_samp + sfreq\n"
-        "data = raw.get_data(start=0, stop=last - first + 1)\n"
-        "\n"
-        "# Zero-mean (row-wise, matching C++ convention)\n"
-        "data = data - data.mean(axis=1, keepdims=True)\n"
-        "\n"
-        "# Ledoit-Wolf (sklearn expects samples x features)\n"
-        "cov, shrinkage = ledoit_wolf(data.T)\n"
-        "\n"
-        "# Save covariance matrix to file (full precision)\n"
-        "np.savetxt('%2', cov, fmt='%.17e')\n"
-        "\n"
-        "# Print shrinkage to stdout\n"
-        "print(f'{shrinkage:.17e}')\n"
-    ).arg(m_sRawFile, covFilePath);
+                         "import mne\n"
+                         "import numpy as np\n"
+                         "from sklearn.covariance import ledoit_wolf\n"
+                         "\n"
+                         "raw = mne.io.read_raw_fif('%1', preload=True, verbose=False)\n"
+                         "raw.pick('meg')\n"
+                         "sfreq = raw.info['sfreq']\n"
+                         "first = raw.first_samp\n"
+                         "last  = min(first + int(sfreq), raw.last_samp)\n"
+                         "\n"
+                         "# Extract the same segment as C++: first_samp .. first_samp + sfreq\n"
+                         "data = raw.get_data(start=0, stop=last - first + 1)\n"
+                         "\n"
+                         "# Zero-mean (row-wise, matching C++ convention)\n"
+                         "data = data - data.mean(axis=1, keepdims=True)\n"
+                         "\n"
+                         "# Ledoit-Wolf (sklearn expects samples x features)\n"
+                         "cov, shrinkage = ledoit_wolf(data.T)\n"
+                         "\n"
+                         "# Save covariance matrix to file (full precision)\n"
+                         "np.savetxt('%2', cov, fmt='%.17e')\n"
+                         "\n"
+                         "# Print shrinkage to stdout\n"
+                         "print(f'{shrinkage:.17e}')\n")
+                         .arg(m_sRawFile, covFilePath);
 
     // Run Python and capture both the file and stdout
     PythonRunnerResult result = m_pyHelper.eval(pyCode, 120000);
     QVERIFY2(result.success,
              qPrintable(QString("Python failed (exit %1): %2")
-                       .arg(result.exitCode).arg(result.stdErr)));
+                            .arg(result.exitCode)
+                            .arg(result.stdErr)));
 
     // Parse shrinkage from stdout
     bool alphaOk = false;
@@ -289,7 +290,9 @@ void TestCrossvalCovariance::testLedoitWolfCovarianceVsPython()
     const double kRelTol = 0.02;
     QVERIFY2(relDiff < kRelTol,
              qPrintable(QString("Covariance matrices differ by %1 relative "
-                                "(tolerance: %2)").arg(relDiff).arg(kRelTol)));
+                                "(tolerance: %2)")
+                            .arg(relDiff)
+                            .arg(kRelTol)));
 }
 
 //=============================================================================================================
@@ -314,7 +317,10 @@ void TestCrossvalCovariance::testLedoitWolfShrinkageVsPython()
     QVERIFY2(absDiff < kAbsTol,
              qPrintable(QString("Shrinkage coefficients differ by %1 "
                                 "(C++=%2, Python=%3, tolerance=%4)")
-                       .arg(absDiff).arg(m_cppAlpha).arg(m_pyAlpha).arg(kAbsTol)));
+                            .arg(absDiff)
+                            .arg(m_cppAlpha)
+                            .arg(m_pyAlpha)
+                            .arg(kAbsTol)));
 }
 
 //=============================================================================================================
@@ -337,7 +343,8 @@ void TestCrossvalCovariance::testLedoitWolfSmokeTest()
     for (int i = 0; i < m_nChannels; ++i) {
         QVERIFY2(m_cppCov(i, i) > 0.0,
                  qPrintable(QString("Negative diagonal at index %1: %2")
-                           .arg(i).arg(m_cppCov(i, i))));
+                                .arg(i)
+                                .arg(m_cppCov(i, i))));
     }
 
     // Shrinkage in [0, 1]

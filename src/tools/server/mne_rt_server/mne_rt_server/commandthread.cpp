@@ -37,7 +37,7 @@ using namespace RTSERVER;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-CommandThread::CommandThread(int socketDescriptor, qint32 p_iId, QObject *parent)
+CommandThread::CommandThread(int socketDescriptor, qint32 p_iId, QObject* parent)
 : QThread(parent)
 , socketDescriptor(socketDescriptor)
 , m_bIsRunning(false)
@@ -58,8 +58,7 @@ CommandThread::~CommandThread()
 void CommandThread::attachCommandReply(QString p_blockReply, qint32 p_iID)
 {
     qDebug() << "CommandThread::attachCommandReply";
-    if(p_iID == m_iThreadID)
-    {
+    if (p_iID == m_iThreadID) {
         m_qMutex.lock();
         m_qSendData = p_blockReply;
         m_qMutex.unlock();
@@ -77,12 +76,10 @@ void CommandThread::run()
     if (!t_qTcpSocket.setSocketDescriptor(socketDescriptor)) {
         emit error(t_qTcpSocket.error());
         return;
-    }
-    else
-    {
-        qInfo("CommandClient connection accepted from\n\tIP:\t%s\n\tPort:\t%d\n" ,
-               QHostAddress(t_qTcpSocket.peerAddress()).toString().toUtf8().constData(),
-               t_qTcpSocket.peerPort());
+    } else {
+        qInfo("CommandClient connection accepted from\n\tIP:\t%s\n\tPort:\t%d\n",
+              QHostAddress(t_qTcpSocket.peerAddress()).toString().toUtf8().constData(),
+              t_qTcpSocket.peerPort());
     }
 
     QDataStream t_FiffStreamIn(&t_qTcpSocket);
@@ -92,14 +89,12 @@ void CommandThread::run()
     qint64 t_iMaxBufSize = 1024;
 #endif
 
-    while(t_qTcpSocket.state() != QAbstractSocket::UnconnectedState && m_bIsRunning)
-    {
+    while (t_qTcpSocket.state() != QAbstractSocket::UnconnectedState && m_bIsRunning) {
 #ifdef USENEWSERVER
         //
         // Write available data
         //
-        if(m_qSendData.size() > 0)
-        {
+        if (m_qSendData.size() > 0) {
             QByteArray block;
             QDataStream out(&block, QIODevice::WriteOnly);
             out.setVersion(QDataStream::Qt_6_0);
@@ -121,17 +116,15 @@ void CommandThread::run()
 
         t_qTcpSocket.waitForReadyRead(100);
 
-        if (t_qTcpSocket.bytesAvailable() >= (int)sizeof(quint16))
-        {
+        if (t_qTcpSocket.bytesAvailable() >= (int)sizeof(quint16)) {
             quint16 blockSize = 0;
 
             bool respComplete = false;
             t_FiffStreamIn >> blockSize;
 
-            while(!respComplete && blockSize < 65000)//Sanity Check -> allowed maximal blocksize is 65.000
+            while (!respComplete && blockSize < 65000) //Sanity Check -> allowed maximal blocksize is 65.000
             {
-                if (t_qTcpSocket.bytesAvailable() >= blockSize)
-                {
+                if (t_qTcpSocket.bytesAvailable() >= blockSize) {
                     QString t_sCommand;
 
                     t_FiffStreamIn >> t_sCommand;
@@ -141,7 +134,7 @@ void CommandThread::run()
                     //
                     // Parse command
                     //
-                    if(!t_sCommand.isEmpty())
+                    if (!t_sCommand.isEmpty())
                         emit newCommand(t_sCommand, m_iThreadID);
 
                     respComplete = true;
@@ -153,16 +146,15 @@ void CommandThread::run()
         //
         // Write available data
         //
-        if(m_qSendBlock.size() > 0)
-        {
+        if (m_qSendBlock.size() > 0) {
             qint32 t_iBlockSize = m_qSendBlock.size();
             m_qMutex.lock();
             qint32 t_iBytesWritten = t_qTcpSocket.write(m_qSendBlock);
             t_qTcpSocket.waitForBytesWritten();
-            if(t_iBytesWritten == t_iBlockSize)
+            if (t_iBytesWritten == t_iBlockSize)
                 m_qSendBlock.clear();
             else
-                m_qSendBlock = m_qSendBlock.mid(t_iBytesWritten, t_iBlockSize-t_iBytesWritten);
+                m_qSendBlock = m_qSendBlock.mid(t_iBytesWritten, t_iBlockSize - t_iBytesWritten);
             m_qMutex.unlock();
         }
 
@@ -172,25 +164,22 @@ void CommandThread::run()
         //ToDo its not the best solution in terms of receiving the command for sure
         t_qTcpSocket.waitForReadyRead(100);
 
-        if (t_qTcpSocket.bytesAvailable() > 0 && t_qTcpSocket.canReadLine())
-        {
+        if (t_qTcpSocket.bytesAvailable() > 0 && t_qTcpSocket.canReadLine()) {
             QByteArray t_qByteArrayRaw = t_qTcpSocket.readLine(t_iMaxBufSize);
             QString t_sCommand = QString(t_qByteArrayRaw).simplified();
 
             //
             // Parse command
             //
-            if(!t_sCommand.isEmpty())
+            if (!t_sCommand.isEmpty())
                 emit newCommand(t_sCommand, m_iThreadID);
-        }
-        else if(t_qTcpSocket.bytesAvailable() > t_iMaxBufSize)
-        {
-            t_qTcpSocket.readAll();//readAll that QTcpSocket is empty again -> prevent overflow
+        } else if (t_qTcpSocket.bytesAvailable() > t_iMaxBufSize) {
+            t_qTcpSocket.readAll(); //readAll that QTcpSocket is empty again -> prevent overflow
         }
 #endif
     }
 
     t_qTcpSocket.disconnectFromHost();
-    if(t_qTcpSocket.state() != QAbstractSocket::UnconnectedState)
+    if (t_qTcpSocket.state() != QAbstractSocket::UnconnectedState)
         t_qTcpSocket.waitForDisconnected();
 }

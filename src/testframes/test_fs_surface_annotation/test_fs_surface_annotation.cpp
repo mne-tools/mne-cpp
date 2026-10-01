@@ -20,18 +20,18 @@ class TestFsSurfaceAnnotation : public QObject
     Q_OBJECT
 
 private:
-    void makeTetrahedron(MatrixX3f &verts, MatrixX3i &tris)
+    void makeTetrahedron(MatrixX3f& verts, MatrixX3i& tris)
     {
         verts.resize(4, 3);
         verts << 0.0f, 0.0f, 1.0f,
-                 1.0f, 0.0f, 0.0f,
-                 -0.5f, 0.866f, 0.0f,
-                 -0.5f, -0.866f, 0.0f;
+            1.0f, 0.0f, 0.0f,
+            -0.5f, 0.866f, 0.0f,
+            -0.5f, -0.866f, 0.0f;
         tris.resize(4, 3);
         tris << 0, 1, 2,
-                0, 2, 3,
-                0, 3, 1,
-                1, 3, 2;
+            0, 2, 3,
+            0, 3, 1,
+            1, 3, 2;
     }
 
 private slots:
@@ -58,12 +58,12 @@ private slots:
     {
         MatrixX3f verts(4, 3);
         verts << 0.0f, 0.0f, 0.0f,
-                 1.0f, 0.0f, 0.0f,
-                 1.0f, 1.0f, 0.0f,
-                 0.0f, 1.0f, 0.0f;
+            1.0f, 0.0f, 0.0f,
+            1.0f, 1.0f, 0.0f,
+            0.0f, 1.0f, 0.0f;
         MatrixX3i tris(2, 3);
         tris << 0, 1, 2,
-                0, 2, 3;
+            0, 2, 3;
 
         MatrixX3f normals = FsSurface::compute_normals(verts, tris);
         QCOMPARE(normals.rows(), 4);
@@ -77,8 +77,8 @@ private slots:
     {
         MatrixX3f verts(3, 3);
         verts << 0.0f, 0.0f, 0.0f,
-                 1.0f, 0.0f, 0.0f,
-                 0.0f, 1.0f, 0.0f;
+            1.0f, 0.0f, 0.0f,
+            0.0f, 1.0f, 0.0f;
         MatrixX3i tris(1, 3);
         tris << 0, 1, 2;
 

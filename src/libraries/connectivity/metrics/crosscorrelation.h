@@ -64,7 +64,8 @@
 // DEFINE NAMESPACE CONNECTIVITYLIB
 //=============================================================================================================
 
-namespace CONNECTIVITYLIB {
+namespace CONNECTIVITYLIB
+{
 
 //=============================================================================================================
 // CONNECTIVITYLIB FORWARD DECLARATIONS
@@ -87,7 +88,6 @@ class Network;
  */
 class CONNECTIVITYSHARED_EXPORT CrossCorrelation : public AbstractMetric
 {
-
 public:
     typedef QSharedPointer<CrossCorrelation> SPtr;            /**< Shared pointer type for CrossCorrelation. */
     typedef QSharedPointer<const CrossCorrelation> ConstSPtr; /**< Const shared pointer type for CrossCorrelation. */
@@ -106,7 +106,7 @@ public:
      *
      * @return                   The connectivity information in form of a network structure.
      */
-    static Network calculate(ConnectivitySettings &connectivitySettings);
+    static Network calculate(ConnectivitySettings& connectivitySettings);
 
 protected:
     //=========================================================================================================

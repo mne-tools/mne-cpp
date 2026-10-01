@@ -41,8 +41,8 @@ InvVolumeSourceEstimate::InvVolumeSourceEstimate()
 //=============================================================================================================
 
 InvVolumeSourceEstimate::InvVolumeSourceEstimate(const MatrixXd& p_sol,
-                                                   const VectorXi& p_vertices,
-                                                   float p_tmin, float p_tstep)
+                                                 const VectorXi& p_vertices,
+                                                 float p_tmin, float p_tstep)
 : InvSourceEstimate(p_sol, p_vertices, p_tmin, p_tstep)
 {
     sourceSpaceType = InvSourceSpaceType::Volume;

@@ -80,7 +80,7 @@ public:
      * @param[in] flags          Window flags passed to the main window (default Qt::Widget).
      */
     explicit MultiView(const QString& sSettingsPath = "",
-                       QWidget *parent = Q_NULLPTR,
+                       QWidget* parent = Q_NULLPTR,
                        Qt::WindowFlags flags = Qt::Widget);
 
     //=========================================================================================================
@@ -99,7 +99,7 @@ public:
      * @return Returns a pointer to the added widget in form of a MultiViewWindow.
      */
     MultiViewWindow* addWidgetTop(QWidget* pWidget,
-                                  const QString &sName);
+                                  const QString& sName);
 
     //=========================================================================================================
     /**
@@ -126,13 +126,13 @@ public:
     void loadSettings();
 
 private:
-    QList<MultiViewWindow *>    m_lDockWidgets;
-    QString                     m_sSettingsPath;            /**< The settings path to store the GUI settings to. */
+    QList<MultiViewWindow*> m_lDockWidgets;
+    QString m_sSettingsPath; /**< The settings path to store the GUI settings to. */
 
 signals:
     void dockLocationChanged(QWidget* pWidget);
 };
 
-}// NAMESPACE
+} // NAMESPACE
 
 #endif // MULTIVIEW_H

@@ -62,9 +62,9 @@ using namespace Eigen;
 DecodingCsp::DecodingCsp(int nComponents,
                          TransformMode transformInto,
                          bool useLog)
-    : m_nComponents(nComponents)
-    , m_transformInto(transformInto)
-    , m_useLog(useLog)
+: m_nComponents(nComponents)
+, m_transformInto(transformInto)
+, m_useLog(useLog)
 {
 }
 
@@ -107,16 +107,14 @@ void DecodingCsp::fit(const std::vector<MatrixXd>& epochs,
     MatrixXd cov1 = MatrixXd::Zero(n_ch, n_ch);
     for (const auto& epoch : epochs1) {
         MatrixXd centered = epoch.colwise() - epoch.rowwise().mean();
-        cov1 += centered * centered.transpose()
-                / static_cast<double>(epoch.cols() - 1);
+        cov1 += centered * centered.transpose() / static_cast<double>(epoch.cols() - 1);
     }
     cov1 /= static_cast<double>(epochs1.size());
 
     MatrixXd cov2 = MatrixXd::Zero(n_ch, n_ch);
     for (const auto& epoch : epochs2) {
         MatrixXd centered = epoch.colwise() - epoch.rowwise().mean();
-        cov2 += centered * centered.transpose()
-                / static_cast<double>(epoch.cols() - 1);
+        cov2 += centered * centered.transpose() / static_cast<double>(epoch.cols() - 1);
     }
     cov2 /= static_cast<double>(epochs2.size());
 
@@ -130,11 +128,11 @@ void DecodingCsp::fit(const std::vector<MatrixXd>& epochs,
 
     const double d_min = d.maxCoeff() * 1e-10;
     for (Index i = 0; i < d.size(); ++i) {
-        if (d(i) < d_min) d(i) = d_min;
+        if (d(i) < d_min)
+            d(i) = d_min;
     }
 
-    MatrixXd W = d.array().sqrt().inverse().matrix().asDiagonal()
-                 * U.transpose();
+    MatrixXd W = d.array().sqrt().inverse().matrix().asDiagonal() * U.transpose();
 
     // Whiten class-1 covariance and eigendecompose
     MatrixXd S1 = W * cov1 * W.transpose();
@@ -178,8 +176,7 @@ void DecodingCsp::fit(const std::vector<MatrixXd>& epochs,
     m_std = VectorXd(powerFeatures.cols());
     for (int c = 0; c < powerFeatures.cols(); ++c) {
         centered = powerFeatures.col(c).array() - m_mean(c);
-        m_std(c) = std::sqrt(centered.squaredNorm()
-                             / static_cast<double>(centered.size()));
+        m_std(c) = std::sqrt(centered.squaredNorm() / static_cast<double>(centered.size()));
     }
 
     m_fitted = true;
@@ -215,7 +212,8 @@ MatrixXd DecodingCsp::transform(const std::vector<MatrixXd>& epochs) const
         // z-score
         for (int c = 0; c < X.cols(); ++c) {
             double s = m_std(c);
-            if (s < 1e-15) s = 1.0;
+            if (s < 1e-15)
+                s = 1.0;
             X.col(c) = (X.col(c).array() - m_mean(c)) / s;
         }
     }
@@ -314,8 +312,7 @@ MatrixXd DecodingCsp::computePowerFeatures(
     for (int e = 0; e < nEpochs; ++e) {
         MatrixXd filtered = m_filters * epochs[static_cast<size_t>(e)];
         for (int c = 0; c < nComp; ++c) {
-            features(e, c) = filtered.row(c).squaredNorm()
-                            / static_cast<double>(filtered.cols());
+            features(e, c) = filtered.row(c).squaredNorm() / static_cast<double>(filtered.cols());
         }
     }
 

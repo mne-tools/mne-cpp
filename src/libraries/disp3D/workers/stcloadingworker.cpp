@@ -27,18 +27,18 @@
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-StcLoadingWorker::StcLoadingWorker(const QString &lhPath,
-                                   const QString &rhPath,
-                                   BrainSurface *lhSurface,
-                                   BrainSurface *rhSurface,
+StcLoadingWorker::StcLoadingWorker(const QString& lhPath,
+                                   const QString& rhPath,
+                                   BrainSurface* lhSurface,
+                                   BrainSurface* rhSurface,
                                    double cancelDist,
-                                   QObject *parent)
-    : QObject(parent)
-    , m_lhPath(lhPath)
-    , m_rhPath(rhPath)
-    , m_lhSurface(lhSurface)
-    , m_rhSurface(rhSurface)
-    , m_cancelDist(cancelDist)
+                                   QObject* parent)
+: QObject(parent)
+, m_lhPath(lhPath)
+, m_rhPath(rhPath)
+, m_lhSurface(lhSurface)
+, m_rhSurface(rhSurface)
+, m_cancelDist(cancelDist)
 {
 }
 
@@ -51,10 +51,10 @@ StcLoadingWorker::~StcLoadingWorker()
 //=============================================================================================================
 
 QSharedPointer<Eigen::SparseMatrix<float>> StcLoadingWorker::computeInterpolationMatrix(
-    const Eigen::MatrixX3f &matVertices,
-    Eigen::VectorXi &vecSourceVertices,
+    const Eigen::MatrixX3f& matVertices,
+    Eigen::VectorXi& vecSourceVertices,
     double cancelDist,
-    const QString &hemiLabel,
+    const QString& hemiLabel,
     int progressStart,
     int progressEnd)
 {
@@ -87,8 +87,7 @@ QSharedPointer<Eigen::SparseMatrix<float>> StcLoadingWorker::computeInterpolatio
         DISP3DLIB::Interpolation::cubic,
         cancelDist,
         progressCallback,
-        &m_cancelled
-    );
+        &m_cancelled);
 
     if (m_cancelled.load(std::memory_order_relaxed))
         return QSharedPointer<Eigen::SparseMatrix<float>>();
@@ -135,7 +134,10 @@ void StcLoadingWorker::process()
         return;
     }
 
-    if (m_cancelled.load(std::memory_order_relaxed)) { emit finished(false); return; }
+    if (m_cancelled.load(std::memory_order_relaxed)) {
+        emit finished(false);
+        return;
+    }
 
     // Compute LH interpolation matrix
     if (m_hasLh && m_lhSurface) {
@@ -145,7 +147,10 @@ void StcLoadingWorker::process()
         if (vecSourceVertices.size() > 0) {
             m_interpMatLh = computeInterpolationMatrix(matVertices, vecSourceVertices, m_cancelDist,
                                                        "LH", 10, 45);
-            if (m_cancelled.load(std::memory_order_relaxed)) { emit finished(false); return; }
+            if (m_cancelled.load(std::memory_order_relaxed)) {
+                emit finished(false);
+                return;
+            }
         }
     }
 
@@ -157,7 +162,10 @@ void StcLoadingWorker::process()
         if (vecSourceVertices.size() > 0) {
             m_interpMatRh = computeInterpolationMatrix(matVertices, vecSourceVertices, m_cancelDist,
                                                        "RH", 50, 90);
-            if (m_cancelled.load(std::memory_order_relaxed)) { emit finished(false); return; }
+            if (m_cancelled.load(std::memory_order_relaxed)) {
+                emit finished(false);
+                return;
+            }
         }
     }
 

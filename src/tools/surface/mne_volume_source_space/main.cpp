@@ -53,7 +53,7 @@ using namespace Eigen;
 
 //=============================================================================================================
 
-int main(int argc, char *argv[])
+int main(int argc, char* argv[])
 {
     qInstallMessageHandler(MNELogger::customLogWriter);
     QCoreApplication app(argc, argv);
@@ -88,8 +88,14 @@ int main(int argc, char *argv[])
     float excludeMm = parser.value(excludeOpt).toFloat();
     float mindistMm = parser.value(mindistOpt).toFloat();
 
-    if (bemFile.isEmpty()) { qCritical("--bem is required."); parser.showHelp(1); }
-    if (outFile.isEmpty()) { qCritical("--out is required."); parser.showHelp(1); }
+    if (bemFile.isEmpty()) {
+        qCritical("--bem is required.");
+        parser.showHelp(1);
+    }
+    if (outFile.isEmpty()) {
+        qCritical("--out is required.");
+        parser.showHelp(1);
+    }
 
     // Convert mm to meters
     float grid = gridMm / 1000.0f;
@@ -114,9 +120,9 @@ int main(int argc, char *argv[])
     }
 
     const MNEBemSurface& innerSurf = bem[innerIdx];
-    qInfo("Using surface: %s (%d vertices, %d triangles)" ,
-           qPrintable(MNEBemSurface::id_name(innerSurf.id)),
-           innerSurf.np, innerSurf.ntri);
+    qInfo("Using surface: %s (%d vertices, %d triangles)",
+          qPrintable(MNEBemSurface::id_name(innerSurf.id)),
+          innerSurf.np, innerSurf.ntri);
 
     // Create MNESurface from BEM surface for the library function
     MNESurface surf;
@@ -128,8 +134,8 @@ int main(int argc, char *argv[])
     surf.id = innerSurf.id;
     surf.coord_frame = innerSurf.coord_frame;
 
-    qInfo("Creating volume source space (grid=%.1f mm, mindist=%.1f mm, exclude=%.1f mm)..." ,
-           gridMm, mindistMm, excludeMm);
+    qInfo("Creating volume source space (grid=%.1f mm, mindist=%.1f mm, exclude=%.1f mm)...",
+          gridMm, mindistMm, excludeMm);
 
     // Use the existing library function
     MNESourceSpace* sp = MNESourceSpace::make_volume_source_space(surf, grid, exclude, mindist);
@@ -138,7 +144,7 @@ int main(int argc, char *argv[])
         return 1;
     }
 
-    qInfo("Volume source space: %d total points, %d active" , sp->np, sp->nuse);
+    qInfo("Volume source space: %d total points, %d active", sp->np, sp->nuse);
 
     // Write output
     QFile outF(outFile);
@@ -160,7 +166,7 @@ int main(int argc, char *argv[])
     outStream->end_block(FIFFB_MNE);
     outStream->end_file();
     outF.close();
-    qInfo("Written volume source space to: %s" , qPrintable(outFile));
+    qInfo("Written volume source space to: %s", qPrintable(outFile));
 
     delete sp;
     return 0;

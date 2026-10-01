@@ -42,12 +42,14 @@
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-namespace Ui {
-    class TriggerDetectionViewWidget;
+namespace Ui
+{
+class TriggerDetectionViewWidget;
 }
 
-namespace FIFFLIB {
-    class FiffInfo;
+namespace FIFFLIB
+{
+class FiffInfo;
 }
 
 //=============================================================================================================
@@ -74,8 +76,8 @@ class DISPSHARED_EXPORT TriggerDetectionView : public AbstractView
     Q_OBJECT
 
 public:
-    typedef QSharedPointer<TriggerDetectionView> SPtr;              /**< Shared pointer type for TriggerDetectionView. */
-    typedef QSharedPointer<const TriggerDetectionView> ConstSPtr;   /**< Const shared pointer type for TriggerDetectionView. */
+    typedef QSharedPointer<TriggerDetectionView> SPtr;            /**< Shared pointer type for TriggerDetectionView. */
+    typedef QSharedPointer<const TriggerDetectionView> ConstSPtr; /**< Const shared pointer type for TriggerDetectionView. */
 
     //=========================================================================================================
     /**
@@ -86,7 +88,7 @@ public:
      * @param[in] f Qt window flags passed to the QWidget constructor.
      */
     TriggerDetectionView(const QString& sSettingsPath = "",
-                         QWidget *parent = 0,
+                         QWidget* parent = 0,
                          Qt::WindowFlags f = Qt::Widget);
 
     //=========================================================================================================
@@ -111,7 +113,7 @@ public:
      * @param[in] mapDetectedTriggers       The currently detected triggers.
      */
     void setNumberDetectedTriggersAndTypes(int totalNumberDetections,
-                                           const QMap<int,QList<QPair<int,double> > >& mapDetectedTriggers);
+                                           const QMap<int, QList<QPair<int, double>>>& mapDetectedTriggers);
 
     //=========================================================================================================
     /**
@@ -190,13 +192,13 @@ protected:
      */
     void onDetectTriggers();
 
-    Ui::TriggerDetectionViewWidget*                     m_pUi;
+    Ui::TriggerDetectionViewWidget* m_pUi;
 
-    QSharedPointer<FIFFLIB::FiffInfo>                   m_pFiffInfo;                    /**< Connected fiff info. */
+    QSharedPointer<FIFFLIB::FiffInfo> m_pFiffInfo; /**< Connected fiff info. */
 
-    QMap<double, QColor>                                m_qMapTriggerColor;             /**< Trigger colors per detected type. */
+    QMap<double, QColor> m_qMapTriggerColor; /**< Trigger colors per detected type. */
 
-    QString                                             m_sSettingsPath;                /**< The settings path to store the GUI settings to. */
+    QString m_sSettingsPath; /**< The settings path to store the GUI settings to. */
 
 signals:
     //=========================================================================================================
@@ -210,7 +212,7 @@ signals:
      * Emit this signal whenever the trigger information changed.
      */
     void triggerInfoChanged(const QMap<double,
-                            QColor>& value,
+                                       QColor>& value,
                             bool bActive,
                             const QString& sTriggerCh,
                             double dThreshold);

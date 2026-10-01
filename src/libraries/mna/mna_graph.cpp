@@ -131,7 +131,7 @@ bool MnaGraph::hasNode(const QString& nodeId) const
 //=============================================================================================================
 
 bool MnaGraph::connect(const QString& srcNodeId, const QString& srcPortName,
-                        const QString& dstNodeId, const QString& dstPortName)
+                       const QString& dstNodeId, const QString& dstPortName)
 {
     // Verify source node and port exist
     if (!hasNode(srcNodeId) || !hasNode(dstNodeId)) {
@@ -154,7 +154,7 @@ bool MnaGraph::connect(const QString& srcNodeId, const QString& srcPortName,
     MnaNode& dstNode = node(dstNodeId);
     for (int i = 0; i < dstNode.inputs.size(); ++i) {
         if (dstNode.inputs[i].name == dstPortName) {
-            dstNode.inputs[i].sourceNodeId   = srcNodeId;
+            dstNode.inputs[i].sourceNodeId = srcNodeId;
             dstNode.inputs[i].sourcePortName = srcPortName;
             return true;
         }
@@ -195,7 +195,7 @@ bool MnaGraph::validate(QStringList* errors) const
             if (!p.sourceNodeId.isEmpty()) {
                 if (!adj.contains(p.sourceNodeId)) {
                     addError(QStringLiteral("Node '%1' input port '%2' references unknown source node '%3'")
-                             .arg(n.id, p.name, p.sourceNodeId));
+                                 .arg(n.id, p.name, p.sourceNodeId));
                 } else {
                     if (!adj[p.sourceNodeId].contains(n.id)) {
                         adj[p.sourceNodeId].insert(n.id);
@@ -235,7 +235,7 @@ bool MnaGraph::validate(QStringList* errors) const
     for (const MnaNode& n : m_nodes) {
         if (!registry.hasOp(n.opType)) {
             addError(QStringLiteral("Node '%1' has unregistered op type '%2'")
-                     .arg(n.id, n.opType));
+                         .arg(n.id, n.opType));
             continue;
         }
 
@@ -254,7 +254,7 @@ bool MnaGraph::validate(QStringList* errors) const
             for (const MnaPort& np : n.inputs) {
                 if (np.name == sp.name && np.sourceNodeId.isEmpty()) {
                     addError(QStringLiteral("Node '%1': required input port '%2' is not connected")
-                             .arg(n.id, sp.name));
+                                 .arg(n.id, sp.name));
                 }
             }
         }
@@ -275,9 +275,9 @@ bool MnaGraph::validate(QStringList* errors) const
                             srcOut.dataKind != MnaDataKind::Custom &&
                             inp.dataKind != srcOut.dataKind) {
                             addError(QStringLiteral("Edge %1.%2 -> %3.%4: data kind mismatch (%5 != %6)")
-                                     .arg(srcNode.id, srcOut.name, n.id, inp.name)
-                                     .arg(static_cast<int>(srcOut.dataKind))
-                                     .arg(static_cast<int>(inp.dataKind)));
+                                         .arg(srcNode.id, srcOut.name, n.id, inp.name)
+                                         .arg(static_cast<int>(srcOut.dataKind))
+                                         .arg(static_cast<int>(inp.dataKind)));
                         }
                     }
                 }

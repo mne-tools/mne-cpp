@@ -34,13 +34,13 @@ private slots:
         MatrixXd data = MatrixXd::Random(5, 500);
         IcaResult res = ICA::run(data, -1, 200, 1e-4, 42);
 
-        QCOMPARE(res.matMixing.rows(),   5);
-        QCOMPARE(res.matMixing.cols(),   5);
+        QCOMPARE(res.matMixing.rows(), 5);
+        QCOMPARE(res.matMixing.cols(), 5);
         QCOMPARE(res.matUnmixing.rows(), 5);
         QCOMPARE(res.matUnmixing.cols(), 5);
-        QCOMPARE(res.matSources.rows(),  5);
-        QCOMPARE(res.matSources.cols(),  500);
-        QCOMPARE(res.vecMean.size(),     5);
+        QCOMPARE(res.matSources.rows(), 5);
+        QCOMPARE(res.matSources.cols(), 500);
+        QCOMPARE(res.vecMean.size(), 5);
     }
 
     void resultDimensions_reducedComponents()
@@ -49,12 +49,12 @@ private slots:
         MatrixXd data = MatrixXd::Random(10, 1000);
         IcaResult res = ICA::run(data, 3, 200, 1e-4, 42);
 
-        QCOMPARE(res.matMixing.rows(),   10);
-        QCOMPARE(res.matMixing.cols(),   3);
+        QCOMPARE(res.matMixing.rows(), 10);
+        QCOMPARE(res.matMixing.cols(), 3);
         QCOMPARE(res.matUnmixing.rows(), 3);
         QCOMPARE(res.matUnmixing.cols(), 10);
-        QCOMPARE(res.matSources.rows(),  3);
-        QCOMPARE(res.matSources.cols(),  1000);
+        QCOMPARE(res.matSources.rows(), 3);
+        QCOMPARE(res.matSources.cols(), 1000);
     }
 
     //=========================================================================
@@ -67,14 +67,14 @@ private slots:
         const int nCh = 2;
         MatrixXd sources(nCh, N);
         for (int i = 0; i < N; ++i) {
-            sources(0, i) = std::sin(2.0 * M_PI * 5.0  * i / 1000.0);
+            sources(0, i) = std::sin(2.0 * M_PI * 5.0 * i / 1000.0);
             sources(1, i) = std::sin(2.0 * M_PI * 13.0 * i / 1000.0);
         }
 
         // Random mixing matrix
         MatrixXd A(nCh, nCh);
         A << 0.8, 0.4,
-             0.2, 0.9;
+            0.2, 0.9;
         MatrixXd mixed = A * sources;
 
         IcaResult res = ICA::run(mixed, nCh, 300, 1e-5, 1);
@@ -84,7 +84,8 @@ private slots:
         MatrixXd S = res.matSources;
         for (int r = 0; r < nCh; ++r) {
             double s = S.row(r).norm();
-            if (s > 1e-12) S.row(r) /= s;
+            if (s > 1e-12)
+                S.row(r) /= s;
         }
 
         // Correlation matrix (should be close to identity up to permutation/sign)
@@ -121,14 +122,14 @@ private slots:
         const int nCh = 3;
         MatrixXd sources(nCh, N);
         for (int i = 0; i < N; ++i) {
-            sources(0, i) = std::sin(2 * M_PI * 50.0 * i / 1000.0);  // "artifact" at 50 Hz
+            sources(0, i) = std::sin(2 * M_PI * 50.0 * i / 1000.0); // "artifact" at 50 Hz
             sources(1, i) = std::sin(2 * M_PI * 10.0 * i / 1000.0);
-            sources(2, i) = std::sin(2 * M_PI * 3.0  * i / 1000.0);
+            sources(2, i) = std::sin(2 * M_PI * 3.0 * i / 1000.0);
         }
         MatrixXd A(nCh, nCh);
         A << 1.0, 0.3, 0.1,
-             0.2, 1.0, 0.4,
-             0.1, 0.5, 1.0;
+            0.2, 1.0, 0.4,
+            0.1, 0.5, 1.0;
         MatrixXd mixed = A * sources;
 
         IcaResult res = ICA::run(mixed, nCh, 300, 1e-5, 42);
@@ -183,8 +184,8 @@ private slots:
 
         QCOMPARE(res.matSources.rows(), 1);
         QCOMPARE(res.matSources.cols(), 500);
-        QCOMPARE(res.matMixing.rows(),  5);
-        QCOMPARE(res.matMixing.cols(),  1);
+        QCOMPARE(res.matMixing.rows(), 5);
+        QCOMPARE(res.matMixing.cols(), 1);
     }
 };
 

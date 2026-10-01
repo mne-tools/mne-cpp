@@ -151,7 +151,7 @@ public:
      * @return                    Peak localisation error per source (n_sources).
      */
     static Eigen::VectorXd peakLocalisationError(const Eigen::MatrixXd& matResolution,
-                                                  const Eigen::MatrixX3d& matPositions);
+                                                 const Eigen::MatrixX3d& matPositions);
 };
 
 } // namespace INVLIB

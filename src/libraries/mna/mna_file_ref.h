@@ -52,7 +52,8 @@
 // DEFINE NAMESPACE MNALIB
 //=============================================================================================================
 
-namespace MNALIB{
+namespace MNALIB
+{
 
 //=============================================================================================================
 /**
@@ -60,14 +61,14 @@ namespace MNALIB{
  */
 struct MNASHARED_EXPORT MnaFileRef
 {
-    MnaFileRole role = MnaFileRole::Custom;   /**< Role of the file. */
-    QString     path;                         /**< Relative POSIX path. */
-    QString     sha256;                       /**< SHA-256 hash of file contents. */
-    QString     format;                       /**< File format: "fiff", "mgh", "stc", etc. */
-    qint64      sizeBytes = 0;                /**< File size in bytes. */
-    bool        embedded  = false;            /**< Whether data is embedded in the container. */
-    QByteArray  data;                         /**< Embedded file data (only when embedded == true). */
-    QJsonObject extras;                       /**< Unknown keys preserved for lossless round-trip. */
+    MnaFileRole role = MnaFileRole::Custom; /**< Role of the file. */
+    QString path;                           /**< Relative POSIX path. */
+    QString sha256;                         /**< SHA-256 hash of file contents. */
+    QString format;                         /**< File format: "fiff", "mgh", "stc", etc. */
+    qint64 sizeBytes = 0;                   /**< File size in bytes. */
+    bool embedded = false;                  /**< Whether data is embedded in the container. */
+    QByteArray data;                        /**< Embedded file data (only when embedded == true). */
+    QJsonObject extras;                     /**< Unknown keys preserved for lossless round-trip. */
 
     //=========================================================================================================
     /**

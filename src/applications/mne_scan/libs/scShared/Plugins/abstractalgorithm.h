@@ -42,14 +42,16 @@ namespace SCSHAREDLIB
 class AbstractAlgorithm : public AbstractPlugin
 {
 public:
-    typedef QSharedPointer<AbstractAlgorithm> SPtr;               /**< Shared pointer type for AbstractAlgorithm. */
-    typedef QSharedPointer<const AbstractAlgorithm> ConstSPtr;    /**< Const shared pointer type for AbstractAlgorithm. */
+    typedef QSharedPointer<AbstractAlgorithm> SPtr;            /**< Shared pointer type for AbstractAlgorithm. */
+    typedef QSharedPointer<const AbstractAlgorithm> ConstSPtr; /**< Const shared pointer type for AbstractAlgorithm. */
 
     //=========================================================================================================
     /**
      * Destroys the AbstractAlgorithm.
      */
-    virtual ~AbstractAlgorithm() {}
+    virtual ~AbstractAlgorithm()
+    {
+    }
 
     //=========================================================================================================
     /**

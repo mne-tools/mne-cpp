@@ -44,7 +44,7 @@ using namespace Eigen;
 //=============================================================================================================
 
 FiffInfo::FiffInfo()
-: FiffInfoBase()//nchan(-1)
+: FiffInfoBase() //nchan(-1)
 , sfreq(-1.0)
 , linefreq(-1.0)
 , highpass(-1.0)
@@ -107,7 +107,7 @@ void FiffInfo::clear()
     xplotter_layout = "";
     experimenter = "";
     description = "";
-    utc_offset = "";         /**< UTC offset of related meas_date (sHH:MM).*/
+    utc_offset = ""; /**< UTC offset of related meas_date (sHH:MM).*/
     gantry_angle = -1;
     dev_ctf_t.clear();
     dig.clear();
@@ -127,10 +127,8 @@ qint32 FiffInfo::get_current_comp()
     qint32 first_comp = -1;
 
     qint32 k = 0;
-    for (k = 0; k < this->nchan; ++k)
-    {
-        if (this->chs[k].kind == FIFFV_MEG_CH)
-        {
+    for (k = 0; k < this->nchan; ++k) {
+        if (this->chs[k].kind == FIFFV_MEG_CH) {
             comp = this->chs[k].chpos.coil_type >> 16;
             if (first_comp < 0)
                 first_comp = comp;
@@ -147,36 +145,31 @@ bool FiffInfo::make_compensator(fiff_int_t from, fiff_int_t to, FiffCtfComp& ctf
 {
     MatrixXd C1, C2, comp_tmp;
 
-//    if(ctf_comp.data)
-//        delete ctf_comp.data;
+    //    if(ctf_comp.data)
+    //        delete ctf_comp.data;
     ctf_comp.data->clear();
 
-    if (from == to)
-    {
+    if (from == to) {
         ctf_comp.data->data = MatrixXd::Identity(this->nchan, this->nchan);
         return false;
     }
 
     if (from == 0)
-        C1 = MatrixXd::Zero(this->nchan,this->nchan);
-    else
-    {
-        if (!this->make_compensator(from, C1))
-        {
+        C1 = MatrixXd::Zero(this->nchan, this->nchan);
+    else {
+        if (!this->make_compensator(from, C1)) {
             qWarning("Cannot create compensator C1\n");
-            qWarning("Desired compensation matrix (kind = %d) not found\n",from);
+            qWarning("Desired compensation matrix (kind = %d) not found\n", from);
             return false;
         }
     }
 
     if (to == 0)
-        C2 = MatrixXd::Zero(this->nchan,this->nchan);
-    else
-    {
-        if (!this->make_compensator(to, C2))
-        {
+        C2 = MatrixXd::Zero(this->nchan, this->nchan);
+    else {
+        if (!this->make_compensator(to, C2)) {
             qWarning("Cannot create compensator C2\n");
-            qWarning("Desired compensation matrix (kind = %d) not found\n",to);
+            qWarning("Desired compensation matrix (kind = %d) not found\n", to);
             return false;
         }
     }
@@ -185,28 +178,24 @@ bool FiffInfo::make_compensator(fiff_int_t from, fiff_int_t to, FiffCtfComp& ctf
     //   s_to   = s_orig - C2*s_orig = (I - C2)*s_orig
     //   s_to   = (I - C2)*(I + C1)*s_from = (I + C1 - C2 - C2*C1)*s_from
     //
-    comp_tmp = MatrixXd::Identity(this->nchan,this->nchan) + C1 - C2 - C2*C1;
+    comp_tmp = MatrixXd::Identity(this->nchan, this->nchan) + C1 - C2 - C2 * C1;
 
     qint32 k;
-    if (exclude_comp_chs)
-    {
-        VectorXi pick  = MatrixXi::Zero(1,this->nchan);
+    if (exclude_comp_chs) {
+        VectorXi pick = MatrixXi::Zero(1, this->nchan);
         qint32 npick = 0;
-        for (k = 0; k < this->nchan; ++k)
-        {
-            if (this->chs[k].kind != FIFFV_REF_MEG_CH)
-            {
+        for (k = 0; k < this->nchan; ++k) {
+            if (this->chs[k].kind != FIFFV_REF_MEG_CH) {
                 pick(npick) = k;
                 ++npick;
             }
         }
-        if (npick == 0)
-        {
+        if (npick == 0) {
             qWarning("Nothing remains after excluding the compensation channels\n");
             return false;
         }
 
-        ctf_comp.data->data.resize(npick,this->nchan);
+        ctf_comp.data->data.resize(npick, this->nchan);
         for (k = 0; k < npick; ++k)
             ctf_comp.data->data.row(k) = comp_tmp.block(pick(k), 0, 1, this->nchan);
     } else {
@@ -218,73 +207,59 @@ bool FiffInfo::make_compensator(fiff_int_t from, fiff_int_t to, FiffCtfComp& ctf
 
 //=============================================================================================================
 
-bool FiffInfo::make_compensator(fiff_int_t kind, MatrixXd& this_comp) const//private method
+bool FiffInfo::make_compensator(fiff_int_t kind, MatrixXd& this_comp) const //private method
 {
     FiffNamedMatrix::SDPtr this_data;
     MatrixXd presel, postsel;
-    qint32 k, col, c, ch=0, row, row_ch=0, channelAvailable;
+    qint32 k, col, c, ch = 0, row, row_ch = 0, channelAvailable;
 
-    for (k = 0; k < this->comps.size(); ++k)
-    {
-        if (this->comps[k].kind == kind)
-        {
+    for (k = 0; k < this->comps.size(); ++k) {
+        if (this->comps[k].kind == kind) {
             this_data = this->comps[k].data;
 
             //
             //   Create the preselector
             //
-            presel = MatrixXd::Zero(this_data->ncol,this->nchan);
+            presel = MatrixXd::Zero(this_data->ncol, this->nchan);
 
-            for(col = 0; col < this_data->ncol; ++col)
-            {
+            for (col = 0; col < this_data->ncol; ++col) {
                 channelAvailable = 0;
-                for (c = 0; c < this->ch_names.size(); ++c)
-                {
-                    if (QString::compare(this_data->col_names.at(col),this->ch_names.at(c)) == 0)
-                    {
+                for (c = 0; c < this->ch_names.size(); ++c) {
+                    if (QString::compare(this_data->col_names.at(col), this->ch_names.at(c)) == 0) {
                         ++channelAvailable;
                         ch = c;
                     }
                 }
-                if (channelAvailable == 0)
-                {
-                    qWarning("Channel %s is not available in data\n",this_data->col_names.at(col).toUtf8().constData());
+                if (channelAvailable == 0) {
+                    qWarning("Channel %s is not available in data\n", this_data->col_names.at(col).toUtf8().constData());
+                    return false;
+                } else if (channelAvailable > 1) {
+                    qWarning("Ambiguous channel %s", this_data->col_names.at(col).toUtf8().constData());
                     return false;
                 }
-                else if (channelAvailable > 1)
-                {
-                    qWarning("Ambiguous channel %s",this_data->col_names.at(col).toUtf8().constData());
-                    return false;
-                }
-                presel(col,ch) = 1.0;
+                presel(col, ch) = 1.0;
             }
             //
             //   Create the postselector
             //
-            postsel = MatrixXd::Zero(this->nchan,this_data->nrow);
+            postsel = MatrixXd::Zero(this->nchan, this_data->nrow);
 
-            for (c = 0; c  < this->nchan; ++c)
-            {
+            for (c = 0; c < this->nchan; ++c) {
                 channelAvailable = 0;
-                for (row = 0; row < this_data->row_names.size(); ++row)
-                {
-                    if (QString::compare(this->ch_names.at(c),this_data->row_names.at(row)) == 0)
-                    {
+                for (row = 0; row < this_data->row_names.size(); ++row) {
+                    if (QString::compare(this->ch_names.at(c), this_data->row_names.at(row)) == 0) {
                         ++channelAvailable;
                         row_ch = row;
                     }
                 }
-                if (channelAvailable > 1)
-                {
+                if (channelAvailable > 1) {
                     qWarning("Ambiguous channel %s", this->ch_names.at(c).toUtf8().constData());
                     return false;
-                }
-                else if (channelAvailable == 1)
-                {
-                    postsel(c,row_ch) = 1.0;
+                } else if (channelAvailable == 1) {
+                    postsel(c, row_ch) = 1.0;
                 }
             }
-            this_comp = postsel*this_data->data*presel;
+            this_comp = postsel * this_data->data * presel;
             return true;
         }
     }
@@ -294,9 +269,9 @@ bool FiffInfo::make_compensator(fiff_int_t kind, MatrixXd& this_comp) const//pri
 
 //=============================================================================================================
 
-FiffInfo FiffInfo::pick_info(const RowVectorXi &sel) const
+FiffInfo FiffInfo::pick_info(const RowVectorXi& sel) const
 {
-    FiffInfo res = *this;//new FiffInfo(this);
+    FiffInfo res = *this; //new FiffInfo(this);
     if (sel.size() == 0)
         return res;
 
@@ -305,13 +280,12 @@ FiffInfo FiffInfo::pick_info(const RowVectorXi &sel) const
     res.ch_names.clear();
 
     qint32 idx;
-    for(qint32 i = 0; i < sel.size(); ++i)
-    {
+    for (qint32 i = 0; i < sel.size(); ++i) {
         idx = sel[i];
         res.chs.append(this->chs[idx]);
         res.ch_names.append(this->ch_names[idx]);
     }
-    res.nchan  = static_cast<int>(sel.size());
+    res.nchan = static_cast<int>(sel.size());
 
     return res;
 }
@@ -324,14 +298,12 @@ QList<FiffChInfo> FiffInfo::set_current_comp(QList<FiffChInfo>& listFiffChInfo, 
     qint32 k;
     fiff_int_t coil_type;
 
-    for(k = 0; k < listFiffChInfo.size(); ++k)
+    for (k = 0; k < listFiffChInfo.size(); ++k)
         newList.append(listFiffChInfo[k]);
 
-    qint32 lower_half = 65535;// hex2dec('FFFF');
-    for (k = 0; k < listFiffChInfo.size(); ++k)
-    {
-        if (listFiffChInfo[k].kind == FIFFV_MEG_CH)
-        {
+    qint32 lower_half = 65535; // hex2dec('FFFF');
+    for (k = 0; k < listFiffChInfo.size(); ++k) {
+        if (listFiffChInfo[k].kind == FIFFV_MEG_CH) {
             coil_type = listFiffChInfo[k].chpos.coil_type & lower_half;
             newList[k].chpos.coil_type = (coil_type | (value << 16));
         }
@@ -396,7 +368,7 @@ void FiffInfo::writeToStream(FiffStream* p_pStream) const
     fiff_int_t data_type = 4;
     QList<FiffChInfo> chsToWrite;
 
-    for(qint32 k = 0; k < this->nchan; ++k)
+    for (qint32 k = 0; k < this->nchan; ++k)
         chsToWrite << this->chs[k];
 
     fiff_int_t nchanToWrite = chsToWrite.size();
@@ -404,29 +376,27 @@ void FiffInfo::writeToStream(FiffStream* p_pStream) const
     //
     // write the essentials
     //
-    p_pStream->start_block(FIFFB_MEAS);//4
-    p_pStream->write_id(FIFF_BLOCK_ID);//5
-    if(this->meas_id.version != -1)
-    {
-        p_pStream->write_id(FIFF_PARENT_BLOCK_ID,this->meas_id);//6
+    p_pStream->start_block(FIFFB_MEAS); //4
+    p_pStream->write_id(FIFF_BLOCK_ID); //5
+    if (this->meas_id.version != -1) {
+        p_pStream->write_id(FIFF_PARENT_BLOCK_ID, this->meas_id); //6
     }
     //
     //    Measurement info
     //
-    p_pStream->start_block(FIFFB_MEAS_INFO);//7
+    p_pStream->start_block(FIFFB_MEAS_INFO); //7
 
     //
     //    Blocks from the original -> skip this
     //
-//        QList<fiff_int_t> blocks;
-//        blocks << FIFFB_SUBJECT << FIFFB_HPI_MEAS << FIFFB_HPI_RESULT << FIFFB_ISOTRAK << FIFFB_PROCESSING_HISTORY;
+    //        QList<fiff_int_t> blocks;
+    //        blocks << FIFFB_SUBJECT << FIFFB_HPI_MEAS << FIFFB_HPI_RESULT << FIFFB_ISOTRAK << FIFFB_PROCESSING_HISTORY;
     bool have_hpi_result = false;
-    bool have_isotrak    = false;
+    bool have_isotrak = false;
     //
     //    megacq parameters
     //
-    if (!this->acq_pars.isEmpty() || !this->acq_stim.isEmpty())
-    {
+    if (!this->acq_pars.isEmpty() || !this->acq_stim.isEmpty()) {
         p_pStream->start_block(FIFFB_DACQ_PARS);
         if (!this->acq_pars.isEmpty())
             p_pStream->write_string(FIFF_DACQ_PARS, this->acq_pars);
@@ -439,8 +409,7 @@ void FiffInfo::writeToStream(FiffStream* p_pStream) const
     //
     //    Coordinate transformations if the HPI result block was not there
     //
-    if (!have_hpi_result)
-    {
+    if (!have_hpi_result) {
         if (!this->dev_head_t.isEmpty())
             p_pStream->write_coord_trans(this->dev_head_t);
 
@@ -450,8 +419,7 @@ void FiffInfo::writeToStream(FiffStream* p_pStream) const
     //
     //    Polhemus data
     //
-    if (this->dig.size() > 0 && !have_isotrak)
-    {
+    if (this->dig.size() > 0 && !have_isotrak) {
         p_pStream->start_block(FIFFB_ISOTRAK);
         for (qint32 k = 0; k < this->dig.size(); ++k)
             p_pStream->write_dig_point(this->dig[k]);
@@ -469,42 +437,40 @@ void FiffInfo::writeToStream(FiffStream* p_pStream) const
     //
     //    Bad channels
     //
-    if (this->bads.size() > 0)
-    {
+    if (this->bads.size() > 0) {
         p_pStream->start_block(FIFFB_MNE_BAD_CHANNELS);
-        p_pStream->write_name_list(FIFF_MNE_CH_NAME_LIST,this->bads);
+        p_pStream->write_name_list(FIFF_MNE_CH_NAME_LIST, this->bads);
         p_pStream->end_block(FIFFB_MNE_BAD_CHANNELS);
     }
     //
     //    General
     //
-    p_pStream->write_float(FIFF_SFREQ,&this->sfreq);
-    p_pStream->write_float(FIFF_LINE_FREQ,&this->linefreq);
-    p_pStream->write_float(FIFF_HIGHPASS,&this->highpass);
-    p_pStream->write_float(FIFF_LOWPASS,&this->lowpass);
-    p_pStream->write_string(FIFF_EXPERIMENTER,this->experimenter);
-    p_pStream->write_string(FIFF_DESCRIPTION,this->description);
-    p_pStream->write_string(FIFF_UNIT_C,this->utc_offset);
-    p_pStream->write_string(FIFF_PROJ_NAME,this->proj_name);
-    p_pStream->write_int(FIFF_PROJ_ID,&this->proj_id);
-    p_pStream->write_int(FIFF_GANTRY_ANGLE,&this->gantry_angle);
-    p_pStream->write_int(FIFF_NCHAN,&nchanToWrite);
-    p_pStream->write_int(FIFF_DATA_PACK,&data_type);
+    p_pStream->write_float(FIFF_SFREQ, &this->sfreq);
+    p_pStream->write_float(FIFF_LINE_FREQ, &this->linefreq);
+    p_pStream->write_float(FIFF_HIGHPASS, &this->highpass);
+    p_pStream->write_float(FIFF_LOWPASS, &this->lowpass);
+    p_pStream->write_string(FIFF_EXPERIMENTER, this->experimenter);
+    p_pStream->write_string(FIFF_DESCRIPTION, this->description);
+    p_pStream->write_string(FIFF_UNIT_C, this->utc_offset);
+    p_pStream->write_string(FIFF_PROJ_NAME, this->proj_name);
+    p_pStream->write_int(FIFF_PROJ_ID, &this->proj_id);
+    p_pStream->write_int(FIFF_GANTRY_ANGLE, &this->gantry_angle);
+    p_pStream->write_int(FIFF_NCHAN, &nchanToWrite);
+    p_pStream->write_int(FIFF_DATA_PACK, &data_type);
     if (this->meas_date[0] != -1)
-        p_pStream->write_int(FIFF_MEAS_DATE,this->meas_date, 2);
+        p_pStream->write_int(FIFF_MEAS_DATE, this->meas_date, 2);
     //
     //    Channel info
     //
-    MatrixXd cals(1,nchanToWrite);
+    MatrixXd cals(1, nchanToWrite);
 
-    for(qint32 k = 0; k < nchanToWrite; ++k)
-    {
+    for (qint32 k = 0; k < nchanToWrite; ++k) {
         //
         //    Scan numbers may have been messed up
         //
-        chsToWrite[k].scanNo = k+1;//+1 because
-//        chs[k].range  = 1.0f;//Why? -> cause its already calibrated through reading
-        cals(0,k) = static_cast<double>(chsToWrite[k].cal); //ToDo whats going on with cals?
+        chsToWrite[k].scanNo = k + 1;                        //+1 because
+                                                             //        chs[k].range  = 1.0f;//Why? -> cause its already calibrated through reading
+        cals(0, k) = static_cast<double>(chsToWrite[k].cal); //ToDo whats going on with cals?
         p_pStream->write_ch_info(chsToWrite[k]);
     }
     //
@@ -519,8 +485,8 @@ void FiffInfo::print() const
     std::cout << "Sample frequency: " << sfreq << "\n";
     std::cout << "LineFreq: " << linefreq << " | Highpass: " << highpass << " | Lowpass: " << lowpass << "\n";
     std::cout << "Number of digitizer points: " << dig.size() << "\n";
-    for (auto& point : dig){
-        if (point.kind == FIFFV_POINT_HPI){
+    for (auto& point : dig) {
+        if (point.kind == FIFFV_POINT_HPI) {
             std::cout << "HPI Point " << point.ident << " - " << point.r[0] << ", " << point.r[1] << ", " << point.r[2] << "\n";
         }
     }

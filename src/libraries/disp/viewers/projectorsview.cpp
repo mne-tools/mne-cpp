@@ -44,7 +44,7 @@ using namespace FIFFLIB;
 //=============================================================================================================
 
 ProjectorsView::ProjectorsView(const QString& sSettingsPath,
-                               QWidget *parent,
+                               QWidget* parent,
                                Qt::WindowFlags f)
 : AbstractView(parent, f)
 , m_pEnableDisableProjectors(Q_NULLPTR)
@@ -78,8 +78,8 @@ void ProjectorsView::setProjectors(const QList<FIFFLIB::FiffProj>& projs)
 {
     m_pProjs = projs;
 
-    for(int i = 0; i < m_pProjs.size(); ++i) {
-        if(!m_mapProjActive.contains(m_pProjs.at(i).desc)) {
+    for (int i = 0; i < m_pProjs.size(); ++i) {
+        if (!m_mapProjActive.contains(m_pProjs.at(i).desc)) {
             m_mapProjActive.insert(m_pProjs.at(i).desc, m_pProjs.at(i).active);
         } else {
             m_pProjs[i].active = m_mapProjActive[m_pProjs.at(i).desc];
@@ -93,23 +93,23 @@ void ProjectorsView::setProjectors(const QList<FIFFLIB::FiffProj>& projs)
 
 void ProjectorsView::redrawGUI()
 {
-    if(m_pProjs.isEmpty()) {
+    if (m_pProjs.isEmpty()) {
         return;
     }
 
     m_qListProjCheckBox.clear();
 
     // Projection Selection
-    QGridLayout *topLayout = new QGridLayout;
+    QGridLayout* topLayout = new QGridLayout;
 
     bool bAllActivated = true;
 
     qint32 i = 0;
 
-    for(; i < m_pProjs.size(); ++i) {
+    for (; i < m_pProjs.size(); ++i) {
         QCheckBox* checkBox = new QCheckBox(m_pProjs.at(i).desc);
 
-        if(m_pProjs.at(i).active == false) {
+        if (m_pProjs.at(i).active == false) {
             bAllActivated = false;
         }
 
@@ -127,13 +127,13 @@ void ProjectorsView::redrawGUI()
     line->setFrameShape(QFrame::HLine);
     line->setFrameShadow(QFrame::Sunken);
 
-    topLayout->addWidget(line, i+1, 0);
+    topLayout->addWidget(line, i + 1, 0);
 
     m_pEnableDisableProjectors = new QCheckBox("Enable all");
     m_pEnableDisableProjectors->setChecked(bAllActivated);
-    topLayout->addWidget(m_pEnableDisableProjectors, i+2, 0);
+    topLayout->addWidget(m_pEnableDisableProjectors, i + 2, 0);
     connect(m_pEnableDisableProjectors, static_cast<void (QCheckBox::*)(bool)>(&QCheckBox::clicked),
-        this, &ProjectorsView::onEnableDisableAllProj);
+            this, &ProjectorsView::onEnableDisableAllProj);
 
     this->setLayout(topLayout);
 
@@ -144,7 +144,7 @@ void ProjectorsView::redrawGUI()
 
 void ProjectorsView::saveSettings()
 {
-    if(m_sSettingsPath.isEmpty()) {
+    if (m_sSettingsPath.isEmpty()) {
         return;
     }
 
@@ -152,10 +152,10 @@ void ProjectorsView::saveSettings()
 
     settings.beginGroup(m_sSettingsPath + QString("/ProjectorsView/projectorsActive"));
 
-    QMap<QString,bool>::const_iterator iProj = m_mapProjActive.constBegin();
+    QMap<QString, bool>::const_iterator iProj = m_mapProjActive.constBegin();
     while (iProj != m_mapProjActive.constEnd()) {
-         settings.setValue(iProj.key(), iProj.value());
-         ++iProj;
+        settings.setValue(iProj.key(), iProj.value());
+        ++iProj;
     }
 
     settings.endGroup();
@@ -165,7 +165,7 @@ void ProjectorsView::saveSettings()
 
 void ProjectorsView::loadSettings()
 {
-    if(m_sSettingsPath.isEmpty()) {
+    if (m_sSettingsPath.isEmpty()) {
         return;
     }
 
@@ -184,7 +184,7 @@ void ProjectorsView::loadSettings()
 
 void ProjectorsView::updateGuiMode(GuiMode mode)
 {
-    switch(mode) {
+    switch (mode) {
         case GuiMode::Clinical:
             break;
         default: // default is research mode
@@ -196,7 +196,7 @@ void ProjectorsView::updateGuiMode(GuiMode mode)
 
 void ProjectorsView::updateProcessingMode(ProcessingMode mode)
 {
-    switch(mode) {
+    switch (mode) {
         case ProcessingMode::Offline:
             break;
         default: // default is realtime mode
@@ -209,18 +209,17 @@ void ProjectorsView::updateProcessingMode(ProcessingMode mode)
 void ProjectorsView::onEnableDisableAllProj(bool status)
 {
     //Set all checkboxes to status
-    for(int i = 0; i<m_qListProjCheckBox.size(); i++) {
+    for (int i = 0; i < m_qListProjCheckBox.size(); i++) {
         m_qListProjCheckBox.at(i)->setChecked(status);
     }
 
     //Set all projection activation states to status
-    for(int i = 0; i < m_pProjs.size(); ++i) {
+    for (int i = 0; i < m_pProjs.size(); ++i) {
         m_pProjs[i].active = status;
         m_mapProjActive[m_pProjs.at(i).desc] = status;
-
     }
 
-    if(m_pEnableDisableProjectors) {
+    if (m_pEnableDisableProjectors) {
         m_pEnableDisableProjectors->setChecked(status);
     }
 
@@ -235,8 +234,8 @@ void ProjectorsView::onCheckProjStatusChanged()
 {
     bool bAllActivated = true;
 
-    for(qint32 i = 0; i < m_qListProjCheckBox.size(); ++i) {
-        if(m_qListProjCheckBox.at(i)->isChecked() == false) {
+    for (qint32 i = 0; i < m_qListProjCheckBox.size(); ++i) {
+        if (m_qListProjCheckBox.at(i)->isChecked() == false) {
             bAllActivated = false;
         }
 
@@ -244,7 +243,7 @@ void ProjectorsView::onCheckProjStatusChanged()
         m_mapProjActive[m_pProjs.at(i).desc] = m_qListProjCheckBox.at(i)->isChecked();
     }
 
-    if(m_pEnableDisableProjectors) {
+    if (m_pEnableDisableProjectors) {
         m_pEnableDisableProjectors->setChecked(bAllActivated);
     }
 
@@ -257,5 +256,4 @@ void ProjectorsView::onCheckProjStatusChanged()
 
 void ProjectorsView::clearView()
 {
-
 }

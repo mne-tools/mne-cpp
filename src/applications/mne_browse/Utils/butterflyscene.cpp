@@ -45,7 +45,7 @@ ButterflyScene::ButterflyScene(QGraphicsView* view, QObject* parent)
 
 //*************************************************************************************************************
 
-void ButterflyScene::setScaleMap(const QMap<QString,double> &scaleMap)
+void ButterflyScene::setScaleMap(const QMap<QString, double>& scaleMap)
 {
     QList<QGraphicsItem*> itemList = this->items();
 
@@ -77,7 +77,7 @@ void ButterflyScene::setShowGFP(bool show)
 
 //*************************************************************************************************************
 
-void ButterflyScene::repaintItems(const QList<QGraphicsItem *> &selectedChannelItems)
+void ButterflyScene::repaintItems(const QList<QGraphicsItem*>& selectedChannelItems)
 {
     this->clear();
 
@@ -85,7 +85,7 @@ void ButterflyScene::repaintItems(const QList<QGraphicsItem *> &selectedChannelI
     while (i.hasNext()) {
         SelectionSceneItem* SelectionSceneItemTemp = static_cast<SelectionSceneItem*>(i.next());
         ButterflySceneItem* ButterflySceneItemTemp = new ButterflySceneItem(SelectionSceneItemTemp->m_sChannelName,
-                                                                          SelectionSceneItemTemp->m_iChannelKind);
+                                                                            SelectionSceneItemTemp->m_iChannelKind);
 
         this->addItem(ButterflySceneItemTemp);
     }
@@ -94,7 +94,7 @@ void ButterflyScene::repaintItems(const QList<QGraphicsItem *> &selectedChannelI
 
 //*************************************************************************************************************
 
-void ButterflyScene::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
+void ButterflyScene::mouseMoveEvent(QGraphicsSceneMouseEvent* event)
 {
     m_crosshairPos = event->scenePos();
     m_crosshairVisible = true;
@@ -105,21 +105,21 @@ void ButterflyScene::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
 
 //*************************************************************************************************************
 
-void ButterflyScene::drawForeground(QPainter *painter, const QRectF &rect)
+void ButterflyScene::drawForeground(QPainter* painter, const QRectF& rect)
 {
     Q_UNUSED(rect);
 
-    if(!m_crosshairVisible || items().isEmpty())
+    if (!m_crosshairVisible || items().isEmpty())
         return;
 
     // Find the first ButterflySceneItem to get time/amplitude info
     ButterflySceneItem* item = nullptr;
-    for(auto* gi : items()) {
+    for (auto* gi : items()) {
         item = dynamic_cast<ButterflySceneItem*>(gi);
-        if(item && item->m_pFiffInfo)
+        if (item && item->m_pFiffInfo)
             break;
     }
-    if(!item || !item->m_pFiffInfo)
+    if (!item || !item->m_pFiffInfo)
         return;
 
     // Map scene pos to item coords
@@ -127,7 +127,7 @@ void ButterflyScene::drawForeground(QPainter *painter, const QRectF &rect)
     QRectF pa = item->plotArea();
 
     // Only draw if inside the plot area
-    if(!pa.contains(localPos))
+    if (!pa.contains(localPos))
         return;
 
     QPointF sceneTopLeft = item->mapToScene(pa.topLeft());
@@ -153,9 +153,9 @@ void ButterflyScene::drawForeground(QPainter *painter, const QRectF &rect)
 
     // Format amplitude with unit
     QString ampStr;
-    if(item->m_iSetKind == FIFFV_MEG_CH && item->m_iSetUnit == FIFF_UNIT_T_M) {
+    if (item->m_iSetKind == FIFFV_MEG_CH && item->m_iSetUnit == FIFF_UNIT_T_M) {
         ampStr = QString::number(amplitude * 1e13, 'f', 1) + " fT/cm";
-    } else if(item->m_iSetKind == FIFFV_MEG_CH) {
+    } else if (item->m_iSetKind == FIFFV_MEG_CH) {
         ampStr = QString::number(amplitude * 1e15, 'f', 1) + " fT";
     } else {
         ampStr = QString::number(amplitude * 1e6, 'f', 2) + QStringLiteral(" \u00B5V");
@@ -175,9 +175,9 @@ void ButterflyScene::drawForeground(QPainter *painter, const QRectF &rect)
     double labelX = m_crosshairPos.x() + 10;
     double labelY = m_crosshairPos.y() - 20;
     // Keep label in scene
-    if(labelX + textRect.width() > scenePlotArea.right())
+    if (labelX + textRect.width() > scenePlotArea.right())
         labelX = m_crosshairPos.x() - textRect.width() - 10;
-    if(labelY < scenePlotArea.top())
+    if (labelY < scenePlotArea.top())
         labelY = m_crosshairPos.y() + 5;
 
     textRect.moveTo(labelX, labelY);
@@ -192,7 +192,7 @@ void ButterflyScene::drawForeground(QPainter *painter, const QRectF &rect)
 
 //*************************************************************************************************************
 
-void ButterflyScene::wheelEvent(QGraphicsSceneWheelEvent *event)
+void ButterflyScene::wheelEvent(QGraphicsSceneWheelEvent* event)
 {
     // Ignore wheel events to prevent zoom in butterfly view
     event->accept();

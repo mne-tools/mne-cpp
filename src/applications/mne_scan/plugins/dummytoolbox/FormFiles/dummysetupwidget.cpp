@@ -37,7 +37,7 @@ using namespace Ui;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-DummySetupWidget::DummySetupWidget(DummyToolbox* toolbox, QWidget *parent)
+DummySetupWidget::DummySetupWidget(DummyToolbox* toolbox, QWidget* parent)
 : QWidget(parent)
 , m_pDummyToolbox(toolbox)
 {

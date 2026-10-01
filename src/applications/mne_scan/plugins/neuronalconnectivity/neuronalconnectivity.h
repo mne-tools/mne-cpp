@@ -46,23 +46,27 @@
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-namespace FIFFLIB {
-    class FiffInfo;
+namespace FIFFLIB
+{
+class FiffInfo;
 }
 
-namespace DISPLIB {
-    class ConnectivitySettingsView;
+namespace DISPLIB
+{
+class ConnectivitySettingsView;
 }
 
-namespace RTPROCESSINGLIB {
-    class RtConnectivity;
+namespace RTPROCESSINGLIB
+{
+class RtConnectivity;
 }
 
-namespace SCMEASLIB {
-    class RealTimeSourceEstimate;
-    class RealTimeMultiSampleArray;
-    class RealTimeConnectivityEstimate;
-    class RealTimeEvokedSet;
+namespace SCMEASLIB
+{
+class RealTimeSourceEstimate;
+class RealTimeMultiSampleArray;
+class RealTimeConnectivityEstimate;
+class RealTimeEvokedSet;
 }
 
 //=============================================================================================================
@@ -180,7 +184,7 @@ protected:
      *
      * @param[in] sMetric        The new metric.
      */
-    void onMetricChanged(const QString &sMetric);
+    void onMetricChanged(const QString& sMetric);
 
     //=========================================================================================================
     /**
@@ -216,41 +220,41 @@ protected:
     void onFrequencyBandChanged(float fFreqLow, float fFreqHigh);
 
 private:
-    qint32              m_iDownSample;          /**< Sampling rate. */
-    qint32              m_iNumberAverages;      /**< The number of averages used to calculate the connectivity estimate. Use this only for resting state data when the averaging plugin is not connected.*/
-    qint32              m_iNumberBadChannels;   /**< The current number of bad channels. USed to test if new bad channels were selected. */
-    float               m_fFreqBandLow;         /**< The lower frequency band to average the connectivity weights from. */
-    float               m_fFreqBandHigh;        /**< The higher frequency band to average the connectivity weights to. */
-    qint32              m_iBlockSize;           /**< The block size of teh last received data block. In frequency bins. */
+    qint32 m_iDownSample;        /**< Sampling rate. */
+    qint32 m_iNumberAverages;    /**< The number of averages used to calculate the connectivity estimate. Use this only for resting state data when the averaging plugin is not connected.*/
+    qint32 m_iNumberBadChannels; /**< The current number of bad channels. USed to test if new bad channels were selected. */
+    float m_fFreqBandLow;        /**< The lower frequency band to average the connectivity weights from. */
+    float m_fFreqBandHigh;       /**< The higher frequency band to average the connectivity weights to. */
+    qint32 m_iBlockSize;         /**< The block size of teh last received data block. In frequency bins. */
 
-    QString             m_sAvrType;             /**< The average type. */
-    QStringList         m_sConnectivityMethods; /**< The connectivity metric to use. */
+    QString m_sAvrType;                 /**< The average type. */
+    QStringList m_sConnectivityMethods; /**< The connectivity metric to use. */
 
-    QMutex              m_mutex;                /**< The mutex to guarantee thread safety. */
+    QMutex m_mutex; /**< The mutex to guarantee thread safety. */
 
-    QElapsedTimer       m_timer;                /**< The timer to evaluate performance. */
+    QElapsedTimer m_timer; /**< The timer to evaluate performance. */
 
-    CONNECTIVITYLIB::ConnectivitySettings                                           m_connectivitySettings;         /**< The connectivity settings.*/
+    CONNECTIVITYLIB::ConnectivitySettings m_connectivitySettings; /**< The connectivity settings.*/
 
-    QSharedPointer<UTILSLIB::CircularBuffer<CONNECTIVITYLIB::Network> >             m_pCircularBuffer;              /**< The circular buffer holding the connectivity estimates.*/
-    QSharedPointer<RTPROCESSINGLIB::RtConnectivity>                                 m_pRtConnectivity;              /**< The real-time connectivity estimation object.*/
-    QSharedPointer<FIFFLIB::FiffInfo>                                               m_pFiffInfo;                    /**< Fiff measurement info.*/
-    QSharedPointer<DISPLIB::ConnectivitySettingsView>                               m_pConnectivitySettingsView;    /**< The connectivity settings widget which will be added to the Quick Control view. The QuickControlView will not take ownership. Ownership will be managed by the QSharedPointer.*/
-    QAction*                                                                        m_pActionShowYourWidget;        /**< flag whether thread is running.*/
+    QSharedPointer<UTILSLIB::CircularBuffer<CONNECTIVITYLIB::Network>> m_pCircularBuffer; /**< The circular buffer holding the connectivity estimates.*/
+    QSharedPointer<RTPROCESSINGLIB::RtConnectivity> m_pRtConnectivity;                    /**< The real-time connectivity estimation object.*/
+    QSharedPointer<FIFFLIB::FiffInfo> m_pFiffInfo;                                        /**< Fiff measurement info.*/
+    QSharedPointer<DISPLIB::ConnectivitySettingsView> m_pConnectivitySettingsView;        /**< The connectivity settings widget which will be added to the Quick Control view. The QuickControlView will not take ownership. Ownership will be managed by the QSharedPointer.*/
+    QAction* m_pActionShowYourWidget;                                                     /**< flag whether thread is running.*/
 
-    SCSHAREDLIB::PluginInputData<SCMEASLIB::RealTimeSourceEstimate>::SPtr           m_pRTSEInput;                   /**< The RealTimeSourceEstimate input.*/
-    SCSHAREDLIB::PluginInputData<SCMEASLIB::RealTimeMultiSampleArray>::SPtr         m_pRTMSAInput;                  /**< The RealTimeMultiSampleArray input.*/
-    SCSHAREDLIB::PluginInputData<SCMEASLIB::RealTimeEvokedSet>::SPtr                m_pRTEVSInput;                  /**< The RealTimeEvoked input.*/
+    SCSHAREDLIB::PluginInputData<SCMEASLIB::RealTimeSourceEstimate>::SPtr m_pRTSEInput;    /**< The RealTimeSourceEstimate input.*/
+    SCSHAREDLIB::PluginInputData<SCMEASLIB::RealTimeMultiSampleArray>::SPtr m_pRTMSAInput; /**< The RealTimeMultiSampleArray input.*/
+    SCSHAREDLIB::PluginInputData<SCMEASLIB::RealTimeEvokedSet>::SPtr m_pRTEVSInput;        /**< The RealTimeEvoked input.*/
 
-    SCSHAREDLIB::PluginOutputData<SCMEASLIB::RealTimeConnectivityEstimate>::SPtr    m_pRTCEOutput;                  /**< The RealTimeSourceEstimate output.*/
+    SCSHAREDLIB::PluginOutputData<SCMEASLIB::RealTimeConnectivityEstimate>::SPtr m_pRTCEOutput; /**< The RealTimeSourceEstimate output.*/
 
-    CONNECTIVITYLIB::Network    m_connectivityEstimate;         /**< The current connectivity estimate.*/
-    Eigen::MatrixX3f            m_matNodeVertLeft;              /**< Holds the left hemi vertex postions of the network nodes. Corresponding to the neuronal sources.*/
-    Eigen::MatrixX3f            m_matNodeVertRight;             /**< Holds the right hemi vertex postions of the network nodes. Corresponding to the neuronal sources.*/
-    Eigen::MatrixX3f            m_matNodeVertComb;              /**< Holds both hemi vertex postions of the network nodes. Corresponding to the neuronal sources.*/ 
-    Eigen::RowVectorXi          m_vecPicks;                     /**< The picked data channels. */
+    CONNECTIVITYLIB::Network m_connectivityEstimate; /**< The current connectivity estimate.*/
+    Eigen::MatrixX3f m_matNodeVertLeft;              /**< Holds the left hemi vertex postions of the network nodes. Corresponding to the neuronal sources.*/
+    Eigen::MatrixX3f m_matNodeVertRight;             /**< Holds the right hemi vertex postions of the network nodes. Corresponding to the neuronal sources.*/
+    Eigen::MatrixX3f m_matNodeVertComb;              /**< Holds both hemi vertex postions of the network nodes. Corresponding to the neuronal sources.*/
+    Eigen::RowVectorXi m_vecPicks;                   /**< The picked data channels. */
 
-    CONNECTIVITYLIB::Network    m_currentConnectivityResult;    /**< The current connectivity result.*/
+    CONNECTIVITYLIB::Network m_currentConnectivityResult; /**< The current connectivity result.*/
 };
 } // NAMESPACE
 

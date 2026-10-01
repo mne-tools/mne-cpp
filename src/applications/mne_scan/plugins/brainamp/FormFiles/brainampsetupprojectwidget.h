@@ -30,8 +30,9 @@
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-namespace Ui {
-    class BrainAMPSetupProjectWidget;
+namespace Ui
+{
+class BrainAMPSetupProjectWidget;
 }
 
 //=============================================================================================================
@@ -66,7 +67,7 @@ public:
      * @param[in] pBrainAMP a pointer to the corresponding ECGSimulator.
      */
     explicit BrainAMPSetupProjectWidget(BrainAMP* pBrainAMP,
-                                        QWidget *parent = 0);
+                                        QWidget* parent = 0);
 
     //=========================================================================================================
     /**
@@ -83,14 +84,14 @@ public:
     void initGui();
 
 private:
-    BrainAMP*                           m_pBrainAMP;        /**< a pointer to corresponding BrainAMP.*/
-    Ui::BrainAMPSetupProjectWidget*     ui;                 /**< the user interface for the BrainAMPSetupWidget.*/
+    BrainAMP* m_pBrainAMP;              /**< a pointer to corresponding BrainAMP.*/
+    Ui::BrainAMPSetupProjectWidget* ui; /**< the user interface for the BrainAMPSetupWidget.*/
 
     //=========================================================================================================
     /**
      * Sets the project dir
      */
-    void changeCardinalMode(const QString &text);
+    void changeCardinalMode(const QString& text);
 
     //=========================================================================================================
     /**

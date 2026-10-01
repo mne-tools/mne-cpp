@@ -66,7 +66,8 @@
 // DEFINE NAMESPACE CONNECTIVITYLIB
 //=============================================================================================================
 
-namespace CONNECTIVITYLIB {
+namespace CONNECTIVITYLIB
+{
 
 //=============================================================================================================
 // CONNECTIVITYLIB FORWARD DECLARATIONS
@@ -89,7 +90,6 @@ class Network;
  */
 class CONNECTIVITYSHARED_EXPORT UnbiasedSquaredPhaseLagIndex : public AbstractMetric
 {
-
 public:
     typedef QSharedPointer<UnbiasedSquaredPhaseLagIndex> SPtr;            /**< Shared pointer type for UnbiasedSquaredPhaseLagIndex. */
     typedef QSharedPointer<const UnbiasedSquaredPhaseLagIndex> ConstSPtr; /**< Const shared pointer type for UnbiasedSquaredPhaseLagIndex. */
@@ -125,8 +125,8 @@ protected:
      * @param[in] tapers                 The taper information.
      */
     static void compute(ConnectivitySettings::IntermediateTrialData& inputData,
-                        QVector<QPair<int,Eigen::MatrixXcd> >& vecPairCsdSum,
-                        QVector<QPair<int,Eigen::MatrixXd> >& vecPairCsdImagSignSum,
+                        QVector<QPair<int, Eigen::MatrixXcd>>& vecPairCsdSum,
+                        QVector<QPair<int, Eigen::MatrixXd>>& vecPairCsdImagSignSum,
                         QMutex& mutex,
                         int iNRows,
                         int iNFreqs,
@@ -140,7 +140,7 @@ protected:
      * @param[out] connectivitySettings   The input data.
      * @param[in] finalNetwork           The final network.
      */
-    static void computeUSPLI(ConnectivitySettings &connectivitySettings,
+    static void computeUSPLI(ConnectivitySettings& connectivitySettings,
                              Network& finalNetwork);
 };
 

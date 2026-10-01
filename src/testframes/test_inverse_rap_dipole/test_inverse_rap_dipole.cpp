@@ -45,14 +45,16 @@ class TestInverseRapDipole : public QObject
 private:
     QString m_sDataPath;
 
-    bool hasData() const { return !m_sDataPath.isEmpty(); }
+    bool hasData() const
+    {
+        return !m_sDataPath.isEmpty();
+    }
 
 private slots:
     void initTestCase()
     {
         qInstallMessageHandler(MNELogger::customLogWriter);
-        QString base = QCoreApplication::applicationDirPath()
-                       + "/../resources/data/mne-cpp-test-data";
+        QString base = QCoreApplication::applicationDirPath() + "/../resources/data/mne-cpp-test-data";
         if (QFile::exists(base + "/MEG/sample/sample_audvis_trunc_raw.fif"))
             m_sDataPath = base;
     }
@@ -117,9 +119,15 @@ private slots:
     void ecdSet_addAndAccess()
     {
         InvEcdSet set;
-        InvEcd d1; d1.time = 0.1f; d1.valid = true;
-        InvEcd d2; d2.time = 0.2f; d2.valid = false;
-        InvEcd d3; d3.time = 0.3f; d3.valid = true;
+        InvEcd d1;
+        d1.time = 0.1f;
+        d1.valid = true;
+        InvEcd d2;
+        d2.time = 0.2f;
+        d2.valid = false;
+        InvEcd d3;
+        d3.time = 0.3f;
+        d3.valid = true;
 
         set.addEcd(d1);
         set << d2;
@@ -136,7 +144,9 @@ private slots:
     void ecdSet_copyCtor()
     {
         InvEcdSet set;
-        InvEcd d; d.time = 1.0f; d.valid = true;
+        InvEcd d;
+        d.time = 1.0f;
+        d.valid = true;
         set.addEcd(d);
 
         InvEcdSet copy(set);
@@ -401,8 +411,8 @@ private slots:
     {
         MNELIB::MNEInverseOperator invOp;
         InvMinimumNorm mn(invOp, 1.0f / 9.0f, false, false);
-        mn.setMethod(true, false); // sLORETA
-        mn.setMethod(false, true); // dSPM
+        mn.setMethod(true, false);  // sLORETA
+        mn.setMethod(false, true);  // dSPM
         mn.setMethod(false, false); // MNE
         QVERIFY(true);
     }
@@ -412,7 +422,8 @@ private slots:
     //=========================================================================
     void data_makeInverseOperator()
     {
-        if (!hasData()) QSKIP("No test data");
+        if (!hasData())
+            QSKIP("No test data");
 
         QString fwdPath = m_sDataPath + "/Result/ref-sample_audvis-meg-eeg-oct-6-fwd.fif";
         QString covPath = m_sDataPath + "/MEG/sample/sample_audvis-cov.fif";
@@ -426,7 +437,8 @@ private slots:
         FiffCov noiseCov(covFile);
         FiffRawData raw(rawFile);
 
-        if (fwd.isEmpty() || noiseCov.isEmpty()) QSKIP("Data load failed");
+        if (fwd.isEmpty() || noiseCov.isEmpty())
+            QSKIP("Data load failed");
 
         MNELIB::MNEInverseOperator invOp = MNELIB::MNEInverseOperator::make_inverse_operator(
             raw.info, fwd, noiseCov, 0.2f, 0.8f, false, true);
@@ -442,7 +454,8 @@ private slots:
     //=========================================================================
     void data_dSPM_fromEvoked()
     {
-        if (!hasData()) QSKIP("No test data");
+        if (!hasData())
+            QSKIP("No test data");
 
         QString fwdPath = m_sDataPath + "/Result/ref-sample_audvis-meg-eeg-oct-6-fwd.fif";
         QString covPath = m_sDataPath + "/MEG/sample/sample_audvis-cov.fif";
@@ -459,10 +472,11 @@ private slots:
 
         MNELIB::MNEInverseOperator invOp = MNELIB::MNEInverseOperator::make_inverse_operator(
             raw.info, fwd, noiseCov, 0.2f, 0.8f, false, true);
-        if (invOp.nchan == 0) QSKIP("Inverse operator build failed");
+        if (invOp.nchan == 0)
+            QSKIP("Inverse operator build failed");
 
         QFile evkFile(evkPath);
-        QPair<float,float> noBaseline(-1.0f, -1.0f);
+        QPair<float, float> noBaseline(-1.0f, -1.0f);
         FiffEvoked evoked(evkFile, 0, noBaseline);
         FiffEvoked picked = evoked.pick_channels(invOp.noise_cov->names);
 
@@ -485,7 +499,8 @@ private slots:
     //=========================================================================
     void data_sLORETA_fromEvoked()
     {
-        if (!hasData()) QSKIP("No test data");
+        if (!hasData())
+            QSKIP("No test data");
 
         QString fwdPath = m_sDataPath + "/Result/ref-sample_audvis-meg-eeg-oct-6-fwd.fif";
         QString covPath = m_sDataPath + "/MEG/sample/sample_audvis-cov.fif";
@@ -502,10 +517,11 @@ private slots:
 
         MNELIB::MNEInverseOperator invOp = MNELIB::MNEInverseOperator::make_inverse_operator(
             raw.info, fwd, noiseCov, 0.2f, 0.8f, false, true);
-        if (invOp.nchan == 0) QSKIP("Inverse operator build failed");
+        if (invOp.nchan == 0)
+            QSKIP("Inverse operator build failed");
 
         QFile evkFile(evkPath);
-        QPair<float,float> noBaseline(-1.0f, -1.0f);
+        QPair<float, float> noBaseline(-1.0f, -1.0f);
         FiffEvoked evoked(evkFile, 0, noBaseline);
         FiffEvoked picked = evoked.pick_channels(invOp.noise_cov->names);
 
@@ -527,7 +543,8 @@ private slots:
     //=========================================================================
     void data_MNE_fromEvoked()
     {
-        if (!hasData()) QSKIP("No test data");
+        if (!hasData())
+            QSKIP("No test data");
 
         QString fwdPath = m_sDataPath + "/Result/ref-sample_audvis-meg-eeg-oct-6-fwd.fif";
         QString covPath = m_sDataPath + "/MEG/sample/sample_audvis-cov.fif";
@@ -544,10 +561,11 @@ private slots:
 
         MNELIB::MNEInverseOperator invOp = MNELIB::MNEInverseOperator::make_inverse_operator(
             raw.info, fwd, noiseCov, 0.2f, 0.8f, false, true);
-        if (invOp.nchan == 0) QSKIP("Inverse operator build failed");
+        if (invOp.nchan == 0)
+            QSKIP("Inverse operator build failed");
 
         QFile evkFile(evkPath);
-        QPair<float,float> noBaseline(-1.0f, -1.0f);
+        QPair<float, float> noBaseline(-1.0f, -1.0f);
         FiffEvoked evoked(evkFile, 0, noBaseline);
         FiffEvoked picked = evoked.pick_channels(invOp.noise_cov->names);
 
@@ -569,7 +587,8 @@ private slots:
     //=========================================================================
     void data_invOp_writeReadRoundtrip()
     {
-        if (!hasData()) QSKIP("No test data");
+        if (!hasData())
+            QSKIP("No test data");
 
         QString fwdPath = m_sDataPath + "/Result/ref-sample_audvis-meg-eeg-oct-6-fwd.fif";
         QString covPath = m_sDataPath + "/MEG/sample/sample_audvis-cov.fif";
@@ -585,7 +604,8 @@ private slots:
 
         MNELIB::MNEInverseOperator invOp = MNELIB::MNEInverseOperator::make_inverse_operator(
             raw.info, fwd, noiseCov, 0.2f, 0.8f, false, true);
-        if (invOp.nchan == 0) QSKIP("Inverse operator build failed");
+        if (invOp.nchan == 0)
+            QSKIP("Inverse operator build failed");
 
         QTemporaryDir tmpDir;
         QVERIFY(tmpDir.isValid());
@@ -608,14 +628,17 @@ private slots:
     //=========================================================================
     void data_rapMusic_initWithFwd()
     {
-        if (!hasData()) QSKIP("No test data");
+        if (!hasData())
+            QSKIP("No test data");
 
         QString fwdPath = m_sDataPath + "/Result/ref-sample_audvis-meg-eeg-oct-6-fwd.fif";
         QFile fwdFile(fwdPath);
-        if (!fwdFile.exists()) QSKIP("Forward solution not found");
+        if (!fwdFile.exists())
+            QSKIP("Forward solution not found");
 
         MNEForwardSolution fwd(fwdFile);
-        if (fwd.isEmpty()) QSKIP("Fwd load failed");
+        if (fwd.isEmpty())
+            QSKIP("Fwd load failed");
 
         InvRapMusic rap;
         bool ok = rap.init(fwd, false, 2, 0.5);
@@ -629,11 +652,13 @@ private slots:
     //=========================================================================
     void data_allEvokedConditions()
     {
-        if (!hasData()) QSKIP("No test data");
+        if (!hasData())
+            QSKIP("No test data");
 
         QString path = m_sDataPath + "/MEG/sample/sample_audvis-ave.fif";
         QFile file(path);
-        if (!file.exists()) QSKIP("Evoked file not found");
+        if (!file.exists())
+            QSKIP("Evoked file not found");
 
         FiffEvokedSet evokedSet(file);
         QVERIFY(evokedSet.evoked.size() > 0);
@@ -665,7 +690,9 @@ private slots:
         QVERIFY(sensors.ncoils() == 0 || true);
     }
 
-    void cleanupTestCase() {}
+    void cleanupTestCase()
+    {
+    }
 };
 
 QTEST_GUILESS_MAIN(TestInverseRapDipole)

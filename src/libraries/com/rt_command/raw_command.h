@@ -69,17 +69,16 @@ namespace COMLIB
  */
 class COMSHARED_EXPORT RawCommand : public QObject, public UTILSLIB::ICommand
 {
-Q_OBJECT
+    Q_OBJECT
 
 public:
-
     //=========================================================================================================
     /**
      * Default constructor.
      *
      * @param[in] parent             Parent QObject (optional).
      */
-    explicit RawCommand(QObject *parent = 0);
+    explicit RawCommand(QObject* parent = 0);
 
     //=========================================================================================================
     /**
@@ -89,7 +88,7 @@ public:
      * @param[in] p_bIsJson          If is received/should be send as JSON (optional, default true).
      * @param[in] parent             Parent QObject (optional).
      */
-    explicit RawCommand(const QString &p_sCommand, bool p_bIsJson = true, QObject *parent = 0);
+    explicit RawCommand(const QString& p_sCommand, bool p_bIsJson = true, QObject* parent = 0);
 
     //=========================================================================================================
     /**
@@ -97,7 +96,7 @@ public:
      *
      * @param[in] p_rawCommand   RawCommand which should be copied.
      */
-    explicit RawCommand(const RawCommand &p_rawCommand);
+    explicit RawCommand(const RawCommand& p_rawCommand);
 
     //=========================================================================================================
     /**
@@ -141,7 +140,7 @@ public:
      *
      * @return Reference to this object.
      */
-    RawCommand& operator= (const RawCommand &rhs);
+    RawCommand& operator=(const RawCommand& rhs);
 
 signals:
     //=========================================================================================================
@@ -156,7 +155,7 @@ private:
     QString m_sCommand;
     bool m_bIsJson;
 
-    QList<QString> m_qListRawParameters;    /**< Raw parameters. Their type is not specified jet.*/
+    QList<QString> m_qListRawParameters; /**< Raw parameters. Their type is not specified jet.*/
 };
 
 //=============================================================================================================

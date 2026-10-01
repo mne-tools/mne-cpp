@@ -35,7 +35,7 @@ class CommandThread : public QThread
     Q_OBJECT
 
 public:
-    CommandThread(int socketDescriptor, qint32 p_iId, QObject *parent);
+    CommandThread(int socketDescriptor, qint32 p_iId, QObject* parent);
 
     ~CommandThread();
 
@@ -49,7 +49,6 @@ signals:
     void newCommand(QString p_sCommand, qint32 p_iThreadID);
 
 private:
-
     int socketDescriptor;
 
     bool m_bIsRunning;

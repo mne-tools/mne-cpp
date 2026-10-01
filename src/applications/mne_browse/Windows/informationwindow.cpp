@@ -32,14 +32,14 @@ using namespace MNEBROWSE;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-InformationWindow::InformationWindow(QWidget *parent)
+InformationWindow::InformationWindow(QWidget* parent)
 : QDockWidget(parent)
 , ui(new Ui::InformationWindowWidget)
 , m_eLogLevelCurrent(LogLevel::_LogLvMin)
 {
     ui->setupUi(this);
 
-    m_pTextBrowser_Log = (QTextBrowser*)ui->tab_log->childAt(50,50);
+    m_pTextBrowser_Log = (QTextBrowser*)ui->tab_log->childAt(50, 50);
 }
 
 
@@ -54,11 +54,11 @@ InformationWindow::~InformationWindow()
 
 void InformationWindow::writeToLog(const QString& logMsg, LogKind lgknd, LogLevel lglvl)
 {
-    if(lglvl<=m_eLogLevelCurrent) {
-        if(lgknd == _LogKndError)
-            m_pTextBrowser_Log->insertHtml("<font color=red><b>Error:</b> "+logMsg+"</font>");
-        else if(lgknd == _LogKndWarning)
-            m_pTextBrowser_Log->insertHtml("<font color=blue><b>Warning:</b> "+logMsg+"</font>");
+    if (lglvl <= m_eLogLevelCurrent) {
+        if (lgknd == _LogKndError)
+            m_pTextBrowser_Log->insertHtml("<font color=red><b>Error:</b> " + logMsg + "</font>");
+        else if (lgknd == _LogKndWarning)
+            m_pTextBrowser_Log->insertHtml("<font color=blue><b>Warning:</b> " + logMsg + "</font>");
         else
             m_pTextBrowser_Log->insertHtml(logMsg);
         m_pTextBrowser_Log->insertPlainText("\n"); // new line
@@ -78,15 +78,15 @@ void InformationWindow::setLogLevel(LogLevel lvl)
 {
     m_eLogLevelCurrent = lvl;
 
-    switch(lvl) {
-    case _LogLvMin:
-        writeToLog(tr("minimal log level set"), _LogKndMessage, _LogLvMin);
-        break;
-    case _LogLvNormal:
-        writeToLog(tr("normal log level set"), _LogKndMessage, _LogLvMin);
-        break;
-    case _LogLvMax:
-        writeToLog(tr("maximum log level set"), _LogKndMessage, _LogLvMin);
-        break;
+    switch (lvl) {
+        case _LogLvMin:
+            writeToLog(tr("minimal log level set"), _LogKndMessage, _LogLvMin);
+            break;
+        case _LogLvNormal:
+            writeToLog(tr("normal log level set"), _LogKndMessage, _LogLvMin);
+            break;
+        case _LogLvMax:
+            writeToLog(tr("maximum log level set"), _LogKndMessage, _LogLvMin);
+            break;
     }
 }

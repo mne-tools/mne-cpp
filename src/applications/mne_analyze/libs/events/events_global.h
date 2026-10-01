@@ -18,11 +18,11 @@
 #include <utils/buildinfo.h>
 
 #if defined(STATICBUILD)
-#  define EVENTS_EXPORT
+#define EVENTS_EXPORT
 #elif defined(MNE_EVENTS_LIBRARY)
-#  define EVENTS_EXPORT Q_DECL_EXPORT    /**< Q_DECL_EXPORT must be added to the declarations of symbols used when compiling a shared library. */
+#define EVENTS_EXPORT Q_DECL_EXPORT /**< Q_DECL_EXPORT must be added to the declarations of symbols used when compiling a shared library. */
 #else
-#  define EVENTS_EXPORT Q_DECL_IMPORT    /**< Q_DECL_IMPORT must be added to the declarations of symbols used when compiling a client that uses the shared library. */
+#define EVENTS_EXPORT Q_DECL_IMPORT /**< Q_DECL_IMPORT must be added to the declarations of symbols used when compiling a client that uses the shared library. */
 #endif
 
 //=============================================================================================================
@@ -30,7 +30,8 @@
  * @namespace EVENTSLIB
  * @brief     Event annotation management (creation, grouping, shared-memory transport).
  */
-namespace EVENTSLIB{
+namespace EVENTSLIB
+{
 
 //=============================================================================================================
 /**

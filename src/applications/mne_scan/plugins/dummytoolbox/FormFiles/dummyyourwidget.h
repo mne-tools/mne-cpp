@@ -34,8 +34,9 @@
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-namespace Ui{
-    class DummyYourWidgetGui;
+namespace Ui
+{
+class DummyYourWidgetGui;
 }
 
 //=============================================================================================================
@@ -60,15 +61,15 @@ class DummyYourWidget : public QWidget
     Q_OBJECT
 
 public:
-    typedef QSharedPointer<DummyYourWidget> SPtr;         /**< Shared pointer type for DummyYourWidget. */
-    typedef QSharedPointer<DummyYourWidget> ConstSPtr;    /**< Const shared pointer type for DummyYourWidget. */
+    typedef QSharedPointer<DummyYourWidget> SPtr;      /**< Shared pointer type for DummyYourWidget. */
+    typedef QSharedPointer<DummyYourWidget> ConstSPtr; /**< Const shared pointer type for DummyYourWidget. */
 
     //=========================================================================================================
     /**
      * Constructs a DummyToolbox.
      */
     explicit DummyYourWidget(const QString& sSettingsPath = "",
-                             QWidget *parent = 0);
+                             QWidget* parent = 0);
 
     //=========================================================================================================
     /**
@@ -89,10 +90,9 @@ private:
      */
     void loadSettings();
 
-    Ui::DummyYourWidgetGui*     m_pUi;              /**< The UI class specified in the designer. */
-    QString                     m_sSettingsPath;    /**< The settings path to store the GUI settings to. */
-
+    Ui::DummyYourWidgetGui* m_pUi; /**< The UI class specified in the designer. */
+    QString m_sSettingsPath;       /**< The settings path to store the GUI settings to. */
 };
-}   //namespace
+} //namespace
 
 #endif // DUMMYYOURWIDGET_H

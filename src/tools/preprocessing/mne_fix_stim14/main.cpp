@@ -53,7 +53,7 @@ using namespace Eigen;
 
 //=============================================================================================================
 
-static int findChannelByName(const FiffInfo &info, const QString &name)
+static int findChannelByName(const FiffInfo& info, const QString& name)
 {
     for (int i = 0; i < info.chs.size(); ++i) {
         if (info.chs[i].ch_name.trimmed() == name)
@@ -64,7 +64,7 @@ static int findChannelByName(const FiffInfo &info, const QString &name)
 
 //=============================================================================================================
 
-int main(int argc, char *argv[])
+int main(int argc, char* argv[])
 {
     qInstallMessageHandler(MNELogger::customLogWriter);
     QCoreApplication app(argc, argv);
@@ -88,8 +88,14 @@ int main(int argc, char *argv[])
     QString rawFile = parser.value(rawOpt);
     QString outFile = parser.value(outOpt);
 
-    if (rawFile.isEmpty()) { qCritical("--raw is required."); return 1; }
-    if (outFile.isEmpty()) { qCritical("--out is required."); return 1; }
+    if (rawFile.isEmpty()) {
+        qCritical("--raw is required.");
+        return 1;
+    }
+    if (outFile.isEmpty()) {
+        qCritical("--out is required.");
+        return 1;
+    }
 
     // Open raw data
     QFile fileIn(rawFile);
@@ -110,7 +116,7 @@ int main(int argc, char *argv[])
             qCritical("Cannot find channel: %s", qPrintable(stiNames[i]));
             return 1;
         }
-        qInfo("Found %s at index %d" , qPrintable(stiNames[i]), stiIndices[i]);
+        qInfo("Found %s at index %d", qPrintable(stiNames[i]), stiIndices[i]);
     }
 
     int sti14Idx = findChannelByName(raw.info, "STI 014");
@@ -122,7 +128,7 @@ int main(int argc, char *argv[])
         qCritical("Cannot find STI 014 channel.");
         return 1;
     }
-    qInfo("Found STI 014 at index %d" , sti14Idx);
+    qInfo("Found STI 014 at index %d", sti14Idx);
 
     // Read all data
     MatrixXd data;
@@ -163,6 +169,6 @@ int main(int argc, char *argv[])
     }
     outStream->finish_writing_raw();
 
-    qInfo("Written fixed raw data to: %s" , qPrintable(outFile));
+    qInfo("Written fixed raw data to: %s", qPrintable(outFile));
     return 0;
 }

@@ -52,14 +52,14 @@ class SCMEASSHARED_EXPORT RealTimeSpectrum : public Measurement
     Q_OBJECT
 
 public:
-    typedef QSharedPointer<RealTimeSpectrum> SPtr;               /**< Shared pointer type for RealTimeSpectrum. */
-    typedef QSharedPointer<const RealTimeSpectrum> ConstSPtr;    /**< Const shared pointer type for RealTimeSpectrum. */
+    typedef QSharedPointer<RealTimeSpectrum> SPtr;            /**< Shared pointer type for RealTimeSpectrum. */
+    typedef QSharedPointer<const RealTimeSpectrum> ConstSPtr; /**< Const shared pointer type for RealTimeSpectrum. */
 
     //=========================================================================================================
     /**
      * Constructs a RealTimeSpectrum.
      */
-    explicit RealTimeSpectrum(QObject *parent = 0);
+    explicit RealTimeSpectrum(QObject* parent = 0);
 
     //=========================================================================================================
     /**
@@ -73,7 +73,7 @@ public:
      *
      * @param[in] p_pFiffInfo     Info to init from.
      */
-    void initFromFiffInfo(FIFFLIB::FiffInfo::SPtr &p_pFiffInfo);
+    void initFromFiffInfo(FIFFLIB::FiffInfo::SPtr& p_pFiffInfo);
 
     //=========================================================================================================
     /**
@@ -133,14 +133,14 @@ public:
     inline bool containsValues() const;
 
 private:
-    FIFFLIB::FiffInfo::SPtr         m_pFiffInfo;    /**< Original Fiff Info if initialized by fiff info. */
+    FIFFLIB::FiffInfo::SPtr m_pFiffInfo; /**< Original Fiff Info if initialized by fiff info. */
 
-    Eigen::MatrixXd                 m_matValue;     /**< The current attached sample vector.*/
+    Eigen::MatrixXd m_matValue; /**< The current attached sample vector.*/
 
-    bool m_bIsInit;             /**< If channel info is initialized.*/
-    bool m_bContainsValues;     /**< If values are stored.*/
+    bool m_bIsInit;         /**< If channel info is initialized.*/
+    bool m_bContainsValues; /**< If values are stored.*/
 
-    qint8 m_xScaleType;         /**< The scale type of x axis: 0-normal; 1-log. */
+    qint8 m_xScaleType; /**< The scale type of x axis: 0-normal; 1-log. */
 };
 
 //=============================================================================================================

@@ -37,9 +37,10 @@
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-namespace ANSHAREDLIB {
-    class Communicator;
-    class FiffRawViewModel;
+namespace ANSHAREDLIB
+{
+class Communicator;
+class FiffRawViewModel;
 }
 
 //=============================================================================================================
@@ -150,7 +151,7 @@ private:
      */
     void triggerLoadingEnd(const QString& sMessage);
 
-    QSharedPointer<ANSHAREDLIB::Communicator>                     m_pCommu;                   /**< To broadcst signals. */
+    QSharedPointer<ANSHAREDLIB::Communicator> m_pCommu; /**< To broadcst signals. */
 
 signals:
     void newEventAvailable(int iEvent);

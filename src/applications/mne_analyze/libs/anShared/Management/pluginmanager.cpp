@@ -41,18 +41,16 @@ using namespace ANSHAREDLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-PluginManager::PluginManager(QObject *parent)
+PluginManager::PluginManager(QObject* parent)
 : QPluginLoader(parent)
 {
-
 }
 
 //=============================================================================================================
 
 PluginManager::~PluginManager()
 {
-    for(AbstractPlugin*& plugin : m_qVecPlugins)
-    {
+    for (AbstractPlugin*& plugin : m_qVecPlugins) {
         delete plugin;
     }
 }
@@ -65,15 +63,15 @@ void PluginManager::loadPluginsFromDirectory(const QString& dir)
     Q_UNUSED(dir);
 
     const auto staticInstances = QPluginLoader::staticInstances();
-    for(QObject *plugin : staticInstances) {
+    for (QObject* plugin : staticInstances) {
         // AbstractPlugin
-        if(AbstractPlugin* pPlugin = qobject_cast<AbstractPlugin*>(plugin)) {
+        if (AbstractPlugin* pPlugin = qobject_cast<AbstractPlugin*>(plugin)) {
             m_qVecPlugins.push_back(qobject_cast<AbstractPlugin*>(pPlugin));
         }
     }
 #else
     QDir pluginsDir(dir);
-    foreach(const QString &file, pluginsDir.entryList(QDir::NoDotAndDotDot | QDir::Files)) {
+    foreach (const QString& file, pluginsDir.entryList(QDir::NoDotAndDotDot | QDir::Files)) {
         emit pluginLoaded("Loading " + file);
         loadPlugin(pluginsDir.absoluteFilePath(file));
     }
@@ -84,13 +82,11 @@ void PluginManager::loadPluginsFromDirectory(const QString& dir)
 
 void PluginManager::loadPlugin(const QString& file)
 {
-    if(!file.contains(".exp") && !file.contains(".lib"))
-    {
+    if (!file.contains(".exp") && !file.contains(".lib")) {
         this->setFileName(file);
         AbstractPlugin* pPlugin = qobject_cast<AbstractPlugin*>(this->instance());
-        if(pPlugin) {
-            if(findByName(pPlugin->getName()) == -1)
-            {
+        if (pPlugin) {
+            if (findByName(pPlugin->getName()) == -1) {
                 qInfo() << "[PluginManager::loadPlugin] Loading Plugin " << file.toUtf8().constData() << " succeeded.";
                 qInfo() << "[PluginManager::loadPlugin] Build Info:" << pPlugin->getBuildInfo();
                 insertPlugin(pPlugin);
@@ -108,19 +104,17 @@ void PluginManager::loadPlugin(const QString& file)
 void PluginManager::insertPlugin(AbstractPlugin* pPlugin)
 {
     m_qVecPlugins.push_back(pPlugin);
-    std::sort(m_qVecPlugins.begin(),m_qVecPlugins.end(),
-              [](AbstractPlugin* a,AbstractPlugin* b) { return a->getOrder() > b->getOrder(); });
+    std::sort(m_qVecPlugins.begin(), m_qVecPlugins.end(),
+              [](AbstractPlugin* a, AbstractPlugin* b) { return a->getOrder() > b->getOrder(); });
 }
 
 //=============================================================================================================
 
 void PluginManager::initPlugins(QSharedPointer<AnalyzeData> data)
 {
-    for(AbstractPlugin* plugin : m_qVecPlugins)
-    {
+    for (AbstractPlugin* plugin : m_qVecPlugins) {
         emit pluginLoaded("Initializing " + plugin->getName());
-        if(plugin->hasBeenInitialized() == false)
-        {
+        if (plugin->hasBeenInitialized() == false) {
             plugin->setGlobalData(data);
             plugin->init();
             plugin->setInitState(true);
@@ -137,10 +131,8 @@ void PluginManager::initPlugins(QSharedPointer<AnalyzeData> data)
 int PluginManager::findByName(const QString& name)
 {
     QVector<AbstractPlugin*>::const_iterator it = m_qVecPlugins.cbegin();
-    for(int i = 0; it != m_qVecPlugins.cend(); ++i, ++it)
-    {
-        if((*it)->getName() == name)
-        {
+    for (int i = 0; it != m_qVecPlugins.cend(); ++i, ++it) {
+        if ((*it)->getName() == name) {
             return i;
         }
     }
@@ -151,8 +143,7 @@ int PluginManager::findByName(const QString& name)
 
 void PluginManager::shutdown()
 {
-    for(AbstractPlugin*& plugin : m_qVecPlugins)
-    {
+    for (AbstractPlugin*& plugin : m_qVecPlugins) {
         plugin->unload();
     }
 }

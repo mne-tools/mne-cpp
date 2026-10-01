@@ -54,23 +54,24 @@
 #include <QDebug>
 
 
-#define FIFF_MNE_SOURCE_SPACE_NNEIGHBORS    3594    /* Number of neighbors for each source space point (used for volume source spaces) */
-#define FIFF_MNE_SOURCE_SPACE_NEIGHBORS     3595    /* Neighbors for each source space point (used for volume source spaces) */
+#define FIFF_MNE_SOURCE_SPACE_NNEIGHBORS 3594 /* Number of neighbors for each source space point (used for volume source spaces) */
+#define FIFF_MNE_SOURCE_SPACE_NEIGHBORS 3595  /* Neighbors for each source space point (used for volume source spaces) */
 
-#define FIFFV_MNE_COORD_SURFACE_RAS   FIFFV_COORD_MRI    /* The surface RAS coordinates */
+#define FIFFV_MNE_COORD_SURFACE_RAS FIFFV_COORD_MRI /* The surface RAS coordinates */
 
-#define TRIANGLE_FILE_MAGIC_NUMBER  (0xfffffe)
-#define NEW_QUAD_FILE_MAGIC_NUMBER  (0xfffffd)
-#define QUAD_FILE_MAGIC_NUMBER      (0xffffff)
+#define TRIANGLE_FILE_MAGIC_NUMBER (0xfffffe)
+#define NEW_QUAD_FILE_MAGIC_NUMBER (0xfffffd)
+#define QUAD_FILE_MAGIC_NUMBER (0xffffff)
 
-#define TAG_OLD_SURF_GEOM           20
+#define TAG_OLD_SURF_GEOM 20
 
 //=============================================================================================================
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-namespace FIFFLIB {
-    class FiffDigitizerData;
+namespace FIFFLIB
+{
+class FiffDigitizerData;
 }
 
 //=============================================================================================================
@@ -101,16 +102,16 @@ class FilterThreadArg;
 class MNESHARED_EXPORT MNESurfaceOrVolume
 {
 public:
-    typedef QSharedPointer<MNESurfaceOrVolume> SPtr;              /**< Shared pointer type for MNESurfaceOrVolume. */
-    typedef QSharedPointer<const MNESurfaceOrVolume> ConstSPtr;   /**< Const shared pointer type for MNESurfaceOrVolume. */
+    typedef QSharedPointer<MNESurfaceOrVolume> SPtr;            /**< Shared pointer type for MNESurfaceOrVolume. */
+    typedef QSharedPointer<const MNESurfaceOrVolume> ConstSPtr; /**< Const shared pointer type for MNESurfaceOrVolume. */
 
     /*
      * Eigen convenience types – row-major so that row(i).data() gives
      * a contiguous 3-element pointer, matching the old float** / int** layout.
      */
-    typedef Eigen::Matrix<float, Eigen::Dynamic, 3, Eigen::RowMajor> PointsT;     /**< Type abbreviation for np x 3 point data. */
-    typedef Eigen::Matrix<float, Eigen::Dynamic, 3, Eigen::RowMajor> NormalsT;    /**< Type abbreviation for np x 3 normal data. */
-    typedef Eigen::Matrix<int,   Eigen::Dynamic, 3, Eigen::RowMajor> TrianglesT;  /**< Type abbreviation for ntri x 3 triangle indices. */
+    typedef Eigen::Matrix<float, Eigen::Dynamic, 3, Eigen::RowMajor> PointsT;  /**< Type abbreviation for np x 3 point data. */
+    typedef Eigen::Matrix<float, Eigen::Dynamic, 3, Eigen::RowMajor> NormalsT; /**< Type abbreviation for np x 3 normal data. */
+    typedef Eigen::Matrix<int, Eigen::Dynamic, 3, Eigen::RowMajor> TrianglesT; /**< Type abbreviation for ntri x 3 triangle indices. */
 
     //=========================================================================================================
     /**
@@ -138,8 +139,8 @@ public:
      *
      * @return The solid angle in steradians.
      */
-    static double solid_angle (const Eigen::Vector3f& from,	/* From this point... */
-                               const MNELIB::MNETriangle& tri);
+    static double solid_angle(const Eigen::Vector3f& from, /* From this point... */
+                              const MNELIB::MNETriangle& tri);
 
     /**
      * Set all vertex curvature values to 1.0 (uniform curvature),
@@ -245,22 +246,22 @@ public:
 
 
 public:
-    int             type;          /**< Is this a volume or a surface. */
-    QString         subject;       /**< Name (id) of the subject. */
-    int             id;            /**< FsSurface id. */
-    int             coord_frame;   /**< Which coordinate system the data are in now. */
+    int type;        /**< Is this a volume or a surface. */
+    QString subject; /**< Name (id) of the subject. */
+    int id;          /**< FsSurface id. */
+    int coord_frame; /**< Which coordinate system the data are in now. */
     /*
      * These relate to the FreeSurfer way
      */
-    std::optional<MNEVolGeom> vol_geom;         /**< MRI volume geometry information as FreeSurfer likes it. */
-    std::optional<MNEMghTagGroup> mgh_tags;     /**< Tags listed in the file. */
+    std::optional<MNEVolGeom> vol_geom;     /**< MRI volume geometry information as FreeSurfer likes it. */
+    std::optional<MNEMghTagGroup> mgh_tags; /**< Tags listed in the file. */
     /*
      * These are meaningful for both surfaces and volumes
      */
-    int              np;        /**< Number of vertices. */
-    PointsT          rr;        /**< The vertex locations (np x 3, row-major). */
-    NormalsT         nn;        /**< FsSurface normals at these points (np x 3, row-major). */
-    float            cm[3];     /**< Center of mass of the vertex cloud. */
+    int np;      /**< Number of vertices. */
+    PointsT rr;  /**< The vertex locations (np x 3, row-major). */
+    NormalsT nn; /**< FsSurface normals at these points (np x 3, row-major). */
+    float cm[3]; /**< Center of mass of the vertex cloud. */
 
     /**
      * Return a read-only map to the k-th vertex position (3 contiguous floats).
@@ -268,65 +269,74 @@ public:
      * @param[in] k  Vertex index (0 to np - 1).
      * @return Read-only view of row k of rr, in m.
      */
-    Eigen::Map<const Eigen::Vector3f> point(int k) const { return Eigen::Map<const Eigen::Vector3f>(rr.row(k).data()); }
+    Eigen::Map<const Eigen::Vector3f> point(int k) const
+    {
+        return Eigen::Map<const Eigen::Vector3f>(rr.row(k).data());
+    }
     /**
      * Return a mutable map to the k-th vertex position.
      *
      * @param[in] k  Vertex index (0 to np - 1).
      * @return Writable view of row k of rr, in m.
      */
-    Eigen::Map<Eigen::Vector3f> point(int k) { return Eigen::Map<Eigen::Vector3f>(rr.row(k).data()); }
+    Eigen::Map<Eigen::Vector3f> point(int k)
+    {
+        return Eigen::Map<Eigen::Vector3f>(rr.row(k).data());
+    }
     /**
      * Return a read-only map to the k-th vertex normal (3 contiguous floats).
      *
      * @param[in] k  Vertex index (0 to np - 1).
      * @return Read-only view of row k of nn (unit normal).
      */
-    Eigen::Map<const Eigen::Vector3f> normal(int k) const { return Eigen::Map<const Eigen::Vector3f>(nn.row(k).data()); }
+    Eigen::Map<const Eigen::Vector3f> normal(int k) const
+    {
+        return Eigen::Map<const Eigen::Vector3f>(nn.row(k).data());
+    }
 
-    Eigen::VectorXi   inuse;    /**< Boolean array indicating whether each vertex is in use in the source space (np elements). */
-    Eigen::VectorXi   vertno;   /**< Vertex numbers of the used vertices in the full source space (nuse elements). */
-    int              nuse;      /**< Number of vertices in use. */
+    Eigen::VectorXi inuse;  /**< Boolean array indicating whether each vertex is in use in the source space (np elements). */
+    Eigen::VectorXi vertno; /**< Vertex numbers of the used vertices in the full source space (nuse elements). */
+    int nuse;               /**< Number of vertices in use. */
 
     std::vector<Eigen::VectorXi> neighbor_vert; /**< Vertices neighboring each vertex (np entries, variable length). */
-    Eigen::VectorXi   nneighbor_vert; /**< Number of vertices neighboring each vertex (np elements). */
+    Eigen::VectorXi nneighbor_vert;             /**< Number of vertices neighboring each vertex (np elements). */
     std::vector<Eigen::VectorXf> vert_dist;     /**< Euclidean distances between neighboring vertices (np entries, variable length). */
     /*
      * These are for surfaces only
      */
-    float            sigma;     /**< Conductivity of a BEM compartment (-1 if not set). */
+    float sigma; /**< Conductivity of a BEM compartment (-1 if not set). */
 
-    int              ntri;      /**< Number of triangles in the surface. */
+    int ntri;                      /**< Number of triangles in the surface. */
     std::vector<MNETriangle> tris; /**< The full triangulation data (ntri elements). */
-    TrianglesT       itris;     /**< Triangle vertex indices (ntri x 3, row-major). */
-    float            tot_area;  /**< Total area of the surface, computed from the triangles (m^2). */
+    TrianglesT itris;              /**< Triangle vertex indices (ntri x 3, row-major). */
+    float tot_area;                /**< Total area of the surface, computed from the triangles (m^2). */
 
-    int              nuse_tri;      /**< Number of triangles in the in-use triangulation. */
+    int nuse_tri;                      /**< Number of triangles in the in-use triangulation. */
     std::vector<MNETriangle> use_tris; /**< Triangulation data for the in-use vertices. */
-    TrianglesT       use_itris;     /**< Vertex indices for the in-use triangulation (row-major). */
+    TrianglesT use_itris;              /**< Vertex indices for the in-use triangulation (row-major). */
 
-    std::vector<Eigen::VectorXi> neighbor_tri;    /**< Neighboring triangles for each vertex (np entries, variable length). */
-    Eigen::VectorXi   nneighbor_tri;    /**< Number of neighboring triangles for each vertex (np elements). */
+    std::vector<Eigen::VectorXi> neighbor_tri; /**< Neighboring triangles for each vertex (np entries, variable length). */
+    Eigen::VectorXi nneighbor_tri;             /**< Number of neighboring triangles for each vertex (np elements). */
 
-    std::vector<MNENearest> nearest; /**< Nearest in-use vertex info for each vertex (np elements). */
+    std::vector<MNENearest> nearest;                  /**< Nearest in-use vertex info for each vertex (np elements). */
     std::vector<std::optional<MNEPatchInfo>> patches; /**< Patch information for each in-use vertex (nuse elements). */
 
-    FIFFLIB::FiffSparseMatrix dist;         /**< Distances between (used) vertices along the surface. */
-    float            dist_limit;    /**< Distance limit: values above this were not computed. Negative means only used vertices were considered. */
+    FIFFLIB::FiffSparseMatrix dist; /**< Distances between (used) vertices along the surface. */
+    float dist_limit;               /**< Distance limit: values above this were not computed. Negative means only used vertices were considered. */
 
-    Eigen::VectorXf   curv; /**< The FreeSurfer curvature values (np elements). */
-    Eigen::VectorXf   val;  /**< Auxiliary values associated with the vertices (np elements). */
+    Eigen::VectorXf curv; /**< The FreeSurfer curvature values (np elements). */
+    Eigen::VectorXf val;  /**< Auxiliary values associated with the vertices (np elements). */
     /*
      * These are for volumes only
      */
-    std::optional<FIFFLIB::FiffCoordTrans>  voxel_surf_RAS_t;   /**< Transform from voxel coordinates to surface RAS (MRI) coordinates. */
-    int             vol_dims[3];        /**< Dimensions of the volume grid (width x height x depth). Present only for complete rectangular grids including unused vertices. */
-    float           voxel_size[3];      /**< Voxel size in meters, derived from the voxel transform. */
+    std::optional<FIFFLIB::FiffCoordTrans> voxel_surf_RAS_t;     /**< Transform from voxel coordinates to surface RAS (MRI) coordinates. */
+    int vol_dims[3];                                             /**< Dimensions of the volume grid (width x height x depth). Present only for complete rectangular grids including unused vertices. */
+    float voxel_size[3];                                         /**< Voxel size in meters, derived from the voxel transform. */
     std::optional<FIFFLIB::FiffSparseMatrix> interpolator;       /**< Sparse matrix to interpolate from source space into an MRI volume. */
-    QString         MRI_volume;         /**< Path to the MRI volume file the interpolator is based on. */
-    std::optional<FIFFLIB::FiffCoordTrans>  MRI_voxel_surf_RAS_t; /**< Voxel-to-surface-RAS transform for the associated MRI volume. */
-    std::optional<FIFFLIB::FiffCoordTrans>  MRI_surf_RAS_RAS_t; /**< Transform from surface RAS to scanner RAS in the associated MRI volume. */
-    int             MRI_vol_dims[3];       /**< Dimensions of the associated MRI volume (width x height x depth). */
+    QString MRI_volume;                                          /**< Path to the MRI volume file the interpolator is based on. */
+    std::optional<FIFFLIB::FiffCoordTrans> MRI_voxel_surf_RAS_t; /**< Voxel-to-surface-RAS transform for the associated MRI volume. */
+    std::optional<FIFFLIB::FiffCoordTrans> MRI_surf_RAS_RAS_t;   /**< Transform from surface RAS to scanner RAS in the associated MRI volume. */
+    int MRI_vol_dims[3];                                         /**< Dimensions of the associated MRI volume (width x height x depth). */
 };
 
 //=============================================================================================================

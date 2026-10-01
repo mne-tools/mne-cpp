@@ -38,7 +38,8 @@
 // DEFINE NAMESPACE
 //=============================================================================================================
 
-namespace FTBUFFERPLUGIN {
+namespace FTBUFFERPLUGIN
+{
 
 //=============================================================================================================
 // FTBUFFERPLUGIN FORWARD DECLARATIONS
@@ -115,7 +116,7 @@ signals:
      *
      * @param[in] matData   Formated data from buffer.
      */
-    void newDataAvailable(const Eigen::MatrixXd &matData);
+    void newDataAvailable(const Eigen::MatrixXd& matData);
 
     //=========================================================================================================
     /**
@@ -126,10 +127,9 @@ signals:
     void connecStatus(bool connection);
 
 private:
-    FtBuffer*                       m_pFtBuffer;                /**< Pointer to FtBuffer that created this object. Destination of collected data. */
+    FtBuffer* m_pFtBuffer; /**< Pointer to FtBuffer that created this object. Destination of collected data. */
 
-    FtConnector*                    m_pFtConnector;             /**< FtConnectr object that interfaces with buffer and gets buffer data. */
-
+    FtConnector* m_pFtConnector; /**< FtConnectr object that interfaces with buffer and gets buffer data. */
 };
 
 } // namespace

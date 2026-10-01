@@ -32,8 +32,9 @@
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-namespace Ui {
-    class ProgressViewWidget;
+namespace Ui
+{
+class ProgressViewWidget;
 }
 
 //=============================================================================================================
@@ -151,9 +152,7 @@ public slots:
     void setLoadingBarVisible(bool bVisible);
 
 private:
-
-    Ui::ProgressViewWidget*     m_pUi;
-
+    Ui::ProgressViewWidget* m_pUi;
 };
 } //Namespace
 

@@ -166,7 +166,7 @@ private slots:
         QStringList rowNames = {"v1", "v2"};
         Eigen::MatrixXf data(2, 3);
         data << 1, 0, 0,
-                0, 1, 0;
+            0, 1, 0;
         auto nm_ptr = MNENamedMatrix::build(2, 3, rowNames, colNames, data);
 
         MNENamedMatrix nm(*nm_ptr);
@@ -337,9 +337,9 @@ private slots:
     {
         // Create mock EEG channel info
         QList<FiffChInfo> chs;
-        for(int i = 0; i < 5; ++i) {
+        for (int i = 0; i < 5; ++i) {
             FiffChInfo ch;
-            ch.ch_name = QString("EEG%1").arg(i+1, 3, 10, QChar('0'));
+            ch.ch_name = QString("EEG%1").arg(i + 1, 3, 10, QChar('0'));
             ch.kind = FIFFV_EEG_CH;
             ch.chpos.coil_type = FIFFV_COIL_EEG;
             chs.append(ch);
@@ -352,7 +352,8 @@ private slots:
 
     void testProjOpReadFromFiff()
     {
-        if(!QFile::exists(m_sRawFile)) QSKIP("Raw file not found");
+        if (!QFile::exists(m_sRawFile))
+            QSKIP("Raw file not found");
 
         QFile file(m_sRawFile);
         FiffRawData raw(file);
@@ -428,9 +429,9 @@ private slots:
     {
         // Create mock channel list with no compensation
         QList<FiffChInfo> chs;
-        for(int i = 0; i < 3; ++i) {
+        for (int i = 0; i < 3; ++i) {
             FiffChInfo ch;
-            ch.ch_name = QString("MEG%1").arg(i+1, 4, 10, QChar('0'));
+            ch.ch_name = QString("MEG%1").arg(i + 1, 4, 10, QChar('0'));
             ch.kind = FIFFV_MEG_CH;
             chs.append(ch);
         }
@@ -442,9 +443,9 @@ private slots:
     void testCtfCompSetComp()
     {
         QList<FiffChInfo> chs;
-        for(int i = 0; i < 3; ++i) {
+        for (int i = 0; i < 3; ++i) {
             FiffChInfo ch;
-            ch.ch_name = QString("MEG%1").arg(i+1, 4, 10, QChar('0'));
+            ch.ch_name = QString("MEG%1").arg(i + 1, 4, 10, QChar('0'));
             ch.kind = FIFFV_MEG_CH;
             chs.append(ch);
         }
@@ -500,7 +501,7 @@ private slots:
 
         AverageDescription desc;
         bool ok = MNEDescriptionParser::parseAverageFile(aveFile, desc);
-        if(ok) {
+        if (ok) {
             QVERIFY(desc.categories.size() > 0);
         } else {
             qWarning("parseAverageFile failed — code path exercised");
@@ -533,7 +534,7 @@ private slots:
 
         CovDescription desc;
         bool ok = MNEDescriptionParser::parseCovarianceFile(covFile, desc);
-        if(ok) {
+        if (ok) {
             QVERIFY(desc.defs.size() > 0);
         } else {
             qWarning("parseCovarianceFile failed — code path exercised");
@@ -547,7 +548,9 @@ private slots:
         QVERIFY(!ok);
     }
 
-    void cleanupTestCase() {}
+    void cleanupTestCase()
+    {
+    }
 };
 
 QTEST_GUILESS_MAIN(TestMneProjections)

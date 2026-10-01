@@ -35,7 +35,7 @@ using namespace std;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-ButterflySceneItem::ButterflySceneItem(QString setName, int setKind, int setUnit, const QList<QColor> &defaultColors)
+ButterflySceneItem::ButterflySceneItem(QString setName, int setKind, int setUnit, const QList<QColor>& defaultColors)
 : m_sSetName(setName)
 , m_iSetKind(setKind)
 , m_iSetUnit(setUnit)
@@ -44,11 +44,11 @@ ButterflySceneItem::ButterflySceneItem(QString setName, int setKind, int setUnit
 {
     //Init m_scaleMap
     m_scaleMap["MEG_grad"] = RawSettingsConstants::DELEGATE_SCALE_MEG_GRAD;
-    m_scaleMap["MEG_mag"]  = RawSettingsConstants::DELEGATE_SCALE_MEG_MAG;
-    m_scaleMap["MEG_EEG"]  = RawSettingsConstants::DELEGATE_SCALE_EEG;
-    m_scaleMap["MEG_EOG"]  = RawSettingsConstants::DELEGATE_SCALE_EOG;
-    m_scaleMap["MEG_EMG"]  = RawSettingsConstants::DELEGATE_SCALE_EMG;
-    m_scaleMap["MEG_ECG"]  = RawSettingsConstants::DELEGATE_SCALE_ECG;
+    m_scaleMap["MEG_mag"] = RawSettingsConstants::DELEGATE_SCALE_MEG_MAG;
+    m_scaleMap["MEG_EEG"] = RawSettingsConstants::DELEGATE_SCALE_EEG;
+    m_scaleMap["MEG_EOG"] = RawSettingsConstants::DELEGATE_SCALE_EOG;
+    m_scaleMap["MEG_EMG"] = RawSettingsConstants::DELEGATE_SCALE_EMG;
+    m_scaleMap["MEG_ECG"] = RawSettingsConstants::DELEGATE_SCALE_ECG;
     m_scaleMap["MEG_MISC"] = RawSettingsConstants::DELEGATE_SCALE_MISC;
     m_scaleMap["MEG_STIM"] = RawSettingsConstants::DELEGATE_SCALE_STIM;
 }
@@ -77,7 +77,7 @@ QRectF ButterflySceneItem::plotArea() const
 void ButterflySceneItem::setPlotSize(int plotW, int plotH)
 {
     prepareGeometryChange();
-    m_plotWidth  = qMax(100, plotW);
+    m_plotWidth = qMax(100, plotW);
     m_plotHeight = qMax(60, plotH);
 }
 
@@ -86,7 +86,7 @@ void ButterflySceneItem::setPlotSize(int plotW, int plotH)
 
 double ButterflySceneItem::xToTime(double sceneX) const
 {
-    if(!m_pFiffInfo || m_lAverageData.second <= 0)
+    if (!m_pFiffInfo || m_lAverageData.second <= 0)
         return 0.0;
     const QRectF pa = plotArea();
     const double frac = (sceneX - pa.x()) / pa.width();
@@ -102,10 +102,10 @@ double ButterflySceneItem::yToAmplitude(double sceneY) const
 {
     const QRectF pa = plotArea();
     double dMaxValue = 1e-09;
-    if(m_iSetKind == FIFFV_MEG_CH) {
+    if (m_iSetKind == FIFFV_MEG_CH) {
         dMaxValue = (m_iSetUnit == FIFF_UNIT_T_M) ? m_scaleMap.value("MEG_grad", RawSettingsConstants::DELEGATE_SCALE_MEG_GRAD)
-                                                   : m_scaleMap.value("MEG_mag", RawSettingsConstants::DELEGATE_SCALE_MEG_MAG);
-    } else if(m_iSetKind == FIFFV_EEG_CH) {
+                                                  : m_scaleMap.value("MEG_mag", RawSettingsConstants::DELEGATE_SCALE_MEG_MAG);
+    } else if (m_iSetKind == FIFFV_EEG_CH) {
         dMaxValue = m_scaleMap.value("MEG_EEG", RawSettingsConstants::DELEGATE_SCALE_EEG);
     }
     const double centerY = pa.y() + pa.height() / 2.0;
@@ -115,7 +115,7 @@ double ButterflySceneItem::yToAmplitude(double sceneY) const
 
 //*************************************************************************************************************
 
-void ButterflySceneItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
+void ButterflySceneItem::paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget)
 {
     Q_UNUSED(option);
     Q_UNUSED(widget);
@@ -140,7 +140,7 @@ void ButterflySceneItem::paint(QPainter *painter, const QStyleOptionGraphicsItem
     painter->restore();
 
     // GFP overlay
-    if(m_bShowGFP) {
+    if (m_bShowGFP) {
         painter->save();
         paintGFP(painter);
         painter->restore();
@@ -174,9 +174,9 @@ void ButterflySceneItem::setEvokedData(const FiffEvoked& evoked)
 
 //*************************************************************************************************************
 
-void ButterflySceneItem::paintAxes(QPainter *painter)
+void ButterflySceneItem::paintAxes(QPainter* painter)
 {
-    if(!m_pFiffInfo || m_lAverageData.second <= 0)
+    if (!m_pFiffInfo || m_lAverageData.second <= 0)
         return;
 
     const QRectF pa = plotArea();
@@ -184,23 +184,23 @@ void ButterflySceneItem::paintAxes(QPainter *painter)
     const double tMin = m_firstLastSample.first / sfreq;
     const double tMax = m_firstLastSample.second / sfreq;
     const double tRange = tMax - tMin;
-    if(tRange <= 0.0)
+    if (tRange <= 0.0)
         return;
 
     // --- Determine max value for Y axis ---
     double dMaxValue = 1e-09;
     QString yUnitLabel;
-    if(m_iSetKind == FIFFV_MEG_CH) {
-        if(m_iSetUnit == FIFF_UNIT_T_M) {
+    if (m_iSetKind == FIFFV_MEG_CH) {
+        if (m_iSetUnit == FIFF_UNIT_T_M) {
             dMaxValue = m_scaleMap.value("MEG_grad", RawSettingsConstants::DELEGATE_SCALE_MEG_GRAD);
             yUnitLabel = "fT/cm";
         } else {
             dMaxValue = m_scaleMap.value("MEG_mag", RawSettingsConstants::DELEGATE_SCALE_MEG_MAG);
             yUnitLabel = "fT";
         }
-    } else if(m_iSetKind == FIFFV_EEG_CH) {
+    } else if (m_iSetKind == FIFFV_EEG_CH) {
         dMaxValue = m_scaleMap.value("MEG_EEG", RawSettingsConstants::DELEGATE_SCALE_EEG);
-        yUnitLabel = QStringLiteral("\u00B5V");  // µV
+        yUnitLabel = QStringLiteral("\u00B5V"); // µV
     }
 
     // --- Axis pens ---
@@ -234,14 +234,18 @@ void ButterflySceneItem::paintAxes(QPainter *painter)
     double mag = std::pow(10.0, std::floor(std::log10(rawStep)));
     double residual = rawStep / mag;
     double tickStep;
-    if(residual < 1.5) tickStep = 1.0 * mag;
-    else if(residual < 3.5) tickStep = 2.0 * mag;
-    else if(residual < 7.5) tickStep = 5.0 * mag;
-    else tickStep = 10.0 * mag;
+    if (residual < 1.5)
+        tickStep = 1.0 * mag;
+    else if (residual < 3.5)
+        tickStep = 2.0 * mag;
+    else if (residual < 7.5)
+        tickStep = 5.0 * mag;
+    else
+        tickStep = 10.0 * mag;
 
     double tStart = std::ceil(tMin / tickStep) * tickStep;
     painter->setPen(axisPen);
-    for(double t = tStart; t <= tMax + tickStep * 0.01; t += tickStep) {
+    for (double t = tStart; t <= tMax + tickStep * 0.01; t += tickStep) {
         double xFrac = (t - tMin) / tRange;
         double xPos = pa.x() + xFrac * pa.width();
 
@@ -273,31 +277,35 @@ void ButterflySceneItem::paintAxes(QPainter *painter)
 
     // Determine Y display scale factor and unit
     double yDisplayFactor = 1.0;
-    if(m_iSetKind == FIFFV_MEG_CH && m_iSetUnit == FIFF_UNIT_T_M) {
-        yDisplayFactor = 1e13;  // T/m → fT/cm
-    } else if(m_iSetKind == FIFFV_MEG_CH && m_iSetUnit == FIFF_UNIT_T) {
-        yDisplayFactor = 1e15;  // T → fT
-    } else if(m_iSetKind == FIFFV_EEG_CH) {
-        yDisplayFactor = 1e6;   // V → µV
+    if (m_iSetKind == FIFFV_MEG_CH && m_iSetUnit == FIFF_UNIT_T_M) {
+        yDisplayFactor = 1e13; // T/m → fT/cm
+    } else if (m_iSetKind == FIFFV_MEG_CH && m_iSetUnit == FIFF_UNIT_T) {
+        yDisplayFactor = 1e15; // T → fT
+    } else if (m_iSetKind == FIFFV_EEG_CH) {
+        yDisplayFactor = 1e6; // V → µV
     }
 
     double yMag = std::pow(10.0, std::floor(std::log10(yRawStep * yDisplayFactor)));
     double yRes = (yRawStep * yDisplayFactor) / yMag;
     double yTickDisplayStep;
-    if(yRes < 1.5) yTickDisplayStep = 1.0 * yMag;
-    else if(yRes < 3.5) yTickDisplayStep = 2.0 * yMag;
-    else if(yRes < 7.5) yTickDisplayStep = 5.0 * yMag;
-    else yTickDisplayStep = 10.0 * yMag;
+    if (yRes < 1.5)
+        yTickDisplayStep = 1.0 * yMag;
+    else if (yRes < 3.5)
+        yTickDisplayStep = 2.0 * yMag;
+    else if (yRes < 7.5)
+        yTickDisplayStep = 5.0 * yMag;
+    else
+        yTickDisplayStep = 10.0 * yMag;
     yTickStep = yTickDisplayStep / yDisplayFactor;
 
     double scaleY = pa.height() / (2.0 * dMaxValue);
-    for(double v = -dMaxValue; v <= dMaxValue + yTickStep * 0.01; v += yTickStep) {
+    for (double v = -dMaxValue; v <= dMaxValue + yTickStep * 0.01; v += yTickStep) {
         double yPos = centerY - v * scaleY;
-        if(yPos < pa.y() - 1 || yPos > pa.y() + pa.height() + 1)
+        if (yPos < pa.y() - 1 || yPos > pa.y() + pa.height() + 1)
             continue;
 
         // Grid line
-        if(std::abs(v) > yTickStep * 0.01) {
+        if (std::abs(v) > yTickStep * 0.01) {
             painter->setPen(gridPen);
             painter->drawLine(QPointF(pa.x(), yPos), QPointF(pa.x() + pa.width(), yPos));
         }
@@ -317,12 +325,12 @@ void ButterflySceneItem::paintAxes(QPainter *painter)
     painter->setPen(axisPen);
     painter->translate(12, pa.y() + pa.height() / 2.0);
     painter->rotate(-90);
-    painter->drawText(QRectF(-pa.height()/2, -8, pa.height(), 16),
+    painter->drawText(QRectF(-pa.height() / 2, -8, pa.height(), 16),
                       Qt::AlignHCenter | Qt::AlignVCenter, yUnitLabel);
     painter->restore();
 
     // --- Stimulus line at t=0 ---
-    if(tMin < 0 && tMax > 0) {
+    if (tMin < 0 && tMax > 0) {
         double x0 = pa.x() + (-tMin / tRange) * pa.width();
         painter->setPen(stimPen);
         painter->drawLine(QPointF(x0, pa.y()), QPointF(x0, pa.y() + pa.height()));
@@ -337,32 +345,30 @@ void ButterflySceneItem::paintAxes(QPainter *painter)
 
 //*************************************************************************************************************
 
-void ButterflySceneItem::paintAveragePaths(QPainter *painter)
+void ButterflySceneItem::paintAveragePaths(QPainter* painter)
 {
-    if(!m_pFiffInfo) {
+    if (!m_pFiffInfo) {
         return;
     }
 
     const QRectF pa = plotArea();
 
     //Create path for all channels
-    for(int i = 0; i < m_pFiffInfo->chs.size() ;i++) {
-
+    for (int i = 0; i < m_pFiffInfo->chs.size(); i++) {
         FiffChInfo fiffChInfoTemp = m_pFiffInfo->chs.at(i);
 
-        if(m_pFiffInfo->bads.contains(fiffChInfoTemp.ch_name) == false) {
+        if (m_pFiffInfo->bads.contains(fiffChInfoTemp.ch_name) == false) {
             //Only plot EEG or MEG channels
-            if((fiffChInfoTemp.kind == FIFFV_MEG_CH && m_iSetKind == FIFFV_MEG_CH && fiffChInfoTemp.unit == FIFF_UNIT_T_M && m_iSetUnit == FIFF_UNIT_T_M) ||    //MEG grad
-               (fiffChInfoTemp.kind == FIFFV_MEG_CH && m_iSetKind == FIFFV_MEG_CH && fiffChInfoTemp.unit == FIFF_UNIT_T && m_iSetUnit == FIFF_UNIT_T) ||        //MEG mag
-               (fiffChInfoTemp.kind == FIFFV_EEG_CH && m_iSetKind == FIFFV_EEG_CH)) {                                                                           //EEG
+            if ((fiffChInfoTemp.kind == FIFFV_MEG_CH && m_iSetKind == FIFFV_MEG_CH && fiffChInfoTemp.unit == FIFF_UNIT_T_M && m_iSetUnit == FIFF_UNIT_T_M) || //MEG grad
+                (fiffChInfoTemp.kind == FIFFV_MEG_CH && m_iSetKind == FIFFV_MEG_CH && fiffChInfoTemp.unit == FIFF_UNIT_T && m_iSetUnit == FIFF_UNIT_T) ||     //MEG mag
+                (fiffChInfoTemp.kind == FIFFV_EEG_CH && m_iSetKind == FIFFV_EEG_CH)) {                                                                        //EEG
                 //Determine channel scaling
                 double dMaxValue = 1e-09;
-                switch(fiffChInfoTemp.kind) {
+                switch (fiffChInfoTemp.kind) {
                     case FIFFV_MEG_CH: {
-                        if(fiffChInfoTemp.unit == FIFF_UNIT_T_M) {
+                        if (fiffChInfoTemp.unit == FIFF_UNIT_T_M) {
                             dMaxValue = m_scaleMap["MEG_grad"];
-                        }
-                        else if(fiffChInfoTemp.unit == FIFF_UNIT_T)
+                        } else if (fiffChInfoTemp.unit == FIFF_UNIT_T)
                             dMaxValue = m_scaleMap["MEG_mag"];
                         break;
                     }
@@ -374,36 +380,38 @@ void ButterflySceneItem::paintAveragePaths(QPainter *painter)
 
                 //Get data pointer for the current channel
                 const double* averageData = m_lAverageData.first;
-                int totalCols =  m_lAverageData.second; //equals to the number of samples stored in the data matrix
-                if(totalCols <= 0)
+                int totalCols = m_lAverageData.second; //equals to the number of samples stored in the data matrix
+                if (totalCols <= 0)
                     continue;
 
                 //Calculate step sizes using the plot area
                 double xStep = pa.width() / static_cast<double>(totalCols);
 
                 //Calculate scaling value
-                double dScaleY = (pa.height())/(2*dMaxValue);
+                double dScaleY = (pa.height()) / (2 * dMaxValue);
 
                 //Setup the painter
                 double centerY = pa.y() + pa.height() / 2.0;
-                double startVal = (*(averageData+(0*m_pFiffInfo->chs.size())+i)) * dScaleY;
+                double startVal = (*(averageData + (0 * m_pFiffInfo->chs.size()) + i)) * dScaleY;
                 QPainterPath path = QPainterPath(QPointF(pa.x(), centerY - startVal));
                 QPen pen;
                 pen.setStyle(Qt::SolidLine);
-                if(!m_cAverageColors.isEmpty() && i<m_cAverageColors.size())
+                if (!m_cAverageColors.isEmpty() && i < m_cAverageColors.size())
                     pen.setColor(m_cAverageColors.at(i));
                 pen.setWidthF(0.5);
                 painter->setPen(pen);
 
                 //Generate plot path
-                for(int u = 0; u < totalCols; ++u) {
+                for (int u = 0; u < totalCols; ++u) {
                     //evoked matrix is stored in column major
-                    double val = (*(averageData+(u*m_pFiffInfo->chs.size())+i)) * dScaleY;
+                    double val = (*(averageData + (u * m_pFiffInfo->chs.size()) + i)) * dScaleY;
 
                     //Clamp to plot area
                     double halfH = pa.height() / 2.0;
-                    if(val > halfH) val = halfH;
-                    else if(val < -halfH) val = -halfH;
+                    if (val > halfH)
+                        val = halfH;
+                    else if (val < -halfH)
+                        val = -halfH;
 
                     double xPos = pa.x() + u * xStep;
                     path.lineTo(QPointF(xPos, centerY - val));
@@ -419,25 +427,25 @@ void ButterflySceneItem::paintAveragePaths(QPainter *painter)
 
 //*************************************************************************************************************
 
-void ButterflySceneItem::paintGFP(QPainter *painter)
+void ButterflySceneItem::paintGFP(QPainter* painter)
 {
-    if(!m_pFiffInfo)
+    if (!m_pFiffInfo)
         return;
 
     const QRectF pa = plotArea();
     const double* averageData = m_lAverageData.first;
     int totalCols = m_lAverageData.second;
-    if(totalCols <= 0)
+    if (totalCols <= 0)
         return;
 
     // Determine scale for this channel type
     double dMaxValue = 1e-09;
-    if(m_iSetKind == FIFFV_MEG_CH) {
-        if(m_iSetUnit == FIFF_UNIT_T_M)
+    if (m_iSetKind == FIFFV_MEG_CH) {
+        if (m_iSetUnit == FIFF_UNIT_T_M)
             dMaxValue = m_scaleMap.value("MEG_grad", 4e-11);
         else
             dMaxValue = m_scaleMap.value("MEG_mag", 1.2e-12);
-    } else if(m_iSetKind == FIFFV_EEG_CH) {
+    } else if (m_iSetKind == FIFFV_EEG_CH) {
         dMaxValue = m_scaleMap.value("MEG_EEG", 30e-6);
     }
 
@@ -448,18 +456,18 @@ void ButterflySceneItem::paintGFP(QPainter *painter)
     // Collect channel indices matching this kind/unit
     QVector<int> chIndices;
     int nChs = m_pFiffInfo->chs.size();
-    for(int i = 0; i < nChs; ++i) {
+    for (int i = 0; i < nChs; ++i) {
         const FiffChInfo& ch = m_pFiffInfo->chs[i];
-        if(m_pFiffInfo->bads.contains(ch.ch_name))
+        if (m_pFiffInfo->bads.contains(ch.ch_name))
             continue;
-        if(ch.kind == FIFFV_MEG_CH && m_iSetKind == FIFFV_MEG_CH &&
-           ch.unit == m_iSetUnit) {
+        if (ch.kind == FIFFV_MEG_CH && m_iSetKind == FIFFV_MEG_CH &&
+            ch.unit == m_iSetUnit) {
             chIndices.append(i);
-        } else if(ch.kind == FIFFV_EEG_CH && m_iSetKind == FIFFV_EEG_CH) {
+        } else if (ch.kind == FIFFV_EEG_CH && m_iSetKind == FIFFV_EEG_CH) {
             chIndices.append(i);
         }
     }
-    if(chIndices.isEmpty())
+    if (chIndices.isEmpty())
         return;
 
     int nMatch = chIndices.size();
@@ -469,16 +477,17 @@ void ButterflySceneItem::paintGFP(QPainter *painter)
     QPainterPath pathTop(QPointF(pa.x(), centerY));
     QPainterPath pathBot(QPointF(pa.x(), centerY));
 
-    for(int u = 0; u < totalCols; ++u) {
+    for (int u = 0; u < totalCols; ++u) {
         double sumSq = 0.0;
-        for(int c = 0; c < nMatch; ++c) {
+        for (int c = 0; c < nMatch; ++c) {
             double v = *(averageData + (u * nChs) + chIndices[c]);
             sumSq += v * v;
         }
         double gfp = std::sqrt(sumSq / nMatch);
         double yVal = gfp * dScaleY;
         double halfH = pa.height() / 2.0;
-        if(yVal > halfH) yVal = halfH;
+        if (yVal > halfH)
+            yVal = halfH;
 
         double xPos = pa.x() + u * xStep;
         pathTop.lineTo(QPointF(xPos, centerY - yVal));
@@ -490,8 +499,8 @@ void ButterflySceneItem::paintGFP(QPainter *painter)
     pathTop.closeSubpath();
 
     // Draw filled GFP area (semi-transparent)
-    QColor gfpFill(108, 92, 231, 35);   // purple, very transparent
-    QColor gfpLine(108, 92, 231, 180);  // purple, mostly opaque
+    QColor gfpFill(108, 92, 231, 35);  // purple, very transparent
+    QColor gfpLine(108, 92, 231, 180); // purple, mostly opaque
     painter->setBrush(gfpFill);
     painter->setPen(Qt::NoPen);
     painter->drawPath(pathTop);
@@ -503,16 +512,17 @@ void ButterflySceneItem::paintGFP(QPainter *painter)
 
     // Draw GFP outline
     QPainterPath outline(QPointF(pa.x(), centerY));
-    for(int u = 0; u < totalCols; ++u) {
+    for (int u = 0; u < totalCols; ++u) {
         double sumSq = 0.0;
-        for(int c = 0; c < nMatch; ++c) {
+        for (int c = 0; c < nMatch; ++c) {
             double v = *(averageData + (u * nChs) + chIndices[c]);
             sumSq += v * v;
         }
         double gfp = std::sqrt(sumSq / nMatch);
         double yVal = gfp * dScaleY;
         double halfH = pa.height() / 2.0;
-        if(yVal > halfH) yVal = halfH;
+        if (yVal > halfH)
+            yVal = halfH;
         outline.lineTo(QPointF(pa.x() + u * xStep, centerY - yVal));
     }
 
@@ -524,26 +534,18 @@ void ButterflySceneItem::paintGFP(QPainter *painter)
 
     // Mirror outline
     QPainterPath outlineMirror(QPointF(pa.x(), centerY));
-    for(int u = 0; u < totalCols; ++u) {
+    for (int u = 0; u < totalCols; ++u) {
         double sumSq = 0.0;
-        for(int c = 0; c < nMatch; ++c) {
+        for (int c = 0; c < nMatch; ++c) {
             double v = *(averageData + (u * nChs) + chIndices[c]);
             sumSq += v * v;
         }
         double gfp = std::sqrt(sumSq / nMatch);
         double yVal = gfp * dScaleY;
         double halfH = pa.height() / 2.0;
-        if(yVal > halfH) yVal = halfH;
+        if (yVal > halfH)
+            yVal = halfH;
         outlineMirror.lineTo(QPointF(pa.x() + u * xStep, centerY + yVal));
     }
     painter->drawPath(outlineMirror);
 }
-
-
-
-
-
-
-
-
-

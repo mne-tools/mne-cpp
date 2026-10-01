@@ -33,7 +33,7 @@ using namespace MNESETUPMRI;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-MNESetupMriSettings::MNESetupMriSettings(int *argc, char **argv)
+MNESetupMriSettings::MNESetupMriSettings(int* argc, char** argv)
 : m_bOverwrite(false)
 , m_bVerbose(false)
 {
@@ -43,37 +43,36 @@ MNESetupMriSettings::MNESetupMriSettings(int *argc, char **argv)
         "This tool creates the Neuromag-compatible directory structure and\n"
         "converts FreeSurfer MRI volumes (COR files or .mgz) into COR.fif\n"
         "FIFF files, following the original MNE C tool by Matti Hamalainen.\n\n"
-        "Ported from SVN MNE mne_setup_mri / mne_make_cor_set."
-    );
+        "Ported from SVN MNE mne_setup_mri / mne_make_cor_set.");
     parser.addHelpOption();
     parser.addVersionOption();
 
     // --subject
     QCommandLineOption subjectOpt(QStringList() << "subject",
-        "Subject name (defaults to $SUBJECT environment variable).",
-        "subject");
+                                  "Subject name (defaults to $SUBJECT environment variable).",
+                                  "subject");
     parser.addOption(subjectOpt);
 
     // --subjects-dir
     QCommandLineOption subjectsDirOpt(QStringList() << "subjects-dir",
-        "Subjects directory (defaults to $SUBJECTS_DIR environment variable).",
-        "dir");
+                                      "Subjects directory (defaults to $SUBJECTS_DIR environment variable).",
+                                      "dir");
     parser.addOption(subjectsDirOpt);
 
     // --mri
     QCommandLineOption mriOpt(QStringList() << "mri",
-        "MRI set name to process (can be specified multiple times, default: T1 brain).",
-        "name");
+                              "MRI set name to process (can be specified multiple times, default: T1 brain).",
+                              "name");
     parser.addOption(mriOpt);
 
     // --overwrite
     QCommandLineOption overwriteOpt(QStringList() << "overwrite",
-        "Overwrite existing data.");
+                                    "Overwrite existing data.");
     parser.addOption(overwriteOpt);
 
     // --verbose
     QCommandLineOption verboseOpt(QStringList() << "verbose",
-        "Enable verbose output.");
+                                  "Enable verbose output.");
     parser.addOption(verboseOpt);
 
     // Build argument list from argc/argv

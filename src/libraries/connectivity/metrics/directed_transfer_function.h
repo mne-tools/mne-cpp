@@ -61,7 +61,8 @@
 // DEFINE NAMESPACE CONNECTIVITYLIB
 //=============================================================================================================
 
-namespace CONNECTIVITYLIB {
+namespace CONNECTIVITYLIB
+{
 
 //=============================================================================================================
 // CONNECTIVITYLIB FORWARD DECLARATIONS
@@ -86,7 +87,6 @@ class ConnectivitySettings;
  */
 class CONNECTIVITYSHARED_EXPORT DirectedTransferFunction : public AbstractMetric
 {
-
 public:
     typedef QSharedPointer<DirectedTransferFunction> SPtr;            /**< Shared pointer type for DirectedTransferFunction. */
     typedef QSharedPointer<const DirectedTransferFunction> ConstSPtr; /**< Const shared pointer type for DirectedTransferFunction. */
@@ -107,7 +107,7 @@ public:
      *
      * @since 2.2.0
      */
-    static Network calculate(ConnectivitySettings &connectivitySettings);
+    static Network calculate(ConnectivitySettings& connectivitySettings);
 };
 
 //=============================================================================================================

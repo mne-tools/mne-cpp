@@ -57,7 +57,8 @@
 // DEFINE NAMESPACE CONNECTIVITYLIB
 //=============================================================================================================
 
-namespace CONNECTIVITYLIB {
+namespace CONNECTIVITYLIB
+{
 
 //=============================================================================================================
 // CONNECTIVITYLIB FORWARD DECLARATIONS
@@ -78,7 +79,6 @@ class NetworkEdge;
 
 class CONNECTIVITYSHARED_EXPORT NetworkNode
 {
-
 public:
     typedef QSharedPointer<NetworkNode> SPtr;            /**< Shared pointer type for NetworkNode. */
     typedef QSharedPointer<const NetworkNode> ConstSPtr; /**< Const shared pointer type for NetworkNode. */
@@ -98,7 +98,7 @@ public:
      *
      * @return   Returns the list with all ingoing edges.
      */
-    const QList<QSharedPointer<NetworkEdge> >& getFullEdges() const;
+    const QList<QSharedPointer<NetworkEdge>>& getFullEdges() const;
 
     //=========================================================================================================
     /**
@@ -106,7 +106,7 @@ public:
      *
      * @return   Returns the list with all ingoing edges.
      */
-    QList<QSharedPointer<NetworkEdge> > getThresholdedEdges() const;
+    QList<QSharedPointer<NetworkEdge>> getThresholdedEdges() const;
 
     //=========================================================================================================
     /**
@@ -114,7 +114,7 @@ public:
      *
      * @return   Returns the list with all ingoing edges.
      */
-    QList<QSharedPointer<NetworkEdge> > getFullEdgesIn() const;
+    QList<QSharedPointer<NetworkEdge>> getFullEdgesIn() const;
 
     //=========================================================================================================
     /**
@@ -122,7 +122,7 @@ public:
      *
      * @return   Returns the list with all ingoing edges.
      */
-    QList<QSharedPointer<NetworkEdge> > getThresholdedEdgesIn() const;
+    QList<QSharedPointer<NetworkEdge>> getThresholdedEdgesIn() const;
 
     //=========================================================================================================
     /**
@@ -130,7 +130,7 @@ public:
      *
      * @return   Returns the list with all outgoing edges.
      */
-    QList<QSharedPointer<NetworkEdge> > getFullEdgesOut() const;
+    QList<QSharedPointer<NetworkEdge>> getFullEdgesOut() const;
 
     //=========================================================================================================
     /**
@@ -138,7 +138,7 @@ public:
      *
      * @return   Returns the list with all outgoing edges.
      */
-    QList<QSharedPointer<NetworkEdge> > getThresholdedEdgesOut() const;
+    QList<QSharedPointer<NetworkEdge>> getThresholdedEdgesOut() const;
 
     //=========================================================================================================
     /**
@@ -277,13 +277,13 @@ public:
     void append(QSharedPointer<NetworkEdge> newEdge);
 
 protected:
-    bool                                    m_bIsHub;       /**< Whether this node is a hub.*/
+    bool m_bIsHub; /**< Whether this node is a hub.*/
 
-    qint16                                  m_iId;          /**< The node's ID.*/
+    qint16 m_iId; /**< The node's ID.*/
 
-    Eigen::RowVectorXf                      m_vecVert;      /**< The 3D position of the node.*/
+    Eigen::RowVectorXf m_vecVert; /**< The 3D position of the node.*/
 
-    QList<QSharedPointer<NetworkEdge> >     m_lEdges;     /**< List with all incoming edges of the node.*/
+    QList<QSharedPointer<NetworkEdge>> m_lEdges; /**< List with all incoming edges of the node.*/
 };
 
 //=============================================================================================================

@@ -50,21 +50,23 @@
 // DEFINE NAMESPACE LSLLIB
 //=============================================================================================================
 
-namespace LSLLIB {
+namespace LSLLIB
+{
 
 //=============================================================================================================
 /**
  * Data format of a channel (mirroring the values used in the original LSL protocol).
  */
-enum class ChannelFormat : int {
-    Undefined = 0,   /**< Undefined format. */
-    Float32   = 1,   /**< 32-bit IEEE 754 floating point. */
-    Double64  = 2,   /**< 64-bit IEEE 754 floating point. */
-    String    = 3,   /**< Variable-length string. */
-    Int32     = 4,   /**< 32-bit signed integer. */
-    Int16     = 5,   /**< 16-bit signed integer. */
-    Int8      = 6,   /**< 8-bit signed integer. */
-    Int64     = 7    /**< 64-bit signed integer. */
+enum class ChannelFormat : int
+{
+    Undefined = 0, /**< Undefined format. */
+    Float32 = 1,   /**< 32-bit IEEE 754 floating point. */
+    Double64 = 2,  /**< 64-bit IEEE 754 floating point. */
+    String = 3,    /**< Variable-length string. */
+    Int32 = 4,     /**< 32-bit signed integer. */
+    Int16 = 5,     /**< 16-bit signed integer. */
+    Int8 = 6,      /**< 8-bit signed integer. */
+    Int64 = 7      /**< 64-bit signed integer. */
 };
 
 //=============================================================================================================
@@ -241,17 +243,17 @@ public:
     /** @} */
 
 private:
-    std::string         m_name;             /**< Stream name. */
-    std::string         m_type;             /**< Stream content type. */
-    int                 m_channel_count;    /**< Number of channels. */
-    double              m_nominal_srate;    /**< Nominal sampling rate (Hz). */
-    ChannelFormat       m_channel_format;   /**< Channel data format. */
-    std::string         m_source_id;        /**< Source identifier. */
-    std::string         m_uid;              /**< Unique per-instance identifier. */
-    std::string         m_hostname;         /**< Hostname of the originating machine. */
+    std::string m_name;             /**< Stream name. */
+    std::string m_type;             /**< Stream content type. */
+    int m_channel_count;            /**< Number of channels. */
+    double m_nominal_srate;         /**< Nominal sampling rate (Hz). */
+    ChannelFormat m_channel_format; /**< Channel data format. */
+    std::string m_source_id;        /**< Source identifier. */
+    std::string m_uid;              /**< Unique per-instance identifier. */
+    std::string m_hostname;         /**< Hostname of the originating machine. */
 
-    int                 m_data_port;        /**< TCP data port (set during discovery). */
-    std::string         m_data_host;        /**< Data host address (set during discovery). */
+    int m_data_port;         /**< TCP data port (set during discovery). */
+    std::string m_data_host; /**< Data host address (set during discovery). */
 };
 
 } // namespace LSLLIB

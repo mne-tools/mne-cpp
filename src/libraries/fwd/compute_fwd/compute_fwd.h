@@ -67,12 +67,14 @@
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-namespace FIFFLIB {
-    class FiffNamedMatrix;
+namespace FIFFLIB
+{
+class FiffNamedMatrix;
 }
 
-namespace MNELIB {
-    class MNEForwardSolution;
+namespace MNELIB
+{
+class MNEForwardSolution;
 }
 
 //=============================================================================================================
@@ -153,7 +155,7 @@ private:
     // Computation state
     //=========================================================================================================
 
-    std::vector<MNELIB::MNESourceSpace::UPtr> m_spaces;     /**< Source spaces. */
+    std::vector<MNELIB::MNESourceSpace::UPtr> m_spaces; /**< Source spaces. */
     int m_iNSource = 0;                                 /**< Number of active source points. */
     FwdCoilSet::UPtr m_templates;                       /**< Template coil set. */
     FwdCoilSet::UPtr m_megcoils;                        /**< MEG coil set. */
@@ -164,25 +166,25 @@ private:
     FwdEegSphereModel::UPtr m_eegModel;                 /**< Active EEG sphere model. */
     FwdBemModel::UPtr m_bemModel;                       /**< BEM model. */
 
-    QList<FIFFLIB::FiffChInfo> m_listMegChs;             /**< MEG channel information. */
-    QList<FIFFLIB::FiffChInfo> m_listEegChs;             /**< EEG channel information. */
-    QList<FIFFLIB::FiffChInfo> m_listCompChs;            /**< Compensator channel list. */
-    int m_iNChan = 0;                                    /**< Number of channels. */
+    QList<FIFFLIB::FiffChInfo> m_listMegChs;  /**< MEG channel information. */
+    QList<FIFFLIB::FiffChInfo> m_listEegChs;  /**< EEG channel information. */
+    QList<FIFFLIB::FiffChInfo> m_listCompChs; /**< Compensator channel list. */
+    int m_iNChan = 0;                         /**< Number of channels. */
 
-    FIFFLIB::FiffId m_mri_id;                            /**< MRI file ID. */
-    FIFFLIB::FiffId m_meas_id;                           /**< Measurement ID. */
-    FIFFLIB::FiffCoordTrans m_mri_head_t;                /**< MRI-to-head transform. */
-    FIFFLIB::FiffCoordTrans m_meg_head_t;                /**< MEG-to-head transform. */
+    FIFFLIB::FiffId m_mri_id;             /**< MRI file ID. */
+    FIFFLIB::FiffId m_meas_id;            /**< Measurement ID. */
+    FIFFLIB::FiffCoordTrans m_mri_head_t; /**< MRI-to-head transform. */
+    FIFFLIB::FiffCoordTrans m_meg_head_t; /**< MEG-to-head transform. */
 
-    QSharedPointer<FIFFLIB::FiffInfoBase> m_pInfoBase;   /**< Measurement info. */
-    std::shared_ptr<ComputeFwdSettings> m_pSettings;     /**< Forward computation settings. */
+    QSharedPointer<FIFFLIB::FiffInfoBase> m_pInfoBase; /**< Measurement info. */
+    std::shared_ptr<ComputeFwdSettings> m_pSettings;   /**< Forward computation settings. */
 
-    QSharedDataPointer<FIFFLIB::FiffNamedMatrix> m_meg_forward;        /**< MEG forward matrix. */
-    QSharedDataPointer<FIFFLIB::FiffNamedMatrix> m_meg_forward_grad;   /**< MEG gradient forward matrix. */
-    QSharedDataPointer<FIFFLIB::FiffNamedMatrix> m_eeg_forward;        /**< EEG forward matrix. */
-    QSharedDataPointer<FIFFLIB::FiffNamedMatrix> m_eeg_forward_grad;   /**< EEG gradient forward matrix. */
+    QSharedDataPointer<FIFFLIB::FiffNamedMatrix> m_meg_forward;      /**< MEG forward matrix. */
+    QSharedDataPointer<FIFFLIB::FiffNamedMatrix> m_meg_forward_grad; /**< MEG gradient forward matrix. */
+    QSharedDataPointer<FIFFLIB::FiffNamedMatrix> m_eeg_forward;      /**< EEG forward matrix. */
+    QSharedDataPointer<FIFFLIB::FiffNamedMatrix> m_eeg_forward_grad; /**< EEG gradient forward matrix. */
 
-    QString m_qPath;                                     /**< Coil definition file path. */
+    QString m_qPath; /**< Coil definition file path. */
 };
 
 //=============================================================================================================

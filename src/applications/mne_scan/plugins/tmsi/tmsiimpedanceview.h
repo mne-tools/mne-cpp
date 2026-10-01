@@ -49,7 +49,7 @@ public:
     /**
      * Constructs a TMSIImpedanceView.
      */
-    explicit TMSIImpedanceView(QWidget *parent = 0);
+    explicit TMSIImpedanceView(QWidget* parent = 0);
 
 private:
     //=========================================================================================================

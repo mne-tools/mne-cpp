@@ -60,9 +60,9 @@ int Resample::gcd(int a, int b)
 
 RowVectorXd Resample::buildKernel(int p, int q, int iNZeros)
 {
-    int M        = std::max(p, q);
-    int halfLen  = iNZeros * M;
-    int L        = 2 * halfLen + 1;
+    int M = std::max(p, q);
+    int halfLen = iNZeros * M;
+    int L = 2 * halfLen + 1;
 
     // Cutoff as a fraction of the sampling frequency at the upsampled rate p*oldSFreq.
     // We want to cut at the lower Nyquist: min(oldSFreq, newSFreq)/2.
@@ -74,8 +74,8 @@ RowVectorXd Resample::buildKernel(int p, int q, int iNZeros)
 
     RowVectorXd h(L);
     for (int k = 0; k < L; ++k) {
-        double n   = k - halfLen;
-        double win = 0.54 - 0.46 * std::cos(2.0 * M_PI * k / (L - 1));  // Hamming
+        double n = k - halfLen;
+        double win = 0.54 - 0.46 * std::cos(2.0 * M_PI * k / (L - 1)); // Hamming
 
         if (std::abs(n) < 1e-10) {
             h(k) = 2.0 * fc * win;
@@ -93,13 +93,13 @@ RowVectorXd Resample::buildKernel(int p, int q, int iNZeros)
 //=============================================================================================================
 
 RowVectorXd Resample::polyphaseConv(const RowVectorXd& vecX,
-                                     const RowVectorXd& vecH,
-                                     int                p,
-                                     int                q,
-                                     int                halfLen)
+                                    const RowVectorXd& vecH,
+                                    int p,
+                                    int q,
+                                    int halfLen)
 {
-    const long long nIn  = static_cast<long long>(vecX.size());
-    const long long L    = static_cast<long long>(vecH.size());  // = 2*halfLen + 1
+    const long long nIn = static_cast<long long>(vecX.size());
+    const long long L = static_cast<long long>(vecH.size()); // = 2*halfLen + 1
 
     // Output length: ceil(nIn * p / q)
     const long long nOut = (nIn * p + q - 1) / q;
@@ -115,10 +115,12 @@ RowVectorXd Resample::polyphaseConv(const RowVectorXd& vecX,
         // the filter window [center - L + 1, center].
         // That is: j*p in [center - L + 1, center]
         //       => j in [ceil((center-L+1)/p), floor(center/p)]  ∩ [0, nIn-1]
-        long long j_min = (center - L + 1 + p - 1) / p;  // ceil division
-        if (j_min < 0) j_min = 0;
+        long long j_min = (center - L + 1 + p - 1) / p; // ceil division
+        if (j_min < 0)
+            j_min = 0;
         long long j_max = center / p;
-        if (j_max >= nIn) j_max = nIn - 1;
+        if (j_max >= nIn)
+            j_max = nIn - 1;
 
         double val = 0.0;
         for (long long j = j_min; j <= j_max; ++j) {
@@ -138,9 +140,9 @@ RowVectorXd Resample::polyphaseConv(const RowVectorXd& vecX,
 //=============================================================================================================
 
 RowVectorXd Resample::resample(const RowVectorXd& vecData,
-                                double             dNewSFreq,
-                                double             dOldSFreq,
-                                int                iNZeros)
+                               double dNewSFreq,
+                               double dOldSFreq,
+                               int iNZeros)
 {
     if (vecData.size() == 0) {
         qWarning() << "Resample::resample: empty input.";
@@ -156,46 +158,48 @@ RowVectorXd Resample::resample(const RowVectorXd& vecData,
     const int scale = 1000;
     int p_raw = static_cast<int>(std::round(dNewSFreq * scale));
     int q_raw = static_cast<int>(std::round(dOldSFreq * scale));
-    int g     = gcd(p_raw, q_raw);
-    int p     = p_raw / g;
-    int q     = q_raw / g;
+    int g = gcd(p_raw, q_raw);
+    int p = p_raw / g;
+    int q = q_raw / g;
 
     if (p == q) {
-        return vecData;  // Same rate after reduction
+        return vecData; // Same rate after reduction
     }
 
     const int halfLen = iNZeros * std::max(p, q);
-    RowVectorXd h     = buildKernel(p, q, iNZeros);
+    RowVectorXd h = buildKernel(p, q, iNZeros);
 
     return polyphaseConv(vecData, h, p, q, halfLen);
 }
 
 //=============================================================================================================
 
-MatrixXd Resample::resampleMatrix(const MatrixXd&    matData,
-                                   double             dNewSFreq,
-                                   double             dOldSFreq,
-                                   const RowVectorXi& vecPicks,
-                                   int                iNZeros)
+MatrixXd Resample::resampleMatrix(const MatrixXd& matData,
+                                  double dNewSFreq,
+                                  double dOldSFreq,
+                                  const RowVectorXi& vecPicks,
+                                  int iNZeros)
 {
-    if (matData.size() == 0) return matData;
+    if (matData.size() == 0)
+        return matData;
 
     // Pre-build kernel once for all channels
     const int scale = 1000;
     int p_raw = static_cast<int>(std::round(dNewSFreq * scale));
     int q_raw = static_cast<int>(std::round(dOldSFreq * scale));
-    int g     = gcd(p_raw, q_raw);
-    int p     = p_raw / g;
-    int q     = q_raw / g;
+    int g = gcd(p_raw, q_raw);
+    int p = p_raw / g;
+    int q = q_raw / g;
 
-    if (p == q) return matData;
+    if (p == q)
+        return matData;
 
     const int halfLen = iNZeros * std::max(p, q);
-    RowVectorXd h     = buildKernel(p, q, iNZeros);
+    RowVectorXd h = buildKernel(p, q, iNZeros);
 
-    const int nIn    = static_cast<int>(matData.cols());
-    const int nOut   = static_cast<int>((static_cast<long long>(nIn) * p + q - 1) / q);
-    const int nCh    = static_cast<int>(matData.rows());
+    const int nIn = static_cast<int>(matData.cols());
+    const int nOut = static_cast<int>((static_cast<long long>(nIn) * p + q - 1) / q);
+    const int nCh = static_cast<int>(matData.rows());
 
     MatrixXd result(nCh, nOut);
 

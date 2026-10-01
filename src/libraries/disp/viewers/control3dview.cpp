@@ -55,8 +55,8 @@ Control3DView::Control3DView(const QString& sSettingsPath,
                              Qt::WindowType type)
 : AbstractView(parent, type)
 , m_pUi(new Ui::Control3DViewWidget)
-, m_colCurrentSceneColor(QColor(0,0,0))
-, m_colCurrentLightColor(QColor(255,255,255))
+, m_colCurrentSceneColor(QColor(0, 0, 0))
+, m_colCurrentLightColor(QColor(255, 255, 255))
 {
     m_sSettingsPath = sSettingsPath;
     m_pUi->setupUi(this);
@@ -90,13 +90,13 @@ Control3DView::~Control3DView()
 void Control3DView::setFlags(const QStringList& slFlags)
 {
     //Parse flags
-    if(slFlags.contains("Data")) {
+    if (slFlags.contains("Data")) {
         m_pUi->m_treeView_loadedData->show();
     } else {
         m_pUi->m_treeView_loadedData->hide();
     }
 
-    if(slFlags.contains("View")) {
+    if (slFlags.contains("View")) {
         m_pUi->m_groupBox_viewOptions->show();
 
         connect(m_pUi->m_pushButton_sceneColorPicker, static_cast<void (QPushButton::*)(bool)>(&QPushButton::clicked),
@@ -122,7 +122,7 @@ void Control3DView::setFlags(const QStringList& slFlags)
         m_pUi->m_groupBox_viewOptions->hide();
     }
 
-    if(slFlags.contains("Light")) {
+    if (slFlags.contains("Light")) {
         m_pUi->m_groupBox_lightOptions->show();
 
         connect(m_pUi->m_pushButton_lightColorPicker, static_cast<void (QPushButton::*)(bool)>(&QPushButton::clicked),
@@ -136,7 +136,7 @@ void Control3DView::setFlags(const QStringList& slFlags)
 
 //=============================================================================================================
 
-void Control3DView::setDelegate(QStyledItemDelegate *pItemDelegate)
+void Control3DView::setDelegate(QStyledItemDelegate* pItemDelegate)
 {
     //Init tree view properties
     m_pUi->m_treeView_loadedData->setItemDelegate(pItemDelegate);
@@ -159,7 +159,7 @@ void Control3DView::setModel(QStandardItemModel* pDataTreeModel)
 
 void Control3DView::onTreeViewHeaderHide()
 {
-    if(!m_pUi->m_treeView_loadedData->isHeaderHidden()) {
+    if (!m_pUi->m_treeView_loadedData->isHeaderHidden()) {
         m_pUi->m_treeView_loadedData->setHeaderHidden(true);
     } else {
         m_pUi->m_treeView_loadedData->setHeaderHidden(false);
@@ -170,7 +170,7 @@ void Control3DView::onTreeViewHeaderHide()
 
 void Control3DView::onTreeViewRemoveItem(const QModelIndex& index)
 {
-    if(index.isValid()) {
+    if (index.isValid()) {
         m_pUi->m_treeView_loadedData->model()->removeRow(index.row(), index.parent());
     }
 }
@@ -179,7 +179,7 @@ void Control3DView::onTreeViewRemoveItem(const QModelIndex& index)
 
 void Control3DView::onTreeViewDescriptionHide()
 {
-    if(m_pUi->m_treeView_loadedData->isColumnHidden(1)) {
+    if (m_pUi->m_treeView_loadedData->isColumnHidden(1)) {
         m_pUi->m_treeView_loadedData->setColumnHidden(1, false);
     } else {
         m_pUi->m_treeView_loadedData->setColumnHidden(1, true);
@@ -190,7 +190,7 @@ void Control3DView::onTreeViewDescriptionHide()
 
 void Control3DView::saveSettings()
 {
-    if(m_sSettingsPath.isEmpty()) {
+    if (m_sSettingsPath.isEmpty()) {
         return;
     }
 
@@ -202,7 +202,7 @@ void Control3DView::saveSettings()
 
 void Control3DView::loadSettings()
 {
-    if(m_sSettingsPath.isEmpty()) {
+    if (m_sSettingsPath.isEmpty()) {
         return;
     }
 
@@ -214,7 +214,7 @@ void Control3DView::loadSettings()
 
 void Control3DView::updateGuiMode(GuiMode mode)
 {
-    switch(mode) {
+    switch (mode) {
         case GuiMode::Clinical:
             break;
         default: // default is research mode
@@ -226,7 +226,7 @@ void Control3DView::updateGuiMode(GuiMode mode)
 
 void Control3DView::updateProcessingMode(ProcessingMode mode)
 {
-    switch(mode) {
+    switch (mode) {
         case ProcessingMode::Offline:
             break;
         default: // default is realtime mode
@@ -238,7 +238,7 @@ void Control3DView::updateProcessingMode(ProcessingMode mode)
 
 void Control3DView::onOpacityChange(qint32 value)
 {
-    this->setWindowOpacity(1/(100.0/value));
+    this->setWindowOpacity(1 / (100.0 / value));
 }
 
 //=============================================================================================================
@@ -264,7 +264,7 @@ void Control3DView::onSceneColorPicker()
 void Control3DView::onCustomContextMenuRequested(QPoint pos)
 {
     //create custom context menu and actions
-    QMenu *menu = new QMenu(this);
+    QMenu* menu = new QMenu(this);
 
     // Hide header
     QAction* pHideHeader = menu->addAction(tr("Toggle header"));
@@ -281,9 +281,9 @@ void Control3DView::onCustomContextMenuRequested(QPoint pos)
         }
     });
 
-//    QAction* pHideDesc = menu->addAction(tr("Toggle description"));
-//    connect(pHideDesc, &QAction::triggered,
-//            this, &Control3DView::onTreeViewDescriptionHide);
+    //    QAction* pHideDesc = menu->addAction(tr("Toggle description"));
+    //    connect(pHideDesc, &QAction::triggered,
+    //            this, &Control3DView::onTreeViewDescriptionHide);
 
     //show context menu
     menu->popup(m_pUi->m_treeView_loadedData->viewport()->mapToGlobal(pos));
@@ -293,7 +293,7 @@ void Control3DView::onCustomContextMenuRequested(QPoint pos)
 
 void Control3DView::onAlwaysOnTop(bool state)
 {
-    if(state) {
+    if (state) {
         this->setWindowFlags(this->windowFlags() | Qt::WindowStaysOnTopHint);
         this->show();
     } else {
@@ -350,7 +350,7 @@ void Control3DView::onLightColorPicker()
 
 //=============================================================================================================
 
-void Control3DView::onLightColorChanged(const QColor &color)
+void Control3DView::onLightColorChanged(const QColor& color)
 {
     emit lightColorChanged(color);
 }
@@ -366,5 +366,4 @@ void Control3DView::onLightIntensityChanged(double value)
 
 void Control3DView::clearView()
 {
-
 }

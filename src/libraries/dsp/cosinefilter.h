@@ -60,7 +60,13 @@ namespace UTILSLIB
 class DSPSHARED_EXPORT CosineFilter
 {
 public:
-    enum TPassType {LPF, HPF, BPF, NOTCH };
+    enum TPassType
+    {
+        LPF,
+        HPF,
+        BPF,
+        NOTCH
+    };
 
     //=========================================================================================================
     /**
@@ -89,10 +95,10 @@ public:
                  double sFreq,
                  TPassType type);
 
-    Eigen::RowVectorXcd    m_vecFftCoeff;   /**< the FFT-transformed forward filter coefficient set, required for frequency-domain filtering, zero-padded to m_iFftLength. */
-    Eigen::RowVectorXd     m_vecCoeff;      /**< the time filter coefficient set*/
+    Eigen::RowVectorXcd m_vecFftCoeff; /**< the FFT-transformed forward filter coefficient set, required for frequency-domain filtering, zero-padded to m_iFftLength. */
+    Eigen::RowVectorXd m_vecCoeff;     /**< the time filter coefficient set*/
 
-    int             m_iFilterOrder;
+    int m_iFilterOrder;
 };
 } // NAMESPACE UTILSLIB
 

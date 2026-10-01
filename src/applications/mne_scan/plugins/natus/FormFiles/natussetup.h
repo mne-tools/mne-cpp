@@ -51,7 +51,6 @@ class NatusSetup : public QWidget
     Q_OBJECT
 
 public:
-
     //=========================================================================================================
     /**
      * Constructs a NatusSetup which is a child of parent.
@@ -59,7 +58,7 @@ public:
      * @param[in] parent pointer to parent widget; If parent is 0, the new NatusSetup becomes a window. If parent is another widget, NatusSetup becomes a child window inside parent. NatusSetup is deleted when its parent is deleted.
      * @param[in] pNatus a pointer to the corresponding parent.
      */
-    NatusSetup(Natus* pNatus, QWidget *parent = 0);
+    NatusSetup(Natus* pNatus, QWidget* parent = 0);
 
     //=========================================================================================================
     /**
@@ -99,8 +98,8 @@ private:
      */
     void setSamplesPerBlock();
 
-    Natus*                  m_pNatus;          /**< A pointer to corresponding Natus.*/
-    Ui::NatusSetupWidget    ui;                /**< The user interface for the NatusSetup.*/
+    Natus* m_pNatus;         /**< A pointer to corresponding Natus.*/
+    Ui::NatusSetupWidget ui; /**< The user interface for the NatusSetup.*/
 };
 } // NAMESPACE
 

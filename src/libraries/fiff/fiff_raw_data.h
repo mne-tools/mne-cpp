@@ -82,10 +82,10 @@ class FiffRawData;
 class FIFFSHARED_EXPORT FiffRawData
 {
 public:
-    using SPtr = QSharedPointer<FiffRawData>;            /**< Shared pointer type for FiffRawData. */
-    using ConstSPtr = QSharedPointer<const FiffRawData>; /**< Const shared pointer type for FiffRawData. */
-    using UPtr = std::unique_ptr<FiffRawData>;             /**< Unique pointer type for FiffRawData. */
-    using ConstUPtr = std::unique_ptr<const FiffRawData>;  /**< Const unique pointer type for FiffRawData. */
+    using SPtr = QSharedPointer<FiffRawData>;             /**< Shared pointer type for FiffRawData. */
+    using ConstSPtr = QSharedPointer<const FiffRawData>;  /**< Const shared pointer type for FiffRawData. */
+    using UPtr = std::unique_ptr<FiffRawData>;            /**< Unique pointer type for FiffRawData. */
+    using ConstUPtr = std::unique_ptr<const FiffRawData>; /**< Const unique pointer type for FiffRawData. */
 
     //=========================================================================================================
     /**
@@ -99,7 +99,7 @@ public:
      *
      * @param[in] p_FiffRawData  FIFF raw measurement which should be copied.
      */
-    FiffRawData(const FiffRawData &p_FiffRawData);
+    FiffRawData(const FiffRawData& p_FiffRawData);
 
     //=========================================================================================================
     /**
@@ -120,7 +120,7 @@ public:
      *
      * @param[in] p_IODevice     IO device to read the raw data from .
      */
-    FiffRawData(QIODevice &p_IODevice);
+    FiffRawData(QIODevice& p_IODevice);
 
     //=========================================================================================================
     /**
@@ -129,7 +129,7 @@ public:
      * @param[in] p_IODevice       IO device to read the raw data from.
      * @param[in] b_littleEndian   If true, read data as little-endian.
      */
-    FiffRawData(QIODevice &p_IODevice, bool b_littleEndian);
+    FiffRawData(QIODevice& p_IODevice, bool b_littleEndian);
 
     //=========================================================================================================
     /**
@@ -227,22 +227,21 @@ public:
      *
      * @return true on success.
      */
-    bool save(QIODevice &p_IODevice,
-              const Eigen::RowVectorXi &picks = Eigen::RowVectorXi(),
+    bool save(QIODevice& p_IODevice,
+              const Eigen::RowVectorXi& picks = Eigen::RowVectorXi(),
               int decim = 1,
               int from = -1,
               int to = -1) const;
 
 public:
-    FiffStream::SPtr file;      /**< replaces fid. */
-    FiffInfo info;              /**< Fiff measurement information. */
-    fiff_int_t first_samp;      /**< First sample number. */
-    fiff_int_t last_samp;       /**< Last sample number. */
-    Eigen::RowVectorXd cals;    /**< Calibration values. */
-    QList<FiffRawDir> rawdir;   /**< Special fiff directory entry for raw data. */
-    Eigen::MatrixXd proj;       /**< SSP operator to apply to the data. */
-    FiffCtfComp comp;           /**< Compensator. */
-
+    FiffStream::SPtr file;    /**< replaces fid. */
+    FiffInfo info;            /**< Fiff measurement information. */
+    fiff_int_t first_samp;    /**< First sample number. */
+    fiff_int_t last_samp;     /**< Last sample number. */
+    Eigen::RowVectorXd cals;  /**< Calibration values. */
+    QList<FiffRawDir> rawdir; /**< Special fiff directory entry for raw data. */
+    Eigen::MatrixXd proj;     /**< SSP operator to apply to the data. */
+    FiffCtfComp comp;         /**< Compensator. */
 };
 } // NAMESPACE
 

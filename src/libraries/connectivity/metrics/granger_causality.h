@@ -66,7 +66,8 @@
 // DEFINE NAMESPACE CONNECTIVITYLIB
 //=============================================================================================================
 
-namespace CONNECTIVITYLIB {
+namespace CONNECTIVITYLIB
+{
 
 //=============================================================================================================
 // CONNECTIVITYLIB FORWARD DECLARATIONS
@@ -93,7 +94,6 @@ class ConnectivitySettings;
  */
 class CONNECTIVITYSHARED_EXPORT GrangerCausality : public AbstractMetric
 {
-
 public:
     typedef QSharedPointer<GrangerCausality> SPtr;            /**< Shared pointer type for GrangerCausality. */
     typedef QSharedPointer<const GrangerCausality> ConstSPtr; /**< Const shared pointer type for GrangerCausality. */
@@ -114,7 +114,7 @@ public:
      *
      * @since 2.2.0
      */
-    static Network calculate(ConnectivitySettings &connectivitySettings);
+    static Network calculate(ConnectivitySettings& connectivitySettings);
 };
 
 //=============================================================================================================

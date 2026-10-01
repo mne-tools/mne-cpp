@@ -72,14 +72,14 @@ using namespace FIFFLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-RealTimeEvokedSetWidget::RealTimeEvokedSetWidget(QSharedPointer<QTime> &pTime,
+RealTimeEvokedSetWidget::RealTimeEvokedSetWidget(QSharedPointer<QTime>& pTime,
                                                  QWidget* parent)
 : MeasurementWidget(parent)
 , m_iMaxFilterTapSize(0)
 {
     Q_UNUSED(pTime)
 
-    QAction* pActionSelectSensors = new QAction(QIcon(":/images/selectSensors.png"), tr("Show the channel selection window"),this);
+    QAction* pActionSelectSensors = new QAction(QIcon(":/images/selectSensors.png"), tr("Show the channel selection window"), this);
     pActionSelectSensors->setStatusTip(tr("Show the channel selection view"));
     connect(pActionSelectSensors, &QAction::triggered,
             this, &RealTimeEvokedSetWidget::showSensorSelectionWidget);
@@ -88,7 +88,7 @@ RealTimeEvokedSetWidget::RealTimeEvokedSetWidget(QSharedPointer<QTime> &pTime,
     m_pRTESetLayout = new QVBoxLayout(this);
 
     //Set acquire label
-    m_pLabelInit= new QLabel(this);
+    m_pLabelInit = new QLabel(this);
     m_pLabelInit->setText("Acquiring Data");
     m_pLabelInit->setAlignment(Qt::AlignCenter);
     QFont font;
@@ -96,7 +96,7 @@ RealTimeEvokedSetWidget::RealTimeEvokedSetWidget(QSharedPointer<QTime> &pTime,
     font.setPointSize(20);
     m_pLabelInit->setFont(font);
     m_pRTESetLayout->addWidget(m_pLabelInit);
-    m_pRTESetLayout->setContentsMargins(0,0,0,0);
+    m_pRTESetLayout->setContentsMargins(0, 0, 0, 0);
 
     //Create toolboxes with butterfly and 2D layout plot
     m_pToolBox = new QToolBox(this);
@@ -133,12 +133,11 @@ RealTimeEvokedSetWidget::~RealTimeEvokedSetWidget()
     // m_pRTESet is only assigned once a measurement arrives through update, so
     // a widget destroyed before its plugin produced anything still has it null.
     // That happens whenever a scene is torn down shortly after being built.
-    if(m_pRTESet && !m_pRTESet->getName().isEmpty())
-    {
+    if (m_pRTESet && !m_pRTESet->getName().isEmpty()) {
         QSettings settings("MNECPP");
 
         //Store current view toolbox index - butterfly or 2D layout
-        if(m_pToolBox) {
+        if (m_pToolBox) {
             settings.setValue(QString("MNESCAN/RTESW/selectedView"), m_pToolBox->currentIndex());
         }
     }
@@ -148,23 +147,23 @@ RealTimeEvokedSetWidget::~RealTimeEvokedSetWidget()
 
 void RealTimeEvokedSetWidget::update(SCMEASLIB::Measurement::SPtr pMeasurement)
 {
-    if(!m_pRTESet) {
+    if (!m_pRTESet) {
         m_pRTESet = qSharedPointerDynamicCast<RealTimeEvokedSet>(pMeasurement);
     }
 
-    if(m_pRTESet) {
-        if(!m_pFiffInfo) {
+    if (m_pRTESet) {
+        if (!m_pFiffInfo) {
             m_pFiffInfo = m_pRTESet->info();
 
-            if(!m_bDisplayWidgetsInitialized) {
+            if (!m_bDisplayWidgetsInitialized) {
                 initDisplayControllWidgets();
             }
         }
 
-        if(m_pRTESet->isInitialized()) {
+        if (m_pRTESet->isInitialized()) {
             //Check if block size has changed, if yes update the filter
-            if(!m_pRTESet->getValue()->evoked.isEmpty()) {
-                if(m_iMaxFilterTapSize != m_pRTESet->getValue()->evoked.first().data.cols()) {
+            if (!m_pRTESet->getValue()->evoked.isEmpty()) {
+                if (m_iMaxFilterTapSize != m_pRTESet->getValue()->evoked.first().data.cols()) {
                     m_iMaxFilterTapSize = m_pRTESet->getValue()->evoked.first().data.cols();
 
                     emit windowSizeChanged(m_iMaxFilterTapSize);
@@ -182,12 +181,12 @@ void RealTimeEvokedSetWidget::update(SCMEASLIB::Measurement::SPtr pMeasurement)
 
 void RealTimeEvokedSetWidget::initDisplayControllWidgets()
 {
-    if(m_pFiffInfo) {
+    if (m_pFiffInfo) {
         QSettings settings("MNECPP");
         QString t_sRTESName = m_pRTESet->getName();
 
         //Initialize leftover scalars to default values
-        if(!m_pRTESet->getValue()->evoked.isEmpty()){
+        if (!m_pRTESet->getValue()->evoked.isEmpty()) {
             m_iMaxFilterTapSize = m_pRTESet->getValue()->evoked.first().data.cols();
         } else {
             m_iMaxFilterTapSize = 0;
@@ -240,65 +239,65 @@ void RealTimeEvokedSetWidget::initDisplayControllWidgets()
         //Init control widgets
         QList<QWidget*> lControlWidgets;
 
-//        // Quick control projectors
-//        ProjectorsView* pProjectorsView = new ProjectorsView(QString("MNESCAN/RTESW"));
-//        pProjectorsView->setObjectName("group_tab_View_SSP");
-//        lControlWidgets.append(pProjectorsView);
+        //        // Quick control projectors
+        //        ProjectorsView* pProjectorsView = new ProjectorsView(QString("MNESCAN/RTESW"));
+        //        pProjectorsView->setObjectName("group_tab_View_SSP");
+        //        lControlWidgets.append(pProjectorsView);
 
-//        connect(pProjectorsView, &ProjectorsView::projSelectionChanged,
-//                m_pEvokedSetModel.data(), &EvokedSetModel::updateProjection);
+        //        connect(pProjectorsView, &ProjectorsView::projSelectionChanged,
+        //                m_pEvokedSetModel.data(), &EvokedSetModel::updateProjection);
 
-//        connect(pProjectorsView, &ProjectorsView::projSelectionChanged,
-//                m_pButterflyView.data(), &ButterflyView::updateView);
+        //        connect(pProjectorsView, &ProjectorsView::projSelectionChanged,
+        //                m_pButterflyView.data(), &ButterflyView::updateView);
 
-//        pProjectorsView->setProjectors(m_pFiffInfo->projs);
+        //        pProjectorsView->setProjectors(m_pFiffInfo->projs);
 
-//        // Quick control compensators
-//        CompensatorView* pCompensatorView = new CompensatorView(QString("MNESCAN/RTESW"));
-//        pCompensatorView->setObjectName("group_tab_View_Comp");
-//        lControlWidgets.append(pCompensatorView);
+        //        // Quick control compensators
+        //        CompensatorView* pCompensatorView = new CompensatorView(QString("MNESCAN/RTESW"));
+        //        pCompensatorView->setObjectName("group_tab_View_Comp");
+        //        lControlWidgets.append(pCompensatorView);
 
-//        connect(pCompensatorView, &CompensatorView::compSelectionChanged,
-//                m_pEvokedSetModel.data(), &EvokedSetModel::updateCompensator);
+        //        connect(pCompensatorView, &CompensatorView::compSelectionChanged,
+        //                m_pEvokedSetModel.data(), &EvokedSetModel::updateCompensator);
 
-//        connect(pCompensatorView, &CompensatorView::compSelectionChanged,
-//                m_pButterflyView.data(), &ButterflyView::updateView);
+        //        connect(pCompensatorView, &CompensatorView::compSelectionChanged,
+        //                m_pButterflyView.data(), &ButterflyView::updateView);
 
-//        pCompensatorView->setCompensators(m_pFiffInfo->comps);
+        //        pCompensatorView->setCompensators(m_pFiffInfo->comps);
 
-//        // Quick control filter settings
-//        FilterSettingsView* pFilterSettingsView = new FilterSettingsView(QString("MNESCAN/RTESW"));
-//        pFilterSettingsView->setObjectName("group_tab_View_Filter");
-//        lControlWidgets.append(pFilterSettingsView);
+        //        // Quick control filter settings
+        //        FilterSettingsView* pFilterSettingsView = new FilterSettingsView(QString("MNESCAN/RTESW"));
+        //        pFilterSettingsView->setObjectName("group_tab_View_Filter");
+        //        lControlWidgets.append(pFilterSettingsView);
 
-//        connect(pFilterSettingsView->getFilterView().data(), &FilterDesignView::filterChannelTypeChanged,
-//                m_pEvokedSetModel.data(), &EvokedSetModel::setFilterChannelType);
+        //        connect(pFilterSettingsView->getFilterView().data(), &FilterDesignView::filterChannelTypeChanged,
+        //                m_pEvokedSetModel.data(), &EvokedSetModel::setFilterChannelType);
 
-//        connect(pFilterSettingsView->getFilterView().data(), &FilterDesignView::filterChanged,
-//                m_pEvokedSetModel.data(), &EvokedSetModel::setFilter);
+        //        connect(pFilterSettingsView->getFilterView().data(), &FilterDesignView::filterChanged,
+        //                m_pEvokedSetModel.data(), &EvokedSetModel::setFilter);
 
-//        connect(this, &RealTimeEvokedSetWidget::windowSizeChanged,
-//                pFilterSettingsView->getFilterView().data(), &FilterDesignView::setWindowSize);
+        //        connect(this, &RealTimeEvokedSetWidget::windowSizeChanged,
+        //                pFilterSettingsView->getFilterView().data(), &FilterDesignView::setWindowSize);
 
-//        connect(this, &RealTimeEvokedSetWidget::windowSizeChanged,
-//                pFilterSettingsView->getFilterView().data(), &FilterDesignView::setMaxAllowedFilterTaps);
+        //        connect(this, &RealTimeEvokedSetWidget::windowSizeChanged,
+        //                pFilterSettingsView->getFilterView().data(), &FilterDesignView::setMaxAllowedFilterTaps);
 
-//        connect(pFilterSettingsView, &FilterSettingsView::filterActivationChanged,
-//                m_pEvokedSetModel.data(), &EvokedSetModel::setFilterActive);
+        //        connect(pFilterSettingsView, &FilterSettingsView::filterActivationChanged,
+        //                m_pEvokedSetModel.data(), &EvokedSetModel::setFilterActive);
 
-//        m_pEvokedSetModel->setFilterActive(pFilterSettingsView->getFilterActive());
+        //        m_pEvokedSetModel->setFilterActive(pFilterSettingsView->getFilterActive());
 
-//        pFilterSettingsView->getFilterView()->init(m_pFiffInfo->sfreq);
+        //        pFilterSettingsView->getFilterView()->init(m_pFiffInfo->sfreq);
 
-//        if(!m_pRTESet->getValue()->evoked.isEmpty()) {
-//            m_iMaxFilterTapSize = m_pRTESet->getValue()->evoked.first().data.cols();
+        //        if(!m_pRTESet->getValue()->evoked.isEmpty()) {
+        //            m_iMaxFilterTapSize = m_pRTESet->getValue()->evoked.first().data.cols();
 
-//            pFilterSettingsView->getFilterView()->setWindowSize(m_iMaxFilterTapSize);
-//            pFilterSettingsView->getFilterView()->setMaxAllowedFilterTaps(m_iMaxFilterTapSize);
-//        }
+        //            pFilterSettingsView->getFilterView()->setWindowSize(m_iMaxFilterTapSize);
+        //            pFilterSettingsView->getFilterView()->setMaxAllowedFilterTaps(m_iMaxFilterTapSize);
+        //        }
 
         // Scaling
-        ScalingView* pScalingView = new ScalingView(QString("MNESCAN/RTESW"),0, Qt::Widget, m_pFiffInfo->get_channel_types());
+        ScalingView* pScalingView = new ScalingView(QString("MNESCAN/RTESW"), 0, Qt::Widget, m_pFiffInfo->get_channel_types());
         pScalingView->setObjectName("group_tab_View_Scaling");
         lControlWidgets.append(pScalingView);
 
@@ -386,10 +385,10 @@ void RealTimeEvokedSetWidget::initDisplayControllWidgets()
 
 void RealTimeEvokedSetWidget::updateViewport()
 {
-    if(m_pAverageLayoutView) {
+    if (m_pAverageLayoutView) {
         m_pAverageLayoutView->updateViewport();
     }
-    if(m_pButterflyView) {
+    if (m_pButterflyView) {
         m_pButterflyView->updateViewport();
     }
 }
@@ -398,7 +397,7 @@ void RealTimeEvokedSetWidget::updateViewport()
 
 void RealTimeEvokedSetWidget::showSensorSelectionWidget()
 {
-    if(!m_pChannelSelectionView) {
+    if (!m_pChannelSelectionView) {
         m_pChannelSelectionView = QSharedPointer<ChannelSelectionView>::create();
     }
 
@@ -413,7 +412,7 @@ void RealTimeEvokedSetWidget::onMakeScreenshot(const QString& imageType)
     QString sDate = QDate::currentDate().toString("yyyy_MM_dd");
     QString sTime = QTime::currentTime().toString("hh_mm_ss");
 
-    if(!QDir("./Screenshots").exists()) {
+    if (!QDir("./Screenshots").exists()) {
         QDir().mkdir("./Screenshots");
     }
 
@@ -422,9 +421,9 @@ void RealTimeEvokedSetWidget::onMakeScreenshot(const QString& imageType)
     // empty and be handed on to a view that then writes nothing.
     //
     QString sSuffix;
-    if(imageType.contains("SVG")) {
+    if (imageType.contains("SVG")) {
         sSuffix = "svg";
-    } else if(imageType.contains("PNG")) {
+    } else if (imageType.contains("PNG")) {
         sSuffix = "png";
     } else {
         qWarning() << "[RealTimeEvokedSetWidget::onMakeScreenshot] Unsupported image type"
@@ -444,7 +443,7 @@ void RealTimeEvokedSetWidget::onMakeScreenshot(const QString& imageType)
                                       bIsLayout ? "Layout" : "Butterfly",
                                       sSuffix);
 
-    if(bIsLayout) {
+    if (bIsLayout) {
         m_pAverageLayoutView->takeScreenshot(fileName);
     } else {
         m_pButterflyView->takeScreenshot(fileName);
@@ -453,11 +452,10 @@ void RealTimeEvokedSetWidget::onMakeScreenshot(const QString& imageType)
 
 //=============================================================================================================
 
-bool RealTimeEvokedSetWidget::eventFilter(QObject *object, QEvent *event)
+bool RealTimeEvokedSetWidget::eventFilter(QObject* object, QEvent* event)
 {
     if ((object == m_pButterflyView || object == m_pAverageLayoutView) && event->type() == QEvent::MouseButtonDblClick) {
         m_pEvokedSetModel->toggleFreeze();
     }
     return false;
 }
-

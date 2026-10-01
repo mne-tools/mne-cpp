@@ -91,13 +91,13 @@ static bool createBrainVisionFiles(const QString& nxeFile, const QString& baseNa
     vmrkOut << "Mk1=New Segment,,1,1,0\n";
     vmrk.close();
 
-    qInfo("Created Brain Vision header: %s" , vhdrFile.toUtf8().constData());
+    qInfo("Created Brain Vision header: %s", vhdrFile.toUtf8().constData());
     return true;
 }
 
 //=============================================================================================================
 
-int main(int argc, char *argv[])
+int main(int argc, char* argv[])
 {
     qInstallMessageHandler(MNELogger::customLogWriter);
     QCoreApplication app(argc, argv);
@@ -198,6 +198,6 @@ int main(int argc, char *argv[])
     if (!digFifFile.isEmpty())
         QFile::remove(digFifFile);
 
-    qInfo("Successfully converted eXimia data to: %s" , outFile.toUtf8().constData());
+    qInfo("Successfully converted eXimia data to: %s", outFile.toUtf8().constData());
     return 0;
 }

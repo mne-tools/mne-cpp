@@ -51,21 +51,21 @@ namespace UTILSLIB
 /** @brief ECG R-peak detection parameters (defined outside class to avoid Clang/GCC default-argument issues with nested structs). */
 struct DSPSHARED_EXPORT ArtifactDetectEcgParams
 {
-    double dFilterLow    =  5.0;    /**< Bandpass lower cutoff (Hz). */
-    double dFilterHigh   = 40.0;    /**< Bandpass upper cutoff (Hz). */
-    int    iFilterOrder  =  4;      /**< Butterworth order for the bandpass pre-filter. */
-    double dThreshFactor =  0.5;    /**< R-peak threshold = dThreshFactor * (max − min) + min of the filtered signal. */
-    double dMinRRSec     =  0.35;   /**< Minimum R–R interval in seconds (caps detection rate at ~170 bpm). */
+    double dFilterLow = 5.0;    /**< Bandpass lower cutoff (Hz). */
+    double dFilterHigh = 40.0;  /**< Bandpass upper cutoff (Hz). */
+    int iFilterOrder = 4;       /**< Butterworth order for the bandpass pre-filter. */
+    double dThreshFactor = 0.5; /**< R-peak threshold = dThreshFactor * (max − min) + min of the filtered signal. */
+    double dMinRRSec = 0.35;    /**< Minimum R–R interval in seconds (caps detection rate at ~170 bpm). */
 };
 
 //=============================================================================================================
 /** @brief EOG blink / saccade detection parameters (defined outside class to avoid Clang/GCC default-argument issues with nested structs). */
 struct DSPSHARED_EXPORT ArtifactDetectEogParams
 {
-    double dFilterHigh   = 10.0;    /**< Low-pass cutoff (Hz). */
-    int    iFilterOrder  =  4;      /**< Butterworth order for the low-pass pre-filter. */
-    double dThresholdV   = 150e-6;  /**< Absolute voltage threshold (V). Events are detected when the signal exceeds ±threshold. */
-    double dMinGapSec    =  0.3;    /**< Minimum gap between successive events in seconds. */
+    double dFilterHigh = 10.0;   /**< Low-pass cutoff (Hz). */
+    int iFilterOrder = 4;        /**< Butterworth order for the low-pass pre-filter. */
+    double dThresholdV = 150e-6; /**< Absolute voltage threshold (V). Events are detected when the signal exceeds ±threshold. */
+    double dMinGapSec = 0.3;     /**< Minimum gap between successive events in seconds. */
 };
 
 //=============================================================================================================
@@ -101,10 +101,10 @@ public:
      *
      * @return              Sample indices (0-based) of detected R-peaks.
      */
-    static QVector<int> detectEcg(const Eigen::MatrixXd&  matData,
-                                   const FIFFLIB::FiffInfo& fiffInfo,
-                                   double                   dSFreq,
-                                   const EcgParams&         params = EcgParams());
+    static QVector<int> detectEcg(const Eigen::MatrixXd& matData,
+                                  const FIFFLIB::FiffInfo& fiffInfo,
+                                  double dSFreq,
+                                  const EcgParams& params = EcgParams());
 
     //=========================================================================================================
     /**
@@ -121,10 +121,10 @@ public:
      *
      * @return              Sample indices (0-based) of detected EOG events (onset of supra-threshold excursion).
      */
-    static QVector<int> detectEog(const Eigen::MatrixXd&  matData,
-                                   const FIFFLIB::FiffInfo& fiffInfo,
-                                   double                   dSFreq,
-                                   const EogParams&         params = EogParams());
+    static QVector<int> detectEog(const Eigen::MatrixXd& matData,
+                                  const FIFFLIB::FiffInfo& fiffInfo,
+                                  double dSFreq,
+                                  const EogParams& params = EogParams());
 
 private:
     //=========================================================================================================
@@ -140,10 +140,10 @@ private:
      * @return Filtered row vector.
      */
     static Eigen::RowVectorXd bandpassFilter(const Eigen::RowVectorXd& vecSignal,
-                                              double                    dSFreq,
-                                              double                    dLow,
-                                              double                    dHigh,
-                                              int                       iOrder);
+                                             double dSFreq,
+                                             double dLow,
+                                             double dHigh,
+                                             int iOrder);
 
     //=========================================================================================================
     /**
@@ -156,8 +156,8 @@ private:
      * @return Sample indices of detected peaks.
      */
     static QVector<int> findPeaks(const Eigen::RowVectorXd& vecSignal,
-                                   double                    dThreshold,
-                                   int                       iMinDist);
+                                  double dThreshold,
+                                  int iMinDist);
 };
 
 } // namespace UTILSLIB

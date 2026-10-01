@@ -48,12 +48,14 @@
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-namespace FIFFLIB {
-    class FiffInfo;
+namespace FIFFLIB
+{
+class FiffInfo;
 }
 
-namespace CONNECTIVITYLIB {
-    class ConnectivitySettings;
+namespace CONNECTIVITYLIB
+{
+class ConnectivitySettings;
 }
 
 //=============================================================================================================
@@ -87,7 +89,7 @@ public:
     void doWork(const CONNECTIVITYLIB::ConnectivitySettings& connectivitySettings);
 
 signals:
-    void resultReady(const  QList<CONNECTIVITYLIB::Network>& connectivityResults, const CONNECTIVITYLIB::ConnectivitySettings& connectivitySettings);
+    void resultReady(const QList<CONNECTIVITYLIB::Network>& connectivityResults, const CONNECTIVITYLIB::ConnectivitySettings& connectivitySettings);
 };
 
 //=============================================================================================================
@@ -101,8 +103,8 @@ class DSPSHARED_EXPORT RtConnectivity : public QObject
     Q_OBJECT
 
 public:
-    typedef QSharedPointer<RtConnectivity> SPtr;             /**< Shared pointer type for RtConnectivity. */
-    typedef QSharedPointer<const RtConnectivity> ConstSPtr;  /**< Const shared pointer type for RtConnectivity. */
+    typedef QSharedPointer<RtConnectivity> SPtr;            /**< Shared pointer type for RtConnectivity. */
+    typedef QSharedPointer<const RtConnectivity> ConstSPtr; /**< Const shared pointer type for RtConnectivity. */
 
     //=========================================================================================================
     /**
@@ -110,7 +112,7 @@ public:
      *
      * @param[in] parent     Parent QObject (optional).
      */
-    explicit RtConnectivity(QObject *parent = 0);
+    explicit RtConnectivity(QObject* parent = 0);
 
     //=========================================================================================================
     /**
@@ -139,7 +141,7 @@ public:
     void stop();
 
 protected:
-    QThread             m_workerThread;         /**< The worker thread. */
+    QThread m_workerThread; /**< The worker thread. */
 
 signals:
     void newConnectivityResultAvailable(const QList<CONNECTIVITYLIB::Network>& connectivityResults, const CONNECTIVITYLIB::ConnectivitySettings& connectivitySettings);

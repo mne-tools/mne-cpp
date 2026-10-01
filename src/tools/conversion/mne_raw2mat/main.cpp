@@ -51,18 +51,18 @@ using namespace Eigen;
 #define PROGRAM_VERSION MNE_CPP_VERSION
 
 // MAT-file Level 5 constants
-static const quint32 miDOUBLE   = 9;
-static const quint32 miINT32    = 5;
-static const quint32 miUINT32   = 6;
-static const quint32 miINT8     = 1;
-static const quint32 miMATRIX   = 14;
+static const quint32 miDOUBLE = 9;
+static const quint32 miINT32 = 5;
+static const quint32 miUINT32 = 6;
+static const quint32 miINT8 = 1;
+static const quint32 miMATRIX = 14;
 static const quint32 mxDOUBLE_CLASS = 6;
 
 //=============================================================================================================
 // MAT-file writing helpers
 //=============================================================================================================
 
-static void writePad(QDataStream &ds, int numBytes)
+static void writePad(QDataStream& ds, int numBytes)
 {
     // Pad to 8-byte boundary
     int pad = (8 - (numBytes % 8)) % 8;
@@ -70,13 +70,13 @@ static void writePad(QDataStream &ds, int numBytes)
         ds << static_cast<quint8>(0);
 }
 
-static void writeMatTag(QDataStream &ds, quint32 dataType, quint32 numBytes)
+static void writeMatTag(QDataStream& ds, quint32 dataType, quint32 numBytes)
 {
     ds << dataType;
     ds << numBytes;
 }
 
-static void writeSmallTag(QDataStream &ds, quint32 dataType, quint32 numBytes, const QByteArray &data)
+static void writeSmallTag(QDataStream& ds, quint32 dataType, quint32 numBytes, const QByteArray& data)
 {
     // Small Data Element format (data <= 4 bytes)
     if (numBytes <= 4) {
@@ -94,19 +94,19 @@ static void writeSmallTag(QDataStream &ds, quint32 dataType, quint32 numBytes, c
 }
 
 // Write a double matrix variable to MAT file
-static void writeMatrixVariable(QDataStream &ds, const QString &name, const MatrixXd &mat)
+static void writeMatrixVariable(QDataStream& ds, const QString& name, const MatrixXd& mat)
 {
     int nRows = mat.rows();
     int nCols = mat.cols();
     QByteArray nameBytes = name.toLatin1();
 
     // Calculate sizes
-    quint32 flagsSize = 8;                      // 2 x uint32 flags
-    quint32 dimsSize = 8;                       // 2 x int32 dims
+    quint32 flagsSize = 8; // 2 x uint32 flags
+    quint32 dimsSize = 8;  // 2 x int32 dims
     quint32 nameSize = nameBytes.size();
     quint32 namePadded = nameSize <= 4 ? 4 : nameSize + ((8 - (nameSize % 8)) % 8);
     quint32 nameTagSize = nameSize <= 4 ? 8 : 8 + namePadded;
-    quint32 dataSize = nRows * nCols * 8;       // doubles
+    quint32 dataSize = nRows * nCols * 8; // doubles
     quint32 dataPadded = dataSize + ((8 - (dataSize % 8)) % 8);
 
     // Array flags subelement
@@ -125,8 +125,8 @@ static void writeMatrixVariable(QDataStream &ds, const QString &name, const Matr
 
     // Array Flags subelement
     writeMatTag(ds, miUINT32, flagsSize);
-    ds << static_cast<quint32>(mxDOUBLE_CLASS);  // flags (double class)
-    ds << static_cast<quint32>(0);                // reserved
+    ds << static_cast<quint32>(mxDOUBLE_CLASS); // flags (double class)
+    ds << static_cast<quint32>(0);              // reserved
 
     // Dimensions subelement
     writeMatTag(ds, miINT32, dimsSize);
@@ -154,7 +154,7 @@ static void writeMatrixVariable(QDataStream &ds, const QString &name, const Matr
 
 //=============================================================================================================
 
-int main(int argc, char *argv[])
+int main(int argc, char* argv[])
 {
     qInstallMessageHandler(MNELogger::customLogWriter);
     QCoreApplication app(argc, argv);
@@ -185,8 +185,14 @@ int main(int argc, char *argv[])
     int fromSamp = parser.value(fromOpt).toInt();
     int toSamp = parser.value(toOpt).toInt();
 
-    if (rawFile.isEmpty()) { qCritical("--raw is required."); parser.showHelp(1); }
-    if (outFile.isEmpty()) { qCritical("--out is required."); parser.showHelp(1); }
+    if (rawFile.isEmpty()) {
+        qCritical("--raw is required.");
+        parser.showHelp(1);
+    }
+    if (outFile.isEmpty()) {
+        qCritical("--out is required.");
+        parser.showHelp(1);
+    }
 
     // Load raw data
     QFile fRaw(rawFile);
@@ -201,7 +207,7 @@ int main(int argc, char *argv[])
     int first = (fromSamp >= 0) ? fromSamp : raw.first_samp;
     int last = (toSamp >= 0) ? toSamp : raw.last_samp;
 
-    qInfo("Raw: %d channels, %.1f Hz, samples %d..%d" , nChan, sfreq, first, last);
+    qInfo("Raw: %d channels, %.1f Hz, samples %d..%d", nChan, sfreq, first, last);
 
     // Read data
     MatrixXd data;
@@ -213,7 +219,7 @@ int main(int argc, char *argv[])
 
     const auto rowCount = static_cast<long long>(data.rows());
     const auto sampleCount = static_cast<long long>(data.cols());
-    qInfo("Read %lld channels x %lld samples" , rowCount, sampleCount);
+    qInfo("Read %lld channels x %lld samples", rowCount, sampleCount);
 
     // Build channel names
     QStringList chNames;
@@ -242,8 +248,8 @@ int main(int argc, char *argv[])
         ds << static_cast<quint8>(0);
 
     // Version (2 bytes) + Endian indicator (2 bytes)
-    ds << static_cast<quint16>(0x0100);  // version
-    ds << static_cast<quint16>(0x4D49);  // 'MI' = little-endian
+    ds << static_cast<quint16>(0x0100); // version
+    ds << static_cast<quint16>(0x4D49); // 'MI' = little-endian
 
     // --- Write 'data' variable (channels x samples) ---
     writeMatrixVariable(ds, "data", data);
@@ -257,11 +263,11 @@ int main(int argc, char *argv[])
     writeMatrixVariable(ds, "times", times);
 
     outF.close();
-    qInfo("Written MAT file: %s" , qPrintable(outFile));
-    qInfo("Variables: data (%d x %lld), sfreq (1x1), times (1 x %lld)" ,
-           nChan,
-           sampleCount,
-           static_cast<long long>(times.cols()));
+    qInfo("Written MAT file: %s", qPrintable(outFile));
+    qInfo("Variables: data (%d x %lld), sfreq (1x1), times (1 x %lld)",
+          nChan,
+          sampleCount,
+          static_cast<long long>(times.cols()));
 
     return 0;
 }

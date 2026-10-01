@@ -57,7 +57,8 @@
 // DEFINE NAMESPACE CONNECTIVITYLIB
 //=============================================================================================================
 
-namespace CONNECTIVITYLIB {
+namespace CONNECTIVITYLIB
+{
 
 //=============================================================================================================
 // CONNECTIVITYLIB FORWARD DECLARATIONS
@@ -79,7 +80,6 @@ namespace CONNECTIVITYLIB {
  */
 class CONNECTIVITYSHARED_EXPORT AbstractMetric
 {
-
 public:
     typedef QSharedPointer<AbstractMetric> SPtr;            /**< Shared pointer type for AbstractMetric. */
     typedef QSharedPointer<const AbstractMetric> ConstSPtr; /**< Const shared pointer type for AbstractMetric. */
@@ -90,9 +90,9 @@ public:
      */
     explicit AbstractMetric();
 
-    static bool     m_bStorageModeIsActive;
-    static int      m_iNumberBinStart;
-    static int      m_iNumberBinAmount;
+    static bool m_bStorageModeIsActive;
+    static int m_iNumberBinStart;
+    static int m_iNumberBinAmount;
 
 protected:
 };

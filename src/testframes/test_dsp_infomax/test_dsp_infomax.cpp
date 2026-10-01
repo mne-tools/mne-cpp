@@ -71,8 +71,8 @@ private slots:
 
 private:
     MatrixXd createSuperGaussianMix(int nSources, int nSamples,
-                                     MatrixXd& mixingOut, MatrixXd& sourcesOut,
-                                     unsigned int seed = 42) const;
+                                    MatrixXd& mixingOut, MatrixXd& sourcesOut,
+                                    unsigned int seed = 42) const;
 };
 
 //=============================================================================================================
@@ -183,7 +183,7 @@ void TestDspInfomax::testSuperGaussianRecovery()
     // Fixed well-conditioned mixing matrix
     MatrixXd trueMixing(2, 2);
     trueMixing << 0.8, -0.5,
-                 -0.4,  0.9;
+        -0.4, 0.9;
 
     MatrixXd data = trueMixing * trueSources;
     data.colwise() -= data.rowwise().mean().eval();
@@ -253,8 +253,8 @@ void TestDspInfomax::cleanupTestCase()
 //=============================================================================================================
 
 MatrixXd TestDspInfomax::createSuperGaussianMix(int nSources, int nSamples,
-                                                  MatrixXd& mixingOut, MatrixXd& sourcesOut,
-                                                  unsigned int seed) const
+                                                MatrixXd& mixingOut, MatrixXd& sourcesOut,
+                                                unsigned int seed) const
 {
     std::mt19937 gen(seed);
 

@@ -57,8 +57,8 @@ class MNEDeriv;
 class MNESHARED_EXPORT MNEDerivSet
 {
 public:
-    typedef QSharedPointer<MNEDerivSet> SPtr;              /**< Shared pointer type for MNEDerivSet. */
-    typedef QSharedPointer<const MNEDerivSet> ConstSPtr;   /**< Const shared pointer type for MNEDerivSet. */
+    typedef QSharedPointer<MNEDerivSet> SPtr;            /**< Shared pointer type for MNEDerivSet. */
+    typedef QSharedPointer<const MNEDerivSet> ConstSPtr; /**< Const shared pointer type for MNEDerivSet. */
 
     //=========================================================================================================
     /**
@@ -73,7 +73,7 @@ public:
     ~MNEDerivSet();
 
 public:
-    QList<MNEDeriv*> derivs;       /**< List of derivation items. */
+    QList<MNEDeriv*> derivs; /**< List of derivation items. */
 };
 
 //=============================================================================================================

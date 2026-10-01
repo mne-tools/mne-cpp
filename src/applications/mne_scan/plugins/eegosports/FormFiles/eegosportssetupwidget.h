@@ -51,7 +51,6 @@ class EEGoSportsSetupWidget : public QWidget
     Q_OBJECT
 
 public:
-
     //=========================================================================================================
     /**
      * Constructs a EEGoSportsSetupWidget which is a child of parent.
@@ -59,7 +58,7 @@ public:
      * @param[in] parent pointer to parent widget; If parent is 0, the new EEGoSportsSetupWidget becomes a window. If parent is another widget, EEGoSportsSetupWidget becomes a child window inside parent. EEGoSportsSetupWidget is deleted when its parent is deleted.
      * @param[in] pEEGoSports a pointer to the corresponding ECGSimulator.
      */
-    EEGoSportsSetupWidget(EEGoSports* pEEGoSports, QWidget *parent = 0);
+    EEGoSportsSetupWidget(EEGoSports* pEEGoSports, QWidget* parent = 0);
 
     //=========================================================================================================
     /**
@@ -76,7 +75,6 @@ public:
     void initGui();
 
 private:
-
     //=========================================================================================================
     /**
      * Sets the device sampling properties.
@@ -98,9 +96,9 @@ private:
      */
     void setWriteToFile();
 
-    EEGoSports*               m_pEEGoSports;           /**< a pointer to corresponding EEGoSports.*/
+    EEGoSports* m_pEEGoSports; /**< a pointer to corresponding EEGoSports.*/
 
-    Ui::EEGoSportsSetupClass  ui;                      /**< the user interface for the EEGoSportsSetupWidget.*/
+    Ui::EEGoSportsSetupClass ui; /**< the user interface for the EEGoSportsSetupWidget.*/
 };
 } // NAMESPACE
 

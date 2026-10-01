@@ -223,10 +223,10 @@ void TestIcaLabel::testMultipleArtifacts()
     MatrixXd sources(4, 500);
     for (int t = 0; t < 500; ++t) {
         double time = static_cast<double>(t) / m_sFreq;
-        sources(0, t) = std::sin(2.0 * M_PI * 10.0 * time);  // brain
-        sources(1, t) = m_eogRef(0, t) * 3.0;                  // EOG 1
-        sources(2, t) = m_eogRef(0, t) * -2.5;                 // EOG 2 (anti-correlated)
-        sources(3, t) = m_ecgRef(0, t) * 2.0;                  // ECG
+        sources(0, t) = std::sin(2.0 * M_PI * 10.0 * time); // brain
+        sources(1, t) = m_eogRef(0, t) * 3.0;               // EOG 1
+        sources(2, t) = m_eogRef(0, t) * -2.5;              // EOG 2 (anti-correlated)
+        sources(3, t) = m_ecgRef(0, t) * 2.0;               // ECG
     }
 
     QList<IcaLabelResult> labels = MlIcaLabel::classify(sources, m_eogRef, m_ecgRef, m_sFreq);

@@ -61,14 +61,14 @@ MNEProjItem::MNEProjItem(const MNEProjItem& other)
 MNEProjItem& MNEProjItem::operator=(const MNEProjItem& other)
 {
     if (this != &other) {
-        vecs        = other.vecs ? std::make_unique<MNENamedMatrix>(*other.vecs) : nullptr;
-        nvec        = other.nvec;
-        desc        = other.desc;
-        kind        = other.kind;
-        active      = other.active;
+        vecs = other.vecs ? std::make_unique<MNENamedMatrix>(*other.vecs) : nullptr;
+        nvec = other.nvec;
+        desc = other.desc;
+        kind = other.kind;
+        active = other.active;
         active_file = other.active_file;
-        has_meg     = other.has_meg;
-        has_eeg     = other.has_eeg;
+        has_meg = other.has_meg;
+        has_eeg = other.has_eeg;
     }
     return *this;
 }

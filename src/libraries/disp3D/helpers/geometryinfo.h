@@ -66,7 +66,8 @@
 // DEFINE NAMESPACE
 //=============================================================================================================
 
-namespace DISP3DLIB {
+namespace DISP3DLIB
+{
 
 #define FLOAT_INFINITY std::numeric_limits<float>::infinity()
 
@@ -79,7 +80,6 @@ namespace DISP3DLIB {
 
 class DISP3DSHARED_EXPORT GeometryInfo
 {
-
 public:
     typedef QSharedPointer<GeometryInfo> SPtr;
     typedef QSharedPointer<const GeometryInfo> ConstSPtr;
@@ -96,9 +96,9 @@ public:
      * @param[in] dCancelDist            Maximum geodesic distance to explore, in vertex coordinate units.
      * @return Distance table (nVertices x nSubset); entries beyond dCancelDist stay infinite.
      */
-    static QSharedPointer<Eigen::MatrixXd> scdc(const Eigen::MatrixX3f &matVertices,
-                                                const std::vector<Eigen::VectorXi> &vecNeighborVertices,
-                                                Eigen::VectorXi &vecVertSubset,
+    static QSharedPointer<Eigen::MatrixXd> scdc(const Eigen::MatrixX3f& matVertices,
+                                                const std::vector<Eigen::VectorXi>& vecNeighborVertices,
+                                                Eigen::VectorXi& vecVertSubset,
                                                 double dCancelDist = FLOAT_INFINITY);
 
     //=========================================================================================================
@@ -118,13 +118,13 @@ public:
      * @return Sparse interpolation matrix (nVertices x nSources), or empty matrix if cancelled.
      */
     static QSharedPointer<Eigen::SparseMatrix<float>> scdcInterpolationMat(
-        const Eigen::MatrixX3f &matVertices,
-        const std::vector<Eigen::VectorXi> &vecNeighborVertices,
-        const Eigen::VectorXi &vecVertSubset,
+        const Eigen::MatrixX3f& matVertices,
+        const std::vector<Eigen::VectorXi>& vecNeighborVertices,
+        const Eigen::VectorXi& vecVertSubset,
         double (*interpolationFunction)(double),
         double dCancelDist,
         std::function<void(int, int)> progressCallback = nullptr,
-        const std::atomic<bool> *cancelledFlag = nullptr);
+        const std::atomic<bool>* cancelledFlag = nullptr);
 
     //=========================================================================================================
     /**
@@ -134,8 +134,8 @@ public:
      * @param[in] matSensorPositions   Sensor positions (nSensors x 3) in the same coordinate frame.
      * @return Index of the nearest mesh vertex for each sensor.
      */
-    static Eigen::VectorXi projectSensors(const Eigen::MatrixX3f &matVertices,
-                                          const Eigen::MatrixX3f &matSensorPositions);
+    static Eigen::VectorXi projectSensors(const Eigen::MatrixX3f& matVertices,
+                                          const Eigen::MatrixX3f& matSensorPositions);
 
     //=========================================================================================================
     /**
@@ -153,15 +153,15 @@ public:
 protected:
     static inline double squared(double dBase);
 
-    static Eigen::VectorXi nearestNeighbor(const Eigen::MatrixX3f &matVertices,
-                                           const Eigen::MatrixX3f &matSensorPositions,
+    static Eigen::VectorXi nearestNeighbor(const Eigen::MatrixX3f& matVertices,
+                                           const Eigen::MatrixX3f& matSensorPositions,
                                            qint32 iBegin,
                                            qint32 iEnd);
 
     static void iterativeDijkstra(QSharedPointer<Eigen::MatrixXd> matOutputDistMatrix,
-                                  const Eigen::MatrixX3f &matVertices,
-                                  const std::vector<Eigen::VectorXi> &vecNeighborVertices,
-                                  const Eigen::VectorXi &vecVertSubset,
+                                  const Eigen::MatrixX3f& matVertices,
+                                  const std::vector<Eigen::VectorXi>& vecNeighborVertices,
+                                  const Eigen::VectorXi& vecVertSubset,
                                   qint32 iBegin,
                                   qint32 iEnd,
                                   double dCancelDistance);

@@ -51,8 +51,8 @@ class MainSplashScreen : public QSplashScreen
     Q_OBJECT
 
 public:
-    typedef QSharedPointer<MainSplashScreen> SPtr;               /**< Shared pointer type for MainSplashScreen. */
-    typedef QSharedPointer<const MainSplashScreen> ConstSPtr;    /**< Const shared pointer type for MainSplashScreen. */
+    typedef QSharedPointer<MainSplashScreen> SPtr;            /**< Shared pointer type for MainSplashScreen. */
+    typedef QSharedPointer<const MainSplashScreen> ConstSPtr; /**< Const shared pointer type for MainSplashScreen. */
 
     //=========================================================================================================
     /**
@@ -60,7 +60,7 @@ public:
      *
      * @param[in] pixmap is the background of the splash screen.
      */
-    MainSplashScreen ();
+    MainSplashScreen();
 
     //=========================================================================================================
     /**
@@ -68,7 +68,7 @@ public:
      *
      * @param[in] pixmap is the background of the splash screen.
      */
-    MainSplashScreen (const QPixmap & pixmap);
+    MainSplashScreen(const QPixmap& pixmap);
 
     //=========================================================================================================
     /**
@@ -77,13 +77,13 @@ public:
      * @param[in] pixmap is the background of the splash screen.
      * @param[in] f There should be no need to set the widget flags, f, except perhaps Qt::WindowStaysOnTopHint.
      */
-    MainSplashScreen (const QPixmap & pixmap, Qt::WindowFlags f);
+    MainSplashScreen(const QPixmap& pixmap, Qt::WindowFlags f);
     //=========================================================================================================
     /**
      * Destroys the MainSplashScreen.
      */
-    virtual ~MainSplashScreen ();
+    virtual ~MainSplashScreen();
 };
-}// NAMESPACE
+} // NAMESPACE
 
 #endif // MAINSPLASHSCREEN_H

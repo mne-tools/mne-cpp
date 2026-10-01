@@ -30,7 +30,8 @@ private:
     InvSourceEstimate makeTestStc(int nVerts = 5, int nTimes = 10)
     {
         VectorXi verts(nVerts);
-        for (int i = 0; i < nVerts; ++i) verts(i) = i * 10;
+        for (int i = 0; i < nVerts; ++i)
+            verts(i) = i * 10;
         MatrixXd data = MatrixXd::Random(nVerts, nTimes);
         return InvSourceEstimate(data, verts, 0.1f, 0.001f);
     }

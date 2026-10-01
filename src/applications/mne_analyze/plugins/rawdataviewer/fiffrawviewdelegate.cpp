@@ -51,11 +51,10 @@ using namespace ANSHAREDLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-FiffRawViewDelegate::FiffRawViewDelegate(QObject *parent)
+FiffRawViewDelegate::FiffRawViewDelegate(QObject* parent)
 : QAbstractItemDelegate(parent)
 , m_iUpperItemIndex(0)
 {
-
 }
 
 //=============================================================================================================
@@ -67,20 +66,20 @@ void FiffRawViewDelegate::setUpperItemIndex(int iUpperItemIndex)
 
 //=============================================================================================================
 
-void FiffRawViewDelegate::paint(QPainter *painter,
-                                const QStyleOptionViewItem &option,
-                                const QModelIndex &index) const
+void FiffRawViewDelegate::paint(QPainter* painter,
+                                const QStyleOptionViewItem& option,
+                                const QModelIndex& index) const
 {
     float t_fPlotHeight = option.rect.height();
     painter->setRenderHint(QPainter::Antialiasing, true);
 
-    switch(index.column()) {
+    switch (index.column()) {
         case 1: { //data plot
             QBrush backgroundBrush = index.model()->data(index, Qt::BackgroundRole).value<QBrush>();
 
             // Plot background based on user chosen color
             // This is a rather ugly hack in order to cope with QOpenGLWidget's/QtableView's problem when setting a background color
-            if(index.row() == m_iUpperItemIndex) {
+            if (index.row() == m_iUpperItemIndex) {
                 // Plot background based on user chosen color
                 // This is a rather ugly hack in order to cope with QOpenGLWidget's/QtableView's problem when setting a background color
                 painter->save();
@@ -94,32 +93,32 @@ void FiffRawViewDelegate::paint(QPainter *painter,
             // Draw special background when channel is marked as bad
             bool bIsBadChannel = index.model()->data(index.model()->index(index.row(), 2), Qt::DisplayRole).toBool();
 
-            if(bIsBadChannel) {
+            if (bIsBadChannel) {
                 painter->save();
-                QBrush brush(QColor(254,74,93,40));
+                QBrush brush(QColor(254, 74, 93, 40));
                 painter->setBrushOrigin(option.rect.topLeft());
                 painter->fillRect(option.rect, brush);
                 painter->restore();
             }
 
             //Get data
-            QVariant variant = index.model()->data(index,Qt::DisplayRole);
+            QVariant variant = index.model()->data(index, Qt::DisplayRole);
             ChannelData data = variant.value<ChannelData>();
 
-            if(data.size() > 0) {
+            if (data.size() > 0) {
                 //Plot data path
                 const FiffRawViewModel* pFiffRawModel = static_cast<const FiffRawViewModel*>(index.model());
 
                 int pos = pFiffRawModel->pixelDifference() * (pFiffRawModel->currentFirstSample() - pFiffRawModel->absoluteFirstSample());
 
-                QPainterPath path = QPainterPath(QPointF(option.rect.x()+pos, option.rect.y()));
+                QPainterPath path = QPainterPath(QPointF(option.rect.x() + pos, option.rect.y()));
 
                 createScroller(index,
                                option,
                                path,
                                painter);
 
-                path = QPainterPath(QPointF(option.rect.x()+pos, option.rect.y()));
+                path = QPainterPath(QPointF(option.rect.x() + pos, option.rect.y()));
 
                 //Plot data
                 createPlotPath(option,
@@ -130,16 +129,16 @@ void FiffRawViewDelegate::paint(QPainter *painter,
 
                 painter->setRenderHint(QPainter::Antialiasing, true);
                 painter->save();
-                painter->translate(0, t_fPlotHeight/2);
+                painter->translate(0, t_fPlotHeight / 2);
 
                 //Set colors
-                if(bIsBadChannel) {
-                    if(option.state & QStyle::State_Selected)
+                if (bIsBadChannel) {
+                    if (option.state & QStyle::State_Selected)
                         painter->setPen(m_penNormalSelectedBad);
                     else
                         painter->setPen(m_penNormalBad);
                 } else {
-                    if(option.state & QStyle::State_Selected)
+                    if (option.state & QStyle::State_Selected)
                         painter->setPen(m_penNormalSelected);
                     else
                         painter->setPen(m_penNormal);
@@ -148,7 +147,7 @@ void FiffRawViewDelegate::paint(QPainter *painter,
                 painter->drawPath(path);
                 painter->restore();
 
-                path = QPainterPath(QPointF(option.rect.x()+pos, option.rect.y()));
+                path = QPainterPath(QPointF(option.rect.x() + pos, option.rect.y()));
 
                 //Plot time spacers
                 createTimeSpacersPath(index,
@@ -161,21 +160,21 @@ void FiffRawViewDelegate::paint(QPainter *painter,
                 painter->drawPath(path);
                 painter->restore();
 
-                if(pFiffRawModel->shouldDisplayEvent()) {
-                    path = QPainterPath(QPointF(option.rect.x()+pos, option.rect.y()));
+                if (pFiffRawModel->shouldDisplayEvent()) {
+                    path = QPainterPath(QPointF(option.rect.x() + pos, option.rect.y()));
 
                     painter->setPen(QPen(m_penNormal.color().darker(250), 1, Qt::SolidLine));
 
                     //Plot time marks
                     createEventsPath(index,
-                                    option,
-                                    path,
-                                    data,
-                                    painter);
-//                    painter->save();
-//                    painter->setPen(QPen(m_penNormal.color().darker(250), 2, Qt::SolidLine));
-//                    painter->drawPath(path);
-//                    painter->restore();
+                                     option,
+                                     path,
+                                     data,
+                                     painter);
+                    //                    painter->save();
+                    //                    painter->setPen(QPen(m_penNormal.color().darker(250), 2, Qt::SolidLine));
+                    //                    painter->drawPath(path);
+                    //                    painter->restore();
                 }
             }
             break;
@@ -185,12 +184,12 @@ void FiffRawViewDelegate::paint(QPainter *painter,
 
 //=============================================================================================================
 
-QSize FiffRawViewDelegate::sizeHint(const QStyleOptionViewItem &option,
-                                    const QModelIndex &index) const
+QSize FiffRawViewDelegate::sizeHint(const QStyleOptionViewItem& option,
+                                    const QModelIndex& index) const
 {
     QSize size;
 
-    switch(index.column()) {
+    switch (index.column()) {
         case 1:
             const FiffRawViewModel* pFiffRawModel = static_cast<const FiffRawViewModel*>(index.model());
             qint32 nsamples = pFiffRawModel->absoluteLastSample() - pFiffRawModel->absoluteFirstSample();
@@ -207,17 +206,16 @@ QSize FiffRawViewDelegate::sizeHint(const QStyleOptionViewItem &option,
 
 //=============================================================================================================
 
-void FiffRawViewDelegate::createPlotPath(const QStyleOptionViewItem &option,
+void FiffRawViewDelegate::createPlotPath(const QStyleOptionViewItem& option,
                                          QPainterPath& path,
                                          ChannelData& data,
                                          double dDx,
-                                         const QModelIndex &index) const
+                                         const QModelIndex& index) const
 {
-
     const FiffRawViewModel* t_pModel = static_cast<const FiffRawViewModel*>(index.model());
 
     double dMaxValue = DISPLIB::getScalingValue(t_pModel->getScaling(), t_pModel->getKind(index.row()), t_pModel->getUnit(index.row()));
-    double dScaleY = option.rect.height()/(2*dMaxValue);
+    double dScaleY = option.rect.height() / (2 * dMaxValue);
     double y_base = path.currentPosition().y();
     double dValue, newY;
 
@@ -225,7 +223,7 @@ void FiffRawViewDelegate::createPlotPath(const QStyleOptionViewItem &option,
 
     int iPaintStep = 1;
 
-    for(unsigned int j = 0; j < data.size(); j = j + iPaintStep) {
+    for (unsigned int j = 0; j < data.size(); j = j + iPaintStep) {
         dValue = data[j] * dScaleY;
 
         //Reverse direction -> plot the right way
@@ -253,10 +251,10 @@ void FiffRawViewDelegate::setSignalColor(const QColor& signalColor)
 
 //=============================================================================================================
 
-void FiffRawViewDelegate::createTimeSpacersPath(const QModelIndex &index,
-                                                const QStyleOptionViewItem &option,
+void FiffRawViewDelegate::createTimeSpacersPath(const QModelIndex& index,
+                                                const QStyleOptionViewItem& option,
                                                 QPainterPath& path,
-                                                ANSHAREDLIB::ChannelData &data) const
+                                                ANSHAREDLIB::ChannelData& data) const
 {
     Q_UNUSED(data);
 
@@ -269,7 +267,7 @@ void FiffRawViewDelegate::createTimeSpacersPath(const QModelIndex &index,
     float fTop = option.rect.topLeft().y();
     float fBottom = option.rect.bottomRight().y();
 
-    for(int j = 0; j < (1.5 * iSpacersPerSecond * t_pModel->getTotalBlockCount()); j++) {
+    for (int j = 0; j < (1.5 * iSpacersPerSecond * t_pModel->getTotalBlockCount()); j++) {
         //draw vertical line
         path.moveTo(path.currentPosition().x(), fTop);
         path.lineTo(path.currentPosition().x(), fBottom);
@@ -281,11 +279,11 @@ void FiffRawViewDelegate::createTimeSpacersPath(const QModelIndex &index,
 
 //=============================================================================================================
 
-void FiffRawViewDelegate::createEventsPath(const QModelIndex &index,
-                                          const QStyleOptionViewItem &option,
-                                          QPainterPath &path,
-                                          ANSHAREDLIB::ChannelData &data,
-                                          QPainter* painter) const
+void FiffRawViewDelegate::createEventsPath(const QModelIndex& index,
+                                           const QStyleOptionViewItem& option,
+                                           QPainterPath& path,
+                                           ANSHAREDLIB::ChannelData& data,
+                                           QPainter* painter) const
 {
     const FiffRawViewModel* t_pModel = static_cast<const FiffRawViewModel*>(index.model());
     QSharedPointer<EventModel> t_pEventModel = t_pModel->getEventModel();
@@ -299,16 +297,16 @@ void FiffRawViewDelegate::createEventsPath(const QModelIndex &index,
     float fInitX = path.currentPosition().x();
 
     auto events = t_pEventModel->getEventsToDisplay(iStart, iStart + data.size());
-    if (!t_pEventModel->getShowSelected()){
+    if (!t_pEventModel->getShowSelected()) {
         // Paint all events
-        for(const auto& event : *events){
+        for (const auto& event : *events) {
             paintEvent(event, t_pEventModel.data(), painter, fInitX, fTop, fBottom, iStart, dDx);
         }
     } else {
         // Paint selected events
         auto selection = t_pEventModel->getEventSelection();
-        for(const auto& item : selection){
-            if (item < events->size()){
+        for (const auto& item : selection) {
+            if (item < events->size()) {
                 paintEvent(events->at(item), t_pEventModel.data(), painter, fInitX, fTop, fBottom, iStart, dDx);
             }
         }
@@ -334,7 +332,7 @@ void FiffRawViewDelegate::paintEvent(const EVENTSLIB::Event& event,
     // that range rather than as a single line, so an annotation with a
     // duration does not look like an instant. Zero duration events, which are
     // the common case for a trigger, still get just the line.
-    if(event.duration > 0) {
+    if (event.duration > 0) {
         const float fEndX = fInitX + static_cast<float>(event.sample + event.duration - iStart) * dDx;
 
         QColor fillColor = groupColor;
@@ -353,8 +351,8 @@ void FiffRawViewDelegate::paintEvent(const EVENTSLIB::Event& event,
 
 //=============================================================================================================
 
-void FiffRawViewDelegate::createScroller(const QModelIndex &index,
-                                         const QStyleOptionViewItem &option,
+void FiffRawViewDelegate::createScroller(const QModelIndex& index,
+                                         const QStyleOptionViewItem& option,
                                          QPainterPath& path,
                                          QPainter* painter) const
 {
@@ -373,7 +371,7 @@ void FiffRawViewDelegate::createScroller(const QModelIndex &index,
 
     double dDx = t_pModel->pixelDifference();
 
-    if(iScroller >= iFirstSampleDrawn && iScroller <= iLastSampleDrawn){
+    if (iScroller >= iFirstSampleDrawn && iScroller <= iLastSampleDrawn) {
         painter->drawLine(fInitX + static_cast<float>(iScroller - iFirstSampleDrawn) * dDx,
                           fTop,
                           fInitX + static_cast<float>(iScroller - iFirstSampleDrawn) * dDx,

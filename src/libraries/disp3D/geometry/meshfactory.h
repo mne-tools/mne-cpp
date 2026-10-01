@@ -64,10 +64,10 @@ public:
      * @param[in] subdivisions  Number of subdivision passes (0 = 20 tris, 1 = 80 tris).
      * @return Shared pointer to the created BrainSurface.
      */
-    static std::shared_ptr<BrainSurface> createSphere(const QVector3D &center,
-                                                       float radius,
-                                                       const QColor &color,
-                                                       int subdivisions = 1);
+    static std::shared_ptr<BrainSurface> createSphere(const QVector3D& center,
+                                                      float radius,
+                                                      const QColor& color,
+                                                      int subdivisions = 1);
 
     //=========================================================================================================
     /**
@@ -79,10 +79,10 @@ public:
      * @param[in] size       Side length in meters (plate is size × size × thin).
      * @return Shared pointer to the created BrainSurface.
      */
-    static std::shared_ptr<BrainSurface> createPlate(const QVector3D &center,
-                                                      const QMatrix4x4 &orientation,
-                                                      const QColor &color,
-                                                      float size);
+    static std::shared_ptr<BrainSurface> createPlate(const QVector3D& center,
+                                                     const QMatrix4x4& orientation,
+                                                     const QColor& color,
+                                                     float size);
 
     //=========================================================================================================
     /**
@@ -95,10 +95,10 @@ public:
      * @param[in] size       Overall size scale in meters.
      * @return Shared pointer to the created BrainSurface.
      */
-    static std::shared_ptr<BrainSurface> createBarbell(const QVector3D &center,
-                                                        const QMatrix4x4 &orientation,
-                                                        const QColor &color,
-                                                        float size);
+    static std::shared_ptr<BrainSurface> createBarbell(const QVector3D& center,
+                                                       const QMatrix4x4& orientation,
+                                                       const QColor& color,
+                                                       float size);
 
     //=========================================================================================================
     /**
@@ -113,10 +113,10 @@ public:
      * @param[in] subdivisions  Number of subdivision passes per sphere.
      * @return Shared pointer to the batched BrainSurface.
      */
-    static std::shared_ptr<BrainSurface> createBatchedSpheres(const QVector<QVector3D> &positions,
-                                                               float radius,
-                                                               const QColor &color,
-                                                               int subdivisions = 1);
+    static std::shared_ptr<BrainSurface> createBatchedSpheres(const QVector<QVector3D>& positions,
+                                                              float radius,
+                                                              const QColor& color,
+                                                              int subdivisions = 1);
 
     //=========================================================================================================
     /**
@@ -129,11 +129,11 @@ public:
      * @param[in] sides    Number of sides around the circumference (min 3).
      * @return Shared pointer to the created BrainSurface.
      */
-    static std::shared_ptr<BrainSurface> createCylinder(const QVector3D &from,
-                                                         const QVector3D &to,
-                                                         float radius,
-                                                         const QColor &color,
-                                                         int sides = 12);
+    static std::shared_ptr<BrainSurface> createCylinder(const QVector3D& from,
+                                                        const QVector3D& to,
+                                                        float radius,
+                                                        const QColor& color,
+                                                        int sides = 12);
 
     //=========================================================================================================
     /**
@@ -153,8 +153,8 @@ private:
      * @param[out] faces     Triangle index triplets.
      * @param[in]  subdivisions  Number of subdivision passes.
      */
-    static void buildIcosphere(QVector<Eigen::Vector3f> &vertices,
-                               QVector<Eigen::Vector3i> &faces,
+    static void buildIcosphere(QVector<Eigen::Vector3f>& vertices,
+                               QVector<Eigen::Vector3i>& faces,
                                int subdivisions);
 };
 

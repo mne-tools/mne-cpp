@@ -55,10 +55,10 @@ namespace UTILSLIB
  */
 struct UTILSSHARED_EXPORT FastrakSample
 {
-    int          station = 0;     ///< 1-based station id reported by the device.
-    QVector3D    position;        ///< Position in metres (always normalised to SI).
-    QQuaternion  orientation;     ///< Sensor orientation; identity if not provided.
-    bool         hasOrientation = false;
+    int station = 0;         ///< 1-based station id reported by the device.
+    QVector3D position;      ///< Position in metres (always normalised to SI).
+    QQuaternion orientation; ///< Sensor orientation; identity if not provided.
+    bool hasOrientation = false;
 };
 
 //=============================================================================================================
@@ -72,9 +72,10 @@ class UTILSSHARED_EXPORT FastrakParser
 {
 public:
     /** Linear unit of the positions reported by the device. */
-    enum class Units {
-        Inches,           ///< Fastrak factory default.
-        Centimetres       ///< FastSCAN / G4 default.
+    enum class Units
+    {
+        Inches,     ///< Fastrak factory default.
+        Centimetres ///< FastSCAN / G4 default.
     };
 
     FastrakParser() = default;
@@ -84,16 +85,25 @@ public:
      *
      * @param[in] units Unit of incoming positions; samples are converted to metres.
      */
-    void setUnits(Units units) { m_units = units; }
+    void setUnits(Units units)
+    {
+        m_units = units;
+    }
 
-    Units units() const { return m_units; }
+    Units units() const
+    {
+        return m_units;
+    }
 
     /**
      * Append raw bytes received from the serial port.
      *
      * @param[in] chunk Raw bytes to append to the internal buffer; may contain partial records.
      */
-    void append(const QByteArray& chunk) { m_buffer.append(chunk); }
+    void append(const QByteArray& chunk)
+    {
+        m_buffer.append(chunk);
+    }
 
     /**
      * Pop the next fully-decoded sample, if any.
@@ -106,7 +116,10 @@ public:
     bool nextSample(FastrakSample& out);
 
     /** Reset accumulated buffer state. */
-    void reset() { m_buffer.clear(); }
+    void reset()
+    {
+        m_buffer.clear();
+    }
 
     /**
      * Parse one record line (without trailing CR/LF) — exposed for unit
@@ -122,7 +135,7 @@ public:
 
 private:
     QByteArray m_buffer;
-    Units      m_units = Units::Centimetres;
+    Units m_units = Units::Centimetres;
 };
 
 } // namespace UTILSLIB

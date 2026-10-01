@@ -28,7 +28,8 @@ using namespace CORTICALSURFACEPLUGIN;
 using namespace INVLIB;
 using namespace FSLIB;
 
-namespace {
+namespace
+{
 
 QString findSampleSubjectsDir()
 {
@@ -89,8 +90,8 @@ void TestCorticalSurfacePicking::testPickVertexAndTimeCourse()
     // vertex list contains the queried indices directly.
     QVector<double> tc = plugin.timeCourseAt(/*hemi=*/0, /*vertex=*/2);
     QCOMPARE(tc.size(), nTimes);
-    QCOMPARE(tc.front(), 2.0);            // v=2, t=0 -> 2*1
-    QCOMPARE(tc.back(),  2.0 * nTimes);   // v=2, t=last
+    QCOMPARE(tc.front(), 2.0);         // v=2, t=0 -> 2*1
+    QCOMPARE(tc.back(), 2.0 * nTimes); // v=2, t=last
 }
 
 //=============================================================================================================
@@ -103,8 +104,9 @@ void TestCorticalSurfacePicking::testExportCsvAndRemove()
     const int nTimes = 5;
     Eigen::MatrixXd data(2, nTimes);
     data << 0, 1, 2, 3, 4,
-            5, 6, 7, 8, 9;
-    Eigen::VectorXi verts(2); verts << 10, 20;
+        5, 6, 7, 8, 9;
+    Eigen::VectorXi verts(2);
+    verts << 10, 20;
     plugin.setSourceEstimate(InvSourceEstimate(data, verts, 0.0f, 1e-3f));
 
     // Exporting with no traces fails gracefully.
@@ -162,8 +164,8 @@ void TestCorticalSurfacePicking::testPickOnRealSurface()
     QVERIFY(plugin.pickVertex(worldHit));
     QCOMPARE(spy.count(), 1);
     const auto args = spy.takeFirst();
-    QCOMPARE(args.at(0).toInt(), 0);              // lh
-    QCOMPARE(args.at(1).toInt(), targetVertex);   // closest vertex is the queried one
+    QCOMPARE(args.at(0).toInt(), 0);            // lh
+    QCOMPARE(args.at(1).toInt(), targetVertex); // closest vertex is the queried one
 
     QCOMPARE(plugin.pickedVertexCount(), 1);
     const auto picks = plugin.pickedVertices();

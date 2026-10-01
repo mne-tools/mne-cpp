@@ -23,10 +23,11 @@
 
 using namespace MNEANALYZESTUDIO;
 
-class TestStudioNeuroKernel : public QObject {
+class TestStudioNeuroKernel : public QObject
+{
     Q_OBJECT
 
-    private slots:
+private slots:
     void initTestCase();
     void malformedRequest();
     void listTools();
@@ -41,22 +42,23 @@ class TestStudioNeuroKernel : public QObject {
     void unmatchedChannels_data();
     void unmatchedChannels();
 
-    private:
+private:
     void sendRequest(const QJsonObject& request, QJsonObject& response);
 
     NeuroKernelService m_service;
     QLocalSocket m_socket;
 };
 
-void TestStudioNeuroKernel::initTestCase() {
-    const QString socketName = QStringLiteral("mne-nk-")
-                               + QUuid::createUuid().toString(QUuid::Id128).left(12);
+void TestStudioNeuroKernel::initTestCase()
+{
+    const QString socketName = QStringLiteral("mne-nk-") + QUuid::createUuid().toString(QUuid::Id128).left(12);
     QVERIFY(m_service.start(socketName));
     m_socket.connectToServer(socketName);
     QVERIFY(m_socket.waitForConnected(5000));
 }
 
-void TestStudioNeuroKernel::sendRequest(const QJsonObject& request, QJsonObject& response) {
+void TestStudioNeuroKernel::sendRequest(const QJsonObject& request, QJsonObject& response)
+{
     QVERIFY(m_socket.write(JsonRpcMessage::serialize(request)) > 0);
     m_socket.flush();
     QTRY_VERIFY_WITH_TIMEOUT(m_socket.canReadLine(), 5000);
@@ -66,7 +68,8 @@ void TestStudioNeuroKernel::sendRequest(const QJsonObject& request, QJsonObject&
              qPrintable(errorString));
 }
 
-void TestStudioNeuroKernel::malformedRequest() {
+void TestStudioNeuroKernel::malformedRequest()
+{
     QVERIFY(m_socket.write("{bad json\n") > 0);
     m_socket.flush();
     QTRY_VERIFY_WITH_TIMEOUT(m_socket.canReadLine(), 5000);
@@ -78,7 +81,8 @@ void TestStudioNeuroKernel::malformedRequest() {
              -32700);
 }
 
-void TestStudioNeuroKernel::listTools() {
+void TestStudioNeuroKernel::listTools()
+{
     const QJsonObject request = JsonRpcMessage::createRequest(QStringLiteral("list"),
                                                               QStringLiteral("tools/list"));
     QJsonObject response;
@@ -89,7 +93,8 @@ void TestStudioNeuroKernel::listTools() {
     QCOMPARE(result.value(QStringLiteral("transport")).toString(), QStringLiteral("local_socket"));
 }
 
-void TestStudioNeuroKernel::executeCommands_data() {
+void TestStudioNeuroKernel::executeCommands_data()
+{
     QTest::addColumn<QString>("command");
     QTest::addColumn<QString>("status");
 
@@ -100,13 +105,14 @@ void TestStudioNeuroKernel::executeCommands_data() {
     QTest::newRow("unknown") << QStringLiteral("unknown") << QStringLiteral("error");
 }
 
-void TestStudioNeuroKernel::executeCommands() {
+void TestStudioNeuroKernel::executeCommands()
+{
     QFETCH(QString, command);
     QFETCH(QString, status);
 
     const QJsonObject params{
-    {QStringLiteral("name"), QStringLiteral("neurokernel.execute")},
-    {QStringLiteral("arguments"), QJsonObject{{QStringLiteral("command"), command}}}};
+        {QStringLiteral("name"), QStringLiteral("neurokernel.execute")},
+        {QStringLiteral("arguments"), QJsonObject{{QStringLiteral("command"), command}}}};
     const QJsonObject request = JsonRpcMessage::createRequest(QStringLiteral("execute"),
                                                               QStringLiteral("tools/call"),
                                                               params);
@@ -118,10 +124,11 @@ void TestStudioNeuroKernel::executeCommands() {
              QStringLiteral("neurokernel.execute"));
 }
 
-void TestStudioNeuroKernel::unknownTool() {
+void TestStudioNeuroKernel::unknownTool()
+{
     const QJsonObject params{
-    {QStringLiteral("name"), QStringLiteral("neurokernel.unknown")},
-    {QStringLiteral("arguments"), QJsonObject()}};
+        {QStringLiteral("name"), QStringLiteral("neurokernel.unknown")},
+        {QStringLiteral("arguments"), QJsonObject()}};
     const QJsonObject request = JsonRpcMessage::createRequest(QStringLiteral("unknown"),
                                                               QStringLiteral("tools/call"),
                                                               params);
@@ -131,7 +138,8 @@ void TestStudioNeuroKernel::unknownTool() {
     QCOMPARE(result.value(QStringLiteral("status")).toString(), QStringLiteral("ignored"));
 }
 
-void TestStudioNeuroKernel::missingFiles_data() {
+void TestStudioNeuroKernel::missingFiles_data()
+{
     QTest::addColumn<QString>("toolName");
 
     QTest::newRow("raw stats") << QStringLiteral("neurokernel.raw_stats");
@@ -140,13 +148,14 @@ void TestStudioNeuroKernel::missingFiles_data() {
     QTest::newRow("psd") << QStringLiteral("neurokernel.psd_summary");
 }
 
-void TestStudioNeuroKernel::missingFiles() {
+void TestStudioNeuroKernel::missingFiles()
+{
     QFETCH(QString, toolName);
 
     const QJsonObject arguments{{QStringLiteral("file"), QStringLiteral("missing-raw.fif")}};
     const QJsonObject params{
-    {QStringLiteral("name"), toolName},
-    {QStringLiteral("arguments"), arguments}};
+        {QStringLiteral("name"), toolName},
+        {QStringLiteral("arguments"), arguments}};
     const QJsonObject request = JsonRpcMessage::createRequest(QStringLiteral("missing"),
                                                               QStringLiteral("tools/call"),
                                                               params);
@@ -157,7 +166,8 @@ void TestStudioNeuroKernel::missingFiles() {
     QVERIFY(result.value(QStringLiteral("message")).toString().contains(QStringLiteral("could not find")));
 }
 
-void TestStudioNeuroKernel::malformedFile() {
+void TestStudioNeuroKernel::malformedFile()
+{
     QTemporaryFile malformedFile;
     QVERIFY(malformedFile.open());
     QCOMPARE(malformedFile.write("not a fiff file"), 15);
@@ -165,8 +175,8 @@ void TestStudioNeuroKernel::malformedFile() {
 
     const QJsonObject arguments{{QStringLiteral("file"), malformedFile.fileName()}};
     const QJsonObject params{
-    {QStringLiteral("name"), QStringLiteral("neurokernel.raw_stats")},
-    {QStringLiteral("arguments"), arguments}};
+        {QStringLiteral("name"), QStringLiteral("neurokernel.raw_stats")},
+        {QStringLiteral("arguments"), arguments}};
     const QJsonObject request = JsonRpcMessage::createRequest(QStringLiteral("malformed"),
                                                               QStringLiteral("tools/call"),
                                                               params);
@@ -177,27 +187,29 @@ void TestStudioNeuroKernel::malformedFile() {
     QVERIFY(result.value(QStringLiteral("message")).toString().contains(QStringLiteral("failed")));
 }
 
-void TestStudioNeuroKernel::analyzeRawData_data() {
+void TestStudioNeuroKernel::analyzeRawData_data()
+{
     QTest::addColumn<QString>("toolName");
     QTest::addColumn<QJsonObject>("extraArguments");
 
     QTest::newRow("raw stats")
-    << QStringLiteral("neurokernel.raw_stats")
-    << QJsonObject();
+        << QStringLiteral("neurokernel.raw_stats")
+        << QJsonObject();
     QTest::newRow("channel stats")
-    << QStringLiteral("neurokernel.channel_stats")
-    << QJsonObject{{QStringLiteral("match"), QStringLiteral("EEG")},
-                   {QStringLiteral("limit"), 2}};
+        << QStringLiteral("neurokernel.channel_stats")
+        << QJsonObject{{QStringLiteral("match"), QStringLiteral("EEG")},
+                       {QStringLiteral("limit"), 2}};
     QTest::newRow("peak window")
-    << QStringLiteral("neurokernel.find_peak_window")
-    << QJsonObject{{QStringLiteral("match"), QStringLiteral("MEG")}};
+        << QStringLiteral("neurokernel.find_peak_window")
+        << QJsonObject{{QStringLiteral("match"), QStringLiteral("MEG")}};
     QTest::newRow("psd")
-    << QStringLiteral("neurokernel.psd_summary")
-    << QJsonObject{{QStringLiteral("match"), QStringLiteral("EEG")},
-                   {QStringLiteral("nfft"), 64}};
+        << QStringLiteral("neurokernel.psd_summary")
+        << QJsonObject{{QStringLiteral("match"), QStringLiteral("EEG")},
+                       {QStringLiteral("nfft"), 64}};
 }
 
-void TestStudioNeuroKernel::analyzeRawData() {
+void TestStudioNeuroKernel::analyzeRawData()
+{
     QFETCH(QString, toolName);
     QFETCH(QJsonObject, extraArguments);
 
@@ -212,8 +224,8 @@ void TestStudioNeuroKernel::analyzeRawData() {
     arguments.insert(QStringLiteral("from_sample"), 12900);
     arguments.insert(QStringLiteral("to_sample"), 13155);
     const QJsonObject params{
-    {QStringLiteral("name"), toolName},
-    {QStringLiteral("arguments"), arguments}};
+        {QStringLiteral("name"), toolName},
+        {QStringLiteral("arguments"), arguments}};
     const QJsonObject request = JsonRpcMessage::createRequest(QStringLiteral("analysis"),
                                                               QStringLiteral("tools/call"),
                                                               params);
@@ -243,14 +255,16 @@ void TestStudioNeuroKernel::analyzeRawData() {
     }
 }
 
-void TestStudioNeuroKernel::unmatchedChannels_data() {
+void TestStudioNeuroKernel::unmatchedChannels_data()
+{
     QTest::addColumn<QString>("toolName");
 
     QTest::newRow("peak window") << QStringLiteral("neurokernel.find_peak_window");
     QTest::newRow("psd") << QStringLiteral("neurokernel.psd_summary");
 }
 
-void TestStudioNeuroKernel::unmatchedChannels() {
+void TestStudioNeuroKernel::unmatchedChannels()
+{
     QFETCH(QString, toolName);
 
     const QString rawPath = QCoreApplication::applicationDirPath() + QStringLiteral("/../resources/data/mne-cpp-test-data/MEG/sample/"
@@ -260,13 +274,13 @@ void TestStudioNeuroKernel::unmatchedChannels() {
     }
 
     const QJsonObject arguments{
-    {QStringLiteral("file"), rawPath},
-    {QStringLiteral("from_sample"), 12900},
-    {QStringLiteral("to_sample"), 13155},
-    {QStringLiteral("match"), QStringLiteral("NOT_A_CHANNEL")}};
+        {QStringLiteral("file"), rawPath},
+        {QStringLiteral("from_sample"), 12900},
+        {QStringLiteral("to_sample"), 13155},
+        {QStringLiteral("match"), QStringLiteral("NOT_A_CHANNEL")}};
     const QJsonObject params{
-    {QStringLiteral("name"), toolName},
-    {QStringLiteral("arguments"), arguments}};
+        {QStringLiteral("name"), toolName},
+        {QStringLiteral("arguments"), arguments}};
     const QJsonObject request = JsonRpcMessage::createRequest(QStringLiteral("unmatched"),
                                                               QStringLiteral("tools/call"),
                                                               params);

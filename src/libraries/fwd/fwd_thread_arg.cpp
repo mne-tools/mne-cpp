@@ -35,18 +35,18 @@ using namespace MNELIB;
 //=============================================================================================================
 
 FwdThreadArg::FwdThreadArg()
-:res           (nullptr)
-,res_grad      (nullptr)
-,off           (0)
-,field_pot     (nullptr)
-,vec_field_pot (nullptr)
-,field_pot_grad(nullptr)
-,coils_els     (nullptr)
-,client        (nullptr)
-,s             (nullptr)
-,fixed_ori     (false)
-,comp          (-1)
-,stat          (-1)
+: res(nullptr)
+, res_grad(nullptr)
+, off(0)
+, field_pot(nullptr)
+, vec_field_pot(nullptr)
+, field_pot_grad(nullptr)
+, coils_els(nullptr)
+, client(nullptr)
+, s(nullptr)
+, fixed_ori(false)
+, comp(-1)
+, stat(-1)
 {
 }
 
@@ -64,14 +64,15 @@ FwdThreadArg::UPtr FwdThreadArg::create_eeg_multi_thread_duplicate(FwdThreadArg&
 {
     auto res = std::make_unique<FwdThreadArg>();
 
-     *res = one;
-    res->client_free = nullptr;  /* Don't copy the source's deleter */
+    *res = one;
+    res->client_free = nullptr; /* Don't copy the source's deleter */
     if (bem_model) {
         auto bem = std::make_shared<FwdBemModel>();
         *bem = *static_cast<FwdBemModel*>(res->client);
         bem->v0.resize(0);
         res->client = bem.get();
-        res->client_free = [bem]() {};  /* shared_ptr releases FwdBemModel on destruction */
+        res->client_free = [bem]() {
+        }; /* shared_ptr releases FwdBemModel on destruction */
     }
     return res;
 }
@@ -81,15 +82,15 @@ FwdThreadArg::UPtr FwdThreadArg::create_eeg_multi_thread_duplicate(FwdThreadArg&
 FwdThreadArg::UPtr FwdThreadArg::create_meg_multi_thread_duplicate(FwdThreadArg& one, bool bem_model)
 {
     auto res = std::make_unique<FwdThreadArg>();
-    FwdCompData*  orig = static_cast<FwdCompData*>(one.client);
+    FwdCompData* orig = static_cast<FwdCompData*>(one.client);
 
-     *res = one;
-    res->client_free = nullptr;  /* Don't copy the source's deleter */
+    *res = one;
+    res->client_free = nullptr; /* Don't copy the source's deleter */
 
     auto comp = std::make_shared<FwdCompData>();
     *comp = *orig;
-    comp->comp_coils = nullptr;  /* Non-owning: shared with original, prevent ~FwdCompData from deleting */
-    comp->set        = nullptr;  /* Will be replaced below; prevent dtor from deleting orig's copy */
+    comp->comp_coils = nullptr; /* Non-owning: shared with original, prevent ~FwdCompData from deleting */
+    comp->set = nullptr;        /* Will be replaced below; prevent dtor from deleting orig's copy */
     comp->work.resize(0);
     comp->vec_work.resize(0, 0);
 
@@ -106,12 +107,11 @@ FwdThreadArg::UPtr FwdThreadArg::create_meg_multi_thread_duplicate(FwdThreadArg&
         comp->client = bem.get();
         /* shared_ptrs release their objects when client_free is destroyed */
         res->client_free = [comp, set_guard, bem]() {
-            comp->set = nullptr;  /* Prevent ~FwdCompData double-free; set_guard owns it */
+            comp->set = nullptr; /* Prevent ~FwdCompData double-free; set_guard owns it */
         };
-    }
-    else {
+    } else {
         res->client_free = [comp, set_guard]() {
-            comp->set = nullptr;  /* Prevent ~FwdCompData double-free; set_guard owns it */
+            comp->set = nullptr; /* Prevent ~FwdCompData double-free; set_guard owns it */
         };
     }
     return res;

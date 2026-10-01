@@ -56,7 +56,8 @@
 // DEFINE NAMESPACE FTBUFFERPLUGIN
 //=============================================================================================================
 
-namespace FTBUFFERPLUGIN {
+namespace FTBUFFERPLUGIN
+{
 
 //=============================================================================================================
 // FTBUFFERPLUGIN FORWARD DECLARATION
@@ -186,7 +187,7 @@ private:
     /**
      * Gets extecuted after start(), currently does nothing
      */
-    virtual void run();    
+    virtual void run();
 
     //=========================================================================================================
     /**
@@ -194,7 +195,7 @@ private:
      *
      * @param[in] matData   New data from FtBuffProducer.
      */
-    void onNewDataAvailable(const Eigen::MatrixXd &matData);
+    void onNewDataAvailable(const Eigen::MatrixXd& matData);
 
     //=========================================================================================================
     /**
@@ -218,21 +219,21 @@ private:
      */
     bool setupRTMSA(const MetaData& metadata);
 
-    bool                                                                                m_bIsConfigured;                /**< Whether the buffer output has been configured. */
+    bool m_bIsConfigured; /**< Whether the buffer output has been configured. */
 
-    QMutex                                                                              m_mutex;                        /**< Guards shared data from being accessed at the same time. */
+    QMutex m_mutex; /**< Guards shared data from being accessed at the same time. */
 
-    QThread                                                                             m_pProducerThread;              /**< Producer thread for the FtBuffProducer object. */
+    QThread m_pProducerThread; /**< Producer thread for the FtBuffProducer object. */
 
-    QSharedPointer<FtBuffProducer>                                                      m_pFtBuffProducer;              /**< Pointer to producer object that handles data from FtConnector*/
-    QSharedPointer<FIFFLIB::FiffInfo>                                                   m_pFiffInfo;                    /**< Fiff measurement info.*/
-    QSharedPointer<FIFFLIB::FiffRawData>                                                m_pNeuromagHeadChunkData;       /**< Fiff into parser for header data collected from Neuromag extended header. */
-    QSharedPointer<SCSHAREDLIB::PluginOutputData<SCMEASLIB::RealTimeMultiSampleArray> > m_pRTMSA_BufferOutput;          /**< The RealTimeSampleArray to provide the plugin output data.*/
-    QSharedPointer<UTILSLIB::CircularBuffer_Matrix_double>                              m_pCircularBuffer;              /**< Holds incoming raw data. */
+    QSharedPointer<FtBuffProducer> m_pFtBuffProducer;                                                         /**< Pointer to producer object that handles data from FtConnector*/
+    QSharedPointer<FIFFLIB::FiffInfo> m_pFiffInfo;                                                            /**< Fiff measurement info.*/
+    QSharedPointer<FIFFLIB::FiffRawData> m_pNeuromagHeadChunkData;                                            /**< Fiff into parser for header data collected from Neuromag extended header. */
+    QSharedPointer<SCSHAREDLIB::PluginOutputData<SCMEASLIB::RealTimeMultiSampleArray>> m_pRTMSA_BufferOutput; /**< The RealTimeSampleArray to provide the plugin output data.*/
+    QSharedPointer<UTILSLIB::CircularBuffer_Matrix_double> m_pCircularBuffer;                                 /**< Holds incoming raw data. */
 
-    QString                                                                             m_sBufferAddress;               /**< The address used to connect to the buffer if starting without being connected */
-    int                                                                                 m_iBufferPort;                  /**< The port used to connect to the buffer if starting without being connected */
+    QString m_sBufferAddress; /**< The address used to connect to the buffer if starting without being connected */
+    int m_iBufferPort;        /**< The port used to connect to the buffer if starting without being connected */
 };
-}//namespace end brace
+} //namespace end brace
 
 #endif // FTBUFFER_H

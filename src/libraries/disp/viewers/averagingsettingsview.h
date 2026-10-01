@@ -43,13 +43,15 @@
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-namespace Ui {
-    class AverageSettingsViewWidget;
+namespace Ui
+{
+class AverageSettingsViewWidget;
 }
 
-namespace FIFFLIB {
-    class FiffEvokedSet;
-    class FiffChInfo;
+namespace FIFFLIB
+{
+class FiffEvokedSet;
+class FiffChInfo;
 }
 
 //=============================================================================================================
@@ -77,12 +79,12 @@ class DISPSHARED_EXPORT AveragingSettingsView : public AbstractView
     Q_OBJECT
 
 public:
-    typedef QSharedPointer<AveragingSettingsView> SPtr;         /**< Shared pointer type for AveragingAdjustmentWidget. */
-    typedef QSharedPointer<AveragingSettingsView> ConstSPtr;    /**< Const shared pointer type for AveragingAdjustmentWidget. */
+    typedef QSharedPointer<AveragingSettingsView> SPtr;      /**< Shared pointer type for AveragingAdjustmentWidget. */
+    typedef QSharedPointer<AveragingSettingsView> ConstSPtr; /**< Const shared pointer type for AveragingAdjustmentWidget. */
 
     explicit AveragingSettingsView(const QString& sSettingsPath = "",
                                    const QMap<QString, int>& mapStimChsIndexNames = QMap<QString, int>(),
-                                   QWidget *parent = Q_NULLPTR);
+                                   QWidget* parent = Q_NULLPTR);
 
     //=========================================================================================================
     /**
@@ -90,7 +92,7 @@ public:
      */
     ~AveragingSettingsView();
 
-    void setStimChannels(const QMap<QString, int> &mapStimChsIndexNames);
+    void setStimChannels(const QMap<QString, int>& mapStimChsIndexNames);
 
     QString getCurrentStimCh();
 
@@ -161,22 +163,22 @@ protected:
     void onChangePostStim();
     void onChangeBaselineFrom();
     void onChangeBaselineTo();
-    void onChangeNumAverages();    
+    void onChangeNumAverages();
     void onChangeStimChannel();
     void onChangeGroupSelect(int iIndex);
 
-    Ui::AverageSettingsViewWidget* m_pUi;              /**< Holds the user interface for the AverageSettingsViewWidget.*/
+    Ui::AverageSettingsViewWidget* m_pUi; /**< Holds the user interface for the AverageSettingsViewWidget.*/
 
-    QString             m_sCurrentStimChan;
+    QString m_sCurrentStimChan;
 
-    QMap<QString,int>   m_mapStimChsIndexNames;
+    QMap<QString, int> m_mapStimChsIndexNames;
 
-    int                 m_iNumAverages;
-    int                 m_iPreStimSeconds;
-    int                 m_iPostStimSeconds;
-    int                 m_iBaselineFromSeconds;
-    int                 m_iBaselineToSeconds;
-    bool                m_bDoBaselineCorrection;
+    int m_iNumAverages;
+    int m_iPreStimSeconds;
+    int m_iPostStimSeconds;
+    int m_iBaselineFromSeconds;
+    int m_iBaselineToSeconds;
+    bool m_bDoBaselineCorrection;
 
 signals:
     void changePreStim(qint32 value);

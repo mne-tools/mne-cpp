@@ -27,10 +27,10 @@ using namespace DISP3DLIB;
 //=============================================================================================================
 
 SliceObject::SliceObject()
-    : m_corner00(Eigen::Vector3d::Zero())
-    , m_corner10(Eigen::Vector3d::UnitX())
-    , m_corner01(Eigen::Vector3d::UnitY())
-    , m_corner11(Eigen::Vector3d::UnitX() + Eigen::Vector3d::UnitY())
+: m_corner00(Eigen::Vector3d::Zero())
+, m_corner10(Eigen::Vector3d::UnitX())
+, m_corner01(Eigen::Vector3d::UnitY())
+, m_corner11(Eigen::Vector3d::UnitX() + Eigen::Vector3d::UnitY())
 {
 }
 
@@ -41,9 +41,9 @@ void SliceObject::setSlice(const QImage& image,
                            int sliceIndex,
                            const Eigen::Matrix4d& voxelToWorld)
 {
-    m_image        = image;
-    m_orientation  = orientation;
-    m_sliceIndex   = sliceIndex;
+    m_image = image;
+    m_orientation = orientation;
+    m_sliceIndex = sliceIndex;
     m_voxelToWorld = voxelToWorld;
 
     // Image dimensions define the number of voxels along each in-plane axis.
@@ -60,27 +60,27 @@ void SliceObject::setSlice(const QImage& image,
     Eigen::Vector4d c11 = Eigen::Vector4d::Zero();
 
     switch (m_orientation) {
-    case SliceOrientation::Axial:
-        //  u → X,  v → Y,  slice along Z
-        c00 << 0, 0, sliceIndex, 1;
-        c10 << w, 0, sliceIndex, 1;
-        c01 << 0, h, sliceIndex, 1;
-        c11 << w, h, sliceIndex, 1;
-        break;
-    case SliceOrientation::Coronal:
-        //  u → X,  v → Z,  slice along Y
-        c00 << 0, sliceIndex, 0, 1;
-        c10 << w, sliceIndex, 0, 1;
-        c01 << 0, sliceIndex, h, 1;
-        c11 << w, sliceIndex, h, 1;
-        break;
-    case SliceOrientation::Sagittal:
-        //  u → Y,  v → Z,  slice along X
-        c00 << sliceIndex, 0, 0, 1;
-        c10 << sliceIndex, w, 0, 1;
-        c01 << sliceIndex, 0, h, 1;
-        c11 << sliceIndex, w, h, 1;
-        break;
+        case SliceOrientation::Axial:
+            //  u → X,  v → Y,  slice along Z
+            c00 << 0, 0, sliceIndex, 1;
+            c10 << w, 0, sliceIndex, 1;
+            c01 << 0, h, sliceIndex, 1;
+            c11 << w, h, sliceIndex, 1;
+            break;
+        case SliceOrientation::Coronal:
+            //  u → X,  v → Z,  slice along Y
+            c00 << 0, sliceIndex, 0, 1;
+            c10 << w, sliceIndex, 0, 1;
+            c01 << 0, sliceIndex, h, 1;
+            c11 << w, sliceIndex, h, 1;
+            break;
+        case SliceOrientation::Sagittal:
+            //  u → Y,  v → Z,  slice along X
+            c00 << sliceIndex, 0, 0, 1;
+            c10 << sliceIndex, w, 0, 1;
+            c01 << sliceIndex, 0, h, 1;
+            c11 << sliceIndex, w, h, 1;
+            break;
     }
 
     // Transform voxel → world (RAS)
@@ -102,9 +102,9 @@ void SliceObject::setSliceToWorld(const QImage& image,
                                   int sliceIndex,
                                   const Eigen::Matrix4d& imageToWorld)
 {
-    m_image       = image;
+    m_image = image;
     m_orientation = orientation;
-    m_sliceIndex  = sliceIndex;
+    m_sliceIndex = sliceIndex;
 
     const int w = m_image.width();
     const int h = m_image.height();
@@ -179,7 +179,7 @@ QMatrix4x4 SliceObject::sliceToWorld() const
 void SliceObject::setWindowLevel(float center, float width)
 {
     m_windowCenter = center;
-    m_windowWidth  = width;
+    m_windowWidth = width;
 }
 
 //=============================================================================================================
@@ -222,25 +222,29 @@ void SliceObject::generateQuadVertices(QVector<float>& vertices) const
     *p++ = static_cast<float>(m_corner00.x());
     *p++ = static_cast<float>(m_corner00.y());
     *p++ = static_cast<float>(m_corner00.z());
-    *p++ = 0.0f;  *p++ = 0.0f;
+    *p++ = 0.0f;
+    *p++ = 0.0f;
 
     // Vertex 1: corner10, uv(1,0)
     *p++ = static_cast<float>(m_corner10.x());
     *p++ = static_cast<float>(m_corner10.y());
     *p++ = static_cast<float>(m_corner10.z());
-    *p++ = 1.0f;  *p++ = 0.0f;
+    *p++ = 1.0f;
+    *p++ = 0.0f;
 
     // Vertex 2: corner01, uv(0,1)
     *p++ = static_cast<float>(m_corner01.x());
     *p++ = static_cast<float>(m_corner01.y());
     *p++ = static_cast<float>(m_corner01.z());
-    *p++ = 0.0f;  *p++ = 1.0f;
+    *p++ = 0.0f;
+    *p++ = 1.0f;
 
     // Vertex 3: corner11, uv(1,1)
     *p++ = static_cast<float>(m_corner11.x());
     *p++ = static_cast<float>(m_corner11.y());
     *p++ = static_cast<float>(m_corner11.z());
-    *p++ = 1.0f;  *p++ = 1.0f;
+    *p++ = 1.0f;
+    *p++ = 1.0f;
 }
 
 //=============================================================================================================
@@ -248,5 +252,5 @@ void SliceObject::generateQuadVertices(QVector<float>& vertices) const
 void SliceObject::generateQuadIndices(QVector<unsigned int>& indices)
 {
     // Two triangles: (0,1,2) and (2,1,3)
-    indices = { 0, 1, 2,  2, 1, 3 };
+    indices = {0, 1, 2, 2, 1, 3};
 }

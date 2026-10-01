@@ -60,36 +60,45 @@ class TestFwdBemFieldComputation : public QObject
     Q_OBJECT
 
 public:
-    TestFwdBemFieldComputation() {}
+    TestFwdBemFieldComputation()
+    {
+    }
 
 private:
-    QString testDataPath() const {
-        return QCoreApplication::applicationDirPath()
-               + "/../resources/data/mne-cpp-test-data";
+    QString testDataPath() const
+    {
+        return QCoreApplication::applicationDirPath() + "/../resources/data/mne-cpp-test-data";
     }
-    QString coilDefPath() const {
-        return QCoreApplication::applicationDirPath()
-               + "/../resources/general/coilDefinitions/coil_def.dat";
+    QString coilDefPath() const
+    {
+        return QCoreApplication::applicationDirPath() + "/../resources/general/coilDefinitions/coil_def.dat";
     }
-    QString bemPath() const {
+    QString bemPath() const
+    {
         return testDataPath() + "/subjects/sample/bem/sample-5120-bem.fif";
     }
-    QString bemSolPath() const {
+    QString bemSolPath() const
+    {
         return testDataPath() + "/subjects/sample/bem/sample-5120-bem-sol.fif";
     }
-    QString bem3Path() const {
+    QString bem3Path() const
+    {
         return testDataPath() + "/subjects/sample/bem/sample-1280-1280-1280-bem.fif";
     }
-    QString bem3SolPath() const {
+    QString bem3SolPath() const
+    {
         return testDataPath() + "/subjects/sample/bem/sample-1280-1280-1280-bem-sol.fif";
     }
-    QString rawPath() const {
+    QString rawPath() const
+    {
         return testDataPath() + "/MEG/sample/sample_audvis_trunc_raw.fif";
     }
-    QString srcPath() const {
+    QString srcPath() const
+    {
         return testDataPath() + "/subjects/sample/bem/sample-oct-6-src.fif";
     }
-    QString transPath() const {
+    QString transPath() const
+    {
         return testDataPath() + "/MEG/sample/all-trans.fif";
     }
 
@@ -163,8 +172,8 @@ private slots:
 
         // Create coils using dev->head transform so coord_frame is set
         auto coils = coilDefs->create_meg_coils(megChs, megChs.size(),
-                                                 FWD_COIL_ACCURACY_NORMAL,
-                                                 raw.info.dev_head_t);
+                                                FWD_COIL_ACCURACY_NORMAL,
+                                                raw.info.dev_head_t);
         QVERIFY(coils != nullptr);
         QVERIFY(coils->ncoil() > 0);
 
@@ -233,8 +242,8 @@ private slots:
         model->fwd_bem_specify_coils(coils.get());
 
         // Place a dipole inside the BEM surface
-        Vector3f rd(0.0f, 0.0f, 0.06f);  // ~6cm deep
-        Vector3f Q(0.0f, 0.0f, 1e-8f);   // z-directed, 10 nAm
+        Vector3f rd(0.0f, 0.0f, 0.06f); // ~6cm deep
+        Vector3f Q(0.0f, 0.0f, 1e-8f);  // z-directed, 10 nAm
 
         VectorXf B = VectorXf::Zero(coils->ncoil());
         model->fwd_bem_field_calc(rd, Q, *coils, B);
@@ -533,7 +542,7 @@ private slots:
         // Sphere model origin
         float r0[3] = {0.0f, 0.0f, 0.04f};
         int ret = FwdBemModel::fwd_sphere_field_grad(rd, Q, *coils, Bval,
-                                                      xgrad, ygrad, zgrad, r0);
+                                                     xgrad, ygrad, zgrad, r0);
         QVERIFY(ret == 0);
         QVERIFY(Bval.norm() > 0);
         float gradNorm = xgrad.norm() + ygrad.norm() + zgrad.norm();
@@ -595,10 +604,10 @@ private slots:
         // Test generating a guess point grid for dipole fitting.
         // Creates a regular grid of points inside a sphere and
         // excludes points too close to surfaces.
-        float guessrad = 0.080f;  // 80mm sphere radius
-        Vector3f r0(0.0f, 0.0f, 0.04f);  // center of sphere
-        float grid = 0.010f;  // 10mm grid spacing
-        float exclude = 0.020f;  // exclude 20mm from surface
+        float guessrad = 0.080f;        // 80mm sphere radius
+        Vector3f r0(0.0f, 0.0f, 0.04f); // center of sphere
+        float grid = 0.010f;            // 10mm grid spacing
+        float exclude = 0.020f;         // exclude 20mm from surface
         float mindist = 0.005f;
 
         auto guess = FwdBemModel::make_guesses(nullptr, guessrad, r0, grid, exclude, mindist);
@@ -615,11 +624,15 @@ private slots:
                 continue;
             float dist = (guess->rr.row(i).transpose().cast<float>() - r0).norm();
             QVERIFY2(dist <= guessrad,
-                      qPrintable(QString("In-use guess point %1 at distance %2 exceeds sphere radius %3")
-                                 .arg(i).arg(dist).arg(guessrad)));
+                     qPrintable(QString("In-use guess point %1 at distance %2 exceeds sphere radius %3")
+                                    .arg(i)
+                                    .arg(dist)
+                                    .arg(guessrad)));
             QVERIFY2(dist >= exclude,
-                      qPrintable(QString("In-use guess point %1 at distance %2 is closer than exclude %3")
-                                 .arg(i).arg(dist).arg(exclude)));
+                     qPrintable(QString("In-use guess point %1 at distance %2 is closer than exclude %3")
+                                    .arg(i)
+                                    .arg(dist)
+                                    .arg(exclude)));
         }
     }
 

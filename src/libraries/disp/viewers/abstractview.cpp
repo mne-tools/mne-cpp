@@ -37,7 +37,7 @@ using namespace DISPLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-AbstractView::AbstractView(QWidget *parent,
+AbstractView::AbstractView(QWidget* parent,
                            Qt::WindowFlags f)
 : QWidget(parent, f)
 {

@@ -154,7 +154,8 @@ FiffEvoked UTILSLIB::simulateEvoked(
     // First generate noiseless data
     FiffEvoked evoked = simulateEvokedNoiseless(fwd, stc, info);
 
-    if (evoked.data.size() == 0) return evoked;
+    if (evoked.data.size() == 0)
+        return evoked;
 
     const int nChan = static_cast<int>(evoked.data.rows());
     const int nTimes = static_cast<int>(evoked.data.cols());
@@ -169,7 +170,8 @@ FiffEvoked UTILSLIB::simulateEvoked(
 
         // Clamp negative eigenvalues
         for (int i = 0; i < eigvals.size(); ++i) {
-            if (eigvals(i) < 0) eigvals(i) = 0;
+            if (eigvals(i) < 0)
+                eigvals(i) = 0;
         }
 
         MatrixXd sqrtCov = eigvecs * eigvals.cwiseSqrt().asDiagonal();
@@ -211,7 +213,7 @@ FiffEvoked UTILSLIB::simulateEvokedNoiseless(
         return evoked;
     }
 
-    MatrixXd G = fwd.sol->data;  // (n_channels x n_dipoles)
+    MatrixXd G = fwd.sol->data; // (n_channels x n_dipoles)
     const int nDipoles = static_cast<int>(G.cols());
     const int nSrc = static_cast<int>(stc.data.rows());
     const int nTimes = static_cast<int>(stc.data.cols());

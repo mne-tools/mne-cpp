@@ -35,21 +35,21 @@ using namespace MNESCAN;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-MainSplashScreen::MainSplashScreen ()
+MainSplashScreen::MainSplashScreen()
 : MainSplashScreen(QPixmap())
 {
 }
 
 //=============================================================================================================
 
-MainSplashScreen::MainSplashScreen (const QPixmap & pixmap)
+MainSplashScreen::MainSplashScreen(const QPixmap& pixmap)
 : MainSplashScreen(pixmap, Qt::Widget)
 {
 }
 
 //=============================================================================================================
 
-MainSplashScreen::MainSplashScreen (const QPixmap & pixmap, Qt::WindowFlags f)
+MainSplashScreen::MainSplashScreen(const QPixmap& pixmap, Qt::WindowFlags f)
 : QSplashScreen(pixmap, f)
 {
 }

@@ -66,12 +66,12 @@ int SetupMri::run()
     // Validate settings
     if (m_settings.subjectsDir().isEmpty()) {
         qCritical() << "The subjects directory (SUBJECTS_DIR) is not set.\n"
-                     << "Use --subjects-dir or set the SUBJECTS_DIR environment variable.";
+                    << "Use --subjects-dir or set the SUBJECTS_DIR environment variable.";
         return 1;
     }
     if (m_settings.subject().isEmpty()) {
         qCritical() << "The subject name is not set.\n"
-                     << "Use --subject or set the SUBJECT environment variable.";
+                    << "Use --subject or set the SUBJECT environment variable.";
         return 1;
     }
 
@@ -93,7 +93,7 @@ int SetupMri::run()
     QStringList mriSets = m_settings.mriSets();
     for (const QString& mriName : mriSets) {
         qInfo("-----------------------------------------------------------------------------------------------");
-        qInfo("Setting up %s..." , qPrintable(mriName));
+        qInfo("Setting up %s...", qPrintable(mriName));
 
         if (!processMriSet(mriName)) {
             return 1;
@@ -175,7 +175,7 @@ bool SetupMri::processMriSet(const QString& mriName)
 
     if (mgzInfo.exists()) {
         // MGZ/MGH path — use MRILIB::MriMghIO
-        qInfo("Reading %s..." , qPrintable(thisMgz));
+        qInfo("Reading %s...", qPrintable(thisMgz));
 
         MriVolData volData;
         QString subjectMriDir = m_settings.subjectsDir() + "/" + m_settings.subject() + "/mri";
@@ -187,7 +187,7 @@ bool SetupMri::processMriSet(const QString& mriName)
         slices = volData.slices;
     } else {
         // COR slices path — use MRILIB::MriCorIO
-        qInfo("Reading COR files from %s..." , qPrintable(thisDir));
+        qInfo("Reading COR files from %s...", qPrintable(thisDir));
 
         // Create symbolic links (like the shell script does)
         QDir corDir(thisDir);
@@ -211,12 +211,12 @@ bool SetupMri::processMriSet(const QString& mriName)
     QString corFifPath = setsDir + "/COR.fif";
     QFile::remove(corFifPath);
 
-    qInfo("Creating %s..." , qPrintable(corFifPath));
+    qInfo("Creating %s...", qPrintable(corFifPath));
     if (!MriCorFifIO::write(corFifPath, slices, additionalTrans)) {
         qCritical() << "Failed to write" << corFifPath;
         return false;
     }
-    qInfo("Created %s" , qPrintable(corFifPath));
+    qInfo("Created %s", qPrintable(corFifPath));
 
     return true;
 }

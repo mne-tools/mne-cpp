@@ -30,8 +30,9 @@
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-namespace Ui {
-    class TMSISetupClass;
+namespace Ui
+{
+class TMSISetupClass;
 }
 
 //=============================================================================================================
@@ -58,7 +59,6 @@ class TMSISetupWidget : public QWidget
     Q_OBJECT
 
 public:
-
     //=========================================================================================================
     /**
      * Constructs a TMSISetupWidget which is a child of parent.
@@ -66,7 +66,7 @@ public:
      * @param[in] parent pointer to parent widget; If parent is 0, the new TMSISetupWidget becomes a window. If parent is another widget, TMSISetupWidget becomes a child window inside parent. TMSISetupWidget is deleted when its parent is deleted.
      * @param[in] pTMSI a pointer to the corresponding ECGSimulator.
      */
-    TMSISetupWidget(TMSI* pTMSI, QWidget *parent = 0);
+    TMSISetupWidget(TMSI* pTMSI, QWidget* parent = 0);
 
     //=========================================================================================================
     /**
@@ -83,7 +83,6 @@ public:
     void initGui();
 
 private:
-
     //=========================================================================================================
     /**
      * Sets the device sampling properties.
@@ -105,9 +104,9 @@ private:
      */
     void setTriggerProperties();
 
-    TMSI*                   m_pTMSI;                 /**< a pointer to corresponding TMSI.*/
+    TMSI* m_pTMSI; /**< a pointer to corresponding TMSI.*/
 
-    Ui::TMSISetupClass*     m_pUi;                   /**< the user interface for the TMSISetupWidget.*/
+    Ui::TMSISetupClass* m_pUi; /**< the user interface for the TMSISetupWidget.*/
 };
 } // NAMESPACE
 

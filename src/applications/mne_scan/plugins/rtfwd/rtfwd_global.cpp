@@ -22,12 +22,21 @@
 // DEFINE METHODS
 //=============================================================================================================
 
-const char* RTFWDPLUGIN::buildDateTime(){ return UTILSLIB::dateTimeNow();}
+const char* RTFWDPLUGIN::buildDateTime()
+{
+    return UTILSLIB::dateTimeNow();
+}
 
 //=============================================================================================================
 
-const char* RTFWDPLUGIN::buildHash(){ return UTILSLIB::gitHash();}
+const char* RTFWDPLUGIN::buildHash()
+{
+    return UTILSLIB::gitHash();
+}
 
 //=============================================================================================================
 
-const char* RTFWDPLUGIN::buildHashLong(){ return UTILSLIB::gitHashLong();}
+const char* RTFWDPLUGIN::buildHashLong()
+{
+    return UTILSLIB::gitHashLong();
+}

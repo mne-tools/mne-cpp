@@ -40,17 +40,19 @@ using namespace Eigen;
 using namespace FIFFLIB;
 using namespace FWDLIB;
 
-namespace {
+namespace
+{
 constexpr float BIG = 0.5f;
 }
 
 /**
  * Read a possibly-quoted word from a QTextStream (comments already stripped).
  */
-static QString readWord(QTextStream &in)
+static QString readWord(QTextStream& in)
 {
     in.skipWhiteSpace();
-    if (in.atEnd()) return QString();
+    if (in.atEnd())
+        return QString();
 
     QChar ch;
     in >> ch;
@@ -59,7 +61,8 @@ static QString readWord(QTextStream &in)
         QString word;
         while (!in.atEnd()) {
             in >> ch;
-            if (ch == '"') break;
+            if (ch == '"')
+                break;
             word += ch;
         }
         return word;
@@ -68,7 +71,8 @@ static QString readWord(QTextStream &in)
     QString word(ch);
     while (!in.atEnd()) {
         in >> ch;
-        if (ch.isSpace()) break;
+        if (ch.isSpace())
+            break;
         word += ch;
     }
     return word;
@@ -77,32 +81,32 @@ static QString readWord(QTextStream &in)
 FwdCoil* FwdCoilSet::fwd_add_coil_to_set(int type, int coil_class, int acc, int np, float size, float base, const QString& desc)
 {
     if (np <= 0) {
-        qWarning("Number of integration points should be positive (type = %d acc = %d)",type,acc);
+        qWarning("Number of integration points should be positive (type = %d acc = %d)", type, acc);
         return nullptr;
     }
-    if (! (acc == FWD_COIL_ACCURACY_POINT ||
-           acc == FWD_COIL_ACCURACY_NORMAL ||
-           acc == FWD_COIL_ACCURACY_ACCURATE) ) {
-        qWarning("Illegal accuracy (type = %d acc = %d)",type,acc);
+    if (!(acc == FWD_COIL_ACCURACY_POINT ||
+          acc == FWD_COIL_ACCURACY_NORMAL ||
+          acc == FWD_COIL_ACCURACY_ACCURATE)) {
+        qWarning("Illegal accuracy (type = %d acc = %d)", type, acc);
         return nullptr;
     }
-    if (! (coil_class == FWD_COILC_MAG ||
-           coil_class == FWD_COILC_AXIAL_GRAD ||
-           coil_class == FWD_COILC_PLANAR_GRAD ||
-           coil_class == FWD_COILC_AXIAL_GRAD2) ) {
-        qWarning("Illegal coil class (type = %d acc = %d class = %d)",type,acc,coil_class);
+    if (!(coil_class == FWD_COILC_MAG ||
+          coil_class == FWD_COILC_AXIAL_GRAD ||
+          coil_class == FWD_COILC_PLANAR_GRAD ||
+          coil_class == FWD_COILC_AXIAL_GRAD2)) {
+        qWarning("Illegal coil class (type = %d acc = %d class = %d)", type, acc, coil_class);
         return nullptr;
     }
 
     coils.push_back(std::make_unique<FwdCoil>(np));
     FwdCoil* def = coils.back().get();
 
-    def->type       = type;
+    def->type = type;
     def->coil_class = coil_class;
-    def->accuracy   = acc;
-    def->np         = np;
-    def->size       = size;
-    def->base       = base;
+    def->accuracy = acc;
+    def->np = np;
+    def->size = size;
+    def->base = base;
     if (!desc.isEmpty())
         def->desc = desc;
     return def;
@@ -137,12 +141,12 @@ FwdCoil::UPtr FwdCoilSet::create_meg_coil(const FiffChInfo& ch, int acc, const F
     FwdCoil* def = nullptr;
     for (int k = 0; k < this->ncoil(); k++) {
         if ((this->coils[k]->type == (ch.chpos.coil_type & 0xFFFF)) &&
-                this->coils[k]->accuracy == acc) {
+            this->coils[k]->accuracy == acc) {
             def = this->coils[k].get();
         }
     }
     if (!def) {
-        qWarning("Desired coil definition not found (type = %d acc = %d)",ch.chpos.coil_type,acc);
+        qWarning("Desired coil definition not found (type = %d acc = %d)", ch.chpos.coil_type, acc);
         return nullptr;
     }
     /*
@@ -150,14 +154,14 @@ FwdCoil::UPtr FwdCoilSet::create_meg_coil(const FiffChInfo& ch, int acc, const F
      */
     auto res = std::make_unique<FwdCoil>(def->np);
 
-    res->chname   = ch.ch_name;
+    res->chname = ch.ch_name;
     if (!def->desc.isEmpty())
-        res->desc   = def->desc;
+        res->desc = def->desc;
     res->coil_class = def->coil_class;
-    res->accuracy   = def->accuracy;
-    res->base       = def->base;
-    res->size       = def->size;
-    res->type       = ch.chpos.coil_type;
+    res->accuracy = def->accuracy;
+    res->base = def->base;
+    res->size = def->size;
+    res->type = ch.chpos.coil_type;
 
     res->r0 = ch.chpos.r0;
     res->ex = ch.chpos.ex;
@@ -167,19 +171,18 @@ FwdCoil::UPtr FwdCoilSet::create_meg_coil(const FiffChInfo& ch, int acc, const F
      * Apply a coordinate transformation if so desired
      */
     if (!t.isEmpty()) {
-        FiffCoordTrans::apply_trans(res->r0.data(),t,FIFFV_MOVE);
-        FiffCoordTrans::apply_trans(res->ex.data(),t,FIFFV_NO_MOVE);
-        FiffCoordTrans::apply_trans(res->ey.data(),t,FIFFV_NO_MOVE);
-        FiffCoordTrans::apply_trans(res->ez.data(),t,FIFFV_NO_MOVE);
+        FiffCoordTrans::apply_trans(res->r0.data(), t, FIFFV_MOVE);
+        FiffCoordTrans::apply_trans(res->ex.data(), t, FIFFV_NO_MOVE);
+        FiffCoordTrans::apply_trans(res->ey.data(), t, FIFFV_NO_MOVE);
+        FiffCoordTrans::apply_trans(res->ez.data(), t, FIFFV_NO_MOVE);
         res->coord_frame = t.to;
-    }
-    else
+    } else
         res->coord_frame = FIFFV_COORD_DEVICE;
 
     for (int p = 0; p < res->np; p++) {
         res->w[p] = def->w[p];
-        res->rmag.row(p)   = (res->r0 + def->rmag(p, 0)*res->ex + def->rmag(p, 1)*res->ey + def->rmag(p, 2)*res->ez).transpose();
-        res->cosmag.row(p) = (def->cosmag(p, 0)*res->ex + def->cosmag(p, 1)*res->ey + def->cosmag(p, 2)*res->ez).transpose();
+        res->rmag.row(p) = (res->r0 + def->rmag(p, 0) * res->ex + def->rmag(p, 1) * res->ey + def->rmag(p, 2) * res->ez).transpose();
+        res->cosmag.row(p) = (def->cosmag(p, 0) * res->ex + def->cosmag(p, 1) * res->ey + def->cosmag(p, 2) * res->ez).transpose();
     }
     return res;
 }
@@ -187,14 +190,14 @@ FwdCoil::UPtr FwdCoilSet::create_meg_coil(const FiffChInfo& ch, int acc, const F
 //=============================================================================================================
 
 FwdCoilSet::UPtr FwdCoilSet::create_meg_coils(const QList<FIFFLIB::FiffChInfo>& chs,
-                                         int nch,
-                                         int acc,
-                                         const FiffCoordTrans& t)
+                                              int nch,
+                                              int acc,
+                                              const FiffCoordTrans& t)
 {
     auto res = std::make_unique<FwdCoilSet>();
 
     for (int k = 0; k < nch; k++) {
-        auto next = this->create_meg_coil(chs.at(k),acc,t);
+        auto next = this->create_meg_coil(chs.at(k), acc, t);
         if (!next)
             return nullptr;
         res->coils.push_back(std::move(next));
@@ -207,13 +210,13 @@ FwdCoilSet::UPtr FwdCoilSet::create_meg_coils(const QList<FIFFLIB::FiffChInfo>& 
 //=============================================================================================================
 
 FwdCoilSet::UPtr FwdCoilSet::create_eeg_els(const QList<FIFFLIB::FiffChInfo>& chs,
-                                       int nch,
-                                       const FiffCoordTrans& t)
+                                            int nch,
+                                            const FiffCoordTrans& t)
 {
     auto res = std::make_unique<FwdCoilSet>();
 
     for (int k = 0; k < nch; k++) {
-        auto next = FwdCoil::create_eeg_el(chs.at(k),t);
+        auto next = FwdCoil::create_eeg_el(chs.at(k), t);
         if (!next)
             return nullptr;
         res->coils.push_back(std::move(next));
@@ -225,7 +228,7 @@ FwdCoilSet::UPtr FwdCoilSet::create_eeg_els(const QList<FIFFLIB::FiffChInfo>& ch
 
 //=============================================================================================================
 
-FwdCoilSet::UPtr FwdCoilSet::read_coil_defs(const QString &name)
+FwdCoilSet::UPtr FwdCoilSet::read_coil_defs(const QString& name)
 {
     QFile file(name);
     if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
@@ -275,7 +278,7 @@ FwdCoilSet::UPtr FwdCoilSet::read_coil_defs(const QString &name)
             return nullptr;
         }
 
-        FwdCoil* def = res->fwd_add_coil_to_set(type,coil_class,acc,np,size,base,desc);
+        FwdCoil* def = res->fwd_add_coil_to_set(type, coil_class, acc, np, size, base, desc);
         if (!def)
             return nullptr;
 
@@ -283,28 +286,26 @@ FwdCoilSet::UPtr FwdCoilSet::read_coil_defs(const QString &name)
             /*
              * Read and verify data for each integration point
              */
-            in >> def->w[p]
-               >> def->rmag(p, 0) >> def->rmag(p, 1) >> def->rmag(p, 2)
-               >> def->cosmag(p, 0) >> def->cosmag(p, 1) >> def->cosmag(p, 2);
+            in >> def->w[p] >> def->rmag(p, 0) >> def->rmag(p, 1) >> def->rmag(p, 2) >> def->cosmag(p, 0) >> def->cosmag(p, 1) >> def->cosmag(p, 2);
             if (in.status() != QTextStream::Ok) {
                 qWarning("FwdCoilSet::read_coil_defs - Error reading integration point %d", p);
                 return nullptr;
             }
 
             if (def->pos(p).norm() > BIG) {
-                qWarning("Unreasonable integration point: %f %f %f mm (coil type = %d acc = %d)", 1000*def->rmag(p, 0),1000*def->rmag(p, 1),1000*def->rmag(p, 2), def->type,def->accuracy);
+                qWarning("Unreasonable integration point: %f %f %f mm (coil type = %d acc = %d)", 1000 * def->rmag(p, 0), 1000 * def->rmag(p, 1), 1000 * def->rmag(p, 2), def->type, def->accuracy);
                 return nullptr;
             }
             float cosmagNorm = def->dir(p).norm();
             if (cosmagNorm <= 0) {
-                qWarning("Unreasonable normal: %f %f %f (coil type = %d acc = %d)", def->cosmag(p, 0),def->cosmag(p, 1),def->cosmag(p, 2), def->type,def->accuracy);
+                qWarning("Unreasonable normal: %f %f %f (coil type = %d acc = %d)", def->cosmag(p, 0), def->cosmag(p, 1), def->cosmag(p, 2), def->type, def->accuracy);
                 return nullptr;
             }
             def->cosmag.row(p).normalize();
         }
     }
 
-    qInfo("%d coil definitions read",res->ncoil());
+    qInfo("%d coil definitions read", res->ncoil());
     return res;
 }
 
@@ -334,14 +335,14 @@ FwdCoilSet::UPtr FwdCoilSet::dup_coil_set(const FiffCoordTrans& t) const
      * Optional coordinate transformation
      */
         if (!t.isEmpty()) {
-            FiffCoordTrans::apply_trans(coil->r0.data(),t,FIFFV_MOVE);
-            FiffCoordTrans::apply_trans(coil->ex.data(),t,FIFFV_NO_MOVE);
-            FiffCoordTrans::apply_trans(coil->ey.data(),t,FIFFV_NO_MOVE);
-            FiffCoordTrans::apply_trans(coil->ez.data(),t,FIFFV_NO_MOVE);
+            FiffCoordTrans::apply_trans(coil->r0.data(), t, FIFFV_MOVE);
+            FiffCoordTrans::apply_trans(coil->ex.data(), t, FIFFV_NO_MOVE);
+            FiffCoordTrans::apply_trans(coil->ey.data(), t, FIFFV_NO_MOVE);
+            FiffCoordTrans::apply_trans(coil->ez.data(), t, FIFFV_NO_MOVE);
 
             for (int p = 0; p < coil->np; p++) {
-                FiffCoordTrans::apply_trans(&coil->rmag(p, 0),t,FIFFV_MOVE);
-                FiffCoordTrans::apply_trans(&coil->cosmag(p, 0),t,FIFFV_NO_MOVE);
+                FiffCoordTrans::apply_trans(&coil->rmag(p, 0), t, FIFFV_MOVE);
+                FiffCoordTrans::apply_trans(&coil->cosmag(p, 0), t, FIFFV_NO_MOVE);
             }
             coil->coord_frame = t.to;
         }
@@ -394,4 +395,3 @@ bool FwdCoilSet::is_eeg_electrode_type(int type) const
 {
     return type == FIFFV_COIL_EEG;
 }
-

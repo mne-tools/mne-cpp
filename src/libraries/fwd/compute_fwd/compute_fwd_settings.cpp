@@ -82,7 +82,7 @@ void ComputeFwdSettings::checkIntegrity()
         qCritical("Solution name is missing. Use the --fwd option to specify it.");
         return;
     }
-    if (! (include_meg || include_eeg)) {
+    if (!(include_meg || include_eeg)) {
         qCritical("Employ the --meg and --eeg options to select MEG and/or EEG");
         return;
     }
@@ -96,23 +96,23 @@ void ComputeFwdSettings::checkIntegrity()
 void ComputeFwdSettings::initMembers()
 {
     // Init origin
-    r0 << 0.0f,0.0f,0.04f;
+    r0 << 0.0f, 0.0f, 0.04f;
 
     mri_head_ident = false;
-    filter_spaces = true;  
-    accurate = false;      
-    fixed_ori = false;     
+    filter_spaces = true;
+    accurate = false;
+    fixed_ori = false;
     include_meg = false;
     include_eeg = false;
     compute_grad = false;
-    mindist = 0.0f;        
+    mindist = 0.0f;
     coord_frame = FIFFV_COORD_HEAD;
     do_all = false;
     nlabel = 0;
 
-    eeg_sphere_rad = 0.09f;   
-    scale_eeg_pos = false;    
-    use_equiv_eeg = true;     
+    eeg_sphere_rad = 0.09f;
+    scale_eeg_pos = false;
+    use_equiv_eeg = true;
     use_threads = true;
 
     pFiffInfo = nullptr;

@@ -43,8 +43,7 @@ QJsonObject objectSchema(const QJsonObject& properties,
     return QJsonObject{
         {"type", "object"},
         {"properties", properties},
-        {"required", required}
-    };
+        {"required", required}};
 }
 
 QJsonObject numberSchema(const QString& title,
@@ -52,10 +51,9 @@ QJsonObject numberSchema(const QString& title,
 {
     QJsonObject schema{
         {"type", "number"},
-        {"title", title}
-    };
+        {"title", title}};
 
-    if(!description.isEmpty()) {
+    if (!description.isEmpty()) {
         schema.insert("description", description);
     }
 
@@ -73,10 +71,9 @@ QJsonObject integerSchema(const QString& title,
         {"title", title},
         {"minimum", minimum},
         {"maximum", maximum},
-        {"default", defaultValue}
-    };
+        {"default", defaultValue}};
 
-    if(!description.isEmpty()) {
+    if (!description.isEmpty()) {
         schema.insert("description", description);
     }
 
@@ -91,14 +88,13 @@ QJsonObject stringSchema(const QString& title,
     QJsonObject schema{
         {"type", "string"},
         {"title", title},
-        {"default", defaultValue}
-    };
+        {"default", defaultValue}};
 
-    if(!values.isEmpty()) {
+    if (!values.isEmpty()) {
         schema.insert("enum", values);
     }
 
-    if(!description.isEmpty()) {
+    if (!description.isEmpty()) {
         schema.insert("description", description);
     }
 
@@ -112,10 +108,9 @@ QJsonObject arraySchema(const QString& title,
     QJsonObject schema{
         {"type", "array"},
         {"title", title},
-        {"items", itemSchema}
-    };
+        {"items", itemSchema}};
 
-    if(!description.isEmpty()) {
+    if (!description.isEmpty()) {
         schema.insert("description", description);
     }
 
@@ -139,20 +134,20 @@ NeuroKernelService::NeuroKernelService(QObject* parent)
 bool NeuroKernelService::start(const QString& socketName)
 {
     QLocalServer::removeServer(socketName);
-    if(!m_server.listen(socketName)) {
+    if (!m_server.listen(socketName)) {
         return false;
     }
 
     connect(&m_server, &QLocalServer::newConnection, this, [this]() {
-        while(QLocalSocket* socket = m_server.nextPendingConnection()) {
+        while (QLocalSocket* socket = m_server.nextPendingConnection()) {
             connect(socket, &QLocalSocket::readyRead, socket, [this, socket]() {
-                while(socket->canReadLine()) {
+                while (socket->canReadLine()) {
                     const QByteArray payload = socket->readLine();
                     QJsonObject request;
                     QString errorString;
                     QJsonObject response;
 
-                    if(JsonRpcMessage::deserialize(payload, request, errorString)) {
+                    if (JsonRpcMessage::deserialize(payload, request, errorString)) {
                         response = m_router.route(request);
                     } else {
                         response = JsonRpcMessage::createError(QJsonValue(), -32700, errorString);
@@ -173,13 +168,11 @@ QJsonObject NeuroKernelService::handleToolCall(const QJsonObject& params) const
     const QString toolName = params.value("name").toString();
     try {
         return handleToolCallUnchecked(params);
-    } catch(const std::exception& exception) {
+    } catch (const std::exception& exception) {
         return QJsonObject{
             {"status", "error"},
             {"tool_name", toolName},
-            {"message", QString("Neuro-Kernel tool %1 failed: %2")
-                            .arg(toolName, QString::fromUtf8(exception.what()))}
-        };
+            {"message", QString("Neuro-Kernel tool %1 failed: %2").arg(toolName, QString::fromUtf8(exception.what()))}};
     }
 }
 
@@ -188,22 +181,20 @@ QJsonObject NeuroKernelService::handleToolCallUnchecked(const QJsonObject& param
     const QString toolName = params.value("name").toString();
     const QJsonObject arguments = params.value("arguments").toObject();
 
-    if(toolName == "neurokernel.raw_stats") {
+    if (toolName == "neurokernel.raw_stats") {
         const QString filePath = arguments.value("file").toString();
-        if(!QFileInfo::exists(filePath)) {
+        if (!QFileInfo::exists(filePath)) {
             return QJsonObject{
                 {"status", "error"},
-                {"message", QString("Neuro-Kernel could not find raw file: %1").arg(filePath)}
-            };
+                {"message", QString("Neuro-Kernel could not find raw file: %1").arg(filePath)}};
         }
 
         QFile file(filePath);
         FIFFLIB::FiffRawData raw(file);
-        if(raw.isEmpty()) {
+        if (raw.isEmpty()) {
             return QJsonObject{
                 {"status", "error"},
-                {"message", QString("Neuro-Kernel could not parse raw file: %1").arg(filePath)}
-            };
+                {"message", QString("Neuro-Kernel could not parse raw file: %1").arg(filePath)}};
         }
         const int requestedFrom = arguments.value("from_sample").toInt(raw.first_samp);
         const int requestedTo = arguments.value("to_sample").toInt(raw.last_samp);
@@ -212,36 +203,34 @@ QJsonObject NeuroKernelService::handleToolCallUnchecked(const QJsonObject& param
 
         Eigen::MatrixXd data;
         Eigen::MatrixXd times;
-        if(!raw.read_raw_segment(data, times, fromSample, toSample)) {
+        if (!raw.read_raw_segment(data, times, fromSample, toSample)) {
             return QJsonObject{
                 {"status", "error"},
-                {"message", QString("Neuro-Kernel could not read raw segment for %1").arg(filePath)}
-            };
+                {"message", QString("Neuro-Kernel could not read raw segment for %1").arg(filePath)}};
         }
 
-        if(data.size() == 0) {
+        if (data.size() == 0) {
             return QJsonObject{
                 {"status", "error"},
-                {"message", QString("Neuro-Kernel read an empty data segment for %1").arg(filePath)}
-            };
+                {"message", QString("Neuro-Kernel read an empty data segment for %1").arg(filePath)}};
         }
 
         const double rms = std::sqrt(data.array().square().mean());
         const double meanAbs = data.array().abs().mean();
         const double peakAbs = data.array().abs().maxCoeff();
 
-        struct ChannelStat {
+        struct ChannelStat
+        {
             QString name;
             double rms;
         };
 
         QVector<ChannelStat> channelStats;
         channelStats.reserve(static_cast<int>(data.rows()));
-        for(int row = 0; row < data.rows(); ++row) {
+        for (int row = 0; row < data.rows(); ++row) {
             channelStats.push_back(ChannelStat{
                 raw.info.ch_names.value(row),
-                std::sqrt(data.row(row).array().square().mean())
-            });
+                std::sqrt(data.row(row).array().square().mean())});
         }
 
         std::sort(channelStats.begin(), channelStats.end(), [](const ChannelStat& left, const ChannelStat& right) {
@@ -251,11 +240,10 @@ QJsonObject NeuroKernelService::handleToolCallUnchecked(const QJsonObject& param
         QJsonArray topChannels;
         const int topCount = std::min<int>(3, channelStats.size());
         QStringList topChannelTexts;
-        for(int i = 0; i < topCount; ++i) {
+        for (int i = 0; i < topCount; ++i) {
             topChannels.append(QJsonObject{
                 {"name", channelStats.at(i).name},
-                {"rms", channelStats.at(i).rms}
-            });
+                {"rms", channelStats.at(i).rms}});
             topChannelTexts << QString("%1 (%2)")
                                    .arg(channelStats.at(i).name)
                                    .arg(channelStats.at(i).rms, 0, 'g', 4);
@@ -264,14 +252,7 @@ QJsonObject NeuroKernelService::handleToolCallUnchecked(const QJsonObject& param
         return QJsonObject{
             {"status", "ok"},
             {"tool_name", toolName},
-            {"message", QString("Raw stats for %1 samples %2-%3: RMS=%4, mean|x|=%5, peak|x|=%6, top channels=%7")
-                            .arg(QFileInfo(filePath).fileName())
-                            .arg(fromSample)
-                            .arg(toSample)
-                            .arg(rms, 0, 'g', 4)
-                            .arg(meanAbs, 0, 'g', 4)
-                            .arg(peakAbs, 0, 'g', 4)
-                            .arg(topChannelTexts.join(", "))},
+            {"message", QString("Raw stats for %1 samples %2-%3: RMS=%4, mean|x|=%5, peak|x|=%6, top channels=%7").arg(QFileInfo(filePath).fileName()).arg(fromSample).arg(toSample).arg(rms, 0, 'g', 4).arg(meanAbs, 0, 'g', 4).arg(peakAbs, 0, 'g', 4).arg(topChannelTexts.join(", "))},
             {"file", filePath},
             {"from_sample", fromSample},
             {"to_sample", toSample},
@@ -283,26 +264,23 @@ QJsonObject NeuroKernelService::handleToolCallUnchecked(const QJsonObject& param
             {"top_channels", topChannels},
             {"plane", "data"},
             {"transport", "local_socket"},
-            {"protocol", "mcp-over-json-rpc-2.0"}
-        };
+            {"protocol", "mcp-over-json-rpc-2.0"}};
     }
 
-    if(toolName == "neurokernel.channel_stats") {
+    if (toolName == "neurokernel.channel_stats") {
         const QString filePath = arguments.value("file").toString();
-        if(!QFileInfo::exists(filePath)) {
+        if (!QFileInfo::exists(filePath)) {
             return QJsonObject{
                 {"status", "error"},
-                {"message", QString("Neuro-Kernel could not find raw file: %1").arg(filePath)}
-            };
+                {"message", QString("Neuro-Kernel could not find raw file: %1").arg(filePath)}};
         }
 
         QFile file(filePath);
         FIFFLIB::FiffRawData raw(file);
-        if(raw.isEmpty()) {
+        if (raw.isEmpty()) {
             return QJsonObject{
                 {"status", "error"},
-                {"message", QString("Neuro-Kernel could not parse raw file: %1").arg(filePath)}
-            };
+                {"message", QString("Neuro-Kernel could not parse raw file: %1").arg(filePath)}};
         }
 
         const int requestedFrom = arguments.value("from_sample").toInt(raw.first_samp);
@@ -314,14 +292,14 @@ QJsonObject NeuroKernelService::handleToolCallUnchecked(const QJsonObject& param
 
         Eigen::MatrixXd data;
         Eigen::MatrixXd times;
-        if(!raw.read_raw_segment(data, times, fromSample, toSample)) {
+        if (!raw.read_raw_segment(data, times, fromSample, toSample)) {
             return QJsonObject{
                 {"status", "error"},
-                {"message", QString("Neuro-Kernel could not read raw segment for %1").arg(filePath)}
-            };
+                {"message", QString("Neuro-Kernel could not read raw segment for %1").arg(filePath)}};
         }
 
-        struct ChannelStat {
+        struct ChannelStat
+        {
             QString name;
             double rms;
             double meanAbs;
@@ -330,9 +308,9 @@ QJsonObject NeuroKernelService::handleToolCallUnchecked(const QJsonObject& param
 
         QVector<ChannelStat> channelStats;
         channelStats.reserve(static_cast<int>(data.rows()));
-        for(int row = 0; row < data.rows(); ++row) {
+        for (int row = 0; row < data.rows(); ++row) {
             const QString channelName = raw.info.ch_names.value(row);
-            if(!match.isEmpty() && !channelName.contains(match, Qt::CaseInsensitive)) {
+            if (!match.isEmpty() && !channelName.contains(match, Qt::CaseInsensitive)) {
                 continue;
             }
 
@@ -340,8 +318,7 @@ QJsonObject NeuroKernelService::handleToolCallUnchecked(const QJsonObject& param
                 channelName,
                 std::sqrt(data.row(row).array().square().mean()),
                 data.row(row).array().abs().mean(),
-                data.row(row).array().abs().maxCoeff()
-            });
+                data.row(row).array().abs().maxCoeff()});
         }
 
         std::sort(channelStats.begin(), channelStats.end(), [](const ChannelStat& left, const ChannelStat& right) {
@@ -351,25 +328,20 @@ QJsonObject NeuroKernelService::handleToolCallUnchecked(const QJsonObject& param
         QJsonArray channels;
         QStringList channelTexts;
         const int resultCount = std::min(limit, static_cast<int>(channelStats.size()));
-        for(int i = 0; i < resultCount; ++i) {
+        for (int i = 0; i < resultCount; ++i) {
             const ChannelStat& stat = channelStats.at(i);
             channels.append(QJsonObject{
                 {"name", stat.name},
                 {"rms", stat.rms},
                 {"mean_abs", stat.meanAbs},
-                {"peak_abs", stat.peakAbs}
-            });
+                {"peak_abs", stat.peakAbs}});
             channelTexts << QString("%1 (rms=%2)").arg(stat.name).arg(stat.rms, 0, 'g', 4);
         }
 
         return QJsonObject{
             {"status", "ok"},
             {"tool_name", toolName},
-            {"message", QString("Channel stats for %1 samples %2-%3: %4")
-                            .arg(QFileInfo(filePath).fileName())
-                            .arg(fromSample)
-                            .arg(toSample)
-                            .arg(channelTexts.isEmpty() ? QString("no channels matched") : channelTexts.join(", "))},
+            {"message", QString("Channel stats for %1 samples %2-%3: %4").arg(QFileInfo(filePath).fileName()).arg(fromSample).arg(toSample).arg(channelTexts.isEmpty() ? QString("no channels matched") : channelTexts.join(", "))},
             {"file", filePath},
             {"from_sample", fromSample},
             {"to_sample", toSample},
@@ -378,26 +350,23 @@ QJsonObject NeuroKernelService::handleToolCallUnchecked(const QJsonObject& param
             {"channels", channels},
             {"plane", "data"},
             {"transport", "local_socket"},
-            {"protocol", "mcp-over-json-rpc-2.0"}
-        };
+            {"protocol", "mcp-over-json-rpc-2.0"}};
     }
 
-    if(toolName == "neurokernel.find_peak_window") {
+    if (toolName == "neurokernel.find_peak_window") {
         const QString filePath = arguments.value("file").toString();
-        if(!QFileInfo::exists(filePath)) {
+        if (!QFileInfo::exists(filePath)) {
             return QJsonObject{
                 {"status", "error"},
-                {"message", QString("Neuro-Kernel could not find raw file: %1").arg(filePath)}
-            };
+                {"message", QString("Neuro-Kernel could not find raw file: %1").arg(filePath)}};
         }
 
         QFile file(filePath);
         FIFFLIB::FiffRawData raw(file);
-        if(raw.isEmpty()) {
+        if (raw.isEmpty()) {
             return QJsonObject{
                 {"status", "error"},
-                {"message", QString("Neuro-Kernel could not parse raw file: %1").arg(filePath)}
-            };
+                {"message", QString("Neuro-Kernel could not parse raw file: %1").arg(filePath)}};
         }
 
         const int requestedFrom = arguments.value("from_sample").toInt(raw.first_samp);
@@ -408,36 +377,34 @@ QJsonObject NeuroKernelService::handleToolCallUnchecked(const QJsonObject& param
 
         Eigen::MatrixXd data;
         Eigen::MatrixXd times;
-        if(!raw.read_raw_segment(data, times, fromSample, toSample)) {
+        if (!raw.read_raw_segment(data, times, fromSample, toSample)) {
             return QJsonObject{
                 {"status", "error"},
-                {"message", QString("Neuro-Kernel could not read raw segment for %1").arg(filePath)}
-            };
+                {"message", QString("Neuro-Kernel could not read raw segment for %1").arg(filePath)}};
         }
 
         double peakValue = -1.0;
         int peakRow = -1;
         int peakColumn = -1;
-        for(int row = 0; row < data.rows(); ++row) {
+        for (int row = 0; row < data.rows(); ++row) {
             const QString channelName = raw.info.ch_names.value(row);
-            if(!match.isEmpty() && !channelName.contains(match, Qt::CaseInsensitive)) {
+            if (!match.isEmpty() && !channelName.contains(match, Qt::CaseInsensitive)) {
                 continue;
             }
 
             Eigen::Index localColumn = 0;
             const double localPeak = data.row(row).array().abs().maxCoeff(&localColumn);
-            if(localPeak > peakValue) {
+            if (localPeak > peakValue) {
                 peakValue = localPeak;
                 peakRow = row;
                 peakColumn = static_cast<int>(localColumn);
             }
         }
 
-        if(peakRow < 0 || peakColumn < 0) {
+        if (peakRow < 0 || peakColumn < 0) {
             return QJsonObject{
                 {"status", "error"},
-                {"message", QString("Neuro-Kernel could not find a matching peak window for %1").arg(filePath)}
-            };
+                {"message", QString("Neuro-Kernel could not find a matching peak window for %1").arg(filePath)}};
         }
 
         const int peakSample = fromSample + peakColumn;
@@ -445,11 +412,7 @@ QJsonObject NeuroKernelService::handleToolCallUnchecked(const QJsonObject& param
         return QJsonObject{
             {"status", "ok"},
             {"tool_name", toolName},
-            {"message", QString("Peak window for %1: sample %2 on %3 with |x|=%4")
-                            .arg(QFileInfo(filePath).fileName())
-                            .arg(peakSample)
-                            .arg(peakChannel)
-                            .arg(peakValue, 0, 'g', 4)},
+            {"message", QString("Peak window for %1: sample %2 on %3 with |x|=%4").arg(QFileInfo(filePath).fileName()).arg(peakSample).arg(peakChannel).arg(peakValue, 0, 'g', 4)},
             {"file", filePath},
             {"from_sample", fromSample},
             {"to_sample", toSample},
@@ -459,26 +422,23 @@ QJsonObject NeuroKernelService::handleToolCallUnchecked(const QJsonObject& param
             {"peak_abs", peakValue},
             {"plane", "data"},
             {"transport", "local_socket"},
-            {"protocol", "mcp-over-json-rpc-2.0"}
-        };
+            {"protocol", "mcp-over-json-rpc-2.0"}};
     }
 
-    if(toolName == "neurokernel.psd_summary") {
+    if (toolName == "neurokernel.psd_summary") {
         const QString filePath = arguments.value("file").toString();
-        if(!QFileInfo::exists(filePath)) {
+        if (!QFileInfo::exists(filePath)) {
             return QJsonObject{
                 {"status", "error"},
-                {"message", QString("Neuro-Kernel could not find raw file: %1").arg(filePath)}
-            };
+                {"message", QString("Neuro-Kernel could not find raw file: %1").arg(filePath)}};
         }
 
         QFile file(filePath);
         FIFFLIB::FiffRawData raw(file);
-        if(raw.isEmpty()) {
+        if (raw.isEmpty()) {
             return QJsonObject{
                 {"status", "error"},
-                {"message", QString("Neuro-Kernel could not parse raw file: %1").arg(filePath)}
-            };
+                {"message", QString("Neuro-Kernel could not parse raw file: %1").arg(filePath)}};
         }
 
         const int requestedFrom = arguments.value("from_sample").toInt(raw.first_samp);
@@ -490,19 +450,18 @@ QJsonObject NeuroKernelService::handleToolCallUnchecked(const QJsonObject& param
 
         Eigen::MatrixXd data;
         Eigen::MatrixXd times;
-        if(!raw.read_raw_segment(data, times, fromSample, toSample)) {
+        if (!raw.read_raw_segment(data, times, fromSample, toSample)) {
             return QJsonObject{
                 {"status", "error"},
-                {"message", QString("Neuro-Kernel could not read raw segment for %1").arg(filePath)}
-            };
+                {"message", QString("Neuro-Kernel could not read raw segment for %1").arg(filePath)}};
         }
 
         Eigen::RowVectorXi picks(data.rows());
         int pickCount = 0;
         QStringList matchedChannels;
-        for(int row = 0; row < data.rows(); ++row) {
+        for (int row = 0; row < data.rows(); ++row) {
             const QString channelName = raw.info.ch_names.value(row);
-            if(!match.isEmpty() && !channelName.contains(match, Qt::CaseInsensitive)) {
+            if (!match.isEmpty() && !channelName.contains(match, Qt::CaseInsensitive)) {
                 continue;
             }
 
@@ -510,11 +469,10 @@ QJsonObject NeuroKernelService::handleToolCallUnchecked(const QJsonObject& param
             matchedChannels << channelName;
         }
 
-        if(pickCount == 0) {
+        if (pickCount == 0) {
             return QJsonObject{
                 {"status", "error"},
-                {"message", QString("Neuro-Kernel could not find matching channels for PSD in %1").arg(filePath)}
-            };
+                {"message", QString("Neuro-Kernel could not find matching channels for PSD in %1").arg(filePath)}};
         }
 
         const Eigen::RowVectorXi selectedPicks = picks.head(pickCount);
@@ -529,7 +487,7 @@ QJsonObject NeuroKernelService::handleToolCallUnchecked(const QJsonObject& param
         const Eigen::RowVectorXd meanPsd = psdResult.matPsd.colwise().mean();
         QJsonArray frequencies;
         QJsonArray psdValues;
-        for(int i = 0; i < psdResult.vecFreqs.size(); ++i) {
+        for (int i = 0; i < psdResult.vecFreqs.size(); ++i) {
             frequencies.append(psdResult.vecFreqs[i]);
             psdValues.append(meanPsd[i]);
         }
@@ -537,9 +495,7 @@ QJsonObject NeuroKernelService::handleToolCallUnchecked(const QJsonObject& param
         return QJsonObject{
             {"status", "ok"},
             {"tool_name", toolName},
-            {"message", QString("PSD summary for %1 using %2 channels.")
-                            .arg(QFileInfo(filePath).fileName())
-                            .arg(pickCount)},
+            {"message", QString("PSD summary for %1 using %2 channels.").arg(QFileInfo(filePath).fileName()).arg(pickCount)},
             {"file", filePath},
             {"from_sample", fromSample},
             {"to_sample", toSample},
@@ -551,32 +507,29 @@ QJsonObject NeuroKernelService::handleToolCallUnchecked(const QJsonObject& param
             {"psd", psdValues},
             {"plane", "data"},
             {"transport", "local_socket"},
-            {"protocol", "mcp-over-json-rpc-2.0"}
-        };
+            {"protocol", "mcp-over-json-rpc-2.0"}};
     }
 
-    if(toolName == "neurokernel.execute") {
+    if (toolName == "neurokernel.execute") {
         const QString command = arguments.value("command").toString().trimmed();
 
-        if(command.isEmpty() || command.compare(QLatin1String("help"), Qt::CaseInsensitive) == 0) {
+        if (command.isEmpty() || command.compare(QLatin1String("help"), Qt::CaseInsensitive) == 0) {
             QJsonArray toolNames;
-            for(const QJsonValue& tool : toolDefinitions()) {
+            for (const QJsonValue& tool : toolDefinitions()) {
                 toolNames.append(tool.toObject().value("name").toString());
             }
             return QJsonObject{
                 {"status", "ok"},
                 {"tool_name", toolName},
                 {"command", command.isEmpty() ? "help" : command},
-                {"message", QString("Neuro-Kernel exposes %1 tools. Use tools/list for full definitions.")
-                                .arg(toolNames.size())},
+                {"message", QString("Neuro-Kernel exposes %1 tools. Use tools/list for full definitions.").arg(toolNames.size())},
                 {"available_tools", toolNames},
                 {"plane", "data"},
                 {"transport", "local_socket"},
-                {"protocol", "mcp-over-json-rpc-2.0"}
-            };
+                {"protocol", "mcp-over-json-rpc-2.0"}};
         }
 
-        if(command.compare(QLatin1String("status"), Qt::CaseInsensitive) == 0) {
+        if (command.compare(QLatin1String("status"), Qt::CaseInsensitive) == 0) {
             return QJsonObject{
                 {"status", "ok"},
                 {"tool_name", toolName},
@@ -586,11 +539,10 @@ QJsonObject NeuroKernelService::handleToolCallUnchecked(const QJsonObject& param
                 {"tool_count", static_cast<int>(toolDefinitions().size())},
                 {"plane", "data"},
                 {"transport", "local_socket"},
-                {"protocol", "mcp-over-json-rpc-2.0"}
-            };
+                {"protocol", "mcp-over-json-rpc-2.0"}};
         }
 
-        if(command.compare(QLatin1String("version"), Qt::CaseInsensitive) == 0) {
+        if (command.compare(QLatin1String("version"), Qt::CaseInsensitive) == 0) {
             return QJsonObject{
                 {"status", "ok"},
                 {"tool_name", toolName},
@@ -599,8 +551,7 @@ QJsonObject NeuroKernelService::handleToolCallUnchecked(const QJsonObject& param
                 {"version", "2.0.0"},
                 {"plane", "data"},
                 {"transport", "local_socket"},
-                {"protocol", "mcp-over-json-rpc-2.0"}
-            };
+                {"protocol", "mcp-over-json-rpc-2.0"}};
         }
 
         return QJsonObject{
@@ -610,14 +561,12 @@ QJsonObject NeuroKernelService::handleToolCallUnchecked(const QJsonObject& param
             {"message", QString("Unknown Neuro-Kernel command `%1`. Run `help` for available commands.").arg(command)},
             {"plane", "data"},
             {"transport", "local_socket"},
-            {"protocol", "mcp-over-json-rpc-2.0"}
-        };
+            {"protocol", "mcp-over-json-rpc-2.0"}};
     }
 
     return QJsonObject{
         {"status", "ignored"},
-        {"message", QString("No Neuro-Kernel tool registered for %1").arg(toolName)}
-    };
+        {"message", QString("No Neuro-Kernel tool registered for %1").arg(toolName)}};
 }
 
 QJsonObject NeuroKernelService::handleToolsList() const
@@ -629,8 +578,7 @@ QJsonObject NeuroKernelService::handleToolsList() const
         {"tools", toolDefinitions()},
         {"plane", "data"},
         {"transport", "local_socket"},
-        {"protocol", "mcp-over-json-rpc-2.0"}
-    };
+        {"protocol", "mcp-over-json-rpc-2.0"}};
 }
 
 QJsonArray NeuroKernelService::toolDefinitions() const
@@ -639,145 +587,31 @@ QJsonArray NeuroKernelService::toolDefinitions() const
         QJsonObject{
             {"name", "neurokernel.execute"},
             {"description", "Execute a generic neuro-kernel command string."},
-            {"input_schema", objectSchema(QJsonObject{
-                 {"command", stringSchema("Command",
-                                          QJsonArray(),
-                                          "help",
-                                          "Generic Neuro-Kernel command string for debugging or fallback execution.")}
-             }, QJsonArray{"command"})},
-            {"result_schema", objectSchema(QJsonObject{
-                 {"status", stringSchema("Status", QJsonArray{"ok", "error", "ignored"})},
-                 {"tool_name", stringSchema("Tool Name")},
-                 {"message", stringSchema("Message")}
-             }, QJsonArray{"status", "tool_name", "message"})}
-        },
+            {"input_schema", objectSchema(QJsonObject{{"command", stringSchema("Command", QJsonArray(), "help", "Generic Neuro-Kernel command string for debugging or fallback execution.")}}, QJsonArray{"command"})},
+            {"result_schema", objectSchema(QJsonObject{{"status", stringSchema("Status", QJsonArray{"ok", "error", "ignored"})}, {"tool_name", stringSchema("Tool Name")}, {"message", stringSchema("Message")}}, QJsonArray{"status", "tool_name", "message"})}},
         QJsonObject{
             {"name", "neurokernel.raw_stats"},
             {"description", "Compute RMS, mean absolute value, peak absolute value, and top channels for a raw sample window."},
-            {"input_schema", objectSchema(QJsonObject{
-                 {"window_samples", integerSchema("Window Samples",
-                                                  1,
-                                                  1000000,
-                                                  600,
-                                                  "Number of samples around the current cursor to include in the analysis window.")}
-             }, QJsonArray{"window_samples"})},
-            {"result_schema", objectSchema(QJsonObject{
-                 {"status", stringSchema("Status", QJsonArray{"ok", "error"})},
-                 {"tool_name", stringSchema("Tool Name")},
-                 {"message", stringSchema("Message")},
-                 {"file", stringSchema("File")},
-                 {"from_sample", integerSchema("From Sample", 0, 1000000000, 0)},
-                 {"to_sample", integerSchema("To Sample", 0, 1000000000, 0)},
-                 {"channel_count", integerSchema("Channel Count", 0, 1000000, 0)},
-                 {"sample_count", integerSchema("Sample Count", 0, 1000000000, 0)},
-                 {"rms", numberSchema("RMS", "Root mean square value over the selected raw window.")},
-                 {"mean_abs", numberSchema("Mean Absolute", "Mean absolute amplitude over the selected raw window.")},
-                 {"peak_abs", numberSchema("Peak Absolute", "Peak absolute amplitude over the selected raw window.")},
-                 {"top_channels", arraySchema("Top Channels",
-                                              objectSchema(QJsonObject{
-                                                  {"name", stringSchema("Channel Name")},
-                                                  {"rms", numberSchema("Channel RMS")}
-                                              }, QJsonArray{"name", "rms"}))}
-             }, QJsonArray{"status", "tool_name", "message", "rms", "mean_abs", "peak_abs"})}
-        },
+            {"input_schema", objectSchema(QJsonObject{{"window_samples", integerSchema("Window Samples", 1, 1000000, 600, "Number of samples around the current cursor to include in the analysis window.")}}, QJsonArray{"window_samples"})},
+            {"result_schema", objectSchema(QJsonObject{{"status", stringSchema("Status", QJsonArray{"ok", "error"})}, {"tool_name", stringSchema("Tool Name")}, {"message", stringSchema("Message")}, {"file", stringSchema("File")}, {"from_sample", integerSchema("From Sample", 0, 1000000000, 0)}, {"to_sample", integerSchema("To Sample", 0, 1000000000, 0)}, {"channel_count", integerSchema("Channel Count", 0, 1000000, 0)}, {"sample_count", integerSchema("Sample Count", 0, 1000000000, 0)}, {"rms", numberSchema("RMS", "Root mean square value over the selected raw window.")}, {"mean_abs", numberSchema("Mean Absolute", "Mean absolute amplitude over the selected raw window.")}, {"peak_abs", numberSchema("Peak Absolute", "Peak absolute amplitude over the selected raw window.")}, {"top_channels", arraySchema("Top Channels", objectSchema(QJsonObject{{"name", stringSchema("Channel Name")}, {"rms", numberSchema("Channel RMS")}}, QJsonArray{"name", "rms"}))}}, QJsonArray{"status", "tool_name", "message", "rms", "mean_abs", "peak_abs"})}},
         QJsonObject{
             {"name", "neurokernel.channel_stats"},
             {"description", "Compute per-channel RMS, mean absolute value, and peak absolute value for a raw sample window."},
-            {"input_schema", objectSchema(QJsonObject{
-                 {"window_samples", integerSchema("Window Samples",
-                                                  1,
-                                                  1000000,
-                                                  600,
-                                                  "Number of samples around the current cursor to analyze.")},
-                 {"limit", integerSchema("Channel Limit",
-                                         1,
-                                         512,
-                                         5,
-                                         "Maximum number of channels to return in the result.")},
-                 {"match", stringSchema("Channel Match",
-                                        QJsonArray{"", "EEG", "MEG", "EOG"},
-                                        "EEG",
-                                        "Optional channel-name filter applied before ranking channels.")}
-             }, QJsonArray{"window_samples"})},
-            {"result_schema", objectSchema(QJsonObject{
-                 {"status", stringSchema("Status", QJsonArray{"ok", "error"})},
-                 {"tool_name", stringSchema("Tool Name")},
-                 {"message", stringSchema("Message")},
-                 {"file", stringSchema("File")},
-                 {"from_sample", integerSchema("From Sample", 0, 1000000000, 0)},
-                 {"to_sample", integerSchema("To Sample", 0, 1000000000, 0)},
-                 {"match", stringSchema("Channel Match")},
-                 {"channel_count", integerSchema("Channel Count", 0, 1000000, 0)},
-                 {"channels", arraySchema("Channels",
-                                          objectSchema(QJsonObject{
-                                              {"name", stringSchema("Channel Name")},
-                                              {"rms", numberSchema("Channel RMS")},
-                                              {"mean_abs", numberSchema("Mean Absolute")},
-                                              {"peak_abs", numberSchema("Peak Absolute")}
-                                          }, QJsonArray{"name", "rms", "mean_abs", "peak_abs"}))}
-             }, QJsonArray{"status", "tool_name", "message", "channels"})}
-        },
+            {"input_schema", objectSchema(QJsonObject{{"window_samples", integerSchema("Window Samples", 1, 1000000, 600, "Number of samples around the current cursor to analyze.")}, {"limit", integerSchema("Channel Limit", 1, 512, 5, "Maximum number of channels to return in the result.")}, {"match", stringSchema("Channel Match", QJsonArray{"", "EEG", "MEG", "EOG"}, "EEG", "Optional channel-name filter applied before ranking channels.")}}, QJsonArray{"window_samples"})},
+            {"result_schema", objectSchema(QJsonObject{{"status", stringSchema("Status", QJsonArray{"ok", "error"})}, {"tool_name", stringSchema("Tool Name")}, {"message", stringSchema("Message")}, {"file", stringSchema("File")}, {"from_sample", integerSchema("From Sample", 0, 1000000000, 0)}, {"to_sample", integerSchema("To Sample", 0, 1000000000, 0)}, {"match", stringSchema("Channel Match")}, {"channel_count", integerSchema("Channel Count", 0, 1000000, 0)}, {"channels", arraySchema("Channels", objectSchema(QJsonObject{{"name", stringSchema("Channel Name")}, {"rms", numberSchema("Channel RMS")}, {"mean_abs", numberSchema("Mean Absolute")}, {"peak_abs", numberSchema("Peak Absolute")}}, QJsonArray{"name", "rms", "mean_abs", "peak_abs"}))}}, QJsonArray{"status", "tool_name", "message", "channels"})}},
         QJsonObject{
             {"name", "neurokernel.psd_summary"},
             {"description", "Compute a Welch PSD summary for the active raw sample window and optional channel match."},
-            {"input_schema", objectSchema(QJsonObject{
-                 {"window_samples", integerSchema("Window Samples",
-                                                  32,
-                                                  1000000,
-                                                  1200,
-                                                  "Number of samples around the current cursor to include in the PSD window.")},
-                 {"nfft", integerSchema("FFT Size",
-                                        32,
-                                        8192,
-                                        256,
-                                        "FFT length used for the Welch PSD estimate.")},
-                 {"match", stringSchema("Channel Match",
-                                        QJsonArray{"", "EEG", "MEG", "EOG"},
-                                        "EEG",
-                                        "Optional channel-name filter applied before averaging PSDs.")}
-             }, QJsonArray{"window_samples"})},
-            {"result_schema", objectSchema(QJsonObject{
-                 {"status", stringSchema("Status", QJsonArray{"ok", "error"})},
-                 {"tool_name", stringSchema("Tool Name")},
-                 {"message", stringSchema("Message")},
-                 {"file", stringSchema("File")},
-                 {"channel_count", integerSchema("Channel Count", 0, 1000000, 0)},
-                 {"channels", arraySchema("Channels", stringSchema("Channel Name"))},
-                 {"frequencies", arraySchema("Frequencies", numberSchema("Frequency"))},
-                 {"psd", arraySchema("PSD", numberSchema("Power Spectral Density"))}
-             }, QJsonArray{"status", "tool_name", "message", "frequencies", "psd"})}
-        },
+            {"input_schema", objectSchema(QJsonObject{{"window_samples", integerSchema("Window Samples", 32, 1000000, 1200, "Number of samples around the current cursor to include in the PSD window.")}, {"nfft", integerSchema("FFT Size", 32, 8192, 256, "FFT length used for the Welch PSD estimate.")}, {"match", stringSchema("Channel Match", QJsonArray{"", "EEG", "MEG", "EOG"}, "EEG", "Optional channel-name filter applied before averaging PSDs.")}}, QJsonArray{"window_samples"})},
+            {"result_schema", objectSchema(QJsonObject{{"status", stringSchema("Status", QJsonArray{"ok", "error"})}, {"tool_name", stringSchema("Tool Name")}, {"message", stringSchema("Message")}, {"file", stringSchema("File")}, {"channel_count", integerSchema("Channel Count", 0, 1000000, 0)}, {"channels", arraySchema("Channels", stringSchema("Channel Name"))}, {"frequencies", arraySchema("Frequencies", numberSchema("Frequency"))}, {"psd", arraySchema("PSD", numberSchema("Power Spectral Density"))}}, QJsonArray{"status", "tool_name", "message", "frequencies", "psd"})}},
         QJsonObject{
             {"name", "neurokernel.find_peak_window"},
             {"description", "Find the strongest absolute-amplitude sample inside a raw window, optionally filtered by channel name match."},
-            {"input_schema", objectSchema(QJsonObject{
-                 {"window_samples", integerSchema("Window Samples",
-                                                  1,
-                                                  1000000,
-                                                  4000,
-                                                  "Number of samples to search for the strongest absolute-amplitude event.")},
-                 {"match", stringSchema("Channel Match",
-                                        QJsonArray{"", "EEG", "MEG", "EOG"},
-                                        "EEG",
-                                        "Optional channel-name filter used while searching for the peak window.")}
-             }, QJsonArray{"window_samples"})},
-            {"result_schema", objectSchema(QJsonObject{
-                 {"status", stringSchema("Status", QJsonArray{"ok", "error"})},
-                 {"tool_name", stringSchema("Tool Name")},
-                 {"message", stringSchema("Message")},
-                 {"file", stringSchema("File")},
-                 {"from_sample", integerSchema("From Sample", 0, 1000000000, 0)},
-                 {"to_sample", integerSchema("To Sample", 0, 1000000000, 0)},
-                 {"match", stringSchema("Channel Match")},
-                 {"peak_sample", integerSchema("Peak Sample", 0, 1000000000, 0)},
-                 {"peak_channel", stringSchema("Peak Channel")},
-                {"peak_abs", numberSchema("Peak Absolute")}
-             }, QJsonArray{"status", "tool_name", "message", "peak_sample", "peak_channel", "peak_abs"})}
-        }
-    };
+            {"input_schema", objectSchema(QJsonObject{{"window_samples", integerSchema("Window Samples", 1, 1000000, 4000, "Number of samples to search for the strongest absolute-amplitude event.")}, {"match", stringSchema("Channel Match", QJsonArray{"", "EEG", "MEG", "EOG"}, "EEG", "Optional channel-name filter used while searching for the peak window.")}}, QJsonArray{"window_samples"})},
+            {"result_schema", objectSchema(QJsonObject{{"status", stringSchema("Status", QJsonArray{"ok", "error"})}, {"tool_name", stringSchema("Tool Name")}, {"message", stringSchema("Message")}, {"file", stringSchema("File")}, {"from_sample", integerSchema("From Sample", 0, 1000000000, 0)}, {"to_sample", integerSchema("To Sample", 0, 1000000000, 0)}, {"match", stringSchema("Channel Match")}, {"peak_sample", integerSchema("Peak Sample", 0, 1000000000, 0)}, {"peak_channel", stringSchema("Peak Channel")}, {"peak_abs", numberSchema("Peak Absolute")}}, QJsonArray{"status", "tool_name", "message", "peak_sample", "peak_channel", "peak_abs"})}}};
 
     QJsonArray tools;
-    for(const QJsonValue& value : rawTools) {
+    for (const QJsonValue& value : rawTools) {
         tools.append(annotateCapabilityMetadata(value.toObject()));
     }
 

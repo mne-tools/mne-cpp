@@ -32,12 +32,21 @@
 // DEFINE METHODS
 //=============================================================================================================
 
-const char* COMLIB::buildDateTime(){ return UTILSLIB::dateTimeNow();}
+const char* COMLIB::buildDateTime()
+{
+    return UTILSLIB::dateTimeNow();
+}
 
 //=============================================================================================================
 
-const char* COMLIB::buildHash(){ return UTILSLIB::gitHash();}
+const char* COMLIB::buildHash()
+{
+    return UTILSLIB::gitHash();
+}
 
 //=============================================================================================================
 
-const char* COMLIB::buildHashLong(){ return UTILSLIB::gitHashLong();}
+const char* COMLIB::buildHashLong()
+{
+    return UTILSLIB::gitHashLong();
+}

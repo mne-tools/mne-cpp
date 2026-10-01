@@ -317,7 +317,8 @@ void TestPythonRunner::testHelperEvalMatrix()
     bool ok = false;
     Eigen::MatrixXd mat = helper.evalMatrix(
         "print('1.0 2.0 3.0')\n"
-        "print('4.0 5.0 6.0')", &ok);
+        "print('4.0 5.0 6.0')",
+        &ok);
     QVERIFY(ok);
     QCOMPARE(mat.rows(), 2);
     QCOMPARE(mat.cols(), 3);

@@ -106,10 +106,22 @@ private slots:
     void cleanupTestCase();
 
 private:
-    QString rawPath() const { return m_sTestDataPath + "/MEG/sample/sample_audvis_trunc_raw.fif"; }
-    QString avePath() const { return m_sTestDataPath + "/MEG/sample/sample_audvis-ave.fif"; }
-    QString covPath() const { return m_sTestDataPath + "/MEG/sample/sample_audvis-cov.fif"; }
-    QString fwdPath() const { return m_sTestDataPath + "/Result/ref-sample_audvis-meg-eeg-oct-6-fwd.fif"; }
+    QString rawPath() const
+    {
+        return m_sTestDataPath + "/MEG/sample/sample_audvis_trunc_raw.fif";
+    }
+    QString avePath() const
+    {
+        return m_sTestDataPath + "/MEG/sample/sample_audvis-ave.fif";
+    }
+    QString covPath() const
+    {
+        return m_sTestDataPath + "/MEG/sample/sample_audvis-cov.fif";
+    }
+    QString fwdPath() const
+    {
+        return m_sTestDataPath + "/Result/ref-sample_audvis-meg-eeg-oct-6-fwd.fif";
+    }
 
     QString m_sTestDataPath;
     QTemporaryDir m_tmpDir;
@@ -120,8 +132,7 @@ private:
 void TestFiffCoverage::initTestCase()
 {
     qInstallMessageHandler(MNELogger::customLogWriter);
-    m_sTestDataPath = QCoreApplication::applicationDirPath()
-                      + "/../resources/data/mne-cpp-test-data";
+    m_sTestDataPath = QCoreApplication::applicationDirPath() + "/../resources/data/mne-cpp-test-data";
     QVERIFY2(QFile::exists(rawPath()),
              qPrintable(QString("Test data not found: %1").arg(rawPath())));
     QVERIFY(m_tmpDir.isValid());
@@ -210,7 +221,7 @@ void TestFiffCoverage::testReadDigitizerDataPoints()
         if (p.kind == FIFFV_POINT_CARDINAL)
             nCardinal++;
     }
-    QVERIFY(nCardinal >= 3);  // LPA, nasion, RPA
+    QVERIFY(nCardinal >= 3); // LPA, nasion, RPA
 }
 
 //=============================================================================================================
@@ -250,7 +261,7 @@ void TestFiffCoverage::testReadMeasInfoBaseChannels()
 
     // Should have channel info
     QCOMPARE(infoBase.chs.size(), infoBase.nchan);
-    QVERIFY(infoBase.nchan > 300);  // Sample data has 376 channels
+    QVERIFY(infoBase.nchan > 300); // Sample data has 376 channels
 }
 
 //=============================================================================================================
@@ -321,7 +332,7 @@ void TestFiffCoverage::testWriteBadChannels()
         bads << "MEG0111" << "MEG0113" << "MEG0121";
         stream->write_bad_channels(bads);
         stream->end_file();
-        stream->close();  // flush to disk
+        stream->close(); // flush to disk
     }
 
     // Verify file was created and is non-empty
@@ -345,7 +356,7 @@ void TestFiffCoverage::testOpenUpdateAttachEnv()
         fiff_int_t val = 42;
         s->write_int(FIFF_NCHAN, &val);
         s->end_file();
-        s->close();  // flush to disk
+        s->close(); // flush to disk
     }
 
     // Open for update
@@ -413,7 +424,7 @@ void TestFiffCoverage::testCtfCompRoundTrip()
         comp.ctfkind = 101;
         comp.kind = 101;
         comp.save_calibrated = false;
-        FiffNamedMatrix *data = new FiffNamedMatrix();
+        FiffNamedMatrix* data = new FiffNamedMatrix();
         data->nrow = 2;
         data->ncol = 3;
         data->data = MatrixXd::Ones(2, 3);
@@ -431,7 +442,7 @@ void TestFiffCoverage::testCtfCompRoundTrip()
         QVERIFY(outStream != nullptr);
         outStream->write_ctf_comp(comps);
         outStream->end_file();
-        outStream->close();  // flush to disk
+        outStream->close(); // flush to disk
     }
 
     // Verify file was created
@@ -463,7 +474,7 @@ void TestFiffCoverage::testCoordTransInverse()
     t.from = FIFFV_COORD_MRI;
     t.to = FIFFV_COORD_HEAD;
     t.trans = Matrix4f::Identity();
-    t.trans(0, 3) = 0.1f;  // 100mm translation on X
+    t.trans(0, 3) = 0.1f; // 100mm translation on X
     t.trans(1, 3) = 0.05f;
     // inverted() uses the invtrans field, so compute and set it
     t.invtrans = t.trans.inverse();
@@ -490,7 +501,7 @@ void TestFiffCoverage::testCoordTransApply()
     // Apply to a point using apply_trans
     MatrixX3f point(1, 3);
     point << 0.0f, 0.0f, 0.0f;
-    MatrixX3f transformed = t.apply_trans(point, true);  // forward
+    MatrixX3f transformed = t.apply_trans(point, true); // forward
     QVERIFY(qAbs(transformed(0, 0) - 0.1f) < 1e-5f);
     QVERIFY(qAbs(transformed(0, 1) - 0.0f) < 1e-5f);
     QVERIFY(qAbs(transformed(0, 2) - 0.0f) < 1e-5f);
@@ -527,7 +538,7 @@ void TestFiffCoverage::testNamedMatrixTranspose()
     data << 1, 2, 3, 4, 5, 6;
 
     FiffNamedMatrix nm(2, 3, rowNames, colNames, data);
-    nm.transpose_named_matrix();  // in-place transpose
+    nm.transpose_named_matrix(); // in-place transpose
 
     QCOMPARE(nm.nrow, 3);
     QCOMPARE(nm.ncol, 2);

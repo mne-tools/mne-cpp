@@ -78,14 +78,14 @@ QString SamplePlugin::getName() const
 
 //=============================================================================================================
 
-QMenu *SamplePlugin::getMenu()
+QMenu* SamplePlugin::getMenu()
 {
     return Q_NULLPTR;
 }
 
 //=============================================================================================================
 
-QDockWidget *SamplePlugin::getControl()
+QDockWidget* SamplePlugin::getControl()
 {
     //If plugin has dock controls:
     QDockWidget* pControlDock = new QDockWidget(getName());
@@ -106,7 +106,7 @@ QDockWidget *SamplePlugin::getControl()
 
 //=============================================================================================================
 
-QWidget *SamplePlugin::getView()
+QWidget* SamplePlugin::getView()
 {
     //If the plugin has a view:
     QWidget* pPluginView = new QWidget();
@@ -125,9 +125,9 @@ QWidget *SamplePlugin::getView()
 void SamplePlugin::handleEvent(QSharedPointer<Event> e)
 {
     switch (e->getType()) {
-    default:
-        qWarning() << "[SamplePlugin::handleEvent] received an Event that is not handled by switch-cases";
-        break;
+        default:
+            qWarning() << "[SamplePlugin::handleEvent] received an Event that is not handled by switch-cases";
+            break;
     }
 }
 
@@ -145,6 +145,4 @@ QVector<EVENT_TYPE> SamplePlugin::getEventSubscriptions(void) const
 QString SamplePlugin::getBuildInfo()
 {
     return QString(SAMPLEPLUGINPLUGIN::buildDateTime()) + QString(" - ") + QString(SAMPLEPLUGINPLUGIN::buildHash());
-
 }
-

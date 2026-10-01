@@ -58,8 +58,8 @@ void TestMriSlicesPlugin::emptyOnConstruction()
     QCOMPARE(plugin.volume(), nullptr);
     QVERIFY(plugin.sourcePath().isEmpty());
     QCOMPARE(plugin.crosshair(), Eigen::Vector3f::Zero());
-    QCOMPARE(plugin.axialSlice(),    nullptr);
-    QCOMPARE(plugin.coronalSlice(),  nullptr);
+    QCOMPARE(plugin.axialSlice(), nullptr);
+    QCOMPARE(plugin.coronalSlice(), nullptr);
     QCOMPARE(plugin.sagittalSlice(), nullptr);
 }
 

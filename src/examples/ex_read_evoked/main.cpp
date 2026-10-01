@@ -53,7 +53,7 @@ using namespace UTILSLIB;
  * @param[in] argv (argument vector) is an array of pointers to arrays of character objects. The array objects are null-terminated strings, representing the arguments that were entered on the command line when the program was started.
  * @return the value that was set to exit() (which is 0 if exit() is called via quit()).
  */
-int main(int argc, char *argv[])
+int main(int argc, char* argv[])
 {
     qInstallMessageHandler(MNELogger::customLogWriter);
     QCoreApplication a(argc, argv);
@@ -74,26 +74,27 @@ int main(int argc, char *argv[])
 
     //generate FiffEvoked object
     QFile t_sampleFile(parser.value(evokedFileOption));
-    FiffEvoked p_FiffEvoked(t_sampleFile,QVariant(parser.value(evokedIdxOption)));
+    FiffEvoked p_FiffEvoked(t_sampleFile, QVariant(parser.value(evokedIdxOption)));
 
     //Select the head coordinate system
     bool use_ctf_head = parser.isSet(useCTFCompOption);
     FiffCoordTrans meg_trans;
 
-    if(use_ctf_head) {
-        if(p_FiffEvoked.info.ctf_head_t.isEmpty())
-           std::cout << "\nNo CTF head transformation available" << std::endl;
+    if (use_ctf_head) {
+        if (p_FiffEvoked.info.ctf_head_t.isEmpty())
+            std::cout << "\nNo CTF head transformation available" << std::endl;
         else {
             meg_trans = p_FiffEvoked.info.dev_ctf_t;
             FiffCoordTrans eeg_trans(meg_trans);
             eeg_trans.invert_transform();
-            std::cout << "Employing the CTF/4D head coordinate system\n" << std::endl;
+            std::cout << "Employing the CTF/4D head coordinate system\n"
+                      << std::endl;
         }
-    }
-    else {
+    } else {
         meg_trans = p_FiffEvoked.info.dev_head_t;
         FiffCoordTrans eeg_trans;
-        std::cout << "Employing the Neuromag head coordinate system\n" << std::endl;
+        std::cout << "Employing the Neuromag head coordinate system\n"
+                  << std::endl;
     }
 
     //Transform coil and electrode locations to the desired coordinate frame

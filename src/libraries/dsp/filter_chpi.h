@@ -39,7 +39,10 @@
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-namespace FIFFLIB { class FiffInfo; }
+namespace FIFFLIB
+{
+class FiffInfo;
+}
 
 //=============================================================================================================
 // DEFINE NAMESPACE UTILSLIB
@@ -54,9 +57,9 @@ namespace UTILSLIB
  */
 struct DSPSHARED_EXPORT FilterChpiParams
 {
-    double dNotchWidth = 2.0;  /**< Half-width of each notch filter in Hz (notch = freq +/- width). */
-    int    iFilterOrder = 4;   /**< Butterworth order for each notch filter. */
-    bool   bMegOnly = true;    /**< If true, only filter MEG channels. If false, filter all channels. */
+    double dNotchWidth = 2.0; /**< Half-width of each notch filter in Hz (notch = freq +/- width). */
+    int iFilterOrder = 4;     /**< Butterworth order for each notch filter. */
+    bool bMegOnly = true;     /**< If true, only filter MEG channels. If false, filter all channels. */
 };
 
 //=============================================================================================================
@@ -74,10 +77,10 @@ struct DSPSHARED_EXPORT FilterChpiParams
  * @param[in]     params       Filtering parameters.
  */
 DSPSHARED_EXPORT void filterChpi(Eigen::MatrixXd& data,
-                                  const FIFFLIB::FiffInfo& info,
-                                  double sfreq,
-                                  const QVector<double>& hpiFreqs,
-                                  const FilterChpiParams& params = FilterChpiParams());
+                                 const FIFFLIB::FiffInfo& info,
+                                 double sfreq,
+                                 const QVector<double>& hpiFreqs,
+                                 const FilterChpiParams& params = FilterChpiParams());
 
 //=============================================================================================================
 /**
@@ -94,9 +97,9 @@ DSPSHARED_EXPORT void filterChpi(Eigen::MatrixXd& data,
  * @param[in]     params  Filtering parameters.
  */
 DSPSHARED_EXPORT void filterChpi(Eigen::MatrixXd& data,
-                                  const FIFFLIB::FiffInfo& info,
-                                  double sfreq,
-                                  const FilterChpiParams& params = FilterChpiParams());
+                                 const FIFFLIB::FiffInfo& info,
+                                 double sfreq,
+                                 const FilterChpiParams& params = FilterChpiParams());
 
 } // namespace UTILSLIB
 

@@ -30,7 +30,7 @@ using namespace TMSIPLUGIN;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-TMSISetupProjectWidget::TMSISetupProjectWidget(TMSI* pTMSI, QWidget *parent)
+TMSISetupProjectWidget::TMSISetupProjectWidget(TMSI* pTMSI, QWidget* parent)
 : QWidget(parent)
 , ui(new Ui::TMSISetupProjectWidget)
 , m_pTMSI(pTMSI)
@@ -41,7 +41,7 @@ TMSISetupProjectWidget::TMSISetupProjectWidget(TMSI* pTMSI, QWidget *parent)
     connect(ui->m_qPushButton_EEGCap, &QPushButton::released, this, &TMSISetupProjectWidget::changeCap);
 
     // Connect QLineEdit's
-    connect(ui->m_qLineEdit_EEGCap, static_cast<void (QLineEdit::*)(const QString &)>(&QLineEdit::textEdited),
+    connect(ui->m_qLineEdit_EEGCap, static_cast<void (QLineEdit::*)(const QString&)>(&QLineEdit::textEdited),
             this, &TMSISetupProjectWidget::changeQLineEdits);
 }
 
@@ -67,9 +67,9 @@ void TMSISetupProjectWidget::changeCap()
     QString path = QFileDialog::getOpenFileName(this,
                                                 "Change EEG cap layout",
                                                 "../resources/mne_scan/plugins/tmsi/loc_files",
-                                                 tr("Electrode location files (*.elc)"));
+                                                tr("Electrode location files (*.elc)"));
 
-    if(path==NULL)
+    if (path == NULL)
         path = ui->m_qLineEdit_EEGCap->text();
 
     ui->m_qLineEdit_EEGCap->setText(path);

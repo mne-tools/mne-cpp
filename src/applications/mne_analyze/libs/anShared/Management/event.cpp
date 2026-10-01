@@ -35,12 +35,11 @@ using namespace ANSHAREDLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-Event::Event(const EVENT_TYPE type, const Communicator *sender, const QVariant& data)
-    : m_eventType(type),
-      m_sender(sender),
-      m_data(data)
+Event::Event(const EVENT_TYPE type, const Communicator* sender, const QVariant& data)
+: m_eventType(type)
+, m_sender(sender)
+, m_data(data)
 {
-
 }
 
 //=============================================================================================================

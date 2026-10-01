@@ -39,7 +39,7 @@ using namespace DISPLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-DraggableFramelessWidget::DraggableFramelessWidget(QWidget *parent,
+DraggableFramelessWidget::DraggableFramelessWidget(QWidget* parent,
                                                    Qt::WindowFlags flags,
                                                    bool bRoundEdges,
                                                    bool bDraggable,
@@ -68,9 +68,9 @@ void DraggableFramelessWidget::setDraggable(bool bFlag)
 
 //=============================================================================================================
 
-void DraggableFramelessWidget::mousePressEvent(QMouseEvent *event)
+void DraggableFramelessWidget::mousePressEvent(QMouseEvent* event)
 {
-    if(!m_bDraggable) {
+    if (!m_bDraggable) {
         return QWidget::mousePressEvent(event);
     }
 
@@ -83,9 +83,9 @@ void DraggableFramelessWidget::mousePressEvent(QMouseEvent *event)
 
 //=============================================================================================================
 
-void DraggableFramelessWidget::mouseMoveEvent(QMouseEvent *event)
+void DraggableFramelessWidget::mouseMoveEvent(QMouseEvent* event)
 {
-    if(!m_bDraggable) {
+    if (!m_bDraggable) {
         return QWidget::mouseMoveEvent(event);
     }
 
@@ -97,19 +97,19 @@ void DraggableFramelessWidget::mouseMoveEvent(QMouseEvent *event)
 
 //=============================================================================================================
 
-void DraggableFramelessWidget::mouseReleaseEvent(QMouseEvent *event )
+void DraggableFramelessWidget::mouseReleaseEvent(QMouseEvent* event)
 {
-    if(event->button() == Qt::LeftButton) {
+    if (event->button() == Qt::LeftButton) {
         m_bMousePressed = false;
     }
 }
 
 //=============================================================================================================
 
-void DraggableFramelessWidget::resizeEvent(QResizeEvent * /* event */)
+void DraggableFramelessWidget::resizeEvent(QResizeEvent* /* event */)
 {
-    if(m_bRoundEdges) {
-        setMask(roundedRect(QRect(0,0,width(),height()),10));
+    if (m_bRoundEdges) {
+        setMask(roundedRect(QRect(0, 0, width(), height()), 10));
     }
 }
 
@@ -122,7 +122,7 @@ QRegion DraggableFramelessWidget::roundedRect(const QRect& rect, int r)
     region += rect.adjusted(r, 0, -r, 0);
     region += rect.adjusted(0, r, 0, -r);
     // top left
-    QRect corner(rect.topLeft(), QSize(r*2, r*2));
+    QRect corner(rect.topLeft(), QSize(r * 2, r * 2));
     region += QRegion(corner, QRegion::Ellipse);
     // top right
     corner.moveTopRight(rect.topRight());

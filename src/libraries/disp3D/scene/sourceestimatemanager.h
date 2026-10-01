@@ -65,7 +65,7 @@ public:
      *
      * @param[in] parent    Parent QObject.
      */
-    explicit SourceEstimateManager(QObject *parent = nullptr);
+    explicit SourceEstimateManager(QObject* parent = nullptr);
 
     //=========================================================================================================
     /**
@@ -84,9 +84,9 @@ public:
      * @param[in] activeSurfaceType  Active surface type name (e.g. "pial").
      * @return true if loading was started, false on error.
      */
-    bool load(const QString &lhPath, const QString &rhPath,
-              const QMap<QString, std::shared_ptr<BrainSurface>> &surfaces,
-              const QString &activeSurfaceType);
+    bool load(const QString& lhPath, const QString& rhPath,
+              const QMap<QString, std::shared_ptr<BrainSurface>>& surfaces,
+              const QString& activeSurfaceType);
 
     /**
      * Cancel any in-progress STC loading / interpolation and wait for the thread to finish.
@@ -96,7 +96,10 @@ public:
     /**
      * @return true while an async STC load is in progress.
      */
-    bool isLoading() const { return m_isLoading; }
+    bool isLoading() const
+    {
+        return m_isLoading;
+    }
 
     /**
      * @return true if source estimate data has been loaded successfully.
@@ -114,12 +117,15 @@ public:
      * @param[in] subViews   Multi-view states.
      */
     void setTimePoint(int index,
-                      const QMap<QString, std::shared_ptr<BrainSurface>> &surfaces,
-                      const SubView &singleView,
-                      const QVector<SubView> &subViews);
+                      const QMap<QString, std::shared_ptr<BrainSurface>>& surfaces,
+                      const SubView& singleView,
+                      const QVector<SubView>& subViews);
 
     /** @return current time-point index. */
-    int currentTimePoint() const { return m_currentTimePoint; }
+    int currentTimePoint() const
+    {
+        return m_currentTimePoint;
+    }
 
     /** @return time step between STC samples (seconds), or 0. */
     float tstep() const;
@@ -143,7 +149,7 @@ public:
      *
      * @param[in] name   Colormap name (e.g. "Hot", "Jet").
      */
-    void setColormap(const QString &name);
+    void setColormap(const QString& name);
 
     /**
      * Set source estimate thresholds.
@@ -164,22 +170,25 @@ public:
      * @param[in] singleView Single-view state.
      * @param[in] subViews   Multi-view states.
      */
-    void startStreaming(const QMap<QString, std::shared_ptr<BrainSurface>> &surfaces,
-                        const SubView &singleView,
-                        const QVector<SubView> &subViews);
+    void startStreaming(const QMap<QString, std::shared_ptr<BrainSurface>>& surfaces,
+                        const SubView& singleView,
+                        const QVector<SubView>& subViews);
 
     /** Stop real-time streaming. */
     void stopStreaming();
 
     /** @return true while real-time streaming is active. */
-    bool isStreaming() const { return m_isStreaming; }
+    bool isStreaming() const
+    {
+        return m_isStreaming;
+    }
 
     /**
      * Push a single column of source data into the streaming queue.
      *
      * @param[in] data   Source amplitudes for one time point; ignored if no controller exists.
      */
-    void pushData(const Eigen::VectorXd &data);
+    void pushData(const Eigen::VectorXd& data);
 
     /**
      * Set the streaming playback interval in milliseconds.
@@ -198,7 +207,7 @@ public:
     // ── Accessors ──────────────────────────────────────────────────────
 
     /** @return read-only pointer to the overlay (may be null). */
-    const SourceEstimateOverlay *overlay() const;
+    const SourceEstimateOverlay* overlay() const;
 
 signals:
     //=========================================================================================================
@@ -212,15 +221,15 @@ signals:
     void timePointChanged(int index, float time);
 
     /** Emitted during async loading to report progress. */
-    void loadingProgress(int percent, const QString &message);
+    void loadingProgress(int percent, const QString& message);
 
     /**
      * Emitted when the real-time pipeline produces a new set of
      * per-vertex colours.  The host widget should apply these to its
      * surfaces and repaint.
      */
-    void realtimeColorsAvailable(const QVector<uint32_t> &colorsLh,
-                                  const QVector<uint32_t> &colorsRh);
+    void realtimeColorsAvailable(const QVector<uint32_t>& colorsLh,
+                                 const QVector<uint32_t>& colorsRh);
 
 private slots:
     /** Handle background-thread STC loading completion. */
@@ -229,11 +238,11 @@ private slots:
 private:
     std::unique_ptr<SourceEstimateOverlay> m_overlay;       /**< Source estimate data / interpolation. */
     std::unique_ptr<RtSourceDataController> m_rtController; /**< Real-time streaming controller. */
-    QThread *m_loadingThread = nullptr;                     /**< Background thread for STC file loading. */
-    StcLoadingWorker *m_stcWorker = nullptr;                /**< Worker performing the async STC load. */
+    QThread* m_loadingThread = nullptr;                     /**< Background thread for STC file loading. */
+    StcLoadingWorker* m_stcWorker = nullptr;                /**< Worker performing the async STC load. */
     int m_currentTimePoint = 0;                             /**< Current time-point index. */
     bool m_isLoading = false;                               /**< True while async load is in progress. */
-    bool m_isStreaming = false;                              /**< True while real-time streaming is active. */
+    bool m_isStreaming = false;                             /**< True while real-time streaming is active. */
 };
 
 #endif // SOURCEESTIMATEMANAGER_H

@@ -53,15 +53,17 @@
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-namespace FWDLIB{
-    class FwdCoil;
-    class FwdCoilSet;
+namespace FWDLIB
+{
+class FwdCoil;
+class FwdCoilSet;
 }
 
-namespace FIFFLIB{
-    class FiffInfo;
-    class FiffCoordTrans;
-    class FiffDigPointSet;
+namespace FIFFLIB
+{
+class FiffInfo;
+class FiffCoordTrans;
+class FiffDigPointSet;
 }
 
 //=============================================================================================================
@@ -70,9 +72,9 @@ namespace FIFFLIB{
 
 namespace INVLIB
 {
-    class InvSensorSet;
-    class InvSignalModel;
-    class InvHpiModelParameters;
+class InvSensorSet;
+class InvSignalModel;
+class InvHpiModelParameters;
 //=============================================================================================================
 // Declare all structures to be used
 //=============================================================================================================
@@ -82,18 +84,20 @@ namespace INVLIB
  *
  * @brief Estimated dipole parameters (position, moment, goodness-of-fit) for a single HPI coil
  */
-struct CoilParam {
+struct CoilParam
+{
     Eigen::MatrixXd pos;
     Eigen::MatrixXd mom;
     Eigen::VectorXd dpfiterror;
     Eigen::VectorXd dpfitnumitr;
 
     CoilParam(int iNumCoils)
-        : pos(Eigen::MatrixXd(iNumCoils,3)),
-          mom(Eigen::MatrixXd::Zero(iNumCoils,3)),
-          dpfiterror(Eigen::VectorXd::Zero(iNumCoils)),
-          dpfitnumitr(Eigen::VectorXd::Zero(iNumCoils))
-    {}
+    : pos(Eigen::MatrixXd(iNumCoils, 3))
+    , mom(Eigen::MatrixXd::Zero(iNumCoils, 3))
+    , dpfiterror(Eigen::VectorXd::Zero(iNumCoils))
+    , dpfitnumitr(Eigen::VectorXd::Zero(iNumCoils))
+    {
+    }
 };
 
 /**
@@ -101,16 +105,17 @@ struct CoilParam {
  *
  * @brief Complete HPI fit output: per-coil dipole parameters, head-to-device transform, fit error, and head movement distance
  */
-struct HpiFitResult {
-    QVector<int>                hpiFreqs;
-    FIFFLIB::FiffDigPointSet    fittedCoils;
-    FIFFLIB::FiffCoordTrans     devHeadTrans;
-    QVector<double>             errorDistances;
-    Eigen::VectorXd             GoF;
-    QString                     sFilePathDigitzers;
-    bool                        bIsLargeHeadMovement;
-    float                       fHeadMovementDistance;
-    float                       fHeadMovementAngle;
+struct HpiFitResult
+{
+    QVector<int> hpiFreqs;
+    FIFFLIB::FiffDigPointSet fittedCoils;
+    FIFFLIB::FiffCoordTrans devHeadTrans;
+    QVector<double> errorDistances;
+    Eigen::VectorXd GoF;
+    QString sFilePathDigitzers;
+    bool bIsLargeHeadMovement;
+    float fHeadMovementDistance;
+    float fHeadMovementAngle;
 };
 
 //=============================================================================================================
@@ -129,10 +134,9 @@ struct HpiFitResult {
  */
 class INVSHARED_EXPORT InvHpiFit
 {
-
 public:
-    typedef QSharedPointer<InvHpiFit> SPtr;             /**< Shared pointer type for InvHpiFit. */
-    typedef QSharedPointer<const InvHpiFit> ConstSPtr;  /**< Const shared pointer type for InvHpiFit. */
+    typedef QSharedPointer<InvHpiFit> SPtr;            /**< Shared pointer type for InvHpiFit. */
+    typedef QSharedPointer<const InvHpiFit> ConstSPtr; /**< Const shared pointer type for InvHpiFit. */
 
     //=========================================================================================================
     /**
@@ -216,7 +220,6 @@ public:
                                       const float& fThreshTrans);
 
 private:
-
     //=========================================================================================================
     /**
      * Fit linear model to data to get amplitudes for the dipole fit.
@@ -260,9 +263,9 @@ private:
      */
     CoilParam dipfit(const Eigen::MatrixXd matCoilsSeed,
                      const InvSensorSet& sensors,
-                     const Eigen::MatrixXd &matData,
+                     const Eigen::MatrixXd& matData,
                      const int iNumCoils,
-                     const Eigen::MatrixXd &t_matProjectors,
+                     const Eigen::MatrixXd& t_matProjectors,
                      const int iMaxIterations,
                      const float fAbortError);
 
@@ -363,9 +366,8 @@ private:
                        const Eigen::MatrixXd& matCoilsDev,
                        const Eigen::MatrixXd& matTrans);
 
-    InvSensorSet m_sensors;            /**< The sensor struct that contains information about all sensors. */
-    InvSignalModel m_signalModel;      /**< The signal model for the Hpi signals used to compute extract the coil amplitudes */
-
+    InvSensorSet m_sensors;       /**< The sensor struct that contains information about all sensors. */
+    InvSignalModel m_signalModel; /**< The signal model for the Hpi signals used to compute extract the coil amplitudes */
 };
 
 //=============================================================================================================

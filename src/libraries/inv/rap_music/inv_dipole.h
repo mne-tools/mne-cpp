@@ -59,12 +59,12 @@ template<typename T>
 struct InvDipolePair
 {
     int m_iIdx1;            /**< Index of dipole one. */
-    InvDipole<T> m_Dipole1;    /**< InvDipole one. */
+    InvDipole<T> m_Dipole1; /**< InvDipole one. */
 
     int m_iIdx2;            /**< Index of dipole two. */
-    InvDipole<T> m_Dipole2;    /**< InvDipole two. */
+    InvDipole<T> m_Dipole2; /**< InvDipole two. */
 
-    T m_vCorrelation;     /**< Correlation of the dipole pair. */
+    T m_vCorrelation; /**< Correlation of the dipole pair. */
 };
 
 //=============================================================================================================
@@ -76,10 +76,9 @@ struct InvDipolePair
 template<class T>
 class InvDipole
 {
-//typedef Eigen::Matrix<T, 3, 1> Point3D;
+    //typedef Eigen::Matrix<T, 3, 1> Point3D;
 
 public:
-
     //=========================================================================================================
     /**
      * Default constructor
@@ -93,19 +92,55 @@ public:
      */
     virtual ~InvDipole();
 
-    inline T& x() { return m_vecPosition[0] ; }
-    inline T& y() { return m_vecPosition[1] ; }
-    inline T& z() { return m_vecPosition[2] ; }
-    inline T x() const { return m_vecPosition[0] ; }
-    inline T y() const { return m_vecPosition[1] ; }
-    inline T z() const { return m_vecPosition[2] ; }
+    inline T& x()
+    {
+        return m_vecPosition[0];
+    }
+    inline T& y()
+    {
+        return m_vecPosition[1];
+    }
+    inline T& z()
+    {
+        return m_vecPosition[2];
+    }
+    inline T x() const
+    {
+        return m_vecPosition[0];
+    }
+    inline T y() const
+    {
+        return m_vecPosition[1];
+    }
+    inline T z() const
+    {
+        return m_vecPosition[2];
+    }
 
-    inline T& phi_x() { return m_vecDirection[0] ; }
-    inline T& phi_y() { return m_vecDirection[1] ; }
-    inline T& phi_z() { return m_vecDirection[2] ; }
-    inline T phi_x() const { return m_vecDirection[0] ; }
-    inline T phi_y() const { return m_vecDirection[1] ; }
-    inline T phi_z() const { return m_vecDirection[2] ; }
+    inline T& phi_x()
+    {
+        return m_vecDirection[0];
+    }
+    inline T& phi_y()
+    {
+        return m_vecDirection[1];
+    }
+    inline T& phi_z()
+    {
+        return m_vecDirection[2];
+    }
+    inline T phi_x() const
+    {
+        return m_vecDirection[0];
+    }
+    inline T phi_y() const
+    {
+        return m_vecDirection[1];
+    }
+    inline T phi_z() const
+    {
+        return m_vecDirection[2];
+    }
 
     //=========================================================================================================
     /**
@@ -114,23 +149,21 @@ public:
     void clean();
 
 protected:
-
 private:
-
     Eigen::Matrix<T, 3, 1> m_vecPosition;
     Eigen::Matrix<T, 3, 1> m_vecDirection;
 
-    double  m_dLength;
-    double  m_dFrequency;
+    double m_dLength;
+    double m_dFrequency;
 
     //TGreensFunction* green;
 };
 } // NAMESPACE
 
 //TypeDefs
-typedef INVLIB::InvDipole<int>     InvDipole_INT;
-typedef INVLIB::InvDipole<float>   InvDipole_FLOAT;
-typedef INVLIB::InvDipole<double>  InvDipole_DOUBLE;
+typedef INVLIB::InvDipole<int> InvDipole_INT;
+typedef INVLIB::InvDipole<float> InvDipole_FLOAT;
+typedef INVLIB::InvDipole<double> InvDipole_DOUBLE;
 
 //Make the template definition visible to compiler in the first point of instantiation
 #include "inv_dipole.cpp"

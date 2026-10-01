@@ -30,13 +30,13 @@ void McpRouter::registerMethod(const QString& method, Handler handler)
 
 QJsonObject McpRouter::route(const QJsonObject& request) const
 {
-    if(!JsonRpcMessage::isValid(request)) {
+    if (!JsonRpcMessage::isValid(request)) {
         return JsonRpcMessage::createError(request.value("id"), -32600, "Invalid JSON-RPC envelope.");
     }
 
     const QString method = request.value("method").toString();
     const auto it = m_handlers.constFind(method);
-    if(it == m_handlers.constEnd()) {
+    if (it == m_handlers.constEnd()) {
         return JsonRpcMessage::createError(request.value("id"), -32601, QString("No handler registered for %1").arg(method));
     }
 

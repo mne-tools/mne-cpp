@@ -65,14 +65,14 @@ namespace BIDSLIB
  */
 struct BIDSSHARED_EXPORT BidsElectrode
 {
-    QString name;       /**< Electrode name (REQUIRED). */
-    QString x;          /**< X coordinate or "n/a" (REQUIRED). */
-    QString y;          /**< Y coordinate or "n/a" (REQUIRED). */
-    QString z;          /**< Z coordinate or "n/a" (REQUIRED). */
-    QString size;       /**< Electrode size in mm or "n/a" (RECOMMENDED for iEEG). */
-    QString type;       /**< Electrode type: "depth", "strip", "grid" (OPTIONAL). */
-    QString material;   /**< Electrode material (OPTIONAL). */
-    QString impedance;  /**< Impedance value or "n/a" (OPTIONAL). */
+    QString name;      /**< Electrode name (REQUIRED). */
+    QString x;         /**< X coordinate or "n/a" (REQUIRED). */
+    QString y;         /**< Y coordinate or "n/a" (REQUIRED). */
+    QString z;         /**< Z coordinate or "n/a" (REQUIRED). */
+    QString size;      /**< Electrode size in mm or "n/a" (RECOMMENDED for iEEG). */
+    QString type;      /**< Electrode type: "depth", "strip", "grid" (OPTIONAL). */
+    QString material;  /**< Electrode material (OPTIONAL). */
+    QString impedance; /**< Impedance value or "n/a" (OPTIONAL). */
 
     /**
      * @brief Read a BIDS *_electrodes.tsv file.

@@ -67,7 +67,7 @@ BabyMEGSetupWidget::~BabyMEGSetupWidget()
 
 void BabyMEGSetupWidget::setSamplingFrequency()
 {
-    if(m_pBabyMEG->m_pFiffInfo) {
+    if (m_pBabyMEG->m_pFiffInfo) {
         this->ui.m_qLabel_sps->setText(QString("%1").arg(m_pBabyMEG->m_pFiffInfo->sfreq));
     }
 }

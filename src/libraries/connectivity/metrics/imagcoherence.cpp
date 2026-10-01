@@ -61,12 +61,12 @@ Network ImagCoherence::calculate(ConnectivitySettings& connectivitySettings)
 {
     Network finalNetwork("IMAGCOH");
 
-    if(connectivitySettings.isEmpty()) {
+    if (connectivitySettings.isEmpty()) {
         qDebug() << "ImagCoherence::calculate - Input data is empty";
         return finalNetwork;
     }
 
-    if(AbstractMetric::m_bStorageModeIsActive == false) {
+    if (AbstractMetric::m_bStorageModeIsActive == false) {
         connectivitySettings.clearIntermediateData();
     }
 
@@ -75,18 +75,18 @@ Network ImagCoherence::calculate(ConnectivitySettings& connectivitySettings)
     // Check if start and bin amount need to be reset to full spectrum
     int iNfft = connectivitySettings.getFFTSize();
 
-//    // Check that iNfft >= signal length
-//    if(iNfft > connectivitySettings.at(0).matData.cols()) {
-//        iNfft = connectivitySettings.at(0).matData.cols();
-//    }
+    //    // Check that iNfft >= signal length
+    //    if(iNfft > connectivitySettings.at(0).matData.cols()) {
+    //        iNfft = connectivitySettings.at(0).matData.cols();
+    //    }
 
     int iNFreqs = int(floor(iNfft / 2.0)) + 1;
 
-    if(m_iNumberBinStart == -1 ||
-       m_iNumberBinAmount == -1 ||
-       m_iNumberBinStart > iNFreqs ||
-       m_iNumberBinAmount > iNFreqs ||
-       m_iNumberBinAmount + m_iNumberBinStart > iNFreqs) {
+    if (m_iNumberBinStart == -1 ||
+        m_iNumberBinAmount == -1 ||
+        m_iNumberBinStart > iNFreqs ||
+        m_iNumberBinAmount > iNFreqs ||
+        m_iNumberBinAmount + m_iNumberBinStart > iNFreqs) {
         qDebug() << "ImagCoherence::calculate - Resetting to full spectrum";
         AbstractMetric::m_iNumberBinStart = 0;
         AbstractMetric::m_iNumberBinAmount = iNFreqs;
@@ -100,10 +100,10 @@ Network ImagCoherence::calculate(ConnectivitySettings& connectivitySettings)
     int rows = connectivitySettings.at(0).matData.rows();
     RowVectorXf rowVert = RowVectorXf::Zero(3);
 
-    for(int i = 0; i < rows; ++i) {
+    for (int i = 0; i < rows; ++i) {
         rowVert = RowVectorXf::Zero(3);
 
-        if(connectivitySettings.getNodePositions().rows() != 0 && i < connectivitySettings.getNodePositions().rows()) {
+        if (connectivitySettings.getNodePositions().rows() != 0 && i < connectivitySettings.getNodePositions().rows()) {
             rowVert(0) = connectivitySettings.getNodePositions().row(i)(0);
             rowVert(1) = connectivitySettings.getNodePositions().row(i)(1);
             rowVert(2) = connectivitySettings.getNodePositions().row(i)(2);

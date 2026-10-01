@@ -71,7 +71,7 @@ public:
     * @param[in] fScaleFactor Raw value scaling factor.
     * @param[in] parent Parent object.
     */
-    EDFRawData(QIODevice* pDev, float fScaleFactor = 1e6, QObject *parent = nullptr);
+    EDFRawData(QIODevice* pDev, float fScaleFactor = 1e6, QObject* parent = nullptr);
 
     //=========================================================================================================
     /**
@@ -115,9 +115,9 @@ signals:
 public slots:
 
 private:
-    QIODevice* m_pDev;      /** The device that is reflected by this EDFRawData object. */
-    float m_fScaleFactor;   /** Raw value scaling factor. */
-    EDFInfo m_edfInfo;      /** EDF info that holds all the relevant information. */
+    QIODevice* m_pDev;    /** The device that is reflected by this EDFRawData object. */
+    float m_fScaleFactor; /** Raw value scaling factor. */
+    EDFInfo m_edfInfo;    /** EDF info that holds all the relevant information. */
 };
 
 } // NAMESPACE

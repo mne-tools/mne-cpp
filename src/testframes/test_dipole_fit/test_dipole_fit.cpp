@@ -43,7 +43,7 @@ using namespace INVLIB;
  * @brief The TestDipoleFit class provides dipole fit tests
  *
  */
-class TestDipoleFit: public QObject
+class TestDipoleFit : public QObject
 {
     Q_OBJECT
 
@@ -83,7 +83,8 @@ void TestDipoleFit::initTestCase()
 
 void TestDipoleFit::dipoleFitSimple()
 {
-    printf("[checkpoint] dipoleFitSimple() entered\n"); fflush(stdout);
+    printf("[checkpoint] dipoleFitSimple() entered\n");
+    fflush(stdout);
     printf(">>>>>>>>>>>>>>>>>>>>>>>>> InvDipole FitSimple >>>>>>>>>>>>>>>>>>>>>>>>>\n");
 
     QString refFileName(QCoreApplication::applicationDirPath() + "/../resources/data/mne-cpp-test-data/Result/ref_dip_fit.dat");
@@ -98,16 +99,17 @@ void TestDipoleFit::dipoleFitSimple()
     //Following is equivalent to: --meas ../resources/data/mne-cpp-test-data/MEG/sample/sample_audvis-ave.fif --set 1 --meg
     //--eeg --tmin 32 --tmax 148 --bmin -100 --bmax 0 --dip ../resources/data/mne-cpp-test-data/Result/dip_fit.dat
     InvDipoleFitSettings settings;
-    testFile.setFileName(QCoreApplication::applicationDirPath() + "/../resources/data/mne-cpp-test-data/MEG/sample/sample_audvis-ave.fif"); QVERIFY( testFile.exists() );
+    testFile.setFileName(QCoreApplication::applicationDirPath() + "/../resources/data/mne-cpp-test-data/MEG/sample/sample_audvis-ave.fif");
+    QVERIFY(testFile.exists());
     settings.measname = testFile.fileName();
     settings.is_raw = false;
     settings.setno = 1;
     settings.include_meg = true;
     settings.include_eeg = true;
-    settings.tmin = 32.0f/1000.0f;
-    settings.tmax = 148.0f/1000.0f;
-    settings.bmin = -100.0f/1000.0f;
-    settings.bmax = 0.0f/1000.0f;
+    settings.tmin = 32.0f / 1000.0f;
+    settings.tmax = 148.0f / 1000.0f;
+    settings.bmin = -100.0f / 1000.0f;
+    settings.bmax = 0.0f / 1000.0f;
     settings.dipname = QCoreApplication::applicationDirPath() + "/../resources/data/mne-cpp-test-data/Result/dip_fit.dat";
 
     settings.checkIntegrity();
@@ -122,9 +124,11 @@ void TestDipoleFit::dipoleFitSimple()
     printf(">>>>>>>>>>>>>>>>>>>>>>>>> Compute InvDipole Fit >>>>>>>>>>>>>>>>>>>>>>>>>\n");
     fflush(stdout);
 
-    printf("[checkpoint] Creating InvDipoleFit (simple)...\n"); fflush(stdout);
+    printf("[checkpoint] Creating InvDipoleFit (simple)...\n");
+    fflush(stdout);
     InvDipoleFit dipFit(&settings);
-    printf("[checkpoint] InvDipoleFit created, calling calculateFit() (simple)...\n"); fflush(stdout);
+    printf("[checkpoint] InvDipoleFit created, calling calculateFit() (simple)...\n");
+    fflush(stdout);
     InvEcdSet set = dipFit.calculateFit();
 
     printf("<<<<<<<<<<<<<<<<<<<<<<<<< Compute InvDipole Fit Finished (simple, set size=%d) <<<<<<<<<<<<<<<<<<<<<<<<<\n", set.size());
@@ -138,9 +142,11 @@ void TestDipoleFit::dipoleFitSimple()
     fflush(stdout);
 
     set.save_dipoles_dip(settings.dipname);
-    printf("[checkpoint] dipole file written (simple)\n"); fflush(stdout);
+    printf("[checkpoint] dipole file written (simple)\n");
+    fflush(stdout);
     m_ECDSet = InvEcdSet::read_dipoles_dip(settings.dipname);
-    printf("[checkpoint] dipole file read back (simple, size=%d)\n", m_ECDSet.size()); fflush(stdout);
+    printf("[checkpoint] dipole file read back (simple, size=%d)\n", m_ECDSet.size());
+    fflush(stdout);
 
     printf("<<<<<<<<<<<<<<<<<<<<<<<<< Write Read InvDipole Fit Finished <<<<<<<<<<<<<<<<<<<<<<<<<\n");
     fflush(stdout);
@@ -152,7 +158,8 @@ void TestDipoleFit::dipoleFitSimple()
     printf(">>>>>>>>>>>>>>>>>>>>>>>>> Load InvDipole Fit Reference Set >>>>>>>>>>>>>>>>>>>>>>>>>\n");
     fflush(stdout);
     m_refECDSet = InvEcdSet::read_dipoles_dip(refFileName);
-    printf("[checkpoint] reference loaded (simple, size=%d)\n", m_refECDSet.size()); fflush(stdout);
+    printf("[checkpoint] reference loaded (simple, size=%d)\n", m_refECDSet.size());
+    fflush(stdout);
 
     printf("<<<<<<<<<<<<<<<<<<<<<<<<< InvDipole Fit Reference Set Loaded <<<<<<<<<<<<<<<<<<<<<<<<<\n");
     fflush(stdout);
@@ -183,7 +190,8 @@ void TestDipoleFit::dipoleFitAdvanced()
     //--mindist 0 --guessrad 100
     InvDipoleFitSettings settings;
 
-    testFile.setFileName(QCoreApplication::applicationDirPath() + "/../resources/data/mne-cpp-test-data/MEG/sample/sample_audvis-ave.fif"); QVERIFY( testFile.exists() );
+    testFile.setFileName(QCoreApplication::applicationDirPath() + "/../resources/data/mne-cpp-test-data/MEG/sample/sample_audvis-ave.fif");
+    QVERIFY(testFile.exists());
     settings.measname = testFile.fileName();
 
     settings.is_raw = false;
@@ -194,7 +202,8 @@ void TestDipoleFit::dipoleFitAdvanced()
     settings.tmax = 0.25f;
     settings.tstep = 0.01f;
 
-    testFile.setFileName(QCoreApplication::applicationDirPath() + "/../resources/data/mne-cpp-test-data/subjects/sample/bem/sample-5120-bem.fif"); QVERIFY( testFile.exists() );
+    testFile.setFileName(QCoreApplication::applicationDirPath() + "/../resources/data/mne-cpp-test-data/subjects/sample/bem/sample-5120-bem.fif");
+    QVERIFY(testFile.exists());
     settings.bemname = testFile.fileName();
 
     settings.bmin = 1000000.0f;
@@ -205,13 +214,16 @@ void TestDipoleFit::dipoleFitAdvanced()
     settings.guess_mindist = 0.0f;
     settings.guess_rad = 0.1f;
 
-    testFile.setFileName(QCoreApplication::applicationDirPath() + "/../resources/data/mne-cpp-test-data/MEG/sample/all-trans.fif"); QVERIFY( testFile.exists() );
+    testFile.setFileName(QCoreApplication::applicationDirPath() + "/../resources/data/mne-cpp-test-data/MEG/sample/all-trans.fif");
+    QVERIFY(testFile.exists());
     settings.mriname = testFile.fileName();
 
-    testFile.setFileName(QCoreApplication::applicationDirPath() + "/../resources/data/mne-cpp-test-data/MEG/sample/sample_audvis-cov.fif"); QVERIFY( testFile.exists() );
+    testFile.setFileName(QCoreApplication::applicationDirPath() + "/../resources/data/mne-cpp-test-data/MEG/sample/sample_audvis-cov.fif");
+    QVERIFY(testFile.exists());
     settings.noisename = testFile.fileName();
 
-    testFile.setFileName(QCoreApplication::applicationDirPath() + "/../resources/data/mne-cpp-test-data/MEG/sample/sample_audvis-ave.fif"); QVERIFY( testFile.exists() );
+    testFile.setFileName(QCoreApplication::applicationDirPath() + "/../resources/data/mne-cpp-test-data/MEG/sample/sample_audvis-ave.fif");
+    QVERIFY(testFile.exists());
     settings.projnames.append(testFile.fileName());
 
     settings.checkIntegrity();
@@ -226,9 +238,11 @@ void TestDipoleFit::dipoleFitAdvanced()
     printf(">>>>>>>>>>>>>>>>>>>>>>>>> Compute InvDipole Fit >>>>>>>>>>>>>>>>>>>>>>>>>\n");
     fflush(stdout);
 
-    printf("[checkpoint] Creating InvDipoleFit (advanced)...\n"); fflush(stdout);
+    printf("[checkpoint] Creating InvDipoleFit (advanced)...\n");
+    fflush(stdout);
     InvDipoleFit dipFit(&settings);
-    printf("[checkpoint] InvDipoleFit created, calling calculateFit() (advanced)...\n"); fflush(stdout);
+    printf("[checkpoint] InvDipoleFit created, calling calculateFit() (advanced)...\n");
+    fflush(stdout);
     InvEcdSet set = dipFit.calculateFit();
 
     printf("<<<<<<<<<<<<<<<<<<<<<<<<< Compute InvDipole Fit Finished (advanced, set size=%d) <<<<<<<<<<<<<<<<<<<<<<<<<\n", set.size());
@@ -242,9 +256,11 @@ void TestDipoleFit::dipoleFitAdvanced()
     fflush(stdout);
 
     set.save_dipoles_dip(settings.dipname);
-    printf("[checkpoint] dipole file written (advanced)\n"); fflush(stdout);
+    printf("[checkpoint] dipole file written (advanced)\n");
+    fflush(stdout);
     m_ECDSet = InvEcdSet::read_dipoles_dip(settings.dipname);
-    printf("[checkpoint] dipole file read back (advanced, size=%d)\n", m_ECDSet.size()); fflush(stdout);
+    printf("[checkpoint] dipole file read back (advanced, size=%d)\n", m_ECDSet.size());
+    fflush(stdout);
 
     printf("<<<<<<<<<<<<<<<<<<<<<<<<< Write Read InvDipole Fit Finished <<<<<<<<<<<<<<<<<<<<<<<<<\n");
     fflush(stdout);
@@ -256,7 +272,8 @@ void TestDipoleFit::dipoleFitAdvanced()
     printf(">>>>>>>>>>>>>>>>>>>>>>>>> Load InvDipole Fit Reference Set >>>>>>>>>>>>>>>>>>>>>>>>>\n");
     fflush(stdout);
     m_refECDSet = InvEcdSet::read_dipoles_dip(refFileName);
-    printf("[checkpoint] reference loaded (advanced, size=%d)\n", m_refECDSet.size()); fflush(stdout);
+    printf("[checkpoint] reference loaded (advanced, size=%d)\n", m_refECDSet.size());
+    fflush(stdout);
 
     printf("<<<<<<<<<<<<<<<<<<<<<<<<< InvDipole Fit Reference Set Loaded <<<<<<<<<<<<<<<<<<<<<<<<<\n");
     fflush(stdout);
@@ -278,18 +295,17 @@ void TestDipoleFit::compareFit()
 
     printf(">>>>>>>>>>>>>>>>>>>>>>>>> Compare InvDipole Fits >>>>>>>>>>>>>>>>>>>>>>>>>\n");
 
-    QVERIFY( m_refECDSet.size() == m_ECDSet.size() );
+    QVERIFY(m_refECDSet.size() == m_ECDSet.size());
 
-    for (int i = 0; i < m_refECDSet.size(); ++i)
-    {
+    for (int i = 0; i < m_refECDSet.size(); ++i) {
         printf("Compare orig InvDipole %d: %7.1f %7.1f %8.2f %8.2f %8.2f %8.3f %8.3f %8.3f %8.3f %6.1f\n", i,
-                1000*m_ECDSet[i].time,1000*m_ECDSet[i].time,
-                1000*m_ECDSet[i].rd[0],1000*m_ECDSet[i].rd[1],1000*m_ECDSet[i].rd[2],
-                1e9*m_ECDSet[i].Q.norm(),1e9*m_ECDSet[i].Q[0],1e9*m_ECDSet[i].Q[1],1e9*m_ECDSet[i].Q[2],100.0*m_ECDSet[i].good);
+               1000 * m_ECDSet[i].time, 1000 * m_ECDSet[i].time,
+               1000 * m_ECDSet[i].rd[0], 1000 * m_ECDSet[i].rd[1], 1000 * m_ECDSet[i].rd[2],
+               1e9 * m_ECDSet[i].Q.norm(), 1e9 * m_ECDSet[i].Q[0], 1e9 * m_ECDSet[i].Q[1], 1e9 * m_ECDSet[i].Q[2], 100.0 * m_ECDSet[i].good);
         printf("         ref InvDipole %d: %7.1f %7.1f %8.2f %8.2f %8.2f %8.3f %8.3f %8.3f %8.3f %6.1f\n", i,
-                1000*m_refECDSet[i].time,1000*m_refECDSet[i].time,
-                1000*m_refECDSet[i].rd[0],1000*m_refECDSet[i].rd[1],1000*m_refECDSet[i].rd[2],
-                1e9*m_refECDSet[i].Q.norm(),1e9*m_refECDSet[i].Q[0],1e9*m_refECDSet[i].Q[1],1e9*m_refECDSet[i].Q[2],100.0*m_refECDSet[i].good);
+               1000 * m_refECDSet[i].time, 1000 * m_refECDSet[i].time,
+               1000 * m_refECDSet[i].rd[0], 1000 * m_refECDSet[i].rd[1], 1000 * m_refECDSet[i].rd[2],
+               1e9 * m_refECDSet[i].Q.norm(), 1e9 * m_refECDSet[i].Q[0], 1e9 * m_refECDSet[i].Q[1], 1e9 * m_refECDSet[i].Q[2], 100.0 * m_refECDSet[i].good);
 
         // Verbose diagnostics for CI debugging
         double dt = std::abs(m_ECDSet[i].time - m_refECDSet[i].time);
@@ -303,13 +319,13 @@ void TestDipoleFit::compareFit()
                m_ECDSet[i].valid, m_refECDSet[i].valid);
         fflush(stdout);
 
-        QVERIFY( m_ECDSet[i].valid == m_refECDSet[i].valid );
-        QVERIFY( std::abs(m_ECDSet[i].time - m_refECDSet[i].time) < epsilon );
-        QVERIFY( (m_ECDSet[i].rd - m_refECDSet[i].rd).norm() < epsilon );
-        QVERIFY( (m_ECDSet[i].Q - m_refECDSet[i].Q).norm() < epsilon );
-        QVERIFY( std::abs(m_ECDSet[i].good - m_refECDSet[i].good) < epsilon );
-        QVERIFY( std::abs(m_ECDSet[i].khi2 - m_refECDSet[i].khi2) < epsilon );
-        QVERIFY( m_ECDSet[i].nfree == m_refECDSet[i].nfree );
+        QVERIFY(m_ECDSet[i].valid == m_refECDSet[i].valid);
+        QVERIFY(std::abs(m_ECDSet[i].time - m_refECDSet[i].time) < epsilon);
+        QVERIFY((m_ECDSet[i].rd - m_refECDSet[i].rd).norm() < epsilon);
+        QVERIFY((m_ECDSet[i].Q - m_refECDSet[i].Q).norm() < epsilon);
+        QVERIFY(std::abs(m_ECDSet[i].good - m_refECDSet[i].good) < epsilon);
+        QVERIFY(std::abs(m_ECDSet[i].khi2 - m_refECDSet[i].khi2) < epsilon);
+        QVERIFY(m_ECDSet[i].nfree == m_refECDSet[i].nfree);
     }
 
     printf("<<<<<<<<<<<<<<<<<<<<<<<<< Compare InvDipole Fits Finished <<<<<<<<<<<<<<<<<<<<<<<<<\n");

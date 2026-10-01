@@ -42,7 +42,7 @@ using namespace TMSIPLUGIN;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-TMSIManualAnnotationWidget::TMSIManualAnnotationWidget(TMSI* pTMSI, QWidget *parent)
+TMSIManualAnnotationWidget::TMSIManualAnnotationWidget(TMSI* pTMSI, QWidget* parent)
 : QWidget(parent)
 , m_pTMSI(pTMSI)
 {
@@ -63,27 +63,26 @@ void TMSIManualAnnotationWidget::initGui()
 
 //=============================================================================================================
 
-void TMSIManualAnnotationWidget::keyPressEvent(QKeyEvent *event)
+void TMSIManualAnnotationWidget::keyPressEvent(QKeyEvent* event)
 {
-    switch (event->key())
-    {
+    switch (event->key()) {
         case Qt::Key_Up:
             //std::cout<<"Up"<<endl;
             break;
         case Qt::Key_Down:
             //std::cout<<"Down"<<endl;
             break;
-        case Qt::Key_Control://Qt::Key_Left:
+        case Qt::Key_Control: //Qt::Key_Left:
             //std::cout<<"Left"<<endl;
             m_pTMSI->setKeyboardTriggerType(253);
-            ui.m_pushButton_Left->click();//setStyleSheet("background-color: green");
+            ui.m_pushButton_Left->click(); //setStyleSheet("background-color: green");
             break;
-        case Qt::Key_Enter://Qt::Key_Right:
+        case Qt::Key_Enter: //Qt::Key_Right:
             //std::cout<<"right"<<endl;
             m_pTMSI->setKeyboardTriggerType(254);
-            ui.m_pushButton_Right->click();//->setStyleSheet("background-color: green");
+            ui.m_pushButton_Right->click(); //->setStyleSheet("background-color: green");
             break;
         default:
             QWidget::keyPressEvent(event);
-     }
+    }
 }

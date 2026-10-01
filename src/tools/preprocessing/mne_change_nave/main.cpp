@@ -49,7 +49,7 @@ using namespace UTILSLIB;
 
 //=============================================================================================================
 
-int main(int argc, char *argv[])
+int main(int argc, char* argv[])
 {
     qInstallMessageHandler(MNELogger::customLogWriter);
     QCoreApplication app(argc, argv);
@@ -78,9 +78,18 @@ int main(int argc, char *argv[])
     QString measFile = parser.value(measOpt);
     QString outFile = parser.value(outOpt);
 
-    if (measFile.isEmpty()) { qCritical("--meas is required."); return 1; }
-    if (!parser.isSet(naveOpt)) { qCritical("--nave is required."); return 1; }
-    if (outFile.isEmpty()) { qCritical("--out is required."); return 1; }
+    if (measFile.isEmpty()) {
+        qCritical("--meas is required.");
+        return 1;
+    }
+    if (!parser.isSet(naveOpt)) {
+        qCritical("--nave is required.");
+        return 1;
+    }
+    if (outFile.isEmpty()) {
+        qCritical("--out is required.");
+        return 1;
+    }
 
     int newNave = parser.value(naveOpt).toInt();
     int setIdx = parser.value(setOpt).toInt();
@@ -88,7 +97,7 @@ int main(int argc, char *argv[])
     // Read evoked data
     QFile file(measFile);
     FiffEvokedSet evokedSet;
-    if (!FiffEvokedSet::read(file, evokedSet, QPair<float,float>(0.0f, 0.0f), false)) {
+    if (!FiffEvokedSet::read(file, evokedSet, QPair<float, float>(0.0f, 0.0f), false)) {
         qCritical("Cannot read evoked data from: %s", qPrintable(measFile));
         return 1;
     }
@@ -99,9 +108,9 @@ int main(int argc, char *argv[])
         return 1;
     }
 
-    qInfo("Changing nave for set %d (%s): %d -> %d" ,
-           setIdx, qPrintable(evokedSet.evoked[setIdx].comment),
-           evokedSet.evoked[setIdx].nave, newNave);
+    qInfo("Changing nave for set %d (%s): %d -> %d",
+          setIdx, qPrintable(evokedSet.evoked[setIdx].comment),
+          evokedSet.evoked[setIdx].nave, newNave);
 
     evokedSet.evoked[setIdx].nave = newNave;
 
@@ -111,6 +120,6 @@ int main(int argc, char *argv[])
         return 1;
     }
 
-    qInfo("Written updated evoked data to: %s" , qPrintable(outFile));
+    qInfo("Written updated evoked data to: %s", qPrintable(outFile));
     return 0;
 }

@@ -47,4 +47,3 @@ int AbstractMetric::m_iNumberBinAmount = -1;
 AbstractMetric::AbstractMetric()
 {
 }
-

@@ -58,7 +58,7 @@ FilterOperator::FilterOperator(QString unique_name, FilterType type, int order, 
 , m_dBandwidth(bandwidth)
 , m_sName(unique_name)
 {
-    switch(designMethod) {
+    switch (designMethod) {
         case Tschebyscheff: {
             ParksMcClellan filter(order, centerfreq, bandwidth, parkswidth, (ParksMcClellan::TPassType)type);
             m_dCoeffA = filter.FirCoeff;
@@ -74,35 +74,35 @@ FilterOperator::FilterOperator(QString unique_name, FilterType type, int order, 
 
             CosineFilter filtercos;
 
-            switch(type) {
+            switch (type) {
                 case FilterType::LPF:
-                    filtercos = CosineFilter (fftlength,
-                                            (centerfreq)*(sFreq/2),
-                                            parkswidth*(sFreq/2),
-                                            (centerfreq)*(sFreq/2),
-                                            parkswidth*(sFreq/2),
-                                            sFreq,
-                                            (CosineFilter::TPassType)type);
+                    filtercos = CosineFilter(fftlength,
+                                             (centerfreq) * (sFreq / 2),
+                                             parkswidth * (sFreq / 2),
+                                             (centerfreq) * (sFreq / 2),
+                                             parkswidth * (sFreq / 2),
+                                             sFreq,
+                                             (CosineFilter::TPassType)type);
                     break;
 
                 case FilterType::HPF:
-                    filtercos = CosineFilter (fftlength,
-                                            (centerfreq)*(sFreq/2),
-                                            parkswidth*(sFreq/2),
-                                            (centerfreq)*(sFreq/2),
-                                            parkswidth*(sFreq/2),
-                                            sFreq,
-                                            (CosineFilter::TPassType)type);
+                    filtercos = CosineFilter(fftlength,
+                                             (centerfreq) * (sFreq / 2),
+                                             parkswidth * (sFreq / 2),
+                                             (centerfreq) * (sFreq / 2),
+                                             parkswidth * (sFreq / 2),
+                                             sFreq,
+                                             (CosineFilter::TPassType)type);
                     break;
 
                 case FilterType::BPF:
-                    filtercos = CosineFilter (fftlength,
-                                            (centerfreq + bandwidth/2)*(sFreq/2),
-                                            parkswidth*(sFreq/2),
-                                            (centerfreq - bandwidth/2)*(sFreq/2),
-                                            parkswidth*(sFreq/2),
-                                            sFreq,
-                                            (CosineFilter::TPassType)type);
+                    filtercos = CosineFilter(fftlength,
+                                             (centerfreq + bandwidth / 2) * (sFreq / 2),
+                                             parkswidth * (sFreq / 2),
+                                             (centerfreq - bandwidth / 2) * (sFreq / 2),
+                                             parkswidth * (sFreq / 2),
+                                             sFreq,
+                                             (CosineFilter::TPassType)type);
                 case FilterType::NOTCH:
                     break;
             }
@@ -127,9 +127,9 @@ FilterOperator::~FilterOperator()
 
 void FilterOperator::fftTransformCoeffs()
 {
-    #ifdef EIGEN_FFTW_DEFAULT
-        fftw_make_planner_thread_safe();
-    #endif
+#ifdef EIGEN_FFTW_DEFAULT
+    fftw_make_planner_thread_safe();
+#endif
 
     //This function only nneds to be called when using the Tschebyscheff design method
     //zero-pad m_dCoeffA to m_iFFTlength
@@ -142,7 +142,7 @@ void FilterOperator::fftTransformCoeffs()
 
     //fft-transform filter coeffs
     m_dFFTCoeffA = RowVectorXcd::Zero(m_iFFTlength);
-    fft.fwd(m_dFFTCoeffA,t_coeffAzeroPad);
+    fft.fwd(m_dFFTCoeffA, t_coeffAzeroPad);
 }
 
 
@@ -150,13 +150,13 @@ void FilterOperator::fftTransformCoeffs()
 
 RowVectorXd FilterOperator::applyFFTFilter(const RowVectorXd& data) const
 {
-    #ifdef EIGEN_FFTW_DEFAULT
-        fftw_make_planner_thread_safe();
-    #endif
+#ifdef EIGEN_FFTW_DEFAULT
+    fftw_make_planner_thread_safe();
+#endif
 
     //Zero pad in front and back
     RowVectorXd t_dataZeroPad = RowVectorXd::Zero(m_iFFTlength);
-    t_dataZeroPad.segment(m_iFFTlength/4-m_iFilterOrder/2, data.cols()) = data;
+    t_dataZeroPad.segment(m_iFFTlength / 4 - m_iFilterOrder / 2, data.cols()) = data;
 
     //generate fft object
     Eigen::FFT<double> fft;
@@ -164,14 +164,14 @@ RowVectorXd FilterOperator::applyFFTFilter(const RowVectorXd& data) const
 
     //fft-transform data sequence
     RowVectorXcd t_freqData;
-    fft.fwd(t_freqData,t_dataZeroPad);
+    fft.fwd(t_freqData, t_dataZeroPad);
 
     //perform frequency-domain filtering
-    RowVectorXcd t_filteredFreq = m_dFFTCoeffA.array()*t_freqData.array();
+    RowVectorXcd t_filteredFreq = m_dFFTCoeffA.array() * t_freqData.array();
 
     //inverse-FFT
     RowVectorXd t_filteredTime;
-    fft.inv(t_filteredTime,t_filteredFreq);
+    fft.inv(t_filteredTime, t_filteredFreq);
 
     //Return filtered data still with zeros at front and end
     return t_filteredTime;

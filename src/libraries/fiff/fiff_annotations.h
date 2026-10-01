@@ -58,12 +58,12 @@ namespace FIFFLIB
  */
 struct FIFFSHARED_EXPORT FiffAnnotation
 {
-    double      onset;          /**< Onset in seconds. */
-    double      duration;       /**< Duration in seconds (0 for point events). */
-    QString     description;    /**< Label: "BAD", "BAD_ACQ_SKIP", etc. */
-    QStringList channelNames;   /**< Empty = global annotation. */
-    QString     comment;        /**< Optional free-form comment. */
-    QVariantMap extras;         /**< Format-specific metadata. */
+    double onset;             /**< Onset in seconds. */
+    double duration;          /**< Duration in seconds (0 for point events). */
+    QString description;      /**< Label: "BAD", "BAD_ACQ_SKIP", etc. */
+    QStringList channelNames; /**< Empty = global annotation. */
+    QString comment;          /**< Optional free-form comment. */
+    QVariantMap extras;       /**< Format-specific metadata. */
 };
 
 //=============================================================================================================
@@ -273,7 +273,7 @@ public:
     static bool write(const QString& path, const FiffAnnotations& annot);
 
 private:
-    QVector<FiffAnnotation> m_annotations;  /**< Annotation storage. */
+    QVector<FiffAnnotation> m_annotations; /**< Annotation storage. */
 };
 
 } // namespace FIFFLIB

@@ -39,19 +39,20 @@ using namespace DISPLIB;
 // CONSTANTS
 //=============================================================================================================
 
-namespace {
-constexpr int kPanelWidth  = 120;
-constexpr int kStripWidth  =   5;   // type-colour strip on left edge
-constexpr int kBadBadgeW   =  28;
-constexpr int kBadBadgeH   =  11;
+namespace
+{
+constexpr int kPanelWidth = 120;
+constexpr int kStripWidth = 5; // type-colour strip on left edge
+constexpr int kBadBadgeW = 28;
+constexpr int kBadBadgeH = 11;
 }
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-ChannelLabelPanel::ChannelLabelPanel(QWidget *parent)
-    : QWidget(parent)
+ChannelLabelPanel::ChannelLabelPanel(QWidget* parent)
+: QWidget(parent)
 {
     setFixedWidth(kPanelWidth);
     setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Expanding);
@@ -75,7 +76,7 @@ QSize ChannelLabelPanel::minimumSizeHint() const
 
 //=============================================================================================================
 
-void ChannelLabelPanel::setModel(ChannelDataModel *model)
+void ChannelLabelPanel::setModel(ChannelDataModel* model)
 {
     m_model = model;
     update();
@@ -83,7 +84,7 @@ void ChannelLabelPanel::setModel(ChannelDataModel *model)
 
 //=============================================================================================================
 
-void ChannelLabelPanel::setChannelIndices(const QVector<int> &indices)
+void ChannelLabelPanel::setChannelIndices(const QVector<int>& indices)
 {
     m_channelIndices = indices;
     update();
@@ -134,13 +135,13 @@ void ChannelLabelPanel::setButterflyMode(bool enabled)
 void ChannelLabelPanel::setVisibleSampleRange(int firstSample, int lastSample)
 {
     m_visSampleFirst = firstSample;
-    m_visSampleLast  = lastSample;
+    m_visSampleLast = lastSample;
     update();
 }
 
 //=============================================================================================================
 
-void ChannelLabelPanel::paintEvent(QPaintEvent *)
+void ChannelLabelPanel::paintEvent(QPaintEvent*)
 {
     QPainter p(this);
     p.setRenderHint(QPainter::TextAntialiasing, true);
@@ -154,10 +155,11 @@ void ChannelLabelPanel::paintEvent(QPaintEvent *)
     // ── Butterfly mode: show type group labels ──────────────────────
     if (m_butterflyMode) {
         // Collect unique types in order
-        struct TypeGroup {
+        struct TypeGroup
+        {
             QString typeLabel;
-            QColor  color;
-            int     count = 0;
+            QColor color;
+            int count = 0;
         };
         QVector<TypeGroup> groups;
         QMap<QString, int> typeToGroup;
@@ -231,8 +233,8 @@ void ChannelLabelPanel::paintEvent(QPaintEvent *)
     if (visibleCount <= 0)
         return;
 
-    const int   pw         = width();
-    const float laneH      = static_cast<float>(height()) / visibleCount;
+    const int pw = width();
+    const float laneH = static_cast<float>(height()) / visibleCount;
 
     // Whether DC removal is active (shown as a pill in the status line)
     const bool dcActive = m_model->removeDC();
@@ -255,7 +257,7 @@ void ChannelLabelPanel::paintEvent(QPaintEvent *)
             continue;
         }
         auto info = m_model->channelInfo(ch);
-        float yBot  = yTop + laneH;
+        float yBot = yTop + laneH;
 
         // Lane separator
         p.setPen(QPen(QColor(200, 200, 200), 1));
@@ -308,17 +310,17 @@ void ChannelLabelPanel::paintEvent(QPaintEvent *)
         p.drawText(statusRect, Qt::AlignLeft | Qt::AlignVCenter, statusLine);
 
         // ── RMS level bar ─────────────────────────────────────────────────
-        float rms   = 0.f;
+        float rms = 0.f;
         if (m_visSampleFirst < m_visSampleLast)
             rms = m_model->channelRms(ch, m_visSampleFirst, m_visSampleLast);
         float level = (info.amplitudeMax > 0.f)
-                      ? qBound(0.f, rms / info.amplitudeMax, 1.f)
-                      : 0.f;
+            ? qBound(0.f, rms / info.amplitudeMax, 1.f)
+            : 0.f;
 
-        const float barY  = yTop + laneH * 0.80f;
-        const float barH  = qMax(2.f, laneH * 0.14f);
+        const float barY = yTop + laneH * 0.80f;
+        const float barH = qMax(2.f, laneH * 0.14f);
         const float barX0 = kStripWidth + 4.f;
-        const float barW  = pw - kStripWidth - 8.f;
+        const float barW = pw - kStripWidth - 8.f;
 
         p.fillRect(QRectF(barX0, barY, barW, barH), QColor(215, 215, 215));
 
@@ -341,12 +343,12 @@ void ChannelLabelPanel::paintEvent(QPaintEvent *)
 
 //=============================================================================================================
 
-void ChannelLabelPanel::mousePressEvent(QMouseEvent *event)
+void ChannelLabelPanel::mousePressEvent(QMouseEvent* event)
 {
     if (event->button() == Qt::LeftButton) {
-        m_dragging       = true;
-        m_dragActivated  = false;
-        m_dragStartY     = event->position().toPoint().y();
+        m_dragging = true;
+        m_dragActivated = false;
+        m_dragStartY = event->position().toPoint().y();
         m_dragStartFirst = m_firstVisibleChannel;
         event->accept();
     }
@@ -354,7 +356,7 @@ void ChannelLabelPanel::mousePressEvent(QMouseEvent *event)
 
 //=============================================================================================================
 
-void ChannelLabelPanel::mouseMoveEvent(QMouseEvent *event)
+void ChannelLabelPanel::mouseMoveEvent(QMouseEvent* event)
 {
     if (!m_dragging) {
         event->ignore();
@@ -370,11 +372,11 @@ void ChannelLabelPanel::mouseMoveEvent(QMouseEvent *event)
         return;
     }
 
-    const int totalCh    = effectiveChannelIndices().size();
-    const int maxFirst   = qMax(0, totalCh - m_visibleChannelCount);
-    const float laneH    = (m_visibleChannelCount > 0 && height() > 0)
-                           ? static_cast<float>(height()) / m_visibleChannelCount
-                           : 30.f;
+    const int totalCh = effectiveChannelIndices().size();
+    const int maxFirst = qMax(0, totalCh - m_visibleChannelCount);
+    const float laneH = (m_visibleChannelCount > 0 && height() > 0)
+        ? static_cast<float>(height()) / m_visibleChannelCount
+        : 30.f;
 
     // Dragging DOWN means earlier channels (positive dy → lower first index)
     int targetFirst = qBound(0,
@@ -387,7 +389,7 @@ void ChannelLabelPanel::mouseMoveEvent(QMouseEvent *event)
 
 //=============================================================================================================
 
-void ChannelLabelPanel::mouseReleaseEvent(QMouseEvent *event)
+void ChannelLabelPanel::mouseReleaseEvent(QMouseEvent* event)
 {
     if (event->button() == Qt::LeftButton) {
         const bool wasClick = m_dragging && !m_dragActivated;
@@ -452,10 +454,10 @@ QVector<int> ChannelLabelPanel::effectiveChannelIndices() const
     return visibleIndices;
 }
 
-bool ChannelLabelPanel::event(QEvent *e)
+bool ChannelLabelPanel::event(QEvent* e)
 {
     if (e->type() == QEvent::ToolTip && m_model) {
-        auto *he = static_cast<QHelpEvent *>(e);
+        auto* he = static_cast<QHelpEvent*>(e);
         const QVector<int> displayChannels = effectiveChannelIndices();
         int totalCh = displayChannels.size();
         int visibleCount = qMin(m_visibleChannelCount, totalCh - m_firstVisibleChannel);
@@ -467,26 +469,27 @@ bool ChannelLabelPanel::event(QEvent *e)
                 const int ch = (logIdx >= 0 && logIdx < displayChannels.size())
                     ? displayChannels.at(logIdx)
                     : -1;
-                if (ch < 0) return QWidget::event(e);
+                if (ch < 0)
+                    return QWidget::event(e);
                 auto info = m_model->channelInfo(ch);
                 float rms = (m_visSampleFirst < m_visSampleLast)
-                            ? m_model->channelRms(ch, m_visSampleFirst, m_visSampleLast)
-                            : 0.f;
+                    ? m_model->channelRms(ch, m_visSampleFirst, m_visSampleLast)
+                    : 0.f;
                 float level = (info.amplitudeMax > 0.f)
-                              ? qBound(0.f, rms / info.amplitudeMax * 100.f, 100.f)
-                              : 0.f;
+                    ? qBound(0.f, rms / info.amplitudeMax * 100.f, 100.f)
+                    : 0.f;
                 QString tip = QStringLiteral("<b>%1</b><br>"
-                                              "Type: %2<br>"
-                                              "Scale: %3<br>"
-                                              "Level: %4 %<br>"
-                                              "Bad: %5<br>"
-                                              "Virtual: %6")
-                    .arg(info.name)
-                    .arg(info.typeLabel)
-                    .arg(info.amplitudeMax, 0, 'e', 2)
-                    .arg(static_cast<int>(level))
-                    .arg(info.bad ? QStringLiteral("yes") : QStringLiteral("no"))
-                    .arg(info.isVirtualChannel ? QStringLiteral("yes") : QStringLiteral("no"));
+                                             "Type: %2<br>"
+                                             "Scale: %3<br>"
+                                             "Level: %4 %<br>"
+                                             "Bad: %5<br>"
+                                             "Virtual: %6")
+                                  .arg(info.name)
+                                  .arg(info.typeLabel)
+                                  .arg(info.amplitudeMax, 0, 'e', 2)
+                                  .arg(static_cast<int>(level))
+                                  .arg(info.bad ? QStringLiteral("yes") : QStringLiteral("no"))
+                                  .arg(info.isVirtualChannel ? QStringLiteral("yes") : QStringLiteral("no"));
                 QToolTip::showText(he->globalPos(), tip, this);
                 return true;
             }

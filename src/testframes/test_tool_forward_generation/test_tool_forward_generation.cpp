@@ -85,7 +85,7 @@ void TestToolForwardGeneration::testIcosahedronGrade0()
 {
     MatrixX3f verts;
     QVERIFY(makeIcosahedron(0, verts));
-    QCOMPARE(verts.rows(), (Eigen::Index)12);  // Base icosahedron
+    QCOMPARE(verts.rows(), (Eigen::Index)12); // Base icosahedron
 }
 
 void TestToolForwardGeneration::testIcosahedronGrade1()
@@ -151,10 +151,10 @@ void TestToolForwardGeneration::testSelectVerticesIcoBasic()
 {
     // Create a surface and icosphere, select vertices
     MatrixX3f surfVerts;
-    QVERIFY(makeIcosahedron(3, surfVerts));  // 642 surface vertices
+    QVERIFY(makeIcosahedron(3, surfVerts)); // 642 surface vertices
 
     MatrixX3f icoVerts;
-    QVERIFY(makeIcosahedron(1, icoVerts));  // 42 ico points
+    QVERIFY(makeIcosahedron(1, icoVerts)); // 42 ico points
 
     VectorXi inuse;
     VectorXi vertno;
@@ -169,17 +169,17 @@ void TestToolForwardGeneration::testSelectVerticesIcoBasic()
 void TestToolForwardGeneration::testSelectVerticesIcoCount()
 {
     MatrixX3f surfVerts;
-    QVERIFY(makeIcosahedron(4, surfVerts));  // 2562 surface vertices
+    QVERIFY(makeIcosahedron(4, surfVerts)); // 2562 surface vertices
 
     MatrixX3f icoVerts;
-    QVERIFY(makeIcosahedron(2, icoVerts));  // 162 ico points
+    QVERIFY(makeIcosahedron(2, icoVerts)); // 162 ico points
 
     VectorXi inuse;
     VectorXi vertno;
     int nSelected = selectVerticesIco(surfVerts, icoVerts, inuse, vertno);
 
     // Should select roughly as many as ico points
-    QVERIFY(nSelected >= icoVerts.rows() * 0.8);  // Some may overlap
+    QVERIFY(nSelected >= icoVerts.rows() * 0.8); // Some may overlap
     QVERIFY(nSelected <= icoVerts.rows());
 }
 
@@ -189,7 +189,7 @@ void TestToolForwardGeneration::testSelectVerticesIcoInuseVector()
     QVERIFY(makeIcosahedron(3, surfVerts));
 
     MatrixX3f icoVerts;
-    QVERIFY(makeIcosahedron(0, icoVerts));  // 12 ico points
+    QVERIFY(makeIcosahedron(0, icoVerts)); // 12 ico points
 
     VectorXi inuse;
     VectorXi vertno;

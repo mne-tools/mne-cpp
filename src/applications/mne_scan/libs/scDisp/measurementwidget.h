@@ -33,8 +33,9 @@
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-namespace DISPLIB {
-    class QuickControlView;
+namespace DISPLIB
+{
+class QuickControlView;
 }
 
 //=============================================================================================================
@@ -58,8 +59,8 @@ namespace SCDISPLIB
  */
 enum Tool
 {
-    Freeze     = 0,       /**< Freezing tool. */
-    FsAnnotation = 1        /**< FsAnnotation tool. */
+    Freeze = 0,      /**< Freezing tool. */
+    FsAnnotation = 1 /**< FsAnnotation tool. */
 };
 
 //=============================================================================================================
@@ -132,11 +133,10 @@ protected:
      */
     inline void addDisplayAction(QAction* pAction);
 
-    bool                m_bDisplayWidgetsInitialized;   /**< Whether the control widgets were sucesfully initialized. */
+    bool m_bDisplayWidgetsInitialized; /**< Whether the control widgets were sucesfully initialized. */
 
 private:
-    QList< QAction* >   m_qListDisplayActions;          /**< List of display actions. */
-
+    QList<QAction*> m_qListDisplayActions; /**< List of display actions. */
 };
 
 //=============================================================================================================

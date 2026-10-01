@@ -65,12 +65,12 @@ namespace FIFFLIB
 {
 
 const static QStringList defaultQStringList = QStringList();
-static Eigen::MatrixXd defaultMatrixXd = Eigen::MatrixXd::Constant(1,1,-1);
-const static Eigen::MatrixXd defaultConstMatrixXd(0,0);
-const static Eigen::MatrixXi defaultMatrixXi(0,0);
+static Eigen::MatrixXd defaultMatrixXd = Eigen::MatrixXd::Constant(1, 1, -1);
+const static Eigen::MatrixXd defaultConstMatrixXd(0, 0);
+const static Eigen::MatrixXi defaultMatrixXi(0, 0);
 const static Eigen::VectorXi defaultVectorXi;
 const static Eigen::RowVectorXi defaultRowVectorXi;
-const static QPair<float,float> defaultFloatPair = qMakePair(-1.0f, -1.0f);
+const static QPair<float, float> defaultFloatPair = qMakePair(-1.0f, -1.0f);
 
 typedef Eigen::Matrix<qint16, Eigen::Dynamic, Eigen::Dynamic> MatrixDau16;
 typedef Eigen::Matrix<short, Eigen::Dynamic, Eigen::Dynamic> MatrixShort;
@@ -79,21 +79,21 @@ typedef Eigen::Matrix<short, Eigen::Dynamic, Eigen::Dynamic> MatrixShort;
 // TYPEDEFS Primitive building blocks:
 //=============================================================================================================
 
-typedef unsigned char        fiff_byte_t;
-typedef char                 fiff_char_t;
-typedef qint16               fiff_short_t;
-typedef quint16              fiff_ushort_t;
-typedef qint32               fiff_int_t;
-typedef quint32              fiff_uint_t;
-typedef qint64               fiff_long_t;
-typedef quint64              fiff_ulong_t;
-typedef float                fiff_float_t;
-typedef double               fiff_double_t;
-typedef quint16              fiff_dau_pack13_t;
-typedef quint16              fiff_dau_pack14_t;
-typedef qint16               fiff_dau_pack16_t;
-typedef qint32               fiff_julian_t;
-typedef char                 fiff_data_t; //unsig char instead of void -> avoid void in C++ cause of its undefined behaviour using delete -> this can happen during lots of casting
+typedef unsigned char fiff_byte_t;
+typedef char fiff_char_t;
+typedef qint16 fiff_short_t;
+typedef quint16 fiff_ushort_t;
+typedef qint32 fiff_int_t;
+typedef quint32 fiff_uint_t;
+typedef qint64 fiff_long_t;
+typedef quint64 fiff_ulong_t;
+typedef float fiff_float_t;
+typedef double fiff_double_t;
+typedef quint16 fiff_dau_pack13_t;
+typedef quint16 fiff_dau_pack14_t;
+typedef qint16 fiff_dau_pack16_t;
+typedef qint32 fiff_julian_t;
+typedef char fiff_data_t; //unsig char instead of void -> avoid void in C++ cause of its undefined behaviour using delete -> this can happen during lots of casting
 
 //=============================================================================================================
 // TYPEDEFS Structured types:
@@ -152,6 +152,6 @@ typedef FiffDigPoint fiffDigPointRec;
 
 #define FIFFM_CHPOS(x) &((x)->chpos)
 
-}//NAMESPACE
+} //NAMESPACE
 
 #endif // FIFF_TYPES_H

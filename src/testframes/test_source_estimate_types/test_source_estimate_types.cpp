@@ -170,7 +170,7 @@ void TestSourceEstimateTypes::testVectorProjectNormals()
     MatrixX3f normals(nVert, 3);
     // Normal 0: (1, 0, 0) → projection = 1.0
     normals << 1.0f, 0.0f, 0.0f,
-               0.0f, 0.0f, 1.0f;  // Normal 1: (0, 0, 1) → projection = 0.0
+        0.0f, 0.0f, 1.0f; // Normal 1: (0, 0, 1) → projection = 0.0
 
     InvVectorSourceEstimate vstc(data, verts, 0.0f, 0.001f);
     InvSourceEstimate proj = vstc.projectToNormals(normals);
@@ -221,7 +221,7 @@ void TestSourceEstimateTypes::testVolumeShape()
 void TestSourceEstimateTypes::testVolumeToVolume()
 {
     int nx = 3, ny = 3, nz = 3;
-    int nTotal = nx * ny * nz;  // 27
+    int nTotal = nx * ny * nz; // 27
     int nTimes = 2;
 
     // Active voxels: 0, 5, 13
@@ -229,8 +229,8 @@ void TestSourceEstimateTypes::testVolumeToVolume()
     verts << 0, 5, 13;
     MatrixXd data(3, nTimes);
     data << 1.0, 2.0,
-            3.0, 4.0,
-            5.0, 6.0;
+        3.0, 4.0,
+        5.0, 6.0;
 
     InvVolumeSourceEstimate vol(data, verts, 0.0f, 0.001f);
     vol.setShape({nx, ny, nz});
@@ -240,7 +240,7 @@ void TestSourceEstimateTypes::testVolumeToVolume()
     QVERIFY(std::abs(flat[0] - 1.0) < 1e-10);
     QVERIFY(std::abs(flat[5] - 3.0) < 1e-10);
     QVERIFY(std::abs(flat[13] - 5.0) < 1e-10);
-    QVERIFY(std::abs(flat[1]) < 1e-10);  // Inactive voxel
+    QVERIFY(std::abs(flat[1]) < 1e-10); // Inactive voxel
 }
 
 //=============================================================================================================

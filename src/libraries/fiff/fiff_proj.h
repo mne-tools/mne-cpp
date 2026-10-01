@@ -75,13 +75,13 @@ class FiffRawData;
  * the @c info['projs'] list and are combined into one projection
  * operator by @c make_projector when raw / evoked data is loaded.
  */
-class FIFFSHARED_EXPORT FiffProj {
-
+class FIFFSHARED_EXPORT FiffProj
+{
 public:
-    using SPtr = QSharedPointer<FiffProj>;            /**< Shared pointer type for FiffProj. */
-    using ConstSPtr = QSharedPointer<const FiffProj>; /**< Const shared pointer type for FiffProj. */
-    using UPtr = std::unique_ptr<FiffProj>;             /**< Unique pointer type for FiffProj. */
-    using ConstUPtr = std::unique_ptr<const FiffProj>;  /**< Const unique pointer type for FiffProj. */
+    using SPtr = QSharedPointer<FiffProj>;             /**< Shared pointer type for FiffProj. */
+    using ConstSPtr = QSharedPointer<const FiffProj>;  /**< Const shared pointer type for FiffProj. */
+    using UPtr = std::unique_ptr<FiffProj>;            /**< Unique pointer type for FiffProj. */
+    using ConstUPtr = std::unique_ptr<const FiffProj>; /**< Const unique pointer type for FiffProj. */
 
     //=========================================================================================================
     /**
@@ -136,7 +136,7 @@ public:
      *
      * @param[in, out] p_qListFiffProj  activates projectors in place.
      */
-    static void activate_projs(QList<FiffProj> &p_qListFiffProj);
+    static void activate_projs(QList<FiffProj>& p_qListFiffProj);
 
     //=========================================================================================================
     /**
@@ -179,15 +179,15 @@ public:
      *
      * @return List of FiffProj items, or empty list on failure.
      */
-    static QList<FiffProj> compute_from_raw(const FiffRawData &raw,
-                                            const Eigen::MatrixXi &events,
+    static QList<FiffProj> compute_from_raw(const FiffRawData& raw,
+                                            const Eigen::MatrixXi& events,
                                             int eventCode,
                                             float tmin,
                                             float tmax,
                                             int nGrad,
                                             int nMag,
                                             int nEeg,
-                                            const QMap<QString,double> &mapReject = QMap<QString,double>());
+                                            const QMap<QString, double>& mapReject = QMap<QString, double>());
 
     //=========================================================================================================
     /**
@@ -198,21 +198,21 @@ public:
      *
      * @return the stream with the attached fiff projector.
      */
-    friend std::ostream& operator<<(std::ostream& out, const FIFFLIB::FiffProj &p_FiffProj);
+    friend std::ostream& operator<<(std::ostream& out, const FIFFLIB::FiffProj& p_FiffProj);
 
 public:
-    fiff_int_t kind;                /**< Fiff kind. */
-    bool active;                    /**< If fiff projector active. */
-    QString desc;                   /**< Projector description. */
+    fiff_int_t kind; /**< Fiff kind. */
+    bool active;     /**< If fiff projector active. */
+    QString desc;    /**< Projector description. */
 
-    FiffNamedMatrix::SDPtr data;    /**< Projector data, rows are equal to the length of channels. */
+    FiffNamedMatrix::SDPtr data; /**< Projector data, rows are equal to the length of channels. */
 };
 
 //=============================================================================================================
 // INLINE DEFINITIONS
 //=============================================================================================================
 
-inline std::ostream& operator<<(std::ostream& out, const FIFFLIB::FiffProj &p_FiffProj)
+inline std::ostream& operator<<(std::ostream& out, const FIFFLIB::FiffProj& p_FiffProj)
 {
     out << "#### Fiff Projector ####\n";
     out << "\tKind: " << p_FiffProj.kind << std::endl;

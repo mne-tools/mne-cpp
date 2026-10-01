@@ -55,7 +55,7 @@ public:
      *
      * @param [in] parent pointer to parent widget; If parent is 0, the new FilterPlotScene becomes a window. If parent is another widget, FilterPlotScene becomes a child window inside parent. FilterPlotScene is deleted when its parent is deleted.
      */
-    FilterPlotScene(QObject *parent = 0);
+    FilterPlotScene(QObject* parent = 0);
 
     //=========================================================================================================
     /**
@@ -105,20 +105,19 @@ protected:
      */
     void plotFilterPhaseResponse(int xOffset, int diagramWidth);
 
-    QSharedPointer<SessionFilter>       m_pCurrentFilter;       /**< Pointer to the current session filter. */
+    QSharedPointer<SessionFilter> m_pCurrentFilter; /**< Pointer to the current session filter. */
 
-    QGraphicsPathItem*                  m_pGraphicsItemPath;    /**< Pointer to the graphics path item in the filterplotscene */
+    QGraphicsPathItem* m_pGraphicsItemPath; /**< Pointer to the graphics path item in the filterplotscene */
 
-    int             m_iScalingFactor;           /**< Scales the db filter magnitudes by the specified factor in order to provide better plotting. */
-    double          m_dMaxMagnitude;            /**< the maximum magnirutde shown in the diagram. */
-    int             m_iNumberHorizontalLines;   /**< number of plotted horizontal ()lines. */
-    int             m_iNumberVerticalLines;     /**< number of plotted vertical lines. */
-    int             m_iAxisTextSize;            /**< point size of the plotted text. */
-    int             m_iDiagramMarginsHoriz;     /**< horizontal space between the filter and diagram plot.  */
-    int             m_iDiagramMarginsVert;      /**< vertical space between the filter and diagram plot. */
-    int             m_iDiagramSpacing;          /**< Horizontal spacing between magnitude and phase panels. */
-    int             m_iCutOffMarkerWidth;       /**< cut off marker width. */
-
+    int m_iScalingFactor;         /**< Scales the db filter magnitudes by the specified factor in order to provide better plotting. */
+    double m_dMaxMagnitude;       /**< the maximum magnirutde shown in the diagram. */
+    int m_iNumberHorizontalLines; /**< number of plotted horizontal ()lines. */
+    int m_iNumberVerticalLines;   /**< number of plotted vertical lines. */
+    int m_iAxisTextSize;          /**< point size of the plotted text. */
+    int m_iDiagramMarginsHoriz;   /**< horizontal space between the filter and diagram plot.  */
+    int m_iDiagramMarginsVert;    /**< vertical space between the filter and diagram plot. */
+    int m_iDiagramSpacing;        /**< Horizontal spacing between magnitude and phase panels. */
+    int m_iCutOffMarkerWidth;     /**< cut off marker width. */
 };
 
 } // NAMESPACE MNEBROWSE

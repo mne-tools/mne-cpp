@@ -48,13 +48,15 @@ class QDoubleSpinBox;
 class QSpinBox;
 class QGridLayout;
 
-namespace Ui {
-    class AverageSettingsViewWidget;
+namespace Ui
+{
+class AverageSettingsViewWidget;
 }
 
-namespace FIFFLIB {
-    class FiffEvokedSet;
-    class FiffChInfo;
+namespace FIFFLIB
+{
+class FiffEvokedSet;
+class FiffChInfo;
 }
 
 //=============================================================================================================
@@ -81,12 +83,12 @@ class DISPSHARED_EXPORT ArtifactSettingsView : public AbstractView
     Q_OBJECT
 
 public:
-    typedef QSharedPointer<ArtifactSettingsView> SPtr;         /**< Shared pointer type for AveragingAdjustmentWidget. */
-    typedef QSharedPointer<ArtifactSettingsView> ConstSPtr;    /**< Const shared pointer type for AveragingAdjustmentWidget. */
+    typedef QSharedPointer<ArtifactSettingsView> SPtr;      /**< Shared pointer type for AveragingAdjustmentWidget. */
+    typedef QSharedPointer<ArtifactSettingsView> ConstSPtr; /**< Const shared pointer type for AveragingAdjustmentWidget. */
 
     explicit ArtifactSettingsView(const QString& sSettingsPath = "",
                                   const QList<FIFFLIB::FiffChInfo>& fiffChInfoList = QList<FIFFLIB::FiffChInfo>(),
-                                  QWidget *parent = Q_NULLPTR);
+                                  QWidget* parent = Q_NULLPTR);
 
     //=========================================================================================================
     /**
@@ -96,9 +98,9 @@ public:
 
     void setChInfo(const QList<FIFFLIB::FiffChInfo>& fiffChInfoList);
 
-    QMap<QString,double> getThresholdMap();
+    QMap<QString, double> getThresholdMap();
 
-    void setThresholdMap(const QMap<QString,double>& mapThresholds);
+    void setThresholdMap(const QMap<QString, double>& mapThresholds);
 
     bool getDoArtifactThresholdRejection();
 
@@ -145,21 +147,21 @@ protected:
 
     void onChangeArtifactThreshold();
 
-    QMap<QString,QDoubleSpinBox*>   m_mapChThresholdsDoubleSpinBoxes;
-    QMap<QString,QSpinBox*>         m_mapChThresholdsSpinBoxes;
+    QMap<QString, QDoubleSpinBox*> m_mapChThresholdsDoubleSpinBoxes;
+    QMap<QString, QSpinBox*> m_mapChThresholdsSpinBoxes;
 
-    QMap<QString,double>            m_mapThresholdsFirst;
-    QMap<QString,int>               m_mapThresholdsSecond;
-    QMap<QString,double>            m_mapThresholds;
+    QMap<QString, double> m_mapThresholdsFirst;
+    QMap<QString, int> m_mapThresholdsSecond;
+    QMap<QString, double> m_mapThresholds;
 
-    QList<FIFFLIB::FiffChInfo>      m_fiffChInfoList;
+    QList<FIFFLIB::FiffChInfo> m_fiffChInfoList;
 
-    bool                            m_bDoArtifactThresholdReduction;
+    bool m_bDoArtifactThresholdReduction;
 
-    QPointer<QCheckBox>             m_pArtifactRejectionCheckBox;
+    QPointer<QCheckBox> m_pArtifactRejectionCheckBox;
 
 signals:
-    void changeArtifactThreshold(const QMap<QString,double>& mapThresholds);
+    void changeArtifactThreshold(const QMap<QString, double>& mapThresholds);
 };
 } // NAMESPACE
 

@@ -34,7 +34,7 @@
 class DISP3DSHARED_EXPORT BemTreeItem : public AbstractTreeItem
 {
 public:
-    explicit BemTreeItem(const QString &text = "", const MNELIB::MNEBemSurface &bemSurf = MNELIB::MNEBemSurface());
+    explicit BemTreeItem(const QString& text = "", const MNELIB::MNEBemSurface& bemSurf = MNELIB::MNEBemSurface());
     virtual ~BemTreeItem() = default;
 
     const MNELIB::MNEBemSurface& bemSurfaceData() const;

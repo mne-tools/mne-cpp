@@ -47,12 +47,18 @@ using namespace UTILSLIB;
 static QString coilClassName(int coilClass)
 {
     switch (coilClass) {
-    case FWD_COILC_MAG:         return "MAG";
-    case FWD_COILC_AXIAL_GRAD:  return "AXIAL_GRAD";
-    case FWD_COILC_PLANAR_GRAD: return "PLANAR_GRAD";
-    case FWD_COILC_AXIAL_GRAD2: return "AXIAL_GRAD2";
-    case FWD_COILC_EEG:         return "EEG";
-    default:                    return "UNKNOWN";
+        case FWD_COILC_MAG:
+            return "MAG";
+        case FWD_COILC_AXIAL_GRAD:
+            return "AXIAL_GRAD";
+        case FWD_COILC_PLANAR_GRAD:
+            return "PLANAR_GRAD";
+        case FWD_COILC_AXIAL_GRAD2:
+            return "AXIAL_GRAD2";
+        case FWD_COILC_EEG:
+            return "EEG";
+        default:
+            return "UNKNOWN";
     }
 }
 
@@ -61,16 +67,20 @@ static QString coilClassName(int coilClass)
 static QString accuracyName(int acc)
 {
     switch (acc) {
-    case FWD_COIL_ACCURACY_POINT:    return "point";
-    case FWD_COIL_ACCURACY_NORMAL:   return "normal";
-    case FWD_COIL_ACCURACY_ACCURATE: return "accurate";
-    default:                         return "unknown";
+        case FWD_COIL_ACCURACY_POINT:
+            return "point";
+        case FWD_COIL_ACCURACY_NORMAL:
+            return "normal";
+        case FWD_COIL_ACCURACY_ACCURATE:
+            return "accurate";
+        default:
+            return "unknown";
     }
 }
 
 //=============================================================================================================
 
-int main(int argc, char *argv[])
+int main(int argc, char* argv[])
 {
     qInstallMessageHandler(MNELogger::customLogWriter);
     QCoreApplication app(argc, argv);

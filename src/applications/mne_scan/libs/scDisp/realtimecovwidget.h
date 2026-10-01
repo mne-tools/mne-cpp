@@ -43,17 +43,20 @@ class QTime;
 class QVBoxLayout;
 class QLabel;
 
-namespace FIFFLIB {
-    class FiffInfo;
+namespace FIFFLIB
+{
+class FiffInfo;
 }
 
-namespace SCMEASLIB {
-    class RealTimeCov;
+namespace SCMEASLIB
+{
+class RealTimeCov;
 }
 
-namespace DISPLIB {
-    class ModalitySelectionView;
-    class ImageSc;
+namespace DISPLIB
+{
+class ModalitySelectionView;
+class ImageSc;
 }
 
 //=============================================================================================================
@@ -85,7 +88,7 @@ public:
      * @param[in] pTime         pointer to application time.
      * @param[in] parent        pointer to parent widget; If parent is 0, the new NumericWidget becomes a window. If parent is another widget, NumericWidget becomes a child window inside parent. NumericWidget is deleted when its parent is deleted.
      */
-    RealTimeCovWidget(QSharedPointer<QTime> &pTime,
+    RealTimeCovWidget(QSharedPointer<QTime>& pTime,
                       QWidget* parent = 0);
 
     //=========================================================================================================
@@ -98,7 +101,9 @@ public:
     /**
      * Initialise the MeasurementWidget.
      */
-    virtual void init(){}
+    virtual void init()
+    {
+    }
 
     //=========================================================================================================
     /**
@@ -121,18 +126,18 @@ protected:
      */
     void onNewModalitySelection(const QMap<QString, bool>& modalityMap);
 
-    QSharedPointer<SCMEASLIB::RealTimeCov>  m_pRTC;                                 /**< The real-time covariance measurement. */
+    QSharedPointer<SCMEASLIB::RealTimeCov> m_pRTC; /**< The real-time covariance measurement. */
 
-    QPointer<QVBoxLayout>                   m_pRtcLayout;                           /**< Widget layout. */
-    QPointer<QLabel>                        m_pLabelInit;                           /**< Initialization label. */
+    QPointer<QVBoxLayout> m_pRtcLayout; /**< Widget layout. */
+    QPointer<QLabel> m_pLabelInit;      /**< Initialization label. */
 
-    QSharedPointer<FIFFLIB::FiffInfo>       m_pFiffInfo;                            /**< The Fiff Info. */
+    QSharedPointer<FIFFLIB::FiffInfo> m_pFiffInfo; /**< The Fiff Info. */
 
-    QMap<QString, bool>                     m_modalityMap;                          /**< Map of different modalities. */
+    QMap<QString, bool> m_modalityMap; /**< Map of different modalities. */
 
-    QPointer<DISPLIB::ImageSc>              m_pImageSc;                             /**< The covariance colormap. */
+    QPointer<DISPLIB::ImageSc> m_pImageSc; /**< The covariance colormap. */
 
-    QList<qint32>                           m_qListSelChannel;                      /**< The channel list generated from the selected modalities. */
+    QList<qint32> m_qListSelChannel; /**< The channel list generated from the selected modalities. */
 };
 } // NAMESPACE
 

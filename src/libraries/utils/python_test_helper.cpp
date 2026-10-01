@@ -80,13 +80,15 @@ double PythonTestHelper::evalDouble(const QString& code, bool* ok, int timeoutMs
 {
     PythonRunnerResult result = eval(code, timeoutMs);
     if (!result.success) {
-        if (ok) *ok = false;
+        if (ok)
+            *ok = false;
         return 0.0;
     }
 
     bool parseOk = false;
     double value = result.stdOut.trimmed().toDouble(&parseOk);
-    if (ok) *ok = parseOk;
+    if (ok)
+        *ok = parseOk;
     return parseOk ? value : 0.0;
 }
 
@@ -96,14 +98,16 @@ VectorXd PythonTestHelper::evalVector(const QString& code, bool* ok, int timeout
 {
     PythonRunnerResult result = eval(code, timeoutMs);
     if (!result.success) {
-        if (ok) *ok = false;
+        if (ok)
+            *ok = false;
         return VectorXd();
     }
 
     // Parse stdout: one value per line, or space-separated on one line
     QString output = result.stdOut.trimmed();
     if (output.isEmpty()) {
-        if (ok) *ok = false;
+        if (ok)
+            *ok = false;
         return VectorXd();
     }
 
@@ -117,7 +121,8 @@ VectorXd PythonTestHelper::evalVector(const QString& code, bool* ok, int timeout
             bool parseOk = false;
             double val = token.toDouble(&parseOk);
             if (!parseOk) {
-                if (ok) *ok = false;
+                if (ok)
+                    *ok = false;
                 return VectorXd();
             }
             values.append(val);
@@ -129,7 +134,8 @@ VectorXd PythonTestHelper::evalVector(const QString& code, bool* ok, int timeout
         vec(i) = values[i];
     }
 
-    if (ok) *ok = true;
+    if (ok)
+        *ok = true;
     return vec;
 }
 
@@ -139,13 +145,15 @@ MatrixXd PythonTestHelper::evalMatrix(const QString& code, bool* ok, int timeout
 {
     PythonRunnerResult result = eval(code, timeoutMs);
     if (!result.success) {
-        if (ok) *ok = false;
+        if (ok)
+            *ok = false;
         return MatrixXd();
     }
 
     QString output = result.stdOut.trimmed();
     if (output.isEmpty()) {
-        if (ok) *ok = false;
+        if (ok)
+            *ok = false;
         return MatrixXd();
     }
 
@@ -159,7 +167,8 @@ MatrixXd PythonTestHelper::evalMatrix(const QString& code, bool* ok, int timeout
         if (nCols < 0) {
             nCols = tokens.size();
         } else if (tokens.size() != nCols) {
-            if (ok) *ok = false;
+            if (ok)
+                *ok = false;
             return MatrixXd();
         }
 
@@ -168,7 +177,8 @@ MatrixXd PythonTestHelper::evalMatrix(const QString& code, bool* ok, int timeout
             bool parseOk = false;
             double val = token.toDouble(&parseOk);
             if (!parseOk) {
-                if (ok) *ok = false;
+                if (ok)
+                    *ok = false;
                 return MatrixXd();
             }
             row.append(val);
@@ -177,7 +187,8 @@ MatrixXd PythonTestHelper::evalMatrix(const QString& code, bool* ok, int timeout
     }
 
     if (nCols <= 0) {
-        if (ok) *ok = false;
+        if (ok)
+            *ok = false;
         return MatrixXd();
     }
 
@@ -188,15 +199,16 @@ MatrixXd PythonTestHelper::evalMatrix(const QString& code, bool* ok, int timeout
         }
     }
 
-    if (ok) *ok = true;
+    if (ok)
+        *ok = true;
     return mat;
 }
 
 //=============================================================================================================
 
 PythonRunnerResult PythonTestHelper::runScript(const QString& scriptPath,
-                                                const QStringList& args,
-                                                int timeoutMs) const
+                                               const QStringList& args,
+                                               int timeoutMs) const
 {
     Q_UNUSED(timeoutMs);
     return m_runner.run(scriptPath, args);
@@ -232,7 +244,8 @@ bool PythonTestHelper::writeMatrix(const QString& filePath, const MatrixXd& mat)
 
     for (int r = 0; r < mat.rows(); ++r) {
         for (int c = 0; c < mat.cols(); ++c) {
-            if (c > 0) out << ' ';
+            if (c > 0)
+                out << ' ';
             out << mat(r, c);
         }
         out << '\n';
@@ -248,7 +261,8 @@ MatrixXd PythonTestHelper::readMatrix(const QString& filePath, bool* ok)
 {
     QFile file(filePath);
     if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
-        if (ok) *ok = false;
+        if (ok)
+            *ok = false;
         return MatrixXd();
     }
 
@@ -258,13 +272,15 @@ MatrixXd PythonTestHelper::readMatrix(const QString& filePath, bool* ok)
 
     while (!in.atEnd()) {
         QString line = in.readLine().trimmed();
-        if (line.isEmpty()) continue;
+        if (line.isEmpty())
+            continue;
 
         QStringList tokens = line.split(QRegularExpression("\\s+"), Qt::SkipEmptyParts);
         if (nCols < 0) {
             nCols = tokens.size();
         } else if (tokens.size() != nCols) {
-            if (ok) *ok = false;
+            if (ok)
+                *ok = false;
             return MatrixXd();
         }
 
@@ -273,7 +289,8 @@ MatrixXd PythonTestHelper::readMatrix(const QString& filePath, bool* ok)
             bool parseOk = false;
             double val = token.toDouble(&parseOk);
             if (!parseOk) {
-                if (ok) *ok = false;
+                if (ok)
+                    *ok = false;
                 return MatrixXd();
             }
             row.append(val);
@@ -284,7 +301,8 @@ MatrixXd PythonTestHelper::readMatrix(const QString& filePath, bool* ok)
     file.close();
 
     if (rowData.isEmpty() || nCols <= 0) {
-        if (ok) *ok = false;
+        if (ok)
+            *ok = false;
         return MatrixXd();
     }
 
@@ -295,20 +313,22 @@ MatrixXd PythonTestHelper::readMatrix(const QString& filePath, bool* ok)
         }
     }
 
-    if (ok) *ok = true;
+    if (ok)
+        *ok = true;
     return mat;
 }
 
 //=============================================================================================================
 
 MatrixXd PythonTestHelper::evalMatrixViaFile(const QString& code,
-                                              const QString& outputFilePath,
-                                              bool* ok,
-                                              int timeoutMs) const
+                                             const QString& outputFilePath,
+                                             bool* ok,
+                                             int timeoutMs) const
 {
     PythonRunnerResult result = eval(code, timeoutMs);
     if (!result.success) {
-        if (ok) *ok = false;
+        if (ok)
+            *ok = false;
         return MatrixXd();
     }
 

@@ -48,12 +48,12 @@ namespace INVLIB
  */
 struct INVSHARED_EXPORT InvCMNESettings
 {
-    QString onnxModelPath;          /**< Path to trained LSTM model (.onnx). */
-    int lookBack = 80;              /**< k: number of past time steps. */
-    int numSources = 5124;          /**< n_s: must match model input dim. */
-    double lambda2 = 1.0 / 9.0;    /**< Tikhonov regularisation (SNR=3 -> lambda^2=1/9). */
-    int method = 1;                 /**< 0=MNE, 1=dSPM (default), 2=sLORETA. */
-    double looseOriConstraint = 0.2;/**< Orientation constraint. */
+    QString onnxModelPath;           /**< Path to trained LSTM model (.onnx). */
+    int lookBack = 80;               /**< k: number of past time steps. */
+    int numSources = 5124;           /**< n_s: must match model input dim. */
+    double lambda2 = 1.0 / 9.0;      /**< Tikhonov regularisation (SNR=3 -> lambda^2=1/9). */
+    int method = 1;                  /**< 0=MNE, 1=dSPM (default), 2=sLORETA. */
+    double looseOriConstraint = 0.2; /**< Orientation constraint. */
 };
 
 } // namespace INVLIB

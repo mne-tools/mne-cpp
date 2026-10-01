@@ -32,8 +32,7 @@ QJsonObject objectSchema(const QJsonObject& properties,
     return QJsonObject{
         {"type", "object"},
         {"properties", properties},
-        {"required", required}
-    };
+        {"required", required}};
 }
 
 QJsonObject stringSchema(const QString& title,
@@ -42,14 +41,13 @@ QJsonObject stringSchema(const QString& title,
 {
     QJsonObject schema{
         {"type", "string"},
-        {"title", title}
-    };
+        {"title", title}};
 
-    if(!values.isEmpty()) {
+    if (!values.isEmpty()) {
         schema.insert("enum", values);
     }
 
-    if(!defaultValue.isEmpty()) {
+    if (!defaultValue.isEmpty()) {
         schema.insert("default", defaultValue);
     }
 
@@ -66,8 +64,7 @@ QJsonObject integerSchema(const QString& title,
         {"title", title},
         {"minimum", minimum},
         {"maximum", maximum},
-        {"default", defaultValue}
-    };
+        {"default", defaultValue}};
 }
 
 } // namespace
@@ -82,8 +79,8 @@ bool ViewProviderRegistry::loadFromDirectory(const QString& directoryPath, QStri
     m_manifests.clear();
 
     QFileInfo info(directoryPath);
-    if(!info.exists() || !info.isDir()) {
-        if(errorMessage) {
+    if (!info.exists() || !info.isDir()) {
+        if (errorMessage) {
             *errorMessage = QString("Extension directory not found: %1").arg(directoryPath);
         }
         return false;
@@ -101,11 +98,11 @@ bool ViewProviderRegistry::loadFromDirectory(const QString& directoryPath, QStri
                     QStringList() << "manifest.json",
                     QDir::Files | QDir::NoDotAndDotDot,
                     QDirIterator::Subdirectories);
-    while(it.hasNext()) {
+    while (it.hasNext()) {
         const QString manifestPath = it.next();
         QString parseError;
         const ExtensionManifest manifest = parser.parseFile(manifestPath, &parseError);
-        if(manifest.isValid()) {
+        if (manifest.isValid()) {
             QStringList manifestErrors;
             const QString manifestLabel = QString("%1 (%2)").arg(manifest.id, manifestPath);
 
@@ -120,11 +117,11 @@ bool ViewProviderRegistry::loadFromDirectory(const QString& directoryPath, QStri
                                                                                const QString& kind,
                                                                                const QString& id) {
                 const QString trimmedId = id.trimmed();
-                if(trimmedId.isEmpty()) {
+                if (trimmedId.isEmpty()) {
                     return;
                 }
 
-                if(localOrigins.contains(trimmedId)) {
+                if (localOrigins.contains(trimmedId)) {
                     manifestErrors.append(QString("Duplicate %1 `%2` declared twice inside %3.")
                                               .arg(kind, trimmedId, manifestLabel));
                     return;
@@ -133,7 +130,7 @@ bool ViewProviderRegistry::loadFromDirectory(const QString& directoryPath, QStri
                 localOrigins.insert(trimmedId, manifestLabel);
             };
 
-            if(manifestOrigins.contains(manifest.id)) {
+            if (manifestOrigins.contains(manifest.id)) {
                 noteDuplicate(QStringLiteral("extension id"), manifest.id, manifestOrigins.value(manifest.id));
             }
 
@@ -142,39 +139,39 @@ bool ViewProviderRegistry::loadFromDirectory(const QString& directoryPath, QStri
             QHash<QString, QString> localRendererOrigins;
             QHash<QString, QString> localPipelineOrigins;
 
-            for(const ViewProviderContribution& provider : manifest.viewProviders) {
+            for (const ViewProviderContribution& provider : manifest.viewProviders) {
                 const QString providerId = provider.id.trimmed();
                 checkLocalDuplicate(localProviderOrigins, QStringLiteral("view provider id"), providerId);
-                if(!providerId.isEmpty() && providerOrigins.contains(providerId)) {
+                if (!providerId.isEmpty() && providerOrigins.contains(providerId)) {
                     noteDuplicate(QStringLiteral("view provider id"), providerId, providerOrigins.value(providerId));
                 }
             }
 
-            for(const ToolContribution& tool : manifest.tools) {
+            for (const ToolContribution& tool : manifest.tools) {
                 const QString toolName = tool.name.trimmed();
                 checkLocalDuplicate(localToolOrigins, QStringLiteral("tool name"), toolName);
-                if(!toolName.isEmpty() && toolOrigins.contains(toolName)) {
+                if (!toolName.isEmpty() && toolOrigins.contains(toolName)) {
                     noteDuplicate(QStringLiteral("tool name"), toolName, toolOrigins.value(toolName));
                 }
             }
 
-            for(const ResultRendererContribution& renderer : manifest.resultRenderers) {
+            for (const ResultRendererContribution& renderer : manifest.resultRenderers) {
                 const QString rendererId = renderer.id.trimmed();
                 checkLocalDuplicate(localRendererOrigins, QStringLiteral("result renderer id"), rendererId);
-                if(!rendererId.isEmpty() && rendererOrigins.contains(rendererId)) {
+                if (!rendererId.isEmpty() && rendererOrigins.contains(rendererId)) {
                     noteDuplicate(QStringLiteral("result renderer id"), rendererId, rendererOrigins.value(rendererId));
                 }
             }
 
-            for(const AnalysisPipelineContribution& pipeline : manifest.analysisPipelines) {
+            for (const AnalysisPipelineContribution& pipeline : manifest.analysisPipelines) {
                 const QString pipelineId = pipeline.id.trimmed();
                 checkLocalDuplicate(localPipelineOrigins, QStringLiteral("analysis pipeline id"), pipelineId);
-                if(!pipelineId.isEmpty() && pipelineOrigins.contains(pipelineId)) {
+                if (!pipelineId.isEmpty() && pipelineOrigins.contains(pipelineId)) {
                     noteDuplicate(QStringLiteral("analysis pipeline id"), pipelineId, pipelineOrigins.value(pipelineId));
                 }
             }
 
-            if(!manifestErrors.isEmpty()) {
+            if (!manifestErrors.isEmpty()) {
                 errors.append(manifestErrors.join(" | "));
                 continue;
             }
@@ -182,36 +179,36 @@ bool ViewProviderRegistry::loadFromDirectory(const QString& directoryPath, QStri
             m_manifests.append(manifest);
 
             manifestOrigins.insert(manifest.id, manifestLabel);
-            for(const ViewProviderContribution& provider : manifest.viewProviders) {
+            for (const ViewProviderContribution& provider : manifest.viewProviders) {
                 const QString providerId = provider.id.trimmed();
-                if(!providerId.isEmpty()) {
+                if (!providerId.isEmpty()) {
                     providerOrigins.insert(providerId, manifestLabel);
                 }
             }
-            for(const ToolContribution& tool : manifest.tools) {
+            for (const ToolContribution& tool : manifest.tools) {
                 const QString toolName = tool.name.trimmed();
-                if(!toolName.isEmpty()) {
+                if (!toolName.isEmpty()) {
                     toolOrigins.insert(toolName, manifestLabel);
                 }
             }
-            for(const ResultRendererContribution& renderer : manifest.resultRenderers) {
+            for (const ResultRendererContribution& renderer : manifest.resultRenderers) {
                 const QString rendererId = renderer.id.trimmed();
-                if(!rendererId.isEmpty()) {
+                if (!rendererId.isEmpty()) {
                     rendererOrigins.insert(rendererId, manifestLabel);
                 }
             }
-            for(const AnalysisPipelineContribution& pipeline : manifest.analysisPipelines) {
+            for (const AnalysisPipelineContribution& pipeline : manifest.analysisPipelines) {
                 const QString pipelineId = pipeline.id.trimmed();
-                if(!pipelineId.isEmpty()) {
+                if (!pipelineId.isEmpty()) {
                     pipelineOrigins.insert(pipelineId, manifestLabel);
                 }
             }
-        } else if(!parseError.isEmpty()) {
+        } else if (!parseError.isEmpty()) {
             errors.append(parseError);
         }
     }
 
-    if(errorMessage && !errors.isEmpty()) {
+    if (errorMessage && !errors.isEmpty()) {
         *errorMessage = errors.join(" | ");
     }
 
@@ -236,8 +233,8 @@ bool ViewProviderRegistry::isExtensionEnabled(const QString& extensionId) const
 QVector<ExtensionManifest> ViewProviderRegistry::manifests() const
 {
     QVector<ExtensionManifest> enabledManifests;
-    for(const ExtensionManifest& manifest : m_manifests) {
-        if(isExtensionEnabled(manifest.id)) {
+    for (const ExtensionManifest& manifest : m_manifests) {
+        if (isExtensionEnabled(manifest.id)) {
             enabledManifests.append(manifest);
         }
     }
@@ -253,24 +250,18 @@ QVector<ExtensionManifest> ViewProviderRegistry::allManifests() const
 QJsonArray ViewProviderRegistry::toolDefinitions() const
 {
     QJsonArray tools;
-    for(const ExtensionManifest& manifest : manifests()) {
-        for(const ToolContribution& tool : manifest.tools) {
+    for (const ExtensionManifest& manifest : manifests()) {
+        for (const ToolContribution& tool : manifest.tools) {
             tools.append(annotatePlannerMetadata(QJsonObject{
-                {"name", tool.name},
-                {"description", tool.description},
-                {"input_schema", tool.inputSchema},
-                {"result_schema", tool.resultSchema},
-                {"capability_id", QStringLiteral("tool:%1").arg(tool.name.trimmed())},
-                {"capability_kind", QStringLiteral("extension_tool")},
-                {"extension_id", manifest.id},
-                {"extension_display_name", manifest.displayName}
-            },
-            false,
-            QStringLiteral("medium"),
-            QStringLiteral("Extension-contributed tools may have side effects that require explicit user intent."),
-            QStringLiteral("suggestion_only"),
-            QStringLiteral("Extension-contributed tools should be suggested rather than auto-executed."),
-            false));
+                                                     {"name", tool.name},
+                                                     {"description", tool.description},
+                                                     {"input_schema", tool.inputSchema},
+                                                     {"result_schema", tool.resultSchema},
+                                                     {"capability_id", QStringLiteral("tool:%1").arg(tool.name.trimmed())},
+                                                     {"capability_kind", QStringLiteral("extension_tool")},
+                                                     {"extension_id", manifest.id},
+                                                     {"extension_display_name", manifest.displayName}},
+                                                 false, QStringLiteral("medium"), QStringLiteral("Extension-contributed tools may have side effects that require explicit user intent."), QStringLiteral("suggestion_only"), QStringLiteral("Extension-contributed tools should be suggested rather than auto-executed."), false));
         }
     }
 
@@ -281,10 +272,10 @@ QJsonArray ViewProviderRegistry::analysisPipelineToolDefinitions() const
 {
     QJsonArray tools;
     const QJsonArray pipelines = analysisPipelineDefinitions();
-    for(const QJsonValue& value : pipelines) {
+    for (const QJsonValue& value : pipelines) {
         const QJsonObject pipeline = value.toObject();
         const QString pipelineId = pipeline.value("id").toString().trimmed();
-        if(pipelineId.isEmpty()) {
+        if (pipelineId.isEmpty()) {
             continue;
         }
 
@@ -293,39 +284,22 @@ QJsonArray ViewProviderRegistry::analysisPipelineToolDefinitions() const
         const QJsonObject expectedOutputSchema = pipeline.value("output_schema").toObject();
 
         tools.append(annotateCapabilityMetadata(annotatePlannerMetadata(QJsonObject{
-            {"name", pipelineRunAliasToolName(pipelineId)},
-            {"display_name", displayName},
-            {"description", pipeline.value("description").toString().trimmed().isEmpty()
-                                ? QString("Run the analysis pipeline `%1`.").arg(displayName)
-                                : pipeline.value("description").toString().trimmed()},
-            {"input_schema", inputSchema.isEmpty() ? objectSchema(QJsonObject()) : inputSchema},
-            {"result_schema", objectSchema(QJsonObject{
-                 {"status", stringSchema("Status", QJsonArray{"queued", "error"})},
-                 {"pipeline_id", stringSchema("Pipeline ID", QJsonArray(), pipelineId)},
-                 {"run_id", stringSchema("Run ID")},
-                 {"queued_steps", integerSchema("Queued Steps", 0, 1000, pipeline.value("steps").toArray().size())}
-             }, QJsonArray{"status", "pipeline_id", "queued_steps"})},
-            {"pipeline_id", pipelineId},
-            {"pipeline_run_tool", QStringLiteral("studio.pipeline.run")},
-            {"steps", pipeline.value("steps").toArray()},
-            {"follow_up_actions", pipeline.value("follow_up_actions").toArray()},
-            {"expected_output_schema", expectedOutputSchema},
-            {"extension_id", pipeline.value("extension_id").toString()},
-            {"extension_display_name", pipeline.value("extension_display_name").toString()},
-            {"capability_kind", QStringLiteral("analysis_pipeline")},
-            {"capability_id", QStringLiteral("pipeline:%1").arg(pipelineId)},
-            {"capability_aliases", QJsonArray::fromStringList(QStringList()
-                 << pipelineId
-                 << QStringLiteral("studio.pipeline.run"))}
-        },
-        true,
-        QStringLiteral("medium"),
-        QStringLiteral("Runs a manifest-declared analysis pipeline against the active dataset."),
-        QStringLiteral("confirm_required"),
-        QStringLiteral("Pipeline execution changes workspace state and should be surfaced before execution."),
-        false,
-        QJsonArray{QStringLiteral("analysis_pipeline_contract"), QStringLiteral("active_raw_browser")},
-        QJsonObject{{"planner_validate_analysis_pipeline", true}})));
+                                                                            {"name", pipelineRunAliasToolName(pipelineId)},
+                                                                            {"display_name", displayName},
+                                                                            {"description", pipeline.value("description").toString().trimmed().isEmpty() ? QString("Run the analysis pipeline `%1`.").arg(displayName) : pipeline.value("description").toString().trimmed()},
+                                                                            {"input_schema", inputSchema.isEmpty() ? objectSchema(QJsonObject()) : inputSchema},
+                                                                            {"result_schema", objectSchema(QJsonObject{{"status", stringSchema("Status", QJsonArray{"queued", "error"})}, {"pipeline_id", stringSchema("Pipeline ID", QJsonArray(), pipelineId)}, {"run_id", stringSchema("Run ID")}, {"queued_steps", integerSchema("Queued Steps", 0, 1000, pipeline.value("steps").toArray().size())}}, QJsonArray{"status", "pipeline_id", "queued_steps"})},
+                                                                            {"pipeline_id", pipelineId},
+                                                                            {"pipeline_run_tool", QStringLiteral("studio.pipeline.run")},
+                                                                            {"steps", pipeline.value("steps").toArray()},
+                                                                            {"follow_up_actions", pipeline.value("follow_up_actions").toArray()},
+                                                                            {"expected_output_schema", expectedOutputSchema},
+                                                                            {"extension_id", pipeline.value("extension_id").toString()},
+                                                                            {"extension_display_name", pipeline.value("extension_display_name").toString()},
+                                                                            {"capability_kind", QStringLiteral("analysis_pipeline")},
+                                                                            {"capability_id", QStringLiteral("pipeline:%1").arg(pipelineId)},
+                                                                            {"capability_aliases", QJsonArray::fromStringList(QStringList() << pipelineId << QStringLiteral("studio.pipeline.run"))}},
+                                                                        true, QStringLiteral("medium"), QStringLiteral("Runs a manifest-declared analysis pipeline against the active dataset."), QStringLiteral("confirm_required"), QStringLiteral("Pipeline execution changes workspace state and should be surfaced before execution."), false, QJsonArray{QStringLiteral("analysis_pipeline_contract"), QStringLiteral("active_raw_browser")}, QJsonObject{{"planner_validate_analysis_pipeline", true}})));
     }
 
     return tools;
@@ -334,8 +308,8 @@ QJsonArray ViewProviderRegistry::analysisPipelineToolDefinitions() const
 QJsonArray ViewProviderRegistry::resultRendererDefinitions() const
 {
     QJsonArray renderers;
-    for(const ExtensionManifest& manifest : manifests()) {
-        for(const ResultRendererContribution& renderer : manifest.resultRenderers) {
+    for (const ExtensionManifest& manifest : manifests()) {
+        for (const ResultRendererContribution& renderer : manifest.resultRenderers) {
             renderers.append(QJsonObject{
                 {"id", renderer.id},
                 {"display_name", renderer.displayName},
@@ -346,8 +320,7 @@ QJsonArray ViewProviderRegistry::resultRendererDefinitions() const
                 {"runtime_context_schema", renderer.runtimeContextSchema},
                 {"history_schema", renderer.historySchema},
                 {"extension_id", manifest.id},
-                {"extension_display_name", manifest.displayName}
-            });
+                {"extension_display_name", manifest.displayName}});
         }
     }
 
@@ -357,8 +330,8 @@ QJsonArray ViewProviderRegistry::resultRendererDefinitions() const
 QJsonArray ViewProviderRegistry::analysisPipelineDefinitions() const
 {
     QJsonArray pipelines;
-    for(const ExtensionManifest& manifest : manifests()) {
-        for(const AnalysisPipelineContribution& pipeline : manifest.analysisPipelines) {
+    for (const ExtensionManifest& manifest : manifests()) {
+        for (const AnalysisPipelineContribution& pipeline : manifest.analysisPipelines) {
             pipelines.append(QJsonObject{
                 {"id", pipeline.id},
                 {"display_name", pipeline.displayName},
@@ -369,12 +342,9 @@ QJsonArray ViewProviderRegistry::analysisPipelineDefinitions() const
                 {"follow_up_actions", pipeline.followUpActions},
                 {"capability_id", QStringLiteral("pipeline:%1").arg(pipeline.id)},
                 {"capability_kind", QStringLiteral("analysis_pipeline")},
-                {"capability_aliases", QJsonArray::fromStringList(QStringList()
-                     << pipeline.id
-                     << "studio.pipeline.run")},
+                {"capability_aliases", QJsonArray::fromStringList(QStringList() << pipeline.id << "studio.pipeline.run")},
                 {"extension_id", manifest.id},
-                {"extension_display_name", manifest.displayName}
-            });
+                {"extension_display_name", manifest.displayName}});
         }
     }
 
@@ -386,9 +356,9 @@ QJsonObject ViewProviderRegistry::providerForFile(const QString& filePath, const
     Q_UNUSED(metadata)
 
     const QString extension = QString(".%1").arg(QFileInfo(filePath).suffix().toLower());
-    for(const ExtensionManifest& manifest : manifests()) {
-        for(const ViewProviderContribution& provider : manifest.viewProviders) {
-            if(provider.fileExtensions.contains(extension)) {
+    for (const ExtensionManifest& manifest : manifests()) {
+        for (const ViewProviderContribution& provider : manifest.viewProviders) {
+            if (provider.fileExtensions.contains(extension)) {
                 return QJsonObject{
                     {"extension_id", manifest.id},
                     {"extension_display_name", manifest.displayName},
@@ -396,8 +366,7 @@ QJsonObject ViewProviderRegistry::providerForFile(const QString& filePath, const
                     {"provider_display_name", provider.displayName},
                     {"widget_type", provider.widgetType},
                     {"slot", provider.slot},
-                    {"supports_scene_merging", provider.supportsSceneMerging}
-                };
+                    {"supports_scene_merging", provider.supportsSceneMerging}};
             }
         }
     }

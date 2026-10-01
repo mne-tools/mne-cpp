@@ -48,7 +48,8 @@
 // DEFINE NAMESPACE HPILIBE
 //=============================================================================================================
 
-namespace INVLIB {
+namespace INVLIB
+{
 
 //=============================================================================================================
 // HPILIBE FORWARD DECLARATIONS
@@ -82,9 +83,9 @@ public:
     * @param[in] bBasic          Create a basic model without line frequeny or not.
     */
     explicit InvHpiModelParameters(const QVector<int> vecHpiFreqs,
-                                const int iSampleFreq,
-                                const int iLineFreq,
-                                const bool bBasic);
+                                   const int iSampleFreq,
+                                   const int iLineFreq,
+                                   const bool bBasic);
 
     //=========================================================================================================
     /**
@@ -92,13 +93,13 @@ public:
      *
      * @param[in] hpiModelParameter   InvHpiModelParameters which should be copied.
      */
-    InvHpiModelParameters(const InvHpiModelParameters &hpiModelParameter);
+    InvHpiModelParameters(const InvHpiModelParameters& hpiModelParameter);
 
     //=========================================================================================================
 
-    InvHpiModelParameters operator= (const InvHpiModelParameters& other);
-    inline bool operator== (const InvHpiModelParameters &b) const;
-    inline bool operator!= (const InvHpiModelParameters &b) const;
+    InvHpiModelParameters operator=(const InvHpiModelParameters& other);
+    inline bool operator==(const InvHpiModelParameters& b) const;
+    inline bool operator!=(const InvHpiModelParameters& b) const;
 
     //=========================================================================================================
     /**
@@ -172,7 +173,7 @@ inline bool InvHpiModelParameters::bBasic() const
 
 //=============================================================================================================
 
-inline bool InvHpiModelParameters::operator== (const InvHpiModelParameters &b) const
+inline bool InvHpiModelParameters::operator==(const InvHpiModelParameters& b) const
 {
     return (this->vecHpiFreqs() == b.vecHpiFreqs() &&
             this->iNHpiCoils() == b.iNHpiCoils() &&
@@ -183,12 +184,11 @@ inline bool InvHpiModelParameters::operator== (const InvHpiModelParameters &b) c
 
 //=============================================================================================================
 
-inline bool InvHpiModelParameters::operator!= (const InvHpiModelParameters &b) const
+inline bool InvHpiModelParameters::operator!=(const InvHpiModelParameters& b) const
 {
-    return !(*this==b);
+    return !(*this == b);
 }
 
 } // namespace INVLIBE
 
 #endif // INV_HPI_MODEL_PARAMETERS_H
-

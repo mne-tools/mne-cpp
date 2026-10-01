@@ -49,12 +49,14 @@
 
 class QListWidgetItem;
 
-namespace Ui {
-    class ChannelSelectionViewWidget;
+namespace Ui
+{
+class ChannelSelectionViewWidget;
 } //This must be defined outside of the DISPLIB namespace
 
-namespace FIFFLIB {
-    class FiffInfo;
+namespace FIFFLIB
+{
+class FiffInfo;
 }
 
 //=============================================================================================================
@@ -85,8 +87,8 @@ class DISPSHARED_EXPORT ChannelSelectionView : public AbstractView
     Q_OBJECT
 
 public:
-    typedef QSharedPointer<ChannelSelectionView> SPtr;              /**< Shared pointer type for ChannelSelectionView. */
-    typedef QSharedPointer<const ChannelSelectionView> ConstSPtr;   /**< Const shared pointer type for ChannelSelectionView. */
+    typedef QSharedPointer<ChannelSelectionView> SPtr;            /**< Shared pointer type for ChannelSelectionView. */
+    typedef QSharedPointer<const ChannelSelectionView> ConstSPtr; /**< Const shared pointer type for ChannelSelectionView. */
 
     //=========================================================================================================
     /**
@@ -98,7 +100,7 @@ public:
      * @param[in] f Qt window flags passed to the QWidget constructor.
      */
     ChannelSelectionView(const QString& sSettingsPath = "",
-                         QWidget *parent = 0,
+                         QWidget* parent = 0,
                          QSharedPointer<ChannelInfoModel> pChannelInfoModel = QSharedPointer<ChannelInfoModel>(0),
                          Qt::WindowType f = Qt::Widget);
 
@@ -115,7 +117,7 @@ public:
      *
      * @param[in] mappedLayoutChNames the currently to layout mapped channels.
      */
-    void setCurrentlyMappedFiffChannels(const QStringList &mappedLayoutChNames);
+    void setCurrentlyMappedFiffChannels(const QStringList& mappedLayoutChNames);
 
     //=========================================================================================================
     /**
@@ -153,7 +155,7 @@ public:
      *
      * @return Matching list item, or a newly allocated empty item owned by the caller if none matches.
      */
-    QListWidgetItem* getItemForChName(QListWidget *listWidget,
+    QListWidgetItem* getItemForChName(QListWidget* listWidget,
                                       const QString& channelName);
 
     //=========================================================================================================
@@ -162,7 +164,7 @@ public:
      *
      * @return Map from channel name to its 2-D layout position.
      */
-    const QMap<QString,QPointF>& getLayoutMap();
+    const QMap<QString, QPointF>& getLayoutMap();
 
     //=========================================================================================================
     /**
@@ -391,22 +393,22 @@ private:
      * Installed event filter.
      *
      */
-    bool eventFilter(QObject *obj, QEvent *event);
+    bool eventFilter(QObject* obj, QEvent* event);
 
-    Ui::ChannelSelectionViewWidget*     m_pUi;                              /**< Pointer to the qt designer generated ui class. */
+    Ui::ChannelSelectionViewWidget* m_pUi; /**< Pointer to the qt designer generated ui class. */
 
-    QSharedPointer<ChannelInfoModel>    m_pChannelInfoModel;                /**< Pointer to the channel info model. */
+    QSharedPointer<ChannelInfoModel> m_pChannelInfoModel; /**< Pointer to the channel info model. */
 
-    QMap<QString,QPointF>               m_layoutMap;                        /**< QMap with the loaded layout. each channel name correspond to a QPointF variable. */
-    QMultiMap<QString,QStringList>      m_selectionGroupsMap;               /**< QMultiMap with the loaded selection groups. Each group name holds a string list with the corresponding channels of the group.*/
+    QMap<QString, QPointF> m_layoutMap;                   /**< QMap with the loaded layout. each channel name correspond to a QPointF variable. */
+    QMultiMap<QString, QStringList> m_selectionGroupsMap; /**< QMultiMap with the loaded selection groups. Each group name holds a string list with the corresponding channels of the group.*/
 
-    SelectionScene*                     m_pSelectionScene;                  /**< Pointer to the selection scene class. */
+    SelectionScene* m_pSelectionScene; /**< Pointer to the selection scene class. */
 
-    QStringList                         m_currentlyLoadedFiffChannels;      /**< List of currently loaded fiff data channels.*/
+    QStringList m_currentlyLoadedFiffChannels; /**< List of currently loaded fiff data channels.*/
 
-    QString                             m_sSettingsPath;                    /**< The settings path to store the GUI settings to. */
+    QString m_sSettingsPath; /**< The settings path to store the GUI settings to. */
 
-    bool                                m_bSetup;
+    bool m_bSetup;
 signals:
     //=========================================================================================================
     /**
@@ -422,7 +424,7 @@ signals:
      *
      * @param[in] selectedChannelItems currently user selected channels.
      */
-    void selectionChanged(const QList<QGraphicsItem*> &selectedChannelItems);
+    void selectionChanged(const QList<QGraphicsItem*>& selectedChannelItems);
 
     //=========================================================================================================
     /**
@@ -430,7 +432,7 @@ signals:
      *
      * @param[in] layoutMap currently loaded layout.
      */
-    void loadedLayoutMap(const QMap<QString,QPointF> &layoutMap);
+    void loadedLayoutMap(const QMap<QString, QPointF>& layoutMap);
 };
 } // NAMESPACE DISPLIB
 

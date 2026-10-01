@@ -33,7 +33,8 @@
 // DEFINE NAMESPACE UTILSLIB
 //=============================================================================================================
 
-namespace UTILSLIB {
+namespace UTILSLIB
+{
 
 //=============================================================================================================
 /**
@@ -41,8 +42,8 @@ namespace UTILSLIB {
  */
 enum class StimArtifactMode
 {
-    Linear,     /**< Linear interpolation across the artifact window. */
-    Window      /**< Zero-pad (set to zero) the artifact window. */
+    Linear, /**< Linear interpolation across the artifact window. */
+    Window  /**< Zero-pad (set to zero) the artifact window. */
 };
 
 //=============================================================================================================
@@ -66,12 +67,12 @@ enum class StimArtifactMode
  *                             Default: StimArtifactMode::Linear.
  */
 DSPSHARED_EXPORT void fixStimArtifact(Eigen::MatrixXd& data,
-                                       const Eigen::MatrixXi& events,
-                                       double sfreq,
-                                       int eventId = -1,
-                                       double tmin = 0.0,
-                                       double tmax = 0.01,
-                                       StimArtifactMode mode = StimArtifactMode::Linear);
+                                      const Eigen::MatrixXi& events,
+                                      double sfreq,
+                                      int eventId = -1,
+                                      double tmin = 0.0,
+                                      double tmax = 0.01,
+                                      StimArtifactMode mode = StimArtifactMode::Linear);
 
 } // namespace UTILSLIB
 

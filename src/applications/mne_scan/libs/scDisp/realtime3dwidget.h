@@ -51,17 +51,20 @@ class NetworkTreeItem;
 class BemTreeItem;
 class DigitizerSetTreeItem;
 
-namespace SCMEASLIB {
-    class RealTimeConnectivityEstimate;
+namespace SCMEASLIB
+{
+class RealTimeConnectivityEstimate;
 }
 
-namespace DISPLIB {
-    class QuickControlView;
-    class Control3DView;
+namespace DISPLIB
+{
+class QuickControlView;
+class Control3DView;
 }
 
-namespace FIFFLIB {
-    class FiffDigPointSet;
+namespace FIFFLIB
+{
+class FiffDigPointSet;
 }
 
 //=============================================================================================================
@@ -87,8 +90,8 @@ class SCDISPSHARED_EXPORT RealTime3DWidget : public MeasurementWidget
     Q_OBJECT
 
 public:
-    typedef QSharedPointer<RealTime3DWidget> SPtr;             /**< Shared pointer type for RealTime3DWidget class. */
-    typedef QSharedPointer<const RealTime3DWidget> ConstSPtr;  /**< Const shared pointer type for RealTime3DWidget class. */
+    typedef QSharedPointer<RealTime3DWidget> SPtr;            /**< Shared pointer type for RealTime3DWidget class. */
+    typedef QSharedPointer<const RealTime3DWidget> ConstSPtr; /**< Const shared pointer type for RealTime3DWidget class. */
 
     //=========================================================================================================
     /**
@@ -108,7 +111,9 @@ public:
     /**
      * Initialise the MeasurementWidget.
      */
-    virtual void init(){}
+    virtual void init()
+    {
+    }
 
     //=========================================================================================================
     /**
@@ -119,7 +124,6 @@ public:
     virtual void update(SCMEASLIB::Measurement::SPtr pMeasurement);
 
 protected:
-
     //=========================================================================================================
     /**
      * Call this function whenever the digitizer changed and you want to align fiducials.
@@ -176,25 +180,25 @@ protected:
      */
     void createGUI();
 
-    QString                                                     m_sFilePathDigitizers;  /**< Path to loaded fiff file with digitizer data. */
-    QSharedPointer<FIFFLIB::FiffDigitizerData>                  m_pFiffDigitizerData;   /**< Fiff digitizer data for current measurement. */
+    QString m_sFilePathDigitizers;                                   /**< Path to loaded fiff file with digitizer data. */
+    QSharedPointer<FIFFLIB::FiffDigitizerData> m_pFiffDigitizerData; /**< Fiff digitizer data for current measurement. */
 
-    int                                                         m_iNumberBadChannels;   /**< The last received number of bad channels. */
+    int m_iNumberBadChannels; /**< The last received number of bad channels. */
 
-    FSLIB::FsAnnotationSet                                        m_annotationSet;        /**< The current annotation set. */
-    FSLIB::FsSurfaceSet                                           m_surfSet;              /**< The current surface set. */
+    FSLIB::FsAnnotationSet m_annotationSet; /**< The current annotation set. */
+    FSLIB::FsSurfaceSet m_surfSet;          /**< The current surface set. */
 
-    QMatrix4x4                                                  m_tAlignment;           /**< Transformation matrix alignment fiducials/tracked in head space. */
-    FIFFLIB::FiffCoordTrans                                     m_mriHeadTrans;         /**< The mri to head transformation. */
+    QMatrix4x4 m_tAlignment;                /**< Transformation matrix alignment fiducials/tracked in head space. */
+    FIFFLIB::FiffCoordTrans m_mriHeadTrans; /**< The mri to head transformation. */
 
-    QSharedPointer<BrainTreeModel>                              m_pData3DModel;         /**< The Disp3D model. */
+    QSharedPointer<BrainTreeModel> m_pData3DModel; /**< The Disp3D model. */
 
-    DigitizerSetTreeItem*                                    m_pTrackedDigitizer;    /**< The 3D item pointing to the tracked digitizers. */
-    QPointer<BrainView>                                         m_p3DView;              /**< The Disp3D view. */
-    NetworkTreeItem*                                            m_pRtConnectivityItem;  /**< The Disp3D real time item. */
-    bool                                                        m_bRtSourceActive;      /**< Whether realtime source is active. */
-    BemTreeItem*                                                m_pBemHeadAvr;          /**< The fsaverage BEM head model. */
-    QPointer<QAction>                                           m_pActionQuickControl;  /**< Show quick control widget. */
+    DigitizerSetTreeItem* m_pTrackedDigitizer; /**< The 3D item pointing to the tracked digitizers. */
+    QPointer<BrainView> m_p3DView;             /**< The Disp3D view. */
+    NetworkTreeItem* m_pRtConnectivityItem;    /**< The Disp3D real time item. */
+    bool m_bRtSourceActive;                    /**< Whether realtime source is active. */
+    BemTreeItem* m_pBemHeadAvr;                /**< The fsaverage BEM head model. */
+    QPointer<QAction> m_pActionQuickControl;   /**< Show quick control widget. */
 };
 } // NAMESPACE
 

@@ -61,7 +61,8 @@ private slots:
         int nSamples = 200;
         MatrixXd data = MatrixXd::Zero(1, nSamples);
         // Rising edge at sample 50
-        for (int i = 50; i < 55; ++i) data(0, i) = 10.0;
+        for (int i = 50; i < 55; ++i)
+            data(0, i) = 10.0;
 
         QList<QPair<int, double>> triggers = detectTriggerFlanksGrad(
             data, 0, 0, 1.0, true, "Rising", 5);
@@ -73,7 +74,8 @@ private slots:
         int nSamples = 200;
         MatrixXd data = MatrixXd::Constant(1, nSamples, 10.0);
         // Falling edge at sample 50
-        for (int i = 50; i < nSamples; ++i) data(0, i) = 0.0;
+        for (int i = 50; i < nSamples; ++i)
+            data(0, i) = 0.0;
 
         QList<QPair<int, double>> triggers = detectTriggerFlanksGrad(
             data, 0, 0, 1.0, false, "Falling", 5);
@@ -84,7 +86,8 @@ private slots:
     {
         int nSamples = 200;
         MatrixXd data = MatrixXd::Zero(3, nSamples);
-        for (int i = 80; i < 85; ++i) data(2, i) = 10.0;
+        for (int i = 80; i < 85; ++i)
+            data(2, i) = 10.0;
 
         QList<int> triggerChannels;
         triggerChannels << 2;
@@ -99,7 +102,7 @@ private slots:
         QMap<int, QList<QPair<int, double>>> mapTriggers;
         QList<QPair<int, double>> ch0Triggers;
         ch0Triggers << QPair<int, double>(100, 5.0)
-                     << QPair<int, double>(200, 10.0);
+                    << QPair<int, double>(200, 10.0);
         mapTriggers[0] = ch0Triggers;
 
         QList<MatrixXi> events = toEventMatrix(mapTriggers);
@@ -187,13 +190,13 @@ private slots:
     void testFilterKernelLPF()
     {
         FilterKernel fk("TestLPF",
-                        0, // LPF type
-                        64, // filter order
-                        0.1, // center frequency (normed to sFreq/2)
-                        0.0, // bandwidth (ignored for LPF)
-                        0.01, // transition bandwidth
+                        0,      // LPF type
+                        64,     // filter order
+                        0.1,    // center frequency (normed to sFreq/2)
+                        0.0,    // bandwidth (ignored for LPF)
+                        0.01,   // transition bandwidth
                         1000.0, // sampling frequency
-                        0); // design method = Parks-McClellan
+                        0);     // design method = Parks-McClellan
 
         QCOMPARE(fk.getName(), QString("TestLPF"));
         QVERIFY(fk.getFilterOrder() > 0);
@@ -282,7 +285,8 @@ private slots:
         FilterKernel fk("LPF", 0, 64, 0.2, 0.0, 0.01, 1000.0, 0);
         // Provide explicit picks to avoid LinSpaced bug
         RowVectorXi picks(nCh);
-        for (int i = 0; i < nCh; ++i) picks(i) = i;
+        for (int i = 0; i < nCh; ++i)
+            picks(i) = i;
         MatrixXd filtered = filterData(data, fk, picks);
         QCOMPARE(filtered.rows(), nCh);
     }
@@ -295,7 +299,8 @@ private slots:
         FilterKernel fk("LPF", 0, 32, 0.2, 0.0, 0.01, 1000.0, 0);
         // Provide explicit picks to avoid LinSpaced bug with empty picks
         RowVectorXi picks(nCh);
-        for (int i = 0; i < nCh; ++i) picks(i) = i;
+        for (int i = 0; i < nCh; ++i)
+            picks(i) = i;
         MatrixXd filtered = filterDataBlock(data, picks, fk, false);
         QCOMPARE(filtered.rows(), nCh);
     }
@@ -310,14 +315,15 @@ private slots:
         for (int i = 0; i < nSamples; ++i) {
             double t = i / sFreq;
             data(0, i) = std::sin(2.0 * M_PI * 10.0 * t) +
-                         std::sin(2.0 * M_PI * 200.0 * t);
+                std::sin(2.0 * M_PI * 200.0 * t);
             data(1, i) = data(0, i);
             data(2, i) = data(0, i);
         }
 
         // Provide explicit picks to avoid LinSpaced bug in filterData
         RowVectorXi picks(nCh);
-        for (int i = 0; i < nCh; ++i) picks(i) = i;
+        for (int i = 0; i < nCh; ++i)
+            picks(i) = i;
 
         // Low-pass at 50 Hz
         MatrixXd filtered = filterData(data, 0, 50.0, 0.0, 5.0, sFreq, 128, 0, picks);
@@ -335,7 +341,8 @@ private slots:
 
         int nCh = 2;
         RowVectorXi picks(nCh);
-        for (int i = 0; i < nCh; ++i) picks(i) = i;
+        for (int i = 0; i < nCh; ++i)
+            picks(i) = i;
 
         // Process two blocks with explicit picks
         MatrixXd block1 = MatrixXd::Random(nCh, 256);

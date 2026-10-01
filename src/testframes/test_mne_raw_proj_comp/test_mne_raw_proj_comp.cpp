@@ -66,9 +66,18 @@ class TestMneRawProjComp : public QObject
 private:
     QString m_sTestDataPath;
 
-    QString rawPath() const { return m_sTestDataPath + "/MEG/sample/sample_audvis_trunc_raw.fif"; }
-    QString avePath() const { return m_sTestDataPath + "/MEG/sample/sample_audvis-ave.fif"; }
-    QString covPath() const { return m_sTestDataPath + "/MEG/sample/sample_audvis-cov.fif"; }
+    QString rawPath() const
+    {
+        return m_sTestDataPath + "/MEG/sample/sample_audvis_trunc_raw.fif";
+    }
+    QString avePath() const
+    {
+        return m_sTestDataPath + "/MEG/sample/sample_audvis-ave.fif";
+    }
+    QString covPath() const
+    {
+        return m_sTestDataPath + "/MEG/sample/sample_audvis-cov.fif";
+    }
 
 private slots:
     void initTestCase();
@@ -153,13 +162,14 @@ void TestMneRawProjComp::initTestCase()
 {
     qInstallMessageHandler(MNELogger::customLogWriter);
 
-    m_sTestDataPath = QCoreApplication::applicationDirPath()
-                      + "/../resources/data/mne-cpp-test-data";
+    m_sTestDataPath = QCoreApplication::applicationDirPath() + "/../resources/data/mne-cpp-test-data";
     QVERIFY2(QFile::exists(rawPath()),
              qPrintable(QString("Test data not found: %1").arg(rawPath())));
 }
 
-void TestMneRawProjComp::cleanupTestCase() {}
+void TestMneRawProjComp::cleanupTestCase()
+{
+}
 
 //=============================================================================================================
 // MNEFilterDef tests
@@ -271,7 +281,7 @@ void TestMneRawProjComp::rawBufDef_defaultConstruction()
     QCOMPARE(buf.ns, 0);
     QCOMPARE(buf.nchan, 0);
     QCOMPARE(buf.is_skip, 0);
-    QVERIFY(buf.vals.size() == 0);  // not loaded yet
+    QVERIFY(buf.vals.size() == 0); // not loaded yet
 }
 
 //=============================================================================================================
@@ -314,7 +324,6 @@ void TestMneRawProjComp::sssData_copyConstruction()
 
 void TestMneRawProjComp::sssData_readFromRawFile()
 {
-
     // SSS data may or may not be present in the test file
     auto sss = MNESssData::read(rawPath());
     // The test file is from Elekta Neuromag, should have SSS info
@@ -384,7 +393,6 @@ void TestMneRawProjComp::ctfCompDataSet_defaultConstruction()
 
 void TestMneRawProjComp::ctfCompDataSet_readFromRawFile()
 {
-
     auto compSet = MNECTFCompDataSet::read(rawPath());
     QVERIFY(compSet != nullptr);
     // Neuromag data typically has no CTF compensation but the read should succeed
@@ -393,7 +401,6 @@ void TestMneRawProjComp::ctfCompDataSet_readFromRawFile()
 
 void TestMneRawProjComp::ctfCompDataSet_makeCompensator()
 {
-
     auto compSet = MNECTFCompDataSet::read(rawPath());
     if (compSet && compSet->ncomp > 0) {
         QFile file(rawPath());
@@ -446,7 +453,7 @@ void TestMneRawProjComp::projOp_addItemAndDuplicate()
     vecs->rowlist << "proj1";
     vecs->collist << "ch1" << "ch2" << "ch3";
     vecs->data = MatrixXf(1, 3);
-    vecs->data << 1.0f/std::sqrt(3.0f), 1.0f/std::sqrt(3.0f), 1.0f/std::sqrt(3.0f);
+    vecs->data << 1.0f / std::sqrt(3.0f), 1.0f / std::sqrt(3.0f), 1.0f / std::sqrt(3.0f);
 
     proj.add_item(vecs.get(), FIFFV_MNE_PROJ_ITEM_EEG_AVREF, "Test EEG avg ref");
     QCOMPARE(proj.nitems, 1);
@@ -459,15 +466,13 @@ void TestMneRawProjComp::projOp_addItemAndDuplicate()
 
 void TestMneRawProjComp::projOp_readFromFile()
 {
-
     auto proj = MNEProjOp::read(rawPath());
     QVERIFY(proj != nullptr);
-    QVERIFY(proj->nitems > 0);  // Neuromag data should have SSP projectors
+    QVERIFY(proj->nitems > 0); // Neuromag data should have SSP projectors
 }
 
 void TestMneRawProjComp::projOp_assignChannelsAndMake()
 {
-
     auto proj = MNEProjOp::read(rawPath());
     QVERIFY(proj != nullptr);
 
@@ -489,7 +494,6 @@ void TestMneRawProjComp::projOp_assignChannelsAndMake()
 
 void TestMneRawProjComp::projOp_affectChannels()
 {
-
     auto proj = MNEProjOp::read(rawPath());
     QVERIFY(proj != nullptr);
 
@@ -502,7 +506,6 @@ void TestMneRawProjComp::projOp_affectChannels()
 
 void TestMneRawProjComp::projOp_createAvgEegRef()
 {
-
     QFile file(rawPath());
     FiffRawData rawData(file);
 
@@ -546,7 +549,6 @@ void TestMneRawProjComp::projOp_projectVector()
 
 void TestMneRawProjComp::projOp_report()
 {
-
     auto proj = MNEProjOp::read(rawPath());
     QVERIFY(proj != nullptr);
 
@@ -561,18 +563,20 @@ void TestMneRawProjComp::projOp_combine()
     MNEProjOp proj1, proj2;
 
     auto vecs1 = std::make_unique<MNENamedMatrix>();
-    vecs1->nrow = 1; vecs1->ncol = 2;
+    vecs1->nrow = 1;
+    vecs1->ncol = 2;
     vecs1->rowlist << "p1";
     vecs1->collist << "ch0" << "ch1";
     vecs1->data = MatrixXf::Ones(1, 2) / std::sqrt(2.0f);
     proj1.add_item(vecs1.get(), 1, "proj1");
 
     auto vecs2 = std::make_unique<MNENamedMatrix>();
-    vecs2->nrow = 1; vecs2->ncol = 2;
+    vecs2->nrow = 1;
+    vecs2->ncol = 2;
     vecs2->rowlist << "p2";
     vecs2->collist << "ch0" << "ch1";
     vecs2->data = MatrixXf(1, 2);
-    vecs2->data << 1.0f/std::sqrt(2.0f), -1.0f/std::sqrt(2.0f);
+    vecs2->data << 1.0f / std::sqrt(2.0f), -1.0f / std::sqrt(2.0f);
     proj2.add_item(vecs2.get(), 2, "proj2");
 
     MNEProjOp* combined = proj1.combine(&proj2);
@@ -594,7 +598,6 @@ void TestMneRawProjComp::rawInfo_defaultConstruction()
 
 void TestMneRawProjComp::rawInfo_loadFromFile()
 {
-
     std::unique_ptr<MNERawInfo> info;
     int result = MNERawInfo::load(rawPath(), 0, info);
     QCOMPARE(result, 0);
@@ -608,7 +611,6 @@ void TestMneRawProjComp::rawInfo_loadFromFile()
 
 void TestMneRawProjComp::rawInfo_findNodes()
 {
-
     QFile file(rawPath());
     FiffStream::SPtr stream(new FiffStream(&file));
     QVERIFY(stream->open());
@@ -632,7 +634,6 @@ void TestMneRawProjComp::rawInfo_findNodes()
 
 void TestMneRawProjComp::rawInfo_getMeasInfo()
 {
-
     QFile file(rawPath());
     FiffStream::SPtr stream(new FiffStream(&file));
     QVERIFY(stream->open());
@@ -676,7 +677,6 @@ void TestMneRawProjComp::rawData_defaultConstruction()
 
 void TestMneRawProjComp::rawData_openFile()
 {
-
     MNEFilterDef filter;
     std::unique_ptr<MNERawData> raw(
         MNERawData::open_file(rawPath(), 0, 0, filter));
@@ -690,7 +690,6 @@ void TestMneRawProjComp::rawData_openFile()
 
 void TestMneRawProjComp::rawData_openFileComp()
 {
-
     MNEFilterDef filter;
     // Open with explicit compensation grade 0
     std::unique_ptr<MNERawData> raw(
@@ -702,7 +701,6 @@ void TestMneRawProjComp::rawData_openFileComp()
 
 void TestMneRawProjComp::rawData_members()
 {
-
     MNEFilterDef filter;
     std::unique_ptr<MNERawData> raw(
         MNERawData::open_file(rawPath(), 0, 0, filter));
@@ -728,7 +726,6 @@ void TestMneRawProjComp::rawData_members()
 
 void TestMneRawProjComp::rawData_loadBuffer()
 {
-
     MNEFilterDef filter;
     std::unique_ptr<MNERawData> raw(
         MNERawData::open_file(rawPath(), 0, 0, filter));
@@ -737,14 +734,13 @@ void TestMneRawProjComp::rawData_loadBuffer()
 
     // Load first buffer
     int result = raw->load_one_buffer(&raw->bufs[0]);
-    QCOMPARE(result, 0);  // OK = 0
+    QCOMPARE(result, 0); // OK = 0
     // After loading, the buffer should have data
     QVERIFY(raw->bufs[0].vals.size() > 0);
 }
 
 void TestMneRawProjComp::rawData_pickData()
 {
-
     MNEFilterDef filter;
     std::unique_ptr<MNERawData> raw(
         MNERawData::open_file(rawPath(), 0, 0, filter));
@@ -773,18 +769,19 @@ void TestMneRawProjComp::rawData_pickData()
     bool hasNonZero = false;
     for (int ch = 0; ch < sel.nchan && !hasNonZero; ch++) {
         for (int s = 0; s < ns && !hasNonZero; s++) {
-            if (picked[ch][s] != 0.0f) hasNonZero = true;
+            if (picked[ch][s] != 0.0f)
+                hasNonZero = true;
         }
     }
     QVERIFY(hasNonZero);
 
-    for (int i = 0; i < sel.nchan; i++) delete[] picked[i];
+    for (int i = 0; i < sel.nchan; i++)
+        delete[] picked[i];
     delete[] picked;
 }
 
 void TestMneRawProjComp::rawData_setupFilterBufs()
 {
-
     MNEFilterDef filter;
     filter.filter_on = true;
     filter.size = 2048;
@@ -806,7 +803,6 @@ void TestMneRawProjComp::rawData_setupFilterBufs()
 
 void TestMneRawProjComp::rawData_compensateBuffer()
 {
-
     MNEFilterDef filter;
     std::unique_ptr<MNERawData> raw(
         MNERawData::open_file(rawPath(), 0, 0, filter));
@@ -925,7 +921,7 @@ void TestMneRawProjComp::measDataSet_getValuesAtTime()
     ds.np = 100;
     ds.nave = 1;
     ds.tmin = 0.0f;
-    ds.tstep = 0.01f;  // 100 Hz
+    ds.tstep = 0.01f; // 100 Hz
     ds.first = 0;
 
     int nch = 3;
@@ -960,7 +956,7 @@ void TestMneRawProjComp::measDataSet_getValuesFromChannelData()
     for (int c = 0; c < nch; c++) {
         data[c] = new float[nsamp];
         for (int s = 0; s < nsamp; s++) {
-            data[c][s] = static_cast<float>(c + 1) * 100.0f;  // constant per channel
+            data[c][s] = static_cast<float>(c + 1) * 100.0f; // constant per channel
         }
     }
 
@@ -971,7 +967,8 @@ void TestMneRawProjComp::measDataSet_getValuesFromChannelData()
     QVERIFY(qAbs(values[0] - 100.0f) < 1.0f);
     QVERIFY(qAbs(values[1] - 200.0f) < 1.0f);
 
-    for (int c = 0; c < nch; c++) delete[] data[c];
+    for (int c = 0; c < nch; c++)
+        delete[] data[c];
     delete[] data;
 }
 
@@ -991,11 +988,10 @@ void TestMneRawProjComp::measData_defaultConstruction()
 
 void TestMneRawProjComp::measData_readFromFile()
 {
-
     // Read evoked data from the ave file
     std::unique_ptr<MNEMeasData> md(
         MNEMeasData::mne_read_meas_data(avePath(), 0, nullptr, nullptr,
-                                         QStringList(), 0));
+                                        QStringList(), 0));
     if (md) {
         QVERIFY(md->nchan > 0);
         QVERIFY(md->sfreq > 0);
@@ -1006,10 +1002,9 @@ void TestMneRawProjComp::measData_readFromFile()
 
 void TestMneRawProjComp::measData_adjustBaselines()
 {
-
     std::unique_ptr<MNEMeasData> md(
         MNEMeasData::mne_read_meas_data(avePath(), 0, nullptr, nullptr,
-                                         QStringList(), 0));
+                                        QStringList(), 0));
     if (md && md->current) {
         // Store original data
         MatrixXf origData = md->current->data;

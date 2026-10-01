@@ -28,15 +28,15 @@
 #include <Eigen/Core>
 
 constexpr int FAIL = -1;
-constexpr int OK   =  0;
+constexpr int OK = 0;
 
 #define MNE_CTFV_COMP_UNKNOWN -1
-#define MNE_CTFV_COMP_NONE    0
-#define MNE_CTFV_COMP_G1BR    0x47314252
-#define MNE_CTFV_COMP_G2BR    0x47324252
-#define MNE_CTFV_COMP_G3BR    0x47334252
-#define MNE_CTFV_COMP_G2OI    0x47324f49
-#define MNE_CTFV_COMP_G3OI    0x47334f49
+#define MNE_CTFV_COMP_NONE 0
+#define MNE_CTFV_COMP_G1BR 0x47314252
+#define MNE_CTFV_COMP_G2BR 0x47324252
+#define MNE_CTFV_COMP_G3BR 0x47334252
+#define MNE_CTFV_COMP_G2OI 0x47324f49
+#define MNE_CTFV_COMP_G3OI 0x47334f49
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -51,28 +51,28 @@ using namespace MNELIB;
 //=============================================================================================================
 
 MNECTFCompData::MNECTFCompData()
-:kind(MNE_CTFV_COMP_UNKNOWN)
-,mne_kind(MNE_CTFV_COMP_UNKNOWN)
-,calibrated(false)
+: kind(MNE_CTFV_COMP_UNKNOWN)
+, mne_kind(MNE_CTFV_COMP_UNKNOWN)
+, calibrated(false)
 {
 }
 
 //=============================================================================================================
 
 MNECTFCompData::MNECTFCompData(const MNECTFCompData& comp)
-:kind(MNE_CTFV_COMP_UNKNOWN)
-,mne_kind(MNE_CTFV_COMP_UNKNOWN)
-,calibrated(false)
+: kind(MNE_CTFV_COMP_UNKNOWN)
+, mne_kind(MNE_CTFV_COMP_UNKNOWN)
+, calibrated(false)
 {
-    kind       = comp.kind;
-    mne_kind   = comp.mne_kind;
+    kind = comp.kind;
+    mne_kind = comp.mne_kind;
     calibrated = comp.calibrated;
     if (comp.data)
-        data       = std::make_unique<MNENamedMatrix>(*comp.data);
+        data = std::make_unique<MNENamedMatrix>(*comp.data);
     if (comp.presel)
-        presel     = std::make_unique<FiffSparseMatrix>(*comp.presel);
+        presel = std::make_unique<FiffSparseMatrix>(*comp.presel);
     if (comp.postsel)
-        postsel    = std::make_unique<FiffSparseMatrix>(*comp.postsel);
+        postsel = std::make_unique<FiffSparseMatrix>(*comp.postsel);
 }
 
 //=============================================================================================================
@@ -87,7 +87,7 @@ int MNECTFCompData::calibrate(const QList<FIFFLIB::FiffChInfo>& chs, int nch, bo
 {
     Eigen::VectorXf col_cals(this->data->ncol);
     Eigen::VectorXf row_cals(this->data->nrow);
-    int   j,k,p,found;
+    int j, k, p, found;
     QString name;
 
     if (calibrated)
@@ -97,13 +97,13 @@ int MNECTFCompData::calibrate(const QList<FIFFLIB::FiffChInfo>& chs, int nch, bo
         name = this->data->rowlist[j];
         found = false;
         for (p = 0; p < nch; p++)
-            if (QString::compare(name,chs[p].ch_name) == 0) {
-                row_cals[j] = chs[p].range*chs[p].cal;
+            if (QString::compare(name, chs[p].ch_name) == 0) {
+                row_cals[j] = chs[p].range * chs[p].cal;
                 found = true;
                 break;
             }
         if (!found) {
-            qCritical("Channel %s not found. Cannot calibrate the compensation matrix.",name.toUtf8().constData());
+            qCritical("Channel %s not found. Cannot calibrate the compensation matrix.", name.toUtf8().constData());
             return FAIL;
         }
     }
@@ -111,25 +111,24 @@ int MNECTFCompData::calibrate(const QList<FIFFLIB::FiffChInfo>& chs, int nch, bo
         name = this->data->collist[k];
         found = false;
         for (p = 0; p < nch; p++)
-            if (QString::compare(name,chs[p].ch_name) == 0) {
-                col_cals[k] = chs[p].range*chs[p].cal;
+            if (QString::compare(name, chs[p].ch_name) == 0) {
+                col_cals[k] = chs[p].range * chs[p].cal;
                 found = true;
                 break;
             }
         if (!found) {
-            qCritical("Channel %s not found. Cannot calibrate the compensation matrix.",name.toUtf8().constData());
+            qCritical("Channel %s not found. Cannot calibrate the compensation matrix.", name.toUtf8().constData());
             return FAIL;
         }
     }
     if (do_it) {
         for (j = 0; j < this->data->nrow; j++)
             for (k = 0; k < this->data->ncol; k++)
-                this->data->data(j, k) = row_cals[j]*this->data->data(j, k)/col_cals[k];
-    }
-    else {
+                this->data->data(j, k) = row_cals[j] * this->data->data(j, k) / col_cals[k];
+    } else {
         for (j = 0; j < this->data->nrow; j++)
             for (k = 0; k < this->data->ncol; k++)
-                this->data->data(j, k) = col_cals[k]*this->data->data(j, k)/row_cals[j];
+                this->data->data(j, k) = col_cals[k] * this->data->data(j, k) / row_cals[j];
     }
     return OK;
 }

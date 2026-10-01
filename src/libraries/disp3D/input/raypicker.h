@@ -53,20 +53,20 @@ class DipoleObject;
  */
 struct DISP3DSHARED_EXPORT PickResult
 {
-    bool    hit             = false;     ///< True if something was hit
-    float   distance        = 0.0f;     ///< Distance along ray to hit point
-    QVector3D hitPoint;                 ///< World-space intersection point
+    bool hit = false;      ///< True if something was hit
+    float distance = 0.0f; ///< Distance along ray to hit point
+    QVector3D hitPoint;    ///< World-space intersection point
 
-    QStandardItem *item     = nullptr;  ///< Tree item that was hit (nullable)
-    QString surfaceKey;                 ///< FsSurface map key of the hit surface
-    int     vertexIndex     = -1;       ///< Vertex or element index at hit
+    QStandardItem* item = nullptr; ///< Tree item that was hit (nullable)
+    QString surfaceKey;            ///< FsSurface map key of the hit surface
+    int vertexIndex = -1;          ///< Vertex or element index at hit
 
-    bool    isDipole        = false;    ///< True if a dipole was hit
-    int     dipoleIndex     = -1;       ///< Index within the dipole set
+    bool isDipole = false; ///< True if a dipole was hit
+    int dipoleIndex = -1;  ///< Index within the dipole set
 
     // FsAnnotation info (brain surfaces only)
-    QString regionName;                 ///< FsAnnotation region label (if available)
-    int     regionId        = -1;       ///< FsAnnotation label ID
+    QString regionName; ///< FsAnnotation region label (if available)
+    int regionId = -1;  ///< FsAnnotation label ID
 
     //=========================================================================================================
     /**
@@ -103,11 +103,11 @@ public:
      * @param[out] rayDir       Ray direction (normalised, world space).
      * @return                  True if the unproject succeeded.
      */
-    static bool unproject(const QPoint &screenPos,
-                          const QRect &paneRect,
-                          const QMatrix4x4 &pvm,
-                          QVector3D &rayOrigin,
-                          QVector3D &rayDir);
+    static bool unproject(const QPoint& screenPos,
+                          const QRect& paneRect,
+                          const QMatrix4x4& pvm,
+                          QVector3D& rayOrigin,
+                          QVector3D& rayDir);
 
     //=========================================================================================================
     /**
@@ -121,12 +121,12 @@ public:
      * @param[in] itemDipoleMap   Map of tree item → DipoleObject.
      * @return                    PickResult for the closest hit.
      */
-    static PickResult pick(const QVector3D &rayOrigin,
-                           const QVector3D &rayDir,
-                           const SubView &subView,
-                           const QMap<QString, std::shared_ptr<BrainSurface>> &surfaces,
-                           const QMap<const QStandardItem*, std::shared_ptr<BrainSurface>> &itemSurfaceMap,
-                           const QMap<const QStandardItem*, std::shared_ptr<DipoleObject>> &itemDipoleMap);
+    static PickResult pick(const QVector3D& rayOrigin,
+                           const QVector3D& rayDir,
+                           const SubView& subView,
+                           const QMap<QString, std::shared_ptr<BrainSurface>>& surfaces,
+                           const QMap<const QStandardItem*, std::shared_ptr<BrainSurface>>& itemSurfaceMap,
+                           const QMap<const QStandardItem*, std::shared_ptr<DipoleObject>>& itemDipoleMap);
 
     //=========================================================================================================
     /**
@@ -140,9 +140,9 @@ public:
      * @param[in] surfaces        FsSurface map for key-based lookup.
      * @return                    Display label string.
      */
-    static QString buildLabel(const PickResult &result,
-                              const QMap<const QStandardItem*, std::shared_ptr<BrainSurface>> &itemSurfaceMap,
-                              const QMap<QString, std::shared_ptr<BrainSurface>> &surfaces);
+    static QString buildLabel(const PickResult& result,
+                              const QMap<const QStandardItem*, std::shared_ptr<BrainSurface>>& itemSurfaceMap,
+                              const QMap<QString, std::shared_ptr<BrainSurface>>& surfaces);
 };
 
 #endif // RAYPICKER_H

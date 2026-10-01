@@ -40,7 +40,7 @@ FiffRawDir::FiffRawDir()
 
 //=============================================================================================================
 
-FiffRawDir::FiffRawDir(const FiffRawDir &p_FiffRawDir)
+FiffRawDir::FiffRawDir(const FiffRawDir& p_FiffRawDir)
 : ent(p_FiffRawDir.ent)
 , first(p_FiffRawDir.first)
 , last(p_FiffRawDir.last)

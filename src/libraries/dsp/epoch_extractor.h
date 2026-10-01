@@ -52,13 +52,13 @@ namespace UTILSLIB
 /** @brief Epoch extraction parameters (defined outside class to avoid Clang/GCC default-argument issues with nested structs). */
 struct DSPSHARED_EXPORT EpochExtractorParams
 {
-    double dTmin      = -0.2;   /**< Epoch start relative to event in seconds (negative = pre-stimulus). */
-    double dTmax      =  0.5;   /**< Epoch end relative to event in seconds. */
-    double dBaseMin   = -0.2;   /**< Baseline start in seconds (relative to event). */
-    double dBaseMax   =  0.0;   /**< Baseline end in seconds (relative to event). Set both to 0 to skip. */
-    double dThreshold =  0.0;   /**< Peak-to-peak amplitude rejection threshold (SI units, e.g. V or T).
+    double dTmin = -0.2;        /**< Epoch start relative to event in seconds (negative = pre-stimulus). */
+    double dTmax = 0.5;         /**< Epoch end relative to event in seconds. */
+    double dBaseMin = -0.2;     /**< Baseline start in seconds (relative to event). */
+    double dBaseMax = 0.0;      /**< Baseline end in seconds (relative to event). Set both to 0 to skip. */
+    double dThreshold = 0.0;    /**< Peak-to-peak amplitude rejection threshold (SI units, e.g. V or T).
                                      0 = no rejection. Applied per-channel across all channels. */
-    bool   bApplyBaseline = true; /**< Whether to apply baseline correction. */
+    bool bApplyBaseline = true; /**< Whether to apply baseline correction. */
 };
 
 //=============================================================================================================
@@ -107,11 +107,11 @@ public:
      * @return Vector of MNEEpochData (one per valid event).  Rejected epochs are included with
      *         MNEEpochData::bReject == true so callers can choose whether to exclude them.
      */
-    static QVector<MNELIB::MNEEpochData> extract(const Eigen::MatrixXd&  matData,
-                                                   const QVector<int>&     eventSamples,
-                                                   double                  dSFreq,
-                                                   const Params&           params     = Params(),
-                                                   const QVector<int>&     eventCodes = QVector<int>());
+    static QVector<MNELIB::MNEEpochData> extract(const Eigen::MatrixXd& matData,
+                                                 const QVector<int>& eventSamples,
+                                                 double dSFreq,
+                                                 const Params& params = Params(),
+                                                 const QVector<int>& eventCodes = QVector<int>());
 
     //=========================================================================================================
     /**

@@ -42,7 +42,7 @@ using namespace ANSHAREDLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-AnalyzeData::AnalyzeData(QObject *pParent)
+AnalyzeData::AnalyzeData(QObject* pParent)
 : QObject(pParent)
 , m_pData(new DISPLIB::BidsViewModel(this))
 {
@@ -57,15 +57,15 @@ AnalyzeData::~AnalyzeData()
 
 //=============================================================================================================
 
-QVector<QSharedPointer<AbstractModel> > AnalyzeData::getAllModels(QModelIndex parent) const
+QVector<QSharedPointer<AbstractModel>> AnalyzeData::getAllModels(QModelIndex parent) const
 {
-    QVector<QSharedPointer<AbstractModel> > lModels;
+    QVector<QSharedPointer<AbstractModel>> lModels;
     QList<QStandardItem*> lItemList;
 
     lItemList.append(getAllItems(parent));
 
-    for(QStandardItem* pItem : lItemList) {
-        if(QSharedPointer<AbstractModel> pModel = pItem->data().value<QSharedPointer<AbstractModel>>()) {
+    for (QStandardItem* pItem : lItemList) {
+        if (QSharedPointer<AbstractModel> pModel = pItem->data().value<QSharedPointer<AbstractModel>>()) {
             lModels.append(pModel);
         }
     }
@@ -74,17 +74,17 @@ QVector<QSharedPointer<AbstractModel> > AnalyzeData::getAllModels(QModelIndex pa
 
 //=============================================================================================================
 
-QVector<QSharedPointer<AbstractModel> > AnalyzeData::getModelsByType(MODEL_TYPE mtype,
-                                                                     QModelIndex parent) const
+QVector<QSharedPointer<AbstractModel>> AnalyzeData::getModelsByType(MODEL_TYPE mtype,
+                                                                    QModelIndex parent) const
 {
-    QVector<QSharedPointer<AbstractModel> > lModels;
+    QVector<QSharedPointer<AbstractModel>> lModels;
     QList<QStandardItem*> lItemList;
 
     lItemList.append(getAllItems(parent));
 
-    for(QStandardItem* pItem : lItemList) {
-        if(QSharedPointer<AbstractModel> pModel = pItem->data().value<QSharedPointer<AbstractModel>>()) {
-            if (pModel->getType() == mtype){
+    for (QStandardItem* pItem : lItemList) {
+        if (QSharedPointer<AbstractModel> pModel = pItem->data().value<QSharedPointer<AbstractModel>>()) {
+            if (pModel->getType() == mtype) {
                 lModels.append(pModel);
             }
         }
@@ -94,12 +94,12 @@ QVector<QSharedPointer<AbstractModel> > AnalyzeData::getModelsByType(MODEL_TYPE 
 
 //=============================================================================================================
 
-QSharedPointer<AbstractModel> AnalyzeData::getModelByName(const QString &sName) const
+QSharedPointer<AbstractModel> AnalyzeData::getModelByName(const QString& sName) const
 {
     QList<QStandardItem*> lItems = m_pData->findItems(sName, Qt::MatchRecursive);
 
-    if(!lItems.isEmpty()) {
-        return lItems.first()->data().value<QSharedPointer<AbstractModel> >();
+    if (!lItems.isEmpty()) {
+        return lItems.first()->data().value<QSharedPointer<AbstractModel>>();
     } else {
         return Q_NULLPTR;
     }
@@ -114,9 +114,9 @@ QSharedPointer<AbstractModel> AnalyzeData::getModelByPath(const QString& sPath,
 
     lItemList.append(getAllItems(parent));
 
-    for(QStandardItem* pItem : lItemList) {
-        if(QSharedPointer<AbstractModel> pModel = pItem->data().value<QSharedPointer<AbstractModel>>()) {
-            if(pItem->toolTip() == sPath){
+    for (QStandardItem* pItem : lItemList) {
+        if (QSharedPointer<AbstractModel> pModel = pItem->data().value<QSharedPointer<AbstractModel>>()) {
+            if (pItem->toolTip() == sPath) {
                 return pModel;
             }
         }
@@ -138,7 +138,7 @@ bool AnalyzeData::removeModel(const QModelIndex& index)
 {
     QVector<QSharedPointer<AbstractModel>> lModels = getAllModels(index);
 
-    for (QSharedPointer<AbstractModel> pModel : lModels){
+    for (QSharedPointer<AbstractModel> pModel : lModels) {
         m_pCommu->publishEvent(EVENT_TYPE::MODEL_REMOVED, QVariant::fromValue(pModel));
     }
 
@@ -150,16 +150,16 @@ bool AnalyzeData::removeModel(const QModelIndex& index)
 
 //=============================================================================================================
 
-QStandardItem* AnalyzeData::addSubject(const QString &sSubjectName)
+QStandardItem* AnalyzeData::addSubject(const QString& sSubjectName)
 {
     return m_pData->itemFromIndex(m_pData->addSubject(sSubjectName));
 }
 
 //=============================================================================================================
 
-void AnalyzeData::newSelection(const QModelIndex &index)
+void AnalyzeData::newSelection(const QModelIndex& index)
 {
-    switch(m_pData->itemFromIndex(index)->data(BIDS_ITEM_TYPE).value<int>()){
+    switch (m_pData->itemFromIndex(index)->data(BIDS_ITEM_TYPE).value<int>()) {
         case BIDS_UNKNOWN:
         case BIDS_FUNCTIONALDATA:
             m_SelectedFunctionalData = index;
@@ -177,10 +177,10 @@ QList<QStandardItem*> AnalyzeData::getAllItems(QModelIndex parent) const
 {
     QList<QStandardItem*> lItemList;
 
-    for(int iRow = 0; iRow < m_pData->rowCount(parent); ++iRow) {
+    for (int iRow = 0; iRow < m_pData->rowCount(parent); ++iRow) {
         QModelIndex index = m_pData->index(iRow, 0, parent);
         lItemList.append(m_pData->itemFromIndex(index));
-        if( m_pData->hasChildren(index) ) {
+        if (m_pData->hasChildren(index)) {
             lItemList.append(getAllItems(index));
         }
     }

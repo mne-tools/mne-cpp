@@ -44,11 +44,11 @@ using namespace FIFFLIB;
 MNEHemisphere::MNEHemisphere()
 : MNESourceSpace(0)
 , patch_inds(VectorXi::Zero(0))
-, tri_cent(MatrixX3d::Zero(0,3))
-, tri_nn(MatrixX3d::Zero(0,3))
+, tri_cent(MatrixX3d::Zero(0, 3))
+, tri_nn(MatrixX3d::Zero(0, 3))
 , tri_area(VectorXd::Zero(0))
-, use_tri_cent(MatrixX3d::Zero(0,3))
-, use_tri_nn(MatrixX3d::Zero(0,3))
+, use_tri_cent(MatrixX3d::Zero(0, 3))
+, use_tri_nn(MatrixX3d::Zero(0, 3))
 , use_tri_area(VectorXd::Zero(0))
 //, m_TriCoords()
 //, m_pGeometryData(NULL)
@@ -165,23 +165,21 @@ bool MNEHemisphere::complete_source_space_info()
     //   Main triangulation
     //
     qInfo("\tCompleting triangulation info...");
-    tri_cent = MatrixX3d::Zero(ntri,3);
-    tri_nn = MatrixX3d::Zero(ntri,3);
+    tri_cent = MatrixX3d::Zero(ntri, 3);
+    tri_nn = MatrixX3d::Zero(ntri, 3);
     tri_area = VectorXd::Zero(ntri);
 
     Matrix3d r;
     Vector3d a, b;
     int k = 0;
     float size = 0;
-    for (int i = 0; i < ntri; ++i)
-    {
-        for ( int j = 0; j < 3; ++j)
-        {
+    for (int i = 0; i < ntri; ++i) {
+        for (int j = 0; j < 3; ++j) {
             k = itris(i, j);
 
-            r(j,0) = rr(k, 0);
-            r(j,1) = rr(k, 1);
-            r(j,2) = rr(k, 2);
+            r(j, 0) = rr(k, 0);
+            r(j, 1) = rr(k, 1);
+            r(j, 2) = rr(k, 2);
 
             tri_cent(i, 0) += rr(k, 0);
             tri_cent(i, 1) += rr(k, 1);
@@ -190,19 +188,18 @@ bool MNEHemisphere::complete_source_space_info()
         tri_cent.row(i) /= 3.0f;
 
         //cross product {cross((r2-r1),(r3-r1))}
-        a = (r.row(1) - r.row(0 )).transpose();
+        a = (r.row(1) - r.row(0)).transpose();
         b = (r.row(2) - r.row(0)).transpose();
-        tri_nn(i,0) = a(1)*b(2)-a(2)*b(1);
-        tri_nn(i,1) = a(2)*b(0)-a(0)*b(2);
-        tri_nn(i,2) = a(0)*b(1)-a(1)*b(0);
+        tri_nn(i, 0) = a(1) * b(2) - a(2) * b(1);
+        tri_nn(i, 1) = a(2) * b(0) - a(0) * b(2);
+        tri_nn(i, 2) = a(0) * b(1) - a(1) * b(0);
 
         //area
-        size = tri_nn.row(i)*tri_nn.row(i).transpose();
-        size = std::pow(size, 0.5f );
+        size = tri_nn.row(i) * tri_nn.row(i).transpose();
+        size = std::pow(size, 0.5f);
 
-        tri_area(i) = size/2.0f;
+        tri_area(i) = size / 2.0f;
         tri_nn.row(i) /= size;
-
     }
     qInfo("[done]\n");
 
@@ -210,21 +207,18 @@ bool MNEHemisphere::complete_source_space_info()
     //   Selected triangles
     //
     qInfo("\tCompleting selection triangulation info...");
-    if (nuse_tri > 0)
-    {
-        use_tri_cent = MatrixX3d::Zero(nuse_tri,3);
-        use_tri_nn = MatrixX3d::Zero(nuse_tri,3);
+    if (nuse_tri > 0) {
+        use_tri_cent = MatrixX3d::Zero(nuse_tri, 3);
+        use_tri_nn = MatrixX3d::Zero(nuse_tri, 3);
         use_tri_area = VectorXd::Zero(nuse_tri);
 
-        for (int i = 0; i < nuse_tri; ++i)
-        {
-            for ( int j = 0; j < 3; ++j)
-            {
+        for (int i = 0; i < nuse_tri; ++i) {
+            for (int j = 0; j < 3; ++j) {
                 k = use_itris(i, j);
 
-                r(j,0) = rr(k, 0);
-                r(j,1) = rr(k, 1);
-                r(j,2) = rr(k, 2);
+                r(j, 0) = rr(k, 0);
+                r(j, 1) = rr(k, 1);
+                r(j, 2) = rr(k, 2);
 
                 use_tri_cent(i, 0) += rr(k, 0);
                 use_tri_cent(i, 1) += rr(k, 1);
@@ -233,19 +227,18 @@ bool MNEHemisphere::complete_source_space_info()
             use_tri_cent.row(i) /= 3.0f;
 
             //cross product {cross((r2-r1),(r3-r1))}
-            a = r.row(1) - r.row(0 );
+            a = r.row(1) - r.row(0);
             b = r.row(2) - r.row(0);
-            use_tri_nn(i,0) = a(1)*b(2)-a(2)*b(1);
-            use_tri_nn(i,1) = a(2)*b(0)-a(0)*b(2);
-            use_tri_nn(i,2) = a(0)*b(1)-a(1)*b(0);
+            use_tri_nn(i, 0) = a(1) * b(2) - a(2) * b(1);
+            use_tri_nn(i, 1) = a(2) * b(0) - a(0) * b(2);
+            use_tri_nn(i, 2) = a(0) * b(1) - a(1) * b(0);
 
             //area
-            size = use_tri_nn.row(i)*use_tri_nn.row(i).transpose();
-            size = std::pow(size, 0.5f );
+            size = use_tri_nn.row(i) * use_tri_nn.row(i).transpose();
+            size = std::pow(size, 0.5f);
 
-            use_tri_area(i) = size/2.0f;
+            use_tri_area(i) = size / 2.0f;
         }
-
     }
     qInfo("[done]\n");
 
@@ -260,23 +253,21 @@ bool MNEHemisphere::complete_source_space_info()
 
 bool MNEHemisphere::compute_patch_info()
 {
-    if (nearest.empty())
-    {
-       pinfo.clear();
-       patch_inds = VectorXi();
-       return false;
+    if (nearest.empty()) {
+        pinfo.clear();
+        patch_inds = VectorXi();
+        return false;
     }
 
     qInfo("\tComputing patch statistics...");
 
-    std::vector< std::pair<int,int> > t_vIndn;
+    std::vector<std::pair<int, int>> t_vIndn;
 
-    for(size_t i = 0; i < nearest.size(); ++i)
-    {
-        std::pair<int,int> t_pair(static_cast<int>(i), nearest[i].nearest);
+    for (size_t i = 0; i < nearest.size(); ++i) {
+        std::pair<int, int> t_pair(static_cast<int>(i), nearest[i].nearest);
         t_vIndn.push_back(t_pair);
     }
-    std::sort(t_vIndn.begin(),t_vIndn.end(), Linalg::compareIdxValuePairSmallerThan<int> );
+    std::sort(t_vIndn.begin(), t_vIndn.end(), Linalg::compareIdxValuePairSmallerThan<int>);
 
     VectorXi nearest_sorted(t_vIndn.size());
 
@@ -285,23 +276,20 @@ bool MNEHemisphere::compute_patch_info()
     t_vfirsti.push_back(current);
     std::vector<int> t_vlasti;
 
-    for(int i = 0; i < static_cast<int>(t_vIndn.size()); ++i)
-    {
+    for (int i = 0; i < static_cast<int>(t_vIndn.size()); ++i) {
         nearest_sorted[i] = t_vIndn[i].second;
-        if (t_vIndn[current].second != t_vIndn[i].second)
-        {
+        if (t_vIndn[current].second != t_vIndn[i].second) {
             current = i;
-            t_vlasti.push_back(i-1);
+            t_vlasti.push_back(i - 1);
             t_vfirsti.push_back(current);
         }
     }
-    t_vlasti.push_back(static_cast<int>(t_vIndn.size()-1));
+    t_vlasti.push_back(static_cast<int>(t_vIndn.size() - 1));
 
-    for(int k = 0; k < static_cast<int>(t_vfirsti.size()); ++k)
-    {
+    for (int k = 0; k < static_cast<int>(t_vfirsti.size()); ++k) {
         Eigen::VectorXi t_vIndex(t_vlasti[k] - t_vfirsti[k] + 1);
 
-        for(int l = t_vfirsti[k]; l <= t_vlasti[k]; ++l)
+        for (int l = t_vfirsti[k]; l <= t_vlasti[k]; ++l)
             t_vIndex[l - t_vfirsti[k]] = t_vIndn[l].first;
 
         std::sort(t_vIndex.data(), t_vIndex.data() + t_vIndex.size());
@@ -311,12 +299,11 @@ bool MNEHemisphere::compute_patch_info()
 
     // compute patch indices of the in-use source space vertices
     Eigen::VectorXi patch_verts(t_vlasti.size());
-    for(int i = 0; i < static_cast<int>(t_vlasti.size()); ++i)
+    for (int i = 0; i < static_cast<int>(t_vlasti.size()); ++i)
         patch_verts[i] = nearest_sorted[t_vlasti[i]];
 
     patch_inds.resize(vertno.size());
-    for(int i = 0; i < vertno.size(); ++i)
-    {
+    for (int i = 0; i < vertno.size(); ++i) {
         const int* ptr = std::find(patch_verts.data(), patch_verts.data() + patch_verts.size(), vertno[i]);
         patch_inds[i] = static_cast<int>(ptr - patch_verts.data());
     }
@@ -328,7 +315,7 @@ bool MNEHemisphere::compute_patch_info()
 
 bool MNEHemisphere::add_geometry_info()
 {
-    int k,c,p,q;
+    int k, c, p, q;
     bool found;
 
     //Create neighboring triangle vector using temporary std::vector for efficient appending
@@ -336,7 +323,7 @@ bool MNEHemisphere::add_geometry_info()
         std::vector<std::vector<int>> temp_ntri(this->itris.rows());
         for (p = 0; p < this->itris.rows(); p++) {
             for (k = 0; k < 3; k++) {
-                temp_ntri[this->itris(p,k)].push_back(p);
+                temp_ntri[this->itris(p, k)].push_back(p);
             }
         }
         neighbor_tri.resize(this->itris.rows());
@@ -364,7 +351,7 @@ bool MNEHemisphere::add_geometry_info()
                             }
                         }
 
-                        if(!found) {
+                        if (!found) {
                             temp_nvert[k].push_back(vert);
                         }
                     }
@@ -390,8 +377,8 @@ void MNEHemisphere::clear()
     np = -1;
     ntri = -1;
     coord_frame = -1;
-    rr = PointsT::Zero(0,3);
-    nn = NormalsT::Zero(0,3);
+    rr = PointsT::Zero(0, 3);
+    nn = NormalsT::Zero(0, 3);
     nuse = -1;
     inuse = VectorXi::Zero(0);
     vertno = VectorXi::Zero(0);
@@ -401,19 +388,19 @@ void MNEHemisphere::clear()
     neighbor_vert.clear();
 
     // Reset inherited value-semantic fields
-    itris = TrianglesT::Zero(0,3);
-    use_itris = TrianglesT::Zero(0,3);
+    itris = TrianglesT::Zero(0, 3);
+    use_itris = TrianglesT::Zero(0, 3);
     dist = FiffSparseMatrix();
     nearest.clear();
 
     // Reset MNEHemisphere fields
     pinfo.clear();
     patch_inds = VectorXi::Zero(0);
-    tri_cent = MatrixX3d::Zero(0,3);
-    tri_nn = MatrixX3d::Zero(0,3);
+    tri_cent = MatrixX3d::Zero(0, 3);
+    tri_nn = MatrixX3d::Zero(0, 3);
     tri_area = VectorXd::Zero(0);
-    use_tri_cent = MatrixX3d::Zero(0,3);
-    use_tri_nn = MatrixX3d::Zero(0,3);
+    use_tri_cent = MatrixX3d::Zero(0, 3);
+    use_tri_nn = MatrixX3d::Zero(0, 3);
     use_tri_area = VectorXd::Zero(0);
 
     cluster_info.clear();
@@ -425,14 +412,12 @@ void MNEHemisphere::clear()
 
 MatrixXf& MNEHemisphere::getTriCoords(float p_fScaling)
 {
-    if(m_TriCoords.size() == 0)
-    {
-        m_TriCoords = MatrixXf(3,3*itris.rows());
-        for(int i = 0; i < itris.rows(); ++i)
-        {
-            m_TriCoords.col(i*3) = rr.row( itris(i,0) ).transpose().cast<float>();
-            m_TriCoords.col(i*3+1) = rr.row( itris(i,1) ).transpose().cast<float>();
-            m_TriCoords.col(i*3+2) = rr.row( itris(i,2) ).transpose().cast<float>();
+    if (m_TriCoords.size() == 0) {
+        m_TriCoords = MatrixXf(3, 3 * itris.rows());
+        for (int i = 0; i < itris.rows(); ++i) {
+            m_TriCoords.col(i * 3) = rr.row(itris(i, 0)).transpose().cast<float>();
+            m_TriCoords.col(i * 3 + 1) = rr.row(itris(i, 1)).transpose().cast<float>();
+            m_TriCoords.col(i * 3 + 2) = rr.row(itris(i, 2)).transpose().cast<float>();
         }
     }
 
@@ -443,34 +428,32 @@ MatrixXf& MNEHemisphere::getTriCoords(float p_fScaling)
 
 //=============================================================================================================
 
-bool MNEHemisphere::transform_hemisphere_to(fiff_int_t dest, const FiffCoordTrans &p_Trans)
+bool MNEHemisphere::transform_hemisphere_to(fiff_int_t dest, const FiffCoordTrans& p_Trans)
 {
     FiffCoordTrans trans(p_Trans);
 
-    if (this->coord_frame == dest)
-    {
-//            res = src;
+    if (this->coord_frame == dest) {
+        //            res = src;
         return true;
     }
 
     if (trans.to == this->coord_frame && trans.from == dest)
         trans.invert_transform();
-    else if(trans.from != this->coord_frame || trans.to != dest)
-    {
-        qWarning("Cannot transform the source space using this coordinate transformation");//Consider throw
+    else if (trans.from != this->coord_frame || trans.to != dest) {
+        qWarning("Cannot transform the source space using this coordinate transformation"); //Consider throw
         return false;
     }
 
-    MatrixXf t = trans.trans.block(0,0,3,4);
-//        res             = src;
+    MatrixXf t = trans.trans.block(0, 0, 3, 4);
+    //        res             = src;
     this->coord_frame = dest;
     MatrixXf t_rr = MatrixXf::Ones(this->np, 4);
     t_rr.block(0, 0, this->np, 3) = this->rr;
     MatrixXf t_nn = MatrixXf::Zero(this->np, 4);
     t_nn.block(0, 0, this->np, 3) = this->nn;
 
-    this->rr    = (t*t_rr.transpose()).transpose();
-    this->nn    = (t*t_nn.transpose()).transpose();
+    this->rr = (t * t_rr.transpose()).transpose();
+    this->nn = (t * t_nn.transpose()).transpose();
 
     return true;
 }
@@ -479,38 +462,38 @@ bool MNEHemisphere::transform_hemisphere_to(fiff_int_t dest, const FiffCoordTran
 //ToDo
 void MNEHemisphere::writeToStream(FiffStream* p_pStream)
 {
-    if(this->type == 1 || this->type == 2)
+    if (this->type == 1 || this->type == 2)
         p_pStream->write_int(FIFF_MNE_SOURCE_SPACE_TYPE, &this->type);
     else
         qWarning("Unknown source space type (%d)", this->type);
     p_pStream->write_int(FIFF_MNE_SOURCE_SPACE_ID, &this->id);
 
-//    data = this.get('subject_his_id', None)
-//    if data:
-//        write_string(fid, FIFF.FIFF_SUBJ_HIS_ID, data)
+    //    data = this.get('subject_his_id', None)
+    //    if data:
+    //        write_string(fid, FIFF.FIFF_SUBJ_HIS_ID, data)
     p_pStream->write_int(FIFF_MNE_COORD_FRAME, &this->coord_frame);
 
-    if(this->type == 2) //2 = Vol
+    if (this->type == 2) //2 = Vol
     {
         qDebug() << "ToDo: Write Volume not implemented yet!!!!!!!!";
-//        p_pStream->write_int(FIFF_MNE_SOURCE_SPACE_VOXEL_DIMS, this->shape)
-//        p_pStream->write_coord_trans(this->src_mri_t);
+        //        p_pStream->write_int(FIFF_MNE_SOURCE_SPACE_VOXEL_DIMS, this->shape)
+        //        p_pStream->write_coord_trans(this->src_mri_t);
 
         p_pStream->start_block(FIFFB_MNE_PARENT_MRI_FILE);
-//        write_coord_trans(fid, this['vox_mri_t'])
+        //        write_coord_trans(fid, this['vox_mri_t'])
 
-//        write_coord_trans(fid, this['mri_ras_t'])
+        //        write_coord_trans(fid, this['mri_ras_t'])
 
-//        write_float_sparse_rcs(fid, FIFF.FIFF_MNE_SOURCE_SPACE_INTERPOLATOR,
-//                            this['interpolator'])
+        //        write_float_sparse_rcs(fid, FIFF.FIFF_MNE_SOURCE_SPACE_INTERPOLATOR,
+        //                            this['interpolator'])
 
-//        if 'mri_file' in this and this['mri_file'] is not None:
-//            write_string(fid, FIFF.FIFF_MNE_SOURCE_SPACE_MRI_FILE,
-//                         this['mri_file'])
+        //        if 'mri_file' in this and this['mri_file'] is not None:
+        //            write_string(fid, FIFF.FIFF_MNE_SOURCE_SPACE_MRI_FILE,
+        //                         this['mri_file'])
 
-//        write_int(fid, FIFF.FIFF_MRI_WIDTH, this['mri_width'])
-//        write_int(fid, FIFF.FIFF_MRI_HEIGHT, this['mri_height'])
-//        write_int(fid, FIFF.FIFF_MRI_DEPTH, this['mri_depth'])
+        //        write_int(fid, FIFF.FIFF_MRI_WIDTH, this['mri_width'])
+        //        write_int(fid, FIFF.FIFF_MRI_HEIGHT, this['mri_height'])
+        //        write_int(fid, FIFF.FIFF_MRI_DEPTH, this['mri_depth'])
 
         p_pStream->end_block(FIFFB_MNE_PARENT_MRI_FILE);
     }
@@ -527,16 +510,14 @@ void MNEHemisphere::writeToStream(FiffStream* p_pStream)
     if (this->ntri > 0)
         p_pStream->write_int_matrix(FIFF_MNE_SOURCE_SPACE_TRIANGLES, (this->itris.array() + 1).matrix());
 
-    if (this->type != 2 && this->use_itris.rows() > 0)
-    {
+    if (this->type != 2 && this->use_itris.rows() > 0) {
         //   Use triangulation
         p_pStream->write_int(FIFF_MNE_SOURCE_SPACE_NUSE_TRI, &this->nuse_tri);
         p_pStream->write_int_matrix(FIFF_MNE_SOURCE_SPACE_USE_TRIANGLES, (this->use_itris.array() + 1).matrix());
     }
 
     //   Patch-related information
-    if (!this->nearest.empty())
-    {
+    if (!this->nearest.empty()) {
         Eigen::VectorXi nearestIdx = this->nearestVertIdx();
         Eigen::VectorXf nearestDistF = this->nearestDistVec().cast<float>();
         p_pStream->write_int(FIFF_MNE_SOURCE_SPACE_NEAREST, nearestIdx.data(), nearestIdx.size());
@@ -544,16 +525,15 @@ void MNEHemisphere::writeToStream(FiffStream* p_pStream)
     }
 
     //   Distances
-    if (!this->dist.is_empty())
-    {
+    if (!this->dist.is_empty()) {
         // Extract upper triangular portion from the dist matrix
         const Eigen::SparseMatrix<float>& eigenDist = this->dist.eigen();
         typedef Eigen::Triplet<float> T;
         std::vector<T> tripletList;
         tripletList.reserve(eigenDist.nonZeros());
-        for (int k=0; k < eigenDist.outerSize(); ++k)
-            for (Eigen::SparseMatrix<float>::InnerIterator it(eigenDist,k); it; ++it)
-                if(it.col() >= it.row())//only upper triangle -> todo iteration can be optimized
+        for (int k = 0; k < eigenDist.outerSize(); ++k)
+            for (Eigen::SparseMatrix<float>::InnerIterator it(eigenDist, k); it; ++it)
+                if (it.col() >= it.row()) //only upper triangle -> todo iteration can be optimized
                     tripletList.push_back(T(it.row(), it.col(), it.value()));
         Eigen::SparseMatrix<float> dists(eigenDist.rows(), eigenDist.cols());
         dists.setFromTriplets(tripletList.begin(), tripletList.end());

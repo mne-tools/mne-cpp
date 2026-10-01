@@ -46,7 +46,8 @@
 
 using namespace MRILIB;
 
-namespace {
+namespace
+{
 
 QByteArray makeSyntheticNifti(int nx, int ny, int nz, float dx, float dy, float dz)
 {
@@ -57,8 +58,14 @@ QByteArray makeSyntheticNifti(int nx, int ny, int nz, float dx, float dy, float 
     buf.resize(dataOff + nx * ny * nz * 4);
     std::memset(buf.data(), 0, buf.size());
 
-    auto putI32 = [&](int off, qint32 v) { qint32 le = qToLittleEndian<qint32>(v); std::memcpy(buf.data() + off, &le, 4); };
-    auto putI16 = [&](int off, qint16 v) { qint16 le = qToLittleEndian<qint16>(v); std::memcpy(buf.data() + off, &le, 2); };
+    auto putI32 = [&](int off, qint32 v) {
+        qint32 le = qToLittleEndian<qint32>(v);
+        std::memcpy(buf.data() + off, &le, 4);
+    };
+    auto putI16 = [&](int off, qint16 v) {
+        qint16 le = qToLittleEndian<qint16>(v);
+        std::memcpy(buf.data() + off, &le, 2);
+    };
     auto putF32 = [&](int off, float v) {
         quint32 raw;
         std::memcpy(&raw, &v, 4);
@@ -66,27 +73,36 @@ QByteArray makeSyntheticNifti(int nx, int ny, int nz, float dx, float dy, float 
         std::memcpy(buf.data() + off, &le, 4);
     };
 
-    putI32(0, hdrSize);           // sizeof_hdr
-    putI16(40, 3);                // dim[0] = ndim
+    putI32(0, hdrSize); // sizeof_hdr
+    putI16(40, 3);      // dim[0] = ndim
     putI16(42, static_cast<qint16>(nx));
     putI16(44, static_cast<qint16>(ny));
     putI16(46, static_cast<qint16>(nz));
-    putI16(48, 1);                // dim[4] = nt
-    putI16(70, 16);               // datatype = DT_FLOAT32
-    putI16(72, 32);               // bitpix
-    putF32(76, 1.0f);             // pixdim[0] = qfac
+    putI16(48, 1);    // dim[4] = nt
+    putI16(70, 16);   // datatype = DT_FLOAT32
+    putI16(72, 32);   // bitpix
+    putF32(76, 1.0f); // pixdim[0] = qfac
     putF32(80, dx);
     putF32(84, dy);
     putF32(88, dz);
-    putF32(108, static_cast<float>(dataOff));  // vox_offset
-    putF32(112, 1.0f);            // scl_slope
-    putF32(116, 0.0f);            // scl_inter
-    putI16(254, 1);               // sform_code = NIFTI_XFORM_SCANNER_ANAT
+    putF32(108, static_cast<float>(dataOff)); // vox_offset
+    putF32(112, 1.0f);                        // scl_slope
+    putF32(116, 0.0f);                        // scl_inter
+    putI16(254, 1);                           // sform_code = NIFTI_XFORM_SCANNER_ANAT
     // srow_x = (dx, 0, 0, -dx*nx/2); srow_y = (0, dy, 0, -dy*ny/2); srow_z = (0, 0, dz, -dz*nz/2)
-    putF32(280, dx);  putF32(284, 0); putF32(288, 0); putF32(292, -0.5f * dx * nx);
-    putF32(296, 0);   putF32(300, dy); putF32(304, 0); putF32(308, -0.5f * dy * ny);
-    putF32(312, 0);   putF32(316, 0); putF32(320, dz); putF32(324, -0.5f * dz * nz);
-    std::memcpy(buf.data() + 344, "n+1\0", 4);  // magic
+    putF32(280, dx);
+    putF32(284, 0);
+    putF32(288, 0);
+    putF32(292, -0.5f * dx * nx);
+    putF32(296, 0);
+    putF32(300, dy);
+    putF32(304, 0);
+    putF32(308, -0.5f * dy * ny);
+    putF32(312, 0);
+    putF32(316, 0);
+    putF32(320, dz);
+    putF32(324, -0.5f * dz * nz);
+    std::memcpy(buf.data() + 344, "n+1\0", 4); // magic
 
     // Voxel payload: value = ix + 10*iy + 100*iz, in fortran order.
     char* data = buf.data() + dataOff;

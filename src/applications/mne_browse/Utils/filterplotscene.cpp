@@ -32,7 +32,8 @@
 using namespace MNEBROWSE;
 using namespace Eigen;
 
-namespace {
+namespace
+{
 
 constexpr double kPhaseMinDegrees = -180.0;
 constexpr double kPhaseMaxDegrees = 180.0;
@@ -55,11 +56,11 @@ double mapPhaseToY(double phaseDegrees,
 
 QString formatFrequencyLabel(double frequencyHz)
 {
-    if(frequencyHz >= 100.0) {
+    if (frequencyHz >= 100.0) {
         return QStringLiteral("%1 Hz").arg(QString::number(frequencyHz, 'f', 0));
     }
 
-    if(frequencyHz >= 10.0) {
+    if (frequencyHz >= 10.0) {
         return QStringLiteral("%1 Hz").arg(QString::number(frequencyHz, 'f', 1));
     }
 
@@ -74,19 +75,19 @@ QString formatFrequencyLabel(double frequencyHz)
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-FilterPlotScene::FilterPlotScene(QObject *parent) :
-    QGraphicsScene(parent),
-    m_pCurrentFilter(),
-    m_pGraphicsItemPath(new QGraphicsPathItem()),
-    m_iScalingFactor(5),
-    m_dMaxMagnitude(100*m_iScalingFactor),
-    m_iNumberHorizontalLines(4),
-    m_iNumberVerticalLines(3),
-    m_iAxisTextSize(24),
-    m_iDiagramMarginsHoriz(5),
-    m_iDiagramMarginsVert(5),
-    m_iDiagramSpacing(140),
-    m_iCutOffMarkerWidth(3)
+FilterPlotScene::FilterPlotScene(QObject* parent)
+: QGraphicsScene(parent)
+, m_pCurrentFilter()
+, m_pGraphicsItemPath(new QGraphicsPathItem())
+, m_iScalingFactor(5)
+, m_dMaxMagnitude(100 * m_iScalingFactor)
+, m_iNumberHorizontalLines(4)
+, m_iNumberVerticalLines(3)
+, m_iAxisTextSize(24)
+, m_iDiagramMarginsHoriz(5)
+, m_iDiagramMarginsVert(5)
+, m_iDiagramSpacing(140)
+, m_iCutOffMarkerWidth(3)
 {
 }
 
@@ -98,7 +99,7 @@ void FilterPlotScene::updateFilter(const QSharedPointer<SessionFilter>& filter, 
     //Clear the scene
     this->clear();
 
-    if(filter && filter->isValid()) {
+    if (filter && filter->isValid()) {
         m_pCurrentFilter = filter;
     } else {
         m_pCurrentFilter.clear();
@@ -122,12 +123,12 @@ void FilterPlotScene::updateFilter(const QSharedPointer<SessionFilter>& filter, 
 
 void FilterPlotScene::plotMagnitudeDiagram(int samplingFreq, int xOffset, int diagramWidth)
 {
-    const int fMax = samplingFreq/2; //nyquist frequency
+    const int fMax = samplingFreq / 2; //nyquist frequency
 
     addRect(xOffset - m_iDiagramMarginsHoriz,
             -m_iDiagramMarginsVert,
             diagramWidth + (m_iDiagramMarginsHoriz * 2),
-            m_dMaxMagnitude+(m_iDiagramMarginsVert*2));
+            m_dMaxMagnitude + (m_iDiagramMarginsVert * 2));
 
     QGraphicsTextItem* title = addText(QStringLiteral("Magnitude"),
                                        QFont(QStringLiteral("Times"), m_iAxisTextSize, QFont::Bold));
@@ -136,51 +137,51 @@ void FilterPlotScene::plotMagnitudeDiagram(int samplingFreq, int xOffset, int di
 
     //HORIZONTAL
     //Draw horizontal lines
-    for(int i = 1; i <= m_iNumberHorizontalLines; i++)
+    for (int i = 1; i <= m_iNumberHorizontalLines; i++)
         addLine(xOffset - m_iDiagramMarginsHoriz,
-                (i * (m_dMaxMagnitude/(m_iNumberHorizontalLines+1))) - m_iDiagramMarginsVert,
+                (i * (m_dMaxMagnitude / (m_iNumberHorizontalLines + 1))) - m_iDiagramMarginsVert,
                 xOffset + diagramWidth + m_iDiagramMarginsHoriz,
-                (i * (m_dMaxMagnitude/(m_iNumberHorizontalLines+1))) - m_iDiagramMarginsVert,
+                (i * (m_dMaxMagnitude / (m_iNumberHorizontalLines + 1))) - m_iDiagramMarginsVert,
                 QPen(Qt::DotLine));
 
     //Draw vertical axis texts - db magnitude
-    for(int i = 0; i <= m_iNumberHorizontalLines+1; i++) {
-        QGraphicsTextItem * text = addText(QString("-%1 db").arg(QString().number(i * m_dMaxMagnitude/(m_iScalingFactor*(m_iNumberHorizontalLines+1)),'g',3)),
-                                           QFont("Times", m_iAxisTextSize));
-        text->setPos(xOffset - text->boundingRect().width() - m_iAxisTextSize/2,
-                     (i * (m_dMaxMagnitude/(m_iNumberHorizontalLines+1))) - (text->boundingRect().height()/2) - m_iDiagramMarginsVert);
+    for (int i = 0; i <= m_iNumberHorizontalLines + 1; i++) {
+        QGraphicsTextItem* text = addText(QString("-%1 db").arg(QString().number(i * m_dMaxMagnitude / (m_iScalingFactor * (m_iNumberHorizontalLines + 1)), 'g', 3)),
+                                          QFont("Times", m_iAxisTextSize));
+        text->setPos(xOffset - text->boundingRect().width() - m_iAxisTextSize / 2,
+                     (i * (m_dMaxMagnitude / (m_iNumberHorizontalLines + 1))) - (text->boundingRect().height() / 2) - m_iDiagramMarginsVert);
     }
 
     //VERTICAL
     //Draw vertical lines
-    double length = static_cast<double>(diagramWidth) / static_cast<double>(m_iNumberVerticalLines+1);
-    for(int i = 1; i<=m_iNumberVerticalLines; i++)
-        addLine(xOffset + i*length - m_iDiagramMarginsHoriz,
+    double length = static_cast<double>(diagramWidth) / static_cast<double>(m_iNumberVerticalLines + 1);
+    for (int i = 1; i <= m_iNumberVerticalLines; i++)
+        addLine(xOffset + i * length - m_iDiagramMarginsHoriz,
                 -m_iDiagramMarginsVert,
-                xOffset + i*length - m_iDiagramMarginsHoriz,
+                xOffset + i * length - m_iDiagramMarginsHoriz,
                 m_dMaxMagnitude + m_iDiagramMarginsVert,
                 QPen(Qt::DotLine));
 
     //Draw horizontal axis texts - Hz frequency
-    for(int i = 0; i <= m_iNumberVerticalLines+1; i++) {
+    for (int i = 0; i <= m_iNumberVerticalLines + 1; i++) {
         const double frequencyHz = i * (fMax / static_cast<double>(m_iNumberVerticalLines + 1));
-        QGraphicsTextItem * text = addText(formatFrequencyLabel(frequencyHz),
-                                           QFont("Times", m_iAxisTextSize));
-        text->setPos(xOffset + i * length - m_iDiagramMarginsHoriz - (text->boundingRect().width()/2),
-                     m_dMaxMagnitude + (text->boundingRect().height()/2));
+        QGraphicsTextItem* text = addText(formatFrequencyLabel(frequencyHz),
+                                          QFont("Times", m_iAxisTextSize));
+        text->setPos(xOffset + i * length - m_iDiagramMarginsHoriz - (text->boundingRect().width() / 2),
+                     m_dMaxMagnitude + (text->boundingRect().height() / 2));
     }
 
     //Plot lower higher cut off frequency
     auto addCutoffMarker = [this, xOffset, diagramWidth, fMax](double frequencyHz) {
         const double pos = xOffset + (frequencyHz / static_cast<double>(fMax)) * diagramWidth;
         addLine(pos - m_iDiagramMarginsHoriz,
-                -m_iDiagramMarginsVert + m_iCutOffMarkerWidth/2,
+                -m_iDiagramMarginsVert + m_iCutOffMarkerWidth / 2,
                 pos - m_iDiagramMarginsHoriz,
-                m_dMaxMagnitude + m_iDiagramMarginsVert - m_iCutOffMarkerWidth/2,
-                QPen(Qt::red,m_iCutOffMarkerWidth));
+                m_dMaxMagnitude + m_iDiagramMarginsVert - m_iCutOffMarkerWidth / 2,
+                QPen(Qt::red, m_iCutOffMarkerWidth));
     };
 
-    switch(m_pCurrentFilter->filterType()) {
+    switch (m_pCurrentFilter->filterType()) {
         case SessionFilter::FilterType::LowPass:
         case SessionFilter::FilterType::HighPass:
             addCutoffMarker(m_pCurrentFilter->cutoffLowHz());
@@ -210,7 +211,7 @@ void FilterPlotScene::plotPhaseDiagram(int samplingFreq, int xOffset, int diagra
     title->setPos(xOffset + diagramWidth / 2.0 - title->boundingRect().width() / 2.0,
                   -title->boundingRect().height() - (m_iDiagramMarginsVert * 4));
 
-    for(int i = 1; i <= m_iNumberHorizontalLines; ++i) {
+    for (int i = 1; i <= m_iNumberHorizontalLines; ++i) {
         const double y = (i * (phaseHeight / (m_iNumberHorizontalLines + 1))) - m_iDiagramMarginsVert;
         addLine(xOffset - m_iDiagramMarginsHoriz,
                 y,
@@ -219,19 +220,16 @@ void FilterPlotScene::plotPhaseDiagram(int samplingFreq, int xOffset, int diagra
                 QPen(Qt::DotLine));
     }
 
-    for(int i = 0; i <= m_iNumberHorizontalLines + 1; ++i) {
-        const double phaseDegrees = kPhaseMaxDegrees
-                                    - i * ((kPhaseMaxDegrees - kPhaseMinDegrees) / static_cast<double>(m_iNumberHorizontalLines + 1));
+    for (int i = 0; i <= m_iNumberHorizontalLines + 1; ++i) {
+        const double phaseDegrees = kPhaseMaxDegrees - i * ((kPhaseMaxDegrees - kPhaseMinDegrees) / static_cast<double>(m_iNumberHorizontalLines + 1));
         QGraphicsTextItem* text = addText(QStringLiteral("%1°").arg(QString::number(phaseDegrees, 'f', 0)),
                                           QFont(QStringLiteral("Times"), m_iAxisTextSize));
         text->setPos(xOffset - text->boundingRect().width() - m_iAxisTextSize / 2.0,
-                     (i * (phaseHeight / (m_iNumberHorizontalLines + 1)))
-                        - (text->boundingRect().height() / 2.0)
-                        - m_iDiagramMarginsVert);
+                     (i * (phaseHeight / (m_iNumberHorizontalLines + 1))) - (text->boundingRect().height() / 2.0) - m_iDiagramMarginsVert);
     }
 
     const double length = static_cast<double>(diagramWidth) / static_cast<double>(m_iNumberVerticalLines + 1);
-    for(int i = 1; i <= m_iNumberVerticalLines; ++i) {
+    for (int i = 1; i <= m_iNumberVerticalLines; ++i) {
         addLine(xOffset + i * length - m_iDiagramMarginsHoriz,
                 -m_iDiagramMarginsVert,
                 xOffset + i * length - m_iDiagramMarginsHoriz,
@@ -239,7 +237,7 @@ void FilterPlotScene::plotPhaseDiagram(int samplingFreq, int xOffset, int diagra
                 QPen(Qt::DotLine));
     }
 
-    for(int i = 0; i <= m_iNumberVerticalLines + 1; ++i) {
+    for (int i = 0; i <= m_iNumberVerticalLines + 1; ++i) {
         const double frequencyHz = i * (fMax / static_cast<double>(m_iNumberVerticalLines + 1));
         QGraphicsTextItem* text = addText(formatFrequencyLabel(frequencyHz),
                                           QFont(QStringLiteral("Times"), m_iAxisTextSize));
@@ -256,7 +254,7 @@ void FilterPlotScene::plotPhaseDiagram(int samplingFreq, int xOffset, int diagra
                 QPen(Qt::red, m_iCutOffMarkerWidth));
     };
 
-    switch(m_pCurrentFilter->filterType()) {
+    switch (m_pCurrentFilter->filterType()) {
         case SessionFilter::FilterType::LowPass:
         case SessionFilter::FilterType::HighPass:
             addCutoffMarker(m_pCurrentFilter->cutoffLowHz());
@@ -275,7 +273,7 @@ void FilterPlotScene::plotPhaseDiagram(int samplingFreq, int xOffset, int diagra
 void FilterPlotScene::plotFilterFrequencyResponse(int xOffset, int diagramWidth)
 {
     const VectorXd magnitudeResponse = m_pCurrentFilter->magnitudeResponse();
-    if(magnitudeResponse.size() == 0) {
+    if (magnitudeResponse.size() == 0) {
         return;
     }
 
@@ -290,7 +288,7 @@ void FilterPlotScene::plotFilterFrequencyResponse(int xOffset, int diagramWidth)
     const double initialDb = -20.0 * log10(std::max(1e-12, std::abs(normalizedResponse(0)))) * m_iScalingFactor;
     path.moveTo(xOffset, mapMagnitudeToY(initialDb, m_dMaxMagnitude, m_iDiagramMarginsVert));
 
-    for(int i = 0; i<numberCoeff; i+=dsFactor) {
+    for (int i = 0; i < numberCoeff; i += dsFactor) {
         const double x = xOffset + (static_cast<double>(i) / static_cast<double>(std::max(1, numberCoeff - 1))) * diagramWidth;
         const double magnitudeDb = -20.0 * log10(std::max(1e-12, std::abs(normalizedResponse(i)))) * m_iScalingFactor;
         path.lineTo(x, mapMagnitudeToY(magnitudeDb, m_dMaxMagnitude, m_iDiagramMarginsVert));
@@ -309,7 +307,7 @@ void FilterPlotScene::plotFilterFrequencyResponse(int xOffset, int diagramWidth)
 void FilterPlotScene::plotFilterPhaseResponse(int xOffset, int diagramWidth)
 {
     const VectorXd phaseResponse = m_pCurrentFilter->phaseResponse();
-    if(phaseResponse.size() == 0) {
+    if (phaseResponse.size() == 0) {
         return;
     }
 
@@ -322,7 +320,7 @@ void FilterPlotScene::plotFilterPhaseResponse(int xOffset, int diagramWidth)
                             m_dMaxMagnitude,
                             m_iDiagramMarginsVert));
 
-    for(int index = 0; index < pointCount; index += dsFactor) {
+    for (int index = 0; index < pointCount; index += dsFactor) {
         const double x = xOffset + (static_cast<double>(index) / static_cast<double>(std::max(1, pointCount - 1))) * diagramWidth;
         const double y = mapPhaseToY(phaseResponse(index),
                                      m_dMaxMagnitude,

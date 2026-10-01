@@ -35,7 +35,7 @@ using namespace FSLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-RealTimeSourceEstimate::RealTimeSourceEstimate(QObject *parent)
+RealTimeSourceEstimate::RealTimeSourceEstimate(QObject* parent)
 : Measurement(QMetaType::fromName("RealTimeSourceEstimate::SPtr").id(), parent)
 , m_pAnnotSet(FsAnnotationSet::SPtr(new FsAnnotationSet))
 , m_pSurfSet(FsSurfaceSet::SPtr(new FsSurfaceSet))
@@ -73,12 +73,10 @@ void RealTimeSourceEstimate::setValue(InvSourceEstimate& v)
 
     m_qMutex.unlock();
 
-    if(m_pMNEStc.size() >= m_iSourceEstimateSize)
-    {
+    if (m_pMNEStc.size() >= m_iSourceEstimateSize) {
         emit notify();
         m_qMutex.lock();
         m_pMNEStc.clear();
         m_qMutex.unlock();
     }
 }
-

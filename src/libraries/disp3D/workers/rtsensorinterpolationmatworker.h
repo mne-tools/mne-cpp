@@ -48,7 +48,8 @@ class BrainSurface;
 // DEFINE NAMESPACE
 //=============================================================================================================
 
-namespace DISP3DLIB {
+namespace DISP3DLIB
+{
 
 //=============================================================================================================
 /**
@@ -79,7 +80,7 @@ public:
      *
      * @param[in] parent     Parent QObject.
      */
-    explicit RtSensorInterpolationMatWorker(QObject *parent = nullptr);
+    explicit RtSensorInterpolationMatWorker(QObject* parent = nullptr);
 
     //=========================================================================================================
     /**
@@ -87,7 +88,7 @@ public:
      *
      * @param[in] evoked    The evoked dataset.
      */
-    void setEvoked(const FIFFLIB::FiffEvoked &evoked);
+    void setEvoked(const FIFFLIB::FiffEvoked& evoked);
 
     //=========================================================================================================
     /**
@@ -96,7 +97,7 @@ public:
      * @param[in] trans              The transform.
      * @param[in] applySensorTrans   Whether to apply the transform.
      */
-    void setTransform(const FIFFLIB::FiffCoordTrans &trans, bool applySensorTrans);
+    void setTransform(const FIFFLIB::FiffCoordTrans& trans, bool applySensorTrans);
 
     //=========================================================================================================
     /**
@@ -117,10 +118,10 @@ public:
      * @param[in] normals       Vertex normals (nVerts x 3).
      * @param[in] triangles     Triangle indices (nTris x 3).
      */
-    void setMegSurface(const QString &surfaceKey,
-                       const Eigen::MatrixX3f &vertices,
-                       const Eigen::MatrixX3f &normals,
-                       const Eigen::MatrixX3i &triangles);
+    void setMegSurface(const QString& surfaceKey,
+                       const Eigen::MatrixX3f& vertices,
+                       const Eigen::MatrixX3f& normals,
+                       const Eigen::MatrixX3i& triangles);
 
     //=========================================================================================================
     /**
@@ -129,8 +130,8 @@ public:
      * @param[in] surfaceKey    The key identifying the surface.
      * @param[in] vertices      Vertex positions (nVerts x 3).
      */
-    void setEegSurface(const QString &surfaceKey,
-                       const Eigen::MatrixX3f &vertices);
+    void setEegSurface(const QString& surfaceKey,
+                       const Eigen::MatrixX3f& vertices);
 
     //=========================================================================================================
     /**
@@ -138,7 +139,7 @@ public:
      *
      * @param[in] bads           List of bad channel names.
      */
-    void setBadChannels(const QStringList &bads);
+    void setBadChannels(const QStringList& bads);
 
 public slots:
     //=========================================================================================================
@@ -159,9 +160,9 @@ signals:
      * @param[in] mappingMat    Dense mapping matrix (nVerts x nChannels).
      * @param[in] pick          Channel indices picked for this mapping.
      */
-    void newMegMappingAvailable(const QString &surfaceKey,
+    void newMegMappingAvailable(const QString& surfaceKey,
                                 std::shared_ptr<Eigen::MatrixXf> mappingMat,
-                                const QVector<int> &pick);
+                                const QVector<int>& pick);
 
     //=========================================================================================================
     /**
@@ -171,34 +172,34 @@ signals:
      * @param[in] mappingMat    Dense mapping matrix (nVerts x nChannels).
      * @param[in] pick          Channel indices picked for this mapping.
      */
-    void newEegMappingAvailable(const QString &surfaceKey,
+    void newEegMappingAvailable(const QString& surfaceKey,
                                 std::shared_ptr<Eigen::MatrixXf> mappingMat,
-                                const QVector<int> &pick);
+                                const QVector<int>& pick);
 
 private:
-    mutable QMutex m_mutex;                              /**< Protects all data members. */
+    mutable QMutex m_mutex; /**< Protects all data members. */
 
-    FIFFLIB::FiffEvoked m_evoked;                        /**< Evoked data with channel info. */
-    bool m_hasEvoked = false;                            /**< Whether evoked data has been set. */
+    FIFFLIB::FiffEvoked m_evoked; /**< Evoked data with channel info. */
+    bool m_hasEvoked = false;     /**< Whether evoked data has been set. */
 
-    FIFFLIB::FiffCoordTrans m_headToMriTrans;            /**< Head-to-MRI transform. */
-    bool m_applySensorTrans = true;                      /**< Whether to apply sensor transform. */
+    FIFFLIB::FiffCoordTrans m_headToMriTrans; /**< Head-to-MRI transform. */
+    bool m_applySensorTrans = true;           /**< Whether to apply sensor transform. */
 
-    bool m_megOnHead = false;                            /**< Map MEG onto head vs helmet. */
+    bool m_megOnHead = false; /**< Map MEG onto head vs helmet. */
 
     // MEG target surface
-    QString m_megSurfaceKey;                             /**< Key of the MEG target surface. */
-    Eigen::MatrixX3f m_megVertices;                      /**< MEG surface vertices. */
-    Eigen::MatrixX3f m_megNormals;                       /**< MEG surface normals. */
-    Eigen::MatrixX3i m_megTriangles;                     /**< MEG surface triangles. */
-    bool m_hasMegSurface = false;                        /**< Whether MEG surface has been set. */
+    QString m_megSurfaceKey;         /**< Key of the MEG target surface. */
+    Eigen::MatrixX3f m_megVertices;  /**< MEG surface vertices. */
+    Eigen::MatrixX3f m_megNormals;   /**< MEG surface normals. */
+    Eigen::MatrixX3i m_megTriangles; /**< MEG surface triangles. */
+    bool m_hasMegSurface = false;    /**< Whether MEG surface has been set. */
 
     // EEG target surface
-    QString m_eegSurfaceKey;                             /**< Key of the EEG target surface. */
-    Eigen::MatrixX3f m_eegVertices;                      /**< EEG surface vertices. */
-    bool m_hasEegSurface = false;                        /**< Whether EEG surface has been set. */
+    QString m_eegSurfaceKey;        /**< Key of the EEG target surface. */
+    Eigen::MatrixX3f m_eegVertices; /**< EEG surface vertices. */
+    bool m_hasEegSurface = false;   /**< Whether EEG surface has been set. */
 
-    QStringList m_bads;                                  /**< Current bad channel names. */
+    QStringList m_bads; /**< Current bad channel names. */
 };
 
 } // namespace DISP3DLIB

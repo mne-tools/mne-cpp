@@ -22,12 +22,21 @@
 // DEFINE METHODS
 //=============================================================================================================
 
-const char* SOURCELOCALIZATIONPLUGIN::buildDateTime(){ return UTILSLIB::dateTimeNow();}
+const char* SOURCELOCALIZATIONPLUGIN::buildDateTime()
+{
+    return UTILSLIB::dateTimeNow();
+}
 
 //=============================================================================================================
 
-const char* SOURCELOCALIZATIONPLUGIN::buildHash(){ return UTILSLIB::gitHash();}
+const char* SOURCELOCALIZATIONPLUGIN::buildHash()
+{
+    return UTILSLIB::gitHash();
+}
 
 //=============================================================================================================
 
-const char* SOURCELOCALIZATIONPLUGIN::buildHashLong(){ return UTILSLIB::gitHashLong();}
+const char* SOURCELOCALIZATIONPLUGIN::buildHashLong()
+{
+    return UTILSLIB::gitHashLong();
+}

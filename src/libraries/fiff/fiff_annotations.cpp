@@ -293,9 +293,11 @@ FiffAnnotations FiffAnnotations::readCsv(const QString& path)
         // Parse: onset,duration,description
         // Description may contain commas, so split only the first two commas
         int firstComma = line.indexOf(',');
-        if (firstComma < 0) continue;
+        if (firstComma < 0)
+            continue;
         int secondComma = line.indexOf(',', firstComma + 1);
-        if (secondComma < 0) continue;
+        if (secondComma < 0)
+            continue;
 
         bool onsetOk = false, durationOk = false;
         double onset = line.left(firstComma).toDouble(&onsetOk);

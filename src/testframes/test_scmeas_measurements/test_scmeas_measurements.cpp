@@ -61,7 +61,7 @@ using namespace Eigen;
  *
  * @brief Checks the mne_scan real time measurement containers.
  */
-class TestScMeasMeasurements: public QObject
+class TestScMeasMeasurements : public QObject
 {
     Q_OBJECT
 
@@ -91,9 +91,9 @@ void TestScMeasMeasurements::rtmsa_scalarsRoundTrip_data()
     // the time axis of everything acquired afterwards, so the boundary values
     // are checked as well as an ordinary one.
     QTest::newRow("typical meg") << 1000.0 << 10;
-    QTest::newRow("low rate")    <<    1.0 <<  1;
-    QTest::newRow("high rate")   << 5000.0 << 64;
-    QTest::newRow("fractional")  <<  600.615 << 5;
+    QTest::newRow("low rate") << 1.0 << 1;
+    QTest::newRow("high rate") << 5000.0 << 64;
+    QTest::newRow("fractional") << 600.615 << 5;
 }
 
 //=============================================================================================================

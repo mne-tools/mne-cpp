@@ -73,7 +73,10 @@ public:
      *
      * @return Number of owned events.
      */
-    int nevent() const { return static_cast<int>(events.size()); }
+    int nevent() const
+    {
+        return static_cast<int>(events.size());
+    }
 
     std::vector<std::unique_ptr<MNEEvent>> events; /**< Owned event pointers. */
 };

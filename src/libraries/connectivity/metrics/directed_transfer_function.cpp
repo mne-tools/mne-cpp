@@ -58,7 +58,7 @@ Network DirectedTransferFunction::calculate(ConnectivitySettings& connectivitySe
 {
     Network finalNetwork("DTF");
 
-    if(connectivitySettings.isEmpty()) {
+    if (connectivitySettings.isEmpty()) {
         qDebug() << "DirectedTransferFunction::calculate - Input data is empty";
         return finalNetwork;
     }
@@ -68,7 +68,7 @@ Network DirectedTransferFunction::calculate(ConnectivitySettings& connectivitySe
     // Average trial data for MVAR fitting
     const int nTrials = connectivitySettings.size();
     MatrixXd matDataAvg = connectivitySettings.at(0).matData;
-    for(int t = 1; t < nTrials; ++t) {
+    for (int t = 1; t < nTrials; ++t) {
         matDataAvg += connectivitySettings.at(t).matData;
     }
     matDataAvg /= static_cast<double>(nTrials);
@@ -82,9 +82,9 @@ Network DirectedTransferFunction::calculate(ConnectivitySettings& connectivitySe
 
     // Create nodes
     RowVectorXf rowVert = RowVectorXf::Zero(3);
-    for(int i = 0; i < nCh; ++i) {
+    for (int i = 0; i < nCh; ++i) {
         rowVert = RowVectorXf::Zero(3);
-        if(connectivitySettings.getNodePositions().rows() != 0 && i < connectivitySettings.getNodePositions().rows()) {
+        if (connectivitySettings.getNodePositions().rows() != 0 && i < connectivitySettings.getNodePositions().rows()) {
             rowVert(0) = connectivitySettings.getNodePositions().row(i)(0);
             rowVert(1) = connectivitySettings.getNodePositions().row(i)(1);
             rowVert(2) = connectivitySettings.getNodePositions().row(i)(2);
@@ -102,18 +102,18 @@ Network DirectedTransferFunction::calculate(ConnectivitySettings& connectivitySe
 
     // Compute DTF: DTF_{ij}(f) = |H_{ij}(f)|^2 / sum_k |H_{ik}(f)|^2
     // (normalized per row i)
-    for(int i = 0; i < nCh; ++i) {
-        for(int j = 0; j < nCh; ++j) {
+    for (int i = 0; i < nCh; ++i) {
+        for (int j = 0; j < nCh; ++j) {
             MatrixXd matWeight(iNFreqs, 1);
 
-            for(int fi = 0; fi < iNFreqs; ++fi) {
+            for (int fi = 0; fi < iNFreqs; ++fi) {
                 // Row normalization: sum of |H_{ik}(f)|^2 over all k
                 double rowNorm = 0.0;
-                for(int k = 0; k < nCh; ++k) {
+                for (int k = 0; k < nCh; ++k) {
                     rowNorm += std::norm(vecH[fi](i, k));
                 }
 
-                if(rowNorm > 0.0) {
+                if (rowNorm > 0.0) {
                     matWeight(fi, 0) = std::norm(vecH[fi](i, j)) / rowNorm;
                 } else {
                     matWeight(fi, 0) = 0.0;

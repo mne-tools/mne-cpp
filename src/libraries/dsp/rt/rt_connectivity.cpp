@@ -41,14 +41,14 @@ using namespace CONNECTIVITYLIB;
 // DEFINE MEMBER METHODS RtConnectivityWorker
 //=============================================================================================================
 
-void RtConnectivityWorker::doWork(const ConnectivitySettings &connectivitySettings)
+void RtConnectivityWorker::doWork(const ConnectivitySettings& connectivitySettings)
 {
-    if(this->thread()->isInterruptionRequested()) {
+    if (this->thread()->isInterruptionRequested()) {
         return;
     }
 
-    if(connectivitySettings.getConnectivityMethods().isEmpty()) {
-        qDebug()<<"RtConnectivityWorker::doWork() - Network methods are empty";
+    if (connectivitySettings.getConnectivityMethods().isEmpty()) {
+        qDebug() << "RtConnectivityWorker::doWork() - Network methods are empty";
         return;
     }
 
@@ -59,17 +59,17 @@ void RtConnectivityWorker::doWork(const ConnectivitySettings &connectivitySettin
 
     QList<Network> finalNetworks = Connectivity::calculate(connectivitySettingsTemp);
 
-//    iTime = time.elapsed();
+    //    iTime = time.elapsed();
 
-//    qDebug()<<"----------------------------------------";
-//    qDebug()<<"----------------------------------------";
-//    qDebug()<<"------RtConnectivityWorker::doWork()";
-//    qDebug()<<"------Method:"<<connectivitySettings.getConnectivityMethods().first();
-//    qDebug()<<"------Data dim:"<<connectivitySettings.at(0).matData.rows() << "x" << connectivitySettings.at(0).matData.cols();
-//    qDebug()<<"------Number trials:"<< connectivitySettings.size();
-//    qDebug()<<"------Total time:"<<iTime << "ms";
-//    qDebug()<<"----------------------------------------";
-//    qDebug()<<"----------------------------------------";
+    //    qDebug()<<"----------------------------------------";
+    //    qDebug()<<"----------------------------------------";
+    //    qDebug()<<"------RtConnectivityWorker::doWork()";
+    //    qDebug()<<"------Method:"<<connectivitySettings.getConnectivityMethods().first();
+    //    qDebug()<<"------Data dim:"<<connectivitySettings.at(0).matData.rows() << "x" << connectivitySettings.at(0).matData.cols();
+    //    qDebug()<<"------Number trials:"<< connectivitySettings.size();
+    //    qDebug()<<"------Total time:"<<iTime << "ms";
+    //    qDebug()<<"----------------------------------------";
+    //    qDebug()<<"----------------------------------------";
 
     emit resultReady(finalNetworks, connectivitySettingsTemp);
 }
@@ -78,10 +78,10 @@ void RtConnectivityWorker::doWork(const ConnectivitySettings &connectivitySettin
 // DEFINE MEMBER METHODS RtConnectivity
 //=============================================================================================================
 
-RtConnectivity::RtConnectivity(QObject *parent)
+RtConnectivity::RtConnectivity(QObject* parent)
 : QObject(parent)
 {
-    RtConnectivityWorker *worker = new RtConnectivityWorker;
+    RtConnectivityWorker* worker = new RtConnectivityWorker;
     worker->moveToThread(&m_workerThread);
 
     connect(&m_workerThread, &QThread::finished,
@@ -116,7 +116,7 @@ void RtConnectivity::restart()
 {
     stop();
 
-    RtConnectivityWorker *worker = new RtConnectivityWorker;
+    RtConnectivityWorker* worker = new RtConnectivityWorker;
     worker->moveToThread(&m_workerThread);
 
     connect(&m_workerThread, &QThread::finished,

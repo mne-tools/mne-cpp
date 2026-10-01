@@ -38,18 +38,21 @@
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-namespace FIFFLIB {
-    class FiffCov;
-    class FiffInfo;
+namespace FIFFLIB
+{
+class FiffCov;
+class FiffInfo;
 }
 
-namespace RTPROCESSINGLIB {
-    class RtCov;
+namespace RTPROCESSINGLIB
+{
+class RtCov;
 }
 
-namespace SCMEASLIB {
-    class RealTimeMultiSampleArray;
-    class RealTimeCov;
+namespace SCMEASLIB
+{
+class RealTimeMultiSampleArray;
+class RealTimeCov;
 }
 
 //=============================================================================================================
@@ -135,15 +138,15 @@ protected:
     virtual void run() override;
 
 private:
-    QMutex      m_mutex;
-    qint32      m_iEstimationSamples;
+    QMutex m_mutex;
+    qint32 m_iEstimationSamples;
 
-    UTILSLIB::CircularBuffer_Matrix_double::SPtr        m_pCircularBuffer;              /**< Matrix data circular buffer. */
+    UTILSLIB::CircularBuffer_Matrix_double::SPtr m_pCircularBuffer; /**< Matrix data circular buffer. */
 
-    QSharedPointer<FIFFLIB::FiffInfo>                   m_pFiffInfo;                    /**< Fiff measurement info.*/
+    QSharedPointer<FIFFLIB::FiffInfo> m_pFiffInfo; /**< Fiff measurement info.*/
 
-    QSharedPointer<SCSHAREDLIB::PluginInputData<SCMEASLIB::RealTimeMultiSampleArray> >  m_pCovarianceInput;     /**< The RealTimeMultiSampleArray of the Covariance input.*/
-    QSharedPointer<SCSHAREDLIB::PluginOutputData<SCMEASLIB::RealTimeCov> >              m_pCovarianceOutput;    /**< The RealTimeCov of the Covariance output.*/
+    QSharedPointer<SCSHAREDLIB::PluginInputData<SCMEASLIB::RealTimeMultiSampleArray>> m_pCovarianceInput; /**< The RealTimeMultiSampleArray of the Covariance input.*/
+    QSharedPointer<SCSHAREDLIB::PluginOutputData<SCMEASLIB::RealTimeCov>> m_pCovarianceOutput;            /**< The RealTimeCov of the Covariance output.*/
 
 signals:
 };

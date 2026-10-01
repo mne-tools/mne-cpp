@@ -22,12 +22,21 @@
 // DEFINE METHODS
 //=============================================================================================================
 
-const char* WRITETOFILEPLUGIN::buildDateTime(){ return UTILSLIB::dateTimeNow();}
+const char* WRITETOFILEPLUGIN::buildDateTime()
+{
+    return UTILSLIB::dateTimeNow();
+}
 
 //=============================================================================================================
 
-const char* WRITETOFILEPLUGIN::buildHash(){ return UTILSLIB::gitHash();}
+const char* WRITETOFILEPLUGIN::buildHash()
+{
+    return UTILSLIB::gitHash();
+}
 
 //=============================================================================================================
 
-const char* WRITETOFILEPLUGIN::buildHashLong(){ return UTILSLIB::gitHashLong();}
+const char* WRITETOFILEPLUGIN::buildHashLong()
+{
+    return UTILSLIB::gitHashLong();
+}

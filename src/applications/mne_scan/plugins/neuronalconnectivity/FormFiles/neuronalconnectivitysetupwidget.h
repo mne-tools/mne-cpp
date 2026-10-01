@@ -58,7 +58,7 @@ public:
      * @param[in] toolbox a pointer to the corresponding NeuronalConnectivityToolbox.
      * @param[in] parent pointer to parent widget; If parent is 0, the new NeuronalConnectivitySetupWidget becomes a window. If parent is another widget, NeuronalConnectivitySetupWidget becomes a child window inside parent. NeuronalConnectivitySetupWidget is deleted when its parent is deleted.
      */
-    NeuronalConnectivitySetupWidget(NeuronalConnectivity* toolbox, QWidget *parent = 0);
+    NeuronalConnectivitySetupWidget(NeuronalConnectivity* toolbox, QWidget* parent = 0);
 
     //=========================================================================================================
     /**
@@ -68,9 +68,9 @@ public:
     ~NeuronalConnectivitySetupWidget();
 
 private:
-    NeuronalConnectivity*   m_pNeuronalConnectivity;	/**< Holds a pointer to corresponding NeuronalConnectivityToolbox.*/
+    NeuronalConnectivity* m_pNeuronalConnectivity; /**< Holds a pointer to corresponding NeuronalConnectivityToolbox.*/
 
-    Ui::NeuronalConnectivitySetupWidgetClass ui;        /**< Holds the user interface for the NeuronalConnectivitySetupWidget.*/
+    Ui::NeuronalConnectivitySetupWidgetClass ui; /**< Holds the user interface for the NeuronalConnectivitySetupWidget.*/
 };
 } // NAMESPACE
 

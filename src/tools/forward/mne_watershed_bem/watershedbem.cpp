@@ -150,9 +150,9 @@ int WatershedBem::run()
     qInfo("%s", "");
     qInfo("Running mri_watershed for BEM segmentation with the following parameters");
     qInfo("%s", "");
-    qInfo("SUBJECTS_DIR = %s" , qPrintable(m_settings.subjectsDir()));
-    qInfo("Subject      = %s" , qPrintable(m_settings.subject()));
-    qInfo("Result dir   = %s" , qPrintable(wsDir));
+    qInfo("SUBJECTS_DIR = %s", qPrintable(m_settings.subjectsDir()));
+    qInfo("Subject      = %s", qPrintable(m_settings.subject()));
+    qInfo("Result dir   = %s", qPrintable(wsDir));
     qInfo("%s", "");
 
     // Create output directory structure
@@ -198,7 +198,7 @@ int WatershedBem::run()
         return 1;
     }
 
-    qInfo("Created %s" , qPrintable(headFif));
+    qInfo("Created %s", qPrintable(headFif));
     qInfo("\nComplete.\n");
     return 0;
 }
@@ -229,8 +229,7 @@ bool WatershedBem::runMriWatershed(const QString& mriInput, const QString& wsDir
         // GCA atlas: -atlas -T1 -brain_atlas $FREESURFER_HOME/average/RB_all_withskull_2007-08-08.gca
         //            $subject_dir/mri/transforms/talairach_with_skull.lta
         QString gcaFile = m_settings.freeSurferHome() + "/average/RB_all_withskull_2007-08-08.gca";
-        QString ltaFile = m_settings.subjectsDir() + "/" + m_settings.subject()
-                        + "/mri/transforms/talairach_with_skull.lta";
+        QString ltaFile = m_settings.subjectsDir() + "/" + m_settings.subject() + "/mri/transforms/talairach_with_skull.lta";
         args << "-atlas" << "-T1" << "-brain_atlas" << gcaFile << ltaFile;
     } else if (m_settings.atlas()) {
         args << "-atlas";
@@ -326,7 +325,7 @@ bool WatershedBem::convertSurfaces(const QString& wsDir, const QString& mgzFile)
         }
 
         if (m_settings.verbose()) {
-            qInfo("Verifying surface: %s" , qPrintable(surfPath));
+            qInfo("Verifying surface: %s", qPrintable(surfPath));
         }
 
         // Read surface to verify it is valid
@@ -335,7 +334,7 @@ bool WatershedBem::convertSurfaces(const QString& wsDir, const QString& mgzFile)
         if (surf.rr().rows() == 0) {
             qWarning() << "FsSurface" << surfPath << "has no vertices.";
         } else if (m_settings.verbose()) {
-            qInfo("  %d vertices, %d triangles" , (int)surf.rr().rows(), (int)surf.tris().rows());
+            qInfo("  %d vertices, %d triangles", (int)surf.rr().rows(), (int)surf.tris().rows());
         }
     }
 
@@ -365,8 +364,8 @@ bool WatershedBem::createBemFif(const QString& surfFile, const QString& fifFile)
         return false;
     }
 
-    qInfo("Read surface: %d vertices, %d triangles" ,
-           (int)fsSurface.rr().rows(), (int)fsSurface.tris().rows());
+    qInfo("Read surface: %d vertices, %d triangles",
+          (int)fsSurface.rr().rows(), (int)fsSurface.tris().rows());
 
     //
     // Create BEM surface
@@ -374,11 +373,11 @@ bool WatershedBem::createBemFif(const QString& surfFile, const QString& fifFile)
     //   MNEBemSurface expects vertices in meters as well.
     //
     MNEBemSurface bemSurface;
-    bemSurface.id = FIFFV_BEM_SURF_ID_HEAD;   // 4 = head surface
+    bemSurface.id = FIFFV_BEM_SURF_ID_HEAD; // 4 = head surface
     bemSurface.np = fsSurface.rr().rows();
     bemSurface.ntri = fsSurface.tris().rows();
     bemSurface.coord_frame = FIFFV_COORD_MRI;
-    bemSurface.sigma = 0.0f;                   // Default conductivity
+    bemSurface.sigma = 0.0f; // Default conductivity
 
     // Copy vertex coordinates and triangles
     bemSurface.rr = fsSurface.rr();

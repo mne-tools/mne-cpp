@@ -57,7 +57,7 @@ using namespace Eigen;
  * @param[in] argv (argument vector) is an array of pointers to arrays of character objects. The array objects are null-terminated strings, representing the arguments that were entered on the command line when the program was started.
  * @return the value that was set to exit() (which is 0 if exit() is called via quit()).
  */
-int main(int argc, char *argv[])
+int main(int argc, char* argv[])
 {
     qInstallMessageHandler(MNELogger::customLogWriter);
     QCoreApplication a(argc, argv);
@@ -80,20 +80,20 @@ int main(int argc, char *argv[])
     FiffEvokedSet p_FiffEvokedSet(t_sampleFile);
 
     //mne_ex_evoked_grad_amp.m example
-    fiff_int_t coil1,coil2;
-    QString one,two;
-    QChar lastone,lasttwo;
+    fiff_int_t coil1, coil2;
+    QString one, two;
+    QChar lastone, lasttwo;
     qint32 npair = 0;
-    MatrixXi pairs(p_FiffEvokedSet.info.nchan,2);
-    fiff_double_t base1,base2;
+    MatrixXi pairs(p_FiffEvokedSet.info.nchan, 2);
+    fiff_double_t base1, base2;
 
     QStringList ch_sel_names;
 
     //settings
     bool do_baseline = false;
-    if(parser.value(doBaselineption) == "false" || parser.value(doBaselineption) == "0") {
+    if (parser.value(doBaselineption) == "false" || parser.value(doBaselineption) == "0") {
         do_baseline = false;
-    } else if(parser.value(doBaselineption) == "true" || parser.value(doBaselineption) == "1") {
+    } else if (parser.value(doBaselineption) == "true" || parser.value(doBaselineption) == "1") {
         do_baseline = true;
     }
 
@@ -102,20 +102,20 @@ int main(int argc, char *argv[])
     fiff_double_t bmin = 0;
     fiff_double_t bmax = 0.231;
 
-    for(qint32 i=0; i < p_FiffEvokedSet.info.nchan-1; ++i) {
+    for (qint32 i = 0; i < p_FiffEvokedSet.info.nchan - 1; ++i) {
         //First check the coil types
         coil1 = p_FiffEvokedSet.info.chs.at(i).chpos.coil_type;
-        coil2 = p_FiffEvokedSet.info.chs.at(i+1).chpos.coil_type;
+        coil2 = p_FiffEvokedSet.info.chs.at(i + 1).chpos.coil_type;
         if (coil1 == coil2 && (coil1 == 2 || coil1 == 3012 || coil1 == 3013)) {
             one = p_FiffEvokedSet.info.ch_names[i];
-            two = p_FiffEvokedSet.info.ch_names[i+1];
-            lastone = one.at(one.size()-1);
-            lasttwo = one.at(two.size()-1);
+            two = p_FiffEvokedSet.info.ch_names[i + 1];
+            lastone = one.at(one.size() - 1);
+            lasttwo = one.at(two.size() - 1);
 
             //Then the channel names
-            if((one.left(3) == "MEG") && (two.left(3) == "MEG") && (one.left(one.size()-1) == two.left(two.size()-1)) && ((one.right(1)=="2" && two.right(1)=="3") || (one.right(1)=="3" && two.right(1)=="2"))) {
-                pairs(npair,0) = (int) i;
-                pairs(npair,1) = i+1;
+            if ((one.left(3) == "MEG") && (two.left(3) == "MEG") && (one.left(one.size() - 1) == two.left(two.size() - 1)) && ((one.right(1) == "2" && two.right(1) == "3") || (one.right(1) == "3" && two.right(1) == "2"))) {
+                pairs(npair, 0) = (int)i;
+                pairs(npair, 1) = i + 1;
                 ++npair;
                 ++i;
             }
@@ -123,44 +123,44 @@ int main(int argc, char *argv[])
     }
 
     printf("\nComputing the amplitudes");
-    if(do_baseline) {
-        printf("(Baseline = %7.1f ... %7.1f ms)',1000*bmin,1000*bmax)",1000*bmin,1000*bmax);
+    if (do_baseline) {
+        printf("(Baseline = %7.1f ... %7.1f ms)',1000*bmin,1000*bmax)", 1000 * bmin, 1000 * bmax);
     }
     printf("...");
 
-    for(qint32 i=0; i < p_FiffEvokedSet.evoked.size()-1; ++i) {
-        if(b2>b1) {
-            b1 = (p_FiffEvokedSet.info.sfreq*bmin) - p_FiffEvokedSet.evoked[i].first;
-            b2 = (p_FiffEvokedSet.info.sfreq*bmax) - p_FiffEvokedSet.evoked[i].last;
-            if(b1 < 1) b1 = 1;
-            if(b2 > p_FiffEvokedSet.evoked[i].data.cols()) b2 = p_FiffEvokedSet.evoked[i].data.cols();
-        }
-        else {
+    for (qint32 i = 0; i < p_FiffEvokedSet.evoked.size() - 1; ++i) {
+        if (b2 > b1) {
+            b1 = (p_FiffEvokedSet.info.sfreq * bmin) - p_FiffEvokedSet.evoked[i].first;
+            b2 = (p_FiffEvokedSet.info.sfreq * bmax) - p_FiffEvokedSet.evoked[i].last;
+            if (b1 < 1)
+                b1 = 1;
+            if (b2 > p_FiffEvokedSet.evoked[i].data.cols())
+                b2 = p_FiffEvokedSet.evoked[i].data.cols();
+        } else {
             b1 = 1;
             b2 = 1;
         }
 
         //go through all pairs
-        qint16 p0,p1;
+        qint16 p0, p1;
         ArrayXd tmparray;
 
-        for(qint32 p=0; p < npair; ++p) {
-            p0 = pairs(p,0);
-            p1 = pairs(p,1);
+        for (qint32 p = 0; p < npair; ++p) {
+            p0 = pairs(p, 0);
+            p1 = pairs(p, 1);
 
-            if(b2 > b1) {
-                Matrix<double,1,Dynamic> tmpbase1;
-                Matrix<double,1,Dynamic> tmpbase2;
+            if (b2 > b1) {
+                Matrix<double, 1, Dynamic> tmpbase1;
+                Matrix<double, 1, Dynamic> tmpbase2;
 
-                tmpbase1 = p_FiffEvokedSet.evoked[i].data.block(pairs(p,0),(b2-b1),1,p_FiffEvokedSet.evoked[i].data.cols());
-                base1 = tmpbase1.sum()/tmpbase1.rows();
-                tmpbase2 = p_FiffEvokedSet.evoked[i].data.block(pairs(p,1),(b2-b1),1,p_FiffEvokedSet.evoked[i].data.cols());
-                base2 = tmpbase2.sum()/tmpbase2.rows();
+                tmpbase1 = p_FiffEvokedSet.evoked[i].data.block(pairs(p, 0), (b2 - b1), 1, p_FiffEvokedSet.evoked[i].data.cols());
+                base1 = tmpbase1.sum() / tmpbase1.rows();
+                tmpbase2 = p_FiffEvokedSet.evoked[i].data.block(pairs(p, 1), (b2 - b1), 1, p_FiffEvokedSet.evoked[i].data.cols());
+                base2 = tmpbase2.sum() / tmpbase2.rows();
 
-                tmparray = ((p_FiffEvokedSet.evoked[i].data.row(p0).array()-base1).square()) + ((p_FiffEvokedSet.evoked[i].data.row(p1).array()-base2).square()).square();
+                tmparray = ((p_FiffEvokedSet.evoked[i].data.row(p0).array() - base1).square()) + ((p_FiffEvokedSet.evoked[i].data.row(p1).array() - base2).square()).square();
                 p_FiffEvokedSet.evoked[i].data.row(p0) = tmparray.matrix();
-            }
-            else {
+            } else {
                 tmparray = ((p_FiffEvokedSet.evoked[i].data.row(p0).array()).square()) + ((p_FiffEvokedSet.evoked[i].data.row(p1).array()).square());
                 p_FiffEvokedSet.evoked[i].data.row(p0) = tmparray.matrix();
             }
@@ -170,30 +170,30 @@ int main(int argc, char *argv[])
     printf("[done]\n");
 
     //Compose the selection name list
-    for(qint32 i=0; i < npair; ++i) {
+    for (qint32 i = 0; i < npair; ++i) {
         ch_sel_names.append(p_FiffEvokedSet.info.ch_names.at(i));
     }
 
     //Omit MEG channels but include others
-    for(qint32 p=0; p < p_FiffEvokedSet.info.nchan; ++p) {
-        if((p_FiffEvokedSet.info.channel_type(p) == "grad") || (p_FiffEvokedSet.info.channel_type(p) == "mag")) {
+    for (qint32 p = 0; p < p_FiffEvokedSet.info.nchan; ++p) {
+        if ((p_FiffEvokedSet.info.channel_type(p) == "grad") || (p_FiffEvokedSet.info.channel_type(p) == "mag")) {
             ch_sel_names.append(p_FiffEvokedSet.info.ch_names.at(p));
         }
     }
 
     //Modify the bad channel list
-    if(!p_FiffEvokedSet.info.bads.isEmpty()) {
-        QString firstOfPair,secondOfPair;
+    if (!p_FiffEvokedSet.info.bads.isEmpty()) {
+        QString firstOfPair, secondOfPair;
 
-        for(qint32 i=0; i < npair; ++i) {
-            firstOfPair = p_FiffEvokedSet.info.ch_names.at(pairs(i,0));
-            secondOfPair = p_FiffEvokedSet.info.ch_names.at(pairs(i,1));
+        for (qint32 i = 0; i < npair; ++i) {
+            firstOfPair = p_FiffEvokedSet.info.ch_names.at(pairs(i, 0));
+            secondOfPair = p_FiffEvokedSet.info.ch_names.at(pairs(i, 1));
 
             //If one channel of the planar gradiometer is marked bad, add the other to the bad channel list
-            if(!p_FiffEvokedSet.info.bads.contains(firstOfPair) && p_FiffEvokedSet.info.bads.contains(secondOfPair))
-                    p_FiffEvokedSet.info.bads.append(secondOfPair);
-            if(p_FiffEvokedSet.info.bads.contains(firstOfPair) && !p_FiffEvokedSet.info.bads.contains(secondOfPair))
-                    p_FiffEvokedSet.info.bads.append(firstOfPair);
+            if (!p_FiffEvokedSet.info.bads.contains(firstOfPair) && p_FiffEvokedSet.info.bads.contains(secondOfPair))
+                p_FiffEvokedSet.info.bads.append(secondOfPair);
+            if (p_FiffEvokedSet.info.bads.contains(firstOfPair) && !p_FiffEvokedSet.info.bads.contains(secondOfPair))
+                p_FiffEvokedSet.info.bads.append(firstOfPair);
         }
     }
 

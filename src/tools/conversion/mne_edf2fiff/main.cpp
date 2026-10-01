@@ -70,7 +70,7 @@ using namespace Eigen;
 * @param[in] argv (argument vector) is an array of pointers to arrays of character objects. The array objects are null-terminated strings, representing the arguments that were entered on the command line when the program was started.
 * @return the value that was set to exit() (which is 0 if exit() is called via quit()).
 */
-int main(int argc, char *argv[])
+int main(int argc, char* argv[])
 {
     qInstallMessageHandler(MNELogger::customLogWriter);
     QCoreApplication a(argc, argv);
@@ -97,24 +97,24 @@ int main(int argc, char *argv[])
     QString sScaleFactor = parser.value(scaleOption);
 
     // check for correct usage:
-    if(sInputFile.isEmpty()) {
+    if (sInputFile.isEmpty()) {
         parser.showHelp(0);
     }
-    if(!sInputFile.toUpper().endsWith(".EDF")) {
+    if (!sInputFile.toUpper().endsWith(".EDF")) {
         qDebug() << "Not an EDF file: " << sInputFile;
         return 0;
     }
 
-    if(sScaleFactor.toFloat() == 0.0f) {
+    if (sScaleFactor.toFloat() == 0.0f) {
         qDebug() << "Not a float number: " << sScaleFactor;
         return 0;
     }
 
     // if the user did not specify an output file, simply use the same location as the input file:
-    if(sOutputFile.isEmpty()) {
+    if (sOutputFile.isEmpty()) {
         qDebug() << "No output file specified, using same filename for output FIFF file";
-        sOutputFile = sInputFile.left(sInputFile.size() - 3);  // cut the 'edf'
-        sOutputFile = sOutputFile.append("fif"); // append 'fif'
+        sOutputFile = sInputFile.left(sInputFile.size() - 3); // cut the 'edf'
+        sOutputFile = sOutputFile.append("fif");              // append 'fif'
     }
 
     // init data loading and writing
@@ -138,13 +138,13 @@ int main(int argc, char *argv[])
     FiffStream::SPtr outfid = FiffStream::start_writing_raw(t_fileOut, fiffRaw.info, cals);
 
     // copied from read/write example
-    fiff_int_t first = 0;  // EDF files start at index 0
+    fiff_int_t first = 0; // EDF files start at index 0
     outfid->write_int(FIFF_FIRST_SAMPLE, &first);
 
     // read chunks, remember how many samples were already read
     int iSamplesRead = 0;
 
-    while(iSamplesRead < edfInfo.getSampleCount()) {
+    while (iSamplesRead < edfInfo.getSampleCount()) {
         int iNextChunkSize = std::min(iTimesliceSamples, edfInfo.getSampleCount() - iSamplesRead);
         // EDF sample indexing starts at 0, simply use samplesRead as argument to read_raw_segment
         MatrixXd data = edfRaw.read_raw_segment(iSamplesRead, iSamplesRead + iNextChunkSize).cast<double>();

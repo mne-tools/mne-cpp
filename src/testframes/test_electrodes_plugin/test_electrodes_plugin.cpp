@@ -89,7 +89,7 @@ void TestElectrodesPlugin::setArraysReplacesGeometry()
         c.position = QVector3D(0.0f, 0.0f, static_cast<float>(i) * 0.005f);
         arr.contacts.append(c);
     }
-    QVector<ElectrodeArray> arrays {arr};
+    QVector<ElectrodeArray> arrays{arr};
     plugin.setArrays(arrays);
 
     QCOMPARE(plugin.arrayCount(), 1);

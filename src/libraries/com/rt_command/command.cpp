@@ -44,7 +44,7 @@ using namespace COMLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-Command::Command(bool p_bIsJson, QObject *parent)
+Command::Command(bool p_bIsJson, QObject* parent)
 : QObject(parent)
 , m_sCommand("")
 , m_sDescription("")
@@ -54,7 +54,7 @@ Command::Command(bool p_bIsJson, QObject *parent)
 
 //=============================================================================================================
 
-Command::Command(const QString &p_sCommand, const QJsonObject &p_qCommandDescription, bool p_bIsJson, QObject *parent)
+Command::Command(const QString& p_sCommand, const QJsonObject& p_qCommandDescription, bool p_bIsJson, QObject* parent)
 : QObject(parent)
 , m_bIsJson(p_bIsJson)
 {
@@ -65,8 +65,7 @@ Command::Command(const QString &p_sCommand, const QJsonObject &p_qCommandDescrip
 
     QJsonObject::Iterator it;
 
-    for(it = t_jsonObjectParameter.begin(); it != t_jsonObjectParameter.end(); ++it)
-    {
+    for (it = t_jsonObjectParameter.begin(); it != t_jsonObjectParameter.end(); ++it) {
         QJsonValue t_jsonValueType = it.value().toObject().value(QString("type"));
         QMetaType t_metaType = QMetaType::fromName(t_jsonValueType.toString().toUtf8().constData());
 
@@ -78,7 +77,7 @@ Command::Command(const QString &p_sCommand, const QJsonObject &p_qCommandDescrip
 
 //=============================================================================================================
 
-Command::Command(const QString &p_sCommand, const QString &p_sDescription, bool p_bIsJson, QObject *parent)
+Command::Command(const QString& p_sCommand, const QString& p_sDescription, bool p_bIsJson, QObject* parent)
 : QObject(parent)
 , m_sCommand(p_sCommand)
 , m_sDescription(p_sDescription)
@@ -88,8 +87,8 @@ Command::Command(const QString &p_sCommand, const QString &p_sDescription, bool 
 
 //=============================================================================================================
 
-Command::Command(   const QString &p_sCommand, const QString &p_sDescription,
-                    const QStringList &p_qListParamNames, const QList<QVariant> &p_qListParamValues, bool p_bIsJson, QObject *parent)
+Command::Command(const QString& p_sCommand, const QString& p_sDescription,
+                 const QStringList& p_qListParamNames, const QList<QVariant>& p_qListParamValues, bool p_bIsJson, QObject* parent)
 : QObject(parent)
 , m_sCommand(p_sCommand)
 , m_sDescription(p_sDescription)
@@ -98,30 +97,26 @@ Command::Command(   const QString &p_sCommand, const QString &p_sDescription,
     m_qListParamNames = p_qListParamNames;
     m_qListParamValues = p_qListParamValues;
 
-    for(qint32 i = 0; i < p_qListParamValues.size(); ++i)
+    for (qint32 i = 0; i < p_qListParamValues.size(); ++i)
         m_qListParamDescriptions.append("");
 }
 
 //=============================================================================================================
 
-Command::Command(   const QString &p_sCommand, const QString &p_sDescription,
-                    const QStringList &p_qListParamNames, const QList<QVariant> &p_qListParamValues, const QStringList &p_vecParameterDescriptions, bool p_bIsJson, QObject *parent)
+Command::Command(const QString& p_sCommand, const QString& p_sDescription,
+                 const QStringList& p_qListParamNames, const QList<QVariant>& p_qListParamValues, const QStringList& p_vecParameterDescriptions, bool p_bIsJson, QObject* parent)
 : QObject(parent)
 , m_sCommand(p_sCommand)
 , m_sDescription(p_sDescription)
 , m_bIsJson(p_bIsJson)
 {
-    if(p_qListParamNames.size() == p_qListParamValues.size())
-    {
-        if(p_qListParamValues.size() == p_vecParameterDescriptions.size())
-        {
+    if (p_qListParamNames.size() == p_qListParamValues.size()) {
+        if (p_qListParamValues.size() == p_vecParameterDescriptions.size()) {
             m_qListParamNames = p_qListParamNames;
             m_qListParamValues = p_qListParamValues;
             m_qListParamDescriptions = p_vecParameterDescriptions;
         }
-    }
-    else
-    {
+    } else {
         qCritical("error: description vector hasn't the same size like parameter map.\n");
         return;
     }
@@ -129,7 +124,7 @@ Command::Command(   const QString &p_sCommand, const QString &p_sDescription,
 
 //=============================================================================================================
 
-Command::Command(const Command &p_Command)
+Command::Command(const Command& p_Command)
 : QObject(p_Command.parent())
 , m_sCommand(p_Command.m_sCommand)
 , m_sDescription(p_Command.m_sDescription)
@@ -155,11 +150,11 @@ void Command::execute()
 
 //=============================================================================================================
 
-void Command::reply(const QString &p_sReply)
+void Command::reply(const QString& p_sReply)
 {
-    CommandManager* t_commandManager = static_cast<CommandManager*> (this->parent());
+    CommandManager* t_commandManager = static_cast<CommandManager*>(this->parent());
 
-    if(t_commandManager) {
+    if (t_commandManager) {
         emit t_commandManager->response(p_sReply, *this);
     }
 }
@@ -168,9 +163,9 @@ void Command::reply(const QString &p_sReply)
 
 void Command::send()
 {
-    CommandManager* t_commandManager = static_cast<CommandManager*> (this->parent());
+    CommandManager* t_commandManager = static_cast<CommandManager*>(this->parent());
 
-    if(t_commandManager) {
+    if (t_commandManager) {
         emit t_commandManager->triggered(*this);
     }
 }
@@ -183,11 +178,10 @@ QJsonObject Command::toJsonObject() const
     p_jsonCommandObject.insert("description", QJsonValue(m_sDescription));
 
     QJsonObject t_jsonAllParametersObject;
-    for(qint32 i = 0; i < m_qListParamValues.size(); ++i)
-    {
+    for (qint32 i = 0; i < m_qListParamValues.size(); ++i) {
         QJsonObject t_jsonParameterObject;
-        t_jsonParameterObject.insert("description",QJsonValue(m_qListParamDescriptions[i]));
-        t_jsonParameterObject.insert("type",QString(m_qListParamValues[i].typeName()));
+        t_jsonParameterObject.insert("description", QJsonValue(m_qListParamDescriptions[i]));
+        t_jsonParameterObject.insert("type", QString(m_qListParamValues[i].typeName()));
         t_jsonAllParametersObject.insert(m_qListParamNames[i], QJsonValue(t_jsonParameterObject));
     }
     p_jsonCommandObject.insert("parameters", QJsonValue(t_jsonAllParametersObject));
@@ -204,8 +198,7 @@ QStringList Command::toStringList() const
     p_stringCommandList << m_sCommand;
 
     QString t_sParameters;
-    for(qint32 i = 0; i < m_qListParamDescriptions.size(); ++i)
-    {
+    for (qint32 i = 0; i < m_qListParamDescriptions.size(); ++i) {
         t_sParameters.append("[");
         t_sParameters.append(m_qListParamDescriptions[i]);
         t_sParameters.append("]");
@@ -224,12 +217,11 @@ QString Command::toStringReadySend() const
     QString p_stringCommand;
 
     QString t_sParameters;
-    for(qint32 i = 0; i < m_qListParamNames.size(); ++i)
-    {
-//        qDebug() << m_qListParamValues[i];
+    for (qint32 i = 0; i < m_qListParamNames.size(); ++i) {
+        //        qDebug() << m_qListParamValues[i];
         t_sParameters.append(QString("\"%1\":\"%2\"").arg(m_qListParamNames[i]).arg(m_qListParamValues[i].toString()));
 
-        if(i < m_qListParamNames.size()-1)
+        if (i < m_qListParamNames.size() - 1)
             t_sParameters.append(",");
     }
 
@@ -240,7 +232,7 @@ QString Command::toStringReadySend() const
 
 //=============================================================================================================
 
-Command& Command::operator= (const Command &rhs)
+Command& Command::operator=(const Command& rhs)
 {
     if (this != &rhs) // protect against invalid self-assignment
     {
@@ -256,9 +248,9 @@ Command& Command::operator= (const Command &rhs)
 
 //=============================================================================================================
 
-QVariant& Command::operator[] (const QString &key)
+QVariant& Command::operator[](const QString& key)
 {
-    if(m_qListParamNames.contains(key))
+    if (m_qListParamNames.contains(key))
         return m_qListParamValues[m_qListParamNames.indexOf(key)];
     else
         return defaultVariant;
@@ -266,9 +258,9 @@ QVariant& Command::operator[] (const QString &key)
 
 //=============================================================================================================
 
-QVariant& Command::operator[] (qint32 idx)
+QVariant& Command::operator[](qint32 idx)
 {
-    if(m_qListParamValues.size() > idx)
+    if (m_qListParamValues.size() > idx)
         return m_qListParamValues[idx];
     else
         return defaultVariant;
@@ -276,9 +268,9 @@ QVariant& Command::operator[] (qint32 idx)
 
 //=============================================================================================================
 
-const QVariant Command::operator[] (const QString &key) const
+const QVariant Command::operator[](const QString& key) const
 {
-    if(m_qListParamNames.contains(key))
+    if (m_qListParamNames.contains(key))
         return m_qListParamValues[m_qListParamNames.indexOf(key)];
     else
         return defaultVariant;

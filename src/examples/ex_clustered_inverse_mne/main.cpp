@@ -68,11 +68,11 @@ using namespace Eigen;
  * @param[in] argv (argument vector) is an array of pointers to arrays of character objects. The array objects are null-terminated strings, representing the arguments that were entered on the command line when the program was started.
  * @return the value that was set to exit() (which is 0 if exit() is called via quit()).
  */
-int main(int argc, char *argv[])
+int main(int argc, char* argv[])
 {
-    #ifdef STATICBUILD
-    // Q_INIT_RESOURCE(mne_disp3d);
-    #endif
+#ifdef STATICBUILD
+// Q_INIT_RESOURCE(mne_disp3d);
+#endif
     qInstallMessageHandler(MNELogger::customLogWriter);
     QApplication app(argc, argv);
 
@@ -84,8 +84,8 @@ int main(int argc, char *argv[])
     QCommandLineOption sampleFwdFileOption("fwd", "Path to the forward solution <file>.", "file", QCoreApplication::applicationDirPath() + "/../resources/data/MNE-sample-data/MEG/sample/sample_audvis-meg-eeg-oct-6-fwd.fif");
     QCommandLineOption sampleCovFileOption("cov", "Path to the covariance <file>.", "file", QCoreApplication::applicationDirPath() + "/../resources/data/MNE-sample-data/MEG/sample/sample_audvis-cov.fif");
     QCommandLineOption sampleEvokedFileOption("ave", "Path to the evoked/average <file>.", "file", QCoreApplication::applicationDirPath() + "/../resources/data/MNE-sample-data/MEG/sample/sample_audvis-ave.fif");
-    QCommandLineOption snrOption("snr", "The <snr> value used for computation.", "snr", "1.0");//3.0;//0.1;//3.0;
-    QCommandLineOption methodOption("method", "Inverse estimation <method>, i.e., 'MNE', 'dSPM' or 'sLORETA'.", "method", "dSPM");//"MNE" | "dSPM" | "sLORETA"
+    QCommandLineOption snrOption("snr", "The <snr> value used for computation.", "snr", "1.0");                                    //3.0;//0.1;//3.0;
+    QCommandLineOption methodOption("method", "Inverse estimation <method>, i.e., 'MNE', 'dSPM' or 'sLORETA'.", "method", "dSPM"); //"MNE" | "dSPM" | "sLORETA"
     QCommandLineOption invFileOption("invOut", "Path to inverse <file>, which is to be written.", "file", "");
     QCommandLineOption stcFileOption("stcOut", "Path to stc <file>, which is to be written.", "file", "");
     QCommandLineOption surfOption("surfType", "FsSurface type <type>.", "type", "orig");
@@ -122,8 +122,8 @@ int main(int argc, char *argv[])
 
     double lambda2 = 1.0 / pow(snr, 2);
 
-    FsSurfaceSet t_surfSet (parser.value(subjectOption), parser.value(hemiOption).toInt(), parser.value(surfOption), parser.value(subjectPathOption));
-    FsAnnotationSet t_annotationSet (parser.value(subjectOption), parser.value(hemiOption).toInt(), parser.value(annotOption), parser.value(subjectPathOption));
+    FsSurfaceSet t_surfSet(parser.value(subjectOption), parser.value(hemiOption).toInt(), parser.value(surfOption), parser.value(subjectPathOption));
+    FsAnnotationSet t_annotationSet(parser.value(subjectOption), parser.value(hemiOption).toInt(), parser.value(annotOption), parser.value(subjectPathOption));
 
     qDebug() << "Start calculation with: SNR" << snr << "; Lambda" << lambda2 << "; Method" << method << "; stc:" << t_sFileNameStc;
 
@@ -131,13 +131,13 @@ int main(int argc, char *argv[])
     fiff_int_t setno = 0;
     QPair<float, float> baseline(-1.0f, -1.0f);
     FiffEvoked evoked(t_fileEvoked, setno, baseline);
-    if(evoked.isEmpty())
+    if (evoked.isEmpty())
         return 1;
 
     std::cout << "evoked first " << evoked.first << "; last " << evoked.last << std::endl;
 
     MNEForwardSolution t_Fwd(t_fileFwd);
-    if(t_Fwd.isEmpty())
+    if (t_Fwd.isEmpty())
         return 1;
 
     FiffCov noise_cov(t_fileCov);
@@ -148,10 +148,10 @@ int main(int argc, char *argv[])
     //
     // Cluster forward solution;
     //
-    MNEForwardSolution t_clusteredFwd = t_Fwd.cluster_forward_solution(t_annotationSet, 20);//40);
+    MNEForwardSolution t_clusteredFwd = t_Fwd.cluster_forward_solution(t_annotationSet, 20); //40);
 
-//    std::cout << "Size " << t_clusteredFwd.sol->data.rows() << " x " << t_clusteredFwd.sol->data.cols() << std::endl;
-//    std::cout << "Clustered Fwd:\n" << t_clusteredFwd.sol->data.row(0) << std::endl;
+    //    std::cout << "Size " << t_clusteredFwd.sol->data.rows() << " x " << t_clusteredFwd.sol->data.cols() << std::endl;
+    //    std::cout << "Clustered Fwd:\n" << t_clusteredFwd.sol->data.row(0) << std::endl;
 
     //
     // make an inverse operators
@@ -163,8 +163,7 @@ int main(int argc, char *argv[])
     //
     // save clustered inverse
     //
-    if(!t_sFileNameClusteredInv.isEmpty())
-    {
+    if (!t_sFileNameClusteredInv.isEmpty()) {
         QFile t_fileClusteredInverse(t_sFileNameClusteredInv);
         inverse_operator.write(t_fileClusteredInverse);
     }
@@ -175,90 +174,97 @@ int main(int argc, char *argv[])
     InvMinimumNorm minimumNorm(inverse_operator, lambda2, method);
     InvSourceEstimate sourceEstimate = minimumNorm.calculateInverse(evoked);
 
-    if(sourceEstimate.isEmpty())
+    if (sourceEstimate.isEmpty())
         return 1;
 
     // View activation time-series
-    std::cout << "\nsourceEstimate:\n" << sourceEstimate.data.block(0,0,10,10) << std::endl;
-    std::cout << "time\n" << sourceEstimate.times.block(0,0,1,10) << std::endl;
-    std::cout << "timeMin\n" << sourceEstimate.times[0] << std::endl;
-    std::cout << "timeMax\n" << sourceEstimate.times[sourceEstimate.times.size()-1] << std::endl;
-    std::cout << "time step\n" << sourceEstimate.tstep << std::endl;
+    std::cout << "\nsourceEstimate:\n"
+              << sourceEstimate.data.block(0, 0, 10, 10) << std::endl;
+    std::cout << "time\n"
+              << sourceEstimate.times.block(0, 0, 1, 10) << std::endl;
+    std::cout << "timeMin\n"
+              << sourceEstimate.times[0] << std::endl;
+    std::cout << "timeMax\n"
+              << sourceEstimate.times[sourceEstimate.times.size() - 1] << std::endl;
+    std::cout << "time step\n"
+              << sourceEstimate.tstep << std::endl;
 
     //Condition Numbers
-//    MatrixXd mags(102, t_Fwd.sol->data.cols());
-//    qint32 count = 0;
-//    for(qint32 i = 2; i < 306; i += 3)
-//    {
-//        mags.row(count) = t_Fwd.sol->data.row(i);
-//        ++count;
-//    }
-//    MatrixXd magsClustered(102, t_clusteredFwd.sol->data.cols());
-//    count = 0;
-//    for(qint32 i = 2; i < 306; i += 3)
-//    {
-//        magsClustered.row(count) = t_clusteredFwd.sol->data.row(i);
-//        ++count;
-//    }
+    //    MatrixXd mags(102, t_Fwd.sol->data.cols());
+    //    qint32 count = 0;
+    //    for(qint32 i = 2; i < 306; i += 3)
+    //    {
+    //        mags.row(count) = t_Fwd.sol->data.row(i);
+    //        ++count;
+    //    }
+    //    MatrixXd magsClustered(102, t_clusteredFwd.sol->data.cols());
+    //    count = 0;
+    //    for(qint32 i = 2; i < 306; i += 3)
+    //    {
+    //        magsClustered.row(count) = t_clusteredFwd.sol->data.row(i);
+    //        ++count;
+    //    }
 
-//    MatrixXd grads(204, t_Fwd.sol->data.cols());
-//    count = 0;
-//    for(qint32 i = 0; i < 306; i += 3)
-//    {
-//        grads.row(count) = t_Fwd.sol->data.row(i);
-//        ++count;
-//        grads.row(count) = t_Fwd.sol->data.row(i+1);
-//        ++count;
-//    }
-//    MatrixXd gradsClustered(204, t_clusteredFwd.sol->data.cols());
-//    count = 0;
-//    for(qint32 i = 0; i < 306; i += 3)
-//    {
-//        gradsClustered.row(count) = t_clusteredFwd.sol->data.row(i);
-//        ++count;
-//        gradsClustered.row(count) = t_clusteredFwd.sol->data.row(i+1);
-//        ++count;
-//    }
+    //    MatrixXd grads(204, t_Fwd.sol->data.cols());
+    //    count = 0;
+    //    for(qint32 i = 0; i < 306; i += 3)
+    //    {
+    //        grads.row(count) = t_Fwd.sol->data.row(i);
+    //        ++count;
+    //        grads.row(count) = t_Fwd.sol->data.row(i+1);
+    //        ++count;
+    //    }
+    //    MatrixXd gradsClustered(204, t_clusteredFwd.sol->data.cols());
+    //    count = 0;
+    //    for(qint32 i = 0; i < 306; i += 3)
+    //    {
+    //        gradsClustered.row(count) = t_clusteredFwd.sol->data.row(i);
+    //        ++count;
+    //        gradsClustered.row(count) = t_clusteredFwd.sol->data.row(i+1);
+    //        ++count;
+    //    }
 
     VectorXd s;
 
     double t_dConditionNumber = Linalg::getConditionNumber(t_Fwd.sol->data, s);
     double t_dConditionNumberClustered = Linalg::getConditionNumber(t_clusteredFwd.sol->data, s);
 
-    std::cout << "Condition Number:\n" << t_dConditionNumber << std::endl;
-    std::cout << "Clustered Condition Number:\n" << t_dConditionNumberClustered << std::endl;
+    std::cout << "Condition Number:\n"
+              << t_dConditionNumber << std::endl;
+    std::cout << "Clustered Condition Number:\n"
+              << t_dConditionNumberClustered << std::endl;
 
-    std::cout << "ForwardSolution" << t_Fwd.sol->data.block(0,0,10,10) << std::endl;
+    std::cout << "ForwardSolution" << t_Fwd.sol->data.block(0, 0, 10, 10) << std::endl;
 
-    std::cout << "Clustered ForwardSolution" << t_clusteredFwd.sol->data.block(0,0,10,10) << std::endl;
+    std::cout << "Clustered ForwardSolution" << t_clusteredFwd.sol->data.block(0, 0, 10, 10) << std::endl;
 
-//    double t_dConditionNumberMags = Linalg::getConditionNumber(mags, s);
-//    double t_dConditionNumberMagsClustered = Linalg::getConditionNumber(magsClustered, s);
+    //    double t_dConditionNumberMags = Linalg::getConditionNumber(mags, s);
+    //    double t_dConditionNumberMagsClustered = Linalg::getConditionNumber(magsClustered, s);
 
-//    std::cout << "Condition Number Magnetometers:\n" << t_dConditionNumberMags << std::endl;
-//    std::cout << "Clustered Condition Number Magnetometers:\n" << t_dConditionNumberMagsClustered << std::endl;
+    //    std::cout << "Condition Number Magnetometers:\n" << t_dConditionNumberMags << std::endl;
+    //    std::cout << "Clustered Condition Number Magnetometers:\n" << t_dConditionNumberMagsClustered << std::endl;
 
-//    double t_dConditionNumberGrads = Linalg::getConditionNumber(grads, s);
-//    double t_dConditionNumberGradsClustered = Linalg::getConditionNumber(gradsClustered, s);
+    //    double t_dConditionNumberGrads = Linalg::getConditionNumber(grads, s);
+    //    double t_dConditionNumberGradsClustered = Linalg::getConditionNumber(gradsClustered, s);
 
-//    std::cout << "Condition Number Gradiometers:\n" << t_dConditionNumberGrads << std::endl;
-//    std::cout << "Clustered Condition Number Gradiometers:\n" << t_dConditionNumberGradsClustered << std::endl;
+    //    std::cout << "Condition Number Gradiometers:\n" << t_dConditionNumberGrads << std::endl;
+    //    std::cout << "Clustered Condition Number Gradiometers:\n" << t_dConditionNumberGradsClustered << std::endl;
 
     //Source Estimate end
     //########################################################################################
 
-//    //only one time point - P100
-//    qint32 sample = 0;
-//    for(qint32 i = 0; i < sourceEstimate.times.size(); ++i)
-//    {
-//        if(sourceEstimate.times(i) >= 0)
-//        {
-//            sample = i;
-//            break;
-//        }
-//    }
-//    sample += (qint32)ceil(0.106/sourceEstimate.tstep); //100ms
-//    sourceEstimate = sourceEstimate.reduce(sample, 1);
+    //    //only one time point - P100
+    //    qint32 sample = 0;
+    //    for(qint32 i = 0; i < sourceEstimate.times.size(); ++i)
+    //    {
+    //        if(sourceEstimate.times(i) >= 0)
+    //        {
+    //            sample = i;
+    //            break;
+    //        }
+    //    }
+    //    sample += (qint32)ceil(0.106/sourceEstimate.tstep); //100ms
+    //    sourceEstimate = sourceEstimate.reduce(sample, 1);
 
     // Write source estimate to temp files for visualization
     int nVertLh = t_clusteredFwd.src[0].nuse;
@@ -282,8 +288,8 @@ int main(int argc, char *argv[])
     QFile rhStcFile(rhStcPath);
     stcRh.write(rhStcFile);
 
-    BrainView *pBrainView = new BrainView();
-    BrainTreeModel *pModel = new BrainTreeModel();
+    BrainView* pBrainView = new BrainView();
+    BrainTreeModel* pModel = new BrainTreeModel();
     pBrainView->setModel(pModel);
 
     // Add hemisphere surfaces
@@ -306,13 +312,12 @@ int main(int argc, char *argv[])
     });
     pBrainView->loadSourceEstimate(lhStcPath, rhStcPath);
 
-    if(!t_sFileNameStc.isEmpty())
-    {
+    if (!t_sFileNameStc.isEmpty()) {
         QFile t_fileClusteredStc(t_sFileNameStc);
         sourceEstimate.write(t_fileClusteredStc);
     }
 
     pBrainView->show();
 
-    return app.exec();//1;
+    return app.exec(); //1;
 }

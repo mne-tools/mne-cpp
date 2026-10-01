@@ -66,10 +66,10 @@ namespace UTILSLIB
  * @return Returns the final SPHARA operator with dimensions (iOperatorDim,iOperatorDim).
  */
 DSPSHARED_EXPORT Eigen::MatrixXd makeSpharaProjector(const Eigen::MatrixXd& matBaseFct,
-                                                      const Eigen::VectorXi& vecIndices,
-                                                      int iOperatorDim,
-                                                      int iNBaseFct,
-                                                      int iSkip = 0);
+                                                     const Eigen::VectorXi& vecIndices,
+                                                     int iOperatorDim,
+                                                     int iNBaseFct,
+                                                     int iSkip = 0);
 
 } // NAMESPACE UTILSLIB
 

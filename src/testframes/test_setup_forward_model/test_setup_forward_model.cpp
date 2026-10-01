@@ -22,7 +22,9 @@ class TestSetupForwardModel : public QObject
     Q_OBJECT
 
 public:
-    TestSetupForwardModel() {}
+    TestSetupForwardModel()
+    {
+    }
 
 private:
     bool createSyntheticTriFile(const QString& filePath, float scale = 100.0f)
@@ -181,12 +183,12 @@ private slots:
     void testSettingsCombined()
     {
         const char* argv[] = {"test",
-            "--subject", "sample", "--subjects-dir", "/tmp/sub",
-            "--homog", "--nosol", "--noswap", "--meters", "--overwrite",
-            "--scalpc", "0.5", "--skullc", "0.01", "--brainc", "0.4",
-            "--model", "mymodel",
-            "--innershift", "2.0", "--outershift", "3.0", "--scalpshift", "1.0",
-            "--ico", "5", "--surf"};
+                              "--subject", "sample", "--subjects-dir", "/tmp/sub",
+                              "--homog", "--nosol", "--noswap", "--meters", "--overwrite",
+                              "--scalpc", "0.5", "--skullc", "0.01", "--brainc", "0.4",
+                              "--model", "mymodel",
+                              "--innershift", "2.0", "--outershift", "3.0", "--scalpshift", "1.0",
+                              "--ico", "5", "--surf"};
         int argc = 27;
         MNESetupForwardModelSettings settings(&argc, const_cast<char**>(argv));
         QCOMPARE(settings.subject(), QString("sample"));
@@ -283,7 +285,7 @@ private slots:
         createBemDirectory(tmpDir.path(), "sample", true);
         QByteArray dirBytes = tmpDir.path().toUtf8();
         const char* argv[] = {"test", "--subjects-dir", dirBytes.constData(),
-            "--subject", "sample", "--homog", "--nosol", "--overwrite"};
+                              "--subject", "sample", "--homog", "--nosol", "--overwrite"};
         int argc = 8;
         MNESetupForwardModelSettings settings(&argc, const_cast<char**>(argv));
         SetupForwardModel model(settings);
@@ -302,7 +304,7 @@ private slots:
         createBemDirectory(tmpDir.path(), "sample", false);
         QByteArray dirBytes = tmpDir.path().toUtf8();
         const char* argv[] = {"test", "--subjects-dir", dirBytes.constData(),
-            "--subject", "sample", "--nosol", "--overwrite"};
+                              "--subject", "sample", "--nosol", "--overwrite"};
         int argc = 7;
         MNESetupForwardModelSettings settings(&argc, const_cast<char**>(argv));
         SetupForwardModel model(settings);
@@ -320,7 +322,7 @@ private slots:
         createBemDirectory(tmpDir.path(), "sample", true);
         QByteArray dirBytes = tmpDir.path().toUtf8();
         const char* argv[] = {"test", "--subjects-dir", dirBytes.constData(),
-            "--subject", "sample", "--homog", "--nosol", "--overwrite", "--model", "test_model"};
+                              "--subject", "sample", "--homog", "--nosol", "--overwrite", "--model", "test_model"};
         int argc = 10;
         MNESetupForwardModelSettings settings(&argc, const_cast<char**>(argv));
         SetupForwardModel model(settings);
@@ -336,7 +338,7 @@ private slots:
         QByteArray dirBytes = tmpDir.path().toUtf8();
         {
             const char* argv[] = {"test", "--subjects-dir", dirBytes.constData(),
-                "--subject", "sample", "--homog", "--nosol", "--overwrite", "--model", "ow_test"};
+                                  "--subject", "sample", "--homog", "--nosol", "--overwrite", "--model", "ow_test"};
             int argc = 10;
             MNESetupForwardModelSettings settings(&argc, const_cast<char**>(argv));
             SetupForwardModel model(settings);
@@ -344,7 +346,7 @@ private slots:
         }
         {
             const char* argv[] = {"test", "--subjects-dir", dirBytes.constData(),
-                "--subject", "sample", "--homog", "--nosol", "--model", "ow_test"};
+                                  "--subject", "sample", "--homog", "--nosol", "--model", "ow_test"};
             int argc = 9;
             MNESetupForwardModelSettings settings(&argc, const_cast<char**>(argv));
             SetupForwardModel model(settings);
@@ -359,7 +361,7 @@ private slots:
         createBemDirectory(tmpDir.path(), "sample", true);
         QByteArray dirBytes = tmpDir.path().toUtf8();
         const char* argv[] = {"test", "--subjects-dir", dirBytes.constData(),
-            "--subject", "sample", "--homog", "--nosol", "--overwrite", "--innershift", "2.0"};
+                              "--subject", "sample", "--homog", "--nosol", "--overwrite", "--innershift", "2.0"};
         int argc = 10;
         MNESetupForwardModelSettings settings(&argc, const_cast<char**>(argv));
         SetupForwardModel model(settings);
@@ -373,7 +375,7 @@ private slots:
         createBemDirectory(tmpDir.path(), "sample", true);
         QByteArray dirBytes = tmpDir.path().toUtf8();
         const char* argv[] = {"test", "--subjects-dir", dirBytes.constData(),
-            "--subject", "sample", "--homog", "--nosol", "--overwrite", "--noswap"};
+                              "--subject", "sample", "--homog", "--nosol", "--overwrite", "--noswap"};
         int argc = 9;
         MNESetupForwardModelSettings settings(&argc, const_cast<char**>(argv));
         SetupForwardModel model(settings);
@@ -389,7 +391,7 @@ private slots:
         createSyntheticTriFile(bemDir + "/inner_skull.tri", 0.1f);
         QByteArray dirBytes = tmpDir.path().toUtf8();
         const char* argv[] = {"test", "--subjects-dir", dirBytes.constData(),
-            "--subject", "sample", "--homog", "--nosol", "--overwrite", "--meters"};
+                              "--subject", "sample", "--homog", "--nosol", "--overwrite", "--meters"};
         int argc = 9;
         MNESetupForwardModelSettings settings(&argc, const_cast<char**>(argv));
         SetupForwardModel model(settings);
@@ -403,8 +405,8 @@ private slots:
         createBemDirectory(tmpDir.path(), "sample", false);
         QByteArray dirBytes = tmpDir.path().toUtf8();
         const char* argv[] = {"test", "--subjects-dir", dirBytes.constData(),
-            "--subject", "sample", "--nosol", "--overwrite",
-            "--scalpc", "0.5", "--skullc", "0.01", "--brainc", "0.4"};
+                              "--subject", "sample", "--nosol", "--overwrite",
+                              "--scalpc", "0.5", "--skullc", "0.01", "--brainc", "0.4"};
         int argc = 13;
         MNESetupForwardModelSettings settings(&argc, const_cast<char**>(argv));
         SetupForwardModel model(settings);
@@ -418,8 +420,8 @@ private slots:
         createBemDirectory(tmpDir.path(), "sample", false);
         QByteArray dirBytes = tmpDir.path().toUtf8();
         const char* argv[] = {"test", "--subjects-dir", dirBytes.constData(),
-            "--subject", "sample", "--nosol", "--overwrite",
-            "--innershift", "1.0", "--outershift", "2.0", "--scalpshift", "3.0"};
+                              "--subject", "sample", "--nosol", "--overwrite",
+                              "--innershift", "1.0", "--outershift", "2.0", "--scalpshift", "3.0"};
         int argc = 13;
         MNESetupForwardModelSettings settings(&argc, const_cast<char**>(argv));
         SetupForwardModel model(settings);
@@ -435,7 +437,7 @@ private slots:
         createSyntheticTriFile(bemDir + "/sample-inner_skull.tri");
         QByteArray dirBytes = tmpDir.path().toUtf8();
         const char* argv[] = {"test", "--subjects-dir", dirBytes.constData(),
-            "--subject", "sample", "--homog", "--nosol", "--overwrite"};
+                              "--subject", "sample", "--homog", "--nosol", "--overwrite"};
         int argc = 8;
         MNESetupForwardModelSettings settings(&argc, const_cast<char**>(argv));
         SetupForwardModel model(settings);
@@ -449,7 +451,7 @@ private slots:
         createBemDirectory(tmpDir.path(), "sample", true);
         QByteArray dirBytes = tmpDir.path().toUtf8();
         const char* argv[] = {"test", "--subjects-dir", dirBytes.constData(),
-            "--subject", "sample", "--homog", "--nosol", "--overwrite"};
+                              "--subject", "sample", "--homog", "--nosol", "--overwrite"};
         int argc = 8;
         MNESetupForwardModelSettings settings(&argc, const_cast<char**>(argv));
         SetupForwardModel model(settings);
@@ -474,7 +476,7 @@ private slots:
         createBemDirectory(tmpDir.path(), "sample", true);
         QByteArray dirBytes = tmpDir.path().toUtf8();
         const char* argv[] = {"test", "--subjects-dir", dirBytes.constData(),
-            "--subject", "sample", "--homog", "--overwrite"};
+                              "--subject", "sample", "--homog", "--overwrite"};
         int argc = 7;
         MNESetupForwardModelSettings settings(&argc, const_cast<char**>(argv));
         SetupForwardModel model(settings);
@@ -491,7 +493,7 @@ private slots:
         createBemDirectory(tmpDir.path(), "sample", false);
         QByteArray dirBytes = tmpDir.path().toUtf8();
         const char* argv[] = {"test", "--subjects-dir", dirBytes.constData(),
-            "--subject", "sample", "--overwrite"};
+                              "--subject", "sample", "--overwrite"};
         int argc = 5;
         MNESetupForwardModelSettings settings(&argc, const_cast<char**>(argv));
         SetupForwardModel model(settings);

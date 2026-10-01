@@ -52,8 +52,8 @@ namespace UTILSLIB
  */
 struct DSPSHARED_EXPORT SurfaceLaplacianResult
 {
-    Eigen::MatrixXd matData;          ///< Transformed data (n_eeg_channels × n_times)
-    Eigen::MatrixXd matTransform;     ///< CSD transformation matrix (n_eeg × n_eeg)
+    Eigen::MatrixXd matData;      ///< Transformed data (n_eeg_channels × n_times)
+    Eigen::MatrixXd matTransform; ///< CSD transformation matrix (n_eeg × n_eeg)
 };
 
 //=============================================================================================================

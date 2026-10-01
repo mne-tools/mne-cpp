@@ -86,7 +86,7 @@ Hpi::Hpi()
 
 Hpi::~Hpi()
 {
-    if(isRunning()) {
+    if (isRunning()) {
         resetState();
     }
 }
@@ -111,7 +111,7 @@ void Hpi::init()
 
     // Output
     m_pHpiOutput = PluginOutputData<RealTimeHpiResult>::create(this, "HpiOut", "Hpi output data");
-    m_pHpiOutput->measurementData()->setName(this->getName());//Provide name to auto store widget settings
+    m_pHpiOutput->measurementData()->setName(this->getName()); //Provide name to auto store widget settings
     m_outputConnectors.append(m_pHpiOutput);
 }
 
@@ -168,7 +168,7 @@ QString Hpi::getName() const
 
 QWidget* Hpi::setupWidget()
 {
-    HpiSetupWidget* setupWidget = new HpiSetupWidget(this);//widget is later distroyed by CentralWidget - so it has to be created everytime new
+    HpiSetupWidget* setupWidget = new HpiSetupWidget(this); //widget is later distroyed by CentralWidget - so it has to be created everytime new
     return setupWidget;
 }
 
@@ -176,13 +176,13 @@ QWidget* Hpi::setupWidget()
 
 void Hpi::update(SCMEASLIB::Measurement::SPtr pMeasurement)
 {
-    if(QSharedPointer<RealTimeMultiSampleArray> pRTMSA = pMeasurement.dynamicCast<RealTimeMultiSampleArray>()) {
+    if (QSharedPointer<RealTimeMultiSampleArray> pRTMSA = pMeasurement.dynamicCast<RealTimeMultiSampleArray>()) {
         //Check if the fiff info was inititalized
 
         manageInitialization(pRTMSA);
 
         // Check if data is present
-        if(pRTMSA->getMultiSampleArray().size() > 0) {
+        if (pRTMSA->getMultiSampleArray().size() > 0) {
             //If bad channels changed, recalcluate projectors
             updateProjections();
 
@@ -191,18 +191,18 @@ void Hpi::update(SCMEASLIB::Measurement::SPtr pMeasurement)
             bool bDoFreqOrder = m_bDoFreqOrder;
             m_mutex.unlock();
 
-            if(bDoFreqOrder || bDoSingleHpi) {
-                while(!m_pCircularBuffer->push(pRTMSA->getMultiSampleArray()[0])) {
+            if (bDoFreqOrder || bDoSingleHpi) {
+                while (!m_pCircularBuffer->push(pRTMSA->getMultiSampleArray()[0])) {
                     //Do nothing until the circular buffer is ready to accept new data again
                 }
             }
 
-            if(m_bDoContinousHpi && (m_vCoilFreqs.size() >= 3)) {
-                for(qsizetype i = 0; i < pRTMSA->getMultiSampleArray().size(); ++i) {
+            if (m_bDoContinousHpi && (m_vCoilFreqs.size() >= 3)) {
+                for (qsizetype i = 0; i < pRTMSA->getMultiSampleArray().size(); ++i) {
                     // Please note that we do not need a copy here since this function will block until
                     // the buffer accepts new data again. Hence, the data is not deleted in the actual
                     // Measurement function after it emitted the notify signal.
-                    while(!m_pCircularBuffer->push(pRTMSA->getMultiSampleArray()[i])) {
+                    while (!m_pCircularBuffer->push(pRTMSA->getMultiSampleArray()[i])) {
                         //Do nothing until the circular buffer is ready to accept new data again
                     }
                 }
@@ -215,13 +215,13 @@ void Hpi::update(SCMEASLIB::Measurement::SPtr pMeasurement)
 
 void Hpi::manageInitialization(QSharedPointer<SCMEASLIB::RealTimeMultiSampleArray> pRTMSA)
 {
-    if(!m_pFiffInfo) {
+    if (!m_pFiffInfo) {
         initFiffInfo(pRTMSA->info());
     }
-    if(!m_bPluginControlWidgetsInit) {
+    if (!m_bPluginControlWidgetsInit) {
         initPluginControlWidgets();
     }
-    if(!m_pFiffDigitizerData && m_pFiffInfo){
+    if (!m_pFiffDigitizerData && m_pFiffInfo) {
         initFiffDigitizers(pRTMSA->digitizerData());
     }
 }
@@ -237,8 +237,8 @@ void Hpi::initFiffInfo(QSharedPointer<FIFFLIB::FiffInfo> info)
     // Take the HPI coil excitation frequencies from the file when it provides
     // them, so the user does not have to type them in by hand. Frequencies the
     // user enters in the GUI still override these.
-    if(m_vCoilFreqs.isEmpty() && m_pFiffInfo && !m_pFiffInfo->hpi_coil_freqs.isEmpty()) {
-        for(float fFreq : m_pFiffInfo->hpi_coil_freqs) {
+    if (m_vCoilFreqs.isEmpty() && m_pFiffInfo && !m_pFiffInfo->hpi_coil_freqs.isEmpty()) {
+        for (float fFreq : m_pFiffInfo->hpi_coil_freqs) {
             m_vCoilFreqs.append(static_cast<int>(qRound(fFreq)));
         }
 
@@ -253,7 +253,7 @@ void Hpi::initFiffInfo(QSharedPointer<FIFFLIB::FiffInfo> info)
 
 void Hpi::initFiffDigitizers(QSharedPointer<FIFFLIB::FiffDigitizerData> fiffDig)
 {
-    if(fiffDig){
+    if (fiffDig) {
         m_mutex.lock();
         m_pFiffDigitizerData = fiffDig;
         m_pHpiOutput->measurementData()->setDigitizerData(m_pFiffDigitizerData);
@@ -277,12 +277,12 @@ void Hpi::initPluginControlWidgets()
 {
     bool bFiffInfo = false;
     m_mutex.lock();
-    if(m_pFiffInfo) {
+    if (m_pFiffInfo) {
         bFiffInfo = true;
     }
     m_mutex.unlock();
 
-    if(bFiffInfo) {
+    if (bFiffInfo) {
         QList<QWidget*> plControlWidgets;
 
         // Projects Settings
@@ -339,10 +339,10 @@ void Hpi::initPluginControlWidgets()
         m_mutex.lock();
         const bool bHaveDigitizers = !m_pFiffDigitizerData.isNull();
         const QList<FIFFLIB::FiffDigPoint> lDigPoints =
-                bHaveDigitizers ? m_pFiffDigitizerData->points : QList<FIFFLIB::FiffDigPoint>();
+            bHaveDigitizers ? m_pFiffDigitizerData->points : QList<FIFFLIB::FiffDigPoint>();
         m_mutex.unlock();
 
-        if(bHaveDigitizers) {
+        if (bHaveDigitizers) {
             pHpiSettingsView->newDigitizerList(lDigPoints);
         }
 
@@ -358,11 +358,9 @@ void Hpi::initPluginControlWidgets()
 
 void Hpi::updateProjections()
 {
-    if(m_pFiffInfo) {
+    if (m_pFiffInfo) {
         m_mutex.lock();
-        if(m_iNumberBadChannels != m_pFiffInfo->bads.size()
-           || m_matCompProjectors.rows() == 0
-           || m_matCompProjectors.cols() == 0) {
+        if (m_iNumberBadChannels != m_pFiffInfo->bads.size() || m_matCompProjectors.rows() == 0 || m_matCompProjectors.cols() == 0) {
             m_iNumberBadChannels = m_pFiffInfo->bads.size();
         } else {
             m_mutex.unlock();
@@ -373,29 +371,29 @@ void Hpi::updateProjections()
         Eigen::MatrixXd matProjectors = Eigen::MatrixXd::Identity(m_pFiffInfo->chs.size(), m_pFiffInfo->chs.size());
         Eigen::MatrixXd matComp = Eigen::MatrixXd::Identity(m_pFiffInfo->chs.size(), m_pFiffInfo->chs.size());
 
-        if(m_bUseSSP) {
+        if (m_bUseSSP) {
             // Use SSP + SGM + calibration
             //Do a copy here because we are going to change the activity flags of the SSP's
             FiffInfo infoTemp = *(m_pFiffInfo.data());
 
             //Turn on all SSP
-            for(int i = 0; i < infoTemp.projs.size(); ++i) {
+            for (int i = 0; i < infoTemp.projs.size(); ++i) {
                 infoTemp.projs[i].active = true;
             }
 
             //Create the projector for all SSP's on
             infoTemp.make_projector(matProjectors);
             //set columns of matrix to zero depending on bad channels indexes
-            for(qint32 j = 0; j < infoTemp.bads.size(); ++j) {
+            for (qint32 j = 0; j < infoTemp.bads.size(); ++j) {
                 matProjectors.col(infoTemp.ch_names.indexOf(infoTemp.bads.at(j))).setZero();
             }
         }
 
-        if(m_bUseComp) {
+        if (m_bUseComp) {
             // Setup Comps
             FiffCtfComp newComp;
             //Do this always from 0 since we always read new raw data, we never actually perform a multiplication on already existing data
-            if(m_pFiffInfo->make_compensator(0, 101, newComp)) {
+            if (m_pFiffInfo->make_compensator(0, 101, newComp)) {
                 matComp = newComp.data->data;
             }
         }
@@ -439,7 +437,7 @@ void Hpi::onDigitizersChanged(const QList<FIFFLIB::FiffDigPoint>& lDigitzers,
                               const QString& sFilePath)
 {
     m_mutex.lock();
-    if(m_pFiffInfo) {
+    if (m_pFiffInfo) {
         m_pFiffInfo->dig = lDigitzers;
     }
 
@@ -452,11 +450,11 @@ void Hpi::onDigitizersChanged(const QList<FIFFLIB::FiffDigPoint>& lDigitzers,
 
 void Hpi::onDoSingleHpiFit()
 {
-    if(m_vCoilFreqs.size() < 3) {
-       QMessageBox msgBox;
-       msgBox.setText("Please input HPI coil frequencies first.");
-       msgBox.exec();
-       return;
+    if (m_vCoilFreqs.size() < 3) {
+        QMessageBox msgBox;
+        msgBox.setText("Please input HPI coil frequencies first.");
+        msgBox.exec();
+        return;
     }
 
     m_mutex.lock();
@@ -468,11 +466,11 @@ void Hpi::onDoSingleHpiFit()
 
 void Hpi::onDoFreqOrder()
 {
-    if(m_vCoilFreqs.size() < 3) {
-       QMessageBox msgBox;
-       msgBox.setText("Please input HPI coil frequencies first.");
-       msgBox.exec();
-       return;
+    if (m_vCoilFreqs.size() < 3) {
+        QMessageBox msgBox;
+        msgBox.setText("Please input HPI coil frequencies first.");
+        msgBox.exec();
+        return;
     }
 
     m_mutex.lock();
@@ -509,12 +507,12 @@ void Hpi::onCompStatusChanged(bool bChecked)
 
 void Hpi::onContHpiStatusChanged(bool bChecked)
 {
-//    if(m_vCoilFreqs.size() < 3) {
-//       QMessageBox msgBox;
-//       msgBox.setText("Please load a digitizer set with at least 3 HPI coils first.");
-//       msgBox.exec();
-//       return;
-//    }
+    //    if(m_vCoilFreqs.size() < 3) {
+    //       QMessageBox msgBox;
+    //       msgBox.setText("Please load a digitizer set with at least 3 HPI coils first.");
+    //       msgBox.exec();
+    //       return;
+    //    }
 
     m_bDoContinousHpi = bChecked;
 }
@@ -541,13 +539,13 @@ void Hpi::run()
     // Wait for fiff info
     bool bFiffInfo = false;
 
-    while(true) {
+    while (true) {
         m_mutex.lock();
-        if(m_pFiffInfo) {
+        if (m_pFiffInfo) {
             bFiffInfo = true;
         }
         m_mutex.unlock();
-        if(bFiffInfo) {
+        if (bFiffInfo) {
             break;
         }
         msleep(100);
@@ -555,9 +553,9 @@ void Hpi::run()
 
     // init hpi fit
     InvHpiModelParameters hpiModelParameters(m_vCoilFreqs,
-                                          m_pFiffInfo->sfreq,
-                                          m_pFiffInfo->linefreq,
-                                          false);
+                                             m_pFiffInfo->sfreq,
+                                             m_pFiffInfo->linefreq,
+                                             false);
     HpiFitResult fitResult;
     fitResult.hpiFreqs = m_vCoilFreqs;
     fitResult.errorDistances = QVector<double>(m_vCoilFreqs.size());
@@ -588,9 +586,9 @@ void Hpi::run()
     MatrixXd matDataMerged(m_pFiffInfo->chs.size(), fittingWindowSize);
     bool bOrder = false;
 
-    while(!isInterruptionRequested()) {
+    while (!isInterruptionRequested()) {
         m_mutex.lock();
-        if(fittingWindowSize != m_iFittingWindowSize) {
+        if (fittingWindowSize != m_iFittingWindowSize) {
             fittingWindowSize = m_iFittingWindowSize;
             std::cout << "Fitting window size: " << fittingWindowSize << "\n";
             matDataMerged.resize(m_pFiffInfo->chs.size(), fittingWindowSize);
@@ -599,31 +597,31 @@ void Hpi::run()
         m_mutex.unlock();
 
         //pop matrix
-        if(m_pCircularBuffer->pop(matData)) {
-            if(iDataIndexCounter + matData.cols() < matDataMerged.cols()) {
+        if (m_pCircularBuffer->pop(matData)) {
+            if (iDataIndexCounter + matData.cols() < matDataMerged.cols()) {
                 matDataMerged.block(0, iDataIndexCounter, matData.rows(), matData.cols()) = matData;
                 iDataIndexCounter += matData.cols();
             } else {
                 m_mutex.lock();
-                if(m_bDoSingleHpi) {
+                if (m_bDoSingleHpi) {
                     m_bDoSingleHpi = false;
                     fitResult = HpiFitResult();
                 }
                 fitResult.sFilePathDigitzers = m_sFilePathDigitzers;
                 m_mutex.unlock();
 
-                matDataMerged.block(0, iDataIndexCounter, matData.rows(), matDataMerged.cols()-iDataIndexCounter) =
-                        matData.block(0, 0, matData.rows(), matDataMerged.cols()-iDataIndexCounter);
+                matDataMerged.block(0, iDataIndexCounter, matData.rows(), matDataMerged.cols() - iDataIndexCounter) =
+                    matData.block(0, 0, matData.rows(), matDataMerged.cols() - iDataIndexCounter);
 
                 m_mutex.lock();
                 hpiModelParameters = InvHpiModelParameters(m_vCoilFreqs,
-                                                        m_pFiffInfo->sfreq,
-                                                        m_pFiffInfo->linefreq,
-                                                        false);
+                                                           m_pFiffInfo->sfreq,
+                                                           m_pFiffInfo->linefreq,
+                                                           false);
                 hpiDataUpdater.checkForUpdate(m_pFiffInfo);
                 HPI.checkForUpdate(hpiDataUpdater.getSensors());
 
-                hpiDataUpdater.prepareDataAndProjectors(matDataMerged,m_matCompProjectors);
+                hpiDataUpdater.prepareDataAndProjectors(matDataMerged, m_matCompProjectors);
                 bOrder = m_bDoFreqOrder;
                 m_bDoFreqOrder = false;
                 m_mutex.unlock();
@@ -636,14 +634,14 @@ void Hpi::run()
                         bOrder,
                         fitResult);
 
-                if(bOrder) {
+                if (bOrder) {
                     m_mutex.lock();
                     m_vCoilFreqs = fitResult.hpiFreqs;
                     m_mutex.unlock();
                 }
 
                 //Check if the error meets distance requirement
-                if(fitResult.errorDistances.size() > 0) {
+                if (fitResult.errorDistances.size() > 0) {
                     dMeanErrorDist = std::accumulate(fitResult.errorDistances.begin(), fitResult.errorDistances.end(), .0) / fitResult.errorDistances.size();
                     dMeanGoF = fitResult.GoF.mean();
 
@@ -653,7 +651,7 @@ void Hpi::run()
                     m_mutex.lock();
                     dErrorMax = m_dAllowedMeanErrorDist;
                     m_mutex.unlock();
-                    if(dMeanErrorDist < dErrorMax) {
+                    if (dMeanErrorDist < dErrorMax) {
                         //If fit was good, set newly calculated transformation matrix to fiff info
                         emit devHeadTransAvailable(fitResult.devHeadTrans);
 
@@ -661,7 +659,7 @@ void Hpi::run()
                         dMovement = transDevHeadRef.translationTo(fitResult.devHeadTrans.trans);
                         dRotation = transDevHeadRef.angleTo(fitResult.devHeadTrans.trans);
 
-                        emit movementResultsChanged(dMovement,dRotation);
+                        emit movementResultsChanged(dMovement, dRotation);
 
                         fitResult.fHeadMovementDistance = dMovement;
                         fitResult.fHeadMovementAngle = dRotation;
@@ -671,7 +669,7 @@ void Hpi::run()
                         dAllowedMovement = m_dAllowedMovement;
                         dAllowedRotation = m_dAllowedRotation;
                         m_mutex.unlock();
-                        if(dMovement > dAllowedMovement || dRotation > dAllowedRotation) {
+                        if (dMovement > dAllowedMovement || dRotation > dAllowedRotation) {
                             fitResult.bIsLargeHeadMovement = true;
                             transDevHeadRef = fitResult.devHeadTrans;
                         }
@@ -690,7 +688,7 @@ void Hpi::run()
 
 QString Hpi::getBuildInfo()
 {
-    return QString(HPIPLUGIN::buildDateTime()) + QString(" - ")  + QString(HPIPLUGIN::buildHash());
+    return QString(HPIPLUGIN::buildDateTime()) + QString(" - ") + QString(HPIPLUGIN::buildHash());
 }
 
 //=============================================================================================================
@@ -699,11 +697,11 @@ QVariantMap Hpi::getAttributes() const
 {
     QVariantMap attrs;
     attrs[QStringLiteral("filePathDigitizers")] = m_sFilePathDigitzers;
-    attrs[QStringLiteral("fittingWindowSize")]  = static_cast<int>(m_iFittingWindowSize);
-    attrs[QStringLiteral("doFreqOrder")]        = m_bDoFreqOrder;
-    attrs[QStringLiteral("doContinuousHpi")]    = m_bDoContinousHpi;
-    attrs[QStringLiteral("useSSP")]             = m_bUseSSP;
-    attrs[QStringLiteral("useComp")]            = m_bUseComp;
+    attrs[QStringLiteral("fittingWindowSize")] = static_cast<int>(m_iFittingWindowSize);
+    attrs[QStringLiteral("doFreqOrder")] = m_bDoFreqOrder;
+    attrs[QStringLiteral("doContinuousHpi")] = m_bDoContinousHpi;
+    attrs[QStringLiteral("useSSP")] = m_bUseSSP;
+    attrs[QStringLiteral("useComp")] = m_bUseComp;
     return attrs;
 }
 

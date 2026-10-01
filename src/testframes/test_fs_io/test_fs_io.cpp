@@ -36,8 +36,8 @@ private:
      *         int32 nvert, int32 ntri, 3*nvert floats (coords),
      *         3*ntri int32 (tri indices).
      */
-    void writeSyntheticSurface(const QString &path, int nvert, int ntri,
-                                const MatrixX3f &verts, const MatrixX3i &tris)
+    void writeSyntheticSurface(const QString& path, int nvert, int ntri,
+                               const MatrixX3f& verts, const MatrixX3i& tris)
     {
         QFile f(path);
         QVERIFY(f.open(QIODevice::WriteOnly));
@@ -73,9 +73,9 @@ private:
      * Format: int32 nvert, for each vertex: (int32 vertno, int32 label),
      *         then the colortable (using "new" format).
      */
-    void writeSyntheticAnnotation(const QString &path, int nvert,
-                                   const VectorXi &vertIndices,
-                                   const VectorXi &labels)
+    void writeSyntheticAnnotation(const QString& path, int nvert,
+                                  const VectorXi& vertIndices,
+                                  const VectorXi& labels)
     {
         QFile f(path);
         QVERIFY(f.open(QIODevice::WriteOnly));
@@ -91,7 +91,7 @@ private:
         // has_colortable tag
         ds << (qint32)1;
         // num_entries (negative = new format)
-        ds << (qint32)(-1);  // new format marker
+        ds << (qint32)(-1); // new format marker
         // version
         ds << (qint32)1;
         // num entries for real
@@ -103,7 +103,7 @@ private:
         // num entries again
         ds << (qint32)1;
         // For each entry: struct_id, name_length, name, R, G, B, A
-        ds << (qint32)0;  // struct id
+        ds << (qint32)0; // struct id
         QByteArray entryName = "unknown";
         ds << (qint32)entryName.size();
         f.write(entryName);
@@ -139,8 +139,8 @@ private slots:
         // A single triangle in the XY plane
         MatrixX3f rr(3, 3);
         rr << 0, 0, 0,
-              1, 0, 0,
-              0, 1, 0;
+            1, 0, 0,
+            0, 1, 0;
         MatrixX3i tris(1, 3);
         tris << 0, 1, 2;
 
@@ -162,14 +162,14 @@ private slots:
         // A tetrahedron
         MatrixX3f rr(4, 3);
         rr << 1, 1, 1,
-              -1, -1, 1,
-              -1, 1, -1,
-              1, -1, -1;
+            -1, -1, 1,
+            -1, 1, -1,
+            1, -1, -1;
         MatrixX3i tris(4, 3);
         tris << 0, 1, 2,
-                0, 2, 3,
-                0, 3, 1,
-                1, 3, 2;
+            0, 2, 3,
+            0, 3, 1,
+            1, 3, 2;
 
         MatrixX3f nn = FsSurface::compute_normals(rr, tris);
         QCOMPARE(nn.rows(), (Eigen::Index)4);
@@ -208,12 +208,12 @@ private slots:
 
         MatrixX3f verts(4, 3);
         verts << 0, 0, 0,
-                 1, 0, 0,
-                 0, 1, 0,
-                 0, 0, 1;
+            1, 0, 0,
+            0, 1, 0,
+            0, 0, 1;
         MatrixX3i tris(2, 3);
         tris << 0, 1, 2,
-                0, 2, 3;
+            0, 2, 3;
 
         QString filePath = tmpDir.path() + "/lh.test";
         writeSyntheticSurface(filePath, 4, 2, verts, tris);
@@ -295,8 +295,8 @@ private slots:
         verts << 10, 20, 30;
         MatrixX3f pos(3, 3);
         pos << 0.01f, 0.02f, 0.03f,
-               0.04f, 0.05f, 0.06f,
-               0.07f, 0.08f, 0.09f;
+            0.04f, 0.05f, 0.06f,
+            0.07f, 0.08f, 0.09f;
         VectorXd vals(3);
         vals << 1.0, 2.0, 3.0;
 
@@ -343,9 +343,9 @@ private slots:
 
         MatrixX3i allTris(4, 3);
         allTris << 0, 1, 2,
-                   0, 2, 3,
-                   3, 4, 5,
-                   1, 2, 6;
+            0, 2, 3,
+            3, 4, 5,
+            1, 2, 6;
 
         MatrixX3i selected = l.selectTris(allTris);
         // Only tris where ALL 3 vertices are in the label's vertices should be selected

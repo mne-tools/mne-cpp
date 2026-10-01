@@ -92,7 +92,7 @@ void FiffSimulatorSetupWidget::bufferSizeEdited()
     bool t_bSuccess = false;
     qint32 t_iBufferSize = ui.m_qLineEdit_BufferSize->text().toInt(&t_bSuccess);
 
-    if(t_bSuccess && t_iBufferSize > 0)
+    if (t_bSuccess && t_iBufferSize > 0)
         m_pFiffSimulator->m_iBufferSize = t_iBufferSize;
     else
         ui.m_qLineEdit_BufferSize->setText(QString("%1").arg(m_pFiffSimulator->m_iBufferSize));
@@ -102,10 +102,9 @@ void FiffSimulatorSetupWidget::bufferSizeEdited()
 
 void FiffSimulatorSetupWidget::pressedConnect()
 {
-    if(m_pFiffSimulator->m_bCmdClientIsConnected)
+    if (m_pFiffSimulator->m_bCmdClientIsConnected)
         m_pFiffSimulator->disconnectCmdClient();
-    else
-    {
+    else {
         m_pFiffSimulator->m_sFiffSimulatorIP = this->ui.m_qLineEdit_Ip->text();
         m_pFiffSimulator->connectCmdClient();
     }
@@ -115,8 +114,7 @@ void FiffSimulatorSetupWidget::pressedConnect()
 
 void FiffSimulatorSetupWidget::pressedSendCLI()
 {
-    if(m_pFiffSimulator->m_bCmdClientIsConnected)
-    {
+    if (m_pFiffSimulator->m_bCmdClientIsConnected) {
         this->printToLog(this->ui.m_qLineEdit_SendCLI->text());
         QString t_sReply = m_pFiffSimulator->m_pRtCmdClient->sendCLICommand(this->ui.m_qLineEdit_SendCLI->text());
         this->printToLog(t_sReply);
@@ -127,7 +125,7 @@ void FiffSimulatorSetupWidget::pressedSendCLI()
 
 void FiffSimulatorSetupWidget::printToLog(QString logMsg)
 {
-    ui.m_qTextBrowser_ServerMessage->insertPlainText(logMsg+"\n");
+    ui.m_qTextBrowser_ServerMessage->insertPlainText(logMsg + "\n");
     //scroll down to the newest entry
     QTextCursor c = ui.m_qTextBrowser_ServerMessage->textCursor();
     c.movePosition(QTextCursor::End);
@@ -140,12 +138,11 @@ void FiffSimulatorSetupWidget::cmdConnectionChanged(bool p_bConnectionStatus)
 {
     m_bIsInit = false;
 
-    if(p_bConnectionStatus)
-    {
+    if (p_bConnectionStatus) {
         //
         // set frequency txt
         //
-        if(m_pFiffSimulator->m_pFiffInfo)
+        if (m_pFiffSimulator->m_pFiffInfo)
             this->ui.m_qLabel_sps->setText(QString("%1").arg(m_pFiffSimulator->m_pFiffInfo->sfreq));
 
         //
@@ -156,20 +153,20 @@ void FiffSimulatorSetupWidget::cmdConnectionChanged(bool p_bConnectionStatus)
         //
         // set connectors
         //
-//        QMap<qint32, QString>::ConstIterator it = m_pFiffSimulator->m_qMapConnectors.begin();
-//        qint32 idx = 0;
+        //        QMap<qint32, QString>::ConstIterator it = m_pFiffSimulator->m_qMapConnectors.begin();
+        //        qint32 idx = 0;
 
-//        for(; it != m_pFiffSimulator->m_qMapConnectors.end(); ++it)
-//        {
-//            if(this->ui.m_qComboBox_Connector->findData(it.key()) == -1)
-//            {
-//                this->ui.m_qComboBox_Connector->insertItem(idx, it.value(), it.key());
-//                ++idx;
-//            }
-//            else
-//                idx = this->ui.m_qComboBox_Connector->findData(it.key()) + 1;
-//        }
-//        this->ui.m_qComboBox_Connector->setCurrentIndex(this->ui.m_qComboBox_Connector->findData(m_pFiffSimulator->m_iActiveConnectorId));
+        //        for(; it != m_pFiffSimulator->m_qMapConnectors.end(); ++it)
+        //        {
+        //            if(this->ui.m_qComboBox_Connector->findData(it.key()) == -1)
+        //            {
+        //                this->ui.m_qComboBox_Connector->insertItem(idx, it.value(), it.key());
+        //                ++idx;
+        //            }
+        //            else
+        //                idx = this->ui.m_qComboBox_Connector->findData(it.key()) + 1;
+        //        }
+        //        this->ui.m_qComboBox_Connector->setCurrentIndex(this->ui.m_qComboBox_Connector->findData(m_pFiffSimulator->m_iActiveConnectorId));
 
         //UI enables/disables
         this->ui.m_qLabel_ConnectionStatus->setText(QString("Connected"));
@@ -179,12 +176,10 @@ void FiffSimulatorSetupWidget::cmdConnectionChanged(bool p_bConnectionStatus)
         this->ui.m_qPushButton_SendCLI->setEnabled(true);
 
         m_bIsInit = true;
-    }
-    else
-    {
+    } else {
         //clear connectors --> ToDO create a clear function
         m_pFiffSimulator->m_qMapConnectors.clear();
-//        this->ui.m_qComboBox_Connector->clear();
+        //        this->ui.m_qComboBox_Connector->clear();
         m_pFiffSimulator->m_iBufferSize = -1;
 
         //UI enables/disables
@@ -195,7 +190,6 @@ void FiffSimulatorSetupWidget::cmdConnectionChanged(bool p_bConnectionStatus)
         this->ui.m_qPushButton_SendCLI->setEnabled(false);
 
         this->ui.m_qLineEdit_BufferSize->setText(QString(""));
-
     }
 }
 
@@ -203,6 +197,6 @@ void FiffSimulatorSetupWidget::cmdConnectionChanged(bool p_bConnectionStatus)
 
 void FiffSimulatorSetupWidget::fiffInfoReceived()
 {
-    if(m_pFiffSimulator->m_pFiffInfo)
+    if (m_pFiffSimulator->m_pFiffInfo)
         this->ui.m_qLabel_sps->setText(QString("%1").arg(m_pFiffSimulator->m_pFiffInfo->sfreq));
 }

@@ -71,8 +71,8 @@ class DISPSHARED_EXPORT ProjectorsView : public AbstractView
     Q_OBJECT
 
 public:
-    typedef QSharedPointer<ProjectorsView> SPtr;              /**< Shared pointer type for ProjectorsView. */
-    typedef QSharedPointer<const ProjectorsView> ConstSPtr;   /**< Const shared pointer type for ProjectorsView. */
+    typedef QSharedPointer<ProjectorsView> SPtr;            /**< Shared pointer type for ProjectorsView. */
+    typedef QSharedPointer<const ProjectorsView> ConstSPtr; /**< Const shared pointer type for ProjectorsView. */
 
     //=========================================================================================================
     /**
@@ -83,7 +83,7 @@ public:
      * @param[in] f Qt window flags passed to the QWidget constructor.
      */
     ProjectorsView(const QString& sSettingsPath = "",
-                   QWidget *parent = 0,
+                   QWidget* parent = 0,
                    Qt::WindowFlags f = Qt::Widget);
 
     //=========================================================================================================
@@ -163,14 +163,14 @@ protected:
      */
     void onCheckProjStatusChanged();
 
-    QList<QCheckBox*>                                   m_qListProjCheckBox;            /**< List of projection CheckBox. */
-    QCheckBox*                                          m_pEnableDisableProjectors;     /**< Holds the enable disable all check box. */
+    QList<QCheckBox*> m_qListProjCheckBox; /**< List of projection CheckBox. */
+    QCheckBox* m_pEnableDisableProjectors; /**< Holds the enable disable all check box. */
 
-    QList<FIFFLIB::FiffProj>                            m_pProjs;                       /**< The current projectors. */
+    QList<FIFFLIB::FiffProj> m_pProjs; /**< The current projectors. */
 
-    QString                                             m_sSettingsPath;                /**< The settings path to store the GUI settings to. */
+    QString m_sSettingsPath; /**< The settings path to store the GUI settings to. */
 
-    QMap<QString,bool>                                  m_mapProjActive;
+    QMap<QString, bool> m_mapProjActive;
 
 signals:
     //=========================================================================================================

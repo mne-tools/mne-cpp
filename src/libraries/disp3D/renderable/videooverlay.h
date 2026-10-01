@@ -54,27 +54,51 @@ class DISP3DSHARED_EXPORT VideoOverlay
 public:
     VideoOverlay() = default;
 
-    bool isEnabled() const { return m_enabled; }
-    void setEnabled(bool enabled) { m_enabled = enabled; }
+    bool isEnabled() const
+    {
+        return m_enabled;
+    }
+    void setEnabled(bool enabled)
+    {
+        m_enabled = enabled;
+    }
 
     /** @return World-space centre of the overlay quad (metres). */
-    QVector3D focusPosition() const { return m_focusPosition; }
-    void setFocusPosition(const QVector3D &pos) { m_focusPosition = pos; }
+    QVector3D focusPosition() const
+    {
+        return m_focusPosition;
+    }
+    void setFocusPosition(const QVector3D& pos)
+    {
+        m_focusPosition = pos;
+    }
 
     /** @return Side length of the overlay quad (metres). */
-    float sizeMeters() const { return m_size; }
-    void setSizeMeters(float size) { m_size = size; }
+    float sizeMeters() const
+    {
+        return m_size;
+    }
+    void setSizeMeters(float size)
+    {
+        m_size = size;
+    }
 
     /** @return Latest video frame (CPU-side). Empty until a frame arrives. */
-    const QImage &frame() const { return m_frame; }
-    bool hasFrame() const { return !m_frame.isNull(); }
+    const QImage& frame() const
+    {
+        return m_frame;
+    }
+    bool hasFrame() const
+    {
+        return !m_frame.isNull();
+    }
 
     /**
      * Push a new video frame; bumps the generation counter so the GPU re-uploads.
      *
      * @param[in] image   New video frame; null images are ignored.
      */
-    void setFrame(const QImage &image)
+    void setFrame(const QImage& image)
     {
         if (image.isNull())
             return;
@@ -87,11 +111,20 @@ public:
      *
      * @return Current video frame generation.
      */
-    quint64 frameGeneration() const { return m_frameGeneration; }
+    quint64 frameGeneration() const
+    {
+        return m_frameGeneration;
+    }
 
     /** @return Overall opacity of the overlay [0..1]. */
-    float opacity() const { return m_opacity; }
-    void setOpacity(float opacity) { m_opacity = opacity; }
+    float opacity() const
+    {
+        return m_opacity;
+    }
+    void setOpacity(float opacity)
+    {
+        m_opacity = opacity;
+    }
 
     /**
      * @brief Hint direction used as the quad's "up" axis.
@@ -100,21 +133,33 @@ public:
      *
      * @return Up-hint direction, or a zero vector if unset.
      */
-    QVector3D upHint() const { return m_upHint; }
-    void setUpHint(const QVector3D &dir) { m_upHint = dir; }
+    QVector3D upHint() const
+    {
+        return m_upHint;
+    }
+    void setUpHint(const QVector3D& dir)
+    {
+        m_upHint = dir;
+    }
 
     // ── Depth / topographic relief ──────────────────────────────────
 
     /** @return Whether depth-based parallax relief is enabled. */
-    bool isDepthEnabled() const { return m_depthEnabled; }
-    void setDepthEnabled(bool enabled) { m_depthEnabled = enabled; }
+    bool isDepthEnabled() const
+    {
+        return m_depthEnabled;
+    }
+    void setDepthEnabled(bool enabled)
+    {
+        m_depthEnabled = enabled;
+    }
 
     /**
      * Push a new monocular depth map (single-channel or RGBA grayscale).
      *
      * @param[in] image   New depth map; null images are ignored.
      */
-    void setDepthFrame(const QImage &image)
+    void setDepthFrame(const QImage& image)
     {
         if (image.isNull())
             return;
@@ -122,23 +167,44 @@ public:
         ++m_depthFrameGeneration;
     }
 
-    const QImage &depthFrame() const { return m_depthFrame; }
-    bool hasDepthFrame() const { return !m_depthFrame.isNull(); }
-    quint64 depthFrameGeneration() const { return m_depthFrameGeneration; }
+    const QImage& depthFrame() const
+    {
+        return m_depthFrame;
+    }
+    bool hasDepthFrame() const
+    {
+        return !m_depthFrame.isNull();
+    }
+    quint64 depthFrameGeneration() const
+    {
+        return m_depthFrameGeneration;
+    }
 
     /** @return POM displacement scale in UV space [0..1]. */
-    float depthScale() const { return m_depthScale; }
-    void setDepthScale(float scale) { m_depthScale = scale; }
+    float depthScale() const
+    {
+        return m_depthScale;
+    }
+    void setDepthScale(float scale)
+    {
+        m_depthScale = scale;
+    }
 
     /** @return Number of POM ray-march steps (quality vs. performance). */
-    int depthSteps() const { return m_depthSteps; }
-    void setDepthSteps(int steps) { m_depthSteps = steps; }
+    int depthSteps() const
+    {
+        return m_depthSteps;
+    }
+    void setDepthSteps(int steps)
+    {
+        m_depthSteps = steps;
+    }
 
 private:
     bool m_enabled = false;
     QVector3D m_focusPosition = QVector3D(0.0f, 0.05f, 0.08f); // arbitrary default near the top of the head
-    QVector3D m_upHint;          //!< Optional orientation hint (zero = default billboard)
-    float m_size = 0.06f;        //!< 6 cm wide by default
+    QVector3D m_upHint;                                        //!< Optional orientation hint (zero = default billboard)
+    float m_size = 0.06f;                                      //!< 6 cm wide by default
     float m_opacity = 1.0f;
     QImage m_frame;
     quint64 m_frameGeneration = 0;
@@ -147,8 +213,8 @@ private:
     bool m_depthEnabled = false;
     QImage m_depthFrame;
     quint64 m_depthFrameGeneration = 0;
-    float m_depthScale = 0.25f;  //!< POM height scale (UV space units)
-    int m_depthSteps = 32;       //!< POM ray-march steps
+    float m_depthScale = 0.25f; //!< POM height scale (UV space units)
+    int m_depthSteps = 32;      //!< POM ray-march steps
 };
 
 } // namespace DISP3DLIB

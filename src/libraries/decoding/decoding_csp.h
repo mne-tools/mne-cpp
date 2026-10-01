@@ -60,7 +60,8 @@
 // DEFINE NAMESPACE DECODINGLIB
 //=============================================================================================================
 
-namespace DECODINGLIB{
+namespace DECODINGLIB
+{
 
 //=============================================================================================================
 /**
@@ -99,9 +100,10 @@ public:
     /**
      * Transform mode for the CSP output.
      */
-    enum class TransformMode {
-        AveragePower,   /**< Return average band power per component (n_epochs × n_components). */
-        CspSpace        /**< Return data projected into CSP space (n_epochs × n_components × n_times). */
+    enum class TransformMode
+    {
+        AveragePower, /**< Return average band power per component (n_epochs × n_components). */
+        CspSpace      /**< Return data projected into CSP space (n_epochs × n_components × n_times). */
     };
 
     //=========================================================================================================
@@ -201,10 +203,10 @@ private:
     TransformMode m_transformInto;
     bool m_useLog;
 
-    Eigen::MatrixXd m_filters;      /**< Spatial filters (n_components × n_channels). */
-    Eigen::MatrixXd m_patterns;     /**< Spatial patterns (n_channels × n_components). */
-    Eigen::VectorXd m_mean;         /**< Mean band power per component. */
-    Eigen::VectorXd m_std;          /**< Std dev band power per component. */
+    Eigen::MatrixXd m_filters;  /**< Spatial filters (n_components × n_channels). */
+    Eigen::MatrixXd m_patterns; /**< Spatial patterns (n_channels × n_components). */
+    Eigen::VectorXd m_mean;     /**< Mean band power per component. */
+    Eigen::VectorXd m_std;      /**< Std dev band power per component. */
     bool m_fitted = false;
 
     /**

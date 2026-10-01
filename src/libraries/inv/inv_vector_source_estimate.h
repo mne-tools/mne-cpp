@@ -61,8 +61,8 @@ public:
      * @param[in] p_tstep     Time step.
      */
     InvVectorSourceEstimate(const Eigen::MatrixXd& p_sol,
-                             const Eigen::VectorXi& p_vertices,
-                             float p_tmin, float p_tstep);
+                            const Eigen::VectorXi& p_vertices,
+                            float p_tmin, float p_tstep);
 
     //=========================================================================================================
     /**

@@ -58,12 +58,17 @@ class PluginScene : public QGraphicsScene
     Q_OBJECT
 
 public:
-    typedef QSharedPointer<PluginScene> SPtr;               /**< Shared pointer type for PluginScene. */
-    typedef QSharedPointer<const PluginScene> ConstSPtr;    /**< Const shared pointer type for PluginScene. */
+    typedef QSharedPointer<PluginScene> SPtr;            /**< Shared pointer type for PluginScene. */
+    typedef QSharedPointer<const PluginScene> ConstSPtr; /**< Const shared pointer type for PluginScene. */
 
-    enum Mode { InsertPluginItem, InsertLine, MovePluginItem};
+    enum Mode
+    {
+        InsertPluginItem,
+        InsertLine,
+        MovePluginItem
+    };
 
-    explicit PluginScene(QMenu *pMenuPluginItem, PluginGui *pPluginGui);
+    explicit PluginScene(QMenu* pMenuPluginItem, PluginGui* pPluginGui);
 
     ~PluginScene();
 
@@ -84,34 +89,34 @@ public:
      *
      * @return true if successfull.
      */
-    bool insertPlugin(QAction* pActionPluginItem, SCSHAREDLIB::AbstractPlugin::SPtr &pAddedPlugin);
+    bool insertPlugin(QAction* pActionPluginItem, SCSHAREDLIB::AbstractPlugin::SPtr& pAddedPlugin);
 
     inline void setMode(Mode mode);
     inline void setActionPluginItem(QAction* pAction);
 
 signals:
-    void itemInserted(PluginItem *item);
+    void itemInserted(PluginItem* item);
 
 protected:
-    void drawBackground(QPainter *painter, const QRectF &rect) override;
-    void mousePressEvent(QGraphicsSceneMouseEvent *mouseEvent) override;
-    void mouseMoveEvent(QGraphicsSceneMouseEvent *mouseEvent) override;
-    void mouseReleaseEvent(QGraphicsSceneMouseEvent *mouseEvent) override;
+    void drawBackground(QPainter* painter, const QRectF& rect) override;
+    void mousePressEvent(QGraphicsSceneMouseEvent* mouseEvent) override;
+    void mouseMoveEvent(QGraphicsSceneMouseEvent* mouseEvent) override;
+    void mouseReleaseEvent(QGraphicsSceneMouseEvent* mouseEvent) override;
 
 private:
-//    bool isItemChange(int type);
+    //    bool isItemChange(int type);
 
-    PluginGui*  m_pPluginGui;   /**< Corresponding plugin gui. */
+    PluginGui* m_pPluginGui; /**< Corresponding plugin gui. */
 
     //Current info
-    Mode            m_mode;
-    QAction*        m_pActionPluginItem;    /**< Selected plugin. */
+    Mode m_mode;
+    QAction* m_pActionPluginItem; /**< Selected plugin. */
 
-    QMenu *m_pMenuPluginItem;         /**< Plugin context menu. */
+    QMenu* m_pMenuPluginItem; /**< Plugin context menu. */
 
     bool leftButtonDown;
     QPointF startPoint;
-    QGraphicsLineItem *line;
+    QGraphicsLineItem* line;
     QColor m_qColorLine;
 };
 

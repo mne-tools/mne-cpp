@@ -39,7 +39,7 @@ using namespace FIFFLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-RtFwdSetupWidget::RtFwdSetupWidget(RtFwd* toolbox, QWidget *parent)
+RtFwdSetupWidget::RtFwdSetupWidget(RtFwd* toolbox, QWidget* parent)
 : QWidget(parent)
 , m_pRtFwd(toolbox)
 {
@@ -61,7 +61,7 @@ RtFwdSetupWidget::RtFwdSetupWidget(RtFwd* toolbox, QWidget *parent)
     m_ui.m_check_bIncludeMeg->setChecked(m_pRtFwd->m_pFwdSettings->include_meg);
     m_ui.m_check_bComputeGrad->setChecked(m_pRtFwd->m_pFwdSettings->compute_grad);
 
-    if(m_pRtFwd->m_pFwdSettings->coord_frame == FIFFV_COORD_MRI) {
+    if (m_pRtFwd->m_pFwdSettings->coord_frame == FIFFV_COORD_MRI) {
         m_ui.m_check_bCoordframe->setChecked(true);
     } else {
         m_ui.m_check_bCoordframe->setChecked(false);
@@ -75,11 +75,11 @@ RtFwdSetupWidget::RtFwdSetupWidget(RtFwd* toolbox, QWidget *parent)
     m_ui.m_check_bUseEquivEeg->setChecked(m_pRtFwd->m_pFwdSettings->use_equiv_eeg);
 
     // init Spin Boxes
-    m_ui.m_doubleSpinBox_dMinDist->setValue(m_pRtFwd->m_pFwdSettings->mindist*1000);
-    m_ui.m_doubleSpinBox_dEegSphereRad->setValue(m_pRtFwd->m_pFwdSettings->eeg_sphere_rad*1000);
-    m_ui.m_doubleSpinBox_dVecR0x->setValue(m_pRtFwd->m_pFwdSettings->r0.x()*1000);
-    m_ui.m_doubleSpinBox_dVecR0y->setValue(m_pRtFwd->m_pFwdSettings->r0.y()*1000);
-    m_ui.m_doubleSpinBox_dVecR0z->setValue(m_pRtFwd->m_pFwdSettings->r0.z()*1000);
+    m_ui.m_doubleSpinBox_dMinDist->setValue(m_pRtFwd->m_pFwdSettings->mindist * 1000);
+    m_ui.m_doubleSpinBox_dEegSphereRad->setValue(m_pRtFwd->m_pFwdSettings->eeg_sphere_rad * 1000);
+    m_ui.m_doubleSpinBox_dVecR0x->setValue(m_pRtFwd->m_pFwdSettings->r0.x() * 1000);
+    m_ui.m_doubleSpinBox_dVecR0y->setValue(m_pRtFwd->m_pFwdSettings->r0.y() * 1000);
+    m_ui.m_doubleSpinBox_dVecR0z->setValue(m_pRtFwd->m_pFwdSettings->r0.z() * 1000);
 
     // connect line edits
     connect(m_ui.m_qLineEdit_SolName, &QLineEdit::textChanged, this, &RtFwdSetupWidget::onSolNameChanged);
@@ -100,7 +100,7 @@ RtFwdSetupWidget::RtFwdSetupWidget(RtFwd* toolbox, QWidget *parent)
     connect(m_ui.m_check_bMriHeadIdent, &QCheckBox::checkStateChanged, this, &RtFwdSetupWidget::onCheckStateChanged);
 
     // connect spin boxes
-    connect(m_ui.m_doubleSpinBox_dMinDist,static_cast<void (QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged), this, &RtFwdSetupWidget::onMinDistChanged);
+    connect(m_ui.m_doubleSpinBox_dMinDist, static_cast<void (QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged), this, &RtFwdSetupWidget::onMinDistChanged);
     connect(m_ui.m_doubleSpinBox_dEegSphereRad, static_cast<void (QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged), this, &RtFwdSetupWidget::onEEGSphereRadChanged);
     connect(m_ui.m_doubleSpinBox_dVecR0x, static_cast<void (QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged), this, &RtFwdSetupWidget::onEEGSphereOriginChanged);
     connect(m_ui.m_doubleSpinBox_dVecR0y, static_cast<void (QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged), this, &RtFwdSetupWidget::onEEGSphereOriginChanged);
@@ -121,10 +121,9 @@ RtFwdSetupWidget::RtFwdSetupWidget(RtFwd* toolbox, QWidget *parent)
 void RtFwdSetupWidget::showFwdDirDialog()
 {
     QString t_sSolDir = QFileDialog::getExistingDirectory(this,
-                                                         tr("Select Directory to store the forward solution"),
-                                                         QString(),
-                                                         QFileDialog::ShowDirsOnly
-                                                         | QFileDialog::DontResolveSymlinks);
+                                                          tr("Select Directory to store the forward solution"),
+                                                          QString(),
+                                                          QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks);
 
     m_ui.m_qLineEdit_SolName->setText(t_sSolDir);
 }
@@ -136,7 +135,7 @@ void RtFwdSetupWidget::onSolNameChanged()
     QString t_sFileName = m_ui.m_qLineEdit_SolName->text();
 
     // check for file endings
-    if(t_sFileName.contains("-fwd.fif")) {
+    if (t_sFileName.contains("-fwd.fif")) {
         m_pRtFwd->m_pFwdSettings->solname = t_sFileName;
     } else {
         qWarning() << "rtFwdSetup: make sure to name solution file correctly: -fwd.fif";
@@ -155,14 +154,13 @@ void RtFwdSetupWidget::showMeasFileDialog()
     m_ui.m_qLineEdit_MeasName->setText(t_sFileName);
 
     QFile t_fSource(t_sFileName);
-    if(t_fSource.open(QIODevice::ReadOnly)) {
+    if (t_fSource.open(QIODevice::ReadOnly)) {
         m_pRtFwd->m_pFwdSettings->measname = t_sFileName;
         m_ui.m_qLineEdit_MeasName->setText(t_sFileName);
     } else {
         qWarning() << "rtFwdSetup: Measurement file cannot be opened";
     }
     t_fSource.close();
-
 }
 
 //=============================================================================================================
@@ -175,7 +173,7 @@ void RtFwdSetupWidget::showSourceFileDialog()
                                                        tr("Fif Files (*.fif)"));
 
     QFile t_fSource(t_sFileName);
-    if(t_fSource.open(QIODevice::ReadOnly)) {
+    if (t_fSource.open(QIODevice::ReadOnly)) {
         m_pRtFwd->m_pFwdSettings->srcname = t_sFileName;
         m_ui.m_qLineEdit_SourceName->setText(t_sFileName);
     } else {
@@ -194,7 +192,7 @@ void RtFwdSetupWidget::showBemFileDialog()
                                                        tr("Fif Files (*.fif)"));
 
     QFile t_fBem(t_sFileName);
-    if(t_fBem.open(QIODevice::ReadOnly)) {
+    if (t_fBem.open(QIODevice::ReadOnly)) {
         m_pRtFwd->m_pFwdSettings->bemname = t_sFileName;
         m_ui.m_qLineEdit_BemName->setText(t_sFileName);
     } else {
@@ -213,7 +211,7 @@ void RtFwdSetupWidget::showMriFileDialog()
                                                        tr("Fif Files (*.fif)"));
 
     QFile t_fMri(t_sFileName);
-    if(t_fMri.open(QIODevice::ReadOnly)) {
+    if (t_fMri.open(QIODevice::ReadOnly)) {
         m_pRtFwd->m_pFwdSettings->mriname = t_sFileName;
         m_ui.m_qLineEdit_MriName->setText(t_sFileName);
     } else {
@@ -232,7 +230,7 @@ void RtFwdSetupWidget::showEEGModelFileDialog()
                                                        tr("Fif Files (*.fif)"));
 
     QFile t_fEegModel(t_sFileName);
-    if(t_fEegModel.open(QIODevice::ReadOnly)) {
+    if (t_fEegModel.open(QIODevice::ReadOnly)) {
         m_pRtFwd->m_pFwdSettings->eeg_model_file = t_sFileName;
         m_ui.m_qLineEdit_EEGModelFile->setText(t_sFileName);
     } else {
@@ -253,10 +251,9 @@ void RtFwdSetupWidget::onEEGModelNameChanged()
 void RtFwdSetupWidget::showMinDistDirDialog()
 {
     QString t_sMinDistDir = QFileDialog::getExistingDirectory(this,
-                                                             tr("Select output for omitted source space"),
-                                                             QString(),
-                                                             QFileDialog::ShowDirsOnly
-                                                             | QFileDialog::DontResolveSymlinks);
+                                                              tr("Select output for omitted source space"),
+                                                              QString(),
+                                                              QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks);
 
     m_ui.m_qLineEdit_MinDistName->setText(t_sMinDistDir);
 }
@@ -273,22 +270,22 @@ void RtFwdSetupWidget::onMinDistNameChanged()
 
 void RtFwdSetupWidget::onMinDistChanged()
 {
-    m_pRtFwd->m_pFwdSettings->mindist = m_ui.m_doubleSpinBox_dMinDist->value()/1000;
+    m_pRtFwd->m_pFwdSettings->mindist = m_ui.m_doubleSpinBox_dMinDist->value() / 1000;
 }
 //=============================================================================================================
 
 void RtFwdSetupWidget::onEEGSphereRadChanged()
 {
-    m_pRtFwd->m_pFwdSettings->eeg_sphere_rad = m_ui.m_doubleSpinBox_dEegSphereRad->value()/1000;
+    m_pRtFwd->m_pFwdSettings->eeg_sphere_rad = m_ui.m_doubleSpinBox_dEegSphereRad->value() / 1000;
 }
 
 //=============================================================================================================
 
 void RtFwdSetupWidget::onEEGSphereOriginChanged()
 {
-    m_pRtFwd->m_pFwdSettings->r0.x() = m_ui.m_doubleSpinBox_dVecR0x->value()/1000;
-    m_pRtFwd->m_pFwdSettings->r0.y() = m_ui.m_doubleSpinBox_dVecR0y->value()/1000;
-    m_pRtFwd->m_pFwdSettings->r0.z() = m_ui.m_doubleSpinBox_dVecR0z->value()/1000;
+    m_pRtFwd->m_pFwdSettings->r0.x() = m_ui.m_doubleSpinBox_dVecR0x->value() / 1000;
+    m_pRtFwd->m_pFwdSettings->r0.y() = m_ui.m_doubleSpinBox_dVecR0y->value() / 1000;
+    m_pRtFwd->m_pFwdSettings->r0.z() = m_ui.m_doubleSpinBox_dVecR0z->value() / 1000;
 }
 
 //=============================================================================================================
@@ -300,7 +297,7 @@ void RtFwdSetupWidget::onCheckStateChanged()
     m_pRtFwd->m_pFwdSettings->include_meg = m_ui.m_check_bIncludeMeg->isChecked();
     m_pRtFwd->m_pFwdSettings->compute_grad = m_ui.m_check_bComputeGrad->isChecked();
 
-    if( m_ui.m_check_bCoordframe->isChecked()) {
+    if (m_ui.m_check_bCoordframe->isChecked()) {
         m_pRtFwd->m_pFwdSettings->coord_frame = FIFFV_COORD_MRI;
     } else {
         m_pRtFwd->m_pFwdSettings->coord_frame = FIFFV_COORD_HEAD;

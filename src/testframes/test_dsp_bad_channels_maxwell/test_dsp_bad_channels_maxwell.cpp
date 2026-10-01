@@ -108,7 +108,9 @@ class TestDspBadChannelsMaxwell : public QObject
     Q_OBJECT
 
 private slots:
-    void initTestCase() {}
+    void initTestCase()
+    {
+    }
 
     void testBasicDetectionNoBad()
     {
@@ -126,7 +128,7 @@ private slots:
         }
 
         BadChannelsMaxwellParams params;
-        params.iOrderIn = 4;  // Low order for small array
+        params.iOrderIn = 4; // Low order for small array
         params.iOrderOut = 2;
 
         BadChannelsMaxwellResult result = findBadChannelsMaxwell(data, info, params);
@@ -224,7 +226,8 @@ private slots:
 
         QVERIFY2(resultLow.badChannels.size() >= resultHigh.badChannels.size(),
                  qPrintable(QString("Low threshold: %1 bad, high threshold: %2 bad")
-                            .arg(resultLow.badChannels.size()).arg(resultHigh.badChannels.size())));
+                                .arg(resultLow.badChannels.size())
+                                .arg(resultHigh.badChannels.size())));
     }
 
     void testResidualsNonNegative()
@@ -245,7 +248,9 @@ private slots:
         }
     }
 
-    void cleanupTestCase() {}
+    void cleanupTestCase()
+    {
+    }
 };
 
 //=============================================================================================================

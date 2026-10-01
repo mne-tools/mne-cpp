@@ -54,15 +54,17 @@
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-namespace FIFFLIB {
-    class FiffInfo;
+namespace FIFFLIB
+{
+class FiffInfo;
 }
 
-namespace INVLIB {
-    class InvSensorSet;
-    class InvHpiFit;
-    struct HpiFitResult;
-    class InvHpiModelParameters;
+namespace INVLIB
+{
+class InvSensorSet;
+class InvHpiFit;
+struct HpiFitResult;
+class InvHpiModelParameters;
 }
 
 //=============================================================================================================
@@ -83,7 +85,6 @@ class DSPSHARED_EXPORT RtHpiWorker : public QObject
     Q_OBJECT
 
 public:
-
     //=========================================================================================================
     /**
      * Creates the real-time HPI worker object.
@@ -108,10 +109,10 @@ public:
 
 protected:
     //=========================================================================================================
-    QSharedPointer<INVLIB::InvHpiFit>              m_pHpiFit;             /**< Holds the HpiFit object. */
+    QSharedPointer<INVLIB::InvHpiFit> m_pHpiFit; /**< Holds the HpiFit object. */
 
 signals:
-    void resultReady(const INVLIB::HpiFitResult &fitResult);
+    void resultReady(const INVLIB::HpiFitResult& fitResult);
 };
 
 //=============================================================================================================
@@ -125,8 +126,8 @@ class DSPSHARED_EXPORT RtHpi : public QObject
     Q_OBJECT
 
 public:
-    typedef QSharedPointer<RtHpi> SPtr;             /**< Shared pointer type for RtHpi. */
-    typedef QSharedPointer<const RtHpi> ConstSPtr;  /**< Const shared pointer type for RtHpi. */
+    typedef QSharedPointer<RtHpi> SPtr;            /**< Shared pointer type for RtHpi. */
+    typedef QSharedPointer<const RtHpi> ConstSPtr; /**< Const shared pointer type for RtHpi. */
 
     //=========================================================================================================
     /**
@@ -136,7 +137,7 @@ public:
      * @param[in] parent     Parent QObject (optional).
      */
     explicit RtHpi(const INVLIB::InvSensorSet sensorSet,
-                   QObject *parent = 0);
+                   QObject* parent = 0);
 
     //=========================================================================================================
     /**
@@ -150,7 +151,7 @@ public:
      *
      * @param[in] data  Data to estimate the HPI positions from.
      */
-    void append(const Eigen::MatrixXd &data);
+    void append(const Eigen::MatrixXd& data);
 
     //=========================================================================================================
     /**
@@ -195,16 +196,16 @@ protected:
      *
      * @param[in] fitResult  HPI fit result from the worker, re-emitted via newHpiFitResultAvailable().
      */
-    void handleResults(const INVLIB::HpiFitResult &fitResult);
+    void handleResults(const INVLIB::HpiFitResult& fitResult);
 
-    QThread m_workerThread;         /**< The worker thread. */
-    Eigen::MatrixXd m_matCoilsHead;           /**< Vector contains the HPI coil frequencies. */
-    Eigen::MatrixXd m_matProjectors;        /**< Holds the matrix with the SSP and compensator projectors.*/
+    QThread m_workerThread;          /**< The worker thread. */
+    Eigen::MatrixXd m_matCoilsHead;  /**< Vector contains the HPI coil frequencies. */
+    Eigen::MatrixXd m_matProjectors; /**< Holds the matrix with the SSP and compensator projectors.*/
     INVLIB::InvSensorSet m_sensorSet;
     INVLIB::InvHpiModelParameters m_modelParameters;
 
 signals:
-    void newHpiFitResultAvailable(const INVLIB::HpiFitResult &fitResult);
+    void newHpiFitResultAvailable(const INVLIB::HpiFitResult& fitResult);
     void operate(const Eigen::MatrixXd& matData,
                  const Eigen::MatrixXd& matProjectors,
                  const INVLIB::InvHpiModelParameters& hpiModelParameters,

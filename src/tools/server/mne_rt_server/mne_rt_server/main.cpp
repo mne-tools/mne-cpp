@@ -57,7 +57,7 @@ Q_IMPORT_PLUGIN(FiffSimulator)
  * @param[in] argv (argument vector) is an array of pointers to arrays of character objects. The array objects are null-terminated strings, representing the arguments that were entered on the command line when the program was started.
  * @return the value that was set to exit() (which is 0 if exit() is called via quit()).
  */
-int main(int argc, char *argv[])
+int main(int argc, char* argv[])
 {
     qInstallMessageHandler(UTILSLIB::MNELogger::customLogWriter);
     QCoreApplication app(argc, argv);
@@ -68,21 +68,22 @@ int main(int argc, char *argv[])
     parser.addHelpOption();
 
     QCommandLineOption inFileOpt(QStringList() << "f" << "file",
-                                 QCoreApplication::translate("main","File to stream."),
-                                 QCoreApplication::translate("main","filePath"));
+                                 QCoreApplication::translate("main", "File to stream."),
+                                 QCoreApplication::translate("main", "filePath"));
 
     parser.addOption(inFileOpt);
 
     parser.process(app);
 
     // Parse input file for mne_rt_server's FiffSimulator
-    if(parser.isSet("file")) {
+    if (parser.isSet("file")) {
         QFile file(QCoreApplication::applicationDirPath() + "/../resources/mne_rt_server/plugins/fiffsimulator/FiffSimulation.cfg");
 
         if (QFileInfo(parser.value(inFileOpt)).exists()) {
             if (file.open(QIODevice::Truncate | QIODevice::Text | QIODevice::WriteOnly)) {
                 QTextStream stream(&file);
-                stream << QString("simFile = %1").arg(parser.value(inFileOpt));;
+                stream << QString("simFile = %1").arg(parser.value(inFileOpt));
+                ;
                 file.close();
 
                 qInfo() << QString("[MNERtServer::main] Streaming file %1").arg(parser.value(inFileOpt));
@@ -111,4 +112,3 @@ int main(int argc, char *argv[])
 //=============================================================================================================
 // STATIC DEFINITIONS
 //=============================================================================================================
-

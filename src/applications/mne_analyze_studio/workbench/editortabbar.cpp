@@ -38,26 +38,26 @@ void EditorTabBar::tabRemoved(int index)
 {
     QTabBar::tabRemoved(index);
 
-    for(int i = 0; i < count(); ++i) {
+    for (int i = 0; i < count(); ++i) {
         ensureCloseButton(i);
     }
 }
 
 void EditorTabBar::ensureCloseButton(int index)
 {
-    if(index < 0 || index >= count()) {
+    if (index < 0 || index >= count()) {
         return;
     }
 
     QWidget* existingLeftButton = tabButton(index, QTabBar::LeftSide);
-    if(existingLeftButton) {
+    if (existingLeftButton) {
         existingLeftButton->hide();
         setTabButton(index, QTabBar::LeftSide, nullptr);
         existingLeftButton->deleteLater();
     }
 
     QToolButton* closeButton = qobject_cast<QToolButton*>(tabButton(index, QTabBar::RightSide));
-    if(!closeButton) {
+    if (!closeButton) {
         closeButton = new QToolButton(this);
         closeButton->setAutoRaise(true);
         closeButton->setIcon(style()->standardIcon(QStyle::SP_DockWidgetCloseButton));
@@ -65,8 +65,8 @@ void EditorTabBar::ensureCloseButton(int index)
         setTabButton(index, QTabBar::RightSide, closeButton);
 
         connect(closeButton, &QToolButton::clicked, this, [this, closeButton]() {
-            for(int tabIndex = 0; tabIndex < count(); ++tabIndex) {
-                if(tabButton(tabIndex, QTabBar::RightSide) == closeButton) {
+            for (int tabIndex = 0; tabIndex < count(); ++tabIndex) {
+                if (tabButton(tabIndex, QTabBar::RightSide) == closeButton) {
                     emit closeButtonClicked(tabIndex);
                     return;
                 }

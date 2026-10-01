@@ -28,7 +28,7 @@ using namespace SCMEASLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-Numeric::Numeric(QObject *parent)
+Numeric::Numeric(QObject* parent)
 : Measurement(QMetaType::fromName("Numeric::SPtr").id(), parent)
 , m_qString_Unit("")
 , m_dValue(-1)

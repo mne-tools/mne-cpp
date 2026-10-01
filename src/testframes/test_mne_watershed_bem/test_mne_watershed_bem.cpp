@@ -68,13 +68,13 @@ private:
     QString findSubjectsDir();
     bool hasFreeSurfer();
 
-    QString m_sAppPath;         /**< Path to the mne_watershed_bem executable. */
-    bool m_bAppAvailable;       /**< Whether the app is found. */
-    bool m_bDataAvailable;      /**< Whether sample data is found. */
-    bool m_bFreeSurferAvailable;/**< Whether FreeSurfer is installed. */
-    QString m_sSubjectsDir;     /**< Path to subjects dir. */
-    QString m_sFreeSurferHome;  /**< Path to FreeSurfer home. */
-    QTemporaryDir m_tempDir;    /**< Temporary directory for test output. */
+    QString m_sAppPath;          /**< Path to the mne_watershed_bem executable. */
+    bool m_bAppAvailable;        /**< Whether the app is found. */
+    bool m_bDataAvailable;       /**< Whether sample data is found. */
+    bool m_bFreeSurferAvailable; /**< Whether FreeSurfer is installed. */
+    QString m_sSubjectsDir;      /**< Path to subjects dir. */
+    QString m_sFreeSurferHome;   /**< Path to FreeSurfer home. */
+    QTemporaryDir m_tempDir;     /**< Temporary directory for test output. */
 };
 
 //=============================================================================================================

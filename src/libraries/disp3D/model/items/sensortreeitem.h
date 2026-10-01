@@ -48,7 +48,7 @@ public:
      *
      * @param[in] orient   Coil rotation stored in the upper-left 3x3 of a 4x4 matrix.
      */
-    void setOrientation(const QMatrix4x4 &orient);
+    void setOrientation(const QMatrix4x4& orient);
 
     //=========================================================================================================
     /**
@@ -69,7 +69,7 @@ public:
 private:
     QVector3D m_pos;
     float m_scale;
-    QMatrix4x4 m_orientation;   /**< Coil orientation (3x3 rotation in 4x4). */
+    QMatrix4x4 m_orientation; /**< Coil orientation (3x3 rotation in 4x4). */
     bool m_hasOrientation = false;
 };
 

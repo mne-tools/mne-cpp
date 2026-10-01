@@ -89,7 +89,7 @@ DpssResult Dpss::compute(int N, double halfBandwidth, int nTapers)
     result.vecEigenvalues.resize(nTapers);
 
     for (int k = 0; k < nTapers; ++k) {
-        const int idx = N - 1 - k;  // largest eigenvalue first
+        const int idx = N - 1 - k; // largest eigenvalue first
         result.vecEigenvalues[k] = allEigenvalues[idx];
 
         // Extract eigenvector as a row, normalize to unit L2 norm

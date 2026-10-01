@@ -44,7 +44,6 @@
 #include <dsp/cosinefilter.h>
 
 
-
 //*************************************************************************************************************
 //=============================================================================================================
 // Eigen INCLUDES
@@ -86,15 +85,18 @@ namespace MNEBROWSE
 class FilterOperator : public MNEOperator
 {
 public:
-    enum DesignMethod {
-       Tschebyscheff,
-       Cosine} m_designMethod;
+    enum DesignMethod
+    {
+        Tschebyscheff,
+        Cosine
+    } m_designMethod;
 
-    enum FilterType {
-       LPF,
-       HPF,
-       BPF,
-       NOTCH
+    enum FilterType
+    {
+        LPF,
+        HPF,
+        BPF,
+        NOTCH
     } m_Type;
 
     FilterOperator();
@@ -112,7 +114,7 @@ public:
      * @param sFreq sampling frequency
      * @param fftlength length of the fft (multiple integer of 2^x)
      */
-    FilterOperator(QString unique_name, FilterType type, int order, double centerfreq, double bandwidth, double parkswidth, double sFreq, qint32 fftlength=4096, DesignMethod method = Cosine);
+    FilterOperator(QString unique_name, FilterType type, int order, double centerfreq, double bandwidth, double parkswidth, double sFreq, qint32 fftlength = 4096, DesignMethod method = Cosine);
 
     //=========================================================================================================
     /**
@@ -135,19 +137,19 @@ public:
      */
     RowVectorXd applyFFTFilter(const RowVectorXd& data) const;
 
-    double          m_sFreq;            /**< the sampling frequency. */
-    int             m_iFilterOrder;     /**< represents the order of the filter instance. */
-    int             m_iFFTlength;       /**< represents the filter length. */
-    double          m_dCenterFreq;      /**< contains center freq of the filter. */
-    double          m_dBandwidth;       /**< contains bandwidth of the filter. */
+    double m_sFreq;       /**< the sampling frequency. */
+    int m_iFilterOrder;   /**< represents the order of the filter instance. */
+    int m_iFFTlength;     /**< represents the filter length. */
+    double m_dCenterFreq; /**< contains center freq of the filter. */
+    double m_dBandwidth;  /**< contains bandwidth of the filter. */
 
-    QString         m_sName;            /**< contains name of the filter. */
+    QString m_sName; /**< contains name of the filter. */
 
-    RowVectorXd     m_dCoeffA;          /**< contains the forward filter coefficient set. */
-    RowVectorXd     m_dCoeffB;          /**< contains the backward filter coefficient set (empty if FIR filter). */
+    RowVectorXd m_dCoeffA; /**< contains the forward filter coefficient set. */
+    RowVectorXd m_dCoeffB; /**< contains the backward filter coefficient set (empty if FIR filter). */
 
-    RowVectorXcd    m_dFFTCoeffA;       /**< the FFT-transformed forward filter coefficient set, required for frequency-domain filtering, zero-padded to m_iFFTlength. */
-    RowVectorXcd    m_dFFTCoeffB;       /**< the FFT-transformed backward filter coefficient set, required for frequency-domain filtering, zero-padded to m_iFFTlength. */
+    RowVectorXcd m_dFFTCoeffA; /**< the FFT-transformed forward filter coefficient set, required for frequency-domain filtering, zero-padded to m_iFFTlength. */
+    RowVectorXcd m_dFFTCoeffB; /**< the FFT-transformed backward filter coefficient set, required for frequency-domain filtering, zero-padded to m_iFFTlength. */
 };
 
 } // NAMESPACE

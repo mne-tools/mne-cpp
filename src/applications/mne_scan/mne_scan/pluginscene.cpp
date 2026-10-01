@@ -35,7 +35,7 @@ using namespace MNESCAN;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-PluginScene::PluginScene(QMenu *pMenuPluginItem, PluginGui *pPluginGui)
+PluginScene::PluginScene(QMenu* pMenuPluginItem, PluginGui* pPluginGui)
 : QGraphicsScene(pPluginGui)
 , m_pPluginGui(pPluginGui)
 , m_pActionPluginItem(Q_NULLPTR)
@@ -43,7 +43,7 @@ PluginScene::PluginScene(QMenu *pMenuPluginItem, PluginGui *pPluginGui)
 {
     m_pMenuPluginItem = pMenuPluginItem;
     m_mode = MovePluginItem;
-//    m_itemType = PluginItem::Sensor;
+    //    m_itemType = PluginItem::Sensor;
     line = 0;
     m_qColorLine = QColor(148, 163, 184); // slate-400
 }
@@ -57,7 +57,7 @@ PluginScene::~PluginScene()
 
 //=============================================================================================================
 
-void PluginScene::drawBackground(QPainter *painter, const QRectF &rect)
+void PluginScene::drawBackground(QPainter* painter, const QRectF& rect)
 {
     // Solid background
     painter->fillRect(rect, QColor(249, 250, 251)); // gray-50
@@ -67,7 +67,7 @@ void PluginScene::drawBackground(QPainter *painter, const QRectF &rect)
     painter->setPen(QPen(QColor(209, 213, 219), 1.5)); // gray-300
 
     qreal left = qFloor(rect.left() / gridSize) * gridSize;
-    qreal top  = qFloor(rect.top()  / gridSize) * gridSize;
+    qreal top = qFloor(rect.top() / gridSize) * gridSize;
 
     QVector<QPointF> points;
     for (qreal x = left; x <= rect.right(); x += gridSize)
@@ -81,65 +81,59 @@ void PluginScene::drawBackground(QPainter *painter, const QRectF &rect)
 
 void PluginScene::insertItem(const QPointF& pos)
 {
-    PluginItem *item;
+    PluginItem* item;
     SCSHAREDLIB::AbstractPlugin::SPtr pPlugin;
     QString name;
     switch (m_mode) {
         case InsertPluginItem:
-            if(insertPlugin(m_pActionPluginItem, pPlugin))
-            {
+            if (insertPlugin(m_pActionPluginItem, pPlugin)) {
                 name = m_pActionPluginItem->text();
                 item = new PluginItem(pPlugin, m_pMenuPluginItem);
                 addItem(item);
                 item->setPos(pos);
                 emit itemInserted(item);
-            }
-            else
-            {
+            } else {
                 //If insertion failed, disable insert action
                 m_pActionPluginItem->setEnabled(false);
             }
             break;
         case InsertLine:
-            line = new QGraphicsLineItem(QLineF(pos,pos));
+            line = new QGraphicsLineItem(QLineF(pos, pos));
             line->setPen(QPen(m_qColorLine, 1));
             addItem(line);
             break;
-        default:
-        ;
+        default:;
     }
 }
 
 //=============================================================================================================
 
-bool PluginScene::insertPlugin(QAction* pActionPluginItem, SCSHAREDLIB::AbstractPlugin::SPtr &pAddedPlugin)
+bool PluginScene::insertPlugin(QAction* pActionPluginItem, SCSHAREDLIB::AbstractPlugin::SPtr& pAddedPlugin)
 {
-    if(pActionPluginItem->isEnabled())
-    {
+    if (pActionPluginItem->isEnabled()) {
         QString name = pActionPluginItem->text();
         qint32 idx = m_pPluginGui->m_pPluginManager->findByName(name);
-        if(idx < 0) {
+        if (idx < 0) {
             qDebug() << "Unable to find index";
             return false;
         }
         SCSHAREDLIB::AbstractPlugin* pPlugin = m_pPluginGui->m_pPluginManager->getPlugins()[idx];
 
-        if(m_pPluginGui->m_pPluginSceneManager->addPlugin(pPlugin, pAddedPlugin))
-        {
+        if (m_pPluginGui->m_pPluginSceneManager->addPlugin(pPlugin, pAddedPlugin)) {
             //If only single instance -> disable insert action
-            if(!pPlugin->multiInstanceAllowed())
+            if (!pPlugin->multiInstanceAllowed())
                 pActionPluginItem->setEnabled(false);
             return true;
         }
     }
     return false;
 
-//    return true;//DEBUG
+    //    return true;//DEBUG
 }
 
 //=============================================================================================================
 
-void PluginScene::mousePressEvent(QGraphicsSceneMouseEvent *mouseEvent)
+void PluginScene::mousePressEvent(QGraphicsSceneMouseEvent* mouseEvent)
 {
     if (mouseEvent->button() != Qt::LeftButton)
         return;
@@ -151,7 +145,7 @@ void PluginScene::mousePressEvent(QGraphicsSceneMouseEvent *mouseEvent)
 
 //=============================================================================================================
 
-void PluginScene::mouseMoveEvent(QGraphicsSceneMouseEvent *mouseEvent)
+void PluginScene::mouseMoveEvent(QGraphicsSceneMouseEvent* mouseEvent)
 {
     if (m_mode == InsertLine && line != 0) {
         QLineF newLine(line->line().p1(), mouseEvent->scenePos());
@@ -163,13 +157,13 @@ void PluginScene::mouseMoveEvent(QGraphicsSceneMouseEvent *mouseEvent)
 
 //=============================================================================================================
 
-void PluginScene::mouseReleaseEvent(QGraphicsSceneMouseEvent *mouseEvent)
+void PluginScene::mouseReleaseEvent(QGraphicsSceneMouseEvent* mouseEvent)
 {
     if (line != 0 && m_mode == InsertLine) {
-        QList<QGraphicsItem *> startItems = items(line->line().p1());
+        QList<QGraphicsItem*> startItems = items(line->line().p1());
         if (startItems.count() && startItems.first() == line)
             startItems.removeFirst();
-        QList<QGraphicsItem *> endItems = items(line->line().p2());
+        QList<QGraphicsItem*> endItems = items(line->line().p2());
         if (endItems.count() && endItems.first() == line)
             endItems.removeFirst();
 
@@ -181,15 +175,13 @@ void PluginScene::mouseReleaseEvent(QGraphicsSceneMouseEvent *mouseEvent)
             startItems.first()->type() == PluginItem::Type &&
             endItems.first()->type() == PluginItem::Type &&
             startItems.first() != endItems.first()) {
-
-            PluginItem *startItem = qgraphicsitem_cast<PluginItem *>(startItems.first());
-            PluginItem *endItem = qgraphicsitem_cast<PluginItem *>(endItems.first());
+            PluginItem* startItem = qgraphicsitem_cast<PluginItem*>(startItems.first());
+            PluginItem* endItem = qgraphicsitem_cast<PluginItem*>(endItems.first());
 
             SCSHAREDLIB::PluginConnectorConnection::SPtr pConnection = SCSHAREDLIB::PluginConnectorConnection::create(startItem->plugin(), endItem->plugin());
 
-            if(pConnection->isConnected())
-            {
-                Arrow *arrow = new Arrow(startItem, endItem, pConnection);
+            if (pConnection->isConnected()) {
+                Arrow* arrow = new Arrow(startItem, endItem, pConnection);
                 arrow->setColor(m_qColorLine);
                 startItem->addArrow(arrow);
                 endItem->addArrow(arrow);
@@ -201,7 +193,6 @@ void PluginScene::mouseReleaseEvent(QGraphicsSceneMouseEvent *mouseEvent)
                 m_pPluginGui->m_pPluginSceneManager->connectGraphNodes(
                     startItem->plugin(), endItem->plugin());
             }
-
         }
     }
     line = 0;

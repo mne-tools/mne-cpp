@@ -33,30 +33,29 @@
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-EventDelegate::EventDelegate(QObject *parent)
+EventDelegate::EventDelegate(QObject* parent)
 : QItemDelegate(parent)
 {
-
 }
 
 //=============================================================================================================
 
-QWidget* EventDelegate::createEditor(QWidget *parent,
-     const QStyleOptionViewItem &/* option */,
-     const QModelIndex & index) const
+QWidget* EventDelegate::createEditor(QWidget* parent,
+                                     const QStyleOptionViewItem& /* option */,
+                                     const QModelIndex& index) const
 {
     const ANSHAREDLIB::EventModel* pEventModel = static_cast<const ANSHAREDLIB::EventModel*>(index.model());
 
-    switch(index.column()) {
+    switch (index.column()) {
         case 0: {
-            QSpinBox *editor = new QSpinBox(parent);
+            QSpinBox* editor = new QSpinBox(parent);
             editor->setMinimum(0);
             editor->setMaximum(pEventModel->getFirstLastSample().second);
             return editor;
         }
 
         case 1: {
-            QDoubleSpinBox *editor = new QDoubleSpinBox(parent);
+            QDoubleSpinBox* editor = new QDoubleSpinBox(parent);
             editor->setMinimum(0.00);
             editor->setMaximum(pEventModel->getFirstLastSample().second / pEventModel->getSampleFreq());
             editor->setSingleStep(0.100);
@@ -64,25 +63,25 @@ QWidget* EventDelegate::createEditor(QWidget *parent,
         }
     }
 
-    QWidget *returnWidget = new QWidget();
+    QWidget* returnWidget = new QWidget();
     return returnWidget;
 }
 
 //=============================================================================================================
 
-void EventDelegate::setEditorData(QWidget *editor, const QModelIndex &index) const
+void EventDelegate::setEditorData(QWidget* editor, const QModelIndex& index) const
 {
-    switch(index.column()) {
+    switch (index.column()) {
         case 0: {
             int value = index.model()->data(index, Qt::DisplayRole).toInt();
-            QSpinBox *spinBox = static_cast<QSpinBox*>(editor);
+            QSpinBox* spinBox = static_cast<QSpinBox*>(editor);
             spinBox->setValue(value);
             break;
         }
 
         case 1: {
             double value = index.model()->data(index, Qt::DisplayRole).toDouble();
-            QDoubleSpinBox *spinBox = static_cast<QDoubleSpinBox*>(editor);
+            QDoubleSpinBox* spinBox = static_cast<QDoubleSpinBox*>(editor);
             spinBox->setValue(value);
             break;
         }
@@ -91,12 +90,12 @@ void EventDelegate::setEditorData(QWidget *editor, const QModelIndex &index) con
 
 //=============================================================================================================
 
-void EventDelegate::setModelData(QWidget *editor, QAbstractItemModel *model,
-                                    const QModelIndex &index) const
+void EventDelegate::setModelData(QWidget* editor, QAbstractItemModel* model,
+                                 const QModelIndex& index) const
 {
-    switch(index.column()) {
+    switch (index.column()) {
         case 0: {
-            QSpinBox *spinBox = static_cast<QSpinBox*>(editor);
+            QSpinBox* spinBox = static_cast<QSpinBox*>(editor);
             spinBox->interpretText();
             int value = spinBox->value();
 
@@ -105,7 +104,7 @@ void EventDelegate::setModelData(QWidget *editor, QAbstractItemModel *model,
         }
 
         case 1: {
-            QDoubleSpinBox *spinBox = static_cast<QDoubleSpinBox*>(editor);
+            QDoubleSpinBox* spinBox = static_cast<QDoubleSpinBox*>(editor);
             spinBox->interpretText();
             double value = spinBox->value();
 
@@ -117,8 +116,8 @@ void EventDelegate::setModelData(QWidget *editor, QAbstractItemModel *model,
 
 //=============================================================================================================
 
-void EventDelegate::updateEditorGeometry(QWidget *editor,
-    const QStyleOptionViewItem &option, const QModelIndex &/* index */) const
+void EventDelegate::updateEditorGeometry(QWidget* editor,
+                                         const QStyleOptionViewItem& option, const QModelIndex& /* index */) const
 {
     editor->setGeometry(option.rect);
 }

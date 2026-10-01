@@ -51,13 +51,13 @@ namespace FWDLIB
 class FWDSHARED_EXPORT Fwd
 {
 public:
-
     //=========================================================================================================
     /**
      * Destructor.
      */
     virtual ~Fwd()
-    { }
+    {
+    }
 
     //=========================================================================================================
     /**
@@ -86,11 +86,11 @@ public:
                                              const QStringList& exclude = FIFFLIB::defaultQStringList)
     {
         return MNELIB::MNEForwardSolution::read(p_IODevice,
-                                        fwd,
-                                        force_fixed,
-                                        surf_ori,
-                                        include,
-                                        exclude);
+                                                fwd,
+                                                force_fixed,
+                                                surf_ori,
+                                                include,
+                                                exclude);
     }
 };
 

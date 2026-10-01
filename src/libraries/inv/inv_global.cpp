@@ -26,12 +26,21 @@
 // DEFINE METHODS
 //=============================================================================================================
 
-const char* INVLIB::buildDateTime(){ return UTILSLIB::dateTimeNow();}
+const char* INVLIB::buildDateTime()
+{
+    return UTILSLIB::dateTimeNow();
+}
 
 //=============================================================================================================
 
-const char* INVLIB::buildHash(){ return UTILSLIB::gitHash();}
+const char* INVLIB::buildHash()
+{
+    return UTILSLIB::gitHash();
+}
 
 //=============================================================================================================
 
-const char* INVLIB::buildHashLong(){ return UTILSLIB::gitHashLong();}
+const char* INVLIB::buildHashLong()
+{
+    return UTILSLIB::gitHashLong();
+}

@@ -57,16 +57,16 @@ WriteToFile::WriteToFile()
 , m_bContinuous(false) //CHANGE TO USER TOGGLE ASAP
 , m_iBlinkStatus(0)
 , m_iSplitCount(0)
-, m_iRecordingMSeconds(5*60*1000)
+, m_iRecordingMSeconds(5 * 60 * 1000)
 , m_pCircularBuffer(CircularBuffer_Matrix_double::SPtr(new CircularBuffer_Matrix_double(40)))
 {
-    m_pActionRecordFile = new QAction(QIcon(":/images/record.png"), tr("Start Recording"),this);
+    m_pActionRecordFile = new QAction(QIcon(":/images/record.png"), tr("Start Recording"), this);
     m_pActionRecordFile->setStatusTip(tr("Start Recording"));
     connect(m_pActionRecordFile.data(), &QAction::triggered,
             this, &WriteToFile::toggleRecordingFile);
     addPluginAction(m_pActionRecordFile);
 
-    m_pActionClipRecording = new QAction(QIcon(":/images/analyze.png"), tr("Send to MNE Analyze"),this);
+    m_pActionClipRecording = new QAction(QIcon(":/images/analyze.png"), tr("Send to MNE Analyze"), this);
     m_pActionClipRecording->setStatusTip(tr("Clip Recording"));
     connect(m_pActionClipRecording.data(), &QAction::triggered,
             this, &WriteToFile::clipRecording);
@@ -74,20 +74,20 @@ WriteToFile::WriteToFile()
     m_pActionClipRecording->setVisible(false);
 
     //Init timers
-    if(!m_pRecordTimer) {
+    if (!m_pRecordTimer) {
         m_pRecordTimer = QSharedPointer<QTimer>(new QTimer(this));
         m_pRecordTimer->setSingleShot(true);
         connect(m_pRecordTimer.data(), &QTimer::timeout,
                 this, &WriteToFile::toggleRecordingFile);
     }
 
-    if(!m_pBlinkingRecordButtonTimer) {
+    if (!m_pBlinkingRecordButtonTimer) {
         m_pBlinkingRecordButtonTimer = QSharedPointer<QTimer>(new QTimer(this));
         connect(m_pBlinkingRecordButtonTimer.data(), &QTimer::timeout,
                 this, &WriteToFile::changeRecordingButton);
     }
 
-    if(!m_pStatusEmitTimer) {
+    if (!m_pStatusEmitTimer) {
         m_pStatusEmitTimer = QSharedPointer<QTimer>(new QTimer(this));
         m_pStatusEmitTimer->setInterval(1000);
         connect(m_pStatusEmitTimer.data(), &QTimer::timeout,
@@ -99,7 +99,7 @@ WriteToFile::WriteToFile()
 
 WriteToFile::~WriteToFile()
 {
-    if(this->isRunning()) {
+    if (this->isRunning()) {
         stop();
     }
 }
@@ -168,7 +168,7 @@ QString WriteToFile::getName() const
 
 QWidget* WriteToFile::setupWidget()
 {
-    WriteToFileSetupWidget* setupWidget = new WriteToFileSetupWidget(this);//widget is later distroyed by CentralWidget - so it has to be created everytime new
+    WriteToFileSetupWidget* setupWidget = new WriteToFileSetupWidget(this); //widget is later distroyed by CentralWidget - so it has to be created everytime new
     return setupWidget;
 }
 
@@ -176,28 +176,28 @@ QWidget* WriteToFile::setupWidget()
 
 void WriteToFile::update(SCMEASLIB::Measurement::SPtr pMeasurement)
 {
-    if(QSharedPointer<RealTimeMultiSampleArray> pRTMSA = pMeasurement.dynamicCast<RealTimeMultiSampleArray>()) {
+    if (QSharedPointer<RealTimeMultiSampleArray> pRTMSA = pMeasurement.dynamicCast<RealTimeMultiSampleArray>()) {
         //Check if the fiff info was inititalized
-        if(!m_pFiffInfo) {
+        if (!m_pFiffInfo) {
             m_pFiffInfo = pRTMSA->info();
         }
 
-        if(!m_bPluginControlWidgetsInit) {
+        if (!m_bPluginControlWidgetsInit) {
             initPluginControlWidgets();
         }
 
-        if(m_bContinuous && !m_bWriteToFile){
+        if (m_bContinuous && !m_bWriteToFile) {
             toggleRecordingFile();
             m_bContinuous = false;
         }
 
         // Check if data is present
-        if(pRTMSA->getMultiSampleArray().size() > 0) {
-            for(qsizetype i = 0; i < pRTMSA->getMultiSampleArray().size(); ++i) {
+        if (pRTMSA->getMultiSampleArray().size() > 0) {
+            for (qsizetype i = 0; i < pRTMSA->getMultiSampleArray().size(); ++i) {
                 // Please note that we do not need a copy here since this function will block until
                 // the buffer accepts new data again. Hence, the data is not deleted in the actual
                 // Measurement function after it emitted the notify signal.
-                while(!m_pCircularBuffer->push(pRTMSA->getMultiSampleArray()[i])) {
+                while (!m_pCircularBuffer->push(pRTMSA->getMultiSampleArray()[i])) {
                     //Do nothing until the circular buffer is ready to accept new data again
                 }
             }
@@ -209,27 +209,27 @@ void WriteToFile::update(SCMEASLIB::Measurement::SPtr pMeasurement)
 
 void WriteToFile::initPluginControlWidgets()
 {
-    if(m_pFiffInfo) {
+    if (m_pFiffInfo) {
         QList<QWidget*> plControlWidgets;
 
         QSettings settings("MNECPP");
 
         //Mne Scan data Path
         QString sMneScanDataPath = settings.value(QString("MNESCAN/%1/currentDir").arg(getName()), QDir::homePath() + "/mne_scan").toString();
-        if(!QDir(sMneScanDataPath).exists()) {
+        if (!QDir(sMneScanDataPath).exists()) {
             QDir().mkdir(sMneScanDataPath);
         }
 
         //Test Project
         QString sCurrentProject = settings.value(QString("MNESCAN/%1/currentProject").arg(getName()), "TestProject").toString();
-        if(!QDir(sMneScanDataPath+"/"+sCurrentProject).exists()) {
-            QDir().mkdir(sMneScanDataPath+"/"+sCurrentProject);
+        if (!QDir(sMneScanDataPath + "/" + sCurrentProject).exists()) {
+            QDir().mkdir(sMneScanDataPath + "/" + sCurrentProject);
         }
 
         //Test Subject
         QString sCurrentSubject = settings.value(QString("MNESCAN/%1/currentSubject").arg(getName()), "TestSubject").toString();
-        if(!QDir(sMneScanDataPath+"/"+sCurrentProject+"/"+sCurrentSubject).exists()) {
-            QDir().mkdir(sMneScanDataPath+"/"+sCurrentProject+"/"+sCurrentSubject);
+        if (!QDir(sMneScanDataPath + "/" + sCurrentProject + "/" + sCurrentSubject).exists()) {
+            QDir().mkdir(sMneScanDataPath + "/" + sCurrentProject + "/" + sCurrentSubject);
         }
 
         // Projects Settings
@@ -263,10 +263,10 @@ void WriteToFile::initPluginControlWidgets()
 
         emit pluginControlWidgetsChanged(plControlWidgets, this->getName());
 
-        if(!m_pUpdateTimeInfoTimer) {
+        if (!m_pUpdateTimeInfoTimer) {
             m_pUpdateTimeInfoTimer = QSharedPointer<QTimer>(new QTimer(this));
             connect(m_pUpdateTimeInfoTimer.data(), &QTimer::timeout, [=, this]() {
-                    pProjectSettingsView->setRecordingElapsedTime(m_recordingStartedTime.elapsed());
+                pProjectSettingsView->setRecordingElapsedTime(m_recordingStartedTime.elapsed());
             });
         }
 
@@ -281,22 +281,22 @@ void WriteToFile::run()
     MatrixXd matData;
     qint32 size = 0;
 
-    while(!isInterruptionRequested()) {
-        if(m_pCircularBuffer) {
+    while (!isInterruptionRequested()) {
+        if (m_pCircularBuffer) {
             //pop matrix
 
-            if(m_pCircularBuffer->pop(matData)) {
+            if (m_pCircularBuffer->pop(matData)) {
                 //Write raw data to fif file
                 m_mutex.lock();
-                if(m_bWriteToFile) {
-                    size += matData.rows()*matData.cols() * 4;
+                if (m_bWriteToFile) {
+                    size += matData.rows() * matData.cols() * 4;
 
-                    if(size > MAX_DATA_LEN) {
+                    if (size > MAX_DATA_LEN) {
                         size = 0;
                         this->splitRecordingFile();
                     }
 
-                    if(m_pOutfid) {
+                    if (m_pOutfid) {
                         m_pOutfid->write_raw_buffer(matData, m_mCals);
                     }
                 } else {
@@ -308,7 +308,7 @@ void WriteToFile::run()
     }
 
     //Close the fif output stream
-    if(m_bWriteToFile) {
+    if (m_bWriteToFile) {
         m_bContinuous = false;
         this->toggleRecordingFile();
     }
@@ -319,8 +319,8 @@ void WriteToFile::run()
 void WriteToFile::setRecordingTimerChanged(int timeMSecs)
 {
     //If the recording time is changed during the recording, change the timer
-    if(m_bWriteToFile) {
-        m_pRecordTimer->setInterval(timeMSecs-m_recordingStartedTime.elapsed());
+    if (m_bWriteToFile) {
+        m_pRecordTimer->setInterval(timeMSecs - m_recordingStartedTime.elapsed());
     }
 
     m_iRecordingMSeconds = timeMSecs;
@@ -345,7 +345,7 @@ void WriteToFile::onFileNameChanged(const QString& sFileName)
 void WriteToFile::toggleRecordingFile()
 {
     //Setup writing to file
-    if(m_bWriteToFile) {
+    if (m_bWriteToFile) {
         m_mutex.lock();
         m_pOutfid->finish_writing_raw();
         m_mutex.unlock();
@@ -360,7 +360,7 @@ void WriteToFile::toggleRecordingFile()
         m_pActionRecordFile->setText(tr("Start Recording"));
         m_pActionRecordFile->setStatusTip(tr("Start Recording"));
         m_pUpdateTimeInfoTimer->stop();
-        if(m_pStatusEmitTimer) {
+        if (m_pStatusEmitTimer) {
             m_pStatusEmitTimer->stop();
         }
         emit recordingActiveChanged(false);
@@ -370,30 +370,30 @@ void WriteToFile::toggleRecordingFile()
     } else {
         m_iSplitCount = 0;
 
-        if(!m_pFiffInfo) {
+        if (!m_pFiffInfo) {
             popUp("FiffInfo missing!");
             return;
         }
 
-        if(m_pFiffInfo->dev_head_t.trans.isIdentity()) {
+        if (m_pFiffInfo->dev_head_t.trans.isIdentity()) {
             int ret = popUpYesNo("It seems that no HPI fitting was performed. This is your last chance!",
                                  "Do you want to continue without HPI fitting?");
-            if(ret == QMessageBox::No)
+            if (ret == QMessageBox::No)
                 return;
         }
 
         //Initiate the stream for writing to the fif file
         m_qFileOut.setFileName(m_sRecordFileName);
-        if(m_qFileOut.exists()) {
+        if (m_qFileOut.exists()) {
             int ret = popUpYesNo("The file you want to write already exists.",
                                  "Do you want to overwrite this file?");
-            if(ret == QMessageBox::No) {
+            if (ret == QMessageBox::No) {
                 return;
             }
         }
 
         //Set all projectors to zero before writing to file because we always write the raw data
-        for(int i = 0; i<m_pFiffInfo->projs.size(); i++) {
+        for (int i = 0; i < m_pFiffInfo->projs.size(); i++) {
             m_pFiffInfo->projs[i].active = false;
         }
 
@@ -415,13 +415,13 @@ void WriteToFile::toggleRecordingFile()
         m_pBlinkingRecordButtonTimer->start(500);
         m_recordingStartedTime.restart();
         m_pUpdateTimeInfoTimer->start(200);
-        if(m_pStatusEmitTimer) {
+        if (m_pStatusEmitTimer) {
             m_pStatusEmitTimer->start();
         }
         emit recordingActiveChanged(true);
         emitRecordingStatus();
 
-        if(m_bUseRecordTimer) {
+        if (m_bUseRecordTimer) {
             m_pRecordTimer->start(m_iRecordingMSeconds);
         }
 
@@ -442,9 +442,9 @@ void WriteToFile::splitRecordingFile()
     qint32 data;
     m_pOutfid->start_block(FIFFB_REF);
     data = FIFFV_ROLE_NEXT_FILE;
-    m_pOutfid->write_int(FIFF_REF_ROLE,&data);
+    m_pOutfid->write_int(FIFF_REF_ROLE, &data);
     m_pOutfid->write_string(FIFF_REF_FILE_NAME, nextFileName);
-    m_pOutfid->write_id(FIFF_REF_FILE_ID);//ToDo meas_id
+    m_pOutfid->write_id(FIFF_REF_FILE_ID); //ToDo meas_id
     data = m_iSplitCount - 1;
     m_pOutfid->write_int(FIFF_REF_FILE_NUM, &data);
     m_pOutfid->end_block(FIFFB_REF);
@@ -471,7 +471,7 @@ void WriteToFile::splitRecordingFile()
 
 void WriteToFile::changeRecordingButton()
 {
-    if(m_iBlinkStatus == 0) {
+    if (m_iBlinkStatus == 0) {
         m_pActionRecordFile->setIcon(QIcon(":/images/record.png"));
         m_iBlinkStatus = 1;
     } else {
@@ -517,7 +517,7 @@ bool WriteToFile::isContinuous()
 
 QString WriteToFile::getBuildInfo()
 {
-    return QString(WRITETOFILEPLUGIN::buildDateTime()) + QString(" - ")  + QString(WRITETOFILEPLUGIN::buildHash());
+    return QString(WRITETOFILEPLUGIN::buildDateTime()) + QString(" - ") + QString(WRITETOFILEPLUGIN::buildHash());
 }
 
 //=============================================================================================================
@@ -526,13 +526,13 @@ void WriteToFile::promptFileName()
 {
     bool bFileHandled = false;
 
-    while(!bFileHandled){
+    while (!bFileHandled) {
         bool ok;
         QString sFileName = QInputDialog::getText(Q_NULLPTR, tr("Write to File"), tr("Name your save file:"), QLineEdit::Normal, QString(), &ok);
 
-        if (ok && !sFileName.isEmpty()){
+        if (ok && !sFileName.isEmpty()) {
             bFileHandled = renameRecording(sFileName);
-        } else if (ok){
+        } else if (ok) {
             popUp("Cannot save file with no name.");
         } else {
             deleteRecording();
@@ -549,7 +549,7 @@ bool WriteToFile::renameRecording(const QString& sFileName)
 {
     bool bRenameFile = false;
 
-    if(m_lFileNames.size() == 1){
+    if (m_lFileNames.size() == 1) {
         bRenameFile = renameSingleFile(QFileInfo(m_qFileOut).fileName(), sFileName);
     } else {
         bRenameFile = renameMultipleFiles(sFileName);
@@ -564,7 +564,7 @@ bool WriteToFile::renameSingleFile(const QString& sCurrentFileName, const QStrin
 {
     QString sFullNewName;
 
-    if(sNewFileName.endsWith(".fif")){
+    if (sNewFileName.endsWith(".fif")) {
         sFullNewName = sNewFileName;
     } else {
         sFullNewName = sNewFileName + ".fif";
@@ -572,10 +572,10 @@ bool WriteToFile::renameSingleFile(const QString& sCurrentFileName, const QStrin
 
     QString dir(QFileInfo(m_qFileOut).dir().absolutePath() + QString("/"));
 
-    if(QFile::exists(dir + sFullNewName)){
+    if (QFile::exists(dir + sFullNewName)) {
         int ret = popUpYesNo("A file with this name already exists.",
                              "Do you want to overwrite this file?");
-        if(ret == QMessageBox::No) {
+        if (ret == QMessageBox::No) {
             return false;
         } else {
             QFile::remove(dir + sFullNewName);
@@ -593,9 +593,9 @@ bool WriteToFile::renameMultipleFiles(const QString& sFileName)
 {
     bool renamingOK(false);
     int fileIndex(1);
-    for( auto& fileName: m_lFileNames) {
+    for (auto& fileName : m_lFileNames) {
         renamingOK = renameSingleFile(fileName, sFileName + "-" + QString::number(fileIndex));
-        if ( !renamingOK ) {
+        if (!renamingOK) {
             break;
         }
     }
@@ -607,7 +607,7 @@ bool WriteToFile::renameMultipleFiles(const QString& sFileName)
 
 void WriteToFile::deleteRecording()
 {
-    for (QString& sFileName : m_lFileNames){
+    for (QString& sFileName : m_lFileNames) {
         QFile(QFileInfo(m_qFileOut).dir().absolutePath() + QString("/") + sFileName).remove();
     }
 }
@@ -666,7 +666,7 @@ QWidget* WriteToFile::getStatusWidget()
 void WriteToFile::emitRecordingStatus()
 {
     qint64 iElapsed = 0;
-    qint64 iSize    = 0;
+    qint64 iSize = 0;
     {
         QMutexLocker locker(&m_mutex);
         if (!m_bWriteToFile) {
@@ -679,7 +679,7 @@ void WriteToFile::emitRecordingStatus()
         }
     }
     const QString summary = QStringLiteral("%1  %2")
-        .arg(formatElapsed(iElapsed), formatBytes(iSize));
+                                .arg(formatElapsed(iElapsed), formatBytes(iSize));
     emit recordingStatus(summary);
 }
 

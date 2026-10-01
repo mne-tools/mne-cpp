@@ -60,8 +60,8 @@ namespace MNELIB
 class MNESHARED_EXPORT MNEDeriv
 {
 public:
-    typedef QSharedPointer<MNEDeriv> SPtr;              /**< Shared pointer type for MNEDeriv. */
-    typedef QSharedPointer<const MNEDeriv> ConstSPtr;   /**< Const shared pointer type for MNEDeriv. */
+    typedef QSharedPointer<MNEDeriv> SPtr;            /**< Shared pointer type for MNEDeriv. */
+    typedef QSharedPointer<const MNEDeriv> ConstSPtr; /**< Const shared pointer type for MNEDeriv. */
 
     //=========================================================================================================
     /**
@@ -76,12 +76,12 @@ public:
     ~MNEDeriv();
 
 public:
-    QString                  filename;   /**< Source file name the derivation was loaded from. */
-    QString                  shortname;  /**< Short nickname for this derivation. */
+    QString filename;                                 /**< Source file name the derivation was loaded from. */
+    QString shortname;                                /**< Short nickname for this derivation. */
     std::unique_ptr<MNESparseNamedMatrix> deriv_data; /**< The derivation data itself (sparse named matrix). */
-    Eigen::VectorXi          in_use;     /**< Per-column count of non-zero elements in the derivation data. */
-    Eigen::VectorXi          valid;      /**< Per-derivation validity flags considering input channel units. */
-    QList<FIFFLIB::FiffChInfo> chs;      /**< First matching channel info for each derivation. */
+    Eigen::VectorXi in_use;                           /**< Per-column count of non-zero elements in the derivation data. */
+    Eigen::VectorXi valid;                            /**< Per-derivation validity flags considering input channel units. */
+    QList<FIFFLIB::FiffChInfo> chs;                   /**< First matching channel info for each derivation. */
 };
 
 //=============================================================================================================

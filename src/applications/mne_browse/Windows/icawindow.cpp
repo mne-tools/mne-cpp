@@ -43,8 +43,8 @@ using namespace Eigen;
 
 //=============================================================================================================
 
-IcaWindow::IcaWindow(QWidget *parent)
-    : QDockWidget(tr("ICA Browser"), parent)
+IcaWindow::IcaWindow(QWidget* parent)
+: QDockWidget(tr("ICA Browser"), parent)
 {
     setupUi();
 }
@@ -67,10 +67,10 @@ void IcaWindow::setupUi()
     m_pMainLayout = new QVBoxLayout(m_pCentralWidget);
 
     // ── Controls group ──────────────────────────────────────────────
-    auto *controlGroup = new QGroupBox(tr("ICA Settings"), m_pCentralWidget);
-    auto *controlLayout = new QHBoxLayout(controlGroup);
+    auto* controlGroup = new QGroupBox(tr("ICA Settings"), m_pCentralWidget);
+    auto* controlLayout = new QHBoxLayout(controlGroup);
 
-    auto *nCompLabel = new QLabel(tr("Components:"), controlGroup);
+    auto* nCompLabel = new QLabel(tr("Components:"), controlGroup);
     m_pNComponentsSpin = new QSpinBox(controlGroup);
     m_pNComponentsSpin->setRange(2, 500);
     m_pNComponentsSpin->setValue(20);
@@ -102,7 +102,7 @@ void IcaWindow::setupUi()
     m_pMainLayout->addWidget(m_pScrollArea, 1);
 
     // ── Apply / Reset buttons ───────────────────────────────────────
-    auto *buttonLayout = new QHBoxLayout();
+    auto* buttonLayout = new QHBoxLayout();
     m_pApplyButton = new QPushButton(tr("Apply Exclusion"), m_pCentralWidget);
     m_pApplyButton->setToolTip(tr("Remove the checked components from the raw data"));
     m_pApplyButton->setEnabled(false);
@@ -117,30 +117,31 @@ void IcaWindow::setupUi()
 
     // Connections
     connect(m_pComputeButton, &QPushButton::clicked, this, &IcaWindow::onCompute);
-    connect(m_pApplyButton,   &QPushButton::clicked, this, &IcaWindow::onApply);
-    connect(m_pResetButton,   &QPushButton::clicked, this, &IcaWindow::onReset);
+    connect(m_pApplyButton, &QPushButton::clicked, this, &IcaWindow::onApply);
+    connect(m_pResetButton, &QPushButton::clicked, this, &IcaWindow::onReset);
 }
 
 //=============================================================================================================
 
-void IcaWindow::setRawData(const MatrixXd &rawData,
-                            QSharedPointer<FIFFLIB::FiffInfo> fiffInfo,
-                            int firstSample)
+void IcaWindow::setRawData(const MatrixXd& rawData,
+                           QSharedPointer<FIFFLIB::FiffInfo> fiffInfo,
+                           int firstSample)
 {
-    m_rawData     = rawData;
-    m_pFiffInfo   = fiffInfo;
+    m_rawData = rawData;
+    m_pFiffInfo = fiffInfo;
     m_firstSample = firstSample;
-    m_bHasResult  = false;
+    m_bHasResult = false;
 
     m_pComputeButton->setEnabled(rawData.rows() > 0 && rawData.cols() > 0);
 
-    const int nCh  = static_cast<int>(rawData.rows());
+    const int nCh = static_cast<int>(rawData.rows());
     const int nSmp = static_cast<int>(rawData.cols());
     m_pNComponentsSpin->setMaximum(qMin(nCh, 200));
     m_pNComponentsSpin->setValue(qMin(m_pNComponentsSpin->value(), nCh));
 
     m_pStatusLabel->setText(tr("Raw data loaded: %1 channels × %2 samples.\nPress Compute to run FastICA.")
-                                .arg(nCh).arg(nSmp));
+                                .arg(nCh)
+                                .arg(nSmp));
     clearIca();
 }
 
@@ -149,16 +150,16 @@ void IcaWindow::setRawData(const MatrixXd &rawData,
 void IcaWindow::clearIca()
 {
     m_bHasResult = false;
-    m_icaResult  = IcaResult();
+    m_icaResult = IcaResult();
     m_pApplyButton->setEnabled(false);
 
     // Clear component list
-    for (auto *cb : m_componentCheckboxes)
+    for (auto* cb : m_componentCheckboxes)
         cb->deleteLater();
     m_componentCheckboxes.clear();
 
     // Remove all items from the component list layout
-    while (QLayoutItem *item = m_pComponentListLayout->takeAt(0)) {
+    while (QLayoutItem* item = m_pComponentListLayout->takeAt(0)) {
         if (item->widget())
             item->widget()->deleteLater();
         delete item;
@@ -193,7 +194,8 @@ void IcaWindow::onCompute()
 
     m_pStatusLabel->setText(tr("ICA decomposition complete (%1 components).\n%2\n"
                                "Check components to exclude, then press Apply.")
-                                .arg(nComp).arg(convergenceMsg));
+                                .arg(nComp)
+                                .arg(convergenceMsg));
 
     rebuildComponentList();
     m_pApplyButton->setEnabled(true);
@@ -237,7 +239,7 @@ void IcaWindow::onReset()
         return;
 
     // Uncheck all component checkboxes
-    for (auto *cb : m_componentCheckboxes)
+    for (auto* cb : m_componentCheckboxes)
         cb->setChecked(false);
 
     m_pStatusLabel->setText(tr("Reset: original data restored."));
@@ -251,30 +253,30 @@ void IcaWindow::onReset()
 void IcaWindow::rebuildComponentList()
 {
     // Clear only the UI widgets, not the ICA result
-    for (auto *cb : m_componentCheckboxes)
+    for (auto* cb : m_componentCheckboxes)
         cb->deleteLater();
     m_componentCheckboxes.clear();
-    while (QLayoutItem *item = m_pComponentListLayout->takeAt(0)) {
+    while (QLayoutItem* item = m_pComponentListLayout->takeAt(0)) {
         if (item->widget())
             item->widget()->deleteLater();
         delete item;
     }
 
     const int nComp = static_cast<int>(m_icaResult.matSources.rows());
-    const int waveWidth  = 260;
+    const int waveWidth = 260;
     const int waveHeight = 40;
 
     for (int i = 0; i < nComp; ++i) {
-        auto *rowWidget = new QWidget(m_pComponentListWidget);
-        auto *rowLayout = new QHBoxLayout(rowWidget);
+        auto* rowWidget = new QWidget(m_pComponentListWidget);
+        auto* rowLayout = new QHBoxLayout(rowWidget);
         rowLayout->setContentsMargins(2, 2, 2, 2);
 
-        auto *cb = new QCheckBox(tr("IC %1").arg(i), rowWidget);
+        auto* cb = new QCheckBox(tr("IC %1").arg(i), rowWidget);
         cb->setToolTip(tr("Check to exclude this component"));
         m_componentCheckboxes.append(cb);
 
         QImage waveImg = renderComponentWaveform(i, waveWidth, waveHeight);
-        auto *waveLabel = new QLabel(rowWidget);
+        auto* waveLabel = new QLabel(rowWidget);
         waveLabel->setPixmap(QPixmap::fromImage(waveImg));
         waveLabel->setFixedSize(waveWidth, waveHeight);
 
@@ -300,37 +302,41 @@ QImage IcaWindow::renderComponentWaveform(int compIdx, int width, int height) co
         return img;
 
     // Compute min/max for normalisation
-    const auto &row = m_icaResult.matSources.row(compIdx);
+    const auto& row = m_icaResult.matSources.row(compIdx);
     double minVal = row.minCoeff();
     double maxVal = row.maxCoeff();
-    double range  = maxVal - minVal;
+    double range = maxVal - minVal;
     if (range < 1e-30)
         range = 1.0;
 
     // Min/max decimation: for each pixel column, find min and max sample values
     const float spp = static_cast<float>(nSamples) / width;
     const int margin = 2;
-    const int plotH  = height - 2 * margin;
+    const int plotH = height - 2 * margin;
 
     for (int px = 0; px < width; ++px) {
-        int sB = static_cast<int>(px       * spp);
+        int sB = static_cast<int>(px * spp);
         int sE = static_cast<int>((px + 1) * spp);
         sE = qMin(sE, nSamples);
-        if (sB >= sE) sB = qMax(sE - 1, 0);
+        if (sB >= sE)
+            sB = qMax(sE - 1, 0);
 
         double lo = row(sB);
         double hi = row(sB);
         for (int s = sB + 1; s < sE; ++s) {
             double v = row(s);
-            if (v < lo) lo = v;
-            if (v > hi) hi = v;
+            if (v < lo)
+                lo = v;
+            if (v > hi)
+                hi = v;
         }
 
         int yLo = margin + static_cast<int>((1.0 - (lo - minVal) / range) * plotH);
         int yHi = margin + static_cast<int>((1.0 - (hi - minVal) / range) * plotH);
         yLo = qBound(0, yLo, height - 1);
         yHi = qBound(0, yHi, height - 1);
-        if (yHi > yLo) qSwap(yHi, yLo); // yHi should be smaller (higher on screen)
+        if (yHi > yLo)
+            qSwap(yHi, yLo); // yHi should be smaller (higher on screen)
 
         for (int y = yHi; y <= yLo; ++y)
             img.setPixel(px, y, qRgb(30, 90, 170));

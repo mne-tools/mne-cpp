@@ -67,7 +67,7 @@ class FSSHARED_EXPORT FsSurfaceSet
 public:
     typedef QSharedPointer<FsSurfaceSet> SPtr;            /**< Shared pointer type for FsSurfaceSet class. */
     typedef QSharedPointer<const FsSurfaceSet> ConstSPtr; /**< Const shared pointer type for FsSurfaceSet class. */
-    
+
     //=========================================================================================================
     /**
      * Default constructor
@@ -83,7 +83,7 @@ public:
      * @param[in] surf               Name of the surface to load (eg. inflated, orig ...).
      * @param[in] subjects_dir       Subjects directory.
      */
-    explicit FsSurfaceSet(const QString &subject_id, qint32 hemi, const QString &surf, const QString &subjects_dir);
+    explicit FsSurfaceSet(const QString& subject_id, qint32 hemi, const QString& surf, const QString& subjects_dir);
 
     //=========================================================================================================
     /**
@@ -93,7 +93,7 @@ public:
      * @param[in] hemi               Which hemisphere to load {0 -> lh, 1 -> rh, 2 -> both}.
      * @param[in] surf               Name of the surface to load (eg. inflated, orig ...).
      */
-    explicit FsSurfaceSet(const QString &path, qint32 hemi, const QString &surf);
+    explicit FsSurfaceSet(const QString& path, qint32 hemi, const QString& surf);
 
     //=========================================================================================================
     /**
@@ -118,7 +118,7 @@ public:
      * Destroys the FsSurfaceSet class.
      */
     ~FsSurfaceSet();
-    
+
     //=========================================================================================================
     /**
      * Initializes the FsAnnotationSet.
@@ -159,7 +159,7 @@ public:
      *
      * @return true if succesfull, false otherwise.
      */
-    static bool read(const QString& p_sLHFileName, const QString& p_sRHFileName, FsSurfaceSet &p_SurfaceSet);
+    static bool read(const QString& p_sLHFileName, const QString& p_sRHFileName, FsSurfaceSet& p_SurfaceSet);
 
     //=========================================================================================================
     /**
@@ -177,7 +177,7 @@ public:
      *
      * @return FsSurface related to the parameter index.
      */
-    const FsSurface& operator[] (qint32 idx) const;
+    const FsSurface& operator[](qint32 idx) const;
 
     //=========================================================================================================
     /**
@@ -187,7 +187,7 @@ public:
      *
      * @return FsSurface related to the parameter index.
      */
-    FsSurface& operator[] (qint32 idx);
+    FsSurface& operator[](qint32 idx);
 
     //=========================================================================================================
     /**
@@ -197,7 +197,7 @@ public:
      *
      * @return FsSurface related to the parameter identifier.
      */
-    const FsSurface& operator[] (QString idt) const;
+    const FsSurface& operator[](QString idt) const;
 
     //=========================================================================================================
     /**
@@ -207,7 +207,7 @@ public:
      *
      * @return FsSurface related to the parameter identifier.
      */
-    FsSurface& operator[] (QString idt);
+    FsSurface& operator[](QString idt);
 
     //=========================================================================================================
     /**
@@ -224,7 +224,7 @@ private:
      */
     void calcOffset();
 
-    QMap<qint32, FsSurface> m_qMapSurfs;  /**< Hemisphere surfaces (lh = 0; rh = 1). */
+    QMap<qint32, FsSurface> m_qMapSurfs; /**< Hemisphere surfaces (lh = 0; rh = 1). */
 };
 
 //=============================================================================================================
@@ -247,7 +247,7 @@ inline bool FsSurfaceSet::isEmpty() const
 
 inline QString FsSurfaceSet::surf() const
 {
-    if(m_qMapSurfs.size() > 0)
+    if (m_qMapSurfs.size() > 0)
         return m_qMapSurfs.begin().value().surf();
     else
         return QString("");
@@ -262,4 +262,3 @@ inline qint32 FsSurfaceSet::size() const
 } // NAMESPACE
 
 #endif // FS_SURFACESET_H
-

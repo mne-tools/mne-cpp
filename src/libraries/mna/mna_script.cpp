@@ -41,7 +41,7 @@ using namespace MNALIB;
 QJsonObject MnaScript::toJson() const
 {
     QJsonObject json;
-    json[QStringLiteral("language")]    = language;
+    json[QStringLiteral("language")] = language;
 
     if (!interpreter.isEmpty()) {
         json[QStringLiteral("interpreter")] = interpreter;
@@ -77,11 +77,11 @@ QJsonObject MnaScript::toJson() const
 MnaScript MnaScript::fromJson(const QJsonObject& json)
 {
     MnaScript s;
-    s.language     = json.value(QStringLiteral("language")).toString();
-    s.interpreter  = json.value(QStringLiteral("interpreter")).toString();
-    s.code         = json.value(QStringLiteral("code")).toString();
-    s.sourceUri    = json.value(QStringLiteral("source_uri")).toString();
-    s.codeSha256   = json.value(QStringLiteral("code_sha256")).toString();
+    s.language = json.value(QStringLiteral("language")).toString();
+    s.interpreter = json.value(QStringLiteral("interpreter")).toString();
+    s.code = json.value(QStringLiteral("code")).toString();
+    s.sourceUri = json.value(QStringLiteral("source_uri")).toString();
+    s.codeSha256 = json.value(QStringLiteral("code_sha256")).toString();
     s.keepTempFile = json.value(QStringLiteral("keep_temp_file")).toBool(false);
 
     const QJsonArray arr = json.value(QStringLiteral("interpreter_args")).toArray();
@@ -133,11 +133,11 @@ QCborMap MnaScript::toCbor() const
 MnaScript MnaScript::fromCbor(const QCborMap& cbor)
 {
     MnaScript s;
-    s.language     = cbor.value(QStringLiteral("language")).toString();
-    s.interpreter  = cbor.value(QStringLiteral("interpreter")).toString();
-    s.code         = cbor.value(QStringLiteral("code")).toString();
-    s.sourceUri    = cbor.value(QStringLiteral("source_uri")).toString();
-    s.codeSha256   = cbor.value(QStringLiteral("code_sha256")).toString();
+    s.language = cbor.value(QStringLiteral("language")).toString();
+    s.interpreter = cbor.value(QStringLiteral("interpreter")).toString();
+    s.code = cbor.value(QStringLiteral("code")).toString();
+    s.sourceUri = cbor.value(QStringLiteral("source_uri")).toString();
+    s.codeSha256 = cbor.value(QStringLiteral("code_sha256")).toString();
     s.keepTempFile = cbor.value(QStringLiteral("keep_temp_file")).toBool();
 
     const QCborArray arr = cbor.value(QStringLiteral("interpreter_args")).toArray();

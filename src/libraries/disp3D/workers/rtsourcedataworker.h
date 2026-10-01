@@ -39,7 +39,8 @@
 // DEFINE NAMESPACE
 //=============================================================================================================
 
-namespace DISP3DLIB {
+namespace DISP3DLIB
+{
 
 //=============================================================================================================
 /**
@@ -62,7 +63,7 @@ public:
      *
      * @param[in] parent     Parent QObject.
      */
-    explicit RtSourceDataWorker(QObject *parent = nullptr);
+    explicit RtSourceDataWorker(QObject* parent = nullptr);
 
     //=========================================================================================================
     /**
@@ -71,7 +72,7 @@ public:
      *
      * @param[in] data       Source activity vector (nSources x 1).
      */
-    void addData(const Eigen::VectorXd &data);
+    void addData(const Eigen::VectorXd& data);
 
     //=========================================================================================================
     /**
@@ -109,7 +110,7 @@ public:
      *
      * @param[in] name       Colormap name ("Hot", "Jet", "Viridis", "Cool", "RedBlue").
      */
-    void setColormapType(const QString &name);
+    void setColormapType(const QString& name);
 
     //=========================================================================================================
     /**
@@ -159,8 +160,8 @@ public:
      * @param[in] baseColorsLh   Per-vertex ABGR colors for the left hemisphere.
      * @param[in] baseColorsRh   Per-vertex ABGR colors for the right hemisphere.
      */
-    void setSurfaceColor(const QVector<uint32_t> &baseColorsLh,
-                         const QVector<uint32_t> &baseColorsRh);
+    void setSurfaceColor(const QVector<uint32_t>& baseColorsLh,
+                         const QVector<uint32_t>& baseColorsRh);
 
 public slots:
     //=========================================================================================================
@@ -178,8 +179,8 @@ signals:
      * @param[in] colorsLh   Per-vertex ABGR color array for the left hemisphere.
      * @param[in] colorsRh   Per-vertex ABGR color array for the right hemisphere.
      */
-    void newRtSmoothedData(const QVector<uint32_t> &colorsLh,
-                           const QVector<uint32_t> &colorsRh);
+    void newRtSmoothedData(const QVector<uint32_t>& colorsLh,
+                           const QVector<uint32_t>& colorsRh);
 
     //=========================================================================================================
     /**
@@ -188,8 +189,8 @@ signals:
      * @param[in] dataLh     Source values for left hemisphere.
      * @param[in] dataRh     Source values for right hemisphere.
      */
-    void newRtRawData(const Eigen::VectorXd &dataLh,
-                      const Eigen::VectorXd &dataRh);
+    void newRtRawData(const Eigen::VectorXd& dataLh,
+                      const Eigen::VectorXd& dataRh);
 
 private:
     //=========================================================================================================
@@ -211,33 +212,33 @@ private:
      * @param[in] baseColors Per-vertex base surface colors (ABGR).
      * @return Per-vertex ABGR color array.
      */
-    QVector<uint32_t> computeHemiColors(const Eigen::VectorXf &sourceData,
-                                        const QSharedPointer<Eigen::SparseMatrix<float>> &interpMat,
-                                        const QVector<uint32_t> &baseColors) const;
+    QVector<uint32_t> computeHemiColors(const Eigen::VectorXf& sourceData,
+                                        const QSharedPointer<Eigen::SparseMatrix<float>>& interpMat,
+                                        const QVector<uint32_t>& baseColors) const;
 
-    mutable QMutex m_mutex;                                         /**< Protects data members. */
+    mutable QMutex m_mutex; /**< Protects data members. */
 
-    QList<Eigen::VectorXd> m_lDataQ;                                /**< Incoming data queue. */
-    QList<Eigen::VectorXd> m_lDataLoopQ;                            /**< Copy for looping. */
-    Eigen::VectorXd m_vecAverage;                                   /**< Running average accumulator. */
-    int m_iSampleCtr = 0;                                           /**< Sample counter for averaging. */
-    int m_iCurrentSample = 0;                                       /**< Current sample index in queue. */
+    QList<Eigen::VectorXd> m_lDataQ;     /**< Incoming data queue. */
+    QList<Eigen::VectorXd> m_lDataLoopQ; /**< Copy for looping. */
+    Eigen::VectorXd m_vecAverage;        /**< Running average accumulator. */
+    int m_iSampleCtr = 0;                /**< Sample counter for averaging. */
+    int m_iCurrentSample = 0;            /**< Current sample index in queue. */
 
-    QSharedPointer<Eigen::SparseMatrix<float>> m_interpMatLh;       /**< LH interpolation matrix. */
-    QSharedPointer<Eigen::SparseMatrix<float>> m_interpMatRh;       /**< RH interpolation matrix. */
+    QSharedPointer<Eigen::SparseMatrix<float>> m_interpMatLh; /**< LH interpolation matrix. */
+    QSharedPointer<Eigen::SparseMatrix<float>> m_interpMatRh; /**< RH interpolation matrix. */
 
-    int m_iNumAverages = 1;                                         /**< Number of samples to average. */
-    bool m_bIsLooping = true;                                       /**< Whether to loop data. */
-    bool m_bStreamSmoothedData = true;                               /**< Whether to stream smoothed colors (true) or raw data (false). */
-    double m_dSFreq = 1000.0;                                       /**< Sampling frequency in Hz. */
+    int m_iNumAverages = 1;            /**< Number of samples to average. */
+    bool m_bIsLooping = true;          /**< Whether to loop data. */
+    bool m_bStreamSmoothedData = true; /**< Whether to stream smoothed colors (true) or raw data (false). */
+    double m_dSFreq = 1000.0;          /**< Sampling frequency in Hz. */
 
-    QString m_sColormapType = QStringLiteral("Hot");                /**< Active colormap name. */
-    double m_dThreshMin = 0.0;                                      /**< Lower normalization threshold. */
-    double m_dThreshMid = 0.5;                                      /**< Mid normalization threshold. */
-    double m_dThreshMax = 1.0;                                      /**< Upper normalization threshold. */
+    QString m_sColormapType = QStringLiteral("Hot"); /**< Active colormap name. */
+    double m_dThreshMin = 0.0;                       /**< Lower normalization threshold. */
+    double m_dThreshMid = 0.5;                       /**< Mid normalization threshold. */
+    double m_dThreshMax = 1.0;                       /**< Upper normalization threshold. */
 
-    QVector<uint32_t> m_baseColorsLh;                                /**< LH base surface colors (curvature/annotation). */
-    QVector<uint32_t> m_baseColorsRh;                                /**< RH base surface colors (curvature/annotation). */
+    QVector<uint32_t> m_baseColorsLh; /**< LH base surface colors (curvature/annotation). */
+    QVector<uint32_t> m_baseColorsRh; /**< RH base surface colors (curvature/annotation). */
 };
 
 } // namespace DISP3DLIB

@@ -41,12 +41,14 @@
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-namespace SCMEASLIB {
-    class RealTimeMultiSampleArray;
+namespace SCMEASLIB
+{
+class RealTimeMultiSampleArray;
 }
 
-namespace FIFFLIB {
-    class FiffInfo;
+namespace FIFFLIB
+{
+class FiffInfo;
 }
 
 //=============================================================================================================
@@ -139,7 +141,7 @@ protected:
      *
      * @param[in] matData The new data.
      */
-    void onNewDataAvailable(const Eigen::MatrixXd &matData);
+    void onNewDataAvailable(const Eigen::MatrixXd& matData);
 
     //=========================================================================================================
     /**
@@ -149,18 +151,18 @@ protected:
      */
     virtual void run();
 
-    int                     m_iSamplingFreq;                /**< The sampling frequency defined by the user via the GUI (in Hertz).*/
-    int                     m_iNumberChannels;              /**< The number of channels to be received.*/
-    int                     m_iSamplesPerBlock;             /**< The number of samples per block to be received.*/
+    int m_iSamplingFreq;    /**< The sampling frequency defined by the user via the GUI (in Hertz).*/
+    int m_iNumberChannels;  /**< The number of channels to be received.*/
+    int m_iSamplesPerBlock; /**< The number of samples per block to be received.*/
 
-    QString                 m_qStringResourcePath;          /**< The path to the EEG resource directory.*/
+    QString m_qStringResourcePath; /**< The path to the EEG resource directory.*/
 
-    QThread                                                 m_pProducerThread;          /**< The thread used to host the producer.*/
-    QSharedPointer<NATUSPLUGIN::NatusProducer>              m_pNatusProducer;           /**< The producer object.*/
-    QSharedPointer<UTILSLIB::CircularBuffer_Matrix_double>  m_pCircularBuffer;          /**< Holds incoming raw data. */
+    QThread m_pProducerThread;                                                /**< The thread used to host the producer.*/
+    QSharedPointer<NATUSPLUGIN::NatusProducer> m_pNatusProducer;              /**< The producer object.*/
+    QSharedPointer<UTILSLIB::CircularBuffer_Matrix_double> m_pCircularBuffer; /**< Holds incoming raw data. */
 
-    QSharedPointer<SCSHAREDLIB::PluginOutputData<SCMEASLIB::RealTimeMultiSampleArray> >     m_pRMTSA_Natus;     /**< The RealTimeSampleArray to provide the EEG data.*/
-    QSharedPointer<FIFFLIB::FiffInfo>                                                       m_pFiffInfo;        /**< Fiff measurement info.*/
+    QSharedPointer<SCSHAREDLIB::PluginOutputData<SCMEASLIB::RealTimeMultiSampleArray>> m_pRMTSA_Natus; /**< The RealTimeSampleArray to provide the EEG data.*/
+    QSharedPointer<FIFFLIB::FiffInfo> m_pFiffInfo;                                                     /**< Fiff measurement info.*/
 };
 } // NAMESPACE
 

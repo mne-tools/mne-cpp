@@ -57,7 +57,7 @@ using namespace SCMEASLIB;
  *
  * @brief Construction and update checks for the mne_scan real time display widgets.
  */
-class TestScDispWidgets: public QObject
+class TestScDispWidgets : public QObject
 {
     Q_OBJECT
 

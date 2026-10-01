@@ -57,10 +57,11 @@ namespace DISP3DLIB
 /**
  * @brief Orientation for an orthogonal MRI slice.
  */
-enum class SliceOrientation {
-    Axial = 0,      /**< XY plane (Z = const). */
-    Coronal = 1,    /**< XZ plane (Y = const). */
-    Sagittal = 2    /**< YZ plane (X = const). */
+enum class SliceOrientation
+{
+    Axial = 0,   /**< XY plane (Z = const). */
+    Coronal = 1, /**< XZ plane (Y = const). */
+    Sagittal = 2 /**< YZ plane (X = const). */
 };
 
 static_assert(static_cast<int>(SliceOrientation::Axial) == 0, "MRI axial slice slot must be 0");
@@ -182,19 +183,19 @@ public:
     static void generateQuadIndices(QVector<unsigned int>& indices);
 
 private:
-    QImage              m_image;
-    SliceOrientation    m_orientation = SliceOrientation::Axial;
-    int                 m_sliceIndex = 0;
-    Eigen::Matrix4d     m_voxelToWorld = Eigen::Matrix4d::Identity();
-    float               m_windowCenter = 0.5f;
-    float               m_windowWidth  = 1.0f;
-    float               m_opacity      = 0.7f;
+    QImage m_image;
+    SliceOrientation m_orientation = SliceOrientation::Axial;
+    int m_sliceIndex = 0;
+    Eigen::Matrix4d m_voxelToWorld = Eigen::Matrix4d::Identity();
+    float m_windowCenter = 0.5f;
+    float m_windowWidth = 1.0f;
+    float m_opacity = 0.7f;
 
     // Cached corners in world coordinates (computed in setSlice)
-    Eigen::Vector3d     m_corner00;  // (0,0) UV corner
-    Eigen::Vector3d     m_corner10;  // (1,0) UV corner
-    Eigen::Vector3d     m_corner01;  // (0,1) UV corner
-    Eigen::Vector3d     m_corner11;  // (1,1) UV corner
+    Eigen::Vector3d m_corner00; // (0,0) UV corner
+    Eigen::Vector3d m_corner10; // (1,0) UV corner
+    Eigen::Vector3d m_corner01; // (0,1) UV corner
+    Eigen::Vector3d m_corner11; // (1,1) UV corner
 };
 
 } // namespace DISP3DLIB

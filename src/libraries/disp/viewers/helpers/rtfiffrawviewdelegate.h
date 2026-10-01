@@ -46,8 +46,9 @@
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-namespace RTPROCESSINGLIB{
-    class EventList;
+namespace RTPROCESSINGLIB
+{
+class EventList;
 }
 
 //=============================================================================================================
@@ -67,7 +68,7 @@ class RtFiffRawView;
 // DEFINE TYPEDEFS
 //=============================================================================================================
 
-typedef QPair<const double*,qint32> RowVectorPair;
+typedef QPair<const double*, qint32> RowVectorPair;
 
 //=============================================================================================================
 /**
@@ -83,8 +84,8 @@ class DISPSHARED_EXPORT RtFiffRawViewDelegate : public QAbstractItemDelegate
     Q_OBJECT
 
 public:
-    typedef QSharedPointer<RtFiffRawViewDelegate> SPtr;              /**< Shared pointer type for RtFiffRawViewDelegate. */
-    typedef QSharedPointer<const RtFiffRawViewDelegate> ConstSPtr;   /**< Const shared pointer type for RtFiffRawViewDelegate. */
+    typedef QSharedPointer<RtFiffRawViewDelegate> SPtr;            /**< Shared pointer type for RtFiffRawViewDelegate. */
+    typedef QSharedPointer<const RtFiffRawViewDelegate> ConstSPtr; /**< Const shared pointer type for RtFiffRawViewDelegate. */
 
     //=========================================================================================================
     /**
@@ -100,7 +101,7 @@ public:
      *
      * @param[in] model     model.
      */
-    void initPainterPaths(const QAbstractTableModel *model);
+    void initPainterPaths(const QAbstractTableModel* model);
 
     //=========================================================================================================
     /**
@@ -112,7 +113,7 @@ public:
      * @param[in] option     Describes the parameters used to draw an item in a view widget.
      * @param[in] index      Used to locate data in a data model.
      */
-    virtual void paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const;
+    virtual void paint(QPainter* painter, const QStyleOptionViewItem& option, const QModelIndex& index) const;
 
     //=========================================================================================================
     /**
@@ -123,7 +124,7 @@ public:
      *
      * @return 20 pixels wide by the row height for column 0, the option rectangle size otherwise.
      */
-    virtual QSize sizeHint(const QStyleOptionViewItem &option, const QModelIndex &index) const;
+    virtual QSize sizeHint(const QStyleOptionViewItem& option, const QModelIndex& index) const;
 
     //=========================================================================================================
     /**
@@ -169,10 +170,10 @@ private:
      * @param[in, out] path   The QPointerPath to create for the data plot.
      * @param[in] data       Current data for the given row.
      */
-    void createPlotPath(const QModelIndex &index,
-                        const QStyleOptionViewItem &option,
+    void createPlotPath(const QModelIndex& index,
+                        const QStyleOptionViewItem& option,
                         QPainterPath& path,
-                        const DISPLIB::RowVectorPair &data) const;
+                        const DISPLIB::RowVectorPair& data) const;
 
     //=========================================================================================================
     /**
@@ -182,7 +183,7 @@ private:
      * @param[in] option     Describes the parameters used to draw an item in a view widget.
      * @param[in, out] path   The QPointerPath to create for the data plot.
      */
-    void createCurrentPositionMarkerPath(const QModelIndex &index, const QStyleOptionViewItem &option, QPainterPath& path) const;
+    void createCurrentPositionMarkerPath(const QModelIndex& index, const QStyleOptionViewItem& option, QPainterPath& path) const;
 
     //=========================================================================================================
     /**
@@ -193,7 +194,7 @@ private:
      * @param[in, out] path   The QPointerPath to create for the data plot.
      * @param[in] data       Data for the given row.
      */
-    void createGridPath(const QModelIndex &index, const QStyleOptionViewItem &option, QPainterPath& path, RowVectorPair &data) const;
+    void createGridPath(const QModelIndex& index, const QStyleOptionViewItem& option, QPainterPath& path, RowVectorPair& data) const;
 
     //=========================================================================================================
     /**
@@ -204,7 +205,7 @@ private:
      * @param[in, out] path   The QPointerPath to create for the data plot.
      * @param[in] data       Data for the given row.
      */
-    void createTimeSpacersPath(const QModelIndex &index, const QStyleOptionViewItem &option, QPainterPath& path, RowVectorPair &data) const;
+    void createTimeSpacersPath(const QModelIndex& index, const QStyleOptionViewItem& option, QPainterPath& path, RowVectorPair& data) const;
 
     //=========================================================================================================
     /**
@@ -216,7 +217,7 @@ private:
      * @param[in, out] path   The QPointerPath to create for the data plot.
      * @param[in] data       Data for the given row.
      */
-    void createTriggerPath(QPainter *painter, const QModelIndex &index, const QStyleOptionViewItem &option, QPainterPath& path, RowVectorPair &data) const;
+    void createTriggerPath(QPainter* painter, const QModelIndex& index, const QStyleOptionViewItem& option, QPainterPath& path, RowVectorPair& data) const;
 
     //=========================================================================================================
     /**
@@ -228,7 +229,7 @@ private:
      * @param[in] data       Data for the given row.
      * @param[in] textPosition Position of the text.
      */
-    void createTriggerThresholdPath(const QModelIndex &index, const QStyleOptionViewItem &option, QPainterPath& path, RowVectorPair &data, QPointF &textPosition) const;
+    void createTriggerThresholdPath(const QModelIndex& index, const QStyleOptionViewItem& option, QPainterPath& path, RowVectorPair& data, QPointF& textPosition) const;
 
     //=========================================================================================================
     /**
@@ -238,7 +239,7 @@ private:
      * @param[in] option     Describes the parameters used to draw an item in a view widget.
      * @param[in, out] path   The QPointerPath to create for the data plot.
      */
-    void createMarkerPath(const QModelIndex &index, const QStyleOptionViewItem &option, QPainterPath& path) const;
+    void createMarkerPath(const QModelIndex& index, const QStyleOptionViewItem& option, QPainterPath& path) const;
 
     //=========================================================================================================
     /**
@@ -259,28 +260,28 @@ private:
      */
     inline double retrieveSamplingPeriod() const;
 
-    RtFiffRawView*      m_pParent;          /**< Pointer to parent class. **/
-    QPoint              m_markerPosition;   /**< Current mouse position used to draw the marker in the plot. */
-    QList<QPainterPath> m_painterPaths;     /**< List of all current painter paths for each row. */
+    RtFiffRawView* m_pParent;           /**< Pointer to parent class. **/
+    QPoint m_markerPosition;            /**< Current mouse position used to draw the marker in the plot. */
+    QList<QPainterPath> m_painterPaths; /**< List of all current painter paths for each row. */
 
-    double              m_dMaxValue;        /**< Maximum value of the data to plot. */
-    double              m_dScaleY;          /**< Maximum amplitude of plot (max is m_dPlotHeight/2). */
-    int                 m_iActiveRow;       /**< The current row which the mouse is moved over. */
-    int                 m_iUpperItemIndex;  /**< The current upper item index visible in the QTableView. */
+    double m_dMaxValue;    /**< Maximum value of the data to plot. */
+    double m_dScaleY;      /**< Maximum amplitude of plot (max is m_dPlotHeight/2). */
+    int m_iActiveRow;      /**< The current row which the mouse is moved over. */
+    int m_iUpperItemIndex; /**< The current upper item index visible in the QTableView. */
 
-    QPen        m_penMarker;                /**< Pen for drawing the data marker. */
-    QPen        m_penGrid;                  /**< Pen for drawing the data grid. */
-    QPen        m_penTimeSpacers;           /**< Pen for drawing the time spacer. */
-    QPen        m_penFreeze;                /**< Pen for drawing the data when freeze is on. */
-    QPen        m_penFreezeSelected;        /**< Pen for drawing the data when freeze is on and channel is selected. */
-    QPen        m_penFreezeBad;             /**< Pen for drawing the bad data when freeze is on. */
-    QPen        m_penFreezeSelectedBad;     /**< Pen for drawing the bad data when freeze is on and channel is selected. */
-    QPen        m_penNormal;                /**< Pen for drawing the data when data is plotted normally without freeze on. */
-    QPen        m_penNormalSelected;        /**< Pen for drawing the data when data is plotted normally without freeze on and channel is selected. */
-    QPen        m_penNormalBad;             /**< Pen for drawing the data when bad data is plotted normally without freeze on. */
-    QPen        m_penNormalSelectedBad;     /**< Pen for drawing the data when bad data is plotted normally without freeze on and channel is selected. */
+    QPen m_penMarker;            /**< Pen for drawing the data marker. */
+    QPen m_penGrid;              /**< Pen for drawing the data grid. */
+    QPen m_penTimeSpacers;       /**< Pen for drawing the time spacer. */
+    QPen m_penFreeze;            /**< Pen for drawing the data when freeze is on. */
+    QPen m_penFreezeSelected;    /**< Pen for drawing the data when freeze is on and channel is selected. */
+    QPen m_penFreezeBad;         /**< Pen for drawing the bad data when freeze is on. */
+    QPen m_penFreezeSelectedBad; /**< Pen for drawing the bad data when freeze is on and channel is selected. */
+    QPen m_penNormal;            /**< Pen for drawing the data when data is plotted normally without freeze on. */
+    QPen m_penNormalSelected;    /**< Pen for drawing the data when data is plotted normally without freeze on and channel is selected. */
+    QPen m_penNormalBad;         /**< Pen for drawing the data when bad data is plotted normally without freeze on. */
+    QPen m_penNormalSelectedBad; /**< Pen for drawing the data when bad data is plotted normally without freeze on and channel is selected. */
 
-    QMap<double,QColor> m_mapTriggerColors; /**< Colors per trigger. */
+    QMap<double, QColor> m_mapTriggerColors; /**< Colors per trigger. */
 };
 } // NAMESPACE
 

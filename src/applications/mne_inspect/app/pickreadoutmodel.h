@@ -38,16 +38,19 @@
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-namespace DISP3DLIB {
-    class MultimodalScene;
+namespace DISP3DLIB
+{
+class MultimodalScene;
 }
 
-namespace ELECTRODESPLUGIN {
-    class ElectrodesPlugin;
+namespace ELECTRODESPLUGIN
+{
+class ElectrodesPlugin;
 }
 
-namespace MRISLICESPLUGIN {
-    class MriSlicesPlugin;
+namespace MRISLICESPLUGIN
+{
+class MriSlicesPlugin;
 }
 
 namespace MNEINSPECT
@@ -99,23 +102,38 @@ public:
     //=========================================================================================================
     /** @return Most recent pick payload (default-constructed before the
      *  first hit). */
-    const DISP3DLIB::PickResult& lastPick() const { return m_lastPick; }
+    const DISP3DLIB::PickResult& lastPick() const
+    {
+        return m_lastPick;
+    }
 
     //=========================================================================================================
     /** @return Single-line "label" row for the dock (e.g. "Contact: LA0"). */
-    QString labelRow() const { return m_labelRow; }
+    QString labelRow() const
+    {
+        return m_labelRow;
+    }
 
     //=========================================================================================================
     /** @return Single-line "world position" row (RAS millimetres). */
-    QString worldRow() const { return m_worldRow; }
+    QString worldRow() const
+    {
+        return m_worldRow;
+    }
 
     //=========================================================================================================
     /** @return Single-line "voxel / kind-specific extra" row. */
-    QString voxelRow() const { return m_voxelRow; }
+    QString voxelRow() const
+    {
+        return m_voxelRow;
+    }
 
     //=========================================================================================================
     /** @return Single-line "value" row (overlay value, intensity, …). */
-    QString valueRow() const { return m_valueRow; }
+    QString valueRow() const
+    {
+        return m_valueRow;
+    }
 
     //=========================================================================================================
     /** @return Multi-line concatenation of all four rows. */
@@ -138,14 +156,14 @@ private:
     void formatRows(const DISP3DLIB::PickResult& pick);
     static QString formatVec(const QVector3D& v);
 
-    DISP3DLIB::MultimodalScene*           m_scene = nullptr;
-    ELECTRODESPLUGIN::ElectrodesPlugin*   m_electrodes = nullptr;
-    MRISLICESPLUGIN::MriSlicesPlugin*     m_mriSlices = nullptr;
-    DISP3DLIB::PickResult                 m_lastPick;
-    QString                               m_labelRow;
-    QString                               m_worldRow;
-    QString                               m_voxelRow;
-    QString                               m_valueRow;
+    DISP3DLIB::MultimodalScene* m_scene = nullptr;
+    ELECTRODESPLUGIN::ElectrodesPlugin* m_electrodes = nullptr;
+    MRISLICESPLUGIN::MriSlicesPlugin* m_mriSlices = nullptr;
+    DISP3DLIB::PickResult m_lastPick;
+    QString m_labelRow;
+    QString m_worldRow;
+    QString m_voxelRow;
+    QString m_valueRow;
 };
 
 } // namespace MNEINSPECT

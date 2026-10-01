@@ -26,8 +26,14 @@
 #ifndef NO_IPC
 #include "eventsharedmemmanager.h"
 #else
-namespace EVENTSLIB{
-    enum SharedMemoryMode { READ, WRITE, READWRITE };
+namespace EVENTSLIB
+{
+enum SharedMemoryMode
+{
+    READ,
+    WRITE,
+    READWRITE
+};
 }
 #endif
 //=============================================================================================================
@@ -44,14 +50,16 @@ namespace EVENTSLIB{
 // NAMESPACE EVENTSLIB
 //=============================================================================================================
 
-namespace EVENTSLIB {
+namespace EVENTSLIB
+{
 
 //=============================================================================================================
 // EVENTSINTERNAL FORWARD DECLARATIONS
 //=============================================================================================================
 
-namespace EVENTSINTERNAL {
-    class EventSharedMemManager;
+namespace EVENTSINTERNAL
+{
+class EventSharedMemManager;
 }
 
 //=============================================================================================================
@@ -93,14 +101,14 @@ public:
      * @param[in] eventIds The ids of events to retrieve.
      * @return A pointer to a vector with all the events are kept.
      */
-    std::unique_ptr<std::vector<Event> > getEvents(const std::vector<idNum> eventIds) const ;
+    std::unique_ptr<std::vector<Event>> getEvents(const std::vector<idNum> eventIds) const;
 
     //=========================================================================================================
     /**
      * Retrieve all the events in the system.
      * @return A pointer to a vector with all the events.
      */
-    std::unique_ptr<std::vector<Event> > getAllEvents() const ;
+    std::unique_ptr<std::vector<Event>> getAllEvents() const;
 
     //=========================================================================================================
     /**
@@ -108,7 +116,7 @@ public:
      * @param[in] sample The sample from where to get the events from.
      * @return A pointer to a vector whith all the events ocurring in the specified sample.
      */
-    std::unique_ptr<std::vector<Event> > getEventsInSample(int sample) const ;
+    std::unique_ptr<std::vector<Event>> getEventsInSample(int sample) const;
 
     //=========================================================================================================
     /**
@@ -117,7 +125,7 @@ public:
      * @param[in] sampleEnd Last sample to look for events.
      * @return A pointer to a vector containing all the events in between the specified samples.
      */
-    std::unique_ptr<std::vector<Event> > getEventsBetween(int sampleStart, int sampleEnd) const ;
+    std::unique_ptr<std::vector<Event>> getEventsBetween(int sampleStart, int sampleEnd) const;
 
     //=========================================================================================================
     /**
@@ -128,7 +136,7 @@ public:
      * @param[in] groupid The group to which the events have to belong.
      * @return A pointer to a vector containing all the events.
      */
-    std::unique_ptr<std::vector<Event> > getEventsBetween(int sampleStart, int sampleEnd, idNum groupid) const ;
+    std::unique_ptr<std::vector<Event>> getEventsBetween(int sampleStart, int sampleEnd, idNum groupid) const;
 
     //=========================================================================================================
     /**
@@ -139,7 +147,7 @@ public:
      * @param[in] groupidList The list of groups to which the events have to belong.
      * @return A pointer to a vector containing all the events found.
      */
-    std::unique_ptr<std::vector<Event> > getEventsBetween(int sampleStart, int sampleEnd, const std::vector<idNum>& groupIdsList) const ;
+    std::unique_ptr<std::vector<Event>> getEventsBetween(int sampleStart, int sampleEnd, const std::vector<idNum>& groupIdsList) const;
 
     //=========================================================================================================
     /**
@@ -147,7 +155,7 @@ public:
      * @param[in] groupId The group of events.
      * @return A pointer to a vector containing all the events found.
      */
-    std::unique_ptr<std::vector<Event> > getEventsInGroup(const idNum groupId) const;
+    std::unique_ptr<std::vector<Event>> getEventsInGroup(const idNum groupId) const;
 
     //=========================================================================================================
     /**
@@ -155,7 +163,7 @@ public:
      * @param[in] groupIdsList The set of group of events to which the events will belong to.
      * @return A pointer to a vector containing all the events found.
      */
-    std::unique_ptr<std::vector<Event> > getEventsInGroups(const std::vector<idNum>& groupIdsList) const;
+    std::unique_ptr<std::vector<Event>> getEventsInGroups(const std::vector<idNum>& groupIdsList) const;
 
     //=========================================================================================================
     /**
@@ -260,7 +268,7 @@ public:
      * @param[in] eventIds A pointer to a vector with the events to be deleted.
      * @return All the deletion operations where successful.
      */
-    bool deleteEvents(std::unique_ptr<std::vector<Event> > eventIds);
+    bool deleteEvents(std::unique_ptr<std::vector<Event>> eventIds);
 
     //=========================================================================================================
     /**
@@ -290,7 +298,7 @@ public:
      * Retrieve all the groups declared in the event system.
      * @return A pointer to a vector containing all the event groups existing.
      */
-    std::unique_ptr<std::vector<EventGroup> > getAllGroups() const ;
+    std::unique_ptr<std::vector<EventGroup>> getAllGroups() const;
 
     //=========================================================================================================
     /**
@@ -298,7 +306,7 @@ public:
      * @param[in] groupIds A list of group eveent ids to be retrieved.
      * @return A pointer to a vector storing a list of event groups.
      */
-    std::unique_ptr<std::vector<EventGroup> > getGroups(const std::vector<idNum>& groupIds) const ;
+    std::unique_ptr<std::vector<EventGroup>> getGroups(const std::vector<idNum>& groupIds) const;
 
     //=========================================================================================================
     /**
@@ -456,20 +464,19 @@ private:
      */
     void createDefaultGroupIfNeeded();
 
-    std::multimap<int, EVENTSINTERNAL::EventINT>    m_EventsListBySample;           /**< List of events organized by sample.*/
-    std::unordered_map<idNum, int>                  m_MapIdToSample;                /**< EventId to sample relationship table.*/
-    std::map<idNum, EVENTSINTERNAL::EventGroupINT>  m_GroupsList;                   /**< Storage of eventgroups.*/
+    std::multimap<int, EVENTSINTERNAL::EventINT> m_EventsListBySample; /**< List of events organized by sample.*/
+    std::unordered_map<idNum, int> m_MapIdToSample;                    /**< EventId to sample relationship table.*/
+    std::map<idNum, EVENTSINTERNAL::EventGroupINT> m_GroupsList;       /**< Storage of eventgroups.*/
 
 #ifndef NO_IPC
-    std::unique_ptr<EVENTSINTERNAL::EventSharedMemManager>  m_pSharedMemManager;    /**< Pointer to a shared manager object.*/
+    std::unique_ptr<EVENTSINTERNAL::EventSharedMemManager> m_pSharedMemManager; /**< Pointer to a shared manager object.*/
     friend class EVENTSINTERNAL::EventSharedMemManager;
 #endif
 
-    idNum   m_iEventIdCounter;          /**< This counter will serve as an eventId until this get error-prone. However it can be easily updated.*/
-    idNum   m_iGroupIdCounter;          /**< This counter will serve as a groupId counter, and id generator.*/
-    bool    m_bDefaultGroupNotCreated;  /**< State variable to know if the default group has been created, and thus decide to create it again or not. */
-    idNum   m_DefaultGroupId;           /**< The id of the default group.*/
-
+    idNum m_iEventIdCounter;        /**< This counter will serve as an eventId until this get error-prone. However it can be easily updated.*/
+    idNum m_iGroupIdCounter;        /**< This counter will serve as a groupId counter, and id generator.*/
+    bool m_bDefaultGroupNotCreated; /**< State variable to know if the default group has been created, and thus decide to create it again or not. */
+    idNum m_DefaultGroupId;         /**< The id of the default group.*/
 };
 
 //=============================================================================================================
@@ -477,9 +484,9 @@ private:
  * Prepare memory allocation for the output of one of the methods in the class.
  */
 template<typename T>
-inline std::unique_ptr<std::vector<T> > allocateOutputContainer() noexcept
+inline std::unique_ptr<std::vector<T>> allocateOutputContainer() noexcept
 {
-    return std::make_unique<std::vector<T> >();
+    return std::make_unique<std::vector<T>>();
 };
 
 //=============================================================================================================
@@ -487,16 +494,15 @@ inline std::unique_ptr<std::vector<T> > allocateOutputContainer() noexcept
  * Prepare memory allocation for the output of one of the methods in the class.
  */
 template<typename T>
-inline std::unique_ptr<std::vector<T> > allocateOutputContainer(size_t size) noexcept
+inline std::unique_ptr<std::vector<T>> allocateOutputContainer(size_t size) noexcept
 {
-    auto v = std::make_unique<std::vector<T> >();
-    if(size > 0)
-    {
+    auto v = std::make_unique<std::vector<T>>();
+    if (size > 0) {
         v->reserve(size);
     }
 
     return v;
 };
 
-}//namespace EVENTSLIB
+} //namespace EVENTSLIB
 #endif // EVENTS_H

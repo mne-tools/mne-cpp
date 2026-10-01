@@ -75,11 +75,11 @@ private:
      */
     static bool linkOrCopyDir(const QString& src, const QString& dst);
 
-    QString m_sAppPath;         /**< Path to the mne_setup_mri executable. */
-    bool m_bAppAvailable;       /**< Whether the app is found. */
-    bool m_bDataAvailable;      /**< Whether sample data is found. */
-    QString m_sSubjectsDir;     /**< Path to subjects dir. */
-    QTemporaryDir m_tempDir;    /**< Temporary subjects dir for test output. */
+    QString m_sAppPath;      /**< Path to the mne_setup_mri executable. */
+    bool m_bAppAvailable;    /**< Whether the app is found. */
+    bool m_bDataAvailable;   /**< Whether sample data is found. */
+    QString m_sSubjectsDir;  /**< Path to subjects dir. */
+    QTemporaryDir m_tempDir; /**< Temporary subjects dir for test output. */
 };
 
 //=============================================================================================================
@@ -108,15 +108,18 @@ bool TestMneSetupMri::linkOrCopyDir(const QString& src, const QString& dst)
 #ifdef Q_OS_WIN
     // Recursively copy directory on Windows
     QDir srcDir(src);
-    if (!srcDir.exists()) return false;
+    if (!srcDir.exists())
+        return false;
     QDir().mkpath(dst);
     for (const QFileInfo& fi : srcDir.entryInfoList(QDir::Files | QDir::Dirs | QDir::NoDotAndDotDot)) {
         QString srcPath = fi.absoluteFilePath();
         QString dstPath = dst + "/" + fi.fileName();
         if (fi.isDir()) {
-            if (!linkOrCopyDir(srcPath, dstPath)) return false;
+            if (!linkOrCopyDir(srcPath, dstPath))
+                return false;
         } else {
-            if (!QFile::copy(srcPath, dstPath)) return false;
+            if (!QFile::copy(srcPath, dstPath))
+                return false;
         }
     }
     return true;

@@ -59,7 +59,7 @@ MNERawInfo::~MNERawInfo()
 
 //=============================================================================================================
 
-FiffDirNode::SPtr MNERawInfo::find_meas(const FiffDirNode::SPtr &node)
+FiffDirNode::SPtr MNERawInfo::find_meas(const FiffDirNode::SPtr& node)
 {
     FiffDirNode::SPtr empty_node;
     FiffDirNode::SPtr tmp_node = node;
@@ -74,7 +74,7 @@ FiffDirNode::SPtr MNERawInfo::find_meas(const FiffDirNode::SPtr &node)
 
 //=============================================================================================================
 
-FiffDirNode::SPtr MNERawInfo::find_meas_info(const FiffDirNode::SPtr &node)
+FiffDirNode::SPtr MNERawInfo::find_meas_info(const FiffDirNode::SPtr& node)
 {
     int k;
     FiffDirNode::SPtr empty_node;
@@ -93,7 +93,7 @@ FiffDirNode::SPtr MNERawInfo::find_meas_info(const FiffDirNode::SPtr &node)
 
 //=============================================================================================================
 
-FiffDirNode::SPtr MNERawInfo::find_raw(const FiffDirNode::SPtr &node)
+FiffDirNode::SPtr MNERawInfo::find_raw(const FiffDirNode::SPtr& node)
 {
     FiffDirNode::SPtr raw;
     QList<FiffDirNode::SPtr> temp;
@@ -102,15 +102,14 @@ FiffDirNode::SPtr MNERawInfo::find_raw(const FiffDirNode::SPtr &node)
         temp = node->dir_tree_find(FIFFB_CONTINUOUS_DATA);
         if (temp.size() > 0)
             raw = temp[0];
-    }
-    else
+    } else
         raw = temp[0];
     return raw;
 }
 
 //=============================================================================================================
 
-FiffDirNode::SPtr MNERawInfo::find_maxshield(const FiffDirNode::SPtr &node)
+FiffDirNode::SPtr MNERawInfo::find_maxshield(const FiffDirNode::SPtr& node)
 
 {
     FiffDirNode::SPtr raw;
@@ -123,13 +122,13 @@ FiffDirNode::SPtr MNERawInfo::find_maxshield(const FiffDirNode::SPtr &node)
 
 //=============================================================================================================
 
-int MNERawInfo::get_meas_info(FiffStream::SPtr &stream,
-                              FiffDirNode::SPtr &node,
+int MNERawInfo::get_meas_info(FiffStream::SPtr& stream,
+                              FiffDirNode::SPtr& node,
                               std::unique_ptr<FiffId>& id,
-                              int *nchan,
-                              float *sfreq,
-                              float *highpass,
-                              float *lowpass,
+                              int* nchan,
+                              float* sfreq,
+                              float* highpass,
+                              float* lowpass,
                               QList<FiffChInfo>& chp,
                               FiffCoordTrans& trans)
 {
@@ -139,13 +138,13 @@ int MNERawInfo::get_meas_info(FiffStream::SPtr &stream,
 
 //=============================================================================================================
 
-int MNERawInfo::get_meas_info(FiffStream::SPtr &stream,
-                              FiffDirNode::SPtr &node,
+int MNERawInfo::get_meas_info(FiffStream::SPtr& stream,
+                              FiffDirNode::SPtr& node,
                               std::unique_ptr<FiffId>& id,
-                              int *nchan,
-                              float *sfreq,
-                              float *highpass,
-                              float *lowpass,
+                              int* nchan,
+                              float* sfreq,
+                              float* highpass,
+                              float* lowpass,
                               QList<FiffChInfo>& chp,
                               FiffCoordTrans& trans,
                               FiffTime& start_time)
@@ -154,7 +153,7 @@ int MNERawInfo::get_meas_info(FiffStream::SPtr &stream,
     QList<FiffChInfo> ch;
     FiffChInfo this_ch;
     FiffCoordTrans t;
-    int j,k;
+    int j, k;
     int to_find = 4;
     QList<FiffDirNode::SPtr> hpi;
     FiffDirNode::SPtr meas;
@@ -162,19 +161,19 @@ int MNERawInfo::get_meas_info(FiffStream::SPtr &stream,
     fiff_int_t kind, pos;
     bool found_meas_date = false;
 
-     trans      = FiffCoordTrans();
-     id.reset();
-     start_time = FiffTime();
+    trans = FiffCoordTrans();
+    id.reset();
+    start_time = FiffTime();
     /*
         * Find desired parents
         */
     if (!(meas = find_meas(node))) {
-        qCritical ("Meas. block not found!");
+        qCritical("Meas. block not found!");
         return (-1);
     }
 
     if (!(meas_info = find_meas_info(node))) {
-        qCritical ("Meas. info not found!");
+        qCritical("Meas. info not found!");
         return (-1);
     }
     /*
@@ -190,81 +189,79 @@ int MNERawInfo::get_meas_info(FiffStream::SPtr &stream,
     /*
        * Others from FIFFB_MEAS_INFO
        */
-     *lowpass  = -1;
-     *highpass = -1;
+    *lowpass = -1;
+    *highpass = -1;
     for (k = 0; k < meas_info->nent(); k++) {
         kind = meas_info->dir[k]->kind;
-        pos  = meas_info->dir[k]->pos;
+        pos = meas_info->dir[k]->pos;
         switch (kind) {
+            case FIFF_NCHAN:
+                if (!stream->read_tag(t_pTag, pos))
+                    return (-1);
+                *nchan = *t_pTag->toInt();
 
-        case FIFF_NCHAN :
-            if (!stream->read_tag(t_pTag,pos))
-                return (-1);
-            *nchan = *t_pTag->toInt();
+                for (j = 0; j < *nchan; j++) {
+                    ch.append(FiffChInfo());
+                    ch[j].scanNo = -1;
+                }
+                to_find = to_find + *nchan - 1;
+                break;
 
-            for (j = 0; j < *nchan; j++) {
-                ch.append(FiffChInfo());
-                ch[j].scanNo = -1;
-            }
-            to_find = to_find + *nchan - 1;
-            break;
+            case FIFF_SFREQ:
+                if (!stream->read_tag(t_pTag, pos))
+                    return (-1);
+                *sfreq = *t_pTag->toFloat();
+                to_find--;
+                break;
 
-        case FIFF_SFREQ :
-            if (!stream->read_tag(t_pTag,pos))
-                return (-1);
-            *sfreq = *t_pTag->toFloat();
-            to_find--;
-            break;
+            case FIFF_LOWPASS:
+                if (!stream->read_tag(t_pTag, pos))
+                    return (-1);
+                *lowpass = *t_pTag->toFloat();
+                to_find--;
+                break;
 
-        case FIFF_LOWPASS :
-            if (!stream->read_tag(t_pTag,pos))
-                return (-1);
-            *lowpass = *t_pTag->toFloat();
-            to_find--;
-            break;
+            case FIFF_HIGHPASS:
+                if (!stream->read_tag(t_pTag, pos))
+                    return (-1);
+                *highpass = *t_pTag->toFloat();
+                to_find--;
+                break;
 
-        case FIFF_HIGHPASS :
-            if (!stream->read_tag(t_pTag,pos))
-                return (-1);
-            *highpass = *t_pTag->toFloat();
-            to_find--;
-            break;
+            case FIFF_CH_INFO:
+                if (!stream->read_tag(t_pTag, pos))
+                    return (-1);
 
-        case FIFF_CH_INFO :
-            if (!stream->read_tag(t_pTag,pos))
-                return (-1);
+                this_ch = t_pTag->toChInfo();
+                if (this_ch.scanNo <= 0 || this_ch.scanNo > *nchan) {
+                    qCritical("FIFF_CH_INFO : scan # out of range!");
+                    return (-1);
+                } else
+                    ch[this_ch.scanNo - 1] = this_ch;
+                to_find--;
+                break;
 
-            this_ch = t_pTag->toChInfo();
-            if (this_ch.scanNo <= 0 || this_ch.scanNo > *nchan) {
-                qCritical ("FIFF_CH_INFO : scan # out of range!");
-                return (-1);
-            }
-            else
-                ch[this_ch.scanNo-1] = this_ch;
-            to_find--;
-            break;
+            case FIFF_MEAS_DATE:
+                if (!stream->read_tag(t_pTag, pos))
+                    return (-1);
+                {
+                    const FiffTime* pTime = reinterpret_cast<const FiffTime*>(t_pTag->data());
+                    start_time = FiffTime(pTime->secs, pTime->usecs);
+                    found_meas_date = true;
+                }
+                break;
 
-        case FIFF_MEAS_DATE :
-            if (!stream->read_tag(t_pTag,pos))
-                return (-1);
-            {
-                const FiffTime* pTime = reinterpret_cast<const FiffTime*>(t_pTag->data());
-                start_time = FiffTime(pTime->secs, pTime->usecs);
-                found_meas_date = true;
-            }
-            break;
-
-        case FIFF_COORD_TRANS :
-            if (!stream->read_tag(t_pTag,pos))
-                return (-1);
-            t = FiffCoordTrans::readFromTag( t_pTag );
-            /*
+            case FIFF_COORD_TRANS:
+                if (!stream->read_tag(t_pTag, pos))
+                    return (-1);
+                t = FiffCoordTrans::readFromTag(t_pTag);
+                /*
                 * Require this particular transform!
                 */
-            if (t.from == FIFFV_COORD_DEVICE && t.to == FIFFV_COORD_HEAD) {
-                trans = t;
-                break;
-            }
+                if (t.from == FIFFV_COORD_DEVICE && t.to == FIFFV_COORD_HEAD) {
+                    trans = t;
+                    break;
+                }
         }
     }
     /*
@@ -275,10 +272,10 @@ int MNERawInfo::get_meas_info(FiffStream::SPtr &stream,
 
     if (hpi.size() > 0 && trans.isEmpty())
         for (k = 0; k < hpi[0]->nent(); k++)
-            if (hpi[0]->dir[k]->kind ==  FIFF_COORD_TRANS) {
-                if (!stream->read_tag(t_pTag,hpi[0]->dir[k]->pos))
+            if (hpi[0]->dir[k]->kind == FIFF_COORD_TRANS) {
+                if (!stream->read_tag(t_pTag, hpi[0]->dir[k]->pos))
                     return (-1);
-                t = FiffCoordTrans::readFromTag( t_pTag );
+                t = FiffCoordTrans::readFromTag(t_pTag);
                 if (t.from == FIFFV_COORD_DEVICE && t.to == FIFFV_COORD_HEAD) {
                     trans = t;
                     break;
@@ -286,7 +283,7 @@ int MNERawInfo::get_meas_info(FiffStream::SPtr &stream,
             }
     if (to_find < 3) {
         if (*lowpass < 0) {
-            *lowpass = *sfreq/2.0;
+            *lowpass = *sfreq / 2.0;
             to_find--;
         }
         if (*highpass < 0) {
@@ -295,7 +292,7 @@ int MNERawInfo::get_meas_info(FiffStream::SPtr &stream,
         }
     }
     if (to_find != 0) {
-        qCritical ("Not all essential tags were found!");
+        qCritical("Not all essential tags were found!");
         return (-1);
     }
     chp = ch;
@@ -318,25 +315,26 @@ int MNERawInfo::load(const QString& name, int allow_maxshield, std::unique_ptr<M
     QFile file(name);
     FiffStream::SPtr stream(new FiffStream(&file));
 
-    int            res      = FIFF_FAIL;
-    QList<FiffChInfo> chs;	/* Channel info */
-    FiffCoordTrans trans;       /* The coordinate transformation */
-    std::unique_ptr<FiffId> id; /* Measurement id */
-    QList<FiffDirEntry::SPtr>   rawDir;	/* Directory of raw data tags */
+    int res = FIFF_FAIL;
+    QList<FiffChInfo> chs;            /* Channel info */
+    FiffCoordTrans trans;             /* The coordinate transformation */
+    std::unique_ptr<FiffId> id;       /* Measurement id */
+    QList<FiffDirEntry::SPtr> rawDir; /* Directory of raw data tags */
     std::unique_ptr<MNERawInfo> info;
-    int            nchan    = 0;		/* Number of channels */
-    float          sfreq    = 0.0;	/* Sampling frequency */
-    float          highpass;		/* Highpass filter frequency */
-    float          lowpass;		/* Lowpass filter frequency */
-    FiffDirNode::SPtr    raw;
-    FiffTime       start_time;
-    int            k;
-    int            maxshield_data = false;
+    int nchan = 0;     /* Number of channels */
+    float sfreq = 0.0; /* Sampling frequency */
+    float highpass;    /* Highpass filter frequency */
+    float lowpass;     /* Lowpass filter frequency */
+    FiffDirNode::SPtr raw;
+    FiffTime start_time;
+    int k;
+    int maxshield_data = false;
     /*
        * Open file
        */
-    if(!stream->open()) {
-        stream->close(); return FIFF_FAIL;
+    if (!stream->open()) {
+        stream->close();
+        return FIFF_FAIL;
     }
     raw = find_raw(stream->dirtree());
     if (raw->isEmpty()) {
@@ -344,29 +342,31 @@ int MNERawInfo::load(const QString& name, int allow_maxshield, std::unique_ptr<M
             raw = find_maxshield(stream->dirtree());
             if (raw->isEmpty()) {
                 qCritical("No raw data in this file.");
-                stream->close(); return FIFF_FAIL;
+                stream->close();
+                return FIFF_FAIL;
             }
             maxshield_data = true;
-        }
-        else {
+        } else {
             qCritical("No raw data in this file.");
-            stream->close(); return FIFF_FAIL;
+            stream->close();
+            return FIFF_FAIL;
         }
     }
     /*
        * Get the essential measurement information
        */
-    if (get_meas_info (stream,
-                       raw,
-                       id,
-                       &nchan,
-                       &sfreq,
-                       &highpass,
-                       &lowpass,
-                       chs,
-                       trans,
-                       start_time) < 0) {
-        stream->close(); return FIFF_FAIL;
+    if (get_meas_info(stream,
+                      raw,
+                      id,
+                      &nchan,
+                      &sfreq,
+                      &highpass,
+                      &lowpass,
+                      chs,
+                      trans,
+                      start_time) < 0) {
+        stream->close();
+        return FIFF_FAIL;
     }
     /*
         * Get the raw directory
@@ -376,14 +376,14 @@ int MNERawInfo::load(const QString& name, int allow_maxshield, std::unique_ptr<M
        * Ready to put everything together
        */
     info = std::make_unique<MNERawInfo>();
-    info->filename       = name;
-    info->nchan          = nchan;
-    info->chInfo         = chs;
-    info->coord_frame    = FIFFV_COORD_DEVICE;
-    info->trans          = std::make_unique<FiffCoordTrans>(trans);
-    info->sfreq          = sfreq;
-    info->lowpass        = lowpass;
-    info->highpass       = highpass;
+    info->filename = name;
+    info->nchan = nchan;
+    info->chInfo = chs;
+    info->coord_frame = FIFFV_COORD_DEVICE;
+    info->trans = std::make_unique<FiffCoordTrans>(trans);
+    info->sfreq = sfreq;
+    info->lowpass = lowpass;
+    info->highpass = highpass;
     info->maxshield_data = maxshield_data;
     if (id) {
         info->id = std::make_unique<FiffId>(*id);
@@ -392,28 +392,30 @@ int MNERawInfo::load(const QString& name, int allow_maxshield, std::unique_ptr<M
        * Getting starting time from measurement ID is not too accurate...
        */
     info->start_time = start_time;
-    info->buf_size   = 0;
+    info->buf_size = 0;
     for (k = 0; k < raw->nent(); k++) {
         if (raw->dir[k]->kind == FIFF_DATA_BUFFER) {
             if (raw->dir[k]->type == FIFFT_DAU_PACK16 || raw->dir[k]->type == FIFFT_SHORT)
-                info->buf_size = raw->dir[k]->size/(nchan*sizeof(fiff_short_t));
+                info->buf_size = raw->dir[k]->size / (nchan * sizeof(fiff_short_t));
             else if (raw->dir[k]->type == FIFFT_FLOAT)
-                info->buf_size = raw->dir[k]->size/(nchan*sizeof(fiff_float_t));
+                info->buf_size = raw->dir[k]->size / (nchan * sizeof(fiff_float_t));
             else if (raw->dir[k]->type == FIFFT_INT)
-                info->buf_size = raw->dir[k]->size/(nchan*sizeof(fiff_int_t));
+                info->buf_size = raw->dir[k]->size / (nchan * sizeof(fiff_int_t));
             else {
-                qCritical("We are not prepared to handle raw data type: %d",raw->dir[k]->type);
-                stream->close(); return FIFF_FAIL;
+                qCritical("We are not prepared to handle raw data type: %d", raw->dir[k]->type);
+                stream->close();
+                return FIFF_FAIL;
             }
             break;
         }
     }
     if (info->buf_size <= 0) {
         qCritical("No raw data buffers available.");
-        stream->close(); return FIFF_FAIL;
+        stream->close();
+        return FIFF_FAIL;
     }
-    info->rawDir     = rawDir;
-    info->ndir       = raw->nent();
+    info->rawDir = rawDir;
+    info->ndir = raw->nent();
     infop = std::move(info);
     res = FIFF_OK;
 

@@ -44,74 +44,74 @@ QString transcriptHtml(const QString& text, const QString& isoTimestamp = QStrin
     const QString trimmed = text.trimmed();
     const int sep = trimmed.indexOf('>');
     const QString speaker = sep > 0 ? trimmed.left(sep).trimmed() : QStringLiteral("Studio");
-    const QString body    = sep > 0 ? trimmed.mid(sep + 1).trimmed() : trimmed;
+    const QString body = sep > 0 ? trimmed.mid(sep + 1).trimmed() : trimmed;
 
     // Per-speaker accent colour (badge / left-bar)
-    QString accent       = QStringLiteral("#3b82f6");
+    QString accent = QStringLiteral("#3b82f6");
     QString speakerColor = QStringLiteral("#9aa6b2");
-    bool    isUser       = false;
+    bool isUser = false;
 
-    if(speaker == QLatin1String("You") || speaker == QLatin1String("Agent")) {
-        accent       = QStringLiteral("#0ea5e9");
+    if (speaker == QLatin1String("You") || speaker == QLatin1String("Agent")) {
+        accent = QStringLiteral("#0ea5e9");
         speakerColor = QStringLiteral("#7ab8e8");
-        isUser       = true;
-    } else if(speaker == QLatin1String("Planner")) {
-        accent       = QStringLiteral("#8b5cf6");
+        isUser = true;
+    } else if (speaker == QLatin1String("Planner")) {
+        accent = QStringLiteral("#8b5cf6");
         speakerColor = QStringLiteral("#a78bfa");
-    } else if(speaker == QLatin1String("Studio")) {
-        accent       = QStringLiteral("#10b981");
+    } else if (speaker == QLatin1String("Studio")) {
+        accent = QStringLiteral("#10b981");
         speakerColor = QStringLiteral("#34d399");
-    } else if(speaker == QLatin1String("Kernel")) {
-        accent       = QStringLiteral("#f59e0b");
+    } else if (speaker == QLatin1String("Kernel")) {
+        accent = QStringLiteral("#f59e0b");
         speakerColor = QStringLiteral("#fbbf24");
-    } else if(speaker == QLatin1String("Extension Host")) {
-        accent       = QStringLiteral("#f97316");
+    } else if (speaker == QLatin1String("Extension Host")) {
+        accent = QStringLiteral("#f97316");
         speakerColor = QStringLiteral("#fb923c");
     }
 
-    const QString safeBody    = body.toHtmlEscaped().replace(QLatin1Char('\n'), QLatin1String("<br/>"));
+    const QString safeBody = body.toHtmlEscaped().replace(QLatin1Char('\n'), QLatin1String("<br/>"));
     const QString safeSpeaker = speaker.toHtmlEscaped();
 
     // Convert ISO timestamp → local "hh:mm"
     QString displayTime;
-    if(!isoTimestamp.isEmpty()) {
+    if (!isoTimestamp.isEmpty()) {
         const QDateTime dt = QDateTime::fromString(isoTimestamp, Qt::ISODate);
         displayTime = dt.isValid() ? dt.toLocalTime().toString(QStringLiteral("hh:mm")) : QString();
     }
-    if(displayTime.isEmpty()) {
+    if (displayTime.isEmpty()) {
         displayTime = QDateTime::currentDateTime().toString(QStringLiteral("hh:mm"));
     }
 
-    if(isUser) {
+    if (isUser) {
         // Right-aligned user message with a blue bubble
         return QString(
-            "<div style='margin:2px 0 10px 0;'>"
-              "<table width='100%' cellspacing='0' cellpadding='0'><tr>"
-                "<td width='10%'></td>"
-                "<td>"
-                  "<div style='text-align:right; margin-bottom:3px;'>"
-                    "<span style='color:%1; font-size:11px; font-weight:600;'>%2</span>"
-                    "<span style='color:#4a5568; font-size:10px;'> &middot; %3</span>"
-                  "</div>"
-                  "<div style='background:#1a3354; border:1px solid #2a4f7a;"
-                       " border-radius:10px 2px 10px 10px; padding:8px 12px;"
-                       " color:#c9d1d9; line-height:1.5;'>%4</div>"
-                "</td>"
-              "</tr></table>"
-            "</div>")
+                   "<div style='margin:2px 0 10px 0;'>"
+                   "<table width='100%' cellspacing='0' cellpadding='0'><tr>"
+                   "<td width='10%'></td>"
+                   "<td>"
+                   "<div style='text-align:right; margin-bottom:3px;'>"
+                   "<span style='color:%1; font-size:11px; font-weight:600;'>%2</span>"
+                   "<span style='color:#4a5568; font-size:10px;'> &middot; %3</span>"
+                   "</div>"
+                   "<div style='background:#1a3354; border:1px solid #2a4f7a;"
+                   " border-radius:10px 2px 10px 10px; padding:8px 12px;"
+                   " color:#c9d1d9; line-height:1.5;'>%4</div>"
+                   "</td>"
+                   "</tr></table>"
+                   "</div>")
             .arg(speakerColor, safeSpeaker, displayTime, safeBody);
     }
 
     // Left-aligned system / agent message with coloured left bar
     return QString(
-        "<div style='margin:2px 0 10px 0;'>"
-          "<div style='margin-bottom:3px;'>"
-            "<span style='color:%1; font-size:11px; font-weight:600;'>%2</span>"
-            "<span style='color:#4a5568; font-size:10px;'> &middot; %3</span>"
-          "</div>"
-          "<div style='border-left:3px solid %4; padding:6px 10px;"
+               "<div style='margin:2px 0 10px 0;'>"
+               "<div style='margin-bottom:3px;'>"
+               "<span style='color:%1; font-size:11px; font-weight:600;'>%2</span>"
+               "<span style='color:#4a5568; font-size:10px;'> &middot; %3</span>"
+               "</div>"
+               "<div style='border-left:3px solid %4; padding:6px 10px;"
                " color:#c9d1d9; line-height:1.5;'>%5</div>"
-        "</div>")
+               "</div>")
         .arg(speakerColor, safeSpeaker, displayTime, accent, safeBody);
 }
 
@@ -120,7 +120,7 @@ void appendHtmlEntry(QTextEdit* edit, const QString& html)
 {
     QTextCursor cursor = edit->textCursor();
     cursor.movePosition(QTextCursor::End);
-    if(!edit->document()->isEmpty()) {
+    if (!edit->document()->isEmpty()) {
         cursor.insertBlock();
     }
     cursor.insertHtml(html);
@@ -235,8 +235,7 @@ AgentChatDockWidget::AgentChatDockWidget(QWidget* parent)
         "QPushButton#agentDismissBtn {"
         "  background: #252c38; color: #9aa6b2; border: 1px solid #2f3843;"
         "  border-radius: 6px; padding: 5px 12px; font-size: 12px; }"
-        "QPushButton#agentDismissBtn:hover { background: #2e3748; color: #e6edf3; }"
-    );
+        "QPushButton#agentDismissBtn:hover { background: #2e3748; color: #e6edf3; }");
 
     // ── Header ──────────────────────────────────────────────────────────────
     QWidget* header = new QWidget(this);
@@ -319,8 +318,8 @@ AgentChatDockWidget::AgentChatDockWidget(QWidget* parent)
 
     // ── Assemble main stack ───────────────────────────────────────────────
     m_mainStack->addWidget(m_currentConversationPage); // index 0
-    m_mainStack->addWidget(m_historyListPage);          // index 1
-    m_mainStack->addWidget(m_historyDetailPage);        // index 2
+    m_mainStack->addWidget(m_historyListPage);         // index 1
+    m_mainStack->addWidget(m_historyDetailPage);       // index 2
     m_mainStack->setCurrentIndex(0);
 
     // ── Composer panel ────────────────────────────────────────────────────
@@ -330,16 +329,14 @@ AgentChatDockWidget::AgentChatDockWidget(QWidget* parent)
     // Safety selector options
     m_safetySelector->setPlaceholderText(QStringLiteral("Safety"));
     m_safetySelector->setEmptyText(QStringLiteral("Safety"));
-    m_safetySelector->setItems({
-        {QStringLiteral("auto"),    QStringLiteral("Auto")},
-        {QStringLiteral("confirm"), QStringLiteral("Confirm")},
-        {QStringLiteral("safe"),    QStringLiteral("Safe")}
-    });
+    m_safetySelector->setItems({{QStringLiteral("auto"), QStringLiteral("Auto")},
+                                {QStringLiteral("confirm"), QStringLiteral("Confirm")},
+                                {QStringLiteral("safe"), QStringLiteral("Safe")}});
     m_safetySelector->setCurrentValue(QStringLiteral("auto"));
     m_safetySelector->setToolTip(
         QStringLiteral("Auto — auto-run safe steps\n"
-                        "Confirm — ask before every step\n"
-                        "Safe — suggestions only, nothing auto-runs"));
+                       "Confirm — ask before every step\n"
+                       "Safe — suggestions only, nothing auto-runs"));
 
     m_modeSelector->setPlaceholderText(QStringLiteral("Provider"));
     m_modeSelector->setEmptyText(QStringLiteral("Provider"));
@@ -412,7 +409,7 @@ AgentChatDockWidget::AgentChatDockWidget(QWidget* parent)
     // ── Connections ───────────────────────────────────────────────────────
     connect(m_sendButton, &QPushButton::clicked, this, [this]() {
         const QString text = m_input->text().trimmed();
-        if(text.isEmpty()) {
+        if (text.isEmpty()) {
             return;
         }
         appendTranscript(QString("You> %1").arg(text));
@@ -428,7 +425,7 @@ AgentChatDockWidget::AgentChatDockWidget(QWidget* parent)
     });
 
     connect(m_historyButton, &QPushButton::clicked, this, [this]() {
-        if(m_mainStack->currentIndex() == 0) {
+        if (m_mainStack->currentIndex() == 0) {
             showHistoryList();
         } else {
             showCurrentConversation();
@@ -438,22 +435,22 @@ AgentChatDockWidget::AgentChatDockWidget(QWidget* parent)
     connect(m_backToSessionsButton, &QPushButton::clicked, this, &AgentChatDockWidget::showHistoryList);
 
     connect(m_profileSelector, &PillSelectorWidget::currentValueChanged, this, [this](const QString& value) {
-        if(!value.trimmed().isEmpty()) {
+        if (!value.trimmed().isEmpty()) {
             emit connectionProfileSelected(value.trimmed());
         }
     });
     connect(m_modeSelector, &PillSelectorWidget::currentValueChanged, this, [this](const QString& value) {
-        if(!value.trimmed().isEmpty()) {
+        if (!value.trimmed().isEmpty()) {
             emit connectionModeSelected(value.trimmed());
         }
     });
     connect(m_modelSelector, &PillSelectorWidget::currentValueChanged, this, [this](const QString& value) {
-        if(!value.trimmed().isEmpty()) {
+        if (!value.trimmed().isEmpty()) {
             emit connectionModelSelected(value.trimmed());
         }
     });
     connect(m_safetySelector, &PillSelectorWidget::currentValueChanged, this, [this](const QString& value) {
-        if(!value.trimmed().isEmpty()) {
+        if (!value.trimmed().isEmpty()) {
             emit plannerSafetyLevelSelected(value.trimmed());
         }
     });
@@ -472,30 +469,30 @@ AgentChatDockWidget::AgentChatDockWidget(QWidget* parent)
 void AgentChatDockWidget::setPlannerStatus(const QString& statusText)
 {
     QString simplified = statusText.trimmed();
-    if(simplified.startsWith(QLatin1String("LLM: Connected"))) {
+    if (simplified.startsWith(QLatin1String("LLM: Connected"))) {
         const QStringList parts = simplified.split(QLatin1Char('|'));
         QString provider;
         QString model;
-        for(const QString& part : parts) {
+        for (const QString& part : parts) {
             const QString p = part.trimmed();
-            if(p.startsWith(QLatin1String("Provider:"))) {
+            if (p.startsWith(QLatin1String("Provider:"))) {
                 provider = p.mid(9).trimmed();
-            } else if(p.startsWith(QLatin1String("Model:"))) {
+            } else if (p.startsWith(QLatin1String("Model:"))) {
                 model = p.mid(6).trimmed();
             }
         }
         simplified = QString("Connected \u2014 %1%2")
                          .arg(provider.isEmpty() ? QStringLiteral("LLM") : provider,
                               model.isEmpty() ? QString() : QString(" \u00b7 %1").arg(model));
-    } else if(simplified.contains(QLatin1String("Deterministic fallback only"))) {
+    } else if (simplified.contains(QLatin1String("Deterministic fallback only"))) {
         simplified = QStringLiteral("Rule-based planning active");
     }
     m_statusLabel->setText(simplified);
 }
 
 void AgentChatDockWidget::setConnectionState(const QString& stateText,
-                                              bool            warning,
-                                              const QString&  detailMessage)
+                                             bool warning,
+                                             const QString& detailMessage)
 {
     const bool isRuleBased =
         stateText.trimmed().compare(QLatin1String("Rule-based"), Qt::CaseInsensitive) == 0;
@@ -517,10 +514,10 @@ void AgentChatDockWidget::setConnectionState(const QString& stateText,
 }
 
 void AgentChatDockWidget::setConnectionProfiles(const QStringList& profiles,
-                                                 const QString&     currentProfile)
+                                                const QString& currentProfile)
 {
     QList<QPair<QString, QString>> items;
-    for(const QString& p : profiles) {
+    for (const QString& p : profiles) {
         items.append(qMakePair(p, p));
     }
     m_profileSelector->setItems(items);
@@ -529,17 +526,17 @@ void AgentChatDockWidget::setConnectionProfiles(const QStringList& profiles,
 }
 
 void AgentChatDockWidget::setConnectionModes(const QList<QPair<QString, QString>>& modes,
-                                              const QString& currentMode)
+                                             const QString& currentMode)
 {
     m_modeSelector->setItems(modes);
     m_modeSelector->setCurrentValue(currentMode.trimmed());
 }
 
 void AgentChatDockWidget::setSuggestedModels(const QStringList& models,
-                                              const QString&     currentModel)
+                                             const QString& currentModel)
 {
     QList<QPair<QString, QString>> items;
-    for(const QString& m : models) {
+    for (const QString& m : models) {
         items.append(qMakePair(m, m));
     }
     m_modelSelector->setItems(items);
@@ -550,9 +547,7 @@ void AgentChatDockWidget::setSuggestedModels(const QStringList& models,
 void AgentChatDockWidget::setPlannerSafetyLevel(const QString& level)
 {
     const QString normalized = level.trimmed().toLower();
-    if(normalized == QLatin1String("auto")
-       || normalized == QLatin1String("confirm")
-       || normalized == QLatin1String("safe")) {
+    if (normalized == QLatin1String("auto") || normalized == QLatin1String("confirm") || normalized == QLatin1String("safe")) {
         m_safetySelector->setCurrentValue(normalized);
     }
 }
@@ -560,24 +555,23 @@ void AgentChatDockWidget::setPlannerSafetyLevel(const QString& level)
 void AgentChatDockWidget::appendTranscript(const QString& text)
 {
     const QString trimmed = text.trimmed();
-    if(trimmed.isEmpty()) {
+    if (trimmed.isEmpty()) {
         return;
     }
 
     // A new user turn archives the previous conversation automatically.
-    if(trimmed.startsWith(QLatin1String("You>"))) {
+    if (trimmed.startsWith(QLatin1String("You>"))) {
         archiveCurrentConversation();
         m_activeArchivedSessionIndex = -1;
     }
 
     const QString isoNow = QDateTime::currentDateTimeUtc().toString(Qt::ISODate);
     m_currentConversationEntries.append(QJsonObject{
-        {QStringLiteral("text"),      trimmed},
-        {QStringLiteral("timestamp"), isoNow}
-    });
+        {QStringLiteral("text"), trimmed},
+        {QStringLiteral("timestamp"), isoNow}});
 
     // Switch to current conversation page and append incrementally.
-    if(m_mainStack->currentIndex() != 0) {
+    if (m_mainStack->currentIndex() != 0) {
         showCurrentConversation();
     }
     appendHtmlEntry(m_transcript, transcriptHtml(trimmed, isoNow));
@@ -594,11 +588,11 @@ QJsonArray AgentChatDockWidget::currentConversationEntries() const
 }
 
 void AgentChatDockWidget::restoreConversationState(const QJsonArray& currentEntries,
-                                                    const QJsonArray& archivedSessions)
+                                                   const QJsonArray& archivedSessions)
 {
-    m_currentConversationEntries    = currentEntries;
-    m_archivedConversationSessions  = archivedSessions;
-    m_activeArchivedSessionIndex    = -1;
+    m_currentConversationEntries = currentEntries;
+    m_archivedConversationSessions = archivedSessions;
+    m_activeArchivedSessionIndex = -1;
     m_mainStack->setCurrentIndex(0);
     refreshCurrentTranscriptView();
     refreshArchivedSessions();
@@ -609,8 +603,8 @@ void AgentChatDockWidget::restoreConversationState(const QJsonArray& currentEntr
 void AgentChatDockWidget::setPendingConfirmations(const QJsonArray& confirmations)
 {
     m_pendingConfirmations = confirmations;
-    while(QLayoutItem* item = m_confirmationLayout->takeAt(0)) {
-        if(QWidget* w = item->widget()) {
+    while (QLayoutItem* item = m_confirmationLayout->takeAt(0)) {
+        if (QWidget* w = item->widget()) {
             w->deleteLater();
         }
         delete item;
@@ -618,14 +612,14 @@ void AgentChatDockWidget::setPendingConfirmations(const QJsonArray& confirmation
 
     m_confirmationLabel->setVisible(!confirmations.isEmpty());
     m_confirmationPanel->setVisible(!confirmations.isEmpty());
-    if(confirmations.isEmpty()) {
+    if (confirmations.isEmpty()) {
         return;
     }
 
-    for(int i = 0; i < confirmations.size(); ++i) {
+    for (int i = 0; i < confirmations.size(); ++i) {
         const QJsonObject confirmation = confirmations.at(i).toObject();
         const QString commandText = confirmation.value(QStringLiteral("command")).toString().trimmed();
-        if(commandText.isEmpty()) {
+        if (commandText.isEmpty()) {
             continue;
         }
 
@@ -643,8 +637,7 @@ void AgentChatDockWidget::setPendingConfirmations(const QJsonArray& confirmation
         };
 
         QLabel* titleLbl = makeLabel(
-            confirmation.value(QStringLiteral("title")).toString(
-                QString("Proposal %1").arg(i + 1)));
+            confirmation.value(QStringLiteral("title")).toString(QString("Proposal %1").arg(i + 1)));
         titleLbl->setStyleSheet(
             QStringLiteral("color: #e6edf3; font-size: 12px; font-weight: 600;"));
 
@@ -658,9 +651,9 @@ void AgentChatDockWidget::setPendingConfirmations(const QJsonArray& confirmation
         reasonLbl->setVisible(!reasonText.isEmpty());
         reasonLbl->setStyleSheet(QStringLiteral("color: #9aa6b2; font-size: 11px;"));
 
-        const bool    stale       = confirmation.value(QStringLiteral("stale")).toBool(false);
+        const bool stale = confirmation.value(QStringLiteral("stale")).toBool(false);
         const QString staleReason = confirmation.value(QStringLiteral("stale_reason")).toString().trimmed();
-        QLabel* warningLbl        = makeLabel(
+        QLabel* warningLbl = makeLabel(
             (stale && !staleReason.isEmpty()) ? QString("Warning: %1").arg(staleReason) : QString());
         warningLbl->setVisible(stale && !staleReason.isEmpty());
         warningLbl->setStyleSheet(QStringLiteral("color: #fbbf24; font-size: 11px;"));
@@ -701,24 +694,24 @@ void AgentChatDockWidget::setPendingConfirmations(const QJsonArray& confirmation
 
 void AgentChatDockWidget::updateHeaderForPage(int pageIndex)
 {
-    switch(pageIndex) {
-    case 0:
-        m_titleLabel->setText(QStringLiteral("Conversation"));
-        m_historyButton->setText(QStringLiteral("History"));
-        m_historyButton->setToolTip(QStringLiteral("Browse prior sessions"));
-        break;
-    case 1:
-        m_titleLabel->setText(QStringLiteral("History"));
-        m_historyButton->setText(QStringLiteral("\u2190 Chat"));
-        m_historyButton->setToolTip(QStringLiteral("Return to current conversation"));
-        break;
-    case 2:
-        m_titleLabel->setText(QStringLiteral("Session"));
-        m_historyButton->setText(QStringLiteral("\u2190 Chat"));
-        m_historyButton->setToolTip(QStringLiteral("Return to current conversation"));
-        break;
-    default:
-        break;
+    switch (pageIndex) {
+        case 0:
+            m_titleLabel->setText(QStringLiteral("Conversation"));
+            m_historyButton->setText(QStringLiteral("History"));
+            m_historyButton->setToolTip(QStringLiteral("Browse prior sessions"));
+            break;
+        case 1:
+            m_titleLabel->setText(QStringLiteral("History"));
+            m_historyButton->setText(QStringLiteral("\u2190 Chat"));
+            m_historyButton->setToolTip(QStringLiteral("Return to current conversation"));
+            break;
+        case 2:
+            m_titleLabel->setText(QStringLiteral("Session"));
+            m_historyButton->setText(QStringLiteral("\u2190 Chat"));
+            m_historyButton->setToolTip(QStringLiteral("Return to current conversation"));
+            break;
+        default:
+            break;
     }
 }
 
@@ -739,7 +732,7 @@ void AgentChatDockWidget::showHistoryList()
 
 void AgentChatDockWidget::showArchivedSession(int index)
 {
-    if(index < 0 || index >= m_archivedConversationSessions.size()) {
+    if (index < 0 || index >= m_archivedConversationSessions.size()) {
         return;
     }
     m_activeArchivedSessionIndex = index;
@@ -754,11 +747,11 @@ void AgentChatDockWidget::refreshCurrentTranscriptView()
     m_confirmationLabel->setVisible(!m_pendingConfirmations.isEmpty());
     m_confirmationPanel->setVisible(!m_pendingConfirmations.isEmpty());
 
-    for(const QJsonValue& value : std::as_const(m_currentConversationEntries)) {
-        const QJsonObject entry     = value.toObject();
-        const QString     text      = entry.value(QStringLiteral("text")).toString().trimmed();
-        const QString     timestamp = entry.value(QStringLiteral("timestamp")).toString();
-        if(text.isEmpty()) {
+    for (const QJsonValue& value : std::as_const(m_currentConversationEntries)) {
+        const QJsonObject entry = value.toObject();
+        const QString text = entry.value(QStringLiteral("text")).toString().trimmed();
+        const QString timestamp = entry.value(QStringLiteral("timestamp")).toString();
+        if (text.isEmpty()) {
             continue;
         }
         appendHtmlEntry(m_transcript, transcriptHtml(text, timestamp));
@@ -767,14 +760,14 @@ void AgentChatDockWidget::refreshCurrentTranscriptView()
 
 void AgentChatDockWidget::refreshArchivedSessions()
 {
-    while(QLayoutItem* item = m_archivedSessionsLayout->takeAt(0)) {
-        if(QWidget* w = item->widget()) {
+    while (QLayoutItem* item = m_archivedSessionsLayout->takeAt(0)) {
+        if (QWidget* w = item->widget()) {
             w->deleteLater();
         }
         delete item;
     }
 
-    if(m_archivedConversationSessions.isEmpty()) {
+    if (m_archivedConversationSessions.isEmpty()) {
         QLabel* emptyLabel = new QLabel(
             QStringLiteral("No prior sessions yet."), m_archivedSessionsPanel);
         emptyLabel->setWordWrap(true);
@@ -784,14 +777,13 @@ void AgentChatDockWidget::refreshArchivedSessions()
         return;
     }
 
-    for(int i = 0; i < m_archivedConversationSessions.size(); ++i) {
-        const QJsonObject session  = m_archivedConversationSessions.at(i).toObject();
-        const QString     title    = session.value(QStringLiteral("title")).toString(
-            QString("Earlier Session %1").arg(i + 1));
-        const QString     preview  = session.value(QStringLiteral("preview")).toString().trimmed();
-        const QString     tsIso    = session.value(QStringLiteral("timestamp")).toString();
+    for (int i = 0; i < m_archivedConversationSessions.size(); ++i) {
+        const QJsonObject session = m_archivedConversationSessions.at(i).toObject();
+        const QString title = session.value(QStringLiteral("title")).toString(QString("Earlier Session %1").arg(i + 1));
+        const QString preview = session.value(QStringLiteral("preview")).toString().trimmed();
+        const QString tsIso = session.value(QStringLiteral("timestamp")).toString();
         QString displayTime;
-        if(!tsIso.isEmpty()) {
+        if (!tsIso.isEmpty()) {
             const QDateTime dt = QDateTime::fromString(tsIso, Qt::ISODate);
             displayTime = dt.isValid()
                 ? dt.toLocalTime().toString(QStringLiteral("yyyy-MM-dd hh:mm"))
@@ -821,7 +813,7 @@ void AgentChatDockWidget::refreshArchivedSessions()
             QStringLiteral("color: #6b7280; font-size: 11px;"));
 
         cardLayout->addWidget(titleLbl);
-        if(!displayTime.isEmpty()) {
+        if (!displayTime.isEmpty()) {
             cardLayout->addWidget(timeLbl);
         }
         cardLayout->addWidget(previewLbl);
@@ -837,8 +829,7 @@ void AgentChatDockWidget::refreshArchivedSessions()
         openBtn->setFlat(true);
         openBtn->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
         openBtn->setStyleSheet(QStringLiteral(
-            "QPushButton { background: transparent; border: none; }"
-        ));
+            "QPushButton { background: transparent; border: none; }"));
         openBtn->setGeometry(card->rect());
         openBtn->raise();
         cardLayout->addWidget(openBtn);
@@ -854,25 +845,24 @@ void AgentChatDockWidget::refreshArchivedSessions()
 void AgentChatDockWidget::refreshArchivedSessionView()
 {
     m_archivedTranscript->clear();
-    if(m_activeArchivedSessionIndex < 0
-       || m_activeArchivedSessionIndex >= m_archivedConversationSessions.size()) {
+    if (m_activeArchivedSessionIndex < 0 || m_activeArchivedSessionIndex >= m_archivedConversationSessions.size()) {
         m_archivedTranscriptContextLabel->setText(
             QStringLiteral("Select a prior session"));
         return;
     }
 
     const QJsonObject session = m_archivedConversationSessions
-                                    .at(m_activeArchivedSessionIndex).toObject();
-    const QString title = session.value(QStringLiteral("title")).toString(
-        QString("Session %1").arg(m_activeArchivedSessionIndex + 1));
+                                    .at(m_activeArchivedSessionIndex)
+                                    .toObject();
+    const QString title = session.value(QStringLiteral("title")).toString(QString("Session %1").arg(m_activeArchivedSessionIndex + 1));
     m_archivedTranscriptContextLabel->setText(title);
 
     const QJsonArray entries = session.value(QStringLiteral("entries")).toArray();
-    for(const QJsonValue& value : entries) {
-        const QJsonObject entry     = value.toObject();
-        const QString     text      = entry.value(QStringLiteral("text")).toString().trimmed();
-        const QString     timestamp = entry.value(QStringLiteral("timestamp")).toString();
-        if(text.isEmpty()) {
+    for (const QJsonValue& value : entries) {
+        const QJsonObject entry = value.toObject();
+        const QString text = entry.value(QStringLiteral("text")).toString().trimmed();
+        const QString timestamp = entry.value(QStringLiteral("timestamp")).toString();
+        if (text.isEmpty()) {
             continue;
         }
         appendHtmlEntry(m_archivedTranscript, transcriptHtml(text, timestamp));
@@ -881,24 +871,23 @@ void AgentChatDockWidget::refreshArchivedSessionView()
 
 void AgentChatDockWidget::archiveCurrentConversation()
 {
-    if(m_currentConversationEntries.isEmpty()) {
+    if (m_currentConversationEntries.isEmpty()) {
         return;
     }
 
     // Derive the title from the first user message.
     QString title =
-        QStringLiteral("Session ")
-        + QDateTime::currentDateTime().toString(QStringLiteral("yyyy-MM-dd hh:mm"));
+        QStringLiteral("Session ") + QDateTime::currentDateTime().toString(QStringLiteral("yyyy-MM-dd hh:mm"));
 
-    for(const QJsonValue& v : std::as_const(m_currentConversationEntries)) {
+    for (const QJsonValue& v : std::as_const(m_currentConversationEntries)) {
         const QString text = v.toObject().value(QStringLiteral("text")).toString().trimmed();
-        if(text.isEmpty()) {
+        if (text.isEmpty()) {
             continue;
         }
         const int sep = text.indexOf('>');
         const QString speaker = sep > 0 ? text.left(sep).trimmed() : QString();
-        const QString body    = sep > 0 ? text.mid(sep + 1).trimmed() : text;
-        if(speaker == QLatin1String("You") && !body.isEmpty()) {
+        const QString body = sep > 0 ? text.mid(sep + 1).trimmed() : text;
+        if (speaker == QLatin1String("You") && !body.isEmpty()) {
             title = body.left(60);
             break;
         }
@@ -906,30 +895,29 @@ void AgentChatDockWidget::archiveCurrentConversation()
 
     // Build a short preview from the first two bodies.
     QStringList previewLines;
-    for(const QJsonValue& v : std::as_const(m_currentConversationEntries)) {
+    for (const QJsonValue& v : std::as_const(m_currentConversationEntries)) {
         const QString text = v.toObject().value(QStringLiteral("text")).toString().trimmed();
-        if(text.isEmpty()) {
+        if (text.isEmpty()) {
             continue;
         }
         const int sep = text.indexOf('>');
         const QString body = sep > 0 ? text.mid(sep + 1).trimmed() : text;
-        if(!body.isEmpty()) {
+        if (!body.isEmpty()) {
             previewLines << body;
         }
-        if(previewLines.size() >= 2) {
+        if (previewLines.size() >= 2) {
             break;
         }
     }
 
     m_archivedConversationSessions.prepend(QJsonObject{
-        {QStringLiteral("title"),     title},
-        {QStringLiteral("preview"),   previewLines.join(QStringLiteral(" | ")).left(180)},
-        {QStringLiteral("entries"),   m_currentConversationEntries},
-        {QStringLiteral("timestamp"), QDateTime::currentDateTimeUtc().toString(Qt::ISODate)}
-    });
+        {QStringLiteral("title"), title},
+        {QStringLiteral("preview"), previewLines.join(QStringLiteral(" | ")).left(180)},
+        {QStringLiteral("entries"), m_currentConversationEntries},
+        {QStringLiteral("timestamp"), QDateTime::currentDateTimeUtc().toString(Qt::ISODate)}});
 
     // Keep at most 20 prior sessions.
-    while(m_archivedConversationSessions.size() > 20) {
+    while (m_archivedConversationSessions.size() > 20) {
         m_archivedConversationSessions.removeLast();
     }
 

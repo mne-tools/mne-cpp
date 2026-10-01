@@ -61,7 +61,7 @@ using namespace Eigen;
  * @param[in] argv (argument vector) is an array of pointers to arrays of character objects. The array objects are null-terminated strings, representing the arguments that were entered on the command line when the program was started.
  * @return the value that was set to exit() (which is 0 if exit() is called via quit()).
  */
-int main(int argc, char *argv[])
+int main(int argc, char* argv[])
 {
     qInstallMessageHandler(MNELogger::customLogWriter);
     QCoreApplication a(argc, argv);
@@ -97,18 +97,18 @@ int main(int argc, char *argv[])
     float fTMax = 1.5f;
 
     bool keep_comp = false;
-    if(parser.value(keepCompOption) == "false" || parser.value(keepCompOption) == "0") {
+    if (parser.value(keepCompOption) == "false" || parser.value(keepCompOption) == "0") {
         keep_comp = false;
-    } else if(parser.value(keepCompOption) == "true" || parser.value(keepCompOption) == "1") {
+    } else if (parser.value(keepCompOption) == "true" || parser.value(keepCompOption) == "1") {
         keep_comp = true;
     }
 
     fiff_int_t dest_comp = parser.value(destCompsOption).toInt();
 
     bool pick_all = false;
-    if(parser.value(pickAllOption) == "false" || parser.value(pickAllOption) == "0") {
+    if (parser.value(pickAllOption) == "false" || parser.value(pickAllOption) == "0") {
         pick_all = false;
-    } else if(parser.value(pickAllOption) == "true" || parser.value(pickAllOption) == "1") {
+    } else if (parser.value(pickAllOption) == "true" || parser.value(pickAllOption) == "1") {
         pick_all = true;
     }
 
@@ -121,15 +121,15 @@ int main(int argc, char *argv[])
         // Pick all
         picks.resize(raw.info.nchan);
 
-        for(qint32 k = 0; k < raw.info.nchan; ++k) {
+        for (qint32 k = 0; k < raw.info.nchan; ++k) {
             picks(k) = k;
         }
     } else {
         QStringList include;
         include << "STI 014";
-        bool want_meg   = true;
-        bool want_eeg   = false;
-        bool want_stim  = false;
+        bool want_meg = true;
+        bool want_eeg = false;
+        bool want_stim = false;
 
         picks = raw.info.pick_types(want_meg,
                                     want_eeg,
@@ -139,13 +139,13 @@ int main(int argc, char *argv[])
     }
 
     // Read the events
-    MatrixXi events;    
+    MatrixXi events;
     MNE::read_events(t_sEventName,
                      t_fileRawName,
                      events);
 
     // Read the epochs and reject epochs with EOG higher than 300e-06
-    QMap<QString,double> mapReject;
+    QMap<QString, double> mapReject;
     mapReject.insert("eog", 300e-06);
 
     MNEEpochDataList data = MNEEpochDataList::readEpochs(raw,

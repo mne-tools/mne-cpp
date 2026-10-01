@@ -63,8 +63,8 @@ namespace MNELIB
 class MNESHARED_EXPORT MNECTFCompData
 {
 public:
-    typedef QSharedPointer<MNECTFCompData> SPtr;              /**< Shared pointer type for MNECTFCompData. */
-    typedef QSharedPointer<const MNECTFCompData> ConstSPtr;   /**< Const shared pointer type for MNECTFCompData. */
+    typedef QSharedPointer<MNECTFCompData> SPtr;            /**< Shared pointer type for MNECTFCompData. */
+    typedef QSharedPointer<const MNECTFCompData> ConstSPtr; /**< Const shared pointer type for MNECTFCompData. */
 
     //=========================================================================================================
     /**
@@ -96,20 +96,20 @@ public:
      *
      * @return OK on success, FAIL if a channel is not found.
      */
-    int calibrate(const QList<FIFFLIB::FiffChInfo> &chs,
-                  int            nch,
-                  bool           do_it);
+    int calibrate(const QList<FIFFLIB::FiffChInfo>& chs,
+                  int nch,
+                  bool do_it);
 
 public:
-    int             kind;                   /**< The CTF compensation kind constant. */
-    int             mne_kind;               /**< MNE-internal compensation kind. */
-    bool            calibrated;             /**< Whether the coefficients are already calibrated. */
-    std::unique_ptr<MNENamedMatrix>            data;      /**< The compensation matrix. */
-    std::unique_ptr<FIFFLIB::FiffSparseMatrix>   presel;    /**< Sparse selector applied before compensation. */
-    std::unique_ptr<FIFFLIB::FiffSparseMatrix>   postsel;   /**< Sparse selector applied after compensation. */
-    Eigen::VectorXf  presel_data;            /**< Intermediate buffer for pre-selection results. */
-    Eigen::VectorXf  comp_data;              /**< Intermediate buffer for compensation results. */
-    Eigen::VectorXf  postsel_data;           /**< Intermediate buffer for post-selection results. */
+    int kind;                                           /**< The CTF compensation kind constant. */
+    int mne_kind;                                       /**< MNE-internal compensation kind. */
+    bool calibrated;                                    /**< Whether the coefficients are already calibrated. */
+    std::unique_ptr<MNENamedMatrix> data;               /**< The compensation matrix. */
+    std::unique_ptr<FIFFLIB::FiffSparseMatrix> presel;  /**< Sparse selector applied before compensation. */
+    std::unique_ptr<FIFFLIB::FiffSparseMatrix> postsel; /**< Sparse selector applied after compensation. */
+    Eigen::VectorXf presel_data;                        /**< Intermediate buffer for pre-selection results. */
+    Eigen::VectorXf comp_data;                          /**< Intermediate buffer for compensation results. */
+    Eigen::VectorXf postsel_data;                       /**< Intermediate buffer for post-selection results. */
 };
 
 //=============================================================================================================

@@ -151,7 +151,7 @@ void PsdResultWidget::clearComparisonResult()
 
 void PsdResultWidget::emitRerunCommand()
 {
-    if(m_toolName != "neurokernel.psd_summary") {
+    if (m_toolName != "neurokernel.psd_summary") {
         return;
     }
 
@@ -162,7 +162,7 @@ void PsdResultWidget::emitRerunCommand()
 
     arguments.insert("window_samples", windowSamples);
     arguments.insert("nfft", m_nfftSpin->value());
-    if(!match.isEmpty()) {
+    if (!match.isEmpty()) {
         arguments.insert("match", match);
     } else {
         arguments.remove("match");
@@ -174,13 +174,13 @@ void PsdResultWidget::emitRerunCommand()
 
 void PsdResultWidget::updateComparisonFromSelection()
 {
-    if(m_compareCombo->currentIndex() <= 0) {
+    if (m_compareCombo->currentIndex() <= 0) {
         clearComparisonResult();
         return;
     }
 
     const QJsonObject comparison = m_compareCombo->currentData().toJsonObject();
-    if(!comparison.isEmpty()) {
+    if (!comparison.isEmpty()) {
         setComparisonResult(comparison);
     }
 }
@@ -207,9 +207,9 @@ void PsdResultWidget::rebuildControls()
         const QSignalBlocker blocker(m_compareCombo);
         m_compareCombo->clear();
         m_compareCombo->addItem("No comparison");
-        for(int i = m_history.size() - 1; i >= 0; --i) {
+        for (int i = m_history.size() - 1; i >= 0; --i) {
             const QJsonObject entry = m_history.at(i).toObject();
-            if(entry.isEmpty() || entry == m_result) {
+            if (entry.isEmpty() || entry == m_result) {
                 continue;
             }
 
@@ -237,13 +237,13 @@ void PsdResultWidget::applySpectrumResult(const QJsonObject& result, bool compar
     const int pointCount = std::min(freqArray.size(), valueArray.size());
     frequencies.reserve(pointCount);
     values.reserve(pointCount);
-    for(int i = 0; i < pointCount; ++i) {
+    for (int i = 0; i < pointCount; ++i) {
         frequencies.append(freqArray.at(i).toDouble());
         values.append(valueArray.at(i).toDouble());
     }
 
     const QString label = result.value("message").toString(m_toolName);
-    if(comparison) {
+    if (comparison) {
         m_plot->setComparisonSpectrum(frequencies, values, label);
     } else {
         m_plot->setSpectrum(frequencies, values, label);

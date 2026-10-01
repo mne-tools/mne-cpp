@@ -200,9 +200,12 @@ void TestSensorStreaming::testWorkerAveraging()
     worker.setNumberAverages(3);
 
     // Add 3 samples
-    Eigen::VectorXf d1(nSensors); d1 << 1.0f, 2.0f, 3.0f;
-    Eigen::VectorXf d2(nSensors); d2 << 4.0f, 5.0f, 6.0f;
-    Eigen::VectorXf d3(nSensors); d3 << 7.0f, 8.0f, 9.0f;
+    Eigen::VectorXf d1(nSensors);
+    d1 << 1.0f, 2.0f, 3.0f;
+    Eigen::VectorXf d2(nSensors);
+    d2 << 4.0f, 5.0f, 6.0f;
+    Eigen::VectorXf d3(nSensors);
+    d3 << 7.0f, 8.0f, 9.0f;
 
     worker.addData(d1);
     worker.addData(d2);
@@ -346,9 +349,9 @@ void TestSensorStreaming::testWorkerSymmetricNormalization()
 
     // 1:1 mapping with different weights
     auto mapping = std::make_shared<Eigen::MatrixXf>(nVertices, nSensors);
-    (*mapping)(0, 0) = 1.0f;   // Will get +1.0 * data
-    (*mapping)(1, 0) = 0.0f;   // Will get 0.0
-    (*mapping)(2, 0) = -1.0f;  // Will get -1.0 * data
+    (*mapping)(0, 0) = 1.0f;  // Will get +1.0 * data
+    (*mapping)(1, 0) = 0.0f;  // Will get 0.0
+    (*mapping)(2, 0) = -1.0f; // Will get -1.0 * data
 
     worker.setMappingMatrix(mapping);
 

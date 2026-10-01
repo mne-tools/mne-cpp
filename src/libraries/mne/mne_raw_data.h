@@ -81,8 +81,8 @@ struct FilterData;
 class MNESHARED_EXPORT MNERawData
 {
 public:
-    typedef QSharedPointer<MNERawData> SPtr;              /**< Shared pointer type for MNERawData. */
-    typedef QSharedPointer<const MNERawData> ConstSPtr;   /**< Const shared pointer type for MNERawData. */
+    typedef QSharedPointer<MNERawData> SPtr;            /**< Shared pointer type for MNERawData. */
+    typedef QSharedPointer<const MNERawData> ConstSPtr; /**< Const shared pointer type for MNERawData. */
 
     //=========================================================================================================
     /**
@@ -104,7 +104,7 @@ public:
      *
      * @param[out] highpass_effective  Set to non-zero if the highpass filter is active.
      */
-    void add_filter_response(int *highpass_effective);
+    void add_filter_response(int* highpass_effective);
 
     /**
      * Allocate filter output buffers spanning the entire raw data range
@@ -146,9 +146,9 @@ public:
      * @return OK on success, FAIL on error.
      */
     int pick_data(mneChSelection sel,
-                  int            firsts,
-                  int            ns,
-                  float          **picked);
+                  int firsts,
+                  int ns,
+                  float** picked);
 
     /**
      * Extract raw data with SSP projection applied to each time sample
@@ -162,9 +162,9 @@ public:
      * @return OK on success, FAIL on error.
      */
     int pick_data_proj(mneChSelection sel,
-                       int            firsts,
-                       int            ns,
-                       float          **picked);
+                       int firsts,
+                       int ns,
+                       float** picked);
 
     /**
      * Load a single filter-sized buffer by picking projected unfiltered data
@@ -189,9 +189,9 @@ public:
      * @return OK on success, FAIL on error.
      */
     int pick_data_filt(mneChSelection sel,
-                       int            firsts,
-                       int            ns,
-                       float          **picked);
+                       int firsts,
+                       int ns,
+                       float** picked);
 
     /**
      * Open a raw FIFF file with explicit compensation grade.
@@ -223,39 +223,39 @@ public:
     static MNERawData* open_file(const QString& name, int omit_skip, int allow_maxshield, const MNEFilterDef& filter);
 
 public:
-    QString         filename;             /**< Path to the raw FIFF file. */
+    QString filename; /**< Path to the raw FIFF file. */
     //  FIFFLIB::fiffFile       file;
-    std::unique_ptr<QFile> file;          /**< Owned QFile backing the FIFF stream. */
-    FIFFLIB::FiffStream::SPtr stream;     /**< Open FIFF stream for reading. */
-    std::unique_ptr<MNELIB::MNERawInfo> info;      /**< Raw data information loaded using MNE routines. */
-    QStringList     ch_names;           /**< Channel names as a flat list. */
-    QStringList     badlist;            /**< Bad channel names. */
-    int             nbad;               /**< Number of bad channels. */
-    Eigen::VectorXi  bad;               /**< Boolean array marking bad channels (0 = good, 1 = bad). */
-    std::vector<MNELIB::MNERawBufDef> bufs;  /**< Raw data buffer definitions. */
-    std::vector<MNELIB::MNERawBufDef> filt_bufs;  /**< Filtered data buffer definitions. */
-    int             first_samp;         /**< First sample index in the file. */
-    int             omit_samp;          /**< Number of skip samples omitted from the beginning. */
-    int             first_samp_old;     /**< First sample index (old-version compatible value). */
-    int             omit_samp_old;      /**< Omitted samples (old-version compatible value). */
-    int             nsamp;              /**< Total number of samples in the file. */
-    Eigen::VectorXf  first_sample_val;  /**< Values at the first sample (for DC offset correction before filtering). */
-    std::unique_ptr<MNELIB::MNEProjOp> proj;            /**< SSP projection operator. */
-    std::unique_ptr<MNELIB::MNESssData> sss;            /**< SSS data found in this file. */
-    std::unique_ptr<MNELIB::MNECTFCompDataSet> comp;    /**< CTF compensation data. */
-    int             comp_file;          /**< Compensation grade stored in the file. */
-    int             comp_now;           /**< Current compensation grade applied to data. */
-    std::unique_ptr<MNEFilterDef> filter; /**< Filter definition (highpass/lowpass). */
-    std::unique_ptr<FilterData> filter_data;  /**< Pre-computed frequency-domain filter state. */
-    std::unique_ptr<MNEEventList> event_list; /**< Trigger event list. */
-    unsigned int    max_event;          /**< Maximum event number in use. */
-    QString         dig_trigger;        /**< Name of the digital trigger channel. */
-    unsigned int     dig_trigger_mask;  /**< Bit mask applied to digital trigger channel. */
-    Eigen::VectorXf  offsets;           /**< DC offset corrections for display. */
-    std::unique_ptr<RingBuffer> ring;        /**< Ring buffer for raw data. */
-    std::unique_ptr<RingBuffer> filt_ring;   /**< Ring buffer for filtered data. */
-    std::unique_ptr<MNELIB::MNEDerivSet> deriv;        /**< Derivation data definitions. */
-    std::unique_ptr<MNELIB::MNEDeriv> deriv_matched;   /**< Derivation data matched to this raw data. */
+    std::unique_ptr<QFile> file;                     /**< Owned QFile backing the FIFF stream. */
+    FIFFLIB::FiffStream::SPtr stream;                /**< Open FIFF stream for reading. */
+    std::unique_ptr<MNELIB::MNERawInfo> info;        /**< Raw data information loaded using MNE routines. */
+    QStringList ch_names;                            /**< Channel names as a flat list. */
+    QStringList badlist;                             /**< Bad channel names. */
+    int nbad;                                        /**< Number of bad channels. */
+    Eigen::VectorXi bad;                             /**< Boolean array marking bad channels (0 = good, 1 = bad). */
+    std::vector<MNELIB::MNERawBufDef> bufs;          /**< Raw data buffer definitions. */
+    std::vector<MNELIB::MNERawBufDef> filt_bufs;     /**< Filtered data buffer definitions. */
+    int first_samp;                                  /**< First sample index in the file. */
+    int omit_samp;                                   /**< Number of skip samples omitted from the beginning. */
+    int first_samp_old;                              /**< First sample index (old-version compatible value). */
+    int omit_samp_old;                               /**< Omitted samples (old-version compatible value). */
+    int nsamp;                                       /**< Total number of samples in the file. */
+    Eigen::VectorXf first_sample_val;                /**< Values at the first sample (for DC offset correction before filtering). */
+    std::unique_ptr<MNELIB::MNEProjOp> proj;         /**< SSP projection operator. */
+    std::unique_ptr<MNELIB::MNESssData> sss;         /**< SSS data found in this file. */
+    std::unique_ptr<MNELIB::MNECTFCompDataSet> comp; /**< CTF compensation data. */
+    int comp_file;                                   /**< Compensation grade stored in the file. */
+    int comp_now;                                    /**< Current compensation grade applied to data. */
+    std::unique_ptr<MNEFilterDef> filter;            /**< Filter definition (highpass/lowpass). */
+    std::unique_ptr<FilterData> filter_data;         /**< Pre-computed frequency-domain filter state. */
+    std::unique_ptr<MNEEventList> event_list;        /**< Trigger event list. */
+    unsigned int max_event;                          /**< Maximum event number in use. */
+    QString dig_trigger;                             /**< Name of the digital trigger channel. */
+    unsigned int dig_trigger_mask;                   /**< Bit mask applied to digital trigger channel. */
+    Eigen::VectorXf offsets;                         /**< DC offset corrections for display. */
+    std::unique_ptr<RingBuffer> ring;                /**< Ring buffer for raw data. */
+    std::unique_ptr<RingBuffer> filt_ring;           /**< Ring buffer for filtered data. */
+    std::unique_ptr<MNELIB::MNEDerivSet> deriv;      /**< Derivation data definitions. */
+    std::unique_ptr<MNELIB::MNEDeriv> deriv_matched; /**< Derivation data matched to this raw data. */
 };
 
 //=============================================================================================================

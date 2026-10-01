@@ -45,14 +45,16 @@ class TestMneHemisphereEpoch : public QObject
 private:
     QString m_sDataPath;
 
-    bool hasData() const { return !m_sDataPath.isEmpty(); }
+    bool hasData() const
+    {
+        return !m_sDataPath.isEmpty();
+    }
 
 private slots:
     void initTestCase()
     {
         qInstallMessageHandler(MNELogger::customLogWriter);
-        QString base = QCoreApplication::applicationDirPath()
-                       + "/../resources/data/mne-cpp-test-data";
+        QString base = QCoreApplication::applicationDirPath() + "/../resources/data/mne-cpp-test-data";
         if (QFile::exists(base + "/MEG/sample/sample_audvis_trunc_raw.fif"))
             m_sDataPath = base;
     }
@@ -78,8 +80,12 @@ private slots:
         // Assign coefficient wise. GCC loses track of a comma initializer here
         // and reports a false -Wmaybe-uninitialized from inside Eigen.
         h.itris = MatrixX3i::Zero(2, 3);
-        h.itris(0, 0) = 0; h.itris(0, 1) = 1; h.itris(0, 2) = 2;
-        h.itris(1, 0) = 1; h.itris(1, 1) = 2; h.itris(1, 2) = 3;
+        h.itris(0, 0) = 0;
+        h.itris(0, 1) = 1;
+        h.itris(0, 2) = 2;
+        h.itris(1, 0) = 1;
+        h.itris(1, 1) = 2;
+        h.itris(1, 2) = 3;
 
         MNEHemisphere h2(h);
         QCOMPARE(h2.np, 4);
@@ -97,13 +103,18 @@ private slots:
     void hemisphere_equalityPopulated()
     {
         MNEHemisphere a;
-        a.np = 3; a.ntri = 1; a.type = 1; a.id = 101;
+        a.np = 3;
+        a.ntri = 1;
+        a.type = 1;
+        a.id = 101;
         a.rr = MatrixX3f::Ones(3, 3);
         a.nn = MatrixX3f::Zero(3, 3);
-        a.itris = MatrixX3i(1, 3); a.itris << 0, 1, 2;
+        a.itris = MatrixX3i(1, 3);
+        a.itris << 0, 1, 2;
         a.nuse = 3;
         a.inuse = VectorXi::Ones(3);
-        a.vertno = VectorXi(3); a.vertno << 0, 1, 2;
+        a.vertno = VectorXi(3);
+        a.vertno << 0, 1, 2;
 
         MNEHemisphere b = a;
         // Verify copy has same basic members
@@ -161,9 +172,9 @@ private slots:
         bs.np = 4;
         bs.ntri = 4;
         bs.rr.resize(4, 3);
-        bs.rr << 1,0,0, -1,0,0, 0,1,0, 0,0,1;
+        bs.rr << 1, 0, 0, -1, 0, 0, 0, 1, 0, 0, 0, 1;
         bs.itris.resize(4, 3);
-        bs.itris << 0,1,2, 0,1,3, 0,2,3, 1,2,3;
+        bs.itris << 0, 1, 2, 0, 1, 3, 0, 2, 3, 1, 2, 3;
 
         bool ok = bs.addTriangleData();
         QVERIFY(ok);
@@ -183,9 +194,9 @@ private slots:
         bs.np = 4;
         bs.ntri = 4;
         bs.rr.resize(4, 3);
-        bs.rr << 1,0,0, -1,0,0, 0,1,0, 0,0,1;
+        bs.rr << 1, 0, 0, -1, 0, 0, 0, 1, 0, 0, 0, 1;
         bs.itris.resize(4, 3);
-        bs.itris << 0,1,2, 0,1,3, 0,2,3, 1,2,3;
+        bs.itris << 0, 1, 2, 0, 1, 3, 0, 2, 3, 1, 2, 3;
 
         bs.addTriangleData();
         // add_geometry_info creates neighbor_tri and neighbor_vert
@@ -201,7 +212,9 @@ private slots:
     void bemSurface_clear()
     {
         MNEBemSurface bs;
-        bs.id = 5; bs.np = 10; bs.ntri = 5;
+        bs.id = 5;
+        bs.np = 10;
+        bs.ntri = 5;
         bs.clear();
         QCOMPARE(bs.id, -1);
         QCOMPARE(bs.np, -1);
@@ -221,7 +234,8 @@ private slots:
     {
         MatrixXd data = MatrixXd::Random(10, 5);
         VectorXi verts(10);
-        for (int i = 0; i < 10; ++i) verts(i) = i;
+        for (int i = 0; i < 10; ++i)
+            verts(i) = i;
 
         InvSourceEstimate se(data, verts, 0.0f, 0.001f);
         QVERIFY(!se.isEmpty());
@@ -232,7 +246,8 @@ private slots:
     void sourceEstimate_copyCtor()
     {
         MatrixXd data = MatrixXd::Random(5, 3);
-        VectorXi verts(5); verts << 0, 1, 2, 3, 4;
+        VectorXi verts(5);
+        verts << 0, 1, 2, 3, 4;
         InvSourceEstimate se(data, verts, 0.1f, 0.002f);
 
         InvSourceEstimate copy(se);
@@ -245,7 +260,8 @@ private slots:
     {
         MatrixXd data = MatrixXd::Random(8, 10);
         VectorXi verts(8);
-        for (int i = 0; i < 8; ++i) verts(i) = i;
+        for (int i = 0; i < 8; ++i)
+            verts(i) = i;
 
         InvSourceEstimate se(data, verts, 0.0f, 0.001f);
         InvSourceEstimate reduced = se.reduce(2, 4);
@@ -256,7 +272,8 @@ private slots:
     void sourceEstimate_clear()
     {
         MatrixXd data = MatrixXd::Random(5, 3);
-        VectorXi verts(5); verts << 0, 1, 2, 3, 4;
+        VectorXi verts(5);
+        verts << 0, 1, 2, 3, 4;
         InvSourceEstimate se(data, verts, 0.0f, 0.001f);
         QVERIFY(!se.isEmpty());
         se.clear();
@@ -267,7 +284,8 @@ private slots:
     void sourceEstimate_assign()
     {
         MatrixXd data = MatrixXd::Random(5, 3);
-        VectorXi verts(5); verts << 0, 1, 2, 3, 4;
+        VectorXi verts(5);
+        verts << 0, 1, 2, 3, 4;
         InvSourceEstimate se(data, verts, 0.0f, 0.001f);
 
         InvSourceEstimate se2;
@@ -391,8 +409,10 @@ private slots:
 
     void namedMatrix_build()
     {
-        QStringList rows; rows << "R1" << "R2";
-        QStringList cols; cols << "C1" << "C2" << "C3";
+        QStringList rows;
+        rows << "R1" << "R2";
+        QStringList cols;
+        cols << "C1" << "C2" << "C3";
         MatrixXf data(2, 3);
         data << 1, 2, 3, 4, 5, 6;
 
@@ -406,8 +426,10 @@ private slots:
 
     void namedMatrix_copyCtor()
     {
-        QStringList rows; rows << "A" << "B";
-        QStringList cols; cols << "X" << "Y";
+        QStringList rows;
+        rows << "A" << "B";
+        QStringList cols;
+        cols << "X" << "Y";
         MatrixXf data(2, 2);
         data << 1, 2, 3, 4;
 
@@ -420,15 +442,19 @@ private slots:
 
     void namedMatrix_pick()
     {
-        QStringList rows; rows << "R1" << "R2" << "R3";
-        QStringList cols; cols << "C1" << "C2" << "C3";
+        QStringList rows;
+        rows << "R1" << "R2" << "R3";
+        QStringList cols;
+        cols << "C1" << "C2" << "C3";
         MatrixXf data(3, 3);
         data << 1, 2, 3, 4, 5, 6, 7, 8, 9;
 
         auto nm = MNENamedMatrix::build(3, 3, rows, cols, data);
 
-        QStringList pickRows; pickRows << "R1" << "R3";
-        QStringList pickCols; pickCols << "C2";
+        QStringList pickRows;
+        pickRows << "R1" << "R3";
+        QStringList pickCols;
+        pickCols << "C2";
         auto picked = nm->pick(pickRows, 2, pickCols, 1);
         QVERIFY(picked != nullptr);
         QCOMPARE(picked->nrow, 2);
@@ -440,7 +466,8 @@ private slots:
     //=========================================================================
     void covMatrix_createDense()
     {
-        QStringList names; names << "CH1" << "CH2" << "CH3";
+        QStringList names;
+        names << "CH1" << "CH2" << "CH3";
         // Packed lower triangle for 3x3: elements [0,0], [1,0], [1,1], [2,0], [2,1], [2,2]
         VectorXd cov(6);
         cov << 1, 0, 1, 0, 0, 1; // identity
@@ -453,7 +480,8 @@ private slots:
 
     void covMatrix_createDiag()
     {
-        QStringList names; names << "CH1" << "CH2";
+        QStringList names;
+        names << "CH1" << "CH2";
         VectorXd diag(2);
         diag << 4.0, 9.0;
 
@@ -465,8 +493,10 @@ private slots:
 
     void covMatrix_dup()
     {
-        QStringList names; names << "A" << "B";
-        VectorXd diag(2); diag << 2.0, 3.0;
+        QStringList names;
+        names << "A" << "B";
+        VectorXd diag(2);
+        diag << 2.0, 3.0;
 
         auto cm = MNECovMatrix::create_diag(1, 2, names, diag);
         auto dup = cm->dup();
@@ -487,8 +517,10 @@ private slots:
     void projOp_addItem()
     {
         MNEProjOp op;
-        QStringList rows; rows << "R1";
-        QStringList cols; cols << "CH1" << "CH2" << "CH3";
+        QStringList rows;
+        rows << "R1";
+        QStringList cols;
+        cols << "CH1" << "CH2" << "CH3";
         MatrixXf data(1, 3);
         data << 1.0f, 0.0f, 0.0f;
 
@@ -500,8 +532,10 @@ private slots:
     void projOp_dup()
     {
         MNEProjOp op;
-        QStringList rows; rows << "R1";
-        QStringList cols; cols << "CH1" << "CH2";
+        QStringList rows;
+        rows << "R1";
+        QStringList cols;
+        cols << "CH1" << "CH2";
         MatrixXf data(1, 2);
         data << 1.0f, 0.0f;
 
@@ -571,10 +605,12 @@ private slots:
     //=========================================================================
     void data_sourceSpace_readFromFile()
     {
-        if (!hasData()) QSKIP("No test data");
+        if (!hasData())
+            QSKIP("No test data");
         QString path = m_sDataPath + "/subjects/sample/bem/sample-oct-6-src.fif";
         QFile file(path);
-        if (!file.exists()) QSKIP("Source space file not found");
+        if (!file.exists())
+            QSKIP("Source space file not found");
 
         MNESourceSpaces srcSpace;
         FiffStream::SPtr srcStream(new FiffStream(&file));
@@ -595,10 +631,12 @@ private slots:
 
     void data_sourceSpace_hemisphereDetails()
     {
-        if (!hasData()) QSKIP("No test data");
+        if (!hasData())
+            QSKIP("No test data");
         QString path = m_sDataPath + "/subjects/sample/bem/sample-oct-6-src.fif";
         QFile file(path);
-        if (!file.exists()) QSKIP("Source space file not found");
+        if (!file.exists())
+            QSKIP("Source space file not found");
 
         MNESourceSpaces srcSpace;
         FiffStream::SPtr srcStream2(new FiffStream(&file));
@@ -620,10 +658,12 @@ private slots:
     //=========================================================================
     void data_bem_readSingleLayer()
     {
-        if (!hasData()) QSKIP("No test data");
+        if (!hasData())
+            QSKIP("No test data");
         QString path = m_sDataPath + "/subjects/sample/bem/sample-5120-bem.fif";
         QFile file(path);
-        if (!file.exists()) QSKIP("BEM file not found");
+        if (!file.exists())
+            QSKIP("BEM file not found");
 
         MNEBem bem(file);
         QVERIFY(bem.size() > 0);
@@ -636,10 +676,12 @@ private slots:
 
     void data_bem_readThreeLayer()
     {
-        if (!hasData()) QSKIP("No test data");
+        if (!hasData())
+            QSKIP("No test data");
         QString path = m_sDataPath + "/subjects/sample/bem/sample-1280-1280-1280-bem.fif";
         QFile file(path);
-        if (!file.exists()) QSKIP("3-layer BEM not found");
+        if (!file.exists())
+            QSKIP("3-layer BEM not found");
 
         MNEBem bem(file);
         QCOMPARE(bem.size(), 3);
@@ -651,10 +693,12 @@ private slots:
 
     void data_bem_addTriangleData()
     {
-        if (!hasData()) QSKIP("No test data");
+        if (!hasData())
+            QSKIP("No test data");
         QString path = m_sDataPath + "/subjects/sample/bem/sample-5120-bem.fif";
         QFile file(path);
-        if (!file.exists()) QSKIP("BEM file not found");
+        if (!file.exists())
+            QSKIP("BEM file not found");
 
         MNEBem bem(file);
         if (bem.size() > 0) {
@@ -669,10 +713,12 @@ private slots:
 
     void data_bem_addGeometryInfo()
     {
-        if (!hasData()) QSKIP("No test data");
+        if (!hasData())
+            QSKIP("No test data");
         QString path = m_sDataPath + "/subjects/sample/bem/sample-5120-bem.fif";
         QFile file(path);
-        if (!file.exists()) QSKIP("BEM file not found");
+        if (!file.exists())
+            QSKIP("BEM file not found");
 
         MNEBem bem(file);
         if (bem.size() > 0) {
@@ -689,10 +735,12 @@ private slots:
     //=========================================================================
     void data_fwdSol_readFromFile()
     {
-        if (!hasData()) QSKIP("No test data");
+        if (!hasData())
+            QSKIP("No test data");
         QString path = m_sDataPath + "/Result/ref-sample_audvis-meg-eeg-oct-6-fwd.fif";
         QFile file(path);
-        if (!file.exists()) QSKIP("Forward solution not found");
+        if (!file.exists())
+            QSKIP("Forward solution not found");
 
         MNEForwardSolution fwd(file);
         QVERIFY(!fwd.isEmpty());
@@ -704,10 +752,12 @@ private slots:
 
     void data_fwdSol_pickChannels()
     {
-        if (!hasData()) QSKIP("No test data");
+        if (!hasData())
+            QSKIP("No test data");
         QString path = m_sDataPath + "/Result/ref-sample_audvis-meg-eeg-oct-6-fwd.fif";
         QFile file(path);
-        if (!file.exists()) QSKIP("Forward solution not found");
+        if (!file.exists())
+            QSKIP("Forward solution not found");
 
         MNEForwardSolution fwd(file);
         if (!fwd.isEmpty() && fwd.info.nchan > 0) {
@@ -724,10 +774,12 @@ private slots:
 
     void data_fwdSol_computeOrientPrior()
     {
-        if (!hasData()) QSKIP("No test data");
+        if (!hasData())
+            QSKIP("No test data");
         QString path = m_sDataPath + "/Result/ref-sample_audvis-meg-eeg-oct-6-fwd.fif";
         QFile file(path);
-        if (!file.exists()) QSKIP("Forward solution not found");
+        if (!file.exists())
+            QSKIP("Forward solution not found");
 
         MNEForwardSolution fwd(file);
         if (!fwd.isEmpty()) {
@@ -741,9 +793,11 @@ private slots:
     //=========================================================================
     void data_epochList_fromRawData()
     {
-        if (!hasData()) QSKIP("No test data");
+        if (!hasData())
+            QSKIP("No test data");
         QFile file(m_sDataPath + "/MEG/sample/sample_audvis_trunc_raw.fif");
-        if (!file.exists()) QSKIP("Raw file not found");
+        if (!file.exists())
+            QSKIP("Raw file not found");
 
         FiffRawData raw(file);
         fiff_int_t epochSamples = (fiff_int_t)(0.5 * raw.info.sfreq);
@@ -773,9 +827,11 @@ private slots:
 
     void data_epochList_dropRejected()
     {
-        if (!hasData()) QSKIP("No test data");
+        if (!hasData())
+            QSKIP("No test data");
         QFile file(m_sDataPath + "/MEG/sample/sample_audvis_trunc_raw.fif");
-        if (!file.exists()) QSKIP("Raw file not found");
+        if (!file.exists())
+            QSKIP("Raw file not found");
 
         FiffRawData raw(file);
         fiff_int_t epochSamples = (fiff_int_t)(0.3 * raw.info.sfreq);
@@ -799,9 +855,11 @@ private slots:
 
     void data_epochList_pickChannels()
     {
-        if (!hasData()) QSKIP("No test data");
+        if (!hasData())
+            QSKIP("No test data");
         QFile file(m_sDataPath + "/MEG/sample/sample_audvis_trunc_raw.fif");
-        if (!file.exists()) QSKIP("Raw file not found");
+        if (!file.exists())
+            QSKIP("Raw file not found");
 
         FiffRawData raw(file);
         fiff_int_t epochSamples = (fiff_int_t)(0.2 * raw.info.sfreq);
@@ -820,7 +878,8 @@ private slots:
 
         // Pick first 10 channels
         RowVectorXi sel(10);
-        for (int i = 0; i < 10; ++i) sel(i) = i;
+        for (int i = 0; i < 10; ++i)
+            sel(i) = i;
         epochList.pick_channels(sel);
         for (int i = 0; i < epochList.size(); ++i)
             QCOMPARE(epochList[i]->epoch.rows(), (Eigen::Index)10);
@@ -831,10 +890,12 @@ private slots:
     //=========================================================================
     void data_noiseCov_readFromFile()
     {
-        if (!hasData()) QSKIP("No test data");
+        if (!hasData())
+            QSKIP("No test data");
         QString path = m_sDataPath + "/MEG/sample/sample_audvis-cov.fif";
         QFile file(path);
-        if (!file.exists()) QSKIP("Covariance file not found");
+        if (!file.exists())
+            QSKIP("Covariance file not found");
 
         FiffCov cov(file);
         QVERIFY(!cov.isEmpty());
@@ -845,13 +906,16 @@ private slots:
 
     void data_noiseCov_pickChannels()
     {
-        if (!hasData()) QSKIP("No test data");
+        if (!hasData())
+            QSKIP("No test data");
         QString path = m_sDataPath + "/MEG/sample/sample_audvis-cov.fif";
         QFile file(path);
-        if (!file.exists()) QSKIP("Covariance file not found");
+        if (!file.exists())
+            QSKIP("Covariance file not found");
 
         FiffCov cov(file);
-        if (cov.isEmpty()) QSKIP("Failed to read cov");
+        if (cov.isEmpty())
+            QSKIP("Failed to read cov");
 
         int nPick = qMin(30, cov.names.size());
         QStringList pickNames = cov.names.mid(0, nPick);
@@ -865,13 +929,16 @@ private slots:
     //=========================================================================
     void data_proj_fromRawInfo()
     {
-        if (!hasData()) QSKIP("No test data");
+        if (!hasData())
+            QSKIP("No test data");
         QFile file(m_sDataPath + "/MEG/sample/sample_audvis_trunc_raw.fif");
-        if (!file.exists()) QSKIP("Raw file not found");
+        if (!file.exists())
+            QSKIP("Raw file not found");
 
         FiffRawData raw(file);
         QList<FiffProj>& projs = raw.info.projs;
-        if (projs.isEmpty()) QSKIP("No projectors in raw");
+        if (projs.isEmpty())
+            QSKIP("No projectors in raw");
 
         // Activate all projectors
         FiffProj::activate_projs(projs);
@@ -891,7 +958,8 @@ private slots:
     //=========================================================================
     void data_invOp_makeFromFwdCov()
     {
-        if (!hasData()) QSKIP("No test data");
+        if (!hasData())
+            QSKIP("No test data");
 
         QString fwdPath = m_sDataPath + "/Result/ref-sample_audvis-meg-eeg-oct-6-fwd.fif";
         QString covPath = m_sDataPath + "/MEG/sample/sample_audvis-cov.fif";
@@ -907,7 +975,8 @@ private slots:
         FiffCov noiseCov(covFile);
         FiffRawData raw(rawFile);
 
-        if (fwd.isEmpty() || noiseCov.isEmpty()) QSKIP("Failed to load");
+        if (fwd.isEmpty() || noiseCov.isEmpty())
+            QSKIP("Failed to load");
 
         MNEInverseOperator invOp = MNEInverseOperator::make_inverse_operator(
             raw.info, fwd, noiseCov, 0.2f, 0.8f, false, true);
@@ -915,7 +984,9 @@ private slots:
         QVERIFY(invOp.nsource > 0);
     }
 
-    void cleanupTestCase() {}
+    void cleanupTestCase()
+    {
+    }
 };
 
 QTEST_GUILESS_MAIN(TestMneHemisphereEpoch)

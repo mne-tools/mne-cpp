@@ -46,7 +46,7 @@ using namespace FIFFLIB;
 //=============================================================================================================
 
 CompensatorView::CompensatorView(const QString& sSettingsPath,
-                                 QWidget *parent,
+                                 QWidget* parent,
                                  Qt::WindowFlags f)
 : AbstractView(parent, f)
 , m_iLastTo(0)
@@ -80,8 +80,8 @@ void CompensatorView::setCompensators(const QList<FIFFLIB::FiffCtfComp>& comps)
 {
     m_pComps = comps;
 
-    for(int i = 0; i < m_pComps.size(); ++i) {
-        if(!m_mapCompActive.contains(m_pComps.at(i).kind)) {
+    for (int i = 0; i < m_pComps.size(); ++i) {
+        if (!m_mapCompActive.contains(m_pComps.at(i).kind)) {
             m_mapCompActive.insert(m_pComps.at(i).kind, false);
         }
     }
@@ -93,7 +93,7 @@ void CompensatorView::setCompensators(const QList<FIFFLIB::FiffCtfComp>& comps)
 
 void CompensatorView::saveSettings()
 {
-    if(m_sSettingsPath.isEmpty()) {
+    if (m_sSettingsPath.isEmpty()) {
         return;
     }
 
@@ -101,10 +101,10 @@ void CompensatorView::saveSettings()
 
     settings.beginGroup(m_sSettingsPath + QString("/CompensatorView/compensatorActive"));
 
-    QMap<int,bool>::const_iterator iComp = m_mapCompActive.constBegin();
+    QMap<int, bool>::const_iterator iComp = m_mapCompActive.constBegin();
     while (iComp != m_mapCompActive.constEnd()) {
-         settings.setValue(QString::number(iComp.key()), iComp.value());
-         ++iComp;
+        settings.setValue(QString::number(iComp.key()), iComp.value());
+        ++iComp;
     }
 
     settings.endGroup();
@@ -114,7 +114,7 @@ void CompensatorView::saveSettings()
 
 void CompensatorView::loadSettings()
 {
-    if(m_sSettingsPath.isEmpty()) {
+    if (m_sSettingsPath.isEmpty()) {
         return;
     }
 
@@ -134,7 +134,7 @@ void CompensatorView::loadSettings()
 
 void CompensatorView::updateGuiMode(GuiMode mode)
 {
-    switch(mode) {
+    switch (mode) {
         case GuiMode::Clinical:
             break;
         default: // default is research mode
@@ -146,7 +146,7 @@ void CompensatorView::updateGuiMode(GuiMode mode)
 
 void CompensatorView::updateProcessingMode(ProcessingMode mode)
 {
-    switch(mode) {
+    switch (mode) {
         case ProcessingMode::Offline:
             break;
         default: // default is realtime mode
@@ -165,16 +165,16 @@ int CompensatorView::getLastTo() const
 
 void CompensatorView::redrawGUI()
 {
-    if(m_pComps.isEmpty()) {
+    if (m_pComps.isEmpty()) {
         return;
     }
 
     m_qListCompCheckBox.clear();
 
     // Compensation Selection
-    QGridLayout *topLayout = new QGridLayout;
+    QGridLayout* topLayout = new QGridLayout;
 
-    for(int i = 0; i < m_pComps.size(); ++i) {
+    for (int i = 0; i < m_pComps.size(); ++i) {
         QString numStr;
         QCheckBox* checkBox = new QCheckBox(numStr.setNum(m_pComps[i].kind));
 
@@ -196,12 +196,12 @@ void CompensatorView::redrawGUI()
 
 void CompensatorView::onCheckCompStatusChanged()
 {
-   if(QCheckBox* pCheckBox = qobject_cast<QCheckBox*>(sender())) {
+    if (QCheckBox* pCheckBox = qobject_cast<QCheckBox*>(sender())) {
         bool currentState = false;
         QString compName = pCheckBox->text();
 
-        for(int i = 0; i < m_qListCompCheckBox.size(); ++i) {
-            if(m_qListCompCheckBox[i]->text() != compName) {
+        for (int i = 0; i < m_qListCompCheckBox.size(); ++i) {
+            if (m_qListCompCheckBox[i]->text() != compName) {
                 m_qListCompCheckBox[i]->setChecked(false);
                 m_mapCompActive[compName.toInt()] = false;
             } else {
@@ -210,21 +210,20 @@ void CompensatorView::onCheckCompStatusChanged()
             }
         }
 
-        if(currentState) {
+        if (currentState) {
             emit compSelectionChanged(compName.toInt());
             m_iLastTo = compName.toInt();
         } else { //If none selected
             emit compSelectionChanged(0);
             m_iLastTo = 0;
         }
-   }
+    }
 
-   saveSettings();
+    saveSettings();
 }
 
 //=============================================================================================================
 
 void CompensatorView::clearView()
 {
-
 }

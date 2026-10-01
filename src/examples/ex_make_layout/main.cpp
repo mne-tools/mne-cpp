@@ -53,7 +53,7 @@ using namespace UTILSLIB;
  * @param[in] argv (argument vector) is an array of pointers to arrays of character objects. The array objects are null-terminated strings, representing the arguments that were entered on the command line when the program was started.
  * @return the value that was set to exit() (which is 0 if exit() is called via quit()).
  */
-int main(int argc, char *argv[])
+int main(int argc, char* argv[])
 {
     //
     // Please notice that this example only works in release mode.
@@ -80,17 +80,17 @@ int main(int argc, char *argv[])
     parser.process(a);
 
     //Read 3D locations
-    if(!parser.value(inputOption).contains(".fif") && !parser.value(inputOption).contains(".elc")) {
-        qDebug()<<"MakeLayout::Main - Input file type not supported";
+    if (!parser.value(inputOption).contains(".fif") && !parser.value(inputOption).contains(".elc")) {
+        qDebug() << "MakeLayout::Main - Input file type not supported";
         return 0;
     }
 
-    QList<QVector<float> > inputPoints;
-    QList<QVector<float> > outputPoints;
-    QList<QVector<float> > channel2DData;
+    QList<QVector<float>> inputPoints;
+    QList<QVector<float>> outputPoints;
+    QList<QVector<float>> channel2DData;
     QStringList names;
 
-    if(parser.value(inputOption).contains(".fif")) {
+    if (parser.value(inputOption).contains(".fif")) {
         QFile t_fileRaw(parser.value(inputOption));
 
         FiffRawData raw(t_fileRaw);
@@ -98,10 +98,10 @@ int main(int argc, char *argv[])
 
         int chKind = parser.value(chKindOption).toInt();
 
-        for(int i = 0; i<fiffInfo.ch_names.size(); i++) {
+        for (int i = 0; i < fiffInfo.ch_names.size(); i++) {
             int type = fiffInfo.chs.at(i).chpos.coil_type;
 
-            if(type == chKind) {
+            if (type == chKind) {
                 QVector<float> temp;
                 float x = fiffInfo.chs.at(i).chpos.r0[0] * 100.0f;
                 float y = fiffInfo.chs.at(i).chpos.r0[1] * 100.0f;
@@ -119,7 +119,7 @@ int main(int argc, char *argv[])
         }
     }
 
-    if(parser.value(inputOption).contains(".elc")) {
+    if (parser.value(inputOption).contains(".elc")) {
         QString unit;
 
         LayoutLoader::readAsaElcFile(parser.value(inputOption), names, inputPoints, channel2DData, unit);
@@ -130,7 +130,7 @@ int main(int argc, char *argv[])
     qDebug() << inputPoints;
 
     // convert 3D points to layout and write to file
-    if(inputPoints.size() > 0) {
+    if (inputPoints.size() > 0) {
         float prad = 60.0;
         float width = 5.0;
         float height = 4.0;
@@ -138,18 +138,18 @@ int main(int argc, char *argv[])
         QFile out(parser.value(outputOption));
 
         int numberTries = 0;
-        while(numberTries < 10) {
-            if(!LayoutMaker::makeLayout(inputPoints,
-                                       outputPoints,
-                                       names,
-                                       out,
-                                       true,
-                                       prad,
-                                       width,
-                                       height,
-                                       true,
-                                       (bool)parser.value(mirrorxOption).toInt(),
-                                       (bool)parser.value(mirrorxOption).toInt())) {
+        while (numberTries < 10) {
+            if (!LayoutMaker::makeLayout(inputPoints,
+                                         outputPoints,
+                                         names,
+                                         out,
+                                         true,
+                                         prad,
+                                         width,
+                                         height,
+                                         true,
+                                         (bool)parser.value(mirrorxOption).toInt(),
+                                         (bool)parser.value(mirrorxOption).toInt())) {
                 numberTries++;
             } else {
                 numberTries = 11;

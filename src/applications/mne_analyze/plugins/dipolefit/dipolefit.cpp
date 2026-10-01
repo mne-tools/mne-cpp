@@ -97,14 +97,14 @@ QString InvDipoleFit::getName() const
 
 //=============================================================================================================
 
-QMenu *InvDipoleFit::getMenu()
+QMenu* InvDipoleFit::getMenu()
 {
     return Q_NULLPTR;
 }
 
 //=============================================================================================================
 
-QDockWidget *InvDipoleFit::getControl()
+QDockWidget* InvDipoleFit::getControl()
 {
     DISPLIB::DipoleFitView* pDipoleView = new DISPLIB::DipoleFitView();
 
@@ -167,7 +167,7 @@ QDockWidget *InvDipoleFit::getControl()
 
 //=============================================================================================================
 
-QWidget *InvDipoleFit::getView()
+QWidget* InvDipoleFit::getView()
 {
     return Q_NULLPTR;
 }
@@ -177,15 +177,15 @@ QWidget *InvDipoleFit::getView()
 void InvDipoleFit::handleEvent(QSharedPointer<Event> e)
 {
     switch (e->getType()) {
-    case EVENT_TYPE::SELECTED_MODEL_CHANGED:
-        onModelChanged(e->getData().value<QSharedPointer<ANSHAREDLIB::AbstractModel> >());
-        break;
-    case EVENT_TYPE::MODEL_REMOVED:
-        onModelRemoved(e->getData().value<QSharedPointer<ANSHAREDLIB::AbstractModel>>());
-        break;
-    default:
-        qWarning() << "[InvDipoleFit::handleEvent] received an Event that is not handled by switch-cases";
-        break;
+        case EVENT_TYPE::SELECTED_MODEL_CHANGED:
+            onModelChanged(e->getData().value<QSharedPointer<ANSHAREDLIB::AbstractModel>>());
+            break;
+        case EVENT_TYPE::MODEL_REMOVED:
+            onModelRemoved(e->getData().value<QSharedPointer<ANSHAREDLIB::AbstractModel>>());
+            break;
+        default:
+            qWarning() << "[InvDipoleFit::handleEvent] received an Event that is not handled by switch-cases";
+            break;
     }
 }
 
@@ -227,27 +227,27 @@ void InvDipoleFit::onModalityChanged(bool bEEG, bool bMEG)
 //=============================================================================================================
 
 void InvDipoleFit::onTimeChanged(int iMin,
-                              int iMax,
-                              int iStep,
-                              int iInt)
+                                 int iMax,
+                                 int iStep,
+                                 int iInt)
 {
     QMutexLocker lock(&m_FitMutex);
 
-    m_DipoleSettings.tmin = static_cast<float>(iMin)/1000.f;
-    m_DipoleSettings.tmax = static_cast<float>(iMax)/1000.f;
-    m_DipoleSettings.tstep = static_cast<float>(iStep)/1000.f;
-    m_DipoleSettings.integ = static_cast<float>(iInt)/1000.f;
+    m_DipoleSettings.tmin = static_cast<float>(iMin) / 1000.f;
+    m_DipoleSettings.tmax = static_cast<float>(iMax) / 1000.f;
+    m_DipoleSettings.tstep = static_cast<float>(iStep) / 1000.f;
+    m_DipoleSettings.integ = static_cast<float>(iInt) / 1000.f;
 }
 
 //=============================================================================================================
 
 void InvDipoleFit::onFittingChanged(float fMinDistance,
-                                 float fSize)
+                                    float fSize)
 {
     QMutexLocker lock(&m_FitMutex);
 
-    m_DipoleSettings.guess_mindist = static_cast<float>(fMinDistance)/1000.f;
-    m_DipoleSettings.guess_rad = static_cast<float>(fSize)/1000.f;
+    m_DipoleSettings.guess_mindist = static_cast<float>(fMinDistance) / 1000.f;
+    m_DipoleSettings.guess_rad = static_cast<float>(fSize) / 1000.f;
 }
 
 //=============================================================================================================
@@ -256,27 +256,27 @@ void InvDipoleFit::onModelChanged(QSharedPointer<ANSHAREDLIB::AbstractModel> pNe
 {
     QMutexLocker lock(&m_FitMutex);
 
-    for(QSharedPointer<ANSHAREDLIB::AbstractModel> pModel : m_ModelList){
-        if (pModel == pNewModel){
+    for (QSharedPointer<ANSHAREDLIB::AbstractModel> pModel : m_ModelList) {
+        if (pModel == pNewModel) {
             return;
         }
     }
 
-    if(pNewModel->getType() == MODEL_TYPE::ANSHAREDLIB_FIFFRAW_MODEL) {
+    if (pNewModel->getType() == MODEL_TYPE::ANSHAREDLIB_FIFFRAW_MODEL) {
         emit newMeasurment(QFileInfo(pNewModel->getModelPath()).fileName());
         m_ModelList.append(pNewModel);
-    } else if(pNewModel->getType() == MODEL_TYPE::ANSHAREDLIB_BEMDATA_MODEL) {
+    } else if (pNewModel->getType() == MODEL_TYPE::ANSHAREDLIB_BEMDATA_MODEL) {
         emit newBemModel(QFileInfo(pNewModel->getModelPath()).fileName());
         m_ModelList.append(pNewModel);
-    } else if(pNewModel->getType() == MODEL_TYPE::ANSHAREDLIB_NOISE_MODEL) {
+    } else if (pNewModel->getType() == MODEL_TYPE::ANSHAREDLIB_NOISE_MODEL) {
         emit newCovarianceModel(QFileInfo(pNewModel->getModelPath()).fileName());
         m_ModelList.append(pNewModel);
-    } else if(pNewModel->getType() == MODEL_TYPE::ANSHAREDLIB_MRICOORD_MODEL) {
+    } else if (pNewModel->getType() == MODEL_TYPE::ANSHAREDLIB_MRICOORD_MODEL) {
         emit newMriModel(QFileInfo(pNewModel->getModelPath()).fileName());
         m_ModelList.append(pNewModel);
-    } else if(pNewModel->getType() == MODEL_TYPE::ANSHAREDLIB_AVERAGING_MODEL) {
+    } else if (pNewModel->getType() == MODEL_TYPE::ANSHAREDLIB_AVERAGING_MODEL) {
         QSharedPointer<ANSHAREDLIB::AveragingDataModel> pAverageModel = qSharedPointerCast<AveragingDataModel>(pNewModel);
-        if (pAverageModel->isFromFile()){
+        if (pAverageModel->isFromFile()) {
             emit newMeasurment(QFileInfo(pNewModel->getModelPath()).fileName());
             m_ModelList.append(pNewModel);
         }
@@ -290,39 +290,37 @@ void InvDipoleFit::newDipoleFit(INVLIB::InvEcdSet set, const QString& sFitName)
     QSharedPointer<ANSHAREDLIB::DipoleFitModel> pModel = QSharedPointer<ANSHAREDLIB::DipoleFitModel>(new ANSHAREDLIB::DipoleFitModel(set));
     m_pAnalyzeData->addModel<ANSHAREDLIB::DipoleFitModel>(pModel,
                                                           sFitName);
-
 }
 
 //=============================================================================================================
 
 void InvDipoleFit::onBaselineChanged(int iBMin,
-                                  int iBMax)
+                                     int iBMax)
 {
     QMutexLocker lock(&m_FitMutex);
 
-    m_DipoleSettings.bmin = static_cast<float>(iBMin)/1000.f;
-    m_DipoleSettings.bmax = static_cast<float>(iBMax)/1000.f;
+    m_DipoleSettings.bmin = static_cast<float>(iBMin) / 1000.f;
+    m_DipoleSettings.bmax = static_cast<float>(iBMax) / 1000.f;
 }
 
 //=============================================================================================================
 
 void InvDipoleFit::onNoiseChanged(double dGrad,
-                               double dMag,
-                               double dEeg)
+                                  double dMag,
+                                  double dEeg)
 {
     QMutexLocker lock(&m_FitMutex);
 
-    m_DipoleSettings.grad_std = 1e-13*dGrad;
-    m_DipoleSettings.mag_std = 1e-15*dMag;
-    m_DipoleSettings.eeg_std = 1e-6*dEeg;
-
+    m_DipoleSettings.grad_std = 1e-13 * dGrad;
+    m_DipoleSettings.mag_std = 1e-15 * dMag;
+    m_DipoleSettings.eeg_std = 1e-6 * dEeg;
 }
 
 //=============================================================================================================
 
 void InvDipoleFit::onRegChanged(double dRegGrad,
-                             double dRegMag,
-                             double dRegEeg)
+                                double dRegMag,
+                                double dRegEeg)
 {
     QMutexLocker lock(&m_FitMutex);
 
@@ -338,35 +336,34 @@ void InvDipoleFit::onSetChanged(int iSet)
     QMutexLocker lock(&m_FitMutex);
 
     m_DipoleSettings.setno = iSet;
-
 }
 
 //=============================================================================================================
 
 void InvDipoleFit::onSphereChanged(double dX,
-                                double dY,
-                                double dZ,
-                                double dRadius)
+                                   double dY,
+                                   double dZ,
+                                   double dRadius)
 {
     QMutexLocker lock(&m_FitMutex);
 
-    m_DipoleSettings.r0[0] = dX/1000.0;
-    m_DipoleSettings.r0[1] = dY/1000.0;
-    m_DipoleSettings.r0[2] = dZ/1000.0;
+    m_DipoleSettings.r0[0] = dX / 1000.0;
+    m_DipoleSettings.r0[1] = dY / 1000.0;
+    m_DipoleSettings.r0[2] = dZ / 1000.0;
 
-    m_DipoleSettings.eeg_sphere_rad = dRadius/1000.0;
+    m_DipoleSettings.eeg_sphere_rad = dRadius / 1000.0;
 }
 
 //=============================================================================================================
 
-void InvDipoleFit::onNewBemSelected(const QString &sName)
+void InvDipoleFit::onNewBemSelected(const QString& sName)
 {
-    if(sName == "None"){
+    if (sName == "None") {
         m_DipoleSettings.bemname = "";
         return;
     }
-    for(QSharedPointer<ANSHAREDLIB::AbstractModel> pModel : m_ModelList){
-        if (QFileInfo(pModel->getModelPath()).fileName() == sName){
+    for (QSharedPointer<ANSHAREDLIB::AbstractModel> pModel : m_ModelList) {
+        if (QFileInfo(pModel->getModelPath()).fileName() == sName) {
             m_DipoleSettings.bemname = pModel->getModelPath();
             return;
         }
@@ -375,14 +372,14 @@ void InvDipoleFit::onNewBemSelected(const QString &sName)
 
 //=============================================================================================================
 
-void InvDipoleFit::onNewMriSelected(const QString &sName)
+void InvDipoleFit::onNewMriSelected(const QString& sName)
 {
-    if(sName == "None"){
+    if (sName == "None") {
         m_DipoleSettings.mriname = "";
         return;
     }
-    for(QSharedPointer<ANSHAREDLIB::AbstractModel> pModel : m_ModelList){
-        if (QFileInfo(pModel->getModelPath()).fileName() == sName){
+    for (QSharedPointer<ANSHAREDLIB::AbstractModel> pModel : m_ModelList) {
+        if (QFileInfo(pModel->getModelPath()).fileName() == sName) {
             m_DipoleSettings.mriname = pModel->getModelPath();
             return;
         }
@@ -391,14 +388,14 @@ void InvDipoleFit::onNewMriSelected(const QString &sName)
 
 //=============================================================================================================
 
-void InvDipoleFit::onNewNoiseSelected(const QString &sName)
+void InvDipoleFit::onNewNoiseSelected(const QString& sName)
 {
-    if(sName == "None"){
+    if (sName == "None") {
         m_DipoleSettings.noisename = "";
         return;
     }
-    for(QSharedPointer<ANSHAREDLIB::AbstractModel> pModel : m_ModelList){
-        if (QFileInfo(pModel->getModelPath()).fileName() == sName){
+    for (QSharedPointer<ANSHAREDLIB::AbstractModel> pModel : m_ModelList) {
+        if (QFileInfo(pModel->getModelPath()).fileName() == sName) {
             m_DipoleSettings.noisename = pModel->getModelPath();
             return;
         }
@@ -407,20 +404,20 @@ void InvDipoleFit::onNewNoiseSelected(const QString &sName)
 
 //=============================================================================================================
 
-void InvDipoleFit::onNewMeasSelected(const QString &sName)
+void InvDipoleFit::onNewMeasSelected(const QString& sName)
 {
-    if(sName == "None"){
+    if (sName == "None") {
         m_DipoleSettings.measname = "";
         return;
     }
 
     //qDebug() << "InvDipoleFit::onNewMeasSelected";
-    for(QSharedPointer<ANSHAREDLIB::AbstractModel> pModel : m_ModelList){
-        if (QFileInfo(pModel->getModelPath()).fileName() == sName){
-            if(pModel->getType() == MODEL_TYPE::ANSHAREDLIB_AVERAGING_MODEL){
+    for (QSharedPointer<ANSHAREDLIB::AbstractModel> pModel : m_ModelList) {
+        if (QFileInfo(pModel->getModelPath()).fileName() == sName) {
+            if (pModel->getType() == MODEL_TYPE::ANSHAREDLIB_AVERAGING_MODEL) {
                 m_DipoleSettings.measname = pModel->getModelPath();
                 m_DipoleSettings.is_raw = false;
-            } else if(pModel->getType() == MODEL_TYPE::ANSHAREDLIB_FIFFRAW_MODEL) {
+            } else if (pModel->getType() == MODEL_TYPE::ANSHAREDLIB_FIFFRAW_MODEL) {
                 m_DipoleSettings.measname = pModel->getModelPath();
                 m_DipoleSettings.is_raw = true;
             }
@@ -448,32 +445,32 @@ INVLIB::InvEcdSet InvDipoleFit::dipoleFitCalculation()
 
     QFile file(m_DipoleSettings.mriname);
 
-    if(file.exists()) {
+    if (file.exists()) {
         FIFFLIB::FiffCoordTrans coordTrans(file);
 
-        for(int i = 0; i < ecdSet.size() ; ++i) {
+        for (int i = 0; i < ecdSet.size(); ++i) {
             MatrixX3f dipoles(1, 3);
             //transform location
-            dipoles(0,0) = ecdSet[i].rd(0);
-            dipoles(0,1) = ecdSet[i].rd(1);
-            dipoles(0,2) = ecdSet[i].rd(2);
+            dipoles(0, 0) = ecdSet[i].rd(0);
+            dipoles(0, 1) = ecdSet[i].rd(1);
+            dipoles(0, 2) = ecdSet[i].rd(2);
 
             dipoles = coordTrans.apply_trans(dipoles);
 
-            ecdSetTrans[i].rd(0) = dipoles(0,0);
-            ecdSetTrans[i].rd(1) = dipoles(0,1);
-            ecdSetTrans[i].rd(2) = dipoles(0,2);
+            ecdSetTrans[i].rd(0) = dipoles(0, 0);
+            ecdSetTrans[i].rd(1) = dipoles(0, 1);
+            ecdSetTrans[i].rd(2) = dipoles(0, 2);
 
             //transform orientation
-            dipoles(0,0) = ecdSet[i].Q(0);
-            dipoles(0,1) = ecdSet[i].Q(1);
-            dipoles(0,2) = ecdSet[i].Q(2);
+            dipoles(0, 0) = ecdSet[i].Q(0);
+            dipoles(0, 1) = ecdSet[i].Q(1);
+            dipoles(0, 2) = ecdSet[i].Q(2);
 
             dipoles = coordTrans.apply_trans(dipoles, false);
 
-            ecdSetTrans[i].Q(0) = dipoles(0,0);
-            ecdSetTrans[i].Q(1) = dipoles(0,1);
-            ecdSetTrans[i].Q(2) = dipoles(0,2);
+            ecdSetTrans[i].Q(0) = dipoles(0, 0);
+            ecdSetTrans[i].Q(1) = dipoles(0, 1);
+            ecdSetTrans[i].Q(2) = dipoles(0, 2);
         }
     } else {
         qWarning("[InvDipoleFit::onPerformDipoleFit] Cannot open FiffCoordTrans file");
@@ -495,19 +492,19 @@ void InvDipoleFit::dipoleFitResults()
 
 void InvDipoleFit::onModelRemoved(QSharedPointer<ANSHAREDLIB::AbstractModel> pRemovedModel)
 {
-    for(QSharedPointer<ANSHAREDLIB::AbstractModel> pModel : m_ModelList){
-        if (pModel == pRemovedModel){
+    for (QSharedPointer<ANSHAREDLIB::AbstractModel> pModel : m_ModelList) {
+        if (pModel == pRemovedModel) {
             m_ModelList.removeAt(m_ModelList.indexOf(pModel));
 
-            if(pRemovedModel->getType() == MODEL_TYPE::ANSHAREDLIB_FIFFRAW_MODEL) {
+            if (pRemovedModel->getType() == MODEL_TYPE::ANSHAREDLIB_FIFFRAW_MODEL) {
                 emit removeModel(QFileInfo(pRemovedModel->getModelPath()).fileName(), 1);
-            } else if(pRemovedModel->getType() == MODEL_TYPE::ANSHAREDLIB_AVERAGING_MODEL) {
+            } else if (pRemovedModel->getType() == MODEL_TYPE::ANSHAREDLIB_AVERAGING_MODEL) {
                 emit removeModel(QFileInfo(pRemovedModel->getModelPath()).fileName(), 1);
-            } else if(pRemovedModel->getType() == MODEL_TYPE::ANSHAREDLIB_BEMDATA_MODEL) {
+            } else if (pRemovedModel->getType() == MODEL_TYPE::ANSHAREDLIB_BEMDATA_MODEL) {
                 emit removeModel(QFileInfo(pRemovedModel->getModelPath()).fileName(), 2);
-            } else if(pRemovedModel->getType() == MODEL_TYPE::ANSHAREDLIB_NOISE_MODEL) {
+            } else if (pRemovedModel->getType() == MODEL_TYPE::ANSHAREDLIB_NOISE_MODEL) {
                 emit removeModel(QFileInfo(pRemovedModel->getModelPath()).fileName(), 4);
-            } else if(pRemovedModel->getType() == MODEL_TYPE::ANSHAREDLIB_MRICOORD_MODEL) {
+            } else if (pRemovedModel->getType() == MODEL_TYPE::ANSHAREDLIB_MRICOORD_MODEL) {
                 emit removeModel(QFileInfo(pRemovedModel->getModelPath()).fileName(), 3);
             }
             return;
@@ -533,5 +530,5 @@ void InvDipoleFit::triggerLoadingEnd(QString sMessage)
 
 QString InvDipoleFit::getBuildInfo()
 {
-    return QString(DIPOLEFITPLUGIN::buildDateTime()) + QString(" - ")  + QString(DIPOLEFITPLUGIN::buildHash());
+    return QString(DIPOLEFITPLUGIN::buildDateTime()) + QString(" - ") + QString(DIPOLEFITPLUGIN::buildHash());
 }

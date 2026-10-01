@@ -55,7 +55,8 @@ class TestFiffRawIO : public QObject
 private:
     QString m_sDataPath;
 
-    bool hasData() const {
+    bool hasData() const
+    {
         return !m_sDataPath.isEmpty();
     }
 
@@ -65,8 +66,7 @@ private slots:
     void initTestCase()
     {
         qInstallMessageHandler(MNELogger::customLogWriter);
-        QString base = QCoreApplication::applicationDirPath()
-                       + "/../resources/data/mne-cpp-test-data";
+        QString base = QCoreApplication::applicationDirPath() + "/../resources/data/mne-cpp-test-data";
         if (QFile::exists(base + "/MEG/sample/sample_audvis_trunc_raw.fif")) {
             m_sDataPath = base;
         }
@@ -80,7 +80,8 @@ private slots:
     //=========================================================================
     void fiffStream_openRaw()
     {
-        if (!hasData()) QSKIP("No test data");
+        if (!hasData())
+            QSKIP("No test data");
 
         QFile file(m_sDataPath + "/MEG/sample/sample_audvis_trunc_raw.fif");
         QVERIFY(file.exists());
@@ -101,7 +102,8 @@ private slots:
 
     void fiffStream_findDirTree()
     {
-        if (!hasData()) QSKIP("No test data");
+        if (!hasData())
+            QSKIP("No test data");
 
         QFile file(m_sDataPath + "/MEG/sample/sample_audvis_trunc_raw.fif");
         FiffStream::SPtr stream(new FiffStream(&file));
@@ -124,7 +126,8 @@ private slots:
 
     void fiffStream_readTags()
     {
-        if (!hasData()) QSKIP("No test data");
+        if (!hasData())
+            QSKIP("No test data");
 
         QFile file(m_sDataPath + "/MEG/sample/sample_audvis_trunc_raw.fif");
         FiffStream::SPtr stream(new FiffStream(&file));
@@ -147,7 +150,8 @@ private slots:
     //=========================================================================
     void fiffRawData_readRawFile()
     {
-        if (!hasData()) QSKIP("No test data");
+        if (!hasData())
+            QSKIP("No test data");
 
         QFile file(m_sDataPath + "/MEG/sample/sample_audvis_trunc_raw.fif");
         FiffRawData raw(file);
@@ -162,7 +166,8 @@ private slots:
 
     void fiffRawData_readSegment()
     {
-        if (!hasData()) QSKIP("No test data");
+        if (!hasData())
+            QSKIP("No test data");
 
         QFile file(m_sDataPath + "/MEG/sample/sample_audvis_trunc_raw.fif");
         FiffRawData raw(file);
@@ -179,7 +184,8 @@ private slots:
 
     void fiffRawData_readSegmentWithPicks()
     {
-        if (!hasData()) QSKIP("No test data");
+        if (!hasData())
+            QSKIP("No test data");
 
         QFile file(m_sDataPath + "/MEG/sample/sample_audvis_trunc_raw.fif");
         FiffRawData raw(file);
@@ -198,7 +204,8 @@ private slots:
 
     void fiffRawData_readMultipleSegments()
     {
-        if (!hasData()) QSKIP("No test data");
+        if (!hasData())
+            QSKIP("No test data");
 
         QFile file(m_sDataPath + "/MEG/sample/sample_audvis_trunc_raw.fif");
         FiffRawData raw(file);
@@ -221,7 +228,8 @@ private slots:
 
     void fiffRawData_infoDetails()
     {
-        if (!hasData()) QSKIP("No test data");
+        if (!hasData())
+            QSKIP("No test data");
 
         QFile file(m_sDataPath + "/MEG/sample/sample_audvis_trunc_raw.fif");
         FiffRawData raw(file);
@@ -269,7 +277,8 @@ private slots:
     //=========================================================================
     void fiffRawData_writeRoundTrip()
     {
-        if (!hasData()) QSKIP("No test data");
+        if (!hasData())
+            QSKIP("No test data");
 
         QFile file(m_sDataPath + "/MEG/sample/sample_audvis_trunc_raw.fif");
         FiffRawData raw(file);
@@ -311,7 +320,8 @@ private slots:
     //=========================================================================
     void fiffEvokedSet_readFromFile()
     {
-        if (!hasData()) QSKIP("No test data");
+        if (!hasData())
+            QSKIP("No test data");
 
         QString path = m_sDataPath + "/MEG/sample/sample_audvis-ave.fif";
         QFile file(path);
@@ -333,7 +343,8 @@ private slots:
 
     void fiffEvokedSet_pickChannels()
     {
-        if (!hasData()) QSKIP("No test data");
+        if (!hasData())
+            QSKIP("No test data");
 
         QFile file(m_sDataPath + "/MEG/sample/sample_audvis-ave.fif");
         FiffEvokedSet evokedSet(file);
@@ -355,7 +366,8 @@ private slots:
 
     void fiffEvokedSet_subtractBaseline()
     {
-        if (!hasData()) QSKIP("No test data");
+        if (!hasData())
+            QSKIP("No test data");
 
         QFile file(m_sDataPath + "/MEG/sample/sample_audvis-ave.fif");
         FiffEvokedSet evokedSet(file);
@@ -365,7 +377,7 @@ private slots:
             FiffEvoked ev = evokedSet.evoked[0];
             MatrixXd origData = ev.data;
 
-            QPair<float,float> baseline(ev.times(0), 0.0f);
+            QPair<float, float> baseline(ev.times(0), 0.0f);
             // FiffEvoked doesn't have subtractBaseline directly on set,
             // so just verify data integrity
             QCOMPARE(ev.data.rows(), origData.rows());
@@ -378,7 +390,8 @@ private slots:
     //=========================================================================
     void fiffCov_readFromFile()
     {
-        if (!hasData()) QSKIP("No test data");
+        if (!hasData())
+            QSKIP("No test data");
 
         QFile file(m_sDataPath + "/MEG/sample/sample_audvis-cov.fif");
 
@@ -398,7 +411,8 @@ private slots:
 
     void fiffCov_readAndPickChannels()
     {
-        if (!hasData()) QSKIP("No test data");
+        if (!hasData())
+            QSKIP("No test data");
 
         // Read raw to get info, then read cov
         QFile rawFile(m_sDataPath + "/MEG/sample/sample_audvis_trunc_raw.fif");
@@ -426,7 +440,8 @@ private slots:
     //=========================================================================
     void fiffCoordTrans_readAllTrans()
     {
-        if (!hasData()) QSKIP("No test data");
+        if (!hasData())
+            QSKIP("No test data");
 
         // Read the head<->MRI transform
         QFile file(m_sDataPath + "/MEG/sample/all-trans.fif");
@@ -457,11 +472,13 @@ private slots:
 
     void fiffCoordTrans_readIcpTrans()
     {
-        if (!hasData()) QSKIP("No test data");
+        if (!hasData())
+            QSKIP("No test data");
 
         QString path = m_sDataPath + "/Result/icp-trans.fif";
         QFile file(path);
-        if (!file.exists()) QSKIP("icp-trans.fif not found");
+        if (!file.exists())
+            QSKIP("icp-trans.fif not found");
 
         FiffStream::SPtr stream(new FiffStream(&file));
         QVERIFY(stream->open());
@@ -490,7 +507,8 @@ private slots:
     //=========================================================================
     void fiffStream_openHpiFile()
     {
-        if (!hasData()) QSKIP("No test data");
+        if (!hasData())
+            QSKIP("No test data");
 
         QFile file(m_sDataPath + "/MEG/sample/test_hpiFit_raw.fif");
         FiffRawData raw(file);
@@ -513,7 +531,8 @@ private slots:
     //=========================================================================
     void fiffStream_exploreEvokedTree()
     {
-        if (!hasData()) QSKIP("No test data");
+        if (!hasData())
+            QSKIP("No test data");
 
         QFile file(m_sDataPath + "/MEG/sample/sample_audvis-ave.fif");
         FiffStream::SPtr stream(new FiffStream(&file));
@@ -548,11 +567,13 @@ private slots:
     //=========================================================================
     void fiffStream_exploreFwdTree()
     {
-        if (!hasData()) QSKIP("No test data");
+        if (!hasData())
+            QSKIP("No test data");
 
         QString path = m_sDataPath + "/Result/ref-sample_audvis-meg-eeg-oct-6-fwd.fif";
         QFile file(path);
-        if (!file.exists()) QSKIP("Forward solution file not found");
+        if (!file.exists())
+            QSKIP("Forward solution file not found");
 
         FiffStream::SPtr stream(new FiffStream(&file));
         QVERIFY(stream->open());
@@ -573,11 +594,13 @@ private slots:
     //=========================================================================
     void fiffStream_exploreBemTree()
     {
-        if (!hasData()) QSKIP("No test data");
+        if (!hasData())
+            QSKIP("No test data");
 
         QString path = m_sDataPath + "/subjects/sample/bem/sample-5120-bem.fif";
         QFile file(path);
-        if (!file.exists()) QSKIP("BEM file not found");
+        if (!file.exists())
+            QSKIP("BEM file not found");
 
         FiffStream::SPtr stream(new FiffStream(&file));
         QVERIFY(stream->open());
@@ -594,11 +617,13 @@ private slots:
     //=========================================================================
     void fiffStream_exploreSourceSpaceTree()
     {
-        if (!hasData()) QSKIP("No test data");
+        if (!hasData())
+            QSKIP("No test data");
 
         QString path = m_sDataPath + "/subjects/sample/bem/sample-oct-6-src.fif";
         QFile file(path);
-        if (!file.exists()) QSKIP("Source space file not found");
+        if (!file.exists())
+            QSKIP("Source space file not found");
 
         FiffStream::SPtr stream(new FiffStream(&file));
         QVERIFY(stream->open());
@@ -624,7 +649,8 @@ private slots:
     //=========================================================================
     void fiffInfo_readAndExercise()
     {
-        if (!hasData()) QSKIP("No test data");
+        if (!hasData())
+            QSKIP("No test data");
 
         QFile file(m_sDataPath + "/MEG/sample/sample_audvis_trunc_raw.fif");
         FiffRawData raw(file);
@@ -666,11 +692,13 @@ private slots:
     //=========================================================================
     void fiffRawData_readFilterReference()
     {
-        if (!hasData()) QSKIP("No test data");
+        if (!hasData())
+            QSKIP("No test data");
 
         QString path = m_sDataPath + "/Result/ref_rtfilter_filterdata_raw.fif";
         QFile file(path);
-        if (!file.exists()) QSKIP("Filter reference data not found");
+        if (!file.exists())
+            QSKIP("Filter reference data not found");
 
         FiffRawData raw(file);
         QVERIFY(raw.info.nchan > 0);
@@ -718,7 +746,8 @@ private slots:
     //=========================================================================
     void fiffRawData_persistentFileHandleWorks()
     {
-        if (!hasData()) QSKIP("No test data");
+        if (!hasData())
+            QSKIP("No test data");
 
         // Persistent QFile — mirrors the fixed application code
         QFile file(m_sDataPath + "/MEG/sample/sample_audvis_trunc_raw.fif");
@@ -745,7 +774,8 @@ private slots:
     //=========================================================================
     void fiffRawData_emptyRawDirectoryFailsGracefully()
     {
-        if (!hasData()) QSKIP("No test data");
+        if (!hasData())
+            QSKIP("No test data");
 
         // Borrow a valid measurement info from the real test file so the
         // written file has a well-formed meas-info block ...
@@ -785,7 +815,9 @@ private slots:
     }
 
     //=========================================================================
-    void cleanupTestCase() {}
+    void cleanupTestCase()
+    {
+    }
 };
 
 QTEST_GUILESS_MAIN(TestFiffRawIO)

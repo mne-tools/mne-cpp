@@ -31,9 +31,9 @@ using namespace MNEBROWSE;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-RawSettings::RawSettings(QObject *parent)
+RawSettings::RawSettings(QObject* parent)
 : QObject(parent)
-, m_qSettings("mne-cpp","mne_browse")
+, m_qSettings("mne-cpp", "mne_browse")
 {
     init();
 }
@@ -53,51 +53,51 @@ void RawSettings::write()
     //Window settings
     m_qSettings.beginGroup("MainWindow");
 
-        m_qSettings.setValue("size",QSize(m_mainwindow_size_w, m_mainwindow_size_h));
-        m_qSettings.setValue("position",QPoint(m_mainwindow_position_x, m_mainwindow_position_y));
+    m_qSettings.setValue("size", QSize(m_mainwindow_size_w, m_mainwindow_size_h));
+    m_qSettings.setValue("position", QPoint(m_mainwindow_position_x, m_mainwindow_position_y));
 
     m_qSettings.endGroup();
 
     //EventDesignParameters
     m_qSettings.beginGroup("EventDesignParameters");
 
-        //Event colors
-        QVariant variant;
-        variant = m_event_color_default;
-        m_qSettings.setValue("event_color_default",variant);
+    //Event colors
+    QVariant variant;
+    variant = m_event_color_default;
+    m_qSettings.setValue("event_color_default", variant);
 
-        variant = m_event_color_1;
-        m_qSettings.setValue("event_color_1",variant);
+    variant = m_event_color_1;
+    m_qSettings.setValue("event_color_1", variant);
 
-        variant = m_event_color_2;
-        m_qSettings.setValue("event_color_2",variant);
+    variant = m_event_color_2;
+    m_qSettings.setValue("event_color_2", variant);
 
-        variant = m_event_color_3;
-        m_qSettings.setValue("event_color_3",variant);
+    variant = m_event_color_3;
+    m_qSettings.setValue("event_color_3", variant);
 
-        variant = m_event_color_4;
-        m_qSettings.setValue("event_color_4",variant);
+    variant = m_event_color_4;
+    m_qSettings.setValue("event_color_4", variant);
 
-        variant = m_event_color_5;
-        m_qSettings.setValue("event_color_5",variant);
+    variant = m_event_color_5;
+    m_qSettings.setValue("event_color_5", variant);
 
-        variant = m_event_color_32;
-        m_qSettings.setValue("event_color_32",variant);
+    variant = m_event_color_32;
+    m_qSettings.setValue("event_color_32", variant);
 
-        variant = m_event_color_998;
-        m_qSettings.setValue("event_color_998",variant);
+    variant = m_event_color_998;
+    m_qSettings.setValue("event_color_998", variant);
 
-        variant = m_event_color_999;
-        m_qSettings.setValue("event_color_999",variant);
+    variant = m_event_color_999;
+    m_qSettings.setValue("event_color_999", variant);
 
     m_qSettings.endGroup();
 
     //Data window marker
     m_qSettings.beginGroup("DataMarker");
 
-        //data marker color and width colors
-        variant = m_data_marker_color;
-        m_qSettings.setValue("data_marker_color",variant);
+    //data marker color and width colors
+    variant = m_data_marker_color;
+    m_qSettings.setValue("data_marker_color", variant);
 
     m_qSettings.endGroup();
 }
@@ -132,6 +132,6 @@ void RawSettings::init()
 
     //Data marker color
     m_qSettings.beginGroup("DataMarker");
-    m_data_marker_color = m_qSettings.value("data_marker_color", QColor(93,177,47)).value<QColor>();
+    m_data_marker_color = m_qSettings.value("data_marker_color", QColor(93, 177, 47)).value<QColor>();
     m_qSettings.endGroup();
 }

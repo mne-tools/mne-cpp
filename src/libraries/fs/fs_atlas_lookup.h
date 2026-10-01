@@ -106,14 +106,14 @@ public:
     bool isLoaded() const;
 
 private:
-    QVector<int> m_voxelData;           /**< Flat voxel data (label indices). */
-    int m_dimX = 0;                     /**< Volume dimension X. */
-    int m_dimY = 0;                     /**< Volume dimension Y. */
-    int m_dimZ = 0;                     /**< Volume dimension Z. */
+    QVector<int> m_voxelData; /**< Flat voxel data (label indices). */
+    int m_dimX = 0;           /**< Volume dimension X. */
+    int m_dimY = 0;           /**< Volume dimension Y. */
+    int m_dimZ = 0;           /**< Volume dimension Z. */
 
-    Eigen::Matrix4f m_ras2vox;          /**< RAS-to-voxel affine (inverse of vox2ras). */
+    Eigen::Matrix4f m_ras2vox; /**< RAS-to-voxel affine (inverse of vox2ras). */
 
-    QMap<int, QString> m_lookupTable;   /**< Label index → region name. */
+    QMap<int, QString> m_lookupTable; /**< Label index → region name. */
 
     bool m_loaded = false;
 

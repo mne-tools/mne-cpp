@@ -46,9 +46,10 @@
 class QThread;
 class QTimer;
 
-namespace DISP3DLIB {
-    class RtSensorDataWorker;
-    class RtSensorInterpolationMatWorker;
+namespace DISP3DLIB
+{
+class RtSensorDataWorker;
+class RtSensorInterpolationMatWorker;
 }
 
 //=============================================================================================================
@@ -90,7 +91,7 @@ public:
      *
      * @param[in] parent     Parent QObject.
      */
-    explicit RtSensorDataController(QObject *parent = nullptr);
+    explicit RtSensorDataController(QObject* parent = nullptr);
 
     //=========================================================================================================
     /**
@@ -106,7 +107,7 @@ public:
      *
      * @param[in] data       Sensor measurement vector (nChannels x 1).
      */
-    void addData(const Eigen::VectorXf &data);
+    void addData(const Eigen::VectorXf& data);
 
     //=========================================================================================================
     /**
@@ -155,7 +156,7 @@ public:
      *
      * @param[in] name       Colormap name ("MNE", "Hot", "Jet", "Viridis", "Cool", "RedBlue").
      */
-    void setColormapType(const QString &name);
+    void setColormapType(const QString& name);
 
     //=========================================================================================================
     /**
@@ -208,7 +209,7 @@ public:
      *
      * @param[in] evoked    The evoked dataset.
      */
-    void setEvoked(const FIFFLIB::FiffEvoked &evoked);
+    void setEvoked(const FIFFLIB::FiffEvoked& evoked);
 
     //=========================================================================================================
     /**
@@ -217,7 +218,7 @@ public:
      * @param[in] trans              The transform.
      * @param[in] applySensorTrans   Whether to apply the transform.
      */
-    void setTransform(const FIFFLIB::FiffCoordTrans &trans, bool applySensorTrans);
+    void setTransform(const FIFFLIB::FiffCoordTrans& trans, bool applySensorTrans);
 
     //=========================================================================================================
     /**
@@ -237,10 +238,10 @@ public:
      * @param[in] normals       Vertex normals (nVerts x 3).
      * @param[in] triangles     Triangle indices (nTris x 3).
      */
-    void setMegSurface(const QString &surfaceKey,
-                       const Eigen::MatrixX3f &vertices,
-                       const Eigen::MatrixX3f &normals,
-                       const Eigen::MatrixX3i &triangles);
+    void setMegSurface(const QString& surfaceKey,
+                       const Eigen::MatrixX3f& vertices,
+                       const Eigen::MatrixX3f& normals,
+                       const Eigen::MatrixX3i& triangles);
 
     //=========================================================================================================
     /**
@@ -249,8 +250,8 @@ public:
      * @param[in] surfaceKey    The key identifying the surface.
      * @param[in] vertices      Vertex positions (nVerts x 3).
      */
-    void setEegSurface(const QString &surfaceKey,
-                       const Eigen::MatrixX3f &vertices);
+    void setEegSurface(const QString& surfaceKey,
+                       const Eigen::MatrixX3f& vertices);
 
     //=========================================================================================================
     /**
@@ -258,7 +259,7 @@ public:
      *
      * @param[in] bads    List of bad channel names.
      */
-    void setBadChannels(const QStringList &bads);
+    void setBadChannels(const QStringList& bads);
 
     //=========================================================================================================
     /**
@@ -276,8 +277,8 @@ signals:
      * @param[in] surfaceKey  Key identifying the target surface.
      * @param[in] colors      Per-vertex ABGR color array.
      */
-    void newSensorColorsAvailable(const QString &surfaceKey,
-                                  const QVector<uint32_t> &colors);
+    void newSensorColorsAvailable(const QString& surfaceKey,
+                                  const QVector<uint32_t>& colors);
 
     //=========================================================================================================
     /**
@@ -285,7 +286,7 @@ signals:
      *
      * @param[in] data        Raw sensor measurement vector.
      */
-    void newRawSensorDataAvailable(const Eigen::VectorXf &data);
+    void newRawSensorDataAvailable(const Eigen::VectorXf& data);
 
     //=========================================================================================================
     /**
@@ -295,9 +296,9 @@ signals:
      * @param[in] mappingMat    Dense mapping matrix (nVerts x nChannels).
      * @param[in] pick          Channel indices picked for this mapping.
      */
-    void newMegMappingAvailable(const QString &surfaceKey,
+    void newMegMappingAvailable(const QString& surfaceKey,
                                 std::shared_ptr<Eigen::MatrixXf> mappingMat,
-                                const QVector<int> &pick);
+                                const QVector<int>& pick);
 
     //=========================================================================================================
     /**
@@ -307,27 +308,27 @@ signals:
      * @param[in] mappingMat    Dense mapping matrix (nVerts x nChannels).
      * @param[in] pick          Channel indices picked for this mapping.
      */
-    void newEegMappingAvailable(const QString &surfaceKey,
+    void newEegMappingAvailable(const QString& surfaceKey,
                                 std::shared_ptr<Eigen::MatrixXf> mappingMat,
-                                const QVector<int> &pick);
+                                const QVector<int>& pick);
 
 private slots:
-    void onNewMegMapping(const QString &surfaceKey,
+    void onNewMegMapping(const QString& surfaceKey,
                          std::shared_ptr<Eigen::MatrixXf> mappingMat,
-                         const QVector<int> &pick);
-    void onNewEegMapping(const QString &surfaceKey,
+                         const QVector<int>& pick);
+    void onNewEegMapping(const QString& surfaceKey,
                          std::shared_ptr<Eigen::MatrixXf> mappingMat,
-                         const QVector<int> &pick);
+                         const QVector<int>& pick);
 
 private:
-    QThread *m_pWorkerThread = nullptr;                         /**< Background thread for the data worker. */
-    DISP3DLIB::RtSensorDataWorker *m_pWorker = nullptr;      /**< Data streaming worker. */
-    QTimer *m_pTimer = nullptr;                                 /**< Timer driving the streaming cadence. */
-    bool m_bIsStreaming = false;                                 /**< Whether streaming is active. */
-    int m_iTimeInterval = 17;                                   /**< Streaming interval in ms (~60fps). */
+    QThread* m_pWorkerThread = nullptr;                 /**< Background thread for the data worker. */
+    DISP3DLIB::RtSensorDataWorker* m_pWorker = nullptr; /**< Data streaming worker. */
+    QTimer* m_pTimer = nullptr;                         /**< Timer driving the streaming cadence. */
+    bool m_bIsStreaming = false;                        /**< Whether streaming is active. */
+    int m_iTimeInterval = 17;                           /**< Streaming interval in ms (~60fps). */
 
-    QThread *m_pInterpThread = nullptr;                          /**< Background thread for interpolation matrix worker. */
-    DISP3DLIB::RtSensorInterpolationMatWorker *m_pInterpWorker = nullptr; /**< Interpolation matrix worker. */
+    QThread* m_pInterpThread = nullptr;                                   /**< Background thread for interpolation matrix worker. */
+    DISP3DLIB::RtSensorInterpolationMatWorker* m_pInterpWorker = nullptr; /**< Interpolation matrix worker. */
 };
 
 #endif // BRAINVIEW_RTSENSORDATACONTROLLER_H

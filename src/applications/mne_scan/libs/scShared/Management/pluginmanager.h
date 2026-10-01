@@ -34,7 +34,7 @@
 
 namespace MNESCAN
 {
-    class MainWindow;
+class MainWindow;
 }
 
 //=============================================================================================================
@@ -67,8 +67,8 @@ class SCSHAREDSHARED_EXPORT PluginManager : public QPluginLoader
     friend class PluginDockWidget;
 
 public:
-    typedef QSharedPointer<PluginManager> SPtr;               /**< Shared pointer type for PluginManager. */
-    typedef QSharedPointer<const PluginManager> ConstSPtr;    /**< Const shared pointer type for PluginManager. */
+    typedef QSharedPointer<PluginManager> SPtr;            /**< Shared pointer type for PluginManager. */
+    typedef QSharedPointer<const PluginManager> ConstSPtr; /**< Const shared pointer type for PluginManager. */
 
     //=========================================================================================================
     /**
@@ -135,14 +135,14 @@ public:
     inline const QVector<IIO*>& getIOPlugins();
 
 signals:
-    void pluginLoaded(const QString &msg, int alignment = Qt::AlignLeft, const QColor &color = Qt::black );
+    void pluginLoaded(const QString& msg, int alignment = Qt::AlignLeft, const QColor& color = Qt::black);
 
 private:
-    QVector<AbstractPlugin*>    m_qVecPlugins;             /**< Vector of all plugins. */
+    QVector<AbstractPlugin*> m_qVecPlugins; /**< Vector of all plugins. */
 
-    QVector<AbstractSensor*>    m_qVecSensorPlugins;       /**< Vector of all AbstractSensor plugins. */
-    QVector<AbstractAlgorithm*> m_qVecAlgorithmPlugins;    /**< Vector of all AbstractAlgorithm plugins. */
-    QVector<IIO*>        m_qVecIOPlugins;           /**< Vector of all IIO plugins. */
+    QVector<AbstractSensor*> m_qVecSensorPlugins;       /**< Vector of all AbstractSensor plugins. */
+    QVector<AbstractAlgorithm*> m_qVecAlgorithmPlugins; /**< Vector of all AbstractAlgorithm plugins. */
+    QVector<IIO*> m_qVecIOPlugins;                      /**< Vector of all IIO plugins. */
 };
 
 //=============================================================================================================

@@ -45,7 +45,7 @@
 
 namespace MNEBROWSE
 {
-    using namespace FIFFLIB;
+using namespace FIFFLIB;
 
 
 //*************************************************************************************************************
@@ -71,7 +71,7 @@ public:
      *
      * @param [in] parent pointer to parent widget; If parent is 0, the new FilterWindow becomes a window. If parent is another widget, FilterWindow becomes a child window inside parent. FilterWindow is deleted when its parent is deleted.
      */
-    FilterWindow(MainWindow *mainWindow, QWidget *parent = 0);
+    FilterWindow(MainWindow* mainWindow, QWidget* parent = 0);
 
     //=========================================================================================================
     /**
@@ -109,7 +109,10 @@ public:
      *
      * @return Shared session-filter definition, or null if the current UI state is invalid.
      */
-    QSharedPointer<SessionFilter> currentPreviewFilter() const { return m_pUserDefinedFilter; }
+    QSharedPointer<SessionFilter> currentPreviewFilter() const
+    {
+        return m_pUserDefinedFilter;
+    }
 
 private:
     //=========================================================================================================
@@ -146,19 +149,19 @@ private:
     /**
      * resizeEvent reimplemented virtual function to handle resize events of the filter window
      */
-    void resizeEvent(QResizeEvent * event);
+    void resizeEvent(QResizeEvent* event);
 
     //=========================================================================================================
     /**
      * keyPressEvent reimplemented virtual function to handle key events
      */
-    virtual void keyPressEvent(QKeyEvent * event);
+    virtual void keyPressEvent(QKeyEvent* event);
 
     //=========================================================================================================
     /**
      * eventFilter reimplemented virtual function to handle object specific events
      */
-    bool eventFilter(QObject *obj, QEvent *event);
+    bool eventFilter(QObject* obj, QEvent* event);
 
     //=========================================================================================================
     /**
@@ -174,14 +177,14 @@ private:
      */
     QSharedPointer<SessionFilter> buildUserDefinedFilter() const;
 
-    std::unique_ptr<Ui::FilterWindowDockWidget> ui;         /**< Pointer to the qt designer generated ui class.*/
+    std::unique_ptr<Ui::FilterWindowDockWidget> ui; /**< Pointer to the qt designer generated ui class.*/
 
-    MainWindow*         m_pMainWindow;          /**< Pointer to the parent, the MainWindow class.*/
+    MainWindow* m_pMainWindow; /**< Pointer to the parent, the MainWindow class.*/
 
-    QSettings           m_qSettings;            /**< QSettings variable used to write or read from independent application sessions.*/
+    QSettings m_qSettings; /**< QSettings variable used to write or read from independent application sessions.*/
 
-    std::unique_ptr<FilterPlotScene> m_pFilterPlotScene;    /**< Owns the QGraphicsScene which holds the filter plotting.*/
-    QSharedPointer<SessionFilter>    m_pUserDefinedFilter;  /**< Current shared session-filter definition. */
+    std::unique_ptr<FilterPlotScene> m_pFilterPlotScene; /**< Owns the QGraphicsScene which holds the filter plotting.*/
+    QSharedPointer<SessionFilter> m_pUserDefinedFilter;  /**< Current shared session-filter definition. */
 
 protected slots:
     //=========================================================================================================

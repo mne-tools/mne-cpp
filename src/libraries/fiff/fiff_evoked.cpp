@@ -48,19 +48,17 @@ FiffEvoked::FiffEvoked()
 , last(-1)
 , baseline(qMakePair(-1.0f, -1.0f))
 {
-
 }
 
 //=============================================================================================================
 
 FiffEvoked::FiffEvoked(QIODevice& p_IODevice,
                        QVariant setno,
-                       QPair<float,float> t_baseline,
+                       QPair<float, float> t_baseline,
                        bool proj,
                        fiff_int_t p_aspect_kind)
 {
-    if(!FiffEvoked::read(p_IODevice, *this, setno, t_baseline, proj, p_aspect_kind))
-    {
+    if (!FiffEvoked::read(p_IODevice, *this, setno, t_baseline, proj, p_aspect_kind)) {
         baseline = t_baseline;
 
         throw std::runtime_error("Fiff evoked data not found");
@@ -81,14 +79,12 @@ FiffEvoked::FiffEvoked(const FiffEvoked& p_FiffEvoked)
 , proj(p_FiffEvoked.proj)
 , baseline(p_FiffEvoked.baseline)
 {
-
 }
 
 //=============================================================================================================
 
 FiffEvoked::~FiffEvoked()
 {
-
 }
 
 //=============================================================================================================
@@ -111,12 +107,11 @@ void FiffEvoked::clear()
 FiffEvoked FiffEvoked::pick_channels(const QStringList& include,
                                      const QStringList& exclude) const
 {
-    if(include.size() == 0 && exclude.size() == 0)
+    if (include.size() == 0 && exclude.size() == 0)
         return FiffEvoked(*this);
 
     RowVectorXi sel = FiffInfo::pick_channels(this->info.ch_names, include, exclude);
-    if (sel.cols() == 0)
-    {
+    if (sel.cols() == 0) {
         qWarning("Warning : No channels match the selection.\n");
         return FiffEvoked(*this);
     }
@@ -129,14 +124,13 @@ FiffEvoked FiffEvoked::pick_channels(const QStringList& include,
     //
     //   Create the reduced data set
     //
-    MatrixXd selBlock(1,1);
+    MatrixXd selBlock(1, 1);
 
-    if(selBlock.rows() != sel.cols() || selBlock.cols() != res.data.cols())
+    if (selBlock.rows() != sel.cols() || selBlock.cols() != res.data.cols())
         selBlock.resize(sel.cols(), res.data.cols());
-    for(qint32 l = 0; l < sel.cols(); ++l)
-    {
-        if(sel(0,l) <= res.data.rows()) {
-            selBlock.block(l,0,1,selBlock.cols()) = res.data.block(sel(0,l),0,1,selBlock.cols());
+    for (qint32 l = 0; l < sel.cols(); ++l) {
+        if (sel(0, l) <= res.data.rows()) {
+            selBlock.block(l, 0, 1, selBlock.cols()) = res.data.block(sel(0, l), 0, 1, selBlock.cols());
         } else {
             qWarning("FiffEvoked::pick_channels - Warning : Selected channel index out of bound.\n");
         }
@@ -152,7 +146,7 @@ FiffEvoked FiffEvoked::pick_channels(const QStringList& include,
 bool FiffEvoked::read(QIODevice& p_IODevice,
                       FiffEvoked& p_FiffEvoked,
                       QVariant setno,
-                      QPair<float,float> t_baseline,
+                      QPair<float, float> t_baseline,
                       bool proj,
                       fiff_int_t p_aspect_kind)
 {
@@ -164,60 +158,51 @@ bool FiffEvoked::read(QIODevice& p_IODevice,
     FiffStream::SPtr t_pStream(new FiffStream(&p_IODevice));
     QString t_sFileName = t_pStream->streamName();
 
-    qInfo("Reading %s ...\n",t_sFileName.toUtf8().constData());
+    qInfo("Reading %s ...\n", t_sFileName.toUtf8().constData());
 
-    if(!t_pStream->open())
+    if (!t_pStream->open())
         return false;
     //
     //   Read the measurement info
     //
     FiffInfo info;
     FiffDirNode::SPtr meas;
-    if(!t_pStream->read_meas_info(t_pStream->dirtree(), info, meas))
+    if (!t_pStream->read_meas_info(t_pStream->dirtree(), info, meas))
         return false;
     info.filename = t_sFileName; //move fname storage to read_meas_info member function
     //
     //   Locate the data of interest
     //
     QList<FiffDirNode::SPtr> processed = meas->dir_tree_find(FIFFB_PROCESSED_DATA);
-    if (processed.size() == 0)
-    {
+    if (processed.size() == 0) {
         qWarning("Could not find processed data");
         return false;
     }
     //
     QList<FiffDirNode::SPtr> evoked_node = meas->dir_tree_find(FIFFB_EVOKED);
-    if (evoked_node.size() == 0)
-    {
+    if (evoked_node.size() == 0) {
         qWarning("Could not find evoked data");
         return false;
     }
 
     // convert setno to an integer
-    if(!setno.isValid())
-    {
-        if (evoked_node.size() > 1)
-        {
+    if (!setno.isValid()) {
+        if (evoked_node.size() > 1) {
             QStringList comments;
             QList<fiff_int_t> aspect_kinds;
             QString t;
-            if(!t_pStream->get_evoked_entries(evoked_node, comments, aspect_kinds, t))
+            if (!t_pStream->get_evoked_entries(evoked_node, comments, aspect_kinds, t))
                 t = QString("None found, must use integer");
             qWarning("%lld datasets present, setno parameter must be set. Candidate setno names:\n%s", evoked_node.size(), t.toUtf8().constData());
             return false;
-        }
-        else
+        } else
             setno = 0;
-    }
-    else
-    {
+    } else {
         // find string-based entry
         bool t_bIsInteger = true;
         setno.toInt(&t_bIsInteger);
-        if(!t_bIsInteger)
-        {
-            if(p_aspect_kind != FIFFV_ASPECT_AVERAGE && p_aspect_kind != FIFFV_ASPECT_STD_ERR)
-            {
+        if (!t_bIsInteger) {
+            if (p_aspect_kind != FIFFV_ASPECT_AVERAGE && p_aspect_kind != FIFFV_ASPECT_STD_ERR) {
                 qWarning("kindStat must be \"FIFFV_ASPECT_AVERAGE\" or \"FIFFV_ASPECT_STD_ERR\"");
                 return false;
             }
@@ -228,25 +213,21 @@ bool FiffEvoked::read(QIODevice& p_IODevice,
             t_pStream->get_evoked_entries(evoked_node, comments, aspect_kinds, t);
 
             bool found = false;
-            for(qint32 i = 0; i < comments.size(); ++i)
-            {
-                if(comments[i].compare(setno.toString()) == 0 && p_aspect_kind == aspect_kinds[i])
-                {
+            for (qint32 i = 0; i < comments.size(); ++i) {
+                if (comments[i].compare(setno.toString()) == 0 && p_aspect_kind == aspect_kinds[i]) {
                     setno = i;
                     found = true;
                     break;
                 }
             }
-            if(!found)
-            {
+            if (!found) {
                 qWarning() << "setno " << setno << " (" << p_aspect_kind << ") not found, out of found datasets:\n " << t;
                 return false;
             }
         }
     }
 
-    if (setno.toInt() >= evoked_node.size() || setno.toInt() < 0)
-    {
+    if (setno.toInt() >= evoked_node.size() || setno.toInt() < 0) {
         qWarning("Data set selector out of range");
         return false;
     }
@@ -258,7 +239,7 @@ bool FiffEvoked::read(QIODevice& p_IODevice,
     //
     QList<FiffDirNode::SPtr> aspects = my_evoked->dir_tree_find(FIFFB_ASPECT);
 
-    if(aspects.size() > 1)
+    if (aspects.size() > 1)
         qInfo("\tMultiple (%lld) aspects found. Taking first one.\n", aspects.size());
 
     FiffDirNode::SPtr my_aspect = aspects[0];
@@ -269,39 +250,37 @@ bool FiffEvoked::read(QIODevice& p_IODevice,
     fiff_int_t nchan = 0;
     float sfreq = -1.0f;
     QList<FiffChInfo> chs;
-    fiff_int_t kind, pos, first=0, last=0;
+    fiff_int_t kind, pos, first = 0, last = 0;
     FiffTag::UPtr t_pTag;
     QString comment("");
     qint32 k;
-    for (k = 0; k < my_evoked->nent(); ++k)
-    {
+    for (k = 0; k < my_evoked->nent(); ++k) {
         kind = my_evoked->dir[k]->kind;
-        pos  = my_evoked->dir[k]->pos;
-        switch (kind)
-        {
+        pos = my_evoked->dir[k]->pos;
+        switch (kind) {
             case FIFF_COMMENT:
-                t_pStream->read_tag(t_pTag,pos);
+                t_pStream->read_tag(t_pTag, pos);
                 comment = t_pTag->toString();
                 break;
             case FIFF_FIRST_SAMPLE:
-                t_pStream->read_tag(t_pTag,pos);
+                t_pStream->read_tag(t_pTag, pos);
                 first = *t_pTag->toInt();
                 break;
             case FIFF_LAST_SAMPLE:
-                t_pStream->read_tag(t_pTag,pos);
+                t_pStream->read_tag(t_pTag, pos);
                 last = *t_pTag->toInt();
                 break;
             case FIFF_NCHAN:
-                t_pStream->read_tag(t_pTag,pos);
+                t_pStream->read_tag(t_pTag, pos);
                 nchan = *t_pTag->toInt();
                 break;
             case FIFF_SFREQ:
-                t_pStream->read_tag(t_pTag,pos);
+                t_pStream->read_tag(t_pTag, pos);
                 sfreq = *t_pTag->toFloat();
                 break;
             case FIFF_CH_INFO:
                 t_pStream->read_tag(t_pTag, pos);
-                chs.append( t_pTag->toChInfo() );
+                chs.append(t_pTag->toChInfo());
                 break;
         }
     }
@@ -311,27 +290,24 @@ bool FiffEvoked::read(QIODevice& p_IODevice,
     //
     //   Local channel information?
     //
-    if (nchan > 0)
-    {
-        if (chs.size() == 0)
-        {
+    if (nchan > 0) {
+        if (chs.size() == 0) {
             qWarning("Local channel information was not found when it was expected.");
             return false;
         }
-        if (chs.size() != nchan)
-        {
+        if (chs.size() != nchan) {
             qWarning("Number of channels and number of channel definitions are different.");
             return false;
         }
-        info.chs   = chs;
+        info.chs = chs;
         info.nchan = nchan;
-        qInfo("\tFound channel information in evoked data. nchan = %d\n",nchan);
+        qInfo("\tFound channel information in evoked data. nchan = %d\n", nchan);
         if (sfreq > 0.0f)
             info.sfreq = sfreq;
     }
-    qint32 nsamp = last-first+1;
+    qint32 nsamp = last - first + 1;
     qInfo("\tFound the data of interest:\n");
-    qInfo("\t\tt = %10.2f ... %10.2f ms (%s)\n", 1000*static_cast<float>(first)/info.sfreq, 1000*static_cast<float>(last)/info.sfreq,comment.toUtf8().constData());
+    qInfo("\t\tt = %10.2f ... %10.2f ms (%s)\n", 1000 * static_cast<float>(first) / info.sfreq, 1000 * static_cast<float>(last) / info.sfreq, comment.toUtf8().constData());
     if (info.comps.size() > 0)
         qInfo("\t\t%lld CTF compensation matrices available\n", info.comps.size());
 
@@ -341,13 +317,11 @@ bool FiffEvoked::read(QIODevice& p_IODevice,
     fiff_int_t aspect_kind = -1;
     fiff_int_t nave = -1;
     QList<FiffTag> epoch;
-    for (k = 0; k < my_aspect->nent(); ++k)
-    {
+    for (k = 0; k < my_aspect->nent(); ++k) {
         kind = my_aspect->dir[k]->kind;
-        pos  = my_aspect->dir[k]->pos;
+        pos = my_aspect->dir[k]->pos;
 
-        switch (kind)
-        {
+        switch (kind) {
             case FIFF_COMMENT:
                 t_pStream->read_tag(t_pTag, pos);
                 comment = t_pTag->toString();
@@ -372,8 +346,7 @@ bool FiffEvoked::read(QIODevice& p_IODevice,
 
     qint32 nepoch = epoch.size();
     MatrixXd all_data;
-    if (nepoch == 1)
-    {
+    if (nepoch == 1) {
         //
         //   Only one epoch
         //
@@ -384,27 +357,23 @@ bool FiffEvoked::read(QIODevice& p_IODevice,
         //
         if (all_data.cols() == 1 && info.nchan == 1)
             all_data.transposeInPlace();
-    }
-    else
-    {
+    } else {
         //
         //   Put the old style epochs together
         //
         all_data = epoch[0].toFloatMatrix().cast<double>();
         all_data.transposeInPlace();
         qint32 oldsize;
-        for (k = 1; k < nepoch; ++k)
-        {
+        for (k = 1; k < nepoch; ++k) {
             oldsize = all_data.rows();
             MatrixXd tmp = epoch[k].toFloatMatrix().cast<double>();
             tmp.transposeInPlace();
-            all_data.conservativeResize(oldsize+tmp.rows(), all_data.cols());
+            all_data.conservativeResize(oldsize + tmp.rows(), all_data.cols());
             all_data.block(oldsize, 0, tmp.rows(), tmp.cols()) = tmp;
         }
     }
-    if (all_data.cols() != nsamp)
-    {
-        qWarning("Incorrect number of samples (%d instead of %d)", (int) all_data.cols(), nsamp);
+    if (all_data.cols() != nsamp) {
+        qWarning("Incorrect number of samples (%d instead of %d)", (int)all_data.cols(), nsamp);
         return false;
     }
 
@@ -412,42 +381,36 @@ bool FiffEvoked::read(QIODevice& p_IODevice,
     //   Calibrate
     //
     qInfo("\n\tPreprocessing...\n");
-    qInfo("\t%d channels remain after picking\n",info.nchan);
+    qInfo("\t%d channels remain after picking\n", info.nchan);
 
     using T = Eigen::Triplet<double>;
     std::vector<T> tripletList;
     tripletList.reserve(info.nchan);
-    for(k = 0; k < info.nchan; ++k)
+    for (k = 0; k < info.nchan; ++k)
         tripletList.push_back(T(k, k, info.chs[k].cal));
     SparseMatrix<double> cals(info.nchan, info.nchan);
     cals.setFromTriplets(tripletList.begin(), tripletList.end());
 
     all_data = cals * all_data;
 
-    RowVectorXf times = RowVectorXf(last-first+1);
+    RowVectorXf times = RowVectorXf(last - first + 1);
     for (k = 0; k < times.size(); ++k)
-        times[k] = static_cast<float>(first+k) / info.sfreq;
+        times[k] = static_cast<float>(first + k) / info.sfreq;
 
     //
     // Set up projection
     //
-    if(info.projs.size() == 0 || !proj)
-    {
+    if (info.projs.size() == 0 || !proj) {
         qInfo("\tNo projector specified for these data.\n");
         p_FiffEvoked.proj = MatrixXd();
-    }
-    else
-    {
+    } else {
         //   Create the projector
         MatrixXd projection;
         qint32 nproj = info.make_projector(projection);
-        if(nproj == 0)
-        {
+        if (nproj == 0) {
             qWarning("\tThe projection vectors do not apply to these channels\n");
             p_FiffEvoked.proj = MatrixXd();
-        }
-        else
-        {
+        } else {
             qInfo("\tCreated an SSP operator (subspace dimension = %d)\n", nproj);
             p_FiffEvoked.proj = projection;
         }
@@ -456,8 +419,7 @@ bool FiffEvoked::read(QIODevice& p_IODevice,
         FiffProj::activate_projs(info.projs);
     }
 
-    if(p_FiffEvoked.proj.rows() > 0)
-    {
+    if (p_FiffEvoked.proj.rows() > 0) {
         all_data = p_FiffEvoked.proj * all_data;
         qInfo("\tSSP projectors applied to the evoked data\n");
     }
@@ -487,30 +449,24 @@ bool FiffEvoked::read(QIODevice& p_IODevice,
 
 //=============================================================================================================
 
-void FiffEvoked::setInfo(const FiffInfo &p_info,
+void FiffEvoked::setInfo(const FiffInfo& p_info,
                          bool applyProj)
 {
     info = p_info;
     //
     // Set up projection
     //
-    if(info.projs.size() == 0 || !applyProj)
-    {
+    if (info.projs.size() == 0 || !applyProj) {
         qInfo("\tNo projector specified for these data.\n");
         this->proj = MatrixXd();
-    }
-    else
-    {
+    } else {
         //   Create the projector
         MatrixXd projection;
         qint32 nproj = info.make_projector(projection);
-        if(nproj == 0)
-        {
+        if (nproj == 0) {
             qWarning("\tThe projection vectors do not apply to these channels\n");
             this->proj = MatrixXd();
-        }
-        else
-        {
+        } else {
             qInfo("\tCreated an SSP operator (subspace dimension = %d)\n", nproj);
             this->proj = projection;
         }
@@ -522,20 +478,20 @@ void FiffEvoked::setInfo(const FiffInfo &p_info,
 
 //=============================================================================================================
 
-FiffEvoked & FiffEvoked::operator+=(const MatrixXd &newData)
+FiffEvoked& FiffEvoked::operator+=(const MatrixXd& newData)
 {
     //Init matrix if necessary
-    if(nave == -1 || nave == 0) {
-        data = MatrixXd::Zero(newData.rows(),newData.cols());
+    if (nave == -1 || nave == 0) {
+        data = MatrixXd::Zero(newData.rows(), newData.cols());
     }
 
-    if(data.cols() == newData.cols() && data.rows() == newData.rows()) {
+    if (data.cols() == newData.cols() && data.rows() == newData.rows()) {
         //Revert old averaging
-        data = data*nave;
+        data = data * nave;
 
         //Do new averaging
         data += newData;
-        if(nave <= 0) {
+        if (nave <= 0) {
             nave = 1;
         } else {
             nave++;

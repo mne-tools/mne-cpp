@@ -34,14 +34,16 @@ using uchar = unsigned char;
 // NAMESPACE EVENTSLIB
 //=============================================================================================================
 
-namespace EVENTSLIB {
+namespace EVENTSLIB
+{
 
 //=============================================================================================================
 // EVENTSINTERNAL FORWARD DECLARATIONS
 //=============================================================================================================
 
-namespace EVENTSINTERNAL {
-    class EventGroupINT;
+namespace EVENTSINTERNAL
+{
+class EventGroupINT;
 }
 
 //=============================================================================================================
@@ -82,10 +84,10 @@ struct EVENTS_EXPORT RgbColor
     RgbColor(const uchar rRhs, const uchar gRhs,
              const uchar bRhs, const uchar aRhs);
 
-    uchar r;    /**< Red value. */
-    uchar g;    /**< Green value. */
-    uchar b;    /**< Blue value. */
-    uchar a;    /**< Transparency value. */
+    uchar r; /**< Red value. */
+    uchar g; /**< Green value. */
+    uchar b; /**< Blue value. */
+    uchar a; /**< Transparency value. */
 };
 
 /**
@@ -96,7 +98,6 @@ struct EVENTS_EXPORT RgbColor
  */
 struct EVENTS_EXPORT EventGroup
 {
-
     //=========================================================================================================
     /**
     * Constructs an EventGroup external sctruct.
@@ -119,13 +120,14 @@ struct EVENTS_EXPORT EventGroup
      */
     EventGroup(const EVENTSINTERNAL::EventGroupINT& g);
 
-    idNum           id;     /**< Id of the event group. */
-    std::string     name;   /**< Name of the event group. */
-    RgbColor        color;  /**< Color of the event. */
-    int             order;  /**< Holder for an ordering variable. */
+    idNum id;         /**< Id of the event group. */
+    std::string name; /**< Name of the event group. */
+    RgbColor color;   /**< Color of the event. */
+    int order;        /**< Holder for an ordering variable. */
 };
 
-namespace EVENTSINTERNAL {
+namespace EVENTSINTERNAL
+{
 
 /**
  * EventGroupINT class.
@@ -135,7 +137,6 @@ namespace EVENTSINTERNAL {
 class EventGroupINT
 {
 public:
-
     //=========================================================================================================
     /**
      * EventGroupINT constructor.
@@ -252,11 +253,11 @@ public:
     bool operator<(const EventGroupINT& groupRHS) const;
 
 private:
-    std::string         m_sName;            /**< Group name. */
-    EVENTSLIB::RgbColor m_Color;            /**< Group color. */
-    idNum               m_Id;               /**< Group Id.*/
-    std::string         m_sDescription;     /**< Group description text.*/
-    int                 m_order;            /**< Group order placeholder.*/
+    std::string m_sName;         /**< Group name. */
+    EVENTSLIB::RgbColor m_Color; /**< Group color. */
+    idNum m_Id;                  /**< Group Id.*/
+    std::string m_sDescription;  /**< Group description text.*/
+    int m_order;                 /**< Group order placeholder.*/
 };
 
 } //namespace EVENTSINTERNAL

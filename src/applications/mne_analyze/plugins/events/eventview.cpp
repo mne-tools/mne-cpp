@@ -105,7 +105,7 @@ void EventView::initMVCSettings()
 {
     //Model
     m_pUi->m_tableView_eventTableView->setModel(m_pEventModel.data());
-    connect(m_pEventModel.data(),&ANSHAREDLIB::EventModel::dataChanged,
+    connect(m_pEventModel.data(), &ANSHAREDLIB::EventModel::dataChanged,
             this, &EventView::onDataChanged, Qt::UniqueConnection);
 
     //Delegate
@@ -124,18 +124,16 @@ void EventView::initMVCSettings()
 void EventView::initGUIFunctionality()
 {
     //'Activate events' checkbox
-    connect(m_pUi->m_checkBox_activateEvents, &QCheckBox::checkStateChanged,
-            this, [this](Qt::CheckState state) { emit activeEventsChecked(static_cast<int>(state)); }, Qt::UniqueConnection);
+    connect(m_pUi->m_checkBox_activateEvents, &QCheckBox::checkStateChanged, this, [this](Qt::CheckState state) { emit activeEventsChecked(static_cast<int>(state)); }, Qt::UniqueConnection);
 
     //'Show selected event' checkbox
-    connect(m_pUi->m_checkBox_showSelectedEventsOnly, &QCheckBox::checkStateChanged,
-            this, [this](Qt::CheckState state) { onSelectedEventsChecked(static_cast<int>(state)); }, Qt::UniqueConnection);
+    connect(m_pUi->m_checkBox_showSelectedEventsOnly, &QCheckBox::checkStateChanged, this, [this](Qt::CheckState state) { onSelectedEventsChecked(static_cast<int>(state)); }, Qt::UniqueConnection);
     connect(m_pUi->m_tableView_eventTableView->selectionModel(), &QItemSelectionModel::selectionChanged,
             this, &EventView::onCurrentSelectedChanged, Qt::UniqueConnection);
 
     //'Show all' checkbox
-//    connect(m_pUi->m_checkBox_showAll, &QCheckBox::stateChanged,
-//            this, &EventView::onShowAllChecked, Qt::UniqueConnection);
+    //    connect(m_pUi->m_checkBox_showAll, &QCheckBox::stateChanged,
+    //            this, &EventView::onShowAllChecked, Qt::UniqueConnection);
 
     //Add type button
     connect(m_pUi->m_pushButton_addEventType, &QPushButton::clicked,
@@ -157,11 +155,11 @@ void EventView::initGUIFunctionality()
     connect(m_pUi->m_listWidget_groupListWidget, &QWidget::customContextMenuRequested,
             this, &EventView::customGroupContextMenuRequested, Qt::UniqueConnection);
 
-//    connect(m_pUi->m_listWidget_groupListWidget, &QListWidget::currentTextChanged,
-//            this, &EventView::renameGroup, Qt::UniqueConnection);
+    //    connect(m_pUi->m_listWidget_groupListWidget, &QListWidget::currentTextChanged,
+    //            this, &EventView::renameGroup, Qt::UniqueConnection);
 
     connect(m_pUi->m_listWidget_groupListWidget, &QListWidget::itemChanged,
-                this, &EventView::onGroupItemNameChanged, Qt::UniqueConnection);
+            this, &EventView::onGroupItemNameChanged, Qt::UniqueConnection);
 
     connect(m_pUi->m_pushButtonStim, &QPushButton::clicked,
             this, &EventView::onStimButtonClicked, Qt::UniqueConnection);
@@ -169,7 +167,7 @@ void EventView::initGUIFunctionality()
     connect(m_pTriggerDetectView.data(), &DISPLIB::TriggerDetectionView::detectTriggers,
             this, &EventView::onDetectTriggers, Qt::UniqueConnection);
 
-    connect(&m_FutureWatcher, &QFutureWatcher<QMap<double,QList<int>>>::finished,
+    connect(&m_FutureWatcher, &QFutureWatcher<QMap<double, QList<int>>>::finished,
             this, &EventView::createGroupsFromTriggers, Qt::UniqueConnection);
 
     m_pEventModel->setShowSelected(m_pUi->m_checkBox_showSelectedEventsOnly->isChecked());
@@ -187,11 +185,11 @@ void EventView::onActiveEventsChecked(int iCheckBoxState)
 
 void EventView::addEventToModel(int iSamplePos)
 {
-    if(!m_pEventModel){
+    if (!m_pEventModel) {
         return;
     }
 
-    if(!m_pEventModel->getNumberOfGroups()){
+    if (!m_pEventModel->getNumberOfGroups()) {
         addEventGroup();
     }
 
@@ -209,9 +207,9 @@ void EventView::setModel(QSharedPointer<ANSHAREDLIB::EventModel> pEventModel)
     initMVCSettings();
     initGUIFunctionality();
     redrawGroups();
-//    loadGroupSettings();
+    //    loadGroupSettings();
 
-    if(m_pFiffRawModel){
+    if (m_pFiffRawModel) {
         m_pEventModel->setSharedMemory(m_pFiffRawModel->isRealtime());
     }
 
@@ -248,11 +246,11 @@ void EventView::removeEvent()
 
     std::set<int> set;
 
-    for (const auto& index : indexList){
+    for (const auto& index : indexList) {
         set.insert(index.row());
     }
 
-    for (auto it = set.crbegin(); it != set.crend(); ++it){
+    for (auto it = set.crbegin(); it != set.crend(); ++it) {
         m_pEventModel->removeRow(*it);
     }
 
@@ -280,28 +278,28 @@ void EventView::onSelectedEventsChecked(int iCheckBoxState)
 
 void EventView::disconnectFromModel()
 {
-    disconnect(m_pEventModel.data(),&ANSHAREDLIB::EventModel::dataChanged,
-            this, &EventView::onDataChanged);
+    disconnect(m_pEventModel.data(), &ANSHAREDLIB::EventModel::dataChanged,
+               this, &EventView::onDataChanged);
     disconnect(m_pUi->m_checkBox_activateEvents, &QCheckBox::checkStateChanged,
-            this, nullptr);
+               this, nullptr);
     disconnect(m_pUi->m_checkBox_showSelectedEventsOnly, &QCheckBox::checkStateChanged,
-            this, nullptr);
+               this, nullptr);
     disconnect(m_pUi->m_pushButton_addEventType, &QPushButton::clicked,
-            this, &EventView::addEventGroup);
+               this, &EventView::addEventGroup);
     disconnect(m_pUi->m_listWidget_groupListWidget->selectionModel(), &QItemSelectionModel::selectionChanged,
-            this, &EventView::groupChanged);
-//    disconnect(m_pUi->m_checkBox_showAll, &QCheckBox::stateChanged,
-//            this, &EventView::onShowAllChecked);
+               this, &EventView::groupChanged);
+    //    disconnect(m_pUi->m_checkBox_showAll, &QCheckBox::stateChanged,
+    //            this, &EventView::onShowAllChecked);
     disconnect(m_pUi->m_tableView_eventTableView, &QWidget::customContextMenuRequested,
-            this, &EventView::customEventContextMenuRequested);
+               this, &EventView::customEventContextMenuRequested);
     disconnect(m_pUi->m_listWidget_groupListWidget, &QWidget::customContextMenuRequested,
-            this, &EventView::customGroupContextMenuRequested);
+               this, &EventView::customGroupContextMenuRequested);
     disconnect(m_pUi->m_pushButtonStim, &QPushButton::clicked,
-            this, &EventView::onStimButtonClicked);
+               this, &EventView::onStimButtonClicked);
     disconnect(m_pTriggerDetectView.data(), &DISPLIB::TriggerDetectionView::detectTriggers,
-            this, &EventView::onDetectTriggers);
+               this, &EventView::onDetectTriggers);
     disconnect(m_pEventModel.data(), &ANSHAREDLIB::EventModel::eventGroupsUpdated,
-            this, &EventView::redrawGroups);
+               this, &EventView::redrawGroups);
 }
 
 //=============================================================================================================
@@ -310,7 +308,7 @@ void EventView::onCurrentSelectedChanged()
 {
     m_pEventModel->clearEventSelection();
 
-    for (int i = 0;  i < m_pUi->m_tableView_eventTableView->selectionModel()->selectedRows().size(); i++) {
+    for (int i = 0; i < m_pUi->m_tableView_eventTableView->selectionModel()->selectedRows().size(); i++) {
         m_pEventModel->appendSelected(m_pUi->m_tableView_eventTableView->selectionModel()->selectedRows().at(i).row());
     }
 
@@ -321,9 +319,9 @@ void EventView::onCurrentSelectedChanged()
 
 void EventView::onSaveButton()
 {
-    #ifdef WASMBUILD
+#ifdef WASMBUILD
     m_pEventModel->saveToFile("");
-    #else
+#else
     QString fileName = QFileDialog::getSaveFileName(Q_NULLPTR,
                                                     tr("Save Events"), "",
                                                     tr("Event file (*.eve);;All Files (*)"));
@@ -333,7 +331,7 @@ void EventView::onSaveButton()
     }
 
     m_pEventModel->saveToFile(fileName);
-    #endif
+#endif
 }
 
 //=============================================================================================================
@@ -341,10 +339,10 @@ void EventView::onSaveButton()
 void EventView::keyReleaseEvent(QKeyEvent* event)
 {
     switch (event->key()) {
-        case  Qt::Key_Delete:
-            if(m_pUi->m_tableView_eventTableView->hasFocus()){
+        case Qt::Key_Delete:
+            if (m_pUi->m_tableView_eventTableView->hasFocus()) {
                 removeEvent();
-            } else if(m_pUi->m_listWidget_groupListWidget->hasFocus()){
+            } else if (m_pUi->m_listWidget_groupListWidget->hasFocus()) {
                 deleteGroup();
             }
             break;
@@ -357,18 +355,18 @@ void EventView::keyReleaseEvent(QKeyEvent* event)
 //=============================================================================================================
 
 bool EventView::newUserGroup(const QString& sName,
-                                          [[maybe_unused]] int iType,
-                                          bool bDefaultColor)
+                             [[maybe_unused]] int iType,
+                             bool bDefaultColor)
 {
-    if(!m_pEventModel){
+    if (!m_pEventModel) {
         return false;
     }
 
     QColor groupColor;
 
     if (!bDefaultColor) {
-        groupColor = QColor(rand()%255, rand()%255, rand()%255);
-        if(!groupColor.isValid()){
+        groupColor = QColor(rand() % 255, rand() % 255, rand() % 255);
+        if (!groupColor.isValid()) {
             return false;
         }
     } else {
@@ -377,7 +375,7 @@ bool EventView::newUserGroup(const QString& sName,
 
     m_pEventModel->addGroup(sName, groupColor);
 
-    m_pUi->lineEdit->setText("New Group"/* + QString::number(iCat + 1)*/);
+    m_pUi->lineEdit->setText("New Group" /* + QString::number(iCat + 1)*/);
 
     return true;
 }
@@ -388,7 +386,7 @@ void EventView::groupChanged()
 {
     auto selection = m_pUi->m_listWidget_groupListWidget->selectionModel()->selectedRows();
 
-    if(!selection.size()){
+    if (!selection.size()) {
         return;
     }
 
@@ -397,18 +395,18 @@ void EventView::groupChanged()
 
 //=============================================================================================================
 
-void EventView::customEventContextMenuRequested(const QPoint &pos)
+void EventView::customEventContextMenuRequested(const QPoint& pos)
 {
-    if(m_pEventContexMenu){
+    if (m_pEventContexMenu) {
         m_pEventContexMenu->popup(m_pUi->m_tableView_eventTableView->viewport()->mapToGlobal(pos));
     }
 }
 
 //=============================================================================================================
 
-void EventView::customGroupContextMenuRequested(const QPoint &pos)
+void EventView::customGroupContextMenuRequested(const QPoint& pos)
 {
-    if(m_pGroupContexMenu){
+    if (m_pGroupContexMenu) {
         m_pGroupContexMenu->popup(m_pUi->m_listWidget_groupListWidget->viewport()->mapToGlobal(pos));
     }
 }
@@ -422,9 +420,9 @@ void EventView::deleteGroup()
 
 //=============================================================================================================
 
-void EventView::renameGroup(const QString &currentText)
+void EventView::renameGroup(const QString& currentText)
 {
-    if(m_pEventModel){
+    if (m_pEventModel) {
         m_pEventModel->setSelectedGroupName(currentText);
     }
 }
@@ -435,7 +433,7 @@ void EventView::changeGroupColor()
 {
     QColor groupColor = m_pColordialog->getColor(Qt::black, this);
 
-    if(!groupColor.isValid()){
+    if (!groupColor.isValid()) {
         return;
     }
 
@@ -446,7 +444,7 @@ void EventView::changeGroupColor()
 
 void EventView::onStimButtonClicked()
 {
-    if(m_pTriggerDetectView->isHidden()){
+    if (m_pTriggerDetectView->isHidden()) {
         m_pTriggerDetectView->activateWindow();
         m_pTriggerDetectView->show();
         m_pTriggerDetectView->resize(m_pTriggerDetectView->minimumSizeHint());
@@ -455,70 +453,69 @@ void EventView::onStimButtonClicked()
 
 //=============================================================================================================
 
-void EventView::initTriggerDetect(const QSharedPointer<FIFFLIB::FiffInfo>info)
+void EventView::initTriggerDetect(const QSharedPointer<FIFFLIB::FiffInfo> info)
 {
     m_pTriggerDetectView->init(info);
 }
 
 //=============================================================================================================
 
-void EventView::onDetectTriggers(const QString &sChannelName,
-                                              double dThreshold)
+void EventView::onDetectTriggers(const QString& sChannelName,
+                                 double dThreshold)
 {
     if (!m_pFiffRawModel) {
         qWarning() << "[EventView::onDetectTriggers] No Fiff Raw Model selected for trigger detection.";
         return;
     }
 
-    if(m_FutureWatcher.isRunning()){
+    if (m_FutureWatcher.isRunning()) {
         return;
     }
 
     emit loadingStart("Detecting triggers...");
 
     m_Future = QtConcurrent::run([&, this] {
-        return this->detectTriggerCalculations(sChannelName, dThreshold, *m_pFiffRawModel->getFiffInfo(),*this->m_pFiffRawModel->getFiffIO()->m_qlistRaw.first().data());
+        return this->detectTriggerCalculations(sChannelName, dThreshold, *m_pFiffRawModel->getFiffInfo(), *this->m_pFiffRawModel->getFiffIO()->m_qlistRaw.first().data());
     });
     m_FutureWatcher.setFuture(m_Future);
-
 }
 
 //=============================================================================================================
 
-QMap<double,QList<int>> EventView::detectTriggerCalculations(const QString& sChannelName,
-                                                                          double dThreshold,
-                                                                          FIFFLIB::FiffInfo fiffInfo,
-                                                                          FIFFLIB::FiffRawData fiffRaw)
+QMap<double, QList<int>> EventView::detectTriggerCalculations(const QString& sChannelName,
+                                                              double dThreshold,
+                                                              FIFFLIB::FiffInfo fiffInfo,
+                                                              FIFFLIB::FiffRawData fiffRaw)
 {
     int iCurrentTriggerChIndex = 9999;
 
-    for(int i = 0; i < fiffInfo.chs.size(); ++i) {
-        if(fiffInfo.chs[i].ch_name == sChannelName) {
+    for (int i = 0; i < fiffInfo.chs.size(); ++i) {
+        if (fiffInfo.chs[i].ch_name == sChannelName) {
             iCurrentTriggerChIndex = i;
             break;
         }
     }
 
-    if(iCurrentTriggerChIndex == 9999){
-        qWarning() << "[EventView::onDetectTriggers] Channel Index not valid";\
-        QMap<double,QList<int>> map;
+    if (iCurrentTriggerChIndex == 9999) {
+        qWarning() << "[EventView::onDetectTriggers] Channel Index not valid";
+        QMap<double, QList<int>> map;
         return map;
     }
 
     Eigen::MatrixXd mSampleData, mSampleTimes;
 
     fiffRaw.read_raw_segment(mSampleData,
-                               mSampleTimes);
+                             mSampleTimes);
 
-    QList<QPair<int,double>> detectedTriggerSamples = RTPROCESSINGLIB::detectTriggerFlanksMax(mSampleData,
-                                                                                              iCurrentTriggerChIndex,
-                                                                                              0,
-                                                                                              dThreshold,
-                                                                                              0);
+    QList<QPair<int, double>> detectedTriggerSamples = RTPROCESSINGLIB::detectTriggerFlanksMax(mSampleData,
+                                                                                               iCurrentTriggerChIndex,
+                                                                                               0,
+                                                                                               dThreshold,
+                                                                                               0);
 
-    QMap<double,QList<int>> mEventsinTypes;
+    QMap<double, QList<int>> mEventsinTypes;
 
-    for(QPair<int,double> pair : detectedTriggerSamples){
+    for (QPair<int, double> pair : detectedTriggerSamples) {
         mEventsinTypes[pair.second].append(pair.first);
     }
 
@@ -531,10 +528,10 @@ void EventView::onNewFiffRawViewModel(QSharedPointer<ANSHAREDLIB::FiffRawViewMod
 {
     m_pFiffRawModel = pFiffRawModel;
 
-    if(auto info = pFiffRawModel->getFiffInfo()){
-    passFiffParams(pFiffRawModel->absoluteFirstSample(),
-                   pFiffRawModel->absoluteLastSample(),
-                   pFiffRawModel->getFiffInfo()->sfreq);
+    if (auto info = pFiffRawModel->getFiffInfo()) {
+        passFiffParams(pFiffRawModel->absoluteFirstSample(),
+                       pFiffRawModel->absoluteLastSample(),
+                       pFiffRawModel->getFiffInfo()->sfreq);
     }
 
     initTriggerDetect(m_pFiffRawModel->getFiffInfo());
@@ -542,9 +539,9 @@ void EventView::onNewFiffRawViewModel(QSharedPointer<ANSHAREDLIB::FiffRawViewMod
 
 //=============================================================================================================
 
-bool EventView::newStimGroup(const QString &sName,
-                                          int iType,
-                                          const QColor &groupColor)
+bool EventView::newStimGroup(const QString& sName,
+                             int iType,
+                             const QColor& groupColor)
 {
     m_pEventModel->addGroup(sName + "_" + QString::number(iType), groupColor);
 
@@ -555,22 +552,22 @@ bool EventView::newStimGroup(const QString &sName,
 
 void EventView::createGroupsFromTriggers()
 {
-    QMap<double,QList<int>> mEventGroupMap = m_Future.result();
+    QMap<double, QList<int>> mEventGroupMap = m_Future.result();
 
     QList<double> keyList = mEventGroupMap.keys();
     int iFirstSample = m_pFiffRawModel->absoluteFirstSample();
 
     QColor colors[10] = {QColor("cyan"), QColor("magenta"), QColor("red"),
-                          QColor("darkRed"), QColor("darkCyan"), QColor("darkMagenta"),
-                          QColor("green"), QColor("darkGreen"), QColor("yellow"),
-                          QColor("blue")};
+                         QColor("darkRed"), QColor("darkCyan"), QColor("darkMagenta"),
+                         QColor("green"), QColor("darkGreen"), QColor("yellow"),
+                         QColor("blue")};
 
-    for (int i = 0; i < keyList.size(); i++){
-        if ((m_pUi->m_listWidget_groupListWidget->findItems(m_pTriggerDetectView->getSelectedStimChannel()+ "_" + QString::number(static_cast<int>(keyList[i])), Qt::MatchExactly).isEmpty())){
+    for (int i = 0; i < keyList.size(); i++) {
+        if ((m_pUi->m_listWidget_groupListWidget->findItems(m_pTriggerDetectView->getSelectedStimChannel() + "_" + QString::number(static_cast<int>(keyList[i])), Qt::MatchExactly).isEmpty())) {
             newStimGroup(m_pTriggerDetectView->getSelectedStimChannel(),
                          static_cast<int>(keyList[i]),
                          colors[i % 10]);
-            for (int j : mEventGroupMap[keyList[i]]){
+            for (int j : mEventGroupMap[keyList[i]]) {
                 m_pEventModel->addEvent(j + iFirstSample);
             }
         }
@@ -584,10 +581,10 @@ void EventView::createGroupsFromTriggers()
 
 void EventView::clearView(QSharedPointer<ANSHAREDLIB::AbstractModel> pRemovedModel)
 {
-    if (qSharedPointerCast<ANSHAREDLIB::AbstractModel>(m_pEventModel) == pRemovedModel){
+    if (qSharedPointerCast<ANSHAREDLIB::AbstractModel>(m_pEventModel) == pRemovedModel) {
         disconnectFromModel();
         reset();
-    } else if (qSharedPointerCast<ANSHAREDLIB::AbstractModel>(m_pFiffRawModel) == pRemovedModel){
+    } else if (qSharedPointerCast<ANSHAREDLIB::AbstractModel>(m_pFiffRawModel) == pRemovedModel) {
         m_pFiffRawModel = Q_NULLPTR;
     }
 }
@@ -596,7 +593,7 @@ void EventView::clearView(QSharedPointer<ANSHAREDLIB::AbstractModel> pRemovedMod
 
 void EventView::redrawGroups()
 {
-    if(!m_pEventModel){
+    if (!m_pEventModel) {
         return;
     }
     auto groups = m_pEventModel->getGroupsToDisplay();
@@ -604,15 +601,15 @@ void EventView::redrawGroups()
 
     m_pUi->m_listWidget_groupListWidget->clear();
 
-    for (auto& eventGroup : *groups){
+    for (auto& eventGroup : *groups) {
         QListWidgetItem* newItem = new QListWidgetItem(QString::fromStdString(eventGroup.name));
         newItem->setData(Qt::UserRole, QVariant(eventGroup.id));
         newItem->setData(Qt::DecorationRole, QColor(eventGroup.color.r, eventGroup.color.g, eventGroup.color.b));
-        newItem->setFlags (newItem->flags () | Qt::ItemIsEnabled | Qt::ItemIsSelectable | Qt::ItemIsEditable);
+        newItem->setFlags(newItem->flags() | Qt::ItemIsEnabled | Qt::ItemIsSelectable | Qt::ItemIsEditable);
 
         m_pUi->m_listWidget_groupListWidget->addItem(newItem);
-        for (auto group : selection){
-            if (group == eventGroup.id){
+        for (auto group : selection) {
+            if (group == eventGroup.id) {
                 m_pUi->m_listWidget_groupListWidget->setCurrentItem(newItem);
             }
         }
@@ -624,11 +621,11 @@ void EventView::redrawGroups()
 
 //=============================================================================================================
 
-void EventView::onGroupItemNameChanged(QListWidgetItem *item)
+void EventView::onGroupItemNameChanged(QListWidgetItem* item)
 {
     int iGroupId = item->data(Qt::UserRole).toInt();
 
-    if(m_pEventModel){
+    if (m_pEventModel) {
         m_pEventModel->setGroupName(iGroupId, item->text());
     }
 }

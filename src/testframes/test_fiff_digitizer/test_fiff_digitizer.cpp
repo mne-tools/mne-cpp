@@ -41,7 +41,7 @@ using namespace FIFFLIB;
  * @brief The TestFiffDigitizer class provides digitizer data reading verification tests
  *
  */
-class TestFiffDigitizer: public QObject
+class TestFiffDigitizer : public QObject
 {
     Q_OBJECT
 
@@ -56,10 +56,10 @@ private slots:
     void cleanupTestCase();
 
 private:
-    double      m_dEpsilon;
-    double      m_dSumPointsDigDataResult;
-    int         m_iCoordFrameDigDataResult;
-    int         m_iNPointDigDataResult;
+    double m_dEpsilon;
+    double m_dSumPointsDigDataResult;
+    int m_iCoordFrameDigDataResult;
+    int m_iNPointDigDataResult;
 
     FiffDigitizerData digDataLoaded;
 };
@@ -91,7 +91,7 @@ void TestFiffDigitizer::initTestCase()
 void TestFiffDigitizer::comparePoints()
 {
     double dSum = 0.0;
-    for(int i = 0; i < digDataLoaded.points.size(); ++i) {
+    for (int i = 0; i < digDataLoaded.points.size(); ++i) {
         dSum += digDataLoaded.points[i].r[0];
         dSum += digDataLoaded.points[i].r[1];
         dSum += digDataLoaded.points[i].r[2];
@@ -99,21 +99,21 @@ void TestFiffDigitizer::comparePoints()
 
     double dDiff = dSum - m_dSumPointsDigDataResult;
 
-    QVERIFY( dDiff < m_dEpsilon );
+    QVERIFY(dDiff < m_dEpsilon);
 }
 
 //=============================================================================================================
 
 void TestFiffDigitizer::compareCoordFrame()
 {
-    QVERIFY( m_iCoordFrameDigDataResult == digDataLoaded.coord_frame );
+    QVERIFY(m_iCoordFrameDigDataResult == digDataLoaded.coord_frame);
 }
 
 //=============================================================================================================
 
 void TestFiffDigitizer::compareNPoint()
 {
-    QVERIFY( m_iNPointDigDataResult == digDataLoaded.npoint );
+    QVERIFY(m_iNPointDigDataResult == digDataLoaded.npoint);
 }
 
 //=============================================================================================================

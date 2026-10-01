@@ -38,7 +38,7 @@ using namespace BABYMEGPLUGIN;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-BabyMEGClient::BabyMEGClient(int myPort, QObject *parent)
+BabyMEGClient::BabyMEGClient(int myPort, QObject* parent)
 : QThread(parent)
 {
     connect(this, &BabyMEGClient::DataAcq,
@@ -50,19 +50,18 @@ BabyMEGClient::BabyMEGClient(int myPort, QObject *parent)
             this, &BabyMEGClient::ReadToBuffer);
 
     connect(this, &BabyMEGClient::error,
-            this, &BabyMEGClient::DisplayError);     //find out name of this machine
+            this, &BabyMEGClient::DisplayError); //find out name of this machine
 
     name = QHostInfo::localHostName();
-    if(!name.isEmpty())
-    {
+    if (!name.isEmpty()) {
         QString domain = QHostInfo::localDomainName();
         if (!domain.isEmpty())
             name = name + QChar('.') + domain;
     }
-    if (name!=QString("localhost"))
+    if (name != QString("localhost"))
         name = QString("localhost");
-    qDebug()<< "- " + name;
-    port = myPort;//6340;
+    qDebug() << "- " + name;
+    port = myPort; //6340;
     m_bSocketIsConnected = false;
     SkipLoop = false;
     DataAcqStartFlag = false;
@@ -74,7 +73,7 @@ BabyMEGClient::BabyMEGClient(int myPort, QObject *parent)
 
 BabyMEGClient::~BabyMEGClient()
 {
-    delete tcpSocket;   // added 5.31.2013
+    delete tcpSocket; // added 5.31.2013
 }
 
 //=============================================================================================================
@@ -86,19 +85,19 @@ void BabyMEGClient::SetInfo(QSharedPointer<BabyMEGInfo> pInfo)
 
 //=============================================================================================================
 
-void BabyMEGClient::DisplayError(int socketError, const QString &message)
+void BabyMEGClient::DisplayError(int socketError, const QString& message)
 {
-    switch (socketError){
-    case QAbstractSocket::RemoteHostClosedError:
+    switch (socketError) {
+        case QAbstractSocket::RemoteHostClosedError:
             break;
-    case QAbstractSocket::HostNotFoundError:
-        qDebug()<< "The host was not found. Please check the host name and the port number";
-        break;
-    case QAbstractSocket::ConnectionRefusedError:
-        qDebug()<< "The connection was refused by the peer. Make sure the server is running?";
-        break;
-    default:
-        qDebug()<< "Error: " << message;
+        case QAbstractSocket::HostNotFoundError:
+            qDebug() << "The host was not found. Please check the host name and the port number";
+            break;
+        case QAbstractSocket::ConnectionRefusedError:
+            qDebug() << "The connection was refused by the peer. Make sure the server is running?";
+            break;
+        default:
+            qDebug() << "Error: " << message;
     }
 }
 
@@ -110,15 +109,14 @@ int BabyMEGClient::MGH_LM_Byte2Int(QByteArray b)
         qWarning("MGH_LM_Byte2Int: input too short (%lld bytes, need 4)", static_cast<long long>(b.size()));
         return 0;
     }
-    int value= 0;
-    for (int i=0;i<2;i++)
-    {
+    int value = 0;
+    for (int i = 0; i < 2; i++) {
         QByteArray t;
         t[0] = b[i];
-        b[i] = b[3-i];
-        b[3-i] = t[0];
+        b[i] = b[3 - i];
+        b[3 - i] = t[0];
     }
-    memcpy((char *)&value,b,4);
+    memcpy((char*)&value, b, 4);
     return value;
 }
 
@@ -126,14 +124,13 @@ int BabyMEGClient::MGH_LM_Byte2Int(QByteArray b)
 
 QByteArray BabyMEGClient::MGH_LM_Int2Byte(int a)
 {
-    QByteArray b = QByteArray::fromRawData((char *)&a,4);
+    QByteArray b = QByteArray::fromRawData((char*)&a, 4);
 
-    for (int i=0;i<2;i++)
-    {
+    for (int i = 0; i < 2; i++) {
         QByteArray t;
         t[0] = b[i];
-        b[i] = b[3-i];
-        b[3-i] = t[0];
+        b[i] = b[3 - i];
+        b[3 - i] = t[0];
     }
     return b;
 }
@@ -146,16 +143,15 @@ double BabyMEGClient::MGH_LM_Byte2Double(QByteArray b)
         qWarning("MGH_LM_Byte2Double: input too short (%lld bytes, need 8)", static_cast<long long>(b.size()));
         return 0.0;
     }
-    double value= 1.0;
+    double value = 1.0;
     // reverse the byte order
-    for (int i=0;i<4;i++)
-    {
+    for (int i = 0; i < 4; i++) {
         QByteArray t;
         t[0] = b[i];
-        b[i] = b[7-i];
-        b[7-i] = t[0];
+        b[i] = b[7 - i];
+        b[7 - i] = t[0];
     }
-    memcpy((char *)&value,b,8);
+    memcpy((char*)&value, b, 8);
 
     return value;
 }
@@ -164,7 +160,7 @@ double BabyMEGClient::MGH_LM_Byte2Double(QByteArray b)
 
 void BabyMEGClient::HescDisplay(double a)
 {
-    QByteArray data = QByteArray::fromRawData((char *)&a,8);
+    QByteArray data = QByteArray::fromRawData((char*)&a, 8);
     qDebug() << data.toHex();
 }
 
@@ -175,26 +171,26 @@ void BabyMEGClient::ConnectToBabyMEG()
     m_bSocketIsConnected = false;
 
     // Connect to the server of babyMEG [labview]
-    qDebug()<< "Client is started!";
+    qDebug() << "Client is started!";
 
-    for(int i = 0; i < 10; i++) {
-        tcpSocket->connectToHost(name,port,QIODevice::ReadWrite);
+    for (int i = 0; i < 10; i++) {
+        tcpSocket->connectToHost(name, port, QIODevice::ReadWrite);
 
         if (tcpSocket->waitForConnected(5000)) {
             m_bSocketIsConnected = true;
             qDebug("Connect to BabyMEG Server ... Ok");
 
             //download parameters
-            qDebug()<< "Send the initial parameter request";
+            qDebug() << "Send the initial parameter request";
 
-            if (tcpSocket->state()==QAbstractSocket::ConnectedState)  {
+            if (tcpSocket->state() == QAbstractSocket::ConnectedState) {
                 buffer.clear();
-//                SendCommand("INFO");
+                //                SendCommand("INFO");
                 SendCommand("DATA");
             }
 
             return;
-        } else{
+        } else {
             qDebug("Connection to BabyMEG server failed");
             qDebug("Retry...");
         }
@@ -209,7 +205,7 @@ void BabyMEGClient::ConnectToBabyMEG()
 
 void BabyMEGClient::DisconnectBabyMEG()
 {
-    if(m_bSocketIsConnected && tcpSocket->state()==QAbstractSocket::ConnectedState)
+    if (m_bSocketIsConnected && tcpSocket->state() == QAbstractSocket::ConnectedState)
         SendCommand("QUIT");
 }
 
@@ -220,33 +216,28 @@ void BabyMEGClient::SendCommandToBabyMEGShortConnection(QByteArray s)
     qDebug() << "SendCommandToBabyMEGShortConnection";
 
     bool connected = (tcpSocket->state() == QTcpSocket::ConnectedState);
-    if(connected)
-    {
+    if (connected) {
         tcpSocket->disconnectFromHost();
-        if(tcpSocket->state() != QAbstractSocket::UnconnectedState)
-                    tcpSocket->waitForDisconnected();
+        if (tcpSocket->state() != QAbstractSocket::UnconnectedState)
+            tcpSocket->waitForDisconnected();
     }
 
-    tcpSocket->connectToHost(name,port,QIODevice::ReadWrite);
-    if (tcpSocket->waitForConnected(10000))
-    {
+    tcpSocket->connectToHost(name, port, QIODevice::ReadWrite);
+    if (tcpSocket->waitForConnected(10000)) {
+        qDebug() << "Connection is built.";
 
-        qDebug()<<"Connection is built.";
-
-        if(tcpSocket->state()==QAbstractSocket::ConnectedState)
-        {
-            qDebug()<<"Send String [" << s << "]\n"<<"length["<<s.size()<<"]\n";
+        if (tcpSocket->state() == QAbstractSocket::ConnectedState) {
+            qDebug() << "Send String [" << s << "]\n"
+                     << "length[" << s.size() << "]\n";
             tcpSocket->write(s);
-//            int strlen = s.size();
-//            QByteArray Scmd = MGH_LM_Int2Byte(strlen);
+            //            int strlen = s.size();
+            //            QByteArray Scmd = MGH_LM_Int2Byte(strlen);
 
-//            tcpSocket->write(Scmd);
-//            tcpSocket->write("SLM");
+            //            tcpSocket->write(Scmd);
+            //            tcpSocket->write("SLM");
             tcpSocket->waitForBytesWritten();
-        }
-        else
-        {
-            qDebug()<<"Connect state is abnormal:"<<tcpSocket->state();
+        } else {
+            qDebug() << "Connect state is abnormal:" << tcpSocket->state();
         }
     }
 }
@@ -255,9 +246,8 @@ void BabyMEGClient::SendCommandToBabyMEGShortConnection(QByteArray s)
 
 void BabyMEGClient::SendCommandToBabyMEG()
 {
-    qDebug()<<"Send Command";
-    if(m_bSocketIsConnected && tcpSocket->state()==QAbstractSocket::ConnectedState)
-    {
+    qDebug() << "Send Command";
+    if (m_bSocketIsConnected && tcpSocket->state() == QAbstractSocket::ConnectedState) {
         m_qMutex.lock();
         tcpSocket->write("COMD");
         tcpSocket->waitForBytesWritten();
@@ -276,24 +266,21 @@ void BabyMEGClient::SendCommandToBabyMEG()
 
 void BabyMEGClient::ReadToBuffer()
 {
-
     QByteArray dat;
 
     int numBytes = tcpSocket->bytesAvailable();
-//    qDebug() << "1.byte available: " << numBytes;
-    if (numBytes > 0){
+    //    qDebug() << "1.byte available: " << numBytes;
+    if (numBytes > 0) {
         dat = tcpSocket->read(numBytes); // read all pending data
-//        qDebug()<<"[dat Size]"<<dat.size();
-        if (!dat.isEmpty()){
+                                         //        qDebug()<<"[dat Size]"<<dat.size();
+        if (!dat.isEmpty()) {
             buffer.append(dat); // and append it to your own buffer
-//            qDebug()<<"[ReadToBuffer: Buffer Size]"<<buffer.size();
-        }
-        else
-        {
-            qDebug()<<"[Empty dat: error]"<<tcpSocket->errorString();
+                                //            qDebug()<<"[ReadToBuffer: Buffer Size]"<<buffer.size();
+        } else {
+            qDebug() << "[Empty dat: error]" << tcpSocket->errorString();
         }
     }
-//    qDebug()<<"read buffer is done!";
+    //    qDebug()<<"read buffer is done!";
 
     handleBuffer();
     return;
@@ -303,13 +290,13 @@ void BabyMEGClient::ReadToBuffer()
 
 void BabyMEGClient::handleBuffer()
 {
-    if(buffer.size()>= 8){
+    if (buffer.size() >= 8) {
         QByteArray CMD = buffer.left(4);
-        QByteArray DLEN = buffer.mid(4,4);
+        QByteArray DLEN = buffer.mid(4, 4);
         int tmp = MGH_LM_Byte2Int(DLEN);
-//        qDebug() << "First 4 bytes + length" << CMD << "["<<CMD.toHex()<<"]";
-//        qDebug() << "Command[" << CMD <<"]";
-//        qDebug() << "Body Length[" << tmp << "]";
+        //        qDebug() << "First 4 bytes + length" << CMD << "["<<CMD.toHex()<<"]";
+        //        qDebug() << "Command[" << CMD <<"]";
+        //        qDebug() << "Body Length[" << tmp << "]";
 
         if (tmp < 0) {
             qWarning("handleBuffer: negative body length %d, discarding", tmp);
@@ -317,9 +304,8 @@ void BabyMEGClient::handleBuffer()
             return;
         }
 
-        if (tmp <= (buffer.size() - 8))
-        {
-            buffer.remove(0,8);
+        if (tmp <= (buffer.size() - 8)) {
+            buffer.remove(0, 8);
 
             int OPT = 0;
 
@@ -338,104 +324,101 @@ void BabyMEGClient::handleBuffer()
             else if (CMD == "INFG")
                 OPT = 7;
 
-            switch (OPT){
-            case 1:
-                // from buffer get data package
-                {
-                QByteArray PARA = buffer.left(tmp);
-                qDebug()<<"[INFO]"<<PARA;
-                //Parse parameters from PARA string
-                myBabyMEGInfo->MGH_LM_Parse_Para(PARA);
-                buffer.remove(0,tmp);
-                qDebug()<<"INFO has been received!!!!";
-//                qDebug()<<"ACQ Start";
-//                SendCommand("DATA");
+            switch (OPT) {
+                case 1:
+                    // from buffer get data package
+                    {
+                        QByteArray PARA = buffer.left(tmp);
+                        qDebug() << "[INFO]" << PARA;
+                        //Parse parameters from PARA string
+                        myBabyMEGInfo->MGH_LM_Parse_Para(PARA);
+                        buffer.remove(0, tmp);
+                        qDebug() << "INFO has been received!!!!";
+                        //                qDebug()<<"ACQ Start";
+                        //                SendCommand("DATA");
+                    }
+                    break;
+                case 2:
+                    // read data package from buffer
+                    // Ask for the next data block
+
+                    SendCommand("DATA");
+                    DispatchDataPackage(tmp);
+
+                    break;
+                case 3: {
+                    QByteArray RESP = buffer.left(tmp);
+                    qDebug() << "5.Readbytes:" << RESP.size();
+                    qDebug() << RESP;
                 }
-                break;
-            case 2:
-                // read data package from buffer
-                // Ask for the next data block
+                    buffer.remove(0, tmp);
 
-                SendCommand("DATA");
-                DispatchDataPackage(tmp);
+                    break;
+                case 4: //quit
+                    qDebug() << "Quit";
 
-                break;
-            case 3:
+                    SendCommand("QREL");
+                    tcpSocket->disconnectFromHost();
+                    if (tcpSocket->state() != QAbstractSocket::UnconnectedState)
+                        tcpSocket->waitForDisconnected();
+                    m_bSocketIsConnected = false;
+                    qDebug() << "Disconnect Server";
+                    qDebug() << "Client is End!";
+                    qDebug() << "You can close this application or restart to connect Server.";
+
+                    break;
+                case 5: //command short connection
                 {
-                QByteArray RESP = buffer.left(tmp);
-                qDebug()<< "5.Readbytes:"<<RESP.size();
-                qDebug() << RESP;
+                    QByteArray RESP = buffer.left(tmp);
+                    qDebug() << "5.Readbytes:" << RESP.size();
+                    qDebug() << RESP;
+                    myBabyMEGInfo->MGH_LM_Send_CMDPackage(RESP);
                 }
-                buffer.remove(0,tmp);
+                    buffer.remove(0, tmp);
+                    SendCommand("QUIT");
+                    break;
+                case 6: //quit
+                    qDebug() << "Quit";
 
-                break;
-            case 4:  //quit
-                qDebug()<<"Quit";
-
-                SendCommand("QREL");
-                tcpSocket->disconnectFromHost();
-                if(tcpSocket->state() != QAbstractSocket::UnconnectedState)
-                            tcpSocket->waitForDisconnected();
-                m_bSocketIsConnected = false;
-                qDebug()<< "Disconnect Server";
-                qDebug()<< "Client is End!";
-                qDebug()<< "You can close this application or restart to connect Server.";
-
-                break;
-            case 5://command short connection
+                    SendCommand("QREL");
+                    tcpSocket->disconnectFromHost();
+                    if (tcpSocket->state() != QAbstractSocket::UnconnectedState)
+                        tcpSocket->waitForDisconnected();
+                    m_bSocketIsConnected = false;
+                    qDebug() << "Disconnect Server";
+                    break;
+                case 7: //INFG
                 {
-                QByteArray RESP = buffer.left(tmp);
-                qDebug()<< "5.Readbytes:"<<RESP.size();
-                qDebug() << RESP;
-                myBabyMEGInfo->MGH_LM_Send_CMDPackage(RESP);
-                }
-                buffer.remove(0,tmp);
-                SendCommand("QUIT");
-                break;
-            case 6:  //quit
-                qDebug()<<"Quit";
+                    QByteArray PARA = buffer.left(tmp);
+                    qDebug() << "[INFG]" << PARA;
+                    //Parse parameters from PARA string
+                    myBabyMEGInfo->MGH_LM_Parse_Para_Infg(PARA);
+                    buffer.remove(0, tmp);
+                    qDebug() << "INFG has been received!!!!";
+                } break;
 
-                SendCommand("QREL");
-                tcpSocket->disconnectFromHost();
-                if(tcpSocket->state() != QAbstractSocket::UnconnectedState)
-                            tcpSocket->waitForDisconnected();
-                m_bSocketIsConnected = false;
-                qDebug()<< "Disconnect Server";
-                break;
-            case 7: //INFG
-                {
-                QByteArray PARA = buffer.left(tmp);
-                qDebug()<<"[INFG]"<<PARA;
-                //Parse parameters from PARA string
-                myBabyMEGInfo->MGH_LM_Parse_Para_Infg(PARA);
-                buffer.remove(0,tmp);
-                qDebug()<<"INFG has been received!!!!";
-                }
-                break;
-
-            default:
-                qDebug()<< "Unknow Type";
-                break;
+                default:
+                    qDebug() << "Unknow Type";
+                    break;
             }
         }
-    }// buffer is not empty and larger than 8 bytes
+    } // buffer is not empty and larger than 8 bytes
 }
 
 //=============================================================================================================
 
 void BabyMEGClient::DispatchDataPackage(int tmp)
 {
-
-//    qDebug()<<"Acq data from buffer  [buffer size() =" << buffer.size()<<"]";
+    //    qDebug()<<"Acq data from buffer  [buffer size() =" << buffer.size()<<"]";
     QByteArray DATA = buffer.left(tmp);
-    qDebug()<< "5.Readbytes:"<<DATA.size();
+    qDebug() << "5.Readbytes:" << DATA.size();
     myBabyMEGInfo->MGH_LM_Send_DataPackage(DATA);
-//    myBabyMEGInfo->EnQueue(DATA);
-    buffer.remove(0,tmp);
-//    qDebug()<<"Rest buffer  [buffer size() =" << buffer.size()<<"]";
-    numBlock ++;
-    qDebug()<< "Next Block ..." << numBlock;
-//    DATA.clear();
+    //    myBabyMEGInfo->EnQueue(DATA);
+    buffer.remove(0, tmp);
+    //    qDebug()<<"Rest buffer  [buffer size() =" << buffer.size()<<"]";
+    numBlock++;
+    qDebug() << "Next Block ..." << numBlock;
+    //    DATA.clear();
 
     ReadNextBlock(tmp);
 }
@@ -448,16 +431,14 @@ void BabyMEGClient::ReadNextBlock(int tmp)
     QByteArray DLEN1;
     QByteArray DATA1;
     int tmp1;
-    while (buffer.size()>=(tmp+8))
-    { // process the extra data block to reduce the load of data buffer
+    while (buffer.size() >= (tmp + 8)) { // process the extra data block to reduce the load of data buffer
         CMD1 = buffer.left(4);
-        qDebug()<<"CMD"<< CMD1;
-        if (CMD1 == "DATR")
-        {
-            DLEN1 = buffer.mid(4,4);
+        qDebug() << "CMD" << CMD1;
+        if (CMD1 == "DATR") {
+            DLEN1 = buffer.mid(4, 4);
             tmp1 = MGH_LM_Byte2Int(DLEN1);
-            qDebug() << "[2]First 4 bytes + length" << CMD1 << "["<<CMD1.toHex()<<"]";
-            qDebug() << "[2]Command[" << CMD1 <<"]";
+            qDebug() << "[2]First 4 bytes + length" << CMD1 << "[" << CMD1.toHex() << "]";
+            qDebug() << "[2]Command[" << CMD1 << "]";
             qDebug() << "[2]Body Length[" << tmp1 << "]";
 
             if (tmp1 < 0) {
@@ -466,22 +447,20 @@ void BabyMEGClient::ReadNextBlock(int tmp)
                 break;
             }
 
-            buffer.remove(0,8);
+            buffer.remove(0, 8);
             DATA1 = buffer.left(tmp1);
             myBabyMEGInfo->MGH_LM_Send_DataPackage(DATA1);
-//            myBabyMEGInfo->EnQueue(DATA1);
-            buffer.remove(0,tmp1);
-            qDebug()<<"End of DataPackeage" << buffer.left(3);
-            qDebug()<<"[2]Rest buffer  [buffer size() =" << buffer.size()<<"]";
-            numBlock ++;
-            qDebug()<< "[2]Next Block ..." << numBlock;
-        }
-        else
-        {
-            qDebug()<<"[CMD1]"<<CMD1.toHex();
+            //            myBabyMEGInfo->EnQueue(DATA1);
+            buffer.remove(0, tmp1);
+            qDebug() << "End of DataPackeage" << buffer.left(3);
+            qDebug() << "[2]Rest buffer  [buffer size() =" << buffer.size() << "]";
+            numBlock++;
+            qDebug() << "[2]Next Block ..." << numBlock;
+        } else {
+            qDebug() << "[CMD1]" << CMD1.toHex();
             break;
         }
-        qDebug()<<"[ReadNextBlock:buffer size]"<<buffer.size();
+        qDebug() << "[ReadNextBlock:buffer size]" << buffer.size();
     }
     DATA1.clear();
     CMD1.clear();
@@ -497,35 +476,30 @@ void BabyMEGClient::SendCommand(QString s)
 
     qint64 WrtNum;
 
-    if (tcpSocket->state()==QAbstractSocket::ConnectedState)
-    {
+    if (tcpSocket->state() == QAbstractSocket::ConnectedState) {
         m_qMutex.lock();
 
-//    qDebug()<<"[Send Command]"<<array;
-        WrtNum = tcpSocket->write(array,4);
-        if(WrtNum==-1)
-        {
-            qDebug()<<"Error for sending a command";
+        //    qDebug()<<"[Send Command]"<<array;
+        WrtNum = tcpSocket->write(array, 4);
+        if (WrtNum == -1) {
+            qDebug() << "Error for sending a command";
         }
-        if(WrtNum != array.size())
-        {
-            qDebug()<<"Uncorrectly sending";
+        if (WrtNum != array.size()) {
+            qDebug() << "Uncorrectly sending";
         }
         tcpSocket->flush();
         tcpSocket->waitForBytesWritten();
         m_qMutex.unlock();
-        qDebug()<<"[Done: Send Command]"<<array<<"[Send bytes]"<<WrtNum;
+        qDebug() << "[Done: Send Command]" << array << "[Send bytes]" << WrtNum;
 
-        }
-        else
-        {
-            qDebug()<<"Not in Connected state";
-            //re-connect to server
-            ConnectToBabyMEG();
-            buffer.clear();
-            SendCommand("DATA");
-        }
-//    sleep(1);
+    } else {
+        qDebug() << "Not in Connected state";
+        //re-connect to server
+        ConnectToBabyMEG();
+        buffer.clear();
+        SendCommand("DATA");
+    }
+    //    sleep(1);
 }
 
 //=============================================================================================================

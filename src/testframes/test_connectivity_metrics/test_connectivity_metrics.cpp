@@ -86,7 +86,7 @@ private slots:
     {
         ConnectivitySettings settings;
         MatrixX3f pos(4, 3);
-        pos << 0,0,0, 1,0,0, 0,1,0, 0,0,1;
+        pos << 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1;
         settings.setNodePositions(pos);
         QCOMPARE(settings.getNodePositions().rows(), 4);
     }
@@ -142,7 +142,7 @@ private slots:
         settings.setConnectivityMethods(methods);
 
         MatrixX3f nodePos(4, 3);
-        nodePos << 0,0,0, 1,0,0, 0,1,0, 0,0,1;
+        nodePos << 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1;
         settings.setNodePositions(nodePos);
 
         QList<Network> networks = Connectivity::calculate(settings);
@@ -163,7 +163,7 @@ private slots:
         settings.setConnectivityMethods(methods);
 
         MatrixX3f nodePos(4, 3);
-        nodePos << 0,0,0, 1,0,0, 0,1,0, 0,0,1;
+        nodePos << 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1;
         settings.setNodePositions(nodePos);
 
         QList<Network> networks = Connectivity::calculate(settings);
@@ -183,7 +183,7 @@ private slots:
         settings.setConnectivityMethods(methods);
 
         MatrixX3f nodePos(4, 3);
-        nodePos << 0,0,0, 1,0,0, 0,1,0, 0,0,1;
+        nodePos << 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1;
         settings.setNodePositions(nodePos);
 
         QList<Network> networks = Connectivity::calculate(settings);
@@ -203,7 +203,7 @@ private slots:
         settings.setConnectivityMethods(methods);
 
         MatrixX3f nodePos(4, 3);
-        nodePos << 0,0,0, 1,0,0, 0,1,0, 0,0,1;
+        nodePos << 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1;
         settings.setNodePositions(nodePos);
 
         QList<Network> networks = Connectivity::calculate(settings);
@@ -223,7 +223,7 @@ private slots:
         settings.setConnectivityMethods(methods);
 
         MatrixX3f nodePos(4, 3);
-        nodePos << 0,0,0, 1,0,0, 0,1,0, 0,0,1;
+        nodePos << 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1;
         settings.setNodePositions(nodePos);
 
         QList<Network> networks = Connectivity::calculate(settings);
@@ -243,7 +243,7 @@ private slots:
         settings.setConnectivityMethods(methods);
 
         MatrixX3f nodePos(4, 3);
-        nodePos << 0,0,0, 1,0,0, 0,1,0, 0,0,1;
+        nodePos << 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1;
         settings.setNodePositions(nodePos);
 
         QList<Network> networks = Connectivity::calculate(settings);
@@ -263,7 +263,7 @@ private slots:
         settings.setConnectivityMethods(methods);
 
         MatrixX3f nodePos(4, 3);
-        nodePos << 0,0,0, 1,0,0, 0,1,0, 0,0,1;
+        nodePos << 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1;
         settings.setNodePositions(nodePos);
 
         QList<Network> networks = Connectivity::calculate(settings);
@@ -283,7 +283,7 @@ private slots:
         settings.setConnectivityMethods(methods);
 
         MatrixX3f nodePos(4, 3);
-        nodePos << 0,0,0, 1,0,0, 0,1,0, 0,0,1;
+        nodePos << 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1;
         settings.setNodePositions(nodePos);
 
         QList<Network> networks = Connectivity::calculate(settings);
@@ -303,7 +303,7 @@ private slots:
         settings.setConnectivityMethods(methods);
 
         MatrixX3f nodePos(4, 3);
-        nodePos << 0,0,0, 1,0,0, 0,1,0, 0,0,1;
+        nodePos << 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1;
         settings.setNodePositions(nodePos);
 
         QList<Network> networks = Connectivity::calculate(settings);
@@ -323,7 +323,7 @@ private slots:
         settings.setConnectivityMethods(methods);
 
         MatrixX3f nodePos(4, 3);
-        nodePos << 0,0,0, 1,0,0, 0,1,0, 0,0,1;
+        nodePos << 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1;
         settings.setNodePositions(nodePos);
 
         QList<Network> networks = Connectivity::calculate(settings);

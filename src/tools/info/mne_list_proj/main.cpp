@@ -51,19 +51,26 @@ using namespace UTILSLIB;
 static QString projKindName(int kind)
 {
     switch (kind) {
-    case 1:                                return "Field";
-    case 2:                                return "Fixed dipole";
-    case 3:                                return "Rotating dipole";
-    case 4:                                return "Homog. grad.";
-    case 5:                                return "Homog. field";
-    case FIFFV_MNE_PROJ_ITEM_EEG_AVREF:   return "EEG avg ref";
-    default:                               return QString("Unknown (%1)").arg(kind);
+        case 1:
+            return "Field";
+        case 2:
+            return "Fixed dipole";
+        case 3:
+            return "Rotating dipole";
+        case 4:
+            return "Homog. grad.";
+        case 5:
+            return "Homog. field";
+        case FIFFV_MNE_PROJ_ITEM_EEG_AVREF:
+            return "EEG avg ref";
+        default:
+            return QString("Unknown (%1)").arg(kind);
     }
 }
 
 //=============================================================================================================
 
-int main(int argc, char *argv[])
+int main(int argc, char* argv[])
 {
     qInstallMessageHandler(MNELogger::customLogWriter);
     QCoreApplication app(argc, argv);

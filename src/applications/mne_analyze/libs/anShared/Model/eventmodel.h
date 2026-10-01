@@ -42,7 +42,8 @@
 // DEFINE NAMESPACE ANSHAREDLIB
 //=============================================================================================================
 
-namespace ANSHAREDLIB {
+namespace ANSHAREDLIB
+{
 
 //=============================================================================================================
 // ANSHAREDLIB FORWARD DECLARATIONS
@@ -59,8 +60,8 @@ class ANSHAREDSHARED_EXPORT EventModel : public AbstractModel
     Q_OBJECT
 
 public:
-    typedef QSharedPointer<EventModel> SPtr;              /**< Shared pointer type for EventModel. */
-    typedef QSharedPointer<const EventModel> ConstSPtr;   /**< Const shared pointer type for EventModel. */
+    typedef QSharedPointer<EventModel> SPtr;            /**< Shared pointer type for EventModel. */
+    typedef QSharedPointer<const EventModel> ConstSPtr; /**< Const shared pointer type for EventModel. */
 
     //=========================================================================================================
     /**
@@ -73,11 +74,11 @@ public:
     //=========================================================================================================
 
     EventModel(QSharedPointer<FiffRawViewModel> pFiffModel,
-                    QObject* parent = Q_NULLPTR);
+               QObject* parent = Q_NULLPTR);
 
     //=========================================================================================================
 
-    EventModel(const QString &sFilePath,
+    EventModel(const QString& sFilePath,
                const QByteArray& byteLoadedData = QByteArray(),
                float fSampFreq = 600,
                int iFirstSampOffst = 0,
@@ -101,7 +102,7 @@ public:
      */
     bool insertRows(int position,
                     int span,
-                    const QModelIndex & parent) override;
+                    const QModelIndex& parent) override;
 
     //=========================================================================================================
     /**
@@ -115,7 +116,7 @@ public:
      */
     bool removeRows(int position,
                     int span,
-                    const QModelIndex & parent = QModelIndex()) override;
+                    const QModelIndex& parent = QModelIndex()) override;
 
     //=========================================================================================================
     /**
@@ -123,7 +124,7 @@ public:
      *
      * @param[in] parent     The parent index.
      */
-    virtual int rowCount(const QModelIndex &parent = QModelIndex()) const override;
+    virtual int rowCount(const QModelIndex& parent = QModelIndex()) const override;
 
     //=========================================================================================================
     /**
@@ -131,7 +132,7 @@ public:
      *
      * @param[in] parent     The parent index.
      */
-    virtual int columnCount(const QModelIndex &parent = QModelIndex()) const override;
+    virtual int columnCount(const QModelIndex& parent = QModelIndex()) const override;
 
     //=========================================================================================================
     /**
@@ -140,7 +141,7 @@ public:
      * @param[in] index   The index that referres to the requested item.
      * @param[in] role    The requested role.
      */
-    virtual QVariant data(const QModelIndex &index,
+    virtual QVariant data(const QModelIndex& index,
                           int role = Qt::DisplayRole) const override;
 
     //=========================================================================================================
@@ -167,8 +168,8 @@ public:
      *
      * @return returns true if successful.
      */
-    bool setData(const QModelIndex & index,
-                 const QVariant & value,
+    bool setData(const QModelIndex& index,
+                 const QVariant& value,
                  int role = Qt::EditRole) override;
 
     //=========================================================================================================
@@ -177,7 +178,7 @@ public:
      *
      * @param[in] index   The index that referres to the requested item.
      */
-    Qt::ItemFlags flags(const QModelIndex & index) const override;
+    Qt::ItemFlags flags(const QModelIndex& index) const override;
 
     //=========================================================================================================
     /**
@@ -328,7 +329,7 @@ public:
      *
      * @param[in] currentText
      */
-    void setSelectedGroupName(const QString &sGroupName);
+    void setSelectedGroupName(const QString& sGroupName);
 
     //=========================================================================================================
     /**
@@ -345,7 +346,7 @@ public:
      *
      * @param[in] index   The index that referres to the child.
      */
-    inline QModelIndex parent(const QModelIndex &index) const override;
+    inline QModelIndex parent(const QModelIndex& index) const override;
 
     //=========================================================================================================
     /**
@@ -359,7 +360,7 @@ public:
      */
     inline QModelIndex index(int row,
                              int column,
-                             const QModelIndex &parent = QModelIndex()) const override;
+                             const QModelIndex& parent = QModelIndex()) const override;
 
     //=========================================================================================================
     /**
@@ -413,8 +414,8 @@ public:
      *
      * @return  Pointer to a vector of events.
      */
-    std::unique_ptr<std::vector<EVENTSLIB::Event> > getEventsToDisplay(int iBegin,
-                                                                       int iEnd) const;
+    std::unique_ptr<std::vector<EVENTSLIB::Event>> getEventsToDisplay(int iBegin,
+                                                                      int iEnd) const;
 
     //=========================================================================================================
     /**
@@ -422,7 +423,7 @@ public:
      *
      * @return Pointer to a vector of groups
      */
-    std::unique_ptr<std::vector<EVENTSLIB::EventGroup> > getGroupsToDisplay() const;
+    std::unique_ptr<std::vector<EVENTSLIB::EventGroup>> getGroupsToDisplay() const;
 
     //=========================================================================================================
     /**
@@ -509,7 +510,6 @@ signals:
     void eventGroupsUpdated();
 
 private:
-
     //=========================================================================================================
     /**
      * Sets up default paramaters ofr new model
@@ -530,22 +530,22 @@ private:
      */
     void eventsUpdated();
 
-    int                                 m_iSamplePos;                   /**< Sample of event to be added */
-    int                                 m_iFirstSample;                 /**< First sample of file */
-    int                                 m_iLastSample;                  /**< Last sample of file */
+    int m_iSamplePos;   /**< Sample of event to be added */
+    int m_iFirstSample; /**< First sample of file */
+    int m_iLastSample;  /**< Last sample of file */
 
-    int                                 m_iSelectedCheckState;          /**< State of checkbox of whether to show only selected events. */
+    int m_iSelectedCheckState; /**< State of checkbox of whether to show only selected events. */
 
-    std::vector<uint>                   m_listEventSelection;           /**< List of selected events. */
-    std::vector<idNum>                  m_selectedEventGroups;          /**< Vector of selected groups. */
+    std::vector<uint> m_listEventSelection;   /**< List of selected events. */
+    std::vector<idNum> m_selectedEventGroups; /**< Vector of selected groups. */
 
-    float                               m_fFreq;                        /**< Frequency of data file. */
+    float m_fFreq; /**< Frequency of data file. */
 
-    QSharedPointer<FiffRawViewModel>    m_pFiffModel;                   /**< Pointer to FiffRawViewModel associated with the events stored in this model. */
+    QSharedPointer<FiffRawViewModel> m_pFiffModel; /**< Pointer to FiffRawViewModel associated with the events stored in this model. */
 
-    EVENTSLIB::EventManager             m_EventManager;                 /**< Database of of events. */
+    EVENTSLIB::EventManager m_EventManager; /**< Database of of events. */
 
-    const static double                 m_dThreshold;
+    const static double m_dThreshold;
 };
 
 //=============================================================================================================
@@ -559,7 +559,7 @@ inline MODEL_TYPE EventModel::getType() const
 
 //=============================================================================================================
 
-QModelIndex EventModel::parent(const QModelIndex &index) const
+QModelIndex EventModel::parent(const QModelIndex& index) const
 {
     Q_UNUSED(index);
     return QModelIndex();
@@ -567,7 +567,7 @@ QModelIndex EventModel::parent(const QModelIndex &index) const
 
 //=============================================================================================================
 
-QModelIndex EventModel::index(int row, int column, const QModelIndex &parent) const
+QModelIndex EventModel::index(int row, int column, const QModelIndex& parent) const
 {
     Q_UNUSED(parent);
     return createIndex(row, column);

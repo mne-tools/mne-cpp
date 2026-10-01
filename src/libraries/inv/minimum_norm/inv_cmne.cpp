@@ -70,8 +70,8 @@ InvCMNEResult InvCMNE::compute(
     InvCMNEResult result;
 
     int nChannels = matGain.rows();
-    int nSources  = matGain.cols();
-    int nTimes    = matEvoked.cols();
+    int nSources = matGain.cols();
+    int nTimes = matEvoked.cols();
 
     // Step 1: Compute dSPM kernel
     qInfo() << "[InvCMNE] Step 1/4: Computing dSPM kernel"
@@ -85,7 +85,7 @@ InvCMNEResult InvCMNE::compute(
     // Step 2: Apply kernel to evoked data -> dSPM source estimate
     qInfo() << "[InvCMNE] Step 2/4: Projecting evoked data to source space"
             << "(" << nTimes << "time points) …";
-    MatrixXd matDspmData = matKernelDspm * matEvoked;  // n_sources x n_times
+    MatrixXd matDspmData = matKernelDspm * matEvoked; // n_sources x n_times
 
     // Build dSPM source estimate
     VectorXi vertices = VectorXi::LinSpaced(matDspmData.rows(), 0, matDspmData.rows() - 1);
@@ -103,8 +103,8 @@ InvCMNEResult InvCMNE::compute(
 
     if (!settings.onnxModelPath.isEmpty() && nTimes >= settings.lookBack) {
         qInfo() << "[InvCMNE] Step 4/4: Applying LSTM temporal correction"
-               << "(look-back=" << settings.lookBack << ","
-               << (nTimes - settings.lookBack) << "correctable time points) …";
+                << "(look-back=" << settings.lookBack << ","
+                << (nTimes - settings.lookBack) << "correctable time points) …";
         matCmneData = applyLstmCorrection(matZScored, settings.onnxModelPath, settings.lookBack);
 
         // Store raw LSTM prediction for diagnostics
@@ -161,13 +161,13 @@ MatrixXd InvCMNE::computeDspmKernel(
 
     // Step 2: Whiten gain matrix
     qInfo() << "  [dSPM kernel] Whitening gain matrix …";
-    MatrixXd matGainWhitened = matWhitener * matGain;  // n_channels x n_sources
+    MatrixXd matGainWhitened = matWhitener * matGain; // n_channels x n_sources
 
     // Step 3: MNE kernel
     qInfo() << "  [dSPM kernel] Computing MNE kernel (LDLT solve," << nChannels << "x" << nChannels << ") …";
     // K = C_R * G_tilde^T * (G_tilde * C_R * G_tilde^T + lambda2 * I)^{-1}
-    MatrixXd matGCR = matGainWhitened * matSrcCov;                         // n_channels x n_sources
-    MatrixXd matA = matGCR * matGainWhitened.transpose();                  // n_channels x n_channels
+    MatrixXd matGCR = matGainWhitened * matSrcCov;        // n_channels x n_sources
+    MatrixXd matA = matGCR * matGainWhitened.transpose(); // n_channels x n_channels
     matA.diagonal().array() += lambda2;
 
     // Solve once: A^{-1} via LDLT, then K = (C_R * G_tilde^T) * A^{-1}
@@ -178,7 +178,7 @@ MatrixXd InvCMNE::computeDspmKernel(
     // noise_norm_i = sqrt((K * C_n * K^T)(i,i))
     // K_dSPM(i,:) = K(i,:) / noise_norm_i
     qInfo() << "  [dSPM kernel] Normalizing" << nSources << "source rows …";
-    MatrixXd matKCn = matK * matNoiseCov;  // n_sources x n_channels
+    MatrixXd matKCn = matK * matNoiseCov; // n_sources x n_channels
     for (int i = 0; i < nSources; ++i) {
         double noiseNorm = std::sqrt(matKCn.row(i).dot(matK.row(i)));
         if (noiseNorm > 1e-10) {
@@ -186,7 +186,7 @@ MatrixXd InvCMNE::computeDspmKernel(
         }
     }
 
-    return matK;  // n_sources x n_channels (dSPM kernel)
+    return matK; // n_sources x n_channels (dSPM kernel)
 }
 
 //=============================================================================================================
@@ -225,10 +225,10 @@ MatrixXd InvCMNE::applyLstmCorrection(
     int nSources = matDspmData.rows();
     int nTimes = matDspmData.cols();
 
-    MatrixXd result = matDspmData;  // copy — for t < lookBack: identity (no correction)
+    MatrixXd result = matDspmData; // copy — for t < lookBack: identity (no correction)
 
     int nCorrectableSteps = nTimes - lookBack;
-    int reportInterval = qMax(1, nCorrectableSteps / 10);  // report ~10 times
+    int reportInterval = qMax(1, nCorrectableSteps / 10); // report ~10 times
 
     // Try to load ONNX model for LSTM inference
     MLLIB::MlOnnxModel lstmModel;
@@ -258,7 +258,9 @@ MatrixXd InvCMNE::applyLstmCorrection(
         if (step % reportInterval == 0 || t == nTimes - 1) {
             double pct = 100.0 * (step + 1) / nCorrectableSteps;
             qInfo().noquote() << QString("  [LSTM correction] %1% (%2/%3 time steps)")
-                .arg(pct, 0, 'f', 0).arg(step + 1).arg(nCorrectableSteps);
+                                     .arg(pct, 0, 'f', 0)
+                                     .arg(step + 1)
+                                     .arg(nCorrectableSteps);
         }
 
         VectorXd prediction;
@@ -269,8 +271,7 @@ MatrixXd InvCMNE::applyLstmCorrection(
             for (int k = 0; k < lookBack; ++k) {
                 int col = t - lookBack + k;
                 for (int s = 0; s < nSources; ++s) {
-                    inputBuf[static_cast<size_t>(k) * static_cast<size_t>(nSources)
-                             + static_cast<size_t>(s)] = static_cast<float>(result(s, col));
+                    inputBuf[static_cast<size_t>(k) * static_cast<size_t>(nSources) + static_cast<size_t>(s)] = static_cast<float>(result(s, col));
                 }
             }
 
@@ -353,29 +354,39 @@ UTILSLIB::PythonRunnerResult InvCMNE::trainLstm(
     // Map method integer to string
     QString methodStr;
     switch (settings.method) {
-        case 0: methodStr = QStringLiteral("MNE");     break;
-        case 1: methodStr = QStringLiteral("dSPM");    break;
-        case 2: methodStr = QStringLiteral("sLORETA"); break;
-        case 3: methodStr = QStringLiteral("eLORETA"); break;
-        default: methodStr = QStringLiteral("dSPM");   break;
+        case 0:
+            methodStr = QStringLiteral("MNE");
+            break;
+        case 1:
+            methodStr = QStringLiteral("dSPM");
+            break;
+        case 2:
+            methodStr = QStringLiteral("sLORETA");
+            break;
+        case 3:
+            methodStr = QStringLiteral("eLORETA");
+            break;
+        default:
+            methodStr = QStringLiteral("dSPM");
+            break;
     }
 
     double snr = 1.0 / std::sqrt(settings.lambda2);
 
     // Build argument list matching train_cmne_lstm.py CLI
     QStringList args;
-    args << QStringLiteral("--fwd")          << fwdPath
-         << QStringLiteral("--cov")          << covPath
-         << QStringLiteral("--epochs")       << epochsPath
-         << QStringLiteral("--out")          << outOnnxPath
-         << QStringLiteral("--look-back")    << QString::number(settings.lookBack)
-         << QStringLiteral("--method")       << methodStr
-         << QStringLiteral("--snr")          << QString::number(snr, 'g', 6)
-         << QStringLiteral("--hidden")       << QString::number(hiddenSize)
-         << QStringLiteral("--layers")       << QString::number(numLayers)
+    args << QStringLiteral("--fwd") << fwdPath
+         << QStringLiteral("--cov") << covPath
+         << QStringLiteral("--epochs") << epochsPath
+         << QStringLiteral("--out") << outOnnxPath
+         << QStringLiteral("--look-back") << QString::number(settings.lookBack)
+         << QStringLiteral("--method") << methodStr
+         << QStringLiteral("--snr") << QString::number(snr, 'g', 6)
+         << QStringLiteral("--hidden") << QString::number(hiddenSize)
+         << QStringLiteral("--layers") << QString::number(numLayers)
          << QStringLiteral("--train-epochs") << QString::number(trainEpochs)
-         << QStringLiteral("--lr")           << QString::number(learningRate, 'g', 6)
-         << QStringLiteral("--batch")        << QString::number(batchSize);
+         << QStringLiteral("--lr") << QString::number(learningRate, 'g', 6)
+         << QStringLiteral("--batch") << QString::number(batchSize);
 
     if (!gtStcPrefix.isEmpty()) {
         args << QStringLiteral("--gt-stc") << gtStcPrefix;
@@ -388,8 +399,8 @@ UTILSLIB::PythonRunnerResult InvCMNE::trainLstm(
     // Configure PythonRunner with venv + pyproject.toml
     // Venv lives inside the cmne package directory as .venv/
     UTILSLIB::PythonRunnerConfig config;
-    config.pythonExe  = pythonExe;
-    config.venvDir    = QDir(cmneDir).absoluteFilePath(QStringLiteral(".venv"));
+    config.pythonExe = pythonExe;
+    config.venvDir = QDir(cmneDir).absoluteFilePath(QStringLiteral(".venv"));
     config.packageDir = cmneDir;
 
     MLLIB::MLTrainer trainer(config);

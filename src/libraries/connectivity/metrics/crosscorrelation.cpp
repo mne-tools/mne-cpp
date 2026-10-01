@@ -60,22 +60,22 @@ CrossCorrelation::CrossCorrelation()
 
 Network CrossCorrelation::calculate(ConnectivitySettings& connectivitySettings)
 {
-//    QElapsedTimer timer;
-//    qint64 iTime = 0;
-//    timer.start();
+    //    QElapsedTimer timer;
+    //    qint64 iTime = 0;
+    //    timer.start();
 
-    #ifdef EIGEN_FFTW_DEFAULT
-        fftw_make_planner_thread_safe();
-    #endif
+#ifdef EIGEN_FFTW_DEFAULT
+    fftw_make_planner_thread_safe();
+#endif
 
     Network finalNetwork("XCOR");
 
-    if(connectivitySettings.isEmpty()) {
+    if (connectivitySettings.isEmpty()) {
         qDebug() << "CrossCorrelation::calculate - Input data is empty";
         return finalNetwork;
     }
 
-    if(AbstractMetric::m_bStorageModeIsActive == false) {
+    if (AbstractMetric::m_bStorageModeIsActive == false) {
         connectivitySettings.clearIntermediateData();
     }
 
@@ -85,10 +85,10 @@ Network CrossCorrelation::calculate(ConnectivitySettings& connectivitySettings)
     int rows = connectivitySettings.at(0).matData.rows();
     RowVectorXf rowVert = RowVectorXf::Zero(3);
 
-    for(int i = 0; i < rows; ++i) {
+    for (int i = 0; i < rows; ++i) {
         rowVert = RowVectorXf::Zero(3);
 
-        if(connectivitySettings.getNodePositions().rows() != 0 && i < connectivitySettings.getNodePositions().rows()) {
+        if (connectivitySettings.getNodePositions().rows() != 0 && i < connectivitySettings.getNodePositions().rows()) {
             rowVert(0) = connectivitySettings.getNodePositions().row(i)(0);
             rowVert(1) = connectivitySettings.getNodePositions().row(i)(1);
             rowVert(2) = connectivitySettings.getNodePositions().row(i)(2);
@@ -115,9 +115,9 @@ Network CrossCorrelation::calculate(ConnectivitySettings& connectivitySettings)
                 tapers);
     };
 
-//    iTime = timer.elapsed();
-//    qWarning() << "Preparation" << iTime;
-//    timer.restart();
+    //    iTime = timer.elapsed();
+    //    qWarning() << "Preparation" << iTime;
+    //    timer.restart();
 
     // Calculate connectivity matrix over epochs and average afterwards
     QFuture<void> resultMat = QtConcurrent::map(connectivitySettings.getTrialData(),
@@ -126,18 +126,18 @@ Network CrossCorrelation::calculate(ConnectivitySettings& connectivitySettings)
 
     matDist /= connectivitySettings.size();
 
-//    iTime = timer.elapsed();
-//    qWarning() << "ComputeSpectraPSDCSD" << iTime;
-//    timer.restart();
+    //    iTime = timer.elapsed();
+    //    qWarning() << "ComputeSpectraPSDCSD" << iTime;
+    //    timer.restart();
 
     //Add edges to network
-    MatrixXd matWeight(1,1);
+    MatrixXd matWeight(1, 1);
     QSharedPointer<NetworkEdge> pEdge;
     int j;
 
-    for(int i = 0; i < matDist.rows(); ++i) {
-        for(j = i; j < matDist.cols(); ++j) {
-            matWeight << matDist(i,j);
+    for (int i = 0; i < matDist.rows(); ++i) {
+        for (j = i; j < matDist.cols(); ++j) {
+            matWeight << matDist(i, j);
 
             pEdge = QSharedPointer<NetworkEdge>(new NetworkEdge(i, j, matWeight));
 
@@ -147,9 +147,9 @@ Network CrossCorrelation::calculate(ConnectivitySettings& connectivitySettings)
         }
     }
 
-//    iTime = timer.elapsed();
-//    qWarning() << "Compute" << iTime;
-//    timer.restart();
+    //    iTime = timer.elapsed();
+    //    qWarning() << "Compute" << iTime;
+    //    timer.restart();
 
     return finalNetwork;
 }
@@ -162,9 +162,9 @@ void CrossCorrelation::compute(ConnectivitySettings::IntermediateTrialData& inpu
                                int iNfft,
                                const QPair<MatrixXd, VectorXd>& tapers)
 {
-//    QElapsedTimer timer;
-//    qint64 iTime = 0;
-//    timer.start();
+    //    QElapsedTimer timer;
+    //    qint64 iTime = 0;
+    //    timer.start();
 
     // Calculate tapered spectra if not available already
     RowVectorXd vecInputFFT, rowData;
@@ -178,7 +178,7 @@ void CrossCorrelation::compute(ConnectivitySettings::IntermediateTrialData& inpu
 
     // Calculate tapered spectra if not available already
     // This code was copied and changed modified Utils/Spectra since we do not want to call the function due to time loss.
-    if(inputData.vecTapSpectra.isEmpty()) {
+    if (inputData.vecTapSpectra.isEmpty()) {
         int iNFreqs = int(floor(iNfft / 2.0)) + 1;
         MatrixXcd matTapSpectrum(tapers.first.rows(), iNFreqs);
 
@@ -187,11 +187,12 @@ void CrossCorrelation::compute(ConnectivitySettings::IntermediateTrialData& inpu
             rowData.array() = inputData.matData.row(i).array() - inputData.matData.row(i).mean();
 
             // Calculate tapered spectra
-            for(j = 0; j < tapers.first.rows(); j++) {
+            for (j = 0; j < tapers.first.rows(); j++) {
                 // Zero padd if necessary. The zero padding in Eigen's FFT is only working for column vectors.
                 if (rowData.cols() < iNfft) {
                     vecInputFFT.setZero(iNfft);
-                    vecInputFFT.block(0,0,1,rowData.cols()) = rowData.cwiseProduct(tapers.first.row(j));;
+                    vecInputFFT.block(0, 0, 1, rowData.cols()) = rowData.cwiseProduct(tapers.first.row(j));
+                    ;
                 } else {
                     vecInputFFT = rowData.cwiseProduct(tapers.first.row(j));
                 }
@@ -205,9 +206,9 @@ void CrossCorrelation::compute(ConnectivitySettings::IntermediateTrialData& inpu
         }
     }
 
-//    iTime = timer.elapsed();
-//    qDebug() << QThread::currentThreadId() << "CrossCorrelation::compute timer - Tapered spectra:" << iTime;
-//    timer.restart();
+    //    iTime = timer.elapsed();
+    //    qDebug() << QThread::currentThreadId() << "CrossCorrelation::compute timer - Tapered spectra:" << iTime;
+    //    timer.restart();
 
     // Perform multiplication and transform back to time domain to find max XCOR coefficient
     // Note that the result in time domain is mirrored around the center of the data (compared to Matlab)
@@ -216,28 +217,28 @@ void CrossCorrelation::compute(ConnectivitySettings::IntermediateTrialData& inpu
     int idx = 0;
     double denom = tapers.second.sum();
 
-    for(i = 0; i < inputData.vecTapSpectra.size(); ++i) {
+    for (i = 0; i < inputData.vecTapSpectra.size(); ++i) {
         vecResultFreq = inputData.vecTapSpectra.at(i).colwise().sum() / denom;
 
-        for(j = i; j < inputData.vecTapSpectra.size(); ++j) {
+        for (j = i; j < inputData.vecTapSpectra.size(); ++j) {
             vecResultXCor = vecResultFreq.cwiseProduct(inputData.vecTapSpectra.at(j).colwise().sum() / denom);
 
             fft.inv(vecInputFFT, vecResultXCor, iNfft);
 
             vecInputFFT.maxCoeff(&idx);
 
-            matDistTrial(i,j) = vecInputFFT(idx);
+            matDistTrial(i, j) = vecInputFFT(idx);
         }
     }
 
-//    iTime = timer.elapsed();
-//    qDebug() << QThread::currentThreadId() << "CrossCorrelation::compute timer - Multiplication and inv FFT:" << iTime;
-//    timer.restart();
+    //    iTime = timer.elapsed();
+    //    qDebug() << QThread::currentThreadId() << "CrossCorrelation::compute timer - Multiplication and inv FFT:" << iTime;
+    //    timer.restart();
 
     // Sum up weights
     mutex.lock();
 
-    if(matDist.rows() != matDistTrial.rows() || matDist.cols() != matDistTrial.cols()) {
+    if (matDist.rows() != matDistTrial.rows() || matDist.cols() != matDistTrial.cols()) {
         matDist.resize(matDistTrial.rows(), matDistTrial.cols());
         matDist.setZero();
     }
@@ -246,11 +247,11 @@ void CrossCorrelation::compute(ConnectivitySettings::IntermediateTrialData& inpu
 
     mutex.unlock();
 
-//    iTime = timer.elapsed();
-//    qDebug() << QThread::currentThreadId() << "CrossCorrelation::compute timer - Summing up matDist:" << iTime;
-//    timer.restart();
+    //    iTime = timer.elapsed();
+    //    qDebug() << QThread::currentThreadId() << "CrossCorrelation::compute timer - Summing up matDist:" << iTime;
+    //    timer.restart();
 
-    if(!m_bStorageModeIsActive) {
+    if (!m_bStorageModeIsActive) {
         inputData.vecTapSpectra.clear();
     }
 }

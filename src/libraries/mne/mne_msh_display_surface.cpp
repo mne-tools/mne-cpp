@@ -52,19 +52,19 @@ using namespace MNELIB;
 //============================= local macros =================================
 
 constexpr int FAIL = -1;
-constexpr int OK   =  0;
+constexpr int OK = 0;
 
 // Axis indices for coordinate access (kept for documentation).
 [[maybe_unused]] constexpr int X = 0;
 [[maybe_unused]] constexpr int Y = 1;
 [[maybe_unused]] constexpr int Z = 2;
 
-constexpr int  SHOW_CURVATURE_NONE    = 0;
-constexpr int  SHOW_CURVATURE_OVERLAY = 1;
-constexpr int  SHOW_OVERLAY_HEAT      = 1;
+constexpr int SHOW_CURVATURE_NONE = 0;
+constexpr int SHOW_CURVATURE_OVERLAY = 1;
+constexpr int SHOW_OVERLAY_HEAT = 1;
 
-constexpr float POS_CURV_COLOR  = 0.25f;
-constexpr float NEG_CURV_COLOR  = 0.375f;
+constexpr float POS_CURV_COLOR = 0.25f;
+constexpr float NEG_CURV_COLOR = 0.375f;
 constexpr float EVEN_CURV_COLOR = 0.375f;
 
 //=============================================================================================================
@@ -86,25 +86,25 @@ MNEMshDisplaySurface::~MNEMshDisplaySurface()
 //=============================================================================================================
 
 int MNEMshDisplaySurface::align_fiducials(FiffDigitizerData& head_dig,
-                                        const FiffDigitizerData& mri_dig,
-                                        int niter,
-                                        int scale_head,
-                                        float omit_dist,
-                                        Eigen::Vector3f& scales)
+                                          const FiffDigitizerData& mri_dig,
+                                          int niter,
+                                          int scale_head,
+                                          float omit_dist,
+                                          Eigen::Vector3f& scales)
 
 {
     using FidMatrix = Eigen::Matrix<float, 3, 3, Eigen::RowMajor>;
-    FidMatrix           head_fid, mri_fid;
-    bool                head_fid_found[3] = {false, false, false};
-    bool                mri_fid_found[3]  = {false, false, false};
-    int             j,k;
-    FiffDigPoint    p;
-    float          nasion_weight = 5.0;
+    FidMatrix head_fid, mri_fid;
+    bool head_fid_found[3] = {false, false, false};
+    bool mri_fid_found[3] = {false, false, false};
+    int j, k;
+    FiffDigPoint p;
+    float nasion_weight = 5.0;
 
     for (j = 0; j < 2; j++) {
         const FiffDigitizerData& d = (j == 0) ? head_dig : mri_dig;
-        FidMatrix&         fid  = (j == 0) ? head_fid : mri_fid;
-        bool*              found = (j == 0) ? head_fid_found : mri_fid_found;
+        FidMatrix& fid = (j == 0) ? head_fid : mri_fid;
+        bool* found = (j == 0) ? head_fid_found : mri_fid_found;
 
         for (k = 0; k < d.npoint; k++) {
             p = d.points[k];
@@ -112,12 +112,10 @@ int MNEMshDisplaySurface::align_fiducials(FiffDigitizerData& head_dig,
                 if (p.ident == FIFFV_POINT_LPA) {
                     fid.row(0) = Eigen::Map<const Eigen::RowVector3f>(d.points[k].r);
                     found[0] = true;
-                }
-                else if (p.ident == FIFFV_POINT_NASION) {
+                } else if (p.ident == FIFFV_POINT_NASION) {
                     fid.row(1) = Eigen::Map<const Eigen::RowVector3f>(d.points[k].r);
                     found[1] = true;
-                }
-                else if (p.ident == FIFFV_POINT_RPA) {
+                } else if (p.ident == FIFFV_POINT_RPA) {
                     fid.row(2) = Eigen::Map<const Eigen::RowVector3f>(d.points[k].r);
                     found[2] = true;
                 }
@@ -138,19 +136,19 @@ int MNEMshDisplaySurface::align_fiducials(FiffDigitizerData& head_dig,
     }
 
     if (scale_head) {
-        get_head_scale(head_dig,mri_fid,scales);
-        qInfo("xscale = %.3f yscale = %.3f zscale = %.3f\n",scales[0],scales[1],scales[2]);
+        get_head_scale(head_dig, mri_fid, scales);
+        qInfo("xscale = %.3f yscale = %.3f zscale = %.3f\n", scales[0], scales[1], scales[2]);
 
         for (j = 0; j < 3; j++)
             for (k = 0; k < 3; k++)
-                mri_fid(j,k) = mri_fid(j,k)*scales[k];
+                mri_fid(j, k) = mri_fid(j, k) * scales[k];
 
         scale(scales);
     }
 
     // Initial alignment
-    head_dig.head_mri_t_adj = std::make_unique<FiffCoordTrans>(FIFFLIB::FiffCoordTrans::fromCardinalPoints(FIFFV_COORD_HEAD,FIFFV_COORD_MRI,
-                                                                                    mri_fid.row(0).data(),mri_fid.row(1).data(),mri_fid.row(2).data()));
+    head_dig.head_mri_t_adj = std::make_unique<FiffCoordTrans>(FIFFLIB::FiffCoordTrans::fromCardinalPoints(FIFFV_COORD_HEAD, FIFFV_COORD_MRI,
+                                                                                                           mri_fid.row(0).data(), mri_fid.row(1).data(), mri_fid.row(2).data()));
 
     // Populate mri_fids from cardinal digitizer points transformed into MRI coords
     head_dig.pickCardinalFiducials();
@@ -162,17 +160,17 @@ int MNEMshDisplaySurface::align_fiducials(FiffDigitizerData& head_dig,
     qInfo("After simple alignment : \n");
 
     if (omit_dist > 0)
-        discard_outlier_digitizer_points(head_dig,omit_dist);
+        discard_outlier_digitizer_points(head_dig, omit_dist);
 
     // Optional iterative refinement
     if (niter > 0) {
         for (k = 0; k < niter; k++) {
-            if (iterate_alignment_once(head_dig,nasion_weight,Eigen::Vector3f(mri_fid.row(1).transpose()),k == niter-1 && niter > 1) == FAIL)
+            if (iterate_alignment_once(head_dig, nasion_weight, Eigen::Vector3f(mri_fid.row(1).transpose()), k == niter - 1 && niter > 1) == FAIL)
                 return FAIL;
         }
 
-        qInfo("%d / %d iterations done. RMS dist = %7.1f mm\n",k,niter,
-                1000.0*rms_digitizer_distance(head_dig));
+        qInfo("%d / %d iterations done. RMS dist = %7.1f mm\n", k, niter,
+              1000.0 * rms_digitizer_distance(head_dig));
         qInfo("After refinement :\n");
         head_dig.head_mri_t_adj->print();
     }
@@ -184,13 +182,13 @@ int MNEMshDisplaySurface::align_fiducials(FiffDigitizerData& head_dig,
 
 // Simple head size fit
 void MNEMshDisplaySurface::get_head_scale(FIFFLIB::FiffDigitizerData& dig,
-                                        const Eigen::Matrix<float, 3, 3, Eigen::RowMajor>& mri_fid,
-                                        Eigen::Vector3f& scales)
+                                          const Eigen::Matrix<float, 3, 3, Eigen::RowMajor>& mri_fid,
+                                          Eigen::Vector3f& scales)
 {
-    int   k,ndig,nhead;
+    int k, ndig, nhead;
     float simplex_size = 2e-2f;
     Eigen::VectorXf r0(3);
-    float Rdig,Rscalp;
+    float Rdig, Rscalp;
 
     scales[0] = scales[1] = scales[2] = 1.0;
 
@@ -204,11 +202,11 @@ void MNEMshDisplaySurface::get_head_scale(FIFFLIB::FiffDigitizerData& dig,
         }
     }
 
-    if (!UTILSLIB::Sphere::fit_sphere_to_points(dig_rr.topRows(ndig),simplex_size,r0,Rdig)){
+    if (!UTILSLIB::Sphere::fit_sphere_to_points(dig_rr.topRows(ndig), simplex_size, r0, Rdig)) {
         return;
     }
 
-    qInfo("Polhemus : (%.1f %.1f %.1f) mm R = %.1f mm\n",1000*r0[0],1000*r0[1],1000*r0[2],1000*Rdig);
+    qInfo("Polhemus : (%.1f %.1f %.1f) mm R = %.1f mm\n", 1000 * r0[0], 1000 * r0[1], 1000 * r0[2], 1000 * Rdig);
 
     // Pick only the points above the fiducial plane
     Eigen::Vector3f LR = mri_fid.row(2).transpose() - mri_fid.row(0).transpose();
@@ -223,19 +221,19 @@ void MNEMshDisplaySurface::get_head_scale(FIFFLIB::FiffDigitizerData& dig,
         }
     }
 
-    if (!UTILSLIB::Sphere::fit_sphere_to_points(head_rr.topRows(nhead),simplex_size,r0,Rscalp)) {
+    if (!UTILSLIB::Sphere::fit_sphere_to_points(head_rr.topRows(nhead), simplex_size, r0, Rscalp)) {
         return;
     }
 
-    qInfo("Scalp : (%.1f %.1f %.1f) mm R = %.1f mm\n",1000*r0[0],1000*r0[1],1000*r0[2],1000*Rscalp);
+    qInfo("Scalp : (%.1f %.1f %.1f) mm R = %.1f mm\n", 1000 * r0[0], 1000 * r0[1], 1000 * r0[2], 1000 * Rscalp);
 
-    scales[0] = scales[1] = scales[2] = Rdig/Rscalp;
+    scales[0] = scales[1] = scales[2] = Rdig / Rscalp;
 }
 
 //=============================================================================================================
 
 int MNEMshDisplaySurface::discard_outlier_digitizer_points(FIFFLIB::FiffDigitizerData& d,
-                                                         float maxdist) const
+                                                           float maxdist) const
 /*
       * Discard outlier digitizer points
       */
@@ -244,20 +242,20 @@ int MNEMshDisplaySurface::discard_outlier_digitizer_points(FIFFLIB::FiffDigitize
     int k;
 
     d.dist_valid = false;
-    calculate_digitizer_distances(d,true,true);
+    calculate_digitizer_distances(d, true, true);
     for (k = 0; k < d.npoint; k++) {
         d.discard[k] = 0;
         /*
         * Discard unless cardinal landmark or HPI coil
         */
         if (std::fabs(d.dist(k)) > maxdist &&
-                d.points[k].kind != FIFFV_POINT_CARDINAL &&
-                d.points[k].kind != FIFFV_POINT_HPI) {
+            d.points[k].kind != FIFFV_POINT_CARDINAL &&
+            d.points[k].kind != FIFFV_POINT_HPI) {
             discarded++;
             d.discard[k] = 1;
         }
     }
-    qInfo("%d points discarded (maxdist = %6.1f mm).\n",discarded,1000*maxdist);
+    qInfo("%d points discarded (maxdist = %6.1f mm).\n", discarded, 1000 * maxdist);
 
     return discarded;
 }
@@ -265,19 +263,19 @@ int MNEMshDisplaySurface::discard_outlier_digitizer_points(FIFFLIB::FiffDigitize
 //=============================================================================================================
 
 void MNEMshDisplaySurface::calculate_digitizer_distances(FIFFLIB::FiffDigitizerData& dig,
-                                                       bool do_all, bool do_approx) const
+                                                         bool do_all, bool do_approx) const
 /*
  * Calculate the distances from the scalp surface
  */
 {
-    int                 k,nactive;
-    FiffDigPoint        point;
+    int k, nactive;
+    FiffDigPoint point;
     Q_ASSERT(dig.head_mri_t);
     const FiffCoordTrans& t = (dig.head_mri_t_adj && !dig.head_mri_t_adj->isEmpty()) ? *dig.head_mri_t_adj : *dig.head_mri_t;
-    int                 nstep = 4;
+    int nstep = 4;
 
     if (dig.dist_valid)
-        return ;
+        return;
 
     PointsT digPoints(dig.npoint, 3);
 
@@ -289,7 +287,7 @@ void MNEMshDisplaySurface::calculate_digitizer_distances(FIFFLIB::FiffDigitizerD
         dig.closest = Eigen::VectorXi::Constant(dig.npoint, -1);
     }
 
-    dig.closest_point.setZero(dig.npoint,3);
+    dig.closest_point.setZero(dig.npoint, 3);
     Eigen::VectorXi closest(dig.npoint);
     Eigen::VectorXf dists(dig.npoint);
 
@@ -297,31 +295,30 @@ void MNEMshDisplaySurface::calculate_digitizer_distances(FIFFLIB::FiffDigitizerD
         if ((dig.active[k] && !dig.discard[k]) || do_all) {
             point = dig.points.at(k);
             digPoints.row(nactive) = Eigen::Map<const Eigen::RowVector3f>(point.r);
-            FiffCoordTrans::apply_trans(digPoints.row(nactive).data(),t,FIFFV_MOVE);
+            FiffCoordTrans::apply_trans(digPoints.row(nactive).data(), t, FIFFV_MOVE);
             if (do_approx) {
                 closest[nactive] = dig.closest(k);
                 if (closest[nactive] < 0)
                     do_approx = false;
-            }
-            else
+            } else
                 closest[nactive] = -1;
             nactive++;
         }
     }
 
-    find_closest_on_surface_approx(digPoints,nactive,closest,dists,nstep);
+    find_closest_on_surface_approx(digPoints, nactive, closest, dists, nstep);
     /*
      * Project the points on the triangles
      */
     if (!do_approx)
-        qInfo("Inside or outside for %d points...",nactive);
+        qInfo("Inside or outside for %d points...", nactive);
     for (k = 0, nactive = 0; k < dig.npoint; k++) {
         if ((dig.active[k] && !dig.discard[k]) || do_all) {
-            dig.dist(k)    = dists[nactive];
+            dig.dist(k) = dists[nactive];
             dig.closest(k) = closest[nactive];
             {
                 Eigen::Vector3f pt = Eigen::Map<const Eigen::Vector3f>(digPoints.row(nactive).data());
-                Eigen::Vector3f proj = project_to_triangle(dig.closest(k),pt);
+                Eigen::Vector3f proj = project_to_triangle(dig.closest(k), pt);
                 dig.closest_point.row(k) = proj.transpose();
             }
             // The distance above is with respect to the closest triangle only,
@@ -353,8 +350,8 @@ void MNEMshDisplaySurface::calculate_digitizer_distances(FIFFLIB::FiffDigitizerD
             constexpr bool bUseSolidAngleSign = false;
             if (bUseSolidAngleSign && !do_approx) {
                 Eigen::Vector3f pt = Eigen::Map<const Eigen::Vector3f>(digPoints.row(nactive).data());
-                if (sum_solids(pt)/(4*M_PI) > 0.9)
-                    dig.dist(k) = - std::fabs(dig.dist(k));
+                if (sum_solids(pt) / (4 * M_PI) > 0.9)
+                    dig.dist(k) = -std::fabs(dig.dist(k));
                 else
                     dig.dist(k) = std::fabs(dig.dist(k));
             }
@@ -372,10 +369,10 @@ void MNEMshDisplaySurface::calculate_digitizer_distances(FIFFLIB::FiffDigitizerD
 
 //=============================================================================================================
 
-int MNEMshDisplaySurface::iterate_alignment_once(FIFFLIB::FiffDigitizerData& dig,	   /* The digitizer data */
-                                               int nasion_weight,	   /* Weight for the nasion */
-                                               const std::optional<Eigen::Vector3f>& nasion_mri,   /* Fixed correspondence point for the nasion (optional) */
-                                               int last_step) const         /* Is this the last iteration step */
+int MNEMshDisplaySurface::iterate_alignment_once(FIFFLIB::FiffDigitizerData& dig,                  /* The digitizer data */
+                                                 int nasion_weight,                                /* Weight for the nasion */
+                                                 const std::optional<Eigen::Vector3f>& nasion_mri, /* Fixed correspondence point for the nasion (optional) */
+                                                 int last_step) const                              /* Is this the last iteration step */
 /*
  * Find the best alignment of the coordinate frames
  */
@@ -383,19 +380,19 @@ int MNEMshDisplaySurface::iterate_alignment_once(FIFFLIB::FiffDigitizerData& dig
     Eigen::MatrixXf rr_head(dig.npoint, 3);
     Eigen::MatrixXf rr_mri(dig.npoint, 3);
     Eigen::VectorXf w = Eigen::VectorXf::Zero(dig.npoint);
-    int             k,nactive;
-    FiffDigPoint    point;
+    int k, nactive;
+    FiffDigPoint point;
     FiffCoordTrans t;
-    float           max_diff = 40e-3f;
+    float max_diff = 40e-3f;
 
     if (!dig.head_mri_t_adj) {
-        qCritical()<<"Not adjusting the transformation";
+        qCritical() << "Not adjusting the transformation";
         return FAIL;
     }
     /*
      * Calculate initial distances
      */
-    calculate_digitizer_distances(dig,false,true);
+    calculate_digitizer_distances(dig, false, true);
 
     for (k = 0, nactive = 0; k < dig.npoint; k++) {
         if (dig.active[k] && !dig.discard[k]) {
@@ -406,18 +403,17 @@ int MNEMshDisplaySurface::iterate_alignment_once(FIFFLIB::FiffDigitizerData& dig
             * Special handling for the nasion
             */
             if (point.kind == FIFFV_POINT_CARDINAL &&
-                    point.ident == FIFFV_POINT_NASION) {
+                point.ident == FIFFV_POINT_NASION) {
                 w[nactive] = nasion_weight;
                 if (nasion_mri) {
                     rr_mri.row(nactive) = nasion_mri->transpose();
                     rr_head.row(nactive) = nasion_mri->transpose();
                     Q_ASSERT(dig.head_mri_t || dig.head_mri_t_adj);
                     FiffCoordTrans::apply_inverse_trans(rr_head.row(nactive).data(),
-                                                            dig.head_mri_t_adj ? *dig.head_mri_t_adj : *dig.head_mri_t,
-                                                            FIFFV_MOVE);
+                                                        dig.head_mri_t_adj ? *dig.head_mri_t_adj : *dig.head_mri_t,
+                                                        FIFFV_MOVE);
                 }
-            }
-            else
+            } else
                 w[nactive] = 1.0;
             nactive++;
         }
@@ -427,10 +423,11 @@ int MNEMshDisplaySurface::iterate_alignment_once(FIFFLIB::FiffDigitizerData& dig
         return FAIL;
     }
     if ((t = FiffCoordTrans::procrustesAlign(FIFFV_COORD_HEAD, FIFFV_COORD_MRI,
-                                                 rr_head.topRows(nactive),
-                                                 rr_mri.topRows(nactive),
-                                                 w.head(nactive),
-                                                 max_diff)).isEmpty())
+                                             rr_head.topRows(nactive),
+                                             rr_mri.topRows(nactive),
+                                             w.head(nactive),
+                                             max_diff))
+            .isEmpty())
         return FAIL;
 
     if (dig.head_mri_t_adj)
@@ -439,7 +436,7 @@ int MNEMshDisplaySurface::iterate_alignment_once(FIFFLIB::FiffDigitizerData& dig
      * Calculate final distances
      */
     dig.dist_valid = false;
-    calculate_digitizer_distances(dig,false,!last_step);
+    calculate_digitizer_distances(dig, false, !last_step);
     return OK;
 }
 
@@ -448,17 +445,17 @@ int MNEMshDisplaySurface::iterate_alignment_once(FIFFLIB::FiffDigitizerData& dig
 float MNEMshDisplaySurface::rms_digitizer_distance(FIFFLIB::FiffDigitizerData& dig) const
 {
     float rms;
-    int   k,nactive;
+    int k, nactive;
 
-    calculate_digitizer_distances(dig,false,true);
+    calculate_digitizer_distances(dig, false, true);
 
     for (k = 0, rms = 0.0, nactive = 0; k < dig.npoint; k++)
         if (dig.active[k] && !dig.discard[k]) {
-            rms = rms + dig.dist(k)*dig.dist(k);
+            rms = rms + dig.dist(k) * dig.dist(k);
             nactive++;
         }
     if (nactive > 1)
-        rms = rms/(nactive-1);
+        rms = rms / (nactive - 1);
     return sqrt(rms);
 }
 
@@ -469,15 +466,15 @@ void MNEMshDisplaySurface::scale(const Eigen::Vector3f& scales)
  * Not quite complete yet
  */
 {
-    int j,k;
+    int j, k;
 
     for (k = 0; k < 3; k++) {
-        minv[k] = scales[k]*minv[k];
-        maxv[k] = scales[k]*maxv[k];
+        minv[k] = scales[k] * minv[k];
+        maxv[k] = scales[k] * maxv[k];
     }
     for (j = 0; j < np; j++)
         for (k = 0; k < 3; k++)
-            rr(j,k) = rr(j,k)*scales[k];
+            rr(j, k) = rr(j, k) * scales[k];
     return;
 }
 
@@ -495,10 +492,10 @@ void MNEMshDisplaySurface::decide_surface_extent([[maybe_unused]] const QString&
     }
 
 #ifdef DEBUG
-    qInfo("%s:\n",tag.toUtf8().constData());
-    qInfo("\tx = %f ... %f mm\n",1000*mn[0],1000*mx[0]);
-    qInfo("\ty = %f ... %f mm\n",1000*mn[1],1000*mx[1]);
-    qInfo("\tz = %f ... %f mm\n",1000*mn[2],1000*mx[2]);
+    qInfo("%s:\n", tag.toUtf8().constData());
+    qInfo("\tx = %f ... %f mm\n", 1000 * mn[0], 1000 * mx[0]);
+    qInfo("\ty = %f ... %f mm\n", 1000 * mn[1], 1000 * mx[1]);
+    qInfo("\tz = %f ... %f mm\n", 1000 * mn[2], 1000 * mx[2]);
 #endif
 
     fov = std::max(mn.cwiseAbs().maxCoeff(), mx.cwiseAbs().maxCoeff());
@@ -543,8 +540,7 @@ void MNEMshDisplaySurface::setup_curvature_colors()
             if (ncolor == 4)
                 vertex_colors[base + 3] = 1.0f;
         }
-    }
-    else {
+    } else {
         for (int k = 0; k < np; k++) {
             const int base = k * ncolor;
             curv_sum += std::fabs(curv[k]);
@@ -555,7 +551,6 @@ void MNEMshDisplaySurface::setup_curvature_colors()
         }
     }
 #ifdef DEBUG
-    qInfo("Average curvature : %f\n",curv_sum/np);
+    qInfo("Average curvature : %f\n", curv_sum / np);
 #endif
 }
-

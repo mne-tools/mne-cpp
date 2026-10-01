@@ -72,11 +72,11 @@ using namespace MNELIB;
  * @param[in] argv (argument vector) is an array of pointers to arrays of character objects. The array objects are null-terminated strings, representing the arguments that were entered on the command line when the program was started.
  * @return the value that was set to exit() (which is 0 if exit() is called via quit()).
  */
-int main(int argc, char *argv[])
+int main(int argc, char* argv[])
 {
-    #ifdef STATICBUILD
-    // Q_INIT_RESOURCE(mne_disp3d);
-    #endif
+#ifdef STATICBUILD
+// Q_INIT_RESOURCE(mne_disp3d);
+#endif
 
     qInstallMessageHandler(MNELogger::customLogWriter);
     QApplication a(argc, argv);
@@ -110,9 +110,9 @@ int main(int argc, char *argv[])
     QFile t_fileTrans(parser.value(transOption));
 
     bool bScale = false;
-    if(parser.value(scaleOption) == "false" || parser.value(scaleOption) == "0") {
+    if (parser.value(scaleOption) == "false" || parser.value(scaleOption) == "0") {
         bScale = false;
-    } else if(parser.value(scaleOption) == "true" || parser.value(scaleOption) == "1") {
+    } else if (parser.value(scaleOption) == "true" || parser.value(scaleOption) == "1") {
         bScale = true;
     }
 
@@ -130,27 +130,31 @@ int main(int argc, char *argv[])
 
     // read digitizer data
     QList<int> lPickFiducials({FIFFV_POINT_CARDINAL});
-    QList<int> lPickHSP({FIFFV_POINT_CARDINAL,FIFFV_POINT_HPI,FIFFV_POINT_EXTRA,FIFFV_POINT_EEG});
-    FiffDigPointSet digSetSrc = FiffDigPointSet(t_fileDig).pickTypes(lPickFiducials);   // Fiducials Head-Space
+    QList<int> lPickHSP({FIFFV_POINT_CARDINAL, FIFFV_POINT_HPI, FIFFV_POINT_EXTRA, FIFFV_POINT_EEG});
+    FiffDigPointSet digSetSrc = FiffDigPointSet(t_fileDig).pickTypes(lPickFiducials); // Fiducials Head-Space
     FiffDigPointSet digSetDst = FiffDigPointSet(t_fileDig).pickTypes(lPickFiducials);
     digSetDst.applyTransform(transHeadMriRef, false);
-    FiffDigPointSet digSetHsp = FiffDigPointSet(t_fileDig).pickTypes(lPickHSP);         // Head shape points Head-Space
+    FiffDigPointSet digSetHsp = FiffDigPointSet(t_fileDig).pickTypes(lPickHSP); // Head shape points Head-Space
 
     // Initial Fiducial Alignment
     // Declare variables
-    Matrix3f matSrc(digSetSrc.size(),3);
-    Matrix3f matDst(digSetDst.size(),3);
+    Matrix3f matSrc(digSetSrc.size(), 3);
+    Matrix3f matDst(digSetDst.size(), 3);
     Matrix4f matTrans;
     Vector3f vecWeights(digSetSrc.size()); // LPA, Nasion, RPA
     float fScale = 1.0f;
 
     // get coordinates
-    for(int i = 0; i< digSetSrc.size(); ++i) {
-        matSrc(i,0) = digSetSrc[i].r[0]; matSrc(i,1) = digSetSrc[i].r[1]; matSrc(i,2) = digSetSrc[i].r[2];
-        matDst(i,0) = digSetDst[i].r[0]; matDst(i,1) = digSetDst[i].r[1]; matDst(i,2) = digSetDst[i].r[2];
+    for (int i = 0; i < digSetSrc.size(); ++i) {
+        matSrc(i, 0) = digSetSrc[i].r[0];
+        matSrc(i, 1) = digSetSrc[i].r[1];
+        matSrc(i, 2) = digSetSrc[i].r[2];
+        matDst(i, 0) = digSetDst[i].r[0];
+        matDst(i, 1) = digSetDst[i].r[1];
+        matDst(i, 2) = digSetDst[i].r[2];
 
         // set standart weights
-        if(digSetSrc[i].ident == FIFFV_POINT_NASION) {
+        if (digSetSrc[i].ident == FIFFV_POINT_NASION) {
             vecWeights(i) = 10.0;
         } else {
             vecWeights(i) = 1.0;
@@ -158,7 +162,7 @@ int main(int argc, char *argv[])
     }
 
     // align fiducials
-    if(!MNELIB::fitMatchedPoints(matSrc,matDst,matTrans,fScale,bScale,vecWeights)) {
+    if (!MNELIB::fitMatchedPoints(matSrc, matDst, matTrans, fScale, bScale, vecWeights)) {
         qWarning() << "Point cloud registration not succesfull.";
     }
 
@@ -168,12 +172,14 @@ int main(int argc, char *argv[])
 
     // Prepare Icp:
     VectorXf vecWeightsICP(digSetHsp.size()); // Weigths vector
-    MatrixXf matHsp(digSetHsp.size(),3);
+    MatrixXf matHsp(digSetHsp.size(), 3);
 
-    for(int i = 0; i < digSetHsp.size(); ++i) {
-        matHsp(i,0) = digSetHsp[i].r[0]; matHsp(i,1) = digSetHsp[i].r[1]; matHsp(i,2) = digSetHsp[i].r[2];
+    for (int i = 0; i < digSetHsp.size(); ++i) {
+        matHsp(i, 0) = digSetHsp[i].r[0];
+        matHsp(i, 1) = digSetHsp[i].r[1];
+        matHsp(i, 2) = digSetHsp[i].r[2];
         // set standart weights
-        if((digSetHsp[i].kind == FIFFV_POINT_CARDINAL) && (digSetHsp[i].ident == FIFFV_POINT_NASION)) {
+        if ((digSetHsp[i].kind == FIFFV_POINT_CARDINAL) && (digSetHsp[i].ident == FIFFV_POINT_NASION)) {
             vecWeightsICP(i) = 10.0;
         } else {
             vecWeightsICP(i) = 1.0;
@@ -185,17 +191,17 @@ int main(int argc, char *argv[])
     float fRMSE = 0.0;
 
     // discard outliers
-    if(!MNELIB::discard3DPointOutliers(mneSurfacePoints, matHsp, transHeadMri, vecTake, matHspClean, fMaxDist)) {
+    if (!MNELIB::discard3DPointOutliers(mneSurfacePoints, matHsp, transHeadMri, vecTake, matHspClean, fMaxDist)) {
         qWarning() << "Discard outliers was not succesfull.";
     }
     VectorXf vecWeightsICPClean(vecTake.size());
 
-    for(int i = 0; i < vecTake.size(); ++i) {
+    for (int i = 0; i < vecTake.size(); ++i) {
         vecWeightsICPClean(i) = vecWeightsICP(vecTake(i));
     }
 
     // icp
-    if(!MNELIB::performIcp(mneSurfacePoints, matHspClean, transHeadMri, fRMSE, bScale, iMaxIter, fTol, vecWeightsICPClean)) {
+    if (!MNELIB::performIcp(mneSurfacePoints, matHspClean, transHeadMri, fRMSE, bScale, iMaxIter, fTol, vecWeightsICPClean)) {
         qWarning() << "ICP was not succesfull.";
     }
     qInfo() << "transHeadMri:";
@@ -203,8 +209,8 @@ int main(int argc, char *argv[])
     qInfo() << "transHeadMriRef:";
     transHeadMriRef.print();
 
-    BrainView *pBrainView = new BrainView();
-    BrainTreeModel *pModel = new BrainTreeModel();
+    BrainView* pBrainView = new BrainView();
+    BrainTreeModel* pModel = new BrainTreeModel();
     pBrainView->setModel(pModel);
     pModel->addDigitizerData(digSetSrc.getList());
     pModel->addDigitizerData(digSetHsp.getList());

@@ -53,7 +53,8 @@ constexpr double MORLET_PI = 3.14159265358979323846;
 int MorletTfr::nextPow2(int n)
 {
     int p = 1;
-    while (p < n) p <<= 1;
+    while (p < n)
+        p <<= 1;
     return p;
 }
 
@@ -67,14 +68,14 @@ VectorXcd MorletTfr::buildWavelet(double dFreq, double dSFreq, double dNCycles, 
     // Truncate at ±4σ — captures > 99.99 % of energy
     halfLen = static_cast<int>(std::round(4.0 * sigma_t * dSFreq));
 
-    const int    nWav = 2 * halfLen + 1;
-    VectorXcd    wavelet(nWav);
+    const int nWav = 2 * halfLen + 1;
+    VectorXcd wavelet(nWav);
 
     // L2-energy normalisation: A = (σ_t · √(2π))^(-0.5)
     const double A = std::pow(sigma_t * std::sqrt(2.0 * MORLET_PI), -0.5);
 
     for (int i = 0; i < nWav; ++i) {
-        const double t     = static_cast<double>(i - halfLen) / dSFreq;
+        const double t = static_cast<double>(i - halfLen) / dSFreq;
         const double gauss = std::exp(-t * t / (2.0 * sigma_t * sigma_t));
         const double phase = 2.0 * MORLET_PI * dFreq * t;
         wavelet[i] = std::complex<double>(A * gauss * std::cos(phase),
@@ -86,9 +87,9 @@ VectorXcd MorletTfr::buildWavelet(double dFreq, double dSFreq, double dNCycles, 
 //=============================================================================================================
 
 MorletTfrResult MorletTfr::compute(const RowVectorXd& vecData,
-                                    double dSFreq,
-                                    const RowVectorXd& vecFreqs,
-                                    double dNCycles)
+                                   double dSFreq,
+                                   const RowVectorXd& vecFreqs,
+                                   double dNCycles)
 {
     const int nTimes = static_cast<int>(vecData.cols());
     const int nFreqs = static_cast<int>(vecFreqs.cols());
@@ -105,7 +106,7 @@ MorletTfrResult MorletTfr::compute(const RowVectorXd& vecData,
         int halfLen = 0;
         const VectorXcd wavelet = buildWavelet(vecFreqs[fi], dSFreq, dNCycles, halfLen);
 
-        const int nWav  = static_cast<int>(wavelet.size());
+        const int nWav = static_cast<int>(wavelet.size());
         const int nConv = nextPow2(nTimes + nWav - 1);
 
         // --- FFT of zero-padded real signal ---
@@ -142,11 +143,11 @@ MorletTfrResult MorletTfr::compute(const RowVectorXd& vecData,
 
 //=============================================================================================================
 
-QVector<MorletTfrResult> MorletTfr::computeMultiChannel(const MatrixXd&    matData,
-                                                          double             dSFreq,
-                                                          const RowVectorXd& vecFreqs,
-                                                          double             dNCycles,
-                                                          const RowVectorXi& vecPicks)
+QVector<MorletTfrResult> MorletTfr::computeMultiChannel(const MatrixXd& matData,
+                                                        double dSFreq,
+                                                        const RowVectorXd& vecFreqs,
+                                                        double dNCycles,
+                                                        const RowVectorXi& vecPicks)
 {
     std::vector<int> picks;
     if (vecPicks.size() > 0) {

@@ -48,8 +48,9 @@
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-namespace FIFFLIB {
-    class FiffInfo;
+namespace FIFFLIB
+{
+class FiffInfo;
 }
 
 //=============================================================================================================
@@ -67,18 +68,21 @@ class MNEOperator;
 
 namespace ChannelInfoModelRoles
 {
-    enum ItemRole{GetOrigChName = Qt::UserRole + 1009,
-                  GetMappedLayoutChName = Qt::UserRole + 1010,
-                  GetChNumber = Qt::UserRole + 1011,
-                  GetChKind = Qt::UserRole + 1012,
-                  GetMEGType = Qt::UserRole + 1013,
-                  GetChUnit = Qt::UserRole + 1014,
-                  GetChAlias = Qt::UserRole + 1015,
-                  GetChPosition = Qt::UserRole + 1016,
-                  GetChDigitizer = Qt::UserRole + 1017,
-                  GetChActiveFilter = Qt::UserRole + 1018,
-                  GetChCoilType = Qt::UserRole + 1019,
-                  GetIsBad = Qt::UserRole + 1020};
+enum ItemRole
+{
+    GetOrigChName = Qt::UserRole + 1009,
+    GetMappedLayoutChName = Qt::UserRole + 1010,
+    GetChNumber = Qt::UserRole + 1011,
+    GetChKind = Qt::UserRole + 1012,
+    GetMEGType = Qt::UserRole + 1013,
+    GetChUnit = Qt::UserRole + 1014,
+    GetChAlias = Qt::UserRole + 1015,
+    GetChPosition = Qt::UserRole + 1016,
+    GetChDigitizer = Qt::UserRole + 1017,
+    GetChActiveFilter = Qt::UserRole + 1018,
+    GetChCoilType = Qt::UserRole + 1019,
+    GetIsBad = Qt::UserRole + 1020
+};
 }
 
 //=============================================================================================================
@@ -94,11 +98,11 @@ class DISPSHARED_EXPORT ChannelInfoModel : public QAbstractTableModel
     Q_OBJECT
 
 public:
-    typedef QSharedPointer<ChannelInfoModel> SPtr;              /**< Shared pointer type for ChannelInfoModel. */
-    typedef QSharedPointer<const ChannelInfoModel> ConstSPtr;   /**< Const shared pointer type for ChannelInfoModel. */
+    typedef QSharedPointer<ChannelInfoModel> SPtr;            /**< Shared pointer type for ChannelInfoModel. */
+    typedef QSharedPointer<const ChannelInfoModel> ConstSPtr; /**< Const shared pointer type for ChannelInfoModel. */
 
-    ChannelInfoModel(QSharedPointer<FIFFLIB::FiffInfo>& pFiffInfo, QObject *parent = 0);
-    ChannelInfoModel(QObject *parent = 0);
+    ChannelInfoModel(QSharedPointer<FIFFLIB::FiffInfo>& pFiffInfo, QObject* parent = 0);
+    ChannelInfoModel(QObject* parent = 0);
 
     //=========================================================================================================
     /**
@@ -108,14 +112,14 @@ public:
      *
      * @return Number of channels in the attached measurement info.
      */
-    virtual int rowCount(const QModelIndex & parent = QModelIndex()) const;
-    virtual int columnCount(const QModelIndex &parent = QModelIndex()) const;
+    virtual int rowCount(const QModelIndex& parent = QModelIndex()) const;
+    virtual int columnCount(const QModelIndex& parent = QModelIndex()) const;
     virtual QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const;
-    virtual QVariant data(const QModelIndex & index, int role = Qt::DisplayRole) const;
-    virtual bool setData(const QModelIndex & index, const QVariant & value, int role = Qt::EditRole);
-    virtual Qt::ItemFlags flags(const QModelIndex & index) const;
-    virtual bool insertRows(int position, int span, const QModelIndex & parent = QModelIndex());
-    virtual bool removeRows(int position, int span, const QModelIndex & parent = QModelIndex());
+    virtual QVariant data(const QModelIndex& index, int role = Qt::DisplayRole) const;
+    virtual bool setData(const QModelIndex& index, const QVariant& value, int role = Qt::EditRole);
+    virtual Qt::ItemFlags flags(const QModelIndex& index) const;
+    virtual bool insertRows(int position, int span, const QModelIndex& parent = QModelIndex());
+    virtual bool removeRows(int position, int span, const QModelIndex& parent = QModelIndex());
 
     //=========================================================================================================
     /**
@@ -131,7 +135,7 @@ public:
      *
      * @param[in] assignedOperators the filter operators which are currently active.
      */
-    void assignedOperatorsChanged(const QMultiMap<int,QSharedPointer<MNEOperator> > &assignedOperators);
+    void assignedOperatorsChanged(const QMultiMap<int, QSharedPointer<MNEOperator>>& assignedOperators);
 
     //=========================================================================================================
     /**
@@ -139,7 +143,7 @@ public:
      *
      * @param[in] layoutMap the layout map with the 2D positions.
      */
-    void layoutChanged(const QMap<QString,QPointF> &layoutMap);
+    void layoutChanged(const QMap<QString, QPointF>& layoutMap);
 
     //=========================================================================================================
     /**
@@ -147,7 +151,7 @@ public:
      *
      * @return the current mapped channel list.
      */
-    const QStringList & getMappedChannelsList();
+    const QStringList& getMappedChannelsList();
 
     //=========================================================================================================
     /**
@@ -182,20 +186,19 @@ public:
     void clearModel();
 
 protected:
-
     //=========================================================================================================
     /**
      * Maps the currently loaded channels to the loaded layout file
      */
     void mapLayoutToChannels();
 
-    QSharedPointer<FIFFLIB::FiffInfo>           m_pFiffInfo;            /**< The fiff info of the currently loaded fiff file. */
+    QSharedPointer<FIFFLIB::FiffInfo> m_pFiffInfo; /**< The fiff info of the currently loaded fiff file. */
 
-    QMultiMap<int,QSharedPointer<MNEOperator> >      m_assignedOperators;    /**< Map of MNEOperator types to channels.*/
-    QMap<QString,QPointF>                       m_layoutMap;            /**< The current layout map with a position for all MEG and EEG channels. */
+    QMultiMap<int, QSharedPointer<MNEOperator>> m_assignedOperators; /**< Map of MNEOperator types to channels.*/
+    QMap<QString, QPointF> m_layoutMap;                              /**< The current layout map with a position for all MEG and EEG channels. */
 
-    QStringList                 m_aliasNames;           /**< list of given channel aliases. */
-    QStringList                 m_mappedLayoutChNames;  /**< list of the mapped layout channel names. */
+    QStringList m_aliasNames;          /**< list of given channel aliases. */
+    QStringList m_mappedLayoutChNames; /**< list of the mapped layout channel names. */
 
 signals:
     //=========================================================================================================
@@ -203,7 +206,7 @@ signals:
      * Emit this signal whenever channels where mapped to a layout
      *
      */
-    void channelsMappedToLayout(const QStringList &mappedLayoutChNames);
+    void channelsMappedToLayout(const QStringList& mappedLayoutChNames);
 };
 } // NAMESPACE DISPLIB
 

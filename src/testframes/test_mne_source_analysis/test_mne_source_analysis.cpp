@@ -52,12 +52,12 @@ private slots:
     {
         m_sDataPath = QCoreApplication::applicationDirPath() + "/../resources/data/mne-cpp-test-data";
 
-        m_sRawFile    = m_sDataPath + "/MEG/sample/sample_audvis_trunc_raw.fif";
+        m_sRawFile = m_sDataPath + "/MEG/sample/sample_audvis_trunc_raw.fif";
         m_sEvokedFile = m_sDataPath + "/MEG/sample/sample_audvis-ave.fif";
-        m_sCovFile    = m_sDataPath + "/MEG/sample/sample_audvis-cov.fif";
-        m_sFwdFile    = m_sDataPath + "/Result/ref-sample_audvis-meg-eeg-oct-6-fwd.fif";
+        m_sCovFile = m_sDataPath + "/MEG/sample/sample_audvis-cov.fif";
+        m_sFwdFile = m_sDataPath + "/Result/ref-sample_audvis-meg-eeg-oct-6-fwd.fif";
 
-        if(!QFile::exists(m_sRawFile)) {
+        if (!QFile::exists(m_sRawFile)) {
             QSKIP("MNE-CPP test data not found");
         }
     }
@@ -66,11 +66,12 @@ private slots:
 
     void testReadEvokedSet()
     {
-        if(!QFile::exists(m_sEvokedFile)) QSKIP("Evoked file not found");
+        if (!QFile::exists(m_sEvokedFile))
+            QSKIP("Evoked file not found");
 
         QFile file(m_sEvokedFile);
         FiffEvokedSet evokedSet;
-        bool ok = FiffEvokedSet::read(file, evokedSet, QPair<float,float>(-0.2f, 0.0f), true);
+        bool ok = FiffEvokedSet::read(file, evokedSet, QPair<float, float>(-0.2f, 0.0f), true);
 
         QVERIFY(ok);
         QVERIFY(!evokedSet.info.isEmpty());
@@ -80,11 +81,12 @@ private slots:
 
     void testEvokedSetPickChannels()
     {
-        if(!QFile::exists(m_sEvokedFile)) QSKIP("Evoked file not found");
+        if (!QFile::exists(m_sEvokedFile))
+            QSKIP("Evoked file not found");
 
         QFile file(m_sEvokedFile);
         FiffEvokedSet evokedSet;
-        FiffEvokedSet::read(file, evokedSet, QPair<float,float>(-0.2f, 0.0f), true);
+        FiffEvokedSet::read(file, evokedSet, QPair<float, float>(-0.2f, 0.0f), true);
 
         QStringList include;
         include << "MEG0111" << "MEG0121" << "MEG0131";
@@ -96,11 +98,12 @@ private slots:
 
     void testEvokedAspectKind()
     {
-        if(!QFile::exists(m_sEvokedFile)) QSKIP("Evoked file not found");
+        if (!QFile::exists(m_sEvokedFile))
+            QSKIP("Evoked file not found");
 
         QFile file(m_sEvokedFile);
         FiffEvokedSet evokedSet;
-        FiffEvokedSet::read(file, evokedSet, QPair<float,float>(-0.2f, 0.0f), true);
+        FiffEvokedSet::read(file, evokedSet, QPair<float, float>(-0.2f, 0.0f), true);
 
         QVERIFY(!evokedSet.evoked.isEmpty());
         FiffEvoked& evoked = evokedSet.evoked[0];
@@ -112,11 +115,12 @@ private slots:
 
     void testEvokedPickChannels()
     {
-        if(!QFile::exists(m_sEvokedFile)) QSKIP("Evoked file not found");
+        if (!QFile::exists(m_sEvokedFile))
+            QSKIP("Evoked file not found");
 
         QFile file(m_sEvokedFile);
         FiffEvokedSet evokedSet;
-        FiffEvokedSet::read(file, evokedSet, QPair<float,float>(-0.2f, 0.0f), true);
+        FiffEvokedSet::read(file, evokedSet, QPair<float, float>(-0.2f, 0.0f), true);
 
         QStringList include;
         include << "MEG0111" << "MEG0121";
@@ -126,7 +130,8 @@ private slots:
 
     void testEvokedSetSaveRoundTrip()
     {
-        if(!QFile::exists(m_sEvokedFile)) QSKIP("Evoked file not found");
+        if (!QFile::exists(m_sEvokedFile))
+            QSKIP("Evoked file not found");
 
         // Read without baseline correction for clean round-trip
         QFile file(m_sEvokedFile);
@@ -143,7 +148,7 @@ private slots:
         QFile reloadFile(tmpFile);
         FiffEvokedSet reloaded;
         bool ok = FiffEvokedSet::read(reloadFile, reloaded);
-        if(ok) {
+        if (ok) {
             QCOMPARE(reloaded.evoked.size(), evokedSet.evoked.size());
         } else {
             qWarning("Re-read of saved evoked set failed — save() code path was still exercised");
@@ -160,7 +165,7 @@ private slots:
 
         // After baseline subtraction: baseline region (2.0) mean is subtracted.
         // Non-baseline samples: 1.0 - 2.0 = -1.0
-        for(int ch = 0; ch < 3; ++ch) {
+        for (int ch = 0; ch < 3; ++ch) {
             QVERIFY(qAbs(epoch(ch, 50) - (-1.0)) < 1e-10);
         }
     }
@@ -191,7 +196,7 @@ private slots:
         Eigen::MatrixXd proj;
         qint32 nproj = info.make_projector(proj);
         QVERIFY(nproj >= 0);
-        if(nproj > 0) {
+        if (nproj > 0) {
             QCOMPARE(proj.rows(), (Eigen::Index)info.nchan);
             QCOMPARE(proj.cols(), (Eigen::Index)info.nchan);
         }
@@ -214,7 +219,7 @@ private slots:
         FiffRawData raw(file);
         FiffInfo& info = raw.info;
 
-        for(int i = 0; i < qMin(5, info.nchan); ++i) {
+        for (int i = 0; i < qMin(5, info.nchan); ++i) {
             QString chType = info.channel_type(i);
             QVERIFY(!chType.isEmpty());
         }
@@ -269,7 +274,8 @@ private slots:
 
     void testFiffCovRead()
     {
-        if(!QFile::exists(m_sCovFile)) QSKIP("Cov file not found");
+        if (!QFile::exists(m_sCovFile))
+            QSKIP("Cov file not found");
 
         QFile file(m_sCovFile);
         FiffCov cov(file);
@@ -279,7 +285,8 @@ private slots:
 
     void testFiffCovPickChannels()
     {
-        if(!QFile::exists(m_sCovFile)) QSKIP("Cov file not found");
+        if (!QFile::exists(m_sCovFile))
+            QSKIP("Cov file not found");
 
         QFile file(m_sCovFile);
         FiffCov cov(file);
@@ -293,7 +300,8 @@ private slots:
 
     void testFiffCovRegularize()
     {
-        if(!QFile::exists(m_sCovFile) || !QFile::exists(m_sRawFile)) QSKIP("Data not found");
+        if (!QFile::exists(m_sCovFile) || !QFile::exists(m_sRawFile))
+            QSKIP("Data not found");
 
         QFile covFile(m_sCovFile);
         FiffCov cov(covFile);
@@ -307,7 +315,8 @@ private slots:
 
     void testFiffCovPrepareNoiseCov()
     {
-        if(!QFile::exists(m_sCovFile) || !QFile::exists(m_sRawFile)) QSKIP("Data not found");
+        if (!QFile::exists(m_sCovFile) || !QFile::exists(m_sRawFile))
+            QSKIP("Data not found");
 
         QFile covFile(m_sCovFile);
         FiffCov cov(covFile);
@@ -319,9 +328,9 @@ private slots:
         QSet<QString> covNames(cov.names.begin(), cov.names.end());
         Eigen::RowVectorXi sel = raw.info.pick_types(true, false, false, QStringList(), QStringList());
         QStringList chNames;
-        for(int i = 0; i < sel.size(); ++i) {
+        for (int i = 0; i < sel.size(); ++i) {
             QString name = raw.info.ch_names[sel(i)];
-            if(covNames.contains(name))
+            if (covNames.contains(name))
                 chNames << name;
         }
         QVERIFY2(!chNames.isEmpty(), "No intersecting channels between cov and info");
@@ -329,11 +338,10 @@ private slots:
         FiffCov prepared = cov.prepare_noise_cov(raw.info, chNames);
         // prepare_noise_cov may fail if channel projector dimensions don't match;
         // the important thing is exercising the code path for coverage
-        if(prepared.dim >= 0) {
+        if (prepared.dim >= 0) {
             QVERIFY(prepared.dim == chNames.size());
         } else {
-            qWarning("%s", qPrintable(QString("prepare_noise_cov returned dim=%1 for %2 channels — code path exercised")
-                             .arg(prepared.dim).arg(chNames.size())));
+            qWarning("%s", qPrintable(QString("prepare_noise_cov returned dim=%1 for %2 channels — code path exercised").arg(prepared.dim).arg(chNames.size())));
         }
     }
 
@@ -341,7 +349,8 @@ private slots:
 
     void testForwardSolutionRead()
     {
-        if(!QFile::exists(m_sFwdFile)) QSKIP("Forward file not found");
+        if (!QFile::exists(m_sFwdFile))
+            QSKIP("Forward file not found");
 
         QFile file(m_sFwdFile);
         MNEForwardSolution fwd(file);
@@ -352,7 +361,8 @@ private slots:
 
     void testForwardSolutionSourceSpaces()
     {
-        if(!QFile::exists(m_sFwdFile)) QSKIP("Forward file not found");
+        if (!QFile::exists(m_sFwdFile))
+            QSKIP("Forward file not found");
 
         QFile file(m_sFwdFile);
         MNEForwardSolution fwd(file);
@@ -368,12 +378,13 @@ private slots:
 
     void testForwardSolutionSourceSpaceHemi()
     {
-        if(!QFile::exists(m_sFwdFile)) QSKIP("Forward file not found");
+        if (!QFile::exists(m_sFwdFile))
+            QSKIP("Forward file not found");
 
         QFile file(m_sFwdFile);
         MNEForwardSolution fwd(file);
 
-        for(int i = 0; i < fwd.src.size(); ++i) {
+        for (int i = 0; i < fwd.src.size(); ++i) {
             MNESourceSpace hemi = fwd.src[i];
             qint32 hemiId = MNESourceSpaces::find_source_space_hemi(hemi);
             QVERIFY(hemiId != 0);
@@ -384,7 +395,7 @@ private slots:
 
     void testMakeInverseOperator()
     {
-        if(!QFile::exists(m_sFwdFile) || !QFile::exists(m_sCovFile) || !QFile::exists(m_sRawFile))
+        if (!QFile::exists(m_sFwdFile) || !QFile::exists(m_sCovFile) || !QFile::exists(m_sRawFile))
             QSKIP("Data files not found");
 
         QFile fwdFile(m_sFwdFile);
@@ -404,7 +415,7 @@ private slots:
 
     void testInverseOperatorWriteRead()
     {
-        if(!QFile::exists(m_sFwdFile) || !QFile::exists(m_sCovFile) || !QFile::exists(m_sRawFile))
+        if (!QFile::exists(m_sFwdFile) || !QFile::exists(m_sCovFile) || !QFile::exists(m_sRawFile))
             QSKIP("Data files not found");
 
         QFile fwdFile(m_sFwdFile);
@@ -436,7 +447,7 @@ private slots:
 
     void testPrepareInverseOperator()
     {
-        if(!QFile::exists(m_sFwdFile) || !QFile::exists(m_sCovFile) || !QFile::exists(m_sRawFile))
+        if (!QFile::exists(m_sFwdFile) || !QFile::exists(m_sCovFile) || !QFile::exists(m_sRawFile))
             QSKIP("Data files not found");
 
         QFile fwdFile(m_sFwdFile);
@@ -459,14 +470,14 @@ private slots:
 
     void testMinimumNormCalculateInverse()
     {
-        if(!QFile::exists(m_sEvokedFile) || !QFile::exists(m_sFwdFile) ||
-           !QFile::exists(m_sCovFile) || !QFile::exists(m_sRawFile))
+        if (!QFile::exists(m_sEvokedFile) || !QFile::exists(m_sFwdFile) ||
+            !QFile::exists(m_sCovFile) || !QFile::exists(m_sRawFile))
             QSKIP("Data files not found");
 
         // Read evoked
         QFile evokedFile(m_sEvokedFile);
         FiffEvokedSet evokedSet;
-        FiffEvokedSet::read(evokedFile, evokedSet, QPair<float,float>(-0.2f, 0.0f), true);
+        FiffEvokedSet::read(evokedFile, evokedSet, QPair<float, float>(-0.2f, 0.0f), true);
         QVERIFY(evokedSet.evoked.size() > 0);
 
         // Read forward
@@ -508,7 +519,7 @@ private slots:
 
     void testMinimumNormSetMethod()
     {
-        if(!QFile::exists(m_sFwdFile) || !QFile::exists(m_sCovFile) || !QFile::exists(m_sRawFile))
+        if (!QFile::exists(m_sFwdFile) || !QFile::exists(m_sCovFile) || !QFile::exists(m_sRawFile))
             QSKIP("Data files not found");
 
         QFile fwdFile(m_sFwdFile);
@@ -578,7 +589,8 @@ private slots:
 
     void testCovMatrixClassifyChannels()
     {
-        if(!QFile::exists(m_sCovFile) || !QFile::exists(m_sRawFile)) QSKIP("Data not found");
+        if (!QFile::exists(m_sCovFile) || !QFile::exists(m_sRawFile))
+            QSKIP("Data not found");
 
         auto cov = MNECovMatrix::read(m_sCovFile, FIFFV_MNE_NOISE_COV);
         QVERIFY(cov != nullptr);
@@ -592,12 +604,14 @@ private slots:
 
     void testCovMatrixRegularize()
     {
-        if(!QFile::exists(m_sCovFile)) QSKIP("Cov file not found");
+        if (!QFile::exists(m_sCovFile))
+            QSKIP("Cov file not found");
 
         auto cov = MNECovMatrix::read(m_sCovFile, FIFFV_MNE_NOISE_COV);
         QVERIFY(cov != nullptr);
 
-        if(!QFile::exists(m_sRawFile)) QSKIP("Raw file not found");
+        if (!QFile::exists(m_sRawFile))
+            QSKIP("Raw file not found");
         QFile rawFile(m_sRawFile);
         FiffRawData raw(rawFile);
 
@@ -621,7 +635,8 @@ private slots:
 
     void testCovMatrixCondition()
     {
-        if(!QFile::exists(m_sCovFile) || !QFile::exists(m_sRawFile)) QSKIP("Data not found");
+        if (!QFile::exists(m_sCovFile) || !QFile::exists(m_sRawFile))
+            QSKIP("Data not found");
 
         auto cov = MNECovMatrix::read(m_sCovFile, FIFFV_MNE_NOISE_COV);
         QVERIFY(cov != nullptr);

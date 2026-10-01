@@ -77,7 +77,7 @@ public:
      * @param[in] hemi       Hemisphere index (0=lh, 1=rh).
      * @return True if successful.
      */
-    bool loadStc(const QString &path, int hemi);
+    bool loadStc(const QString& path, int hemi);
 
     //=========================================================================================================
     /**
@@ -94,7 +94,7 @@ public:
      * @param[in] surface    Pointer to the brain surface.
      * @param[in] timeIndex  Time sample index.
      */
-    void applyToSurface(BrainSurface *surface, int timeIndex);
+    void applyToSurface(BrainSurface* surface, int timeIndex);
 
     //=========================================================================================================
     /**
@@ -105,7 +105,7 @@ public:
      * @param[in] hemi          Hemisphere index (0=lh, 1=rh).
      * @param[in] cancelDist    Cancel distance for interpolation (default 0.05m).
      */
-    void computeInterpolationMatrix(BrainSurface *surface, int hemi, double cancelDist = 0.05);
+    void computeInterpolationMatrix(BrainSurface* surface, int hemi, double cancelDist = 0.05);
 
     //=========================================================================================================
     /**
@@ -113,7 +113,7 @@ public:
      *
      * @param[in] name       Colormap name ("Hot", "Jet", "Viridis", "Cool", "RedBlue").
      */
-    void setColormap(const QString &name);
+    void setColormap(const QString& name);
 
     //=========================================================================================================
     /**
@@ -121,7 +121,10 @@ public:
      *
      * @return The colormap name.
      */
-    QString colormap() const { return m_colormap; }
+    QString colormap() const
+    {
+        return m_colormap;
+    }
 
     //=========================================================================================================
     /**
@@ -140,9 +143,18 @@ public:
      *
      * @return Minimum threshold; values below it are rendered transparent.
      */
-    float thresholdMin() const { return m_threshMin; }
-    float thresholdMid() const { return m_threshMid; }
-    float thresholdMax() const { return m_threshMax; }
+    float thresholdMin() const
+    {
+        return m_threshMin;
+    }
+    float thresholdMid() const
+    {
+        return m_threshMid;
+    }
+    float thresholdMax() const
+    {
+        return m_threshMax;
+    }
 
     //=========================================================================================================
     /**
@@ -184,7 +196,7 @@ public:
      * @param[out] minVal    Minimum data value.
      * @param[out] maxVal    Maximum data value.
      */
-    void getDataRange(double &minVal, double &maxVal) const;
+    void getDataRange(double& minVal, double& maxVal) const;
 
     //=========================================================================================================
     /**
@@ -193,7 +205,7 @@ public:
      * @param[in] stc        The source estimate data.
      * @param[in] hemi       Hemisphere index (0=lh, 1=rh).
      */
-    void setStcData(const INVLIB::InvSourceEstimate &stc, int hemi);
+    void setStcData(const INVLIB::InvSourceEstimate& stc, int hemi);
 
     //=========================================================================================================
     /**
@@ -216,7 +228,10 @@ public:
      *
      * @return Shared pointer to the LH interpolation matrix (may be null).
      */
-    QSharedPointer<Eigen::SparseMatrix<float>> interpolationMatLh() const { return m_interpolationMatLh; }
+    QSharedPointer<Eigen::SparseMatrix<float>> interpolationMatLh() const
+    {
+        return m_interpolationMatLh;
+    }
 
     //=========================================================================================================
     /**
@@ -224,7 +239,10 @@ public:
      *
      * @return Shared pointer to the RH interpolation matrix (may be null).
      */
-    QSharedPointer<Eigen::SparseMatrix<float>> interpolationMatRh() const { return m_interpolationMatRh; }
+    QSharedPointer<Eigen::SparseMatrix<float>> interpolationMatRh() const
+    {
+        return m_interpolationMatRh;
+    }
 
     //=========================================================================================================
     /**
@@ -247,18 +265,18 @@ private:
      */
     uint32_t valueToColor(double value, uint8_t alpha = 255) const;
 
-    INVLIB::InvSourceEstimate m_stcLh;      /**< Left hemisphere source estimate. */
-    INVLIB::InvSourceEstimate m_stcRh;      /**< Right hemisphere source estimate. */
-    bool m_hasLh = false;                    /**< Flag indicating LH data loaded. */
-    bool m_hasRh = false;                    /**< Flag indicating RH data loaded. */
+    INVLIB::InvSourceEstimate m_stcLh; /**< Left hemisphere source estimate. */
+    INVLIB::InvSourceEstimate m_stcRh; /**< Right hemisphere source estimate. */
+    bool m_hasLh = false;              /**< Flag indicating LH data loaded. */
+    bool m_hasRh = false;              /**< Flag indicating RH data loaded. */
 
-    QString m_colormap = "Hot";              /**< Current colormap name. */
-    float m_threshMin = 0.0f;                /**< Minimum threshold. */
-    float m_threshMid = 0.5f;                /**< Mid threshold. */
-    float m_threshMax = 1.0f;                /**< Maximum threshold. */
+    QString m_colormap = "Hot"; /**< Current colormap name. */
+    float m_threshMin = 0.0f;   /**< Minimum threshold. */
+    float m_threshMid = 0.5f;   /**< Mid threshold. */
+    float m_threshMax = 1.0f;   /**< Maximum threshold. */
 
-    QSharedPointer<Eigen::SparseMatrix<float>> m_interpolationMatLh;  /**< LH interpolation matrix. */
-    QSharedPointer<Eigen::SparseMatrix<float>> m_interpolationMatRh;  /**< RH interpolation matrix. */
+    QSharedPointer<Eigen::SparseMatrix<float>> m_interpolationMatLh; /**< LH interpolation matrix. */
+    QSharedPointer<Eigen::SparseMatrix<float>> m_interpolationMatRh; /**< RH interpolation matrix. */
 
     // ── Per-time-point color cache ─────────────────────────────────────
     // Keyed by (hemi, vertexCount). The inner hash maps timeIndex →
@@ -267,10 +285,13 @@ private:
     // and auto-loop playback effectively free after the first pass: only
     // the per-vertex color blend + GPU upload happens, never the sparse
     // interpolation matvec or the per-vertex colormap calculation.
-    using ColorCacheKey = QPair<int, int>;                                  /**< (hemi, vertexCount). */
-    using ColorCacheBucket = QHash<int, QVector<uint32_t>>;                 /**< timeIndex → ABGR colors. */
-    mutable QHash<ColorCacheKey, ColorCacheBucket> m_colorCache;            /**< Lazy color cache. */
-    void invalidateColorCache() { m_colorCache.clear(); }
+    using ColorCacheKey = QPair<int, int>;                       /**< (hemi, vertexCount). */
+    using ColorCacheBucket = QHash<int, QVector<uint32_t>>;      /**< timeIndex → ABGR colors. */
+    mutable QHash<ColorCacheKey, ColorCacheBucket> m_colorCache; /**< Lazy color cache. */
+    void invalidateColorCache()
+    {
+        m_colorCache.clear();
+    }
 };
 
 #endif // SOURCEESTIMATEOVERLAY_H

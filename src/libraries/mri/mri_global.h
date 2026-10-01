@@ -36,11 +36,11 @@
 //=============================================================================================================
 
 #if defined(STATICBUILD)
-#  define MRISHARED_EXPORT
+#define MRISHARED_EXPORT
 #elif defined(MNE_MRI_LIBRARY)
-#  define MRISHARED_EXPORT Q_DECL_EXPORT    /**< Shared library export. */
+#define MRISHARED_EXPORT Q_DECL_EXPORT /**< Shared library export. */
 #else
-#  define MRISHARED_EXPORT Q_DECL_IMPORT    /**< Shared library import. */
+#define MRISHARED_EXPORT Q_DECL_IMPORT /**< Shared library import. */
 #endif
 
 //=============================================================================================================
@@ -54,7 +54,8 @@
  * plane (@ref MriSlicer, @ref MriSliceImage) and re-serialising it through
  * the FIFF MRI block hierarchy (@ref MriCorFifIO).
  */
-namespace MRILIB {
+namespace MRILIB
+{
 
 //=============================================================================================================
 /**

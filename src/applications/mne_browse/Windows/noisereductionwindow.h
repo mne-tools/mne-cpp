@@ -73,7 +73,7 @@ public:
      *
      * @param [in] parent pointer to parent widget; If parent is 0, the new NoiseReductionWindow becomes a window. If parent is another widget, NoiseReductionWindow becomes a child window inside parent. NoiseReductionWindow is deleted when its parent is deleted.
      */
-    NoiseReductionWindow(QWidget *parent = 0);
+    NoiseReductionWindow(QWidget* parent = 0);
 
     //=========================================================================================================
     /**
@@ -82,7 +82,7 @@ public:
      * @param [in] parent        pointer to parent widget; If parent is 0, the new NoiseReductionWindow becomes a window. If parent is another widget, NoiseReductionWindow becomes a child window inside parent. NoiseReductionWindow is deleted when its parent is deleted.
      * @param [in] pFiffInfo     fiff info with the projectors and compensators.
      */
-    NoiseReductionWindow(QWidget *parent, FiffInfo* pFiffInfo);
+    NoiseReductionWindow(QWidget* parent, FiffInfo* pFiffInfo);
 
     //=========================================================================================================
     /**
@@ -113,7 +113,7 @@ signals:
     /**
      * Signal mapper signal for compensator changes.
      */
-    void compClicked(const QString &text);
+    void compClicked(const QString& text);
 
 private:
     //=========================================================================================================
@@ -144,7 +144,7 @@ private:
     /**
      * Slot called when the compensator check state changes
      */
-    void checkCompStatusChanged(const QString & compName);
+    void checkCompStatusChanged(const QString& compName);
 
     //=========================================================================================================
     /**
@@ -152,15 +152,15 @@ private:
      */
     void remove(QLayout* layout);
 
-    std::unique_ptr<Ui::NoiseReductionWindow> ui;           /**< Pointer to the qt designer generated ui class.*/
+    std::unique_ptr<Ui::NoiseReductionWindow> ui; /**< Pointer to the qt designer generated ui class.*/
 
-    QList<QCheckBox*>   m_qListProjCheckBox;            /**< List of projection CheckBox. */
-    QList<QCheckBox*>   m_qListCompCheckBox;            /**< List of compensator CheckBox. */
-    QCheckBox *         m_enableDisableProjectors;      /**< Holds the enable disable all check box. */
+    QList<QCheckBox*> m_qListProjCheckBox; /**< List of projection CheckBox. */
+    QList<QCheckBox*> m_qListCompCheckBox; /**< List of compensator CheckBox. */
+    QCheckBox* m_enableDisableProjectors;  /**< Holds the enable disable all check box. */
 
-    QSignalMapper*      m_pCompSignalMapper;
+    QSignalMapper* m_pCompSignalMapper;
 
-    FiffInfo::SPtr      m_pFiffInfo;                    /**< Connected fiff info. */
+    FiffInfo::SPtr m_pFiffInfo; /**< Connected fiff info. */
 };
 
 } // NAMESPACE MNEBROWSE

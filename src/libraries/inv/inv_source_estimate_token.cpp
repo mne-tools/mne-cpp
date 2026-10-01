@@ -41,140 +41,210 @@ using namespace Eigen;
 // LOCAL HELPERS — enum ↔ token mapping
 //=============================================================================================================
 
-namespace {
+namespace
+{
 
 InvTokenId methodToTokenId(InvEstimateMethod m)
 {
     switch (m) {
-    case InvEstimateMethod::MNE:          return InvTokenId::MethodMNE;
-    case InvEstimateMethod::dSPM:         return InvTokenId::MethodDSPM;
-    case InvEstimateMethod::sLORETA:      return InvTokenId::MethodSLORETA;
-    case InvEstimateMethod::eLORETA:      return InvTokenId::MethodELORETA;
-    case InvEstimateMethod::LCMV:         return InvTokenId::MethodLCMV;
-    case InvEstimateMethod::DICS:         return InvTokenId::MethodDICS;
-    case InvEstimateMethod::SAM:          return InvTokenId::MethodSAM;
-    case InvEstimateMethod::MixedNorm:    return InvTokenId::MethodMixedNorm;
-    case InvEstimateMethod::GammaMAP:     return InvTokenId::MethodGammaMAP;
-    case InvEstimateMethod::DipoleFit:    return InvTokenId::MethodDipoleFit;
-    case InvEstimateMethod::RapMusic:     return InvTokenId::MethodRapMusic;
-    case InvEstimateMethod::PwlRapMusic:  return InvTokenId::MethodPwlRapMusic;
-    default:                              return InvTokenId::MethodUnknown;
+        case InvEstimateMethod::MNE:
+            return InvTokenId::MethodMNE;
+        case InvEstimateMethod::dSPM:
+            return InvTokenId::MethodDSPM;
+        case InvEstimateMethod::sLORETA:
+            return InvTokenId::MethodSLORETA;
+        case InvEstimateMethod::eLORETA:
+            return InvTokenId::MethodELORETA;
+        case InvEstimateMethod::LCMV:
+            return InvTokenId::MethodLCMV;
+        case InvEstimateMethod::DICS:
+            return InvTokenId::MethodDICS;
+        case InvEstimateMethod::SAM:
+            return InvTokenId::MethodSAM;
+        case InvEstimateMethod::MixedNorm:
+            return InvTokenId::MethodMixedNorm;
+        case InvEstimateMethod::GammaMAP:
+            return InvTokenId::MethodGammaMAP;
+        case InvEstimateMethod::DipoleFit:
+            return InvTokenId::MethodDipoleFit;
+        case InvEstimateMethod::RapMusic:
+            return InvTokenId::MethodRapMusic;
+        case InvEstimateMethod::PwlRapMusic:
+            return InvTokenId::MethodPwlRapMusic;
+        default:
+            return InvTokenId::MethodUnknown;
     }
 }
 
 InvEstimateMethod tokenIdToMethod(InvTokenId id)
 {
     switch (id) {
-    case InvTokenId::MethodMNE:          return InvEstimateMethod::MNE;
-    case InvTokenId::MethodDSPM:         return InvEstimateMethod::dSPM;
-    case InvTokenId::MethodSLORETA:      return InvEstimateMethod::sLORETA;
-    case InvTokenId::MethodELORETA:      return InvEstimateMethod::eLORETA;
-    case InvTokenId::MethodLCMV:         return InvEstimateMethod::LCMV;
-    case InvTokenId::MethodDICS:         return InvEstimateMethod::DICS;
-    case InvTokenId::MethodSAM:          return InvEstimateMethod::SAM;
-    case InvTokenId::MethodMixedNorm:    return InvEstimateMethod::MixedNorm;
-    case InvTokenId::MethodGammaMAP:     return InvEstimateMethod::GammaMAP;
-    case InvTokenId::MethodDipoleFit:    return InvEstimateMethod::DipoleFit;
-    case InvTokenId::MethodRapMusic:     return InvEstimateMethod::RapMusic;
-    case InvTokenId::MethodPwlRapMusic:  return InvEstimateMethod::PwlRapMusic;
-    default:                             return InvEstimateMethod::Unknown;
+        case InvTokenId::MethodMNE:
+            return InvEstimateMethod::MNE;
+        case InvTokenId::MethodDSPM:
+            return InvEstimateMethod::dSPM;
+        case InvTokenId::MethodSLORETA:
+            return InvEstimateMethod::sLORETA;
+        case InvTokenId::MethodELORETA:
+            return InvEstimateMethod::eLORETA;
+        case InvTokenId::MethodLCMV:
+            return InvEstimateMethod::LCMV;
+        case InvTokenId::MethodDICS:
+            return InvEstimateMethod::DICS;
+        case InvTokenId::MethodSAM:
+            return InvEstimateMethod::SAM;
+        case InvTokenId::MethodMixedNorm:
+            return InvEstimateMethod::MixedNorm;
+        case InvTokenId::MethodGammaMAP:
+            return InvEstimateMethod::GammaMAP;
+        case InvTokenId::MethodDipoleFit:
+            return InvEstimateMethod::DipoleFit;
+        case InvTokenId::MethodRapMusic:
+            return InvEstimateMethod::RapMusic;
+        case InvTokenId::MethodPwlRapMusic:
+            return InvEstimateMethod::PwlRapMusic;
+        default:
+            return InvEstimateMethod::Unknown;
     }
 }
 
 InvTokenId spaceToTokenId(InvSourceSpaceType s)
 {
     switch (s) {
-    case InvSourceSpaceType::Surface:  return InvTokenId::SpaceSurface;
-    case InvSourceSpaceType::Volume:   return InvTokenId::SpaceVolume;
-    case InvSourceSpaceType::Mixed:    return InvTokenId::SpaceMixed;
-    case InvSourceSpaceType::Discrete: return InvTokenId::SpaceDiscrete;
-    default:                           return InvTokenId::SpaceUnknown;
+        case InvSourceSpaceType::Surface:
+            return InvTokenId::SpaceSurface;
+        case InvSourceSpaceType::Volume:
+            return InvTokenId::SpaceVolume;
+        case InvSourceSpaceType::Mixed:
+            return InvTokenId::SpaceMixed;
+        case InvSourceSpaceType::Discrete:
+            return InvTokenId::SpaceDiscrete;
+        default:
+            return InvTokenId::SpaceUnknown;
     }
 }
 
 InvSourceSpaceType tokenIdToSpace(InvTokenId id)
 {
     switch (id) {
-    case InvTokenId::SpaceSurface:  return InvSourceSpaceType::Surface;
-    case InvTokenId::SpaceVolume:   return InvSourceSpaceType::Volume;
-    case InvTokenId::SpaceMixed:    return InvSourceSpaceType::Mixed;
-    case InvTokenId::SpaceDiscrete: return InvSourceSpaceType::Discrete;
-    default:                        return InvSourceSpaceType::Unknown;
+        case InvTokenId::SpaceSurface:
+            return InvSourceSpaceType::Surface;
+        case InvTokenId::SpaceVolume:
+            return InvSourceSpaceType::Volume;
+        case InvTokenId::SpaceMixed:
+            return InvSourceSpaceType::Mixed;
+        case InvTokenId::SpaceDiscrete:
+            return InvSourceSpaceType::Discrete;
+        default:
+            return InvSourceSpaceType::Unknown;
     }
 }
 
 InvTokenId orientToTokenId(InvOrientationType o)
 {
     switch (o) {
-    case InvOrientationType::Fixed: return InvTokenId::OrientFixed;
-    case InvOrientationType::Free:  return InvTokenId::OrientFree;
-    case InvOrientationType::Loose: return InvTokenId::OrientLoose;
-    default:                        return InvTokenId::OrientUnknown;
+        case InvOrientationType::Fixed:
+            return InvTokenId::OrientFixed;
+        case InvOrientationType::Free:
+            return InvTokenId::OrientFree;
+        case InvOrientationType::Loose:
+            return InvTokenId::OrientLoose;
+        default:
+            return InvTokenId::OrientUnknown;
     }
 }
 
 InvOrientationType tokenIdToOrient(InvTokenId id)
 {
     switch (id) {
-    case InvTokenId::OrientFixed: return InvOrientationType::Fixed;
-    case InvTokenId::OrientFree:  return InvOrientationType::Free;
-    case InvTokenId::OrientLoose: return InvOrientationType::Loose;
-    default:                      return InvOrientationType::Unknown;
+        case InvTokenId::OrientFixed:
+            return InvOrientationType::Fixed;
+        case InvTokenId::OrientFree:
+            return InvOrientationType::Free;
+        case InvTokenId::OrientLoose:
+            return InvOrientationType::Loose;
+        default:
+            return InvOrientationType::Unknown;
     }
 }
 
-InvTokenId measureToTokenId(const std::string &m)
+InvTokenId measureToTokenId(const std::string& m)
 {
-    if (m == "coh")              return InvTokenId::MeasCoh;
-    if (m == "imcoh")            return InvTokenId::MeasImCoh;
-    if (m == "plv")              return InvTokenId::MeasPlv;
-    if (m == "pli")              return InvTokenId::MeasPli;
-    if (m == "wpli")             return InvTokenId::MeasWpli;
-    if (m == "granger")          return InvTokenId::MeasGranger;
-    if (m == "pdc")              return InvTokenId::MeasPdc;
-    if (m == "dtf")              return InvTokenId::MeasDtf;
-    if (m == "correlation")      return InvTokenId::MeasCorrelation;
-    if (m == "crosscorrelation") return InvTokenId::MeasCrossCorr;
+    if (m == "coh")
+        return InvTokenId::MeasCoh;
+    if (m == "imcoh")
+        return InvTokenId::MeasImCoh;
+    if (m == "plv")
+        return InvTokenId::MeasPlv;
+    if (m == "pli")
+        return InvTokenId::MeasPli;
+    if (m == "wpli")
+        return InvTokenId::MeasWpli;
+    if (m == "granger")
+        return InvTokenId::MeasGranger;
+    if (m == "pdc")
+        return InvTokenId::MeasPdc;
+    if (m == "dtf")
+        return InvTokenId::MeasDtf;
+    if (m == "correlation")
+        return InvTokenId::MeasCorrelation;
+    if (m == "crosscorrelation")
+        return InvTokenId::MeasCrossCorr;
     return InvTokenId::MeasOther;
 }
 
 std::string tokenIdToMeasure(InvTokenId id)
 {
     switch (id) {
-    case InvTokenId::MeasCoh:         return "coh";
-    case InvTokenId::MeasImCoh:       return "imcoh";
-    case InvTokenId::MeasPlv:         return "plv";
-    case InvTokenId::MeasPli:         return "pli";
-    case InvTokenId::MeasWpli:        return "wpli";
-    case InvTokenId::MeasGranger:     return "granger";
-    case InvTokenId::MeasPdc:         return "pdc";
-    case InvTokenId::MeasDtf:         return "dtf";
-    case InvTokenId::MeasCorrelation: return "correlation";
-    case InvTokenId::MeasCrossCorr:   return "crosscorrelation";
-    default:                          return "";
+        case InvTokenId::MeasCoh:
+            return "coh";
+        case InvTokenId::MeasImCoh:
+            return "imcoh";
+        case InvTokenId::MeasPlv:
+            return "plv";
+        case InvTokenId::MeasPli:
+            return "pli";
+        case InvTokenId::MeasWpli:
+            return "wpli";
+        case InvTokenId::MeasGranger:
+            return "granger";
+        case InvTokenId::MeasPdc:
+            return "pdc";
+        case InvTokenId::MeasDtf:
+            return "dtf";
+        case InvTokenId::MeasCorrelation:
+            return "correlation";
+        case InvTokenId::MeasCrossCorr:
+            return "crosscorrelation";
+        default:
+            return "";
     }
 }
 
 // Check whether a token ID falls in the method label range
-bool isMethodToken(InvTokenId id) {
+bool isMethodToken(InvTokenId id)
+{
     int v = static_cast<int>(id);
     return v >= 100 && v <= 112;
 }
 
 // Check whether a token ID falls in the source-space label range
-bool isSpaceToken(InvTokenId id) {
+bool isSpaceToken(InvTokenId id)
+{
     int v = static_cast<int>(id);
     return v >= 150 && v <= 154;
 }
 
 // Check whether a token ID falls in the orientation label range
-bool isOrientToken(InvTokenId id) {
+bool isOrientToken(InvTokenId id)
+{
     int v = static_cast<int>(id);
     return v >= 170 && v <= 173;
 }
 
 // Check whether a token ID falls in the connectivity measure label range
-bool isMeasureToken(InvTokenId id) {
+bool isMeasureToken(InvTokenId id)
+{
     int v = static_cast<int>(id);
     return v >= 300 && v <= 310;
 }
@@ -182,7 +252,8 @@ bool isMeasureToken(InvTokenId id) {
 // Compute sub-sampling stride
 int stride(int total, int max)
 {
-    if (max <= 0 || max >= total) return 1;
+    if (max <= 0 || max >= total)
+        return 1;
     return std::max(1, total / max);
 }
 
@@ -195,19 +266,19 @@ namespace INVLIB
 // TOKENIZE
 //=============================================================================================================
 
-std::vector<InvToken> tokenize(const InvSourceEstimate &estimate, const InvTokenizeOptions &options)
+std::vector<InvToken> tokenize(const InvSourceEstimate& estimate, const InvTokenizeOptions& options)
 {
     std::vector<InvToken> tokens;
 
     // Rough capacity estimate to avoid excessive reallocations
-    int nSrc   = static_cast<int>(estimate.data.rows());
+    int nSrc = static_cast<int>(estimate.data.rows());
     int nTimes = static_cast<int>(estimate.data.cols());
-    int srcStride  = stride(nSrc,   options.maxSources);
+    int srcStride = stride(nSrc, options.maxSources);
     int timeStride = stride(nTimes, options.maxTimePoints);
-    int effSrc  = (nSrc  + srcStride  - 1) / srcStride;
+    int effSrc = (nSrc + srcStride - 1) / srcStride;
     int effTime = (nTimes + timeStride - 1) / timeStride;
 
-    size_t est = 10;  // structural overhead
+    size_t est = 10; // structural overhead
     if (options.includeGridData && estimate.hasGridData())
         est += static_cast<size_t>(effSrc) * (1 + effTime) + effSrc + 6;
     est += estimate.focalDipoles.size() * 16;
@@ -231,9 +302,9 @@ std::vector<InvToken> tokenize(const InvSourceEstimate &estimate, const InvToken
     if (options.includeGridData && estimate.hasGridData()) {
         tokens.emplace_back(InvTokenId::GridBegin);
         tokens.emplace_back(InvTokenId::NSources, static_cast<float>(effSrc));
-        tokens.emplace_back(InvTokenId::NTimes,   static_cast<float>(effTime));
-        tokens.emplace_back(InvTokenId::TimeVal,   estimate.tmin);
-        tokens.emplace_back(InvTokenId::TStep,     estimate.tstep);
+        tokens.emplace_back(InvTokenId::NTimes, static_cast<float>(effTime));
+        tokens.emplace_back(InvTokenId::TimeVal, estimate.tmin);
+        tokens.emplace_back(InvTokenId::TStep, estimate.tstep);
 
         // Vertex indices
         for (int s = 0; s < nSrc; s += srcStride)
@@ -265,7 +336,7 @@ std::vector<InvToken> tokenize(const InvSourceEstimate &estimate, const InvToken
         tokens.emplace_back(InvTokenId::CouplingBegin);
         tokens.emplace_back(InvTokenId::NGroups, static_cast<float>(estimate.couplings.size()));
 
-        for (const auto &grp : estimate.couplings) {
+        for (const auto& grp : estimate.couplings) {
             tokens.emplace_back(InvTokenId::GroupBegin);
             tokens.emplace_back(InvTokenId::TimeVal, grp.tmin);
             tokens.emplace_back(InvTokenId::TimeVal, grp.tmax);
@@ -296,7 +367,7 @@ std::vector<InvToken> tokenize(const InvSourceEstimate &estimate, const InvToken
         tokens.emplace_back(InvTokenId::FocalBegin);
         tokens.emplace_back(InvTokenId::NDipoles, static_cast<float>(estimate.focalDipoles.size()));
 
-        for (const auto &dip : estimate.focalDipoles) {
+        for (const auto& dip : estimate.focalDipoles) {
             tokens.emplace_back(InvTokenId::DipoleBegin);
             tokens.emplace_back(InvTokenId::TimeVal, dip.tmin);
             tokens.emplace_back(InvTokenId::TimeVal, dip.tmax);
@@ -321,7 +392,7 @@ std::vector<InvToken> tokenize(const InvSourceEstimate &estimate, const InvToken
         tokens.emplace_back(InvTokenId::ConnBegin);
         tokens.emplace_back(InvTokenId::NMeasures, static_cast<float>(estimate.connectivity.size()));
 
-        for (const auto &conn : estimate.connectivity) {
+        for (const auto& conn : estimate.connectivity) {
             tokens.emplace_back(InvTokenId::ConnEntryBegin);
             tokens.emplace_back(measureToTokenId(conn.measure));
             tokens.emplace_back(conn.directed ? InvTokenId::DirectedTrue : InvTokenId::DirectedFalse);
@@ -350,7 +421,7 @@ std::vector<InvToken> tokenize(const InvSourceEstimate &estimate, const InvToken
 // FROM TOKENS — reconstruct InvSourceEstimate from a token sequence
 //=============================================================================================================
 
-InvSourceEstimate fromTokens(const std::vector<InvToken> &tokens)
+InvSourceEstimate fromTokens(const std::vector<InvToken>& tokens)
 {
     InvSourceEstimate est;
     size_t pos = 0;
@@ -365,10 +436,11 @@ InvSourceEstimate fromTokens(const std::vector<InvToken> &tokens)
     };
 
     // Skip BOS
-    if (pos < len && tokens[pos].id == InvTokenId::Bos) ++pos;
+    if (pos < len && tokens[pos].id == InvTokenId::Bos)
+        ++pos;
 
     while (pos < len && tokens[pos].id != InvTokenId::Eos) {
-        const InvToken &tok = tokens[pos];
+        const InvToken& tok = tokens[pos];
 
         // --- Metadata ---
         if (tok.id == InvTokenId::MetaBegin) {
@@ -383,7 +455,8 @@ InvSourceEstimate fromTokens(const std::vector<InvToken> &tokens)
                 else
                     ++pos;
             }
-            if (pos < len) ++pos; // skip MetaEnd
+            if (pos < len)
+                ++pos; // skip MetaEnd
         }
 
         // --- Grid data ---
@@ -393,21 +466,24 @@ InvSourceEstimate fromTokens(const std::vector<InvToken> &tokens)
             std::vector<std::vector<float>> rows;
 
             while (pos < len && peek() != InvTokenId::GridEnd) {
-                const InvToken &g = tokens[pos];
+                const InvToken& g = tokens[pos];
 
                 if (g.id == InvTokenId::NSources) {
                     ++pos;
                 } else if (g.id == InvTokenId::NTimes) {
                     ++pos;
                 } else if (g.id == InvTokenId::TimeVal && est.tmin == 0 && est.tstep == -1) {
-                    est.tmin = g.value; ++pos;
+                    est.tmin = g.value;
+                    ++pos;
                 } else if (g.id == InvTokenId::TStep) {
-                    est.tstep = g.value; ++pos;
+                    est.tstep = g.value;
+                    ++pos;
                 } else if (g.id == InvTokenId::TimeVal) {
                     // Second TimeVal inside grid is still tmin if tstep wasn't set yet
                     ++pos;
                 } else if (g.id == InvTokenId::Vertex) {
-                    verts.push_back(static_cast<int>(g.value)); ++pos;
+                    verts.push_back(static_cast<int>(g.value));
+                    ++pos;
                 } else if (g.id == InvTokenId::GridRow) {
                     ++pos;
                     std::vector<float> row;
@@ -420,10 +496,11 @@ InvSourceEstimate fromTokens(const std::vector<InvToken> &tokens)
                     ++pos;
                 }
             }
-            if (pos < len) ++pos; // skip GridEnd
+            if (pos < len)
+                ++pos; // skip GridEnd
 
             // Fill Eigen structures
-            int effSrc  = static_cast<int>(rows.size());
+            int effSrc = static_cast<int>(rows.size());
             int effTime = effSrc > 0 ? static_cast<int>(rows[0].size()) : 0;
             if (effSrc > 0 && effTime > 0) {
                 est.data = MatrixXd(effSrc, effTime);
@@ -452,7 +529,8 @@ InvSourceEstimate fromTokens(const std::vector<InvToken> &tokens)
                     ++pos;
                 }
             }
-            if (pos < len) ++pos; // skip PosEnd
+            if (pos < len)
+                ++pos; // skip PosEnd
 
             est.positions = MatrixX3f(static_cast<int>(posVec.size()), 3);
             for (int i = 0; i < static_cast<int>(posVec.size()); ++i)
@@ -462,7 +540,8 @@ InvSourceEstimate fromTokens(const std::vector<InvToken> &tokens)
         // --- Couplings ---
         else if (tok.id == InvTokenId::CouplingBegin) {
             ++pos;
-            if (pos < len && tokens[pos].id == InvTokenId::NGroups) ++pos; // skip count
+            if (pos < len && tokens[pos].id == InvTokenId::NGroups)
+                ++pos; // skip count
 
             while (pos < len && peek() != InvTokenId::CouplingEnd) {
                 if (peek() == InvTokenId::GroupBegin) {
@@ -470,7 +549,7 @@ InvSourceEstimate fromTokens(const std::vector<InvToken> &tokens)
                     InvSourceCoupling grp;
 
                     while (pos < len && peek() != InvTokenId::GroupEnd) {
-                        const InvToken &ct = tokens[pos];
+                        const InvToken& ct = tokens[pos];
                         if (ct.id == InvTokenId::TimeVal) {
                             if (grp.tmin == 0.0f && grp.tmax == 0.0f)
                                 grp.tmin = ct.value;
@@ -480,7 +559,8 @@ InvSourceEstimate fromTokens(const std::vector<InvToken> &tokens)
                         } else if (ct.id == InvTokenId::NIndices) {
                             ++pos;
                         } else if (ct.id == InvTokenId::GridIndex) {
-                            grp.gridIndices.push_back(static_cast<int>(ct.value)); ++pos;
+                            grp.gridIndices.push_back(static_cast<int>(ct.value));
+                            ++pos;
                         } else if (ct.id == InvTokenId::MomX && pos + 2 < len) {
                             Vector3d m;
                             m.x() = static_cast<double>(tokens[pos].value);
@@ -508,19 +588,22 @@ InvSourceEstimate fromTokens(const std::vector<InvToken> &tokens)
                             ++pos;
                         }
                     }
-                    if (pos < len) ++pos; // skip GroupEnd
+                    if (pos < len)
+                        ++pos; // skip GroupEnd
                     est.couplings.push_back(std::move(grp));
                 } else {
                     ++pos;
                 }
             }
-            if (pos < len) ++pos; // skip CouplingEnd
+            if (pos < len)
+                ++pos; // skip CouplingEnd
         }
 
         // --- Focal dipoles ---
         else if (tok.id == InvTokenId::FocalBegin) {
             ++pos;
-            if (pos < len && tokens[pos].id == InvTokenId::NDipoles) ++pos;
+            if (pos < len && tokens[pos].id == InvTokenId::NDipoles)
+                ++pos;
 
             while (pos < len && peek() != InvTokenId::FocalEnd) {
                 if (peek() == InvTokenId::DipoleBegin) {
@@ -529,38 +612,70 @@ InvSourceEstimate fromTokens(const std::vector<InvToken> &tokens)
                     int timeIdx = 0;
 
                     while (pos < len && peek() != InvTokenId::DipoleEnd) {
-                        const InvToken &dt = tokens[pos];
+                        const InvToken& dt = tokens[pos];
                         if (dt.id == InvTokenId::TimeVal) {
-                            if (timeIdx == 0) dip.tmin = dt.value;
-                            else              dip.tmax = dt.value;
-                            ++timeIdx; ++pos;
-                        } else if (dt.id == InvTokenId::PosX) { dip.position.x() = dt.value; ++pos; }
-                        else if (dt.id == InvTokenId::PosY) { dip.position.y() = dt.value; ++pos; }
-                        else if (dt.id == InvTokenId::PosZ) { dip.position.z() = dt.value; ++pos; }
-                        else if (dt.id == InvTokenId::MomX) { dip.moment.x() = dt.value; ++pos; }
-                        else if (dt.id == InvTokenId::MomY) { dip.moment.y() = dt.value; ++pos; }
-                        else if (dt.id == InvTokenId::MomZ) { dip.moment.z() = dt.value; ++pos; }
-                        else if (dt.id == InvTokenId::GridIndex) { dip.gridIndex = static_cast<int>(dt.value); ++pos; }
-                        else if (dt.id == InvTokenId::Goodness)  { dip.goodness = dt.value; ++pos; }
-                        else if (dt.id == InvTokenId::ChiSquared){ dip.khi2 = dt.value; ++pos; }
-                        else if (dt.id == InvTokenId::NFreeDof)  { dip.nfree = static_cast<int>(dt.value); ++pos; }
-                        else if (dt.id == InvTokenId::ValidTrue) { dip.valid = true; ++pos; }
-                        else if (dt.id == InvTokenId::ValidFalse){ dip.valid = false; ++pos; }
-                        else { ++pos; }
+                            if (timeIdx == 0)
+                                dip.tmin = dt.value;
+                            else
+                                dip.tmax = dt.value;
+                            ++timeIdx;
+                            ++pos;
+                        } else if (dt.id == InvTokenId::PosX) {
+                            dip.position.x() = dt.value;
+                            ++pos;
+                        } else if (dt.id == InvTokenId::PosY) {
+                            dip.position.y() = dt.value;
+                            ++pos;
+                        } else if (dt.id == InvTokenId::PosZ) {
+                            dip.position.z() = dt.value;
+                            ++pos;
+                        } else if (dt.id == InvTokenId::MomX) {
+                            dip.moment.x() = dt.value;
+                            ++pos;
+                        } else if (dt.id == InvTokenId::MomY) {
+                            dip.moment.y() = dt.value;
+                            ++pos;
+                        } else if (dt.id == InvTokenId::MomZ) {
+                            dip.moment.z() = dt.value;
+                            ++pos;
+                        } else if (dt.id == InvTokenId::GridIndex) {
+                            dip.gridIndex = static_cast<int>(dt.value);
+                            ++pos;
+                        } else if (dt.id == InvTokenId::Goodness) {
+                            dip.goodness = dt.value;
+                            ++pos;
+                        } else if (dt.id == InvTokenId::ChiSquared) {
+                            dip.khi2 = dt.value;
+                            ++pos;
+                        } else if (dt.id == InvTokenId::NFreeDof) {
+                            dip.nfree = static_cast<int>(dt.value);
+                            ++pos;
+                        } else if (dt.id == InvTokenId::ValidTrue) {
+                            dip.valid = true;
+                            ++pos;
+                        } else if (dt.id == InvTokenId::ValidFalse) {
+                            dip.valid = false;
+                            ++pos;
+                        } else {
+                            ++pos;
+                        }
                     }
-                    if (pos < len) ++pos; // skip DipoleEnd
+                    if (pos < len)
+                        ++pos; // skip DipoleEnd
                     est.focalDipoles.push_back(dip);
                 } else {
                     ++pos;
                 }
             }
-            if (pos < len) ++pos; // skip FocalEnd
+            if (pos < len)
+                ++pos; // skip FocalEnd
         }
 
         // --- Connectivity ---
         else if (tok.id == InvTokenId::ConnBegin) {
             ++pos;
-            if (pos < len && tokens[pos].id == InvTokenId::NMeasures) ++pos;
+            if (pos < len && tokens[pos].id == InvTokenId::NMeasures)
+                ++pos;
 
             while (pos < len && peek() != InvTokenId::ConnEnd) {
                 if (peek() == InvTokenId::ConnEntryBegin) {
@@ -570,21 +685,33 @@ InvSourceEstimate fromTokens(const std::vector<InvToken> &tokens)
                     int freqIdx = 0, timeIdx = 0;
 
                     while (pos < len && peek() != InvTokenId::ConnEntryEnd) {
-                        const InvToken &ct = tokens[pos];
+                        const InvToken& ct = tokens[pos];
                         if (isMeasureToken(ct.id)) {
-                            conn.measure = tokenIdToMeasure(ct.id); ++pos;
-                        } else if (ct.id == InvTokenId::DirectedTrue) { conn.directed = true; ++pos; }
-                        else if (ct.id == InvTokenId::DirectedFalse)  { conn.directed = false; ++pos; }
-                        else if (ct.id == InvTokenId::FreqVal) {
-                            if (freqIdx == 0) conn.fmin = ct.value;
-                            else              conn.fmax = ct.value;
-                            ++freqIdx; ++pos;
+                            conn.measure = tokenIdToMeasure(ct.id);
+                            ++pos;
+                        } else if (ct.id == InvTokenId::DirectedTrue) {
+                            conn.directed = true;
+                            ++pos;
+                        } else if (ct.id == InvTokenId::DirectedFalse) {
+                            conn.directed = false;
+                            ++pos;
+                        } else if (ct.id == InvTokenId::FreqVal) {
+                            if (freqIdx == 0)
+                                conn.fmin = ct.value;
+                            else
+                                conn.fmax = ct.value;
+                            ++freqIdx;
+                            ++pos;
                         } else if (ct.id == InvTokenId::TimeVal) {
-                            if (timeIdx == 0) conn.tmin = ct.value;
-                            else              conn.tmax = ct.value;
-                            ++timeIdx; ++pos;
+                            if (timeIdx == 0)
+                                conn.tmin = ct.value;
+                            else
+                                conn.tmax = ct.value;
+                            ++timeIdx;
+                            ++pos;
                         } else if (ct.id == InvTokenId::NSources) {
-                            n = static_cast<int>(ct.value); ++pos;
+                            n = static_cast<int>(ct.value);
+                            ++pos;
                         } else if (ct.id == InvTokenId::ConnValue && n > 0) {
                             conn.matrix = MatrixXd(n, n);
                             for (int r = 0; r < n; ++r)
@@ -594,13 +721,15 @@ InvSourceEstimate fromTokens(const std::vector<InvToken> &tokens)
                             ++pos;
                         }
                     }
-                    if (pos < len) ++pos; // skip ConnEntryEnd
+                    if (pos < len)
+                        ++pos; // skip ConnEntryEnd
                     est.connectivity.push_back(std::move(conn));
                 } else {
                     ++pos;
                 }
             }
-            if (pos < len) ++pos; // skip ConnEnd
+            if (pos < len)
+                ++pos; // skip ConnEnd
         }
 
         else {

@@ -52,10 +52,10 @@ private slots:
         m_sCovFile = m_sDataPath + "/MEG/sample/sample_audvis-cov.fif";
 
         m_bFwdLoaded = false;
-        if(QFile::exists(m_sFwdFile)) {
+        if (QFile::exists(m_sFwdFile)) {
             QFile file(m_sFwdFile);
             MNEForwardSolution fwd(file);
-            if(!fwd.isEmpty()) {
+            if (!fwd.isEmpty()) {
                 m_fwd = fwd;
                 m_bFwdLoaded = true;
             }
@@ -66,11 +66,12 @@ private slots:
 
     void testPickChannelsByInclude()
     {
-        if(!m_bFwdLoaded) QSKIP("Forward solution not loaded");
+        if (!m_bFwdLoaded)
+            QSKIP("Forward solution not loaded");
 
         // Pick a subset of channels
         QStringList include;
-        for(int i = 0; i < qMin(10, m_fwd.info.ch_names.size()); ++i) {
+        for (int i = 0; i < qMin(10, m_fwd.info.ch_names.size()); ++i) {
             include << m_fwd.info.ch_names[i];
         }
 
@@ -83,11 +84,12 @@ private slots:
 
     void testPickChannelsByExclude()
     {
-        if(!m_bFwdLoaded) QSKIP("Forward solution not loaded");
+        if (!m_bFwdLoaded)
+            QSKIP("Forward solution not loaded");
 
         // Exclude some channels
         QStringList exclude;
-        for(int i = 0; i < qMin(5, m_fwd.info.ch_names.size()); ++i) {
+        for (int i = 0; i < qMin(5, m_fwd.info.ch_names.size()); ++i) {
             exclude << m_fwd.info.ch_names[i];
         }
 
@@ -101,7 +103,8 @@ private slots:
 
     void testPickTypesMeg()
     {
-        if(!m_bFwdLoaded) QSKIP("Forward solution not loaded");
+        if (!m_bFwdLoaded)
+            QSKIP("Forward solution not loaded");
 
         MNEForwardSolution megFwd = m_fwd.pick_types(true, false);
         QVERIFY(!megFwd.isEmpty());
@@ -111,11 +114,12 @@ private slots:
 
     void testPickTypesEeg()
     {
-        if(!m_bFwdLoaded) QSKIP("Forward solution not loaded");
+        if (!m_bFwdLoaded)
+            QSKIP("Forward solution not loaded");
 
         MNEForwardSolution eegFwd = m_fwd.pick_types(false, true);
         // EEG channels may or may not be present
-        if(!eegFwd.isEmpty()) {
+        if (!eegFwd.isEmpty()) {
             QVERIFY(eegFwd.nchan > 0);
         }
     }
@@ -124,7 +128,8 @@ private slots:
 
     void testToFixedOri()
     {
-        if(!m_bFwdLoaded) QSKIP("Forward solution not loaded");
+        if (!m_bFwdLoaded)
+            QSKIP("Forward solution not loaded");
 
         MNEForwardSolution fwdCopy = m_fwd;
 
@@ -139,7 +144,8 @@ private slots:
 
     void testComputeOrientPrior()
     {
-        if(!m_bFwdLoaded) QSKIP("Forward solution not loaded");
+        if (!m_bFwdLoaded)
+            QSKIP("Forward solution not loaded");
 
         FiffCov orientPrior = m_fwd.compute_orient_prior(0.2f);
         QVERIFY(orientPrior.dim > 0);
@@ -147,7 +153,8 @@ private slots:
 
     void testComputeOrientPriorLoose()
     {
-        if(!m_bFwdLoaded) QSKIP("Forward solution not loaded");
+        if (!m_bFwdLoaded)
+            QSKIP("Forward solution not loaded");
 
         // loose=1.0 means free orientation
         FiffCov orientPrior = m_fwd.compute_orient_prior(1.0f);
@@ -158,7 +165,8 @@ private slots:
 
     void testComputeDepthPrior()
     {
-        if(!m_bFwdLoaded) QSKIP("Forward solution not loaded");
+        if (!m_bFwdLoaded)
+            QSKIP("Forward solution not loaded");
 
         // Use the forward solution's gain matrix and info from raw file
         QFile rawFileForDepth(m_sRawFile);
@@ -173,8 +181,10 @@ private slots:
 
     void testPrepareForward()
     {
-        if(!m_bFwdLoaded) QSKIP("Forward solution not loaded");
-        if(!QFile::exists(m_sCovFile) || !QFile::exists(m_sRawFile)) QSKIP("Data files not found");
+        if (!m_bFwdLoaded)
+            QSKIP("Forward solution not loaded");
+        if (!QFile::exists(m_sCovFile) || !QFile::exists(m_sRawFile))
+            QSKIP("Data files not found");
 
         QFile covFile(m_sCovFile);
         FiffCov noiseCov(covFile);
@@ -201,16 +211,17 @@ private slots:
 
     void testForwardSolutionWriteRead()
     {
-        if(!m_bFwdLoaded) QSKIP("Forward solution not loaded");
+        if (!m_bFwdLoaded)
+            QSKIP("Forward solution not loaded");
 
         QString tmpFile = QDir::tempPath() + "/test_fwd_roundtrip.fif";
         QFile outFile(tmpFile);
         bool written = false;
-        if(outFile.open(QIODevice::WriteOnly)) {
+        if (outFile.open(QIODevice::WriteOnly)) {
             written = m_fwd.write(outFile);
             outFile.close();
         }
-        if(written) {
+        if (written) {
             QFile reloadFile(tmpFile);
             MNEForwardSolution reloaded(reloadFile);
             QVERIFY(!reloaded.isEmpty());
@@ -226,11 +237,12 @@ private slots:
 
     void testSourceSpaceProperties()
     {
-        if(!m_bFwdLoaded) QSKIP("Forward solution not loaded");
+        if (!m_bFwdLoaded)
+            QSKIP("Forward solution not loaded");
 
         QCOMPARE(m_fwd.src.size(), 2); // Left and right hemisphere
 
-        for(int h = 0; h < 2; ++h) {
+        for (int h = 0; h < 2; ++h) {
             QVERIFY(m_fwd.src[h].nuse > 0);
             QVERIFY(m_fwd.src[h].np > 0);
             QVERIFY(m_fwd.src[h].rr.rows() > 0);
@@ -241,7 +253,8 @@ private slots:
 
     void testSourceOrientations()
     {
-        if(!m_bFwdLoaded) QSKIP("Forward solution not loaded");
+        if (!m_bFwdLoaded)
+            QSKIP("Forward solution not loaded");
 
         QVERIFY(m_fwd.source_rr.rows() == m_fwd.nsource);
         QVERIFY(m_fwd.source_nn.rows() > 0);
@@ -253,14 +266,17 @@ private slots:
 
     void testGainMatrixProperties()
     {
-        if(!m_bFwdLoaded) QSKIP("Forward solution not loaded");
+        if (!m_bFwdLoaded)
+            QSKIP("Forward solution not loaded");
 
         QVERIFY(m_fwd.sol != nullptr);
         QVERIFY(m_fwd.sol->data.rows() == m_fwd.nchan);
         QVERIFY(m_fwd.sol->data.cols() > 0);
     }
 
-    void cleanupTestCase() {}
+    void cleanupTestCase()
+    {
+    }
 };
 
 QTEST_GUILESS_MAIN(TestMneForwardOps)

@@ -17,8 +17,8 @@
 #include "dipoletreeitem.h"
 
 DipoleTreeItem::DipoleTreeItem(const QString& text, const INVLIB::InvEcdSet& set, int type)
-    : AbstractTreeItem(text, type)
-    , m_ecdSet(set)
+: AbstractTreeItem(text, type)
+, m_ecdSet(set)
 {
 }
 

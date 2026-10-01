@@ -61,16 +61,23 @@ private:
         Network net("TestCorrelation", 0.0);
 
         auto n0 = QSharedPointer<NetworkNode>::create(0, RowVectorXf::Zero(3));
-        auto n1 = QSharedPointer<NetworkNode>::create(1, (RowVectorXf(3) << 1,0,0).finished());
-        auto n2 = QSharedPointer<NetworkNode>::create(2, (RowVectorXf(3) << 0,1,0).finished());
-        auto n3 = QSharedPointer<NetworkNode>::create(3, (RowVectorXf(3) << 1,1,0).finished());
+        auto n1 = QSharedPointer<NetworkNode>::create(1, (RowVectorXf(3) << 1, 0, 0).finished());
+        auto n2 = QSharedPointer<NetworkNode>::create(2, (RowVectorXf(3) << 0, 1, 0).finished());
+        auto n3 = QSharedPointer<NetworkNode>::create(3, (RowVectorXf(3) << 1, 1, 0).finished());
 
-        net.append(n0); net.append(n1); net.append(n2); net.append(n3);
+        net.append(n0);
+        net.append(n1);
+        net.append(n2);
+        net.append(n3);
 
-        MatrixXd w08(1,1); w08(0,0) = 0.8;
-        MatrixXd w05(1,1); w05(0,0) = 0.5;
-        MatrixXd w03(1,1); w03(0,0) = 0.3;
-        MatrixXd w06(1,1); w06(0,0) = 0.6;
+        MatrixXd w08(1, 1);
+        w08(0, 0) = 0.8;
+        MatrixXd w05(1, 1);
+        w05(0, 0) = 0.5;
+        MatrixXd w03(1, 1);
+        w03(0, 0) = 0.3;
+        MatrixXd w06(1, 1);
+        w06(0, 0) = 0.6;
 
         // Insert smallest weight first so Network::append min/max tracking
         // (which uses if/else-if) correctly captures both extremes.
@@ -79,13 +86,20 @@ private:
         auto e23 = QSharedPointer<NetworkEdge>::create(2, 3, w06);
         auto e01 = QSharedPointer<NetworkEdge>::create(0, 1, w08);
 
-        net.append(e13); net.append(e02); net.append(e23); net.append(e01);
+        net.append(e13);
+        net.append(e02);
+        net.append(e23);
+        net.append(e01);
 
         // Register edges on nodes so node-level degree/strength methods work
-        n0->append(e02); n0->append(e01);
-        n1->append(e13); n1->append(e01);
-        n2->append(e02); n2->append(e23);
-        n3->append(e13); n3->append(e23);
+        n0->append(e02);
+        n0->append(e01);
+        n1->append(e13);
+        n1->append(e01);
+        n2->append(e02);
+        n2->append(e23);
+        n3->append(e13);
+        n3->append(e23);
 
         return net;
     }
@@ -113,7 +127,8 @@ private slots:
 
     void testEdgeConstruction()
     {
-        MatrixXd w(1,1); w(0,0) = 0.75;
+        MatrixXd w(1, 1);
+        w(0, 0) = 0.75;
         auto edge = QSharedPointer<NetworkEdge>::create(0, 1, w, true);
 
         QCOMPARE(edge->getStartNodeID(), 0);
@@ -123,7 +138,8 @@ private slots:
 
     void testEdgeActiveToggle()
     {
-        MatrixXd w(1,1); w(0,0) = 0.5;
+        MatrixXd w(1, 1);
+        w(0, 0) = 0.5;
         auto edge = QSharedPointer<NetworkEdge>::create(0, 1, w, true);
 
         QVERIFY(edge->isActive());
@@ -133,7 +149,8 @@ private slots:
 
     void testEdgeWeight()
     {
-        MatrixXd w(1,3); w << 0.1, 0.5, 0.9;
+        MatrixXd w(1, 3);
+        w << 0.1, 0.5, 0.9;
         auto edge = QSharedPointer<NetworkEdge>::create(2, 5, w);
 
         // Average across all bins
@@ -182,13 +199,13 @@ private slots:
 
         // Diagonal should be zero
         for (int i = 0; i < 4; ++i)
-            QCOMPARE(C(i,i), 0.0);
+            QCOMPARE(C(i, i), 0.0);
 
         // Edge 0→1 has weight 0.8
-        QVERIFY(qAbs(C(0,1) - 0.8) < 1e-10);
+        QVERIFY(qAbs(C(0, 1) - 0.8) < 1e-10);
 
         // Mirrored: C(1,0) should also be 0.8
-        QVERIFY(qAbs(C(1,0) - 0.8) < 1e-10);
+        QVERIFY(qAbs(C(1, 0) - 0.8) < 1e-10);
     }
 
     //=========================================================================================================
@@ -204,7 +221,8 @@ private slots:
         const auto& tEdges = net.getThresholdedEdges();
         int activeCount = 0;
         for (const auto& e : tEdges)
-            if (e->isActive()) ++activeCount;
+            if (e->isActive())
+                ++activeCount;
         QCOMPARE(activeCount, 3);
     }
 
@@ -216,7 +234,8 @@ private slots:
         const auto& tEdges = net.getThresholdedEdges();
         int activeCount = 0;
         for (const auto& e : tEdges)
-            if (e->isActive()) ++activeCount;
+            if (e->isActive())
+                ++activeCount;
         QCOMPARE(activeCount, 0);
     }
 
@@ -274,7 +293,7 @@ private slots:
         // After normalization, max should be 1.0
         QVERIFY(qAbs(minmax.second - 1.0) < 1e-10);
         // Min should be 0.3/0.8
-        QVERIFY(qAbs(minmax.first - 0.3/0.8) < 1e-6);
+        QVERIFY(qAbs(minmax.first - 0.3 / 0.8) < 1e-6);
     }
 
     //=========================================================================================================
@@ -418,7 +437,8 @@ private slots:
         auto node = QSharedPointer<NetworkNode>::create(5, pos);
 
         // Self-loop edge (startID == endID) should be rejected by append
-        MatrixXd w(1,1); w(0,0) = 1.0;
+        MatrixXd w(1, 1);
+        w(0, 0) = 1.0;
         auto selfEdge = QSharedPointer<NetworkEdge>::create(5, 5, w);
         node->append(selfEdge);
         QCOMPARE(node->getFullDegree(), static_cast<qint16>(0));
@@ -468,7 +488,7 @@ private slots:
 
     void testEdgeFrequencyBins()
     {
-        MatrixXd w(4,1);
+        MatrixXd w(4, 1);
         w << 0.1, 0.2, 0.3, 0.4;
         auto edge = QSharedPointer<NetworkEdge>::create(0, 1, w);
 
@@ -480,7 +500,7 @@ private slots:
         QVERIFY(qAbs(edge->getWeight() - expected) < 1e-10);
 
         // Set frequency bins to average rows 1-2 (0.2, 0.3)
-        edge->setFrequencyBins(QPair<int,int>(1, 2));
+        edge->setFrequencyBins(QPair<int, int>(1, 2));
         auto bins2 = edge->getFrequencyBins();
         QCOMPARE(bins2.first, 1);
         QCOMPARE(bins2.second, 2);
@@ -490,19 +510,20 @@ private slots:
 
     void testEdgeMatrixWeight()
     {
-        MatrixXd w(2,2);
+        MatrixXd w(2, 2);
         w << 0.1, 0.2, 0.3, 0.4;
         auto edge = QSharedPointer<NetworkEdge>::create(0, 1, w);
 
         MatrixXd mw = edge->getMatrixWeight();
         QCOMPARE(mw.rows(), static_cast<Eigen::Index>(2));
         QCOMPARE(mw.cols(), static_cast<Eigen::Index>(2));
-        QVERIFY(qAbs(mw(0,0) - 0.1) < 1e-10);
+        QVERIFY(qAbs(mw(0, 0) - 0.1) < 1e-10);
     }
 
     void testEdgeSetWeight()
     {
-        MatrixXd w(1,1); w(0,0) = 0.5;
+        MatrixXd w(1, 1);
+        w(0, 0) = 0.5;
         auto edge = QSharedPointer<NetworkEdge>::create(0, 1, w);
         edge->setWeight(0.99);
         QVERIFY(qAbs(edge->getWeight() - 0.99) < 1e-10);
@@ -511,7 +532,7 @@ private slots:
     void testEdgeZeroMatrix()
     {
         // Empty matrix should be converted to 1x1 zero matrix
-        MatrixXd w(0,0);
+        MatrixXd w(0, 0);
         auto edge = QSharedPointer<NetworkEdge>::create(0, 1, w);
         QCOMPARE(edge->getWeight(), 0.0);
     }
@@ -547,9 +568,9 @@ private slots:
         QCOMPARE(C.rows(), 4);
         QCOMPARE(C.cols(), 4);
         // Edge 1→3 (w=0.3) should be inactive → 0
-        QCOMPARE(C(1,3), 0.0);
+        QCOMPARE(C(1, 3), 0.0);
         // Edge 0→1 (w=0.8) should be active
-        QVERIFY(qAbs(C(0,1) - 0.8) < 1e-10);
+        QVERIFY(qAbs(C(0, 1) - 0.8) < 1e-10);
     }
 
     void testThresholdedConnectivityMatrixNoMirror()
@@ -559,9 +580,9 @@ private slots:
         MatrixXd C = net.getThresholdedConnectivityMatrix(false);
 
         // Without mirroring, lower triangle should be 0
-        QCOMPARE(C(1,0), 0.0);
+        QCOMPARE(C(1, 0), 0.0);
         // Upper triangle edge 0→1 should have weight
-        QVERIFY(qAbs(C(0,1) - 0.8) < 1e-10);
+        QVERIFY(qAbs(C(0, 1) - 0.8) < 1e-10);
     }
 
     void testGetEdgeAt()
@@ -674,8 +695,8 @@ private slots:
         Network net = buildDiamond();
         MatrixXd C = net.getFullConnectivityMatrix(false);
         // Without mirroring, lower triangle should be 0
-        QCOMPARE(C(1,0), 0.0);
-        QVERIFY(qAbs(C(0,1) - 0.8) < 1e-10);
+        QCOMPARE(C(1, 0), 0.0);
+        QVERIFY(qAbs(C(0, 1) - 0.8) < 1e-10);
     }
 };
 

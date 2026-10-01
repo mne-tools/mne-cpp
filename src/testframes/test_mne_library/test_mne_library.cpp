@@ -75,20 +75,46 @@ class TestMneLibrary : public QObject
 
 private:
     QString m_sDataPath;
-    bool hasData() const { return !m_sDataPath.isEmpty(); }
+    bool hasData() const
+    {
+        return !m_sDataPath.isEmpty();
+    }
 
-    QString bemPath()   const { return m_sDataPath + "/subjects/sample/bem/sample-5120-bem.fif"; }
-    QString rawPath()   const { return m_sDataPath + "/MEG/sample/sample_audvis_trunc_raw.fif"; }
-    QString avePath()   const { return m_sDataPath + "/MEG/sample/sample_audvis-ave.fif"; }
-    QString covPath()   const { return m_sDataPath + "/MEG/sample/sample_audvis-cov.fif"; }
-    QString fwdPath()   const { return m_sDataPath + "/Result/ref-sample_audvis-meg-eeg-oct-6-fwd.fif"; }
-    QString srcPath()   const { return m_sDataPath + "/subjects/sample/bem/sample-oct-6-src.fif"; }
-    QString transPath() const { return m_sDataPath + "/MEG/sample/all-trans.fif"; }
+    QString bemPath() const
+    {
+        return m_sDataPath + "/subjects/sample/bem/sample-5120-bem.fif";
+    }
+    QString rawPath() const
+    {
+        return m_sDataPath + "/MEG/sample/sample_audvis_trunc_raw.fif";
+    }
+    QString avePath() const
+    {
+        return m_sDataPath + "/MEG/sample/sample_audvis-ave.fif";
+    }
+    QString covPath() const
+    {
+        return m_sDataPath + "/MEG/sample/sample_audvis-cov.fif";
+    }
+    QString fwdPath() const
+    {
+        return m_sDataPath + "/Result/ref-sample_audvis-meg-eeg-oct-6-fwd.fif";
+    }
+    QString srcPath() const
+    {
+        return m_sDataPath + "/subjects/sample/bem/sample-oct-6-src.fif";
+    }
+    QString transPath() const
+    {
+        return m_sDataPath + "/MEG/sample/all-trans.fif";
+    }
 
-    bool readSourceSpaces(const QString& path, MNESourceSpaces& out) {
+    bool readSourceSpaces(const QString& path, MNESourceSpaces& out)
+    {
         QFile file(path);
         FiffStream::SPtr stream(new FiffStream(&file));
-        if (!stream->open()) return false;
+        if (!stream->open())
+            return false;
         return MNESourceSpaces::readFromStream(stream, false, out);
     }
 
@@ -211,13 +237,14 @@ private slots:
 void TestMneLibrary::initTestCase()
 {
     qInstallMessageHandler(MNELogger::customLogWriter);
-    QString base = QCoreApplication::applicationDirPath()
-                   + "/../resources/data/mne-cpp-test-data";
+    QString base = QCoreApplication::applicationDirPath() + "/../resources/data/mne-cpp-test-data";
     if (QFile::exists(base + "/MEG/sample/sample_audvis_trunc_raw.fif"))
         m_sDataPath = base;
 }
 
-void TestMneLibrary::cleanupTestCase() {}
+void TestMneLibrary::cleanupTestCase()
+{
+}
 
 //=============================================================================================================
 // MNESourceSpace
@@ -248,9 +275,11 @@ void TestMneLibrary::sourceSpace_createAndBasicOps()
 
 void TestMneLibrary::sourceSpace_readFromFile()
 {
-    if (!hasData()) QSKIP("No test data");
+    if (!hasData())
+        QSKIP("No test data");
     QString path = m_sDataPath + "/subjects/sample/bem/sample-oct-6-src.fif";
-    if (!QFile::exists(path)) QSKIP("Source space file not found");
+    if (!QFile::exists(path))
+        QSKIP("Source space file not found");
 
     std::vector<std::unique_ptr<MNESourceSpace>> spaces;
     int res = MNESourceSpace::read_source_spaces(path, spaces);
@@ -290,13 +319,17 @@ void TestMneLibrary::sourceSpace_cloneAndMethods()
 
 void TestMneLibrary::sourceSpace_transform()
 {
-    if (!hasData()) QSKIP("No test data");
+    if (!hasData())
+        QSKIP("No test data");
     MNESourceSpaces srcSpaces;
-    if (!readSourceSpaces(srcPath(), srcSpaces)) QSKIP("Could not read source spaces");
+    if (!readSourceSpaces(srcPath(), srcSpaces))
+        QSKIP("Could not read source spaces");
 
     FiffCoordTrans t;
-    t.from = FIFFV_COORD_MRI; t.to = FIFFV_COORD_HEAD;
-    t.trans = Matrix4f::Identity(); t.invtrans = Matrix4f::Identity();
+    t.from = FIFFV_COORD_MRI;
+    t.to = FIFFV_COORD_HEAD;
+    t.trans = Matrix4f::Identity();
+    t.invtrans = Matrix4f::Identity();
 
     int oldNp = srcSpaces[0].np;
     srcSpaces[0].transform_source_space(t);
@@ -305,9 +338,11 @@ void TestMneLibrary::sourceSpace_transform()
 
 void TestMneLibrary::sourceSpace_rearrange()
 {
-    if (!hasData()) QSKIP("No test data");
+    if (!hasData())
+        QSKIP("No test data");
     MNESourceSpaces srcSpaces;
-    if (!readSourceSpaces(srcPath(), srcSpaces)) QSKIP("Could not read source spaces");
+    if (!readSourceSpaces(srcPath(), srcSpaces))
+        QSKIP("Could not read source spaces");
 
     srcSpaces[0].rearrange_source_space();
     QVERIFY(srcSpaces[0].np > 0);
@@ -315,9 +350,11 @@ void TestMneLibrary::sourceSpace_rearrange()
 
 void TestMneLibrary::sourceSpace_addPatchStats()
 {
-    if (!hasData()) QSKIP("No test data");
+    if (!hasData())
+        QSKIP("No test data");
     MNESourceSpaces srcSpaces;
-    if (!readSourceSpaces(srcPath(), srcSpaces)) QSKIP("Could not read source spaces");
+    if (!readSourceSpaces(srcPath(), srcSpaces))
+        QSKIP("Could not read source spaces");
 
     int result = srcSpaces[0].add_patch_stats();
     Q_UNUSED(result);
@@ -329,9 +366,11 @@ void TestMneLibrary::sourceSpace_addPatchStats()
 
 void TestMneLibrary::sourceSpaces_getVertno()
 {
-    if (!hasData()) QSKIP("No test data");
+    if (!hasData())
+        QSKIP("No test data");
     MNESourceSpaces srcSpaces;
-    if (!readSourceSpaces(srcPath(), srcSpaces)) QSKIP("Could not read source spaces");
+    if (!readSourceSpaces(srcPath(), srcSpaces))
+        QSKIP("Could not read source spaces");
 
     QList<VectorXi> vertno = srcSpaces.get_vertno();
     QCOMPARE(vertno.size(), srcSpaces.size());
@@ -341,9 +380,11 @@ void TestMneLibrary::sourceSpaces_getVertno()
 
 void TestMneLibrary::sourceSpaces_clearAndAccess()
 {
-    if (!hasData()) QSKIP("No test data");
+    if (!hasData())
+        QSKIP("No test data");
     MNESourceSpaces srcSpaces;
-    if (!readSourceSpaces(srcPath(), srcSpaces)) QSKIP("Could not read source spaces");
+    if (!readSourceSpaces(srcPath(), srcSpaces))
+        QSKIP("Could not read source spaces");
 
     MNESourceSpace& lh = srcSpaces[0];
     QVERIFY(lh.np > 0);
@@ -364,10 +405,12 @@ void TestMneLibrary::sourceSpaces_clearAndAccess()
 
 void TestMneLibrary::sourceSpaces_readWithGeometry()
 {
-    if (!hasData()) QSKIP("No test data");
+    if (!hasData())
+        QSKIP("No test data");
     QFile file(srcPath());
     FiffStream::SPtr stream(new FiffStream(&file));
-    if (!stream->open()) QSKIP("Could not open source space");
+    if (!stream->open())
+        QSKIP("Could not open source space");
 
     MNESourceSpaces srcSpaces;
     bool ok = MNESourceSpaces::readFromStream(stream, true, srcSpaces);
@@ -379,7 +422,8 @@ void TestMneLibrary::sourceSpaces_readWithGeometry()
 
 void TestMneLibrary::sourceSpaces_filterAndTransform()
 {
-    if (!hasData()) QSKIP("No test data");
+    if (!hasData())
+        QSKIP("No test data");
     QFile file(srcPath());
     FiffStream::SPtr stream(new FiffStream(&file));
     QVERIFY(stream->open());
@@ -397,7 +441,8 @@ void TestMneLibrary::sourceSpaces_filterAndTransform()
 
 void TestMneLibrary::sourceSpaces_readAddGeom()
 {
-    if (!hasData()) QSKIP("No test data");
+    if (!hasData())
+        QSKIP("No test data");
     QFile file(srcPath());
     FiffStream::SPtr stream(new FiffStream(&file));
     QVERIFY(stream->open());
@@ -431,7 +476,8 @@ void TestMneLibrary::sourceEstimate_fullLifecycle()
 
     MatrixXd sol = MatrixXd::Random(20, 10);
     VectorXi verts(20);
-    for (int i = 0; i < 20; i++) verts[i] = i;
+    for (int i = 0; i < 20; i++)
+        verts[i] = i;
 
     InvSourceEstimate stc1(sol, verts, 0.0f, 0.001f);
     QVERIFY(!stc1.isEmpty());
@@ -524,9 +570,11 @@ void TestMneLibrary::bem_constructAndOperators()
 
 void TestMneLibrary::bem_readFromFile()
 {
-    if (!hasData()) QSKIP("No test data");
+    if (!hasData())
+        QSKIP("No test data");
     QString path = m_sDataPath + "/subjects/sample/bem/sample-1280-1280-1280-bem.fif";
-    if (!QFile::exists(path)) QSKIP("BEM file not found");
+    if (!QFile::exists(path))
+        QSKIP("BEM file not found");
 
     QFile bemFile(path);
     MNEBem bem(bemFile);
@@ -545,8 +593,10 @@ void TestMneLibrary::bem_transformOps()
     bem << surf;
 
     FiffCoordTrans trans;
-    trans.from = FIFFV_COORD_MRI; trans.to = FIFFV_COORD_HEAD;
-    trans.trans = Matrix4f::Identity(); trans.invtrans = Matrix4f::Identity();
+    trans.from = FIFFV_COORD_MRI;
+    trans.to = FIFFV_COORD_HEAD;
+    trans.trans = Matrix4f::Identity();
+    trans.invtrans = Matrix4f::Identity();
 
     bem.transform(trans);
     bem.invtransform(trans);
@@ -593,7 +643,8 @@ void TestMneLibrary::ctfComp_staticHelpers()
 
 void TestMneLibrary::ctfComp_readFromRawFile()
 {
-    if (!hasData()) QSKIP("No test data");
+    if (!hasData())
+        QSKIP("No test data");
     auto compSet = MNECTFCompDataSet::read(rawPath());
     QVERIFY(compSet != nullptr);
 }
@@ -612,16 +663,19 @@ void TestMneLibrary::ctfComp_constructCopyDestroy()
 
 void TestMneLibrary::ctfComp_makeComp()
 {
-    if (!hasData()) QSKIP("No test data");
+    if (!hasData())
+        QSKIP("No test data");
     auto compSet = MNECTFCompDataSet::read(rawPath());
-    if (!compSet) QSKIP("No compensation data read");
+    if (!compSet)
+        QSKIP("No compensation data read");
 
     QFile rawFile(rawPath());
     FiffRawData raw(rawFile);
 
     QList<FiffChInfo> compchs;
     for (const auto& ch : raw.info.chs) {
-        if (ch.kind == FIFFV_REF_MEG_CH) compchs.append(ch);
+        if (ch.kind == FIFFV_REF_MEG_CH)
+            compchs.append(ch);
     }
 
     if (compchs.size() > 0) {
@@ -648,8 +702,10 @@ void TestMneLibrary::ctfComp_explainAndMap()
 
 void TestMneLibrary::inverseOp_readFromFile()
 {
-    if (!hasData()) QSKIP("No test data");
-    if (!QFile::exists(fwdPath())) QSKIP("Forward file not found");
+    if (!hasData())
+        QSKIP("No test data");
+    if (!QFile::exists(fwdPath()))
+        QSKIP("Forward file not found");
 
     QFile fwdFile(fwdPath());
     MNEForwardSolution fwd(fwdFile);
@@ -682,7 +738,8 @@ void TestMneLibrary::inverseOp_basicGetters()
 
 void TestMneLibrary::inverseOp_readFullFile()
 {
-    if (!hasData()) QSKIP("No test data");
+    if (!hasData())
+        QSKIP("No test data");
     QString invPath = m_sDataPath + "/Result/sample_audvis-meg-eeg-oct-6-meg-eeg-inv.fif";
     if (!QFile::exists(invPath)) {
         invPath = m_sDataPath + "/MEG/sample/sample_audvis-meg-oct-6-meg-inv.fif";
@@ -712,9 +769,13 @@ void TestMneLibrary::inverseOp_readFullFile()
 void TestMneLibrary::surfOrVol_solidAngle()
 {
     MNETriangle tri;
-    tri.r1 = Vector3f(0,0,0); tri.r2 = Vector3f(1,0,0); tri.r3 = Vector3f(0,1,0);
-    tri.r12 = Vector3f(1,0,0); tri.r13 = Vector3f(0,1,0);
-    tri.nn = Vector3f(0,0,1); tri.area = 0.5f;
+    tri.r1 = Vector3f(0, 0, 0);
+    tri.r2 = Vector3f(1, 0, 0);
+    tri.r3 = Vector3f(0, 1, 0);
+    tri.r12 = Vector3f(1, 0, 0);
+    tri.r13 = Vector3f(0, 1, 0);
+    tri.nn = Vector3f(0, 0, 1);
+    tri.area = 0.5f;
 
     Vector3f from(0.1f, 0.1f, 1.0f);
     double omega = MNESurfaceOrVolume::solid_angle(from, tri);
@@ -728,7 +789,7 @@ void TestMneLibrary::surfOrVol_solidAngle()
 void TestMneLibrary::surfOrVol_computeCm()
 {
     MatrixXf rr(4, 3);
-    rr << 1,0,0, -1,0,0, 0,1,0, 0,-1,0;
+    rr << 1, 0, 0, -1, 0, 0, 0, 1, 0, 0, -1, 0;
     float cm[3];
     MNESurfaceOrVolume::compute_cm(rr, 4, cm);
     QVERIFY(std::abs(cm[0]) < 1e-6f);
@@ -756,7 +817,8 @@ void TestMneLibrary::surfOrVol_addUniformCurv()
 
 void TestMneLibrary::surfOrVol_realBemMethods()
 {
-    if (!hasData()) QSKIP("No test data");
+    if (!hasData())
+        QSKIP("No test data");
     auto surf = MNESurface::read_bem_surface2(bemPath(), -1, 1);
     QVERIFY(surf != nullptr);
 
@@ -781,8 +843,8 @@ void TestMneLibrary::displaySurf_basicOps()
     MNEMshDisplaySurface dsurf;
     dsurf.np = 3;
     dsurf.rr = MatrixXf::Ones(3, 3);
-    dsurf.scale(Vector3f(2,2,2));
-    QVERIFY(std::abs(dsurf.rr(0,0) - 2.0f) < 1e-6f);
+    dsurf.scale(Vector3f(2, 2, 2));
+    QVERIFY(std::abs(dsurf.rr(0, 0) - 2.0f) < 1e-6f);
 }
 
 void TestMneLibrary::displaySurf_decideCurvDisplay()
@@ -801,7 +863,7 @@ void TestMneLibrary::displaySurf_decideExtent()
     MNEMshDisplaySurface dsurf;
     dsurf.np = 4;
     dsurf.rr = MatrixXf(4, 3);
-    dsurf.rr << -1,  -1, -1, 1, 1, 1, 0, 0, 0, 0.5f, 0.5f, 0.5f;
+    dsurf.rr << -1, -1, -1, 1, 1, 1, 0, 0, 0, 0.5f, 0.5f, 0.5f;
     dsurf.decide_surface_extent("test");
 }
 
@@ -816,7 +878,8 @@ void TestMneLibrary::displaySurf_setupCurvatureColors()
 
 void TestMneLibrary::displaySurf_alignment()
 {
-    if (!hasData()) QSKIP("No test data");
+    if (!hasData())
+        QSKIP("No test data");
     auto surf = MNESurface::read_bem_surface2(bemPath(), -1, 1);
     QVERIFY(surf != nullptr);
 
@@ -828,20 +891,30 @@ void TestMneLibrary::displaySurf_alignment()
     headDig.coord_frame = FIFFV_COORD_HEAD;
     headDig.npoint = 13;
 
-    float cardinals[3][3] = {{-0.07f,0,0},{0,0.08f,0},{0.07f,0,0}};
+    float cardinals[3][3] = {{-0.07f, 0, 0}, {0, 0.08f, 0}, {0.07f, 0, 0}};
     int cardIdents[3] = {FIFFV_POINT_LPA, FIFFV_POINT_NASION, FIFFV_POINT_RPA};
     for (int i = 0; i < 3; i++) {
         FiffDigPoint pt;
-        pt.kind = FIFFV_POINT_CARDINAL; pt.ident = cardIdents[i];
-        pt.r[0] = cardinals[i][0]; pt.r[1] = cardinals[i][1]; pt.r[2] = cardinals[i][2];
-        headDig.points.append(pt); headDig.active.append(1); headDig.discard.append(0);
+        pt.kind = FIFFV_POINT_CARDINAL;
+        pt.ident = cardIdents[i];
+        pt.r[0] = cardinals[i][0];
+        pt.r[1] = cardinals[i][1];
+        pt.r[2] = cardinals[i][2];
+        headDig.points.append(pt);
+        headDig.active.append(1);
+        headDig.discard.append(0);
     }
     for (int i = 0; i < 10; i++) {
         FiffDigPoint pt;
-        pt.kind = FIFFV_POINT_EXTRA; pt.ident = i;
+        pt.kind = FIFFV_POINT_EXTRA;
+        pt.ident = i;
         float theta = (float)i / 10 * 2.0f * (float)M_PI;
-        pt.r[0] = 0.08f * cosf(theta); pt.r[1] = 0.08f * sinf(theta); pt.r[2] = 0.06f;
-        headDig.points.append(pt); headDig.active.append(1); headDig.discard.append(0);
+        pt.r[0] = 0.08f * cosf(theta);
+        pt.r[1] = 0.08f * sinf(theta);
+        pt.r[2] = 0.06f;
+        headDig.points.append(pt);
+        headDig.active.append(1);
+        headDig.discard.append(0);
     }
     headDig.head_mri_t = std::make_unique<FiffCoordTrans>(
         FIFFV_COORD_HEAD, FIFFV_COORD_MRI, Matrix4f::Identity());
@@ -863,9 +936,11 @@ void TestMneLibrary::displaySurf_alignment()
 
 void TestMneLibrary::displaySurfSet_load()
 {
-    if (!hasData()) QSKIP("No test data");
+    if (!hasData())
+        QSKIP("No test data");
     QString subjectsDir = m_sDataPath + "/subjects";
-    if (!QFile::exists(subjectsDir + "/sample/surf/lh.white")) QSKIP("No FreeSurfer surfaces");
+    if (!QFile::exists(subjectsDir + "/sample/surf/lh.white"))
+        QSKIP("No FreeSurfer surfaces");
 
     auto surfSet = MNEMshDisplaySurfaceSet::load(QString("sample"), QString("white"), subjectsDir);
     if (surfSet) {
@@ -875,12 +950,15 @@ void TestMneLibrary::displaySurfSet_load()
 
 void TestMneLibrary::displaySurfSet_addBem()
 {
-    if (!hasData()) QSKIP("No test data");
+    if (!hasData())
+        QSKIP("No test data");
     MNEMshDisplaySurfaceSet surfSet;
     int result = surfSet.add_bem_surface(bemPath(), FIFFV_BEM_SURF_ID_BRAIN,
                                          QString("innerskull"), 1, 0);
-    if (result == 0) QVERIFY(surfSet.surfs.size() > 0);
-    else QVERIFY(true);
+    if (result == 0)
+        QVERIFY(surfSet.surfs.size() > 0);
+    else
+        QVERIFY(true);
 }
 
 //=============================================================================================================
@@ -889,12 +967,15 @@ void TestMneLibrary::displaySurfSet_addBem()
 
 void TestMneLibrary::forwardSolution_pickTypes()
 {
-    if (!hasData()) QSKIP("No test data");
-    if (!QFile::exists(fwdPath())) QSKIP("Forward file not found");
+    if (!hasData())
+        QSKIP("No test data");
+    if (!QFile::exists(fwdPath()))
+        QSKIP("Forward file not found");
 
     QFile fwdFile(fwdPath());
     MNEForwardSolution fwd(fwdFile);
-    if (fwd.isEmpty()) QSKIP("Could not read forward solution");
+    if (fwd.isEmpty())
+        QSKIP("Could not read forward solution");
 
     MNEForwardSolution fwdMeg = fwd.pick_types(true, false);
     QVERIFY(!fwdMeg.isEmpty());
@@ -917,12 +998,15 @@ void TestMneLibrary::forwardSolution_clusterInfo()
 
 void TestMneLibrary::forwardSolution_reduceForward()
 {
-    if (!hasData()) QSKIP("No test data");
-    if (!QFile::exists(fwdPath())) QSKIP("Forward file not found");
+    if (!hasData())
+        QSKIP("No test data");
+    if (!QFile::exists(fwdPath()))
+        QSKIP("Forward file not found");
 
     QFile fwdFile(fwdPath());
     MNEForwardSolution fwd(fwdFile);
-    if (fwd.isEmpty()) QSKIP("Could not read forward solution");
+    if (fwd.isEmpty())
+        QSKIP("Could not read forward solution");
 
     MatrixXd D;
     MNEForwardSolution reduced = fwd.reduce_forward_solution(100, D);
@@ -931,12 +1015,15 @@ void TestMneLibrary::forwardSolution_reduceForward()
 
 void TestMneLibrary::forwardSolution_orientPrior()
 {
-    if (!hasData()) QSKIP("No test data");
-    if (!QFile::exists(fwdPath())) QSKIP("Forward file not found");
+    if (!hasData())
+        QSKIP("No test data");
+    if (!QFile::exists(fwdPath()))
+        QSKIP("Forward file not found");
 
     QFile fwdFile(fwdPath());
     MNEForwardSolution fwd(fwdFile);
-    if (fwd.isEmpty()) QSKIP("Could not read forward solution");
+    if (fwd.isEmpty())
+        QSKIP("Could not read forward solution");
 
     FiffCov orient_prior = fwd.compute_orient_prior(0.2f);
     QVERIFY(orient_prior.data.rows() > 0);
@@ -944,8 +1031,10 @@ void TestMneLibrary::forwardSolution_orientPrior()
 
 void TestMneLibrary::forwardSolution_restrictGainMatrix()
 {
-    if (!hasData()) QSKIP("No test data");
-    if (!QFile::exists(rawPath())) QSKIP("Raw file not found");
+    if (!hasData())
+        QSKIP("No test data");
+    if (!QFile::exists(rawPath()))
+        QSKIP("Raw file not found");
 
     QFile rawFile(rawPath());
     FiffRawData raw(rawFile);
@@ -958,13 +1047,15 @@ void TestMneLibrary::forwardSolution_restrictGainMatrix()
 
 void TestMneLibrary::forwardSolution_prepareForward()
 {
-    if (!hasData()) QSKIP("No test data");
+    if (!hasData())
+        QSKIP("No test data");
     if (!QFile::exists(fwdPath()) || !QFile::exists(rawPath()) || !QFile::exists(covPath()))
         QSKIP("Required files not found");
 
     QFile fwdFile(fwdPath());
     MNEForwardSolution fwd(fwdFile);
-    if (fwd.isEmpty()) QSKIP("Could not read forward solution");
+    if (fwd.isEmpty())
+        QSKIP("Could not read forward solution");
 
     QFile rawFile(rawPath());
     FiffRawData raw(rawFile);
@@ -985,12 +1076,15 @@ void TestMneLibrary::forwardSolution_prepareForward()
 
 void TestMneLibrary::forwardSolution_toFixedOri()
 {
-    if (!hasData()) QSKIP("No test data");
-    if (!QFile::exists(fwdPath())) QSKIP("Forward file not found");
+    if (!hasData())
+        QSKIP("No test data");
+    if (!QFile::exists(fwdPath()))
+        QSKIP("Forward file not found");
 
     QFile fwdFile(fwdPath());
     MNEForwardSolution fwd(fwdFile);
-    if (fwd.isEmpty()) QSKIP("Could not read forward solution");
+    if (fwd.isEmpty())
+        QSKIP("Could not read forward solution");
 
     MNEForwardSolution fwdMeg = fwd.pick_types(true, false);
     QVERIFY(!fwdMeg.isEmpty());
@@ -1001,16 +1095,20 @@ void TestMneLibrary::forwardSolution_toFixedOri()
 
 void TestMneLibrary::forwardSolution_pickChannels()
 {
-    if (!hasData()) QSKIP("No test data");
-    if (!QFile::exists(fwdPath())) QSKIP("Forward file not found");
+    if (!hasData())
+        QSKIP("No test data");
+    if (!QFile::exists(fwdPath()))
+        QSKIP("Forward file not found");
 
     QFile fwdFile(fwdPath());
     MNEForwardSolution fwd(fwdFile);
-    if (fwd.isEmpty()) QSKIP("Could not read forward solution");
+    if (fwd.isEmpty())
+        QSKIP("Could not read forward solution");
 
     QStringList include;
     if (fwd.sol->row_names.size() >= 10) {
-        for (int i = 0; i < 10; i++) include.append(fwd.sol->row_names[i]);
+        for (int i = 0; i < 10; i++)
+            include.append(fwd.sol->row_names[i]);
     }
     if (include.size() > 0) {
         MNEForwardSolution fwdPicked = fwd.pick_channels(include);
@@ -1020,18 +1118,22 @@ void TestMneLibrary::forwardSolution_pickChannels()
 
 void TestMneLibrary::forwardSolution_computeDepthPrior()
 {
-    if (!hasData()) QSKIP("No test data");
-    if (!QFile::exists(fwdPath()) || !QFile::exists(rawPath())) QSKIP("Required files not found");
+    if (!hasData())
+        QSKIP("No test data");
+    if (!QFile::exists(fwdPath()) || !QFile::exists(rawPath()))
+        QSKIP("Required files not found");
 
     QFile fwdFile(fwdPath());
     MNEForwardSolution fwd(fwdFile);
-    if (fwd.isEmpty()) QSKIP("Could not read forward solution");
+    if (fwd.isEmpty())
+        QSKIP("Could not read forward solution");
 
     QFile rawFile(rawPath());
     FiffRawData raw(rawFile);
 
     MNEForwardSolution fwdMeg = fwd.pick_types(true, false);
-    if (fwdMeg.isEmpty()) QSKIP("No MEG forward");
+    if (fwdMeg.isEmpty())
+        QSKIP("No MEG forward");
 
     Eigen::MatrixXd Gain = fwdMeg.sol->data.cast<double>();
     FiffCov depth_prior = MNEForwardSolution::compute_depth_prior(
@@ -1041,7 +1143,8 @@ void TestMneLibrary::forwardSolution_computeDepthPrior()
 
 void TestMneLibrary::forwardSolution_pickRegions()
 {
-    if (!hasData()) QSKIP("No test data");
+    if (!hasData())
+        QSKIP("No test data");
 
     QFile fwdFile(fwdPath());
     MNEForwardSolution fwd(fwdFile);
@@ -1075,7 +1178,8 @@ void TestMneLibrary::namedMatrix_lifecycle()
     QCOMPARE(nm.ncol, 0);
 
     MNENamedMatrix nm2;
-    nm2.nrow = 3; nm2.ncol = 4;
+    nm2.nrow = 3;
+    nm2.ncol = 4;
     nm2.data = MatrixXf::Random(3, 4).eval();
     nm2.rowlist = QStringList{"r0", "r1", "r2"};
     nm2.collist = QStringList{"c0", "c1", "c2", "c3"};
@@ -1086,12 +1190,15 @@ void TestMneLibrary::namedMatrix_lifecycle()
 
 void TestMneLibrary::namedMatrix_readFromStream()
 {
-    if (!hasData()) QSKIP("No test data");
-    if (!QFile::exists(fwdPath())) QSKIP("Forward file not found");
+    if (!hasData())
+        QSKIP("No test data");
+    if (!QFile::exists(fwdPath()))
+        QSKIP("Forward file not found");
 
     QFile fwdFile(fwdPath());
     MNEForwardSolution fwd(fwdFile);
-    if (fwd.isEmpty()) QSKIP("Could not read forward solution");
+    if (fwd.isEmpty())
+        QSKIP("Could not read forward solution");
 
     QVERIFY(fwd.sol->data.rows() > 0);
     QVERIFY(fwd.sol->nrow > 0);
@@ -1126,12 +1233,13 @@ void TestMneLibrary::epochData_baselineCorrectionAndDrop()
     for (int i = 0; i < 5; i++) {
         MNEEpochData::SPtr epoch = MNEEpochData::SPtr::create();
         epoch->epoch = MatrixXd::Random(3, 100) + MatrixXd::Constant(3, 100, 10.0);
-        epoch->tmin = -0.1f; epoch->tmax = 0.3f;
+        epoch->tmin = -0.1f;
+        epoch->tmax = 0.3f;
         epoch->bReject = (i == 2);
         list.append(epoch);
     }
 
-    QPair<float,float> baseline(-0.1f, 0.0f);
+    QPair<float, float> baseline(-0.1f, 0.0f);
     list.applyBaselineCorrection(baseline);
     list.dropRejected();
     QCOMPARE(list.size(), 4);
@@ -1155,18 +1263,22 @@ void TestMneLibrary::epochData_pickChannels()
 void TestMneLibrary::epochData_average()
 {
     auto pInfo = FiffInfo::SPtr::create();
-    pInfo->sfreq = 1000.0; pInfo->nchan = 3;
+    pInfo->sfreq = 1000.0;
+    pInfo->nchan = 3;
     for (int i = 0; i < 3; i++) {
         FiffChInfo ch;
-        ch.ch_name = QString("CH%1").arg(i); ch.kind = FIFFV_MEG_CH;
-        pInfo->chs.append(ch); pInfo->ch_names.append(ch.ch_name);
+        ch.ch_name = QString("CH%1").arg(i);
+        ch.kind = FIFFV_MEG_CH;
+        pInfo->chs.append(ch);
+        pInfo->ch_names.append(ch.ch_name);
     }
 
     MNEEpochDataList list;
     for (int i = 0; i < 10; i++) {
         MNEEpochData::SPtr epoch = MNEEpochData::SPtr::create();
         epoch->epoch = MatrixXd::Ones(3, 100) * (i + 1);
-        epoch->tmin = 0.0f; epoch->tmax = 0.099f;
+        epoch->tmin = 0.0f;
+        epoch->tmax = 0.099f;
         list.append(epoch);
     }
 
@@ -1177,14 +1289,16 @@ void TestMneLibrary::epochData_average()
 
 void TestMneLibrary::epochData_readEpochs()
 {
-    if (!hasData()) QSKIP("No test data");
+    if (!hasData())
+        QSKIP("No test data");
     QFile rawFile(rawPath());
     FiffRawData raw(rawFile);
 
     MatrixXi events(5, 3);
     for (int i = 0; i < 5; i++) {
         events(i, 0) = raw.first_samp + 500 + i * 200;
-        events(i, 1) = 0; events(i, 2) = 1;
+        events(i, 1) = 0;
+        events(i, 2) = 1;
     }
 
     QMap<QString, double> reject;
@@ -1198,7 +1312,8 @@ void TestMneLibrary::epochData_readEpochs()
 
 void TestMneLibrary::volumeSourceSpace_create()
 {
-    if (!hasData()) QSKIP("No test data");
+    if (!hasData())
+        QSKIP("No test data");
     auto surf = MNESurface::read_bem_surface2(bemPath(), -1, 1);
     QVERIFY(surf != nullptr);
 
@@ -1230,8 +1345,16 @@ void TestMneLibrary::misc_volGeom()
     QVERIFY(vg.valid == 0);
 }
 
-void TestMneLibrary::misc_mshPicked()   { MNEMshPicked p; Q_UNUSED(p); }
-void TestMneLibrary::misc_colorScaleDef() { MNEMshColorScaleDef c; Q_UNUSED(c); }
+void TestMneLibrary::misc_mshPicked()
+{
+    MNEMshPicked p;
+    Q_UNUSED(p);
+}
+void TestMneLibrary::misc_colorScaleDef()
+{
+    MNEMshColorScaleDef c;
+    Q_UNUSED(c);
+}
 
 void TestMneLibrary::misc_ctfCompData()
 {
@@ -1247,14 +1370,16 @@ void TestMneLibrary::misc_epochDataList()
 
     MNEEpochData::SPtr epoch = MNEEpochData::SPtr::create();
     epoch->epoch = MatrixXd::Random(5, 100);
-    epoch->tmin = 0.0f; epoch->tmax = 0.1f;
+    epoch->tmin = 0.0f;
+    epoch->tmax = 0.1f;
     list.append(epoch);
     QCOMPARE(list.size(), 1);
 }
 
 void TestMneLibrary::misc_bemRead()
 {
-    if (!hasData()) QSKIP("No test data");
+    if (!hasData())
+        QSKIP("No test data");
     QFile bemFile(bemPath());
     MNEBem bem(bemFile);
     QVERIFY(bem.size() > 0);
@@ -1270,7 +1395,8 @@ void TestMneLibrary::misc_bemRead()
 
 void TestMneLibrary::bemSurface_readSingleLayer()
 {
-    if (!hasData()) QSKIP("No test data");
+    if (!hasData())
+        QSKIP("No test data");
     float sigma = 0.0f;
     auto surf = MNESurface::read_bem_surface(bemPath(), -1, true, sigma);
     QVERIFY(surf != nullptr);
@@ -1283,9 +1409,12 @@ void TestMneLibrary::bemSurface_readSingleLayer()
 
 void TestMneLibrary::bemSurface_readThreeLayer()
 {
-    if (!hasData()) QSKIP("No test data");
+    if (!hasData())
+        QSKIP("No test data");
     QString bem3File = m_sDataPath + "/subjects/sample/bem/sample-1280-1280-1280-bem.fif";
-    if (!QFile::exists(bem3File)) { QSKIP("Three-layer BEM file not available"); }
+    if (!QFile::exists(bem3File)) {
+        QSKIP("Three-layer BEM file not available");
+    }
     float sigma = 0.0f;
     auto surf = MNESurface::read_bem_surface(bem3File, 1, true, sigma);
     QVERIFY(surf != nullptr);
@@ -1295,7 +1424,8 @@ void TestMneLibrary::bemSurface_readThreeLayer()
 
 void TestMneLibrary::bemSurface_sumSolids()
 {
-    if (!hasData()) QSKIP("No test data");
+    if (!hasData())
+        QSKIP("No test data");
     auto surf = MNESurface::read_bem_surface(bemPath(), -1, true);
     QVERIFY(surf != nullptr);
     Vector3f inside(surf->cm[0], surf->cm[1], surf->cm[2]);
@@ -1306,7 +1436,8 @@ void TestMneLibrary::bemSurface_sumSolids()
 
 void TestMneLibrary::bemSurface_triangleCoords()
 {
-    if (!hasData()) QSKIP("No test data");
+    if (!hasData())
+        QSKIP("No test data");
     auto surf = MNESurface::read_bem_surface(bemPath(), -1, true);
     QVERIFY(surf != nullptr && surf->ntri > 0);
     int v0 = surf->itris(0, 0);
@@ -1318,7 +1449,8 @@ void TestMneLibrary::bemSurface_triangleCoords()
 
 void TestMneLibrary::bemSurface_nearestTrianglePoint()
 {
-    if (!hasData()) QSKIP("No test data");
+    if (!hasData())
+        QSKIP("No test data");
     auto surf = MNESurface::read_bem_surface(bemPath(), -1, true);
     QVERIFY(surf != nullptr);
     int v0 = surf->itris(0, 0);
@@ -1331,7 +1463,8 @@ void TestMneLibrary::bemSurface_nearestTrianglePoint()
 
 void TestMneLibrary::bemSurface_projectToTriangle()
 {
-    if (!hasData()) QSKIP("No test data");
+    if (!hasData())
+        QSKIP("No test data");
     auto surf = MNESurface::read_bem_surface(bemPath(), -1, true);
     QVERIFY(surf != nullptr);
     Vector3f projected = surf->project_to_triangle(0, 0.3f, 0.3f);
@@ -1340,7 +1473,8 @@ void TestMneLibrary::bemSurface_projectToTriangle()
 
 void TestMneLibrary::bemSurface_projectToSurface()
 {
-    if (!hasData()) QSKIP("No test data");
+    if (!hasData())
+        QSKIP("No test data");
     auto surf = MNESurface::read_bem_surface(bemPath(), -1, true);
     QVERIFY(surf != nullptr);
     Vector3f r(surf->cm[0] + 0.01f, surf->cm[1], surf->cm[2]);
@@ -1352,7 +1486,8 @@ void TestMneLibrary::bemSurface_projectToSurface()
 
 void TestMneLibrary::bemSurface_geometryInfo()
 {
-    if (!hasData()) QSKIP("No test data");
+    if (!hasData())
+        QSKIP("No test data");
     auto surf = MNESurface::read_bem_surface(bemPath(), -1, true);
     QVERIFY(surf != nullptr);
     QVERIFY(surf->ntri > 0 && surf->np > 0);
@@ -1367,12 +1502,14 @@ void TestMneLibrary::bemSurface_geometryInfo()
 
 void TestMneLibrary::forwardSolution_tripletSelection()
 {
-    if (!hasData()) QSKIP("No test data");
+    if (!hasData())
+        QSKIP("No test data");
     QFile fwdFile(fwdPath());
     MNEForwardSolution fwd(fwdFile);
     QVERIFY(!fwd.isEmpty());
     VectorXi sel(10);
-    for (int i = 0; i < 10; ++i) sel(i) = i;
+    for (int i = 0; i < 10; ++i)
+        sel(i) = i;
     VectorXi tripSel = fwd.tripletSelection(sel);
     QCOMPARE(tripSel.size(), 30);
     QCOMPARE(tripSel(0), 0);
@@ -1381,7 +1518,8 @@ void TestMneLibrary::forwardSolution_tripletSelection()
 
 void TestMneLibrary::forwardSolution_readVerify()
 {
-    if (!hasData()) QSKIP("No test data");
+    if (!hasData())
+        QSKIP("No test data");
     QFile fwdFile(fwdPath());
     MNEForwardSolution fwd(fwdFile);
     QVERIFY(!fwd.isEmpty());
@@ -1390,7 +1528,8 @@ void TestMneLibrary::forwardSolution_readVerify()
     QVERIFY(fwd.nsource > 0);
     QVERIFY(fwd.src.size() > 0);
     int totalVerts = 0;
-    for (int i = 0; i < fwd.src.size(); ++i) totalVerts += fwd.src[i].nuse;
+    for (int i = 0; i < fwd.src.size(); ++i)
+        totalVerts += fwd.src[i].nuse;
     qDebug() << "Fwd:" << fwd.sol->nrow << "chs," << fwd.nsource << "src," << totalVerts << "verts";
 }
 

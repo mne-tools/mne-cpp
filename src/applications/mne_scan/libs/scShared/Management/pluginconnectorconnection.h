@@ -45,14 +45,14 @@ namespace SCSHAREDLIB
  */
 enum ConnectorDataType
 {
-    _N,         /**< Numeric. */
-    _RTMSA,     /**< Real-Time Multi Sample Array. */
-    _RTES,      /**< Real-Time Evoked Set. */
-    _RTC,       /**< Real-Time Covariance. */
-    _RTSE,      /**< Real-Time Source Estimate. */
-    _RTHR,      /**< Real-Time Hpi Result. */
-    _RTFS,      /**< Real-Time Forward Solution. */
-    _None,      /**< None. */
+    _N,     /**< Numeric. */
+    _RTMSA, /**< Real-Time Multi Sample Array. */
+    _RTES,  /**< Real-Time Evoked Set. */
+    _RTC,   /**< Real-Time Covariance. */
+    _RTSE,  /**< Real-Time Source Estimate. */
+    _RTHR,  /**< Real-Time Hpi Result. */
+    _RTFS,  /**< Real-Time Forward Solution. */
+    _None,  /**< None. */
 };
 
 //=============================================================================================================
@@ -68,11 +68,11 @@ class SCSHAREDSHARED_EXPORT PluginConnectorConnection : public QObject
     friend class PluginConnectorConnectionWidget;
 
 public:
-    typedef QSharedPointer<PluginConnectorConnection> SPtr;             /**< Shared pointer type for PluginConnectorConnection. */
-    typedef QSharedPointer<const PluginConnectorConnection> ConstSPtr;  /**< Const shared pointer type for PluginConnectorConnection. */
+    typedef QSharedPointer<PluginConnectorConnection> SPtr;            /**< Shared pointer type for PluginConnectorConnection. */
+    typedef QSharedPointer<const PluginConnectorConnection> ConstSPtr; /**< Const shared pointer type for PluginConnectorConnection. */
 
-    explicit PluginConnectorConnection(AbstractPlugin::SPtr sender, AbstractPlugin::SPtr receiver, QObject *parent = 0);
-    
+    explicit PluginConnectorConnection(AbstractPlugin::SPtr sender, AbstractPlugin::SPtr receiver, QObject* parent = 0);
+
     //=========================================================================================================
     /**
      * Destructor
@@ -89,7 +89,7 @@ public:
     /**
      * Create connection
      */
-    static inline QSharedPointer<PluginConnectorConnection> create(AbstractPlugin::SPtr sender, AbstractPlugin::SPtr receiver, QObject *parent = 0);
+    static inline QSharedPointer<PluginConnectorConnection> create(AbstractPlugin::SPtr sender, AbstractPlugin::SPtr receiver, QObject* parent = 0);
 
     static ConnectorDataType getDataType(QSharedPointer<PluginConnector> pPluginConnector);
 
@@ -108,7 +108,7 @@ public:
     QWidget* setupWidget();
 
 signals:
-    
+
 private:
     //=========================================================================================================
     /**
@@ -126,7 +126,7 @@ private:
 // INLINE DEFINITIONS
 //=============================================================================================================
 
-inline QSharedPointer<PluginConnectorConnection> PluginConnectorConnection::create(AbstractPlugin::SPtr sender, AbstractPlugin::SPtr receiver, QObject *parent)
+inline QSharedPointer<PluginConnectorConnection> PluginConnectorConnection::create(AbstractPlugin::SPtr sender, AbstractPlugin::SPtr receiver, QObject* parent)
 {
     QSharedPointer<PluginConnectorConnection> pPluginConnectorConnection(new PluginConnectorConnection(sender, receiver, parent));
     return pPluginConnectorConnection;

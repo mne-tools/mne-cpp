@@ -64,7 +64,7 @@ public:
      * @param[in] context   Context provides information about the source code location.
      * @param[in] msg       The message to print in the terminal.
      */
-    static void customLogWriter(QtMsgType type, const QMessageLogContext &context, const QString &msg);
+    static void customLogWriter(QtMsgType type, const QMessageLogContext& context, const QString& msg);
 
     //=========================================================================================================
     /**
@@ -90,7 +90,7 @@ public:
 
 private:
     static std::mutex m_mutex;
-    static QString    m_sLogFilePath;
+    static QString m_sLogFilePath;
 };
 }
 #endif // MNE_LOGGER_H

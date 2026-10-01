@@ -20,13 +20,14 @@ using namespace RTPROCESSINGLIB;
 using namespace FIFFLIB;
 using namespace Eigen;
 
-namespace {
+namespace
+{
 
 QSharedPointer<FiffInfo> makeSyntheticInfo()
 {
     QSharedPointer<FiffInfo> info(new FiffInfo);
 
-    for(int i = 0; i < 2; ++i) {
+    for (int i = 0; i < 2; ++i) {
         FiffChInfo ch;
         ch.kind = FIFFV_EEG_CH;
         ch.unit = FIFF_UNIT_V;
@@ -56,7 +57,7 @@ private slots:
 
         MatrixXd block(2, 2);
         block << 1.0, 2.0,
-                 2.0, 4.0;
+            2.0, 4.0;
 
         FiffCov result = cov.estimateCovariance(block, 3);
         QVERIFY(result.isEmpty());
@@ -68,7 +69,7 @@ private slots:
 
         MatrixXd block(2, 3);
         block << 1.0, 2.0, 3.0,
-                 2.0, 4.0, 6.0;
+            2.0, 4.0, 6.0;
 
         FiffCov result = cov.estimateCovariance(block, 3);
         QVERIFY(!result.isEmpty());
@@ -92,12 +93,12 @@ private slots:
 
         MatrixXd first(2, 3);
         first << 1.0, 2.0, 3.0,
-                 3.0, 2.0, 1.0;
+            3.0, 2.0, 1.0;
         QVERIFY(!cov.estimateCovariance(first, 3).isEmpty());
 
         MatrixXd second(2, 1);
         second << 10.0,
-                  20.0;
+            20.0;
         QVERIFY(cov.estimateCovariance(second, 2).isEmpty());
     }
 };

@@ -39,7 +39,7 @@ class VirtualChannelWindow : public QDockWidget
     Q_OBJECT
 
 public:
-    explicit VirtualChannelWindow(QWidget *parent = nullptr);
+    explicit VirtualChannelWindow(QWidget* parent = nullptr);
     ~VirtualChannelWindow() override;
 
     void init();
@@ -49,7 +49,7 @@ public:
     void setAvailableChannelNames(const QStringList& channelNames);
 
 protected:
-    bool event(QEvent *event) override;
+    bool event(QEvent* event) override;
 
 private:
     void setupUi();
@@ -64,14 +64,14 @@ private slots:
     void removeSelectedVirtualChannels();
 
 private:
-    MainWindow*          m_pMainWindow = nullptr;
-    QWidget*             m_pContents = nullptr;
-    QVBoxLayout*         m_pLayout = nullptr;
-    QLabel*              m_pHintLabel = nullptr;
-    QToolBar*            m_pToolBar = nullptr;
-    QTableView*          m_pTableView = nullptr;
+    MainWindow* m_pMainWindow = nullptr;
+    QWidget* m_pContents = nullptr;
+    QVBoxLayout* m_pLayout = nullptr;
+    QLabel* m_pHintLabel = nullptr;
+    QToolBar* m_pToolBar = nullptr;
+    QTableView* m_pTableView = nullptr;
     VirtualChannelModel* m_pVirtualChannelModel = nullptr;
-    QStringList          m_availableChannelNames;
+    QStringList m_availableChannelNames;
 };
 
 } // namespace MNEBROWSE

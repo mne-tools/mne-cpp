@@ -60,7 +60,6 @@ class BABYMEGSHARED_EXPORT BabyMEGSetupWidget : public QWidget
     Q_OBJECT
 
 public:
-
     //=========================================================================================================
     /**
      * Constructs a BabyMEGSetupWidget which is a child of parent.
@@ -68,7 +67,7 @@ public:
      * @param[in] p_pBabyMEG   a pointer to the corresponding BabyMEG.
      * @param[in] parent        pointer to parent widget; If parent is 0, the new BabyMEGSetupWidget becomes a window. If parent is another widget, BabyMEGSetupWidget becomes a child window inside parent. BabyMEGSetupWidget is deleted when its parent is deleted.
      */
-    BabyMEGSetupWidget(BabyMEG* p_pBabyMEG, QWidget *parent = 0);
+    BabyMEGSetupWidget(BabyMEG* p_pBabyMEG, QWidget* parent = 0);
 
     //=========================================================================================================
     /**
@@ -84,9 +83,9 @@ public:
     void setSamplingFrequency();
 
 private:
-    BabyMEG*                    m_pBabyMEG;         /**< a pointer to corresponding mne rt client.*/
+    BabyMEG* m_pBabyMEG; /**< a pointer to corresponding mne rt client.*/
 
-    Ui::BabyMEGSetupWidgetClass ui;                 /**< the user interface for the BabyMEGSetupWidget.*/
+    Ui::BabyMEGSetupWidgetClass ui; /**< the user interface for the BabyMEGSetupWidget.*/
 };
 } // NAMESPACE
 

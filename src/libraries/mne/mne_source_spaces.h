@@ -55,7 +55,7 @@
 
 namespace FSLIB
 {
-    class FsLabel;
+class FsLabel;
 }
 
 //=============================================================================================================
@@ -95,7 +95,7 @@ public:
      *
      * @param[in] p_MNESourceSpaces   MNE forward solution.
      */
-    MNESourceSpaces(const MNESourceSpaces &p_MNESourceSpaces);
+    MNESourceSpaces(const MNESourceSpaces& p_MNESourceSpaces);
 
     //=========================================================================================================
     /**
@@ -160,7 +160,7 @@ public:
      *
      * @return vertno list of length 2 Vertex numbers for lh and rh.
      */
-    QList<Eigen::VectorXi> label_src_vertno_sel(const FSLIB::FsLabel &p_label, Eigen::VectorXi &src_sel) const;
+    QList<Eigen::VectorXi> label_src_vertno_sel(const FSLIB::FsLabel& p_label, Eigen::VectorXi& src_sel) const;
 
     //=========================================================================================================
     /**
@@ -173,7 +173,7 @@ public:
      *
      * @return true if succeeded, false otherwise.
      */
-    static bool patch_info(MNEHemisphere &p_Hemisphere);//VectorXi& nearest, QList<VectorXi>& pinfo);@param[in] nearest   The nearest vector of the source space.@param[in, out] pinfo    The requested patch information.
+    static bool patch_info(MNEHemisphere& p_Hemisphere); //VectorXi& nearest, QList<VectorXi>& pinfo);@param[in] nearest   The nearest vector of the source space.@param[in, out] pinfo    The requested patch information.
 
     //=========================================================================================================
     /**
@@ -183,7 +183,7 @@ public:
      *
      * @return the reduced source space.
      */
-    MNESourceSpaces pick_regions(const QList<FSLIB::FsLabel> &p_qListLabels) const;
+    MNESourceSpaces pick_regions(const QList<FSLIB::FsLabel>& p_qListLabels) const;
 
     //=========================================================================================================
     /**
@@ -253,7 +253,7 @@ public:
      *
      * @return Reference to the source space at the given index.
      */
-    MNESourceSpace& operator[] (qint32 idx);
+    MNESourceSpace& operator[](qint32 idx);
 
     //=========================================================================================================
     /**
@@ -263,7 +263,7 @@ public:
      *
      * @return Const reference to the source space at the given index.
      */
-    const MNESourceSpace& operator[] (qint32 idx) const;
+    const MNESourceSpace& operator[](qint32 idx) const;
 
     //=========================================================================================================
     /**
@@ -273,7 +273,7 @@ public:
      *
      * @return Reference to the source space for the given hemisphere.
      */
-    MNESourceSpace& operator[] (QString idt);
+    MNESourceSpace& operator[](QString idt);
 
     //=========================================================================================================
     /**
@@ -283,7 +283,7 @@ public:
      *
      * @return Const reference to the source space for the given hemisphere.
      */
-    const MNESourceSpace& operator[] (QString idt) const;
+    const MNESourceSpace& operator[](QString idt) const;
 
     //=========================================================================================================
     /**
@@ -333,10 +333,9 @@ public:
      *
      * @return true if equal, false otherwise.
      */
-    friend bool operator== (const MNESourceSpaces &a, const MNESourceSpaces &b);
+    friend bool operator==(const MNESourceSpaces& a, const MNESourceSpaces& b);
 
 private:
-
     //=========================================================================================================
     /**
      * Definition of the complete_source_space_info function in e.g. mne_read_source_spaces.m, mne_read_bem_surfaces.m
@@ -366,7 +365,7 @@ private:
                                   MNEHemisphere& p_Hemisphere);
 
 private:
-    std::vector<std::shared_ptr<MNESourceSpace>> m_sourceSpaces;    /**< Source spaces (typically hemispheres). */
+    std::vector<std::shared_ptr<MNESourceSpace>> m_sourceSpaces; /**< Source spaces (typically hemispheres). */
 };
 
 //=============================================================================================================
@@ -387,7 +386,7 @@ inline qint32 MNESourceSpaces::size() const
 
 //=============================================================================================================
 
-inline bool operator== (const MNESourceSpaces &a, const MNESourceSpaces &b)
+inline bool operator==(const MNESourceSpaces& a, const MNESourceSpaces& b)
 {
     if (a.size() != b.size())
         return false;

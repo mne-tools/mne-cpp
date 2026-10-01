@@ -83,7 +83,7 @@ private:
             ch.ch_name = names[i];
             ch.range = 1.0f;
             ch.cal = 1.0f;
-            ch.unit = 107;   // FIFF_UNIT_V
+            ch.unit = 107; // FIFF_UNIT_V
             ch.unit_mul = 0;
             ch.coord_frame = 0;
             info.chs.append(ch);
@@ -173,7 +173,8 @@ private slots:
         // EOG contribution should be reduced by >80%
         QVERIFY2(rmsAfter < 0.2 * rmsBefore,
                  qPrintable(QString("EOG RMS not reduced enough: before=%1 after=%2")
-                            .arg(rmsBefore).arg(rmsAfter)));
+                                .arg(rmsBefore)
+                                .arg(rmsAfter)));
     }
 
     //=========================================================================================================
@@ -244,7 +245,7 @@ private slots:
         MatrixXd data = makeTestData();
 
         EogRegression reg;
-        reg.fit(data, info);  // no explicit EOG list — auto-detect
+        reg.fit(data, info); // no explicit EOG list — auto-detect
 
         QVERIFY(reg.isFitted());
         // 3 target channels (MEG1, MEG2, EEG1) x 2 EOG channels (EOG1, EOG2)

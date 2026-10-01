@@ -46,14 +46,16 @@ VectorXd UTILSLIB::peakProminences(const VectorXd& data, const QList<int>& peakI
         // Search left for highest valley before a higher peak
         double leftMin = peakVal;
         for (int i = idx - 1; i >= 0; --i) {
-            if (data(i) > peakVal) break;
+            if (data(i) > peakVal)
+                break;
             leftMin = std::min(leftMin, data(i));
         }
 
         // Search right for highest valley before a higher peak
         double rightMin = peakVal;
         for (int i = idx + 1; i < n; ++i) {
-            if (data(i) > peakVal) break;
+            if (data(i) > peakVal)
+                break;
             rightMin = std::min(rightMin, data(i));
         }
 
@@ -67,11 +69,11 @@ VectorXd UTILSLIB::peakProminences(const VectorXd& data, const QList<int>& peakI
 
 //=============================================================================================================
 
-QList<QPair<int,double>> UTILSLIB::peakFinder(const VectorXd& data,
+QList<QPair<int, double>> UTILSLIB::peakFinder(const VectorXd& data,
                                                const PeakFinderParams& params)
 {
     const int n = static_cast<int>(data.size());
-    QList<QPair<int,double>> peaks;
+    QList<QPair<int, double>> peaks;
 
     if (n < 3) {
         return peaks;
@@ -110,7 +112,8 @@ QList<QPair<int,double>> UTILSLIB::peakFinder(const VectorXd& data,
         std::vector<bool> suppressed(static_cast<size_t>(n), false);
 
         for (int idx : sortedIdx) {
-            if (suppressed[static_cast<size_t>(idx)]) continue;
+            if (suppressed[static_cast<size_t>(idx)])
+                continue;
             kept.append(idx);
 
             // Suppress nearby peaks

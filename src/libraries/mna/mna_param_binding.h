@@ -59,11 +59,11 @@ namespace MNALIB
  */
 struct MNASHARED_EXPORT MnaParamBinding
 {
-    QString     targetPath;     ///< Parameter to control: "nodeId/attrKey"
-    QString     expression;     ///< Formula string, e.g. "clamp(ref('noise_est_01/snr') * 0.1, 0.01, 1.0)"
-    QString     trigger;        ///< "on_change", "periodic", "manual"
-    int         periodMs = 0;   ///< Evaluation period when trigger == "periodic" (ignored otherwise)
-    QStringList dependencies;   ///< Paths this binding reads from
+    QString targetPath;       ///< Parameter to control: "nodeId/attrKey"
+    QString expression;       ///< Formula string, e.g. "clamp(ref('noise_est_01/snr') * 0.1, 0.01, 1.0)"
+    QString trigger;          ///< "on_change", "periodic", "manual"
+    int periodMs = 0;         ///< Evaluation period when trigger == "periodic" (ignored otherwise)
+    QStringList dependencies; ///< Paths this binding reads from
 
     QJsonObject toJson() const;
     static MnaParamBinding fromJson(const QJsonObject& json);

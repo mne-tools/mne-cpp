@@ -51,7 +51,8 @@
 // DEFINE NAMESPACE MNALIB
 //=============================================================================================================
 
-namespace MNALIB{
+namespace MNALIB
+{
 
 //=============================================================================================================
 /**
@@ -59,10 +60,10 @@ namespace MNALIB{
  */
 struct MNASHARED_EXPORT MnaSubject
 {
-    QString            id;              /**< Subject identifier. */
-    QString            freeSurferDir;   /**< Relative path to FreeSurfer SUBJECTS_DIR. */
-    QList<MnaSession>  sessions;        /**< Sessions for this subject. */
-    QJsonObject        extras;          /**< Unknown keys preserved for lossless round-trip. */
+    QString id;                 /**< Subject identifier. */
+    QString freeSurferDir;      /**< Relative path to FreeSurfer SUBJECTS_DIR. */
+    QList<MnaSession> sessions; /**< Sessions for this subject. */
+    QJsonObject extras;         /**< Unknown keys preserved for lossless round-trip. */
 
     //=========================================================================================================
     /**

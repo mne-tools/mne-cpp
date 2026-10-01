@@ -72,7 +72,7 @@ public:
      */
     explicit NatusProducer(int iBlockSize,
                            int iChannelSize,
-                           QObject *parent = 0);
+                           QObject* parent = 0);
 
 protected:
     //=========================================================================================================
@@ -87,14 +87,14 @@ protected:
      *
      * @param[in] datagram The received datagram.
      */
-    void processDatagram(const QNetworkDatagram &datagram);
+    void processDatagram(const QNetworkDatagram& datagram);
 
-    QSharedPointer<QUdpSocket>          m_pUdpSocket;                   /**< A pointer to the UDP socket.*/
-    Eigen::MatrixXd                     m_matData;                      /**< The data matrix storing the received data.*/
+    QSharedPointer<QUdpSocket> m_pUdpSocket; /**< A pointer to the UDP socket.*/
+    Eigen::MatrixXd m_matData;               /**< The data matrix storing the received data.*/
 
-    int                                 m_iMatDataSampleIterator;       /**< The current iterator of the current data matrix.*/
-    float                               m_fSampleFreq;                  /**< The current sample frequency.*/
-    float                               m_fChannelSize;                 /**< The current channel size.*/
+    int m_iMatDataSampleIterator; /**< The current iterator of the current data matrix.*/
+    float m_fSampleFreq;          /**< The current sample frequency.*/
+    float m_fChannelSize;         /**< The current channel size.*/
 
 signals:
     //=========================================================================================================
@@ -103,7 +103,7 @@ signals:
      *
      * @param[in] matData The newly parsed data.
      */
-    void newDataAvailable(const Eigen::MatrixXd &matData);
+    void newDataAvailable(const Eigen::MatrixXd& matData);
 };
 } // NAMESPACE
 

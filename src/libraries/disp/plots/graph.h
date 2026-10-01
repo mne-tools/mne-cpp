@@ -81,7 +81,7 @@ public:
      *
      * @param[in] parent   The parent widget.
      */
-    explicit Graph(QWidget *parent = 0);
+    explicit Graph(QWidget* parent = 0);
 
     //=========================================================================================================
     /**
@@ -95,7 +95,7 @@ public:
      *
      * @param[in] p_sTitle   The title.
      */
-    void setTitle(const QString &p_sTitle);
+    void setTitle(const QString& p_sTitle);
 
     //=========================================================================================================
     /**
@@ -103,7 +103,7 @@ public:
      *
      * @param[in] p_sXLabel   The x axes label.
      */
-    void setXLabel(const QString &p_sXLabel);
+    void setXLabel(const QString& p_sXLabel);
 
     //=========================================================================================================
     /**
@@ -111,10 +111,10 @@ public:
      *
      * @param[in] p_sYLabel   The y axes label.
      */
-    void setYLabel(const QString &p_sYLabel);
+    void setYLabel(const QString& p_sYLabel);
 
 protected:
-//    void paintEvent(QPaintEvent*);
+    //    void paintEvent(QPaintEvent*);
     //=========================================================================================================
     /**
      * Reimplemented resizeEvent
@@ -133,19 +133,19 @@ protected:
     void drawLabels(qint32 p_iContentWidth,
                     qint32 p_iContentHeight);
 
-    QSize       m_qSizeWidget;          /**< current widget size. */
+    QSize m_qSizeWidget; /**< current widget size. */
 
-    QString     m_sTitle;               /**< Title. */
-    QFont       m_qFontTitle;           /**< Title font. */
-    QPen        m_qPenTitle;            /**< Title pen. */
+    QString m_sTitle;   /**< Title. */
+    QFont m_qFontTitle; /**< Title font. */
+    QPen m_qPenTitle;   /**< Title pen. */
 
-    qint32      m_iBorderTopBottom;     /**< distance to top and bottom. */
-    qint32      m_iBorderLeftRight;     /**< distance to left and right. */
+    qint32 m_iBorderTopBottom; /**< distance to top and bottom. */
+    qint32 m_iBorderLeftRight; /**< distance to left and right. */
 
-    QString     m_sXLabel;              /**< X axes label. */
-    QString     m_sYLabel;              /**< Y axes label. */
-    QFont       m_qFontAxes;            /**< Axes font. */
-    QPen        m_qPenAxes;             /**< Axes pen. */
+    QString m_sXLabel; /**< X axes label. */
+    QString m_sYLabel; /**< Y axes label. */
+    QFont m_qFontAxes; /**< Axes font. */
+    QPen m_qPenAxes;   /**< Axes pen. */
 };
 
 //=============================================================================================================

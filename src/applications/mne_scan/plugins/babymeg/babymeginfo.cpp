@@ -49,14 +49,14 @@ BabyMEGInfo::BabyMEGInfo()
 
 void BabyMEGInfo::MGH_LM_Send_CMDPackage(QByteArray DATA)
 {
-//    qDebug()<<"[BabyMEGInfo]CMD Size:"<<DATA.size();
+    //    qDebug()<<"[BabyMEGInfo]CMD Size:"<<DATA.size();
     emit SendCMDPackage(DATA);
 }
 //=============================================================================================================
 
 void BabyMEGInfo::MGH_LM_Send_DataPackage(QByteArray DATA)
 {
-//    qDebug()<<"[BabyMEGInfo]Data Size:"<<DATA.size();
+    //    qDebug()<<"[BabyMEGInfo]Data Size:"<<DATA.size();
     emit SendDataPackage(DATA);
 }
 
@@ -68,29 +68,22 @@ QByteArray BabyMEGInfo::MGH_LM_Get_Field(QByteArray cmdstr)
     qint32 bPos = 0;
     qint32 ePos = 0;
     qint32 cn = 0;
-    for(qint32 i=0;i<cmdstr.size();i++)
-    {
-        if (cmdstr[i] == ':')
-        { // get channel number
+    for (qint32 i = 0; i < cmdstr.size(); i++) {
+        if (cmdstr[i] == ':') { // get channel number
             Start = !Start;
-            if (Start)
-            {
+            if (Start) {
                 bPos = i;
-            }
-            else
-            {
+            } else {
                 ePos = i;
             }
-            cn ++;
+            cn++;
         }
-        if (cn == 2)
-        { // find the first ":" and the next ":"
+        if (cn == 2) { // find the first ":" and the next ":"
             break;
         }
-
     }
 
-    return cmdstr.mid(bPos,ePos-bPos);
+    return cmdstr.mid(bPos, ePos - bPos);
 }
 
 //=============================================================================================================
@@ -98,18 +91,16 @@ QByteArray BabyMEGInfo::MGH_LM_Get_Field(QByteArray cmdstr)
 QStringList BabyMEGInfo::MGH_LM_Exact_Single_Channel_Info(QByteArray cmdstr)
 {
     QStringList sList;
-    qint32 sp =0;
-    qint32 ep =0;
+    qint32 sp = 0;
+    qint32 ep = 0;
     //extract single channel information by char ';'
-    for (qint32 i=0;i<cmdstr.size();i++)
-    {
-        if (cmdstr[i]==';')
-        {
+    for (qint32 i = 0; i < cmdstr.size(); i++) {
+        if (cmdstr[i] == ';') {
             ep = i;
-            QString t =  cmdstr.mid(sp,ep-sp);
+            QString t = cmdstr.mid(sp, ep - sp);
             //qDebug()<<"[BabyMEGInfo] chan-name"<<t;
             sList.append(t);
-            sp = i+1;
+            sp = i + 1;
         }
     }
 
@@ -121,8 +112,8 @@ QStringList BabyMEGInfo::MGH_LM_Exact_Single_Channel_Info(QByteArray cmdstr)
 void BabyMEGInfo::MGH_LM_Get_Channel_Info(QByteArray cmdstr)
 {
     //operation about lm_ch_names
-    if (cmdstr[0]==':')
-        cmdstr.remove(0,1);
+    if (cmdstr[0] == ':')
+        cmdstr.remove(0, 1);
 
     QStringList sList = MGH_LM_Exact_Single_Channel_Info(cmdstr);
 
@@ -145,13 +136,10 @@ void BabyMEGInfo::MGH_LM_Get_Channel_Info(QByteArray cmdstr)
     lm_ch_gain.clear();
 
     // parse the information for each channel
-    for(qint32 k =0; k<sList.size(); k++)
-    {
+    for (qint32 k = 0; k < sList.size(); k++) {
         QString t = sList.at(k);
-        for (qint32 z=0;z<t.size();z++)
-        {
-            if (t[z]=='|')
-            {
+        for (qint32 z = 0; z < t.size(); z++) {
+            if (t[z] == '|') {
                 lm_ch_names.append(t.left(z));
                 //qDebug()<<t.left(z);
                 //extract the substring contained channel information: scale and coil positions
@@ -182,9 +170,9 @@ void BabyMEGInfo::MGH_LM_Get_Channel_Info(QByteArray cmdstr)
                 //gain
                 lm_ch_gain.append(schp.at(15));
 
-//                qDebug()<<lm_ch_scales;
-//                qDebug()<<lm_ch_pos2;
-//                qDebug()<<"coiltype"<<lm_ch_coiltype<<"calicoef"<<lm_ch_calicoef;
+                //                qDebug()<<lm_ch_scales;
+                //                qDebug()<<lm_ch_pos2;
+                //                qDebug()<<"coiltype"<<lm_ch_coiltype<<"calicoef"<<lm_ch_calicoef;
             }
         }
     }
@@ -195,35 +183,31 @@ void BabyMEGInfo::MGH_LM_Get_Channel_Info(QByteArray cmdstr)
 
 void BabyMEGInfo::MGH_LM_Parse_Para(QByteArray cmdstr)
 {
-
     QByteArray CMD = cmdstr.left(4);
-    if (CMD == "INFO")
-    {
+    if (CMD == "INFO") {
         //remove INFO
-        cmdstr.remove(0,4);
+        cmdstr.remove(0, 4);
         //ACQ the number of channels
         QByteArray T = MGH_LM_Get_Field(cmdstr);
-        cmdstr.remove(0,T.size());
-        T.remove(0,1);
+        cmdstr.remove(0, T.size());
+        T.remove(0, 1);
         chnNum = T.toInt();
         //ACQ the length of data package
         T = MGH_LM_Get_Field(cmdstr);
-        cmdstr.remove(0,T.size());
-        T.remove(0,1);
+        cmdstr.remove(0, T.size());
+        T.remove(0, 1);
         dataLength = T.toInt();
         // ACQ sampling rate
         T = MGH_LM_Get_Field(cmdstr);
-        cmdstr.remove(0,T.size());
-        T.remove(0,1);
+        cmdstr.remove(0, T.size());
+        T.remove(0, 1);
         sfreq = T.toDouble();
-        qDebug()<<"[babyMEGinfo] chnNum:" << chnNum << "Data Length" <<dataLength<<"sampling rate"<<sfreq;
+        qDebug() << "[babyMEGinfo] chnNum:" << chnNum << "Data Length" << dataLength << "sampling rate" << sfreq;
         //qDebug()<<"cmdstr"<<cmdstr;
         // Start to acquire the channel's name and channel's scale
         MGH_LM_Get_Channel_Info(cmdstr);
 
-    }
-    else
-    {
+    } else {
         chnNum = 464;
         dataLength = 5000;
         sfreq = 10000;
@@ -236,32 +220,33 @@ void BabyMEGInfo::MGH_LM_Parse_Para(QByteArray cmdstr)
     m_FiffInfo.meas_date[1] = 0;
     m_FiffInfo.sfreq = sfreq;
     m_FiffInfo.highpass = 0;
-    m_FiffInfo.lowpass = m_FiffInfo.sfreq/2;
+    m_FiffInfo.lowpass = m_FiffInfo.sfreq / 2;
     m_FiffInfo.acq_pars = QString("BabyMEG");
     m_FiffInfo.acq_stim = QString("");
     m_FiffInfo.filename = QString("");
     m_FiffInfo.meas_id = FiffId::new_file_id();
-    m_FiffInfo.nchan = chnNum; //464;
-    m_FiffInfo.dev_head_t.from =FIFFV_COORD_DEVICE;//1;  //* should be from dev to head 7/18/2016 Limin
-    m_FiffInfo.dev_head_t.to =FIFFV_COORD_HEAD;//4;
+    m_FiffInfo.nchan = chnNum;                       //464;
+    m_FiffInfo.dev_head_t.from = FIFFV_COORD_DEVICE; //1;  //* should be from dev to head 7/18/2016 Limin
+    m_FiffInfo.dev_head_t.to = FIFFV_COORD_HEAD;     //4;
 
     //set the identified matrix
-    for (int li=0;li<4;li++)
-        for(int lj=0;lj<4;lj++)
-            if (li==lj) m_FiffInfo.dev_head_t.trans(li,lj) = 1.0f;
-            else m_FiffInfo.dev_head_t.trans(li,lj) = 0.0f;
+    for (int li = 0; li < 4; li++)
+        for (int lj = 0; lj < 4; lj++)
+            if (li == lj)
+                m_FiffInfo.dev_head_t.trans(li, lj) = 1.0f;
+            else
+                m_FiffInfo.dev_head_t.trans(li, lj) = 0.0f;
 
     //MEG
-    for(qint32 i = 0; i < chnNum; i++)
-    {
+    for (qint32 i = 0; i < chnNum; i++) {
         FiffChInfo t_ch;
 
         t_ch.ch_name = lm_ch_names.at(i); //QString("MEG%1").arg(i);
         //qDebug()<<t_ch.ch_name;
         t_ch.scanNo = i;
-        t_ch.logNo = i+1;
+        t_ch.logNo = i + 1;
         t_ch.cal = lm_ch_calicoef.at(i).toFloat();
-        t_ch.range =1.0f/lm_ch_gain.at(i).toFloat();//1; // set gain
+        t_ch.range = 1.0f / lm_ch_gain.at(i).toFloat(); //1; // set gain
 
         //qDebug()<<i<<":="<<t_ch.ch_name<<","<<t_ch.range<<","<<t_ch.cal;
         //t_ch.loc.setZero(12,1);
@@ -300,92 +285,90 @@ void BabyMEGInfo::MGH_LM_Parse_Para(QByteArray cmdstr)
         else if (type == FIFFV_HPI_G)
             ntype = 7;
 
-        switch (ntype)
-        {
-        case 1: // inner layer meg sensors
-            t_ch.kind = FIFFV_MEG_CH;
-            t_ch.unit = FIFF_UNIT_T;
-            t_ch.unit_mul = FIFF_UNITM_NONE;
-            t_ch.chpos.coil_type = FIFFV_COIL_BABY_MAG;
-            break;
-        case 2: // outer layer meg sensors
-            t_ch.kind = FIFFV_REF_MEG_CH;
-            t_ch.unit = FIFF_UNIT_T;
-            t_ch.unit_mul = FIFF_UNITM_NONE;
-            t_ch.chpos.coil_type = FIFFV_COIL_BABY_REF_MAG;
+        switch (ntype) {
+            case 1: // inner layer meg sensors
+                t_ch.kind = FIFFV_MEG_CH;
+                t_ch.unit = FIFF_UNIT_T;
+                t_ch.unit_mul = FIFF_UNITM_NONE;
+                t_ch.chpos.coil_type = FIFFV_COIL_BABY_MAG;
+                break;
+            case 2: // outer layer meg sensors
+                t_ch.kind = FIFFV_REF_MEG_CH;
+                t_ch.unit = FIFF_UNIT_T;
+                t_ch.unit_mul = FIFF_UNITM_NONE;
+                t_ch.chpos.coil_type = FIFFV_COIL_BABY_REF_MAG;
 
-            break;
-        case 3: // reference meg sensors
-            t_ch.kind = FIFFV_REF_MEG_CH;
-            t_ch.unit = FIFF_UNIT_T;
-            t_ch.unit_mul = FIFF_UNITM_NONE;
-            t_ch.chpos.coil_type = FIFFV_COIL_BABY_REF_MAG2;
+                break;
+            case 3: // reference meg sensors
+                t_ch.kind = FIFFV_REF_MEG_CH;
+                t_ch.unit = FIFF_UNIT_T;
+                t_ch.unit_mul = FIFF_UNITM_NONE;
+                t_ch.chpos.coil_type = FIFFV_COIL_BABY_REF_MAG2;
 
-            break;
-        case 4: // trigger lines
-            t_ch.kind = FIFFV_STIM_CH;
-            t_ch.unit = FIFF_UNIT_V;
-            t_ch.unit_mul = FIFF_UNITM_NONE;
-            t_ch.chpos.coil_type = FIFFV_STIM_CH;
-            break;
-        case 5: // EEG channels
-            t_ch.kind = FIFFV_EEG_CH;
-            t_ch.unit = FIFF_UNIT_V;
-            t_ch.unit_mul = FIFF_UNITM_NONE;
-            t_ch.chpos.coil_type = FIFFV_COIL_EEG;
+                break;
+            case 4: // trigger lines
+                t_ch.kind = FIFFV_STIM_CH;
+                t_ch.unit = FIFF_UNIT_V;
+                t_ch.unit_mul = FIFF_UNITM_NONE;
+                t_ch.chpos.coil_type = FIFFV_STIM_CH;
+                break;
+            case 5: // EEG channels
+                t_ch.kind = FIFFV_EEG_CH;
+                t_ch.unit = FIFF_UNIT_V;
+                t_ch.unit_mul = FIFF_UNITM_NONE;
+                t_ch.chpos.coil_type = FIFFV_COIL_EEG;
 
-            break;
-        case 6: // HPI channels
-            t_ch.kind = type;
-            t_ch.unit = FIFF_UNIT_V;
-            t_ch.unit_mul = FIFF_UNITM_NONE;
-            t_ch.chpos.coil_type = FIFFV_COIL_NONE;
+                break;
+            case 6: // HPI channels
+                t_ch.kind = type;
+                t_ch.unit = FIFF_UNIT_V;
+                t_ch.unit_mul = FIFF_UNITM_NONE;
+                t_ch.chpos.coil_type = FIFFV_COIL_NONE;
 
-            break;
-        case 7: // HPI G channels
-            t_ch.kind = FIFFV_HPI_G;
-            t_ch.unit = FIFF_UNIT_V;
-            t_ch.unit_mul = FIFF_UNITM_NONE;
-            t_ch.chpos.coil_type = FIFFV_COIL_NONE;
+                break;
+            case 7: // HPI G channels
+                t_ch.kind = FIFFV_HPI_G;
+                t_ch.unit = FIFF_UNIT_V;
+                t_ch.unit_mul = FIFF_UNITM_NONE;
+                t_ch.chpos.coil_type = FIFFV_COIL_NONE;
 
-            break;
+                break;
 
-        default: // other unknown type sensors
-            t_ch.kind = FIFFV_MEG_CH;
-            t_ch.unit = FIFF_UNIT_T;
-            t_ch.unit_mul = FIFF_UNITM_NONE;
-            t_ch.chpos.coil_type = FIFFV_COIL_NONE;
+            default: // other unknown type sensors
+                t_ch.kind = FIFFV_MEG_CH;
+                t_ch.unit = FIFF_UNIT_T;
+                t_ch.unit_mul = FIFF_UNITM_NONE;
+                t_ch.chpos.coil_type = FIFFV_COIL_NONE;
 
-            break;
+                break;
         }
 
         /*  Add the coiltrans for each sensor */
         /* x-axis normal vector */
-        t_ch.coil_trans(0,0) = t_ch.chpos.ex[0];
-        t_ch.coil_trans(1,0) = t_ch.chpos.ex[1];
-        t_ch.coil_trans(2,0) = t_ch.chpos.ex[2];
+        t_ch.coil_trans(0, 0) = t_ch.chpos.ex[0];
+        t_ch.coil_trans(1, 0) = t_ch.chpos.ex[1];
+        t_ch.coil_trans(2, 0) = t_ch.chpos.ex[2];
         /* y-axis normal vector */
-        t_ch.coil_trans(0,1) = t_ch.chpos.ey[0];
-        t_ch.coil_trans(1,1) = t_ch.chpos.ey[1];
-        t_ch.coil_trans(2,1) = t_ch.chpos.ey[2];
+        t_ch.coil_trans(0, 1) = t_ch.chpos.ey[0];
+        t_ch.coil_trans(1, 1) = t_ch.chpos.ey[1];
+        t_ch.coil_trans(2, 1) = t_ch.chpos.ey[2];
         /* z-axis normal vector */
-        t_ch.coil_trans(0,2) = t_ch.chpos.ez[0];
-        t_ch.coil_trans(1,2) = t_ch.chpos.ez[1];
-        t_ch.coil_trans(2,2) = t_ch.chpos.ez[2];
+        t_ch.coil_trans(0, 2) = t_ch.chpos.ez[0];
+        t_ch.coil_trans(1, 2) = t_ch.chpos.ez[1];
+        t_ch.coil_trans(2, 2) = t_ch.chpos.ez[2];
         /* x,y,z coordinates */
-        t_ch.coil_trans(0,3) = t_ch.chpos.r0[0];
-        t_ch.coil_trans(1,3) = t_ch.chpos.r0[0];
-        t_ch.coil_trans(2,3) = t_ch.chpos.r0[0];
+        t_ch.coil_trans(0, 3) = t_ch.chpos.r0[0];
+        t_ch.coil_trans(1, 3) = t_ch.chpos.r0[0];
+        t_ch.coil_trans(2, 3) = t_ch.chpos.r0[0];
 
         /* 0 0 0 1 */
-        t_ch.coil_trans(3,0) = 0.0;
-        t_ch.coil_trans(3,1) = 0.0;
-        t_ch.coil_trans(3,2) = 0.0;
-        t_ch.coil_trans(3,3) = 1.0;
+        t_ch.coil_trans(3, 0) = 0.0;
+        t_ch.coil_trans(3, 1) = 0.0;
+        t_ch.coil_trans(3, 2) = 0.0;
+        t_ch.coil_trans(3, 3) = 1.0;
 
         m_FiffInfo.chs.append(t_ch);
         m_FiffInfo.ch_names.append(t_ch.ch_name);
-
     }
 
     emit fiffInfoAvailable(m_FiffInfo);
@@ -398,8 +381,8 @@ void BabyMEGInfo::MGH_LM_Parse_Para(QByteArray cmdstr)
 void BabyMEGInfo::MGH_LM_Get_Channel_Infg(QByteArray cmdstr)
 {
     //operation about lm_ch_names
-    if (cmdstr[0]==':')
-        cmdstr.remove(0,1);
+    if (cmdstr[0] == ':')
+        cmdstr.remove(0, 1);
 
     QStringList sList = MGH_LM_Exact_Single_Channel_Info(cmdstr);
 
@@ -407,22 +390,18 @@ void BabyMEGInfo::MGH_LM_Get_Channel_Infg(QByteArray cmdstr)
     lm_ch_gain.clear();
 
     // parse the information for each channel
-    for(qint32 k =0; k<sList.size(); k++)
-    {
+    for (qint32 k = 0; k < sList.size(); k++) {
         QString t = sList.at(k);
-        for (qint32 z=0;z<t.size();z++)
-        {
-            if (t[z]=='|')
-            {
+        for (qint32 z = 0; z < t.size(); z++) {
+            if (t[z] == '|') {
                 lm_ch_names.append(t.left(z));
                 //qDebug()<<t.left(z);
                 //extract the substring contained channel information: scale and coil positions
-                QString tt = t.mid(z+1);
-                qDebug()<<tt;
+                QString tt = t.mid(z + 1);
+                qDebug() << tt;
                 //gain
                 lm_ch_gain.append(tt);
-                qDebug()<<t.left(z)<<"----"<<tt;
-
+                qDebug() << t.left(z) << "----" << tt;
             }
         }
     }
@@ -433,37 +412,33 @@ void BabyMEGInfo::MGH_LM_Get_Channel_Infg(QByteArray cmdstr)
 
 void BabyMEGInfo::MGH_LM_Parse_Para_Infg(QByteArray cmdstr)
 {
-
     QByteArray CMD = cmdstr.left(4);
-    if (CMD == "INFG")
-    {
+    if (CMD == "INFG") {
         //remove INFG
-        cmdstr.remove(0,4);
+        cmdstr.remove(0, 4);
         //ACQ the number of channels
         QByteArray T = MGH_LM_Get_Field(cmdstr);
-        cmdstr.remove(0,T.size());
-        T.remove(0,1);
+        cmdstr.remove(0, T.size());
+        T.remove(0, 1);
         chnNum = T.toInt();
         //ACQ the length of data package
         T = MGH_LM_Get_Field(cmdstr);
-        cmdstr.remove(0,T.size());
-        T.remove(0,1);
+        cmdstr.remove(0, T.size());
+        T.remove(0, 1);
         dataLength = T.toInt();
         // ACQ sampling rate
         T = MGH_LM_Get_Field(cmdstr);
-        cmdstr.remove(0,T.size());
-        T.remove(0,1);
+        cmdstr.remove(0, T.size());
+        T.remove(0, 1);
         sfreq = T.toDouble();
-        qDebug()<<"[babyMEG_INFG] chnNum:" << chnNum << "Data Length" <<dataLength<<"sampling rate"<<sfreq;
+        qDebug() << "[babyMEG_INFG] chnNum:" << chnNum << "Data Length" << dataLength << "sampling rate" << sfreq;
         //qDebug()<<"cmdstr"<<cmdstr;
         // Start to acquire the channel's name and channel's scale
         MGH_LM_Get_Channel_Infg(cmdstr);
 
         //emit gain info
         emit GainInfoUpdate(lm_ch_gain);
-
     }
 
     return;
 }
-

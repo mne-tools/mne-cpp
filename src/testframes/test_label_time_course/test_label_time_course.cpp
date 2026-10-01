@@ -84,14 +84,14 @@ void TestLabelTimeCourse::initTestCase()
 
     // Create two labels covering different vertex subsets
     FsLabel label1;
-    label1.vertices = VectorXi::LinSpaced(5, 0, 4);  // vertices 0-4
+    label1.vertices = VectorXi::LinSpaced(5, 0, 4); // vertices 0-4
     label1.pos = MatrixX3f::Zero(5, 3);
     label1.values = VectorXd::Ones(5);
     label1.hemi = 0;
     label1.name = "label1";
 
     FsLabel label2;
-    label2.vertices = VectorXi::LinSpaced(8, 10, 17);  // vertices 10-17
+    label2.vertices = VectorXi::LinSpaced(8, 10, 17); // vertices 10-17
     label2.pos = MatrixX3f::Zero(8, 3);
     label2.values = VectorXd::Ones(8);
     label2.hemi = 0;
@@ -209,7 +209,7 @@ void TestLabelTimeCourse::testEmptyLabel()
 {
     // Label with vertices not in the STC
     FsLabel emptyLabel;
-    emptyLabel.vertices = VectorXi::LinSpaced(3, 100, 102);  // out of range
+    emptyLabel.vertices = VectorXi::LinSpaced(3, 100, 102); // out of range
     emptyLabel.pos = MatrixX3f::Zero(3, 3);
     emptyLabel.values = VectorXd::Ones(3);
     emptyLabel.hemi = 0;
@@ -277,7 +277,9 @@ void TestLabelTimeCourse::testSignFlip()
     for (int i = 1; i < 5; ++i)
         QVERIFY2(signs[i] == firstSign,
                  qPrintable(QString("Sign[%1]=%2 differs from sign[0]=%3 for coherent data.")
-                    .arg(i).arg(signs[i]).arg(firstSign)));
+                                .arg(i)
+                                .arg(signs[i])
+                                .arg(firstSign)));
 
     // All values should be exactly +1 or -1
     for (int i = 0; i < 5; ++i)

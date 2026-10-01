@@ -73,10 +73,10 @@ private:
      */
     QSharedPointer<SparseMatrix<float>> makeIdentityInterpMat(int nVerts, int nSources);
 
-    int m_iNumSourcesLh = 10;     /**< Test LH source count. */
-    int m_iNumSourcesRh = 8;      /**< Test RH source count. */
-    int m_iNumVertsLh = 20;       /**< Test LH vertex count. */
-    int m_iNumVertsRh = 16;       /**< Test RH vertex count. */
+    int m_iNumSourcesLh = 10; /**< Test LH source count. */
+    int m_iNumSourcesRh = 8;  /**< Test RH source count. */
+    int m_iNumVertsLh = 20;   /**< Test LH vertex count. */
+    int m_iNumVertsRh = 16;   /**< Test RH vertex count. */
 };
 
 //=============================================================================================================
@@ -363,7 +363,7 @@ void TestRtSourceStreaming::testControllerStreaming()
     QSignalSpy spy(&controller, &RtSourceDataController::newSmoothedDataAvailable);
 
     // Start streaming with a fast interval
-    controller.setTimeInterval(10);  // 10ms
+    controller.setTimeInterval(10); // 10ms
     controller.setStreamingState(true);
 
     // Wait until we have received at least 2 color frames (CI runners may be slow)

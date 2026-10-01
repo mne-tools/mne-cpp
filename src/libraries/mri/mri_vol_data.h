@@ -68,7 +68,8 @@
 // DEFINE NAMESPACE MRILIB
 //=============================================================================================================
 
-namespace MRILIB {
+namespace MRILIB
+{
 
 //=============================================================================================================
 /**
@@ -87,30 +88,31 @@ namespace MRILIB {
  */
 struct MRISHARED_EXPORT MriSlice
 {
-    QString                     fileName;       /**< Source file name. */
-    QVector<unsigned char>      pixels;         /**< Pixel data (unsigned char), for FIFFV_MRI_PIXEL_BYTE. */
-    QVector<unsigned short>     pixelsWord;     /**< Pixel data (unsigned short), for FIFFV_MRI_PIXEL_WORD. */
-    QVector<float>              pixelsFloat;    /**< Pixel data (float), for FIFFV_MRI_PIXEL_FLOAT. */
-    int                         pixelFormat;    /**< Pixel format: FIFFV_MRI_PIXEL_BYTE(1), WORD(2), FLOAT(4). */
-    int                         width;          /**< Width of the image in pixels. */
-    int                         height;         /**< Height of the image in pixels. */
-    float                       dimx;           /**< Pixel size in x direction (meters). */
-    float                       dimy;           /**< Pixel size in y direction (meters). */
-    float                       scale;          /**< Scaling factor for pixel data. */
-    FIFFLIB::FiffCoordTrans     trans;          /**< Coordinate transform: slice -> MRI (surface RAS). */
+    QString fileName;                   /**< Source file name. */
+    QVector<unsigned char> pixels;      /**< Pixel data (unsigned char), for FIFFV_MRI_PIXEL_BYTE. */
+    QVector<unsigned short> pixelsWord; /**< Pixel data (unsigned short), for FIFFV_MRI_PIXEL_WORD. */
+    QVector<float> pixelsFloat;         /**< Pixel data (float), for FIFFV_MRI_PIXEL_FLOAT. */
+    int pixelFormat;                    /**< Pixel format: FIFFV_MRI_PIXEL_BYTE(1), WORD(2), FLOAT(4). */
+    int width;                          /**< Width of the image in pixels. */
+    int height;                         /**< Height of the image in pixels. */
+    float dimx;                         /**< Pixel size in x direction (meters). */
+    float dimy;                         /**< Pixel size in y direction (meters). */
+    float scale;                        /**< Scaling factor for pixel data. */
+    FIFFLIB::FiffCoordTrans trans;      /**< Coordinate transform: slice -> MRI (surface RAS). */
 
     //=========================================================================================================
     /**
      * Default constructor.
      */
     MriSlice()
-    : pixelFormat(1)    // FIFFV_MRI_PIXEL_BYTE
+    : pixelFormat(1) // FIFFV_MRI_PIXEL_BYTE
     , width(0)
     , height(0)
     , dimx(COR_PIXEL_SIZE)
     , dimy(COR_PIXEL_SIZE)
     , scale(1.0f)
-    {}
+    {
+    }
 };
 
 //=============================================================================================================
@@ -173,25 +175,37 @@ public:
     /**
      * @return First (x) dimension — fastest-varying axis.
      */
-    int dimX() const { return width; }
+    int dimX() const
+    {
+        return width;
+    }
 
     //=========================================================================================================
     /**
      * @return Second (y) dimension.
      */
-    int dimY() const { return height; }
+    int dimY() const
+    {
+        return height;
+    }
 
     //=========================================================================================================
     /**
      * @return Third (z) dimension — slowest-varying axis.
      */
-    int dimZ() const { return depth; }
+    int dimZ() const
+    {
+        return depth;
+    }
 
     //=========================================================================================================
     /**
      * @return Volume dimensions as {dimX, dimY, dimZ}.
      */
-    QVector<int> dims() const { return {width, height, depth}; }
+    QVector<int> dims() const
+    {
+        return {width, height, depth};
+    }
 
     //=========================================================================================================
     /**
@@ -234,50 +248,50 @@ public:
     // MGH Header Fields
     //=========================================================================================================
 
-    QString     fileName;           /**< Name of the source file. */
-    int         version;            /**< MGH format version (should be 1). */
-    int         width;              /**< First dimension of the image buffer (fastest). */
-    int         height;             /**< Second dimension. */
-    int         depth;              /**< Third dimension (slowest). */
-    int         nframes;            /**< Number of frames (scalar components per voxel). */
-    int         type;               /**< Voxel data type (MRI_UCHAR, MRI_INT, MRI_FLOAT, MRI_SHORT). */
-    int         dof;                /**< Degrees of freedom. */
-    bool        rasGood;            /**< Whether the direction cosines in the header are valid. */
-    float       xsize;              /**< Voxel spacing in X direction (mm). */
-    float       ysize;              /**< Voxel spacing in Y direction (mm). */
-    float       zsize;              /**< Voxel spacing in Z direction (mm). */
-    Eigen::Vector3f  x_ras;    /**< X-direction cosines (xr, xa, xs). Default: (-1, 0, 0). */
-    Eigen::Vector3f  y_ras;    /**< Y-direction cosines (yr, ya, ys). Default: (0, 0, -1). */
-    Eigen::Vector3f  z_ras;    /**< Z-direction cosines (zr, za, zs). Default: (0, 1, 0). */
-    Eigen::Vector3f  c_ras;    /**< Center RAS coordinates (cr, ca, cs). Default: (0, 0, 0). */
+    QString fileName;      /**< Name of the source file. */
+    int version;           /**< MGH format version (should be 1). */
+    int width;             /**< First dimension of the image buffer (fastest). */
+    int height;            /**< Second dimension. */
+    int depth;             /**< Third dimension (slowest). */
+    int nframes;           /**< Number of frames (scalar components per voxel). */
+    int type;              /**< Voxel data type (MRI_UCHAR, MRI_INT, MRI_FLOAT, MRI_SHORT). */
+    int dof;               /**< Degrees of freedom. */
+    bool rasGood;          /**< Whether the direction cosines in the header are valid. */
+    float xsize;           /**< Voxel spacing in X direction (mm). */
+    float ysize;           /**< Voxel spacing in Y direction (mm). */
+    float zsize;           /**< Voxel spacing in Z direction (mm). */
+    Eigen::Vector3f x_ras; /**< X-direction cosines (xr, xa, xs). Default: (-1, 0, 0). */
+    Eigen::Vector3f y_ras; /**< Y-direction cosines (yr, ya, ys). Default: (0, 0, -1). */
+    Eigen::Vector3f z_ras; /**< Z-direction cosines (zr, za, zs). Default: (0, 1, 0). */
+    Eigen::Vector3f c_ras; /**< Center RAS coordinates (cr, ca, cs). Default: (0, 0, 0). */
 
     //=========================================================================================================
     // Coordinate Transforms
     //=========================================================================================================
 
-    FIFFLIB::FiffCoordTrans  voxelSurfRasT;      /**< Voxel -> surface RAS (MRI) transform. */
+    FIFFLIB::FiffCoordTrans voxelSurfRasT; /**< Voxel -> surface RAS (MRI) transform. */
 
     //=========================================================================================================
     // Optional Footer Data (scan parameters)
     //=========================================================================================================
 
-    float       TR;                 /**< Repetition time (ms). */
-    float       flipAngle;          /**< Flip angle (radians). */
-    float       TE;                 /**< Echo time (ms). */
-    float       TI;                 /**< Inversion time (ms). */
-    float       FoV;                /**< Field of view (unreliable per FreeSurfer docs). */
+    float TR;        /**< Repetition time (ms). */
+    float flipAngle; /**< Flip angle (radians). */
+    float TE;        /**< Echo time (ms). */
+    float TI;        /**< Inversion time (ms). */
+    float FoV;       /**< Field of view (unreliable per FreeSurfer docs). */
 
     //=========================================================================================================
     // Talairach Transform
     //=========================================================================================================
 
-    QString     talairachXfmPath;   /**< Path to the Talairach .xfm file (from MGH footer tags). */
+    QString talairachXfmPath; /**< Path to the Talairach .xfm file (from MGH footer tags). */
 
     //=========================================================================================================
     // Slice Data
     //=========================================================================================================
 
-    QVector<MriSlice> slices;       /**< Per-slice data (for COR-equivalent representation). */
+    QVector<MriSlice> slices; /**< Per-slice data (for COR-equivalent representation). */
 };
 
 } // namespace MRILIB

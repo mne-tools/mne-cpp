@@ -36,9 +36,9 @@ FiffRawData raw(t_fileRaw);
 //
 QStringList include;
 include << "STI 014";
-bool want_meg   = true;
-bool want_eeg   = false;
-bool want_stim  = false;
+bool want_meg = true;
+bool want_eeg = false;
+bool want_stim = false;
 
 RowVectorXi picks = raw.info.pick_types(want_meg, want_eeg, want_stim, include, raw.info.bads);
 ```
@@ -58,8 +58,7 @@ if (in_samples)
 else
     readSuccessful = raw.read_raw_segment_times(data, times, from, to, picks);
 
-if (!readSuccessful)
-{
+if (!readSuccessful) {
     qWarning("Could not read raw segment.\n");
     return -1;
 }

@@ -41,8 +41,8 @@ class SCSHAREDSHARED_EXPORT PluginOutputConnector : public PluginConnector
     Q_OBJECT
 
 public:
-    typedef QSharedPointer<PluginOutputConnector> SPtr;               /**< Shared pointer type for PluginOutputConnector. */
-    typedef QSharedPointer<const PluginOutputConnector> ConstSPtr;    /**< Const shared pointer type for PluginOutputConnector. */
+    typedef QSharedPointer<PluginOutputConnector> SPtr;            /**< Shared pointer type for PluginOutputConnector. */
+    typedef QSharedPointer<const PluginOutputConnector> ConstSPtr; /**< Const shared pointer type for PluginOutputConnector. */
 
     //=========================================================================================================
     /**
@@ -52,15 +52,17 @@ public:
      * @param[in] name       connection name.
      * @param[in] descr      connection description.
      */
-    PluginOutputConnector(AbstractPlugin *parent,
-                          const QString &name,
-                          const QString &descr);
+    PluginOutputConnector(AbstractPlugin* parent,
+                          const QString& name,
+                          const QString& descr);
 
     //=========================================================================================================
     /**
      * Destructor
      */
-    virtual ~PluginOutputConnector(){}
+    virtual ~PluginOutputConnector()
+    {
+    }
 
     //=========================================================================================================
     /**

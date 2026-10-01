@@ -65,7 +65,7 @@ using namespace Eigen;
 
 //=============================================================================================================
 
-int main(int argc, char *argv[])
+int main(int argc, char* argv[])
 {
     qInstallMessageHandler(MNELogger::customLogWriter);
     QCoreApplication app(argc, argv);
@@ -181,40 +181,40 @@ int main(int argc, char *argv[])
     }
 
     // 5. Prepare inverse
-    const FiffEvoked &firstEvoked = srcEvokedSet.evoked[0];
+    const FiffEvoked& firstEvoked = srcEvokedSet.evoked[0];
     MNEInverseOperator prepInv = invOp.prepare_inverse_operator(
         firstEvoked.nave, lambda2, false, false);
 
     // 6. For each evoked set: apply inverse then forward
     // Get the forward solution matrix (sensors x sources)
-    const MatrixXd &G = fwd.sol->data;  // nchan_fwd x nsource
+    const MatrixXd& G = fwd.sol->data; // nchan_fwd x nsource
 
     // Build output evoked set with target info
     FiffEvokedSet outEvokedSet;
     outEvokedSet.info = targetInfo;
 
     for (int i = 0; i < srcEvokedSet.evoked.size(); ++i) {
-        const FiffEvoked &srcEvoked = srcEvokedSet.evoked[i];
+        const FiffEvoked& srcEvoked = srcEvokedSet.evoked[i];
 
         // Apply inverse: source estimate = inv_kernel * data
         // The prepared inverse has eigen_leads, eigen_fields, noise_norm, etc.
         // For a simplified mapping: mapping = G_target * pinv(G_source) * data
         // Use the forward matrix as the mapping kernel
-        const MatrixXd &srcData = srcEvoked.data;  // nchan_src x ntimes
+        const MatrixXd& srcData = srcEvoked.data; // nchan_src x ntimes
 
         // Compute pseudo-inverse of source forward
         // source_est = G^+ * data (minimum norm)
-        MatrixXd Gt = G.transpose();  // nsource x nchan
+        MatrixXd Gt = G.transpose(); // nsource x nchan
         MatrixXd GtG = Gt * G;
         // Regularize
         GtG += lambda2 * MatrixXd::Identity(GtG.rows(), GtG.cols());
-        MatrixXd invKernel = GtG.ldlt().solve(Gt);  // nsource x nchan
+        MatrixXd invKernel = GtG.ldlt().solve(Gt); // nsource x nchan
 
-        MatrixXd sourceEst = invKernel * srcData;  // nsource x ntimes
+        MatrixXd sourceEst = invKernel * srcData; // nsource x ntimes
 
         // Project to target sensors: target_data = G_target * source_est
         // For now, use the same forward matrix (same source space)
-        MatrixXd mappedData = G * sourceEst;  // nchan_fwd x ntimes
+        MatrixXd mappedData = G * sourceEst; // nchan_fwd x ntimes
 
         // Build output evoked
         FiffEvoked outEvoked;

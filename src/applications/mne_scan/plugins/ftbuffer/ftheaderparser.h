@@ -51,17 +51,24 @@ namespace FTBUFFERPLUGIN
 /**
  * Struct that holds metadata for a measurement.
  */
-struct FTBUFFER_EXPORT MetaData{
+struct FTBUFFER_EXPORT MetaData
+{
     bool bFiffInfo = false;
     FIFFLIB::FiffInfo info;
     bool bFiffDigitizerData = false;
     FIFFLIB::FiffDigitizerData dig;
 
-    void setFiffinfo(const FIFFLIB::FiffInfo& newinfo) {info = newinfo;
-                                                        bFiffInfo = true;};
+    void setFiffinfo(const FIFFLIB::FiffInfo& newinfo)
+    {
+        info = newinfo;
+        bFiffInfo = true;
+    };
 
-    void setFiffDigitizerData(const FIFFLIB::FiffDigitizerData& newdig) {dig = newdig;
-                                                                         bFiffDigitizerData = true;};
+    void setFiffDigitizerData(const FIFFLIB::FiffDigitizerData& newdig)
+    {
+        dig = newdig;
+        bFiffDigitizerData = true;
+    };
 };
 
 //=============================================================================================================
@@ -96,7 +103,8 @@ FTBUFFER_EXPORT void parseIsotrakHeader(MetaData& data, QBuffer& isotrakBuffer);
  * buffer; thse functions expect the 'read head' of the QBuffer to be at the correct location for the component
  * they are trying to read.
  */
-class FTBUFFER_EXPORT FtHeaderParser{
+class FTBUFFER_EXPORT FtHeaderParser
+{
 public:
     //=========================================================================================================
     /**
@@ -149,8 +157,8 @@ private:
      */
     HeaderChunk getChunkType(QBuffer& buffer);
 
-    std::unordered_map<HeaderChunk, std::function<void(MetaData&, QBuffer&)>> functionMap;  /**< Map of functions to parse header chunks. */
+    std::unordered_map<HeaderChunk, std::function<void(MetaData&, QBuffer&)>> functionMap; /**< Map of functions to parse header chunks. */
 };
 
-}//namespace
+} //namespace
 #endif // FTHEADERPARSER_H

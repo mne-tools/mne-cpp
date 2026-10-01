@@ -40,13 +40,14 @@ using namespace INVLIB;
 // STATIC METHODS
 //=============================================================================================================
 
-DataLoader::SensorLoadResult DataLoader::loadSensors(const QString &fifPath,
-                                                     const QString &megHelmetOverridePath)
+DataLoader::SensorLoadResult DataLoader::loadSensors(const QString& fifPath,
+                                                     const QString& megHelmetOverridePath)
 {
     SensorLoadResult result;
 
     QFile file(fifPath);
-    if (!file.exists()) return result;
+    if (!file.exists())
+        return result;
 
     FiffInfo info;
     FiffDigPointSet digSet;
@@ -75,9 +76,9 @@ DataLoader::SensorLoadResult DataLoader::loadSensors(const QString &fifPath,
         }
 
         result.devHeadTrans = devHeadQTrans;
-        result.hasDevHead   = hasDevHead;
+        result.hasDevHead = hasDevHead;
 
-        for (const auto &ch : info.chs) {
+        for (const auto& ch : info.chs) {
             if (ch.kind == FIFFV_MEG_CH) {
                 QVector3D pos(ch.chpos.r0(0), ch.chpos.r0(1), ch.chpos.r0(2));
 
@@ -85,7 +86,7 @@ DataLoader::SensorLoadResult DataLoader::loadSensors(const QString &fifPath,
                     pos = devHeadQTrans.map(pos);
                 }
 
-                auto *item = new SensorTreeItem(ch.ch_name, pos, QColor(100, 100, 100), 0.01f);
+                auto* item = new SensorTreeItem(ch.ch_name, pos, QColor(100, 100, 100), 0.01f);
 
                 // Store coil orientation
                 QMatrix4x4 orient;
@@ -117,7 +118,7 @@ DataLoader::SensorLoadResult DataLoader::loadSensors(const QString &fifPath,
             auto pickHelmetFile = [&info]() -> QString {
                 int coilType = -1;
                 int nMeg = 0;
-                for (const auto &ch : info.chs) {
+                for (const auto& ch : info.chs) {
                     if (ch.kind == FIFFV_MEG_CH) {
                         coilType = ch.chpos.coil_type & 0xFFFF;
                         ++nMeg;
@@ -139,8 +140,7 @@ DataLoader::SensorLoadResult DataLoader::loadSensors(const QString &fifPath,
                     fileName = "306m.fif";
                 }
 
-                return QCoreApplication::applicationDirPath()
-                    + "/../resources/general/sensorSurfaces/" + fileName;
+                return QCoreApplication::applicationDirPath() + "/../resources/general/sensorSurfaces/" + fileName;
             };
 
             QString helmetPath;
@@ -160,15 +160,15 @@ DataLoader::SensorLoadResult DataLoader::loadSensors(const QString &fifPath,
                 // Try the preloaded virtual FS path directly.
                 if (!QFile::exists(helmetPath)) {
                     QString fn = QFileInfo(helmetPath).fileName();
-                    if (fn.isEmpty()) fn = QStringLiteral("306m.fif");
+                    if (fn.isEmpty())
+                        fn = QStringLiteral("306m.fif");
                     helmetPath = QStringLiteral("/resources/general/sensorSurfaces/") + fn;
                 }
 #endif
             }
 
             if (!QFile::exists(helmetPath)) {
-                QString fallback = QCoreApplication::applicationDirPath()
-                    + "/../resources/general/sensorSurfaces/306m.fif";
+                QString fallback = QCoreApplication::applicationDirPath() + "/../resources/general/sensorSurfaces/306m.fif";
                 if (QFile::exists(fallback)) {
                     helmetPath = fallback;
                 }
@@ -179,9 +179,9 @@ DataLoader::SensorLoadResult DataLoader::loadSensors(const QString &fifPath,
             // Emscripten virtual FS at /resources/general/sensorSurfaces/.
             // applicationDirPath() may not resolve the /../ correctly.
             if (!QFile::exists(helmetPath)) {
-                QString wasmFallback = QStringLiteral("/resources/general/sensorSurfaces/")
-                    + QFileInfo(helmetPath).fileName();
-                if (wasmFallback.endsWith('/')) wasmFallback += "306m.fif";
+                QString wasmFallback = QStringLiteral("/resources/general/sensorSurfaces/") + QFileInfo(helmetPath).fileName();
+                if (wasmFallback.endsWith('/'))
+                    wasmFallback += "306m.fif";
                 if (QFile::exists(wasmFallback)) {
                     helmetPath = wasmFallback;
                 }
@@ -211,7 +211,7 @@ DataLoader::SensorLoadResult DataLoader::loadSensors(const QString &fifPath,
                             helmetSurf.rr(i, 2) = pos.z();
 
                             QVector3D nn(helmetSurf.nn(i, 0), helmetSurf.nn(i, 1), helmetSurf.nn(i, 2));
-                            const float *d = normalMat.constData();
+                            const float* d = normalMat.constData();
                             float nx = d[0] * nn.x() + d[3] * nn.y() + d[6] * nn.z();
                             float ny = d[1] * nn.x() + d[4] * nn.y() + d[7] * nn.z();
                             float nz = d[2] * nn.x() + d[5] * nn.y() + d[8] * nn.z();
@@ -254,8 +254,8 @@ DataLoader::SensorLoadResult DataLoader::loadSensors(const QString &fifPath,
 //=============================================================================================================
 
 std::shared_ptr<BrainSurface> DataLoader::loadHelmetSurface(
-    const QString &helmetFilePath,
-    const QMatrix4x4 &devHeadTrans,
+    const QString& helmetFilePath,
+    const QMatrix4x4& devHeadTrans,
     bool applyTrans)
 {
     if (!QFile::exists(helmetFilePath)) {
@@ -286,7 +286,7 @@ std::shared_ptr<BrainSurface> DataLoader::loadHelmetSurface(
             helmetSurf.rr(i, 2) = pos.z();
 
             QVector3D nn(helmetSurf.nn(i, 0), helmetSurf.nn(i, 1), helmetSurf.nn(i, 2));
-            const float *d = normalMat.constData();
+            const float* d = normalMat.constData();
             float nx = d[0] * nn.x() + d[3] * nn.y() + d[6] * nn.z();
             float ny = d[1] * nn.x() + d[4] * nn.y() + d[7] * nn.z();
             float nz = d[2] * nn.x() + d[5] * nn.y() + d[8] * nn.z();
@@ -306,7 +306,7 @@ std::shared_ptr<BrainSurface> DataLoader::loadHelmetSurface(
 
 //=============================================================================================================
 
-InvEcdSet DataLoader::loadDipoles(const QString &dipPath)
+InvEcdSet DataLoader::loadDipoles(const QString& dipPath)
 {
     InvEcdSet ecdSet = InvEcdSet::read_dipoles_dip(dipPath);
     if (ecdSet.size() == 0) {
@@ -317,7 +317,7 @@ InvEcdSet DataLoader::loadDipoles(const QString &dipPath)
 
 //=============================================================================================================
 
-MNESourceSpaces DataLoader::loadSourceSpace(const QString &fwdPath)
+MNESourceSpaces DataLoader::loadSourceSpace(const QString& fwdPath)
 {
     QFile file(fwdPath);
     if (!file.exists()) {
@@ -347,8 +347,8 @@ MNESourceSpaces DataLoader::loadSourceSpace(const QString &fwdPath)
 
 //=============================================================================================================
 
-bool DataLoader::loadHeadToMriTransform(const QString &transPath,
-                                        FiffCoordTrans &trans)
+bool DataLoader::loadHeadToMriTransform(const QString& transPath,
+                                        FiffCoordTrans& trans)
 {
     QFile file(transPath);
 
@@ -369,7 +369,7 @@ bool DataLoader::loadHeadToMriTransform(const QString &transPath,
         trans.invtrans = raw.trans;
     } else {
         qWarning() << "DataLoader: Loaded transformation is not Head<->MRI (from"
-                    << raw.from << "to" << raw.to << "). Using as is.";
+                   << raw.from << "to" << raw.to << "). Using as is.";
         trans = raw;
     }
 
@@ -378,7 +378,7 @@ bool DataLoader::loadHeadToMriTransform(const QString &transPath,
 
 //=============================================================================================================
 
-FiffEvoked DataLoader::loadEvoked(const QString &evokedPath, int aveIndex)
+FiffEvoked DataLoader::loadEvoked(const QString& evokedPath, int aveIndex)
 {
     QFile file(evokedPath);
     if (!file.exists()) {
@@ -395,7 +395,7 @@ FiffEvoked DataLoader::loadEvoked(const QString &evokedPath, int aveIndex)
 
 //=============================================================================================================
 
-QStringList DataLoader::probeEvokedSets(const QString &evokedPath)
+QStringList DataLoader::probeEvokedSets(const QString& evokedPath)
 {
     QStringList result;
     QFile file(evokedPath);
@@ -405,12 +405,12 @@ QStringList DataLoader::probeEvokedSets(const QString &evokedPath)
 
     FiffEvokedSet evokedSet(file);
     for (int i = 0; i < evokedSet.evoked.size(); ++i) {
-        const auto &ev = evokedSet.evoked.at(i);
+        const auto& ev = evokedSet.evoked.at(i);
         QString label = QString("%1: %2 (%3, nave=%4)")
-            .arg(i)
-            .arg(ev.comment.isEmpty() ? QStringLiteral("Set %1").arg(i) : ev.comment)
-            .arg(ev.aspectKindToString())
-            .arg(ev.nave);
+                            .arg(i)
+                            .arg(ev.comment.isEmpty() ? QStringLiteral("Set %1").arg(i) : ev.comment)
+                            .arg(ev.aspectKindToString())
+                            .arg(ev.nave);
         result.append(label);
     }
     return result;

@@ -67,8 +67,8 @@ class DISPSHARED_EXPORT AverageSelectionView : public AbstractView
     Q_OBJECT
 
 public:
-    typedef QSharedPointer<AverageSelectionView> SPtr;              /**< Shared pointer type for AverageSelectionView. */
-    typedef QSharedPointer<const AverageSelectionView> ConstSPtr;   /**< Const shared pointer type for AverageSelectionView. */
+    typedef QSharedPointer<AverageSelectionView> SPtr;            /**< Shared pointer type for AverageSelectionView. */
+    typedef QSharedPointer<const AverageSelectionView> ConstSPtr; /**< Const shared pointer type for AverageSelectionView. */
 
     //=========================================================================================================
     /**
@@ -78,8 +78,8 @@ public:
      * @param[in] parent        parent of widget.
      * @param[in] f Qt window flags passed to the QWidget constructor.
      */
-    AverageSelectionView(const QString &sSettingsPath="",
-                         QWidget *parent = 0,
+    AverageSelectionView(const QString& sSettingsPath = "",
+                         QWidget* parent = 0,
                          Qt::WindowFlags f = Qt::Widget);
 
     //=========================================================================================================
@@ -94,7 +94,7 @@ public:
      *
      * @return Pointer to the current average colors.
      */
-    QSharedPointer<QMap<QString, QColor> > getAverageColor() const;
+    QSharedPointer<QMap<QString, QColor>> getAverageColor() const;
 
     //=========================================================================================================
     /**
@@ -102,7 +102,7 @@ public:
      *
      * @return Pointer to the current average activations.
      */
-    QSharedPointer<QMap<QString, bool> > getAverageActivation() const;
+    QSharedPointer<QMap<QString, bool>> getAverageActivation() const;
 
     //=========================================================================================================
     /**
@@ -110,7 +110,7 @@ public:
      *
      * @param[in] qMapAverageColor      Pointer to the new average colors.
      */
-    void setAverageColor(const QSharedPointer<QMap<QString, QColor> > qMapAverageColor);
+    void setAverageColor(const QSharedPointer<QMap<QString, QColor>> qMapAverageColor);
 
     //=========================================================================================================
     /**
@@ -118,7 +118,7 @@ public:
      *
      * @param[in] qMapAverageActivation      Pointer to the new average activations.
      */
-    void setAverageActivation(const QSharedPointer<QMap<QString, bool> > qMapAverageActivation);
+    void setAverageActivation(const QSharedPointer<QMap<QString, bool>> qMapAverageActivation);
 
     //=========================================================================================================
     /**
@@ -169,8 +169,8 @@ protected:
 
     int m_iMaxNumAverages;
 
-    QSharedPointer<QMap<QString, QColor> >      m_qMapAverageColor;             /**< Average colors. */
-    QSharedPointer<QMap<QString, bool> >        m_qMapAverageActivation;        /**< Average activation status. */
+    QSharedPointer<QMap<QString, QColor>> m_qMapAverageColor;    /**< Average colors. */
+    QSharedPointer<QMap<QString, bool>> m_qMapAverageActivation; /**< Average activation status. */
 
 signals:
     //=========================================================================================================
@@ -179,7 +179,7 @@ signals:
      *
      * @param[in] qMapAverageColor     the average color map.
      */
-    void newAverageColorMap(const QSharedPointer<QMap<QString, QColor> > qMapAverageColor);
+    void newAverageColorMap(const QSharedPointer<QMap<QString, QColor>> qMapAverageColor);
 
     //=========================================================================================================
     /**
@@ -187,7 +187,7 @@ signals:
      *
      * @param[in] qMapAverageActivation     the average activation map.
      */
-    void newAverageActivationMap(const QSharedPointer<QMap<QString, bool> > qMapAverageActivation);
+    void newAverageActivationMap(const QSharedPointer<QMap<QString, bool>> qMapAverageActivation);
 };
 } // NAMESPACE
 

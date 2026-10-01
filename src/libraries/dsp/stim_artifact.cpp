@@ -35,12 +35,12 @@ using namespace Eigen;
 //=============================================================================================================
 
 void UTILSLIB::fixStimArtifact(MatrixXd& data,
-                                const MatrixXi& events,
-                                double sfreq,
-                                int eventId,
-                                double tmin,
-                                double tmax,
-                                StimArtifactMode mode)
+                               const MatrixXi& events,
+                               double sfreq,
+                               int eventId,
+                               double tmin,
+                               double tmax,
+                               StimArtifactMode mode)
 {
     if (events.rows() == 0 || events.cols() < 3 || data.cols() == 0 || data.rows() == 0) {
         return;
@@ -59,11 +59,11 @@ void UTILSLIB::fixStimArtifact(MatrixXd& data,
 
         // Compute window boundaries
         int iStart = events(e, 0) + iMinOffset;
-        int iEnd   = events(e, 0) + iMaxOffset;
+        int iEnd = events(e, 0) + iMaxOffset;
 
         // Clamp to data bounds
         iStart = std::max(0, iStart);
-        iEnd   = std::min(iNumCols - 1, iEnd);
+        iEnd = std::min(iNumCols - 1, iEnd);
 
         if (iEnd <= iStart) {
             continue;
@@ -72,21 +72,21 @@ void UTILSLIB::fixStimArtifact(MatrixXd& data,
         const int iWindowLen = iEnd - iStart + 1;
 
         switch (mode) {
-        case StimArtifactMode::Linear: {
-            for (int ch = 0; ch < iNumRows; ++ch) {
-                const double dStartVal = data(ch, iStart);
-                const double dEndVal   = data(ch, iEnd);
-                for (int s = 0; s < iWindowLen; ++s) {
-                    const double dAlpha = static_cast<double>(s) / static_cast<double>(iWindowLen - 1);
-                    data(ch, iStart + s) = dStartVal + dAlpha * (dEndVal - dStartVal);
+            case StimArtifactMode::Linear: {
+                for (int ch = 0; ch < iNumRows; ++ch) {
+                    const double dStartVal = data(ch, iStart);
+                    const double dEndVal = data(ch, iEnd);
+                    for (int s = 0; s < iWindowLen; ++s) {
+                        const double dAlpha = static_cast<double>(s) / static_cast<double>(iWindowLen - 1);
+                        data(ch, iStart + s) = dStartVal + dAlpha * (dEndVal - dStartVal);
+                    }
                 }
+                break;
             }
-            break;
-        }
-        case StimArtifactMode::Window: {
-            data.block(0, iStart, iNumRows, iWindowLen).setZero();
-            break;
-        }
+            case StimArtifactMode::Window: {
+                data.block(0, iStart, iNumRows, iWindowLen).setZero();
+                break;
+            }
         }
     }
 }

@@ -65,8 +65,8 @@ QList<QSet<int>> FsLabelUtils::buildAdjacency(const MatrixX3i& tris, int nVerts)
 //=============================================================================================================
 
 FsLabel FsLabelUtils::growLabel(const FsLabel& label,
-                                  const FsSurface& surface,
-                                  int nSteps)
+                                const FsSurface& surface,
+                                int nSteps)
 {
     if (label.isEmpty() || surface.isEmpty() || nSteps <= 0)
         return label;
@@ -122,7 +122,7 @@ FsLabel FsLabelUtils::growLabel(const FsLabel& label,
 //=============================================================================================================
 
 QList<FsLabel> FsLabelUtils::splitLabel(const FsLabel& label,
-                                          const FsSurface& surface)
+                                        const FsSurface& surface)
 {
     QList<FsLabel> components;
 
@@ -206,10 +206,10 @@ QList<FsLabel> FsLabelUtils::splitLabel(const FsLabel& label,
 //=============================================================================================================
 
 QList<FsLabel> FsLabelUtils::stcToLabel(const MatrixXd& stcData,
-                                          const VectorXi& vertices,
-                                          const FsSurface& surface,
-                                          double dThreshold,
-                                          int iHemi)
+                                        const VectorXi& vertices,
+                                        const FsSurface& surface,
+                                        double dThreshold,
+                                        int iHemi)
 {
     QList<FsLabel> labels;
 
@@ -264,8 +264,8 @@ QList<FsLabel> FsLabelUtils::stcToLabel(const MatrixXd& stcData,
 //=============================================================================================================
 
 MatrixXd FsLabelUtils::labelsToStc(const QList<FsLabel>& labels,
-                                     const VectorXi& stcVertices,
-                                     int nTimes)
+                                   const VectorXi& stcVertices,
+                                   int nTimes)
 {
     const int nVerts = static_cast<int>(stcVertices.size());
     MatrixXd mask = MatrixXd::Zero(nVerts, nTimes);

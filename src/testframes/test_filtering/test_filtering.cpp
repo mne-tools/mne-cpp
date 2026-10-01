@@ -53,7 +53,7 @@ using namespace Eigen;
  * @brief The TestFiltering class provides read filter read fiff verification tests
  *
  */
-class TestFiltering: public QObject
+class TestFiltering : public QObject
 {
     Q_OBJECT
 
@@ -77,7 +77,6 @@ private:
     MatrixXd mRefInData;
     MatrixXd mRefInTimes;
     MatrixXd mRefFiltered;
-
 };
 
 //=============================================================================================================
@@ -140,7 +139,7 @@ void TestFiltering::initTestCase()
     MatrixXd mDataFiltered;
 
     // Reading
-    if(!rawFirstInRaw.read_raw_segment(mFirstInData, mFirstInTimes, from, to)) {
+    if (!rawFirstInRaw.read_raw_segment(mFirstInData, mFirstInTimes, from, to)) {
         printf("error during read_raw_segment\n");
     }
 
@@ -160,7 +159,7 @@ void TestFiltering::initTestCase()
     // Writing
     printf("Writing...");
     outfid->write_int(FIFF_FIRST_SAMPLE, &from);
-    outfid->write_raw_buffer(mFirstFiltered,vCals);
+    outfid->write_raw_buffer(mFirstFiltered, vCals);
     printf("[done]\n");
 
     outfid->finish_writing_raw();
@@ -170,7 +169,7 @@ void TestFiltering::initTestCase()
     rawSecondInRaw = FiffRawData(t_fileOut);
 
     // Reading
-    if (!rawSecondInRaw.read_raw_segment(mFirstFiltered,mFirstInTimes,from,to,vPicks)) {
+    if (!rawSecondInRaw.read_raw_segment(mFirstFiltered, mFirstInTimes, from, to, vPicks)) {
         printf("error during read_raw_segment\n");
     }
 
@@ -186,7 +185,7 @@ void TestFiltering::initTestCase()
     ref_in_raw = FiffRawData(t_fileRef);
 
     // Reading
-    if (!ref_in_raw.read_raw_segment(mRefFiltered,mRefInTimes,from,to,vPicks)) {
+    if (!ref_in_raw.read_raw_segment(mRefFiltered, mRefInTimes, from, to, vPicks)) {
         printf("error during read_raw_segment\n");
     }
 
@@ -198,9 +197,9 @@ void TestFiltering::initTestCase()
 void TestFiltering::compareData()
 {
     //make sure to only read data after 1/2 filter Length
-    int iLength = mFirstFiltered.cols()-int(iOrder/2);
-    MatrixXd mDataDiff = mFirstFiltered.block(0,int(iOrder/2),mFirstFiltered.rows(),iLength) - mRefFiltered.block(0,int(iOrder/2),mRefFiltered.rows(),iLength);
-    QVERIFY( mDataDiff.sum() < dEpsilon );
+    int iLength = mFirstFiltered.cols() - int(iOrder / 2);
+    MatrixXd mDataDiff = mFirstFiltered.block(0, int(iOrder / 2), mFirstFiltered.rows(), iLength) - mRefFiltered.block(0, int(iOrder / 2), mRefFiltered.rows(), iLength);
+    QVERIFY(mDataDiff.sum() < dEpsilon);
 }
 
 //=============================================================================================================
@@ -208,7 +207,7 @@ void TestFiltering::compareData()
 void TestFiltering::compareTimes()
 {
     MatrixXd mTimesDiff = mFirstInTimes - mRefInTimes;
-    QVERIFY( mTimesDiff.sum() < dEpsilon );
+    QVERIFY(mTimesDiff.sum() < dEpsilon);
 }
 
 void TestFiltering::cleanupTestCase()

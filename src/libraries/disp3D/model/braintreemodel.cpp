@@ -25,59 +25,61 @@
 #include <inv/dipole_fit/inv_ecd_set.h>
 #include <mne/mne_hemisphere.h>
 
-BrainTreeModel::BrainTreeModel(QObject *parent)
-    : QStandardItemModel(parent)
+BrainTreeModel::BrainTreeModel(QObject* parent)
+: QStandardItemModel(parent)
 {
     // Set headers
     setHorizontalHeaderLabels(QStringList() << "Data" << "Description");
 }
 
-SurfaceTreeItem* BrainTreeModel::addSurface(const QString &subject, const QString &hemi, const QString &surfType, const FSLIB::FsSurface &surface)
+SurfaceTreeItem* BrainTreeModel::addSurface(const QString& subject, const QString& hemi, const QString& surfType, const FSLIB::FsSurface& surface)
 {
     QStandardItem* subjectItem = getSubjectItem(subject);
-    
+
     // Find or create Hemi item
     QStandardItem* hemiItem = nullptr;
-    for(int i = 0; i < subjectItem->rowCount(); ++i) {
+    for (int i = 0; i < subjectItem->rowCount(); ++i) {
         if (subjectItem->child(i)->text() == hemi) {
             hemiItem = subjectItem->child(i);
             break;
         }
     }
-    
+
     if (!hemiItem) {
         hemiItem = new QStandardItem(hemi);
         subjectItem->appendRow(hemiItem);
     }
-    
+
     // Create FsSurface Item
     SurfaceTreeItem* surfItem = new SurfaceTreeItem(surfType);
     surfItem->setSurfaceData(surface);
-    
+
     hemiItem->appendRow(surfItem);
     return surfItem;
 }
 
-bool BrainTreeModel::addAnnotation(const QString &subject, const QString &hemi, const FSLIB::FsAnnotation &annotation)
+bool BrainTreeModel::addAnnotation(const QString& subject, const QString& hemi, const FSLIB::FsAnnotation& annotation)
 {
     QStandardItem* subjectItem = getSubjectItem(subject);
-    if (!subjectItem) return false;
+    if (!subjectItem)
+        return false;
 
     QStandardItem* hemiItem = nullptr;
-    for(int i = 0; i < subjectItem->rowCount(); ++i) {
+    for (int i = 0; i < subjectItem->rowCount(); ++i) {
         if (subjectItem->child(i)->text() == hemi) {
             hemiItem = subjectItem->child(i);
             break;
         }
     }
-    
-    if (!hemiItem) return false;
+
+    if (!hemiItem)
+        return false;
 
     // Apply annotation to ALL surfaces in this hemi? Or just one?
     // Ex_brain_view logic applies atlas to the loaded surfaces of that hemi.
     // So we iterate children of hemiItem and if they are SurfaceTreeItems, set annotation.
     bool applied = false;
-    for(int i = 0; i < hemiItem->rowCount(); ++i) {
+    for (int i = 0; i < hemiItem->rowCount(); ++i) {
         SurfaceTreeItem* item = dynamic_cast<SurfaceTreeItem*>(hemiItem->child(i));
         if (item) {
             item->setAnnotationData(annotation);
@@ -87,30 +89,30 @@ bool BrainTreeModel::addAnnotation(const QString &subject, const QString &hemi, 
     return applied;
 }
 
-QStandardItem* BrainTreeModel::getSubjectItem(const QString &subject)
+QStandardItem* BrainTreeModel::getSubjectItem(const QString& subject)
 {
     // Search top level
     QList<QStandardItem*> items = findItems(subject);
     if (!items.isEmpty()) {
         return items.first();
     }
-    
+
     // Create new
     QStandardItem* item = new QStandardItem(subject);
     appendRow(item);
     return item;
 }
 
-BemTreeItem* BrainTreeModel::addBemSurface(const QString &subject, const QString &bemName, const MNELIB::MNEBemSurface &bemSurf)
+BemTreeItem* BrainTreeModel::addBemSurface(const QString& subject, const QString& bemName, const MNELIB::MNEBemSurface& bemSurf)
 {
-    QStandardItem *subjItem = getSubjectItem(subject);
-    
-    // Check if BEM item already exists to avoid duplicates? 
+    QStandardItem* subjItem = getSubjectItem(subject);
+
+    // Check if BEM item already exists to avoid duplicates?
     // Usually BEM is added once.
-    
-    BemTreeItem *bemItem = new BemTreeItem(bemName, bemSurf);
+
+    BemTreeItem* bemItem = new BemTreeItem(bemName, bemSurf);
     bemItem->setVisible(true); // Default to visible
-    
+
     // Set default colors based on type/name
     // Set colors based on ID (matching zeiss-intent)
     // 4=Head (Reddish), 3=OuterSkull (Greenish), 1=InnerSkull (Blueish)
@@ -121,32 +123,32 @@ BemTreeItem* BrainTreeModel::addBemSurface(const QString &subject, const QString
     } else if (bemSurf.id == 1) {
         bemItem->setColor(QColor(77, 77, 128)); // Blueish
     } else {
-         bemItem->setColor(QColor(100, 100, 100)); // Grey default
+        bemItem->setColor(QColor(100, 100, 100)); // Grey default
     }
-    
+
     subjItem->appendRow(bemItem);
-    
+
     return bemItem;
 }
 
 //=============================================================================================================
 
-void BrainTreeModel::addSensors(const QString &type, const QList<QStandardItem*> &items)
+void BrainTreeModel::addSensors(const QString& type, const QList<QStandardItem*>& items)
 {
     QStandardItem* parentItem = new QStandardItem(type);
     parentItem->setCheckable(true);
     parentItem->setCheckState(Qt::Checked);
-    
-    for(auto* item : items) {
+
+    for (auto* item : items) {
         parentItem->appendRow(item);
     }
-    
+
     this->appendRow(parentItem);
 }
 
 //=============================================================================================================
 
-void BrainTreeModel::addDipoles(const INVLIB::InvEcdSet &set)
+void BrainTreeModel::addDipoles(const INVLIB::InvEcdSet& set)
 {
     DipoleTreeItem* item = new DipoleTreeItem("Dipoles", set);
     item->setCheckable(true);
@@ -156,7 +158,7 @@ void BrainTreeModel::addDipoles(const INVLIB::InvEcdSet &set)
 
 //=============================================================================================================
 
-void BrainTreeModel::addSourceSpace(const MNELIB::MNESourceSpaces &srcSpace)
+void BrainTreeModel::addSourceSpace(const MNELIB::MNESourceSpaces& srcSpace)
 {
     QStandardItem* parentItem = new QStandardItem("Source Space");
     parentItem->setCheckable(true);
@@ -166,7 +168,7 @@ void BrainTreeModel::addSourceSpace(const MNELIB::MNESourceSpaces &srcSpace)
     QColor srcColor(212, 28, 92);
 
     for (int h = 0; h < srcSpace.size(); ++h) {
-        const auto &hemi = srcSpace[h];
+        const auto& hemi = srcSpace[h];
         QString hemiLabel = (h == 0) ? "LH" : "RH";
 
         // Collect all source point positions for this hemisphere
@@ -174,7 +176,8 @@ void BrainTreeModel::addSourceSpace(const MNELIB::MNESourceSpaces &srcSpace)
         positions.reserve(hemi.vertno.size());
         for (int i = 0; i < hemi.vertno.size(); ++i) {
             int vIdx = hemi.vertno(i);
-            if (vIdx < 0 || vIdx >= hemi.rr.rows()) continue;
+            if (vIdx < 0 || vIdx >= hemi.rr.rows())
+                continue;
             positions.append(QVector3D(hemi.rr(vIdx, 0), hemi.rr(vIdx, 1), hemi.rr(vIdx, 2)));
         }
 
@@ -194,31 +197,33 @@ void BrainTreeModel::addSourceSpace(const MNELIB::MNESourceSpaces &srcSpace)
 
 //=============================================================================================================
 
-void BrainTreeModel::addDigitizerData(const QList<FIFFLIB::FiffDigPoint> &digitizerPoints)
+void BrainTreeModel::addDigitizerData(const QList<FIFFLIB::FiffDigPoint>& digitizerPoints)
 {
-    if (digitizerPoints.isEmpty()) return;
+    if (digitizerPoints.isEmpty())
+        return;
 
-    auto *setItem = new DigitizerSetTreeItem("Digitizer", digitizerPoints);
+    auto* setItem = new DigitizerSetTreeItem("Digitizer", digitizerPoints);
     this->appendRow(setItem);
 
     qInfo() << "BrainTreeModel: Added digitizer set with"
-             << setItem->totalPointCount() << "points in"
-             << setItem->rowCount() << "categories";
+            << setItem->totalPointCount() << "points in"
+            << setItem->rowCount() << "categories";
 }
 
 //=============================================================================================================
 
-NetworkTreeItem* BrainTreeModel::addNetwork(const CONNECTIVITYLIB::Network &network, const QString &name)
+NetworkTreeItem* BrainTreeModel::addNetwork(const CONNECTIVITYLIB::Network& network, const QString& name)
 {
     QString displayName = name;
     if (displayName.isEmpty()) {
         displayName = network.getConnectivityMethod();
-        if (displayName.isEmpty()) displayName = "Network";
+        if (displayName.isEmpty())
+            displayName = "Network";
     }
 
     QString objectKey = "net_" + displayName.toLower().replace(" ", "_");
 
-    auto *item = new NetworkTreeItem(displayName, objectKey);
+    auto* item = new NetworkTreeItem(displayName, objectKey);
     item->setCheckable(true);
     item->setCheckState(Qt::Checked);
 

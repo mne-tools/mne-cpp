@@ -82,56 +82,56 @@ QList<Network> Connectivity::calculate(ConnectivitySettings& connectivitySetting
     QElapsedTimer timer;
     timer.start();
 
-    if(lMethods.contains("WPLI")) {
+    if (lMethods.contains("WPLI")) {
         results.append(WeightedPhaseLagIndex::calculate(connectivitySettings));
     }
 
-    if(lMethods.contains("USPLI")) {
+    if (lMethods.contains("USPLI")) {
         results.append(UnbiasedSquaredPhaseLagIndex::calculate(connectivitySettings));
     }
 
-    if(lMethods.contains("COR")) {
+    if (lMethods.contains("COR")) {
         results.append(Correlation::calculate(connectivitySettings));
     }
 
-    if(lMethods.contains("XCOR")) {
+    if (lMethods.contains("XCOR")) {
         results.append(CrossCorrelation::calculate(connectivitySettings));
     }
 
-    if(lMethods.contains("PLI")) {
+    if (lMethods.contains("PLI")) {
         results.append(PhaseLagIndex::calculate(connectivitySettings));
     }
 
-    if(lMethods.contains("COH")) {
+    if (lMethods.contains("COH")) {
         results.append(Coherence::calculate(connectivitySettings));
     }
 
-    if(lMethods.contains("IMAGCOH")) {
+    if (lMethods.contains("IMAGCOH")) {
         results.append(ImagCoherence::calculate(connectivitySettings));
     }
 
-    if(lMethods.contains("PLV")) {
+    if (lMethods.contains("PLV")) {
         results.append(PhaseLockingValue::calculate(connectivitySettings));
     }
 
-    if(lMethods.contains("DSWPLI")) {
+    if (lMethods.contains("DSWPLI")) {
         results.append(DebiasedSquaredWeightedPhaseLagIndex::calculate(connectivitySettings));
     }
 
-    if(lMethods.contains("GC")) {
+    if (lMethods.contains("GC")) {
         results.append(GrangerCausality::calculate(connectivitySettings));
     }
 
-    if(lMethods.contains("DTF")) {
+    if (lMethods.contains("DTF")) {
         results.append(DirectedTransferFunction::calculate(connectivitySettings));
     }
 
-    if(lMethods.contains("PDC")) {
+    if (lMethods.contains("PDC")) {
         results.append(PartialDirectedCoherence::calculate(connectivitySettings));
     }
 
     qWarning() << "Total" << timer.elapsed();
-    qDebug() << "Connectivity::calculateMultiMethods - Calculated"<< lMethods <<"for" << connectivitySettings.size() << "trials in"<< timer.elapsed() << "msecs.";
+    qDebug() << "Connectivity::calculateMultiMethods - Calculated" << lMethods << "for" << connectivitySettings.size() << "trials in" << timer.elapsed() << "msecs.";
 
     return results;
 }

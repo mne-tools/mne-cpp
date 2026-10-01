@@ -68,7 +68,8 @@
 // DEFINE NAMESPACE CONNECTIVITYLIB
 //=============================================================================================================
 
-namespace CONNECTIVITYLIB {
+namespace CONNECTIVITYLIB
+{
 
 //=============================================================================================================
 // CONNECTIVITYLIB FORWARD DECLARATIONS
@@ -92,7 +93,6 @@ class Network;
  */
 class CONNECTIVITYSHARED_EXPORT DebiasedSquaredWeightedPhaseLagIndex : public AbstractMetric
 {
-
 public:
     typedef QSharedPointer<DebiasedSquaredWeightedPhaseLagIndex> SPtr;            /**< Shared pointer type for DebiasedSquaredWeightedPhaseLagIndex. */
     typedef QSharedPointer<const DebiasedSquaredWeightedPhaseLagIndex> ConstSPtr; /**< Const shared pointer type for DebiasedSquaredWeightedPhaseLagIndex. */
@@ -111,7 +111,7 @@ public:
      *
      * @return                   The connectivity information in form of a network structure.
      */
-    static Network calculate(ConnectivitySettings &connectivitySettings);
+    static Network calculate(ConnectivitySettings& connectivitySettings);
 
 protected:
     //=========================================================================================================
@@ -129,9 +129,9 @@ protected:
      * @param[in] tapers                 The taper information.
      */
     static void compute(ConnectivitySettings::IntermediateTrialData& inputData,
-                        QVector<QPair<int,Eigen::MatrixXcd> >& vecPairCsdSum,
-                        QVector<QPair<int,Eigen::MatrixXd> >& vecPairCsdImagAbsSum,
-                        QVector<QPair<int,Eigen::MatrixXd> >& vecPairCsdImagSqrdSum,
+                        QVector<QPair<int, Eigen::MatrixXcd>>& vecPairCsdSum,
+                        QVector<QPair<int, Eigen::MatrixXd>>& vecPairCsdImagAbsSum,
+                        QVector<QPair<int, Eigen::MatrixXd>>& vecPairCsdImagSqrdSum,
                         QMutex& mutex,
                         int iNRows,
                         int iNFreqs,
@@ -145,7 +145,7 @@ protected:
      * @param[out] connectivitySettings   The input data.
      * @param[in] finalNetwork           The final network.
      */
-    static void computeDSWPLI(ConnectivitySettings &connectivitySettings,
+    static void computeDSWPLI(ConnectivitySettings& connectivitySettings,
                               Network& finalNetwork);
 };
 

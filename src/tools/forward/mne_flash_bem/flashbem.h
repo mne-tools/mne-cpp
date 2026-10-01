@@ -40,7 +40,8 @@
 // DEFINE NAMESPACE MNEFLASHBEM
 //=============================================================================================================
 
-namespace MNEFLASHBEM {
+namespace MNEFLASHBEM
+{
 
 //=============================================================================================================
 // FORWARD DECLARATIONS
@@ -215,8 +216,8 @@ private:
 
     //=========================================================================================================
 
-    const MNEFlashBemSettings& m_settings;   /**< Command-line settings. */
-    int m_step;                              /**< Current processing step number. */
+    const MNEFlashBemSettings& m_settings; /**< Command-line settings. */
+    int m_step;                            /**< Current processing step number. */
 };
 
 } // namespace MNEFLASHBEM

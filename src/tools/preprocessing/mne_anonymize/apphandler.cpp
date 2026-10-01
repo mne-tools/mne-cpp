@@ -52,10 +52,8 @@ AppHandler::AppHandler()
 
 QCoreApplication* AppHandler::createApplication(int& argc, char* argv[])
 {
-    for (int i = 1; i < argc; ++i)
-    {
-        if (!qstrcmp(argv[i], "--no-gui"))
-        {
+    for (int i = 1; i < argc; ++i) {
+        if (!qstrcmp(argv[i], "--no-gui")) {
             m_bGuiMode = false;
             return new QCoreApplication(argc, argv);
         }
@@ -67,8 +65,7 @@ QCoreApplication* AppHandler::createApplication(int& argc, char* argv[])
 
 SettingsControllerCl* AppHandler::createController(const QStringList& args)
 {
-    if(m_bGuiMode)
-    {
+    if (m_bGuiMode) {
         return new SettingsControllerGui(args);
     } else {
         return new SettingsControllerCl(args);

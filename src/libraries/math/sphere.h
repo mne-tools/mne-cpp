@@ -54,7 +54,8 @@ namespace UTILSLIB
 //=============================================================================================================
 
 /** @brief Cost-function workspace for @ref UTILSLIB::Sphere::fit_sphere_simplex "Sphere::fit_sphere_simplex": holds the @c nx3 point cloud and a verbose-report flag. */
-struct FitUser {
+struct FitUser
+{
     Eigen::MatrixXf rr;
     bool report;
 };
@@ -71,7 +72,6 @@ struct FitUser {
 class MATHSHARED_EXPORT Sphere
 {
 public:
-
     //=========================================================================================================
     /**
      * Constructs the Sphere
@@ -108,7 +108,10 @@ public:
      *
      * @return reference to the sphere's center.
      */
-    Eigen::Vector3f& center() { return m_center; }
+    Eigen::Vector3f& center()
+    {
+        return m_center;
+    }
 
     //=========================================================================================================
     /**
@@ -116,7 +119,10 @@ public:
      *
      * @return reference to the sphere's radius.
      */
-    float& radius() { return m_r; }
+    float& radius()
+    {
+        return m_r;
+    }
 
     //=========================================================================================================
     /**
@@ -129,12 +135,12 @@ public:
      *
      * @return true if successful.
      */
-    static bool fit_sphere_to_points(const Eigen::MatrixXf &rr, float simplex_size, Eigen::VectorXf &r0, float &R);
-    static bool fit_sphere_to_points(float **rr, int np, float simplex_size, float *r0, float *R);
+    static bool fit_sphere_to_points(const Eigen::MatrixXf& rr, float simplex_size, Eigen::VectorXf& r0, float& R);
+    static bool fit_sphere_to_points(float** rr, int np, float simplex_size, float* r0, float* R);
 
 private:
-    Eigen::Vector3f m_center;   /**< Sphere's center. */
-    float m_r;                  /**< Sphere's radius. */
+    Eigen::Vector3f m_center; /**< Sphere's center. */
+    float m_r;                /**< Sphere's radius. */
 
     //=========================================================================================================
     /**
@@ -144,7 +150,7 @@ private:
      * @param[out] cm    The average center of the caretsian data (1 x 3 matrix).
      * @param[out] avep  The average distance to the average center.
      */
-    static void calculate_cm_ave_dist(const Eigen::MatrixXf &rr, Eigen::VectorXf &cm, float &avep);
+    static void calculate_cm_ave_dist(const Eigen::MatrixXf& rr, Eigen::VectorXf& cm, float& avep);
 
     //=========================================================================================================
     /**
@@ -155,7 +161,7 @@ private:
      *
      * @return the inital simplex.
      */
-    static Eigen::MatrixXf make_initial_simplex(const Eigen::VectorXf &pars, float size);
+    static Eigen::MatrixXf make_initial_simplex(const Eigen::VectorXf& pars, float size);
 
     //=========================================================================================================
     /**
@@ -166,7 +172,7 @@ private:
      *
      * @return the distance (cost) of the given vertex (sphere center).
      */
-    static float fit_eval(const Eigen::VectorXf &fitpar, const void  *user_data);
+    static float fit_eval(const Eigen::VectorXf& fitpar, const void* user_data);
 
     //=========================================================================================================
     /**
@@ -180,7 +186,7 @@ private:
      *
      * @return true if reporting was successful.
      */
-    static bool report_func(int loop, const Eigen::VectorXf &fitpar, double fval_lo, double fval_hi, double par_diff);
+    static bool report_func(int loop, const Eigen::VectorXf& fitpar, double fval_lo, double fval_hi, double par_diff);
 
     //=========================================================================================================
     /**
@@ -191,7 +197,7 @@ private:
      *
      * @return the optimal radius.
      */
-    static float opt_rad(const Eigen::VectorXf &r0, const FitUser* user);
+    static float opt_rad(const Eigen::VectorXf& r0, const FitUser* user);
 };
 } // NAMESPACE
 

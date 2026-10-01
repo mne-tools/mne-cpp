@@ -49,29 +49,46 @@ static QString tagName(int kind)
 {
     // Return a human-readable tag name for common FIFF tags
     switch (kind) {
-        case FIFF_FILE_ID:          return "FILE_ID";
-        case FIFF_DIR_POINTER:      return "DIR_POINTER";
-        case FIFF_DIR:              return "DIR";
-        case FIFF_BLOCK_ID:         return "BLOCK_ID";
-        case FIFF_BLOCK_START:      return "BLOCK_START";
-        case FIFF_BLOCK_END:        return "BLOCK_END";
-        case FIFF_FREE_LIST:        return "FREE_LIST";
-        case FIFF_NCHAN:            return "NCHAN";
-        case FIFF_SFREQ:            return "SFREQ";
-        case FIFF_CH_INFO:          return "CH_INFO";
-        case FIFF_MEAS_DATE:        return "MEAS_DATE";
-        case FIFF_COORD_TRANS:      return "COORD_TRANS";
-        case FIFF_NAVE:             return "NAVE";
-        case FIFF_FIRST_SAMPLE:     return "FIRST_SAMPLE";
-        case FIFF_LAST_SAMPLE:      return "LAST_SAMPLE";
-        case FIFF_COMMENT:          return "COMMENT";
-        default:                    return QString("TAG_%1").arg(kind);
+        case FIFF_FILE_ID:
+            return "FILE_ID";
+        case FIFF_DIR_POINTER:
+            return "DIR_POINTER";
+        case FIFF_DIR:
+            return "DIR";
+        case FIFF_BLOCK_ID:
+            return "BLOCK_ID";
+        case FIFF_BLOCK_START:
+            return "BLOCK_START";
+        case FIFF_BLOCK_END:
+            return "BLOCK_END";
+        case FIFF_FREE_LIST:
+            return "FREE_LIST";
+        case FIFF_NCHAN:
+            return "NCHAN";
+        case FIFF_SFREQ:
+            return "SFREQ";
+        case FIFF_CH_INFO:
+            return "CH_INFO";
+        case FIFF_MEAS_DATE:
+            return "MEAS_DATE";
+        case FIFF_COORD_TRANS:
+            return "COORD_TRANS";
+        case FIFF_NAVE:
+            return "NAVE";
+        case FIFF_FIRST_SAMPLE:
+            return "FIRST_SAMPLE";
+        case FIFF_LAST_SAMPLE:
+            return "LAST_SAMPLE";
+        case FIFF_COMMENT:
+            return "COMMENT";
+        default:
+            return QString("TAG_%1").arg(kind);
     }
 }
 
 //=============================================================================================================
 
-int main(int argc, char *argv[])
+int main(int argc, char* argv[])
 {
     qInstallMessageHandler(MNELogger::customLogWriter);
     QCoreApplication app(argc, argv);
@@ -122,8 +139,8 @@ int main(int argc, char *argv[])
     const QList<FiffDirEntry::SPtr>& dir1 = stream1->dir();
     const QList<FiffDirEntry::SPtr>& dir2 = stream2->dir();
 
-    qInfo("File 1: %s (%d directory entries)" , qPrintable(file1), (int)dir1.size());
-    qInfo("File 2: %s (%d directory entries)" , qPrintable(file2), (int)dir2.size());
+    qInfo("File 1: %s (%d directory entries)", qPrintable(file1), (int)dir1.size());
+    qInfo("File 2: %s (%d directory entries)", qPrintable(file2), (int)dir2.size());
     qInfo("%s", "");
 
     int nMatch = 0, nDiff = 0, nMissing = 0;
@@ -148,8 +165,8 @@ int main(int argc, char *argv[])
         if (isMatch) {
             nMatch++;
             if (verbose)
-                qInfo("  [%4d] %s : MATCH (size=%d)" ,
-                       i, qPrintable(tagName(dir1[i]->kind)), dir1[i]->size);
+                qInfo("  [%4d] %s : MATCH (size=%d)",
+                      i, qPrintable(tagName(dir1[i]->kind)), dir1[i]->size);
         } else {
             nDiff++;
             QString line = QString::asprintf("  [%4d] DIFF:", i);
@@ -157,24 +174,27 @@ int main(int argc, char *argv[])
                 line += QString::asprintf(" kind=%d vs %d", dir1[i]->kind, dir2[i]->kind);
             else
                 line += " kind=" + tagName(dir1[i]->kind);
-            if (!typeMatch) line += QString::asprintf(" type=%d vs %d", dir1[i]->type, dir2[i]->type);
-            if (!sizeMatch) line += QString::asprintf(" size=%d vs %d", dir1[i]->size, dir2[i]->size);
-            if (sizeMatch && !dataMatch) line += " DATA_DIFFERS";
+            if (!typeMatch)
+                line += QString::asprintf(" type=%d vs %d", dir1[i]->type, dir2[i]->type);
+            if (!sizeMatch)
+                line += QString::asprintf(" size=%d vs %d", dir1[i]->size, dir2[i]->size);
+            if (sizeMatch && !dataMatch)
+                line += " DATA_DIFFERS";
             qInfo("%s", qPrintable(line));
         }
     }
 
     if (dir1.size() != dir2.size()) {
         nMissing = (int)abs(dir1.size() - dir2.size());
-        qInfo("\n  File %s has %d extra directory entries." ,
-               dir1.size() > dir2.size() ? "1" : "2", nMissing);
+        qInfo("\n  File %s has %d extra directory entries.",
+              dir1.size() > dir2.size() ? "1" : "2", nMissing);
     }
 
-    qInfo("\nSummary: %d matching, %d different, %d extra entries" ,
-           nMatch, nDiff, nMissing);
+    qInfo("\nSummary: %d matching, %d different, %d extra entries",
+          nMatch, nDiff, nMissing);
 
     bool identical = (nDiff == 0 && nMissing == 0);
-    qInfo("Files are %s." , identical ? "IDENTICAL" : "DIFFERENT");
+    qInfo("Files are %s.", identical ? "IDENTICAL" : "DIFFERENT");
 
     stream1->close();
     stream2->close();

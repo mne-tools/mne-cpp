@@ -71,7 +71,6 @@ class MNEShowFiffSettings;
 
 class MNEFiffExpSet
 {
-
 public:
     typedef QSharedPointer<MNEFiffExpSet> SPtr;            /**< Shared pointer type for MNEFiffExpSet. */
     typedef QSharedPointer<const MNEFiffExpSet> ConstSPtr; /**< Const shared pointer type for MNEFiffExpSet. */
@@ -88,7 +87,7 @@ public:
      *
      * @param[in] p_MneFiffExpSet       MNE Fiff Explanation Set which should be copied
      */
-    MNEFiffExpSet(const MNEFiffExpSet &p_MneFiffExpSet);
+    MNEFiffExpSet(const MNEFiffExpSet& p_MneFiffExpSet);
 
     //=========================================================================================================
     /**
@@ -112,7 +111,7 @@ public:
      *
      * @return MNEFiffExp related to the parameter index.
      */
-    const MNEFiffExp& operator[] (int idx) const;
+    const MNEFiffExp& operator[](int idx) const;
 
     //=========================================================================================================
     /**
@@ -122,7 +121,7 @@ public:
      *
      * @return MNEFiffExp related to the parameter index.
      */
-    MNEFiffExp& operator[] (int idx);
+    MNEFiffExp& operator[](int idx);
 
     //=========================================================================================================
     /**
@@ -132,7 +131,7 @@ public:
      *
      * @return MNEFiffExpSet
      */
-    MNEFiffExpSet& operator<< (const MNEFiffExp& p_MneFiffExp);
+    MNEFiffExpSet& operator<<(const MNEFiffExp& p_MneFiffExp);
 
     //=========================================================================================================
     /**
@@ -150,7 +149,7 @@ public:
      *
      * @param[in] out   Stream to write the content to
      */
-    void list_fiff_explanations(FILE *out);
+    void list_fiff_explanations(FILE* out);
 
     //=========================================================================================================
     /**
@@ -179,7 +178,7 @@ public:
      *
      * @return true if succeeded
      */
-    bool show_fiff_contents (FILE *out, const MNEShowFiffSettings& settings);
+    bool show_fiff_contents(FILE* out, const MNEShowFiffSettings& settings);
 
     //=========================================================================================================
     /**
@@ -196,7 +195,7 @@ public:
      *
      * @return true if succeeded
      */
-    bool show_fiff_contents (FILE *out, const QString& name, bool verbose, const QList<int>& tags, int indent_step, bool long_strings, bool blocks_only);
+    bool show_fiff_contents(FILE* out, const QString& name, bool verbose, const QList<int>& tags, int indent_step, bool long_strings, bool blocks_only);
 
 private:
     //=========================================================================================================
@@ -206,24 +205,24 @@ private:
      */
     void sort_fiff_explanations();
 
-    void print_file_id (FILE *out, const FIFFLIB::FiffTag::UPtr& tag);
+    void print_file_id(FILE* out, const FIFFLIB::FiffTag::UPtr& tag);
 
-    void print_ch_info (FILE *out, const FIFFLIB::FiffTag::UPtr& tag);
+    void print_ch_info(FILE* out, const FIFFLIB::FiffTag::UPtr& tag);
 
-    void print_transform(FILE *out, const FIFFLIB::FiffTag::UPtr& tag);
+    void print_transform(FILE* out, const FIFFLIB::FiffTag::UPtr& tag);
 
-    void print_dig_point(FILE *out, const FIFFLIB::FiffTag::UPtr& tag);
+    void print_dig_point(FILE* out, const FIFFLIB::FiffTag::UPtr& tag);
 
-    void print_matrix(FILE *out, FIFFLIB::FiffStream::SPtr stream, FIFFLIB::FiffDirEntry::SPtr this_ent);
+    void print_matrix(FILE* out, FIFFLIB::FiffStream::SPtr stream, FIFFLIB::FiffDirEntry::SPtr this_ent);
 
 private:
-    QList<MNEFiffExp> m_qListExp;     /**< List of Explanations. */
+    QList<MNEFiffExp> m_qListExp; /**< List of Explanations. */
 
-// ### OLD STRUCT ###
-//    typedef struct {
-//        mneFiffExp exp;
-//        int        nexp;
-//    } *mneFiffExpSet,mneFiffExpSetRec;
+    // ### OLD STRUCT ###
+    //    typedef struct {
+    //        mneFiffExp exp;
+    //        int        nexp;
+    //    } *mneFiffExpSet,mneFiffExpSetRec;
 };
 
 

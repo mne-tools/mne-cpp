@@ -50,8 +50,8 @@ class StartUpWidget : public QWidget
     Q_OBJECT
 
 public:
-    typedef QSharedPointer<StartUpWidget> SPtr;               /**< Shared pointer type for StartUpWidget. */
-    typedef QSharedPointer<const StartUpWidget> ConstSPtr;    /**< Const shared pointer type for StartUpWidget. */
+    typedef QSharedPointer<StartUpWidget> SPtr;            /**< Shared pointer type for StartUpWidget. */
+    typedef QSharedPointer<const StartUpWidget> ConstSPtr; /**< Const shared pointer type for StartUpWidget. */
 
     //=========================================================================================================
     /**
@@ -59,7 +59,7 @@ public:
      *
      * @param[in] parent pointer to parent widget; If parent is 0, the new StartUpWidget becomes a window. If parent is another widget, StartUpWidget becomes a child window inside parent. StartUpWidget is deleted when its parent is deleted.
      */
-    StartUpWidget(QWidget *parent = 0);
+    StartUpWidget(QWidget* parent = 0);
 
     //=========================================================================================================
     /**
@@ -68,8 +68,8 @@ public:
     ~StartUpWidget();
 
 private:
-    QLabel* m_pLabel_Info;      /**< Holds the start up widget label. */
+    QLabel* m_pLabel_Info; /**< Holds the start up widget label. */
 };
-}//NAMESPACE
+} //NAMESPACE
 
 #endif // STARTUPWIDGET_H

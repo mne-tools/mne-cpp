@@ -100,8 +100,8 @@ public:
      * @param[in] rows      Row data (list of string lists).
      */
     void addTable(const QString& sTitle,
-                   const QStringList& headers,
-                   const QList<QStringList>& rows);
+                  const QStringList& headers,
+                  const QList<QStringList>& rows);
 
     //=========================================================================================================
     /**
@@ -111,7 +111,7 @@ public:
      * @param[in] pairs     List of (key, value) pairs.
      */
     void addKeyValue(const QString& sTitle,
-                      const QList<QPair<QString, QString>>& pairs);
+                     const QList<QPair<QString, QString>>& pairs);
 
     //=========================================================================================================
     /**
@@ -128,7 +128,10 @@ public:
      *
      * @return Number of sections added so far.
      */
-    int sectionCount() const { return m_sections.size(); }
+    int sectionCount() const
+    {
+        return m_sections.size();
+    }
 
     //=========================================================================================================
     /**
@@ -154,7 +157,10 @@ public:
      *
      * @return Title passed at construction.
      */
-    const QString& title() const { return m_sTitle; }
+    const QString& title() const
+    {
+        return m_sTitle;
+    }
 
 private:
     QString m_sTitle;

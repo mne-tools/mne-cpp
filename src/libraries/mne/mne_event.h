@@ -46,12 +46,12 @@ public:
     MNEEvent() = default;
     ~MNEEvent() = default;
 
-    unsigned int from = 0;          /**< Source transition value. */
-    unsigned int to = 0;            /**< Destination transition value. */
-    int          sample = 0;        /**< Sample number. */
-    bool         show = false;          /**< Display flag (application-defined). */
-    bool         created_here = false;  /**< Non-zero if this event was created in the program. */
-    QString      comment;           /**< Free-text event comment. */
+    unsigned int from = 0;     /**< Source transition value. */
+    unsigned int to = 0;       /**< Destination transition value. */
+    int sample = 0;            /**< Sample number. */
+    bool show = false;         /**< Display flag (application-defined). */
+    bool created_here = false; /**< Non-zero if this event was created in the program. */
+    QString comment;           /**< Free-text event comment. */
 };
 
 } // namespace MNELIB

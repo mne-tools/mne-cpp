@@ -78,7 +78,7 @@ static VectorXi buildNearestMap(const MatrixX3f& srcSphere, const MatrixX3f& dst
 
 //=============================================================================================================
 
-int main(int argc, char *argv[])
+int main(int argc, char* argv[])
 {
     qInstallMessageHandler(MNELogger::customLogWriter);
     QCoreApplication app(argc, argv);
@@ -97,7 +97,7 @@ int main(int argc, char *argv[])
     parser.addOption(toOpt);
 
     QCommandLineOption subjectsDirOpt("subjects_dir", "Subjects directory.", "dir",
-                                       qEnvironmentVariable("SUBJECTS_DIR"));
+                                      qEnvironmentVariable("SUBJECTS_DIR"));
     parser.addOption(subjectsDirOpt);
 
     QCommandLineOption hemiOpt("hemi", "Hemisphere: lh or rh.", "hemi");
@@ -122,10 +122,22 @@ int main(int argc, char *argv[])
         qCritical("--from and --to are required.");
         parser.showHelp(1);
     }
-    if (hemi.isEmpty()) { qCritical("--hemi is required."); parser.showHelp(1); }
-    if (labelFile.isEmpty()) { qCritical("--label is required."); parser.showHelp(1); }
-    if (outFile.isEmpty()) { qCritical("--out is required."); parser.showHelp(1); }
-    if (subjectsDir.isEmpty()) { qCritical("$SUBJECTS_DIR not set."); return 1; }
+    if (hemi.isEmpty()) {
+        qCritical("--hemi is required.");
+        parser.showHelp(1);
+    }
+    if (labelFile.isEmpty()) {
+        qCritical("--label is required.");
+        parser.showHelp(1);
+    }
+    if (outFile.isEmpty()) {
+        qCritical("--out is required.");
+        parser.showHelp(1);
+    }
+    if (subjectsDir.isEmpty()) {
+        qCritical("$SUBJECTS_DIR not set.");
+        return 1;
+    }
 
     // Load sphere-registered surfaces
     QString srcSpherePath = QString("%1/%2/surf/%3.sphere.reg").arg(subjectsDir, fromSubject, hemi);
@@ -146,8 +158,8 @@ int main(int argc, char *argv[])
         return 1;
     }
 
-    qInfo("Source sphere: %d vertices" , (int)srcSphere.rr().rows());
-    qInfo("Dest sphere:   %d vertices" , (int)dstSphere.rr().rows());
+    qInfo("Source sphere: %d vertices", (int)srcSphere.rr().rows());
+    qInfo("Dest sphere:   %d vertices", (int)dstSphere.rr().rows());
 
     // Build nearest-neighbor mapping on sphere
     qInfo("Building nearest-neighbor mapping on sphere...");
@@ -159,7 +171,7 @@ int main(int argc, char *argv[])
         qCritical("Cannot read label: %s", qPrintable(labelFile));
         return 1;
     }
-    qInfo("Input label: %d vertices" , (int)label.vertices.size());
+    qInfo("Input label: %d vertices", (int)label.vertices.size());
 
     // Morph label vertices
     std::set<int> morphedSet;
@@ -182,13 +194,13 @@ int main(int argc, char *argv[])
     for (int v : morphedSet) {
         if (v < dstWhite.rr().rows()) {
             out << QString::asprintf("%d  %8.4f  %8.4f  %8.4f  %10.6f\n",
-                v,
-                dstWhite.rr()(v, 0), dstWhite.rr()(v, 1), dstWhite.rr()(v, 2),
-                0.0);
+                                     v,
+                                     dstWhite.rr()(v, 0), dstWhite.rr()(v, 1), dstWhite.rr()(v, 2),
+                                     0.0);
         }
     }
     outF.close();
 
-    qInfo("Morphed label: %d vertices -> %s" , (int)morphedSet.size(), qPrintable(outFile));
+    qInfo("Morphed label: %d vertices -> %s", (int)morphedSet.size(), qPrintable(outFile));
     return 0;
 }

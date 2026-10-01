@@ -39,7 +39,7 @@ using namespace MNEBROWSE;
 
 //=============================================================================================================
 
-AnnotationWindow::AnnotationWindow(QWidget *parent)
+AnnotationWindow::AnnotationWindow(QWidget* parent)
 : QDockWidget(parent)
 , m_pMainWindow(static_cast<MainWindow*>(parent))
 , m_pAnnotationModel(new AnnotationModel(this))
@@ -78,7 +78,7 @@ QTableView* AnnotationWindow::getAnnotationTableView() const
 void AnnotationWindow::addAnnotation(int startSample, int endSample, const QString& label)
 {
     const int row = m_pAnnotationModel->addAnnotation(startSample, endSample, label);
-    if(row >= 0 && m_pTableView) {
+    if (row >= 0 && m_pTableView) {
         m_pTableView->selectRow(row);
         m_pTableView->scrollTo(m_pAnnotationModel->index(row, 0));
     }
@@ -93,11 +93,11 @@ bool AnnotationWindow::isDescriptionVisible(const QString& description) const
 
 //=============================================================================================================
 
-bool AnnotationWindow::event(QEvent *event)
+bool AnnotationWindow::event(QEvent* event)
 {
-    if(event->type() == QEvent::KeyPress && m_pTableView && m_pTableView->hasFocus()) {
-        QKeyEvent *keyEvent = static_cast<QKeyEvent*>(event);
-        if(keyEvent->key() == Qt::Key_Delete) {
+    if (event->type() == QEvent::KeyPress && m_pTableView && m_pTableView->hasFocus()) {
+        QKeyEvent* keyEvent = static_cast<QKeyEvent*>(event);
+        if (keyEvent->key() == Qt::Key_Delete) {
             removeSelectedAnnotations();
             return true;
         }
@@ -135,9 +135,7 @@ void AnnotationWindow::initTable()
     m_pTableView->setModel(m_pAnnotationModel);
     m_pTableView->setSelectionBehavior(QAbstractItemView::SelectRows);
     m_pTableView->setSelectionMode(QAbstractItemView::ExtendedSelection);
-    m_pTableView->setEditTriggers(QAbstractItemView::DoubleClicked
-                                  | QAbstractItemView::EditKeyPressed
-                                  | QAbstractItemView::AnyKeyPressed);
+    m_pTableView->setEditTriggers(QAbstractItemView::DoubleClicked | QAbstractItemView::EditKeyPressed | QAbstractItemView::AnyKeyPressed);
     m_pTableView->horizontalHeader()->setStretchLastSection(true);
     m_pTableView->verticalHeader()->setVisible(false);
     m_pTableView->resizeColumnsToContents();
@@ -146,7 +144,7 @@ void AnnotationWindow::initTable()
             this, &AnnotationWindow::jumpToAnnotation);
 
     connect(m_pAnnotationModel, &AnnotationModel::annotationsChanged, this, [this]() {
-        if(m_pTableView) {
+        if (m_pTableView) {
             m_pTableView->resizeColumnsToContents();
         }
     });
@@ -177,7 +175,7 @@ void AnnotationWindow::initToolBar()
 
 void AnnotationWindow::removeSelectedAnnotations()
 {
-    if(!m_pTableView || !m_pTableView->selectionModel()) {
+    if (!m_pTableView || !m_pTableView->selectionModel()) {
         return;
     }
 
@@ -187,19 +185,18 @@ void AnnotationWindow::removeSelectedAnnotations()
                   return left.row() > right.row();
               });
 
-    for(const QModelIndex& index : selectedRows) {
+    for (const QModelIndex& index : selectedRows) {
         m_pAnnotationModel->removeRow(index.row());
     }
 }
 
 //=============================================================================================================
 
-void AnnotationWindow::jumpToAnnotation(const QModelIndex &current, const QModelIndex &previous)
+void AnnotationWindow::jumpToAnnotation(const QModelIndex& current, const QModelIndex& previous)
 {
     Q_UNUSED(previous)
 
-    if(!current.isValid() || !m_pMainWindow || !m_pMainWindow->dataWindow()
-       || !m_pMainWindow->dataWindow()->getChannelDataView()) {
+    if (!current.isValid() || !m_pMainWindow || !m_pMainWindow->dataWindow() || !m_pMainWindow->dataWindow()->getChannelDataView()) {
         return;
     }
 

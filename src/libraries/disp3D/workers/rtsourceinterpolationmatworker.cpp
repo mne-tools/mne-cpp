@@ -28,14 +28,14 @@ using namespace DISP3DLIB;
 // MEMBER METHODS
 //=============================================================================================================
 
-RtSourceInterpolationMatWorker::RtSourceInterpolationMatWorker(QObject *parent)
-    : QObject(parent)
+RtSourceInterpolationMatWorker::RtSourceInterpolationMatWorker(QObject* parent)
+: QObject(parent)
 {
 }
 
 //=============================================================================================================
 
-void RtSourceInterpolationMatWorker::setInterpolationFunction(const QString &sInterpolationFunction)
+void RtSourceInterpolationMatWorker::setInterpolationFunction(const QString& sInterpolationFunction)
 {
     QMutexLocker locker(&m_mutex);
     m_sInterpolationFunction = sInterpolationFunction;
@@ -52,9 +52,9 @@ void RtSourceInterpolationMatWorker::setCancelDistance(double dCancelDist)
 //=============================================================================================================
 
 void RtSourceInterpolationMatWorker::setInterpolationInfoLeft(
-    const Eigen::MatrixX3f &matVertices,
-    const std::vector<Eigen::VectorXi> &vecNeighborVertices,
-    const Eigen::VectorXi &vecSourceVertices)
+    const Eigen::MatrixX3f& matVertices,
+    const std::vector<Eigen::VectorXi>& vecNeighborVertices,
+    const Eigen::VectorXi& vecSourceVertices)
 {
     QMutexLocker locker(&m_mutex);
     m_matVerticesLh = matVertices;
@@ -66,9 +66,9 @@ void RtSourceInterpolationMatWorker::setInterpolationInfoLeft(
 //=============================================================================================================
 
 void RtSourceInterpolationMatWorker::setInterpolationInfoRight(
-    const Eigen::MatrixX3f &matVertices,
-    const std::vector<Eigen::VectorXi> &vecNeighborVertices,
-    const Eigen::VectorXi &vecSourceVertices)
+    const Eigen::MatrixX3f& matVertices,
+    const std::vector<Eigen::VectorXi>& vecNeighborVertices,
+    const Eigen::VectorXi& vecSourceVertices)
 {
     QMutexLocker locker(&m_mutex);
     m_matVerticesRh = matVertices;
@@ -87,9 +87,9 @@ void RtSourceInterpolationMatWorker::setVisualizationType(int iVisType)
 
 //=============================================================================================================
 
-void RtSourceInterpolationMatWorker::setAnnotationInfoLeft(const Eigen::VectorXi &vecLabelIds,
-                                                            const QList<FSLIB::FsLabel> &lLabels,
-                                                            const Eigen::VectorXi &vecVertNo)
+void RtSourceInterpolationMatWorker::setAnnotationInfoLeft(const Eigen::VectorXi& vecLabelIds,
+                                                           const QList<FSLIB::FsLabel>& lLabels,
+                                                           const Eigen::VectorXi& vecVertNo)
 {
     if (vecLabelIds.rows() == 0 || lLabels.isEmpty()) {
         qDebug() << "RtSourceInterpolationMatWorker::setAnnotationInfoLeft - FsAnnotation data is empty.";
@@ -111,9 +111,9 @@ void RtSourceInterpolationMatWorker::setAnnotationInfoLeft(const Eigen::VectorXi
 
 //=============================================================================================================
 
-void RtSourceInterpolationMatWorker::setAnnotationInfoRight(const Eigen::VectorXi &vecLabelIds,
-                                                             const QList<FSLIB::FsLabel> &lLabels,
-                                                             const Eigen::VectorXi &vecVertNo)
+void RtSourceInterpolationMatWorker::setAnnotationInfoRight(const Eigen::VectorXi& vecLabelIds,
+                                                            const QList<FSLIB::FsLabel>& lLabels,
+                                                            const Eigen::VectorXi& vecVertNo)
 {
     if (vecLabelIds.rows() == 0 || lLabels.isEmpty()) {
         qDebug() << "RtSourceInterpolationMatWorker::setAnnotationInfoRight - FsAnnotation data is empty.";
@@ -135,12 +135,16 @@ void RtSourceInterpolationMatWorker::setAnnotationInfoRight(const Eigen::VectorX
 
 //=============================================================================================================
 
-double (*RtSourceInterpolationMatWorker::resolveInterpolationFunction(const QString &name))(double)
+double (*RtSourceInterpolationMatWorker::resolveInterpolationFunction(const QString& name))(double)
 {
-    if (name == QStringLiteral("linear"))   return Interpolation::linear;
-    if (name == QStringLiteral("gaussian")) return Interpolation::gaussian;
-    if (name == QStringLiteral("square"))   return Interpolation::square;
-    if (name == QStringLiteral("cubic"))    return Interpolation::cubic;
+    if (name == QStringLiteral("linear"))
+        return Interpolation::linear;
+    if (name == QStringLiteral("gaussian"))
+        return Interpolation::gaussian;
+    if (name == QStringLiteral("square"))
+        return Interpolation::square;
+    if (name == QStringLiteral("cubic"))
+        return Interpolation::cubic;
 
     // Default to cubic
     return Interpolation::cubic;
@@ -149,8 +153,8 @@ double (*RtSourceInterpolationMatWorker::resolveInterpolationFunction(const QStr
 //=============================================================================================================
 
 QSharedPointer<Eigen::SparseMatrix<float>> RtSourceInterpolationMatWorker::computeHemi(
-    const Eigen::MatrixX3f &matVertices,
-    const std::vector<Eigen::VectorXi> &vecNeighborVertices,
+    const Eigen::MatrixX3f& matVertices,
+    const std::vector<Eigen::VectorXi>& vecNeighborVertices,
     Eigen::VectorXi vecSourceVertices,
     double dCancelDist,
     double (*interpFunc)(double))
@@ -164,8 +168,7 @@ QSharedPointer<Eigen::SparseMatrix<float>> RtSourceInterpolationMatWorker::compu
         matVertices,
         vecNeighborVertices,
         vecSourceVertices,
-        dCancelDist
-    );
+        dCancelDist);
 
     if (!distTable || distTable->rows() == 0) {
         qWarning() << "RtSourceInterpolationMatWorker: SCDC computation failed.";
@@ -177,8 +180,7 @@ QSharedPointer<Eigen::SparseMatrix<float>> RtSourceInterpolationMatWorker::compu
         vecSourceVertices,
         distTable,
         interpFunc,
-        dCancelDist
-    );
+        dCancelDist);
 
     return interpMat;
 }
@@ -301,9 +303,9 @@ void RtSourceInterpolationMatWorker::computeInterpolationMatrix()
 //=============================================================================================================
 
 QSharedPointer<Eigen::SparseMatrix<float>> RtSourceInterpolationMatWorker::computeAnnotationOperator(
-    const QList<FSLIB::FsLabel> &lLabels,
-    const QMap<qint32, qint32> &mapLabelIdSrc,
-    const QList<int> &vertNos)
+    const QList<FSLIB::FsLabel>& lLabels,
+    const QMap<qint32, qint32>& mapLabelIdSrc,
+    const QList<int>& vertNos)
 {
     if (lLabels.isEmpty() || vertNos.isEmpty()) {
         return QSharedPointer<Eigen::SparseMatrix<float>>();
@@ -320,7 +322,7 @@ QSharedPointer<Eigen::SparseMatrix<float>> RtSourceInterpolationMatWorker::compu
 
     // For each label: assign uniform weight to all its vertices from sources in that label
     for (int i = 0; i < lLabels.size(); ++i) {
-        const FSLIB::FsLabel &label = lLabels.at(i);
+        const FSLIB::FsLabel& label = lLabels.at(i);
         QList<qint32> listSourcesVertNoLabel = mapLabelIdSrc.keys(label.label_id);
 
         for (int j = 0; j < label.vertices.rows(); ++j) {

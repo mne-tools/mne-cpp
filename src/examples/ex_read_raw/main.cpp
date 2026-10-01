@@ -55,7 +55,7 @@ using namespace Eigen;
  * @param[in] argv (argument vector) is an array of pointers to arrays of character objects. The array objects are null-terminated strings, representing the arguments that were entered on the command line when the program was started.
  * @return the value that was set to exit() (which is 0 if exit() is called via quit()).
  */
-int main(int argc, char *argv[])
+int main(int argc, char* argv[])
 {
     qInstallMessageHandler(MNELogger::customLogWriter);
     QCoreApplication app(argc, argv);
@@ -85,16 +85,16 @@ int main(int argc, char *argv[])
     float to = parser.value(toOption).toFloat();
 
     bool in_samples = false;
-    if(parser.value(inSamplesOption) == "false" || parser.value(inSamplesOption) == "0") {
+    if (parser.value(inSamplesOption) == "false" || parser.value(inSamplesOption) == "0") {
         in_samples = false;
-    } else if(parser.value(inSamplesOption) == "true" || parser.value(inSamplesOption) == "1") {
+    } else if (parser.value(inSamplesOption) == "true" || parser.value(inSamplesOption) == "1") {
         in_samples = true;
     }
 
     bool keep_comp = false;
-    if(parser.value(keepCompOption) == "false" || parser.value(keepCompOption) == "0") {
+    if (parser.value(keepCompOption) == "false" || parser.value(keepCompOption) == "0") {
         keep_comp = false;
-    } else if(parser.value(keepCompOption) == "true" || parser.value(keepCompOption) == "1") {
+    } else if (parser.value(keepCompOption) == "true" || parser.value(keepCompOption) == "1") {
         keep_comp = true;
     }
 
@@ -109,9 +109,9 @@ int main(int argc, char *argv[])
     //
     QStringList include;
     include << "STI 014";
-    bool want_meg   = true;
-    bool want_eeg   = false;
-    bool want_stim  = false;
+    bool want_meg = true;
+    bool want_eeg = false;
+    bool want_stim = false;
 
     RowVectorXi picks = raw.info.pick_types(want_meg, want_eeg, want_stim, include, raw.info.bads);
     //! [fiff_raw_data_open]
@@ -122,8 +122,7 @@ int main(int argc, char *argv[])
     qint32 k = 0;
     if (raw.info.projs.size() == 0)
         qInfo("No projector specified for these data\n");
-    else
-    {
+    else {
         //
         //   Activate the projection items
         //
@@ -140,7 +139,7 @@ int main(int argc, char *argv[])
         if (nproj == 0)
             qWarning("The projection vectors do not apply to these channels\n");
         else
-            qInfo("Created an SSP operator (subspace dimension = %d)\n",nproj);
+            qInfo("Created an SSP operator (subspace dimension = %d)\n", nproj);
     }
 
     //
@@ -150,20 +149,16 @@ int main(int argc, char *argv[])
     qint32 dest_comp = 0;
 
     if (current_comp > 0)
-        qInfo("Current compensation grade : %d\n",current_comp);
+        qInfo("Current compensation grade : %d\n", current_comp);
 
     if (keep_comp)
         dest_comp = current_comp;
 
-    if (current_comp != dest_comp)
-    {
-        if(MNE::make_compensator(raw.info, current_comp, dest_comp, raw.comp))
-        {
+    if (current_comp != dest_comp) {
+        if (MNE::make_compensator(raw.info, current_comp, dest_comp, raw.comp)) {
             raw.info.set_current_comp(dest_comp);
-            qInfo("Appropriate compensator added to change to grade %d.\n",dest_comp);
-        }
-        else
-        {
+            qInfo("Appropriate compensator added to change to grade %d.\n", dest_comp);
+        } else {
             qWarning("Could not make the compensator\n");
             return -1;
         }
@@ -181,16 +176,15 @@ int main(int argc, char *argv[])
     else
         readSuccessful = raw.read_raw_segment_times(data, times, from, to, picks);
 
-    if (!readSuccessful)
-    {
+    if (!readSuccessful) {
         qWarning("Could not read raw segment.\n");
         return -1;
     }
     //! [fiff_raw_data_read_segment]
 
-    qInfo("Read %d samples.\n",(qint32)data.cols());
+    qInfo("Read %d samples.\n", (qint32)data.cols());
 
-    std::cout << data.block(0,0,10,10) << std::endl;
+    std::cout << data.block(0, 0, 10, 10) << std::endl;
 
     return app.exec();
 }

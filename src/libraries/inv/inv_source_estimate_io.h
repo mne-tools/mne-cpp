@@ -63,8 +63,8 @@ public:
      * @return true if successful.
      */
     static bool writeCsv(const InvSourceEstimate& stc,
-                          const QString& sPath,
-                          char cDelim = ',');
+                         const QString& sPath,
+                         char cDelim = ',');
 
     //=========================================================================================================
     /**
@@ -76,7 +76,7 @@ public:
      * @return Source estimate (empty if failed).
      */
     static InvSourceEstimate readCsv(const QString& sPath,
-                                      char cDelim = ',');
+                                     char cDelim = ',');
 
     //=========================================================================================================
     /**
@@ -90,7 +90,7 @@ public:
      * @return true if successful.
      */
     static bool writeMatrix(const InvSourceEstimate& stc,
-                             const QString& sPath);
+                            const QString& sPath);
 };
 
 } // namespace INVLIB

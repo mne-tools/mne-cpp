@@ -65,18 +65,21 @@ class QTreeWidget;
 class QTreeWidgetItem;
 class QWidget;
 
-namespace ANSHAREDLIB {
-    class Communicator;
-    class Event;
+namespace ANSHAREDLIB
+{
+class Communicator;
+class Event;
 }
 
-namespace DISP3DLIB {
-    class MultimodalScene;
+namespace DISP3DLIB
+{
+class MultimodalScene;
 }
 
-namespace FSLIB {
-    class FsSurface;
-    class FsLabel;
+namespace FSLIB
+{
+class FsSurface;
+class FsLabel;
 }
 
 //=============================================================================================================
@@ -90,7 +93,8 @@ namespace CORTICALSURFACEPLUGIN
 /**
  * @brief Hemisphere selection for the cortical surface plugin.
  */
-enum class HemisphereChoice {
+enum class HemisphereChoice
+{
     LeftOnly = 0,
     RightOnly,
     Both
@@ -103,10 +107,11 @@ enum class HemisphereChoice {
  * Maps directly to the FreeSurfer surface filename suffix
  * (`lh.<name>` / `rh.<name>`).
  */
-enum class CorticalSurfaceType {
-    Inflated = 0,    /**< `lh.inflated` / `rh.inflated` */
-    Pial,            /**< `lh.pial` / `rh.pial` */
-    White            /**< `lh.white` / `rh.white` */
+enum class CorticalSurfaceType
+{
+    Inflated = 0, /**< `lh.inflated` / `rh.inflated` */
+    Pial,         /**< `lh.pial` / `rh.pial` */
+    White         /**< `lh.white` / `rh.white` */
 };
 
 //=============================================================================================================
@@ -121,12 +126,12 @@ enum class CorticalSurfaceType {
  */
 struct CORTICAL_SURFACE_SHARED_EXPORT ComputeSourceEstimateOptions
 {
-    QString method  = QStringLiteral("MNE");
-    double  snr     = 3.0;     /**< Linear regularisation: lambda² = 1 / SNR². */
-    double  alpha   = 1.0;     /**< Sparsity weight (MxNE / Gamma-MAP). */
-    double  loose   = 0.2;     /**< Loose orientation factor in [0, 1]. */
-    double  depth   = 0.8;     /**< Depth weighting exponent in [0, 1]. */
-    QString onnxPath;          /**< Optional CMNE LSTM model. */
+    QString method = QStringLiteral("MNE");
+    double snr = 3.0;   /**< Linear regularisation: lambda² = 1 / SNR². */
+    double alpha = 1.0; /**< Sparsity weight (MxNE / Gamma-MAP). */
+    double loose = 0.2; /**< Loose orientation factor in [0, 1]. */
+    double depth = 0.8; /**< Depth weighting exponent in [0, 1]. */
+    QString onnxPath;   /**< Optional CMNE LSTM model. */
 };
 
 //=============================================================================================================
@@ -135,11 +140,11 @@ struct CORTICAL_SURFACE_SHARED_EXPORT ComputeSourceEstimateOptions
  */
 struct CORTICAL_SURFACE_SHARED_EXPORT CorticalPickedVertex
 {
-    int        hemi    = -1;          /**< 0 = lh, 1 = rh. */
-    int        vertex  = -1;          /**< Surface-local vertex index. */
-    QVector3D  world;                  /**< World position used to look up the vertex. */
-    QString    name;                   /**< Auto-generated or user-renamed label. */
-    QColor     color   = QColor("steelblue"); /**< Plot colour. */
+    int hemi = -1;                      /**< 0 = lh, 1 = rh. */
+    int vertex = -1;                    /**< Surface-local vertex index. */
+    QVector3D world;                    /**< World position used to look up the vertex. */
+    QString name;                       /**< Auto-generated or user-renamed label. */
+    QColor color = QColor("steelblue"); /**< Plot colour. */
 };
 
 //=============================================================================================================
@@ -172,16 +177,16 @@ public:
 
     // AbstractPlugin contract
     QSharedPointer<AbstractPlugin> clone() const override;
-    void                           init() override;
-    void                           unload() override;
-    QString                        getName() const override;
+    void init() override;
+    void unload() override;
+    QString getName() const override;
 
-    QMenu*                         getMenu() override;
-    QDockWidget*                   getControl() override;
-    QWidget*                       getView() override;
-    QString                        getBuildInfo() override;
+    QMenu* getMenu() override;
+    QDockWidget* getControl() override;
+    QWidget* getView() override;
+    QString getBuildInfo() override;
 
-    void                           handleEvent(QSharedPointer<ANSHAREDLIB::Event> e) override;
+    void handleEvent(QSharedPointer<ANSHAREDLIB::Event> e) override;
     QVector<ANSHAREDLIB::EVENT_TYPE> getEventSubscriptions() const override;
 
     //=========================================================================================================
@@ -273,8 +278,8 @@ public:
     void setColormapThresholds(float fthresh, float fmid, float fmax);
 
     float fThresh() const;
-    float fMid()    const;
-    float fMax()    const;
+    float fMid() const;
+    float fMax() const;
 
     /** @return true when the playback timer is running. */
     bool isPlaying() const;
@@ -444,7 +449,7 @@ private:
     /** Translate (subject_id, hemi, type) into a FreeSurfer file path. */
     static QString surfaceFilePath(const QString& subjectsDir,
                                    const QString& subjectId,
-                                   int            hemiCode,    // 0 = lh, 1 = rh
+                                   int hemiCode, // 0 = lh, 1 = rh
                                    CorticalSurfaceType type);
 
     /** Map a plugin enum to the on-disk surface filename suffix. */
@@ -482,7 +487,7 @@ private:
     void appendTrace(const QString& name,
                      const QColor& color,
                      const QVector<double>& trace,
-                     int hemi   = -1,
+                     int hemi = -1,
                      int vertex = -1);
 
     /** Find the row in m_stc.vertices that matches a (hemi, vertex) tuple. */
@@ -497,92 +502,93 @@ private:
     /** Write @p label to disk in FreeSurfer `.label` format. */
     static bool writeLabelFile(const FSLIB::FsLabel& label, const QString& path);
 
-    ANSHAREDLIB::Communicator*           m_pCommu = nullptr;
-    QPointer<QMenu>                      m_pMenu;
-    QPointer<QAction>                    m_pLoadSurfaceAction;
-    QPointer<QAction>                    m_pLoadStcAction;
-    QPointer<QDockWidget>                m_pControlDock;
-    QPointer<QComboBox>                  m_pHemiCombo;
-    QPointer<QComboBox>                  m_pSurfaceTypeCombo;
+    ANSHAREDLIB::Communicator* m_pCommu = nullptr;
+    QPointer<QMenu> m_pMenu;
+    QPointer<QAction> m_pLoadSurfaceAction;
+    QPointer<QAction> m_pLoadStcAction;
+    QPointer<QDockWidget> m_pControlDock;
+    QPointer<QComboBox> m_pHemiCombo;
+    QPointer<QComboBox> m_pSurfaceTypeCombo;
 
     // Overlay controls
-    QPointer<QDoubleSpinBox>             m_pFThreshSpin;
-    QPointer<QDoubleSpinBox>             m_pFMidSpin;
-    QPointer<QDoubleSpinBox>             m_pFMaxSpin;
-    QPointer<QSlider>                    m_pTimeSlider;
-    QPointer<QLabel>                     m_pTimeReadout;
-    QPointer<QPushButton>                m_pPlayButton;
-    QPointer<QDoubleSpinBox>             m_pFpsSpin;
-    QPointer<QTimer>                     m_pPlaybackTimer;
+    QPointer<QDoubleSpinBox> m_pFThreshSpin;
+    QPointer<QDoubleSpinBox> m_pFMidSpin;
+    QPointer<QDoubleSpinBox> m_pFMaxSpin;
+    QPointer<QSlider> m_pTimeSlider;
+    QPointer<QLabel> m_pTimeReadout;
+    QPointer<QPushButton> m_pPlayButton;
+    QPointer<QDoubleSpinBox> m_pFpsSpin;
+    QPointer<QTimer> m_pPlaybackTimer;
 
-    HemisphereChoice                     m_hemi = HemisphereChoice::Both;
-    CorticalSurfaceType                  m_surfaceType = CorticalSurfaceType::Inflated;
+    HemisphereChoice m_hemi = HemisphereChoice::Both;
+    CorticalSurfaceType m_surfaceType = CorticalSurfaceType::Inflated;
 
     /** Loaded surfaces keyed by hemisphere index (0 = lh, 1 = rh). */
-    QSharedPointer<FSLIB::FsSurface>     m_pSurfaceLh;
-    QSharedPointer<FSLIB::FsSurface>     m_pSurfaceRh;
+    QSharedPointer<FSLIB::FsSurface> m_pSurfaceLh;
+    QSharedPointer<FSLIB::FsSurface> m_pSurfaceRh;
 
     /** Per-plugin scene; a future slice will share this with the
      *  MNE Inspect application via the AnalyzeData store. */
     QScopedPointer<DISP3DLIB::MultimodalScene> m_pScene;
 
-    QString                              m_lastSubjectsDir;
-    QString                              m_lastSubjectId;
-    QString                              m_lastStcDir;
+    QString m_lastSubjectsDir;
+    QString m_lastSubjectId;
+    QString m_lastStcDir;
 
     // Overlay state
-    INVLIB::InvSourceEstimate            m_stc;
-    int                                  m_currentSample = -1;
-    float                                m_fThresh = 0.0f;
-    float                                m_fMid    = 0.5f;
-    float                                m_fMax    = 1.0f;
-    double                               m_fps = 10.0;
-    bool                                 m_playing = false;
+    INVLIB::InvSourceEstimate m_stc;
+    int m_currentSample = -1;
+    float m_fThresh = 0.0f;
+    float m_fMid = 0.5f;
+    float m_fMax = 1.0f;
+    double m_fps = 10.0;
+    bool m_playing = false;
 
     //=========================================================================================================
     // Time Course dock (per-vertex STC trace)
     //=========================================================================================================
 
-    QPointer<QDockWidget>                m_pTimeCourseDock;
-    QPointer<QListWidget>                m_pTimeCourseList;
-    class TimeCoursePlotter*             m_pPlotter = nullptr;
-    QPointer<QPushButton>                m_pTcRenameBtn;
-    QPointer<QPushButton>                m_pTcColorBtn;
-    QPointer<QPushButton>                m_pTcRemoveBtn;
-    QPointer<QPushButton>                m_pTcExportBtn;
+    QPointer<QDockWidget> m_pTimeCourseDock;
+    QPointer<QListWidget> m_pTimeCourseList;
+    class TimeCoursePlotter* m_pPlotter = nullptr;
+    QPointer<QPushButton> m_pTcRenameBtn;
+    QPointer<QPushButton> m_pTcColorBtn;
+    QPointer<QPushButton> m_pTcRemoveBtn;
+    QPointer<QPushButton> m_pTcExportBtn;
 
-    struct TraceEntry {
-        QString          name;
-        QColor           color;
-        QVector<double>  data;
-        int              hemi   = -1;
-        int              vertex = -1;
-        bool             isPick = false;     /**< true if produced by pickVertex(); false for label extracts. */
+    struct TraceEntry
+    {
+        QString name;
+        QColor color;
+        QVector<double> data;
+        int hemi = -1;
+        int vertex = -1;
+        bool isPick = false; /**< true if produced by pickVertex(); false for label extracts. */
     };
-    QVector<TraceEntry>                  m_traces;
+    QVector<TraceEntry> m_traces;
 
     //=========================================================================================================
     // Inverse dialog state
     //=========================================================================================================
 
-    QPointer<QAction>                    m_pComputeSourceEstimateAction;
-    QString                              m_lastFwdDir;
-    QString                              m_lastCovDir;
-    QString                              m_lastAveDir;
+    QPointer<QAction> m_pComputeSourceEstimateAction;
+    QString m_lastFwdDir;
+    QString m_lastCovDir;
+    QString m_lastAveDir;
 
     //=========================================================================================================
     // Labels dock state
     //=========================================================================================================
 
-    QPointer<QDockWidget>                m_pLabelsDock;
-    QPointer<QTreeWidget>                m_pLabelTree;
-    QTreeWidgetItem*                     m_pLabelRootLh = nullptr;
-    QTreeWidgetItem*                     m_pLabelRootRh = nullptr;
-    QPointer<QAction>                    m_pLoadLabelAction;
-    QPointer<QAction>                    m_pLoadAnnotAction;
-    QPointer<QAction>                    m_pSaveLabelAction;
-    QPointer<QAction>                    m_pCreateLabelAction;
-    QString                              m_lastLabelDir;
+    QPointer<QDockWidget> m_pLabelsDock;
+    QPointer<QTreeWidget> m_pLabelTree;
+    QTreeWidgetItem* m_pLabelRootLh = nullptr;
+    QTreeWidgetItem* m_pLabelRootRh = nullptr;
+    QPointer<QAction> m_pLoadLabelAction;
+    QPointer<QAction> m_pLoadAnnotAction;
+    QPointer<QAction> m_pSaveLabelAction;
+    QPointer<QAction> m_pCreateLabelAction;
+    QString m_lastLabelDir;
 };
 
 } // namespace CORTICALSURFACEPLUGIN

@@ -238,30 +238,30 @@ private slots:
 
     void testViewKindForFile3D()
     {
-        QCOMPARE(ViewManager::viewKindForFile("/data/lh.pial"),    ViewManager::ViewKind::ThreeDScene);
-        QCOMPARE(ViewManager::viewKindForFile("/data/rh.white"),   ViewManager::ViewKind::ThreeDScene);
+        QCOMPARE(ViewManager::viewKindForFile("/data/lh.pial"), ViewManager::ViewKind::ThreeDScene);
+        QCOMPARE(ViewManager::viewKindForFile("/data/rh.white"), ViewManager::ViewKind::ThreeDScene);
         QCOMPARE(ViewManager::viewKindForFile("/data/inner.surf"), ViewManager::ViewKind::ThreeDScene);
-        QCOMPARE(ViewManager::viewKindForFile("/data/head.bem"),   ViewManager::ViewKind::ThreeDScene);
-        QCOMPARE(ViewManager::viewKindForFile("/data/lh.inflated"),ViewManager::ViewKind::ThreeDScene);
-        QCOMPARE(ViewManager::viewKindForFile("/data/lh.orig"),    ViewManager::ViewKind::ThreeDScene);
+        QCOMPARE(ViewManager::viewKindForFile("/data/head.bem"), ViewManager::ViewKind::ThreeDScene);
+        QCOMPARE(ViewManager::viewKindForFile("/data/lh.inflated"), ViewManager::ViewKind::ThreeDScene);
+        QCOMPARE(ViewManager::viewKindForFile("/data/lh.orig"), ViewManager::ViewKind::ThreeDScene);
     }
 
     void testViewKindForFileText()
     {
-        QCOMPARE(ViewManager::viewKindForFile("/data/script.py"),   ViewManager::ViewKind::TextEditor);
-        QCOMPARE(ViewManager::viewKindForFile("/data/main.cpp"),    ViewManager::ViewKind::TextEditor);
+        QCOMPARE(ViewManager::viewKindForFile("/data/script.py"), ViewManager::ViewKind::TextEditor);
+        QCOMPARE(ViewManager::viewKindForFile("/data/main.cpp"), ViewManager::ViewKind::TextEditor);
         QCOMPARE(ViewManager::viewKindForFile("/data/config.json"), ViewManager::ViewKind::TextEditor);
-        QCOMPARE(ViewManager::viewKindForFile("/data/notes.md"),    ViewManager::ViewKind::TextEditor);
-        QCOMPARE(ViewManager::viewKindForFile("/data/header.h"),    ViewManager::ViewKind::TextEditor);
-        QCOMPARE(ViewManager::viewKindForFile("/data/lib.hpp"),     ViewManager::ViewKind::TextEditor);
-        QCOMPARE(ViewManager::viewKindForFile("/data/paper.tex"),   ViewManager::ViewKind::TextEditor);
-        QCOMPARE(ViewManager::viewKindForFile("/data/setup.mne"),   ViewManager::ViewKind::TextEditor);
+        QCOMPARE(ViewManager::viewKindForFile("/data/notes.md"), ViewManager::ViewKind::TextEditor);
+        QCOMPARE(ViewManager::viewKindForFile("/data/header.h"), ViewManager::ViewKind::TextEditor);
+        QCOMPARE(ViewManager::viewKindForFile("/data/lib.hpp"), ViewManager::ViewKind::TextEditor);
+        QCOMPARE(ViewManager::viewKindForFile("/data/paper.tex"), ViewManager::ViewKind::TextEditor);
+        QCOMPARE(ViewManager::viewKindForFile("/data/setup.mne"), ViewManager::ViewKind::TextEditor);
     }
 
     void testViewKindForFileUnsupported()
     {
-        QCOMPARE(ViewManager::viewKindForFile("/data/image.png"),   ViewManager::ViewKind::Unsupported);
-        QCOMPARE(ViewManager::viewKindForFile("/data/movie.avi"),   ViewManager::ViewKind::Unsupported);
+        QCOMPARE(ViewManager::viewKindForFile("/data/image.png"), ViewManager::ViewKind::Unsupported);
+        QCOMPARE(ViewManager::viewKindForFile("/data/movie.avi"), ViewManager::ViewKind::Unsupported);
         QCOMPARE(ViewManager::viewKindForFile("/data/archive.zip"), ViewManager::ViewKind::Unsupported);
     }
 
@@ -433,59 +433,7 @@ private slots:
             {"display_name", "Test Extension"},
             {"version", "1.2.3"},
             {"entry_point", "main.py"},
-            {"contributes", QJsonObject{
-                {"view_providers", QJsonArray{
-                    QJsonObject{
-                        {"id", "vp1"},
-                        {"display_name", "Test View"},
-                        {"widget_type", "custom"},
-                        {"slot", "right"},
-                        {"supports_scene_merging", true},
-                        {"file_extensions", QJsonArray{".stc", ".w"}}
-                    }
-                }},
-                {"tools", QJsonArray{
-                    QJsonObject{
-                        {"name", "compute_stc"},
-                        {"description", "Compute source time courses"},
-                        {"input_schema", QJsonObject{{"type", "object"}}},
-                        {"result_schema", QJsonObject{{"type", "object"}}}
-                    }
-                }},
-                {"result_renderers", QJsonArray{
-                    QJsonObject{
-                        {"id", "rr1"},
-                        {"display_name", "STC Renderer"},
-                        {"tool_names", QJsonArray{"compute_stc"}},
-                        {"widget_type", "result_renderer"}
-                    }
-                }},
-                {"analysis_pipelines", QJsonArray{
-                    QJsonObject{
-                        {"id", "pipe1"},
-                        {"display_name", "MEG Pipeline"},
-                        {"description", "Full MEG analysis"},
-                        {"input_schema", QJsonObject{{"type", "object"}}},
-                        {"output_schema", QJsonObject{{"type", "object"}}},
-                        {"steps", QJsonArray{QJsonObject{{"tool", "compute_stc"}}}},
-                        {"follow_up_actions", QJsonArray{QJsonObject{{"action", "show"}}}}
-                    }
-                }},
-                {"ui", QJsonObject{
-                    {"sidebar_items", QJsonArray{"item1", "item2"}},
-                    {"menu_items", QJsonArray{"menu1"}},
-                    {"settings_tabs", QJsonArray{
-                        QJsonObject{
-                            {"id", "tab1"},
-                            {"title", "Settings"},
-                            {"description", "Test settings"},
-                            {"fields", QJsonArray{QJsonObject{{"name", "field1"}}}},
-                            {"actions", QJsonArray{QJsonObject{{"name", "act1"}}}}
-                        }
-                    }}
-                }}
-            }}
-        };
+            {"contributes", QJsonObject{{"view_providers", QJsonArray{QJsonObject{{"id", "vp1"}, {"display_name", "Test View"}, {"widget_type", "custom"}, {"slot", "right"}, {"supports_scene_merging", true}, {"file_extensions", QJsonArray{".stc", ".w"}}}}}, {"tools", QJsonArray{QJsonObject{{"name", "compute_stc"}, {"description", "Compute source time courses"}, {"input_schema", QJsonObject{{"type", "object"}}}, {"result_schema", QJsonObject{{"type", "object"}}}}}}, {"result_renderers", QJsonArray{QJsonObject{{"id", "rr1"}, {"display_name", "STC Renderer"}, {"tool_names", QJsonArray{"compute_stc"}}, {"widget_type", "result_renderer"}}}}, {"analysis_pipelines", QJsonArray{QJsonObject{{"id", "pipe1"}, {"display_name", "MEG Pipeline"}, {"description", "Full MEG analysis"}, {"input_schema", QJsonObject{{"type", "object"}}}, {"output_schema", QJsonObject{{"type", "object"}}}, {"steps", QJsonArray{QJsonObject{{"tool", "compute_stc"}}}}, {"follow_up_actions", QJsonArray{QJsonObject{{"action", "show"}}}}}}}, {"ui", QJsonObject{{"sidebar_items", QJsonArray{"item1", "item2"}}, {"menu_items", QJsonArray{"menu1"}}, {"settings_tabs", QJsonArray{QJsonObject{{"id", "tab1"}, {"title", "Settings"}, {"description", "Test settings"}, {"fields", QJsonArray{QJsonObject{{"name", "field1"}}}}, {"actions", QJsonArray{QJsonObject{{"name", "act1"}}}}}}}}}}}};
 
         tmp.write(QJsonDocument(manifest).toJson());
         tmp.flush();
@@ -543,20 +491,19 @@ private slots:
     void testFiffBufferProperties()
     {
         // The truncated raw file ships with mne-cpp-test-data, not with MNE sample data.
-        QString sampleFile = QCoreApplication::applicationDirPath()
-            + "/../resources/data/mne-cpp-test-data/MEG/sample/sample_audvis_trunc_raw.fif";
+        QString sampleFile = QCoreApplication::applicationDirPath() + "/../resources/data/mne-cpp-test-data/MEG/sample/sample_audvis_trunc_raw.fif";
 
-        if(!QFile::exists(sampleFile)) {
+        if (!QFile::exists(sampleFile)) {
             sampleFile = QString("%1/%2").arg(
                 qgetenv("MNE_SAMPLE_DATA_PATH").constData(),
                 "MEG/sample/sample_audvis_trunc_raw.fif");
         }
 
-        if(!QFile::exists(sampleFile)) {
+        if (!QFile::exists(sampleFile)) {
             sampleFile = QDir::homePath() + "/mne_data/MNE-sample-data/MEG/sample/sample_audvis_trunc_raw.fif";
         }
 
-        if(!QFile::exists(sampleFile)) {
+        if (!QFile::exists(sampleFile)) {
             QSKIP("MNE sample data not found");
         }
 
@@ -623,22 +570,7 @@ private slots:
             {"id", "com.test.ext1"},
             {"display_name", "Test Ext 1"},
             {"version", "0.1.0"},
-            {"contributes", QJsonObject{
-                {"view_providers", QJsonArray{
-                    QJsonObject{
-                        {"id", "vp_test"},
-                        {"display_name", "Test Provider"},
-                        {"file_extensions", QJsonArray{".stc", ".w"}}
-                    }
-                }},
-                {"tools", QJsonArray{
-                    QJsonObject{
-                        {"name", "my_tool"},
-                        {"description", "A test tool"}
-                    }
-                }}
-            }}
-        };
+            {"contributes", QJsonObject{{"view_providers", QJsonArray{QJsonObject{{"id", "vp_test"}, {"display_name", "Test Provider"}, {"file_extensions", QJsonArray{".stc", ".w"}}}}}, {"tools", QJsonArray{QJsonObject{{"name", "my_tool"}, {"description", "A test tool"}}}}}}};
 
         manifestFile.write(QJsonDocument(manifest).toJson());
         manifestFile.close();
@@ -696,17 +628,7 @@ private slots:
         QVERIFY(manifestFile.open(QIODevice::WriteOnly));
         QJsonObject manifest{
             {"id", "ext.b"},
-            {"contributes", QJsonObject{
-                {"view_providers", QJsonArray{
-                    QJsonObject{
-                        {"id", "custom_viewer"},
-                        {"display_name", "Custom Viewer"},
-                        {"widget_type", "custom_widget"},
-                        {"file_extensions", QJsonArray{".xyz"}}
-                    }
-                }}
-            }}
-        };
+            {"contributes", QJsonObject{{"view_providers", QJsonArray{QJsonObject{{"id", "custom_viewer"}, {"display_name", "Custom Viewer"}, {"widget_type", "custom_widget"}, {"file_extensions", QJsonArray{".xyz"}}}}}}}};
         manifestFile.write(QJsonDocument(manifest).toJson());
         manifestFile.close();
 
@@ -732,17 +654,7 @@ private slots:
         QVERIFY(manifestFile.open(QIODevice::WriteOnly));
         QJsonObject manifest{
             {"id", "ext.c"},
-            {"contributes", QJsonObject{
-                {"view_providers", QJsonArray{
-                    QJsonObject{
-                        {"id", "stc_viewer"},
-                        {"display_name", "STC Viewer"},
-                        {"file_extensions", QJsonArray{".stc"}},
-                        {"supports_scene_merging", true}
-                    }
-                }}
-            }}
-        };
+            {"contributes", QJsonObject{{"view_providers", QJsonArray{QJsonObject{{"id", "stc_viewer"}, {"display_name", "STC Viewer"}, {"file_extensions", QJsonArray{".stc"}}, {"supports_scene_merging", true}}}}}}};
         manifestFile.write(QJsonDocument(manifest).toJson());
         manifestFile.close();
 

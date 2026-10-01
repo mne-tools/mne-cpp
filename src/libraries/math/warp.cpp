@@ -59,7 +59,7 @@ using namespace Eigen;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-MatrixXf Warp::calculate(const MatrixXf &sLm, const MatrixXf &dLm, const MatrixXf &sVert)
+MatrixXf Warp::calculate(const MatrixXf& sLm, const MatrixXf& dLm, const MatrixXf& sVert)
 {
     MatrixXf warpWeight, polWeight;
     calcWeighting(sLm, dLm, warpWeight, polWeight);
@@ -69,49 +69,48 @@ MatrixXf Warp::calculate(const MatrixXf &sLm, const MatrixXf &dLm, const MatrixX
 
 //=============================================================================================================
 
-void Warp::calculate(const MatrixXf & sLm, const MatrixXf &dLm, QList<MatrixXf> & vertList)
+void Warp::calculate(const MatrixXf& sLm, const MatrixXf& dLm, QList<MatrixXf>& vertList)
 {
     MatrixXf warpWeight, polWeight;
     calcWeighting(sLm, dLm, warpWeight, polWeight);
 
-    for (int i=0; i<vertList.size(); i++)
-    {
-        vertList.replace(i,warpVertices(vertList.at(i), sLm, warpWeight, polWeight));
+    for (int i = 0; i < vertList.size(); i++) {
+        vertList.replace(i, warpVertices(vertList.at(i), sLm, warpWeight, polWeight));
     }
     return;
 }
 
 //=============================================================================================================
 
-bool Warp::calcWeighting(const MatrixXf &sLm, const MatrixXf &dLm, MatrixXf& warpWeight, MatrixXf& polWeight)
+bool Warp::calcWeighting(const MatrixXf& sLm, const MatrixXf& dLm, MatrixXf& warpWeight, MatrixXf& polWeight)
 {
-    MatrixXf K = MatrixXf::Zero(sLm.rows(),sLm.rows());     //K(i,j)=||sLm(i)-sLm(j)||
-    for (int i=0; i<sLm.rows(); i++)
-        K.col(i)=((sLm.rowwise()-sLm.row(i)).rowwise().norm());
+    MatrixXf K = MatrixXf::Zero(sLm.rows(), sLm.rows()); //K(i,j)=||sLm(i)-sLm(j)||
+    for (int i = 0; i < sLm.rows(); i++)
+        K.col(i) = ((sLm.rowwise() - sLm.row(i)).rowwise().norm());
 
-//    std::cout << "Here is the matrix K:" << std::endl << K << std::endl;
+    //    std::cout << "Here is the matrix K:" << std::endl << K << std::endl;
 
-    MatrixXf P (sLm.rows(),4);                              //P=[ones,sLm]
-    P << MatrixXf::Ones(sLm.rows(),1),sLm;
-//    std::cout << "Here is the matrix P:" << std::endl << P << std::endl;
+    MatrixXf P(sLm.rows(), 4); //P=[ones,sLm]
+    P << MatrixXf::Ones(sLm.rows(), 1), sLm;
+    //    std::cout << "Here is the matrix P:" << std::endl << P << std::endl;
 
-    MatrixXf L ((sLm.rows()+4),(sLm.rows()+4));             //L=Full Matrix of the linear eq.
-    L <<    K,P,
-            P.transpose(),MatrixXf::Zero(4,4);
-//    std::cout << "Here is the matrix L:" << std::endl << L << std::endl;
+    MatrixXf L((sLm.rows() + 4), (sLm.rows() + 4)); //L=Full Matrix of the linear eq.
+    L << K, P,
+        P.transpose(), MatrixXf::Zero(4, 4);
+    //    std::cout << "Here is the matrix L:" << std::endl << L << std::endl;
 
-    MatrixXf Y ((dLm.rows()+4),3);                          //Y=[dLm,Zero]
-    Y <<    dLm,
-            MatrixXf::Zero(4,3);
-//    std::cout << "Here is the matrix Y:" << std::endl << Y << std::endl;
+    MatrixXf Y((dLm.rows() + 4), 3); //Y=[dLm,Zero]
+    Y << dLm,
+        MatrixXf::Zero(4, 3);
+    //    std::cout << "Here is the matrix Y:" << std::endl << Y << std::endl;
 
     //
     // calculate the weighting matrix (Y=L*W)
     //
-    MatrixXf W ((dLm.rows()+4),3);                          //W=[warpWeight,polWeight]
-    Eigen::FullPivLU <MatrixXf> Lu(L);                      //LU decomposition is one method to solve lin. eq.
-    W=Lu.solve(Y);
-//    std::cout << "Here is the matrix W:" << std::endl << W << std::endl;
+    MatrixXf W((dLm.rows() + 4), 3);  //W=[warpWeight,polWeight]
+    Eigen::FullPivLU<MatrixXf> Lu(L); //LU decomposition is one method to solve lin. eq.
+    W = Lu.solve(Y);
+    //    std::cout << "Here is the matrix W:" << std::endl << W << std::endl;
 
     warpWeight = W.topRows(sLm.rows());
     polWeight = W.bottomRows(4);
@@ -121,60 +120,59 @@ bool Warp::calcWeighting(const MatrixXf &sLm, const MatrixXf &dLm, MatrixXf& war
 
 //=============================================================================================================
 
-MatrixXf Warp::warpVertices(const MatrixXf &sVert, const MatrixXf & sLm, const MatrixXf& warpWeight, const MatrixXf& polWeight)
+MatrixXf Warp::warpVertices(const MatrixXf& sVert, const MatrixXf& sLm, const MatrixXf& warpWeight, const MatrixXf& polWeight)
 {
-    MatrixXf wVert = sVert * polWeight.bottomRows(3);         //Pol. Warp
-    wVert.rowwise() += polWeight.row(0);                      //Translation
+    MatrixXf wVert = sVert * polWeight.bottomRows(3); //Pol. Warp
+    wVert.rowwise() += polWeight.row(0);              //Translation
 
     //
     // TPS Warp
     //
-    MatrixXf K = MatrixXf::Zero(sVert.rows(),sLm.rows());     //K(i,j)=||sLm(i)-sLm(j)||
-    for (int i=0; i<sVert.rows(); i++)
-        K.row(i)=((sLm.rowwise()-sVert.row(i)).rowwise().norm().transpose());
-//    std::cout << "Here is the matrix K:" << std::endl << K << std::endl;
+    MatrixXf K = MatrixXf::Zero(sVert.rows(), sLm.rows()); //K(i,j)=||sLm(i)-sLm(j)||
+    for (int i = 0; i < sVert.rows(); i++)
+        K.row(i) = ((sLm.rowwise() - sVert.row(i)).rowwise().norm().transpose());
+    //    std::cout << "Here is the matrix K:" << std::endl << K << std::endl;
 
-    wVert += K*warpWeight;
-//    std::cout << "Here is the matrix wVert:" << std::endl << wVert << std::endl;
+    wVert += K * warpWeight;
+    //    std::cout << "Here is the matrix wVert:" << std::endl << wVert << std::endl;
     return wVert;
 }
 
 //=============================================================================================================
 
-MatrixXf Warp::readsLm(const QString &electrodeFileName)
+MatrixXf Warp::readsLm(const QString& electrodeFileName)
 {
     MatrixXf electrodes;
     QFile file(electrodeFileName);
 
-    if(!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
-        qDebug()<<"Error opening file";
-//        return false;
+    if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
+        qDebug() << "Error opening file";
+        //        return false;
     }
 
     //Start reading from file
     double numberElectrodes;
     QTextStream in(&file);
-    int i=0;
+    int i = 0;
 
-    while(!in.atEnd())
-    {
+    while (!in.atEnd()) {
         QString line = in.readLine();
         QStringList fields = line.split(QRegularExpression("\\s+"));
 
         //Delete last element if it is a blank character
-        if(fields.at(fields.size()-1) == "")
+        if (fields.at(fields.size() - 1) == "")
             fields.removeLast();
 
         //Read number of electrodes
-        if(i == 0){
-            numberElectrodes = fields.at(fields.size()-1).toDouble();
+        if (i == 0) {
+            numberElectrodes = fields.at(fields.size() - 1).toDouble();
             electrodes = MatrixXf::Zero(numberElectrodes, 3);
         }
         //Read actual electrode positions
-        else{
+        else {
             Vector3f x;
-            x << fields.at(fields.size()-3).toFloat(),fields.at(fields.size()-2).toFloat(),fields.at(fields.size()-1).toFloat();
-            electrodes.row(i-1)=x.transpose();
+            x << fields.at(fields.size() - 3).toFloat(), fields.at(fields.size() - 2).toFloat(), fields.at(fields.size() - 1).toFloat();
+            electrodes.row(i - 1) = x.transpose();
         }
         i++;
     }
@@ -183,15 +181,15 @@ MatrixXf Warp::readsLm(const QString &electrodeFileName)
 
 //=============================================================================================================
 
-MatrixXf Warp::readsLm(const std::string &electrodeFileName)
+MatrixXf Warp::readsLm(const std::string& electrodeFileName)
 {
     MatrixXf electrodes;
     std::ifstream inFile(electrodeFileName);
 
-    if(!inFile.is_open()) {
-        qDebug()<<"Error opening file";
+    if (!inFile.is_open()) {
+        qDebug() << "Error opening file";
         //Why are we not returning?
-//        return false;
+        //        return false;
     }
 
     //Start reading from file
@@ -199,28 +197,28 @@ MatrixXf Warp::readsLm(const std::string &electrodeFileName)
     int i = 0;
 
     std::string line;
-    while(std::getline(inFile, line)){
+    while (std::getline(inFile, line)) {
         std::vector<std::string> fields;
         std::stringstream stream{line};
         std::string element;
 
         stream >> std::ws;
-        while(stream >> element){
+        while (stream >> element) {
             fields.push_back(std::move(element));
             stream >> std::ws;
         }
 
         //Read number of electrodes
-        if(i == 0){
-            numberElectrodes = std::stod(fields.at(fields.size()-1));
+        if (i == 0) {
+            numberElectrodes = std::stod(fields.at(fields.size() - 1));
             electrodes = MatrixXf::Zero(numberElectrodes, 3);
         }
 
         //Read actual electrode positions
-        else{
+        else {
             Vector3f x;
-            x << std::stof(fields.at(fields.size()-3)), std::stof(fields.at(fields.size()-2)), std::stof(fields.at(fields.size()-1));
-            electrodes.row(i-1)=x.transpose();
+            x << std::stof(fields.at(fields.size() - 3)), std::stof(fields.at(fields.size() - 2)), std::stof(fields.at(fields.size() - 1));
+            electrodes.row(i - 1) = x.transpose();
         }
         i++;
     }

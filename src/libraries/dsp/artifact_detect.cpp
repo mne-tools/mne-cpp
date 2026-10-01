@@ -56,10 +56,10 @@ using namespace Eigen;
 //=============================================================================================================
 
 RowVectorXd ArtifactDetect::bandpassFilter(const RowVectorXd& vecSignal,
-                                             double             dSFreq,
-                                             double             dLow,
-                                             double             dHigh,
-                                             int                iOrder)
+                                           double dSFreq,
+                                           double dLow,
+                                           double dHigh,
+                                           int iOrder)
 {
     QVector<IirBiquad> sos;
 
@@ -76,18 +76,20 @@ RowVectorXd ArtifactDetect::bandpassFilter(const RowVectorXd& vecSignal,
 //=============================================================================================================
 
 QVector<int> ArtifactDetect::findPeaks(const RowVectorXd& vecSignal,
-                                         double             dThreshold,
-                                         int                iMinDist)
+                                       double dThreshold,
+                                       int iMinDist)
 {
     QVector<int> peaks;
     const int N = static_cast<int>(vecSignal.size());
-    if (N < 3) return peaks;
+    if (N < 3)
+        return peaks;
 
     int lastPeak = -iMinDist - 1;
 
     for (int i = 1; i < N - 1; ++i) {
         double v = vecSignal(i);
-        if (v < dThreshold) continue;
+        if (v < dThreshold)
+            continue;
 
         // Local maximum check
         if (v > vecSignal(i - 1) && v >= vecSignal(i + 1)) {
@@ -110,10 +112,10 @@ QVector<int> ArtifactDetect::findPeaks(const RowVectorXd& vecSignal,
 // PUBLIC DEFINITIONS
 //=============================================================================================================
 
-QVector<int> ArtifactDetect::detectEcg(const MatrixXd&  matData,
-                                         const FiffInfo&  fiffInfo,
-                                         double           dSFreq,
-                                         const EcgParams& params)
+QVector<int> ArtifactDetect::detectEcg(const MatrixXd& matData,
+                                       const FiffInfo& fiffInfo,
+                                       double dSFreq,
+                                       const EcgParams& params)
 {
     // ---- Find ECG channel ----
     int ecgIdx = -1;
@@ -144,7 +146,7 @@ QVector<int> ArtifactDetect::detectEcg(const MatrixXd&  matData,
                 // magnetometers have a single integration point — heuristically identified
                 // as FIFFV_COIL_MAG type; use channel unit as a proxy (T vs T/m).
                 // Use unit: FIFF_UNIT_T = 112, FIFF_UNIT_T_M = 201
-                if (fiffInfo.chs[i].unit == 112) {  // Tesla — magnetometer
+                if (fiffInfo.chs[i].unit == 112) { // Tesla — magnetometer
                     magIdx.append(i);
                 }
             }
@@ -174,8 +176,8 @@ QVector<int> ArtifactDetect::detectEcg(const MatrixXd&  matData,
 
     // ---- Band-pass filter to isolate QRS complex ----
     RowVectorXd filtered = bandpassFilter(ecgSignal, dSFreq,
-                                           params.dFilterLow, params.dFilterHigh,
-                                           params.iFilterOrder);
+                                          params.dFilterLow, params.dFilterHigh,
+                                          params.iFilterOrder);
 
     // ---- Adaptive threshold: fraction of the peak-to-peak amplitude ----
     double sigMin = filtered.minCoeff();
@@ -191,10 +193,10 @@ QVector<int> ArtifactDetect::detectEcg(const MatrixXd&  matData,
 
 //=============================================================================================================
 
-QVector<int> ArtifactDetect::detectEog(const MatrixXd&  matData,
-                                         const FiffInfo&  fiffInfo,
-                                         double           dSFreq,
-                                         const EogParams& params)
+QVector<int> ArtifactDetect::detectEog(const MatrixXd& matData,
+                                       const FiffInfo& fiffInfo,
+                                       double dSFreq,
+                                       const EogParams& params)
 {
     // ---- Find EOG channel(s) ----
     QVector<int> eogIdx;
@@ -225,8 +227,8 @@ QVector<int> ArtifactDetect::detectEog(const MatrixXd&  matData,
 
     // ---- Low-pass filter ----
     RowVectorXd filtered = bandpassFilter(eogSignal, dSFreq,
-                                           0.0, params.dFilterHigh,
-                                           params.iFilterOrder);
+                                          0.0, params.dFilterHigh,
+                                          params.iFilterOrder);
 
     // ---- Detect excursions above ±threshold ----
     // Work on the absolute value so both positive (downward blinks, depending on EOG polarity)

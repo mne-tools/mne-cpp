@@ -46,13 +46,15 @@
 class QThread;
 class QTimer;
 
-namespace FSLIB {
-    class FsLabel;
+namespace FSLIB
+{
+class FsLabel;
 }
 
-namespace DISP3DLIB {
-    class RtSourceDataWorker;
-    class RtSourceInterpolationMatWorker;
+namespace DISP3DLIB
+{
+class RtSourceDataWorker;
+class RtSourceInterpolationMatWorker;
 }
 
 //=============================================================================================================
@@ -96,7 +98,7 @@ public:
      *
      * @param[in] parent     Parent QObject.
      */
-    explicit RtSourceDataController(QObject *parent = nullptr);
+    explicit RtSourceDataController(QObject* parent = nullptr);
 
     //=========================================================================================================
     /**
@@ -111,7 +113,7 @@ public:
      *
      * @param[in] data       Source activity vector (nSourcesLH + nSourcesRH).
      */
-    void addData(const Eigen::VectorXd &data);
+    void addData(const Eigen::VectorXd& data);
 
     //=========================================================================================================
     /**
@@ -167,7 +169,7 @@ public:
      *
      * @param[in] name       Colormap name ("Hot", "Jet", "Viridis", "Cool", "RedBlue").
      */
-    void setColormapType(const QString &name);
+    void setColormapType(const QString& name);
 
     //=========================================================================================================
     /**
@@ -210,8 +212,8 @@ public:
      * @param[in] baseColorsLh   Per-vertex ABGR colors for the left hemisphere.
      * @param[in] baseColorsRh   Per-vertex ABGR colors for the right hemisphere.
      */
-    void setSurfaceColor(const QVector<uint32_t> &baseColorsLh,
-                         const QVector<uint32_t> &baseColorsRh);
+    void setSurfaceColor(const QVector<uint32_t>& baseColorsLh,
+                         const QVector<uint32_t>& baseColorsRh);
 
     //=========================================================================================================
     /**
@@ -232,7 +234,7 @@ public:
      * @param[in] sInterpolationFunction    Function name ("linear", "gaussian",
      *                                      "square", "cubic").
      */
-    void setInterpolationFunction(const QString &sInterpolationFunction);
+    void setInterpolationFunction(const QString& sInterpolationFunction);
 
     //=========================================================================================================
     /**
@@ -252,9 +254,9 @@ public:
      * @param[in] vecNeighborVertices   Per-vertex neighbor index lists.
      * @param[in] vecSourceVertices     Source vertex indices into the surface.
      */
-    void setInterpolationInfoLeft(const Eigen::MatrixX3f &matVertices,
-                                  const std::vector<Eigen::VectorXi> &vecNeighborVertices,
-                                  const Eigen::VectorXi &vecSourceVertices);
+    void setInterpolationInfoLeft(const Eigen::MatrixX3f& matVertices,
+                                  const std::vector<Eigen::VectorXi>& vecNeighborVertices,
+                                  const Eigen::VectorXi& vecSourceVertices);
 
     //=========================================================================================================
     /**
@@ -265,9 +267,9 @@ public:
      * @param[in] vecNeighborVertices   Per-vertex neighbor index lists.
      * @param[in] vecSourceVertices     Source vertex indices into the surface.
      */
-    void setInterpolationInfoRight(const Eigen::MatrixX3f &matVertices,
-                                   const std::vector<Eigen::VectorXi> &vecNeighborVertices,
-                                   const Eigen::VectorXi &vecSourceVertices);
+    void setInterpolationInfoRight(const Eigen::MatrixX3f& matVertices,
+                                   const std::vector<Eigen::VectorXi>& vecNeighborVertices,
+                                   const Eigen::VectorXi& vecSourceVertices);
 
     //=========================================================================================================
     /**
@@ -292,9 +294,9 @@ public:
      * @param[in] lLabels       FreeSurfer Labels.
      * @param[in] vecVertNo     Source vertex numbers.
      */
-    void setAnnotationInfoLeft(const Eigen::VectorXi &vecLabelIds,
-                               const QList<FSLIB::FsLabel> &lLabels,
-                               const Eigen::VectorXi &vecVertNo);
+    void setAnnotationInfoLeft(const Eigen::VectorXi& vecLabelIds,
+                               const QList<FSLIB::FsLabel>& lLabels,
+                               const Eigen::VectorXi& vecVertNo);
 
     //=========================================================================================================
     /**
@@ -304,9 +306,9 @@ public:
      * @param[in] lLabels       FreeSurfer Labels.
      * @param[in] vecVertNo     Source vertex numbers.
      */
-    void setAnnotationInfoRight(const Eigen::VectorXi &vecLabelIds,
-                                const QList<FSLIB::FsLabel> &lLabels,
-                                const Eigen::VectorXi &vecVertNo);
+    void setAnnotationInfoRight(const Eigen::VectorXi& vecLabelIds,
+                                const QList<FSLIB::FsLabel>& lLabels,
+                                const Eigen::VectorXi& vecVertNo);
 
 signals:
     //=========================================================================================================
@@ -316,8 +318,8 @@ signals:
      * @param[in] colorsLh   Per-vertex ABGR color array for the left hemisphere.
      * @param[in] colorsRh   Per-vertex ABGR color array for the right hemisphere.
      */
-    void newSmoothedDataAvailable(const QVector<uint32_t> &colorsLh,
-                                  const QVector<uint32_t> &colorsRh);
+    void newSmoothedDataAvailable(const QVector<uint32_t>& colorsLh,
+                                  const QVector<uint32_t>& colorsRh);
 
     //=========================================================================================================
     /**
@@ -326,8 +328,8 @@ signals:
      * @param[in] dataLh     Source values for left hemisphere.
      * @param[in] dataRh     Source values for right hemisphere.
      */
-    void newRawDataAvailable(const Eigen::VectorXd &dataLh,
-                             const Eigen::VectorXd &dataRh);
+    void newRawDataAvailable(const Eigen::VectorXd& dataLh,
+                             const Eigen::VectorXd& dataRh);
 
     //=========================================================================================================
     /**
@@ -350,14 +352,14 @@ private slots:
     void onNewInterpolationMatrixRight(QSharedPointer<Eigen::SparseMatrix<float>> interpMat);
 
 private:
-    QThread *m_pWorkerThread = nullptr;                     /**< Background thread for the data worker. */
-    DISP3DLIB::RtSourceDataWorker *m_pWorker = nullptr;  /**< Data streaming worker. */
-    QTimer *m_pTimer = nullptr;                             /**< Timer driving the streaming cadence. */
-    bool m_bIsStreaming = false;                             /**< Whether streaming is active. */
-    int m_iTimeInterval = 17;                               /**< Streaming interval in ms (~60fps). */
+    QThread* m_pWorkerThread = nullptr;                 /**< Background thread for the data worker. */
+    DISP3DLIB::RtSourceDataWorker* m_pWorker = nullptr; /**< Data streaming worker. */
+    QTimer* m_pTimer = nullptr;                         /**< Timer driving the streaming cadence. */
+    bool m_bIsStreaming = false;                        /**< Whether streaming is active. */
+    int m_iTimeInterval = 17;                           /**< Streaming interval in ms (~60fps). */
 
-    QThread *m_pInterpThread = nullptr;                     /**< Background thread for interpolation matrix worker. */
-    DISP3DLIB::RtSourceInterpolationMatWorker *m_pInterpWorker = nullptr; /**< Interpolation matrix worker. */
+    QThread* m_pInterpThread = nullptr;                                   /**< Background thread for interpolation matrix worker. */
+    DISP3DLIB::RtSourceInterpolationMatWorker* m_pInterpWorker = nullptr; /**< Interpolation matrix worker. */
 };
 
 #endif // BRAINVIEW_RTSOURCEDATACONTROLLER_H

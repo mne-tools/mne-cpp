@@ -54,14 +54,13 @@ void Subject::detach(IObserver* pObserver)
 
 void Subject::notify()
 {
-    if(notifyEnabled)
-    {
+    if (notifyEnabled) {
         t_Observers::const_iterator it = m_Observers.begin();
-        for( ; it != m_Observers.end(); ++it)
+        for (; it != m_Observers.end(); ++it)
             (*it)->update(this);
-//        for(auto observer : m_Observers){
-//            observer->update(this);
-//        }
+        //        for(auto observer : m_Observers){
+        //            observer->update(this);
+        //        }
     }
 }
 

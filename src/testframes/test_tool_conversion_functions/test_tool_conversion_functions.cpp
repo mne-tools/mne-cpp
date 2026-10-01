@@ -138,7 +138,7 @@ void TestToolConversionFunctions::testParseBVHeaderBasic()
     QCOMPARE(hdr.dataFile, QString("test.eeg"));
     QCOMPARE(hdr.markerFile, QString("test.vmrk"));
     QCOMPARE(hdr.dataFormat, QString("BINARY"));
-    QCOMPARE(hdr.dataOrientation, 0);  // MULTIPLEXED
+    QCOMPARE(hdr.dataOrientation, 0); // MULTIPLEXED
     QCOMPARE(hdr.numberOfChannels, 3);
     QCOMPARE(hdr.samplingInterval, 2000.0);
     QCOMPARE(hdr.binaryFormat, QString("INT_16"));
@@ -185,8 +185,8 @@ void TestToolConversionFunctions::testParseBVHeaderDefaults()
 
     BVHeader hdr;
     QVERIFY(parseBVHeader(vhdrPath, hdr));
-    QCOMPARE(hdr.dataOrientation, 0);     // default: MULTIPLEXED
-    QCOMPARE(hdr.binaryFormat, QString("INT_16"));  // default
+    QCOMPARE(hdr.dataOrientation, 0);              // default: MULTIPLEXED
+    QCOMPARE(hdr.binaryFormat, QString("INT_16")); // default
     QCOMPARE(hdr.numberOfChannels, 2);
     // Missing channels should be auto-filled
     QCOMPARE(hdr.channels.size(), 2);
@@ -263,7 +263,8 @@ void TestToolConversionFunctions::testReadBVDataInt16Multiplexed()
     ds.setByteOrder(QDataStream::LittleEndian);
     // Multiplexed: [ch0_s0, ch1_s0, ch0_s1, ch1_s1, ...]
     qint16 values[] = {100, 200, 300, 400, 500, 600, 700, 800};
-    for (int i = 0; i < 8; i++) ds << values[i];
+    for (int i = 0; i < 8; i++)
+        ds << values[i];
     file.close();
 
     BVHeader hdr;
@@ -271,8 +272,14 @@ void TestToolConversionFunctions::testReadBVDataInt16Multiplexed()
     hdr.binaryFormat = "INT_16";
     hdr.dataOrientation = 0; // MULTIPLEXED
     hdr.channels.clear();
-    BVChannelInfo ch1; ch1.name = "A"; ch1.resolution = 0.5; hdr.channels.append(ch1);
-    BVChannelInfo ch2; ch2.name = "B"; ch2.resolution = 1.0; hdr.channels.append(ch2);
+    BVChannelInfo ch1;
+    ch1.name = "A";
+    ch1.resolution = 0.5;
+    hdr.channels.append(ch1);
+    BVChannelInfo ch2;
+    ch2.name = "B";
+    ch2.resolution = 1.0;
+    hdr.channels.append(ch2);
 
     MatrixXd data;
     QVERIFY(readBVData(dataPath, hdr, data));
@@ -297,7 +304,8 @@ void TestToolConversionFunctions::testReadBVDataFloat32Vectorized()
     ds.setFloatingPointPrecision(QDataStream::SinglePrecision);
     // Vectorized: all ch0 samples, then all ch1 samples
     float values[] = {1.0f, 2.0f, 3.0f, 4.0f, 5.0f, 6.0f};
-    for (int i = 0; i < 6; i++) ds << values[i];
+    for (int i = 0; i < 6; i++)
+        ds << values[i];
     file.close();
 
     BVHeader hdr;
@@ -305,16 +313,22 @@ void TestToolConversionFunctions::testReadBVDataFloat32Vectorized()
     hdr.binaryFormat = "IEEE_FLOAT_32";
     hdr.dataOrientation = 1; // VECTORIZED
     hdr.channels.clear();
-    BVChannelInfo ch1; ch1.name = "A"; ch1.resolution = 2.0; hdr.channels.append(ch1);
-    BVChannelInfo ch2; ch2.name = "B"; ch2.resolution = 1.0; hdr.channels.append(ch2);
+    BVChannelInfo ch1;
+    ch1.name = "A";
+    ch1.resolution = 2.0;
+    hdr.channels.append(ch1);
+    BVChannelInfo ch2;
+    ch2.name = "B";
+    ch2.resolution = 1.0;
+    hdr.channels.append(ch2);
 
     MatrixXd data;
     QVERIFY(readBVData(dataPath, hdr, data));
     QCOMPARE(data.rows(), 2);
     QCOMPARE(data.cols(), (Eigen::Index)3);
-    QCOMPARE(data(0, 0), 2.0);   // 1.0 * 2.0
-    QCOMPARE(data(0, 2), 6.0);   // 3.0 * 2.0
-    QCOMPARE(data(1, 0), 4.0);   // 4.0 * 1.0
+    QCOMPARE(data(0, 0), 2.0); // 1.0 * 2.0
+    QCOMPARE(data(0, 2), 6.0); // 3.0 * 2.0
+    QCOMPARE(data(1, 0), 4.0); // 4.0 * 1.0
 }
 
 void TestToolConversionFunctions::testReadBVDataUint16()
@@ -325,7 +339,8 @@ void TestToolConversionFunctions::testReadBVDataUint16()
     QDataStream ds(&file);
     ds.setByteOrder(QDataStream::LittleEndian);
     quint16 values[] = {1000, 2000};
-    for (int i = 0; i < 2; i++) ds << values[i];
+    for (int i = 0; i < 2; i++)
+        ds << values[i];
     file.close();
 
     BVHeader hdr;
@@ -333,14 +348,17 @@ void TestToolConversionFunctions::testReadBVDataUint16()
     hdr.binaryFormat = "UINT_16";
     hdr.dataOrientation = 0;
     hdr.channels.clear();
-    BVChannelInfo ch; ch.name = "A"; ch.resolution = 0.1; hdr.channels.append(ch);
+    BVChannelInfo ch;
+    ch.name = "A";
+    ch.resolution = 0.1;
+    hdr.channels.append(ch);
 
     MatrixXd data;
     QVERIFY(readBVData(dataPath, hdr, data));
     QCOMPARE(data.rows(), 1);
     QCOMPARE(data.cols(), (Eigen::Index)2);
-    QVERIFY(qAbs(data(0, 0) - 100.0) < 0.01);  // 1000 * 0.1
-    QVERIFY(qAbs(data(0, 1) - 200.0) < 0.01);  // 2000 * 0.1
+    QVERIFY(qAbs(data(0, 0) - 100.0) < 0.01); // 1000 * 0.1
+    QVERIFY(qAbs(data(0, 1) - 200.0) < 0.01); // 2000 * 0.1
 }
 
 void TestToolConversionFunctions::testReadBVDataWithRealFile()
@@ -399,7 +417,7 @@ void TestToolConversionFunctions::testBrainVisionRoundTrip()
 
     BVHeader hdr;
     QVERIFY(parseBVHeader(vhdrPath, hdr));
-    QCOMPARE(hdr.dataOrientation, 1);  // VECTORIZED
+    QCOMPARE(hdr.dataOrientation, 1); // VECTORIZED
     QCOMPARE(hdr.binaryFormat, QString("IEEE_FLOAT_32"));
     QCOMPARE(hdr.samplingInterval, 500.0);
     QCOMPARE(hdr.channels.size(), 4);
@@ -418,9 +436,9 @@ void TestToolConversionFunctions::testReadWriteHptsRoundTrip()
         QFile file(inputPath);
         QVERIFY(file.open(QIODevice::WriteOnly | QIODevice::Text));
         QTextStream out(&file);
-        out << "cardinal 1 0.0 80.0 0.0\n"      // Nasion (mm)
-            << "cardinal 2 -70.0 0.0 0.0\n"     // LPA
-            << "cardinal 3 70.0 0.0 0.0\n"      // RPA
+        out << "cardinal 1 0.0 80.0 0.0\n"  // Nasion (mm)
+            << "cardinal 2 -70.0 0.0 0.0\n" // LPA
+            << "cardinal 3 70.0 0.0 0.0\n"  // RPA
             << "hpi 1 0.0 60.0 50.0\n"
             << "eeg 1 -30.0 50.0 80.0\n"
             << "extra 1 10.0 10.0 90.0\n";
@@ -466,11 +484,11 @@ void TestToolConversionFunctions::testReadHptsCategories()
     QList<DigPt> points = readHpts(path);
     QCOMPARE(points.size(), 6);
     QCOMPARE(points[0].kind, FIFFV_POINT_CARDINAL);
-    QCOMPARE(points[1].kind, FIFFV_POINT_CARDINAL);  // fiducial = cardinal
+    QCOMPARE(points[1].kind, FIFFV_POINT_CARDINAL); // fiducial = cardinal
     QCOMPARE(points[2].kind, FIFFV_POINT_HPI);
     QCOMPARE(points[3].kind, FIFFV_POINT_EEG);
     QCOMPARE(points[4].kind, FIFFV_POINT_EXTRA);
-    QCOMPARE(points[5].kind, FIFFV_POINT_EXTRA);  // unknown → extra
+    QCOMPARE(points[5].kind, FIFFV_POINT_EXTRA); // unknown → extra
 }
 
 void TestToolConversionFunctions::testReadHptsCoordinateConversion()
@@ -487,7 +505,7 @@ void TestToolConversionFunctions::testReadHptsCoordinateConversion()
 
     QList<DigPt> points = readHpts(path);
     QCOMPARE(points.size(), 1);
-    QVERIFY(qAbs(points[0].r[0] - 0.100f) < 1e-5f);  // 100 mm → 0.1 m
+    QVERIFY(qAbs(points[0].r[0] - 0.100f) < 1e-5f); // 100 mm → 0.1 m
     QVERIFY(qAbs(points[0].r[1] - 0.200f) < 1e-5f);
     QVERIFY(qAbs(points[0].r[2] - 0.300f) < 1e-5f);
 }
@@ -498,7 +516,9 @@ void TestToolConversionFunctions::testWriteHptsFormat()
     DigPt p;
     p.kind = FIFFV_POINT_CARDINAL;
     p.ident = 1;
-    p.r[0] = 0.1f; p.r[1] = 0.2f; p.r[2] = 0.3f;
+    p.r[0] = 0.1f;
+    p.r[1] = 0.2f;
+    p.r[2] = 0.3f;
     points.append(p);
 
     QString outPath = m_tempDir.path() + "/format_test.hpts";
@@ -571,7 +591,7 @@ void TestToolConversionFunctions::testReadHptsComments()
             << "cardinal 1 10.0 20.0 30.0\n"
             << "# Middle comment\n"
             << "eeg 1 40.0 50.0 60.0\n"
-            << "\n"  // Empty line
+            << "\n" // Empty line
             << "extra 1 70.0 80.0 90.0\n";
         file.close();
     }
@@ -618,15 +638,15 @@ void TestToolConversionFunctions::testTriFileRoundTrip()
     // Create a simple tetrahedron
     MatrixX3f rr(4, 3);
     rr << 0, 0, 0,
-          1, 0, 0,
-          0, 1, 0,
-          0, 0, 1;
+        1, 0, 0,
+        0, 1, 0,
+        0, 0, 1;
 
     MatrixX3i tris(4, 3);
     tris << 0, 1, 2,
-            0, 1, 3,
-            0, 2, 3,
-            1, 2, 3;
+        0, 1, 3,
+        0, 2, 3,
+        1, 2, 3;
 
     QString triPath = m_tempDir.path() + "/test.tri";
     QVERIFY(writeTriFile(triPath, rr, tris));
@@ -667,7 +687,7 @@ void TestToolConversionFunctions::testTriFileIndexing()
             << "2 1.0 0.0 0.0\n"
             << "3 0.0 1.0 0.0\n"
             << "1\n"
-            << "1 1 2 3\n";  // 1-based: vertices 1,2,3
+            << "1 1 2 3\n"; // 1-based: vertices 1,2,3
         file.close();
     }
 
@@ -686,8 +706,8 @@ void TestToolConversionFunctions::testSmfFileRoundTrip()
 {
     MatrixX3f rr(3, 3);
     rr << 0.0f, 0.0f, 0.0f,
-          1.0f, 0.0f, 0.0f,
-          0.0f, 1.0f, 0.0f;
+        1.0f, 0.0f, 0.0f,
+        0.0f, 1.0f, 0.0f;
 
     MatrixX3i tris(1, 3);
     tris << 0, 1, 2;
@@ -713,15 +733,15 @@ void TestToolConversionFunctions::testFifSurfaceRoundTrip()
     // Create a tetrahedron - a closed surface required by MNEBem reader
     MatrixX3f rr(4, 3);
     rr << 0.01f, 0.01f, 0.01f,
-          0.05f, 0.01f, 0.01f,
-          0.03f, 0.05f, 0.01f,
-          0.03f, 0.03f, 0.05f;
+        0.05f, 0.01f, 0.01f,
+        0.03f, 0.05f, 0.01f,
+        0.03f, 0.03f, 0.05f;
 
     MatrixX3i tris(4, 3);
     tris << 0, 1, 2,
-            0, 1, 3,
-            0, 2, 3,
-            1, 2, 3;
+        0, 1, 3,
+        0, 2, 3,
+        1, 2, 3;
 
     QString fifPath = m_tempDir.path() + "/surf.fif";
     QVERIFY(writeFifSurface(fifPath, rr, tris, FIFFV_BEM_SURF_ID_BRAIN));
@@ -753,9 +773,9 @@ void TestToolConversionFunctions::testConvertTriToSmf()
 {
     // Write as tri, read, write as smf, read, verify
     MatrixX3f rr(4, 3);
-    rr << 0, 0, 0,   1, 0, 0,   0, 1, 0,   0, 0, 1;
+    rr << 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1;
     MatrixX3i tris(4, 3);
-    tris << 0, 1, 2,   0, 1, 3,   0, 2, 3,   1, 2, 3;
+    tris << 0, 1, 2, 0, 1, 3, 0, 2, 3, 1, 2, 3;
 
     QString triPath = m_tempDir.path() + "/convert.tri";
     QVERIFY(writeTriFile(triPath, rr, tris));
@@ -780,30 +800,31 @@ void TestToolConversionFunctions::testSurfaceWithLargeMesh()
     // Create an icosahedron-like mesh (12 vertices, 20 faces)
     const float phi = (1.0f + std::sqrt(5.0f)) / 2.0f;
     MatrixX3f rr(12, 3);
-    rr.row(0)  = Vector3f(-1,  phi, 0).normalized() * 0.1f;
-    rr.row(1)  = Vector3f( 1,  phi, 0).normalized() * 0.1f;
-    rr.row(2)  = Vector3f(-1, -phi, 0).normalized() * 0.1f;
-    rr.row(3)  = Vector3f( 1, -phi, 0).normalized() * 0.1f;
-    rr.row(4)  = Vector3f(0, -1,  phi).normalized() * 0.1f;
-    rr.row(5)  = Vector3f(0,  1,  phi).normalized() * 0.1f;
-    rr.row(6)  = Vector3f(0, -1, -phi).normalized() * 0.1f;
-    rr.row(7)  = Vector3f(0,  1, -phi).normalized() * 0.1f;
-    rr.row(8)  = Vector3f( phi, 0, -1).normalized() * 0.1f;
-    rr.row(9)  = Vector3f( phi, 0,  1).normalized() * 0.1f;
+    rr.row(0) = Vector3f(-1, phi, 0).normalized() * 0.1f;
+    rr.row(1) = Vector3f(1, phi, 0).normalized() * 0.1f;
+    rr.row(2) = Vector3f(-1, -phi, 0).normalized() * 0.1f;
+    rr.row(3) = Vector3f(1, -phi, 0).normalized() * 0.1f;
+    rr.row(4) = Vector3f(0, -1, phi).normalized() * 0.1f;
+    rr.row(5) = Vector3f(0, 1, phi).normalized() * 0.1f;
+    rr.row(6) = Vector3f(0, -1, -phi).normalized() * 0.1f;
+    rr.row(7) = Vector3f(0, 1, -phi).normalized() * 0.1f;
+    rr.row(8) = Vector3f(phi, 0, -1).normalized() * 0.1f;
+    rr.row(9) = Vector3f(phi, 0, 1).normalized() * 0.1f;
     rr.row(10) = Vector3f(-phi, 0, -1).normalized() * 0.1f;
-    rr.row(11) = Vector3f(-phi, 0,  1).normalized() * 0.1f;
+    rr.row(11) = Vector3f(-phi, 0, 1).normalized() * 0.1f;
 
     MatrixX3i tris(20, 3);
-    tris <<  0,11,5,  0,5,1,  0,1,7,  0,7,10,  0,10,11,
-             1,5,9,   5,11,4, 11,10,2, 10,7,6,  7,1,8,
-             3,9,4,   3,4,2,  3,2,6,   3,6,8,   3,8,9,
-             4,9,5,   2,4,11, 6,2,10,  8,6,7,   9,8,1;
+    tris << 0, 11, 5, 0, 5, 1, 0, 1, 7, 0, 7, 10, 0, 10, 11,
+        1, 5, 9, 5, 11, 4, 11, 10, 2, 10, 7, 6, 7, 1, 8,
+        3, 9, 4, 3, 4, 2, 3, 2, 6, 3, 6, 8, 3, 8, 9,
+        4, 9, 5, 2, 4, 11, 6, 2, 10, 8, 6, 7, 9, 8, 1;
 
     // Round-trip through all formats
     // TRI
     QString triPath = m_tempDir.path() + "/ico.tri";
     QVERIFY(writeTriFile(triPath, rr, tris));
-    MatrixX3f rrT; MatrixX3i trisT;
+    MatrixX3f rrT;
+    MatrixX3i trisT;
     QVERIFY(readTriFile(triPath, rrT, trisT));
     QCOMPARE(rrT.rows(), (Eigen::Index)12);
     QCOMPARE(trisT.rows(), (Eigen::Index)20);
@@ -811,14 +832,16 @@ void TestToolConversionFunctions::testSurfaceWithLargeMesh()
     // SMF
     QString smfPath = m_tempDir.path() + "/ico.smf";
     QVERIFY(writeSmfFile(smfPath, rr, tris));
-    MatrixX3f rrS; MatrixX3i trisS;
+    MatrixX3f rrS;
+    MatrixX3i trisS;
     QVERIFY(readSmfFile(smfPath, rrS, trisS));
     QCOMPARE(rrS.rows(), (Eigen::Index)12);
 
     // FIF
     QString fifPath = m_tempDir.path() + "/ico.fif";
     QVERIFY(writeFifSurface(fifPath, rr, tris, FIFFV_BEM_SURF_ID_HEAD));
-    MatrixX3f rrF; MatrixX3i trisF;
+    MatrixX3f rrF;
+    MatrixX3i trisF;
     QVERIFY(readFifSurface(fifPath, rrF, trisF));
     QCOMPARE(rrF.rows(), (Eigen::Index)12);
 }

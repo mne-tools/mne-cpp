@@ -36,7 +36,8 @@
 /**
  * Identifies which splitter(s) are hit by a cursor position.
  */
-enum class SplitterHit {
+enum class SplitterHit
+{
     None,
     Vertical,
     Horizontal,
@@ -71,17 +72,42 @@ public:
 
     // ── Split fractions ────────────────────────────────────────────────
 
-    float splitX() const              { return m_splitX; }
-    float splitY() const              { return m_splitY; }
-    void  setSplitX(float x)          { m_splitX = clampSplit(x); }
-    void  setSplitY(float y)          { m_splitY = clampSplit(y); }
-    void  resetSplits()               { m_splitX = 0.5f; m_splitY = 0.5f; }
+    float splitX() const
+    {
+        return m_splitX;
+    }
+    float splitY() const
+    {
+        return m_splitY;
+    }
+    void setSplitX(float x)
+    {
+        m_splitX = clampSplit(x);
+    }
+    void setSplitY(float y)
+    {
+        m_splitY = clampSplit(y);
+    }
+    void resetSplits()
+    {
+        m_splitX = 0.5f;
+        m_splitY = 0.5f;
+    }
 
     // ── Tolerance / sizing constants ───────────────────────────────────
 
-    int  hitTolerancePx()   const     { return m_hitTolerancePx; }
-    int  minPanePx()        const     { return m_minPanePx; }
-    int  separatorLinePx()  const     { return m_separatorLinePx; }
+    int hitTolerancePx() const
+    {
+        return m_hitTolerancePx;
+    }
+    int minPanePx() const
+    {
+        return m_minPanePx;
+    }
+    int separatorLinePx() const
+    {
+        return m_separatorLinePx;
+    }
 
     //=========================================================================================================
     /**
@@ -92,7 +118,7 @@ public:
      * @param[in] outputSize    Total output pixel size.
      * @return                  Pixel rectangle for the slot.
      */
-    QRect slotRect(int slot, int numEnabled, const QSize &outputSize) const;
+    QRect slotRect(int slot, int numEnabled, const QSize& outputSize) const;
 
     //=========================================================================================================
     /**
@@ -103,9 +129,9 @@ public:
      * @param[in] outputSize    Total output pixel size.
      * @return                  Which splitter(s) are under the cursor.
      */
-    SplitterHit hitTestSplitter(const QPoint &pos,
+    SplitterHit hitTestSplitter(const QPoint& pos,
                                 int numEnabled,
-                                const QSize &outputSize) const;
+                                const QSize& outputSize) const;
 
     //=========================================================================================================
     /**
@@ -126,9 +152,9 @@ public:
      * @param[in] outputSize        Total output pixel size.
      * @return                      Viewport index, or -1 if outside.
      */
-    int viewportIndexAt(const QPoint &pos,
-                        const QVector<int> &enabledViewports,
-                        const QSize &outputSize) const;
+    int viewportIndexAt(const QPoint& pos,
+                        const QVector<int>& enabledViewports,
+                        const QSize& outputSize) const;
 
     //=========================================================================================================
     /**
@@ -141,7 +167,7 @@ public:
      * @param[in] numEnabled    Total enabled count.
      * @return                  Inset rectangle.
      */
-    QRect insetForSeparator(const QRect &paneRect,
+    QRect insetForSeparator(const QRect& paneRect,
                             int slot,
                             int numEnabled) const;
 
@@ -155,9 +181,9 @@ public:
      * @param[out] horizontalRect  Geometry for the horizontal separator (empty if hidden).
      */
     void separatorGeometries(int numEnabled,
-                             const QSize &widgetSize,
-                             QRect &verticalRect,
-                             QRect &horizontalRect) const;
+                             const QSize& widgetSize,
+                             QRect& verticalRect,
+                             QRect& horizontalRect) const;
 
     //=========================================================================================================
     /**
@@ -167,18 +193,21 @@ public:
      * @param[in] activeSplitter Which splitter is being dragged.
      * @param[in] widgetSize     Widget size in pixels.
      */
-    void dragSplitter(const QPoint &pos,
+    void dragSplitter(const QPoint& pos,
                       SplitterHit activeSplitter,
-                      const QSize &widgetSize);
+                      const QSize& widgetSize);
 
 private:
-    static float clampSplit(float v) { return std::clamp(v, 0.15f, 0.85f); }
+    static float clampSplit(float v)
+    {
+        return std::clamp(v, 0.15f, 0.85f);
+    }
 
     float m_splitX = 0.5f;
     float m_splitY = 0.5f;
-    int   m_hitTolerancePx = 6;
-    int   m_minPanePx      = 80;
-    int   m_separatorLinePx = 2;
+    int m_hitTolerancePx = 6;
+    int m_minPanePx = 80;
+    int m_separatorLinePx = 2;
 };
 
 #endif // MULTIVIEWLAYOUT_H

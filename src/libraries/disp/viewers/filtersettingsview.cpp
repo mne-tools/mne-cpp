@@ -47,7 +47,7 @@ using namespace DISPLIB;
 //=============================================================================================================
 
 FilterSettingsView::FilterSettingsView(const QString& sSettingsPath,
-                                       QWidget *parent,
+                                       QWidget* parent,
                                        Qt::WindowFlags f)
 : AbstractView(parent, f)
 , m_pUi(new Ui::FilterSettingsViewWidget)
@@ -64,12 +64,12 @@ FilterSettingsView::FilterSettingsView(const QString& sSettingsPath,
                                                    Q_NULLPTR,
                                                    Qt::Dialog);
 
-    connect(m_pFilterView.data(), &FilterDesignView::updateFilterFrom,[=, this](double dFrom){
-                m_pUi->m_pDoubleSpinBoxFrom->setValue(dFrom);
-            });
-    connect(m_pFilterView.data(), &FilterDesignView::updateFilterTo,[=, this](double dTo){
-                m_pUi->m_pDoubleSpinBoxTo->setValue(dTo);
-            });
+    connect(m_pFilterView.data(), &FilterDesignView::updateFilterFrom, [=, this](double dFrom) {
+        m_pUi->m_pDoubleSpinBoxFrom->setValue(dFrom);
+    });
+    connect(m_pFilterView.data(), &FilterDesignView::updateFilterTo, [=, this](double dTo) {
+        m_pUi->m_pDoubleSpinBoxTo->setValue(dTo);
+    });
 
     connect(this, &FilterSettingsView::guiStyleChanged,
             m_pFilterView.data(), &FilterDesignView::guiStyleChanged);
@@ -117,17 +117,17 @@ bool FilterSettingsView::getFilterActive()
 void FilterSettingsView::setSamplingRate(double dSFreq)
 {
     //Update min max of spin boxes to nyquist
-    double nyquistFrequency = dSFreq/2;
+    double nyquistFrequency = dSFreq / 2;
 
     m_pUi->m_pDoubleSpinBoxFrom->setMaximum(nyquistFrequency);
     m_pUi->m_pDoubleSpinBoxTo->setMaximum(nyquistFrequency);
 
-    if(m_pUi->m_pDoubleSpinBoxFrom->value() > dSFreq/2) {
-        m_pUi->m_pDoubleSpinBoxFrom->setValue(dSFreq/2);
+    if (m_pUi->m_pDoubleSpinBoxFrom->value() > dSFreq / 2) {
+        m_pUi->m_pDoubleSpinBoxFrom->setValue(dSFreq / 2);
     }
 
-    if(m_pUi->m_pDoubleSpinBoxTo->value() > dSFreq/2) {
-        m_pUi->m_pDoubleSpinBoxTo->setValue(dSFreq/2);
+    if (m_pUi->m_pDoubleSpinBoxTo->value() > dSFreq / 2) {
+        m_pUi->m_pDoubleSpinBoxTo->setValue(dSFreq / 2);
     }
 
     m_pFilterView->setSamplingRate(dSFreq);
@@ -137,7 +137,7 @@ void FilterSettingsView::setSamplingRate(double dSFreq)
 
 void FilterSettingsView::saveSettings()
 {
-    if(m_sSettingsPath.isEmpty()) {
+    if (m_sSettingsPath.isEmpty()) {
         return;
     }
 
@@ -153,7 +153,7 @@ void FilterSettingsView::saveSettings()
 
 void FilterSettingsView::loadSettings()
 {
-    if(m_sSettingsPath.isEmpty()) {
+    if (m_sSettingsPath.isEmpty()) {
         return;
     }
 
@@ -169,7 +169,7 @@ void FilterSettingsView::loadSettings()
 
 void FilterSettingsView::updateGuiMode(GuiMode mode)
 {
-    switch(mode) {
+    switch (mode) {
         case GuiMode::Clinical:
             m_pUi->m_pPushButtonShowFilterOptions->hide();
             break;
@@ -183,7 +183,7 @@ void FilterSettingsView::updateGuiMode(GuiMode mode)
 
 void FilterSettingsView::updateProcessingMode(ProcessingMode mode)
 {
-    switch(mode) {
+    switch (mode) {
         case ProcessingMode::Offline:
             break;
         default: // default is realtime mode
@@ -195,7 +195,7 @@ void FilterSettingsView::updateProcessingMode(ProcessingMode mode)
 
 void FilterSettingsView::onShowFilterView()
 {
-    if(m_pFilterView->isActiveWindow()) {
+    if (m_pFilterView->isActiveWindow()) {
         m_pFilterView->hide();
     } else {
         m_pFilterView->activateWindow();
@@ -226,8 +226,8 @@ void FilterSettingsView::onFilterFromChanged()
 
 void FilterSettingsView::onFilterToChanged()
 {
-    if(m_pUi->m_pDoubleSpinBoxFrom->value() >= 2) {
-        m_pUi->m_pDoubleSpinBoxFrom->setMaximum(m_pUi->m_pDoubleSpinBoxTo->value()-1);
+    if (m_pUi->m_pDoubleSpinBoxFrom->value() >= 2) {
+        m_pUi->m_pDoubleSpinBoxFrom->setMaximum(m_pUi->m_pDoubleSpinBoxTo->value() - 1);
     } else {
         m_pUi->m_pDoubleSpinBoxFrom->setMaximum(m_pUi->m_pDoubleSpinBoxTo->value());
     }
@@ -250,5 +250,4 @@ void FilterSettingsView::onFilterChannelTypeChanged(const QString& sType)
 
 void FilterSettingsView::clearView()
 {
-
 }

@@ -72,11 +72,11 @@ private slots:
 private:
     // Flat-array path
     QVector<float> m_volData;
-    QVector<int>   m_dims;
-    Matrix4f       m_vox2ras;
+    QVector<int> m_dims;
+    Matrix4f m_vox2ras;
 
     // MriVolData path — populated with same synthetic data
-    MriVolData     m_vol;
+    MriVolData m_vol;
 };
 
 //=============================================================================================================
@@ -99,9 +99,9 @@ void TestMriSlicer::initTestCase()
     m_vox2ras = Matrix4f::Identity();
 
     // Populate m_vol with equivalent data via MriVolData fields
-    m_vol.width  = m_dims[0];
+    m_vol.width = m_dims[0];
     m_vol.height = m_dims[1];
-    m_vol.depth  = m_dims[2];
+    m_vol.depth = m_dims[2];
     m_vol.nframes = 1;
     m_vol.rasGood = true;
     m_vol.xsize = 1.0f;
@@ -119,7 +119,7 @@ void TestMriSlicer::initTestCase()
     for (int z = 0; z < m_dims[2]; ++z) {
         MriSlice& s = m_vol.slices[z];
         s.pixelFormat = FIFFV_MRI_PIXEL_FLOAT;
-        s.width  = m_dims[0];
+        s.width = m_dims[0];
         s.height = m_dims[1];
         int sliceSize = m_dims[0] * m_dims[1];
         s.pixelsFloat.resize(sliceSize);
@@ -136,7 +136,7 @@ void TestMriSlicer::testSliceOrientations()
     // Extract one slice of each orientation at the middle index
     int midAxial = m_dims[2] / 2;
     MriSliceImage axial = MriSlicer::extractSlice(m_volData, m_dims, m_vox2ras,
-                                                   SliceOrientation::Axial, midAxial);
+                                                  SliceOrientation::Axial, midAxial);
     QCOMPARE(axial.orientation, SliceOrientation::Axial);
     QVERIFY(axial.width > 0);
     QVERIFY(axial.height > 0);
@@ -144,14 +144,14 @@ void TestMriSlicer::testSliceOrientations()
 
     int midCoronal = m_dims[1] / 2;
     MriSliceImage coronal = MriSlicer::extractSlice(m_volData, m_dims, m_vox2ras,
-                                                     SliceOrientation::Coronal, midCoronal);
+                                                    SliceOrientation::Coronal, midCoronal);
     QCOMPARE(coronal.orientation, SliceOrientation::Coronal);
     QVERIFY(coronal.width > 0);
     QVERIFY(coronal.height > 0);
 
     int midSagittal = m_dims[0] / 2;
     MriSliceImage sagittal = MriSlicer::extractSlice(m_volData, m_dims, m_vox2ras,
-                                                      SliceOrientation::Sagittal, midSagittal);
+                                                     SliceOrientation::Sagittal, midSagittal);
     QCOMPARE(sagittal.orientation, SliceOrientation::Sagittal);
     QVERIFY(sagittal.width > 0);
     QVERIFY(sagittal.height > 0);
@@ -175,9 +175,12 @@ void TestMriSlicer::testRasVoxelRoundTrip()
         // The round-trip error should be at most 1 voxel width in each dimension
         // (due to integer rounding of voxel indices)
         float maxErr = (roundTrip - ras).cwiseAbs().maxCoeff();
-        QVERIFY2(maxErr < 2.0f,  // Allow up to 2mm (typical voxel size is 1mm)
+        QVERIFY2(maxErr < 2.0f, // Allow up to 2mm (typical voxel size is 1mm)
                  qPrintable(QString("RAS round-trip error=%1mm for point (%2,%3,%4)")
-                           .arg(maxErr).arg(ras.x()).arg(ras.y()).arg(ras.z())));
+                                .arg(maxErr)
+                                .arg(ras.x())
+                                .arg(ras.y())
+                                .arg(ras.z())));
     }
 }
 
@@ -188,16 +191,19 @@ void TestMriSlicer::testOrthogonalExtraction()
     // Extract three orthogonal slices at a point
     Vector3f centerRas(8.0f, 8.0f, 8.0f);
     QVector<MriSliceImage> slices = MriSlicer::extractOrthogonal(m_volData, m_dims,
-                                                                  m_vox2ras, centerRas);
+                                                                 m_vox2ras, centerRas);
 
     QCOMPARE(slices.size(), 3);
 
     // Each orientation should appear exactly once
     bool hasAxial = false, hasCoronal = false, hasSagittal = false;
     for (const auto& s : slices) {
-        if (s.orientation == SliceOrientation::Axial) hasAxial = true;
-        if (s.orientation == SliceOrientation::Coronal) hasCoronal = true;
-        if (s.orientation == SliceOrientation::Sagittal) hasSagittal = true;
+        if (s.orientation == SliceOrientation::Axial)
+            hasAxial = true;
+        if (s.orientation == SliceOrientation::Coronal)
+            hasCoronal = true;
+        if (s.orientation == SliceOrientation::Sagittal)
+            hasSagittal = true;
     }
     QVERIFY(hasAxial);
     QVERIFY(hasCoronal);
@@ -222,7 +228,7 @@ void TestMriSlicer::testFreeSurferTkRasAnatomicalAxes()
     fsTkr.block<3, 3>(0, 0).setZero();
     fsTkr(0, 0) = -1.0f;
     fsTkr(2, 1) = -1.0f;
-    fsTkr(1, 2) =  1.0f;
+    fsTkr(1, 2) = 1.0f;
 
     QCOMPARE(MriSlicer::voxelAxisForOrientation(fsTkr, SliceOrientation::Axial), 1);
     QCOMPARE(MriSlicer::voxelAxisForOrientation(fsTkr, SliceOrientation::Coronal), 2);
@@ -262,7 +268,7 @@ void TestMriSlicer::testSliceNormalization()
 {
     // Slice pixels should be normalized to [0, 1]
     MriSliceImage slice = MriSlicer::extractSlice(m_volData, m_dims, m_vox2ras,
-                                                   SliceOrientation::Axial, m_dims[2] / 2);
+                                                  SliceOrientation::Axial, m_dims[2] / 2);
 
     float minVal = slice.pixels.minCoeff();
     float maxVal = slice.pixels.maxCoeff();
@@ -316,10 +322,10 @@ void TestMriSlicer::testVolDataSliceOverload()
     // MriVolData convenience overloads.
     Matrix4f volVox2ras = m_vol.computeVox2RasTkr();
     QVector<float> flat = m_vol.voxelDataAsFloat();
-    QVector<int>   dims = m_vol.dims();
+    QVector<int> dims = m_vol.dims();
 
     MriSliceImage refSlice = MriSlicer::extractSlice(flat, dims, volVox2ras,
-                                                      SliceOrientation::Axial, midAxial);
+                                                     SliceOrientation::Axial, midAxial);
     // Extract via MriVolData overload
     MriSliceImage volSlice = MriSlicer::extractSlice(m_vol, SliceOrientation::Axial, midAxial);
 
@@ -342,14 +348,14 @@ void TestMriSlicer::testVolDataOrthogonalOverload()
     // the MriVolData convenience overloads.
     Matrix4f volVox2ras = m_vol.computeVox2RasTkr();
     QVector<float> flat = m_vol.voxelDataAsFloat();
-    QVector<int>   dims = m_vol.dims();
+    QVector<int> dims = m_vol.dims();
 
     // Centre voxel in RAS (meters)
     Vector3i centerVox(m_dims[0] / 2, m_dims[1] / 2, m_dims[2] / 2);
     Vector3f centerRas = MriSlicer::voxelToRas(volVox2ras, centerVox);
 
     QVector<MriSliceImage> refSlices = MriSlicer::extractOrthogonal(flat, dims,
-                                                                     volVox2ras, centerRas);
+                                                                    volVox2ras, centerRas);
     QVector<MriSliceImage> volSlices = MriSlicer::extractOrthogonal(m_vol, centerRas);
 
     QCOMPARE(volSlices.size(), 3);

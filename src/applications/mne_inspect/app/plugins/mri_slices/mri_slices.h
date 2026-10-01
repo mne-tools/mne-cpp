@@ -50,8 +50,9 @@
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-namespace DISP3DLIB {
-    class MultimodalScene;
+namespace DISP3DLIB
+{
+class MultimodalScene;
 }
 
 namespace MRISLICESPLUGIN
@@ -115,19 +116,28 @@ public:
     /**
      * @return Path of the most recent successful load. Empty if none.
      */
-    QString sourcePath() const { return m_sourcePath; }
+    QString sourcePath() const
+    {
+        return m_sourcePath;
+    }
 
     //=========================================================================================================
     /**
      * @return Underlying volume, or nullptr if no volume is loaded.
      */
-    const MRILIB::MriVolData* volume() const { return m_volume.get(); }
+    const MRILIB::MriVolData* volume() const
+    {
+        return m_volume.get();
+    }
 
     //=========================================================================================================
     /**
      * @return Current crosshair position in MRI RAS coordinates.
      */
-    Eigen::Vector3f crosshair() const { return m_crosshair; }
+    Eigen::Vector3f crosshair() const
+    {
+        return m_crosshair;
+    }
 
     //=========================================================================================================
     /**
@@ -169,15 +179,24 @@ public:
     //=========================================================================================================
     /** @return Renderable for the axial slice. May be null when
      *  no volume is loaded. */
-    DISP3DLIB::SliceObject* axialSlice() const { return m_slices[0].get(); }
+    DISP3DLIB::SliceObject* axialSlice() const
+    {
+        return m_slices[0].get();
+    }
 
     //=========================================================================================================
     /** @return Renderable for the coronal slice. */
-    DISP3DLIB::SliceObject* coronalSlice() const { return m_slices[1].get(); }
+    DISP3DLIB::SliceObject* coronalSlice() const
+    {
+        return m_slices[1].get();
+    }
 
     //=========================================================================================================
     /** @return Renderable for the sagittal slice. */
-    DISP3DLIB::SliceObject* sagittalSlice() const { return m_slices[2].get(); }
+    DISP3DLIB::SliceObject* sagittalSlice() const
+    {
+        return m_slices[2].get();
+    }
 
     //=========================================================================================================
     /** @return Scene-layer ids in fixed order: axial, coronal, sagittal. */
@@ -213,11 +232,11 @@ private:
     void publishToScene();
     Eigen::Vector3f volumeCenter() const;
 
-    std::unique_ptr<MRILIB::MriVolData>              m_volume;
+    std::unique_ptr<MRILIB::MriVolData> m_volume;
     std::array<std::unique_ptr<DISP3DLIB::SliceObject>, 3> m_slices;
-    DISP3DLIB::MultimodalScene*                      m_scene = nullptr;
-    Eigen::Vector3f                                  m_crosshair = Eigen::Vector3f::Zero();
-    QString                                          m_sourcePath;
+    DISP3DLIB::MultimodalScene* m_scene = nullptr;
+    Eigen::Vector3f m_crosshair = Eigen::Vector3f::Zero();
+    QString m_sourcePath;
 };
 
 } // namespace MRISLICESPLUGIN

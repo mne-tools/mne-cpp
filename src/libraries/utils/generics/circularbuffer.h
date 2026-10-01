@@ -68,8 +68,8 @@ template<typename T>
 class CircularBuffer
 {
 public:
-    typedef QSharedPointer<CircularBuffer> SPtr;              /**< Shared pointer type for CircularBuffer. */
-    typedef QSharedPointer<const CircularBuffer> ConstSPtr;   /**< Const shared pointer type for CircularBuffer. */
+    typedef QSharedPointer<CircularBuffer> SPtr;            /**< Shared pointer type for CircularBuffer. */
+    typedef QSharedPointer<const CircularBuffer> ConstSPtr; /**< Const shared pointer type for CircularBuffer. */
 
     //=========================================================================================================
     /**
@@ -155,15 +155,15 @@ private:
      * @return the mapped index.
      */
     inline unsigned int mapIndex(int& index);
-    unsigned int    m_uiMaxNumElements;     /**< Holds the maximal number of buffer elements.*/
-    T*            m_pBuffer;              /**< Holds the circular buffer.*/
-    int             m_iCurrentReadIndex;    /**< Holds the current read index.*/
-    int             m_iCurrentWriteIndex;   /**< Holds the current write index.*/
-    QSemaphore*     m_pFreeElements;        /**< Holds a semaphore which acquires free elements for thread safe writing. A semaphore is a generalization of a mutex.*/
-    QSemaphore*     m_pUsedElements;        /**< Holds a semaphore which acquires written semaphore for thread safe reading.*/
-    int             m_iTimeout;             /**< Holds the timeout value after which the acquire statement will return false.*/
+    unsigned int m_uiMaxNumElements; /**< Holds the maximal number of buffer elements.*/
+    T* m_pBuffer;                    /**< Holds the circular buffer.*/
+    int m_iCurrentReadIndex;         /**< Holds the current read index.*/
+    int m_iCurrentWriteIndex;        /**< Holds the current write index.*/
+    QSemaphore* m_pFreeElements;     /**< Holds a semaphore which acquires free elements for thread safe writing. A semaphore is a generalization of a mutex.*/
+    QSemaphore* m_pUsedElements;     /**< Holds a semaphore which acquires written semaphore for thread safe reading.*/
+    int m_iTimeout;                  /**< Holds the timeout value after which the acquire statement will return false.*/
 
-    bool            m_bPause;
+    bool m_bPause;
 };
 
 //=============================================================================================================
@@ -190,7 +190,7 @@ CircularBuffer<T>::~CircularBuffer()
 {
     delete m_pFreeElements;
     delete m_pUsedElements;
-    delete [] m_pBuffer;
+    delete[] m_pBuffer;
 }
 
 //=============================================================================================================
@@ -198,12 +198,12 @@ CircularBuffer<T>::~CircularBuffer()
 template<typename T>
 inline bool CircularBuffer<T>::push(const T* pArray, unsigned int size)
 {
-    if(m_bPause) {
+    if (m_bPause) {
         return false;
     }
 
-    if(m_pFreeElements->tryAcquire(size, m_iTimeout)) {
-        for(unsigned int i = 0; i < size; ++i) {
+    if (m_pFreeElements->tryAcquire(size, m_iTimeout)) {
+        for (unsigned int i = 0; i < size; ++i) {
             m_pBuffer[mapIndex(m_iCurrentWriteIndex)] = pArray[i];
         }
         const QSemaphoreReleaser releaser(m_pUsedElements, size);
@@ -219,15 +219,15 @@ inline bool CircularBuffer<T>::push(const T* pArray, unsigned int size)
 template<typename T>
 inline bool CircularBuffer<T>::push(const T& newElement)
 {
-    if(m_bPause) {
+    if (m_bPause) {
         return false;
     }
 
-    if(m_pFreeElements->tryAcquire(1, m_iTimeout)) {
+    if (m_pFreeElements->tryAcquire(1, m_iTimeout)) {
         m_pBuffer[mapIndex(m_iCurrentWriteIndex)] = newElement;
         const QSemaphoreReleaser releaser(m_pUsedElements, 1);
     } else {
-       return false;
+        return false;
     }
 
     return true;
@@ -238,11 +238,11 @@ inline bool CircularBuffer<T>::push(const T& newElement)
 template<typename T>
 inline bool CircularBuffer<T>::pop(T& element)
 {
-    if(m_bPause) {
+    if (m_bPause) {
         return false;
     }
 
-    if(m_pUsedElements->tryAcquire(1, m_iTimeout)) {
+    if (m_pUsedElements->tryAcquire(1, m_iTimeout)) {
         element = m_pBuffer[mapIndex(m_iCurrentReadIndex)];
         const QSemaphoreReleaser releaser(m_pFreeElements, 1);
     } else {
@@ -303,14 +303,14 @@ inline int CircularBuffer<T>::getFreeElementsWrite()
 // TYPEDEF
 //=============================================================================================================
 
-typedef CircularBuffer<int>                      CircularBuffer_int;                 /**< Defines CircularBuffer of integer type.*/
-typedef CircularBuffer<short>                    CircularBuffer_short;               /**< Defines CircularBuffer of short type.*/
-typedef CircularBuffer<char>                     CircularBuffer_char;                /**< Defines CircularBuffer of char type.*/
-typedef CircularBuffer<double>                   CircularBuffer_double;              /**< Defines CircularBuffer of double type.*/
-typedef CircularBuffer< QPair<int, int> >        CircularBuffer_pair_int_int;        /**< Defines CircularBuffer of integer Pair type.*/
-typedef CircularBuffer< QPair<double, double> >  CircularBuffer_pair_double_double;  /**< Defines CircularBuffer of double Pair type.*/
-typedef CircularBuffer< Eigen::MatrixXd >        CircularBuffer_Matrix_double;       /**< Defines CircularBuffer of Eigen::MatrixXd type.*/
-typedef CircularBuffer< Eigen::MatrixXf >        CircularBuffer_Matrix_float;        /**< Defines CircularBuffer of Eigen::MatrixXf type.*/
+typedef CircularBuffer<int> CircularBuffer_int;                                  /**< Defines CircularBuffer of integer type.*/
+typedef CircularBuffer<short> CircularBuffer_short;                              /**< Defines CircularBuffer of short type.*/
+typedef CircularBuffer<char> CircularBuffer_char;                                /**< Defines CircularBuffer of char type.*/
+typedef CircularBuffer<double> CircularBuffer_double;                            /**< Defines CircularBuffer of double type.*/
+typedef CircularBuffer<QPair<int, int>> CircularBuffer_pair_int_int;             /**< Defines CircularBuffer of integer Pair type.*/
+typedef CircularBuffer<QPair<double, double>> CircularBuffer_pair_double_double; /**< Defines CircularBuffer of double Pair type.*/
+typedef CircularBuffer<Eigen::MatrixXd> CircularBuffer_Matrix_double;            /**< Defines CircularBuffer of Eigen::MatrixXd type.*/
+typedef CircularBuffer<Eigen::MatrixXf> CircularBuffer_Matrix_float;             /**< Defines CircularBuffer of Eigen::MatrixXf type.*/
 
 } // NAMESPACE
 

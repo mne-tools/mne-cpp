@@ -44,7 +44,8 @@ constexpr unsigned long defaultTimeToWait(3);
 
 MainSplashScreenCloser::MainSplashScreenCloser(MainSplashScreen& splashScreen)
 : MainSplashScreenCloser(splashScreen, defaultTimeToWait)
-{ }
+{
+}
 
 //=============================================================================================================
 
@@ -60,11 +61,11 @@ MainSplashScreenCloser::MainSplashScreenCloser(MainSplashScreen& splashScreen, u
 
 MainSplashScreenCloser::~MainSplashScreenCloser()
 {
-  quit();
-  #if QT_VERSION >= QT_VERSION_CHECK(5,2,0)
-  requestInterruption();
-  #endif
-  wait();
+    quit();
+#if QT_VERSION >= QT_VERSION_CHECK(5, 2, 0)
+    requestInterruption();
+#endif
+    wait();
 }
 
 //=============================================================================================================

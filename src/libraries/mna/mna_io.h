@@ -46,7 +46,8 @@
 // DEFINE NAMESPACE MNALIB
 //=============================================================================================================
 
-namespace MNALIB{
+namespace MNALIB
+{
 
 //=============================================================================================================
 /**
@@ -78,9 +79,9 @@ public:
 
 private:
     static MnaProject readJson(const QString& path);
-    static bool       writeJson(const MnaProject& project, const QString& path);
+    static bool writeJson(const MnaProject& project, const QString& path);
     static MnaProject readCbor(const QString& path);
-    static bool       writeCbor(const MnaProject& project, const QString& path);
+    static bool writeCbor(const MnaProject& project, const QString& path);
 };
 
 } // namespace MNALIB

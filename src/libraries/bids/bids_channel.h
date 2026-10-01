@@ -53,15 +53,15 @@ namespace BIDSLIB
  */
 struct BIDSSHARED_EXPORT BidsChannel
 {
-    QString name;           /**< Channel name (REQUIRED). */
-    QString type;           /**< BIDS channel type: EEG, ECOG, SEEG, DBS, TRIG, etc. (REQUIRED). */
-    QString units;          /**< Unit of measurement: V, uV, mV (REQUIRED). */
-    QString samplingFreq;   /**< Sampling frequency in Hz (OPTIONAL). */
-    QString lowCutoff;      /**< High-pass cutoff frequency in Hz (OPTIONAL). */
-    QString highCutoff;     /**< Low-pass cutoff frequency in Hz (OPTIONAL). */
-    QString notch;          /**< Notch filter frequency in Hz (OPTIONAL). */
-    QString status;         /**< "good" or "bad" (OPTIONAL). */
-    QString description;    /**< Free-text description (OPTIONAL). */
+    QString name;         /**< Channel name (REQUIRED). */
+    QString type;         /**< BIDS channel type: EEG, ECOG, SEEG, DBS, TRIG, etc. (REQUIRED). */
+    QString units;        /**< Unit of measurement: V, uV, mV (REQUIRED). */
+    QString samplingFreq; /**< Sampling frequency in Hz (OPTIONAL). */
+    QString lowCutoff;    /**< High-pass cutoff frequency in Hz (OPTIONAL). */
+    QString highCutoff;   /**< Low-pass cutoff frequency in Hz (OPTIONAL). */
+    QString notch;        /**< Notch filter frequency in Hz (OPTIONAL). */
+    QString status;       /**< "good" or "bad" (OPTIONAL). */
+    QString description;  /**< Free-text description (OPTIONAL). */
 
     /**
      * @brief Read a BIDS *_channels.tsv file.

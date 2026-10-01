@@ -43,7 +43,8 @@
 // DEFINE NAMESPACE MNEWATERSHEDBEM
 //=============================================================================================================
 
-namespace MNEWATERSHEDBEM {
+namespace MNEWATERSHEDBEM
+{
 
 //=============================================================================================================
 // FORWARD DECLARATIONS
@@ -138,7 +139,7 @@ private:
 
     //=========================================================================================================
 
-    const MNEWatershedBemSettings& m_settings;  /**< Command-line settings. */
+    const MNEWatershedBemSettings& m_settings; /**< Command-line settings. */
 };
 
 } // namespace MNEWATERSHEDBEM

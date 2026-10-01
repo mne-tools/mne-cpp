@@ -42,9 +42,9 @@ namespace
 QStringList jsonArrayToStringList(const QJsonArray& values)
 {
     QStringList result;
-    for(const QJsonValue& value : values) {
+    for (const QJsonValue& value : values) {
         const QString text = value.toString().trimmed();
-        if(!text.isEmpty() && !result.contains(text)) {
+        if (!text.isEmpty() && !result.contains(text)) {
             result.append(text);
         }
     }
@@ -54,7 +54,7 @@ QStringList jsonArrayToStringList(const QJsonArray& values)
 
 QString bemSurfaceName(const MNELIB::MNEBemSurface& bemSurface, int index)
 {
-    switch(bemSurface.id) {
+    switch (bemSurface.id) {
         case 4:
             return "head";
         case 3:
@@ -80,7 +80,7 @@ public:
         widget->setSessionDescriptor(sessionDescriptor);
 
         const QString requestedFile = sessionDescriptor.value("file").toString().trimmed();
-        if(!requestedFile.isEmpty() && !widget->hasLoadedFile(requestedFile)) {
+        if (!requestedFile.isEmpty() && !widget->hasLoadedFile(requestedFile)) {
             delete widget;
             return nullptr;
         }
@@ -165,7 +165,7 @@ Dummy3DHostedViewWidget::Dummy3DHostedViewWidget(QWidget* parent)
             &QComboBox::currentTextChanged,
             this,
             [this](const QString& surfaceType) {
-                if(!surfaceType.trimmed().isEmpty()) {
+                if (!surfaceType.trimmed().isEmpty()) {
                     m_brainView->setActiveSurface(surfaceType.trimmed());
                 }
             });
@@ -178,22 +178,22 @@ void Dummy3DHostedViewWidget::setSessionDescriptor(const QJsonObject& descriptor
     m_descriptor = descriptor;
 
     QStringList filesToLoad = requestedSceneFiles();
-    if(filesToLoad.isEmpty()) {
+    if (filesToLoad.isEmpty()) {
         const QString requestedFile = descriptor.value("file").toString().trimmed();
-        if(!requestedFile.isEmpty()) {
+        if (!requestedFile.isEmpty()) {
             filesToLoad.append(requestedFile);
         }
     }
 
     QStringList loadErrors;
-    for(const QString& sceneFile : std::as_const(filesToLoad)) {
+    for (const QString& sceneFile : std::as_const(filesToLoad)) {
         QString errorMessage;
-        if(!loadFileInternal(sceneFile, &errorMessage, false) && !errorMessage.isEmpty()) {
+        if (!loadFileInternal(sceneFile, &errorMessage, false) && !errorMessage.isEmpty()) {
             loadErrors.append(errorMessage);
         }
     }
 
-    if(!loadErrors.isEmpty()) {
+    if (!loadErrors.isEmpty()) {
         const QString message = loadErrors.join(" | ");
         m_descriptor.insert("message", message);
         m_statusLabel->setText(message);
@@ -225,11 +225,11 @@ QStringList Dummy3DHostedViewWidget::loadedFiles() const
 QString Dummy3DHostedViewWidget::displayTitle() const
 {
     const QString descriptorTitle = m_descriptor.value("title").toString().trimmed();
-    if(!descriptorTitle.isEmpty()) {
+    if (!descriptorTitle.isEmpty()) {
         return descriptorTitle;
     }
 
-    if(!m_loadedFiles.isEmpty()) {
+    if (!m_loadedFiles.isEmpty()) {
         return QFileInfo(m_loadedFiles.constFirst()).fileName();
     }
 
@@ -239,11 +239,11 @@ QString Dummy3DHostedViewWidget::displayTitle() const
 bool Dummy3DHostedViewWidget::addFileToScene(const QString& filePath)
 {
     const QString normalizedPath = filePath.trimmed();
-    if(normalizedPath.isEmpty()) {
+    if (normalizedPath.isEmpty()) {
         return false;
     }
 
-    if(hasLoadedFile(normalizedPath)) {
+    if (hasLoadedFile(normalizedPath)) {
         const QString message = QString("%1 is already loaded in this 3D scene.")
                                     .arg(QFileInfo(normalizedPath).fileName());
         m_descriptor.insert("message", message);
@@ -263,12 +263,12 @@ bool Dummy3DHostedViewWidget::hasLoadedFile(const QString& filePath) const
 
 void Dummy3DHostedViewWidget::applySessionUpdate(const QJsonObject& update)
 {
-    for(auto it = update.constBegin(); it != update.constEnd(); ++it) {
+    for (auto it = update.constBegin(); it != update.constEnd(); ++it) {
         m_descriptor.insert(it.key(), it.value());
     }
 
     const QStringList filesToLoad = requestedSceneFiles();
-    for(const QString& sceneFile : filesToLoad) {
+    for (const QString& sceneFile : filesToLoad) {
         loadFileInternal(sceneFile, nullptr, false);
     }
 
@@ -280,32 +280,32 @@ bool Dummy3DHostedViewWidget::loadFileInternal(const QString& filePath,
                                                bool notifyUser)
 {
     const QString normalizedPath = filePath.trimmed();
-    if(normalizedPath.isEmpty()) {
-        if(errorMessage) {
+    if (normalizedPath.isEmpty()) {
+        if (errorMessage) {
             *errorMessage = "No surface file path was provided.";
         }
         return false;
     }
 
-    if(m_loadedFiles.contains(normalizedPath)) {
+    if (m_loadedFiles.contains(normalizedPath)) {
         return true;
     }
 
     bool loaded = false;
     QString localError;
     const QString suffix = QFileInfo(normalizedPath).suffix().toLower();
-    if(suffix == "bem") {
+    if (suffix == "bem") {
         loaded = loadBemFile(normalizedPath, &localError);
     } else {
         loaded = loadSurfaceFile(normalizedPath, &localError);
     }
 
-    if(!loaded) {
-        if(errorMessage) {
+    if (!loaded) {
+        if (errorMessage) {
             *errorMessage = localError;
         }
 
-        if(notifyUser && !localError.isEmpty()) {
+        if (notifyUser && !localError.isEmpty()) {
             m_descriptor.insert("message", localError);
             rebuildUi();
             emit statusMessage(localError);
@@ -321,7 +321,7 @@ bool Dummy3DHostedViewWidget::loadFileInternal(const QString& filePath,
     updateDescriptorProperties();
     rebuildUi();
 
-    if(notifyUser) {
+    if (notifyUser) {
         emit statusMessage(m_descriptor.value("message").toString());
         emit outputMessage(QString("3D view added %1").arg(normalizedPath));
     }
@@ -332,8 +332,8 @@ bool Dummy3DHostedViewWidget::loadFileInternal(const QString& filePath,
 bool Dummy3DHostedViewWidget::loadSurfaceFile(const QString& filePath, QString* errorMessage)
 {
     FSLIB::FsSurface surface(filePath);
-    if(surface.isEmpty()) {
-        if(errorMessage) {
+    if (surface.isEmpty()) {
+        if (errorMessage) {
             *errorMessage = QString("Failed to load FreeSurfer surface %1.").arg(filePath);
         }
         return false;
@@ -344,7 +344,7 @@ bool Dummy3DHostedViewWidget::loadSurfaceFile(const QString& filePath, QString* 
     const QString subjectName = inferSubjectName(filePath);
 
     m_model->addSurface(subjectName, hemi, surfaceType, surface);
-    if(!m_surfaceTypes.contains(surfaceType)) {
+    if (!m_surfaceTypes.contains(surfaceType)) {
         m_surfaceTypes.append(surfaceType);
     }
 
@@ -355,23 +355,23 @@ bool Dummy3DHostedViewWidget::loadSurfaceFile(const QString& filePath, QString* 
 bool Dummy3DHostedViewWidget::loadBemFile(const QString& filePath, QString* errorMessage)
 {
     QFile file(filePath);
-    if(!file.exists()) {
-        if(errorMessage) {
+    if (!file.exists()) {
+        if (errorMessage) {
             *errorMessage = QString("BEM file not found: %1").arg(filePath);
         }
         return false;
     }
 
     MNELIB::MNEBem bem(file);
-    if(bem.isEmpty()) {
-        if(errorMessage) {
+    if (bem.isEmpty()) {
+        if (errorMessage) {
             *errorMessage = QString("Failed to load BEM surface set %1.").arg(filePath);
         }
         return false;
     }
 
     const QString subjectName = inferSubjectName(filePath);
-    for(int i = 0; i < bem.size(); ++i) {
+    for (int i = 0; i < bem.size(); ++i) {
         m_model->addBemSurface(subjectName, bemSurfaceName(bem[i], i), bem[i]);
     }
 
@@ -389,7 +389,7 @@ void Dummy3DHostedViewWidget::rebuildUi()
     QStringList summaryParts;
     summaryParts << QString("Provider: %1")
                         .arg(m_descriptor.value("provider_display_name").toString("Inspect Surface View"));
-    if(!sceneId().isEmpty()) {
+    if (!sceneId().isEmpty()) {
         summaryParts << QString("Scene: %1").arg(sceneId());
     }
     summaryParts << QString("Layers: %1").arg(m_loadedFiles.size());
@@ -401,7 +401,7 @@ void Dummy3DHostedViewWidget::rebuildUi()
 void Dummy3DHostedViewWidget::refreshLoadedFileList()
 {
     m_loadedFilesList->clear();
-    for(const QString& loadedFile : std::as_const(m_loadedFiles)) {
+    for (const QString& loadedFile : std::as_const(m_loadedFiles)) {
         QListWidgetItem* item = new QListWidgetItem(QFileInfo(loadedFile).fileName(), m_loadedFilesList);
         item->setToolTip(loadedFile);
     }
@@ -413,21 +413,21 @@ void Dummy3DHostedViewWidget::refreshSurfaceTypeSelector()
     const QString currentSurfaceType = m_surfaceTypeCombo->currentText();
 
     m_surfaceTypeCombo->clear();
-    for(const QString& surfaceType : std::as_const(m_surfaceTypes)) {
+    for (const QString& surfaceType : std::as_const(m_surfaceTypes)) {
         m_surfaceTypeCombo->addItem(surfaceType);
     }
 
     m_surfaceTypeCombo->setEnabled(m_surfaceTypeCombo->count() > 0);
 
-    if(!currentSurfaceType.isEmpty()) {
+    if (!currentSurfaceType.isEmpty()) {
         const int existingIndex = m_surfaceTypeCombo->findText(currentSurfaceType);
-        if(existingIndex >= 0) {
+        if (existingIndex >= 0) {
             m_surfaceTypeCombo->setCurrentIndex(existingIndex);
             return;
         }
     }
 
-    if(m_surfaceTypeCombo->count() > 0) {
+    if (m_surfaceTypeCombo->count() > 0) {
         m_surfaceTypeCombo->setCurrentIndex(m_surfaceTypeCombo->count() - 1);
     }
 }
@@ -446,14 +446,14 @@ QStringList Dummy3DHostedViewWidget::requestedSceneFiles() const
     QStringList files = jsonArrayToStringList(m_descriptor.value("scene_layers").toArray());
 
     const QStringList alternateFiles = jsonArrayToStringList(m_descriptor.value("sceneLayers").toArray());
-    for(const QString& alternateFile : alternateFiles) {
-        if(!files.contains(alternateFile)) {
+    for (const QString& alternateFile : alternateFiles) {
+        if (!files.contains(alternateFile)) {
             files.append(alternateFile);
         }
     }
 
     const QString primaryFile = m_descriptor.value("file").toString().trimmed();
-    if(!primaryFile.isEmpty() && !files.contains(primaryFile)) {
+    if (!primaryFile.isEmpty() && !files.contains(primaryFile)) {
         files.prepend(primaryFile);
     }
 
@@ -463,16 +463,16 @@ QStringList Dummy3DHostedViewWidget::requestedSceneFiles() const
 QString Dummy3DHostedViewWidget::inferHemisphere(const QString& filePath) const
 {
     const QString lowerFileName = QFileInfo(filePath).fileName().toLower();
-    if(lowerFileName.contains("lh.") || lowerFileName.startsWith("lh_") || lowerFileName.startsWith("lh.")) {
+    if (lowerFileName.contains("lh.") || lowerFileName.startsWith("lh_") || lowerFileName.startsWith("lh.")) {
         return "lh";
     }
-    if(lowerFileName.contains("rh.") || lowerFileName.startsWith("rh_") || lowerFileName.startsWith("rh.")) {
+    if (lowerFileName.contains("rh.") || lowerFileName.startsWith("rh_") || lowerFileName.startsWith("rh.")) {
         return "rh";
     }
-    if(lowerFileName.contains("left")) {
+    if (lowerFileName.contains("left")) {
         return "lh";
     }
-    if(lowerFileName.contains("right")) {
+    if (lowerFileName.contains("right")) {
         return "rh";
     }
 
@@ -482,21 +482,21 @@ QString Dummy3DHostedViewWidget::inferHemisphere(const QString& filePath) const
 QString Dummy3DHostedViewWidget::inferSurfaceType(const QString& filePath) const
 {
     const QString lowerFileName = QFileInfo(filePath).fileName().toLower();
-    if(lowerFileName.contains("inflated")) {
+    if (lowerFileName.contains("inflated")) {
         return "inflated";
     }
-    if(lowerFileName.contains("white")) {
+    if (lowerFileName.contains("white")) {
         return "white";
     }
-    if(lowerFileName.contains("orig")) {
+    if (lowerFileName.contains("orig")) {
         return "orig";
     }
-    if(lowerFileName.contains("pial")) {
+    if (lowerFileName.contains("pial")) {
         return "pial";
     }
 
     const QString suffix = QFileInfo(filePath).suffix().toLower();
-    if(!suffix.isEmpty()) {
+    if (!suffix.isEmpty()) {
         return suffix;
     }
 
@@ -506,21 +506,21 @@ QString Dummy3DHostedViewWidget::inferSurfaceType(const QString& filePath) const
 QString Dummy3DHostedViewWidget::inferSubjectName(const QString& filePath) const
 {
     const QString descriptorSubject = m_descriptor.value("subjectId").toString().trimmed();
-    if(!descriptorSubject.isEmpty()) {
+    if (!descriptorSubject.isEmpty()) {
         return descriptorSubject;
     }
 
     QDir parentDir = QFileInfo(filePath).dir();
     const QString parentName = parentDir.dirName().toLower();
-    if((parentName == "surf" || parentName == "bem" || parentName == "label") && parentDir.cdUp()) {
+    if ((parentName == "surf" || parentName == "bem" || parentName == "label") && parentDir.cdUp()) {
         const QString subjectName = parentDir.dirName().trimmed();
-        if(!subjectName.isEmpty()) {
+        if (!subjectName.isEmpty()) {
             return subjectName;
         }
     }
 
     const QString directParentName = QFileInfo(filePath).dir().dirName().trimmed();
-    if(!directParentName.isEmpty()) {
+    if (!directParentName.isEmpty()) {
         return directParentName;
     }
 

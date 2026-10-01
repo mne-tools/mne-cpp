@@ -56,7 +56,7 @@ using namespace Eigen;
 //=============================================================================================================
 
 #define PROGRAM_VERSION MNE_CPP_VERSION
-#define N_NEAREST 5  // Number of nearest neighbors for interpolation
+#define N_NEAREST 5 // Number of nearest neighbors for interpolation
 
 //=============================================================================================================
 /**
@@ -106,7 +106,7 @@ static SparseMatrix<double> computeMorphMap(const MatrixX3f& srcSphere,
 
 //=============================================================================================================
 
-int main(int argc, char *argv[])
+int main(int argc, char* argv[])
 {
     qInstallMessageHandler(MNELogger::customLogWriter);
     QCoreApplication app(argc, argv);
@@ -142,9 +142,13 @@ int main(int argc, char *argv[])
     int nNearest = parser.value(nearestOpt).toInt();
 
     if (fromSubject.isEmpty() || toSubject.isEmpty()) {
-        qCritical("--from and --to are required."); return 1;
+        qCritical("--from and --to are required.");
+        return 1;
     }
-    if (subjectsDir.isEmpty()) { qCritical("$SUBJECTS_DIR not set."); return 1; }
+    if (subjectsDir.isEmpty()) {
+        qCritical("$SUBJECTS_DIR not set.");
+        return 1;
+    }
     if (outFile.isEmpty()) {
         outFile = QString("%1/morph-maps/%2-%3-morph.fif").arg(subjectsDir, fromSubject, toSubject);
         QDir().mkpath(QString("%1/morph-maps").arg(subjectsDir));
@@ -165,7 +169,7 @@ int main(int argc, char *argv[])
     stream->start_block(FIFFB_MNE);
 
     for (const QString& hemi : hemis) {
-        qInfo("\nProcessing %s hemisphere..." , qPrintable(hemi));
+        qInfo("\nProcessing %s hemisphere...", qPrintable(hemi));
 
         // Load sphere-registered surfaces
         QString srcPath = QString("%1/%2/surf/%3.sphere.reg").arg(subjectsDir, fromSubject, hemi);
@@ -185,14 +189,14 @@ int main(int argc, char *argv[])
             return 1;
         }
 
-        qInfo("  Source: %d vertices" , (int)srcSphere.rr().rows());
-        qInfo("  Dest:   %d vertices" , (int)dstSphere.rr().rows());
+        qInfo("  Source: %d vertices", (int)srcSphere.rr().rows());
+        qInfo("  Dest:   %d vertices", (int)dstSphere.rr().rows());
 
         // Compute morph map
-        qInfo("  Computing morph map (nearest=%d)..." , nNearest);
+        qInfo("  Computing morph map (nearest=%d)...", nNearest);
         SparseMatrix<double> morphMap = computeMorphMap(srcSphere.rr(), dstSphere.rr(), nNearest);
-        qInfo("  Morph map: %dx%d, %ld nonzeros" ,
-               (int)morphMap.rows(), (int)morphMap.cols(), (long)morphMap.nonZeros());
+        qInfo("  Morph map: %dx%d, %ld nonzeros",
+              (int)morphMap.rows(), (int)morphMap.cols(), (long)morphMap.nonZeros());
 
         // Write morph map as FIFF sparse matrix
         // Store as row/col/data arrays
@@ -217,6 +221,6 @@ int main(int argc, char *argv[])
     stream->end_block(FIFFB_MNE);
     stream->end_file();
 
-    qInfo("\nWritten morph maps to: %s" , qPrintable(outFile));
+    qInfo("\nWritten morph maps to: %s", qPrintable(outFile));
     return 0;
 }

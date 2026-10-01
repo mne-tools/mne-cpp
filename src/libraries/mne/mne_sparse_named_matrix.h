@@ -46,10 +46,10 @@ public:
     MNESparseNamedMatrix() = default;
     ~MNESparseNamedMatrix() = default;
 
-    int   nrow = 0;                        /**< Number of rows (same as in data). */
-    int   ncol = 0;                        /**< Number of columns (same as in data). */
-    QStringList rowlist;                   /**< Name list for the rows. */
-    QStringList collist;                   /**< Name list for the columns. */
+    int nrow = 0;                                    /**< Number of rows (same as in data). */
+    int ncol = 0;                                    /**< Number of columns (same as in data). */
+    QStringList rowlist;                             /**< Name list for the rows. */
+    QStringList collist;                             /**< Name list for the columns. */
     std::unique_ptr<FIFFLIB::FiffSparseMatrix> data; /**< The data itself (sparse). */
 };
 

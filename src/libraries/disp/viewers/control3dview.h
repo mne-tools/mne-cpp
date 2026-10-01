@@ -42,8 +42,9 @@
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-namespace Ui {
-    class Control3DViewWidget;
+namespace Ui
+{
+class Control3DViewWidget;
 }
 
 class QStyledItemDelegate;
@@ -73,8 +74,8 @@ class DISPSHARED_EXPORT Control3DView : public AbstractView
     Q_OBJECT
 
 public:
-    typedef QSharedPointer<Control3DView> SPtr;              /**< Shared pointer type for Control3DView. */
-    typedef QSharedPointer<const Control3DView> ConstSPtr;   /**< Const shared pointer type for Control3DView. */
+    typedef QSharedPointer<Control3DView> SPtr;            /**< Shared pointer type for Control3DView. */
+    typedef QSharedPointer<const Control3DView> ConstSPtr; /**< Const shared pointer type for Control3DView. */
 
     //=========================================================================================================
     /**
@@ -132,7 +133,7 @@ public:
      *
      * @param[in] index  Model index of the tree view row to remove; ignored if invalid.
      */
-    void onTreeViewRemoveItem(const QModelIndex &index);
+    void onTreeViewRemoveItem(const QModelIndex& index);
 
     //=========================================================================================================
     /**
@@ -260,10 +261,10 @@ protected:
      */
     void clearView();
 
-    Ui::Control3DViewWidget*    m_pUi;                      /**< The pointer to the QtDesigner ui class. */
+    Ui::Control3DViewWidget* m_pUi; /**< The pointer to the QtDesigner ui class. */
 
-    QColor                      m_colCurrentSceneColor;     /**< Current color of the scene in all View3D's. */
-    QColor                      m_colCurrentLightColor;     /**< Current color of the lights in all View3D's. */
+    QColor m_colCurrentSceneColor; /**< Current color of the scene in all View3D's. */
+    QColor m_colCurrentLightColor; /**< Current color of the lights in all View3D's. */
 
 signals:
     //=========================================================================================================

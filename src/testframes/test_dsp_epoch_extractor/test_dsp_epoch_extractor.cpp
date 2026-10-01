@@ -85,16 +85,16 @@ private slots:
 
 void TestDspEpochExtractor::extract_basicDimensions()
 {
-    const int nCh    = 4;
+    const int nCh = 4;
     const double sFreq = 1000.0;
     // Raw data: 3 seconds
     MatrixXd raw = MatrixXd::Random(nCh, static_cast<int>(3.0 * sFreq));
 
-    QVector<int> events = {500, 1000, 1500, 2000};  // 4 events
+    QVector<int> events = {500, 1000, 1500, 2000}; // 4 events
 
     EpochExtractor::Params p;
-    p.dTmin    = -0.2;
-    p.dTmax    =  0.5;
+    p.dTmin = -0.2;
+    p.dTmax = 0.5;
     p.bApplyBaseline = false;
     p.dThreshold = 0.0;
 
@@ -113,17 +113,17 @@ void TestDspEpochExtractor::extract_basicDimensions()
 
 void TestDspEpochExtractor::extract_dataValues_matchRaw()
 {
-    const int nCh    = 2;
+    const int nCh = 2;
     const double sFreq = 500.0;
-    const int nSamp  = 2000;
-    MatrixXd raw     = MatrixXd::Random(nCh, nSamp);
+    const int nSamp = 2000;
+    MatrixXd raw = MatrixXd::Random(nCh, nSamp);
 
     // Single event at sample 500, epoch [0, 0.1] s (no pre-stimulus)
     EpochExtractor::Params p;
-    p.dTmin           = 0.0;
-    p.dTmax           = 0.1;
-    p.bApplyBaseline  = false;
-    p.dThreshold      = 0.0;
+    p.dTmin = 0.0;
+    p.dTmax = 0.1;
+    p.bApplyBaseline = false;
+    p.dThreshold = 0.0;
 
     QVector<int> events = {500};
     auto epochs = EpochExtractor::extract(raw, events, sFreq, p);
@@ -144,8 +144,8 @@ void TestDspEpochExtractor::extract_outOfBounds_skipped()
     MatrixXd raw = MatrixXd::Zero(2, nSamp);
 
     EpochExtractor::Params p;
-    p.dTmin = -0.5;  // 500 samples pre-stimulus
-    p.dTmax =  0.5;  // 500 samples post-stimulus
+    p.dTmin = -0.5; // 500 samples pre-stimulus
+    p.dTmax = 0.5;  // 500 samples post-stimulus
     p.bApplyBaseline = false;
 
     // event at 100: s0 = 100-500 = -400 → out of bounds (skipped)
@@ -171,12 +171,12 @@ void TestDspEpochExtractor::extract_baselineCorrection_zerosMean()
 
     QVector<int> events = {2000};
     EpochExtractor::Params p;
-    p.dTmin          = -0.5;
-    p.dTmax          =  0.5;
-    p.dBaseMin       = -0.5;
-    p.dBaseMax       =  0.0;
+    p.dTmin = -0.5;
+    p.dTmax = 0.5;
+    p.dBaseMin = -0.5;
+    p.dBaseMax = 0.0;
     p.bApplyBaseline = true;
-    p.dThreshold     = 0.0;
+    p.dThreshold = 0.0;
 
     auto epochs = EpochExtractor::extract(raw, events, sFreq, p);
     QCOMPARE(epochs.size(), 1);
@@ -193,18 +193,18 @@ void TestDspEpochExtractor::extract_baselineCorrection_zerosMean()
 void TestDspEpochExtractor::extract_rejection_marksHighAmplitude()
 {
     const double sFreq = 1000.0;
-    const int nSamp    = 5000;
-    const int nCh     = 2;
+    const int nSamp = 5000;
+    const int nCh = 2;
 
     MatrixXd raw = MatrixXd::Zero(nCh, nSamp);
     // Insert a large spike in channel 0, in the epoch window
-    raw(0, 2100) = 1.0;   // 1 V spike
+    raw(0, 2100) = 1.0; // 1 V spike
 
     QVector<int> events = {2000};
     EpochExtractor::Params p;
-    p.dTmin      = -0.5;
-    p.dTmax      =  0.5;
-    p.dThreshold = 0.5;   // 0.5 V threshold — spike exceeds this
+    p.dTmin = -0.5;
+    p.dTmax = 0.5;
+    p.dThreshold = 0.5; // 0.5 V threshold — spike exceeds this
     p.bApplyBaseline = false;
 
     auto epochs = EpochExtractor::extract(raw, events, sFreq, p);
@@ -217,17 +217,17 @@ void TestDspEpochExtractor::extract_rejection_marksHighAmplitude()
 void TestDspEpochExtractor::extract_rejection_keepsgoodEpochs()
 {
     const double sFreq = 1000.0;
-    const int nSamp    = 5000;
-    const int nCh     = 2;
+    const int nSamp = 5000;
+    const int nCh = 2;
 
     // Small amplitude data — well within threshold
     MatrixXd raw = MatrixXd::Constant(nCh, nSamp, 1e-7);
 
     QVector<int> events = {2000};
     EpochExtractor::Params p;
-    p.dTmin      = -0.5;
-    p.dTmax      =  0.5;
-    p.dThreshold = 150e-6;  // 150 µV — data is 100 nV, well below
+    p.dTmin = -0.5;
+    p.dTmax = 0.5;
+    p.dThreshold = 150e-6; // 150 µV — data is 100 nV, well below
     p.bApplyBaseline = false;
 
     auto epochs = EpochExtractor::extract(raw, events, sFreq, p);
@@ -243,10 +243,12 @@ void TestDspEpochExtractor::extract_eventCodes_stored()
     MatrixXd raw = MatrixXd::Zero(2, 5000);
 
     QVector<int> events = {1000, 2000, 3000};
-    QVector<int> codes  = {1, 2, 3};
+    QVector<int> codes = {1, 2, 3};
 
     EpochExtractor::Params p;
-    p.dTmin = -0.1; p.dTmax = 0.1; p.bApplyBaseline = false;
+    p.dTmin = -0.1;
+    p.dTmax = 0.1;
+    p.bApplyBaseline = false;
 
     auto epochs = EpochExtractor::extract(raw, events, sFreq, p, codes);
     QCOMPARE(epochs.size(), 3);
@@ -261,7 +263,7 @@ void TestDspEpochExtractor::rejectMarked_returnsGoodOnly()
 {
     MNEEpochData good1, bad1, good2;
     good1.bReject = false;
-    bad1.bReject  = true;
+    bad1.bReject = true;
     good2.bReject = false;
 
     QVector<MNEEpochData> all = {good1, bad1, good2};
@@ -280,9 +282,9 @@ void TestDspEpochExtractor::average_correctGrandAverage()
 
     // Two epochs: one all-ones, one all-twos → mean = 1.5
     MNEEpochData ep1, ep2;
-    ep1.epoch  = MatrixXd::Ones(nCh, nSamp);
+    ep1.epoch = MatrixXd::Ones(nCh, nSamp);
     ep1.bReject = false;
-    ep2.epoch  = MatrixXd::Constant(nCh, nSamp, 2.0);
+    ep2.epoch = MatrixXd::Constant(nCh, nSamp, 2.0);
     ep2.bReject = false;
 
     auto avg = EpochExtractor::average({ep1, ep2});
@@ -298,7 +300,7 @@ void TestDspEpochExtractor::average_allRejected_returnsEmpty()
 {
     MNEEpochData ep;
     ep.bReject = true;
-    ep.epoch   = MatrixXd::Ones(3, 100);
+    ep.epoch = MatrixXd::Ones(3, 100);
 
     auto avg = EpochExtractor::average({ep});
     QVERIFY(avg.size() == 0);

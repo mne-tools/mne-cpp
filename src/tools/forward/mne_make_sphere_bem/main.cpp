@@ -62,30 +62,26 @@ static void makeIcosphere(int nSubdiv, MatrixX3f& verts, MatrixX3i& tris)
     float t = (1.0f + sqrtf(5.0f)) / 2.0f;
 
     std::vector<Vector3f> v = {
-        Vector3f(-1,  t, 0).normalized(), Vector3f( 1,  t, 0).normalized(),
-        Vector3f(-1, -t, 0).normalized(), Vector3f( 1, -t, 0).normalized(),
-        Vector3f( 0, -1,  t).normalized(), Vector3f( 0,  1,  t).normalized(),
-        Vector3f( 0, -1, -t).normalized(), Vector3f( 0,  1, -t).normalized(),
-        Vector3f( t,  0, -1).normalized(), Vector3f( t,  0,  1).normalized(),
-        Vector3f(-t,  0, -1).normalized(), Vector3f(-t,  0,  1).normalized()
-    };
+        Vector3f(-1, t, 0).normalized(), Vector3f(1, t, 0).normalized(),
+        Vector3f(-1, -t, 0).normalized(), Vector3f(1, -t, 0).normalized(),
+        Vector3f(0, -1, t).normalized(), Vector3f(0, 1, t).normalized(),
+        Vector3f(0, -1, -t).normalized(), Vector3f(0, 1, -t).normalized(),
+        Vector3f(t, 0, -1).normalized(), Vector3f(t, 0, 1).normalized(),
+        Vector3f(-t, 0, -1).normalized(), Vector3f(-t, 0, 1).normalized()};
 
     std::vector<Vector3i> f = {
-        {0,11,5}, {0,5,1}, {0,1,7}, {0,7,10}, {0,10,11},
-        {1,5,9}, {5,11,4}, {11,10,2}, {10,7,6}, {7,1,8},
-        {3,9,4}, {3,4,2}, {3,2,6}, {3,6,8}, {3,8,9},
-        {4,9,5}, {2,4,11}, {6,2,10}, {8,6,7}, {9,8,1}
-    };
+        {0, 11, 5}, {0, 5, 1}, {0, 1, 7}, {0, 7, 10}, {0, 10, 11}, {1, 5, 9}, {5, 11, 4}, {11, 10, 2}, {10, 7, 6}, {7, 1, 8}, {3, 9, 4}, {3, 4, 2}, {3, 2, 6}, {3, 6, 8}, {3, 8, 9}, {4, 9, 5}, {2, 4, 11}, {6, 2, 10}, {8, 6, 7}, {9, 8, 1}};
 
     // Subdivision
     for (int s = 0; s < nSubdiv; ++s) {
         std::vector<Vector3i> newFaces;
-        std::map<std::pair<int,int>, int> edgeMidpoint;
+        std::map<std::pair<int, int>, int> edgeMidpoint;
 
         auto getMidpoint = [&](int a, int b) -> int {
             auto key = std::make_pair(std::min(a, b), std::max(a, b));
             auto it = edgeMidpoint.find(key);
-            if (it != edgeMidpoint.end()) return it->second;
+            if (it != edgeMidpoint.end())
+                return it->second;
             int idx = static_cast<int>(v.size());
             v.push_back(((v[a] + v[b]) * 0.5f).normalized());
             edgeMidpoint[key] = idx;
@@ -115,7 +111,7 @@ static void makeIcosphere(int nSubdiv, MatrixX3f& verts, MatrixX3i& tris)
 
 //=============================================================================================================
 
-int main(int argc, char *argv[])
+int main(int argc, char* argv[])
 {
     qInstallMessageHandler(MNELogger::customLogWriter);
     QCoreApplication app(argc, argv);
@@ -148,7 +144,10 @@ int main(int argc, char *argv[])
 
     // Parse origin
     QStringList originParts = parser.value(originOpt).split(',');
-    if (originParts.size() != 3) { qCritical("--origin: need x,y,z"); return 1; }
+    if (originParts.size() != 3) {
+        qCritical("--origin: need x,y,z");
+        return 1;
+    }
     Vector3f origin(originParts[0].toFloat() / 1000.0f,
                     originParts[1].toFloat() / 1000.0f,
                     originParts[2].toFloat() / 1000.0f);
@@ -156,16 +155,21 @@ int main(int argc, char *argv[])
     // Parse radii
     QList<float> radii;
     QStringList radiiParts = parser.value(radiiOpt).split(',');
-    for (const QString& p : radiiParts) radii.append(p.toFloat() / 1000.0f);
+    for (const QString& p : radiiParts)
+        radii.append(p.toFloat() / 1000.0f);
 
     // Parse conductivities
     QList<float> sigmas;
     QStringList sigmaParts = parser.value(condOpt).split(',');
-    for (const QString& p : sigmaParts) sigmas.append(p.toFloat());
+    for (const QString& p : sigmaParts)
+        sigmas.append(p.toFloat());
 
     int icoLevel = parser.value(icoOpt).toInt();
 
-    if (outFile.isEmpty()) { qCritical("--out is required."); return 1; }
+    if (outFile.isEmpty()) {
+        qCritical("--out is required.");
+        return 1;
+    }
     if (radii.size() != sigmas.size()) {
         qCritical("Number of radii (%lld) must match number of conductivities (%lld)",
                   static_cast<long long>(radii.size()), static_cast<long long>(sigmas.size()));
@@ -176,16 +180,17 @@ int main(int argc, char *argv[])
     MatrixX3f unitVerts;
     MatrixX3i tris;
     makeIcosphere(icoLevel, unitVerts, tris);
-    qInfo("Icosphere subdivision %d: %d vertices, %d triangles" ,
-           icoLevel, (int)unitVerts.rows(), (int)tris.rows());
+    qInfo("Icosphere subdivision %d: %d vertices, %d triangles",
+          icoLevel, (int)unitVerts.rows(), (int)tris.rows());
 
     // Create BEM model
     MNEBem bem;
-    QList<int> surfIds = { FIFFV_BEM_SURF_ID_BRAIN, FIFFV_BEM_SURF_ID_SKULL, FIFFV_BEM_SURF_ID_HEAD };
+    QList<int> surfIds = {FIFFV_BEM_SURF_ID_BRAIN, FIFFV_BEM_SURF_ID_SKULL, FIFFV_BEM_SURF_ID_HEAD};
 
     // Sort radii ascending (innermost first)
     QList<int> sortIdx;
-    for (int i = 0; i < radii.size(); ++i) sortIdx.append(i);
+    for (int i = 0; i < radii.size(); ++i)
+        sortIdx.append(i);
     std::sort(sortIdx.begin(), sortIdx.end(), [&](int a, int b) { return radii[a] < radii[b]; });
 
     for (int i = 0; i < radii.size(); ++i) {
@@ -212,9 +217,9 @@ int main(int argc, char *argv[])
         surf.itris = tris;
         surf.nn = unitVerts; // normals point outward on unit sphere
 
-        qInfo("Surface %d (%s): radius=%6.1f mm, sigma=%g S/m, %d vertices" ,
-               i + 1, qPrintable(MNEBemSurface::id_name(surfId)),
-               1000.0f * radius, sigma, surf.np);
+        qInfo("Surface %d (%s): radius=%6.1f mm, sigma=%g S/m, %d vertices",
+              i + 1, qPrintable(MNEBemSurface::id_name(surfId)),
+              1000.0f * radius, sigma, surf.np);
 
         bem << surf;
     }
@@ -222,7 +227,7 @@ int main(int argc, char *argv[])
     // Write BEM
     QFile file(outFile);
     bem.write(file);
-    qInfo("Written spherical BEM model to: %s" , qPrintable(outFile));
+    qInfo("Written spherical BEM model to: %s", qPrintable(outFile));
 
     return 0;
 }

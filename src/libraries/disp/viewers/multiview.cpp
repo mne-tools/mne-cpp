@@ -39,13 +39,13 @@ using namespace DISPLIB;
 //=============================================================================================================
 
 MultiView::MultiView(const QString& sSettingsPath,
-                     QWidget *parent,
+                     QWidget* parent,
                      Qt::WindowFlags flags)
 : QMainWindow(parent, flags)
 {
     m_sSettingsPath = sSettingsPath;
     this->setDockNestingEnabled(true);
-    if(QWidget* pCentralWidget = this->centralWidget()) {
+    if (QWidget* pCentralWidget = this->centralWidget()) {
         pCentralWidget->hide();
     }
 }
@@ -66,14 +66,14 @@ MultiViewWindow* MultiView::addWidgetTop(QWidget* pWidget,
     pDockWidget->setWindowTitle(sName);
     pDockWidget->setWidget(pWidget);
 
-    // Disable floating and editable dock widgets, since the wasm QDockWidget version is buggy
-    #ifdef WASMBUILD
+// Disable floating and editable dock widgets, since the wasm QDockWidget version is buggy
+#ifdef WASMBUILD
     pDockWidget->setFeatures(QDockWidget::DockWidgetClosable);
-    #endif
+#endif
 
-    if(pWidget->layout() && pDockWidget->layout()){
-        pWidget->layout()->setContentsMargins(0,0,0,0);
-        pDockWidget->layout()->setContentsMargins(0,0,0,0);
+    if (pWidget->layout() && pDockWidget->layout()) {
+        pWidget->layout()->setContentsMargins(0, 0, 0, 0);
+        pDockWidget->layout()->setContentsMargins(0, 0, 0, 0);
     }
 
     this->addDockWidget(Qt::DockWidgetArea::TopDockWidgetArea, pDockWidget);
@@ -97,21 +97,21 @@ MultiViewWindow* MultiView::addWidgetBottom(QWidget* pWidget,
 
     pWidget->setParent(pDockWidget);
 
-    // Disable floating and editable dock widgets, since the wasm QDockWidget version is buggy
-    #ifdef WASMBUILD
+// Disable floating and editable dock widgets, since the wasm QDockWidget version is buggy
+#ifdef WASMBUILD
     pDockWidget->setFeatures(QDockWidget::DockWidgetClosable);
-    #endif
+#endif
 
-    if(pWidget->layout() && pDockWidget->layout()){
-        pWidget->layout()->setContentsMargins(0,0,0,0);
-        pDockWidget->layout()->setContentsMargins(0,0,0,0);
+    if (pWidget->layout() && pDockWidget->layout()) {
+        pWidget->layout()->setContentsMargins(0, 0, 0, 0);
+        pDockWidget->layout()->setContentsMargins(0, 0, 0, 0);
     }
 
-    if(m_lDockWidgets.isEmpty()) {
+    if (m_lDockWidgets.isEmpty()) {
         this->addDockWidget(Qt::DockWidgetArea::BottomDockWidgetArea, pDockWidget);
     }
 
-    for(int i = 0; i < m_lDockWidgets.size(); ++i) {
+    for (int i = 0; i < m_lDockWidgets.size(); ++i) {
         this->tabifyDockWidget(m_lDockWidgets.at(i), pDockWidget);
     }
 
@@ -128,7 +128,7 @@ MultiViewWindow* MultiView::addWidgetBottom(QWidget* pWidget,
 
 void MultiView::saveSettings()
 {
-    if(m_sSettingsPath.isEmpty()) {
+    if (m_sSettingsPath.isEmpty()) {
         qWarning() << "[MultiView::saveSettings] Settings path not set for main window. Cannot save central widget state.";
         return;
     }
@@ -145,7 +145,7 @@ void MultiView::saveSettings()
 
 void MultiView::loadSettings()
 {
-    if(m_sSettingsPath.isEmpty()) {
+    if (m_sSettingsPath.isEmpty()) {
         qWarning() << "[MultiView::loadSettings] Settings path not set for main window. Cannot load central widget state.";
         return;
     }

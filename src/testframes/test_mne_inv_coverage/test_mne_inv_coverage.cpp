@@ -101,12 +101,30 @@ private slots:
     void cleanupTestCase();
 
 private:
-    QString rawPath() const { return m_sTestDataPath + "/MEG/sample/sample_audvis_trunc_raw.fif"; }
-    QString avePath() const { return m_sTestDataPath + "/MEG/sample/sample_audvis-ave.fif"; }
-    QString covPath() const { return m_sTestDataPath + "/MEG/sample/sample_audvis-cov.fif"; }
-    QString fwdPath() const { return m_sTestDataPath + "/Result/ref-sample_audvis-meg-eeg-oct-6-fwd.fif"; }
-    QString bemPath() const { return m_sTestDataPath + "/subjects/sample/bem/sample-5120-bem.fif"; }
-    QString srcPath() const { return m_sTestDataPath + "/subjects/sample/bem/sample-oct-6-src.fif"; }
+    QString rawPath() const
+    {
+        return m_sTestDataPath + "/MEG/sample/sample_audvis_trunc_raw.fif";
+    }
+    QString avePath() const
+    {
+        return m_sTestDataPath + "/MEG/sample/sample_audvis-ave.fif";
+    }
+    QString covPath() const
+    {
+        return m_sTestDataPath + "/MEG/sample/sample_audvis-cov.fif";
+    }
+    QString fwdPath() const
+    {
+        return m_sTestDataPath + "/Result/ref-sample_audvis-meg-eeg-oct-6-fwd.fif";
+    }
+    QString bemPath() const
+    {
+        return m_sTestDataPath + "/subjects/sample/bem/sample-5120-bem.fif";
+    }
+    QString srcPath() const
+    {
+        return m_sTestDataPath + "/subjects/sample/bem/sample-oct-6-src.fif";
+    }
 
     QString m_sTestDataPath;
     QTemporaryDir m_tmpDir;
@@ -117,8 +135,7 @@ private:
 void TestMneInvCoverage::initTestCase()
 {
     qInstallMessageHandler(MNELogger::customLogWriter);
-    m_sTestDataPath = QCoreApplication::applicationDirPath()
-                      + "/../resources/data/mne-cpp-test-data";
+    m_sTestDataPath = QCoreApplication::applicationDirPath() + "/../resources/data/mne-cpp-test-data";
     QVERIFY2(QFile::exists(rawPath()),
              qPrintable(QString("Test data not found: %1").arg(rawPath())));
     QVERIFY(m_tmpDir.isValid());
@@ -169,7 +186,7 @@ void TestMneInvCoverage::testCheckChNamesMismatch()
     bool ok = invOp.check_ch_names(info);
     // Mismatch should fail or return false
     // Result depends on implementation: may warn but still proceed
-    Q_UNUSED(ok);  // Just verify it doesn't crash
+    Q_UNUSED(ok); // Just verify it doesn't crash
 }
 
 void TestMneInvCoverage::testCheckChNamesEmpty()
@@ -179,7 +196,7 @@ void TestMneInvCoverage::testCheckChNamesEmpty()
     invOp.noise_cov = FiffCov::SDPtr(new FiffCov());
 
     bool ok = invOp.check_ch_names(info);
-    Q_UNUSED(ok);  // Just verify it doesn't crash
+    Q_UNUSED(ok); // Just verify it doesn't crash
 }
 
 //=============================================================================================================
@@ -260,7 +277,7 @@ void TestMneInvCoverage::testSourceSpaceFromFile()
     QVERIFY(MNESourceSpaces::readFromStream(stream, true, srcSpaces));
     stream->close();
 
-    QVERIFY(srcSpaces.size() >= 2);  // left + right hemispheres
+    QVERIFY(srcSpaces.size() >= 2); // left + right hemispheres
 }
 
 void TestMneInvCoverage::testSourceSpaceVertexCount()
@@ -316,7 +333,7 @@ void TestMneInvCoverage::testSourceEstimateConstruction()
     MatrixXd data = MatrixXd::Random(nSources, nTimes);
     VectorXi vertices = VectorXi::LinSpaced(nSources, 0, nSources - 1);
     float tmin = 0.0f;
-    float tstep = 0.001f;  // 1ms
+    float tstep = 0.001f; // 1ms
 
     InvSourceEstimate stc(data, vertices, tmin, tstep);
     QCOMPARE(stc.data.rows(), (Eigen::Index)nSources);
@@ -415,9 +432,9 @@ void TestMneInvCoverage::testEpochDataListFromRaw()
     MatrixXi events(5, 3);
     int firstSamp = raw.first_samp;
     for (int i = 0; i < 5; i++) {
-        events(i, 0) = firstSamp + i * 1000;  // sample
-        events(i, 1) = 0;           // prev event
-        events(i, 2) = 1;           // event ID
+        events(i, 0) = firstSamp + i * 1000; // sample
+        events(i, 1) = 0;                    // prev event
+        events(i, 2) = 1;                    // event ID
     }
 
     // Read epochs: -0.2 to 0.5 seconds
@@ -425,7 +442,7 @@ void TestMneInvCoverage::testEpochDataListFromRaw()
     float tmax = 0.5f;
 
     MNEEpochDataList epochList;
-    QMap<QString, double> mapReject;  // No rejection thresholds
+    QMap<QString, double> mapReject; // No rejection thresholds
     epochList = MNEEpochDataList::readEpochs(
         raw, events, tmin, tmax, 1, // event ID
         mapReject,

@@ -30,7 +30,7 @@ using namespace std;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-EEGoSportsImpedanceView::EEGoSportsImpedanceView(QWidget *parent)
+EEGoSportsImpedanceView::EEGoSportsImpedanceView(QWidget* parent)
 : QGraphicsView(parent)
 {
     // Enable scene interactions
@@ -54,11 +54,11 @@ EEGoSportsImpedanceView::EEGoSportsImpedanceView(QWidget *parent)
 
 void EEGoSportsImpedanceView::wheelEvent(QWheelEvent* event)
 {
-    if(event->angleDelta().y()>0) // wheel was rotated forward
-        this->scale(1.25,1.25);
+    if (event->angleDelta().y() > 0) // wheel was rotated forward
+        this->scale(1.25, 1.25);
 
-    if(event->angleDelta().y()<0) // wheel was rotated backward
-        this->scale(0.75,0.75);
+    if (event->angleDelta().y() < 0) // wheel was rotated backward
+        this->scale(0.75, 0.75);
 
     // Don't call superclass handler here as wheel is normally used for moving scrollbars
     //QGraphicsView::wheelEvent(event);

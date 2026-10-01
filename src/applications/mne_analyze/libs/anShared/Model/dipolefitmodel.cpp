@@ -36,10 +36,10 @@ using namespace ANSHAREDLIB;
 //=============================================================================================================
 
 DipoleFitModel::DipoleFitModel(INVLIB::InvEcdSet InvEcdSet,
-                               const QString &sFilePath,
+                               const QString& sFilePath,
                                const QByteArray& byteLoadedData,
                                QObject* parent)
-:AbstractModel(parent)
+: AbstractModel(parent)
 {
     Q_UNUSED(byteLoadedData);
     Q_UNUSED(sFilePath);
@@ -49,18 +49,17 @@ DipoleFitModel::DipoleFitModel(INVLIB::InvEcdSet InvEcdSet,
 
 //=============================================================================================================
 
-DipoleFitModel::DipoleFitModel(const QString &sFilePath,
+DipoleFitModel::DipoleFitModel(const QString& sFilePath,
                                const QByteArray& byteLoadedData,
                                QObject* parent)
-:AbstractModel(sFilePath, parent)
+: AbstractModel(sFilePath, parent)
 {
     Q_UNUSED(byteLoadedData);
-
 }
 
 //=============================================================================================================
 
-int DipoleFitModel::rowCount(const QModelIndex &parent) const
+int DipoleFitModel::rowCount(const QModelIndex& parent) const
 {
     Q_UNUSED(parent);
 
@@ -69,7 +68,7 @@ int DipoleFitModel::rowCount(const QModelIndex &parent) const
 
 //=============================================================================================================
 
-int DipoleFitModel::columnCount(const QModelIndex &parent) const
+int DipoleFitModel::columnCount(const QModelIndex& parent) const
 {
     Q_UNUSED(parent);
 
@@ -78,8 +77,8 @@ int DipoleFitModel::columnCount(const QModelIndex &parent) const
 
 //=============================================================================================================
 
-QVariant DipoleFitModel::data(const QModelIndex &index,
-                             int role) const
+QVariant DipoleFitModel::data(const QModelIndex& index,
+                              int role) const
 {
     Q_UNUSED(index);
     Q_UNUSED(role);
@@ -89,7 +88,7 @@ QVariant DipoleFitModel::data(const QModelIndex &index,
 
 //=============================================================================================================
 
-Qt::ItemFlags DipoleFitModel::flags(const QModelIndex &index) const
+Qt::ItemFlags DipoleFitModel::flags(const QModelIndex& index) const
 {
     return QAbstractItemModel::flags(index);
 }

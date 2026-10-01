@@ -138,8 +138,7 @@ QString TestToolExitCodes::findTool(const QString& name) const
         appDir + "/../apps/" + name + suffix,
         appDir + "/../bin/" + name + suffix,
         // Tools with a GUI mode are macOS app bundles when BUILD_MAC_APP_BUNDLE is on.
-        appDir + "/../bin/" + name + ".app/Contents/MacOS/" + name
-    };
+        appDir + "/../bin/" + name + ".app/Contents/MacOS/" + name};
 
     for (const QString& path : candidates) {
         const QFileInfo info(path);
@@ -206,19 +205,19 @@ void TestToolExitCodes::missingRequiredArguments_data()
     // Each of these refuses to run without arguments. None of them needs test
     // data to reach that decision, so the case is available on every platform.
     QTest::newRow("mne_fix_mag_coil_types") << "mne_fix_mag_coil_types";
-    QTest::newRow("mne_add_triggers")       << "mne_add_triggers";
-    QTest::newRow("mne_change_nave")        << "mne_change_nave";
-    QTest::newRow("mne_mark_bad_channels")  << "mne_mark_bad_channels";
-    QTest::newRow("mne_cov2proj")            << "mne_cov2proj";
-    QTest::newRow("mne_compare_fif_files")   << "mne_compare_fif_files";
-    QTest::newRow("mne_collect_transforms")  << "mne_collect_transforms";
-    QTest::newRow("mne_add_patch_info")      << "mne_add_patch_info";
-    QTest::newRow("mne_list_source_space")   << "mne_list_source_space";
-    QTest::newRow("mne_epochs2mat")           << "mne_epochs2mat";
-    QTest::newRow("mne_compute_cmne")         << "mne_compute_cmne";
-    QTest::newRow("mne_make_scalp_surfaces")  << "mne_make_scalp_surfaces";
-    QTest::newRow("mne_dipole_fit")           << "mne_dipole_fit";
-    QTest::newRow("mne_toggle_skips")       << "mne_toggle_skips";
+    QTest::newRow("mne_add_triggers") << "mne_add_triggers";
+    QTest::newRow("mne_change_nave") << "mne_change_nave";
+    QTest::newRow("mne_mark_bad_channels") << "mne_mark_bad_channels";
+    QTest::newRow("mne_cov2proj") << "mne_cov2proj";
+    QTest::newRow("mne_compare_fif_files") << "mne_compare_fif_files";
+    QTest::newRow("mne_collect_transforms") << "mne_collect_transforms";
+    QTest::newRow("mne_add_patch_info") << "mne_add_patch_info";
+    QTest::newRow("mne_list_source_space") << "mne_list_source_space";
+    QTest::newRow("mne_epochs2mat") << "mne_epochs2mat";
+    QTest::newRow("mne_compute_cmne") << "mne_compute_cmne";
+    QTest::newRow("mne_make_scalp_surfaces") << "mne_make_scalp_surfaces";
+    QTest::newRow("mne_dipole_fit") << "mne_dipole_fit";
+    QTest::newRow("mne_toggle_skips") << "mne_toggle_skips";
 }
 
 //=============================================================================================================
@@ -366,8 +365,7 @@ void TestToolExitCodes::helpSucceeds_data()
         // Surface, simulation, server, and visualization
         "mne_add_patch_info", "mne_annot2labels", "mne_make_eeg_layout",
         "mne_make_morph_maps", "mne_morph_labels", "mne_volume_source_space",
-        "mne_rt_server", "mne_simu", "mne_screenshot_regression"
-    };
+        "mne_rt_server", "mne_simu", "mne_screenshot_regression"};
 
     for (const QString& tool : tools) {
         QTest::newRow(tool.toUtf8().constData()) << tool;
@@ -399,9 +397,8 @@ void TestToolExitCodes::invalidListSourceSpaceInputs()
         QSKIP("mne_list_source_space was not built in this configuration");
     }
 
-    const QString sourceFile = QCoreApplication::applicationDirPath()
-                               + "/../resources/data/mne-cpp-test-data/subjects/sample/bem/"
-                                 "sample-oct-6-src.fif";
+    const QString sourceFile = QCoreApplication::applicationDirPath() + "/../resources/data/mne-cpp-test-data/subjects/sample/bem/"
+                                                                        "sample-oct-6-src.fif";
     if (!QFileInfo::exists(sourceFile)) {
         QSKIP("source-space test data is not available");
     }
@@ -438,8 +435,7 @@ void TestToolExitCodes::invalidCmneModes()
         "--cov", m_sMissingFile,
         "--epochs", m_sMissingFile,
         "--onnx-out", m_tempDir.filePath("cmne.onnx"),
-        "--python", missingPython
-    };
+        "--python", missingPython};
     QCOMPARE(runTool(computeCmne,
                      QStringList{"--mode", "train"} + trainingArguments),
              1);
@@ -450,8 +446,7 @@ void TestToolExitCodes::invalidCmneModes()
     QCOMPARE(onnxFile.write("placeholder"), 11);
     onnxFile.close();
     QCOMPARE(runTool(computeCmne,
-                     QStringList{"--mode", "finetune", "--finetune", existingOnnx}
-                         + trainingArguments),
+                     QStringList{"--mode", "finetune", "--finetune", existingOnnx} + trainingArguments),
              1);
 }
 
@@ -459,8 +454,7 @@ void TestToolExitCodes::invalidCmneModes()
 
 void TestToolExitCodes::validFiffFileOperations()
 {
-    const QString dataDir = QCoreApplication::applicationDirPath()
-                            + "/../resources/data/mne-cpp-test-data/MEG/sample/";
+    const QString dataDir = QCoreApplication::applicationDirPath() + "/../resources/data/mne-cpp-test-data/MEG/sample/";
     const QString covFile = dataDir + "sample_audvis-cov.fif";
     const QString evokedFile = dataDir + "sample_audvis-ave.fif";
     const QString rawFile = dataDir + "sample_audvis_trunc_raw.fif";
@@ -502,9 +496,8 @@ void TestToolExitCodes::validFiffFileOperations()
 
     const QString addPatchInfo = findTool("mne_add_patch_info");
     const QString listSourceSpace = findTool("mne_list_source_space");
-    const QString sourceFile = QCoreApplication::applicationDirPath()
-                               + "/../resources/data/mne-cpp-test-data/subjects/sample/bem/"
-                                 "sample-oct-6-src.fif";
+    const QString sourceFile = QCoreApplication::applicationDirPath() + "/../resources/data/mne-cpp-test-data/subjects/sample/bem/"
+                                                                        "sample-oct-6-src.fif";
     if (!addPatchInfo.isEmpty() && QFileInfo::exists(sourceFile)) {
         const QString outputFile = m_tempDir.filePath("source-space-with-patches.fif");
         QCOMPARE(runTool(addPatchInfo, {"--src", sourceFile, "--out", outputFile}), 0);

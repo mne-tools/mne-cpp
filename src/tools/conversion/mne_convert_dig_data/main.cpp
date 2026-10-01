@@ -55,7 +55,8 @@ using namespace UTILSLIB;
 
 //=============================================================================================================
 
-struct DigPt {
+struct DigPt
+{
     int kind;
     int ident;
     float r[3]; // meters
@@ -63,7 +64,7 @@ struct DigPt {
 
 //=============================================================================================================
 
-static QList<DigPt> readFifDig(const QString &filename)
+static QList<DigPt> readFifDig(const QString& filename)
 {
     QList<DigPt> points;
     QFile file(filename);
@@ -93,7 +94,7 @@ static QList<DigPt> readFifDig(const QString &filename)
 
 //=============================================================================================================
 
-static QList<DigPt> readHpts(const QString &filename)
+static QList<DigPt> readHpts(const QString& filename)
 {
     QList<DigPt> points;
     QFile file(filename);
@@ -114,10 +115,14 @@ static QList<DigPt> readHpts(const QString &filename)
 
         DigPt p;
         QString cat = parts[0].toLower();
-        if (cat == "cardinal" || cat == "fiducial") p.kind = FIFFV_POINT_CARDINAL;
-        else if (cat == "hpi") p.kind = FIFFV_POINT_HPI;
-        else if (cat == "eeg") p.kind = FIFFV_POINT_EEG;
-        else p.kind = FIFFV_POINT_EXTRA;
+        if (cat == "cardinal" || cat == "fiducial")
+            p.kind = FIFFV_POINT_CARDINAL;
+        else if (cat == "hpi")
+            p.kind = FIFFV_POINT_HPI;
+        else if (cat == "eeg")
+            p.kind = FIFFV_POINT_EEG;
+        else
+            p.kind = FIFFV_POINT_EXTRA;
 
         p.ident = parts[1].toInt();
         // hpts coordinates are in mm
@@ -132,7 +137,7 @@ static QList<DigPt> readHpts(const QString &filename)
 
 //=============================================================================================================
 
-static bool writeFifDig(const QString &filename, const QList<DigPt> &points)
+static bool writeFifDig(const QString& filename, const QList<DigPt>& points)
 {
     QFile outFile(filename);
     FiffStream::SPtr outStream = FiffStream::start_file(outFile);
@@ -142,7 +147,7 @@ static bool writeFifDig(const QString &filename, const QList<DigPt> &points)
     }
 
     outStream->start_block(FIFFB_ISOTRAK);
-    for (const DigPt &p : points) {
+    for (const DigPt& p : points) {
         FiffDigPoint dp;
         dp.kind = p.kind;
         dp.ident = p.ident;
@@ -160,7 +165,7 @@ static bool writeFifDig(const QString &filename, const QList<DigPt> &points)
 
 //=============================================================================================================
 
-static bool writeHpts(const QString &filename, const QList<DigPt> &points)
+static bool writeHpts(const QString& filename, const QList<DigPt>& points)
 {
     QFile file(filename);
     if (!file.open(QIODevice::WriteOnly | QIODevice::Text)) {
@@ -169,12 +174,16 @@ static bool writeHpts(const QString &filename, const QList<DigPt> &points)
     }
 
     QTextStream out(&file);
-    for (const DigPt &p : points) {
+    for (const DigPt& p : points) {
         QString cat;
-        if (p.kind == FIFFV_POINT_CARDINAL) cat = "cardinal";
-        else if (p.kind == FIFFV_POINT_HPI) cat = "hpi";
-        else if (p.kind == FIFFV_POINT_EEG) cat = "eeg";
-        else cat = "extra";
+        if (p.kind == FIFFV_POINT_CARDINAL)
+            cat = "cardinal";
+        else if (p.kind == FIFFV_POINT_HPI)
+            cat = "hpi";
+        else if (p.kind == FIFFV_POINT_EEG)
+            cat = "eeg";
+        else
+            cat = "extra";
 
         out << cat << " " << p.ident << " "
             << QString::number(1000.0f * p.r[0], 'f', 1) << " "
@@ -188,7 +197,7 @@ static bool writeHpts(const QString &filename, const QList<DigPt> &points)
 
 //=============================================================================================================
 
-int main(int argc, char *argv[])
+int main(int argc, char* argv[])
 {
     qInstallMessageHandler(MNELogger::customLogWriter);
     QCoreApplication app(argc, argv);

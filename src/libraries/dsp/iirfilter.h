@@ -103,8 +103,9 @@ public:
     /**
      * @brief Filter type selector.
      */
-    enum FilterType {
-        LowPass  = 0, /**< Low-pass: attenuate above cutoffLow. */
+    enum FilterType
+    {
+        LowPass = 0,  /**< Low-pass: attenuate above cutoffLow. */
         HighPass = 1, /**< High-pass: attenuate below cutoffLow. */
         BandPass = 2, /**< Band-pass: pass cutoffLow–cutoffHigh. */
         BandStop = 3  /**< Band-stop (notch): attenuate cutoffLow–cutoffHigh. */
@@ -122,11 +123,11 @@ public:
      *
      * @return QVector of IirBiquad sections (multiply their transfer functions to get H(z)).
      */
-    static QVector<IirBiquad> designButterworth(int        iOrder,
+    static QVector<IirBiquad> designButterworth(int iOrder,
                                                 FilterType type,
-                                                double     dCutoffLow,
-                                                double     dCutoffHigh,
-                                                double     dSFreq);
+                                                double dCutoffLow,
+                                                double dCutoffHigh,
+                                                double dSFreq);
 
     //=========================================================================================================
     /**
@@ -138,7 +139,7 @@ public:
      * @return Filtered row vector (same length as vecData).
      */
     static Eigen::RowVectorXd applySos(const Eigen::RowVectorXd& vecData,
-                                        const QVector<IirBiquad>& sos);
+                                       const QVector<IirBiquad>& sos);
 
     //=========================================================================================================
     /**
@@ -151,7 +152,7 @@ public:
      * @return Zero-phase filtered row vector (same length as vecData).
      */
     static Eigen::RowVectorXd applyZeroPhase(const Eigen::RowVectorXd& vecData,
-                                              const QVector<IirBiquad>& sos);
+                                             const QVector<IirBiquad>& sos);
 
     //=========================================================================================================
     /**
@@ -162,8 +163,8 @@ public:
      *
      * @return Filtered matrix (n_channels x n_samples).
      */
-    static Eigen::MatrixXd applyZeroPhaseMatrix(const Eigen::MatrixXd&    matData,
-                                                 const QVector<IirBiquad>& sos);
+    static Eigen::MatrixXd applyZeroPhaseMatrix(const Eigen::MatrixXd& matData,
+                                                const QVector<IirBiquad>& sos);
 
 private:
     //=========================================================================================================
@@ -187,8 +188,8 @@ private:
      * @return  IirBiquad with normalised coefficients.
      */
     static IirBiquad poleToDigitalBiquad(std::complex<double> pole,
-                                          double               dC,
-                                          double               dGain);
+                                         double dC,
+                                         double dGain);
 
     //=========================================================================================================
     /**
@@ -202,8 +203,8 @@ private:
      * @return  IirBiquad representing a first-order section (b2 = a2 = 0).
      */
     static IirBiquad realPoleToDigitalSection(double dPoleReal,
-                                               double dC,
-                                               double dGain);
+                                              double dC,
+                                              double dGain);
 };
 
 } // namespace UTILSLIB

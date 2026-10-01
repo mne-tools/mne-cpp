@@ -42,12 +42,14 @@ using namespace UTILSLIB;
 
 //=============================================================================================================
 
-struct CtfMarker {
+struct CtfMarker
+{
     QString name;
     int eventId;
     QList<int> samples;
 
-    bool operator==(const CtfMarker &other) const {
+    bool operator==(const CtfMarker& other) const
+    {
         return name == other.name && eventId == other.eventId;
     }
 };
@@ -71,7 +73,7 @@ struct CtfMarker {
  *   trial_num           time
  *   ...
  */
-static QList<CtfMarker> parseCtfMarkers(const QString &filename)
+static QList<CtfMarker> parseCtfMarkers(const QString& filename)
 {
     QList<CtfMarker> markers;
     QFile file(filename);
@@ -110,7 +112,8 @@ static QList<CtfMarker> parseCtfMarkers(const QString &filename)
         if (line.startsWith("LIST OF MARKERS:")) {
             inList = true;
             // Skip header line
-            if (!in.atEnd()) in.readLine();
+            if (!in.atEnd())
+                in.readLine();
             continue;
         }
 
@@ -156,7 +159,7 @@ static QList<CtfMarker> parseCtfMarkers(const QString &filename)
 
 //=============================================================================================================
 
-int main(int argc, char *argv[])
+int main(int argc, char* argv[])
 {
     qInstallMessageHandler(MNELogger::customLogWriter);
     QCoreApplication app(argc, argv);
@@ -180,8 +183,14 @@ int main(int argc, char *argv[])
     QString markersFile = parser.value(markersOpt);
     QString outFile = parser.value(outOpt);
 
-    if (markersFile.isEmpty()) { qCritical("--markers is required."); return 1; }
-    if (outFile.isEmpty()) { qCritical("--out is required."); return 1; }
+    if (markersFile.isEmpty()) {
+        qCritical("--markers is required.");
+        return 1;
+    }
+    if (outFile.isEmpty()) {
+        qCritical("--out is required.");
+        return 1;
+    }
 
     // Parse CTF markers
     QList<CtfMarker> markers = parseCtfMarkers(markersFile);
@@ -200,11 +209,11 @@ int main(int argc, char *argv[])
     QTextStream out(&fOut);
     int totalEvents = 0;
 
-    for (const CtfMarker &marker : markers) {
-        qInfo("Marker '%s' (id=%d): %lld events" ,
-               qPrintable(marker.name),
-               marker.eventId,
-               static_cast<long long>(marker.samples.size()));
+    for (const CtfMarker& marker : markers) {
+        qInfo("Marker '%s' (id=%d): %lld events",
+              qPrintable(marker.name),
+              marker.eventId,
+              static_cast<long long>(marker.samples.size()));
 
         for (int sample : marker.samples) {
             out << sample << " 0 " << marker.eventId << "\n";
@@ -213,6 +222,6 @@ int main(int argc, char *argv[])
     }
 
     fOut.close();
-    qInfo("Written %d events to: %s" , totalEvents, qPrintable(outFile));
+    qInfo("Written %d events to: %s", totalEvents, qPrintable(outFile));
     return 0;
 }

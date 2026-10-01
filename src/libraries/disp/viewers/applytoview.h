@@ -41,8 +41,9 @@
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-namespace Ui {
-    class ApplyToViewWidget;
+namespace Ui
+{
+class ApplyToViewWidget;
 }
 
 //=============================================================================================================
@@ -71,7 +72,7 @@ public:
      * @param[in] f                flag to denote window porperties of the widget.
      */
     ApplyToView(const QString& sSettingsPath = "",
-                QWidget *parent = 0,
+                QWidget* parent = 0,
                 Qt::WindowFlags f = Qt::Widget);
 
     //=========================================================================================================
@@ -126,12 +127,11 @@ protected:
      */
     void updateProcessingMode(ProcessingMode mode);
 
-    QString                     m_sSettingsPath;
+    QString m_sSettingsPath;
 
-    QList<QString>              m_lViewList;
+    QList<QString> m_lViewList;
 
-    Ui::ApplyToViewWidget*      m_pUi;
-
+    Ui::ApplyToViewWidget* m_pUi;
 };
 } //NAMESPACE
 

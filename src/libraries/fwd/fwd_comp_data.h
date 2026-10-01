@@ -53,7 +53,7 @@
 
 namespace MNELIB
 {
-    class MNECTFCompDataSet;
+class MNECTFCompDataSet;
 }
 
 //=============================================================================================================
@@ -78,7 +78,6 @@ class FwdCoilSet;
 class FWDSHARED_EXPORT FwdCompData
 {
 public:
-
     //=========================================================================================================
     /**
      * Constructs the Forward Compensation Data
@@ -103,7 +102,7 @@ public:
      *
      * @return OK on success, FAIL on error.
      */
-    static int fwd_comp_field(const Eigen::Vector3f& rd, const Eigen::Vector3f& Q, FwdCoilSet& coils, Eigen::Ref<Eigen::VectorXf> res, void *client);
+    static int fwd_comp_field(const Eigen::Vector3f& rd, const Eigen::Vector3f& Q, FwdCoilSet& coils, Eigen::Ref<Eigen::VectorXf> res, void* client);
 
     //=========================================================================================================
     /**
@@ -116,8 +115,8 @@ public:
      * @return OK on success, FAIL on error.
      */
     static int fwd_make_ctf_comp_coils(MNELIB::MNECTFCompDataSet* set,
-                                       FwdCoilSet*        coils,
-                                       FwdCoilSet*        comp_coils);
+                                       FwdCoilSet* coils,
+                                       FwdCoilSet* comp_coils);
 
     //=========================================================================================================
     /**
@@ -134,12 +133,12 @@ public:
      * @return Pointer to the created FwdCompData, or nullptr on error. Caller owns the pointer.
      */
     static FwdCompData* fwd_make_comp_data(MNELIB::MNECTFCompDataSet* set,
-                                   FwdCoilSet*        coils,
-                                   FwdCoilSet*        comp_coils,
-                                   fwdFieldFunc      field,
-                                   fwdVecFieldFunc   vec_field,
-                                   fwdFieldGradFunc  field_grad,
-                                   void              *client);
+                                           FwdCoilSet* coils,
+                                           FwdCoilSet* comp_coils,
+                                           fwdFieldFunc field,
+                                           fwdVecFieldFunc vec_field,
+                                           fwdFieldGradFunc field_grad,
+                                           void* client);
 
     //=========================================================================================================
     /**
@@ -152,7 +151,7 @@ public:
      *
      * @return OK on success, FAIL on error.
      */
-    static int fwd_comp_field_vec(const Eigen::Vector3f& rd, FwdCoilSet& coils, Eigen::Ref<Eigen::MatrixXf> res, void *client);
+    static int fwd_comp_field_vec(const Eigen::Vector3f& rd, FwdCoilSet& coils, Eigen::Ref<Eigen::MatrixXf> res, void* client);
 
     //=========================================================================================================
     /**
@@ -170,18 +169,18 @@ public:
      * @return OK on success, FAIL on error.
      */
     static int fwd_comp_field_grad(const Eigen::Vector3f& rd, const Eigen::Vector3f& Q, FwdCoilSet& coils,
-                Eigen::Ref<Eigen::VectorXf> res, Eigen::Ref<Eigen::VectorXf> xgrad, Eigen::Ref<Eigen::VectorXf> ygrad, Eigen::Ref<Eigen::VectorXf> zgrad,
-                void *client);
+                                   Eigen::Ref<Eigen::VectorXf> res, Eigen::Ref<Eigen::VectorXf> xgrad, Eigen::Ref<Eigen::VectorXf> ygrad, Eigen::Ref<Eigen::VectorXf> zgrad,
+                                   void* client);
 
 public:
-    MNELIB::MNECTFCompDataSet*  set;        /**< The compensation data set. */
-    FwdCoilSet*         comp_coils; /**< The compensation coil definitions. */
-    fwdFieldFunc        field;      /**< Computes the field of given direction dipole. */
-    fwdVecFieldFunc     vec_field;  /**< Computes the fields of all three dipole components. */
-    fwdFieldGradFunc    field_grad; /**< Computes the field and gradient of one dipole direction. */
-    void                *client;    /**< Client data to pass to the above functions. */
-    Eigen::VectorXf     work;       /**< The work area. */
-    Eigen::MatrixXf     vec_work;   /**< The vector work area (3 x ncoil). */
+    MNELIB::MNECTFCompDataSet* set; /**< The compensation data set. */
+    FwdCoilSet* comp_coils;         /**< The compensation coil definitions. */
+    fwdFieldFunc field;             /**< Computes the field of given direction dipole. */
+    fwdVecFieldFunc vec_field;      /**< Computes the fields of all three dipole components. */
+    fwdFieldGradFunc field_grad;    /**< Computes the field and gradient of one dipole direction. */
+    void* client;                   /**< Client data to pass to the above functions. */
+    Eigen::VectorXf work;           /**< The work area. */
+    Eigen::MatrixXf vec_work;       /**< The vector work area (3 x ncoil). */
 };
 
 //=============================================================================================================

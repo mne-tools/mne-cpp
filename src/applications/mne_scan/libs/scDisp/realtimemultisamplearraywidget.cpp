@@ -63,14 +63,14 @@ using namespace RTPROCESSINGLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-RealTimeMultiSampleArrayWidget::RealTimeMultiSampleArrayWidget(QSharedPointer<QTime> &pTime,
+RealTimeMultiSampleArrayWidget::RealTimeMultiSampleArrayWidget(QSharedPointer<QTime>& pTime,
                                                                QWidget* parent)
 : MeasurementWidget(parent)
 , m_iMaxFilterTapSize(-1)
 {
     Q_UNUSED(pTime)
 
-    qRegisterMetaType<QMap<int,QList<QPair<int,double> > > >();
+    qRegisterMetaType<QMap<int, QList<QPair<int, double>>>>();
 }
 
 //=============================================================================================================
@@ -79,7 +79,7 @@ RealTimeMultiSampleArrayWidget::~RealTimeMultiSampleArrayWidget()
 {
     QSettings settings("MNECPP");
 
-    if(m_pChannelDataView && m_pRTMSA) {
+    if (m_pChannelDataView && m_pRTMSA) {
         settings.setValue(QString("RTMSAW/showHideBad"), m_pChannelDataView->getBadChannelHideStatus());
     }
 }
@@ -88,16 +88,16 @@ RealTimeMultiSampleArrayWidget::~RealTimeMultiSampleArrayWidget()
 
 void RealTimeMultiSampleArrayWidget::update(SCMEASLIB::Measurement::SPtr pMeasurement)
 {
-    if(!m_pRTMSA) {
+    if (!m_pRTMSA) {
         m_pRTMSA = qSharedPointerDynamicCast<RealTimeMultiSampleArray>(pMeasurement);
     }
 
-    if(m_pRTMSA) {
-        if(m_pRTMSA->isChInit() && !m_pFiffInfo) {
+    if (m_pRTMSA) {
+        if (m_pRTMSA->isChInit() && !m_pFiffInfo) {
             m_pFiffInfo = m_pRTMSA->info();
             m_iMaxFilterTapSize = m_pRTMSA->getMultiSampleArray().first().cols();
 
-            if(!m_bDisplayWidgetsInitialized) {
+            if (!m_bDisplayWidgetsInitialized) {
                 initDisplayControllWidgets();
             }
         }
@@ -112,28 +112,28 @@ void RealTimeMultiSampleArrayWidget::update(SCMEASLIB::Measurement::SPtr pMeasur
 
 void RealTimeMultiSampleArrayWidget::initDisplayControllWidgets()
 {
-    if(m_pFiffInfo) {        
+    if (m_pFiffInfo) {
         //Create table view and set layout
         m_pChannelDataView = new RtFiffRawView(QString("MNESCAN/RTMSAW"),
                                                this);
         m_pChannelDataView->hide();
 
-        QVBoxLayout *rtmsaLayout = new QVBoxLayout(this);
-        rtmsaLayout->setContentsMargins(0,0,0,0);
+        QVBoxLayout* rtmsaLayout = new QVBoxLayout(this);
+        rtmsaLayout->setContentsMargins(0, 0, 0, 0);
         this->setLayout(rtmsaLayout);
-        this->setMinimumSize(300,50);
+        this->setMinimumSize(300, 50);
 
         // Prepare actions
         QToolBar* pToolBar = new QToolBar;
 
-        QAction* pActionSelectSensors = new QAction(QIcon(":/images/selectSensors.png"), tr("Show the channel selection view"),this);
+        QAction* pActionSelectSensors = new QAction(QIcon(":/images/selectSensors.png"), tr("Show the channel selection view"), this);
         pActionSelectSensors->setToolTip(tr("Show the channel selection view"));
         connect(pActionSelectSensors, &QAction::triggered,
                 this, &RealTimeMultiSampleArrayWidget::showSensorSelectionWidget);
         pActionSelectSensors->setVisible(true);
         pToolBar->addAction(pActionSelectSensors);
 
-        m_pActionHideBad = new QAction(QIcon(":/images/hideBad.png"), tr("Toggle bad channel visibility"),this);
+        m_pActionHideBad = new QAction(QIcon(":/images/hideBad.png"), tr("Toggle bad channel visibility"), this);
         m_pActionHideBad->setStatusTip(tr("Toggle bad channel visibility"));
         connect(m_pActionHideBad.data(), &QAction::triggered,
                 this, &RealTimeMultiSampleArrayWidget::onHideBadChannels);
@@ -151,7 +151,7 @@ void RealTimeMultiSampleArrayWidget::initDisplayControllWidgets()
         m_pChannelDataView->show();
         m_pChannelDataView->init(m_pFiffInfo);
 
-        if(settings.value(QString("RTMSAW/showHideBad"), false).toBool()) {
+        if (settings.value(QString("RTMSAW/showHideBad"), false).toBool()) {
             this->onHideBadChannels();
         }
 
@@ -182,56 +182,56 @@ void RealTimeMultiSampleArrayWidget::initDisplayControllWidgets()
         //Init control widgets
         QList<QWidget*> lControlWidgets;
 
-//        // Quick control projectors
-//        ProjectorsView* pProjectorsView = new ProjectorsView(QString("MNESCAN/RTMSAW"));
-//        pProjectorsView->setObjectName("group_tab_Noise_SSP");
-//        lControlWidgets.append(pProjectorsView);
+        //        // Quick control projectors
+        //        ProjectorsView* pProjectorsView = new ProjectorsView(QString("MNESCAN/RTMSAW"));
+        //        pProjectorsView->setObjectName("group_tab_Noise_SSP");
+        //        lControlWidgets.append(pProjectorsView);
 
-//        connect(pProjectorsView, &ProjectorsView::projSelectionChanged,
-//                m_pChannelDataView.data(), &RtFiffRawView::updateProjection);
+        //        connect(pProjectorsView, &ProjectorsView::projSelectionChanged,
+        //                m_pChannelDataView.data(), &RtFiffRawView::updateProjection);
 
-//        pProjectorsView->setProjectors(m_pFiffInfo->projs);
+        //        pProjectorsView->setProjectors(m_pFiffInfo->projs);
 
-//        // Quick control compensators
-//        CompensatorView* pCompensatorView = new CompensatorView(QString("MNESCAN/RTMSAW"));
-//        pCompensatorView->setObjectName("group_tab_Noise_Comp");
-//        lControlWidgets.append(pCompensatorView);
+        //        // Quick control compensators
+        //        CompensatorView* pCompensatorView = new CompensatorView(QString("MNESCAN/RTMSAW"));
+        //        pCompensatorView->setObjectName("group_tab_Noise_Comp");
+        //        lControlWidgets.append(pCompensatorView);
 
-//        connect(pCompensatorView, &CompensatorView::compSelectionChanged,
-//                m_pChannelDataView.data(), &RtFiffRawView::updateCompensator);
+        //        connect(pCompensatorView, &CompensatorView::compSelectionChanged,
+        //                m_pChannelDataView.data(), &RtFiffRawView::updateCompensator);
 
-//        pCompensatorView->setCompensators(m_pFiffInfo->comps);
+        //        pCompensatorView->setCompensators(m_pFiffInfo->comps);
 
-//        // Quick control filter
-//        FilterSettingsView* pFilterSettingsView = new FilterSettingsView(QString("MNESCAN/RTMSAW"));
-//        pFilterSettingsView->setObjectName("group_tab_Noise_Filter");
-//        lControlWidgets.append(pFilterSettingsView);
+        //        // Quick control filter
+        //        FilterSettingsView* pFilterSettingsView = new FilterSettingsView(QString("MNESCAN/RTMSAW"));
+        //        pFilterSettingsView->setObjectName("group_tab_Noise_Filter");
+        //        lControlWidgets.append(pFilterSettingsView);
 
-//        connect(pFilterSettingsView->getFilterView().data(), &FilterDesignView::filterChannelTypeChanged,
-//                m_pChannelDataView.data(), &RtFiffRawView::setFilterChannelType);
+        //        connect(pFilterSettingsView->getFilterView().data(), &FilterDesignView::filterChannelTypeChanged,
+        //                m_pChannelDataView.data(), &RtFiffRawView::setFilterChannelType);
 
-//        connect(pFilterSettingsView->getFilterView().data(), &FilterDesignView::filterChanged,
-//                m_pChannelDataView.data(), &RtFiffRawView::setFilter);
+        //        connect(pFilterSettingsView->getFilterView().data(), &FilterDesignView::filterChanged,
+        //                m_pChannelDataView.data(), &RtFiffRawView::setFilter);
 
-//        connect(pFilterSettingsView, &FilterSettingsView::filterActivationChanged,
-//                m_pChannelDataView.data(), &RtFiffRawView::setFilterActive);
+        //        connect(pFilterSettingsView, &FilterSettingsView::filterActivationChanged,
+        //                m_pChannelDataView.data(), &RtFiffRawView::setFilterActive);
 
-//        m_pChannelDataView->setFilterActive(pFilterSettingsView->getFilterActive());
-//        m_pChannelDataView->setFilterChannelType(pFilterSettingsView->getFilterView()->getChannelType());
-//        pFilterSettingsView->getFilterView()->setWindowSize(m_iMaxFilterTapSize);
-//        pFilterSettingsView->getFilterView()->setMaxAllowedFilterTaps(m_iMaxFilterTapSize);
-//        pFilterSettingsView->getFilterView()->init(m_pFiffInfo->sfreq);
+        //        m_pChannelDataView->setFilterActive(pFilterSettingsView->getFilterActive());
+        //        m_pChannelDataView->setFilterChannelType(pFilterSettingsView->getFilterView()->getChannelType());
+        //        pFilterSettingsView->getFilterView()->setWindowSize(m_iMaxFilterTapSize);
+        //        pFilterSettingsView->getFilterView()->setMaxAllowedFilterTaps(m_iMaxFilterTapSize);
+        //        pFilterSettingsView->getFilterView()->init(m_pFiffInfo->sfreq);
 
-//        // Quick control SPHARA settings
-//        SpharaSettingsView* pSpharaSettingsView = new SpharaSettingsView();
-//        pSpharaSettingsView->setObjectName("group_tab_Noise_SPHARA");
-//        lControlWidgets.append(pSpharaSettingsView);
+        //        // Quick control SPHARA settings
+        //        SpharaSettingsView* pSpharaSettingsView = new SpharaSettingsView();
+        //        pSpharaSettingsView->setObjectName("group_tab_Noise_SPHARA");
+        //        lControlWidgets.append(pSpharaSettingsView);
 
-//        connect(pSpharaSettingsView, &SpharaSettingsView::spharaActivationChanged,
-//                m_pChannelDataView.data(), &RtFiffRawView::updateSpharaActivation);
+        //        connect(pSpharaSettingsView, &SpharaSettingsView::spharaActivationChanged,
+        //                m_pChannelDataView.data(), &RtFiffRawView::updateSpharaActivation);
 
-//        connect(pSpharaSettingsView, &SpharaSettingsView::spharaOptionsChanged,
-//                m_pChannelDataView.data(), &RtFiffRawView::updateSpharaOptions);
+        //        connect(pSpharaSettingsView, &SpharaSettingsView::spharaOptionsChanged,
+        //                m_pChannelDataView.data(), &RtFiffRawView::updateSpharaOptions);
 
         // Quick control scaling
         ScalingView* pScalingView = new ScalingView(QString("MNESCAN/RTMSAW"), 0, Qt::Widget, m_pFiffInfo->get_channel_types());
@@ -299,7 +299,7 @@ void RealTimeMultiSampleArrayWidget::initDisplayControllWidgets()
 
 void RealTimeMultiSampleArrayWidget::showSensorSelectionWidget()
 {
-    if(m_pChannelSelectionView->isActiveWindow()) {
+    if (m_pChannelSelectionView->isActiveWindow()) {
         m_pChannelSelectionView->hide();
     } else {
         m_pChannelSelectionView->activateWindow();
@@ -315,7 +315,7 @@ void RealTimeMultiSampleArrayWidget::onMakeScreenshot(const QString& imageType)
     QString sDate = QDate::currentDate().toString("yyyy_MM_dd");
     QString sTime = QTime::currentTime().toString("hh_mm_ss");
 
-    if(!QDir("./Screenshots").exists()) {
+    if (!QDir("./Screenshots").exists()) {
         QDir().mkdir("./Screenshots");
     }
 
@@ -324,9 +324,9 @@ void RealTimeMultiSampleArrayWidget::onMakeScreenshot(const QString& imageType)
     // name empty and be passed on to the view regardless.
     //
     QString sSuffix;
-    if(imageType.contains("SVG")) {
+    if (imageType.contains("SVG")) {
         sSuffix = "svg";
-    } else if(imageType.contains("PNG")) {
+    } else if (imageType.contains("PNG")) {
         sSuffix = "png";
     } else {
         qWarning() << "[RealTimeMultiSampleArrayWidget::onMakeScreenshot] Unsupported image type"
@@ -334,7 +334,7 @@ void RealTimeMultiSampleArrayWidget::onMakeScreenshot(const QString& imageType)
         return;
     }
 
-    if(m_pChannelDataView.isNull()) {
+    if (m_pChannelDataView.isNull()) {
         qWarning() << "[RealTimeMultiSampleArrayWidget::onMakeScreenshot] No data view"
                    << "- no screenshot was taken.";
         return;
@@ -350,7 +350,7 @@ void RealTimeMultiSampleArrayWidget::onHideBadChannels()
 {
     m_pChannelDataView->hideBadChannels();
 
-    if(m_pActionHideBad->toolTip() == "Show all bad channels") {
+    if (m_pActionHideBad->toolTip() == "Show all bad channels") {
         m_pActionHideBad->setIcon(QIcon(":/images/hideBad.png"));
         m_pActionHideBad->setToolTip("Hide all bad channels");
         m_pActionHideBad->setStatusTip(tr("Hide all bad channels"));
@@ -365,7 +365,7 @@ void RealTimeMultiSampleArrayWidget::onHideBadChannels()
 
 void RealTimeMultiSampleArrayWidget::updateViewport()
 {
-    if(m_pChannelDataView) {
+    if (m_pChannelDataView) {
         m_pChannelDataView->updateViewport();
     }
 }

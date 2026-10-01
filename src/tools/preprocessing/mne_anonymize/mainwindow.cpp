@@ -77,10 +77,9 @@ MainWindow::~MainWindow()
 
 //=============================================================================================================
 
-void MainWindow::closeEvent(QCloseEvent *event)
+void MainWindow::closeEvent(QCloseEvent* event)
 {
-    if(confirmClose())
-    {
+    if (confirmClose()) {
         event->accept();
     } else {
         event->ignore();
@@ -99,18 +98,17 @@ bool MainWindow::confirmClose()
 void MainWindow::setDefaultStateUi()
 {
     this->setWindowTitle(qApp->organizationName() + " ~ " + qApp->applicationName() + " ~ " + qApp->applicationVersion());
-    #ifdef WASMBUILD
+#ifdef WASMBUILD
     m_pUi->lineEditInFile->setReadOnly(true);
     m_pUi->labelOutFile->setVisible(false);
     m_pUi->openOutFileWindowButton->setVisible(false);
     m_pUi->lineEditOutFile->setVisible(false);
     m_bOptionsVisibility = true;
-    #endif
-    resize(m_iDefaultWindowHeightLarge,m_iDefaultWindowHeight);
+#endif
+    resize(m_iDefaultWindowHeightLarge, m_iDefaultWindowHeight);
     setMaximumHeight(m_iDefaultWindowHeight);
 
-    if(m_bOptionsVisibility)
-    {
+    if (m_bOptionsVisibility) {
         m_pUi->checkBoxShowOptions->setCheckState(Qt::Checked);
     } else {
         m_pUi->checkBoxShowOptions->setCheckState(Qt::Unchecked);
@@ -287,55 +285,54 @@ void MainWindow::setDefaultStateExtraInfo()
 
 void MainWindow::setupConnections()
 {
-
     //from gui to mainwindow class
-    QObject::connect(m_pUi->checkBoxShowOptions,&QCheckBox::checkStateChanged,
-                     this,&MainWindow::checkBoxShowOptionsChanged);
+    QObject::connect(m_pUi->checkBoxShowOptions, &QCheckBox::checkStateChanged,
+                     this, &MainWindow::checkBoxShowOptionsChanged);
 
-    QObject::connect(m_pUi->pushButtonReadData,&QPushButton::clicked,
-                     this,&MainWindow::readInputDataButtonClicked);
+    QObject::connect(m_pUi->pushButtonReadData, &QPushButton::clicked,
+                     this, &MainWindow::readInputDataButtonClicked);
 
-    QObject::connect(m_pUi->pushButtonAnonymizeFile,&QPushButton::clicked,
-                     this,&MainWindow::saveOutputFileClicked);
+    QObject::connect(m_pUi->pushButtonAnonymizeFile, &QPushButton::clicked,
+                     this, &MainWindow::saveOutputFileClicked);
 
-    QObject::connect(m_pUi->moreInfoButton,&QToolButton::clicked,
-                     this,&MainWindow::helpButtonClicked);
+    QObject::connect(m_pUi->moreInfoButton, &QToolButton::clicked,
+                     this, &MainWindow::helpButtonClicked);
 
-    QObject::connect(m_pUi->lineEditInFile,&QLineEdit::editingFinished,
-                     this,&MainWindow::inFileEditingFinished);
-    QObject::connect(m_pUi->lineEditOutFile,&QLineEdit::editingFinished,
-                     this,&MainWindow::outFileEditingFinished);
+    QObject::connect(m_pUi->lineEditInFile, &QLineEdit::editingFinished,
+                     this, &MainWindow::inFileEditingFinished);
+    QObject::connect(m_pUi->lineEditOutFile, &QLineEdit::editingFinished,
+                     this, &MainWindow::outFileEditingFinished);
 
-    QObject::connect(m_pUi->openInFileWindowButton,&QToolButton::clicked,
-                     this,&MainWindow::openInFileDialog);
-    QObject::connect(m_pUi->openOutFileWindowButton,&QToolButton::clicked,
-                     this,&MainWindow::openOutFileDialog);
+    QObject::connect(m_pUi->openInFileWindowButton, &QToolButton::clicked,
+                     this, &MainWindow::openInFileDialog);
+    QObject::connect(m_pUi->openOutFileWindowButton, &QToolButton::clicked,
+                     this, &MainWindow::openOutFileDialog);
 
-    QObject::connect(m_pUi->checkBoxBruteMode,&QCheckBox::checkStateChanged,
-                     this,&MainWindow::checkBoxBruteModeChanged);
+    QObject::connect(m_pUi->checkBoxBruteMode, &QCheckBox::checkStateChanged,
+                     this, &MainWindow::checkBoxBruteModeChanged);
 
-    QObject::connect(m_pUi->checkBoxMeasurementDateOffset,&QCheckBox::checkStateChanged,
-                     this,&MainWindow::checkBoxMeasurementDateOffsetStateChanged);
-    QObject::connect(m_pUi->spinBoxMeasurementDateOffset,QOverload<int>::of(&QSpinBox::valueChanged),
-                     this,&MainWindow::spinBoxMeasurementDateOffsetValueChanged);
-    QObject::connect(m_pUi->dateTimeMeasurementDate,&QDateTimeEdit::dateTimeChanged,
-                     this,&MainWindow::dateTimeMeasurementDateDateTimeChanged);
+    QObject::connect(m_pUi->checkBoxMeasurementDateOffset, &QCheckBox::checkStateChanged,
+                     this, &MainWindow::checkBoxMeasurementDateOffsetStateChanged);
+    QObject::connect(m_pUi->spinBoxMeasurementDateOffset, QOverload<int>::of(&QSpinBox::valueChanged),
+                     this, &MainWindow::spinBoxMeasurementDateOffsetValueChanged);
+    QObject::connect(m_pUi->dateTimeMeasurementDate, &QDateTimeEdit::dateTimeChanged,
+                     this, &MainWindow::dateTimeMeasurementDateDateTimeChanged);
 
-    QObject::connect(m_pUi->checkBoxBirthdayDateOffset,&QCheckBox::checkStateChanged,
-                     this,&MainWindow::checkBoxBirthdayDateOffsetStateChanged);
-    QObject::connect(m_pUi->dateEditBirthdayDate,&QDateEdit::dateChanged,
-                     this,&MainWindow::dateEditBirthdayDateDateChanged);
+    QObject::connect(m_pUi->checkBoxBirthdayDateOffset, &QCheckBox::checkStateChanged,
+                     this, &MainWindow::checkBoxBirthdayDateOffsetStateChanged);
+    QObject::connect(m_pUi->dateEditBirthdayDate, &QDateEdit::dateChanged,
+                     this, &MainWindow::dateEditBirthdayDateDateChanged);
 
-    QObject::connect(m_pUi->spinBoxBirthdayDateOffset,QOverload<int>::of(&QSpinBox::valueChanged),
-                     this,&MainWindow::spinBoxBirthdayDateOffsetValueChanged);
+    QObject::connect(m_pUi->spinBoxBirthdayDateOffset, QOverload<int>::of(&QSpinBox::valueChanged),
+                     this, &MainWindow::spinBoxBirthdayDateOffsetValueChanged);
 
-    QObject::connect(m_pUi->lineEditSubjectHisId,&QLineEdit::editingFinished,
-                     this,&MainWindow::lineEditSubjectHisIdEditingFinished);   
+    QObject::connect(m_pUi->lineEditSubjectHisId, &QLineEdit::editingFinished,
+                     this, &MainWindow::lineEditSubjectHisIdEditingFinished);
 }
 
 //=============================================================================================================
 
-void MainWindow::setInFile(const QString &s)
+void MainWindow::setInFile(const QString& s)
 {
     m_fiInFile.setFile(s);
     m_pUi->lineEditInFile->setText(m_fiInFile.absoluteFilePath());
@@ -343,7 +340,7 @@ void MainWindow::setInFile(const QString &s)
 
 //=============================================================================================================
 
-void MainWindow::setOutFile(const QString &s)
+void MainWindow::setOutFile(const QString& s)
 {
     m_fiOutFile.setFile(s);
     m_pUi->lineEditOutFile->setText(m_fiOutFile.absoluteFilePath());
@@ -379,7 +376,7 @@ void MainWindow::setMeasurementDateOffset(int d)
 
 //=============================================================================================================
 
-void MainWindow::setSubjectBirthday(const QDate &d)
+void MainWindow::setSubjectBirthday(const QDate& d)
 {
     m_pUi->dateEditBirthdayDate->setDate(d);
 }
@@ -610,12 +607,11 @@ void MainWindow::setLineEditMNECommand(const QString& s)
 
 void MainWindow::openInFileDialog()
 {
-    #ifdef WASMBUILD
+#ifdef WASMBUILD
     m_pUi->pushButtonReadData->setDisabled(true);
 
-    auto fileContentReady = [&](const QString &filePath, const QByteArray &fileContent) {
-        if(!filePath.isNull()) {
-
+    auto fileContentReady = [&](const QString& filePath, const QByteArray& fileContent) {
+        if (!filePath.isNull()) {
             QFile fileIn(m_sDefaultWasmInFile);
             fileIn.open(QIODevice::WriteOnly);
             fileIn.write(fileContent);
@@ -632,35 +628,33 @@ void MainWindow::openInFileDialog()
         }
     };
 
-    if(m_bShowWarningMsgBoxInWasm)
-    {
+    if (m_bShowWarningMsgBoxInWasm) {
         m_bShowWarningMsgBoxInWasm = false;
         m_pUi->labelInFile->setText(m_pUi->labelInFile->text() + " [Max. 500MB]. ");
         QMessageBox msgBox(this);
         msgBox.setWindowTitle("Warning on FIFF maximum size.");
-        msgBox.setTextFormat(Qt::RichText);   //this is what makes the links clickable
+        msgBox.setTextFormat(Qt::RichText); //this is what makes the links clickable
         msgBox.setText("Warning. Development version.\nBrowser-based MNE Anonymize is compatible with FIFF files up to 500MB.\n"
                        "For bigger files, download MNE-CPP suite from <a href='https://mne-cpp.github.io/pages/install/binaries.html'>here</a>.\n"
                        "                Sincerely, the development team @ MNE-CPP.");
         msgBox.exec();
     }
 
-    QFileDialog::getOpenFileContent("Fiff File (*.fif *.fiff)",  fileContentReady);
-    #else
+    QFileDialog::getOpenFileContent("Fiff File (*.fif *.fiff)", fileContentReady);
+#else
     QFileDialog dialog(this);
     dialog.setNameFilter(tr("Fiff file (*.fif *.fiff)"));
     dialog.setDirectory(QDir::currentPath());
     dialog.setViewMode(QFileDialog::Detail);
     dialog.setFileMode(QFileDialog::ExistingFile);
     QStringList fileNames;
-    if (dialog.exec())
-    {
+    if (dialog.exec()) {
         fileNames = dialog.selectedFiles();
         m_fiInFile.setFile(fileNames.at(0));
         m_pUi->lineEditInFile->setText(m_fiInFile.absoluteFilePath());
         emit fileInChanged(m_fiInFile.absoluteFilePath());
     }
-    #endif
+#endif
 }
 
 //=============================================================================================================
@@ -669,8 +663,7 @@ void MainWindow::openOutFileDialog()
 {
     QFileInfo inFile(m_pUi->lineEditInFile->text());
     QDir inDir;
-    if(inFile.isFile())
-    {
+    if (inFile.isFile()) {
         inDir.setPath(inFile.absolutePath());
     } else {
         inDir.setPath(QDir::currentPath());
@@ -679,8 +672,7 @@ void MainWindow::openOutFileDialog()
     dialog.setDirectory(inDir);
     dialog.setViewMode(QFileDialog::Detail);
     QStringList fileNames;
-    if (dialog.exec())
-    {
+    if (dialog.exec()) {
         fileNames = dialog.selectedFiles();
         m_fiOutFile.setFile(fileNames.at(0));
         m_pUi->lineEditOutFile->setText(m_fiOutFile.absoluteFilePath());
@@ -692,33 +684,33 @@ void MainWindow::openOutFileDialog()
 
 void MainWindow::outputFileReady()
 {
-    #ifdef WASMBUILD
+#ifdef WASMBUILD
     //we need to give space to the output file to be copied.
     QFile::remove(m_fiInFile.absoluteFilePath());
 
     QFile fileOut(m_fiOutFile.absoluteFilePath());
-//    qDebug() << "file out:" << m_fiOutFile.absoluteFilePath();
-//    qDebug() << "fileout size: " << QString::number(fileOut.size());
+    //    qDebug() << "file out:" << m_fiOutFile.absoluteFilePath();
+    //    qDebug() << "fileout size: " << QString::number(fileOut.size());
 
     fileOut.open(QIODevice::ReadWrite);
-    QByteArray  outFileContent;
+    QByteArray outFileContent;
 
     outFileContent = fileOut.readAll();
 
-//    qDebug() << "fileout size (after read): " << QString::number(fileOut.size());
+    //    qDebug() << "fileout size (after read): " << QString::number(fileOut.size());
 
     QFileInfo fiInFile(m_pUi->lineEditInFile->text());
     QString fileOutName(fiInFile.baseName() + "_anonymized." + fiInFile.completeSuffix());
 
-    QFileDialog::saveFileContent(outFileContent,fileOutName);
+    QFileDialog::saveFileContent(outFileContent, fileOutName);
 
     //we reset the input file textbox (and the according member var) because we want to
     //make explicit to the user that the input file has been deleted. Reading or anonymization
     //will not work.
     setInFile("");
-    #else
+#else
     statusMsg("Your file is ready!");
-    #endif
+#endif
 }
 
 //=============================================================================================================
@@ -727,12 +719,14 @@ void MainWindow::helpButtonClicked()
 {
     QMessageBox msgBox(this);
     msgBox.setWindowTitle(qApp->organizationName() + " ~ " + qApp->applicationName() + " ~ " + qApp->applicationVersion());
-    msgBox.setTextFormat(Qt::RichText);   //this is what makes the links clickable
+    msgBox.setTextFormat(Qt::RichText); //this is what makes the links clickable
     msgBox.setText("<p>June 2020<br>mne_anonymize <br>version: " + qApp->applicationVersion() + "</p>"
-                   "<p>This applcation allows to anonymize and deidentify FIFF files.</p>"
-                   "<p>For more information please visit "
-                   "<a href='https://mne-cpp.github.io/pages/documentation/anonymize.html'>mne_anonymize's documentation web</a>.</p>"
-                   "<p style=""text-align:right"">Sincerely, the development team @ MNE-CPP.</p>");
+                                                                                                "<p>This applcation allows to anonymize and deidentify FIFF files.</p>"
+                                                                                                "<p>For more information please visit "
+                                                                                                "<a href='https://mne-cpp.github.io/pages/documentation/anonymize.html'>mne_anonymize's documentation web</a>.</p>"
+                                                                                                "<p style="
+                                                                                                "text-align:right"
+                                                                                                ">Sincerely, the development team @ MNE-CPP.</p>");
     msgBox.exec();
 }
 
@@ -758,11 +752,10 @@ void MainWindow::checkBoxBruteModeChanged()
 {
     bool state(m_pUi->checkBoxBruteMode->isChecked());
     emit bruteModeChanged(state);
-    if(state)
-    {
-        statusMsg("Brute mode selected",2000);
+    if (state) {
+        statusMsg("Brute mode selected", 2000);
     } else {
-        statusMsg("Brute mode deselected",2000);
+        statusMsg("Brute mode deselected", 2000);
     }
 }
 
@@ -775,11 +768,10 @@ void MainWindow::checkBoxMeasurementDateOffsetStateChanged(Qt::CheckState arg)
     m_pUi->spinBoxMeasurementDateOffset->setEnabled(state);
     emit useMeasurementOffset(state);
     m_pUi->dateTimeMeasurementDate->setEnabled(!state);
-    if(state)
-    {
-        statusMsg("Specify a measurement date offset.",2000);
+    if (state) {
+        statusMsg("Specify a measurement date offset.", 2000);
     } else {
-        statusMsg("Specify the measurement date.",2000);
+        statusMsg("Specify the measurement date.", 2000);
     }
 }
 
@@ -792,11 +784,10 @@ void MainWindow::checkBoxBirthdayDateOffsetStateChanged(Qt::CheckState arg)
     m_pUi->spinBoxBirthdayDateOffset->setEnabled(state);
     emit useBirthdayOffset(state);
     m_pUi->dateEditBirthdayDate->setEnabled(!state);
-    if(state)
-    {
-        statusMsg("Specify a subject's birthday offset.",2000);
+    if (state) {
+        statusMsg("Specify a subject's birthday offset.", 2000);
     } else {
-        statusMsg("Specify the subject's birthday.",2000);
+        statusMsg("Specify the subject's birthday.", 2000);
     }
 }
 
@@ -847,10 +838,10 @@ void MainWindow::winPopup(const QString& s)
 
 //=============================================================================================================
 
-void MainWindow::statusMsg(const QString& s,int to)
+void MainWindow::statusMsg(const QString& s, int to)
 {
     m_pUi->statusbar->clearMessage();
-    m_pUi->statusbar->showMessage(s,to);
+    m_pUi->statusbar->showMessage(s, to);
 }
 
 //=============================================================================================================
@@ -861,7 +852,7 @@ void MainWindow::resizeEvent(QResizeEvent* event)
 #ifndef WASMBUILD
     checkSmallGui();
 #endif
-//    statusMsg("width: " + QString::number(m_pUi->centralwidget->width()));
+    //    statusMsg("width: " + QString::number(m_pUi->centralwidget->width()));
 }
 
 //=============================================================================================================
@@ -870,20 +861,16 @@ void MainWindow::checkSmallGui()
 {
     int criticalWidth(350);
 
-    if( !m_pUi->lineEditInFile->text().isEmpty())
-    {
-        if(m_pUi->lineEditInFile->width() < criticalWidth)
-        {
+    if (!m_pUi->lineEditInFile->text().isEmpty()) {
+        if (m_pUi->lineEditInFile->width() < criticalWidth) {
             m_pUi->lineEditInFile->setText("(...)/" + m_fiInFile.fileName());
         } else {
             m_pUi->lineEditInFile->setText(m_fiInFile.absoluteFilePath());
         }
     }
 
-    if( !m_pUi->lineEditOutFile->text().isEmpty())
-    {
-        if(m_pUi->lineEditOutFile->width() < criticalWidth)
-        {
+    if (!m_pUi->lineEditOutFile->text().isEmpty()) {
+        if (m_pUi->lineEditOutFile->width() < criticalWidth) {
             m_pUi->lineEditOutFile->setText("(...)/" + m_fiOutFile.fileName());
         } else {
             m_pUi->lineEditOutFile->setText(m_fiOutFile.absoluteFilePath());
@@ -896,17 +883,14 @@ void MainWindow::checkSmallGui()
 void MainWindow::checkBoxShowOptionsChanged()
 {
     m_bOptionsVisibility = m_pUi->checkBoxShowOptions->isChecked();
-    if(m_bOptionsVisibility)
-    {
-        setMaximumHeight(10*m_iDefaultWindowHeight);
-        if(height() < m_iDefaultWindowHeightLarge)
-        {
-            resize(width(),m_iDefaultWindowHeightLarge);
+    if (m_bOptionsVisibility) {
+        setMaximumHeight(10 * m_iDefaultWindowHeight);
+        if (height() < m_iDefaultWindowHeightLarge) {
+            resize(width(), m_iDefaultWindowHeightLarge);
         }
     } else {
-        if(height() > m_iDefaultWindowHeight)
-        {
-            resize(width(),m_iDefaultWindowHeight);
+        if (height() > m_iDefaultWindowHeight) {
+            resize(width(), m_iDefaultWindowHeight);
         }
         setMaximumHeight(m_iDefaultWindowHeight);
     }

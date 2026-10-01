@@ -46,8 +46,8 @@ namespace SCMEASLIB
 class SCMEASSHARED_EXPORT RealTimeSampleArrayChInfo
 {
 public:
-    typedef QSharedPointer<RealTimeSampleArrayChInfo> SPtr;               /**< Shared pointer type for RealTimeSampleArrayChInfo. */
-    typedef QSharedPointer<const RealTimeSampleArrayChInfo> ConstSPtr;    /**< Const shared pointer type for RealTimeSampleArrayChInfo. */
+    typedef QSharedPointer<RealTimeSampleArrayChInfo> SPtr;            /**< Shared pointer type for RealTimeSampleArrayChInfo. */
+    typedef QSharedPointer<const RealTimeSampleArrayChInfo> ConstSPtr; /**< Const shared pointer type for RealTimeSampleArrayChInfo. */
 
     //=========================================================================================================
     /**
@@ -158,12 +158,12 @@ public:
     inline FIFFLIB::fiff_int_t getCoil() const;
 
 private:
-    QString             m_qStringChName;    /**< The channel name.*/
-    double              m_dMinValue;        /**< The minimal value.*/
-    double              m_dMaxValue;        /**< The maximal value.*/
-    qint32              m_iKind;            /**< The channel kind.*/
-    FIFFLIB::fiff_int_t m_iUnit;            /**< Unit of the data of the measurement.*/
-    FIFFLIB::fiff_int_t m_iCoilType;        /**< What kind of coil. */
+    QString m_qStringChName;         /**< The channel name.*/
+    double m_dMinValue;              /**< The minimal value.*/
+    double m_dMaxValue;              /**< The maximal value.*/
+    qint32 m_iKind;                  /**< The channel kind.*/
+    FIFFLIB::fiff_int_t m_iUnit;     /**< Unit of the data of the measurement.*/
+    FIFFLIB::fiff_int_t m_iCoilType; /**< What kind of coil. */
 };
 
 //=============================================================================================================
@@ -214,7 +214,7 @@ inline double RealTimeSampleArrayChInfo::getMinValue() const
 
 inline void RealTimeSampleArrayChInfo::setMaxValue(double maxValue)
 {
-    if(m_iKind != FIFFV_STIM_CH) // ToDo dirty hack // don't set max for stim channels
+    if (m_iKind != FIFFV_STIM_CH) // ToDo dirty hack // don't set max for stim channels
         m_dMaxValue = maxValue;
 }
 

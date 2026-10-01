@@ -49,12 +49,14 @@
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-namespace FSLIB {
-    class FsAnnotationSet;
+namespace FSLIB
+{
+class FsAnnotationSet;
 }
 
-namespace Ui {
-    class FwdSettingsViewWidget;
+namespace Ui
+{
+class FwdSettingsViewWidget;
 }
 //=============================================================================================================
 // DEFINE NAMESPACE DISPLIB
@@ -76,7 +78,6 @@ class DISPSHARED_EXPORT FwdSettingsView : public AbstractView
     Q_OBJECT
 
 public:
-
     //=========================================================================================================
     /**
     * Constructs a FwdSettingsView object.
@@ -86,7 +87,7 @@ public:
     * @param[in] f              Window flags passed to the widget (default Qt::Widget).
     */
     explicit FwdSettingsView(const QString& sSettingsPath = "",
-                             QWidget *parent = 0,
+                             QWidget* parent = 0,
                              Qt::WindowFlags f = Qt::Widget);
 
     ~FwdSettingsView();
@@ -200,11 +201,11 @@ protected:
      */
     void updateProcessingMode(ProcessingMode mode);
 
-    bool                                        m_bAnnotaionsLoaded;    /**< If the annotationset is loaded. */
+    bool m_bAnnotaionsLoaded; /**< If the annotationset is loaded. */
 
-    Ui::FwdSettingsViewWidget*                  m_pUi;                  /**< The rtFwd dialog. */
+    Ui::FwdSettingsViewWidget* m_pUi; /**< The rtFwd dialog. */
 
-    QString                                     m_sSettingsPath;        /**< The settings path to store the GUI settings to. */
+    QString m_sSettingsPath; /**< The settings path to store the GUI settings to. */
 
 signals:
     //=========================================================================================================
@@ -246,7 +247,6 @@ signals:
      * @param[in] iNCluster    Number of desired sources in the clustered source space.
      */
     void clusterNumberChanged(int iNCluster);
-
 };
 
 //=============================================================================================================
@@ -256,4 +256,3 @@ signals:
 } // NAMESPACE
 
 #endif // FWDSETTINGSVIEW_H
-

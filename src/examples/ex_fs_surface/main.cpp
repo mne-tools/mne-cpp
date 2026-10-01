@@ -49,12 +49,12 @@ using namespace FSLIB;
  * @param[in] argv (argument vector) is an array of pointers to arrays of character objects. The array objects are null-terminated strings, representing the arguments that were entered on the command line when the program was started.
  * @return the value that was set to exit() (which is 0 if exit() is called via quit()).
  */
-int main(int argc, char *argv[])
+int main(int argc, char* argv[])
 {
-    #ifdef STATICBUILD
-    // Q_INIT_RESOURCE(mne_disp3d);
-    #endif
-    
+#ifdef STATICBUILD
+// Q_INIT_RESOURCE(mne_disp3d);
+#endif
+
     qInstallMessageHandler(UTILSLIB::MNELogger::customLogWriter);
     QApplication a(argc, argv);
 
@@ -80,10 +80,10 @@ int main(int argc, char *argv[])
     //
     // pial
     //
-    FsSurfaceSet tSurfSetPial (subject, hemi, "pial", subjectPath);
+    FsSurfaceSet tSurfSetPial(subject, hemi, "pial", subjectPath);
 
-    BrainView *pBrainView = new BrainView();
-    BrainTreeModel *pModel = new BrainTreeModel();
+    BrainView* pBrainView = new BrainView();
+    BrainTreeModel* pModel = new BrainTreeModel();
     pBrainView->setModel(pModel);
 
     for (auto it = tSurfSetPial.data().constBegin(); it != tSurfSetPial.data().constEnd(); ++it) {
@@ -94,7 +94,7 @@ int main(int argc, char *argv[])
     //
     // inflated
     //
-    FsSurfaceSet tSurfSetInflated (subject, hemi, "inflated", subjectPath);
+    FsSurfaceSet tSurfSetInflated(subject, hemi, "inflated", subjectPath);
     for (auto it = tSurfSetInflated.data().constBegin(); it != tSurfSetInflated.data().constEnd(); ++it) {
         QString sHemi = (it.value().hemi() == 0) ? "lh" : "rh";
         pModel->addSurface(subject, sHemi, "inflated", it.value());
@@ -103,7 +103,7 @@ int main(int argc, char *argv[])
     //
     // orig
     //
-    FsSurfaceSet tSurfSetOrig (subject, hemi, "orig", subjectPath);
+    FsSurfaceSet tSurfSetOrig(subject, hemi, "orig", subjectPath);
     for (auto it = tSurfSetOrig.data().constBegin(); it != tSurfSetOrig.data().constEnd(); ++it) {
         QString sHemi = (it.value().hemi() == 0) ? "lh" : "rh";
         pModel->addSurface(subject, sHemi, "orig", it.value());
@@ -112,7 +112,7 @@ int main(int argc, char *argv[])
     //
     // white
     //
-    FsSurfaceSet tSurfSetWhite (subject, hemi, "white", subjectPath);
+    FsSurfaceSet tSurfSetWhite(subject, hemi, "white", subjectPath);
     for (auto it = tSurfSetWhite.data().constBegin(); it != tSurfSetWhite.data().constEnd(); ++it) {
         QString sHemi = (it.value().hemi() == 0) ? "lh" : "rh";
         pModel->addSurface(subject, sHemi, "white", it.value());

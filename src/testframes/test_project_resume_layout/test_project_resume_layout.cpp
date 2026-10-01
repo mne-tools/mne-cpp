@@ -28,7 +28,8 @@
 
 using namespace MNALIB;
 
-namespace {
+namespace
+{
 
 constexpr const char* kLayoutKeyPrefix = "ui.layout.";
 
@@ -102,10 +103,10 @@ void TestProjectResumeLayout::layoutBlob_roundTripsThroughMnaExtras()
 
     // 2. Build a minimal MnaProject, stash the layout blob (base64) under ui.layout.MainWindow.
     MnaProject proj;
-    proj.name        = QStringLiteral("Synthetic");
-    proj.mnaVersion  = QString::fromLatin1(MnaProject::CURRENT_SCHEMA_VERSION);
-    proj.created     = QDateTime::currentDateTimeUtc();
-    proj.modified    = proj.created;
+    proj.name = QStringLiteral("Synthetic");
+    proj.mnaVersion = QString::fromLatin1(MnaProject::CURRENT_SCHEMA_VERSION);
+    proj.created = QDateTime::currentDateTimeUtc();
+    proj.modified = proj.created;
 
     const QString key = layoutKey(QStringLiteral("MainWindow"));
     proj.extras.insert(key, QString::fromLatin1(expectedState.toBase64()));

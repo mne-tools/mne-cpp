@@ -28,7 +28,8 @@
 // DEFINE NAMESPACE MNEWATERSHEDBEM
 //=============================================================================================================
 
-namespace MNEWATERSHEDBEM {
+namespace MNEWATERSHEDBEM
+{
 
 //=============================================================================================================
 /**
@@ -49,7 +50,7 @@ public:
      * @param[in] argc  Number of arguments.
      * @param[in] argv  Argument array.
      */
-    MNEWatershedBemSettings(int *argc, char **argv);
+    MNEWatershedBemSettings(int* argc, char** argv);
 
     //=========================================================================================================
     /**
@@ -124,15 +125,15 @@ public:
     bool verbose() const;
 
 private:
-    QString     m_sSubject;         /**< Subject name. */
-    QString     m_sSubjectsDir;     /**< Subjects directory path. */
-    QString     m_sFreeSurferHome;  /**< FreeSurfer home path. */
-    QString     m_sVolume;          /**< MRI volume name. */
-    bool        m_bOverwrite;       /**< Whether to overwrite existing data. */
-    bool        m_bAtlas;           /**< Use --atlas for mri_watershed. */
-    bool        m_bGcaAtlas;        /**< Use subcortical atlas. */
-    int         m_iPreflood;        /**< Preflood height (-1 = not set). */
-    bool        m_bVerbose;         /**< Verbose output. */
+    QString m_sSubject;        /**< Subject name. */
+    QString m_sSubjectsDir;    /**< Subjects directory path. */
+    QString m_sFreeSurferHome; /**< FreeSurfer home path. */
+    QString m_sVolume;         /**< MRI volume name. */
+    bool m_bOverwrite;         /**< Whether to overwrite existing data. */
+    bool m_bAtlas;             /**< Use --atlas for mri_watershed. */
+    bool m_bGcaAtlas;          /**< Use subcortical atlas. */
+    int m_iPreflood;           /**< Preflood height (-1 = not set). */
+    bool m_bVerbose;           /**< Verbose output. */
 };
 
 } // namespace MNEWATERSHEDBEM

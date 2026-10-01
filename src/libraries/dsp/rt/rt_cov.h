@@ -52,8 +52,9 @@
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-namespace FIFFLIB {
-    class FiffInfo;
+namespace FIFFLIB
+{
+class FiffInfo;
 }
 
 //=============================================================================================================
@@ -70,7 +71,8 @@ namespace RTPROCESSINGLIB
 /**
  * @brief Bundled output of a real-time covariance computation step containing the covariance matrix and sample count.
  */
-struct RtCovComputeResult {
+struct RtCovComputeResult
+{
     Eigen::VectorXd mu;
     Eigen::MatrixXd matData;
 };
@@ -109,7 +111,7 @@ protected:
      *
      * @return   The multiplication result.
      */
-    static RtCovComputeResult compute(const Eigen::MatrixXd &matData);
+    static RtCovComputeResult compute(const Eigen::MatrixXd& matData);
 
     //=========================================================================================================
     /**
@@ -118,16 +120,16 @@ protected:
      * @param[out]   finalResult     The final covariance estimation.
      * @param[in]   tempResult      The intermediate result from the compute function.
      */
-    static void reduce(RtCovComputeResult& finalResult, const RtCovComputeResult &tempResult);
+    static void reduce(RtCovComputeResult& finalResult, const RtCovComputeResult& tempResult);
 
-    int                     m_iSamples;                 /**< The number of stored samples. */
+    int m_iSamples; /**< The number of stored samples. */
 
-    QList<Eigen::MatrixXd>  m_lData;                    /**< The stored data blocks. */
+    QList<Eigen::MatrixXd> m_lData; /**< The stored data blocks. */
 
-    FIFFLIB::FiffInfo       m_fiffInfo;                 /**< Holds the fiff measurement information. */
+    FIFFLIB::FiffInfo m_fiffInfo; /**< Holds the fiff measurement information. */
 
-    QVector<int>            m_picks;                    /**< Indices of MEG/EEG channels to include. */
-    bool                    m_bPicksReady;              /**< Whether picks have been computed. */
+    QVector<int> m_picks; /**< Indices of MEG/EEG channels to include. */
+    bool m_bPicksReady;   /**< Whether picks have been computed. */
 };
 
 //=============================================================================================================

@@ -45,10 +45,19 @@ class TestFwdLibrary : public QObject
 
 private:
     QString m_sDataPath;
-    bool hasData() const { return !m_sDataPath.isEmpty(); }
+    bool hasData() const
+    {
+        return !m_sDataPath.isEmpty();
+    }
 
-    QString bemPath()   const { return m_sDataPath + "/subjects/sample/bem/sample-5120-bem.fif"; }
-    QString rawPath()   const { return m_sDataPath + "/MEG/sample/sample_audvis_trunc_raw.fif"; }
+    QString bemPath() const
+    {
+        return m_sDataPath + "/subjects/sample/bem/sample-5120-bem.fif";
+    }
+    QString rawPath() const
+    {
+        return m_sDataPath + "/MEG/sample/sample_audvis_trunc_raw.fif";
+    }
 
 private slots:
     void initTestCase();
@@ -119,13 +128,14 @@ private slots:
 void TestFwdLibrary::initTestCase()
 {
     qInstallMessageHandler(UTILSLIB::MNELogger::customLogWriter);
-    QString base = QCoreApplication::applicationDirPath()
-                   + "/../resources/data/mne-cpp-test-data";
+    QString base = QCoreApplication::applicationDirPath() + "/../resources/data/mne-cpp-test-data";
     if (QFile::exists(base + "/MEG/sample/sample_audvis_trunc_raw.fif"))
         m_sDataPath = base;
 }
 
-void TestFwdLibrary::cleanupTestCase() {}
+void TestFwdLibrary::cleanupTestCase()
+{
+}
 
 //=============================================================================================================
 // FwdBemModel: construction & statics
@@ -169,8 +179,10 @@ void TestFwdLibrary::bemModel_mathHelpers()
 
 void TestFwdLibrary::bemModel_loadFromFile()
 {
-    if (!hasData()) QSKIP("No test data");
-    if (!QFile::exists(bemPath())) QSKIP("BEM file not found");
+    if (!hasData())
+        QSKIP("No test data");
+    if (!QFile::exists(bemPath()))
+        QSKIP("BEM file not found");
 
     int kind = FIFFV_BEM_SURF_ID_BRAIN;
     auto model = FwdBemModel::fwd_bem_load_surfaces(bemPath(), {kind});
@@ -193,8 +205,10 @@ void TestFwdLibrary::bemModel_loadFromFile()
 
 void TestFwdLibrary::bemModel_loadHomogSurface()
 {
-    if (!hasData()) QSKIP("No test data");
-    if (!QFile::exists(bemPath())) QSKIP("BEM file not found");
+    if (!hasData())
+        QSKIP("No test data");
+    if (!QFile::exists(bemPath()))
+        QSKIP("BEM file not found");
 
     auto model = FwdBemModel::fwd_bem_load_homog_surface(bemPath());
     QVERIFY(model != nullptr);
@@ -204,9 +218,11 @@ void TestFwdLibrary::bemModel_loadHomogSurface()
 
 void TestFwdLibrary::bemModel_loadThreeLayerSurfaces()
 {
-    if (!hasData()) QSKIP("No test data");
+    if (!hasData())
+        QSKIP("No test data");
     QString bem3Path = m_sDataPath + "/subjects/sample/bem/sample-1280-1280-1280-bem.fif";
-    if (!QFile::exists(bem3Path)) QSKIP("3-layer BEM not found");
+    if (!QFile::exists(bem3Path))
+        QSKIP("3-layer BEM not found");
 
     auto model3 = FwdBemModel::fwd_bem_load_three_layer_surfaces(bem3Path);
     QVERIFY(model3 != nullptr);
@@ -219,9 +235,11 @@ void TestFwdLibrary::bemModel_loadThreeLayerSurfaces()
 
 void TestFwdLibrary::bemModel_loadSolutionFile()
 {
-    if (!hasData()) QSKIP("No test data");
+    if (!hasData())
+        QSKIP("No test data");
     QString bemSolPath = m_sDataPath + "/subjects/sample/bem/sample-5120-bem-sol.fif";
-    if (!QFile::exists(bemSolPath)) QSKIP("BEM solution file not found");
+    if (!QFile::exists(bemSolPath))
+        QSKIP("BEM solution file not found");
 
     auto model = FwdBemModel::fwd_bem_load_homog_surface(bemSolPath);
     QVERIFY(model != nullptr);
@@ -235,15 +253,19 @@ void TestFwdLibrary::bemModel_loadSolutionFile()
 
 void TestFwdLibrary::bemModel_setHeadMriT()
 {
-    if (!hasData()) QSKIP("No test data");
-    if (!QFile::exists(bemPath())) QSKIP("BEM file not found");
+    if (!hasData())
+        QSKIP("No test data");
+    if (!QFile::exists(bemPath()))
+        QSKIP("BEM file not found");
 
     auto model = FwdBemModel::fwd_bem_load_homog_surface(bemPath());
     QVERIFY(model != nullptr);
 
     FiffCoordTrans t;
-    t.from = FIFFV_COORD_HEAD; t.to = FIFFV_COORD_MRI;
-    t.trans = Matrix4f::Identity(); t.invtrans = Matrix4f::Identity();
+    t.from = FIFFV_COORD_HEAD;
+    t.to = FIFFV_COORD_MRI;
+    t.trans = Matrix4f::Identity();
+    t.invtrans = Matrix4f::Identity();
 
     int result = model->fwd_bem_set_head_mri_t(t);
     Q_UNUSED(result);
@@ -283,7 +305,8 @@ void TestFwdLibrary::bemModel_infFieldDer()
 
 void TestFwdLibrary::bemModel_constantCollocation()
 {
-    if (!hasData()) QSKIP("No test data");
+    if (!hasData())
+        QSKIP("No test data");
     auto model = FwdBemModel::fwd_bem_load_homog_surface(bemPath());
     QVERIFY(model != nullptr);
     QVERIFY(model->surfs.size() > 0);
@@ -296,7 +319,8 @@ void TestFwdLibrary::bemModel_constantCollocation()
 
 void TestFwdLibrary::bemModel_accessors()
 {
-    if (!hasData()) QSKIP("No test data");
+    if (!hasData())
+        QSKIP("No test data");
     auto model = FwdBemModel::fwd_bem_load_homog_surface(bemPath());
     QVERIFY(model != nullptr);
 
@@ -305,7 +329,8 @@ void TestFwdLibrary::bemModel_accessors()
     QVERIFY(model->surfs[0]->ntri > 0);
     QVERIFY(model->surfs[0]->rr.rows() > 0);
 
-    if (model->gamma.size() > 0) QVERIFY(true);
+    if (model->gamma.size() > 0)
+        QVERIFY(true);
 
     // Load 3-layer for more coverage
     QString bem3Path = m_sDataPath + "/subjects/sample/bem/sample-1280-1280-1280-bem.fif";
@@ -320,9 +345,11 @@ void TestFwdLibrary::bemModel_accessors()
 
 void TestFwdLibrary::bemModel_solvedPotentials()
 {
-    if (!hasData()) QSKIP("No test data");
+    if (!hasData())
+        QSKIP("No test data");
     QString bemSolPath = m_sDataPath + "/subjects/sample/bem/sample-5120-bem-sol.fif";
-    if (!QFile::exists(bemSolPath)) QSKIP("BEM solution file not found");
+    if (!QFile::exists(bemSolPath))
+        QSKIP("BEM solution file not found");
 
     auto model = FwdBemModel::fwd_bem_load_homog_surface(bemSolPath);
     QVERIFY(model != nullptr);
@@ -340,9 +367,11 @@ void TestFwdLibrary::bemModel_solvedPotentials()
 
 void TestFwdLibrary::bemModel_fieldIntegrals()
 {
-    if (!hasData()) QSKIP("No test data");
+    if (!hasData())
+        QSKIP("No test data");
     QString bem3Path = m_sDataPath + "/subjects/sample/bem/sample-1280-1280-1280-bem.fif";
-    if (!QFile::exists(bem3Path)) QSKIP("3-layer BEM not found");
+    if (!QFile::exists(bem3Path))
+        QSKIP("3-layer BEM not found");
 
     auto model3 = FwdBemModel::fwd_bem_load_three_layer_surfaces(bem3Path);
     QVERIFY(model3 != nullptr);
@@ -355,7 +384,8 @@ void TestFwdLibrary::bemModel_fieldIntegrals()
 
 void TestFwdLibrary::bemModel_findSurface()
 {
-    if (!hasData()) QSKIP("No test data");
+    if (!hasData())
+        QSKIP("No test data");
     auto model = FwdBemModel::fwd_bem_load_homog_surface(bemPath());
     QVERIFY(model != nullptr);
     MNESurface* surf = model->fwd_bem_find_surface(FIFFV_BEM_SURF_ID_BRAIN);
@@ -439,7 +469,8 @@ void TestFwdLibrary::bemModel_makeGuesses()
 
 void TestFwdLibrary::bemModel_linearCollocation()
 {
-    if (!hasData()) QSKIP("No test data");
+    if (!hasData())
+        QSKIP("No test data");
     auto model = FwdBemModel::fwd_bem_load_homog_surface(bemPath());
     QVERIFY(model != nullptr);
     QVERIFY(model->surfs.size() > 0);
@@ -545,7 +576,8 @@ void TestFwdLibrary::eegSphere_getCoeff()
 {
     auto model = FwdEegSphereModel::setup_eeg_sphere_model(
         QString(), QString("Default"), 0.09f);
-    if (!model) QSKIP("Could not setup EEG sphere model");
+    if (!model)
+        QSKIP("Could not setup EEG sphere model");
 
     for (int n = 1; n <= 50; n++) {
         double coeff = model->fwd_eeg_get_multi_sphere_model_coeff(n);
@@ -580,24 +612,26 @@ void TestFwdLibrary::eegSphere_multiSpherepot()
 {
     auto model = FwdEegSphereModel::setup_eeg_sphere_model(
         QString(), QString("Default"), 0.09f);
-    if (!model) QSKIP("Could not setup EEG sphere model");
+    if (!model)
+        QSKIP("Could not setup EEG sphere model");
 
     Eigen::Vector3f rd(0.0f, 0.0f, 0.05f);
     Eigen::Vector3f Q(1.0f, 0.0f, 0.0f);
     int neeg = 5;
     Eigen::Matrix<float, Eigen::Dynamic, 3, Eigen::RowMajor> el(neeg, 3);
     el << 0.08f, 0.0f, 0.0f,
-         0.0f, 0.08f, 0.0f,
-         -0.08f, 0.0f, 0.0f,
-         0.0f, -0.08f, 0.0f,
-         0.0f, 0.0f, 0.08f;
+        0.0f, 0.08f, 0.0f,
+        -0.08f, 0.0f, 0.0f,
+        0.0f, -0.08f, 0.0f,
+        0.0f, 0.0f, 0.08f;
     Eigen::VectorXf Vval = Eigen::VectorXf::Zero(neeg);
 
     int res = FwdEegSphereModel::fwd_eeg_multi_spherepot(rd, Q, el, neeg, Vval, (void*)model.get());
     if (res == 0) {
         bool anyNonZero = false;
         for (int i = 0; i < neeg; i++)
-            if (std::isfinite(Vval[i]) && Vval[i] != 0.0f) anyNonZero = true;
+            if (std::isfinite(Vval[i]) && Vval[i] != 0.0f)
+                anyNonZero = true;
         QVERIFY(anyNonZero);
     }
 }
@@ -612,9 +646,9 @@ void TestFwdLibrary::eegSphere_spherepotVec()
     int neeg = 4;
     Eigen::Matrix<float, Eigen::Dynamic, 3, Eigen::RowMajor> el(neeg, 3);
     el << 0.08f, 0.0f, 0.0f,
-         0.0f, 0.08f, 0.0f,
-         -0.08f, 0.0f, 0.0f,
-         0.0f, -0.08f, 0.0f;
+        0.0f, 0.08f, 0.0f,
+        -0.08f, 0.0f, 0.0f,
+        0.0f, -0.08f, 0.0f;
 
     Eigen::MatrixXf Vval_vec = Eigen::MatrixXf::Zero(3, neeg);
 
@@ -624,7 +658,8 @@ void TestFwdLibrary::eegSphere_spherepotVec()
     bool anyNonZero = false;
     for (int d = 0; d < 3; d++)
         for (int i = 0; i < neeg; i++)
-            if (Vval_vec(d, i) != 0.0f) anyNonZero = true;
+            if (Vval_vec(d, i) != 0.0f)
+                anyNonZero = true;
     QVERIFY(anyNonZero);
 }
 
@@ -664,7 +699,8 @@ void TestFwdLibrary::compData_defaultCtor()
 
 void TestFwdLibrary::coilSet_readDefs()
 {
-    if (!hasData()) QSKIP("No test data");
+    if (!hasData())
+        QSKIP("No test data");
     QFile rawFile(rawPath());
     FiffRawData raw(rawFile);
 
@@ -680,7 +716,8 @@ void TestFwdLibrary::coilSet_readDefs()
 
 void TestFwdLibrary::settings_checkIntegrity()
 {
-    if (!hasData()) QSKIP("No test data");
+    if (!hasData())
+        QSKIP("No test data");
     ComputeFwdSettings settings;
     settings.srcname = m_sDataPath + "/subjects/sample/bem/sample-oct-6-src.fif";
     settings.measname = rawPath();

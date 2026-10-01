@@ -59,9 +59,10 @@
 // TMSIPLUGIN FORWARD DECLARATIONS
 //=============================================================================================================
 
-namespace FIFFLIB {
-    class FiffInfo;
-    class FiffStream;
+namespace FIFFLIB
+{
+class FiffInfo;
+class FiffStream;
 }
 
 //=============================================================================================================
@@ -195,44 +196,44 @@ protected:
     bool dirExists(const std::string& dirName_in);
 
 private:
-    QSharedPointer<SCSHAREDLIB::PluginOutputData<SCMEASLIB::RealTimeMultiSampleArray> > m_pRMTSA_TMSI;                  /**< The RealTimeSampleArray to provide the EEG data.*/
-    QSharedPointer<TMSIManualAnnotationWidget>                                          m_pTmsiManualAnnotationWidget;  /**< Widget for manually annotation the trigger during session.*/
-    QSharedPointer<TMSIImpedanceWidget>                                                 m_pTmsiImpedanceWidget;         /**< Widget for checking the impedances*/
-    QSharedPointer<TMSISetupProjectWidget>                                              m_pTmsiSetupProjectWidget;      /**< Widget for checking the impedances*/
+    QSharedPointer<SCSHAREDLIB::PluginOutputData<SCMEASLIB::RealTimeMultiSampleArray>> m_pRMTSA_TMSI; /**< The RealTimeSampleArray to provide the EEG data.*/
+    QSharedPointer<TMSIManualAnnotationWidget> m_pTmsiManualAnnotationWidget;                         /**< Widget for manually annotation the trigger during session.*/
+    QSharedPointer<TMSIImpedanceWidget> m_pTmsiImpedanceWidget;                                       /**< Widget for checking the impedances*/
+    QSharedPointer<TMSISetupProjectWidget> m_pTmsiSetupProjectWidget;                                 /**< Widget for checking the impedances*/
 
-    QString                             m_qStringResourcePath;              /**< The path to the EEG resource directory.*/
+    QString m_qStringResourcePath; /**< The path to the EEG resource directory.*/
 
-    int                                 m_iSamplingFreq;                    /**< The sampling frequency defined by the user via the GUI (in Hertz).*/
-    int                                 m_iNumberOfChannels;                /**< The number of channels defined by the user via the GUI.*/
-    int                                 m_iSamplesPerBlock;                 /**< The samples per block defined by the user via the GUI.*/
+    int m_iSamplingFreq;     /**< The sampling frequency defined by the user via the GUI (in Hertz).*/
+    int m_iNumberOfChannels; /**< The number of channels defined by the user via the GUI.*/
+    int m_iSamplesPerBlock;  /**< The samples per block defined by the user via the GUI.*/
 
-    int                                 m_iTriggerInterval;                 /**< The gap between the trigger signals which request the subject to do something (in ms).*/
-    QTime                               m_qTimerTrigger;                    /**< Time stemp of the last trigger event (in ms).*/
+    int m_iTriggerInterval; /**< The gap between the trigger signals which request the subject to do something (in ms).*/
+    QTime m_qTimerTrigger;  /**< Time stemp of the last trigger event (in ms).*/
 
-    bool                                m_bUseChExponent;                   /**< Flag for using the channels exponent. Defined by the user via the GUI.*/
-    bool                                m_bUseUnitGain;                     /**< Flag for using the channels unit gain. Defined by the user via the GUI.*/
-    bool                                m_bUseUnitOffset;                   /**< Flag for using the channels unit offset. Defined by the user via the GUI.*/
-    bool                                m_bWriteDriverDebugToFile;          /**< Flag for for writing driver debug informstions to a file. Defined by the user via the GUI.*/
-    bool                                m_bBeepTrigger;                     /**< Flag for using a trigger input.*/
-    bool                                m_bUseCommonAverage;                /**< Flag for using common average.*/
-    bool                                m_bUseKeyboardTrigger;              /**< Flag for using the keyboard as a trigger input.*/
-    bool                                m_bCheckImpedances;                 /**< Flag for checking the impedances of the EEG amplifier.*/
+    bool m_bUseChExponent;          /**< Flag for using the channels exponent. Defined by the user via the GUI.*/
+    bool m_bUseUnitGain;            /**< Flag for using the channels unit gain. Defined by the user via the GUI.*/
+    bool m_bUseUnitOffset;          /**< Flag for using the channels unit offset. Defined by the user via the GUI.*/
+    bool m_bWriteDriverDebugToFile; /**< Flag for for writing driver debug informstions to a file. Defined by the user via the GUI.*/
+    bool m_bBeepTrigger;            /**< Flag for using a trigger input.*/
+    bool m_bUseCommonAverage;       /**< Flag for using common average.*/
+    bool m_bUseKeyboardTrigger;     /**< Flag for using the keyboard as a trigger input.*/
+    bool m_bCheckImpedances;        /**< Flag for checking the impedances of the EEG amplifier.*/
 
-    int                                 m_iTriggerType;                     /**< Holds the trigger type | 0 - no trigger activated, 254 - left, 253 - right, 252 - beep.*/
+    int m_iTriggerType; /**< Holds the trigger type | 0 - no trigger activated, 254 - left, 253 - right, 252 - beep.*/
 
-    QString                             m_sElcFilePath;                     /**< Holds the path for the .elc file (electrode positions). Defined by the user via the GUI.*/
-    QSharedPointer<FIFFLIB::FiffInfo>   m_pFiffInfo;                        /**< Fiff measurement info.*/
+    QString m_sElcFilePath;                        /**< Holds the path for the .elc file (electrode positions). Defined by the user via the GUI.*/
+    QSharedPointer<FIFFLIB::FiffInfo> m_pFiffInfo; /**< Fiff measurement info.*/
 
-    QSharedPointer<UTILSLIB::CircularBuffer_Matrix_float>     m_pCircularBuffer;              /**< Holds incoming raw data.*/
+    QSharedPointer<UTILSLIB::CircularBuffer_Matrix_float> m_pCircularBuffer; /**< Holds incoming raw data.*/
 
-    QSharedPointer<TMSIProducer>        m_pTMSIProducer;                    /**< the TMSIProducer.*/
+    QSharedPointer<TMSIProducer> m_pTMSIProducer; /**< the TMSIProducer.*/
 
-    Eigen::MatrixXf                     m_matOldMatrix;                     /**< Last received sample matrix by the tmsiproducer/tmsidriver class. Used for simple HP filtering.*/
+    Eigen::MatrixXf m_matOldMatrix; /**< Last received sample matrix by the tmsiproducer/tmsidriver class. Used for simple HP filtering.*/
 
-    QMutex                              m_qMutex;                           /**< Holds the threads mutex.*/
+    QMutex m_qMutex; /**< Holds the threads mutex.*/
 
-    QAction*                            m_pActionImpedance;                 /**< shows impedance widget. */
-    QAction*                            m_pActionSetupProject;              /**< shows setup project dialog. */
+    QAction* m_pActionImpedance;    /**< shows impedance widget. */
+    QAction* m_pActionSetupProject; /**< shows setup project dialog. */
 };
 } // NAMESPACE
 

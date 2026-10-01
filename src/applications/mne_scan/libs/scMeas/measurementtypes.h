@@ -48,18 +48,17 @@ public:
     /**
      * Constructs a MeasurementTypes Object.
      */
-    explicit MeasurementTypes(QObject *parent = 0);
+    explicit MeasurementTypes(QObject* parent = 0);
 
     //=========================================================================================================
     /**
      * Call to register MeasurementTypes
      */
     static void registerTypes();
-    
+
 signals:
-    
+
 public slots:
-    
 };
 } //NAMESPACE
 

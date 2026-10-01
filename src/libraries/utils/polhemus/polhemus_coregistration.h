@@ -95,18 +95,39 @@ public:
     void setPenStation(int station);
     void setProbeStation(int station);
 
-    int trackerStation() const { return m_trackerStation; }
-    int penStation()     const { return m_penStation; }
-    int probeStation()   const { return m_probeStation; }
+    int trackerStation() const
+    {
+        return m_trackerStation;
+    }
+    int penStation() const
+    {
+        return m_penStation;
+    }
+    int probeStation() const
+    {
+        return m_probeStation;
+    }
 
     //=========================================================================================================
     // Pen tip offset (sensor body frame → tip)
     //=========================================================================================================
 
-    void setPenTipOffset(const QVector3D& offset) { m_penTipOffset = offset; }
-    QVector3D penTipOffset() const { return m_penTipOffset; }
-    void setTipOffsetEnabled(bool on) { m_tipOffsetEnabled = on; }
-    bool tipOffsetEnabled() const { return m_tipOffsetEnabled; }
+    void setPenTipOffset(const QVector3D& offset)
+    {
+        m_penTipOffset = offset;
+    }
+    QVector3D penTipOffset() const
+    {
+        return m_penTipOffset;
+    }
+    void setTipOffsetEnabled(bool on)
+    {
+        m_tipOffsetEnabled = on;
+    }
+    bool tipOffsetEnabled() const
+    {
+        return m_tipOffsetEnabled;
+    }
 
     //=========================================================================================================
     // Axis mirroring — compensate for transmitter placement
@@ -124,21 +145,46 @@ public:
      * @param[in] mirrorX True to negate the X coordinate of incoming positions.
      * @param[in] mirrorY True to negate the Y coordinate of incoming positions.
      */
-    void setAxisMirror(bool mirrorX, bool mirrorY) { m_mirrorX = mirrorX; m_mirrorY = mirrorY; }
-    bool mirrorX() const { return m_mirrorX; }
-    bool mirrorY() const { return m_mirrorY; }
+    void setAxisMirror(bool mirrorX, bool mirrorY)
+    {
+        m_mirrorX = mirrorX;
+        m_mirrorY = mirrorY;
+    }
+    bool mirrorX() const
+    {
+        return m_mirrorX;
+    }
+    bool mirrorY() const
+    {
+        return m_mirrorY;
+    }
 
     //=========================================================================================================
     // Pivot calibration — determine pen tip offset by pivoting pen around its tip
     //=========================================================================================================
 
-    enum class PivotState { Idle, WaitingForStart, Collecting, Done };
+    enum class PivotState
+    {
+        Idle,
+        WaitingForStart,
+        Collecting,
+        Done
+    };
 
     void startPivotCalibration();
     void cancelPivotCalibration();
-    PivotState pivotState() const { return m_pivotState; }
-    int pivotSampleCount() const { return static_cast<int>(m_pivotPositions.size()); }
-    float pivotResidualMm() const { return m_pivotResidualMm; }
+    PivotState pivotState() const
+    {
+        return m_pivotState;
+    }
+    int pivotSampleCount() const
+    {
+        return static_cast<int>(m_pivotPositions.size());
+    }
+    float pivotResidualMm() const
+    {
+        return m_pivotResidualMm;
+    }
 
     //=========================================================================================================
     // Tracker-to-device calibration offset
@@ -154,8 +200,14 @@ public:
     void setTrackerToDeviceOffset(const QVector3D& translation,
                                   const QQuaternion& rotation);
 
-    QVector3D   trackerToDeviceTranslation() const { return m_offsetTranslation; }
-    QQuaternion trackerToDeviceRotation()    const { return m_offsetRotation; }
+    QVector3D trackerToDeviceTranslation() const
+    {
+        return m_offsetTranslation;
+    }
+    QQuaternion trackerToDeviceRotation() const
+    {
+        return m_offsetRotation;
+    }
 
     //=========================================================================================================
     // Optical path calibration — determine the microscope optical axis
@@ -170,10 +222,11 @@ public:
     //      direction and the optical center offset from the tracker.
     //=========================================================================================================
 
-    struct OpticalCalibSample {
-        QVector3D   trackerPos;    ///< Tracker position in world frame (metres).
-        QQuaternion trackerOri;    ///< Tracker orientation in world frame.
-        QVector3D   focusPoint;    ///< Stylus focus point in world frame (metres).
+    struct OpticalCalibSample
+    {
+        QVector3D trackerPos;   ///< Tracker position in world frame (metres).
+        QQuaternion trackerOri; ///< Tracker orientation in world frame.
+        QVector3D focusPoint;   ///< Stylus focus point in world frame (metres).
     };
 
     /**
@@ -183,7 +236,10 @@ public:
     bool captureOpticalCalibSample();
 
     /** @return Number of calibration samples recorded so far. */
-    int opticalCalibSampleCount() const { return static_cast<int>(m_opticalCalibSamples.size()); }
+    int opticalCalibSampleCount() const
+    {
+        return static_cast<int>(m_opticalCalibSamples.size());
+    }
 
     /** Discard all calibration samples and reset the optical calibration. */
     void clearOpticalCalibSamples();
@@ -201,7 +257,10 @@ public:
     bool captureObjectiveCenter();
 
     /** @return Whether an objective center has been captured. */
-    bool hasObjectiveCenter() const { return m_hasObjectiveCenter; }
+    bool hasObjectiveCenter() const
+    {
+        return m_hasObjectiveCenter;
+    }
 
     /** Clear the captured objective center. */
     void clearObjectiveCenter();
@@ -211,7 +270,10 @@ public:
      *
      * @return Objective center in the tracker body frame in metres; only meaningful if hasObjectiveCenter() is true.
      */
-    QVector3D objectiveCenterLocal() const { return m_objectiveCenterLocal; }
+    QVector3D objectiveCenterLocal() const
+    {
+        return m_objectiveCenterLocal;
+    }
 
     /**
      * @brief Fit a 3D line through the focus points in tracker-local frame.
@@ -233,39 +295,60 @@ public:
      *
      * @param[in] metres Tracker-to-objective distance in metres; 0 disables the constraint.
      */
-    void setKnownTrackerToObjectiveDistance(float metres) { m_knownTrackerToObjectiveDist = metres; }
-    float knownTrackerToObjectiveDistance() const { return m_knownTrackerToObjectiveDist; }
+    void setKnownTrackerToObjectiveDistance(float metres)
+    {
+        m_knownTrackerToObjectiveDist = metres;
+    }
+    float knownTrackerToObjectiveDistance() const
+    {
+        return m_knownTrackerToObjectiveDist;
+    }
 
     /** @return Whether a valid optical calibration has been computed. */
-    bool opticalCalibrationValid() const { return m_opticalCalibValid; }
+    bool opticalCalibrationValid() const
+    {
+        return m_opticalCalibValid;
+    }
 
     /**
      * Direction of the optical axis in the tracker body frame (unit vector).
      *
      * @return Unit optical-axis direction in the tracker body frame; only meaningful if opticalCalibrationValid() is true.
      */
-    QVector3D opticalAxisLocal() const { return m_opticalAxisLocal; }
+    QVector3D opticalAxisLocal() const
+    {
+        return m_opticalAxisLocal;
+    }
 
     /**
      * Position of the optical center in the tracker body frame (metres).
      *
      * @return Optical center in the tracker body frame in metres.
      */
-    QVector3D opticalCenterLocal() const { return m_opticalCenterLocal; }
+    QVector3D opticalCenterLocal() const
+    {
+        return m_opticalCenterLocal;
+    }
 
     /**
      * RMS residual of the last optical calibration (mm).
      *
      * @return RMS distance of the focus points from the fitted optical axis in millimetres.
      */
-    float opticalCalibResidualMm() const { return m_opticalCalibResidualMm; }
+    float opticalCalibResidualMm() const
+    {
+        return m_opticalCalibResidualMm;
+    }
 
     /**
      * Depth spread of calibration samples along the optical axis (mm).
      *
      * @return Extent of the calibration focus points along the optical axis in millimetres.
      */
-    float opticalCalibDepthSpreadMm() const { return m_opticalCalibDepthSpreadMm; }
+    float opticalCalibDepthSpreadMm() const
+    {
+        return m_opticalCalibDepthSpreadMm;
+    }
 
     /**
      * @brief Fine-adjust the optical axis so it passes through a known
@@ -284,10 +367,16 @@ public:
                                     float& correctionDeg);
 
     /** @return Whether a fine adjustment has been applied. */
-    bool opticalFineAdjustApplied() const { return m_opticalFineAdjustApplied; }
+    bool opticalFineAdjustApplied() const
+    {
+        return m_opticalFineAdjustApplied;
+    }
 
     /** @return The angle of the last fine adjustment (degrees). */
-    float opticalFineAdjustDeg() const { return m_opticalFineAdjustDeg; }
+    float opticalFineAdjustDeg() const
+    {
+        return m_opticalFineAdjustDeg;
+    }
 
     /** Undo the last fine adjustment, restoring the original solved axis. */
     void clearOpticalFineAdjust();
@@ -317,13 +406,19 @@ public:
     //=========================================================================================================
 
     void setConnection(PolhemusConnection* conn);
-    PolhemusConnection* connection() const { return m_pConn; }
+    PolhemusConnection* connection() const
+    {
+        return m_pConn;
+    }
 
     //=========================================================================================================
     // Digitized-point store
     //=========================================================================================================
 
-    AcquiredPoints* acquiredPoints() const { return m_pPoints; }
+    AcquiredPoints* acquiredPoints() const
+    {
+        return m_pPoints;
+    }
 
     //=========================================================================================================
     // Explicit capture API
@@ -347,13 +442,29 @@ public:
     // Vertex (CZ / top of head) — 4th reference point for orientation validation
     //=========================================================================================================
 
-    void setModelVertex(const QVector3D& pos) { m_modelVertex = pos; m_hasModelVertex = true; }
-    bool hasModelVertex() const { return m_hasModelVertex; }
-    QVector3D modelVertex() const { return m_modelVertex; }
+    void setModelVertex(const QVector3D& pos)
+    {
+        m_modelVertex = pos;
+        m_hasModelVertex = true;
+    }
+    bool hasModelVertex() const
+    {
+        return m_hasModelVertex;
+    }
+    QVector3D modelVertex() const
+    {
+        return m_modelVertex;
+    }
 
     bool captureCurrentPenPositionAsVertex();
-    bool hasPenVertex() const { return m_hasPenVertex; }
-    QVector3D penVertex() const { return m_penVertex; }
+    bool hasPenVertex() const
+    {
+        return m_hasPenVertex;
+    }
+    QVector3D penVertex() const
+    {
+        return m_penVertex;
+    }
 
     //=========================================================================================================
     // Registration
@@ -378,26 +489,59 @@ public:
     // Session persistence — save/restore registration state across app restarts
     //=========================================================================================================
 
-    void saveSessionState(QSettings &settings, const QString &prefix = QStringLiteral("polhemus")) const;
-    bool restoreSessionState(QSettings &settings, const QString &prefix = QStringLiteral("polhemus"));
+    void saveSessionState(QSettings& settings, const QString& prefix = QStringLiteral("polhemus")) const;
+    bool restoreSessionState(QSettings& settings, const QString& prefix = QStringLiteral("polhemus"));
 
-    bool registrationValid() const { return m_registrationValid; }
+    bool registrationValid() const
+    {
+        return m_registrationValid;
+    }
 
     //=========================================================================================================
     // Current state accessors
     //=========================================================================================================
 
-    QMatrix4x4  deviceToWorld()    const { return m_deviceToWorld; }
-    QMatrix4x4  headToWorld()      const { return m_headToWorld; }
-    QMatrix4x4  headToDevice()     const { return m_headToDevice; }
-    QMatrix4x4  worldToModel()     const { return m_worldToModel; }
-    QVector3D   penPosition()      const { return m_penPosition; }
-    QQuaternion penOrientation()   const { return m_penOrientation; }
-    bool        haveLivePenPosition() const { return m_havePenPos; }
+    QMatrix4x4 deviceToWorld() const
+    {
+        return m_deviceToWorld;
+    }
+    QMatrix4x4 headToWorld() const
+    {
+        return m_headToWorld;
+    }
+    QMatrix4x4 headToDevice() const
+    {
+        return m_headToDevice;
+    }
+    QMatrix4x4 worldToModel() const
+    {
+        return m_worldToModel;
+    }
+    QVector3D penPosition() const
+    {
+        return m_penPosition;
+    }
+    QQuaternion penOrientation() const
+    {
+        return m_penOrientation;
+    }
+    bool haveLivePenPosition() const
+    {
+        return m_havePenPos;
+    }
 
-    QVector3D   probePosition()    const { return m_probePosition; }
-    QQuaternion probeOrientation() const { return m_probeOrientation; }
-    bool        haveLiveProbePosition() const { return m_haveProbePos; }
+    QVector3D probePosition() const
+    {
+        return m_probePosition;
+    }
+    QQuaternion probeOrientation() const
+    {
+        return m_probeOrientation;
+    }
+    bool haveLiveProbePosition() const
+    {
+        return m_haveProbePos;
+    }
 
 signals:
     void devicePoseChanged(const QMatrix4x4& deviceToWorld);
@@ -420,76 +564,76 @@ private:
     QMatrix4x4 buildHeadFrame() const;
 
     int m_trackerStation = 2;
-    int m_penStation     = 1;
-    int m_probeStation   = 3;
+    int m_penStation = 1;
+    int m_probeStation = 3;
 
-    QVector3D   m_offsetTranslation;
+    QVector3D m_offsetTranslation;
     QQuaternion m_offsetRotation;
-    QVector3D   m_penTipOffset;        // tip offset in sensor body frame (metres)
-    bool        m_tipOffsetEnabled = false;
-    bool        m_mirrorX = false;     // negate X of incoming Polhemus positions
-    bool        m_mirrorY = false;     // negate Y of incoming Polhemus positions
+    QVector3D m_penTipOffset; // tip offset in sensor body frame (metres)
+    bool m_tipOffsetEnabled = false;
+    bool m_mirrorX = false; // negate X of incoming Polhemus positions
+    bool m_mirrorY = false; // negate Y of incoming Polhemus positions
 
-    PolhemusConnection* m_pConn   = nullptr;
-    AcquiredPoints*     m_pPoints = nullptr;
+    PolhemusConnection* m_pConn = nullptr;
+    AcquiredPoints* m_pPoints = nullptr;
 
-    QVector3D   m_penPosition;
+    QVector3D m_penPosition;
     QQuaternion m_penOrientation;
-    bool        m_havePenPos = false;
+    bool m_havePenPos = false;
 
-    QVector3D   m_probePosition;
+    QVector3D m_probePosition;
     QQuaternion m_probeOrientation;
-    bool        m_haveProbePos = false;
+    bool m_haveProbePos = false;
 
-    QMatrix4x4  m_deviceToWorld;
-    QMatrix4x4  m_headToWorld;
-    QMatrix4x4  m_headToDevice;
-    QMatrix4x4  m_worldToModel;
-    bool        m_registrationValid = false;
+    QMatrix4x4 m_deviceToWorld;
+    QMatrix4x4 m_headToWorld;
+    QMatrix4x4 m_headToDevice;
+    QMatrix4x4 m_worldToModel;
+    bool m_registrationValid = false;
 
     // Pen fiducials (captured from stylus in Polhemus world frame)
-    QVector3D   m_penFid[4];          // indexed by FiducialId (1..3)
-    bool        m_hasPenFid[4] = {};
+    QVector3D m_penFid[4]; // indexed by FiducialId (1..3)
+    bool m_hasPenFid[4] = {};
 
     // Model fiducials (from FIFF / BEM, in MRI/surface-RAS frame)
-    QVector3D   m_modelFid[4];        // indexed by FiducialId (1..3)
-    bool        m_hasModelFid[4] = {};
+    QVector3D m_modelFid[4]; // indexed by FiducialId (1..3)
+    bool m_hasModelFid[4] = {};
 
     // Vertex / CZ (top of head) for orientation validation
-    QVector3D   m_modelVertex;
-    bool        m_hasModelVertex = false;
-    QVector3D   m_penVertex;
-    bool        m_hasPenVertex = false;
+    QVector3D m_modelVertex;
+    bool m_hasModelVertex = false;
+    QVector3D m_penVertex;
+    bool m_hasPenVertex = false;
 
     // Pivot calibration state
-    PivotState  m_pivotState = PivotState::Idle;
-    std::vector<QVector3D>   m_pivotPositions;
+    PivotState m_pivotState = PivotState::Idle;
+    std::vector<QVector3D> m_pivotPositions;
     std::vector<QQuaternion> m_pivotOrientations;
     float m_pivotResidualMm = 0.0f;
 
     // Optical path calibration state
     std::vector<OpticalCalibSample> m_opticalCalibSamples;
-    QVector3D m_opticalAxisLocal;           // optical axis direction in tracker body frame
-    QVector3D m_opticalCenterLocal;         // optical center position in tracker body frame
-    float     m_opticalCalibResidualMm = 0.0f;
-    float     m_opticalCalibDepthSpreadMm = 0.0f;
-    bool      m_opticalCalibValid = false;
+    QVector3D m_opticalAxisLocal;   // optical axis direction in tracker body frame
+    QVector3D m_opticalCenterLocal; // optical center position in tracker body frame
+    float m_opticalCalibResidualMm = 0.0f;
+    float m_opticalCalibDepthSpreadMm = 0.0f;
+    bool m_opticalCalibValid = false;
 
     // Directly captured objective center (in tracker-local frame, metres).
     // When available, the solver uses this instead of the distance constraint.
-    QVector3D m_objectiveCenterLocal;       // objective center in tracker body frame
-    bool      m_hasObjectiveCenter = false;
+    QVector3D m_objectiveCenterLocal; // objective center in tracker body frame
+    bool m_hasObjectiveCenter = false;
 
     // Fine adjustment — small correction rotation applied on top of the
     // solved optical axis to compensate for residual misalignment between
     // the tracked probe position and its appearance in the video.
-    QVector3D m_opticalAxisPreFineAdjust;   // axis before fine-adjust (for undo)
-    float     m_opticalFineAdjustDeg = 0.0f;
-    bool      m_opticalFineAdjustApplied = false;
+    QVector3D m_opticalAxisPreFineAdjust; // axis before fine-adjust (for undo)
+    float m_opticalFineAdjustDeg = 0.0f;
+    bool m_opticalFineAdjustApplied = false;
 
     // Known tracker-to-objective distance (metres) — fallback constraint when
     // no direct objective center capture is available.
-    float     m_knownTrackerToObjectiveDist = 0.200f;  // metres
+    float m_knownTrackerToObjectiveDist = 0.200f; // metres
 
     bool solvePivotCalibration();
 };

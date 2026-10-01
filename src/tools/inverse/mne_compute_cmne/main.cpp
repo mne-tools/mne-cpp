@@ -72,10 +72,14 @@ using namespace MLLIB;
 
 static int methodStringToInt(const QString& method)
 {
-    if (method.compare(QLatin1String("MNE"),     Qt::CaseInsensitive) == 0) return 0;
-    if (method.compare(QLatin1String("dSPM"),    Qt::CaseInsensitive) == 0) return 1;
-    if (method.compare(QLatin1String("sLORETA"), Qt::CaseInsensitive) == 0) return 2;
-    if (method.compare(QLatin1String("eLORETA"), Qt::CaseInsensitive) == 0) return 3;
+    if (method.compare(QLatin1String("MNE"), Qt::CaseInsensitive) == 0)
+        return 0;
+    if (method.compare(QLatin1String("dSPM"), Qt::CaseInsensitive) == 0)
+        return 1;
+    if (method.compare(QLatin1String("sLORETA"), Qt::CaseInsensitive) == 0)
+        return 2;
+    if (method.compare(QLatin1String("eLORETA"), Qt::CaseInsensitive) == 0)
+        return 3;
     return 1; // default dSPM
 }
 
@@ -84,7 +88,7 @@ static int methodStringToInt(const QString& method)
 static QString resolveScriptDir()
 {
     const QString relPath = QStringLiteral("scripts/ml/training/cmne");
-    const QString marker  = QStringLiteral("pyproject.toml");
+    const QString marker = QStringLiteral("pyproject.toml");
 
     // 1) Binary lives in <root>/out/<config>/bin/ → go up 4 levels to repo root
     QString appDir = QCoreApplication::applicationDirPath();
@@ -114,10 +118,10 @@ static int doCompute(const QCommandLineParser& parser)
     QTextStream err(stderr);
 
     // ── Validate required arguments ────────────────────────────────────
-    const QString fwdPath    = parser.value(QStringLiteral("fwd"));
-    const QString covPath    = parser.value(QStringLiteral("cov"));
+    const QString fwdPath = parser.value(QStringLiteral("fwd"));
+    const QString covPath = parser.value(QStringLiteral("cov"));
     const QString evokedPath = parser.value(QStringLiteral("evoked"));
-    const QString outPrefix  = parser.value(QStringLiteral("out"));
+    const QString outPrefix = parser.value(QStringLiteral("out"));
 
     if (fwdPath.isEmpty() || covPath.isEmpty() || evokedPath.isEmpty()) {
         err << "Error: --fwd, --cov, and --evoked are required for compute mode.\n";
@@ -132,7 +136,7 @@ static int doCompute(const QCommandLineParser& parser)
     out << "Reading forward solution: " << fwdPath << "\n";
     out.flush();
     QFile fwdFile(fwdPath);
-    MNEForwardSolution fwd(fwdFile, true, true);  // force_fixed=true, surf_ori=true
+    MNEForwardSolution fwd(fwdFile, true, true); // force_fixed=true, surf_ori=true
     if (fwd.isEmpty()) {
         err << "Error: Failed to read forward solution from " << fwdPath << "\n";
         return 1;
@@ -140,7 +144,7 @@ static int doCompute(const QCommandLineParser& parser)
 
     const MatrixXd matGain = fwd.sol->data;
     const int nChannels = matGain.rows();
-    const int nSources  = matGain.cols();
+    const int nSources = matGain.cols();
     out << "  " << nChannels << " channels x " << nSources << " sources\n";
 
     // ── Read noise covariance ──────────────────────────────────────────
@@ -167,19 +171,19 @@ static int doCompute(const QCommandLineParser& parser)
         return 1;
     }
 
-    const float tmin  = evoked.times(0);
+    const float tmin = evoked.times(0);
     const float tstep = (evoked.times.size() > 1)
-                        ? (evoked.times(1) - evoked.times(0))
-                        : 1.0f;
+        ? (evoked.times(1) - evoked.times(0))
+        : 1.0f;
 
     // ── Pick channels to match forward solution ────────────────────────
     // The evoked file may contain extra channels (STIM, EOG, ECG, …)
     // that are not in the forward solution.  Subset to forward channels.
     const QStringList fwdChNames = fwd.sol->row_names;
     FiffEvoked evokedPicked = evoked.pick_channels(fwdChNames);
-    FiffCov    noiseCovPicked = noiseCov.pick_channels(fwdChNames);
+    FiffCov noiseCovPicked = noiseCov.pick_channels(fwdChNames);
 
-    const MatrixXd matEvoked   = evokedPicked.data;
+    const MatrixXd matEvoked = evokedPicked.data;
     const MatrixXd matNoiseCovPicked = noiseCovPicked.data;
 
     out << "  " << evoked.data.rows() << " channels in file, "
@@ -197,10 +201,10 @@ static int doCompute(const QCommandLineParser& parser)
     const QString onnxPath = parser.value(QStringLiteral("onnx"));
 
     InvCMNESettings settings;
-    settings.lambda2     = 1.0 / (snr * snr);
-    settings.method      = methodStringToInt(methodStr);
-    settings.lookBack    = lookBack;
-    settings.numSources  = nSources;
+    settings.lambda2 = 1.0 / (snr * snr);
+    settings.method = methodStringToInt(methodStr);
+    settings.lookBack = lookBack;
+    settings.numSources = nSources;
     settings.onnxModelPath = onnxPath;
 
     out << "Settings: method=" << methodStr << ", SNR=" << snr
@@ -238,9 +242,9 @@ static int doCompute(const QCommandLineParser& parser)
         matEvoked, matGain, matNoiseCovPicked, matSrcCov, settings);
 
     // Propagate timing from evoked data
-    result.stcDspm.tmin  = tmin;
+    result.stcDspm.tmin = tmin;
     result.stcDspm.tstep = tstep;
-    result.stcCmne.tmin  = tmin;
+    result.stcCmne.tmin = tmin;
     result.stcCmne.tstep = tstep;
 
     out << "  dSPM: " << result.stcDspm.data.rows() << " sources x "
@@ -280,9 +284,9 @@ static int doTrain(const QCommandLineParser& parser, bool finetune)
     QTextStream err(stderr);
 
     // ── Validate required arguments ────────────────────────────────────
-    const QString fwdPath     = parser.value(QStringLiteral("fwd"));
-    const QString covPath     = parser.value(QStringLiteral("cov"));
-    const QString epochsPath  = parser.value(QStringLiteral("epochs"));
+    const QString fwdPath = parser.value(QStringLiteral("fwd"));
+    const QString covPath = parser.value(QStringLiteral("cov"));
+    const QString epochsPath = parser.value(QStringLiteral("epochs"));
     const QString onnxOutPath = parser.value(QStringLiteral("onnx-out"));
 
     if (fwdPath.isEmpty() || covPath.isEmpty() || epochsPath.isEmpty()) {
@@ -325,31 +329,31 @@ static int doTrain(const QCommandLineParser& parser, bool finetune)
     }
 
     // ── Read settings from CLI ─────────────────────────────────────────
-    const double snr         = parser.value(QStringLiteral("snr")).toDouble();
-    const QString methodStr  = parser.value(QStringLiteral("method"));
-    const int lookBack       = parser.value(QStringLiteral("look-back")).toInt();
-    const int hiddenSize     = parser.value(QStringLiteral("hidden")).toInt();
-    const int numLayers      = parser.value(QStringLiteral("layers")).toInt();
-    const int trainEpochs    = parser.value(QStringLiteral("train-epochs")).toInt();
-    const double lr          = parser.value(QStringLiteral("lr")).toDouble();
-    const int batchSize      = parser.value(QStringLiteral("batch")).toInt();
-    const QString gtStcPfx   = parser.value(QStringLiteral("gt-stc"));
-    const QString pythonExe  = parser.value(QStringLiteral("python"));
+    const double snr = parser.value(QStringLiteral("snr")).toDouble();
+    const QString methodStr = parser.value(QStringLiteral("method"));
+    const int lookBack = parser.value(QStringLiteral("look-back")).toInt();
+    const int hiddenSize = parser.value(QStringLiteral("hidden")).toInt();
+    const int numLayers = parser.value(QStringLiteral("layers")).toInt();
+    const int trainEpochs = parser.value(QStringLiteral("train-epochs")).toInt();
+    const double lr = parser.value(QStringLiteral("lr")).toDouble();
+    const int batchSize = parser.value(QStringLiteral("batch")).toInt();
+    const QString gtStcPfx = parser.value(QStringLiteral("gt-stc"));
+    const QString pythonExe = parser.value(QStringLiteral("python"));
 
     // ── Build Python script arguments ──────────────────────────────────
     QStringList args;
-    args << QStringLiteral("--fwd")          << fwdPath
-         << QStringLiteral("--cov")          << covPath
-         << QStringLiteral("--epochs")       << epochsPath
-         << QStringLiteral("--out")          << onnxOutPath
-         << QStringLiteral("--look-back")    << QString::number(lookBack)
-         << QStringLiteral("--method")       << methodStr
-         << QStringLiteral("--snr")          << QString::number(snr, 'g', 6)
-         << QStringLiteral("--hidden")       << QString::number(hiddenSize)
-         << QStringLiteral("--layers")       << QString::number(numLayers)
+    args << QStringLiteral("--fwd") << fwdPath
+         << QStringLiteral("--cov") << covPath
+         << QStringLiteral("--epochs") << epochsPath
+         << QStringLiteral("--out") << onnxOutPath
+         << QStringLiteral("--look-back") << QString::number(lookBack)
+         << QStringLiteral("--method") << methodStr
+         << QStringLiteral("--snr") << QString::number(snr, 'g', 6)
+         << QStringLiteral("--hidden") << QString::number(hiddenSize)
+         << QStringLiteral("--layers") << QString::number(numLayers)
          << QStringLiteral("--train-epochs") << QString::number(trainEpochs)
-         << QStringLiteral("--lr")           << QString::number(lr, 'g', 6)
-         << QStringLiteral("--batch")        << QString::number(batchSize);
+         << QStringLiteral("--lr") << QString::number(lr, 'g', 6)
+         << QStringLiteral("--batch") << QString::number(batchSize);
 
     if (!gtStcPfx.isEmpty()) {
         args << QStringLiteral("--gt-stc") << gtStcPfx;
@@ -361,8 +365,8 @@ static int doTrain(const QCommandLineParser& parser, bool finetune)
 
     // ── Configure PythonRunner with venv ───────────────────────────────
     PythonRunnerConfig config;
-    config.pythonExe  = pythonExe;
-    config.venvDir    = QDir(cmneDir).absoluteFilePath(QStringLiteral(".venv"));
+    config.pythonExe = pythonExe;
+    config.venvDir = QDir(cmneDir).absoluteFilePath(QStringLiteral(".venv"));
     config.packageDir = cmneDir;
 
     MLTrainer trainer(config);
@@ -425,7 +429,8 @@ static int doTrain(const QCommandLineParser& parser, bool finetune)
         err << " with exit code " << result.exitCode << ".\n";
 
         if (!result.stdErr.isEmpty()) {
-            err << "--- stderr ---\n" << result.stdErr << "\n";
+            err << "--- stderr ---\n"
+                << result.stdErr << "\n";
         }
     }
 
@@ -436,7 +441,7 @@ static int doTrain(const QCommandLineParser& parser, bool finetune)
 // MAIN
 //=============================================================================================================
 
-int main(int argc, char *argv[])
+int main(int argc, char* argv[])
 {
     qInstallMessageHandler(MNELogger::customLogWriter);
     QCoreApplication app(argc, argv);
@@ -456,71 +461,71 @@ int main(int argc, char *argv[])
 
     // -- Mode --
     parser.addOption({QStringLiteral("mode"),
-        QStringLiteral("Operation mode: compute, train, or finetune."),
-        QStringLiteral("mode"), QStringLiteral("compute")});
+                      QStringLiteral("Operation mode: compute, train, or finetune."),
+                      QStringLiteral("mode"), QStringLiteral("compute")});
 
     // -- Common data inputs --
     parser.addOption({QStringLiteral("fwd"),
-        QStringLiteral("Forward solution FIFF file."),
-        QStringLiteral("file")});
+                      QStringLiteral("Forward solution FIFF file."),
+                      QStringLiteral("file")});
     parser.addOption({QStringLiteral("cov"),
-        QStringLiteral("Noise covariance FIFF file."),
-        QStringLiteral("file")});
+                      QStringLiteral("Noise covariance FIFF file."),
+                      QStringLiteral("file")});
     parser.addOption({QStringLiteral("snr"),
-        QStringLiteral("Signal-to-noise ratio (default: 3.0)."),
-        QStringLiteral("value"), QStringLiteral("3.0")});
+                      QStringLiteral("Signal-to-noise ratio (default: 3.0)."),
+                      QStringLiteral("value"), QStringLiteral("3.0")});
     parser.addOption({QStringLiteral("method"),
-        QStringLiteral("Inverse method: MNE, dSPM, sLORETA, eLORETA (default: dSPM)."),
-        QStringLiteral("name"), QStringLiteral("dSPM")});
+                      QStringLiteral("Inverse method: MNE, dSPM, sLORETA, eLORETA (default: dSPM)."),
+                      QStringLiteral("name"), QStringLiteral("dSPM")});
     parser.addOption({QStringLiteral("look-back"),
-        QStringLiteral("Number of past time steps k (default: 80)."),
-        QStringLiteral("k"), QStringLiteral("80")});
+                      QStringLiteral("Number of past time steps k (default: 80)."),
+                      QStringLiteral("k"), QStringLiteral("80")});
 
     // -- Compute-mode options --
     parser.addOption({QStringLiteral("evoked"),
-        QStringLiteral("Evoked data FIFF file (compute mode)."),
-        QStringLiteral("file")});
+                      QStringLiteral("Evoked data FIFF file (compute mode)."),
+                      QStringLiteral("file")});
     parser.addOption({QStringLiteral("onnx"),
-        QStringLiteral("ONNX model for LSTM correction (compute mode)."),
-        QStringLiteral("file")});
+                      QStringLiteral("ONNX model for LSTM correction (compute mode)."),
+                      QStringLiteral("file")});
     parser.addOption({QStringLiteral("out"),
-        QStringLiteral("Output STC prefix; writes <prefix>-dspm.stc and <prefix>-cmne.stc."),
-        QStringLiteral("prefix")});
+                      QStringLiteral("Output STC prefix; writes <prefix>-dspm.stc and <prefix>-cmne.stc."),
+                      QStringLiteral("prefix")});
     parser.addOption({QStringLiteral("setno"),
-        QStringLiteral("Evoked data set number (default: 0)."),
-        QStringLiteral("n"), QStringLiteral("0")});
+                      QStringLiteral("Evoked data set number (default: 0)."),
+                      QStringLiteral("n"), QStringLiteral("0")});
 
     // -- Train / finetune options --
     parser.addOption({QStringLiteral("epochs"),
-        QStringLiteral("MNE Epochs FIFF file (train/finetune mode)."),
-        QStringLiteral("file")});
+                      QStringLiteral("MNE Epochs FIFF file (train/finetune mode)."),
+                      QStringLiteral("file")});
     parser.addOption({QStringLiteral("gt-stc"),
-        QStringLiteral("Ground-truth STC prefix (optional; omit for pseudo-GT mode)."),
-        QStringLiteral("prefix")});
+                      QStringLiteral("Ground-truth STC prefix (optional; omit for pseudo-GT mode)."),
+                      QStringLiteral("prefix")});
     parser.addOption({QStringLiteral("onnx-out"),
-        QStringLiteral("Output ONNX model path (train/finetune mode)."),
-        QStringLiteral("file"), QStringLiteral("cmne_lstm.onnx")});
+                      QStringLiteral("Output ONNX model path (train/finetune mode)."),
+                      QStringLiteral("file"), QStringLiteral("cmne_lstm.onnx")});
     parser.addOption({QStringLiteral("hidden"),
-        QStringLiteral("LSTM hidden dimension (default: 256)."),
-        QStringLiteral("n"), QStringLiteral("256")});
+                      QStringLiteral("LSTM hidden dimension (default: 256)."),
+                      QStringLiteral("n"), QStringLiteral("256")});
     parser.addOption({QStringLiteral("layers"),
-        QStringLiteral("Number of LSTM layers (default: 1)."),
-        QStringLiteral("n"), QStringLiteral("1")});
+                      QStringLiteral("Number of LSTM layers (default: 1)."),
+                      QStringLiteral("n"), QStringLiteral("1")});
     parser.addOption({QStringLiteral("train-epochs"),
-        QStringLiteral("Number of training epochs (default: 50)."),
-        QStringLiteral("n"), QStringLiteral("50")});
+                      QStringLiteral("Number of training epochs (default: 50)."),
+                      QStringLiteral("n"), QStringLiteral("50")});
     parser.addOption({QStringLiteral("lr"),
-        QStringLiteral("Learning rate (default: 0.001)."),
-        QStringLiteral("value"), QStringLiteral("0.001")});
+                      QStringLiteral("Learning rate (default: 0.001)."),
+                      QStringLiteral("value"), QStringLiteral("0.001")});
     parser.addOption({QStringLiteral("batch"),
-        QStringLiteral("Batch size (default: 64)."),
-        QStringLiteral("n"), QStringLiteral("64")});
+                      QStringLiteral("Batch size (default: 64)."),
+                      QStringLiteral("n"), QStringLiteral("64")});
     parser.addOption({QStringLiteral("finetune"),
-        QStringLiteral("Existing ONNX model to fine-tune from."),
-        QStringLiteral("file")});
+                      QStringLiteral("Existing ONNX model to fine-tune from."),
+                      QStringLiteral("file")});
     parser.addOption({QStringLiteral("python"),
-        QStringLiteral("Python interpreter (default: python3)."),
-        QStringLiteral("exe"), QStringLiteral("python3")});
+                      QStringLiteral("Python interpreter (default: python3)."),
+                      QStringLiteral("exe"), QStringLiteral("python3")});
 
     parser.process(app);
 

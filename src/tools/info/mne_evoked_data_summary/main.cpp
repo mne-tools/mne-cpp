@@ -49,13 +49,20 @@ using namespace UTILSLIB;
 static QString channelKindName(fiff_int_t kind)
 {
     switch (kind) {
-    case FIFFV_MEG_CH:      return "MEG";
-    case FIFFV_REF_MEG_CH:  return "REF_MEG";
-    case FIFFV_EEG_CH:      return "EEG";
-    case FIFFV_STIM_CH:     return "STIM";
-    case FIFFV_EOG_CH:      return "EOG";
-    case FIFFV_ECG_CH:      return "ECG";
-    default:                return QString("OTHER(%1)").arg(kind);
+        case FIFFV_MEG_CH:
+            return "MEG";
+        case FIFFV_REF_MEG_CH:
+            return "REF_MEG";
+        case FIFFV_EEG_CH:
+            return "EEG";
+        case FIFFV_STIM_CH:
+            return "STIM";
+        case FIFFV_EOG_CH:
+            return "EOG";
+        case FIFFV_ECG_CH:
+            return "ECG";
+        default:
+            return QString("OTHER(%1)").arg(kind);
     }
 }
 
@@ -71,23 +78,23 @@ static QString coilTypeName(fiff_int_t kind, fiff_int_t coilType)
     // Coil types 3022, 3023, 3024 are magnetometers
     // Simple heuristic: unit T/m -> grad, T -> mag
     switch (coilType) {
-    case 2:
-    case 3012:
-    case 3013:
-    case 3014:
-        return "MEG_GRAD";
-    case 3022:
-    case 3023:
-    case 3024:
-        return "MEG_MAG";
-    default:
-        return "MEG";
+        case 2:
+        case 3012:
+        case 3013:
+        case 3014:
+            return "MEG_GRAD";
+        case 3022:
+        case 3023:
+        case 3024:
+            return "MEG_MAG";
+        default:
+            return "MEG";
     }
 }
 
 //=============================================================================================================
 
-int main(int argc, char *argv[])
+int main(int argc, char* argv[])
 {
     qInstallMessageHandler(MNELogger::customLogWriter);
     QCoreApplication app(argc, argv);
@@ -121,33 +128,33 @@ int main(int argc, char *argv[])
         return 1;
     }
 
-    qInfo("File: %s" , qPrintable(measFile));
-    qInfo("Number of evoked data sets: %lld\n" , static_cast<long long>(evokedSet.evoked.size()));
+    qInfo("File: %s", qPrintable(measFile));
+    qInfo("Number of evoked data sets: %lld\n", static_cast<long long>(evokedSet.evoked.size()));
 
     for (int i = 0; i < evokedSet.evoked.size(); ++i) {
-        const FiffEvoked &evoked = evokedSet.evoked[i];
+        const FiffEvoked& evoked = evokedSet.evoked[i];
 
-        qInfo("--- Set %d ---" , i + 1);
-        qInfo("  Comment    : %s" , qPrintable(evoked.comment));
-        qInfo("  Type       : %s" , qPrintable(evoked.aspectKindToString()));
-        qInfo("  Nave       : %d" , evoked.nave);
+        qInfo("--- Set %d ---", i + 1);
+        qInfo("  Comment    : %s", qPrintable(evoked.comment));
+        qInfo("  Type       : %s", qPrintable(evoked.aspectKindToString()));
+        qInfo("  Nave       : %d", evoked.nave);
 
         float tmin = evoked.times.size() > 0 ? evoked.times(0) : 0.0f;
         float tmax = evoked.times.size() > 0 ? evoked.times(evoked.times.size() - 1) : 0.0f;
-        qInfo("  Time range : %.3f to %.3f s" , tmin, tmax);
-        qInfo("  Channels   : %d" , evoked.info.nchan);
+        qInfo("  Time range : %.3f to %.3f s", tmin, tmax);
+        qInfo("  Channels   : %d", evoked.info.nchan);
 
         // Count channel types
         QMap<QString, int> typeCounts;
         for (int c = 0; c < evoked.info.chs.size(); ++c) {
-            const FiffChInfo &ch = evoked.info.chs[c];
+            const FiffChInfo& ch = evoked.info.chs[c];
             QString typeName = coilTypeName(ch.kind, ch.chpos.coil_type);
             typeCounts[typeName]++;
         }
 
         qInfo("  Channel types:");
         for (auto it = typeCounts.constBegin(); it != typeCounts.constEnd(); ++it) {
-            qInfo("    %-12s : %d" , qPrintable(it.key()), it.value());
+            qInfo("    %-12s : %d", qPrintable(it.key()), it.value());
         }
         qInfo("%s", "");
     }

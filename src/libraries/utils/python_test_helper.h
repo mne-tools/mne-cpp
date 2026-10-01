@@ -97,13 +97,13 @@ namespace UTILSLIB
  * @param available   A PythonTestHelper (or bool) — must support operator bool / isAvailable().
  * @param reason   Human-readable reason string.
  */
-#define GUARD_PYTHON(available, reason) \
-    do { \
-        if (!(available)) { \
-            if (UTILSLIB::PythonTestHelper::isPythonRequired()) \
+#define GUARD_PYTHON(available, reason)                                                            \
+    do {                                                                                           \
+        if (!(available)) {                                                                        \
+            if (UTILSLIB::PythonTestHelper::isPythonRequired())                                    \
                 QFAIL(qPrintable(QString("HARD FAIL (MNE_REQUIRE_PYTHON=true): %1").arg(reason))); \
-            QSKIP(qPrintable(QString("SKIP: %1").arg(reason))); \
-        } \
+            QSKIP(qPrintable(QString("SKIP: %1").arg(reason)));                                    \
+        }                                                                                          \
     } while (0)
 
 /**
@@ -112,7 +112,7 @@ namespace UTILSLIB
  * @param helper       A PythonTestHelper instance.
  * @param packageName  Package name string (e.g. "sklearn").
  */
-#define GUARD_PYTHON_PACKAGE(helper, packageName) \
+#define GUARD_PYTHON_PACKAGE(helper, packageName)  \
     GUARD_PYTHON((helper).hasPackage(packageName), \
                  QString("Python package '%1' not available").arg(packageName))
 
@@ -285,12 +285,12 @@ public:
      * @return Parsed MatrixXd, or empty matrix on failure.
      */
     Eigen::MatrixXd evalMatrixViaFile(const QString& code,
-                                       const QString& outputFilePath,
-                                       bool* ok = nullptr,
-                                       int timeoutMs = 120000) const;
+                                      const QString& outputFilePath,
+                                      bool* ok = nullptr,
+                                      int timeoutMs = 120000) const;
 
 private:
-    mutable PythonRunner m_runner;  /**< Internal PythonRunner instance. */
+    mutable PythonRunner m_runner; /**< Internal PythonRunner instance. */
 };
 
 } // namespace UTILSLIB

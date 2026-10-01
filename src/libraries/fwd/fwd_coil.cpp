@@ -36,7 +36,6 @@ using namespace FIFFLIB;
 using namespace FWDLIB;
 
 
-
 //=============================================================================================================
 // DEFINE MEMBER METHODS
 //=============================================================================================================
@@ -44,13 +43,13 @@ using namespace FWDLIB;
 FwdCoil::FwdCoil(int p_np)
 {
     coil_class = FWD_COILC_UNKNOWN;
-    accuracy   = FWD_COIL_ACCURACY_POINT;
-    base       = 0.0;
-    size       = 0.0;
-    np         = p_np;
-    rmag       = Eigen::Matrix<float, Eigen::Dynamic, 3, Eigen::RowMajor>::Zero(np, 3);
-    cosmag     = Eigen::Matrix<float, Eigen::Dynamic, 3, Eigen::RowMajor>::Zero(np, 3);
-    w          = Eigen::VectorXf::Zero(np);
+    accuracy = FWD_COIL_ACCURACY_POINT;
+    base = 0.0;
+    size = 0.0;
+    np = p_np;
+    rmag = Eigen::Matrix<float, Eigen::Dynamic, 3, Eigen::RowMajor>::Zero(np, 3);
+    cosmag = Eigen::Matrix<float, Eigen::Dynamic, 3, Eigen::RowMajor>::Zero(np, 3);
+    w = Eigen::VectorXf::Zero(np);
     /*
    * Reasonable defaults
    */
@@ -70,19 +69,19 @@ FwdCoil::FwdCoil(int p_np)
 FwdCoil::FwdCoil(const FwdCoil& p_FwdCoil)
 {
     if (!p_FwdCoil.chname.isEmpty())
-        this->chname   = p_FwdCoil.chname;
+        this->chname = p_FwdCoil.chname;
     if (!p_FwdCoil.desc.isEmpty())
-        this->desc   = p_FwdCoil.desc;
+        this->desc = p_FwdCoil.desc;
     this->coil_class = p_FwdCoil.coil_class;
-    this->accuracy   = p_FwdCoil.accuracy;
-    this->base       = p_FwdCoil.base;
-    this->size       = p_FwdCoil.size;
-    this->np         = p_FwdCoil.np;
-    this->type       = p_FwdCoil.type;
+    this->accuracy = p_FwdCoil.accuracy;
+    this->base = p_FwdCoil.base;
+    this->size = p_FwdCoil.size;
+    this->np = p_FwdCoil.np;
+    this->type = p_FwdCoil.type;
 
-    rmag   = p_FwdCoil.rmag;
+    rmag = p_FwdCoil.rmag;
     cosmag = p_FwdCoil.cosmag;
-    w      = p_FwdCoil.w;
+    w = p_FwdCoil.w;
 
     this->r0 = p_FwdCoil.r0;
     this->ex = p_FwdCoil.ex;
@@ -113,26 +112,25 @@ FwdCoil::UPtr FwdCoil::create_eeg_el(const FiffChInfo& ch, const FiffCoordTrans&
 
     FwdCoil::UPtr res;
     if (ch.chpos.ex.norm() < 1e-4)
-        res = std::make_unique<FwdCoil>(1);   /* No reference electrode */
+        res = std::make_unique<FwdCoil>(1); /* No reference electrode */
     else
-        res = std::make_unique<FwdCoil>(2);   /* Reference electrode present */
+        res = std::make_unique<FwdCoil>(2); /* Reference electrode present */
 
-    res->chname     = ch.ch_name;
-    res->desc       = "EEG electrode";
+    res->chname = ch.ch_name;
+    res->desc = "EEG electrode";
     res->coil_class = FWD_COILC_EEG;
-    res->accuracy   = FWD_COIL_ACCURACY_NORMAL;
-    res->type       = ch.chpos.coil_type;
+    res->accuracy = FWD_COIL_ACCURACY_NORMAL;
+    res->type = ch.chpos.coil_type;
     res->r0 = ch.chpos.r0;
     res->ex = ch.chpos.ex;
     /*
      * Optional coordinate transformation
      */
     if (!t.isEmpty()) {
-        FiffCoordTrans::apply_trans(res->r0.data(),t,FIFFV_MOVE);
-        FiffCoordTrans::apply_trans(res->ex.data(),t,FIFFV_MOVE);
+        FiffCoordTrans::apply_trans(res->r0.data(), t, FIFFV_MOVE);
+        FiffCoordTrans::apply_trans(res->ex.data(), t, FIFFV_MOVE);
         res->coord_frame = t.to;
-    }
-    else
+    } else
         res->coord_frame = FIFFV_COORD_HEAD;
     /*
      * The electrode location

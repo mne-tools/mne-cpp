@@ -50,7 +50,8 @@ namespace MNELIB
 /**
  * @brief Artifact rejection thresholds and flags for each channel type (grad, mag, eeg, eog) used during epoch dropping
  */
-struct ArtifactRejectionData {
+struct ArtifactRejectionData
+{
     bool bRejected = false;
     Eigen::RowVectorXd data;
     double dThreshold;
@@ -65,10 +66,9 @@ struct ArtifactRejectionData {
  */
 class MNESHARED_EXPORT MNEEpochDataList : public QList<MNEEpochData::SPtr>
 {
-
 public:
-    typedef QSharedPointer<MNEEpochDataList> SPtr;              /**< Shared pointer type for MNEEpochDataList. */
-    typedef QSharedPointer<const MNEEpochDataList> ConstSPtr;   /**< Const shared pointer type for MNEEpochDataList. */
+    typedef QSharedPointer<MNEEpochDataList> SPtr;            /**< Shared pointer type for MNEEpochDataList. */
+    typedef QSharedPointer<const MNEEpochDataList> ConstSPtr; /**< Const shared pointer type for MNEEpochDataList. */
 
     //=========================================================================================================
     /**
@@ -102,8 +102,8 @@ public:
                                        float tmin,
                                        float tmax,
                                        qint32 event,
-                                       const QMap<QString,double>& mapReject,
-                                       const QStringList &lExcludeChs = QStringList(),
+                                       const QMap<QString, double>& mapReject,
+                                       const QStringList& lExcludeChs = QStringList(),
                                        const Eigen::RowVectorXi& picks = Eigen::RowVectorXi());
 
     //=========================================================================================================
@@ -118,7 +118,7 @@ public:
      *
      * @return Averaged evoked response; aspect_kind is FIFFV_ASPECT_STD_ERR with no data if the list is empty.
      */
-    FIFFLIB::FiffEvoked average(const FIFFLIB::FiffInfo &p_info,
+    FIFFLIB::FiffEvoked average(const FIFFLIB::FiffInfo& p_info,
                                 FIFFLIB::fiff_int_t first,
                                 FIFFLIB::fiff_int_t last,
                                 Eigen::VectorXi sel = FIFFLIB::defaultVectorXi,
@@ -130,7 +130,7 @@ public:
      *
      * @param[in] baseline     time definition of the baseline in seconds [from, to].
      */
-    void applyBaselineCorrection(const QPair<float, float> &baseline);
+    void applyBaselineCorrection(const QPair<float, float>& baseline);
 
     //=========================================================================================================
     /**
@@ -159,8 +159,8 @@ public:
      */
     static bool checkForArtifact(const Eigen::MatrixXd& data,
                                  const FIFFLIB::FiffInfo& pFiffInfo,
-                                 const QMap<QString,double>& mapReject,
-                                 const QStringList &lExcludeChs = QStringList());
+                                 const QMap<QString, double>& mapReject,
+                                 const QStringList& lExcludeChs = QStringList());
 
     static void checkChThreshold(ArtifactRejectionData& inputData);
 
@@ -184,15 +184,15 @@ public:
      *
      * @return FiffEvokedSet containing one FiffEvoked per category.
      */
-    static FIFFLIB::FiffEvokedSet averageCategories(const FIFFLIB::FiffRawData &raw,
-                                                     const Eigen::MatrixXi &events,
-                                                     const QList<int> &eventCodes,
-                                                     const QStringList &comments,
-                                                     float tmin,
-                                                     float tmax,
-                                                     const QMap<QString,double> &mapReject = QMap<QString,double>(),
-                                                     const QPair<float,float> &baseline = QPair<float,float>(0.0f, 0.0f),
-                                                     bool proj = false);
+    static FIFFLIB::FiffEvokedSet averageCategories(const FIFFLIB::FiffRawData& raw,
+                                                    const Eigen::MatrixXi& events,
+                                                    const QList<int>& eventCodes,
+                                                    const QStringList& comments,
+                                                    float tmin,
+                                                    float tmax,
+                                                    const QMap<QString, double>& mapReject = QMap<QString, double>(),
+                                                    const QPair<float, float>& baseline = QPair<float, float>(0.0f, 0.0f),
+                                                    bool proj = false);
 
     //=========================================================================================================
     /**
@@ -221,8 +221,8 @@ public:
                                               bool bApplyBaseline,
                                               float fTBaselineFromS,
                                               float fTBaselineToS,
-                                              const QMap<QString,double>& mapReject,
-                                              const QStringList &lExcludeChs = QStringList(),
+                                              const QMap<QString, double>& mapReject,
+                                              const QStringList& lExcludeChs = QStringList(),
                                               const Eigen::RowVectorXi& vecPicks = Eigen::RowVectorXi());
 };
 } // NAMESPACE

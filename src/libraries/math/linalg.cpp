@@ -56,8 +56,7 @@ using namespace Eigen;
 
 VectorXd Linalg::combine_xyz(const VectorXd& vec)
 {
-    if (vec.size() % 3 != 0)
-    {
+    if (vec.size() % 3 != 0) {
         qWarning("Linalg::combine_xyz: Input must be a row or column vector with 3N components.");
         return VectorXd();
     }
@@ -77,12 +76,12 @@ VectorXd Linalg::combine_xyz(const VectorXd& vec)
 //=============================================================================================================
 
 double Linalg::getConditionNumber(const MatrixXd& A,
-                                  VectorXd &s)
+                                  VectorXd& s)
 {
     JacobiSVD<MatrixXd> svd(A);
     s = svd.singularValues();
 
-    double c = s.maxCoeff()/s.minCoeff();
+    double c = s.maxCoeff() / s.minCoeff();
 
     return c;
 }
@@ -90,23 +89,23 @@ double Linalg::getConditionNumber(const MatrixXd& A,
 //=============================================================================================================
 
 double Linalg::getConditionSlope(const MatrixXd& A,
-                                 VectorXd &s)
+                                 VectorXd& s)
 {
     JacobiSVD<MatrixXd> svd(A);
     s = svd.singularValues();
 
-    double c = s.maxCoeff()/s.mean();
+    double c = s.maxCoeff() / s.mean();
 
     return c;
 }
 
 //=============================================================================================================
 
-void Linalg::get_whitener(MatrixXd &A,
+void Linalg::get_whitener(MatrixXd& A,
                           bool pca,
                           QString ch_type,
-                          VectorXd &eig,
-                          MatrixXd &eigvec)
+                          VectorXd& eig,
+                          MatrixXd& eigvec)
 {
     SelfAdjointEigenSolver<MatrixXd> t_eigenSolver(A);
 
@@ -116,26 +115,25 @@ void Linalg::get_whitener(MatrixXd &A,
     Linalg::sort<double>(eig, eigvec, false);
     qint32 rnk = Linalg::rank(A);
 
-    for(qint32 i = 0; i < eig.size()-rnk; ++i)
+    for (qint32 i = 0; i < eig.size() - rnk; ++i)
         eig(i) = 0;
 
     qInfo("Setting small %s eigenvalues to zero.", ch_type.toUtf8().constData());
     if (!pca)
         qInfo("Not doing PCA for %s", ch_type.toUtf8().constData());
-    else
-    {
+    else {
         qInfo("Doing PCA for %s.", ch_type.toUtf8().constData());
-        eigvec = eigvec.block(eigvec.rows()-rnk, 0, rnk, eigvec.cols());
+        eigvec = eigvec.block(eigvec.rows() - rnk, 0, rnk, eigvec.cols());
     }
 }
 
 //=============================================================================================================
 
-void Linalg::get_whitener(MatrixXd &A,
+void Linalg::get_whitener(MatrixXd& A,
                           bool pca,
                           const std::string& ch_type,
-                          VectorXd &eig,
-                          MatrixXd &eigvec)
+                          VectorXd& eig,
+                          MatrixXd& eigvec)
 {
     SelfAdjointEigenSolver<MatrixXd> t_eigenSolver(A);
 
@@ -145,38 +143,36 @@ void Linalg::get_whitener(MatrixXd &A,
     Linalg::sort<double>(eig, eigvec, false);
     qint32 rnk = Linalg::rank(A);
 
-    for(qint32 i = 0; i < eig.size()-rnk; ++i)
+    for (qint32 i = 0; i < eig.size() - rnk; ++i)
         eig(i) = 0;
 
     qInfo("Setting small %s eigenvalues to zero.", ch_type.c_str());
     if (!pca)
         qInfo("Not doing PCA for %s", ch_type.c_str());
-    else
-    {
+    else {
         qInfo("Doing PCA for %s.", ch_type.c_str());
-        eigvec = eigvec.block(eigvec.rows()-rnk, 0, rnk, eigvec.cols());
+        eigvec = eigvec.block(eigvec.rows() - rnk, 0, rnk, eigvec.cols());
     }
 }
 
 //=============================================================================================================
 
-VectorXi Linalg::intersect(const VectorXi &v1,
-                           const VectorXi &v2,
-                           VectorXi &idx_sel)
+VectorXi Linalg::intersect(const VectorXi& v1,
+                           const VectorXi& v2,
+                           VectorXi& idx_sel)
 {
     std::vector<int> tmp;
 
-    std::vector< std::pair<int,int> > t_vecIntIdxValue;
+    std::vector<std::pair<int, int>> t_vecIntIdxValue;
 
-    for(qint32 i = 0; i < v1.size(); ++i)
+    for (qint32 i = 0; i < v1.size(); ++i)
         tmp.push_back(v1[i]);
 
     std::vector<int>::iterator it;
-    for(qint32 i = 0; i < v2.size(); ++i)
-    {
-        it = std::search(tmp.begin(), tmp.end(), &v2[i], &v2[i]+1);
-        if(it != tmp.end())
-            t_vecIntIdxValue.push_back(std::pair<int,int>(v2[i], it-tmp.begin()));
+    for (qint32 i = 0; i < v2.size(); ++i) {
+        it = std::search(tmp.begin(), tmp.end(), &v2[i], &v2[i] + 1);
+        if (it != tmp.end())
+            t_vecIntIdxValue.push_back(std::pair<int, int>(v2[i], it - tmp.begin()));
     }
 
     std::sort(t_vecIntIdxValue.begin(), t_vecIntIdxValue.end(), Linalg::compareIdxValuePairSmallerThan<int>);
@@ -184,8 +180,7 @@ VectorXi Linalg::intersect(const VectorXi &v1,
     VectorXi p_res(t_vecIntIdxValue.size());
     idx_sel = VectorXi(t_vecIntIdxValue.size());
 
-    for(quint32 i = 0; i < t_vecIntIdxValue.size(); ++i)
-    {
+    for (quint32 i = 0; i < t_vecIntIdxValue.size(); ++i) {
         p_res[i] = t_vecIntIdxValue[i].first;
         idx_sel[i] = t_vecIntIdxValue[i].second;
     }
@@ -195,15 +190,14 @@ VectorXi Linalg::intersect(const VectorXi &v1,
 
 //=============================================================================================================
 
-SparseMatrix<double> Linalg::make_block_diag(const MatrixXd &A,
+SparseMatrix<double> Linalg::make_block_diag(const MatrixXd& A,
                                              qint32 n)
 {
     qint32 ma = A.rows();
     qint32 na = A.cols();
     float bdn = static_cast<float>(na) / n;
 
-    if (bdn - std::floor(bdn))
-    {
+    if (bdn - std::floor(bdn)) {
         qWarning("Linalg::make_block_diag: Width of matrix must be an even multiple of n.");
         return SparseMatrix<double>();
     }
@@ -212,8 +206,7 @@ SparseMatrix<double> Linalg::make_block_diag(const MatrixXd &A,
     std::vector<T> tripletList;
     tripletList.reserve(static_cast<size_t>(bdn * ma * n));
 
-    for (qint32 i = 0; i < static_cast<qint32>(bdn); ++i)
-    {
+    for (qint32 i = 0; i < static_cast<qint32>(bdn); ++i) {
         qint32 current_col = i * n;
         qint32 current_row = i * ma;
 
@@ -238,7 +231,7 @@ qint32 Linalg::rank(const MatrixXd& A,
     double t_dMax = s.maxCoeff();
     t_dMax *= tol;
     qint32 sum = 0;
-    for(qint32 i = 0; i < s.size(); ++i)
+    for (qint32 i = 0; i < s.size(); ++i)
         sum += s[i] > t_dMax ? 1 : 0;
     return sum;
 }

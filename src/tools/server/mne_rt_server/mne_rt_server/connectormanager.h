@@ -62,7 +62,6 @@ class ConnectorManager : public QPluginLoader
     Q_OBJECT
 
 public:
-
     //=========================================================================================================
     /**
      * Constructs a ConnectorManager with the given parent.
@@ -129,12 +128,11 @@ public:
 
 signals:
     void sendMeasInfo(qint32, FIFFLIB::FiffInfo);
-//    void setBufferSize(qint32 ID);
-//    void startMeasConnector();
-//    void stopMeasConnector();
+    //    void setBufferSize(qint32 ID);
+    //    void startMeasConnector();
+    //    void stopMeasConnector();
 
 private:
-
     //SLOTS
     //=========================================================================================================
     /**
@@ -158,7 +156,7 @@ private:
      *
      * @param[in] p_command  The start command.
      */
-    void comStart(COMLIB::Command p_command);//comMeas
+    void comStart(COMLIB::Command p_command); //comMeas
 
     //=========================================================================================================
     /**
@@ -168,7 +166,7 @@ private:
      */
     void comStopAll(COMLIB::Command p_command);
 
-    static QVector<IConnector*> s_vecConnectors;       /**< Holds vector of all plugins. */
+    static QVector<IConnector*> s_vecConnectors; /**< Holds vector of all plugins. */
 
     FiffStreamServer* m_pFiffStreamServer;
 };

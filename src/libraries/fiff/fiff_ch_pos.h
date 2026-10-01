@@ -62,10 +62,10 @@ namespace FIFFLIB
 class FIFFSHARED_EXPORT FiffChPos
 {
 public:
-    using SPtr = QSharedPointer<FiffChPos>;            /**< Shared pointer type for FiffChPos. */
-    using ConstSPtr = QSharedPointer<const FiffChPos>; /**< Const shared pointer type for FiffChPos. */
-    using UPtr = std::unique_ptr<FiffChPos>;             /**< Unique pointer type for FiffChPos. */
-    using ConstUPtr = std::unique_ptr<const FiffChPos>;  /**< Const unique pointer type for FiffChPos. */
+    using SPtr = QSharedPointer<FiffChPos>;             /**< Shared pointer type for FiffChPos. */
+    using ConstSPtr = QSharedPointer<const FiffChPos>;  /**< Const shared pointer type for FiffChPos. */
+    using UPtr = std::unique_ptr<FiffChPos>;            /**< Unique pointer type for FiffChPos. */
+    using ConstUPtr = std::unique_ptr<const FiffChPos>; /**< Const unique pointer type for FiffChPos. */
 
     //=========================================================================================================
     /**
@@ -79,7 +79,7 @@ public:
      *
      * @param[in] p_FiffChPos  Coil position descriptor which should be copied.
      */
-    FiffChPos(const FiffChPos &p_FiffChPos);
+    FiffChPos(const FiffChPos& p_FiffChPos);
 
     //=========================================================================================================
     /**
@@ -117,15 +117,14 @@ public:
      *
      * @return true if equal, false otherwise.
      */
-    friend bool operator== (const FiffChPos &a, const FiffChPos &b);
+    friend bool operator==(const FiffChPos& a, const FiffChPos& b);
 
 public:
-    fiff_int_t   coil_type; /**< What kind of coil. */
-    Eigen::Vector3f r0;     /**< Coil coordinate system origin. */
-    Eigen::Vector3f ex;     /**< Coil coordinate system x-axis unit vector. */
-    Eigen::Vector3f ey;     /**< Coil coordinate system y-axis unit vector. */
-    Eigen::Vector3f ez;     /**< Coil coordinate system z-axis unit vector. */
-
+    fiff_int_t coil_type; /**< What kind of coil. */
+    Eigen::Vector3f r0;   /**< Coil coordinate system origin. */
+    Eigen::Vector3f ex;   /**< Coil coordinate system x-axis unit vector. */
+    Eigen::Vector3f ey;   /**< Coil coordinate system y-axis unit vector. */
+    Eigen::Vector3f ez;   /**< Coil coordinate system z-axis unit vector. */
 };
 
 //=============================================================================================================
@@ -134,14 +133,12 @@ public:
 
 inline qint32 FiffChPos::storageSize()
 {
-    return sizeof(FiffChPos::coil_type)
-         + sizeof(FiffChPos::r0) + sizeof(FiffChPos::ex)
-         + sizeof(FiffChPos::ey) + sizeof(FiffChPos::ez);
+    return sizeof(FiffChPos::coil_type) + sizeof(FiffChPos::r0) + sizeof(FiffChPos::ex) + sizeof(FiffChPos::ey) + sizeof(FiffChPos::ez);
 }
 
 //=============================================================================================================
 
-inline bool operator== (const FiffChPos &a, const FiffChPos &b)
+inline bool operator==(const FiffChPos& a, const FiffChPos& b)
 {
     return (a.coil_type == b.coil_type &&
             a.r0.isApprox(b.r0, 0.0001f) &&

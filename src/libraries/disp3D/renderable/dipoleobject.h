@@ -55,23 +55,35 @@ public:
     DipoleObject();
     ~DipoleObject();
 
-    void load(const INVLIB::InvEcdSet &ecdSet);
-    
-    // Apply a transformation matrix to all dipoles
-    void applyTransform(const QMatrix4x4 &trans);
+    void load(const INVLIB::InvEcdSet& ecdSet);
 
-    void updateBuffers(QRhi *rhi, QRhiResourceUpdateBatch *u);
+    // Apply a transformation matrix to all dipoles
+    void applyTransform(const QMatrix4x4& trans);
+
+    void updateBuffers(QRhi* rhi, QRhiResourceUpdateBatch* u);
 
     QRhiBuffer* vertexBuffer() const;
     QRhiBuffer* indexBuffer() const;
     QRhiBuffer* instanceBuffer() const;
-    
-    int indexCount() const { return m_indexCount; }
-    int instanceCount() const { return m_instanceCount; }
-    
-    bool isVisible() const { return m_visible; }
-    void setVisible(bool visible) { m_visible = visible; }
-    
+
+    int indexCount() const
+    {
+        return m_indexCount;
+    }
+    int instanceCount() const
+    {
+        return m_instanceCount;
+    }
+
+    bool isVisible() const
+    {
+        return m_visible;
+    }
+    void setVisible(bool visible)
+    {
+        m_visible = visible;
+    }
+
     QVector3D debugFirstDipolePosition() const; // For debugging
 
     void setSelected(int index, bool selected);
@@ -85,11 +97,11 @@ public:
      * @param[out] dist      Distance to intersection.
      * @return Index of intersected dipole, or -1 if none.
      */
-    int intersect(const QVector3D &rayOrigin, const QVector3D &rayDir, float &dist) const;
+    int intersect(const QVector3D& rayOrigin, const QVector3D& rayDir, float& dist) const;
 
 private:
     void createGeometry();
-    
+
     /** @brief QRhi vertex, index, and instance buffers for dipole arrow GPU rendering. */
     struct GpuBuffers;
     std::unique_ptr<GpuBuffers> m_gpu;
@@ -97,32 +109,34 @@ private:
     int m_indexCount = 0;
     int m_instanceCount = 0;
     bool m_visible = true;
-    
+
     /**
      * @brief Interleaved vertex attributes for a single dipole arrow mesh.
      */
-    struct VertexData {
+    struct VertexData
+    {
         float x, y, z;
         float nx, ny, nz;
     };
-    
+
     /**
      * @brief Per-instance transform and color for GPU-instanced dipole rendering.
      */
     // Instance data: Model Matrix (4x4) + Color (vec4)
-    struct InstanceData {
-        float model[16]; 
+    struct InstanceData
+    {
+        float model[16];
         float color[4];
         float isSelected; // 1.0 = selected, 0.0 = not
     };
-    
+
     QByteArray m_vertexData;
     QByteArray m_indexData;
     QByteArray m_instanceData;
-    
+
     bool m_geometryDirty = false;
     bool m_instancesDirty = false;
-    
+
     std::vector<QVector4D> m_originalColors;
 };
 

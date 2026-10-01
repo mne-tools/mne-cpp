@@ -59,8 +59,8 @@ namespace INVLIB
 // SOME DEFINES
 //=============================================================================================================
 
-#define NOT_TRANSPOSED   0  /**< Defines NOT_TRANSPOSED. */
-#define IS_TRANSPOSED   1   /**< Defines IS_TRANSPOSED. */
+#define NOT_TRANSPOSED 0 /**< Defines NOT_TRANSPOSED. */
+#define IS_TRANSPOSED 1  /**< Defines IS_TRANSPOSED. */
 
 //=============================================================================================================
 /**
@@ -89,25 +89,25 @@ struct Pair
 class INVSHARED_EXPORT InvRapMusic
 {
 public:
-    typedef QSharedPointer<InvRapMusic> SPtr;             /**< Shared pointer type for InvRapMusic. */
-    typedef QSharedPointer<const InvRapMusic> ConstSPtr;  /**< Const shared pointer type for InvRapMusic. */
+    typedef QSharedPointer<InvRapMusic> SPtr;            /**< Shared pointer type for InvRapMusic. */
+    typedef QSharedPointer<const InvRapMusic> ConstSPtr; /**< Const shared pointer type for InvRapMusic. */
 
     //*********************************************************************************************************
     //=========================================================================================================
     // TYPEDEFS
     //=========================================================================================================
 
-    typedef Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic> MatrixXT;  /**< Defines Eigen::Matrix<T, Eigen::Dynamic,
+    typedef Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic> MatrixXT; /**< Defines Eigen::Matrix<T, Eigen::Dynamic,
                                                                              Eigen::Dynamic> as MatrixXT type. */
-    typedef Eigen::Matrix<double, Eigen::Dynamic, 6> MatrixX6T;              /**< Defines Eigen::Matrix<T, Eigen::Dynamic,
+    typedef Eigen::Matrix<double, Eigen::Dynamic, 6> MatrixX6T;             /**< Defines Eigen::Matrix<T, Eigen::Dynamic,
                                                                              6> as MatrixX6T type. */
-    typedef Eigen::Matrix<double, 6, Eigen::Dynamic> Matrix6XT;              /**< Defines Eigen::Matrix<T, 6,
+    typedef Eigen::Matrix<double, 6, Eigen::Dynamic> Matrix6XT;             /**< Defines Eigen::Matrix<T, 6,
                                                                              Eigen::Dynamic> as Matrix6XT type. */
-    typedef Eigen::Matrix<double, 6, 6> Matrix6T;                            /**< Defines Eigen::Matrix<T, 6, 6>
+    typedef Eigen::Matrix<double, 6, 6> Matrix6T;                           /**< Defines Eigen::Matrix<T, 6, 6>
                                                                              as Matrix6T type. */
-    typedef Eigen::Matrix<double, Eigen::Dynamic, 1> VectorXT;               /**< Defines Eigen::Matrix<T, Eigen::Dynamic,
+    typedef Eigen::Matrix<double, Eigen::Dynamic, 1> VectorXT;              /**< Defines Eigen::Matrix<T, Eigen::Dynamic,
                                                                              1> as VectorXT type. */
-    typedef Eigen::Matrix<double, 6, 1> Vector6T;                            /**< Defines Eigen::Matrix<T, 6, 1>
+    typedef Eigen::Matrix<double, 6, 1> Vector6T;                           /**< Defines Eigen::Matrix<T, 6, 1>
                                                                              as Vector6T type. */
 
     //=========================================================================================================
@@ -143,11 +143,11 @@ public:
      */
     bool init(MNELIB::MNEForwardSolution& p_pFwd, bool p_bSparsed = false, int p_iN = 2, double p_dThr = 0.5);
 
-    virtual InvSourceEstimate calculateInverse(const FIFFLIB::FiffEvoked &p_fiffEvoked, bool pick_normal = false);
+    virtual InvSourceEstimate calculateInverse(const FIFFLIB::FiffEvoked& p_fiffEvoked, bool pick_normal = false);
 
-    virtual InvSourceEstimate calculateInverse(const Eigen::MatrixXd &data, float tmin, float tstep, bool pick_normal = false) const;
+    virtual InvSourceEstimate calculateInverse(const Eigen::MatrixXd& data, float tmin, float tstep, bool pick_normal = false) const;
 
-    virtual InvSourceEstimate calculateInverse(const Eigen::MatrixXd& p_matMeasurement, QList< InvDipolePair<double> > &p_RapDipoles) const;
+    virtual InvSourceEstimate calculateInverse(const Eigen::MatrixXd& p_matMeasurement, QList<InvDipolePair<double>>& p_RapDipoles) const;
 
     virtual const char* getName() const;
 
@@ -172,7 +172,7 @@ protected:
      * @param[out] p_pMatPhi_s   The calculated signal subspace.
      * @return   The rank of the measurement F (named r lt. Mosher 1998, 1999).
      */
-    int calcPhi_s(const MatrixXT& p_matMeasurement, MatrixXT* &p_pMatPhi_s) const;
+    int calcPhi_s(const MatrixXT& p_matMeasurement, MatrixXT*& p_pMatPhi_s) const;
 
     //=========================================================================================================
     /**
@@ -217,10 +217,10 @@ protected:
      * @param[in] p_iIdxk_1  The current position in the manifold vector array A_k_1.
      * @param[out] p_matA_k_1    The array of the manifold vectors.
      */
-    static void calcA_k_1(  const MatrixX6T& p_matG_k_1,
-                            const Vector6T& p_matPhi_k_1,
-                            const int p_iIdxk_1,
-                            MatrixXT& p_matA_k_1);
+    static void calcA_k_1(const MatrixX6T& p_matG_k_1,
+                          const Vector6T& p_matPhi_k_1,
+                          const int p_iIdxk_1,
+                          MatrixXT& p_matA_k_1);
 
     //=========================================================================================================
     /**
@@ -242,9 +242,9 @@ protected:
      *                                       combinations of Lead Field indices -> Number of pointers =
      *                                       Combination (number of grid points over 2 = Num + 1 C 2)
      */
-    void calcPairCombinations(  const int p_iNumPoints,
-                                const int p_iNumCombinations,
-                                std::vector<Pair>& p_pairIdxCombinations) const;
+    void calcPairCombinations(const int p_iNumPoints,
+                              const int p_iNumCombinations,
+                              std::vector<Pair>& p_pairIdxCombinations) const;
 
     //=========================================================================================================
     /**
@@ -262,7 +262,7 @@ protected:
      * @param[out] p_iIdx1   The resulting index 1.
      * @param[out] p_iIdx2   The resulting index 2.
      */
-    static void getPointPair(const int p_iPoints, const int p_iCurIdx, int &p_iIdx1, int &p_iIdx2);
+    static void getPointPair(const int p_iPoints, const int p_iCurIdx, int& p_iIdx1, int& p_iIdx2);
 
     //=========================================================================================================
     /**
@@ -273,9 +273,9 @@ protected:
      * @param[in]   p_iIdx1 first Lead Field index point.
      * @param[in]   p_iIdx2 second Lead Field index point.
      */
-    static void getGainMatrixPair(  const MatrixXT& p_matGainMarix,
-                                    MatrixX6T& p_matGainMarix_Pair,
-                                    int p_iIdx1, int p_iIdx2);
+    static void getGainMatrixPair(const MatrixXT& p_matGainMarix,
+                                  MatrixX6T& p_matGainMarix_Pair,
+                                  int p_iIdx1, int p_iIdx2);
 
     //=========================================================================================================
     /**
@@ -287,31 +287,31 @@ protected:
      * @param[in] p_valCor       Correlation value of the dipole pair.
      * @param[out] p_RapDipoles  the list of dipole pairs.
      */
-    static void insertSource(  int p_iDipoleIdx1, int p_iDipoleIdx2,
-                        const Vector6T &p_vec_phi_k_1,
-                        double p_valCor,
-                        QList< InvDipolePair<double> > &p_RapDipoles);
+    static void insertSource(int p_iDipoleIdx1, int p_iDipoleIdx2,
+                             const Vector6T& p_vec_phi_k_1,
+                             double p_valCor,
+                             QList<InvDipolePair<double>>& p_RapDipoles);
 
     MNELIB::MNEForwardSolution m_ForwardSolution; /**< The Forward operator which should be scanned through*/
 
-    int m_iN;               /**< Number of Sources to find*/
-    double m_dThreshold;    /**< Threshold which defines the minimal correlation. Is the correlation of
+    int m_iN;            /**< Number of Sources to find*/
+    double m_dThreshold; /**< Threshold which defines the minimal correlation. Is the correlation of
                                  the found dipole pair smaller as this threshold than the RAP MUSIC
                                  calculation is stopped. */
 
-    int m_iNumGridPoints;               /**< Number of Grid points. */
-    int m_iNumChannels;                 /**< Number of channels. */
-    int m_iNumLeadFieldCombinations;    /**< Number of Lead Filed combinations (grid points + 1 over 2)*/
+    int m_iNumGridPoints;            /**< Number of Grid points. */
+    int m_iNumChannels;              /**< Number of channels. */
+    int m_iNumLeadFieldCombinations; /**< Number of Lead Filed combinations (grid points + 1 over 2)*/
 
     std::vector<Pair> m_ppPairIdxCombinations; /**< Index combination vector with grid pair indices. */
 
-    int m_iMaxNumThreads;   /**< Number of available CPU threads. */
+    int m_iMaxNumThreads; /**< Number of available CPU threads. */
 
     bool m_bIsInit; /**< Whether the algorithm is initialized. */
 
     //Stc stuff
-    int m_iSamplesStcWindow;    /**< Number of samples per localization window. */
-    float m_fStcOverlap;        /**< Percentage of localization window overlap. */
+    int m_iSamplesStcWindow; /**< Number of samples per localization window. */
+    float m_fStcOverlap;     /**< Percentage of localization window overlap. */
 
     //=========================================================================================================
     /**
@@ -335,10 +335,10 @@ protected:
      *
      * @return The rank r used to truncate p_Mat.
      */
-    static inline int useFullRank( const MatrixXT& p_Mat,
-                            const MatrixXT& p_matSigma_src,
-                            MatrixXT& p_matFull_Rank,
-                            int type = NOT_TRANSPOSED);
+    static inline int useFullRank(const MatrixXT& p_Mat,
+                                  const MatrixXT& p_matSigma_src,
+                                  MatrixXT& p_matFull_Rank,
+                                  int type = NOT_TRANSPOSED);
 
     //=========================================================================================================
     /**
@@ -359,18 +359,18 @@ inline int InvRapMusic::getRank(const MatrixXT& p_matSigma)
     int t_iRank;
     //if once a singularvalue is smaller than epsilon = 10^-5 the following values are also smaller
     // -> because Singular values are ordered
-    for(t_iRank = p_matSigma.rows()-1; t_iRank > 0; t_iRank--)
+    for (t_iRank = p_matSigma.rows() - 1; t_iRank > 0; t_iRank--)
         if (p_matSigma(t_iRank, t_iRank) > 0.00001)
             break;
 
-    t_iRank++;//rank corresponding to epsilon
+    t_iRank++; //rank corresponding to epsilon
 
     return t_iRank;
 }
 
 //=============================================================================================================
 
-inline int InvRapMusic::useFullRank(   const MatrixXT& p_Mat,
+inline int InvRapMusic::useFullRank(const MatrixXT& p_Mat,
                                     const MatrixXT& p_matSigma_src,
                                     MatrixXT& p_matFull_Rank,
                                     int type)
@@ -378,9 +378,9 @@ inline int InvRapMusic::useFullRank(   const MatrixXT& p_Mat,
     int rank = getRank(p_matSigma_src);
 
     if (type == NOT_TRANSPOSED)
-        p_matFull_Rank = p_Mat.block(0,0,p_Mat.rows(),rank);
+        p_matFull_Rank = p_Mat.block(0, 0, p_Mat.rows(), rank);
     else
-        p_matFull_Rank = p_Mat.block(0,0,rank,p_Mat.cols());
+        p_matFull_Rank = p_Mat.block(0, 0, rank, p_Mat.cols());
 
     return rank;
 }
@@ -394,7 +394,7 @@ inline InvRapMusic::MatrixXT InvRapMusic::makeSquareMat(const MatrixXT& p_matF)
 
     MatrixXT mat = p_matF.transpose();
 
-    return p_matF*mat;
+    return p_matF * mat;
 }
 } //NAMESPACE
 

@@ -43,13 +43,15 @@
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-namespace SCMEASLIB {
-    class RealTimeMultiSampleArray;
+namespace SCMEASLIB
+{
+class RealTimeMultiSampleArray;
 }
 
-namespace FIFFLIB {
-    class FiffInfo;
-    class FiffDigitizerData;
+namespace FIFFLIB
+{
+class FiffInfo;
+class FiffDigitizerData;
 }
 
 //=============================================================================================================
@@ -60,7 +62,7 @@ namespace FIFFSIMULATORPLUGIN
 {
 
 //=============================================================================================================
-// FIFFSIMULATORPLUGIN FORWARD DECLARATIONS 
+// FIFFSIMULATORPLUGIN FORWARD DECLARATIONS
 //=============================================================================================================
 
 class FiffSimulatorProducer;
@@ -82,7 +84,6 @@ class FIFFSIMULATORSHARED_EXPORT FiffSimulator : public SCSHAREDLIB::AbstractSen
     friend class FiffSimulatorSetupWidget;
 
 public:
-
     //=========================================================================================================
     /**
      * Constructs a FiffSimulator.
@@ -169,27 +170,27 @@ protected:
      */
     void requestInfo();
 
-    SCSHAREDLIB::PluginOutputData<SCMEASLIB::RealTimeMultiSampleArray>::SPtr m_pRTMSA_FiffSimulator;     /**< The RealTimeMultiSampleArray to provide the rt_server Channels.*/
+    SCSHAREDLIB::PluginOutputData<SCMEASLIB::RealTimeMultiSampleArray>::SPtr m_pRTMSA_FiffSimulator; /**< The RealTimeMultiSampleArray to provide the rt_server Channels.*/
 
-    QSharedPointer<FiffSimulatorProducer>                       m_pFiffSimulatorProducer;   /**< Holds the FiffSimulatorProducer.*/
-    QSharedPointer<FIFFLIB::FiffInfo>                           m_pFiffInfo;                /**< Fiff measurement info.*/
-    QSharedPointer<FIFFLIB::FiffDigitizerData>                  m_pFiffDigData;             /**< Fiff Digitizer Data. */
-    QSharedPointer<COMLIB::RtCmdClient>               m_pRtCmdClient;             /**< The command client.*/
-    QSharedPointer<UTILSLIB::CircularBuffer_Matrix_float>       m_pCircularBuffer;          /**< Holds incoming raw data. */
+    QSharedPointer<FiffSimulatorProducer> m_pFiffSimulatorProducer;          /**< Holds the FiffSimulatorProducer.*/
+    QSharedPointer<FIFFLIB::FiffInfo> m_pFiffInfo;                           /**< Fiff measurement info.*/
+    QSharedPointer<FIFFLIB::FiffDigitizerData> m_pFiffDigData;               /**< Fiff Digitizer Data. */
+    QSharedPointer<COMLIB::RtCmdClient> m_pRtCmdClient;                      /**< The command client.*/
+    QSharedPointer<UTILSLIB::CircularBuffer_Matrix_float> m_pCircularBuffer; /**< Holds incoming raw data. */
 
-    bool                    m_bCmdClientIsConnected;        /**< If the command client is connected.*/
-    QString                 m_sFiffSimulatorIP;             /**< The IP Adress of mne_rt_server.*/
-    QString                 m_sFiffSimulatorClientAlias;    /**< The rt server client alias.*/
+    bool m_bCmdClientIsConnected;        /**< If the command client is connected.*/
+    QString m_sFiffSimulatorIP;          /**< The IP Adress of mne_rt_server.*/
+    QString m_sFiffSimulatorClientAlias; /**< The rt server client alias.*/
 
-    qint32                  m_iActiveConnectorId;           /**< The active connector.*/
-    qint32                  m_iBufferSize;                  /**< The raw data buffer size.*/
-    quint16                 m_iDefaultPortCmdClient;        /**< The default port for the rt command client. */
+    qint32 m_iActiveConnectorId;     /**< The active connector.*/
+    qint32 m_iBufferSize;            /**< The raw data buffer size.*/
+    quint16 m_iDefaultPortCmdClient; /**< The default port for the rt command client. */
 
-    QMap<qint32, QString>   m_qMapConnectors;               /**< Connector map.*/
+    QMap<qint32, QString> m_qMapConnectors; /**< Connector map.*/
 
-    QTimer                  m_cmdConnectionTimer;           /**< Timer for convinient command client connection. When timer times out a connection is tried to be established. */
+    QTimer m_cmdConnectionTimer; /**< Timer for convinient command client connection. When timer times out a connection is tried to be established. */
 
-    QMutex                  m_qMutex;                       /**< The mutex to ensure thread safety.*/
+    QMutex m_qMutex; /**< The mutex to ensure thread safety.*/
 
 signals:
     //=========================================================================================================

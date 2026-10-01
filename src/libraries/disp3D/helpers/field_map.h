@@ -20,8 +20,8 @@
 
 namespace DISP3DLIB
 {
-    /** @deprecated Use FWDLIB::FwdFieldMap instead. */
-    using FieldMap = FWDLIB::FwdFieldMap;
+/** @deprecated Use FWDLIB::FwdFieldMap instead. */
+using FieldMap = FWDLIB::FwdFieldMap;
 }
 
 #endif // FIELD_MAP_H

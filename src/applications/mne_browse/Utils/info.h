@@ -36,9 +36,9 @@ namespace MNEBROWSE
  */
 enum LogLevel
 {
-    _LogLvMin,      /**< Minimal log information */
-    _LogLvNormal,   /**< Normal amount of log information */
-    _LogLvMax       /**< Accurate logging */
+    _LogLvMin,    /**< Minimal log information */
+    _LogLvNormal, /**< Normal amount of log information */
+    _LogLvMax     /**< Accurate logging */
 };
 
 
@@ -48,9 +48,9 @@ enum LogLevel
  */
 enum LogKind
 {
-    _LogKndMessage,     /**< Normal log message */
-    _LogKndWarning,     /**< Warning log message */
-    _LogKndError        /**< Error log message */
+    _LogKndMessage, /**< Normal log message */
+    _LogKndWarning, /**< Warning log message */
+    _LogKndError    /**< Error log message */
 };
 
 

@@ -36,12 +36,13 @@ namespace SCSHAREDLIB
 class AbstractSensor : public AbstractPlugin
 {
 public:
-
     //=========================================================================================================
     /**
      * Destroys the AbstractSensor.
      */
-    virtual ~AbstractSensor() {}
+    virtual ~AbstractSensor()
+    {
+    }
 
     //=========================================================================================================
     /**
@@ -115,7 +116,6 @@ public:
     virtual QWidget* setupWidget() = 0;
 
 protected:
-
     //=========================================================================================================
     /**
      * The starting point for the thread. After calling start(), the newly created thread calls this function.

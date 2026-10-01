@@ -54,15 +54,15 @@ using namespace FIFFLIB;
 // of the null terminator. The code is Qt's, not ours, and only this macro
 // expansion triggers it, so the suppression is kept to these two lines.
 #if defined(__GNUC__) && !defined(__clang__)
-    #pragma GCC diagnostic push
-    #pragma GCC diagnostic ignored "-Wstringop-overread"
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wstringop-overread"
 #endif
 
 Q_DECLARE_METATYPE(LSLLIB::stream_info);
 Q_DECLARE_METATYPE(QVector<LSLLIB::stream_info>);
 
 #if defined(__GNUC__) && !defined(__clang__)
-    #pragma GCC diagnostic pop
+#pragma GCC diagnostic pop
 #endif
 
 //=============================================================================================================
@@ -114,7 +114,7 @@ void LSLAdapter::init()
     connect(&m_producerThread, &QThread::started,
             m_pProducer, &LSLAdapterProducer::readStream);
     connect(m_pProducer, &LSLAdapterProducer::finished,
-            &m_producerThread, &QThread::quit, Qt::DirectConnection);  // apparently a direct connection is needed in order to avoid a crash upon 'stop'
+            &m_producerThread, &QThread::quit, Qt::DirectConnection); // apparently a direct connection is needed in order to avoid a crash upon 'stop'
 
     // make RTMSA accessible
     m_pRTMSA->measurementData()->setName(this->getName());
@@ -149,14 +149,14 @@ void LSLAdapter::unload()
 
 bool LSLAdapter::start()
 {
-//    // check if the thread is already or still running.
-//    // this can happen if the start button is pressed immediately after the stop button was pressed.
-//    // in this case the stopping process is not finished yet but the start process is initiated.
-//    if(this->isRunning()) {
-//        this->wait();
-//    }
+    //    // check if the thread is already or still running.
+    //    // this can happen if the start button is pressed immediately after the stop button was pressed.
+    //    // in this case the stopping process is not finished yet but the start process is initiated.
+    //    if(this->isRunning()) {
+    //        this->wait();
+    //    }
 
-    if(m_bHasValidStream) {
+    if (m_bHasValidStream) {
         prepareFiffInfo(m_currentStream);
 
         // set the channel size of the RTMSA - this needs to be done here and NOT in the init() function because the user can change the number of channels during runtime
@@ -203,7 +203,7 @@ QWidget* LSLAdapter::setupWidget()
     connect(this, &LSLAdapter::updatedAvailableLSLStreams, temp, &LSLAdapterSetup::onLSLScanResults);
 
     // check if we have some information about previously available lsl streams:
-    if(m_vAvailableStreams.isEmpty() == false && m_bHasValidStream) {
+    if (m_vAvailableStreams.isEmpty() == false && m_bHasValidStream) {
         // let the widget display potentially outdated info, until the background thread for stream scanning will return
         temp->onLSLScanResults(m_vAvailableStreams, m_currentStream);
     }
@@ -240,15 +240,14 @@ void LSLAdapter::onLSLStreamScanReady()
     m_vAvailableStreams = m_updateStreamsFutureWatcher.result();
 
     // check whether any streams are available
-    if(m_vAvailableStreams.size() == 0) {
+    if (m_vAvailableStreams.size() == 0) {
         m_bHasValidStream = false;
         // overwrite current stream with default constructor, this will also result in correct UI display
         m_currentStream = LSLLIB::stream_info();
-    }
-    else {
+    } else {
         // check whether we had a valid stream, and if its still amongst the available ones
-        if(m_bHasValidStream) {
-            if(contains(m_vAvailableStreams, m_currentStream) == false) {
+        if (m_bHasValidStream) {
+            if (contains(m_vAvailableStreams, m_currentStream) == false) {
                 qDebug() << "[LSLAdapter] Old stream no longer available, switching to first available stream";
                 m_currentStream = m_vAvailableStreams[0];
                 m_bHasValidStream = true;
@@ -273,12 +272,12 @@ QVector<LSLLIB::stream_info> LSLAdapter::scanAvailableLSLStreams()
     const auto streams = LSLLIB::resolve_streams();
     QVector<LSLLIB::stream_info> vAvailableStreams;
     vAvailableStreams.reserve(static_cast<int>(streams.size()));
-    for(const auto& stream : streams) {
+    for (const auto& stream : streams) {
         vAvailableStreams.append(stream);
     }
     // do validity checks for all stream infos
-    for(int i = 0; i < vAvailableStreams.size(); ++i) {
-        if(isValid(vAvailableStreams[i]) == false) {
+    for (int i = 0; i < vAvailableStreams.size(); ++i) {
+        if (isValid(vAvailableStreams[i]) == false) {
             vAvailableStreams.remove(i);
             i--;
             qDebug() << "[LSLAdapter::scanAvailableLSLStreams] Found and removed an invalid stream !";
@@ -298,11 +297,11 @@ void LSLAdapter::onStreamSelectionChanged(const LSLLIB::stream_info& newStream)
 
 //=============================================================================================================
 
-void LSLAdapter::prepareFiffInfo(const LSLLIB::stream_info &stream)
+void LSLAdapter::prepareFiffInfo(const LSLLIB::stream_info& stream)
 {
     // parse fiff info from lsl stream info
     QString type = QString::fromStdString(stream.type()).toUpper();
-    if(type == "EEG") {
+    if (type == "EEG") {
         // copy basic info into intended member fields
         m_iNumberChannels = stream.channel_count();
         m_fSamplingFrequency = static_cast<float>(stream.nominal_srate());
@@ -317,18 +316,18 @@ void LSLAdapter::prepareFiffInfo(const LSLLIB::stream_info &stream)
         QStringList QSLChNames;
         m_pFiffInfo->chs.clear();
 
-        for(int i = 0; i < m_pFiffInfo->nchan; ++i) {
+        for (int i = 0; i < m_pFiffInfo->nchan; ++i) {
             // create information for each channel
             QString sChType;
             FiffChInfo fChInfo;
 
             // set channel name
             sChType = QString("EEG ");
-            if(i < 10) {
+            if (i < 10) {
                 sChType.append("00");
             }
 
-            if(i >= 10 && i < 100) {
+            if (i >= 10 && i < 100) {
                 sChType.append("0");
             }
 
@@ -348,14 +347,14 @@ void LSLAdapter::prepareFiffInfo(const LSLLIB::stream_info &stream)
             fChInfo.unit_mul = 0;
 
             // set EEG electrode location - Convert from mm to m
-            fChInfo.eeg_loc(0,0) = 0;
-            fChInfo.eeg_loc(1,0) = 0;
-            fChInfo.eeg_loc(2,0) = 0;
+            fChInfo.eeg_loc(0, 0) = 0;
+            fChInfo.eeg_loc(1, 0) = 0;
+            fChInfo.eeg_loc(2, 0) = 0;
 
             // set EEG electrode direction - Convert from mm to m
-            fChInfo.eeg_loc(0,1) = 0;
-            fChInfo.eeg_loc(1,1) = 0;
-            fChInfo.eeg_loc(2,1) = 0;
+            fChInfo.eeg_loc(0, 1) = 0;
+            fChInfo.eeg_loc(1, 1) = 0;
+            fChInfo.eeg_loc(2, 1) = 0;
 
             // also write the eeg electrode locations into the meg loc variable (mne_ex_read_raw() matlab function wants this)
             fChInfo.chpos.r0(0) = 0;
@@ -387,8 +386,7 @@ void LSLAdapter::prepareFiffInfo(const LSLLIB::stream_info &stream)
         m_pFiffInfo->dev_head_t.to = FIFFV_COORD_HEAD;
         m_pFiffInfo->ctf_head_t.from = FIFFV_COORD_DEVICE;
         m_pFiffInfo->ctf_head_t.to = FIFFV_COORD_HEAD;
-    }
-    else {
+    } else {
         qDebug() << "[LSLAdapterProducer::setStreamInfo] Type " << type << " not implemented !";
         return;
     }
@@ -405,5 +403,5 @@ void LSLAdapter::onBlockSizeChanged(const int newBlockSize)
 
 QString LSLAdapter::getBuildInfo()
 {
-    return QString(LSLADAPTERPLUGIN::buildDateTime()) + QString(" - ")  + QString(LSLADAPTERPLUGIN::buildHash());
+    return QString(LSLADAPTERPLUGIN::buildDateTime()) + QString(" - ") + QString(LSLADAPTERPLUGIN::buildHash());
 }

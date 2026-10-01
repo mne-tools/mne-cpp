@@ -88,7 +88,7 @@ void TestLabelUtils::testBuildAdjacency()
     // Triangle 1: (1, 2, 3)
     MatrixX3i tris(2, 3);
     tris << 0, 1, 2,
-            1, 2, 3;
+        1, 2, 3;
 
     auto adj = FsLabelUtils::buildAdjacency(tris, 4);
 
@@ -272,7 +272,7 @@ void TestLabelUtils::testLabelsToStcEmpty()
     MatrixXd mask = FsLabelUtils::labelsToStc(emptyLabels, stcVerts, 10);
     QCOMPARE(static_cast<int>(mask.rows()), 5);
     QCOMPARE(static_cast<int>(mask.cols()), 10);
-    QVERIFY(mask.norm() < 1e-15);  // All zeros
+    QVERIFY(mask.norm() < 1e-15); // All zeros
 }
 
 //=============================================================================================================

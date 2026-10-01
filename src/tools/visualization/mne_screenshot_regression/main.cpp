@@ -30,7 +30,7 @@ using namespace FSLIB;
 
 //=============================================================================================================
 
-static double imageRmse(const QImage &a, const QImage &b)
+static double imageRmse(const QImage& a, const QImage& b)
 {
     if (a.size() != b.size())
         return 1.0;
@@ -40,8 +40,8 @@ static double imageRmse(const QImage &a, const QImage &b)
 
     double sumSq = 0.0;
     const int n = imgA.width() * imgA.height() * 4; // RGBA channels
-    const uchar *pA = imgA.constBits();
-    const uchar *pB = imgB.constBits();
+    const uchar* pA = imgA.constBits();
+    const uchar* pB = imgB.constBits();
 
     for (int i = 0; i < n; ++i) {
         double diff = static_cast<double>(pA[i]) - static_cast<double>(pB[i]);
@@ -53,7 +53,7 @@ static double imageRmse(const QImage &a, const QImage &b)
 
 //=============================================================================================================
 
-int main(int argc, char *argv[])
+int main(int argc, char* argv[])
 {
     QApplication app(argc, argv);
     app.setApplicationName("mne_screenshot_regression");
@@ -72,12 +72,12 @@ int main(int argc, char *argv[])
     parser.process(app);
 
     const QString subjectsDir = parser.value("subjects-dir");
-    const QString subject     = parser.value("subject");
-    const QString outPath     = parser.value("out");
-    const QString refPath     = parser.value("ref");
-    const double  tolerance   = parser.value("tolerance").toDouble();
-    const int     width       = parser.value("width").toInt();
-    const int     height      = parser.value("height").toInt();
+    const QString subject = parser.value("subject");
+    const QString outPath = parser.value("out");
+    const QString refPath = parser.value("ref");
+    const double tolerance = parser.value("tolerance").toDouble();
+    const int width = parser.value("width").toInt();
+    const int height = parser.value("height").toInt();
 
     if (subjectsDir.isEmpty()) {
         std::cerr << "Error: --subjects-dir is required.\n";
@@ -93,7 +93,7 @@ int main(int argc, char *argv[])
     bool anyLoaded = false;
 
     const QStringList hemis{QStringLiteral("lh"), QStringLiteral("rh")};
-    for (const QString &hemi : hemis) {
+    for (const QString& hemi : hemis) {
         const int hemiIdx = (hemi == "lh") ? 0 : 1;
         FsSurface surf;
         if (FsSurface::read(subject, hemiIdx, "white", subjectsDir, surf)) {
@@ -102,8 +102,7 @@ int main(int argc, char *argv[])
         }
 
         FsAnnotation annot;
-        const QString annotPath = QDir(subjectsDir).filePath(
-            subject + "/label/" + hemi + ".aparc.annot");
+        const QString annotPath = QDir(subjectsDir).filePath(subject + "/label/" + hemi + ".aparc.annot");
         if (QFile::exists(annotPath) && FsAnnotation::read(annotPath, annot)) {
             model.addAnnotation(subject, hemi, annot);
         }

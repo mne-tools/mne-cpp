@@ -37,7 +37,7 @@ using namespace INVLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-RealTimeHpiResult::RealTimeHpiResult(QObject *parent)
+RealTimeHpiResult::RealTimeHpiResult(QObject* parent)
 : Measurement(QMetaType::fromName("RealTimeHpiResult::SPtr").id(), parent)
 , m_bInitialized(false)
 , m_pHpiFitResult(QSharedPointer<HpiFitResult>(new HpiFitResult))
@@ -79,17 +79,17 @@ void RealTimeHpiResult::setValue(const HpiFitResult& v)
 {
     m_qMutex.lock();
     //Store
-     *m_pHpiFitResult = v;
+    *m_pHpiFitResult = v;
     m_bInitialized = true;
 
     // Keep the head origin of this fit so the path the head travelled can be
     // drawn later. The device-to-head transform maps device to head, so the
     // head origin expressed in device coordinates is the translation of the
     // inverse transform.
-    if(m_iMaxHeadPositions > 0 && !v.devHeadTrans.isEmpty()) {
-        m_vecHeadPositions.append(v.devHeadTrans.invtrans.block<3,1>(0,3));
+    if (m_iMaxHeadPositions > 0 && !v.devHeadTrans.isEmpty()) {
+        m_vecHeadPositions.append(v.devHeadTrans.invtrans.block<3, 1>(0, 3));
 
-        while(m_vecHeadPositions.size() > m_iMaxHeadPositions) {
+        while (m_vecHeadPositions.size() > m_iMaxHeadPositions) {
             m_vecHeadPositions.removeFirst();
         }
     }
@@ -121,7 +121,7 @@ void RealTimeHpiResult::setHeadPositionHistorySize(int iMaxPositions)
     QMutexLocker locker(&m_qMutex);
     m_iMaxHeadPositions = iMaxPositions > 0 ? iMaxPositions : 0;
 
-    while(m_vecHeadPositions.size() > m_iMaxHeadPositions) {
+    while (m_vecHeadPositions.size() > m_iMaxHeadPositions) {
         m_vecHeadPositions.removeFirst();
     }
 }

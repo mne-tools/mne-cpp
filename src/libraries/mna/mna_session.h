@@ -48,7 +48,8 @@
 // DEFINE NAMESPACE MNALIB
 //=============================================================================================================
 
-namespace MNALIB{
+namespace MNALIB
+{
 
 //=============================================================================================================
 /**
@@ -56,9 +57,9 @@ namespace MNALIB{
  */
 struct MNASHARED_EXPORT MnaSession
 {
-    QString              id;          /**< Session identifier. */
-    QList<MnaRecording>  recordings;  /**< Recordings in this session. */
-    QJsonObject          extras;      /**< Unknown keys preserved for lossless round-trip. */
+    QString id;                     /**< Session identifier. */
+    QList<MnaRecording> recordings; /**< Recordings in this session. */
+    QJsonObject extras;             /**< Unknown keys preserved for lossless round-trip. */
 
     //=========================================================================================================
     /**

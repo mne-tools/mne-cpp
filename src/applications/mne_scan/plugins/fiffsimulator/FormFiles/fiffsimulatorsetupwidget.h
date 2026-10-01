@@ -39,7 +39,7 @@ namespace FIFFSIMULATORPLUGIN
 {
 
 //=============================================================================================================
-// FIFFSIMULATORPLUGIN FORWARD DECLARATIONS 
+// FIFFSIMULATORPLUGIN FORWARD DECLARATIONS
 //=============================================================================================================
 
 class FiffSimulator;
@@ -55,7 +55,6 @@ class FiffSimulatorSetupWidget : public QWidget
     Q_OBJECT
 
 public:
-
     //=========================================================================================================
     /**
      * Constructs a FiffSimulatorSetupWidget which is a child of parent.
@@ -63,7 +62,7 @@ public:
      * @param[in] p_pFiffSimulator   a pointer to the corresponding FiffSimulator.
      * @param[in] parent        pointer to parent widget; If parent is 0, the new FiffSimulatorSetupWidget becomes a window. If parent is another widget, FiffSimulatorSetupWidget becomes a child window inside parent. FiffSimulatorSetupWidget is deleted when its parent is deleted.
      */
-    FiffSimulatorSetupWidget(FiffSimulator* p_pFiffSimulator, QWidget *parent = 0);
+    FiffSimulatorSetupWidget(FiffSimulator* p_pFiffSimulator, QWidget* parent = 0);
 
     //=========================================================================================================
     /**
@@ -78,16 +77,16 @@ public:
      */
     void init();
 
-//slots
-    void bufferSizeEdited();        /**< Buffer size edited and set new buffer size.*/
+    //slots
+    void bufferSizeEdited(); /**< Buffer size edited and set new buffer size.*/
 
-    void printToLog(QString message);   /**< Implements printing messages to rtproc log.*/
+    void printToLog(QString message); /**< Implements printing messages to rtproc log.*/
 
-    void pressedConnect();          /**< Triggers a connection trial to rt_server.*/
+    void pressedConnect(); /**< Triggers a connection trial to rt_server.*/
 
-    void pressedSendCLI();          /**< Triggers a send request of a cli command.*/
+    void pressedSendCLI(); /**< Triggers a send request of a cli command.*/
 
-    void fiffInfoReceived();        /**< Triggered when new fiff info is recieved by producer and stored intor rt_server. */
+    void fiffInfoReceived(); /**< Triggered when new fiff info is recieved by producer and stored intor rt_server. */
 
 private:
     //=========================================================================================================
@@ -98,11 +97,11 @@ private:
      */
     void cmdConnectionChanged(bool p_bConnectionStatus);
 
-    FiffSimulator*   m_pFiffSimulator;      /**< a pointer to corresponding mne rt client.*/
+    FiffSimulator* m_pFiffSimulator; /**< a pointer to corresponding mne rt client.*/
 
-    Ui::FiffSimulatorSetupWidgetClass ui;   /**< the user interface for the MNERtClientSetupWidget.*/
+    Ui::FiffSimulatorSetupWidgetClass ui; /**< the user interface for the MNERtClientSetupWidget.*/
 
-    bool m_bIsInit;                         /**< false when gui is not initialized jet. Prevents gui from already interacting when not initialized. */
+    bool m_bIsInit; /**< false when gui is not initialized jet. Prevents gui from already interacting when not initialized. */
 };
 } // NAMESPACE
 

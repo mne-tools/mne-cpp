@@ -92,8 +92,8 @@ bool MriMghIO::read(const QString& mgzFile,
 
     if (fileData.size() < MRI_MGH_DATA_OFFSET) {
         qCritical() << "MriMghIO::read - File" << mgzFile
-                     << "is too small to be a valid MGH file ("
-                     << fileData.size() << "bytes)";
+                    << "is too small to be a valid MGH file ("
+                    << fileData.size() << "bytes)";
         return false;
     }
 
@@ -111,7 +111,7 @@ bool MriMghIO::read(const QString& mgzFile,
         qInfo("Voxel -> FsSurface RAS transform:\n");
         for (int r = 0; r < 4; ++r) {
             qInfo("  %10.6f %10.6f %10.6f %10.6f\n",
-                   vox2ras(r, 0), vox2ras(r, 1), vox2ras(r, 2), vox2ras(r, 3));
+                  vox2ras(r, 0), vox2ras(r, 1), vox2ras(r, 2), vox2ras(r, 3));
         }
     }
 
@@ -125,8 +125,8 @@ bool MriMghIO::read(const QString& mgzFile,
 
     if (verbose) {
         qInfo("Read %d slices from %s (%dx%d pixels)\n",
-               static_cast<int>(volData.slices.size()), qPrintable(mgzFile),
-               volData.width, volData.height);
+              static_cast<int>(volData.slices.size()), qPrintable(mgzFile),
+              volData.width, volData.height);
     }
 
     return true;
@@ -162,7 +162,7 @@ bool MriMghIO::decompress(const QString& mgzFile, QByteArray& rawData)
     strm.next_in = reinterpret_cast<Bytef*>(compressedData.data());
     strm.avail_in = static_cast<uInt>(compressedData.size());
 
-    const int chunkSize = 256 * 1024;  // 256 KB chunks
+    const int chunkSize = 256 * 1024; // 256 KB chunks
     rawData.clear();
 
     do {
@@ -173,7 +173,7 @@ bool MriMghIO::decompress(const QString& mgzFile, QByteArray& rawData)
         ret = inflate(&strm, Z_NO_FLUSH);
         if (ret == Z_STREAM_ERROR || ret == Z_DATA_ERROR || ret == Z_MEM_ERROR) {
             qCritical() << "MriMghIO::decompress - inflate failed for" << mgzFile
-                         << "- zlib error:" << ret;
+                        << "- zlib error:" << ret;
             inflateEnd(&strm);
             return false;
         }
@@ -219,16 +219,16 @@ bool MriMghIO::parseHeader(const QByteArray& data, MriVolData& volData, bool ver
     }
 
     volData.version = version;
-    volData.width   = width;
-    volData.height  = height;
-    volData.depth   = depth;
+    volData.width = width;
+    volData.height = height;
+    volData.depth = depth;
     volData.nframes = nframes;
-    volData.type    = type;
-    volData.dof     = dof;
+    volData.type = type;
+    volData.dof = dof;
 
     if (verbose) {
         qInfo("MGH file: %dx%dx%d, %d frame(s), type=%d\n",
-               width, height, depth, nframes, type);
+              width, height, depth, nframes, type);
     }
 
     // goodRASflag (2 bytes short)
@@ -255,10 +255,10 @@ bool MriMghIO::parseHeader(const QByteArray& data, MriVolData& volData, bool ver
 
     if (verbose) {
         qInfo("Voxel sizes: %.4f x %.4f x %.4f mm\n",
-               volData.xsize, volData.ysize, volData.zsize);
+              volData.xsize, volData.ysize, volData.zsize);
         qInfo("goodRAS: %d\n", goodRASflag);
         qInfo("c_ras: %.4f %.4f %.4f\n",
-               volData.c_ras[0], volData.c_ras[1], volData.c_ras[2]);
+              volData.c_ras[0], volData.c_ras[1], volData.c_ras[2]);
     }
 
     return true;
@@ -300,10 +300,10 @@ bool MriMghIO::readVoxelData(const QByteArray& data, MriVolData& volData)
 
     for (int k = 0; k < nslice; ++k) {
         MriSlice& slice = volData.slices[k];
-        slice.width  = volData.width;
+        slice.width = volData.width;
         slice.height = volData.height;
-        slice.dimx   = volData.xsize / 1000.0f;  // mm -> meters
-        slice.dimy   = volData.ysize / 1000.0f;
+        slice.dimx = volData.xsize / 1000.0f; // mm -> meters
+        slice.dimy = volData.ysize / 1000.0f;
 
         // Read pixel data for this slice
         switch (volData.type) {
@@ -366,9 +366,9 @@ bool MriMghIO::readVoxelData(const QByteArray& data, MriVolData& volData)
         sliceOrigin(2) = vox2ras(2, 2) * k + vox2ras(2, 3);
 
         Matrix3f sliceRot;
-        sliceRot.col(0) = vox2ras.block<3, 1>(0, 0);   // x-pixel direction
-        sliceRot.col(1) = vox2ras.block<3, 1>(0, 1);   // y-pixel direction
-        sliceRot.col(2) = vox2ras.block<3, 1>(0, 2);   // z (normal) direction
+        sliceRot.col(0) = vox2ras.block<3, 1>(0, 0); // x-pixel direction
+        sliceRot.col(1) = vox2ras.block<3, 1>(0, 1); // y-pixel direction
+        sliceRot.col(2) = vox2ras.block<3, 1>(0, 2); // z (normal) direction
 
         Vector3f sliceMove;
         sliceMove << sliceOrigin(0), sliceOrigin(1), sliceOrigin(2);
@@ -425,7 +425,8 @@ bool MriMghIO::parseFooter(const QByteArray& data,
     while (!stream.atEnd()) {
         qint32 tagType;
         stream >> tagType;
-        if (stream.atEnd()) break;
+        if (stream.atEnd())
+            break;
 
         qint64 tagLen;
         // For TAG_OLD_SURF_GEOM (20) and TAG_OLD_MGH_XFORM (30), length is 4 bytes
@@ -440,10 +441,12 @@ bool MriMghIO::parseFooter(const QByteArray& data,
             tagLen = len64;
         }
 
-        if (tagLen <= 0 || tagLen > data.size()) break;
+        if (tagLen <= 0 || tagLen > data.size())
+            break;
 
         QByteArray tagData(tagLen, '\0');
-        if (stream.readRawData(tagData.data(), tagLen) != tagLen) break;
+        if (stream.readRawData(tagData.data(), tagLen) != tagLen)
+            break;
 
         if (tagType == MGH_TAG_MGH_XFORM) {
             // TAG_MGH_XFORM: contains path to talairach.xfm
@@ -481,7 +484,7 @@ bool MriMghIO::parseFooter(const QByteArray& data,
                             matStr.remove(';');
 
                             QStringList vals = matStr.split(QRegularExpression("\\s+"),
-                                                           Qt::SkipEmptyParts);
+                                                            Qt::SkipEmptyParts);
 
                             if (vals.size() >= 12) {
                                 // RAS -> MNI Talairach (3×4 matrix, in mm)
@@ -527,10 +530,15 @@ bool MriMghIO::parseFooter(const QByteArray& data,
 int MriMghIO::bytesPerVoxel(int type)
 {
     switch (type) {
-        case MRI_UCHAR: return 1;
-        case MRI_SHORT: return 2;
-        case MRI_INT:   return 4;
-        case MRI_FLOAT: return 4;
-        default:        return 0;
+        case MRI_UCHAR:
+            return 1;
+        case MRI_SHORT:
+            return 2;
+        case MRI_INT:
+            return 4;
+        case MRI_FLOAT:
+            return 4;
+        default:
+            return 0;
     }
 }

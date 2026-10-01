@@ -39,13 +39,17 @@
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-namespace FIFFLIB { class FiffInfo; }
+namespace FIFFLIB
+{
+class FiffInfo;
+}
 
 //=============================================================================================================
 // DEFINE NAMESPACE UTILSLIB
 //=============================================================================================================
 
-namespace UTILSLIB {
+namespace UTILSLIB
+{
 
 //=============================================================================================================
 /**
@@ -116,7 +120,10 @@ public:
      * @brief Returns the fitted regression coefficients.
      * @return Matrix (n_non_eog_channels x n_eog_channels).
      */
-    const Eigen::MatrixXd& coefficients() const { return m_matBeta; }
+    const Eigen::MatrixXd& coefficients() const
+    {
+        return m_matBeta;
+    }
 
     //=========================================================================================================
     /**
@@ -124,7 +131,10 @@ public:
      *
      * @return True if regression coefficients are available, false otherwise.
      */
-    bool isFitted() const { return m_bFitted; }
+    bool isFitted() const
+    {
+        return m_bFitted;
+    }
 
 private:
     Eigen::MatrixXd m_matBeta;       /**< Regression coefficients (n_targets x n_eog). */

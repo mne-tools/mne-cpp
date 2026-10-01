@@ -49,17 +49,17 @@ QList<BidsChannel> BidsChannel::readTsv(const QString& sFilePath)
     QList<BidsChannel> channels;
     channels.reserve(rawRows.size());
 
-    for(const auto& row : rawRows) {
+    for (const auto& row : rawRows) {
         BidsChannel ch;
-        ch.name         = row.value(QStringLiteral("name"));
-        ch.type         = row.value(QStringLiteral("type"));
-        ch.units        = row.value(QStringLiteral("units"));
+        ch.name = row.value(QStringLiteral("name"));
+        ch.type = row.value(QStringLiteral("type"));
+        ch.units = row.value(QStringLiteral("units"));
         ch.samplingFreq = naToEmpty(row.value(QStringLiteral("sampling_frequency")));
-        ch.lowCutoff    = naToEmpty(row.value(QStringLiteral("low_cutoff")));
-        ch.highCutoff   = naToEmpty(row.value(QStringLiteral("high_cutoff")));
-        ch.notch        = naToEmpty(row.value(QStringLiteral("notch")));
-        ch.status       = naToEmpty(row.value(QStringLiteral("status")));
-        ch.description  = naToEmpty(row.value(QStringLiteral("description")));
+        ch.lowCutoff = naToEmpty(row.value(QStringLiteral("low_cutoff")));
+        ch.highCutoff = naToEmpty(row.value(QStringLiteral("high_cutoff")));
+        ch.notch = naToEmpty(row.value(QStringLiteral("notch")));
+        ch.status = naToEmpty(row.value(QStringLiteral("status")));
+        ch.description = naToEmpty(row.value(QStringLiteral("description")));
         channels.append(ch);
     }
 
@@ -86,17 +86,17 @@ bool BidsChannel::writeTsv(const QString& sFilePath,
     QList<BidsTsvRow> rows;
     rows.reserve(channels.size());
 
-    for(const auto& ch : channels) {
+    for (const auto& ch : channels) {
         BidsTsvRow row;
-        row[QStringLiteral("name")]               = ch.name;
-        row[QStringLiteral("type")]                = ch.type;
-        row[QStringLiteral("units")]               = ch.units;
-        row[QStringLiteral("sampling_frequency")]  = ch.samplingFreq;
-        row[QStringLiteral("low_cutoff")]          = ch.lowCutoff;
-        row[QStringLiteral("high_cutoff")]         = ch.highCutoff;
-        row[QStringLiteral("notch")]               = ch.notch;
-        row[QStringLiteral("status")]              = ch.status;
-        row[QStringLiteral("description")]         = ch.description;
+        row[QStringLiteral("name")] = ch.name;
+        row[QStringLiteral("type")] = ch.type;
+        row[QStringLiteral("units")] = ch.units;
+        row[QStringLiteral("sampling_frequency")] = ch.samplingFreq;
+        row[QStringLiteral("low_cutoff")] = ch.lowCutoff;
+        row[QStringLiteral("high_cutoff")] = ch.highCutoff;
+        row[QStringLiteral("notch")] = ch.notch;
+        row[QStringLiteral("status")] = ch.status;
+        row[QStringLiteral("description")] = ch.description;
         rows.append(row);
     }
 

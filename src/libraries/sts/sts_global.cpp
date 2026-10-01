@@ -26,12 +26,21 @@
 // DEFINE METHODS
 //=============================================================================================================
 
-const char* STSLIB::buildDateTime(){ return UTILSLIB::dateTimeNow();}
+const char* STSLIB::buildDateTime()
+{
+    return UTILSLIB::dateTimeNow();
+}
 
 //=============================================================================================================
 
-const char* STSLIB::buildHash(){ return UTILSLIB::gitHash();}
+const char* STSLIB::buildHash()
+{
+    return UTILSLIB::gitHash();
+}
 
 //=============================================================================================================
 
-const char* STSLIB::buildHashLong(){ return UTILSLIB::gitHashLong();}
+const char* STSLIB::buildHashLong()
+{
+    return UTILSLIB::gitHashLong();
+}

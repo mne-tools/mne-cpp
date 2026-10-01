@@ -77,18 +77,19 @@ class FiffRawData;
  * default values match the MNE-C defaults so existing "ave description"
  * files keep producing identical results.
  */
-struct FIFFSHARED_EXPORT RejectionParams {
-    float stimIgnore       = 0.0f;      /**< Ignore this many seconds around the stimulus. */
-    float megGradReject    = 2000e-13f;  /**< Gradiometer rejection (T/m). */
-    float megMagReject     = 3e-12f;     /**< Magnetometer rejection (T). */
-    float eegReject        = 100e-6f;    /**< EEG rejection (V). */
-    float eogReject        = 150e-6f;    /**< EOG rejection (V). */
-    float ecgReject        = 0.0f;       /**< ECG rejection (V). */
-    float megGradFlat      = 0.0f;      /**< Gradiometer flatness (T/m). */
-    float megMagFlat       = 0.0f;      /**< Magnetometer flatness (T). */
-    float eegFlat          = 0.0f;      /**< EEG flatness (V). */
-    float eogFlat          = 0.0f;      /**< EOG flatness (V). */
-    float ecgFlat          = 0.0f;      /**< ECG flatness (V). */
+struct FIFFSHARED_EXPORT RejectionParams
+{
+    float stimIgnore = 0.0f;         /**< Ignore this many seconds around the stimulus. */
+    float megGradReject = 2000e-13f; /**< Gradiometer rejection (T/m). */
+    float megMagReject = 3e-12f;     /**< Magnetometer rejection (T). */
+    float eegReject = 100e-6f;       /**< EEG rejection (V). */
+    float eogReject = 150e-6f;       /**< EOG rejection (V). */
+    float ecgReject = 0.0f;          /**< ECG rejection (V). */
+    float megGradFlat = 0.0f;        /**< Gradiometer flatness (T/m). */
+    float megMagFlat = 0.0f;         /**< Magnetometer flatness (T). */
+    float eegFlat = 0.0f;            /**< EEG flatness (V). */
+    float eogFlat = 0.0f;            /**< EOG flatness (V). */
+    float ecgFlat = 0.0f;            /**< ECG flatness (V). */
 };
 
 //=============================================================================================================
@@ -102,23 +103,24 @@ struct FIFFSHARED_EXPORT RejectionParams {
  * post-processing flags (baseline correction, std-error vs.\ average,
  * absolute values).
  */
-struct FIFFSHARED_EXPORT AverageCategory {
-    QString comment;                     /**< Description. */
-    QVector<unsigned int> events;        /**< The interesting events. */
-    unsigned int nextEvent  = 0;         /**< Require this event next. */
-    unsigned int prevEvent  = 0;         /**< Require this event just before. */
-    unsigned int ignore     = 0;         /**< Which trigger lines to ignore. */
-    unsigned int prevIgnore = 0;         /**< Ignore mask for previous event. */
-    unsigned int nextIgnore = 0;         /**< Ignore mask for next event. */
-    float delay             = 0.0f;      /**< Stimulus delay (s). */
-    float tmin              = -0.2f;     /**< Minimum time (s). */
-    float tmax              = 0.5f;      /**< Maximum time (s). */
-    float bmin              = 0.0f;      /**< Baseline min (s). */
-    float bmax              = 0.0f;      /**< Baseline max (s). */
-    bool  doBaseline        = false;     /**< Should we baseline? */
-    bool  doStdErr          = false;     /**< Compute std error of mean? */
-    bool  doAbs             = false;     /**< Compute absolute values? */
-    float color[3]          = {0,0,0};   /**< Display color (unused in batch). */
+struct FIFFSHARED_EXPORT AverageCategory
+{
+    QString comment;              /**< Description. */
+    QVector<unsigned int> events; /**< The interesting events. */
+    unsigned int nextEvent = 0;   /**< Require this event next. */
+    unsigned int prevEvent = 0;   /**< Require this event just before. */
+    unsigned int ignore = 0;      /**< Which trigger lines to ignore. */
+    unsigned int prevIgnore = 0;  /**< Ignore mask for previous event. */
+    unsigned int nextIgnore = 0;  /**< Ignore mask for next event. */
+    float delay = 0.0f;           /**< Stimulus delay (s). */
+    float tmin = -0.2f;           /**< Minimum time (s). */
+    float tmax = 0.5f;            /**< Maximum time (s). */
+    float bmin = 0.0f;            /**< Baseline min (s). */
+    float bmax = 0.0f;            /**< Baseline max (s). */
+    bool doBaseline = false;      /**< Should we baseline? */
+    bool doStdErr = false;        /**< Compute std error of mean? */
+    bool doAbs = false;           /**< Compute absolute values? */
+    float color[3] = {0, 0, 0};   /**< Display color (unused in batch). */
 };
 
 //=============================================================================================================
@@ -131,14 +133,15 @@ struct FIFFSHARED_EXPORT AverageCategory {
  * log file) so an entire batch-averaging job can be described as one
  * value.
  */
-struct FIFFSHARED_EXPORT AverageDescription {
-    QString comment;                     /**< Description. */
-    QList<AverageCategory> categories;   /**< The categories. */
-    RejectionParams rej;                 /**< Rejection limits. */
-    bool fixSkew            = false;     /**< Fix skew on trigger lines. */
-    QString filename;                    /**< Output file. */
-    QString eventFile;                   /**< Read events from here. */
-    QString logFile;                     /**< Save log here. */
+struct FIFFSHARED_EXPORT AverageDescription
+{
+    QString comment;                   /**< Description. */
+    QList<AverageCategory> categories; /**< The categories. */
+    RejectionParams rej;               /**< Rejection limits. */
+    bool fixSkew = false;              /**< Fix skew on trigger lines. */
+    QString filename;                  /**< Output file. */
+    QString eventFile;                 /**< Read events from here. */
+    QString logFile;                   /**< Save log here. */
 };
 
 //=============================================================================================================
@@ -152,12 +155,11 @@ struct FIFFSHARED_EXPORT AverageDescription {
  */
 class FIFFSHARED_EXPORT FiffEvokedSet
 {
-
 public:
-    using SPtr = QSharedPointer<FiffEvokedSet>;            /**< Shared pointer type for FiffEvokedSet. */
-    using ConstSPtr = QSharedPointer<const FiffEvokedSet>; /**< Const shared pointer type for FiffEvokedSet. */
-    using UPtr = std::unique_ptr<FiffEvokedSet>;             /**< Unique pointer type for FiffEvokedSet. */
-    using ConstUPtr = std::unique_ptr<const FiffEvokedSet>;  /**< Const unique pointer type for FiffEvokedSet. */
+    using SPtr = QSharedPointer<FiffEvokedSet>;             /**< Shared pointer type for FiffEvokedSet. */
+    using ConstSPtr = QSharedPointer<const FiffEvokedSet>;  /**< Const shared pointer type for FiffEvokedSet. */
+    using UPtr = std::unique_ptr<FiffEvokedSet>;            /**< Unique pointer type for FiffEvokedSet. */
+    using ConstUPtr = std::unique_ptr<const FiffEvokedSet>; /**< Const unique pointer type for FiffEvokedSet. */
 
     //=========================================================================================================
     /**
@@ -231,7 +233,7 @@ public:
      *
      * @return true if succeeded, false otherwise.
      */
-    bool compensate_to(FiffEvokedSet &p_FiffEvokedSet,
+    bool compensate_to(FiffEvokedSet& p_FiffEvokedSet,
                        fiff_int_t to) const;
 
     //=========================================================================================================
@@ -266,7 +268,7 @@ public:
      */
     static bool read(QIODevice& p_IODevice,
                      FiffEvokedSet& p_FiffEvokedSet,
-                     QPair<float,float> baseline = defaultFloatPair,
+                     QPair<float, float> baseline = defaultFloatPair,
                      bool proj = true);
 
     //=========================================================================================================
@@ -276,7 +278,7 @@ public:
      * @param[in] fileName  Output file path.
      * @return true on success.
      */
-    bool save(const QString &fileName) const;
+    bool save(const QString& fileName) const;
 
     //=========================================================================================================
     /**
@@ -287,7 +289,7 @@ public:
      * @param[in] evokedSets    List of evoked data sets to combine.
      * @return The grand-average evoked set, or an empty set if input is empty.
      */
-    static FiffEvokedSet computeGrandAverage(const QList<FiffEvokedSet> &evokedSets);
+    static FiffEvokedSet computeGrandAverage(const QList<FiffEvokedSet>& evokedSets);
 
     //=========================================================================================================
     /**
@@ -302,10 +304,10 @@ public:
      * @param[out] log          Processing log output.
      * @return FiffEvokedSet containing one FiffEvoked per category, or empty set on failure.
      */
-    static FiffEvokedSet computeAverages(const FiffRawData &raw,
-                                         const AverageDescription &desc,
-                                         const Eigen::MatrixXi &events,
-                                         QString &log);
+    static FiffEvokedSet computeAverages(const FiffRawData& raw,
+                                         const AverageDescription& desc,
+                                         const Eigen::MatrixXi& events,
+                                         QString& log);
 
     //=========================================================================================================
     /**
@@ -318,11 +320,11 @@ public:
      * @param[out] reason   Rejection reason string (set only when rejected).
      * @return true if epoch is clean (not rejected).
      */
-    static bool checkArtifacts(const Eigen::MatrixXd &epoch,
-                               const FiffInfo &info,
-                               const QStringList &bads,
-                               const RejectionParams &rej,
-                               QString &reason);
+    static bool checkArtifacts(const Eigen::MatrixXd& epoch,
+                               const FiffInfo& info,
+                               const QStringList& bads,
+                               const RejectionParams& rej,
+                               QString& reason);
 
     /**
      * @brief Subtract baseline from each channel of an epoch.
@@ -334,22 +336,22 @@ public:
      * @param[in] bminSamp      First baseline sample (clamped to 0).
      * @param[in] bmaxSamp      Last baseline sample (clamped to epoch length - 1).
      */
-    static void subtractBaseline(Eigen::MatrixXd &epoch, int bminSamp, int bmaxSamp);
+    static void subtractBaseline(Eigen::MatrixXd& epoch, int bminSamp, int bmaxSamp);
 
 public:
-    FiffInfo             info;   /**< FIFF measurement information. */
-    QList<FiffEvoked>    evoked; /**< List of Fiff Evoked Data. */
+    FiffInfo info;            /**< FIFF measurement information. */
+    QList<FiffEvoked> evoked; /**< List of Fiff Evoked Data. */
 };
 } // NAMESPACE
 
 #ifndef metatype_fiffevokedset
 #define metatype_fiffevokedset
-Q_DECLARE_METATYPE(FIFFLIB::FiffEvokedSet);/**< Provides QT META type declaration of the FIFFLIB::FiffEvokedSet type. For signal/slot and QVariant usage.*/
+Q_DECLARE_METATYPE(FIFFLIB::FiffEvokedSet); /**< Provides QT META type declaration of the FIFFLIB::FiffEvokedSet type. For signal/slot and QVariant usage.*/
 #endif
 
 #ifndef metatype_fiffevokedsetsptr
 #define metatype_fiffevokedsetsptr
-Q_DECLARE_METATYPE(FIFFLIB::FiffEvokedSet::SPtr);/**< Provides QT META type declaration of the FIFFLIB::FiffEvokedSet type. For signal/slot and QVariant usage.*/
+Q_DECLARE_METATYPE(FIFFLIB::FiffEvokedSet::SPtr); /**< Provides QT META type declaration of the FIFFLIB::FiffEvokedSet type. For signal/slot and QVariant usage.*/
 #endif
 
 #endif // FIFF_EVOKED_SET_H

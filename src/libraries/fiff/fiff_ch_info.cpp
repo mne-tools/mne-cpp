@@ -54,7 +54,7 @@ FiffChInfo::FiffChInfo()
 
 //=============================================================================================================
 
-FiffChInfo::FiffChInfo(const FiffChInfo &p_FiffChInfo)
+FiffChInfo::FiffChInfo(const FiffChInfo& p_FiffChInfo)
 : scanNo(p_FiffChInfo.scanNo)
 , logNo(p_FiffChInfo.logNo)
 , kind(p_FiffChInfo.kind)
@@ -97,7 +97,5 @@ bool FiffChInfo::checkEegLocations(const QList<FiffChInfo>& chs, int nch)
 bool FiffChInfo::isValidEeg() const
 {
     constexpr float TOO_CLOSE = 1e-4f;
-    return kind == FIFFV_EEG_CH
-        && chpos.r0.norm() >= TOO_CLOSE
-        && chpos.coil_type != FIFFV_COIL_NONE;
+    return kind == FIFFV_EEG_CH && chpos.r0.norm() >= TOO_CLOSE && chpos.coil_type != FIFFV_COIL_NONE;
 }

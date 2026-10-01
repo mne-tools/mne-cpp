@@ -37,7 +37,7 @@ using namespace FIFFLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-RealTimeEvokedSet::RealTimeEvokedSet(QObject *parent)
+RealTimeEvokedSet::RealTimeEvokedSet(QObject* parent)
 : Measurement(QMetaType::fromName("RealTimeEvokedSet::SPtr").id(), parent)
 , m_pFiffEvokedSet(new FiffEvokedSet)
 , m_iPreStimSamples(0)
@@ -62,9 +62,8 @@ void RealTimeEvokedSet::init(FiffInfo::SPtr p_fiffInfo)
     m_pFiffInfo = p_fiffInfo;
 
     srand(static_cast<uint>(time(Q_NULLPTR)));
-    for(qint32 i = 0; i < p_fiffInfo->nchan; ++i)
-    {
-         m_qListChColors.append(QColor(rand() % 256, rand() % 256, rand() % 256));
+    for (qint32 i = 0; i < p_fiffInfo->nchan; ++i) {
+        m_qListChColors.append(QColor(rand() % 256, rand() % 256, rand() % 256));
 
         RealTimeSampleArrayChInfo initChInfo;
         initChInfo.setChannelName(p_fiffInfo->chs[i].ch_name);
@@ -73,9 +72,8 @@ void RealTimeEvokedSet::init(FiffInfo::SPtr p_fiffInfo)
         initChInfo.setUnit(p_fiffInfo->chs[i].unit);
 
         //Treat stimulus channels different
-        if(p_fiffInfo->chs[i].kind == FIFFV_STIM_CH)
-        {
-//            initChInfo.setUnit("");
+        if (p_fiffInfo->chs[i].kind == FIFFV_STIM_CH) {
+            //            initChInfo.setUnit("");
             initChInfo.setMinValue(0);
             initChInfo.setMaxValue(1.0e6);
         }
@@ -108,17 +106,17 @@ const QStringList& RealTimeEvokedSet::getResponsibleTriggerTypes()
 
 //=============================================================================================================
 
-void RealTimeEvokedSet::setValue(const FiffEvokedSet &v,
-                                 const FiffInfo::SPtr &p_fiffinfo,
-                                 const QStringList &lResponsibleTriggerTypes)
+void RealTimeEvokedSet::setValue(const FiffEvokedSet& v,
+                                 const FiffInfo::SPtr& p_fiffinfo,
+                                 const QStringList& lResponsibleTriggerTypes)
 {
     //Store
     m_qMutex.lock();
-     *m_pFiffEvokedSet = v;
+    *m_pFiffEvokedSet = v;
     m_lResponsibleTriggerTypes = lResponsibleTriggerTypes;
     m_qMutex.unlock();
 
-    if(!m_bInitialized) {
+    if (!m_bInitialized) {
         init(p_fiffinfo);
 
         m_qMutex.lock();
@@ -126,9 +124,9 @@ void RealTimeEvokedSet::setValue(const FiffEvokedSet &v,
 
         //Take the first evoked iformation to calcualte the pre samples.
         //They all have the same pre sample size as of right now.
-        if(!m_pFiffEvokedSet->evoked.isEmpty()) {
-            for(qint32 i = 0; i < m_pFiffEvokedSet->evoked.at(0).times.size(); ++i) {
-                if(m_pFiffEvokedSet->evoked.at(0).times[i] >= 0) {
+        if (!m_pFiffEvokedSet->evoked.isEmpty()) {
+            for (qint32 i = 0; i < m_pFiffEvokedSet->evoked.at(0).times.size(); ++i) {
+                if (m_pFiffEvokedSet->evoked.at(0).times[i] >= 0) {
                     break;
                 } else {
                     ++m_iPreStimSamples;

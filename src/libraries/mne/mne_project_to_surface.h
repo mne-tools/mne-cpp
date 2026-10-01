@@ -49,7 +49,8 @@
 // DEFINE NAMESPACE MNELIB
 //=============================================================================================================
 
-namespace MNELIB {
+namespace MNELIB
+{
 
 //=============================================================================================================
 // MNELIB FORWARD DECLARATIONS
@@ -66,7 +67,6 @@ class MNEBemSurface;
 
 class MNESHARED_EXPORT MNEProjectToSurface
 {
-
 public:
     typedef QSharedPointer<MNEProjectToSurface> SPtr;            /**< Shared pointer type for MNEProjectToSurface. */
     typedef QSharedPointer<const MNEProjectToSurface> ConstSPtr; /**< Const shared pointer type for MNEProjectToSurface. */
@@ -83,7 +83,7 @@ public:
      * @brief Build a projector that snaps points onto the triangulation of @p p_MNEBemSurf.
      * @param[in] p_MNEBemSurf   The MNEBemSurface to which is to be projected.
      */
-    MNEProjectToSurface(const MNELIB::MNEBemSurface &p_MNEBemSurf);
+    MNEProjectToSurface(const MNELIB::MNEBemSurface& p_MNEBemSurf);
 
     //=========================================================================================================
     /**
@@ -99,11 +99,10 @@ public:
      *
      * @return true if succeeded, false otherwise.
      */
-    bool find_closest_on_surface(const Eigen::MatrixXf &r, const int np, Eigen::MatrixXf &rTri,
-                                     Eigen::VectorXi &nearest, Eigen::VectorXf &dist);
+    bool find_closest_on_surface(const Eigen::MatrixXf& r, const int np, Eigen::MatrixXf& rTri,
+                                 Eigen::VectorXi& nearest, Eigen::VectorXf& dist);
 
 protected:
-
 private:
     //=========================================================================================================
     /**
@@ -118,7 +117,7 @@ private:
      *
      * @return true if succeeded, false otherwise.
      */
-    bool project_to_surface(const Eigen::Vector3f &r, Eigen::Vector3f &rTri, int &bestTri, float &bestDist);
+    bool project_to_surface(const Eigen::Vector3f& r, Eigen::Vector3f& rTri, int& bestTri, float& bestDist);
 
     //=========================================================================================================
     /**
@@ -134,7 +133,7 @@ private:
      *
      * @return true if succeeded, false otherwise.
      */
-    bool nearest_triangle_point(const Eigen::Vector3f &r, const int tri, float &p, float &q, float &dist);
+    bool nearest_triangle_point(const Eigen::Vector3f& r, const int tri, float& p, float& q, float& dist);
 
     //=========================================================================================================
     /**
@@ -149,16 +148,16 @@ private:
      *
      * @return true if succeeded, false otherwise.
      */
-    bool project_to_triangle(Eigen::Vector3f &rTri, const float p, const float q, const int tri);
+    bool project_to_triangle(Eigen::Vector3f& rTri, const float p, const float q, const int tri);
 
-    Eigen::MatrixX3f r1;         /**< Cartesian Vector to the first triangel corner. */
-    Eigen::MatrixX3f r12;        /**< Cartesian Vector from the first to the second triangel corner. */
-    Eigen::MatrixX3f r13;        /**< Cartesian Vector from the first to the third triangel corner. */
-    Eigen::MatrixX3f nn;         /**< Cartesian Vector of the triangle plane normal. */
-    Eigen::VectorXf a;           /**< r12*r12. */
-    Eigen::VectorXf b;           /**< r13*r13. */
-    Eigen::VectorXf c;           /**< r12*r13. */
-    Eigen::VectorXf det;         /**< Determinant of the Matrix [a c, c b]. */
+    Eigen::MatrixX3f r1;  /**< Cartesian Vector to the first triangel corner. */
+    Eigen::MatrixX3f r12; /**< Cartesian Vector from the first to the second triangel corner. */
+    Eigen::MatrixX3f r13; /**< Cartesian Vector from the first to the third triangel corner. */
+    Eigen::MatrixX3f nn;  /**< Cartesian Vector of the triangle plane normal. */
+    Eigen::VectorXf a;    /**< r12*r12. */
+    Eigen::VectorXf b;    /**< r13*r13. */
+    Eigen::VectorXf c;    /**< r12*r13. */
+    Eigen::VectorXf det;  /**< Determinant of the Matrix [a c, c b]. */
 };
 
 //=============================================================================================================

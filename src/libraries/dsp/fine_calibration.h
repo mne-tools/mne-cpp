@@ -49,9 +49,9 @@ namespace UTILSLIB
  */
 struct DSPSHARED_EXPORT FineCalEntry
 {
-    int     chNumber = 0;               /**< MEG channel number (e.g., 0113 for MEG0113). */
-    double  dGain = 1.0;                /**< Gain correction factor (nominal = 1.0). */
-    Eigen::Vector3d imbalance{0,0,0};   /**< Cross-talk imbalance correction (x, y, z). */
+    int chNumber = 0;                   /**< MEG channel number (e.g., 0113 for MEG0113). */
+    double dGain = 1.0;                 /**< Gain correction factor (nominal = 1.0). */
+    Eigen::Vector3d imbalance{0, 0, 0}; /**< Cross-talk imbalance correction (x, y, z). */
 };
 
 //=============================================================================================================
@@ -102,7 +102,10 @@ public:
      *
      * @return Const reference to the list of per-channel calibration entries.
      */
-    const QList<FineCalEntry>& entries() const { return m_entries; }
+    const QList<FineCalEntry>& entries() const
+    {
+        return m_entries;
+    }
 
     //=========================================================================================================
     /**
@@ -110,7 +113,10 @@ public:
      *
      * @return Number of calibration entries (one per MEG channel).
      */
-    int size() const { return m_entries.size(); }
+    int size() const
+    {
+        return m_entries.size();
+    }
 
     //=========================================================================================================
     /**
@@ -118,7 +124,10 @@ public:
      *
      * @return True if no calibration entries are stored.
      */
-    bool isEmpty() const { return m_entries.isEmpty(); }
+    bool isEmpty() const
+    {
+        return m_entries.isEmpty();
+    }
 
     //=========================================================================================================
     /**
@@ -137,7 +146,10 @@ public:
      *
      * @param[in] entry  Calibration entry appended to the end of the list.
      */
-    void addEntry(const FineCalEntry& entry) { m_entries.append(entry); }
+    void addEntry(const FineCalEntry& entry)
+    {
+        m_entries.append(entry);
+    }
 
     //=========================================================================================================
     /**

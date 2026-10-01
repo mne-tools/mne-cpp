@@ -88,7 +88,7 @@ public:
      *
      * @param [in] parent pointer to parent widget; If parent is 0, the new DataWindow becomes a window. If parent is another widget, DataWindow becomes a child window inside parent. DataWindow is deleted when its parent is deleted.
      */
-    DataWindow(QWidget *parent = 0);
+    DataWindow(QWidget* parent = 0);
 
     //=========================================================================================================
     /**
@@ -117,7 +117,7 @@ public:
      * @param[in] path  Absolute path to the .fif file.
      * @return true on success.
      */
-    bool loadFiffFile(const QString &path);
+    bool loadFiffFile(const QString& path);
 
     //=========================================================================================================
     /**
@@ -128,7 +128,7 @@ public:
      * @param[in] displayName  Friendly file name shown in the UI.
      * @return true on success.
      */
-    bool loadFiffBuffer(const QByteArray &baData, const QString &displayName);
+    bool loadFiffBuffer(const QByteArray& baData, const QString& displayName);
 
     //=========================================================================================================
     /**
@@ -196,7 +196,7 @@ public:
      *
      * @param [in] scaleMap map with all channel types and their current scaling value
      */
-    void scaleData(const QMap<QString,double> &scaleMap);
+    void scaleData(const QMap<QString, double>& scaleMap);
 
     //=========================================================================================================
     /**
@@ -234,19 +234,25 @@ public:
     /**
      * Returns the GPU-accelerated ChannelDataView (may be nullptr before loadFiffFile).
      */
-    DISPLIB::ChannelDataView* getChannelDataView() { return m_pChannelDataView; }
+    DISPLIB::ChannelDataView* getChannelDataView()
+    {
+        return m_pChannelDataView;
+    }
 
     //=========================================================================================================
     /**
      * Returns the application-level raw browser wrapper.
      */
-    RawView* getRawView() { return m_pChannelDataView; }
+    RawView* getRawView()
+    {
+        return m_pChannelDataView;
+    }
 
     //=========================================================================================================
     /**
      * Set the browser annotation spans shown in the GPU raw view.
      */
-    void setAnnotations(const QVector<DISPLIB::ChannelRhiView::AnnotationSpan> &annotations);
+    void setAnnotations(const QVector<DISPLIB::ChannelRhiView::AnnotationSpan>& annotations);
 
     //=========================================================================================================
     /**
@@ -261,7 +267,7 @@ public:
      * @param[in] virtualChannels  Virtual channel definitions to apply.
      * @param[in] reloadIfOpen     True to refresh the current browser immediately.
      */
-    void setVirtualChannels(const QVector<VirtualChannelDefinition> &virtualChannels,
+    void setVirtualChannels(const QVector<VirtualChannelDefinition>& virtualChannels,
                             bool reloadIfOpen = true);
 
     //=========================================================================================================
@@ -282,7 +288,10 @@ public:
     /**
      * Returns the currently active session filter used by preview and offline processing.
      */
-    QSharedPointer<SessionFilter> activeSessionFilter() const { return m_pUserDefinedFilter; }
+    QSharedPointer<SessionFilter> activeSessionFilter() const
+    {
+        return m_pUserDefinedFilter;
+    }
 
     //=========================================================================================================
     /**
@@ -297,7 +306,10 @@ public:
     /**
      * Returns whether raw-trace whitening is currently active.
      */
-    bool isRawWhiteningEnabled() const { return m_bRawWhiteningEnabled; }
+    bool isRawWhiteningEnabled() const
+    {
+        return m_bRawWhiteningEnabled;
+    }
 
     //=========================================================================================================
     /**
@@ -401,13 +413,13 @@ private:
     /**
      * Append the currently active virtual channels to a raw data block.
      */
-    Eigen::MatrixXd appendVirtualChannels(const Eigen::MatrixXd &matData) const;
+    Eigen::MatrixXd appendVirtualChannels(const Eigen::MatrixXd& matData) const;
 
     //=========================================================================================================
     /**
      * Apply the currently active session filter to a loaded raw block.
      */
-    Eigen::MatrixXd applyUserDefinedFilter(const Eigen::MatrixXd &matData) const;
+    Eigen::MatrixXd applyUserDefinedFilter(const Eigen::MatrixXd& matData) const;
 
     //=========================================================================================================
     /**
@@ -444,88 +456,90 @@ private:
     /**
      * Installed event filter.
      */
-    bool eventFilter(QObject *object, QEvent *event);
+    bool eventFilter(QObject* object, QEvent* event);
 
     //=========================================================================================================
     /**
      * gestureEvent processes gesture events
      */
-    bool gestureEvent(QGestureEvent *event);
+    bool gestureEvent(QGestureEvent* event);
 
     //=========================================================================================================
     /**
      * pinchTriggered processes pinch gesture events
      */
-    bool pinchTriggered(QPinchGesture *gesture);
+    bool pinchTriggered(QPinchGesture* gesture);
 
-    std::unique_ptr<Ui::DataWindowDockWidget> ui;           /**< Pointer to the qt designer generated ui class.*/
+    std::unique_ptr<Ui::DataWindowDockWidget> ui; /**< Pointer to the qt designer generated ui class.*/
 
-    MainWindow*     m_pMainWindow;                  /**< pointer to the main window (parent). */
+    MainWindow* m_pMainWindow; /**< pointer to the main window (parent). */
 
-    QSettings       m_qSettings;                    /**< QSettings variable used to write or read from independent application sessions. */
+    QSettings m_qSettings; /**< QSettings variable used to write or read from independent application sessions. */
 
-    struct PersistentMarker {
-        int         id = -1;                        /**< Internal marker id. */
-        int         sample = 0;                     /**< Absolute sample position the marker is anchored to. */
-        QColor      color;                          /**< Marker colour used for the line and label. */
-        DataMarker* line = nullptr;                 /**< Draggable line widget rendered over the signal viewport. */
-        QLabel*     label = nullptr;                /**< Small floating label with sample/time information. */
+    struct PersistentMarker
+    {
+        int id = -1;                /**< Internal marker id. */
+        int sample = 0;             /**< Absolute sample position the marker is anchored to. */
+        QColor color;               /**< Marker colour used for the line and label. */
+        DataMarker* line = nullptr; /**< Draggable line widget rendered over the signal viewport. */
+        QLabel* label = nullptr;    /**< Small floating label with sample/time information. */
     };
 
-    QVector<PersistentMarker> m_dataMarkers;        /**< All persistent sample markers in the raw browser. */
-    int             m_iNextMarkerId = 1;            /**< Next internal marker id. */
-    int             m_iActiveMarkerId = -1;         /**< Active marker used for event insertion. */
+    QVector<PersistentMarker> m_dataMarkers; /**< All persistent sample markers in the raw browser. */
+    int m_iNextMarkerId = 1;                 /**< Next internal marker id. */
+    int m_iActiveMarkerId = -1;              /**< Active marker used for event insertion. */
 
-    RawDelegate*    m_pRawDelegate;                 /**< the QAbstractDelegate being part of the raw model/view framework of Qt. */
-    RawModel*       m_pRawModel;                    /**< the QAbstractTable model being part of the model/view framework of Qt. */
+    RawDelegate* m_pRawDelegate; /**< the QAbstractDelegate being part of the raw model/view framework of Qt. */
+    RawModel* m_pRawModel;       /**< the QAbstractTable model being part of the model/view framework of Qt. */
 
-    QScroller*      m_pKineticScroller;             /**< the kinetic scroller of the QTableView. */
+    QScroller* m_pKineticScroller; /**< the kinetic scroller of the QTableView. */
 
-    QStringList     m_slSelectedChannels;           /**< the currently selected channels from the selection manager window. */
+    QStringList m_slSelectedChannels; /**< the currently selected channels from the selection manager window. */
 
-    bool            m_bHideBadChannels;             /**< hide bad channels flag. */
+    bool m_bHideBadChannels; /**< hide bad channels flag. */
 
     // ── ChannelDataView (GPU-accelerated renderer) ─────────────────────
-    RawView*                 m_pChannelDataView     = nullptr; /**< Application-level raw browser view wrapper. */
-    FiffBlockReader*         m_pFiffReader          = nullptr; /**< Demand-paging FIFF reader. */
-    int                      m_iNextLoadSample      = 0;       /**< First sample of the next forward block to load. */
-    int                      m_iCurrentScrollSample = 0;       /**< Last known scroll position (absolute sample). */
-    bool                     m_bLoadingBlock        = false;   /**< Async load in progress. */
-    QString                  m_sFiffFilePath;                  /**< Path of the currently open FIFF file. */
+    RawView* m_pChannelDataView = nullptr;    /**< Application-level raw browser view wrapper. */
+    FiffBlockReader* m_pFiffReader = nullptr; /**< Demand-paging FIFF reader. */
+    int m_iNextLoadSample = 0;                /**< First sample of the next forward block to load. */
+    int m_iCurrentScrollSample = 0;           /**< Last known scroll position (absolute sample). */
+    bool m_bLoadingBlock = false;             /**< Async load in progress. */
+    QString m_sFiffFilePath;                  /**< Path of the currently open FIFF file. */
 
     // ── STIM event cache ───────────────────────────────────────────────
     QVector<DISPLIB::ChannelRhiView::EventMarker> m_stimEvents; /**< Accumulated STIM-channel events across loaded blocks. */
-    QMap<int, QColor>                             m_eventTypeColors; /**< Per-type colour palette (built on demand). */
-    QSet<quint64>                                 m_seenStimEventKeys; /**< De-duplicates events when blocks are revisited. */
-    int                                           m_iStimChannel       = -1; /**< Selected trigger channel index (prefer STI 014). */
-    int                                           m_iStimLastSample    = std::numeric_limits<int>::min(); /**< Last scanned sample on the trigger channel. */
-    int                                           m_iStimLastValue     = 0; /**< Trigger value at m_iStimLastSample. */
+    QMap<int, QColor> m_eventTypeColors;                        /**< Per-type colour palette (built on demand). */
+    QSet<quint64> m_seenStimEventKeys;                          /**< De-duplicates events when blocks are revisited. */
+    int m_iStimChannel = -1;                                    /**< Selected trigger channel index (prefer STI 014). */
+    int m_iStimLastSample = std::numeric_limits<int>::min();    /**< Last scanned sample on the trigger channel. */
+    int m_iStimLastValue = 0;                                   /**< Trigger value at m_iStimLastSample. */
 
-    struct ResolvedVirtualChannel {
-        QString                     name;
-        VirtualChannelKind          kind = VirtualChannelKind::Bipolar;
-        int                         primaryChannel = -1;
-        QVector<int>                referenceChannels;
-        QVector<double>             referenceWeights;
+    struct ResolvedVirtualChannel
+    {
+        QString name;
+        VirtualChannelKind kind = VirtualChannelKind::Bipolar;
+        int primaryChannel = -1;
+        QVector<int> referenceChannels;
+        QVector<double> referenceWeights;
         DISPLIB::ChannelDisplayInfo displayInfo;
     };
 
-    QVector<VirtualChannelDefinition>             m_virtualChannelDefinitions; /**< Requested virtual-channel definitions. */
-    QVector<ResolvedVirtualChannel>               m_resolvedVirtualChannels; /**< Definitions resolved against the current FIFF header. */
-    QSharedPointer<SessionFilter>                 m_pUserDefinedFilter; /**< Optional session filter applied directly in the QRHI browser path. */
+    QVector<VirtualChannelDefinition> m_virtualChannelDefinitions; /**< Requested virtual-channel definitions. */
+    QVector<ResolvedVirtualChannel> m_resolvedVirtualChannels;     /**< Definitions resolved against the current FIFF header. */
+    QSharedPointer<SessionFilter> m_pUserDefinedFilter;            /**< Optional session filter applied directly in the QRHI browser path. */
 
     // ── Raw-trace whitening ────────────────────────────────────────────
-    bool                     m_bRawWhiteningEnabled = false; /**< True when raw traces should be whitened. */
-    Eigen::MatrixXd          m_rawWhitener;                  /**< Precomputed whitener (nch × nch) or empty. */
+    bool m_bRawWhiteningEnabled = false; /**< True when raw traces should be whitened. */
+    Eigen::MatrixXd m_rawWhitener;       /**< Precomputed whitener (nch × nch) or empty. */
 
     // ── Buffer sizing ──────────────────────────────────────────────────
     // Each block is 60 s.  Buffer holds kMaxBlocks = 10 blocks = 10 min.
     // Prefetch is triggered whenever the unloaded frontier is within
     // kLookaheadBlocks × kBlockSeconds ahead of the current scroll position,
     // so loading chains greedily and keeps at least ~3 min of data ahead.
-    static constexpr float kBlockSeconds    = 60.f;  /**< Seconds of data per demand-load block. */
-    static constexpr int   kMaxBlocks       = 10;    /**< Ring-buffer depth in blocks (10 × 60 s = 10 min). */
-    static constexpr float kLookaheadBlocks = 3.f;   /**< Keep this many blocks loaded ahead of scroll. */
+    static constexpr float kBlockSeconds = 60.f;   /**< Seconds of data per demand-load block. */
+    static constexpr int kMaxBlocks = 10;          /**< Ring-buffer depth in blocks (10 × 60 s = 10 min). */
+    static constexpr float kLookaheadBlocks = 3.f; /**< Keep this many blocks loaded ahead of scroll. */
 
 signals:
     //=========================================================================================================
@@ -584,7 +598,7 @@ protected slots:
      * @param[in] data         channels × samples matrix.
      * @param[in] firstSample  Absolute sample index of column 0.
      */
-    void onBlockLoaded(const Eigen::MatrixXd &matData, int firstSample);
+    void onBlockLoaded(const Eigen::MatrixXd& matData, int firstSample);
 
     //=========================================================================================================
     /**

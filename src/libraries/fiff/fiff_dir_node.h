@@ -75,12 +75,13 @@ class FiffTag;
  * which is how MNE-CPP writes derived files that keep provenance back to
  * the source recording.
  */
-class FIFFSHARED_EXPORT FiffDirNode {
+class FIFFSHARED_EXPORT FiffDirNode
+{
 public:
-    using SPtr = QSharedPointer<FiffDirNode>;            /**< Shared pointer type for FiffDirNode. */
-    using ConstSPtr = QSharedPointer<const FiffDirNode>; /**< Const shared pointer type for FiffDirNode. */
-    using UPtr = std::unique_ptr<FiffDirNode>;             /**< Unique pointer type for FiffDirNode. */
-    using ConstUPtr = std::unique_ptr<const FiffDirNode>;  /**< Const unique pointer type for FiffDirNode. */
+    using SPtr = QSharedPointer<FiffDirNode>;             /**< Shared pointer type for FiffDirNode. */
+    using ConstSPtr = QSharedPointer<const FiffDirNode>;  /**< Const shared pointer type for FiffDirNode. */
+    using UPtr = std::unique_ptr<FiffDirNode>;            /**< Unique pointer type for FiffDirNode. */
+    using ConstUPtr = std::unique_ptr<const FiffDirNode>; /**< Const unique pointer type for FiffDirNode. */
 
     //=========================================================================================================
     /**
@@ -113,7 +114,7 @@ public:
      *
      * @return true if succeeded, false otherwise.
      */
-    static bool copy_tree(QSharedPointer<FiffStream>& p_pStreamIn, const FiffId& in_id, const QList< QSharedPointer<FiffDirNode> >& p_Nodes, QSharedPointer<FiffStream>& p_pStreamOut);
+    static bool copy_tree(QSharedPointer<FiffStream>& p_pStreamIn, const FiffId& in_id, const QList<QSharedPointer<FiffDirNode>>& p_Nodes, QSharedPointer<FiffStream>& p_pStreamOut);
 
     //=========================================================================================================
     /**
@@ -210,7 +211,7 @@ public:
      *
      * @param[in] kind   directory kind.
      */
-    static void explain (int kind);
+    static void explain(int kind);
 
     //=========================================================================================================
     /**
@@ -220,7 +221,7 @@ public:
      *
      * @return Pointer to the static string explaining the tag, or nullptr if not found.
      */
-    static const char *get_tag_explanation (int kind);
+    static const char* get_tag_explanation(int kind);
 
     //=========================================================================================================
     /**
@@ -239,25 +240,24 @@ public:
     fiff_int_t nchild() const;
 
 public:
-    fiff_int_t                  type;       /**< Block type for this directory. */
-    FiffId                      id;         /**< Id of this block if any. */
-    QList<FiffDirEntry::SPtr>   dir;        /**< Directory of tags in this node. */
-//    fiff_int_t                  nent;       /**< Number of entries in this node. */
-    QList<FiffDirEntry::SPtr>   dir_tree;   /**< Directory of tags within this node subtrees
+    fiff_int_t type;                    /**< Block type for this directory. */
+    FiffId id;                          /**< Id of this block if any. */
+    QList<FiffDirEntry::SPtr> dir;      /**< Directory of tags in this node. */
+                                        //    fiff_int_t                  nent;       /**< Number of entries in this node. */
+    QList<FiffDirEntry::SPtr> dir_tree; /**< Directory of tags within this node subtrees
                                                  as well as FIFF_BLOCK_START and FIFF_BLOCK_END */
-    fiff_int_t                  nent_tree;  /**< Number of entries in the directory tree node. */
-    FiffDirNode::SPtr           parent;     /**< Parent node. */
-    FiffId                      parent_id;  /**< Newly added to stay consistent with MATLAB implementation. */
-    QList<FiffDirNode::SPtr>    children;   /**< Child nodes. */
-//    fiff_int_t                  nchild;     /**< Number of child nodes. */ -> use nchild() instead
-
+    fiff_int_t nent_tree;               /**< Number of entries in the directory tree node. */
+    FiffDirNode::SPtr parent;           /**< Parent node. */
+    FiffId parent_id;                   /**< Newly added to stay consistent with MATLAB implementation. */
+    QList<FiffDirNode::SPtr> children;  /**< Child nodes. */
+    //    fiff_int_t                  nchild;     /**< Number of child nodes. */ -> use nchild() instead
 };
 
 //=============================================================================================================
 // INLINE DEFINITIONS
 //=============================================================================================================
 
-inline bool FiffDirNode::find_tag(QSharedPointer<FiffStream> &p_pStream, fiff_int_t findkind, std::unique_ptr<FiffTag> &p_pTag) const
+inline bool FiffDirNode::find_tag(QSharedPointer<FiffStream>& p_pStream, fiff_int_t findkind, std::unique_ptr<FiffTag>& p_pTag) const
 {
     return find_tag(p_pStream.data(), findkind, p_pTag);
 }

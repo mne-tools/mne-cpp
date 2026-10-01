@@ -60,12 +60,12 @@ namespace UTILSLIB
  */
 struct UTILSSHARED_EXPORT PythonRunnerResult
 {
-    bool    success    = false;     /**< True when process exited with code 0. */
-    int     exitCode   = -1;        /**< Process exit code (-1 if never started). */
-    bool    timedOut   = false;     /**< True if the timeout was reached. */
-    QString stdOut;                 /**< Complete captured standard output. */
-    QString stdErr;                 /**< Complete captured standard error. */
-    float   progressPct = -1.0f;   /**< Last parsed progress percentage (0–100), or -1 if none. */
+    bool success = false;      /**< True when process exited with code 0. */
+    int exitCode = -1;         /**< Process exit code (-1 if never started). */
+    bool timedOut = false;     /**< True if the timeout was reached. */
+    QString stdOut;            /**< Complete captured standard output. */
+    QString stdErr;            /**< Complete captured standard error. */
+    float progressPct = -1.0f; /**< Last parsed progress percentage (0–100), or -1 if none. */
 };
 
 //=============================================================================================================
@@ -76,14 +76,14 @@ struct UTILSSHARED_EXPORT PythonRunnerResult
  */
 struct UTILSSHARED_EXPORT PythonRunnerConfig
 {
-    QString       pythonExe = QStringLiteral("python3");  /**< Python interpreter path or command. */
-    QString       workingDir;                             /**< Working directory (empty = inherit). */
-    QStringList   extraEnv;                               /**< KEY=VALUE pairs appended to environment. */
-    int           timeoutMsec = -1;                       /**< Wall-clock timeout (-1 = no limit). */
-    bool          unbuffered  = true;                     /**< Pass -u to Python for unbuffered I/O. */
-    QString       venvDir;                                /**< Virtual-env directory (empty = no venv). */
-    QString       packageDir;                             /**< Directory containing pyproject.toml for `pip install <dir>` (preferred). */
-    QString       requirementsFile;                       /**< Fallback: path to requirements.txt for `pip install -r`. */
+    QString pythonExe = QStringLiteral("python3"); /**< Python interpreter path or command. */
+    QString workingDir;                            /**< Working directory (empty = inherit). */
+    QStringList extraEnv;                          /**< KEY=VALUE pairs appended to environment. */
+    int timeoutMsec = -1;                          /**< Wall-clock timeout (-1 = no limit). */
+    bool unbuffered = true;                        /**< Pass -u to Python for unbuffered I/O. */
+    QString venvDir;                               /**< Virtual-env directory (empty = no venv). */
+    QString packageDir;                            /**< Directory containing pyproject.toml for `pip install <dir>` (preferred). */
+    QString requirementsFile;                      /**< Fallback: path to requirements.txt for `pip install -r`. */
 };
 
 //=============================================================================================================
@@ -300,9 +300,9 @@ signals:
     void finished(const UTILSLIB::PythonRunnerResult& result);
 
 private:
-    PythonRunnerConfig      m_config;           /**< Current configuration.   */
-    PythonLineCallback      m_lineCb;           /**< Optional line callback.  */
-    PythonProgressCallback  m_progressCb;       /**< Optional progress callback. */
+    PythonRunnerConfig m_config;         /**< Current configuration.   */
+    PythonLineCallback m_lineCb;         /**< Optional line callback.  */
+    PythonProgressCallback m_progressCb; /**< Optional progress callback. */
 
     //=========================================================================================================
     /**

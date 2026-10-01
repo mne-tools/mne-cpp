@@ -30,7 +30,7 @@ QString locateToolBinary()
 {
     const QString appDir = QCoreApplication::applicationDirPath();
     const QStringList candidates = {
-    QStringLiteral(MNE_DOC_SHOTS_PATH),
+        QStringLiteral(MNE_DOC_SHOTS_PATH),
         appDir + QStringLiteral("/mne_doc_shots"),
 #ifdef Q_OS_MAC
         appDir + QStringLiteral("/mne_doc_shots.app/Contents/MacOS/mne_doc_shots"),
@@ -48,7 +48,7 @@ QString locateToolBinary()
     return QString();
 }
 
-}  // namespace
+} // namespace
 
 class TestDocShots : public QObject
 {
@@ -105,12 +105,12 @@ void TestDocShots::runsAndProducesPng()
         const QString stderrText = QString::fromLocal8Bit(p.readAllStandardError());
         // If the offscreen plugin isn't installed in this Qt build, skip
         // rather than fail — the tool relies on it.
-        if (stderrText.contains(QStringLiteral("offscreen"), Qt::CaseInsensitive)
-            && stderrText.contains(QStringLiteral("could not"), Qt::CaseInsensitive)) {
+        if (stderrText.contains(QStringLiteral("offscreen"), Qt::CaseInsensitive) && stderrText.contains(QStringLiteral("could not"), Qt::CaseInsensitive)) {
             QSKIP("Qt offscreen platform plugin not available in this build");
         }
         QFAIL(qPrintable(QStringLiteral("mne_doc_shots failed (exit %1): %2")
-                             .arg(p.exitCode()).arg(stderrText)));
+                             .arg(p.exitCode())
+                             .arg(stderrText)));
     }
 
     const QString pngPath = QDir(tmp.path()).absoluteFilePath("out/smoke.png");
@@ -160,15 +160,15 @@ void TestDocShots::runsMneInspectAppKind()
 
     if (p.exitStatus() != QProcess::NormalExit || p.exitCode() != 0) {
         const QString stderrText = QString::fromLocal8Bit(p.readAllStandardError());
-        if (stderrText.contains(QStringLiteral("offscreen"), Qt::CaseInsensitive)
-            && stderrText.contains(QStringLiteral("could not"), Qt::CaseInsensitive)) {
+        if (stderrText.contains(QStringLiteral("offscreen"), Qt::CaseInsensitive) && stderrText.contains(QStringLiteral("could not"), Qt::CaseInsensitive)) {
             QSKIP("Qt offscreen platform plugin not available in this build");
         }
         if (stderrText.contains(QStringLiteral("skipped"), Qt::CaseInsensitive)) {
             QSKIP(qPrintable(QStringLiteral("mne_inspect_app renderer skipped: %1").arg(stderrText)));
         }
         QFAIL(qPrintable(QStringLiteral("mne_doc_shots (mne_inspect_app) failed (exit %1): %2")
-                             .arg(p.exitCode()).arg(stderrText)));
+                             .arg(p.exitCode())
+                             .arg(stderrText)));
     }
 
     const QString pngPath = QDir(tmp.path()).absoluteFilePath("out/inspect-smoke.png");
@@ -228,15 +228,15 @@ void TestDocShots::runsMneAlignAppKind()
 
     if (p.exitStatus() != QProcess::NormalExit || p.exitCode() != 0) {
         const QString stderrText = QString::fromLocal8Bit(p.readAllStandardError());
-        if (stderrText.contains(QStringLiteral("offscreen"), Qt::CaseInsensitive)
-            && stderrText.contains(QStringLiteral("could not"), Qt::CaseInsensitive)) {
+        if (stderrText.contains(QStringLiteral("offscreen"), Qt::CaseInsensitive) && stderrText.contains(QStringLiteral("could not"), Qt::CaseInsensitive)) {
             QSKIP("Qt offscreen platform plugin not available in this build");
         }
         if (stderrText.contains(QStringLiteral("skipped"), Qt::CaseInsensitive)) {
             QSKIP(qPrintable(QStringLiteral("mne_align_app renderer skipped: %1").arg(stderrText)));
         }
         QFAIL(qPrintable(QStringLiteral("mne_doc_shots (mne_align_app) failed (exit %1): %2")
-                             .arg(p.exitCode()).arg(stderrText)));
+                             .arg(p.exitCode())
+                             .arg(stderrText)));
     }
 
     const QString pngPath = QDir(tmp.path()).absoluteFilePath("out/align-smoke.png");

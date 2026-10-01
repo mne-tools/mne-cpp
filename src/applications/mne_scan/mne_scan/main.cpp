@@ -100,10 +100,10 @@ Q_IMPORT_PLUGIN(TMSI)
  * @param[in] argv (argument vector) is an array of pointers to arrays of character objects. The array objects are null-terminated strings, representing the arguments that were entered on the command line when the program was started.
  * @return the value that was set to exit() (which is 0 if exit() is called via quit()).
  */
-int main(int argc, char *argv[])
+int main(int argc, char* argv[])
 {
-    // When building a static version of MNE Scan we have to init all resource (.qrc) files here manually
-    #ifdef STATICBUILD
+// When building a static version of MNE Scan we have to init all resource (.qrc) files here manually
+#ifdef STATICBUILD
     Q_INIT_RESOURCE(babymeg);
     Q_INIT_RESOURCE(fiffsimulator);
     Q_INIT_RESOURCE(covariance);
@@ -112,19 +112,19 @@ int main(int argc, char *argv[])
     Q_INIT_RESOURCE(averaging);
     Q_INIT_RESOURCE(writetofile);
     Q_INIT_RESOURCE(hpi);
-    #ifdef WITHBRAINAMP
+#ifdef WITHBRAINAMP
     Q_INIT_RESOURCE(brainamp);
-    #endif
-    #ifdef WITHEEGOSPORTS
+#endif
+#ifdef WITHEEGOSPORTS
     Q_INIT_RESOURCE(eegosports);
-    #endif
-    #ifdef WITHGUSBAMP
+#endif
+#ifdef WITHGUSBAMP
     Q_INIT_RESOURCE(gusbamp);
-    #endif
-    #ifdef WITHTMSI
+#endif
+#ifdef WITHTMSI
     Q_INIT_RESOURCE(tmsi);
-    #endif
-    #endif
+#endif
+#endif
 
     qInstallMessageHandler(UTILSLIB::MNELogger::customLogWriter);
 
@@ -137,7 +137,7 @@ int main(int argc, char *argv[])
     // Set default font
     int id = QFontDatabase::addApplicationFont(":/fonts/Roboto-Light.ttf");
 
-    if(id != -1){
+    if (id != -1) {
         app.setFont(QFont(QFontDatabase::applicationFontFamilies(id).at(0)));
     }
 
@@ -153,9 +153,9 @@ int main(int argc, char *argv[])
     // be lost.
     //
     const QString sLogDir = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
-    if(!sLogDir.isEmpty() && QDir().mkpath(sLogDir)) {
+    if (!sLogDir.isEmpty() && QDir().mkpath(sLogDir)) {
         const QString sLogFile = sLogDir + "/mne_scan.log";
-        if(UTILSLIB::MNELogger::setLogFile(sLogFile)) {
+        if (UTILSLIB::MNELogger::setLogFile(sLogFile)) {
             qInfo() << "Logging to" << sLogFile;
         } else {
             qWarning() << "Could not open log file" << sLogFile << "- logging to console only.";

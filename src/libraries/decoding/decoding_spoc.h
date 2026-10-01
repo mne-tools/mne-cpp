@@ -58,7 +58,8 @@
 // DEFINE NAMESPACE DECODINGLIB
 //=============================================================================================================
 
-namespace DECODINGLIB{
+namespace DECODINGLIB
+{
 
 //=============================================================================================================
 /**
@@ -93,9 +94,10 @@ public:
     /**
      * Transform mode for the SPoC output.
      */
-    enum class TransformMode {
-        AveragePower,   /**< Return average band power per component. */
-        CspSpace        /**< Return data projected into SPoC space. */
+    enum class TransformMode
+    {
+        AveragePower, /**< Return average band power per component. */
+        CspSpace      /**< Return data projected into SPoC space. */
     };
 
     //=========================================================================================================

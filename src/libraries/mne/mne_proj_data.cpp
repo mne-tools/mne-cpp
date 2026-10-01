@@ -40,11 +40,11 @@ MNEProjData::MNEProjData(const MNELIB::MNESurface* s)
 
     const MNETriangle* tri = s->tris.data();
     for (int k = 0; k < s->ntri; k++, tri++) {
-      a[k] =  tri->r12.dot(tri->r12);
-      b[k] =  tri->r13.dot(tri->r13);
-      c[k] =  tri->r12.dot(tri->r13);
+        a[k] = tri->r12.dot(tri->r12);
+        b[k] = tri->r13.dot(tri->r13);
+        c[k] = tri->r12.dot(tri->r13);
 
-      act[k] = 1;
+        act[k] = 1;
     }
     nactive = s->ntri;
 }

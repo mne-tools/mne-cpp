@@ -35,8 +35,8 @@ using namespace DISPLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-OverviewBarWidget::OverviewBarWidget(QWidget *parent)
-    : QWidget(parent)
+OverviewBarWidget::OverviewBarWidget(QWidget* parent)
+: QWidget(parent)
 {
     setFixedHeight(kBarHeight);
     setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
@@ -59,7 +59,7 @@ QSize OverviewBarWidget::minimumSizeHint() const
 
 //=============================================================================================================
 
-void OverviewBarWidget::setModel(ChannelDataModel *model)
+void OverviewBarWidget::setModel(ChannelDataModel* model)
 {
     m_model = model;
     m_envelopeDirty = true;
@@ -103,7 +103,7 @@ void OverviewBarWidget::setViewport(float scrollSample, float visibleSamples)
 
 //=============================================================================================================
 
-void OverviewBarWidget::setEvents(const QVector<ChannelRhiView::EventMarker> &events)
+void OverviewBarWidget::setEvents(const QVector<ChannelRhiView::EventMarker>& events)
 {
     m_events = events;
     update();
@@ -111,7 +111,7 @@ void OverviewBarWidget::setEvents(const QVector<ChannelRhiView::EventMarker> &ev
 
 //=============================================================================================================
 
-void OverviewBarWidget::setAnnotations(const QVector<ChannelRhiView::AnnotationSpan> &annotations)
+void OverviewBarWidget::setAnnotations(const QVector<ChannelRhiView::AnnotationSpan>& annotations)
 {
     m_annotations = annotations;
     update();
@@ -156,9 +156,10 @@ void OverviewBarWidget::rebuildEnvelope()
     }
 
     // Group channels by type and compute a per-pixel RMS envelope for each type
-    struct TypeEnvelope {
+    struct TypeEnvelope
+    {
         QString typeLabel;
-        QColor  color;
+        QColor color;
         QVector<float> envelope; // per-pixel RMS, size = pw
     };
     QVector<TypeEnvelope> typeEnvelopes;
@@ -190,12 +191,14 @@ void OverviewBarWidget::rebuildEnvelope()
         for (int ch = 0; ch < nChannels; ++ch) {
             auto info = m_model->channelInfo(ch);
             int ti = typeIndex.value(info.typeLabel, -1);
-            if (ti < 0) continue;
+            if (ti < 0)
+                continue;
 
             float maxAbs = 0.f;
             for (int s = sampleStart; s < sampleEnd; s += step) {
                 float v = qAbs(m_model->sampleValueAt(ch, s));
-                if (v > maxAbs) maxAbs = v;
+                if (v > maxAbs)
+                    maxAbs = v;
             }
             // Normalise by amplitude scale
             float norm = (info.amplitudeMax > 0.f) ? maxAbs / info.amplitudeMax : 0.f;
@@ -209,7 +212,7 @@ void OverviewBarWidget::rebuildEnvelope()
     const float laneH = static_cast<float>(ph) / qMax(nTypes, 1);
 
     for (int ti = 0; ti < nTypes; ++ti) {
-        const auto &te = typeEnvelopes[ti];
+        const auto& te = typeEnvelopes[ti];
         QColor fillColor = te.color;
         fillColor.setAlpha(160);
         p.setPen(Qt::NoPen);
@@ -218,7 +221,8 @@ void OverviewBarWidget::rebuildEnvelope()
         for (int x = 0; x < pw; ++x) {
             float level = qBound(0.f, te.envelope[x], 1.f);
             float barH = level * laneH * 0.9f;
-            if (barH < 0.5f) continue;
+            if (barH < 0.5f)
+                continue;
             p.fillRect(QRectF(x, yBase - barH, 1.f, barH), fillColor);
         }
 
@@ -236,7 +240,7 @@ void OverviewBarWidget::rebuildEnvelope()
 
 //=============================================================================================================
 
-void OverviewBarWidget::paintEvent(QPaintEvent *)
+void OverviewBarWidget::paintEvent(QPaintEvent*)
 {
     QPainter p(this);
     p.setRenderHint(QPainter::Antialiasing, false);
@@ -265,7 +269,7 @@ void OverviewBarWidget::paintEvent(QPaintEvent *)
     float samplesPerPx = static_cast<float>(totalSamples) / static_cast<float>(pw);
 
     // ── Annotation spans ────────────────────────────────────────────
-    for (const auto &ann : m_annotations) {
+    for (const auto& ann : m_annotations) {
         float xStart = static_cast<float>(ann.startSample - m_firstFileSample) / samplesPerPx;
         float xEnd = static_cast<float>(ann.endSample - m_firstFileSample) / samplesPerPx;
         xStart = qBound(0.f, xStart, static_cast<float>(pw));
@@ -278,7 +282,7 @@ void OverviewBarWidget::paintEvent(QPaintEvent *)
     }
 
     // ── Event markers ───────────────────────────────────────────────
-    for (const auto &ev : m_events) {
+    for (const auto& ev : m_events) {
         float xF = static_cast<float>(ev.sample - m_firstFileSample) / samplesPerPx;
         if (xF < 0.f || xF > pw)
             continue;
@@ -311,7 +315,7 @@ void OverviewBarWidget::paintEvent(QPaintEvent *)
 
 //=============================================================================================================
 
-void OverviewBarWidget::mousePressEvent(QMouseEvent *event)
+void OverviewBarWidget::mousePressEvent(QMouseEvent* event)
 {
     if (event->button() == Qt::LeftButton) {
         m_dragging = true;
@@ -323,7 +327,7 @@ void OverviewBarWidget::mousePressEvent(QMouseEvent *event)
 
 //=============================================================================================================
 
-void OverviewBarWidget::mouseMoveEvent(QMouseEvent *event)
+void OverviewBarWidget::mouseMoveEvent(QMouseEvent* event)
 {
     if (m_dragging) {
         float targetSample = xToSample(event->position().toPoint().x()) - m_visibleSamples * 0.5f;
@@ -334,7 +338,7 @@ void OverviewBarWidget::mouseMoveEvent(QMouseEvent *event)
 
 //=============================================================================================================
 
-void OverviewBarWidget::mouseReleaseEvent(QMouseEvent *event)
+void OverviewBarWidget::mouseReleaseEvent(QMouseEvent* event)
 {
     if (event->button() == Qt::LeftButton) {
         m_dragging = false;

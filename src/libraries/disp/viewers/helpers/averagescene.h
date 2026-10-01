@@ -66,8 +66,8 @@ class DISPSHARED_EXPORT AverageScene : public LayoutScene
     Q_OBJECT
 
 public:
-    typedef QSharedPointer<AverageScene> SPtr;              /**< Shared pointer type for AverageScene. */
-    typedef QSharedPointer<const AverageScene> ConstSPtr;   /**< Const shared pointer type for AverageScene. */
+    typedef QSharedPointer<AverageScene> SPtr;            /**< Shared pointer type for AverageScene. */
+    typedef QSharedPointer<const AverageScene> ConstSPtr; /**< Const shared pointer type for AverageScene. */
 
     //=========================================================================================================
     /**
@@ -76,7 +76,7 @@ public:
      * @param[in] view    Graphics view that displays this scene.
      * @param[in] parent  Parent QObject (default 0).
      */
-    explicit AverageScene(QGraphicsView* view, QObject *parent = 0);
+    explicit AverageScene(QGraphicsView* view, QObject* parent = 0);
 
     //=========================================================================================================
     /**
@@ -84,7 +84,7 @@ public:
      *
      * @param[in] scaleMap map with all channel types and their current scaling value.
      */
-    void setScaleMap(const QMap<qint32, float> &scaleMap);
+    void setScaleMap(const QMap<qint32, float>& scaleMap);
 
     //=========================================================================================================
     /**
@@ -92,7 +92,7 @@ public:
      *
      *  @param[in] selectedChannelItems    items which are to painted to the average scene
      */
-    void repaintItems(const QList<QGraphicsItem*> &selectedChannelItems);
+    void repaintItems(const QList<QGraphicsItem*>& selectedChannelItems);
 
     //=========================================================================================================
     /**
@@ -100,7 +100,7 @@ public:
      *
      * @param[in] selectedChannelItems     data about items which are to be painted.
      */
-    void repaintSelectionItems(const DISPLIB::SelectionItem &selectedChannelItems);
+    void repaintSelectionItems(const DISPLIB::SelectionItem& selectedChannelItems);
 
     //=========================================================================================================
     /**
@@ -114,7 +114,7 @@ public:
      *
      * @param[in] qMapActivationPerAverage     The average activation information.
      */
-    void setActivationPerAverage(const QSharedPointer<QMap<QString, bool> > qMapActivationPerAverage);
+    void setActivationPerAverage(const QSharedPointer<QMap<QString, bool>> qMapActivationPerAverage);
 
     //=========================================================================================================
     /**
@@ -122,7 +122,7 @@ public:
      *
      * @param[in] qMapAverageColor     The average color information.
      */
-    void setColorPerAverage(const QSharedPointer<QMap<QString, QColor> > qMapAverageColor);
+    void setColorPerAverage(const QSharedPointer<QMap<QString, QColor>> qMapAverageColor);
 
     //=========================================================================================================
     /**
@@ -138,13 +138,13 @@ public:
      *
      * @param[in] signalColor New signal color.
      */
-    void setSignalItemColor(const QColor &signalColor);
+    void setSignalItemColor(const QColor& signalColor);
 
 private:
-    QColor                          m_colGlobalItemSignalColor;     /**< The color used in all items to draw the signals.*/
-    QMap<qint32, float>             m_qMapChScaling;                /**< Stored scale map applied to newly created items.*/
+    QColor m_colGlobalItemSignalColor;   /**< The color used in all items to draw the signals.*/
+    QMap<qint32, float> m_qMapChScaling; /**< Stored scale map applied to newly created items.*/
 
-    QList<SelectionSceneItem*>      m_lSelectedChannelItems;        /**< Holds the selected channels from the selection manager.*/
+    QList<SelectionSceneItem*> m_lSelectedChannelItems; /**< Holds the selected channels from the selection manager.*/
 };
 } // NAMESPACE DISPLIB
 

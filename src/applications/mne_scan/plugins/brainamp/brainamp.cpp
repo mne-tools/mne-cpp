@@ -59,7 +59,7 @@ using namespace Eigen;
 
 BrainAMP::BrainAMP()
 : m_pRMTSA_BrainAMP(0)
-, m_qStringResourcePath(qApp->applicationDirPath()+"/../resources/mne_scan/plugins/brainamp/")
+, m_qStringResourcePath(qApp->applicationDirPath() + "/../resources/mne_scan/plugins/brainamp/")
 , m_pBrainAMPProducer(new BrainAMPProducer(this))
 , m_dLPAShift(0.01)
 , m_dRPAShift(0.01)
@@ -85,8 +85,8 @@ BrainAMP::~BrainAMP()
     //std::cout << "BrainAMP::~BrainAMP() " << std::endl;
 
     //If the program is closed while the sampling is in process
-    if(this->isRunning()) {
-        this->stop();    
+    if (this->isRunning()) {
+        this->stop();
     }
 }
 
@@ -103,7 +103,7 @@ QSharedPointer<AbstractPlugin> BrainAMP::clone() const
 void BrainAMP::init()
 {
     m_pRMTSA_BrainAMP = PluginOutputData<RealTimeMultiSampleArray>::create(this, "BrainAMP", "EEG output data");
-    m_pRMTSA_BrainAMP->measurementData()->setName(this->getName());//Provide name to auto store widget settings
+    m_pRMTSA_BrainAMP->measurementData()->setName(this->getName()); //Provide name to auto store widget settings
 
     m_outputConnectors.append(m_pRMTSA_BrainAMP);
 
@@ -151,7 +151,7 @@ void BrainAMP::setUpFiffInfo()
     m_pFiffInfo->nchan = 33;
     m_pFiffInfo->sfreq = m_iSamplingFreq;
     m_pFiffInfo->highpass = (float)0.001;
-    m_pFiffInfo->lowpass = m_iSamplingFreq/2;
+    m_pFiffInfo->lowpass = m_iSamplingFreq / 2;
 
     //
     //Set up the channel info
@@ -159,22 +159,20 @@ void BrainAMP::setUpFiffInfo()
     QStringList QSLChNames;
     m_pFiffInfo->chs.clear();
 
-    for(int i = 0; i < m_pFiffInfo->nchan; ++i)
-    {
+    for (int i = 0; i < m_pFiffInfo->nchan; ++i) {
         //Create information for each channel
         QString sChType;
         FiffChInfo fChInfo;
 
         //EEG Channels
-        if(i <= m_pFiffInfo->nchan-2)
-        {
+        if (i <= m_pFiffInfo->nchan - 2) {
             //Set channel name
             sChType = QString("EEG ");
-            if(i<10) {
+            if (i < 10) {
                 sChType.append("00");
             }
 
-            if(i>=10 && i<100) {
+            if (i >= 10 && i < 100) {
                 sChType.append("0");
             }
 
@@ -194,14 +192,14 @@ void BrainAMP::setUpFiffInfo()
             fChInfo.unit_mul = 0;
 
             //Set EEG electrode location - Convert from mm to m
-            fChInfo.eeg_loc(0,0) = 0;
-            fChInfo.eeg_loc(1,0) = 0;
-            fChInfo.eeg_loc(2,0) = 0;
+            fChInfo.eeg_loc(0, 0) = 0;
+            fChInfo.eeg_loc(1, 0) = 0;
+            fChInfo.eeg_loc(2, 0) = 0;
 
             //Set EEG electrode direction - Convert from mm to m
-            fChInfo.eeg_loc(0,1) = 0;
-            fChInfo.eeg_loc(1,1) = 0;
-            fChInfo.eeg_loc(2,1) = 0;
+            fChInfo.eeg_loc(0, 1) = 0;
+            fChInfo.eeg_loc(1, 1) = 0;
+            fChInfo.eeg_loc(2, 1) = 0;
 
             //Also write the eeg electrode locations into the meg loc variable (mne_ex_read_raw() matlab function wants this)
             fChInfo.chpos.r0(0) = 0;
@@ -222,8 +220,7 @@ void BrainAMP::setUpFiffInfo()
         }
 
         //Digital input channel
-        if(i == m_pFiffInfo->nchan-1)
-        {
+        if (i == m_pFiffInfo->nchan - 1) {
             //Set channel type
             fChInfo.kind = FIFFV_STIM_CH;
 
@@ -263,7 +260,7 @@ bool BrainAMP::start()
     m_pBrainAMPProducer->start(m_iSamplesPerBlock,
                                m_iSamplingFreq);
 
-    if(m_pBrainAMPProducer->isRunning()) {
+    if (m_pBrainAMPProducer->isRunning()) {
         QThread::start();
         return true;
     } else {
@@ -306,9 +303,9 @@ bool BrainAMP::stop()
 
 //=============================================================================================================
 
-void BrainAMP::setSampleData(MatrixXd &matData)
+void BrainAMP::setSampleData(MatrixXd& matData)
 {
-    while(!m_pCircularBuffer->push(matData)) {
+    while (!m_pCircularBuffer->push(matData)) {
         //Do nothing until the circular buffer is ready to accept new data again
     }
 }
@@ -331,7 +328,7 @@ QString BrainAMP::getName() const
 
 QWidget* BrainAMP::setupWidget()
 {
-    BrainAMPSetupWidget* widget = new BrainAMPSetupWidget(this);//widget is later destroyed by CentralWidget - so it has to be created everytime new
+    BrainAMPSetupWidget* widget = new BrainAMPSetupWidget(this); //widget is later destroyed by CentralWidget - so it has to be created everytime new
 
     //init properties dialog
     widget->initGui();
@@ -358,13 +355,13 @@ void BrainAMP::run()
 {
     MatrixXd matData;
 
-    while(!isInterruptionRequested()) {
-        if(m_pBrainAMPProducer->isRunning()) {
+    while (!isInterruptionRequested()) {
+        if (m_pBrainAMPProducer->isRunning()) {
             //pop matrix
-            if(m_pCircularBuffer->pop(matData)) {
+            if (m_pCircularBuffer->pop(matData)) {
                 //emit values to real time multi sample array
                 m_pRMTSA_BrainAMP->measurementData()->setValue(matData);
-            }       
+            }
         }
     }
 }
@@ -374,14 +371,14 @@ void BrainAMP::run()
 void BrainAMP::showSetupProjectDialog()
 {
     // Open setup project widget
-    if(m_pBrainAMPSetupProjectWidget == Q_NULLPTR) {
+    if (m_pBrainAMPSetupProjectWidget == Q_NULLPTR) {
         m_pBrainAMPSetupProjectWidget = QSharedPointer<BrainAMPSetupProjectWidget>(new BrainAMPSetupProjectWidget(this));
 
         connect(m_pBrainAMPSetupProjectWidget.data(), &BrainAMPSetupProjectWidget::cardinalPointsChanged,
                 this, &BrainAMP::onUpdateCardinalPoints);
     }
 
-    if(!m_pBrainAMPSetupProjectWidget->isVisible()) {
+    if (!m_pBrainAMPSetupProjectWidget->isVisible()) {
         m_pBrainAMPSetupProjectWidget->setWindowTitle("BrainAMP EEG Connector - Setup project");
         m_pBrainAMPSetupProjectWidget->show();
         m_pBrainAMPSetupProjectWidget->raise();
@@ -392,5 +389,5 @@ void BrainAMP::showSetupProjectDialog()
 
 QString BrainAMP::getBuildInfo()
 {
-    return QString(BRAINAMPPLUGIN::buildDateTime()) + QString(" - ")  + QString(BRAINAMPPLUGIN::buildHash());
+    return QString(BRAINAMPPLUGIN::buildDateTime()) + QString(" - ") + QString(BRAINAMPPLUGIN::buildHash());
 }

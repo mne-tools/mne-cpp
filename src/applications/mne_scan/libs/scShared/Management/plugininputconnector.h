@@ -48,8 +48,8 @@ class SCSHAREDSHARED_EXPORT PluginInputConnector : public PluginConnector
     Q_OBJECT
 
 public:
-    typedef QSharedPointer<PluginInputConnector> SPtr;               /**< Shared pointer type for PluginInputConnector. */
-    typedef QSharedPointer<const PluginInputConnector> ConstSPtr;    /**< Const shared pointer type for PluginInputConnector. */
+    typedef QSharedPointer<PluginInputConnector> SPtr;            /**< Shared pointer type for PluginInputConnector. */
+    typedef QSharedPointer<const PluginInputConnector> ConstSPtr; /**< Const shared pointer type for PluginInputConnector. */
 
     //=========================================================================================================
     /**
@@ -59,15 +59,17 @@ public:
      * @param[in] name       connection name.
      * @param[in] descr      connection description.
      */
-    PluginInputConnector(AbstractPlugin *parent,
-                         const QString &name,
-                         const QString &descr);
+    PluginInputConnector(AbstractPlugin* parent,
+                         const QString& name,
+                         const QString& descr);
 
     //=========================================================================================================
     /**
      * Destructor
      */
-    virtual ~PluginInputConnector(){}
+    virtual ~PluginInputConnector()
+    {
+    }
 
     //=========================================================================================================
     /**
@@ -90,7 +92,6 @@ signals:
 
 public slots:
     void update(SCMEASLIB::Measurement::SPtr pMeasurement);
-
 };
 } // NAMESPACE
 

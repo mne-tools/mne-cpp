@@ -126,12 +126,12 @@ private:
     /** Write a QByteArray to a file. */
     bool writeToFile(const QString& path, const QByteArray& data);
 
-    bool m_bDataAvailable;      /**< Whether sample data is found. */
-    QString m_sSubjectsDir;     /**< Path to subjects dir. */
-    QString m_sMriDir;          /**< Path to sample/mri/. */
-    MriVolData m_volT1;         /**< Loaded T1 volume (populated in initTestCase). */
-    QVector<FiffCoordTrans> m_transT1;  /**< Additional transforms from T1. */
-    QTemporaryDir m_tempDir;    /**< Temporary directory for output files. */
+    bool m_bDataAvailable;             /**< Whether sample data is found. */
+    QString m_sSubjectsDir;            /**< Path to subjects dir. */
+    QString m_sMriDir;                 /**< Path to sample/mri/. */
+    MriVolData m_volT1;                /**< Loaded T1 volume (populated in initTestCase). */
+    QVector<FiffCoordTrans> m_transT1; /**< Additional transforms from T1. */
+    QTemporaryDir m_tempDir;           /**< Temporary directory for output files. */
 };
 
 //=============================================================================================================
@@ -156,19 +156,19 @@ QByteArray TestMriIO::createSyntheticMgh(int width, int height, int depth, int t
     // Header (7 × int32 + 1 × int16 = 30 bytes)
     stream << qint32(MRI_MGH_VERSION)
            << qint32(width) << qint32(height) << qint32(depth)
-           << qint32(1)       // nframes
+           << qint32(1) // nframes
            << qint32(type)
-           << qint32(0);      // dof
+           << qint32(0); // dof
 
     if (setRas) {
-        stream << qint16(1);  // goodRASflag
-        stream << 1.0f << 1.0f << 1.0f;            // xsize, ysize, zsize
-        stream << -1.0f << 0.0f << 0.0f;           // x_ras
-        stream <<  0.0f << 0.0f << -1.0f;          // y_ras
-        stream <<  0.0f << 1.0f <<  0.0f;          // z_ras
-        stream <<  0.0f << 0.0f <<  0.0f;          // c_ras
+        stream << qint16(1);             // goodRASflag
+        stream << 1.0f << 1.0f << 1.0f;  // xsize, ysize, zsize
+        stream << -1.0f << 0.0f << 0.0f; // x_ras
+        stream << 0.0f << 0.0f << -1.0f; // y_ras
+        stream << 0.0f << 1.0f << 0.0f;  // z_ras
+        stream << 0.0f << 0.0f << 0.0f;  // c_ras
     } else {
-        stream << qint16(0);  // goodRASflag
+        stream << qint16(0); // goodRASflag
     }
 
     // Pad header to 284 bytes
@@ -181,11 +181,21 @@ QByteArray TestMriIO::createSyntheticMgh(int width, int height, int depth, int t
     int nVoxels = width * height * depth;
     for (int i = 0; i < nVoxels; ++i) {
         switch (type) {
-            case MRI_UCHAR: stream << quint8(i % 256); break;
-            case MRI_SHORT: stream << qint16(i % 1000); break;
-            case MRI_INT:   stream << qint32(i); break;
-            case MRI_FLOAT: stream << float(i * 0.5f); break;
-            default:        stream << quint8(0); break;
+            case MRI_UCHAR:
+                stream << quint8(i % 256);
+                break;
+            case MRI_SHORT:
+                stream << qint16(i % 1000);
+                break;
+            case MRI_INT:
+                stream << qint32(i);
+                break;
+            case MRI_FLOAT:
+                stream << float(i * 0.5f);
+                break;
+            default:
+                stream << quint8(0);
+                break;
         }
     }
 
@@ -370,8 +380,8 @@ void TestMriIO::testVolDataComputeVox2Ras_identity()
 
     // The diagonal should be (-0.001, 0, 0) for x, etc. (1mm / 1000)
     float eps = 1e-6f;
-    QVERIFY(std::abs(vox2ras(0, 0) - (-0.001f)) < eps);  // x_ras[0]*xsize/1000
-    QVERIFY(std::abs(vox2ras(1, 2) - (0.001f)) < eps);   // z_ras[1]*zsize/1000
+    QVERIFY(std::abs(vox2ras(0, 0) - (-0.001f)) < eps); // x_ras[0]*xsize/1000
+    QVERIFY(std::abs(vox2ras(1, 2) - (0.001f)) < eps);  // z_ras[1]*zsize/1000
 
     // P0 = c_ras - M * center = 0 - M * 128
     // P0_x = 0 - (-0.001)*128 = 0.128
@@ -431,8 +441,8 @@ void TestMriIO::testMghReadT1()
     QCOMPARE(m_volT1.slices.size(), 256);
 
     // Verify scan parameters were parsed from footer
-    QVERIFY(m_volT1.TR > 0.0f);           // T1 MPRAGE has non-zero TR
-    QVERIFY(m_volT1.flipAngle > 0.0f);    // Non-zero flip angle
+    QVERIFY(m_volT1.TR > 0.0f);        // T1 MPRAGE has non-zero TR
+    QVERIFY(m_volT1.flipAngle > 0.0f); // Non-zero flip angle
 }
 
 //=============================================================================================================
@@ -474,15 +484,9 @@ void TestMriIO::testMghHeaderGeometry()
     }
 
     // Verify direction cosines are valid unit vectors
-    float lenX = std::sqrt(m_volT1.x_ras[0] * m_volT1.x_ras[0]
-                         + m_volT1.x_ras[1] * m_volT1.x_ras[1]
-                         + m_volT1.x_ras[2] * m_volT1.x_ras[2]);
-    float lenY = std::sqrt(m_volT1.y_ras[0] * m_volT1.y_ras[0]
-                         + m_volT1.y_ras[1] * m_volT1.y_ras[1]
-                         + m_volT1.y_ras[2] * m_volT1.y_ras[2]);
-    float lenZ = std::sqrt(m_volT1.z_ras[0] * m_volT1.z_ras[0]
-                         + m_volT1.z_ras[1] * m_volT1.z_ras[1]
-                         + m_volT1.z_ras[2] * m_volT1.z_ras[2]);
+    float lenX = std::sqrt(m_volT1.x_ras[0] * m_volT1.x_ras[0] + m_volT1.x_ras[1] * m_volT1.x_ras[1] + m_volT1.x_ras[2] * m_volT1.x_ras[2]);
+    float lenY = std::sqrt(m_volT1.y_ras[0] * m_volT1.y_ras[0] + m_volT1.y_ras[1] * m_volT1.y_ras[1] + m_volT1.y_ras[2] * m_volT1.y_ras[2]);
+    float lenZ = std::sqrt(m_volT1.z_ras[0] * m_volT1.z_ras[0] + m_volT1.z_ras[1] * m_volT1.z_ras[1] + m_volT1.z_ras[2] * m_volT1.z_ras[2]);
 
     float eps = 1e-5f;
     QVERIFY(std::abs(lenX - 1.0f) < eps);
@@ -528,7 +532,7 @@ void TestMriIO::testMghSliceTransforms()
                   m_volT1.slices[255].trans.trans(1, 3),
                   m_volT1.slices[255].trans.trans(2, 3));
     float dist = (t255 - t0).norm();
-    QVERIFY(dist > 0.01f);  // Should be ~0.255 m (255 × 1mm)
+    QVERIFY(dist > 0.01f); // Should be ~0.255 m (255 × 1mm)
 }
 
 //=============================================================================================================
@@ -588,8 +592,8 @@ void TestMriIO::testCorFifWriteRead()
 
     // Verify file size is reasonable (256 slices × 256×256 bytes + overhead ≈ 16MB)
     QFileInfo fi(corFifPath);
-    QVERIFY(fi.size() > 10 * 1024 * 1024);  // > 10 MB
-    QVERIFY(fi.size() < 30 * 1024 * 1024);  // < 30 MB
+    QVERIFY(fi.size() > 10 * 1024 * 1024); // > 10 MB
+    QVERIFY(fi.size() < 30 * 1024 * 1024); // < 30 MB
 
     // Read back and verify FIFF structure
     QFile file(corFifPath);
@@ -607,13 +611,17 @@ void TestMriIO::testCorFifWriteRead()
     stream->device()->seek(0);
     while (!stream->device()->atEnd()) {
         stream->read_tag(tag);
-        if (!tag) break;
+        if (!tag)
+            break;
 
         if (tag->kind == FIFF_BLOCK_START) {
             fiff_int_t blockKind = *tag->toInt();
-            if (blockKind == FIFFB_MRI) foundMriBlock = true;
-            if (blockKind == FIFFB_MRI_SET) foundMriSet = true;
-            if (blockKind == FIFFB_MRI_SLICE) sliceCount++;
+            if (blockKind == FIFFB_MRI)
+                foundMriBlock = true;
+            if (blockKind == FIFFB_MRI_SET)
+                foundMriSet = true;
+            if (blockKind == FIFFB_MRI_SLICE)
+                sliceCount++;
         }
     }
 
@@ -767,7 +775,7 @@ void TestMriIO::testMghFooterScanParams()
 {
     // Create MGH with footer containing scan parameters
     float testTR = 2300.0f;
-    float testFlip = 0.1396f;  // ~8 degrees in radians
+    float testFlip = 0.1396f; // ~8 degrees in radians
     float testTE = 2.98f;
     float testTI = 900.0f;
     float testFoV = 256.0f;
@@ -804,8 +812,8 @@ void TestMriIO::testMghFooterTalairachTag()
     QByteArray xfmPath = "talairach.xfm";
     QDataStream tagStream(&mghData, QIODevice::Append);
     tagStream.setByteOrder(QDataStream::BigEndian);
-    tagStream << qint32(MGH_TAG_MGH_XFORM);  // tag type
-    tagStream << qint64(xfmPath.size());       // tag length (int64 for new tags)
+    tagStream << qint32(MGH_TAG_MGH_XFORM); // tag type
+    tagStream << qint64(xfmPath.size());    // tag length (int64 for new tags)
     tagStream.writeRawData(xfmPath.constData(), xfmPath.size());
 
     QString path = m_tempDir.path() + "/synth_xfm.mgh";
@@ -855,9 +863,11 @@ void TestMriIO::testMghUnsupportedDataType()
            << qint32(1) << qint32(MRI_BITMAP) << qint32(0);
     stream << qint16(0);
     // Pad header
-    for (int i = data.size(); i < MRI_MGH_DATA_OFFSET; ++i) stream << quint8(0);
+    for (int i = data.size(); i < MRI_MGH_DATA_OFFSET; ++i)
+        stream << quint8(0);
     // Write some dummy voxel data (1 byte per voxel for bitmap)
-    for (int i = 0; i < 4 * 4 * 2; ++i) stream << quint8(0);
+    for (int i = 0; i < 4 * 4 * 2; ++i)
+        stream << quint8(0);
 
     QString path = m_tempDir.path() + "/synth_bitmap.mgh";
     QVERIFY(writeToFile(path, data));
@@ -865,7 +875,7 @@ void TestMriIO::testMghUnsupportedDataType()
     MriVolData vol;
     QVector<FiffCoordTrans> trans;
     bool ok = MriMghIO::read(path, vol, trans);
-    QVERIFY(!ok);  // Should fail for unsupported type
+    QVERIFY(!ok); // Should fail for unsupported type
 }
 
 //=============================================================================================================
@@ -948,10 +958,12 @@ void TestMriIO::testCorFifWriteReadSynthetic()
     stream->device()->seek(0);
     while (!stream->device()->atEnd()) {
         stream->read_tag(tag);
-        if (!tag) break;
+        if (!tag)
+            break;
         if (tag->kind == FIFF_BLOCK_START) {
             fiff_int_t blockKind = *tag->toInt();
-            if (blockKind == FIFFB_MRI_SLICE) sliceCount++;
+            if (blockKind == FIFFB_MRI_SLICE)
+                sliceCount++;
         }
     }
     QCOMPARE(sliceCount, 3);

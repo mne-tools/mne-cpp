@@ -40,7 +40,7 @@ using namespace MNEBROWSE;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-NoiseReductionWindow::NoiseReductionWindow(QWidget *parent)
+NoiseReductionWindow::NoiseReductionWindow(QWidget* parent)
 : QDockWidget(parent)
 , ui(new Ui::NoiseReductionWindow)
 , m_enableDisableProjectors(Q_NULLPTR)
@@ -52,7 +52,7 @@ NoiseReductionWindow::NoiseReductionWindow(QWidget *parent)
 
 //*************************************************************************************************************
 
-NoiseReductionWindow::NoiseReductionWindow(QWidget *parent, FiffInfo* pFiffInfo)
+NoiseReductionWindow::NoiseReductionWindow(QWidget* parent, FiffInfo* pFiffInfo)
 : QDockWidget(parent)
 , ui(new Ui::NoiseReductionWindow)
 , m_pFiffInfo(pFiffInfo)
@@ -79,13 +79,13 @@ void NoiseReductionWindow::setFiffInfo(FiffInfo::SPtr& pFiffInfo)
 
 void NoiseReductionWindow::toggleAllProjectors()
 {
-    if(!m_pFiffInfo || m_qListProjCheckBox.isEmpty())
+    if (!m_pFiffInfo || m_qListProjCheckBox.isEmpty())
         return;
 
     // Determine new state: if all are on, turn all off; otherwise turn all on
     bool allOn = true;
-    for(int i = 0; i < m_qListProjCheckBox.size(); ++i) {
-        if(!m_qListProjCheckBox[i]->isChecked()) {
+    for (int i = 0; i < m_qListProjCheckBox.size(); ++i) {
+        if (!m_qListProjCheckBox[i]->isChecked()) {
             allOn = false;
             break;
         }
@@ -98,28 +98,25 @@ void NoiseReductionWindow::toggleAllProjectors()
 
 void NoiseReductionWindow::createProjectorGroup()
 {
-    if(m_pFiffInfo)
-    {
-        if(ui->m_groupBox_projections->layout() != 0)
+    if (m_pFiffInfo) {
+        if (ui->m_groupBox_projections->layout() != 0)
             this->remove(ui->m_groupBox_projections->layout());
 
         m_qListProjCheckBox.clear();
 
         // Projection Selection
-        QGridLayout *topLayout = new QGridLayout;
+        QGridLayout* topLayout = new QGridLayout;
 
-        if(!m_pFiffInfo->projs.isEmpty())
-        {
+        if (!m_pFiffInfo->projs.isEmpty()) {
             bool bAllActivated = true;
 
-            qint32 i=0;
+            qint32 i = 0;
 
-            for(; i < m_pFiffInfo->projs.size(); ++i)
-            {
+            for (; i < m_pFiffInfo->projs.size(); ++i) {
                 QCheckBox* checkBox = new QCheckBox(m_pFiffInfo->projs[i].desc);
                 checkBox->setChecked(m_pFiffInfo->projs[i].active);
 
-                if(m_pFiffInfo->projs[i].active == false)
+                if (m_pFiffInfo->projs[i].active == false)
                     bAllActivated = false;
 
                 m_qListProjCheckBox.append(checkBox);
@@ -129,26 +126,25 @@ void NoiseReductionWindow::createProjectorGroup()
 
                 topLayout->addWidget(checkBox, i, 0); //+2 because we already added two widgets before the first projector check box
 
-    //            if(i>m_pFiffInfo->projs.size()/2)
-    //                topLayout->addWidget(checkBox, i-rowCount, 1); //+2 because we already added two widgets before the first projector check box
-    //            else {
-    //                topLayout->addWidget(checkBox, i, 0); //+2 because we already added two widgets before the first projector check box
-    //                rowCount++;
-    //            }
+                //            if(i>m_pFiffInfo->projs.size()/2)
+                //                topLayout->addWidget(checkBox, i-rowCount, 1); //+2 because we already added two widgets before the first projector check box
+                //            else {
+                //                topLayout->addWidget(checkBox, i, 0); //+2 because we already added two widgets before the first projector check box
+                //                rowCount++;
+                //            }
             }
 
             QFrame* line = new QFrame();
             line->setFrameShape(QFrame::HLine);
             line->setFrameShadow(QFrame::Sunken);
 
-            topLayout->addWidget(line, i+1, 0);
+            topLayout->addWidget(line, i + 1, 0);
 
             m_enableDisableProjectors = new QCheckBox("Enable all");
             m_enableDisableProjectors->setChecked(bAllActivated);
-            topLayout->addWidget(m_enableDisableProjectors, i+2, 0);
+            topLayout->addWidget(m_enableDisableProjectors, i + 2, 0);
             connect(m_enableDisableProjectors, static_cast<void (QCheckBox::*)(bool)>(&QCheckBox::clicked),
-                this, &NoiseReductionWindow::enableDisableAllProj);
-
+                    this, &NoiseReductionWindow::enableDisableAllProj);
         }
 
         delete ui->m_groupBox_projections->layout();
@@ -161,40 +157,36 @@ void NoiseReductionWindow::createProjectorGroup()
 
 void NoiseReductionWindow::createCompensatorGroup()
 {
-    if(m_pFiffInfo)
-    {
+    if (m_pFiffInfo) {
         m_pCompSignalMapper = new QSignalMapper(this);
 
-        if(ui->m_groupBox_compensators->layout() != 0)
+        if (ui->m_groupBox_compensators->layout() != 0)
             this->remove(ui->m_groupBox_compensators->layout());
 
         m_qListCompCheckBox.clear();
 
         // Compensation Selection
-        QGridLayout *topLayout = new QGridLayout;
+        QGridLayout* topLayout = new QGridLayout;
 
-        if(!m_pFiffInfo->comps.isEmpty())
-        {
-            qint32 i=0;
+        if (!m_pFiffInfo->comps.isEmpty()) {
+            qint32 i = 0;
 
-            for(; i < m_pFiffInfo->comps.size(); ++i)
-            {
+            for (; i < m_pFiffInfo->comps.size(); ++i) {
                 QString numStr;
                 QCheckBox* checkBox = new QCheckBox(numStr.setNum(m_pFiffInfo->comps[i].kind));
 
                 m_qListCompCheckBox.append(checkBox);
 
                 connect(checkBox, SIGNAL(clicked()),
-                            m_pCompSignalMapper, SLOT(map()));
+                        m_pCompSignalMapper, SLOT(map()));
 
                 m_pCompSignalMapper->setMapping(checkBox, numStr);
 
                 topLayout->addWidget(checkBox, i, 0);
-
             }
 
-            connect(m_pCompSignalMapper, SIGNAL(mapped(const QString &)),
-                        this, SIGNAL(compClicked(const QString &)));
+            connect(m_pCompSignalMapper, SIGNAL(mapped(const QString&)),
+                    this, SIGNAL(compClicked(const QString&)));
 
             connect(this, &NoiseReductionWindow::compClicked,
                     this, &NoiseReductionWindow::checkCompStatusChanged);
@@ -211,11 +203,11 @@ void NoiseReductionWindow::createCompensatorGroup()
 void NoiseReductionWindow::enableDisableAllProj(bool status)
 {
     //Set all checkboxes to status
-    for(int i=0; i<m_qListProjCheckBox.size(); i++)
+    for (int i = 0; i < m_qListProjCheckBox.size(); i++)
         m_qListProjCheckBox.at(i)->setChecked(status);
 
     //Set all projection activation states to status
-    for(int i=0; i < m_pFiffInfo->projs.size(); ++i)
+    for (int i = 0; i < m_pFiffInfo->projs.size(); ++i)
         m_pFiffInfo->projs[i].active = status;
 
     m_enableDisableProjectors->setChecked(status);
@@ -232,8 +224,8 @@ void NoiseReductionWindow::checkProjStatusChanged(bool status)
 
     bool bAllActivated = true;
 
-    for(qint32 i = 0; i < m_qListProjCheckBox.size(); ++i) {
-        if(m_qListProjCheckBox[i]->isChecked() == false)
+    for (qint32 i = 0; i < m_qListProjCheckBox.size(); ++i) {
+        if (m_qListProjCheckBox[i]->isChecked() == false)
             bAllActivated = false;
 
         this->m_pFiffInfo->projs[i].active = m_qListProjCheckBox[i]->isChecked();
@@ -250,17 +242,17 @@ void NoiseReductionWindow::checkProjStatusChanged(bool status)
 
 //*************************************************************************************************************
 
-void NoiseReductionWindow::checkCompStatusChanged(const QString & compName)
+void NoiseReductionWindow::checkCompStatusChanged(const QString& compName)
 {
     bool currentState = false;
 
-    for(int i = 0; i < m_qListCompCheckBox.size(); ++i)
-        if(m_qListCompCheckBox[i]->text() != compName)
+    for (int i = 0; i < m_qListCompCheckBox.size(); ++i)
+        if (m_qListCompCheckBox[i]->text() != compName)
             m_qListCompCheckBox[i]->setChecked(false);
         else
             currentState = m_qListCompCheckBox[i]->isChecked();
 
-    if(currentState)
+    if (currentState)
         emit compSelectionChanged(compName.toInt());
     else //If none selected
         emit compSelectionChanged(0);
@@ -272,15 +264,11 @@ void NoiseReductionWindow::checkCompStatusChanged(const QString & compName)
 void NoiseReductionWindow::remove(QLayout* layout)
 {
     QLayoutItem* child;
-    while(layout->count()!=0)
-    {
+    while (layout->count() != 0) {
         child = layout->takeAt(0);
-        if(child->layout() != 0)
-        {
+        if (child->layout() != 0) {
             remove(child->layout());
-        }
-        else if(child->widget() != 0)
-        {
+        } else if (child->widget() != 0) {
             delete child->widget();
         }
 

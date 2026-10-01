@@ -62,9 +62,9 @@ class DISPSHARED_EXPORT OverviewBarWidget : public QWidget
 public:
     static constexpr int kBarHeight = 48;
 
-    explicit OverviewBarWidget(QWidget *parent = nullptr);
+    explicit OverviewBarWidget(QWidget* parent = nullptr);
 
-    void setModel(ChannelDataModel *model);
+    void setModel(ChannelDataModel* model);
 
     void setFirstFileSample(int first);
     void setLastFileSample(int last);
@@ -72,40 +72,40 @@ public:
 
     void setViewport(float scrollSample, float visibleSamples);
 
-    void setEvents(const QVector<ChannelRhiView::EventMarker> &events);
-    void setAnnotations(const QVector<ChannelRhiView::AnnotationSpan> &annotations);
+    void setEvents(const QVector<ChannelRhiView::EventMarker>& events);
+    void setAnnotations(const QVector<ChannelRhiView::AnnotationSpan>& annotations);
 
-    QSize sizeHint()        const override;
+    QSize sizeHint() const override;
     QSize minimumSizeHint() const override;
 
 signals:
     void scrollRequested(float targetSample);
 
 protected:
-    void paintEvent(QPaintEvent *event) override;
-    void mousePressEvent(QMouseEvent *event) override;
-    void mouseMoveEvent(QMouseEvent *event) override;
-    void mouseReleaseEvent(QMouseEvent *event) override;
+    void paintEvent(QPaintEvent* event) override;
+    void mousePressEvent(QMouseEvent* event) override;
+    void mouseMoveEvent(QMouseEvent* event) override;
+    void mouseReleaseEvent(QMouseEvent* event) override;
 
 private:
     float xToSample(int x) const;
-    void  rebuildEnvelope();
+    void rebuildEnvelope();
 
     QPointer<ChannelDataModel> m_model;
-    int    m_firstFileSample = 0;
-    int    m_lastFileSample  = -1;
-    float  m_sfreq           = 1000.f;
+    int m_firstFileSample = 0;
+    int m_lastFileSample = -1;
+    float m_sfreq = 1000.f;
 
-    float  m_scrollSample    = 0.f;
-    float  m_visibleSamples  = 0.f;
+    float m_scrollSample = 0.f;
+    float m_visibleSamples = 0.f;
 
-    QVector<ChannelRhiView::EventMarker>     m_events;
-    QVector<ChannelRhiView::AnnotationSpan>  m_annotations;
+    QVector<ChannelRhiView::EventMarker> m_events;
+    QVector<ChannelRhiView::AnnotationSpan> m_annotations;
 
     QImage m_envelopeImage;
-    bool   m_envelopeDirty = true;
+    bool m_envelopeDirty = true;
 
-    bool   m_dragging      = false;
+    bool m_dragging = false;
 };
 
 } // namespace DISPLIB

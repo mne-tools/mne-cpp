@@ -86,7 +86,7 @@ private slots:
     {
         const int n = 3;
         QStringList names = {"MEG0111", "MEG0121", "MEG0131"};
-        VectorXd cov(n * (n + 1) / 2);  // 6 elements for 3x3
+        VectorXd cov(n * (n + 1) / 2); // 6 elements for 3x3
         cov << 1.0, 0.1, 0.2, 2.0, 0.3, 3.0;
 
         auto cm = MNECovMatrix::create_dense(FIFFV_MNE_NOISE_COV, n, names, cov);
@@ -166,8 +166,10 @@ private slots:
         // Validate: covariance should contain MEG and EEG channel names
         bool hasMEG = false, hasEEG = false;
         for (const auto& name : cm->names) {
-            if (name.startsWith("MEG")) hasMEG = true;
-            if (name.startsWith("EEG")) hasEEG = true;
+            if (name.startsWith("MEG"))
+                hasMEG = true;
+            if (name.startsWith("EEG"))
+                hasEEG = true;
         }
         QVERIFY(hasMEG);
         QVERIFY(hasEEG);
@@ -183,7 +185,7 @@ private slots:
         const int n = 3;
         QStringList names = {"ch1", "ch2", "ch3"};
         VectorXd cov(6);
-        cov << 1.0, 0.0, 0.0, 1.0, 0.0, 1.0;  // pack of identity
+        cov << 1.0, 0.0, 0.0, 1.0, 0.0, 1.0; // pack of identity
 
         auto cm = MNECovMatrix::create_dense(FIFFV_MNE_NOISE_COV, n, names, cov);
 
@@ -194,7 +196,7 @@ private slots:
         cm->ch_class[2] = MNE_COV_CH_MEG_MAG;
 
         int result = cm->decompose_eigen();
-        QCOMPARE(result, 0);  // OK = 0
+        QCOMPARE(result, 0); // OK = 0
     }
 };
 

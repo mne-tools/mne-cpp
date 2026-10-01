@@ -44,39 +44,46 @@
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-namespace DISPLIB {
-    class MinimumNormSettingsView;
+namespace DISPLIB
+{
+class MinimumNormSettingsView;
 }
 
-namespace MNELIB {
-    class MNEForwardSolution;
-    class MNEInverseOperator;
+namespace MNELIB
+{
+class MNEForwardSolution;
+class MNEInverseOperator;
 }
 
-namespace FIFFLIB {
-    class FiffInfo;
-    class FiffInfoBase;
+namespace FIFFLIB
+{
+class FiffInfo;
+class FiffInfoBase;
 }
 
-namespace INVLIB {
-    class InvMinimumNorm;
+namespace INVLIB
+{
+class InvMinimumNorm;
 }
 
-namespace RTPROCESSINGLIB {
-    class RtInvOp;
+namespace RTPROCESSINGLIB
+{
+class RtInvOp;
 }
 
-namespace FSLIB {
-    class FsAnnotationSet;
-    class FsSurfaceSet;
+namespace FSLIB
+{
+class FsAnnotationSet;
+class FsSurfaceSet;
 }
 
-namespace SCMEASLIB {
-    class RealTimeEvokedSet;
-    class RealTimeMultiSampleArray;
-    class RealTimeCov;
-    class RealTimeSourceEstimate;
-    class RealTimeFwdSolution;
+namespace SCMEASLIB
+{
+class RealTimeEvokedSet;
+class RealTimeMultiSampleArray;
+class RealTimeCov;
+class RealTimeSourceEstimate;
+class RealTimeFwdSolution;
 }
 
 //=============================================================================================================
@@ -188,7 +195,7 @@ protected:
      *
      * @param[in] method        The new method.
      */
-    void onMethodChanged(const QString &method);
+    void onMethodChanged(const QString& method);
 
     //=========================================================================================================
     /**
@@ -230,51 +237,50 @@ protected:
                                                  float fLambda2,
                                                  const QString& sModelCheckpoint);
 
-    QSharedPointer<SCSHAREDLIB::PluginInputData<SCMEASLIB::RealTimeFwdSolution> >           m_pRTFSInput;               /**< The RealTimeFwdSolution input.*/
-    QSharedPointer<SCSHAREDLIB::PluginInputData<SCMEASLIB::RealTimeMultiSampleArray> >      m_pRTMSAInput;              /**< The RealTimeMultiSampleArray input.*/
-    QSharedPointer<SCSHAREDLIB::PluginInputData<SCMEASLIB::RealTimeEvokedSet> >             m_pRTESInput;               /**< The RealTimeEvoked input.*/
-    QSharedPointer<SCSHAREDLIB::PluginInputData<SCMEASLIB::RealTimeCov> >                   m_pRTCInput;                /**< The RealTimeCov input.*/
-    QSharedPointer<SCSHAREDLIB::PluginOutputData<SCMEASLIB::RealTimeSourceEstimate> >       m_pRTSEOutput;              /**< The RealTimeSourceEstimate output.*/
-    QSharedPointer<UTILSLIB::CircularBuffer_Matrix_double >                                 m_pCircularMatrixBuffer;    /**< Holds incoming RealTimeMultiSampleArray data.*/
-    QSharedPointer<UTILSLIB::CircularBuffer<FIFFLIB::FiffEvoked> >                          m_pCircularEvokedBuffer;    /**< Holds incoming RealTimeMultiSampleArray data.*/
-    QSharedPointer<RTPROCESSINGLIB::RtInvOp>                                                m_pRtInvOp;                 /**< Real-time inverse operator. */
-    QSharedPointer<MNELIB::MNEForwardSolution>                                              m_pFwd;                     /**< Forward solution. */
-    QSharedPointer<FIFFLIB::FiffCov>                                                        m_pNoiseCov;                     /**< Noise Covariance Matrix. */
-    QSharedPointer<FSLIB::FsAnnotationSet>                                                    m_pAnnotationSet;           /**< FsAnnotation set. */
-    QSharedPointer<FSLIB::FsSurfaceSet>                                                       m_pSurfaceSet;              /**< FsSurface set. */
-    QSharedPointer<FIFFLIB::FiffInfoBase>                                                   m_pFiffInfoForward;         /**< Fiff information of the forward solution. */
-    QSharedPointer<FIFFLIB::FiffInfo>                                                       m_pFiffInfo;                /**< Fiff information. */
-    QSharedPointer<FIFFLIB::FiffInfo>                                                       m_pFiffInfoInput;           /**< Fiff information of the evoked. */
+    QSharedPointer<SCSHAREDLIB::PluginInputData<SCMEASLIB::RealTimeFwdSolution>> m_pRTFSInput;       /**< The RealTimeFwdSolution input.*/
+    QSharedPointer<SCSHAREDLIB::PluginInputData<SCMEASLIB::RealTimeMultiSampleArray>> m_pRTMSAInput; /**< The RealTimeMultiSampleArray input.*/
+    QSharedPointer<SCSHAREDLIB::PluginInputData<SCMEASLIB::RealTimeEvokedSet>> m_pRTESInput;         /**< The RealTimeEvoked input.*/
+    QSharedPointer<SCSHAREDLIB::PluginInputData<SCMEASLIB::RealTimeCov>> m_pRTCInput;                /**< The RealTimeCov input.*/
+    QSharedPointer<SCSHAREDLIB::PluginOutputData<SCMEASLIB::RealTimeSourceEstimate>> m_pRTSEOutput;  /**< The RealTimeSourceEstimate output.*/
+    QSharedPointer<UTILSLIB::CircularBuffer_Matrix_double> m_pCircularMatrixBuffer;                  /**< Holds incoming RealTimeMultiSampleArray data.*/
+    QSharedPointer<UTILSLIB::CircularBuffer<FIFFLIB::FiffEvoked>> m_pCircularEvokedBuffer;           /**< Holds incoming RealTimeMultiSampleArray data.*/
+    QSharedPointer<RTPROCESSINGLIB::RtInvOp> m_pRtInvOp;                                             /**< Real-time inverse operator. */
+    QSharedPointer<MNELIB::MNEForwardSolution> m_pFwd;                                               /**< Forward solution. */
+    QSharedPointer<FIFFLIB::FiffCov> m_pNoiseCov;                                                    /**< Noise Covariance Matrix. */
+    QSharedPointer<FSLIB::FsAnnotationSet> m_pAnnotationSet;                                         /**< FsAnnotation set. */
+    QSharedPointer<FSLIB::FsSurfaceSet> m_pSurfaceSet;                                               /**< FsSurface set. */
+    QSharedPointer<FIFFLIB::FiffInfoBase> m_pFiffInfoForward;                                        /**< Fiff information of the forward solution. */
+    QSharedPointer<FIFFLIB::FiffInfo> m_pFiffInfo;                                                   /**< Fiff information. */
+    QSharedPointer<FIFFLIB::FiffInfo> m_pFiffInfoInput;                                              /**< Fiff information of the evoked. */
 
-    bool                            m_bEvokedInput;             /**< Flag whether an evoked input was received. */
-    bool                            m_bRawInput;                /**< Flag whether a raw data input was received. */
-    bool                            m_bUpdateMinimumNorm;       /**< Flag whether to update the miniumum norm object. */
+    bool m_bEvokedInput;       /**< Flag whether an evoked input was received. */
+    bool m_bRawInput;          /**< Flag whether a raw data input was received. */
+    bool m_bUpdateMinimumNorm; /**< Flag whether to update the miniumum norm object. */
 
-    QMutex                          m_qMutex;                   /**< The mutex ensuring thread safety. */
-    QFuture<void>                   m_future;                   /**< The future monitoring the clustering. */
+    QMutex m_qMutex;        /**< The mutex ensuring thread safety. */
+    QFuture<void> m_future; /**< The future monitoring the clustering. */
 
-    FIFFLIB::FiffEvoked             m_currentEvoked;
-    FIFFLIB::FiffCoordTrans         m_mriHeadTrans;             /**< the Mri Head transformation. */
+    FIFFLIB::FiffEvoked m_currentEvoked;
+    FIFFLIB::FiffCoordTrans m_mriHeadTrans; /**< the Mri Head transformation. */
 
-    qint32                          m_iNumAverages;             /**< The number of trials/averages to store. */
-    qint32                          m_iDownSample;              /**< Down sample factor. */
-    qint32                          m_iTimePointSps;            /**< The time point to pick from the data in samples. */
+    qint32 m_iNumAverages;  /**< The number of trials/averages to store. */
+    qint32 m_iDownSample;   /**< Down sample factor. */
+    qint32 m_iTimePointSps; /**< The time point to pick from the data in samples. */
 
-    QString                         m_sAtlasDir;                /**< File to Atlas. */
-    QString                         m_sSurfaceDir;              /**< File to FsSurface. */
-    QString                         m_sAvrType;                 /**< The average type. */
-    QString                         m_sMethod;                  /**< The method: "MNE" | "dSPM" | "sLORETA" | "CMNE". */
-    QString                         m_sModelCheckpoint;         /**< CMNE LSTM model checkpoint path (.onnx). */
-    QFile                           m_fMriHeadTrans;            /**< The Head - Mri transformation. */
+    QString m_sAtlasDir;        /**< File to Atlas. */
+    QString m_sSurfaceDir;      /**< File to FsSurface. */
+    QString m_sAvrType;         /**< The average type. */
+    QString m_sMethod;          /**< The method: "MNE" | "dSPM" | "sLORETA" | "CMNE". */
+    QString m_sModelCheckpoint; /**< CMNE LSTM model checkpoint path (.onnx). */
+    QFile m_fMriHeadTrans;      /**< The Head - Mri transformation. */
 
-    QStringList                     m_qListCovChNames;          /**< Covariance channel names. */
-    QStringList                     m_qListPickChannels;        /**< Channels to pick. */
+    QStringList m_qListCovChNames;   /**< Covariance channel names. */
+    QStringList m_qListPickChannels; /**< Channels to pick. */
 
-    MNELIB::MNEInverseOperator      m_invOp;                    /**< The inverse operator. */
+    MNELIB::MNEInverseOperator m_invOp; /**< The inverse operator. */
 
 signals:
     void responsibleTriggerTypesChanged(const QStringList& lResponsibleTriggerTypes);
-
 };
 } // NAMESPACE
 

@@ -63,13 +63,13 @@ ConnectivitySettings::ConnectivitySettings()
 , m_fSFreq(1000.0f)
 , m_fFreqResolution(1.0f)
 {
-    m_iNfft = int(m_fSFreq/m_fFreqResolution);
+    m_iNfft = int(m_fSFreq / m_fFreqResolution);
     qRegisterMetaType<CONNECTIVITYLIB::ConnectivitySettings>("CONNECTIVITYLIB::ConnectivitySettings");
 }
 
 //*******************************************************************************************************
 
-void ConnectivitySettings::clearAllData() 
+void ConnectivitySettings::clearAllData()
 {
     m_trialData.clear();
 
@@ -78,10 +78,10 @@ void ConnectivitySettings::clearAllData()
 
 //*******************************************************************************************************
 
-void ConnectivitySettings::clearIntermediateData() 
+void ConnectivitySettings::clearIntermediateData()
 {
     for (int i = 0; i < m_trialData.size(); ++i) {
-        m_trialData[i].matPsd.resize(0,0);
+        m_trialData[i].matPsd.resize(0, 0);
         m_trialData[i].vecPairCsd.clear();
         m_trialData[i].vecTapSpectra.clear();
         m_trialData[i].vecPairCsdNormalized.clear();
@@ -90,7 +90,7 @@ void ConnectivitySettings::clearIntermediateData()
         m_trialData[i].vecPairCsdImagSqrd.clear();
     }
 
-    m_intermediateSumData.matPsdSum.resize(0,0);
+    m_intermediateSumData.matPsdSum.resize(0, 0);
     m_intermediateSumData.vecPairCsdSum.clear();
     m_intermediateSumData.vecPairCsdNormalizedSum.clear();
     m_intermediateSumData.vecPairCsdImagSignSum.clear();
@@ -102,7 +102,7 @@ void ConnectivitySettings::clearIntermediateData()
 
 void ConnectivitySettings::append(const QList<MatrixXd>& matInputData)
 {
-    for(int i = 0; i < matInputData.size(); ++i) {
+    for (int i = 0; i < matInputData.size(); ++i) {
         this->append(matInputData.at(i));
     }
 }
@@ -149,16 +149,16 @@ bool ConnectivitySettings::isEmpty() const
 
 void ConnectivitySettings::removeFirst(int iAmount)
 {
-//    QElapsedTimer timer;
-//    qint64 iTime = 0;
-//    timer.start();
+    //    QElapsedTimer timer;
+    //    qint64 iTime = 0;
+    //    timer.start();
 
-    if(m_trialData.isEmpty()) {
+    if (m_trialData.isEmpty()) {
         qDebug() << "ConnectivitySettings::removeFirst - No elements to delete. Returning.";
         return;
     }
 
-    if(m_trialData.size() < iAmount) {
+    if (m_trialData.size() < iAmount) {
         qDebug() << "ConnectivitySettings::removeFirst - Not enough elements stored in list in order to delete them. Returning.";
         return;
     }
@@ -166,50 +166,50 @@ void ConnectivitySettings::removeFirst(int iAmount)
     // Substract influence of trials from overall summed up intermediate data and remove from data list
     for (int j = 0; j < iAmount; ++j) {
         for (int i = 0; i < m_trialData.first().matData.rows(); ++i) {
-            if(i < m_intermediateSumData.vecPairCsdSum.size() && (m_intermediateSumData.vecPairCsdSum.size() == m_trialData.first().vecPairCsd.size())) {
+            if (i < m_intermediateSumData.vecPairCsdSum.size() && (m_intermediateSumData.vecPairCsdSum.size() == m_trialData.first().vecPairCsd.size())) {
                 m_intermediateSumData.vecPairCsdSum[i].second -= m_trialData.first().vecPairCsd.at(i).second;
             }
-            if(i < m_intermediateSumData.vecPairCsdNormalizedSum.size() && (m_intermediateSumData.vecPairCsdNormalizedSum.size() == m_trialData.first().vecPairCsdNormalized.size())) {
+            if (i < m_intermediateSumData.vecPairCsdNormalizedSum.size() && (m_intermediateSumData.vecPairCsdNormalizedSum.size() == m_trialData.first().vecPairCsdNormalized.size())) {
                 m_intermediateSumData.vecPairCsdNormalizedSum[i].second -= m_trialData.first().vecPairCsdNormalized.at(i).second;
             }
-            if(i < m_intermediateSumData.vecPairCsdImagSignSum.size() && (m_intermediateSumData.vecPairCsdImagSignSum.size() == m_trialData.first().vecPairCsdImagSign.size())) {
+            if (i < m_intermediateSumData.vecPairCsdImagSignSum.size() && (m_intermediateSumData.vecPairCsdImagSignSum.size() == m_trialData.first().vecPairCsdImagSign.size())) {
                 m_intermediateSumData.vecPairCsdImagSignSum[i].second -= m_trialData.first().vecPairCsdImagSign.at(i).second;
             }
-            if(i < m_intermediateSumData.vecPairCsdImagAbsSum.size() && (m_intermediateSumData.vecPairCsdImagAbsSum.size() == m_trialData.first().vecPairCsdImagAbs.size())) {
+            if (i < m_intermediateSumData.vecPairCsdImagAbsSum.size() && (m_intermediateSumData.vecPairCsdImagAbsSum.size() == m_trialData.first().vecPairCsdImagAbs.size())) {
                 m_intermediateSumData.vecPairCsdImagAbsSum[i].second -= m_trialData.first().vecPairCsdImagAbs.at(i).second;
             }
-            if(i < m_intermediateSumData.vecPairCsdImagSqrdSum.size() && (m_intermediateSumData.vecPairCsdImagSqrdSum.size() == m_trialData.first().vecPairCsdImagSqrd.size())) {
+            if (i < m_intermediateSumData.vecPairCsdImagSqrdSum.size() && (m_intermediateSumData.vecPairCsdImagSqrdSum.size() == m_trialData.first().vecPairCsdImagSqrd.size())) {
                 m_intermediateSumData.vecPairCsdImagSqrdSum[i].second -= m_trialData.first().vecPairCsdImagSqrd.at(i).second;
             }
         }
 
-        if(m_intermediateSumData.matPsdSum.rows() == m_trialData.first().matPsd.rows() &&
-           m_intermediateSumData.matPsdSum.cols() == m_trialData.first().matPsd.cols() ) {
+        if (m_intermediateSumData.matPsdSum.rows() == m_trialData.first().matPsd.rows() &&
+            m_intermediateSumData.matPsdSum.cols() == m_trialData.first().matPsd.cols()) {
             m_intermediateSumData.matPsdSum -= m_trialData.first().matPsd;
         }
 
         m_trialData.removeFirst();
     }
 
-//    iTime = timer.elapsed();
-//    qDebug() << "ConnectivitySettings::removeFirst" << iTime;
-//    timer.restart();
+    //    iTime = timer.elapsed();
+    //    qDebug() << "ConnectivitySettings::removeFirst" << iTime;
+    //    timer.restart();
 }
 
 //*******************************************************************************************************
 
 void ConnectivitySettings::removeLast(int iAmount)
 {
-//    QElapsedTimer timer;
-//    qint64 iTime = 0;
-//    timer.start();
+    //    QElapsedTimer timer;
+    //    qint64 iTime = 0;
+    //    timer.start();
 
-    if(m_trialData.isEmpty()) {
+    if (m_trialData.isEmpty()) {
         qDebug() << "ConnectivitySettings::removeLast - No elements to delete. Returning.";
         return;
     }
 
-    if(m_trialData.size() < iAmount) {
+    if (m_trialData.size() < iAmount) {
         qDebug() << "ConnectivitySettings::removeLast - Not enough elements stored in list in order to delete them. Returning.";
         return;
     }
@@ -217,34 +217,34 @@ void ConnectivitySettings::removeLast(int iAmount)
     // Substract influence of trials from overall summed up intermediate data and remove from data list
     for (int j = 0; j < iAmount; ++j) {
         for (int i = 0; i < m_trialData.last().matData.rows(); ++i) {
-            if(i < m_intermediateSumData.vecPairCsdSum.size() && (m_intermediateSumData.vecPairCsdSum.size() == m_trialData.last().vecPairCsd.size())) {
+            if (i < m_intermediateSumData.vecPairCsdSum.size() && (m_intermediateSumData.vecPairCsdSum.size() == m_trialData.last().vecPairCsd.size())) {
                 m_intermediateSumData.vecPairCsdSum[i].second -= m_trialData.last().vecPairCsd.at(i).second;
             }
-            if(i < m_intermediateSumData.vecPairCsdNormalizedSum.size() && (m_intermediateSumData.vecPairCsdNormalizedSum.size() == m_trialData.last().vecPairCsdNormalized.size())) {
+            if (i < m_intermediateSumData.vecPairCsdNormalizedSum.size() && (m_intermediateSumData.vecPairCsdNormalizedSum.size() == m_trialData.last().vecPairCsdNormalized.size())) {
                 m_intermediateSumData.vecPairCsdNormalizedSum[i].second -= m_trialData.last().vecPairCsdNormalized.at(i).second;
             }
-            if(i < m_intermediateSumData.vecPairCsdImagSignSum.size() && (m_intermediateSumData.vecPairCsdImagSignSum.size() == m_trialData.last().vecPairCsdImagSign.size())) {
+            if (i < m_intermediateSumData.vecPairCsdImagSignSum.size() && (m_intermediateSumData.vecPairCsdImagSignSum.size() == m_trialData.last().vecPairCsdImagSign.size())) {
                 m_intermediateSumData.vecPairCsdImagSignSum[i].second -= m_trialData.last().vecPairCsdImagSign.at(i).second;
             }
-            if(i < m_intermediateSumData.vecPairCsdImagAbsSum.size() && (m_intermediateSumData.vecPairCsdImagAbsSum.size() == m_trialData.last().vecPairCsdImagAbs.size())) {
+            if (i < m_intermediateSumData.vecPairCsdImagAbsSum.size() && (m_intermediateSumData.vecPairCsdImagAbsSum.size() == m_trialData.last().vecPairCsdImagAbs.size())) {
                 m_intermediateSumData.vecPairCsdImagAbsSum[i].second -= m_trialData.last().vecPairCsdImagAbs.at(i).second;
             }
-            if(i < m_intermediateSumData.vecPairCsdImagSqrdSum.size() && (m_intermediateSumData.vecPairCsdImagSqrdSum.size() == m_trialData.last().vecPairCsdImagSqrd.size())) {
+            if (i < m_intermediateSumData.vecPairCsdImagSqrdSum.size() && (m_intermediateSumData.vecPairCsdImagSqrdSum.size() == m_trialData.last().vecPairCsdImagSqrd.size())) {
                 m_intermediateSumData.vecPairCsdImagSqrdSum[i].second -= m_trialData.last().vecPairCsdImagSqrd.at(i).second;
             }
         }
 
-        if(m_intermediateSumData.matPsdSum.rows() == m_trialData.last().matPsd.rows() &&
-           m_intermediateSumData.matPsdSum.cols() == m_trialData.last().matPsd.cols() ) {
+        if (m_intermediateSumData.matPsdSum.rows() == m_trialData.last().matPsd.rows() &&
+            m_intermediateSumData.matPsdSum.cols() == m_trialData.last().matPsd.cols()) {
             m_intermediateSumData.matPsdSum -= m_trialData.last().matPsd;
         }
 
         m_trialData.removeLast();
     }
 
-//    iTime = timer.elapsed();
-//    qDebug() << "ConnectivitySettings::removeLast" << iTime;
-//    timer.restart();
+    //    iTime = timer.elapsed();
+    //    qDebug() << "ConnectivitySettings::removeLast" << iTime;
+    //    timer.restart();
 }
 
 //*******************************************************************************************************
@@ -265,7 +265,7 @@ const QStringList& ConnectivitySettings::getConnectivityMethods() const
 
 void ConnectivitySettings::setSamplingFrequency(int iSFreq)
 {
-    if(m_fSFreq == iSFreq) {
+    if (m_fSFreq == iSFreq) {
         return;
     }
 
@@ -273,8 +273,8 @@ void ConnectivitySettings::setSamplingFrequency(int iSFreq)
 
     m_fSFreq = iSFreq;
 
-    if(m_fFreqResolution != 0.0f) {
-        m_iNfft = int(m_fSFreq/m_fFreqResolution);
+    if (m_fFreqResolution != 0.0f) {
+        m_iNfft = int(m_fSFreq / m_fFreqResolution);
     }
 }
 
@@ -289,14 +289,14 @@ int ConnectivitySettings::getSamplingFrequency() const
 
 void ConnectivitySettings::setFFTSize(int iNfft)
 {
-    if(iNfft == 0) {
+    if (iNfft == 0) {
         return;
     }
 
     clearIntermediateData();
 
     m_iNfft = iNfft;
-    m_fFreqResolution = m_fSFreq/m_iNfft;
+    m_fFreqResolution = m_fSFreq / m_iNfft;
 }
 
 //*******************************************************************************************************
@@ -328,16 +328,16 @@ const QString& ConnectivitySettings::getWindowType() const
 void ConnectivitySettings::setNodePositions(const FiffInfo& fiffInfo,
                                             const RowVectorXi& picks)
 {
-    m_matNodePositions.resize(picks.cols(),3);
+    m_matNodePositions.resize(picks.cols(), 3);
 
     qint32 kind;
-    for(int i = 0; i < picks.cols(); ++i) {
+    for (int i = 0; i < picks.cols(); ++i) {
         kind = fiffInfo.chs.at(i).kind;
-        if(kind == FIFFV_EEG_CH ||
-           kind == FIFFV_MEG_CH) {
-            m_matNodePositions(i,0) = fiffInfo.chs.at(picks(i)).chpos.r0(0);
-            m_matNodePositions(i,1) = fiffInfo.chs.at(picks(i)).chpos.r0(1);
-            m_matNodePositions(i,2) = fiffInfo.chs.at(picks(i)).chpos.r0(2);
+        if (kind == FIFFV_EEG_CH ||
+            kind == FIFFV_MEG_CH) {
+            m_matNodePositions(i, 0) = fiffInfo.chs.at(picks(i)).chpos.r0(0);
+            m_matNodePositions(i, 1) = fiffInfo.chs.at(picks(i)).chpos.r0(1);
+            m_matNodePositions(i, 2) = fiffInfo.chs.at(picks(i)).chpos.r0(2);
         }
     }
 }
@@ -349,31 +349,31 @@ void ConnectivitySettings::setNodePositions(const MNEForwardSolution& forwardSol
     //Generate node vertices
     MatrixX3f matNodeVertLeft, matNodeVertRight;
 
-    if(forwardSolution.isClustered()) {
+    if (forwardSolution.isClustered()) {
         auto* lhHemi = forwardSolution.src.hemisphereAt(0);
         auto* rhHemi = forwardSolution.src.hemisphereAt(1);
-        matNodeVertLeft.resize(lhHemi->cluster_info.centroidVertno.size(),3);
-        for(int j = 0; j < matNodeVertLeft.rows(); ++j) {
+        matNodeVertLeft.resize(lhHemi->cluster_info.centroidVertno.size(), 3);
+        for (int j = 0; j < matNodeVertLeft.rows(); ++j) {
             matNodeVertLeft.row(j) = surfSet[0].rr().row(lhHemi->cluster_info.centroidVertno.at(j)) - surfSet[0].offset().transpose();
         }
 
-        matNodeVertRight.resize(rhHemi->cluster_info.centroidVertno.size(),3);
-        for(int j = 0; j < matNodeVertRight.rows(); ++j) {
+        matNodeVertRight.resize(rhHemi->cluster_info.centroidVertno.size(), 3);
+        for (int j = 0; j < matNodeVertRight.rows(); ++j) {
             matNodeVertRight.row(j) = surfSet[1].rr().row(rhHemi->cluster_info.centroidVertno.at(j)) - surfSet[1].offset().transpose();
         }
     } else {
-        matNodeVertLeft.resize(forwardSolution.src[0].vertno.rows(),3);
-        for(int j = 0; j < matNodeVertLeft.rows(); ++j) {
+        matNodeVertLeft.resize(forwardSolution.src[0].vertno.rows(), 3);
+        for (int j = 0; j < matNodeVertLeft.rows(); ++j) {
             matNodeVertLeft.row(j) = surfSet[0].rr().row(forwardSolution.src[0].vertno(j)) - surfSet[0].offset().transpose();
         }
 
-        matNodeVertRight.resize(forwardSolution.src[1].vertno.rows(),3);
-        for(int j = 0; j < matNodeVertRight.rows(); ++j) {
+        matNodeVertRight.resize(forwardSolution.src[1].vertno.rows(), 3);
+        for (int j = 0; j < matNodeVertRight.rows(); ++j) {
             matNodeVertRight.row(j) = surfSet[1].rr().row(forwardSolution.src[1].vertno(j)) - surfSet[1].offset().transpose();
         }
     }
 
-    m_matNodePositions.resize(matNodeVertLeft.rows()+matNodeVertRight.rows(),3);
+    m_matNodePositions.resize(matNodeVertLeft.rows() + matNodeVertRight.rows(), 3);
     m_matNodePositions << matNodeVertLeft, matNodeVertRight;
 }
 

@@ -49,16 +49,17 @@ using namespace INVLIB;
 // STATIC HELPERS
 //=============================================================================================================
 
-namespace {
+namespace
+{
 
 /**
  * Invert a small symmetric positive-definite matrix using eigendecomposition.
  * Handles 1x1 (scalar) and 3x3 (free orientation) cases.
  */
-MatrixXd invertSmallSym(const MatrixXd &X, bool reduceRank)
+MatrixXd invertSmallSym(const MatrixXd& X, bool reduceRank)
 {
     const int n = static_cast<int>(X.rows());
-    if(n == 1) {
+    if (n == 1) {
         MatrixXd result(1, 1);
         double val = X(0, 0);
         result(0, 0) = (std::abs(val) > 1e-30) ? 1.0 / val : 1.0;
@@ -73,29 +74,29 @@ MatrixXd invertSmallSym(const MatrixXd &X, bool reduceRank)
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-void InvBeamformerCompute::regPinv(const MatrixXd &C,
+void InvBeamformerCompute::regPinv(const MatrixXd& C,
                                    double reg,
-                                   MatrixXd &CInv,
-                                   double &loadingFactor,
-                                   int &rankOut)
+                                   MatrixXd& CInv,
+                                   double& loadingFactor,
+                                   int& rankOut)
 {
     const int n = static_cast<int>(C.rows());
 
     // Eigendecomposition of symmetric matrix
     SelfAdjointEigenSolver<MatrixXd> eig(C);
-    VectorXd eigVals = eig.eigenvalues();   // ascending order
+    VectorXd eigVals = eig.eigenvalues(); // ascending order
     MatrixXd eigVecs = eig.eigenvectors();
 
     // Determine rank: count eigenvalues above threshold
     double maxEig = eigVals.maxCoeff();
     double threshold = maxEig * 1e-10;
     rankOut = 0;
-    for(int i = 0; i < n; ++i) {
-        if(eigVals(i) > threshold)
+    for (int i = 0; i < n; ++i) {
+        if (eigVals(i) > threshold)
             ++rankOut;
     }
 
-    if(rankOut == 0) {
+    if (rankOut == 0) {
         qWarning("InvBeamformerCompute::regPinv - Covariance matrix has zero rank!");
         CInv = MatrixXd::Zero(n, n);
         loadingFactor = 0.0;
@@ -109,8 +110,8 @@ void InvBeamformerCompute::regPinv(const MatrixXd &C,
     // Regularize: lambda_i += loading_factor (for significant eigenvalues)
     // Then invert: 1 / (lambda_i + loading)
     VectorXd eigValsInv(n);
-    for(int i = 0; i < n; ++i) {
-        if(eigVals(i) > threshold) {
+    for (int i = 0; i < n; ++i) {
+        if (eigVals(i) > threshold) {
             eigValsInv(i) = 1.0 / (eigVals(i) + loadingFactor);
         } else {
             eigValsInv(i) = 0.0;
@@ -123,7 +124,7 @@ void InvBeamformerCompute::regPinv(const MatrixXd &C,
 
 //=============================================================================================================
 
-void InvBeamformerCompute::reduceLeadfieldRank(MatrixXd &Gk)
+void InvBeamformerCompute::reduceLeadfieldRank(MatrixXd& Gk)
 {
     // SVD of per-source leadfield: Gk (n_channels, n_orient)
     JacobiSVD<MatrixXd> svd(Gk, ComputeThinU | ComputeThinV);
@@ -133,7 +134,8 @@ void InvBeamformerCompute::reduceLeadfieldRank(MatrixXd &Gk)
 
     // Drop the smallest singular value
     const int keep = static_cast<int>(S.size()) - 1;
-    if(keep <= 0) return;
+    if (keep <= 0)
+        return;
 
     // Reconstruct without smallest component
     Gk = U.leftCols(keep) * S.head(keep).asDiagonal() * V.leftCols(keep).transpose();
@@ -141,7 +143,7 @@ void InvBeamformerCompute::reduceLeadfieldRank(MatrixXd &Gk)
 
 //=============================================================================================================
 
-MatrixXd InvBeamformerCompute::symMatPow(const MatrixXd &X, double p, bool reduceRank)
+MatrixXd InvBeamformerCompute::symMatPow(const MatrixXd& X, double p, bool reduceRank)
 {
     const int n = static_cast<int>(X.rows());
     SelfAdjointEigenSolver<MatrixXd> eig(X);
@@ -154,10 +156,10 @@ MatrixXd InvBeamformerCompute::symMatPow(const MatrixXd &X, double p, bool reduc
 
     // Determine how many to keep
     int startIdx = 0;
-    if(reduceRank) {
+    if (reduceRank) {
         // Find first (smallest magnitude) eigenvalue above threshold, then skip it
-        for(int i = 0; i < n; ++i) {
-            if(std::abs(eigVals(i)) > threshold) {
+        for (int i = 0; i < n; ++i) {
+            if (std::abs(eigVals(i)) > threshold) {
                 startIdx = i + 1; // skip this one
                 break;
             }
@@ -166,8 +168,8 @@ MatrixXd InvBeamformerCompute::symMatPow(const MatrixXd &X, double p, bool reduc
 
     // Compute: V diag(lambda^p) V^T for significant eigenvalues
     VectorXd eigPow = VectorXd::Zero(n);
-    for(int i = startIdx; i < n; ++i) {
-        if(std::abs(eigVals(i)) > threshold) {
+    for (int i = startIdx; i < n; ++i) {
+        if (std::abs(eigVals(i)) > threshold) {
             eigPow(i) = std::pow(eigVals(i), p);
         }
     }
@@ -177,27 +179,27 @@ MatrixXd InvBeamformerCompute::symMatPow(const MatrixXd &X, double p, bool reduc
 
 //=============================================================================================================
 
-bool InvBeamformerCompute::computeBeamformer(const MatrixXd &G,
-                                             const MatrixXd &Cm,
+bool InvBeamformerCompute::computeBeamformer(const MatrixXd& G,
+                                             const MatrixXd& Cm,
                                              double reg,
                                              int nOrient,
                                              BeamformerWeightNorm weightNorm,
                                              BeamformerPickOri pickOri,
                                              bool reduceRank,
                                              BeamformerInversion invMethod,
-                                             const MatrixX3d &nn,
-                                             MatrixXd &W,
-                                             MatrixX3d &maxPowerOri)
+                                             const MatrixX3d& nn,
+                                             MatrixXd& W,
+                                             MatrixX3d& maxPowerOri)
 {
     const int nChannels = static_cast<int>(G.rows());
     const int nDipoles = static_cast<int>(G.cols());
     const int nSources = nDipoles / nOrient;
 
-    if(nSources * nOrient != nDipoles) {
+    if (nSources * nOrient != nDipoles) {
         qWarning("InvBeamformerCompute::computeBeamformer - G.cols() not divisible by nOrient!");
         return false;
     }
-    if(Cm.rows() != nChannels || Cm.cols() != nChannels) {
+    if (Cm.rows() != nChannels || Cm.cols() != nChannels) {
         qWarning("InvBeamformerCompute::computeBeamformer - Cm dimension mismatch with leadfield!");
         return false;
     }
@@ -215,30 +217,30 @@ bool InvBeamformerCompute::computeBeamformer(const MatrixXd &G,
     // -----------------------------------------------------------------------
     // Determine output orientation count
     int nOrientOut = nOrient;
-    if(pickOri == BeamformerPickOri::Normal || pickOri == BeamformerPickOri::MaxPower) {
+    if (pickOri == BeamformerPickOri::Normal || pickOri == BeamformerPickOri::MaxPower) {
         nOrientOut = 1;
     }
     // For Vector mode, keep all 3
-    if(pickOri == BeamformerPickOri::Vector) {
+    if (pickOri == BeamformerPickOri::Vector) {
         nOrientOut = nOrient;
     }
 
     W.resize(static_cast<Eigen::Index>(nSources) * nOrientOut, nChannels);
     W.setZero();
 
-    if(pickOri == BeamformerPickOri::MaxPower) {
+    if (pickOri == BeamformerPickOri::MaxPower) {
         maxPowerOri.resize(nSources, 3);
         maxPowerOri.setZero();
     } else {
         maxPowerOri.resize(0, 3);
     }
 
-    for(int s = 0; s < nSources; ++s) {
+    for (int s = 0; s < nSources; ++s) {
         // Extract per-source leadfield block: Gk (n_channels, n_orient)
         MatrixXd Gk = G.middleCols(static_cast<Eigen::Index>(s) * nOrient, nOrient);
 
         // Step 3: Optional rank reduction
-        if(reduceRank && nOrient > 1) {
+        if (reduceRank && nOrient > 1) {
             reduceLeadfieldRank(Gk);
         }
 
@@ -247,21 +249,21 @@ bool InvBeamformerCompute::computeBeamformer(const MatrixXd &G,
         // ------------------------------------------------------------------
         int orientForFilter = nOrient;
 
-        if(pickOri == BeamformerPickOri::MaxPower) {
+        if (pickOri == BeamformerPickOri::MaxPower) {
             // Compute optimal orientation via max eigenvalue criterion
             // bf_numer = Gk^T Cm^{-1}   (n_orient, n_channels)
             // bf_denom = Gk^T Cm^{-1} Gk (n_orient, n_orient)
-            MatrixXd bfNumer = Gk.transpose() * CmInv;               // (n_orient, n_ch)
-            MatrixXd bfDenom = bfNumer * Gk;                         // (n_orient, n_orient)
+            MatrixXd bfNumer = Gk.transpose() * CmInv; // (n_orient, n_ch)
+            MatrixXd bfDenom = bfNumer * Gk;           // (n_orient, n_orient)
 
             MatrixXd oriNumer, oriDenom;
-            if(weightNorm == BeamformerWeightNorm::None) {
+            if (weightNorm == BeamformerWeightNorm::None) {
                 oriNumer = MatrixXd::Identity(nOrient, nOrient);
                 oriDenom = bfDenom;
             } else {
                 // Sekihara & Nagarajan 2008, eq. 4.47
                 oriNumer = bfDenom;
-                oriDenom = Gk.transpose() * (CmInv * CmInv) * Gk;   // (n_orient, n_orient)
+                oriDenom = Gk.transpose() * (CmInv * CmInv) * Gk; // (n_orient, n_orient)
             }
 
             // Compute oriDenom^{-1} @ oriNumer
@@ -276,9 +278,9 @@ bool InvBeamformerCompute::computeBeamformer(const MatrixXd &G,
 
             int maxIdx = 0;
             double maxVal = 0.0;
-            for(int i = 0; i < eigVals.size(); ++i) {
+            for (int i = 0; i < eigVals.size(); ++i) {
                 double absVal = std::abs(eigVals(i));
-                if(absVal > maxVal) {
+                if (absVal > maxVal) {
                     maxVal = absVal;
                     maxIdx = i;
                 }
@@ -288,20 +290,21 @@ bool InvBeamformerCompute::computeBeamformer(const MatrixXd &G,
             Vector3d ori = eigVecs.col(maxIdx).real().head(3).normalized();
 
             // Align sign with surface normal
-            if(nn.rows() > s) {
+            if (nn.rows() > s) {
                 double dot = ori.dot(nn.row(s).transpose());
-                if(dot < 0.0) ori = -ori;
+                if (dot < 0.0)
+                    ori = -ori;
             }
 
             maxPowerOri.row(s) = ori.transpose();
 
             // Project leadfield to optimal orientation
-            Gk = Gk * ori;  // (n_channels, 1)
+            Gk = Gk * ori; // (n_channels, 1)
             orientForFilter = 1;
 
-        } else if(pickOri == BeamformerPickOri::Normal && nOrient >= 3) {
+        } else if (pickOri == BeamformerPickOri::Normal && nOrient >= 3) {
             // Extract Z-component (normal to surface in local source coords)
-            Gk = Gk.col(2);  // (n_channels, 1)
+            Gk = Gk.col(2); // (n_channels, 1)
             orientForFilter = 1;
         }
 
@@ -311,14 +314,14 @@ bool InvBeamformerCompute::computeBeamformer(const MatrixXd &G,
         //   bf_denom = Gk^T Cm^{-1} Gk       (n_ori_filt, n_ori_filt)
         //   W_ug     = bf_denom^{-1} bf_numer (n_ori_filt, n_channels)
         // ------------------------------------------------------------------
-        MatrixXd bfNumer = Gk.transpose() * CmInv;    // (orientForFilter, n_ch)
-        MatrixXd bfDenom = bfNumer * Gk;               // (orientForFilter, orientForFilter)
+        MatrixXd bfNumer = Gk.transpose() * CmInv; // (orientForFilter, n_ch)
+        MatrixXd bfDenom = bfNumer * Gk;           // (orientForFilter, orientForFilter)
 
         MatrixXd bfDenomInv;
-        if(invMethod == BeamformerInversion::Single && orientForFilter > 1) {
+        if (invMethod == BeamformerInversion::Single && orientForFilter > 1) {
             // Scalar inversion of diagonal elements
             bfDenomInv = MatrixXd::Zero(orientForFilter, orientForFilter);
-            for(int d = 0; d < orientForFilter; ++d) {
+            for (int d = 0; d < orientForFilter; ++d) {
                 double val = bfDenom(d, d);
                 bfDenomInv(d, d) = (std::abs(val) > 1e-30) ? 1.0 / val : 0.0;
             }
@@ -326,33 +329,33 @@ bool InvBeamformerCompute::computeBeamformer(const MatrixXd &G,
             bfDenomInv = invertSmallSym(bfDenom, reduceRank);
         }
 
-        MatrixXd Wug = bfDenomInv * bfNumer;  // (orientForFilter, n_channels)
+        MatrixXd Wug = bfDenomInv * bfNumer; // (orientForFilter, n_channels)
 
         // ------------------------------------------------------------------
         // Step 6: Weight normalization
         // ------------------------------------------------------------------
-        if(weightNorm == BeamformerWeightNorm::UnitNoiseGain || weightNorm == BeamformerWeightNorm::NAI) {
+        if (weightNorm == BeamformerWeightNorm::UnitNoiseGain || weightNorm == BeamformerWeightNorm::NAI) {
             // Sekihara 2008: normalize by sqrt(diag(W W^T))
-            MatrixXd noiseNorm = Wug * Wug.transpose();   // (orientForFilter, orientForFilter)
+            MatrixXd noiseNorm = Wug * Wug.transpose(); // (orientForFilter, orientForFilter)
 
-            for(int d = 0; d < orientForFilter; ++d) {
+            for (int d = 0; d < orientForFilter; ++d) {
                 double normVal = std::sqrt(std::abs(noiseNorm(d, d)));
-                if(normVal > 1e-30) {
+                if (normVal > 1e-30) {
                     Wug.row(d) /= normVal;
                 }
             }
 
-            if(weightNorm == BeamformerWeightNorm::NAI) {
+            if (weightNorm == BeamformerWeightNorm::NAI) {
                 // Additional normalization by noise level
                 double noise = loadingFactor;
-                if(noise > 1e-30) {
+                if (noise > 1e-30) {
                     Wug /= std::sqrt(noise);
                 }
             }
 
-        } else if(weightNorm == BeamformerWeightNorm::UnitNoiseGainInv) {
+        } else if (weightNorm == BeamformerWeightNorm::UnitNoiseGainInv) {
             // Rotation-invariant version: sqrtm(inner)^{-0.5} @ G^T Cm^{-1}
-            MatrixXd inner = bfNumer * bfNumer.transpose();   // (orientForFilter, orientForFilter)
+            MatrixXd inner = bfNumer * bfNumer.transpose(); // (orientForFilter, orientForFilter)
             MatrixXd innerPow = symMatPow(inner, -0.5, reduceRank);
             Wug = innerPow * bfNumer;
         }
@@ -366,15 +369,15 @@ bool InvBeamformerCompute::computeBeamformer(const MatrixXd &G,
 
 //=============================================================================================================
 
-VectorXd InvBeamformerCompute::computePower(const MatrixXd &Cm,
-                                            const MatrixXd &W,
+VectorXd InvBeamformerCompute::computePower(const MatrixXd& Cm,
+                                            const MatrixXd& W,
                                             int nOrient)
 {
     const int nTotal = static_cast<int>(W.rows());
     const int nSources = nTotal / nOrient;
 
     VectorXd power(nSources);
-    for(int s = 0; s < nSources; ++s) {
+    for (int s = 0; s < nSources; ++s) {
         // W_k: (n_orient, n_channels)
         MatrixXd Wk = W.middleRows(static_cast<Eigen::Index>(s) * nOrient, nOrient);
         // power = trace(W_k Cm W_k^T)

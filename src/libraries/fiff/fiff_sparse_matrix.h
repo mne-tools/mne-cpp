@@ -71,10 +71,10 @@ namespace FIFFLIB
 class FIFFSHARED_EXPORT FiffSparseMatrix
 {
 public:
-    using SPtr = QSharedPointer<FiffSparseMatrix>;            /**< Shared pointer type for FiffSparseMatrix. */
-    using ConstSPtr = QSharedPointer<const FiffSparseMatrix>; /**< Const shared pointer type for FiffSparseMatrix. */
-    using UPtr = std::unique_ptr<FiffSparseMatrix>;           /**< Unique pointer type for FiffSparseMatrix. */
-    using ConstUPtr = std::unique_ptr<const FiffSparseMatrix>;  /**< Const unique pointer type for FiffSparseMatrix. */
+    using SPtr = QSharedPointer<FiffSparseMatrix>;             /**< Shared pointer type for FiffSparseMatrix. */
+    using ConstSPtr = QSharedPointer<const FiffSparseMatrix>;  /**< Const shared pointer type for FiffSparseMatrix. */
+    using UPtr = std::unique_ptr<FiffSparseMatrix>;            /**< Unique pointer type for FiffSparseMatrix. */
+    using ConstUPtr = std::unique_ptr<const FiffSparseMatrix>; /**< Const unique pointer type for FiffSparseMatrix. */
 
     //=========================================================================================================
     /**
@@ -136,36 +136,54 @@ public:
      * Mutable access to the underlying Eigen sparse matrix.
      * @return Reference to the internal Eigen::SparseMatrix<float>.
      */
-    inline Eigen::SparseMatrix<float>& eigen() { return m_eigen; }
+    inline Eigen::SparseMatrix<float>& eigen()
+    {
+        return m_eigen;
+    }
 
     /**
      * Const access to the underlying Eigen sparse matrix.
      * @return Const reference to the internal Eigen::SparseMatrix<float>.
      */
-    inline const Eigen::SparseMatrix<float>& eigen() const { return m_eigen; }
+    inline const Eigen::SparseMatrix<float>& eigen() const
+    {
+        return m_eigen;
+    }
 
     /**
      * Implicit conversion to const Eigen::SparseMatrix<float>&.
      */
-    inline operator const Eigen::SparseMatrix<float>&() const { return m_eigen; }
+    inline operator const Eigen::SparseMatrix<float>&() const
+    {
+        return m_eigen;
+    }
 
     /**
      * Number of rows.
      * @return Row count of the underlying Eigen sparse matrix.
      */
-    inline int rows() const { return static_cast<int>(m_eigen.rows()); }
+    inline int rows() const
+    {
+        return static_cast<int>(m_eigen.rows());
+    }
 
     /**
      * Number of columns.
      * @return Column count of the underlying Eigen sparse matrix.
      */
-    inline int cols() const { return static_cast<int>(m_eigen.cols()); }
+    inline int cols() const
+    {
+        return static_cast<int>(m_eigen.cols());
+    }
 
     /**
      * Number of stored non-zero elements.
      * @return Count of explicitly stored entries in the underlying Eigen sparse matrix.
      */
-    inline int nonZeros() const { return static_cast<int>(m_eigen.nonZeros()); }
+    inline int nonZeros() const
+    {
+        return static_cast<int>(m_eigen.nonZeros());
+    }
 
     //============================= fiff_sparse.c =============================
 
@@ -202,9 +220,9 @@ public:
      */
     static FiffSparseMatrix::UPtr create_sparse_rcs(int nrow,
                                                     int ncol,
-                                                    int *nnz,
-                                                    int **colindex,
-                                                    float **vals);
+                                                    int* nnz,
+                                                    int** colindex,
+                                                    float** vals);
 
     /**
      * Add the upper triangle to a lower-triangular sparse RCS matrix.
@@ -254,10 +272,10 @@ public:
     static FiffSparseMatrix fromEigenSparse(const Eigen::SparseMatrix<float>& mat);
 
 public:
-    FIFFLIB::fiff_int_t   coding;    /**< FIFF coding type (FIFFTS_MC_RCS or FIFFTS_MC_CCS). Used for serialization only. */
+    FIFFLIB::fiff_int_t coding; /**< FIFF coding type (FIFFTS_MC_RCS or FIFFTS_MC_CCS). Used for serialization only. */
 
 private:
-    Eigen::SparseMatrix<float> m_eigen;  /**< The sparse matrix data. */
+    Eigen::SparseMatrix<float> m_eigen; /**< The sparse matrix data. */
 };
 
 //=============================================================================================================

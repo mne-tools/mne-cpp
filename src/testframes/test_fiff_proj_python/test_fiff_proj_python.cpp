@@ -90,15 +90,14 @@ private slots:
 
 QString TestFiffProjPython::rawPath()
 {
-    return QCoreApplication::applicationDirPath()
-           + "/../resources/data/mne-cpp-test-data/MEG/sample/sample_audvis_trunc_raw.fif";
+    return QCoreApplication::applicationDirPath() + "/../resources/data/mne-cpp-test-data/MEG/sample/sample_audvis_trunc_raw.fif";
 }
 
 //=============================================================================================================
 
 void TestFiffProjPython::initTestCase()
 {
-    if(!QFile::exists(rawPath())) {
+    if (!QFile::exists(rawPath())) {
         QSKIP("Raw test data not found");
     }
 
@@ -123,10 +122,10 @@ void TestFiffProjPython::projections_matchPython_data()
 
     // Straight from mne-python. The sum pins all 102 or 60 weights of each
     // vector, so a reader that dropped or reordered entries still fails.
-    QTest::newRow("PCA-v1") << 0 << "PCA-v1"                << 1  << 102 <<  2.479997158;
-    QTest::newRow("PCA-v2") << 1 << "PCA-v2"                << 1  << 102 << -7.375615597;
-    QTest::newRow("PCA-v3") << 2 << "PCA-v3"                << 1  << 102 <<  1.150934458;
-    QTest::newRow("EEG ref") << 3 << "Average EEG reference" << 10 << 60  <<  7.745965958;
+    QTest::newRow("PCA-v1") << 0 << "PCA-v1" << 1 << 102 << 2.479997158;
+    QTest::newRow("PCA-v2") << 1 << "PCA-v2" << 1 << 102 << -7.375615597;
+    QTest::newRow("PCA-v3") << 2 << "PCA-v3" << 1 << 102 << 1.150934458;
+    QTest::newRow("EEG ref") << 3 << "Average EEG reference" << 10 << 60 << 7.745965958;
 }
 
 //=============================================================================================================
@@ -153,7 +152,9 @@ void TestFiffProjPython::projections_matchPython()
     const double sum = p.data->data.sum();
     QVERIFY2(std::fabs(sum - dataSum) < 1.0e-6,
              qPrintable(QString("%1 weights sum to %2, mne-python says %3")
-                        .arg(desc).arg(sum, 0, 'g', 12).arg(dataSum, 0, 'g', 12)));
+                            .arg(desc)
+                            .arg(sum, 0, 'g', 12)
+                            .arg(dataSum, 0, 'g', 12)));
 
     // The vector names have to line up with the weights, otherwise the
     // projector is applied to the wrong channels.
@@ -190,12 +191,12 @@ void TestFiffProjPython::projector_matchesPython()
     const double trace = proj.trace();
     QVERIFY2(std::fabs(trace - 372.0) < 1.0e-6,
              qPrintable(QString("projector trace is %1, expected 372 (376 channels minus 4 projections)")
-                        .arg(trace, 0, 'g', 12)));
+                            .arg(trace, 0, 'g', 12)));
 
     const double sum = proj.sum();
     QVERIFY2(std::fabs(sum - 255.125263745) < 1.0e-5,
              qPrintable(QString("projector sums to %1, mne-python says 255.125263745")
-                        .arg(sum, 0, 'g', 12)));
+                            .arg(sum, 0, 'g', 12)));
 }
 
 //=============================================================================================================
@@ -255,7 +256,7 @@ void TestFiffProjPython::projector_ignoresInactiveProjections()
     // Pinning the behaviour that differs from mne-python, so a future change
     // to it is a deliberate decision rather than an accident. As loaded, the
     // projections are inactive and MNE-CPP builds no projector from them.
-    for(const FiffProj& p : m_info.projs) {
+    for (const FiffProj& p : m_info.projs) {
         QCOMPARE(p.active, false);
     }
 
@@ -265,7 +266,7 @@ void TestFiffProjPython::projector_ignoresInactiveProjections()
 
     // Activating them is what makes the projector real.
     FiffProj::activate_projs(info.projs);
-    for(const FiffProj& p : info.projs) {
+    for (const FiffProj& p : info.projs) {
         QCOMPARE(p.active, true);
     }
     QCOMPARE(static_cast<int>(info.make_projector(proj)), 4);

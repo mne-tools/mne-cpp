@@ -41,7 +41,7 @@ using namespace DISPLIB;
 //=============================================================================================================
 
 SpharaSettingsView::SpharaSettingsView(const QString& sSettingsPath,
-                                       QWidget *parent,
+                                       QWidget* parent,
                                        Qt::WindowFlags f)
 : AbstractView(parent, f)
 , m_pUi(new Ui::SpharaSettingsViewWidget)
@@ -81,7 +81,7 @@ SpharaSettingsView::~SpharaSettingsView()
 
 void SpharaSettingsView::saveSettings()
 {
-    if(m_sSettingsPath.isEmpty()) {
+    if (m_sSettingsPath.isEmpty()) {
         return;
     }
 
@@ -93,7 +93,7 @@ void SpharaSettingsView::saveSettings()
 
 void SpharaSettingsView::loadSettings()
 {
-    if(m_sSettingsPath.isEmpty()) {
+    if (m_sSettingsPath.isEmpty()) {
         return;
     }
 
@@ -105,7 +105,7 @@ void SpharaSettingsView::loadSettings()
 
 void SpharaSettingsView::updateGuiMode(GuiMode mode)
 {
-    switch(mode) {
+    switch (mode) {
         case GuiMode::Clinical:
             break;
         default: // default is research mode
@@ -117,7 +117,7 @@ void SpharaSettingsView::updateGuiMode(GuiMode mode)
 
 void SpharaSettingsView::updateProcessingMode(ProcessingMode mode)
 {
-    switch(mode) {
+    switch (mode) {
         case ProcessingMode::Offline:
             break;
         default: // default is realtime mode
@@ -142,7 +142,7 @@ void SpharaSettingsView::onSpharaOptionsChanged()
     m_pUi->m_label_spharaSecond->show();
     m_pUi->m_spinBox_spharaSecond->show();
 
-    if(m_pUi->m_comboBox_spharaSystem->currentText() == "VectorView") {
+    if (m_pUi->m_comboBox_spharaSystem->currentText() == "VectorView") {
         m_pUi->m_label_spharaFirst->setText("Mag");
         m_pUi->m_spinBox_spharaFirst->setMaximum(102);
 
@@ -150,7 +150,7 @@ void SpharaSettingsView::onSpharaOptionsChanged()
         m_pUi->m_spinBox_spharaSecond->setMaximum(102);
     }
 
-    if(m_pUi->m_comboBox_spharaSystem->currentText() == "BabyMEG") {
+    if (m_pUi->m_comboBox_spharaSystem->currentText() == "BabyMEG") {
         m_pUi->m_label_spharaFirst->setText("Inner layer");
         m_pUi->m_spinBox_spharaFirst->setMaximum(270);
 
@@ -158,7 +158,7 @@ void SpharaSettingsView::onSpharaOptionsChanged()
         m_pUi->m_spinBox_spharaSecond->setMaximum(105);
     }
 
-    if(m_pUi->m_comboBox_spharaSystem->currentText() == "EEG") {
+    if (m_pUi->m_comboBox_spharaSystem->currentText() == "EEG") {
         m_pUi->m_label_spharaFirst->setText("EEG");
         m_pUi->m_spinBox_spharaFirst->setMaximum(256);
 
@@ -175,5 +175,4 @@ void SpharaSettingsView::onSpharaOptionsChanged()
 
 void SpharaSettingsView::clearView()
 {
-
 }

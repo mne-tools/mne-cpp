@@ -82,7 +82,7 @@ public:
      *
      * @return true if reading was successful, false otherwise.
      */
-    static bool readFilter(QString path, FilterKernel &filter);
+    static bool readFilter(QString path, FilterKernel& filter);
 
     //=========================================================================================================
     /**
@@ -93,7 +93,7 @@ public:
      *
      * @return true if reading was successful, false otherwise.
      */
-    static bool writeFilter(const QString &path, const FilterKernel &filter);
+    static bool writeFilter(const QString& path, const FilterKernel& filter);
 
 private:
 };

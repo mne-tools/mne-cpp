@@ -34,13 +34,15 @@
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-namespace SCMEASLIB{
-    class RealTimeMultiSampleArray;
-    class RealTimeEvokedSet;
+namespace SCMEASLIB
+{
+class RealTimeMultiSampleArray;
+class RealTimeEvokedSet;
 }
 
-namespace RTPROCESSINGLIB{
-    class RtAveraging;
+namespace RTPROCESSINGLIB
+{
+class RtAveraging;
 }
 
 //=============================================================================================================
@@ -122,7 +124,7 @@ public:
      *
      * @param[in] sStimCh     the new stim channel name.
      */
-    void onChangeStimChannel(const QString &sStimCh);
+    void onChangeStimChannel(const QString& sStimCh);
 
     //=========================================================================================================
     /**
@@ -146,7 +148,7 @@ public:
      *
      * @param[in] mapThresholds       The new map including the current thresholds for the channels.
      */
-    void onChangeArtifactThreshold(const QMap<QString, double> &mapThresholds);
+    void onChangeArtifactThreshold(const QMap<QString, double>& mapThresholds);
 
     //=========================================================================================================
     /**
@@ -188,7 +190,7 @@ public:
      * @param[in] lResponsibleTriggerTypes   List of all trigger types which lead to the recent emit of a new evoked set.
      */
     void onNewEvokedSet(const FIFFLIB::FiffEvokedSet& evokedSet,
-                        const QStringList &lResponsibleTriggerTypes);
+                        const QStringList& lResponsibleTriggerTypes);
 
     //=========================================================================================================
     /**
@@ -201,23 +203,23 @@ public:
 private:
     virtual void run();
 
-    SCSHAREDLIB::PluginInputData<SCMEASLIB::RealTimeMultiSampleArray>::SPtr     m_pAveragingInput;      /**< The RealTimeSampleArray of the Averaging input.*/
-    SCSHAREDLIB::PluginOutputData<SCMEASLIB::RealTimeEvokedSet>::SPtr           m_pAveragingOutput;     /**< The RealTimeEvoked of the Averaging output.*/
+    SCSHAREDLIB::PluginInputData<SCMEASLIB::RealTimeMultiSampleArray>::SPtr m_pAveragingInput; /**< The RealTimeSampleArray of the Averaging input.*/
+    SCSHAREDLIB::PluginOutputData<SCMEASLIB::RealTimeEvokedSet>::SPtr m_pAveragingOutput;      /**< The RealTimeEvoked of the Averaging output.*/
 
-    UTILSLIB::CircularBuffer<FIFFLIB::FiffEvokedSet>::SPtr                      m_pCircularBuffer;      /**< Holds incoming fiff evoked sets. */
+    UTILSLIB::CircularBuffer<FIFFLIB::FiffEvokedSet>::SPtr m_pCircularBuffer; /**< Holds incoming fiff evoked sets. */
 
-    QMutex                                          m_qMutex;                           /**< Provides access serialization between threads. */
+    QMutex m_qMutex; /**< Provides access serialization between threads. */
 
-    FIFFLIB::FiffInfo::SPtr                         m_pFiffInfo;                        /**< Fiff measurement info.*/
+    FIFFLIB::FiffInfo::SPtr m_pFiffInfo; /**< Fiff measurement info.*/
 
-    QSharedPointer<RTPROCESSINGLIB::RtAveraging>          m_pRtAve;                     /**< Real-time average object. */
+    QSharedPointer<RTPROCESSINGLIB::RtAveraging> m_pRtAve; /**< Real-time average object. */
 
-    QStringList                                     m_lResponsibleTriggerTypes;         /**< List of all trigger types which lead to the recent emit of a new evoked set. */
+    QStringList m_lResponsibleTriggerTypes; /**< List of all trigger types which lead to the recent emit of a new evoked set. */
 
-    QMap<QString,int>                               m_mapStimChsIndexNames;             /**< The currently available stim channels and their corresponding index in the data. */
+    QMap<QString, int> m_mapStimChsIndexNames; /**< The currently available stim channels and their corresponding index in the data. */
 
 signals:
-    void stimChannelsChanged(const QMap<QString,int>& mapStimChsIndexNames);
+    void stimChannelsChanged(const QMap<QString, int>& mapStimChsIndexNames);
     void fiffChInfoChanged(const QList<FIFFLIB::FiffChInfo>& fiffChInfoList);
     void evokedSetChanged(const FIFFLIB::FiffEvokedSet& evokedSet);
 };

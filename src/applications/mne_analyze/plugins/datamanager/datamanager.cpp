@@ -83,14 +83,14 @@ QString DataManager::getName() const
 
 //=============================================================================================================
 
-QMenu *DataManager::getMenu()
+QMenu* DataManager::getMenu()
 {
     return Q_NULLPTR;
 }
 
 //=============================================================================================================
 
-QDockWidget *DataManager::getControl()
+QDockWidget* DataManager::getControl()
 {
     DISPLIB::BidsView* pDataManagerBidsView = new DISPLIB::BidsView;
 
@@ -115,7 +115,7 @@ QDockWidget *DataManager::getControl()
 
 //=============================================================================================================
 
-QWidget *DataManager::getView()
+QWidget* DataManager::getView()
 {
     return Q_NULLPTR;
 }
@@ -156,7 +156,7 @@ void DataManager::onRemoveItem(const QModelIndex& index)
 
 //=============================================================================================================
 
-void DataManager::onCurrentItemChanged(const QModelIndex &pIndex)
+void DataManager::onCurrentItemChanged(const QModelIndex& pIndex)
 {
     m_pAnalyzeData->newSelection(pIndex);
 }
@@ -165,5 +165,5 @@ void DataManager::onCurrentItemChanged(const QModelIndex &pIndex)
 
 QString DataManager::getBuildInfo()
 {
-    return QString(DATAMANAGERPLUGIN::buildDateTime()) + QString(" - ")  + QString(DATAMANAGERPLUGIN::buildHash());
+    return QString(DATAMANAGERPLUGIN::buildDateTime()) + QString(" - ") + QString(DATAMANAGERPLUGIN::buildHash());
 }

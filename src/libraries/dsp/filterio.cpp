@@ -42,15 +42,15 @@ FilterIO::FilterIO()
 
 //=============================================================================================================
 
-bool FilterIO::readFilter(QString path, FilterKernel &filter)
+bool FilterIO::readFilter(QString path, FilterKernel& filter)
 {
     //Open .txt file
-    if(!path.contains(".txt"))
+    if (!path.contains(".txt"))
         return false;
 
     QFile file(path);
-    if(!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
-        qDebug()<<"Error opening filter txt file for reading";
+    if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
+        qDebug() << "Error opening filter txt file for reading";
         return false;
     }
 
@@ -58,64 +58,63 @@ bool FilterIO::readFilter(QString path, FilterKernel &filter)
     QTextStream in(&file);
     QVector<double> coefficientsTemp;
 
-    while(!in.atEnd())
-    {
+    while (!in.atEnd()) {
         QString line = in.readLine();
 
         QStringList fields = line.split(QRegularExpression("\\s+"));
 
         //Delete last element if it is a blank character
-        if(fields.at(fields.size()-1) == "")
+        if (fields.at(fields.size() - 1) == "")
             fields.removeLast();
 
-        if(line.contains("#")) //Filter meta information commented areas in file
+        if (line.contains("#")) //Filter meta information commented areas in file
         {
             //Read filter sFreq
-            if(line.contains("sFreq") && fields.size()==2)
+            if (line.contains("sFreq") && fields.size() == 2)
                 filter.setSamplingFrequency(fields.at(1).toDouble());
 
             //Read filter name
-            if(line.contains("name")) {
+            if (line.contains("name")) {
                 QString sFilterName;
-                for(int i=1; i<fields.size(); i++)
+                for (int i = 1; i < fields.size(); i++)
                     sFilterName.append(fields.at(i));
                 filter.setName(sFilterName);
             }
 
             //Read the filter order
-            if(line.contains("order") && fields.size()==2)
+            if (line.contains("order") && fields.size() == 2)
                 filter.setFilterOrder(fields.at(1).toInt());
 
             //Read the filter type
-            if(line.contains("type") && fields.size()==2)
+            if (line.contains("type") && fields.size() == 2)
                 filter.setFilterType(FilterKernel::m_filterTypes.indexOf(FilterParameter(fields.at(1))));
 
             //Read the filter LPFreq
-            if(line.contains("LPFreq") && fields.size()==2)
+            if (line.contains("LPFreq") && fields.size() == 2)
                 filter.setLowpassFreq(fields.at(1).toDouble());
 
             //Read the filter HPFreq
-            if(line.contains("HPFreq") && fields.size()==2)
+            if (line.contains("HPFreq") && fields.size() == 2)
                 filter.setHighpassFreq(fields.at(1).toDouble());
 
             //Read the filter CenterFreq
-            if(line.contains("CenterFreq") && fields.size()==2)
+            if (line.contains("CenterFreq") && fields.size() == 2)
                 filter.setCenterFrequency(fields.at(1).toDouble());
 
             //Read the filter DesignMethod
-            if(line.contains("DesignMethod") && fields.size()==2)
+            if (line.contains("DesignMethod") && fields.size() == 2)
                 filter.setDesignMethod(FilterKernel::m_designMethods.indexOf(FilterParameter(fields.at(1))));
 
         } else // Read filter coefficients
             coefficientsTemp.push_back(fields.join("").toDouble());
     }
     // Check if reading was successful and correct
-    if(filter.getFilterOrder() != coefficientsTemp.size()) {
+    if (filter.getFilterOrder() != coefficientsTemp.size()) {
         filter.setFilterOrder(coefficientsTemp.size());
     }
 
     RowVectorXd vecCoeff = RowVectorXd::Zero(coefficientsTemp.size());
-    for(int i=0; i < vecCoeff.cols(); i++) {
+    for (int i = 0; i < vecCoeff.cols(); i++) {
         vecCoeff(i) = coefficientsTemp.at(i);
     }
     filter.setCoefficients(vecCoeff);
@@ -127,14 +126,13 @@ bool FilterIO::readFilter(QString path, FilterKernel &filter)
 
 //=============================================================================================================
 
-bool FilterIO::writeFilter(const QString &path, const FilterKernel &filter)
+bool FilterIO::writeFilter(const QString& path, const FilterKernel& filter)
 {
     // Open file dialog
-    if(!path.isEmpty())
-    {
+    if (!path.isEmpty()) {
         QFile file(path);
-        if (!file.open(QIODevice::WriteOnly | QIODevice::Text)){
-            qDebug()<<"Error opening filter txt file for writing";
+        if (!file.open(QIODevice::WriteOnly | QIODevice::Text)) {
+            qDebug() << "Error opening filter txt file for writing";
             return false;
         }
 
@@ -150,7 +148,7 @@ bool FilterIO::writeFilter(const QString &path, const FilterKernel &filter)
         out << "#CenterFreq " << filter.getCenterFrequency() << "\n";
         out << "#DesignMethod " << filter.getDesignMethod().getName() << "\n";
 
-        for(int i = 0 ; i<filter.getCoefficients().cols() ;i++)
+        for (int i = 0; i < filter.getCoefficients().cols(); i++)
             out << filter.getCoefficients()(i) << "\n";
 
         file.close();
@@ -158,7 +156,7 @@ bool FilterIO::writeFilter(const QString &path, const FilterKernel &filter)
         return true;
     }
 
-    qDebug()<<"Error Filter File path is empty";
+    qDebug() << "Error Filter File path is empty";
 
     return false;
 }

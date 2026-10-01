@@ -59,8 +59,7 @@ private:
 
     void initTestCase()
     {
-        dataPath = QCoreApplication::applicationDirPath()
-                   + "/../resources/data/mne-cpp-test-data";
+        dataPath = QCoreApplication::applicationDirPath() + "/../resources/data/mne-cpp-test-data";
     }
 
 private slots:
@@ -103,8 +102,7 @@ private slots:
 
     void sourceSpace_readFromFile()
     {
-        QString srcPath = QCoreApplication::applicationDirPath()
-                          + "/../resources/data/mne-cpp-test-data/subjects/sample/bem/sample-oct-6-src.fif";
+        QString srcPath = QCoreApplication::applicationDirPath() + "/../resources/data/mne-cpp-test-data/subjects/sample/bem/sample-oct-6-src.fif";
         if (!QFile::exists(srcPath)) {
             QSKIP("Source space file not found");
         }
@@ -170,8 +168,7 @@ private slots:
 
     void bem_readFromFile()
     {
-        QString bemPath = QCoreApplication::applicationDirPath()
-                          + "/../resources/data/mne-cpp-test-data/subjects/sample/bem/sample-5120-bem.fif";
+        QString bemPath = QCoreApplication::applicationDirPath() + "/../resources/data/mne-cpp-test-data/subjects/sample/bem/sample-5120-bem.fif";
         if (!QFile::exists(bemPath)) {
             QSKIP("BEM file not found");
         }
@@ -191,8 +188,8 @@ private slots:
         surf.coord_frame = FIFFV_COORD_MRI;
         surf.rr.resize(3, 3);
         surf.rr << 1.0f, 0.0f, 0.0f,
-                   0.0f, 1.0f, 0.0f,
-                   0.0f, 0.0f, 1.0f;
+            0.0f, 1.0f, 0.0f,
+            0.0f, 0.0f, 1.0f;
         surf.nn = MatrixX3f::Zero(3, 3);
         surf.itris.resize(1, 3);
         surf.itris << 0, 1, 2;
@@ -239,8 +236,7 @@ private slots:
     //=========================================================================
     void fwd_readFromFile()
     {
-        QString fwdPath = QCoreApplication::applicationDirPath()
-                          + "/../resources/data/mne-cpp-test-data/Result/ref-sample_audvis-meg-eeg-oct-6-fwd.fif";
+        QString fwdPath = QCoreApplication::applicationDirPath() + "/../resources/data/mne-cpp-test-data/Result/ref-sample_audvis-meg-eeg-oct-6-fwd.fif";
         if (!QFile::exists(fwdPath)) {
             QSKIP("Forward solution file not found");
         }
@@ -324,7 +320,8 @@ private slots:
     {
         MatrixXd data = MatrixXd::Random(100, 10);
         VectorXi vertices(100);
-        for (int i = 0; i < 100; ++i) vertices(i) = i;
+        for (int i = 0; i < 100; ++i)
+            vertices(i) = i;
         float tmin = 0.0f;
         float tstep = 0.001f;
 
@@ -339,8 +336,7 @@ private slots:
     //=========================================================================
     void epochData_fromEvoked()
     {
-        QString avePath = QCoreApplication::applicationDirPath()
-                          + "/../resources/data/mne-cpp-test-data/MEG/sample/sample_audvis-ave.fif";
+        QString avePath = QCoreApplication::applicationDirPath() + "/../resources/data/mne-cpp-test-data/MEG/sample/sample_audvis-ave.fif";
         if (!QFile::exists(avePath)) {
             QSKIP("Sample evoked file not found");
         }
@@ -384,7 +380,8 @@ private slots:
     {
         MatrixXd data = MatrixXd::Random(50, 5);
         VectorXi vertices(50);
-        for (int i = 0; i < 50; ++i) vertices(i) = i;
+        for (int i = 0; i < 50; ++i)
+            vertices(i) = i;
         InvSourceEstimate stc(data, vertices, 0.0f, 0.001f);
 
         InvSourceEstimate copy(stc);
@@ -397,7 +394,8 @@ private slots:
     {
         MatrixXd data = MatrixXd::Random(50, 10);
         VectorXi vertices(50);
-        for (int i = 0; i < 50; ++i) vertices(i) = i;
+        for (int i = 0; i < 50; ++i)
+            vertices(i) = i;
         InvSourceEstimate stc(data, vertices, 0.0f, 0.001f);
 
         InvSourceEstimate reduced = stc.reduce(2, 5);
@@ -408,7 +406,8 @@ private slots:
     {
         MatrixXd data = MatrixXd::Random(10, 5);
         VectorXi vertices(10);
-        for (int i = 0; i < 10; ++i) vertices(i) = i;
+        for (int i = 0; i < 10; ++i)
+            vertices(i) = i;
         InvSourceEstimate stc(data, vertices, 0.0f, 0.001f);
         QVERIFY(!stc.isEmpty());
 
@@ -423,8 +422,7 @@ private slots:
     //=========================================================================
     void sourceSpace_readAndTransform()
     {
-        QString srcPath = QCoreApplication::applicationDirPath()
-                          + "/../resources/data/mne-cpp-test-data/subjects/sample/bem/sample-oct-6-src.fif";
+        QString srcPath = QCoreApplication::applicationDirPath() + "/../resources/data/mne-cpp-test-data/subjects/sample/bem/sample-oct-6-src.fif";
         if (!QFile::exists(srcPath))
             QSKIP("Source space file not found");
         QFile file(srcPath);
@@ -448,8 +446,7 @@ private slots:
     //=========================================================================
     void fwd_clusterForward()
     {
-        QString fwdPath = QCoreApplication::applicationDirPath()
-                          + "/../resources/data/mne-cpp-test-data/Result/ref-sample_audvis-meg-eeg-oct-6-fwd.fif";
+        QString fwdPath = QCoreApplication::applicationDirPath() + "/../resources/data/mne-cpp-test-data/Result/ref-sample_audvis-meg-eeg-oct-6-fwd.fif";
         if (!QFile::exists(fwdPath))
             QSKIP("Forward solution file not found");
         QFile file(fwdPath);
@@ -485,7 +482,8 @@ private slots:
         solData->data = MatrixXd::Random(nSensors, nSources);
         solData->nrow = nSensors;
         solData->ncol = nSources;
-        for (int i = 0; i < nSensors; ++i) solData->row_names << QString("CH%1").arg(i);
+        for (int i = 0; i < nSensors; ++i)
+            solData->row_names << QString("CH%1").arg(i);
         fwd.sol = solData;
 
         FiffInfo info;
@@ -513,17 +511,14 @@ private slots:
     //=========================================================================
     void invOp_readFromFile()
     {
-        QString invPath = QCoreApplication::applicationDirPath()
-                          + "/../resources/data/mne-cpp-test-data/Result/ref-sample_audvis-meg-oct-6-meg-inv.fif";
+        QString invPath = QCoreApplication::applicationDirPath() + "/../resources/data/mne-cpp-test-data/Result/ref-sample_audvis-meg-oct-6-meg-inv.fif";
         if (!QFile::exists(invPath)) {
             // Try MNE sample data
-            invPath = QDir::homePath()
-                      + "/mne_data/MNE-sample-data/MEG/sample/sample_audvis-meg-oct-6-meg-inv.fif";
+            invPath = QDir::homePath() + "/mne_data/MNE-sample-data/MEG/sample/sample_audvis-meg-oct-6-meg-inv.fif";
         }
         if (!QFile::exists(invPath)) {
             // Try fixed orientation variant
-            invPath = QDir::homePath()
-                      + "/mne_data/MNE-sample-data/MEG/sample/sample_audvis-meg-oct-6-meg-fixed-inv.fif";
+            invPath = QDir::homePath() + "/mne_data/MNE-sample-data/MEG/sample/sample_audvis-meg-oct-6-meg-fixed-inv.fif";
         }
         if (!QFile::exists(invPath))
             QSKIP("Inverse operator file not found");
@@ -564,8 +559,7 @@ private slots:
     void fsLabel_readFromFile()
     {
         // Try to find a label file
-        QString labelPath = QCoreApplication::applicationDirPath()
-                            + "/../resources/data/mne-cpp-test-data/subjects/sample/label/lh.aparc.a2009s.annot";
+        QString labelPath = QCoreApplication::applicationDirPath() + "/../resources/data/mne-cpp-test-data/subjects/sample/label/lh.aparc.a2009s.annot";
         // Labels in the test data might be annotation files, try a regular label
         QString labelPath2 = QString::fromUtf8(qgetenv("MNE_DATA"));
         if (labelPath2.isEmpty())
@@ -599,8 +593,7 @@ private slots:
 
     void fsAnnotation_readFromFile()
     {
-        QString annotPath = QCoreApplication::applicationDirPath()
-                            + "/../resources/data/mne-cpp-test-data/subjects/sample/label/lh.aparc.annot";
+        QString annotPath = QCoreApplication::applicationDirPath() + "/../resources/data/mne-cpp-test-data/subjects/sample/label/lh.aparc.annot";
         if (!QFile::exists(annotPath))
             QSKIP("Annotation file not found");
         FsAnnotation annot;
@@ -619,8 +612,7 @@ private slots:
     //=========================================================================
     void descriptionParser_parseAverageFile()
     {
-        QString avePath = QDir::homePath()
-                          + "/mne_data/MNE-sample-data/MEG/sample/audvis.ave";
+        QString avePath = QDir::homePath() + "/mne_data/MNE-sample-data/MEG/sample/audvis.ave";
         if (!QFile::exists(avePath))
             QSKIP("audvis.ave not found");
 
@@ -648,8 +640,7 @@ private slots:
     //=========================================================================
     void descriptionParser_parseCovarianceFile()
     {
-        QString covPath = QDir::homePath()
-                          + "/mne_data/MNE-sample-data/MEG/sample/audvis.cov";
+        QString covPath = QDir::homePath() + "/mne_data/MNE-sample-data/MEG/sample/audvis.cov";
         if (!QFile::exists(covPath))
             QSKIP("audvis.cov not found");
 
@@ -676,8 +667,7 @@ private slots:
 
     void descriptionParser_parseCovarianceFile_ernoise()
     {
-        QString covPath = QDir::homePath()
-                          + "/mne_data/MNE-sample-data/MEG/sample/ernoise.cov";
+        QString covPath = QDir::homePath() + "/mne_data/MNE-sample-data/MEG/sample/ernoise.cov";
         if (!QFile::exists(covPath))
             QSKIP("ernoise.cov not found");
 
@@ -715,8 +705,10 @@ private slots:
         nm.nrow = 3;
         nm.ncol = 4;
         nm.data = MatrixXd::Random(3, 4);
-        for (int i = 0; i < 3; ++i) nm.row_names << QString("r%1").arg(i);
-        for (int j = 0; j < 4; ++j) nm.col_names << QString("c%1").arg(j);
+        for (int i = 0; i < 3; ++i)
+            nm.row_names << QString("r%1").arg(i);
+        for (int j = 0; j < 4; ++j)
+            nm.col_names << QString("c%1").arg(j);
 
         QCOMPARE(nm.row_names.size(), 3);
         QCOMPARE(nm.col_names.size(), 4);
@@ -774,11 +766,13 @@ private slots:
         MNESourceSpace sp(10);
         sp.rr = MatrixX3f::Zero(10, 3);
         // All x < 0 → left hemisphere
-        for (int i = 0; i < 10; ++i) sp.rr(i, 0) = -0.05f;
+        for (int i = 0; i < 10; ++i)
+            sp.rr(i, 0) = -0.05f;
         QCOMPARE(sp.is_left_hemi(), 1);
 
         // All x > 0 → right hemisphere
-        for (int i = 0; i < 10; ++i) sp.rr(i, 0) = 0.05f;
+        for (int i = 0; i < 10; ++i)
+            sp.rr(i, 0) = 0.05f;
         QCOMPARE(sp.is_left_hemi(), 0);
     }
 
@@ -811,12 +805,14 @@ private slots:
         MNESourceSpace lh(5);
         lh.id = FIFFV_MNE_SURF_LEFT_HEMI;
         lh.rr = MatrixX3f::Zero(5, 3);
-        for (int i = 0; i < 5; ++i) lh.rr(i, 0) = -0.05f;
+        for (int i = 0; i < 5; ++i)
+            lh.rr(i, 0) = -0.05f;
 
         MNESourceSpace rh(5);
         rh.id = FIFFV_MNE_SURF_RIGHT_HEMI;
         rh.rr = MatrixX3f::Zero(5, 3);
-        for (int i = 0; i < 5; ++i) rh.rr(i, 0) = 0.05f;
+        for (int i = 0; i < 5; ++i)
+            rh.rr(i, 0) = 0.05f;
 
         ss.append(lh);
         ss.append(rh);
@@ -832,8 +828,7 @@ private slots:
     //=========================================================================
     void fwd_writeReadRoundtrip()
     {
-        QString fwdPath = QCoreApplication::applicationDirPath()
-                          + "/../resources/data/mne-cpp-test-data/Result/ref-sample_audvis-meg-eeg-oct-6-fwd.fif";
+        QString fwdPath = QCoreApplication::applicationDirPath() + "/../resources/data/mne-cpp-test-data/Result/ref-sample_audvis-meg-eeg-oct-6-fwd.fif";
         if (!QFile::exists(fwdPath))
             QSKIP("Forward solution file not found");
 
@@ -859,8 +854,7 @@ private slots:
 
     void fwd_toFixedOri()
     {
-        QString fwdPath = QCoreApplication::applicationDirPath()
-                          + "/../resources/data/mne-cpp-test-data/Result/ref-sample_audvis-meg-eeg-oct-6-fwd.fif";
+        QString fwdPath = QCoreApplication::applicationDirPath() + "/../resources/data/mne-cpp-test-data/Result/ref-sample_audvis-meg-eeg-oct-6-fwd.fif";
         if (!QFile::exists(fwdPath))
             QSKIP("Forward solution file not found");
 
@@ -881,8 +875,7 @@ private slots:
 
     void fwd_computeOrientPrior()
     {
-        QString fwdPath = QCoreApplication::applicationDirPath()
-                          + "/../resources/data/mne-cpp-test-data/Result/ref-sample_audvis-meg-eeg-oct-6-fwd.fif";
+        QString fwdPath = QCoreApplication::applicationDirPath() + "/../resources/data/mne-cpp-test-data/Result/ref-sample_audvis-meg-eeg-oct-6-fwd.fif";
         if (!QFile::exists(fwdPath))
             QSKIP("Forward solution file not found");
 
@@ -900,15 +893,12 @@ private slots:
     //=========================================================================
     void invOp_prepareAndKernel()
     {
-        QString invPath = QCoreApplication::applicationDirPath()
-                          + "/../resources/data/mne-cpp-test-data/Result/ref-sample_audvis-meg-oct-6-meg-inv.fif";
+        QString invPath = QCoreApplication::applicationDirPath() + "/../resources/data/mne-cpp-test-data/Result/ref-sample_audvis-meg-oct-6-meg-inv.fif";
         if (!QFile::exists(invPath)) {
-            invPath = QDir::homePath()
-                      + "/mne_data/MNE-sample-data/MEG/sample/sample_audvis-meg-oct-6-meg-inv.fif";
+            invPath = QDir::homePath() + "/mne_data/MNE-sample-data/MEG/sample/sample_audvis-meg-oct-6-meg-inv.fif";
         }
         if (!QFile::exists(invPath)) {
-            invPath = QDir::homePath()
-                      + "/mne_data/MNE-sample-data/MEG/sample/sample_audvis-meg-oct-6-meg-fixed-inv.fif";
+            invPath = QDir::homePath() + "/mne_data/MNE-sample-data/MEG/sample/sample_audvis-meg-oct-6-meg-fixed-inv.fif";
         }
         if (!QFile::exists(invPath))
             QSKIP("Inverse operator file not found");
@@ -925,15 +915,12 @@ private slots:
 
     void invOp_writeReadRoundtrip()
     {
-        QString invPath = QCoreApplication::applicationDirPath()
-                          + "/../resources/data/mne-cpp-test-data/Result/ref-sample_audvis-meg-oct-6-meg-inv.fif";
+        QString invPath = QCoreApplication::applicationDirPath() + "/../resources/data/mne-cpp-test-data/Result/ref-sample_audvis-meg-oct-6-meg-inv.fif";
         if (!QFile::exists(invPath)) {
-            invPath = QDir::homePath()
-                      + "/mne_data/MNE-sample-data/MEG/sample/sample_audvis-meg-oct-6-meg-inv.fif";
+            invPath = QDir::homePath() + "/mne_data/MNE-sample-data/MEG/sample/sample_audvis-meg-oct-6-meg-inv.fif";
         }
         if (!QFile::exists(invPath)) {
-            invPath = QDir::homePath()
-                      + "/mne_data/MNE-sample-data/MEG/sample/sample_audvis-meg-oct-6-meg-fixed-inv.fif";
+            invPath = QDir::homePath() + "/mne_data/MNE-sample-data/MEG/sample/sample_audvis-meg-oct-6-meg-fixed-inv.fif";
         }
         if (!QFile::exists(invPath))
             QSKIP("Inverse operator file not found");
@@ -1006,8 +993,7 @@ private slots:
     void mne_setupCompensators()
     {
         // Load raw data file
-        QString rawPath = QDir::homePath()
-                         + "/mne_data/MNE-sample-data/MEG/sample/sample_audvis_raw.fif";
+        QString rawPath = QDir::homePath() + "/mne_data/MNE-sample-data/MEG/sample/sample_audvis_raw.fif";
         if (!QFile::exists(rawPath))
             QSKIP("sample_audvis_raw.fif not found");
 
@@ -1031,7 +1017,7 @@ private slots:
         vec << 1.0, 2.0, 3.0, 4.0, 5.0, 6.0;
         VectorXd result = MNE::combine_xyz(vec);
         QCOMPARE(result.size(), static_cast<Eigen::Index>(2));
-        double exp0 = 1.0 + 4.0 + 9.0;   // 14
+        double exp0 = 1.0 + 4.0 + 9.0;    // 14
         double exp1 = 16.0 + 25.0 + 36.0; // 77
         QVERIFY(qAbs(result(0) - exp0) < 1e-10);
         QVERIFY(qAbs(result(1) - exp1) < 1e-10);
@@ -1042,21 +1028,21 @@ private slots:
         // make_block_diag splits columns into blocks of n columns each
         MatrixXd A(2, 4);
         A << 1, 2, 5, 6,
-             3, 4, 7, 8;
+            3, 4, 7, 8;
         SparseMatrix<double> S = MNE::make_block_diag(A, 2);
         // A has 4 cols with block size 2 → 2 blocks, each 2x2
         // Result should be 4x4 sparse block diagonal
         QCOMPARE(S.rows(), static_cast<Eigen::Index>(4));
         QCOMPARE(S.cols(), static_cast<Eigen::Index>(4));
         // Top-left block should be [1,2; 3,4]
-        QVERIFY(qAbs(S.coeff(0,0) - 1.0) < 1e-10);
-        QVERIFY(qAbs(S.coeff(1,1) - 4.0) < 1e-10);
+        QVERIFY(qAbs(S.coeff(0, 0) - 1.0) < 1e-10);
+        QVERIFY(qAbs(S.coeff(1, 1) - 4.0) < 1e-10);
         // Bottom-right block [5,6; 7,8]
-        QVERIFY(qAbs(S.coeff(2,2) - 5.0) < 1e-10);
-        QVERIFY(qAbs(S.coeff(3,3) - 8.0) < 1e-10);
+        QVERIFY(qAbs(S.coeff(2, 2) - 5.0) < 1e-10);
+        QVERIFY(qAbs(S.coeff(3, 3) - 8.0) < 1e-10);
         // Off-diagonal blocks should be zero
-        QCOMPARE(S.coeff(0,2), 0.0);
-        QCOMPARE(S.coeff(2,0), 0.0);
+        QCOMPARE(S.coeff(0, 2), 0.0);
+        QCOMPARE(S.coeff(2, 0), 0.0);
     }
 
     //=========================================================================
@@ -1077,8 +1063,10 @@ private slots:
         MNEProjOp projOp;
 
         // Create a named matrix for projection vectors
-        QStringList rowlist; rowlist << "vec1";
-        QStringList collist; collist << "MEG 001" << "MEG 002" << "MEG 003";
+        QStringList rowlist;
+        rowlist << "vec1";
+        QStringList collist;
+        collist << "MEG 001" << "MEG 002" << "MEG 003";
         MatrixXf data(1, 3);
         data << 0.577f, 0.577f, 0.577f;
         auto vecs = MNENamedMatrix::build(1, 3, rowlist, collist, data);
@@ -1096,8 +1084,10 @@ private slots:
     void projOp_addItemActive()
     {
         MNEProjOp projOp;
-        QStringList rowlist; rowlist << "v1";
-        QStringList collist; collist << "ch1" << "ch2";
+        QStringList rowlist;
+        rowlist << "v1";
+        QStringList collist;
+        collist << "ch1" << "ch2";
         MatrixXf data(1, 2);
         data << 0.707f, 0.707f;
         auto vecs = MNENamedMatrix::build(1, 2, rowlist, collist, data);
@@ -1109,8 +1099,10 @@ private slots:
     void projOp_combine()
     {
         MNEProjOp projOp1;
-        QStringList rowlist; rowlist << "v1";
-        QStringList collist; collist << "ch1" << "ch2";
+        QStringList rowlist;
+        rowlist << "v1";
+        QStringList collist;
+        collist << "ch1" << "ch2";
         MatrixXf data(1, 2);
         data << 1.0f, 0.0f;
         auto vecs = MNENamedMatrix::build(1, 2, rowlist, collist, data);
@@ -1129,15 +1121,18 @@ private slots:
     void projOp_assignAndMakeProj()
     {
         MNEProjOp projOp;
-        QStringList rowlist; rowlist << "v1";
-        QStringList collist; collist << "ch1" << "ch2" << "ch3";
+        QStringList rowlist;
+        rowlist << "v1";
+        QStringList collist;
+        collist << "ch1" << "ch2" << "ch3";
         MatrixXf data(1, 3);
         data << 0.577f, 0.577f, 0.577f;
         auto vecs = MNENamedMatrix::build(1, 3, rowlist, collist, data);
         projOp.add_item(vecs.get(), FIFFV_PROJ_ITEM_FIELD, "Test proj");
 
         // assign_channels
-        QStringList chanNames; chanNames << "ch1" << "ch2" << "ch3";
+        QStringList chanNames;
+        chanNames << "ch1" << "ch2" << "ch3";
         int ret = projOp.assign_channels(chanNames, 3);
         QCOMPARE(ret, 0);
 
@@ -1149,14 +1144,17 @@ private slots:
     void projOp_affect()
     {
         MNEProjOp projOp;
-        QStringList rowlist; rowlist << "v1";
-        QStringList collist; collist << "ch1" << "ch2";
+        QStringList rowlist;
+        rowlist << "v1";
+        QStringList collist;
+        collist << "ch1" << "ch2";
         MatrixXf data(1, 2);
         data << 1.0f, 0.0f;
         auto vecs = MNENamedMatrix::build(1, 2, rowlist, collist, data);
         projOp.add_item(vecs.get(), FIFFV_PROJ_ITEM_FIELD, "Test");
 
-        QStringList chList; chList << "ch1" << "ch2" << "ch3";
+        QStringList chList;
+        chList << "ch1" << "ch2" << "ch3";
         int nAffect = projOp.affect(chList, 3);
         QVERIFY(nAffect >= 0);
     }
@@ -1164,8 +1162,10 @@ private slots:
     void projOp_report()
     {
         MNEProjOp projOp;
-        QStringList rowlist; rowlist << "v1";
-        QStringList collist; collist << "ch1" << "ch2";
+        QStringList rowlist;
+        rowlist << "v1";
+        QStringList collist;
+        collist << "ch1" << "ch2";
         MatrixXf data(1, 2);
         data << 1.0f, 0.0f;
         auto vecs = MNENamedMatrix::build(1, 2, rowlist, collist, data);
@@ -1184,8 +1184,10 @@ private slots:
 
     void namedMatrix_build()
     {
-        QStringList rows; rows << "r1" << "r2";
-        QStringList cols; cols << "c1" << "c2" << "c3";
+        QStringList rows;
+        rows << "r1" << "r2";
+        QStringList cols;
+        cols << "c1" << "c2" << "c3";
         MatrixXf data(2, 3);
         data << 1, 2, 3, 4, 5, 6;
         auto mat = MNENamedMatrix::build(2, 3, rows, cols, data);
@@ -1198,22 +1200,26 @@ private slots:
 
     void namedMatrix_pick()
     {
-        QStringList rows; rows << "r1" << "r2" << "r3";
-        QStringList cols; cols << "c1" << "c2" << "c3";
+        QStringList rows;
+        rows << "r1" << "r2" << "r3";
+        QStringList cols;
+        cols << "c1" << "c2" << "c3";
         MatrixXf data(3, 3);
         data << 1, 2, 3, 4, 5, 6, 7, 8, 9;
         auto mat = MNENamedMatrix::build(3, 3, rows, cols, data);
 
         // Pick subset of rows and cols
-        QStringList pickRows; pickRows << "r1" << "r3";
-        QStringList pickCols; pickCols << "c2";
+        QStringList pickRows;
+        pickRows << "r1" << "r3";
+        QStringList pickCols;
+        pickCols << "c2";
         auto sub = mat->pick(pickRows, 2, pickCols, 1);
         QVERIFY(sub != nullptr);
         QCOMPARE(sub->nrow, 2);
         QCOMPARE(sub->ncol, 1);
         // r1,c2 = 2; r3,c2 = 8
-        QVERIFY(qAbs(sub->data(0,0) - 2.0f) < 1e-5f);
-        QVERIFY(qAbs(sub->data(1,0) - 8.0f) < 1e-5f);
+        QVERIFY(qAbs(sub->data(0, 0) - 2.0f) < 1e-5f);
+        QVERIFY(qAbs(sub->data(1, 0) - 8.0f) < 1e-5f);
     }
 
     //=========================================================================
@@ -1222,11 +1228,9 @@ private slots:
 
     void sourceSpaces_writeReadRoundtrip()
     {
-        QString fwdPath = QCoreApplication::applicationDirPath()
-                          + "/../resources/data/mne-cpp-test-data/MEG/sample/sample_audvis-meg-eeg-oct-6-fwd.fif";
+        QString fwdPath = QCoreApplication::applicationDirPath() + "/../resources/data/mne-cpp-test-data/MEG/sample/sample_audvis-meg-eeg-oct-6-fwd.fif";
         if (!QFile::exists(fwdPath))
-            fwdPath = QCoreApplication::applicationDirPath()
-                      + "/../resources/data/mne-cpp-test-data/Result/ref-sample_audvis-meg-eeg-oct-6-fwd.fif";
+            fwdPath = QCoreApplication::applicationDirPath() + "/../resources/data/mne-cpp-test-data/Result/ref-sample_audvis-meg-eeg-oct-6-fwd.fif";
         if (!QFile::exists(fwdPath))
             QSKIP("Forward file not found");
 
@@ -1247,11 +1251,9 @@ private slots:
 
     void sourceSpaces_getVertno()
     {
-        QString fwdPath = QCoreApplication::applicationDirPath()
-                          + "/../resources/data/mne-cpp-test-data/MEG/sample/sample_audvis-meg-eeg-oct-6-fwd.fif";
+        QString fwdPath = QCoreApplication::applicationDirPath() + "/../resources/data/mne-cpp-test-data/MEG/sample/sample_audvis-meg-eeg-oct-6-fwd.fif";
         if (!QFile::exists(fwdPath))
-            fwdPath = QCoreApplication::applicationDirPath()
-                      + "/../resources/data/mne-cpp-test-data/Result/ref-sample_audvis-meg-eeg-oct-6-fwd.fif";
+            fwdPath = QCoreApplication::applicationDirPath() + "/../resources/data/mne-cpp-test-data/Result/ref-sample_audvis-meg-eeg-oct-6-fwd.fif";
         if (!QFile::exists(fwdPath))
             QSKIP("Forward file not found");
 
@@ -1267,11 +1269,9 @@ private slots:
 
     void sourceSpaces_findHemi()
     {
-        QString fwdPath = QCoreApplication::applicationDirPath()
-                          + "/../resources/data/mne-cpp-test-data/MEG/sample/sample_audvis-meg-eeg-oct-6-fwd.fif";
+        QString fwdPath = QCoreApplication::applicationDirPath() + "/../resources/data/mne-cpp-test-data/MEG/sample/sample_audvis-meg-eeg-oct-6-fwd.fif";
         if (!QFile::exists(fwdPath))
-            fwdPath = QCoreApplication::applicationDirPath()
-                      + "/../resources/data/mne-cpp-test-data/Result/ref-sample_audvis-meg-eeg-oct-6-fwd.fif";
+            fwdPath = QCoreApplication::applicationDirPath() + "/../resources/data/mne-cpp-test-data/Result/ref-sample_audvis-meg-eeg-oct-6-fwd.fif";
         if (!QFile::exists(fwdPath))
             QSKIP("Forward file not found");
 
@@ -1291,8 +1291,7 @@ private slots:
     void evokedSet_readAndPickChannels()
     {
         // Read the evoked set
-        QString avePath = QDir::homePath()
-                         + "/mne_data/MNE-sample-data/MEG/sample/sample_audvis-ave.fif";
+        QString avePath = QDir::homePath() + "/mne_data/MNE-sample-data/MEG/sample/sample_audvis-ave.fif";
         if (!QFile::exists(avePath))
             QSKIP("sample_audvis-ave.fif not found");
 
@@ -1316,8 +1315,7 @@ private slots:
 
     void evokedSet_save()
     {
-        QString avePath = QDir::homePath()
-                         + "/mne_data/MNE-sample-data/MEG/sample/sample_audvis-ave.fif";
+        QString avePath = QDir::homePath() + "/mne_data/MNE-sample-data/MEG/sample/sample_audvis-ave.fif";
         if (!QFile::exists(avePath))
             QSKIP("sample_audvis-ave.fif not found");
 
@@ -1419,7 +1417,8 @@ private slots:
         QList<FiffProj> projs;
         projs.append(FiffProj(FIFFV_PROJ_ITEM_FIELD, true, "TestProj", data));
 
-        QStringList ch_names; ch_names << "ch1" << "ch2" << "ch3";
+        QStringList ch_names;
+        ch_names << "ch1" << "ch2" << "ch3";
         MatrixXd proj;
         fiff_int_t nproj = FiffProj::make_projector(projs, ch_names, proj);
         QVERIFY(nproj >= 0);
@@ -1435,56 +1434,65 @@ private slots:
 
     void namedMatrix_pickRowsOnly()
     {
-        QStringList rows; rows << "r1" << "r2" << "r3";
-        QStringList cols; cols << "c1" << "c2";
+        QStringList rows;
+        rows << "r1" << "r2" << "r3";
+        QStringList cols;
+        cols << "c1" << "c2";
         MatrixXf data(3, 2);
         data << 1, 2, 3, 4, 5, 6;
         auto mat = MNENamedMatrix::build(3, 2, rows, cols, data);
 
         // Pick only rows — empty col list keeps all columns
-        QStringList pickRows; pickRows << "r2";
+        QStringList pickRows;
+        pickRows << "r2";
         QStringList emptyCols;
         auto sub = mat->pick(pickRows, 1, emptyCols, 0);
         QVERIFY(sub != nullptr);
         QCOMPARE(sub->nrow, 1);
         QCOMPARE(sub->ncol, 2);
         // r2 = [3, 4]
-        QVERIFY(qAbs(sub->data(0,0) - 3.0f) < 1e-5f);
-        QVERIFY(qAbs(sub->data(0,1) - 4.0f) < 1e-5f);
+        QVERIFY(qAbs(sub->data(0, 0) - 3.0f) < 1e-5f);
+        QVERIFY(qAbs(sub->data(0, 1) - 4.0f) < 1e-5f);
     }
 
     void namedMatrix_pickColsOnly()
     {
-        QStringList rows; rows << "r1" << "r2";
-        QStringList cols; cols << "c1" << "c2" << "c3";
+        QStringList rows;
+        rows << "r1" << "r2";
+        QStringList cols;
+        cols << "c1" << "c2" << "c3";
         MatrixXf data(2, 3);
         data << 1, 2, 3, 4, 5, 6;
         auto mat = MNENamedMatrix::build(2, 3, rows, cols, data);
 
         // Pick only cols — empty row list keeps all rows
         QStringList emptyRows;
-        QStringList pickCols; pickCols << "c3" << "c1";
+        QStringList pickCols;
+        pickCols << "c3" << "c1";
         auto sub = mat->pick(emptyRows, 0, pickCols, 2);
         QVERIFY(sub != nullptr);
         QCOMPARE(sub->nrow, 2);
         QCOMPARE(sub->ncol, 2);
         // All rows, picked cols c3,c1: r1=[3,1], r2=[6,4]
-        QVERIFY(qAbs(sub->data(0,0) - 3.0f) < 1e-5f);
-        QVERIFY(qAbs(sub->data(0,1) - 1.0f) < 1e-5f);
-        QVERIFY(qAbs(sub->data(1,0) - 6.0f) < 1e-5f);
-        QVERIFY(qAbs(sub->data(1,1) - 4.0f) < 1e-5f);
+        QVERIFY(qAbs(sub->data(0, 0) - 3.0f) < 1e-5f);
+        QVERIFY(qAbs(sub->data(0, 1) - 1.0f) < 1e-5f);
+        QVERIFY(qAbs(sub->data(1, 0) - 6.0f) < 1e-5f);
+        QVERIFY(qAbs(sub->data(1, 1) - 4.0f) < 1e-5f);
     }
 
     void namedMatrix_pickMissingRow()
     {
-        QStringList rows; rows << "r1" << "r2";
-        QStringList cols; cols << "c1";
+        QStringList rows;
+        rows << "r1" << "r2";
+        QStringList cols;
+        cols << "c1";
         MatrixXf data(2, 1);
         data << 1, 2;
         auto mat = MNENamedMatrix::build(2, 1, rows, cols, data);
 
         // Pick a row that does not exist
-        QStringList pickRows; pickRows << "r_missing";
+        QStringList pickRows;
+        pickRows << "r_missing";
         QStringList emptyCols;
         auto sub = mat->pick(pickRows, 1, emptyCols, 0);
         QVERIFY(sub == nullptr);
@@ -1492,23 +1500,28 @@ private slots:
 
     void namedMatrix_pickMissingCol()
     {
-        QStringList rows; rows << "r1";
-        QStringList cols; cols << "c1" << "c2";
+        QStringList rows;
+        rows << "r1";
+        QStringList cols;
+        cols << "c1" << "c2";
         MatrixXf data(1, 2);
         data << 1, 2;
         auto mat = MNENamedMatrix::build(1, 2, rows, cols, data);
 
         // Pick a col that does not exist
         QStringList emptyRows;
-        QStringList pickCols; pickCols << "c_missing";
+        QStringList pickCols;
+        pickCols << "c_missing";
         auto sub = mat->pick(emptyRows, 0, pickCols, 1);
         QVERIFY(sub == nullptr);
     }
 
     void namedMatrix_copyCtor()
     {
-        QStringList rows; rows << "r1" << "r2";
-        QStringList cols; cols << "c1";
+        QStringList rows;
+        rows << "r1" << "r2";
+        QStringList cols;
+        cols << "c1";
         MatrixXf data(2, 1);
         data << 3, 7;
         auto orig = MNENamedMatrix::build(2, 1, rows, cols, data);
@@ -1518,7 +1531,7 @@ private slots:
         QCOMPARE(copy.ncol, 1);
         QCOMPARE(copy.rowlist, rows);
         QCOMPARE(copy.collist, cols);
-        QVERIFY(qAbs(copy.data(0,0) - 3.0f) < 1e-5f);
+        QVERIFY(qAbs(copy.data(0, 0) - 3.0f) < 1e-5f);
     }
 
     //=========================================================================
@@ -1538,15 +1551,15 @@ private slots:
         MNEMeasDataSet ds;
         ds.np = 5;
         ds.tmin = 0.0f;
-        ds.tstep = 0.1f;  // 10 Hz: times 0.0, 0.1, 0.2, 0.3, 0.4
+        ds.tstep = 0.1f; // 10 Hz: times 0.0, 0.1, 0.2, 0.3, 0.4
 
         // data layout is [np x nchan] — samples as rows, channels as columns
         ds.data = MatrixXf(5, 3);
         ds.data << 1, 10, 100,
-                   2, 20, 200,
-                   3, 30, 300,
-                   4, 40, 400,
-                   5, 50, 500;
+            2, 20, 200,
+            3, 30, 300,
+            4, 40, 400,
+            5, 50, 500;
 
         int nch = 3;
         std::vector<float> values(nch);
@@ -1569,9 +1582,9 @@ private slots:
         // data layout [np x nch]
         ds.data = MatrixXf(4, 2);
         ds.data << -1, -10,
-                    2,  20,
-                   -3, -30,
-                    4,  40;
+            2, 20,
+            -3, -30,
+            4, 40;
 
         int nch = 2;
         std::vector<float> values(nch);
@@ -1619,8 +1632,8 @@ private slots:
         // Create events matrix: N x 3 (sample, prev, event_id)
         MatrixXi evMat(3, 3);
         evMat << 100, 0, 1,
-                 200, 0, 2,
-                 300, 0, 1;
+            200, 0, 2,
+            300, 0, 1;
 
         FiffEvents evWrite;
         evWrite.events = evMat;
@@ -1652,7 +1665,7 @@ private slots:
     {
         MatrixXi evMat(2, 3);
         evMat << 500, 0, 3,
-                 600, 0, 4;
+            600, 0, 4;
 
         FiffEvents evWrite;
         evWrite.events = evMat;
@@ -1705,8 +1718,12 @@ private slots:
         // a dynamically sized matrix and reports a false -Wmaybe-uninitialized
         // from inside Eigen.
         surf.rr = MatrixXf::Zero(3, 3);
-        surf.rr(1, 0) =  1.0f; surf.rr(1, 1) =  2.0f; surf.rr(1, 2) =  3.0f;
-        surf.rr(2, 0) = -1.0f; surf.rr(2, 1) = -2.0f; surf.rr(2, 2) = -3.0f;
+        surf.rr(1, 0) = 1.0f;
+        surf.rr(1, 1) = 2.0f;
+        surf.rr(1, 2) = 3.0f;
+        surf.rr(2, 0) = -1.0f;
+        surf.rr(2, 1) = -2.0f;
+        surf.rr(2, 2) = -3.0f;
         surf.decide_surface_extent("test");
         // After deciding extent, minv/maxv should be set
         QVERIFY(surf.minv(0) <= surf.maxv(0));
@@ -1718,7 +1735,7 @@ private slots:
         surf.np = 4;
         surf.curv = VectorXf(4);
         surf.curv << -0.5f, 0.2f, 0.0f, 0.8f;
-        surf.curvature_color_mode = 0;  // SHOW_CURVATURE_NONE
+        surf.curvature_color_mode = 0; // SHOW_CURVATURE_NONE
         surf.setup_curvature_colors();
         QVERIFY(surf.vertex_colors.size() > 0);
     }
@@ -1729,7 +1746,7 @@ private slots:
         surf.np = 3;
         surf.curv = VectorXf(3);
         surf.curv << -0.3f, 0.5f, 0.1f;
-        surf.curvature_color_mode = 1;  // SHOW_CURVATURE_OVERLAY
+        surf.curvature_color_mode = 1; // SHOW_CURVATURE_OVERLAY
         surf.setup_curvature_colors();
         QVERIFY(surf.vertex_colors.size() > 0);
     }
@@ -1744,8 +1761,12 @@ private slots:
         surf.np = 2;
         // See mshDisplaySurface_decideExtent for why this is not a comma initializer.
         surf.rr = MatrixXf::Zero(2, 3);
-        surf.rr(0, 0) = 1.0f; surf.rr(0, 1) = 2.0f; surf.rr(0, 2) = 3.0f;
-        surf.rr(1, 0) = 4.0f; surf.rr(1, 1) = 5.0f; surf.rr(1, 2) = 6.0f;
+        surf.rr(0, 0) = 1.0f;
+        surf.rr(0, 1) = 2.0f;
+        surf.rr(0, 2) = 3.0f;
+        surf.rr(1, 0) = 4.0f;
+        surf.rr(1, 1) = 5.0f;
+        surf.rr(1, 2) = 6.0f;
         surf.minv = Eigen::Vector3f(0.0f, 1.0f, 2.0f);
         surf.maxv = Eigen::Vector3f(4.0f, 5.0f, 6.0f);
 
@@ -1778,12 +1799,12 @@ private slots:
         MNEMeasDataSet ds;
         ds.np = 10;
         ds.tmin = 0.0f;
-        ds.tstep = 0.1f;  // sfreq = 10 Hz
+        ds.tstep = 0.1f; // sfreq = 10 Hz
 
         // data [np x nch], 1 channel
         ds.data = MatrixXf(10, 1);
         for (int i = 0; i < 10; ++i)
-            ds.data(i, 0) = static_cast<float>(i * 10);  // 0,10,20,...,90
+            ds.data(i, 0) = static_cast<float>(i * 10); // 0,10,20,...,90
 
         float value;
         // time=0.15 → s1=1.5, n1=1, f1=0.5 — interpolates between sample 1 (10) and 2 (20)
@@ -1867,7 +1888,7 @@ private slots:
         MNEMeasDataSet ds;
         ds.np = 10;
         ds.tmin = 0.0f;
-        ds.tstep = 0.01f;  // sfreq = 100
+        ds.tstep = 0.01f; // sfreq = 100
 
         ds.data = MatrixXf(10, 1);
         for (int i = 0; i < 10; ++i)
@@ -1897,7 +1918,7 @@ private slots:
         MNEMeasDataSet ds;
         ds.np = 10;
         ds.tmin = 0.0f;
-        ds.tstep = 0.01f;  // sfreq = 100
+        ds.tstep = 0.01f; // sfreq = 100
 
         ds.data = MatrixXf(10, 1);
         for (int i = 0; i < 10; ++i)
@@ -1930,7 +1951,7 @@ private slots:
         MNEMeasDataSet ds;
         ds.np = 10;
         ds.tmin = 0.0f;
-        ds.tstep = 0.01f;  // sfreq = 100
+        ds.tstep = 0.01f; // sfreq = 100
 
         ds.data = MatrixXf(10, 1);
         for (int i = 0; i < 10; ++i)
@@ -1942,7 +1963,7 @@ private slots:
         // This exercises the use_abs branches in the multi-sample path
         int ok = ds.getValuesAtTime(0.05f, 0.05f, 1, true, &value);
         QCOMPARE(ok, 0);
-        QVERIFY(value > 0.0f);  // Should be positive since we take abs
+        QVERIFY(value > 0.0f); // Should be positive since we take abs
     }
 
     //=========================================================================
@@ -1954,7 +1975,7 @@ private slots:
         int nsamp = 10, nch = 1;
         float ch0[10];
         for (int i = 0; i < nsamp; ++i)
-            ch0[i] = static_cast<float>(i * 10);  // 0,10,...,90
+            ch0[i] = static_cast<float>(i * 10); // 0,10,...,90
         float* data2d[1] = {ch0};
 
         float value;
@@ -1989,7 +2010,8 @@ private slots:
     {
         int nsamp = 10, nch = 1;
         float ch0[10];
-        for (int i = 0; i < nsamp; ++i) ch0[i] = static_cast<float>(i);
+        for (int i = 0; i < nsamp; ++i)
+            ch0[i] = static_cast<float>(i);
         float* data2d[1] = {ch0};
 
         float value;
@@ -2023,7 +2045,8 @@ private slots:
     {
         int nsamp = 10, nch = 1;
         float ch0[10];
-        for (int i = 0; i < nsamp; ++i) ch0[i] = static_cast<float>(i);
+        for (int i = 0; i < nsamp; ++i)
+            ch0[i] = static_cast<float>(i);
         float* data2d[1] = {ch0};
 
         float value;
@@ -2058,8 +2081,8 @@ private slots:
         // events matrix: [N x 3] = sample, from, to
         MatrixXi events(3, 3);
         events << 100, 0, 1,
-                  200, 0, 2,
-                  300, 0, 1;
+            200, 0, 2,
+            300, 0, 1;
 
         AverageCategory cat;
         cat.events = {1};
@@ -2079,7 +2102,7 @@ private slots:
     {
         MatrixXi events(2, 3);
         events << 100, 0, 1,
-                  200, 0, 2;
+            200, 0, 2;
 
         AverageCategory cat;
         cat.events = {1};
@@ -2097,13 +2120,13 @@ private slots:
         // events: ev0=(100, 0, 1), ev1=(200, 0, 2), ev2=(300, 0, 1)
         MatrixXi events(3, 3);
         events << 100, 0, 1,
-                  200, 0, 2,
-                  300, 0, 1;
+            200, 0, 2,
+            300, 0, 1;
 
         AverageCategory cat;
         cat.events = {1};
         cat.ignore = 0;
-        cat.prevEvent = 2;   // must have previous event with to==2
+        cat.prevEvent = 2; // must have previous event with to==2
         cat.prevIgnore = 0;
         cat.nextEvent = 0;
 
@@ -2117,14 +2140,14 @@ private slots:
     {
         MatrixXi events(3, 3);
         events << 100, 0, 1,
-                  200, 0, 2,
-                  300, 0, 3;
+            200, 0, 2,
+            300, 0, 3;
 
         AverageCategory cat;
         cat.events = {1};
         cat.ignore = 0;
         cat.prevEvent = 0;
-        cat.nextEvent = 2;   // must have next event with to==2
+        cat.nextEvent = 2; // must have next event with to==2
         cat.nextIgnore = 0;
 
         // Event 0: to=1 matches, next event 1 has from=0 (from & ~ignore==0 ✓), to=2==nextEvent ✓
@@ -2135,13 +2158,13 @@ private slots:
     {
         MatrixXi events(2, 3);
         events << 100, 0, 1,
-                  200, 5, 2;  // from=5, so (5 & ~0) != 0 → "found" is true but match fails
+            200, 5, 2; // from=5, so (5 & ~0) != 0 → "found" is true but match fails
 
         AverageCategory cat;
         cat.events = {1};
         cat.ignore = 0;
         cat.prevEvent = 0;
-        cat.nextEvent = 99;   // require next event == 99
+        cat.nextEvent = 99; // require next event == 99
         cat.nextIgnore = 0;
 
         // Event 0: to=1 matches events, but next event 1 has from=5 (non-zero) and to=2≠99
@@ -2159,7 +2182,7 @@ private slots:
     {
         MNEMshDisplaySurface surf;
         surf.decide_curv_display("inflated");
-        QCOMPARE(surf.curvature_color_mode, 1);  // SHOW_CURVATURE_OVERLAY
+        QCOMPARE(surf.curvature_color_mode, 1); // SHOW_CURVATURE_OVERLAY
     }
 
     void mshDisplaySurface_decideCurvDisplayWhite()
@@ -2180,7 +2203,7 @@ private slots:
     {
         MNEMshDisplaySurface surf;
         surf.decide_curv_display("pial");
-        QCOMPARE(surf.curvature_color_mode, 0);  // SHOW_CURVATURE_NONE
+        QCOMPARE(surf.curvature_color_mode, 0); // SHOW_CURVATURE_NONE
     }
 
     //=========================================================================
@@ -2194,7 +2217,7 @@ private slots:
         surf.curv = VectorXf(2);
         surf.curv << 0.5f, -0.3f;
         surf.nvertex_colors = 4;
-        surf.curvature_color_mode = 1;  // overlay
+        surf.curvature_color_mode = 1; // overlay
         surf.setup_curvature_colors();
         QCOMPARE(surf.vertex_colors.size(), 2 * 4);
         // Alpha channel (index 3, 7) should be 1.0

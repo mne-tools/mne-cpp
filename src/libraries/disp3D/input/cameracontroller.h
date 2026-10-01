@@ -49,13 +49,13 @@
  */
 struct CameraResult
 {
-    QMatrix4x4  projection;
-    QMatrix4x4  view;
-    QMatrix4x4  model;
-    QVector3D   cameraPos;
-    QVector3D   upVector;
-    QVector3D   lookAt;
-    float       distance = 0.0f;
+    QMatrix4x4 projection;
+    QMatrix4x4 view;
+    QMatrix4x4 model;
+    QVector3D cameraPos;
+    QVector3D upVector;
+    QVector3D lookAt;
+    float distance = 0.0f;
 };
 
 //=============================================================================================================
@@ -84,17 +84,29 @@ public:
      *
      * @param[in] center   Scene centroid in world coordinates.
      */
-    void setSceneCenter(const QVector3D &center) { m_sceneCenter = center; }
+    void setSceneCenter(const QVector3D& center)
+    {
+        m_sceneCenter = center;
+    }
 
     /**
      * Set the scene size (extent of visible objects).
      *
      * @param[in] size   Scene extent in world units; values at or below 0.01 fall back to 0.3.
      */
-    void setSceneSize(float size)                { m_sceneSize = (size > 0.01f) ? size : 0.3f; }
+    void setSceneSize(float size)
+    {
+        m_sceneSize = (size > 0.01f) ? size : 0.3f;
+    }
 
-    QVector3D sceneCenter() const { return m_sceneCenter; }
-    float     sceneSize()   const { return m_sceneSize; }
+    QVector3D sceneCenter() const
+    {
+        return m_sceneCenter;
+    }
+    float sceneSize() const
+    {
+        return m_sceneSize;
+    }
 
     // ── Single-view camera state ───────────────────────────────────────
 
@@ -103,19 +115,34 @@ public:
      *
      * @param[in] q   Camera rotation quaternion.
      */
-    void setRotation(const QQuaternion &q) { m_cameraRotation = q; }
-    QQuaternion rotation() const           { return m_cameraRotation; }
+    void setRotation(const QQuaternion& q)
+    {
+        m_cameraRotation = q;
+    }
+    QQuaternion rotation() const
+    {
+        return m_cameraRotation;
+    }
 
     /**
      * Single-view zoom level.
      *
      * @param[in] z   Zoom level; each unit moves the camera 5% of the scene size closer.
      */
-    void  setZoom(float z)     { m_zoom = z; }
-    float zoom() const         { return m_zoom; }
+    void setZoom(float z)
+    {
+        m_zoom = z;
+    }
+    float zoom() const
+    {
+        return m_zoom;
+    }
 
     /** Reset single-view rotation to identity. */
-    void resetRotation()       { m_cameraRotation = QQuaternion(); }
+    void resetRotation()
+    {
+        m_cameraRotation = QQuaternion();
+    }
 
     // ── Matrix computation ─────────────────────────────────────────────
 
@@ -134,7 +161,7 @@ public:
      * @param[in] aspectRatio    Width / height of the pane.
      * @return                   CameraResult with all matrices.
      */
-    CameraResult computeMultiView(const SubView &subView, float aspectRatio) const;
+    CameraResult computeMultiView(const SubView& subView, float aspectRatio) const;
 
     // ── Mouse interaction ──────────────────────────────────────────────
 
@@ -145,8 +172,8 @@ public:
      * @param[in,out] rotation   Rotation quaternion to update.
      * @param[in] speed          Rotation speed multiplier (default 0.5).
      */
-    static void applyMouseRotation(const QPoint &delta,
-                                   QQuaternion &rotation,
+    static void applyMouseRotation(const QPoint& delta,
+                                   QQuaternion& rotation,
                                    float speed = 0.5f);
 
     /**
@@ -156,21 +183,21 @@ public:
      * @param[in,out] pan        Pan offset to update.
      * @param[in] sceneSize      Current scene size for scaling.
      */
-    static void applyMousePan(const QPoint &delta,
-                              QVector2D &pan,
+    static void applyMousePan(const QPoint& delta,
+                              QVector2D& pan,
                               float sceneSize);
 
 private:
-    CameraResult computeForRotation(const QQuaternion &effectiveRotation,
+    CameraResult computeForRotation(const QQuaternion& effectiveRotation,
                                     float zoom,
-                                    const QVector2D &pan,
+                                    const QVector2D& pan,
                                     bool applyPan,
                                     float aspectRatio) const;
 
     QQuaternion m_cameraRotation;
-    QVector3D   m_sceneCenter = QVector3D(0, 0, 0);
-    float       m_sceneSize   = 0.3f;
-    float       m_zoom        = 0.0f;
+    QVector3D m_sceneCenter = QVector3D(0, 0, 0);
+    float m_sceneSize = 0.3f;
+    float m_zoom = 0.0f;
 };
 
 #endif // CAMERACONTROLLER_H

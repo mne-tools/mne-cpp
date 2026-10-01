@@ -111,17 +111,17 @@ protected:
     virtual void run();
 
 private:
-    QMutex                  m_producerMutex;                        /**< The mutex to ensure thread safety.*/
+    QMutex m_producerMutex; /**< The mutex to ensure thread safety.*/
 
     QSharedPointer<COMLIB::RtDataClient> m_pRtDataClient; /**< The data client.*/
 
-    FiffSimulator*          m_pFiffSimulator;                       /**< Holds a pointer to corresponding MNERtClient.*/
+    FiffSimulator* m_pFiffSimulator; /**< Holds a pointer to corresponding MNERtClient.*/
 
-    bool                    m_bDataClientIsConnected;               /**< If the data client is connected.*/
-    bool                    m_bFlagInfoRequest;                     /**< Read Fiff Info flag. */
+    bool m_bDataClientIsConnected; /**< If the data client is connected.*/
+    bool m_bFlagInfoRequest;       /**< Read Fiff Info flag. */
 
-    qint32                  m_iDataClientId;                        /**< The client id. */
-    quint16                 m_iDefaultPortDataClient;               /**< The default port for the rt data client. */
+    qint32 m_iDataClientId;           /**< The client id. */
+    quint16 m_iDefaultPortDataClient; /**< The default port for the rt data client. */
 };
 } // NAMESPACE
 

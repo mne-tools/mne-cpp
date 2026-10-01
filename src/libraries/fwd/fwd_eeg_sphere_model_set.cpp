@@ -67,14 +67,13 @@ FwdEegSphereModelSet* FwdEegSphereModelSet::fwd_add_to_eeg_sphere_model_set(FwdE
 //fwd_eeg_sphere_models.c
 FwdEegSphereModelSet* FwdEegSphereModelSet::fwd_add_default_eeg_sphere_model(FwdEegSphereModelSet* s)
 {
-    static const int   def_nlayer        = 4;
+    static const int def_nlayer = 4;
     VectorXf def_unit_rads(def_nlayer);
-    def_unit_rads << 0.90f,0.92f,0.97f,1.0f;
+    def_unit_rads << 0.90f, 0.92f, 0.97f, 1.0f;
     VectorXf def_sigmas(def_nlayer);
-    def_sigmas << 0.33f,1.0f,0.4e-2f,0.33f;
+    def_sigmas << 0.33f, 1.0f, 0.4e-2f, 0.33f;
 
-    return FwdEegSphereModelSet::fwd_add_to_eeg_sphere_model_set(s,FwdEegSphereModel::fwd_create_eeg_sphere_model("Default",
-                                                                         def_nlayer,def_unit_rads,def_sigmas));
+    return FwdEegSphereModelSet::fwd_add_to_eeg_sphere_model_set(s, FwdEegSphereModel::fwd_create_eeg_sphere_model("Default", def_nlayer, def_unit_rads, def_sigmas));
 }
 
 //=============================================================================================================
@@ -143,11 +142,11 @@ FwdEegSphereModel* FwdEegSphereModelSet::fwd_select_eeg_sphere_model(const QStri
 
     for (int k = 0; k < this->nmodel(); k++) {
         if (this->models[k]->name.compare(name) == 0) {
-            qInfo("Selected model: %s",this->models[k]->name.toUtf8().constData());
+            qInfo("Selected model: %s", this->models[k]->name.toUtf8().constData());
             return new FwdEegSphereModel(*(this->models[k]));
         }
     }
-    qWarning("EEG sphere model %s not found.",name.toUtf8().constData());
+    qWarning("EEG sphere model %s not found.", name.toUtf8().constData());
     return nullptr;
 }
 
@@ -166,4 +165,3 @@ void FwdEegSphereModelSet::fwd_list_eeg_sphere_models()
         qInfo("%s", line.toUtf8().constData());
     }
 }
-

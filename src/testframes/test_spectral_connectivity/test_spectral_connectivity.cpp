@@ -59,7 +59,7 @@ using namespace UTILSLIB;
  * @brief The TestSpectralConnectivity class provides spectral connectivity tests
  *
  */
-class TestSpectralConnectivity: public QObject
+class TestSpectralConnectivity : public QObject
 {
     Q_OBJECT
 
@@ -118,7 +118,7 @@ void TestSpectralConnectivity::spectralConnectivityCoherence()
     //*********************************************************************************************************
 
     Network network = Coherence::calculate(m_connectivitySettings);
-    m_dConnectivityOutput = network.getFullConnectivityMatrix()(0,1);
+    m_dConnectivityOutput = network.getFullConnectivityMatrix()(0, 1);
 
     //*********************************************************************************************************
     // Load MNE-PYTHON Results As Reference
@@ -144,7 +144,7 @@ void TestSpectralConnectivity::spectralConnectivityImagCoherence()
     //*********************************************************************************************************
 
     Network network = ImagCoherence::calculate(m_connectivitySettings);
-    m_dConnectivityOutput = network.getFullConnectivityMatrix()(0,1);
+    m_dConnectivityOutput = network.getFullConnectivityMatrix()(0, 1);
 
     //*********************************************************************************************************
     // Load MNE-PYTHON Results As Reference
@@ -171,7 +171,7 @@ void TestSpectralConnectivity::spectralConnectivityPLV()
     //*********************************************************************************************************
 
     Network network = PhaseLockingValue::calculate(m_connectivitySettings);
-    m_dConnectivityOutput = network.getFullConnectivityMatrix()(0,1);
+    m_dConnectivityOutput = network.getFullConnectivityMatrix()(0, 1);
 
     //*********************************************************************************************************
     // Load MNE-PYTHON Results As Reference
@@ -198,7 +198,7 @@ void TestSpectralConnectivity::spectralConnectivityPLI()
     //*********************************************************************************************************
 
     Network network = PhaseLagIndex::calculate(m_connectivitySettings);
-    m_dConnectivityOutput = network.getFullConnectivityMatrix()(0,1);
+    m_dConnectivityOutput = network.getFullConnectivityMatrix()(0, 1);
 
     //*********************************************************************************************************
     // Load MNE-PYTHON Results As Reference
@@ -225,7 +225,7 @@ void TestSpectralConnectivity::spectralConnectivityPLI2()
     //*********************************************************************************************************
 
     Network network = UnbiasedSquaredPhaseLagIndex::calculate(m_connectivitySettings);
-    m_dConnectivityOutput = network.getFullConnectivityMatrix()(0,1);
+    m_dConnectivityOutput = network.getFullConnectivityMatrix()(0, 1);
 
     //*********************************************************************************************************
     // Load MNE-PYTHON Results As Reference
@@ -252,7 +252,7 @@ void TestSpectralConnectivity::spectralConnectivityWPLI()
     //*********************************************************************************************************
 
     Network network = WeightedPhaseLagIndex::calculate(m_connectivitySettings);
-    m_dConnectivityOutput = network.getFullConnectivityMatrix()(0,1);
+    m_dConnectivityOutput = network.getFullConnectivityMatrix()(0, 1);
 
     //*********************************************************************************************************
     // Load MNE-PYTHON Results As Reference
@@ -279,7 +279,7 @@ void TestSpectralConnectivity::spectralConnectivityWPLI2()
     //*********************************************************************************************************
 
     Network network = DebiasedSquaredWeightedPhaseLagIndex::calculate(m_connectivitySettings);
-    m_dConnectivityOutput = network.getFullConnectivityMatrix()(0,1);
+    m_dConnectivityOutput = network.getFullConnectivityMatrix()(0, 1);
 
     //*********************************************************************************************************
     // Load MNE-PYTHON Results As Reference
@@ -307,7 +307,7 @@ void TestSpectralConnectivity::spectralConnectivityXCOR()
 
     QString outputResultFile("ref_spectral_connectivity_xcorr.txt");
     Network network = CrossCorrelation::calculate(m_connectivitySettings);
-    m_dConnectivityOutput = network.getFullConnectivityMatrix()(0,1);
+    m_dConnectivityOutput = network.getFullConnectivityMatrix()(0, 1);
     IOUtils::write_eigen_matrix(network.getFullConnectivityMatrix(), outputResultFile);
 
     //*********************************************************************************************************
@@ -317,7 +317,7 @@ void TestSpectralConnectivity::spectralConnectivityXCOR()
     MatrixXd refConnectivity;
     QString refFileName(QCoreApplication::applicationDirPath() + "/../resources/data/mne-cpp-test-data/Result/Connectivity/ref_spectral_connectivity_xcor.txt");
     IOUtils::read_eigen_matrix(refConnectivity, refFileName);
-    m_dRefConnectivityOutput = refConnectivity(0,1);
+    m_dRefConnectivityOutput = refConnectivity(0, 1);
 
     //*********************************************************************************************************
     // Compare Connectivity
@@ -329,8 +329,7 @@ void TestSpectralConnectivity::spectralConnectivityXCOR()
     // Cleanup
     //*********************************************************************************************************
 
-    if(QFile::exists(outputResultFile))
-    {
+    if (QFile::exists(outputResultFile)) {
         QFile::remove(outputResultFile);
     }
 }
@@ -345,8 +344,7 @@ QList<MatrixXd> TestSpectralConnectivity::readConnectivityData()
     int iNTrials = inputTrials.rows() / 2;
 
     QList<MatrixXd> matDataList;
-    for (int i = 0; i < iNTrials; ++i)
-    {
+    for (int i = 0; i < iNTrials; ++i) {
         matDataList.append(inputTrials.middleRows(i * 2, 2));
     }
 
@@ -367,7 +365,7 @@ void TestSpectralConnectivity::compareConnectivity()
     // Compare connectivity estimate
     //*********************************************************************************************************
 
-    QVERIFY( (fabs(m_dConnectivityOutput - m_dRefConnectivityOutput)) < dEpsilon );
+    QVERIFY((fabs(m_dConnectivityOutput - m_dRefConnectivityOutput)) < dEpsilon);
 
     printf("<<<<<<<<<<<<<<<<<<<<<<<<< Compare Spectral Connectivities Finished <<<<<<<<<<<<<<<<<<<<<<<<<\n");
 }

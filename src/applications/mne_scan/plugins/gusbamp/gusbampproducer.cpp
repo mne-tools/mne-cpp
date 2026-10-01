@@ -40,10 +40,10 @@ GUSBAmpProducer::GUSBAmpProducer(GUSBAmp* pGUSBAmp)
 , m_iSampRate(1200)
 , m_sFilePath("data")
 {
-    m_viSizeOfSampleMatrix.resize(2,0);
+    m_viSizeOfSampleMatrix.resize(2, 0);
 
     m_vSerials.resize(1);
-    m_vSerials[0]= "UB-2015.05.16";
+    m_vSerials[0] = "UB-2015.05.16";
 }
 
 //=============================================================================================================
@@ -54,7 +54,7 @@ GUSBAmpProducer::~GUSBAmpProducer()
 
 //=============================================================================================================
 
-void GUSBAmpProducer::start(vector<QString> &serials,
+void GUSBAmpProducer::start(vector<QString>& serials,
                             vector<int> channels,
                             int sampleRate)
 {
@@ -67,7 +67,7 @@ void GUSBAmpProducer::start(vector<QString> &serials,
     m_viSizeOfSampleMatrix = m_pGUSBAmpDriver->getSizeOfSampleMatrix();
 
     //Initialise and starting the device
-    if(m_pGUSBAmpDriver->initDevice()) {
+    if (m_pGUSBAmpDriver->initDevice()) {
         QThread::start();
     }
 }
@@ -84,13 +84,13 @@ void GUSBAmpProducer::stop()
 
 void GUSBAmpProducer::run()
 {
-    MatrixXf matData(m_viSizeOfSampleMatrix[0],m_viSizeOfSampleMatrix[1]);
+    MatrixXf matData(m_viSizeOfSampleMatrix[0], m_viSizeOfSampleMatrix[1]);
 
-    while(!isInterruptionRequested()) {
+    while (!isInterruptionRequested()) {
         //qDebug()<<"GUSBAmpProducer::run()"<<endl;
         //Get the GUSBAmp EEG data out of the device buffer and write received data to circular buffer
-        if(m_pGUSBAmpDriver->getSampleMatrixValue(matData)) {
-            while(!m_pGUSBAmp->m_pCircularBuffer->push(matData) && !isInterruptionRequested()) {
+        if (m_pGUSBAmpDriver->getSampleMatrixValue(matData)) {
+            while (!m_pGUSBAmp->m_pCircularBuffer->push(matData) && !isInterruptionRequested()) {
                 //Do nothing until the circular buffer is ready to accept new data again
             }
         }

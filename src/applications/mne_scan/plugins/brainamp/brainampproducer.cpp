@@ -63,8 +63,8 @@ void BrainAMPProducer::start(int iSamplesPerBlock,
                              int iSamplingFrequency)
 {
     //Initialise device
-    if(m_pBrainAmpDriver->initDevice(iSamplesPerBlock,
-                                     iSamplingFrequency)) {
+    if (m_pBrainAmpDriver->initDevice(iSamplesPerBlock,
+                                      iSamplingFrequency)) {
         m_bIsRunning = true;
         QThread::start();
     } else {
@@ -79,7 +79,7 @@ void BrainAMPProducer::stop()
     //Wait until this thread (BrainAMPProducer) is stopped
     m_bIsRunning = false;
 
-    while(this->isRunning())
+    while (this->isRunning())
         m_bIsRunning = false;
 
     //Unitialise device only after the thread stopped
@@ -90,17 +90,15 @@ void BrainAMPProducer::stop()
 
 void BrainAMPProducer::run()
 {
-    while(m_bIsRunning)
-    {
+    while (m_bIsRunning) {
         //std::cout<<"BrainAMPProducer::run()"<<std::endl;
         //Get the TMSi EEG data out of the device buffer and write received data to a QList
         MatrixXd matRawBuffer;
 
-        if(m_pBrainAmpDriver->getSampleMatrixValue(matRawBuffer)) {
+        if (m_pBrainAmpDriver->getSampleMatrixValue(matRawBuffer)) {
             m_pBrainAmp->setSampleData(matRawBuffer);
         }
     }
 
-    std::cout<<"EXITING - BrainAMPProducer::run()"<<std::endl;
+    std::cout << "EXITING - BrainAMPProducer::run()" << std::endl;
 }
-

@@ -51,8 +51,9 @@
 
 class QCheckBox;
 
-namespace Ui {
-    class FilterDesignViewWidget;
+namespace Ui
+{
+class FilterDesignViewWidget;
 }
 
 //=============================================================================================================
@@ -83,8 +84,8 @@ class DISPSHARED_EXPORT FilterDesignView : public AbstractView
     Q_OBJECT
 
 public:
-    typedef QSharedPointer<FilterDesignView> SPtr;              /**< Shared pointer type for FilterDesignView. */
-    typedef QSharedPointer<const FilterDesignView> ConstSPtr;   /**< Const shared pointer type for FilterDesignView. */
+    typedef QSharedPointer<FilterDesignView> SPtr;            /**< Shared pointer type for FilterDesignView. */
+    typedef QSharedPointer<const FilterDesignView> ConstSPtr; /**< Const shared pointer type for FilterDesignView. */
 
     //=========================================================================================================
     /**
@@ -97,7 +98,7 @@ public:
      * @param[in] f Qt window flags passed to the QWidget constructor.
      */
     FilterDesignView(const QString& sSettingsPath,
-                     QWidget *parent = 0,
+                     QWidget* parent = 0,
                      Qt::WindowFlags f = Qt::Widget);
 
     //=========================================================================================================
@@ -266,7 +267,7 @@ protected:
      *
      * @param[in] event  The resize event (unused; the plot is refitted to the view).
      */
-    void resizeEvent(QResizeEvent * event);
+    void resizeEvent(QResizeEvent* event);
 
     //=========================================================================================================
     /**
@@ -274,7 +275,7 @@ protected:
      *
      * @param[in] event  The key event; Enter/Return, Ctrl+Z and Delete re-emit the filter channel type.
      */
-    virtual void keyPressEvent(QKeyEvent * event);
+    virtual void keyPressEvent(QKeyEvent* event);
 
     //=========================================================================================================
     /**
@@ -296,7 +297,7 @@ protected:
      *
      * @param[in] channelType holds the current text of the connected spin box.
      */
-    void onSpinBoxFilterChannelType(const QString &channelType);
+    void onSpinBoxFilterChannelType(const QString& channelType);
 
     //=========================================================================================================
     /**
@@ -324,16 +325,16 @@ protected:
      */
     void updateGuiFromFilter(const UTILSLIB::FilterKernel& filter);
 
-    Ui::FilterDesignViewWidget*         m_pUi;                      /**< Pointer to the qt designer generated ui class.*/
+    Ui::FilterDesignViewWidget* m_pUi; /**< Pointer to the qt designer generated ui class.*/
 
-    QPointer<FilterPlotScene>           m_pFilterPlotScene;         /**< Pointer to the QGraphicsScene which holds the filter plotting.*/
+    QPointer<FilterPlotScene> m_pFilterPlotScene; /**< Pointer to the QGraphicsScene which holds the filter plotting.*/
 
-    UTILSLIB::FilterKernel       m_filterKernel;             /**< The current filter operator.*/
+    UTILSLIB::FilterKernel m_filterKernel; /**< The current filter operator.*/
 
-    QString                             m_sSettingsPath;            /**< The settings path to store the GUI settings to. */
+    QString m_sSettingsPath; /**< The settings path to store the GUI settings to. */
 
-    int                                 m_iFilterTaps;              /**< The current number of filter taps.*/
-    double                              m_dSFreq;                   /**< The current sampling frequency.*/
+    int m_iFilterTaps; /**< The current number of filter taps.*/
+    double m_dSFreq;   /**< The current sampling frequency.*/
 
 signals:
     //=========================================================================================================

@@ -55,23 +55,27 @@
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-namespace MNELIB {
-    class MNEForwardSolution;
+namespace MNELIB
+{
+class MNEForwardSolution;
 }
 
-namespace FSLIB {
-    class FsSurfaceSet;
+namespace FSLIB
+{
+class FsSurfaceSet;
 }
 
-namespace FIFFLIB {
-    class FiffInfo;
+namespace FIFFLIB
+{
+class FiffInfo;
 }
 
 //=============================================================================================================
 // DEFINE NAMESPACE CONNECTIVITYLIB
 //=============================================================================================================
 
-namespace CONNECTIVITYLIB {
+namespace CONNECTIVITYLIB
+{
 
 //=============================================================================================================
 // CONNECTIVITYLIB FORWARD DECLARATIONS
@@ -95,7 +99,6 @@ namespace CONNECTIVITYLIB {
  */
 class CONNECTIVITYSHARED_EXPORT ConnectivitySettings
 {
-
 public:
     typedef QSharedPointer<ConnectivitySettings> SPtr;            /**< Shared pointer type for ConnectivitySettings. */
     typedef QSharedPointer<const ConnectivitySettings> ConstSPtr; /**< Const shared pointer type for ConnectivitySettings. */
@@ -103,27 +106,29 @@ public:
     /**
      * @brief Per-trial intermediate frequency-domain data used during connectivity computation
      */
-    struct IntermediateTrialData {
-        Eigen::MatrixXd     matData;
-        Eigen::MatrixXd     matPsd;
-        QVector<Eigen::MatrixXcd>               vecTapSpectra;
-        QVector<QPair<int,Eigen::MatrixXcd> >   vecPairCsd;
-        QVector<QPair<int,Eigen::MatrixXcd> >   vecPairCsdNormalized;
-        QVector<QPair<int,Eigen::MatrixXd> >    vecPairCsdImagSign;
-        QVector<QPair<int,Eigen::MatrixXd> >    vecPairCsdImagAbs;
-        QVector<QPair<int,Eigen::MatrixXd> >    vecPairCsdImagSqrd;
+    struct IntermediateTrialData
+    {
+        Eigen::MatrixXd matData;
+        Eigen::MatrixXd matPsd;
+        QVector<Eigen::MatrixXcd> vecTapSpectra;
+        QVector<QPair<int, Eigen::MatrixXcd>> vecPairCsd;
+        QVector<QPair<int, Eigen::MatrixXcd>> vecPairCsdNormalized;
+        QVector<QPair<int, Eigen::MatrixXd>> vecPairCsdImagSign;
+        QVector<QPair<int, Eigen::MatrixXd>> vecPairCsdImagAbs;
+        QVector<QPair<int, Eigen::MatrixXd>> vecPairCsdImagSqrd;
     };
 
     /**
      * @brief Accumulated cross-spectral and auto-spectral sums across trials for final metric normalization
      */
-    struct IntermediateSumData {
-        Eigen::MatrixXd     matPsdSum;
-        QVector<QPair<int,Eigen::MatrixXcd> >   vecPairCsdSum;
-        QVector<QPair<int,Eigen::MatrixXcd> >   vecPairCsdNormalizedSum;
-        QVector<QPair<int,Eigen::MatrixXd> >    vecPairCsdImagSignSum;
-        QVector<QPair<int,Eigen::MatrixXd> >    vecPairCsdImagAbsSum;
-        QVector<QPair<int,Eigen::MatrixXd> >    vecPairCsdImagSqrdSum;
+    struct IntermediateSumData
+    {
+        Eigen::MatrixXd matPsdSum;
+        QVector<QPair<int, Eigen::MatrixXcd>> vecPairCsdSum;
+        QVector<QPair<int, Eigen::MatrixXcd>> vecPairCsdNormalizedSum;
+        QVector<QPair<int, Eigen::MatrixXd>> vecPairCsdImagSignSum;
+        QVector<QPair<int, Eigen::MatrixXd>> vecPairCsdImagAbsSum;
+        QVector<QPair<int, Eigen::MatrixXd>> vecPairCsdImagSqrdSum;
     };
 
     //=========================================================================================================
@@ -183,17 +188,17 @@ public:
     IntermediateSumData& getIntermediateSumData();
 
 protected:
-    QStringList                     m_sConnectivityMethods;         /**< The connectivity methods. */
-    QString                         m_sWindowType;                  /**< The window type used to compute tapered spectra. */
+    QStringList m_sConnectivityMethods; /**< The connectivity methods. */
+    QString m_sWindowType;              /**< The window type used to compute tapered spectra. */
 
-    float                           m_fSFreq;                       /**< The sampling frequency. */
-    int                             m_iNfft;                        /**< The FFT length. Also includes the negativ frequencies. Gets recalculated if the sFreq or spectrum resolution change. */
-    float                           m_fFreqResolution;              /**< The spectrum's resolution. */
+    float m_fSFreq;          /**< The sampling frequency. */
+    int m_iNfft;             /**< The FFT length. Also includes the negativ frequencies. Gets recalculated if the sFreq or spectrum resolution change. */
+    float m_fFreqResolution; /**< The spectrum's resolution. */
 
-    Eigen::MatrixX3f                m_matNodePositions;             /**< The node position in 3D space. */
+    Eigen::MatrixX3f m_matNodePositions; /**< The node position in 3D space. */
 
-    IntermediateSumData             m_intermediateSumData;          /**< The intermediate sum data holds data calculated over all trials as a whole. */
-    QList<IntermediateTrialData>    m_trialData;                    /**< The trial data holds the actual and intermediate data calcualted for each trial. */
+    IntermediateSumData m_intermediateSumData; /**< The intermediate sum data holds data calculated over all trials as a whole. */
+    QList<IntermediateTrialData> m_trialData;  /**< The trial data holds the actual and intermediate data calcualted for each trial. */
 };
 
 //=============================================================================================================

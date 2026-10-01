@@ -78,21 +78,21 @@ private slots:
 
 private:
     // Helper: create a minimal triangle mesh (a single triangle)
-    void createMinimalSurface(BrainSurface &surf);
+    void createMinimalSurface(BrainSurface& surf);
     // Helper: create a quad (two triangles)
-    void createQuadSurface(BrainSurface &surf);
+    void createQuadSurface(BrainSurface& surf);
 };
 
 //=============================================================================================================
 // Helpers
 //=============================================================================================================
 
-void TestDisp3dBrainSurface::createMinimalSurface(BrainSurface &surf)
+void TestDisp3dBrainSurface::createMinimalSurface(BrainSurface& surf)
 {
     Eigen::MatrixX3f verts(3, 3);
     verts << 0.0f, 0.0f, 0.0f,
-             1.0f, 0.0f, 0.0f,
-             0.5f, 1.0f, 0.0f;
+        1.0f, 0.0f, 0.0f,
+        0.5f, 1.0f, 0.0f;
 
     Eigen::MatrixX3i tris(1, 3);
     tris << 0, 1, 2;
@@ -100,17 +100,17 @@ void TestDisp3dBrainSurface::createMinimalSurface(BrainSurface &surf)
     surf.createFromData(verts, tris, Qt::gray);
 }
 
-void TestDisp3dBrainSurface::createQuadSurface(BrainSurface &surf)
+void TestDisp3dBrainSurface::createQuadSurface(BrainSurface& surf)
 {
     Eigen::MatrixX3f verts(4, 3);
     verts << 0.0f, 0.0f, 0.0f,
-             1.0f, 0.0f, 0.0f,
-             1.0f, 1.0f, 0.0f,
-             0.0f, 1.0f, 0.0f;
+        1.0f, 0.0f, 0.0f,
+        1.0f, 1.0f, 0.0f,
+        0.0f, 1.0f, 0.0f;
 
     Eigen::MatrixX3i tris(2, 3);
     tris << 0, 1, 2,
-            0, 2, 3;
+        0, 2, 3;
 
     surf.createFromData(verts, tris, Qt::blue);
 }
@@ -144,13 +144,13 @@ void TestDisp3dBrainSurface::testCreateFromDataWithNormals()
 {
     Eigen::MatrixX3f verts(3, 3);
     verts << 0.0f, 0.0f, 0.0f,
-             1.0f, 0.0f, 0.0f,
-             0.5f, 1.0f, 0.0f;
+        1.0f, 0.0f, 0.0f,
+        0.5f, 1.0f, 0.0f;
 
     Eigen::MatrixX3f normals(3, 3);
     normals << 0.0f, 0.0f, 1.0f,
-               0.0f, 0.0f, 1.0f,
-               0.0f, 0.0f, 1.0f;
+        0.0f, 0.0f, 1.0f,
+        0.0f, 0.0f, 1.0f;
 
     Eigen::MatrixX3i tris(1, 3);
     tris << 0, 1, 2;
@@ -252,13 +252,13 @@ void TestDisp3dBrainSurface::testVertexNormals()
     // Test with explicit normals to verify round-trip.
     Eigen::MatrixX3f verts(3, 3);
     verts << 0.0f, 0.0f, 0.0f,
-             1.0f, 0.0f, 0.0f,
-             0.5f, 1.0f, 0.0f;
+        1.0f, 0.0f, 0.0f,
+        0.5f, 1.0f, 0.0f;
 
     Eigen::MatrixX3f normals(3, 3);
     normals << 0.0f, 0.0f, 1.0f,
-               0.0f, 0.0f, 1.0f,
-               0.0f, 0.0f, 1.0f;
+        0.0f, 0.0f, 1.0f,
+        0.0f, 0.0f, 1.0f;
 
     Eigen::MatrixX3i tris(1, 3);
     tris << 0, 1, 2;
@@ -348,9 +348,9 @@ void TestDisp3dBrainSurface::testApplySourceEstimateColors()
 
     // Apply 3 vertex colors (one per vertex)
     QVector<uint32_t> colors;
-    colors.append(packABGR(255, 0, 0));    // Red
-    colors.append(packABGR(0, 255, 0));    // Green
-    colors.append(packABGR(0, 0, 255));    // Blue
+    colors.append(packABGR(255, 0, 0)); // Red
+    colors.append(packABGR(0, 255, 0)); // Green
+    colors.append(packABGR(0, 0, 255)); // Blue
 
     surf.applySourceEstimateColors(colors);
     QVERIFY(true); // Should not crash

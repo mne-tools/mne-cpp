@@ -33,7 +33,7 @@ using namespace UTILSLIB;
 // MAIN
 //=============================================================================================================
 
-int main(int argc, char *argv[])
+int main(int argc, char* argv[])
 {
     qInstallMessageHandler(MNELogger::customLogWriter);
     QApplication app(argc, argv);
@@ -47,7 +47,7 @@ int main(int argc, char *argv[])
     parser.addHelpOption();
 
     QCommandLineOption subjectPathOption("subjectPath", "Path to subjects directory", "path",
-        QCoreApplication::applicationDirPath() + "/../resources/data/MNE-sample-data/subjects");
+                                         QCoreApplication::applicationDirPath() + "/../resources/data/MNE-sample-data/subjects");
     QCommandLineOption subjectOption("subject", "Subject name", "name", "sample");
     QCommandLineOption hemiOption("hemi", "Hemisphere (unused)", "hemi", "0");
     QCommandLineOption bemOption("bem", "BEM file path", "path", "");
@@ -73,8 +73,7 @@ int main(int argc, char *argv[])
         parser.value(srcSpaceOption),
         parser.value(atlasOption),
         parser.value(evokedOption),
-        parser.value(mriOption)
-    );
+        parser.value(mriOption));
     mainWindow.show();
 
     return app.exec();

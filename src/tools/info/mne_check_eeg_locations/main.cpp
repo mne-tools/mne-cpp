@@ -54,7 +54,7 @@ using namespace Eigen;
 
 //=============================================================================================================
 
-int main(int argc, char *argv[])
+int main(int argc, char* argv[])
 {
     qInstallMessageHandler(MNELogger::customLogWriter);
     QCoreApplication app(argc, argv);
@@ -90,7 +90,8 @@ int main(int argc, char *argv[])
     fprintf(stderr, "Opened %s : %d channels\n", qPrintable(measName), raw.info.nchan);
 
     // Collect EEG channels
-    struct EegEntry {
+    struct EegEntry
+    {
         int index;
         QString name;
         Vector3f pos;
@@ -146,8 +147,8 @@ int main(int argc, char *argv[])
     }
 
     // Check 3: Distance from origin (typical head radius 0.05 - 0.15 m)
-    constexpr float minRadius = 0.05f;  // 5 cm
-    constexpr float maxRadius = 0.15f;  // 15 cm
+    constexpr float minRadius = 0.05f; // 5 cm
+    constexpr float maxRadius = 0.15f; // 15 cm
     for (const auto& e : eegChannels) {
         if (e.pos.norm() < 1e-10f)
             continue; // skip undefined

@@ -83,18 +83,18 @@ using namespace FSLIB;
  * @param[in] argv (argument vector) is an array of pointers to arrays of character objects. The array objects are null-terminated strings, representing the arguments that were entered on the command line when the program was started.
  * @return the value that was set to exit() (which is 0 if exit() is called via quit()).
  */
-int main(int argc, char *argv[])
+int main(int argc, char* argv[])
 {
-    #ifdef STATICBUILD
-    // Q_INIT_RESOURCE(mne_disp3d);
-    #endif
+#ifdef STATICBUILD
+// Q_INIT_RESOURCE(mne_disp3d);
+#endif
 
     qInstallMessageHandler(MNELogger::customLogWriter);
     QApplication a(argc, argv);
 
     AbstractMetric::m_bStorageModeIsActive = false;
-//    AbstractMetric::m_iNumberBinStart = 8;
-//    AbstractMetric::m_iNumberBinAmount = 4;
+    //    AbstractMetric::m_iNumberBinStart = 8;
+    //    AbstractMetric::m_iNumberBinAmount = 4;
 
     QCommandLineParser parser;
     parser.setApplicationDescription("Connectivity Comparison Example");
@@ -162,15 +162,15 @@ int main(int argc, char *argv[])
 
     bool bDoSourceLoc = false;
     bool bDoClust = false;
-    if(parser.value(sourceLocOption) == "false" || parser.value(sourceLocOption) == "0") {
-        bDoSourceLoc =false;
-    } else if(parser.value(sourceLocOption) == "true" || parser.value(sourceLocOption) == "1") {
+    if (parser.value(sourceLocOption) == "false" || parser.value(sourceLocOption) == "0") {
+        bDoSourceLoc = false;
+    } else if (parser.value(sourceLocOption) == "true" || parser.value(sourceLocOption) == "1") {
         bDoSourceLoc = true;
     }
 
-    if(parser.value(clustOption) == "false" || parser.value(clustOption) == "0") {
-        bDoClust =false;
-    } else if(parser.value(clustOption) == "true" || parser.value(clustOption) == "1") {
+    if (parser.value(clustOption) == "false" || parser.value(clustOption) == "0") {
+        bDoClust = false;
+    } else if (parser.value(clustOption) == "true" || parser.value(clustOption) == "1") {
         bDoClust = true;
     }
 
@@ -182,7 +182,7 @@ int main(int argc, char *argv[])
     MNEForwardSolution t_clusteredFwd;
     MNEForwardSolution t_Fwd;
 
-    FsSurfaceSet tSurfSetInflated (sSubj, 2, "inflated", sSubjDir);
+    FsSurfaceSet tSurfSetInflated(sSubj, 2, "inflated", sSubjDir);
     FsAnnotationSet tAnnotSet(sSubj, 2, sAnnotType, sSubjDir);
 
     QFile t_fileCov(sCov);
@@ -211,7 +211,7 @@ int main(int argc, char *argv[])
                      events);
 
     // Read the epochs and reject bad epochs. Note, that SSPs are automatically applied to the data if MNE::setup_compensators was called beforehand.
-    QMap<QString,double> mapReject;
+    QMap<QString, double> mapReject;
     mapReject.insert("eog", 100e-06);
     mapReject.insert("grad", 3000e-13);
     mapReject.insert("mag", 3.5e-12);
@@ -234,23 +234,23 @@ int main(int argc, char *argv[])
     QStringList exclude;
     exclude << raw.info.bads << raw.info.ch_names.filter("EOG");
 
-    if(!bDoSourceLoc) {
+    if (!bDoSourceLoc) {
         // Pick relevant channels
-        if(sChType.contains("EEG", Qt::CaseInsensitive)) {
-            picks = raw.info.pick_types(false,true,false,QStringList(),exclude);
-        } else if(sCoilType.contains("grad", Qt::CaseInsensitive)) {
+        if (sChType.contains("EEG", Qt::CaseInsensitive)) {
+            picks = raw.info.pick_types(false, true, false, QStringList(), exclude);
+        } else if (sCoilType.contains("grad", Qt::CaseInsensitive)) {
             // Only pick every second gradiometer which are not marked as bad.
-            RowVectorXi picksTmp = raw.info.pick_types(QString("grad"),false,false);
+            RowVectorXi picksTmp = raw.info.pick_types(QString("grad"), false, false);
             picks.resize(0);
 
-            for(int i = 0; i < picksTmp.cols()-1; i+=2) {
-                if(!raw.info.bads.contains(raw.info.ch_names.at(picksTmp(i)))) {
-                    picks.conservativeResize(picks.cols()+1);
-                    picks(picks.cols()-1) = picksTmp(i);
+            for (int i = 0; i < picksTmp.cols() - 1; i += 2) {
+                if (!raw.info.bads.contains(raw.info.ch_names.at(picksTmp(i)))) {
+                    picks.conservativeResize(picks.cols() + 1);
+                    picks(picks.cols() - 1) = picksTmp(i);
                 }
             }
         } else if (sCoilType.contains("mag", Qt::CaseInsensitive)) {
-            picks = raw.info.pick_types(QString("mag"),false,false,QStringList(),exclude);
+            picks = raw.info.pick_types(QString("mag"), false, false, QStringList(), exclude);
         }
 
         // Generate network nodes
@@ -260,10 +260,10 @@ int main(int argc, char *argv[])
         MatrixXd matData;
         int iNumberRows = picks.cols(); //picks.cols() 32
 
-        for(int i = 0; i < data.size(); ++i) {
+        for (int i = 0; i < data.size(); ++i) {
             matData.resize(iNumberRows, data.at(i)->epoch.cols());
 
-            for(qint32 j = 0; j < iNumberRows; ++j) {
+            for (qint32 j = 0; j < iNumberRows; ++j) {
                 matData.row(j) = data.at(i)->epoch.row(picks(j));
             }
             matDataList << matData;
@@ -287,7 +287,7 @@ int main(int argc, char *argv[])
                                          true);
 
         // Cluster forward solution;
-        if(bDoClust) {
+        if (bDoClust) {
             t_clusteredFwd = t_Fwd.cluster_forward_solution(tAnnotSet, 40);
         } else {
             t_clusteredFwd = t_Fwd;
@@ -301,17 +301,17 @@ int main(int argc, char *argv[])
 
         // Compute inverse solution
         InvMinimumNorm minimumNorm(inverse_operator, lambda2, method);
-        minimumNorm.doInverseSetup(1,true);
+        minimumNorm.doInverseSetup(1, true);
 
-        picks = raw.info.pick_types(QString("all"),true,false,QStringList(),exclude);
+        picks = raw.info.pick_types(QString("all"), true, false, QStringList(), exclude);
         data.pick_channels(picks);
-        for(int i = 0; i < data.size(); i++) {
+        for (int i = 0; i < data.size(); i++) {
             sourceEstimate = minimumNorm.calculateInverse(data.at(i)->epoch,
                                                           0.0f,
-                                                          1.0/raw.info.sfreq,
+                                                          1.0 / raw.info.sfreq,
                                                           true);
 
-            if(sourceEstimate.isEmpty()) {
+            if (sourceEstimate.isEmpty()) {
                 printf("Source estimate is empty");
             } else {
                 matDataList << sourceEstimate.data;
@@ -329,13 +329,13 @@ int main(int argc, char *argv[])
     conSettings.setConnectivityMethods(QStringList() << "COH" << "COR" << "XCOR" << "PLI" << "IMAGCOH" << "PLV" << "WPLI" << "USPLI" << "DSWPLI");
 
     iNumTrials = qMin(iNumTrials, matDataList.size());
-    for(int i = 0; i < iNumTrials; i++) {
+    for (int i = 0; i < iNumTrials; i++) {
         // Only calculate connectivity for post stim
-        int samplesToCutOut = abs(fTMin*raw.info.sfreq);
+        int samplesToCutOut = abs(fTMin * raw.info.sfreq);
         conSettings.append(matDataList.at(i).block(0,
-                                                  samplesToCutOut,
-                                                  matDataList.at(i).rows(),
-                                                  matDataList.at(i).cols()-samplesToCutOut));
+                                                   samplesToCutOut,
+                                                   matDataList.at(i).rows(),
+                                                   matDataList.at(i).cols() - samplesToCutOut));
     }
 
     conSettings.setSamplingFrequency(raw.info.sfreq);
@@ -343,18 +343,18 @@ int main(int argc, char *argv[])
 
     QList<Network> lNetworks = Connectivity::calculate(conSettings);
 
-    QMap<QString,Vector4i> mColor;
-    mColor.insert("COR",Vector4i(90, 26, 100, 1));
-    mColor.insert("XCOR",Vector4i(255, 20, 80, 1));
-    mColor.insert("PLI",Vector4i(255, 255, 0, 1));
-    mColor.insert("COH",Vector4i(2, 89, 100, 1));
-    mColor.insert("IMAGCOH",Vector4i(50, 255, 48, 1));
-    mColor.insert("PLV",Vector4i(0, 255, 255, 1));
-    mColor.insert("WPLI",Vector4i(255, 0, 100, 1));
-    mColor.insert("USPLI",Vector4i(255, 89, 200, 1));
-    mColor.insert("DSWPLI",Vector4i(25, 10, 255, 1));
+    QMap<QString, Vector4i> mColor;
+    mColor.insert("COR", Vector4i(90, 26, 100, 1));
+    mColor.insert("XCOR", Vector4i(255, 20, 80, 1));
+    mColor.insert("PLI", Vector4i(255, 255, 0, 1));
+    mColor.insert("COH", Vector4i(2, 89, 100, 1));
+    mColor.insert("IMAGCOH", Vector4i(50, 255, 48, 1));
+    mColor.insert("PLV", Vector4i(0, 255, 255, 1));
+    mColor.insert("WPLI", Vector4i(255, 0, 100, 1));
+    mColor.insert("USPLI", Vector4i(255, 89, 200, 1));
+    mColor.insert("DSWPLI", Vector4i(25, 10, 255, 1));
 
-    for(int j = 0; j < lNetworks.size(); ++j) {
+    for (int j = 0; j < lNetworks.size(); ++j) {
         lNetworks[j].setFrequencyRange(dFreqMin, dFreqMax);
         lNetworks[j].normalize();
         VisualizationInfo visInfo = lNetworks.at(j).getVisualizationInfo();
@@ -365,12 +365,12 @@ int main(int argc, char *argv[])
     }
 
     // Create BrainView for visualization
-    BrainView *pBrainView = new BrainView();
-    BrainTreeModel *pModel = new BrainTreeModel();
+    BrainView* pBrainView = new BrainView();
+    BrainTreeModel* pModel = new BrainTreeModel();
     pBrainView->setModel(pModel);
 
     // Load all networks
-    for(int j = 0; j < lNetworks.size(); ++j) {
+    for (int j = 0; j < lNetworks.size(); ++j) {
         pBrainView->loadNetwork(lNetworks[j], lNetworks[j].getConnectivityMethod());
     }
     pBrainView->setNetworkThreshold(0.9);
@@ -381,7 +381,7 @@ int main(int argc, char *argv[])
     pConnSettingsView->setFrequencyBand(dFreqMin, dFreqMax);
 
     //Read and show sensor helmets
-    if(!bDoSourceLoc && sChType.contains("meg", Qt::CaseInsensitive)) {
+    if (!bDoSourceLoc && sChType.contains("meg", Qt::CaseInsensitive)) {
         pBrainView->loadSensors(QCoreApplication::applicationDirPath() + "/../resources/general/sensorSurfaces/306m_rt.fif");
     } else {
         // Add source estimate for source-level visualization
@@ -425,10 +425,10 @@ int main(int argc, char *argv[])
     }
 
     QObject::connect(pConnSettingsView.data(), &ConnectivitySettingsView::numberTrialsChanged,
-                     [&pConnSettingsView,iNumTrials] () {pConnSettingsView->setNumberTrials(iNumTrials);});
+                     [&pConnSettingsView, iNumTrials]() { pConnSettingsView->setNumberTrials(iNumTrials); });
 
     QObject::connect(pConnSettingsView.data(), &ConnectivitySettingsView::freqBandChanged,
-                     [&pConnSettingsView,dFreqMin,dFreqMax] () {pConnSettingsView->setFrequencyBand(dFreqMin,dFreqMax);});
+                     [&pConnSettingsView, dFreqMin, dFreqMax]() { pConnSettingsView->setFrequencyBand(dFreqMin, dFreqMax); });
 
     pConnSettingsView->show();
     pBrainView->show();

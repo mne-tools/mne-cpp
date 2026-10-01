@@ -94,14 +94,14 @@ QString ChannelSelection::getName() const
 
 //=============================================================================================================
 
-QMenu *ChannelSelection::getMenu()
+QMenu* ChannelSelection::getMenu()
 {
     return Q_NULLPTR;
 }
 
 //=============================================================================================================
 
-QDockWidget *ChannelSelection::getControl()
+QDockWidget* ChannelSelection::getControl()
 {
     QDockWidget* pControlDockWidget = new QDockWidget(getName());
     QWidget* pControlWidget = new QWidget(pControlDockWidget);
@@ -113,7 +113,7 @@ QDockWidget *ChannelSelection::getControl()
     pControlDockWidget->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
     pControlDockWidget->setObjectName("Channel Selection");
     pControlDockWidget->setSizePolicy(QSizePolicy(QSizePolicy::Expanding,
-                                        QSizePolicy::Preferred));
+                                                  QSizePolicy::Preferred));
 
     QLabel* pTempLabel = new QLabel("No File Loaded");
     m_pControlLayout->addWidget(pTempLabel);
@@ -123,7 +123,7 @@ QDockWidget *ChannelSelection::getControl()
 
 //=============================================================================================================
 
-QWidget *ChannelSelection::getView()
+QWidget* ChannelSelection::getView()
 {
     QWidget* pViewWidget = new QWidget();
     m_pViewLayout = new QHBoxLayout();
@@ -137,17 +137,17 @@ QWidget *ChannelSelection::getView()
 void ChannelSelection::handleEvent(QSharedPointer<Event> e)
 {
     switch (e->getType()) {
-    case EVENT_TYPE::SELECTED_MODEL_CHANGED:
-        if(e->getData().value<QSharedPointer<ANSHAREDLIB::AbstractModel> >()->getType() != ANSHAREDLIB_BEMDATA_MODEL) {
-            onModelChanged(e->getData().value<QSharedPointer<ANSHAREDLIB::AbstractModel> >());
-        }
-        break;
-    case EVENT_TYPE::MODEL_REMOVED:
-        onModelRemoved(e->getData().value<QSharedPointer<ANSHAREDLIB::AbstractModel>>());
-        break;
-    default:
-        qWarning() << "[ChannelSelection::handleEvent] received an Event that is not handled by switch-cases";
-        break;
+        case EVENT_TYPE::SELECTED_MODEL_CHANGED:
+            if (e->getData().value<QSharedPointer<ANSHAREDLIB::AbstractModel>>()->getType() != ANSHAREDLIB_BEMDATA_MODEL) {
+                onModelChanged(e->getData().value<QSharedPointer<ANSHAREDLIB::AbstractModel>>());
+            }
+            break;
+        case EVENT_TYPE::MODEL_REMOVED:
+            onModelRemoved(e->getData().value<QSharedPointer<ANSHAREDLIB::AbstractModel>>());
+            break;
+        default:
+            qWarning() << "[ChannelSelection::handleEvent] received an Event that is not handled by switch-cases";
+            break;
     }
 }
 
@@ -166,8 +166,8 @@ QVector<EVENT_TYPE> ChannelSelection::getEventSubscriptions(void) const
 
 void ChannelSelection::onModelChanged(QSharedPointer<ANSHAREDLIB::AbstractModel> pNewModel)
 {
-    if(pNewModel->getType() == MODEL_TYPE::ANSHAREDLIB_FIFFRAW_MODEL) {
-        if(auto info = qSharedPointerCast<FiffRawViewModel>(pNewModel)->getFiffInfo()){
+    if (pNewModel->getType() == MODEL_TYPE::ANSHAREDLIB_FIFFRAW_MODEL) {
+        if (auto info = qSharedPointerCast<FiffRawViewModel>(pNewModel)->getFiffInfo()) {
             setFiffSettings(info);
         }
     }
@@ -179,7 +179,7 @@ void ChannelSelection::setFiffSettings(QSharedPointer<FIFFLIB::FiffInfo> pFiffIn
 {
     m_pFiffInfo = pFiffInfo;
 
-    if(m_bIsInit){
+    if (m_bIsInit) {
         m_pChannelInfoModel->setFiffInfo(m_pFiffInfo);
         return;
     }
@@ -197,7 +197,7 @@ void ChannelSelection::setFiffSettings(QSharedPointer<FIFFLIB::FiffInfo> pFiffIn
     m_pViewLayout->addWidget(m_pChannelSelectionView->getViewWidget());
     m_pControlLayout->addWidget(m_pChannelSelectionView->getControlWidget());
 
-    m_pApplyToView = new DISPLIB::ApplyToView("",m_pControlLayout->widget());
+    m_pApplyToView = new DISPLIB::ApplyToView("", m_pControlLayout->widget());
 
     m_pControlLayout->addWidget(m_pApplyToView);
 
@@ -232,7 +232,7 @@ void ChannelSelection::onSelectionChanged(const QList<QGraphicsItem*>& selectedC
     m_pSelectionItem->m_qpChannelPosition.clear();
     m_pSelectionItem->m_sViewsToApply.clear();
 
-    while(i.hasNext()){
+    while (i.hasNext()) {
         DISPLIB::SelectionSceneItem* selectionSceneItemTemp = static_cast<DISPLIB::SelectionSceneItem*>(i.next());
 
         m_pSelectionItem->m_sChannelName.append(selectionSceneItemTemp->m_sChannelName);
@@ -246,14 +246,14 @@ void ChannelSelection::onSelectionChanged(const QList<QGraphicsItem*>& selectedC
 
     m_pSelectionItem->m_sViewsToApply = m_pApplyToView->getSelectedViews();
 
-    m_pCommu->publishEvent(EVENT_TYPE::CHANNEL_SELECTION_ITEMS, QVariant::fromValue(/*static_cast<void*>(*/m_pSelectionItem/*)*/));
+    m_pCommu->publishEvent(EVENT_TYPE::CHANNEL_SELECTION_ITEMS, QVariant::fromValue(/*static_cast<void*>(*/ m_pSelectionItem /*)*/));
 }
 
 //=============================================================================================================
 
 void ChannelSelection::onModelRemoved([[maybe_unused]] QSharedPointer<ANSHAREDLIB::AbstractModel> pRemovedModel)
 {
-    if(m_pAnalyzeData->getModelsByType(ANSHAREDLIB_FIFFRAW_MODEL).size() == 0 && m_pAnalyzeData->getModelsByType(ANSHAREDLIB_AVERAGING_MODEL).size() == 0){
+    if (m_pAnalyzeData->getModelsByType(ANSHAREDLIB_FIFFRAW_MODEL).size() == 0 && m_pAnalyzeData->getModelsByType(ANSHAREDLIB_AVERAGING_MODEL).size() == 0) {
         m_pChannelSelectionView->clearView();
     }
 }
@@ -262,5 +262,5 @@ void ChannelSelection::onModelRemoved([[maybe_unused]] QSharedPointer<ANSHAREDLI
 
 QString ChannelSelection::getBuildInfo()
 {
-    return QString(CHANNELSELECTIONPLUGIN::buildDateTime()) + QString(" - ")  + QString(CHANNELSELECTIONPLUGIN::buildHash());
+    return QString(CHANNELSELECTIONPLUGIN::buildDateTime()) + QString(" - ") + QString(CHANNELSELECTIONPLUGIN::buildHash());
 }

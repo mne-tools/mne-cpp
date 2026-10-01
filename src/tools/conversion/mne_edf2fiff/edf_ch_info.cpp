@@ -50,21 +50,20 @@ EDFChannelInfo::EDFChannelInfo(const int channelNumber,
                                const long numberOfSamplesTotal,
                                const float frequency,
                                const bool isMeasurement)
-: m_iChanNo(channelNumber),
-  m_sLabel(label),
-  m_sTransducerType(transducer),
-  m_sPhysicalDimension(physicalDimension),
-  m_sPrefiltering(prefiltering),
-  m_fPhysicalMinimum(physicalMin),
-  m_fPhysicalMaximum(physicalMax),
-  m_iDigitalMinimum(digitalMin),
-  m_iDigitalMaximum(digitalMax),
-  m_iNumberOfSamplesPerRecord(numberOfSamplesPerRecord),
-  m_iNumberOfSamplesTotal(numberOfSamplesTotal),
-  m_frequency(frequency),
-  m_bIsMeas(isMeasurement)
+: m_iChanNo(channelNumber)
+, m_sLabel(label)
+, m_sTransducerType(transducer)
+, m_sPhysicalDimension(physicalDimension)
+, m_sPrefiltering(prefiltering)
+, m_fPhysicalMinimum(physicalMin)
+, m_fPhysicalMaximum(physicalMax)
+, m_iDigitalMinimum(digitalMin)
+, m_iDigitalMaximum(digitalMax)
+, m_iNumberOfSamplesPerRecord(numberOfSamplesPerRecord)
+, m_iNumberOfSamplesTotal(numberOfSamplesTotal)
+, m_frequency(frequency)
+, m_bIsMeas(isMeasurement)
 {
-
 }
 
 //*************************************************************************************************************
@@ -102,38 +101,36 @@ FiffChInfo EDFChannelInfo::toFiffChInfo() const
     FiffChInfo fiffChInfo;
 
     fiffChInfo.scanNo = m_iChanNo;
-    fiffChInfo.logNo = m_iChanNo;  // simply take index from file organisation as logical channel number, this guarantees uniqueness.
+    fiffChInfo.logNo = m_iChanNo; // simply take index from file organisation as logical channel number, this guarantees uniqueness.
     // check a few basic cases for channel kind:
     QString sLabelUpper = m_sLabel.toUpper();
-    if(m_bIsMeas == false) {
-        if(sLabelUpper.contains("STIM"))
+    if (m_bIsMeas == false) {
+        if (sLabelUpper.contains("STIM"))
             fiffChInfo.kind = FIFFV_STIM_CH;
         else
-            fiffChInfo.kind = FIFFV_MISC_CH;  // declare as miscellaneous, cannot be wrong.
-    }
-    else {
-        if(sLabelUpper.contains("EEG"))
+            fiffChInfo.kind = FIFFV_MISC_CH; // declare as miscellaneous, cannot be wrong.
+    } else {
+        if (sLabelUpper.contains("EEG"))
             fiffChInfo.kind = FIFFV_EEG_CH;
-        else if(sLabelUpper.contains("MEG"))
+        else if (sLabelUpper.contains("MEG"))
             fiffChInfo.kind = FIFFV_MEG_CH;
-        else if(sLabelUpper.contains("ECG"))
+        else if (sLabelUpper.contains("ECG"))
             fiffChInfo.kind = FIFFV_ECG_CH;
-        else if(sLabelUpper.contains("EOG"))
+        else if (sLabelUpper.contains("EOG"))
             fiffChInfo.kind = FIFFV_EOG_CH;
         else
-            fiffChInfo.kind = FIFFV_MISC_CH;  // declare as miscellaneous, cannot be wrong.
+            fiffChInfo.kind = FIFFV_MISC_CH; // declare as miscellaneous, cannot be wrong.
     }
 
     // check a few basic cases for physical dimension / unit:
     QString sUnitUpper = m_sPhysicalDimension.toUpper();
-    if(sUnitUpper.endsWith("V") || sUnitUpper.endsWith("VOLT")) {
+    if (sUnitUpper.endsWith("V") || sUnitUpper.endsWith("VOLT")) {
         fiffChInfo.unit = FIFF_UNIT_V;
-        if(sUnitUpper.startsWith("U") || sUnitUpper.startsWith("MICRO"))
+        if (sUnitUpper.startsWith("U") || sUnitUpper.startsWith("MICRO"))
             fiffChInfo.unit_mul = FIFF_UNITM_MU;
         else
-            fiffChInfo.unit_mul = FIFF_UNITM_NONE;  // seems to be the best solution
-    }
-    else {
+            fiffChInfo.unit_mul = FIFF_UNITM_NONE; // seems to be the best solution
+    } else {
         fiffChInfo.unit = FIFF_UNIT_NONE;
         fiffChInfo.unit_mul = FIFF_UNITM_NONE;
     }

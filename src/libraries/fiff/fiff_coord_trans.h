@@ -81,10 +81,10 @@ class FiffTag;
 class FIFFSHARED_EXPORT FiffCoordTrans
 {
 public:
-    using SPtr = QSharedPointer<FiffCoordTrans>;            /**< Shared pointer type for FiffCoordTrans. */
-    using ConstSPtr = QSharedPointer<const FiffCoordTrans>; /**< Const shared pointer type for FiffCoordTrans. */
-    using UPtr = std::unique_ptr<FiffCoordTrans>;           /**< Unique pointer type for FiffCoordTrans. */
-    using ConstUPtr = std::unique_ptr<const FiffCoordTrans>;/**< Const unique pointer type for FiffCoordTrans. */
+    using SPtr = QSharedPointer<FiffCoordTrans>;             /**< Shared pointer type for FiffCoordTrans. */
+    using ConstSPtr = QSharedPointer<const FiffCoordTrans>;  /**< Const shared pointer type for FiffCoordTrans. */
+    using UPtr = std::unique_ptr<FiffCoordTrans>;            /**< Unique pointer type for FiffCoordTrans. */
+    using ConstUPtr = std::unique_ptr<const FiffCoordTrans>; /**< Const unique pointer type for FiffCoordTrans. */
 
     //=========================================================================================================
     /**
@@ -98,7 +98,7 @@ public:
      *
      * @param[in] p_IODevice     IO device to read from the coordinate transform.
      */
-    FiffCoordTrans(QIODevice &p_IODevice);
+    FiffCoordTrans(QIODevice& p_IODevice);
 
     //=========================================================================================================
     /**
@@ -106,7 +106,7 @@ public:
      *
      * @param[in] p_FiffCoordTrans   Coordinate transformation description which should be copied.
      */
-    FiffCoordTrans(const FiffCoordTrans &p_FiffCoordTrans);
+    FiffCoordTrans(const FiffCoordTrans& p_FiffCoordTrans);
 
     //=========================================================================================================
     /**
@@ -119,7 +119,7 @@ public:
      *
      * @return reference to this object.
      */
-    FiffCoordTrans& operator=(const FiffCoordTrans &p_FiffCoordTrans) = default;
+    FiffCoordTrans& operator=(const FiffCoordTrans& p_FiffCoordTrans) = default;
 
     //=========================================================================================================
     /**
@@ -189,52 +189,76 @@ public:
      *
      * @return Writable 3×3 block view of the upper-left rotation part of trans.
      */
-    auto rot() { return trans.block<3,3>(0,0); }
+    auto rot()
+    {
+        return trans.block<3, 3>(0, 0);
+    }
     /**
      * @overload
      *
      * @return Read-only 3×3 block view of the upper-left rotation part of trans.
      */
-    auto rot() const { return trans.block<3,3>(0,0); }
+    auto rot() const
+    {
+        return trans.block<3, 3>(0, 0);
+    }
 
     /**
      * Forward translation (column 3 of trans).
      *
      * @return Writable 3×1 block view of the translation column of trans (meters).
      */
-    auto move() { return trans.block<3,1>(0,3); }
+    auto move()
+    {
+        return trans.block<3, 1>(0, 3);
+    }
     /**
      * @overload
      *
      * @return Read-only 3×1 block view of the translation column of trans (meters).
      */
-    auto move() const { return trans.block<3,1>(0,3); }
+    auto move() const
+    {
+        return trans.block<3, 1>(0, 3);
+    }
 
     /**
      * Inverse rotation (3×3 block of invtrans).
      *
      * @return Writable 3×3 block view of the upper-left rotation part of invtrans.
      */
-    auto invrot() { return invtrans.block<3,3>(0,0); }
+    auto invrot()
+    {
+        return invtrans.block<3, 3>(0, 0);
+    }
     /**
      * @overload
      *
      * @return Read-only 3×3 block view of the upper-left rotation part of invtrans.
      */
-    auto invrot() const { return invtrans.block<3,3>(0,0); }
+    auto invrot() const
+    {
+        return invtrans.block<3, 3>(0, 0);
+    }
 
     /**
      * Inverse translation (column 3 of invtrans).
      *
      * @return Writable 3×1 block view of the translation column of invtrans (meters).
      */
-    auto invmove() { return invtrans.block<3,1>(0,3); }
+    auto invmove()
+    {
+        return invtrans.block<3, 1>(0, 3);
+    }
     /**
      * @overload
      *
      * @return Read-only 3×1 block view of the translation column of invtrans (meters).
      */
-    auto invmove() const { return invtrans.block<3,1>(0,3); }
+    auto invmove() const
+    {
+        return invtrans.block<3, 1>(0, 3);
+    }
     /** @} */
 
     //=========================================================================================================
@@ -354,7 +378,7 @@ public:
      *
      * @return Human readable form of the coordinate frame.
      */
-    static QString frame_name (int frame);
+    static QString frame_name(int frame);
 
     //=========================================================================================================
     /**
@@ -423,7 +447,7 @@ public:
      *
      * @param[in] p_IODevice   IO device to write the transformation to.
      */
-    void write(QIODevice &p_IODevice);
+    void write(QIODevice& p_IODevice);
 
     //=========================================================================================================
     /**
@@ -450,7 +474,7 @@ public:
      *
      * @return true if equal, false otherwise.
      */
-    friend bool operator== (const FiffCoordTrans &a, const FiffCoordTrans &b);
+    friend bool operator==(const FiffCoordTrans& a, const FiffCoordTrans& b);
 
     //========================================================================================================
     /**
@@ -517,11 +541,10 @@ public:
                                           float max_diff);
 
 public:
-    fiff_int_t  from;   /**< Source coordinate system. */
-    fiff_int_t  to;     /**< Destination coordinate system. */
-    Eigen::Matrix<float, 4,4, Eigen::DontAlign>   trans;      /**< The forward transform. */
-    Eigen::Matrix<float, 4,4, Eigen::DontAlign>   invtrans;   /**< The inverse transform. */
-
+    fiff_int_t from;                                       /**< Source coordinate system. */
+    fiff_int_t to;                                         /**< Destination coordinate system. */
+    Eigen::Matrix<float, 4, 4, Eigen::DontAlign> trans;    /**< The forward transform. */
+    Eigen::Matrix<float, 4, 4, Eigen::DontAlign> invtrans; /**< The inverse transform. */
 };
 
 //=============================================================================================================
@@ -537,7 +560,7 @@ inline qint32 FiffCoordTrans::storageSize()
 
 //=============================================================================================================
 
-inline bool operator== (const FiffCoordTrans &a, const FiffCoordTrans &b)
+inline bool operator==(const FiffCoordTrans& a, const FiffCoordTrans& b)
 {
     return (a.from == b.from &&
             a.to == b.to &&

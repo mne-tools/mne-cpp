@@ -36,7 +36,7 @@ using namespace COVARIANCEPLUGIN;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-CovarianceSetupWidget::CovarianceSetupWidget(Covariance* toolbox, QWidget *parent)
+CovarianceSetupWidget::CovarianceSetupWidget(Covariance* toolbox, QWidget* parent)
 : QWidget(parent)
 , m_pCovariance(toolbox)
 {

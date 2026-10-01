@@ -36,11 +36,12 @@
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-namespace ANSHAREDLIB {
-    class Communicator;
-    class BemDataModel;
-    class AbstractModel;
-    class DipoleFitModel;
+namespace ANSHAREDLIB
+{
+class Communicator;
+class BemDataModel;
+class AbstractModel;
+class DipoleFitModel;
 }
 
 class BrainView;
@@ -49,17 +50,20 @@ class BemTreeItem;
 class DigitizerSetTreeItem;
 class DipoleTreeItem;
 
-namespace DISPLIB {
-    class Control3DView;
+namespace DISPLIB
+{
+class Control3DView;
 }
 
-namespace FIFFLIB {
-    class FiffCoordTrans;
-    class FiffDigPointSet;
+namespace FIFFLIB
+{
+class FiffCoordTrans;
+class FiffDigPointSet;
 }
 
-namespace INVLIB {
-    class InvEcdSet;
+namespace INVLIB
+{
+class InvEcdSet;
 }
 //=============================================================================================================
 // DEFINE NAMESPACE VIEW3DPLUGIN
@@ -153,7 +157,7 @@ private:
     /**
      * Handle incoming picking event from BrainView.
      */
-    void newPickingEvent(const QVector3D &worldIntersection);
+    void newPickingEvent(const QVector3D& worldIntersection);
 
     //=========================================================================================================
     /**
@@ -194,17 +198,17 @@ private:
      */
     void onModelRemoved(QSharedPointer<ANSHAREDLIB::AbstractModel> pRemovedModel);
 
-    QPointer<ANSHAREDLIB::Communicator>                     m_pCommu;               /**< To broadcst signals. */
+    QPointer<ANSHAREDLIB::Communicator> m_pCommu; /**< To broadcst signals. */
 
-    int                                                     m_iFiducial;            /**< Currently selected fiducial. */
+    int m_iFiducial; /**< Currently selected fiducial. */
 
-    QSharedPointer<BrainTreeModel>                          m_p3DModel;             /**< The 3D model data. */
-    BemTreeItem*                                            m_pBemTreeCoreg;        /**< TThe BEM head model of the coregistration plugin. */
+    QSharedPointer<BrainTreeModel> m_p3DModel; /**< The 3D model data. */
+    BemTreeItem* m_pBemTreeCoreg;              /**< TThe BEM head model of the coregistration plugin. */
 
-    BrainView*                                              m_pView3D;              /**< The Disp3D view. */
-    DISPLIB::Control3DView*                                 m_pControl3DView;       /**< The 3D Control view. */
+    BrainView* m_pView3D;                     /**< The Disp3D view. */
+    DISPLIB::Control3DView* m_pControl3DView; /**< The 3D Control view. */
 
-    bool                                                    m_bPickingActivated;    /**< If Picking is activated*/
+    bool m_bPickingActivated; /**< If Picking is activated*/
 
 signals:
     //=========================================================================================================
@@ -265,4 +269,3 @@ signals:
 } // NAMESPACE
 
 #endif // MNEANALYZE_VIEW3D_H
-

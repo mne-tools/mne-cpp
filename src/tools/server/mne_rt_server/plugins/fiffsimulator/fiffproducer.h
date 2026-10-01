@@ -49,7 +49,6 @@ class FiffSimulator;
 class FIFFSIMULATORSHARED_EXPORT FiffProducer : public QThread
 {
 public:
-
     //=========================================================================================================
     /**
      * Constructs a FiffProducer.
@@ -78,8 +77,8 @@ protected:
     virtual void run();
 
 private:
-    FiffSimulator*  m_pFiffSimulator;   /**< Holds a pointer to corresponding FiffSimulator.*/
-    bool            m_bIsRunning;       /**< Holds whether ECGProducer is running.*/
+    FiffSimulator* m_pFiffSimulator; /**< Holds a pointer to corresponding FiffSimulator.*/
+    bool m_bIsRunning;               /**< Holds whether ECGProducer is running.*/
 };
 } // NAMESPACE
 

@@ -65,7 +65,8 @@ private slots:
 
     void testFiffIOReadRaw()
     {
-        if(!QFile::exists(m_sRawFile)) QSKIP("Raw file not found");
+        if (!QFile::exists(m_sRawFile))
+            QSKIP("Raw file not found");
 
         QFile file(m_sRawFile);
         FiffIO io(file);
@@ -75,7 +76,8 @@ private slots:
 
     void testFiffIOReadEvoked()
     {
-        if(!QFile::exists(m_sEvokedFile)) QSKIP("Evoked file not found");
+        if (!QFile::exists(m_sEvokedFile))
+            QSKIP("Evoked file not found");
 
         QFile file(m_sEvokedFile);
         FiffIO io(file);
@@ -85,7 +87,8 @@ private slots:
 
     void testFiffIOSetupRead()
     {
-        if(!QFile::exists(m_sRawFile)) QSKIP("Raw file not found");
+        if (!QFile::exists(m_sRawFile))
+            QSKIP("Raw file not found");
 
         QFile file(m_sRawFile);
         FiffInfo info;
@@ -97,19 +100,20 @@ private slots:
 
     void testFiffIOWriteRaw()
     {
-        if(!QFile::exists(m_sRawFile)) QSKIP("Raw file not found");
+        if (!QFile::exists(m_sRawFile))
+            QSKIP("Raw file not found");
 
         QFile file(m_sRawFile);
         FiffIO io(file);
 
-        if(io.m_qlistRaw.size() > 0) {
+        if (io.m_qlistRaw.size() > 0) {
             QTemporaryDir tmpDir;
             QVERIFY(tmpDir.isValid());
             QString outFile = tmpDir.path() + "/test_raw_write.fif";
             QFile out(outFile);
             bool written = io.write_raw(out, 0);
             // Exercise the write code path
-            if(written) {
+            if (written) {
                 QVERIFY(QFileInfo(outFile).size() > 0);
             } else {
                 qWarning() << "write_raw returned false — code path exercised";
@@ -128,11 +132,12 @@ private slots:
 
     void testMneRawInfoLoad()
     {
-        if(!QFile::exists(m_sRawFile)) QSKIP("Raw file not found");
+        if (!QFile::exists(m_sRawFile))
+            QSKIP("Raw file not found");
 
         std::unique_ptr<MNERawInfo> info;
         int rc = MNERawInfo::load(m_sRawFile, 0, info);
-        if(rc == 0 && info) {
+        if (rc == 0 && info) {
             QVERIFY(info->nchan > 0);
             QVERIFY(info->sfreq > 0);
             QVERIFY(!info->chInfo.isEmpty());
@@ -143,11 +148,13 @@ private slots:
 
     void testMneRawInfoFindNodes()
     {
-        if(!QFile::exists(m_sRawFile)) QSKIP("Raw file not found");
+        if (!QFile::exists(m_sRawFile))
+            QSKIP("Raw file not found");
 
         QFile file(m_sRawFile);
         FiffStream::SPtr stream(new FiffStream(&file));
-        if(!stream->open()) QSKIP("Could not open FIFF stream");
+        if (!stream->open())
+            QSKIP("Could not open FIFF stream");
 
         FiffDirNode::SPtr meas = MNERawInfo::find_meas(stream->dirtree());
         // find_meas may return null depending on tree structure; code path exercised
@@ -166,14 +173,16 @@ private slots:
 
     void testMneRawInfoGetMeasInfo()
     {
-        if(!QFile::exists(m_sRawFile)) QSKIP("Raw file not found");
+        if (!QFile::exists(m_sRawFile))
+            QSKIP("Raw file not found");
 
         QFile file(m_sRawFile);
         FiffStream::SPtr stream(new FiffStream(&file));
-        if(!stream->open()) QSKIP("Could not open FIFF stream");
+        if (!stream->open())
+            QSKIP("Could not open FIFF stream");
 
         FiffDirNode::SPtr meas = MNERawInfo::find_meas(stream->dirtree());
-        if(meas) {
+        if (meas) {
             std::unique_ptr<FiffId> id;
             int nchan = 0;
             float sfreq = 0, highpass = 0, lowpass = 0;
@@ -183,7 +192,7 @@ private slots:
 
             int rc = MNERawInfo::get_meas_info(stream, meas, id, &nchan, &sfreq,
                                                &highpass, &lowpass, chInfo, trans, startTime);
-            if(rc == 0) {
+            if (rc == 0) {
                 QVERIFY(nchan > 0);
                 QVERIFY(sfreq > 0);
             }
@@ -246,12 +255,12 @@ private slots:
         bool written = stc.write(outFile);
         outFile.close();
 
-        if(written) {
+        if (written) {
             // Read back
             QFile inFile(stcFile);
             InvSourceEstimate stcRead;
             bool readOk = InvSourceEstimate::read(inFile, stcRead);
-            if(readOk) {
+            if (readOk) {
                 QCOMPARE(stcRead.data.rows(), nSources);
                 QCOMPARE(stcRead.data.cols(), nTimes);
             }
@@ -375,7 +384,9 @@ private slots:
         QCOMPARE(stc.vertices.size(), 0);
     }
 
-    void cleanupTestCase() {}
+    void cleanupTestCase()
+    {
+    }
 };
 
 QTEST_GUILESS_MAIN(TestMneIoCoverage)

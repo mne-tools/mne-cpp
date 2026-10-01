@@ -60,14 +60,14 @@ public:
     typedef QSharedPointer<PluginSceneManager> SPtr;            /**< Shared pointer type for PluginSceneManager. */
     typedef QSharedPointer<const PluginSceneManager> ConstSPtr; /**< Const shared pointer type for PluginSceneManager. */
 
-    typedef QList< AbstractPlugin::SPtr > PluginList;                                      /**< type for a list of plugins. */
-    typedef QList<PluginConnectorConnection::SPtr> PluginConnectorConnectionList;   /**< Shared pointer type for PluginConnectorConnection::SPtr list. */
+    typedef QList<AbstractPlugin::SPtr> PluginList;                               /**< type for a list of plugins. */
+    typedef QList<PluginConnectorConnection::SPtr> PluginConnectorConnectionList; /**< Shared pointer type for PluginConnectorConnection::SPtr list. */
 
     //=========================================================================================================
     /**
      * Constructs a PluginSceneManager.
      */
-    explicit PluginSceneManager(QObject *parent = 0);
+    explicit PluginSceneManager(QObject* parent = 0);
 
     //=========================================================================================================
     /**
@@ -84,7 +84,7 @@ public:
      *
      *@return true if plugin is added successful.
      */
-    bool addPlugin(const AbstractPlugin* pPlugin, AbstractPlugin::SPtr &pAddedPlugin);
+    bool addPlugin(const AbstractPlugin* pPlugin, AbstractPlugin::SPtr& pAddedPlugin);
 
     inline PluginList& getPlugins();
 
@@ -184,7 +184,6 @@ public:
 signals:
 
 private:
-
     //=========================================================================================================
     /**
      * Stops all sensor plugins in m_pluginList.
@@ -197,8 +196,8 @@ private:
      */
     void stopNonSensorPlugins();
 
-    PluginList m_pluginList;    /**< List of plugins associated with this set. */
-    MNALIB::MnaGraph* m_pPipelineGraph;  /**< MNA graph mirroring the plugin scene. */
+    PluginList m_pluginList;            /**< List of plugins associated with this set. */
+    MNALIB::MnaGraph* m_pPipelineGraph; /**< MNA graph mirroring the plugin scene. */
 };
 
 //=============================================================================================================

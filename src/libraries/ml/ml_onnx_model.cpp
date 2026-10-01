@@ -163,7 +163,7 @@ bool MlOnnxModel::load(const QString& path)
         Ort::SessionOptions sessionOpts;
         sessionOpts.SetGraphOptimizationLevel(GraphOptimizationLevel::ORT_ENABLE_ALL);
         sessionOpts.SetIntraOpNumThreads(1);
-        sessionOpts.DisableMemPattern();  // reduces peak memory for small models
+        sessionOpts.DisableMemPattern(); // reduces peak memory for small models
 
         // Create session from the ONNX file
         std::string modelPathStd = path.toStdString();

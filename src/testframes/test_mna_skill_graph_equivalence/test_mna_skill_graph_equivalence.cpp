@@ -51,7 +51,7 @@
 #include <QtTest>
 
 #ifndef MNA_WORKFLOWS_SRC_DIR
-#  error "MNA_WORKFLOWS_SRC_DIR must be set by CMake"
+#error "MNA_WORKFLOWS_SRC_DIR must be set by CMake"
 #endif
 
 using namespace MNEANALYZESTUDIO;
@@ -69,21 +69,21 @@ namespace
 QString findUnderRepo(const QString& relativePath)
 {
     const QString envPath = QString::fromUtf8(qgetenv("MNE_CPP_TEST_DATA_PATH")).trimmed();
-    if(!envPath.isEmpty()) {
+    if (!envPath.isEmpty()) {
         const QString candidate = QDir(envPath).filePath(relativePath);
-        if(QFileInfo::exists(candidate)) {
+        if (QFileInfo::exists(candidate)) {
             return QFileInfo(candidate).absoluteFilePath();
         }
     }
 
     QDir dir(QCoreApplication::applicationDirPath());
-    for(int depth = 0; depth < 10; ++depth) {
+    for (int depth = 0; depth < 10; ++depth) {
         const QString candidate = dir.filePath(
             QStringLiteral("resources/data/mne-cpp-test-data/") + relativePath);
-        if(QFileInfo::exists(candidate)) {
+        if (QFileInfo::exists(candidate)) {
             return QFileInfo(candidate).absoluteFilePath();
         }
-        if(!dir.cdUp()) {
+        if (!dir.cdUp()) {
             break;
         }
     }
@@ -100,8 +100,8 @@ QString findInverseOperatorAsset()
         QDir::homePath() + QStringLiteral("/mne_data/MNE-sample-data/MEG/sample/sample_audvis-meg-oct-6-meg-inv.fif"),
         QDir::homePath() + QStringLiteral("/mne_data/MNE-sample-data/MEG/sample/sample_audvis-eeg-oct-6-eeg-inv.fif"),
     };
-    for(const QString& candidate : candidates) {
-        if(QFileInfo::exists(candidate)) {
+    for (const QString& candidate : candidates) {
+        if (QFileInfo::exists(candidate)) {
             return candidate;
         }
     }
@@ -117,7 +117,7 @@ bool copyOrFail(const QString& from, const QString& to)
 // Resolve `file://...` URI to a filesystem path.
 QString uriToPath(const QString& uri)
 {
-    if(uri.startsWith(QLatin1String("file://"))) {
+    if (uri.startsWith(QLatin1String("file://"))) {
         return uri.mid(7);
     }
     return uri;
@@ -126,7 +126,7 @@ QString uriToPath(const QString& uri)
 QString findStcInDir(const QDir& dir)
 {
     const QStringList files = dir.entryList({QStringLiteral("*.stc")}, QDir::Files);
-    if(files.isEmpty()) {
+    if (files.isEmpty()) {
         return QString();
     }
     return dir.absoluteFilePath(files.first());
@@ -135,7 +135,7 @@ QString findStcInDir(const QDir& dir)
 QByteArray readAllBytes(const QString& path)
 {
     QFile f(path);
-    if(!f.open(QIODevice::ReadOnly)) {
+    if (!f.open(QIODevice::ReadOnly)) {
         return QByteArray();
     }
     return f.readAll();
@@ -161,19 +161,19 @@ QByteArray patchShowcase(const QByteArray& showcaseJson,
 {
     QJsonParseError parseErr;
     QJsonDocument doc = QJsonDocument::fromJson(showcaseJson, &parseErr);
-    if(parseErr.error != QJsonParseError::NoError || !doc.isObject()) {
+    if (parseErr.error != QJsonParseError::NoError || !doc.isObject()) {
         errorOut = QStringLiteral("Failed to parse showcase JSON: %1").arg(parseErr.errorString());
         return {};
     }
 
     QJsonObject root = doc.object();
     QJsonArray resources = root.value(QStringLiteral("resources")).toArray();
-    for(int i = 0; i < resources.size(); ++i) {
+    for (int i = 0; i < resources.size(); ++i) {
         QJsonObject r = resources.at(i).toObject();
         const QString uid = r.value(QStringLiteral("uid")).toString();
-        if(uid == QLatin1String("raw_meg")) {
+        if (uid == QLatin1String("raw_meg")) {
             r.insert(QStringLiteral("uri"), QStringLiteral("file://") + copyRawPath);
-        } else if(uid == QLatin1String("inv_op")) {
+        } else if (uid == QLatin1String("inv_op")) {
             r.insert(QStringLiteral("uri"), QStringLiteral("file://") + copyInvPath);
         }
         resources.replace(i, r);
@@ -207,27 +207,26 @@ private:
 
 void TestMnaSkillGraphEquivalence::initTestCase()
 {
-    m_showcasePath = QString::fromUtf8(MNA_WORKFLOWS_SRC_DIR)
-        + QStringLiteral("/filter_then_source_estimation_demo.mna");
-    if(!QFileInfo::exists(m_showcasePath)) {
+    m_showcasePath = QString::fromUtf8(MNA_WORKFLOWS_SRC_DIR) + QStringLiteral("/filter_then_source_estimation_demo.mna");
+    if (!QFileInfo::exists(m_showcasePath)) {
         m_skipReason = QStringLiteral("Showcase .mna missing: %1").arg(m_showcasePath);
         return;
     }
     QFile f(m_showcasePath);
-    if(!f.open(QIODevice::ReadOnly)) {
+    if (!f.open(QIODevice::ReadOnly)) {
         m_skipReason = QStringLiteral("Could not open showcase .mna: %1").arg(m_showcasePath);
         return;
     }
     m_showcaseJson = f.readAll();
 
     m_rawPath = findUnderRepo(QStringLiteral("MEG/sample/sample_audvis_trunc_raw.fif"));
-    if(m_rawPath.isEmpty()) {
+    if (m_rawPath.isEmpty()) {
         m_skipReason = QStringLiteral("sample_audvis_trunc_raw.fif not found in mne-cpp-test-data.");
         return;
     }
 
     m_invPath = findInverseOperatorAsset();
-    if(m_invPath.isEmpty()) {
+    if (m_invPath.isEmpty()) {
         m_skipReason = QStringLiteral("No sample inverse operator (.fif) asset found under "
                                       "~/mne_data/MNE-sample-data or mne-cpp-test-data. "
                                       "MNA-skill-vs-graph equivalence test requires a real inverse operator.");
@@ -242,7 +241,7 @@ void TestMnaSkillGraphEquivalence::initTestCase()
 
 void TestMnaSkillGraphEquivalence::testFilterThenSourceEstimationEquivalence()
 {
-    if(!m_assetsReady) {
+    if (!m_assetsReady) {
         QSKIP(qPrintable(m_skipReason));
     }
 
@@ -301,20 +300,21 @@ void TestMnaSkillGraphEquivalence::testFilterThenSourceEstimationEquivalence()
     QString throwMsgA;
     try {
         managerA.loadAnalysisFile(workflowPathA);
-    } catch(const std::exception& e) {
+    } catch (const std::exception& e) {
         threwA = true;
         throwMsgA = QString::fromUtf8(e.what());
     }
-    if(threwA) {
+    if (threwA) {
         QSKIP(qPrintable(QStringLiteral(
-            "EQUIVALENCE TEST QSKIP: path A (.mna) pipeline could not complete "
-            "in this environment (underlying skill error: ") + throwMsgA +
-            QStringLiteral("). The equivalence test requires both paths to "
-            "produce STC output; report deferred until the skill is functional.")));
+                             "EQUIVALENCE TEST QSKIP: path A (.mna) pipeline could not complete "
+                             "in this environment (underlying skill error: ") +
+                         throwMsgA +
+                         QStringLiteral("). The equivalence test requires both paths to "
+                                        "produce STC output; report deferred until the skill is functional.")));
     }
 
     const QString stcPathA = findStcInDir(QDir(dirA));
-    if(stcPathA.isEmpty()) {
+    if (stcPathA.isEmpty()) {
         QSKIP("EQUIVALENCE TEST QSKIP: path A (.mna) finished without producing an STC "
               "file; cannot perform equivalence comparison.");
     }
@@ -331,25 +331,20 @@ void TestMnaSkillGraphEquivalence::testFilterThenSourceEstimationEquivalence()
     filterNodeB.parameters = filterParams;
     filterNodeB.outputs = filterNodeSpec.value(QStringLiteral("outputs")).toObject();
     filterNodeB.resolvedInputs = QJsonObject{
-        {"raw_data", QJsonObject{
-             {"uid", QStringLiteral("raw_meg")},
-             {"type", QStringLiteral("fiff_raw")},
-             {"uri", QStringLiteral("file://") + rawCopyB}
-         }}
-    };
+        {"raw_data", QJsonObject{{"uid", QStringLiteral("raw_meg")}, {"type", QStringLiteral("fiff_raw")}, {"uri", QStringLiteral("file://") + rawCopyB}}}};
 
     const QJsonObject filterResultB = filterSkillB.executeSkill(filterNodeB);
-    if(filterResultB.value(QStringLiteral("status")).toString() != QLatin1String("completed")) {
+    if (filterResultB.value(QStringLiteral("status")).toString() != QLatin1String("completed")) {
         QSKIP(qPrintable(QStringLiteral(
-            "EQUIVALENCE TEST QSKIP: path B filter skill returned status=`%1` (message: %2).")
-            .arg(filterResultB.value(QStringLiteral("status")).toString(),
-                 filterResultB.value(QStringLiteral("message")).toString())));
+                             "EQUIVALENCE TEST QSKIP: path B filter skill returned status=`%1` (message: %2).")
+                             .arg(filterResultB.value(QStringLiteral("status")).toString(),
+                                  filterResultB.value(QStringLiteral("message")).toString())));
     }
     const QString filteredUriB = filterResultB.value(QStringLiteral("outputs"))
                                      .toObject()
                                      .value(QStringLiteral("filtered_data"))
                                      .toString();
-    if(filteredUriB.isEmpty()) {
+    if (filteredUriB.isEmpty()) {
         QSKIP("EQUIVALENCE TEST QSKIP: path B filter step produced no filtered_data URI.");
     }
 
@@ -359,25 +354,16 @@ void TestMnaSkillGraphEquivalence::testFilterThenSourceEstimationEquivalence()
     sourceNodeB.parameters = sourceParams;
     sourceNodeB.outputs = sourceNodeSpec.value(QStringLiteral("outputs")).toObject();
     sourceNodeB.resolvedInputs = QJsonObject{
-        {"raw_data", QJsonObject{
-             {"uid", QStringLiteral("bandpass_out")},
-             {"type", QStringLiteral("fiff_raw")},
-             {"uri", filteredUriB}
-         }},
-        {"inverse_operator", QJsonObject{
-             {"uid", QStringLiteral("inv_op")},
-             {"type", QStringLiteral("fiff_inv")},
-             {"uri", QStringLiteral("file://") + invCopyB}
-         }}
-    };
+        {"raw_data", QJsonObject{{"uid", QStringLiteral("bandpass_out")}, {"type", QStringLiteral("fiff_raw")}, {"uri", filteredUriB}}},
+        {"inverse_operator", QJsonObject{{"uid", QStringLiteral("inv_op")}, {"type", QStringLiteral("fiff_inv")}, {"uri", QStringLiteral("file://") + invCopyB}}}};
 
     const QJsonObject sourceResultB = sourceSkillB.executeSkill(sourceNodeB);
-    if(sourceResultB.value(QStringLiteral("status")).toString() != QLatin1String("completed")) {
+    if (sourceResultB.value(QStringLiteral("status")).toString() != QLatin1String("completed")) {
         QSKIP(qPrintable(QStringLiteral(
-            "EQUIVALENCE TEST QSKIP: path B source-estimation skill returned status=`%1` "
-            "(message: %2).")
-            .arg(sourceResultB.value(QStringLiteral("status")).toString(),
-                 sourceResultB.value(QStringLiteral("message")).toString())));
+                             "EQUIVALENCE TEST QSKIP: path B source-estimation skill returned status=`%1` "
+                             "(message: %2).")
+                             .arg(sourceResultB.value(QStringLiteral("status")).toString(),
+                                  sourceResultB.value(QStringLiteral("message")).toString())));
     }
 
     const QString stcUriB = sourceResultB.value(QStringLiteral("outputs"))
@@ -385,7 +371,7 @@ void TestMnaSkillGraphEquivalence::testFilterThenSourceEstimationEquivalence()
                                 .value(QStringLiteral("source_estimate"))
                                 .toString();
     const QString stcPathB = uriToPath(stcUriB);
-    if(stcPathB.isEmpty() || !QFileInfo::exists(stcPathB)) {
+    if (stcPathB.isEmpty() || !QFileInfo::exists(stcPathB)) {
         QSKIP("EQUIVALENCE TEST QSKIP: path B source-estimation produced no STC on disk.");
     }
 
@@ -401,21 +387,21 @@ void TestMnaSkillGraphEquivalence::testFilterThenSourceEstimationEquivalence()
     QVERIFY2(stcA.vertices == stcB.vertices,
              "Vertex index vector differs between .mna run and skill-chain run.");
 
-    const bool tminEqual  = std::abs(stcA.tmin  - stcB.tmin)  < 1e-12f;
+    const bool tminEqual = std::abs(stcA.tmin - stcB.tmin) < 1e-12f;
     const bool tstepEqual = std::abs(stcA.tstep - stcB.tstep) < 1e-12f;
-    QVERIFY2(tminEqual,  "tmin differs between paths.");
+    QVERIFY2(tminEqual, "tmin differs between paths.");
     QVERIFY2(tstepEqual, "tstep differs between paths.");
 
     // Eigen isApprox with 1e-10 absolute tolerance: scale by max coefficient
     // so we get an absolute-style threshold even when data is small.
     const double maxAbs = std::max(stcA.data.cwiseAbs().maxCoeff(),
                                    stcB.data.cwiseAbs().maxCoeff());
-    const double tol    = 1e-10;
-    const double diff   = (stcA.data - stcB.data).cwiseAbs().maxCoeff();
+    const double tol = 1e-10;
+    const double diff = (stcA.data - stcB.data).cwiseAbs().maxCoeff();
     QVERIFY2(diff <= tol,
              qPrintable(QString("STC data matrices differ: max|A-B|=%1 > tol=%2 (max|A|,|B|=%3).")
                             .arg(diff, 0, 'e', 6)
-                            .arg(tol,  0, 'e', 6)
+                            .arg(tol, 0, 'e', 6)
                             .arg(maxAbs, 0, 'e', 6)));
 
     // ── File-level (byte) comparison — acceptance criterion #1 ──────────────
@@ -424,7 +410,7 @@ void TestMnaSkillGraphEquivalence::testFilterThenSourceEstimationEquivalence()
     QVERIFY(!bytesA.isEmpty());
     QVERIFY(!bytesB.isEmpty());
 
-    if(bytesA == bytesB) {
+    if (bytesA == bytesB) {
         qInfo().noquote()
             << "ACCEPTANCE CRITERION SATISFIED: byte-identical STC outputs.\n"
             << "  Size:" << bytesA.size() << "bytes\n"
@@ -441,8 +427,8 @@ void TestMnaSkillGraphEquivalence::testFilterThenSourceEstimationEquivalence()
         // hard-failing, per the test brief.
         const qsizetype minLen = std::min(bytesA.size(), bytesB.size());
         qsizetype firstDiff = -1;
-        for(qsizetype i = 0; i < minLen; ++i) {
-            if(bytesA.at(i) != bytesB.at(i)) {
+        for (qsizetype i = 0; i < minLen; ++i) {
+            if (bytesA.at(i) != bytesB.at(i)) {
                 firstDiff = i;
                 break;
             }

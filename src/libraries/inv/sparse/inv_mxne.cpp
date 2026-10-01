@@ -49,7 +49,6 @@ InvMxneResult InvMxne::compute(
     int nIterations,
     double tolerance)
 {
-
     const int nSources = static_cast<int>(matGain.cols());
     const int nTimes = static_cast<int>(matData.cols());
 
@@ -84,7 +83,7 @@ InvMxneResult InvMxne::compute(
         for (int i = 0; i < nActive; ++i) {
             matGtM_active.row(i) = matGtM.row(activeIdx[i]);
             for (int j = 0; j < nActive; ++j) {
-                matGtG_active(i,j) = matGtG(activeIdx[i], activeIdx[j]);
+                matGtG_active(i, j) = matGtG(activeIdx[i], activeIdx[j]);
             }
         }
 

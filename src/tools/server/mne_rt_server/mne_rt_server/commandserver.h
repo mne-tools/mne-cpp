@@ -51,14 +51,13 @@ class CommandServer : public QTcpServer
     Q_OBJECT
 
 public:
-
     //=========================================================================================================
     /**
      * Constructs a CommandServer
      *
      * @param[in] parent         Parent QObject (optional).
      */
-    CommandServer(QObject *parent = 0);
+    CommandServer(QObject* parent = 0);
 
     //=========================================================================================================
     /**
@@ -89,7 +88,7 @@ public:
      *
      * @param[in] p_commandManager   Command Manager to register.
      */
-    void registerCommandManager(COMLIB::CommandManager &p_commandManager);
+    void registerCommandManager(COMLIB::CommandManager& p_commandManager);
 
     //=========================================================================================================
     /**
@@ -124,12 +123,12 @@ protected:
     void incomingConnection(qintptr socketDescriptor);
 
 private:
-    qint32 m_iThreadCount;              /**< Is incresed each time a new command client connects to mne_rt_server. */
+    qint32 m_iThreadCount; /**< Is incresed each time a new command client connects to mne_rt_server. */
 
-    COMLIB::CommandParser m_commandParser;      /**< Command parser. */
+    COMLIB::CommandParser m_commandParser; /**< Command parser. */
 
-//    QMultiMap<QString, qint32> m_qMultiMapCommandThreadID;//This is need when commands are processed by different threads; currently its only one command per time processed by one thread --> m_iCurrentCommandThreadID
-    qint32 m_iCurrentCommandThreadID;   /**< Command Thread ID of the current command. */
+    //    QMultiMap<QString, qint32> m_qMultiMapCommandThreadID;//This is need when commands are processed by different threads; currently its only one command per time processed by one thread --> m_iCurrentCommandThreadID
+    qint32 m_iCurrentCommandThreadID; /**< Command Thread ID of the current command. */
 };
 
 //=============================================================================================================

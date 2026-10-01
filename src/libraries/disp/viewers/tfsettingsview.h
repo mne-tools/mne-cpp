@@ -39,8 +39,9 @@
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-namespace Ui {
-    class TfSettingsViewWidget;
+namespace Ui
+{
+class TfSettingsViewWidget;
 }
 
 //=============================================================================================================
@@ -66,8 +67,8 @@ class DISPSHARED_EXPORT TfSettingsView : public AbstractView
     Q_OBJECT
 
 public:
-    typedef QSharedPointer<TfSettingsView> SPtr;              /**< Shared pointer type for TfSettingsView. */
-    typedef QSharedPointer<const TfSettingsView> ConstSPtr;   /**< Const shared pointer type for TfSettingsView. */
+    typedef QSharedPointer<TfSettingsView> SPtr;            /**< Shared pointer type for TfSettingsView. */
+    typedef QSharedPointer<const TfSettingsView> ConstSPtr; /**< Const shared pointer type for TfSettingsView. */
 
     //=========================================================================================================
     /**
@@ -78,7 +79,7 @@ public:
      * @param[in] f Qt window flags passed to the QWidget constructor.
      */
     TfSettingsView(const QString& sSettingsPath = "",
-                   QWidget *parent = 0,
+                   QWidget* parent = 0,
                    Qt::WindowFlags f = Qt::Widget);
 
     //=========================================================================================================
@@ -130,7 +131,7 @@ protected:
 
     Ui::TfSettingsViewWidget* m_pUi;
 
-    QString         m_sSettingsPath;                /**< The settings path to store the GUI settings to. */
+    QString m_sSettingsPath; /**< The settings path to store the GUI settings to. */
 
 signals:
     //=========================================================================================================

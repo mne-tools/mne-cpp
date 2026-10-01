@@ -79,9 +79,9 @@ public:
      * @return Resampled row vector.
      */
     static Eigen::RowVectorXd resample(const Eigen::RowVectorXd& vecData,
-                                        double                    dNewSFreq,
-                                        double                    dOldSFreq,
-                                        int                       iNZeros = 10);
+                                       double dNewSFreq,
+                                       double dOldSFreq,
+                                       int iNZeros = 10);
 
     //=========================================================================================================
     /**
@@ -97,11 +97,11 @@ public:
      *
      * @return Resampled matrix (n_channels × n_new_samples).
      */
-    static Eigen::MatrixXd resampleMatrix(const Eigen::MatrixXd&    matData,
-                                           double                    dNewSFreq,
-                                           double                    dOldSFreq,
-                                           const Eigen::RowVectorXi& vecPicks = Eigen::RowVectorXi(),
-                                           int                       iNZeros  = 10);
+    static Eigen::MatrixXd resampleMatrix(const Eigen::MatrixXd& matData,
+                                          double dNewSFreq,
+                                          double dOldSFreq,
+                                          const Eigen::RowVectorXi& vecPicks = Eigen::RowVectorXi(),
+                                          int iNZeros = 10);
 
 private:
     //=========================================================================================================
@@ -140,10 +140,10 @@ private:
      * @return Resampled row vector of length ceil(nIn·p/q).
      */
     static Eigen::RowVectorXd polyphaseConv(const Eigen::RowVectorXd& vecX,
-                                             const Eigen::RowVectorXd& vecH,
-                                             int                       p,
-                                             int                       q,
-                                             int                       halfLen);
+                                            const Eigen::RowVectorXd& vecH,
+                                            int p,
+                                            int q,
+                                            int halfLen);
 };
 
 } // namespace UTILSLIB

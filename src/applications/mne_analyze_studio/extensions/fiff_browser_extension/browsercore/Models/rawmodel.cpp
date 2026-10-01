@@ -54,7 +54,7 @@ using namespace UTILSLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-RawModel::RawModel(QObject *parent)
+RawModel::RawModel(QObject* parent)
 : QAbstractTableModel(parent)
 , m_bFileloaded(false)
 , m_pFiffInfo(new FiffInfo())
@@ -80,17 +80,17 @@ RawModel::RawModel(QObject *parent)
     genStdFilterOps();
 
     //connect data reloading - this is done concurrently
-    connect(&m_reloadFutureWatcher,&QFutureWatcher<QPair<MatrixXd,MatrixXd> >::finished,[this](){
+    connect(&m_reloadFutureWatcher, &QFutureWatcher<QPair<MatrixXd, MatrixXd>>::finished, [this]() {
         insertReloadedData(m_reloadFutureWatcher.future().result());
     });
 
     //connect filtering reloading - this is done after a new block has been loaded
-    connect(this,&RawModel::dataReloaded,[this](){
-        if(!m_assignedOperators.empty())
+    connect(this, &RawModel::dataReloaded, [this]() {
+        if (!m_assignedOperators.empty())
             updateOperatorsConcurrently();
     });
 
-    connect(&m_operatorFutureWatcher,&QFutureWatcher<void>::finished,[this](){
+    connect(&m_operatorFutureWatcher, &QFutureWatcher<void>::finished, [this]() {
         insertProcessedDataAll();
     });
 }
@@ -98,7 +98,7 @@ RawModel::RawModel(QObject *parent)
 
 //*************************************************************************************************************
 
-RawModel::RawModel(QFile &qFile, QObject *parent)
+RawModel::RawModel(QFile& qFile, QObject* parent)
 : QAbstractTableModel(parent)
 , m_bFileloaded(false)
 , m_pFiffInfo(new FiffInfo())
@@ -121,16 +121,16 @@ RawModel::RawModel(QFile &qFile, QObject *parent)
     genStdFilterOps();
 
     //connect signal and slots
-    connect(&m_reloadFutureWatcher,&QFutureWatcher<QPair<MatrixXd,MatrixXd> >::finished,[this](){
+    connect(&m_reloadFutureWatcher, &QFutureWatcher<QPair<MatrixXd, MatrixXd>>::finished, [this]() {
         insertReloadedData(m_reloadFutureWatcher.future().result());
     });
 
-    connect(this,&RawModel::dataReloaded,[this](){
-        if(!m_assignedOperators.empty())
+    connect(this, &RawModel::dataReloaded, [this]() {
+        if (!m_assignedOperators.empty())
             updateOperatorsConcurrently();
     });
 
-    connect(&m_operatorFutureWatcher,&QFutureWatcher<void>::finished,[this](){
+    connect(&m_operatorFutureWatcher, &QFutureWatcher<void>::finished, [this]() {
         insertProcessedDataAll();
     });
 }
@@ -138,17 +138,18 @@ RawModel::RawModel(QFile &qFile, QObject *parent)
 
 //*************************************************************************************************************
 //virtual functions
-int RawModel::rowCount(const QModelIndex & /*parent*/) const
+int RawModel::rowCount(const QModelIndex& /*parent*/) const
 {
-    if(!m_chInfolist.empty())
+    if (!m_chInfolist.empty())
         return m_chInfolist.size();
-    else return 0;
+    else
+        return 0;
 }
 
 
 //*************************************************************************************************************
 
-int RawModel::columnCount(const QModelIndex & /*parent*/) const
+int RawModel::columnCount(const QModelIndex& /*parent*/) const
 {
     return 3;
 }
@@ -156,86 +157,82 @@ int RawModel::columnCount(const QModelIndex & /*parent*/) const
 
 //*************************************************************************************************************
 
-QVariant RawModel::data(const QModelIndex &index, int role) const
+QVariant RawModel::data(const QModelIndex& index, int role) const
 {
-    if(role != Qt::DisplayRole && role != Qt::BackgroundRole && role != RawModelRoles::GetChannelMean)
+    if (role != Qt::DisplayRole && role != Qt::BackgroundRole && role != RawModelRoles::GetChannelMean)
         return QVariant();
 
     if (index.isValid()) {
         //******** first column (chname) ********
-        if(index.column()==0 && role == Qt::DisplayRole)
+        if (index.column() == 0 && role == Qt::DisplayRole)
             return QVariant(m_chInfolist[index.row()].ch_name);
 
         //******** second column (data plot) ********
-        if(index.column()==1) {
+        if (index.column() == 1) {
             QVariant v;
 
-            switch(role) {
-            case Qt::DisplayRole: {
-                //form RowVectorPair of pointer and length of RowVector
-                QPair<const double*,qint32> rowVectorPair;
+            switch (role) {
+                case Qt::DisplayRole: {
+                    //form RowVectorPair of pointer and length of RowVector
+                    QPair<const double*, qint32> rowVectorPair;
 
-                //pack all adjacent (after reload) RowVectorPairs into a QList
-                QList<RowVectorPair> listRowVectorPair;
+                    //pack all adjacent (after reload) RowVectorPairs into a QList
+                    QList<RowVectorPair> listRowVectorPair;
 
-                for(qsizetype i=0; i < m_data.size(); ++i) {
-                    //if channel is not filtered or background Processing pending...
-                    if(!m_assignedOperators.contains(index.row()) || (m_bProcessing && m_bReloadBefore && i==0) || (m_bProcessing && !m_bReloadBefore && i==m_data.size()-1)) {
-                        rowVectorPair.first = m_data[i]->dataRaw().data() + index.row()*m_data[i]->dataRaw().cols();
-                        rowVectorPair.second  = m_data[i]->dataRaw().cols();
+                    for (qsizetype i = 0; i < m_data.size(); ++i) {
+                        //if channel is not filtered or background Processing pending...
+                        if (!m_assignedOperators.contains(index.row()) || (m_bProcessing && m_bReloadBefore && i == 0) || (m_bProcessing && !m_bReloadBefore && i == m_data.size() - 1)) {
+                            rowVectorPair.first = m_data[i]->dataRaw().data() + index.row() * m_data[i]->dataRaw().cols();
+                            rowVectorPair.second = m_data[i]->dataRaw().cols();
+                        } else { //if channel IS filtered
+                            rowVectorPair.first = m_data[i]->dataProc().data() + index.row() * m_data[i]->dataProc().cols();
+                            rowVectorPair.second = m_data[i]->dataProc().cols();
+                        }
+
+                        listRowVectorPair.append(rowVectorPair);
                     }
-                    else { //if channel IS filtered
-                        rowVectorPair.first = m_data[i]->dataProc().data() + index.row()*m_data[i]->dataProc().cols();
-                        rowVectorPair.second  = m_data[i]->dataProc().cols();
-                    }
 
-                    listRowVectorPair.append(rowVectorPair);
+                    v.setValue(listRowVectorPair);
+                    return v;
                 }
 
-                v.setValue(listRowVectorPair);
-                return v;
-            }
-
-            case Qt::BackgroundRole: { //plot channel red if marked as red
-                if(m_pFiffInfo->bads.contains(m_chInfolist[index.row()].ch_name)) {
-                    QBrush brush;
-                    brush.setStyle(Qt::SolidPattern);
-                    brush.setColor(Qt::darkRed);
-                    return QVariant(brush);
+                case Qt::BackgroundRole: { //plot channel red if marked as red
+                    if (m_pFiffInfo->bads.contains(m_chInfolist[index.row()].ch_name)) {
+                        QBrush brush;
+                        brush.setStyle(Qt::SolidPattern);
+                        brush.setColor(Qt::darkRed);
+                        return QVariant(brush);
+                    } else
+                        return QVariant();
                 }
-                else
-                    return QVariant();
-
-            }
             }
         }
 
         //******** third column (mean data of the channels plot) ********
-        if(index.column()==2) {
-            switch(role) {
-            case RawModelRoles::GetChannelMean: {
-                QVariant v;
+        if (index.column() == 2) {
+            switch (role) {
+                case RawModelRoles::GetChannelMean: {
+                    QVariant v;
 
-                //if channel is not filtered or background Processing pending...
-                if(!m_assignedOperators.contains(index.row()) || (m_bProcessing && m_bReloadBefore) || (m_bProcessing && !m_bReloadBefore)) {
-                    //Calculate the global mean of all loaded data in m_dataMean
-                    double sum = 0;
-                    for(int i = 0; i<m_data.size(); i++)
-                        sum += m_data[i]->dataRawMean(index.row());
+                    //if channel is not filtered or background Processing pending...
+                    if (!m_assignedOperators.contains(index.row()) || (m_bProcessing && m_bReloadBefore) || (m_bProcessing && !m_bReloadBefore)) {
+                        //Calculate the global mean of all loaded data in m_dataMean
+                        double sum = 0;
+                        for (int i = 0; i < m_data.size(); i++)
+                            sum += m_data[i]->dataRawMean(index.row());
 
-                    v.setValue(sum/m_data.size());
+                        v.setValue(sum / m_data.size());
+                    } else { //if channel IS filtered
+                        //Calculate the global mean of all loaded data in m_dataMean
+                        double sum = 0;
+                        for (int i = 0; i < m_data.size(); i++)
+                            sum += m_data[i]->dataProcMean(index.row());
+
+                        v.setValue(sum / m_data.size());
+                    }
+
+                    return v;
                 }
-                else { //if channel IS filtered
-                    //Calculate the global mean of all loaded data in m_dataMean
-                    double sum = 0;
-                    for(int i = 0; i<m_data.size(); i++)
-                        sum += m_data[i]->dataProcMean(index.row());
-
-                    v.setValue(sum/m_data.size());
-                }
-
-                return v;
-            }
             } // end role switch
         } // end column check
     } // end index.valid() check
@@ -248,27 +245,26 @@ QVariant RawModel::data(const QModelIndex &index, int role) const
 
 QVariant RawModel::headerData(int section, Qt::Orientation orientation, int role) const
 {
-    if(role != Qt::DisplayRole && role != Qt::TextAlignmentRole)
+    if (role != Qt::DisplayRole && role != Qt::TextAlignmentRole)
         return QVariant();
 
-    if(orientation == Qt::Horizontal) {
-        switch(section) {
-        case 0: //chname column
-            return QVariant();
-        case 1: //data plot column
-            switch(role) {
-            case Qt::DisplayRole:
-                return QVariant("data plot");
-            case Qt::TextAlignmentRole:
-                return QVariant(Qt::AlignLeft);
-            }
+    if (orientation == Qt::Horizontal) {
+        switch (section) {
+            case 0: //chname column
+                return QVariant();
+            case 1: //data plot column
+                switch (role) {
+                    case Qt::DisplayRole:
+                        return QVariant("data plot");
+                    case Qt::TextAlignmentRole:
+                        return QVariant(Qt::AlignLeft);
+                }
         }
-    }
-    else if(orientation == Qt::Vertical) {
-        QModelIndex chname = createIndex(static_cast<int>(section),0);
-        switch(role) {
-        case Qt::DisplayRole:
-            return QVariant(data(chname).toString());
+    } else if (orientation == Qt::Vertical) {
+        QModelIndex chname = createIndex(static_cast<int>(section), 0);
+        switch (role) {
+            case Qt::DisplayRole:
+                return QVariant(data(chname).toString());
         }
     }
 
@@ -284,12 +280,12 @@ void RawModel::genStdFilterOps()
     //m_Operators.clear();
 
     //regenerate them with the correct sampling frequency (only required for naming of filter)
-    double sfreq = (m_pFiffInfo->sfreq>=0) ? m_pFiffInfo->sfreq : 600.0;
-    double nyquist_freq = sfreq/2;
+    double sfreq = (m_pFiffInfo->sfreq >= 0) ? m_pFiffInfo->sfreq : 600.0;
+    double nyquist_freq = sfreq / 2;
 
     int fftLength = m_iWindowSize;
     int exp = ceil(Numerics::log2(fftLength));
-    fftLength = pow(2, exp+1);
+    fftLength = pow(2, exp + 1);
     m_iCurrentFFTLength = fftLength;
 
     FilterOperator::DesignMethod dMethod = FilterOperator::Cosine;
@@ -297,32 +293,32 @@ void RawModel::genStdFilterOps()
     //HPF
     double cutoffFreqHz = 50; //in Hz
     QString name = QString("HPF_%1").arg(cutoffFreqHz);
-    m_Operators.insert(name,QSharedPointer<MNEOperator>(new FilterOperator(name,FilterOperator::HPF,m_iFilterTaps,cutoffFreqHz/nyquist_freq,5/nyquist_freq,1/nyquist_freq,sfreq,fftLength,dMethod)));
+    m_Operators.insert(name, QSharedPointer<MNEOperator>(new FilterOperator(name, FilterOperator::HPF, m_iFilterTaps, cutoffFreqHz / nyquist_freq, 5 / nyquist_freq, 1 / nyquist_freq, sfreq, fftLength, dMethod)));
 
     //LPF
     cutoffFreqHz = 30; //in Hz
     name = QString("LPF_%1").arg(cutoffFreqHz);
-    m_Operators.insert(name,QSharedPointer<MNEOperator>(new FilterOperator(name,FilterOperator::LPF,m_iFilterTaps,cutoffFreqHz/nyquist_freq,5/nyquist_freq,1/nyquist_freq,sfreq,fftLength,dMethod)));
+    m_Operators.insert(name, QSharedPointer<MNEOperator>(new FilterOperator(name, FilterOperator::LPF, m_iFilterTaps, cutoffFreqHz / nyquist_freq, 5 / nyquist_freq, 1 / nyquist_freq, sfreq, fftLength, dMethod)));
     cutoffFreqHz = 10; //in Hz
     name = QString("LPF_%1").arg(cutoffFreqHz);
-    m_Operators.insert(name,QSharedPointer<MNEOperator>(new FilterOperator(name,FilterOperator::LPF,m_iFilterTaps,cutoffFreqHz/nyquist_freq,5/nyquist_freq,1/nyquist_freq,sfreq,fftLength,dMethod)));
+    m_Operators.insert(name, QSharedPointer<MNEOperator>(new FilterOperator(name, FilterOperator::LPF, m_iFilterTaps, cutoffFreqHz / nyquist_freq, 5 / nyquist_freq, 1 / nyquist_freq, sfreq, fftLength, dMethod)));
 
     //BPF
     double from_freqHz = 30;
     double to_freqHz = 40;
     double trans_width = 5;
-    double bw = to_freqHz-from_freqHz; //double bw = to_freqHz/from_freqHz;
-    double center = from_freqHz+bw/2;
+    double bw = to_freqHz - from_freqHz; //double bw = to_freqHz/from_freqHz;
+    double center = from_freqHz + bw / 2;
 
     name = QString("BPF_%1-%2").arg(from_freqHz).arg(to_freqHz);
-    m_Operators.insert(name,QSharedPointer<MNEOperator>(new FilterOperator(name,FilterOperator::BPF,80,(double)center/nyquist_freq,(double)bw/nyquist_freq,(double)trans_width/nyquist_freq,sfreq,fftLength,dMethod)));
+    m_Operators.insert(name, QSharedPointer<MNEOperator>(new FilterOperator(name, FilterOperator::BPF, 80, (double)center / nyquist_freq, (double)bw / nyquist_freq, (double)trans_width / nyquist_freq, sfreq, fftLength, dMethod)));
 
     //Own/manual set filter - only an entry i nthe operator list generated which is called when the filterwindow is used
     cutoffFreqHz = 40;
     //only create if filter does not exist yet
-    if(!m_Operators.contains(QString("User defined (See 'Adjust/Filter')"))) {
+    if (!m_Operators.contains(QString("User defined (See 'Adjust/Filter')"))) {
         name = QString("User defined (See 'Adjust/Filter')");
-        m_Operators.insert(name,QSharedPointer<MNEOperator>(new FilterOperator(name,FilterOperator::LPF,m_iFilterTaps,cutoffFreqHz/nyquist_freq,5/nyquist_freq,1/nyquist_freq,sfreq,(m_iWindowSize+m_iFilterTaps),dMethod)));
+        m_Operators.insert(name, QSharedPointer<MNEOperator>(new FilterOperator(name, FilterOperator::LPF, m_iFilterTaps, cutoffFreqHz / nyquist_freq, 5 / nyquist_freq, 1 / nyquist_freq, sfreq, (m_iWindowSize + m_iFilterTaps), dMethod)));
     }
 
     qInfo() << "RawModel: Standard FilterOperators generated and loaded.";
@@ -336,30 +332,30 @@ bool RawModel::loadFiffData(QIODevice* qFile)
     beginResetModel();
     clearModel();
 
-    MatrixXd t_data,t_times; //type is later on (when append to m_data) casted into MatrixXdR (Row-Major)
+    MatrixXd t_data, t_times; //type is later on (when append to m_data) casted into MatrixXdR (Row-Major)
     QSharedPointer<DataPackage> newDataPackage;
 
-    if(!qFile) {
+    if (!qFile) {
         endResetModel();
         return false;
     }
 
-    if(QFile* sourceFile = qobject_cast<QFile*>(qFile)) {
+    if (QFile* sourceFile = qobject_cast<QFile*>(qFile)) {
         QSharedPointer<QFile> persistentFile(new QFile(sourceFile->fileName()));
-        if(!persistentFile->exists()) {
+        if (!persistentFile->exists()) {
             qWarning() << "RawModel: ERROR! Could not open source file" << sourceFile->fileName();
             endResetModel();
             return false;
         }
         m_pSourceDevice = persistentFile;
     } else {
-        if(!qFile->isOpen() && !qFile->open(QIODevice::ReadOnly)) {
+        if (!qFile->isOpen() && !qFile->open(QIODevice::ReadOnly)) {
             qWarning() << "RawModel: ERROR! Could not open source device.";
             endResetModel();
             return false;
         }
 
-        if(!qFile->isSequential()) {
+        if (!qFile->isSequential()) {
             qFile->seek(0);
         }
 
@@ -369,7 +365,7 @@ bool RawModel::loadFiffData(QIODevice* qFile)
     }
 
     m_pfiffIO = QSharedPointer<FiffIO>(new FiffIO(*m_pSourceDevice));
-    if(!m_pfiffIO->m_qlistRaw.empty()) {
+    if (!m_pfiffIO->m_qlistRaw.empty()) {
         m_iAbsFiffCursor = m_pfiffIO->m_qlistRaw[0]->first_samp; //Set cursor somewhere into fiff file [in samples]
         m_iCurAbsScrollPos = 0;
         m_bStartReached = true;
@@ -377,14 +373,13 @@ bool RawModel::loadFiffData(QIODevice* qFile)
         int start = m_iAbsFiffCursor;
         int end = start + m_iWindowSize - 1;
 
-        if(!m_pfiffIO->m_qlistRaw[0]->read_raw_segment(t_data, t_times, start, end))
+        if (!m_pfiffIO->m_qlistRaw[0]->read_raw_segment(t_data, t_times, start, end))
             return false;
 
         newDataPackage = QSharedPointer<DataPackage>(new DataPackage(t_data, (MatrixXdR)t_times));
 
         m_bFileloaded = true;
-    }
-    else {
+    } else {
         qWarning("RawModel: ERROR! Data set does not contain any fiff data!");
         endResetModel();
         m_bFileloaded = false;
@@ -408,20 +403,20 @@ bool RawModel::loadFiffData(QIODevice* qFile)
 
 //*************************************************************************************************************
 
-bool RawModel::writeFiffData(QIODevice *p_IODevice)
+bool RawModel::writeFiffData(QIODevice* p_IODevice)
 {
     RowVectorXd cals;
     SparseMatrix<double> mult;
     RowVectorXi sel;
 
-//    std::cout << "Writing file " << QFile(&p_IODevice).fileName().toUtf8() << std::endl;
-    FiffStream::SPtr outfid = FiffStream::start_writing_raw(*p_IODevice,*m_pFiffInfo,cals);
+    //    std::cout << "Writing file " << QFile(&p_IODevice).fileName().toUtf8() << std::endl;
+    FiffStream::SPtr outfid = FiffStream::start_writing_raw(*p_IODevice, *m_pFiffInfo, cals);
 
     //Setup reading parameters
     fiff_int_t from = firstSample();
     fiff_int_t to = lastSample();
-    float quantum_sec = 10.0f;//read and write in 10 sec junks
-    fiff_int_t quantum = ceil(quantum_sec*m_pFiffInfo->sfreq);
+    float quantum_sec = 10.0f; //read and write in 10 sec junks
+    fiff_int_t quantum = ceil(quantum_sec * m_pFiffInfo->sfreq);
 
     // Uncomment to read the whole file at once. Warning MAtrix may be none-initialisable because its huge
     //quantum = to - from + 1;
@@ -435,23 +430,23 @@ bool RawModel::writeFiffData(QIODevice *p_IODevice)
 
     emit writeProgressRangeChanged(from, to);
 
-    for(first = from; first < to; first+=quantum) {
-        last = first+quantum-1;
+    for (first = from; first < to; first += quantum) {
+        last = first + quantum - 1;
         if (last > to)
             last = to;
 
-        if (!m_pfiffIO->m_qlistRaw[0]->read_raw_segment(data,times,mult,first,last,sel)) {
+        if (!m_pfiffIO->m_qlistRaw[0]->read_raw_segment(data, times, mult, first, last, sel)) {
             qWarning("error during read_raw_segment");
             return false;
         }
 
         qInfo("Writing...");
         if (first_buffer) {
-           if (first > 0)
-               outfid->write_int(FIFF_FIRST_SAMPLE,&first);
-           first_buffer = false;
+            if (first > 0)
+                outfid->write_int(FIFF_FIRST_SAMPLE, &first);
+            first_buffer = false;
         }
-        outfid->write_raw_buffer(data,mult);
+        outfid->write_raw_buffer(data, mult);
         qInfo("[done]");
 
         emit writeProgressChanged(first);
@@ -469,7 +464,7 @@ bool RawModel::writeFiffData(QIODevice *p_IODevice)
 void RawModel::loadFiffInfos()
 {
     //loads chinfos
-    for(qint32 i=0; i < m_pfiffIO->m_qlistRaw[0]->info.nchan; ++i)
+    for (qint32 i = 0; i < m_pfiffIO->m_qlistRaw[0]->info.nchan; ++i)
         m_chInfolist.append(m_pfiffIO->m_qlistRaw[0]->info.chs[i]);
 
     //loads fiffInfo
@@ -483,7 +478,7 @@ void RawModel::clearModel()
 {
     //FiffIO object
     m_pfiffIO.clear();
-    if(m_pSourceDevice) {
+    if (m_pSourceDevice) {
         m_pSourceDevice->close();
         m_pSourceDevice.clear();
     }
@@ -526,15 +521,15 @@ void RawModel::resetPosition(qint32 position)
     qint32 distance = position - firstSample();
     qint32 mult = floor(distance / m_iWindowSize);
 
-    m_iAbsFiffCursor = firstSample() + mult*m_iWindowSize;
+    m_iAbsFiffCursor = firstSample() + mult * m_iWindowSize;
 
-    MatrixXd t_data,t_times; //type is later on (when append to m_data) casted into MatrixXdR (Row-Major)
+    MatrixXd t_data, t_times; //type is later on (when append to m_data) casted into MatrixXdR (Row-Major)
 
     int start = m_iAbsFiffCursor;
     int end = start + m_iWindowSize - 1;
 
     m_Mutex.lock();
-    if(!m_pfiffIO->m_qlistRaw[0]->read_raw_segment(t_data, t_times, start, end))
+    if (!m_pfiffIO->m_qlistRaw[0]->read_raw_segment(t_data, t_times, start, end))
         qWarning() << "RawModel: Error resetting position of Fiff file!";
     m_Mutex.unlock();
 
@@ -545,17 +540,17 @@ void RawModel::resetPosition(qint32 position)
     //append loaded block
     m_data.append(newDataPackage);
 
-    if(!m_assignedOperators.empty())
+    if (!m_assignedOperators.empty())
         updateOperators();
 
     endResetModel();
 
-//    if(!(m_iAbsFiffCursor<=firstSample()))
-//        updateScrollPos(m_iCurAbsScrollPos-firstSample()); //little hack: if the m_iCurAbsScrollPos is now close to the edge -> force reloading w/o scrolling
+    //    if(!(m_iAbsFiffCursor<=firstSample()))
+    //        updateScrollPos(m_iCurAbsScrollPos-firstSample()); //little hack: if the m_iCurAbsScrollPos is now close to the edge -> force reloading w/o scrolling
 
-    qInfo() << "RawModel: Model Position RESET, samples from " << m_iAbsFiffCursor << "to" << m_iAbsFiffCursor+m_iWindowSize-1 << "reloaded. actual loaded t_data cols: " << t_data.cols();
+    qInfo() << "RawModel: Model Position RESET, samples from " << m_iAbsFiffCursor << "to" << m_iAbsFiffCursor + m_iWindowSize - 1 << "reloaded. actual loaded t_data cols: " << t_data.cols();
 
-    emit dataChanged(createIndex(0,1),createIndex(static_cast<int>(m_chInfolist.size())-1,1));
+    emit dataChanged(createIndex(0, 1), createIndex(static_cast<int>(m_chInfolist.size()) - 1, 1));
 }
 
 
@@ -566,14 +561,14 @@ void RawModel::reloadFiffData(bool before)
     m_bReloadBefore = before;
 
     //update scroll position
-    fiff_int_t start,end;
-    if(before) {
+    fiff_int_t start, end;
+    if (before) {
         m_iAbsFiffCursor -= m_iWindowSize;
         start = m_iAbsFiffCursor;
         end = start + m_iWindowSize - 1;
 
         //check if start of fiff file is reached
-        if(start < firstSample()) {
+        if (start < firstSample()) {
             m_bStartReached = true;
             qInfo() << "RawModel: Start of fiff file reached.";
 
@@ -581,15 +576,14 @@ void RawModel::reloadFiffData(bool before)
             //resetPosition(m_iAbsFiffCursor);
             return;
         }
-    }
-    else {
+    } else {
         start = m_iAbsFiffCursor + sizeOfPreloadedData();
         end = start + m_iWindowSize - 1;
 
         //check if end of fiff file is reached
-        if(end > lastSample()) {
+        if (end > lastSample()) {
             //Reload one more time
-            if(m_bEndReached)
+            if (m_bEndReached)
                 return;
             else
                 m_bEndReached = true;
@@ -602,7 +596,7 @@ void RawModel::reloadFiffData(bool before)
     m_bReloading = true;
 
     //read data with respect to start and end point
-    QFuture<QPair<MatrixXd,MatrixXd> > future = QtConcurrent::run([this, start, end](){
+    QFuture<QPair<MatrixXd, MatrixXd>> future = QtConcurrent::run([this, start, end]() {
         return this->readSegment(start, end);
     });
 
@@ -616,12 +610,12 @@ void RawModel::reloadFiffData(bool before)
 
 //*************************************************************************************************************
 
-QPair<MatrixXd,MatrixXd> RawModel::readSegment(fiff_int_t from, fiff_int_t to)
+QPair<MatrixXd, MatrixXd> RawModel::readSegment(fiff_int_t from, fiff_int_t to)
 {
-    QPair<MatrixXd,MatrixXd> datatime;
+    QPair<MatrixXd, MatrixXd> datatime;
 
     QMutexLocker locker(&m_Mutex);
-    if(!m_pfiffIO->m_qlistRaw[0]->read_raw_segment(datatime.first, datatime.second, from, to)) {
+    if (!m_pfiffIO->m_qlistRaw[0]->read_raw_segment(datatime.first, datatime.second, from, to)) {
         qCritical("[RawModel::readSegment] Error when reading raw data.");
         return datatime;
     }
@@ -638,7 +632,7 @@ void RawModel::updateScrollPos(int value)
     qInfo() << "RawModel: absolute Fiff Scroll Cursor" << m_iCurAbsScrollPos << "(m_iAbsFiffCursor" << m_iAbsFiffCursor << ", sizeOfPreloadedData" << sizeOfPreloadedData() << ", firstSample()" << firstSample() << ")";
 
     //if a scroll position is selected, which is not within the loaded data range -> reset position of model
-    if(m_iCurAbsScrollPos > (m_iAbsFiffCursor+sizeOfPreloadedData()+m_iWindowSize) || m_iCurAbsScrollPos < m_iAbsFiffCursor) {
+    if (m_iCurAbsScrollPos > (m_iAbsFiffCursor + sizeOfPreloadedData() + m_iWindowSize) || m_iCurAbsScrollPos < m_iAbsFiffCursor) {
         qInfo() << "RawModel: Reset position requested, m_iAbsFiffCursor:" << m_iAbsFiffCursor << "m_iCurAbsScrollPos:" << m_iCurAbsScrollPos;
         resetPosition(m_iCurAbsScrollPos);
         return;
@@ -646,12 +640,12 @@ void RawModel::updateScrollPos(int value)
 
     //reload data if end of loaded range is reached and no relaoding is currently active
     //front
-    if(!m_bReloading && (m_iCurAbsScrollPos-m_iAbsFiffCursor < m_reloadPos) && !m_bStartReached) {
+    if (!m_bReloading && (m_iCurAbsScrollPos - m_iAbsFiffCursor < m_reloadPos) && !m_bStartReached) {
         qInfo() << "RawModel: Reload requested at FRONT of loaded fiff data, m_iAbsFiffCursor:" << m_iAbsFiffCursor << "m_iCurAbsScrollPos:" << m_iCurAbsScrollPos;
         reloadFiffData(1);
     }
     //end
-    else if(!m_bReloading && m_iCurAbsScrollPos > m_iAbsFiffCursor+sizeOfPreloadedData()-m_reloadPos && !m_bEndReached) {
+    else if (!m_bReloading && m_iCurAbsScrollPos > m_iAbsFiffCursor + sizeOfPreloadedData() - m_reloadPos && !m_bEndReached) {
         qInfo() << "RawModel: Reload requested at END of loaded fiff data, m_iAbsFiffCursor:" << m_iAbsFiffCursor << "m_iCurAbsScrollPos:" << m_iCurAbsScrollPos;
         reloadFiffData(0);
     }
@@ -662,22 +656,21 @@ void RawModel::updateScrollPos(int value)
 
 void RawModel::markChBad(QModelIndexList chlist, bool status)
 {
-    for(int i=0; i < chlist.size(); ++i) {
-        if(chlist[i].column() == 1) {//only process indexes corresponding to column 1 (data)
-            if(status) {
-                if(!m_pFiffInfo->bads.contains(m_chInfolist[chlist[i].row()].ch_name))
+    for (int i = 0; i < chlist.size(); ++i) {
+        if (chlist[i].column() == 1) { //only process indexes corresponding to column 1 (data)
+            if (status) {
+                if (!m_pFiffInfo->bads.contains(m_chInfolist[chlist[i].row()].ch_name))
                     m_pFiffInfo->bads.append(m_chInfolist[chlist[i].row()].ch_name);
                 qInfo() << "RawModel:" << m_chInfolist[chlist[i].row()].ch_name << "marked as bad.";
-            }
-            else {
-                if(m_pFiffInfo->bads.contains(m_chInfolist[chlist[i].row()].ch_name)) {
+            } else {
+                if (m_pFiffInfo->bads.contains(m_chInfolist[chlist[i].row()].ch_name)) {
                     int index = m_pFiffInfo->bads.indexOf(m_chInfolist[chlist[i].row()].ch_name);
                     m_pFiffInfo->bads.removeAt(index);
                     qInfo() << "RawModel:" << m_chInfolist[chlist[i].row()].ch_name << "marked as good.";
                 }
             }
 
-            emit dataChanged(chlist[i],chlist[i]);
+            emit dataChanged(chlist[i], chlist[i]);
         }
     }
 }
@@ -685,7 +678,7 @@ void RawModel::markChBad(QModelIndexList chlist, bool status)
 
 //*************************************************************************************************************
 
-void RawModel::applyOperator(QModelIndexList chlist, const QSharedPointer<MNEOperator>& operatorPtr, const QString &chType)
+void RawModel::applyOperator(QModelIndexList chlist, const QSharedPointer<MNEOperator>& operatorPtr, const QString& chType)
 {
     m_filterChType = chType;
 
@@ -693,24 +686,23 @@ void RawModel::applyOperator(QModelIndexList chlist, const QSharedPointer<MNEOpe
     chlist.clear();
 
     //filter only channels which include chType in their names
-    if(chType == "All") {
-        for(qint32 i=0; i < m_chInfolist.size(); ++i) {
-            if(!m_chInfolist.at(i).ch_name.contains("STI") && !m_chInfolist.at(i).ch_name.contains("MISC") && !m_chInfolist.at(i).ch_name.contains("TRG"))
-                if(!m_assignedOperators.values(i).contains(operatorPtr))
-                    m_assignedOperators.insert(i,operatorPtr);
+    if (chType == "All") {
+        for (qint32 i = 0; i < m_chInfolist.size(); ++i) {
+            if (!m_chInfolist.at(i).ch_name.contains("STI") && !m_chInfolist.at(i).ch_name.contains("MISC") && !m_chInfolist.at(i).ch_name.contains("TRG"))
+                if (!m_assignedOperators.values(i).contains(operatorPtr))
+                    m_assignedOperators.insert(i, operatorPtr);
         }
-    }
-    else {
-        for(qint32 i=0; i < m_chInfolist.size(); ++i) {
-            if(!m_chInfolist.at(i).ch_name.contains("STI") && !m_chInfolist.at(i).ch_name.contains("MISC") && !m_chInfolist.at(i).ch_name.contains("TRG") && m_chInfolist.at(i).ch_name.contains(chType))
-                if(!m_assignedOperators.values(i).contains(operatorPtr))
-                    m_assignedOperators.insert(i,operatorPtr);
+    } else {
+        for (qint32 i = 0; i < m_chInfolist.size(); ++i) {
+            if (!m_chInfolist.at(i).ch_name.contains("STI") && !m_chInfolist.at(i).ch_name.contains("MISC") && !m_chInfolist.at(i).ch_name.contains("TRG") && m_chInfolist.at(i).ch_name.contains(chType))
+                if (!m_assignedOperators.values(i).contains(operatorPtr))
+                    m_assignedOperators.insert(i, operatorPtr);
         }
     }
 
     m_bProcessing = true;
 
-    for(int i=0; i<m_data.size(); i++)
+    for (int i = 0; i < m_data.size(); i++)
         updateOperatorsConcurrently(i);
 
     performOverlapAdd();
@@ -728,27 +720,27 @@ void RawModel::applyOperator(QModelIndexList chlist, const QSharedPointer<MNEOpe
 void RawModel::applyOperator(QModelIndexList chlist, const QSharedPointer<MNEOperator>& operatorPtr)
 {
     //filter all when chlist is empty
-    if(chlist.empty()) {
-        for(qint32 i=0; i < m_chInfolist.size(); ++i) {
-            if(chlist.at(i).column()==1)
-                if(!m_chInfolist.at(i).ch_name.contains("STI") && !m_chInfolist.at(i).ch_name.contains("MISC") && !m_chInfolist.at(i).ch_name.contains("TRG"))
-                    if(!m_assignedOperators.values(i).contains(operatorPtr))
-                        m_assignedOperators.insert(i,operatorPtr);
+    if (chlist.empty()) {
+        for (qint32 i = 0; i < m_chInfolist.size(); ++i) {
+            if (chlist.at(i).column() == 1)
+                if (!m_chInfolist.at(i).ch_name.contains("STI") && !m_chInfolist.at(i).ch_name.contains("MISC") && !m_chInfolist.at(i).ch_name.contains("TRG"))
+                    if (!m_assignedOperators.values(i).contains(operatorPtr))
+                        m_assignedOperators.insert(i, operatorPtr);
         }
     }
 
-    for(qint32 i=0; i < chlist.size(); ++i) {  //iterate through selected channels to filter
-        if(chlist.at(i).column()==1) {
-            QString chName = data(index(i,0)).toString();
-            if(!chName.contains("STI") && !chName.contains("MISC") && !chName.contains("TRG"))
-                if(!m_assignedOperators.values(chlist.at(i).row()).contains(operatorPtr))
-                    m_assignedOperators.insert(chlist.at(i).row(),operatorPtr);
+    for (qint32 i = 0; i < chlist.size(); ++i) { //iterate through selected channels to filter
+        if (chlist.at(i).column() == 1) {
+            QString chName = data(index(i, 0)).toString();
+            if (!chName.contains("STI") && !chName.contains("MISC") && !chName.contains("TRG"))
+                if (!m_assignedOperators.values(chlist.at(i).row()).contains(operatorPtr))
+                    m_assignedOperators.insert(chlist.at(i).row(), operatorPtr);
         }
     }
 
     m_bProcessing = true;
 
-    for(int i=0; i<m_data.size(); i++)
+    for (int i = 0; i < m_data.size(); i++)
         updateOperatorsConcurrently(i);
 
     performOverlapAdd();
@@ -763,31 +755,31 @@ void RawModel::applyOperator(QModelIndexList chlist, const QSharedPointer<MNEOpe
 
 //*************************************************************************************************************
 
-void RawModel::applyOperatorsConcurrently(QPair<int,RowVectorXd>& chdata) const
+void RawModel::applyOperatorsConcurrently(QPair<int, RowVectorXd>& chdata) const
 {
     QSharedPointer<FilterOperator> filter;
 
     //QList<int> listFilteredChs = m_assignedOperators.keys();
 
-    QList<QSharedPointer<MNEOperator> > ops = m_assignedOperators.values(chdata.first);
-    for(qint32 i=0; i < ops.size(); ++i) {
-        switch(ops[i]->m_OperatorType) {
-        case MNEOperator::FILTER: {
-            filter = ops[i].staticCast<FilterOperator>();
-            RowVectorXd tmp = filter->applyFFTFilter(chdata.second);
-            chdata.second = tmp;
-            break;
-        }
-        case MNEOperator::PCA: {
-            //do something
-            break;
-        }
-        case MNEOperator::AVERAGE:
-        case MNEOperator::UNKNOWN:
-            break;
+    QList<QSharedPointer<MNEOperator>> ops = m_assignedOperators.values(chdata.first);
+    for (qint32 i = 0; i < ops.size(); ++i) {
+        switch (ops[i]->m_OperatorType) {
+            case MNEOperator::FILTER: {
+                filter = ops[i].staticCast<FilterOperator>();
+                RowVectorXd tmp = filter->applyFFTFilter(chdata.second);
+                chdata.second = tmp;
+                break;
+            }
+            case MNEOperator::PCA: {
+                //do something
+                break;
+            }
+            case MNEOperator::AVERAGE:
+            case MNEOperator::UNKNOWN:
+                break;
         }
     }
-//    return chdata;
+    //    return chdata;
 }
 
 
@@ -795,16 +787,16 @@ void RawModel::applyOperatorsConcurrently(QPair<int,RowVectorXd>& chdata) const
 
 void RawModel::updateOperators(QModelIndex chan)
 {
-    for(qint32 i=0; i < m_assignedOperators.values(chan.row()).size(); ++i) {
-        for(qint32 j=0; j < m_assignedOperators.values(chan.row()).size(); ++j) {
-            if(!m_assignedOperators.values(chan.row()).contains(m_assignedOperators.values(chan.row())[j]))
+    for (qint32 i = 0; i < m_assignedOperators.values(chan.row()).size(); ++i) {
+        for (qint32 j = 0; j < m_assignedOperators.values(chan.row()).size(); ++j) {
+            if (!m_assignedOperators.values(chan.row()).contains(m_assignedOperators.values(chan.row())[j]))
                 m_assignedOperators.insert(chan.row(), m_assignedOperators.values(chan.row())[j]);
         }
     }
 
     m_bProcessing = true;
 
-    for(int i=0; i<m_data.size(); i++)
+    for (int i = 0; i < m_data.size(); i++)
         updateOperatorsConcurrently(i);
 
     performOverlapAdd();
@@ -819,20 +811,20 @@ void RawModel::updateOperators(QModelIndex chan)
 
 void RawModel::updateOperators(QModelIndexList chlist)
 {
-    if(chlist.empty())
-        for(qint32 i=0; i < m_chInfolist.size(); ++i)
+    if (chlist.empty())
+        for (qint32 i = 0; i < m_chInfolist.size(); ++i)
             chlist.append(createIndex(static_cast<int>(i), 1));
 
-    for(qint32 i=0; i < chlist.size(); ++i) {
-        for(qint32 j=0; j < m_assignedOperators.values(chlist[i].row()).size(); ++j) {
-            if(!m_assignedOperators.values(chlist[i].row()).contains(m_assignedOperators.values(chlist[i].row())[j]))
+    for (qint32 i = 0; i < chlist.size(); ++i) {
+        for (qint32 j = 0; j < m_assignedOperators.values(chlist[i].row()).size(); ++j) {
+            if (!m_assignedOperators.values(chlist[i].row()).contains(m_assignedOperators.values(chlist[i].row())[j]))
                 m_assignedOperators.insert(chlist[i].row(), m_assignedOperators.values(chlist[i].row())[j]);
         }
     }
 
     m_bProcessing = true;
 
-    for(int i=0; i<m_data.size(); i++)
+    for (int i = 0; i < m_data.size(); i++)
         updateOperatorsConcurrently(i);
 
     performOverlapAdd();
@@ -853,14 +845,14 @@ void RawModel::updateOperators()
 
 //*************************************************************************************************************
 
-void RawModel::undoFilter(QModelIndexList chlist, const QSharedPointer<MNEOperator> &filterPtr)
+void RawModel::undoFilter(QModelIndexList chlist, const QSharedPointer<MNEOperator>& filterPtr)
 {
-    for(qint32 i=0; i < chlist.size(); ++i) {
-        if(m_assignedOperators.contains(chlist[i].row()) && m_assignedOperators.values(chlist[i].row()).contains(filterPtr)) {
-            QMutableMultiMapIterator<int,QSharedPointer<MNEOperator> > it(m_assignedOperators);
-            while(it.hasNext()) {
+    for (qint32 i = 0; i < chlist.size(); ++i) {
+        if (m_assignedOperators.contains(chlist[i].row()) && m_assignedOperators.values(chlist[i].row()).contains(filterPtr)) {
+            QMutableMultiMapIterator<int, QSharedPointer<MNEOperator>> it(m_assignedOperators);
+            while (it.hasNext()) {
                 it.next();
-                if(it.key()==chlist[i].row() && it.value()==filterPtr) {
+                if (it.key() == chlist[i].row() && it.value() == filterPtr) {
                     it.remove();
                     qInfo() << "RawModel: Filter operator removed of type" << filterPtr->m_sName << "for channel" << chlist[i].row();
                     updateOperators(chlist[i]);
@@ -868,8 +860,7 @@ void RawModel::undoFilter(QModelIndexList chlist, const QSharedPointer<MNEOperat
                 }
             }
 
-        }
-        else {
+        } else {
             qInfo() << "RawModel: No filter of type" << filterPtr->m_sName << "applied to channel" << chlist[i].row();
             continue;
         }
@@ -883,7 +874,7 @@ void RawModel::undoFilter(QModelIndexList chlist, const QSharedPointer<MNEOperat
 
 void RawModel::undoFilter(QModelIndexList chlist)
 {
-    for(qint32 i=0; i < chlist.size(); ++i) {
+    for (qint32 i = 0; i < chlist.size(); ++i) {
         m_assignedOperators.remove(chlist[i].row());
         qInfo() << "RawModel: All filter operator removed of type for channel" << chlist[i].row();
     }
@@ -894,14 +885,14 @@ void RawModel::undoFilter(QModelIndexList chlist)
 
 //*************************************************************************************************************
 
-void RawModel::undoFilter(const QString &chType)
+void RawModel::undoFilter(const QString& chType)
 {
-    if(chType == "All")
+    if (chType == "All")
         undoFilter();
     else {
         //filter only channels which include chType in their names
-        for(qint32 i=0; i < m_chInfolist.size(); ++i)
-            if(m_chInfolist.at(i).ch_name.contains(chType))
+        for (qint32 i = 0; i < m_chInfolist.size(); ++i)
+            if (m_chInfolist.at(i).ch_name.contains(chType))
                 m_assignedOperators.remove(i);
     }
 
@@ -924,61 +915,59 @@ void RawModel::undoFilter()
 void RawModel::updateProjections()
 {
     //  Update the SSP projector
-    if(m_pFiffInfo)
-    {
-        if(!m_bFileloaded || !m_pfiffIO || m_pfiffIO->m_qlistRaw.isEmpty()) {
+    if (m_pFiffInfo) {
+        if (!m_bFileloaded || !m_pfiffIO || m_pfiffIO->m_qlistRaw.isEmpty()) {
             qInfo() << "RawModel::updateProjections skipped because raw data is not loaded yet.";
             return;
         }
 
         //If a minimum of one projector is active set m_bProjActivated to true so that this model applies the ssp to the incoming data
         bool bProjActivated = false;
-        for(qint32 i = 0; i < this->m_pFiffInfo->projs.size(); ++i) {
-            if(this->m_pFiffInfo->projs[i].active) {
+        for (qint32 i = 0; i < this->m_pFiffInfo->projs.size(); ++i) {
+            if (this->m_pFiffInfo->projs[i].active) {
                 bProjActivated = true;
                 break;
             }
         }
 
-        if(bProjActivated)
-        {
+        if (bProjActivated) {
             MatrixXd matProj;
             qint32 nproj = this->m_pFiffInfo->make_projector(matProj);
-            qInfo() << "updateProjection :: New projection calculated."<<nproj;
+            qInfo() << "updateProjection :: New projection calculated." << nproj;
 
             //set columns of matrix to zero depending on bad channels indexes
-    //        for(qint32 j = 0; j < m_vecBadIdcs.cols(); ++j)
-    //            m_matProj.col(m_vecBadIdcs[j]).setZero();
+            //        for(qint32 j = 0; j < m_vecBadIdcs.cols(); ++j)
+            //            m_matProj.col(m_vecBadIdcs[j]).setZero();
 
-    //        std::cout << "Proj\n";
-    //        std::cout << m_matProj.block(0,0,10,10) << std::endl;
+            //        std::cout << "Proj\n";
+            //        std::cout << m_matProj.block(0,0,10,10) << std::endl;
 
-//            qint32 nchan = this->m_pFiffInfo->nchan;
-//            qint32 i, k;
+            //            qint32 nchan = this->m_pFiffInfo->nchan;
+            //            qint32 i, k;
 
-//            typedef Eigen::Triplet<double> T;
-//            std::vector<T> tripletList;
-//            tripletList.reserve(nchan);
+            //            typedef Eigen::Triplet<double> T;
+            //            std::vector<T> tripletList;
+            //            tripletList.reserve(nchan);
 
-//            // Make proj sparse
-//            tripletList.clear();
-//            tripletList.reserve(matProj.rows()*matProj.cols());
-//            for(i = 0; i < matProj.rows(); ++i)
-//                for(k = 0; k < matProj.cols(); ++k)
-//                    if(matProj(i,k) != 0)
-//                        tripletList.push_back(T(i, k, matProj(i,k)));
+            //            // Make proj sparse
+            //            tripletList.clear();
+            //            tripletList.reserve(matProj.rows()*matProj.cols());
+            //            for(i = 0; i < matProj.rows(); ++i)
+            //                for(k = 0; k < matProj.cols(); ++k)
+            //                    if(matProj(i,k) != 0)
+            //                        tripletList.push_back(T(i, k, matProj(i,k)));
 
-//            SparseMatrix<double> matSparseProj (matProj.rows(),matProj.cols());
-//            if(tripletList.size() > 0)
-//                matSparseProj.setFromTriplets(tripletList.begin(), tripletList.end());
+            //            SparseMatrix<double> matSparseProj (matProj.rows(),matProj.cols());
+            //            if(tripletList.size() > 0)
+            //                matSparseProj.setFromTriplets(tripletList.begin(), tripletList.end());
 
             //set projection matrix for upcoming read raw segement calls
             m_pfiffIO->m_qlistRaw[0]->proj = matProj;
         } else {
-            m_pfiffIO->m_qlistRaw[0]->proj.resize(0,0);
+            m_pfiffIO->m_qlistRaw[0]->proj.resize(0, 0);
         }
 
-        if(m_iCurAbsScrollPos == 0)
+        if (m_iCurAbsScrollPos == 0)
             resetPosition(m_iCurAbsScrollPos + firstSample());
         else
             resetPosition(m_iCurAbsScrollPos);
@@ -993,17 +982,15 @@ void RawModel::updateCompensator(int to)
     //
     //  Update the compensator
     //
-    if(m_pFiffInfo)
-    {
-        if(!m_bFileloaded || !m_pfiffIO || m_pfiffIO->m_qlistRaw.isEmpty()) {
+    if (m_pFiffInfo) {
+        if (!m_bFileloaded || !m_pfiffIO || m_pfiffIO->m_qlistRaw.isEmpty()) {
             qInfo() << "RawModel::updateCompensator skipped because raw data is not loaded yet.";
             return;
         }
 
         FiffCtfComp newComp;
 
-        if(to != 0) {
-
+        if (to != 0) {
             this->m_pFiffInfo->make_compensator(0, to, newComp); //Do this always from 0 since we always read new raw data, we never actually perform a multiplication on already existing data
 
             newComp.kind = to;
@@ -1014,7 +1001,7 @@ void RawModel::updateCompensator(int to)
         //set compensator for upcoming read raw segement calls
         m_pfiffIO->m_qlistRaw[0]->comp = newComp;
 
-        if(m_iCurAbsScrollPos == 0)
+        if (m_iCurAbsScrollPos == 0)
             resetPosition(m_iCurAbsScrollPos + firstSample());
         else
             resetPosition(m_iCurAbsScrollPos);
@@ -1024,24 +1011,23 @@ void RawModel::updateCompensator(int to)
 
 //*************************************************************************************************************
 //private SLOTS
-void RawModel::insertReloadedData(QPair<MatrixXd,MatrixXd> dataTimesPair)
+void RawModel::insertReloadedData(QPair<MatrixXd, MatrixXd> dataTimesPair)
 {
     QSharedPointer<DataPackage> newDataPackage = QSharedPointer<DataPackage>(new DataPackage((MatrixXdR)dataTimesPair.first, (MatrixXdR)dataTimesPair.second));
 
     //extend m_data with reloaded data
-    if(m_bReloadBefore) {
+    if (m_bReloadBefore) {
         m_data.prepend(newDataPackage);
 
         //maintain at maximum m_maxWindows data windows and drop the rest
-        if(m_data.size() > m_maxWindows) {
+        if (m_data.size() > m_maxWindows) {
             m_data.removeLast();
         }
-    }
-    else {
+    } else {
         m_data.append(newDataPackage);
 
         //maintain at maximum m_maxWindows data windows and drop the rest
-        if(m_data.size() > m_maxWindows) {
+        if (m_data.size() > m_maxWindows) {
             m_data.removeFirst();
             m_iAbsFiffCursor += m_iWindowSize;
         }
@@ -1049,10 +1035,10 @@ void RawModel::insertReloadedData(QPair<MatrixXd,MatrixXd> dataTimesPair)
 
     m_bReloading = false;
 
-    emit dataChanged(createIndex(0,1),createIndex(static_cast<int>(m_chInfolist.size())-1,1));
+    emit dataChanged(createIndex(0, 1), createIndex(static_cast<int>(m_chInfolist.size()) - 1, 1));
     emit dataReloaded();
 
-    qInfo() << "RawModel: Fiff data Reloaded from " << dataTimesPair.second.coeff(0) << "secs to" << dataTimesPair.second.coeff(dataTimesPair.second.cols()-1) << "secs";
+    qInfo() << "RawModel: Fiff data Reloaded from " << dataTimesPair.second.coeff(0) << "secs to" << dataTimesPair.second.coeff(dataTimesPair.second.cols() - 1) << "secs";
 }
 
 
@@ -1066,11 +1052,11 @@ void RawModel::updateOperatorsConcurrently()
     m_listTmpChData.clear();
 
     //get the rows which are to be filtered out of the m_data matrix. Note that this is done windows wise, hence jumps in the filtered signal might be visible
-    for(qint32 i=0; i < listFilteredChs.size(); ++i) {
-        if(m_bReloadBefore)
-            m_listTmpChData.append(QPair<int,RowVectorXd>(listFilteredChs[i],m_data.first()->dataRawOrig().row(listFilteredChs[i])));
+    for (qint32 i = 0; i < listFilteredChs.size(); ++i) {
+        if (m_bReloadBefore)
+            m_listTmpChData.append(QPair<int, RowVectorXd>(listFilteredChs[i], m_data.first()->dataRawOrig().row(listFilteredChs[i])));
         else
-            m_listTmpChData.append(QPair<int,RowVectorXd>(listFilteredChs[i],m_data.last()->dataRawOrig().row(listFilteredChs[i])));
+            m_listTmpChData.append(QPair<int, RowVectorXd>(listFilteredChs[i], m_data.last()->dataRawOrig().row(listFilteredChs[i])));
     }
 
     qInfo() << "RawModel: Starting of concurrent PROCESSING operation of" << listFilteredChs.size() << "items";
@@ -1080,14 +1066,14 @@ void RawModel::updateOperatorsConcurrently()
     // disadvantage: data needs to be copied twice (also to QFuture<QPair<int,RowVectorXd> > object) instead of once (to m_listTmpChData)
 
     //generate lambda function
-//    std::function<QPair<int,RowVectorXd> (QPair<int,RowVectorXd>&)> applyOps = [this](QPair<int,RowVectorXd>& chdata) -> QPair<int,RowVectorXd> {
-//        return applyOperatorsConcurrently(chdata);
-//    };
+    //    std::function<QPair<int,RowVectorXd> (QPair<int,RowVectorXd>&)> applyOps = [this](QPair<int,RowVectorXd>& chdata) -> QPair<int,RowVectorXd> {
+    //        return applyOperatorsConcurrently(chdata);
+    //    };
 
-//    QFuture<QPair<int,RowVectorXd> > future = QtConcurrent::mapped(m_listTmpChData.begin(),m_listTmpChData.end(),applyOps);
+    //    QFuture<QPair<int,RowVectorXd> > future = QtConcurrent::mapped(m_listTmpChData.begin(),m_listTmpChData.end(),applyOps);
     //**************************************************************************************************************************************************************************
 
-    QFuture<void > future = QtConcurrent::map(m_listTmpChData,[this](QPair<int,RowVectorXd>& chdata) {
+    QFuture<void> future = QtConcurrent::map(m_listTmpChData, [this](QPair<int, RowVectorXd>& chdata) {
         return applyOperatorsConcurrently(chdata);
     });
 
@@ -1106,32 +1092,32 @@ void RawModel::updateOperatorsConcurrently()
 
 void RawModel::updateOperatorsConcurrently(int windowIndex)
 {
-    if(windowIndex >= m_data.size() || windowIndex < 0)
+    if (windowIndex >= m_data.size() || windowIndex < 0)
         windowIndex = 0;
 
     QList<int> listFilteredChs = m_assignedOperators.keys();
     m_listTmpChData.clear();
 
     //get the rows which are to be filtered out of the m_data matrix. Note that this is done windows wise, hence jumps in the filtered signal might be visible
-    for(qint32 i=0; i < listFilteredChs.size(); ++i) {  
-        m_listTmpChData.append(QPair<int,RowVectorXd>(listFilteredChs[i],m_data[windowIndex]->dataRawOrig().row(listFilteredChs[i])));
+    for (qint32 i = 0; i < listFilteredChs.size(); ++i) {
+        m_listTmpChData.append(QPair<int, RowVectorXd>(listFilteredChs[i], m_data[windowIndex]->dataRawOrig().row(listFilteredChs[i])));
     }
 
-    qInfo() << "RawModel: Starting of concurrent PROCESSING operation of" << listFilteredChs.size() << "items in m_data block"<<windowIndex;
+    qInfo() << "RawModel: Starting of concurrent PROCESSING operation of" << listFilteredChs.size() << "items in m_data block" << windowIndex;
 
     //************* here it could be also performed QtConcurrent::mapped() *************
     // advantage: QFutureWatcher would give partial results -> signal resultsReadyAt(int idx)
     // disadvantage: data needs to be copied twice (also to QFuture<QPair<int,RowVectorXd> > object) instead of once (to m_listTmpChData)
 
     //generate lambda function
-//    std::function<QPair<int,RowVectorXd> (QPair<int,RowVectorXd>&)> applyOps = [this](QPair<int,RowVectorXd>& chdata) -> QPair<int,RowVectorXd> {
-//        return applyOperatorsConcurrently(chdata);
-//    };
+    //    std::function<QPair<int,RowVectorXd> (QPair<int,RowVectorXd>&)> applyOps = [this](QPair<int,RowVectorXd>& chdata) -> QPair<int,RowVectorXd> {
+    //        return applyOperatorsConcurrently(chdata);
+    //    };
 
-//    QFuture<QPair<int,RowVectorXd> > future = QtConcurrent::mapped(m_listTmpChData.begin(),m_listTmpChData.end(),applyOps);
+    //    QFuture<QPair<int,RowVectorXd> > future = QtConcurrent::mapped(m_listTmpChData.begin(),m_listTmpChData.end(),applyOps);
     //**************************************************************************************************************************************************************************
 
-    QFuture<void > future = QtConcurrent::map(m_listTmpChData,[this](QPair<int,RowVectorXd>& chdata) {
+    QFuture<void> future = QtConcurrent::map(m_listTmpChData, [this](QPair<int, RowVectorXd>& chdata) {
         return applyOperatorsConcurrently(chdata);
     });
 
@@ -1151,24 +1137,24 @@ void RawModel::insertProcessedDataRow(int rowIndex)
     QList<int> listFilteredChs = m_assignedOperators.keys();
 
     int dataLength = m_iWindowSize;
-    if(m_bReloadBefore)
+    if (m_bReloadBefore)
         dataLength = m_data.first()->dataRaw().cols();
     else
         dataLength = m_data.last()->dataRaw().cols();
 
-    int cutFront = m_iCurrentFFTLength/4;
-    int cutBack = m_iCurrentFFTLength/4 + (m_listTmpChData[0].second.cols()-m_iCurrentFFTLength/2-dataLength);
+    int cutFront = m_iCurrentFFTLength / 4;
+    int cutBack = m_iCurrentFFTLength / 4 + (m_listTmpChData[0].second.cols() - m_iCurrentFFTLength / 2 - dataLength);
 
-    if(m_bReloadBefore)
+    if (m_bReloadBefore)
         m_data.first()->setOrigProcData(m_listTmpChData[rowIndex].second, m_listTmpChData[rowIndex].first, cutFront, cutBack);
     else
         m_data.last()->setOrigProcData(m_listTmpChData[rowIndex].second, m_listTmpChData[rowIndex].first, cutFront, cutBack);
 
     performOverlapAdd();
 
-    emit dataChanged(createIndex(static_cast<int>(listFilteredChs[rowIndex]),1),createIndex(static_cast<int>(listFilteredChs[rowIndex]),1));
+    emit dataChanged(createIndex(static_cast<int>(listFilteredChs[rowIndex]), 1), createIndex(static_cast<int>(listFilteredChs[rowIndex]), 1));
 
-    if(rowIndex == listFilteredChs.last())
+    if (rowIndex == listFilteredChs.last())
         m_bProcessing = false;
 }
 
@@ -1177,23 +1163,24 @@ void RawModel::insertProcessedDataRow(int rowIndex)
 
 void RawModel::insertProcessedDataAll(int windowIndex)
 {
-    if(windowIndex >= m_data.size() || windowIndex < 0 || m_assignedOperators.empty())
+    if (windowIndex >= m_data.size() || windowIndex < 0 || m_assignedOperators.empty())
         windowIndex = 0;
 
     QList<int> listFilteredChs = m_assignedOperators.keys();
 
-    int dataLength = m_data[windowIndex]->dataRaw().cols();;
+    int dataLength = m_data[windowIndex]->dataRaw().cols();
+    ;
 
-    int cutFront = m_iCurrentFFTLength/4;
-    int cutBack = m_iCurrentFFTLength/4 + (m_listTmpChData[0].second.cols()-m_iCurrentFFTLength/2-dataLength);
+    int cutFront = m_iCurrentFFTLength / 4;
+    int cutBack = m_iCurrentFFTLength / 4 + (m_listTmpChData[0].second.cols() - m_iCurrentFFTLength / 2 - dataLength);
 
     //Set and cut original data to window size and calculate mean for filtered data
-    for(int i=0; i < listFilteredChs.size(); ++i)
+    for (int i = 0; i < listFilteredChs.size(); ++i)
         m_data[windowIndex]->setOrigProcData(m_listTmpChData[i].second, listFilteredChs[i], cutFront, cutBack);
 
-    emit dataChanged(createIndex(0,1),createIndex(static_cast<int>(m_chInfolist.size())-1,1));
+    emit dataChanged(createIndex(0, 1), createIndex(static_cast<int>(m_chInfolist.size()) - 1, 1));
 
-    qInfo() << "RawModel: Finished inserting" << listFilteredChs.size() << "channels in window "<<windowIndex;
+    qInfo() << "RawModel: Finished inserting" << listFilteredChs.size() << "channels in window " << windowIndex;
 }
 
 
@@ -1204,17 +1191,17 @@ void RawModel::insertProcessedDataAll()
     QList<int> listFilteredChs = m_assignedOperators.keys();
 
     int dataLength = m_iWindowSize;
-    if(m_bReloadBefore)
+    if (m_bReloadBefore)
         dataLength = m_data.first()->dataRaw().cols();
     else
         dataLength = m_data.last()->dataRaw().cols();
 
-    int cutFront = m_iCurrentFFTLength/4;
-    int cutBack = m_iCurrentFFTLength/4 + (m_listTmpChData[0].second.cols()-m_iCurrentFFTLength/2-dataLength);
+    int cutFront = m_iCurrentFFTLength / 4;
+    int cutBack = m_iCurrentFFTLength / 4 + (m_listTmpChData[0].second.cols() - m_iCurrentFFTLength / 2 - dataLength);
 
     //Set and cut original data to window size and calculate mean for filtered data
-    for(int i=0; i < listFilteredChs.size(); ++i) {
-        if(m_bReloadBefore)
+    for (int i = 0; i < listFilteredChs.size(); ++i) {
+        if (m_bReloadBefore)
             m_data.first()->setOrigProcData(m_listTmpChData[i].second, listFilteredChs[i], cutFront, cutBack);
         else
             m_data.last()->setOrigProcData(m_listTmpChData[i].second, listFilteredChs[i], cutFront, cutBack);
@@ -1222,7 +1209,7 @@ void RawModel::insertProcessedDataAll()
 
     performOverlapAdd();
 
-    emit dataChanged(createIndex(0,1),createIndex(static_cast<int>(m_chInfolist.size())-1,1));
+    emit dataChanged(createIndex(0, 1), createIndex(static_cast<int>(m_chInfolist.size()) - 1, 1));
 
     qInfo() << "RawModel: Finished inserting" << listFilteredChs.size() << "channels.";
     m_bProcessing = false;
@@ -1233,7 +1220,7 @@ void RawModel::insertProcessedDataAll()
 
 void RawModel::performOverlapAdd()
 {
-    if(m_data.empty() || m_data.size()<2)
+    if (m_data.empty() || m_data.size() < 2)
         return;
 
     QList<int> listFilteredChs = m_assignedOperators.keys();
@@ -1241,83 +1228,83 @@ void RawModel::performOverlapAdd()
     //Overlap add window data
     int numberWin = m_data.size();
     int cols = m_data[0]->dataProcOrig().cols();
-    int filterLength = m_iCurrentFFTLength/2; //Total number of zeros which needed to be added to compensate the covolution size increasement. zeroTaper/2 zeros were added at front and back of the data
+    int filterLength = m_iCurrentFFTLength / 2; //Total number of zeros which needed to be added to compensate the covolution size increasement. zeroTaper/2 zeros were added at front and back of the data
     int zeroFFT;
 
     //Iterate through window data
-    for(int i = 0; i<numberWin; i++) {
-        for(int j = 0; j<listFilteredChs.size(); j++) {
+    for (int i = 0; i < numberWin; i++) {
+        for (int j = 0; j < listFilteredChs.size(); j++) {
             RowVectorXd front = RowVectorXd::Zero(cols);
             RowVectorXd back = RowVectorXd::Zero(cols);
 
             //First window
-            if(i==0) {
+            if (i == 0) {
                 zeroFFT = m_iCurrentFFTLength - filterLength - m_data[i]->dataRaw().cols(); //The total number of zeros added to compensate for multiple integer of 2^x
-                back.segment(cols-filterLength-zeroFFT, filterLength) =
-                        m_data[i+1]->dataProcOrig().row(listFilteredChs[j]).segment(0, filterLength);
+                back.segment(cols - filterLength - zeroFFT, filterLength) =
+                    m_data[i + 1]->dataProcOrig().row(listFilteredChs[j]).segment(0, filterLength);
             }
 
             //Middle windows
-            if(i > 0 && i < numberWin-1) {
-                zeroFFT = m_iCurrentFFTLength - filterLength - m_data[i-1]->dataRaw().cols(); //The total number of zeros added to compensate for multiple integer of 2^x
+            if (i > 0 && i < numberWin - 1) {
+                zeroFFT = m_iCurrentFFTLength - filterLength - m_data[i - 1]->dataRaw().cols(); //The total number of zeros added to compensate for multiple integer of 2^x
                 front.segment(0, filterLength) =
-                        m_data[i-1]->dataProcOrig().row(listFilteredChs[j]).segment(cols-filterLength-zeroFFT, filterLength);
+                    m_data[i - 1]->dataProcOrig().row(listFilteredChs[j]).segment(cols - filterLength - zeroFFT, filterLength);
 
                 zeroFFT = m_iCurrentFFTLength - filterLength - m_data[i]->dataRaw().cols(); //The total number of zeros added to compensate for multiple integer of 2^x
-                back.segment(cols-filterLength-zeroFFT, filterLength) =
-                        m_data[i+1]->dataProcOrig().row(listFilteredChs[j]).segment(0, filterLength);
+                back.segment(cols - filterLength - zeroFFT, filterLength) =
+                    m_data[i + 1]->dataProcOrig().row(listFilteredChs[j]).segment(0, filterLength);
             }
 
             //Last window
-            if(i == numberWin-1) {
-                zeroFFT = m_iCurrentFFTLength - filterLength - m_data[i-1]->dataRaw().cols(); //The total number of zeros added to compensate for multiple integer of 2^x
+            if (i == numberWin - 1) {
+                zeroFFT = m_iCurrentFFTLength - filterLength - m_data[i - 1]->dataRaw().cols(); //The total number of zeros added to compensate for multiple integer of 2^x
                 front.segment(0, filterLength) =
-                        m_data[i-1]->dataProcOrig().row(listFilteredChs[j]).segment(cols-filterLength-zeroFFT, filterLength);
+                    m_data[i - 1]->dataProcOrig().row(listFilteredChs[j]).segment(cols - filterLength - zeroFFT, filterLength);
             }
 
             //Do the overlap add
             zeroFFT = m_iCurrentFFTLength - filterLength - m_data[i]->dataRaw().cols(); //The total number of zeros added to compensate for multiple integer of 2^x
-            m_data[i]->setMappedProcData(m_data[i]->dataProcOrig().row(listFilteredChs[j])+front+back,
-                                       listFilteredChs[j],
-                                       filterLength/2,
-                                       filterLength/2+zeroFFT);
+            m_data[i]->setMappedProcData(m_data[i]->dataProcOrig().row(listFilteredChs[j]) + front + back,
+                                         listFilteredChs[j],
+                                         filterLength / 2,
+                                         filterLength / 2 + zeroFFT);
 
-//            QFile file("D:/inputData.txt");
-//            file.open(QFile::WriteOnly | QFile::Text);
-//            QTextStream out(&file);
+            //            QFile file("D:/inputData.txt");
+            //            file.open(QFile::WriteOnly | QFile::Text);
+            //            QTextStream out(&file);
 
-//            for(int i=0; i < m_listTmpChData[0].second.cols(); ++i)
-//                out << m_listTmpChData[0].second(0,i) << endl;
+            //            for(int i=0; i < m_listTmpChData[0].second.cols(); ++i)
+            //                out << m_listTmpChData[0].second(0,i) << endl;
 
-//            file.close();
+            //            file.close();
 
-//            QFile file1("D:/front.txt");
-//            file1.open(QFile::WriteOnly | QFile::Text);
-//            QTextStream out1(&file1);
+            //            QFile file1("D:/front.txt");
+            //            file1.open(QFile::WriteOnly | QFile::Text);
+            //            QTextStream out1(&file1);
 
-//            for(int i=0; i < front.cols(); ++i)
-//                out1 << front(0,i) << endl;
+            //            for(int i=0; i < front.cols(); ++i)
+            //                out1 << front(0,i) << endl;
 
-//            file1.close();
+            //            file1.close();
 
-//            QFile file2("D:/back.txt");
-//            file2.open(QFile::WriteOnly | QFile::Text);
-//            QTextStream out2(&file2);
+            //            QFile file2("D:/back.txt");
+            //            file2.open(QFile::WriteOnly | QFile::Text);
+            //            QTextStream out2(&file2);
 
-//            for(int i=0; i < back.cols(); ++i)
-//                out2 << back(0,i) << endl;
+            //            for(int i=0; i < back.cols(); ++i)
+            //                out2 << back(0,i) << endl;
 
-//            file2.close();
+            //            file2.close();
 
-//            RowVectorXd result = m_listTmpChData[j].second+front+back;
-//            QFile file3("D:/result.txt");
-//            file3.open(QFile::WriteOnly | QFile::Text);
-//            QTextStream out3(&file3);
+            //            RowVectorXd result = m_listTmpChData[j].second+front+back;
+            //            QFile file3("D:/result.txt");
+            //            file3.open(QFile::WriteOnly | QFile::Text);
+            //            QTextStream out3(&file3);
 
-//            for(int i=0; i < result.cols(); ++i)
-//                out3 << result(0,i) << endl;
+            //            for(int i=0; i < result.cols(); ++i)
+            //                out3 << result(0,i) << endl;
 
-//            file3.close();
+            //            file3.close();
         }
     }
 }
@@ -1327,7 +1314,7 @@ void RawModel::performOverlapAdd()
 
 void RawModel::performOverlapAdd(int windowIndex)
 {
-    if(windowIndex<0 || windowIndex>m_data.size()-1 || m_data.size()<2)
+    if (windowIndex < 0 || windowIndex > m_data.size() - 1 || m_data.size() < 2)
         return;
 
     QList<int> listFilteredChs = m_assignedOperators.keys();
@@ -1335,43 +1322,43 @@ void RawModel::performOverlapAdd(int windowIndex)
     //Overlap add window data
     int numberWin = m_data.size();
     int cols = m_data[windowIndex]->dataProcOrig().cols();
-    int filterLength = m_iCurrentFFTLength/2; //Total number of zeros which needed to be added to compensate the covolution size increasement. zeroTaper/2 zeros were added at front and back of the data
+    int filterLength = m_iCurrentFFTLength / 2; //Total number of zeros which needed to be added to compensate the covolution size increasement. zeroTaper/2 zeros were added at front and back of the data
     int zeroFFT;
 
-    for(int j = 0; j<listFilteredChs.size(); j++) {
+    for (int j = 0; j < listFilteredChs.size(); j++) {
         RowVectorXd front = RowVectorXd::Zero(cols);
         RowVectorXd back = RowVectorXd::Zero(cols);
 
         //First window
-        if(windowIndex==0) {
+        if (windowIndex == 0) {
             zeroFFT = m_iCurrentFFTLength - filterLength - m_data[windowIndex]->dataRaw().cols(); //The total number of zeros added to compensate for multiple integer of 2^x
-            back.segment(cols-filterLength-zeroFFT, filterLength) =
-                    m_data[windowIndex+1]->dataProcOrig().row(listFilteredChs[j]).segment(0, filterLength);
+            back.segment(cols - filterLength - zeroFFT, filterLength) =
+                m_data[windowIndex + 1]->dataProcOrig().row(listFilteredChs[j]).segment(0, filterLength);
         }
 
         //Middle windows
-        if(windowIndex > 0 && windowIndex < numberWin-1) {
-            zeroFFT = m_iCurrentFFTLength - filterLength - m_data[windowIndex-1]->dataRaw().cols(); //The total number of zeros added to compensate for multiple integer of 2^x
+        if (windowIndex > 0 && windowIndex < numberWin - 1) {
+            zeroFFT = m_iCurrentFFTLength - filterLength - m_data[windowIndex - 1]->dataRaw().cols(); //The total number of zeros added to compensate for multiple integer of 2^x
             front.segment(0, filterLength) =
-                    m_data[windowIndex-1]->dataProcOrig().row(listFilteredChs[j]).segment(cols-filterLength-zeroFFT, filterLength);
+                m_data[windowIndex - 1]->dataProcOrig().row(listFilteredChs[j]).segment(cols - filterLength - zeroFFT, filterLength);
 
             zeroFFT = m_iCurrentFFTLength - filterLength - m_data[windowIndex]->dataRaw().cols(); //The total number of zeros added to compensate for multiple integer of 2^x
-            back.segment(cols-filterLength-zeroFFT, filterLength) =
-                    m_data[windowIndex+1]->dataProcOrig().row(listFilteredChs[j]).segment(0, filterLength);
+            back.segment(cols - filterLength - zeroFFT, filterLength) =
+                m_data[windowIndex + 1]->dataProcOrig().row(listFilteredChs[j]).segment(0, filterLength);
         }
 
         //Last window
-        if(windowIndex == numberWin-1) {
-            zeroFFT = m_iCurrentFFTLength - filterLength - m_data[windowIndex-1]->dataRaw().cols(); //The total number of zeros added to compensate for multiple integer of 2^x
+        if (windowIndex == numberWin - 1) {
+            zeroFFT = m_iCurrentFFTLength - filterLength - m_data[windowIndex - 1]->dataRaw().cols(); //The total number of zeros added to compensate for multiple integer of 2^x
             front.segment(0, filterLength) =
-                    m_data[windowIndex-1]->dataProcOrig().row(listFilteredChs[j]).segment(cols-filterLength-zeroFFT, filterLength);
+                m_data[windowIndex - 1]->dataProcOrig().row(listFilteredChs[j]).segment(cols - filterLength - zeroFFT, filterLength);
         }
 
         //Do the overlap add
         zeroFFT = m_iCurrentFFTLength - filterLength - m_data[windowIndex]->dataRaw().cols(); //The total number of zeros added to compensate for multiple integer of 2^x
-        m_data[windowIndex]->setMappedProcData(m_data[windowIndex]->dataProcOrig().row(listFilteredChs[j])+front+back,
-                                   listFilteredChs[j],
-                                   filterLength/2,
-                                   filterLength/2+zeroFFT);
+        m_data[windowIndex]->setMappedProcData(m_data[windowIndex]->dataProcOrig().row(listFilteredChs[j]) + front + back,
+                                               listFilteredChs[j],
+                                               filterLength / 2,
+                                               filterLength / 2 + zeroFFT);
     }
 }

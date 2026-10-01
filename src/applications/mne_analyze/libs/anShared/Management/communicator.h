@@ -61,7 +61,7 @@ public:
     typedef QSharedPointer<Communicator> SPtr;            /**< Shared pointer type for Communicator. */
     typedef QSharedPointer<const Communicator> ConstSPtr; /**< Const shared pointer type for Communicator. */
 
-    typedef long CommunicatorID;                        /**< Typedef for CommunicatorID. */
+    typedef long CommunicatorID; /**< Typedef for CommunicatorID. */
 
     //=========================================================================================================
     /**
@@ -152,11 +152,11 @@ signals:
     void receivedEvent(const QSharedPointer<Event> e);
 
 private:
-    static CommunicatorID m_IDCounter;                  /**< ID-Counter for Communicator instances. */
-    inline static CommunicatorID nextID();              /**< Simply increments the counter and returns it. */
+    static CommunicatorID m_IDCounter;     /**< ID-Counter for Communicator instances. */
+    inline static CommunicatorID nextID(); /**< Simply increments the counter and returns it. */
 
-    CommunicatorID m_ID;                                /**< Communicator ID. */
-    QVector<EVENT_TYPE> m_EventSubscriptions;           /**< All event types that the Communicator receives*/
+    CommunicatorID m_ID;                      /**< Communicator ID. */
+    QVector<EVENT_TYPE> m_EventSubscriptions; /**< All event types that the Communicator receives*/
 };
 
 //=============================================================================================================

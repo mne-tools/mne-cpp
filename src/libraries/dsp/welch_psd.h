@@ -55,8 +55,8 @@ namespace UTILSLIB
  */
 struct DSPSHARED_EXPORT WelchPsdResult
 {
-    Eigen::MatrixXd    matPsd;    ///< n_channels × (iNfft/2+1); one-sided PSD in unit²/Hz
-    Eigen::RowVectorXd vecFreqs;  ///< Frequency axis in Hz, length iNfft/2+1
+    Eigen::MatrixXd matPsd;      ///< n_channels × (iNfft/2+1); one-sided PSD in unit²/Hz
+    Eigen::RowVectorXd vecFreqs; ///< Frequency axis in Hz, length iNfft/2+1
 };
 
 //=============================================================================================================
@@ -78,7 +78,13 @@ class DSPSHARED_EXPORT WelchPsd
 {
 public:
     /** Window function applied to each segment before the FFT. */
-    enum WindowType { Hann=0, Hamming=1, Blackman=2, FlatTop=3 };
+    enum WindowType
+    {
+        Hann = 0,
+        Hamming = 1,
+        Blackman = 2,
+        FlatTop = 3
+    };
 
     //=========================================================================================================
     /**
@@ -92,12 +98,12 @@ public:
      * @param[in] vecPicks  Channel row indices to process; empty = all channels.
      * @return              WelchPsdResult with matPsd (n_picks × iNfft/2+1) and vecFreqs.
      */
-    static WelchPsdResult compute(const Eigen::MatrixXd&    matData,
-                                   double                    dSFreq,
-                                   int                       iNfft    = 256,
-                                   double                    dOverlap = 0.5,
-                                   WindowType                window   = Hann,
-                                   const Eigen::RowVectorXi& vecPicks = Eigen::RowVectorXi());
+    static WelchPsdResult compute(const Eigen::MatrixXd& matData,
+                                  double dSFreq,
+                                  int iNfft = 256,
+                                  double dOverlap = 0.5,
+                                  WindowType window = Hann,
+                                  const Eigen::RowVectorXi& vecPicks = Eigen::RowVectorXi());
 
     //=========================================================================================================
     /**
@@ -111,10 +117,10 @@ public:
      * @return              One-sided PSD row vector of length iNfft/2+1.
      */
     static Eigen::RowVectorXd computeVector(const Eigen::RowVectorXd& vecData,
-                                             double     dSFreq,
-                                             int        iNfft    = 256,
-                                             double     dOverlap = 0.5,
-                                             WindowType window   = Hann);
+                                            double dSFreq,
+                                            int iNfft = 256,
+                                            double dOverlap = 0.5,
+                                            WindowType window = Hann);
 
     //=========================================================================================================
     /**

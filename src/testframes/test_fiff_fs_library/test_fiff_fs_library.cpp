@@ -65,21 +65,57 @@ class TestFiffFsLibrary : public QObject
 
 private:
     QString m_sDataPath;
-    bool hasData() const { return !m_sDataPath.isEmpty(); }
+    bool hasData() const
+    {
+        return !m_sDataPath.isEmpty();
+    }
 
-    QString rawPath()   const { return m_sDataPath + "/MEG/sample/sample_audvis_trunc_raw.fif"; }
-    QString avePath()   const { return m_sDataPath + "/MEG/sample/sample_audvis-ave.fif"; }
-    QString covPath()   const { return m_sDataPath + "/MEG/sample/sample_audvis-cov.fif"; }
+    QString rawPath() const
+    {
+        return m_sDataPath + "/MEG/sample/sample_audvis_trunc_raw.fif";
+    }
+    QString avePath() const
+    {
+        return m_sDataPath + "/MEG/sample/sample_audvis-ave.fif";
+    }
+    QString covPath() const
+    {
+        return m_sDataPath + "/MEG/sample/sample_audvis-cov.fif";
+    }
     QTemporaryDir m_tempDir;
-    QString transPath() const { return m_sDataPath + "/MEG/sample/all-trans.fif"; }
+    QString transPath() const
+    {
+        return m_sDataPath + "/MEG/sample/all-trans.fif";
+    }
     // FreeSurfer surface files
-    QString surfLhPath()  const { return m_sDataPath + "/subjects/sample/surf/lh.white"; }
-    QString surfRhPath()  const { return m_sDataPath + "/subjects/sample/surf/rh.white"; }
-    QString curvLhPath()  const { return m_sDataPath + "/subjects/sample/surf/lh.curv"; }
-    QString curvRhPath()  const { return m_sDataPath + "/subjects/sample/surf/rh.curv"; }
-    QString annotLhPath() const { return m_sDataPath + "/subjects/sample/label/lh.aparc.annot"; }
-    QString annotRhPath() const { return m_sDataPath + "/subjects/sample/label/rh.aparc.annot"; }
-    QString labelLhPath() const { return m_sDataPath + "/subjects/sample/label/lh.V1.label"; }
+    QString surfLhPath() const
+    {
+        return m_sDataPath + "/subjects/sample/surf/lh.white";
+    }
+    QString surfRhPath() const
+    {
+        return m_sDataPath + "/subjects/sample/surf/rh.white";
+    }
+    QString curvLhPath() const
+    {
+        return m_sDataPath + "/subjects/sample/surf/lh.curv";
+    }
+    QString curvRhPath() const
+    {
+        return m_sDataPath + "/subjects/sample/surf/rh.curv";
+    }
+    QString annotLhPath() const
+    {
+        return m_sDataPath + "/subjects/sample/label/lh.aparc.annot";
+    }
+    QString annotRhPath() const
+    {
+        return m_sDataPath + "/subjects/sample/label/rh.aparc.annot";
+    }
+    QString labelLhPath() const
+    {
+        return m_sDataPath + "/subjects/sample/label/lh.V1.label";
+    }
 
 private slots:
     void initTestCase();
@@ -222,13 +258,14 @@ private slots:
 void TestFiffFsLibrary::initTestCase()
 {
     qInstallMessageHandler(UTILSLIB::MNELogger::customLogWriter);
-    QString base = QCoreApplication::applicationDirPath()
-                   + "/../resources/data/mne-cpp-test-data";
+    QString base = QCoreApplication::applicationDirPath() + "/../resources/data/mne-cpp-test-data";
     if (QFile::exists(base + "/MEG/sample/sample_audvis_trunc_raw.fif"))
         m_sDataPath = base;
 }
 
-void TestFiffFsLibrary::cleanupTestCase() {}
+void TestFiffFsLibrary::cleanupTestCase()
+{
+}
 
 //=============================================================================================================
 // FIFF: Raw data reading
@@ -236,13 +273,14 @@ void TestFiffFsLibrary::cleanupTestCase() {}
 
 void TestFiffFsLibrary::fiff_readRawSegment()
 {
-    if (!hasData()) QSKIP("No test data");
+    if (!hasData())
+        QSKIP("No test data");
     QFile rawFile(rawPath());
     FiffRawData raw(rawFile);
 
     MatrixXd data, times;
     fiff_int_t from = raw.first_samp;
-    fiff_int_t to   = from + 999;
+    fiff_int_t to = from + 999;
 
     bool ok = raw.read_raw_segment(data, times, from, to);
     QVERIFY(ok);
@@ -252,17 +290,19 @@ void TestFiffFsLibrary::fiff_readRawSegment()
 
 void TestFiffFsLibrary::fiff_readRawSegmentWithSel()
 {
-    if (!hasData()) QSKIP("No test data");
+    if (!hasData())
+        QSKIP("No test data");
     QFile rawFile(rawPath());
     FiffRawData raw(rawFile);
 
     int nPick = qMin(10, (int)raw.info.nchan);
     RowVectorXi sel(nPick);
-    for (int i = 0; i < nPick; i++) sel[i] = i;
+    for (int i = 0; i < nPick; i++)
+        sel[i] = i;
 
     MatrixXd data, times;
     fiff_int_t from = raw.first_samp;
-    fiff_int_t to   = from + 499;
+    fiff_int_t to = from + 499;
 
     bool ok = raw.read_raw_segment(data, times, from, to, sel);
     QVERIFY(ok);
@@ -272,7 +312,8 @@ void TestFiffFsLibrary::fiff_readRawSegmentWithSel()
 
 void TestFiffFsLibrary::fiff_readRawSegmentTimes()
 {
-    if (!hasData()) QSKIP("No test data");
+    if (!hasData())
+        QSKIP("No test data");
     QFile rawFile(rawPath());
     FiffRawData raw(rawFile);
 
@@ -290,7 +331,8 @@ void TestFiffFsLibrary::fiff_readRawSegmentTimes()
 
 void TestFiffFsLibrary::fiff_readEvokedSet()
 {
-    if (!hasData()) QSKIP("No test data");
+    if (!hasData())
+        QSKIP("No test data");
     QFile aveFile(avePath());
     FiffEvokedSet evokedSet(aveFile);
     QVERIFY(evokedSet.evoked.size() > 0);
@@ -299,7 +341,8 @@ void TestFiffFsLibrary::fiff_readEvokedSet()
 
 void TestFiffFsLibrary::fiff_evokedSetPickChannels()
 {
-    if (!hasData()) QSKIP("No test data");
+    if (!hasData())
+        QSKIP("No test data");
     QFile aveFile(avePath());
     FiffEvokedSet evokedSet(aveFile);
     QVERIFY(evokedSet.evoked.size() > 0);
@@ -316,7 +359,8 @@ void TestFiffFsLibrary::fiff_evokedSetPickChannels()
 
 void TestFiffFsLibrary::fiff_evokedSetSave()
 {
-    if (!hasData()) QSKIP("No test data");
+    if (!hasData())
+        QSKIP("No test data");
     QFile aveFile(avePath());
     FiffEvokedSet evokedSet(aveFile);
     QVERIFY(evokedSet.evoked.size() > 0);
@@ -333,7 +377,8 @@ void TestFiffFsLibrary::fiff_evokedSetSave()
 
 void TestFiffFsLibrary::fiff_evokedSetGrandAverage()
 {
-    if (!hasData()) QSKIP("No test data");
+    if (!hasData())
+        QSKIP("No test data");
     QFile aveFile1(avePath());
     FiffEvokedSet set1(aveFile1);
     QVERIFY(set1.evoked.size() > 0);
@@ -353,7 +398,8 @@ void TestFiffFsLibrary::fiff_evokedSetGrandAverage()
 
 void TestFiffFsLibrary::fiff_evokedSetCompensate()
 {
-    if (!hasData()) QSKIP("No test data");
+    if (!hasData())
+        QSKIP("No test data");
     QFile aveFile(avePath());
     FiffEvokedSet evokedSet(aveFile);
     QVERIFY(evokedSet.evoked.size() > 0);
@@ -372,11 +418,11 @@ void TestFiffFsLibrary::fiff_digPointSetRoundtrip()
     FiffDigPointSet digSet;
     for (int i = 0; i < 5; i++) {
         FiffDigPoint pt;
-        pt.kind  = FIFFV_POINT_EXTRA;
+        pt.kind = FIFFV_POINT_EXTRA;
         pt.ident = i;
-        pt.r[0]  = 0.01f * i;
-        pt.r[1]  = 0.02f * i;
-        pt.r[2]  = 0.03f;
+        pt.r[0] = 0.01f * i;
+        pt.r[1] = 0.02f * i;
+        pt.r[2] = 0.03f;
         digSet << pt;
     }
     QCOMPARE(digSet.size(), 5);
@@ -425,7 +471,8 @@ void TestFiffFsLibrary::fiff_digPointSetRoundtrip()
 
 void TestFiffFsLibrary::fiff_infoPickMeg()
 {
-    if (!hasData()) QSKIP("No test data");
+    if (!hasData())
+        QSKIP("No test data");
     QFile rawFile(rawPath());
     FiffRawData raw(rawFile);
 
@@ -443,12 +490,14 @@ void TestFiffFsLibrary::fiff_infoPickMeg()
 
 void TestFiffFsLibrary::fiff_infoPickEeg()
 {
-    if (!hasData()) QSKIP("No test data");
+    if (!hasData())
+        QSKIP("No test data");
     QFile rawFile(rawPath());
     FiffRawData raw(rawFile);
 
     RowVectorXi eegSel = raw.info.pick_types(false, true, false);
-    if (eegSel.size() == 0) QSKIP("No EEG channels in sample data");
+    if (eegSel.size() == 0)
+        QSKIP("No EEG channels in sample data");
 
     int nEeg = qMin((int)eegSel.size(), 20);
     RowVectorXi sel = eegSel.head(nEeg);
@@ -468,7 +517,8 @@ void TestFiffFsLibrary::fiff_infoPickEeg()
 
 void TestFiffFsLibrary::fiff_coordTransReadWrite()
 {
-    if (!hasData()) QSKIP("No test data");
+    if (!hasData())
+        QSKIP("No test data");
     QVERIFY(QFile::exists(transPath()));
 
     FiffCoordTrans trans = FiffCoordTrans::readMriTransform(transPath());
@@ -483,7 +533,9 @@ void TestFiffFsLibrary::fiff_coordTransReadWrite()
     QCOMPARE(inv.to, trans.from);
 
     MatrixX3f point(1, 3);
-    point(0, 0) = 0.0f; point(0, 1) = 0.0f; point(0, 2) = 0.05f;
+    point(0, 0) = 0.0f;
+    point(0, 1) = 0.0f;
+    point(0, 2) = 0.05f;
     MatrixX3f transformed = trans.apply_trans(point);
     MatrixX3f back = inv.apply_trans(transformed);
     QVERIFY((point - back).norm() < 1e-4f);
@@ -500,7 +552,8 @@ void TestFiffFsLibrary::fiff_namedMatrixAccessors()
     QCOMPARE(m.ncol, -1);
 
     FiffNamedMatrix m2;
-    m2.nrow = 2; m2.ncol = 3;
+    m2.nrow = 2;
+    m2.ncol = 3;
     m2.row_names << "r1" << "r2";
     m2.col_names << "c1" << "c2" << "c3";
     m2.data = MatrixXd::Identity(2, 3);
@@ -518,7 +571,8 @@ void TestFiffFsLibrary::fiff_namedMatrixAccessors()
 
 void TestFiffFsLibrary::fiff_infoBaseAccessors()
 {
-    if (!hasData()) QSKIP("No test data");
+    if (!hasData())
+        QSKIP("No test data");
     QFile rawFile(rawPath());
     FiffRawData raw(rawFile);
 
@@ -538,7 +592,8 @@ void TestFiffFsLibrary::fiff_infoBaseAccessors()
 
 void TestFiffFsLibrary::fiff_detectEventsFromRaw()
 {
-    if (!hasData()) QSKIP("No test data");
+    if (!hasData())
+        QSKIP("No test data");
     QFile rawFile(rawPath());
     FiffRawData raw(rawFile);
 
@@ -565,11 +620,11 @@ void TestFiffFsLibrary::fs_surfaceComputeNormals()
 {
     MatrixX3f verts(4, 3);
     verts << 0.0f, 0.0f, 1.0f,
-             1.0f, 0.0f, 0.0f,
-            -0.5f, 0.866f, 0.0f,
-            -0.5f,-0.866f, 0.0f;
+        1.0f, 0.0f, 0.0f,
+        -0.5f, 0.866f, 0.0f,
+        -0.5f, -0.866f, 0.0f;
     MatrixX3i tris(4, 3);
-    tris << 0,1,2, 0,2,3, 0,3,1, 1,3,2;
+    tris << 0, 1, 2, 0, 2, 3, 0, 3, 1, 1, 3, 2;
 
     MatrixX3f normals = FsSurface::compute_normals(verts, tris);
     QCOMPARE(normals.rows(), 4);
@@ -581,9 +636,9 @@ void TestFiffFsLibrary::fs_surfaceReadWrite()
 {
     MatrixX3f rr(4, 3);
     rr << 0.0f, 0.0f, 1.0f, 1.0f, 0.0f, 0.0f,
-         -0.5f, 0.866f, 0.0f, -0.5f,-0.866f, 0.0f;
+        -0.5f, 0.866f, 0.0f, -0.5f, -0.866f, 0.0f;
     MatrixX3i tris(4, 3);
-    tris << 0,1,2, 0,2,3, 0,3,1, 1,3,2;
+    tris << 0, 1, 2, 0, 2, 3, 0, 3, 1, 1, 3, 2;
 
     FsSurface s1;
     QVERIFY(s1.isEmpty());
@@ -602,8 +657,10 @@ void TestFiffFsLibrary::fs_surfaceReadWrite()
 
 void TestFiffFsLibrary::fs_surfaceReadReal()
 {
-    if (!hasData()) QSKIP("No test data");
-    if (!QFile::exists(surfLhPath())) QSKIP("lh.white not found");
+    if (!hasData())
+        QSKIP("No test data");
+    if (!QFile::exists(surfLhPath()))
+        QSKIP("lh.white not found");
 
     FsSurface surfLh;
     bool ok = FsSurface::read(surfLhPath(), surfLh, false);
@@ -638,7 +695,8 @@ void TestFiffFsLibrary::fs_surfaceReadReal()
 
 void TestFiffFsLibrary::fs_surfaceSetReadReal()
 {
-    if (!hasData()) QSKIP("No test data");
+    if (!hasData())
+        QSKIP("No test data");
     if (!QFile::exists(surfLhPath()) || !QFile::exists(surfRhPath()))
         QSKIP("FsSurface files not found");
 
@@ -672,16 +730,20 @@ void TestFiffFsLibrary::fs_surfaceSetReadReal()
 
 void TestFiffFsLibrary::fs_surfaceReadCurv()
 {
-    if (!hasData()) QSKIP("No test data");
-    if (!QFile::exists(curvLhPath())) QSKIP("lh.curv not found");
+    if (!hasData())
+        QSKIP("No test data");
+    if (!QFile::exists(curvLhPath()))
+        QSKIP("lh.curv not found");
 
     VectorXf curv = FsSurface::read_curv(curvLhPath());
     QVERIFY(curv.size() > 0);
 
     bool hasPos = false, hasNeg = false;
     for (int i = 0; i < curv.size(); i++) {
-        if (curv[i] > 0) hasPos = true;
-        if (curv[i] < 0) hasNeg = true;
+        if (curv[i] > 0)
+            hasPos = true;
+        if (curv[i] < 0)
+            hasNeg = true;
     }
     QVERIFY(hasPos);
     QVERIFY(hasNeg);
@@ -702,7 +764,7 @@ void TestFiffFsLibrary::fs_annotationReadWrite()
         ds.setByteOrder(QDataStream::BigEndian);
 
         ds << (qint32)nv;
-        qint32 labelVal = 25 + 100*256 + 40*65536;
+        qint32 labelVal = 25 + 100 * 256 + 40 * 65536;
         for (int i = 0; i < nv; i++) {
             ds << (qint32)i;
             ds << labelVal;
@@ -731,8 +793,10 @@ void TestFiffFsLibrary::fs_annotationReadWrite()
 
 void TestFiffFsLibrary::fs_annotationReadReal()
 {
-    if (!hasData()) QSKIP("No test data");
-    if (!QFile::exists(annotLhPath())) QSKIP("lh.aparc.annot not found");
+    if (!hasData())
+        QSKIP("No test data");
+    if (!QFile::exists(annotLhPath()))
+        QSKIP("lh.aparc.annot not found");
 
     FsAnnotation annot;
     bool ok = FsAnnotation::read(annotLhPath(), annot);
@@ -755,7 +819,8 @@ void TestFiffFsLibrary::fs_annotationReadReal()
 
 void TestFiffFsLibrary::fs_annotationSetReadReal()
 {
-    if (!hasData()) QSKIP("No test data");
+    if (!hasData())
+        QSKIP("No test data");
     if (!QFile::exists(annotLhPath()) || !QFile::exists(annotRhPath()))
         QSKIP("FsAnnotation files not found");
 
@@ -785,7 +850,8 @@ void TestFiffFsLibrary::fs_annotationSetReadReal()
 
 void TestFiffFsLibrary::fs_annotationToLabels()
 {
-    if (!hasData()) QSKIP("No test data");
+    if (!hasData())
+        QSKIP("No test data");
     if (!QFile::exists(annotLhPath()) || !QFile::exists(surfLhPath()))
         QSKIP("Required files not found");
 
@@ -840,7 +906,7 @@ void TestFiffFsLibrary::fs_colorTableFromLabels()
     ct.struct_names << "region1" << "region2";
     ct.table.resize(2, 5);
     ct.table << 255, 0, 0, 0, 255,
-                0, 255, 0, 0, 16711680;
+        0, 255, 0, 0, 16711680;
     QCOMPARE(ct.struct_names.size(), 2);
 }
 
@@ -850,7 +916,8 @@ void TestFiffFsLibrary::fs_colorTableFromLabels()
 
 void TestFiffFsLibrary::fiffCov_readFromFile()
 {
-    if (!hasData()) QSKIP("No test data");
+    if (!hasData())
+        QSKIP("No test data");
     QFile covFile(covPath());
     FiffCov cov(covFile);
     QVERIFY(!cov.isEmpty());
@@ -861,13 +928,15 @@ void TestFiffFsLibrary::fiffCov_readFromFile()
 
 void TestFiffFsLibrary::fiffCov_pickChannels()
 {
-    if (!hasData()) QSKIP("No test data");
+    if (!hasData())
+        QSKIP("No test data");
     QFile covFile(covPath());
     FiffCov cov(covFile);
     QVERIFY(!cov.isEmpty());
     QStringList pickNames;
     int nPick = qMin(20, cov.names.size());
-    for (int i = 0; i < nPick; ++i) pickNames.append(cov.names[i]);
+    for (int i = 0; i < nPick; ++i)
+        pickNames.append(cov.names[i]);
     FiffCov pickedCov = cov.pick_channels(pickNames);
     QCOMPARE(pickedCov.dim, nPick);
     QCOMPARE(pickedCov.names.size(), nPick);
@@ -875,7 +944,8 @@ void TestFiffFsLibrary::fiffCov_pickChannels()
 
 void TestFiffFsLibrary::fiffCov_saveAndReload()
 {
-    if (!hasData()) QSKIP("No test data");
+    if (!hasData())
+        QSKIP("No test data");
     // Read cov and verify basic properties (full round-trip write is slow in debug+coverage)
     QFile covFile(covPath());
     FiffCov cov(covFile);
@@ -886,7 +956,8 @@ void TestFiffFsLibrary::fiffCov_saveAndReload()
 
 void TestFiffFsLibrary::fiffCov_regularize()
 {
-    if (!hasData()) QSKIP("No test data");
+    if (!hasData())
+        QSKIP("No test data");
     QFile covFile(covPath());
     FiffCov cov(covFile);
     QVERIFY(!cov.isEmpty());
@@ -899,7 +970,8 @@ void TestFiffFsLibrary::fiffCov_regularize()
 
 void TestFiffFsLibrary::fiffCov_computeGrandAverage()
 {
-    if (!hasData()) QSKIP("No test data");
+    if (!hasData())
+        QSKIP("No test data");
     QFile covFile(covPath());
     FiffCov cov(covFile);
     QVERIFY(!cov.isEmpty());
@@ -915,7 +987,8 @@ void TestFiffFsLibrary::fiffCov_computeGrandAverage()
 
 void TestFiffFsLibrary::fiffCov_copyAndAssign()
 {
-    if (!hasData()) QSKIP("No test data");
+    if (!hasData())
+        QSKIP("No test data");
     QFile covFile(covPath());
     FiffCov cov(covFile);
     QVERIFY(!cov.isEmpty());
@@ -930,7 +1003,8 @@ void TestFiffFsLibrary::fiffCov_isEmpty()
 {
     FiffCov emptyCov;
     QVERIFY(emptyCov.isEmpty());
-    if (!hasData()) return;
+    if (!hasData())
+        return;
     QFile covFile(covPath());
     FiffCov cov(covFile);
     QVERIFY(!cov.isEmpty());
@@ -944,7 +1018,8 @@ void TestFiffFsLibrary::fiffCov_isEmpty()
 
 void TestFiffFsLibrary::fiffRaw_saveSubset()
 {
-    if (!hasData()) QSKIP("No test data");
+    if (!hasData())
+        QSKIP("No test data");
     QFile rawFile(rawPath());
     FiffRawData raw(rawFile);
     QVERIFY(!raw.isEmpty());
@@ -953,7 +1028,8 @@ void TestFiffFsLibrary::fiffRaw_saveSubset()
     QString tmpPath = tmpDir.path() + "/raw_subset.fif";
     int nPick = qMin(10, raw.info.nchan);
     RowVectorXi picks(nPick);
-    for (int i = 0; i < nPick; ++i) picks(i) = i;
+    for (int i = 0; i < nPick; ++i)
+        picks(i) = i;
     QFile outFile(tmpPath);
     bool saved = raw.save(outFile, picks, 1, raw.first_samp, raw.first_samp + 2000);
     QVERIFY(saved);
@@ -962,7 +1038,8 @@ void TestFiffFsLibrary::fiffRaw_saveSubset()
 
 void TestFiffFsLibrary::fiffRaw_saveAndReload()
 {
-    if (!hasData()) QSKIP("No test data");
+    if (!hasData())
+        QSKIP("No test data");
     QFile rawFile(rawPath());
     FiffRawData raw(rawFile);
     QVERIFY(!raw.isEmpty());
@@ -971,7 +1048,8 @@ void TestFiffFsLibrary::fiffRaw_saveAndReload()
     QString tmpPath = tmpDir.path() + "/raw_roundtrip.fif";
     int nPick = qMin(5, raw.info.nchan);
     RowVectorXi picks(nPick);
-    for (int i = 0; i < nPick; ++i) picks(i) = i;
+    for (int i = 0; i < nPick; ++i)
+        picks(i) = i;
     QFile outFile(tmpPath);
     bool saved = raw.save(outFile, picks, 1, raw.first_samp, raw.first_samp + 1000);
     QVERIFY(saved);
@@ -983,7 +1061,8 @@ void TestFiffFsLibrary::fiffRaw_saveAndReload()
 
 void TestFiffFsLibrary::fiffRaw_copyConstructor()
 {
-    if (!hasData()) QSKIP("No test data");
+    if (!hasData())
+        QSKIP("No test data");
     QFile rawFile(rawPath());
     FiffRawData raw(rawFile);
     QVERIFY(!raw.isEmpty());
@@ -1009,7 +1088,8 @@ void TestFiffFsLibrary::fiffEvokedSet_subtractBaseline()
 
 void TestFiffFsLibrary::fiffEvokedSet_findEvoked()
 {
-    if (!hasData()) QSKIP("No test data");
+    if (!hasData())
+        QSKIP("No test data");
     QFile aveFile(avePath());
     FiffEvokedSet evokedSet(aveFile);
     QVERIFY(evokedSet.evoked.size() > 0);
@@ -1077,20 +1157,23 @@ void TestFiffFsLibrary::fiffCoordTrans_compose()
 
 void TestFiffFsLibrary::fiffInfo_pickChannels()
 {
-    if (!hasData()) QSKIP("No test data");
+    if (!hasData())
+        QSKIP("No test data");
     QFile rawFile(rawPath());
     FiffRawData raw(rawFile);
     FiffInfo info = raw.info;
     int nPick = qMin(15, info.ch_names.size());
     RowVectorXi picks(nPick);
-    for (int i = 0; i < nPick; ++i) picks(i) = i;
+    for (int i = 0; i < nPick; ++i)
+        picks(i) = i;
     FiffInfo pickedInfo = info.pick_info(picks);
     QCOMPARE(pickedInfo.nchan, nPick);
 }
 
 void TestFiffFsLibrary::fiffInfo_writeAndRead()
 {
-    if (!hasData()) QSKIP("No test data");
+    if (!hasData())
+        QSKIP("No test data");
     QFile rawFile(rawPath());
     FiffRawData raw(rawFile);
     FiffInfo info = raw.info;
@@ -1447,12 +1530,12 @@ void TestFiffFsLibrary::fs_surfaceDefaultConstruction()
 void TestFiffFsLibrary::fs_surfaceComputeNormalsCube()
 {
     MatrixX3f rr(8, 3);
-    rr << -1,-1,-1,  1,-1,-1,  1,1,-1,  -1,1,-1,
-          -1,-1,1,   1,-1,1,   1,1,1,   -1,1,1;
+    rr << -1, -1, -1, 1, -1, -1, 1, 1, -1, -1, 1, -1,
+        -1, -1, 1, 1, -1, 1, 1, 1, 1, -1, 1, 1;
     MatrixX3i tris(12, 3);
-    tris << 0,1,2,  0,2,3,  4,6,5,  4,7,6,
-            0,5,1,  0,4,5,  2,7,3,  2,6,7,
-            0,3,7,  0,7,4,  1,5,6,  1,6,2;
+    tris << 0, 1, 2, 0, 2, 3, 4, 6, 5, 4, 7, 6,
+        0, 5, 1, 0, 4, 5, 2, 7, 3, 2, 6, 7,
+        0, 3, 7, 0, 7, 4, 1, 5, 6, 1, 6, 2;
     MatrixX3f normals = FsSurface::compute_normals(rr, tris);
     QCOMPARE(normals.rows(), 8);
     for (int i = 0; i < normals.rows(); ++i) {
@@ -1473,10 +1556,12 @@ void TestFiffFsLibrary::fs_surfaceSetIsEmpty()
     QVERIFY(surfSet.isEmpty());
     // Default-constructed FsSurface is empty (hemi == -1) and insert() rejects it.
     // Read a real surface to test insert.
-    if (!hasData()) QSKIP("No test data");
+    if (!hasData())
+        QSKIP("No test data");
     QString surfPath = m_sDataPath + "/subjects/sample/surf/lh.white";
     FsSurface surf(surfPath);
-    if (surf.isEmpty()) QSKIP("Could not load surface");
+    if (surf.isEmpty())
+        QSKIP("Could not load surface");
     surfSet.insert(surf);
     QVERIFY(!surfSet.isEmpty());
     QCOMPARE(surfSet.size(), 1);
@@ -1509,10 +1594,12 @@ void TestFiffFsLibrary::fs_annotationSetIsEmpty()
     QVERIFY(annotSet.isEmpty());
     // Default-constructed FsAnnotation is empty (hemi == -1) and insert() rejects it.
     // Read a real annotation to test insert.
-    if (!hasData()) QSKIP("No test data");
+    if (!hasData())
+        QSKIP("No test data");
     QString annotPath = m_sDataPath + "/subjects/sample/label/lh.aparc.annot";
     FsAnnotation annot(annotPath);
-    if (annot.isEmpty()) QSKIP("Could not load annotation");
+    if (annot.isEmpty())
+        QSKIP("Could not load annotation");
     annotSet.insert(annot);
     QVERIFY(!annotSet.isEmpty());
     QCOMPARE(annotSet.size(), 1);
@@ -1539,8 +1626,8 @@ void TestFiffFsLibrary::fs_labelDefaultConstruction()
 // FS operator and synthetic exercises (from coverage_push)
 //=============================================================================================================
 
-static void writeSyntheticSurface(const QString &path, int nvert, int ntri,
-                                   const MatrixX3f &verts, const MatrixX3i &tris)
+static void writeSyntheticSurface(const QString& path, int nvert, int ntri,
+                                  const MatrixX3f& verts, const MatrixX3i& tris)
 {
     QFile f(path);
     if (!f.open(QIODevice::WriteOnly)) {
@@ -1560,9 +1647,9 @@ static void writeSyntheticSurface(const QString &path, int nvert, int ntri,
     f.close();
 }
 
-static void writeSyntheticAnnotation(const QString &path, int nvert,
-                                      const VectorXi &vertIndices,
-                                      const VectorXi &labels)
+static void writeSyntheticAnnotation(const QString& path, int nvert,
+                                     const VectorXi& vertIndices,
+                                     const VectorXi& labels)
 {
     QFile f(path);
     if (!f.open(QIODevice::WriteOnly)) {
@@ -1590,9 +1677,9 @@ static void writeSyntheticAnnotation(const QString &path, int nvert,
 void TestFiffFsLibrary::fs_surfaceSetOperators()
 {
     MatrixX3f verts(4, 3);
-    verts << 0,0,0, 1,0,0, 0,1,0, 0,0,1;
+    verts << 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1;
     MatrixX3i tris(2, 3);
-    tris << 0,1,2, 0,2,3;
+    tris << 0, 1, 2, 0, 2, 3;
     QString lhPath = m_tempDir.filePath("lh.test");
     QString rhPath = m_tempDir.filePath("rh.test");
     writeSyntheticSurface(lhPath, 4, 2, verts, tris);
@@ -1607,7 +1694,8 @@ void TestFiffFsLibrary::fs_surfaceSetOperators()
         QVERIFY(surfSet.size() == 2);
         FsSurface& s0 = surfSet[0];
         FsSurface& s1 = surfSet[1];
-        Q_UNUSED(s0); Q_UNUSED(s1);
+        Q_UNUSED(s0);
+        Q_UNUSED(s1);
         const FsSurfaceSet& constSet = surfSet;
         const FsSurface& cs0 = constSet[0];
         Q_UNUSED(cs0);
@@ -1646,16 +1734,17 @@ void TestFiffFsLibrary::fs_annotationSetOperators()
 void TestFiffFsLibrary::fs_surfaceReadFromSynthetic()
 {
     MatrixX3f verts(4, 3);
-    verts << 0,0,0, 1,0,0, 0,1,0, 0,0,1;
+    verts << 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1;
     MatrixX3i tris(2, 3);
-    tris << 0,1,2, 0,2,3;
+    tris << 0, 1, 2, 0, 2, 3;
     QString surfDir = m_tempDir.filePath("surf_test");
     QDir().mkpath(surfDir);
     writeSyntheticSurface(surfDir + "/lh.inflated", 4, 2, verts, tris);
     writeSyntheticSurface(surfDir + "/rh.inflated", 4, 2, verts, tris);
     FsSurface s1(surfDir + "/lh.inflated");
     FsSurface s2(surfDir, 0, "inflated");
-    Q_UNUSED(s1); Q_UNUSED(s2);
+    Q_UNUSED(s1);
+    Q_UNUSED(s2);
     QVERIFY(true);
 }
 
@@ -1671,16 +1760,17 @@ void TestFiffFsLibrary::fs_annotationReadFromSynthetic()
     writeSyntheticAnnotation(annotDir + "/rh.aparc.annot", 4, vertIdx, labels);
     FsAnnotation a1(annotDir + "/lh.aparc.annot");
     FsAnnotation a2(annotDir, 0, "aparc");
-    Q_UNUSED(a1); Q_UNUSED(a2);
+    Q_UNUSED(a1);
+    Q_UNUSED(a2);
     QVERIFY(true);
 }
 
 void TestFiffFsLibrary::fs_surfaceSetCalcOffset()
 {
     MatrixX3f verts(4, 3);
-    verts << -1,0,0, 1,0,0, 0,1,0, 0,0,1;
+    verts << -1, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1;
     MatrixX3i tris(2, 3);
-    tris << 0,1,2, 0,2,3;
+    tris << 0, 1, 2, 0, 2, 3;
     QString surfDir = m_tempDir.filePath("offset_test");
     QDir().mkpath(surfDir);
     writeSyntheticSurface(surfDir + "/lh.inflated", 4, 2, verts, tris);
@@ -1694,9 +1784,9 @@ void TestFiffFsLibrary::fs_surfaceSetCalcOffset()
 void TestFiffFsLibrary::fs_surfaceSetReadNonInflated()
 {
     MatrixX3f verts(4, 3);
-    verts << 0,0,0, 1,0,0, 0,1,0, 0,0,1;
+    verts << 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1;
     MatrixX3i tris(2, 3);
-    tris << 0,1,2, 0,2,3;
+    tris << 0, 1, 2, 0, 2, 3;
     QString surfDir = m_tempDir.filePath("surfread_test");
     QDir().mkpath(surfDir);
     writeSyntheticSurface(surfDir + "/lh.orig", 4, 2, verts, tris);
@@ -1725,11 +1815,12 @@ void TestFiffFsLibrary::fs_annotationSetReadSynthetic()
 
 void TestFiffFsLibrary::fs_labelSelectTris()
 {
-    if (!hasData()) QSKIP("No test data");
+    if (!hasData())
+        QSKIP("No test data");
     MatrixX3f verts(4, 3);
-    verts << 0,0,0, 1,0,0, 0,1,0, 0,0,1;
+    verts << 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1;
     MatrixX3i tris(2, 3);
-    tris << 0,1,2, 0,2,3;
+    tris << 0, 1, 2, 0, 2, 3;
     QString surfPath = m_tempDir.filePath("lh.labeltest");
     writeSyntheticSurface(surfPath, 4, 2, verts, tris);
     FsSurface surf;
@@ -1751,8 +1842,10 @@ void TestFiffFsLibrary::fs_labelSelectTris()
 
 void TestFiffFsLibrary::fs_annotationMutableGetters()
 {
-    if (!hasData()) QSKIP("No test data");
-    if (!QFile::exists(annotLhPath())) QSKIP("lh.aparc.annot not found");
+    if (!hasData())
+        QSKIP("No test data");
+    if (!QFile::exists(annotLhPath()))
+        QSKIP("lh.aparc.annot not found");
 
     FsAnnotation annot;
     FsAnnotation::read(annotLhPath(), annot);
@@ -1779,8 +1872,10 @@ void TestFiffFsLibrary::fs_annotationMutableGetters()
 
 void TestFiffFsLibrary::fs_surfaceNnCurvOffset()
 {
-    if (!hasData()) QSKIP("No test data");
-    if (!QFile::exists(surfLhPath())) QSKIP("lh.white not found");
+    if (!hasData())
+        QSKIP("No test data");
+    if (!QFile::exists(surfLhPath()))
+        QSKIP("lh.white not found");
 
     FsSurface surf;
     FsSurface::read(surfLhPath(), surf);

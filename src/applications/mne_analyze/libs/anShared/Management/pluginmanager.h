@@ -56,8 +56,8 @@ class ANSHAREDSHARED_EXPORT PluginManager : public QPluginLoader
     Q_OBJECT
 
 public:
-    typedef QSharedPointer<PluginManager> SPtr;               /**< Shared pointer type for PluginManager. */
-    typedef QSharedPointer<const PluginManager> ConstSPtr;    /**< Const shared pointer type for PluginManager. */
+    typedef QSharedPointer<PluginManager> SPtr;            /**< Shared pointer type for PluginManager. */
+    typedef QSharedPointer<const PluginManager> ConstSPtr; /**< Const shared pointer type for PluginManager. */
 
     //=========================================================================================================
     /**
@@ -135,14 +135,13 @@ signals:
     void pluginLoaded(const QString& msg);
 
 private:
-
     //=========================================================================================================
     /**
      * Insert a plugin into the vector of plugins inserted.
      */
-    void insertPlugin(AbstractPlugin*  plugin);
+    void insertPlugin(AbstractPlugin* plugin);
 
-    QVector<AbstractPlugin*>    m_qVecPlugins;       /**< Vector containing all plugins. */
+    QVector<AbstractPlugin*> m_qVecPlugins; /**< Vector containing all plugins. */
 };
 
 //=============================================================================================================

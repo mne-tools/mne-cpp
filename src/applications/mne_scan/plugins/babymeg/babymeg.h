@@ -49,16 +49,18 @@
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-namespace SCMEASLIB {
-    class RealTimeMultiSampleArray;
+namespace SCMEASLIB
+{
+class RealTimeMultiSampleArray;
 }
 
-namespace DISPLIB {
-    class ProjectSettingsView;
+namespace DISPLIB
+{
+class ProjectSettingsView;
 }
 
-#define MAX_DATA_LEN    2000000000L
-#define MAX_POS         2000000000L
+#define MAX_DATA_LEN 2000000000L
+#define MAX_POS 2000000000L
 
 //=============================================================================================================
 // DEFINE NAMESPACE BABYMEGPLUGIN
@@ -270,32 +272,32 @@ protected:
      */
     bool readBadChannels();
 
-    SCSHAREDLIB::PluginOutputData<SCMEASLIB::RealTimeMultiSampleArray>::SPtr m_pRTMSABabyMEG;    /**< The RealTimeMultiSampleArray to provide the rt_server Channels.*/
+    SCSHAREDLIB::PluginOutputData<SCMEASLIB::RealTimeMultiSampleArray>::SPtr m_pRTMSABabyMEG; /**< The RealTimeMultiSampleArray to provide the rt_server Channels.*/
 
-    QSharedPointer<UTILSLIB::CircularBuffer_Matrix_float>                    m_pCircularBuffer;  /**< Holds incoming raw data. */
+    QSharedPointer<UTILSLIB::CircularBuffer_Matrix_float> m_pCircularBuffer; /**< Holds incoming raw data. */
 
-    QSharedPointer<BabyMEGClient>                   m_pMyClient;                    /**< TCP/IP communication between Qt and Labview. */
-    QSharedPointer<BabyMEGClient>                   m_pMyClientComm;                /**< TCP/IP communication between Qt and Labview - communication. */
-    QSharedPointer<BabyMEGInfo>                     m_pInfo;                        /**< Set up the babyMEG info. */
-    QSharedPointer<BabyMEGSQUIDControlDgl>          m_pSQUIDCtrlDlg;                /**< Nonmodal dialog for squid control. */
+    QSharedPointer<BabyMEGClient> m_pMyClient;              /**< TCP/IP communication between Qt and Labview. */
+    QSharedPointer<BabyMEGClient> m_pMyClientComm;          /**< TCP/IP communication between Qt and Labview - communication. */
+    QSharedPointer<BabyMEGInfo> m_pInfo;                    /**< Set up the babyMEG info. */
+    QSharedPointer<BabyMEGSQUIDControlDgl> m_pSQUIDCtrlDlg; /**< Nonmodal dialog for squid control. */
 
-    QList<int>                              m_lTriggerChannelIndices;       /**< List of all trigger channel indices. */
+    QList<int> m_lTriggerChannelIndices; /**< List of all trigger channel indices. */
 
-    FIFFLIB::FiffInfo::SPtr                 m_pFiffInfo;                    /**< Fiff measurement info.*/
+    FIFFLIB::FiffInfo::SPtr m_pFiffInfo; /**< Fiff measurement info.*/
 
-    qint32                                  m_iBufferSize;                  /**< The raw data buffer size.*/
+    qint32 m_iBufferSize; /**< The raw data buffer size.*/
 
-    QString                                 m_sFiffProjections;             /**< Fiff projection information. */
-    QString                                 m_sFiffCompensators;            /**< Fiff compensator information. */
-    QString                                 m_sBadChannels;                 /**< Filename which contains a list of bad channels. */
+    QString m_sFiffProjections;  /**< Fiff projection information. */
+    QString m_sFiffCompensators; /**< Fiff compensator information. */
+    QString m_sBadChannels;      /**< Filename which contains a list of bad channels. */
 
-    QMutex                                  m_mutex;                        /**< Mutex to guarantee thread safety.*/
+    QMutex m_mutex; /**< Mutex to guarantee thread safety.*/
 
-    Eigen::RowVectorXd                      m_cals;                         /**< Calibration vector.*/
-    Eigen::SparseMatrix<double>             m_sparseMatCals;                /**< Sparse calibration matrix.*/
+    Eigen::RowVectorXd m_cals;                   /**< Calibration vector.*/
+    Eigen::SparseMatrix<double> m_sparseMatCals; /**< Sparse calibration matrix.*/
 
-    QPointer<QAction>                       m_pActionSqdCtrl;               /**< show squid control. */
-    QPointer<QAction>                       m_pActionUpdateFiffInfo;        /**< Update Fiff Info action. */
+    QPointer<QAction> m_pActionSqdCtrl;        /**< show squid control. */
+    QPointer<QAction> m_pActionUpdateFiffInfo; /**< Update Fiff Info action. */
 
 signals:
     //=========================================================================================================

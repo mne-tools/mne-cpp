@@ -50,7 +50,8 @@ using namespace Eigen;
 // HELPERS
 //=============================================================================================================
 
-namespace {
+namespace
+{
 
 /**
  * @brief Build a minimal FiffInfo with the given number of MEG and EEG channels.
@@ -167,9 +168,7 @@ void TestDspFilterChpi::testMultipleFrequencies()
 
     MatrixXd data(3, nSamples);
     for (int ch = 0; ch < 3; ++ch) {
-        data.row(ch) = sineTone(83.0, sfreq, nSamples)
-                      + sineTone(143.0, sfreq, nSamples)
-                      + sineTone(203.0, sfreq, nSamples);
+        data.row(ch) = sineTone(83.0, sfreq, nSamples) + sineTone(143.0, sfreq, nSamples) + sineTone(203.0, sfreq, nSamples);
     }
 
     const double pow83Before = powerAtFreq(data.row(0), 83.0, sfreq);
@@ -344,9 +343,7 @@ void TestDspFilterChpi::testNotchWidth()
 
     // Signal at 143 Hz + sidebands at 140 Hz and 146 Hz
     MatrixXd dataNarrow(1, nSamples);
-    dataNarrow.row(0) = sineTone(143.0, sfreq, nSamples)
-                       + sineTone(140.0, sfreq, nSamples)
-                       + sineTone(146.0, sfreq, nSamples);
+    dataNarrow.row(0) = sineTone(143.0, sfreq, nSamples) + sineTone(140.0, sfreq, nSamples) + sineTone(146.0, sfreq, nSamples);
 
     MatrixXd dataWide = dataNarrow;
 
@@ -368,7 +365,8 @@ void TestDspFilterChpi::testNotchWidth()
     // Wide notch should remove more of the 140 Hz sideband
     QVERIFY2(pow140Wide < pow140Narrow,
              qPrintable(QString("Wide notch power at 140 Hz (%1) should be less than narrow (%2)")
-                        .arg(pow140Wide).arg(pow140Narrow)));
+                            .arg(pow140Wide)
+                            .arg(pow140Narrow)));
 }
 
 //=============================================================================================================

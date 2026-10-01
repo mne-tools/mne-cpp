@@ -26,8 +26,8 @@
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-RtSensorDataController::RtSensorDataController(QObject *parent)
-    : QObject(parent)
+RtSensorDataController::RtSensorDataController(QObject* parent)
+: QObject(parent)
 {
     // Create data worker
     m_pWorker = new DISP3DLIB::RtSensorDataWorker();
@@ -95,7 +95,7 @@ RtSensorDataController::~RtSensorDataController()
 
 //=============================================================================================================
 
-void RtSensorDataController::addData(const Eigen::VectorXf &data)
+void RtSensorDataController::addData(const Eigen::VectorXf& data)
 {
     if (m_pWorker) {
         // Direct call is thread-safe because RtSensorDataWorker uses a mutex
@@ -158,7 +158,7 @@ void RtSensorDataController::setNumberAverages(int numAvr)
 
 //=============================================================================================================
 
-void RtSensorDataController::setColormapType(const QString &name)
+void RtSensorDataController::setColormapType(const QString& name)
 {
     if (m_pWorker) {
         m_pWorker->setColormapType(name);
@@ -214,7 +214,7 @@ void RtSensorDataController::setStreamSmoothedData(bool bStreamSmoothedData)
 // ── On-the-fly interpolation matrix computation ────────────────────────
 //=============================================================================================================
 
-void RtSensorDataController::setEvoked(const FIFFLIB::FiffEvoked &evoked)
+void RtSensorDataController::setEvoked(const FIFFLIB::FiffEvoked& evoked)
 {
     if (m_pInterpWorker) {
         m_pInterpWorker->setEvoked(evoked);
@@ -223,8 +223,8 @@ void RtSensorDataController::setEvoked(const FIFFLIB::FiffEvoked &evoked)
 
 //=============================================================================================================
 
-void RtSensorDataController::setTransform(const FIFFLIB::FiffCoordTrans &trans,
-                                            bool applySensorTrans)
+void RtSensorDataController::setTransform(const FIFFLIB::FiffCoordTrans& trans,
+                                          bool applySensorTrans)
 {
     if (m_pInterpWorker) {
         m_pInterpWorker->setTransform(trans, applySensorTrans);
@@ -242,10 +242,10 @@ void RtSensorDataController::setMegFieldMapOnHead(bool onHead)
 
 //=============================================================================================================
 
-void RtSensorDataController::setMegSurface(const QString &surfaceKey,
-                                            const Eigen::MatrixX3f &vertices,
-                                            const Eigen::MatrixX3f &normals,
-                                            const Eigen::MatrixX3i &triangles)
+void RtSensorDataController::setMegSurface(const QString& surfaceKey,
+                                           const Eigen::MatrixX3f& vertices,
+                                           const Eigen::MatrixX3f& normals,
+                                           const Eigen::MatrixX3i& triangles)
 {
     if (m_pInterpWorker) {
         m_pInterpWorker->setMegSurface(surfaceKey, vertices, normals, triangles);
@@ -254,8 +254,8 @@ void RtSensorDataController::setMegSurface(const QString &surfaceKey,
 
 //=============================================================================================================
 
-void RtSensorDataController::setEegSurface(const QString &surfaceKey,
-                                            const Eigen::MatrixX3f &vertices)
+void RtSensorDataController::setEegSurface(const QString& surfaceKey,
+                                           const Eigen::MatrixX3f& vertices)
 {
     if (m_pInterpWorker) {
         m_pInterpWorker->setEegSurface(surfaceKey, vertices);
@@ -264,7 +264,7 @@ void RtSensorDataController::setEegSurface(const QString &surfaceKey,
 
 //=============================================================================================================
 
-void RtSensorDataController::setBadChannels(const QStringList &bads)
+void RtSensorDataController::setBadChannels(const QStringList& bads)
 {
     if (m_pInterpWorker) {
         m_pInterpWorker->setBadChannels(bads);
@@ -284,9 +284,9 @@ void RtSensorDataController::recomputeMapping()
 
 //=============================================================================================================
 
-void RtSensorDataController::onNewMegMapping(const QString &surfaceKey,
-                                               std::shared_ptr<Eigen::MatrixXf> mappingMat,
-                                               const QVector<int> &pick)
+void RtSensorDataController::onNewMegMapping(const QString& surfaceKey,
+                                             std::shared_ptr<Eigen::MatrixXf> mappingMat,
+                                             const QVector<int>& pick)
 {
     // Auto-forward the new matrix to the data worker
     if (m_pWorker && mappingMat) {
@@ -302,9 +302,9 @@ void RtSensorDataController::onNewMegMapping(const QString &surfaceKey,
 
 //=============================================================================================================
 
-void RtSensorDataController::onNewEegMapping(const QString &surfaceKey,
-                                               std::shared_ptr<Eigen::MatrixXf> mappingMat,
-                                               const QVector<int> &pick)
+void RtSensorDataController::onNewEegMapping(const QString& surfaceKey,
+                                             std::shared_ptr<Eigen::MatrixXf> mappingMat,
+                                             const QVector<int>& pick)
 {
     // Auto-forward the new matrix to the data worker
     if (m_pWorker && mappingMat) {

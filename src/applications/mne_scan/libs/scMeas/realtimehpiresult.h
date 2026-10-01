@@ -41,9 +41,10 @@
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-namespace FIFFLIB{
-    class FiffInfo;
-    class FiffDigitizerData;
+namespace FIFFLIB
+{
+class FiffInfo;
+class FiffDigitizerData;
 }
 
 //=============================================================================================================
@@ -64,14 +65,14 @@ class SCMEASSHARED_EXPORT RealTimeHpiResult : public Measurement
     Q_OBJECT
 
 public:
-    typedef QSharedPointer<RealTimeHpiResult> SPtr;               /**< Shared pointer type for RealTimeHpiResult. */
-    typedef QSharedPointer<const RealTimeHpiResult> ConstSPtr;    /**< Const shared pointer type for RealTimeHpiResult. */
+    typedef QSharedPointer<RealTimeHpiResult> SPtr;            /**< Shared pointer type for RealTimeHpiResult. */
+    typedef QSharedPointer<const RealTimeHpiResult> ConstSPtr; /**< Const shared pointer type for RealTimeHpiResult. */
 
     //=========================================================================================================
     /**
      * Constructs a RealTimeHpiResult.
      */
-    explicit RealTimeHpiResult(QObject *parent = 0);
+    explicit RealTimeHpiResult(QObject* parent = 0);
 
     //=========================================================================================================
     /**
@@ -167,15 +168,15 @@ public:
     void setHeadPositionHistorySize(int iMaxPositions);
 
 private:
-    mutable QMutex          m_qMutex;                               /**< Mutex to ensure thread safety. */
-    bool                    m_bInitialized;                         /**< If values are stored.*/
+    mutable QMutex m_qMutex; /**< Mutex to ensure thread safety. */
+    bool m_bInitialized;     /**< If values are stored.*/
 
-    QSharedPointer<INVLIB::HpiFitResult>    m_pHpiFitResult;    /**< The HPI fit result. */
-    QSharedPointer<FIFFLIB::FiffInfo>           m_pFiffInfo;        /**< The Fiff Info. */
-    QSharedPointer<FIFFLIB::FiffDigitizerData>  m_pFiffDigData;     /**< The Fiff Digigtizer Data */
+    QSharedPointer<INVLIB::HpiFitResult> m_pHpiFitResult;      /**< The HPI fit result. */
+    QSharedPointer<FIFFLIB::FiffInfo> m_pFiffInfo;             /**< The Fiff Info. */
+    QSharedPointer<FIFFLIB::FiffDigitizerData> m_pFiffDigData; /**< The Fiff Digigtizer Data */
 
-    QVector<Eigen::Vector3f>    m_vecHeadPositions;         /**< Head origin in device coordinates for every fit so far, oldest first. */
-    int                         m_iMaxHeadPositions;        /**< Ring size of m_vecHeadPositions. Zero disables recording. */
+    QVector<Eigen::Vector3f> m_vecHeadPositions; /**< Head origin in device coordinates for every fit so far, oldest first. */
+    int m_iMaxHeadPositions;                     /**< Ring size of m_vecHeadPositions. Zero disables recording. */
 };
 
 //=============================================================================================================

@@ -51,7 +51,7 @@ struct NetworkObject::GpuBuffers
 //=============================================================================================================
 
 NetworkObject::NetworkObject()
-    : m_gpu(std::make_unique<GpuBuffers>())
+: m_gpu(std::make_unique<GpuBuffers>())
 {
 }
 
@@ -61,16 +61,34 @@ NetworkObject::~NetworkObject() = default;
 
 //=============================================================================================================
 
-QRhiBuffer* NetworkObject::nodeVertexBuffer()   const { return m_gpu->nodeVertexBuffer.get(); }
-QRhiBuffer* NetworkObject::nodeIndexBuffer()    const { return m_gpu->nodeIndexBuffer.get(); }
-QRhiBuffer* NetworkObject::nodeInstanceBuffer() const { return m_gpu->nodeInstanceBuffer.get(); }
-QRhiBuffer* NetworkObject::edgeVertexBuffer()   const { return m_gpu->edgeVertexBuffer.get(); }
-QRhiBuffer* NetworkObject::edgeIndexBuffer()    const { return m_gpu->edgeIndexBuffer.get(); }
-QRhiBuffer* NetworkObject::edgeInstanceBuffer() const { return m_gpu->edgeInstanceBuffer.get(); }
+QRhiBuffer* NetworkObject::nodeVertexBuffer() const
+{
+    return m_gpu->nodeVertexBuffer.get();
+}
+QRhiBuffer* NetworkObject::nodeIndexBuffer() const
+{
+    return m_gpu->nodeIndexBuffer.get();
+}
+QRhiBuffer* NetworkObject::nodeInstanceBuffer() const
+{
+    return m_gpu->nodeInstanceBuffer.get();
+}
+QRhiBuffer* NetworkObject::edgeVertexBuffer() const
+{
+    return m_gpu->edgeVertexBuffer.get();
+}
+QRhiBuffer* NetworkObject::edgeIndexBuffer() const
+{
+    return m_gpu->edgeIndexBuffer.get();
+}
+QRhiBuffer* NetworkObject::edgeInstanceBuffer() const
+{
+    return m_gpu->edgeInstanceBuffer.get();
+}
 
 //=============================================================================================================
 
-void NetworkObject::load(const Network &network, const QString &sColormap)
+void NetworkObject::load(const Network& network, const QString& sColormap)
 {
     m_network = network;
     m_colormap = sColormap;
@@ -92,7 +110,7 @@ void NetworkObject::setThreshold(double dThreshold)
 
 //=============================================================================================================
 
-void NetworkObject::setColormap(const QString &sColormap)
+void NetworkObject::setColormap(const QString& sColormap)
 {
     m_colormap = sColormap;
     buildNodeInstances();
@@ -103,7 +121,8 @@ void NetworkObject::setColormap(const QString &sColormap)
 
 void NetworkObject::createNodeGeometry()
 {
-    if (!m_nodeVertexData.isEmpty()) return;
+    if (!m_nodeVertexData.isEmpty())
+        return;
 
     // Create an icosphere (subdivision level 1) for nodes
     const int subdivisions = 1;
@@ -113,25 +132,81 @@ void NetworkObject::createNodeGeometry()
     const float t = (1.0f + std::sqrt(5.0f)) / 2.0f;
 
     std::vector<QVector3D> vertices = {
-        QVector3D(-1,  t,  0).normalized() * radius,
-        QVector3D( 1,  t,  0).normalized() * radius,
-        QVector3D(-1, -t,  0).normalized() * radius,
-        QVector3D( 1, -t,  0).normalized() * radius,
-        QVector3D( 0, -1,  t).normalized() * radius,
-        QVector3D( 0,  1,  t).normalized() * radius,
-        QVector3D( 0, -1, -t).normalized() * radius,
-        QVector3D( 0,  1, -t).normalized() * radius,
-        QVector3D( t,  0, -1).normalized() * radius,
-        QVector3D( t,  0,  1).normalized() * radius,
-        QVector3D(-t,  0, -1).normalized() * radius,
-        QVector3D(-t,  0,  1).normalized() * radius,
+        QVector3D(-1, t, 0).normalized() * radius,
+        QVector3D(1, t, 0).normalized() * radius,
+        QVector3D(-1, -t, 0).normalized() * radius,
+        QVector3D(1, -t, 0).normalized() * radius,
+        QVector3D(0, -1, t).normalized() * radius,
+        QVector3D(0, 1, t).normalized() * radius,
+        QVector3D(0, -1, -t).normalized() * radius,
+        QVector3D(0, 1, -t).normalized() * radius,
+        QVector3D(t, 0, -1).normalized() * radius,
+        QVector3D(t, 0, 1).normalized() * radius,
+        QVector3D(-t, 0, -1).normalized() * radius,
+        QVector3D(-t, 0, 1).normalized() * radius,
     };
 
     std::vector<uint32_t> indices = {
-        0,11,5,  0,5,1,   0,1,7,   0,7,10,  0,10,11,
-        1,5,9,   5,11,4,  11,10,2, 10,7,6,  7,1,8,
-        3,9,4,   3,4,2,   3,2,6,   3,6,8,   3,8,9,
-        4,9,5,   2,4,11,  6,2,10,  8,6,7,   9,8,1,
+        0,
+        11,
+        5,
+        0,
+        5,
+        1,
+        0,
+        1,
+        7,
+        0,
+        7,
+        10,
+        0,
+        10,
+        11,
+        1,
+        5,
+        9,
+        5,
+        11,
+        4,
+        11,
+        10,
+        2,
+        10,
+        7,
+        6,
+        7,
+        1,
+        8,
+        3,
+        9,
+        4,
+        3,
+        4,
+        2,
+        3,
+        2,
+        6,
+        3,
+        6,
+        8,
+        3,
+        8,
+        9,
+        4,
+        9,
+        5,
+        2,
+        4,
+        11,
+        6,
+        2,
+        10,
+        8,
+        6,
+        7,
+        9,
+        8,
+        1,
     };
 
     // Subdivide
@@ -142,7 +217,8 @@ void NetworkObject::createNodeGeometry()
         auto getMidpoint = [&](uint32_t i0, uint32_t i1) -> uint32_t {
             uint64_t key = (uint64_t)std::min(i0, i1) << 32 | std::max(i0, i1);
             auto it = midpointCache.find(key);
-            if (it != midpointCache.end()) return it->second;
+            if (it != midpointCache.end())
+                return it->second;
 
             QVector3D mid = ((vertices[i0] + vertices[i1]) / 2.0f).normalized() * radius;
             uint32_t idx = (uint32_t)vertices.size();
@@ -169,7 +245,7 @@ void NetworkObject::createNodeGeometry()
     // Build vertex data with normals (normal = normalized position for sphere)
     std::vector<VertexData> vd;
     vd.reserve(vertices.size());
-    for (const auto &v : vertices) {
+    for (const auto& v : vertices) {
         QVector3D n = v.normalized();
         vd.push_back({v.x(), v.y(), v.z(), n.x(), n.y(), n.z()});
     }
@@ -189,7 +265,8 @@ void NetworkObject::createNodeGeometry()
 
 void NetworkObject::createEdgeGeometry()
 {
-    if (!m_edgeVertexData.isEmpty()) return;
+    if (!m_edgeVertexData.isEmpty())
+        return;
 
     // Create a unit cylinder along Y axis (height=1, radius=1, scaled per-instance)
     const int segments = 8;
@@ -287,9 +364,10 @@ void NetworkObject::buildNodeInstances()
         return;
     }
 
-    const auto &nodes = m_network.getNodes();
+    const auto& nodes = m_network.getNodes();
     qint16 iMaxDegree = m_network.getMinMaxThresholdedDegrees().second;
-    if (iMaxDegree == 0) iMaxDegree = 1;
+    if (iMaxDegree == 0)
+        iMaxDegree = 1;
 
     VisualizationInfo vizInfo = m_network.getVisualizationInfo();
 
@@ -298,9 +376,10 @@ void NetworkObject::buildNodeInstances()
 
     for (int i = 0; i < nodes.size(); ++i) {
         qint16 degree = nodes[i]->getThresholdedDegree();
-        if (degree == 0) continue;
+        if (degree == 0)
+            continue;
 
-        const RowVectorXf &vert = nodes[i]->getVert();
+        const RowVectorXf& vert = nodes[i]->getVert();
         QVector3D pos(vert(0), vert(1), vert(2));
 
         // Scale: nodes with higher degree are larger
@@ -312,8 +391,9 @@ void NetworkObject::buildNodeInstances()
         m.scale(scaleFactor);
 
         InstanceData inst;
-        const float *mPtr = m.constData();
-        for (int j = 0; j < 16; ++j) inst.model[j] = mPtr[j];
+        const float* mPtr = m.constData();
+        for (int j = 0; j < 16; ++j)
+            inst.model[j] = mPtr[j];
 
         // Color: colormap-based or fixed
         if (vizInfo.sMethod == "Map") {
@@ -356,13 +436,14 @@ void NetworkObject::buildEdgeInstances()
         return;
     }
 
-    const auto &edges = m_network.getThresholdedEdges();
-    const auto &nodes = m_network.getNodes();
+    const auto& edges = m_network.getThresholdedEdges();
+    const auto& nodes = m_network.getNodes();
 
     double dMaxWeight = m_network.getMinMaxThresholdedWeights().second;
     double dMinWeight = m_network.getMinMaxThresholdedWeights().first;
     double dWeightRange = dMaxWeight - dMinWeight;
-    if (dWeightRange == 0.0) dWeightRange = 1.0;
+    if (dWeightRange == 0.0)
+        dWeightRange = 1.0;
 
     VisualizationInfo vizInfo = m_network.getVisualizationInfo();
 
@@ -370,24 +451,28 @@ void NetworkObject::buildEdgeInstances()
     instances.reserve(edges.size());
 
     for (int i = 0; i < edges.size(); ++i) {
-        auto &edge = edges[i];
-        if (!edge->isActive()) continue;
+        auto& edge = edges[i];
+        if (!edge->isActive())
+            continue;
 
         int iStart = edge->getStartNodeID();
         int iEnd = edge->getEndNodeID();
 
-        if (iStart < 0 || iStart >= nodes.size() || iEnd < 0 || iEnd >= nodes.size()) continue;
+        if (iStart < 0 || iStart >= nodes.size() || iEnd < 0 || iEnd >= nodes.size())
+            continue;
 
-        const RowVectorXf &vStart = nodes[iStart]->getVert();
-        const RowVectorXf &vEnd = nodes[iEnd]->getVert();
+        const RowVectorXf& vStart = nodes[iStart]->getVert();
+        const RowVectorXf& vEnd = nodes[iEnd]->getVert();
 
         QVector3D startPos(vStart(0), vStart(1), vStart(2));
         QVector3D endPos(vEnd(0), vEnd(1), vEnd(2));
 
-        if (startPos == endPos) continue;
+        if (startPos == endPos)
+            continue;
 
         double dWeight = std::fabs(edge->getWeight());
-        if (dWeight == 0.0) continue;
+        if (dWeight == 0.0)
+            continue;
 
         QVector3D diff = endPos - startPos;
         QVector3D midPoint = startPos + diff / 2.0f;
@@ -405,8 +490,9 @@ void NetworkObject::buildEdgeInstances()
         m.scale(edgeRadius, length, edgeRadius);
 
         InstanceData inst;
-        const float *mPtr = m.constData();
-        for (int j = 0; j < 16; ++j) inst.model[j] = mPtr[j];
+        const float* mPtr = m.constData();
+        for (int j = 0; j < 16; ++j)
+            inst.model[j] = mPtr[j];
 
         // Color
         if (vizInfo.sMethod == "Map") {
@@ -441,7 +527,7 @@ void NetworkObject::buildEdgeInstances()
 
 //=============================================================================================================
 
-void NetworkObject::updateNodeBuffers(QRhi *rhi, QRhiResourceUpdateBatch *u)
+void NetworkObject::updateNodeBuffers(QRhi* rhi, QRhiResourceUpdateBatch* u)
 {
     if (m_nodeGeometryDirty) {
         if (!m_gpu->nodeVertexBuffer) {
@@ -470,7 +556,7 @@ void NetworkObject::updateNodeBuffers(QRhi *rhi, QRhiResourceUpdateBatch *u)
 
 //=============================================================================================================
 
-void NetworkObject::updateEdgeBuffers(QRhi *rhi, QRhiResourceUpdateBatch *u)
+void NetworkObject::updateEdgeBuffers(QRhi* rhi, QRhiResourceUpdateBatch* u)
 {
     if (m_edgeGeometryDirty) {
         if (!m_gpu->edgeVertexBuffer) {

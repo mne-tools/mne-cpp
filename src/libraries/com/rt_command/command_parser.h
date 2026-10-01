@@ -76,14 +76,13 @@ class COMSHARED_EXPORT CommandParser : public QObject, public UTILSLIB::Subject
     Q_OBJECT
 
 public:
-
     //=========================================================================================================
     /**
      * Default constructor
      *
      * @param[in] parent     Parent QObject (optional).
      */
-    explicit CommandParser(QObject *parent = 0);
+    explicit CommandParser(QObject* parent = 0);
 
     //=========================================================================================================
     /**
@@ -104,7 +103,7 @@ public:
      *
      * @return false if the input is empty, malformed JSON or an unknown CLI command, true otherwise.
      */
-    bool parse(const QString &p_sInput, QStringList &p_qListCommandsParsed);
+    bool parse(const QString& p_sInput, QStringList& p_qListCommandsParsed);
 
     //=========================================================================================================
     /**

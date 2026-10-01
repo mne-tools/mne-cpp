@@ -54,7 +54,7 @@ using namespace Eigen;
 #define PROGRAM_VERSION MNE_CPP_VERSION
 
 #define COR_NSLICE 256
-#define COR_NPIX   256
+#define COR_NPIX 256
 #define COR_SLICE_SIZE (COR_NPIX * COR_NPIX)
 
 //=============================================================================================================
@@ -78,7 +78,7 @@ static bool readCorDirectory(const QString& dirPath, std::vector<std::vector<uns
         }
         slices[k].assign(data.constData(), data.constData() + data.size());
     }
-    qInfo("Read %d COR slices from %s" , COR_NSLICE, dirPath.toUtf8().constData());
+    qInfo("Read %d COR slices from %s", COR_NSLICE, dirPath.toUtf8().constData());
     return true;
 }
 
@@ -152,14 +152,14 @@ static bool writeMriDescription(const QString& filename,
     stream->end_block(FIFFB_MRI);
     stream->end_file();
 
-    qInfo("Wrote MRI description to %s (%dx%dx%d)" ,
-           filename.toUtf8().constData(), width, height, nslice);
+    qInfo("Wrote MRI description to %s (%dx%dx%d)",
+          filename.toUtf8().constData(), width, height, nslice);
     return true;
 }
 
 //=============================================================================================================
 
-int main(int argc, char *argv[])
+int main(int argc, char* argv[])
 {
     qInstallMessageHandler(MNELogger::customLogWriter);
     QCoreApplication app(argc, argv);
@@ -242,7 +242,7 @@ int main(int argc, char *argv[])
         // Skip rest of header (284 bytes total - 24 already read)
         in.skipRawData(284 - 24);
 
-        qInfo("Read MGH: %dx%dx%d, type=%d" , width, height, nslice, type);
+        qInfo("Read MGH: %dx%dx%d, type=%d", width, height, nslice, type);
 
         slices.resize(nslice);
         int sliceSize = width * height;

@@ -53,7 +53,7 @@ MNEMeasDataSet::~MNEMeasDataSet()
 
 //=============================================================================================================
 
-int MNEMeasDataSet::getValuesAtTime(float time, float integ, int nch, bool use_abs, float *value) const
+int MNEMeasDataSet::getValuesAtTime(float time, float integ, int nch, bool use_abs, float* value) const
 {
     constexpr float EPS = 0.05f;
     const float sfreq = 1.0f / tstep;
@@ -155,8 +155,8 @@ int MNEMeasDataSet::getValuesAtTime(float time, float integ, int nch, bool use_a
 
 //=============================================================================================================
 
-int MNEMeasDataSet::getValuesFromChannelData(float time, float integ, float **data, int nsamp, int nch,
-                                             float tmin, float sfreq, bool use_abs, float *value)
+int MNEMeasDataSet::getValuesFromChannelData(float time, float integ, float** data, int nsamp, int nch,
+                                             float tmin, float sfreq, bool use_abs, float* value)
 {
     constexpr float EPS = 0.05f;
 

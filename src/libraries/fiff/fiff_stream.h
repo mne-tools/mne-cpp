@@ -110,10 +110,10 @@ class FiffDigitizerData;
 class FIFFSHARED_EXPORT FiffStream : public QDataStream
 {
 public:
-    using SPtr = QSharedPointer<FiffStream>;            /**< Shared pointer type for FiffStream. */
-    using ConstSPtr = QSharedPointer<const FiffStream>; /**< Const shared pointer type for FiffStream. */
-    using UPtr = std::unique_ptr<FiffStream>;             /**< Unique pointer type for FiffStream. */
-    using ConstUPtr = std::unique_ptr<const FiffStream>;  /**< Const unique pointer type for FiffStream. */
+    using SPtr = QSharedPointer<FiffStream>;             /**< Shared pointer type for FiffStream. */
+    using ConstSPtr = QSharedPointer<const FiffStream>;  /**< Const shared pointer type for FiffStream. */
+    using UPtr = std::unique_ptr<FiffStream>;            /**< Unique pointer type for FiffStream. */
+    using ConstUPtr = std::unique_ptr<const FiffStream>; /**< Const unique pointer type for FiffStream. */
 
     //=========================================================================================================
     /**
@@ -121,7 +121,7 @@ public:
      *
      * @param[in] p_pIODevice    A fiff IO device like a fiff QFile or QTCPSocket.
      */
-    explicit FiffStream(QIODevice *p_pIODevice);
+    explicit FiffStream(QIODevice* p_pIODevice);
 
     //=========================================================================================================
     /**
@@ -130,7 +130,7 @@ public:
      * @param[in] a      The byte array.
      * @param[in] mode   The open mode.
      */
-    explicit FiffStream(QByteArray * a, QIODevice::OpenMode mode);
+    explicit FiffStream(QByteArray* a, QIODevice::OpenMode mode);
 
     //=========================================================================================================
     /**
@@ -218,7 +218,7 @@ public:
      *
      * @return true if information is available, false otherwise.
      */
-    bool get_evoked_entries(const QList<FiffDirNode::SPtr> &evoked_node, QStringList &comments, QList<fiff_int_t> &aspect_kinds, QString &t);
+    bool get_evoked_entries(const QList<FiffDirNode::SPtr>& evoked_node, QStringList& comments, QList<fiff_int_t>& aspect_kinds, QString& t);
 
     //=========================================================================================================
     /**
@@ -226,7 +226,7 @@ public:
      *
      * unmask base class open function
      */
-//    using QFile::open;
+    //    using QFile::open;
 
     //=========================================================================================================
     /**
@@ -448,7 +448,7 @@ public:
      *
      * @return true if succeeded, false otherwise.
      */
-    static bool setup_read_raw(QIODevice &p_IODevice,
+    static bool setup_read_raw(QIODevice& p_IODevice,
                                FiffRawData& data,
                                bool allow_maxshield = true,
                                bool is_littleEndian = false);
@@ -509,7 +509,7 @@ public:
      *
      * @return the started fiff file.
      */
-    static FiffStream::SPtr start_writing_raw(QIODevice &p_IODevice,
+    static FiffStream::SPtr start_writing_raw(QIODevice& p_IODevice,
                                               const FiffInfo& info,
                                               Eigen::RowVectorXd& cals,
                                               Eigen::MatrixXi sel = defaultMatrixXi,
@@ -557,7 +557,7 @@ public:
      *
      * @return the position where the coordinate transformation struct was written to.
      */
-    fiff_long_t write_coord_trans(const FiffCoordTrans &trans);
+    fiff_long_t write_coord_trans(const FiffCoordTrans& trans);
 
     //=========================================================================================================
     /**
@@ -567,7 +567,7 @@ public:
      *
      * @return the position where the covaraince was written to.
      */
-    fiff_long_t write_cov(const FiffCov &p_FiffCov);
+    fiff_long_t write_cov(const FiffCov& p_FiffCov);
 
     //=========================================================================================================
     /**
@@ -650,7 +650,7 @@ public:
      *
      * @return the position where the info base struct was written to.
      */
-    fiff_long_t write_info_base(const FiffInfoBase & p_FiffInfoBase);
+    fiff_long_t write_info_base(const FiffInfoBase& p_FiffInfoBase);
 
     //=========================================================================================================
     /**
@@ -873,19 +873,17 @@ private:
      *
      * @return The created directory.
      */
-    QList<FiffDirEntry::SPtr> make_dir(bool *ok=nullptr);
+    QList<FiffDirEntry::SPtr> make_dir(bool* ok = nullptr);
 
 private:
-
-//    char         *file_name;    /**< Name of the file. */ -> Use streamName() instead
-//    FILE         *fd;           /**< The normal file descriptor. */ -> file descitpion is part of the stream: stream->device()
-    FiffId                      m_id;   /**< The file identifier. */
-    QList<FiffDirEntry::SPtr>   m_dir;  /**< This is the directory. If no directory exists, open automatically scans the file to create one. */
-//    int         nent;           /**< How many entries? */ -> Use nent() instead
-    FiffDirNode::SPtr           m_dirtree; /**< Directory compiled into a tree. */
-//    char        *ext_file_name; /**< Name of the file holding the external data. */
-//    FILE        *ext_fd;        /**< The file descriptor of the above file if open . */
-
+    //    char         *file_name;    /**< Name of the file. */ -> Use streamName() instead
+    //    FILE         *fd;           /**< The normal file descriptor. */ -> file descitpion is part of the stream: stream->device()
+    FiffId m_id;                     /**< The file identifier. */
+    QList<FiffDirEntry::SPtr> m_dir; /**< This is the directory. If no directory exists, open automatically scans the file to create one. */
+                                     //    int         nent;           /**< How many entries? */ -> Use nent() instead
+    FiffDirNode::SPtr m_dirtree;     /**< Directory compiled into a tree. */
+    //    char        *ext_file_name; /**< Name of the file holding the external data. */
+    //    FILE        *ext_fd;        /**< The file descriptor of the above file if open . */
 };
 } // NAMESPACE
 

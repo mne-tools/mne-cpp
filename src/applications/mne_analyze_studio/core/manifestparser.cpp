@@ -32,8 +32,8 @@ ExtensionManifest ManifestParser::parseFile(const QString& manifestFilePath, QSt
     ExtensionManifest manifest;
 
     QFile file(manifestFilePath);
-    if(!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
-        if(errorMessage) {
+    if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
+        if (errorMessage) {
             *errorMessage = QString("Could not open manifest: %1").arg(manifestFilePath);
         }
         return manifest;
@@ -41,8 +41,8 @@ ExtensionManifest ManifestParser::parseFile(const QString& manifestFilePath, QSt
 
     QJsonParseError error;
     const QJsonDocument document = QJsonDocument::fromJson(file.readAll(), &error);
-    if(error.error != QJsonParseError::NoError || !document.isObject()) {
-        if(errorMessage) {
+    if (error.error != QJsonParseError::NoError || !document.isObject()) {
+        if (errorMessage) {
             *errorMessage = QString("Invalid manifest JSON in %1: %2").arg(manifestFilePath, error.errorString());
         }
         return manifest;
@@ -58,7 +58,7 @@ ExtensionManifest ManifestParser::parseFile(const QString& manifestFilePath, QSt
 
     const QJsonObject contributes = root.value("contributes").toObject();
     const QJsonArray viewProviders = contributes.value("view_providers").toArray();
-    for(const QJsonValue& value : viewProviders) {
+    for (const QJsonValue& value : viewProviders) {
         const QJsonObject object = value.toObject();
         ViewProviderContribution contribution;
         contribution.id = object.value("id").toString();
@@ -71,14 +71,14 @@ ExtensionManifest ManifestParser::parseFile(const QString& manifestFilePath, QSt
         contribution.stateSchema = object.value("state_schema").toObject();
         contribution.initialState = object.value("initial_state").toObject();
         const QJsonArray fileExtensions = object.value("file_extensions").toArray();
-        for(const QJsonValue& extensionValue : fileExtensions) {
+        for (const QJsonValue& extensionValue : fileExtensions) {
             contribution.fileExtensions.append(extensionValue.toString().trimmed().toLower());
         }
         manifest.viewProviders.append(contribution);
     }
 
     const QJsonArray tools = contributes.value("tools").toArray();
-    for(const QJsonValue& value : tools) {
+    for (const QJsonValue& value : tools) {
         const QJsonObject object = value.toObject();
         ToolContribution tool;
         tool.name = object.value("name").toString();
@@ -89,16 +89,16 @@ ExtensionManifest ManifestParser::parseFile(const QString& manifestFilePath, QSt
     }
 
     const QJsonArray resultRenderers = contributes.value("result_renderers").toArray();
-    for(const QJsonValue& value : resultRenderers) {
+    for (const QJsonValue& value : resultRenderers) {
         const QJsonObject object = value.toObject();
         ResultRendererContribution renderer;
         renderer.id = object.value("id").toString().trimmed();
         renderer.displayName = object.value("display_name").toString(renderer.id);
         renderer.widgetType = object.value("widget_type").toString("result_renderer");
         const QJsonArray toolNames = object.value("tool_names").toArray();
-        for(const QJsonValue& toolValue : toolNames) {
+        for (const QJsonValue& toolValue : toolNames) {
             const QString toolName = toolValue.toString().trimmed();
-            if(!toolName.isEmpty()) {
+            if (!toolName.isEmpty()) {
                 renderer.toolNames.append(toolName);
             }
         }
@@ -106,13 +106,13 @@ ExtensionManifest ManifestParser::parseFile(const QString& manifestFilePath, QSt
         renderer.actions = object.value("actions").toArray();
         renderer.runtimeContextSchema = object.value("runtime_context_schema").toObject();
         renderer.historySchema = object.value("history_schema").toObject();
-        if(!renderer.id.isEmpty()) {
+        if (!renderer.id.isEmpty()) {
             manifest.resultRenderers.append(renderer);
         }
     }
 
     const QJsonArray analysisPipelines = contributes.value("analysis_pipelines").toArray();
-    for(const QJsonValue& value : analysisPipelines) {
+    for (const QJsonValue& value : analysisPipelines) {
         const QJsonObject object = value.toObject();
         AnalysisPipelineContribution pipeline;
         pipeline.id = object.value("id").toString().trimmed();
@@ -122,22 +122,22 @@ ExtensionManifest ManifestParser::parseFile(const QString& manifestFilePath, QSt
         pipeline.outputSchema = object.value("output_schema").toObject();
         pipeline.steps = object.value("steps").toArray();
         pipeline.followUpActions = object.value("follow_up_actions").toArray();
-        if(!pipeline.id.isEmpty()) {
+        if (!pipeline.id.isEmpty()) {
             manifest.analysisPipelines.append(pipeline);
         }
     }
 
     const QJsonObject ui = contributes.value("ui").toObject();
     const QJsonArray sidebarItems = ui.value("sidebar_items").toArray();
-    for(const QJsonValue& value : sidebarItems) {
+    for (const QJsonValue& value : sidebarItems) {
         manifest.ui.sidebarItems.append(value.toString());
     }
     const QJsonArray menuItems = ui.value("menu_items").toArray();
-    for(const QJsonValue& value : menuItems) {
+    for (const QJsonValue& value : menuItems) {
         manifest.ui.menuItems.append(value.toString());
     }
     const QJsonArray settingsTabs = ui.value("settings_tabs").toArray();
-    for(const QJsonValue& value : settingsTabs) {
+    for (const QJsonValue& value : settingsTabs) {
         const QJsonObject object = value.toObject();
         UiContribution::SettingsTabContribution tab;
         tab.id = object.value("id").toString().trimmed();
@@ -145,12 +145,12 @@ ExtensionManifest ManifestParser::parseFile(const QString& manifestFilePath, QSt
         tab.description = object.value("description").toString().trimmed();
         tab.fields = object.value("fields").toArray();
         tab.actions = object.value("actions").toArray();
-        if(!tab.id.isEmpty()) {
+        if (!tab.id.isEmpty()) {
             manifest.ui.settingsTabs.append(tab);
         }
     }
 
-    if(!manifest.isValid() && errorMessage) {
+    if (!manifest.isValid() && errorMessage) {
         *errorMessage = QString("Manifest in %1 is missing an id.").arg(manifestFilePath);
     }
 

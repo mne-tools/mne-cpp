@@ -44,8 +44,9 @@
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-namespace Ui {
-    class DipoleFitViewWidget;
+namespace Ui
+{
+class DipoleFitViewWidget;
 }
 
 //=============================================================================================================
@@ -69,7 +70,7 @@ class DISPSHARED_EXPORT DipoleFitView : public AbstractView
     Q_OBJECT
 
 public:
-    DipoleFitView(QWidget *parent = 0,
+    DipoleFitView(QWidget* parent = 0,
                   Qt::WindowFlags f = Qt::Widget);
 
     //=========================================================================================================
@@ -155,14 +156,13 @@ protected:
     void updateProcessingMode(ProcessingMode mode);
 
 private:
-
     //=========================================================================================================
     /**
      * Sets up Gui slot/signal connections and initializes item group box selections
      */
     void initGui();
 
-    Ui::DipoleFitViewWidget*        m_pUi;              /**< Holds GUI for view. */
+    Ui::DipoleFitViewWidget* m_pUi; /**< Holds GUI for view. */
 
 signals:
     //=========================================================================================================
@@ -292,8 +292,7 @@ signals:
      * @param[in] sName    file name.
      */
     void selectedMeas(const QString& sName);
-
 };
-}//namespace
+} //namespace
 
 #endif // DIPOLEFITVIEW_H

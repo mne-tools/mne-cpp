@@ -66,7 +66,7 @@ using namespace Eigen;
  *
  * @brief The TestFiffEvokedPython class checks the evoked reader against mne-python.
  */
-class TestFiffEvokedPython: public QObject
+class TestFiffEvokedPython : public QObject
 {
     Q_OBJECT
 
@@ -93,15 +93,14 @@ private slots:
 
 QString TestFiffEvokedPython::avePath()
 {
-    return QCoreApplication::applicationDirPath()
-           + "/../resources/data/mne-cpp-test-data/MEG/sample/sample_audvis-ave.fif";
+    return QCoreApplication::applicationDirPath() + "/../resources/data/mne-cpp-test-data/MEG/sample/sample_audvis-ave.fif";
 }
 
 //=============================================================================================================
 
 void TestFiffEvokedPython::initTestCase()
 {
-    if(!QFile::exists(avePath())) {
+    if (!QFile::exists(avePath())) {
         QSKIP("Averaged test data not found");
     }
 
@@ -123,10 +122,10 @@ void TestFiffEvokedPython::conditions_matchPython_data()
     // nave and the data sum are checked together on the same row, which is what
     // makes a mismatched pairing visible. Checking them in separate tests would
     // let a set with swapped naves pass both.
-    QTest::newRow("left auditory")  << 0 << "Left Auditory"  << 55 <<  5.710164498347e+01;
-    QTest::newRow("right auditory") << 1 << "Right Auditory" << 61 <<  7.910733502294e+01;
-    QTest::newRow("left visual")    << 2 << "Left visual"    << 67 <<  1.142761471304e+02;
-    QTest::newRow("right visual")   << 3 << "Right visual"   << 58 <<  9.442361010079e+01;
+    QTest::newRow("left auditory") << 0 << "Left Auditory" << 55 << 5.710164498347e+01;
+    QTest::newRow("right auditory") << 1 << "Right Auditory" << 61 << 7.910733502294e+01;
+    QTest::newRow("left visual") << 2 << "Left visual" << 67 << 1.142761471304e+02;
+    QTest::newRow("right visual") << 3 << "Right visual" << 58 << 9.442361010079e+01;
 }
 
 //=============================================================================================================
@@ -161,7 +160,9 @@ void TestFiffEvokedPython::conditions_matchPython()
     const double sum = e.data.sum();
     QVERIFY2(std::fabs(sum - dataSum) / std::fabs(dataSum) < 1.0e-7,
              qPrintable(QString("%1 data sums to %2, mne-python says %3")
-                        .arg(comment).arg(sum, 0, 'e', 12).arg(dataSum, 0, 'e', 12)));
+                            .arg(comment)
+                            .arg(sum, 0, 'e', 12)
+                            .arg(dataSum, 0, 'e', 12)));
 }
 
 //=============================================================================================================
@@ -170,7 +171,7 @@ void TestFiffEvokedPython::times_matchPython()
 {
     // Every condition shares one time axis. If it were off, the whole response
     // would be shifted in time while still looking like a clean evoked field.
-    for(const FiffEvoked& e : m_set.evoked) {
+    for (const FiffEvoked& e : m_set.evoked) {
         QCOMPARE(static_cast<int>(e.times.size()), 421);
 
         const double tmin = static_cast<double>(e.times(0));
@@ -180,10 +181,12 @@ void TestFiffEvokedPython::times_matchPython()
         // rather than as exact doubles.
         QVERIFY2(std::fabs(tmin - (-0.19979521315838786)) < 1.0e-7,
                  qPrintable(QString("%1 starts at %2, mne-python says -0.19979521315838786")
-                            .arg(e.comment).arg(tmin, 0, 'g', 17)));
+                                .arg(e.comment)
+                                .arg(tmin, 0, 'g', 17)));
         QVERIFY2(std::fabs(tmax - 0.49948803289596966) < 1.0e-7,
                  qPrintable(QString("%1 ends at %2, mne-python says 0.49948803289596966")
-                            .arg(e.comment).arg(tmax, 0, 'g', 17)));
+                                .arg(e.comment)
+                                .arg(tmax, 0, 'g', 17)));
 
         // The time axis has to line up with the data it labels.
         QCOMPARE(static_cast<int>(e.times.size()), static_cast<int>(e.data.cols()));
@@ -199,7 +202,7 @@ void TestFiffEvokedPython::conditionOrder_matchesPython()
     const QStringList expected{"Left Auditory", "Right Auditory", "Left visual", "Right visual"};
 
     QStringList actual;
-    for(const FiffEvoked& e : m_set.evoked) {
+    for (const FiffEvoked& e : m_set.evoked) {
         actual << e.comment;
     }
 
@@ -215,15 +218,17 @@ void TestFiffEvokedPython::dataSumsAreDistinct()
     // data ever made two conditions identical the check would quietly weaken
     // and this states that assumption out loud.
     QList<double> sums;
-    for(const FiffEvoked& e : m_set.evoked) {
+    for (const FiffEvoked& e : m_set.evoked) {
         sums << e.data.sum();
     }
 
-    for(int i = 0; i < sums.size(); ++i) {
-        for(int j = i + 1; j < sums.size(); ++j) {
+    for (int i = 0; i < sums.size(); ++i) {
+        for (int j = i + 1; j < sums.size(); ++j) {
             QVERIFY2(std::fabs(sums.at(i) - sums.at(j)) > 1.0,
                      qPrintable(QString("conditions %1 and %2 have near identical data sums, "
-                                        "which makes the pairing check meaningless").arg(i).arg(j)));
+                                        "which makes the pairing check meaningless")
+                                    .arg(i)
+                                    .arg(j)));
         }
     }
 }

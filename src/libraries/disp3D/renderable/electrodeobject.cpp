@@ -35,8 +35,8 @@ using namespace DISP3DLIB;
 struct ElectrodeObject::GpuBuffers
 {
     std::unique_ptr<QRhiBuffer> vertexBuffer;   // shaft geometry (pos+normal)
-    std::unique_ptr<QRhiBuffer> indexBuffer;     // shaft triangle indices
-    std::unique_ptr<QRhiBuffer> instanceBuffer;  // per-contact instance data
+    std::unique_ptr<QRhiBuffer> indexBuffer;    // shaft triangle indices
+    std::unique_ptr<QRhiBuffer> instanceBuffer; // per-contact instance data
     uint32_t shaftIndexCount = 0;
     uint32_t instanceCount = 0;
     bool dirty = true;
@@ -47,13 +47,13 @@ struct ElectrodeObject::GpuBuffers
 //=============================================================================================================
 
 ElectrodeObject::ElectrodeObject()
-    : m_bbMin(std::numeric_limits<float>::max(),
-              std::numeric_limits<float>::max(),
-              std::numeric_limits<float>::max())
-    , m_bbMax(std::numeric_limits<float>::lowest(),
-              std::numeric_limits<float>::lowest(),
-              std::numeric_limits<float>::lowest())
-    , m_gpu(std::make_unique<GpuBuffers>())
+: m_bbMin(std::numeric_limits<float>::max(),
+          std::numeric_limits<float>::max(),
+          std::numeric_limits<float>::max())
+, m_bbMax(std::numeric_limits<float>::lowest(),
+          std::numeric_limits<float>::lowest(),
+          std::numeric_limits<float>::lowest())
+, m_gpu(std::make_unique<GpuBuffers>())
 {
 }
 
@@ -101,8 +101,10 @@ void ElectrodeObject::setContactValues(const QMap<QString, float>& values,
     float minVal = std::numeric_limits<float>::max();
     float maxVal = std::numeric_limits<float>::lowest();
     for (auto it = values.cbegin(); it != values.cend(); ++it) {
-        if (it.value() < minVal) minVal = it.value();
-        if (it.value() > maxVal) maxVal = it.value();
+        if (it.value() < minVal)
+            minVal = it.value();
+        if (it.value() > maxVal)
+            maxVal = it.value();
     }
 
     // Apply to contacts
@@ -181,7 +183,7 @@ void ElectrodeObject::generateShaftGeometry(QVector<float>& vertices,
         if (shaft.contacts.size() < 2)
             continue;
 
-        const QVector3D& tipPos  = shaft.contacts.first().position;
+        const QVector3D& tipPos = shaft.contacts.first().position;
         const QVector3D& tailPos = shaft.contacts.last().position;
         const QVector3D axis = tailPos - tipPos;
         const float length = axis.length();
@@ -232,8 +234,12 @@ void ElectrodeObject::generateShaftGeometry(QVector<float>& vertices,
             const unsigned int i3 = i1 + static_cast<unsigned int>(cylinderSides);
 
             // Two triangles per quad
-            indices.append(i0); indices.append(i2); indices.append(i1);
-            indices.append(i1); indices.append(i2); indices.append(i3);
+            indices.append(i0);
+            indices.append(i2);
+            indices.append(i1);
+            indices.append(i1);
+            indices.append(i2);
+            indices.append(i3);
         }
 
         // Tip endcap (ring 0, center = tipPos)
@@ -250,7 +256,9 @@ void ElectrodeObject::generateShaftGeometry(QVector<float>& vertices,
             for (int i = 0; i < cylinderSides; ++i) {
                 const unsigned int i0 = baseIdx + static_cast<unsigned int>(i);
                 const unsigned int i1 = baseIdx + static_cast<unsigned int>((i + 1) % cylinderSides);
-                indices.append(centerIdx); indices.append(i1); indices.append(i0);
+                indices.append(centerIdx);
+                indices.append(i1);
+                indices.append(i0);
             }
         }
 
@@ -269,7 +277,9 @@ void ElectrodeObject::generateShaftGeometry(QVector<float>& vertices,
             for (int i = 0; i < cylinderSides; ++i) {
                 const unsigned int i0 = ring1Base + static_cast<unsigned int>(i);
                 const unsigned int i1 = ring1Base + static_cast<unsigned int>((i + 1) % cylinderSides);
-                indices.append(centerIdx); indices.append(i0); indices.append(i1);
+                indices.append(centerIdx);
+                indices.append(i0);
+                indices.append(i1);
             }
         }
     }
@@ -332,13 +342,19 @@ void ElectrodeObject::computeBoundingBox()
             const float pad = contact.radius;
             const QVector3D& p = contact.position;
 
-            if (p.x() - pad < m_bbMin.x()) m_bbMin.setX(p.x() - pad);
-            if (p.y() - pad < m_bbMin.y()) m_bbMin.setY(p.y() - pad);
-            if (p.z() - pad < m_bbMin.z()) m_bbMin.setZ(p.z() - pad);
+            if (p.x() - pad < m_bbMin.x())
+                m_bbMin.setX(p.x() - pad);
+            if (p.y() - pad < m_bbMin.y())
+                m_bbMin.setY(p.y() - pad);
+            if (p.z() - pad < m_bbMin.z())
+                m_bbMin.setZ(p.z() - pad);
 
-            if (p.x() + pad > m_bbMax.x()) m_bbMax.setX(p.x() + pad);
-            if (p.y() + pad > m_bbMax.y()) m_bbMax.setY(p.y() + pad);
-            if (p.z() + pad > m_bbMax.z()) m_bbMax.setZ(p.z() + pad);
+            if (p.x() + pad > m_bbMax.x())
+                m_bbMax.setX(p.x() + pad);
+            if (p.y() + pad > m_bbMax.y())
+                m_bbMax.setY(p.y() + pad);
+            if (p.z() + pad > m_bbMax.z())
+                m_bbMax.setZ(p.z() + pad);
         }
     }
 }
@@ -354,9 +370,9 @@ QColor ElectrodeObject::interpolateColor(float value, float minVal, float maxVal
     float t = (value - minVal) / (maxVal - minVal);
     t = qBound(0.0f, t, 1.0f);
 
-    const float r = static_cast<float>(minColor.redF())   * (1.0f - t) + static_cast<float>(maxColor.redF())   * t;
+    const float r = static_cast<float>(minColor.redF()) * (1.0f - t) + static_cast<float>(maxColor.redF()) * t;
     const float g = static_cast<float>(minColor.greenF()) * (1.0f - t) + static_cast<float>(maxColor.greenF()) * t;
-    const float b = static_cast<float>(minColor.blueF())  * (1.0f - t) + static_cast<float>(maxColor.blueF())  * t;
+    const float b = static_cast<float>(minColor.blueF()) * (1.0f - t) + static_cast<float>(maxColor.blueF()) * t;
     const float a = static_cast<float>(minColor.alphaF()) * (1.0f - t) + static_cast<float>(maxColor.alphaF()) * t;
 
     QColor result;
@@ -369,7 +385,7 @@ QColor ElectrodeObject::interpolateColor(float value, float minVal, float maxVal
 
 //=============================================================================================================
 
-void ElectrodeObject::updateBuffers(QRhi *rhi, QRhiResourceUpdateBatch *u)
+void ElectrodeObject::updateBuffers(QRhi* rhi, QRhiResourceUpdateBatch* u)
 {
     const bool needsCreate = !m_gpu->vertexBuffer || !m_gpu->indexBuffer || !m_gpu->instanceBuffer;
 
@@ -391,7 +407,8 @@ void ElectrodeObject::updateBuffers(QRhi *rhi, QRhiResourceUpdateBatch *u)
         return;
     }
 #else
-    if (!m_gpu->dirty && !needsCreate) return;
+    if (!m_gpu->dirty && !needsCreate)
+        return;
 #endif
 
     // Generate CPU-side data
@@ -403,7 +420,7 @@ void ElectrodeObject::updateBuffers(QRhi *rhi, QRhiResourceUpdateBatch *u)
     generateContactInstances(instData);
 
     m_gpu->shaftIndexCount = static_cast<uint32_t>(shaftIdx.size());
-    m_gpu->instanceCount   = static_cast<uint32_t>(instData.size() / 9);
+    m_gpu->instanceCount = static_cast<uint32_t>(instData.size() / 9);
 
     // Shaft vertex buffer
     const quint32 vbufSize = static_cast<quint32>(shaftVerts.size() * sizeof(float));

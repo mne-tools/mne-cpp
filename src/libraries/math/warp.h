@@ -75,7 +75,6 @@ namespace UTILSLIB
 class MATHSHARED_EXPORT Warp
 {
 public:
-
     typedef QSharedPointer<Warp> SPtr;            /**< Shared pointer type for Warp. */
     typedef QSharedPointer<const Warp> ConstSPtr; /**< Const shared pointer type for Warp. */
 
@@ -89,9 +88,9 @@ public:
      *
      * @return wVert   Vertices of the warped destination geometry.
      */
-    Eigen::MatrixXf calculate(const Eigen::MatrixXf & sLm,
-                              const Eigen::MatrixXf &dLm,
-                              const Eigen::MatrixXf & sVert);
+    Eigen::MatrixXf calculate(const Eigen::MatrixXf& sLm,
+                              const Eigen::MatrixXf& dLm,
+                              const Eigen::MatrixXf& sVert);
 
     //=========================================================================================================
     /**
@@ -101,9 +100,9 @@ public:
      * @param[in] dLm       3D Landmarks of the destination geometry.
      * @param[in, out] vertList  List of Vertices of the source geometry that are warped to the destination.
      */
-    void calculate(const Eigen::MatrixXf & sLm,
-                   const Eigen::MatrixXf &dLm,
-                   QList<Eigen::MatrixXf> & vertList);
+    void calculate(const Eigen::MatrixXf& sLm,
+                   const Eigen::MatrixXf& dLm,
+                   QList<Eigen::MatrixXf>& vertList);
 
     //=========================================================================================================
     /**
@@ -113,7 +112,7 @@ public:
      *
      * @return electrodes   Matrix with electrode positions.
      */
-    Eigen::MatrixXf readsLm(const QString &electrodeFileName);
+    Eigen::MatrixXf readsLm(const QString& electrodeFileName);
 
     //=========================================================================================================
     /**
@@ -123,10 +122,9 @@ public:
      *
      * @return electrodes   Matrix with electrode positions.
      */
-    Eigen::MatrixXf readsLm(const std::string &electrodeFileName);
+    Eigen::MatrixXf readsLm(const std::string& electrodeFileName);
 
 private:
-
     //=========================================================================================================
     /**
      * Calculate the weighting parameters.
@@ -137,7 +135,7 @@ private:
      * @param[out] polWeight  Weighting papameters of the polynomial warp.
      */
     bool calcWeighting(const Eigen::MatrixXf& sLm,
-                       const Eigen::MatrixXf &dLm,
+                       const Eigen::MatrixXf& dLm,
                        Eigen::MatrixXf& warpWeight,
                        Eigen::MatrixXf& polWeight);
 
@@ -152,8 +150,8 @@ private:
      *
      * @return Warped Vertices.
      */
-    Eigen::MatrixXf warpVertices(const Eigen::MatrixXf & sVert,
-                                 const Eigen::MatrixXf & sLm,
+    Eigen::MatrixXf warpVertices(const Eigen::MatrixXf& sVert,
+                                 const Eigen::MatrixXf& sLm,
                                  const Eigen::MatrixXf& warpWeight,
                                  const Eigen::MatrixXf& polWeight);
 };

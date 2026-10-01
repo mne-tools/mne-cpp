@@ -98,8 +98,8 @@ private slots:
 
 private:
     MnaProject createTestProject(bool embed = true);
-    void createBidsTree(const QString &rootDir);
-    QString findTool(const QString &name);
+    void createBidsTree(const QString& rootDir);
+    QString findTool(const QString& name);
 
     QTemporaryDir m_tempDir;
     QString m_showMnaPath;
@@ -126,7 +126,7 @@ void TestMnaBids::cleanupTestCase()
 {
 }
 
-QString TestMnaBids::findTool(const QString &name)
+QString TestMnaBids::findTool(const QString& name)
 {
     // Look in same directory as the test binary
     const QString appDir = QCoreApplication::applicationDirPath();
@@ -248,7 +248,7 @@ MnaProject TestMnaBids::createTestProject(bool embed)
 // HELPER: create a BIDS directory tree with sample files
 //=============================================================================================================
 
-void TestMnaBids::createBidsTree(const QString &rootDir)
+void TestMnaBids::createBidsTree(const QString& rootDir)
 {
     QDir root(rootDir);
 
@@ -259,7 +259,7 @@ void TestMnaBids::createBidsTree(const QString &rootDir)
     root.mkpath("sub-sample/ses-01/source");
 
     // Write sample files
-    auto writeFile = [&](const QString &relPath, const QByteArray &data) {
+    auto writeFile = [&](const QString& relPath, const QByteArray& data) {
         QFile f(root.filePath(relPath));
         QVERIFY(f.open(QIODevice::WriteOnly));
         f.write(data);
@@ -297,10 +297,10 @@ void TestMnaBids::testExtractMnxToBidsDir()
     const QString extractDir = m_tempDir.filePath("extracted");
     QDir().mkpath(extractDir);
 
-    for (const MnaSubject &subj : loaded.subjects) {
-        for (const MnaSession &sess : subj.sessions) {
-            for (const MnaRecording &rec : sess.recordings) {
-                for (const MnaFileRef &ref : rec.files) {
+    for (const MnaSubject& subj : loaded.subjects) {
+        for (const MnaSession& sess : subj.sessions) {
+            for (const MnaRecording& rec : sess.recordings) {
+                for (const MnaFileRef& ref : rec.files) {
                     if (ref.embedded && !ref.data.isEmpty()) {
                         const QString fullPath = QDir(extractDir).filePath(ref.path);
                         QDir().mkpath(QFileInfo(fullPath).absolutePath());
@@ -332,10 +332,10 @@ void TestMnaBids::testExtractPreservesDirStructure()
     const QString extractDir = m_tempDir.filePath("dir_structure");
     QDir().mkpath(extractDir);
 
-    for (const auto &subj : loaded.subjects) {
-        for (const auto &sess : subj.sessions) {
-            for (const auto &rec : sess.recordings) {
-                for (const auto &ref : rec.files) {
+    for (const auto& subj : loaded.subjects) {
+        for (const auto& sess : subj.sessions) {
+            for (const auto& rec : sess.recordings) {
+                for (const auto& ref : rec.files) {
                     if (ref.embedded) {
                         const QString fullPath = QDir(extractDir).filePath(ref.path);
                         QDir().mkpath(QFileInfo(fullPath).absolutePath());
@@ -369,10 +369,10 @@ void TestMnaBids::testExtractedDataIntegrity()
     const QString extractDir = m_tempDir.filePath("integrity");
     QDir().mkpath(extractDir);
 
-    for (const auto &subj : loaded.subjects) {
-        for (const auto &sess : subj.sessions) {
-            for (const auto &rec : sess.recordings) {
-                for (const auto &ref : rec.files) {
+    for (const auto& subj : loaded.subjects) {
+        for (const auto& sess : subj.sessions) {
+            for (const auto& rec : sess.recordings) {
+                for (const auto& ref : rec.files) {
                     if (ref.embedded) {
                         const QString fullPath = QDir(extractDir).filePath(ref.path);
                         QDir().mkpath(QFileInfo(fullPath).absolutePath());
@@ -415,10 +415,10 @@ void TestMnaBids::testPackBidsDirToMnx()
 
     // Read sidecar and embed
     MnaProject loaded = MnaIO::read(bidsDir + "/project.mna");
-    for (MnaSubject &subj : loaded.subjects) {
-        for (MnaSession &sess : subj.sessions) {
-            for (MnaRecording &rec : sess.recordings) {
-                for (MnaFileRef &ref : rec.files) {
+    for (MnaSubject& subj : loaded.subjects) {
+        for (MnaSession& sess : subj.sessions) {
+            for (MnaRecording& rec : sess.recordings) {
+                for (MnaFileRef& ref : rec.files) {
                     if (!ref.embedded) {
                         QString filePath = QDir(bidsDir).filePath(ref.path);
                         QFile f(filePath);
@@ -442,9 +442,9 @@ void TestMnaBids::testPackBidsDirToMnx()
     MnaProject verify = MnaIO::read(mnxPath);
     QCOMPARE(verify.subjects.size(), 1);
     int totalFiles = 0;
-    for (const auto &s : verify.subjects)
-        for (const auto &se : s.sessions)
-            for (const auto &r : se.recordings)
+    for (const auto& s : verify.subjects)
+        for (const auto& se : s.sessions)
+            for (const auto& r : se.recordings)
                 totalFiles += r.files.size();
     QCOMPARE(totalFiles, 5);
 }
@@ -460,10 +460,10 @@ void TestMnaBids::testPackBidsDirToMna()
 
     // Read back and verify it's non-embedded
     MnaProject loaded = MnaIO::read(mnaPath);
-    for (const auto &subj : loaded.subjects)
-        for (const auto &sess : subj.sessions)
-            for (const auto &rec : sess.recordings)
-                for (const auto &ref : rec.files)
+    for (const auto& subj : loaded.subjects)
+        for (const auto& sess : subj.sessions)
+            for (const auto& rec : sess.recordings)
+                for (const auto& ref : rec.files)
                     QCOMPARE(ref.embedded, false);
 }
 
@@ -700,10 +700,10 @@ void TestMnaBids::testConverterPack()
     QCOMPARE(verify.subjects.size(), 1);
 
     // All files should be embedded (default for .mnx)
-    for (const auto &subj : verify.subjects)
-        for (const auto &sess : subj.sessions)
-            for (const auto &rec : sess.recordings)
-                for (const auto &ref : rec.files)
+    for (const auto& subj : verify.subjects)
+        for (const auto& sess : subj.sessions)
+            for (const auto& rec : sess.recordings)
+                for (const auto& ref : rec.files)
                     QCOMPARE(ref.embedded, true);
 }
 
@@ -783,8 +783,7 @@ void TestMnaBids::testMultiSubjectMultiSession()
 
     const QList<MnaFileRole> roles = {
         MnaFileRole::Surface, MnaFileRole::Annotation, MnaFileRole::Bem,
-        MnaFileRole::Digitizer, MnaFileRole::SourceEstimate
-    };
+        MnaFileRole::Digitizer, MnaFileRole::SourceEstimate};
 
     for (int si = 0; si < 3; ++si) {
         MnaSubject subj;
@@ -801,7 +800,7 @@ void TestMnaBids::testMultiSubjectMultiSession()
                 MnaFileRef ref;
                 ref.role = roles[fi];
                 ref.path = QString("sub-%1/ses-%2/%3/file_%4")
-                    .arg(subj.id, sess.id, mnaFileRoleToString(ref.role), QString::number(fi));
+                               .arg(subj.id, sess.id, mnaFileRoleToString(ref.role), QString::number(fi));
                 ref.embedded = true;
                 ref.data = QByteArray(32 * (fi + 1), static_cast<char>(si * 20 + sei * 10 + fi));
                 ref.sizeBytes = ref.data.size();
@@ -822,19 +821,19 @@ void TestMnaBids::testMultiSubjectMultiSession()
     QCOMPARE(verify.subjects.size(), 3);
 
     int totalFiles = 0;
-    for (const auto &s : verify.subjects)
-        for (const auto &se : s.sessions)
-            for (const auto &r : se.recordings)
+    for (const auto& s : verify.subjects)
+        for (const auto& se : s.sessions)
+            for (const auto& r : se.recordings)
                 totalFiles += r.files.size();
 
     QCOMPARE(totalFiles, 3 * 2 * 5); // 3 subjects × 2 sessions × 5 files
 
     // Verify data integrity of first and last file
-    const auto &firstFile = verify.subjects[0].sessions[0].recordings[0].files[0];
+    const auto& firstFile = verify.subjects[0].sessions[0].recordings[0].files[0];
     QCOMPARE(firstFile.data.size(), 32);
     QCOMPARE(firstFile.data[0], '\x00');
 
-    const auto &lastFile = verify.subjects[2].sessions[1].recordings[0].files[4];
+    const auto& lastFile = verify.subjects[2].sessions[1].recordings[0].files[4];
     QCOMPARE(lastFile.data.size(), 160);
     QCOMPARE(lastFile.data[0], static_cast<char>(2 * 20 + 1 * 10 + 4));
 }

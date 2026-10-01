@@ -55,8 +55,8 @@ namespace UTILSLIB
 class ICommand
 {
 public:
-    typedef QSharedPointer<ICommand> SPtr;             /**< Shared pointer type for ICommand. */
-    typedef QSharedPointer<const ICommand> ConstSPtr;  /**< Const shared pointer type for ICommand. */
+    typedef QSharedPointer<ICommand> SPtr;            /**< Shared pointer type for ICommand. */
+    typedef QSharedPointer<const ICommand> ConstSPtr; /**< Const shared pointer type for ICommand. */
 
     //=========================================================================================================
     /**

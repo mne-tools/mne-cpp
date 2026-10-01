@@ -25,9 +25,11 @@
 using namespace Eigen;
 using namespace FIFFLIB;
 
-namespace {
+namespace
+{
 
-FiffDigPoint makeDigPoint(int kind, const Vector3f& position, int coordFrame = FIFFV_COORD_HEAD) {
+FiffDigPoint makeDigPoint(int kind, const Vector3f& position, int coordFrame = FIFFV_COORD_HEAD)
+{
     FiffDigPoint point;
     point.kind = kind;
     point.coord_frame = coordFrame;
@@ -39,10 +41,11 @@ FiffDigPoint makeDigPoint(int kind, const Vector3f& position, int coordFrame = F
 
 } // namespace
 
-class TestSensorFieldMapper : public QObject {
+class TestSensorFieldMapper : public QObject
+{
     Q_OBJECT
 
-    private slots:
+private slots:
     void defaultsAndBaseline();
     void unloadedAndSurfaceLookup();
     void contourStep_data();
@@ -50,7 +53,8 @@ class TestSensorFieldMapper : public QObject {
     void sphereFit();
 };
 
-void TestSensorFieldMapper::defaultsAndBaseline() {
+void TestSensorFieldMapper::defaultsAndBaseline()
+{
     SensorFieldMapper mapper;
     QVERIFY(!mapper.isLoaded());
     QCOMPARE(mapper.timePoint(), 0);
@@ -83,7 +87,8 @@ void TestSensorFieldMapper::defaultsAndBaseline() {
     QVERIFY(!mapper.buildMapping(surfaces, FiffCoordTrans(), false));
 }
 
-void TestSensorFieldMapper::unloadedAndSurfaceLookup() {
+void TestSensorFieldMapper::unloadedAndSurfaceLookup()
+{
     SensorFieldMapper mapper;
     FiffEvoked emptyEvoked;
     mapper.setEvoked(emptyEvoked);
@@ -115,7 +120,8 @@ void TestSensorFieldMapper::unloadedAndSurfaceLookup() {
     mapper.apply(surfaces, SubView(), {});
 }
 
-void TestSensorFieldMapper::contourStep_data() {
+void TestSensorFieldMapper::contourStep_data()
+{
     QTest::addColumn<float>("minimum");
     QTest::addColumn<float>("maximum");
     QTest::addColumn<int>("ticks");
@@ -130,7 +136,8 @@ void TestSensorFieldMapper::contourStep_data() {
     QTest::newRow("milliscale") << 0.0f << 0.05f << 10 << 0.01f;
 }
 
-void TestSensorFieldMapper::contourStep() {
+void TestSensorFieldMapper::contourStep()
+{
     QFETCH(float, minimum);
     QFETCH(float, maximum);
     QFETCH(int, ticks);
@@ -139,7 +146,8 @@ void TestSensorFieldMapper::contourStep() {
     QCOMPARE(SensorFieldMapper::contourStep(minimum, maximum, ticks), expected);
 }
 
-void TestSensorFieldMapper::sphereFit() {
+void TestSensorFieldMapper::sphereFit()
+{
     FiffInfo emptyInfo;
     float radius = -1.0f;
     const Vector3f fallback = SensorFieldMapper::fitSphereOrigin(emptyInfo, &radius);
@@ -149,12 +157,12 @@ void TestSensorFieldMapper::sphereFit() {
     const Vector3f center(0.01f, -0.02f, 0.03f);
     constexpr float expectedRadius = 0.09f;
     const Vector3f offsets[] = {
-    Vector3f(expectedRadius, 0.0f, 0.0f),
-    Vector3f(-expectedRadius, 0.0f, 0.0f),
-    Vector3f(0.0f, expectedRadius, 0.0f),
-    Vector3f(0.0f, -expectedRadius, 0.0f),
-    Vector3f(0.0f, 0.0f, expectedRadius),
-    Vector3f(0.0f, 0.0f, -expectedRadius)};
+        Vector3f(expectedRadius, 0.0f, 0.0f),
+        Vector3f(-expectedRadius, 0.0f, 0.0f),
+        Vector3f(0.0f, expectedRadius, 0.0f),
+        Vector3f(0.0f, -expectedRadius, 0.0f),
+        Vector3f(0.0f, 0.0f, expectedRadius),
+        Vector3f(0.0f, 0.0f, -expectedRadius)};
 
     FiffInfo info;
     for (int i = 0; i < 6; ++i) {

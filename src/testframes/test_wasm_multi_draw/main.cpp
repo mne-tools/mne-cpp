@@ -43,40 +43,45 @@
 
 // ─── Vertex data: two independent triangles ─────────────────────────────────
 
-struct Vertex {
+struct Vertex
+{
     float pos[3];
     float col[3];
 };
 
 // RED triangle — left half
 static const Vertex triangleRed[] = {
-    {{ -0.9f, -0.6f, 0.0f }, { 1, 0, 0 }},
-    {{ -0.1f, -0.6f, 0.0f }, { 1, 0, 0 }},
-    {{ -0.5f,  0.6f, 0.0f }, { 1, 0, 0 }},
+    {{-0.9f, -0.6f, 0.0f}, {1, 0, 0}},
+    {{-0.1f, -0.6f, 0.0f}, {1, 0, 0}},
+    {{-0.5f, 0.6f, 0.0f}, {1, 0, 0}},
 };
 
 // GREEN triangle — right half
 static const Vertex triangleGreen[] = {
-    {{  0.1f, -0.6f, 0.0f }, { 0, 1, 0 }},
-    {{  0.9f, -0.6f, 0.0f }, { 0, 1, 0 }},
-    {{  0.5f,  0.6f, 0.0f }, { 0, 1, 0 }},
+    {{0.1f, -0.6f, 0.0f}, {0, 1, 0}},
+    {{0.9f, -0.6f, 0.0f}, {0, 1, 0}},
+    {{0.5f, 0.6f, 0.0f}, {0, 1, 0}},
 };
 
-static const uint32_t indices[] = { 0, 1, 2 };
+static const uint32_t indices[] = {0, 1, 2};
 
 // ─── Widget ─────────────────────────────────────────────────────────────────
 
 class MultiDrawWidget : public QRhiWidget
 {
 public:
-    explicit MultiDrawWidget(QWidget *parent = nullptr) : QRhiWidget(parent) {}
+    explicit MultiDrawWidget(QWidget* parent = nullptr)
+    : QRhiWidget(parent)
+    {
+    }
 
 private:
-    void initialize(QRhiCommandBuffer *) override;
-    void render(QRhiCommandBuffer *cb) override;
+    void initialize(QRhiCommandBuffer*) override;
+    void render(QRhiCommandBuffer* cb) override;
     void evaluate();
 
-    struct TriMesh {
+    struct TriMesh
+    {
         std::unique_ptr<QRhiBuffer> vbuf;
         std::unique_ptr<QRhiBuffer> ibuf;
         bool uploaded = false;
@@ -89,7 +94,7 @@ private:
     std::unique_ptr<QRhiGraphicsPipeline> m_pipeline;
 
     QRhiReadbackResult m_rb;
-    int  m_frame = 0;
+    int m_frame = 0;
     bool m_readbackScheduled = false;
     bool m_evaluated = false;
 };
@@ -114,12 +119,12 @@ static QShader loadShader(QShader::Stage stage)
 
 // ─── Initialization ─────────────────────────────────────────────────────────
 
-void MultiDrawWidget::initialize(QRhiCommandBuffer *)
+void MultiDrawWidget::initialize(QRhiCommandBuffer*)
 {
-    QRhi *rhi = this->rhi();
+    QRhi* rhi = this->rhi();
 
     if (!m_red.vbuf) {
-        auto makeMesh = [&](TriMesh &mesh) {
+        auto makeMesh = [&](TriMesh& mesh) {
             mesh.vbuf.reset(rhi->newBuffer(QRhiBuffer::Immutable,
                                            QRhiBuffer::VertexBuffer,
                                            3 * sizeof(Vertex)));
@@ -137,25 +142,23 @@ void MultiDrawWidget::initialize(QRhiCommandBuffer *)
         m_ubuf->create();
 
         m_srb.reset(rhi->newShaderResourceBindings());
-        m_srb->setBindings({
-            QRhiShaderResourceBinding::uniformBuffer(
-                0, QRhiShaderResourceBinding::VertexStage, m_ubuf.get())
-        });
+        m_srb->setBindings({QRhiShaderResourceBinding::uniformBuffer(
+            0, QRhiShaderResourceBinding::VertexStage, m_ubuf.get())});
         m_srb->create();
     }
 
     if (!m_pipeline) {
         m_pipeline.reset(rhi->newGraphicsPipeline());
         m_pipeline->setShaderStages({
-            { QRhiShaderStage::Vertex,   loadShader(QShader::VertexStage) },
-            { QRhiShaderStage::Fragment, loadShader(QShader::FragmentStage) },
+            {QRhiShaderStage::Vertex, loadShader(QShader::VertexStage)},
+            {QRhiShaderStage::Fragment, loadShader(QShader::FragmentStage)},
         });
 
         QRhiVertexInputLayout layout;
-        layout.setBindings({ { sizeof(Vertex) } });
+        layout.setBindings({{sizeof(Vertex)}});
         layout.setAttributes({
-            { 0, 0, QRhiVertexInputAttribute::Float3, offsetof(Vertex, pos) },
-            { 0, 1, QRhiVertexInputAttribute::Float3, offsetof(Vertex, col) },
+            {0, 0, QRhiVertexInputAttribute::Float3, offsetof(Vertex, pos)},
+            {0, 1, QRhiVertexInputAttribute::Float3, offsetof(Vertex, col)},
         });
         m_pipeline->setVertexInputLayout(layout);
         m_pipeline->setShaderResourceBindings(m_srb.get());
@@ -169,16 +172,16 @@ void MultiDrawWidget::initialize(QRhiCommandBuffer *)
 
 // ─── Render ─────────────────────────────────────────────────────────────────
 
-void MultiDrawWidget::render(QRhiCommandBuffer *cb)
+void MultiDrawWidget::render(QRhiCommandBuffer* cb)
 {
-    QRhi *rhi = this->rhi();
-    QRhiRenderTarget *rt = renderTarget();
+    QRhi* rhi = this->rhi();
+    QRhiRenderTarget* rt = renderTarget();
     const QSize sz = rt->pixelSize();
     ++m_frame;
 
-    QRhiResourceUpdateBatch *u = rhi->nextResourceUpdateBatch();
+    QRhiResourceUpdateBatch* u = rhi->nextResourceUpdateBatch();
 
-    auto uploadMesh = [&](TriMesh &mesh, const Vertex *data) {
+    auto uploadMesh = [&](TriMesh& mesh, const Vertex* data) {
         if (!mesh.uploaded) {
             u->uploadStaticBuffer(mesh.vbuf.get(), data);
             u->uploadStaticBuffer(mesh.ibuf.get(), indices);
@@ -188,10 +191,10 @@ void MultiDrawWidget::render(QRhiCommandBuffer *cb)
     uploadMesh(m_red, triangleRed);
     uploadMesh(m_green, triangleGreen);
 
-    QMatrix4x4 mvp;  // identity → NDC coordinates straight through
+    QMatrix4x4 mvp; // identity → NDC coordinates straight through
     u->updateDynamicBuffer(m_ubuf.get(), 0, 64, mvp.constData());
 
-    auto drawTriangle = [&](TriMesh &mesh) {
+    auto drawTriangle = [&](TriMesh& mesh) {
         const QRhiCommandBuffer::VertexInput vbuf(mesh.vbuf.get(), 0);
         cb->setVertexInput(0, 1, &vbuf, mesh.ibuf.get(), 0,
                            QRhiCommandBuffer::IndexUInt32);
@@ -199,21 +202,21 @@ void MultiDrawWidget::render(QRhiCommandBuffer *cb)
     };
 
     // ── ONE render pass, TWO drawIndexed() calls ────────────────────────
-    cb->beginPass(rt, QColor(30, 30, 30), { 1.0f, 0 }, u);
+    cb->beginPass(rt, QColor(30, 30, 30), {1.0f, 0}, u);
     cb->setGraphicsPipeline(m_pipeline.get());
     cb->setViewport(QRhiViewport(0, 0, sz.width(), sz.height()));
     cb->setShaderResources(m_srb.get());
 
-    drawTriangle(m_red);     // draw 1
-    drawTriangle(m_green);   // draw 2 — the call that blanked WebGL in 6.11.0
+    drawTriangle(m_red);   // draw 1
+    drawTriangle(m_green); // draw 2 — the call that blanked WebGL in 6.11.0
 
     cb->endPass();
 
     // Schedule a one-shot read-back of the rendered color texture so the test
     // can decide PASS/FAIL without a human squinting at the canvas.
     if (!m_readbackScheduled && m_frame >= 2) {
-        if (QRhiTexture *tex = colorTexture()) {
-            QRhiResourceUpdateBatch *rbBatch = rhi->nextResourceUpdateBatch();
+        if (QRhiTexture* tex = colorTexture()) {
+            QRhiResourceUpdateBatch* rbBatch = rhi->nextResourceUpdateBatch();
             m_rb.completed = [this]() {
                 QTimer::singleShot(0, this, [this]() { evaluate(); });
             };
@@ -224,7 +227,7 @@ void MultiDrawWidget::render(QRhiCommandBuffer *cb)
     }
 
     if (!m_evaluated)
-        update();  // keep the loop alive until the read-back resolves
+        update(); // keep the loop alive until the read-back resolves
 }
 
 // ─── Verdict ────────────────────────────────────────────────────────────────
@@ -237,7 +240,7 @@ void MultiDrawWidget::evaluate()
 
     const int w = m_rb.pixelSize.width();
     const int h = m_rb.pixelSize.height();
-    const QByteArray &px = m_rb.data;
+    const QByteArray& px = m_rb.data;
 
     if (w <= 0 || h <= 0 || px.size() < w * h * 4) {
         qWarning("[multi-draw] read-back unavailable (w=%d h=%d bytes=%lld)",
@@ -245,20 +248,22 @@ void MultiDrawWidget::evaluate()
         return;
     }
 
-    const auto *p = reinterpret_cast<const uchar *>(px.constData());
+    const auto* p = reinterpret_cast<const uchar*>(px.constData());
     bool leftRed = false;
     bool rightGreen = false;
 
     // Scan a coarse grid; tolerate RGBA/BGRA by checking dominant channels.
     for (int y = 0; y < h; y += 4) {
         for (int x = 0; x < w; x += 4) {
-            const uchar *c = p + (static_cast<qsizetype>(y) * w + x) * 4;
+            const uchar* c = p + (static_cast<qsizetype>(y) * w + x) * 4;
             const int c0 = c[0], c1 = c[1], c2 = c[2];
-            const bool isRed   = (c0 > 170 && c1 < 90 && c2 < 90) ||
-                                 (c2 > 170 && c1 < 90 && c0 < 90);
+            const bool isRed = (c0 > 170 && c1 < 90 && c2 < 90) ||
+                (c2 > 170 && c1 < 90 && c0 < 90);
             const bool isGreen = (c1 > 170 && c0 < 90 && c2 < 90);
-            if (isRed   && x <  w / 2) leftRed = true;
-            if (isGreen && x >= w / 2) rightGreen = true;
+            if (isRed && x < w / 2)
+                leftRed = true;
+            if (isGreen && x >= w / 2)
+                rightGreen = true;
         }
     }
 
@@ -280,7 +285,7 @@ void MultiDrawWidget::evaluate()
 
 // ─── Main ───────────────────────────────────────────────────────────────────
 
-int main(int argc, char *argv[])
+int main(int argc, char* argv[])
 {
     QApplication app(argc, argv);
 

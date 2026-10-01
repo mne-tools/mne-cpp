@@ -40,7 +40,8 @@
 // DEFINE NAMESPACE MNESURF2BEM
 //=============================================================================================================
 
-namespace MNESURF2BEM {
+namespace MNESURF2BEM
+{
 
 //=============================================================================================================
 /**
@@ -174,7 +175,7 @@ private:
      * @return Minimum distance in meters.
      */
     static float minSurfaceDistance(const MNELIB::MNEBemSurface& s1,
-                                   const MNELIB::MNEBemSurface& s2);
+                                    const MNELIB::MNEBemSurface& s2);
 };
 
 } // namespace MNESURF2BEM

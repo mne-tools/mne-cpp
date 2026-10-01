@@ -86,7 +86,7 @@ public:
      *
      * @param[in] parent     Parent QObject (optional).
      */
-    explicit RtCmdClient(QObject *parent = Q_NULLPTR);
+    explicit RtCmdClient(QObject* parent = Q_NULLPTR);
 
     //=========================================================================================================
     /**
@@ -96,7 +96,7 @@ public:
      *
      * @return true if part of command manager, false otherwise.
      */
-    inline bool hasCommand(const QString &p_sCommand) const;
+    inline bool hasCommand(const QString& p_sCommand) const;
 
     //=========================================================================================================
     /**
@@ -106,7 +106,7 @@ public:
      *
      * @return mne_rt_server reply.
      */
-    QString sendCLICommand(const QString &p_sCommand);
+    QString sendCLICommand(const QString& p_sCommand);
 
     //=========================================================================================================
     /**
@@ -114,7 +114,7 @@ public:
      *
      * @param[in] p_command    The command to send.
      */
-    void sendCommandJSON(const Command &p_command);
+    void sendCommandJSON(const Command& p_command);
 
     //=========================================================================================================
     /**
@@ -146,7 +146,7 @@ public:
      *
      * @return the active connector.
      */
-    qint32 requestConnectors(QMap<qint32, QString> &p_qMapConnectors);
+    qint32 requestConnectors(QMap<qint32, QString>& p_qMapConnectors);
 
     //=========================================================================================================
     /**
@@ -166,7 +166,7 @@ public:
      *
      * @return Command object related to command key word.
      */
-    Command& operator[] (const QString &key);
+    Command& operator[](const QString& key);
 
     //=========================================================================================================
     /**
@@ -176,7 +176,7 @@ public:
      *
      * @return Command object related to command key word.
      */
-    const Command operator[] (const QString &key) const;
+    const Command operator[](const QString& key) const;
 
 signals:
     //=========================================================================================================
@@ -188,9 +188,9 @@ signals:
     void response(QString p_sResponse);
 
 private:
-    CommandManager  m_commandManager;   /**< The command manager. */
-    QMutex          m_qMutex;           /**< Access serialization between threads. */
-    QString         m_sAvailableData;   /**< The last received response. */
+    CommandManager m_commandManager; /**< The command manager. */
+    QMutex m_qMutex;                 /**< Access serialization between threads. */
+    QString m_sAvailableData;        /**< The last received response. */
 };
 
 //=============================================================================================================
@@ -209,7 +209,7 @@ inline QString RtCmdClient::readAvailableData()
 
 //=============================================================================================================
 
-inline bool RtCmdClient::hasCommand(const QString &p_sCommand) const
+inline bool RtCmdClient::hasCommand(const QString& p_sCommand) const
 {
     return m_commandManager.hasCommand(p_sCommand);
 }

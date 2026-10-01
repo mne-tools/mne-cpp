@@ -60,7 +60,6 @@
 #include <algorithm>
 
 
-
 //=============================================================================================================
 // USED NAMESPACES
 //=============================================================================================================
@@ -72,7 +71,7 @@ using namespace MNELIB;
 //============================= dot.h =============================
 
 constexpr int FAIL = -1;
-constexpr int OK   =  0;
+constexpr int OK = 0;
 
 // Axis indices and mesh neighbour count (kept for documentation).
 [[maybe_unused]] constexpr int X = 0;
@@ -81,15 +80,13 @@ constexpr int OK   =  0;
 [[maybe_unused]] constexpr int NNEIGHBORS = 26;
 
 
-
-
 //============================= make_volume_source_space.c =============================
 
 [[maybe_unused]] static std::optional<FiffCoordTrans> make_voxel_ras_trans(const Eigen::Vector3f& r0,
-                                                  const Eigen::Vector3f& x_ras,
-                                                  const Eigen::Vector3f& y_ras,
-                                                  const Eigen::Vector3f& z_ras,
-                                                  const Eigen::Vector3f& voxel_size)
+                                                                           const Eigen::Vector3f& x_ras,
+                                                                           const Eigen::Vector3f& y_ras,
+                                                                           const Eigen::Vector3f& z_ras,
+                                                                           const Eigen::Vector3f& voxel_size)
 {
     Eigen::Matrix3f rot;
     rot.row(0) = x_ras.transpose() * voxel_size[0];
@@ -173,7 +170,7 @@ void MNESurfaceOrVolume::setNearestData(const Eigen::VectorXi& nearestIdx, const
 
 //=============================================================================================================
 
-double MNESurfaceOrVolume::solid_angle(const Eigen::Vector3f& from, const MNETriangle& tri)	/* ...to this triangle */
+double MNESurfaceOrVolume::solid_angle(const Eigen::Vector3f& from, const MNETriangle& tri) /* ...to this triangle */
 /*
      * Compute the solid angle according to van Oosterom's
      * formula
@@ -188,9 +185,9 @@ double MNESurfaceOrVolume::solid_angle(const Eigen::Vector3f& from, const MNETri
     double l1 = v1.norm();
     double l2 = v2.norm();
     double l3 = v3.norm();
-    double s = (l1*l2*l3+v1.dot(v2)*l3+v1.dot(v3)*l2+v2.dot(v3)*l1);
+    double s = (l1 * l2 * l3 + v1.dot(v2) * l3 + v1.dot(v3) * l2 + v2.dot(v3) * l1);
 
-    return (2.0*atan2(triple,s));
+    return (2.0 * atan2(triple, s));
 }
 
 //=============================================================================================================
@@ -215,22 +212,22 @@ void MNESurfaceOrVolume::add_triangle_data()
         tris.resize(ntri);
         tot_area = 0.0;
         for (k = 0, tri = tris.data(); k < ntri; k++, tri++) {
-            tri->vert = &itris(k,0);
-            tri->r1   = rr.row(tri->vert[0]).transpose();
-            tri->r2   = rr.row(tri->vert[1]).transpose();
-            tri->r3   = rr.row(tri->vert[2]).transpose();
+            tri->vert = &itris(k, 0);
+            tri->r1 = rr.row(tri->vert[0]).transpose();
+            tri->r2 = rr.row(tri->vert[1]).transpose();
+            tri->r3 = rr.row(tri->vert[2]).transpose();
             tri->compute_data();
             tot_area += tri->area;
         }
 #ifdef TRIANGLE_SIZE_WARNING
         for (k = 0, tri = tris.data(); k < ntri; k++, tri++)
-            if (tri->area < 1e-5*tot_area/ntri)
+            if (tri->area < 1e-5 * tot_area / ntri)
                 qWarning("Warning: Triangle area is only %g um^2 (%.5f %% of expected average)\n",
-                       1e12*tri->area,100*ntri*tri->area/tot_area);
+                         1e12 * tri->area, 100 * ntri * tri->area / tot_area);
 #endif
     }
 #ifdef DEBUG
-    qInfo("\ttotal area = %-.1f cm^2\n",1e4*tot_area);
+    qInfo("\ttotal area = %-.1f cm^2\n", 1e4 * tot_area);
 #endif
     /*
        * Add information for the selected subset if applicable
@@ -238,10 +235,10 @@ void MNESurfaceOrVolume::add_triangle_data()
     if (use_itris.rows() > 0 && nuse_tri > 0) {
         use_tris.resize(nuse_tri);
         for (k = 0, tri = use_tris.data(); k < nuse_tri; k++, tri++) {
-            tri->vert = &use_itris(k,0);
-            tri->r1   = rr.row(tri->vert[0]).transpose();
-            tri->r2   = rr.row(tri->vert[1]).transpose();
-            tri->r3   = rr.row(tri->vert[2]).transpose();
+            tri->vert = &use_itris(k, 0);
+            tri->r1 = rr.row(tri->vert[0]).transpose();
+            tri->r2 = rr.row(tri->vert[1]).transpose();
+            tri->r3 = rr.row(tri->vert[2]).transpose();
             tri->compute_data();
         }
     }
@@ -258,14 +255,14 @@ void MNESurfaceOrVolume::compute_cm(const MNESurfaceOrVolume::PointsT& rr, int n
     int q;
     cm[0] = cm[1] = cm[2] = 0.0;
     for (q = 0; q < np; q++) {
-        cm[0] += rr(q,0);
-        cm[1] += rr(q,1);
-        cm[2] += rr(q,2);
+        cm[0] += rr(q, 0);
+        cm[1] += rr(q, 1);
+        cm[2] += rr(q, 2);
     }
     if (np > 0) {
-        cm[0] = cm[0]/np;
-        cm[1] = cm[1]/np;
-        cm[2] = cm[2]/np;
+        cm[0] = cm[0] / np;
+        cm[1] = cm[1] / np;
+        cm[2] = cm[2] / np;
     }
     return;
 }
@@ -277,7 +274,7 @@ void MNESurfaceOrVolume::compute_surface_cm()
      * Compute the center of mass of a surface
      */
 {
-    compute_cm(rr,np,cm);
+    compute_cm(rr, np, cm);
     return;
 }
 
@@ -285,8 +282,8 @@ void MNESurfaceOrVolume::compute_surface_cm()
 
 void MNESurfaceOrVolume::calculate_vertex_distances()
 {
-    int   k,p,ndist;
-    int   nneigh;
+    int k, p, ndist;
+    int nneigh;
 
     if (neighbor_vert.empty() || nneighbor_vert.size() == 0)
         return;
@@ -301,13 +298,12 @@ void MNESurfaceOrVolume::calculate_vertex_distances()
         for (p = 0; p < nneigh; p++) {
             if (neigh[p] >= 0) {
                 vert_dist[k][p] = (rr.row(neigh[p]) - rr.row(k)).norm();
-            }
-            else
+            } else
                 vert_dist[k][p] = -1.0;
             ndist++;
         }
     }
-    qInfo("[%d distances done]\n",ndist);
+    qInfo("[%d distances done]\n", ndist);
     return;
 }
 
@@ -315,9 +311,9 @@ void MNESurfaceOrVolume::calculate_vertex_distances()
 
 int MNESurfaceOrVolume::add_vertex_normals()
 {
-    int k,c,p;
-    int *ii;
-    float w,size;
+    int k, c, p;
+    int* ii;
+    float w, size;
     MNETriangle* tri;
 
     if (type != MNE_SOURCE_SPACE_SURFACE)
@@ -325,20 +321,20 @@ int MNESurfaceOrVolume::add_vertex_normals()
     /*
        * Reallocate the stuff and initialize
        */
-    nn = MNESurfaceOrVolume::NormalsT::Zero(np,3);
+    nn = MNESurfaceOrVolume::NormalsT::Zero(np, 3);
     /*
        * One pass through the triangles will do it
        */
     add_triangle_data();
     for (p = 0, tri = tris.data(); p < ntri; p++, tri++) {
         ii = tri->vert;
-        w = 1.0;			/* This should be related to the triangle size */
+        w = 1.0; /* This should be related to the triangle size */
         /*
          * Then the vertex normals
          */
         for (k = 0; k < 3; k++)
             for (c = 0; c < 3; c++)
-                nn(ii[k],c) += w*tri->nn[c];
+                nn(ii[k], c) += w * tri->nn[c];
     }
     for (k = 0; k < np; k++) {
         size = nn.row(k).norm();
@@ -356,13 +352,13 @@ int MNESurfaceOrVolume::add_geometry_info(bool do_normals, bool check_too_many_n
           * Add vertex normals and neighbourhood information
           */
 {
-    int k,c,p,q;
+    int k, c, p, q;
     int vert;
-    int *ii;
+    int* ii;
     int nneighbors;
-    float w,size;
-    int   found;
-    int   nfix_distinct,nfix_no_neighbors,nfix_defect;
+    float w, size;
+    int found;
+    int nfix_distinct, nfix_no_neighbors, nfix_defect;
     MNETriangle* tri;
 
     if (type == MNE_SOURCE_SPACE_VOLUME) {
@@ -375,7 +371,7 @@ int MNESurfaceOrVolume::add_geometry_info(bool do_normals, bool check_too_many_n
        * Reallocate the stuff and initialize
        */
     if (do_normals) {
-        nn = MNESurfaceOrVolume::NormalsT::Zero(np,3);
+        nn = MNESurfaceOrVolume::NormalsT::Zero(np, 3);
     }
     neighbor_tri.clear();
     neighbor_tri.resize(np);
@@ -388,25 +384,25 @@ int MNESurfaceOrVolume::add_geometry_info(bool do_normals, bool check_too_many_n
     add_triangle_data();
     for (p = 0, tri = tris.data(); p < ntri; p++, tri++)
         if (tri->area == 0)
-            qWarning("\tWarning : zero size triangle # %d\n",p);
+            qWarning("\tWarning : zero size triangle # %d\n", p);
     qInfo("\tTriangle ");
     if (do_normals)
         qInfo("and vertex ");
     qInfo("normals and neighboring triangles...");
     for (p = 0, tri = tris.data(); p < ntri; p++, tri++) {
         ii = tri->vert;
-        w = 1.0;			/* This should be related to the triangle size */
+        w = 1.0; /* This should be related to the triangle size */
         for (k = 0; k < 3; k++) {
             /*
            * Then the vertex normals
            */
             if (do_normals)
                 for (c = 0; c < 3; c++)
-                    nn(ii[k],c) += w*tri->nn[c];
+                    nn(ii[k], c) += w * tri->nn[c];
             /*
            * Add to the list of neighbors
            */
-            neighbor_tri[ii[k]].conservativeResize(nneighbor_tri[ii[k]]+1);
+            neighbor_tri[ii[k]].conservativeResize(nneighbor_tri[ii[k]] + 1);
             neighbor_tri[ii[k]][nneighbor_tri[ii[k]]] = p;
             nneighbor_tri[ii[k]]++;
         }
@@ -416,19 +412,18 @@ int MNESurfaceOrVolume::add_geometry_info(bool do_normals, bool check_too_many_n
     for (k = 0; k < np; k++) {
         if (nneighbor_tri[k] <= 0) {
 #ifdef STRICT_ERROR
-            err_printf_set_error("Vertex %d does not have any neighboring triangles!",k);
+            err_printf_set_error("Vertex %d does not have any neighboring triangles!", k);
             return FAIL;
 #else
 #ifdef REPORT_WARNINGS
-            qWarning("Warning: Vertex %d does not have any neighboring triangles!\n",k);
+            qWarning("Warning: Vertex %d does not have any neighboring triangles!\n", k);
 #endif
 #endif
             nfix_no_neighbors++;
-        }
-        else if (nneighbor_tri[k] < 3) {
+        } else if (nneighbor_tri[k] < 3) {
 #ifdef REPORT_WARNINGS
             qWarning("\n\tTopological defect: Vertex %d has only %d neighboring triangle%s Vertex omitted.\n\t",
-                   k,nneighbor_tri[k],nneighbor_tri[k] > 1 ? "s." : ".");
+                     k, nneighbor_tri[k], nneighbor_tri[k] > 1 ? "s." : ".");
 #endif
             nfix_defect++;
             nneighbor_tri[k] = 0;
@@ -457,10 +452,9 @@ int MNESurfaceOrVolume::add_geometry_info(bool do_normals, bool check_too_many_n
        */
     for (k = 0; k < np; k++) {
         if (nneighbor_tri[k] > 0) {
-            neighbor_vert[k]  = VectorXi(nneighbor_tri[k]);
+            neighbor_vert[k] = VectorXi(nneighbor_tri[k]);
             nneighbor_vert[k] = nneighbor_tri[k];
-        }
-        else {
+        } else {
             nneighbor_vert[k] = 0;
         }
     }
@@ -486,11 +480,10 @@ int MNESurfaceOrVolume::add_geometry_info(bool do_normals, bool check_too_many_n
                             neighbors[nneighbors++] = vert;
                         else {
                             if (check_too_many_neighbors) {
-                                qCritical("Too many neighbors for vertex %d.",k);
+                                qCritical("Too many neighbors for vertex %d.", k);
                                 return FAIL;
-                            }
-                            else
-                                qWarning("\tWarning: Too many neighbors for vertex %d\n",k);
+                            } else
+                                qWarning("\tWarning: Too many neighbors for vertex %d\n", k);
                         }
                     }
                 }
@@ -499,7 +492,7 @@ int MNESurfaceOrVolume::add_geometry_info(bool do_normals, bool check_too_many_n
         if (nneighbors != nneighbor_vert[k]) {
 #ifdef REPORT_WARNINGS
             qWarning("\n\tIncorrect number of distinct neighbors for vertex %d (%d instead of %d) [fixed].",
-                   k,nneighbors,nneighbor_vert[k]);
+                     k, nneighbors, nneighbor_vert[k]);
 #endif
             nfix_distinct++;
             nneighbor_vert[k] = nneighbors;
@@ -515,17 +508,17 @@ int MNESurfaceOrVolume::add_geometry_info(bool do_normals, bool check_too_many_n
        * Summarize the defects
        */
     if (nfix_defect > 0)
-        qWarning("\tWarning: %d topological defects were fixed.\n",nfix_defect);
+        qWarning("\tWarning: %d topological defects were fixed.\n", nfix_defect);
     if (nfix_distinct > 0)
-        qWarning("\tWarning: %d vertices had incorrect number of distinct neighbors (fixed).\n",nfix_distinct);
+        qWarning("\tWarning: %d vertices had incorrect number of distinct neighbors (fixed).\n", nfix_distinct);
     if (nfix_no_neighbors > 0)
-        qWarning("\tWarning: %d vertices did not have any neighboring triangles (fixed)\n",nfix_no_neighbors);
+        qWarning("\tWarning: %d vertices did not have any neighboring triangles (fixed)\n", nfix_no_neighbors);
 #ifdef DEBUG
     for (k = 0; k < np; k++) {
         if (nneighbor_vert[k] <= 0)
-            qCritical("No neighbors for vertex %d\n",k);
+            qCritical("No neighbors for vertex %d\n", k);
         if (nneighbor_tri[k] <= 0)
-            qCritical("No neighbor tris for vertex %d\n",k);
+            qCritical("No neighbor tris for vertex %d\n", k);
     }
 #endif
     return OK;
@@ -535,7 +528,7 @@ int MNESurfaceOrVolume::add_geometry_info(bool do_normals, bool check_too_many_n
 
 int MNESurfaceOrVolume::add_geometry_info(bool do_normals)
 {
-    return add_geometry_info(do_normals,true);
+    return add_geometry_info(do_normals, true);
 }
 
 //=============================================================================================================
@@ -543,7 +536,7 @@ int MNESurfaceOrVolume::add_geometry_info(bool do_normals)
 int MNESurfaceOrVolume::add_geometry_info2(bool do_normals)
 
 {
-    return add_geometry_info(do_normals,false);
+    return add_geometry_info(do_normals, false);
 }
 
 //=============================================================================================================

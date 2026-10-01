@@ -98,7 +98,7 @@ private slots:
 
         MatrixX3f pts(2, 3);
         pts << 0, 0, 0,
-               1, 2, 3;
+            1, 2, 3;
 
         MatrixX3f result = t.apply_trans(pts);
         QCOMPARE(result.rows(), (Eigen::Index)2);
@@ -224,7 +224,9 @@ private slots:
     void fiffCov_equality()
     {
         FiffCov c1, c2;
-        c1.kind = 1; c1.dim = 2; c1.nfree = 50;
+        c1.kind = 1;
+        c1.dim = 2;
+        c1.nfree = 50;
         c1.names << "A" << "B";
         c1.data = MatrixXd::Identity(2, 2);
 

@@ -55,14 +55,15 @@ namespace MNEALIGN
 
 //=============================================================================================================
 /** @brief Identifies the seven wizard steps. */
-enum class AlignStep {
-    Setup = 0,    ///< Load anatomy (BEM) and place MRI-space twin fiducials.
-    Fiducials,    ///< Capture NAS / LPA / RPA in turn (or load digitisation FIFF).
-    EegCap,       ///< Walk the cap labels and capture each electrode.
-    HeadShape,    ///< Free continuous capture of HSP points.
-    Verify,       ///< Inspect ICP residuals before persisting the transform.
-    Save,         ///< Write the head→MRI transform to a -trans.fif file.
-    Done          ///< Completion summary.
+enum class AlignStep
+{
+    Setup = 0, ///< Load anatomy (BEM) and place MRI-space twin fiducials.
+    Fiducials, ///< Capture NAS / LPA / RPA in turn (or load digitisation FIFF).
+    EegCap,    ///< Walk the cap labels and capture each electrode.
+    HeadShape, ///< Free continuous capture of HSP points.
+    Verify,    ///< Inspect ICP residuals before persisting the transform.
+    Save,      ///< Write the head→MRI transform to a -trans.fif file.
+    Done       ///< Completion summary.
 };
 
 //=============================================================================================================
@@ -106,37 +107,46 @@ public:
      *
      * @param[in] step   Target step.
      */
-    void      goToStep(AlignStep step);
+    void goToStep(AlignStep step);
 
     /**
      * @brief Set the BEM file path displayed in the Setup page.
      *
      * @param[in] path   Absolute file path.
      */
-    void      setBemPath(const QString& path);
+    void setBemPath(const QString& path);
 
     /**
      * @brief Set the active pen station number (1–4).
      *
      * @param[in] station   Polhemus station id.
      */
-    void      setPenStation(int station);
+    void setPenStation(int station);
 
     /**
      * @brief Push the current tracker→MRI transform for live coordinate display.
      *
      * @param[in] t   Combined device→MRI transform.
      */
-    void      setTrackerTransform(const QMatrix4x4& t) { m_trackerToMri = t; }
+    void setTrackerTransform(const QMatrix4x4& t)
+    {
+        m_trackerToMri = t;
+    }
 
     /** @return The current BEM file path. */
-    QString                            bemPath() const { return m_bemPath; }
+    QString bemPath() const
+    {
+        return m_bemPath;
+    }
 
     /** @return The selected EEG cap montage system. */
-    UTILSLIB::StandardMontage::System  cap()     const { return m_capSystem; }
+    UTILSLIB::StandardMontage::System cap() const
+    {
+        return m_capSystem;
+    }
 
     /** @return The number of wizard steps. */
-    static int     stepCount();
+    static int stepCount();
 
     /** @return Human-readable title for the given step. */
     static QString titleFor(AlignStep step);
@@ -235,31 +245,30 @@ private:
     /** @return next un-captured fiducial in the {NAS,LPA,RPA} order. */
     FiducialId nextFiducial(bool* allDone) const;
     /** @return next un-captured EEG label, or empty string when complete. */
-    QString    nextEegLabel(int* outIdent) const;
+    QString nextEegLabel(int* outIdent) const;
 
-    AcquiredPoints*     m_pPoints    = nullptr;
+    AcquiredPoints* m_pPoints = nullptr;
     PolhemusConnection* m_pDigitizer = nullptr;
 
-    QString                                       m_bemPath;
-    UTILSLIB::StandardMontage::System             m_capSystem
-        = UTILSLIB::StandardMontage::System::Standard_1020;
+    QString m_bemPath;
+    UTILSLIB::StandardMontage::System m_capSystem = UTILSLIB::StandardMontage::System::Standard_1020;
 
-    QVector3D                                     m_lastLivePos;
-    bool                                          m_haveLive = false;
-    int                                           m_penStation = 1;
-    FiducialId                                    m_selectedFiducial = FiducialId::NAS;
-    QMatrix4x4                                    m_trackerToMri;
+    QVector3D m_lastLivePos;
+    bool m_haveLive = false;
+    int m_penStation = 1;
+    FiducialId m_selectedFiducial = FiducialId::NAS;
+    QMatrix4x4 m_trackerToMri;
 
-    QPointer<QLabel>      m_pSetupBemLabel;
-    QPointer<QComboBox>   m_pSetupCapCombo;
-    QPointer<QLabel>      m_pSetupTwinFidLabel;
+    QPointer<QLabel> m_pSetupBemLabel;
+    QPointer<QComboBox> m_pSetupCapCombo;
+    QPointer<QLabel> m_pSetupTwinFidLabel;
     QPointer<QPushButton> m_pTwinNasBtn;
     QPointer<QPushButton> m_pTwinLpaBtn;
     QPointer<QPushButton> m_pTwinRpaBtn;
-    FiducialId            m_selectedTwinFid = FiducialId::NAS;
+    FiducialId m_selectedTwinFid = FiducialId::NAS;
 
-    QPointer<QLabel>      m_pFidStatusLabel;
-    QPointer<QLabel>      m_pFidLiveLabel;
+    QPointer<QLabel> m_pFidStatusLabel;
+    QPointer<QLabel> m_pFidLiveLabel;
     QPointer<QPushButton> m_pFidCaptureBtn;
     QPointer<QPushButton> m_pFidUndoBtn;
     QPointer<QPushButton> m_pFidNasBtn;
@@ -267,31 +276,31 @@ private:
     QPointer<QPushButton> m_pFidRpaBtn;
 
     QPointer<QListWidget> m_pEegList;
-    QPointer<QLabel>      m_pEegLiveLabel;
+    QPointer<QLabel> m_pEegLiveLabel;
     QPointer<QPushButton> m_pEegCaptureBtn;
     QPointer<QPushButton> m_pEegUndoBtn;
 
-    QPointer<QLabel>      m_pHspCountLabel;
-    QPointer<QLabel>      m_pHspLiveLabel;
+    QPointer<QLabel> m_pHspCountLabel;
+    QPointer<QLabel> m_pHspLiveLabel;
     QPointer<QPushButton> m_pHspCaptureBtn;
     QPointer<QPushButton> m_pHspUndoBtn;
 
-    QPointer<QLabel>      m_pVerifyLabel;
+    QPointer<QLabel> m_pVerifyLabel;
     QPointer<QPushButton> m_pVerifyIcpBtn;
 
-    QPointer<QLabel>      m_pSaveSummaryLabel;
-    QPointer<QLabel>      m_pIcpStatusLabel;
+    QPointer<QLabel> m_pSaveSummaryLabel;
+    QPointer<QLabel> m_pIcpStatusLabel;
     QPointer<QPushButton> m_pSaveTransBtn;
     QPointer<QPushButton> m_pSaveDigiBtn;
 
-    QPointer<QLabel>      m_pDoneLabel;
+    QPointer<QLabel> m_pDoneLabel;
 
-    QMatrix4x4                              m_lastIcpHeadToMri;
-    float                                   m_lastIcpRmse = -1.0f;
-    bool                                    m_haveIcpResult = false;
-    QString                                 m_lastIcpSource;
-    QVector<QPair<QString, float>>          m_lastIcpResiduals;
-    QString                                 m_lastSavedTransPath;
+    QMatrix4x4 m_lastIcpHeadToMri;
+    float m_lastIcpRmse = -1.0f;
+    bool m_haveIcpResult = false;
+    QString m_lastIcpSource;
+    QVector<QPair<QString, float>> m_lastIcpResiduals;
+    QString m_lastSavedTransPath;
 };
 
 } // namespace MNEALIGN

@@ -40,7 +40,7 @@ public:
      *
      * @param[in] parent    Parent QObject.
      */
-    explicit EpochModel(QObject *parent = nullptr);
+    explicit EpochModel(QObject* parent = nullptr);
 
     //=========================================================================================================
     /**
@@ -55,7 +55,7 @@ public:
      * @param[in] parent    Parent index supplied by Qt.
      * @return Number of reviewable epochs.
      */
-    int rowCount(const QModelIndex &parent = QModelIndex()) const override;
+    int rowCount(const QModelIndex& parent = QModelIndex()) const override;
 
     //=========================================================================================================
     /**
@@ -64,7 +64,7 @@ public:
      * @param[in] parent    Parent index supplied by Qt.
      * @return Number of model columns.
      */
-    int columnCount(const QModelIndex &parent = QModelIndex()) const override;
+    int columnCount(const QModelIndex& parent = QModelIndex()) const override;
 
     //=========================================================================================================
     /**
@@ -85,7 +85,7 @@ public:
      * @param[in] role      Requested Qt role.
      * @return Cell data for the requested role.
      */
-    QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const override;
+    QVariant data(const QModelIndex& index, int role = Qt::DisplayRole) const override;
 
     //=========================================================================================================
     /**
@@ -96,7 +96,7 @@ public:
      * @param[in] role      Edit role.
      * @return True on success.
      */
-    bool setData(const QModelIndex &index, const QVariant &value, int role = Qt::EditRole) override;
+    bool setData(const QModelIndex& index, const QVariant& value, int role = Qt::EditRole) override;
 
     //=========================================================================================================
     /**
@@ -105,7 +105,7 @@ public:
      * @param[in] index     Requested model index.
      * @return Supported flags.
      */
-    Qt::ItemFlags flags(const QModelIndex &index) const override;
+    Qt::ItemFlags flags(const QModelIndex& index) const override;
 
     //=========================================================================================================
     /**
@@ -188,11 +188,11 @@ private:
      */
     struct EpochEntry
     {
-        MNELIB::MNEEpochData::SPtr epoch;   /**< Backing epoch object with reject/exclude state. */
-        int eventCode = 0;                  /**< Event code that created this epoch. */
-        int absoluteSample = 0;             /**< Absolute trigger sample in the raw file. */
-        int sample = 0;                     /**< Display sample relative to the loaded raw file. */
-        double timeSeconds = 0.0;           /**< Trigger time in seconds relative to file start. */
+        MNELIB::MNEEpochData::SPtr epoch; /**< Backing epoch object with reject/exclude state. */
+        int eventCode = 0;                /**< Event code that created this epoch. */
+        int absoluteSample = 0;           /**< Absolute trigger sample in the raw file. */
+        int sample = 0;                   /**< Display sample relative to the loaded raw file. */
+        double timeSeconds = 0.0;         /**< Trigger time in seconds relative to file start. */
     };
 
     //=========================================================================================================
@@ -213,8 +213,8 @@ private:
      */
     QString epochStatusText(const EpochEntry& entry) const;
 
-    QList<EpochEntry> m_entries;              /**< Flattened list of all reviewable epochs. */
-    bool m_bRespectAutoRejects = true;        /**< True if automatic rejection remains active. */
+    QList<EpochEntry> m_entries;       /**< Flattened list of all reviewable epochs. */
+    bool m_bRespectAutoRejects = true; /**< True if automatic rejection remains active. */
 };
 
 } // namespace MNEBROWSE

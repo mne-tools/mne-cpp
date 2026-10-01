@@ -25,9 +25,10 @@
 // STATIC HELPERS
 //=============================================================================================================
 
-namespace {
+namespace
+{
 
-Eigen::Matrix3f extractRotation(const QMatrix4x4 &m)
+Eigen::Matrix3f extractRotation(const QMatrix4x4& m)
 {
     Eigen::Matrix3f rot;
     for (int r = 0; r < 3; ++r)
@@ -42,40 +43,40 @@ Eigen::Matrix3f extractRotation(const QMatrix4x4 &m)
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-void MeshFactory::buildIcosphere(QVector<Eigen::Vector3f> &vertices,
-                                  QVector<Eigen::Vector3i> &faces,
-                                  int subdivisions)
+void MeshFactory::buildIcosphere(QVector<Eigen::Vector3f>& vertices,
+                                 QVector<Eigen::Vector3i>& faces,
+                                 int subdivisions)
 {
     // Golden ratio
     const float phi = (1.0f + std::sqrt(5.0f)) / 2.0f;
 
     vertices.clear();
     vertices.reserve(12 + 30 * subdivisions); // rough estimate
-    vertices << Eigen::Vector3f(-1,  phi, 0) << Eigen::Vector3f( 1,  phi, 0)
-             << Eigen::Vector3f(-1, -phi, 0) << Eigen::Vector3f( 1, -phi, 0)
-             << Eigen::Vector3f( 0, -1,  phi) << Eigen::Vector3f( 0,  1,  phi)
-             << Eigen::Vector3f( 0, -1, -phi) << Eigen::Vector3f( 0,  1, -phi)
-             << Eigen::Vector3f( phi, 0, -1) << Eigen::Vector3f( phi, 0,  1)
-             << Eigen::Vector3f(-phi, 0, -1) << Eigen::Vector3f(-phi, 0,  1);
-    for (auto &v : vertices)
+    vertices << Eigen::Vector3f(-1, phi, 0) << Eigen::Vector3f(1, phi, 0)
+             << Eigen::Vector3f(-1, -phi, 0) << Eigen::Vector3f(1, -phi, 0)
+             << Eigen::Vector3f(0, -1, phi) << Eigen::Vector3f(0, 1, phi)
+             << Eigen::Vector3f(0, -1, -phi) << Eigen::Vector3f(0, 1, -phi)
+             << Eigen::Vector3f(phi, 0, -1) << Eigen::Vector3f(phi, 0, 1)
+             << Eigen::Vector3f(-phi, 0, -1) << Eigen::Vector3f(-phi, 0, 1);
+    for (auto& v : vertices)
         v.normalize();
 
     faces.clear();
     faces.reserve(20);
-    faces << Eigen::Vector3i(0,11,5)  << Eigen::Vector3i(0,5,1)
-          << Eigen::Vector3i(0,1,7)   << Eigen::Vector3i(0,7,10)
-          << Eigen::Vector3i(0,10,11) << Eigen::Vector3i(1,5,9)
-          << Eigen::Vector3i(5,11,4)  << Eigen::Vector3i(11,10,2)
-          << Eigen::Vector3i(10,7,6)  << Eigen::Vector3i(7,1,8)
-          << Eigen::Vector3i(3,9,4)   << Eigen::Vector3i(3,4,2)
-          << Eigen::Vector3i(3,2,6)   << Eigen::Vector3i(3,6,8)
-          << Eigen::Vector3i(3,8,9)   << Eigen::Vector3i(4,9,5)
-          << Eigen::Vector3i(2,4,11)  << Eigen::Vector3i(6,2,10)
-          << Eigen::Vector3i(8,6,7)   << Eigen::Vector3i(9,8,1);
+    faces << Eigen::Vector3i(0, 11, 5) << Eigen::Vector3i(0, 5, 1)
+          << Eigen::Vector3i(0, 1, 7) << Eigen::Vector3i(0, 7, 10)
+          << Eigen::Vector3i(0, 10, 11) << Eigen::Vector3i(1, 5, 9)
+          << Eigen::Vector3i(5, 11, 4) << Eigen::Vector3i(11, 10, 2)
+          << Eigen::Vector3i(10, 7, 6) << Eigen::Vector3i(7, 1, 8)
+          << Eigen::Vector3i(3, 9, 4) << Eigen::Vector3i(3, 4, 2)
+          << Eigen::Vector3i(3, 2, 6) << Eigen::Vector3i(3, 6, 8)
+          << Eigen::Vector3i(3, 8, 9) << Eigen::Vector3i(4, 9, 5)
+          << Eigen::Vector3i(2, 4, 11) << Eigen::Vector3i(6, 2, 10)
+          << Eigen::Vector3i(8, 6, 7) << Eigen::Vector3i(9, 8, 1);
 
     // Subdivide
     for (int s = 0; s < subdivisions; ++s) {
-        QMap<QPair<int,int>, int> cache;
+        QMap<QPair<int, int>, int> cache;
         auto midpoint = [&](int a, int b) -> int {
             auto key = qMakePair(qMin(a, b), qMax(a, b));
             if (cache.contains(key))
@@ -88,14 +89,14 @@ void MeshFactory::buildIcosphere(QVector<Eigen::Vector3f> &vertices,
 
         QVector<Eigen::Vector3i> newFaces;
         newFaces.reserve(faces.size() * 4);
-        for (const auto &f : faces) {
+        for (const auto& f : faces) {
             int ab = midpoint(f(0), f(1));
             int bc = midpoint(f(1), f(2));
             int ca = midpoint(f(2), f(0));
             newFaces << Eigen::Vector3i(f(0), ab, ca)
                      << Eigen::Vector3i(f(1), bc, ab)
                      << Eigen::Vector3i(f(2), ca, bc)
-                     << Eigen::Vector3i(ab,   bc, ca);
+                     << Eigen::Vector3i(ab, bc, ca);
         }
         faces = std::move(newFaces);
     }
@@ -113,10 +114,10 @@ int MeshFactory::sphereVertexCount(int subdivisions)
 
 //=============================================================================================================
 
-std::shared_ptr<BrainSurface> MeshFactory::createSphere(const QVector3D &center,
-                                                          float radius,
-                                                          const QColor &color,
-                                                          int subdivisions)
+std::shared_ptr<BrainSurface> MeshFactory::createSphere(const QVector3D& center,
+                                                        float radius,
+                                                        const QColor& color,
+                                                        int subdivisions)
 {
     QVector<Eigen::Vector3f> verts;
     QVector<Eigen::Vector3i> faces;
@@ -146,10 +147,10 @@ std::shared_ptr<BrainSurface> MeshFactory::createSphere(const QVector3D &center,
 
 //=============================================================================================================
 
-std::shared_ptr<BrainSurface> MeshFactory::createPlate(const QVector3D &center,
-                                                         const QMatrix4x4 &orientation,
-                                                         const QColor &color,
-                                                         float size)
+std::shared_ptr<BrainSurface> MeshFactory::createPlate(const QVector3D& center,
+                                                       const QMatrix4x4& orientation,
+                                                       const QColor& color,
+                                                       float size)
 {
     const float hw = size / 2.0f;
     const float hh = size / 2.0f;
@@ -158,17 +159,12 @@ std::shared_ptr<BrainSurface> MeshFactory::createPlate(const QVector3D &center,
     const Eigen::Matrix3f rot = extractRotation(orientation);
 
     Eigen::Vector3f corners[8] = {
-        {-hw, -hh, -hd}, { hw, -hh, -hd}, { hw,  hh, -hd}, {-hw,  hh, -hd},
-        {-hw, -hh,  hd}, { hw, -hh,  hd}, { hw,  hh,  hd}, {-hw,  hh,  hd}
-    };
-    for (auto &c : corners)
+        {-hw, -hh, -hd}, {hw, -hh, -hd}, {hw, hh, -hd}, {-hw, hh, -hd}, {-hw, -hh, hd}, {hw, -hh, hd}, {hw, hh, hd}, {-hw, hh, hd}};
+    for (auto& c : corners)
         c = rot * c;
 
     const int faceIndices[6][4] = {
-        {4,5,6,7}, {1,0,3,2},
-        {3,7,6,2}, {0,1,5,4},
-        {1,2,6,5}, {0,4,7,3}
-    };
+        {4, 5, 6, 7}, {1, 0, 3, 2}, {3, 7, 6, 2}, {0, 1, 5, 4}, {1, 2, 6, 5}, {0, 4, 7, 3}};
 
     Eigen::MatrixX3f rr(24, 3), nn(24, 3);
     Eigen::MatrixX3i tris(12, 3);
@@ -186,7 +182,7 @@ std::shared_ptr<BrainSurface> MeshFactory::createPlate(const QVector3D &center,
             rr.row(base + k) << v.x() + center.x(), v.y() + center.y(), v.z() + center.z();
             nn.row(base + k) = fn;
         }
-        tris.row(f * 2)     << base, base + 1, base + 2;
+        tris.row(f * 2) << base, base + 1, base + 2;
         tris.row(f * 2 + 1) << base, base + 2, base + 3;
     }
 
@@ -197,23 +193,23 @@ std::shared_ptr<BrainSurface> MeshFactory::createPlate(const QVector3D &center,
 
 //=============================================================================================================
 
-std::shared_ptr<BrainSurface> MeshFactory::createBarbell(const QVector3D &center,
-                                                           const QMatrix4x4 &orientation,
-                                                           const QColor &color,
-                                                           float size)
+std::shared_ptr<BrainSurface> MeshFactory::createBarbell(const QVector3D& center,
+                                                         const QMatrix4x4& orientation,
+                                                         const QColor& color,
+                                                         float size)
 {
     const Eigen::Matrix3f rot = extractRotation(orientation);
 
     const float halfSpan = size * 0.6f;
-    const float sphereR  = size * 0.2f;
-    const float rodR     = size * 0.08f;
+    const float sphereR = size * 0.2f;
+    const float rodR = size * 0.08f;
 
     QVector<Eigen::Vector3f> allVerts;
     QVector<Eigen::Vector3f> allNorms;
     QVector<Eigen::Vector3i> allTris;
 
     // ── Helper: append a sphere ────────────────────────────────────────
-    auto appendSphere = [&](const QVector3D &pos, float radius) {
+    auto appendSphere = [&](const QVector3D& pos, float radius) {
         QVector<Eigen::Vector3f> sv;
         QVector<Eigen::Vector3i> sf;
         buildIcosphere(sv, sf, 1); // single subdivision
@@ -223,13 +219,13 @@ std::shared_ptr<BrainSurface> MeshFactory::createBarbell(const QVector3D &center
         allNorms.reserve(base + sv.size());
         allTris.reserve(allTris.size() + sf.size());
 
-        for (const auto &v : sv) {
+        for (const auto& v : sv) {
             Eigen::Vector3f vn = rot * v;
             Eigen::Vector3f vp = rot * (v * radius);
             allVerts.append(Eigen::Vector3f(vp.x() + pos.x(), vp.y() + pos.y(), vp.z() + pos.z()));
             allNorms.append(vn.normalized());
         }
-        for (const auto &f : sf) {
+        for (const auto& f : sf) {
             allTris.append(Eigen::Vector3i(base + f(0), base + f(1), base + f(2)));
         }
     };
@@ -238,14 +234,12 @@ std::shared_ptr<BrainSurface> MeshFactory::createBarbell(const QVector3D &center
     auto appendRod = [&]() {
         float hx = rodR, hy = halfSpan, hz = rodR;
         Eigen::Vector3f corners[8] = {
-            {-hx, -hy, -hz}, { hx, -hy, -hz}, { hx,  hy, -hz}, {-hx,  hy, -hz},
-            {-hx, -hy,  hz}, { hx, -hy,  hz}, { hx,  hy,  hz}, {-hx,  hy,  hz}
-        };
-        for (auto &c : corners) c = rot * c;
+            {-hx, -hy, -hz}, {hx, -hy, -hz}, {hx, hy, -hz}, {-hx, hy, -hz}, {-hx, -hy, hz}, {hx, -hy, hz}, {hx, hy, hz}, {-hx, hy, hz}};
+        for (auto& c : corners)
+            c = rot * c;
 
         const int faceIdx[6][4] = {
-            {4,5,6,7}, {1,0,3,2}, {3,7,6,2}, {0,1,5,4}, {1,2,6,5}, {0,4,7,3}
-        };
+            {4, 5, 6, 7}, {1, 0, 3, 2}, {3, 7, 6, 2}, {0, 1, 5, 4}, {1, 2, 6, 5}, {0, 4, 7, 3}};
 
         const int base = allVerts.size();
         for (int f = 0; f < 6; ++f) {
@@ -267,7 +261,7 @@ std::shared_ptr<BrainSurface> MeshFactory::createBarbell(const QVector3D &center
     };
 
     // Build the barbell
-    QVector3D axis(rot(0,1), rot(1,1), rot(2,1));
+    QVector3D axis(rot(0, 1), rot(1, 1), rot(2, 1));
     appendSphere(center + axis * halfSpan, sphereR);
     appendSphere(center - axis * halfSpan, sphereR);
     appendRod();
@@ -289,13 +283,14 @@ std::shared_ptr<BrainSurface> MeshFactory::createBarbell(const QVector3D &center
 
 //=============================================================================================================
 
-std::shared_ptr<BrainSurface> MeshFactory::createCylinder(const QVector3D &from,
-                                                          const QVector3D &to,
+std::shared_ptr<BrainSurface> MeshFactory::createCylinder(const QVector3D& from,
+                                                          const QVector3D& to,
                                                           float radius,
-                                                          const QColor &color,
+                                                          const QColor& color,
                                                           int sides)
 {
-    if (sides < 3) sides = 3;
+    if (sides < 3)
+        sides = 3;
 
     const QVector3D axis = to - from;
     const float length = axis.length();
@@ -313,7 +308,7 @@ std::shared_ptr<BrainSurface> MeshFactory::createCylinder(const QVector3D &from,
 
     // Two rings of vertices (bottom = from, top = to) + 2 center caps
     const int nVerts = 2 * sides + 2;
-    const int nTris  = 4 * sides; // 2 * sides for barrel + sides for each cap
+    const int nTris = 4 * sides; // 2 * sides for barrel + sides for each cap
 
     Eigen::MatrixX3f verts(nVerts, 3);
     Eigen::MatrixX3f norms(nVerts, 3);
@@ -353,11 +348,19 @@ std::shared_ptr<BrainSurface> MeshFactory::createCylinder(const QVector3D &from,
 
     // Cap center vertices
     const int bottomCenter = 2 * sides;
-    const int topCenter    = 2 * sides + 1;
-    verts(bottomCenter, 0) = from.x(); verts(bottomCenter, 1) = from.y(); verts(bottomCenter, 2) = from.z();
-    norms(bottomCenter, 0) = -axisN.x(); norms(bottomCenter, 1) = -axisN.y(); norms(bottomCenter, 2) = -axisN.z();
-    verts(topCenter, 0) = to.x(); verts(topCenter, 1) = to.y(); verts(topCenter, 2) = to.z();
-    norms(topCenter, 0) = axisN.x(); norms(topCenter, 1) = axisN.y(); norms(topCenter, 2) = axisN.z();
+    const int topCenter = 2 * sides + 1;
+    verts(bottomCenter, 0) = from.x();
+    verts(bottomCenter, 1) = from.y();
+    verts(bottomCenter, 2) = from.z();
+    norms(bottomCenter, 0) = -axisN.x();
+    norms(bottomCenter, 1) = -axisN.y();
+    norms(bottomCenter, 2) = -axisN.z();
+    verts(topCenter, 0) = to.x();
+    verts(topCenter, 1) = to.y();
+    verts(topCenter, 2) = to.z();
+    norms(topCenter, 0) = axisN.x();
+    norms(topCenter, 1) = axisN.y();
+    norms(topCenter, 2) = axisN.z();
 
     // Barrel triangles (2 tris per side)
     int t = 0;
@@ -366,8 +369,14 @@ std::shared_ptr<BrainSurface> MeshFactory::createCylinder(const QVector3D &from,
         const int i1 = (i + 1) % sides;
         const int i2 = sides + i;
         const int i3 = sides + (i + 1) % sides;
-        tris(t, 0) = i0; tris(t, 1) = i2; tris(t, 2) = i1; ++t;
-        tris(t, 0) = i1; tris(t, 1) = i2; tris(t, 2) = i3; ++t;
+        tris(t, 0) = i0;
+        tris(t, 1) = i2;
+        tris(t, 2) = i1;
+        ++t;
+        tris(t, 0) = i1;
+        tris(t, 1) = i2;
+        tris(t, 2) = i3;
+        ++t;
     }
 
     // Bottom cap
@@ -393,10 +402,10 @@ std::shared_ptr<BrainSurface> MeshFactory::createCylinder(const QVector3D &from,
 
 //=============================================================================================================
 
-std::shared_ptr<BrainSurface> MeshFactory::createBatchedSpheres(const QVector<QVector3D> &positions,
-                                                                  float radius,
-                                                                  const QColor &color,
-                                                                  int subdivisions)
+std::shared_ptr<BrainSurface> MeshFactory::createBatchedSpheres(const QVector<QVector3D>& positions,
+                                                                float radius,
+                                                                const QColor& color,
+                                                                int subdivisions)
 {
     if (positions.isEmpty())
         return std::make_shared<BrainSurface>();
@@ -430,7 +439,7 @@ std::shared_ptr<BrainSurface> MeshFactory::createBatchedSpheres(const QVector<QV
     Eigen::MatrixX3i allTris(nPts * nTPerPt, 3);
 
     for (int p = 0; p < nPts; ++p) {
-        const QVector3D &pos = positions[p];
+        const QVector3D& pos = positions[p];
         const int vOff = p * nVPerPt;
         const int tOff = p * nTPerPt;
         for (int iv = 0; iv < nVPerPt; ++iv) {

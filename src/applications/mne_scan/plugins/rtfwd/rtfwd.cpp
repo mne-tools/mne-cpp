@@ -87,7 +87,7 @@ RtFwd::RtFwd()
     m_pFwdSettings->include_meg = true;
     m_pFwdSettings->include_eeg = true;
     m_pFwdSettings->accurate = true;
-    m_pFwdSettings->mindist = 5.0f/1000.0f;
+    m_pFwdSettings->mindist = 5.0f / 1000.0f;
     m_pFwdSettings->ncluster = 200;
 
     m_sAtlasDir = QCoreApplication::applicationDirPath() + "/../resources/data/MNE-sample-data/subjects/sample/label";
@@ -99,7 +99,7 @@ RtFwd::~RtFwd()
 {
     m_future.waitForFinished();
 
-    if(this->isRunning()) {
+    if (this->isRunning()) {
         stop();
     }
 }
@@ -117,7 +117,7 @@ QSharedPointer<AbstractPlugin> RtFwd::clone() const
 void RtFwd::init()
 {
     // Inits
-    m_pAnnotationSet = FsAnnotationSet::SPtr(new FsAnnotationSet(m_sAtlasDir+"/lh.aparc.a2009s.annot", m_sAtlasDir+"/rh.aparc.a2009s.annot"));
+    m_pAnnotationSet = FsAnnotationSet::SPtr(new FsAnnotationSet(m_sAtlasDir + "/lh.aparc.a2009s.annot", m_sAtlasDir + "/rh.aparc.a2009s.annot"));
 
     // Input
     m_pHpiInput = PluginInputData<RealTimeHpiResult>::create(this, "rtFwd RTHR In", "rtFwd real time HPI result input data");
@@ -132,7 +132,7 @@ void RtFwd::init()
 
     // Output
     m_pRTFSOutput = PluginOutputData<RealTimeFwdSolution>::create(this, "rtFwdOut", "rtFwd real-time forward solution output data");
-    m_pRTFSOutput->measurementData()->setName(this->getName());//Provide name to auto store widget settings
+    m_pRTFSOutput->measurementData()->setName(this->getName()); //Provide name to auto store widget settings
     m_outputConnectors.append(m_pRTFSOutput);
 }
 
@@ -151,7 +151,7 @@ bool RtFwd::start()
     // Read BEM
     QFile t_fBem(m_pFwdSettings->bemname);
     FiffStream::SPtr stream(new FiffStream(&t_fBem));
-    if(!stream->open()) {
+    if (!stream->open()) {
         QMessageBox msgBox;
         msgBox.setText("The bem model cannot be opend. Chosse another file.");
         msgBox.setStandardButtons(QMessageBox::Ok);
@@ -165,7 +165,7 @@ bool RtFwd::start()
     // Read source space
     QFile t_fSource(m_pFwdSettings->srcname);
     stream = FiffStream::SPtr(new FiffStream(&t_fSource));
-    if(!stream->open()) {
+    if (!stream->open()) {
         QMessageBox msgBox;
         msgBox.setText("The source space cannot be opend. Chosse another file.");
         msgBox.setText(m_pFwdSettings->srcname);
@@ -180,7 +180,7 @@ bool RtFwd::start()
     // Read MRI transformation
     QFile t_fMri(m_pFwdSettings->mriname);
     stream = FiffStream::SPtr(new FiffStream(&t_fMri));
-    if(!stream->open()) {
+    if (!stream->open()) {
         QMessageBox msgBox;
         msgBox.setText("The mri - head transformation cannot be opend. Chosse another file.");
         msgBox.setStandardButtons(QMessageBox::Ok);
@@ -194,7 +194,7 @@ bool RtFwd::start()
     // Read measurement
     QFile t_fMeas(m_pFwdSettings->measname);
     stream = FiffStream::SPtr(new FiffStream(&t_fMri));
-    if(!stream->open()) {
+    if (!stream->open()) {
         QMessageBox msgBox;
         msgBox.setText("The meaurement file cannot be opend. Chosse another file.");
         msgBox.setStandardButtons(QMessageBox::Ok);
@@ -249,30 +249,30 @@ QWidget* RtFwd::setupWidget()
 
 void RtFwd::update(SCMEASLIB::Measurement::SPtr pMeasurement)
 {
-    if(QSharedPointer<RealTimeMultiSampleArray> pRTMSA = pMeasurement.dynamicCast<RealTimeMultiSampleArray>()) {
+    if (QSharedPointer<RealTimeMultiSampleArray> pRTMSA = pMeasurement.dynamicCast<RealTimeMultiSampleArray>()) {
         //Fiff information
         m_mutex.lock();
-        if(!m_pFiffInfo) {
+        if (!m_pFiffInfo) {
             m_pFiffInfo = pRTMSA->info();
         }
         m_mutex.unlock();
 
-        if(!m_bPluginControlWidgetsInit) {
+        if (!m_bPluginControlWidgetsInit) {
             initPluginControlWidgets();
         }
-    } else if(QSharedPointer<RealTimeHpiResult> pRTHPI = pMeasurement.dynamicCast<RealTimeHpiResult>()) {
+    } else if (QSharedPointer<RealTimeHpiResult> pRTHPI = pMeasurement.dynamicCast<RealTimeHpiResult>()) {
         //Fiff information
         m_mutex.lock();
-        if(!m_pFiffInfo) {
+        if (!m_pFiffInfo) {
             m_pFiffInfo = pRTHPI->getFiffInfo();
         }
 
-        if(!m_bBusy) {
+        if (!m_bBusy) {
             m_pHpiFitResult = pRTHPI->getValue();
         }
         m_mutex.unlock();
 
-        if(!m_bPluginControlWidgetsInit) {
+        if (!m_bPluginControlWidgetsInit) {
             initPluginControlWidgets();
         }
     }
@@ -284,12 +284,12 @@ void RtFwd::initPluginControlWidgets()
 {
     bool bFiffInfo = false;
     m_mutex.lock();
-    if(m_pFiffInfo) {
+    if (m_pFiffInfo) {
         bFiffInfo = true;
     }
     m_mutex.unlock();
 
-    if(bFiffInfo) {
+    if (bFiffInfo) {
         QList<QWidget*> plControlWidgets;
 
         FwdSettingsView* pFwdSettingsView = new FwdSettingsView(QString("MNESCAN/%1/").arg(this->getName()));
@@ -339,7 +339,7 @@ void RtFwd::onDoForwardComputation()
 void RtFwd::onRecompStatusChanged(bool bDoRecomputation)
 {
     m_mutex.lock();
-    if(!m_pHpiInput) {
+    if (!m_pHpiInput) {
         QMessageBox msgBox;
         msgBox.setText("Please connect the Hpi plugin.");
         msgBox.exec();
@@ -353,7 +353,7 @@ void RtFwd::onRecompStatusChanged(bool bDoRecomputation)
 
 void RtFwd::onClusteringStatusChanged(bool bDoClustering)
 {
-    if(m_pAnnotationSet->isEmpty()) {
+    if (m_pAnnotationSet->isEmpty()) {
         QMessageBox msgBox;
         msgBox.setText("Please load an annotation set befor clustering.");
         msgBox.exec();
@@ -389,9 +389,9 @@ void RtFwd::onClusterNumberChanged(int iNClusterNumber)
 void RtFwd::run()
 {
     // Wait for fiff the info to arrive
-    while(true) {
+    while (true) {
         m_mutex.lock();
-        if(m_pFiffInfo) {
+        if (m_pFiffInfo) {
             m_mutex.unlock();
             break;
         }
@@ -406,32 +406,32 @@ void RtFwd::run()
     m_mutex.unlock();
 
     // initialize fwd solution
-    emit statusInformationChanged(0);           // initializing
+    emit statusInformationChanged(0); // initializing
     std::shared_ptr<ComputeFwd> pFwdComputer = std::make_shared<ComputeFwd>(m_pFwdSettings);
 
     MNEForwardSolution::SPtr pFwdSolution;
     MNEForwardSolution::SPtr pClusteredFwd;
 
-    emit statusInformationChanged(4);           // not computed
+    emit statusInformationChanged(4); // not computed
 
     // do recomputation if requested, not busy and transformation is different
-    bool bIsLargeHeadMovement = false;          // indicate if movement was large
-    bool bIsDifferent = false;                  // indicate if incoming transformation matrix is different
-    bool bDoRecomputation = false;              // indicate if we want to recompute
-    bool bDoClustering = false;                 // indicate if we want to cluster
-    bool bFwdReady = false;                     // only cluster if fwd is ready
-    bool bNClusterChanged = false;              // Perform new clustering when cluster size changed
-    bool bHpiConnectected = false;              // only update/recompute if hpi is connected
-    bool bDoFwdComputation = false;             // compute forward if requested
-    bool bIsInit = false;                       // only recompute if initial fwd solulion is calculated
+    bool bIsLargeHeadMovement = false; // indicate if movement was large
+    bool bIsDifferent = false;         // indicate if incoming transformation matrix is different
+    bool bDoRecomputation = false;     // indicate if we want to recompute
+    bool bDoClustering = false;        // indicate if we want to cluster
+    bool bFwdReady = false;            // only cluster if fwd is ready
+    bool bNClusterChanged = false;     // Perform new clustering when cluster size changed
+    bool bHpiConnectected = false;     // only update/recompute if hpi is connected
+    bool bDoFwdComputation = false;    // compute forward if requested
+    bool bIsInit = false;              // only recompute if initial fwd solulion is calculated
 
-    while(!isInterruptionRequested()) {
+    while (!isInterruptionRequested()) {
         m_mutex.lock();
         bDoFwdComputation = m_bDoFwdComputation;
         m_mutex.unlock();
 
-        if(bDoFwdComputation) {
-            emit statusInformationChanged(1);   // computing
+        if (bDoFwdComputation) {
+            emit statusInformationChanged(1); // computing
             m_mutex.lock();
             m_bBusy = true;
             m_mutex.unlock();
@@ -450,24 +450,24 @@ void RtFwd::run()
                                       pFwdSolution->src.size());
 
             m_mutex.lock();
-            if(!m_bDoClustering) {
+            if (!m_bDoClustering) {
                 m_pRTFSOutput->measurementData()->setValue(pFwdSolution);
-                emit statusInformationChanged(5);   //finished
+                emit statusInformationChanged(5); //finished
             }
-            bFwdReady = true;                       // provide fwd for clustering if wanted
-            m_bDoFwdComputation = false;            // don't call this again if not requested
-            bIsInit = true;                         // init computation finished -> recomputation possible
+            bFwdReady = true;            // provide fwd for clustering if wanted
+            m_bDoFwdComputation = false; // don't call this again if not requested
+            bIsInit = true;              // init computation finished -> recomputation possible
             m_mutex.unlock();
         }
 
         // check if hpi is connected
         m_mutex.lock();
-        if(m_pHpiFitResult) {
+        if (m_pHpiFitResult) {
             bHpiConnectected = true;
         }
         m_mutex.unlock();
 
-        if(bHpiConnectected && bIsInit) {
+        if (bHpiConnectected && bIsInit) {
             // only recompute if hpi is connected
             m_mutex.lock();
             bIsLargeHeadMovement = m_pHpiFitResult->bIsLargeHeadMovement;
@@ -476,8 +476,8 @@ void RtFwd::run()
             m_mutex.unlock();
 
             // do recomputation if requested, a large head movement occured and devHeadTrans is different
-            if(bIsLargeHeadMovement && bIsDifferent && bDoRecomputation) {
-                emit statusInformationChanged(2);           // recomputing
+            if (bIsLargeHeadMovement && bIsDifferent && bDoRecomputation) {
+                emit statusInformationChanged(2); // recomputing
                 m_mutex.lock();
                 m_bBusy = true;
                 transMegHead = m_pHpiFitResult->devHeadTrans;
@@ -490,10 +490,10 @@ void RtFwd::run()
                 m_mutex.unlock();
                 bFwdReady = true;
 
-                if(!bDoClustering) {
+                if (!bDoClustering) {
                     m_pRTFSOutput->measurementData()->setValue(pFwdSolution);
                     //bFwdReady = false; // doesn't seem to be necessary? bDoClustering = false anyway
-                    emit statusInformationChanged(5);       //finished
+                    emit statusInformationChanged(5); //finished
                 }
             }
         }
@@ -504,8 +504,8 @@ void RtFwd::run()
         bNClusterChanged = m_bNClusterChanged;
         m_mutex.unlock();
 
-        if(bDoClustering && bFwdReady && bNClusterChanged) {
-            emit statusInformationChanged(3);               // clustering
+        if (bDoClustering && bFwdReady && bNClusterChanged) {
+            emit statusInformationChanged(3); // clustering
             pClusteredFwd = MNEForwardSolution::SPtr(new MNEForwardSolution(pFwdSolution->cluster_forward_solution(*m_pAnnotationSet.data(), m_pFwdSettings->ncluster)));
             emit clusteringAvailable(pClusteredFwd->nsource);
 
@@ -516,7 +516,7 @@ void RtFwd::run()
             m_bNClusterChanged = false;
             m_mutex.unlock();
 
-            emit statusInformationChanged(6);               //finished
+            emit statusInformationChanged(6); //finished
         }
     }
 }
@@ -525,7 +525,7 @@ void RtFwd::run()
 
 QString RtFwd::getBuildInfo()
 {
-    return QString(RTFWDPLUGIN::buildDateTime()) + QString(" - ")  + QString(RTFWDPLUGIN::buildHash());
+    return QString(RTFWDPLUGIN::buildDateTime()) + QString(" - ") + QString(RTFWDPLUGIN::buildHash());
 }
 
 //=============================================================================================================
@@ -533,20 +533,20 @@ QString RtFwd::getBuildInfo()
 QVariantMap RtFwd::getAttributes() const
 {
     QVariantMap attrs;
-    attrs[QStringLiteral("solname")]        = m_pFwdSettings->solname;
-    attrs[QStringLiteral("mriname")]        = m_pFwdSettings->mriname;
-    attrs[QStringLiteral("bemname")]        = m_pFwdSettings->bemname;
-    attrs[QStringLiteral("srcname")]        = m_pFwdSettings->srcname;
-    attrs[QStringLiteral("measname")]       = m_pFwdSettings->measname;
-    attrs[QStringLiteral("transname")]      = m_pFwdSettings->transname;
+    attrs[QStringLiteral("solname")] = m_pFwdSettings->solname;
+    attrs[QStringLiteral("mriname")] = m_pFwdSettings->mriname;
+    attrs[QStringLiteral("bemname")] = m_pFwdSettings->bemname;
+    attrs[QStringLiteral("srcname")] = m_pFwdSettings->srcname;
+    attrs[QStringLiteral("measname")] = m_pFwdSettings->measname;
+    attrs[QStringLiteral("transname")] = m_pFwdSettings->transname;
     attrs[QStringLiteral("eeg_model_name")] = m_pFwdSettings->eeg_model_name;
-    attrs[QStringLiteral("include_meg")]    = m_pFwdSettings->include_meg;
-    attrs[QStringLiteral("include_eeg")]    = m_pFwdSettings->include_eeg;
-    attrs[QStringLiteral("accurate")]       = m_pFwdSettings->accurate;
-    attrs[QStringLiteral("mindist")]        = static_cast<double>(m_pFwdSettings->mindist);
-    attrs[QStringLiteral("ncluster")]       = m_pFwdSettings->ncluster;
-    attrs[QStringLiteral("atlasDir")]       = m_sAtlasDir;
-    attrs[QStringLiteral("doClustering")]   = m_bDoClustering;
+    attrs[QStringLiteral("include_meg")] = m_pFwdSettings->include_meg;
+    attrs[QStringLiteral("include_eeg")] = m_pFwdSettings->include_eeg;
+    attrs[QStringLiteral("accurate")] = m_pFwdSettings->accurate;
+    attrs[QStringLiteral("mindist")] = static_cast<double>(m_pFwdSettings->mindist);
+    attrs[QStringLiteral("ncluster")] = m_pFwdSettings->ncluster;
+    attrs[QStringLiteral("atlasDir")] = m_sAtlasDir;
+    attrs[QStringLiteral("doClustering")] = m_bDoClustering;
     attrs[QStringLiteral("doRecomputation")] = m_bDoRecomputation;
     return attrs;
 }

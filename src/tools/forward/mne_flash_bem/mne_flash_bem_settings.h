@@ -28,7 +28,8 @@
 // DEFINE NAMESPACE MNEFLASHBEM
 //=============================================================================================================
 
-namespace MNEFLASHBEM {
+namespace MNEFLASHBEM
+{
 
 //=============================================================================================================
 /**
@@ -52,7 +53,7 @@ public:
      * @param[in] argc  Number of arguments.
      * @param[in] argv  Argument array.
      */
-    MNEFlashBemSettings(int *argc, char **argv);
+    MNEFlashBemSettings(int* argc, char** argv);
 
     //=========================================================================================================
     /**
@@ -112,13 +113,13 @@ public:
     QString flashDir() const;
 
 private:
-    QString     m_sSubject;         /**< Subject name. */
-    QString     m_sSubjectsDir;     /**< Subjects directory path. */
-    QString     m_sFreeSurferHome;  /**< FreeSurfer home path. */
-    bool        m_bNoConvert;       /**< Skip DICOM conversion. */
-    bool        m_bNoFlash30;       /**< No 30-degree flash data. */
-    QString     m_sUnwarp;          /**< Gradient unwarp option. */
-    QString     m_sFlashDir;        /**< Flash data directory. */
+    QString m_sSubject;        /**< Subject name. */
+    QString m_sSubjectsDir;    /**< Subjects directory path. */
+    QString m_sFreeSurferHome; /**< FreeSurfer home path. */
+    bool m_bNoConvert;         /**< Skip DICOM conversion. */
+    bool m_bNoFlash30;         /**< No 30-degree flash data. */
+    QString m_sUnwarp;         /**< Gradient unwarp option. */
+    QString m_sFlashDir;       /**< Flash data directory. */
 };
 
 } // namespace MNEFLASHBEM

@@ -67,8 +67,8 @@ private slots:
 
 private:
     void createSyntheticForwardProblem(MatrixXd& gain, MatrixXd& data,
-                                        int nSensors, int nSources, int nTimes,
-                                        QVector<int> activeIndices) const;
+                                       int nSensors, int nSources, int nTimes,
+                                       QVector<int> activeIndices) const;
 };
 
 //=============================================================================================================
@@ -131,7 +131,7 @@ void TestInvSparse::testMxneSparsity()
 
     // High regularization should produce sparser solution
     InvMxneResult sparse = InvMxne::compute(gain, data, 10.0, 50, 1e-6);
-    InvMxneResult dense  = InvMxne::compute(gain, data, 0.01, 50, 1e-6);
+    InvMxneResult dense = InvMxne::compute(gain, data, 0.01, 50, 1e-6);
 
     QVERIFY(sparse.activeVertices.size() <= dense.activeVertices.size());
 }

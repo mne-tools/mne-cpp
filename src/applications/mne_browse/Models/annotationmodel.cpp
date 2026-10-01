@@ -40,7 +40,8 @@ using namespace FIFFLIB;
 namespace
 {
 
-enum AnnotationColumn {
+enum AnnotationColumn
+{
     StartSampleColumn = 0,
     EndSampleColumn,
     OnsetSecondsColumn,
@@ -69,7 +70,7 @@ QString displayChannelNames(const QStringList& channelNames)
 QStringList parseDisplayChannelNames(QString text)
 {
     text = text.trimmed();
-    if(text.isEmpty()) {
+    if (text.isEmpty()) {
         return {};
     }
 
@@ -78,9 +79,9 @@ QStringList parseDisplayChannelNames(QString text)
 
     QStringList channelNames;
     const QStringList parts = text.split(separator, Qt::SkipEmptyParts);
-    for(const QString& part : parts) {
+    for (const QString& part : parts) {
         const QString trimmed = part.trimmed();
-        if(!trimmed.isEmpty() && !channelNames.contains(trimmed)) {
+        if (!trimmed.isEmpty() && !channelNames.contains(trimmed)) {
             channelNames.append(trimmed);
         }
     }
@@ -93,9 +94,9 @@ QString encodeMneChannelNames(const QStringList& channelNames)
     QStringList encodedNames;
     encodedNames.reserve(channelNames.size());
 
-    for(const QString& channelName : channelNames) {
+    for (const QString& channelName : channelNames) {
         QString sanitized = channelName.trimmed();
-        if(sanitized.isEmpty()) {
+        if (sanitized.isEmpty()) {
             continue;
         }
 
@@ -110,17 +111,17 @@ QString encodeMneChannelNames(const QStringList& channelNames)
 QStringList decodeMneChannelNames(const QString& text)
 {
     const QString trimmedText = text.trimmed();
-    if(trimmedText.isEmpty()) {
+    if (trimmedText.isEmpty()) {
         return {};
     }
 
     QStringList channelNames;
     const QStringList parts = trimmedText.split(QLatin1Char(':'), Qt::KeepEmptyParts);
-    for(QString part : parts) {
+    for (QString part : parts) {
         part.replace(QStringLiteral("{COLON}{COLON}"), QStringLiteral("{COLON}"));
         part.replace(QStringLiteral("{COLON}"), QStringLiteral(":"));
         part = part.trimmed();
-        if(!part.isEmpty()) {
+        if (!part.isEmpty()) {
             channelNames.append(part);
         }
     }
@@ -130,11 +131,11 @@ QStringList decodeMneChannelNames(const QString& text)
 
 QString variantToText(const QVariant& value)
 {
-    if(!value.isValid() || value.isNull()) {
+    if (!value.isValid() || value.isNull()) {
         return QString();
     }
 
-    switch(value.metaType().id()) {
+    switch (value.metaType().id()) {
         case QMetaType::Bool:
             return value.toBool() ? QStringLiteral("true") : QStringLiteral("false");
         case QMetaType::Double:
@@ -146,28 +147,28 @@ QString variantToText(const QVariant& value)
 
 QVariant textToVariant(const QString& text)
 {
-    if(text.isEmpty()) {
+    if (text.isEmpty()) {
         return QString();
     }
 
     const QString trimmed = text.trimmed();
-    if(trimmed.compare(QStringLiteral("true"), Qt::CaseInsensitive) == 0) {
+    if (trimmed.compare(QStringLiteral("true"), Qt::CaseInsensitive) == 0) {
         return true;
     }
 
-    if(trimmed.compare(QStringLiteral("false"), Qt::CaseInsensitive) == 0) {
+    if (trimmed.compare(QStringLiteral("false"), Qt::CaseInsensitive) == 0) {
         return false;
     }
 
     bool intOk = false;
     const qlonglong intValue = trimmed.toLongLong(&intOk);
-    if(intOk) {
+    if (intOk) {
         return intValue;
     }
 
     bool doubleOk = false;
     const double doubleValue = trimmed.toDouble(&doubleOk);
-    if(doubleOk) {
+    if (doubleOk) {
         return doubleValue;
     }
 
@@ -177,7 +178,7 @@ QVariant textToVariant(const QString& text)
 QJsonObject variantMapToJsonObject(const QVariantMap& values)
 {
     QJsonObject object;
-    for(auto it = values.constBegin(); it != values.constEnd(); ++it) {
+    for (auto it = values.constBegin(); it != values.constEnd(); ++it) {
         object.insert(it.key(), QJsonValue::fromVariant(it.value()));
     }
 
@@ -196,8 +197,7 @@ QString escapeCsvField(QString text)
 {
     text.replace(QStringLiteral("\""), QStringLiteral("\"\""));
 
-    if(text.contains(QLatin1Char(',')) || text.contains(QLatin1Char('"'))
-       || text.contains(QLatin1Char('\n')) || text.contains(QLatin1Char('\r'))) {
+    if (text.contains(QLatin1Char(',')) || text.contains(QLatin1Char('"')) || text.contains(QLatin1Char('\n')) || text.contains(QLatin1Char('\r'))) {
         return QStringLiteral("\"%1\"").arg(text);
     }
 
@@ -210,11 +210,11 @@ QStringList parseCsvRow(const QString& line)
     QString currentField;
     bool insideQuotes = false;
 
-    for(int index = 0; index < line.size(); ++index) {
+    for (int index = 0; index < line.size(); ++index) {
         const QChar character = line.at(index);
 
-        if(character == QLatin1Char('"')) {
-            if(insideQuotes && index + 1 < line.size() && line.at(index + 1) == QLatin1Char('"')) {
+        if (character == QLatin1Char('"')) {
+            if (insideQuotes && index + 1 < line.size() && line.at(index + 1) == QLatin1Char('"')) {
                 currentField.append(QLatin1Char('"'));
                 ++index;
             } else {
@@ -223,7 +223,7 @@ QStringList parseCsvRow(const QString& line)
             continue;
         }
 
-        if(character == QLatin1Char(',') && !insideQuotes) {
+        if (character == QLatin1Char(',') && !insideQuotes) {
             fields.append(currentField);
             currentField.clear();
             continue;
@@ -234,7 +234,7 @@ QStringList parseCsvRow(const QString& line)
 
     fields.append(currentField);
 
-    if(!fields.isEmpty() && !fields.first().isEmpty() && fields.first().at(0) == QChar(0xFEFF)) {
+    if (!fields.isEmpty() && !fields.first().isEmpty() && fields.first().at(0) == QChar(0xFEFF)) {
         fields[0].remove(0, 1);
     }
 
@@ -247,7 +247,7 @@ bool parseTimestampToUsecs(const QString& text, qint64& usecsSinceEpoch)
         QStringLiteral("^(\\d{4})-(\\d{2})-(\\d{2})[ T](\\d{2}):(\\d{2}):(\\d{2})(?:\\.(\\d{1,6}))?$"));
 
     const QRegularExpressionMatch match = timestampExpression.match(text.trimmed());
-    if(!match.hasMatch()) {
+    if (!match.hasMatch()) {
         return false;
     }
 
@@ -258,13 +258,13 @@ bool parseTimestampToUsecs(const QString& text, qint64& usecsSinceEpoch)
                      match.captured(5).toInt(),
                      match.captured(6).toInt());
 
-    if(!date.isValid() || !time.isValid()) {
+    if (!date.isValid() || !time.isValid()) {
         return false;
     }
 
     const QDateTime dateTime(date, time, QTimeZone::UTC);
     QString fractionalPart = match.captured(7);
-    if(!fractionalPart.isEmpty()) {
+    if (!fractionalPart.isEmpty()) {
         fractionalPart = fractionalPart.leftJustified(6, QLatin1Char('0'), true).left(6);
     } else {
         fractionalPart = QStringLiteral("000000");
@@ -279,7 +279,7 @@ QString formatTimestampFromUsecs(qint64 usecsSinceEpoch)
     qint64 secondsSinceEpoch = usecsSinceEpoch / 1000000LL;
     qint64 microseconds = usecsSinceEpoch % 1000000LL;
 
-    if(microseconds < 0) {
+    if (microseconds < 0) {
         microseconds += 1000000LL;
         --secondsSinceEpoch;
     }
@@ -294,7 +294,7 @@ QString formatTimestampFromUsecs(qint64 usecsSinceEpoch)
 
 //=============================================================================================================
 
-AnnotationModel::AnnotationModel(QObject *parent)
+AnnotationModel::AnnotationModel(QObject* parent)
 : QAbstractTableModel(parent)
 , m_pFiffInfo(new FIFFLIB::FiffInfo)
 {
@@ -306,7 +306,7 @@ AnnotationModel::~AnnotationModel() = default;
 
 //=============================================================================================================
 
-int AnnotationModel::rowCount(const QModelIndex &parent) const
+int AnnotationModel::rowCount(const QModelIndex& parent) const
 {
     Q_UNUSED(parent)
     return m_fiffAnnotations.size();
@@ -314,7 +314,7 @@ int AnnotationModel::rowCount(const QModelIndex &parent) const
 
 //=============================================================================================================
 
-int AnnotationModel::columnCount(const QModelIndex &parent) const
+int AnnotationModel::columnCount(const QModelIndex& parent) const
 {
     Q_UNUSED(parent)
     return AnnotationColumnCount;
@@ -324,16 +324,16 @@ int AnnotationModel::columnCount(const QModelIndex &parent) const
 
 QVariant AnnotationModel::headerData(int section, Qt::Orientation orientation, int role) const
 {
-    if(role != Qt::DisplayRole && role != Qt::TextAlignmentRole) {
+    if (role != Qt::DisplayRole && role != Qt::TextAlignmentRole) {
         return QVariant();
     }
 
-    if(role == Qt::TextAlignmentRole) {
+    if (role == Qt::TextAlignmentRole) {
         return QVariant(Qt::AlignHCenter | Qt::AlignVCenter);
     }
 
-    if(orientation == Qt::Horizontal) {
-        switch(section) {
+    if (orientation == Qt::Horizontal) {
+        switch (section) {
             case StartSampleColumn:
                 return QVariant(QStringLiteral("Start"));
             case EndSampleColumn:
@@ -351,7 +351,7 @@ QVariant AnnotationModel::headerData(int section, Qt::Orientation orientation, i
             default:
                 break;
         }
-    } else if(orientation == Qt::Vertical) {
+    } else if (orientation == Qt::Vertical) {
         return QStringLiteral("Annotation %1").arg(section + 1);
     }
 
@@ -360,19 +360,19 @@ QVariant AnnotationModel::headerData(int section, Qt::Orientation orientation, i
 
 //=============================================================================================================
 
-QVariant AnnotationModel::data(const QModelIndex &index, int role) const
+QVariant AnnotationModel::data(const QModelIndex& index, int role) const
 {
-    if(!index.isValid() || index.row() < 0 || index.row() >= m_fiffAnnotations.size()) {
+    if (!index.isValid() || index.row() < 0 || index.row() >= m_fiffAnnotations.size()) {
         return QVariant();
     }
 
     const FiffAnnotation& annot = m_fiffAnnotations[index.row()];
 
-    if(role == Qt::TextAlignmentRole) {
+    if (role == Qt::TextAlignmentRole) {
         return QVariant(Qt::AlignCenter | Qt::AlignVCenter);
     }
 
-    if(role == Qt::BackgroundRole) {
+    if (role == Qt::BackgroundRole) {
         QBrush brush;
         brush.setStyle(Qt::SolidPattern);
         QColor color = colorForLabel(annot.description);
@@ -381,7 +381,7 @@ QVariant AnnotationModel::data(const QModelIndex &index, int role) const
         return QVariant(brush);
     }
 
-    if(role != Qt::DisplayRole && role != Qt::EditRole) {
+    if (role != Qt::DisplayRole && role != Qt::EditRole) {
         return QVariant();
     }
 
@@ -391,7 +391,7 @@ QVariant AnnotationModel::data(const QModelIndex &index, int role) const
     const int relativeStart = startSample - m_iFirstSample;
     const int relativeEnd = endSample - m_iFirstSample;
 
-    switch(index.column()) {
+    switch (index.column()) {
         case StartSampleColumn:
             return QVariant(relativeStart);
         case EndSampleColumn:
@@ -413,9 +413,9 @@ QVariant AnnotationModel::data(const QModelIndex &index, int role) const
 
 //=============================================================================================================
 
-Qt::ItemFlags AnnotationModel::flags(const QModelIndex &index) const
+Qt::ItemFlags AnnotationModel::flags(const QModelIndex& index) const
 {
-    if(!index.isValid()) {
+    if (!index.isValid()) {
         return Qt::NoItemFlags;
     }
 
@@ -424,16 +424,16 @@ Qt::ItemFlags AnnotationModel::flags(const QModelIndex &index) const
 
 //=============================================================================================================
 
-bool AnnotationModel::setData(const QModelIndex &index, const QVariant &value, int role)
+bool AnnotationModel::setData(const QModelIndex& index, const QVariant& value, int role)
 {
-    if(role != Qt::EditRole || !index.isValid() || index.row() < 0 || index.row() >= m_fiffAnnotations.size()) {
+    if (role != Qt::EditRole || !index.isValid() || index.row() < 0 || index.row() >= m_fiffAnnotations.size()) {
         return false;
     }
 
     FiffAnnotation& annot = m_fiffAnnotations[index.row()];
     const double sfreq = (m_pFiffInfo && m_pFiffInfo->sfreq > 0.0f) ? m_pFiffInfo->sfreq : 1.0;
 
-    switch(index.column()) {
+    switch (index.column()) {
         case StartSampleColumn:
             annot.onset = static_cast<double>(value.toInt()) / sfreq;
             break;
@@ -463,8 +463,10 @@ bool AnnotationModel::setData(const QModelIndex &index, const QVariant &value, i
     }
 
     // Ensure non-negative onset and duration
-    if(annot.onset < 0.0) annot.onset = 0.0;
-    if(annot.duration < 0.0) annot.duration = 0.0;
+    if (annot.onset < 0.0)
+        annot.onset = 0.0;
+    if (annot.duration < 0.0)
+        annot.duration = 0.0;
 
     beginResetModel();
     sortEntries();
@@ -476,16 +478,16 @@ bool AnnotationModel::setData(const QModelIndex &index, const QVariant &value, i
 
 //=============================================================================================================
 
-bool AnnotationModel::removeRows(int position, int rows, const QModelIndex &parent)
+bool AnnotationModel::removeRows(int position, int rows, const QModelIndex& parent)
 {
     Q_UNUSED(parent)
 
-    if(position < 0 || rows <= 0 || position + rows > m_fiffAnnotations.size()) {
+    if (position < 0 || rows <= 0 || position + rows > m_fiffAnnotations.size()) {
         return false;
     }
 
     beginRemoveRows(QModelIndex(), position, position + rows - 1);
-    for(int index = 0; index < rows; ++index) {
+    for (int index = 0; index < rows; ++index) {
         m_fiffAnnotations.remove(position);
     }
     endRemoveRows();
@@ -523,8 +525,10 @@ int AnnotationModel::addAnnotation(int startSample,
     const double sfreq = (m_pFiffInfo && m_pFiffInfo->sfreq > 0.0f) ? m_pFiffInfo->sfreq : 1.0;
     double onset = static_cast<double>(entry.startSample - m_iFirstSample) / sfreq;
     double duration = static_cast<double>(entry.endSample - entry.startSample) / sfreq;
-    if(onset < 0.0) onset = 0.0;
-    if(duration < 0.0) duration = 0.0;
+    if (onset < 0.0)
+        onset = 0.0;
+    if (duration < 0.0)
+        duration = 0.0;
 
     // Auto-merge: absorb any existing same-description annotations that overlap or are adjacent
     QVector<int> mergeIndices;
@@ -536,10 +540,9 @@ int AnnotationModel::addAnnotation(int startSample,
         int existStart = m_iFirstSample + static_cast<int>(qRound(existing.onset * sfreq));
         int existEnd = existStart + static_cast<int>(qRound(existing.duration * sfreq));
         // Overlapping or adjacent (within 1 sample)?
-        if (existStart <= entry.endSample + 1
-            && existEnd >= entry.startSample - 1) {
+        if (existStart <= entry.endSample + 1 && existEnd >= entry.startSample - 1) {
             entry.startSample = qMin(entry.startSample, existStart);
-            entry.endSample   = qMax(entry.endSample, existEnd);
+            entry.endSample = qMax(entry.endSample, existEnd);
             mergeIndices.append(i);
         }
     }
@@ -561,11 +564,9 @@ int AnnotationModel::addAnnotation(int startSample,
     notifyAnnotationsChanged();
 
     // Find the row of the newly inserted annotation
-    for(int row = 0; row < m_fiffAnnotations.size(); ++row) {
+    for (int row = 0; row < m_fiffAnnotations.size(); ++row) {
         const FiffAnnotation& candidate = m_fiffAnnotations[row];
-        if(qAbs(candidate.onset - onset) < 1e-9
-           && qAbs(candidate.duration - duration) < 1e-9
-           && candidate.description == entry.description) {
+        if (qAbs(candidate.onset - onset) < 1e-9 && qAbs(candidate.duration - duration) < 1e-9 && candidate.description == entry.description) {
             return row;
         }
     }
@@ -577,7 +578,7 @@ int AnnotationModel::addAnnotation(int startSample,
 
 QPair<int, int> AnnotationModel::getSampleRange(int row) const
 {
-    if(row < 0 || row >= m_fiffAnnotations.size()) {
+    if (row < 0 || row >= m_fiffAnnotations.size()) {
         return QPair<int, int>(0, 0);
     }
 
@@ -592,7 +593,7 @@ QPair<int, int> AnnotationModel::getSampleRange(int row) const
 
 bool AnnotationModel::updateAnnotationBoundary(int row, bool isStart, int absoluteSample)
 {
-    if(row < 0 || row >= m_fiffAnnotations.size()) {
+    if (row < 0 || row >= m_fiffAnnotations.size()) {
         return false;
     }
 
@@ -602,21 +603,23 @@ bool AnnotationModel::updateAnnotationBoundary(int row, bool isStart, int absolu
     int startSample = m_iFirstSample + static_cast<int>(qRound(annot.onset * sfreq));
     int endSample = startSample + static_cast<int>(qRound(annot.duration * sfreq));
 
-    if(isStart) {
+    if (isStart) {
         startSample = absoluteSample;
     } else {
         endSample = absoluteSample;
     }
 
     // Ensure start <= end
-    if(startSample > endSample) {
+    if (startSample > endSample) {
         std::swap(startSample, endSample);
     }
 
     annot.onset = static_cast<double>(startSample - m_iFirstSample) / sfreq;
     annot.duration = static_cast<double>(endSample - startSample) / sfreq;
-    if(annot.onset < 0.0) annot.onset = 0.0;
-    if(annot.duration < 0.0) annot.duration = 0.0;
+    if (annot.onset < 0.0)
+        annot.onset = 0.0;
+    if (annot.duration < 0.0)
+        annot.duration = 0.0;
 
     beginResetModel();
     sortEntries();
@@ -635,7 +638,7 @@ QVector<AnnotationSpanData> AnnotationModel::getAnnotationSpans() const
 
     const double sfreq = (m_pFiffInfo && m_pFiffInfo->sfreq > 0.0f) ? m_pFiffInfo->sfreq : 1.0;
 
-    for(int i = 0; i < m_fiffAnnotations.size(); ++i) {
+    for (int i = 0; i < m_fiffAnnotations.size(); ++i) {
         const FiffAnnotation& annot = m_fiffAnnotations[i];
         AnnotationSpanData span;
         span.startSample = m_iFirstSample + static_cast<int>(qRound(annot.onset * sfreq));
@@ -655,15 +658,15 @@ QVector<AnnotationSpanData> AnnotationModel::getAnnotationSpans() const
 bool AnnotationModel::loadAnnotationData(QFile& qFile)
 {
     const QString suffix = QFileInfo(qFile.fileName()).suffix().trimmed().toLower();
-    if(suffix == QStringLiteral("fif")) {
+    if (suffix == QStringLiteral("fif")) {
         return loadAnnotationFif(qFile);
     }
 
-    if(suffix == QStringLiteral("csv")) {
+    if (suffix == QStringLiteral("csv")) {
         return loadAnnotationCsv(qFile);
     }
 
-    if(suffix == QStringLiteral("txt")) {
+    if (suffix == QStringLiteral("txt")) {
         return loadAnnotationTxt(qFile);
     }
 
@@ -675,21 +678,21 @@ bool AnnotationModel::loadAnnotationData(QFile& qFile)
 bool AnnotationModel::saveAnnotationData(QFile& qFile) const
 {
     const QFileInfo fileInfo(qFile);
-    if(fileInfo.dir().exists() == false) {
+    if (fileInfo.dir().exists() == false) {
         qWarning() << "AnnotationModel: annotation directory does not exist" << fileInfo.absolutePath();
         return false;
     }
 
     const QString suffix = fileInfo.suffix().trimmed().toLower();
-    if(suffix == QStringLiteral("fif")) {
+    if (suffix == QStringLiteral("fif")) {
         return saveAnnotationFif(qFile);
     }
 
-    if(suffix == QStringLiteral("csv")) {
+    if (suffix == QStringLiteral("csv")) {
         return saveAnnotationCsv(qFile);
     }
 
-    if(suffix == QStringLiteral("txt")) {
+    if (suffix == QStringLiteral("txt")) {
         return saveAnnotationTxt(qFile);
     }
 
@@ -700,7 +703,7 @@ bool AnnotationModel::saveAnnotationData(QFile& qFile) const
 
 bool AnnotationModel::loadAnnotationJson(QFile& qFile)
 {
-    if(!qFile.open(QIODevice::ReadOnly)) {
+    if (!qFile.open(QIODevice::ReadOnly)) {
         qWarning() << "AnnotationModel: could not open annotation file" << qFile.fileName();
         return false;
     }
@@ -709,7 +712,7 @@ bool AnnotationModel::loadAnnotationJson(QFile& qFile)
     const QJsonDocument document = QJsonDocument::fromJson(qFile.readAll(), &parseError);
     qFile.close();
 
-    if(parseError.error != QJsonParseError::NoError || (!document.isObject() && !document.isArray())) {
+    if (parseError.error != QJsonParseError::NoError || (!document.isObject() && !document.isArray())) {
         qWarning() << "AnnotationModel: invalid annotation json" << qFile.fileName() << parseError.errorString();
         return false;
     }
@@ -721,27 +724,26 @@ bool AnnotationModel::loadAnnotationJson(QFile& qFile)
     QVector<AnnotationEntry> parsedEntries;
     parsedEntries.reserve(annotationArray.size());
 
-    for(const QJsonValue& value : annotationArray) {
+    for (const QJsonValue& value : annotationArray) {
         const QJsonObject object = value.toObject();
-        if(object.isEmpty()) {
+        if (object.isEmpty()) {
             continue;
         }
 
-        const QString description = object.value(QStringLiteral("description")).toString(
-            object.value(QStringLiteral("label")).toString(defaultAnnotationDescription()));
+        const QString description = object.value(QStringLiteral("description")).toString(object.value(QStringLiteral("label")).toString(defaultAnnotationDescription()));
         const QString comment = object.value(QStringLiteral("comment")).toString();
 
         QStringList channelNames;
         const QJsonValue channelValue = object.value(QStringLiteral("ch_names"));
-        if(channelValue.isArray()) {
+        if (channelValue.isArray()) {
             const QJsonArray channelArray = channelValue.toArray();
-            for(const QJsonValue& channelNameValue : channelArray) {
+            for (const QJsonValue& channelNameValue : channelArray) {
                 const QString channelName = channelNameValue.toString().trimmed();
-                if(!channelName.isEmpty() && !channelNames.contains(channelName)) {
+                if (!channelName.isEmpty() && !channelNames.contains(channelName)) {
                     channelNames.append(channelName);
                 }
             }
-        } else if(channelValue.isString()) {
+        } else if (channelValue.isString()) {
             channelNames = decodeMneChannelNames(channelValue.toString());
         }
 
@@ -771,7 +773,7 @@ bool AnnotationModel::loadAnnotationJson(QFile& qFile)
 bool AnnotationModel::loadAnnotationFif(QFile& qFile)
 {
     FIFFLIB::FiffStream::SPtr stream(new FIFFLIB::FiffStream(&qFile));
-    if(!stream->open()) {
+    if (!stream->open()) {
         qWarning() << "AnnotationModel: could not open annotation fif" << qFile.fileName();
         return false;
     }
@@ -779,7 +781,7 @@ bool AnnotationModel::loadAnnotationFif(QFile& qFile)
     const QList<FIFFLIB::FiffDirNode::SPtr> annotationBlocks =
         stream->dirtree()->dir_tree_find(FiffBlockMneAnnotations);
 
-    if(annotationBlocks.isEmpty()) {
+    if (annotationBlocks.isEmpty()) {
         qFile.close();
         qWarning() << "AnnotationModel: could not find annotation block in" << qFile.fileName();
         return false;
@@ -791,49 +793,49 @@ bool AnnotationModel::loadAnnotationFif(QFile& qFile)
     QVector<QStringList> channelNames;
     QVector<QVariantMap> extras;
 
-    for(int entryIndex = 0; entryIndex < annotationBlocks.first()->nent(); ++entryIndex) {
+    for (int entryIndex = 0; entryIndex < annotationBlocks.first()->nent(); ++entryIndex) {
         const auto& directoryEntry = annotationBlocks.first()->dir.at(entryIndex);
         FIFFLIB::FiffTag::UPtr tag;
-        if(!stream->read_tag(tag, directoryEntry->pos) || !tag) {
+        if (!stream->read_tag(tag, directoryEntry->pos) || !tag) {
             continue;
         }
 
-        if(directoryEntry->kind == FiffMneBaselineMin) {
-            if(const float* values = tag->toFloat()) {
+        if (directoryEntry->kind == FiffMneBaselineMin) {
+            if (const float* values = tag->toFloat()) {
                 const int count = tag->size() / static_cast<int>(sizeof(float));
                 onsetSeconds.resize(count);
-                for(int index = 0; index < count; ++index) {
+                for (int index = 0; index < count; ++index) {
                     onsetSeconds[index] = values[index];
                 }
             }
-        } else if(directoryEntry->kind == FiffMneBaselineMax) {
-            if(const float* values = tag->toFloat()) {
+        } else if (directoryEntry->kind == FiffMneBaselineMax) {
+            if (const float* values = tag->toFloat()) {
                 const int count = tag->size() / static_cast<int>(sizeof(float));
                 endSeconds.resize(count);
-                for(int index = 0; index < count; ++index) {
+                for (int index = 0; index < count; ++index) {
                     endSeconds[index] = values[index];
                 }
             }
-        } else if(directoryEntry->kind == FIFF_COMMENT) {
+        } else if (directoryEntry->kind == FIFF_COMMENT) {
             descriptions = decodeMneChannelNames(tag->toString());
-        } else if(directoryEntry->kind == FiffMneEpochsDropLog) {
+        } else if (directoryEntry->kind == FiffMneEpochsDropLog) {
             const QJsonDocument document = QJsonDocument::fromJson(tag->toString().toUtf8());
             const QJsonArray rows = document.array();
             channelNames.resize(rows.size());
-            for(int row = 0; row < rows.size(); ++row) {
+            for (int row = 0; row < rows.size(); ++row) {
                 const QJsonArray channelRow = rows.at(row).toArray();
-                for(const QJsonValue& channelValue : channelRow) {
+                for (const QJsonValue& channelValue : channelRow) {
                     const QString channelName = channelValue.toString().trimmed();
-                    if(!channelName.isEmpty()) {
+                    if (!channelName.isEmpty()) {
                         channelNames[row].append(channelName);
                     }
                 }
             }
-        } else if(directoryEntry->kind == FIFF_FREE_LIST) {
+        } else if (directoryEntry->kind == FIFF_FREE_LIST) {
             const QJsonDocument document = QJsonDocument::fromJson(tag->toString().toUtf8());
             const QJsonArray rows = document.array();
             extras.resize(rows.size());
-            for(int row = 0; row < rows.size(); ++row) {
+            for (int row = 0; row < rows.size(); ++row) {
                 extras[row] = rows.at(row).toObject().toVariantMap();
             }
         }
@@ -842,22 +844,22 @@ bool AnnotationModel::loadAnnotationFif(QFile& qFile)
     qFile.close();
 
     const int count = onsetSeconds.size();
-    if(count == 0 || endSeconds.size() != count || descriptions.size() != count) {
+    if (count == 0 || endSeconds.size() != count || descriptions.size() != count) {
         qWarning() << "AnnotationModel: incomplete annotation fif content in" << qFile.fileName();
         return false;
     }
 
-    if(channelNames.size() < count) {
+    if (channelNames.size() < count) {
         channelNames.resize(count);
     }
-    if(extras.size() < count) {
+    if (extras.size() < count) {
         extras.resize(count);
     }
 
     QVector<AnnotationEntry> parsedEntries;
     parsedEntries.reserve(count);
 
-    for(int index = 0; index < count; ++index) {
+    for (int index = 0; index < count; ++index) {
         QVariantMap extraValues = extras.at(index);
         const QString comment = extraValues.value(QStringLiteral("comment")).toString().trimmed();
         extraValues.remove(QStringLiteral("comment"));
@@ -886,13 +888,13 @@ bool AnnotationModel::loadAnnotationFif(QFile& qFile)
 
 bool AnnotationModel::loadAnnotationCsv(QFile& qFile)
 {
-    if(!qFile.open(QIODevice::ReadOnly | QIODevice::Text)) {
+    if (!qFile.open(QIODevice::ReadOnly | QIODevice::Text)) {
         qWarning() << "AnnotationModel: could not open annotation csv" << qFile.fileName();
         return false;
     }
 
     QTextStream stream(&qFile);
-    if(stream.atEnd()) {
+    if (stream.atEnd()) {
         qFile.close();
         qWarning() << "AnnotationModel: empty annotation csv" << qFile.fileName();
         return false;
@@ -900,13 +902,11 @@ bool AnnotationModel::loadAnnotationCsv(QFile& qFile)
 
     const QStringList columns = parseCsvRow(stream.readLine());
     QMap<QString, int> columnMap;
-    for(int index = 0; index < columns.size(); ++index) {
+    for (int index = 0; index < columns.size(); ++index) {
         columnMap.insert(columns.at(index).trimmed(), index);
     }
 
-    if(!columnMap.contains(QStringLiteral("onset"))
-       || !columnMap.contains(QStringLiteral("duration"))
-       || !columnMap.contains(QStringLiteral("description"))) {
+    if (!columnMap.contains(QStringLiteral("onset")) || !columnMap.contains(QStringLiteral("duration")) || !columnMap.contains(QStringLiteral("description"))) {
         qFile.close();
         qWarning() << "AnnotationModel: invalid annotation csv header" << qFile.fileName();
         return false;
@@ -923,14 +923,14 @@ bool AnnotationModel::loadAnnotationCsv(QFile& qFile)
 
     QVector<AnnotationEntry> parsedEntries;
 
-    while(!stream.atEnd()) {
+    while (!stream.atEnd()) {
         const QString line = stream.readLine();
-        if(line.trimmed().isEmpty()) {
+        if (line.trimmed().isEmpty()) {
             continue;
         }
 
         QStringList values = parseCsvRow(line);
-        while(values.size() < columns.size()) {
+        while (values.size() < columns.size()) {
             values.append(QString());
         }
 
@@ -940,12 +940,11 @@ bool AnnotationModel::loadAnnotationCsv(QFile& qFile)
 
         double onsetSeconds = 0.0;
         qint64 onsetTimestampUsecs = 0;
-        if(parseTimestampToUsecs(onsetText, onsetTimestampUsecs)) {
-            if(!haveFirstTimestamp) {
+        if (parseTimestampToUsecs(onsetText, onsetTimestampUsecs)) {
+            if (!haveFirstTimestamp) {
                 haveFirstTimestamp = true;
                 firstTimestampUsecs = onsetTimestampUsecs;
-                preferMeasurementStart = haveMeasurementStart
-                                         && qAbs(firstTimestampUsecs - measurementStartUsecs) <= 86400LL * 1000000LL;
+                preferMeasurementStart = haveMeasurementStart && qAbs(firstTimestampUsecs - measurementStartUsecs) <= 86400LL * 1000000LL;
             }
 
             const qint64 baseUsecs = preferMeasurementStart ? measurementStartUsecs : firstTimestampUsecs;
@@ -953,10 +952,10 @@ bool AnnotationModel::loadAnnotationCsv(QFile& qFile)
         } else {
             bool onsetOk = false;
             const double onsetMilliseconds = onsetText.toDouble(&onsetOk);
-            if(!onsetOk) {
+            if (!onsetOk) {
                 continue;
             }
-            if(!haveFirstNumericOnset) {
+            if (!haveFirstNumericOnset) {
                 haveFirstNumericOnset = true;
                 firstNumericOnsetMilliseconds = onsetMilliseconds;
             }
@@ -965,12 +964,12 @@ bool AnnotationModel::loadAnnotationCsv(QFile& qFile)
 
         bool durationOk = false;
         const double durationSeconds = durationText.toDouble(&durationOk);
-        if(!durationOk) {
+        if (!durationOk) {
             continue;
         }
 
         QStringList channelNames;
-        if(columnMap.contains(QStringLiteral("ch_names"))) {
+        if (columnMap.contains(QStringLiteral("ch_names"))) {
             channelNames = decodeMneChannelNames(values.value(columnMap.value(QStringLiteral("ch_names"))));
         }
 
@@ -979,12 +978,8 @@ bool AnnotationModel::loadAnnotationCsv(QFile& qFile)
             : QString();
 
         QVariantMap extras;
-        for(auto it = columnMap.constBegin(); it != columnMap.constEnd(); ++it) {
-            if(it.key() == QStringLiteral("onset")
-               || it.key() == QStringLiteral("duration")
-               || it.key() == QStringLiteral("description")
-               || it.key() == QStringLiteral("ch_names")
-               || it.key() == QStringLiteral("comment")) {
+        for (auto it = columnMap.constBegin(); it != columnMap.constEnd(); ++it) {
+            if (it.key() == QStringLiteral("onset") || it.key() == QStringLiteral("duration") || it.key() == QStringLiteral("description") || it.key() == QStringLiteral("ch_names") || it.key() == QStringLiteral("comment")) {
                 continue;
             }
 
@@ -1012,7 +1007,7 @@ bool AnnotationModel::loadAnnotationCsv(QFile& qFile)
 
 bool AnnotationModel::loadAnnotationTxt(QFile& qFile)
 {
-    if(!qFile.open(QIODevice::ReadOnly | QIODevice::Text)) {
+    if (!qFile.open(QIODevice::ReadOnly | QIODevice::Text)) {
         qWarning() << "AnnotationModel: could not open annotation txt" << qFile.fileName();
         return false;
     }
@@ -1021,18 +1016,18 @@ bool AnnotationModel::loadAnnotationTxt(QFile& qFile)
     QStringList columns;
     QVector<AnnotationEntry> parsedEntries;
 
-    while(!stream.atEnd()) {
+    while (!stream.atEnd()) {
         const QString rawLine = stream.readLine();
         const QString line = rawLine.trimmed();
 
-        if(line.isEmpty()) {
+        if (line.isEmpty()) {
             continue;
         }
 
-        if(line.startsWith(QLatin1Char('#'))) {
-            if(line.startsWith(QStringLiteral("# onset"))) {
+        if (line.startsWith(QLatin1Char('#'))) {
+            if (line.startsWith(QStringLiteral("# onset"))) {
                 columns = parseCsvRow(line.mid(2));
-                for(QString& column : columns) {
+                for (QString& column : columns) {
                     column = column.trimmed();
                 }
             }
@@ -1042,27 +1037,25 @@ bool AnnotationModel::loadAnnotationTxt(QFile& qFile)
         QStringList values = parseCsvRow(rawLine);
 
         QStringList activeColumns = columns;
-        if(activeColumns.isEmpty()) {
+        if (activeColumns.isEmpty()) {
             activeColumns = {QStringLiteral("onset"),
                              QStringLiteral("duration"),
                              QStringLiteral("description")};
-            if(values.size() == 4) {
+            if (values.size() == 4) {
                 activeColumns.append(QStringLiteral("ch_names"));
             }
         }
 
-        while(values.size() < activeColumns.size()) {
+        while (values.size() < activeColumns.size()) {
             values.append(QString());
         }
 
         QMap<QString, int> columnMap;
-        for(int index = 0; index < activeColumns.size(); ++index) {
+        for (int index = 0; index < activeColumns.size(); ++index) {
             columnMap.insert(activeColumns.at(index), index);
         }
 
-        if(!columnMap.contains(QStringLiteral("onset"))
-           || !columnMap.contains(QStringLiteral("duration"))
-           || !columnMap.contains(QStringLiteral("description"))) {
+        if (!columnMap.contains(QStringLiteral("onset")) || !columnMap.contains(QStringLiteral("duration")) || !columnMap.contains(QStringLiteral("description"))) {
             continue;
         }
 
@@ -1070,14 +1063,14 @@ bool AnnotationModel::loadAnnotationTxt(QFile& qFile)
         const double onsetSeconds = values.value(columnMap.value(QStringLiteral("onset"))).trimmed().toDouble(&onsetOk);
         bool durationOk = false;
         const double durationSeconds = values.value(columnMap.value(QStringLiteral("duration"))).trimmed().toDouble(&durationOk);
-        if(!onsetOk || !durationOk) {
+        if (!onsetOk || !durationOk) {
             continue;
         }
 
         const QString description = values.value(columnMap.value(QStringLiteral("description"))).trimmed();
 
         QStringList channelNames;
-        if(columnMap.contains(QStringLiteral("ch_names"))) {
+        if (columnMap.contains(QStringLiteral("ch_names"))) {
             channelNames = decodeMneChannelNames(values.value(columnMap.value(QStringLiteral("ch_names"))));
         }
 
@@ -1086,12 +1079,8 @@ bool AnnotationModel::loadAnnotationTxt(QFile& qFile)
             : QString();
 
         QVariantMap extras;
-        for(auto it = columnMap.constBegin(); it != columnMap.constEnd(); ++it) {
-            if(it.key() == QStringLiteral("onset")
-               || it.key() == QStringLiteral("duration")
-               || it.key() == QStringLiteral("description")
-               || it.key() == QStringLiteral("ch_names")
-               || it.key() == QStringLiteral("comment")) {
+        for (auto it = columnMap.constBegin(); it != columnMap.constEnd(); ++it) {
+            if (it.key() == QStringLiteral("onset") || it.key() == QStringLiteral("duration") || it.key() == QStringLiteral("description") || it.key() == QStringLiteral("ch_names") || it.key() == QStringLiteral("comment")) {
                 continue;
             }
 
@@ -1119,32 +1108,31 @@ bool AnnotationModel::loadAnnotationTxt(QFile& qFile)
 
 bool AnnotationModel::saveAnnotationJson(QFile& qFile) const
 {
-    if(!qFile.open(QIODevice::WriteOnly | QIODevice::Truncate)) {
+    if (!qFile.open(QIODevice::WriteOnly | QIODevice::Truncate)) {
         qWarning() << "AnnotationModel: could not write annotation file" << qFile.fileName();
         return false;
     }
 
     QJsonArray annotationArray;
     const QVector<AnnotationEntry> entries = exportEntries();
-    for(const AnnotationEntry& entry : entries) {
+    for (const AnnotationEntry& entry : entries) {
         QJsonObject object;
         object.insert(QStringLiteral("start_sample"), entry.startSample);
         object.insert(QStringLiteral("end_sample"), entry.endSample);
         object.insert(QStringLiteral("onset"), sampleToOnsetSeconds(entry.startSample));
         object.insert(QStringLiteral("duration"),
-                      static_cast<double>(entry.endSample - entry.startSample + 1)
-                      / ((m_pFiffInfo && m_pFiffInfo->sfreq > 0.0f) ? m_pFiffInfo->sfreq : 1.0));
+                      static_cast<double>(entry.endSample - entry.startSample + 1) / ((m_pFiffInfo && m_pFiffInfo->sfreq > 0.0f) ? m_pFiffInfo->sfreq : 1.0));
         object.insert(QStringLiteral("description"), entry.description);
         object.insert(QStringLiteral("label"), entry.description);
         object.insert(QStringLiteral("comment"), entry.comment);
 
         QJsonArray channelArray;
-        for(const QString& channelName : entry.channelNames) {
+        for (const QString& channelName : entry.channelNames) {
             channelArray.append(channelName);
         }
         object.insert(QStringLiteral("ch_names"), channelArray);
 
-        if(!entry.extras.isEmpty()) {
+        if (!entry.extras.isEmpty()) {
             object.insert(QStringLiteral("extras"), variantMapToJsonObject(entry.extras));
         }
 
@@ -1159,11 +1147,11 @@ bool AnnotationModel::saveAnnotationJson(QFile& qFile) const
 
     bool haveMeasurementStart = false;
     const qint64 measurementStartUsecs = measurementStartUsecsSinceEpoch(&haveMeasurementStart);
-    if(haveMeasurementStart) {
+    if (haveMeasurementStart) {
         rootObject.insert(QStringLiteral("orig_time"), formatTimestampFromUsecs(measurementStartUsecs));
     }
 
-    if(m_pFiffInfo && !m_pFiffInfo->utc_offset.isEmpty()) {
+    if (m_pFiffInfo && !m_pFiffInfo->utc_offset.isEmpty()) {
         rootObject.insert(QStringLiteral("utc_offset"), m_pFiffInfo->utc_offset);
     }
 
@@ -1181,7 +1169,7 @@ bool AnnotationModel::saveAnnotationJson(QFile& qFile) const
 bool AnnotationModel::saveAnnotationFif(QFile& qFile) const
 {
     FIFFLIB::FiffStream::SPtr stream = FIFFLIB::FiffStream::start_file(qFile);
-    if(!stream) {
+    if (!stream) {
         qWarning() << "AnnotationModel: could not write annotation fif" << qFile.fileName();
         return false;
     }
@@ -1201,29 +1189,28 @@ bool AnnotationModel::saveAnnotationFif(QFile& qFile) const
     bool haveExtras = false;
 
     const QVector<AnnotationEntry> entries = exportEntries();
-    for(const AnnotationEntry& entry : entries) {
+    for (const AnnotationEntry& entry : entries) {
         const float onset = static_cast<float>(sampleToOnsetSeconds(entry.startSample));
-        const float duration = static_cast<float>((entry.endSample - entry.startSample + 1)
-                               / ((m_pFiffInfo && m_pFiffInfo->sfreq > 0.0f) ? m_pFiffInfo->sfreq : 1.0));
+        const float duration = static_cast<float>((entry.endSample - entry.startSample + 1) / ((m_pFiffInfo && m_pFiffInfo->sfreq > 0.0f) ? m_pFiffInfo->sfreq : 1.0));
 
         onsetSeconds.append(onset);
         endSeconds.append(onset + duration);
         descriptions.append(entry.description);
 
         QJsonArray channelRow;
-        for(const QString& channelName : entry.channelNames) {
+        for (const QString& channelName : entry.channelNames) {
             channelRow.append(channelName);
         }
         haveChannelNames = haveChannelNames || !entry.channelNames.isEmpty();
         channelNameRows.append(channelRow);
 
         QVariantMap extraValues = entry.extras;
-        if(!entry.comment.isEmpty()) {
+        if (!entry.comment.isEmpty()) {
             extraValues.insert(QStringLiteral("comment"), entry.comment);
         }
 
         QJsonObject extraObject;
-        for(auto it = extraValues.constBegin(); it != extraValues.constEnd(); ++it) {
+        for (auto it = extraValues.constBegin(); it != extraValues.constEnd(); ++it) {
             extraObject.insert(it.key(), QJsonValue::fromVariant(it.value()));
         }
 
@@ -1232,7 +1219,7 @@ bool AnnotationModel::saveAnnotationFif(QFile& qFile) const
     }
 
     stream->start_block(FiffBlockMneAnnotations);
-    if(!onsetSeconds.isEmpty()) {
+    if (!onsetSeconds.isEmpty()) {
         stream->write_float(FiffMneBaselineMin, onsetSeconds.data(), onsetSeconds.size());
         stream->write_float(FiffMneBaselineMax, endSeconds.data(), endSeconds.size());
 
@@ -1242,20 +1229,19 @@ bool AnnotationModel::saveAnnotationFif(QFile& qFile) const
 
     bool haveMeasurementStart = false;
     const qint64 measurementStartUsecs = measurementStartUsecsSinceEpoch(&haveMeasurementStart);
-    if(haveMeasurementStart) {
+    if (haveMeasurementStart) {
         const double measurementStamp[2] = {
             static_cast<double>(measurementStartUsecs / 1000000LL),
-            static_cast<double>(measurementStartUsecs % 1000000LL)
-        };
+            static_cast<double>(measurementStartUsecs % 1000000LL)};
         stream->write_double(FIFF_MEAS_DATE, measurementStamp, 2);
     }
 
-    if(haveChannelNames) {
+    if (haveChannelNames) {
         const QString json = QString::fromUtf8(QJsonDocument(channelNameRows).toJson(QJsonDocument::Compact));
         stream->write_string(FiffMneEpochsDropLog, json);
     }
 
-    if(haveExtras) {
+    if (haveExtras) {
         const QString json = QString::fromUtf8(QJsonDocument(extrasRows).toJson(QJsonDocument::Compact));
         stream->write_string(FIFF_FREE_LIST, json);
     }
@@ -1269,7 +1255,7 @@ bool AnnotationModel::saveAnnotationFif(QFile& qFile) const
 
 bool AnnotationModel::saveAnnotationCsv(QFile& qFile) const
 {
-    if(!qFile.open(QIODevice::WriteOnly | QIODevice::Truncate | QIODevice::Text)) {
+    if (!qFile.open(QIODevice::WriteOnly | QIODevice::Truncate | QIODevice::Text)) {
         qWarning() << "AnnotationModel: could not write annotation csv" << qFile.fileName();
         return false;
     }
@@ -1278,10 +1264,10 @@ bool AnnotationModel::saveAnnotationCsv(QFile& qFile) const
     bool haveComments = false;
     QSet<QString> extraKeys;
     const QVector<AnnotationEntry> entries = exportEntries();
-    for(const AnnotationEntry& entry : entries) {
+    for (const AnnotationEntry& entry : entries) {
         haveChannels = haveChannels || !entry.channelNames.isEmpty();
         haveComments = haveComments || !entry.comment.isEmpty();
-        for(auto it = entry.extras.constBegin(); it != entry.extras.constEnd(); ++it) {
+        for (auto it = entry.extras.constBegin(); it != entry.extras.constEnd(); ++it) {
             extraKeys.insert(it.key());
         }
     }
@@ -1292,10 +1278,10 @@ bool AnnotationModel::saveAnnotationCsv(QFile& qFile) const
     QStringList columns = {QStringLiteral("onset"),
                            QStringLiteral("duration"),
                            QStringLiteral("description")};
-    if(haveChannels) {
+    if (haveChannels) {
         columns.append(QStringLiteral("ch_names"));
     }
-    if(haveComments) {
+    if (haveComments) {
         columns.append(QStringLiteral("comment"));
     }
     columns.append(orderedExtraKeys);
@@ -1303,7 +1289,7 @@ bool AnnotationModel::saveAnnotationCsv(QFile& qFile) const
     QTextStream stream(&qFile);
     QStringList escapedHeader;
     escapedHeader.reserve(columns.size());
-    for(const QString& column : columns) {
+    for (const QString& column : columns) {
         escapedHeader.append(escapeCsvField(column));
     }
     stream << escapedHeader.join(QLatin1Char(',')) << '\n';
@@ -1312,32 +1298,31 @@ bool AnnotationModel::saveAnnotationCsv(QFile& qFile) const
     const qint64 measurementStartUsecs = measurementStartUsecsSinceEpoch(&haveMeasurementStart);
     const qint64 csvBaseUsecs = haveMeasurementStart ? measurementStartUsecs : 0;
 
-    for(const AnnotationEntry& entry : entries) {
+    for (const AnnotationEntry& entry : entries) {
         const qint64 onsetUsecs = csvBaseUsecs + qRound64(sampleToOnsetSeconds(entry.startSample) * 1000000.0);
         QStringList values;
         values.reserve(columns.size());
         values.append(formatTimestampFromUsecs(onsetUsecs));
-        values.append(QString::number(static_cast<double>(entry.endSample - entry.startSample + 1)
-                                      / ((m_pFiffInfo && m_pFiffInfo->sfreq > 0.0f) ? m_pFiffInfo->sfreq : 1.0),
+        values.append(QString::number(static_cast<double>(entry.endSample - entry.startSample + 1) / ((m_pFiffInfo && m_pFiffInfo->sfreq > 0.0f) ? m_pFiffInfo->sfreq : 1.0),
                                       'g',
                                       15));
         values.append(entry.description);
 
-        if(haveChannels) {
+        if (haveChannels) {
             values.append(encodeMneChannelNames(entry.channelNames));
         }
 
-        if(haveComments) {
+        if (haveComments) {
             values.append(entry.comment);
         }
 
-        for(const QString& extraKey : orderedExtraKeys) {
+        for (const QString& extraKey : orderedExtraKeys) {
             values.append(variantToText(entry.extras.value(extraKey)));
         }
 
         QStringList escapedValues;
         escapedValues.reserve(values.size());
-        for(const QString& value : values) {
+        for (const QString& value : values) {
             escapedValues.append(escapeCsvField(value));
         }
 
@@ -1352,7 +1337,7 @@ bool AnnotationModel::saveAnnotationCsv(QFile& qFile) const
 
 bool AnnotationModel::saveAnnotationTxt(QFile& qFile) const
 {
-    if(!qFile.open(QIODevice::WriteOnly | QIODevice::Truncate | QIODevice::Text)) {
+    if (!qFile.open(QIODevice::WriteOnly | QIODevice::Truncate | QIODevice::Text)) {
         qWarning() << "AnnotationModel: could not write annotation txt" << qFile.fileName();
         return false;
     }
@@ -1361,10 +1346,10 @@ bool AnnotationModel::saveAnnotationTxt(QFile& qFile) const
     bool haveComments = false;
     QSet<QString> extraKeys;
     const QVector<AnnotationEntry> entries = exportEntries();
-    for(const AnnotationEntry& entry : entries) {
+    for (const AnnotationEntry& entry : entries) {
         haveChannels = haveChannels || !entry.channelNames.isEmpty();
         haveComments = haveComments || !entry.comment.isEmpty();
-        for(auto it = entry.extras.constBegin(); it != entry.extras.constEnd(); ++it) {
+        for (auto it = entry.extras.constBegin(); it != entry.extras.constEnd(); ++it) {
             extraKeys.insert(it.key());
         }
     }
@@ -1377,42 +1362,41 @@ bool AnnotationModel::saveAnnotationTxt(QFile& qFile) const
 
     bool haveMeasurementStart = false;
     const qint64 measurementStartUsecs = measurementStartUsecsSinceEpoch(&haveMeasurementStart);
-    if(haveMeasurementStart) {
+    if (haveMeasurementStart) {
         stream << "# orig_time : " << formatTimestampFromUsecs(measurementStartUsecs) << '\n';
     }
 
     QStringList columns = {QStringLiteral("onset"),
                            QStringLiteral("duration"),
                            QStringLiteral("description")};
-    if(haveChannels) {
+    if (haveChannels) {
         columns.append(QStringLiteral("ch_names"));
     }
-    if(haveComments) {
+    if (haveComments) {
         columns.append(QStringLiteral("comment"));
     }
     columns.append(orderedExtraKeys);
 
     stream << "# " << columns.join(QStringLiteral(", ")) << '\n';
 
-    for(const AnnotationEntry& entry : entries) {
+    for (const AnnotationEntry& entry : entries) {
         QStringList values;
         values.reserve(columns.size());
         values.append(QString::number(sampleToOnsetSeconds(entry.startSample), 'g', 15));
-        values.append(QString::number(static_cast<double>(entry.endSample - entry.startSample + 1)
-                                      / ((m_pFiffInfo && m_pFiffInfo->sfreq > 0.0f) ? m_pFiffInfo->sfreq : 1.0),
+        values.append(QString::number(static_cast<double>(entry.endSample - entry.startSample + 1) / ((m_pFiffInfo && m_pFiffInfo->sfreq > 0.0f) ? m_pFiffInfo->sfreq : 1.0),
                                       'g',
                                       15));
         values.append(sanitizeTxtField(entry.description));
 
-        if(haveChannels) {
+        if (haveChannels) {
             values.append(encodeMneChannelNames(entry.channelNames));
         }
 
-        if(haveComments) {
+        if (haveComments) {
             values.append(sanitizeTxtField(entry.comment));
         }
 
-        for(const QString& extraKey : orderedExtraKeys) {
+        for (const QString& extraKey : orderedExtraKeys) {
             values.append(sanitizeTxtField(variantToText(entry.extras.value(extraKey))));
         }
 
@@ -1476,9 +1460,9 @@ AnnotationModel::AnnotationEntry AnnotationModel::normalizeEntry(int startSample
     entry.description = description.trimmed().isEmpty() ? defaultAnnotationDescription() : description.trimmed();
     entry.comment = comment.trimmed();
 
-    for(const QString& channelName : channelNames) {
+    for (const QString& channelName : channelNames) {
         const QString trimmed = channelName.trimmed();
-        if(!trimmed.isEmpty() && !entry.channelNames.contains(trimmed)) {
+        if (!trimmed.isEmpty() && !entry.channelNames.contains(trimmed)) {
             entry.channelNames.append(trimmed);
         }
     }
@@ -1491,17 +1475,16 @@ AnnotationModel::AnnotationEntry AnnotationModel::normalizeEntry(int startSample
         QStringLiteral("description"),
         QStringLiteral("label"),
         QStringLiteral("comment"),
-        QStringLiteral("ch_names")
-    };
+        QStringLiteral("ch_names")};
 
-    for(auto it = extras.constBegin(); it != extras.constEnd(); ++it) {
-        if(it.key().trimmed().isEmpty() || reservedExtraKeys.contains(it.key())) {
+    for (auto it = extras.constBegin(); it != extras.constEnd(); ++it) {
+        if (it.key().trimmed().isEmpty() || reservedExtraKeys.contains(it.key())) {
             continue;
         }
         entry.extras.insert(it.key(), it.value());
     }
 
-    if(m_iLastSample > m_iFirstSample) {
+    if (m_iLastSample > m_iFirstSample) {
         entry.startSample = qBound(m_iFirstSample, entry.startSample, m_iLastSample);
         entry.endSample = qBound(entry.startSample, entry.endSample, m_iLastSample);
     }
@@ -1535,22 +1518,19 @@ int AnnotationModel::durationSecondsToSamples(double durationSeconds) const
 
 //=============================================================================================================
 
-qint64 AnnotationModel::measurementStartUsecsSinceEpoch(bool *ok) const
+qint64 AnnotationModel::measurementStartUsecsSinceEpoch(bool* ok) const
 {
-    const bool valid = m_pFiffInfo
-                       && m_pFiffInfo->meas_date[0] >= 0
-                       && m_pFiffInfo->meas_date[1] >= 0;
+    const bool valid = m_pFiffInfo && m_pFiffInfo->meas_date[0] >= 0 && m_pFiffInfo->meas_date[1] >= 0;
 
-    if(ok) {
+    if (ok) {
         *ok = valid;
     }
 
-    if(!valid) {
+    if (!valid) {
         return 0;
     }
 
-    return static_cast<qint64>(m_pFiffInfo->meas_date[0]) * 1000000LL
-           + static_cast<qint64>(m_pFiffInfo->meas_date[1]);
+    return static_cast<qint64>(m_pFiffInfo->meas_date[0]) * 1000000LL + static_cast<qint64>(m_pFiffInfo->meas_date[1]);
 }
 
 //=============================================================================================================
@@ -1563,16 +1543,18 @@ void AnnotationModel::importEntries(const QVector<AnnotationEntry>& entries)
     for (const AnnotationEntry& e : entries) {
         double onset = static_cast<double>(e.startSample - m_iFirstSample) / sfreq;
         double duration = static_cast<double>(e.endSample - e.startSample + 1) / sfreq;
-        if (onset < 0.0) onset = 0.0;
-        if (duration < 0.0) duration = 0.0;
+        if (onset < 0.0)
+            onset = 0.0;
+        if (duration < 0.0)
+            duration = 0.0;
 
         FiffAnnotation annot;
-        annot.onset        = onset;
-        annot.duration     = duration;
-        annot.description  = e.description;
+        annot.onset = onset;
+        annot.duration = duration;
+        annot.description = e.description;
         annot.channelNames = e.channelNames;
-        annot.comment      = e.comment;
-        annot.extras       = e.extras;
+        annot.comment = e.comment;
+        annot.extras = e.extras;
         m_fiffAnnotations.append(annot);
     }
 }
@@ -1589,12 +1571,12 @@ QVector<AnnotationModel::AnnotationEntry> AnnotationModel::exportEntries() const
     for (int i = 0; i < m_fiffAnnotations.size(); ++i) {
         const FiffAnnotation& annot = m_fiffAnnotations[i];
         AnnotationEntry e;
-        e.startSample  = m_iFirstSample + static_cast<int>(qRound(annot.onset * sfreq));
-        e.endSample    = e.startSample + static_cast<int>(qRound(annot.duration * sfreq));
-        e.description  = annot.description;
+        e.startSample = m_iFirstSample + static_cast<int>(qRound(annot.onset * sfreq));
+        e.endSample = e.startSample + static_cast<int>(qRound(annot.duration * sfreq));
+        e.description = annot.description;
         e.channelNames = annot.channelNames;
-        e.comment      = annot.comment;
-        e.extras       = annot.extras;
+        e.comment = annot.comment;
+        e.extras = annot.extras;
         entries.append(e);
     }
 
@@ -1610,10 +1592,10 @@ void AnnotationModel::sortEntries()
     QVector<FiffAnnotation>& vec = const_cast<QVector<FiffAnnotation>&>(m_fiffAnnotations.toVector());
     std::sort(vec.begin(), vec.end(),
               [](const FiffAnnotation& left, const FiffAnnotation& right) {
-                  if(qAbs(left.onset - right.onset) > 1e-12) {
+                  if (qAbs(left.onset - right.onset) > 1e-12) {
                       return left.onset < right.onset;
                   }
-                  if(qAbs(left.duration - right.duration) > 1e-12) {
+                  if (qAbs(left.duration - right.duration) > 1e-12) {
                       return left.duration < right.duration;
                   }
                   return left.description < right.description;
@@ -1626,11 +1608,11 @@ QColor AnnotationModel::colorForLabel(const QString& description) const
 {
     const QString normalizedDescription = description.trimmed().toUpper();
 
-    if(normalizedDescription.startsWith(QStringLiteral("BAD"))) {
+    if (normalizedDescription.startsWith(QStringLiteral("BAD"))) {
         return QColor(210, 60, 60, 90);
     }
 
-    if(normalizedDescription.startsWith(QStringLiteral("EDGE"))) {
+    if (normalizedDescription.startsWith(QStringLiteral("EDGE"))) {
         return QColor(230, 160, 40, 90);
     }
 

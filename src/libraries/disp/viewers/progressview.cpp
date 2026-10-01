@@ -37,7 +37,7 @@ ProgressView::ProgressView(bool bHorizontalMessage,
 
     (bHorizontalMessage) ? setHorizontal() : setVertical();
 
-    if(sStyleSheet != ""){
+    if (sStyleSheet != "") {
         m_pUi->m_VerticalLabel->setStyleSheet(sStyleSheet);
         m_pUi->m_HorizonatlLabel->setStyleSheet(sStyleSheet);
     }
@@ -102,7 +102,7 @@ void ProgressView::setVertical()
 
 //=============================================================================================================
 
-void ProgressView::setMessage(const QString &sMessage)
+void ProgressView::setMessage(const QString& sMessage)
 {
     m_pUi->m_VerticalLabel->setText(sMessage);
     m_pUi->m_HorizonatlLabel->setText(sMessage);
@@ -115,13 +115,13 @@ void ProgressView::updateProgress(int iPercentage,
 {
     m_pUi->m_progressBar->show();
 
-    if (m_pUi->m_progressBar->maximum() == 0){
+    if (m_pUi->m_progressBar->maximum() == 0) {
         m_pUi->m_progressBar->setMaximum(100);
     }
 
     m_pUi->m_progressBar->setValue(iPercentage);
 
-    if(sMessage != ""){
+    if (sMessage != "") {
         setMessage(sMessage);
     }
 }
@@ -130,7 +130,7 @@ void ProgressView::updateProgress(int iPercentage,
 
 void ProgressView::setLoadingBarVisible(bool bVisible)
 {
-    if (bVisible){
+    if (bVisible) {
         m_pUi->m_progressBar->show();
     } else {
         m_pUi->m_progressBar->hide();
@@ -141,5 +141,4 @@ void ProgressView::setLoadingBarVisible(bool bVisible)
 
 void ProgressView::clearView()
 {
-
 }

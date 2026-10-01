@@ -52,7 +52,7 @@ public:
     /**
      *  Constructs a EEGoSportsImpedanceView.
      */
-    explicit EEGoSportsImpedanceView(QWidget *parent = 0);
+    explicit EEGoSportsImpedanceView(QWidget* parent = 0);
 
 private:
     //=========================================================================================================

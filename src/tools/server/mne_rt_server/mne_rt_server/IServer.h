@@ -44,7 +44,6 @@ class IServer : public QTcpServer
     Q_OBJECT
 
 public:
-
     //=========================================================================================================
     /**
      * Destroys the IConnector.
@@ -74,7 +73,7 @@ public:
 
 private:
     QMap<quint8, QThread*> m_qClientList;
-    quint8          m_iNextClientId;
+    quint8 m_iNextClientId;
 };
 
 //=============================================================================================================
@@ -102,7 +101,7 @@ void IServer::clearClients()
 {
     QMap<quint8, QThread*>::const_iterator i = m_qClientList.constBegin();
     while (i != map.constEnd()) {
-        if(i.value())
+        if (i.value())
             delete i.value();
         ++i;
     }

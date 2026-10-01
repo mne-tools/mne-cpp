@@ -60,8 +60,8 @@ namespace SHOWFIFF
 class MNEShowFiffSettings
 {
 public:
-    typedef QSharedPointer<MNEShowFiffSettings> SPtr;             /**< Shared pointer type for MNEShowFiffSettings. */
-    typedef QSharedPointer<const MNEShowFiffSettings> ConstSPtr;  /**< Const shared pointer type for MNEShowFiffSettings. */
+    typedef QSharedPointer<MNEShowFiffSettings> SPtr;            /**< Shared pointer type for MNEShowFiffSettings. */
+    typedef QSharedPointer<const MNEShowFiffSettings> ConstSPtr; /**< Const shared pointer type for MNEShowFiffSettings. */
 
     //=========================================================================================================
     /**
@@ -76,7 +76,7 @@ public:
      * @param [in] argc (argument count) is an integer that indicates how many arguments were entered on the command line when the program was started.
      * @param [in] argv (argument vector) is an array of pointers to arrays of character objects. The array objects are null-terminated strings, representing the arguments that were entered on the command line when the program was started.
      */
-    explicit MNEShowFiffSettings(int *argc,char **argv);
+    explicit MNEShowFiffSettings(int* argc, char** argv);
 
     //=========================================================================================================
     /**
@@ -91,18 +91,17 @@ public:
     void checkIntegrity();
 
 public:
-    QString     inname;         /**< The input file. */
-    int         indent;         /**< Number of spaces to use in indentation (default %d in terse and 0 in verbose output). */
-    bool        verbose;        /**< Verbose output. */
-    QList<int>  tags;           /**< Provide information about these tags (can have multiple of these). */
-    bool        long_strings;   /**< Print long strings in full? */
-    bool        blocks_only;    /**< Only list the blocks (the tree structure). */
+    QString inname;    /**< The input file. */
+    int indent;        /**< Number of spaces to use in indentation (default %d in terse and 0 in verbose output). */
+    bool verbose;      /**< Verbose output. */
+    QList<int> tags;   /**< Provide information about these tags (can have multiple of these). */
+    bool long_strings; /**< Print long strings in full? */
+    bool blocks_only;  /**< Only list the blocks (the tree structure). */
 
 private:
-    void usage(char *name);
-    bool check_unrecognized_args(int argc, char **argv);
-    bool check_args (int *argc,char **argv);
-
+    void usage(char* name);
+    bool check_unrecognized_args(int argc, char** argv);
+    bool check_args(int* argc, char** argv);
 };
 
 //*************************************************************************************************************

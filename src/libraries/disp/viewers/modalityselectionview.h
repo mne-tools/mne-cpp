@@ -71,8 +71,8 @@ class DISPSHARED_EXPORT ModalitySelectionView : public AbstractView
     Q_OBJECT
 
 public:
-    typedef QSharedPointer<ModalitySelectionView> SPtr;              /**< Shared pointer type for ModalitySelectionView. */
-    typedef QSharedPointer<const ModalitySelectionView> ConstSPtr;   /**< Const shared pointer type for ModalitySelectionView. */
+    typedef QSharedPointer<ModalitySelectionView> SPtr;            /**< Shared pointer type for ModalitySelectionView. */
+    typedef QSharedPointer<const ModalitySelectionView> ConstSPtr; /**< Const shared pointer type for ModalitySelectionView. */
 
     //=========================================================================================================
     /**
@@ -83,9 +83,9 @@ public:
      * @param[in] parent        parent of widget.
      * @param[in] f Qt window flags passed to the QWidget constructor.
      */
-    ModalitySelectionView(const QList<FIFFLIB::FiffChInfo> &lChannelList,
+    ModalitySelectionView(const QList<FIFFLIB::FiffChInfo>& lChannelList,
                           const QString& sSettingsPath = "",
-                          QWidget *parent = 0,
+                          QWidget* parent = 0,
                           Qt::WindowFlags f = Qt::Widget);
 
     //=========================================================================================================
@@ -159,12 +159,12 @@ protected:
      */
     void onUpdateModalityCheckbox(Qt::CheckState state);
 
-    QMap<QString, bool>                 m_modalityMap;                  /**< Map of different modalities. */
-    QList<QCheckBox*>                   m_qListModalityCheckBox;        /**< List of modality checkboxes. */
+    QMap<QString, bool> m_modalityMap;         /**< Map of different modalities. */
+    QList<QCheckBox*> m_qListModalityCheckBox; /**< List of modality checkboxes. */
 
-    QStringList                         m_lChannelTypeList;             /**< Channel type list. */
+    QStringList m_lChannelTypeList; /**< Channel type list. */
 
-    QString                             m_sSettingsPath;                /**< The settings path to store the GUI settings to. */
+    QString m_sSettingsPath; /**< The settings path to store the GUI settings to. */
 
 signals:
     //=========================================================================================================

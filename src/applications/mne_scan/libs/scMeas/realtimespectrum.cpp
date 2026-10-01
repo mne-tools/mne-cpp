@@ -36,7 +36,7 @@ using namespace Eigen;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-RealTimeSpectrum::RealTimeSpectrum(QObject *parent)
+RealTimeSpectrum::RealTimeSpectrum(QObject* parent)
 : Measurement(QMetaType::fromName("RealTimeSpectrum::SPtr").id(), parent)
 , m_bIsInit(false)
 , m_bContainsValues(false)
@@ -52,7 +52,7 @@ RealTimeSpectrum::~RealTimeSpectrum()
 
 //=============================================================================================================
 
-void RealTimeSpectrum::initFromFiffInfo(FiffInfo::SPtr &p_pFiffInfo)
+void RealTimeSpectrum::initFromFiffInfo(FiffInfo::SPtr& p_pFiffInfo)
 {
     m_pFiffInfo = p_pFiffInfo;
 
@@ -81,7 +81,6 @@ void RealTimeSpectrum::setValue(MatrixXd& v)
     m_matValue = v;
     emit notify();
 
-    if(!m_bContainsValues)
+    if (!m_bContainsValues)
         m_bContainsValues = true;
 }
-

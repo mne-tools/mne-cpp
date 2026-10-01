@@ -73,9 +73,9 @@ static QVector<int> findAllEegIndices(const FiffInfo& info)
 //=============================================================================================================
 
 void UTILSLIB::setEegReference(MatrixXd& data,
-                                const FiffInfo& info,
-                                const QStringList& refChannels,
-                                bool projection)
+                               const FiffInfo& info,
+                               const QStringList& refChannels,
+                               bool projection)
 {
     if (projection) {
         qWarning("setEegReference: projection mode is not yet implemented. "
@@ -102,9 +102,7 @@ void UTILSLIB::setEegReference(MatrixXd& data,
     // Compute reference signal
     RowVectorXd refSignal;
 
-    const bool useAverage = refChannels.isEmpty()
-                            || (refChannels.size() == 1
-                                && refChannels.first().compare(QLatin1String("average"), Qt::CaseInsensitive) == 0);
+    const bool useAverage = refChannels.isEmpty() || (refChannels.size() == 1 && refChannels.first().compare(QLatin1String("average"), Qt::CaseInsensitive) == 0);
 
     if (useAverage) {
         // Average reference: mean of all good EEG channels
@@ -145,8 +143,8 @@ void UTILSLIB::setEegReference(MatrixXd& data,
 //=============================================================================================================
 
 void UTILSLIB::addReferenceChannels(MatrixXd& data,
-                                     FiffInfo& info,
-                                     const QStringList& chNames)
+                                    FiffInfo& info,
+                                    const QStringList& chNames)
 {
     if (chNames.isEmpty()) {
         return;
@@ -194,14 +192,15 @@ void UTILSLIB::addReferenceChannels(MatrixXd& data,
 //=============================================================================================================
 
 void UTILSLIB::setBipolarReference(MatrixXd& data,
-                                    FiffInfo& info,
-                                    const QStringList& anodes,
-                                    const QStringList& cathodes,
-                                    bool dropOriginals)
+                                   FiffInfo& info,
+                                   const QStringList& anodes,
+                                   const QStringList& cathodes,
+                                   bool dropOriginals)
 {
     if (anodes.size() != cathodes.size()) {
         qWarning("setBipolarReference: anodes and cathodes must have the same length "
-                 "(%lld vs %lld).", static_cast<long long>(anodes.size()), static_cast<long long>(cathodes.size()));
+                 "(%lld vs %lld).",
+                 static_cast<long long>(anodes.size()), static_cast<long long>(cathodes.size()));
         return;
     }
 

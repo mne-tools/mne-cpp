@@ -74,7 +74,7 @@ public:
      * @param cutFront the amount to be cutted from orignal data from the front
      * @param cutBack the amount to be cutted from orignal data from the back
      */
-    DataPackage(const MatrixXdR &originalRawData=MatrixXdR(0,0), const MatrixXdR &originalRawTime=MatrixXdR(0,0), int cutFront=0, int cutBack=0);
+    DataPackage(const MatrixXdR& originalRawData = MatrixXdR(0, 0), const MatrixXdR& originalRawTime = MatrixXdR(0, 0), int cutFront = 0, int cutBack = 0);
 
     //=========================================================================================================
     /**
@@ -84,7 +84,7 @@ public:
      * @param cutFront the amount to be cutted from orignal data from the front
      * @param cutBack the amount to be cutted from orignal data from the back
      */
-    void setOrigRawData(const MatrixXdR &originalRawData, int cutFront=0, int cutBack=0);
+    void setOrigRawData(const MatrixXdR& originalRawData, int cutFront = 0, int cutBack = 0);
 
     //=========================================================================================================
     /**
@@ -95,7 +95,7 @@ public:
      * @param cutFront the amount to be cutted from orignal data from the front
      * @param cutBack the amount to be cutted from orignal data from the back
      */
-    void setOrigRawData(const RowVectorXd &originalRawData, int row, int cutFront=0, int cutBack=0);
+    void setOrigRawData(const RowVectorXd& originalRawData, int row, int cutFront = 0, int cutBack = 0);
 
     //=========================================================================================================
     /**
@@ -105,7 +105,7 @@ public:
      * @param cutFront the amount to be cutted from orignal data from the front
      * @param cutBack the amount to be cutted from orignal data from the back
      */
-    void setOrigProcData(const MatrixXdR &originalProcData, int cutFront=0, int cutBack=0);
+    void setOrigProcData(const MatrixXdR& originalProcData, int cutFront = 0, int cutBack = 0);
 
     //=========================================================================================================
     /**
@@ -115,7 +115,7 @@ public:
      * @param cutFront the amount to be cutted from orignal data from the front
      * @param cutBack the amount to be cutted from orignal data from the back
      */
-    void setMappedProcData(const MatrixXdR &originalProcData, int cutFront, int cutBack);
+    void setMappedProcData(const MatrixXdR& originalProcData, int cutFront, int cutBack);
 
 
     //=========================================================================================================
@@ -127,7 +127,7 @@ public:
      * @param cutFront the amount to be cutted from orignal data from the front
      * @param cutBack the amount to be cutted from orignal data from the back
      */
-    void setOrigProcData(const RowVectorXd &originalProcData, int row, int cutFront=0, int cutBack=0);
+    void setOrigProcData(const RowVectorXd& originalProcData, int row, int cutFront = 0, int cutBack = 0);
 
     //=========================================================================================================
     /**
@@ -138,7 +138,7 @@ public:
      * @param cutFront the amount to be cutted from orignal data from the front
      * @param cutBack the amount to be cutted from orignal data from the back
      */
-    void setMappedProcData(const RowVectorXd &originalProcData, int row, int cutFront, int cutBack);
+    void setMappedProcData(const RowVectorXd& originalProcData, int row, int cutFront, int cutBack);
 
     //=========================================================================================================
     /**
@@ -146,7 +146,7 @@ public:
      *
      * @return the mapped data
      */
-    const MatrixXdR & dataRawOrig();
+    const MatrixXdR& dataRawOrig();
 
     //=========================================================================================================
     /**
@@ -154,7 +154,7 @@ public:
      *
      * @return the mapped data
      */
-    const MatrixXdR & dataRaw();
+    const MatrixXdR& dataRaw();
 
     //=========================================================================================================
     /**
@@ -162,7 +162,7 @@ public:
      *
      * @return the mapped data
      */
-    const MatrixXdR & dataProcOrig();
+    const MatrixXdR& dataProcOrig();
 
     //=========================================================================================================
     /**
@@ -170,7 +170,7 @@ public:
      *
      * @return the mapped data
      */
-    const MatrixXdR & dataProc();
+    const MatrixXdR& dataProc();
 
     //=========================================================================================================
     /**
@@ -210,7 +210,7 @@ private:
      * @param cutFront the amount to be cutted from orignal data from the front
      * @param cutBack the amount to be cutted from orignal data from the back
      */
-    MatrixXdR cutData(const MatrixXdR &originalData, int cutFront=0, int cutBack=0);
+    MatrixXdR cutData(const MatrixXdR& originalData, int cutFront = 0, int cutBack = 0);
 
     //=========================================================================================================
     /**
@@ -220,7 +220,7 @@ private:
      * @param cutFront the amount to be cutted from orignal data from the front
      * @param cutBack the amount to be cutted from orignal data from the back
      */
-    RowVectorXd cutData(const RowVectorXd &originalData, int cutFront=0, int cutBack=0);
+    RowVectorXd cutData(const RowVectorXd& originalData, int cutFront = 0, int cutBack = 0);
 
     //=========================================================================================================
     /**
@@ -229,7 +229,7 @@ private:
      * @param data the data matrix
      * @return the means of each row of the input data matrix
      */
-    VectorXd calculateMatMean(const MatrixXd &dataMat);
+    VectorXd calculateMatMean(const MatrixXd& dataMat);
 
     //=========================================================================================================
     /**
@@ -238,27 +238,27 @@ private:
      * @param data the data row
      * @return the means of each row of the input data matrix
      */
-    double calculateRowMean(const VectorXd &dataRow);
+    double calculateRowMean(const VectorXd& dataRow);
 
     //Time data
-    MatrixXdR   m_timeRawMapped;        /**< The mapped/cut time data */
-    MatrixXdR   m_timeRawOriginal;      /**< the original time data */
+    MatrixXdR m_timeRawMapped;   /**< The mapped/cut time data */
+    MatrixXdR m_timeRawOriginal; /**< the original time data */
 
     //Raw data
-    MatrixXdR   m_dataRawMapped;        /**< The mapped/cut raw data */
-    MatrixXdR   m_dataRawOriginal;      /**< The original raw data */
-    VectorXd    m_dataRawMean;          /**< The mean of the mapped/cut raw data */
+    MatrixXdR m_dataRawMapped;   /**< The mapped/cut raw data */
+    MatrixXdR m_dataRawOriginal; /**< The original raw data */
+    VectorXd m_dataRawMean;      /**< The mean of the mapped/cut raw data */
 
     //Processed data
-    MatrixXdR   m_dataProcOriginal;     /**< The mapped/cut processed/filtered data */
-    MatrixXdR   m_dataProcMapped;       /**< The original processed/filtered data */
-    VectorXd    m_dataProcMean;         /**< The mean of the mapped/cut processed/filtered data */
+    MatrixXdR m_dataProcOriginal; /**< The mapped/cut processed/filtered data */
+    MatrixXdR m_dataProcMapped;   /**< The original processed/filtered data */
+    VectorXd m_dataProcMean;      /**< The mean of the mapped/cut processed/filtered data */
 
     //Cutting parameters
-    int m_iCutFrontRaw;                 /**< The last used cut front value of the raw data */
-    int m_iCutBackRaw;                  /**< The last used cut back value of the raw data*/
-    int m_iCutFrontProc;                /**< The last used cut front value of the raw data */
-    int m_iCutBackProc;                 /**< The last used cut back value of the raw data*/
+    int m_iCutFrontRaw;  /**< The last used cut front value of the raw data */
+    int m_iCutBackRaw;   /**< The last used cut back value of the raw data*/
+    int m_iCutFrontProc; /**< The last used cut front value of the raw data */
+    int m_iCutBackProc;  /**< The last used cut back value of the raw data*/
 };
 
 } // NAMESPACE

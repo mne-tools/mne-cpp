@@ -39,7 +39,8 @@ using namespace Eigen;
 // HELPERS
 //=============================================================================================================
 
-namespace {
+namespace
+{
 
 RowVectorXd makeSine(double freqHz, double sFreq, int nSamples)
 {
@@ -112,7 +113,7 @@ private slots:
 void TestDspResample::outputLength_decimation()
 {
     // 4:1 decimation: 1000 → 250 Hz, 4096 samples → ceil(4096 * 250/1000) = 1024
-    const int nIn   = 4096;
+    const int nIn = 4096;
     const int nExpected = 1024;
     RowVectorXd sig = RowVectorXd::Random(nIn);
     RowVectorXd out = Resample::resample(sig, 250.0, 1000.0);
@@ -124,7 +125,7 @@ void TestDspResample::outputLength_decimation()
 void TestDspResample::outputLength_interpolation()
 {
     // 4:1 upsampling: 250 → 1000 Hz, 256 samples → ceil(256 * 4) = 1024
-    const int nIn   = 256;
+    const int nIn = 256;
     const int nExpected = 1024;
     RowVectorXd sig = RowVectorXd::Random(nIn);
     RowVectorXd out = Resample::resample(sig, 1000.0, 250.0);
@@ -168,8 +169,8 @@ void TestDspResample::decimation_passband_preserved()
     // After decimation Nyquist is 125 Hz; 10 Hz is well within passband
     const double sFreqOld = 1000.0;
     const double sFreqNew = 250.0;
-    const int nIn         = 8192;
-    const double freqHz   = 10.0;
+    const int nIn = 8192;
+    const double freqHz = 10.0;
 
     RowVectorXd sig = makeSine(freqHz, sFreqOld, nIn);
     RowVectorXd out = Resample::resample(sig, sFreqNew, sFreqOld);
@@ -187,8 +188,8 @@ void TestDspResample::decimation_stopband_attenuated()
     // 200 Hz is above new Nyquist (125 Hz) → should be strongly attenuated
     const double sFreqOld = 1000.0;
     const double sFreqNew = 250.0;
-    const int nIn         = 8192;
-    const double freqHz   = 200.0;
+    const int nIn = 8192;
+    const double freqHz = 200.0;
 
     RowVectorXd sig = makeSine(freqHz, sFreqOld, nIn);
     RowVectorXd out = Resample::resample(sig, sFreqNew, sFreqOld);
@@ -196,7 +197,7 @@ void TestDspResample::decimation_stopband_attenuated()
     // The 200 Hz component should alias somewhere, but the anti-aliasing filter should suppress it.
     // Check RMS of output is much less than input RMS (input RMS ≈ 0.707)
     double rmsOut = std::sqrt(out.squaredNorm() / out.size());
-    double rmsIn  = std::sqrt(sig.squaredNorm() / sig.size());
+    double rmsIn = std::sqrt(sig.squaredNorm() / sig.size());
     QVERIFY2(rmsOut < rmsIn * 0.05,
              qPrintable(QString("Stopband not suppressed: rmsOut=%1, rmsIn=%2").arg(rmsOut).arg(rmsIn)));
 }
@@ -208,8 +209,8 @@ void TestDspResample::interpolation_sinusoidPreserved()
     // 5 Hz sine at 250 Hz, upsample to 1000 Hz
     const double sFreqOld = 250.0;
     const double sFreqNew = 1000.0;
-    const int nIn         = 1024;
-    const double freqHz   = 5.0;
+    const int nIn = 1024;
+    const double freqHz = 5.0;
 
     RowVectorXd sig = makeSine(freqHz, sFreqOld, nIn);
     RowVectorXd out = Resample::resample(sig, sFreqNew, sFreqOld);
@@ -225,7 +226,7 @@ void TestDspResample::rationalRatio_correctLengthAndContent()
     // 600 Hz → 250 Hz: ratio = 5/12 after GCD(250*1000, 600*1000) reduction
     const double sFreqOld = 600.0;
     const double sFreqNew = 250.0;
-    const int nIn         = 6000;  // 10 s at 600 Hz
+    const int nIn = 6000; // 10 s at 600 Hz
     // Expected: ceil(6000 * 250 / 600) = ceil(2500) = 2500
     const int nExpected = 2500;
 
@@ -254,10 +255,10 @@ void TestDspResample::resampleMatrix_dimensions()
 {
     const int nCh = 6, nIn = 4096;
     MatrixXd data = MatrixXd::Random(nCh, nIn);
-    MatrixXd out  = Resample::resampleMatrix(data, 250.0, 1000.0);
+    MatrixXd out = Resample::resampleMatrix(data, 250.0, 1000.0);
 
     QCOMPARE(out.rows(), nCh);
-    QCOMPARE(out.cols(), 1024);  // ceil(4096 * 250/1000)
+    QCOMPARE(out.cols(), 1024); // ceil(4096 * 250/1000)
 }
 
 //=============================================================================================================
@@ -271,7 +272,7 @@ void TestDspResample::resampleMatrix_picks()
         data.row(ch) = makeSine(5.0, 1000.0, nIn);
 
     RowVectorXi picks(2);
-    picks << 0, 2;  // Only rows 0 and 2
+    picks << 0, 2; // Only rows 0 and 2
 
     MatrixXd out = Resample::resampleMatrix(data, 250.0, 1000.0, picks);
 

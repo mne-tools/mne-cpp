@@ -54,12 +54,13 @@ LayoutScene::LayoutScene(QGraphicsView* view,
 
 //=============================================================================================================
 
-void LayoutScene::wheelEvent(QGraphicsSceneWheelEvent* event) {
+void LayoutScene::wheelEvent(QGraphicsSceneWheelEvent* event)
+{
     m_qvView->setTransformationAnchor(QGraphicsView::AnchorUnderMouse);
 
     // Scale the view / do the zoom
     double scaleFactor = 1.15;
-    if(event->delta() > 0) {
+    if (event->delta() > 0) {
         // Zoom in
         m_qvView->scale(scaleFactor, scaleFactor);
     } else {
@@ -72,7 +73,7 @@ void LayoutScene::wheelEvent(QGraphicsSceneWheelEvent* event) {
 
 void LayoutScene::mouseDoubleClickEvent(QGraphicsSceneMouseEvent* mouseEvent)
 {
-    if(mouseEvent->button() == Qt::LeftButton)
+    if (mouseEvent->button() == Qt::LeftButton)
         m_qvView->fitInView(this->itemsBoundingRect(), Qt::KeepAspectRatio);
 
     QGraphicsScene::mouseDoubleClickEvent(mouseEvent);
@@ -80,27 +81,27 @@ void LayoutScene::mouseDoubleClickEvent(QGraphicsSceneMouseEvent* mouseEvent)
 
 //=============================================================================================================
 
-void LayoutScene::mousePressEvent(QGraphicsSceneMouseEvent *mouseEvent)
+void LayoutScene::mousePressEvent(QGraphicsSceneMouseEvent* mouseEvent)
 {
-    switch(mouseEvent->button()) {
-    case Qt::LeftButton:
-        m_qvView->setDragMode(QGraphicsView::RubberBandDrag);
+    switch (mouseEvent->button()) {
+        case Qt::LeftButton:
+            m_qvView->setDragMode(QGraphicsView::RubberBandDrag);
 
-//        //If a normal left lick occurs without holding down CTRL -> Delete all selected items
-//        if(!m_bExtendedSelectionMode)
-//            m_selectedItems.clear();
+            //        //If a normal left lick occurs without holding down CTRL -> Delete all selected items
+            //        if(!m_bExtendedSelectionMode)
+            //            m_selectedItems.clear();
 
-        break;
+            break;
 
-    case Qt::RightButton:
-        m_bDragMode = true;
-        m_qvView->setDragMode(QGraphicsView::NoDrag);
-        m_mousePressPosition = mouseEvent->screenPos();
+        case Qt::RightButton:
+            m_bDragMode = true;
+            m_qvView->setDragMode(QGraphicsView::NoDrag);
+            m_mousePressPosition = mouseEvent->screenPos();
 
-        //return so that no selection event is called
-        return;
-    default:
-        break;
+            //return so that no selection event is called
+            return;
+        default:
+            break;
     }
 
     QGraphicsScene::mousePressEvent(mouseEvent);
@@ -108,9 +109,9 @@ void LayoutScene::mousePressEvent(QGraphicsSceneMouseEvent *mouseEvent)
 
 //=============================================================================================================
 
-void LayoutScene::mouseMoveEvent(QGraphicsSceneMouseEvent *mouseEvent)
+void LayoutScene::mouseMoveEvent(QGraphicsSceneMouseEvent* mouseEvent)
 {
-    if(m_bDragMode) {
+    if (m_bDragMode) {
         int diffX = mouseEvent->screenPos().x() - m_mousePressPosition.x();
         int diffY = mouseEvent->screenPos().y() - m_mousePressPosition.y();
 
@@ -125,35 +126,35 @@ void LayoutScene::mouseMoveEvent(QGraphicsSceneMouseEvent *mouseEvent)
 
 //=============================================================================================================
 
-void LayoutScene::mouseReleaseEvent(QGraphicsSceneMouseEvent *mouseEvent)
+void LayoutScene::mouseReleaseEvent(QGraphicsSceneMouseEvent* mouseEvent)
 {
-//    if(m_bExtendedSelectionMode) {
-//        qDebug()<<"Extended Selection";
-//        //List of selected items during last rubberband action
-//        QList<QGraphicsItem *> currentSelectedItemsList = this->selectedItems();
+    //    if(m_bExtendedSelectionMode) {
+    //        qDebug()<<"Extended Selection";
+    //        //List of selected items during last rubberband action
+    //        QList<QGraphicsItem *> currentSelectedItemsList = this->selectedItems();
 
-//        //Generate list of all selected items (dont add duplicates)
-//        for(int i = 0; i<currentSelectedItemsList.size(); i++) {
-//            if(!m_selectedItems.contains(currentSelectedItemsList.at(i))) {
-//                //Duplicate not found - new item was selected since the last extended selection
-//                qDebug()<<"add item to m_selectedItems";
-//                m_selectedItems << currentSelectedItemsList.at(i);
-//            }
-//            else {
-//                qDebug()<<"delete item from m_selectedItems";
-//                //Duplicate found - already selected item was selected again since the last extended selection
-//                m_selectedItems.removeAll(currentSelectedItemsList.at(i));
-//                currentSelectedItemsList.at(i)->setSelected(false);
-//            }
-//        }
+    //        //Generate list of all selected items (dont add duplicates)
+    //        for(int i = 0; i<currentSelectedItemsList.size(); i++) {
+    //            if(!m_selectedItems.contains(currentSelectedItemsList.at(i))) {
+    //                //Duplicate not found - new item was selected since the last extended selection
+    //                qDebug()<<"add item to m_selectedItems";
+    //                m_selectedItems << currentSelectedItemsList.at(i);
+    //            }
+    //            else {
+    //                qDebug()<<"delete item from m_selectedItems";
+    //                //Duplicate found - already selected item was selected again since the last extended selection
+    //                m_selectedItems.removeAll(currentSelectedItemsList.at(i));
+    //                currentSelectedItemsList.at(i)->setSelected(false);
+    //            }
+    //        }
 
-//        for(int i = 0; i<m_selectedItems.size(); i++)
-//            m_selectedItems.at(i)->setSelected(true);
+    //        for(int i = 0; i<m_selectedItems.size(); i++)
+    //            m_selectedItems.at(i)->setSelected(true);
 
-//        qDebug()<<m_selectedItems.size();
-//    }
+    //        qDebug()<<m_selectedItems.size();
+    //    }
 
-    if(m_bDragMode) {
+    if (m_bDragMode) {
         m_bDragMode = false;
         this->update();
     }
@@ -163,35 +164,35 @@ void LayoutScene::mouseReleaseEvent(QGraphicsSceneMouseEvent *mouseEvent)
 
 //=============================================================================================================
 
-void LayoutScene::keyPressEvent(QKeyEvent *keyEvent)
+void LayoutScene::keyPressEvent(QKeyEvent* keyEvent)
 {
-//    if(keyEvent->key() == Qt::Key_Control)
-//        m_bExtendedSelectionMode = true;
+    //    if(keyEvent->key() == Qt::Key_Control)
+    //        m_bExtendedSelectionMode = true;
 
     QGraphicsScene::keyPressEvent(keyEvent);
 }
 
 //=============================================================================================================
 
-void LayoutScene::keyReleaseEvent(QKeyEvent *keyEvent)
+void LayoutScene::keyReleaseEvent(QKeyEvent* keyEvent)
 {
-//    if(keyEvent->key() == Qt::Key_Control)
-//        m_bExtendedSelectionMode = false;
+    //    if(keyEvent->key() == Qt::Key_Control)
+    //        m_bExtendedSelectionMode = false;
 
     QGraphicsScene::keyReleaseEvent(keyEvent);
 }
 
 //=============================================================================================================
 
-bool LayoutScene::event(QEvent *event)
+bool LayoutScene::event(QEvent* event)
 {
     if (event->type() == QEvent::Gesture) {
         QGestureEvent* gestureEventCast = static_cast<QGestureEvent*>(event);
 
-//        QList<QGesture *> gestureList = gestureEventCast->gestures();
-//        for(int i = 0; i<gestureList.size(); i++)
-//            qDebug()<<gestureList.at(i)->gestureType();
-//        qDebug()<<"-----------------------";
+        //        QList<QGesture *> gestureList = gestureEventCast->gestures();
+        //        for(int i = 0; i<gestureList.size(); i++)
+        //            qDebug()<<gestureList.at(i)->gestureType();
+        //        qDebug()<<"-----------------------";
 
         return gestureEvent(static_cast<QGestureEvent*>(gestureEventCast));
     }
@@ -201,22 +202,22 @@ bool LayoutScene::event(QEvent *event)
 
 //=============================================================================================================
 
-bool LayoutScene::gestureEvent(QGestureEvent *event)
+bool LayoutScene::gestureEvent(QGestureEvent* event)
 {
     //Pan event
-    if (QGesture *pan = event->gesture(Qt::PanGesture))
-        panTriggered(static_cast<QPanGesture *>(pan));
+    if (QGesture* pan = event->gesture(Qt::PanGesture))
+        panTriggered(static_cast<QPanGesture*>(pan));
 
     //Pinch event
-    if (QGesture *pinch = event->gesture(Qt::PinchGesture))
-        pinchTriggered(static_cast<QPinchGesture *>(pinch));
+    if (QGesture* pinch = event->gesture(Qt::PinchGesture))
+        pinchTriggered(static_cast<QPinchGesture*>(pinch));
 
     return true;
 }
 
 //=============================================================================================================
 
-void LayoutScene::panTriggered(QPanGesture *gesture)
+void LayoutScene::panTriggered(QPanGesture* gesture)
 {
     QPointF delta = gesture->delta();
 
@@ -226,7 +227,7 @@ void LayoutScene::panTriggered(QPanGesture *gesture)
 
 //=============================================================================================================
 
-void LayoutScene::pinchTriggered(QPinchGesture *gesture)
+void LayoutScene::pinchTriggered(QPinchGesture* gesture)
 {
     m_qvView->setTransformationAnchor(QGraphicsView::NoAnchor);
     m_qvView->scale(gesture->scaleFactor(), gesture->scaleFactor());
@@ -234,7 +235,7 @@ void LayoutScene::pinchTriggered(QPinchGesture *gesture)
 
 //=============================================================================================================
 
-bool LayoutScene::eventFilter(QObject *object, QEvent *event)
+bool LayoutScene::eventFilter(QObject* object, QEvent* event)
 {
     if (object == m_qvView && event->type() == QEvent::Gesture) {
         QGestureEvent* gestureEventCast = static_cast<QGestureEvent*>(event);

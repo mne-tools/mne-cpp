@@ -44,7 +44,7 @@ using namespace SCSHAREDLIB;
  *
  * @brief Checks the mne_scan plugin and display management classes.
  */
-class TestScSharedManagement: public QObject
+class TestScSharedManagement : public QObject
 {
     Q_OBJECT
 
@@ -127,9 +127,9 @@ void TestScSharedManagement::pluginManager_findByNameOnEmptyReturnsNotFound_data
     // miss rather than as 0, which would be a valid index into a populated
     // list and would hand the caller the wrong plugin.
     QTest::newRow("ordinary name") << "Covariance";
-    QTest::newRow("empty name")    << "";
-    QTest::newRow("unicode name")  << QString::fromUtf8("Ünïcödé");
-    QTest::newRow("long name")     << QString(512, QChar('x'));
+    QTest::newRow("empty name") << "";
+    QTest::newRow("unicode name") << QString::fromUtf8("Ünïcödé");
+    QTest::newRow("long name") << QString(512, QChar('x'));
 }
 
 //=============================================================================================================
@@ -143,7 +143,8 @@ void TestScSharedManagement::pluginManager_findByNameOnEmptyReturnsNotFound()
     const int index = manager.findByName(name);
     QVERIFY2(index < 0,
              qPrintable(QString("findByName returned index %1 on an empty manager, "
-                                "which is a usable index into a populated list").arg(index)));
+                                "which is a usable index into a populated list")
+                            .arg(index)));
 }
 
 //=============================================================================================================

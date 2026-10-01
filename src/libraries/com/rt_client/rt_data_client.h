@@ -75,14 +75,15 @@ namespace COMLIB
  * return them together without introducing a @c std::pair or splitting
  * the read into two round trips.
  */
-struct MetaData{
+struct MetaData
+{
     MetaData(FIFFLIB::FiffInfo::SPtr pInfo,
              FIFFLIB::FiffDigitizerData::SPtr pDigitizerData)
-            :m_pInfo(pInfo)
-            ,m_pDigitizerData(pDigitizerData){};
+    : m_pInfo(pInfo)
+    , m_pDigitizerData(pDigitizerData) {};
 
     FIFFLIB::FiffInfo::SPtr m_pInfo;                   /**< Measurement information (channel layout, sampling rate, etc.). */
-    FIFFLIB::FiffDigitizerData::SPtr m_pDigitizerData;  /**< Head-shape digitizer point set. */
+    FIFFLIB::FiffDigitizerData::SPtr m_pDigitizerData; /**< Head-shape digitizer point set. */
 };
 
 //=============================================================================================================
@@ -103,8 +104,8 @@ class COMSHARED_EXPORT RtDataClient : public QTcpSocket
     Q_OBJECT
 
 public:
-    typedef QSharedPointer<RtDataClient> SPtr;               /**< Shared pointer type for RtDataClient. */
-    typedef QSharedPointer<const RtDataClient> ConstSPtr;    /**< Const shared pointer type for RtDataClient. */
+    typedef QSharedPointer<RtDataClient> SPtr;            /**< Shared pointer type for RtDataClient. */
+    typedef QSharedPointer<const RtDataClient> ConstSPtr; /**< Const shared pointer type for RtDataClient. */
 
     //=========================================================================================================
     /**
@@ -112,7 +113,7 @@ public:
      *
      * @param[in] parent     Parent QObject (optional).
      */
-    explicit RtDataClient(QObject *parent = Q_NULLPTR);
+    explicit RtDataClient(QObject* parent = Q_NULLPTR);
 
     //=========================================================================================================
     /**
@@ -164,11 +165,10 @@ public:
      *
      * @param[in] p_sAlias    The alias of the data client.
      */
-    void setClientAlias(const QString &p_sAlias);
+    void setClientAlias(const QString& p_sAlias);
 
 private:
-    qint32 m_clientID;  /**< Corresponding client id of the data client at mne_rt_server. */
-    
+    qint32 m_clientID; /**< Corresponding client id of the data client at mne_rt_server. */
 };
 } // NAMESPACE
 

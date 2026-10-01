@@ -39,14 +39,14 @@ ResultRendererFactoryRegistry& ResultRendererFactoryRegistry::instance()
 
 void ResultRendererFactoryRegistry::registerFactory(const IResultRendererFactory* factory)
 {
-    if(!factory) {
+    if (!factory) {
         return;
     }
 
     const QStringList toolNames = factory->supportedToolNames();
-    for(const QString& toolName : toolNames) {
+    for (const QString& toolName : toolNames) {
         const QString normalizedToolName = toolName.trimmed();
-        if(!normalizedToolName.isEmpty()) {
+        if (!normalizedToolName.isEmpty()) {
             factoryMap().insert(normalizedToolName, factory);
         }
     }

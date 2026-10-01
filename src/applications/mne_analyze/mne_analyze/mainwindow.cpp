@@ -60,7 +60,7 @@ using namespace DISPLIB;
 //=============================================================================================================
 
 MainWindow::MainWindow(AnalyzeCore* pAnalyzeCore,
-                       QWidget *parent)
+                       QWidget* parent)
 : QMainWindow(parent)
 , m_pMultiView(Q_NULLPTR)
 , m_pAnalyzeCoreController(pAnalyzeCore)
@@ -87,11 +87,11 @@ MainWindow::MainWindow(AnalyzeCore* pAnalyzeCore,
     initMenusAndPluginControls();
     initStatusBar();
 
-    //Load application icon for linux builds only, mac and win executables have built in icons from .pro file
-    #ifdef __linux__
+//Load application icon for linux builds only, mac and win executables have built in icons from .pro file
+#ifdef __linux__
     qInfo() << "Loading icon...";
     QMainWindow::setWindowIcon(QIcon(":/images/resources/images/appIcons/icon_mne-analyze_256x256.png"));
-    #endif
+#endif
 
     loadSavedSettingsAndState();
 }
@@ -107,8 +107,7 @@ MainWindow::~MainWindow()
 
 void MainWindow::deleteMenus()
 {
-    for(auto& action: menuBar()->actions())
-    {
+    for (auto& action : menuBar()->actions()) {
         menuBar()->removeAction(action);
     }
     delete m_pMenuFile;
@@ -120,7 +119,7 @@ void MainWindow::deleteMenus()
 
 //=============================================================================================================
 
-void MainWindow::closeEvent(QCloseEvent *event)
+void MainWindow::closeEvent(QCloseEvent* event)
 {
     //Save GUI gemoetry and state;
     m_pMultiView->saveSettings();
@@ -128,7 +127,7 @@ void MainWindow::closeEvent(QCloseEvent *event)
 
     this->setAttribute(Qt::WA_DeleteOnClose);
 
-    for(QDockWidget* widget : this->findChildren<QDockWidget*>()){
+    for (QDockWidget* widget : this->findChildren<QDockWidget*>()) {
         widget->setAttribute(Qt::WA_DeleteOnClose);
     }
 
@@ -149,31 +148,30 @@ void MainWindow::initWindow()
 //=============================================================================================================
 
 void MainWindow::writeToLog(QtMsgType type,
-                            const QMessageLogContext &context,
-                            const QString &msg)
+                            const QMessageLogContext& context,
+                            const QString& msg)
 {
     Q_UNUSED(context);
     QMutexLocker locker(&m_Mutex);
 
-    switch (type)
-    {
+    switch (type) {
         case QtDebugMsg:
-            m_pTextBrowser_Log->insertHtml("<font color=green><b>[DEBUG]</b> "+msg+"</font>");
+            m_pTextBrowser_Log->insertHtml("<font color=green><b>[DEBUG]</b> " + msg + "</font>");
             break;
         case QtInfoMsg:
-            m_pTextBrowser_Log->insertHtml("<font color=green><b>[INFO]</b> "+msg+"</font>");
+            m_pTextBrowser_Log->insertHtml("<font color=green><b>[INFO]</b> " + msg + "</font>");
             break;
         case QtWarningMsg:
-            m_pTextBrowser_Log->insertHtml("<font color=purple><b>[WARNING]</b> "+msg+"</font>");
+            m_pTextBrowser_Log->insertHtml("<font color=purple><b>[WARNING]</b> " + msg + "</font>");
             break;
         case QtCriticalMsg:
-            m_pTextBrowser_Log->insertHtml("<font color=red><b>[CRITICAL]</b> "+msg+"</font>");
+            m_pTextBrowser_Log->insertHtml("<font color=red><b>[CRITICAL]</b> " + msg + "</font>");
             break;
         case QtFatalMsg:
-            m_pTextBrowser_Log->insertHtml("<font color=purple><b>[FATAL]</b> "+msg+"</font>");
+            m_pTextBrowser_Log->insertHtml("<font color=purple><b>[FATAL]</b> " + msg + "</font>");
             abort();
         default:
-            m_pTextBrowser_Log->insertHtml("<font color=black><b>[UNKOWN]</b> "+msg+"</font>");
+            m_pTextBrowser_Log->insertHtml("<font color=black><b>[UNKOWN]</b> " + msg + "</font>");
             break;
     }
 
@@ -191,13 +189,13 @@ void MainWindow::writeToLog(QtMsgType type,
 
 void MainWindow::saveSettings()
 {
-    if(m_sSettingsPath.isEmpty()) {
+    if (m_sSettingsPath.isEmpty()) {
         return;
     }
 
     QSettings settings("MNECPP");
     settings.beginGroup(m_sSettingsPath);
-    settings.setValue("already_run","yes");
+    settings.setValue("already_run", "yes");
     settings.setValue("styleMode", m_sCurrentStyle);
     settings.beginGroup("layout");
     settings.setValue("geometry", saveGeometry());
@@ -209,8 +207,7 @@ void MainWindow::saveSettings()
 
 void MainWindow::loadSettings()
 {
-    if(m_sSettingsPath.isEmpty()) {
-
+    if (m_sSettingsPath.isEmpty()) {
         return;
     }
 
@@ -218,8 +215,7 @@ void MainWindow::loadSettings()
 
     settings.beginGroup(m_sSettingsPath);
 
-    if(settings.contains("already_run"))
-    {
+    if (settings.contains("already_run")) {
         settings.beginGroup("layout");
         restoreGeometry(settings.value("geometry").toByteArray());
         restoreState(settings.value("state").toByteArray());
@@ -244,8 +240,7 @@ void MainWindow::setCurrentStyle(const QString& sStyle)
 
 void MainWindow::initMenusAndPluginControls()
 {
-    if(m_pAnalyzeCoreController->pluginsInitialized())
-    {
+    if (m_pAnalyzeCoreController->pluginsInitialized()) {
         initMenuBar();
         createLogDockWindow();
         createPluginMenus();
@@ -263,9 +258,9 @@ void MainWindow::initMenusAndPluginControls()
 
 void MainWindow::initPluginControls()
 {
-        setTabPosition(Qt::LeftDockWidgetArea,QTabWidget::West);
-        setTabPosition(Qt::RightDockWidgetArea,QTabWidget::East);
-        setDockOptions(QMainWindow::AllowNestedDocks | QMainWindow::AllowTabbedDocks);
+    setTabPosition(Qt::LeftDockWidgetArea, QTabWidget::West);
+    setTabPosition(Qt::RightDockWidgetArea, QTabWidget::East);
+    setDockOptions(QMainWindow::AllowNestedDocks | QMainWindow::AllowTabbedDocks);
 }
 
 //=============================================================================================================
@@ -296,7 +291,7 @@ void MainWindow::initMenuBar()
     m_pActionExit->setStatusTip(tr("Exit MNE Analyze"));
     connect(m_pActionExit.data(), &QAction::triggered, this, &MainWindow::close);
 #ifndef WASMBUILD
-    m_pActionReloadPlugins = new QAction(tr("Reload Plugins"),this);
+    m_pActionReloadPlugins = new QAction(tr("Reload Plugins"), this);
     m_pActionReloadPlugins->setStatusTip(tr("Reload all the plugins in MNE Analyze's plugin folder."));
     connect(m_pActionReloadPlugins.data(), &QAction::triggered, this, &MainWindow::reloadPlugins);
     m_pMenuFile->addAction(m_pActionReloadPlugins);
@@ -323,9 +318,9 @@ void MainWindow::initMenuBar()
     pActionDefaultStyle->setChecked(true);
     pActionStyleGroup->addAction(pActionDefaultStyle);
     connect(pActionDefaultStyle, &QAction::triggered,
-        [=, this]() {
-        setCurrentStyle("default");
-    });
+            [=, this]() {
+                setCurrentStyle("default");
+            });
 
     m_pActionDarkMode = new QAction("Dark");
     m_pActionDarkMode->setStatusTip(tr("Activate dark style"));
@@ -333,9 +328,9 @@ void MainWindow::initMenuBar()
     m_pActionDarkMode->setChecked(false);
     pActionStyleGroup->addAction(m_pActionDarkMode);
     connect(m_pActionDarkMode.data(), &QAction::triggered,
-        [=, this]() {
-        setCurrentStyle("dark");
-    });
+            [=, this]() {
+                setCurrentStyle("dark");
+            });
 
     // Modes
     QActionGroup* pActionModeGroup = new QActionGroup(this);
@@ -356,34 +351,33 @@ void MainWindow::initMenuBar()
     connect(m_pActionClinicalMode.data(), &QAction::triggered,
             this, &MainWindow::manageGuiModeChanged);
 
-    if(!m_pMenuAppearance) {
+    if (!m_pMenuAppearance) {
         m_pMenuAppearance = menuBar()->addMenu(tr("Appearance"));
         m_pMenuAppearance->addMenu("Styles")->addActions(pActionStyleGroup->actions());
         m_pMenuAppearance->addMenu("Modes")->addActions(pActionModeGroup->actions());
     }
 
-   //Help QMenu
+    //Help QMenu
     m_pActionAbout = new QAction(tr("About"), this);
     m_pActionAbout->setStatusTip(tr("Show the application's About box"));
     connect(m_pActionAbout.data(), &QAction::triggered, this, &MainWindow::about);
 
     m_pMenuHelp = menuBar()->addMenu(tr("Help"));
     m_pMenuHelp->addAction(m_pActionAbout);
-
 }
 
 //=============================================================================================================
 
 void MainWindow::changeStyle()
 {
-    if(m_sCurrentStyle == "dark") {
+    if (m_sCurrentStyle == "dark") {
         m_pActionDarkMode->setChecked(true);
     } else {
         m_pActionDarkMode->setChecked(false);
     }
 
-    if(QApplication *pApp = qobject_cast<QApplication *>(QApplication::instance())) {
-        if(m_sCurrentStyle == "default") {
+    if (QApplication* pApp = qobject_cast<QApplication*>(QApplication::instance())) {
+        if (m_sCurrentStyle == "default") {
             pApp->setStyleSheet("");
             emit guiStyleChanged(DISPLIB::AbstractView::StyleMode::Default);
         } else if (m_sCurrentStyle == "dark") {
@@ -401,7 +395,7 @@ void MainWindow::changeStyle()
         // Set default font
         int id = QFontDatabase::addApplicationFont(":/fonts/Roboto-Light.ttf");
 
-        if(id != -1){
+        if (id != -1) {
             pApp->setFont(QFont(QFontDatabase::applicationFontFamilies(id).at(0)));
         }
     }
@@ -411,9 +405,9 @@ void MainWindow::changeStyle()
 
 void MainWindow::manageGuiModeChanged()
 {
-    if(m_pActionResearchMode->isChecked()) {
+    if (m_pActionResearchMode->isChecked()) {
         emit guiModeChanged(DISPLIB::AbstractView::GuiMode::Research);
-    } else if(m_pActionClinicalMode->isChecked()) {
+    } else if (m_pActionClinicalMode->isChecked()) {
         emit guiModeChanged(DISPLIB::AbstractView::GuiMode::Clinical);
     }
 }
@@ -426,10 +420,10 @@ void MainWindow::createLogDockWindow()
     QDockWidget* pDockWidget_Log = new QDockWidget(tr("Log"), this);
     pDockWidget_Log->setObjectName("Log");
 
-    // Disable floating and editable dock widgets, since the wasm QDockWidget version is buggy
-    #ifdef WASMBUILD
+// Disable floating and editable dock widgets, since the wasm QDockWidget version is buggy
+#ifdef WASMBUILD
     pDockWidget_Log->setFeatures(QDockWidget::DockWidgetClosable);
-    #endif
+#endif
 
     m_pTextBrowser_Log = new QTextBrowser(pDockWidget_Log);
 
@@ -448,27 +442,27 @@ void MainWindow::createLogDockWindow()
 void MainWindow::createPluginMenus()
 {
     // add plugins menus
-    for(auto pPlugin : m_pAnalyzeCoreController->getLoadedPlugins()) {
-        if(pPlugin) {
-            if(pPlugin->menuAlreadyLoaded() == false) {
+    for (auto pPlugin : m_pAnalyzeCoreController->getLoadedPlugins()) {
+        if (pPlugin) {
+            if (pPlugin->menuAlreadyLoaded() == false) {
                 pPlugin->setMenuLoadingState(true);
                 pPlugin->setObjectName(pPlugin->getName());
                 if (QMenu* pMenu = pPlugin->getMenu()) {
                     // Check if the menu already exists. If it does add the actions to the exisiting menu.
-                    if(pMenu->title() == "File") {
-                        for(QAction* pAction : pMenu->actions()) {
-                            #ifdef WASMBUILD
+                    if (pMenu->title() == "File") {
+                        for (QAction* pAction : pMenu->actions()) {
+#ifdef WASMBUILD
                             m_pMenuFile->insertAction(m_pActionExit, pAction);
-                            #else
+#else
                             m_pMenuFile->insertAction(m_pActionReloadPlugins, pAction);
-                            #endif
+#endif
                         }
-                    } else if(pMenu->title() == "View") {
-                        for(QAction* pAction : pMenu->actions()) {
+                    } else if (pMenu->title() == "View") {
+                        for (QAction* pAction : pMenu->actions()) {
                             m_pMenuView->addAction(pAction);
                         }
-                    } else if(pMenu->title() == "Help") {
-                        for(QAction* pAction : pMenu->actions()) {
+                    } else if (pMenu->title() == "Help") {
+                        for (QAction* pAction : pMenu->actions()) {
                             m_pMenuHelp->insertAction(m_pActionAbout, pAction);
                         }
                     } else {
@@ -485,12 +479,11 @@ void MainWindow::createPluginMenus()
 void MainWindow::createPluginControls()
 {
     //Add Plugin controls to the MainWindow
-    for(AbstractPlugin* pPlugin : m_pAnalyzeCoreController->getLoadedPlugins()) {
-        if(pPlugin->controlAlreadyLoaded() == false) {
+    for (AbstractPlugin* pPlugin : m_pAnalyzeCoreController->getLoadedPlugins()) {
+        if (pPlugin->controlAlreadyLoaded() == false) {
             pPlugin->setControlLoadingState(true);
             QDockWidget* pControl = pPlugin->getControl();
-            if(pControl)
-            {
+            if (pControl) {
                 addDockWidget(Qt::LeftDockWidgetArea, pControl);
                 qInfo() << "[MainWindow::createPluginControls] Found and added dock widget for " << pPlugin->getName();
                 QAction* pAction = pControl->toggleViewAction();
@@ -505,10 +498,10 @@ void MainWindow::createPluginControls()
                 connect(this, &MainWindow::guiStyleChanged,
                         pPlugin, &AbstractPlugin::guiStyleChanged);
 
-                // Disable floating and editable dock widgets, since the wasm QDockWidget version is buggy
-                #ifdef WASMBUILD
+// Disable floating and editable dock widgets, since the wasm QDockWidget version is buggy
+#ifdef WASMBUILD
                 pControl->setFeatures(QDockWidget::DockWidgetClosable);
-                #endif
+#endif
             }
         }
     }
@@ -531,16 +524,16 @@ void MainWindow::initPluginViews()
 void MainWindow::createPluginViews()
 {
     //Add Plugin views to the MultiView, which is the central widget
-    for(AbstractPlugin* pPlugin : m_pAnalyzeCoreController->getLoadedPlugins()) {
-        if(pPlugin->viewAlreadyLoaded() == false) {
+    for (AbstractPlugin* pPlugin : m_pAnalyzeCoreController->getLoadedPlugins()) {
+        if (pPlugin->viewAlreadyLoaded() == false) {
             pPlugin->setViewLoadingState(true);
             QWidget* pView = pPlugin->getView();
-            if(pView) {
+            if (pView) {
                 MultiViewWindow* pWindow = Q_NULLPTR;
                 pWindow = m_pMultiView->addWidgetTop(pView, pPlugin->getName());
                 QAction* pAction = pWindow->toggleViewAction();
                 pAction->setText(pPlugin->getName());
-                if(m_pMenuPlugins) {
+                if (m_pMenuPlugins) {
                     m_pMenuPlugins->addAction(pAction);
                 } else {
                     m_pMenuView->addAction(pAction);
@@ -560,8 +553,7 @@ void MainWindow::tabifyDockWindows()
     QList<QDockWidget*> docks = findChildren<QDockWidget*>();
 
     // first, un-float all the tabs
-    for (QDockWidget* pDockWidget : docks)
-    {
+    for (QDockWidget* pDockWidget : docks) {
         pDockWidget->setFloating(false);
     }
 
@@ -569,35 +561,34 @@ void MainWindow::tabifyDockWindows()
     QVector<QDockWidget*> topArea, leftArea, rightArea, bottomArea;
     QVector<QVector<QDockWidget*>*> dockAreas{&topArea, &leftArea, &rightArea, &bottomArea};
 
-    for (QDockWidget* pDockWidget : docks) {        
-        // Disable floating and editable dock widgets, since the wasm QDockWidget version is buggy
-        #ifdef WASMBUILD
+    for (QDockWidget* pDockWidget : docks) {
+// Disable floating and editable dock widgets, since the wasm QDockWidget version is buggy
+#ifdef WASMBUILD
         pDockWidget->setFeatures(QDockWidget::DockWidgetClosable);
-        #endif
+#endif
 
         // default with left area
         Qt::DockWidgetArea area = Qt::LeftDockWidgetArea;
-        switch (dockWidgetArea(pDockWidget))
-        {
-        case Qt::TopDockWidgetArea:
-            topArea.push_back(pDockWidget);
-            area = Qt::TopDockWidgetArea;
-            break;
-        case Qt::LeftDockWidgetArea:
-            leftArea.push_back(pDockWidget);
-            area = Qt::LeftDockWidgetArea;
-            break;
-        case Qt::RightDockWidgetArea:
-            rightArea.push_back(pDockWidget);
-            area = Qt::RightDockWidgetArea;
-            break;
-        case Qt::BottomDockWidgetArea:
-            bottomArea.push_back(pDockWidget);
-            area = Qt::BottomDockWidgetArea;
-            break;
-        default:
-            qDebug() << "[MainWindow::tabifyDockWindows] Unhandled dock widget area";
-            break;
+        switch (dockWidgetArea(pDockWidget)) {
+            case Qt::TopDockWidgetArea:
+                topArea.push_back(pDockWidget);
+                area = Qt::TopDockWidgetArea;
+                break;
+            case Qt::LeftDockWidgetArea:
+                leftArea.push_back(pDockWidget);
+                area = Qt::LeftDockWidgetArea;
+                break;
+            case Qt::RightDockWidgetArea:
+                rightArea.push_back(pDockWidget);
+                area = Qt::RightDockWidgetArea;
+                break;
+            case Qt::BottomDockWidgetArea:
+                bottomArea.push_back(pDockWidget);
+                area = Qt::BottomDockWidgetArea;
+                break;
+            default:
+                qDebug() << "[MainWindow::tabifyDockWindows] Unhandled dock widget area";
+                break;
         }
         removeDockWidget(pDockWidget);
         pDockWidget->resize(pDockWidget->minimumSizeHint());
@@ -618,12 +609,12 @@ void MainWindow::tabifyDockWindows()
 
 void MainWindow::about()
 {
-    if(!m_pAboutWindow) {
+    if (!m_pAboutWindow) {
         m_pAboutWindow = QSharedPointer<QWidget>(new QWidget(this, Qt::Window));
 
-        QGridLayout *gridLayout;
-        QLabel *m_label_splashcreen;
-        QTextEdit *m_textEdit_aboutText;
+        QGridLayout* gridLayout;
+        QLabel* m_label_splashcreen;
+        QTextEdit* m_textEdit_aboutText;
 
         m_pAboutWindow->setObjectName(QStringLiteral("AboutWindow"));
         m_pAboutWindow->resize(541, 708);
@@ -654,7 +645,7 @@ void MainWindow::about()
         m_textEdit_aboutText->setEnabled(true);
         m_textEdit_aboutText->setReadOnly(true);
         m_textEdit_aboutText->setOverwriteMode(true);
-        m_textEdit_aboutText->setTextInteractionFlags(Qt::LinksAccessibleByKeyboard|Qt::LinksAccessibleByMouse|Qt::TextBrowserInteraction|Qt::TextSelectableByKeyboard|Qt::TextSelectableByMouse);
+        m_textEdit_aboutText->setTextInteractionFlags(Qt::LinksAccessibleByKeyboard | Qt::LinksAccessibleByMouse | Qt::TextBrowserInteraction | Qt::TextSelectableByKeyboard | Qt::TextSelectableByMouse);
 
         QLabel* pLabel = new QLabel();
         pLabel->setText(QString("Version: ") + CInfo::AppVersion() + " - " + QString(UTILSLIB::dateTimeNow()) + " - " + QString(UTILSLIB::gitHash()));
@@ -665,18 +656,18 @@ void MainWindow::about()
 
         m_pAboutWindow->setWindowTitle(tr("About"));
         m_label_splashcreen->setText(QString());
-        m_textEdit_aboutText->setHtml( tr("<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
-                                          "<html><head><meta name=\"qrichtext\" content=\"1\" /><style type=\"text/css\">\n"
-                                          "</style></head><body style=\" font-family:'MS Shell Dlg 2'; font-size:7.8pt; font-weight:400; font-style:normal;\">"
-                                          "<p align=\"justify\" style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-size:8pt;\">For more information please visit the MNE-CPP/MNE Analyze project on its homepage:</span></p>\n"
-                                          "<p align=\"justify\" style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:8pt;\"><br /></p>\n"
-                                          "<p align=\"center\" style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><a href=\"http://www.mne-cpp.org\"><span style=\" font-size:8pt; text-decoration: underline; color:#0000ff;\">http://www.mne-cpp.org</span></a></p>\n"
-                                          "<p align=\"justify\" style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:8pt;\"><br /></p>\n"
-                                          "<p align=\"justify\" style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-size:8pt;\">THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS &quot;AS IS&quot; AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.</span></p>\n"
-                                          "<p align=\"justify\" style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:8pt;\"><br /></p>\n"
-                                          "<p align=\"justify\" style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-size:8pt;\">Redistribution and use in source and binary forms, with or without modification, are permitted provided tha the following conditions are met:</span></p>\n"
-                                          "<p align=\"justify\" style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:8pt;\"><br /></p>\n"
-                                          "<p align=\"justify\" style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-size:8pt;\">Redistributions of source code must retain the above copyright notice, this list of conditions and the following disclaime. Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the following disclaimer in the documentation and/or other materials provided with the distribution. Neither the name of MNE-CPP authors nor the names of its contributors may be used to endorse or promote products derived from this software without specific prior written permission.</span></p></body></html>"));
+        m_textEdit_aboutText->setHtml(tr("<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
+                                         "<html><head><meta name=\"qrichtext\" content=\"1\" /><style type=\"text/css\">\n"
+                                         "</style></head><body style=\" font-family:'MS Shell Dlg 2'; font-size:7.8pt; font-weight:400; font-style:normal;\">"
+                                         "<p align=\"justify\" style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-size:8pt;\">For more information please visit the MNE-CPP/MNE Analyze project on its homepage:</span></p>\n"
+                                         "<p align=\"justify\" style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:8pt;\"><br /></p>\n"
+                                         "<p align=\"center\" style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><a href=\"http://www.mne-cpp.org\"><span style=\" font-size:8pt; text-decoration: underline; color:#0000ff;\">http://www.mne-cpp.org</span></a></p>\n"
+                                         "<p align=\"justify\" style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:8pt;\"><br /></p>\n"
+                                         "<p align=\"justify\" style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-size:8pt;\">THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS &quot;AS IS&quot; AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.</span></p>\n"
+                                         "<p align=\"justify\" style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:8pt;\"><br /></p>\n"
+                                         "<p align=\"justify\" style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-size:8pt;\">Redistribution and use in source and binary forms, with or without modification, are permitted provided tha the following conditions are met:</span></p>\n"
+                                         "<p align=\"justify\" style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:8pt;\"><br /></p>\n"
+                                         "<p align=\"justify\" style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-size:8pt;\">Redistributions of source code must retain the above copyright notice, this list of conditions and the following disclaime. Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the following disclaimer in the documentation and/or other materials provided with the distribution. Neither the name of MNE-CPP authors nor the names of its contributors may be used to endorse or promote products derived from this software without specific prior written permission.</span></p></body></html>"));
 
         m_pAboutWindow->setLayout(gridLayout);
     }

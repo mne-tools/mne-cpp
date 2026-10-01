@@ -48,32 +48,38 @@
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-namespace FIFFLIB {
-    class FiffInfo;
-    class FiffCoordTrans;
+namespace FIFFLIB
+{
+class FiffInfo;
+class FiffCoordTrans;
 }
 
-namespace FWDLIB {
-    class ComputeFwdSettings;
-    class ComputeFwd;
+namespace FWDLIB
+{
+class ComputeFwdSettings;
+class ComputeFwd;
 }
 
-namespace MNELIB {
-    class MNEForwardSolution;
+namespace MNELIB
+{
+class MNEForwardSolution;
 }
 
-namespace FSLIB{
-    class FsAnnotationSet;
+namespace FSLIB
+{
+class FsAnnotationSet;
 }
 
-namespace INVLIB{
-    struct HpiFitResult;
+namespace INVLIB
+{
+struct HpiFitResult;
 }
 
-namespace SCMEASLIB{
-    class RealTimeFwdSolution;
-    class RealTimeHpiResult;
-    class RealTimeMultiSampleArray;
+namespace SCMEASLIB
+{
+class RealTimeFwdSolution;
+class RealTimeHpiResult;
+class RealTimeMultiSampleArray;
 }
 
 //=============================================================================================================
@@ -137,7 +143,7 @@ public:
      */
     void update(SCMEASLIB::Measurement::SPtr pMeasurement);
 
-    std::shared_ptr<FWDLIB::ComputeFwdSettings>                 m_pFwdSettings;         /**< Forward Solution Settings. */
+    std::shared_ptr<FWDLIB::ComputeFwdSettings> m_pFwdSettings; /**< Forward Solution Settings. */
 
 protected:
     //=========================================================================================================
@@ -193,31 +199,31 @@ private:
     void onAtlasDirChanged(const QString& sDirPath,
                            const QSharedPointer<FSLIB::FsAnnotationSet> pAnnotationSet);
 
-    QMutex                                      m_mutex;                    /**< The threads mutex.*/
-    QFuture<void>                               m_future;                   /**< The future monitoring the clustering and forward calculation. */
+    QMutex m_mutex;         /**< The threads mutex.*/
+    QFuture<void> m_future; /**< The future monitoring the clustering and forward calculation. */
 
-    float                                       m_fThreshRot;               /**< The allowed rotation in degree.**/
-    float                                       m_fThreshMove;              /**< The Allowed movement in mm.**/
-    bool                                        m_bBusy;                    /**< Indicates if we have to update headposition.**/
-    bool                                        m_bDoRecomputation;         /**< If recomputation is activated.**/
-    bool                                        m_bDoClustering;            /**< If clustering is activated.**/
-    bool                                        m_bNClusterChanged;         /**< Perform new clustering when cluster size changed**/
+    float m_fThreshRot;      /**< The allowed rotation in degree.**/
+    float m_fThreshMove;     /**< The Allowed movement in mm.**/
+    bool m_bBusy;            /**< Indicates if we have to update headposition.**/
+    bool m_bDoRecomputation; /**< If recomputation is activated.**/
+    bool m_bDoClustering;    /**< If clustering is activated.**/
+    bool m_bNClusterChanged; /**< Perform new clustering when cluster size changed**/
 
-    bool                                        m_bDoFwdComputation;        /**< Do a forward computation. **/
+    bool m_bDoFwdComputation; /**< Do a forward computation. **/
 
-    QString                                     m_sAtlasDir;                /**< File to Atlas. */
+    QString m_sAtlasDir; /**< File to Atlas. */
 
-    QSharedPointer<INVLIB::HpiFitResult>    m_pHpiFitResult;            /**< The Hpi fitting result.**/
+    QSharedPointer<INVLIB::HpiFitResult> m_pHpiFitResult; /**< The Hpi fitting result.**/
 
-    QSharedPointer<FIFFLIB::FiffInfo>           m_pFiffInfo;                /**< Fiff measurement info.*/
-    FIFFLIB::FiffCoordTrans                     m_transDevHead;             /**< Updated meg->head transformation. */
+    QSharedPointer<FIFFLIB::FiffInfo> m_pFiffInfo; /**< Fiff measurement info.*/
+    FIFFLIB::FiffCoordTrans m_transDevHead;        /**< Updated meg->head transformation. */
 
-    QSharedPointer<FSLIB::FsAnnotationSet>                                        m_pAnnotationSet;       /**< FsAnnotation set. */
+    QSharedPointer<FSLIB::FsAnnotationSet> m_pAnnotationSet; /**< FsAnnotation set. */
 
-    SCSHAREDLIB::PluginInputData<SCMEASLIB::RealTimeHpiResult>::SPtr            m_pHpiInput;            /**< The incoming Hpi data.*/
-    SCSHAREDLIB::PluginInputData<SCMEASLIB::RealTimeMultiSampleArray>::SPtr     m_pRTMSAInput;          /**< The incoming data.*/
+    SCSHAREDLIB::PluginInputData<SCMEASLIB::RealTimeHpiResult>::SPtr m_pHpiInput;          /**< The incoming Hpi data.*/
+    SCSHAREDLIB::PluginInputData<SCMEASLIB::RealTimeMultiSampleArray>::SPtr m_pRTMSAInput; /**< The incoming data.*/
 
-    SCSHAREDLIB::PluginOutputData<SCMEASLIB::RealTimeFwdSolution>::SPtr         m_pRTFSOutput;          /**< The fwd solution.*/
+    SCSHAREDLIB::PluginOutputData<SCMEASLIB::RealTimeFwdSolution>::SPtr m_pRTFSOutput; /**< The fwd solution.*/
 
 signals:
     //=========================================================================================================
@@ -244,7 +250,6 @@ signals:
      * @param[in] iStatus            status of recomputation.
      */
     void statusInformationChanged(int iStatus);
-
 };
 } // NAMESPACE
 

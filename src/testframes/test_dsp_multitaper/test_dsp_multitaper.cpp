@@ -72,7 +72,7 @@ private slots:
 
 private:
     MatrixXd generateSinusoidal(int nChannels, int nSamples, double sfreq,
-                                 const QVector<double>& frequencies) const;
+                                const QVector<double>& frequencies) const;
 };
 
 //=============================================================================================================
@@ -84,7 +84,7 @@ void TestDspMultitaper::initTestCase()
 //=============================================================================================================
 
 MatrixXd TestDspMultitaper::generateSinusoidal(int nChannels, int nSamples, double sfreq,
-                                                const QVector<double>& frequencies) const
+                                               const QVector<double>& frequencies) const
 {
     MatrixXd data = MatrixXd::Zero(nChannels, nSamples);
     for (int ch = 0; ch < nChannels; ++ch) {

@@ -105,13 +105,13 @@ private slots:
 
 private:
     /// Build a regular tetrahedron: 4 vertices, 4 triangular faces
-    void buildTetrahedron(MatrixX3f &rr, MatrixX3i &tris);
+    void buildTetrahedron(MatrixX3f& rr, MatrixX3i& tris);
 
     /// Build an XY-plane quad: 4 vertices, 2 triangles, normal should point +Z
-    void buildXYPlane(MatrixX3f &rr, MatrixX3i &tris);
+    void buildXYPlane(MatrixX3f& rr, MatrixX3i& tris);
 
     /// Create a minimal FreeSurfer .label file in the given directory
-    QString createTempLabelFile(const QTemporaryDir &dir, const QString &prefix = "lh");
+    QString createTempLabelFile(const QTemporaryDir& dir, const QString& prefix = "lh");
 };
 
 //=============================================================================================================
@@ -132,51 +132,50 @@ void TestFS::initTestCase()
 // Helper: regular tetrahedron with edge length sqrt(2)
 //=============================================================================================================
 
-void TestFS::buildTetrahedron(MatrixX3f &rr, MatrixX3i &tris)
+void TestFS::buildTetrahedron(MatrixX3f& rr, MatrixX3i& tris)
 {
     rr.resize(4, 3);
-    rr << 1.0f,  1.0f,  1.0f,
-          1.0f, -1.0f, -1.0f,
-         -1.0f,  1.0f, -1.0f,
-         -1.0f, -1.0f,  1.0f;
+    rr << 1.0f, 1.0f, 1.0f,
+        1.0f, -1.0f, -1.0f,
+        -1.0f, 1.0f, -1.0f,
+        -1.0f, -1.0f, 1.0f;
 
     tris.resize(4, 3);
     tris << 0, 1, 2,
-            0, 1, 3,
-            0, 2, 3,
-            1, 2, 3;
+        0, 1, 3,
+        0, 2, 3,
+        1, 2, 3;
 }
 
 //=============================================================================================================
 // Helper: XY-plane quad with known normal (+Z)
 //=============================================================================================================
 
-void TestFS::buildXYPlane(MatrixX3f &rr, MatrixX3i &tris)
+void TestFS::buildXYPlane(MatrixX3f& rr, MatrixX3i& tris)
 {
     rr.resize(4, 3);
     rr << 0.0f, 0.0f, 0.0f,
-          1.0f, 0.0f, 0.0f,
-          1.0f, 1.0f, 0.0f,
-          0.0f, 1.0f, 0.0f;
+        1.0f, 0.0f, 0.0f,
+        1.0f, 1.0f, 0.0f,
+        0.0f, 1.0f, 0.0f;
 
     tris.resize(2, 3);
     tris << 0, 1, 2,
-            0, 2, 3;
+        0, 2, 3;
 }
 
 //=============================================================================================================
 // Helper: Create a temporary .label file
 //=============================================================================================================
 
-QString TestFS::createTempLabelFile(const QTemporaryDir &dir, const QString &prefix)
+QString TestFS::createTempLabelFile(const QTemporaryDir& dir, const QString& prefix)
 {
     // Format: comment line, vertex count, then rows of: vertexId x y z value
     // Positions in mm (will be converted to m by FsLabel::read)
     QString filePath = dir.path() + "/" + prefix + ".test.label";
 
     QFile file(filePath);
-    if (!file.open(QIODevice::WriteOnly | QIODevice::Text))
-    {
+    if (!file.open(QIODevice::WriteOnly | QIODevice::Text)) {
         qWarning("Failed to create temp label file");
         return QString();
     }
@@ -236,8 +235,7 @@ void TestFS::testComputeNormalsTetrahedron()
     QCOMPARE(nn.cols(), 3);
 
     // All normals should be unit length
-    for (int i = 0; i < nn.rows(); ++i)
-    {
+    for (int i = 0; i < nn.rows(); ++i) {
         float norm = nn.row(i).norm();
         QVERIFY2(qAbs(norm - 1.0f) < 1e-5f,
                  qPrintable(QString("Normal %1 has length %2").arg(i).arg(norm)));
@@ -258,11 +256,10 @@ void TestFS::testComputeNormalsPlane()
 
     // All normals on a flat XY plane should point along +Z or -Z
     // The cross product of (1,0,0)x(1,1,0) = (0,0,1) -> +Z
-    for (int i = 0; i < nn.rows(); ++i)
-    {
+    for (int i = 0; i < nn.rows(); ++i) {
         float nz = qAbs(nn(i, 2));
         QVERIFY2(nz > 0.99f,
-                 qPrintable(QString("Vertex %1: Z-component = %2, expected ~1.0").arg(i).arg(nn(i,2))));
+                 qPrintable(QString("Vertex %1: Z-component = %2, expected ~1.0").arg(i).arg(nn(i, 2))));
     }
 }
 
@@ -279,11 +276,10 @@ void TestFS::testComputeNormalsOrthogonality()
     MatrixX3f nn = FsSurface::compute_normals(rr, tris);
 
     // Edge vectors in the plane
-    Vector3f edge1 = rr.row(1) - rr.row(0);  // (1,0,0)
-    Vector3f edge2 = rr.row(2) - rr.row(0);  // (1,1,0)
+    Vector3f edge1 = rr.row(1) - rr.row(0); // (1,0,0)
+    Vector3f edge2 = rr.row(2) - rr.row(0); // (1,1,0)
 
-    for (int i = 0; i < nn.rows(); ++i)
-    {
+    for (int i = 0; i < nn.rows(); ++i) {
         float dot1 = nn.row(i).dot(edge1);
         float dot2 = nn.row(i).dot(edge2);
         QVERIFY2(qAbs(dot1) < 1e-5f,
@@ -363,8 +359,8 @@ void TestFS::testLabelFullCtor()
 
     MatrixX3f pos(3, 3);
     pos << 0.01f, 0.02f, 0.03f,
-           0.04f, 0.05f, 0.06f,
-           0.07f, 0.08f, 0.09f;
+        0.04f, 0.05f, 0.06f,
+        0.07f, 0.08f, 0.09f;
 
     VectorXd vals(3);
     vals << 1.0, 0.5, 0.0;
@@ -413,7 +409,7 @@ void TestFS::testLabelSelectTrisMatrix()
     // Two triangles: (0,1,2) and (0,2,3)
     MatrixX3i allTris(2, 3);
     allTris << 0, 1, 2,
-               0, 2, 3;
+        0, 2, 3;
 
     // FsLabel contains only vertices {0, 1}
     VectorXi labelVerts(2);
@@ -421,7 +417,7 @@ void TestFS::testLabelSelectTrisMatrix()
 
     MatrixX3f pos(2, 3);
     pos << 0.0f, 0.0f, 0.0f,
-           1.0f, 0.0f, 0.0f;
+        1.0f, 0.0f, 0.0f;
 
     VectorXd vals(2);
     vals << 1.0, 1.0;
@@ -439,7 +435,7 @@ void TestFS::testLabelSelectTrisMatrix()
 
 void TestFS::testLabelSelectTrisEmptyVertices()
 {
-    FsLabel l;  // empty label, no vertices
+    FsLabel l; // empty label, no vertices
 
     MatrixX3i someTris(1, 3);
     someTris << 0, 1, 2;
@@ -462,7 +458,7 @@ void TestFS::testLabelReadFromFile()
 
     QVERIFY(ok);
     QVERIFY(!l.isEmpty());
-    QCOMPARE(l.hemi, 0);  // "lh" -> left hemisphere
+    QCOMPARE(l.hemi, 0); // "lh" -> left hemisphere
     QCOMPARE(l.vertices.size(), 3);
     QCOMPARE(l.pos.rows(), 3);
     QCOMPARE(l.values.size(), 3);
@@ -556,7 +552,7 @@ void TestFS::testColortableAccessors()
     // Table: R, G, B, A, Id
     ct.table.resize(2, 5);
     ct.table << 255, 0, 0, 255, 1001,
-                0, 128, 255, 200, 1002;
+        0, 128, 255, 200, 1002;
 
     // getLabelIds
     VectorXi ids = ct.getLabelIds();
@@ -573,10 +569,10 @@ void TestFS::testColortableAccessors()
     // getRGBAs
     MatrixX4i rgbas = ct.getRGBAs();
     QCOMPARE(rgbas.rows(), 2);
-    QCOMPARE(rgbas(0, 0), 255);  // R
-    QCOMPARE(rgbas(0, 1), 0);    // G
-    QCOMPARE(rgbas(0, 2), 0);    // B
-    QCOMPARE(rgbas(0, 3), 255);  // A
+    QCOMPARE(rgbas(0, 0), 255); // R
+    QCOMPARE(rgbas(0, 1), 0);   // G
+    QCOMPARE(rgbas(0, 2), 0);   // B
+    QCOMPARE(rgbas(0, 3), 255); // A
     QCOMPARE(rgbas(1, 0), 0);
     QCOMPARE(rgbas(1, 1), 128);
     QCOMPARE(rgbas(1, 2), 255);

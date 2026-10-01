@@ -32,18 +32,19 @@ using DISP3DLIB::MultimodalScene;
 using DISP3DLIB::SceneLayer;
 using DISP3DLIB::SceneLayerKind;
 
-namespace {
-constexpr const char* kBemLayerId       = "head_bem";
-constexpr const char* kAcquiredLayerId  = "acquired_points";
-constexpr FiducialId  kFiducialOrder[]  = {FiducialId::NAS, FiducialId::LPA, FiducialId::RPA};
+namespace
+{
+constexpr const char* kBemLayerId = "head_bem";
+constexpr const char* kAcquiredLayerId = "acquired_points";
+constexpr FiducialId kFiducialOrder[] = {FiducialId::NAS, FiducialId::LPA, FiducialId::RPA};
 } // namespace
 
 //=============================================================================================================
 
 Align3DView::Align3DView(AcquiredPoints* acquired, QWidget* parent)
-    : QWidget(parent)
-    , m_pPoints(acquired)
-    , m_pScene(std::make_unique<MultimodalScene>())
+: QWidget(parent)
+, m_pPoints(acquired)
+, m_pScene(std::make_unique<MultimodalScene>())
 {
     auto* lay = new QVBoxLayout(this);
     lay->setContentsMargins(0, 0, 0, 0);
@@ -86,7 +87,8 @@ MultimodalScene* Align3DView::scene() const
 
 void Align3DView::setViewCount(int count)
 {
-    if (!m_pBrainView) return;
+    if (!m_pBrainView)
+        return;
     m_pBrainView->setViewCount(qBound(1, count, 4));
     applyViewConfiguration();
 }
@@ -96,7 +98,8 @@ void Align3DView::setRenderMode(const QString& modeName)
     if (modeName != QLatin1String("Anatomical") && modeName != QLatin1String("Holographic")) {
         return;
     }
-    if (!m_pBrainView) return;
+    if (!m_pBrainView)
+        return;
     m_pBrainView->setShaderMode(modeName);
     applyViewConfiguration();
 }
@@ -110,7 +113,8 @@ void Align3DView::setCameraPreset(int preset)
 void Align3DView::setCameraFocus(CameraFocus focus)
 {
     m_cameraFocus = focus;
-    if (!m_pBrainView) return;
+    if (!m_pBrainView)
+        return;
 
     if (focus == CameraFocus::Pointer && m_stationPoses.contains(m_penStation)) {
         m_pBrainView->setCameraFocusOverride(m_stationPoses[m_penStation].position, 0.08f);
@@ -133,10 +137,10 @@ void Align3DView::setBem(std::shared_ptr<MNELIB::MNEBem> bem)
 
     if (m_pBem) {
         SceneLayer layer;
-        layer.id          = QString::fromLatin1(kBemLayerId);
+        layer.id = QString::fromLatin1(kBemLayerId);
         layer.displayName = QStringLiteral("Head BEM");
-        layer.kind        = SceneLayerKind::BrainSurface;
-        layer.payload     = std::shared_ptr<void>(m_pBem, m_pBem.get());
+        layer.kind = SceneLayerKind::BrainSurface;
+        layer.payload = std::shared_ptr<void>(m_pBem, m_pBem.get());
         m_pScene->addLayer(layer);
     }
     rebuildBemSurfaces();
@@ -174,8 +178,8 @@ void Align3DView::setLiveDigitizerPose(int station,
 void Align3DView::setHeadToMriOverride(const QMatrix4x4& headToMri)
 {
     m_haveHeadToMriOverride = true;
-    m_headToMriOverride     = headToMri;
-    m_headToMri             = headToMri;
+    m_headToMriOverride = headToMri;
+    m_headToMri = headToMri;
     rebuildAcquiredLayer();
     rebuildDigitizerLayer();
     rebuildStaticMarkers();
@@ -185,7 +189,8 @@ void Align3DView::setHeadToMriOverride(const QMatrix4x4& headToMri)
 
 void Align3DView::clearHeadToMriOverride()
 {
-    if (!m_haveHeadToMriOverride) return;
+    if (!m_haveHeadToMriOverride)
+        return;
     m_haveHeadToMriOverride = false;
     m_headToMriOverride.setToIdentity();
     recomputeAlignment();
@@ -203,17 +208,17 @@ void Align3DView::onLiveUpdateTick()
     }
     m_liveTrackerDirty = false;
 
-    constexpr float kBaseRadius    = 0.004f;   // 4 mm — transmitter base
-    constexpr float kTrackerRadius = 0.005f;   // 5 mm — stylus tip
-    constexpr float kAxisRadius    = 0.002f;   // 2 mm — axis-tip spheres
-    constexpr float kAxisLength    = 0.015f;   // 1.5 cm axis arm
+    constexpr float kBaseRadius = 0.004f;    // 4 mm — transmitter base
+    constexpr float kTrackerRadius = 0.005f; // 5 mm — stylus tip
+    constexpr float kAxisRadius = 0.002f;    // 2 mm — axis-tip spheres
+    constexpr float kAxisLength = 0.015f;    // 1.5 cm axis arm
 
     // Per-station colours: distinct hues for up to 4 stations.
     static const QColor kStationColors[] = {
-        QColor(255, 220,  40),  // station 1 — yellow
-        QColor(255, 120,   0),  // station 2 — orange
-        QColor(180,  60, 255),  // station 3 — purple
-        QColor(  0, 220, 220),  // station 4 — cyan
+        QColor(255, 220, 40), // station 1 — yellow
+        QColor(255, 120, 0),  // station 2 — orange
+        QColor(180, 60, 255), // station 3 — purple
+        QColor(0, 220, 220),  // station 4 — cyan
     };
     constexpr int kMaxStationColors = 4;
 
@@ -240,7 +245,7 @@ void Align3DView::onLiveUpdateTick()
 
         // Tracker tip — pen station gets a transparent aura sphere
         if (station == m_penStation) {
-            markers.append({pos, tipColor, 0.008f, true});  // 8 mm transparent aura
+            markers.append({pos, tipColor, 0.008f, true});   // 8 mm transparent aura
             markers.append({pos, tipColor, kTrackerRadius}); // solid core
         } else {
             markers.append({pos, tipColor, kTrackerRadius});
@@ -254,8 +259,8 @@ void Align3DView::onLiveUpdateTick()
         const QVector3D zTip = devToMri.map(
             pose.position + pose.orientation.rotatedVector(QVector3D(0.0f, 0.0f, kAxisLength)));
 
-        markers.append({xTip, QColor(255, 50, 50),  kAxisRadius});
-        markers.append({yTip, QColor(50, 220, 50),  kAxisRadius});
+        markers.append({xTip, QColor(255, 50, 50), kAxisRadius});
+        markers.append({yTip, QColor(50, 220, 50), kAxisRadius});
         markers.append({zTip, QColor(80, 140, 255), kAxisRadius});
 
         // Use pen station for camera focus
@@ -294,15 +299,16 @@ void Align3DView::onPointsChanged()
 void Align3DView::rebuildAcquiredLayer()
 {
     m_pScene->removeLayer(QString::fromLatin1(kAcquiredLayerId));
-    if (!m_pPoints || m_pPoints->points().isEmpty()) return;
+    if (!m_pPoints || m_pPoints->points().isEmpty())
+        return;
 
     auto snapshot = std::make_shared<QVector<DigitizedPoint>>(m_pPoints->points());
 
     SceneLayer layer;
-    layer.id          = QString::fromLatin1(kAcquiredLayerId);
+    layer.id = QString::fromLatin1(kAcquiredLayerId);
     layer.displayName = QStringLiteral("Digitised points");
-    layer.kind        = SceneLayerKind::Custom;
-    layer.payload     = std::shared_ptr<void>(snapshot, snapshot.get());
+    layer.kind = SceneLayerKind::Custom;
+    layer.payload = std::shared_ptr<void>(snapshot, snapshot.get());
     m_pScene->addLayer(layer);
 }
 
@@ -320,10 +326,18 @@ void Align3DView::rebuildBemSurfaces()
     for (int i = 0; i < m_pBem->size(); ++i) {
         QString name;
         switch ((*m_pBem)[i].id) {
-            case FIFFV_BEM_SURF_ID_HEAD:  name = QStringLiteral("head");        break;
-            case FIFFV_BEM_SURF_ID_SKULL: name = QStringLiteral("outer_skull"); break;
-            case FIFFV_BEM_SURF_ID_BRAIN: name = QStringLiteral("inner_skull"); break;
-            default:                      name = QString::number(i);           break;
+            case FIFFV_BEM_SURF_ID_HEAD:
+                name = QStringLiteral("head");
+                break;
+            case FIFFV_BEM_SURF_ID_SKULL:
+                name = QStringLiteral("outer_skull");
+                break;
+            case FIFFV_BEM_SURF_ID_BRAIN:
+                name = QStringLiteral("inner_skull");
+                break;
+            default:
+                name = QString::number(i);
+                break;
         }
         m_pBrainModel->addBemSurface(QStringLiteral("align"), name, (*m_pBem)[i]);
     }
@@ -356,15 +370,15 @@ void Align3DView::rebuildDigitizerLayer()
 
         switch (pt.kind) {
             case PointKind::Fiducial:
-                dig.kind  = FIFFV_POINT_CARDINAL;
+                dig.kind = FIFFV_POINT_CARDINAL;
                 dig.ident = pt.identNumber;
                 break;
             case PointKind::Eeg:
-                dig.kind  = FIFFV_POINT_EEG;
+                dig.kind = FIFFV_POINT_EEG;
                 dig.ident = pt.identNumber;
                 break;
             case PointKind::HeadShape:
-                dig.kind  = FIFFV_POINT_EXTRA;
+                dig.kind = FIFFV_POINT_EXTRA;
                 dig.ident = pt.identNumber;
                 break;
         }
@@ -376,19 +390,20 @@ void Align3DView::rebuildDigitizerLayer()
 
 void Align3DView::rebuildStaticMarkers()
 {
-    if (!m_pBrainView || !m_pPoints) return;
+    if (!m_pBrainView || !m_pPoints)
+        return;
 
     QVector<LiveMarker> markers;
 
-    constexpr float kFidRadius = 0.004f;   // 4 mm
-    constexpr float kEegRadius = 0.003f;   // 3 mm
-    constexpr float kHspRadius = 0.002f;   // 2 mm
+    constexpr float kFidRadius = 0.004f; // 4 mm
+    constexpr float kEegRadius = 0.003f; // 3 mm
+    constexpr float kHspRadius = 0.002f; // 2 mm
 
     // Twin fiducials (BEM-space, clicked on surface)
     static const QColor kTwinColors[] = {
-        QColor(0, 220, 0),    // NAS — green
-        QColor(220, 0, 0),    // LPA — red
-        QColor(0, 0, 220),    // RPA — blue
+        QColor(0, 220, 0), // NAS — green
+        QColor(220, 0, 0), // LPA — red
+        QColor(0, 0, 220), // RPA — blue
     };
     for (int i = 0; i < 3; ++i) {
         if (m_pPoints->hasTwinFiducial(kFiducialOrder[i])) {
@@ -399,11 +414,11 @@ void Align3DView::rebuildStaticMarkers()
 
     // Captured fiducial colors — match twin colors but lighter/brighter
     static const QColor kCapFidColors[] = {
-        QColor(120, 255, 120),  // NAS — bright green
-        QColor(255, 120, 120),  // LPA — bright red
-        QColor(120, 120, 255),  // RPA — bright blue
+        QColor(120, 255, 120), // NAS — bright green
+        QColor(255, 120, 120), // LPA — bright red
+        QColor(120, 120, 255), // RPA — bright blue
     };
-    constexpr float kCapFidRadius = 0.005f;  // 5 mm — slightly larger than twins
+    constexpr float kCapFidRadius = 0.005f; // 5 mm — slightly larger than twins
 
     // Acquired points (sensor-frame → transformed to MRI space for display)
     const QMatrix4x4 devToMri = trackerToMri();
@@ -436,7 +451,8 @@ void Align3DView::recomputeAlignment()
 {
     m_deviceToHead.setToIdentity();
     m_headToMri.setToIdentity();
-    if (!m_pPoints) return;
+    if (!m_pPoints)
+        return;
 
     // ── 1. Device → Head (runtime offset, NOT stored in trans.fif) ─────
     //
@@ -475,11 +491,11 @@ void Align3DView::recomputeAlignment()
     // space) using Procrustes.  With fewer than 3 matched pairs we use
     // progressive approximation; with all 3 we get a proper rigid body.
 
-    QVector<QVector3D> headPts;  // fiducials in HEAD space
-    QVector<QVector3D> mriPts;   // twin fiducials in MRI space
+    QVector<QVector3D> headPts; // fiducials in HEAD space
+    QVector<QVector3D> mriPts;  // twin fiducials in MRI space
 
     for (FiducialId id : kFiducialOrder) {
-        const bool hasCap  = m_pPoints->hasFiducial(id);
+        const bool hasCap = m_pPoints->hasFiducial(id);
         const bool hasTwin = m_pPoints->hasTwinFiducial(id);
         if (hasCap && hasTwin) {
             // Transform captured fiducial into HEAD space
@@ -499,8 +515,12 @@ void Align3DView::recomputeAlignment()
         Eigen::MatrixXf src(headPts.size(), 3);
         Eigen::MatrixXf dst(mriPts.size(), 3);
         for (int i = 0; i < headPts.size(); ++i) {
-            src(i, 0) = headPts[i].x(); src(i, 1) = headPts[i].y(); src(i, 2) = headPts[i].z();
-            dst(i, 0) = mriPts[i].x();  dst(i, 1) = mriPts[i].y();  dst(i, 2) = mriPts[i].z();
+            src(i, 0) = headPts[i].x();
+            src(i, 1) = headPts[i].y();
+            src(i, 2) = headPts[i].z();
+            dst(i, 0) = mriPts[i].x();
+            dst(i, 1) = mriPts[i].y();
+            dst(i, 2) = mriPts[i].z();
         }
         Eigen::Matrix4f matTrans;
         if (MNELIB::fitMatchedPoints(src, dst, matTrans)) {
@@ -519,8 +539,8 @@ void Align3DView::applyViewConfiguration()
 
     // Read the authoritative state from BrainView itself — setters that
     // call us have already pushed their values down.
-    const int viewCount       = qBound(1, m_pBrainView->viewCount(), 4);
-    const QString renderMode  = m_pBrainView->shaderModeForTarget(-1);
+    const int viewCount = qBound(1, m_pBrainView->viewCount(), 4);
+    const QString renderMode = m_pBrainView->shaderModeForTarget(-1);
 
     // Default per-pane preset assignment for the 2x2 multi-view grid.
     // Slot 0 mirrors the user-selected camera; the remaining slots show

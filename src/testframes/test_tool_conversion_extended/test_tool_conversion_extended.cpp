@@ -272,7 +272,7 @@ void TestToolConversionExtended::testWriteMatrixVariableSmall()
     // Write a 2x3 matrix as a MAT5 variable
     MatrixXd mat(2, 3);
     mat << 1.0, 2.0, 3.0,
-           4.0, 5.0, 6.0;
+        4.0, 5.0, 6.0;
 
     QString matFile = m_tempDir.path() + "/test_small.mat";
     QFile file(matFile);
@@ -283,8 +283,10 @@ void TestToolConversionExtended::testWriteMatrixVariableSmall()
     // Write MAT 5.0 header (128 bytes)
     QByteArray header(128, '\0');
     header.replace(0, 19, "MATLAB 5.0 MAT-file");
-    header[124] = 0x00; header[125] = 0x01; // version
-    header[126] = 'I';  header[127] = 'M';  // endian
+    header[124] = 0x00;
+    header[125] = 0x01; // version
+    header[126] = 'I';
+    header[127] = 'M'; // endian
     ds.writeRawData(header.constData(), 128);
 
     writeMatrixVariable(ds, "testmat", mat);
@@ -309,8 +311,10 @@ void TestToolConversionExtended::testWriteMatrixVariableLarger()
     ds.setByteOrder(QDataStream::LittleEndian);
     QByteArray header(128, '\0');
     header.replace(0, 19, "MATLAB 5.0 MAT-file");
-    header[124] = 0x00; header[125] = 0x01;
-    header[126] = 'I';  header[127] = 'M';
+    header[124] = 0x00;
+    header[125] = 0x01;
+    header[126] = 'I';
+    header[127] = 'M';
     ds.writeRawData(header.constData(), 128);
     writeMatrixVariable(ds, "bigmat", mat);
     file.close();
@@ -345,7 +349,7 @@ void TestToolConversionExtended::testWritePadAlignment()
     QDataStream ds(&buf, QIODevice::WriteOnly);
     ds.setByteOrder(QDataStream::LittleEndian);
 
-    writePad(ds, 5);  // (8-5)%8 = 3 padding bytes needed
+    writePad(ds, 5); // (8-5)%8 = 3 padding bytes needed
     QCOMPARE(buf.size(), 3);
     for (int i = 0; i < 3; i++)
         QCOMPARE((unsigned char)buf[i], (unsigned char)0);
@@ -363,11 +367,11 @@ void TestToolConversionExtended::testReadCtfDigBasic()
     QVERIFY(file.open(QIODevice::WriteOnly | QIODevice::Text));
     QTextStream out(&file);
     // Nasion, LPA, RPA (first 3 points are fiducials)
-    out << "0.0 8.0 0.0\n"      // Nasion (cm)
-        << "-7.0 0.0 0.0\n"     // LPA
-        << "7.0 0.0 0.0\n"      // RPA
-        << "0.0 5.0 5.0\n"      // Extra point
-        << "1.0 2.0 3.0\n";     // Extra point
+    out << "0.0 8.0 0.0\n"  // Nasion (cm)
+        << "-7.0 0.0 0.0\n" // LPA
+        << "7.0 0.0 0.0\n"  // RPA
+        << "0.0 5.0 5.0\n"  // Extra point
+        << "1.0 2.0 3.0\n"; // Extra point
     file.close();
 
     QList<DigPoint> points = readCtfDig(digPath, true);
@@ -394,9 +398,9 @@ void TestToolConversionExtended::testReadCtfDigFiducials()
     QList<DigPoint> points = readCtfDig(digPath, true);
     QCOMPARE(points.size(), 3);
     // Nasion ident = 1, LPA = 2, RPA = 3
-    QCOMPARE(points[0].ident, 1);  // Nasion
-    QCOMPARE(points[1].ident, 2);  // LPA
-    QCOMPARE(points[2].ident, 3);  // RPA
+    QCOMPARE(points[0].ident, 1); // Nasion
+    QCOMPARE(points[1].ident, 2); // LPA
+    QCOMPARE(points[2].ident, 3); // RPA
 }
 
 void TestToolConversionExtended::testReadCtfDigCoordConversion()
@@ -423,16 +427,22 @@ void TestToolConversionExtended::testComputeHeadTransformIdentity()
 {
     // Nasion on +Y, LPA on -X, RPA on +X → should give identity-like transform
     DigPoint nasion, lpa, rpa;
-    nasion.r[0] = 0.0f;  nasion.r[1] = 0.1f;  nasion.r[2] = 0.0f;
-    lpa.r[0] = -0.08f;   lpa.r[1] = 0.0f;     lpa.r[2] = 0.0f;
-    rpa.r[0] = 0.08f;    rpa.r[1] = 0.0f;     rpa.r[2] = 0.0f;
+    nasion.r[0] = 0.0f;
+    nasion.r[1] = 0.1f;
+    nasion.r[2] = 0.0f;
+    lpa.r[0] = -0.08f;
+    lpa.r[1] = 0.0f;
+    lpa.r[2] = 0.0f;
+    rpa.r[0] = 0.08f;
+    rpa.r[1] = 0.0f;
+    rpa.r[2] = 0.0f;
 
     Matrix4f trans;
     QVERIFY(computeHeadTransform(nasion, lpa, rpa, trans));
 
     // Transform should be close to identity for aligned fiducials
     // The origin should be between LPA and RPA
-    QVERIFY(trans.determinant() > 0.0f);  // Right-handed
+    QVERIFY(trans.determinant() > 0.0f); // Right-handed
 
     // Apply to nasion → should be on +X axis in head coordinates
     Vector4f nasHead = trans * Vector4f(nasion.r[0], nasion.r[1], nasion.r[2], 1.0f);
@@ -444,9 +454,15 @@ void TestToolConversionExtended::testComputeHeadTransformOrthogonal()
 {
     // Verify the rotation component is orthogonal
     DigPoint nasion, lpa, rpa;
-    nasion.r[0] = 0.0f;  nasion.r[1] = 0.09f;  nasion.r[2] = 0.02f;
-    lpa.r[0] = -0.07f;   lpa.r[1] = -0.01f;    lpa.r[2] = 0.0f;
-    rpa.r[0] = 0.07f;    rpa.r[1] = 0.01f;     rpa.r[2] = 0.0f;
+    nasion.r[0] = 0.0f;
+    nasion.r[1] = 0.09f;
+    nasion.r[2] = 0.02f;
+    lpa.r[0] = -0.07f;
+    lpa.r[1] = -0.01f;
+    lpa.r[2] = 0.0f;
+    rpa.r[0] = 0.07f;
+    rpa.r[1] = 0.01f;
+    rpa.r[2] = 0.0f;
 
     Matrix4f trans;
     QVERIFY(computeHeadTransform(nasion, lpa, rpa, trans));
@@ -464,9 +480,15 @@ void TestToolConversionExtended::testComputeHeadTransformRotated()
     DigPoint nasion, lpa, rpa;
     // Rotated 45° around Z
     float c = std::cos(M_PI / 4), s = std::sin(M_PI / 4);
-    nasion.r[0] = -0.08f * s; nasion.r[1] = 0.08f * c; nasion.r[2] = 0.0f;
-    lpa.r[0] = -0.07f * c;    lpa.r[1] = -0.07f * s;   lpa.r[2] = 0.0f;
-    rpa.r[0] = 0.07f * c;     rpa.r[1] = 0.07f * s;    rpa.r[2] = 0.0f;
+    nasion.r[0] = -0.08f * s;
+    nasion.r[1] = 0.08f * c;
+    nasion.r[2] = 0.0f;
+    lpa.r[0] = -0.07f * c;
+    lpa.r[1] = -0.07f * s;
+    lpa.r[2] = 0.0f;
+    rpa.r[0] = 0.07f * c;
+    rpa.r[1] = 0.07f * s;
+    rpa.r[2] = 0.0f;
 
     Matrix4f trans;
     QVERIFY(computeHeadTransform(nasion, lpa, rpa, trans));

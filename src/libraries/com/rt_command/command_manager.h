@@ -87,11 +87,11 @@ class COMSHARED_EXPORT CommandManager : public QObject, public UTILSLIB::IObserv
     Q_OBJECT
 
 public:
-    explicit CommandManager(bool p_bIsActive = true, QObject *parent = 0);
+    explicit CommandManager(bool p_bIsActive = true, QObject* parent = 0);
 
-    explicit CommandManager(const QByteArray &p_qByteArrayJsonDoc, bool p_bIsActive = true, QObject *parent = 0);
+    explicit CommandManager(const QByteArray& p_qByteArrayJsonDoc, bool p_bIsActive = true, QObject* parent = 0);
 
-    explicit CommandManager(const QJsonDocument &p_jsonDoc, bool p_bIsActive = true, QObject *parent = 0);
+    explicit CommandManager(const QJsonDocument& p_jsonDoc, bool p_bIsActive = true, QObject* parent = 0);
 
     virtual ~CommandManager();
 
@@ -117,7 +117,7 @@ public:
      *
      * @return true if part of command manager, false otherwise.
      */
-    inline bool hasCommand(const QString &p_sCommand) const;
+    inline bool hasCommand(const QString& p_sCommand) const;
 
     //=========================================================================================================
     /**
@@ -126,7 +126,7 @@ public:
      *
      * @param p_jsonDocument    JSON document containing commands.
      */
-    void insert(const QJsonDocument &p_jsonDocument);
+    void insert(const QJsonDocument& p_jsonDocument);
 
     //=========================================================================================================
     /**
@@ -137,7 +137,7 @@ public:
      * @param[in] p_sDescription Human-readable description of the command.
      *
      */
-    void insert(const QString &p_sKey, const QString &p_sDescription);
+    void insert(const QString& p_sKey, const QString& p_sDescription);
 
     //=========================================================================================================
     /**
@@ -146,7 +146,7 @@ public:
      * @param p_sKey     Command key word.
      * @param p_command  Command content. Attention CommandManager takes ownership of that command by reseting commad's parent;.
      */
-    void insert(const QString &p_sKey, const Command &p_command);
+    void insert(const QString& p_sKey, const Command& p_command);
 
     //=========================================================================================================
     /**
@@ -180,7 +180,7 @@ public:
      *
      * @return Command object related to command key word.
      */
-    Command& operator[] (const QString &key);
+    Command& operator[](const QString& key);
 
     //=========================================================================================================
     /**
@@ -190,7 +190,7 @@ public:
      *
      * @return Command object related to command key word.
      */
-    const Command operator[] (const QString &key) const;
+    const Command operator[](const QString& key) const;
 
 private:
     //=========================================================================================================
@@ -203,12 +203,12 @@ private:
 
     QJsonDocument m_jsonDocumentOrigin;
 
-    QMetaObject::Connection m_conReplyChannel;      /**< The reply channel of the command manager. */
+    QMetaObject::Connection m_conReplyChannel; /**< The reply channel of the command manager. */
 
-    QMap<QString, Command> m_qMapCommands;          /**< Holds a map as an internal lookuptable of available commands. */
+    QMap<QString, Command> m_qMapCommands; /**< Holds a map as an internal lookuptable of available commands. */
 
 signals:
-    void commandMapChanged();//(QStringList)
+    void commandMapChanged(); //(QStringList)
 
     //=========================================================================================================
     /**
@@ -239,7 +239,7 @@ inline QMap<QString, Command>& CommandManager::commandMap()
 
 //=============================================================================================================
 
-inline bool CommandManager::hasCommand(const QString &p_sCommand) const
+inline bool CommandManager::hasCommand(const QString& p_sCommand) const
 {
     return m_qMapCommands.contains(p_sCommand);
 }

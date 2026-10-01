@@ -53,7 +53,7 @@ using namespace Eigen;
 
 //=============================================================================================================
 
-int main(int argc, char *argv[])
+int main(int argc, char* argv[])
 {
     qInstallMessageHandler(MNELogger::customLogWriter);
     QCoreApplication app(argc, argv);
@@ -80,8 +80,14 @@ int main(int argc, char *argv[])
     QString outFile = parser.value(outOpt);
     QString method = parser.value(methodOpt).toLower();
 
-    if (fwdFile.isEmpty()) { qCritical("--fwd is required."); parser.showHelp(1); }
-    if (outFile.isEmpty()) { qCritical("--out is required."); parser.showHelp(1); }
+    if (fwdFile.isEmpty()) {
+        qCritical("--fwd is required.");
+        parser.showHelp(1);
+    }
+    if (outFile.isEmpty()) {
+        qCritical("--out is required.");
+        parser.showHelp(1);
+    }
 
     // Load forward solution
     QFile f(fwdFile);
@@ -96,8 +102,8 @@ int main(int argc, char *argv[])
     int nSrc = G.cols();
     bool isFixed = fwd.isFixedOrient();
 
-    qInfo("Forward: %d channels x %d sources (%s orientation)" ,
-           nChan, nSrc, isFixed ? "fixed" : "free");
+    qInfo("Forward: %d channels x %d sources (%s orientation)",
+          nChan, nSrc, isFixed ? "fixed" : "free");
 
     // Compute sensitivity per source
     int nSourcePoints = isFixed ? nSrc : nSrc / 3;
@@ -133,10 +139,11 @@ int main(int argc, char *argv[])
 
     // Normalize to [0, 1]
     double maxSens = sensitivity.maxCoeff();
-    if (maxSens > 0) sensitivity /= maxSens;
+    if (maxSens > 0)
+        sensitivity /= maxSens;
 
-    qInfo("Sensitivity range: %g .. %g (normalized)" ,
-           sensitivity.minCoeff(), sensitivity.maxCoeff());
+    qInfo("Sensitivity range: %g .. %g (normalized)",
+          sensitivity.minCoeff(), sensitivity.maxCoeff());
 
     // Write output
     QFile outF(outFile);
@@ -151,6 +158,6 @@ int main(int argc, char *argv[])
         out << s << " " << QString::number(sensitivity(s), 'g', 10) << "\n";
     outF.close();
 
-    qInfo("Written sensitivity map to: %s" , qPrintable(outFile));
+    qInfo("Written sensitivity map to: %s", qPrintable(outFile));
     return 0;
 }

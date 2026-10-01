@@ -35,15 +35,15 @@
 using namespace MNEANALYZESTUDIO;
 using namespace MNALIB;
 
-namespace {
+namespace
+{
 
 QJsonObject objectSchema(const QJsonObject& properties, const QJsonArray& required = QJsonArray())
 {
     return QJsonObject{
         {"type", "object"},
         {"properties", properties},
-        {"required", required}
-    };
+        {"required", required}};
 }
 
 QString resolveUri(const QString& uri)
@@ -57,7 +57,7 @@ QString resolveUri(const QString& uri)
 } // namespace
 
 RunMnaGraphSkill::RunMnaGraphSkill(QObject* parent)
-    : ISkillOperator(parent)
+: ISkillOperator(parent)
 {
 }
 
@@ -70,31 +70,9 @@ QJsonObject RunMnaGraphSkill::getOperatorDefinition() const
         {"description", "Execute the pipeline of an MNA project and report the resulting context keys."},
         {"extension_id", "mna-skills"},
         {"extension_display_name", "MNA Project Skills"},
-        {"inputs_schema", objectSchema(QJsonObject{
-            {"project_path", QJsonObject{
-                {"type", "string"},
-                {"title", "MNA project path"}
-            }}
-        }, QJsonArray{"project_path"})},
-        {"parameters_schema", objectSchema(QJsonObject{
-            {"graph_inputs", QJsonObject{
-                {"type", "object"},
-                {"title", "Graph inputs"},
-                {"description", "Optional name->value map injected into MnaGraphExecutor::execute."}
-            }}
-        })},
-        {"outputs_schema", objectSchema(QJsonObject{
-            {"result_keys", QJsonObject{
-                {"type", "array"},
-                {"title", "Result keys"},
-                {"description", "List of nodeId::portName keys produced by the executor."}
-            }},
-            {"node_count", QJsonObject{
-                {"type", "integer"},
-                {"title", "Node count"}
-            }}
-        }, QJsonArray{"result_keys", "node_count"})}
-    };
+        {"inputs_schema", objectSchema(QJsonObject{{"project_path", QJsonObject{{"type", "string"}, {"title", "MNA project path"}}}}, QJsonArray{"project_path"})},
+        {"parameters_schema", objectSchema(QJsonObject{{"graph_inputs", QJsonObject{{"type", "object"}, {"title", "Graph inputs"}, {"description", "Optional name->value map injected into MnaGraphExecutor::execute."}}}})},
+        {"outputs_schema", objectSchema(QJsonObject{{"result_keys", QJsonObject{{"type", "array"}, {"title", "Result keys"}, {"description", "List of nodeId::portName keys produced by the executor."}}}, {"node_count", QJsonObject{{"type", "integer"}, {"title", "Node count"}}}}, QJsonArray{"result_keys", "node_count"})}};
 }
 
 QJsonObject RunMnaGraphSkill::executeSkill(const WorkflowNode& nodeState)
@@ -107,16 +85,14 @@ QJsonObject RunMnaGraphSkill::executeSkill(const WorkflowNode& nodeState)
     if (uri.isEmpty()) {
         return QJsonObject{
             {"status", "error"},
-            {"message", QStringLiteral("Run MNA node `%1`: missing `project_path` input.").arg(nodeState.uid)}
-        };
+            {"message", QStringLiteral("Run MNA node `%1`: missing `project_path` input.").arg(nodeState.uid)}};
     }
 
     const QString path = resolveUri(uri);
     if (!QFileInfo::exists(path)) {
         return QJsonObject{
             {"status", "error"},
-            {"message", QStringLiteral("Run MNA node `%1`: project `%2` not found.").arg(nodeState.uid, path)}
-        };
+            {"message", QStringLiteral("Run MNA node `%1`: project `%2` not found.").arg(nodeState.uid, path)}};
     }
 
     const MnaProject project = MnaIO::read(path);
@@ -136,12 +112,12 @@ QJsonObject RunMnaGraphSkill::executeSkill(const WorkflowNode& nodeState)
         return QJsonObject{
             {"status", "error"},
             {"message", QStringLiteral("Run MNA node `%1`: graph validation failed.").arg(nodeState.uid)},
-            {"errors", errs}
-        };
+            {"errors", errs}};
     }
 
     QVariantMap graphInputs = nodeState.parameters.value("graph_inputs")
-                                  .toObject().toVariantMap();
+                                  .toObject()
+                                  .toVariantMap();
 
     const auto context = MnaGraphExecutor::execute(graph, graphInputs);
 
@@ -152,13 +128,6 @@ QJsonObject RunMnaGraphSkill::executeSkill(const WorkflowNode& nodeState)
 
     return QJsonObject{
         {"status", "completed"},
-        {"message", QStringLiteral("Executed MNA pipeline `%1` (%2 nodes, %3 result keys).")
-                        .arg(QFileInfo(path).fileName())
-                        .arg(graph.nodes().size())
-                        .arg(keys.size())},
-        {"outputs", QJsonObject{
-            {"result_keys", keys},
-            {"node_count", static_cast<int>(graph.nodes().size())}
-        }}
-    };
+        {"message", QStringLiteral("Executed MNA pipeline `%1` (%2 nodes, %3 result keys).").arg(QFileInfo(path).fileName()).arg(graph.nodes().size()).arg(keys.size())},
+        {"outputs", QJsonObject{{"result_keys", keys}, {"node_count", static_cast<int>(graph.nodes().size())}}}};
 }
