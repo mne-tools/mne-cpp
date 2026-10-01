@@ -1,0 +1,120 @@
+---
+id: inv-guess-data
+title: "INVLIB::InvGuessData"
+sidebar_label: InvGuessData
+sidebar_position: 28
+---
+
+# InvGuessData
+
+**Namespace:** `INVLIB` &nbsp;·&nbsp; **Library:** Inverse Library
+
+`#include <inv/inv_guess_data.h>`
+
+```cpp
+class INVLIB::InvGuessData
+```
+
+Implements [`InvGuessData`](/docs/api/inv/inv-guess-data) (Replaces *guessData,guessDataRec struct of MNE-C fit_types.h).
+
+Precomputed guess point grid with forward fields for initial dipole position candidates.
+
+---
+
+## Public Methods
+
+### InvGuessData()
+
+Constructs the Guess Data Refactored: new_guess_data (dipole_fit_setup.c).
+
+---
+
+### InvGuessData()
+
+Deleted — non-copyable due to unique_ptr members.
+
+---
+
+### operator=()
+
+---
+
+### InvGuessData(guessname, guess_surfname, mindist, exclude, grid, f)
+
+Constructs the Guess Data from given Data Refactored: make_guess_data (setup.c).
+
+**Parameters:**
+
+- **guessname** : *const QString &*
+  File with a predefined guess point set (empty = build a grid).
+
+- **guess_surfname** : *const QString &*
+  Surface file bounding the guess grid (empty = inner skull of the BEM, or a sphere).
+
+- **mindist** : *float*
+  Minimum distance of guess points from the bounding surface (m).
+
+- **exclude** : *float*
+  Exclude guess points closer than this to the sphere origin (m).
+
+- **grid** : *float*
+  Spacing of the guess grid (m).
+
+- **f** : *[InvDipoleFitData](/docs/api/inv/inv-dipole-fit-data) **
+  Dipole fit data providing the forward model.
+
+---
+
+### InvGuessData(guessname, guess_surfname, mindist, exclude, grid, f, guess_save_name)
+
+Constructs the Guess Data from given Data Refactored: make_guess_data (dipole_fit_setup.c).
+
+**Parameters:**
+
+- **guessname** : *const QString &*
+  File with a predefined guess point set (empty = build a grid).
+
+- **guess_surfname** : *const QString &*
+  Surface file bounding the guess grid (empty = inner skull of the BEM, or a sphere).
+
+- **mindist** : *float*
+  Minimum distance of guess points from the bounding surface (m).
+
+- **exclude** : *float*
+  Exclude guess points closer than this to the sphere origin (m).
+
+- **grid** : *float*
+  Spacing of the guess grid (m).
+
+- **f** : *[InvDipoleFitData](/docs/api/inv/inv-dipole-fit-data) **
+  Dipole fit data providing the forward model.
+
+- **guess_save_name** : *char **
+  File to save the guess points to (nullptr = do not save; saving is not implemented yet).
+
+---
+
+### ~InvGuessData()
+
+Destroys the Guess Data description Refactored: free_guess_data (dipole_fit_setup.c).
+
+---
+
+### compute_guess_fields(f)
+
+Once the guess locations have been set up we can compute the fields Refactored: compute_guess_fields (dipole_fit_setup.c).
+
+**Parameters:**
+
+- **f** : *[InvDipoleFitData](/docs/api/inv/inv-dipole-fit-data) **
+  Dipole Fit Data to the Compute Guess Fields.
+
+**Returns:**
+
+- *bool* — true when successful.
+
+---
+
+## Authors of this file
+
+- Christoph Dinh &lt;christoph.dinh@mne-cpp.org&gt;

@@ -1,0 +1,52 @@
+---
+id: inv-sensor-set-creator
+title: "INVLIB::InvSensorSetCreator"
+sidebar_label: InvSensorSetCreator
+sidebar_position: 34
+---
+
+# InvSensorSetCreator
+
+**Namespace:** `INVLIB` &nbsp;·&nbsp; **Library:** Inverse Library
+
+`#include <inv/inv_sensor_set.h>`
+
+```cpp
+class INVLIB::InvSensorSetCreator
+```
+
+Create a [`InvSensorSet`](/docs/api/inv/inv-sensor-set) struct from a channel list with specified accuracy.
+
+Builds [`InvSensorSet`](/docs/api/inv/inv-sensor-set) objects from [FiffInfo](/docs/api/fiff/fiff-info) channel definitions, applying SSP projections and compensation
+
+---
+
+## Public Methods
+
+### InvSensorSetCreator()
+
+Constructs a MEG [`InvSensorSet`](/docs/api/inv/inv-sensor-set) object.
+
+---
+
+### updateSensorSet(channelList, accuracy)
+
+Update [`InvSensorSet`](/docs/api/inv/inv-sensor-set) from new channel list with new accuracy.
+
+**Parameters:**
+
+- **channelList** : *const QList&lt; [FiffChInfo](/docs/api/fiff/fiff-ch-info) &gt; &*
+  The channel list to create the MEG sensor set from.
+
+- **accuracy** : *const Accuracy &*
+  The accuracy level to use for the sensor set.
+
+**Returns:**
+
+- *[InvSensorSet](/docs/api/inv/inv-sensor-set)* — Sensor set built from the MEG coil definitions, or an empty set if channelList is empty.
+
+---
+
+## Authors of this file
+
+- Christoph Dinh &lt;christoph.dinh@mne-cpp.org&gt;

@@ -7,7 +7,7 @@ sidebar_position: 4
 
 # InvDICS
 
-**Namespace:** `INVERSELIB` &nbsp;·&nbsp; **Library:** Inverse Library
+**Namespace:** `INVLIB` &nbsp;·&nbsp; **Library:** Inverse Library
 
 :::info[Python equivalent]
 `mne.beamformer.make_dics / apply_dics` in MNE-Python.
@@ -81,7 +81,7 @@ Compute DICS beamformer spatial filters for one or more frequencies.
 
 **Returns:**
 
-- *InvBeamformer* — Beamformer with one filter weight matrix per frequency.
+- *[InvBeamformer](/docs/api/inv/inv-beamformer)* — Beamformer with one filter weight matrix per frequency.
 
 ---
 
@@ -99,7 +99,7 @@ power_i(f) = trace(W_f_i @ CSD_f @ W_f_i^T)
 - **frequencies** : *const Eigen::VectorXd &*
   Center frequencies (Hz).
 
-- **filters** : *const InvBeamformer &*
+- **filters** : *const [InvBeamformer](/docs/api/inv/inv-beamformer) &*
   Pre-computed DICS beamformer from `makeDICS()`.
 
 **Returns:**
@@ -125,7 +125,7 @@ This is an approximate application — for accurate frequency-domain source esti
 - **tstep** : *float*
   Time step (s).
 
-- **filters** : *const InvBeamformer &*
+- **filters** : *const [InvBeamformer](/docs/api/inv/inv-beamformer) &*
   Pre-computed DICS beamformer (must have exactly 1 frequency).
 
 - **freqIdx** : *int*
@@ -152,7 +152,7 @@ Apply DICS beamformer to each epoch in a list.
 - **tstep** : *float*
   Time step (1/sfreq).
 
-- **filters** : *const InvBeamformer &*
+- **filters** : *const [InvBeamformer](/docs/api/inv/inv-beamformer) &*
   Pre-computed DICS beamformer from `makeDICS()`.
 
 - **freqIdx** : *int*

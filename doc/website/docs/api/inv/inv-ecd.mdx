@@ -1,0 +1,74 @@
+---
+id: inv-ecd
+title: "INVLIB::InvEcd"
+sidebar_label: InvEcd
+sidebar_position: 26
+---
+
+# InvEcd
+
+**Namespace:** `INVLIB` &nbsp;·&nbsp; **Library:** Inverse Library
+
+`#include <inv/inv_ecd.h>`
+
+```cpp
+class INVLIB::InvEcd
+```
+
+Implements one Electric Current Dipole (Replaces *ecd,ecdRec struct of MNE-C fit_types.h).
+
+Single equivalent current dipole with position, orientation, amplitude, and goodness-of-fit.
+
+---
+
+## Public Methods
+
+### InvEcd()
+
+Constructs the Electric Current Dipole.
+
+---
+
+### InvEcd(p_ECD)
+
+Copy constructor.
+
+**Parameters:**
+
+- **p_ECD** : *const InvEcd &*
+  Electric Current Dipole which should be copied.
+
+---
+
+### operator=(other)
+
+Copy assignment.
+
+Every member has value semantics, so the compiler-generated member-wise assignment is correct. It is declared explicitly because declaring a copy constructor and/or a destructor deprecates the implicitly generated one.
+
+**Parameters:**
+
+- **other** : *const [InvEcd](/docs/api/inv/inv-ecd) &*
+  Object to assign from.
+
+**Returns:**
+
+- *[InvEcd](/docs/api/inv/inv-ecd) &* — reference to this object.
+
+---
+
+### ~InvEcd()
+
+Destroys the Electric Current Dipole description.
+
+---
+
+### print()
+
+Prints the [`InvEcd`](/docs/api/inv/inv-ecd) dipole information to the debug output.
+
+---
+
+## Authors of this file
+
+- Christoph Dinh &lt;christoph.dinh@mne-cpp.org&gt;

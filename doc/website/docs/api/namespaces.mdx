@@ -12,7 +12,7 @@ All public namespaces in the MNE-CPP library tree.
 | Namespace | Classes | Description |
 |-----------|---------|-------------|
 | [`BIDSLIB`](/docs/api/bids/) | 14 | BIDS dataset reading, writing, path construction, and sidecar metadata handling for iEEG/EEG/MEG. |
-| `COMLIB` | 8 | Real-time client/server communication primitives for talking to `mne_rt_server`. |
+| [`COMLIB`](/docs/api/com/) | 8 | Real-time client/server communication primitives for talking to `mne_rt_server`. |
 | [`CONNECTIVITYLIB`](/docs/api/connectivity/) | 21 | Functional connectivity metrics (coherence, PLV, cross-correlation, etc.). |
 | [`DECODINGLIB`](/docs/api/decoding/) | 5 | Supervised and unsupervised spatial-filter decompositions for M/EEG decoding. |
 | [`DISP3DLIB`](/docs/api/disp3-d/) | 14 | 3-D brain visualisation using the Qt RHI rendering backend. |
@@ -21,7 +21,7 @@ All public namespaces in the MNE-CPP library tree.
 | [`FIFFLIB`](/docs/api/fiff/) | 37 | FIFF file I/O, in-memory data structures and high-level readers/writers. |
 | [`FSLIB`](/docs/api/fs/) | 8 | FreeSurfer surface, annotation and parcellation I/O for mne-cpp. |
 | [`FWDLIB`](/docs/api/fwd/) | 14 | Forward modelling — BEM solver, spherical models, sensor/coil definitions and the lead-field assembly that links current dipoles to MEG/EEG sensor readings. |
-| `INVLIB` | 54 | Inverse source estimation (MNE, dSPM, sLORETA, dipole fitting). |
+| [`INVLIB`](/docs/api/inv/) | 54 | Inverse source estimation (MNE, dSPM, sLORETA, dipole fitting). |
 | [`LSLLIB`](/docs/api/lsl/) | 3 | Lab Streaming Layer (LSL) integration for real-time data exchange. |
 | [`MATHLIB`](/docs/api/math/) | 0 | Mathematical algorithms and geometry (linear algebra, optimization, spectral estimation). |
 | [`MLLIB`](/docs/api/ml/) | 4 | Tensors, model abstraction, ONNX Runtime inference and Python training drivers used across mne-cpp. |
@@ -29,7 +29,7 @@ All public namespaces in the MNE-CPP library tree.
 | [`MNELIB`](/docs/api/mne/) | 68 | Core [`MNE`](/docs/api/mne/mne-class) data structures (source spaces, source estimates, hemispheres). |
 | [`MRILIB`](/docs/api/mri/) | 8 | Volume I/O, voxel geometry and slice resampling for structural MRI data inside mne-cpp. |
 | [`RTPROCESSINGLIB`](/docs/api/dsp/) | 15 |  |
-| `STSLIB` | 10 | Statistical testing (t-tests, F-tests, cluster permutation, multiple comparison correction). |
+| [`STSLIB`](/docs/api/sts/) | 10 | Statistical testing (t-tests, F-tests, cluster permutation, multiple comparison correction). |
 | `SURFACEKEYS` | 0 | Centralised string constants for surface map keys. |
 | [`UTILSLIB`](/docs/api/utils/) | 93 | Shared utilities (I/O helpers, spectral analysis, layout management, warp algorithms). |
 | `Ui` | 0 |  |
@@ -208,10 +208,10 @@ All public namespaces in the MNE-CPP library tree.
 - [FiffEpochs](/docs/api/fiff/fiff-epochs)
 - [FiffEvents](/docs/api/fiff/fiff-events)
 - [FiffEvoked](/docs/api/fiff/fiff-evoked)
-- `FiffEvokedSet`
+- [FiffEvokedSet](/docs/api/fiff/fiff-evoked-set)
 - `FiffExplainEntry`
 - [FiffFileSharer](/docs/api/fiff/fiff-file-sharer)
-- `FiffIO`
+- [FiffIO](/docs/api/fiff/fiff-io)
 - [FiffId](/docs/api/fiff/fiff-id)
 - [FiffInfo](/docs/api/fiff/fiff-info)
 - [FiffInfoBase](/docs/api/fiff/fiff-info-base)
@@ -260,40 +260,40 @@ All public namespaces in the MNE-CPP library tree.
 - `FitDipUserRec`
 - `HPISortStruct`
 - `HpiFitResult`
-- `InvBeamformer`
-- `InvBeamformerCompute`
+- [InvBeamformer](/docs/api/inv/inv-beamformer)
+- [InvBeamformerCompute](/docs/api/inv/inv-beamformer-compute)
 - [InvCMNE](/docs/api/inv/inv-cmne)
 - `InvCMNEResult`
 - `InvCMNESettings`
 - `InvConnectivity`
 - [InvDICS](/docs/api/inv/inv-dics)
-- `InvDipole`
+- [InvDipole](/docs/api/inv/inv-dipole)
 - [InvDipoleFit](/docs/api/inv/inv-dipole-fit)
-- `InvDipoleFitData`
-- `InvDipoleFitSettings`
-- `InvDipoleForward`
+- [InvDipoleFitData](/docs/api/inv/inv-dipole-fit-data)
+- [InvDipoleFitSettings](/docs/api/inv/inv-dipole-fit-settings)
+- [InvDipoleForward](/docs/api/inv/inv-dipole-forward)
 - `InvDipolePair`
-- `InvEcd`
-- `InvEcdSet`
+- [InvEcd](/docs/api/inv/inv-ecd)
+- [InvEcdSet](/docs/api/inv/inv-ecd-set)
 - `InvFocalDipole`
 - [InvGammaMap](/docs/api/inv/inv-gamma-map)
 - `InvGammaMapResult`
-- `InvGuessData`
-- `InvHpiDataUpdater`
+- [InvGuessData](/docs/api/inv/inv-guess-data)
+- [InvHpiDataUpdater](/docs/api/inv/inv-hpi-data-updater)
 - [InvHpiFit](/docs/api/inv/inv-hpi-fit)
-- `InvHpiFitData`
-- `InvHpiModelParameters`
+- [InvHpiFitData](/docs/api/inv/inv-hpi-fit-data)
+- [InvHpiModelParameters](/docs/api/inv/inv-hpi-model-parameters)
 - [InvLCMV](/docs/api/inv/inv-lcmv)
 - [InvLabelTimeCourse](/docs/api/inv/inv-label-time-course)
 - [InvMinimumNorm](/docs/api/inv/inv-minimum-norm)
 - [InvMxne](/docs/api/inv/inv-mxne)
 - `InvMxneResult`
-- `InvPwlRapMusic`
+- [InvPwlRapMusic](/docs/api/inv/inv-pwl-rap-music)
 - [InvRapMusic](/docs/api/inv/inv-rap-music)
 - [InvResolutionMatrix](/docs/api/inv/inv-resolution-matrix)
-- `InvSensorSet`
-- `InvSensorSetCreator`
-- `InvSignalModel`
+- [InvSensorSet](/docs/api/inv/inv-sensor-set)
+- [InvSensorSetCreator](/docs/api/inv/inv-sensor-set-creator)
+- [InvSignalModel](/docs/api/inv/inv-signal-model)
 - `InvSourceCoupling`
 - [InvSourceEstimate](/docs/api/inv/inv-source-estimate)
 - [InvSourceEstimateIO](/docs/api/inv/inv-source-estimate-io)

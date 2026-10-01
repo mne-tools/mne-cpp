@@ -1,0 +1,52 @@
+---
+id: inv-signal-model
+title: "INVLIB::InvSignalModel"
+sidebar_label: InvSignalModel
+sidebar_position: 35
+---
+
+# InvSignalModel
+
+**Namespace:** `INVLIB` &nbsp;·&nbsp; **Library:** Inverse Library
+
+`#include <inv/inv_signal_model.h>`
+
+```cpp
+class INVLIB::InvSignalModel
+```
+
+Description of what this class is intended to do (in detail).
+
+Generates the forward sinusoidal model matrix for HPI coil signals at known drive frequencies
+
+---
+
+## Public Methods
+
+### InvSignalModel()
+
+Constructs a [`InvSignalModel`](/docs/api/inv/inv-signal-model) object.
+
+---
+
+### fitData(hpiModelParameters, matData)
+
+Fit the data to the model constructed from given model parameters.
+
+**Parameters:**
+
+- **hpiModelParameters** : *const [InvHpiModelParameters](/docs/api/inv/inv-hpi-model-parameters) &*
+  The [`InvHpiModelParameters`](/docs/api/inv/inv-hpi-model-parameters).
+
+- **matData** : *const Eigen::MatrixXd &*
+  The data matrix.
+
+**Returns:**
+
+- *Eigen::MatrixXd* — the fitted data
+
+---
+
+## Authors of this file
+
+- Christoph Dinh &lt;christoph.dinh@mne-cpp.org&gt;

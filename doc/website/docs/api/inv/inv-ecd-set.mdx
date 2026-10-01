@@ -1,0 +1,181 @@
+---
+id: inv-ecd-set
+title: "INVLIB::InvEcdSet"
+sidebar_label: InvEcdSet
+sidebar_position: 27
+---
+
+# InvEcdSet
+
+**Namespace:** `INVLIB` &nbsp;·&nbsp; **Library:** Inverse Library
+
+`#include <inv/inv_ecd_set.h>`
+
+```cpp
+class INVLIB::InvEcdSet
+```
+
+Implements Electric Current Dipole Set (Replaces *ecdSet,ecdSetRec struct of MNE-C fit_types.h).
+
+Holds a set of Electric Current Dipoles.
+
+---
+
+## Public Methods
+
+### InvEcdSet()
+
+Constructs a Electric Current Dipole Set object.
+
+---
+
+### InvEcdSet(p_ECDSet)
+
+Copy constructor.
+
+**Parameters:**
+
+- **p_ECDSet** : *const InvEcdSet &*
+  Electric Current Dipole Set which should be copied.
+
+---
+
+### operator=(other)
+
+Copy assignment.
+
+Every member has value semantics, so the compiler-generated member-wise assignment is correct. It is declared explicitly because declaring a copy constructor and/or a destructor deprecates the implicitly generated one.
+
+**Parameters:**
+
+- **other** : *const [InvEcdSet](/docs/api/inv/inv-ecd-set) &*
+  Object to assign from.
+
+**Returns:**
+
+- *[InvEcdSet](/docs/api/inv/inv-ecd-set) &* — reference to this object.
+
+---
+
+### ~InvEcdSet()
+
+Destroys the Electric Current Dipole description.
+
+---
+
+### addEcd(p_ecd)
+
+Appends an Electric Current Dipole to the set.
+
+**Parameters:**
+
+- **p_ecd** : *const [InvEcd](/docs/api/inv/inv-ecd) &*
+  Dipole to append (copied).
+
+---
+
+### save_dipoles_bdip(fileName)
+
+Save dipoles in the bdip format employed by xfit.
+
+**Parameters:**
+
+- **fileName** : *const QString &*
+  File name to save to.
+
+**Returns:**
+
+- *bool* — True on success or if there is nothing to save, false if the file could not be written.
+
+---
+
+### save_dipoles_dip(fileName)
+
+Save dipoles in the dip format suitable for mrilab.
+
+**Parameters:**
+
+- **fileName** : *const QString &*
+  File name to save to.
+
+**Returns:**
+
+- *bool* — True on success or if there is nothing to save, false if the file could not be written.
+
+---
+
+### size()
+
+Returns the number of stored ECDs.
+
+**Returns:**
+
+- *qint32* — number of stored ECDs.
+
+---
+
+### operator\[\](idx)
+
+Subscript operator [] to access [`InvEcd`](/docs/api/inv/inv-ecd) by index.
+
+**Parameters:**
+
+- **idx** : *int*
+  the [`InvEcd`](/docs/api/inv/inv-ecd) index.
+
+**Returns:**
+
+- *const [InvEcd](/docs/api/inv/inv-ecd) &* — [`InvEcd`](/docs/api/inv/inv-ecd) related to the parameter index.
+
+---
+
+### operator\[\](idx)
+
+Subscript operator [] to access [`InvEcd`](/docs/api/inv/inv-ecd) by index.
+
+**Parameters:**
+
+- **idx** : *int*
+  the [`InvEcd`](/docs/api/inv/inv-ecd) index.
+
+**Returns:**
+
+- *[InvEcd](/docs/api/inv/inv-ecd) &* — [`InvEcd`](/docs/api/inv/inv-ecd) related to the parameter index.
+
+---
+
+### operator&lt;&lt;(p_ecd)
+
+Subscript operator &lt;&lt; to add a new [`InvEcd`](/docs/api/inv/inv-ecd).
+
+**Parameters:**
+
+- **p_ecd** : *const [InvEcd](/docs/api/inv/inv-ecd) &*
+  [`InvEcd`](/docs/api/inv/inv-ecd) to be added.
+
+**Returns:**
+
+- *[InvEcdSet](/docs/api/inv/inv-ecd-set) &* — [`InvEcdSet`](/docs/api/inv/inv-ecd-set).
+
+---
+
+## Static Methods
+
+### read_dipoles_dip(fileName)
+
+Read dipoles from the dip format compatible with mrilab.
+
+**Parameters:**
+
+- **fileName** : *const QString &*
+  File name to read from.
+
+**Returns:**
+
+- *[InvEcdSet](/docs/api/inv/inv-ecd-set)* — The dipole set read from the file; empty if the file could not be read.
+
+---
+
+## Authors of this file
+
+- Christoph Dinh &lt;christoph.dinh@mne-cpp.org&gt;

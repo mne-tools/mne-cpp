@@ -1,0 +1,44 @@
+---
+id: inv-dipole-forward
+title: "INVLIB::InvDipoleForward"
+sidebar_label: InvDipoleForward
+sidebar_position: 25
+---
+
+# InvDipoleForward
+
+**Namespace:** `INVLIB` &nbsp;·&nbsp; **Library:** Inverse Library
+
+`#include <inv/inv_dipole_forward.h>`
+
+```cpp
+class INVLIB::InvDipoleForward
+```
+
+Implements [`InvDipoleForward`](/docs/api/inv/inv-dipole-forward) (Replaces *dipoleForward,dipoleForwardRec struct of MNE-C fit_types.h).
+
+Stores forward field matrices and SVD decomposition for magnetic dipole fitting.
+
+For each set of candidate dipole(s), the forward solution matrix A (size 3*ndip x nch) is computed, column-normalized, and decomposed via SVD: A = U * diag(sing) * V^T. The members uu, vv, and sing store the SVD factors used for fast goodness-of-fit evaluation and dipole moment reconstruction.
+
+---
+
+## Public Methods
+
+### InvDipoleForward()
+
+Constructs a default (empty) [`InvDipoleForward`](/docs/api/inv/inv-dipole-forward).
+
+---
+
+### ~InvDipoleForward()
+
+Destructs the [`InvDipoleForward`](/docs/api/inv/inv-dipole-forward).
+
+Eigen members are cleaned up automatically.
+
+---
+
+## Authors of this file
+
+- Christoph Dinh &lt;christoph.dinh@mne-cpp.org&gt;

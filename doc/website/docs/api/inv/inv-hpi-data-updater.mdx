@@ -1,0 +1,94 @@
+---
+id: inv-hpi-data-updater
+title: "INVLIB::InvHpiDataUpdater"
+sidebar_label: InvHpiDataUpdater
+sidebar_position: 29
+---
+
+# InvHpiDataUpdater
+
+**Namespace:** `INVLIB` &nbsp;·&nbsp; **Library:** Inverse Library
+
+`#include <inv/inv_hpi_data_updater.h>`
+
+```cpp
+class INVLIB::InvHpiDataUpdater
+```
+
+This class brings all the data and objects used for HPI fitting into the right format.
+
+Preprocesses raw HPI coil data (SSP projection, compensation, sinusoidal model fitting) before dipole localization
+
+---
+
+## Public Methods
+
+### InvHpiDataUpdater(pFiffInfo)
+
+Constructs a [`InvHpiDataUpdater`](/docs/api/inv/inv-hpi-data-updater) object.
+
+**Parameters:**
+
+- **pFiffInfo** : *const QSharedPointer&lt;[FiffInfo](/docs/api/fiff/fiff-info)&gt;*
+  Measurement info used to initialize channels, bads, HPI digitizer points and sensors.
+
+---
+
+### checkForUpdate(pFiffInfo)
+
+Check if information in [FiffInfo](/docs/api/fiff/fiff-info) changed and update if necessary.
+
+**Parameters:**
+
+- **pFiffInfo** : *const QSharedPointer&lt;[FiffInfo](/docs/api/fiff/fiff-info)&gt;*
+  The FiffInfo to check for changes.
+
+---
+
+### prepareDataAndProjectors(matData, matProjectors)
+
+Reduce data to only use good channels.
+
+**Parameters:**
+
+- **matData** : *const Eigen::MatrixXd &*
+  Data matrix (channels x samples).
+
+- **matProjectors** : *const Eigen::MatrixXd &*
+  The projector matrix.
+
+---
+
+### getChannels()
+
+inline get functions for private member variables.
+
+**Returns:**
+
+- *const QList&lt; [FiffChInfo](/docs/api/fiff/fiff-ch-info) &gt; &* — Const reference to the channel list with bad channels excluded.
+
+---
+
+### getProjectors()
+
+---
+
+### getHpiDigitizer()
+
+---
+
+### getData()
+
+---
+
+### getProjectedData()
+
+---
+
+### getSensors()
+
+---
+
+## Authors of this file
+
+- Christoph Dinh &lt;christoph.dinh@mne-cpp.org&gt;

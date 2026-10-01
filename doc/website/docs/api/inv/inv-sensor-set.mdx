@@ -1,0 +1,107 @@
+---
+id: inv-sensor-set
+title: "INVLIB::InvSensorSet"
+sidebar_label: InvSensorSet
+sidebar_position: 33
+---
+
+# InvSensorSet
+
+**Namespace:** `INVLIB` &nbsp;·&nbsp; **Library:** Inverse Library
+
+`#include <inv/inv_sensor_set.h>`
+
+```cpp
+class INVLIB::InvSensorSet
+```
+
+Stores MEG sensor geometry (positions, orientations, weights, coil count) for a single sensor type.
+
+---
+
+## Public Methods
+
+### InvSensorSet()
+
+Default Constructor.
+
+---
+
+### InvSensorSet(pFwdCoilSet)
+
+[`InvSensorSet`](/docs/api/inv/inv-sensor-set) that yiealds sensor position, orientation and weights for geometric averaging.
+
+**Parameters:**
+
+- **pFwdCoilSet** : *const QSharedPointer&lt;[FwdCoilSet](/docs/api/fwd/fwd-coil-set)&gt;*
+  The FwdCoilSet to extract the data from.
+
+---
+
+### np()
+
+---
+
+### ncoils()
+
+---
+
+### ez(iSensor)
+
+---
+
+### ez()
+
+---
+
+### r0(iSensor)
+
+---
+
+### r0()
+
+---
+
+### rmag(iSensor)
+
+---
+
+### rmag()
+
+---
+
+### cosmag(iSensor)
+
+---
+
+### cosmag()
+
+---
+
+### tra(iSensor)
+
+---
+
+### tra()
+
+---
+
+### w(iSensor)
+
+---
+
+### w()
+
+---
+
+### operator==(b)
+
+---
+
+### operator!=(b)
+
+---
+
+## Authors of this file
+
+- Christoph Dinh &lt;christoph.dinh@mne-cpp.org&gt;

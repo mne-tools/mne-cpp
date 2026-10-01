@@ -7,7 +7,7 @@ sidebar_position: 11
 
 # InvHpiFit
 
-**Namespace:** `INVERSELIB` &nbsp;·&nbsp; **Library:** Inverse Library
+**Namespace:** `INVLIB` &nbsp;·&nbsp; **Library:** Inverse Library
 
 :::info[Python equivalent]
 `mne.chpi` in MNE-Python.
@@ -37,22 +37,22 @@ Default constructor.
 
 ### InvHpiFit(sensorSet)
 
-Constructs the HPI from a `InvSensorSet`.
+Constructs the HPI from a [`InvSensorSet`](/docs/api/inv/inv-sensor-set).
 
 **Parameters:**
 
-- **sensorSet** : *const InvSensorSet &*
+- **sensorSet** : *const [InvSensorSet](/docs/api/inv/inv-sensor-set) &*
   The MEG sensorSet used for the hpi fitting.
 
 ---
 
 ### checkForUpdate(sensorSet)
 
-Checks if `InvSensorSet` has changed and updates member `InvSensorSet`.
+Checks if [`InvSensorSet`](/docs/api/inv/inv-sensor-set) has changed and updates member [`InvSensorSet`](/docs/api/inv/inv-sensor-set).
 
 **Parameters:**
 
-- **sensorSet** : *const InvSensorSet &*
+- **sensorSet** : *const [InvSensorSet](/docs/api/inv/inv-sensor-set) &*
   The MEG sensorSet used for the hpi fitting.
 
 ---
@@ -69,7 +69,7 @@ Perform one single HPI fit.
 - **matProjectors** : *const Eigen::MatrixXd &*
   The projectors to apply.
 
-- **hpiModelParameters** : *const InvHpiModelParameters &*
+- **hpiModelParameters** : *const [InvHpiModelParameters](/docs/api/inv/inv-hpi-model-parameters) &*
   The model parameters to use for the Hpi Fitting, especially to compute the coil amplitudes.
 
 - **matCoilsHead** : *const Eigen::MatrixXd &*

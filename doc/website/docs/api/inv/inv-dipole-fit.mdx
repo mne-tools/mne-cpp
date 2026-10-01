@@ -7,7 +7,7 @@ sidebar_position: 7
 
 # InvDipoleFit
 
-**Namespace:** `INVERSELIB` &nbsp;·&nbsp; **Library:** Inverse Library
+**Namespace:** `INVLIB` &nbsp;·&nbsp; **Library:** Inverse Library
 
 :::info[Python equivalent]
 `mne.fit_dipole` in MNE-Python.
@@ -21,7 +21,7 @@ class INVLIB::InvDipoleFit
 
 High-level driver for sequential dipole fitting.
 
-[`InvDipoleFit`](/docs/api/inv/inv-dipole-fit) orchestrates the complete dipole-fit pipeline: it sets up the forward model via `InvDipoleFitData`, computes initial guess grids via `InvGuessData`, reads averaged or raw data, and fits an equivalent current dipole (ECD) at each requested time point.
+[`InvDipoleFit`](/docs/api/inv/inv-dipole-fit) orchestrates the complete dipole-fit pipeline: it sets up the forward model via [`InvDipoleFitData`](/docs/api/inv/inv-dipole-fit-data), computes initial guess grids via [`InvGuessData`](/docs/api/inv/inv-guess-data), reads averaged or raw data, and fits an equivalent current dipole (ECD) at each requested time point.
 
 Refactored from fit_dipoles.c / dipole_fit_setup.c (MNE-C).
 
@@ -35,7 +35,7 @@ Constructs Dipole Fit algorithm.
 
 **Parameters:**
 
-- **p_settings** : *InvDipoleFitSettings **
+- **p_settings** : *[InvDipoleFitSettings](/docs/api/inv/inv-dipole-fit-settings) **
   The dipole fit settings.
 
 ---
@@ -52,7 +52,7 @@ Execute the dipole fit using the stored settings.
 
 **Returns:**
 
-- *InvEcdSet* — The fitted dipole set.
+- *[InvEcdSet](/docs/api/inv/inv-ecd-set)* — The fitted dipole set.
 
 ---
 
@@ -72,10 +72,10 @@ Refactored: fit_dipoles (fit_dipoles.c)
 - **data** : *[MNEMeasData](/docs/api/mne/mne-meas-data) **
   The measured data.
 
-- **fit** : *InvDipoleFitData **
+- **fit** : *[InvDipoleFitData](/docs/api/inv/inv-dipole-fit-data) **
   Precomputed fitting data.
 
-- **guess** : *InvGuessData **
+- **guess** : *[InvGuessData](/docs/api/inv/inv-guess-data) **
   The initial guesses.
 
 - **tmin** : *float*
@@ -93,7 +93,7 @@ Refactored: fit_dipoles (fit_dipoles.c)
 - **verbose** : *int*
   Verbose output.
 
-- **p_set** : *InvEcdSet &*
+- **p_set** : *[InvEcdSet](/docs/api/inv/inv-ecd-set) &*
   The fitted dipole set.
 
 **Returns:**
@@ -121,10 +121,10 @@ Refactored: fit_dipoles_raw (fit_dipoles.c)
 - **sel** : *MNELIB::mneChSelection*
   Channel selection to use.
 
-- **fit** : *InvDipoleFitData **
+- **fit** : *[InvDipoleFitData](/docs/api/inv/inv-dipole-fit-data) **
   Precomputed fitting data.
 
-- **guess** : *InvGuessData **
+- **guess** : *[InvGuessData](/docs/api/inv/inv-guess-data) **
   The initial guesses.
 
 - **tmin** : *float*
@@ -142,7 +142,7 @@ Refactored: fit_dipoles_raw (fit_dipoles.c)
 - **verbose** : *int*
   Verbose output.
 
-- **p_set** : *InvEcdSet &*
+- **p_set** : *[InvEcdSet](/docs/api/inv/inv-ecd-set) &*
   The fitted dipole set.
 
 **Returns:**
@@ -168,10 +168,10 @@ Refactored: fit_dipoles_raw (fit_dipoles.c)
 - **sel** : *MNELIB::mneChSelection*
   Channel selection to use.
 
-- **fit** : *InvDipoleFitData **
+- **fit** : *[InvDipoleFitData](/docs/api/inv/inv-dipole-fit-data) **
   Precomputed fitting data.
 
-- **guess** : *InvGuessData **
+- **guess** : *[InvGuessData](/docs/api/inv/inv-guess-data) **
   The initial guesses.
 
 - **tmin** : *float*

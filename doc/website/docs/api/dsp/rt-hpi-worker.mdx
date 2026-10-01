@@ -36,7 +36,7 @@ Creates the real-time HPI worker object.
 
 **Parameters:**
 
-- **sensorSet** : *const INVLIB::InvSensorSet*
+- **sensorSet** : *const [InvSensorSet](/docs/api/inv/inv-sensor-set)*
   Associated Fiff Information.
 
 ---
@@ -53,7 +53,7 @@ Perform one single HPI fit.
 - **matProjectors** : *const Eigen::MatrixXd &*
   The projectors to apply. Bad channels are still included.
 
-- **hpiModelParameters** : *const INVLIB::InvHpiModelParameters &*
+- **hpiModelParameters** : *const [InvHpiModelParameters](/docs/api/inv/inv-hpi-model-parameters) &*
   HPI model parameters (coil frequencies, line frequency, ...).
 
 - **matCoilsHead** : *const Eigen::MatrixXd &*

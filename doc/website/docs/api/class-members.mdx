@@ -21,7 +21,7 @@ Index of 6237 public class members (functions, variables, typedefs, enums) acros
 - **AbstractView** `[fn]` in [AbstractView](/docs/api/disp/abstract-view) — Constructs a [`AbstractView`](/docs/api/disp/abstract-view) which is a child of parent.
 - **accuracy** `[var]` in [FwdCoil](/docs/api/fwd/fwd-coil) — Accuracy.
 - **accurate** `[var]` in [ComputeFwdSettings](/docs/api/fwd/compute-fwd-settings) — Use accurate calculations.
-- **accurate** `[var]` in `InvDipoleFitSettings` — Use accurate coil definitions?
+- **accurate** `[var]` in [InvDipoleFitSettings](/docs/api/inv/inv-dipole-fit-settings) — Use accurate coil definitions?
 - **acq_pars** `[var]` in [FiffInfo](/docs/api/fiff/fiff-info) — Acquisition parameters.
 - **acq_stim** `[var]` in [FiffInfo](/docs/api/fiff/fiff-info) — Acquisition stimulus information.
 - **AcquiredPoints** `[fn]` in [AcquiredPoints](/docs/api/utils/acquired-points)
@@ -40,7 +40,7 @@ Index of 6237 public class members (functions, variables, typedefs, enums) acros
 - **activeVertices** `[var]` in `InvMxneResult`
 - **activeVertices** `[var]` in `InvTfMxneResult` — Indices of active sources.
 - **actualValue** `[var]` in `MnaVerificationResult` — The evaluated expression result.
-- **ad_hoc_noise** `[fn]` in `InvDipoleFitData` — Create an ad-hoc diagonal noise-covariance matrix.
+- **ad_hoc_noise** `[fn]` in [InvDipoleFitData](/docs/api/inv/inv-dipole-fit-data) — Create an ad-hoc diagonal noise-covariance matrix.
 - **add_bem_surface** `[fn]` in [MNEMshDisplaySurfaceSet](/docs/api/mne/mne-msh-display-surface-set) — Read a BEM surface from a FIFF file, optionally validate that it is topologically closed (via solid-angle check), and add it to this set.
 - **add_filter_response** `[fn]` in [MNERawData](/docs/api/mne/mne-raw-data) — Create a frequency-domain filter response from the current filter definition and sampling frequency, replacing any existing response.
 - **add_geometry_info** `[fn]` in [MNEBemSurface](/docs/api/mne/mne-bem-surface) — Add vertex normals and neighbourhood information.
@@ -75,7 +75,7 @@ Index of 6237 public class members (functions, variables, typedefs, enums) acros
 - **addDataToSession** `[slot]` in [BidsViewModel](/docs/api/disp/bids-view-model) — Adds data item pNewItem to session at sessionIndex.
 - **addDigitizerData** `[fn]` in `BrainTreeModel`
 - **addDipoles** `[fn]` in `BrainTreeModel`
-- **addEcd** `[fn]` in `InvEcdSet` — Appends an Electric Current Dipole to the set.
+- **addEcd** `[fn]` in [InvEcdSet](/docs/api/inv/inv-ecd-set) — Appends an Electric Current Dipole to the set.
 - **addEntry** `[fn]` in [FineCalibration](/docs/api/dsp/fine-calibration) — Add an entry.
 - **addEvent** `[fn]` in [RtFiffRawViewModel](/docs/api/disp/rt-fiff-raw-view-model) — Adds event based on input parameters.
 - **addGroupBox** `[fn]` in [QuickControlView](/docs/api/disp/quick-control-view) — Add a new group box to this Widget.
@@ -260,7 +260,7 @@ Index of 6237 public class members (functions, variables, typedefs, enums) acros
 - **badIndices** `[var]` in `BadChannelsMaxwellResult` — Indices in the MEG channel list.
 - **badlist** `[var]` in [MNEMeasData](/docs/api/mne/mne-meas-data) — List of bad channel names.
 - **badlist** `[var]` in [MNERawData](/docs/api/mne/mne-raw-data) — Bad channel names.
-- **badname** `[var]` in `InvDipoleFitSettings` — Bad channel list file.
+- **badname** `[var]` in [InvDipoleFitSettings](/docs/api/inv/inv-dipole-fit-settings) — Bad channel list file.
 - **bads** `[var]` in [FiffCov](/docs/api/fiff/fiff-cov) — List of bad channels.
 - **bads** `[var]` in [FiffInfoBase](/docs/api/fiff/fiff-info-base) — List of bad channels.
 - **bads** `[var]` in [MNECovMatrix](/docs/api/mne/mne-cov-matrix) — Channel names designated bad during computation.
@@ -273,21 +273,21 @@ Index of 6237 public class members (functions, variables, typedefs, enums) acros
 - **baselines** `[var]` in [MNEMeasDataSet](/docs/api/mne/mne-meas-data-set) — Per-channel baseline offsets currently applied.
 - **basename** `[fn]` in [BIDSPath](/docs/api/bids/bids-path) — Constructs the BIDS-compliant filename (without directory).
 - **baudRate** `[var]` in `PolhemusSerialConfig`
-- **bBasic** `[fn]` in `InvHpiModelParameters`
+- **bBasic** `[fn]` in [InvHpiModelParameters](/docs/api/inv/inv-hpi-model-parameters)
 - **bConverged** `[var]` in `IcaResult` — True if all components converged within maxIter.
 - **bDebias** `[var]` in `InvTfMxneParams` — Whether to debias the final solution.
-- **bdipname** `[var]` in `InvDipoleFitSettings` — Output file in bdip format.
+- **bdipname** `[var]` in [InvDipoleFitSettings](/docs/api/inv/inv-dipole-fit-settings) — Output file in bdip format.
 - **bEegOnly** `[var]` in `LofBadChannelParams` — If true, only check EEG channels.
 - **beginFrame** `[fn]` in `BrainRenderer` — Begin the first render pass of a frame.
 - **beginPreservingPass** `[fn]` in `BrainRenderer` — Begin an additional render pass that preserves previous output.
-- **bem_funcs** `[var]` in `InvDipoleFitData` — These are the BEM forward functions.
+- **bem_funcs** `[var]` in [InvDipoleFitData](/docs/api/inv/inv-dipole-fit-data) — These are the BEM forward functions.
 - **bem_method** `[var]` in [FwdBemModel](/docs/api/fwd/fwd-bem-model) — Approximation method (FWD_BEM_CONSTANT_COLL or FWD_BEM_LINEAR_COLL).
-- **bem_model** `[var]` in `InvDipoleFitData` — BEM model definition.
+- **bem_model** `[var]` in [InvDipoleFitData](/docs/api/inv/inv-dipole-fit-data) — BEM model definition.
 - **bemHead** `[var]` in `ViewVisibilityProfile`
 - **bemInnerSkull** `[var]` in `ViewVisibilityProfile`
 - **bemname** `[var]` in [ComputeFwdSettings](/docs/api/fwd/compute-fwd-settings) — BEM model file.
-- **bemname** `[var]` in `InvDipoleFitData` — Using a BEM?
-- **bemname** `[var]` in `InvDipoleFitSettings` — Boundary-element model.
+- **bemname** `[var]` in [InvDipoleFitData](/docs/api/inv/inv-dipole-fit-data) — Using a BEM?
+- **bemname** `[var]` in [InvDipoleFitSettings](/docs/api/inv/inv-dipole-fit-settings) — Boundary-element model.
 - **bemOuterSkull** `[var]` in `ViewVisibilityProfile`
 - **bemShader** `[var]` in `SubView`
 - **bemShaderModeForTarget** `[slot]` in `BrainView` — Get configured BEM shader mode name for a target view.
@@ -312,13 +312,13 @@ Index of 6237 public class members (functions, variables, typedefs, enums) acros
 - **bmax** `[var]` in `AverageCategory` — Baseline max (s).
 - **bmax** `[var]` in `AverageCategory` — Baseline max (s).
 - **bmax** `[var]` in `CovDefinition` — Baseline max (s).
-- **bmax** `[var]` in `InvDipoleFitSettings` — Baseline end time (s).
+- **bmax** `[var]` in [InvDipoleFitSettings](/docs/api/inv/inv-dipole-fit-settings) — Baseline end time (s).
 - **bMegOnly** `[var]` in `FilterChpiParams` — If true, only filter MEG channels.
 - **bMegOnly** `[var]` in `LofBadChannelParams` — If true, only check MEG channels.
 - **bmin** `[var]` in `AverageCategory` — Baseline min (s).
 - **bmin** `[var]` in `AverageCategory` — Baseline min (s).
 - **bmin** `[var]` in `CovDefinition` — Baseline min (s).
-- **bmin** `[var]` in `InvDipoleFitSettings` — Baseline start time (s).
+- **bmin** `[var]` in [InvDipoleFitSettings](/docs/api/inv/inv-dipole-fit-settings) — Baseline start time (s).
 - **bonferroni** `[fn]` in [StatsMcCorrection](/docs/api/sts/stats-mc-correction) — Bonferroni correction: corrected_p = min(p * n, 1.0).
 - **border** `[var]` in [MNESurfacePatch](/docs/api/mne/mne-surface-patch) — Per-vertex flag: non-zero if the vertex lies on the patch border (size np).
 - **borderChanged** `[signal]` in [Spline](/docs/api/disp/spline) — emit signal consisting of three threshold lines x-axis value if any one of them is changed
@@ -399,9 +399,9 @@ Index of 6237 public class members (functions, variables, typedefs, enums) acros
 - **calculateImag** `[fn]` in [Coherency](/docs/api/connectivity/coherency) — Calculates the imaginary part of coherency of the rows of the data matrix.
 - **calculateInverse** `[fn]` in [InvMinimumNorm](/docs/api/inv/inv-minimum-norm) — Computes a L2-norm inverse solution Actual code using these principles might be different because the inverse operator is often reused across data sets.
 - **calculateInverse** `[fn]` in [InvMinimumNorm](/docs/api/inv/inv-minimum-norm)
-- **calculateInverse** `[fn]` in `InvPwlRapMusic` — Note: Since they are virtual they have to be implemented to be called.
-- **calculateInverse** `[fn]` in `InvPwlRapMusic` — Note: Since they are virtual they have to be implemented to be called.
-- **calculateInverse** `[fn]` in `InvPwlRapMusic`
+- **calculateInverse** `[fn]` in [InvPwlRapMusic](/docs/api/inv/inv-pwl-rap-music) — Note: Since they are virtual they have to be implemented to be called.
+- **calculateInverse** `[fn]` in [InvPwlRapMusic](/docs/api/inv/inv-pwl-rap-music) — Note: Since they are virtual they have to be implemented to be called.
+- **calculateInverse** `[fn]` in [InvPwlRapMusic](/docs/api/inv/inv-pwl-rap-music)
 - **calculateInverse** `[fn]` in [InvRapMusic](/docs/api/inv/inv-rap-music)
 - **calculateInverse** `[fn]` in [InvRapMusic](/docs/api/inv/inv-rap-music)
 - **calculateInverse** `[fn]` in [InvRapMusic](/docs/api/inv/inv-rap-music)
@@ -436,7 +436,7 @@ Index of 6237 public class members (functions, variables, typedefs, enums) acros
 - **ch_name** `[var]` in [FiffChInfo](/docs/api/fiff/fiff-ch-info) — Descriptive name for the channel.
 - **ch_names** `[fn]` in [FiffEvoked](/docs/api/fiff/fiff-evoked) — Returns list of channel names stored in fiff info -&gt; this is to stay consistent with python.
 - **ch_names** `[var]` in [FiffInfoBase](/docs/api/fiff/fiff-info-base) — List of all channel names.
-- **ch_names** `[var]` in `InvDipoleFitData` — List of all channel names.
+- **ch_names** `[var]` in [InvDipoleFitData](/docs/api/inv/inv-dipole-fit-data) — List of all channel names.
 - **ch_names** `[var]` in [MNERawData](/docs/api/mne/mne-raw-data) — Channel names as a flat list.
 - **changeArtifactThreshold** `[signal]` in [ArtifactSettingsView](/docs/api/disp/artifact-settings-view)
 - **changeAverageMode** `[signal]` in [AveragingSettingsView](/docs/api/disp/averaging-settings-view)
@@ -476,25 +476,25 @@ Index of 6237 public class members (functions, variables, typedefs, enums) acros
 - **chClass** `[var]` in [FiffCov](/docs/api/fiff/fiff-cov) — Channel classification vector.
 - **chdef** `[var]` in [MNEChSelection](/docs/api/mne/mne-ch-selection) — Channel definitions (may contain regular expressions).
 - **check_ch_names** `[fn]` in [MNEInverseOperator](/docs/api/mne/mne-inverse-operator) — Verify that inverse-operator channels are present in the measurement info.
-- **checkArtifacts** `[fn]` in `FiffEvokedSet` — Check whether an epoch passes artifact rejection criteria.
+- **checkArtifacts** `[fn]` in [FiffEvokedSet](/docs/api/fiff/fiff-evoked-set) — Check whether an epoch passes artifact rejection criteria.
 - **checkChThreshold** `[fn]` in [MNEEpochDataList](/docs/api/mne/mne-epoch-data-list)
 - **checkEegLocations** `[fn]` in [FiffChInfo](/docs/api/fiff/fiff-ch-info) — Check that all EEG channels in the list have reasonable (non-origin) locations.
 - **checkForArtifact** `[fn]` in [MNEEpochDataList](/docs/api/mne/mne-epoch-data-list) — Checks the givven matrix for artifacts beyond a threshold value.
-- **checkForUpdate** `[fn]` in `InvHpiDataUpdater` — Check if information in FiffInfo changed and update if necessary.
-- **checkForUpdate** `[fn]` in [InvHpiFit](/docs/api/inv/inv-hpi-fit) — Checks if `InvSensorSet` has changed and updates member `InvSensorSet`.
+- **checkForUpdate** `[fn]` in [InvHpiDataUpdater](/docs/api/inv/inv-hpi-data-updater) — Check if information in FiffInfo changed and update if necessary.
+- **checkForUpdate** `[fn]` in [InvHpiFit](/docs/api/inv/inv-hpi-fit) — Checks if [`InvSensorSet`](/docs/api/inv/inv-sensor-set) has changed and updates member [`InvSensorSet`](/docs/api/inv/inv-sensor-set).
 - **checkId** `[var]` in `MnaVerificationResult` — References `MnaVerificationCheck::id`.
 - **checkIntegrity** `[fn]` in [ComputeFwdSettings](/docs/api/fwd/compute-fwd-settings) — Check whether Compute Forward Settings are correctly set.
-- **checkIntegrity** `[fn]` in `InvDipoleFitSettings` — Check whether Dipole Fit Settings are correctly set.
+- **checkIntegrity** `[fn]` in [InvDipoleFitSettings](/docs/api/inv/inv-dipole-fit-settings) — Check whether Dipole Fit Settings are correctly set.
 - **checkPrerequisites** `[fn]` in [MLTrainer](/docs/api/ml/ml-trainer) — Check that the required Python packages are importable.
 - **checks** `[var]` in `MnaVerification` — Declarative checks (authored by user, evaluated by executor).
 - **children** `[var]` in [FiffDirNode](/docs/api/fiff/fiff-dir-node) — Child nodes.
 - **chInfo** `[var]` in [MNERawInfo](/docs/api/mne/mne-raw-info) — Channel info data .
 - **chname** `[var]` in [FwdCoil](/docs/api/fwd/fwd-coil) — Name of this channel.
-- **chNames** `[var]` in `InvBeamformer` — Channel names used for filter computation.
+- **chNames** `[var]` in [InvBeamformer](/docs/api/inv/inv-beamformer) — Channel names used for filter computation.
 - **chNumber** `[var]` in `FineCalEntry` — MEG channel number (e.g., 0113 for MEG0113).
 - **chpos** `[var]` in [FiffChInfo](/docs/api/fiff/fiff-ch-info) — Channel location.
 - **chs** `[var]` in [FiffInfoBase](/docs/api/fiff/fiff-info-base) — List of all channel info descriptors.
-- **chs** `[var]` in `InvDipoleFitData` — Channels.
+- **chs** `[var]` in [InvDipoleFitData](/docs/api/inv/inv-dipole-fit-data) — Channels.
 - **chs** `[var]` in [MNECTFCompDataSet](/docs/api/mne/mnectf-comp-data-set) — Channel information associated with compensation.
 - **chs** `[var]` in [MNEDeriv](/docs/api/mne/mne-deriv) — First matching channel info for each derivation.
 - **chs** `[var]` in [MNEMeasData](/docs/api/mne/mne-meas-data) — Channel information list.
@@ -504,7 +504,7 @@ Index of 6237 public class members (functions, variables, typedefs, enums) acros
 - **CircularBuffer** `[fn]` in [CircularBuffer](/docs/api/utils/circular-buffer) — Constructs a [`CircularBuffer`](/docs/api/utils/circular-buffer).
 - **classify** `[fn]` in [MlIcaLabel](/docs/api/decoding/ml-ica-label) — Classify each ICA component using reference signals and spectral heuristics.
 - **classify_channels** `[fn]` in [MNECovMatrix](/docs/api/mne/mne-cov-matrix) — Assign channel-type classifications (MEG mag, MEG grad, EEG) to channels in this covariance matrix, based on channel information.
-- **clean** `[fn]` in `InvDipole` — clean
+- **clean** `[fn]` in [InvDipole](/docs/api/inv/inv-dipole) — clean
 - **clear** `[fn]` in [AcquiredPoints](/docs/api/utils/acquired-points) — Drop every captured point.
 - **clear** `[fn]` in [BidsRawData](/docs/api/bids/bids-raw-data) — Clears all data members and resets to invalid state.
 - **clear** `[fn]` in [CircularBuffer](/docs/api/utils/circular-buffer) — Clears the buffer.
@@ -515,7 +515,7 @@ Index of 6237 public class members (functions, variables, typedefs, enums) acros
 - **clear** `[fn]` in [FiffCtfComp](/docs/api/fiff/fiff-ctf-comp) — Initializes the CTF software compensation data.
 - **clear** `[fn]` in [FiffDigPointSet](/docs/api/fiff/fiff-dig-point-set) — Initializes [`FiffDigPointSet`](/docs/api/fiff/fiff-dig-point-set).
 - **clear** `[fn]` in [FiffEvoked](/docs/api/fiff/fiff-evoked) — Initializes fiff evoked data.
-- **clear** `[fn]` in `FiffEvokedSet` — Initializes fiff evoked data set.
+- **clear** `[fn]` in [FiffEvokedSet](/docs/api/fiff/fiff-evoked-set) — Initializes fiff evoked data set.
 - **clear** `[fn]` in [FiffId](/docs/api/fiff/fiff-id) — Resets the File identifier.
 - **clear** `[fn]` in [FiffInfo](/docs/api/fiff/fiff-info) — Initializes FIFF measurement information.
 - **clear** `[fn]` in [FiffInfoBase](/docs/api/fiff/fiff-info-base) — Initializes light FIFF measurement information.
@@ -678,7 +678,7 @@ Index of 6237 public class members (functions, variables, typedefs, enums) acros
 - **colorsAvailable** `[signal]` in `RtSensorStreamManager` — Emitted when the streaming pipeline produces a new set of per-vertex colours for a sensor surface.
 - **cols** `[fn]` in [FiffSparseMatrix](/docs/api/fiff/fiff-sparse-matrix) — Number of columns.
 - **cols** `[fn]` in [MlTensor](/docs/api/ml/ml-tensor) — 2-D convenience — equivalent to shape(1).
-- **column_norm** `[var]` in `InvDipoleFitData` — What kind of column normalization to apply to the forward solution.
+- **column_norm** `[var]` in [InvDipoleFitData](/docs/api/inv/inv-dipole-fit-data) — What kind of column normalization to apply to the forward solution.
 - **columnCount** `[fn]` in [ChannelInfoModel](/docs/api/disp/channel-info-model)
 - **columnCount** `[fn]` in [EvokedSetModel](/docs/api/disp/evoked-set-model) — Returns the number of columns for the children of the given parent.
 - **columnCount** `[fn]` in [FrequencySpectrumModel](/docs/api/disp/frequency-spectrum-model) — Returns the number of columns for the children of the given parent.
@@ -729,7 +729,7 @@ Index of 6237 public class members (functions, variables, typedefs, enums) acros
 - **compareTripletSecondEntry** `[fn]` in [Linalg](/docs/api/math/linalg) — Compares triplet second entry (column).
 - **compClicked** `[signal]` in [CompensatorView](/docs/api/disp/compensator-view) — Signal mapper signal for compensator changes.
 - **compensate_buffer** `[fn]` in [MNERawData](/docs/api/mne/mne-raw-data) — Apply CTF compensation to a loaded raw data buffer if its compensation status differs from the desired one.
-- **compensate_to** `[fn]` in `FiffEvokedSet` — mne_compensate_to
+- **compensate_to** `[fn]` in [FiffEvokedSet](/docs/api/fiff/fiff-evoked-set) — mne_compensate_to
 - **compensateTo** `[var]` in `ProcessingSettings` — Desired software gradient compensation (-1 = from file).
 - **CompensatorView** `[fn]` in [CompensatorView](/docs/api/disp/compensator-view) — Constructs a [`CompensatorView`](/docs/api/disp/compensator-view) which is a child of parent.
 - **compilerInfo** `[var]` in `MnaProvenance` — e.g. "AppleClang 16.0.0"
@@ -759,14 +759,14 @@ Index of 6237 public class members (functions, variables, typedefs, enums) acros
 - **compute_cm** `[fn]` in [MNESurfaceOrVolume](/docs/api/mne/mne-surface-or-volume) — Compute the center of mass (mean position) of a set of points.
 - **compute_data** `[fn]` in [MNETriangle](/docs/api/mne/mne-triangle) — Compute derived geometry (edge vectors, normal, area, centroid, auxiliary unit vectors) from the current vertex positions.
 - **compute_depth_prior** `[fn]` in [MNEForwardSolution](/docs/api/mne/mne-forward-solution) — Compute weighting for depth prior.
-- **compute_dipole_field** `[fn]` in `InvDipoleFitData` — Compute the forward field for a dipole at the given location.
+- **compute_dipole_field** `[fn]` in [InvDipoleFitData](/docs/api/inv/inv-dipole-fit-data) — Compute the forward field for a dipole at the given location.
 - **compute_epoch_covariance** `[fn]` in [MNE](/docs/api/mne/mne-class) — compute_epoch_covariance
 - **compute_forward_eeg** `[fn]` in [FwdBemModel](/docs/api/fwd/fwd-bem-model) — Compute the EEG forward solution for one or more source spaces.
 - **compute_forward_meg** `[fn]` in [FwdBemModel](/docs/api/fwd/fwd-bem-model) — Compute the MEG forward solution for one or more source spaces.
 - **compute_from_epochs** `[fn]` in [FiffCov](/docs/api/fiff/fiff-cov) — Compute a noise covariance matrix from raw data based on event-locked epochs.
 - **compute_from_raw** `[fn]` in [FiffProj](/docs/api/fiff/fiff-proj) — compute_from_raw
 - **compute_grad** `[var]` in [ComputeFwdSettings](/docs/api/fwd/compute-fwd-settings)
-- **compute_guess_fields** `[fn]` in `InvGuessData` — Once the guess locations have been set up we can compute the fields Refactored: compute_guess_fields (dipole_fit_setup.c).
+- **compute_guess_fields** `[fn]` in [InvGuessData](/docs/api/inv/inv-guess-data) — Once the guess locations have been set up we can compute the fields Refactored: compute_guess_fields (dipole_fit_setup.c).
 - **compute_linear_parameters** `[fn]` in [FwdEegSphereModel](/docs/api/fwd/fwd-eeg-sphere-model) — Solve for the optimal lambda (dipole magnitude) parameters given fixed mu values using SVD.
 - **compute_normals** `[fn]` in [FsSurface](/docs/api/fs/fs-surface) — Efficiently compute vertex normals for triangulated surface.
 - **compute_orient_prior** `[fn]` in [MNEForwardSolution](/docs/api/mne/mne-forward-solution) — Compute orientation prior.
@@ -774,16 +774,16 @@ Index of 6237 public class members (functions, variables, typedefs, enums) acros
 - **compute_proj** `[fn]` in [MNE](/docs/api/mne/mne-class) — compute_proj
 - **compute_surface_cm** `[fn]` in [MNESurfaceOrVolume](/docs/api/mne/mne-surface-or-volume) — Compute and store the center of mass of a surface's vertices.
 - **computeAverage** `[fn]` in [MNEEpochDataList](/docs/api/mne/mne-epoch-data-list) — Convenience function: reads epochs, optionally applies baseline correction and artifact rejection, then returns the averaged evoked response.
-- **computeAverages** `[fn]` in `FiffEvokedSet` — Compute epoch-based averages from raw data according to an averaging description.
+- **computeAverages** `[fn]` in [FiffEvokedSet](/docs/api/fiff/fiff-evoked-set) — Compute epoch-based averages from raw data according to an averaging description.
 - **computeBasis** `[fn]` in [SSS](/docs/api/dsp/sss) — Build the SSS spherical-harmonic basis from MEG sensor geometry.
-- **computeBeamformer** `[fn]` in `InvBeamformerCompute` — Compute beamformer spatial filter weights from a leadfield and data covariance (or CSD).
+- **computeBeamformer** `[fn]` in [InvBeamformerCompute](/docs/api/inv/inv-beamformer-compute) — Compute beamformer spatial filter weights from a leadfield and data covariance (or CSD).
 - **computeEegMapping** `[fn]` in [FwdFieldMap](/docs/api/fwd/fwd-field-map) — Compute EEG electrode-to-surface mapping matrix.
 - **computeEegMapping** `[fn]` in [FwdFieldMap](/docs/api/fwd/fwd-field-map) — Compute EEG electrode-to-surface mapping matrix with SSP projection and average reference.
 - **computeFourier** `[fn]` in [Csd](/docs/api/utils/csd) — Compute CSD using Welch-style Fourier segmented estimation.
 - **ComputeFwd** `[fn]` in [ComputeFwd](/docs/api/fwd/compute-fwd) — Constructs a [`ComputeFwd`](/docs/api/fwd/compute-fwd) and initialises all data structures needed for the forward computation according to *pSettings*.
 - **ComputeFwdSettings** `[fn]` in [ComputeFwdSettings](/docs/api/fwd/compute-fwd-settings) — Default Constructor.
 - **computeGrandAverage** `[fn]` in [FiffCov](/docs/api/fiff/fiff-cov) — Compute a weighted grand-average covariance from multiple covariance matrices, weighting each by its degrees of freedom (nfree).
-- **computeGrandAverage** `[fn]` in `FiffEvokedSet` — Compute a grand average across multiple evoked data sets.
+- **computeGrandAverage** `[fn]` in [FiffEvokedSet](/docs/api/fiff/fiff-evoked-set) — Compute a grand average across multiple evoked data sets.
 - **computeInterpolationMatrix** `[slot]` in [RtSourceInterpolationMatWorker](/docs/api/disp3-d/rt-source-interpolation-mat-worker) — Compute the interpolation matrices for both hemispheres.
 - **computeInterpolationMatrix** `[fn]` in `SourceEstimateOverlay` — Compute interpolation matrix for a surface.
 - **computeMapping** `[slot]` in [RtSensorInterpolationMatWorker](/docs/api/disp3-d/rt-sensor-interpolation-mat-worker) — Compute the sensor-to-surface mapping matrices.
@@ -796,7 +796,7 @@ Index of 6237 public class members (functions, variables, typedefs, enums) acros
 - **computeNeighbors** `[fn]` in `BrainSurface` — Compute neighbor vertices from triangle connectivity.
 - **computeNormRange** `[fn]` in `SensorFieldMapper` — Compute the normalization range anchored at the peak-GFP time.
 - **computeOrthogonalized** `[fn]` in [ConnectivityAec](/docs/api/dsp/connectivity-aec) — Compute orthogonalized AEC (corrected for volume conduction / source leakage).
-- **computePower** `[fn]` in `InvBeamformerCompute` — Compute source power from spatial filter weights and a data covariance / CSD matrix.
+- **computePower** `[fn]` in [InvBeamformerCompute](/docs/api/inv/inv-beamformer-compute) — Compute source power from spatial filter weights and a data covariance / CSD matrix.
 - **computeRegistration** `[fn]` in [PolhemusCoregistration](/docs/api/utils/polhemus-coregistration) — Compute the head→device rigid transform from the three captured fiducials (NAS, LPA, RPA).
 - **computeSignFlip** `[fn]` in [InvLabelTimeCourse](/docs/api/inv/inv-label-time-course) — Compute sign-flip vector for a label based on vertex normals.
 - **computeSingleView** `[fn]` in `CameraController` — Compute camera matrices for a single-view viewport.
@@ -867,7 +867,7 @@ Index of 6237 public class members (functions, variables, typedefs, enums) acros
 - **ConstSPtr** `[type]` in [FiffDirEntry](/docs/api/fiff/fiff-dir-entry) — Const shared pointer type for [`FiffDirEntry`](/docs/api/fiff/fiff-dir-entry).
 - **ConstSPtr** `[type]` in [FiffDirNode](/docs/api/fiff/fiff-dir-node) — Const shared pointer type for [`FiffDirNode`](/docs/api/fiff/fiff-dir-node).
 - **ConstSPtr** `[type]` in [FiffEvoked](/docs/api/fiff/fiff-evoked) — Const shared pointer type for [`FiffEvoked`](/docs/api/fiff/fiff-evoked).
-- **ConstSPtr** `[type]` in `FiffEvokedSet` — Const shared pointer type for `FiffEvokedSet`.
+- **ConstSPtr** `[type]` in [FiffEvokedSet](/docs/api/fiff/fiff-evoked-set) — Const shared pointer type for [`FiffEvokedSet`](/docs/api/fiff/fiff-evoked-set).
 - **ConstSPtr** `[type]` in [FiffId](/docs/api/fiff/fiff-id) — Const shared pointer type for [`FiffId`](/docs/api/fiff/fiff-id).
 - **ConstSPtr** `[type]` in [FiffInfo](/docs/api/fiff/fiff-info) — Const shared pointer type for [`FiffInfo`](/docs/api/fiff/fiff-info).
 - **ConstSPtr** `[type]` in [FiffInfoBase](/docs/api/fiff/fiff-info-base) — Const shared pointer type for [`FiffInfoBase`](/docs/api/fiff/fiff-info-base).
@@ -900,23 +900,23 @@ Index of 6237 public class members (functions, variables, typedefs, enums) acros
 - **ConstSPtr** `[type]` in [ImagCoherence](/docs/api/connectivity/imag-coherence) — Const shared pointer type for [`ImagCoherence`](/docs/api/connectivity/imag-coherence).
 - **ConstSPtr** `[type]` in [ImageSc](/docs/api/disp/image-sc) — Const shared pointer type for [`ImageSc`](/docs/api/disp/image-sc) class.
 - **ConstSPtr** `[type]` in [Interpolation](/docs/api/disp3-d/interpolation)
-- **ConstSPtr** `[type]` in `InvBeamformer`
+- **ConstSPtr** `[type]` in [InvBeamformer](/docs/api/inv/inv-beamformer)
 - **ConstSPtr** `[type]` in [InvDipoleFit](/docs/api/inv/inv-dipole-fit) — Const shared pointer type for [`InvDipoleFit`](/docs/api/inv/inv-dipole-fit).
-- **ConstSPtr** `[type]` in `InvDipoleFitData` — Const shared pointer type for `InvDipoleFitData`.
-- **ConstSPtr** `[type]` in `InvDipoleFitSettings` — Const shared pointer type for `InvDipoleFitSettings`.
-- **ConstSPtr** `[type]` in `InvDipoleForward` — Const shared pointer type for `InvDipoleForward`.
-- **ConstSPtr** `[type]` in `InvEcd` — Const shared pointer type for `InvEcd`.
-- **ConstSPtr** `[type]` in `InvEcdSet` — Const shared pointer type for `InvEcdSet`.
-- **ConstSPtr** `[type]` in `InvGuessData` — Const shared pointer type for `InvGuessData`.
-- **ConstSPtr** `[type]` in `InvHpiDataUpdater` — Const shared pointer type for `InvHpiDataUpdater`.
+- **ConstSPtr** `[type]` in [InvDipoleFitData](/docs/api/inv/inv-dipole-fit-data) — Const shared pointer type for [`InvDipoleFitData`](/docs/api/inv/inv-dipole-fit-data).
+- **ConstSPtr** `[type]` in [InvDipoleFitSettings](/docs/api/inv/inv-dipole-fit-settings) — Const shared pointer type for [`InvDipoleFitSettings`](/docs/api/inv/inv-dipole-fit-settings).
+- **ConstSPtr** `[type]` in [InvDipoleForward](/docs/api/inv/inv-dipole-forward) — Const shared pointer type for [`InvDipoleForward`](/docs/api/inv/inv-dipole-forward).
+- **ConstSPtr** `[type]` in [InvEcd](/docs/api/inv/inv-ecd) — Const shared pointer type for [`InvEcd`](/docs/api/inv/inv-ecd).
+- **ConstSPtr** `[type]` in [InvEcdSet](/docs/api/inv/inv-ecd-set) — Const shared pointer type for [`InvEcdSet`](/docs/api/inv/inv-ecd-set).
+- **ConstSPtr** `[type]` in [InvGuessData](/docs/api/inv/inv-guess-data) — Const shared pointer type for [`InvGuessData`](/docs/api/inv/inv-guess-data).
+- **ConstSPtr** `[type]` in [InvHpiDataUpdater](/docs/api/inv/inv-hpi-data-updater) — Const shared pointer type for [`InvHpiDataUpdater`](/docs/api/inv/inv-hpi-data-updater).
 - **ConstSPtr** `[type]` in [InvHpiFit](/docs/api/inv/inv-hpi-fit) — Const shared pointer type for [`InvHpiFit`](/docs/api/inv/inv-hpi-fit).
-- **ConstSPtr** `[type]` in `InvHpiFitData` — Const shared pointer type for `InvHpiFitData`.
-- **ConstSPtr** `[type]` in `InvHpiModelParameters` — Const shared pointer type for `InvHpiModelParameters`.
+- **ConstSPtr** `[type]` in [InvHpiFitData](/docs/api/inv/inv-hpi-fit-data) — Const shared pointer type for [`InvHpiFitData`](/docs/api/inv/inv-hpi-fit-data).
+- **ConstSPtr** `[type]` in [InvHpiModelParameters](/docs/api/inv/inv-hpi-model-parameters) — Const shared pointer type for [`InvHpiModelParameters`](/docs/api/inv/inv-hpi-model-parameters).
 - **ConstSPtr** `[type]` in [InvMinimumNorm](/docs/api/inv/inv-minimum-norm) — Const shared pointer type for [`InvMinimumNorm`](/docs/api/inv/inv-minimum-norm).
 - **ConstSPtr** `[type]` in [InvRapMusic](/docs/api/inv/inv-rap-music) — Const shared pointer type for [`InvRapMusic`](/docs/api/inv/inv-rap-music).
-- **ConstSPtr** `[type]` in `InvSensorSet` — Const shared pointer type for `InvSensorSet`.
-- **ConstSPtr** `[type]` in `InvSensorSetCreator` — Const shared pointer type for `InvSensorSet`.
-- **ConstSPtr** `[type]` in `InvSignalModel` — Const shared pointer type for `InvSignalModel`.
+- **ConstSPtr** `[type]` in [InvSensorSet](/docs/api/inv/inv-sensor-set) — Const shared pointer type for [`InvSensorSet`](/docs/api/inv/inv-sensor-set).
+- **ConstSPtr** `[type]` in [InvSensorSetCreator](/docs/api/inv/inv-sensor-set-creator) — Const shared pointer type for [`InvSensorSet`](/docs/api/inv/inv-sensor-set).
+- **ConstSPtr** `[type]` in [InvSignalModel](/docs/api/inv/inv-signal-model) — Const shared pointer type for [`InvSignalModel`](/docs/api/inv/inv-signal-model).
 - **ConstSPtr** `[type]` in [InvSourceEstimate](/docs/api/inv/inv-source-estimate) — Const shared pointer type for [`InvSourceEstimate`](/docs/api/inv/inv-source-estimate).
 - **ConstSPtr** `[type]` in [InvVectorSourceEstimate](/docs/api/inv/inv-vector-source-estimate)
 - **ConstSPtr** `[type]` in [InvVolumeSourceEstimate](/docs/api/inv/inv-volume-source-estimate)
@@ -1021,7 +1021,7 @@ Index of 6237 public class members (functions, variables, typedefs, enums) acros
 - **ConstUPtr** `[type]` in [FiffDirEntry](/docs/api/fiff/fiff-dir-entry) — Const unique pointer type for [`FiffDirEntry`](/docs/api/fiff/fiff-dir-entry).
 - **ConstUPtr** `[type]` in [FiffDirNode](/docs/api/fiff/fiff-dir-node) — Const unique pointer type for [`FiffDirNode`](/docs/api/fiff/fiff-dir-node).
 - **ConstUPtr** `[type]` in [FiffEvoked](/docs/api/fiff/fiff-evoked) — Const unique pointer type for [`FiffEvoked`](/docs/api/fiff/fiff-evoked).
-- **ConstUPtr** `[type]` in `FiffEvokedSet` — Const unique pointer type for `FiffEvokedSet`.
+- **ConstUPtr** `[type]` in [FiffEvokedSet](/docs/api/fiff/fiff-evoked-set) — Const unique pointer type for [`FiffEvokedSet`](/docs/api/fiff/fiff-evoked-set).
 - **ConstUPtr** `[type]` in [FiffId](/docs/api/fiff/fiff-id) — Const unique pointer type for [`FiffId`](/docs/api/fiff/fiff-id).
 - **ConstUPtr** `[type]` in [FiffInfo](/docs/api/fiff/fiff-info) — Const unique pointer type for [`FiffInfo`](/docs/api/fiff/fiff-info).
 - **ConstUPtr** `[type]` in [FiffInfoBase](/docs/api/fiff/fiff-info-base) — Const unique pointer type for [`FiffInfoBase`](/docs/api/fiff/fiff-info-base).
@@ -1049,7 +1049,7 @@ Index of 6237 public class members (functions, variables, typedefs, enums) acros
 - **coord_frame** `[var]` in [FiffDigPoint](/docs/api/fiff/fiff-dig-point) — Newly added to stay consistent with fiff MATLAB implementation.
 - **coord_frame** `[var]` in [FwdCoil](/docs/api/fwd/fwd-coil) — Which coordinate frame are we in?
 - **coord_frame** `[var]` in [FwdCoilSet](/docs/api/fwd/fwd-coil-set) — Common coordinate frame.
-- **coord_frame** `[var]` in `InvDipoleFitData` — Common coordinate frame.
+- **coord_frame** `[var]` in [InvDipoleFitData](/docs/api/inv/inv-dipole-fit-data) — Common coordinate frame.
 - **coord_frame** `[var]` in [MNEForwardSolution](/docs/api/mne/mne-forward-solution) — Coil coordinate system definition.
 - **coord_frame** `[var]` in [MNEInverseOperator](/docs/api/mne/mne-inverse-operator) — Coordinate frame of the inverse (MRI or head).
 - **coord_frame** `[var]` in [MNERawInfo](/docs/api/mne/mne-raw-info) — Which coordinate frame are the positions defined in?
@@ -1071,8 +1071,8 @@ Index of 6237 public class members (functions, variables, typedefs, enums) acros
 - **CosineFilter** `[fn]` in [CosineFilter](/docs/api/utils/cosine-filter) — Constructs a [`CosineFilter`](/docs/api/utils/cosine-filter) object.
 - **CosineFilter** `[fn]` in [CosineFilter](/docs/api/utils/cosine-filter) — Constructs a [`CosineFilter`](/docs/api/utils/cosine-filter) object.
 - **cosmag** `[var]` in [FwdCoil](/docs/api/fwd/fwd-coil) — The corresponding direction cosines (np x 3).
-- **cosmag** `[fn]` in `InvSensorSet`
-- **cosmag** `[fn]` in `InvSensorSet`
+- **cosmag** `[fn]` in [InvSensorSet](/docs/api/inv/inv-sensor-set)
+- **cosmag** `[fn]` in [InvSensorSet](/docs/api/inv/inv-sensor-set)
 - **count** `[fn]` in `Command` — Returns the number of parameters.
 - **count** `[fn]` in `RawCommand` — Returns the number of parameters.
 - **countOf** `[fn]` in [AcquiredPoints](/docs/api/utils/acquired-points)
@@ -1174,7 +1174,7 @@ Index of 6237 public class members (functions, variables, typedefs, enums) acros
 - **dataKind** `[var]` in `MnaOpSchemaPort` — Expected data kind.
 - **dataKind** `[var]` in `MnaPort` — Data kind flowing through this port.
 - **DataLoader** `[fn]` in `DataLoader`
-- **dataname** `[var]` in `InvEcdSet` — The associated data file.
+- **dataname** `[var]` in [InvEcdSet](/docs/api/inv/inv-ecd-set) — The associated data file.
 - **datap** `[var]` in [MNEMneData](/docs/api/mne/mne-mne-data) — Projection of the whitened data onto the field eigenvectors.
 - **datasetName** `[var]` in `WriteOptions` — Name for dataset_description.json (defaults to "[Unspecified]").
 - **datasetType** `[var]` in `BidsDatasetDescription` — "raw" or "derivative" (RECOMMENDED).
@@ -1269,7 +1269,7 @@ Index of 6237 public class members (functions, variables, typedefs, enums) acros
 - **dGain** `[var]` in `FineCalEntry` — Gain correction factor (nominal = 1.0).
 - **dGof** `[var]` in `HeadPosEntry` — Goodness of fit for this head position.
 - **diag** `[var]` in [FiffCov](/docs/api/fiff/fiff-cov) — If the covariance is stored in a diagonal order.
-- **diagnoise** `[var]` in `InvDipoleFitSettings` — Use only the diagonals of the noise-covariance matrix.
+- **diagnoise** `[var]` in [InvDipoleFitSettings](/docs/api/inv/inv-dipole-fit-settings) — Use only the diagonals of the noise-covariance matrix.
 - **diagonalFixed** `[fn]` in [StsCovEstimators](/docs/api/sts/sts-cov-estimators) — Fixed diagonal regularisation.
 - **diff** `[var]` in [MNEMshLight](/docs/api/mne/mne-msh-light)
 - **dig** `[var]` in [FiffInfo](/docs/api/fiff/fiff-info) — List of all digitization point descriptors.
@@ -1299,9 +1299,9 @@ Index of 6237 public class members (functions, variables, typedefs, enums) acros
 - **dimY** `[fn]` in [MriVolData](/docs/api/mri/mri-vol-data)
 - **dimy** `[var]` in `MriSlice` — Pixel size in y direction (meters).
 - **dimZ** `[fn]` in [MriVolData](/docs/api/mri/mri-vol-data)
-- **dipname** `[var]` in `InvDipoleFitSettings` — Output file in dip format.
+- **dipname** `[var]` in [InvDipoleFitSettings](/docs/api/inv/inv-dipole-fit-settings) — Output file in dip format.
 - **Dipole** `[var]` in `BrainRenderer`
-- **dipole_forward_one** `[fn]` in `InvDipoleFitData` — Compute the forward solution for a single dipole position.
+- **dipole_forward_one** `[fn]` in [InvDipoleFitData](/docs/api/inv/inv-dipole-fit-data) — Compute the forward solution for a single dipole position.
 - **DipoleFitView** `[fn]` in [DipoleFitView](/docs/api/disp/dipole-fit-view)
 - **dipoleIndex** `[var]` in `PickResult` — Index within the dipole set.
 - **DipoleObject** `[fn]` in `DipoleObject`
@@ -1344,14 +1344,14 @@ Index of 6237 public class members (functions, variables, typedefs, enums) acros
 - **dMinRRSec** `[var]` in `ArtifactDetectEcgParams` — Minimum R–R interval in seconds (caps detection rate at ~170 bpm).
 - **dNotchWidth** `[var]` in `FilterChpiParams` — Half-width of each notch filter in Hz (notch = freq +/- width).
 - **do_all** `[var]` in [ComputeFwdSettings](/docs/api/fwd/compute-fwd-settings)
-- **do_baseline** `[var]` in `InvDipoleFitSettings` — Are both baseline limits set?
+- **do_baseline** `[var]` in [InvDipoleFitSettings](/docs/api/inv/inv-dipole-fit-settings) — Are both baseline limits set?
 - **doAbs** `[var]` in `AverageCategory` — Compute absolute values?
 - **doAbs** `[var]` in `AverageCategory` — Compute absolute values?
 - **doBaseline** `[var]` in `AverageCategory` — Should we baseline?
 - **doBaseline** `[var]` in `AverageCategory` — Should we baseline?
 - **doBaseline** `[var]` in `CovDefinition` — Should we baseline first?
 - **dockLocationChanged** `[signal]` in [MultiView](/docs/api/disp/multi-view)
-- **doDipfitConcurrent** `[fn]` in `InvHpiFitData` — dipfit function is adapted from Fieldtrip Software.
+- **doDipfitConcurrent** `[fn]` in [InvHpiFitData](/docs/api/inv/inv-hpi-fit-data) — dipfit function is adapted from Fieldtrip Software.
 - **dof** `[var]` in [MriVolData](/docs/api/mri/mri-vol-data) — Degrees of freedom.
 - **doForwardComputation** `[signal]` in [FwdSettingsView](/docs/api/disp/fwd-settings-view) — Emit this signal whenever a forward computation is supposed to be triggered.
 - **doFreqOrder** `[signal]` in [HpiSettingsView](/docs/api/disp/hpi-settings-view) — Emit this signal whenever the frequency ordering is supposed to be triggered.
@@ -1417,18 +1417,18 @@ Index of 6237 public class members (functions, variables, typedefs, enums) acros
 - **edgeVertexBuffer** `[fn]` in `NetworkObject`
 - **eeg_client** `[var]` in `dipoleFitFuncsRec` — Client data for EEG field computations.
 - **eeg_client_free** `[var]` in `dipoleFitFuncsRec` — Destructor for EEG client data.
-- **eeg_els** `[var]` in `InvDipoleFitData` — EEG electrode definitions.
+- **eeg_els** `[var]` in [InvDipoleFitData](/docs/api/inv/inv-dipole-fit-data) — EEG electrode definitions.
 - **eeg_loc** `[var]` in [FiffChInfo](/docs/api/fiff/fiff-ch-info) — Channel location.
-- **eeg_model** `[var]` in `InvDipoleFitData` — EEG sphere model definition.
+- **eeg_model** `[var]` in [InvDipoleFitData](/docs/api/inv/inv-dipole-fit-data) — EEG sphere model definition.
 - **eeg_model_file** `[var]` in [ComputeFwdSettings](/docs/api/fwd/compute-fwd-settings) — File of EEG sphere model specifications.
-- **eeg_model_file** `[var]` in `InvDipoleFitSettings` — File of EEG sphere model specifications.
+- **eeg_model_file** `[var]` in [InvDipoleFitSettings](/docs/api/inv/inv-dipole-fit-settings) — File of EEG sphere model specifications.
 - **eeg_model_name** `[var]` in [ComputeFwdSettings](/docs/api/fwd/compute-fwd-settings) — Name of the EEG model to use.
-- **eeg_model_name** `[var]` in `InvDipoleFitSettings` — Name of the EEG model to use.
+- **eeg_model_name** `[var]` in [InvDipoleFitSettings](/docs/api/inv/inv-dipole-fit-settings) — Name of the EEG model to use.
 - **eeg_pot** `[var]` in `dipoleFitFuncsRec` — EEG forward calculation function.
-- **eeg_reg** `[var]` in `InvDipoleFitSettings` — Noise-covariance matrix regularization for EEG.
+- **eeg_reg** `[var]` in [InvDipoleFitSettings](/docs/api/inv/inv-dipole-fit-settings) — Noise-covariance matrix regularization for EEG.
 - **eeg_sphere_rad** `[var]` in [ComputeFwdSettings](/docs/api/fwd/compute-fwd-settings) — Scalp radius to use in EEG sphere model.
-- **eeg_sphere_rad** `[var]` in `InvDipoleFitSettings` — Scalp radius to use in EEG sphere model.
-- **eeg_std** `[var]` in `InvDipoleFitSettings` — Standard deviation for EEG if noise covariance is not specified.
+- **eeg_sphere_rad** `[var]` in [InvDipoleFitSettings](/docs/api/inv/inv-dipole-fit-settings) — Scalp radius to use in EEG sphere model.
+- **eeg_std** `[var]` in [InvDipoleFitSettings](/docs/api/inv/inv-dipole-fit-settings) — Standard deviation for EEG if noise covariance is not specified.
 - **eeg_vec_pot** `[var]` in `dipoleFitFuncsRec` — EEG vectorized forward calculation function.
 - **eegFieldContours** `[var]` in `ViewVisibilityProfile`
 - **eegFieldMap** `[var]` in `ViewVisibilityProfile`
@@ -1525,7 +1525,7 @@ Index of 6237 public class members (functions, variables, typedefs, enums) acros
 - **eventsVisible** `[fn]` in [ChannelDataView](/docs/api/disp/channel-data-view)
 - **eventsVisible** `[fn]` in [ChannelRhiView](/docs/api/disp/channel-rhi-view)
 - **eventsVisibleToggled** `[signal]` in [ChannelDataView](/docs/api/disp/channel-data-view)
-- **evoked** `[var]` in `FiffEvokedSet` — List of [`Fiff`](/docs/api/fiff/fiff-class) Evoked Data.
+- **evoked** `[var]` in [FiffEvokedSet](/docs/api/fiff/fiff-evoked-set) — List of [`Fiff`](/docs/api/fiff/fiff-class) Evoked Data.
 - **evoked** `[fn]` in `SensorFieldMapper`
 - **EvokedSetModel** `[fn]` in [EvokedSetModel](/docs/api/disp/evoked-set-model) — Constructs an real-time multi sample array table model for the given parent.
 - **evokedStim** `[signal]` in [RtAveraging](/docs/api/dsp/rt-averaging)
@@ -1580,8 +1580,8 @@ Index of 6237 public class members (functions, variables, typedefs, enums) acros
 - **eye** `[var]` in [MNEMshDisplaySurfaceSet](/docs/api/mne/mne-msh-display-surface-set) — Eye position for viewing (used in composite views).
 - **ez** `[var]` in [FiffChPos](/docs/api/fiff/fiff-ch-pos) — Coil coordinate system z-axis unit vector.
 - **ez** `[var]` in [FwdCoil](/docs/api/fwd/fwd-coil) — Coil coordinate system z unit vector.
-- **ez** `[fn]` in `InvSensorSet`
-- **ez** `[fn]` in `InvSensorSet`
+- **ez** `[fn]` in [InvSensorSet](/docs/api/inv/inv-sensor-set)
+- **ez** `[fn]` in [InvSensorSet](/docs/api/inv/inv-sensor-set)
 
 ## F {#f}
 
@@ -1640,9 +1640,9 @@ Index of 6237 public class members (functions, variables, typedefs, enums) acros
 - **FiffEvoked** `[fn]` in [FiffEvoked](/docs/api/fiff/fiff-evoked) — Constructs a fiff evoked data.
 - **FiffEvoked** `[fn]` in [FiffEvoked](/docs/api/fiff/fiff-evoked) — Constructs fiff evoked data, by reading from a IO device.
 - **FiffEvoked** `[fn]` in [FiffEvoked](/docs/api/fiff/fiff-evoked) — Copy constructor.
-- **FiffEvokedSet** `[fn]` in `FiffEvokedSet` — Constructs a fiff evoked data set.
-- **FiffEvokedSet** `[fn]` in `FiffEvokedSet` — Constructs a fiff evoked data set, by reading from a IO device.
-- **FiffEvokedSet** `[fn]` in `FiffEvokedSet` — Copy constructor.
+- **FiffEvokedSet** `[fn]` in [FiffEvokedSet](/docs/api/fiff/fiff-evoked-set) — Constructs a fiff evoked data set.
+- **FiffEvokedSet** `[fn]` in [FiffEvokedSet](/docs/api/fiff/fiff-evoked-set) — Constructs a fiff evoked data set, by reading from a IO device.
+- **FiffEvokedSet** `[fn]` in [FiffEvokedSet](/docs/api/fiff/fiff-evoked-set) — Copy constructor.
 - **FiffFileSharer** `[fn]` in [FiffFileSharer](/docs/api/fiff/fiff-file-sharer) — Constructs a [`FiffFileSharer`](/docs/api/fiff/fiff-file-sharer) with default paramaters (based on m_sDefaultDirectory and m_sDefaultFileName).
 - **FiffFileSharer** `[fn]` in [FiffFileSharer](/docs/api/fiff/fiff-file-sharer) — Constructs a [`FiffFileSharer`](/docs/api/fiff/fiff-file-sharer) to watch/save to sDirName.
 - **FiffId** `[fn]` in [FiffId](/docs/api/fiff/fiff-id) — Default Constructor.
@@ -1651,10 +1651,10 @@ Index of 6237 public class members (functions, variables, typedefs, enums) acros
 - **FiffInfo** `[fn]` in [FiffInfo](/docs/api/fiff/fiff-info) — Copy constructor.
 - **FiffInfoBase** `[fn]` in [FiffInfoBase](/docs/api/fiff/fiff-info-base) — Constructors the light fiff measurement file information.
 - **FiffInfoBase** `[fn]` in [FiffInfoBase](/docs/api/fiff/fiff-info-base) — Copy constructor.
-- **FiffIO** `[fn]` in `FiffIO` — Constructs a `FiffIO`.
-- **FiffIO** `[fn]` in `FiffIO` — Constructs a `FiffIO` object by reading from a I/O device pIODevice.
-- **FiffIO** `[fn]` in `FiffIO` — Constructs a `FiffIO` object that uses the I/O device pIODevice.
-- **FiffIO** `[fn]` in `FiffIO` — Copy constructor.
+- **FiffIO** `[fn]` in [FiffIO](/docs/api/fiff/fiff-io) — Constructs a [`FiffIO`](/docs/api/fiff/fiff-io).
+- **FiffIO** `[fn]` in [FiffIO](/docs/api/fiff/fiff-io) — Constructs a [`FiffIO`](/docs/api/fiff/fiff-io) object by reading from a I/O device pIODevice.
+- **FiffIO** `[fn]` in [FiffIO](/docs/api/fiff/fiff-io) — Constructs a [`FiffIO`](/docs/api/fiff/fiff-io) object that uses the I/O device pIODevice.
+- **FiffIO** `[fn]` in [FiffIO](/docs/api/fiff/fiff-io) — Copy constructor.
 - **FiffNamedMatrix** `[fn]` in [FiffNamedMatrix](/docs/api/fiff/fiff-named-matrix) — Default constructor.
 - **FiffNamedMatrix** `[fn]` in [FiffNamedMatrix](/docs/api/fiff/fiff-named-matrix) — Constructs named matrix with given parameters.
 - **FiffNamedMatrix** `[fn]` in [FiffNamedMatrix](/docs/api/fiff/fiff-named-matrix) — Copy constructor.
@@ -1704,7 +1704,7 @@ Index of 6237 public class members (functions, variables, typedefs, enums) acros
 - **files** `[var]` in `MnaRecording` — Files belonging to this recording.
 - **filt_bufs** `[var]` in [MNERawData](/docs/api/mne/mne-raw-data) — Filtered data buffer definitions.
 - **filt_ring** `[var]` in [MNERawData](/docs/api/mne/mne-raw-data) — Ring buffer for filtered data.
-- **filter** `[var]` in `InvDipoleFitSettings` — Data filter definition.
+- **filter** `[var]` in [InvDipoleFitSettings](/docs/api/inv/inv-dipole-fit-settings) — Data filter definition.
 - **filter** `[var]` in [MNERawData](/docs/api/mne/mne-raw-data) — Filter definition (highpass/lowpass).
 - **filter** `[var]` in `ProcessingSettings`
 - **filter_data** `[var]` in [MNERawData](/docs/api/mne/mne-raw-data) — Pre-computed frequency-domain filter state.
@@ -1739,7 +1739,7 @@ Index of 6237 public class members (functions, variables, typedefs, enums) acros
 - **find_closest_on_surface** `[fn]` in [MNEProjectToSurface](/docs/api/mne/mne-project-to-surface) — Projects a set of points r on the FsSurface.
 - **find_closest_on_surface_approx** `[fn]` in [MNESurface](/docs/api/mne/mne-surface) — For each point, find the closest point on the surface using neighborhood-restricted search.
 - **find_evoked** `[fn]` in [Fiff](/docs/api/fiff/fiff-class) — fiff_find_evoked
-- **find_evoked** `[fn]` in `FiffEvokedSet` — fiff_find_evoked
+- **find_evoked** `[fn]` in [FiffEvokedSet](/docs/api/fiff/fiff-evoked-set) — fiff_find_evoked
 - **find_maxshield** `[fn]` in [MNERawInfo](/docs/api/mne/mne-raw-info) — Finds the MaxShield raw data block in the FIFF directory tree.
 - **find_meas** `[fn]` in [MNERawInfo](/docs/api/mne/mne-raw-info) — Finds the nearest FIFFB_MEAS parent node in the FIFF directory tree.
 - **find_meas_info** `[fn]` in [MNERawInfo](/docs/api/mne/mne-raw-info) — Finds the FIFFB_MEAS_INFO child node within the nearest FIFFB_MEAS block.
@@ -1787,15 +1787,15 @@ Index of 6237 public class members (functions, variables, typedefs, enums) acros
 - **fit_dipoles** `[fn]` in [InvDipoleFit](/docs/api/inv/inv-dipole-fit) — Fit a single dipole to each time point of averaged data.
 - **fit_dipoles_raw** `[fn]` in [InvDipoleFit](/docs/api/inv/inv-dipole-fit) — Fit a single dipole to each time point of raw data.
 - **fit_dipoles_raw** `[fn]` in [InvDipoleFit](/docs/api/inv/inv-dipole-fit) — Fit dipoles to raw data (convenience overload without output set).
-- **fit_mag_dipoles** `[var]` in `InvDipoleFitData` — Fit magnetic dipoles?
-- **fit_mag_dipoles** `[var]` in `InvDipoleFitSettings` — Fit magnetic dipoles?
-- **fit_one** `[fn]` in `InvDipoleFitData` — Fit a single dipole to the given data.
+- **fit_mag_dipoles** `[var]` in [InvDipoleFitData](/docs/api/inv/inv-dipole-fit-data) — Fit magnetic dipoles?
+- **fit_mag_dipoles** `[var]` in [InvDipoleFitSettings](/docs/api/inv/inv-dipole-fit-settings) — Fit magnetic dipoles?
+- **fit_one** `[fn]` in [InvDipoleFitData](/docs/api/inv/inv-dipole-fit-data) — Fit a single dipole to the given data.
 - **fit_sphere** `[fn]` in [Sphere](/docs/api/math/sphere) — Fits a sphere to a point cloud.
 - **fit_sphere_simplex** `[fn]` in [Sphere](/docs/api/math/sphere) — Fits a sphere to a point cloud.
 - **fit_sphere_to_points** `[fn]` in [Sphere](/docs/api/math/sphere) — Fits a sphere to a point cloud.
 - **fit_sphere_to_points** `[fn]` in [Sphere](/docs/api/math/sphere)
 - **fitApply** `[fn]` in [EogRegression](/docs/api/dsp/eog-regression) — Convenience: fit and apply in one step.
-- **fitData** `[fn]` in `InvSignalModel` — Fit the data to the model constructed from given model parameters.
+- **fitData** `[fn]` in [InvSignalModel](/docs/api/inv/inv-signal-model) — Fit the data to the model constructed from given model parameters.
 - **fitFiducials** `[signal]` in [CoregSettingsView](/docs/api/disp/coreg-settings-view) — Emit this signal whenever fiducial alignment is requested.
 - **fitICP** `[signal]` in [CoregSettingsView](/docs/api/disp/coreg-settings-view) — Emit this signal whenever icp alignment is requested.
 - **fitSphereOrigin** `[fn]` in `SensorFieldMapper` — Fit a sphere to the digitization headshape points.
@@ -1805,7 +1805,7 @@ Index of 6237 public class members (functions, variables, typedefs, enums) acros
 - **fitTransform** `[fn]` in [DecodingCsp](/docs/api/decoding/decoding-csp) — Fit and transform in one step.
 - **fitTransform** `[fn]` in [DecodingSpoc](/docs/api/decoding/decoding-spoc) — Fit and transform in one step.
 - **fitTransform** `[fn]` in [DecodingSsd](/docs/api/decoding/decoding-ssd) — Fit and transform in one step.
-- **fixed_noise** `[var]` in `InvDipoleFitData` — Were fixed noise values used rather than a noise-covariance matrix read from a file.
+- **fixed_noise** `[var]` in [InvDipoleFitData](/docs/api/inv/inv-dipole-fit-data) — Were fixed noise values used rather than a noise-covariance matrix read from a file.
 - **fixed_ori** `[var]` in [ComputeFwdSettings](/docs/api/fwd/compute-fwd-settings) — Fixed-orientation dipoles?
 - **fixed_ori** `[var]` in [FwdThreadArg](/docs/api/fwd/fwd-thread-arg) — Compute fixed orientation solution?
 - **fixSkew** `[var]` in `AverageDescription` — Fix skew on trigger lines.
@@ -1843,7 +1843,7 @@ Index of 6237 public class members (functions, variables, typedefs, enums) acros
 - **freeSurferDir** `[var]` in `MnaSubject` — Relative path to FreeSurfer SUBJECTS_DIR.
 - **freqAxis** `[fn]` in [WelchPsd](/docs/api/dsp/welch-psd) — Build the frequency axis for a given FFT length and sampling frequency.
 - **freqBandChanged** `[signal]` in [ConnectivitySettingsView](/docs/api/disp/connectivity-settings-view) — Emit signal whenever the frequency band changed.
-- **frequencies** `[var]` in `InvBeamformer` — Center frequencies for DICS (Hz).
+- **frequencies** `[var]` in [InvBeamformer](/docs/api/inv/inv-beamformer) — Center frequencies for DICS (Hz).
 - **frequency** `[var]` in `EDFChannelInfo`
 - **FrequencySpectrumDelegate** `[fn]` in [FrequencySpectrumDelegate](/docs/api/disp/frequency-spectrum-delegate) — Creates a new abstract item delegate with the given parent.
 - **FrequencySpectrumModel** `[fn]` in [FrequencySpectrumModel](/docs/api/disp/frequency-spectrum-model) — Constructs an real-time multi sample array table model for the given parent.
@@ -1914,9 +1914,9 @@ Index of 6237 public class members (functions, variables, typedefs, enums) acros
 - **FsSurfaceSet** `[fn]` in [FsSurfaceSet](/docs/api/fs/fs-surface-set) — Constructs an annotation set by reading from annotation files.
 - **fTestPermutationTest** `[fn]` in [StatsCluster](/docs/api/sts/stats-cluster) — F-test cluster-based permutation test for one-way ANOVA.
 - **fthresh** `[var]` in [MNEMshColorScaleDef](/docs/api/mne/mne-msh-color-scale-def)
-- **funcs** `[var]` in `InvDipoleFitData` — Non-owning alias — points to one of the two above.
+- **funcs** `[var]` in [InvDipoleFitData](/docs/api/inv/inv-dipole-fit-data) — Non-owning alias — points to one of the two above.
 - **fwd** `[var]` in `FitDipUserRec`
-- **fwd** `[var]` in `InvDipoleForward` — Forward solution, projected and whitened (3*ndip x nch, row-major).
+- **fwd** `[var]` in [InvDipoleForward](/docs/api/inv/inv-dipole-forward) — Forward solution, projected and whitened (3*ndip x nch, row-major).
 - **fwd** `[var]` in [MNEMeasData](/docs/api/mne/mne-meas-data) — Forward operator for dipole fitting (not owned).
 - **fwd_add_default_eeg_sphere_model** `[fn]` in [FwdEegSphereModelSet](/docs/api/fwd/fwd-eeg-sphere-model-set) — Choose and setup the default EEG sphere model Refactored from: fwd_eeg_sphere_models.c.
 - **fwd_add_to_eeg_sphere_model_set** `[fn]` in [FwdEegSphereModelSet](/docs/api/fwd/fwd-eeg-sphere-model-set) — Add a model to a set.
@@ -2063,7 +2063,7 @@ Index of 6237 public class members (functions, variables, typedefs, enums) acros
 - **getChannelCount** `[fn]` in [BrainVisionReader](/docs/api/bids/brain-vision-reader) — Return the number of measurement channels.
 - **getChannelCount** `[fn]` in [EDFReader](/docs/api/bids/edf-reader) — Return the number of measurement channels.
 - **getChannelInfos** `[fn]` in [BrainVisionReader](/docs/api/bids/brain-vision-reader) — Return all channel infos.
-- **getChannels** `[fn]` in `InvHpiDataUpdater` — inline get functions for private member variables.
+- **getChannels** `[fn]` in [InvHpiDataUpdater](/docs/api/inv/inv-hpi-data-updater) — inline get functions for private member variables.
 - **getChannelType** `[fn]` in [FilterDesignView](/docs/api/disp/filter-design-view) — Returns the current channel type which is to be filtered.
 - **getClientId** `[fn]` in `RtDataClient` — Requests the ID at mne_rt_server and returns it.
 - **getClusteringStatusChanged** `[fn]` in [FwdSettingsView](/docs/api/disp/fwd-settings-view) — Get status of clustering check box.
@@ -2096,7 +2096,7 @@ Index of 6237 public class members (functions, variables, typedefs, enums) acros
 - **getCurrentSelectGroup** `[fn]` in [AveragingSettingsView](/docs/api/disp/averaging-settings-view)
 - **getCurrentStimCh** `[fn]` in [AveragingSettingsView](/docs/api/disp/averaging-settings-view)
 - **getCurrentTriggerIndex** `[fn]` in [RtFiffRawViewModel](/docs/api/disp/rt-fiff-raw-view-model) — Returns the current trigger channel index.
-- **getData** `[fn]` in `InvHpiDataUpdater`
+- **getData** `[fn]` in [InvHpiDataUpdater](/docs/api/inv/inv-hpi-data-updater)
 - **getDataRange** `[fn]` in `SourceEstimateOverlay` — Get the data range (min/max values) across all time points for auto-thresholding.
 - **getDefault** `[fn]` in [FiffId](/docs/api/fiff/fiff-id) — Returns a default [`FiffId`](/docs/api/fiff/fiff-id) object to be used as a mutable placeholder for a default instance of the class.
 - **getDesignMethod** `[fn]` in [FilterKernel](/docs/api/dsp/filter-kernel)
@@ -2148,7 +2148,7 @@ Index of 6237 public class members (functions, variables, typedefs, enums) acros
 - **getFullOutstrength** `[fn]` in [NetworkNode](/docs/api/connectivity/network-node) — Returns node strength of all outgoing edges corresponding to the full network.
 - **getFullStrength** `[fn]` in [NetworkNode](/docs/api/connectivity/network-node) — Returns node strength corresponding to the full network.
 - **getHighpassFreq** `[fn]` in [FilterKernel](/docs/api/dsp/filter-kernel)
-- **getHpiDigitizer** `[fn]` in `InvHpiDataUpdater`
+- **getHpiDigitizer** `[fn]` in [InvHpiDataUpdater](/docs/api/inv/inv-hpi-data-updater)
 - **getHubStatus** `[fn]` in [NetworkNode](/docs/api/connectivity/network-node) — Returns flag describing whether this node is a hub or not.
 - **getId** `[fn]` in [NetworkNode](/docs/api/connectivity/network-node) — Returns the node id.
 - **getIdxSelMap** `[fn]` in [EvokedSetModel](/docs/api/disp/evoked-set-model) — Returns a map which conatins the channel idx and its corresponding selection status.
@@ -2207,7 +2207,7 @@ Index of 6237 public class members (functions, variables, typedefs, enums) acros
 - **getName** `[fn]` in [FilterKernel](/docs/api/dsp/filter-kernel)
 - **getName** `[fn]` in [FilterParameter](/docs/api/utils/filter-parameter) — Returns parameter name.
 - **getName** `[fn]` in [InvMinimumNorm](/docs/api/inv/inv-minimum-norm) — Get the name of the inverse operator.
-- **getName** `[fn]` in `InvPwlRapMusic`
+- **getName** `[fn]` in [InvPwlRapMusic](/docs/api/inv/inv-pwl-rap-music)
 - **getName** `[fn]` in [InvRapMusic](/docs/api/inv/inv-rap-music)
 - **getNames** `[fn]` in [FsColortable](/docs/api/fs/fs-colortable) — Names encoded in the colortable.
 - **getNodeAt** `[fn]` in [Network](/docs/api/connectivity/network) — Returns the node at a specific position.
@@ -2227,8 +2227,8 @@ Index of 6237 public class members (functions, variables, typedefs, enums) acros
 - **getPostStimMSeconds** `[fn]` in [AveragingSettingsView](/docs/api/disp/averaging-settings-view)
 - **getPreparedInverseOperator** `[fn]` in [InvMinimumNorm](/docs/api/inv/inv-minimum-norm) — Get the prepared inverse operator.
 - **getPreStimMSeconds** `[fn]` in [AveragingSettingsView](/docs/api/disp/averaging-settings-view)
-- **getProjectedData** `[fn]` in `InvHpiDataUpdater`
-- **getProjectors** `[fn]` in `InvHpiDataUpdater`
+- **getProjectedData** `[fn]` in [InvHpiDataUpdater](/docs/api/inv/inv-hpi-data-updater)
+- **getProjectors** `[fn]` in [InvHpiDataUpdater](/docs/api/inv/inv-hpi-data-updater)
 - **getProjectors** `[fn]` in [ProjectorsView](/docs/api/disp/projectors-view) — Get the current projectors.
 - **getPsf** `[fn]` in [InvResolutionMatrix](/docs/api/inv/inv-resolution-matrix) — Extract the point-spread function (PSF) for a given source index.
 - **getPsfs** `[fn]` in [InvResolutionMatrix](/docs/api/inv/inv-resolution-matrix) — Extract PSFs for multiple source indices.
@@ -2249,7 +2249,7 @@ Index of 6237 public class members (functions, variables, typedefs, enums) acros
 - **getSelectedChannels** `[fn]` in [ChannelSelectionView](/docs/api/disp/channel-selection-view) — Current selected channels This function returns the current channel selection.
 - **getSelectedStimChannel** `[fn]` in [TriggerDetectionView](/docs/api/disp/trigger-detection-view) — Gets currently selected STIM channel in GUI.
 - **getSelectedViews** `[fn]` in [ApplyToView](/docs/api/disp/apply-to-view)
-- **getSensors** `[fn]` in `InvHpiDataUpdater`
+- **getSensors** `[fn]` in [InvHpiDataUpdater](/docs/api/inv/inv-hpi-data-updater)
 - **getShortDescription** `[fn]` in [FilterKernel](/docs/api/dsp/filter-kernel)
 - **getSignalColor** `[fn]` in [FiffRawViewSettings](/docs/api/disp/fiff-raw-view-settings) — Returns the current signal color.
 - **getSignalColor** `[fn]` in [RtFiffRawView](/docs/api/disp/rt-fiff-raw-view) — Returns the signal color.
@@ -2313,10 +2313,10 @@ Index of 6237 public class members (functions, variables, typedefs, enums) acros
 - **getZoom** `[fn]` in [FiffRawViewSettings](/docs/api/disp/fiff-raw-view-settings) — Returns the current zoom.
 - **getZoom** `[fn]` in [RtFiffRawView](/docs/api/disp/rt-fiff-raw-view) — Get the current zoom.
 - **GoF** `[var]` in `HpiFitResult`
-- **good** `[var]` in `InvEcd` — Goodness of fit.
+- **good** `[var]` in [InvEcd](/docs/api/inv/inv-ecd) — Goodness of fit.
 - **goodness** `[var]` in `InvFocalDipole` — Goodness-of-fit (0..1).
-- **grad_reg** `[var]` in `InvDipoleFitSettings` — Noise-covariance matrix regularization for planar gradiometers.
-- **grad_std** `[var]` in `InvDipoleFitSettings` — Standard deviation for gradiometers if noise covariance is not specified.
+- **grad_reg** `[var]` in [InvDipoleFitSettings](/docs/api/inv/inv-dipole-fit-settings) — Noise-covariance matrix regularization for planar gradiometers.
+- **grad_std** `[var]` in [InvDipoleFitSettings](/docs/api/inv/inv-dipole-fit-settings) — Standard deviation for gradiometers if noise covariance is not specified.
 - **grandAveFile** `[var]` in `ProcessingSettings` — Grand average output file.
 - **grandCovFile** `[var]` in `ProcessingSettings` — Grand covariance output file.
 - **GrangerCausality** `[fn]` in [GrangerCausality](/docs/api/connectivity/granger-causality) — Constructs a [`GrangerCausality`](/docs/api/connectivity/granger-causality) object.
@@ -2331,14 +2331,14 @@ Index of 6237 public class members (functions, variables, typedefs, enums) acros
 - **gridRows** `[var]` in `ElectrodeArray` — Grid only: number of rows.
 - **gridVisible** `[fn]` in [ChannelRhiView](/docs/api/disp/channel-rhi-view)
 - **growLabel** `[fn]` in [FsLabelUtils](/docs/api/fs/fs-label-utils) — Grow a label by expanding along the surface mesh.
-- **guess_exclude** `[var]` in `InvDipoleFitSettings` — Exclude points closer than this to the origin.
-- **guess_fwd** `[var]` in `InvGuessData` — Forward solutions for the guesses.
-- **guess_grid** `[var]` in `InvDipoleFitSettings` — Grid spacing.
-- **guess_mindist** `[var]` in `InvDipoleFitSettings` — Minimum allowed distance to the surface.
-- **guess_rad** `[var]` in `InvDipoleFitSettings` — Radius of spherical guess surface.
-- **guess_surfname** `[var]` in `InvDipoleFitSettings` — Load the inner skull surface from this BEM file.
-- **guessname** `[var]` in `InvDipoleFitSettings` — Initial guess grid (if not present, the values below will be employed to generate the grid).
-- **gui** `[var]` in `InvDipoleFitSettings` — Should the GUI be shown?
+- **guess_exclude** `[var]` in [InvDipoleFitSettings](/docs/api/inv/inv-dipole-fit-settings) — Exclude points closer than this to the origin.
+- **guess_fwd** `[var]` in [InvGuessData](/docs/api/inv/inv-guess-data) — Forward solutions for the guesses.
+- **guess_grid** `[var]` in [InvDipoleFitSettings](/docs/api/inv/inv-dipole-fit-settings) — Grid spacing.
+- **guess_mindist** `[var]` in [InvDipoleFitSettings](/docs/api/inv/inv-dipole-fit-settings) — Minimum allowed distance to the surface.
+- **guess_rad** `[var]` in [InvDipoleFitSettings](/docs/api/inv/inv-dipole-fit-settings) — Radius of spherical guess surface.
+- **guess_surfname** `[var]` in [InvDipoleFitSettings](/docs/api/inv/inv-dipole-fit-settings) — Load the inner skull surface from this BEM file.
+- **guessname** `[var]` in [InvDipoleFitSettings](/docs/api/inv/inv-dipole-fit-settings) — Initial guess grid (if not present, the values below will be employed to generate the grid).
+- **gui** `[var]` in [InvDipoleFitSettings](/docs/api/inv/inv-dipole-fit-settings) — Should the GUI be shown?
 - **GuiMode** `[enum]` in [AbstractView](/docs/api/disp/abstract-view)
 - **guiStyleChanged** `[signal]` in [AbstractView](/docs/api/disp/abstract-view) — Signal emited whenever the gui style mode changes.
 - **guiStyleChanged** `[fn]` in [FilterDesignView](/docs/api/disp/filter-design-view) — Process the event of style mode change in an upper class.
@@ -2479,7 +2479,7 @@ Index of 6237 public class members (functions, variables, typedefs, enums) acros
 - **iLabelIdxIn** `[var]` in `RegionMT` — Label index passed through to the output.
 - **iLabelIdxOut** `[var]` in `RegionDataOut` — FsLabel ID.
 - **iLabelIdxOut** `[var]` in `RegionMTOut` — Label index carried through from the input.
-- **iLineFreq** `[fn]` in `InvHpiModelParameters`
+- **iLineFreq** `[fn]` in [InvHpiModelParameters](/docs/api/inv/inv-hpi-model-parameters)
 - **ImagCoherence** `[fn]` in [ImagCoherence](/docs/api/connectivity/imag-coherence) — Constructs a [`ImagCoherence`](/docs/api/connectivity/imag-coherence) object.
 - **image** `[fn]` in [SliceObject](/docs/api/disp3-d/slice-object)
 - **image** `[var]` in `TileResult`
@@ -2496,9 +2496,9 @@ Index of 6237 public class members (functions, variables, typedefs, enums) acros
 - **in_order** `[var]` in [MNESssData](/docs/api/mne/mne-sss-data) — Order of the inside expansion.
 - **in_use** `[var]` in [MNEDeriv](/docs/api/mne/mne-deriv) — Per-column count of non-zero elements in the derivation data.
 - **include_eeg** `[var]` in [ComputeFwdSettings](/docs/api/fwd/compute-fwd-settings)
-- **include_eeg** `[var]` in `InvDipoleFitSettings` — Use EEG?
+- **include_eeg** `[var]` in [InvDipoleFitSettings](/docs/api/inv/inv-dipole-fit-settings) — Use EEG?
 - **include_meg** `[var]` in [ComputeFwdSettings](/docs/api/fwd/compute-fwd-settings)
-- **include_meg** `[var]` in `InvDipoleFitSettings` — Use MEG?
+- **include_meg** `[var]` in [InvDipoleFitSettings](/docs/api/inv/inv-dipole-fit-settings) — Use MEG?
 - **includeConnectivity** `[var]` in `InvTokenizeOptions` — Emit connectivity matrices.
 - **includeCouplings** `[var]` in `InvTokenizeOptions` — Emit source coupling annotations.
 - **includeFocalDipoles** `[var]` in `InvTokenizeOptions` — Emit focal dipole layer.
@@ -2516,7 +2516,7 @@ Index of 6237 public class members (functions, variables, typedefs, enums) acros
 - **iNeighbours** `[var]` in `BadChannelDetectParams` — Number of channels on each side to use as neighbours.
 - **iNfft** `[var]` in `TaperedSpectraInputData`
 - **info** `[var]` in [FiffEvoked](/docs/api/fiff/fiff-evoked) — Measurement info.
-- **info** `[var]` in `FiffEvokedSet` — FIFF measurement information.
+- **info** `[var]` in [FiffEvokedSet](/docs/api/fiff/fiff-evoked-set) — FIFF measurement information.
 - **info** `[var]` in [FiffRawData](/docs/api/fiff/fiff-raw-data) — [`Fiff`](/docs/api/fiff/fiff-class) measurement information.
 - **info** `[var]` in [MNEForwardSolution](/docs/api/mne/mne-forward-solution) — light weighted measurement info.
 - **info** `[var]` in [MNEInverseOperator](/docs/api/mne/mne-inverse-operator) — Lightweight measurement info (channel names, types, etc.).
@@ -2524,7 +2524,7 @@ Index of 6237 public class members (functions, variables, typedefs, enums) acros
 - **info** `[var]` in `SensorLoadResult` — Channel / dig info.
 - **info** `[fn]` in [stream_outlet](/docs/api/lsl/stream_outlet) — Get the [`stream_info`](/docs/api/lsl/stream_info) associated with this outlet (including the assigned data port).
 - **iNFreqs** `[var]` in `InvTfMxneParams` — Number of frequency bins for Gabor dictionary.
-- **iNHpiCoils** `[fn]` in `InvHpiModelParameters`
+- **iNHpiCoils** `[fn]` in [InvHpiModelParameters](/docs/api/inv/inv-hpi-model-parameters)
 - **iNin** `[var]` in `Basis` — N_in = iOrderIn*(iOrderIn+2).
 - **init** `[fn]` in [ChannelDataModel](/docs/api/disp/channel-data-model) — Initialise with channel metadata from a FiffInfo.
 - **init** `[fn]` in [ChannelDataView](/docs/api/disp/channel-data-view) — Initialise the view from a FiffInfo (channel names, types, sampling rate).
@@ -2560,7 +2560,7 @@ Index of 6237 public class members (functions, variables, typedefs, enums) acros
 - **instanceBuffer** `[fn]` in `PolylineObject`
 - **instanceCount** `[fn]` in `DipoleObject`
 - **instanceCount** `[fn]` in `PolylineObject`
-- **integ** `[var]` in `InvDipoleFitSettings` — Integration time for each fit (s).
+- **integ** `[var]` in [InvDipoleFitSettings](/docs/api/inv/inv-dipole-fit-settings) — Integration time for each fit (s).
 - **interpolateSignal** `[fn]` in [Interpolation](/docs/api/disp3-d/interpolation) — interpolateSignal Interpolates sensor data using the weight matrix (shared pointer version).
 - **interpolateSignal** `[fn]` in [Interpolation](/docs/api/disp3-d/interpolation) — interpolateSignal Interpolates sensor data using the weight matrix (reference version).
 - **Interpolation** `[fn]` in [Interpolation](/docs/api/disp3-d/interpolation)
@@ -2578,48 +2578,48 @@ Index of 6237 public class members (functions, variables, typedefs, enums) acros
 - **inuse** `[var]` in [MNESurfaceOrVolume](/docs/api/mne/mne-surface-or-volume) — Boolean array indicating whether each vertex is in use in the source space (np elements).
 - **inv_lambda** `[var]` in [MNECovMatrix](/docs/api/mne/mne-cov-matrix) — Inverse square-roots of eigenvalues (for whitening).
 - **invalidateMergedGroup** `[fn]` in `BrainRenderer` — Mark a merged group as dirty so it is rebuilt on the next prepareMergedSurfaces call.
-- **InvBeamformer** `[fn]` in `InvBeamformer` — Default constructor — produces an empty (invalid) beamformer.
+- **InvBeamformer** `[fn]` in [InvBeamformer](/docs/api/inv/inv-beamformer) — Default constructor — produces an empty (invalid) beamformer.
 - **InvConnectivity** `[fn]` in `InvConnectivity`
-- **InvDipole** `[fn]` in `InvDipole` — Default constructor.
+- **InvDipole** `[fn]` in [InvDipole](/docs/api/inv/inv-dipole) — Default constructor.
 - **InvDipoleFit** `[fn]` in [InvDipoleFit](/docs/api/inv/inv-dipole-fit) — Constructs Dipole Fit algorithm.
-- **InvDipoleFitData** `[fn]` in `InvDipoleFitData` — Default Constructor.
-- **InvDipoleFitSettings** `[fn]` in `InvDipoleFitSettings` — Default Constructor.
-- **InvDipoleFitSettings** `[fn]` in `InvDipoleFitSettings` — Constructs Dipole Fit Settings.
-- **InvDipoleForward** `[fn]` in `InvDipoleForward` — Constructs a default (empty) `InvDipoleForward`.
-- **InvEcd** `[fn]` in `InvEcd` — Constructs the Electric Current Dipole.
-- **InvEcd** `[fn]` in `InvEcd` — Copy constructor.
-- **InvEcdSet** `[fn]` in `InvEcdSet` — Constructs a Electric Current Dipole Set object.
-- **InvEcdSet** `[fn]` in `InvEcdSet` — Copy constructor.
+- **InvDipoleFitData** `[fn]` in [InvDipoleFitData](/docs/api/inv/inv-dipole-fit-data) — Default Constructor.
+- **InvDipoleFitSettings** `[fn]` in [InvDipoleFitSettings](/docs/api/inv/inv-dipole-fit-settings) — Default Constructor.
+- **InvDipoleFitSettings** `[fn]` in [InvDipoleFitSettings](/docs/api/inv/inv-dipole-fit-settings) — Constructs Dipole Fit Settings.
+- **InvDipoleForward** `[fn]` in [InvDipoleForward](/docs/api/inv/inv-dipole-forward) — Constructs a default (empty) [`InvDipoleForward`](/docs/api/inv/inv-dipole-forward).
+- **InvEcd** `[fn]` in [InvEcd](/docs/api/inv/inv-ecd) — Constructs the Electric Current Dipole.
+- **InvEcd** `[fn]` in [InvEcd](/docs/api/inv/inv-ecd) — Copy constructor.
+- **InvEcdSet** `[fn]` in [InvEcdSet](/docs/api/inv/inv-ecd-set) — Constructs a Electric Current Dipole Set object.
+- **InvEcdSet** `[fn]` in [InvEcdSet](/docs/api/inv/inv-ecd-set) — Copy constructor.
 - **inverseTransform** `[fn]` in [DecodingCsp](/docs/api/decoding/decoding-csp) — Project CSP power features back to sensor space.
-- **inversion** `[var]` in `InvBeamformer` — Inversion method used.
+- **inversion** `[var]` in [InvBeamformer](/docs/api/inv/inv-beamformer) — Inversion method used.
 - **invert** `[var]` in [MNELayoutPort](/docs/api/mne/mne-layout-port) — Invert the signal coming to this port.
 - **invert_transform** `[fn]` in [Fiff](/docs/api/fiff/fiff-class) — fiff_invert_transform
 - **invert_transform** `[fn]` in [FiffCoordTrans](/docs/api/fiff/fiff-coord-trans) — Invert a coordinate transformation (actual obsolete - cause trans and inverse are both stored).
 - **inverted** `[fn]` in [FiffCoordTrans](/docs/api/fiff/fiff-coord-trans) — Returns a new inverted copy of this transformation (swaps from/to and trans/invtrans).
 - **invertSlider** `[fn]` in [ScaleControl](/docs/api/disp/scale-control) — Invert the effect of sliding the control slider to the right.
 - **InvFocalDipole** `[fn]` in `InvFocalDipole`
-- **InvGuessData** `[fn]` in `InvGuessData` — Constructs the Guess Data Refactored: new_guess_data (dipole_fit_setup.c).
-- **InvGuessData** `[fn]` in `InvGuessData` — Deleted — non-copyable due to unique_ptr members.
-- **InvGuessData** `[fn]` in `InvGuessData` — Constructs the Guess Data from given Data Refactored: make_guess_data (setup.c).
-- **InvGuessData** `[fn]` in `InvGuessData` — Constructs the Guess Data from given Data Refactored: make_guess_data (dipole_fit_setup.c).
-- **InvHpiDataUpdater** `[fn]` in `InvHpiDataUpdater` — Constructs a `InvHpiDataUpdater` object.
+- **InvGuessData** `[fn]` in [InvGuessData](/docs/api/inv/inv-guess-data) — Constructs the Guess Data Refactored: new_guess_data (dipole_fit_setup.c).
+- **InvGuessData** `[fn]` in [InvGuessData](/docs/api/inv/inv-guess-data) — Deleted — non-copyable due to unique_ptr members.
+- **InvGuessData** `[fn]` in [InvGuessData](/docs/api/inv/inv-guess-data) — Constructs the Guess Data from given Data Refactored: make_guess_data (setup.c).
+- **InvGuessData** `[fn]` in [InvGuessData](/docs/api/inv/inv-guess-data) — Constructs the Guess Data from given Data Refactored: make_guess_data (dipole_fit_setup.c).
+- **InvHpiDataUpdater** `[fn]` in [InvHpiDataUpdater](/docs/api/inv/inv-hpi-data-updater) — Constructs a [`InvHpiDataUpdater`](/docs/api/inv/inv-hpi-data-updater) object.
 - **InvHpiFit** `[fn]` in [InvHpiFit](/docs/api/inv/inv-hpi-fit) — Default constructor.
-- **InvHpiFit** `[fn]` in [InvHpiFit](/docs/api/inv/inv-hpi-fit) — Constructs the HPI from a `InvSensorSet`.
-- **InvHpiFitData** `[fn]` in `InvHpiFitData` — Default constructor.
-- **InvHpiModelParameters** `[fn]` in `InvHpiModelParameters` — Defaul Constructor.
-- **InvHpiModelParameters** `[fn]` in `InvHpiModelParameters` — Constructs a `InvHpiModelParameters` object.
-- **InvHpiModelParameters** `[fn]` in `InvHpiModelParameters` — Copy constructor.
+- **InvHpiFit** `[fn]` in [InvHpiFit](/docs/api/inv/inv-hpi-fit) — Constructs the HPI from a [`InvSensorSet`](/docs/api/inv/inv-sensor-set).
+- **InvHpiFitData** `[fn]` in [InvHpiFitData](/docs/api/inv/inv-hpi-fit-data) — Default constructor.
+- **InvHpiModelParameters** `[fn]` in [InvHpiModelParameters](/docs/api/inv/inv-hpi-model-parameters) — Defaul Constructor.
+- **InvHpiModelParameters** `[fn]` in [InvHpiModelParameters](/docs/api/inv/inv-hpi-model-parameters) — Constructs a [`InvHpiModelParameters`](/docs/api/inv/inv-hpi-model-parameters) object.
+- **InvHpiModelParameters** `[fn]` in [InvHpiModelParameters](/docs/api/inv/inv-hpi-model-parameters) — Copy constructor.
 - **InvMinimumNorm** `[fn]` in [InvMinimumNorm](/docs/api/inv/inv-minimum-norm) — Constructs minimum norm inverse algorithm.
 - **InvMinimumNorm** `[fn]` in [InvMinimumNorm](/docs/api/inv/inv-minimum-norm) — Constructs minimum norm inverse algorithm.
 - **invOperatorCalculated** `[signal]` in [RtInvOp](/docs/api/dsp/rt-inv-op) — Signal which is emitted when a inverse operator is calculated.
-- **InvPwlRapMusic** `[fn]` in `InvPwlRapMusic` — Default constructor creates an empty POWELL RAP MUSIC algorithm which still needs to be initialized.
-- **InvPwlRapMusic** `[fn]` in `InvPwlRapMusic` — Constructor which initializes the POWELL RAP MUSIC algorithm with the given model.
+- **InvPwlRapMusic** `[fn]` in [InvPwlRapMusic](/docs/api/inv/inv-pwl-rap-music) — Default constructor creates an empty POWELL RAP MUSIC algorithm which still needs to be initialized.
+- **InvPwlRapMusic** `[fn]` in [InvPwlRapMusic](/docs/api/inv/inv-pwl-rap-music) — Constructor which initializes the POWELL RAP MUSIC algorithm with the given model.
 - **InvRapMusic** `[fn]` in [InvRapMusic](/docs/api/inv/inv-rap-music) — Default constructor creates an empty [`InvRapMusic`](/docs/api/inv/inv-rap-music) algorithm which still needs to be initialized.
 - **InvRapMusic** `[fn]` in [InvRapMusic](/docs/api/inv/inv-rap-music) — Constructor which initializes the [`InvRapMusic`](/docs/api/inv/inv-rap-music) algorithm with the given model.
-- **InvSensorSet** `[fn]` in `InvSensorSet` — Default Constructor.
-- **InvSensorSet** `[fn]` in `InvSensorSet` — `InvSensorSet` that yiealds sensor position, orientation and weights for geometric averaging.
-- **InvSensorSetCreator** `[fn]` in `InvSensorSetCreator` — Constructs a MEG `InvSensorSet` object.
-- **InvSignalModel** `[fn]` in `InvSignalModel` — Constructs a `InvSignalModel` object.
+- **InvSensorSet** `[fn]` in [InvSensorSet](/docs/api/inv/inv-sensor-set) — Default Constructor.
+- **InvSensorSet** `[fn]` in [InvSensorSet](/docs/api/inv/inv-sensor-set) — [`InvSensorSet`](/docs/api/inv/inv-sensor-set) that yiealds sensor position, orientation and weights for geometric averaging.
+- **InvSensorSetCreator** `[fn]` in [InvSensorSetCreator](/docs/api/inv/inv-sensor-set-creator) — Constructs a MEG [`InvSensorSet`](/docs/api/inv/inv-sensor-set) object.
+- **InvSignalModel** `[fn]` in [InvSignalModel](/docs/api/inv/inv-signal-model) — Constructs a [`InvSignalModel`](/docs/api/inv/inv-signal-model) object.
 - **InvSourceCoupling** `[fn]` in `InvSourceCoupling`
 - **InvSourceEstimate** `[fn]` in [InvSourceEstimate](/docs/api/inv/inv-source-estimate) — Default constructor.
 - **InvSourceEstimate** `[fn]` in [InvSourceEstimate](/docs/api/inv/inv-source-estimate) — Constructs a source estimation from given data.
@@ -2664,11 +2664,11 @@ Index of 6237 public class members (functions, variables, typedefs, enums) acros
 - **is_magnetometer_coil_type** `[fn]` in [FwdCoilSet](/docs/api/fwd/fwd-coil-set) — Checks if a set of templates contains a magnetometer of a specified type.
 - **is_planar_coil** `[fn]` in [FwdCoil](/docs/api/fwd/fwd-coil) — Checks if this is an planar coil.
 - **is_planar_coil_type** `[fn]` in [FwdCoilSet](/docs/api/fwd/fwd-coil-set) — Checks if a set of templates contains a planar coil of a specified type.
-- **is_raw** `[var]` in `InvDipoleFitSettings` — Is this a raw data file.
+- **is_raw** `[var]` in [InvDipoleFitSettings](/docs/api/inv/inv-dipole-fit-settings) — Is this a raw data file.
 - **is_skip** `[var]` in [MNERawBufDef](/docs/api/mne/mne-raw-buf-def) — True if this buffer represents a data skip.
 - **isActive** `[fn]` in `CommandManager` — Returns if `CommandManager` is active.
 - **isActive** `[fn]` in [NetworkEdge](/docs/api/connectivity/network-edge) — Returns the activity flag of this edge.
-- **iSampleFreq** `[fn]` in `InvHpiModelParameters`
+- **iSampleFreq** `[fn]` in [InvHpiModelParameters](/docs/api/inv/inv-hpi-model-parameters)
 - **isAvailable** `[fn]` in [PythonTestHelper](/docs/api/utils/python-test-helper) — Check if Python is available and MNE-Python is importable.
 - **isBrainSurfaceKey** `[fn]` in `SubView` — True when `key` identifies a brain-tissue surface (lh_/rh_) as opposed to BEM, sensor, digitizer, or source-space geometry.
 - **isCancelled** `[fn]` in `StcLoadingWorker`
@@ -2711,7 +2711,7 @@ Index of 6237 public class members (functions, variables, typedefs, enums) acros
 - **isFreezed** `[fn]` in [EvokedSetModel](/docs/api/disp/evoked-set-model) — Returns current freezing status.
 - **isFreezed** `[fn]` in [FrequencySpectrumModel](/docs/api/disp/frequency-spectrum-model) — Returns current freezing status.
 - **isFreezed** `[fn]` in [RtFiffRawViewModel](/docs/api/disp/rt-fiff-raw-view-model) — Returns current freezing status.
-- **isFreOri** `[var]` in `InvBeamformer` — True if free orientation (n_orient = 3).
+- **isFreOri** `[var]` in [InvBeamformer](/docs/api/inv/inv-beamformer) — True if free orientation (n_orient = 3).
 - **isFrozen** `[fn]` in [ChannelRhiView](/docs/api/disp/channel-rhi-view)
 - **isInfoPanelVisible** `[slot]` in `BrainView` — Whether the info panel is currently visible.
 - **isInit** `[fn]` in [EvokedSetModel](/docs/api/disp/evoked-set-model) — Returns whether this class is initalized.
@@ -2748,7 +2748,7 @@ Index of 6237 public class members (functions, variables, typedefs, enums) acros
 - **issueSliceDraw** `[fn]` in `BrainRenderer` — Issue draw commands for a prepared MRI slice.
 - **issueSurfaceDraw** `[fn]` in `BrainRenderer` — Issue draw commands for a surface using a pre-computed uniform offset.
 - **isValid** `[fn]` in [BidsRawData](/docs/api/bids/bids-raw-data) — Returns true if the data was loaded successfully.
-- **isValid** `[fn]` in `InvBeamformer` — Returns true if this beamformer contains valid filter weights.
+- **isValid** `[fn]` in [InvBeamformer](/docs/api/inv/inv-beamformer) — Returns true if this beamformer contains valid filter weights.
 - **isValid** `[fn]` in [MriVolData](/docs/api/mri/mri-vol-data) — Returns whether this volume contains valid data.
 - **isValidEeg** `[fn]` in [FiffChInfo](/docs/api/fiff/fiff-ch-info) — Check whether this channel has a valid EEG electrode position.
 - **isValidEntityValue** `[fn]` in [BIDSPath](/docs/api/bids/bids-path) — Validates entity values (no forbidden characters: -, _, /).
@@ -2778,7 +2778,7 @@ Index of 6237 public class members (functions, variables, typedefs, enums) acros
 
 - **kBarHeight** `[var]` in [OverviewBarWidget](/docs/api/disp/overview-bar-widget)
 - **keepTempFile** `[var]` in `MnaScript` — true → preserve temp script file after execution (debug aid)
-- **khi2** `[var]` in `InvEcd` — khi^2 value.
+- **khi2** `[var]` in [InvEcd](/docs/api/inv/inv-ecd) — khi^2 value.
 - **khi2** `[var]` in `InvFocalDipole` — Chi-squared value of the fit.
 - **kind** `[var]` in `DigitizedPoint`
 - **kind** `[var]` in [FiffChInfo](/docs/api/fiff/fiff-ch-info) — Kind of channel.
@@ -2789,7 +2789,7 @@ Index of 6237 public class members (functions, variables, typedefs, enums) acros
 - **kind** `[var]` in `FiffExplainEntry`
 - **kind** `[var]` in [FiffProj](/docs/api/fiff/fiff-proj) — [`Fiff`](/docs/api/fiff/fiff-class) kind.
 - **kind** `[var]` in [FiffTag](/docs/api/fiff/fiff-tag) — Tag number.
-- **kind** `[var]` in `InvBeamformer` — "LCMV" or "DICS".
+- **kind** `[var]` in [InvBeamformer](/docs/api/inv/inv-beamformer) — "LCMV" or "DICS".
 - **kind** `[var]` in [MNEChSelection](/docs/api/mne/mne-ch-selection) — Loaded from file or created here?
 - **kind** `[var]` in [MNECovMatrix](/docs/api/mne/mne-cov-matrix) — Covariance kind: sensor or source.
 - **kind** `[var]` in [MNECTFCompData](/docs/api/mne/mnectf-comp-data) — The CTF compensation kind constant.
@@ -2967,15 +2967,15 @@ Index of 6237 public class members (functions, variables, typedefs, enums) acros
 - **m_bShowAll** `[var]` in [SelectionItem](/docs/api/disp/selection-item) — Whether to show all channels.
 - **m_bStorageModeIsActive** `[var]` in [AbstractMetric](/docs/api/connectivity/abstract-metric)
 - **m_cChannelColor** `[var]` in [SelectionSceneItem](/docs/api/disp/selection-scene-item) — The current channel color.
-- **m_coilPos** `[var]` in `InvHpiFitData`
+- **m_coilPos** `[var]` in [InvHpiFitData](/docs/api/inv/inv-hpi-fit-data)
 - **m_colorDefault** `[var]` in [AverageSceneItem](/docs/api/disp/average-scene-item) — The color for the avergaed signal.
 - **m_designMethods** `[var]` in [FilterKernel](/docs/api/dsp/filter-kernel) — Vector of possible filter design methods.
-- **m_Dipole1** `[var]` in `InvDipolePair` — `InvDipole` one.
-- **m_Dipole2** `[var]` in `InvDipolePair` — `InvDipole` two.
+- **m_Dipole1** `[var]` in `InvDipolePair` — [`InvDipole`](/docs/api/inv/inv-dipole) one.
+- **m_Dipole2** `[var]` in `InvDipolePair` — [`InvDipole`](/docs/api/inv/inv-dipole) two.
 - **m_dMaxAxisX** `[var]` in [Spline](/docs/api/disp/spline) — Display value of the largest point on the series in x-axis.
 - **m_dMinAxisX** `[var]` in [Spline](/docs/api/disp/spline) — Display value of the smallest point of the series in x-axis.
-- **m_errorInfo** `[var]` in `InvHpiFitData`
-- **m_fAbortError** `[var]` in `InvHpiFitData`
+- **m_errorInfo** `[var]` in [InvHpiFitData](/docs/api/inv/inv-hpi-fit-data)
+- **m_fAbortError** `[var]` in [InvHpiFitData](/docs/api/inv/inv-hpi-fit-data)
 - **m_filterTypes** `[var]` in [FilterKernel](/docs/api/dsp/filter-kernel) — Vector of possible filter design types.
 - **m_firstLastSample** `[var]` in [AverageSceneItem](/docs/api/disp/average-scene-item) — The first and last sample.
 - **m_iChannelKind** `[var]` in [AverageSceneItem](/docs/api/disp/average-scene-item) — The channel kind.
@@ -2993,21 +2993,21 @@ Index of 6237 public class members (functions, variables, typedefs, enums) acros
 - **m_iIdx1** `[var]` in `InvDipolePair` — Index of dipole one.
 - **m_iIdx2** `[var]` in `InvDipolePair` — Index of dipole two.
 - **m_iMaxHeigth** `[var]` in [AverageSceneItem](/docs/api/disp/average-scene-item) — The max heigth.
-- **m_iMaxIterations** `[var]` in `InvHpiFitData`
+- **m_iMaxIterations** `[var]` in [InvHpiFitData](/docs/api/inv/inv-hpi-fit-data)
 - **m_iMaxWidth** `[var]` in [AverageSceneItem](/docs/api/disp/average-scene-item) — The max width.
 - **m_iNumberBinAmount** `[var]` in [AbstractMetric](/docs/api/connectivity/abstract-metric)
 - **m_iNumberBinStart** `[var]` in [AbstractMetric](/docs/api/connectivity/abstract-metric)
 - **m_iTotalNumberChannels** `[var]` in [AverageSceneItem](/docs/api/disp/average-scene-item) — The total number of channels loaded in the curent evoked data set.
 - **m_lAverageData** `[var]` in [AverageSceneItem](/docs/api/disp/average-scene-item) — The channels average data which is to be plotted.
-- **m_matProjector** `[var]` in `InvHpiFitData`
+- **m_matProjector** `[var]` in [InvHpiFitData](/docs/api/inv/inv-hpi-fit-data)
 - **m_OperatorType** `[var]` in [MNEOperator](/docs/api/disp/mne-operator)
 - **m_pDigitizerData** `[var]` in `MetaData` — Head-shape digitizer point set.
 - **m_pInfo** `[var]` in `MetaData` — Measurement information (channel layout, sampling rate, etc.).
-- **m_qlistEvoked** `[var]` in `FiffIO` — List of evoked data sets.
+- **m_qlistEvoked** `[var]` in [FiffIO](/docs/api/fiff/fiff-io) — List of evoked data sets.
 - **m_qListParamDescriptions** `[var]` in `Command` — Per-parameter description strings.
 - **m_qListParamNames** `[var]` in `Command` — Parameter names (positional order).
 - **m_qListParamValues** `[var]` in `Command` — Current parameter values (same order as names).
-- **m_qlistRaw** `[var]` in `FiffIO` — List of raw data sets.
+- **m_qlistRaw** `[var]` in [FiffIO](/docs/api/fiff/fiff-io) — List of raw data sets.
 - **m_qMapAverageActivation** `[var]` in [AverageSceneItem](/docs/api/disp/average-scene-item) — The average activation information.
 - **m_qMapAverageColor** `[var]` in [AverageSceneItem](/docs/api/disp/average-scene-item) — The average color information.
 - **m_qpChannelPosition** `[var]` in [AverageSceneItem](/docs/api/disp/average-scene-item) — The channels 2D position in the scene.
@@ -3020,8 +3020,8 @@ Index of 6237 public class members (functions, variables, typedefs, enums) acros
 - **m_sChannelName** `[var]` in [SelectionSceneItem](/docs/api/disp/selection-scene-item) — The channel's name.
 - **m_sCommand** `[var]` in `Command` — The command keyword.
 - **m_sDescription** `[var]` in `Command` — Human-readable description of the command.
-- **m_sensorData** `[var]` in `InvHpiFitData`
-- **m_sensors** `[var]` in `InvHpiFitData`
+- **m_sensorData** `[var]` in [InvHpiFitData](/docs/api/inv/inv-hpi-fit-data)
+- **m_sensors** `[var]` in [InvHpiFitData](/docs/api/inv/inv-hpi-fit-data)
 - **m_sName** `[var]` in [MNEOperator](/docs/api/disp/mne-operator)
 - **m_sViewsToApply** `[var]` in [SelectionItem](/docs/api/disp/selection-item)
 - **m_vCorrelation** `[var]` in `InvDipolePair` — Correlation of the dipole pair.
@@ -3029,10 +3029,10 @@ Index of 6237 public class members (functions, variables, typedefs, enums) acros
 - **m_vecFftCoeff** `[var]` in [CosineFilter](/docs/api/utils/cosine-filter) — the FFT-transformed forward filter coefficient set, required for frequency-domain filtering, zero-padded to m_iFftLength.
 - **m_vecResultExponentValues** `[var]` in [Spline](/docs/api/disp/spline) — Common exponent values for the entire histogram.
 - **machid** `[var]` in [FiffId](/docs/api/fiff/fiff-id) — Unique machine ID.
-- **mag_dipole_funcs** `[var]` in `InvDipoleFitData` — Functions to fit a magnetic dipole.
+- **mag_dipole_funcs** `[var]` in [InvDipoleFitData](/docs/api/inv/inv-dipole-fit-data) — Functions to fit a magnetic dipole.
 - **MAG_FACTOR** `[var]` in [FwdBemModel](/docs/api/fwd/fwd-bem-model) — Magnetic constant mu_0 / (4 * pi).
-- **mag_reg** `[var]` in `InvDipoleFitSettings` — Noise-covariance matrix regularization for MEG (magnetometers and axial gradiometers).
-- **mag_std** `[var]` in `InvDipoleFitSettings` — Standard deviation for magnetometers if noise covariance is not specified.
+- **mag_reg** `[var]` in [InvDipoleFitSettings](/docs/api/inv/inv-dipole-fit-settings) — Noise-covariance matrix regularization for MEG (magnetometers and axial gradiometers).
+- **mag_std** `[var]` in [InvDipoleFitSettings](/docs/api/inv/inv-dipole-fit-settings) — Standard deviation for magnetometers if noise covariance is not specified.
 - **magnitude** `[fn]` in [InvVectorSourceEstimate](/docs/api/inv/inv-vector-source-estimate) — Compute the magnitude (L2 norm) at each vertex across time.
 - **make_block_diag** `[fn]` in [Linalg](/docs/api/math/linalg) — Make a sparse block diagonal matrix.
 - **make_block_diag** `[fn]` in [MNE](/docs/api/mne/mne-class) — mne_block_diag - encoding part
@@ -3130,7 +3130,7 @@ Index of 6237 public class members (functions, variables, typedefs, enums) acros
 - **matUnmixing** `[var]` in `InfomaxResult` — Unmixing matrix (n_components x n_channels).
 - **max_event** `[var]` in [MNERawData](/docs/api/mne/mne-raw-data) — Maximum event number in use.
 - **maxAbsCorrelation** `[fn]` in [MlIcaLabel](/docs/api/decoding/ml-ica-label) — Compute the maximum absolute Pearson correlation between a source and reference channels.
-- **maxPowerOri** `[var]` in `InvBeamformer` — Optimal orientation per source (n_sources, 3).
+- **maxPowerOri** `[var]` in [InvBeamformer](/docs/api/inv/inv-beamformer) — Optimal orientation per source (n_sources, 3).
 - **maxshield_data** `[var]` in [MNERawInfo](/docs/api/mne/mne-raw-info) — Are these unprocessed MaxShield data.
 - **maxSources** `[var]` in `InvTokenizeOptions` — Sub-sample grid sources (-1 = all).
 - **maxTimePoints** `[var]` in `InvTokenizeOptions` — Sub-sample time points (-1 = all).
@@ -3143,15 +3143,15 @@ Index of 6237 public class members (functions, variables, typedefs, enums) acros
 - **meas_id** `[var]` in [FiffInfoBase](/docs/api/fiff/fiff-info-base) — Measurement ID.
 - **meas_id** `[var]` in [MNEMeasData](/docs/api/mne/mne-meas-data) — Measurement block ID from the FIFF file.
 - **measname** `[var]` in [ComputeFwdSettings](/docs/api/fwd/compute-fwd-settings) — Measurement file.
-- **measname** `[var]` in `InvDipoleFitSettings` — Data file.
+- **measname** `[var]` in [InvDipoleFitSettings](/docs/api/inv/inv-dipole-fit-settings) — Data file.
 - **measure** `[var]` in `InvConnectivity` — Metric name, e.g.
 - **meg_client** `[var]` in `dipoleFitFuncsRec` — Client data for MEG field computations.
 - **meg_client_free** `[var]` in `dipoleFitFuncsRec` — Destructor for MEG client data.
-- **meg_coils** `[var]` in `InvDipoleFitData` — MEG coil definitions.
+- **meg_coils** `[var]` in [InvDipoleFitData](/docs/api/inv/inv-dipole-fit-data) — MEG coil definitions.
 - **meg_eeg_fwd_one_source_space** `[fn]` in [FwdBemModel](/docs/api/fwd/fwd-bem-model) — Thread worker: compute the forward solution for one source space.
 - **meg_field** `[var]` in `dipoleFitFuncsRec` — MEG forward calculation function.
 - **meg_head_t** `[var]` in [ComputeFwdSettings](/docs/api/fwd/compute-fwd-settings) — The meg &lt;-&gt; head transformation.
-- **meg_head_t** `[var]` in `InvDipoleFitData` — MEG &lt;-&gt; head coordinate transformation.
+- **meg_head_t** `[var]` in [InvDipoleFitData](/docs/api/inv/inv-dipole-fit-data) — MEG &lt;-&gt; head coordinate transformation.
 - **meg_head_t** `[var]` in [MNEMeasData](/docs/api/mne/mne-meas-data) — MEG device ↔ head coordinate transform.
 - **meg_vec_field** `[var]` in `dipoleFitFuncsRec` — MEG vectorized forward calculation function.
 - **megChannelIdx** `[var]` in `Basis` — Original channel indices in FiffInfo for the MEG rows.
@@ -3337,7 +3337,7 @@ Index of 6237 public class members (functions, variables, typedefs, enums) acros
 - **mri_filename** `[var]` in [MNEForwardSolution](/docs/api/mne/mne-forward-solution) — MRI file name (parent provenance).
 - **mri_head_ident** `[var]` in [ComputeFwdSettings](/docs/api/fwd/compute-fwd-settings) — Are the head and MRI coordinates the same?
 - **mri_head_t** `[var]` in [FilterThreadArg](/docs/api/mne/filter-thread-arg) — MRI-to-head coordinate transformation.
-- **mri_head_t** `[var]` in `InvDipoleFitData` — MRI &lt;-&gt; head coordinate transformation.
+- **mri_head_t** `[var]` in [InvDipoleFitData](/docs/api/inv/inv-dipole-fit-data) — MRI &lt;-&gt; head coordinate transformation.
 - **mri_head_t** `[var]` in [MNEForwardSolution](/docs/api/mne/mne-forward-solution) — MRI head coordinate transformation.
 - **mri_head_t** `[var]` in [MNEInverseOperator](/docs/api/mne/mne-inverse-operator) — MRI-to-head coordinate transformation.
 - **mri_head_t** `[var]` in [MNEMeasData](/docs/api/mne/mne-meas-data) — MRI ↔ head coordinate transform.
@@ -3347,7 +3347,7 @@ Index of 6237 public class members (functions, variables, typedefs, enums) acros
 - **MRI_volume** `[var]` in [MNESurfaceOrVolume](/docs/api/mne/mne-surface-or-volume) — Path to the MRI volume file the interpolator is based on.
 - **MRI_voxel_surf_RAS_t** `[var]` in [MNESurfaceOrVolume](/docs/api/mne/mne-surface-or-volume) — Voxel-to-surface-RAS transform for the associated MRI volume.
 - **mriname** `[var]` in [ComputeFwdSettings](/docs/api/fwd/compute-fwd-settings) — MRI file for head &lt;-&gt; MRI transformation.
-- **mriname** `[var]` in `InvDipoleFitSettings` — Gives the MRI &lt;-&gt; head transform.
+- **mriname** `[var]` in [InvDipoleFitSettings](/docs/api/inv/inv-dipole-fit-settings) — Gives the MRI &lt;-&gt; head transform.
 - **MriSlice** `[fn]` in `MriSlice` — Default constructor.
 - **mriSlices** `[var]` in `ViewVisibilityProfile`
 - **MriVolData** `[fn]` in [MriVolData](/docs/api/mri/mri-vol-data) — Default constructor.
@@ -3388,13 +3388,13 @@ Index of 6237 public class members (functions, variables, typedefs, enums) acros
 - **names** `[var]` in [MNENamedVector](/docs/api/mne/mne-named-vector) — Name list for the elements.
 - **names** `[var]` in [MNEProjOp](/docs/api/mne/mne-proj-op) — Names of the channels in the final compiled projector.
 - **nave** `[var]` in [FiffEvoked](/docs/api/fiff/fiff-evoked) — Number of averaged epochs.
-- **nave** `[var]` in `InvDipoleFitData` — How many averages does this correspond to?
+- **nave** `[var]` in [InvDipoleFitData](/docs/api/inv/inv-dipole-fit-data) — How many averages does this correspond to?
 - **nave** `[var]` in [MNEInverseOperator](/docs/api/mne/mne-inverse-operator) — Number of averages (default 1).
 - **nave** `[var]` in [MNEMeasDataSet](/docs/api/mne/mne-meas-data-set) — Number of averaged responses.
 - **nbad** `[var]` in [MNECovMatrix](/docs/api/mne/mne-cov-matrix) — Number of bad channels.
 - **nbad** `[var]` in [MNEMeasData](/docs/api/mne/mne-meas-data) — Number of bad channels.
 - **nbad** `[var]` in [MNERawData](/docs/api/mne/mne-raw-data) — Number of bad channels.
-- **nch** `[var]` in `InvDipoleForward` — Number of channels.
+- **nch** `[var]` in [InvDipoleForward](/docs/api/inv/inv-dipole-forward) — Number of channels.
 - **nch** `[var]` in [MNECTFCompDataSet](/docs/api/mne/mnectf-comp-data-set) — Number of channels.
 - **nch** `[var]` in [MNEProjOp](/docs/api/mne/mne-proj-op) — Number of channels in the final projector.
 - **nchan** `[var]` in [FiffInfoBase](/docs/api/fiff/fiff-info-base) — Number of channels.
@@ -3405,7 +3405,7 @@ Index of 6237 public class members (functions, variables, typedefs, enums) acros
 - **nchan** `[var]` in [MNERawBufDef](/docs/api/mne/mne-raw-buf-def) — Number of channels.
 - **nchan** `[var]` in [MNERawInfo](/docs/api/mne/mne-raw-info) — Number of channels.
 - **nchan** `[var]` in [MNESssData](/docs/api/mne/mne-sss-data) — How many channels.
-- **nChannels** `[fn]` in `InvBeamformer` — Returns the number of channels.
+- **nChannels** `[fn]` in [InvBeamformer](/docs/api/inv/inv-beamformer) — Returns the number of channels.
 - **nchild** `[fn]` in [FiffDirNode](/docs/api/fiff/fiff-dir-node) — Returns the number of child nodes.
 - **nchoose2** `[fn]` in [Numerics](/docs/api/utils/numerics) — Calculates the combination of n over 2 (nchoosek(n,2)).
 - **ncluster** `[var]` in [ComputeFwdSettings](/docs/api/fwd/compute-fwd-settings) — Number of sources desired in clustered solution.
@@ -3413,7 +3413,7 @@ Index of 6237 public class members (functions, variables, typedefs, enums) acros
 - **nClusters** `[var]` in `RegionMT` — Number of clusters for this region.
 - **ncoil** `[var]` in [FwdBemSolution](/docs/api/fwd/fwd-bem-solution) — Number of sensors.
 - **ncoil** `[fn]` in [FwdCoilSet](/docs/api/fwd/fwd-coil-set) — Number of coils (convenience accessor).
-- **ncoils** `[fn]` in `InvSensorSet`
+- **ncoils** `[fn]` in [InvSensorSet](/docs/api/inv/inv-sensor-set)
 - **ncol** `[var]` in [FiffNamedMatrix](/docs/api/fiff/fiff-named-matrix) — Number of columns.
 - **ncol** `[var]` in [MNENamedMatrix](/docs/api/mne/mne-named-matrix) — Number of columns in `data`.
 - **ncol** `[var]` in [MNESparseNamedMatrix](/docs/api/mne/mne-sparse-named-matrix) — Number of columns (same as in data).
@@ -3422,7 +3422,7 @@ Index of 6237 public class members (functions, variables, typedefs, enums) acros
 - **ndef** `[var]` in [MNEChSelection](/docs/api/mne/mne-ch-selection) — How many of them.
 - **nderiv** `[var]` in [MNEChSelection](/docs/api/mne/mne-ch-selection) — How many derivations in the above.
 - **ndim** `[fn]` in [MlTensor](/docs/api/ml/ml-tensor)
-- **ndip** `[var]` in `InvDipoleForward` — Number of dipoles.
+- **ndip** `[var]` in [InvDipoleForward](/docs/api/inv/inv-dipole-forward) — Number of dipoles.
 - **ndir** `[var]` in [MNERawInfo](/docs/api/mne/mne-raw-info) — Number of tags in the above directory.
 - **nearest** `[var]` in [MNENearest](/docs/api/mne/mne-nearest) — Index of the nearest 'inuse' vertex.
 - **nearest** `[var]` in [MNESurfaceOrVolume](/docs/api/mne/mne-surface-or-volume) — Nearest in-use vertex info for each vertex (np elements).
@@ -3430,7 +3430,7 @@ Index of 6237 public class members (functions, variables, typedefs, enums) acros
 - **nearest_triangle_point** `[fn]` in [MNESurface](/docs/api/mne/mne-surface) — Find the nearest point on a triangle (simplified, no projection data).
 - **nearestDistVec** `[fn]` in [MNESurfaceOrVolume](/docs/api/mne/mne-surface-or-volume) — Extract the nearest distances from the nearest vector as doubles.
 - **nearestVertIdx** `[fn]` in [MNESurfaceOrVolume](/docs/api/mne/mne-surface-or-volume) — Extract the nearest in-use vertex indices from the nearest vector.
-- **neeg** `[var]` in `InvDipoleFitData` — How many EEG.
+- **neeg** `[var]` in [InvDipoleFitData](/docs/api/inv/inv-dipole-fit-data) — How many EEG.
 - **neighbor_tri** `[var]` in [MNESurfaceOrVolume](/docs/api/mne/mne-surface-or-volume) — Neighboring triangles for each vertex (np entries, variable length).
 - **neighbor_vert** `[var]` in [MNESurfaceOrVolume](/docs/api/mne/mne-surface-or-volume) — Vertices neighboring each vertex (np entries, variable length).
 - **nent** `[fn]` in [FiffDirNode](/docs/api/fiff/fiff-dir-node) — Returns the number of entries in this node.
@@ -3442,7 +3442,7 @@ Index of 6237 public class members (functions, variables, typedefs, enums) acros
 - **NetworkNode** `[fn]` in [NetworkNode](/docs/api/connectivity/network-node) — Constructs a [`NetworkNode`](/docs/api/connectivity/network-node) object.
 - **NetworkObject** `[fn]` in `NetworkObject` — Default constructor.
 - **NetworkTreeItem** `[fn]` in `NetworkTreeItem` — Constructs a `NetworkTreeItem`.
-- **neval** `[var]` in `InvEcd` — Number of function evaluations required for this fit.
+- **neval** `[var]` in [InvEcd](/docs/api/inv/inv-ecd) — Number of function evaluations required for this fit.
 - **nevent** `[fn]` in [MNEEventList](/docs/api/mne/mne-event-list) — Returns the number of events in the list.
 - **new_file_id** `[fn]` in [FiffId](/docs/api/fiff/fiff-id) — Constructs a (hopefully) unique file id.
 - **new_fit_user** `[fn]` in [FwdEegSphereModel](/docs/api/fwd/fwd-eeg-sphere-model) — Allocate and initialize a fitting workspace for Berg-Scherg parameter estimation.
@@ -3490,11 +3490,11 @@ Index of 6237 public class members (functions, variables, typedefs, enums) acros
 - **nfit** `[var]` in [FwdEegSphereModel](/docs/api/fwd/fwd-eeg-sphere-model) — How many?
 - **nframes** `[var]` in [MriVolData](/docs/api/mri/mri-vol-data) — Number of frames (scalar components per voxel).
 - **nfree** `[var]` in [FiffCov](/docs/api/fiff/fiff-cov) — Number of degrees of freedom.
-- **nfree** `[var]` in `InvEcd` — Degrees of freedom for the above.
+- **nfree** `[var]` in [InvEcd](/docs/api/inv/inv-ecd) — Degrees of freedom for the above.
 - **nfree** `[var]` in `InvFocalDipole` — Degrees of freedom.
 - **nfree** `[var]` in [MNECovMatrix](/docs/api/mne/mne-cov-matrix) — Number of degrees of freedom used in estimation.
-- **nFreqs** `[fn]` in `InvBeamformer` — Returns the number of frequency bins (1 for LCMV, &gt;= 1 for DICS).
-- **nguess** `[var]` in `InvGuessData` — How many sources.
+- **nFreqs** `[fn]` in [InvBeamformer](/docs/api/inv/inv-beamformer) — Returns the number of frequency bins (1 for LCMV, &gt;= 1 for DICS).
+- **nguess** `[var]` in [InvGuessData](/docs/api/inv/inv-guess-data) — How many sources.
 - **nitems** `[var]` in [MNEProjOp](/docs/api/mne/mne-proj-op) — Number of items.
 - **nIterations** `[var]` in `InfomaxResult` — Number of iterations performed.
 - **nIterations** `[var]` in `InvGammaMapResult`
@@ -3506,7 +3506,7 @@ Index of 6237 public class members (functions, variables, typedefs, enums) acros
 - **nmarker_colors** `[var]` in [MNEMshDisplaySurface](/docs/api/mne/mne-msh-display-surface) — Number of color components per marker vertex.
 - **nmarker_tri** `[var]` in [MNEMshDisplaySurface](/docs/api/mne/mne-msh-display-surface) — Number of marker triangles.
 - **nmatch** `[fn]` in [MNELayout](/docs/api/mne/mne-layout) — Returns the number of channels (rows in match matrix).
-- **nmeg** `[var]` in `InvDipoleFitData` — How many MEG.
+- **nmeg** `[var]` in [InvDipoleFitData](/docs/api/inv/inv-dipole-fit-data) — How many MEG.
 - **nmodel** `[fn]` in [FwdEegSphereModelSet](/docs/api/fwd/fwd-eeg-sphere-model-set) — Number of models in this set.
 - **nn** `[fn]` in [FsSurface](/docs/api/fs/fs-surface) — Normalized surface normals for each vertex.
 - **nn** `[var]` in [MNESurfaceOrVolume](/docs/api/mne/mne-surface-or-volume) — FsSurface normals at these points (np x 3, row-major).
@@ -3522,16 +3522,16 @@ Index of 6237 public class members (functions, variables, typedefs, enums) acros
 - **nodes** `[fn]` in [MnaGraph](/docs/api/mna/mna-graph)
 - **nodes** `[fn]` in [MnaGraph](/docs/api/mna/mna-graph)
 - **nodeVertexBuffer** `[fn]` in `NetworkObject`
-- **noise** `[var]` in `InvDipoleFitData` — Noise covariance matrix (weighted to take the selection into account).
+- **noise** `[var]` in [InvDipoleFitData](/docs/api/inv/inv-dipole-fit-data) — Noise covariance matrix (weighted to take the selection into account).
 - **noise_cov** `[var]` in [MNEInverseOperator](/docs/api/mne/mne-inverse-operator) — Noise covariance matrix.
-- **noise_orig** `[var]` in `InvDipoleFitData` — Noise covariance matrix (original, currently unused).
+- **noise_orig** `[var]` in [InvDipoleFitData](/docs/api/inv/inv-dipole-fit-data) — Noise covariance matrix (original, currently unused).
 - **noiseChanged** `[signal]` in [DipoleFitView](/docs/api/disp/dipole-fit-view) — Set new manual noise parameters.
 - **noiseCov** `[fn]` in [MvarModel](/docs/api/connectivity/mvar-model) — Returns the noise covariance matrix (nChannels x nChannels).
 - **noiseCov** `[var]` in `RtInvOpInput`
-- **noisename** `[var]` in `InvDipoleFitSettings` — Noise-covariance matrix.
+- **noisename** `[var]` in [InvDipoleFitSettings](/docs/api/inv/inv-dipole-fit-settings) — Noise-covariance matrix.
 - **noisenorm** `[var]` in [MNEInverseOperator](/docs/api/mne/mne-inverse-operator) — Diagonal noise-normalisation matrix (dSPM / sLORETA).
 - **nonZeros** `[fn]` in [FiffSparseMatrix](/docs/api/fiff/fiff-sparse-matrix) — Number of stored non-zero elements.
-- **nOrient** `[fn]` in `InvBeamformer` — Returns the number of orientations per source (1 or 3).
+- **nOrient** `[fn]` in [InvBeamformer](/docs/api/inv/inv-beamformer) — Returns the number of orientations per source (1 or 3).
 - **norm** `[var]` in `VertexData`
 - **normal** `[fn]` in [MNESurfaceOrVolume](/docs/api/mne/mne-surface-or-volume) — Return a read-only map to the k-th vertex normal (3 contiguous floats).
 - **normalize** `[fn]` in [Network](/docs/api/connectivity/network) — Normalize the network.
@@ -3543,7 +3543,7 @@ Index of 6237 public class members (functions, variables, typedefs, enums) acros
 - **np** `[var]` in [FwdBemModel](/docs/api/fwd/fwd-bem-model) — Vertex count per surface (length nsurf).
 - **np** `[var]` in [FwdBemSolution](/docs/api/fwd/fwd-bem-solution) — Number of potential solution points.
 - **np** `[var]` in [FwdCoil](/docs/api/fwd/fwd-coil) — Number of integration points.
-- **np** `[fn]` in `InvSensorSet`
+- **np** `[fn]` in [InvSensorSet](/docs/api/inv/inv-sensor-set)
 - **np** `[var]` in [MNEMeasDataSet](/docs/api/mne/mne-meas-data-set) — Number of time samples.
 - **np** `[var]` in [MNESurfaceOrVolume](/docs/api/mne/mne-surface-or-volume) — Number of vertices.
 - **npoint** `[var]` in [FiffDigitizerData](/docs/api/fiff/fiff-digitizer-data) — Number of points.
@@ -3558,8 +3558,8 @@ Index of 6237 public class members (functions, variables, typedefs, enums) acros
 - **nsol** `[var]` in [FwdBemModel](/docs/api/fwd/fwd-bem-model) — Dimension of the solution matrix.
 - **nsource** `[var]` in [MNEForwardSolution](/docs/api/mne/mne-forward-solution) — Number of source dipoles.
 - **nsource** `[var]` in [MNEInverseOperator](/docs/api/mne/mne-inverse-operator) — Number of source-space points.
-- **nSources** `[fn]` in `InvBeamformer` — Returns the number of source points.
-- **nSourcesTotal** `[var]` in `InvBeamformer` — Total number of source points.
+- **nSources** `[fn]` in [InvBeamformer](/docs/api/inv/inv-beamformer) — Returns the number of source points.
+- **nSourcesTotal** `[var]` in [InvBeamformer](/docs/api/inv/inv-beamformer) — Total number of source points.
 - **nsurf** `[var]` in [FwdBemModel](/docs/api/fwd/fwd-bem-model) — Number of interface surfaces.
 - **nsurf** `[var]` in [MNEMshDisplaySurfaceSet](/docs/api/mne/mne-msh-display-surface-set) — Number of surfaces.
 - **ntags** `[fn]` in [MNEMghTagGroup](/docs/api/mne/mne-mgh-tag-group) — Returns the number of tags in the group.
@@ -3586,7 +3586,7 @@ Index of 6237 public class members (functions, variables, typedefs, enums) acros
 - **nvec** `[var]` in [MNEProjOp](/docs/api/mne/mne-proj-op) — Number of orthogonalized vectors in the final projector.
 - **nvertex_colors** `[var]` in [MNEMshDisplaySurface](/docs/api/mne/mne-msh-display-surface) — Number of color components per vertex.
 - **nVertices** `[fn]` in [InvVectorSourceEstimate](/docs/api/inv/inv-vector-source-estimate) — Number of source vertices (data.rows() / 3).
-- **nVerticesLh** `[var]` in `InvBeamformer` — Leading entries of vertices belonging to the left hemisphere.
+- **nVerticesLh** `[var]` in [InvBeamformer](/docs/api/inv/inv-beamformer) — Leading entries of vertices belonging to the left hemisphere.
 - **nVerticesLh** `[var]` in [InvSourceEstimate](/docs/api/inv/inv-source-estimate) — Number of leading entries in vertices/data that belong to the left hemisphere.
 - **nVerticesTo** `[fn]` in [SourceMorph](/docs/api/inv/source-morph) — Get the number of target vertices.
 - **nx** `[var]` in `VertexData`
@@ -3614,7 +3614,7 @@ Index of 6237 public class members (functions, variables, typedefs, enums) acros
 - **offset** `[fn]` in [FsSurface](/docs/api/fs/fs-surface) — Vector offset.
 - **offset** `[fn]` in [FsSurface](/docs/api/fs/fs-surface) — Vector offset.
 - **offsets** `[var]` in [MNERawData](/docs/api/mne/mne-raw-data) — DC offset corrections for display.
-- **omit_data_proj** `[var]` in `InvDipoleFitSettings` — Omit the projection in the data file.
+- **omit_data_proj** `[var]` in [InvDipoleFitSettings](/docs/api/inv/inv-dipole-fit-settings) — Omit the projection in the data file.
 - **omit_samp** `[var]` in [MNERawData](/docs/api/mne/mne-raw-data) — Number of skip samples omitted from the beginning.
 - **omit_samp_old** `[var]` in [MNERawData](/docs/api/mne/mne-raw-data) — Omitted samples (old-version compatible value).
 - **omitSubjectInfo** `[var]` in `ProcessingSettings` — Omit subject info from output.
@@ -3658,12 +3658,12 @@ Index of 6237 public class members (functions, variables, typedefs, enums) acros
 - **operate** `[signal]` in [RtInvOp](/docs/api/dsp/rt-inv-op) — Emit this signal whenver the worker should create a new inverse operator estimation.
 - **operate** `[signal]` in [RtNoise](/docs/api/dsp/rt-noise) — Internal signal to forward data to the worker thread.
 - **operator const Eigen::SparseMatrix&lt; float &gt; &** `[fn]` in [FiffSparseMatrix](/docs/api/fiff/fiff-sparse-matrix) — Implicit conversion to const Eigen::SparseMatrix&lt;float&gt;&.
-- **operator!=** `[fn]` in `InvHpiModelParameters`
-- **operator!=** `[fn]` in `InvSensorSet`
+- **operator!=** `[fn]` in [InvHpiModelParameters](/docs/api/inv/inv-hpi-model-parameters)
+- **operator!=** `[fn]` in [InvSensorSet](/docs/api/inv/inv-sensor-set)
 - **operator+=** `[fn]` in [FiffEvoked](/docs/api/fiff/fiff-evoked) — Inputs a new data set and recalculates the average.
 - **operator&lt;&lt;** `[fn]` in [FiffDigPointSet](/docs/api/fiff/fiff-dig-point-set) — Subscript operator &lt;&lt; to add a new [`FiffDigPoint`](/docs/api/fiff/fiff-dig-point).
 - **operator&lt;&lt;** `[fn]` in [FiffDigPointSet](/docs/api/fiff/fiff-dig-point-set) — Subscript operator &lt;&lt; to add a new [`FiffDigPoint`](/docs/api/fiff/fiff-dig-point).
-- **operator&lt;&lt;** `[fn]` in `InvEcdSet` — Subscript operator &lt;&lt; to add a new `InvEcd`.
+- **operator&lt;&lt;** `[fn]` in [InvEcdSet](/docs/api/inv/inv-ecd-set) — Subscript operator &lt;&lt; to add a new [`InvEcd`](/docs/api/inv/inv-ecd).
 - **operator&lt;&lt;** `[fn]` in [MNEBem](/docs/api/mne/mne-bem) — Subscript operator &lt;&lt; to add a new bem_surface.
 - **operator&lt;&lt;** `[fn]` in [MNEBem](/docs/api/mne/mne-bem) — Subscript operator &lt;&lt; to add a new bem_surface.
 - **operator=** `[fn]` in [BIDSPath](/docs/api/bids/bids-path)
@@ -3678,7 +3678,7 @@ Index of 6237 public class members (functions, variables, typedefs, enums) acros
 - **operator=** `[fn]` in [FiffDigitizerData](/docs/api/fiff/fiff-digitizer-data) — Copy assignment operator (deep-copies unique_ptr members).
 - **operator=** `[fn]` in [FiffDigPointSet](/docs/api/fiff/fiff-dig-point-set) — Copy assignment.
 - **operator=** `[fn]` in [FiffEvoked](/docs/api/fiff/fiff-evoked) — Copy assignment.
-- **operator=** `[fn]` in `FiffEvokedSet` — Copy assignment.
+- **operator=** `[fn]` in [FiffEvokedSet](/docs/api/fiff/fiff-evoked-set) — Copy assignment.
 - **operator=** `[fn]` in [FiffId](/docs/api/fiff/fiff-id) — Copy assignment.
 - **operator=** `[fn]` in [FiffInfo](/docs/api/fiff/fiff-info) — Copy assignment.
 - **operator=** `[fn]` in [FiffInfoBase](/docs/api/fiff/fiff-info-base) — Copy assignment.
@@ -3691,10 +3691,10 @@ Index of 6237 public class members (functions, variables, typedefs, enums) acros
 - **operator=** `[fn]` in [FiffTag](/docs/api/fiff/fiff-tag) — Move assignment operator.
 - **operator=** `[fn]` in [FwdEegSphereModelSet](/docs/api/fwd/fwd-eeg-sphere-model-set)
 - **operator=** `[fn]` in [FwdEegSphereModelSet](/docs/api/fwd/fwd-eeg-sphere-model-set)
-- **operator=** `[fn]` in `InvEcd` — Copy assignment.
-- **operator=** `[fn]` in `InvEcdSet` — Copy assignment.
-- **operator=** `[fn]` in `InvGuessData`
-- **operator=** `[fn]` in `InvHpiModelParameters`
+- **operator=** `[fn]` in [InvEcd](/docs/api/inv/inv-ecd) — Copy assignment.
+- **operator=** `[fn]` in [InvEcdSet](/docs/api/inv/inv-ecd-set) — Copy assignment.
+- **operator=** `[fn]` in [InvGuessData](/docs/api/inv/inv-guess-data)
+- **operator=** `[fn]` in [InvHpiModelParameters](/docs/api/inv/inv-hpi-model-parameters)
 - **operator=** `[fn]` in [InvSourceEstimate](/docs/api/inv/inv-source-estimate) — Assignment Operator.
 - **operator=** `[fn]` in [MNEBemSurface](/docs/api/mne/mne-bem-surface) — Copy assignment.
 - **operator=** `[fn]` in [MNEEpochData](/docs/api/mne/mne-epoch-data) — Copy assignment.
@@ -3715,8 +3715,8 @@ Index of 6237 public class members (functions, variables, typedefs, enums) acros
 - **operator=** `[fn]` in [MNESurfaceOrVolume](/docs/api/mne/mne-surface-or-volume)
 - **operator=** `[fn]` in `RawCommand` — Assignment Operator.
 - **operator=** `[fn]` in [stream_info](/docs/api/lsl/stream_info) — Copy assignment operator.
-- **operator==** `[fn]` in `InvHpiModelParameters`
-- **operator==** `[fn]` in `InvSensorSet`
+- **operator==** `[fn]` in [InvHpiModelParameters](/docs/api/inv/inv-hpi-model-parameters)
+- **operator==** `[fn]` in [InvSensorSet](/docs/api/inv/inv-sensor-set)
 - **operator[]** `[fn]` in `Command` — Subscript operator [] to access parameter values by name.
 - **operator[]** `[fn]` in `Command` — Subscript operator [] to access parameter values by index.
 - **operator[]** `[fn]` in `Command` — Subscript operator [].
@@ -3734,8 +3734,8 @@ Index of 6237 public class members (functions, variables, typedefs, enums) acros
 - **operator[]** `[fn]` in [FsSurfaceSet](/docs/api/fs/fs-surface-set) — Subscript operator [] to access surface by index.
 - **operator[]** `[fn]` in [FsSurfaceSet](/docs/api/fs/fs-surface-set) — Subscript operator [] to access surface by identifier.
 - **operator[]** `[fn]` in [FsSurfaceSet](/docs/api/fs/fs-surface-set) — Subscript operator [] to access surface by identifier.
-- **operator[]** `[fn]` in `InvEcdSet` — Subscript operator [] to access `InvEcd` by index.
-- **operator[]** `[fn]` in `InvEcdSet` — Subscript operator [] to access `InvEcd` by index.
+- **operator[]** `[fn]` in [InvEcdSet](/docs/api/inv/inv-ecd-set) — Subscript operator [] to access [`InvEcd`](/docs/api/inv/inv-ecd) by index.
+- **operator[]** `[fn]` in [InvEcdSet](/docs/api/inv/inv-ecd-set) — Subscript operator [] to access [`InvEcd`](/docs/api/inv/inv-ecd) by index.
 - **operator[]** `[fn]` in [MNEBem](/docs/api/mne/mne-bem) — Subscript operator [] to access bem_surface by index.
 - **operator[]** `[fn]` in [MNEBem](/docs/api/mne/mne-bem) — Subscript operator [] to access bem_surface by index.
 - **operator[]** `[fn]` in [MNESourceSpaces](/docs/api/mne/mne-source-spaces) — Subscript operator [] to access source spaces by index.
@@ -3857,16 +3857,16 @@ Index of 6237 public class members (functions, variables, typedefs, enums) acros
 - **phase** `[var]` in `MnaVerificationCheck` — "pre" (before execution) or "post" (after execution)
 - **PhaseLagIndex** `[fn]` in [PhaseLagIndex](/docs/api/connectivity/phase-lag-index) — Constructs a [`PhaseLagIndex`](/docs/api/connectivity/phase-lag-index) object.
 - **PhaseLockingValue** `[fn]` in [PhaseLockingValue](/docs/api/connectivity/phase-locking-value) — Constructs a [`PhaseLockingValue`](/docs/api/connectivity/phase-locking-value) object.
-- **phi_x** `[fn]` in `InvDipole`
-- **phi_x** `[fn]` in `InvDipole`
-- **phi_y** `[fn]` in `InvDipole`
-- **phi_y** `[fn]` in `InvDipole`
-- **phi_z** `[fn]` in `InvDipole`
-- **phi_z** `[fn]` in `InvDipole`
+- **phi_x** `[fn]` in [InvDipole](/docs/api/inv/inv-dipole)
+- **phi_x** `[fn]` in [InvDipole](/docs/api/inv/inv-dipole)
+- **phi_y** `[fn]` in [InvDipole](/docs/api/inv/inv-dipole)
+- **phi_y** `[fn]` in [InvDipole](/docs/api/inv/inv-dipole)
+- **phi_z** `[fn]` in [InvDipole](/docs/api/inv/inv-dipole)
+- **phi_z** `[fn]` in [InvDipole](/docs/api/inv/inv-dipole)
 - **physicalDimension** `[var]` in `EDFChannelInfo`
 - **physicalMax** `[var]` in `EDFChannelInfo`
 - **physicalMin** `[var]` in `EDFChannelInfo`
-- **pick** `[var]` in `InvDipoleFitData` — Matrix to pick data from the full data set which may contain channels we are not interested in (currently unused).
+- **pick** `[var]` in [InvDipoleFitData](/docs/api/inv/inv-dipole-fit-data) — Matrix to pick data from the full data set which may contain channels we are not interested in (currently unused).
 - **pick** `[var]` in [MNEChSelection](/docs/api/mne/mne-ch-selection) — Corresponding channels in raw data (&lt; 0 indicates missing).
 - **pick** `[fn]` in [MNENamedMatrix](/docs/api/mne/mne-named-matrix) — Create a sub-matrix by picking named rows and columns.
 - **pick** `[fn]` in [MNENamedVector](/docs/api/mne/mne-named-vector) — Pick elements from this named vector by name matching, writing them into a result vector ordered according to the supplied name list.
@@ -3875,7 +3875,7 @@ Index of 6237 public class members (functions, variables, typedefs, enums) acros
 - **pick_channels** `[fn]` in [Fiff](/docs/api/fiff/fiff-class) — fiff_pick_channels_evoked
 - **pick_channels** `[fn]` in [FiffCov](/docs/api/fiff/fiff-cov) — python pick_channels_cov
 - **pick_channels** `[fn]` in [FiffEvoked](/docs/api/fiff/fiff-evoked) — fiff_pick_channels_evoked
-- **pick_channels** `[fn]` in `FiffEvokedSet` — fiff_pick_channels_evoked
+- **pick_channels** `[fn]` in [FiffEvokedSet](/docs/api/fiff/fiff-evoked-set) — fiff_pick_channels_evoked
 - **pick_channels** `[fn]` in [FiffInfoBase](/docs/api/fiff/fiff-info-base) — fiff_pick_channels
 - **pick_channels** `[fn]` in [MNEEpochData](/docs/api/mne/mne-epoch-data) — Reduces the data to the selected rows.
 - **pick_channels** `[fn]` in [MNEEpochDataList](/docs/api/mne/mne-epoch-data-list) — Reduces alld epochs to the selected rows.
@@ -3899,7 +3899,7 @@ Index of 6237 public class members (functions, variables, typedefs, enums) acros
 - **picked** `[signal]` in [MultimodalScene](/docs/api/disp3-d/multimodal-scene) — Emitted when a pick is reported.
 - **pickFiducials** `[signal]` in [CoregSettingsView](/docs/api/disp/coreg-settings-view) — Emit this signal whenever fiducial picking from 3DView should be activated.
 - **pickLowerTriangleRcs** `[fn]` in [FiffSparseMatrix](/docs/api/fiff/fiff-sparse-matrix) — Extract only the lower triangle (including diagonal) from a square RCS matrix.
-- **pickOri** `[var]` in `InvBeamformer` — Orientation picking mode.
+- **pickOri** `[var]` in [InvBeamformer](/docs/api/inv/inv-beamformer) — Orientation picking mode.
 - **pickTypes** `[fn]` in [FiffDigPointSet](/docs/api/fiff/fiff-dig-point-set) — Pick the wanted types from this set and returns them.
 - **pinfo** `[var]` in [MNEHemisphere](/docs/api/mne/mne-hemisphere) — Patch information (using option -cps during mne_setup_source_space).
 - **pinv** `[fn]` in [Linalg](/docs/api/math/linalg) — Creates the pseudo inverse of a matrix.
@@ -3959,8 +3959,8 @@ Index of 6237 public class members (functions, variables, typedefs, enums) acros
 - **postResults** `[var]` in `MnaVerification` — Results of post-execution checks (populated by executor).
 - **postsel** `[var]` in [MNECTFCompData](/docs/api/mne/mnectf-comp-data) — Sparse selector applied after compensation.
 - **postsel_data** `[var]` in [MNECTFCompData](/docs/api/mne/mnectf-comp-data) — Intermediate buffer for post-selection results.
-- **PowellIdxVec** `[fn]` in `InvPwlRapMusic`
-- **PowellOffset** `[fn]` in `InvPwlRapMusic`
+- **PowellIdxVec** `[fn]` in [InvPwlRapMusic](/docs/api/inv/inv-pwl-rap-music)
+- **PowellOffset** `[fn]` in [InvPwlRapMusic](/docs/api/inv/inv-pwl-rap-music)
 - **predict** `[fn]` in [MlModel](/docs/api/ml/ml-model) — Run inference on the given input tensor.
 - **predict** `[fn]` in [MlOnnxModel](/docs/api/ml/ml-onnx-model) — Run inference on the given input tensor.
 - **predicted** `[var]` in [MNEMneData](/docs/api/mne/mne-mne-data) — The predicted data.
@@ -3968,7 +3968,7 @@ Index of 6237 public class members (functions, variables, typedefs, enums) acros
 - **prepare_forward** `[fn]` in [MNEForwardSolution](/docs/api/mne/mne-forward-solution) — Prepare forward for assembling the inverse operator.
 - **prepare_inverse_operator** `[fn]` in [MNEInverseOperator](/docs/api/mne/mne-inverse-operator) — Prepare the inverse operator for source estimation.
 - **prepare_noise_cov** `[fn]` in [FiffCov](/docs/api/fiff/fiff-cov) — Prepare noise covariance matrix.
-- **prepareDataAndProjectors** `[fn]` in `InvHpiDataUpdater` — Reduce data to only use good channels.
+- **prepareDataAndProjectors** `[fn]` in [InvHpiDataUpdater](/docs/api/inv/inv-hpi-data-updater) — Reduce data to only use good channels.
 - **prepareFilter** `[fn]` in [FilterKernel](/docs/api/dsp/filter-kernel) — Prepares a filter kernel to be used wiht a specific data block length.
 - **prepareMergedSurfaces** `[fn]` in `BrainRenderer` — Prepare merged brain surface geometry for single-drawIndexed rendering.
 - **prepareSlice** `[fn]` in `BrainRenderer` — Prepare MRI slice GPU resources and upload texture data.
@@ -3988,7 +3988,7 @@ Index of 6237 public class members (functions, variables, typedefs, enums) acros
 - **print** `[fn]` in [FiffDirNode](/docs/api/fiff/fiff-dir-node) — Prints elements of a tree.
 - **print** `[fn]` in [FiffId](/docs/api/fiff/fiff-id) — Prints the id.
 - **print** `[fn]` in [FiffInfo](/docs/api/fiff/fiff-info) — Prints class contents.
-- **print** `[fn]` in `InvEcd` — Prints the `InvEcd` dipole information to the debug output.
+- **print** `[fn]` in [InvEcd](/docs/api/inv/inv-ecd) — Prints the [`InvEcd`](/docs/api/inv/inv-ecd) dipole information to the debug output.
 - **print** `[fn]` in [MNESssData](/docs/api/mne/mne-sss-data) — Output the SSS information for debugging purposes.
 - **probeEvokedSets** `[slot]` in `BrainView` — Probe evoked data sets in a FIF file.
 - **probeEvokedSets** `[fn]` in `DataLoader` — Probe a FIF file for the available evoked data sets.
@@ -4008,8 +4008,8 @@ Index of 6237 public class members (functions, variables, typedefs, enums) acros
 - **ProgressView** `[fn]` in [ProgressView](/docs/api/disp/progress-view) — Creates an instance of a [`ProgressView`](/docs/api/disp/progress-view) object.
 - **proj** `[var]` in [FiffEvoked](/docs/api/fiff/fiff-evoked) — SSP projection.
 - **proj** `[var]` in [FiffRawData](/docs/api/fiff/fiff-raw-data) — SSP operator to apply to the data.
-- **proj** `[var]` in `InvBeamformer` — SSP projection matrix (n_channels, n_channels).
-- **proj** `[var]` in `InvDipoleFitData` — The projection operator to use.
+- **proj** `[var]` in [InvBeamformer](/docs/api/inv/inv-beamformer) — SSP projection matrix (n_channels, n_channels).
+- **proj** `[var]` in [InvDipoleFitData](/docs/api/inv/inv-dipole-fit-data) — The projection operator to use.
 - **proj** `[var]` in [MNECovMatrix](/docs/api/mne/mne-cov-matrix) — The projection operator active when this matrix was computed.
 - **proj** `[var]` in [MNEInverseOperator](/docs/api/mne/mne-inverse-operator) — SSP projector matrix applied to data.
 - **proj** `[var]` in [MNEMeasData](/docs/api/mne/mne-meas-data) — SSP projection operator (may be `nullptr`).
@@ -4032,7 +4032,7 @@ Index of 6237 public class members (functions, variables, typedefs, enums) acros
 - **projFiles** `[var]` in `ProcessingSettings` — SSP data files.
 - **projGradReject** `[var]` in `ProcessingSettings` — Gradiometer rejection for projection.
 - **projMagReject** `[var]` in `ProcessingSettings` — Magnetometer rejection for projection.
-- **projnames** `[var]` in `InvDipoleFitSettings` — Projection file names.
+- **projnames** `[var]` in [InvDipoleFitSettings](/docs/api/inv/inv-dipole-fit-settings) — Projection file names.
 - **projNEeg** `[var]` in `ProcessingSettings` — Number of EEG components.
 - **projNGrad** `[var]` in `ProcessingSettings` — Number of grad components.
 - **projNMag** `[var]` in `ProcessingSettings` — Number of mag components.
@@ -4067,7 +4067,7 @@ Index of 6237 public class members (functions, variables, typedefs, enums) acros
 
 ## Q {#q}
 
-- **Q** `[var]` in `InvEcd` — Dipole moment.
+- **Q** `[var]` in [InvEcd](/docs/api/inv/inv-ecd) — Dipole moment.
 - **qtVersion** `[var]` in `MnaProvenance` — e.g. "6.11.0"
 - **QuickControlView** `[fn]` in [QuickControlView](/docs/api/disp/quick-control-view) — Constructs a [`QuickControlView`](/docs/api/disp/quick-control-view) which is a child of parent.
 
@@ -4078,10 +4078,10 @@ Index of 6237 public class members (functions, variables, typedefs, enums) acros
 - **r0** `[var]` in [FiffChPos](/docs/api/fiff/fiff-ch-pos) — Coil coordinate system origin.
 - **r0** `[var]` in [FwdCoil](/docs/api/fwd/fwd-coil) — Coil coordinate system origin.
 - **r0** `[var]` in [FwdEegSphereModel](/docs/api/fwd/fwd-eeg-sphere-model) — The origin.
-- **r0** `[var]` in `InvDipoleFitData` — Sphere model origin.
-- **r0** `[var]` in `InvDipoleFitSettings` — Sphere model origin.
-- **r0** `[fn]` in `InvSensorSet`
-- **r0** `[fn]` in `InvSensorSet`
+- **r0** `[var]` in [InvDipoleFitData](/docs/api/inv/inv-dipole-fit-data) — Sphere model origin.
+- **r0** `[var]` in [InvDipoleFitSettings](/docs/api/inv/inv-dipole-fit-settings) — Sphere model origin.
+- **r0** `[fn]` in [InvSensorSet](/docs/api/inv/inv-sensor-set)
+- **r0** `[fn]` in [InvSensorSet](/docs/api/inv/inv-sensor-set)
 - **r1** `[var]` in [MNETriangle](/docs/api/mne/mne-triangle) — Position of vertex 0.
 - **r12** `[var]` in [MNETriangle](/docs/api/mne/mne-triangle) — Edge vector from vertex 0 to vertex 1 (r2 - r1).
 - **r13** `[var]` in [MNETriangle](/docs/api/mne/mne-triangle) — Edge vector from vertex 0 to vertex 2 (r3 - r1).
@@ -4093,7 +4093,7 @@ Index of 6237 public class members (functions, variables, typedefs, enums) acros
 - **radius** `[fn]` in [Sphere](/docs/api/math/sphere) — The radius of the sphere.
 - **randomSeed** `[var]` in `MnaProvenance` — -1 if not applicable
 - **range** `[var]` in [FiffChInfo](/docs/api/fiff/fiff-ch-info) — Voltmeter range (-1 = auto ranging).
-- **rank** `[var]` in `InvBeamformer` — Data covariance rank used.
+- **rank** `[var]` in [InvBeamformer](/docs/api/inv/inv-beamformer) — Data covariance rank used.
 - **rank** `[fn]` in [Linalg](/docs/api/math/linalg) — Returns the rank of a matrix A.
 - **RAS_MNI_tal_t** `[var]` in [FiffCoordTransSet](/docs/api/fiff/fiff-coord-trans-set) — Transform from RAS (nonzero origin) to MNI Talairach coordinates.
 - **rasGood** `[var]` in [MriVolData](/docs/api/mri/mri-vol-data) — Whether the direction cosines in the header are valid.
@@ -4109,17 +4109,17 @@ Index of 6237 public class members (functions, variables, typedefs, enums) acros
 - **rawDir** `[var]` in [MNERawInfo](/docs/api/mne/mne-raw-info) — Directory of raw data tags (FIFF_DATA_BUFFER, FIFF_DATA_SKIP, etc.).
 - **rawFiles** `[var]` in `ProcessingSettings` — Raw data file(s).
 - **rcvMouseLoc** `[fn]` in [FrequencySpectrumDelegate](/docs/api/disp/frequency-spectrum-delegate) — Receive Mouse location.
-- **rd** `[var]` in `InvDipoleForward` — Dipole locations (ndip x 3).
-- **rd** `[var]` in `InvEcd` — Dipole location.
+- **rd** `[var]` in [InvDipoleForward](/docs/api/inv/inv-dipole-forward) — Dipole locations (ndip x 3).
+- **rd** `[var]` in [InvEcd](/docs/api/inv/inv-ecd) — Dipole location.
 - **read** `[fn]` in `BidsDatasetDescription` — Read a dataset_description.json file.
 - **read** `[fn]` in [BidsRawData](/docs/api/bids/bids-raw-data) — Read a BIDS dataset from disk.
 - **read** `[fn]` in [FiffAnnotations](/docs/api/fiff/fiff-annotations) — Auto-detects format and reads annotations.
 - **read** `[fn]` in [FiffCoordTrans](/docs/api/fiff/fiff-coord-trans) — Reads a coordinate transform from a fif file.
 - **read** `[fn]` in [FiffEvents](/docs/api/fiff/fiff-events) — Read events from a FIFF or ASCII event file.
 - **read** `[fn]` in [FiffEvoked](/docs/api/fiff/fiff-evoked) — fiff_read_evoked
-- **read** `[fn]` in `FiffEvokedSet` — fiff_read_evoked
-- **read** `[fn]` in `FiffIO` — Read data from a pIODevice.
-- **read** `[fn]` in `FiffIO` — Read data from a QList of pIODevices.
+- **read** `[fn]` in [FiffEvokedSet](/docs/api/fiff/fiff-evoked-set) — fiff_read_evoked
+- **read** `[fn]` in [FiffIO](/docs/api/fiff/fiff-io) — Read data from a pIODevice.
+- **read** `[fn]` in [FiffIO](/docs/api/fiff/fiff-io) — Read data from a QList of pIODevices.
 - **read** `[fn]` in [FineCalibration](/docs/api/dsp/fine-calibration) — Read a fine calibration file (.dat format).
 - **read** `[fn]` in [FsAnnotation](/docs/api/fs/fs-annotation) — Reads a FreeSurfer annotation file.
 - **read** `[fn]` in [FsAnnotation](/docs/api/fs/fs-annotation) — Reads a FreeSurfer annotation file.
@@ -4156,7 +4156,7 @@ Index of 6237 public class members (functions, variables, typedefs, enums) acros
 - **read_ctf_comp** `[fn]` in [FiffStream](/docs/api/fiff/fiff-stream) — fiff_read_ctf_comp
 - **read_curv** `[fn]` in [FsSurface](/docs/api/fs/fs-surface) — reads a binary curvature file into a vector
 - **read_digitizer_data** `[fn]` in [FiffStream](/docs/api/fiff/fiff-stream) — Reimplemntation of load_digitizer_data (digitizer.c).
-- **read_dipoles_dip** `[fn]` in `InvEcdSet` — Read dipoles from the dip format compatible with mrilab.
+- **read_dipoles_dip** `[fn]` in [InvEcdSet](/docs/api/inv/inv-ecd-set) — Read dipoles from the dip format compatible with mrilab.
 - **read_eigen_matrix** `[fn]` in [IOUtils](/docs/api/utils/io-utils) — Read Eigen Matrix from file (QString path).
 - **read_eigen_matrix** `[fn]` in [IOUtils](/docs/api/utils/io-utils)
 - **read_eigen_matrix** `[fn]` in [IOUtils](/docs/api/utils/io-utils)
@@ -4256,7 +4256,7 @@ Index of 6237 public class members (functions, variables, typedefs, enums) acros
 - **referenceMarkerAddRequested** `[signal]` in [ChannelDataView](/docs/api/disp/channel-data-view) — Emitted when the ruler context menu requests a new sample marker.
 - **referenceMarkerRemoveRequested** `[signal]` in [ChannelDataView](/docs/api/disp/channel-data-view) — Emitted when the ruler context menu requests removal of a nearby sample marker.
 - **referenceMarkersClearRequested** `[signal]` in [ChannelDataView](/docs/api/disp/channel-data-view) — Emitted when the ruler context menu requests clearing all sample markers.
-- **reg** `[var]` in `InvBeamformer` — Regularization parameter used.
+- **reg** `[var]` in [InvBeamformer](/docs/api/inv/inv-beamformer) — Regularization parameter used.
 - **regChanged** `[signal]` in [DipoleFitView](/docs/api/disp/dipole-fit-view) — Set new regularization parameters.
 - **reginv** `[var]` in [MNEInverseOperator](/docs/api/mne/mne-inverse-operator) — Diagonal regularised inverse of the singular values.
 - **regionId** `[var]` in `PickResult` — FsAnnotation label ID.
@@ -4371,8 +4371,8 @@ Index of 6237 public class members (functions, variables, typedefs, enums) acros
 - **right_up** `[var]` in [MNEMshEyes](/docs/api/mne/mne-msh-eyes) — Right hemisphere up-vector.
 - **ring** `[var]` in [MNERawData](/docs/api/mne/mne-raw-data) — Ring buffer for raw data.
 - **rmag** `[var]` in [FwdCoil](/docs/api/fwd/fwd-coil) — The field point locations (np x 3).
-- **rmag** `[fn]` in `InvSensorSet`
-- **rmag** `[fn]` in `InvSensorSet`
+- **rmag** `[fn]` in [InvSensorSet](/docs/api/inv/inv-sensor-set)
+- **rmag** `[fn]` in [InvSensorSet](/docs/api/inv/inv-sensor-set)
 - **rms_digitizer_distance** `[fn]` in [MNEMshDisplaySurface](/docs/api/mne/mne-msh-display-surface) — Compute the RMS distance from active digitizer points to the head surface.
 - **roiIdx** `[var]` in `RegionDataOut` — Region cluster indices.
 - **roiIdx** `[var]` in `RegionMTOut` — Per-source cluster assignment indices.
@@ -4398,7 +4398,7 @@ Index of 6237 public class members (functions, variables, typedefs, enums) acros
 - **rr** `[var]` in `FitUser`
 - **rr** `[var]` in `fitUserRec`
 - **rr** `[fn]` in [FsSurface](/docs/api/fs/fs-surface) — Coordinates of vertices (rr).
-- **rr** `[var]` in `InvGuessData` — Guess dipole locations (nguess x 3, row-major).
+- **rr** `[var]` in [InvGuessData](/docs/api/inv/inv-guess-data) — Guess dipole locations (nguess x 3, row-major).
 - **rr** `[var]` in [MNESurfaceOrVolume](/docs/api/mne/mne-surface-or-volume) — The vertex locations (np x 3, row-major).
 - **RtAveraging** `[fn]` in [RtAveraging](/docs/api/dsp/rt-averaging) — Creates the real-time averaging object.
 - **RtAveragingWorker** `[fn]` in [RtAveragingWorker](/docs/api/dsp/rt-averaging-worker) — Creates the real-time averaging object.
@@ -4462,7 +4462,7 @@ Index of 6237 public class members (functions, variables, typedefs, enums) acros
 - **sampleValueAt** `[fn]` in [ChannelDataModel](/docs/api/disp/channel-data-model) — Return the raw sample value at a specific absolute sample index for the given channel.
 - **samplingFreq** `[var]` in `BidsChannel` — Sampling frequency in Hz (OPTIONAL).
 - **save** `[fn]` in [FiffCov](/docs/api/fiff/fiff-cov) — Save this covariance matrix to a FIFF file.
-- **save** `[fn]` in `FiffEvokedSet` — Save this evoked data set to a FIFF file.
+- **save** `[fn]` in [FiffEvokedSet](/docs/api/fiff/fiff-evoked-set) — Save this evoked data set to a FIFF file.
 - **save** `[fn]` in [FiffRawData](/docs/api/fiff/fiff-raw-data) — Save raw data to a FIFF file, optionally with decimation and channel picking.
 - **save** `[fn]` in [MlModel](/docs/api/ml/ml-model) — Serialise the model to disk.
 - **save** `[fn]` in [MlOnnxModel](/docs/api/ml/ml-onnx-model) — Serialise the model to disk.
@@ -4470,8 +4470,8 @@ Index of 6237 public class members (functions, variables, typedefs, enums) acros
 - **save** `[fn]` in `SubView` — Save this `SubView`'s state to QSettings under the given prefix.
 - **save** `[fn]` in `ViewVisibilityProfile` — Save this profile to QSettings under the given key prefix.
 - **save_calibrated** `[var]` in [FiffCtfComp](/docs/api/fiff/fiff-ctf-comp) — If data should be saved calibrated.
-- **save_dipoles_bdip** `[fn]` in `InvEcdSet` — Save dipoles in the bdip format employed by xfit.
-- **save_dipoles_dip** `[fn]` in `InvEcdSet` — Save dipoles in the dip format suitable for mrilab.
+- **save_dipoles_bdip** `[fn]` in [InvEcdSet](/docs/api/inv/inv-ecd-set) — Save dipoles in the bdip format employed by xfit.
+- **save_dipoles_dip** `[fn]` in [InvEcdSet](/docs/api/inv/inv-ecd-set) — Save dipoles in the dip format suitable for mrilab.
 - **save_raw** `[fn]` in [MNE](/docs/api/mne/mne-class) — save_raw
 - **saveAllEvents** `[var]` in `ProcessingSettings` — Save all transitions (not just leading edge).
 - **saveAveTag** `[var]` in `ProcessingSettings` — Tag for average output files.
@@ -4524,10 +4524,10 @@ Index of 6237 public class members (functions, variables, typedefs, enums) acros
 - **scale** `[var]` in `MriSlice` — Scaling factor for pixel data.
 - **scale** `[fn]` in `SensorTreeItem`
 - **scale** `[fn]` in `SourceSpaceTreeItem` — Returns the rendering scale.
-- **scale_dipole_fit_noise_cov** `[fn]` in `InvDipoleFitData` — Scale dipole-fit noise covariance for a given number of averages.
+- **scale_dipole_fit_noise_cov** `[fn]` in [InvDipoleFitData](/docs/api/inv/inv-dipole-fit-data) — Scale dipole-fit noise covariance for a given number of averages.
 - **scale_eeg_pos** `[var]` in [ComputeFwdSettings](/docs/api/fwd/compute-fwd-settings) — Scale the electrode locations to scalp in the sphere model.
-- **scale_eeg_pos** `[var]` in `InvDipoleFitSettings` — Scale the electrode locations to scalp in the sphere model.
-- **scale_noise_cov** `[fn]` in `InvDipoleFitData` — Scale the noise-covariance matrix for a given number of averages.
+- **scale_eeg_pos** `[var]` in [InvDipoleFitSettings](/docs/api/inv/inv-dipole-fit-settings) — Scale the electrode locations to scalp in the sphere model.
+- **scale_noise_cov** `[fn]` in [InvDipoleFitData](/docs/api/inv/inv-dipole-fit-data) — Scale the noise-covariance matrix for a given number of averages.
 - **scale_pos** `[var]` in [FwdEegSphereModel](/docs/api/fwd/fwd-eeg-sphere-model) — Scale the positions to the surface of the sphere?
 - **scalebarsToggled** `[signal]` in [ChannelDataView](/docs/api/disp/channel-data-view)
 - **scalebarsVisible** `[fn]` in [ChannelDataView](/docs/api/disp/channel-data-view)
@@ -4535,7 +4535,7 @@ Index of 6237 public class members (functions, variables, typedefs, enums) acros
 - **ScaleControl** `[fn]` in [ScaleControl](/docs/api/disp/scale-control) — Constructs a [`ScaleControl`](/docs/api/disp/scale-control) object who's Qlabel element will be set.
 - **ScaleControl** `[fn]` in [ScaleControl](/docs/api/disp/scale-control) — Constructs a [`ScaleControl`](/docs/api/disp/scale-control) object who's Qlabel element will be set, and sets the parent of the underlying QWidget.
 - **ScaleControl** `[fn]` in [ScaleControl](/docs/api/disp/scale-control) — Constructs a [`ScaleControl`](/docs/api/disp/scale-control) object who's Qlabel element will be set, and sets the parent of the underlying QWidget.
-- **scales** `[var]` in `InvDipoleForward` — Column normalization scales applied to fwd (3*ndip).
+- **scales** `[var]` in [InvDipoleForward](/docs/api/inv/inv-dipole-forward) — Column normalization scales applied to fwd (3*ndip).
 - **scalingChanged** `[signal]` in [ScalingView](/docs/api/disp/scaling-view) — Emit this signal whenever the scaling sliders or spin boxes changed.
 - **scalingMap** `[fn]` in [ChannelDataView](/docs/api/disp/channel-data-view)
 - **ScalingView** `[fn]` in [ScalingView](/docs/api/disp/scaling-view) — Constructs a [`ScalingView`](/docs/api/disp/scaling-view) which is a child of parent.
@@ -4573,7 +4573,7 @@ Index of 6237 public class members (functions, variables, typedefs, enums) acros
 - **sectionCount** `[fn]` in [Report](/docs/api/utils/report) — Get the number of sections.
 - **seed** `[var]` in `SimulateStcParams` — Random seed for reproducibility.
 - **select** `[fn]` in [FiffAnnotations](/docs/api/fiff/fiff-annotations) — Selects annotations whose description starts with the filter string.
-- **select_dipole_fit_noise_cov** `[fn]` in `InvDipoleFitData` — Select and weight the noise-covariance for the active channel set.
+- **select_dipole_fit_noise_cov** `[fn]` in [InvDipoleFitData](/docs/api/inv/inv-dipole-fit-data) — Select and weight the noise-covariance for the active channel set.
 - **selectAll** `[fn]` in [ApplyToView](/docs/api/disp/apply-to-view) — Selects all View Select checkboxes.
 - **selectByChannel** `[fn]` in [FiffAnnotations](/docs/api/fiff/fiff-annotations) — Selects annotations that reference the given channel name.
 - **selectChannels** `[fn]` in [ChannelSelectionView](/docs/api/disp/channel-selection-view) — Select channels This function selects channels which were selected outside this selection manager (i.e in the DataWindow's Table View).
@@ -4890,7 +4890,7 @@ Index of 6237 public class members (functions, variables, typedefs, enums) acros
 - **setNetworkColormap** `[slot]` in `BrainView` — Set the colormap for connectivity network visualization.
 - **setNetworkThreshold** `[slot]` in `BrainView` — Set the threshold for connectivity network edge filtering.
 - **setNetworkVisible** `[slot]` in `BrainView` — Toggle visibility of connectivity network.
-- **setno** `[var]` in `InvDipoleFitSettings` — Which data set.
+- **setno** `[var]` in [InvDipoleFitSettings](/docs/api/inv/inv-dipole-fit-settings) — Which data set.
 - **setNodePositions** `[fn]` in [ConnectivitySettings](/docs/api/connectivity/connectivity-settings)
 - **setNodePositions** `[fn]` in [ConnectivitySettings](/docs/api/connectivity/connectivity-settings)
 - **setNodePositions** `[fn]` in [ConnectivitySettings](/docs/api/connectivity/connectivity-settings)
@@ -5075,12 +5075,12 @@ Index of 6237 public class members (functions, variables, typedefs, enums) acros
 - **setup_compensators** `[fn]` in [MNE](/docs/api/mne/mne-class)
 - **setup_current_lights** `[fn]` in [MNEMshDisplaySurfaceSet](/docs/api/mne/mne-msh-display-surface-set) — Initialize the custom light set (if needed) and apply it as the active lighting configuration.
 - **setup_curvature_colors** `[fn]` in [MNEMshDisplaySurface](/docs/api/mne/mne-msh-display-surface) — Allocate and fill per-vertex color arrays using positive/negative curvature colors (if curvature overlay mode is on) or uniform gray.
-- **setup_dipole_fit_data** `[fn]` in `InvDipoleFitData` — Master setup: read all inputs and build a ready-to-use fit workspace.
+- **setup_dipole_fit_data** `[fn]` in [InvDipoleFitData](/docs/api/inv/inv-dipole-fit-data) — Master setup: read all inputs and build a ready-to-use fit workspace.
 - **setup_eeg_sphere_model** `[fn]` in [FwdEegSphereModel](/docs/api/fwd/fwd-eeg-sphere-model) — Set up the desired sphere model for EEG.
 - **setup_filter_bufs** `[fn]` in [MNERawData](/docs/api/mne/mne-raw-data) — Allocate filter output buffers spanning the entire raw data range (with taper overlap), initialize a ring buffer for filtered data, and create the filter response.
-- **setup_forward_model** `[fn]` in `InvDipoleFitData` — Set up the sphere-model and (optionally) BEM forward functions.
+- **setup_forward_model** `[fn]` in [InvDipoleFitData](/docs/api/inv/inv-dipole-fit-data) — Set up the sphere-model and (optionally) BEM forward functions.
 - **setup_lights** `[fn]` in [MNEMshDisplaySurfaceSet](/docs/api/mne/mne-msh-display-surface-set) — Replace the current active lighting with a deep copy of the provided light set.
-- **setup_read** `[fn]` in `FiffIO` — Setup a [`FiffStream`](/docs/api/fiff/fiff-stream).
+- **setup_read** `[fn]` in [FiffIO](/docs/api/fiff/fiff-io) — Setup a [`FiffStream`](/docs/api/fiff/fiff-stream).
 - **setup_read_raw** `[fn]` in [Fiff](/docs/api/fiff/fiff-class) — fiff_setup_read_raw
 - **setup_read_raw** `[fn]` in [FiffStream](/docs/api/fiff/fiff-stream) — fiff_setup_read_raw
 - **setUpHint** `[fn]` in [VideoOverlay](/docs/api/disp3-d/video-overlay)
@@ -5184,7 +5184,7 @@ Index of 6237 public class members (functions, variables, typedefs, enums) acros
 - **simplex_minimize** `[fn]` in [SimplexAlgorithm](/docs/api/math/simplex-algorithm) — mne_simplex_fit.c Refactored: mne_simplex_minimize
 - **simplex_minimize** `[fn]` in [SimplexAlgorithm](/docs/api/math/simplex-algorithm) — Overload without report function (no reporting).
 - **sing** `[var]` in `fitUserRec`
-- **sing** `[var]` in `InvDipoleForward` — Singular values of the forward matrix (3*ndip).
+- **sing** `[var]` in [InvDipoleForward](/docs/api/inv/inv-dipole-forward) — Singular values of the forward matrix (3*ndip).
 - **sing** `[var]` in [MNEInverseOperator](/docs/api/mne/mne-inverse-operator) — Singular values of the whitened lead field.
 - **size** `[var]` in `BidsElectrode` — Electrode size in mm or "n/a" (RECOMMENDED for iEEG).
 - **size** `[fn]` in [ConnectivitySettings](/docs/api/connectivity/connectivity-settings)
@@ -5196,7 +5196,7 @@ Index of 6237 public class members (functions, variables, typedefs, enums) acros
 - **size** `[fn]` in [FsAnnotationSet](/docs/api/fs/fs-annotation-set) — Returns number of loaded hemispheres.
 - **size** `[fn]` in [FsSurfaceSet](/docs/api/fs/fs-surface-set) — Returns number of loaded hemispheres.
 - **size** `[var]` in [FwdCoil](/docs/api/fwd/fwd-coil) — Coil size.
-- **size** `[fn]` in `InvEcdSet` — Returns the number of stored ECDs.
+- **size** `[fn]` in [InvEcdSet](/docs/api/inv/inv-ecd-set) — Returns the number of stored ECDs.
 - **size** `[fn]` in [MlTensor](/docs/api/ml/ml-tensor)
 - **size** `[fn]` in [MNEBem](/docs/api/mne/mne-bem) — Returns the number of stored bem surfaces.
 - **size** `[var]` in [MNEFilterDef](/docs/api/mne/mne-filter-def) — Length in samples (must be a power of 2).
@@ -5248,7 +5248,7 @@ Index of 6237 public class members (functions, variables, typedefs, enums) acros
 - **sourceId** `[var]` in `PickResult` — Source renderable identifier — opaque string assigned by the [`MultimodalScene`](/docs/api/disp3-d/multimodal-scene) when the renderable was added.
 - **sourceIdx** `[var]` in `TrapMusicDipole` — Index in the lead field grid.
 - **SourceMorph** `[fn]` in [SourceMorph](/docs/api/inv/source-morph)
-- **sourceNn** `[var]` in `InvBeamformer` — Source normals (n_sources, 3).
+- **sourceNn** `[var]` in [InvBeamformer](/docs/api/inv/inv-beamformer) — Source normals (n_sources, 3).
 - **sourceNodeId** `[var]` in `MnaPort` — Which node produces this input? (empty → graph-level input).
 - **sourcePortName** `[var]` in `MnaPort` — Which output port on that node?
 - **sourceSpace** `[var]` in `ViewVisibilityProfile`
@@ -5269,7 +5269,7 @@ Index of 6237 public class members (functions, variables, typedefs, enums) acros
 - **spharaOptionsChanged** `[signal]` in [SpharaSettingsView](/docs/api/disp/sphara-settings-view) — Emit this signal whenever the user changes the SPHARA operator.
 - **SpharaSettingsView** `[fn]` in [SpharaSettingsView](/docs/api/disp/sphara-settings-view) — Constructs a [`SpharaSettingsView`](/docs/api/disp/sphara-settings-view) which is a child of parent.
 - **Sphere** `[fn]` in [Sphere](/docs/api/math/sphere) — Constructs the [`Sphere`](/docs/api/math/sphere).
-- **sphere_funcs** `[var]` in `InvDipoleFitData` — These are the sphere model forward functions.
+- **sphere_funcs** `[var]` in [InvDipoleFitData](/docs/api/inv/inv-dipole-fit-data) — These are the sphere model forward functions.
 - **sphereChanged** `[signal]` in [DipoleFitView](/docs/api/disp/dipole-fit-view) — Set new spherer model parameters.
 - **sphereVertexCount** `[fn]` in `MeshFactory` — Number of vertices in a subdivided icosahedron (for picking calculations).
 - **Spline** `[fn]` in [Spline](/docs/api/disp/spline) — The constructor for [`Spline`](/docs/api/disp/spline).
@@ -5330,7 +5330,7 @@ Index of 6237 public class members (functions, variables, typedefs, enums) acros
 - **SPtr** `[type]` in [FiffDirEntry](/docs/api/fiff/fiff-dir-entry) — Shared pointer type for [`FiffDirEntry`](/docs/api/fiff/fiff-dir-entry).
 - **SPtr** `[type]` in [FiffDirNode](/docs/api/fiff/fiff-dir-node) — Shared pointer type for [`FiffDirNode`](/docs/api/fiff/fiff-dir-node).
 - **SPtr** `[type]` in [FiffEvoked](/docs/api/fiff/fiff-evoked) — Shared pointer type for [`FiffEvoked`](/docs/api/fiff/fiff-evoked).
-- **SPtr** `[type]` in `FiffEvokedSet` — Shared pointer type for `FiffEvokedSet`.
+- **SPtr** `[type]` in [FiffEvokedSet](/docs/api/fiff/fiff-evoked-set) — Shared pointer type for [`FiffEvokedSet`](/docs/api/fiff/fiff-evoked-set).
 - **SPtr** `[type]` in [FiffId](/docs/api/fiff/fiff-id) — Shared pointer type for [`FiffId`](/docs/api/fiff/fiff-id).
 - **SPtr** `[type]` in [FiffInfo](/docs/api/fiff/fiff-info) — Shared pointer type for [`FiffInfo`](/docs/api/fiff/fiff-info).
 - **SPtr** `[type]` in [FiffInfoBase](/docs/api/fiff/fiff-info-base) — Shared pointer type for [`FiffInfoBase`](/docs/api/fiff/fiff-info-base).
@@ -5363,23 +5363,23 @@ Index of 6237 public class members (functions, variables, typedefs, enums) acros
 - **SPtr** `[type]` in [ImagCoherence](/docs/api/connectivity/imag-coherence) — Shared pointer type for [`ImagCoherence`](/docs/api/connectivity/imag-coherence).
 - **SPtr** `[type]` in [ImageSc](/docs/api/disp/image-sc) — Shared pointer type for [`ImageSc`](/docs/api/disp/image-sc) class.
 - **SPtr** `[type]` in [Interpolation](/docs/api/disp3-d/interpolation)
-- **SPtr** `[type]` in `InvBeamformer`
+- **SPtr** `[type]` in [InvBeamformer](/docs/api/inv/inv-beamformer)
 - **SPtr** `[type]` in [InvDipoleFit](/docs/api/inv/inv-dipole-fit) — Shared pointer type for [`InvDipoleFit`](/docs/api/inv/inv-dipole-fit).
-- **SPtr** `[type]` in `InvDipoleFitData` — Shared pointer type for `InvDipoleFitData`.
-- **SPtr** `[type]` in `InvDipoleFitSettings` — Shared pointer type for `InvDipoleFitSettings`.
-- **SPtr** `[type]` in `InvDipoleForward` — Shared pointer type for `InvDipoleForward`.
-- **SPtr** `[type]` in `InvEcd` — Shared pointer type for `InvEcd`.
-- **SPtr** `[type]` in `InvEcdSet` — Shared pointer type for `InvEcdSet`.
-- **SPtr** `[type]` in `InvGuessData` — Shared pointer type for `InvGuessData`.
-- **SPtr** `[type]` in `InvHpiDataUpdater` — Shared pointer type for `InvHpiDataUpdater`.
+- **SPtr** `[type]` in [InvDipoleFitData](/docs/api/inv/inv-dipole-fit-data) — Shared pointer type for [`InvDipoleFitData`](/docs/api/inv/inv-dipole-fit-data).
+- **SPtr** `[type]` in [InvDipoleFitSettings](/docs/api/inv/inv-dipole-fit-settings) — Shared pointer type for [`InvDipoleFitSettings`](/docs/api/inv/inv-dipole-fit-settings).
+- **SPtr** `[type]` in [InvDipoleForward](/docs/api/inv/inv-dipole-forward) — Shared pointer type for [`InvDipoleForward`](/docs/api/inv/inv-dipole-forward).
+- **SPtr** `[type]` in [InvEcd](/docs/api/inv/inv-ecd) — Shared pointer type for [`InvEcd`](/docs/api/inv/inv-ecd).
+- **SPtr** `[type]` in [InvEcdSet](/docs/api/inv/inv-ecd-set) — Shared pointer type for [`InvEcdSet`](/docs/api/inv/inv-ecd-set).
+- **SPtr** `[type]` in [InvGuessData](/docs/api/inv/inv-guess-data) — Shared pointer type for [`InvGuessData`](/docs/api/inv/inv-guess-data).
+- **SPtr** `[type]` in [InvHpiDataUpdater](/docs/api/inv/inv-hpi-data-updater) — Shared pointer type for [`InvHpiDataUpdater`](/docs/api/inv/inv-hpi-data-updater).
 - **SPtr** `[type]` in [InvHpiFit](/docs/api/inv/inv-hpi-fit) — Shared pointer type for [`InvHpiFit`](/docs/api/inv/inv-hpi-fit).
-- **SPtr** `[type]` in `InvHpiFitData` — Shared pointer type for `InvHpiFitData`.
-- **SPtr** `[type]` in `InvHpiModelParameters` — Shared pointer type for `InvHpiModelParameters`.
+- **SPtr** `[type]` in [InvHpiFitData](/docs/api/inv/inv-hpi-fit-data) — Shared pointer type for [`InvHpiFitData`](/docs/api/inv/inv-hpi-fit-data).
+- **SPtr** `[type]` in [InvHpiModelParameters](/docs/api/inv/inv-hpi-model-parameters) — Shared pointer type for [`InvHpiModelParameters`](/docs/api/inv/inv-hpi-model-parameters).
 - **SPtr** `[type]` in [InvMinimumNorm](/docs/api/inv/inv-minimum-norm) — Shared pointer type for [`InvMinimumNorm`](/docs/api/inv/inv-minimum-norm).
 - **SPtr** `[type]` in [InvRapMusic](/docs/api/inv/inv-rap-music) — Shared pointer type for [`InvRapMusic`](/docs/api/inv/inv-rap-music).
-- **SPtr** `[type]` in `InvSensorSet` — Shared pointer type for `InvSensorSet`.
-- **SPtr** `[type]` in `InvSensorSetCreator` — Shared pointer type for `InvSensorSet`.
-- **SPtr** `[type]` in `InvSignalModel` — Shared pointer type for `InvSignalModel`.
+- **SPtr** `[type]` in [InvSensorSet](/docs/api/inv/inv-sensor-set) — Shared pointer type for [`InvSensorSet`](/docs/api/inv/inv-sensor-set).
+- **SPtr** `[type]` in [InvSensorSetCreator](/docs/api/inv/inv-sensor-set-creator) — Shared pointer type for [`InvSensorSet`](/docs/api/inv/inv-sensor-set).
+- **SPtr** `[type]` in [InvSignalModel](/docs/api/inv/inv-signal-model) — Shared pointer type for [`InvSignalModel`](/docs/api/inv/inv-signal-model).
 - **SPtr** `[type]` in [InvSourceEstimate](/docs/api/inv/inv-source-estimate) — Shared pointer type for [`InvSourceEstimate`](/docs/api/inv/inv-source-estimate).
 - **SPtr** `[type]` in [InvVectorSourceEstimate](/docs/api/inv/inv-vector-source-estimate)
 - **SPtr** `[type]` in [InvVolumeSourceEstimate](/docs/api/inv/inv-volume-source-estimate)
@@ -5477,7 +5477,7 @@ Index of 6237 public class members (functions, variables, typedefs, enums) acros
 - **src** `[var]` in [MNEForwardSolution](/docs/api/mne/mne-forward-solution) — Geometric description of the source spaces (hemispheres).
 - **src** `[var]` in [MNEInverseOperator](/docs/api/mne/mne-inverse-operator) — Source space (surfaces and/or volume).
 - **srcname** `[var]` in [ComputeFwdSettings](/docs/api/fwd/compute-fwd-settings) — Source space.
-- **srcType** `[var]` in `InvBeamformer` — "surface", "volume", "mixed", "discrete".
+- **srcType** `[var]` in [InvBeamformer](/docs/api/inv/inv-beamformer) — "surface", "volume", "mixed", "discrete".
 - **sspStatusChanged** `[signal]` in [HpiSettingsView](/docs/api/disp/hpi-settings-view) — Emit this signal whenever SSP checkbox changed.
 - **sss** `[var]` in [MNECovMatrix](/docs/api/mne/mne-cov-matrix) — SSS data from the associated raw data file.
 - **sss** `[var]` in [MNERawData](/docs/api/mne/mne-raw-data) — SSS data found in this file.
@@ -5566,10 +5566,10 @@ Index of 6237 public class members (functions, variables, typedefs, enums) acros
 - **subj** `[var]` in [MNEMshDisplaySurface](/docs/api/mne/mne-msh-display-surface) — Subject name in SUBJECTS_DIR.
 - **subj** `[var]` in [MNEMshDisplaySurfaceSet](/docs/api/mne/mne-msh-display-surface-set) — The name of the subject.
 - **subject** `[fn]` in [BIDSPath](/docs/api/bids/bids-path) — Subject label (without "sub-").
-- **subject** `[var]` in `InvBeamformer` — Subject identifier.
+- **subject** `[var]` in [InvBeamformer](/docs/api/inv/inv-beamformer) — Subject identifier.
 - **subject** `[var]` in [MNESurfaceOrVolume](/docs/api/mne/mne-surface-or-volume) — Name (id) of the subject.
 - **subjects** `[var]` in [MnaProject](/docs/api/mna/mna-project) — Subjects in the project.
-- **subtractBaseline** `[fn]` in `FiffEvokedSet` — Subtract baseline from each channel of an epoch.
+- **subtractBaseline** `[fn]` in [FiffEvokedSet](/docs/api/fiff/fiff-evoked-set) — Subtract baseline from each channel of an epoch.
 - **success** `[var]` in `PythonRunnerResult` — True when process exited with code 0.
 - **suffix** `[fn]` in [BIDSPath](/docs/api/bids/bids-path) — Filename suffix.
 - **sum_solids** `[fn]` in [MNESurface](/docs/api/mne/mne-surface) — Sum the solid angles of all triangles as seen from a given point.
@@ -5597,7 +5597,7 @@ Index of 6237 public class members (functions, variables, typedefs, enums) acros
 - **surfaceType** `[var]` in `SubView`
 - **surfs** `[var]` in [FwdBemModel](/docs/api/fwd/fwd-bem-model) — Interface surfaces, outermost first.
 - **surfs** `[var]` in [MNEMshDisplaySurfaceSet](/docs/api/mne/mne-msh-display-surface-set) — Array of display surfaces (owned).
-- **symMatPow** `[fn]` in `InvBeamformerCompute` — Symmetric matrix power: X^p via eigendecomposition.
+- **symMatPow** `[fn]` in [InvBeamformerCompute](/docs/api/inv/inv-beamformer-compute) — Symmetric matrix power: X^p via eigendecomposition.
 - **syncBemShadersToBrainShaders** `[slot]` in `BrainView` — Synchronize all BEM shader targets to their respective brain shader targets.
 - **System** `[enum]` in [StandardMontage](/docs/api/utils/standard-montage) — Supported standard montage systems.
 - **system** `[var]` in `BidsCoordinateSystem` — e.g.
@@ -5639,7 +5639,7 @@ Index of 6237 public class members (functions, variables, typedefs, enums) acros
 - **thresholdsUpdated** `[signal]` in `SourceEstimateManager` — Emitted when thresholds are auto-computed from data.
 - **TI** `[var]` in [MriVolData](/docs/api/mri/mri-vol-data) — Inversion time (ms).
 - **time** `[var]` in [FiffId](/docs/api/fiff/fiff-id) — Time of the ID creation.
-- **time** `[var]` in `InvEcd` — Time point.
+- **time** `[var]` in [InvEcd](/docs/api/inv/inv-ecd) — Time point.
 - **time_loaded** `[var]` in [MNEMshDisplaySurface](/docs/api/mne/mne-msh-display-surface) — Timestamp when the surface was loaded.
 - **timeAtIndex** `[fn]` in `SourceEstimateOverlay` — Get the time value at a given index.
 - **timeChanged** `[signal]` in [DipoleFitView](/docs/api/disp/dipole-fit-view) — Send new time values.
@@ -5668,7 +5668,7 @@ Index of 6237 public class members (functions, variables, typedefs, enums) acros
 - **tmax** `[var]` in `CovDefinition` — Maximum time (s).
 - **tmax** `[var]` in `FiffEpochData` — End time of this epoch in seconds.
 - **tmax** `[var]` in `InvConnectivity` — End of the time window (s) this connectivity represents.
-- **tmax** `[var]` in `InvDipoleFitSettings` — Fit end time (s).
+- **tmax** `[var]` in [InvDipoleFitSettings](/docs/api/inv/inv-dipole-fit-settings) — Fit end time (s).
 - **tmax** `[var]` in `InvFocalDipole` — End of the time window (s) this dipole represents.
 - **tmax** `[var]` in `InvSourceCoupling` — End of the time window (s) this coupling represents.
 - **tmax** `[var]` in [MNEEpochData](/docs/api/mne/mne-epoch-data) — New end time of the data (cannot exceed data duration).
@@ -5677,7 +5677,7 @@ Index of 6237 public class members (functions, variables, typedefs, enums) acros
 - **tmin** `[var]` in `CovDefinition` — Minimum time (s).
 - **tmin** `[var]` in `FiffEpochData` — Start time of this epoch in seconds.
 - **tmin** `[var]` in `InvConnectivity` — Start of the time window (s) this connectivity represents.
-- **tmin** `[var]` in `InvDipoleFitSettings` — Fit start time (s).
+- **tmin** `[var]` in [InvDipoleFitSettings](/docs/api/inv/inv-dipole-fit-settings) — Fit start time (s).
 - **tmin** `[var]` in `InvFocalDipole` — Start of the time window (s) this dipole represents.
 - **tmin** `[var]` in `InvSourceCoupling` — Start of the time window (s) this coupling represents.
 - **tmin** `[var]` in [InvSourceEstimate](/docs/api/inv/inv-source-estimate) — Time starting point.
@@ -5774,8 +5774,8 @@ Index of 6237 public class members (functions, variables, typedefs, enums) acros
 - **TPassType** `[enum]` in [CosineFilter](/docs/api/utils/cosine-filter)
 - **TPassType** `[enum]` in [ParksMcClellan](/docs/api/utils/parks-mc-clellan)
 - **TR** `[var]` in [MriVolData](/docs/api/mri/mri-vol-data) — Repetition time (ms).
-- **tra** `[fn]` in `InvSensorSet`
-- **tra** `[fn]` in `InvSensorSet`
+- **tra** `[fn]` in [InvSensorSet](/docs/api/inv/inv-sensor-set)
+- **tra** `[fn]` in [InvSensorSet](/docs/api/inv/inv-sensor-set)
 - **trackerOri** `[var]` in `OpticalCalibSample` — Tracker orientation in world frame.
 - **trackerPos** `[var]` in `OpticalCalibSample` — Tracker position in world frame (metres).
 - **trackerStation** `[fn]` in [PolhemusCoregistration](/docs/api/utils/polhemus-coregistration)
@@ -5837,7 +5837,7 @@ Index of 6237 public class members (functions, variables, typedefs, enums) acros
 - **tripletSelection** `[fn]` in [MNEForwardSolution](/docs/api/mne/mne-forward-solution)
 - **tris** `[fn]` in [FsSurface](/docs/api/fs/fs-surface) — The triangle descriptions.
 - **tris** `[var]` in [MNESurfaceOrVolume](/docs/api/mne/mne-surface-or-volume) — The full triangulation data (ntri elements).
-- **tstep** `[var]` in `InvDipoleFitSettings` — Step between fits (s).
+- **tstep** `[var]` in [InvDipoleFitSettings](/docs/api/inv/inv-dipole-fit-settings) — Step between fits (s).
 - **tstep** `[var]` in [InvSourceEstimate](/docs/api/inv/inv-source-estimate) — Time steps within the times vector.
 - **tstep** `[var]` in [MNEMeasDataSet](/docs/api/mne/mne-meas-data-set) — Sampling interval (seconds).
 - **tstep** `[fn]` in `SourceEstimateManager`
@@ -5928,7 +5928,7 @@ Index of 6237 public class members (functions, variables, typedefs, enums) acros
 - **updateProjection** `[fn]` in [RtFiffRawViewModel](/docs/api/disp/rt-fiff-raw-view-model) — Update the SSP projection.
 - **updateScene** `[fn]` in [AverageScene](/docs/api/disp/average-scene) — Updates and repaints the scene.
 - **updateSceneUniforms** `[fn]` in `BrainRenderer` — Set uniforms that are shared for the entire frame.
-- **updateSensorSet** `[fn]` in `InvSensorSetCreator` — Update `InvSensorSet` from new channel list with new accuracy.
+- **updateSensorSet** `[fn]` in [InvSensorSetCreator](/docs/api/inv/inv-sensor-set-creator) — Update [`InvSensorSet`](/docs/api/inv/inv-sensor-set) from new channel list with new accuracy.
 - **updateSpharaActivation** `[fn]` in [RtFiffRawView](/docs/api/disp/rt-fiff-raw-view) — Update the SPHARA operator.
 - **updateSpharaActivation** `[fn]` in [RtFiffRawViewModel](/docs/api/disp/rt-fiff-raw-view-model) — Update the SPHARA operator.
 - **updateSpharaOptions** `[fn]` in [RtFiffRawView](/docs/api/disp/rt-fiff-raw-view) — Update the SPHARA operator.
@@ -5954,7 +5954,7 @@ Index of 6237 public class members (functions, variables, typedefs, enums) acros
 - **UPtr** `[type]` in [FiffDirEntry](/docs/api/fiff/fiff-dir-entry) — Unique pointer type for [`FiffDirEntry`](/docs/api/fiff/fiff-dir-entry).
 - **UPtr** `[type]` in [FiffDirNode](/docs/api/fiff/fiff-dir-node) — Unique pointer type for [`FiffDirNode`](/docs/api/fiff/fiff-dir-node).
 - **UPtr** `[type]` in [FiffEvoked](/docs/api/fiff/fiff-evoked) — Unique pointer type for [`FiffEvoked`](/docs/api/fiff/fiff-evoked).
-- **UPtr** `[type]` in `FiffEvokedSet` — Unique pointer type for `FiffEvokedSet`.
+- **UPtr** `[type]` in [FiffEvokedSet](/docs/api/fiff/fiff-evoked-set) — Unique pointer type for [`FiffEvokedSet`](/docs/api/fiff/fiff-evoked-set).
 - **UPtr** `[type]` in [FiffId](/docs/api/fiff/fiff-id) — Unique pointer type for [`FiffId`](/docs/api/fiff/fiff-id).
 - **UPtr** `[type]` in [FiffInfo](/docs/api/fiff/fiff-info) — Unique pointer type for [`FiffInfo`](/docs/api/fiff/fiff-info).
 - **UPtr** `[type]` in [FiffInfoBase](/docs/api/fiff/fiff-info-base) — Unique pointer type for [`FiffInfoBase`](/docs/api/fiff/fiff-info-base).
@@ -5972,7 +5972,7 @@ Index of 6237 public class members (functions, variables, typedefs, enums) acros
 - **UPtr** `[type]` in [FwdEegSphereModel](/docs/api/fwd/fwd-eeg-sphere-model) — Unique pointer type for [`FwdEegSphereModel`](/docs/api/fwd/fwd-eeg-sphere-model).
 - **UPtr** `[type]` in [FwdEegSphereModelSet](/docs/api/fwd/fwd-eeg-sphere-model-set) — Unique pointer type for [`FwdEegSphereModelSet`](/docs/api/fwd/fwd-eeg-sphere-model-set).
 - **UPtr** `[type]` in [FwdThreadArg](/docs/api/fwd/fwd-thread-arg) — Unique pointer type for [`FwdThreadArg`](/docs/api/fwd/fwd-thread-arg).
-- **UPtr** `[type]` in `InvDipoleForward` — Unique pointer type for `InvDipoleForward`.
+- **UPtr** `[type]` in [InvDipoleForward](/docs/api/inv/inv-dipole-forward) — Unique pointer type for [`InvDipoleForward`](/docs/api/inv/inv-dipole-forward).
 - **UPtr** `[type]` in [MNECTFCompDataSet](/docs/api/mne/mnectf-comp-data-set) — Unique pointer type for [`MNECTFCompDataSet`](/docs/api/mne/mnectf-comp-data-set).
 - **UPtr** `[type]` in [MNEForwardSolution](/docs/api/mne/mne-forward-solution) — Unique pointer type for [`MNEForwardSolution`](/docs/api/mne/mne-forward-solution).
 - **UPtr** `[type]` in [MNESourceSpace](/docs/api/mne/mne-source-space) — Unique pointer type for [`MNESourceSpace`](/docs/api/mne/mne-source-space).
@@ -5988,19 +5988,19 @@ Index of 6237 public class members (functions, variables, typedefs, enums) acros
 - **use_tri_nn** `[var]` in [MNEHemisphere](/docs/api/mne/mne-hemisphere) — Triangle normals of used triangles.
 - **use_tris** `[var]` in [MNESurfaceOrVolume](/docs/api/mne/mne-surface-or-volume) — Triangulation data for the in-use vertices.
 - **usecs** `[var]` in [FiffTime](/docs/api/fiff/fiff-time) — Fraction of seconds in microseconds.
-- **user** `[var]` in `InvDipoleFitData` — Non-owning pointer to dipole fit workspace (set during fit_one).
+- **user** `[var]` in [InvDipoleFitData](/docs/api/inv/inv-dipole-fit-data) — Non-owning pointer to dipole fit workspace (set during fit_one).
 - **user_data** `[var]` in [FwdCoilSet](/docs/api/fwd/fwd-coil-set) — Coil-specific BEM solution.
 - **user_data** `[var]` in [MNEMshDisplaySurface](/docs/api/mne/mne-msh-display-surface) — Arbitrary user-defined data pointer.
 - **user_data_free** `[var]` in [MNEMshDisplaySurface](/docs/api/mne/mne-msh-display-surface) — Function to free user_data.
 - **utc_offset** `[var]` in [FiffInfo](/docs/api/fiff/fiff-info) — UTC offset of related meas_date (sHH:MM).
 - **uu** `[var]` in `fitUserRec`
-- **uu** `[var]` in `InvDipoleForward` — Right singular vectors V^T of fwd (udim x nch, row-major).
+- **uu** `[var]` in [InvDipoleForward](/docs/api/inv/inv-dipole-forward) — Right singular vectors V^T of fwd (udim x nch, row-major).
 
 ## V {#v}
 
 - **v0** `[var]` in [FwdBemModel](/docs/api/fwd/fwd-bem-model) — Workspace for infinite-medium potentials (length nsol).
 - **val** `[var]` in [MNESurfaceOrVolume](/docs/api/mne/mne-surface-or-volume) — Auxiliary values associated with the vertices (np elements).
-- **valid** `[var]` in `InvEcd` — Is this dipole valid.
+- **valid** `[var]` in [InvEcd](/docs/api/inv/inv-ecd) — Is this dipole valid.
 - **valid** `[var]` in `InvFocalDipole` — Whether this dipole passed validity checks.
 - **valid** `[var]` in [MNEDeriv](/docs/api/mne/mne-deriv) — Per-derivation validity flags considering input channel units.
 - **valid** `[var]` in [MNERawBufDef](/docs/api/mne/mne-raw-buf-def) — True if the data in this buffer are meaningful.
@@ -6041,7 +6041,7 @@ Index of 6237 public class members (functions, variables, typedefs, enums) acros
 - **vecFreqs** `[var]` in `MultitaperTfrResult` — Frequency axis in Hz.
 - **vecFreqs** `[var]` in `WelchPsdResult` — Frequency axis in Hz, length iNfft/2+1.
 - **vecGamma** `[var]` in `InvGammaMapResult` — Source variance hyperparameters.
-- **vecHpiFreqs** `[fn]` in `InvHpiModelParameters` — Inline functions to get acces to parameters.
+- **vecHpiFreqs** `[fn]` in [InvHpiModelParameters](/docs/api/inv/inv-hpi-model-parameters) — Inline functions to get acces to parameters.
 - **vecInputData** `[var]` in `SpectogramInputData`
 - **vecMean** `[var]` in `IcaResult` — Per-channel mean removed during centering (n_channels).
 - **vecPairCsd** `[var]` in `IntermediateTrialData`
@@ -6061,7 +6061,7 @@ Index of 6237 public class members (functions, variables, typedefs, enums) acros
 - **VectorXT** `[type]` in [InvRapMusic](/docs/api/inv/inv-rap-music) — Defines Eigen::Matrix&lt;T, Eigen::Dynamic, 1&gt; as `VectorXT` type.
 - **venvDir** `[var]` in `PythonRunnerConfig` — Virtual-env directory (empty = no venv).
 - **venvPythonPath** `[fn]` in [PythonRunner](/docs/api/utils/python-runner) — Get the Python interpreter path inside the configured venv.
-- **verbose** `[var]` in `InvDipoleFitSettings` — Verbose output.
+- **verbose** `[var]` in [InvDipoleFitSettings](/docs/api/inv/inv-dipole-fit-settings) — Verbose output.
 - **verification** `[var]` in `MnaNode` — Explanation, checks, results, and provenance snapshot.
 - **version** `[var]` in [FiffId](/docs/api/fiff/fiff-id) — File version.
 - **version** `[var]` in [MnaOpSchema](/docs/api/mna/mna-op-schema) — Version of the operation (e.g. "2.2.0").
@@ -6086,7 +6086,7 @@ Index of 6237 public class members (functions, variables, typedefs, enums) acros
 - **vertexNormals** `[fn]` in `BrainSurface` — Get a copy of the current vertex normals.
 - **vertexPositions** `[fn]` in `BrainSurface` — Get a copy of the current vertex positions.
 - **vertices** `[var]` in [FsLabel](/docs/api/fs/fs-label) — Vertex indices (0 based).
-- **vertices** `[var]` in `InvBeamformer` — Source vertex indices.
+- **vertices** `[var]` in [InvBeamformer](/docs/api/inv/inv-beamformer) — Source vertex indices.
 - **vertices** `[var]` in [InvSourceEstimate](/docs/api/inv/inv-source-estimate) — The indices of the dipoles in the different source spaces.
 - **verticesAsMatrix** `[fn]` in `BrainSurface` — Get vertex positions as Eigen matrix.
 - **vertno** `[var]` in [MNESurfaceOrVolume](/docs/api/mne/mne-surface-or-volume) — Vertex numbers of the used vertices in the full source space (nuse elements).
@@ -6128,24 +6128,24 @@ Index of 6237 public class members (functions, variables, typedefs, enums) acros
 - **voxelToRas** `[fn]` in [MriSlicer](/docs/api/mri/mri-slicer) — Convert voxel index to RAS coordinate.
 - **voxelToRas** `[fn]` in [MriSlicer](/docs/api/mri/mri-slicer) — Convert voxel index to RAS coordinate using a volume's transform.
 - **vv** `[var]` in `fitUserRec`
-- **vv** `[var]` in `InvDipoleForward` — Left singular vectors U^T of fwd (udim x 3*ndip, row-major).
+- **vv** `[var]` in [InvDipoleForward](/docs/api/inv/inv-dipole-forward) — Left singular vectors U^T of fwd (udim x 3*ndip, row-major).
 
 ## W {#w}
 
 - **w** `[var]` in `fitUserRec`
 - **w** `[var]` in [FwdCoil](/docs/api/fwd/fwd-coil) — The weighting coefficients.
-- **w** `[fn]` in `InvSensorSet`
-- **w** `[fn]` in `InvSensorSet`
+- **w** `[fn]` in [InvSensorSet](/docs/api/inv/inv-sensor-set)
+- **w** `[fn]` in [InvSensorSet](/docs/api/inv/inv-sensor-set)
 - **wait** `[fn]` in [RtNoise](/docs/api/dsp/rt-noise) — Blocks until the worker thread has finished, or until the timeout (ms) expires.
 - **waitForDataAvailable** `[fn]` in `RtCmdClient` — Wait for ready read until data are available.
 - **wallTimeMs** `[var]` in `MnaProvenance` — Wall-clock duration in milliseconds.
 - **warp** `[fn]` in [MNEBem](/docs/api/mne/mne-bem) — Warp the Bem.
 - **WeightedPhaseLagIndex** `[fn]` in [WeightedPhaseLagIndex](/docs/api/connectivity/weighted-phase-lag-index) — Constructs a [`WeightedPhaseLagIndex`](/docs/api/connectivity/weighted-phase-lag-index) object.
-- **weightNorm** `[var]` in `InvBeamformer` — Applied weight normalization.
-- **weights** `[var]` in `InvBeamformer` — Filter weights, size 1 for LCMV, n_freqs for DICS.
+- **weightNorm** `[var]` in [InvBeamformer](/docs/api/inv/inv-beamformer) — Applied weight normalization.
+- **weights** `[var]` in [InvBeamformer](/docs/api/inv/inv-beamformer) — Filter weights, size 1 for LCMV, n_freqs for DICS.
 - **wheelScrollsChannels** `[fn]` in [ChannelRhiView](/docs/api/disp/channel-rhi-view)
 - **whiten_vector** `[fn]` in [MNECovMatrix](/docs/api/mne/mne-cov-matrix) — Apply whitening to a data vector using the inverse square-root eigenvalues stored in this covariance matrix.
-- **whitener** `[var]` in `InvBeamformer` — Whitening matrix (n_channels, n_channels).
+- **whitener** `[var]` in [InvBeamformer](/docs/api/inv/inv-beamformer) — Whitening matrix (n_channels, n_channels).
 - **whitener** `[var]` in [MNEInverseOperator](/docs/api/mne/mne-inverse-operator) — Whitening matrix (derived from noise covariance).
 - **width** `[var]` in [MNEVolGeom](/docs/api/mne/mne-vol-geom)
 - **width** `[var]` in `MriSlice` — Width of the image in pixels.
@@ -6172,8 +6172,8 @@ Index of 6237 public class members (functions, variables, typedefs, enums) acros
 - **write** `[fn]` in [FiffCoordTrans](/docs/api/fiff/fiff-coord-trans) — Writes the transformation to file.
 - **write** `[fn]` in [FiffDigPointSet](/docs/api/fiff/fiff-dig-point-set) — Writes the [`FiffDigPointSet`](/docs/api/fiff/fiff-dig-point-set) to a FIFF file.
 - **write** `[fn]` in [FiffDigPointSet](/docs/api/fiff/fiff-dig-point-set) — Convenience overload: write the digitizer point set to a path on disk.
-- **write** `[fn]` in `FiffIO` — Write data to a single pIODevice.
-- **write** `[fn]` in `FiffIO` — Write whole data of a type to a fiff file.
+- **write** `[fn]` in [FiffIO](/docs/api/fiff/fiff-io) — Write data to a single pIODevice.
+- **write** `[fn]` in [FiffIO](/docs/api/fiff/fiff-io) — Write whole data of a type to a fiff file.
 - **write** `[fn]` in [FineCalibration](/docs/api/dsp/fine-calibration) — Write fine calibration to a .dat file.
 - **write** `[fn]` in [InvSourceEstimate](/docs/api/inv/inv-source-estimate) — mne_write_stc_file
 - **write** `[fn]` in [MnaIO](/docs/api/mna/mna-io) — Write an MNA project to file.
@@ -6224,7 +6224,7 @@ Index of 6237 public class members (functions, variables, typedefs, enums) acros
 - **write_named_matrix** `[fn]` in [FiffStream](/docs/api/fiff/fiff-stream) — fiff_write_named_matrix
 - **write_proj** `[fn]` in [Fiff](/docs/api/fiff/fiff-class) — fiff_write_proj
 - **write_proj** `[fn]` in [FiffStream](/docs/api/fiff/fiff-stream) — fiff_write_proj
-- **write_raw** `[fn]` in `FiffIO` — Write raw data to a pIODevice.
+- **write_raw** `[fn]` in [FiffIO](/docs/api/fiff/fiff-io) — Write raw data to a pIODevice.
 - **write_raw_buffer** `[fn]` in [Fiff](/docs/api/fiff/fiff-class) — fiff_write_raw_buffer
 - **write_raw_buffer** `[fn]` in [FiffStream](/docs/api/fiff/fiff-stream) — fiff_write_raw_buffer
 - **write_raw_buffer** `[fn]` in [FiffStream](/docs/api/fiff/fiff-stream) — fiff_write_raw_buffer
@@ -6267,8 +6267,8 @@ Index of 6237 public class members (functions, variables, typedefs, enums) acros
 ## X {#x}
 
 - **x** `[var]` in `BidsElectrode` — X coordinate or "n/a" (REQUIRED).
-- **x** `[fn]` in `InvDipole`
-- **x** `[fn]` in `InvDipole`
+- **x** `[fn]` in [InvDipole](/docs/api/inv/inv-dipole)
+- **x** `[fn]` in [InvDipole](/docs/api/inv/inv-dipole)
 - **x** `[var]` in `VelocitySample`
 - **x** `[var]` in `VertexData`
 - **x** `[var]` in `VertexData`
@@ -6290,8 +6290,8 @@ Index of 6237 public class members (functions, variables, typedefs, enums) acros
 
 - **y** `[var]` in `BidsElectrode` — Y coordinate or "n/a" (REQUIRED).
 - **y** `[var]` in `fitUserRec`
-- **y** `[fn]` in `InvDipole`
-- **y** `[fn]` in `InvDipole`
+- **y** `[fn]` in [InvDipole](/docs/api/inv/inv-dipole)
+- **y** `[fn]` in [InvDipole](/docs/api/inv/inv-dipole)
 - **y** `[var]` in `VertexData`
 - **y** `[var]` in `VertexData`
 - **y** `[var]` in `VertexData`
@@ -6307,8 +6307,8 @@ Index of 6237 public class members (functions, variables, typedefs, enums) acros
 ## Z {#z}
 
 - **z** `[var]` in `BidsElectrode` — Z coordinate or "n/a" (REQUIRED).
-- **z** `[fn]` in `InvDipole`
-- **z** `[fn]` in `InvDipole`
+- **z** `[fn]` in [InvDipole](/docs/api/inv/inv-dipole)
+- **z** `[fn]` in [InvDipole](/docs/api/inv/inv-dipole)
 - **z** `[var]` in `VertexData`
 - **z** `[var]` in `VertexData`
 - **z** `[var]` in `VertexData`

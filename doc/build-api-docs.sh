@@ -8,12 +8,16 @@
 #      freshly emptied doc/xml_out/.
 #   2) tools/quality/check_doxygen_warnings.py fails on any Doxygen warning
 #      outside tools/quality/doxygen_warning_allowlist.json.
-#   3) tools/doxy2mdx/doxy2mdx.py turns XML into MDX + a sidebar fragment.
-#   4) Docusaurus builds the static site in doc/website/build/.
+#   3) tools/doxy2mdx/audit_registry.py fails when the XML and
+#      doc/api_registry.json disagree.
+#   4) tools/doxy2mdx/doxy2mdx.py turns XML into MDX + a sidebar fragment,
+#      or with --check verifies the committed ones without rewriting them.
+#   5) Docusaurus builds the static site in doc/website/build/.
 #
 # Usage (from any directory):
-#   doc/build-api-docs.sh             # all four steps
-#   doc/build-api-docs.sh --no-site   # steps 1-3, no Node.js needed
+#   doc/build-api-docs.sh             # all steps, regenerating the pages
+#   doc/build-api-docs.sh --no-site   # steps 1-4, no Node.js needed
+#   doc/build-api-docs.sh --check     # CI: like --no-site, but fail on stale pages
 
 set -euo pipefail
 REPO_ROOT="$(cd "$(dirname "$0")/.." && pwd)"
@@ -21,10 +25,12 @@ cd "$REPO_ROOT"
 
 DOXYGEN_VERSION="1.16.1"
 BUILD_SITE=true
+CHECK_ONLY=false
 for arg in "$@"; do
   case "$arg" in
     --no-site) BUILD_SITE=false ;;
-    -h|--help) sed -n '5,16p' "$0"; exit 0 ;;
+    --check) BUILD_SITE=false; CHECK_ONLY=true ;;
+    -h|--help) sed -n '5,20p' "$0"; exit 0 ;;
     *) echo "error: unknown argument '$arg'" >&2; exit 2 ;;
   esac
 done
@@ -47,12 +53,18 @@ fi
 rm -rf doc/xml_out
 ( cd doc && doxygen Doxyfile )
 python3 tools/quality/check_doxygen_warnings.py doc/xml_out/doxygen-warnings.log
+python3 tools/doxy2mdx/audit_registry.py --check --xml-dir doc/xml_out/xml
 
+if $CHECK_ONLY; then
+  python3 tools/doxy2mdx/check_generated.py --xml-dir doc/xml_out/xml
+  exit 0
+fi
 python3 tools/doxy2mdx/doxy2mdx.py \
     --xml-dir doc/xml_out/xml \
     --out-dir doc/website/docs/api \
     --registry doc/api_registry.json \
-    --generate-sidebars
+    --generate-sidebars \
+    --strict
 
 if $BUILD_SITE; then
   ( cd doc/website && npm ci && npm run build )

@@ -1,0 +1,122 @@
+---
+id: inv-pwl-rap-music
+title: "INVLIB::InvPwlRapMusic"
+sidebar_label: InvPwlRapMusic
+sidebar_position: 32
+---
+
+# InvPwlRapMusic
+
+**Namespace:** `INVLIB` &nbsp;·&nbsp; **Library:** Inverse Library
+
+`#include <inv/inv_pwl_rap_music.h>`
+
+```cpp
+class INVLIB::InvPwlRapMusic
+```
+
+Powell-accelerated RAP MUSIC variant using gradient-free optimization for refined dipole fitting.
+
+ToDo Detailed description
+
+### Inheritance
+
+```mermaid
+classDiagram
+    InvRapMusic <|-- InvPwlRapMusic
+    click InvRapMusic "/docs/api/inv/inv-rap-music"
+```
+
+---
+
+## Public Methods
+
+### InvPwlRapMusic()
+
+Default constructor creates an empty POWELL RAP MUSIC algorithm which still needs to be initialized.
+
+---
+
+### InvPwlRapMusic(p_pFwd, p_bSparsed, p_iN, p_dThr)
+
+Constructor which initializes the POWELL RAP MUSIC algorithm with the given model.
+
+**Parameters:**
+
+- **p_pFwd** : *[MNEForwardSolution](/docs/api/mne/mne-forward-solution) &*
+  The model which contains the gain matrix and its corresponding grid matrix.
+
+- **p_bSparsed** : *bool*
+  True when sparse matrices should be used.
+
+- **p_iN** : *int*
+  The number (default 2) of uncorrelated sources, which should be found. Starting with. the strongest.
+
+- **p_dThr** : *double*
+  The correlation threshold (default 0.5) at which the search for sources stops.
+
+---
+
+### ~InvPwlRapMusic()
+
+---
+
+### calculateInverse(p_fiffEvoked, pick_normal)
+
+Note: Since they are virtual they have to be implemented to be called.
+
+Even so the base class RAP MUSIC implementation is called.
+
+**Parameters:**
+
+- **p_fiffEvoked** : *const [FiffEvoked](/docs/api/fiff/fiff-evoked) &*
+  Evoked data to localize.
+
+- **pick_normal** : *bool*
+  Keep only the component normal to the cortex.
+
+---
+
+### calculateInverse(data, tmin, tstep, pick_normal)
+
+Note: Since they are virtual they have to be implemented to be called.
+
+Even so the base class RAP MUSIC implementation is called.
+
+**Parameters:**
+
+- **data** : *const Eigen::MatrixXd &*
+  Measurement data (channels x samples).
+
+- **tmin** : *float*
+  Time of the first sample in seconds.
+
+- **tstep** : *float*
+  Time between samples in seconds.
+
+- **pick_normal** : *bool*
+  Keep only the component normal to the cortex.
+
+---
+
+### calculateInverse(p_matMeasurement, p_RapDipoles)
+
+---
+
+### getName()
+
+---
+
+## Static Methods
+
+### PowellOffset(p_iRow, p_iNumPoints)
+
+---
+
+### PowellIdxVec(p_iRow, p_iNumPoints, p_pVecElements)
+
+---
+
+## Authors of this file
+
+- Christoph Dinh &lt;christoph.dinh@mne-cpp.org&gt;

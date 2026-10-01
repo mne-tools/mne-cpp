@@ -1,0 +1,88 @@
+---
+id: inv-beamformer
+title: "INVLIB::InvBeamformer"
+sidebar_label: InvBeamformer
+sidebar_position: 20
+---
+
+# InvBeamformer
+
+**Namespace:** `INVLIB` &nbsp;·&nbsp; **Library:** Inverse Library
+
+`#include <inv/inv_beamformer.h>`
+
+```cpp
+class INVLIB::InvBeamformer
+```
+
+Stores pre-computed beamformer spatial filter weights and associated metadata.
+
+For LCMV: weights is a single matrix (n_sources * n_orient, n_channels). For DICS: weights is a vector of matrices, one per frequency bin.
+
+This class is the C++ equivalent of MNE-Python's Beamformer dict.
+
+Computed beamformer spatial filter container.
+
+---
+
+## Public Methods
+
+### InvBeamformer()
+
+Default constructor — produces an empty (invalid) beamformer.
+
+---
+
+### isValid()
+
+Returns true if this beamformer contains valid filter weights.
+
+**Returns:**
+
+- *bool* — True if filter weights are present, false for a default-constructed beamformer.
+
+---
+
+### nSources()
+
+Returns the number of source points.
+
+**Returns:**
+
+- *int* — Number of source points covered by the filter weights.
+
+---
+
+### nChannels()
+
+Returns the number of channels.
+
+**Returns:**
+
+- *int* — Number of sensor channels the filter weights apply to.
+
+---
+
+### nOrient()
+
+Returns the number of orientations per source (1 or 3).
+
+**Returns:**
+
+- *int* — 1 for fixed or max-power orientation, 3 for free orientation.
+
+---
+
+### nFreqs()
+
+Returns the number of frequency bins (1 for LCMV, &gt;= 1 for DICS).
+
+**Returns:**
+
+- *int* — Number of frequency bins with separate filter weights.
+
+---
+
+## Authors of this file
+
+- Christoph Dinh &lt;christoph.dinh@mne-cpp.org&gt;

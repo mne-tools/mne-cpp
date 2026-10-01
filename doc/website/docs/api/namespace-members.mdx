@@ -13,20 +13,20 @@ Index of 327 namespace-level symbols (functions, typedefs, enums, variables) acr
 - **_fiff_explanations** `[var]` in [FIFFLIB](/docs/api/fiff/)
 - **_fiff_unit_explanations** `[var]` in [FIFFLIB](/docs/api/fiff/)
 - **_fiff_unit_mul_explanations** `[var]` in [FIFFLIB](/docs/api/fiff/)
-- **Accuracy** `[enum]` in `INVLIB`
+- **Accuracy** `[enum]` in [INVLIB](/docs/api/inv/)
 - **addReferenceChannels** `[fn]` in [UTILSLIB](/docs/api/utils/) — Add reference channel(s) back as zero-filled rows.
 - **allowedDatatypes** `[fn]` in [BIDSLIB](/docs/api/bids/) — All allowed BIDS datatypes.
 - **allowedElectrophysiologyDatatypes** `[fn]` in [BIDSLIB](/docs/api/bids/) — All allowed BIDS electrophysiology datatypes.
 - **annotateAmplitude** `[fn]` in [UTILSLIB](/docs/api/utils/) — Annotate segments where amplitude exceeds thresholds or is too flat.
 - **annotateMusclZscore** `[fn]` in [UTILSLIB](/docs/api/utils/) — Detect muscle artifacts via high-frequency z-score and annotate bad segments.
 - **annotationsFromEvents** `[fn]` in [FIFFLIB](/docs/api/fiff/) — Convert a FIFF event matrix to [`FiffAnnotations`](/docs/api/fiff/fiff-annotations).
-- **applyInverseEpochs** `[fn]` in `INVLIB` — Apply inverse operator to each epoch in a list.
-- **applyInverseRaw** `[fn]` in `INVLIB` — Apply inverse operator to raw data in blocks.
+- **applyInverseEpochs** `[fn]` in [INVLIB](/docs/api/inv/) — Apply inverse operator to each epoch in a list.
+- **applyInverseRaw** `[fn]` in [INVLIB](/docs/api/inv/) — Apply inverse operator to raw data in blocks.
 - **AvrTypeRowVector** `[type]` in [DISPLIB](/docs/api/disp/)
 - **AvrTypeRowVectorPair** `[type]` in [DISPLIB](/docs/api/disp/)
-- **BeamformerInversion** `[enum]` in `INVLIB` — Method for inverting the beamformer denominator matrix G^H Cm^\{-1\} G.
-- **BeamformerPickOri** `[enum]` in `INVLIB` — Orientation picking mode for beamformer filters.
-- **BeamformerWeightNorm** `[enum]` in `INVLIB` — Weight normalization strategy for beamformer spatial filters.
+- **BeamformerInversion** `[enum]` in [INVLIB](/docs/api/inv/) — Method for inverting the beamformer denominator matrix G^H Cm^\{-1\} G.
+- **BeamformerPickOri** `[enum]` in [INVLIB](/docs/api/inv/) — Orientation picking mode for beamformer filters.
+- **BeamformerWeightNorm** `[enum]` in [INVLIB](/docs/api/inv/) — Weight normalization strategy for beamformer spatial filters.
 - **BIDS_DATATYPE_ANAT** `[var]` in [BIDSLIB](/docs/api/bids/)
 - **BIDS_DATATYPE_BEH** `[var]` in [BIDSLIB](/docs/api/bids/)
 - **BIDS_DATATYPE_DWI** `[var]` in [BIDSLIB](/docs/api/bids/)
@@ -39,9 +39,9 @@ Index of 327 namespace-level symbols (functions, typedefs, enums, variables) acr
 - **bidsEntityOrder** `[fn]` in [BIDSLIB](/docs/api/bids/) — Entity key ordering for BIDS filenames (per specification).
 - **BidsTsvRow** `[type]` in [BIDSLIB](/docs/api/bids/) — Represents a single row of a BIDS TSV file as a column-name → value map.
 - **bidsTypeToFiffKind** `[fn]` in [BIDSLIB](/docs/api/bids/) — Maps BIDS channel type strings back to FIFF channel kind constants.
-- **BIG_TIME** `[var]` in `INVLIB`
+- **BIG_TIME** `[var]` in [INVLIB](/docs/api/inv/)
 - **buildDateTime** `[fn]` in [BIDSLIB](/docs/api/bids/) — Returns build date and time.
-- **buildDateTime** `[fn]` in `COMLIB` — Compile-time date/time stamp baked into the ``COMLIB`` binary.
+- **buildDateTime** `[fn]` in [COMLIB](/docs/api/com/) — Compile-time date/time stamp baked into the ``COMLIB`` binary.
 - **buildDateTime** `[fn]` in [CONNECTIVITYLIB](/docs/api/connectivity/) — Returns build date and time.
 - **buildDateTime** `[fn]` in [DECODINGLIB](/docs/api/decoding/) — Returns build date and time.
 - **buildDateTime** `[fn]` in [DISP3DLIB](/docs/api/disp3-d/) — Returns build date and time.
@@ -50,17 +50,17 @@ Index of 327 namespace-level symbols (functions, typedefs, enums, variables) acr
 - **buildDateTime** `[fn]` in [FIFFLIB](/docs/api/fiff/) — Returns build date and time.
 - **buildDateTime** `[fn]` in [FSLIB](/docs/api/fs/) — Returns build date and time.
 - **buildDateTime** `[fn]` in [FWDLIB](/docs/api/fwd/) — Returns build date and time.
-- **buildDateTime** `[fn]` in `INVLIB` — Returns build date and time.
+- **buildDateTime** `[fn]` in [INVLIB](/docs/api/inv/) — Returns build date and time.
 - **buildDateTime** `[fn]` in [LSLLIB](/docs/api/lsl/) — Returns build date and time.
 - **buildDateTime** `[fn]` in [MATHLIB](/docs/api/math/) — Returns build date and time.
 - **buildDateTime** `[fn]` in [MLLIB](/docs/api/ml/) — Returns build date and time.
 - **buildDateTime** `[fn]` in [MNALIB](/docs/api/mna/) — Returns build date and time.
 - **buildDateTime** `[fn]` in [MNELIB](/docs/api/mne/) — Returns build date and time.
 - **buildDateTime** `[fn]` in [MRILIB](/docs/api/mri/) — Returns the build date and time.
-- **buildDateTime** `[fn]` in `STSLIB` — Returns build date and time.
+- **buildDateTime** `[fn]` in [STSLIB](/docs/api/sts/) — Returns build date and time.
 - **buildDateTime** `[fn]` in [UTILSLIB](/docs/api/utils/) — Returns build date and time.
 - **buildHash** `[fn]` in [BIDSLIB](/docs/api/bids/) — Returns abbreviated build git hash.
-- **buildHash** `[fn]` in `COMLIB` — Abbreviated git commit hash (typically 7 hex chars) of the source tree this library was built from.
+- **buildHash** `[fn]` in [COMLIB](/docs/api/com/) — Abbreviated git commit hash (typically 7 hex chars) of the source tree this library was built from.
 - **buildHash** `[fn]` in [CONNECTIVITYLIB](/docs/api/connectivity/) — Returns abbreviated build git hash.
 - **buildHash** `[fn]` in [DECODINGLIB](/docs/api/decoding/) — Returns abbreviated build git hash.
 - **buildHash** `[fn]` in [DISP3DLIB](/docs/api/disp3-d/) — Returns abbreviated build git hash.
@@ -69,17 +69,17 @@ Index of 327 namespace-level symbols (functions, typedefs, enums, variables) acr
 - **buildHash** `[fn]` in [FIFFLIB](/docs/api/fiff/) — Returns abbreviated build git hash.
 - **buildHash** `[fn]` in [FSLIB](/docs/api/fs/) — Returns abbreviated build git hash.
 - **buildHash** `[fn]` in [FWDLIB](/docs/api/fwd/) — Returns abbreviated build git hash.
-- **buildHash** `[fn]` in `INVLIB` — Returns abbreviated build git hash.
+- **buildHash** `[fn]` in [INVLIB](/docs/api/inv/) — Returns abbreviated build git hash.
 - **buildHash** `[fn]` in [LSLLIB](/docs/api/lsl/) — Returns abbreviated build git hash.
 - **buildHash** `[fn]` in [MATHLIB](/docs/api/math/) — Returns abbreviated build git hash.
 - **buildHash** `[fn]` in [MLLIB](/docs/api/ml/) — Returns abbreviated build git hash.
 - **buildHash** `[fn]` in [MNALIB](/docs/api/mna/) — Returns abbreviated build git hash.
 - **buildHash** `[fn]` in [MNELIB](/docs/api/mne/) — Returns abbreviated build git hash.
 - **buildHash** `[fn]` in [MRILIB](/docs/api/mri/) — Returns the short git hash.
-- **buildHash** `[fn]` in `STSLIB` — Returns abbreviated build git hash.
+- **buildHash** `[fn]` in [STSLIB](/docs/api/sts/) — Returns abbreviated build git hash.
 - **buildHash** `[fn]` in [UTILSLIB](/docs/api/utils/) — Returns abbreviated build git hash.
 - **buildHashLong** `[fn]` in [BIDSLIB](/docs/api/bids/) — Returns full build git hash.
-- **buildHashLong** `[fn]` in `COMLIB` — Full-length git commit hash (40 hex chars) of the source tree this library was built from.
+- **buildHashLong** `[fn]` in [COMLIB](/docs/api/com/) — Full-length git commit hash (40 hex chars) of the source tree this library was built from.
 - **buildHashLong** `[fn]` in [CONNECTIVITYLIB](/docs/api/connectivity/) — Returns full build git hash.
 - **buildHashLong** `[fn]` in [DECODINGLIB](/docs/api/decoding/) — Returns full build git hash.
 - **buildHashLong** `[fn]` in [DISP3DLIB](/docs/api/disp3-d/) — Returns full build git hash.
@@ -88,14 +88,14 @@ Index of 327 namespace-level symbols (functions, typedefs, enums, variables) acr
 - **buildHashLong** `[fn]` in [FIFFLIB](/docs/api/fiff/) — Returns full build git hash.
 - **buildHashLong** `[fn]` in [FSLIB](/docs/api/fs/) — Returns full build git hash.
 - **buildHashLong** `[fn]` in [FWDLIB](/docs/api/fwd/) — Returns full build git hash.
-- **buildHashLong** `[fn]` in `INVLIB` — Returns full build git hash.
+- **buildHashLong** `[fn]` in [INVLIB](/docs/api/inv/) — Returns full build git hash.
 - **buildHashLong** `[fn]` in [LSLLIB](/docs/api/lsl/) — Returns full build git hash.
 - **buildHashLong** `[fn]` in [MATHLIB](/docs/api/math/) — Returns full build git hash.
 - **buildHashLong** `[fn]` in [MLLIB](/docs/api/ml/) — Returns full build git hash.
 - **buildHashLong** `[fn]` in [MNALIB](/docs/api/mna/) — Returns full build git hash.
 - **buildHashLong** `[fn]` in [MNELIB](/docs/api/mne/) — Returns full build git hash.
 - **buildHashLong** `[fn]` in [MRILIB](/docs/api/mri/) — Returns the long git hash.
-- **buildHashLong** `[fn]` in `STSLIB` — Returns full build git hash.
+- **buildHashLong** `[fn]` in [STSLIB](/docs/api/sts/) — Returns full build git hash.
 - **buildHashLong** `[fn]` in [UTILSLIB](/docs/api/utils/) — Returns full build git hash.
 - **BVBinaryFormat** `[enum]` in [BIDSLIB](/docs/api/bids/) — Binary format enumeration for BrainVision data files.
 - **BVOrientation** `[enum]` in [BIDSLIB](/docs/api/bids/) — Data orientation enumeration.
@@ -113,9 +113,9 @@ Index of 327 namespace-level symbols (functions, typedefs, enums, variables) acr
 - **computeElectricalDistance** `[fn]` in [UTILSLIB](/docs/api/utils/) — Compute electrical distance matrix between EEG channels.
 - **computeFilteredAverage** `[fn]` in [RTPROCESSINGLIB](/docs/api/dsp/) — Computes the filtered average for given fiff raw data.
 - **computeLofScores** `[fn]` in [UTILSLIB](/docs/api/utils/) — Compute LOF scores for a feature matrix.
-- **computeSourceBandPower** `[fn]` in `INVLIB` — Compute band power for source estimate.
-- **computeSourcePsd** `[fn]` in `INVLIB` — Compute PSD for a source estimate using Welch's method.
-- **computeWhitener** `[fn]` in `INVLIB` — Compute whitening matrix from a noise covariance.
+- **computeSourceBandPower** `[fn]` in [INVLIB](/docs/api/inv/) — Compute band power for source estimate.
+- **computeSourcePsd** `[fn]` in [INVLIB](/docs/api/inv/) — Compute PSD for a source estimate using Welch's method.
+- **computeWhitener** `[fn]` in [INVLIB](/docs/api/inv/) — Compute whitening matrix from a noise covariance.
 - **COR_HEIGHT** `[var]` in [MRILIB](/docs/api/mri/) — Height of each COR slice in pixels.
 - **COR_NSLICE** `[var]` in [MRILIB](/docs/api/mri/) — Number of COR slices.
 - **COR_PIXEL_SIZE** `[var]` in [MRILIB](/docs/api/mri/) — Pixel size for COR slices (1mm in meters).
@@ -133,18 +133,18 @@ Index of 327 namespace-level symbols (functions, typedefs, enums, variables) acr
 - **defaultQStringList** `[var]` in [FIFFLIB](/docs/api/fiff/)
 - **defaultRowVectorXi** `[var]` in [FIFFLIB](/docs/api/fiff/)
 - **defaultTris** `[fn]` in [FSLIB](/docs/api/fs/)
-- **defaultVariant** `[var]` in `COMLIB`
+- **defaultVariant** `[var]` in [COMLIB](/docs/api/com/)
 - **defaultVectorXi** `[var]` in [FIFFLIB](/docs/api/fiff/)
 - **detectTriggerFlanksGrad** `[fn]` in [RTPROCESSINGLIB](/docs/api/dsp/) — detectTriggerFlanksGrad detects flanks from a given data matrix in row wise order.
 - **detectTriggerFlanksGrad** `[fn]` in [RTPROCESSINGLIB](/docs/api/dsp/) — detectTriggerFlanksGrad detects flanks from a given data matrix in row wise order.
 - **detectTriggerFlanksMax** `[fn]` in [RTPROCESSINGLIB](/docs/api/dsp/) — detectTriggerFlanks detects flanks from a given data matrix in row wise order.
 - **detectTriggerFlanksMax** `[fn]` in [RTPROCESSINGLIB](/docs/api/dsp/) — detectTriggerFlanks detects flanks from a given data matrix in row wise order.
 - **DetrendMode** `[enum]` in [DISPLIB](/docs/api/disp/) — Channel display metadata (read-only from the renderer's perspective).
-- **dipoleFitFuncs** `[type]` in `INVLIB` — Pointer alias for `dipoleFitFuncsRec`, used throughout the dipole fitting module.
+- **dipoleFitFuncs** `[type]` in [INVLIB](/docs/api/inv/) — Pointer alias for `dipoleFitFuncsRec`, used throughout the dipole fitting module.
 - **discard3DPointOutliers** `[fn]` in [MNELIB](/docs/api/mne/) — Discard outliers compared to a given 3D surface.
 - **eegAllowedExtensions** `[fn]` in [BIDSLIB](/docs/api/bids/) — Supported raw data file extensions for EEG in BIDS.
 - **ElectrodeLayout** `[enum]` in [DISP3DLIB](/docs/api/disp3-d/) — Geometry layout for an electrode array.
-- **estimateSnr** `[fn]` in `INVLIB` — Estimate SNR from evoked data and inverse operator.
+- **estimateSnr** `[fn]` in [INVLIB](/docs/api/inv/) — Estimate SNR from evoked data and inverse operator.
 - **eventsFromAnnotations** `[fn]` in [FIFFLIB](/docs/api/fiff/) — Convert [`FiffAnnotations`](/docs/api/fiff/fiff-annotations) to a FIFF event matrix.
 - **FiducialId** `[enum]` in [UTILSLIB](/docs/api/utils/) — Identifier for the three cardinal fiducials.
 - **FieldMap** `[type]` in [DISP3DLIB](/docs/api/disp3-d/)
@@ -188,7 +188,7 @@ Index of 327 namespace-level symbols (functions, typedefs, enums, variables) acr
 - **fitUser** `[type]` in [FWDLIB](/docs/api/fwd/)
 - **fitUser** `[type]` in [UTILSLIB](/docs/api/utils/)
 - **fixStimArtifact** `[fn]` in [UTILSLIB](/docs/api/utils/) — Repair stimulus artifacts by interpolating or zeroing data around events.
-- **fromTokens** `[fn]` in `INVLIB` — Reconstruct an [`InvSourceEstimate`](/docs/api/inv/inv-source-estimate) from a token sequence.
+- **fromTokens** `[fn]` in [INVLIB](/docs/api/inv/) — Reconstruct an [`InvSourceEstimate`](/docs/api/inv/inv-source-estimate) from a token sequence.
 - **FWD_BEM_CONSTANT_COLL** `[var]` in [FWDLIB](/docs/api/fwd/)
 - **FWD_BEM_IP_APPROACH_LIMIT** `[var]` in [FWDLIB](/docs/api/fwd/)
 - **FWD_BEM_LIN_FIELD_FERGUSON** `[var]` in [FWDLIB](/docs/api/fwd/)
@@ -214,10 +214,10 @@ Index of 327 namespace-level symbols (functions, typedefs, enums, variables) acr
 - **IcaComponentLabel** `[enum]` in [DECODINGLIB](/docs/api/decoding/) — Categorical label assigned to a single ICA component.
 - **ieegAllowedCoordSystems** `[fn]` in [BIDSLIB](/docs/api/bids/) — Allowed coordinate systems for iEEG electrodes (BIDS-iEEG spec).
 - **ieegAllowedExtensions** `[fn]` in [BIDSLIB](/docs/api/bids/) — Supported raw data file extensions for iEEG in BIDS.
-- **InvEstimateMethod** `[enum]` in `INVLIB` — Enumerates the inverse estimation method that produced a source estimate.
-- **InvOrientationType** `[enum]` in `INVLIB` — Enumerates the orientation constraint used during source estimation.
-- **InvSourceSpaceType** `[enum]` in `INVLIB` — Enumerates the source space type underlying a source estimate.
-- **InvTokenId** `[enum]` in `INVLIB` — Token vocabulary for the [`InvSourceEstimate`](/docs/api/inv/inv-source-estimate) tokenization format.
+- **InvEstimateMethod** `[enum]` in [INVLIB](/docs/api/inv/) — Enumerates the inverse estimation method that produced a source estimate.
+- **InvOrientationType** `[enum]` in [INVLIB](/docs/api/inv/) — Enumerates the orientation constraint used during source estimation.
+- **InvSourceSpaceType** `[enum]` in [INVLIB](/docs/api/inv/) — Enumerates the source space type underlying a source estimate.
+- **InvTokenId** `[enum]` in [INVLIB](/docs/api/inv/) — Token vocabulary for the [`InvSourceEstimate`](/docs/api/inv/inv-source-estimate) tokenization format.
 - **isHit** `[fn]` in [DISP3DLIB](/docs/api/disp3-d/)
 - **kBemHead** `[var]` in `SURFACEKEYS`
 - **kBemPrefix** `[var]` in `SURFACEKEYS`
@@ -318,8 +318,8 @@ Index of 327 namespace-level symbols (functions, typedefs, enums, variables) acr
 - **simulateStcFromWaveforms** `[fn]` in [UTILSLIB](/docs/api/utils/) — Create a synthetic source time course from custom waveforms.
 - **SliceOrientation** `[enum]` in [DISP3DLIB](/docs/api/disp3-d/) — Orientation for an orthogonal MRI slice.
 - **SliceOrientation** `[enum]` in [MRILIB](/docs/api/mri/) — Slice orientation for orthogonal MRI volume slicing.
-- **StatsCorrection** `[enum]` in `STSLIB` — Multiple comparison correction method.
-- **StatsTailType** `[enum]` in `STSLIB` — Tail type for statistical tests.
+- **StatsCorrection** `[enum]` in [STSLIB](/docs/api/sts/) — Multiple comparison correction method.
+- **StatsTailType** `[enum]` in [STSLIB](/docs/api/sts/) — Tail type for statistical tests.
 - **StimArtifactMode** `[enum]` in [UTILSLIB](/docs/api/utils/) — Mode for stimulus artifact repair.
 - **swap_doublep** `[fn]` in [FIFFLIB](/docs/api/fiff/) — Swap a 64-bit double in place.
 - **swap_float** `[fn]` in [FIFFLIB](/docs/api/fiff/) — Swap a 32-bit float.
@@ -331,8 +331,8 @@ Index of 327 namespace-level symbols (functions, typedefs, enums, variables) acr
 - **swap_short** `[fn]` in [FIFFLIB](/docs/api/fiff/) — Swap a 16-bit short.
 - **timeNowNow** `[fn]` in [UTILSLIB](/docs/api/utils/) — Returns build time (time preprocessor was run).
 - **toEventMatrix** `[fn]` in [RTPROCESSINGLIB](/docs/api/dsp/) — Transforms QMap with stored information about events per stim channel to a list of event matrices.
-- **tokenIds** `[fn]` in `INVLIB` — Extract just the integer token IDs from a token sequence (discarding continuous values).
-- **tokenize** `[fn]` in `INVLIB` — Serialise an [`InvSourceEstimate`](/docs/api/inv/inv-source-estimate) into a flat token sequence.
-- **tokenValues** `[fn]` in `INVLIB` — Extract just the continuous values from a token sequence (discarding IDs).
+- **tokenIds** `[fn]` in [INVLIB](/docs/api/inv/) — Extract just the integer token IDs from a token sequence (discarding continuous values).
+- **tokenize** `[fn]` in [INVLIB](/docs/api/inv/) — Serialise an [`InvSourceEstimate`](/docs/api/inv/inv-source-estimate) into a flat token sequence.
+- **tokenValues** `[fn]` in [INVLIB](/docs/api/inv/) — Extract just the continuous values from a token sequence (discarding IDs).
 - **toQMatrix4x4** `[fn]` in `SURFACEKEYS` — Convert an Eigen 4x4 matrix to a QMatrix4x4.
 - **vecDefaultWeights** `[var]` in [MNELIB](/docs/api/mne/)

@@ -1,0 +1,62 @@
+---
+id: inv-dipole-fit-settings
+title: "INVLIB::InvDipoleFitSettings"
+sidebar_label: InvDipoleFitSettings
+sidebar_position: 24
+---
+
+# InvDipoleFitSettings
+
+**Namespace:** `INVLIB` &nbsp;·&nbsp; **Library:** Inverse Library
+
+`#include <inv/inv_dipole_fit_settings.h>`
+
+```cpp
+class INVLIB::InvDipoleFitSettings
+```
+
+Command-line and programmatic settings for the `mne_dipole_fit` driver: BEM / sphere model, EEG model, guess-grid parameters, noise-covariance file, measurement file + time window, projection list, per-channel-type regularisation and output dip/bdip file names.
+
+Can be populated from `argc` / `argv` or directly by application code.
+
+Settings for the `mne_dipole_fit` driver (forward model, guess grid, data, projections, output).
+
+---
+
+## Public Methods
+
+### InvDipoleFitSettings()
+
+Default Constructor.
+
+---
+
+### InvDipoleFitSettings(argc, argv)
+
+Constructs Dipole Fit Settings.
+
+**Parameters:**
+
+- **argc** : *int **
+  (argument count) is an integer that indicates how many arguments were entered on the command line when the program was started.
+
+- **argv** : *char ***
+  (argument vector) is an array of pointers to arrays of character objects. The array objects are null-terminated strings, representing the arguments that were entered on the command line when the program was started.
+
+---
+
+### ~InvDipoleFitSettings()
+
+Destructs the Dipole Fit Settings.
+
+---
+
+### checkIntegrity()
+
+Check whether Dipole Fit Settings are correctly set.
+
+---
+
+## Authors of this file
+
+- Christoph Dinh &lt;christoph.dinh@mne-cpp.org&gt;

@@ -1,0 +1,137 @@
+---
+id: inv-beamformer-compute
+title: "INVLIB::InvBeamformerCompute"
+sidebar_label: InvBeamformerCompute
+sidebar_position: 21
+---
+
+# InvBeamformerCompute
+
+**Namespace:** `INVLIB` &nbsp;·&nbsp; **Library:** Inverse Library
+
+`#include <inv/inv_beamformer_compute.h>`
+
+```cpp
+class INVLIB::InvBeamformerCompute
+```
+
+Shared computation routines used by both LCMV and DICS beamformers.
+
+All methods are static — no state is kept between calls.
+
+Core beamformer math.
+
+---
+
+## Static Methods
+
+### computeBeamformer(G, Cm, reg, nOrient, weightNorm, pickOri, reduceRank, invMethod, nn, W, maxPowerOri)
+
+Compute beamformer spatial filter weights from a leadfield and data covariance (or CSD).
+
+This implements the core LCMV/DICS algorithm:
+Regularize and invert covariance
+
+
+Reshape leadfield per source (n_channels x n_orient)
+
+
+Optionally reduce leadfield rank
+
+
+Select orientation (max-power, normal, or keep all)
+
+
+Invert denominator G^T Cm^\{-1\} G
+
+
+Apply weight normalization
+
+**Parameters:**
+
+- **G** : *const Eigen::MatrixXd &*
+  Leadfield matrix (n_channels, n_sources * n_orient).
+
+- **Cm** : *const Eigen::MatrixXd &*
+  Data covariance or CSD matrix (n_channels, n_channels). Real-valued.
+
+- **reg** : *double*
+  Regularization parameter (fraction of trace to add, e.g. 0.05).
+
+- **nOrient** : *int*
+  Orientations per source: 1 (fixed) or 3 (free).
+
+- **weightNorm** : *BeamformerWeightNorm*
+  Weight normalization strategy.
+
+- **pickOri** : *BeamformerPickOri*
+  Orientation selection mode.
+
+- **reduceRank** : *bool*
+  If true, reduce leadfield rank by 1 (for MEG sphere models).
+
+- **invMethod** : *BeamformerInversion*
+  Denominator inversion strategy (matrix or scalar).
+
+- **nn** : *const Eigen::MatrixX3d &*
+  Source normals (n_sources, 3). Used for max-power sign alignment.
+
+- **W** : *Eigen::MatrixXd &*
+  Output spatial filter weights (n_sources * n_orient_out, n_channels).
+
+- **maxPowerOri** : *Eigen::MatrixX3d &*
+  Output max-power orientations (n_sources, 3). Empty if not max-power.
+
+**Returns:**
+
+- *bool* — True on success.
+
+---
+
+### computePower(Cm, W, nOrient)
+
+Compute source power from spatial filter weights and a data covariance / CSD matrix.
+
+power_i = trace(W_i Cm W_i^T)
+
+**Parameters:**
+
+- **Cm** : *const Eigen::MatrixXd &*
+  Data covariance or CSD (n_channels, n_channels).
+
+- **W** : *const Eigen::MatrixXd &*
+  Spatial filter weights (n_sources * n_orient, n_channels).
+
+- **nOrient** : *int*
+  Orientations per source.
+
+**Returns:**
+
+- *Eigen::VectorXd* — Source power vector (n_sources).
+
+---
+
+### symMatPow(X, p, reduceRank)
+
+Symmetric matrix power: X^p via eigendecomposition.
+
+**Parameters:**
+
+- **X** : *const Eigen::MatrixXd &*
+  Symmetric matrix.
+
+- **p** : *double*
+  Power exponent (e.g. -1, -0.5).
+
+- **reduceRank** : *bool*
+  Drop smallest eigenvalue before exponentiating.
+
+**Returns:**
+
+- *Eigen::MatrixXd* — X^p.
+
+---
+
+## Authors of this file
+
+- Christoph Dinh &lt;christoph.dinh@mne-cpp.org&gt;

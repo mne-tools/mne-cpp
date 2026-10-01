@@ -1,0 +1,23 @@
+{
+  "$comment": "Doxygen compounds deliberately left out of the API registry and site (release gate G3, v2.4.0 T4.2). tools/doxy2mdx/audit_registry.py --check fails on any public class in the Doxygen XML that is neither registered nor matched here, and on any entry here that matches nothing. Every entry needs a reason.",
+  "namespaces": {
+    "std": "Standard library.",
+    "Ui": "Qt Designer generated form classes.",
+    "SURFACEKEYS": "String-key constants for disp3D surface lookups, not types."
+  },
+  "unnamespaced": {
+    "reason": "disp3D renderer and scene internals declared outside any namespace. They are reached through BrainView and MultimodalScene (DISP3DLIB) and are not part of the documented API until they move into DISP3DLIB.",
+    "header_prefixes": [
+      "disp3D/"
+    ]
+  },
+  "classes": {
+    "COMLIB::Command": "Real-time client protocol type; needs a running mne_rt_server and is evidenced by integration tests (api_evidence_policy.json).",
+    "COMLIB::CommandManager": "Real-time client protocol type; see COMLIB::Command.",
+    "COMLIB::CommandParser": "Real-time client protocol type; see COMLIB::Command.",
+    "COMLIB::RawCommand": "Real-time client protocol type; see COMLIB::Command.",
+    "COMLIB::RtClient": "Real-time client protocol type; see COMLIB::Command.",
+    "COMLIB::RtCmdClient": "Real-time client protocol type; see COMLIB::Command.",
+    "COMLIB::RtDataClient": "Real-time client protocol type; see COMLIB::Command."
+  }
+}

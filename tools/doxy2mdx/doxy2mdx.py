@@ -2025,6 +2025,9 @@ def main(argv: Optional[List[str]] = None) -> int:
 
     index_tree = ET.parse(index_path)
     index_root = index_tree.getroot()
+    sys.path.insert(0, str(Path(__file__).resolve().parent))
+    from audit_registry import EXCLUSIONS, exclusion_for, load_exclusions
+    exclusions = load_exclusions(EXCLUSIONS)
 
     found_qualified: set = set()
     generated: List[Path] = []
@@ -2045,6 +2048,9 @@ def main(argv: Optional[List[str]] = None) -> int:
 
         reg_entry = module_for(name)
         if reg_entry is None:
+            location = ET.parse(args.xml_dir / f"{compound.get('refid')}.xml").getroot().find(".//location")
+            if exclusion_for(name, location.get("file", "") if location is not None else "", exclusions):
+                continue
             LOG.warning("class %s found in XML but NOT registered in api_registry.json",
                         name)
             warnings += 1

@@ -158,9 +158,9 @@ jobs:
         cd doc/doxygen
         doxygen mne-cpp_doxyfile
 
-    # Gate G3: API XML with no Doxygen warning outside the shrink-only allowlist.
+    # Gate G3: no Doxygen warning, registry matches the XML, committed pages are current.
     - name: Build API docs (strict)
-      run: doc/build-api-docs.sh --no-site
+      run: doc/build-api-docs.sh --check
 
     # The @snippet contract: headers reference named regions in src/examples.
     - name: Check Doxygen snippets

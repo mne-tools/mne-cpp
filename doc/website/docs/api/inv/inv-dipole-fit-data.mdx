@@ -1,0 +1,329 @@
+---
+id: inv-dipole-fit-data
+title: "INVLIB::InvDipoleFitData"
+sidebar_label: InvDipoleFitData
+sidebar_position: 23
+---
+
+# InvDipoleFitData
+
+**Namespace:** `INVLIB` &nbsp;·&nbsp; **Library:** Inverse Library
+
+`#include <inv/inv_dipole_fit_data.h>`
+
+```cpp
+class INVLIB::InvDipoleFitData
+```
+
+Dipole fit workspace holding sensor geometry, forward model, noise covariance, and projection data.
+
+[`InvDipoleFitData`](/docs/api/inv/inv-dipole-fit-data) aggregates everything needed to evaluate the dipole fitting objective function: coordinate transforms, channel lists, coil/ electrode definitions, forward-model function pointers (sphere or BEM), noise covariance, and SSP projection. The static factory `setup_dipole_fit_data()` reads all inputs from disk and returns a fully initialised instance.
+
+Refactored from dipoleFitDataRec / fit_types.h (MNE-C).
+
+---
+
+## Public Methods
+
+### InvDipoleFitData()
+
+Default Constructor.
+
+---
+
+### ~InvDipoleFitData()
+
+Destructs the Dipole Fit Data Refactored: free_dipole_fit_data (dipole_fit_setup.c).
+
+---
+
+## Static Methods
+
+### setup_forward_model(d, comp_data, comp_coils)
+
+Set up the sphere-model and (optionally) BEM forward functions.
+
+Initialises sphere_funcs, bem_funcs, and mag_dipole_funcs, applies CTF compensation if needed, and selects the active forward model.
+
+Refactored: setup_forward_model (dipole_fit_setup.c)
+
+**Parameters:**
+
+- **d** : *[InvDipoleFitData](/docs/api/inv/inv-dipole-fit-data) **
+  Dipole fit data to populate.
+
+- **comp_data** : *[MNECTFCompDataSet](/docs/api/mne/mnectf-comp-data-set) **
+  CTF compensation data (may be nullptr).
+
+- **comp_coils** : *[FwdCoilSet](/docs/api/fwd/fwd-coil-set) **
+  Compensation coil set (may be nullptr).
+
+**Returns:**
+
+- *int* — OK on success, FAIL on error.
+
+---
+
+### ad_hoc_noise(meg, eeg, grad_std, mag_std, eeg_std)
+
+Create an ad-hoc diagonal noise-covariance matrix.
+
+Builds a diagonal noise covariance from fixed standard deviations for gradiometers, magnetometers, and EEG channels.
+
+Refactored: ad_hoc_noise (dipole_fit_setup.c)
+
+**Parameters:**
+
+- **meg** : *[FwdCoilSet](/docs/api/fwd/fwd-coil-set) **
+  MEG coil set (used to classify grad vs. mag channels).
+
+- **eeg** : *[FwdCoilSet](/docs/api/fwd/fwd-coil-set) **
+  EEG electrode set.
+
+- **grad_std** : *float*
+  Standard deviation for planar gradiometers (T/m).
+
+- **mag_std** : *float*
+  Standard deviation for magnetometers (T).
+
+- **eeg_std** : *float*
+  Standard deviation for EEG channels (V).
+
+**Returns:**
+
+- *std::unique_ptr&lt; [MNECovMatrix](/docs/api/mne/mne-cov-matrix) &gt;* — The noise-covariance matrix, or nullptr on error.
+
+---
+
+### scale_noise_cov(f, nave)
+
+Scale the noise-covariance matrix for a given number of averages.
+
+Re-decomposes the covariance after scaling by nave_old / nave_new.
+
+Refactored: scale_noise_cov (dipole_fit_setup.c)
+
+**Parameters:**
+
+- **f** : *[InvDipoleFitData](/docs/api/inv/inv-dipole-fit-data) **
+  Dipole fit data whose noise member is scaled.
+
+- **nave** : *int*
+  Number of averages in the current data.
+
+**Returns:**
+
+- *int* — OK on success, FAIL on error.
+
+---
+
+### scale_dipole_fit_noise_cov(f, nave)
+
+Scale dipole-fit noise covariance for a given number of averages.
+
+Wrapper around `scale_noise_cov()` called from the dipole-fit pipeline.
+
+Refactored: scale_dipole_fit_noise_cov (dipole_fit_setup.c)
+
+**Parameters:**
+
+- **f** : *[InvDipoleFitData](/docs/api/inv/inv-dipole-fit-data) **
+  Dipole fit data whose noise member is scaled.
+
+- **nave** : *int*
+  Number of averages.
+
+**Returns:**
+
+- *int* — OK on success, FAIL on error.
+
+---
+
+### select_dipole_fit_noise_cov(f, meas, nave, sels)
+
+Select and weight the noise-covariance for the active channel set.
+
+Channels present in the measurement data selection receive unit weight; omitted channels receive a reduced weight.
+
+When `meas` is nullptr the function simply scales the noise covariance for nave = 1 (initial setup case).
+
+Refactored: select_dipole_fit_noise_cov (dipole_fit_setup.c)
+
+**Parameters:**
+
+- **f** : *[InvDipoleFitData](/docs/api/inv/inv-dipole-fit-data) **
+  Dipole fit data whose noise_orig is used to build the weighted noise member.
+
+- **meas** : *[MNEMeasData](/docs/api/mne/mne-meas-data) **
+  Measurement data with channel info (may be nullptr).
+
+- **nave** : *int*
+  Number of averages override (&lt; 0 to use meas-&gt;current-&gt;nave).
+
+- **sels** : *const int **
+  Per-channel selection flags (size &gt;= meas-&gt;nchan, may be nullptr).
+
+**Returns:**
+
+- *int* — OK on success, FAIL on error.
+
+---
+
+### setup_dipole_fit_data(mriname, measname, bemname, r0, eeg_model, accurate_coils, badname, noisename, grad_std, mag_std, eeg_std, mag_reg, grad_reg, eeg_reg, diagnoise, projnames, include_meg, include_eeg)
+
+Master setup: read all inputs and build a ready-to-use fit workspace.
+
+Reads coordinate transforms, channel info, BEM/sphere model, noise covariance, SSP projections, and compiles the forward model.
+
+Refactored: setup_dipole_fit_data (dipole_fit_setup.c)
+
+**Parameters:**
+
+- **mriname** : *const QString &*
+  MRI-to-head transform file.
+
+- **measname** : *const QString &*
+  Measurement file (provides MEG-to-head transform and channels).
+
+- **bemname** : *const QString &*
+  BEM model file (empty string to use sphere model only).
+
+- **r0** : *Eigen::Vector3f **
+  Sphere-model origin in head coordinates (may be nullptr).
+
+- **eeg_model** : *[FwdEegSphereModel](/docs/api/fwd/fwd-eeg-sphere-model) **
+  EEG sphere model definition (may be nullptr).
+
+- **accurate_coils** : *int*
+  Use accurate coil definitions.
+
+- **badname** : *const QString &*
+  Bad-channel list file (empty to skip).
+
+- **noisename** : *const QString &*
+  Noise-covariance file (empty for ad-hoc noise).
+
+- **grad_std** : *float*
+  Ad-hoc noise std for planar gradiometers (T/m).
+
+- **mag_std** : *float*
+  Ad-hoc noise std for magnetometers (T).
+
+- **eeg_std** : *float*
+  Ad-hoc noise std for EEG channels (V).
+
+- **mag_reg** : *float*
+  Magnetometer noise-covariance regularization factor.
+
+- **grad_reg** : *float*
+  Gradiometer noise-covariance regularization factor.
+
+- **eeg_reg** : *float*
+  EEG noise-covariance regularization factor.
+
+- **diagnoise** : *int*
+  Use only the diagonal of the noise covariance.
+
+- **projnames** : *const QList&lt; QString &gt; &*
+  SSP projection file paths.
+
+- **include_meg** : *int*
+  Include MEG channels in the fit.
+
+- **include_eeg** : *int*
+  Include EEG channels in the fit.
+
+**Returns:**
+
+- *[InvDipoleFitData](/docs/api/inv/inv-dipole-fit-data) ** — Fully initialised fit data, or nullptr on error. Caller takes ownership.
+
+---
+
+### fit_one(fit, guess, time, B, verbose, res)
+
+Fit a single dipole to the given data.
+
+Refactored: fit_one (fit_dipoles.c)
+
+**Parameters:**
+
+- **fit** : *[InvDipoleFitData](/docs/api/inv/inv-dipole-fit-data) **
+  Precomputed fitting data.
+
+- **guess** : *[InvGuessData](/docs/api/inv/inv-guess-data) **
+  The initial guesses.
+
+- **time** : *float*
+  Time point (s).
+
+- **B** : *Eigen::Ref&lt; Eigen::VectorXf &gt;*
+  The field to fit (modified in-place by projection and whitening).
+
+- **verbose** : *int*
+  Verbose output flag.
+
+- **res** : *[InvEcd](/docs/api/inv/inv-ecd) &*
+  The fitted dipole.
+
+**Returns:**
+
+- *bool* — true on success, false on fitting failure.
+
+---
+
+### compute_dipole_field(d, rd, whiten, fwd)
+
+Compute the forward field for a dipole at the given location.
+
+Evaluates the MEG and/or EEG forward model at position `rd` and optionally applies noise whitening.
+
+Refactored: compute_dipole_field (fit_dipoles.c)
+
+**Parameters:**
+
+- **d** : *[InvDipoleFitData](/docs/api/inv/inv-dipole-fit-data) &*
+  Dipole fit workspace.
+
+- **rd** : *const Eigen::Vector3f &*
+  Dipole position in head coordinates (m).
+
+- **whiten** : *int*
+  If non-zero, whiten the result using the noise covariance.
+
+- **fwd** : *Eigen::Ref&lt; Eigen::MatrixXf &gt;*
+  Forward field matrix (nchan x 3), filled on output.
+
+**Returns:**
+
+- *int* — OK on success, FAIL on error.
+
+---
+
+### dipole_forward_one(d, rd, old)
+
+Compute the forward solution for a single dipole position.
+
+Returns a fully initialised [`InvDipoleForward`](/docs/api/inv/inv-dipole-forward) with the forward field, its SVD, and noise-normalised goodness-of-fit limit. An existing object may be recycled via `old`.
+
+Refactored: dipole_forward_one (fit_dipoles.c)
+
+**Parameters:**
+
+- **d** : *[InvDipoleFitData](/docs/api/inv/inv-dipole-fit-data) **
+  Dipole fit workspace.
+
+- **rd** : *const Eigen::Vector3f &*
+  Dipole position in head coordinates (m).
+
+- **old** : *[InvDipoleForward](/docs/api/inv/inv-dipole-forward) **
+  Existing forward to recycle (may be nullptr).
+
+**Returns:**
+
+- *[InvDipoleForward](/docs/api/inv/inv-dipole-forward) ** — The populated forward object, or nullptr on error.
+
+---
+
+## Authors of this file
+
+- Christoph Dinh &lt;christoph.dinh@mne-cpp.org&gt;

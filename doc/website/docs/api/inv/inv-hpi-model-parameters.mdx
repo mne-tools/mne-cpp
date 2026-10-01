@@ -1,0 +1,103 @@
+---
+id: inv-hpi-model-parameters
+title: "INVLIB::InvHpiModelParameters"
+sidebar_label: InvHpiModelParameters
+sidebar_position: 31
+---
+
+# InvHpiModelParameters
+
+**Namespace:** `INVLIB` &nbsp;·&nbsp; **Library:** Inverse Library
+
+`#include <inv/inv_hpi_model_parameters.h>`
+
+```cpp
+class INVLIB::InvHpiModelParameters
+```
+
+Description of what this class is intended to do (in detail).
+
+Configuration parameters for the HPI signal model (line frequency, coil frequencies, sample rate, buffer size)
+
+---
+
+## Public Methods
+
+### InvHpiModelParameters()
+
+Defaul Constructor.
+
+---
+
+### InvHpiModelParameters(vecHpiFreqs, iSampleFreq, iLineFreq, bBasic)
+
+Constructs a [`InvHpiModelParameters`](/docs/api/inv/inv-hpi-model-parameters) object.
+
+**Parameters:**
+
+- **vecHpiFreqs** : *const QVector&lt; int &gt;*
+  The Hpi frequencies.
+
+- **iSampleFreq** : *const int*
+  The sampling frequency.
+
+- **iLineFreq** : *const int*
+  The line Frequency
+
+- **bBasic** : *const bool*
+  Create a basic model without line frequeny or not.
+
+---
+
+### InvHpiModelParameters(hpiModelParameter)
+
+Copy constructor.
+
+**Parameters:**
+
+- **hpiModelParameter** : *const InvHpiModelParameters &*
+  [`InvHpiModelParameters`](/docs/api/inv/inv-hpi-model-parameters) which should be copied.
+
+---
+
+### operator=(other)
+
+---
+
+### operator==(b)
+
+---
+
+### operator!=(b)
+
+---
+
+### vecHpiFreqs()
+
+Inline functions to get acces to parameters.
+
+**Returns:**
+
+- *QVector&lt; int &gt;* — HPI coil frequencies, in Hz.
+
+---
+
+### iNHpiCoils()
+
+---
+
+### iSampleFreq()
+
+---
+
+### iLineFreq()
+
+---
+
+### bBasic()
+
+---
+
+## Authors of this file
+
+- Christoph Dinh &lt;christoph.dinh@mne-cpp.org&gt;

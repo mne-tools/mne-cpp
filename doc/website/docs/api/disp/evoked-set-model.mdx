@@ -15,7 +15,7 @@ sidebar_position: 27
 class DISPLIB::EvokedSetModel
 ```
 
-QAbstractTableModel wrapping a FiffEvokedSet (one row per channel, one column per condition).
+QAbstractTableModel wrapping a [FiffEvokedSet](/docs/api/fiff/fiff-evoked-set) (one row per channel, one column per condition).
 
 Propagates baseline-correction, SSP-projection and bad-channel updates so connected views ([`ButterflyView`](/docs/api/disp/butterfly-view), [`AverageLayoutView`](/docs/api/disp/average-layout-view)) stay in sync with the latest pre-processing settings.
 
@@ -167,7 +167,7 @@ Sets corresponding evoked set.
 
 **Parameters:**
 
-- **pEvokedSet** : *QSharedPointer&lt;FIFFLIB::FiffEvokedSet&gt;*
+- **pEvokedSet** : *QSharedPointer&lt;[FiffEvokedSet](/docs/api/fiff/fiff-evoked-set)&gt;*
   The evoked set.
 
 ---

@@ -7,7 +7,7 @@ sidebar_position: 3
 
 # InvLCMV
 
-**Namespace:** `INVERSELIB` &nbsp;·&nbsp; **Library:** Inverse Library
+**Namespace:** `INVLIB` &nbsp;·&nbsp; **Library:** Inverse Library
 
 :::info[Python equivalent]
 `mne.beamformer.make_lcmv / apply_lcmv` in MNE-Python.
@@ -75,7 +75,7 @@ Compute LCMV beamformer spatial filters.
 
 **Returns:**
 
-- *InvBeamformer* — The computed beamformer containing spatial filter weights.
+- *[InvBeamformer](/docs/api/inv/inv-beamformer)* — The computed beamformer containing spatial filter weights.
 
 ---
 
@@ -90,7 +90,7 @@ stc = W @ (whitener @ proj @ evoked.data)
 - **evoked** : *const [FiffEvoked](/docs/api/fiff/fiff-evoked) &*
   Evoked data (averaged, channel x time).
 
-- **filters** : *const InvBeamformer &*
+- **filters** : *const [InvBeamformer](/docs/api/inv/inv-beamformer) &*
   Pre-computed LCMV beamformer from `makeLCMV()`.
 
 **Returns:**
@@ -114,7 +114,7 @@ Apply LCMV beamformer to raw data matrix.
 - **tstep** : *float*
   Time step in seconds.
 
-- **filters** : *const InvBeamformer &*
+- **filters** : *const [InvBeamformer](/docs/api/inv/inv-beamformer) &*
   Pre-computed LCMV beamformer from `makeLCMV()`.
 
 **Returns:**
@@ -134,7 +134,7 @@ power_i = trace(W_i @ Cm @ W_i^T)
 - **dataCov** : *const [FiffCov](/docs/api/fiff/fiff-cov) &*
   Data covariance matrix.
 
-- **filters** : *const InvBeamformer &*
+- **filters** : *const [InvBeamformer](/docs/api/inv/inv-beamformer) &*
   Pre-computed LCMV beamformer from `makeLCMV()`.
 
 **Returns:**
@@ -158,7 +158,7 @@ Apply LCMV beamformer to a list of epochs.
 - **tstep** : *float*
   Time step (1/sfreq).
 
-- **filters** : *const InvBeamformer &*
+- **filters** : *const [InvBeamformer](/docs/api/inv/inv-beamformer) &*
   Pre-computed LCMV beamformer from `makeLCMV()`.
 
 **Returns:**

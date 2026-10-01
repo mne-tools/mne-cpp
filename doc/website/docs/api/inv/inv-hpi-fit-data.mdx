@@ -1,0 +1,42 @@
+---
+id: inv-hpi-fit-data
+title: "INVLIB::InvHpiFitData"
+sidebar_label: InvHpiFitData
+sidebar_position: 30
+---
+
+# InvHpiFitData
+
+**Namespace:** `INVLIB` &nbsp;·&nbsp; **Library:** Inverse Library
+
+`#include <inv/inv_hpi_fit_data.h>`
+
+```cpp
+class INVLIB::InvHpiFitData
+```
+
+Per-coil magnetic-dipole fitter: computes the infinite-medium leadfield for a candidate coil position, evaluates the residual against the projected MEG sample and refines the position with a Nelder-Mead simplex search.
+
+Routines are validated against FieldTrip's `magnetic_dipole` and `ft_compute_leadfield` reference implementations.
+
+Per-coil magnetic-dipole fitter (leadfield, residual, Nelder-Mead refinement) for the HPI pipeline.
+
+---
+
+## Public Methods
+
+### InvHpiFitData()
+
+Default constructor.
+
+---
+
+### doDipfitConcurrent()
+
+dipfit function is adapted from Fieldtrip Software.
+
+---
+
+## Authors of this file
+
+- Christoph Dinh &lt;christoph.dinh@mne-cpp.org&gt;

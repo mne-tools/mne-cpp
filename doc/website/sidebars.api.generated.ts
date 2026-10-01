@@ -55,7 +55,9 @@ const apiSidebar: SidebarsConfig['apiSidebar'] = [
         'api/fiff/fiff-raw-dir',
         'api/fiff/fiff-sparse-matrix',
         'api/fiff/fiff-tag',
-        'api/fiff/fiff-time'
+        'api/fiff/fiff-time',
+        'api/fiff/fiff-evoked-set',
+        'api/fiff/fiff-io'
       ],
     },
     {
@@ -171,7 +173,23 @@ const apiSidebar: SidebarsConfig['apiSidebar'] = [
         'api/inv/inv-label-time-course',
         'api/inv/inv-resolution-matrix',
         'api/inv/inv-convenience',
-        'api/inv/source-morph'
+        'api/inv/source-morph',
+        'api/inv/inv-beamformer',
+        'api/inv/inv-beamformer-compute',
+        'api/inv/inv-dipole',
+        'api/inv/inv-dipole-fit-data',
+        'api/inv/inv-dipole-fit-settings',
+        'api/inv/inv-dipole-forward',
+        'api/inv/inv-ecd',
+        'api/inv/inv-ecd-set',
+        'api/inv/inv-guess-data',
+        'api/inv/inv-hpi-data-updater',
+        'api/inv/inv-hpi-fit-data',
+        'api/inv/inv-hpi-model-parameters',
+        'api/inv/inv-pwl-rap-music',
+        'api/inv/inv-sensor-set',
+        'api/inv/inv-sensor-set-creator',
+        'api/inv/inv-signal-model'
       ],
     },
     {

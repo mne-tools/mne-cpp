@@ -17,7 +17,7 @@ class FIFFLIB::Fiff
 
 MATLAB-style static facade re-exporting every public `FIFFLIB` reader/writer for parity with the mne-matlab toolbox.
 
-Only wrappers — no state. Each method forwards to the matching method on [`FiffStream`](/docs/api/fiff/fiff-stream) / [`FiffRawData`](/docs/api/fiff/fiff-raw-data) / [`FiffEvoked`](/docs/api/fiff/fiff-evoked) / `FiffEvokedSet` / [`FiffCov`](/docs/api/fiff/fiff-cov) / [`FiffInfo`](/docs/api/fiff/fiff-info). Prefer the underlying classes for new code; this class exists so Matlab-style ports compile unchanged.
+Only wrappers — no state. Each method forwards to the matching method on [`FiffStream`](/docs/api/fiff/fiff-stream) / [`FiffRawData`](/docs/api/fiff/fiff-raw-data) / [`FiffEvoked`](/docs/api/fiff/fiff-evoked) / [`FiffEvokedSet`](/docs/api/fiff/fiff-evoked-set) / [`FiffCov`](/docs/api/fiff/fiff-cov) / [`FiffInfo`](/docs/api/fiff/fiff-info). Prefer the underlying classes for new code; this class exists so Matlab-style ports compile unchanged.
 
 ---
 
@@ -205,7 +205,7 @@ Pick desired channels from evoked-response data
 
 **Parameters:**
 
-- **orig** : *FiffEvokedSet &*
+- **orig** : *[FiffEvokedSet](/docs/api/fiff/fiff-evoked-set) &*
   The original data.
 
 - **include** : *const QStringList &*
@@ -216,7 +216,7 @@ Pick desired channels from evoked-response data
 
 **Returns:**
 
-- *FiffEvokedSet* — the desired fiff evoked data set.
+- *[FiffEvokedSet](/docs/api/fiff/fiff-evoked-set)* — the desired fiff evoked data set.
 
 ---
 
@@ -230,7 +230,7 @@ Find evoked data sets
 
 **Parameters:**
 
-- **orig** : *FiffEvokedSet &*
+- **orig** : *[FiffEvokedSet](/docs/api/fiff/fiff-evoked-set) &*
   The read evoked data set.
 
 **Returns:**
@@ -385,7 +385,7 @@ Read all evoked data from one file.
 - **p_IODevice** : *QIODevice &*
   A fiff IO device like a fiff QFile or QTCPSocket.
 
-- **data** : *FiffEvokedSet &*
+- **data** : *[FiffEvokedSet](/docs/api/fiff/fiff-evoked-set) &*
   The read evoked data.
 
 **Returns:**
