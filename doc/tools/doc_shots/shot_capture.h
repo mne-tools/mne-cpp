@@ -104,8 +104,7 @@ bool captureWindow(QWidget& window, const QSize& size, const QString& outPath, Q
 
 //=============================================================================================================
 /**
- * Write @p image as an opaque 8-bit RGB PNG. The file is written next to @p outPath and renamed into place,
- * so @p outPath never holds a partial image.
+ * Write @p image as an opaque 8-bit RGB PNG through QSaveFile, so @p outPath never holds a partial image.
  *
  * @param[in] image      Image to save.
  * @param[in] outPath    Destination PNG.

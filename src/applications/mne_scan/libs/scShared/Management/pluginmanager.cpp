@@ -98,6 +98,9 @@ void PluginManager::loadPlugins(const QString& dir)
             this->setFileName(PluginsDir.absoluteFilePath(file));
             qDebug() << PluginsDir.absoluteFilePath(file);
             QObject* pPlugin = this->instance();
+            if (!pPlugin) {
+                qWarning() << "[PluginManager::loadPlugins] Cannot load" << file << "-" << errorString();
+            }
 
             // AbstractPlugin
             if (pPlugin) {

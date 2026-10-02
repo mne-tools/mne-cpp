@@ -15,7 +15,7 @@
 
 #include <QApplication>
 #include <QElapsedTimer>
-#include <QFile>
+#include <QSaveFile>
 #include <QFontDatabase>
 #include <QFontInfo>
 #include <QImage>
@@ -227,17 +227,18 @@ bool captureWindow(QWidget& window, const QSize& size, const QString& outPath, Q
 
 bool savePng(const QImage& image, const QString& outPath, QString& err)
 {
-    const QString partial = outPath + QStringLiteral(".part");
-    QImageWriter writer(partial, "png");
-    if (!writer.write(image.convertToFormat(QImage::Format_RGB888))) {
-        err = QStringLiteral("cannot write %1: %2").arg(partial, writer.errorString());
-        QFile::remove(partial);
+    QSaveFile file(outPath);
+    if (!file.open(QIODevice::WriteOnly)) {
+        err = QStringLiteral("cannot open %1: %2").arg(outPath, file.errorString());
         return false;
     }
-    QFile::remove(outPath);
-    if (!QFile::rename(partial, outPath)) {
-        err = QStringLiteral("cannot move %1 to %2").arg(partial, outPath);
-        QFile::remove(partial);
+    QImageWriter writer(&file, "png");
+    if (!writer.write(image.convertToFormat(QImage::Format_RGB888))) {
+        err = QStringLiteral("cannot write %1: %2").arg(outPath, writer.errorString());
+        return false;
+    }
+    if (!file.commit()) {
+        err = QStringLiteral("cannot commit %1: %2").arg(outPath, file.errorString());
         return false;
     }
     return true;

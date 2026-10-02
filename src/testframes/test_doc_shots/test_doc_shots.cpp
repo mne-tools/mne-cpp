@@ -172,11 +172,12 @@ void TestDocShots::savesOpaquePngAtomically()
     const QString path = tmp.filePath(QStringLiteral("shot.png"));
 
     QString err;
+    QVERIFY2(DOCSHOTS::savePng(QImage(8, 8, QImage::Format_RGB32), path, err), qPrintable(err));
     QVERIFY2(DOCSHOTS::savePng(image, path, err), qPrintable(err));
     QImage saved(path);
     QCOMPARE(saved.size(), QSize(32, 16));
     QVERIFY(!saved.hasAlphaChannel());
-    QVERIFY(!QFileInfo::exists(path + QStringLiteral(".part")));
+    QCOMPARE(QDir(tmp.path()).entryList(QDir::Files), QStringList{QStringLiteral("shot.png")});
 }
 
 void TestDocShots::producesDeclaredSizeDeterministically()
@@ -252,7 +253,7 @@ void TestDocShots::failsWithDiagnostics()
     QVERIFY(!QFileInfo::exists(out + QStringLiteral("/too-small.png")));
     QVERIFY(!QFileInfo::exists(out + QStringLiteral("/no-fixture.png")));
     QCOMPARE(QImage(out + QStringLiteral("/fine.png")).size(), QSize(800, 600));
-    QCOMPARE(QDir(out).entryList({QStringLiteral("*.part")}, QDir::Files), QStringList());
+    QCOMPARE(QDir(out).entryList(QDir::Files), QStringList{QStringLiteral("fine.png")});
 }
 
 int main(int argc, char* argv[])
