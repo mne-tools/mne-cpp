@@ -139,12 +139,19 @@ Each app exposes its window through a static `*_app_core` library
 (`mne_inspect_app_core`, `mne_align_app_core`, `mne_scan_app_core`,
 `mne_analyze_studio_app_core`).
 
-## Screenshots in CI
+## Documentation gate (local and CI)
 
-The `DocShots` job ([`_reusable-doc-shots.yml`](../../.github/workflows/_reusable-doc-shots.yml))
-builds `mne_doc_shots`, renders the whole manifest, runs
-`tools/quality/validate_screenshots.py` and uploads the PNGs as the
-`doc-screenshots` artifact. The website jobs of pull requests, `staging` and
-`main` wait for it and download the PNGs before `npm run build`. A missing
-image fails the site build; for a local build without the screenshots set
+`doc/check-docs.sh --channel dev|stable` runs every documentation check in
+order: API docs without Doxygen warnings and with current generated pages,
+the `@snippet` contract, the quality page, the screenshots, the Docusaurus
+build (broken links, anchors and images fail it) and the version routing.
+`--skip-site` stops before the Node.js build. It needs Doxygen 1.16.1 and the
+screenshots (`cmake --build <build_dir> --target doc-shots`).
+
+In CI, [`_reusable-docs.yml`](../../.github/workflows/_reusable-docs.yml) runs
+the `DocShots` job ([`_reusable-doc-shots.yml`](../../.github/workflows/_reusable-doc-shots.yml)),
+then the same script, on pull requests, `staging` and `main`. It uploads the
+screenshots (`doc-screenshots`), the built site (`website-<channel>`) and the
+Doxygen warning log. The `Website` jobs of `staging` and `main` only deploy
+that checked build. For a local site build without screenshots set
 `MNECPP_ALLOW_MISSING_SCREENSHOTS=1`.

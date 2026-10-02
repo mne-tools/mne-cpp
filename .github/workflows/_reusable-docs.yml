@@ -1,0 +1,92 @@
+# SPDX-License-Identifier: BSD-3-Clause
+# Copyright (c) 2026 MNE-CPP Authors
+#   Christoph Dinh <christoph.dinh@mne-cpp.org>
+
+# ---------------------------------------------------------------------------
+# Reusable workflow: the documentation gate (T4.4).
+# Generates the screenshots (_reusable-doc-shots.yml), then runs
+# doc/check-docs.sh - the same script developers run locally - and uploads the
+# built site, the Doxygen warning log and the screenshots for diagnosis.
+# Deploying is left to the calling workflow, which downloads `website-<channel>`.
+# Called by main.yml, staging.yml and pull-request.yml.
+# ---------------------------------------------------------------------------
+name: Reusable Docs
+
+on:
+  workflow_call:
+    inputs:
+      channel:
+        description: "Website channel to build: dev (staging) or stable (main, pull requests)"
+        required: true
+        type: string
+
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: 'true'
+
+jobs:
+  DocShots:
+    uses: ./.github/workflows/_reusable-doc-shots.yml
+    secrets: inherit
+
+  Docs:
+    runs-on: ubuntu-24.04
+    needs: DocShots
+
+    steps:
+    - name: Clone repository
+      uses: actions/checkout@v5
+
+    - name: Set up Python
+      uses: actions/setup-python@v6
+      with:
+        python-version: '3.11'
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v5
+      with:
+        node-version: '22'
+        cache: 'npm'
+        cache-dependency-path: doc/website/package-lock.json
+
+    # Pinned: the warning gate compares Doxygen's exact texts.
+    - name: Install Doxygen 1.16.1 and Graphviz
+      run: |
+        sudo rm -f /etc/apt/sources.list.d/microsoft-*.list /etc/apt/sources.list.d/azure-*.list /etc/apt/sources.list.d/microsoft-*.sources /etc/apt/sources.list.d/azure-*.sources
+        sudo apt-get update -qq
+        sudo apt-get install -qq graphviz
+        wget -q https://github.com/doxygen/doxygen/releases/download/Release_1_16_1/doxygen-1.16.1.linux.bin.tar.gz
+        tar xzf doxygen-1.16.1.linux.bin.tar.gz
+        sudo install -m 755 doxygen-1.16.1/bin/doxygen /usr/local/bin/doxygen
+
+    - name: Generate contributor data
+      env:
+        GH_TOKEN: ${{ secrets.GH_PAT || secrets.GITHUB_TOKEN }}
+      run: bash tools/generate_contributors.sh
+
+    - name: Download documentation screenshots
+      uses: actions/download-artifact@v5
+      with:
+        name: doc-screenshots
+        path: ${{ runner.temp }}/doc-screenshots
+
+    # Gates G3/G4: API docs, snippets, quality page, screenshots, site build, version routing.
+    - name: Documentation gate
+      run: doc/check-docs.sh --channel "${{ inputs.channel }}" --screenshots "$RUNNER_TEMP/doc-screenshots"
+
+    - name: Upload Doxygen warning log
+      if: always()
+      uses: actions/upload-artifact@v7
+      with:
+        name: doxygen-warnings-${{ inputs.channel }}
+        path: doc/xml_out/doxygen-warnings.log
+        if-no-files-found: ignore
+        retention-days: 30
+
+    - name: Upload website
+      if: always()
+      uses: actions/upload-artifact@v7
+      with:
+        name: website-${{ inputs.channel }}
+        path: doc/website/build
+        if-no-files-found: ignore
+        retention-days: 7

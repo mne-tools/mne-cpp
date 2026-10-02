@@ -160,9 +160,11 @@ class TestEntryPoint(unittest.TestCase):
         self.assertLess(audit_step, check)
         self.assertEqual("exit 0", commands[check + 1])
         self.assertLess(check, rewrite)
+        gate = (_REPO_ROOT / "doc" / "check-docs.sh").read_text(encoding="utf-8")
+        self.assertIn("doc/build-api-docs.sh --check", gate)
         for workflow in ("pull-request.yml", "staging.yml", "main.yml"):
             text = (_REPO_ROOT / ".github" / "workflows" / workflow).read_text(encoding="utf-8")
-            self.assertIn("doc/build-api-docs.sh --check", text, workflow)
+            self.assertIn("uses: ./.github/workflows/_reusable-docs.yml", text, workflow)
 
 
 class TestCommittedPages(unittest.TestCase):
