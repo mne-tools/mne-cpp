@@ -40,7 +40,10 @@
 #include <QCoreApplication>
 #include <QFileInfo>
 #include <QTextStream>
-#ifndef Q_OS_WIN
+#ifdef Q_OS_WIN
+#include <cstdio>
+#include <cstdlib>
+#else
 #include <QTimer>
 #endif
 
@@ -92,7 +95,11 @@ int main(int argc, char* argv[])
 
     DOCSHOTS::ShotRunner runner(opts);
 #ifdef Q_OS_WIN
-    return runner.run() ? 0 : 1;
+    // Qt teardown of the real app windows fails or hangs on headless Windows after the PNGs are written.
+    const int exitCode = runner.run() ? 0 : 1;
+    std::fflush(stdout);
+    std::fflush(stderr);
+    std::_Exit(exitCode);
 #else
     QTimer::singleShot(0, &app, [&app, &runner]() {
         app.exit(runner.run() ? 0 : 1);
