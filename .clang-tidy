@@ -1,0 +1,50 @@
+# SPDX-License-Identifier: BSD-3-Clause
+# Copyright (c) 2026 MNE-CPP Authors
+#   Christoph Dinh <christoph.dinh@mne-cpp.org>
+#
+# clang-tidy configuration for the T6.2/T6.3 static gate (pinned clang-tidy 22.1.8).
+# High-signal bug-finding checks only; style is clang-format's job. Run through
+# tools/quality/check_tidy.py, which ratchets findings per check against
+# tools/quality/tidy_baseline.json. Every disabled check below names its reason.
+Checks: >
+  -*,
+  bugprone-*,
+  -bugprone-easily-swappable-parameters,
+  -bugprone-narrowing-conversions,
+  -bugprone-implicit-widening-of-multiplication-result,
+  -bugprone-branch-clone,
+  -bugprone-exception-escape,
+  -bugprone-unchecked-optional-access,
+  clang-analyzer-core.*,
+  clang-analyzer-cplusplus.*,
+  clang-analyzer-deadcode.DeadStores,
+  clang-analyzer-unix.Malloc,
+  performance-*,
+  -performance-enum-size,
+  -performance-avoid-endl,
+  misc-redundant-expression,
+  misc-misplaced-const,
+  misc-unconventional-assign-operator,
+  misc-new-delete-overloads,
+  misc-throw-by-value-catch-by-reference,
+  modernize-use-override,
+  modernize-use-nullptr,
+  cppcoreguidelines-slicing,
+  cppcoreguidelines-virtual-class-destructor
+# Disabled, with reasons:
+#   bugprone-easily-swappable-parameters        signal-processing APIs take many same-typed parameters by design
+#   bugprone-narrowing-conversions              thousands of Eigen index (long) <-> int conversions; tracked by -Wconversion work
+#   bugprone-implicit-widening-of-multiplication-result  same Eigen index noise
+#   bugprone-branch-clone                       intentional parallel switch arms in format readers
+#   bugprone-exception-escape                   Qt event handlers; no exceptions are used across the API
+#   bugprone-unchecked-optional-access          slow dataflow analysis, little std::optional in the code base
+#   performance-enum-size                       enum widths are part of the FIFF on-disk contract
+#   performance-avoid-endl                      flushing is intended in CLI output
+WarningsAsErrors: ''
+HeaderFilterRegex: '.*/src/(libraries|applications|tools|examples|testframes)/.*'
+ExcludeHeaderFilterRegex: '.*/src/external/.*|.*_autogen/.*|.*/ui_.*\.h'
+FormatStyle: none
+CheckOptions:
+  performance-unnecessary-value-param.AllowedTypes: 'QSharedPointer;QPointer;SPtr;ConstSPtr'
+  performance-unnecessary-copy-initialization.AllowedTypes: 'QSharedPointer;SPtr;ConstSPtr'
+  bugprone-suspicious-string-compare.WarnOnImplicitComparison: false
