@@ -22,6 +22,14 @@ endif()
 set(CMAKE_SHARED_LIBRARY_PREFIX "")
 set(CMAKE_STATIC_LIBRARY_PREFIX "")
 
+# Plugins live in bin/mne_scan_plugins/, one level deeper than the executables, so their own libraries
+# (e.g. libmne_com, which no executable links) must be found relative to the plugin itself.
+if(APPLE)
+  list(APPEND CMAKE_INSTALL_RPATH "@loader_path/../../lib")
+elseif(UNIX)
+  list(APPEND CMAKE_INSTALL_RPATH "\${ORIGIN}/../../lib")
+endif()
+
 # Sensor Plugin
 add_subdirectory(fiffsimulator)
 add_subdirectory(ftbuffer)

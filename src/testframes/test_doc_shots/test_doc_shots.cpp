@@ -81,7 +81,10 @@ ToolRun runTool(const QString& manifestPath, const QString& outDir)
     }
     run.exitCode = process.exitStatus() == QProcess::NormalExit ? process.exitCode() : -1;
     run.out = QString::fromLocal8Bit(process.readAllStandardOutput());
-    run.err = QString::fromLocal8Bit(process.readAllStandardError());
+    run.err = QString::fromLocal8Bit(process.readAllStandardError()) +
+        QStringLiteral("\n[exit status %1, code %2]")
+            .arg(process.exitStatus() == QProcess::NormalExit ? QStringLiteral("normal") : QStringLiteral("crash"))
+            .arg(static_cast<quint32>(process.exitCode()), 0, 16);
     return run;
 }
 
