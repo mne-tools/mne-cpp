@@ -165,5 +165,20 @@ class TestEntryPoint(unittest.TestCase):
             self.assertIn("doc/build-api-docs.sh --check", text, workflow)
 
 
+class TestCommittedPages(unittest.TestCase):
+    def test_every_api_link_resolves(self) -> None:
+        """A link to a module whose classes are all excluded must not survive in the index pages."""
+        import re
+
+        api = _REPO_ROOT / "doc" / "website" / "docs" / "api"
+        unresolved = []
+        for page in api.rglob("*.mdx"):
+            for link in re.findall(r"\]\((/docs/api/[^)#\s]+)", page.read_text(encoding="utf-8")):
+                target = api / link[len("/docs/api/"):].rstrip("/")
+                if not (target.with_suffix(".mdx").exists() or (target / "index.mdx").exists()):
+                    unresolved.append(f"{page.relative_to(api)} -> {link}")
+        self.assertEqual([], unresolved)
+
+
 if __name__ == "__main__":
     unittest.main()

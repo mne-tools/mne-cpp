@@ -1388,6 +1388,16 @@ def generate_library_overview(module_key: str,
 # Global index pages: namespaces, classes, files
 # ---------------------------------------------------------------------------
 
+def _module_link(out_dir: Path, namespace: str, label: str) -> str:
+    """Markdown link to the module overview of *namespace*, or plain code when no overview was generated."""
+    # Overviews are written with the sidebar, only for modules with documented classes.
+    documented = {entry["module"] for entry in _REGISTRY["classes"] if entry.get("documented", False)}
+    for mk, mv in _MODULES.items():
+        if mv.get("namespace") == namespace and mk in documented:
+            return f"[{label}](/docs/api/{mv.get('dir_slug', mk)}/)"
+    return f"`{namespace}`"
+
+
 def generate_namespace_list(xml_dir: Path, out_dir: Path) -> Path:
     """Generate ``docs/api/namespaces.mdx`` listing every namespace with
     its classes and a brief description."""
@@ -1446,15 +1456,7 @@ def generate_namespace_list(xml_dir: Path, out_dir: Path) -> Path:
     ]
     for ns_name, brief, members in namespaces:
         count = len(members)
-        # Link to the library overview if we have a module match
-        mod_link = ""
-        for mk, mv in _MODULES.items():
-            if mv.get("namespace") == ns_name:
-                ds = mv.get("dir_slug", mk)
-                mod_link = f"[`{ns_name}`](/docs/api/{ds}/)"
-                break
-        if not mod_link:
-            mod_link = f"`{ns_name}`"
+        mod_link = _module_link(out_dir, ns_name, f"`{ns_name}`")
         lines.append(f"| {mod_link} | {count} | {brief} |")
 
     lines.append("")
@@ -1845,13 +1847,7 @@ def generate_namespace_members_index(xml_dir: Path, out_dir: Path) -> Path:
                 kind_badge = {"function": "fn", "variable": "var",
                               "typedef": "type", "enum": "enum",
                               "enumvalue": "val"}.get(mkind, mkind)
-                # Link namespace to its library overview if possible
-                ns_link = f"`{ns}`"
-                for mk, mv in _MODULES.items():
-                    if mv.get("namespace") == ns:
-                        ds = mv.get("dir_slug", mk)
-                        ns_link = f"[{ns}](/docs/api/{ds}/)"
-                        break
+                ns_link = _module_link(out_dir, ns, ns)
                 # Escape bare <>{} so MDX doesn't parse them as JSX
                 safe_name = mname.replace("<", "&lt;").replace(">", "&gt;").replace("{", "\\{").replace("}", "\\}")
                 safe_brief = brief.replace("<", "&lt;").replace(">", "&gt;").replace("{", "\\{").replace("}", "\\}")
