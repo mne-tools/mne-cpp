@@ -41,6 +41,7 @@
 #include <inv/dipole_fit/inv_dipole_fit_data.h>
 #include <inv/dipole_fit/inv_dipole_fit_settings.h>
 #include <inv/dipole_fit/inv_ecd_set.h>
+#include <inv/dipole_fit/inv_guess_data.h>
 
 #include <fiff/fiff_evoked_set.h>
 #include <fiff/fiff_raw_data.h>
@@ -166,11 +167,15 @@ private slots:
     void rawFitMatches_data();
     void rawFitMatches();
     void surfaceGuessesFitMatches();
+    void sphereGuessGrid_data();
+    void sphereGuessGrid();
+    void commandLine();
     void rejectsMissingInput();
 
 private:
     QString m_sampleAve;
     QString m_synthAve;
+    std::unique_ptr<InvDipoleFitData> m_fitData;
     InvEcdSet m_rawFit;
     QTemporaryDir m_dir;
     QStringList m_chNames;
@@ -197,6 +202,10 @@ void TestInvDipoleFitPython::initTestCase()
     QCOMPARE(fwdData->neeg, 0);
     fwdData->funcs = fwdData->sphere_funcs.get();
     m_chNames = fwdData->ch_names.mid(0, fwdData->nmeg);
+    m_fitData.reset(InvDipoleFitData::setup_dipole_fit_data(
+        QString(), m_sampleAve, QString(), &r0, nullptr, false, QString(), QString(),
+        5e-13f, 20e-15f, 0.2e-6f, 0.1f, 0.1f, 0.1f, false, projnames, true, false));
+    QVERIFY(m_fitData);
 
     m_fields.resize(fwdData->nmeg, 3);
     for (int k = 0; k < 3; ++k) {
@@ -397,6 +406,85 @@ void TestInvDipoleFitPython::surfaceGuessesFitMatches()
     InvDipoleFit badFit(&settings);
     QTest::ignoreMessage(QtCriticalMsg, "Could not create the initial guesses.");
     QCOMPARE(badFit.calculateFit().size(), 0);
+}
+
+//=============================================================================================================
+
+void TestInvDipoleFitPython::sphereGuessGrid_data()
+{
+    QTest::addColumn<double>("radius");
+    QTest::addColumn<double>("grid");
+    QTest::addColumn<int>("nguess");
+    QTest::addColumn<double>("rrSum");
+
+    // mne-python _make_volume_source_space(surf, grid, exclude=0.02, mindist=0) with surf
+    // the 642-vertex sphere of icos.fif (id 9003) scaled to the radius around (0, 0, 40) mm,
+    // MNE-C's guess boundary. (mne-python's own exact-sphere guesses give 2081 / 892 / 628.)
+    QTest::newRow("80 mm, 10 mm grid") << 0.08 << 0.010 << 2073 << 82.9;
+    QTest::newRow("60 mm, 10 mm grid") << 0.06 << 0.010 << 865 << 34.58;
+    QTest::newRow("80 mm, 15 mm grid") << 0.08 << 0.015 << 627 << 24.84;
+}
+
+void TestInvDipoleFitPython::sphereGuessGrid()
+{
+    QFETCH(double, radius);
+    QFETCH(double, grid);
+    QFETCH(int, nguess);
+    QFETCH(double, rrSum);
+
+    InvGuessData guess(QString(), QString(), 0.0f, 0.02f, static_cast<float>(grid), m_fitData.get(), static_cast<float>(radius));
+    QCOMPARE(guess.nguess, nguess);
+    QVERIFY(std::abs(guess.rr.cast<double>().sum() - rrSum) < 1e-3);
+}
+
+//=============================================================================================================
+
+void TestInvDipoleFitPython::commandLine()
+{
+    QByteArrayList args{"mne_dipole_fit", "--meas", "a-ave.fif", "--meg", "--eeg", "--dip", "out.dip",
+                        "--grid", "15", "--guessrad", "70", "--mindist", "5", "--exclude", "25",
+                        "--origin", "1:2:45", "--tmin", "10", "--tmax", "250", "--tstep", "5", "--integ", "2",
+                        "--gradnoise", "8", "--magnoise", "30", "--eegnoise", "0.5", "--reg", "0.2",
+                        "--filtersize", "3000", "--lowpass", "30", "--set", "2", "--noproj", "--verbose"};
+    std::vector<char*> argv;
+    for (QByteArray& a : args)
+        argv.push_back(a.data());
+    int argc = static_cast<int>(argv.size());
+    InvDipoleFitSettings s(&argc, argv.data());
+
+    QCOMPARE(argc, 1);
+    QCOMPARE(s.measname, QString("a-ave.fif"));
+    QVERIFY(s.include_meg && s.include_eeg && !s.is_raw && s.verbose && s.omit_data_proj);
+    QCOMPARE(s.dipname, QString("out.dip"));
+    QCOMPARE(s.guess_grid, 0.015f);
+    QCOMPARE(s.guess_rad, 0.07f);
+    QCOMPARE(s.guess_mindist, 0.005f);
+    QCOMPARE(s.guess_exclude, 0.025f);
+    QVERIFY((s.r0 - Vector3f(0.001f, 0.002f, 0.045f)).norm() < 1e-7f);
+    QCOMPARE(s.tmin, 0.01f);
+    QCOMPARE(s.tmax, 0.25f);
+    QCOMPARE(s.tstep, 0.005f);
+    QCOMPARE(s.integ, 0.002f);
+    QCOMPARE(s.grad_std, 8e-13f);
+    QCOMPARE(s.mag_std, 30e-15f);
+    QCOMPARE(s.eeg_std, 0.5e-6f);
+    QCOMPARE(s.grad_reg, 0.2f);
+    QCOMPARE(s.mag_reg, 0.2f);
+    QCOMPARE(s.eeg_reg, 0.2f);
+    QCOMPARE(s.filter.size, 4096);
+    QCOMPARE(s.filter.lowpass, 30.0f);
+    QCOMPARE(s.setno, 2);
+    QVERIFY(s.projnames.isEmpty());
+
+    // Invalid values stop parsing and leave the default in place.
+    QByteArrayList bad{"mne_dipole_fit", "--grid", "-3"};
+    std::vector<char*> badArgv;
+    for (QByteArray& a : bad)
+        badArgv.push_back(a.data());
+    int badArgc = static_cast<int>(badArgv.size());
+    QTest::ignoreMessage(QtCriticalMsg, "Grid spacing should be positive");
+    InvDipoleFitSettings rejected(&badArgc, badArgv.data());
+    QCOMPARE(rejected.guess_grid, 0.010f);
 }
 
 //=============================================================================================================

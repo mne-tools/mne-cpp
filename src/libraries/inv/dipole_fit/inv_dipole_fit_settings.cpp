@@ -455,7 +455,8 @@ bool InvDipoleFitSettings::check_args(int* argc, char** argv)
                 qCritical("Grid spacing should be positive");
                 return false;
             }
-            guess_grid = guess_grid / 1000.0;
+            // MNE-C divided the default instead of the value given, so --grid was ignored.
+            guess_grid = fval / 1000.0;
         } else if (strcmp(argv[k], "--mri") == 0) {
             found = 2;
             if (k == *argc - 1) {

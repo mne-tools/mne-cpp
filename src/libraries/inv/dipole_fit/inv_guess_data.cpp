@@ -64,11 +64,10 @@ InvGuessData::InvGuessData()
 
 //=============================================================================================================
 
-InvGuessData::InvGuessData(const QString& guessname, const QString& guess_surfname, float mindist, float exclude, float grid, InvDipoleFitData* f)
+InvGuessData::InvGuessData(const QString& guessname, const QString& guess_surfname, float mindist, float exclude, float grid, InvDipoleFitData* f, float guessrad)
 {
     //    InvGuessData*      res = new InvGuessData();
     int k, p;
-    float guessrad = 0.080f;
     std::unique_ptr<MNESourceSpace> guesses;
     dipoleFitFuncs orig;
 
@@ -155,10 +154,9 @@ InvGuessData::InvGuessData(const QString& guessname, const QString& guess_surfna
 
 //=============================================================================================================
 
-InvGuessData::InvGuessData(const QString& guessname, const QString& guess_surfname, float mindist, float exclude, float grid, InvDipoleFitData* f, char* guess_save_name)
+InvGuessData::InvGuessData(const QString& guessname, const QString& guess_surfname, float mindist, float exclude, float grid, InvDipoleFitData* f, char* guess_save_name, float guessrad)
 {
     int k, p;
-    float guessrad = 0.080f;
     std::unique_ptr<MNESourceSpace> guesses;
 
     if (!guessname.isEmpty()) {
