@@ -31,6 +31,8 @@
 #include <iostream>
 #include <QDebug>
 
+#include <Eigen/LU>
+
 //=============================================================================================================
 // USED NAMESPACES
 //=============================================================================================================
@@ -174,11 +176,13 @@ bool FiffInfo::make_compensator(fiff_int_t from, fiff_int_t to, FiffCtfComp& ctf
         }
     }
     //
-    //   s_orig = s_from + C1*s_from = (I + C1)*s_from
-    //   s_to   = s_orig - C2*s_orig = (I - C2)*s_orig
-    //   s_to   = (I - C2)*(I + C1)*s_from = (I + C1 - C2 - C2*C1)*s_from
+    //   s_from = (I - C1)*s_orig  =>  s_orig = (I - C1)^-1 * s_from
+    //   s_to   = (I - C2)*s_orig
+    //   (I + C1) is only the inverse when C1*C1 = 0, which fails as soon as
+    //   reference channels are themselves compensated (e.g. CTF grade 1).
     //
-    comp_tmp = MatrixXd::Identity(this->nchan, this->nchan) + C1 - C2 - C2 * C1;
+    const MatrixXd eye = MatrixXd::Identity(this->nchan, this->nchan);
+    comp_tmp = (eye - C2) * (eye - C1).partialPivLu().inverse();
 
     qint32 k;
     if (exclude_comp_chs) {
@@ -201,6 +205,8 @@ bool FiffInfo::make_compensator(fiff_int_t from, fiff_int_t to, FiffCtfComp& ctf
     } else {
         ctf_comp.data->data = comp_tmp;
     }
+    // FiffRawData applies the compensator only when kind is set.
+    ctf_comp.kind = to;
 
     return true;
 }

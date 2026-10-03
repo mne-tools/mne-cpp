@@ -6,8 +6,8 @@ CI evidence: https://github.com/mne-tools/mne-cpp/actions/runs/36243010551 (comm
 
 ## Registration
 
-- Test directories: 247
-- Registered unconditionally: 240
+- Test directories: 248
+- Registered unconditionally: 241
 - Registered behind a CMake condition or early `return()`: 4
 - Not registered: 3
 - Registered without `LABELS`: 0
@@ -18,9 +18,9 @@ CI evidence: https://github.com/mne-tools/mne-cpp/actions/runs/36243010551 (comm
 
 | Platform | Executed | Failures | Skipped | Registered but not executed |
 |---|---:|---:|---:|---|
-| macos-26 | 230 | 0 | 0 | `test_fiff_core_python`, `test_fiff_raw_save_python`, `test_fiff_stream_python`, `test_fwd_python`, `test_inv_beamformer_python`, `test_inv_dipole_fit_python`, `test_inv_eloreta_python`, `test_inv_lcmv_python`, `test_inv_rap_music_truth`, `test_mne_cov_python`, `test_mne_description_parser`, `test_mne_label_python`, `test_mne_raw_data_python`, `test_mne_source_space_ops_python` |
-| ubuntu-24.04 | 230 | 0 | 0 | `test_fiff_core_python`, `test_fiff_raw_save_python`, `test_fiff_stream_python`, `test_fwd_python`, `test_inv_beamformer_python`, `test_inv_dipole_fit_python`, `test_inv_eloreta_python`, `test_inv_lcmv_python`, `test_inv_rap_music_truth`, `test_mne_cov_python`, `test_mne_description_parser`, `test_mne_label_python`, `test_mne_raw_data_python`, `test_mne_source_space_ops_python` |
-| windows-2025-vs2026 | 230 | 0 | 2 | `test_fiff_core_python`, `test_fiff_raw_save_python`, `test_fiff_stream_python`, `test_fwd_python`, `test_inv_beamformer_python`, `test_inv_dipole_fit_python`, `test_inv_eloreta_python`, `test_inv_lcmv_python`, `test_inv_rap_music_truth`, `test_mne_cov_python`, `test_mne_description_parser`, `test_mne_label_python`, `test_mne_raw_data_python`, `test_mne_source_space_ops_python` |
+| macos-26 | 230 | 0 | 0 | `test_fiff_core_python`, `test_fiff_raw_save_python`, `test_fiff_stream_python`, `test_fwd_python`, `test_inv_beamformer_python`, `test_inv_dipole_fit_python`, `test_inv_eloreta_python`, `test_inv_lcmv_python`, `test_inv_rap_music_truth`, `test_mne_cov_python`, `test_mne_ctf_comp_python`, `test_mne_description_parser`, `test_mne_label_python`, `test_mne_raw_data_python`, `test_mne_source_space_ops_python` |
+| ubuntu-24.04 | 230 | 0 | 0 | `test_fiff_core_python`, `test_fiff_raw_save_python`, `test_fiff_stream_python`, `test_fwd_python`, `test_inv_beamformer_python`, `test_inv_dipole_fit_python`, `test_inv_eloreta_python`, `test_inv_lcmv_python`, `test_inv_rap_music_truth`, `test_mne_cov_python`, `test_mne_ctf_comp_python`, `test_mne_description_parser`, `test_mne_label_python`, `test_mne_raw_data_python`, `test_mne_source_space_ops_python` |
+| windows-2025-vs2026 | 230 | 0 | 2 | `test_fiff_core_python`, `test_fiff_raw_save_python`, `test_fiff_stream_python`, `test_fwd_python`, `test_inv_beamformer_python`, `test_inv_dipole_fit_python`, `test_inv_eloreta_python`, `test_inv_lcmv_python`, `test_inv_rap_music_truth`, `test_mne_cov_python`, `test_mne_ctf_comp_python`, `test_mne_description_parser`, `test_mne_label_python`, `test_mne_raw_data_python`, `test_mne_source_space_ops_python` |
 
 ## Run-time requirements (lexical signals)
 

@@ -240,23 +240,23 @@ std::unique_ptr<MNENamedMatrix> MNENamedMatrix::read(FiffStream::SPtr& stream,
      * cross-check them against the matrix data.
      */
     if (!tmp_node->find_tag(stream, FIFF_MNE_NROW, t_pTag)) {
-        nrow = dims[0];
+        nrow = static_cast<int>(data.rows());
     } else {
         nrow = *t_pTag->toInt();
-        if (nrow != dims[0]) {
+        if (nrow != data.rows()) {
             qCritical("MNENamedMatrix::read - FIFF_MNE_NROW tag (%d) conflicts with matrix data (%d).",
-                      nrow, dims[0]);
+                      nrow, static_cast<int>(data.rows()));
             return nullptr;
         }
     }
 
     if (!tmp_node->find_tag(stream, FIFF_MNE_NCOL, t_pTag)) {
-        ncol = dims[1];
+        ncol = static_cast<int>(data.cols());
     } else {
         ncol = *t_pTag->toInt();
-        if (ncol != dims[1]) {
+        if (ncol != data.cols()) {
             qCritical("MNENamedMatrix::read - FIFF_MNE_NCOL tag (%d) conflicts with matrix data (%d).",
-                      ncol, dims[1]);
+                      ncol, static_cast<int>(data.cols()));
             return nullptr;
         }
     }
@@ -264,7 +264,7 @@ std::unique_ptr<MNENamedMatrix> MNENamedMatrix::read(FiffStream::SPtr& stream,
     /*
      * Read optional row and column name lists.
      */
-    if (!tmp_node->find_tag(stream, FIFF_MNE_ROW_NAMES, t_pTag)) {
+    if (tmp_node->find_tag(stream, FIFF_MNE_ROW_NAMES, t_pTag)) {
         const QString s = t_pTag->toString();
         rownames = FiffStream::split_name_list(s);
         if (rownames.size() != nrow) {
@@ -274,7 +274,7 @@ std::unique_ptr<MNENamedMatrix> MNENamedMatrix::read(FiffStream::SPtr& stream,
         }
     }
 
-    if (!tmp_node->find_tag(stream, FIFF_MNE_COL_NAMES, t_pTag)) {
+    if (tmp_node->find_tag(stream, FIFF_MNE_COL_NAMES, t_pTag)) {
         const QString s = t_pTag->toString();
         colnames = FiffStream::split_name_list(s);
         if (colnames.size() != ncol) {

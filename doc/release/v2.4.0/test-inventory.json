@@ -6,9 +6,9 @@
     "commit": "96413f7ccc7dabed2c6d40a511960ce8805e0407"
   },
   "summary": {
-    "directories": 247,
+    "directories": 248,
     "registration": {
-      "unconditional": 240,
+      "unconditional": 241,
       "conditional": 4,
       "unregistered": 3
     },
@@ -42,6 +42,7 @@
           "test_inv_lcmv_python",
           "test_inv_rap_music_truth",
           "test_mne_cov_python",
+          "test_mne_ctf_comp_python",
           "test_mne_description_parser",
           "test_mne_label_python",
           "test_mne_raw_data_python",
@@ -64,6 +65,7 @@
           "test_inv_lcmv_python",
           "test_inv_rap_music_truth",
           "test_mne_cov_python",
+          "test_mne_ctf_comp_python",
           "test_mne_description_parser",
           "test_mne_label_python",
           "test_mne_raw_data_python",
@@ -86,6 +88,7 @@
           "test_inv_lcmv_python",
           "test_inv_rap_music_truth",
           "test_mne_cov_python",
+          "test_mne_ctf_comp_python",
           "test_mne_description_parser",
           "test_mne_label_python",
           "test_mne_raw_data_python",
@@ -4860,6 +4863,36 @@
       "requirements": [
         "test-data"
       ],
+      "gui": false,
+      "qskip_sites": 0,
+      "spawns_processes": false,
+      "ci_excluded_on": [],
+      "ci": {
+        "macos-26": "absent",
+        "ubuntu-24.04": "absent",
+        "windows-2025-vs2026": "absent"
+      },
+      "registry_classes": []
+    },
+    {
+      "name": "test_mne_ctf_comp_python",
+      "cmake": "src/testframes/test_mne_ctf_comp_python/CMakeLists.txt",
+      "registration": {
+        "state": "unconditional",
+        "via": "src/testframes/CMakeLists.txt",
+        "conditions": [],
+        "early_return_guard": null,
+        "unregistered_reason": null
+      },
+      "add_test_names": [
+        "test_mne_ctf_comp_python"
+      ],
+      "labels": [
+        "parity",
+        "unit"
+      ],
+      "timeout": 120,
+      "requirements": [],
       "gui": false,
       "qskip_sites": 0,
       "spawns_processes": false,

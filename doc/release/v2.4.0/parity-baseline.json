@@ -64,6 +64,7 @@
         "test_inv_eloreta_python",
         "test_inv_lcmv_python",
         "test_mne_cov_python",
+        "test_mne_ctf_comp_python",
         "test_mne_label_python",
         "test_mne_raw_data_python",
         "test_mne_source_space_ops_python",

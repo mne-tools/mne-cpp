@@ -11,7 +11,7 @@
   },
   "gates": {
     "G1_test_integrity": {
-      "registered": 244,
+      "registered": 245,
       "conditional": 4,
       "unregistered": 3,
       "without_labels": 0,
