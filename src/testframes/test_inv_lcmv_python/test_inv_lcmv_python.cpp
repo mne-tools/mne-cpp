@@ -50,6 +50,7 @@
 
 #include <QtTest>
 #include <QFile>
+#include <QMap>
 
 //=============================================================================================================
 // EIGEN INCLUDES
@@ -84,8 +85,9 @@ private slots:
     void dicsPowerMatches();
 
 private:
-    InvBeamformer makeFilter(BeamformerPickOri pickOri, BeamformerWeightNorm weightNorm, double reg = 0.05) const;
+    const InvBeamformer& makeFilter(BeamformerPickOri pickOri, BeamformerWeightNorm weightNorm, double reg = 0.05);
 
+    QMap<QString, InvBeamformer> m_filters; /**< Each 7928-source filter takes seconds, so build each once. */
     MNEForwardSolution m_fwd;
     FiffInfo m_info;
     FiffCov m_noiseCov;
@@ -146,9 +148,13 @@ void TestInvLcmvPython::initTestCase()
 
 //=============================================================================================================
 
-InvBeamformer TestInvLcmvPython::makeFilter(BeamformerPickOri pickOri, BeamformerWeightNorm weightNorm, double reg) const
+const InvBeamformer& TestInvLcmvPython::makeFilter(BeamformerPickOri pickOri, BeamformerWeightNorm weightNorm, double reg)
 {
-    return InvLCMV::makeLCMV(m_info, m_fwd, m_dataCov, reg, m_noiseCov, pickOri, weightNorm);
+    const QString key = QStringLiteral("%1/%2/%3").arg(static_cast<int>(pickOri)).arg(static_cast<int>(weightNorm)).arg(reg);
+    auto it = m_filters.find(key);
+    if (it == m_filters.end())
+        it = m_filters.insert(key, InvLCMV::makeLCMV(m_info, m_fwd, m_dataCov, reg, m_noiseCov, pickOri, weightNorm));
+    return *it;
 }
 
 //=============================================================================================================
@@ -190,7 +196,7 @@ void TestInvLcmvPython::powerMatches()
     QFETCH(double, power5000);
     QFETCH(int, argmax);
 
-    const InvBeamformer filters = makeFilter(static_cast<BeamformerPickOri>(pickOri), static_cast<BeamformerWeightNorm>(weightNorm), reg);
+    const InvBeamformer& filters = makeFilter(static_cast<BeamformerPickOri>(pickOri), static_cast<BeamformerWeightNorm>(weightNorm), reg);
     QVERIFY(filters.isValid());
     QCOMPARE(static_cast<int>(filters.weights[0].rows()), filterRows);
 
@@ -233,7 +239,7 @@ void TestInvLcmvPython::timeCoursesMatch()
     QFETCH(Vector3d, source5000);
     QFETCH(double, absSum);
 
-    const InvBeamformer filters = makeFilter(static_cast<BeamformerPickOri>(pickOri), BeamformerWeightNorm::UnitNoiseGain);
+    const InvBeamformer& filters = makeFilter(static_cast<BeamformerPickOri>(pickOri), BeamformerWeightNorm::UnitNoiseGain);
     const InvSourceEstimate stc = InvLCMV::applyLCMV(m_evoked, filters);
     QCOMPARE(static_cast<int>(stc.data.rows()), 7928);
     QCOMPARE(static_cast<int>(stc.data.cols()), 3);
@@ -286,7 +292,7 @@ void TestInvLcmvPython::dicsPowerMatches()
 
     // Same matrices as LCMV, so the signed max-power orientations must agree.
     if (filters.pickOri == BeamformerPickOri::MaxPower) {
-        const InvBeamformer lcmv = makeFilter(BeamformerPickOri::MaxPower, BeamformerWeightNorm::UnitNoiseGain);
+        const InvBeamformer& lcmv = makeFilter(BeamformerPickOri::MaxPower, BeamformerWeightNorm::UnitNoiseGain);
         QVERIFY((filters.maxPowerOri - lcmv.maxPowerOri).cwiseAbs().maxCoeff() < 1e-6);
     }
 }

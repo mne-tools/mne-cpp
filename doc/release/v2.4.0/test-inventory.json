@@ -3845,9 +3845,10 @@
       "labels": [
         "integration",
         "parity",
-        "requires-data"
+        "requires-data",
+        "slow"
       ],
-      "timeout": 120,
+      "timeout": 600,
       "requirements": [
         "test-data"
       ],

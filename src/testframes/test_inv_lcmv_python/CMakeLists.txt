@@ -55,8 +55,8 @@ endif()
 # Register with CTest
 enable_testing()
 mne_add_test(${PROJECT_NAME}
-    LABELS integration parity
-    TIMEOUT 120
+    LABELS integration parity slow
+    TIMEOUT 600
     REQUIRES_DATA
         mne-cpp-test-data/MEG/sample
         mne-cpp-test-data/Result)
