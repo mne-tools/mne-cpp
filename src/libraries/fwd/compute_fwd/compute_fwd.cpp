@@ -413,6 +413,7 @@ void ComputeFwd::initFwd()
         qInfo("BEM model %s is now set up", m_bemModel->sol_name.toUtf8().constData());
     } else {
         qInfo("Using the sphere model.");
+        m_bemModel = std::make_unique<FwdBemModel>(); // no surfaces selects the sphere branch
     }
 
     // Try to circumvent numerical problems by excluding points too close or outside the inner skull surface
@@ -528,7 +529,7 @@ std::unique_ptr<MNEForwardSolution> ComputeFwd::calculateFwd()
     if (m_eegels) {
         iNEeg = m_eegels->ncoil();
     }
-    if (!m_bemModel) {
+    if (!m_bemModel || m_bemModel->nsurf == 0) {
         m_pSettings->use_threads = false;
     }
 

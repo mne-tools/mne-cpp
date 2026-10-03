@@ -110,6 +110,8 @@ private slots:
 
     void labelForward_free();
     void labelForward_fixed();
+    void sphereForward_data();
+    void sphereForward();
 };
 
 //=============================================================================================================
@@ -392,6 +394,56 @@ void TestFwdPython::labelForward_fixed()
         const VectorXd ref = m_ref.sol->data.middleCols(3 * m_v1Sel(i), 3) * nn;
         QVERIFY((fwd->sol->data.col(i) - ref).norm() <= 1e-4 * ref.norm());
     }
+}
+
+//=============================================================================================================
+
+void TestFwdPython::sphereForward_data()
+{
+    // mne-python _compute_forwards_meeg on the 78 lh.V1 sources in head coordinates with
+    // make_sphere_model(r0=(0, 0, 0.04), head_radius=0.09), accurate MEG coils and EEG:
+    // np.linalg.norm(G[:, 3k + c]) per channel type.
+    QTest::addColumn<int>("source");
+    QTest::addColumn<Vector3d>("megNorms");
+    QTest::addColumn<Vector3d>("eegNorms");
+
+    QTest::newRow("source 0") << 0 << Vector3d(0.0012455023232288232, 0.0008553711634315896, 0.0010237827397100762)
+                              << Vector3d(551.6501123312413, 522.8970930124603, 458.6240696616932);
+    QTest::newRow("source 40") << 40 << Vector3d(0.0007011757119319035, 0.0005468106389226044, 0.0006286912013834711)
+                               << Vector3d(502.557459453998, 461.3687151657523, 438.55365038029845);
+    QTest::newRow("source 77") << 77 << Vector3d(0.00020488718164145291, 0.00023728405477539279, 0.00020604610935806558)
+                               << Vector3d(411.14962687679156, 379.70623960737703, 405.4180262013036);
+}
+
+void TestFwdPython::sphereForward()
+{
+    QFETCH(int, source);
+    QFETCH(Vector3d, megNorms);
+    QFETCH(Vector3d, eegNorms);
+
+    // No BEM: MEG uses the sphere at r0, EEG the default four-layer sphere of radius 90 mm.
+    auto s = settings(false, false);
+    s->bemname.clear();
+    s->mindist = 0.0f;
+    s->filter_spaces = false;
+    s->r0 = Vector3f(0.0f, 0.0f, 0.04f);
+    s->eeg_sphere_rad = 0.09f;
+    s->solname = m_dir.filePath("sphere-fwd.fif");
+    auto fwd = std::make_shared<ComputeFwd>(s)->calculateFwd();
+    QVERIFY(fwd != nullptr);
+    QCOMPARE(fwd->nsource, 78);
+
+    Vector3d meg;
+    Vector3d eeg;
+    for (int c = 0; c < 3; ++c) {
+        const VectorXd col = fwd->sol->data.col(3 * source + c);
+        meg[c] = col.head(306).norm();
+        eeg[c] = col.tail(60).norm();
+    }
+    QVERIFY2((meg - megNorms).cwiseAbs().maxCoeff() < 1e-4 * megNorms.maxCoeff(),
+             qPrintable(QStringLiteral("MEG norms %1 %2 %3").arg(meg[0], 0, 'g', 10).arg(meg[1], 0, 'g', 10).arg(meg[2], 0, 'g', 10)));
+    QVERIFY2((eeg - eegNorms).cwiseAbs().maxCoeff() < 1e-3 * eegNorms.maxCoeff(),
+             qPrintable(QStringLiteral("EEG norms %1 %2 %3").arg(eeg[0], 0, 'g', 10).arg(eeg[1], 0, 'g', 10).arg(eeg[2], 0, 'g', 10)));
 }
 
 //=============================================================================================================
