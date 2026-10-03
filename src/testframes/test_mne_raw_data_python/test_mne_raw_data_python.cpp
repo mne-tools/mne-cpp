@@ -101,6 +101,8 @@ private slots:
     void padsOutsideData();
     void projectsSegment();
     void filterIsTransparentWhenOff();
+    void filtersSegments_data();
+    void filtersSegments();
     void rejectsMissingFile();
 
 private:
@@ -281,6 +283,66 @@ void TestMneRawDataPython::filterIsTransparentWhenOff()
     QVERIFY(!m_raw->filter->filter_on);
     QCOMPARE(m_raw->pick_data_filt(&sel, m_raw->first_samp + 2990, 25, filt.rows.data()), 0);
     QCOMPARE(filt.values, raw.values);
+}
+
+//=============================================================================================================
+
+void TestMneRawDataPython::filtersSegments_data()
+{
+    QTest::addColumn<double>("highpass");
+    QTest::addColumn<int>("offset");
+    QTest::addColumn<int>("ns");
+    QTest::addColumn<double>("absSum");
+    QTest::addColumn<double>("eegFirst");
+    QTest::addColumn<double>("eogLast");
+
+    // numpy port of MNE-C's overlap-add filter (mne_apply_filter.c, mne_raw_routines.c):
+    // 4096-sample blocks with 2048-sample zero tapers, the first sample's value removed,
+    // rfft * cos^2-edged response (lowpass 40 Hz, width 5 Hz), stim channels unfiltered.
+    // Like the reader, it repeats the last sample past the end. absSum excludes the stim channel.
+    QTest::newRow("lowpass, start") << 0.0 << 0 << 5 << 2.023919891690633e-08 << -1.5030550064406802e-09 << 6.185775627031829e-11;
+    QTest::newRow("lowpass, across buffers") << 0.0 << 2990 << 25 << 1.7383534600305496e-07 << -1.064022285676407e-09 << -3.919694732307241e-09;
+    QTest::newRow("lowpass, end") << 0.0 << 6000 << 7 << 3.491180168507228e-08 << -3.666942281729456e-09 << -4.807140128919311e-09;
+    QTest::newRow("bandpass, start") << 1.0 << 0 << 5 << 1.5276783148546238e-08 << 2.396619036799164e-09 << -1.8021456675591414e-09;
+    QTest::newRow("bandpass, across buffers") << 1.0 << 2990 << 25 << 5.940930901345105e-08 << 1.7552299025034232e-09 << 1.3481973317834655e-10;
+    QTest::newRow("bandpass, end") << 1.0 << 6000 << 7 << 2.0515146096757774e-08 << -7.04241517427401e-10 << -1.2819215478145205e-09;
+}
+
+void TestMneRawDataPython::filtersSegments()
+{
+    QFETCH(double, highpass);
+    QFETCH(int, offset);
+    QFETCH(int, ns);
+    QFETCH(double, absSum);
+    QFETCH(double, eegFirst);
+    QFETCH(double, eogLast);
+
+    MNEFilterDef filter;
+    filter.filter_on = true;
+    filter.size = 4096;
+    filter.taper_size = 2048;
+    filter.highpass = filter.eog_highpass = static_cast<float>(highpass);
+    filter.lowpass = filter.eog_lowpass = 40.0f;
+    filter.lowpass_width = filter.eog_lowpass_width = 5.0f;
+    std::unique_ptr<MNERawData> raw(MNERawData::open_file(m_rawPath, false, false, filter));
+    QVERIFY(raw);
+
+    MNEChSelection sel = makeSelection();
+    PickBuffer buf(sel.nchan, ns);
+    QCOMPARE(raw->pick_data_filt(&sel, raw->first_samp + offset, ns, buf.rows.data()), 0);
+
+    double sum = 0.0;
+    for (int c = 0; c < sel.nchan; ++c)
+        if (c != 4)
+            sum += buf.values.row(c).cast<double>().cwiseAbs().sum();
+    QVERIFY2(closeTo(sum, absSum, 1e-4), qPrintable(QStringLiteral("abs sum %1").arg(sum, 0, 'g', 12)));
+    QVERIFY2(closeTo(buf.values(3, 0), eegFirst, 1e-3), qPrintable(QStringLiteral("EEG %1").arg(buf.values(3, 0), 0, 'g', 12)));
+    QVERIFY2(closeTo(buf.values(5, ns - 1), eogLast, 1e-3), qPrintable(QStringLiteral("EOG %1").arg(buf.values(5, ns - 1), 0, 'g', 12)));
+
+    // The stimulus channel passes through unfiltered.
+    PickBuffer plain(sel.nchan, ns);
+    QCOMPARE(raw->pick_data(&sel, raw->first_samp + offset, ns, plain.rows.data()), 0);
+    QCOMPARE(buf.values.row(4), plain.values.row(4));
 }
 
 //=============================================================================================================

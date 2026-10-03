@@ -26,6 +26,9 @@
 #include <QTextStream>
 
 #include <Eigen/Core>
+#include <unsupported/Eigen/FFT>
+
+#include <complex>
 
 // MSVC builds already define _USE_MATH_DEFINES globally (see src/CMakeLists.txt),
 // so define it here only for the toolchains that do not.
@@ -148,24 +151,39 @@ int mne_compare_filters(const MNEFilterDef& f1,
 
 void mne_fft_ana(float* data, int np, std::vector<float>& /*precalc*/)
 /*
-      * FFT analysis for real data
+      * FFT analysis for real data, in place, FFTPACK rfftf layout:
+      * r0, r1, i1, r2, i2, ..., and r(np/2) last when np is even.
       */
 {
-    Q_UNUSED(data);
-    Q_UNUSED(np);
-    qCritical("##################### DEBUG Error: FFT analysis needs to be implemented");
-    return;
+    Eigen::FFT<float> fft;
+    std::vector<float> in(data, data + np);
+    std::vector<std::complex<float>> spec;
+    fft.fwd(spec, in);
+    data[0] = spec[0].real();
+    for (int k = 1, p = 1; p < np; ++k) {
+        data[p++] = spec[k].real();
+        if (p < np)
+            data[p++] = spec[k].imag();
+    }
 }
 
 void mne_fft_syn(float* data, int np, std::vector<float>& /*precalc*/)
 /*
-      * FFT synthesis for real data
+      * Inverse of mne_fft_ana (FFTPACK rfftb followed by MNE-C's 1/np scaling)
       */
 {
-    Q_UNUSED(data);
-    Q_UNUSED(np);
-    qCritical("##################### DEBUG Error: FFT synthesis needs to be implemented");
-    return;
+    Eigen::FFT<float> fft;
+    std::vector<std::complex<float>> spec(np);
+    spec[0] = std::complex<float>(data[0], 0.0f);
+    for (int k = 1, p = 1; p < np; ++k) {
+        const float re = data[p++];
+        const float im = p < np ? data[p++] : 0.0f;
+        spec[k] = std::complex<float>(re, im);
+        spec[np - k] = std::conj(spec[k]);
+    }
+    std::vector<float> out;
+    fft.inv(out, spec);
+    std::copy(out.begin(), out.begin() + np, data);
 }
 
 int mne_apply_filter(const MNEFilterDef& filter, FilterData* d, float* data, int ns, int zero_pad, float dc_offset, int kind)
