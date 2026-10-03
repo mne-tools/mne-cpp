@@ -738,7 +738,8 @@ int MNERawData::pick_data(mneChSelection sel, int firsts, int ns, float** picked
     /*
        * Have to to the hard work
        */
-    for (k = 0, this_buf = bufs.data(), s = 0; k < static_cast<int>(bufs.size()); k++, this_buf++) {
+    // s continues after any leading zero padding (MNE-C reset it here and overwrote the padding).
+    for (k = 0, this_buf = bufs.data(); k < static_cast<int>(bufs.size()); k++, this_buf++) {
         if (this_buf->lasts >= firsts) {
             start = firsts - this_buf->firsts;
             if (start < 0)
@@ -1355,15 +1356,14 @@ MNERawData* MNERawData::open_file_comp(const QString& name,
     /*
        * Figure out the buffers
        */
-    //    for (k = 0, dir = dir0, nbuf = 0; k < ndir; k++, dir++)
-    for (k = 0, nbuf = 0; k < ndir; k++)
+    // ndir counts the entries after the consumed leading ones (MNE-C advances dir0 instead).
+    for (k = current_dir0, nbuf = 0; k < current_dir0 + ndir; k++)
         if (dir0[k]->kind == FIFF_DATA_BUFFER ||
             dir0[k]->kind == FIFF_DATA_SKIP)
             nbuf++;
     data->bufs.resize(nbuf);
 
-    //    for (k = 0, nbuf = 0, dir = dir0; k < ndir; k++, dir++)
-    for (k = 0, nbuf = 0; k < ndir; k++)
+    for (k = current_dir0, nbuf = 0; k < current_dir0 + ndir; k++)
         if (dir0[k]->kind == FIFF_DATA_BUFFER ||
             dir0[k]->kind == FIFF_DATA_SKIP) {
             data->bufs[nbuf].ns = 0;

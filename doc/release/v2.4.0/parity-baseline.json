@@ -64,6 +64,7 @@
         "test_inv_lcmv_python",
         "test_mne_cov_python",
         "test_mne_label_python",
+        "test_mne_raw_data_python",
         "test_mne_source_space_python",
         "test_spectral_connectivity",
         "test_tool_list_source_space"
