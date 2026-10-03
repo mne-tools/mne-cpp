@@ -267,8 +267,13 @@ bool FiffRawData::read_raw_segment(MatrixXd& data,
                             one = cal * (Map<const MatrixXf>(t_pTag->toFloat(), nchan, thisRawDir.nsamp)).cast<double>();
                         else if (t_pTag->type == FIFFT_SHORT)
                             one = cal * (Map<MatrixShort>(t_pTag->toShort(), nchan, thisRawDir.nsamp)).cast<double>();
-                        else
+                        else if (t_pTag->type == FIFFT_DOUBLE)
+                            one = cal * Map<const MatrixXd>(t_pTag->toDouble(), nchan, thisRawDir.nsamp);
+                        else {
                             qWarning("Data Storage Format not known yet [1]!! Type: %d\n", t_pTag->type);
+                            this->file->device()->close();
+                            return false;
+                        }
                     } else {
                         //ToDo find a faster solution for this!! --> make cal and mul sparse like in MATLAB
                         newData.resize(sel.cols(), thisRawDir.nsamp); //ToDo this can be done much faster, without newData
@@ -293,8 +298,15 @@ bool FiffRawData::read_raw_segment(MatrixXd& data,
 
                             for (r = 0; r < sel.size(); ++r)
                                 newData.block(r, 0, 1, thisRawDir.nsamp) = tmp_data.block(sel[r], 0, 1, thisRawDir.nsamp);
+                        } else if (t_pTag->type == FIFFT_DOUBLE) {
+                            tmp_data = Map<const MatrixXd>(t_pTag->toDouble(), nchan, thisRawDir.nsamp);
+
+                            for (r = 0; r < sel.size(); ++r)
+                                newData.block(r, 0, 1, thisRawDir.nsamp) = tmp_data.block(sel[r], 0, 1, thisRawDir.nsamp);
                         } else {
                             qWarning("Data Storage Format not known yet [2]!! Type: %d\n", t_pTag->type);
+                            this->file->device()->close();
+                            return false;
                         }
 
                         one = cal * newData;
@@ -306,8 +318,15 @@ bool FiffRawData::read_raw_segment(MatrixXd& data,
                         one = mult * (Map<MatrixXi>(t_pTag->toInt(), nchan, thisRawDir.nsamp)).cast<double>();
                     else if (t_pTag->type == FIFFT_FLOAT)
                         one = mult * (Map<const MatrixXf>(t_pTag->toFloat(), nchan, thisRawDir.nsamp)).cast<double>();
-                    else
+                    else if (t_pTag->type == FIFFT_SHORT)
+                        one = mult * (Map<MatrixShort>(t_pTag->toShort(), nchan, thisRawDir.nsamp)).cast<double>();
+                    else if (t_pTag->type == FIFFT_DOUBLE)
+                        one = mult * Map<const MatrixXd>(t_pTag->toDouble(), nchan, thisRawDir.nsamp);
+                    else {
                         qWarning("Data Storage Format not known yet [3]!! Type: %d\n", t_pTag->type);
+                        this->file->device()->close();
+                        return false;
+                    }
                 }
             }
             //
@@ -553,8 +572,13 @@ bool FiffRawData::read_raw_segment(MatrixXd& data,
                             one = cal * (Map<const MatrixXf>(t_pTag->toFloat(), nchan, thisRawDir.nsamp)).cast<double>();
                         else if (t_pTag->type == FIFFT_SHORT)
                             one = cal * (Map<MatrixShort>(t_pTag->toShort(), nchan, thisRawDir.nsamp)).cast<double>();
-                        else
+                        else if (t_pTag->type == FIFFT_DOUBLE)
+                            one = cal * Map<const MatrixXd>(t_pTag->toDouble(), nchan, thisRawDir.nsamp);
+                        else {
                             qWarning("Data Storage Format not known yet [1]!! Type: %d\n", t_pTag->type);
+                            this->file->device()->close();
+                            return false;
+                        }
                     } else {
                         //ToDo find a faster solution for this!! --> make cal and mul sparse like in MATLAB
                         MatrixXd newData(sel.cols(), thisRawDir.nsamp); //ToDo this can be done much faster, without newData
@@ -579,8 +603,15 @@ bool FiffRawData::read_raw_segment(MatrixXd& data,
 
                             for (r = 0; r < sel.size(); ++r)
                                 newData.block(r, 0, 1, thisRawDir.nsamp) = tmp_data.block(sel[r], 0, 1, thisRawDir.nsamp);
+                        } else if (t_pTag->type == FIFFT_DOUBLE) {
+                            MatrixXd tmp_data = Map<const MatrixXd>(t_pTag->toDouble(), nchan, thisRawDir.nsamp);
+
+                            for (r = 0; r < sel.size(); ++r)
+                                newData.block(r, 0, 1, thisRawDir.nsamp) = tmp_data.block(sel[r], 0, 1, thisRawDir.nsamp);
                         } else {
                             qWarning("Data Storage Format not known yet [2]!! Type: %d\n", t_pTag->type);
+                            this->file->device()->close();
+                            return false;
                         }
 
                         one = cal * newData;
@@ -592,8 +623,15 @@ bool FiffRawData::read_raw_segment(MatrixXd& data,
                         one = mult * (Map<MatrixXi>(t_pTag->toInt(), nchan, thisRawDir.nsamp)).cast<double>();
                     else if (t_pTag->type == FIFFT_FLOAT)
                         one = mult * (Map<const MatrixXf>(t_pTag->toFloat(), nchan, thisRawDir.nsamp)).cast<double>();
-                    else
+                    else if (t_pTag->type == FIFFT_SHORT)
+                        one = mult * (Map<MatrixShort>(t_pTag->toShort(), nchan, thisRawDir.nsamp)).cast<double>();
+                    else if (t_pTag->type == FIFFT_DOUBLE)
+                        one = mult * Map<const MatrixXd>(t_pTag->toDouble(), nchan, thisRawDir.nsamp);
+                    else {
                         qWarning("Data Storage Format not known yet [3]!! Type: %d\n", t_pTag->type);
+                        this->file->device()->close();
+                        return false;
+                    }
                 }
             }
             //

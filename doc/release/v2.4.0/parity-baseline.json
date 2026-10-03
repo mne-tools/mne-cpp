@@ -56,6 +56,7 @@
         "test_fiff_dig_point_python",
         "test_fiff_evoked_python",
         "test_fiff_proj_python",
+        "test_fiff_raw_formats_python",
         "test_fiff_raw_save_python",
         "test_filtering",
         "test_fwd_python",

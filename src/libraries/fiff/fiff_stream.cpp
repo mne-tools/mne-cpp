@@ -1841,6 +1841,9 @@ bool FiffStream::setup_read_raw(QIODevice& p_IODevice,
                 case FIFFT_INT:
                     nsamp = ent->size / (4 * nchan);
                     break;
+                case FIFFT_DOUBLE:
+                    nsamp = ent->size / (8 * nchan);
+                    break;
                 default:
                     qWarning("Cannot handle data buffers of type %d\n", ent->type);
                     return false;
