@@ -509,6 +509,8 @@ Writes a FIFF_BLOCK_START tag.
 
 Write one tag to file including its data Data is not written if it is nullptr.
 
+The payload is taken in host byte order (as read_tag returns it).
+
 **Parameters:**
 
 - **p_pTag** : *const std::unique_ptr&lt; [FiffTag](/docs/api/fiff/fiff-tag) &gt; &*

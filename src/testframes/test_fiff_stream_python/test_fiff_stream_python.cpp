@@ -34,6 +34,7 @@
 #include <fiff/fiff_constants.h>
 
 #include <cmath>
+#include <memory>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -88,6 +89,8 @@ private slots:
     void namedMatrix();
     void projectors();
     void coordTrans();
+    void copiesProcessingHistory();
+    void attachesEnvironment();
 
 private:
     FiffDirNode::SPtr findBlock(int kind) const;
@@ -240,6 +243,93 @@ void TestFiffStreamPython::coordTrans()
     QVERIFY((t.trans.block<3, 1>(0, 3) - m_move).cwiseAbs().maxCoeff() < 1e-7f);
     // The stored inverse must undo the transform.
     QVERIFY((t.trans * t.invtrans - Matrix4f::Identity()).cwiseAbs().maxCoeff() < 1e-6f);
+}
+
+//=============================================================================================================
+
+void TestFiffStreamPython::copiesProcessingHistory()
+{
+    // data/sss_history_raw.fif (make_proc_history_fixture.py) carries three MaxFilter
+    // runs; mne-python reads 10th-order SSS info for the first two and cross-talk
+    // compensation (5 entries) for the second.
+    const QString src = QStringLiteral(MNE_FIFF_STREAM_DATA_DIR "/sss_history_raw.fif");
+    auto historyOf = [](const QString& path, QList<FiffDirNode::SPtr>& runs) {
+        auto file = std::make_shared<QFile>(path);
+        FiffStream::SPtr stream(new FiffStream(file.get()));
+        if (!stream->open())
+            return false;
+        const QList<FiffDirNode::SPtr> hist = stream->dirtree()->dir_tree_find(FIFFB_PROCESSING_HISTORY);
+        if (hist.isEmpty())
+            return false;
+        runs = hist[0]->dir_tree_find(FIFFB_PROCESSING_RECORD);
+        stream->close();
+        return true;
+    };
+    QList<FiffDirNode::SPtr> srcRuns;
+    QVERIFY(historyOf(src, srcRuns));
+    QCOMPARE(srcRuns.size(), 3);
+
+    const QString dst = m_dir.filePath("history-copy.fif");
+    {
+        QFile out(dst);
+        FiffStream::SPtr w = FiffStream::start_file(out);
+        QVERIFY(w);
+        fiff_int_t nchan = 3;
+        w->write_int(FIFF_NCHAN, &nchan);
+        w->end_file();
+    }
+    QVERIFY(FiffStream::copyProcessingHistory(src, dst));
+
+    QList<FiffDirNode::SPtr> dstRuns;
+    QVERIFY(historyOf(dst, dstRuns));
+    QCOMPARE(dstRuns.size(), srcRuns.size());
+    for (int k = 0; k < srcRuns.size(); ++k) {
+        QCOMPARE(dstRuns[k]->nchild(), srcRuns[k]->nchild());
+        QCOMPARE(dstRuns[k]->dir_tree_find(FIFFB_SSS_INFO).size(), srcRuns[k]->dir_tree_find(FIFFB_SSS_INFO).size());
+        QCOMPARE(dstRuns[k]->dir_tree_find(FIFFB_SSS_CAL_ADJUST).size(), srcRuns[k]->dir_tree_find(FIFFB_SSS_CAL_ADJUST).size());
+        QCOMPARE(dstRuns[k]->dir_tree_find(FIFFB_CHANNEL_DECOUPLER).size(), srcRuns[k]->dir_tree_find(FIFFB_CHANNEL_DECOUPLER).size());
+    }
+}
+
+//=============================================================================================================
+
+void TestFiffStreamPython::attachesEnvironment()
+{
+    const QString path = m_dir.filePath("env.fif");
+    {
+        QFile out(path);
+        FiffStream::SPtr w = FiffStream::start_file(out);
+        QVERIFY(w);
+        w->start_block(FIFFB_MEAS);
+        fiff_int_t nchan = 3;
+        w->write_int(FIFF_NCHAN, &nchan);
+        w->end_block(FIFFB_MEAS);
+        w->end_file();
+    }
+    {
+        QFile f(path);
+        FiffStream::SPtr u = FiffStream::open_update(f);
+        QVERIFY(u);
+        QVERIFY(u->attach_env(QStringLiteral("/data/study"), QStringLiteral("mne_process --raw a.fif")));
+        u->close();
+    }
+
+    QFile f(path);
+    FiffStream::SPtr r(new FiffStream(&f));
+    QVERIFY(r->open());
+    const QList<FiffDirNode::SPtr> env = r->dirtree()->dir_tree_find(FIFFB_MNE_ENV);
+    QCOMPARE(env.size(), 1);
+    FiffTag::UPtr tag;
+    QVERIFY(env[0]->find_tag(r, FIFF_MNE_ENV_WORKING_DIR, tag));
+    QCOMPARE(tag->toString(), QString("/data/study"));
+    QVERIFY(env[0]->find_tag(r, FIFF_MNE_ENV_COMMAND_LINE, tag));
+    QCOMPARE(tag->toString(), QString("mne_process --raw a.fif"));
+    // The measurement block written before is still there.
+    const QList<FiffDirNode::SPtr> meas = r->dirtree()->dir_tree_find(FIFFB_MEAS);
+    QCOMPARE(meas.size(), 1);
+    QVERIFY(meas[0]->find_tag(r, FIFF_NCHAN, tag));
+    QCOMPARE(*tag->toInt(), 3);
+    r->close();
 }
 
 //=============================================================================================================

@@ -48,6 +48,7 @@
 #include <math/numerics.h>
 #include <utils/ioutils.h>
 
+#include <functional>
 #include <iostream>
 #include <time.h>
 
@@ -2217,10 +2218,10 @@ fiff_long_t FiffStream::write_tag(const FiffTag::UPtr& p_pTag, fiff_long_t pos)
      * Do we have data?
      */
     if (datasize > 0) {
-        /*
-        * Data exists...
-        */
-        this->writeRawData(p_pTag->data(), datasize);
+        // read_tag hands out host byte order; FIFF files are big-endian.
+        auto fileTag = std::make_unique<FiffTag>(*p_pTag);
+        FiffTag::convert_tag_data(fileTag, FIFFV_NATIVE_ENDIAN, FIFFV_BIG_ENDIAN);
+        this->writeRawData(fileTag->data(), datasize);
     }
 
     return pos;
@@ -3311,19 +3312,12 @@ QList<FiffDirEntry::SPtr> FiffStream::make_dir(bool* ok)
 
 bool FiffStream::copyProcessingHistory(const QString& fromPath, const QString& toPath)
 {
-    // Open source file
+    // FiffStream::open() opens the device itself
     QFile srcFile(fromPath);
-    if (!srcFile.open(QIODevice::ReadOnly)) {
-        qWarning("FiffStream::copyProcessingHistory - Cannot open source file %s",
-                 fromPath.toUtf8().constData());
-        return false;
-    }
-
     FiffStream srcStream(&srcFile);
     if (!srcStream.open()) {
         qWarning("FiffStream::copyProcessingHistory - Cannot parse source FIFF file %s",
                  fromPath.toUtf8().constData());
-        srcFile.close();
         return false;
     }
 
@@ -3336,15 +3330,29 @@ bool FiffStream::copyProcessingHistory(const QString& fromPath, const QString& t
         return false;
     }
 
-    // Read all tags from the processing history block
-    const FiffDirNode::SPtr& histNode = histNodes[0];
-    std::vector<FiffTag::UPtr> histTags;
-    for (int i = 0; i < histNode->nent(); ++i) {
+    // Read the whole block, including the processing records nested inside it
+    struct Item
+    {
+        int blockStart = 0; // block kind to open, 0 for a tag
+        int blockEnd = 0;   // block kind to close, 0 for a tag
         FiffTag::UPtr tag;
-        if (srcStream.read_tag(tag, histNode->dir[i]->pos)) {
-            histTags.push_back(std::move(tag));
+    };
+    std::vector<Item> items;
+    std::function<void(const FiffDirNode::SPtr&)> collect = [&](const FiffDirNode::SPtr& node) {
+        items.push_back({node->type, 0, nullptr});
+        for (int i = 0; i < node->nent(); ++i) {
+            const int kind = node->dir[i]->kind;
+            if (kind == FIFF_BLOCK_START || kind == FIFF_BLOCK_END)
+                continue;
+            FiffTag::UPtr tag;
+            if (srcStream.read_tag(tag, node->dir[i]->pos))
+                items.push_back({0, 0, std::move(tag)});
         }
-    }
+        for (int c = 0; c < node->nchild(); ++c)
+            collect(node->children[c]);
+        items.push_back({0, node->type, nullptr});
+    };
+    collect(histNodes[0]);
     srcStream.close();
 
     // Open destination file for update
@@ -3356,12 +3364,27 @@ bool FiffStream::copyProcessingHistory(const QString& fromPath, const QString& t
         return false;
     }
 
-    // Write the processing history block
-    dstStream->start_block(FIFFB_PROCESSING_HISTORY);
-    for (const auto& tag : histTags) {
-        dstStream->write_tag(tag);
+    // open_update marks the last tag as the end of the file; chain it to the appended block
+    const fiff_long_t lastPos = dstStream->dir()[dstStream->nent() - 2]->pos;
+    FiffTag::UPtr lastTag;
+    if (!dstStream->read_tag(lastTag, lastPos)) {
+        dstStream->close();
+        return false;
     }
-    dstStream->end_block(FIFFB_PROCESSING_HISTORY);
+    lastTag->next = FIFFV_NEXT_SEQ;
+    dstStream->write_tag(lastTag, lastPos);
+    dstStream->device()->seek(dstStream->device()->size());
+
+    for (const Item& item : items) {
+        if (item.blockStart)
+            dstStream->start_block(item.blockStart);
+        else if (item.blockEnd)
+            dstStream->end_block(item.blockEnd);
+        else
+            dstStream->write_tag(item.tag);
+    }
+    // open_update left the file without its terminating tag
+    dstStream->end_file();
 
     dstStream->close();
     return true;

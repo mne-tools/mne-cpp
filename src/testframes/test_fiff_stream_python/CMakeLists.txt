@@ -54,6 +54,7 @@ mne_add_test(${PROJECT_NAME}
     LABELS unit parity
     TIMEOUT 120
 )
+target_compile_definitions(${PROJECT_NAME} PRIVATE MNE_FIFF_STREAM_DATA_DIR="${CMAKE_CURRENT_SOURCE_DIR}/data")
 if(NOT BUILD_SHARED_LIBS)
     target_compile_definitions(${PROJECT_NAME} PRIVATE STATICBUILD)
 endif()

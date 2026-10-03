@@ -518,7 +518,7 @@ public:
     //=========================================================================================================
     /**
      * Write one tag to file including its data
-     * Data is not written if it is nullptr
+     * Data is not written if it is nullptr. The payload is taken in host byte order (as read_tag returns it).
      *
      * @param[in] p_pTag     Tag to write;.
      * @param[in] pos        the position where the entires should be written to (default -1, i.e. end of the file).

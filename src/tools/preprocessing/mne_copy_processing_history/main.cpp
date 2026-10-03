@@ -15,9 +15,6 @@
 //=============================================================================================================
 
 #include <fiff/fiff_stream.h>
-#include <fiff/fiff_dir_node.h>
-#include <fiff/fiff_tag.h>
-#include <fiff/fiff_types.h>
 #include <utils/generics/mne_logger.h>
 
 //=============================================================================================================
@@ -27,7 +24,6 @@
 #include <QCoreApplication>
 #include <QCommandLineParser>
 #include <QCommandLineOption>
-#include <QFile>
 #include <QDebug>
 
 //=============================================================================================================
@@ -42,58 +38,6 @@ using namespace UTILSLIB;
 //=============================================================================================================
 
 #define PROGRAM_VERSION MNE_CPP_VERSION
-
-//=============================================================================================================
-
-/**
- * Recursively copy all tags from a FIFF directory node into the destination stream.
- */
-static bool copyBlock(FiffStream::SPtr& src, FiffStream::SPtr& dst, const FiffDirNode::SPtr& node)
-{
-    // Start block
-    dst->start_block(node->type);
-
-    // Copy all tags in this node
-    for (int i = 0; i < node->nent(); ++i) {
-        FiffDirEntry::SPtr entry = node->dir[i];
-        if (entry->kind == FIFF_BLOCK_START || entry->kind == FIFF_BLOCK_END)
-            continue;
-
-        std::unique_ptr<FiffTag> tag;
-        if (!src->read_tag(tag, entry->pos)) {
-            qWarning("Cannot read tag at pos %lld", static_cast<long long>(entry->pos));
-            continue;
-        }
-        dst->write_tag(tag);
-    }
-
-    // Recurse into children
-    for (int i = 0; i < node->nchild(); ++i) {
-        if (!copyBlock(src, dst, node->children[i]))
-            return false;
-    }
-
-    // End block
-    dst->end_block(node->type);
-    return true;
-}
-
-//=============================================================================================================
-
-/**
- * Find FIFFB_PROCESSING_HISTORY nodes in the tree.
- */
-static QList<FiffDirNode::SPtr> findProcessingHistory(const FiffDirNode::SPtr& node)
-{
-    QList<FiffDirNode::SPtr> result;
-    if (node->type == FIFFB_PROCESSING_HISTORY) {
-        result.append(node);
-    }
-    for (int i = 0; i < node->nchild(); ++i) {
-        result.append(findProcessingHistory(node->children[i]));
-    }
-    return result;
-}
 
 //=============================================================================================================
 
@@ -129,47 +73,10 @@ int main(int argc, char* argv[])
         return 1;
     }
 
-    // Open source file
-    QFile srcFile(fromFile);
-    FiffStream::SPtr srcStream(new FiffStream(&srcFile));
-    if (!srcStream->open()) {
-        qCritical("Cannot open source file: %s", qPrintable(fromFile));
+    if (!FiffStream::copyProcessingHistory(fromFile, toFile)) {
+        qCritical("Failed to copy processing history from %s to %s", qPrintable(fromFile), qPrintable(toFile));
         return 1;
     }
-
-    // Find processing history blocks in source
-    QList<FiffDirNode::SPtr> histNodes = findProcessingHistory(srcStream->dirtree());
-    if (histNodes.isEmpty()) {
-        qCritical("No processing history block found in source: %s", qPrintable(fromFile));
-        srcStream->close();
-        return 1;
-    }
-    qInfo("Found %lld processing history block(s) in source.",
-          static_cast<long long>(histNodes.size()));
-
-    // Open destination file for update
-    QFile dstFile(toFile);
-    FiffStream::SPtr dstStream = FiffStream::open_update(dstFile);
-    if (!dstStream) {
-        qCritical("Cannot open destination file for update: %s", qPrintable(toFile));
-        srcStream->close();
-        return 1;
-    }
-
-    // Seek to end of file (before closing tags) and copy all history blocks
-    dstStream->device()->seek(dstStream->device()->size());
-
-    for (const FiffDirNode::SPtr& histNode : histNodes) {
-        if (!copyBlock(srcStream, dstStream, histNode)) {
-            qCritical("Failed to copy processing history block.");
-            srcStream->close();
-            dstStream->close();
-            return 1;
-        }
-    }
-
-    srcStream->close();
-    dstStream->close();
 
     qInfo("Successfully copied processing history from %s to %s",
           qPrintable(fromFile), qPrintable(toFile));

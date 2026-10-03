@@ -525,7 +525,6 @@ void FiffAnonymizer::writeTag()
         m_pTag->next = FIFFV_NEXT_SEQ;
     }
 
-    FIFFLIB::FiffTag::convert_tag_data(m_pTag, FIFFV_NATIVE_ENDIAN, FIFFV_BIG_ENDIAN);
     m_pOutStream->write_tag(m_pTag, -1);
 }
 
