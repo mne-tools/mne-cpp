@@ -304,7 +304,7 @@ std::vector<InvToken> tokenize(const InvSourceEstimate& estimate, const InvToken
         tokens.emplace_back(InvTokenId::NSources, static_cast<float>(effSrc));
         tokens.emplace_back(InvTokenId::NTimes, static_cast<float>(effTime));
         tokens.emplace_back(InvTokenId::TimeVal, estimate.tmin);
-        tokens.emplace_back(InvTokenId::TStep, estimate.tstep);
+        tokens.emplace_back(InvTokenId::TStep, estimate.tstep * static_cast<float>(timeStride));
 
         // Vertex indices
         for (int s = 0; s < nSrc; s += srcStride)
@@ -547,11 +547,12 @@ InvSourceEstimate fromTokens(const std::vector<InvToken>& tokens)
                 if (peek() == InvTokenId::GroupBegin) {
                     ++pos;
                     InvSourceCoupling grp;
+                    int timeIdx = 0;
 
                     while (pos < len && peek() != InvTokenId::GroupEnd) {
                         const InvToken& ct = tokens[pos];
                         if (ct.id == InvTokenId::TimeVal) {
-                            if (grp.tmin == 0.0f && grp.tmax == 0.0f)
+                            if (timeIdx++ == 0)
                                 grp.tmin = ct.value;
                             else
                                 grp.tmax = ct.value;
