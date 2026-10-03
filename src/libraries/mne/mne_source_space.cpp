@@ -1386,6 +1386,14 @@ MNESourceSpace* MNESourceSpace::make_volume_source_space(const MNESurface& surf,
         sp = std::move(sp_vec[0]);
     }
     qInfo("%d sources remaining after excluding the sources outside the surface and less than %6.1f mm inside.\n", sp->nuse, 1000 * mindist);
+    // vertno must list only the used points (MNE-C leaves it covering the full grid).
+    {
+        Eigen::VectorXi used(sp->nuse);
+        for (k = 0, c = 0; k < sp->np; k++)
+            if (sp->inuse[k])
+                used[c++] = k;
+        sp->vertno = used;
+    }
     /*
        * Omit unused vertices from the neighborhoods
        */
