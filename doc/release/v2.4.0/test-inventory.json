@@ -6,9 +6,9 @@
     "commit": "96413f7ccc7dabed2c6d40a511960ce8805e0407"
   },
   "summary": {
-    "directories": 245,
+    "directories": 246,
     "registration": {
-      "unconditional": 238,
+      "unconditional": 239,
       "conditional": 4,
       "unregistered": 3
     },
@@ -20,7 +20,7 @@
       "freesurfer": 2,
       "python": 9,
       "sample-data": 18,
-      "test-data": 100
+      "test-data": 101
     },
     "gui": 33,
     "with_qskip": 74,
@@ -33,6 +33,7 @@
         "skipped": 0,
         "registered_not_executed": [
           "test_fiff_core_python",
+          "test_fiff_raw_save_python",
           "test_fwd_python",
           "test_inv_beamformer_python",
           "test_inv_dipole_fit_python",
@@ -53,6 +54,7 @@
         "skipped": 0,
         "registered_not_executed": [
           "test_fiff_core_python",
+          "test_fiff_raw_save_python",
           "test_fwd_python",
           "test_inv_beamformer_python",
           "test_inv_dipole_fit_python",
@@ -73,6 +75,7 @@
         "skipped": 2,
         "registered_not_executed": [
           "test_fiff_core_python",
+          "test_fiff_raw_save_python",
           "test_fwd_python",
           "test_inv_beamformer_python",
           "test_inv_dipole_fit_python",
@@ -2803,6 +2806,39 @@
         "FiffRawData",
         "FiffStream"
       ]
+    },
+    {
+      "name": "test_fiff_raw_save_python",
+      "cmake": "src/testframes/test_fiff_raw_save_python/CMakeLists.txt",
+      "registration": {
+        "state": "unconditional",
+        "via": "src/testframes/CMakeLists.txt",
+        "conditions": [],
+        "early_return_guard": null,
+        "unregistered_reason": null
+      },
+      "add_test_names": [
+        "test_fiff_raw_save_python"
+      ],
+      "labels": [
+        "integration",
+        "parity",
+        "requires-data"
+      ],
+      "timeout": 120,
+      "requirements": [
+        "test-data"
+      ],
+      "gui": false,
+      "qskip_sites": 0,
+      "spawns_processes": false,
+      "ci_excluded_on": [],
+      "ci": {
+        "macos-26": "absent",
+        "ubuntu-24.04": "absent",
+        "windows-2025-vs2026": "absent"
+      },
+      "registry_classes": []
     },
     {
       "name": "test_fiff_rwr",

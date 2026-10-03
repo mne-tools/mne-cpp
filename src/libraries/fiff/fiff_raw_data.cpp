@@ -718,13 +718,8 @@ bool FiffRawData::save(QIODevice& p_IODevice,
         return false;
     }
 
-    // Prepare output info
-    FiffInfo outInfo;
-    if (picks.size() > 0) {
-        outInfo = info.pick_info(picks);
-    } else {
-        outInfo = info;
-    }
+    // start_writing_raw picks the channels itself; picking info here as well applied picks twice.
+    FiffInfo outInfo = info;
 
     // Adjust sampling frequency for decimation
     if (decim > 1) {
@@ -738,6 +733,10 @@ bool FiffRawData::save(QIODevice& p_IODevice,
         qWarning() << "[FiffRawData::save] Cannot start writing raw file.";
         return false;
     }
+
+    // Without this the copy restarts at sample 0 instead of at its position in the recording.
+    int firstOut = firstSamp / decim;
+    pStream->write_int(FIFF_FIRST_SAMPLE, &firstOut);
 
     // Write data in blocks
     const int blockSize = 2000;
