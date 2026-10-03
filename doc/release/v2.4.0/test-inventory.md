@@ -6,8 +6,8 @@ CI evidence: https://github.com/mne-tools/mne-cpp/actions/runs/36243010551 (comm
 
 ## Registration
 
-- Test directories: 233
-- Registered unconditionally: 226
+- Test directories: 234
+- Registered unconditionally: 227
 - Registered behind a CMake condition or early `return()`: 4
 - Not registered: 3
 - Registered without `LABELS`: 0
@@ -18,9 +18,9 @@ CI evidence: https://github.com/mne-tools/mne-cpp/actions/runs/36243010551 (comm
 
 | Platform | Executed | Failures | Skipped | Registered but not executed |
 |---|---:|---:|---:|---|
-| macos-26 | 230 | 0 | 0 | - |
-| ubuntu-24.04 | 230 | 0 | 0 | - |
-| windows-2025-vs2026 | 230 | 0 | 2 | - |
+| macos-26 | 230 | 0 | 0 | `test_fiff_core_python` |
+| ubuntu-24.04 | 230 | 0 | 0 | `test_fiff_core_python` |
+| windows-2025-vs2026 | 230 | 0 | 2 | `test_fiff_core_python` |
 
 ## Run-time requirements (lexical signals)
 
@@ -29,9 +29,9 @@ CI evidence: https://github.com/mne-tools/mne-cpp/actions/runs/36243010551 (comm
 | freesurfer | 2 |
 | python | 9 |
 | sample-data | 17 |
-| test-data | 91 |
+| test-data | 92 |
 | GUI (`QTEST_MAIN`) | 33 |
-| Contains `QSKIP` | 70 |
+| Contains `QSKIP` | 71 |
 
 ## Conditional and unregistered tests
 

@@ -348,11 +348,10 @@ QList<FiffProj> FiffProj::compute_from_raw(const FiffRawData& raw,
             }
         }
 
-        // Remove column mean
-        VectorXd colMean = dataMat.colwise().mean();
-        dataMat.rowwise() -= colMean.transpose();
-
-        // SVD
+        // SVD of the uncentred data, i.e. the eigenvectors of the second-moment
+        // matrix. MNE-C (compute_cov_raw_epoch with remove_sample_mean = FALSE)
+        // and mne.compute_proj_epochs both do this; removing the mean first
+        // yields a different, non-matching subspace.
         Eigen::JacobiSVD<MatrixXd> svd(dataMat, Eigen::ComputeThinV);
         MatrixXd V = svd.matrixV();
 

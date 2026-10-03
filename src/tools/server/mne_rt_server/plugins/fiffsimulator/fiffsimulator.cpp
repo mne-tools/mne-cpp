@@ -158,7 +158,7 @@ void FiffSimulator::comAccel(Command p_command)
         if (t_bWasRunning)
             this->start();
 
-        QString str = QString("\tSet acceleration factor to %0.3f\r\n\n").arg(t_uiAccel);
+        QString str = QString("\tSet acceleration factor to %1\r\n\n").arg(t_uiAccel, 0, 'f', 3);
 
         m_commandManager[Commands::ACCEL].reply(str);
     } else
@@ -180,7 +180,7 @@ void FiffSimulator::comGetAccel(Command p_command)
 
         m_commandManager[Commands::GETACCEL].reply(p_qJsonDocument.toJson());
     } else {
-        QString str = QString("\t%0.3f\r\n\n").arg(m_AccelerationFactor);
+        QString str = QString("\t%1\r\n\n").arg(m_AccelerationFactor, 0, 'f', 3);
         m_commandManager[Commands::GETACCEL].reply(str);
     }
 }

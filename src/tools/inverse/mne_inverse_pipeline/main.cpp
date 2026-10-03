@@ -94,7 +94,7 @@ int main(int argc, char* argv[])
         out << QStringLiteral("Registered MNA operators (%1):\n").arg(ops.size());
         for (const auto& op : ops) {
             const auto schema = MnaOpRegistry::instance().schema(op);
-            out << QStringLiteral("  %-30s  %1\n").arg(op, schema.description);
+            out << QStringLiteral("  %1  %2\n").arg(op, -30).arg(schema.description);
         }
         return 0;
     }

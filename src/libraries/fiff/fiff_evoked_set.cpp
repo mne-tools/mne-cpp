@@ -337,7 +337,7 @@ FiffEvokedSet FiffEvokedSet::computeAverages(const FiffRawData& raw,
         int nave = 0;
 
         log += QString("\n  Category: %1\n").arg(cat.comment);
-        log += QString("    t = %.1f ... %.1f ms\n").arg(1000.0 * cat.tmin).arg(1000.0 * cat.tmax);
+        log += QString("    t = %1 ... %2 ms\n").arg(1000.0 * cat.tmin, 0, 'f', 1).arg(1000.0 * cat.tmax, 0, 'f', 1);
 
         // Iterate over events
         for (int k = 0; k < events.rows(); ++k) {
@@ -450,57 +450,57 @@ bool FiffEvokedSet::checkArtifacts(const MatrixXd& epoch,
             if (chUnit == FIFF_UNIT_T) {
                 // Magnetometer
                 if (rej.megMagReject > 0 && pp > rej.megMagReject) {
-                    reason = QString("%1 : %.1f fT > %.1f fT")
+                    reason = QString("%1 : %2 fT > %3 fT")
                                  .arg(info.ch_names[c])
-                                 .arg(pp * 1e15)
-                                 .arg(rej.megMagReject * 1e15);
+                                 .arg(pp * 1e15, 0, 'f', 1)
+                                 .arg(rej.megMagReject * 1e15, 0, 'f', 1);
                     return false;
                 }
                 if (rej.megMagFlat > 0 && pp < rej.megMagFlat) {
-                    reason = QString("%1 : %.1f fT < %.1f fT (flat)")
+                    reason = QString("%1 : %2 fT < %3 fT (flat)")
                                  .arg(info.ch_names[c])
-                                 .arg(pp * 1e15)
-                                 .arg(rej.megMagFlat * 1e15);
+                                 .arg(pp * 1e15, 0, 'f', 1)
+                                 .arg(rej.megMagFlat * 1e15, 0, 'f', 1);
                     return false;
                 }
             } else {
                 // Gradiometer
                 if (rej.megGradReject > 0 && pp > rej.megGradReject) {
-                    reason = QString("%1 : %.1f fT/cm > %.1f fT/cm")
+                    reason = QString("%1 : %2 fT/cm > %3 fT/cm")
                                  .arg(info.ch_names[c])
-                                 .arg(pp * 1e13)
-                                 .arg(rej.megGradReject * 1e13);
+                                 .arg(pp * 1e13, 0, 'f', 1)
+                                 .arg(rej.megGradReject * 1e13, 0, 'f', 1);
                     return false;
                 }
                 if (rej.megGradFlat > 0 && pp < rej.megGradFlat) {
-                    reason = QString("%1 : %.1f fT/cm < %.1f fT/cm (flat)")
+                    reason = QString("%1 : %2 fT/cm < %3 fT/cm (flat)")
                                  .arg(info.ch_names[c])
-                                 .arg(pp * 1e13)
-                                 .arg(rej.megGradFlat * 1e13);
+                                 .arg(pp * 1e13, 0, 'f', 1)
+                                 .arg(rej.megGradFlat * 1e13, 0, 'f', 1);
                     return false;
                 }
             }
         } else if (chKind == FIFFV_EEG_CH) {
             if (rej.eegReject > 0 && pp > rej.eegReject) {
-                reason = QString("%1 : %.1f uV > %.1f uV")
+                reason = QString("%1 : %2 uV > %3 uV")
                              .arg(info.ch_names[c])
-                             .arg(pp * 1e6)
-                             .arg(rej.eegReject * 1e6);
+                             .arg(pp * 1e6, 0, 'f', 1)
+                             .arg(rej.eegReject * 1e6, 0, 'f', 1);
                 return false;
             }
             if (rej.eegFlat > 0 && pp < rej.eegFlat) {
-                reason = QString("%1 : %.1f uV < %.1f uV (flat)")
+                reason = QString("%1 : %2 uV < %3 uV (flat)")
                              .arg(info.ch_names[c])
-                             .arg(pp * 1e6)
-                             .arg(rej.eegFlat * 1e6);
+                             .arg(pp * 1e6, 0, 'f', 1)
+                             .arg(rej.eegFlat * 1e6, 0, 'f', 1);
                 return false;
             }
         } else if (chKind == FIFFV_EOG_CH) {
             if (rej.eogReject > 0 && pp > rej.eogReject) {
-                reason = QString("%1 : %.1f uV > %.1f uV (EOG)")
+                reason = QString("%1 : %2 uV > %3 uV (EOG)")
                              .arg(info.ch_names[c])
-                             .arg(pp * 1e6)
-                             .arg(rej.eogReject * 1e6);
+                             .arg(pp * 1e6, 0, 'f', 1)
+                             .arg(rej.eogReject * 1e6, 0, 'f', 1);
                 return false;
             }
             if (rej.eogFlat > 0 && pp < rej.eogFlat) {
@@ -509,10 +509,10 @@ bool FiffEvokedSet::checkArtifacts(const MatrixXd& epoch,
             }
         } else if (chKind == FIFFV_ECG_CH) {
             if (rej.ecgReject > 0 && pp > rej.ecgReject) {
-                reason = QString("%1 : %.2f mV > %.2f mV (ECG)")
+                reason = QString("%1 : %2 mV > %3 mV (ECG)")
                              .arg(info.ch_names[c])
-                             .arg(pp * 1e3)
-                             .arg(rej.ecgReject * 1e3);
+                             .arg(pp * 1e3, 0, 'f', 2)
+                             .arg(rej.ecgReject * 1e3, 0, 'f', 2);
                 return false;
             }
             if (rej.ecgFlat > 0 && pp < rej.ecgFlat) {

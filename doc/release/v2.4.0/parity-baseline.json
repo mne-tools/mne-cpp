@@ -51,6 +51,7 @@
     "tests_by_relation": {
       "cross-validated-static": [
         "test_anshared_models",
+        "test_fiff_core_python",
         "test_fiff_cov_python",
         "test_fiff_dig_point_python",
         "test_fiff_evoked_python",
