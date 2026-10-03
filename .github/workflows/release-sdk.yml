@@ -90,7 +90,7 @@ jobs:
         tar czf "mne-cpp-sdk-${MNE_CPP_VERSION}-linux-x64.tar.gz" sdk/
 
     - name: Upload artifact
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v7
       with:
         name: mne-cpp-sdk-linux-x64
         path: ${{ runner.temp }}/mne-cpp-sdk-${{ env.MNE_CPP_VERSION }}-linux-x64.tar.gz
@@ -156,7 +156,7 @@ jobs:
         tar czf "mne-cpp-sdk-${MNE_CPP_VERSION}-macos-arm64.tar.gz" sdk/
 
     - name: Upload artifact
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v7
       with:
         name: mne-cpp-sdk-macos-arm64
         path: ${{ runner.temp }}/mne-cpp-sdk-${{ env.MNE_CPP_VERSION }}-macos-arm64.tar.gz
@@ -222,7 +222,7 @@ jobs:
         7z a "mne-cpp-sdk-${MNE_CPP_VERSION}-windows-x64.zip" sdk/
 
     - name: Upload artifact
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v7
       with:
         name: mne-cpp-sdk-windows-x64
         path: ${{ runner.temp }}/mne-cpp-sdk-${{ env.MNE_CPP_VERSION }}-windows-x64.zip

@@ -64,7 +64,7 @@ jobs:
       run: bash tools/generate_contributors.sh
 
     - name: Download documentation screenshots
-      uses: actions/download-artifact@v5
+      uses: actions/download-artifact@v8
       with:
         name: doc-screenshots
         path: ${{ runner.temp }}/doc-screenshots

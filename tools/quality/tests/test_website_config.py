@@ -117,6 +117,14 @@ class TestStrictConfig(unittest.TestCase):
                 self.assertIn(f"name: website-{channel}", body)
                 self.assertNotIn("npm run build", body[:body.index("\n  # ", 1) if "\n  # " in body[1:] else None])
 
+    def test_no_node20_actions(self) -> None:
+        """GitHub deprecated Node.js 20 actions; these majors still declare it."""
+        node20 = re.compile(r"uses: actions/(checkout@v4|cache(/\w+)?@v4|upload-artifact@v4|download-artifact@v[4-6]|"
+                            r"setup-python@v5|setup-node@v4)\b")
+        for workflow in sorted(_WORKFLOWS.glob("*.yml")):
+            with self.subTest(workflow=workflow.name):
+                self.assertIsNone(node20.search(workflow.read_text(encoding="utf-8")))
+
     def test_no_workflow_fabricates_placeholder_images(self) -> None:
         for workflow in ("pull-request.yml", "staging.yml", "main.yml"):
             with self.subTest(workflow=workflow):

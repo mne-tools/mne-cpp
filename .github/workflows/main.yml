@@ -200,7 +200,7 @@ jobs:
         submodules: recursive
 
     - name: Download website
-      uses: actions/download-artifact@v5
+      uses: actions/download-artifact@v8
       with:
         name: website-stable
         path: doc/website/build

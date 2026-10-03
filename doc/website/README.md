@@ -14,38 +14,25 @@ make build         # production build under build/
 ## Dependency advisories
 
 Dependabot alerts on this `package-lock.json` are fixed by bumping the
-offending package, except where the fixed release is not API-compatible with
-the dependent that pulls it in. The current standing exception:
+offending package within the range its dependent accepts (`npm update <pkg>`),
+or with an npm `override` when the dependent pins an older release. Check the
+result with `npm audit` and a site build.
 
-**`brace-expansion` / GHSA-mh99-v99m-4gvg (CVE-2026-14257), fixed in 5.0.8.**
-The package reaches us only through
-`@docusaurus/core -> serve-handler -> minimatch@3.1.5`, and `minimatch@3`
-does `const expand = require('brace-expansion')` and then calls `expand(...)`
-directly. From 3.0.0 onwards `brace-expansion` exports an object
-(`{ expand, EXPANSION_MAX, EXPANSION_MAX_LENGTH }`) instead of a callable, so
-forcing 5.0.8 through an npm `override` installs and loads without complaint
-but throws `expand is not a function` for any pattern containing braces.
+Two advisories have no fixed release yet (both published 18 Sep 2026); they
+are reached only through Docusaurus' own tooling, never from the published
+site:
 
-There is no compatible upgrade path today:
+- **`braces` <= 3.0.3 / GHSA-vfj7-8cjw-p6xm** - stack exhaustion on deeply
+  nested brace patterns. Reached through `@docusaurus/utils -> micromatch`
+  and `chokidar`, which match the repository's own file globs at build time.
+  No attacker-supplied pattern reaches them.
+- **`http-cache-semantics` <= 4.2.0 / GHSA-ch52-4w7c-c8xp** - a shared HTTP
+  cache can serve one user's response to another. Reached only through
+  `@docusaurus/core -> update-notifier -> got`, the CLI's "new version
+  available" check, which caches nothing across users.
 
-- `serve-handler` pins `minimatch 3.1.5` exactly, in every published version
-  including `latest` (6.1.7).
-- `minimatch` stays callable only up to the 5.x line, which depends on
-  `brace-expansion ^2.0.1`; the 2.x maintenance branch tops out at 2.1.2 and
-  has no backport of this fix.
-- The only `brace-expansion` release carrying the fix is 5.0.8, on the
-  incompatible object-export line.
-
-Exposure is limited: `serve-handler` is reached exclusively from
-`docusaurus serve`, the local preview server. Neither the staging nor the main
-workflow runs it — both only run `npm run build`, which does not load
-`serve-handler` at all. The advisory describes a denial of service against a
-process serving attacker-supplied patterns, so no CI or published-site path is
-affected.
-
-Re-check when `serve-handler` relaxes its `minimatch` pin or a 1.x/2.x
-backport appears; until then the alert should stay dismissed with this
-rationale rather than force-resolved with a broken override.
+Re-check both when a patched release appears; until then they stay open with
+this rationale rather than being force-resolved.
 
 ## Auto-generated screenshots
 
