@@ -37,6 +37,7 @@
 
 #include <cmath>
 #include <algorithm>
+#include <limits>
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -87,9 +88,9 @@ void InvBeamformerCompute::regPinv(const MatrixXd& C,
     VectorXd eigVals = eig.eigenvalues(); // ascending order
     MatrixXd eigVecs = eig.eigenvectors();
 
-    // Determine rank: count eigenvalues above threshold
+    // Rank tolerance as in mne-python's _estimate_rank_from_s(tol="auto").
     double maxEig = eigVals.maxCoeff();
-    double threshold = maxEig * 1e-10;
+    double threshold = n * maxEig * std::numeric_limits<double>::epsilon();
     rankOut = 0;
     for (int i = 0; i < n; ++i) {
         if (eigVals(i) > threshold)
@@ -103,9 +104,8 @@ void InvBeamformerCompute::regPinv(const MatrixXd& C,
         return;
     }
 
-    // Loading factor: reg * trace / rank
-    double trace = eigVals.sum();
-    loadingFactor = reg * trace / static_cast<double>(rankOut);
+    // Loading factor: reg * mean of all eigenvalues (mne-python _reg_pinv), not trace / rank.
+    loadingFactor = reg * eigVals.mean();
 
     // Regularize: lambda_i += loading_factor (for significant eigenvalues)
     // Then invert: 1 / (lambda_i + loading)
@@ -150,26 +150,13 @@ MatrixXd InvBeamformerCompute::symMatPow(const MatrixXd& X, double p, bool reduc
     VectorXd eigVals = eig.eigenvalues();
     MatrixXd eigVecs = eig.eigenvectors();
 
-    // Find threshold
-    double maxEig = eigVals.cwiseAbs().maxCoeff();
-    double threshold = maxEig * 1e-10;
+    // As mne-python _sym_mat_pow: reduce_rank drops the smallest eigenvalue even if already below the limit.
+    const double limit = eigVals(n - 1) * 1e-7;
+    const int startIdx = reduceRank ? 1 : 0;
 
-    // Determine how many to keep
-    int startIdx = 0;
-    if (reduceRank) {
-        // Find first (smallest magnitude) eigenvalue above threshold, then skip it
-        for (int i = 0; i < n; ++i) {
-            if (std::abs(eigVals(i)) > threshold) {
-                startIdx = i + 1; // skip this one
-                break;
-            }
-        }
-    }
-
-    // Compute: V diag(lambda^p) V^T for significant eigenvalues
     VectorXd eigPow = VectorXd::Zero(n);
     for (int i = startIdx; i < n; ++i) {
-        if (std::abs(eigVals(i)) > threshold) {
+        if (eigVals(i) > limit) {
             eigPow(i) = std::pow(eigVals(i), p);
         }
     }
@@ -211,6 +198,13 @@ bool InvBeamformerCompute::computeBeamformer(const MatrixXd& G,
     double loadingFactor = 0.0;
     int cmRank = 0;
     regPinv(Cm, reg, CmInv, loadingFactor, cmRank);
+
+    // NAI noise level: the rank-th largest eigenvalue of Cm or the loading factor, whichever is larger.
+    double noiseLevel = loadingFactor;
+    if (weightNorm == BeamformerWeightNorm::NAI && cmRank > 0) {
+        const VectorXd cmEig = SelfAdjointEigenSolver<MatrixXd>(Cm, EigenvaluesOnly).eigenvalues();
+        noiseLevel = std::max(cmEig(nChannels - cmRank), loadingFactor);
+    }
 
     // -----------------------------------------------------------------------
     // Step 2--6: Per-source computation
@@ -304,7 +298,7 @@ bool InvBeamformerCompute::computeBeamformer(const MatrixXd& G,
 
         } else if (pickOri == BeamformerPickOri::Normal && nOrient >= 3) {
             // Extract Z-component (normal to surface in local source coords)
-            Gk = Gk.col(2); // (n_channels, 1)
+            Gk = Gk.col(2).eval(); // (n_channels, 1); eval() avoids self-aliasing on resize
             orientForFilter = 1;
         }
 
@@ -345,18 +339,14 @@ bool InvBeamformerCompute::computeBeamformer(const MatrixXd& G,
                 }
             }
 
-            if (weightNorm == BeamformerWeightNorm::NAI) {
-                // Additional normalization by noise level
-                double noise = loadingFactor;
-                if (noise > 1e-30) {
-                    Wug /= std::sqrt(noise);
-                }
+            if (weightNorm == BeamformerWeightNorm::NAI && noiseLevel > 1e-30) {
+                Wug /= std::sqrt(noiseLevel);
             }
 
         } else if (weightNorm == BeamformerWeightNorm::UnitNoiseGainInv) {
             // Rotation-invariant version: sqrtm(inner)^{-0.5} @ G^T Cm^{-1}
             MatrixXd inner = bfNumer * bfNumer.transpose(); // (orientForFilter, orientForFilter)
-            MatrixXd innerPow = symMatPow(inner, -0.5, reduceRank);
+            MatrixXd innerPow = symMatPow(inner, -0.5, false);
             Wug = innerPow * bfNumer;
         }
 

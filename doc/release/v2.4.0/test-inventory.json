@@ -6,9 +6,9 @@
     "commit": "96413f7ccc7dabed2c6d40a511960ce8805e0407"
   },
   "summary": {
-    "directories": 237,
+    "directories": 238,
     "registration": {
-      "unconditional": 230,
+      "unconditional": 231,
       "conditional": 4,
       "unregistered": 3
     },
@@ -34,6 +34,7 @@
         "registered_not_executed": [
           "test_fiff_core_python",
           "test_fwd_python",
+          "test_inv_beamformer_python",
           "test_mne_description_parser",
           "test_mne_label_python"
         ],
@@ -46,6 +47,7 @@
         "registered_not_executed": [
           "test_fiff_core_python",
           "test_fwd_python",
+          "test_inv_beamformer_python",
           "test_mne_description_parser",
           "test_mne_label_python"
         ],
@@ -58,6 +60,7 @@
         "registered_not_executed": [
           "test_fiff_core_python",
           "test_fwd_python",
+          "test_inv_beamformer_python",
           "test_mne_description_parser",
           "test_mne_label_python"
         ],
@@ -3611,6 +3614,36 @@
         "InvDICS",
         "InvLCMV"
       ]
+    },
+    {
+      "name": "test_inv_beamformer_python",
+      "cmake": "src/testframes/test_inv_beamformer_python/CMakeLists.txt",
+      "registration": {
+        "state": "unconditional",
+        "via": "src/testframes/CMakeLists.txt",
+        "conditions": [],
+        "early_return_guard": null,
+        "unregistered_reason": null
+      },
+      "add_test_names": [
+        "test_inv_beamformer_python"
+      ],
+      "labels": [
+        "parity",
+        "unit"
+      ],
+      "timeout": 60,
+      "requirements": [],
+      "gui": false,
+      "qskip_sites": 0,
+      "spawns_processes": false,
+      "ci_excluded_on": [],
+      "ci": {
+        "macos-26": "absent",
+        "ubuntu-24.04": "absent",
+        "windows-2025-vs2026": "absent"
+      },
+      "registry_classes": []
     },
     {
       "name": "test_inv_cmne",
