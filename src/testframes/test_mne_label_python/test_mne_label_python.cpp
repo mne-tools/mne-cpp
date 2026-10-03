@@ -363,8 +363,10 @@ void TestMneLabelPython::assembleKernel_label()
     QList<VectorXi> vLabel;
     QVERIFY(prepared.assemble_kernel(l, method, false, kLabel, nnLabel, vLabel));
 
-    // The label kernel is exactly the label's rows of the full kernel, the
-    // same rows mne-python's _assemble_kernel selects with src_sel.
+    // The label kernel is the label's rows of the full kernel, the same rows
+    // mne-python's _assemble_kernel selects with src_sel. It is computed by a
+    // separate matrix product, so compare to rounding (FMA/SIMD differ by
+    // platform), not bitwise.
     VectorXi sel;
     prepared.src.label_src_vertno_sel(l, sel);
     QCOMPARE(static_cast<int>(kLabel.rows()), 3 * static_cast<int>(sel.size()));
@@ -372,7 +374,9 @@ void TestMneLabelPython::assembleKernel_label()
     const int hemiOffset = l.hemi == 1 ? static_cast<int>(vFull[0].size()) : 0;
     QCOMPARE(static_cast<int>(vLabel[l.hemi].size()), static_cast<int>(sel.size()));
     for (int i = 0; i < sel.size(); ++i) {
-        QVERIFY(kLabel.block(3 * i, 0, 3, kLabel.cols()) == kFull.block(3 * sel(i), 0, 3, kFull.cols()));
+        const MatrixXd rowsFull = kFull.block(3 * sel(i), 0, 3, kFull.cols());
+        QVERIFY2((kLabel.block(3 * i, 0, 3, kLabel.cols()) - rowsFull).norm() <= 1e-10 * rowsFull.norm(),
+                 qPrintable(QStringLiteral("label source %1").arg(i)));
         QCOMPARE(vLabel[l.hemi](i), vFull[l.hemi](sel(i) - hemiOffset));
     }
 
