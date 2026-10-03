@@ -238,6 +238,10 @@ bool MNEDescriptionParser::parseAverageFile(const QString& fileName, AverageDesc
                     qWarning() << "MNEDescriptionParser: no events for" << currentCat.comment;
                     return false;
                 }
+                if (currentCat.doBaseline && currentCat.bmin > currentCat.bmax) {
+                    qWarning() << "MNEDescriptionParser: illegal baseline for" << currentCat.comment;
+                    return false;
+                }
                 if (!currentCat.prevIgnore)
                     currentCat.prevIgnore = currentCat.ignore;
                 if (!currentCat.nextIgnore)
@@ -461,6 +465,10 @@ bool MNEDescriptionParser::parseAverageFile(const QString& fileName, AverageDesc
             int ival;
             if (!getInt(in, ival))
                 return false;
+            if (ival < 0) {
+                qWarning() << "MNEDescriptionParser: ignore numbers must be positive or zero";
+                return false;
+            }
             if (inCategory)
                 currentCat.ignore = static_cast<unsigned int>(ival);
             else {
@@ -473,6 +481,10 @@ bool MNEDescriptionParser::parseAverageFile(const QString& fileName, AverageDesc
             int ival;
             if (!getInt(in, ival))
                 return false;
+            if (ival < 0) {
+                qWarning() << "MNEDescriptionParser: ignore numbers must be positive or zero";
+                return false;
+            }
             if (inCategory)
                 currentCat.prevIgnore = static_cast<unsigned int>(ival);
             else {
@@ -485,6 +497,10 @@ bool MNEDescriptionParser::parseAverageFile(const QString& fileName, AverageDesc
             int ival;
             if (!getInt(in, ival))
                 return false;
+            if (ival < 0) {
+                qWarning() << "MNEDescriptionParser: ignore numbers must be positive or zero";
+                return false;
+            }
             if (inCategory)
                 currentCat.nextIgnore = static_cast<unsigned int>(ival);
             else {
@@ -514,6 +530,10 @@ bool MNEDescriptionParser::parseAverageFile(const QString& fileName, AverageDesc
             int ival;
             if (!getInt(in, ival))
                 return false;
+            if (ival <= 0) {
+                qWarning() << "MNEDescriptionParser: mask numbers must be positive";
+                return false;
+            }
             if (inCategory) {
                 currentCat.prevIgnore = static_cast<unsigned int>(ival);
                 currentCat.prevIgnore = ~currentCat.prevIgnore;
@@ -527,6 +547,10 @@ bool MNEDescriptionParser::parseAverageFile(const QString& fileName, AverageDesc
             int ival;
             if (!getInt(in, ival))
                 return false;
+            if (ival <= 0) {
+                qWarning() << "MNEDescriptionParser: mask numbers must be positive";
+                return false;
+            }
             if (inCategory) {
                 currentCat.nextIgnore = static_cast<unsigned int>(ival);
                 currentCat.nextIgnore = ~currentCat.nextIgnore;
@@ -570,6 +594,10 @@ bool MNEDescriptionParser::parseAverageFile(const QString& fileName, AverageDesc
             float r, g, b;
             if (!getFloat(in, r) || !getFloat(in, g) || !getFloat(in, b))
                 return false;
+            if (r < 0.0f || r > 1.0f || g < 0.0f || g > 1.0f || b < 0.0f || b > 1.0f) {
+                qWarning() << "MNEDescriptionParser: color components must be within 0 ... 1";
+                return false;
+            }
             if (inCategory) {
                 currentCat.color[0] = r;
                 currentCat.color[1] = g;
@@ -582,13 +610,15 @@ bool MNEDescriptionParser::parseAverageFile(const QString& fileName, AverageDesc
         }
 
         // Try rejection parameters (average-level only)
-        if (inAverage && !inCategory) {
-            bool parseOk;
-            if (parseRejectionParam(word, in, desc.rej, parseOk)) {
-                if (!parseOk)
-                    return false;
-                continue;
+        bool parseOk;
+        if (parseRejectionParam(word, in, desc.rej, parseOk)) {
+            if (!(inAverage && !inCategory)) {
+                qWarning() << "MNEDescriptionParser: misplaced" << word;
+                return false;
             }
+            if (!parseOk)
+                return false;
+            continue;
         }
 
         qWarning() << "MNEDescriptionParser: unknown keyword" << word << "in" << fileName;
@@ -620,6 +650,7 @@ bool MNEDescriptionParser::parseCovarianceFile(const QString& fileName, CovDescr
     bool expectBrace = false;
     bool bminSet = false, bmaxSet = false;
     bool inCov = false;
+    bool seenCov = false;
     bool inDef = false;
     CovDefinition currentDef;
 
@@ -647,6 +678,10 @@ bool MNEDescriptionParser::parseCovarianceFile(const QString& fileName, CovDescr
                     qWarning() << "MNEDescriptionParser: illegal time range in def";
                     return false;
                 }
+                if (currentDef.doBaseline && currentDef.bmin > currentDef.bmax) {
+                    qWarning() << "MNEDescriptionParser: illegal baseline in def";
+                    return false;
+                }
                 desc.defs.append(currentDef);
                 currentDef = CovDefinition();
                 inDef = false;
@@ -664,6 +699,7 @@ bool MNEDescriptionParser::parseCovarianceFile(const QString& fileName, CovDescr
                 return false;
             }
             inCov = true;
+            seenCov = true;
             expectBrace = true;
             continue;
         }
@@ -682,6 +718,10 @@ bool MNEDescriptionParser::parseCovarianceFile(const QString& fileName, CovDescr
         // Cov-level keywords
         if (word.compare("outfile", Qt::CaseInsensitive) == 0) {
             QString val = nextWord(in);
+            if (val.isEmpty()) {
+                qWarning() << "MNEDescriptionParser: outfile requires a value";
+                return false;
+            }
             if (inCov && !inDef)
                 desc.filename = val;
             else {
@@ -692,6 +732,10 @@ bool MNEDescriptionParser::parseCovarianceFile(const QString& fileName, CovDescr
         }
         if (word.compare("eventfile", Qt::CaseInsensitive) == 0) {
             QString val = nextWord(in);
+            if (val.isEmpty()) {
+                qWarning() << "MNEDescriptionParser: eventfile requires a value";
+                return false;
+            }
             if (inCov && !inDef)
                 desc.eventFile = val;
             else {
@@ -702,6 +746,10 @@ bool MNEDescriptionParser::parseCovarianceFile(const QString& fileName, CovDescr
         }
         if (word.compare("logfile", Qt::CaseInsensitive) == 0) {
             QString val = nextWord(in);
+            if (val.isEmpty()) {
+                qWarning() << "MNEDescriptionParser: logfile requires a value";
+                return false;
+            }
             if (inCov && !inDef)
                 desc.logFile = val;
             else {
@@ -802,6 +850,10 @@ bool MNEDescriptionParser::parseCovarianceFile(const QString& fileName, CovDescr
             int ival;
             if (!getInt(in, ival))
                 return false;
+            if (ival < 0) {
+                qWarning() << "MNEDescriptionParser: ignore numbers must be positive or zero";
+                return false;
+            }
             if (inDef)
                 currentDef.ignore = static_cast<unsigned int>(ival);
             else {
@@ -814,6 +866,10 @@ bool MNEDescriptionParser::parseCovarianceFile(const QString& fileName, CovDescr
             int ival;
             if (!getInt(in, ival))
                 return false;
+            if (ival <= 0) {
+                qWarning() << "MNEDescriptionParser: mask numbers must be positive";
+                return false;
+            }
             if (inDef) {
                 currentDef.ignore = static_cast<unsigned int>(ival);
                 currentDef.ignore = ~currentDef.ignore;
@@ -837,16 +893,23 @@ bool MNEDescriptionParser::parseCovarianceFile(const QString& fileName, CovDescr
         }
 
         // Rejection parameters (cov-level only)
-        if (inCov && !inDef) {
-            bool parseOk;
-            if (parseRejectionParam(word, in, desc.rej, parseOk)) {
-                if (!parseOk)
-                    return false;
-                continue;
+        bool parseOk;
+        if (parseRejectionParam(word, in, desc.rej, parseOk)) {
+            if (!(inCov && !inDef)) {
+                qWarning() << "MNEDescriptionParser: misplaced" << word;
+                return false;
             }
+            if (!parseOk)
+                return false;
+            continue;
         }
 
         qWarning() << "MNEDescriptionParser: unknown keyword" << word << "in" << fileName;
+    }
+
+    if (!seenCov) {
+        qWarning() << "MNEDescriptionParser: nothing useful read from" << fileName;
+        return false;
     }
 
     return true;
