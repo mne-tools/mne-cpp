@@ -11,7 +11,7 @@
   },
   "gates": {
     "G1_test_integrity": {
-      "registered": 235,
+      "registered": 236,
       "conditional": 4,
       "unregistered": 3,
       "without_labels": 0,
@@ -66,7 +66,7 @@
       "null_macro": 43,
       "typedef_struct": 12,
       "c_style_cast": 430,
-      "raw_new": 168,
+      "raw_new": 169,
       "raw_delete": 276,
       "console_io": 370,
       "numeric_define": 831,

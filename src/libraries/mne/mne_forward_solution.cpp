@@ -801,7 +801,7 @@ FiffCov MNEForwardSolution::compute_depth_prior(const MatrixXd& Gain, const Fiff
     VectorXd d;
     // Compute the gain matrix
     if (is_fixed_ori) {
-        d = (G.array().square()).rowwise().sum();
+        d = G.array().square().colwise().sum().transpose();
     } else {
         qint32 n_pos = G.cols() / 3;
         d = VectorXd::Zero(n_pos);

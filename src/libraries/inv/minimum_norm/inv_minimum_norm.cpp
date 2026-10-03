@@ -25,6 +25,7 @@
 
 #include <inv/inv_source_estimate.h>
 #include <fiff/fiff_evoked.h>
+#include <fiff/fiff_proj.h>
 #include <math/linalg.h>
 
 #include <iostream>
@@ -281,22 +282,18 @@ void InvMinimumNorm::computeELoreta()
 
     qInfo("Computing eLORETA source weights...");
 
-    // Reassemble the whitened gain matrix G from the SVD of the inverse operator:
-    //   G = eigen_fields * diag(sing) * eigen_leads^T
-    // where eigen_fields is (n_channels, n_comp) and eigen_leads is (n_sources*n_orient, n_comp),
-    // giving G of shape (n_channels, n_sources*n_orient).
+    // Reassemble the whitened gain matrix G = eigen_fields^T * diag(sing) * eigen_leads^T,
+    // with eigen_fields (n_comp, n_channels) and eigen_leads (n_sources*n_orient, n_comp).
     if (!inv.eigen_fields || !inv.eigen_leads) {
         qWarning("InvMinimumNorm::computeELoreta - Inverse operator missing eigen structures!");
         return;
     }
 
-    const MatrixXd& eigenFields = inv.eigen_fields->data; // (n_channels, n_comp)
-    const MatrixXd& eigenLeads = inv.eigen_leads->data;   // (n_sources*n_orient, n_comp)
+    const MatrixXd& eigenFields = inv.eigen_fields->data;
+    const MatrixXd& eigenLeads = inv.eigen_leads->data;
     const VectorXd& sing = inv.sing;
 
-    // G = eigenFields * diag(sing) * eigenLeads^T
-    // (n_channels, n_comp) * (n_comp, n_comp) * (n_comp, n_sources*n_orient) = (n_channels, n_sources*n_orient)
-    MatrixXd G = eigenFields * sing.asDiagonal() * eigenLeads.transpose();
+    MatrixXd G = eigenFields.transpose() * sing.asDiagonal() * eigenLeads.transpose();
 
     const int nChan = static_cast<int>(G.rows());
     const int nSrc = inv.nsource;
@@ -329,12 +326,18 @@ void InvMinimumNorm::computeELoreta()
         G.col(i) *= sourceStd(i);
     }
 
-    // Compute rank (number of non-zero singular values)
+    // Rank of the inverse as mne-python compute_rank_inverse: from the noise covariance, not from sing.
     int nNonZero = 0;
-    for (int i = 0; i < sing.size(); ++i) {
-        if (std::abs(sing(i)) > 1e-10 * sing(0))
-            ++nNonZero;
+    if (inv.noise_cov && !inv.noise_cov->diag) {
+        for (int i = 0; i < inv.noise_cov->eig.size(); ++i) {
+            if (inv.noise_cov->eig(i) > 0)
+                ++nNonZero;
+        }
+    } else if (inv.noise_cov) {
+        MatrixXd proj;
+        nNonZero = inv.noise_cov->dim - FiffProj::make_projector(inv.projs, inv.noise_cov->names, proj);
     }
+    nNonZero = std::min(nNonZero, nChan);
 
     double lambda2 = static_cast<double>(m_fLambda);
 
@@ -453,15 +456,21 @@ void InvMinimumNorm::computeELoreta()
                 MatrixXd Gs = G.middleCols(s_idx * 3, 3); // (nChan, 3)
                 Matrix3d M = Gs.transpose() * N * Gs;
 
+                // mne-python: R = 1 / mean(sqrt(eig)); an eigenvalue <= 1e-7 * max counts as infinite, giving R = 0.
                 SelfAdjointEigenSolver<Matrix3d> eigM(M);
                 Vector3d mEig = eigM.eigenvalues();
-                double meanInvSqrt = 0;
+                const double limit = mEig(2) * 1e-7;
+                double meanSqrt = 0;
+                bool degenerate = false;
                 for (int d = 0; d < 3; ++d) {
-                    meanInvSqrt += (mEig(d) > 1e-30) ? 1.0 / std::sqrt(mEig(d)) : 0.0;
+                    if (mEig(d) > limit)
+                        meanSqrt += std::sqrt(mEig(d));
+                    else
+                        degenerate = true;
                 }
-                meanInvSqrt /= 3.0;
+                meanSqrt /= 3.0;
                 for (int d = 0; d < 3; ++d) {
-                    R_vec(s_idx * 3 + d) = meanInvSqrt;
+                    R_vec(s_idx * 3 + d) = (degenerate || meanSqrt <= 0) ? 0.0 : 1.0 / meanSqrt;
                 }
             }
         } else {
@@ -565,7 +574,7 @@ void InvMinimumNorm::computeELoreta()
     // A = U * Σ * V^T  →  U: (nChan, ncomp), V: (nSrc*nOrient, ncomp)
     JacobiSVD<MatrixXd> svd(A, ComputeThinU | ComputeThinV);
     const VectorXd newSing = svd.singularValues(); // (ncomp,)
-    const MatrixXd newU = svd.matrixU();           // (nChan, ncomp) — new eigen_fields
+    const MatrixXd newU = svd.matrixU();           // (nChan, ncomp)
     const MatrixXd newV = svd.matrixV();           // (nSrc*nOrient, ncomp)
 
     // Build R^{1/2}-weighted eigen_leads: weightedLeads[i,:] = R_sqrt[i] * V[i,:]
@@ -582,20 +591,20 @@ void InvMinimumNorm::computeELoreta()
         }
     }
 
-    // Update inverse operator:
-    //   eigen_fields: (nChan, ncomp)          = U
-    //   eigen_leads:  (nSrc*nOrient, ncomp)   = R_sqrt * V  (eLORETA-weighted)
-    //   eigen_leads_weighted = true  →  prepare_inverse_operator uses K = eigenLeads * trans directly
+    // eigen_fields is stored (ncomp, nChan); weighted eigen leads make assemble_kernel use them directly.
     inv.sing = newSing;
-    inv.eigen_fields->data = newU;
+    inv.eigen_fields->data = newU.transpose();
+    inv.eigen_fields->nrow = static_cast<int>(newU.cols());
+    inv.eigen_fields->ncol = static_cast<int>(newU.rows());
+    inv.eigen_leads->ncol = static_cast<int>(weightedLeads.cols());
     inv.eigen_leads->data = weightedLeads;
     inv.eigen_leads_weighted = true;
 
-    // Recompute reginv: σ / (σ² + λ²)
-    VectorXd reginv(newSing.size());
-    for (int i = 0; i < newSing.size(); ++i) {
-        const double s2 = newSing(i) * newSing(i);
-        reginv(i) = (s2 > 1e-30) ? newSing(i) / (s2 + lambda2) : 0.0;
+    // reginv = sing / (sing^2 + lambda2) for the first nNonZero components, zero beyond (mne-python _compute_reginv).
+    VectorXd reginv = VectorXd::Zero(newSing.size());
+    for (int i = 0; i < std::min<int>(nNonZero, static_cast<int>(newSing.size())); ++i) {
+        if (newSing(i) > 0)
+            reginv(i) = newSing(i) / (newSing(i) * newSing(i) + lambda2);
     }
     inv.reginv = reginv;
 

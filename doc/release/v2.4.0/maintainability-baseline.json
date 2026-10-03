@@ -3,7 +3,7 @@
   "generated_by": "tools/quality/audit_maintainability.py",
   "policy": "tools/quality/maintainability_policy.json",
   "scanned_files": 1505,
-  "scanned_lines": 393106,
+  "scanned_lines": 393117,
   "oversized_threshold": 2000,
   "metrics": {
     "null_macro": {
@@ -158,11 +158,11 @@
       }
     },
     "raw_new": {
-      "total": 168,
+      "total": 169,
       "files": 90,
       "by_scope": {
         "applications": 100,
-        "libraries": 62,
+        "libraries": 63,
         "tools": 6
       },
       "suppressed": [],
@@ -170,7 +170,7 @@
         "src/applications/mne_scan/libs/scShared/Management/displaymanager.cpp": 7,
         "src/applications/mne_analyze/plugins/averaging/averaging.cpp": 6,
         "src/libraries/disp3D/model/braintreemodel.cpp": 6,
-        "src/libraries/mne/mne_inverse_operator.cpp": 5,
+        "src/libraries/mne/mne_inverse_operator.cpp": 6,
         "src/applications/mne_analyze/plugins/controlmanager/controlmanager.cpp": 4,
         "src/applications/mne_analyze_studio/workbench/mainwindow.cpp": 4,
         "src/applications/mne_scan/libs/scDisp/realtimeevokedsetwidget.cpp": 4,
@@ -267,7 +267,7 @@
         "src/libraries/lsl/lsl_stream_outlet.cpp": 1,
         "src/libraries/mne/mne_cov_matrix.h": 4,
         "src/libraries/mne/mne_forward_solution.cpp": 2,
-        "src/libraries/mne/mne_inverse_operator.cpp": 5,
+        "src/libraries/mne/mne_inverse_operator.cpp": 6,
         "src/libraries/mne/mne_meas_data.cpp": 2,
         "src/libraries/utils/generics/circularbuffer.h": 1,
         "src/tools/inverse/mne_inverse_operator/main.cpp": 1,

@@ -624,7 +624,8 @@ MNEInverseOperator MNEInverseOperator::make_inverse_operator(const FiffInfo& inf
         // TODO: load patch_areas from forward solution
         p_depth_prior = FiffCov::SDPtr(new FiffCov(MNEForwardSolution::compute_depth_prior(gain, gain_info, is_fixed_ori, depth, 10.0, patch_areas, limit_depth_chs)));
     } else {
-        p_depth_prior->data = MatrixXd::Ones(gain.cols(), gain.cols());
+        p_depth_prior = FiffCov::SDPtr(new FiffCov());
+        p_depth_prior->data = MatrixXd::Ones(gain.cols(), 1);
         p_depth_prior->kind = FIFFV_MNE_DEPTH_PRIOR_COV;
         p_depth_prior->diag = true;
         p_depth_prior->dim = gain.cols();
@@ -834,11 +835,12 @@ MNEInverseOperator MNEInverseOperator::prepare_inverse_operator(qint32 nAve, flo
     qint32 nnzero, k;
     if (inv.noise_cov->diag == 0) {
         //
-        //   Omit the zeroes due to projection
+        //   Omit the zeroes due to projection. The eigenvalues are sorted per channel type, not
+        //   globally, so the zeroes are not necessarily the first ncomp (mne-python compute_whitener).
         //
         nnzero = 0;
 
-        for (k = ncomp; k < inv.noise_cov->dim; ++k) {
+        for (k = 0; k < inv.noise_cov->dim; ++k) {
             if (inv.noise_cov->eig[k] > 0) {
                 inv.whitener(k, k) = 1.0 / sqrt(inv.noise_cov->eig[k]);
                 ++nnzero;
@@ -890,7 +892,7 @@ MNEInverseOperator MNEInverseOperator::prepare_inverse_operator(qint32 nAve, flo
         //
         //   Compute the final result
         //
-        VectorXd noise_norm_new;
+        VectorXd noise_norm_new = noise_norm;
         if (inv.source_ori == FIFFV_MNE_FREE_ORI) {
             // For free orientations the variances at three consecutive entries
             // must be squared and summed, yielding one factor per source location.
