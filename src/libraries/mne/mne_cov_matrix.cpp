@@ -177,7 +177,7 @@ std::unique_ptr<MNECovMatrix> MNECovMatrix::read(const QString& name, int kind)
             break;
         }
     }
-    if (covnode->isEmpty()) {
+    if (!covnode || covnode->isEmpty()) {
         qWarning("Desired covariance matrix not found from %s", name.toUtf8().data());
         stream->close();
         return nullptr;
@@ -260,7 +260,7 @@ std::unique_ptr<MNECovMatrix> MNECovMatrix::read(const QString& name, int kind)
         if (nodes[k]->find_tag(stream, FIFF_MNE_COV_EIGENVALUES, t_pTag)) {
             const double* lambda_data = static_cast<const double*>(t_pTag->toDouble());
             lambda = Eigen::Map<const Eigen::VectorXd>(lambda_data, ncov);
-            if (nodes[k]->find_tag(stream, FIFF_MNE_COV_EIGENVECTORS, t_pTag)) {
+            if (!nodes[k]->find_tag(stream, FIFF_MNE_COV_EIGENVECTORS, t_pTag)) {
                 stream->close();
                 return nullptr;
             }
