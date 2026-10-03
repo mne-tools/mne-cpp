@@ -3114,6 +3114,9 @@ fiff_long_t FiffStream::write_evoked_set(const FiffEvokedSet& p_FiffEvokedSet)
     if (!p_FiffEvokedSet.info.projs.isEmpty())
         this->write_proj(p_FiffEvokedSet.info.projs);
 
+    if (!p_FiffEvokedSet.info.bads.isEmpty())
+        this->write_bad_channels(p_FiffEvokedSet.info.bads);
+
     this->end_block(FIFFB_MEAS_INFO);
 
     for (int j = 0; j < p_FiffEvokedSet.evoked.size(); ++j) {
@@ -3138,7 +3141,13 @@ fiff_long_t FiffStream::write_evoked_set(const FiffEvokedSet& p_FiffEvokedSet)
         int nave = evoked.nave;
         this->write_int(FIFF_NAVE, &nave);
 
-        Eigen::MatrixXf floatData = evoked.data.cast<float>();
+        // Readers multiply FIFF_EPOCH by each channel's cal, so store uncalibrated values.
+        Eigen::VectorXd decal(evoked.data.rows());
+        for (int k = 0; k < decal.size(); ++k) {
+            const double cal = k < p_FiffEvokedSet.info.chs.size() ? p_FiffEvokedSet.info.chs[k].cal : 1.0;
+            decal[k] = cal != 0.0 ? 1.0 / cal : 1.0;
+        }
+        Eigen::MatrixXf floatData = (decal.asDiagonal() * evoked.data).cast<float>();
         this->write_float_matrix(FIFF_EPOCH, floatData);
 
         this->end_block(FIFFB_ASPECT);

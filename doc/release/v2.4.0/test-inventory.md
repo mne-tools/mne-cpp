@@ -6,8 +6,8 @@ CI evidence: https://github.com/mne-tools/mne-cpp/actions/runs/36243010551 (comm
 
 ## Registration
 
-- Test directories: 240
-- Registered unconditionally: 233
+- Test directories: 241
+- Registered unconditionally: 234
 - Registered behind a CMake condition or early `return()`: 4
 - Not registered: 3
 - Registered without `LABELS`: 0
@@ -18,9 +18,9 @@ CI evidence: https://github.com/mne-tools/mne-cpp/actions/runs/36243010551 (comm
 
 | Platform | Executed | Failures | Skipped | Registered but not executed |
 |---|---:|---:|---:|---|
-| macos-26 | 230 | 0 | 0 | `test_fiff_core_python`, `test_fwd_python`, `test_inv_beamformer_python`, `test_inv_eloreta_python`, `test_inv_rap_music_truth`, `test_mne_description_parser`, `test_mne_label_python` |
-| ubuntu-24.04 | 230 | 0 | 0 | `test_fiff_core_python`, `test_fwd_python`, `test_inv_beamformer_python`, `test_inv_eloreta_python`, `test_inv_rap_music_truth`, `test_mne_description_parser`, `test_mne_label_python` |
-| windows-2025-vs2026 | 230 | 0 | 2 | `test_fiff_core_python`, `test_fwd_python`, `test_inv_beamformer_python`, `test_inv_eloreta_python`, `test_inv_rap_music_truth`, `test_mne_description_parser`, `test_mne_label_python` |
+| macos-26 | 230 | 0 | 0 | `test_fiff_core_python`, `test_fwd_python`, `test_inv_beamformer_python`, `test_inv_dipole_fit_python`, `test_inv_eloreta_python`, `test_inv_rap_music_truth`, `test_mne_description_parser`, `test_mne_label_python` |
+| ubuntu-24.04 | 230 | 0 | 0 | `test_fiff_core_python`, `test_fwd_python`, `test_inv_beamformer_python`, `test_inv_dipole_fit_python`, `test_inv_eloreta_python`, `test_inv_rap_music_truth`, `test_mne_description_parser`, `test_mne_label_python` |
+| windows-2025-vs2026 | 230 | 0 | 2 | `test_fiff_core_python`, `test_fwd_python`, `test_inv_beamformer_python`, `test_inv_dipole_fit_python`, `test_inv_eloreta_python`, `test_inv_rap_music_truth`, `test_mne_description_parser`, `test_mne_label_python` |
 
 ## Run-time requirements (lexical signals)
 
@@ -29,7 +29,7 @@ CI evidence: https://github.com/mne-tools/mne-cpp/actions/runs/36243010551 (comm
 | freesurfer | 2 |
 | python | 9 |
 | sample-data | 18 |
-| test-data | 95 |
+| test-data | 96 |
 | GUI (`QTEST_MAIN`) | 33 |
 | Contains `QSKIP` | 74 |
 

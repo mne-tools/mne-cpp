@@ -276,6 +276,17 @@ void TestFiffIoEvokedInfo::evokedSet_saveAndReload()
         double diff = (setReload.evoked[i].data - setOrig.evoked[i].data).norm();
         double relDiff = (norm > 0) ? diff / norm : diff;
         QVERIFY2(relDiff < 1e-3, qPrintable(QString("Evoked %1 rel diff = %2").arg(i).arg(relDiff)));
+
+        // Per channel, so stim channels (cal = 1) cannot mask MEG/EEG channels
+        // whose calibration was applied twice.
+        for (int c = 0; c < setOrig.info.nchan; ++c) {
+            const double chNorm = setOrig.evoked[i].data.row(c).norm();
+            if (chNorm == 0.0)
+                continue;
+            const double chDiff = (setReload.evoked[i].data.row(c) - setOrig.evoked[i].data.row(c)).norm();
+            QVERIFY2(chDiff < 1e-3 * chNorm,
+                     qPrintable(QString("Evoked %1 channel %2 rel diff = %3").arg(i).arg(setOrig.info.ch_names[c]).arg(chDiff / chNorm)));
+        }
     }
 }
 

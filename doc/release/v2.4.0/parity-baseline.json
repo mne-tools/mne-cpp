@@ -59,6 +59,7 @@
         "test_filtering",
         "test_fwd_python",
         "test_inv_beamformer_python",
+        "test_inv_dipole_fit_python",
         "test_inv_eloreta_python",
         "test_mne_label_python",
         "test_mne_source_space_python",
