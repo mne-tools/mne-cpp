@@ -39,7 +39,7 @@ Deleted — non-copyable due to unique_ptr members.
 
 ---
 
-### InvGuessData(guessname, guess_surfname, mindist, exclude, grid, f)
+### InvGuessData(guessname, guess_surfname, mindist, exclude, grid, f, guessrad)
 
 Constructs the Guess Data from given Data Refactored: make_guess_data (setup.c).
 
@@ -63,9 +63,12 @@ Constructs the Guess Data from given Data Refactored: make_guess_data (setup.c).
 - **f** : *[InvDipoleFitData](/docs/api/inv/inv-dipole-fit-data) **
   Dipole fit data providing the forward model.
 
+- **guessrad** : *float*
+  Radius of the spherical guess volume when no surface bounds it (m).
+
 ---
 
-### InvGuessData(guessname, guess_surfname, mindist, exclude, grid, f, guess_save_name)
+### InvGuessData(guessname, guess_surfname, mindist, exclude, grid, f, guess_save_name, guessrad)
 
 Constructs the Guess Data from given Data Refactored: make_guess_data (dipole_fit_setup.c).
 
@@ -91,6 +94,9 @@ Constructs the Guess Data from given Data Refactored: make_guess_data (dipole_fi
 
 - **guess_save_name** : *char **
   File to save the guess points to (nullptr = do not save; saving is not implemented yet).
+
+- **guessrad** : *float*
+  Radius of the spherical guess volume when no surface bounds it (m).
 
 ---
 
