@@ -1336,8 +1336,9 @@ MNESourceSpace* MNESourceSpace::make_volume_source_space(const MNESurface& surf,
                     if (y > minn[1])
                         neigh[16] = k - 1 - nrow;
                 }
+                // MNE-C (and mne-python) repeat neighbour 13 here (k + 1 - nrow - nplane).
                 if (y > minn[1] && x < maxn[0])
-                    neigh[17] = k + 1 - nrow - nplane;
+                    neigh[17] = k + 1 - nrow;
                 /*
              * Finally one plane above
              */

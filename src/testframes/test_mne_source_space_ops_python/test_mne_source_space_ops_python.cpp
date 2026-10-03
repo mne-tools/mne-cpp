@@ -85,6 +85,7 @@ private slots:
     void volumeGrid_data();
     void volumeGrid();
     void writeRoundTrip();
+    void volumeNeighborsRoundTrip();
 
 private:
     QString m_srcPath;
@@ -250,6 +251,79 @@ void TestMneSourceSpaceOpsPython::writeRoundTrip()
     QCOMPARE(sel[0]->nuse, 0);
     for (int k = 0; k < sel[0]->np; ++k)
         QVERIFY((sel[0]->rr.row(k) - m_spaces[0]->rr.row(m_spaces[0]->vertno[k])).cwiseAbs().maxCoeff() < 1e-7f);
+}
+
+//=============================================================================================================
+
+void TestMneSourceSpaceOpsPython::volumeNeighborsRoundTrip()
+{
+    // Brute force on mne-python's grid (no exclusion): pairs of used points at most
+    // sqrt(3) grid apart. 28158 pairs, neighbour vertex numbers summing to 69766539.
+    // mne-python's own neighbor_vert keeps one entry per used point: its mask
+    // (_source_space.py, "removes = ...") tests flat array positions against vertno.
+    std::unique_ptr<MNESurface> surf = MNESurface::read_bem_surface(m_bemPath, FIFFV_BEM_SURF_ID_BRAIN, true);
+    QVERIFY(surf);
+    std::unique_ptr<MNESourceSpace> vol(MNESourceSpace::make_volume_source_space(*surf, 0.01f, 0.0f, 0.005f));
+    QVERIFY(vol);
+    QCOMPARE(vol->nuse, 1306);
+
+    auto usedNeighbors = [](const MNESourceSpace& s, qint64& indexSum) {
+        int pairs = 0;
+        indexSum = 0;
+        for (int k = 0; k < s.np; ++k) {
+            if (!s.inuse[k])
+                continue;
+            for (int n : s.neighbor_vert[k]) {
+                if (n >= 0) {
+                    ++pairs;
+                    indexSum += n;
+                }
+            }
+        }
+        return pairs;
+    };
+    qint64 indexSum = 0;
+    QCOMPARE(usedNeighbors(*vol, indexSum), 28158);
+    QCOMPARE(indexSum, Q_INT64_C(69766539));
+
+    const QString path = m_dir.filePath("volume-src.fif");
+    const QString selPath = m_dir.filePath("volume-selected-src.fif");
+    for (bool selected : {false, true}) {
+        QFile file(selected ? selPath : path);
+        FiffStream::SPtr stream = FiffStream::start_file(file);
+        QVERIFY(stream);
+        QCOMPARE(vol->writeToStream(stream, selected), 0);
+        stream->end_file();
+    }
+
+    std::vector<std::unique_ptr<MNESourceSpace>> back;
+    QCOMPARE(MNESourceSpace::read_source_spaces(path, back), 0);
+    QCOMPARE(static_cast<int>(back.size()), 1);
+    const MNESourceSpace& b = *back[0];
+    QCOMPARE(b.type, static_cast<int>(FIFFV_MNE_SPACE_VOLUME));
+    QCOMPARE(b.np, vol->np);
+    QCOMPARE(b.nuse, vol->nuse);
+    QCOMPARE(b.vertno, vol->vertno);
+    for (int c = 0; c < 3; ++c)
+        QCOMPARE(b.vol_dims[c], vol->vol_dims[c]);
+    QCOMPARE(b.nneighbor_vert, vol->nneighbor_vert);
+    for (int k = 0; k < vol->np; ++k)
+        QCOMPARE(b.neighbor_vert[k], vol->neighbor_vert[k]);
+
+    // The selected-only file renumbers neighbours to positions among the used points
+    // and, carrying no selection, reads back with every point in use.
+    std::vector<std::unique_ptr<MNESourceSpace>> sel;
+    QCOMPARE(MNESourceSpace::read_source_spaces(selPath, sel), 0);
+    QCOMPARE(sel[0]->np, 1306);
+    QCOMPARE(sel[0]->nuse, 1306);
+    qint64 selSum = 0;
+    QCOMPARE(usedNeighbors(*sel[0], selSum), 28158);
+    for (int k = 0; k < sel[0]->np; ++k) {
+        for (int n : sel[0]->neighbor_vert[k]) {
+            if (n >= 0)
+                QVERIFY((sel[0]->rr.row(n) - vol->rr.row(vol->vertno[k])).norm() < 0.0175f);
+        }
+    }
 }
 
 //=============================================================================================================
