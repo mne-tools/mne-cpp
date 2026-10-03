@@ -131,7 +131,7 @@ public:
 public:
     Eigen::Matrix<float, Eigen::Dynamic, 3, Eigen::RowMajor> rr; /**< Guess dipole locations (nguess x 3, row-major). */
     std::vector<InvDipoleForward::UPtr> guess_fwd;               /**< Forward solutions for the guesses. */
-    int nguess;                                                  /**< How many sources. */
+    int nguess = 0;                                              /**< How many sources. */
 };
 
 //=============================================================================================================

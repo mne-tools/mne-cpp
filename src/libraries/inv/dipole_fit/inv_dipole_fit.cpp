@@ -279,8 +279,10 @@ InvEcdSet InvDipoleFit::calculateFit() const
     auto guess = std::make_unique<InvGuessData>(settings->guessname,
                                                 settings->guess_surfname,
                                                 settings->guess_mindist, settings->guess_exclude, settings->guess_grid, fit_data.get());
-    if (!guess)
+    if (guess->nguess == 0) {
+        qCritical("Could not create the initial guesses.");
         return set;
+    }
 
     qInfo("\n---- Fitting : %7.1f ... %7.1f ms (step: %6.1f ms integ: %6.1f ms)\n",
           1000 * settings->tmin, 1000 * settings->tmax, 1000 * settings->tstep, 1000 * settings->integ);

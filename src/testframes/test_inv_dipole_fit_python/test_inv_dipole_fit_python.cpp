@@ -43,6 +43,8 @@
 #include <inv/dipole_fit/inv_ecd_set.h>
 
 #include <fiff/fiff_evoked_set.h>
+#include <fiff/fiff_raw_data.h>
+#include <fiff/fiff_stream.h>
 
 #include <memory>
 
@@ -119,6 +121,32 @@ bool writeSyntheticEvoked(const QString& sourceFile, const QString& outFile, con
     return out.save(outFile);
 }
 
+//=============================================================================================================
+/**
+ * Writes a raw file whose MEG channels hold @p data (one column per sample).
+ */
+bool writeSyntheticRaw(const QString& sourceFile, const QString& outFile, const QStringList& chNames, const MatrixXd& data)
+{
+    QFile file(sourceFile);
+    FiffRawData source(file);
+    const RowVectorXi sel = FiffInfoBase::pick_channels(source.info.ch_names, chNames);
+    if (sel.size() != data.rows())
+        return false;
+    FiffInfo info = source.info.pick_info(sel);
+    info.bads.clear();
+
+    QFile out(outFile);
+    RowVectorXd cals;
+    FiffStream::SPtr stream = FiffStream::start_writing_raw(out, info, cals);
+    if (!stream)
+        return false;
+    constexpr int kBuffer = 100;
+    for (int first = 0; first < data.cols(); first += kBuffer)
+        stream->write_raw_buffer(data.middleCols(first, std::min<int>(kBuffer, static_cast<int>(data.cols()) - first)), cals);
+    stream->finish_writing_raw();
+    return true;
+}
+
 } // namespace
 
 //=============================================================================================================
@@ -135,10 +163,15 @@ private slots:
     void forwardFieldMatches();
     void fitMatches_data();
     void fitMatches();
+    void rawFitMatches_data();
+    void rawFitMatches();
+    void surfaceGuessesFitMatches();
     void rejectsMissingInput();
 
 private:
     QString m_sampleAve;
+    QString m_synthAve;
+    InvEcdSet m_rawFit;
     QTemporaryDir m_dir;
     QStringList m_chNames;
     MatrixXf m_fields; /**< 305 x 3 projected fields of the true dipoles. */
@@ -176,11 +209,11 @@ void TestInvDipoleFitPython::initTestCase()
     data.leftCols(3) = m_fields.cast<double>();
     data.col(3) = (m_fields.col(0) + m_fields.col(1)).cast<double>();
     data.col(4) = data.col(3);
-    const QString synth = m_dir.filePath("synthetic-ave.fif");
-    QVERIFY(writeSyntheticEvoked(m_sampleAve, synth, m_chNames, data));
+    m_synthAve = m_dir.filePath("synthetic-ave.fif");
+    QVERIFY(writeSyntheticEvoked(m_sampleAve, m_synthAve, m_chNames, data));
 
     InvDipoleFitSettings settings;
-    settings.measname = synth;
+    settings.measname = m_synthAve;
     settings.include_meg = true;
     settings.include_eeg = false;
     settings.guess_mindist = 0.0f;
@@ -192,6 +225,31 @@ void TestInvDipoleFitPython::initTestCase()
     m_fit = fit.calculateFit();
     // The time loop stops before the last sample, which only pads the data.
     QCOMPARE(m_fit.size(), 4);
+
+    // A raw recording holding each true field for kBlock samples, longer than
+    // the fitter's 10 s segment so the fit has to reload data part way.
+    const QString sampleRaw = QCoreApplication::applicationDirPath() + "/../resources/data/mne-cpp-test-data/MEG/sample/sample_audvis_trunc_raw.fif";
+    constexpr int kBlock = 1500;
+    MatrixXd rawData(fwdData->nmeg, 3 * kBlock);
+    for (int k = 0; k < 3; ++k)
+        rawData.middleCols(k * kBlock, kBlock) = m_fields.col(k).cast<double>().replicate(1, kBlock);
+    const QString synthRaw = m_dir.filePath("synthetic_raw.fif");
+    QVERIFY(writeSyntheticRaw(sampleRaw, synthRaw, m_chNames, rawData));
+
+    InvDipoleFitSettings rawSettings;
+    rawSettings.measname = synthRaw;
+    rawSettings.is_raw = true;
+    rawSettings.filter.filter_on = false;
+    rawSettings.include_meg = true;
+    rawSettings.include_eeg = false;
+    rawSettings.guess_mindist = 0.0f;
+    rawSettings.tmin = 2.0f;
+    rawSettings.tmax = 13.0f;
+    rawSettings.tstep = 5.0f;
+    rawSettings.dipname = m_dir.filePath("raw-fit.dat");
+    rawSettings.checkIntegrity();
+    InvDipoleFit rawFit(&rawSettings);
+    m_rawFit = rawFit.calculateFit();
 }
 
 //=============================================================================================================
@@ -277,6 +335,68 @@ void TestInvDipoleFitPython::fitMatches()
     // MNE-C convention (fit_dipoles.c): nchan - 3 - ncomp - nproj = 305 - 3 - 2 - 3.
     // mne-python reports rank - ncomp = 300 for the same fit.
     QCOMPARE(dip.nfree, 297);
+}
+
+//=============================================================================================================
+
+void TestInvDipoleFitPython::rawFitMatches_data()
+{
+    QTest::addColumn<int>("sample");
+    QTest::addColumn<int>("dipole");
+    // At 300.3 Hz the blocks start at 0, 4.99 and 9.99 s.
+    QTest::newRow("2 s") << 0 << 0;
+    QTest::newRow("7 s") << 1 << 1;
+    QTest::newRow("12 s, second segment") << 2 << 2;
+}
+
+void TestInvDipoleFitPython::rawFitMatches()
+{
+    QFETCH(int, sample);
+    QFETCH(int, dipole);
+    QCOMPARE(m_rawFit.size(), 3);
+    // Same data and model as the evoked fit, so the same fits come out.
+    const InvEcd& dip = m_rawFit[sample];
+    const InvEcd& ref = m_fit[dipole];
+    QVERIFY(dip.valid);
+    QVERIFY2((dip.rd - ref.rd).norm() < 1e-4f, qPrintable(QStringLiteral("%1 mm off").arg(1e3 * (dip.rd - ref.rd).norm())));
+    QVERIFY((dip.Q - ref.Q).norm() < 1e-3f * ref.Q.norm());
+    QVERIFY(std::abs(dip.good - ref.good) < 1e-5f);
+    QVERIFY((dip.rd - truthPos(dipole)).norm() < 1e-3f);
+}
+
+//=============================================================================================================
+
+void TestInvDipoleFitPython::surfaceGuessesFitMatches()
+{
+    // Guesses inside the inner skull (MRI coordinates, moved to head with the
+    // MRI transform) instead of the default 80 mm sphere.
+    const QString data = QCoreApplication::applicationDirPath() + "/../resources/data/mne-cpp-test-data/";
+    InvDipoleFitSettings settings;
+    settings.measname = m_synthAve;
+    settings.mriname = data + "MEG/sample/all-trans.fif";
+    settings.guess_surfname = data + "subjects/sample/bem/sample-5120-bem.fif";
+    settings.include_meg = true;
+    settings.include_eeg = false;
+    settings.guess_mindist = 0.0f;
+    settings.tmin = 0.0f;
+    settings.dipname = m_dir.filePath("surf-fit.dat");
+    settings.checkIntegrity();
+    InvDipoleFit fit(&settings);
+    const InvEcdSet set = fit.calculateFit();
+    QCOMPARE(set.size(), 4);
+    for (int k = 0; k < 3; ++k) {
+        QVERIFY(set[k].valid);
+        QVERIFY2((set[k].rd - truthPos(k)).norm() < 1e-3f, qPrintable(QStringLiteral("dipole %1: %2 mm off").arg(k + 1).arg(1e3 * (set[k].rd - truthPos(k)).norm())));
+        // Other start points: the simplex ends within 0.2 mm of the sphere-guess fit.
+        QVERIFY((set[k].rd - m_fit[k].rd).norm() < 5e-4f);
+        QVERIFY(set[k].good > 0.9999f);
+    }
+
+    // A guess surface that cannot be read must stop the fit, not run it without guesses.
+    settings.guess_surfname = data + "subjects/sample/bem/sample-inner_skull-5120.surf";
+    InvDipoleFit badFit(&settings);
+    QTest::ignoreMessage(QtCriticalMsg, "Could not create the initial guesses.");
+    QCOMPARE(badFit.calculateFit().size(), 0);
 }
 
 //=============================================================================================================
