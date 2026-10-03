@@ -57,6 +57,7 @@ mne_add_test(${PROJECT_NAME}
     TIMEOUT 120
     REQUIRES_DATA
         mne-cpp-test-data/subjects/sample/bem)
+target_compile_definitions(${PROJECT_NAME} PRIVATE MNE_SOURCE_SPACE_DATA_DIR="${CMAKE_CURRENT_SOURCE_DIR}/data")
 if(NOT BUILD_SHARED_LIBS)
     target_compile_definitions(${PROJECT_NAME} PRIVATE STATICBUILD)
 endif()

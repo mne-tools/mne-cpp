@@ -1934,7 +1934,7 @@ int MNESourceSpace::read_source_spaces(const QString& name, std::vector<std::uni
                         new_space->interpolator = std::move(*FiffSparseMatrix::fiff_get_float_sparse_matrix(t_pTag));
                     }
                 } else {
-                    if (node->find_tag(stream, FIFF_MNE_FILE_NAME, t_pTag)) {
+                    if (mris[0]->find_tag(stream, FIFF_MNE_FILE_NAME, t_pTag)) {
                         new_space->MRI_volume = t_pTag->toString();
                     }
                     new_space->MRI_surf_RAS_RAS_t = FiffCoordTrans(FiffCoordTrans::readTransformFromNode(stream, mris[0], FIFFV_MNE_COORD_SURFACE_RAS, FIFFV_MNE_COORD_RAS));

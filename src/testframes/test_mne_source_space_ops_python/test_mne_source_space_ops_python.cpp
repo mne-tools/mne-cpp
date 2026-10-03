@@ -86,6 +86,7 @@ private slots:
     void volumeGrid();
     void writeRoundTrip();
     void volumeNeighborsRoundTrip();
+    void readsPythonVolumeSpace();
 
 private:
     QString m_srcPath;
@@ -324,6 +325,92 @@ void TestMneSourceSpaceOpsPython::volumeNeighborsRoundTrip()
                 QVERIFY((sel[0]->rr.row(n) - vol->rr.row(vol->vertno[k])).norm() < 0.0175f);
         }
     }
+}
+
+//=============================================================================================================
+
+void TestMneSourceSpaceOpsPython::readsPythonVolumeSpace()
+{
+    // data/sample-vol25-src.fif from make_volume_src_fixture.py: mne-python's 25 mm volume grid
+    // with neighbourhoods, voxel / MRI transforms and the parent-MRI block (MRI shrunk to 32^3).
+    std::vector<std::unique_ptr<MNESourceSpace>> spaces;
+    QCOMPARE(MNESourceSpace::read_source_spaces(QStringLiteral(MNE_SOURCE_SPACE_DATA_DIR "/sample-vol25-src.fif"), spaces), 0);
+    QCOMPARE(static_cast<int>(spaces.size()), 1);
+    const MNESourceSpace& v = *spaces[0];
+    QCOMPARE(v.type, static_cast<int>(FIFFV_MNE_SPACE_VOLUME));
+    QCOMPARE(v.np, 504);
+    QCOMPARE(v.nuse, 87);
+    QCOMPARE(v.vertno.sum(), 20591);
+    double used = 0.0;
+    for (int k = 0; k < v.nuse; ++k)
+        used += v.rr.row(v.vertno[k]).cast<double>().sum();
+    QVERIFY(closeTo(used, 1.4000000320374966, 1e-6));
+
+    // 26 entries per grid point; mne-python keeps one non-negative neighbour per used point.
+    QCOMPARE(static_cast<int>(v.neighbor_vert.size()), 504);
+    QCOMPARE(v.nneighbor_vert.sum(), 13104);
+    int nonneg = 0;
+    qint64 nsum = 0;
+    for (const VectorXi& n : v.neighbor_vert)
+        for (int j : n)
+            if (j >= 0) {
+                ++nonneg;
+                nsum += j;
+            }
+    QCOMPARE(nonneg, 87);
+    QCOMPARE(nsum, Q_INT64_C(15110));
+
+    QCOMPARE(v.vol_dims[0], 7);
+    QCOMPARE(v.vol_dims[1], 9);
+    QCOMPARE(v.vol_dims[2], 8);
+    QCOMPARE(v.MRI_vol_dims[0], 32);
+    QCOMPARE(v.MRI_vol_dims[1], 32);
+    QCOMPARE(v.MRI_vol_dims[2], 32);
+    QCOMPARE(v.MRI_volume, QString("T1.mgz"));
+
+    QVERIFY(v.voxel_surf_RAS_t && !v.voxel_surf_RAS_t->isEmpty());
+    Matrix<float, 3, 4> srcMri;
+    srcMri << 0.025f, 0.0f, 0.0f, -0.075f, 0.0f, 0.025f, 0.0f, -0.1f, 0.0f, 0.0f, 0.025f, -0.05f;
+    QVERIFY((v.voxel_surf_RAS_t->trans.topRows<3>() - srcMri).cwiseAbs().maxCoeff() < 1e-7f);
+
+    QVERIFY(v.MRI_voxel_surf_RAS_t && !v.MRI_voxel_surf_RAS_t->isEmpty());
+    Matrix<float, 3, 4> voxMri;
+    voxMri << -0.001f, 0.0f, 0.0f, 0.128f, 0.0f, 0.0f, 0.001f, -0.128f, 0.0f, -0.001f, 0.0f, 0.128f;
+    QVERIFY((v.MRI_voxel_surf_RAS_t->trans.topRows<3>() - voxMri).cwiseAbs().maxCoeff() < 1e-7f);
+
+    QVERIFY(v.MRI_surf_RAS_RAS_t && !v.MRI_surf_RAS_RAS_t->isEmpty());
+    QVERIFY((v.MRI_surf_RAS_RAS_t->trans.block<3, 1>(0, 3) - Vector3f(-0.0052736131f, 0.0090390854f, -0.0272879638f)).cwiseAbs().maxCoeff() < 1e-8f);
+
+    QVERIFY(v.interpolator);
+    QCOMPARE(v.interpolator->rows(), 32 * 32 * 32);
+    QCOMPARE(v.interpolator->cols(), 504);
+
+    // Writing it back keeps the volume information; mne-python reads that file back
+    // identically (type, vertno, rr, shape, MRI dims and name, all three transforms, neighbours).
+    const QString path = m_dir.filePath("python-vol-src.fif");
+    {
+        QFile file(path);
+        FiffStream::SPtr stream = FiffStream::start_file(file);
+        QVERIFY(stream);
+        QCOMPARE(v.writeToStream(stream, false), 0);
+        stream->end_file();
+    }
+    std::vector<std::unique_ptr<MNESourceSpace>> back;
+    QCOMPARE(MNESourceSpace::read_source_spaces(path, back), 0);
+    const MNESourceSpace& b = *back[0];
+    QCOMPARE(b.vertno, v.vertno);
+    QCOMPARE(b.nneighbor_vert, v.nneighbor_vert);
+    for (int c = 0; c < 3; ++c) {
+        QCOMPARE(b.vol_dims[c], v.vol_dims[c]);
+        QCOMPARE(b.MRI_vol_dims[c], v.MRI_vol_dims[c]);
+    }
+    QCOMPARE(b.MRI_volume, v.MRI_volume);
+    QVERIFY(b.voxel_surf_RAS_t && b.MRI_voxel_surf_RAS_t && b.MRI_surf_RAS_RAS_t);
+    QVERIFY((b.voxel_surf_RAS_t->trans - v.voxel_surf_RAS_t->trans).cwiseAbs().maxCoeff() < 1e-7f);
+    QVERIFY((b.MRI_voxel_surf_RAS_t->trans - v.MRI_voxel_surf_RAS_t->trans).cwiseAbs().maxCoeff() < 1e-7f);
+    QVERIFY((b.MRI_surf_RAS_RAS_t->trans - v.MRI_surf_RAS_RAS_t->trans).cwiseAbs().maxCoeff() < 1e-7f);
+    QVERIFY(b.interpolator);
+    QCOMPARE(b.interpolator->rows(), v.interpolator->rows());
 }
 
 //=============================================================================================================
