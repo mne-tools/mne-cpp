@@ -1006,27 +1006,25 @@ MNEForwardSolution MNEForwardSolution::pick_regions(const QList<FsLabel>& p_qLis
     MNEForwardSolution selectedFwd(*this);
 
     MatrixX3f rr(selVertices.size(), 3);
-    MatrixX3f nn(selVertices.size(), 3);
+    for (qint32 i = 0; i < selVertices.size(); ++i)
+        rr.row(i) = selectedFwd.source_rr.row(selVertices[i]);
 
-    for (qint32 i = 0; i < selVertices.size(); ++i) {
-        rr.block(i, 0, 1, 3) = selectedFwd.source_rr.row(selVertices[i]);
-        nn.block(i, 0, 1, 3) = selectedFwd.source_nn.row(selVertices[i]);
+    // Free orientation stores three normals and three gain columns per source.
+    const VectorXi selSolIdcs = isFixedOrient() ? selVertices : tripletSelection(selVertices);
+
+    MatrixX3f nn(selSolIdcs.size(), 3);
+    MatrixXd G(selectedFwd.sol->data.rows(), selSolIdcs.size());
+    for (qint32 i = 0; i < selSolIdcs.size(); ++i) {
+        nn.row(i) = selectedFwd.source_nn.row(selSolIdcs[i]);
+        G.col(i) = selectedFwd.sol->data.col(selSolIdcs[i]);
     }
 
     selectedFwd.source_rr = rr;
     selectedFwd.source_nn = nn;
-
-    VectorXi selSolIdcs = tripletSelection(selVertices);
-    MatrixXd G(selectedFwd.sol->data.rows(), selSolIdcs.size());
-    qint32 rows = G.rows();
-
-    for (qint32 i = 0; i < selSolIdcs.size(); ++i)
-        G.block(0, i, rows, 1) = selectedFwd.sol->data.col(selSolIdcs[i]);
-
     selectedFwd.sol->data = G;
     selectedFwd.sol->nrow = selectedFwd.sol->data.rows();
     selectedFwd.sol->ncol = selectedFwd.sol->data.cols();
-    selectedFwd.nsource = selectedFwd.sol->ncol / 3;
+    selectedFwd.nsource = static_cast<int>(selVertices.size());
 
     selectedFwd.src = selectedFwd.src.pick_regions(p_qListLabels);
 

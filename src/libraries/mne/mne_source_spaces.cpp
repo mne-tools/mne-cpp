@@ -108,7 +108,7 @@ QList<VectorXi> MNESourceSpaces::label_src_vertno_sel(const FsLabel& p_label, Ve
     } else if (p_label.hemi == 1) //rh
     {
         VectorXi vertno_sel = Linalg::intersect(vertno[1], p_label.vertices, src_sel);
-        src_sel.array() += p_label.vertices.size();
+        src_sel.array() += static_cast<int>(vertno[0].size());
         vertno[0] = VectorXi();
         vertno[1] = vertno_sel;
     }
@@ -183,8 +183,8 @@ MNESourceSpaces MNESourceSpaces::pick_regions(const QList<FsLabel>& p_qListLabel
         srcSpace.inuse = VectorXi::Zero(srcSpace.np);
 
         for (qint32 i = 0; i < selVertices.size(); ++i) {
-            srcSpace.inuse[selVertices[i]] = 1;
             newVertno[i] = origSpace.vertno[selVertices[i]];
+            srcSpace.inuse[newVertno[i]] = 1;
         }
 
         srcSpace.nuse = selVertices.size();

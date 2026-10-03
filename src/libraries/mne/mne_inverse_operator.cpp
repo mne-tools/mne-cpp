@@ -161,29 +161,17 @@ bool MNEInverseOperator::assemble_kernel(const FsLabel& label,
     std::vector<T> tripletList;
 
     if (!label.isEmpty()) {
-        qWarning("Label selection needs further debugging.");
         VectorXi src_sel;
         vertno = src.label_src_vertno_sel(label, src_sel);
 
-        if (method.compare(QLatin1String("MNE")) != 0) {
+        if (method.compare(QLatin1String("MNE")) != 0 && noise_norm.rows() > 0) {
+            // noisenorm is diagonal, one entry per source.
             tripletList.clear();
-            tripletList.reserve(noise_norm.nonZeros());
+            tripletList.reserve(src_sel.size());
+            for (qint32 i = 0; i < src_sel.size(); ++i)
+                tripletList.push_back(T(i, i, noise_norm.coeff(src_sel[i], src_sel[i])));
 
-            for (qint32 k = 0; k < noise_norm.outerSize(); ++k) {
-                for (SparseMatrix<double>::InnerIterator it(noise_norm, k); it; ++it) {
-                    qint32 row = -1;
-                    for (qint32 i = 0; i < src_sel.size(); ++i) {
-                        if (src_sel[i] == it.row()) {
-                            row = i;
-                            break;
-                        }
-                    }
-                    if (row != -1)
-                        tripletList.push_back(T(it.row(), it.col(), it.value()));
-                }
-            }
-
-            noise_norm = SparseMatrix<double>(src_sel.size(), noise_norm.cols());
+            noise_norm = SparseMatrix<double>(src_sel.size(), src_sel.size());
             noise_norm.setFromTriplets(tripletList.begin(), tripletList.end());
         }
 
@@ -198,9 +186,10 @@ bool MNEInverseOperator::assemble_kernel(const FsLabel& label,
             src_sel = src_sel_new;
         }
 
+        // src_sel is ascending with src_sel[i] >= i, so in-place compaction is safe.
         for (qint32 i = 0; i < src_sel.size(); ++i) {
             t_eigen_leads.row(i) = t_eigen_leads.row(src_sel[i]);
-            t_source_cov = t_source_cov.row(src_sel[i]);
+            t_source_cov.row(i) = t_source_cov.row(src_sel[i]);
         }
         t_eigen_leads.conservativeResize(src_sel.size(), t_eigen_leads.cols());
         t_source_cov.conservativeResize(src_sel.size(), t_source_cov.cols());
