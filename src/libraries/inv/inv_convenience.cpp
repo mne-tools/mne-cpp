@@ -231,14 +231,14 @@ QPair<MatrixXd, int> INVLIB::computeWhitener(
     VectorXd eig;
     MatrixXd eigvec;
 
+    // eigvec holds one eigenvector per row, as FiffCov does.
     if (noiseCov.eig.size() > 0 && noiseCov.eigvec.size() > 0) {
         eig = noiseCov.eig;
         eigvec = noiseCov.eigvec;
     } else {
-        // Compute eigendecomposition
         SelfAdjointEigenSolver<MatrixXd> solver(noiseCov.data);
         eig = solver.eigenvalues();
-        eigvec = solver.eigenvectors();
+        eigvec = solver.eigenvectors().transpose();
     }
 
     // Auto-detect rank from eigenvalue spectrum
@@ -254,7 +254,7 @@ QPair<MatrixXd, int> INVLIB::computeWhitener(
             rank = 1;
     }
 
-    // Build whitening matrix: W = diag(1/sqrt(eig)) @ V^T
+    // Build whitening matrix: W = diag(1/sqrt(eig)) @ eigvec
     // Only use the top 'rank' eigenvalues
     VectorXd invSqrtEig = VectorXd::Zero(eig.size());
     int effectiveRank = 0;
@@ -267,7 +267,7 @@ QPair<MatrixXd, int> INVLIB::computeWhitener(
         }
     }
 
-    MatrixXd whitener = invSqrtEig.asDiagonal() * eigvec.transpose();
+    MatrixXd whitener = invSqrtEig.asDiagonal() * eigvec;
 
     return QPair<MatrixXd, int>(whitener, effectiveRank);
 }

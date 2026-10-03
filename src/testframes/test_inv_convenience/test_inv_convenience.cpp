@@ -83,7 +83,7 @@ private slots:
         // Pre-compute eigendecomposition
         SelfAdjointEigenSolver<MatrixXd> solver(cov.data);
         cov.eig = solver.eigenvalues();
-        cov.eigvec = solver.eigenvectors();
+        cov.eigvec = solver.eigenvectors().transpose(); // FiffCov: one eigenvector per row
 
         auto [whitener, rank] = computeWhitener(cov);
 
@@ -103,7 +103,7 @@ private slots:
 
         SelfAdjointEigenSolver<MatrixXd> solver(cov.data);
         cov.eig = solver.eigenvalues();
-        cov.eigvec = solver.eigenvectors();
+        cov.eigvec = solver.eigenvectors().transpose(); // FiffCov: one eigenvector per row
 
         auto [W, rank] = computeWhitener(cov);
         QCOMPARE(rank, 4);
@@ -137,20 +137,21 @@ private slots:
 
         SelfAdjointEigenSolver<MatrixXd> solver(cov.data);
         cov.eig = solver.eigenvalues();
-        cov.eigvec = solver.eigenvectors();
+        cov.eigvec = solver.eigenvectors().transpose(); // FiffCov: one eigenvector per row
 
         auto [W, rank] = computeWhitener(cov);
 
-        // W * C * W^T should be approximately identity
+        // W * C * W^T must be the identity, with or without a stored decomposition.
         MatrixXd whitened = W * trueCov * W.transpose();
-        double diagDiff = 0.0;
-        for (int i = 0; i < rank; ++i) {
-            diagDiff += std::abs(whitened(i, i) - 1.0);
-        }
-        diagDiff /= static_cast<double>(rank);
+        double diff = (whitened - MatrixXd::Identity(p, p)).norm();
+        QVERIFY2(diff < 1e-10, qPrintable(QString("|W C W^T - I| = %1").arg(diff)));
 
-        QVERIFY2(diagDiff < 0.1,
-                 qPrintable(QString("Avg diagonal diff=%1, expected < 0.1").arg(diagDiff)));
+        cov.eig.resize(0);
+        cov.eigvec.resize(0, 0);
+        auto [W2, rank2] = computeWhitener(cov);
+        QCOMPARE(rank2, p);
+        diff = (W2 * trueCov * W2.transpose() - MatrixXd::Identity(p, p)).norm();
+        QVERIFY2(diff < 1e-10, qPrintable(QString("computed decomposition: |W C W^T - I| = %1").arg(diff)));
     }
 
     void testWhitenerAutoRank()
@@ -172,7 +173,7 @@ private slots:
 
         SelfAdjointEigenSolver<MatrixXd> solver(cov.data);
         cov.eig = solver.eigenvalues();
-        cov.eigvec = solver.eigenvectors();
+        cov.eigvec = solver.eigenvectors().transpose(); // FiffCov: one eigenvector per row
 
         auto [W, rank] = computeWhitener(cov);
         QCOMPARE(rank, trueRank);
@@ -188,7 +189,7 @@ private slots:
 
         SelfAdjointEigenSolver<MatrixXd> solver(cov.data);
         cov.eig = solver.eigenvalues();
-        cov.eigvec = solver.eigenvectors();
+        cov.eigvec = solver.eigenvectors().transpose(); // FiffCov: one eigenvector per row
 
         auto [W, rank] = computeWhitener(cov, 3);
         QCOMPARE(rank, 3);

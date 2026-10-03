@@ -102,7 +102,8 @@ InvBeamformer InvDICS::makeDICS([[maybe_unused]] const FiffInfo& info,
                 ? 1.0 / std::sqrt(noiseCov.eig(i))
                 : 0.0;
         }
-        whitener = invSqrtEig.asDiagonal() * noiseCov.eigvec.transpose();
+        // Rows of FiffCov::eigvec are the eigenvectors.
+        whitener = invSqrtEig.asDiagonal() * noiseCov.eigvec;
     } else {
         whitener = MatrixXd::Identity(nChannels, nChannels);
     }
@@ -114,6 +115,13 @@ InvBeamformer InvDICS::makeDICS([[maybe_unused]] const FiffInfo& info,
 
     // Source normals
     MatrixX3d nn = forward.source_nn.cast<double>();
+    if (nOrient == 3 && nn.rows() == 3 * nSources) {
+        // Free orientation stores three rows per source; mne-python uses nn[2::3].
+        MatrixX3d perSource(nSources, 3);
+        for (int s = 0; s < nSources; ++s)
+            perSource.row(s) = nn.row(3 * s + 2);
+        nn = perSource;
+    }
 
     // -----------------------------------------------------------------------
     // Compute filter for each frequency

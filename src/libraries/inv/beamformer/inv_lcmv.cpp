@@ -87,7 +87,7 @@ InvBeamformer InvLCMV::makeLCMV([[maybe_unused]] const FiffInfo& info,
     MatrixXd whitener;
     if (noiseCov.data.size() > 0) {
         // Compute whitener from noise covariance eigendecomposition
-        //   whitener = diag(1/sqrt(eig)) @ eigvec^T
+        //   whitener = diag(1/sqrt(eig)) @ eigvec  (rows of eigvec are the eigenvectors)
         if (noiseCov.eig.size() > 0 && noiseCov.eigvec.size() > 0) {
             VectorXd invSqrtEig(noiseCov.eig.size());
             for (int i = 0; i < noiseCov.eig.size(); ++i) {
@@ -95,7 +95,7 @@ InvBeamformer InvLCMV::makeLCMV([[maybe_unused]] const FiffInfo& info,
                     ? 1.0 / std::sqrt(noiseCov.eig(i))
                     : 0.0;
             }
-            whitener = invSqrtEig.asDiagonal() * noiseCov.eigvec.transpose();
+            whitener = invSqrtEig.asDiagonal() * noiseCov.eigvec;
         } else {
             // Fallback: identity whitening
             whitener = MatrixXd::Identity(nChannels, nChannels);
@@ -134,6 +134,13 @@ InvBeamformer InvLCMV::makeLCMV([[maybe_unused]] const FiffInfo& info,
     // Source normals for orientation picking
     // -----------------------------------------------------------------------
     MatrixX3d nn = forward.source_nn.cast<double>();
+    if (nOrient == 3 && nn.rows() == 3 * nSources) {
+        // Free orientation stores three rows per source; mne-python uses nn[2::3].
+        MatrixX3d perSource(nSources, 3);
+        for (int s = 0; s < nSources; ++s)
+            perSource.row(s) = nn.row(3 * s + 2);
+        nn = perSource;
+    }
 
     // -----------------------------------------------------------------------
     // Compute spatial filter
