@@ -57,6 +57,7 @@
         "test_fiff_evoked_python",
         "test_fiff_proj_python",
         "test_filtering",
+        "test_fwd_python",
         "test_mne_label_python",
         "test_mne_source_space_python",
         "test_spectral_connectivity",

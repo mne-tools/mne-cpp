@@ -1327,8 +1327,8 @@ bool MNEForwardSolution::read(QIODevice& p_IODevice,
         fwd.source_nn = MatrixXf::Zero(fwd.nsource, 3);
         for (qint32 k = 0; k < t_SourceSpace.size(); ++k) {
             for (qint32 q = 0; q < t_SourceSpace[k].nuse; ++q) {
-                fwd.source_rr.block(q, 0, 1, 3) = t_SourceSpace[k].rr.block(t_SourceSpace[k].vertno(q), 0, 1, 3);
-                fwd.source_nn.block(q, 0, 1, 3) = t_SourceSpace[k].nn.block(t_SourceSpace[k].vertno(q), 0, 1, 3);
+                fwd.source_rr.row(nuse + q) = t_SourceSpace[k].rr.row(t_SourceSpace[k].vertno(q));
+                fwd.source_nn.row(nuse + q) = t_SourceSpace[k].nn.row(t_SourceSpace[k].vertno(q));
             }
             nuse += t_SourceSpace[k].nuse;
         }

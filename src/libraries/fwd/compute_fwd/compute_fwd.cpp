@@ -469,6 +469,22 @@ void ComputeFwd::populateMetadata(MNEForwardSolution& fwd)
         }
     }
 
+    // Source locations and orientations in the computation frame, as MNEForwardSolution::read sets them.
+    const int nOri = m_pSettings->fixed_ori ? 1 : 3;
+    fwd.source_rr = MatrixX3f(fwd.nsource, 3);
+    fwd.source_nn = MatrixX3f(nOri * fwd.nsource, 3);
+    for (int i = 0, p = 0; i < static_cast<int>(m_spaces.size()); ++i) {
+        const MNESourceSpace& s = *m_spaces[i];
+        for (int k = 0; k < s.nuse; ++k, ++p) {
+            fwd.source_rr.row(p) = s.rr.row(s.vertno(k));
+            if (nOri == 1) {
+                fwd.source_nn.row(p) = s.nn.row(s.vertno(k));
+            } else {
+                fwd.source_nn.middleRows(3 * p, 3) = Matrix3f::Identity();
+            }
+        }
+    }
+
     // Measurement provenance
     fwd.info.filename = m_pSettings->measname;
     fwd.info.meas_id = m_meas_id;

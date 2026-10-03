@@ -1,0 +1,402 @@
+//=============================================================================================================
+/**
+ * SPDX-License-Identifier: BSD-3-Clause
+ * Copyright (c) 2026 MNE-CPP Authors
+ *
+ * @file     test_fwd_python.cpp
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.4.0
+ * @date     October 2026
+ * @brief    Checks field gradients and label / fixed-orientation forward solutions against independent references.
+ *
+ * Two oracles:
+ *
+ * 1. Every analytic dipole-position gradient must be the derivative of the
+ *    matching field function, checked by central finite differences.
+ *
+ * 2. A forward solution restricted to lh.V1 must reproduce the V1 columns of
+ *    the MNE-C reference ref-sample_audvis-meg-eeg-oct-6-fwd.fif. Its fixed
+ *    orientation version must match mne-python:
+ *
+ *      fx = mne.convert_forward_solution(ref, surf_ori=True, force_fixed=True,
+ *                                        use_cps=False)
+ *      np.abs(fx['sol']['data'][:, sel]).sum()  ->  165133.28497793473
+ */
+
+//=============================================================================================================
+// INCLUDES
+//=============================================================================================================
+
+#include <fwd/fwd_bem_model.h>
+#include <fwd/fwd_coil_set.h>
+#include <fwd/fwd_eeg_sphere_model.h>
+#include <fwd/fwd_eeg_sphere_model_set.h>
+#include <fwd/compute_fwd/compute_fwd.h>
+#include <fwd/compute_fwd/compute_fwd_settings.h>
+#include <fiff/fiff_raw_data.h>
+#include <fiff/fiff_coord_trans.h>
+#include <mne/mne_forward_solution.h>
+#include <fs/fs_label.h>
+
+#include <cmath>
+#include <functional>
+#include <memory>
+
+//=============================================================================================================
+// QT INCLUDES
+//=============================================================================================================
+
+#include <QtTest>
+#include <QCoreApplication>
+#include <QFile>
+#include <QTemporaryDir>
+
+//=============================================================================================================
+// EIGEN INCLUDES
+//=============================================================================================================
+
+#include <Eigen/Core>
+
+//=============================================================================================================
+// USED NAMESPACES
+//=============================================================================================================
+
+using namespace FWDLIB;
+using namespace FIFFLIB;
+using namespace MNELIB;
+using namespace FSLIB;
+using namespace Eigen;
+
+namespace
+{
+
+using FieldFunc = std::function<int(const Vector3f&, const Vector3f&, VectorXf&)>;
+using GradFunc = std::function<int(const Vector3f&, const Vector3f&, VectorXf&, VectorXf&, VectorXf&, VectorXf&)>;
+
+} // namespace
+
+//=============================================================================================================
+/**
+ * DECLARE CLASS TestFwdPython
+ *
+ * @brief Checks forward-model gradients and restricted forward solutions.
+ */
+class TestFwdPython : public QObject
+{
+    Q_OBJECT
+
+private:
+    static QString data(const QString& file);
+    std::shared_ptr<ComputeFwdSettings> settings(bool fixedOri, bool grad);
+    void checkGradient(const FieldFunc& field, const GradFunc& grad, int n);
+
+    QTemporaryDir m_dir;
+    QString m_labelPath;
+    FiffRawData m_raw;
+    QList<FiffChInfo> m_meg;
+    QList<FiffChInfo> m_eeg;
+    MNEForwardSolution m_ref;
+    VectorXi m_v1Sel;
+
+private slots:
+    void initTestCase();
+
+    void gradient_sphereMeg();
+    void gradient_bemMeg_data();
+    void gradient_bemMeg();
+    void gradient_bemEeg_data();
+    void gradient_bemEeg();
+    void gradient_sphereEeg();
+
+    void labelForward_free();
+    void labelForward_fixed();
+};
+
+//=============================================================================================================
+// DEFINE METHODS
+//=============================================================================================================
+
+QString TestFwdPython::data(const QString& file)
+{
+    return QCoreApplication::applicationDirPath() + "/../resources/data/mne-cpp-test-data/" + file;
+}
+
+//=============================================================================================================
+
+void TestFwdPython::initTestCase()
+{
+    const QString refPath = data("Result/ref-sample_audvis-meg-eeg-oct-6-fwd.fif");
+    if (!QFile::exists(refPath)) {
+        QSKIP("Reference forward solution not found");
+    }
+    QVERIFY(m_dir.isValid());
+
+    QFile rawFile(data("MEG/sample/sample_audvis_trunc_raw.fif"));
+    m_raw = FiffRawData(rawFile);
+    for (const FiffChInfo& ch : m_raw.info.chs) {
+        if (ch.kind == FIFFV_MEG_CH) {
+            m_meg << ch;
+        } else if (ch.kind == FIFFV_EEG_CH) {
+            m_eeg << ch;
+        }
+    }
+
+    QFile refFile(refPath);
+    m_ref = MNEForwardSolution(refFile);
+    QVERIFY(!m_ref.isEmpty());
+
+    // MNE-C assigns labels to a hemisphere by the "-lh.label" suffix.
+    m_labelPath = m_dir.filePath("V1-lh.label");
+    QVERIFY(QFile::copy(data("subjects/sample/label/lh.V1.label"), m_labelPath));
+
+    FsLabel v1;
+    QVERIFY(FsLabel::read(m_labelPath, v1));
+    m_ref.src.label_src_vertno_sel(v1, m_v1Sel);
+    QCOMPARE(static_cast<int>(m_v1Sel.size()), 70);
+}
+
+//=============================================================================================================
+
+void TestFwdPython::checkGradient(const FieldFunc& field, const GradFunc& grad, int n)
+{
+    // Dipoles at a few depths and orientations inside the inner skull.
+    const QList<QPair<Vector3f, Vector3f>> dipoles{
+        {Vector3f(0.0f, 0.0f, 0.06f), Vector3f(1.0f, 0.0f, 0.0f)},
+        {Vector3f(0.02f, -0.01f, 0.05f), Vector3f(0.0f, 1.0f, 0.0f)},
+        {Vector3f(-0.03f, 0.02f, 0.04f), Vector3f(0.3f, -0.4f, 0.866f)},
+    };
+
+    // Central differences with h = 0.1 mm: truncation error is ~(h/d)^2 with
+    // d ~ 3 cm, float round-off ~1e-7 / (h/d) ~ 3e-5. 1% of the gradient norm
+    // is far above both and far below a wrong sign or a swapped component.
+    const float h = 1e-4f;
+    for (const auto& [rd, Q] : dipoles) {
+        VectorXf val(n), gx(n), gy(n), gz(n);
+        QCOMPARE(grad(rd, Q, val, gx, gy, gz), 0);
+
+        VectorXf direct(n);
+        QCOMPARE(field(rd, Q, direct), 0);
+        QVERIFY2((val - direct).norm() <= 1e-5f * direct.norm(), "gradient call returned a different field value");
+
+        const VectorXf* analytic[3] = {&gx, &gy, &gz};
+        for (int c = 0; c < 3; ++c) {
+            Vector3f step = Vector3f::Zero();
+            step(c) = h;
+            VectorXf plus(n), minus(n);
+            QCOMPARE(field(rd + step, Q, plus), 0);
+            QCOMPARE(field(rd - step, Q, minus), 0);
+            const VectorXf numeric = (plus - minus) / (2.0f * h);
+            const float rel = (*analytic[c] - numeric).norm() / numeric.norm();
+            QVERIFY2(rel < 1e-2f, qPrintable(QString("d/d%1 relative error %2 at (%3, %4, %5)").arg(QChar('x' + c)).arg(rel).arg(rd.x()).arg(rd.y()).arg(rd.z())));
+        }
+    }
+}
+
+//=============================================================================================================
+
+void TestFwdPython::gradient_sphereMeg()
+{
+    auto defs = FwdCoilSet::read_coil_defs(QCoreApplication::applicationDirPath() + "/../resources/general/coilDefinitions/coil_def.dat");
+    QVERIFY(defs != nullptr);
+    auto coils = defs->create_meg_coils(m_meg, m_meg.size(), FWD_COIL_ACCURACY_ACCURATE, m_raw.info.dev_head_t);
+    QVERIFY(coils != nullptr);
+
+    float r0[3] = {0.0f, 0.0f, 0.04f};
+    const int n = coils->ncoil();
+    checkGradient(
+        [&](const Vector3f& rd, const Vector3f& Q, VectorXf& B) { return FwdBemModel::fwd_sphere_field(rd, Q, *coils, B, r0); },
+        [&](const Vector3f& rd, const Vector3f& Q, VectorXf& B, VectorXf& x, VectorXf& y, VectorXf& z) { return FwdBemModel::fwd_sphere_field_grad(rd, Q, *coils, B, x, y, z, r0); },
+        n);
+}
+
+//=============================================================================================================
+
+void TestFwdPython::gradient_bemMeg_data()
+{
+    QTest::addColumn<int>("method");
+    QTest::newRow("constant collocation") << static_cast<int>(FWD_BEM_CONSTANT_COLL);
+    QTest::newRow("linear collocation") << static_cast<int>(FWD_BEM_LINEAR_COLL);
+}
+
+//=============================================================================================================
+
+void TestFwdPython::gradient_bemMeg()
+{
+    QFETCH(int, method);
+
+    auto model = FwdBemModel::fwd_bem_load_homog_surface(data("subjects/sample/bem/sample-5120-bem.fif"));
+    QVERIFY(model != nullptr);
+    QCOMPARE(model->fwd_bem_load_recompute_solution(data("subjects/sample/bem/sample-5120-bem-sol.fif"), method, 0), 0);
+    QCOMPARE(model->bem_method, method);
+    model->fwd_bem_set_head_mri_t(FiffCoordTrans::readMriTransform(data("MEG/sample/all-trans.fif")));
+
+    auto defs = FwdCoilSet::read_coil_defs(QCoreApplication::applicationDirPath() + "/../resources/general/coilDefinitions/coil_def.dat");
+    auto coils = defs->create_meg_coils(m_meg, m_meg.size(), FWD_COIL_ACCURACY_NORMAL, m_raw.info.dev_head_t);
+    QCOMPARE(model->fwd_bem_specify_coils(coils.get()), 0);
+
+    FwdBemModel* m = model.get();
+    checkGradient(
+        [&](const Vector3f& rd, const Vector3f& Q, VectorXf& B) { return FwdBemModel::fwd_bem_field(rd, Q, *coils, B, m); },
+        [&](const Vector3f& rd, const Vector3f& Q, VectorXf& B, VectorXf& x, VectorXf& y, VectorXf& z) { return FwdBemModel::fwd_bem_field_grad(rd, Q, *coils, B, x, y, z, m); },
+        coils->ncoil());
+}
+
+//=============================================================================================================
+
+void TestFwdPython::gradient_bemEeg_data()
+{
+    gradient_bemMeg_data();
+}
+
+//=============================================================================================================
+
+void TestFwdPython::gradient_bemEeg()
+{
+    QFETCH(int, method);
+
+    auto model = FwdBemModel::fwd_bem_load_three_layer_surfaces(data("subjects/sample/bem/sample-1280-1280-1280-bem.fif"));
+    QVERIFY(model != nullptr);
+    QCOMPARE(model->fwd_bem_load_recompute_solution(data("subjects/sample/bem/sample-1280-1280-1280-bem-sol.fif"), method, 0), 0);
+    QCOMPARE(model->bem_method, method);
+    model->fwd_bem_set_head_mri_t(FiffCoordTrans::readMriTransform(data("MEG/sample/all-trans.fif")));
+
+    auto els = FwdCoilSet::create_eeg_els(m_eeg, m_eeg.size());
+    QVERIFY(els != nullptr);
+    QCOMPARE(model->fwd_bem_specify_els(els.get()), 0);
+
+    FwdBemModel* m = model.get();
+    checkGradient(
+        [&](const Vector3f& rd, const Vector3f& Q, VectorXf& V) { return FwdBemModel::fwd_bem_pot_els(rd, Q, *els, V, m); },
+        [&](const Vector3f& rd, const Vector3f& Q, VectorXf& V, VectorXf& x, VectorXf& y, VectorXf& z) { return FwdBemModel::fwd_bem_pot_grad_els(rd, Q, *els, V, x, y, z, m); },
+        els->ncoil());
+}
+
+//=============================================================================================================
+
+void TestFwdPython::gradient_sphereEeg()
+{
+    std::unique_ptr<FwdEegSphereModelSet> set(FwdEegSphereModelSet::fwd_add_default_eeg_sphere_model(nullptr));
+    QVERIFY(set != nullptr);
+    std::unique_ptr<FwdEegSphereModel> model(set->fwd_select_eeg_sphere_model("Default"));
+    QVERIFY(model != nullptr);
+    QVERIFY(model->fwd_setup_eeg_sphere_model(0.09f, true, 3));
+    model->r0 = Vector3f(0.0f, 0.0f, 0.04f);
+
+    auto els = FwdCoilSet::create_eeg_els(m_eeg, m_eeg.size());
+    QVERIFY(els != nullptr);
+
+    FwdEegSphereModel* m = model.get();
+    checkGradient(
+        [&](const Vector3f& rd, const Vector3f& Q, VectorXf& V) { return FwdEegSphereModel::fwd_eeg_spherepot_coil(rd, Q, *els, V, m); },
+        [&](const Vector3f& rd, const Vector3f& Q, VectorXf& V, VectorXf& x, VectorXf& y, VectorXf& z) { return FwdEegSphereModel::fwd_eeg_spherepot_grad_coil(rd, Q, *els, V, x, y, z, m); },
+        els->ncoil());
+}
+
+//=============================================================================================================
+
+std::shared_ptr<ComputeFwdSettings> TestFwdPython::settings(bool fixedOri, bool grad)
+{
+    // mne_forward_solution --meg --eeg --accurate --mindist 5 --label V1-lh.label
+    auto s = std::make_shared<ComputeFwdSettings>();
+    s->include_meg = true;
+    s->include_eeg = true;
+    s->accurate = true;
+    s->fixed_ori = fixedOri;
+    s->compute_grad = grad;
+    s->srcname = data("subjects/sample/bem/sample-oct-6-src.fif");
+    s->measname = data("MEG/sample/sample_audvis_trunc_raw.fif");
+    s->mriname = data("MEG/sample/all-trans.fif");
+    s->transname.clear();
+    s->bemname = data("subjects/sample/bem/sample-1280-1280-1280-bem.fif");
+    s->mindist = 5.0f / 1000.0f;
+    s->solname = m_dir.filePath(fixedOri ? "fixed-fwd.fif" : "free-fwd.fif");
+    // The second name has no hemisphere tag and is skipped with a warning, as in MNE-C.
+    s->labels = {m_labelPath, m_dir.filePath("unassigned.label")};
+    s->nlabel = s->labels.size();
+    s->pFiffInfo = QSharedPointer<FiffInfo>::create(m_raw.info);
+    s->checkIntegrity();
+    return s;
+}
+
+//=============================================================================================================
+
+void TestFwdPython::labelForward_free()
+{
+    auto fwd = std::make_shared<ComputeFwd>(settings(false, true))->calculateFwd();
+    QVERIFY(fwd != nullptr);
+
+    QCOMPARE(fwd->nsource, 70);
+    QCOMPARE(fwd->src[0].nuse, 70);
+    QCOMPARE(fwd->src[1].nuse, 0);
+    QCOMPARE(fwd->nchan, m_ref.nchan);
+    QCOMPARE(fwd->sol->row_names, m_ref.sol->row_names);
+    QCOMPARE(static_cast<int>(fwd->sol->data.cols()), 3 * 70);
+    QCOMPARE(static_cast<int>(fwd->source_rr.rows()), 70);
+    QCOMPARE(static_cast<int>(fwd->source_nn.rows()), 3 * 70);
+
+    // Each source column must equal the matching reference column. The
+    // reference was computed by MNE-C with the same model; 1e-4 relative per
+    // column is the tolerance test_mne_forward_solution uses for the full
+    // solution, and a column from a neighbouring source differs by >10%.
+    for (int i = 0; i < 70; ++i) {
+        for (int c = 0; c < 3; ++c) {
+            const VectorXd ref = m_ref.sol->data.col(3 * m_v1Sel(i) + c);
+            const VectorXd got = fwd->sol->data.col(3 * i + c);
+            QVERIFY2((got - ref).norm() <= 1e-4 * ref.norm(), qPrintable(QString("source %1 component %2 differs by %3").arg(i).arg(c).arg((got - ref).norm() / ref.norm())));
+        }
+        QVERIFY((fwd->source_rr.row(i) - m_ref.source_rr.row(m_v1Sel(i))).norm() < 1e-6f);
+    }
+
+    // Position derivatives: three per dipole component, nine per source.
+    QCOMPARE(static_cast<int>(fwd->sol_grad->data.rows()), fwd->nchan);
+    QCOMPARE(static_cast<int>(fwd->sol_grad->data.cols()), 9 * 70);
+    for (int k = 0; k < fwd->sol_grad->data.cols(); ++k) {
+        QVERIFY2(fwd->sol_grad->data.col(k).norm() > 0.0, qPrintable(QString("gradient column %1 is empty").arg(k)));
+    }
+}
+
+//=============================================================================================================
+
+void TestFwdPython::labelForward_fixed()
+{
+    auto fwd = std::make_shared<ComputeFwd>(settings(true, false))->calculateFwd();
+    QVERIFY(fwd != nullptr);
+    QVERIFY(fwd->isFixedOrient());
+    QCOMPARE(fwd->nsource, 70);
+    QCOMPARE(static_cast<int>(fwd->sol->data.cols()), 70);
+    QCOMPARE(static_cast<int>(fwd->source_nn.rows()), 70);
+    // Fixed orientation: each normal must be the source-space normal of that vertex.
+    for (int i = 0; i < 70; ++i) {
+        QVERIFY((fwd->source_nn.row(i) - m_ref.src[0].nn.row(m_ref.src[0].vertno(m_v1Sel(i)))).norm() < 1e-6f);
+    }
+
+    // Reading with force_fixed must place right-hemisphere sources after the left ones:
+    // mne.convert_forward_solution(ref, surf_ori=True, force_fixed=True, use_cps=False)
+    {
+        QFile refFile(data("Result/ref-sample_audvis-meg-eeg-oct-6-fwd.fif"));
+        const MNEForwardSolution fixedRef(refFile, true);
+        QCOMPARE(static_cast<int>(fixedRef.source_rr.rows()), 7928);
+        const Vector3f rr(0.009998258482913594f, -0.05067880820682111f, 0.09408170987849368f);
+        const Vector3f nn(0.21600081631257262f, -0.26954704638533555f, 0.9384498779640356f);
+        QVERIFY((fixedRef.source_rr.row(3956).transpose() - rr).norm() < 1e-6f);
+        QVERIFY((fixedRef.source_nn.row(3956).transpose() - nn).norm() < 1e-6f);
+        QVERIFY(std::fabs(fixedRef.source_rr.cwiseAbs().cast<double>().sum() - 1069.459561085619) < 1e-4);
+    }
+
+    // mne-python's fixed conversion of the MNE-C reference: G_free * normal.
+    const double absSum = fwd->sol->data.cwiseAbs().sum();
+    QVERIFY2(std::fabs(absSum - 165133.28497793473) < 1e-4 * 165133.28497793473, qPrintable(QString("fixed gain abs sum %1, mne-python 165133.28497793473").arg(absSum, 0, 'g', 17)));
+
+    for (int i = 0; i < 70; ++i) {
+        const Vector3d nn = m_ref.src[0].nn.row(m_ref.src[0].vertno(m_v1Sel(i))).cast<double>().transpose();
+        const VectorXd ref = m_ref.sol->data.middleCols(3 * m_v1Sel(i), 3) * nn;
+        QVERIFY((fwd->sol->data.col(i) - ref).norm() <= 1e-4 * ref.norm());
+    }
+}
+
+//=============================================================================================================
+// MAIN
+//=============================================================================================================
+
+QTEST_GUILESS_MAIN(TestFwdPython)
+#include "test_fwd_python.moc"
