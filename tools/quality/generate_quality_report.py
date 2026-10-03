@@ -54,8 +54,8 @@ RELEASE_DIR = REPO_ROOT / "doc" / "release" / "v2.4.0"
 
 # Gate thresholds as recorded in doc/dev-notes/v2.4.0-requirements.md (G2, G3).
 THRESHOLDS = {
-    "coverage_line_libraries": 70.0,
-    "coverage_branch_libraries": 55.0,
+    "coverage_line_libraries": 80.0,
+    "coverage_branch_libraries": 65.0,
     "coverage_line_applications": 50.0,
     "coverage_line_tools": 50.0,
     "coverage_line_combined": 60.0,

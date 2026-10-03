@@ -9,10 +9,10 @@ Coverage from `5053fe099` (https://github.com/mne-tools/mne-cpp/actions/runs/362
 | G1 | Tests carry labels and timeouts | 0 unlabelled, 0 untimed | met |
 | G1 | No retry-to-pass path | 0 retry lines in local scripts | met |
 | G2 | Combined line coverage >= 60.0% | 48.85% (13,712 lines short) | **open** |
-| G2 | Libraries >= 70.0% line | 62.75% | **open** |
+| G2 | Libraries >= 80.0% line | 62.75% | **open** |
 | G2 | Applications >= 50.0% line | 24.9% | **open** |
 | G2 | Tools >= 50.0% line | 61.68% | met |
-| G2 | Libraries >= 55.0% branch | 42.9% | **open** |
+| G2 | Libraries >= 65.0% branch | 42.9% | **open** |
 | G3 | Eligible APIs have an executable example | 4.96% of 383; 1 snippets | **open** |
 | G3 | Exported API is registered | 124 exported classes unregistered | **open** |
 | G4 | Documentation images generated in CI | 19 referenced, 0 without producer, placeholders in 0 workflows | met |

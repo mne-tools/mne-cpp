@@ -2,8 +2,8 @@
   "schema_version": 1,
   "generated_by": "tools/quality/generate_quality_report.py",
   "thresholds": {
-    "coverage_line_libraries": 70.0,
-    "coverage_branch_libraries": 55.0,
+    "coverage_line_libraries": 80.0,
+    "coverage_branch_libraries": 65.0,
     "coverage_line_applications": 50.0,
     "coverage_line_tools": 50.0,
     "coverage_line_combined": 60.0,
@@ -41,7 +41,7 @@
       "branch_libraries": 42.9,
       "lines_to_combined_target": 13712,
       "lines_to_scope_targets": {
-        "libraries": 4582,
+        "libraries": 10902,
         "applications": 11230,
         "tools": 0
       }
