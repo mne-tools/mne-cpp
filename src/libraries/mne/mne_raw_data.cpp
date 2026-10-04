@@ -398,7 +398,6 @@ int mne_read_raw_buffer_t( //fiffFile     in,        /* Input file */
             qCritical("Incorrect number of samples in buffer.");
             return FAIL;
         }
-        qDebug() << "ToDo: Check whether this_samplef contains the right stuff!!! - use VectorXf instead";
         this_samplef = t_pTag->toFloat();
         for (s = 0; s < nsamp; s++, this_samplef += nchan) {
             for (c = 0; c < npick; c++)
@@ -409,7 +408,6 @@ int mne_read_raw_buffer_t( //fiffFile     in,        /* Input file */
             qCritical("Incorrect number of samples in buffer.");
             return FAIL;
         }
-        qDebug() << "ToDo: Check whether this_samples contains the right stuff!!! - use VectorXi instead";
         this_samples = (fiff_short_t*)t_pTag->data();
         for (s = 0; s < nsamp; s++, this_samples += nchan) {
             for (c = 0; c < npick; c++)
@@ -420,11 +418,20 @@ int mne_read_raw_buffer_t( //fiffFile     in,        /* Input file */
             qCritical("Incorrect number of samples in buffer.");
             return FAIL;
         }
-        qDebug() << "ToDo: Check whether this_sample contains the right stuff!!! - use VectorXi instead";
         this_sample = t_pTag->toInt();
         for (s = 0; s < nsamp; s++, this_sample += nchan) {
             for (c = 0; c < npick; c++)
                 data(c, s) = mult[c] * this_sample[pickno[c]];
+        }
+    } else if (ent->type == FIFFT_DOUBLE) {
+        if (static_cast<int>(t_pTag->size() / (sizeof(double) * nchan)) != nsamp) {
+            qCritical("Incorrect number of samples in buffer.");
+            return FAIL;
+        }
+        const double* this_sampled = t_pTag->toDouble();
+        for (s = 0; s < nsamp; s++, this_sampled += nchan) {
+            for (c = 0; c < npick; c++)
+                data(c, s) = static_cast<float>(mult[c] * this_sampled[pickno[c]]);
         }
     } else {
         qCritical("We are not prepared to handle raw data type: %d", ent->type);
@@ -1402,6 +1409,8 @@ MNERawData* MNERawData::open_file_comp(const QString& name,
                 data->bufs[k].ns = dir->size / (data->info->nchan * sizeof(fiff_float_t));
             else if (dir->type == FIFFT_INT)
                 data->bufs[k].ns = dir->size / (data->info->nchan * sizeof(fiff_int_t));
+            else if (dir->type == FIFFT_DOUBLE)
+                data->bufs[k].ns = dir->size / (data->info->nchan * sizeof(double));
             else {
                 qCritical("We are not prepared to handle raw data type: %d", dir->type);
                 return nullptr;

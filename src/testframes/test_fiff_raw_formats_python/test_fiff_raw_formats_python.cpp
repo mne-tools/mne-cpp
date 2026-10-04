@@ -22,8 +22,13 @@
 
 #include <fiff/fiff_raw_data.h>
 #include <mne/mne.h>
+#include <mne/mne_filter_def.h>
+#include <mne/mne_raw_data.h>
+#include <mne/mne_raw_info.h>
 
 #include <cmath>
+#include <memory>
+#include <vector>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -73,6 +78,8 @@ private slots:
     void readsFormat_data();
     void readsFormat();
     void readsAcquisitionSkip();
+    void mneRawDataMatches_data();
+    void mneRawDataMatches();
 };
 
 //=============================================================================================================
@@ -182,6 +189,39 @@ void TestFiffRawFormatsPython::readsAcquisitionSkip()
     QCOMPARE(part.row(1), data.block(1, 65, 1, 30));
     QVERIFY(std::abs(part(0, 0) - 7e-6) < 1e-12);
     QCOMPARE(part(0, 10), 0.0);
+}
+
+//=============================================================================================================
+
+void TestFiffRawFormatsPython::mneRawDataMatches_data()
+{
+    QTest::addColumn<QString>("fmt");
+    for (const char* fmt : {"short", "int", "single", "double", "skip"})
+        QTest::newRow(fmt) << QString(fmt);
+}
+
+void TestFiffRawFormatsPython::mneRawDataMatches()
+{
+    // MNE-C's buffered reader must return what FiffRawData (checked against mne-python above) does.
+    QFETCH(QString, fmt);
+    QFile file(fixture(fmt));
+    FiffRawData raw(file);
+    MatrixXd ref, times;
+    QVERIFY(raw.read_raw_segment(ref, times));
+
+    std::unique_ptr<MNERawData> mne(MNERawData::open_file(fixture(fmt), false, false, MNEFilterDef()));
+    QVERIFY(mne);
+    QCOMPARE(mne->first_samp, raw.first_samp);
+    const int nchan = mne->info->nchan;
+    const int ns = static_cast<int>(ref.cols());
+    Matrix<float, Dynamic, Dynamic, RowMajor> values(nchan, ns);
+    std::vector<float*> rows(nchan);
+    for (int c = 0; c < nchan; ++c)
+        rows[c] = values.row(c).data();
+    QCOMPARE(mne->pick_data(nullptr, mne->first_samp, ns, rows.data()), 0);
+    const double scale = ref.cwiseAbs().maxCoeff();
+    QVERIFY2((values.cast<double>() - ref).cwiseAbs().maxCoeff() <= 1e-6 * scale,
+             qPrintable(QString::number((values.cast<double>() - ref).cwiseAbs().maxCoeff() / scale)));
 }
 
 //=============================================================================================================

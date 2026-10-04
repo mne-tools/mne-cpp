@@ -401,6 +401,8 @@ int MNERawInfo::load(const QString& name, int allow_maxshield, std::unique_ptr<M
                 info->buf_size = raw->dir[k]->size / (nchan * sizeof(fiff_float_t));
             else if (raw->dir[k]->type == FIFFT_INT)
                 info->buf_size = raw->dir[k]->size / (nchan * sizeof(fiff_int_t));
+            else if (raw->dir[k]->type == FIFFT_DOUBLE)
+                info->buf_size = raw->dir[k]->size / (nchan * sizeof(double));
             else {
                 qCritical("We are not prepared to handle raw data type: %d", raw->dir[k]->type);
                 stream->close();
