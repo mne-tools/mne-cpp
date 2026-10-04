@@ -80,7 +80,7 @@ void InvHpiFitData::doDipfitConcurrent()
                                  currentSensors,
                                  iSimplexNumitr);
 
-    this->m_errorInfo = dipfitError(vecCurrentCoil,
+    this->m_errorInfo = dipfitError(this->m_coilPos,
                                     vecCurrentData,
                                     currentSensors,
                                     this->m_matProjector);

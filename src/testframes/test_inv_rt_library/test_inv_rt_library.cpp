@@ -529,21 +529,88 @@ void TestInvRtLibrary::hpiFit_fitWithSyntheticData()
         QSKIP("No test data");
     QFile rawFile(rawPath());
     FiffRawData raw(rawFile);
+    RowVectorXi megPicks = raw.info.pick_types(true, false, false);
+    QList<FiffChInfo> megChs;
+    for (int i = 0; i < megPicks.size(); ++i)
+        megChs << raw.info.chs[megPicks(i)];
     InvSensorSetCreator creator;
-    InvSensorSet sensorSet = creator.updateSensorSet(raw.info.chs, Accuracy::medium);
+    InvSensorSet sensorSet = creator.updateSensorSet(megChs, Accuracy::medium);
     InvHpiFit hpiFit(sensorSet);
     QVector<int> hpiFreqs = {154, 158, 162, 166};
     InvHpiModelParameters modelParams(hpiFreqs, static_cast<int>(raw.info.sfreq), 60, false);
-    RowVectorXi megPicks = raw.info.pick_types(true, false, false);
-    int nMeg = megPicks.size();
-    int nSamples = static_cast<int>(raw.info.sfreq);
-    MatrixXd matProjectedData = MatrixXd::Random(nMeg, nSamples) * 1e-12;
-    MatrixXd matProjectors = MatrixXd::Identity(nMeg, nMeg);
+    const int nMeg = megPicks.size();
+    QCOMPARE(nMeg, sensorSet.ncoils());
+    const int nSamples = static_cast<int>(raw.info.sfreq);
+
+    // Four coils at known head positions; the device -> head transform is a 10 degree
+    // rotation about z plus a 5 mm shift. Coil k oscillates at hpiFreqs[perm[k]].
     MatrixXd matCoilsHead(4, 3);
-    matCoilsHead << 0.06, 0.0, 0.06, -0.06, 0.0, 0.06, 0.0, 0.06, 0.06, 0.0, -0.06, 0.06;
+    matCoilsHead << 0.07, 0.0, 0.05, -0.07, 0.0, 0.05, 0.0, 0.08, 0.04, 0.0, -0.06, 0.07;
+    const double angle = 10.0 * M_PI / 180.0;
+    Matrix4f devHead = Matrix4f::Identity();
+    devHead.topLeftCorner<3, 3>() << std::cos(angle), -std::sin(angle), 0, std::sin(angle), std::cos(angle), 0, 0, 0, 1;
+    devHead.topRightCorner<3, 1>() << 0.003f, -0.002f, 0.004f;
+    const FiffCoordTrans trueDevHead(FIFFV_COORD_DEVICE, FIFFV_COORD_HEAD, devHead);
+    const MatrixXd matCoilsDev = trueDevHead.apply_inverse_trans(matCoilsHead.cast<float>()).cast<double>();
+    const std::vector<int> perm{2, 0, 3, 1};
+
+    // Field of a magnetic dipole in vacuum, averaged over each sensor's integration points.
+    auto field = [&](const Vector3d& pos, const Vector3d& moment) {
+        VectorXd b(nMeg);
+        const int np = sensorSet.np();
+        for (int ch = 0; ch < nMeg; ++ch) {
+            const MatrixXd rmag = sensorSet.rmag(ch);
+            const MatrixXd cosmag = sensorSet.cosmag(ch);
+            const RowVectorXd w = sensorSet.w(ch);
+            double sum = 0.0;
+            for (int p = 0; p < np; ++p) {
+                const Vector3d r = rmag.row(p).transpose() - pos;
+                const double rn = r.norm();
+                const Vector3d bp = 1e-7 * (3.0 * r * r.dot(moment) - moment * rn * rn) / std::pow(rn, 5);
+                sum += w(p) * bp.dot(cosmag.row(p).transpose());
+            }
+            b(ch) = sum;
+        }
+        return b;
+    };
+    const RowVectorXd t = RowVectorXd::LinSpaced(nSamples, 0.0, (nSamples - 1) / static_cast<double>(modelParams.iSampleFreq()));
+    MatrixXd matData = MatrixXd::Zero(nMeg, nSamples);
+    const Vector3d moments[4] = {{0.0, 0.0, 1.0}, {0.3, 0.0, 0.95}, {0.0, -0.4, 0.9}, {0.2, 0.2, 0.95}};
+    for (int k = 0; k < 4; ++k) {
+        const double f = hpiFreqs[perm[k]];
+        // Coil 1 carries cosine, the others sine, so both amplitude branches are used.
+        const RowVectorXd phase = 2.0 * M_PI * f * t;
+        const RowVectorXd wave = k == 1 ? RowVectorXd(phase.array().cos()) : RowVectorXd(phase.array().sin());
+        matData += field(matCoilsDev.row(k).transpose(), 1e-8 * moments[k]) * wave;
+    }
+    const MatrixXd matProjectors = MatrixXd::Identity(nMeg, nMeg);
+
+    // Digitised coils listed in frequency order: data channel j is the coil at head position perm^-1(j).
+    MatrixXd matDigitized(4, 3);
+    for (int k = 0; k < 4; ++k)
+        matDigitized.row(perm[k]) = matCoilsHead.row(k);
+
     HpiFitResult result;
-    hpiFit.fit(matProjectedData, matProjectors, modelParams, matCoilsHead, result);
-    QVERIFY(true);
+    hpiFit.fit(matData, matProjectors, modelParams, matDigitized, true, result);
+    QCOMPARE(result.hpiFreqs, hpiFreqs);
+    QCOMPARE(result.GoF.size(), 4);
+    for (int k = 0; k < 4; ++k) {
+        QVERIFY2(result.GoF(k) > 1.0 - 1e-6, qPrintable(QString("GoF %1").arg(result.GoF(k))));
+        QVERIFY2(result.errorDistances[k] < 1e-4, qPrintable(QString("coil %1 error %2 m").arg(k).arg(result.errorDistances[k])));
+    }
+    QVERIFY((result.devHeadTrans.trans - devHead).cwiseAbs().maxCoeff() < 1e-4f);
+
+    // Warm start: a good previous transform seeds the fit from the digitised coils.
+    hpiFit.fit(matData, matProjectors, modelParams, matDigitized, false, result);
+    QVERIFY((result.devHeadTrans.trans - devHead).cwiseAbs().maxCoeff() < 1e-4f);
+
+    // Each guard leaves the result untouched.
+    HpiFitResult untouched;
+    hpiFit.fit(matData, MatrixXd::Identity(3, 3), modelParams, matDigitized, untouched);
+    hpiFit.fit(matData, matProjectors, modelParams, matDigitized.topRows(3), untouched);
+    hpiFit.fit(MatrixXd(), MatrixXd(), modelParams, matDigitized, untouched);
+    hpiFit.fit(matData.topRows(10), MatrixXd::Identity(10, 10), modelParams, matDigitized, untouched);
+    QVERIFY(untouched.GoF.size() == 0);
 }
 
 void TestInvRtLibrary::hpiFitData_defaultConstruction()
