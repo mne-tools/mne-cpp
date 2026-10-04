@@ -315,6 +315,27 @@ void TestMneLabelPython::clusterForward_invariants()
 
     // The clustered gain is the cluster average of the original gain columns.
     QVERIFY((c.sol->data - small.sol->data * D).cwiseAbs().maxCoeff() < 1e-9 * small.sol->data.cwiseAbs().maxCoeff());
+
+    // With a noise covariance the clusters are found on the whitened gain (MEG and EEG in
+    // comparable units) but the centroids remain averages of the original gain.
+    QFile covFile(dataPath("MEG/sample/sample_audvis-cov.fif"));
+    const FiffCov cov(covFile);
+    QFile aveFile(dataPath("MEG/sample/sample_audvis-ave.fif"));
+    const FiffEvoked evoked(aveFile, 0);
+    MatrixXd Dw;
+    const MNEForwardSolution cw = small.cluster_forward_solution(m_annot, 40, Dw, cov, evoked.info, "cityblock");
+    QVERIFY(cw.isClustered());
+    QCOMPARE(static_cast<int>(Dw.rows()), 3 * small.nsource);
+    QVERIFY((Dw.colwise().sum().array() - 1.0).abs().maxCoeff() < 1e-12);
+    QVERIFY(((Dw.array() > 0).rowwise().count() == 1).all());
+    QVERIFY((cw.sol->data - small.sol->data * Dw).cwiseAbs().maxCoeff() < 1e-9 * small.sol->data.cwiseAbs().maxCoeff());
+
+    // Fixed orientation is not supported and returns the input unchanged.
+    MNEForwardSolution fixed = small;
+    fixed.source_ori = FIFFV_MNE_FIXED_ORI;
+    MatrixXd Df;
+    QTest::ignoreMessage(QtWarningMsg, "Error: Fixed orientation not implemented yet!");
+    QVERIFY(!fixed.cluster_forward_solution(m_annot, 40, Df, FiffCov(), FiffInfo()).isClustered());
 }
 
 //=============================================================================================================
