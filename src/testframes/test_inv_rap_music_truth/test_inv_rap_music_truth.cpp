@@ -25,6 +25,8 @@
 #include <inv/rap_music/inv_pwl_rap_music.h>
 #include <inv/rap_music/inv_dipole.h>
 #include <mne/mne_forward_solution.h>
+#include <mne/mne_source_space.h>
+#include <fiff/fiff_evoked.h>
 #include <fiff/fiff_named_matrix.h>
 
 #include <cmath>
@@ -111,6 +113,7 @@ private slots:
     void recoversPairs();
     void stopsAtThreshold();
     void rejectsInvalidInput();
+    void evokedEstimate();
 };
 
 //=============================================================================================================
@@ -220,6 +223,52 @@ void TestInvRapMusicTruth::rejectsInvalidInput()
     MNEForwardSolution bad = makeForward(G.leftCols(3 * kSources - 1));
     InvRapMusic badRap;
     QVERIFY(!badRap.init(bad, false, 2, 0.5));
+}
+
+//=============================================================================================================
+
+void TestInvRapMusicTruth::evokedEstimate()
+{
+    // One pair, two requested: the data have rank one, so only the pair is returned.
+    // Its rows carry |phi_k| * correlation, i.e. the split of the generating 6-vector.
+    MNEForwardSolution fwd = makeForward(makeLeadField());
+    for (int h = 0; h < 2; ++h) {
+        MNESourceSpace hemi;
+        hemi.vertno = VectorXi::LinSpaced(kSources / 2, 0, 10 * (kSources / 2 - 1)).array() + h;
+        fwd.src.append(hemi);
+    }
+    Matrix<double, 6, 1> o;
+    o << 1.0, 0.2, -0.3, 0.0, 0.8, 0.5;
+    FiffEvoked evoked;
+    evoked.data = makeData(makeLeadField(), {{2, 9}}, {o});
+    evoked.times = RowVectorXf::LinSpaced(kSamples, 0.1f, 0.1f + 0.01f * (kSamples - 1));
+
+    InvRapMusic rap(fwd, false, 2, 0.5);
+    const InvSourceEstimate whole = rap.calculateInverse(evoked);
+    QCOMPARE(static_cast<int>(whole.data.rows()), kSources);
+    QCOMPARE(static_cast<int>(whole.data.cols()), kSamples);
+    QCOMPARE(whole.vertices.size(), static_cast<Index>(kSources));
+    QCOMPARE(whole.vertices[kSources / 2], 1);
+    QCOMPARE(whole.tmin, 0.1f);
+    QVERIFY(std::fabs(whole.tstep - 0.01f) < 1e-6f);
+
+    const double norm1 = o.head<3>().norm() / o.norm();
+    const double norm2 = o.tail<3>().norm() / o.norm();
+    for (int s = 0; s < kSources; ++s) {
+        const double expected = s == 2 ? norm1 : (s == 9 ? norm2 : 0.0);
+        QVERIFY2((whole.data.row(s).array() - expected).abs().maxCoeff() < 1e-6,
+                 qPrintable(QString("source %1: %2, expected %3").arg(s).arg(whole.data(s, 0), 0, 'g', 12).arg(expected)));
+    }
+    QCOMPARE(rap.calculateInverse(evoked.data, 0.1f, 0.01f).data, whole.data);
+
+    // Sliding windows over stationary data give the same estimate in every window.
+    rap.setStcAttr(20, 0.5f);
+    const InvSourceEstimate windowed = rap.calculateInverse(evoked);
+    QCOMPARE(static_cast<int>(windowed.data.cols()), kSamples);
+    QVERIFY((windowed.data - whole.data).cwiseAbs().maxCoeff() < 1e-9);
+
+    evoked.data.conservativeResize(kChannels - 1, NoChange);
+    QVERIFY(rap.calculateInverse(evoked).isEmpty());
 }
 
 //=============================================================================================================
