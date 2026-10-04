@@ -174,6 +174,8 @@ private slots:
     void bemForwardMatches();
     void compensatedFieldMatches_data();
     void compensatedFieldMatches();
+    void readsNoiseCov_data();
+    void readsNoiseCov();
     void fitMatches_data();
     void fitMatches();
     void rawFitMatches_data();
@@ -393,6 +395,53 @@ void TestInvDipoleFitPython::compensatedFieldMatches()
     const VectorXd field = (g * q).cast<double>();
     const double err = (field - expected).norm() / expected.norm();
     QVERIFY2(err < 1e-3, qPrintable(QStringLiteral("relative error %1").arg(err)));
+}
+
+//=============================================================================================================
+
+void TestInvDipoleFitPython::readsNoiseCov_data()
+{
+    QTest::addColumn<bool>("diagonal");
+    QTest::addColumn<float>("reg");
+    // Diagonal covariances are never regularized; a zero regularization leaves a full one as read.
+    QTest::newRow("diagonal only") << true << 0.1f;
+    QTest::newRow("full, unregularized") << false << 0.0f;
+}
+
+void TestInvDipoleFitPython::readsNoiseCov()
+{
+    QFETCH(bool, diagonal);
+    QFETCH(float, reg);
+
+    const QString cov = QCoreApplication::applicationDirPath() + "/../resources/data/mne-cpp-test-data/MEG/sample/sample_audvis-cov.fif";
+    QStringList projnames{m_sampleAve};
+    Vector3f r0(0.0f, 0.0f, 0.04f);
+    std::unique_ptr<InvDipoleFitData> fitData(InvDipoleFitData::setup_dipole_fit_data(
+        QString(), m_sampleAve, QString(), &r0, nullptr, false, QString(), cov,
+        5e-13f, 20e-15f, 0.2e-6f, reg, reg, reg, diagonal, projnames, true, false));
+    QVERIFY(fitData);
+    const MNECovMatrix& noise = *fitData->noise;
+    QCOMPARE(noise.ncov, 305);
+    VectorXd diag(noise.ncov);
+    if (diagonal) {
+        QCOMPARE(noise.cov.size(), 0);
+        diag = noise.cov_diag;
+    } else {
+        QCOMPARE(noise.cov.size(), 305 * 306 / 2);
+        QCOMPARE(noise.lambda.size(), 305);
+        for (int k = 0, p = 0; k < noise.ncov; p += k + 2, ++k)
+            diag[k] = noise.cov[p];
+    }
+    // mne-python: np.diag(P @ C @ P.T) for the 305 good MEG channels of sample_audvis-cov.fif,
+    // with P = make_projector(ev.info['projs'], ch_names)[0]; checked by its sum, a
+    // position-weighted sum and channels 0, 150 and 304.
+    const double sum = diag.sum();
+    const double weighted = diag.dot(VectorXd::LinSpaced(305, 1.0, 305.0));
+    QVERIFY2(std::abs(sum - 3.3566836756795968e-21) < 1e-5 * sum, qPrintable(QString::number(sum, 'g', 12)));
+    QVERIFY2(std::abs(weighted - 5.147342638653126e-19) < 1e-5 * weighted, qPrintable(QString::number(weighted, 'g', 12)));
+    QVERIFY(std::abs(diag[0] - 2.272355891906954e-23) < 1e-5 * 2.272355891906954e-23);
+    QVERIFY(std::abs(diag[150] - 2.132513211616573e-23) < 1e-5 * 2.132513211616573e-23);
+    QVERIFY(std::abs(diag[304] - 2.8726580451278425e-26) < 1e-5 * 2.8726580451278425e-26);
 }
 
 //=============================================================================================================
