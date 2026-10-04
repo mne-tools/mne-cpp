@@ -80,6 +80,7 @@ private slots:
     void readsFormat_data();
     void readsFormat();
     void readsAcquisitionSkip();
+    void readsLeadingSkip();
     void mneRawDataMatches_data();
     void mneRawDataMatches();
     void mneRawDataNormalisesChannels();
@@ -193,6 +194,36 @@ void TestFiffRawFormatsPython::readsAcquisitionSkip()
     QCOMPARE(part.row(1), data.block(1, 65, 1, 30));
     QVERIFY(std::abs(part(0, 0) - 7e-6) < 1e-12);
     QCOMPARE(part(0, 10), 0.0);
+}
+
+//=============================================================================================================
+
+void TestFiffRawFormatsPython::readsLeadingSkip()
+{
+    // data/raw_skip_start_raw.fif (make_skip_fixture.py): the first two buffers (samples 0-19 of
+    // first_samp 50) are a FIFF_DATA_SKIP; mne-python starts the recording at sample 70.
+    QFile file(fixture("skip_start"));
+    FiffRawData raw(file);
+    QCOMPARE(raw.first_samp, 70);
+    QCOMPARE(raw.last_samp, 149);
+    MatrixXd ref, times;
+    QVERIFY(raw.read_raw_segment(ref, times));
+    QCOMPARE(ref.cols(), 80);
+    QVERIFY(std::abs(ref(0, 0) - 20e-6) < 1e-11);
+
+    // MNE-C either counts the skip into first_samp or, with omit_skip, starts at zero.
+    for (bool omit : {false, true}) {
+        std::unique_ptr<MNERawData> mne(MNERawData::open_file(fixture("skip_start"), omit, false, MNEFilterDef()));
+        QVERIFY(mne);
+        QCOMPARE(mne->first_samp, omit ? 0 : 70);
+        QCOMPARE(mne->omit_samp, omit ? 70 : 0);
+        Matrix<float, Dynamic, Dynamic, RowMajor> values(mne->info->nchan, 80);
+        std::vector<float*> rows(mne->info->nchan);
+        for (int c = 0; c < mne->info->nchan; ++c)
+            rows[c] = values.row(c).data();
+        QCOMPARE(mne->pick_data(nullptr, mne->first_samp, 80, rows.data()), 0);
+        QVERIFY((values.cast<double>() - ref).cwiseAbs().maxCoeff() <= 1e-6 * ref.cwiseAbs().maxCoeff());
+    }
 }
 
 //=============================================================================================================
