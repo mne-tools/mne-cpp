@@ -23,6 +23,8 @@
 #include <fiff/fiff_raw_data.h>
 #include <mne/mne.h>
 #include <mne/mne_filter_def.h>
+#include <mne/mne_meas_data.h>
+#include <mne/mne_meas_data_set.h>
 #include <mne/mne_raw_data.h>
 #include <mne/mne_raw_info.h>
 
@@ -81,6 +83,7 @@ private slots:
     void mneRawDataMatches_data();
     void mneRawDataMatches();
     void mneRawDataNormalisesChannels();
+    void measDataKeepsTrigger();
 };
 
 //=============================================================================================================
@@ -246,6 +249,21 @@ void TestFiffRawFormatsPython::mneRawDataNormalisesChannels()
     QVERIFY((values.row(0).cast<double>() - ref.row(0)).cwiseAbs().maxCoeff() < 1e-12);
     QVERIFY((values.row(1).cast<double>() - 1e-6 * ref.row(1)).cwiseAbs().maxCoeff() < 1e-6 * 1e-6 * ref.row(1).cwiseAbs().maxCoeff());
     QVERIFY((values.row(2).cast<double>() - 0.5 * ref.row(2)).cwiseAbs().maxCoeff() < 1e-6);
+}
+
+//=============================================================================================================
+
+void TestFiffRawFormatsPython::measDataKeepsTrigger()
+{
+    // data/trigger-ave.fif (make_trigger_evoked_fixture.py): STI 014 with cal 2 next to two EEG channels.
+    std::unique_ptr<MNEMeasData> meas(MNEMeasData::mne_read_meas_data(QStringLiteral(MNE_RAW_FORMATS_DATA_DIR "/trigger-ave.fif"), 1, nullptr, nullptr, QStringList(), 0));
+    QVERIFY(meas);
+    QCOMPARE(meas->nchan, 2);
+    QCOMPARE(meas->sets.size(), 1);
+    VectorXf codes(8);
+    codes << 0, 6, 6, 0, 0, 10, 10, 0;
+    QCOMPARE(meas->sets[0]->stim14.size(), 8);
+    QVERIFY((meas->sets[0]->stim14 - codes / 2.0f).cwiseAbs().maxCoeff() < 1e-6f);
 }
 
 //=============================================================================================================

@@ -188,6 +188,8 @@ MNEMeasData* MNEMeasData::mne_read_meas_data_add(const QString& name,
     stim14_name = qEnvironmentVariable(MNE_ENV_TRIGGER_CH);
     if (stim14_name.isEmpty() || stim14_name.size() == 0)
         stim14_name = MNE_DEFAULT_TRIGGER_CH;
+    // FiffTag::toChInfo strips the spaces from channel names.
+    stim14_name.remove(' ');
 
     if (add_to) {
         for (int i = 0; i < add_to->nchan; i++)
@@ -223,7 +225,7 @@ MNEMeasData* MNEMeasData::mne_read_meas_data_add(const QString& name,
                     break;
                 }
             }
-            if (QString::compare(stim14_name, chs[c].ch_name) == 0) {
+            if (QString(chs[c].ch_name).remove(' ') == stim14_name) {
                 stim14 = c;
             }
         }
@@ -242,7 +244,7 @@ MNEMeasData* MNEMeasData::mne_read_meas_data_add(const QString& name,
                 sel[nchan] = c;
                 nchan++;
             }
-            if (QString::compare(stim14_name, chs[c].ch_name) == 0) {
+            if (QString(chs[c].ch_name).remove(' ') == stim14_name) {
                 stim14 = c;
             }
         }
