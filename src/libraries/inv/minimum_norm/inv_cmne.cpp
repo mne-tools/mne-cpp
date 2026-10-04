@@ -172,7 +172,7 @@ MatrixXd InvCMNE::computeDspmKernel(
 
     // Solve once: A^{-1} via LDLT, then K = (C_R * G_tilde^T) * A^{-1}
     auto ldlt = matA.ldlt();
-    MatrixXd matK = (matSrcCov * matGainWhitened.transpose()) * ldlt.solve(MatrixXd::Identity(nChannels, nChannels));
+    MatrixXd matK = (matSrcCov * matGainWhitened.transpose()) * ldlt.solve(matWhitener);
 
     // Step 4: dSPM normalization
     // noise_norm_i = sqrt((K * C_n * K^T)(i,i))

@@ -78,6 +78,7 @@ private slots:
 
     // Edge cases
     void testFewTimeSamples();
+    void testDspmKernelMatchesDefinition();
 
     void cleanupTestCase();
 
@@ -343,6 +344,52 @@ void TestInvCmne::testFewTimeSamples()
 
     QCOMPARE(result.stcDspm.data.rows(), nSrc);
     QCOMPARE(result.stcDspm.data.cols(), nTimes);
+}
+
+//=============================================================================================================
+
+void TestInvCmne::testDspmKernelMatchesDefinition()
+{
+    // Dale et al. (2000): K = R G~^T (G~ R G~^T + lambda2 I)^-1 W with W = C^-1/2 and G~ = W G,
+    // each row scaled so that sensor noise with covariance C maps to unit variance.
+    const int nCh = 12, nSrc = 25, nTimes = 120;
+    const MatrixXd gain = createSyntheticGain(nCh, nSrc, 7);
+    MatrixXd mix = createSyntheticGain(nCh, nCh, 11);
+    const MatrixXd noiseCov = mix * mix.transpose() + 0.5 * MatrixXd::Identity(nCh, nCh);
+    const MatrixXd srcCov = VectorXd::LinSpaced(nSrc, 0.5, 2.0).asDiagonal();
+    const double lambda2 = 1.0 / 9.0;
+
+    SelfAdjointEigenSolver<MatrixXd> eig(noiseCov);
+    const MatrixXd W = eig.eigenvectors() * eig.eigenvalues().cwiseInverse().cwiseSqrt().asDiagonal() * eig.eigenvectors().transpose();
+    const MatrixXd Gw = W * gain;
+    MatrixXd ref = srcCov * Gw.transpose() * (Gw * srcCov * Gw.transpose() + lambda2 * MatrixXd::Identity(nCh, nCh)).inverse() * W;
+    for (int i = 0; i < nSrc; ++i)
+        ref.row(i) /= std::sqrt(ref.row(i) * noiseCov * ref.row(i).transpose());
+
+    MatrixXd evoked = gain * createSyntheticGain(nSrc, nTimes, 3);
+    InvCMNESettings settings;
+    settings.lambda2 = lambda2;
+    settings.lookBack = 10;
+    const InvCMNEResult result = InvCMNE::compute(evoked, gain, noiseCov, srcCov, settings);
+    const MatrixXd& K = result.matKernelDspm;
+    QVERIFY2((K - ref).norm() < 1e-9 * ref.norm(), qPrintable(QString("kernel differs by %1").arg((K - ref).norm() / ref.norm())));
+    QVERIFY(((K * noiseCov * K.transpose()).diagonal().array() - 1.0).abs().maxCoeff() < 1e-9);
+    const MatrixXd dspm = ref * evoked;
+    QVERIFY((result.stcDspm.data - dspm).norm() < 1e-9 * dspm.norm());
+
+    // Without a model the correction scales each later sample by the normalised moving average of |dSPM|.
+    MatrixXd cmne = dspm;
+    for (int t = settings.lookBack; t < nTimes; ++t) {
+        VectorXd p = cmne.middleCols(t - settings.lookBack, settings.lookBack).rowwise().mean().cwiseAbs();
+        p /= p.maxCoeff();
+        cmne.col(t) = p.cwiseProduct(dspm.col(t));
+    }
+    QVERIFY((result.stcCmne.data - cmne).norm() < 1e-9 * cmne.norm());
+
+    // A model path that cannot be loaded falls back to the same moving average.
+    QTest::ignoreMessage(QtWarningMsg, QRegularExpression("Failed to load ONNX model"));
+    const MatrixXd fallback = InvCMNE::applyLstmCorrection(dspm, QStringLiteral("/nonexistent/model.onnx"), settings.lookBack);
+    QVERIFY((fallback - cmne).norm() < 1e-9 * cmne.norm());
 }
 
 //=============================================================================================================
