@@ -21,6 +21,9 @@
  *
  *   s = read_bem_surfaces('sample-5120-bem.fif')[0]; s['rr'] *= 1e3   # mm
  *   setup_volume_source_space(pos=10.0, surface=s, mindist=5.0, exclude=ex)
+ *
+ * data/ico2-bem.fif (make_bem_normals_fixture.py) checks the vertex normals
+ * MNEBem reads against mne.read_bem_surfaces(patch_stats=False / True).
  */
 
 //=============================================================================================================
@@ -30,6 +33,7 @@
 #include <mne/mne_source_space.h>
 #include <mne/mne_surface.h>
 #include <mne/mne_patch_info.h>
+#include <mne/mne_bem.h>
 
 #include <fiff/fiff_stream.h>
 #include <fiff/fiff_constants.h>
@@ -87,6 +91,8 @@ private slots:
     void writeRoundTrip();
     void volumeNeighborsRoundTrip();
     void readsPythonVolumeSpace();
+    void bemNormals_matchPython_data();
+    void bemNormals_matchPython();
 
 private:
     QString m_srcPath;
@@ -411,6 +417,46 @@ void TestMneSourceSpaceOpsPython::readsPythonVolumeSpace()
     QVERIFY((b.MRI_surf_RAS_RAS_t->trans - v.MRI_surf_RAS_RAS_t->trans).cwiseAbs().maxCoeff() < 1e-7f);
     QVERIFY(b.interpolator);
     QCOMPARE(b.interpolator->rows(), v.interpolator->rows());
+}
+
+//=============================================================================================================
+
+void TestMneSourceSpaceOpsPython::bemNormals_matchPython_data()
+{
+    QTest::addColumn<bool>("addGeom");
+    QTest::addColumn<int>("surface");
+    QTest::addColumn<double>("absSum");
+    QTest::addColumn<Vector3d>("normal17");
+
+    // The inner skull stores no normals, the outer skull stores +z everywhere.
+    const Vector3d fromTris(0.5611954153999911, 1.8265034145236605e-09, 0.827683336629433);
+    QTest::newRow("inner skull, computed") << false << 0 << 241.34681585493314 << fromTris;
+    QTest::newRow("outer skull, stored") << false << 1 << 162.0 << Vector3d(0.0, 0.0, 1.0);
+    QTest::newRow("inner skull, add geometry") << true << 0 << 241.34681585493314 << fromTris;
+    QTest::newRow("outer skull, add geometry") << true << 1 << 241.3468137193307
+                                               << Vector3d(0.5611953385795905, 1.6235588582961614e-09, 0.827683388716083);
+}
+
+void TestMneSourceSpaceOpsPython::bemNormals_matchPython()
+{
+    QFETCH(bool, addGeom);
+    QFETCH(int, surface);
+    QFETCH(double, absSum);
+    QFETCH(Vector3d, normal17);
+
+    QFile file(QStringLiteral(MNE_SOURCE_SPACE_DATA_DIR "/ico2-bem.fif"));
+    FiffStream::SPtr stream(new FiffStream(&file));
+    MNEBem bem;
+    QVERIFY(MNEBem::readFromStream(stream, addGeom, bem));
+    QCOMPARE(bem.size(), 2);
+
+    // mne.read_bem_surfaces(patch_stats=addGeom): normals from the triangles when
+    // none are stored or when the geometry is completed, else the stored ones.
+    const MNEBemSurface& s = bem[surface];
+    QCOMPARE(static_cast<int>(s.nn.rows()), 162);
+    QVERIFY2(closeTo(s.nn.cwiseAbs().cast<double>().sum(), absSum, 1e-6),
+             qPrintable(QString("|nn| sum %1").arg(s.nn.cwiseAbs().cast<double>().sum(), 0, 'g', 17)));
+    QVERIFY((s.nn.row(17).cast<double>().transpose() - normal17).norm() < 1e-6);
 }
 
 //=============================================================================================================

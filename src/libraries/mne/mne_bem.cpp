@@ -141,7 +141,7 @@ bool MNEBem::readFromStream(FiffStream::SPtr& p_pStream, bool add_geom, MNEBem& 
         qInfo("\tReading a BEM surface...");
         MNEBem::readBemSurface(p_pStream, bemsurf[k], p_BemSurface);
         p_BemSurface.addTriangleData();
-        if (add_geom) {
+        if (add_geom || p_BemSurface.nn.rows() == 0) {
             p_BemSurface.addVertexNormals();
         }
         qInfo("\t[done]\n");
@@ -242,20 +242,15 @@ bool MNEBem::readBemSurface(FiffStream::SPtr& p_pStream, const FiffDirNode::SPtr
     //    qDebug() << "Surf Nodes; type:" << t_pTag->getType();
 
     //=====================================================================
-    if (!p_Tree->find_tag(p_pStream, FIFF_BEM_SURF_NORMALS, t_pTag)) {
-        if (!p_Tree->find_tag(p_pStream, FIFF_MNE_SOURCE_SPACE_NORMALS, t_pTag)) {
+    // Stored normals are optional (mne-python, MNE-C); readFromStream computes missing ones.
+    if (p_Tree->find_tag(p_pStream, FIFF_BEM_SURF_NORMALS, t_pTag) || p_Tree->find_tag(p_pStream, FIFF_MNE_SOURCE_SPACE_NORMALS, t_pTag)) {
+        p_BemSurface.nn = t_pTag->toFloatMatrix().transpose();
+        if (p_BemSurface.nn.rows() != p_BemSurface.np) {
             p_pStream->close();
-            throw std::runtime_error("Vertex normals not found.");
+            throw std::runtime_error("Vertex normal information is incorrect.");
         }
-
-        p_BemSurface.nn = t_pTag->toFloatMatrix().transpose();
     } else {
-        p_BemSurface.nn = t_pTag->toFloatMatrix().transpose();
-    }
-
-    if (p_BemSurface.nn.rows() != p_BemSurface.np) {
-        p_pStream->close();
-        throw std::runtime_error("Vertex normal information is incorrect.");
+        p_BemSurface.nn.resize(0, 3);
     }
 
     //    qDebug() << "Bem Vertex Normals; type:" << t_pTag->getType();

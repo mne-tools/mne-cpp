@@ -218,10 +218,9 @@ bool MNEBemSurface::add_geometry_info()
 bool MNEBemSurface::addVertexNormals()
 {
     //
-    //   Accumulate the vertex normals
+    //   Accumulate the vertex normals from scratch (MNE-C mne_add_vertex_normals)
     //
-
-    //    this->nn.resize(this->np,3);
+    this->nn = NormalsT::Zero(this->np, 3);
 
     for (qint32 p = 0; p < this->ntri; ++p) //check each triangle
     {
@@ -236,10 +235,9 @@ bool MNEBemSurface::addVertexNormals()
 
     // normalize
     for (qint32 p = 0; p < this->np; ++p) {
-        float size = 0;
-        size = this->nn.row(p) * this->nn.row(p).transpose();
-        size = std::pow(size, 0.5f);
-        this->nn.row(p) /= size;
+        const float size = this->nn.row(p).norm();
+        if (size > 0.0f)
+            this->nn.row(p) /= size;
     }
 
     return true;
