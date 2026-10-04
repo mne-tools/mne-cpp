@@ -1470,7 +1470,6 @@ QList<FiffProj> FiffStream::read_proj(const FiffDirNode::SPtr& p_Node)
         t_pFiffDirTreeItem->find_tag(this, FIFF_DESCRIPTION, t_pTag);
         QString desc; // maybe, in some cases this has to be a struct.
         if (t_pTag) {
-            qDebug() << "read_proj: this has to be debugged";
             desc = t_pTag->toString();
         } else {
             t_pFiffDirTreeItem->find_tag(this, FIFF_NAME, t_pTag);

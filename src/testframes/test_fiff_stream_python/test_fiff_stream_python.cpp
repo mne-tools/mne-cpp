@@ -26,6 +26,7 @@
 //=============================================================================================================
 
 #include <fiff/fiff_stream.h>
+#include <fiff/fiff_cov.h>
 #include <fiff/fiff_tag.h>
 #include <fiff/fiff_dir_node.h>
 #include <fiff/fiff_proj.h>
@@ -91,6 +92,7 @@ private slots:
     void coordTrans();
     void copiesProcessingHistory();
     void attachesEnvironment();
+    void readsFloatCovariance();
 
 private:
     FiffDirNode::SPtr findBlock(int kind) const;
@@ -330,6 +332,47 @@ void TestFiffStreamPython::attachesEnvironment()
     QVERIFY(meas[0]->find_tag(r, FIFF_NCHAN, tag));
     QCOMPARE(*tag->toInt(), 3);
     r->close();
+}
+
+void TestFiffStreamPython::readsFloatCovariance()
+{
+    // data/float_cov.fif (make_float_cov_fixture.py): single-precision covariances as MNE-C writes them.
+    QFile file(QStringLiteral(MNE_FIFF_STREAM_DATA_DIR "/float_cov.fif"));
+    FiffStream stream(&file);
+    QVERIFY(stream.open());
+
+    FiffCov noise;
+    QVERIFY(stream.read_cov(stream.dirtree(), FIFFV_MNE_NOISE_COV, noise));
+    QCOMPARE(noise.dim, 3);
+    QCOMPARE(noise.nfree, 42);
+    QVERIFY(!noise.diag);
+    QCOMPARE(noise.names, QStringList({"A", "B", "C"}));
+    Matrix3d full;
+    full << 1.164402008, 0.134921417, 0.535389721,
+        0.134921417, 2.983242273, -0.174825236,
+        0.535389721, -0.174825236, 3.042061329;
+    QVERIFY((noise.data - full).cwiseAbs().maxCoeff() < 1e-6);
+    QVERIFY((noise.eig - Vector3d(1.006871979, 2.928603736, 3.254229896)).cwiseAbs().maxCoeff() < 1e-6);
+    // Rows of eigvec are the eigenvectors, as in mne-python (whitener = diag(1/sqrt(eig)) * eigvec).
+    QCOMPARE(noise.eigvec.rows(), 3);
+    QVERIFY((noise.eigvec * full - noise.eig.asDiagonal() * noise.eigvec).cwiseAbs().maxCoeff() < 1e-5);
+    QCOMPARE(noise.bads, QStringList({"B"}));
+    QCOMPARE(noise.projs.size(), 1);
+    QCOMPARE(noise.projs[0].desc, QString("ECG-1"));
+    QCOMPARE(noise.projs[0].kind, static_cast<fiff_int_t>(FIFFV_PROJ_ITEM_FIELD));
+    QVERIFY(!noise.projs[0].active);
+    QCOMPARE(noise.projs[0].data->col_names, QStringList({"A", "B", "C"}));
+    QVERIFY((noise.projs[0].data->data - RowVector3d(0.0, 0.6, 0.8)).cwiseAbs().maxCoeff() < 1e-7);
+
+    FiffCov source;
+    QVERIFY(stream.read_cov(stream.dirtree(), FIFFV_MNE_SOURCE_COV, source));
+    QVERIFY(source.diag);
+    QCOMPARE(source.nfree, -1);
+    QCOMPARE(source.data.col(0), Vector4d(1.5, 2.5, 3.5, 4.5));
+
+    FiffCov missing;
+    QVERIFY(!stream.read_cov(stream.dirtree(), FIFFV_MNE_DEPTH_PRIOR_COV, missing));
+    stream.close();
 }
 
 //=============================================================================================================
