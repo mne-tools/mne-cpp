@@ -185,7 +185,6 @@ bool FiffRawData::read_raw_segment(MatrixXd& data,
             cal.setFromTriplets(tripletList.begin(), tripletList.end());
         } else {
             if (!projAvailable) {
-                qDebug() << "This has to be debugged! #1";
                 for (i = 0; i < sel.size(); ++i)
                     selVect.row(i) = this->comp.data->data.block(sel[i], 0, 1, nchan);
                 mult_full = selVect * cal;
@@ -195,7 +194,6 @@ bool FiffRawData::read_raw_segment(MatrixXd& data,
 
                 mult_full = selVect * cal;
             } else {
-                qDebug() << "This has to be debugged! #3";
                 for (i = 0; i < sel.size(); ++i)
                     selVect.row(i) = this->proj.block(sel[i], 0, 1, nchan);
 
@@ -489,7 +487,6 @@ bool FiffRawData::read_raw_segment(MatrixXd& data,
             cal.setFromTriplets(tripletList.begin(), tripletList.end());
         } else {
             if (!projAvailable) {
-                qDebug() << "This has to be debugged! #1";
                 for (i = 0; i < sel.size(); ++i)
                     selVect.row(i) = this->comp.data->data.block(sel[i], 0, 1, nchan);
                 mult_full = selVect * cal;
@@ -499,7 +496,6 @@ bool FiffRawData::read_raw_segment(MatrixXd& data,
 
                 mult_full = selVect * cal;
             } else {
-                qDebug() << "This has to be debugged! #3";
                 for (i = 0; i < sel.size(); ++i)
                     selVect.row(i) = this->proj.block(sel[i], 0, 1, nchan);
 

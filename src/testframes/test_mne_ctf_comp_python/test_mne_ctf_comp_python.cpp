@@ -54,6 +54,7 @@
 //=============================================================================================================
 
 #include <Eigen/Core>
+#include <Eigen/SparseCore>
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -138,6 +139,8 @@ private slots:
     void readsCompensationData();
     void fiffRawDataChangesGrade_data();
     void fiffRawDataChangesGrade();
+    void fiffRawDataPicksCompensated_data();
+    void fiffRawDataPicksCompensated();
     void mneRawDataChangesGrade_data();
     void mneRawDataChangesGrade();
     void mneRawDataRejectsMissingGrade();
@@ -218,6 +221,55 @@ void TestMneCtfCompPython::fiffRawDataChangesGrade()
     const double err = relError(data, m_reference[to], m_reference[from]);
     // Float32 file storage limits this to ~5e-7; the old (I + C1) inverse gave 1.3e-6.
     QVERIFY2(err < 1e-6, qPrintable(QString::number(err)));
+}
+
+//=============================================================================================================
+
+void TestMneCtfCompPython::fiffRawDataPicksCompensated_data()
+{
+    QTest::addColumn<bool>("withProj");
+    QTest::addColumn<bool>("returnMult");
+    QTest::newRow("compensation") << false << false;
+    QTest::newRow("compensation and projection") << true << false;
+    QTest::newRow("compensation, multiplier returned") << false << true;
+    QTest::newRow("compensation and projection, multiplier returned") << true << true;
+}
+
+void TestMneCtfCompPython::fiffRawDataPicksCompensated()
+{
+    QFETCH(bool, withProj);
+    QFETCH(bool, returnMult);
+
+    QFile file(fixture(3));
+    FiffRawData raw(file);
+    MNE::setup_compensators(raw, 0, false);
+    // Expected: mne-python's grade-0 data, projected away from the mean MEG signal if asked.
+    MatrixXd expected = m_reference[0];
+    if (withProj) {
+        VectorXd u = VectorXd::Zero(kNChan);
+        u.head(kNMeg).setOnes();
+        u.normalize();
+        raw.proj = MatrixXd::Identity(kNChan, kNChan) - u * u.transpose();
+        expected = raw.proj * expected;
+    }
+
+    RowVectorXi sel(5);
+    sel << 0, 3, 6, 10, 20;
+    MatrixXd data, times;
+    SparseMatrix<double> mult;
+    if (returnMult)
+        QVERIFY(raw.read_raw_segment(data, times, mult, -1, -1, sel));
+    else
+        QVERIFY(raw.read_raw_segment(data, times, -1, -1, sel));
+    QCOMPARE(data.rows(), sel.size());
+    QCOMPARE(data.cols(), kNSamp);
+    MatrixXd picked(sel.size(), kNSamp);
+    for (int i = 0; i < sel.size(); ++i)
+        picked.row(i) = expected.row(sel[i]);
+    const double err = relError(data, picked, picked);
+    QVERIFY2(err < 1e-6, qPrintable(QString::number(err)));
+    if (returnMult)
+        QCOMPARE(mult.rows(), sel.size());
 }
 
 //=============================================================================================================

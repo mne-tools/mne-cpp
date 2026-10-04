@@ -86,7 +86,6 @@ void MNE::setup_compensators(FiffRawData& raw,
         dest_comp = current_comp;
 
     if (current_comp != dest_comp) {
-        qDebug() << "This part needs to be debugged";
         if (MNE::make_compensator(raw.info, current_comp, dest_comp, raw.comp)) {
             //            raw.info.chs = MNE::set_current_comp(raw.info.chs,dest_comp);
             raw.info.set_current_comp(dest_comp);
