@@ -184,6 +184,7 @@ private slots:
     void sphereGuessGrid_data();
     void sphereGuessGrid();
     void guessesFromFile();
+    void printsFields();
     void commandLine();
     void commandLineRejects_data();
     void commandLineRejects();
@@ -595,6 +596,33 @@ void TestInvDipoleFitPython::sphereGuessGrid()
     InvGuessData guess(QString(), QString(), 0.0f, 0.02f, static_cast<float>(grid), m_fitData.get(), static_cast<float>(radius));
     QCOMPARE(guess.nguess, nguess);
     QVERIFY(std::abs(guess.rr.cast<double>().sum() - rrSum) < 1e-3);
+}
+
+//=============================================================================================================
+
+void TestInvDipoleFitPython::printsFields()
+{
+    // Sample 0 of the synthetic data is exactly the field of truth dipole 1.
+    std::unique_ptr<MNEMeasData> data(MNEMeasData::mne_read_meas_data(m_synthAve, 1, nullptr, nullptr, m_fitData->ch_names,
+                                                                      m_fitData->nmeg + m_fitData->neeg));
+    QVERIFY(data);
+    QString text;
+    QTextStream out(&text);
+    QVERIFY(InvDipoleFitData::print_fields(truthPos(0), truthMoment(0), 0.0f, 0.0f, *m_fitData, *data, out));
+    const QStringList lines = text.split('\n', Qt::SkipEmptyParts);
+    QCOMPARE(lines.size(), 305);
+    double worst = 0.0;
+    for (int k = 0; k < lines.size(); ++k) {
+        const QStringList cols = lines[k].split('\t');
+        QCOMPARE(cols.size(), 3);
+        QCOMPARE(cols[0], m_chNames[k]);
+        QVERIFY(std::abs(cols[1].toDouble() - 1e15 * m_fields(k, 0)) <= 1e-3 * std::abs(1e15 * m_fields(k, 0)) + 1e-3);
+        worst = std::max(worst, std::abs(cols[2].toDouble() - cols[1].toDouble()));
+    }
+    QVERIFY2(worst < 1e-2 * 1e15 * m_fields.col(0).cwiseAbs().maxCoeff(), qPrintable(QString::number(worst)));
+
+    QTest::ignoreMessage(QtWarningMsg, QRegularExpression("Cannot pick time"));
+    QVERIFY(!InvDipoleFitData::print_fields(truthPos(0), truthMoment(0), 10.0f, 0.0f, *m_fitData, *data, out));
 }
 
 //=============================================================================================================

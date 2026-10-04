@@ -836,43 +836,37 @@ InvDipoleFitData* InvDipoleFitData::setup_dipole_fit_data(const QString& mriname
 
 //=============================================================================================================
 
-// Dipole forward computation
-
-void print_fields(const Eigen::Vector3f& rd,
-                  const Eigen::Vector3f& Q,
-                  float time,
-                  float integ,
-                  InvDipoleFitData* fit,
-                  MNEMeasData* data)
-
+bool InvDipoleFitData::print_fields(const Eigen::Vector3f& rd,
+                                    const Eigen::Vector3f& Q,
+                                    float time,
+                                    float integ,
+                                    InvDipoleFitData& fit,
+                                    const MNEMeasData& data,
+                                    QTextStream& out)
 {
-    Eigen::VectorXf oneVec(data->nchan);
-    int k;
-    int nch = fit->nmeg + fit->neeg;
-
-    if (data->current->getValuesAtTime(time, integ, data->nchan, false, oneVec.data()) == FAIL) {
-        qWarning("Cannot pick time: %7.1f ms", 1000 * time);
-        return;
+    const int nch = fit.nmeg + fit.neeg;
+    if (data.nchan != nch || !data.current) {
+        qWarning("print_fields: the data do not hold the %d fit channels", nch);
+        return false;
     }
-    for (k = 0; k < data->nchan; k++)
-        if (data->chs[k].chpos.coil_type == FIFFV_COIL_CTF_REF_GRAD ||
-            data->chs[k].chpos.coil_type == FIFFV_COIL_CTF_OFFDIAG_REF_GRAD) {
-            qInfo("%g ", 1e15 * oneVec[k]);
-        }
-    qInfo("%s", "");
+    Eigen::VectorXf measured(nch);
+    if (data.current->getValuesAtTime(time, integ, nch, false, measured.data()) == FAIL) {
+        qWarning("Cannot pick time: %7.1f ms", 1000 * time);
+        return false;
+    }
+    if (fit.proj && fit.proj->project_vector(measured, true) == FAIL)
+        return false;
 
-    Eigen::MatrixXf fwd = Eigen::MatrixXf::Zero(nch, 3);
-    if (InvDipoleFitData::compute_dipole_field(*fit, rd, false, fwd) == FAIL)
-        return;
+    Eigen::MatrixXf fwd(nch, 3);
+    if (compute_dipole_field(fit, rd, false, fwd) == FAIL)
+        return false;
+    const Eigen::VectorXf predicted = fwd * Q;
 
-    for (k = 0; k < data->nchan; k++)
-        if (data->chs[k].chpos.coil_type == FIFFV_COIL_CTF_REF_GRAD ||
-            data->chs[k].chpos.coil_type == FIFFV_COIL_CTF_OFFDIAG_REF_GRAD) {
-            qInfo("%g ", 1e15 * (Q[0] * fwd(k, 0) + Q[1] * fwd(k, 1) + Q[2] * fwd(k, 2)));
-        }
-    qInfo("%s", "");
-
-    return;
+    for (int k = 0; k < nch; ++k) {
+        const double scale = k < fit.nmeg ? 1e15 : 1e6;
+        out << fit.ch_names[k] << '\t' << scale * measured[k] << '\t' << scale * predicted[k] << '\n';
+    }
+    return true;
 }
 
 //=============================================================================================================

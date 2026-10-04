@@ -47,6 +47,7 @@
 //=============================================================================================================
 
 #include <QSharedPointer>
+#include <QTextStream>
 
 #include <memory>
 
@@ -331,6 +332,33 @@ public:
      * @return OK on success, FAIL on error.
      */
     static int compute_dipole_field(InvDipoleFitData& d, const Eigen::Vector3f& rd, int whiten, Eigen::Ref<Eigen::MatrixXf> fwd);
+
+    //=========================================================================================================
+    /**
+     * @brief Write the measured and the predicted field of a dipole, channel by channel.
+     *
+     * A debugging aid: one line per fit channel with its name, the measured value at @p time and
+     * the value predicted by the dipole (MEG x 1e15, EEG x 1e6), both after projection.
+     *
+     * Refactored: print_fields (fit_dipoles.c), which printed only CTF reference gradiometers.
+     *
+     * @param[in]  rd     Dipole position in head coordinates (m).
+     * @param[in]  Q      Dipole moment (A m).
+     * @param[in]  time   Time point (s).
+     * @param[in]  integ  Integration window (s).
+     * @param[in]  fit    Dipole fit workspace.
+     * @param[in]  data   Measurement data read for the fit channels.
+     * @param[out] out    Stream the table is written to.
+     *
+     * @return true on success, false if the time cannot be picked or the channels do not match.
+     */
+    static bool print_fields(const Eigen::Vector3f& rd,
+                             const Eigen::Vector3f& Q,
+                             float time,
+                             float integ,
+                             InvDipoleFitData& fit,
+                             const MNELIB::MNEMeasData& data,
+                             QTextStream& out);
 
     //=========================================================================================================
     /**

@@ -299,6 +299,43 @@ Refactored: compute_dipole_field (fit_dipoles.c)
 
 ---
 
+### print_fields(rd, Q, time, integ, fit, data, out)
+
+Write the measured and the predicted field of a dipole, channel by channel.
+
+A debugging aid: one line per fit channel with its name, the measured value at `time` and the value predicted by the dipole (MEG x 1e15, EEG x 1e6), both after projection.
+
+Refactored: print_fields (fit_dipoles.c), which printed only CTF reference gradiometers.
+
+**Parameters:**
+
+- **rd** : *const Eigen::Vector3f &*
+  Dipole position in head coordinates (m).
+
+- **Q** : *const Eigen::Vector3f &*
+  Dipole moment (A m).
+
+- **time** : *float*
+  Time point (s).
+
+- **integ** : *float*
+  Integration window (s).
+
+- **fit** : *[InvDipoleFitData](/docs/api/inv/inv-dipole-fit-data) &*
+  Dipole fit workspace.
+
+- **data** : *const [MNEMeasData](/docs/api/mne/mne-meas-data) &*
+  Measurement data read for the fit channels.
+
+- **out** : *QTextStream &*
+  Stream the table is written to.
+
+**Returns:**
+
+- *bool* — true on success, false if the time cannot be picked or the channels do not match.
+
+---
+
 ### dipole_forward_one(d, rd, old)
 
 Compute the forward solution for a single dipole position.
