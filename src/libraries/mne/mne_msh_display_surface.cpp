@@ -407,11 +407,13 @@ int MNEMshDisplaySurface::iterate_alignment_once(FIFFLIB::FiffDigitizerData& dig
                 w[nactive] = nasion_weight;
                 if (nasion_mri) {
                     rr_mri.row(nactive) = nasion_mri->transpose();
-                    rr_head.row(nactive) = nasion_mri->transpose();
+                    // rr_head is column-major, so its rows are not contiguous; transform a copy.
+                    Eigen::Vector3f nasion_head = *nasion_mri;
                     Q_ASSERT(dig.head_mri_t || dig.head_mri_t_adj);
-                    FiffCoordTrans::apply_inverse_trans(rr_head.row(nactive).data(),
+                    FiffCoordTrans::apply_inverse_trans(nasion_head.data(),
                                                         dig.head_mri_t_adj ? *dig.head_mri_t_adj : *dig.head_mri_t,
                                                         FIFFV_MOVE);
+                    rr_head.row(nactive) = nasion_head.transpose();
                 }
             } else
                 w[nactive] = 1.0;

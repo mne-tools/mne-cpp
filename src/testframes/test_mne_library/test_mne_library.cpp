@@ -172,6 +172,8 @@ private slots:
     void displaySurf_decideExtent();
     void displaySurf_setupCurvatureColors();
     void displaySurf_alignment();
+    void displaySurf_alignFiducials_data();
+    void displaySurf_alignFiducials();
 
     // ── MNEMshDisplaySurfaceSet ──
     void displaySurfSet_load();
@@ -875,6 +877,103 @@ void TestMneLibrary::displaySurf_setupCurvatureColors()
     surf.setup_curvature_colors();
     QVERIFY(true);
 }
+
+void TestMneLibrary::displaySurf_alignFiducials_data()
+{
+    QTest::addColumn<int>("niter");
+    QTest::addColumn<bool>("scaleHead");
+    QTest::addColumn<double>("headScale");
+    QTest::addColumn<double>("tiltDeg");
+    QTest::addColumn<double>("tolMm");
+    // The fiducials alone define the head frame exactly; ICP must keep it there. A digitization
+    // tilted 3 degrees about the nasion is off by several mm until ICP pulls the points onto the
+    // scalp; points may slide along it, so that row checks the distance to the surface instead.
+    QTest::newRow("fiducials only") << 0 << false << 1.0 << 0.0 << 0.01;
+    QTest::newRow("ICP from the exact start") << 10 << false << 1.0 << 0.0 << 0.3;
+    QTest::newRow("ICP, tilted digitization") << 10 << false << 1.0 << 3.0 << 1.0;
+    QTest::newRow("head 10% larger, scaled") << 0 << true << 1.1 << 0.0 << 2.0;
+}
+
+void TestMneLibrary::displaySurf_alignFiducials()
+{
+    QFETCH(int, niter);
+    QFETCH(bool, scaleHead);
+    QFETCH(double, headScale);
+    QFETCH(double, tiltDeg);
+    QFETCH(double, tolMm);
+
+    const QString dir = QCoreApplication::applicationDirPath() + "/../resources/general/hpiAlignment/";
+    MNEMshDisplaySurfaceSet set;
+    QCOMPARE(set.add_bem_surface(dir + "fsaverage-head.fif", FIFFV_BEM_SURF_ID_HEAD, "head", 1, 1), 0);
+    MNEMshDisplaySurface* surf = set.surfs[0].get();
+    const MatrixX3f mriRr = surf->rr;
+    QFile fidFile(dir + "fsaverage-fiducials.fif");
+    FiffDigitizerData mriDig(fidFile);
+    QCOMPARE(mriDig.npoint, 3);
+
+    // mne-python get_ras_to_neuromag_trans(nasion, lpa, rpa) of the fsaverage fiducials.
+    Matrix4f mriHead;
+    mriHead << 0.999993682f, 0.003551874f, 0.000202048f, -0.001762732f,
+        -0.003557634f, 0.998389125f, 0.056625858f, 0.031094351f,
+        -0.000000595f, -0.056626219f, 0.998395443f, 0.039597249f,
+        0.0f, 0.0f, 0.0f, 1.0f;
+    const float s = static_cast<float>(headScale);
+    Vector3f nasionHead = Vector3f::Zero();
+    for (const FiffDigPoint& fid : mriDig.points)
+        if (fid.ident == FIFFV_POINT_NASION)
+            nasionHead = s * (mriHead.topLeftCorner<3, 3>() * Map<const Vector3f>(fid.r) + mriHead.topRightCorner<3, 1>());
+    const Matrix3f tilt = AngleAxisf(static_cast<float>(tiltDeg * M_PI / 180.0), Vector3f::UnitX()).toRotationMatrix();
+    auto toHead = [&](const Vector3f& rMri) {
+        const Vector3f h = s * (mriHead.topLeftCorner<3, 3>() * rMri + mriHead.topRightCorner<3, 1>());
+        return Vector3f(tilt * (h - nasionHead) + nasionHead);
+    };
+
+    FiffDigitizerData headDig;
+    headDig.coord_frame = FIFFV_COORD_HEAD;
+    for (const FiffDigPoint& fid : mriDig.points) {
+        FiffDigPoint p = fid;
+        Map<Vector3f>(p.r) = toHead(Map<const Vector3f>(fid.r));
+        headDig.points << p;
+    }
+    for (int k = 0; k < surf->np; k += 20) {
+        if (mriRr(k, 2) < 0.0f)
+            continue;
+        FiffDigPoint p;
+        p.kind = FIFFV_POINT_EXTRA;
+        p.ident = k;
+        Map<Vector3f>(p.r) = toHead(Vector3f(mriRr.row(k).transpose()));
+        headDig.points << p;
+    }
+    headDig.npoint = static_cast<int>(headDig.points.size());
+    headDig.active = QList<int>(headDig.npoint, 1);
+    headDig.discard = QList<int>(headDig.npoint, 0);
+    headDig.head_mri_t = std::make_unique<FiffCoordTrans>(FIFFV_COORD_HEAD, FIFFV_COORD_MRI, Matrix4f::Identity());
+
+    Vector3f scales;
+    QCOMPARE(surf->align_fiducials(headDig, mriDig, niter, scaleHead, 0.0f, scales), 0);
+    QVERIFY(headDig.head_mri_t_adj);
+    QCOMPARE(headDig.nfids(), 3);
+    if (scaleHead)
+        QVERIFY2(std::abs(scales[0] - headScale) < 0.03, qPrintable(QString::number(scales[0])));
+
+    if (tiltDeg > 0.0) {
+        const double before = 1e3 * tiltDeg * M_PI / 180.0 * 0.1;
+        const double surfRmsMm = 1e3 * surf->rms_digitizer_distance(headDig);
+        QVERIFY2(surfRmsMm < tolMm, qPrintable(QString("surface rms %1 mm (tilt displaces ~%2 mm)").arg(surfRmsMm).arg(before)));
+        return;
+    }
+    // Scalp points must land back on their MRI vertices (align_fiducials scales the surface in place).
+    double sum2 = 0.0;
+    for (int k = 3; k < headDig.npoint; ++k) {
+        Vector3f r = Map<const Vector3f>(headDig.points[k].r);
+        FiffCoordTrans::apply_trans(r.data(), *headDig.head_mri_t_adj, FIFFV_MOVE);
+        sum2 += (r - surf->rr.row(headDig.points[k].ident).transpose()).squaredNorm();
+    }
+    const double rmsMm = 1e3 * std::sqrt(sum2 / (headDig.npoint - 3));
+    QVERIFY2(rmsMm < tolMm, qPrintable(QString("rms %1 mm").arg(rmsMm)));
+}
+
+//=============================================================================================================
 
 void TestMneLibrary::displaySurf_alignment()
 {
