@@ -345,6 +345,10 @@ bool FiffEvoked::read(QIODevice& p_IODevice,
     qInfo("\t\tnave = %d - aspect type = %d\n", nave, aspect_kind);
 
     qint32 nepoch = epoch.size();
+    if (nepoch != 1 && nepoch != info.nchan) {
+        qWarning("Number of epoch tags is unreasonable (nepoch = %d nchan = %d)", nepoch, info.nchan);
+        return false;
+    }
     MatrixXd all_data;
     if (nepoch == 1) {
         //
@@ -359,17 +363,16 @@ bool FiffEvoked::read(QIODevice& p_IODevice,
             all_data.transposeInPlace();
     } else {
         //
-        //   Put the old style epochs together
+        //   Put the old style epochs together: one channel per tag
         //
-        all_data = epoch[0].toFloatMatrix().cast<double>();
-        all_data.transposeInPlace();
-        qint32 oldsize;
-        for (k = 1; k < nepoch; ++k) {
-            oldsize = all_data.rows();
-            MatrixXd tmp = epoch[k].toFloatMatrix().cast<double>();
-            tmp.transposeInPlace();
-            all_data.conservativeResize(oldsize + tmp.rows(), all_data.cols());
-            all_data.block(oldsize, 0, tmp.rows(), tmp.cols()) = tmp;
+        all_data.resize(nepoch, epoch[0].size() / static_cast<int>(sizeof(float)));
+        for (k = 0; k < nepoch; ++k) {
+            const int n = epoch[k].size() / static_cast<int>(sizeof(float));
+            if (n != all_data.cols()) {
+                qWarning("Old style epochs have different lengths (%d and %d)", n, (int)all_data.cols());
+                return false;
+            }
+            all_data.row(k) = Map<const RowVectorXf>(epoch[k].toFloat(), n).cast<double>();
         }
     }
     if (all_data.cols() != nsamp) {

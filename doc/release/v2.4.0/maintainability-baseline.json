@@ -3,7 +3,7 @@
   "generated_by": "tools/quality/audit_maintainability.py",
   "policy": "tools/quality/maintainability_policy.json",
   "scanned_files": 1505,
-  "scanned_lines": 393157,
+  "scanned_lines": 393160,
   "oversized_threshold": 2000,
   "metrics": {
     "null_macro": {
@@ -55,11 +55,11 @@
       }
     },
     "c_style_cast": {
-      "total": 433,
+      "total": 434,
       "files": 74,
       "by_scope": {
         "applications": 61,
-        "libraries": 274,
+        "libraries": 275,
         "tools": 98
       },
       "suppressed": [],
@@ -124,7 +124,7 @@
         "src/libraries/dsp/rt/rt_filter.cpp": 1,
         "src/libraries/fiff/fiff_coord_trans.cpp": 2,
         "src/libraries/fiff/fiff_dir_node.cpp": 4,
-        "src/libraries/fiff/fiff_evoked.cpp": 1,
+        "src/libraries/fiff/fiff_evoked.cpp": 2,
         "src/libraries/fiff/fiff_raw_data.cpp": 2,
         "src/libraries/fiff/fiff_stream.cpp": 82,
         "src/libraries/fiff/fiff_tag.cpp": 20,

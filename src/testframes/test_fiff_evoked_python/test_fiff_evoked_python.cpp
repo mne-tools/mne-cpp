@@ -27,6 +27,10 @@
  * All four share 376 channels, 421 samples, aspect kind 100 (average) and run
  * from -0.19979521315838786 s to 0.49948803289596966 s.
  *
+ * data/old_style-ave.fif (make_old_style_evoked_fixture.py) holds an older
+ * layout: channel information inside the evoked block and one FIFF_EPOCH tag
+ * per channel.
+ *
  */
 
 //=============================================================================================================
@@ -85,6 +89,7 @@ private slots:
     void times_matchPython();
     void conditionOrder_matchesPython();
     void dataSumsAreDistinct();
+    void oldStyleEvoked_matchesPython();
 };
 
 //=============================================================================================================
@@ -231,6 +236,30 @@ void TestFiffEvokedPython::dataSumsAreDistinct()
                                     .arg(j)));
         }
     }
+}
+
+//=============================================================================================================
+
+void TestFiffEvokedPython::oldStyleEvoked_matchesPython()
+{
+    QFile file(QStringLiteral(MNE_FIFF_EVOKED_DATA_DIR) + "/old_style-ave.fif");
+    const FiffEvoked e(file, 0, QPair<float, float>(-1.0f, -1.0f), false);
+
+    // mne.read_evokeds(..., baseline=None, proj=False): the local 200 Hz channel
+    // definitions and calibrations replace the measurement info's.
+    QCOMPARE(e.info.nchan, 6);
+    QCOMPARE(e.info.sfreq, 200.0);
+    QCOMPARE(e.info.chs[5].ch_name, QString("EEG3")); // MNE-CPP reads names without spaces
+    QCOMPARE(e.nave, 1);
+    QCOMPARE(e.aspect_kind, FIFFV_ASPECT_STD_ERR);
+    QCOMPARE(e.comment, QString("aspect comment"));
+    QCOMPARE(static_cast<int>(e.data.rows()), 6);
+    QCOMPARE(static_cast<int>(e.data.cols()), 20);
+    QVERIFY(std::fabs(e.times[0] + 0.02f) < 1e-7f);
+    QVERIFY(std::fabs(e.data(0, 0) - 0.2766302824020386) < 1e-12);
+    QVERIFY(std::fabs(e.data(5, 19) + 0.12329661194235086) < 1e-12);
+    QVERIFY2(std::fabs(e.data.cwiseAbs().sum() - 304.2275329530239) < 1e-9,
+             qPrintable(QString("abs sum %1").arg(e.data.cwiseAbs().sum(), 0, 'g', 17)));
 }
 
 //=============================================================================================================

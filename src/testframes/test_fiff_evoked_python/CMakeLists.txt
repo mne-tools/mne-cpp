@@ -55,6 +55,7 @@ mne_add_test(${PROJECT_NAME}
     TIMEOUT 60
     REQUIRES_DATA
         mne-cpp-test-data/MEG/sample)
+target_compile_definitions(${PROJECT_NAME} PRIVATE MNE_FIFF_EVOKED_DATA_DIR="${CMAKE_CURRENT_SOURCE_DIR}/data")
 if(NOT BUILD_SHARED_LIBS)
     target_compile_definitions(${PROJECT_NAME} PRIVATE STATICBUILD)
 endif()
