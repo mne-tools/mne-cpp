@@ -72,6 +72,7 @@ class TestFiffRawFormatsPython : public QObject
 private slots:
     void readsFormat_data();
     void readsFormat();
+    void readsAcquisitionSkip();
 };
 
 //=============================================================================================================
@@ -148,6 +149,39 @@ void TestFiffRawFormatsPython::readsFormat()
     // Out-of-range requests fail cleanly.
     MatrixXd none, noneTimes;
     QVERIFY(!raw.read_raw_segment(none, noneTimes, raw.last_samp + 10, raw.last_samp + 20));
+}
+
+//=============================================================================================================
+
+void TestFiffRawFormatsPython::readsAcquisitionSkip()
+{
+    // data/raw_skip_raw.fif (make_skip_fixture.py): ramp data whose samples 70-89 were written as a
+    // two-buffer FIFF_DATA_SKIP; mne-python reads them as zeros.
+    QFile file(fixture("skip"));
+    FiffRawData raw(file);
+    QCOMPARE(raw.first_samp, 50);
+    QCOMPARE(raw.last_samp, 149);
+
+    MatrixXd data, times;
+    QVERIFY(raw.read_raw_segment(data, times));
+    QCOMPARE(data.cols(), 100);
+    for (int s = 0; s < 100; ++s) {
+        const double expected = (s >= 70 && s < 90) ? 0.0 : s * 1e-6;
+        // Stored as float32.
+        QVERIFY2(std::abs(data(0, s) - expected) < 1e-12 + 1e-7 * std::abs(expected), qPrintable(QString("sample %1: %2").arg(s).arg(data(0, s))));
+    }
+    QVERIFY(std::abs(data(1, 95) + 95e-6) < 1e-11);
+
+    // A selection spanning the skip, starting and ending inside data buffers.
+    RowVectorXi sel(2);
+    sel << 2, 1;
+    MatrixXd part, partTimes;
+    QVERIFY(raw.read_raw_segment(part, partTimes, raw.first_samp + 65, raw.first_samp + 94, sel));
+    QCOMPARE(part.rows(), 2);
+    QCOMPARE(part.cols(), 30);
+    QCOMPARE(part.row(1), data.block(1, 65, 1, 30));
+    QVERIFY(std::abs(part(0, 0) - 7e-6) < 1e-12);
+    QCOMPARE(part(0, 10), 0.0);
 }
 
 //=============================================================================================================

@@ -1856,6 +1856,8 @@ bool FiffStream::setup_read_raw(QIODevice& p_IODevice,
             //
             if (nskip > 0) {
                 FiffRawDir t_RawDir;
+                // Readers recognise a skip by ent->kind == -1 (the FiffDirEntry default) and fill it with zeros.
+                t_RawDir.ent = FiffDirEntry::SPtr(new FiffDirEntry);
                 t_RawDir.first = first_samp;
                 t_RawDir.last = first_samp + nskip * nsamp - 1; //ToDo -1 right or is that MATLAB syntax
                 t_RawDir.nsamp = nskip * nsamp;
