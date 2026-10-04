@@ -5,6 +5,9 @@
 #include <QtTest/QtTest>
 #include <Eigen/Dense>
 
+#include <cstring>
+#include <new>
+
 #include <utils/generics/mne_logger.h>
 
 #include <fiff/fiff_info_base.h>
@@ -148,6 +151,12 @@ private slots:
         FiffInfoBase info1 = makeSyntheticInfoBase(2);
         FiffInfoBase info2 = makeSyntheticInfoBase(2);
         QVERIFY(info1 == info2);
+        // ez was left uninitialized, so this held only when the stack happened to be finite.
+        alignas(FiffChPos) unsigned char storage[sizeof(FiffChPos)];
+        std::memset(storage, 0xff, sizeof(storage));
+        FiffChPos* pos = new (storage) FiffChPos;
+        QVERIFY(pos->r0.isZero() && pos->ex.isZero() && pos->ey.isZero() && pos->ez.isZero());
+        pos->~FiffChPos();
     }
 
     void infoBase_pickTypes()

@@ -34,13 +34,11 @@ using namespace FIFFLIB;
 
 FiffChPos::FiffChPos()
 : coil_type(0)
+, r0(Eigen::Vector3f::Zero())
+, ex(Eigen::Vector3f::Zero())
+, ey(Eigen::Vector3f::Zero())
+, ez(Eigen::Vector3f::Zero())
 {
-    for (qint32 i = 0; i < 3; ++i) {
-        r0[i] = 0.0f;
-        ex[i] = 0.0f;
-        ey[i] = 0.0f;
-        ey[i] = 0.0f;
-    }
 }
 
 //=============================================================================================================
