@@ -163,8 +163,29 @@ void TestFiffRawFormatsPython::readsFormat()
     QVERIFY(raw.read_raw_segment(selProj, selProjTimes, raw.first_samp + 20, raw.first_samp + 39, sel));
     QVERIFY2(closeTo(selProj.cwiseAbs().sum(), selProjSum, 1e-5), qPrintable(QString::number(selProj.cwiseAbs().sum(), 'g', 12)));
 
+    // The overload used by the browsers also returns the operator it applied to the stored samples:
+    // projector times calibration, so mult * (data / cal) reproduces the projected segment.
+    SparseMatrix<double> mult;
+    MatrixXd multData, multTimes, none, noneTimes;
+    QVERIFY(raw.read_raw_segment(multData, multTimes, mult, raw.first_samp + 20, raw.first_samp + 39, sel));
+    QVERIFY((multData - selProj).cwiseAbs().maxCoeff() <= 1e-12 * selProj.cwiseAbs().maxCoeff());
+    QCOMPARE(static_cast<int>(mult.rows()), 3);
+    QCOMPARE(static_cast<int>(mult.cols()), 12);
+    const MatrixXd stored = raw.cals.asDiagonal().inverse() * data.middleCols(20, 20);
+    QVERIFY((MatrixXd(mult) * stored - selProj).cwiseAbs().maxCoeff() <= 1e-9 * selProj.cwiseAbs().maxCoeff());
+    QVERIFY(raw.read_raw_segment(multData, multTimes, mult));
+    QVERIFY((multData - proj).cwiseAbs().maxCoeff() <= 1e-12 * proj.cwiseAbs().maxCoeff());
+    QVERIFY(!raw.read_raw_segment(none, noneTimes, mult, raw.last_samp + 10, raw.last_samp + 20));
+
+    // Without a projector the overload returns the calibration alone.
+    raw.proj = MatrixXd();
+    QVERIFY(raw.read_raw_segment(multData, multTimes, mult, raw.first_samp + 20, raw.first_samp + 39, sel));
+    QCOMPARE(multData, selData);
+    QVERIFY((MatrixXd(mult).diagonal() - Vector3d(raw.cals(10), raw.cals(0), raw.cals(6))).cwiseAbs().maxCoeff() == 0.0);
+    QVERIFY(raw.read_raw_segment(multData, multTimes, mult));
+    QCOMPARE(multData, data);
+
     // Out-of-range requests fail cleanly.
-    MatrixXd none, noneTimes;
     QVERIFY(!raw.read_raw_segment(none, noneTimes, raw.last_samp + 10, raw.last_samp + 20));
 }
 
