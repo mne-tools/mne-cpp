@@ -26,9 +26,11 @@
 #include <mne/mne_meas_data.h>
 #include <mne/mne_meas_data_set.h>
 #include <mne/mne_raw_data.h>
+#include <mne/mne_proj_op.h>
 #include <mne/mne_raw_info.h>
 #include <mne/mne_sss_data.h>
 
+#include <algorithm>
 #include <cmath>
 #include <memory>
 #include <vector>
@@ -82,6 +84,7 @@ private slots:
     void readsFormat();
     void readsAcquisitionSkip();
     void readsLeadingSkip();
+    void projectsAcrossSkip();
     void readsSssInfo();
     void mneRawDataMatches_data();
     void mneRawDataMatches();
@@ -225,6 +228,36 @@ void TestFiffRawFormatsPython::readsLeadingSkip()
             rows[c] = values.row(c).data();
         QCOMPARE(mne->pick_data(nullptr, mne->first_samp, 80, rows.data()), 0);
         QVERIFY((values.cast<double>() - ref).cwiseAbs().maxCoeff() <= 1e-6 * ref.cwiseAbs().maxCoeff());
+    }
+}
+
+//=============================================================================================================
+
+void TestFiffRawFormatsPython::projectsAcrossSkip()
+{
+    // raw_skip_raw.fif: EEG 001 = s, EEG 002 = -s (x 1e-6, s from 0), samples 70-89 skipped.
+    // The average reference over the two EEG channels leaves them unchanged (their mean is 0).
+    std::unique_ptr<MNERawData> mne(MNERawData::open_file(fixture("skip"), false, false, MNEFilterDef()));
+    QVERIFY(mne);
+    mne->proj = MNEProjOp::create_average_eeg_ref(mne->info->chInfo, mne->info->nchan);
+    QVERIFY(mne->proj);
+    QCOMPARE(mne->proj->assign_channels(mne->ch_names, mne->info->nchan), 0);
+    QCOMPARE(mne->proj->make_proj(), 0);
+
+    // From 2 samples before the data to 3 past its end, across the skip.
+    const int first = mne->first_samp - 2;
+    const int ns = 105;
+    for (bool project : {false, true}) {
+        Matrix<float, Dynamic, Dynamic, RowMajor> values(3, ns);
+        std::vector<float*> rows{values.row(0).data(), values.row(1).data(), values.row(2).data()};
+        QCOMPARE(project ? mne->pick_data_proj(nullptr, first, ns, rows.data()) : mne->pick_data(nullptr, first, ns, rows.data()), 0);
+        for (int k = 0; k < ns; ++k) {
+            const int s = std::clamp(k - 2, 0, 99);
+            const float expected = (k < 2 || (s >= 70 && s < 90)) ? 0.0f : s * 1e-6f;
+            const float tol = 1e-12f + 1e-6f * expected;
+            QVERIFY2(std::abs(values(0, k) - expected) <= tol && std::abs(values(1, k) + expected) <= tol,
+                     qPrintable(QString("%1 sample %2: %3").arg(project).arg(k).arg(values(0, k))));
+        }
     }
 }
 
