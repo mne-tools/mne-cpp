@@ -82,7 +82,7 @@ public:
     //=========================================================================================================
     /**
      * Constructs the Guess Data from given Data
-     * Refactored: make_guess_data (setup.c)
+     * Refactored: make_guess_data (dipole_fit_setup.c)
      *
      * @param[in] guessname File with a predefined guess point set (empty = build a grid).
      * @param[in] guess_surfname Surface file bounding the guess grid (empty = inner skull of the BEM, or a sphere).
@@ -94,23 +94,6 @@ public:
      *
      */
     InvGuessData(const QString& guessname, const QString& guess_surfname, float mindist, float exclude, float grid, InvDipoleFitData* f, float guessrad = 0.080f);
-
-    //=========================================================================================================
-    /**
-     * Constructs the Guess Data from given Data
-     * Refactored: make_guess_data (dipole_fit_setup.c)
-     *
-     * @param[in] guessname File with a predefined guess point set (empty = build a grid).
-     * @param[in] guess_surfname Surface file bounding the guess grid (empty = inner skull of the BEM, or a sphere).
-     * @param[in] mindist Minimum distance of guess points from the bounding surface (m).
-     * @param[in] exclude Exclude guess points closer than this to the sphere origin (m).
-     * @param[in] grid Spacing of the guess grid (m).
-     * @param[in, out] f Dipole fit data providing the forward model.
-     * @param[in, out] guess_save_name File to save the guess points to (nullptr = do not save; saving is not implemented yet).
-     * @param[in] guessrad Radius of the spherical guess volume when no surface bounds it (m).
-     *
-     */
-    InvGuessData(const QString& guessname, const QString& guess_surfname, float mindist, float exclude, float grid, InvDipoleFitData* f, char* guess_save_name, float guessrad = 0.080f);
 
     //=========================================================================================================
     /**

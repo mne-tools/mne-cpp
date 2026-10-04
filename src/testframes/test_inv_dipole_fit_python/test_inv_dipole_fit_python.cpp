@@ -174,6 +174,7 @@ private slots:
     void surfaceGuessesFitMatches();
     void sphereGuessGrid_data();
     void sphereGuessGrid();
+    void guessesFromFile();
     void commandLine();
     void commandLineRejects_data();
     void commandLineRejects();
@@ -444,6 +445,47 @@ void TestInvDipoleFitPython::sphereGuessGrid()
     InvGuessData guess(QString(), QString(), 0.0f, 0.02f, static_cast<float>(grid), m_fitData.get(), static_cast<float>(radius));
     QCOMPARE(guess.nguess, nguess);
     QVERIFY(std::abs(guess.rr.cast<double>().sum() - rrSum) < 1e-3);
+}
+
+//=============================================================================================================
+
+void TestInvDipoleFitPython::guessesFromFile()
+{
+    // A volume source space as --guess file, moved to head coordinates with the MRI transform.
+    const QString data = QCoreApplication::applicationDirPath() + "/../resources/data/mne-cpp-test-data/";
+    const QString guessFile = QStringLiteral(MNE_VOL_SRC_DATA_DIR "/sample-vol25-src.fif");
+    QVERIFY(QFile::exists(guessFile));
+    QStringList projnames{m_sampleAve};
+    Vector3f r0(0.0f, 0.0f, 0.04f);
+    std::unique_ptr<InvDipoleFitData> fitData(InvDipoleFitData::setup_dipole_fit_data(
+        data + "MEG/sample/all-trans.fif", m_sampleAve, QString(), &r0, nullptr, false, QString(), QString(),
+        5e-13f, 20e-15f, 0.2e-6f, 0.1f, 0.1f, 0.1f, false, projnames, true, false));
+    QVERIFY(fitData);
+    fitData->funcs = fitData->sphere_funcs.get();
+
+    InvGuessData guess(guessFile, QString(), 0.0f, 0.0f, 0.01f, fitData.get());
+    // mne-python: apply_trans(mri_head_t, src[0]['rr'][src[0]['vertno']])
+    QCOMPARE(guess.nguess, 87);
+    QVERIFY2(std::abs(guess.rr.cast<double>().sum() - 6.483795735946459) < 1e-5, qPrintable(QString::number(guess.rr.cast<double>().sum(), 'g', 12)));
+    QVERIFY((guess.rr.row(0).transpose() - Vector3f(-0.02775475f, -0.04865797f, 0.0368692f)).norm() < 1e-6f);
+    QCOMPARE(static_cast<int>(guess.guess_fwd.size()), 87);
+    // The guess forward solution is the field of the sphere model at that location.
+    MatrixXf g(fitData->nmeg, 3);
+    QCOMPARE(InvDipoleFitData::compute_dipole_field(*fitData, Vector3f(guess.rr.row(5).transpose()), false, g), 0);
+    QVERIFY(guess.guess_fwd[5]);
+    QVERIFY(guess.guess_fwd[5]->sing.size() == 3 && guess.guess_fwd[5]->sing[0] > 0.0f);
+
+    // A file that is not a source space gives no guesses.
+    QTest::ignoreMessage(QtCriticalMsg, "No source spaces available here");
+    InvGuessData none(m_sampleAve, QString(), 0.0f, 0.0f, 0.01f, fitData.get());
+    QCOMPARE(none.nguess, 0);
+
+    // Fields need the noise covariance that whitens them.
+    fitData->noise.reset();
+    QTest::ignoreMessage(QtCriticalMsg, "Noise covariance missing in compute_guess_fields");
+    QVERIFY(!guess.compute_guess_fields(fitData.get()));
+    QTest::ignoreMessage(QtCriticalMsg, "Data missing in compute_guess_fields");
+    QVERIFY(!guess.compute_guess_fields(nullptr));
 }
 
 //=============================================================================================================
