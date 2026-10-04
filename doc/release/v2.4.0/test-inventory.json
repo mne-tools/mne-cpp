@@ -6,9 +6,9 @@
     "commit": "96413f7ccc7dabed2c6d40a511960ce8805e0407"
   },
   "summary": {
-    "directories": 251,
+    "directories": 252,
     "registration": {
-      "unconditional": 244,
+      "unconditional": 245,
       "conditional": 4,
       "unregistered": 3
     },
@@ -36,6 +36,7 @@
           "test_fiff_raw_formats_python",
           "test_fiff_raw_save_python",
           "test_fiff_stream_python",
+          "test_fwd_bem_driver_python",
           "test_fwd_bem_field_integrals",
           "test_fwd_python",
           "test_inv_beamformer_python",
@@ -62,6 +63,7 @@
           "test_fiff_raw_formats_python",
           "test_fiff_raw_save_python",
           "test_fiff_stream_python",
+          "test_fwd_bem_driver_python",
           "test_fwd_bem_field_integrals",
           "test_fwd_python",
           "test_inv_beamformer_python",
@@ -88,6 +90,7 @@
           "test_fiff_raw_formats_python",
           "test_fiff_raw_save_python",
           "test_fiff_stream_python",
+          "test_fwd_bem_driver_python",
           "test_fwd_bem_field_integrals",
           "test_fwd_python",
           "test_inv_beamformer_python",
@@ -3295,6 +3298,36 @@
         "FwdBemModel",
         "MNEBem"
       ]
+    },
+    {
+      "name": "test_fwd_bem_driver_python",
+      "cmake": "src/testframes/test_fwd_bem_driver_python/CMakeLists.txt",
+      "registration": {
+        "state": "unconditional",
+        "via": "src/testframes/CMakeLists.txt",
+        "conditions": [],
+        "early_return_guard": null,
+        "unregistered_reason": null
+      },
+      "add_test_names": [
+        "test_fwd_bem_driver_python"
+      ],
+      "labels": [
+        "parity",
+        "unit"
+      ],
+      "timeout": 120,
+      "requirements": [],
+      "gui": false,
+      "qskip_sites": 0,
+      "spawns_processes": false,
+      "ci_excluded_on": [],
+      "ci": {
+        "macos-26": "absent",
+        "ubuntu-24.04": "absent",
+        "windows-2025-vs2026": "absent"
+      },
+      "registry_classes": []
     },
     {
       "name": "test_fwd_bem_field_computation",
