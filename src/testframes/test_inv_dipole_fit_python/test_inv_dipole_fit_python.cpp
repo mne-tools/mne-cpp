@@ -46,8 +46,12 @@
 #include <fiff/fiff_evoked_set.h>
 #include <fiff/fiff_raw_data.h>
 #include <fiff/fiff_stream.h>
+#include <mne/mne_cov_matrix.h>
+#include <mne/mne_meas_data.h>
+#include <mne/mne_meas_data_set.h>
 
 #include <memory>
+#include <vector>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -69,6 +73,7 @@
 
 using namespace INVLIB;
 using namespace FIFFLIB;
+using namespace MNELIB;
 using namespace Eigen;
 
 namespace
@@ -172,6 +177,8 @@ private slots:
     void commandLine();
     void commandLineRejects_data();
     void commandLineRejects();
+    void selectsNoiseCov_data();
+    void selectsNoiseCov();
     void rejectsMissingInput();
 
 private:
@@ -581,6 +588,97 @@ void TestInvDipoleFitPython::commandLineRejects()
     QTest::ignoreMessage(QtCriticalMsg, message.toUtf8().constData());
     // Parsing stops at the error, before checkIntegrity would also complain about the missing --meas.
     InvDipoleFitSettings s(&argc, argv.data());
+}
+
+//=============================================================================================================
+
+void TestInvDipoleFitPython::selectsNoiseCov_data()
+{
+    QTest::addColumn<bool>("dense");
+    QTest::addColumn<int>("nUnselected");
+    QTest::addColumn<int>("nave");
+    QTest::addColumn<bool>("ok");
+    // MNE-C (dipole_fit_setup.c): unselected channels get weight 30, the covariance scales
+    // by noise nave / data nave, and fewer than 20 remaining channels of a kind is an error.
+    QTest::newRow("diag, all selected") << false << 0 << 4 << true;
+    QTest::newRow("diag, 3 unselected") << false << 3 << 4 << true;
+    QTest::newRow("dense, 3 unselected") << true << 3 << 2 << true;
+    QTest::newRow("dense, too few left") << true << 10 << 1 << false;
+}
+
+void TestInvDipoleFitPython::selectsNoiseCov()
+{
+    QFETCH(bool, dense);
+    QFETCH(int, nUnselected);
+    QFETCH(int, nave);
+    QFETCH(bool, ok);
+
+    constexpr int kN = 25;
+    QStringList names;
+    MNEMeasData meas;
+    for (int k = 0; k < kN; ++k) {
+        names << QStringLiteral("MEG%1").arg(k, 4, 10, QChar('0'));
+        FiffChInfo ch;
+        ch.ch_name = names.last();
+        meas.chs << ch;
+    }
+    meas.nchan = kN;
+    auto* set = new MNEMeasDataSet;
+    set->nave = nave;
+    meas.sets << set;
+    meas.nset = 1;
+    meas.current = set;
+
+    VectorXd diag = VectorXd::LinSpaced(kN, 1.0, 2.0);
+    InvDipoleFitData fit;
+    fit.nave = 1;
+    if (dense) {
+        MatrixXd full = 0.1 * MatrixXd::Ones(kN, kN);
+        full.diagonal() += diag;
+        VectorXd packed(kN * (kN + 1) / 2);
+        for (int j = 0; j < kN; ++j)
+            for (int k = 0; k <= j; ++k)
+                packed[MNECovMatrix::lt_packed_index(j, k)] = full(j, k);
+        fit.noise_orig = MNECovMatrix::create_dense(FIFFV_MNE_NOISE_COV, kN, names, packed);
+    } else {
+        fit.noise_orig = MNECovMatrix::create_diag(FIFFV_MNE_NOISE_COV, kN, names, diag);
+    }
+    fit.noise_orig->ch_class = VectorXi::Constant(kN, MNE_COV_CH_MEG_GRAD);
+
+    std::vector<int> sels(kN, 1);
+    for (int k = 0; k < nUnselected; ++k)
+        sels[kN - 1 - k] = 0;
+    if (!ok)
+        QTest::ignoreMessage(QtCriticalMsg, "Too few MEG channels remaining");
+    QCOMPARE(InvDipoleFitData::select_dipole_fit_noise_cov(&fit, &meas, -1, sels.data()) == 0, ok);
+    if (!ok)
+        return;
+    QCOMPARE(fit.nave, nave);
+
+    VectorXd w = VectorXd::Ones(kN);
+    w.tail(nUnselected).setConstant(30.0);
+    const double ratio = 1.0 / nave;
+    if (dense) {
+        for (int j = 0; j < kN; ++j)
+            for (int k = 0; k <= j; ++k) {
+                const double expected = ratio * w[j] * w[k] * ((j == k ? diag[j] : 0.0) + 0.1);
+                // condition() rebuilds the matrix from its float eigen decomposition, as MNE-C does.
+                QVERIFY(std::abs(fit.noise->cov[MNECovMatrix::lt_packed_index(j, k)] - expected) < 1e-5 * expected);
+            }
+        QCOMPARE(fit.noise->lambda.size(), kN);
+        QVERIFY(fit.noise->lambda.minCoeff() > 0.0);
+    } else {
+        const VectorXd expected = ratio * w.cwiseProduct(w).cwiseProduct(diag);
+        QVERIFY((fit.noise->cov_diag - expected).cwiseAbs().maxCoeff() < 1e-12);
+        QVERIFY((fit.noise->inv_lambda - expected.cwiseSqrt().cwiseInverse()).cwiseAbs().maxCoeff() < 1e-9);
+    }
+    // The original stays untouched for the next selection.
+    QCOMPARE(fit.noise_orig->ncov, kN);
+    QVERIFY(dense || (fit.noise_orig->cov_diag - diag).cwiseAbs().maxCoeff() == 0.0);
+
+    // Without a selection, nave alone rescales the original.
+    QCOMPARE(InvDipoleFitData::select_dipole_fit_noise_cov(&fit, &meas, 2 * nave, nullptr), 0);
+    QCOMPARE(fit.nave, 2 * nave);
 }
 
 //=============================================================================================================
