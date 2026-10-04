@@ -487,6 +487,14 @@ void TestFiffStreamPython::readsTagTypes()
         QCOMPARE(MatrixXd(t->toSparseFloatMatrix()), expected);
     }
 
+    // getInfo names the type of each tag as make_tag_types_fixture.py wrote it.
+    const QList<QPair<int, QString>> infos{{901, "Simple type FIFFT_DOUBLE"}, {902, "Simple type FIFFT_SHORT"}, {903, "Simple type FIFFT_USHORT"}, {904, "Simple type FIFFT_JULIAN"}, {905, "Simple type FIFFT_DAU_PACK16"}, {906, "Simple type FIFFT_COMPLEX_FLOAT"}, {907, "Matrix of type FIFFT_DOUBLE"}, {908, "Matrix of type FIFFT_COMPLEX_FLOAT"}, {909, "Matrix of type FIFFT_FLOAT"}};
+    for (const auto& [kind, info] : infos)
+        QCOMPARE(tag(kind)->getInfo(), info);
+    FiffTag unknown;
+    unknown.type = 9999;
+    QCOMPARE(unknown.getInfo(), QString("Structure unknown"));
+
     // write_tag must turn every payload back into file byte order.
     const QString copyPath = m_dir.filePath("tag-types-copy.fif");
     {

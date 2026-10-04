@@ -161,6 +161,9 @@ QString FiffTag::getInfo() const
             case FIFFT_UINT:
                 t_qStringInfo = "Simple type FIFFT_UINT";
                 break;
+            case FIFFT_JULIAN:
+                t_qStringInfo = "Simple type FIFFT_JULIAN";
+                break;
             case FIFFT_FLOAT:
                 t_qStringInfo = "Simple type FIFFT_FLOAT";
                 break;
