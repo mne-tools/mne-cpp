@@ -27,6 +27,7 @@
 #include <mne/mne_meas_data_set.h>
 #include <mne/mne_raw_data.h>
 #include <mne/mne_raw_info.h>
+#include <mne/mne_sss_data.h>
 
 #include <cmath>
 #include <memory>
@@ -81,6 +82,7 @@ private slots:
     void readsFormat();
     void readsAcquisitionSkip();
     void readsLeadingSkip();
+    void readsSssInfo();
     void mneRawDataMatches_data();
     void mneRawDataMatches();
     void mneRawDataNormalisesChannels();
@@ -224,6 +226,33 @@ void TestFiffRawFormatsPython::readsLeadingSkip()
         QCOMPARE(mne->pick_data(nullptr, mne->first_samp, 80, rows.data()), 0);
         QVERIFY((values.cast<double>() - ref).cwiseAbs().maxCoeff() <= 1e-6 * ref.cwiseAbs().maxCoeff());
     }
+}
+
+//=============================================================================================================
+
+void TestFiffRawFormatsPython::readsSssInfo()
+{
+    // data/raw_sss_raw.fif (make_sss_fixture.py) carries the SSS block of an mne-python maxwell_filter
+    // run: job 2, head frame, origin (0, 0, 40) mm, 306 channels, orders 8 / 3, 70 of 80 internal
+    // and all 15 external components in use.
+    auto sss = MNESssData::read(fixture("sss"));
+    QVERIFY(sss);
+    QCOMPARE(sss->job, FIFFV_SSS_JOB_FILTER);
+    QCOMPARE(sss->coord_frame, FIFFV_COORD_HEAD);
+    QVERIFY((Map<const Vector3f>(sss->origin) - Vector3f(0.0f, 0.0f, 0.04f)).norm() < 1e-7f);
+    QCOMPARE(sss->nchan, 306);
+    QCOMPARE(sss->in_order, 8);
+    QCOMPARE(sss->out_order, 3);
+    QCOMPARE(sss->comp_info.size(), 95);
+    QCOMPARE(sss->in_nuse, 70);
+    QCOMPARE(sss->out_nuse, 15);
+
+    // MNERawData keeps it; a file without SSS information has none.
+    std::unique_ptr<MNERawData> mne(MNERawData::open_file(fixture("sss"), false, false, MNEFilterDef()));
+    QVERIFY(mne && mne->sss);
+    QCOMPARE(mne->sss->in_nuse, 70);
+    std::unique_ptr<MNERawData> plain(MNERawData::open_file(fixture("single"), false, false, MNEFilterDef()));
+    QVERIFY(plain && !plain->sss);
 }
 
 //=============================================================================================================
