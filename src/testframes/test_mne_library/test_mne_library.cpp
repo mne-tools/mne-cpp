@@ -885,13 +885,17 @@ void TestMneLibrary::displaySurf_alignFiducials_data()
     QTest::addColumn<double>("headScale");
     QTest::addColumn<double>("tiltDeg");
     QTest::addColumn<double>("tolMm");
+    QTest::addColumn<int>("outliers");
     // The fiducials alone define the head frame exactly; ICP must keep it there. A digitization
     // tilted 3 degrees about the nasion is off by several mm until ICP pulls the points onto the
     // scalp; points may slide along it, so that row checks the distance to the surface instead.
-    QTest::newRow("fiducials only") << 0 << false << 1.0 << 0.0 << 0.01;
-    QTest::newRow("ICP from the exact start") << 10 << false << 1.0 << 0.0 << 0.3;
-    QTest::newRow("ICP, tilted digitization") << 10 << false << 1.0 << 3.0 << 1.0;
-    QTest::newRow("head 10% larger, scaled") << 0 << true << 1.1 << 0.0 << 2.0;
+    // Outliers are pushed 30 mm outward (16-30 mm from the scalp per scipy cKDTree on the
+    // vertices) and must be discarded at a 10 mm limit before ICP.
+    QTest::newRow("fiducials only") << 0 << false << 1.0 << 0.0 << 0.01 << 0;
+    QTest::newRow("ICP from the exact start") << 10 << false << 1.0 << 0.0 << 0.3 << 0;
+    QTest::newRow("ICP, tilted digitization") << 10 << false << 1.0 << 3.0 << 1.0 << 0;
+    QTest::newRow("head 10% larger, scaled") << 0 << true << 1.1 << 0.0 << 2.0 << 0;
+    QTest::newRow("ICP, outliers discarded") << 10 << false << 1.0 << 0.0 << 0.3 << 5;
 }
 
 void TestMneLibrary::displaySurf_alignFiducials()
@@ -901,6 +905,7 @@ void TestMneLibrary::displaySurf_alignFiducials()
     QFETCH(double, headScale);
     QFETCH(double, tiltDeg);
     QFETCH(double, tolMm);
+    QFETCH(int, outliers);
 
     const QString dir = QCoreApplication::applicationDirPath() + "/../resources/general/hpiAlignment/";
     MNEMshDisplaySurfaceSet set;
@@ -944,13 +949,23 @@ void TestMneLibrary::displaySurf_alignFiducials()
         Map<Vector3f>(p.r) = toHead(Vector3f(mriRr.row(k).transpose()));
         headDig.points << p;
     }
+    for (int i = 0; i < outliers; ++i) {
+        const Vector3f r = mriRr.row(350 * (i + 1)).transpose();
+        FiffDigPoint p;
+        p.kind = FIFFV_POINT_EXTRA;
+        p.ident = -1;
+        Map<Vector3f>(p.r) = toHead(Vector3f(r + 0.03f * r.normalized()));
+        headDig.points << p;
+    }
     headDig.npoint = static_cast<int>(headDig.points.size());
     headDig.active = QList<int>(headDig.npoint, 1);
     headDig.discard = QList<int>(headDig.npoint, 0);
     headDig.head_mri_t = std::make_unique<FiffCoordTrans>(FIFFV_COORD_HEAD, FIFFV_COORD_MRI, Matrix4f::Identity());
 
     Vector3f scales;
-    QCOMPARE(surf->align_fiducials(headDig, mriDig, niter, scaleHead, 0.0f, scales), 0);
+    QCOMPARE(surf->align_fiducials(headDig, mriDig, niter, scaleHead, outliers > 0 ? 0.01f : 0.0f, scales), 0);
+    for (int k = 0; k < headDig.npoint; ++k)
+        QCOMPARE(headDig.discard[k], headDig.points[k].ident == -1 ? 1 : 0);
     QVERIFY(headDig.head_mri_t_adj);
     QCOMPARE(headDig.nfids(), 3);
     if (scaleHead)
@@ -964,12 +979,13 @@ void TestMneLibrary::displaySurf_alignFiducials()
     }
     // Scalp points must land back on their MRI vertices (align_fiducials scales the surface in place).
     double sum2 = 0.0;
-    for (int k = 3; k < headDig.npoint; ++k) {
+    const int nScalp = headDig.npoint - 3 - outliers;
+    for (int k = 3; k < 3 + nScalp; ++k) {
         Vector3f r = Map<const Vector3f>(headDig.points[k].r);
         FiffCoordTrans::apply_trans(r.data(), *headDig.head_mri_t_adj, FIFFV_MOVE);
         sum2 += (r - surf->rr.row(headDig.points[k].ident).transpose()).squaredNorm();
     }
-    const double rmsMm = 1e3 * std::sqrt(sum2 / (headDig.npoint - 3));
+    const double rmsMm = 1e3 * std::sqrt(sum2 / nScalp);
     QVERIFY2(rmsMm < tolMm, qPrintable(QString("rms %1 mm").arg(rmsMm)));
 }
 
