@@ -343,6 +343,13 @@ void TestMneRawDataPython::filtersSegments()
     PickBuffer plain(sel.nchan, ns);
     QCOMPARE(raw->pick_data(&sel, raw->first_samp + offset, ns, plain.rows.data()), 0);
     QCOMPARE(buf.values.row(4), plain.values.row(4));
+
+    // Without a selection every channel is filtered, in file order; a fresh reader has no cached buffers.
+    std::unique_ptr<MNERawData> fresh(MNERawData::open_file(m_rawPath, false, false, filter));
+    PickBuffer all(fresh->info->nchan, ns);
+    QCOMPARE(fresh->pick_data_filt(nullptr, fresh->first_samp + offset, ns, all.rows.data()), 0);
+    for (int c = 0; c < sel.nchan; ++c)
+        QCOMPARE(all.values.row(sel.pick[c]), buf.values.row(c));
 }
 
 //=============================================================================================================

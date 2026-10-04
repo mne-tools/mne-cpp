@@ -80,6 +80,7 @@ private slots:
     void readsAcquisitionSkip();
     void mneRawDataMatches_data();
     void mneRawDataMatches();
+    void mneRawDataNormalisesChannels();
 };
 
 //=============================================================================================================
@@ -222,6 +223,29 @@ void TestFiffRawFormatsPython::mneRawDataMatches()
     const double scale = ref.cwiseAbs().maxCoeff();
     QVERIFY2((values.cast<double>() - ref).cwiseAbs().maxCoeff() <= 1e-6 * scale,
              qPrintable(QString::number((values.cast<double>() - ref).cwiseAbs().maxCoeff() / scale)));
+}
+
+//=============================================================================================================
+
+void TestFiffRawFormatsPython::mneRawDataNormalisesChannels()
+{
+    // data/raw_unit_mul_raw.fif (make_unit_mul_fixture.py): EEG 002 has unit_mul -6 and STI 014 range 2.
+    // As in MNE-C's mne_open_raw_data, unit_mul is folded into cal and the trigger range reset to 1.
+    QFile file(fixture("unit_mul"));
+    FiffRawData raw(file);
+    MatrixXd ref, times;
+    QVERIFY(raw.read_raw_segment(ref, times));
+
+    std::unique_ptr<MNERawData> mne(MNERawData::open_file(fixture("unit_mul"), false, false, MNEFilterDef()));
+    QVERIFY(mne);
+    QCOMPARE(mne->info->chInfo[1].unit_mul, 0);
+    QCOMPARE(mne->info->chInfo[2].range, 1.0f);
+    Matrix<float, Dynamic, Dynamic, RowMajor> values(3, 20);
+    std::vector<float*> rows = {values.row(0).data(), values.row(1).data(), values.row(2).data()};
+    QCOMPARE(mne->pick_data(nullptr, mne->first_samp, 20, rows.data()), 0);
+    QVERIFY((values.row(0).cast<double>() - ref.row(0)).cwiseAbs().maxCoeff() < 1e-12);
+    QVERIFY((values.row(1).cast<double>() - 1e-6 * ref.row(1)).cwiseAbs().maxCoeff() < 1e-6 * 1e-6 * ref.row(1).cwiseAbs().maxCoeff());
+    QVERIFY((values.row(2).cast<double>() - 0.5 * ref.row(2)).cwiseAbs().maxCoeff() < 1e-6);
 }
 
 //=============================================================================================================

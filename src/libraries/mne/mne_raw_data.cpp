@@ -1240,7 +1240,6 @@ MNERawData* MNERawData::open_file_comp(const QString& name,
     QList<FiffDirEntry::SPtr> dir0;
     //    fiffTagRec   tag;
     FiffTag::UPtr t_pTag;
-    FiffChInfo ch;
     int k, b, nbuf, ndir;
     int current_dir0 = 0;
 
@@ -1250,8 +1249,9 @@ MNERawData* MNERawData::open_file_comp(const QString& name,
         return nullptr;
 
     for (k = 0; k < info->nchan; k++) {
-        ch = info->chInfo.at(k);
-        if (QString::compare(ch.ch_name, MNE_DEFAULT_TRIGGER_CH) == 0) {
+        FiffChInfo& ch = info->chInfo[k];
+        // FiffTag::toChInfo strips the spaces from channel names.
+        if (QString(ch.ch_name).remove(' ') == QString(MNE_DEFAULT_TRIGGER_CH).remove(' ')) {
             if (std::fabs(1.0 - ch.range) > 1e-5) {
                 ch.range = 1.0;
                 qInfo("%s range set to %f\n", MNE_DEFAULT_TRIGGER_CH, ch.range);
