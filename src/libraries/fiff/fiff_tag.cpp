@@ -324,6 +324,12 @@ void FiffTag::convert_matrix_from_file_data(const FiffTag::UPtr& tag)
     } else if (kind == FIFFT_DOUBLE) {
         for (ddata = (double*)(tag->data()), k = 0; k < np; k++)
             swap_doublep(ddata + k);
+    } else if (kind == FIFFT_COMPLEX_FLOAT) {
+        for (fdata = (float*)(tag->data()), k = 0; k < 2 * np; k++)
+            swap_floatp(fdata + k);
+    } else if (kind == FIFFT_COMPLEX_DOUBLE) {
+        for (ddata = (double*)(tag->data()), k = 0; k < 2 * np; k++)
+            swap_doublep(ddata + k);
     }
     return;
 }
@@ -367,14 +373,18 @@ void FiffTag::convert_matrix_to_file_data(const FiffTag::UPtr& tag)
         if (ndim > 2) /* Not quite sure what to do */
             return;
         dimp = dimp - ndim - 1;
+        const int nz = dimp[0];
         if (fiff_type_matrix_coding(tag->type) == FIFFTS_MC_CCS)
-            np = dimp[0] + dimp[2] + 1; /* nz + n + 1 */
+            np = nz + dimp[2] + 1; /* nz + n + 1 */
         else if (fiff_type_matrix_coding(tag->type) == FIFFTS_MC_RCS)
-            np = dimp[0] + dimp[1] + 1; /* nz + m + 1 */
+            np = nz + dimp[1] + 1; /* nz + m + 1 */
         else
             return; /* Don't know what to do */
         for (k = 0; k < ndim + 1; k++)
             swap_intp(dimp + k);
+        for (data = (int*)(tag->data()) + nz, k = 0; k < np; k++)
+            swap_intp(data + k);
+        np = nz;
     }
     /*
      * Now convert data...

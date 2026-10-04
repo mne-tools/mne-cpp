@@ -3,7 +3,7 @@
   "generated_by": "tools/quality/audit_maintainability.py",
   "policy": "tools/quality/maintainability_policy.json",
   "scanned_files": 1505,
-  "scanned_lines": 393168,
+  "scanned_lines": 393178,
   "oversized_threshold": 2000,
   "metrics": {
     "null_macro": {
@@ -55,11 +55,11 @@
       }
     },
     "c_style_cast": {
-      "total": 430,
+      "total": 433,
       "files": 74,
       "by_scope": {
         "applications": 61,
-        "libraries": 271,
+        "libraries": 274,
         "tools": 98
       },
       "suppressed": [],
@@ -67,9 +67,9 @@
         "src/libraries/fiff/fiff_stream.cpp": 82,
         "src/libraries/disp/plots/helpers/colormap.cpp": 42,
         "src/libraries/disp3D/renderable/networkobject.cpp": 23,
+        "src/libraries/fiff/fiff_tag.cpp": 20,
         "src/libraries/disp/viewers/helpers/frequencyspectrumdelegate.cpp": 18,
         "src/tools/inverse/mne_compute_raw_inverse/main.cpp": 18,
-        "src/libraries/fiff/fiff_tag.cpp": 17,
         "src/tools/inverse/mne_compute_mne/main.cpp": 17,
         "src/applications/mne_browse/Utils/newparksmcclellan.cpp": 16,
         "src/libraries/dsp/parksmcclellan.cpp": 16,
@@ -127,7 +127,7 @@
         "src/libraries/fiff/fiff_evoked.cpp": 1,
         "src/libraries/fiff/fiff_raw_data.cpp": 2,
         "src/libraries/fiff/fiff_stream.cpp": 82,
-        "src/libraries/fiff/fiff_tag.cpp": 17,
+        "src/libraries/fiff/fiff_tag.cpp": 20,
         "src/libraries/fiff/fiff_tag.h": 9,
         "src/libraries/inv/dipole_fit/inv_ecd_set.cpp": 4,
         "src/libraries/mne/mne_forward_solution.cpp": 1,

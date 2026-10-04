@@ -27,6 +27,7 @@
 
 #include <fiff/fiff_stream.h>
 #include <fiff/fiff_cov.h>
+#include <fiff/fiff_digitizer_data.h>
 #include <fiff/fiff_info.h>
 #include <fiff/fiff_tag.h>
 #include <fiff/fiff_dir_node.h>
@@ -36,6 +37,7 @@
 #include <fiff/fiff_constants.h>
 
 #include <cmath>
+#include <cstring>
 #include <memory>
 
 //=============================================================================================================
@@ -95,6 +97,7 @@ private slots:
     void attachesEnvironment();
     void readsFloatCovariance();
     void readsMeasInfo();
+    void readsTagTypes();
 
 private:
     FiffDirNode::SPtr findBlock(int kind) const;
@@ -388,6 +391,14 @@ void TestFiffStreamPython::readsMeasInfo()
     FiffInfo info;
     FiffDirNode::SPtr meas;
     QVERIFY(stream.read_meas_info(stream.dirtree(), info, meas));
+
+    // The Isotrak's own FIFF_MNE_COORD_FRAME overrides the head-frame default.
+    FiffDigitizerData digData;
+    QVERIFY(stream.read_digitizer_data(stream.dirtree(), digData));
+    QCOMPARE(digData.coord_frame, FIFFV_COORD_MRI);
+    QCOMPARE(digData.npoint, 3);
+    QCOMPARE(digData.points[2].coord_frame, FIFFV_COORD_MRI);
+    QCOMPARE(digData.points[2].ident, 3);
     stream.close();
 
     QCOMPARE(info.nchan, 2);
@@ -415,6 +426,89 @@ void TestFiffStreamPython::readsMeasInfo()
     QCOMPARE(info.dig_trans.from, FIFFV_COORD_MRI);
     QCOMPARE(info.dig_trans.to, FIFFV_COORD_HEAD);
     QVERIFY(std::abs(info.dig_trans.trans(2, 3) - 0.04f) < 1e-7f);
+}
+
+//=============================================================================================================
+
+void TestFiffStreamPython::readsTagTypes()
+{
+    // data/tag_types.fif (make_tag_types_fixture.py): big-endian payloads of every swapped type.
+    QFile file(QStringLiteral(MNE_FIFF_STREAM_DATA_DIR "/tag_types.fif"));
+    FiffStream stream(&file);
+    QVERIFY(stream.open());
+    auto tag = [&](int kind) {
+        FiffTag::UPtr t;
+        stream.dirtree()->find_tag(&stream, kind, t);
+        return t;
+    };
+
+    FiffTag::UPtr t = tag(901);
+    QVERIFY(t);
+    QCOMPARE(t->toDouble()[0], 1.25);
+    QCOMPARE(t->toDouble()[1], -2.5e-12);
+    QCOMPARE(t->toDouble()[2], 3.0e200);
+    t = tag(902);
+    QCOMPARE(t->toShort()[0], qint16(-3));
+    QCOMPARE(t->toShort()[2], qint16(-32000));
+    t = tag(903);
+    QCOMPARE(t->toUnsignedShort()[1], quint16(40000));
+    QCOMPARE(t->toUnsignedShort()[2], quint16(65535));
+    t = tag(904);
+    QCOMPARE(*t->toJulian(), 2461318); // 2026-10-04
+    t = tag(905);
+    QCOMPARE(t->toDauPack16()[0], qint16(-7));
+    QCOMPARE(t->toDauPack16()[1], qint16(12345));
+    // Complex and matrix payloads have no typed accessor; read the swapped data directly.
+    auto floats = [](const FiffTag::UPtr& x) {
+        return reinterpret_cast<const float*>(x->data());
+    };
+    t = tag(906);
+    QCOMPARE(floats(t)[0], 1.5f);
+    QCOMPARE(floats(t)[1], -2.0f);
+    QCOMPARE(floats(t)[3], 4.0f);
+
+    // Dense matrices keep their trailing dimensions (ncol, nrow, ndim) in host order.
+    qint32 ndim;
+    QVector<qint32> dims;
+    t = tag(907);
+    QVERIFY(t->getMatrixDimensions(ndim, dims));
+    QCOMPARE(dims, QVector<qint32>({3, 2}));
+    QCOMPARE(reinterpret_cast<const double*>(t->data())[5], 6.5);
+    t = tag(908);
+    QVERIFY(t->getMatrixDimensions(ndim, dims));
+    QCOMPARE(dims, QVector<qint32>({2, 1}));
+    QCOMPARE(floats(t)[3], -4.0f);
+
+    MatrixXd expected(4, 4);
+    expected << 1, 0, 2, 0, 0, 0, 3, 4, 5, 0, 0, 6, 0, 7, 0, 0;
+    for (int kind : {909, 910}) {
+        t = tag(kind);
+        QVERIFY(t);
+        QCOMPARE(MatrixXd(t->toSparseFloatMatrix()), expected);
+    }
+
+    // write_tag must turn every payload back into file byte order.
+    const QString copyPath = m_dir.filePath("tag-types-copy.fif");
+    {
+        QFile out(copyPath);
+        FiffStream::SPtr w = FiffStream::start_file(out);
+        QVERIFY(w);
+        for (int kind = 901; kind <= 910; ++kind)
+            w->write_tag(tag(kind));
+        w->end_file();
+    }
+    QFile copyFile(copyPath);
+    FiffStream copy(&copyFile);
+    QVERIFY(copy.open());
+    for (int kind = 901; kind <= 910; ++kind) {
+        FiffTag::UPtr back;
+        QVERIFY(copy.dirtree()->find_tag(&copy, kind, back));
+        const FiffTag::UPtr orig = tag(kind);
+        QVERIFY2(back->size() == orig->size() && std::memcmp(back->data(), orig->data(), static_cast<size_t>(orig->size())) == 0,
+                 qPrintable(QStringLiteral("tag %1 changed in write_tag").arg(kind)));
+    }
+    copy.close();
+    stream.close();
 }
 
 //=============================================================================================================
