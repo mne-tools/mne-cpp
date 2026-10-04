@@ -173,6 +173,19 @@ void TestMneCtfCompPython::readsCompensationData()
     QCOMPARE(raw.info.comps[0].kind, 1);
     QCOMPARE(raw.info.comps[3].kind, 3);
 
+    // mne-python: info["ctf_head_t"] and info["dev_ctf_t"] of the fixture.
+    QCOMPARE(raw.info.ctf_head_t.from, FIFFV_MNE_COORD_CTF_HEAD);
+    QCOMPARE(raw.info.ctf_head_t.to, FIFFV_COORD_HEAD);
+    QCOMPARE(raw.info.dev_ctf_t.from, FIFFV_COORD_DEVICE);
+    QCOMPARE(raw.info.dev_ctf_t.to, FIFFV_MNE_COORD_CTF_HEAD);
+    Matrix4f devCtf;
+    devCtf << 6.720469243e-02f, 9.886326147e-01f, 1.344953576e-01f, -4.123601733e-04f,
+        -9.971782317e-01f, 6.203418125e-02f, 4.227717525e-02f, 1.184050301e-04f,
+        3.345328769e-02f, -1.369570575e-01f, 9.900119895e-01f, 6.580017899e-02f,
+        0.0f, 0.0f, 0.0f, 1.0f;
+    QVERIFY((raw.info.dev_ctf_t.trans - devCtf).cwiseAbs().maxCoeff() < 1e-6f);
+    QVERIFY((raw.info.dev_ctf_t.trans * raw.info.dev_ctf_t.invtrans - Matrix4f::Identity()).cwiseAbs().maxCoeff() < 1e-5f);
+
     auto set = MNECTFCompDataSet::read(fixture(3));
     QVERIFY(set);
     QCOMPARE(set->ncomp, 5);

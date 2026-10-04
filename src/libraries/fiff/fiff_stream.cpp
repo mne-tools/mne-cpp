@@ -1294,12 +1294,9 @@ bool FiffStream::read_meas_info(const FiffDirNode::SPtr& p_Node, FiffInfo& info,
     info.dev_head_t = dev_head_t;
     info.ctf_head_t = ctf_head_t;
     info.all_coord_trans = all_coord_trans;
-    if ((!info.dev_head_t.isEmpty()) && (!info.ctf_head_t.isEmpty())) //~isempty(info.dev_head_t) && ~isempty(info.ctf_head_t)
-    {
-        info.dev_ctf_t = info.dev_head_t;
-        info.dev_ctf_t.to = info.ctf_head_t.from;
-        info.dev_ctf_t.trans = ctf_head_t.trans.inverse() * info.dev_ctf_t.trans;
-    } else
+    if (!info.dev_head_t.isEmpty() && !info.ctf_head_t.isEmpty())
+        info.dev_ctf_t = FiffCoordTrans(FIFFV_COORD_DEVICE, FIFFV_MNE_COORD_CTF_HEAD, ctf_head_t.invtrans * dev_head_t.trans);
+    else
         info.dev_ctf_t.clear();
 
     //
