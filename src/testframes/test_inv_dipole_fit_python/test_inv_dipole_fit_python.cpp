@@ -172,6 +172,8 @@ private slots:
     void forwardFieldMatches();
     void bemForwardMatches_data();
     void bemForwardMatches();
+    void compensatedFieldMatches_data();
+    void compensatedFieldMatches();
     void fitMatches_data();
     void fitMatches();
     void rawFitMatches_data();
@@ -351,6 +353,46 @@ void TestInvDipoleFitPython::bemForwardMatches()
         data + "MEG/sample/all-trans.fif", m_sampleAve, data + "subjects/sample/bem/sample-5120-bem.fif",
         nullptr, FwdEegSphereModel::setup_eeg_sphere_model(QString(), QString(), 0.09f).release(), false, QString(), QString(),
         5e-13f, 20e-15f, 0.2e-6f, 0.1f, 0.1f, 0.1f, false, projnames, false, true));
+}
+
+//=============================================================================================================
+
+void TestInvDipoleFitPython::compensatedFieldMatches_data()
+{
+    QTest::addColumn<int>("grade");
+    QTest::addColumn<VectorXd>("expected");
+
+    // mne-python make_forward_dipole on the CTF fixture (7 MEG + 29 reference channels),
+    // sphere r0 (0, 0, 40) mm, dipole at (30, 20, 70) mm with 30 nAm along (1, 0, 0.2);
+    // grade 0 after raw.apply_gradient_compensation(0).
+    VectorXd grade3(7), grade0(7);
+    grade3 << 3.802754463322344e-14, 4.391023139760363e-14, -3.361109406796458e-14, -3.158846539008664e-14,
+        3.0834929702905355e-14, -6.115886208135634e-14, -5.516961095963779e-14;
+    grade0 << 2.115518000778138e-15, 1.1527947663125814e-14, -2.053172522664681e-14, -9.44117743983952e-16,
+        3.760080630854645e-14, -8.011838019683636e-15, -2.3102320483303626e-14;
+    QTest::newRow("third-order gradiometer") << 3 << grade3;
+    QTest::newRow("uncompensated") << 0 << grade0;
+}
+
+void TestInvDipoleFitPython::compensatedFieldMatches()
+{
+    QFETCH(int, grade);
+    QFETCH(VectorXd, expected);
+
+    // The reference channels must be read and their coils built to compensate the field.
+    const QString meas = QStringLiteral(MNE_CTF_COMP_DATA_DIR "/ctf_grade%1_raw.fif").arg(grade);
+    Vector3f r0(0.0f, 0.0f, 0.04f);
+    std::unique_ptr<InvDipoleFitData> fitData(InvDipoleFitData::setup_dipole_fit_data(
+        QString(), meas, QString(), &r0, nullptr, false, QString(), QString(),
+        5e-13f, 20e-15f, 0.2e-6f, 0.1f, 0.1f, 0.1f, false, QStringList(), true, false));
+    QVERIFY(fitData);
+    QCOMPARE(fitData->nmeg, 7);
+    MatrixXf g(7, 3);
+    const Vector3f q = 30e-9f * Vector3f(1.0f, 0.0f, 0.2f).normalized();
+    QCOMPARE(InvDipoleFitData::compute_dipole_field(*fitData, Vector3f(0.03f, 0.02f, 0.07f), false, g), 0);
+    const VectorXd field = (g * q).cast<double>();
+    const double err = (field - expected).norm() / expected.norm();
+    QVERIFY2(err < 1e-3, qPrintable(QStringLiteral("relative error %1").arg(err)));
 }
 
 //=============================================================================================================

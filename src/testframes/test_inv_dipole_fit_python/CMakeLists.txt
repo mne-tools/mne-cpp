@@ -60,6 +60,7 @@ mne_add_test(${PROJECT_NAME}
     REQUIRES_DATA
         mne-cpp-test-data/MEG/sample)
 target_compile_definitions(${PROJECT_NAME} PRIVATE MNE_VOL_SRC_DATA_DIR="${CMAKE_CURRENT_SOURCE_DIR}/../test_mne_source_space_ops_python/data")
+target_compile_definitions(${PROJECT_NAME} PRIVATE MNE_CTF_COMP_DATA_DIR="${CMAKE_CURRENT_SOURCE_DIR}/../test_mne_ctf_comp_python/data")
 if(NOT BUILD_SHARED_LIBS)
     target_compile_definitions(${PROJECT_NAME} PRIVATE STATICBUILD)
 endif()
