@@ -52,6 +52,7 @@ import numpy as np
 # ─── MNE imports ────────────────────────────────────────────────────────────
 import mne
 from mne.cov import make_ad_hoc_cov
+from mne.io.constants import FIFF
 from mne.forward._field_interpolation import (
     _compute_mapping_matrix,
     _setup_dots,
@@ -240,6 +241,10 @@ def main():
         mapping = _compute_mapping_matrix(fmd, meg_info)
         np.save(os.path.join(args.outdir, "meg_mapping.npy"), mapping)
         print(f"[fieldmap-ref] MEG mapping: {mapping.shape}")
+        with meg_info._unlock():
+            meg_info["projs"] = []
+        np.save(os.path.join(args.outdir, "meg_mapping_noproj.npy"),
+                _compute_mapping_matrix(fmd, meg_info))
 
     # ── EEG field map ───────────────────────────────────────────────────
     eeg_picks = _pick_good_channels(info, "eeg")
@@ -299,6 +304,15 @@ def main():
         mapping = _compute_mapping_matrix(fmd, eeg_info)
         np.save(os.path.join(args.outdir, "eeg_mapping.npy"), mapping)
         print(f"[fieldmap-ref] EEG mapping: {mapping.shape}")
+        with eeg_info._unlock():
+            eeg_info["projs"] = [p for p in eeg_info["projs"]
+                                 if p["kind"] != FIFF.FIFFV_PROJ_ITEM_EEG_AVREF]
+        np.save(os.path.join(args.outdir, "eeg_mapping_noavgref.npy"),
+                _compute_mapping_matrix(fmd, eeg_info))
+        with eeg_info._unlock():
+            eeg_info["projs"] = []
+        np.save(os.path.join(args.outdir, "eeg_mapping_noproj.npy"),
+                _compute_mapping_matrix(fmd, eeg_info))
 
     print("[fieldmap-ref] Done – reference data written to", args.outdir)
     return 0

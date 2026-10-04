@@ -249,6 +249,7 @@ private slots:
     void testEegSelfDots();
     void testEegSurfaceDots();
     void testEegMapping();
+    void testMappingProjectorVariants();
     void testMegMappingApplySymmetry();
     void testEegMappingApplySymmetry();
     void testMultiEvokedMegMapping();
@@ -720,6 +721,62 @@ void TestFieldMap::testEegMapping()
 
     qDebug() << "EEG mapping cross-validation PASSED"
              << "(max rel err:" << maxRelErr << ")";
+}
+
+//=============================================================================================================
+
+void TestFieldMap::testMappingProjectorVariants()
+{
+    if (!m_hasMeg || !m_hasEeg)
+        QSKIP("Needs MEG and EEG data");
+
+    QStringList eegNames;
+    for (const FiffChInfo& ch : m_evoked.info.chs) {
+        if (ch.kind == FIFFV_EEG_CH && !m_evoked.info.bads.contains(ch.ch_name))
+            eegNames << ch.ch_name;
+    }
+
+    // Same thresholds as testMegMapping/testEegMapping: 5% per element, at most 1% outliers.
+    auto check = [](const std::unique_ptr<MatrixXf>& got, const MatrixXd& ref, const MatrixXd& other, const QString& label) {
+        QVERIFY(got != nullptr);
+        int nFail = 0;
+        compareMatrices(got->cast<double>(), ref, 0.05, 1e-20, label, nFail);
+        QVERIFY2(nFail >= 0 && nFail < 0.01 * ref.size(), qPrintable(label + ": " + QString::number(nFail) + " elements differ"));
+        // The variant must differ from the default map, or the comparison proves nothing.
+        QVERIFY2((ref - other).norm() > 0.1 * other.norm(), qPrintable(label + " reference equals the default map"));
+    };
+
+    // Overloads without FiffInfo apply neither SSP nor the average reference.
+    check(FwdFieldMap::computeMegMapping(*m_megCoils, m_surfVerts, m_surfNorms, m_origin, 0.06f, 1e-4f),
+          loadNpy(m_refDir + "/meg_mapping_noproj.npy"), m_refMegMapping, "MEG without projectors");
+    check(FwdFieldMap::computeEegMapping(*m_eegCoils, m_surfVerts, m_origin, 0.06f, 1e-3f),
+          loadNpy(m_refDir + "/eeg_mapping_noproj.npy"), m_refEegMapping, "EEG without projectors");
+
+    // Without the average-reference projector the map keeps its mean over vertices.
+    FiffInfo info = m_evoked.info;
+    info.projs.erase(std::remove_if(info.projs.begin(), info.projs.end(),
+                                    [](const FiffProj& p) { return p.kind == FIFFV_PROJ_ITEM_EEG_AVREF; }),
+                     info.projs.end());
+    QCOMPARE(info.projs.size(), m_evoked.info.projs.size() - 1);
+    check(FwdFieldMap::computeEegMapping(*m_eegCoils, m_surfVerts, m_origin, info, eegNames, 0.06f, 1e-3f),
+          loadNpy(m_refDir + "/eeg_mapping_noavgref.npy"), m_refEegMapping, "EEG without average reference");
+
+    // mne-python also recognises an average reference by its description alone.
+    info = m_evoked.info;
+    for (FiffProj& p : info.projs) {
+        if (p.kind == FIFFV_PROJ_ITEM_EEG_AVREF)
+            p.kind = FIFFV_PROJ_ITEM_FIELD;
+    }
+    auto byDesc = FwdFieldMap::computeEegMapping(*m_eegCoils, m_surfVerts, m_origin, info, eegNames, 0.06f, 1e-3f);
+    QVERIFY(byDesc != nullptr);
+    QVERIFY((byDesc->colwise().sum().cwiseAbs().maxCoeff()) <= 1e-4f * byDesc->cwiseAbs().sum() / byDesc->cols());
+    QVERIFY(((*byDesc) - (*m_eegMapping)).norm() <= 1e-6f * m_eegMapping->norm());
+
+    // Invalid input.
+    QVERIFY(!FwdFieldMap::computeMegMapping(*m_megCoils, m_surfVerts, m_surfNorms.topRows(1), m_origin, 0.06f, 1e-4f));
+    QVERIFY(!FwdFieldMap::computeMegMapping(*m_megCoils, MatrixX3f(), MatrixX3f(), m_origin, m_evoked.info, {}, 0.06f, 1e-4f));
+    QVERIFY(!FwdFieldMap::computeEegMapping(*m_eegCoils, MatrixX3f(), m_origin, 0.06f, 1e-3f));
+    QVERIFY(!FwdFieldMap::computeEegMapping(*m_eegCoils, MatrixX3f(), m_origin, m_evoked.info, eegNames, 0.06f, 1e-3f));
 }
 
 //=============================================================================================================
