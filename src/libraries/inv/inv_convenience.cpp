@@ -9,10 +9,9 @@
  * @date     May 2026
  * @brief    Implementation of the apply-inverse / compute-PSD convenience helpers declared in @c inv_convenience.h.
  *
- * Implements the streaming epoch / raw loops by constructing a single
- * @ref InvMinimumNorm kernel and re-applying it across data chunks, the
- * SNR helper that combines GFP-based signal estimates with the noise
- * normalisation of the inverse operator, and the Welch PSD that re-uses
+ * Implements the epoch / raw loops by constructing a single
+ * @ref InvMinimumNorm kernel and re-applying it, MNE-Python's whitened-data
+ * SNR estimate, and the Welch PSD that re-uses
  * the @c utils/spectral primitives to keep the spectral pipeline
  * identical to the one used elsewhere in mne-cpp.
  */
@@ -29,6 +28,7 @@
 #include <fiff/fiff_raw_data.h>
 #include <fiff/fiff_cov.h>
 #include <fiff/fiff_info.h>
+#include <fiff/fiff_proj.h>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -48,6 +48,8 @@
 //=============================================================================================================
 
 #include <cmath>
+#include <limits>
+#include <vector>
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -99,6 +101,35 @@ VectorXd computeRowPsd(const VectorXd& row, int nFft, double sfreq)
     }
 
     return psd;
+}
+
+/**
+ * Value exceeded by a chi^2 variable with @p dof degrees of freedom with probability @p p
+ * (scipy.stats.chi2.isf). P(a, x) is summed from its power series, A&S 6.5.29, and the
+ * quantile bisected; Q = 1 - P keeps ~1e-13 relative accuracy for the p = 1e-3 used here.
+ */
+double chi2Isf(double p, int dof)
+{
+    const double a = 0.5 * dof;
+    auto upperTail = [a](double chi2) {
+        const double x = 0.5 * chi2;
+        double term = 1.0;
+        double sum = 1.0;
+        for (int n = 1; n < 100000 && term > 1e-17 * sum; ++n) {
+            term *= x / (a + n);
+            sum += term;
+        }
+        return 1.0 - sum * std::exp(a * std::log(x) - x - std::lgamma(a + 1.0));
+    };
+    double lo = 0.0;
+    double hi = dof + 10.0 * std::sqrt(2.0 * dof) + 50.0;
+    while (upperTail(hi) > p)
+        hi *= 2.0;
+    for (int i = 0; i < 200 && hi - lo > 1e-14 * hi; ++i) {
+        const double mid = 0.5 * (lo + hi);
+        (upperTail(mid) > p ? lo : hi) = mid;
+    }
+    return 0.5 * (lo + hi);
 }
 
 } // anonymous namespace
@@ -185,33 +216,60 @@ InvSourceEstimate INVLIB::applyInverseRaw(
 
 //=============================================================================================================
 
-QPair<VectorXd, RowVectorXf> INVLIB::estimateSnr(
+QPair<VectorXd, VectorXd> INVLIB::estimateSnr(
     const FiffEvoked& evoked,
-    const MNEInverseOperator& inverse,
-    const QString& method)
+    const MNEInverseOperator& inverse)
 {
-    float snr = 3.0f;
-    float lambda2 = 1.0f / (snr * snr);
+    // Adapted from MNE-Python mne.minimum_norm.estimate_snr (BSD-3-Clause), itself after
+    // compute_regularization in MNE-C's mne_analyze/regularization.c.
+    const MNEInverseOperator inv = inverse.prepare_inverse_operator(evoked.nave, 1.0f / 9.0f, false);
+    if (!inv.eigen_fields) {
+        qWarning() << "[estimateSnr] Could not prepare the inverse operator.";
+        return QPair<VectorXd, VectorXd>();
+    }
+    const MatrixXd white = inv.whitener * inv.proj * evoked.pick_channels(inv.noise_cov->names).data;
+    const MatrixXd whiteEf = inv.eigen_fields->data * white;
 
-    // Apply inverse to get source estimate
-    InvMinimumNorm mn(inverse, lambda2, method);
-    InvSourceEstimate stc = mn.calculateInverse(evoked);
-
-    if (stc.isEmpty()) {
-        qWarning() << "[estimateSnr] Failed to compute source estimate.";
-        return QPair<VectorXd, RowVectorXf>();
+    int rank = 0;
+    if (!inv.noise_cov->diag) {
+        rank = static_cast<int>((inv.noise_cov->eig.array() > 0).count());
+    } else {
+        MatrixXd proj;
+        rank = inv.noise_cov->dim - FiffProj::make_projector(inv.projs, inv.noise_cov->names, proj);
     }
 
-    // Compute SNR as sqrt(sum of squared source amplitudes per time point)
-    // This gives a time course of source-space SNR
-    const int nTimes = static_cast<int>(stc.data.cols());
-    VectorXd snrTimeCourse(nTimes);
-
+    const int nTimes = static_cast<int>(white.cols());
+    VectorXd snr = white.colwise().squaredNorm().transpose() / rank;
+    VectorXd lambda2 = VectorXd::Constant(nTimes, 10.0);
+    std::vector<bool> remaining(nTimes, true);
     for (int t = 0; t < nTimes; ++t) {
-        snrTimeCourse(t) = std::sqrt(stc.data.col(t).squaredNorm() / static_cast<double>(stc.data.rows()));
+        if (snr(t) <= 1.0) {
+            lambda2(t) = std::numeric_limits<double>::infinity();
+            remaining[t] = false;
+        }
     }
 
-    return QPair<VectorXd, RowVectorXf>(snrTimeCourse, stc.times);
+    const ArrayXd sing2 = inv.sing.array().square();
+    const double limit = chi2Isf(1e-3, rank);
+    bool converged = false;
+    for (int iter = 0; iter < 1000 && !converged; ++iter) {
+        converged = true;
+        for (int t = 0; t < nTimes; ++t) {
+            if (!remaining[t])
+                continue;
+            const ArrayXd keep = (inv.sing.array() == 0).select(1.0, lambda2(t) / (sing2 + lambda2(t)));
+            if ((whiteEf.col(t).array() * keep).matrix().squaredNorm() < limit) {
+                remaining[t] = false;
+            } else {
+                lambda2(t) *= 0.99;
+                converged = false;
+            }
+        }
+    }
+    if (!converged)
+        qWarning() << "[estimateSnr] SNR estimation did not converge.";
+
+    return QPair<VectorXd, VectorXd>(snr.cwiseSqrt(), lambda2.cwiseSqrt().cwiseInverse());
 }
 
 //=============================================================================================================

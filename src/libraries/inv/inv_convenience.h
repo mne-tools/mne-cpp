@@ -13,7 +13,7 @@
  * classes so users can match the MNE-Python ergonomics:
  * @ref INVLIB::applyInverseEpochs applies a precomputed inverse operator
  * across an epoch list, @ref INVLIB::applyInverseRaw "applyInverseRaw" streams raw data through
- * the kernel in blocks, @ref INVLIB::estimateSnr "estimateSnr" returns the source-space SNR
+ * the kernel, @ref INVLIB::estimateSnr "estimateSnr" returns the whitened-data SNR
  * trace from an evoked + inverse pair, @ref INVLIB::computeWhitener "computeWhitener" produces the
  * diagonal whitener from a noise covariance, and
  * @ref INVLIB::computeSourcePsd "computeSourcePsd" / @ref INVLIB::computeSourceBandPower "computeSourceBandPower" run Welch-based
@@ -98,11 +98,12 @@ INVSHARED_EXPORT QList<InvSourceEstimate> applyInverseEpochs(
 
 //=============================================================================================================
 /**
- * @brief Apply inverse operator to raw data in blocks.
+ * @brief Apply inverse operator to raw data.
  *
- * Reads and processes the raw data in chunks, applying the inverse
- * operator to produce a continuous source estimate. Equivalent of
- * MNE-Python's mne.minimum_norm.apply_inverse_raw().
+ * Reads the requested range and applies the inverse operator with nave = 1.
+ * Equivalent of MNE-Python's mne.minimum_norm.apply_inverse_raw(), except
+ * that @p from and @p to are absolute sample numbers and the source estimate
+ * starts at @p from / sfreq (MNE-Python counts from the first sample).
  *
  * @param[in] raw       Raw data object.
  * @param[in] inverse   Pre-computed inverse operator.
@@ -125,21 +126,21 @@ INVSHARED_EXPORT InvSourceEstimate applyInverseRaw(
 
 //=============================================================================================================
 /**
- * @brief Estimate SNR from evoked data and inverse operator.
+ * @brief Estimate the SNR of evoked data as a function of time.
  *
- * Computes source-space SNR estimate using the GFP (Global Field Power)
- * of the evoked data and the noise normalization from the inverse operator.
+ * Equivalent of MNE-Python's mne.minimum_norm.estimate_snr(): @c snr is the
+ * global field power of the whitened data, @c snrEst the largest
+ * regularization 1/sqrt(lambda2) whose prediction error passes a chi^2 test
+ * at p = 0.001 (0 where @c snr <= 1).
  *
  * @param[in] evoked    Evoked data.
  * @param[in] inverse   Inverse operator.
- * @param[in] method    "MNE", "dSPM", or "sLORETA".
  *
- * @return Pair of (SNR time course, times vector).
+ * @return Pair of (snr, snrEst), one value per time point.
  */
-INVSHARED_EXPORT QPair<Eigen::VectorXd, Eigen::RowVectorXf> estimateSnr(
+INVSHARED_EXPORT QPair<Eigen::VectorXd, Eigen::VectorXd> estimateSnr(
     const FIFFLIB::FiffEvoked& evoked,
-    const MNELIB::MNEInverseOperator& inverse,
-    const QString& method = "dSPM");
+    const MNELIB::MNEInverseOperator& inverse);
 
 //=============================================================================================================
 /**

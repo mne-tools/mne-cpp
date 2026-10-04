@@ -25,7 +25,7 @@ SPDX-License-Identifier: BSD-3-Clause Copyright (c) 2026 MNE-CPP Authors.
 
 `apply_inverse_*` / `compute_source_psd` helpers.
 
-Free functions in this header glue together the lower-level `INVLIB` classes so users can match the MNE-Python ergonomics: `INVLIB::applyInverseEpochs` applies a precomputed inverse operator across an epoch list, `applyInverseRaw` streams raw data through the kernel in blocks, `estimateSnr` returns the source-space SNR trace from an evoked + inverse pair, `computeWhitener` produces the diagonal whitener from a noise covariance, and `computeSourcePsd` / `computeSourceBandPower` run Welch-based spectral analysis directly on [`InvSourceEstimate`](/docs/api/inv/inv-source-estimate) output. All methods are headers-only orchestration on top of [`InvMinimumNorm`](/docs/api/inv/inv-minimum-norm) and the underlying FIFF / [MNE](/docs/api/mne/mne-class) primitives.
+Free functions in this header glue together the lower-level `INVLIB` classes so users can match the MNE-Python ergonomics: `INVLIB::applyInverseEpochs` applies a precomputed inverse operator across an epoch list, `applyInverseRaw` streams raw data through the kernel, `estimateSnr` returns the whitened-data SNR trace from an evoked + inverse pair, `computeWhitener` produces the diagonal whitener from a noise covariance, and `computeSourcePsd` / `computeSourceBandPower` run Welch-based spectral analysis directly on [`InvSourceEstimate`](/docs/api/inv/inv-source-estimate) output. All methods are headers-only orchestration on top of [`InvMinimumNorm`](/docs/api/inv/inv-minimum-norm) and the underlying FIFF / [MNE](/docs/api/mne/mne-class) primitives.
 
 ---
 
@@ -76,9 +76,9 @@ For each epoch (data matrix), applies the minimum norm inverse and returns a lis
 [InvSourceEstimate](/docs/api/inv/inv-source-estimate) applyInverseRaw(const [FiffRawData](/docs/api/fiff/fiff-raw-data) & raw, const [MNEInverseOperator](/docs/api/mne/mne-inverse-operator) & inverse, float lambda2, const QString & method, int from, int to, bool pickNormal);
 ```
 
-Apply inverse operator to raw data in blocks.
+Apply inverse operator to raw data.
 
-Reads and processes the raw data in chunks, applying the inverse operator to produce a continuous source estimate. Equivalent of MNE-Python's mne.minimum_norm.apply_inverse_raw().
+Reads the requested range and applies the inverse operator with nave = 1. Equivalent of MNE-Python's mne.minimum_norm.apply_inverse_raw(), except that `from` and `to` are absolute sample numbers and the source estimate starts at `from` / sfreq (MNE-Python counts from the first sample).
 
 **Parameters:**
 
@@ -109,15 +109,15 @@ Reads and processes the raw data in chunks, applying the inverse operator to pro
 
 ---
 
-### estimateSnr(evoked, inverse, method)
+### estimateSnr(evoked, inverse)
 
 ```cpp
-QPair< Eigen::VectorXd, Eigen::RowVectorXf > estimateSnr(const [FiffEvoked](/docs/api/fiff/fiff-evoked) & evoked, const [MNEInverseOperator](/docs/api/mne/mne-inverse-operator) & inverse, const QString & method);
+QPair< Eigen::VectorXd, Eigen::VectorXd > estimateSnr(const [FiffEvoked](/docs/api/fiff/fiff-evoked) & evoked, const [MNEInverseOperator](/docs/api/mne/mne-inverse-operator) & inverse);
 ```
 
-Estimate SNR from evoked data and inverse operator.
+Estimate the SNR of evoked data as a function of time.
 
-Computes source-space SNR estimate using the GFP (Global Field Power) of the evoked data and the noise normalization from the inverse operator.
+Equivalent of MNE-Python's mne.minimum_norm.estimate_snr(): `snr` is the global field power of the whitened data, `snrEst` the largest regularization 1/sqrt(lambda2) whose prediction error passes a chi^2 test at p = 0.001 (0 where `snr` &lt;= 1).
 
 **Parameters:**
 
@@ -127,12 +127,9 @@ Computes source-space SNR estimate using the GFP (Global Field Power) of the evo
 - **inverse** : *const [MNEInverseOperator](/docs/api/mne/mne-inverse-operator) &*
   Inverse operator.
 
-- **method** : *const QString &*
-  "MNE", "dSPM", or "sLORETA".
-
 **Returns:**
 
-- *QPair&lt; Eigen::VectorXd, Eigen::RowVectorXf &gt;* — `Pair` of (SNR time course, times vector).
+- *QPair&lt; Eigen::VectorXd, Eigen::VectorXd &gt;* — `Pair` of (snr, snrEst), one value per time point.
 
 ---
 
