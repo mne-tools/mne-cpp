@@ -359,6 +359,41 @@ void TestFwdPython::labelForward_free()
     for (int k = 0; k < fwd->sol_grad->data.cols(); ++k) {
         QVERIFY2(fwd->sol_grad->data.col(k).norm() > 0.0, qPrintable(QString("gradient column %1 is empty").arg(k)));
     }
+
+    // The file stores MEG and EEG as separate blocks; reading merges them again.
+    const QString path = m_dir.filePath("grad-fwd.fif");
+    {
+        QFile file(path);
+        QVERIFY(fwd->write(file));
+    }
+    const MatrixXd G = fwd->sol->data;
+    const MatrixXd dG = fwd->sol_grad->data;
+    {
+        QFile file(path);
+        MNEForwardSolution back;
+        QVERIFY(MNEForwardSolution::read(file, back, false, false, {}, {}, false));
+        QCOMPARE(back.sol->row_names, fwd->sol->row_names);
+        QCOMPARE(back.sol_grad->row_names, fwd->sol_grad->row_names);
+        QVERIFY((back.sol->data - G).norm() <= 1e-6 * G.norm());
+        QCOMPARE(static_cast<int>(back.sol_grad->data.rows()), static_cast<int>(dG.rows()));
+        QVERIFY((back.sol_grad->data - dG).norm() <= 1e-6 * dG.norm());
+    }
+
+    // Fixed orientation: G n and, per position derivative d, dG_d n (mne-python's kron(fix_rot, eye(3))).
+    {
+        QFile file(path);
+        MNEForwardSolution fixed;
+        QVERIFY(MNEForwardSolution::read(file, fixed, true, false, {}, {}, false));
+        QCOMPARE(static_cast<int>(fixed.sol_grad->data.cols()), 3 * 70);
+        for (int i = 0; i < 70; ++i) {
+            const Vector3d n = fixed.source_nn.row(i).cast<double>().transpose();
+            QVERIFY((fixed.sol->data.col(i) - G.middleCols(3 * i, 3) * n).norm() <= 1e-6 * G.middleCols(3 * i, 3).norm());
+            for (int d = 0; d < 3; ++d) {
+                const VectorXd want = dG.col(9 * i + d) * n(0) + dG.col(9 * i + 3 + d) * n(1) + dG.col(9 * i + 6 + d) * n(2);
+                QVERIFY((fixed.sol_grad->data.col(3 * i + d) - want).norm() <= 1e-6 * want.norm());
+            }
+        }
+    }
 }
 
 //=============================================================================================================

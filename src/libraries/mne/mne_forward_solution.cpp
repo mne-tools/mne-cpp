@@ -1256,8 +1256,8 @@ bool MNEForwardSolution::read(QIODevice& p_IODevice,
         if (!fwd.sol_grad->isEmpty()) {
             fwd.sol_grad->data.resize(megfwd.sol_grad->data.rows() + eegfwd.sol_grad->data.rows(), megfwd.sol_grad->data.cols());
 
-            fwd.sol->data.block(0, 0, megfwd.sol_grad->data.rows(), megfwd.sol_grad->data.cols()) = megfwd.sol_grad->data;
-            fwd.sol->data.block(megfwd.sol_grad->data.rows(), 0, eegfwd.sol_grad->data.rows(), eegfwd.sol_grad->data.cols()) = eegfwd.sol_grad->data;
+            fwd.sol_grad->data.block(0, 0, megfwd.sol_grad->data.rows(), megfwd.sol_grad->data.cols()) = megfwd.sol_grad->data;
+            fwd.sol_grad->data.block(megfwd.sol_grad->data.rows(), 0, eegfwd.sol_grad->data.rows(), eegfwd.sol_grad->data.cols()) = eegfwd.sol_grad->data;
 
             fwd.sol_grad->nrow = megfwd.sol_grad->nrow + eegfwd.sol_grad->nrow;
             fwd.sol_grad->row_names.append(eegfwd.sol_grad->row_names);
