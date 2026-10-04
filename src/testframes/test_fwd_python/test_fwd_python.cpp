@@ -15,8 +15,9 @@
  *    matching field function, checked by central finite differences.
  *
  * 2. A forward solution restricted to lh.V1 must reproduce the V1 columns of
- *    the MNE-C reference ref-sample_audvis-meg-eeg-oct-6-fwd.fif. Its fixed
- *    orientation version must match mne-python:
+ *    the MNE-C reference ref-sample_audvis-meg-eeg-oct-6-fwd.fif, also when
+ *    computed in MRI coordinates, from an ASCII transform, or for one sensor
+ *    type only. Its fixed orientation version must match mne-python:
  *
  *      fx = mne.convert_forward_solution(ref, surf_ori=True, force_fixed=True,
  *                                        use_cps=False)
@@ -110,6 +111,8 @@ private slots:
 
     void labelForward_free();
     void labelForward_fixed();
+    void labelForward_variants_data();
+    void labelForward_variants();
     void sphereForward_data();
     void sphereForward();
 };
@@ -398,6 +401,88 @@ void TestFwdPython::labelForward_fixed()
 
 //=============================================================================================================
 
+void TestFwdPython::labelForward_variants_data()
+{
+    QTest::addColumn<bool>("mriFrame");
+    QTest::addColumn<bool>("asciiTrans");
+    QTest::addColumn<bool>("meg");
+    QTest::addColumn<bool>("eeg");
+    QTest::addColumn<bool>("grad");
+
+    QTest::newRow("MRI frame") << true << false << true << true << false;
+    QTest::newRow("ASCII trans, MEG only, measurement file") << false << true << true << false << true;
+    QTest::newRow("EEG only") << false << false << false << true << true;
+}
+
+void TestFwdPython::labelForward_variants()
+{
+    QFETCH(bool, mriFrame);
+    QFETCH(bool, asciiTrans);
+    QFETCH(bool, meg);
+    QFETCH(bool, eeg);
+    QFETCH(bool, grad);
+
+    auto s = settings(false, grad);
+    s->include_meg = meg;
+    s->include_eeg = eeg;
+    if (mriFrame) {
+        s->coord_frame = FIFFV_COORD_MRI;
+    }
+    if (asciiTrans) {
+        // FreeSurfer-style head -> MRI text transform, translation in mm.
+        const FiffCoordTrans headMri = FiffCoordTrans::readMriTransform(data("MEG/sample/all-trans.fif")).inverted();
+        QFile file(m_dir.filePath("head-mri.txt"));
+        QVERIFY(file.open(QIODevice::WriteOnly | QIODevice::Text));
+        QTextStream out(&file);
+        out.setRealNumberPrecision(10);
+        for (int r = 0; r < 4; ++r) {
+            out << headMri.trans(r, 0) << ' ' << headMri.trans(r, 1) << ' ' << headMri.trans(r, 2) << ' '
+                << (r < 3 ? 1000.0f * headMri.trans(r, 3) : 1.0f) << '\n';
+        }
+        file.close();
+        s->mriname.clear();
+        s->transname = file.fileName();
+        s->pFiffInfo.reset();
+        s->mindistoutname = m_dir.filePath("omitted.txt");
+    }
+
+    ComputeFwd computer(s);
+    auto fwd = computer.calculateFwd();
+    QVERIFY(fwd != nullptr);
+    QCOMPARE(fwd->nsource, 70);
+    QCOMPARE(fwd->coord_frame, mriFrame ? FIFFV_COORD_MRI : FIFFV_COORD_HEAD);
+    if (asciiTrans) {
+        QVERIFY(QFile::exists(s->mindistoutname));
+    }
+
+    // The reference is in head coordinates: q_head = R q_mri, so G_mri = G_head R.
+    const int first = meg ? 0 : 306;
+    const int nChan = (meg ? 306 : 0) + (eeg ? 60 : 0);
+    const Matrix3d R = mriFrame ? Matrix3d(m_ref.mri_head_t.trans.topLeftCorner<3, 3>().cast<double>()) : Matrix3d::Identity();
+    QCOMPARE(static_cast<int>(fwd->sol->data.rows()), nChan);
+    QCOMPARE(fwd->sol->row_names, m_ref.sol->row_names.mid(first, nChan));
+    auto check = [&]() {
+        for (int i = 0; i < 70; ++i) {
+            const MatrixXd ref = m_ref.sol->data.block(first, 3 * m_v1Sel(i), nChan, 3) * R;
+            const MatrixXd got = fwd->sol->data.middleCols(3 * i, 3);
+            QVERIFY2((got - ref).norm() <= 1e-4 * ref.norm(), qPrintable(QString("source %1 differs by %2").arg(i).arg((got - ref).norm() / ref.norm())));
+        }
+    };
+    check();
+    if (grad) {
+        QCOMPARE(static_cast<int>(fwd->sol_grad->data.rows()), nChan);
+        QCOMPARE(static_cast<int>(fwd->sol_grad->data.cols()), 9 * 70);
+    }
+
+    // Recomputing at the same head position must leave the MEG rows unchanged.
+    if (meg) {
+        QVERIFY(computer.updateHeadPos(m_raw.info.dev_head_t, *fwd));
+        check();
+    }
+}
+
+//=============================================================================================================
+
 void TestFwdPython::sphereForward_data()
 {
     // mne-python _compute_forwards_meeg on the 78 lh.V1 sources in head coordinates with
@@ -407,7 +492,7 @@ void TestFwdPython::sphereForward_data()
     QTest::addColumn<Vector3d>("megNorms");
     QTest::addColumn<Vector3d>("eegNorms");
 
-    QTest::newRow("source 0") << 0 << Vector3d(0.0012455023232288232, 0.0008553711634315896, 0.0010237827397100762)
+    QTest::newRow("source 0") << int{0} << Vector3d(0.0012455023232288232, 0.0008553711634315896, 0.0010237827397100762)
                               << Vector3d(551.6501123312413, 522.8970930124603, 458.6240696616932);
     QTest::newRow("source 40") << 40 << Vector3d(0.0007011757119319035, 0.0005468106389226044, 0.0006286912013834711)
                                << Vector3d(502.557459453998, 461.3687151657523, 438.55365038029845);
