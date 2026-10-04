@@ -116,6 +116,8 @@ private slots:
     void sphereForward_data();
     void sphereForward();
     void sphereForward_modelFile();
+    void ctfCompensatedForward_data();
+    void ctfCompensatedForward();
 };
 
 //=============================================================================================================
@@ -629,6 +631,77 @@ void TestFwdPython::sphereForward_modelFile()
         QVERIFY2((got - norms).cwiseAbs().maxCoeff() < 1e-3 * norms.maxCoeff(),
                  qPrintable(QStringLiteral("source %1: %2 %3 %4").arg(source).arg(got[0], 0, 'g', 10).arg(got[1], 0, 'g', 10).arg(got[2], 0, 'g', 10)));
     }
+}
+
+//=============================================================================================================
+
+void TestFwdPython::ctfCompensatedForward_data()
+{
+    QTest::addColumn<int>("grade");
+    QTest::newRow("third-order gradiometer") << 3;
+    QTest::newRow("uncompensated") << int{0};
+}
+
+void TestFwdPython::ctfCompensatedForward()
+{
+    QFETCH(int, grade);
+
+    // make_ctf_fwd_fixture.py: mne-python make_forward_solution, sphere at (0, 0, 40) mm, 7 MEG channels.
+    MatrixXd ref(7, 6);
+    {
+        QFile file(QStringLiteral(MNE_FWD_DATA_DIR "/ctf_grade%1_gain.txt").arg(grade));
+        QVERIFY(file.open(QIODevice::ReadOnly | QIODevice::Text));
+        QTextStream in(&file);
+        for (int r = 0; r < 7; ++r)
+            for (int c = 0; c < 6; ++c)
+                in >> ref(r, c);
+    }
+
+    auto s = std::make_shared<ComputeFwdSettings>();
+    s->include_meg = true;
+    s->include_eeg = false;
+    s->compute_grad = true;
+    s->srcname = QStringLiteral(MNE_FWD_DATA_DIR "/two-dipole-src.fif");
+    s->measname = QStringLiteral(MNE_CTF_COMP_DATA_DIR "/ctf_grade%1_raw.fif").arg(grade);
+    s->mriname.clear();
+    s->transname.clear();
+    s->mri_head_ident = true;
+    s->bemname.clear();
+    s->r0 = Vector3f(0.0f, 0.0f, 0.04f);
+    s->mindist = 0.0f;
+    s->filter_spaces = false;
+    s->do_all = true;
+    s->solname = m_dir.filePath("ctf-fwd.fif");
+    s->checkIntegrity();
+    auto fwd = std::make_shared<ComputeFwd>(s)->calculateFwd();
+    QVERIFY(fwd != nullptr);
+    QCOMPARE(static_cast<int>(fwd->sol->data.rows()), 7);
+    QCOMPARE(static_cast<int>(fwd->sol->data.cols()), 6);
+    const double err = (fwd->sol->data - ref).norm() / ref.norm();
+    QVERIFY2(err < 1e-4, qPrintable(QStringLiteral("gain differs from mne-python by %1").arg(err)));
+
+    // Compensated position derivatives (fwd_comp_field_grad): column 9 s + 3 c + d is dG_c / dr_d of
+    // source s, against mne-python's central differences with h = 0.1 mm in the fixture.
+    MatrixXd refGrad(7, 18);
+    {
+        QFile file(QStringLiteral(MNE_FWD_DATA_DIR "/ctf_grade%1_grad.txt").arg(grade));
+        QVERIFY(file.open(QIODevice::ReadOnly | QIODevice::Text));
+        QTextStream in(&file);
+        for (int r = 0; r < 7; ++r)
+            for (int c = 0; c < 18; ++c)
+                in >> refGrad(r, c);
+    }
+    const MatrixXd& dG = fwd->sol_grad->data;
+    QCOMPARE(static_cast<int>(dG.cols()), 18);
+    const double gradErr = (dG - refGrad).norm() / refGrad.norm();
+    QVERIFY2(gradErr < 1e-3, qPrintable(QStringLiteral("gradient differs by %1").arg(gradErr)));
+
+    // Without gradients the sphere model takes the vector-field path (fwd_comp_field_vec).
+    s->compute_grad = false;
+    auto vecFwd = std::make_shared<ComputeFwd>(s)->calculateFwd();
+    QVERIFY(vecFwd != nullptr);
+    const double vecErr = (vecFwd->sol->data - ref).norm() / ref.norm();
+    QVERIFY2(vecErr < 1e-4, qPrintable(QStringLiteral("vector-field gain differs by %1").arg(vecErr)));
 }
 
 //=============================================================================================================

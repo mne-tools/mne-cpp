@@ -63,3 +63,6 @@ mne_add_test(${PROJECT_NAME}
 if(NOT BUILD_SHARED_LIBS)
     target_compile_definitions(${PROJECT_NAME} PRIVATE STATICBUILD)
 endif()
+target_compile_definitions(${PROJECT_NAME} PRIVATE
+    MNE_FWD_DATA_DIR="${CMAKE_CURRENT_SOURCE_DIR}/data"
+    MNE_CTF_COMP_DATA_DIR="${CMAKE_CURRENT_SOURCE_DIR}/../test_mne_ctf_comp_python/data")
