@@ -10,7 +10,7 @@ Train the CMNE LSTM correction model and export to ONNX.
 This script trains a unidirectional LSTM that learns to predict
 source-space activation from z-scored rectified dSPM time series
 (Dinh et al., 2021).  The trained model is exported as an ONNX file
-that can be loaded by MNE-CPP's ``InvCMNE::applyLstmCorrection()``.
+that can be loaded by MNE-CPP's ``InvCMNE::applyCmne()``.
 
 Usage
 -----
@@ -321,6 +321,18 @@ def export_onnx(
         },
         opset_version=17,
     )
+    # Same metadata contract as ``cmne.export_onnx``, read by InvCMNE::applyCmne
+    import json
+
+    import onnx
+
+    proto = onnx.load(str(out_path))
+    meta = proto.metadata_props.add()
+    meta.key = "cmne_config"
+    meta.value = json.dumps(
+        {"n_sources": n_sources, "look_back": look_back, "rectify": True}
+    )
+    onnx.save(proto, str(out_path))
     print(f"ONNX model exported to {out_path}")
 
 

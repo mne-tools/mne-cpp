@@ -169,6 +169,7 @@ Index of 6237 public class members (functions, variables, typedefs, enums) acros
 - **applyBaselineCorrection** `[fn]` in [FiffEvoked](/docs/api/fiff/fiff-evoked) — Applies baseline correction to the evoked data.
 - **applyBaselineCorrection** `[fn]` in [MNEEpochData](/docs/api/mne/mne-epoch-data) — Applies baseline (mode=mean) correction to the evoked data.
 - **applyBaselineCorrection** `[fn]` in [MNEEpochDataList](/docs/api/mne/mne-epoch-data-list) — Applies baseline correction to the evoked data.
+- **applyCmne** `[fn]` in [InvCMNE](/docs/api/inv/inv-cmne) — Contextual estimate of Eqs. 9-13, as cmne.apply_cmne with normalised weights.
 - **applyConvFilter** `[fn]` in [FilterKernel](/docs/api/dsp/filter-kernel) — Applies the current filter to the input data using convolution in time domain.
 - **applyDICS** `[fn]` in [InvDICS](/docs/api/inv/inv-dics) — Apply DICS beamformer to time-domain data at a single frequency.
 - **applyDICSCsd** `[fn]` in [InvDICS](/docs/api/inv/inv-dics) — Apply DICS beamformer to CSD matrices to estimate source power per frequency.
@@ -178,7 +179,6 @@ Index of 6237 public class members (functions, variables, typedefs, enums) acros
 - **applyLCMVCov** `[fn]` in [InvLCMV](/docs/api/inv/inv-lcmv) — Apply LCMV beamformer to a data covariance to produce a source power map.
 - **applyLCMVEpochs** `[fn]` in [InvLCMV](/docs/api/inv/inv-lcmv) — Apply LCMV beamformer to a list of epochs.
 - **applyLCMVRaw** `[fn]` in [InvLCMV](/docs/api/inv/inv-lcmv) — Apply LCMV beamformer to raw data matrix.
-- **applyLstmCorrection** `[fn]` in [InvCMNE](/docs/api/inv/inv-cmne) — Apply LSTM-based temporal correction to z-scored rectified dSPM data.
 - **applyMousePan** `[fn]` in `CameraController` — Apply pan from mouse drag delta (planar multi-view pane).
 - **applyMouseRotation** `[fn]` in `CameraController` — Apply rotation from mouse drag delta (single-view or perspective pane).
 - **applyOpticalAxisFineAdjust** `[fn]` in [PolhemusCoregistration](/docs/api/utils/polhemus-coregistration) — Fine-adjust the optical axis so it passes through a known world-frame point (e.g.
@@ -1038,6 +1038,7 @@ Index of 6237 public class members (functions, variables, typedefs, enums) acros
 - **continuousHPIChecked** `[fn]` in [HpiSettingsView](/docs/api/disp/hpi-settings-view) — Returns whether continuous fitting is checked.
 - **contourStep** `[fn]` in `SensorFieldMapper` — Compute a "nice" iso-contour step given a value range and target number of ticks.
 - **Control3DView** `[fn]` in [Control3DView](/docs/api/disp/control3-d-view) — Default constructor.
+- **controlEstimate** `[fn]` in [InvCMNE](/docs/api/inv/inv-cmne) — Control estimate of the paper (cmne.control_estimate): q_t times the mean of q over the previous lookBack samples, without an LSTM.
 - **converged** `[var]` in `InfomaxResult` — Whether the algorithm converged.
 - **convert_ch_pos** `[fn]` in [FiffTag](/docs/api/fiff/fiff-tag) — Convert coil position descriptor.
 - **convert_matrix_from_file_data** `[fn]` in [FiffTag](/docs/api/fiff/fiff-tag) — Machine dependent data type conversions (tag info only).
@@ -6322,6 +6323,7 @@ Index of 6237 public class members (functions, variables, typedefs, enums) acros
 - **zScoreMode** `[fn]` in [ChannelDataView](/docs/api/disp/channel-data-view)
 - **zScoreMode** `[fn]` in [ChannelRhiView](/docs/api/disp/channel-rhi-view)
 - **zScoreModeToggled** `[signal]` in [ChannelDataView](/docs/api/disp/channel-data-view)
+- **zScoreRectify** `[fn]` in [InvCMNE](/docs/api/inv/inv-cmne) — Rectify and z-score each source over time (Eq. 9).
 - **zScores** `[var]` in `BadChannelsMaxwellResult` — Per-channel z-scores of residuals.
 - **zsize** `[var]` in [MNEVolGeom](/docs/api/mne/mne-vol-geom) — Voxel size in each direction (mm).
 - **zsize** `[var]` in [MriVolData](/docs/api/mri/mri-vol-data) — Voxel spacing in Z direction (mm).

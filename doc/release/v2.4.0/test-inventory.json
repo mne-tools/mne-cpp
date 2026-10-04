@@ -23,7 +23,7 @@
       "test-data": 101
     },
     "gui": 33,
-    "with_qskip": 74,
+    "with_qskip": 73,
     "ci_excluded": {},
     "retry_paths": [],
     "ci": {
@@ -6282,7 +6282,7 @@
       "timeout": 60,
       "requirements": [],
       "gui": false,
-      "qskip_sites": 1,
+      "qskip_sites": 0,
       "spawns_processes": false,
       "ci_excluded_on": [],
       "ci": {

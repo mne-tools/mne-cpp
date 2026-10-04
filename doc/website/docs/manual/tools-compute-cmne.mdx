@@ -26,9 +26,9 @@ mne_compute_cmne [options]
 | `--cov <file>` | Noise covariance FIFF file |
 | `--snr <value>` | Signal-to-noise ratio (default: 3.0) |
 | `--method <name>` | Inverse method: `MNE`, `dSPM`, `sLORETA`, `eLORETA` (default: `dSPM`) |
-| `--look-back <k>` | Number of past time steps k (default: 80) |
+| `--look-back <k>` | Number of past time steps k for training and for the control estimate without `--onnx`; a model carries its own k (default: 80) |
 | `--evoked <file>` | Evoked data FIFF file (compute mode) |
-| `--onnx <file>` | ONNX model for LSTM correction (compute mode) |
+| `--onnx <file>` | ONNX model with `cmne_config` metadata, from this tool's train mode or `cmne.export_onnx` (compute mode); without it the control estimate is written |
 | `--out <prefix>` | Output STC prefix; writes `<prefix>-dspm.stc` and `<prefix>-cmne.stc` |
 | `--setno <n>` | Evoked data set number (default: 0) |
 | `--epochs <file>` | MNE Epochs FIFF file (train/finetune mode) |

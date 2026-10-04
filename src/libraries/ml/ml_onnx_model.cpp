@@ -229,6 +229,22 @@ bool MlOnnxModel::isLoaded() const
 
 //=============================================================================================================
 
+QString MlOnnxModel::metadata(const QString& key) const
+{
+#ifdef MNE_USE_ONNXRUNTIME
+    if (!m_session)
+        return QString();
+    Ort::AllocatorWithDefaultOptions allocator;
+    auto value = m_session->GetModelMetadata().LookupCustomMetadataMapAllocated(key.toStdString().c_str(), allocator);
+    return value ? QString::fromStdString(value.get()) : QString();
+#else
+    Q_UNUSED(key);
+    return QString();
+#endif
+}
+
+//=============================================================================================================
+
 QString MlOnnxModel::modelType() const
 {
     return QStringLiteral("onnx");

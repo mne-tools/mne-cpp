@@ -37,6 +37,11 @@
 #include <QDebug>
 #include <QCoreApplication>
 #include <QDir>
+#include <QJsonDocument>
+#include <QJsonObject>
+
+#include <algorithm>
+#include <limits>
 
 //=============================================================================================================
 // MNE-CPP INCLUDES
@@ -68,65 +73,24 @@ InvCMNEResult InvCMNE::compute(
     const InvCMNESettings& settings)
 {
     InvCMNEResult result;
+    result.matKernelDspm = computeDspmKernel(matGain, matNoiseCov, matSrcCov, settings.lambda2);
+    const MatrixXd matDspm = result.matKernelDspm * matEvoked;
+    const VectorXi vertices = VectorXi::LinSpaced(matDspm.rows(), 0, static_cast<int>(matDspm.rows()) - 1);
+    result.stcDspm = InvSourceEstimate(matDspm, vertices, 0.0f, 1.0f);
 
-    int nChannels = matGain.rows();
-    int nSources = matGain.cols();
-    int nTimes = matEvoked.cols();
-
-    // Step 1: Compute dSPM kernel
-    qInfo() << "[InvCMNE] Step 1/4: Computing dSPM kernel"
-            << "(" << nChannels << "ch x" << nSources << "src, lambda2="
-            << settings.lambda2 << ") …";
-    MatrixXd matKernelDspm = computeDspmKernel(matGain, matNoiseCov, matSrcCov, settings.lambda2);
-    result.matKernelDspm = matKernelDspm;
-    qInfo() << "[InvCMNE] Step 1/4: dSPM kernel done"
-            << "(" << matKernelDspm.rows() << "x" << matKernelDspm.cols() << ").";
-
-    // Step 2: Apply kernel to evoked data -> dSPM source estimate
-    qInfo() << "[InvCMNE] Step 2/4: Projecting evoked data to source space"
-            << "(" << nTimes << "time points) …";
-    MatrixXd matDspmData = matKernelDspm * matEvoked; // n_sources x n_times
-
-    // Build dSPM source estimate
-    VectorXi vertices = VectorXi::LinSpaced(matDspmData.rows(), 0, matDspmData.rows() - 1);
-    result.stcDspm = InvSourceEstimate(matDspmData, vertices, 0.0f, 1.0f);
-    qInfo() << "[InvCMNE] Step 2/4: dSPM source estimate done"
-            << "(" << matDspmData.rows() << "sources x" << matDspmData.cols() << "samples).";
-
-    // Step 3: Z-score rectify
-    qInfo() << "[InvCMNE] Step 3/4: Z-score rectifying source data …";
-    MatrixXd matZScored = zScoreRectify(matDspmData);
-    qInfo() << "[InvCMNE] Step 3/4: Z-score rectification done.";
-
-    // Step 4: Apply LSTM correction if model available and enough time points
-    MatrixXd matCmneData;
-
-    if (!settings.onnxModelPath.isEmpty() && nTimes >= settings.lookBack) {
-        qInfo() << "[InvCMNE] Step 4/4: Applying LSTM temporal correction"
-                << "(look-back=" << settings.lookBack << ","
-                << (nTimes - settings.lookBack) << "correctable time points) …";
-        matCmneData = applyLstmCorrection(matZScored, settings.onnxModelPath, settings.lookBack);
-
-        // Store raw LSTM prediction for diagnostics
-        result.stcLstmPredict = InvSourceEstimate(matCmneData, vertices, 0.0f, 1.0f);
-        qInfo() << "[InvCMNE] Step 4/4: LSTM correction done.";
-    } else {
-        // No correction possible — CMNE falls back to dSPM
-        matCmneData = matDspmData;
-
-        if (settings.onnxModelPath.isEmpty()) {
-            qInfo() << "[InvCMNE] Step 4/4: No ONNX model — using moving-average correction.";
-            matCmneData = applyLstmCorrection(matDspmData, QString(), settings.lookBack);
-            qInfo() << "[InvCMNE] Step 4/4: Moving-average correction done.";
-        } else {
-            qInfo() << "[InvCMNE] Step 4/4: Not enough time points for lookBack window"
-                    << "(need" << settings.lookBack << ", have" << nTimes << ").";
-        }
+    MatrixXd sensing, prediction, cmne;
+    if (settings.onnxModelPath.isEmpty()) {
+        qInfo() << "[InvCMNE] No model: control estimate with look-back" << settings.lookBack;
+        cmne = controlEstimate(matDspm, settings.lookBack);
+        sensing = zScoreRectify(matDspm);
+        prediction = sensing;
+    } else if (!applyCmne(matDspm, settings.onnxModelPath, sensing, prediction, cmne)) {
+        qWarning() << "[InvCMNE] CMNE could not be applied; returning the dSPM estimate only.";
+        return result;
     }
-
-    // Build CMNE source estimate
-    result.stcCmne = InvSourceEstimate(matCmneData, vertices, 0.0f, 1.0f);
-
+    result.stcSensing = InvSourceEstimate(sensing, vertices, 0.0f, 1.0f);
+    result.stcLstmPredict = InvSourceEstimate(prediction, vertices, 0.0f, 1.0f);
+    result.stcCmne = InvSourceEstimate(cmne, vertices, 0.0f, 1.0f);
     return result;
 }
 
@@ -191,122 +155,82 @@ MatrixXd InvCMNE::computeDspmKernel(
 
 //=============================================================================================================
 
-MatrixXd InvCMNE::zScoreRectify(const MatrixXd& matStcData)
+MatrixXd InvCMNE::standardize(const MatrixXd& matStcData)
 {
-    int nSources = matStcData.rows();
-    int nTimes = matStcData.cols();
-
-    MatrixXd matResult(nSources, nTimes);
-
-    for (int i = 0; i < nSources; ++i) {
-        // Absolute value
-        VectorXd absRow = matStcData.row(i).cwiseAbs();
-
-        // Mean and standard deviation across time
-        double mu = absRow.mean();
-        double variance = (absRow.array() - mu).square().mean();
-        double sigma = std::sqrt(variance);
-
-        // Z-score (guard against zero std)
-        double denom = std::max(sigma, 1e-10);
-        matResult.row(i) = (absRow.array() - mu) / denom;
+    // Constant rows are centred but not scaled, as in cmne.standardize.
+    const VectorXd mean = matStcData.rowwise().mean();
+    MatrixXd result = matStcData.colwise() - mean;
+    const VectorXd std = (result.array().square().rowwise().sum() / static_cast<double>(result.cols())).sqrt();
+    for (int i = 0; i < result.rows(); ++i) {
+        if (std(i) > 0.0)
+            result.row(i) /= std(i);
     }
-
-    return matResult;
+    return result;
 }
 
 //=============================================================================================================
 
-MatrixXd InvCMNE::applyLstmCorrection(
-    const MatrixXd& matDspmData,
-    const QString& onnxModelPath,
-    int lookBack)
+MatrixXd InvCMNE::zScoreRectify(const MatrixXd& matStcData)
 {
-    int nSources = matDspmData.rows();
-    int nTimes = matDspmData.cols();
+    return standardize(matStcData.cwiseAbs()); // Eq. 9
+}
 
-    MatrixXd result = matDspmData; // copy — for t < lookBack: identity (no correction)
+//=============================================================================================================
 
-    int nCorrectableSteps = nTimes - lookBack;
-    int reportInterval = qMax(1, nCorrectableSteps / 10); // report ~10 times
-
-    // Try to load ONNX model for LSTM inference
-    MLLIB::MlOnnxModel lstmModel;
-    bool useOrt = false;
-
-    if (!onnxModelPath.isEmpty()) {
-        if (lstmModel.load(onnxModelPath)) {
-            useOrt = true;
-            qInfo() << "  [LSTM correction] ONNX model loaded — using LSTM inference.";
-        } else {
-            qWarning() << "  [LSTM correction] Failed to load ONNX model — falling back to moving average.";
-        }
-    } else {
-        qInfo() << "  [LSTM correction] No ONNX model path — using moving average.";
-    }
-
-    // Pre-allocate input buffer for ORT: shape [1, lookBack, nSources] (batch, seq, features)
-    // Row-major layout: [seq][features]
-    std::vector<float> inputBuf;
-    if (useOrt) {
-        inputBuf.resize(static_cast<size_t>(lookBack) * static_cast<size_t>(nSources));
-    }
-
-    // For t >= lookBack: apply temporal correction
-    for (int t = lookBack; t < nTimes; ++t) {
-        int step = t - lookBack;
-        if (step % reportInterval == 0 || t == nTimes - 1) {
-            double pct = 100.0 * (step + 1) / nCorrectableSteps;
-            qInfo().noquote() << QString("  [LSTM correction] %1% (%2/%3 time steps)")
-                                     .arg(pct, 0, 'f', 0)
-                                     .arg(step + 1)
-                                     .arg(nCorrectableSteps);
-        }
-
-        VectorXd prediction;
-
-        if (useOrt) {
-            // Fill input buffer: double→float, column-major→row-major
-            // Layout: inputBuf[k * nSources + s] = matDspmData(s, t - lookBack + k)
-            for (int k = 0; k < lookBack; ++k) {
-                int col = t - lookBack + k;
-                for (int s = 0; s < nSources; ++s) {
-                    inputBuf[static_cast<size_t>(k) * static_cast<size_t>(nSources) + static_cast<size_t>(s)] = static_cast<float>(result(s, col));
-                }
-            }
-
-            // Create MlTensor view over the pre-allocated buffer — zero-copy
-            std::vector<int64_t> inputShape = {1, static_cast<int64_t>(lookBack),
-                                               static_cast<int64_t>(nSources)};
-            MLLIB::MlTensor inputTensor = MLLIB::MlTensor::view(inputBuf.data(), inputShape);
-
-            // Run LSTM inference
-            MLLIB::MlTensor outputTensor = lstmModel.predict(inputTensor);
-
-            // Convert output to Eigen VectorXd
-            // Expected output shape: [1, nSources] or [nSources]
-            prediction.resize(nSources);
-            const float* outPtr = outputTensor.data();
-            for (int s = 0; s < nSources; ++s) {
-                prediction(s) = static_cast<double>(outPtr[s]);
-            }
-        } else {
-            // Moving average fallback (control estimate from paper)
-            MatrixXd window = result.middleCols(t - lookBack, lookBack);
-            prediction = window.rowwise().mean();
-        }
-
-        // Normalize prediction (Eq. 12)
-        double maxVal = prediction.cwiseAbs().maxCoeff();
-        if (maxVal > 1e-10) {
-            prediction = prediction.cwiseAbs() / maxVal;
-        }
-
-        // CMNE correction: element-wise product (Eq. 13)
-        result.col(t) = prediction.cwiseProduct(matDspmData.col(t));
-    }
-
+MatrixXd InvCMNE::controlEstimate(const MatrixXd& matDspmData, int lookBack)
+{
+    // Paper's control: q_t times the mean of the previous k sensing estimates (no LSTM, not recursive).
+    const MatrixXd q = zScoreRectify(matDspmData);
+    MatrixXd result = q;
+    for (int t = lookBack; t < q.cols(); ++t)
+        result.col(t) = q.col(t).cwiseProduct(q.middleCols(t - lookBack, lookBack).rowwise().mean());
     return result;
+}
+
+//=============================================================================================================
+
+bool InvCMNE::applyCmne(const MatrixXd& matDspmData,
+                        const QString& onnxModelPath,
+                        MatrixXd& sensing,
+                        MatrixXd& prediction,
+                        MatrixXd& cmne)
+{
+    MLLIB::MlOnnxModel model;
+    if (!model.load(onnxModelPath)) {
+        qWarning() << "[InvCMNE] Cannot load CMNE model" << onnxModelPath;
+        return false;
+    }
+    const QJsonObject config = QJsonDocument::fromJson(model.metadata(QStringLiteral("cmne_config")).toUtf8()).object();
+    const int k = config.value(QStringLiteral("look_back")).toInt();
+    const int nSources = config.value(QStringLiteral("n_sources")).toInt();
+    if (k <= 0 || nSources != matDspmData.rows()) {
+        qWarning() << "[InvCMNE] Model" << onnxModelPath << "has no cmne_config for" << matDspmData.rows()
+                   << "sources (look_back" << k << ", n_sources" << nSources << ").";
+        return false;
+    }
+    if (matDspmData.cols() <= k) {
+        qWarning() << "[InvCMNE] Need more than look_back =" << k << "samples, got" << matDspmData.cols();
+        return false;
+    }
+    sensing = config.value(QStringLiteral("rectify")).toBool(true) ? zScoreRectify(matDspmData) : standardize(matDspmData);
+
+    // The network sees float32 time-major windows of the contextual estimate b (Eq. 13).
+    const MatrixXf q = sensing.cast<float>();
+    MatrixXf b = q;
+    MatrixXf pred = q;
+    std::vector<float> window(static_cast<size_t>(k) * static_cast<size_t>(nSources));
+    for (int t = k; t < q.cols(); ++t) {
+        Map<MatrixXf>(window.data(), nSources, k) = b.middleCols(t - k, k);
+        const MLLIB::MlTensor out = model.predict(MLLIB::MlTensor::view(window.data(), {1, k, nSources}));
+        const Map<const VectorXf> p(out.data(), nSources);
+        pred.col(t) = p;
+        const VectorXf w = p.cwiseAbs();
+        const float maxW = std::max(w.maxCoeff(), std::numeric_limits<float>::min());
+        b.col(t) = (w / maxW).cwiseProduct(q.col(t)); // Eqs. 10-11
+    }
+    prediction = pred.cast<double>();
+    cmne = b.cast<double>();
+    return true;
 }
 
 //=============================================================================================================

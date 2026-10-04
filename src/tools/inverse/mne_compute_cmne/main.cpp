@@ -213,16 +213,15 @@ static int doCompute(const QCommandLineParser& parser)
 
     if (!onnxPath.isEmpty()) {
         if (!QFile::exists(onnxPath)) {
-            err << "Warning: ONNX model not found: " << onnxPath
-                << " — falling back to moving-average correction.\n";
-        } else {
-            out << "ONNX model: " << onnxPath << "\n";
+            err << "Error: ONNX model not found: " << onnxPath << "\n";
+            return 1;
         }
+        out << "ONNX model: " << onnxPath << "\n";
     } else {
         out << "\n"
             << "NOTE: No ONNX model specified (--onnx).\n"
-            << "  The CMNE correction will use a moving-average approximation instead\n"
-            << "  of the trained LSTM. For proper CMNE results, train a model first:\n"
+            << "  Writing the paper's control estimate (no LSTM) instead of CMNE.\n"
+            << "  For CMNE, train a model first:\n"
             << "\n"
             << "    mne_compute_cmne --mode train --fwd <fwd.fif> --cov <cov.fif> \\\n"
             << "                     --epochs <epo.fif> --onnx-out cmne_lstm.onnx\n"
@@ -240,6 +239,10 @@ static int doCompute(const QCommandLineParser& parser)
 
     InvCMNEResult result = InvCMNE::compute(
         matEvoked, matGain, matNoiseCovPicked, matSrcCov, settings);
+    if (result.stcCmne.isEmpty()) {
+        err << "Error: the model cannot be applied to these data (see warnings above).\n";
+        return 1;
+    }
 
     // Propagate timing from evoked data
     result.stcDspm.tmin = tmin;
@@ -478,7 +481,8 @@ int main(int argc, char* argv[])
                       QStringLiteral("Inverse method: MNE, dSPM, sLORETA, eLORETA (default: dSPM)."),
                       QStringLiteral("name"), QStringLiteral("dSPM")});
     parser.addOption({QStringLiteral("look-back"),
-                      QStringLiteral("Number of past time steps k (default: 80)."),
+                      QStringLiteral("Number of past time steps k for training and for the control estimate without --onnx; "
+                                     "a model carries its own k (default: 80)."),
                       QStringLiteral("k"), QStringLiteral("80")});
 
     // -- Compute-mode options --
@@ -486,7 +490,7 @@ int main(int argc, char* argv[])
                       QStringLiteral("Evoked data FIFF file (compute mode)."),
                       QStringLiteral("file")});
     parser.addOption({QStringLiteral("onnx"),
-                      QStringLiteral("ONNX model for LSTM correction (compute mode)."),
+                      QStringLiteral("ONNX model with cmne_config metadata (compute mode); without it the control estimate is written."),
                       QStringLiteral("file")});
     parser.addOption({QStringLiteral("out"),
                       QStringLiteral("Output STC prefix; writes <prefix>-dspm.stc and <prefix>-cmne.stc."),

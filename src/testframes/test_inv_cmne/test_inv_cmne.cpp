@@ -268,16 +268,10 @@ void TestInvCmne::testCmneIdentityForEarlyTimesteps()
 
     InvCMNEResult result = InvCMNE::compute(evoked, gain, noiseCov, srcCov, settings);
 
-    // First lookBack columns of CMNE should equal dSPM (when no model is available,
-    // the entire output may equal dSPM)
-    if (result.stcCmne.data.cols() > 0 && result.stcDspm.data.cols() > 0) {
-        int checkCols = qMin(lookBack, (int)result.stcCmne.data.cols());
-        MatrixXd cmneEarly = result.stcCmne.data.leftCols(checkCols);
-        MatrixXd dspmEarly = result.stcDspm.data.leftCols(checkCols);
-        double maxDiff = (cmneEarly - dspmEarly).cwiseAbs().maxCoeff();
-        QVERIFY2(maxDiff < 1e-10,
-                 qPrintable(QString("Early timesteps: CMNE != dSPM, maxDiff=%1").arg(maxDiff)));
-    }
+    // Before k samples of context the estimate is the sensing estimate q_t itself (Eq. 12).
+    const MatrixXd q = InvCMNE::zScoreRectify(result.stcDspm.data);
+    QCOMPARE(result.stcSensing.data, q);
+    QVERIFY((result.stcCmne.data.leftCols(lookBack) - q.leftCols(lookBack)).cwiseAbs().maxCoeff() < 1e-12);
 }
 
 //=============================================================================================================
@@ -377,19 +371,26 @@ void TestInvCmne::testDspmKernelMatchesDefinition()
     const MatrixXd dspm = ref * evoked;
     QVERIFY((result.stcDspm.data - dspm).norm() < 1e-9 * dspm.norm());
 
-    // Without a model the correction scales each later sample by the normalised moving average of |dSPM|.
-    MatrixXd cmne = dspm;
-    for (int t = settings.lookBack; t < nTimes; ++t) {
-        VectorXd p = cmne.middleCols(t - settings.lookBack, settings.lookBack).rowwise().mean().cwiseAbs();
-        p /= p.maxCoeff();
-        cmne.col(t) = p.cwiseProduct(dspm.col(t));
+    // Without a model compute() returns the paper's control estimate: q_t times the mean of q over the previous k samples.
+    MatrixXd q = dspm.cwiseAbs();
+    for (int i = 0; i < nSrc; ++i) {
+        const double mu = q.row(i).mean();
+        q.row(i).array() -= mu;
+        q.row(i) /= std::sqrt(q.row(i).squaredNorm() / nTimes);
     }
-    QVERIFY((result.stcCmne.data - cmne).norm() < 1e-9 * cmne.norm());
+    MatrixXd control = q;
+    for (int t = settings.lookBack; t < nTimes; ++t)
+        control.col(t) = q.col(t).cwiseProduct(q.middleCols(t - settings.lookBack, settings.lookBack).rowwise().mean());
+    QVERIFY((result.stcSensing.data - q).norm() < 1e-9 * q.norm());
+    QVERIFY((result.stcCmne.data - control).norm() < 1e-9 * control.norm());
 
-    // A model path that cannot be loaded falls back to the same moving average.
-    QTest::ignoreMessage(QtWarningMsg, QRegularExpression("Failed to load ONNX model"));
-    const MatrixXd fallback = InvCMNE::applyLstmCorrection(dspm, QStringLiteral("/nonexistent/model.onnx"), settings.lookBack);
-    QVERIFY((fallback - cmne).norm() < 1e-9 * cmne.norm());
+    // A model that cannot be loaded leaves only the dSPM estimate.
+    settings.onnxModelPath = QStringLiteral("/nonexistent/model.onnx");
+    QTest::ignoreMessage(QtWarningMsg, QRegularExpression("Cannot load CMNE model"));
+    QTest::ignoreMessage(QtWarningMsg, QRegularExpression("returning the dSPM estimate only"));
+    const InvCMNEResult failed = InvCMNE::compute(evoked, gain, noiseCov, srcCov, settings);
+    QVERIFY(failed.stcCmne.isEmpty());
+    QVERIFY((failed.stcDspm.data - dspm).norm() < 1e-9 * dspm.norm());
 }
 
 //=============================================================================================================

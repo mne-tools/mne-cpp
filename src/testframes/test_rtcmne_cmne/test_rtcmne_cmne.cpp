@@ -11,8 +11,7 @@
  *           inverse plugin. The plugin itself can only be exercised in a full MNE Scan
  *           runtime, so this test focuses on the algorithmic dispatch: it drives the
  *           InvCMNE solver through the same compute() entry-point used by the plugin
- *           and validates the result shape. Without CMNE_MODEL_CHECKPOINT it runs the
- *           untrained cmne_smoke.onnx (see make_cmne_smoke_model.py).
+ *           and checks it against the cmne reference implementation (make_cmne_reference.py).
  */
 
 //=============================================================================================================
@@ -36,7 +35,8 @@
 #include <QtTest>
 #include <QObject>
 #include <QFileInfo>
-#include <QProcessEnvironment>
+#include <QFile>
+#include <QRegularExpression>
 #include <QString>
 
 //=============================================================================================================
@@ -44,7 +44,6 @@
 //=============================================================================================================
 
 #include <cmath>
-#include <random>
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -67,15 +66,9 @@ private slots:
     void initTestCase();
 
     void testSettingsRoundTrip();
-    void testCmneInverseSmoke();
+    void testCmneMatchesReference();
 
     void cleanupTestCase();
-
-private:
-    QString resolveModelCheckpoint() const;
-
-    MatrixXd buildSyntheticGain(int nChannels, int nSources, unsigned int seed = 1) const;
-    MatrixXd buildDiagonalCov(int n, double variance = 1.0) const;
 };
 
 //=============================================================================================================
@@ -90,40 +83,6 @@ void TestRtcMneCmne::initTestCase()
 
 void TestRtcMneCmne::cleanupTestCase()
 {
-}
-
-//=============================================================================================================
-
-QString TestRtcMneCmne::resolveModelCheckpoint() const
-{
-    const QString sFromEnv = QProcessEnvironment::systemEnvironment().value(QStringLiteral("CMNE_MODEL_CHECKPOINT"));
-    if (!sFromEnv.isEmpty() && QFileInfo::exists(sFromEnv)) {
-        return sFromEnv;
-    }
-    const QString sShipped = QStringLiteral(MNE_CMNE_SMOKE_MODEL);
-    return QFileInfo::exists(sShipped) ? sShipped : QString();
-}
-
-//=============================================================================================================
-
-MatrixXd TestRtcMneCmne::buildSyntheticGain(int nChannels, int nSources, unsigned int seed) const
-{
-    std::mt19937 gen(seed);
-    std::normal_distribution<double> nd(0.0, 1.0);
-    MatrixXd m(nChannels, nSources);
-    for (int r = 0; r < nChannels; ++r) {
-        for (int c = 0; c < nSources; ++c) {
-            m(r, c) = nd(gen);
-        }
-    }
-    return m;
-}
-
-//=============================================================================================================
-
-MatrixXd TestRtcMneCmne::buildDiagonalCov(int n, double variance) const
-{
-    return MatrixXd::Identity(n, n) * variance;
 }
 
 //=============================================================================================================
@@ -148,42 +107,52 @@ void TestRtcMneCmne::testSettingsRoundTrip()
 
 //=============================================================================================================
 
-void TestRtcMneCmne::testCmneInverseSmoke()
+void TestRtcMneCmne::testCmneMatchesReference()
 {
-    const QString sCheckpoint = resolveModelCheckpoint();
-    if (sCheckpoint.isEmpty()) {
-        QSKIP("No CMNE model checkpoint available (set CMNE_MODEL_CHECKPOINT to a valid .onnx file).");
-    }
+    // make_cmne_reference.py: cmne 0.2.1 apply_cmne / control_estimate on a 12 x 30 estimate.
+    auto load = [](const QString& name) {
+        QFile file(QStringLiteral(MNE_CMNE_REF_DIR "/cmne_ref_%1.txt").arg(name));
+        if (!file.open(QIODevice::ReadOnly | QIODevice::Text))
+            return MatrixXd();
+        QList<QList<double>> rows;
+        while (!file.atEnd()) {
+            QList<double> row;
+            for (const QByteArray& v : file.readLine().simplified().split(' '))
+                row << v.toDouble();
+            rows << row;
+        }
+        MatrixXd m(rows.size(), rows.first().size());
+        for (int r = 0; r < m.rows(); ++r)
+            for (int c = 0; c < m.cols(); ++c)
+                m(r, c) = rows[r][c];
+        return m;
+    };
+    const MatrixXd source = load(QStringLiteral("source"));
+    QCOMPARE(source.rows(), 12);
+    QCOMPARE(source.cols(), 30);
+    auto close = [](const MatrixXd& got, const MatrixXd& ref, double tol) {
+        return got.rows() == ref.rows() && got.cols() == ref.cols() && (got - ref).cwiseAbs().maxCoeff() <= tol * ref.cwiseAbs().maxCoeff();
+    };
 
-    const int nChannels = 32;
-    const int nSources = 16;
-    const int nTimes = 16;
-
-    const MatrixXd matGain = buildSyntheticGain(nChannels, nSources);
-    const MatrixXd matNoiseCov = buildDiagonalCov(nChannels);
-    const MatrixXd matSrcCov = buildDiagonalCov(nSources);
-    const MatrixXd matEvoked = MatrixXd::Random(nChannels, nTimes);
-
-    InvCMNESettings settings;
-    settings.onnxModelPath = sCheckpoint;
-    settings.numSources = nSources;
-    settings.lookBack = 4;
-    settings.lambda2 = 1.0 / 9.0;
-
-    const InvCMNEResult res = InvCMNE::compute(matEvoked, matGain, matNoiseCov, matSrcCov, settings);
-
-    QVERIFY(res.matKernelDspm.rows() == nSources);
-    QVERIFY(res.matKernelDspm.cols() == nChannels);
-    QVERIFY(res.stcDspm.data.rows() == nSources || res.stcDspm.data.rows() == 0);
-    QVERIFY(res.stcCmne.data.rows() == nSources || res.stcCmne.data.rows() == 0);
+    QVERIFY(close(InvCMNE::zScoreRectify(source), load(QStringLiteral("sensing")), 1e-6));
+    QVERIFY(close(InvCMNE::controlEstimate(source, 6), load(QStringLiteral("control")), 1e-6));
 
 #ifdef MNE_USE_ONNXRUNTIME
-    // A model that fails to load falls back to the moving average silently, so prove inference ran.
-    const MatrixXd matSources = MatrixXd::Random(nSources, nTimes).cwiseAbs();
-    const MatrixXd matLstm = InvCMNE::applyLstmCorrection(matSources, sCheckpoint, settings.lookBack);
-    const MatrixXd matMovingAverage = InvCMNE::applyLstmCorrection(matSources, QString(), settings.lookBack);
-    QVERIFY(!matLstm.rightCols(nTimes - settings.lookBack).isApprox(matMovingAverage.rightCols(nTimes - settings.lookBack)));
+    MatrixXd sensing, prediction, cmne;
+    QVERIFY(InvCMNE::applyCmne(source, QStringLiteral(MNE_CMNE_REF_DIR "/cmne_ref.onnx"), sensing, prediction, cmne));
+    QVERIFY(close(sensing, load(QStringLiteral("sensing")), 1e-6));
+    QVERIFY2(close(prediction, load(QStringLiteral("prediction")), 1e-5), qPrintable(QString::number((prediction - load(QStringLiteral("prediction"))).cwiseAbs().maxCoeff())));
+    QVERIFY2(close(cmne, load(QStringLiteral("cmne")), 1e-5), qPrintable(QString::number((cmne - load(QStringLiteral("cmne"))).cwiseAbs().maxCoeff())));
+
+    // The model is for 12 sources and needs more than 6 samples.
+    QTest::ignoreMessage(QtWarningMsg, QRegularExpression("has no cmne_config for 11 sources"));
+    QVERIFY(!InvCMNE::applyCmne(source.topRows(11), QStringLiteral(MNE_CMNE_REF_DIR "/cmne_ref.onnx"), sensing, prediction, cmne));
+    QTest::ignoreMessage(QtWarningMsg, QRegularExpression("Need more than look_back"));
+    QVERIFY(!InvCMNE::applyCmne(source.leftCols(6), QStringLiteral(MNE_CMNE_REF_DIR "/cmne_ref.onnx"), sensing, prediction, cmne));
 #endif
+    QTest::ignoreMessage(QtWarningMsg, QRegularExpression("Cannot load CMNE model"));
+    MatrixXd s, p, c;
+    QVERIFY(!InvCMNE::applyCmne(source, QStringLiteral("/nonexistent.onnx"), s, p, c));
 }
 
 //=============================================================================================================

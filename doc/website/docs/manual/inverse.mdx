@@ -401,7 +401,7 @@ where $g(\cdot)$ encapsulates the LSTM prediction, normalization, and element-wi
 
 #### Connection to the paper
 
-The Markov chain formulation is described in Dinh et al. (2021, Section 2.3). The paper demonstrates that the recursive structure is critical for CMNE's performance — a non-recursive variant (where the LSTM operates on uncorrected dSPM rather than on its own previous outputs) achieves significantly worse spatial resolution. The feedback loop allows the network to:
+The Markov chain formulation is Eq. 13 of Dinh et al. (2021). On the simulated data of the reference implementation ([cmne](https://pypi.org/project/cmne/)), a non-recursive variant, where the LSTM sees the uncorrected $\hat{q}$ instead of its own previous outputs, localizes less accurately than the recursive one. The feedback loop allows the network to:
 
 - **Track propagating activity**: as neural activation moves from one cortical area to another, the Markov chain naturally follows this trajectory because each prediction is conditioned on the recent corrected pattern.
 - **Suppress spurious activations**: a source that was correctly suppressed in $b_{t-1}$ remains suppressed in the input to the LSTM at time $t$, reinforcing the correct spatial pattern.
@@ -439,15 +439,17 @@ When ground-truth source activity is available (e.g., from simulations), the tar
 Training on the MNE sample dataset (289 epochs, 7498 sources, look-back 40) produces approximately 110,000 training samples. The first run computes dSPM for all epochs, which takes several minutes on CPU. Subsequent runs load cached source estimates from disk automatically.
 :::
 
-### Fallback: Moving-Average Approximation
+### Without a Model: Control Estimate
 
-When no trained ONNX model is available, MNE-CPP provides a **moving-average fallback** that replaces the LSTM prediction with a simple temporal average:
+When no ONNX model is given, MNE-CPP returns the **control estimate** of the paper, which mimics CMNE without the LSTM: the current estimate is weighted by the mean of the previous $k$ estimates,
 
 $$
-W_t^\text{MA}(i,i) = \frac{1}{k} \sum_{s=t-k}^{t-1} b_s(i)
+c_t(i) = \hat{q}_t(i) \cdot \frac{1}{k} \sum_{s=t-k}^{t-1} \hat{q}_s(i), \qquad t \geq k,
 $$
 
-This produces a smoothed version of the CMNE correction without requiring any trained model. While it does not achieve the spatial improvement of the LSTM approach, it serves as a baseline and allows the pipeline to run end-to-end for testing.
+and $c_t = \hat{q}_t$ before. It is not recursive and serves as the baseline that shows the benefit of the LSTM.
+
+The ONNX model must carry its configuration (`look_back`, `n_sources`, `rectify`) in the `cmne_config` metadata, as written by `cmne.export_onnx`; a model without it, or for a different number of sources, is rejected. MNE-CPP's results match the reference implementation `cmne.apply_cmne` and `cmne.control_estimate`.
 
 ### Performance
 

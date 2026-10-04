@@ -11,12 +11,13 @@
  *
  * @ref INVLIB::InvCMNE implements the CMNE algorithm of Dinh et al.,
  * @em Contextual Minimum-Norm Estimates: A Deep Learning Method for
- * Source Estimation in Neuroimaging, 2021. The static @c compute method
- * combines a closed-form dSPM kernel with an LSTM correction step that
- * runs in ONNX Runtime: dSPM is computed first, the time-courses are
- * z-scored and rectified, an LSTM consumes a sliding @c lookBack window
- * of past time samples and outputs the contextual correction, and the
- * final CMNE estimate is the LSTM-modulated dSPM. The
+ * Source Estimation in Neuroimaging, 2021, and matches the reference
+ * implementation, the @c cmne Python package (0.2.1). The static @c compute
+ * method combines a closed-form dSPM kernel with the contextual re-weighting
+ * of Eqs. 9-13: the dSPM estimate is rectified and z-scored (q), and for
+ * t >= k an LSTM, run in ONNX Runtime, predicts the next estimate from the
+ * previous k contextual estimates b; q_t is weighted by the max-normalised
+ * |prediction|. Without a model the paper's control estimate is returned. The
  * @c trainLstm helper drives the Python training pipeline
  * (@c scripts/ml/training/train_cmne_lstm.py) through
  * @ref UTILSLIB::PythonRunner so the full train-and-deploy cycle is
@@ -68,8 +69,9 @@ namespace INVLIB
 struct INVSHARED_EXPORT InvCMNEResult
 {
     InvSourceEstimate stcDspm;        /**< Uncorrected dSPM estimate. */
-    InvSourceEstimate stcCmne;        /**< CMNE-corrected estimate. */
-    InvSourceEstimate stcLstmPredict; /**< Raw LSTM prediction (diagnostics). */
+    InvSourceEstimate stcSensing;     /**< Rectified, z-scored dSPM q_t (Eq. 9). */
+    InvSourceEstimate stcCmne;        /**< Contextual estimate b_t (Eqs. 10-13), or the control estimate without a model. */
+    InvSourceEstimate stcLstmPredict; /**< Raw LSTM prediction (q_t for the first k samples). */
     Eigen::MatrixXd matKernelDspm;    /**< Static dSPM kernel (n_sources x n_channels). */
 };
 
@@ -107,18 +109,46 @@ public:
 
     //=========================================================================================================
     /**
-     * Apply LSTM-based temporal correction to z-scored rectified dSPM data.
+     * Contextual estimate of Eqs. 9-13, as cmne.apply_cmne with normalised weights.
      *
-     * @param[in] matDspmData    Z-scored rectified dSPM data (n_sources x n_times).
-     * @param[in] onnxModelPath  Path to ONNX model file.
-     * @param[in] lookBack       Number of past time steps (k).
+     * The model must be exported by cmne.export_onnx: look-back, source count and
+     * rectification are read from its @c cmne_config metadata.
      *
-     * @return Corrected source data (n_sources x n_times).
+     * @param[in] matDspmData    Signed dSPM estimate (n_sources x n_times).
+     * @param[in] onnxModelPath  Path to the ONNX model.
+     * @param[out] sensing       q_t (Eq. 9).
+     * @param[out] prediction    LSTM prediction (q_t for the first k samples).
+     * @param[out] cmne          Contextual estimate b_t.
+     *
+     * @return False if the model cannot be loaded, does not fit the data, or there are no more than k samples.
      */
-    static Eigen::MatrixXd applyLstmCorrection(
-        const Eigen::MatrixXd& matDspmData,
-        const QString& onnxModelPath,
-        int lookBack);
+    static bool applyCmne(const Eigen::MatrixXd& matDspmData,
+                          const QString& onnxModelPath,
+                          Eigen::MatrixXd& sensing,
+                          Eigen::MatrixXd& prediction,
+                          Eigen::MatrixXd& cmne);
+
+    //=========================================================================================================
+    /**
+     * Control estimate of the paper (cmne.control_estimate): q_t times the mean of
+     * q over the previous @p lookBack samples, without an LSTM.
+     *
+     * @param[in] matDspmData    Signed dSPM estimate (n_sources x n_times).
+     * @param[in] lookBack       Window length k.
+     *
+     * @return Control estimate (n_sources x n_times).
+     */
+    static Eigen::MatrixXd controlEstimate(const Eigen::MatrixXd& matDspmData, int lookBack);
+
+    //=========================================================================================================
+    /**
+     * Rectify and z-score each source over time (Eq. 9).
+     *
+     * @param[in] matStcData     Source data (n_sources x n_times).
+     *
+     * @return |x| standardised per row; constant rows are centred only.
+     */
+    static Eigen::MatrixXd zScoreRectify(const Eigen::MatrixXd& matStcData);
 
     //=========================================================================================================
 #ifndef WASMBUILD
@@ -180,16 +210,7 @@ private:
         const Eigen::MatrixXd& matSrcCov,
         double lambda2);
 
-    //=========================================================================================================
-    /**
-     * Z-score rectify source data (absolute value, then z-score per source).
-     *
-     * @param[in] matStcData     Source data (n_sources x n_times).
-     *
-     * @return Z-scored rectified data.
-     */
-    static Eigen::MatrixXd zScoreRectify(
-        const Eigen::MatrixXd& matStcData);
+    static Eigen::MatrixXd standardize(const Eigen::MatrixXd& matStcData);
 };
 
 } // namespace INVLIB

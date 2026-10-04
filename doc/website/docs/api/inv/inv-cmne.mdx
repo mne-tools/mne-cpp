@@ -53,24 +53,65 @@ Compute CMNE inverse solution.
 
 ---
 
-### applyLstmCorrection(matDspmData, onnxModelPath, lookBack)
+### applyCmne(matDspmData, onnxModelPath, sensing, prediction, cmne)
 
-Apply LSTM-based temporal correction to z-scored rectified dSPM data.
+Contextual estimate of Eqs. 9-13, as cmne.apply_cmne with normalised weights.
+
+The model must be exported by cmne.export_onnx: look-back, source count and rectification are read from its `cmne_config` metadata.
 
 **Parameters:**
 
 - **matDspmData** : *const Eigen::MatrixXd &*
-  Z-scored rectified dSPM data (n_sources x n_times).
+  Signed dSPM estimate (n_sources x n_times).
 
 - **onnxModelPath** : *const QString &*
-  Path to ONNX model file.
+  Path to the ONNX model.
 
-- **lookBack** : *int*
-  Number of past time steps (k).
+- **sensing** : *Eigen::MatrixXd &*
+  q_t (Eq. 9).
+
+- **prediction** : *Eigen::MatrixXd &*
+  LSTM prediction (q_t for the first k samples).
+
+- **cmne** : *Eigen::MatrixXd &*
+  Contextual estimate b_t.
 
 **Returns:**
 
-- *Eigen::MatrixXd* — Corrected source data (n_sources x n_times).
+- *bool* — False if the model cannot be loaded, does not fit the data, or there are no more than k samples.
+
+---
+
+### controlEstimate(matDspmData, lookBack)
+
+Control estimate of the paper (cmne.control_estimate): q_t times the mean of q over the previous `lookBack` samples, without an LSTM.
+
+**Parameters:**
+
+- **matDspmData** : *const Eigen::MatrixXd &*
+  Signed dSPM estimate (n_sources x n_times).
+
+- **lookBack** : *int*
+  Window length k.
+
+**Returns:**
+
+- *Eigen::MatrixXd* — Control estimate (n_sources x n_times).
+
+---
+
+### zScoreRectify(matStcData)
+
+Rectify and z-score each source over time (Eq. 9).
+
+**Parameters:**
+
+- **matStcData** : *const Eigen::MatrixXd &*
+  Source data (n_sources x n_times).
+
+**Returns:**
+
+- *Eigen::MatrixXd* — |x| standardised per row; constant rows are centred only.
 
 ---
 

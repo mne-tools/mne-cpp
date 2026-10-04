@@ -111,6 +111,13 @@ public:
      */
     bool isLoaded() const;
 
+    //=========================================================================================================
+    /**
+     * @param[in] key  Custom metadata key stored in the model file.
+     * @return The value stored under @p key, or an empty string if the model has none or is not loaded.
+     */
+    QString metadata(const QString& key) const;
+
 private:
 #ifdef MNE_USE_ONNXRUNTIME
     static Ort::Env& ortEnv();
