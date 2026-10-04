@@ -516,8 +516,8 @@ FiffCov FiffCov::compute_from_epochs(const FiffRawData& raw,
         if (doBaseline) {
             int bminIdx = qMax(0, bminSamp);
             int bmaxIdx = qMin(static_cast<int>(epochData.cols()) - 1, bmaxSamp);
-            if (bmaxIdx > bminIdx) {
-                int nBase = bmaxIdx - bminIdx;
+            if (bmaxIdx >= bminIdx) {
+                int nBase = bmaxIdx - bminIdx + 1;
                 for (int c = 0; c < nchan; ++c) {
                     double baseVal = epochData.row(c).segment(bminIdx, nBase).mean();
                     epochData.row(c).array() -= baseVal;

@@ -2385,7 +2385,7 @@
         "test-data"
       ],
       "gui": false,
-      "qskip_sites": 2,
+      "qskip_sites": 3,
       "spawns_processes": false,
       "ci_excluded_on": [],
       "ci": {

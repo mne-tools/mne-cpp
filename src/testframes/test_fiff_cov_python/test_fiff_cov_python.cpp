@@ -35,6 +35,8 @@
 //=============================================================================================================
 
 #include <fiff/fiff_cov.h>
+#include <fiff/fiff_info.h>
+#include <fiff/fiff_raw_data.h>
 #include <fiff/fiff_stream.h>
 #include <fiff/fiff_dir_node.h>
 #include <fiff/fiff_constants.h>
@@ -89,6 +91,8 @@ private slots:
     void data_matchesPython();
     void data_isSymmetric();
     void missingKind_isReported();
+    void regularize_matchesPython_data();
+    void regularize_matchesPython();
 };
 
 //=============================================================================================================
@@ -124,7 +128,7 @@ void TestFiffCovPython::scalars_matchPython_data()
     QTest::newRow("kind") << "kind" << 1; // FIFFV_MNE_NOISE_COV
     QTest::newRow("dim") << "dim" << 366;
     QTest::newRow("nfree") << "nfree" << 15972;
-    QTest::newRow("diag") << "diag" << 0; // stored full, not diagonal
+    QTest::newRow("diag") << "diag" << int{0}; // stored full, not diagonal
     QTest::newRow("n_names") << "n_names" << 366;
     QTest::newRow("n_bads") << "n_bads" << 2;
     QTest::newRow("n_projs") << "n_projs" << 4;
@@ -268,6 +272,55 @@ void TestFiffCovPython::missingKind_isReported()
     QVERIFY2(!ok, "reading an absent covariance kind reported success");
 
     stream->close();
+}
+
+//=============================================================================================================
+
+void TestFiffCovPython::regularize_matchesPython_data()
+{
+    // mne.cov.regularize(cov, read_info(sample_audvis_trunc_raw.fif), mag=0.1, grad=0.05, eeg=0.2,
+    // proj=..., rank="full"): trace, sum |C|, C[MEG0111,MEG0111], C[EEG001,EEG001], C[MEG0112,MEG0112].
+    QTest::addColumn<bool>("proj");
+    QTest::addColumn<double>("trace");
+    QTest::addColumn<double>("absSum");
+    QTest::addColumn<double>("grad11");
+    QTest::addColumn<double>("eeg1");
+    QTest::addColumn<double>("mag12");
+    QTest::newRow("with SSP") << true << 1.386792121597564e-09 << 2.0671792043092587e-08 << 6.036611780302426e-26 << 4.648008748962221e-11 << 6.1608397326172324e-24;
+    QTest::newRow("without SSP") << false << 1.3867921217721483e-09 << 2.0640104718027955e-08 << 6.03548239156651e-26 << 4.648008832222862e-11 << 6.1608397326172324e-24;
+}
+
+void TestFiffCovPython::regularize_matchesPython()
+{
+    QFETCH(bool, proj);
+    QFETCH(double, trace);
+    QFETCH(double, absSum);
+    QFETCH(double, grad11);
+    QFETCH(double, eeg1);
+    QFETCH(double, mag12);
+
+    QFile rawFile(QCoreApplication::applicationDirPath() + "/../resources/data/mne-cpp-test-data/MEG/sample/sample_audvis_trunc_raw.fif");
+    const FiffRawData raw(rawFile);
+    // The covariance names channels as stored ("MEG 0111"); MNE-CPP's info strips the space.
+    FiffInfo info = raw.info;
+    FiffCov cov = m_cov;
+    for (QString& name : cov.names)
+        name.remove(' ');
+    for (QString& name : cov.bads)
+        name.remove(' ');
+
+    const FiffCov reg = cov.regularize(info, 0.1, 0.05, 0.2, proj);
+    auto at = [&](const char* a, const char* b) {
+        return reg.data(reg.names.indexOf(a), reg.names.indexOf(b));
+    };
+    auto close = [](double got, double want) {
+        return std::abs(got - want) <= 1e-9 * std::abs(want);
+    };
+    QVERIFY2(close(reg.data.trace(), trace), qPrintable(QString("trace %1").arg(reg.data.trace(), 0, 'g', 17)));
+    QVERIFY2(close(reg.data.cwiseAbs().sum(), absSum), qPrintable(QString("sum %1").arg(reg.data.cwiseAbs().sum(), 0, 'g', 17)));
+    QVERIFY2(close(at("MEG0111", "MEG0111"), grad11), qPrintable(QString("grad %1").arg(at("MEG0111", "MEG0111"), 0, 'g', 17)));
+    QVERIFY2(close(at("EEG001", "EEG001"), eeg1), qPrintable(QString("eeg %1").arg(at("EEG001", "EEG001"), 0, 'g', 17)));
+    QVERIFY2(close(at("MEG0112", "MEG0112"), mag12), qPrintable(QString("mag %1").arg(at("MEG0112", "MEG0112"), 0, 'g', 17)));
 }
 
 //=============================================================================================================
