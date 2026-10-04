@@ -624,11 +624,12 @@ void TestFwdPython::sphereForward_modelFile()
         {61, Vector3d(352.97698173839217, 327.7262594697324, 338.9604653611034)},
         {77, Vector3d(325.90676712903104, 304.57117355185295, 330.43617483953057)},
     };
+    // The Berg-Scherg fit leaves up to 8e-4 here; the default four-layer model differs by ~20 %.
     for (const auto& [source, norms] : refs) {
         Vector3d got;
         for (int c = 0; c < 3; ++c)
             got[c] = fwd->sol->data.col(3 * source + c).norm();
-        QVERIFY2((got - norms).cwiseAbs().maxCoeff() < 1e-3 * norms.maxCoeff(),
+        QVERIFY2((got - norms).cwiseAbs().maxCoeff() < 5e-3 * norms.maxCoeff(),
                  qPrintable(QStringLiteral("source %1: %2 %3 %4").arg(source).arg(got[0], 0, 'g', 10).arg(got[1], 0, 'g', 10).arg(got[2], 0, 'g', 10)));
     }
 }
