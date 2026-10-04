@@ -1184,11 +1184,9 @@ bool FiffStream::read_meas_info(const FiffDirNode::SPtr& p_Node, FiffInfo& info,
             } else {
                 if (kind == FIFF_MNE_COORD_FRAME) {
                     this->read_tag(t_pTag, pos);
-                    qDebug() << "NEEDS To BE DEBBUGED: FIFF_MNE_COORD_FRAME" << t_pTag->getType();
                     coord_frame = *t_pTag->toInt();
                 } else if (kind == FIFF_COORD_TRANS) {
                     this->read_tag(t_pTag, pos);
-                    qDebug() << "NEEDS To BE DEBBUGED: FIFF_COORD_TRANS" << t_pTag->getType();
                     dig_trans = t_pTag->toCoordTrans();
                 }
             }

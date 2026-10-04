@@ -27,6 +27,7 @@
 
 #include <fiff/fiff_stream.h>
 #include <fiff/fiff_cov.h>
+#include <fiff/fiff_info.h>
 #include <fiff/fiff_tag.h>
 #include <fiff/fiff_dir_node.h>
 #include <fiff/fiff_proj.h>
@@ -93,6 +94,7 @@ private slots:
     void copiesProcessingHistory();
     void attachesEnvironment();
     void readsFloatCovariance();
+    void readsMeasInfo();
 
 private:
     FiffDirNode::SPtr findBlock(int kind) const;
@@ -373,6 +375,46 @@ void TestFiffStreamPython::readsFloatCovariance()
     FiffCov missing;
     QVERIFY(!stream.read_cov(stream.dirtree(), FIFFV_MNE_DEPTH_PRIOR_COV, missing));
     stream.close();
+}
+
+//=============================================================================================================
+
+void TestFiffStreamPython::readsMeasInfo()
+{
+    // data/meas_info.fif (make_meas_info_fixture.py); expected values are mne-python's read_info.
+    QFile file(QStringLiteral(MNE_FIFF_STREAM_DATA_DIR "/meas_info.fif"));
+    FiffStream stream(&file);
+    QVERIFY(stream.open());
+    FiffInfo info;
+    FiffDirNode::SPtr meas;
+    QVERIFY(stream.read_meas_info(stream.dirtree(), info, meas));
+    stream.close();
+
+    QCOMPARE(info.nchan, 2);
+    QCOMPARE(info.meas_id.version, 65540);
+    QCOMPARE(info.meas_id.machid[0], 11);
+    QCOMPARE(info.meas_id.machid[1], 22);
+    // Without FIFF_MEAS_DATE the date comes from the measurement id.
+    QCOMPARE(info.meas_date[0], 1700000000);
+    QCOMPARE(info.meas_date[1], 250000);
+    QCOMPARE(info.utc_offset, QString("+0100"));
+    QCOMPARE(info.gantry_angle, 68);
+    QCOMPARE(info.acq_pars, QString("pars"));
+    QCOMPARE(info.acq_stim, QString("stim"));
+
+    // ctf_head_t only in the HPI result block.
+    QCOMPARE(info.ctf_head_t.from, FIFFV_MNE_COORD_CTF_HEAD);
+    Matrix4f devCtf;
+    devCtf << 0, 0, -1, 0.022f, -1, 0, 0, -0.006f, 0, 1, 0, 0.03f, 0, 0, 0, 1;
+    QVERIFY((info.dev_ctf_t.trans - devCtf).cwiseAbs().maxCoeff() < 1e-6f);
+
+    QCOMPARE(info.dig.size(), 3);
+    for (const FiffDigPoint& d : info.dig)
+        QCOMPARE(d.coord_frame, FIFFV_COORD_MRI);
+    QVERIFY((Map<const Vector3f>(info.dig[1].r) - Vector3f(0.0f, 0.1f, 0.0f)).norm() < 1e-7f);
+    QCOMPARE(info.dig_trans.from, FIFFV_COORD_MRI);
+    QCOMPARE(info.dig_trans.to, FIFFV_COORD_HEAD);
+    QVERIFY(std::abs(info.dig_trans.trans(2, 3) - 0.04f) < 1e-7f);
 }
 
 //=============================================================================================================

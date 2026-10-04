@@ -58,6 +58,7 @@
         "test_fiff_proj_python",
         "test_fiff_raw_formats_python",
         "test_fiff_raw_save_python",
+        "test_fiff_stream_python",
         "test_filtering",
         "test_fwd_python",
         "test_inv_beamformer_python",
