@@ -28,11 +28,14 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
     ${QT_REQUIRED_COMPONENT_LIBS}
     mne_inv
     mne_mne
+    mne_fs
     mne_fiff
     mne_utils
     mne_math
     Eigen3::Eigen
 )
+
+target_compile_definitions(${PROJECT_NAME} PRIVATE MNE_STC_DATA_DIR="${CMAKE_CURRENT_SOURCE_DIR}/data")
 
 set_target_properties(${PROJECT_NAME} PROPERTIES
     FOLDER "tests"
