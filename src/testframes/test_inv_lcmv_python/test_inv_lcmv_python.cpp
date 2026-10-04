@@ -26,7 +26,13 @@
  * with evoked = [20 nAm g_300, 30 nAm g_15002, their sum] (sources 100 and
  * 5000, x and z components). DICS gets the same matrices as a single real
  * cross-spectral density, mne.beamformer.make_dics(..., noise_csd=nc,
- * real_filter=True, depth=None) and apply_dics_csd.
+ * real_filter=True, depth=None), apply_dics_csd and apply_dics. The
+ * resolution matrix uses the forward restricted to lh.V1 (70 sources):
+ *
+ *   fv = mne.forward.restrict_forward_to_label(fwd, v1)
+ *   f = make_lcmv(info, fv, dc, reg=0.05, noise_cov=nc, pick_ori='vector',
+ *                 weight_norm='unit-noise-gain')
+ *   mne.beamformer.make_lcmv_resolution_matrix(f, fv, info).reshape(210, 210)
  */
 
 //=============================================================================================================
@@ -39,6 +45,8 @@
 #include <inv/inv_source_estimate.h>
 
 #include <mne/mne_forward_solution.h>
+
+#include <fs/fs_label.h>
 
 #include <fiff/fiff_cov.h>
 #include <fiff/fiff_evoked.h>
@@ -65,6 +73,7 @@
 using namespace INVLIB;
 using namespace MNELIB;
 using namespace FIFFLIB;
+using namespace FSLIB;
 using namespace Eigen;
 
 //=============================================================================================================
@@ -83,11 +92,14 @@ private slots:
     void timeCoursesMatch();
     void dicsPowerMatches_data();
     void dicsPowerMatches();
+    void resolutionMatrixMatches();
 
 private:
     const InvBeamformer& makeFilter(BeamformerPickOri pickOri, BeamformerWeightNorm weightNorm, double reg = 0.05);
+    const InvBeamformer& makeDicsFilter(BeamformerPickOri pickOri);
 
     QMap<QString, InvBeamformer> m_filters; /**< Each 7928-source filter takes seconds, so build each once. */
+    QMap<int, InvBeamformer> m_dicsFilters;
     MNEForwardSolution m_fwd;
     FiffInfo m_info;
     FiffCov m_noiseCov;
@@ -154,6 +166,18 @@ const InvBeamformer& TestInvLcmvPython::makeFilter(BeamformerPickOri pickOri, Be
     auto it = m_filters.find(key);
     if (it == m_filters.end())
         it = m_filters.insert(key, InvLCMV::makeLCMV(m_info, m_fwd, m_dataCov, reg, m_noiseCov, pickOri, weightNorm));
+    return *it;
+}
+
+//=============================================================================================================
+
+const InvBeamformer& TestInvLcmvPython::makeDicsFilter(BeamformerPickOri pickOri)
+{
+    auto it = m_dicsFilters.find(static_cast<int>(pickOri));
+    if (it == m_dicsFilters.end())
+        it = m_dicsFilters.insert(static_cast<int>(pickOri),
+                                  InvDICS::makeDICS(m_info, m_fwd, {m_dataCov.data}, VectorXd::Constant(1, 10.0), 0.05, true, m_noiseCov,
+                                                    pickOri, BeamformerWeightNorm::UnitNoiseGain));
     return *it;
 }
 
@@ -239,19 +263,40 @@ void TestInvLcmvPython::timeCoursesMatch()
     QFETCH(Vector3d, source5000);
     QFETCH(double, absSum);
 
-    const InvBeamformer& filters = makeFilter(static_cast<BeamformerPickOri>(pickOri), BeamformerWeightNorm::UnitNoiseGain);
-    const InvSourceEstimate stc = InvLCMV::applyLCMV(m_evoked, filters);
-    QCOMPARE(static_cast<int>(stc.data.rows()), 7928);
-    QCOMPARE(static_cast<int>(stc.data.cols()), 3);
+    const BeamformerPickOri ori = static_cast<BeamformerPickOri>(pickOri);
+    const InvBeamformer& filters = makeFilter(ori, BeamformerWeightNorm::UnitNoiseGain);
+    const InvBeamformer& dics = makeDicsFilter(ori);
+    const float tstep = 1.0f / static_cast<float>(m_info.sfreq);
 
-    const Vector3d s100 = stc.data.row(100).transpose();
-    const Vector3d s5000 = stc.data.row(5000).transpose();
-    QVERIFY2((s100 - source100).norm() < 1e-6 * source100.norm(),
-             qPrintable(QStringLiteral("source 100: %1 %2 %3").arg(s100[0], 0, 'g', 10).arg(s100[1], 0, 'g', 10).arg(s100[2], 0, 'g', 10)));
-    QVERIFY2((s5000 - source5000).norm() < 1e-6 * source5000.norm(),
-             qPrintable(QStringLiteral("source 5000: %1 %2 %3").arg(s5000[0], 0, 'g', 10).arg(s5000[1], 0, 'g', 10).arg(s5000[2], 0, 'g', 10)));
-    const double sum = stc.data.cwiseAbs().sum();
-    QVERIFY2(std::abs(sum - absSum) < 1e-6 * absSum, qPrintable(QStringLiteral("abs sum %1").arg(sum, 0, 'g', 12)));
+    // mne-python's apply_dics on the same matrices gives the LCMV values too.
+    QList<InvSourceEstimate> stcs{InvLCMV::applyLCMV(m_evoked, filters),
+                                  InvLCMV::applyLCMVRaw(m_evoked.data, 0.5f, tstep, filters),
+                                  InvDICS::applyDICS(m_evoked.data, 0.5f, tstep, dics)};
+    stcs << InvLCMV::applyLCMVEpochs({m_evoked.data, m_evoked.data}, 0.5f, tstep, filters)
+         << InvDICS::applyDICSEpochs({m_evoked.data, m_evoked.data}, 0.5f, tstep, dics);
+    QCOMPARE(stcs.size(), 7);
+
+    for (int i = 0; i < stcs.size(); ++i) {
+        const InvSourceEstimate& stc = stcs[i];
+        QCOMPARE(static_cast<int>(stc.data.rows()), 7928);
+        QCOMPARE(static_cast<int>(stc.data.cols()), 3);
+        QCOMPARE(stc.tmin, i == 0 ? 0.0f : 0.5f);
+        QCOMPARE(stc.tstep, tstep);
+
+        const Vector3d s100 = stc.data.row(100).transpose();
+        const Vector3d s5000 = stc.data.row(5000).transpose();
+        QVERIFY2((s100 - source100).norm() < 1e-6 * source100.norm(),
+                 qPrintable(QStringLiteral("%1 source 100: %2 %3 %4").arg(i).arg(s100[0], 0, 'g', 10).arg(s100[1], 0, 'g', 10).arg(s100[2], 0, 'g', 10)));
+        QVERIFY2((s5000 - source5000).norm() < 1e-6 * source5000.norm(),
+                 qPrintable(QStringLiteral("%1 source 5000: %2 %3 %4").arg(i).arg(s5000[0], 0, 'g', 10).arg(s5000[1], 0, 'g', 10).arg(s5000[2], 0, 'g', 10)));
+        const double sum = stc.data.cwiseAbs().sum();
+        QVERIFY2(std::abs(sum - absSum) < 1e-6 * absSum, qPrintable(QStringLiteral("%1 abs sum %2").arg(i).arg(sum, 0, 'g', 12)));
+    }
+
+    QTest::ignoreMessage(QtWarningMsg, "InvLCMV::applyLCMVEpochs - Invalid or non-LCMV filters!");
+    QVERIFY(InvLCMV::applyLCMVEpochs({m_evoked.data}, 0.0f, tstep, dics).isEmpty());
+    QTest::ignoreMessage(QtWarningMsg, "InvDICS::applyDICS - freqIdx 1 out of range (0..0)!");
+    QVERIFY(InvDICS::applyDICS(m_evoked.data, 0.0f, tstep, dics, 1).isEmpty());
 }
 
 //=============================================================================================================
@@ -274,13 +319,10 @@ void TestInvLcmvPython::dicsPowerMatches()
     QFETCH(double, power100);
     QFETCH(int, argmax);
 
-    const std::vector<MatrixXd> csd{m_dataCov.data};
-    const VectorXd freqs = VectorXd::Constant(1, 10.0);
-    const InvBeamformer filters = InvDICS::makeDICS(m_info, m_fwd, csd, freqs, 0.05, true, m_noiseCov,
-                                                    static_cast<BeamformerPickOri>(pickOri), BeamformerWeightNorm::UnitNoiseGain);
+    const InvBeamformer& filters = makeDicsFilter(static_cast<BeamformerPickOri>(pickOri));
     QVERIFY(filters.isValid());
 
-    const VectorXd power = InvDICS::applyDICSCsd(csd, freqs, filters).data.col(0);
+    const VectorXd power = InvDICS::applyDICSCsd({m_dataCov.data}, VectorXd::Constant(1, 10.0), filters).data.col(0);
     QCOMPARE(static_cast<int>(power.size()), 7928);
     QVERIFY2(std::abs(power.sum() - powerSum) < 1e-6 * powerSum,
              qPrintable(QStringLiteral("power sum %1").arg(power.sum(), 0, 'g', 12)));
@@ -295,6 +337,31 @@ void TestInvLcmvPython::dicsPowerMatches()
         const InvBeamformer& lcmv = makeFilter(BeamformerPickOri::MaxPower, BeamformerWeightNorm::UnitNoiseGain);
         QVERIFY((filters.maxPowerOri - lcmv.maxPowerOri).cwiseAbs().maxCoeff() < 1e-6);
     }
+}
+
+//=============================================================================================================
+
+void TestInvLcmvPython::resolutionMatrixMatches()
+{
+    FsLabel v1;
+    QVERIFY(FsLabel::read(QCoreApplication::applicationDirPath() + "/../resources/data/mne-cpp-test-data/subjects/sample/label/lh.V1.label", v1));
+    const MNEForwardSolution fwd = m_fwd.pick_regions({v1});
+    QCOMPARE(static_cast<int>(fwd.nsource), 70);
+
+    const MatrixXd R = InvLCMV::makeLCMVResolutionMatrix(fwd, m_info, m_dataCov, 0.05, m_noiseCov);
+    QCOMPARE(static_cast<int>(R.rows()), 210);
+    QCOMPARE(static_cast<int>(R.cols()), 210);
+
+    const double trace = R.trace();
+    const double absSum = R.cwiseAbs().sum();
+    QVERIFY2(std::abs(trace - 18618495563.21897) < 1e-6 * 18618495563.21897, qPrintable(QStringLiteral("trace %1").arg(trace, 0, 'g', 12)));
+    QVERIFY2(std::abs(absSum - 1267800906128.2031) < 1e-6 * 1267800906128.2031, qPrintable(QStringLiteral("abs sum %1").arg(absSum, 0, 'g', 12)));
+    QVERIFY(std::abs(R(0, 0) - 380180129.19977117) < 1e-6 * 380180129.19977117);
+    QVERIFY(std::abs(R(4, 7) - 51239160.0045701) < 1e-6 * 51239160.0045701);
+    Index row = 0;
+    Index col = 0;
+    R.cwiseAbs().maxCoeff(&row, &col);
+    QCOMPARE(static_cast<int>(row * 210 + col), 23400);
 }
 
 //=============================================================================================================
