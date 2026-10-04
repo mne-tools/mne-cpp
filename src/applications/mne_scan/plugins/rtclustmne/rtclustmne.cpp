@@ -3,22 +3,22 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2013-2026 MNE-CPP Authors
  *
- * @file     rtcmne.cpp
+ * @file     rtclustmne.cpp
  * @author   Gabriel Motta <gabrielbenmotta@gmail.com>;
  *           Christoph Dinh <christoph.dinh@mne-cpp.org>;
  *           Lorenz Esch <lorenz.esch@tu-ilmenau.de>
  * @since    0.1.0
  * @date     February, 2013
- * @brief    Definition of the RtcMne class.
+ * @brief    Definition of the RtClustMne class.
  */
 
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include "rtcmne.h"
+#include "rtclustmne.h"
 
-#include "FormFiles/rtcmnesetupwidget.h"
+#include "FormFiles/rtclustmnesetupwidget.h"
 
 #include <disp/viewers/minimumnormsettingsview.h>
 
@@ -57,7 +57,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace RTCMNEPLUGIN;
+using namespace RTCLUSTMNEPLUGIN;
 using namespace FIFFLIB;
 using namespace SCMEASLIB;
 using namespace DISPLIB;
@@ -73,7 +73,7 @@ using namespace Eigen;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-RtcMne::RtcMne()
+RtClustMne::RtClustMne()
 : m_pCircularMatrixBuffer(CircularBuffer_Matrix_double::SPtr(new CircularBuffer_Matrix_double(40)))
 , m_pCircularEvokedBuffer(CircularBuffer<FIFFLIB::FiffEvoked>::SPtr::create(40))
 , m_bEvokedInput(false)
@@ -92,7 +92,7 @@ RtcMne::RtcMne()
 
 //=============================================================================================================
 
-RtcMne::~RtcMne()
+RtClustMne::~RtClustMne()
 {
     m_future.waitForFinished();
 
@@ -103,15 +103,15 @@ RtcMne::~RtcMne()
 
 //=============================================================================================================
 
-QSharedPointer<AbstractPlugin> RtcMne::clone() const
+QSharedPointer<AbstractPlugin> RtClustMne::clone() const
 {
-    QSharedPointer<RtcMne> pRtcMneClone(new RtcMne());
-    return pRtcMneClone;
+    QSharedPointer<RtClustMne> pRtClustMneClone(new RtClustMne());
+    return pRtClustMneClone;
 }
 
 //=============================================================================================================
 
-void RtcMne::init()
+void RtClustMne::init()
 {
     // Inits
     m_pAnnotationSet = FsAnnotationSet::SPtr(new FsAnnotationSet(m_sAtlasDir + "/lh.aparc.a2009s.annot", m_sAtlasDir + "/rh.aparc.a2009s.annot"));
@@ -121,22 +121,22 @@ void RtcMne::init()
     // Input
     m_pRTMSAInput = PluginInputData<RealTimeMultiSampleArray>::create(this, "MNE RTMSA In", "MNE real-time multi sample array input data");
     connect(m_pRTMSAInput.data(), &PluginInputConnector::notify,
-            this, &RtcMne::updateRTMSA, Qt::DirectConnection);
+            this, &RtClustMne::updateRTMSA, Qt::DirectConnection);
     m_inputConnectors.append(m_pRTMSAInput);
 
     m_pRTESInput = PluginInputData<RealTimeEvokedSet>::create(this, "MNE RTE In", "MNE real-time evoked input data");
     connect(m_pRTESInput.data(), &PluginInputConnector::notify,
-            this, &RtcMne::updateRTE, Qt::DirectConnection);
+            this, &RtClustMne::updateRTE, Qt::DirectConnection);
     m_inputConnectors.append(m_pRTESInput);
 
     m_pRTCInput = PluginInputData<RealTimeCov>::create(this, "MNE RTC In", "MNE real-time covariance input data");
     connect(m_pRTCInput.data(), &PluginInputConnector::notify,
-            this, &RtcMne::updateRTC, Qt::DirectConnection);
+            this, &RtClustMne::updateRTC, Qt::DirectConnection);
     m_inputConnectors.append(m_pRTCInput);
 
     m_pRTFSInput = PluginInputData<RealTimeFwdSolution>::create(this, "MNE RTFS In", "MNE real-time forward solution input data");
     connect(m_pRTFSInput.data(), &PluginInputConnector::notify,
-            this, &RtcMne::updateRTFS, Qt::DirectConnection);
+            this, &RtClustMne::updateRTFS, Qt::DirectConnection);
     m_inputConnectors.append(m_pRTFSInput);
 
     // Output
@@ -160,24 +160,24 @@ void RtcMne::init()
 
 //=============================================================================================================
 
-void RtcMne::initPluginControlWidgets()
+void RtClustMne::initPluginControlWidgets()
 {
     QList<QWidget*> plControlWidgets;
 
     MinimumNormSettingsView* pMinimumNormSettingsView = new MinimumNormSettingsView(QString("MNESCAN/%1").arg(this->getName()));
-    connect(this, &RtcMne::guiModeChanged,
+    connect(this, &RtClustMne::guiModeChanged,
             pMinimumNormSettingsView, &MinimumNormSettingsView::setGuiMode);
     pMinimumNormSettingsView->setObjectName("group_tab_Settings_Source Localization");
 
     connect(pMinimumNormSettingsView, &MinimumNormSettingsView::methodChanged,
-            this, &RtcMne::onMethodChanged);
+            this, &RtClustMne::onMethodChanged);
     connect(pMinimumNormSettingsView, &MinimumNormSettingsView::triggerTypeChanged,
-            this, &RtcMne::onTriggerTypeChanged);
+            this, &RtClustMne::onTriggerTypeChanged);
     connect(pMinimumNormSettingsView, &MinimumNormSettingsView::timePointChanged,
-            this, &RtcMne::onTimePointValueChanged);
+            this, &RtClustMne::onTimePointValueChanged);
     connect(pMinimumNormSettingsView, &MinimumNormSettingsView::modelCheckpointChanged,
-            this, &RtcMne::onModelCheckpointChanged);
-    connect(this, &RtcMne::responsibleTriggerTypesChanged,
+            this, &RtClustMne::onModelCheckpointChanged);
+    connect(this, &RtClustMne::responsibleTriggerTypesChanged,
             pMinimumNormSettingsView, &MinimumNormSettingsView::setTriggerTypes);
 
     // Push any restored checkpoint path to the view so the user sees the persisted value.
@@ -197,23 +197,23 @@ void RtcMne::initPluginControlWidgets()
 
 //=============================================================================================================
 
-void RtcMne::unload()
+void RtClustMne::unload()
 {
     m_future.waitForFinished();
 }
 
 //=============================================================================================================
 
-bool RtcMne::calcFiffInfo()
+bool RtClustMne::calcFiffInfo()
 {
     QMutexLocker locker(&m_qMutex);
 
     if (m_qListCovChNames.size() > 0 && m_pFiffInfoInput && m_pFiffInfoForward) {
-        qDebug() << "[RtcMne::calcFiffInfoFiff] Infos available";
+        qDebug() << "[RtClustMne::calcFiffInfoFiff] Infos available";
 
-        //        qDebug() << "RtcMne::calcFiffInfo - m_qListCovChNames" << m_qListCovChNames;
-        //        qDebug() << "RtcMne::calcFiffInfo - m_pFiffInfoForward->ch_names" << m_pFiffInfoForward->ch_names;
-        //        qDebug() << "RtcMne::calcFiffInfo - m_pFiffInfoInput->ch_names" << m_pFiffInfoInput->ch_names;
+        //        qDebug() << "RtClustMne::calcFiffInfo - m_qListCovChNames" << m_qListCovChNames;
+        //        qDebug() << "RtClustMne::calcFiffInfo - m_pFiffInfoForward->ch_names" << m_pFiffInfoForward->ch_names;
+        //        qDebug() << "RtClustMne::calcFiffInfo - m_pFiffInfoInput->ch_names" << m_pFiffInfoInput->ch_names;
 
         // Align channel names of the forward solution to the incoming averaged (currently acquired) data
         // Find out whether the forward solution depends on only MEG, EEG or both MEG and EEG channels
@@ -256,7 +256,7 @@ bool RtcMne::calcFiffInfo()
 
         //If both MEG and EEG channels are used
         if (forwardChannelsTypes.contains("MEG") && forwardChannelsTypes.contains("EEG")) {
-            //qDebug()<<"RtcMne::calcFiffInfo - MEG EEG fwd solution";
+            //qDebug()<<"RtClustMne::calcFiffInfo - MEG EEG fwd solution";
             for (qint32 x = 0; x < m_pFiffInfoInput->chs.size(); ++x) {
                 if (m_pFiffInfoInput->chs[x].kind == FIFFV_MEG_CH || m_pFiffInfoInput->chs[x].kind == FIFFV_EEG_CH) {
                     m_pFiffInfoForward->chs[counter].ch_name = m_pFiffInfoInput->chs[x].ch_name;
@@ -280,14 +280,14 @@ bool RtcMne::calcFiffInfo()
         }
         RowVectorXi sel = m_pFiffInfoInput->pick_channels(m_qListPickChannels);
 
-        //qDebug() << "RtcMne::calcFiffInfo - m_qListPickChannels.size()" << m_qListPickChannels.size();
-        //qDebug() << "RtcMne::calcFiffInfo - m_qListPickChannels" << m_qListPickChannels;
+        //qDebug() << "RtClustMne::calcFiffInfo - m_qListPickChannels.size()" << m_qListPickChannels.size();
+        //qDebug() << "RtClustMne::calcFiffInfo - m_qListPickChannels" << m_qListPickChannels;
 
         m_pFiffInfo = QSharedPointer<FiffInfo>(new FiffInfo(m_pFiffInfoInput->pick_info(sel)));
 
         m_pRTSEOutput->measurementData()->setFiffInfo(m_pFiffInfo);
 
-        // qDebug() << "RtcMne::calcFiffInfo - m_pFiffInfo" << m_pFiffInfo->ch_names;
+        // qDebug() << "RtClustMne::calcFiffInfo - m_pFiffInfo" << m_pFiffInfo->ch_names;
 
         return true;
     }
@@ -297,7 +297,7 @@ bool RtcMne::calcFiffInfo()
 
 //=============================================================================================================
 
-bool RtcMne::start()
+bool RtClustMne::start()
 {
     QThread::start();
     return true;
@@ -305,7 +305,7 @@ bool RtcMne::start()
 
 //=============================================================================================================
 
-bool RtcMne::stop()
+bool RtClustMne::stop()
 {
     requestInterruption();
     wait(500);
@@ -320,30 +320,30 @@ bool RtcMne::stop()
 
 //=============================================================================================================
 
-AbstractPlugin::PluginType RtcMne::getType() const
+AbstractPlugin::PluginType RtClustMne::getType() const
 {
     return _IAlgorithm;
 }
 
 //=============================================================================================================
 
-QString RtcMne::getName() const
+QString RtClustMne::getName() const
 {
     return "Source Localization";
 }
 
 //=============================================================================================================
 
-QWidget* RtcMne::setupWidget()
+QWidget* RtClustMne::setupWidget()
 {
-    RtcMneSetupWidget* setupWidget = new RtcMneSetupWidget(this); //widget is later distroyed by CentralWidget - so it has to be created everytime new
+    RtClustMneSetupWidget* setupWidget = new RtClustMneSetupWidget(this); //widget is later distroyed by CentralWidget - so it has to be created everytime new
 
     return setupWidget;
 }
 
 //=============================================================================================================
 
-void RtcMne::updateRTFS(SCMEASLIB::Measurement::SPtr pMeasurement)
+void RtClustMne::updateRTFS(SCMEASLIB::Measurement::SPtr pMeasurement)
 {
     if (QSharedPointer<RealTimeFwdSolution> pRTFS = pMeasurement.dynamicCast<RealTimeFwdSolution>()) {
         //
@@ -353,7 +353,7 @@ void RtcMne::updateRTFS(SCMEASLIB::Measurement::SPtr pMeasurement)
         // more sources and therefore a higher computational load.
         //
         if (!pRTFS->isClustered()) {
-            qInfo() << "[RtcMne::updateRTFS] Using a full (unclustered) source space."
+            qInfo() << "[RtClustMne::updateRTFS] Using a full (unclustered) source space."
                     << "Source localization will be slower than with a clustered one.";
         }
 
@@ -374,7 +374,7 @@ void RtcMne::updateRTFS(SCMEASLIB::Measurement::SPtr pMeasurement)
 
 //=============================================================================================================
 
-void RtcMne::updateRTMSA(SCMEASLIB::Measurement::SPtr pMeasurement)
+void RtClustMne::updateRTMSA(SCMEASLIB::Measurement::SPtr pMeasurement)
 {
     if (m_pFwd) {
         QSharedPointer<RealTimeMultiSampleArray> pRTMSA = pMeasurement.dynamicCast<RealTimeMultiSampleArray>();
@@ -411,7 +411,7 @@ void RtcMne::updateRTMSA(SCMEASLIB::Measurement::SPtr pMeasurement)
                             //Do nothing until the circular buffer is ready to accept new data again
                         }
                     } else {
-                        qDebug() << "RtcMne::updateRTMSA - Reject data block";
+                        qDebug() << "RtClustMne::updateRTMSA - Reject data block";
                     }
                 }
             }
@@ -421,7 +421,7 @@ void RtcMne::updateRTMSA(SCMEASLIB::Measurement::SPtr pMeasurement)
 
 //=============================================================================================================
 
-void RtcMne::updateRTC(SCMEASLIB::Measurement::SPtr pMeasurement)
+void RtClustMne::updateRTC(SCMEASLIB::Measurement::SPtr pMeasurement)
 {
     if (m_pFwd) {
         QSharedPointer<RealTimeCov> pRTC = pMeasurement.dynamicCast<RealTimeCov>();
@@ -431,7 +431,7 @@ void RtcMne::updateRTC(SCMEASLIB::Measurement::SPtr pMeasurement)
             if (!m_pRtInvOp && m_pFiffInfo && m_pFwd) {
                 m_pRtInvOp = RtInvOp::SPtr(new RtInvOp(m_pFiffInfo, m_pFwd));
                 connect(m_pRtInvOp.data(), &RtInvOp::invOperatorCalculated,
-                        this, &RtcMne::updateInvOp);
+                        this, &RtClustMne::updateInvOp);
             }
 
             //Fiff Information of the covariance
@@ -449,7 +449,7 @@ void RtcMne::updateRTC(SCMEASLIB::Measurement::SPtr pMeasurement)
 
 //=============================================================================================================
 
-void RtcMne::updateRTE(SCMEASLIB::Measurement::SPtr pMeasurement)
+void RtClustMne::updateRTE(SCMEASLIB::Measurement::SPtr pMeasurement)
 {
     if (m_pFwd) {
         if (QSharedPointer<RealTimeEvokedSet> pRTES = pMeasurement.dynamicCast<RealTimeEvokedSet>()) {
@@ -497,7 +497,7 @@ void RtcMne::updateRTE(SCMEASLIB::Measurement::SPtr pMeasurement)
                             //Do nothing until the circular buffer is ready to accept new data again
                         }
 
-                        //qDebug()<<"RtcMne::updateRTE - average found type" << m_sAvrType;
+                        //qDebug()<<"RtClustMne::updateRTE - average found type" << m_sAvrType;
                         break;
                     }
                 }
@@ -508,7 +508,7 @@ void RtcMne::updateRTE(SCMEASLIB::Measurement::SPtr pMeasurement)
 
 //=============================================================================================================
 
-void RtcMne::updateInvOp(const MNEInverseOperator& invOp)
+void RtClustMne::updateInvOp(const MNEInverseOperator& invOp)
 {
     QMutexLocker locker(&m_qMutex);
 
@@ -519,7 +519,7 @@ void RtcMne::updateInvOp(const MNEInverseOperator& invOp)
 
 //=============================================================================================================
 
-void RtcMne::onMethodChanged(const QString& method)
+void RtClustMne::onMethodChanged(const QString& method)
 {
     QMutexLocker locker(&m_qMutex);
 
@@ -530,7 +530,7 @@ void RtcMne::onMethodChanged(const QString& method)
 
 //=============================================================================================================
 
-void RtcMne::onModelCheckpointChanged(const QString& sPath)
+void RtClustMne::onModelCheckpointChanged(const QString& sPath)
 {
     QMutexLocker locker(&m_qMutex);
 
@@ -539,14 +539,14 @@ void RtcMne::onModelCheckpointChanged(const QString& sPath)
 
 //=============================================================================================================
 
-void RtcMne::onTriggerTypeChanged(const QString& triggerType)
+void RtClustMne::onTriggerTypeChanged(const QString& triggerType)
 {
     m_sAvrType = triggerType;
 }
 
 //=============================================================================================================
 
-void RtcMne::onTimePointValueChanged(int iTimePointMs)
+void RtClustMne::onTimePointValueChanged(int iTimePointMs)
 {
     if (m_pFiffInfoInput && m_pCircularEvokedBuffer) {
         m_qMutex.lock();
@@ -563,7 +563,7 @@ void RtcMne::onTimePointValueChanged(int iTimePointMs)
 
 //=============================================================================================================
 
-void RtcMne::run()
+void RtClustMne::run()
 {
     // Wait for fiff info to arrive
     while (!calcFiffInfo()) {
@@ -698,14 +698,14 @@ void RtcMne::run()
 
 //=============================================================================================================
 
-InvSourceEstimate RtcMne::computeCmneInverse(const FiffEvoked& evoked,
-                                             float fLambda2,
-                                             const QString& sModelCheckpoint)
+InvSourceEstimate RtClustMne::computeCmneInverse(const FiffEvoked& evoked,
+                                                 float fLambda2,
+                                                 const QString& sModelCheckpoint)
 {
     InvSourceEstimate stcEmpty;
 
     if (sModelCheckpoint.isEmpty()) {
-        qWarning() << "[RtcMne::computeCmneInverse] CMNE selected but no model checkpoint set.";
+        qWarning() << "[RtClustMne::computeCmneInverse] CMNE selected but no model checkpoint set.";
         return stcEmpty;
     }
 
@@ -721,7 +721,7 @@ InvSourceEstimate RtcMne::computeCmneInverse(const FiffEvoked& evoked,
     }
 
     if (!pFwd || !pFwd->sol || !pNoiseCov || !pSrcCov) {
-        qWarning() << "[RtcMne::computeCmneInverse] Missing forward solution, noise cov or source cov.";
+        qWarning() << "[RtClustMne::computeCmneInverse] Missing forward solution, noise cov or source cov.";
         return stcEmpty;
     }
 
@@ -740,14 +740,14 @@ InvSourceEstimate RtcMne::computeCmneInverse(const FiffEvoked& evoked,
 
 //=============================================================================================================
 
-QString RtcMne::getBuildInfo()
+QString RtClustMne::getBuildInfo()
 {
-    return QString(RTCMNEPLUGIN::buildDateTime()) + QString(" - ") + QString(RTCMNEPLUGIN::buildHash());
+    return QString(RTCLUSTMNEPLUGIN::buildDateTime()) + QString(" - ") + QString(RTCLUSTMNEPLUGIN::buildHash());
 }
 
 //=============================================================================================================
 
-QVariantMap RtcMne::getAttributes() const
+QVariantMap RtClustMne::getAttributes() const
 {
     QVariantMap attrs;
     attrs[QStringLiteral("atlasDir")] = m_sAtlasDir;
@@ -763,7 +763,7 @@ QVariantMap RtcMne::getAttributes() const
 
 //=============================================================================================================
 
-void RtcMne::setAttributes(const QVariantMap& attributes)
+void RtClustMne::setAttributes(const QVariantMap& attributes)
 {
     if (attributes.contains(QStringLiteral("atlasDir")))
         m_sAtlasDir = attributes[QStringLiteral("atlasDir")].toString();

@@ -2,7 +2,7 @@
 # SPDX-License-Identifier: BSD-3-Clause
 # Copyright (c) 2026 MNE-CPP Authors
 #   Christoph Dinh <christoph.dinh@mne-cpp.org>
-"""Write a small cmne model and cmne's outputs as the oracle for test_rtcmne_cmne.
+"""Write a small cmne model and cmne's outputs as the oracle for test_inv_cmne.
 
 Needs ``pip install "cmne[onnx]==0.2.1"``. An untrained 12-source network
 (look_back 6, 16 units, seed 0) is exported with ``cmne.export_onnx``, which

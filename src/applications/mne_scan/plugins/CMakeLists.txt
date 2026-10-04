@@ -37,7 +37,7 @@ add_subdirectory(babymeg)
 add_subdirectory(natus)
 
 # Algorithm Plugin
-add_subdirectory(rtcmne)
+add_subdirectory(rtclustmne)
 add_subdirectory(averaging)
 add_subdirectory(covariance)
 add_subdirectory(noisereduction)

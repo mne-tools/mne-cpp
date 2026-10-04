@@ -345,9 +345,6 @@ add_subdirectory(test_electrodes_plugin)
 add_subdirectory(test_mri_slices_plugin)
 add_subdirectory(test_mne_inspect_multimodal)
 
-# CMNE routing in the rtcmne real-time inverse plugin
-add_subdirectory(test_rtcmne_cmne)
-
 # WriteToFile recording-status + project-resume-layout tests
 # + FiffSimulator SSP/bad-ch replay round trip
 add_subdirectory(test_writetofile_status)

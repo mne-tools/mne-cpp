@@ -4,7 +4,7 @@
 #   Christoph Dinh <christoph.dinh@mne-cpp.org>
 
 cmake_minimum_required(VERSION 3.14)
-project(scan_rtcmne LANGUAGES CXX)
+project(scan_rtclustmne LANGUAGES CXX)
 
 #Handle qt uic, moc, rrc automatically
 set(CMAKE_AUTOUIC ON)
@@ -16,26 +16,26 @@ find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS ${QT_REQUIRED_COMPONENTS})
 find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS ${QT_REQUIRED_COMPONENTS})
 
 set(SOURCES
-    rtcmne.cpp 
-    FormFiles/rtcmnesetupwidget.cpp 
-    rtcmne_global.cpp
+    rtclustmne.cpp 
+    FormFiles/rtclustmnesetupwidget.cpp 
+    rtclustmne_global.cpp
 )
 
 set(HEADERS
-    rtcmne_global.h 
-    rtcmne.h 
-    FormFiles/rtcmnesetupwidget.h
+    rtclustmne_global.h 
+    rtclustmne.h 
+    FormFiles/rtclustmnesetupwidget.h
 )
 
 set(UI
-    FormFiles/rtcmnesetup.ui
+    FormFiles/rtclustmnesetup.ui
 )
 
 set(RESOURCES
-    rtcmne.qrc    
+    rtclustmne.qrc    
 )
 
-set(FILE_TO_UPDATE rtcmne_global.cpp)
+set(FILE_TO_UPDATE rtclustmne_global.cpp)
 
 set(SOURCE_PATHS ${SOURCES})
 list(TRANSFORM SOURCE_PATHS PREPEND "${CMAKE_CURRENT_SOURCE_DIR}/")
@@ -87,7 +87,7 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
     scMeas
     ${FFTW_LIBS})
 
-target_compile_definitions(${PROJECT_NAME} PRIVATE SCAN_RTCMNE_PLUGIN MNE_GIT_HASH_SHORT="${MNE_GIT_HASH_SHORT}" MNE_GIT_HASH_LONG="${MNE_GIT_HASH_LONG}")
+target_compile_definitions(${PROJECT_NAME} PRIVATE SCAN_RTCLUSTMNE_PLUGIN MNE_GIT_HASH_SHORT="${MNE_GIT_HASH_SHORT}" MNE_GIT_HASH_LONG="${MNE_GIT_HASH_LONG}")
 
 if(NOT BUILD_SHARED_LIBS)
     target_compile_definitions(${PROJECT_NAME} PRIVATE STATICBUILD QT_STATICPLUGIN)

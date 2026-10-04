@@ -47,11 +47,11 @@ Use this checklist whenever you bring up a new acquisition setup. The plugin wil
 | Plugin | Role | Notes |
 |--------|------|-------|
 | `averaging` | Real-time evoked-response averaging with baseline correction and artifact thresholds | Triggered by stimulus channels in the input FIFF info |
-| `covariance` | Online noise-covariance estimation | Output is consumable by `rtcmne` |
+| `covariance` | Online noise-covariance estimation | Output is consumable by `rtclustmne` |
 | `hpi` | Continuous HPI coil fitting and head-position monitoring | Requires a MEG input with active HPI coil channels; coil-frequency presets are read from `hpi.json` |
-| `neuronalconnectivity` | Real-time functional connectivity estimation | Input: source-localised data from `rtcmne` |
+| `neuronalconnectivity` | Real-time functional connectivity estimation | Input: source-localised data from `rtclustmne` |
 | `noisereduction` | SSP projection, gradient compensation, and real-time filtering | Replaces several offline pre-processing steps |
-| `rtcmne` | Real-time minimum-norm source estimation | Requires forward solution (`rtfwd` or pre-computed) + noise covariance |
+| `rtclustmne` | Real-time minimum-norm source estimation (clustered MNE; formerly `rtcmne`) | Requires forward solution (`rtfwd` or pre-computed) + noise covariance |
 | `rtfwd` | Real-time forward-solution recomputation, driven by HPI updates | Pairs with `hpi` for moving-subject MEG |
 
 ## IO / Utility Plugins

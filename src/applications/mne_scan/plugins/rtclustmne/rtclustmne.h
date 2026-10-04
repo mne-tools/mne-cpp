@@ -3,23 +3,23 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2013-2026 MNE-CPP Authors
  *
- * @file     rtcmne.h
+ * @file     rtclustmne.h
  * @author   Gabriel Motta <gabrielbenmotta@gmail.com>;
  *           Christoph Dinh <christoph.dinh@mne-cpp.org>;
  *           Lorenz Esch <lorenz.esch@tu-ilmenau.de>
  * @since    0.1.0
  * @date     February, 2013
- * @brief    Contains the declaration of the RtcMne class.
+ * @brief    Contains the declaration of the RtClustMne class.
  */
 
-#ifndef RTCMNE_H
-#define RTCMNE_H
+#ifndef RTCLUSTMNE_H
+#define RTCLUSTMNE_H
 
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include "rtcmne_global.h"
+#include "rtclustmne_global.h"
 
 #include <scShared/Plugins/abstractalgorithm.h>
 
@@ -87,43 +87,43 @@ class RealTimeFwdSolution;
 }
 
 //=============================================================================================================
-// DEFINE NAMESPACE RTCMNEPLUGIN
+// DEFINE NAMESPACE RTCLUSTMNEPLUGIN
 //=============================================================================================================
 
-namespace RTCMNEPLUGIN
+namespace RTCLUSTMNEPLUGIN
 {
 
 //=============================================================================================================
-// RTCRTCMNEPLUGIN FORWARD DECLARATIONS
+// RTCLUSTMNEPLUGIN FORWARD DECLARATIONS
 //=============================================================================================================
 
 //=============================================================================================================
 /**
- * DECLARE CLASS RtcMne
+ * DECLARE CLASS RtClustMne
  *
- * @brief The RtcMne class provides a plugin for estimating distributed source localization in real-time.
+ * @brief The RtClustMne class provides a plugin for estimating distributed source localization in real-time.
  */
-class RTCMNESHARED_EXPORT RtcMne : public SCSHAREDLIB::AbstractAlgorithm
+class RTCLUSTMNESHARED_EXPORT RtClustMne : public SCSHAREDLIB::AbstractAlgorithm
 {
     Q_OBJECT
-    Q_PLUGIN_METADATA(IID "scsharedlib/1.0" FILE "rtcmne.json") //New Qt5 Plugin system replaces Q_EXPORT_PLUGIN2 macro
+    Q_PLUGIN_METADATA(IID "scsharedlib/1.0" FILE "rtclustmne.json") //New Qt5 Plugin system replaces Q_EXPORT_PLUGIN2 macro
     // Use the Q_INTERFACES() macro to tell Qt's meta-object system about the interfaces
     Q_INTERFACES(SCSHAREDLIB::AbstractAlgorithm)
 
-    friend class RtcMneSetupWidget;
+    friend class RtClustMneSetupWidget;
 
 public:
     //=========================================================================================================
     /**
-     * Constructs a RtcMne.
+     * Constructs a RtClustMne.
      */
-    RtcMne();
+    RtClustMne();
 
     //=========================================================================================================
     /**
-     * Destroys the RtcMne.
+     * Destroys the RtClustMne.
      */
-    ~RtcMne();
+    ~RtClustMne();
 
     //=========================================================================================================
     /**
@@ -284,4 +284,4 @@ signals:
 };
 } // NAMESPACE
 
-#endif // RTCMNE_H
+#endif // RTCLUSTMNE_H

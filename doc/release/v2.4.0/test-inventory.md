@@ -6,8 +6,8 @@ CI evidence: https://github.com/mne-tools/mne-cpp/actions/runs/36243010551 (comm
 
 ## Registration
 
-- Test directories: 252
-- Registered unconditionally: 245
+- Test directories: 251
+- Registered unconditionally: 244
 - Registered behind a CMake condition or early `return()`: 4
 - Not registered: 3
 - Registered without `LABELS`: 0

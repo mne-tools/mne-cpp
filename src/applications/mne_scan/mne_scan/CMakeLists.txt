@@ -99,7 +99,7 @@ if(NOT BUILD_SHARED_LIBS)
         scan_natus
         scan_neuronalconnectivity
         scan_noisereduction
-        scan_rtcmne
+        scan_rtclustmne
         scan_rtfwd
         scan_writetofile)
 

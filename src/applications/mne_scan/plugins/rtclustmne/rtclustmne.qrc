@@ -1,0 +1,5 @@
+<RCC>
+    <qresource prefix="/images">
+        <file alias="rtclustmne.png">images/rtclustmne.png</file>
+    </qresource>
+</RCC>

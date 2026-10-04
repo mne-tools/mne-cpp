@@ -97,7 +97,7 @@ if(TARGET mne_scan_app_core)
         MNE_SCAN_PLUGIN_DIR="$<TARGET_FILE_DIR:scan_writetofile>")
     # The plugins are loaded at run time from their own directory.
     foreach(_plugin scan_fiffsimulator scan_writetofile scan_averaging scan_covariance scan_noisereduction
-                    scan_rtcmne scan_hpi scan_rtfwd scan_neuronalconnectivity scan_ftbuffer scan_natus
+                    scan_rtclustmne scan_hpi scan_rtfwd scan_neuronalconnectivity scan_ftbuffer scan_natus
                     scan_babymeg scan_lsladapter)
         if(TARGET ${_plugin})
             add_dependencies(${PROJECT_NAME} ${_plugin})

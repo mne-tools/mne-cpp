@@ -67,7 +67,7 @@ Q_IMPORT_PLUGIN(FiffSimulator)
 Q_IMPORT_PLUGIN(Natus)
 Q_IMPORT_PLUGIN(Covariance)
 Q_IMPORT_PLUGIN(NoiseReduction)
-Q_IMPORT_PLUGIN(RtcMne)
+Q_IMPORT_PLUGIN(RtClustMne)
 Q_IMPORT_PLUGIN(Averaging)
 Q_IMPORT_PLUGIN(NeuronalConnectivity)
 Q_IMPORT_PLUGIN(FtBuffer)
@@ -111,7 +111,7 @@ int main(int argc, char* argv[])
     Q_INIT_RESOURCE(fiffsimulator);
     Q_INIT_RESOURCE(covariance);
     Q_INIT_RESOURCE(noisereduction);
-    Q_INIT_RESOURCE(rtcmne);
+    Q_INIT_RESOURCE(rtclustmne);
     Q_INIT_RESOURCE(averaging);
     Q_INIT_RESOURCE(writetofile);
     Q_INIT_RESOURCE(hpi);

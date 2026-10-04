@@ -3,17 +3,17 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2013-2026 MNE-CPP Authors
  *
- * @file     rtcmne_global.h
+ * @file     rtclustmne_global.h
  * @author   Gabriel Motta <gabrielbenmotta@gmail.com>;
  *           Christoph Dinh <christoph.dinh@mne-cpp.org>;
  *           Lorenz Esch <lorenz.esch@tu-ilmenau.de>
  * @since    0.1.0
  * @date     February, 2013
- * @brief    Contains the RtcMne library export/import macros.
+ * @brief    Contains the RtClustMne library export/import macros.
  */
 
-#ifndef RTCMNE_GLOBAL_H
-#define RTCMNE_GLOBAL_H
+#ifndef RTCLUSTMNE_GLOBAL_H
+#define RTCLUSTMNE_GLOBAL_H
 
 //=============================================================================================================
 // INCLUDES
@@ -31,32 +31,32 @@
 // PREPROCESSOR DEFINES
 //=============================================================================================================
 
-#if defined(SCAN_RTCMNE_PLUGIN)
-#define RTCMNESHARED_EXPORT Q_DECL_EXPORT /**< Q_DECL_EXPORT must be added to the declarations of symbols used when compiling a shared library. */
+#if defined(SCAN_RTCLUSTMNE_PLUGIN)
+#define RTCLUSTMNESHARED_EXPORT Q_DECL_EXPORT /**< Q_DECL_EXPORT must be added to the declarations of symbols used when compiling a shared library. */
 #else
-#define RTCMNESHARED_EXPORT Q_DECL_IMPORT /**< Q_DECL_IMPORT must be added to the declarations of symbols used when compiling a client that uses the shared library. */
+#define RTCLUSTMNESHARED_EXPORT Q_DECL_IMPORT /**< Q_DECL_IMPORT must be added to the declarations of symbols used when compiling a client that uses the shared library. */
 #endif
 
-namespace RTCMNEPLUGIN
+namespace RTCLUSTMNEPLUGIN
 {
 
 //=============================================================================================================
 /**
  * Returns build date and time.
  */
-RTCMNESHARED_EXPORT const char* buildDateTime();
+RTCLUSTMNESHARED_EXPORT const char* buildDateTime();
 
 //=============================================================================================================
 /**
  * Returns abbreviated build git hash.
  */
-RTCMNESHARED_EXPORT const char* buildHash();
+RTCLUSTMNESHARED_EXPORT const char* buildHash();
 
 //=============================================================================================================
 /**
  * Returns full build git hash.
  */
-RTCMNESHARED_EXPORT const char* buildHashLong();
+RTCLUSTMNESHARED_EXPORT const char* buildHashLong();
 }
 
-#endif // RTCMNE_GLOBAL_H
+#endif // RTCLUSTMNE_GLOBAL_H

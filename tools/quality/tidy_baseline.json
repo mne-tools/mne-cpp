@@ -766,11 +766,11 @@
     "src/applications/mne_scan/plugins/noisereduction/noisereduction.h": {
       "modernize-use-override": 11
     },
-    "src/applications/mne_scan/plugins/rtcmne/FormFiles/rtcmnesetupwidget.h": {
+    "src/applications/mne_scan/plugins/rtclustmne/FormFiles/rtclustmnesetupwidget.h": {
       "modernize-use-nullptr": 1,
       "modernize-use-override": 1
     },
-    "src/applications/mne_scan/plugins/rtcmne/rtcmne.h": {
+    "src/applications/mne_scan/plugins/rtclustmne/rtclustmne.h": {
       "modernize-use-override": 13
     },
     "src/applications/mne_scan/plugins/rtfwd/FormFiles/rtfwdsetupwidget.h": {
@@ -1697,9 +1697,6 @@
     },
     "src/testframes/test_rt_source_streaming/test_rt_source_streaming.cpp": {
       "performance-unnecessary-copy-initialization": 1
-    },
-    "src/testframes/test_rtcmne_cmne/test_rtcmne_cmne.cpp": {
-      "performance-no-automatic-move": 1
     },
     "src/testframes/test_scdisp_widgets/test_scdisp_widgets.cpp": {
       "clang-analyzer-cplusplus.NewDeleteLeaks": 3

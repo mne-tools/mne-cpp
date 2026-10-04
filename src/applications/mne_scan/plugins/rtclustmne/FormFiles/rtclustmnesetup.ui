@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>RtcMneSetupWidgetClass</class>
- <widget class="QWidget" name="RtcMneSetupWidgetClass">
+ <class>RtClustMneSetupWidgetClass</class>
+ <widget class="QWidget" name="RtClustMneSetupWidgetClass">
   <property name="geometry">
    <rect>
     <x>0</x>

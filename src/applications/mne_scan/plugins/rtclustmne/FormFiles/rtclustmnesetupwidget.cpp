@@ -3,22 +3,22 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2013-2026 MNE-CPP Authors
  *
- * @file     rtcmnesetupwidget.cpp
+ * @file     rtclustmnesetupwidget.cpp
  * @author   Gabriel Motta <gabrielbenmotta@gmail.com>;
  *           Christoph Dinh <christoph.dinh@mne-cpp.org>;
  *           Lorenz Esch <lorenz.esch@tu-ilmenau.de>
  * @since    0.1.0
  * @date     February, 2013
- * @brief    Definition of the RtcMneSetupWidget class.
+ * @brief    Definition of the RtClustMneSetupWidget class.
  */
 
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include "rtcmnesetupwidget.h"
+#include "rtclustmnesetupwidget.h"
 
-#include "../rtcmne.h"
+#include "../rtclustmne.h"
 
 #include <fs/fs_annotationset.h>
 #include <fs/fs_surfaceset.h>
@@ -40,7 +40,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace RTCMNEPLUGIN;
+using namespace RTCLUSTMNEPLUGIN;
 using namespace MNELIB;
 using namespace FSLIB;
 
@@ -48,7 +48,7 @@ using namespace FSLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-RtcMneSetupWidget::RtcMneSetupWidget(RtcMne* toolbox, QWidget* parent)
+RtClustMneSetupWidget::RtClustMneSetupWidget(RtClustMne* toolbox, QWidget* parent)
 : QWidget(parent)
 , m_pMNE(toolbox)
 {
@@ -68,20 +68,20 @@ RtcMneSetupWidget::RtcMneSetupWidget(RtcMne* toolbox, QWidget* parent)
 
     ui.m_qLineEdit_MriHeadTrans->setText(m_pMNE->m_fMriHeadTrans.fileName());
 
-    connect(ui.m_qPushButton_AtlasDirDialog, &QPushButton::released, this, &RtcMneSetupWidget::showAtlasDirDialog);
-    connect(ui.m_qPushButton_SurfaceDirDialog, &QPushButton::released, this, &RtcMneSetupWidget::showSurfaceDirDialog);
-    connect(ui.m_qPushButton_MriHeadTrans, &QPushButton::released, this, &RtcMneSetupWidget::showMriHeadFileDialog);
+    connect(ui.m_qPushButton_AtlasDirDialog, &QPushButton::released, this, &RtClustMneSetupWidget::showAtlasDirDialog);
+    connect(ui.m_qPushButton_SurfaceDirDialog, &QPushButton::released, this, &RtClustMneSetupWidget::showSurfaceDirDialog);
+    connect(ui.m_qPushButton_MriHeadTrans, &QPushButton::released, this, &RtClustMneSetupWidget::showMriHeadFileDialog);
 }
 
 //=============================================================================================================
 
-RtcMneSetupWidget::~RtcMneSetupWidget()
+RtClustMneSetupWidget::~RtClustMneSetupWidget()
 {
 }
 
 //=============================================================================================================
 
-void RtcMneSetupWidget::showAtlasDirDialog()
+void RtClustMneSetupWidget::showAtlasDirDialog()
 {
     QString t_sAtlasDir = QFileDialog::getExistingDirectory(this, tr("Open Atlas Directory"),
                                                             QString(),
@@ -109,7 +109,7 @@ void RtcMneSetupWidget::showAtlasDirDialog()
 
 //=============================================================================================================
 
-void RtcMneSetupWidget::showSurfaceDirDialog()
+void RtClustMneSetupWidget::showSurfaceDirDialog()
 {
     QString t_sSurfaceDir = QFileDialog::getExistingDirectory(this, tr("Open FsSurface Directory"),
                                                               QString(),
@@ -135,7 +135,7 @@ void RtcMneSetupWidget::showSurfaceDirDialog()
 
 //=============================================================================================================
 
-void RtcMneSetupWidget::showMriHeadFileDialog()
+void RtClustMneSetupWidget::showMriHeadFileDialog()
 {
     QString t_sMriHeadFile = QFileDialog::getOpenFileName(this,
                                                           tr("Select Mri-Head transformation"),
