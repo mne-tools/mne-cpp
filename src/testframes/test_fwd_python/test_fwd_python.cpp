@@ -115,6 +115,7 @@ private slots:
     void labelForward_variants();
     void sphereForward_data();
     void sphereForward();
+    void sphereForward_modelFile();
 };
 
 //=============================================================================================================
@@ -529,6 +530,70 @@ void TestFwdPython::sphereForward()
              qPrintable(QStringLiteral("MEG norms %1 %2 %3").arg(meg[0], 0, 'g', 10).arg(meg[1], 0, 'g', 10).arg(meg[2], 0, 'g', 10)));
     QVERIFY2((eeg - eegNorms).cwiseAbs().maxCoeff() < 1e-3 * eegNorms.maxCoeff(),
              qPrintable(QStringLiteral("EEG norms %1 %2 %3").arg(eeg[0], 0, 'g', 10).arg(eeg[1], 0, 'g', 10).arg(eeg[2], 0, 'g', 10)));
+}
+
+//=============================================================================================================
+
+void TestFwdPython::sphereForward_modelFile()
+{
+    // MNE-C format: name:rad:sigma:... with unsorted layers; a model with an unparsable number is dropped whole.
+    const QString path = m_dir.filePath("eeg_models.dat");
+    {
+        QFile file(path);
+        QVERIFY(file.open(QIODevice::WriteOnly | QIODevice::Text));
+        file.write("# name : rad : sigma ...\n"
+                   "\n"
+                   "Three:1.0:0.33:0.87:0.33:0.92:0.0042\n"
+                   "Broken:0.9:0.33:x:1.0\n"
+                   "NameOnly\n");
+    }
+
+    std::unique_ptr<FwdEegSphereModelSet> set(FwdEegSphereModelSet::fwd_load_eeg_sphere_models(path, nullptr));
+    QVERIFY(set != nullptr);
+    QCOMPARE(set->nmodel(), 2);
+    set->fwd_list_eeg_sphere_models();
+    std::unique_ptr<FwdEegSphereModel> three(set->fwd_select_eeg_sphere_model("Three"));
+    QVERIFY(three != nullptr);
+    QCOMPARE(three->nlayer(), 3);
+    QCOMPARE(three->layers[0].rel_rad, 0.87f);
+    QCOMPARE(three->layers[1].sigma, 0.0042f);
+    QVERIFY(set->fwd_select_eeg_sphere_model("Broken") == nullptr);
+    QVERIFY(set->fwd_select_eeg_sphere_model("Missing") == nullptr);
+    std::unique_ptr<FwdEegSphereModel> fallback(set->fwd_select_eeg_sphere_model(QString()));
+    QVERIFY(fallback != nullptr);
+    QCOMPARE(fallback->name, QString("Default"));
+
+    std::unique_ptr<FwdEegSphereModelSet> onlyDefault(FwdEegSphereModelSet::fwd_load_eeg_sphere_models(m_dir.filePath("none.dat"), nullptr));
+    QCOMPARE(onlyDefault->nmodel(), 1);
+    QVERIFY(FwdEegSphereModelSet().fwd_select_eeg_sphere_model("Default") == nullptr);
+
+    // mne-python make_sphere_model(r0=(0, 0, 0.04), head_radius=0.09, relative_radii=(0.87, 0.92, 1),
+    // sigmas=(0.33, 0.0042, 0.33)) on the lh.V1 sources: np.linalg.norm(G[:, 3k + c]) over EEG.
+    auto s = settings(false, false);
+    s->include_meg = false;
+    s->bemname.clear();
+    s->mindist = 0.0f;
+    s->filter_spaces = false;
+    s->r0 = Vector3f(0.0f, 0.0f, 0.04f);
+    s->eeg_sphere_rad = 0.09f;
+    s->eeg_model_file = path;
+    s->eeg_model_name = "Three";
+    auto fwd = std::make_shared<ComputeFwd>(s)->calculateFwd();
+    QVERIFY(fwd != nullptr);
+    QCOMPARE(static_cast<int>(fwd->sol->data.rows()), 60);
+
+    const QList<QPair<int, Vector3d>> refs{
+        {28, Vector3d(370.27074684018515, 345.1938826601203, 349.37989001470487)},
+        {61, Vector3d(352.97698173839217, 327.7262594697324, 338.9604653611034)},
+        {77, Vector3d(325.90676712903104, 304.57117355185295, 330.43617483953057)},
+    };
+    for (const auto& [source, norms] : refs) {
+        Vector3d got;
+        for (int c = 0; c < 3; ++c)
+            got[c] = fwd->sol->data.col(3 * source + c).norm();
+        QVERIFY2((got - norms).cwiseAbs().maxCoeff() < 1e-3 * norms.maxCoeff(),
+                 qPrintable(QStringLiteral("source %1: %2 %3 %4").arg(source).arg(got[0], 0, 'g', 10).arg(got[1], 0, 'g', 10).arg(got[2], 0, 'g', 10)));
+    }
 }
 
 //=============================================================================================================

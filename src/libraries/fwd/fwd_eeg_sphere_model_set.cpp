@@ -112,8 +112,10 @@ FwdEegSphereModelSet* FwdEegSphereModelSet::fwd_load_eeg_sphere_models(const QSt
             bool okRad = false, okSig = false;
             float r = parts[i].trimmed().toFloat(&okRad);
             float s = parts[i + 1].trimmed().toFloat(&okSig);
-            if (!okRad || !okSig)
+            if (!okRad || !okSig) {
+                nlayer = 0;
                 break;
+            }
             rads.conservativeResize(nlayer + 1);
             sigmas.conservativeResize(nlayer + 1);
             rads[nlayer] = r;
