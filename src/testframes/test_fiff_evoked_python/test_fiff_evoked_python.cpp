@@ -90,6 +90,7 @@ private slots:
     void conditionOrder_matchesPython();
     void dataSumsAreDistinct();
     void oldStyleEvoked_matchesPython();
+    void readSelectors_matchPython();
 };
 
 //=============================================================================================================
@@ -168,6 +169,45 @@ void TestFiffEvokedPython::conditions_matchPython()
                             .arg(comment)
                             .arg(sum, 0, 'e', 12)
                             .arg(dataSum, 0, 'e', 12)));
+}
+
+//=============================================================================================================
+
+void TestFiffEvokedPython::readSelectors_matchPython()
+{
+    auto read = [](const QVariant& setno, QPair<float, float> baseline, bool proj, fiff_int_t kind, FiffEvoked& e) {
+        QFile file(avePath());
+        return FiffEvoked::read(file, e, setno, baseline, proj, kind);
+    };
+    const QPair<float, float> none(-1.0f, -1.0f);
+
+    // mne.read_evokeds(..., condition="Right visual", proj=False / True, baseline=None): the file's
+    // projectors are already active, so both give 94.42361010079253.
+    FiffEvoked e;
+    for (const bool proj : {false, true}) {
+        QVERIFY(read(QStringLiteral("Right visual"), none, proj, FIFFV_ASPECT_AVERAGE, e));
+        QCOMPARE(static_cast<int>(e.nave), 58);
+        QVERIFY(std::fabs(e.data.sum() - 94.42361010079253) < 1e-7 * 94.42361010079253);
+        QCOMPARE(e.proj.rows() > 0, proj);
+    }
+
+    // condition=1, baseline=(-0.2, 0.0): sum 4.109845103910902, data[0, 0] 4.086686400793876e-13.
+    QVERIFY(read(1, QPair<float, float>(-0.2f, 0.0f), true, FIFFV_ASPECT_AVERAGE, e));
+    QCOMPARE(e.comment, QString("Right Auditory"));
+    QVERIFY2(std::fabs(e.data.sum() - 4.109845103910902) < 1e-6 * 4.109845103910902, qPrintable(QString::number(e.data.sum(), 'g', 17)));
+    QVERIFY(std::fabs(e.data(0, 0) - 4.086686400793876e-13) < 1e-6 * 4.086686400793876e-13);
+
+    // Selectors that mne-python rejects too.
+    QTest::ignoreMessage(QtWarningMsg, QRegularExpression("setno parameter must be set"));
+    QVERIFY(!read(QVariant(), none, true, FIFFV_ASPECT_AVERAGE, e));
+    QTest::ignoreMessage(QtWarningMsg, QRegularExpression("not found, out of found datasets"));
+    QVERIFY(!read(QStringLiteral("Left Auditory"), none, true, FIFFV_ASPECT_STD_ERR, e));
+    QTest::ignoreMessage(QtWarningMsg, QRegularExpression("kindStat must be"));
+    QVERIFY(!read(QStringLiteral("Left Auditory"), none, true, 99, e));
+    QTest::ignoreMessage(QtWarningMsg, "Data set selector out of range");
+    QVERIFY(!read(4, none, true, FIFFV_ASPECT_AVERAGE, e));
+    QTest::ignoreMessage(QtWarningMsg, "Data set selector out of range");
+    QVERIFY(!read(-1, none, true, FIFFV_ASPECT_AVERAGE, e));
 }
 
 //=============================================================================================================
