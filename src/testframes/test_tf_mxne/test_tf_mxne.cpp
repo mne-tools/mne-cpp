@@ -128,6 +128,68 @@ private slots:
         }
     }
 
+    void testSolutionSatisfiesKkt()
+    {
+        // min_Z 0.5 ||M - G Z Phi||^2 + aS sum_j ||z_j|| + aT ||Z||_1 is optimal iff, with g = G^T R Phi^T:
+        // nonzero z_ja: g_ja = aT sign(z_ja) + aS z_ja / ||z_j||; zero z_ja in an active row: |g_ja| <= aT;
+        // inactive row: ||soft_aT(g_j)|| <= aS.
+        const int nCh = 12, nSrc = 8, nTimes = 64;
+        MatrixXd G(nCh, nSrc);
+        for (int c = 0; c < nCh; ++c)
+            for (int s = 0; s < nSrc; ++s)
+                G(c, s) = std::sin(0.7 * (c + 1) * (s + 1)) + (c == s ? 1.0 : 0.0);
+        InvTfMxneParams params;
+        params.dSFreq = 200.0;
+        params.iNFreqs = 3;
+        params.dFMin = 8.0;
+        params.dFMax = 30.0;
+        params.dAlphaSpace = 0.3;
+        params.dAlphaTime = 0.05;
+        params.iMaxIterations = 20000;
+        params.dTolerance = 1e-14;
+        params.bDebias = false;
+        const MatrixXd Phi = InvTfMxne::buildGaborDictionary(nTimes, params.iNFreqs, params.dFMin, params.dFMax, params.dSFreq);
+        MatrixXd Ztrue = MatrixXd::Zero(nSrc, Phi.rows());
+        Ztrue(1, 0) = 4.0;
+        Ztrue(1, 3) = -2.0;
+        Ztrue(5, 4) = 3.0;
+        const MatrixXd M = G * Ztrue * Phi;
+
+        const InvTfMxneResult result = InvTfMxne::compute(G, M, params);
+        QVERIFY(result.nIterations < params.iMaxIterations);
+        QVERIFY(result.activeVertices.contains(1) && result.activeVertices.contains(5));
+        MatrixXd Z = MatrixXd::Zero(nSrc, Phi.rows());
+        for (int i = 0; i < result.activeVertices.size(); ++i) {
+            Z.row(result.activeVertices[i]) = result.tfCoefficients.row(i);
+            QVERIFY((result.stc.data.row(i) - result.tfCoefficients.row(i) * Phi).norm() < 1e-12);
+        }
+
+        const MatrixXd g = G.transpose() * (M - G * Z * Phi) * Phi.transpose();
+        const double tol = 1e-4;
+        for (int j = 0; j < nSrc; ++j) {
+            const double rowNorm = Z.row(j).norm();
+            if (rowNorm == 0.0) {
+                const RowVectorXd soft = g.row(j).unaryExpr([&](double v) { return std::copysign(std::max(0.0, std::abs(v) - params.dAlphaTime), v); });
+                QVERIFY2(soft.norm() <= params.dAlphaSpace + tol, qPrintable(QString("inactive row %1: %2").arg(j).arg(soft.norm())));
+                continue;
+            }
+            for (int a = 0; a < Z.cols(); ++a) {
+                const double z = Z(j, a);
+                const double err = z != 0.0 ? std::abs(g(j, a) - params.dAlphaTime * (z > 0 ? 1.0 : -1.0) - params.dAlphaSpace * z / rowNorm)
+                                            : std::max(0.0, std::abs(g(j, a)) - params.dAlphaTime);
+                QVERIFY2(err <= tol, qPrintable(QString("row %1 atom %2: KKT violation %3").arg(j).arg(a).arg(err)));
+            }
+        }
+
+        // Debiasing refits the active set by least squares: G_A^T (M - G_A X) = 0.
+        params.bDebias = true;
+        const InvTfMxneResult debiased = InvTfMxne::compute(G, M, params);
+        MatrixXd GA(nCh, debiased.activeVertices.size());
+        for (int i = 0; i < debiased.activeVertices.size(); ++i)
+            GA.col(i) = G.col(debiased.activeVertices[i]);
+        QVERIFY((GA.transpose() * (M - GA * debiased.stc.data)).norm() <= 1e-10 * M.norm());
+    }
+
     void testParamsDefaults()
     {
         InvTfMxneParams params;

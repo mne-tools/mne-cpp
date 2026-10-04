@@ -6611,7 +6611,7 @@
       "requirements": [],
       "gui": false,
       "qskip_sites": 0,
-      "spawns_processes": true,
+      "spawns_processes": false,
       "ci_excluded_on": [],
       "ci": {
         "macos-26": "run",
