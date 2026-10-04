@@ -7,12 +7,21 @@
  * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
  * @since    2.4.0
  * @date     October 2026
- * @brief    Cross validates the eLORETA kernel against mne-python on identical inverse operators.
+ * @brief    Cross validates inverse operator construction and the eLORETA kernel against mne-python.
  *
- * The test builds a 70-source (lh.V1) inverse operator with MNE-CPP, once
- * with loose orientations and once with fixed orientations, and assembles
- * the eLORETA kernel. The reference values are mne-python run on the very
- * inverse operators MNE-CPP writes, so both sides start from the same input:
+ * makeInverse_matchesPython builds 70-source (lh.V1) inverse operators with
+ * MNE-CPP and compares them with mne-python's own on the same inputs:
+ *
+ *   inv = make_inverse_operator(info, restrict_forward_to_label(fwd, v1), cov,
+ *                               loose=..., depth=..., fixed=...)
+ *   p = prepare_inverse_operator(inv, nave, 1/9, 'MNE')
+ *   np.abs(p['sing']).sum(), per-source Frobenius norm sum of _assemble_kernel(p, None, 'MNE', None)[0]
+ *   np.sum(1 / prepare_inverse_operator(inv, nave, 1/9, 'dSPM')['noisenorm'])
+ *
+ * The remaining slots build the operators once (loose and fixed) and
+ * assemble the eLORETA kernel. Their reference values are mne-python run on
+ * the very inverse operators MNE-CPP writes, so both sides start from the
+ * same input:
  *
  *   inv = mne.minimum_norm.read_inverse_operator(<written by this test>)
  *   p = prepare_inverse_operator(inv, nave, 1/9, 'eLORETA',
@@ -68,10 +77,15 @@ private:
 
     MNEInverseOperator m_loose;
     MNEInverseOperator m_fixed;
+    FiffInfo m_info;
+    FiffCov m_cov;
+    FsLabel m_v1;
     int m_nave = 0;
 
 private slots:
     void initTestCase();
+    void makeInverse_matchesPython_data();
+    void makeInverse_matchesPython();
     void kernel_matchesPython_data();
     void kernel_matchesPython();
     void noiseNorm_matchesPython_data();
@@ -98,12 +112,15 @@ void TestInvEloretaPython::initTestCase()
 
     FsLabel v1;
     QVERIFY(FsLabel::read(data("subjects/sample/label/lh.V1.label"), v1));
+    m_v1 = v1;
 
     QFile covFile(data("MEG/sample/sample_audvis-cov.fif"));
     const FiffCov cov(covFile);
+    m_cov = cov;
     QFile aveFile(data("MEG/sample/sample_audvis-ave.fif"));
     const FiffEvoked evoked(aveFile, 0);
     m_nave = evoked.nave;
+    m_info = evoked.info;
 
     QFile freeFile(fwdPath);
     const MNEForwardSolution freeFwd = MNEForwardSolution(freeFile).pick_regions({v1});
@@ -119,6 +136,80 @@ void TestInvEloretaPython::initTestCase()
     // One depth weight per fixed-orientation source, three per free one.
     QCOMPARE(static_cast<int>(m_fixed.source_cov->data.rows()), 70);
     QCOMPARE(static_cast<int>(m_loose.source_cov->data.rows()), 210);
+}
+
+//=============================================================================================================
+
+void TestInvEloretaPython::makeInverse_matchesPython_data()
+{
+    QTest::addColumn<bool>("surfOri");
+    QTest::addColumn<float>("loose");
+    QTest::addColumn<float>("depth");
+    QTest::addColumn<bool>("fixed");
+    QTest::addColumn<int>("rows");
+    QTest::addColumn<double>("singSum");
+    QTest::addColumn<double>("kernelNormSum");
+    QTest::addColumn<double>("dspmNormSum");
+    QTest::addColumn<double>("nnZSum");
+
+    // The last column is the z sum of the source normals, inv['source_nn'][2::3, 2]
+    // for free orientations (the tangential vectors are not unique) and all rows
+    // for fixed ones; surface-oriented operators use the patch normals.
+    QTest::newRow("loose 0.2") << true << 0.2f << 0.8f << false << 210
+                               << 70.71887643595808 << 12172144.218271181 << 8.033782202042283e-08 << -2.3680535720497407;
+    QTest::newRow("free") << false << 1.0f << 0.8f << false << 210
+                          << 71.9772089624631 << 10247045.448053062 << 6.85092011400161e-08 << 70.0;
+    QTest::newRow("free, no depth") << false << 1.0f << 0.0f << false << 210
+                                    << 68.06095753009956 << 7684027.38083116 << 4.63638351561198e-08 << 70.0;
+    QTest::newRow("fixed from free") << true << 0.0f << 0.8f << true << 70
+                                     << 67.61900529555693 << 17118113.357613612 << 1.1110428823216728e-07 << -2.3680535720497407;
+}
+
+//=============================================================================================================
+
+void TestInvEloretaPython::makeInverse_matchesPython()
+{
+    QFETCH(bool, surfOri);
+    QFETCH(float, loose);
+    QFETCH(float, depth);
+    QFETCH(bool, fixed);
+    QFETCH(int, rows);
+    QFETCH(double, singSum);
+    QFETCH(double, kernelNormSum);
+    QFETCH(double, dspmNormSum);
+    QFETCH(double, nnZSum);
+
+    QFile fwdFile(data("Result/ref-sample_audvis-meg-eeg-oct-6-fwd.fif"));
+    const MNEForwardSolution fwd = MNEForwardSolution(fwdFile, false, surfOri).pick_regions({m_v1});
+    const MNEInverseOperator inv = MNEInverseOperator::make_inverse_operator(m_info, fwd, m_cov, loose, depth, fixed, true);
+    QCOMPARE(inv.nsource, 70);
+    QCOMPARE(static_cast<int>(inv.source_nn.rows()), rows);
+    double nnZ = 0.0;
+    for (int i = rows / 70 - 1; i < rows; i += rows / 70)
+        nnZ += inv.source_nn(i, 2);
+    QVERIFY2(std::fabs(nnZ - nnZSum) <= 1e-5 * 70, qPrintable(QString("normal z sum %1").arg(nnZ, 0, 'g', 17)));
+
+    InvMinimumNorm mn(inv, 1.0f / 9.0f, "MNE");
+    mn.doInverseSetup(m_nave, false);
+    const MatrixXd& K = mn.getKernel();
+    QCOMPARE(static_cast<int>(K.rows()), rows);
+    // The forward and covariance are float32 on disk; 1e-5 is that precision
+    // carried through the SVD, a wrong prior or orientation moves these by percent.
+    const double gotSing = mn.getPreparedInverseOperator().sing.cwiseAbs().sum();
+    QVERIFY2(std::fabs(gotSing - singSum) <= 1e-5 * singSum, qPrintable(QString("sing sum %1").arg(gotSing, 0, 'g', 17)));
+    // Sum over sources of the Frobenius norm of their kernel rows, which does not
+    // depend on the (non-unique) tangential basis of loose operators.
+    const int nOri = rows / 70;
+    double gotK = 0.0;
+    for (int s = 0; s < 70; ++s)
+        gotK += K.middleRows(s * nOri, nOri).norm();
+    QVERIFY2(std::fabs(gotK - kernelNormSum) <= 1e-5 * kernelNormSum, qPrintable(QString("kernel norm sum %1").arg(gotK, 0, 'g', 17)));
+
+    const MNEInverseOperator dspm = inv.prepare_inverse_operator(m_nave, 1.0f / 9.0f, true);
+    double normSum = 0.0;
+    for (int i = 0; i < 70; ++i)
+        normSum += 1.0 / dspm.noisenorm.coeff(i, i);
+    QVERIFY2(std::fabs(normSum - dspmNormSum) <= 1e-5 * dspmNormSum, qPrintable(QString("sum 1/noisenorm %1").arg(normSum, 0, 'g', 17)));
 }
 
 //=============================================================================================================

@@ -646,13 +646,15 @@ MNEInverseOperator MNEInverseOperator::make_inverse_operator(const FiffInfo& inf
                 qint32 count = 0;
                 for (qint32 i = 2; i < p_depth_prior->data.rows(); i += 3) {
                     p_depth_prior->data.row(count) = p_depth_prior->data.row(i);
+                    gain.col(count) = gain.col(i);
                     ++count;
                 }
                 p_depth_prior->data.conservativeResize(count, 1);
+                p_depth_prior->dim = count;
+                gain.conservativeResize(Eigen::NoChange, count);
 
                 forward.to_fixed_ori();
                 is_fixed_ori = forward.isFixedOrient();
-                forward.prepare_forward(info, p_outNoiseCov, false, gain_info, gain, p_outNoiseCov, whitener, n_nzero);
             }
         }
     }

@@ -1588,9 +1588,15 @@ void MNEForwardSolution::to_fixed_ori()
         return;
     }
     qint32 count = 0;
-    for (qint32 i = 2; i < this->sol->data.cols(); i += 3)
-        this->sol->data.col(count) = this->sol->data.col(i); //ToDo: is this right? - just take z?
+    for (qint32 i = 2; i < this->sol->data.cols(); i += 3) {
+        this->sol->data.col(count) = this->sol->data.col(i);
+        if (this->source_nn.rows() == this->sol->data.cols())
+            this->source_nn.row(count) = this->source_nn.row(i);
+        ++count;
+    }
     this->sol->data.conservativeResize(this->sol->data.rows(), count);
+    if (this->source_nn.rows() == 3 * count)
+        this->source_nn.conservativeResize(count, Eigen::NoChange);
     this->sol->ncol = this->sol->ncol / 3;
     this->source_ori = FIFFV_MNE_FIXED_ORI;
     qInfo("\tConverted the forward solution into the fixed-orientation mode.");
