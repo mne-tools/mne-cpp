@@ -43,6 +43,8 @@
 #include <inv/dipole_fit/inv_ecd_set.h>
 #include <inv/dipole_fit/inv_guess_data.h>
 
+#include <fwd/fwd_eeg_sphere_model.h>
+
 #include <fiff/fiff_evoked_set.h>
 #include <fiff/fiff_raw_data.h>
 #include <fiff/fiff_stream.h>
@@ -74,6 +76,7 @@
 using namespace INVLIB;
 using namespace FIFFLIB;
 using namespace MNELIB;
+using namespace FWDLIB;
 using namespace Eigen;
 
 namespace
@@ -167,6 +170,8 @@ private slots:
     void initTestCase();
     void forwardFieldMatches_data();
     void forwardFieldMatches();
+    void bemForwardMatches_data();
+    void bemForwardMatches();
     void fitMatches_data();
     void fitMatches();
     void rawFitMatches_data();
@@ -292,6 +297,60 @@ void TestInvDipoleFitPython::forwardFieldMatches()
     const double norm = m_fields.col(dipole).cast<double>().norm();
     QVERIFY2(std::abs(norm - pythonNorm) < 1e-4 * pythonNorm,
              qPrintable(QStringLiteral("field norm %1 vs mne-python %2").arg(norm, 0, 'g', 12).arg(pythonNorm, 0, 'g', 12)));
+}
+
+//=============================================================================================================
+
+void TestInvDipoleFitPython::bemForwardMatches_data()
+{
+    QTest::addColumn<int>("dipole");
+    QTest::addColumn<double>("megNorm");
+    QTest::addColumn<double>("eegNorm");
+
+    // mne-python on the three-layer sample-1280-1280-1280 BEM solution:
+    //   fwd = mne.make_forward_dipole(mne.Dipole(t, pos, amp, ori, gof), bem, ev.info, trans)
+    //   P = make_projector(ev.info['projs'], fwd['sol']['row_names'])[0]
+    //   np.linalg.norm((P @ fwd['sol']['data'][:, k] * amp[k])[meg or eeg])
+    QTest::newRow("dipole 1") << 0 << 2.1842782649138175e-12 << 1.0707594849960882e-05;
+    QTest::newRow("dipole 2") << 1 << 1.7820900035529597e-11 << 1.6207656369250373e-05;
+    QTest::newRow("dipole 3") << 2 << 6.618196100881725e-12 << 9.877867103888988e-06;
+}
+
+void TestInvDipoleFitPython::bemForwardMatches()
+{
+    QFETCH(int, dipole);
+    QFETCH(double, megNorm);
+    QFETCH(double, eegNorm);
+
+    const QString data = QCoreApplication::applicationDirPath() + "/../resources/data/mne-cpp-test-data/";
+    QStringList projnames{m_sampleAve};
+    FwdEegSphereModel::UPtr eegModel = FwdEegSphereModel::setup_eeg_sphere_model(QString(), QString(), 0.09f);
+    QVERIFY(eegModel);
+    // MEG and EEG through the BEM, with only the diagonal of the noise covariance.
+    std::unique_ptr<InvDipoleFitData> fitData(InvDipoleFitData::setup_dipole_fit_data(
+        data + "MEG/sample/all-trans.fif", m_sampleAve, data + "subjects/sample/bem/sample-1280-1280-1280-bem.fif",
+        nullptr, eegModel.release(), true, QString(), QString(),
+        5e-13f, 20e-15f, 0.2e-6f, 0.1f, 0.1f, 0.1f, true, projnames, true, true));
+    QVERIFY(fitData);
+    QCOMPARE(fitData->nmeg, 305);
+    QCOMPARE(fitData->neeg, 59);
+    QVERIFY(fitData->funcs == fitData->bem_funcs.get());
+    QVERIFY(fitData->noise->cov_diag.size() == 364);
+
+    MatrixXf g(fitData->nmeg + fitData->neeg, 3);
+    QCOMPARE(InvDipoleFitData::compute_dipole_field(*fitData, truthPos(dipole), false, g), 0);
+    const VectorXd field = (g * truthMoment(dipole)).cast<double>();
+    const double meg = field.head(fitData->nmeg).norm();
+    const double eeg = field.tail(fitData->neeg).norm();
+    QVERIFY2(std::abs(meg - megNorm) < 5e-3 * megNorm, qPrintable(QStringLiteral("MEG %1 vs %2").arg(meg, 0, 'g', 10).arg(megNorm, 0, 'g', 10)));
+    QVERIFY2(std::abs(eeg - eegNorm) < 5e-3 * eegNorm, qPrintable(QStringLiteral("EEG %1 vs %2").arg(eeg, 0, 'g', 10).arg(eegNorm, 0, 'g', 10)));
+
+    // EEG needs a layered model; a homogeneous BEM is refused.
+    QTest::ignoreMessage(QtCriticalMsg, "Cannot use a homogeneous model in EEG calculations.");
+    QVERIFY(!InvDipoleFitData::setup_dipole_fit_data(
+        data + "MEG/sample/all-trans.fif", m_sampleAve, data + "subjects/sample/bem/sample-5120-bem.fif",
+        nullptr, FwdEegSphereModel::setup_eeg_sphere_model(QString(), QString(), 0.09f).release(), false, QString(), QString(),
+        5e-13f, 20e-15f, 0.2e-6f, 0.1f, 0.1f, 0.1f, false, projnames, false, true));
 }
 
 //=============================================================================================================
