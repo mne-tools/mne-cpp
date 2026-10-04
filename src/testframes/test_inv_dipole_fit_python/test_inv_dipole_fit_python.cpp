@@ -184,6 +184,7 @@ private slots:
     void sphereGuessGrid_data();
     void sphereGuessGrid();
     void guessesFromFile();
+    void fitsOneTimePoint();
     void printsFields();
     void commandLine();
     void commandLineRejects_data();
@@ -596,6 +597,32 @@ void TestInvDipoleFitPython::sphereGuessGrid()
     InvGuessData guess(QString(), QString(), 0.0f, 0.02f, static_cast<float>(grid), m_fitData.get(), static_cast<float>(radius));
     QCOMPARE(guess.nguess, nguess);
     QVERIFY(std::abs(guess.rr.cast<double>().sum() - rrSum) < 1e-3);
+}
+
+//=============================================================================================================
+
+void TestInvDipoleFitPython::fitsOneTimePoint()
+{
+    InvGuessData guess(QString(), QString(), 0.0f, 0.02f, 0.015f, m_fitData.get(), 0.08f);
+    QCOMPARE(guess.nguess, 627);
+
+    VectorXf B = m_fields.col(0);
+    InvEcd dip;
+    QVERIFY(InvDipoleFitData::fit_one(m_fitData.get(), &guess, 0.0f, B, false, dip));
+    QVERIFY(dip.valid);
+    QVERIFY2((dip.rd - truthPos(0)).norm() < 1e-3f, qPrintable(QString::number(1e3 * (dip.rd - truthPos(0)).norm())));
+    // The radial part is silent in a sphere: mne-python's fit_dipole moment (fitMatches, dipole 1).
+    const Vector3d qPython(14.972583573738602, -9.63296316190587, -8.565797930810295);
+    QVERIFY2((1e9 * dip.Q.cast<double>() - qPython).norm() < 0.02 * qPython.norm(),
+             qPrintable(QStringLiteral("moment (%1, %2, %3) nAm").arg(1e9 * dip.Q[0]).arg(1e9 * dip.Q[1]).arg(1e9 * dip.Q[2])));
+    QVERIFY(dip.good > 0.9999f);
+
+    // A flat field fits no guess better than another, as in MNE-C's find_best_guess.
+    VectorXf flat = VectorXf::Zero(m_fitData->nmeg);
+    InvEcd none;
+    QTest::ignoreMessage(QtWarningMsg, "No reasonable initial guess found.");
+    QVERIFY(!InvDipoleFitData::fit_one(m_fitData.get(), &guess, 0.0f, flat, false, none));
+    QVERIFY(!none.valid);
 }
 
 //=============================================================================================================
