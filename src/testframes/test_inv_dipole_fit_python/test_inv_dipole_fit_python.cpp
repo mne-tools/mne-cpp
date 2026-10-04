@@ -170,6 +170,8 @@ private slots:
     void sphereGuessGrid_data();
     void sphereGuessGrid();
     void commandLine();
+    void commandLineRejects_data();
+    void commandLineRejects();
     void rejectsMissingInput();
 
 private:
@@ -485,6 +487,100 @@ void TestInvDipoleFitPython::commandLine()
     QTest::ignoreMessage(QtCriticalMsg, "Grid spacing should be positive");
     InvDipoleFitSettings rejected(&badArgc, badArgv.data());
     QCOMPARE(rejected.guess_grid, 0.010f);
+
+    // The remaining options, in MNE-C's units (mm, fT/cm, fT, uV, ms).
+    QByteArrayList more{"mne_dipole_fit", "--raw", "r_raw.fif", "--eeg", "--bdip", "out.bdip", "--guess", "g.fif",
+                        "--gsurf", "s.fif", "--guesssurf", "inner.fif", "--mri", "t.fif", "--bem", "b.fif", "--accurate",
+                        "--eegrad", "95", "--eegmodels", "m.txt", "--eegmodel", "Three", "--eegscalp", "--proj", "p.fif",
+                        "--bad", "bad.txt", "--noise", "n-cov.fif", "--diagnoise", "--eegreg", "0.3", "--magreg", "0.4",
+                        "--gradreg", "0.5", "--bmin", "-100", "--bmax", "0", "--filteroff", "--lowpassw", "7",
+                        "--highpass", "0.5", "--magdip", "--gui", "--mindist", "-2", "--exclude", "-1"};
+    std::vector<char*> moreArgv;
+    for (QByteArray& a : more)
+        moreArgv.push_back(a.data());
+    int moreArgc = static_cast<int>(moreArgv.size());
+    InvDipoleFitSettings m(&moreArgc, moreArgv.data());
+    QCOMPARE(moreArgc, 1);
+    QVERIFY(m.is_raw && m.include_eeg && !m.include_meg && m.accurate && m.scale_eeg_pos && m.diagnoise && m.fit_mag_dipoles && m.gui);
+    QCOMPARE(m.measname, QString("r_raw.fif"));
+    QCOMPARE(m.bdipname, QString("out.bdip"));
+    QCOMPARE(m.guessname, QString("g.fif"));
+    QCOMPARE(m.guess_surfname, QString("inner.fif"));
+    QCOMPARE(m.mriname, QString("t.fif"));
+    QCOMPARE(m.bemname, QString("b.fif"));
+    QCOMPARE(m.eeg_sphere_rad, 0.095f);
+    QCOMPARE(m.eeg_model_file, QString("m.txt"));
+    QCOMPARE(m.eeg_model_name, QString("Three"));
+    // checkIntegrity puts the measurement file first unless --noproj.
+    QCOMPARE(m.projnames, QStringList({"r_raw.fif", "p.fif"}));
+    QCOMPARE(m.badname, QString("bad.txt"));
+    QCOMPARE(m.noisename, QString("n-cov.fif"));
+    QCOMPARE(m.eeg_reg, 0.3f);
+    QCOMPARE(m.mag_reg, 0.4f);
+    QCOMPARE(m.grad_reg, 0.5f);
+    QCOMPARE(m.bmin, -0.1f);
+    QCOMPARE(m.bmax, 0.0f);
+    QVERIFY(m.do_baseline);
+    QVERIFY(!m.filter.filter_on);
+    QCOMPARE(m.filter.lowpass_width, 7.0f);
+    QCOMPARE(m.filter.highpass, 0.5f);
+    // Negative guess distances are clamped to zero rather than rejected.
+    QCOMPARE(m.guess_mindist, 0.0f);
+    QCOMPARE(m.guess_exclude, 0.0f);
+}
+
+//=============================================================================================================
+
+void TestInvDipoleFitPython::commandLineRejects_data()
+{
+    QTest::addColumn<QByteArrayList>("args");
+    QTest::addColumn<QString>("message");
+
+    auto row = [](const char* name, QByteArrayList args, const char* message) {
+        args.prepend("mne_dipole_fit");
+        QTest::newRow(name) << args << QString(message);
+    };
+    for (const char* opt : {"--guess", "--gsurf", "--guesssurf", "--guessrad", "--mindist", "--exclude", "--grid", "--mri", "--bem",
+                            "--origin", "--eegrad", "--eegmodels", "--eegmodel", "--meas", "--raw", "--proj", "--bad", "--noise",
+                            "--gradnoise", "--magnoise", "--eegnoise", "--eegreg", "--magreg", "--gradreg", "--reg", "--tstep",
+                            "--integ", "--tmin", "--tmax", "--bmin", "--bmax", "--set", "--lowpass", "--lowpassw", "--highpass",
+                            "--filtersize", "--dip", "--bdip"})
+        row(opt, {opt}, (QByteArray(opt) + ": argument required.").constData());
+    row("guessrad not a number", {"--guessrad", "x"}, "Could not interpret the radius.");
+    row("guessrad zero", {"--guessrad", "0"}, "Radius should be positive");
+    row("mindist not a number", {"--mindist", "x"}, "Could not interpret the distance.");
+    row("exclude not a number", {"--exclude", "x"}, "Could not interpret the distance.");
+    row("grid not a number", {"--grid", "x"}, "Could not interpret the distance.");
+    row("origin malformed", {"--origin", "1:2"}, "Could not interpret the origin.");
+    row("eegrad zero", {"--eegrad", "0"}, "Radius must be positive");
+    row("gradnoise negative", {"--gradnoise", "-1"}, "Value should be positive");
+    row("magnoise negative", {"--magnoise", "-1"}, "Value should be positive");
+    row("eegnoise negative", {"--eegnoise", "-1"}, "Value should be positive");
+    row("eegreg above one", {"--eegreg", "1.5"}, "Regularization value should be positive and smaller than one.");
+    row("magreg negative", {"--magreg", "-0.1"}, "Regularization value should be positive and smaller than one.");
+    row("gradreg above one", {"--gradreg", "2"}, "Regularization value should be positive and smaller than one.");
+    row("reg above one", {"--reg", "2"}, "Regularization value should be positive and smaller than one.");
+    row("tstep negative", {"--tstep", "-1"}, "Time step should be positive");
+    row("integ zero", {"--integ", "0"}, "Integration time should be positive.");
+    row("set zero", {"--set", "0"}, "Data set number must be > 0");
+    row("lowpass zero", {"--lowpass", "0"}, "Lowpass corner must be positive");
+    row("lowpassw zero", {"--lowpassw", "0"}, "Lowpass width must be positive");
+    row("highpass negative", {"--highpass", "-1"}, "Highpass corner must be positive");
+    row("filtersize too small", {"--filtersize", "512"}, "Filtersize should be at least 1024.");
+    row("unrecognized", {"--meg", "--bogus", "x"}, "Unrecognized arguments : --bogus x");
+}
+
+void TestInvDipoleFitPython::commandLineRejects()
+{
+    QFETCH(QByteArrayList, args);
+    QFETCH(QString, message);
+    std::vector<char*> argv;
+    for (QByteArray& a : args)
+        argv.push_back(a.data());
+    int argc = static_cast<int>(argv.size());
+    QTest::ignoreMessage(QtCriticalMsg, message.toUtf8().constData());
+    // Parsing stops at the error, before checkIntegrity would also complain about the missing --meas.
+    InvDipoleFitSettings s(&argc, argv.data());
 }
 
 //=============================================================================================================
