@@ -1092,10 +1092,7 @@ bool FwdEegSphereModel::fwd_eeg_fit_berg_scherg(int nTerms, /* Number of terms t
    * (4) Rather arbitrary initial guess
    */
     for (k = 0; k < nFit; k++) {
-        /*
-    muFit[k] = (k+1)*0.1*f;
-     */
-        muFit[k] = (rand() / (RAND_MAX + 1.0)) * f; //replacement for: muFit[k] = drand48()*f;
+        muFit[k] = (k + 1) * 0.1 * f;
     }
 
     simplex = get_initial_simplex(muFit, simplex_size);
