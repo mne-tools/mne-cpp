@@ -19,6 +19,14 @@ Static numerical helpers: integer GCD and log2, `nchoose2`, sparsity test, fixed
 
 Static scalar/per-vector numerical helpers (GCD, log2, histograms, baseline rescaling).
 
+```cpp title="src/examples/ex_math/main.cpp"
+MatrixXd data(2, 6);
+data << 1, 2, 3, 4, 6, 8, 2, 2, 2, 4, 4, 4;
+RowVectorXf times(6);
+times << -0.2f, -0.1f, 0.0f, 0.1f, 0.2f, 0.3f;
+const MatrixXd percent = Numerics::rescale(data, times, std::make_pair(-0.2f, 0.0f), std::string("percent")); // (x - mean) / mean over baseline
+```
+
 ---
 
 ## Public Methods
@@ -178,6 +186,11 @@ Creates a class and frequency distribution from data matrix.
 ### histcounts(matRawData, bMakeSymmetrical, iClassAmount, vecResultClassLimits, vecResultFrequency, dGlobalMin, dGlobalMax)
 
 ---
+
+## Example
+
+- Full source: [`src/examples/ex_math/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_math/main.cpp)
+- Build target: `ex_math` (runs under CTest)
 
 ## Authors of this file
 

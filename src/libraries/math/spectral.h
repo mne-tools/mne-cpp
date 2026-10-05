@@ -82,6 +82,8 @@ struct TaperedSpectraInputData
  * CONNECTIVITYLIB's coherence / phase estimators.
  *
  * @brief Static multi-taper spectra, PSD and CSD estimator for MEG/EEG time series.
+ *
+ * @snippet ex_math/main.cpp spectral_psd
  */
 class MATHSHARED_EXPORT Spectral
 {

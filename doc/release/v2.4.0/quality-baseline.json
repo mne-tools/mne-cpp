@@ -50,9 +50,9 @@
       "public_api_units": 478,
       "exported_not_registered": 124,
       "example_eligible": 383,
-      "eligible_backed_percent": 12.27,
-      "snippets": 35,
-      "registered_test_percent": 27.97
+      "eligible_backed_percent": 14.1,
+      "snippets": 42,
+      "registered_test_percent": 28.53
     },
     "G4_screenshots": {
       "referenced_images": 19,

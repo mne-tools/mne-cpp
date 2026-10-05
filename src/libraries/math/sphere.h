@@ -68,6 +68,8 @@ struct FitUser
  * head models, fit HPI coils and digitiser scalps.
  *
  * @brief 3-D sphere value type with algebraic and Nelder–Mead best-fit factories.
+ *
+ * @snippet ex_math/main.cpp sphere_fit
  */
 class MATHSHARED_EXPORT Sphere
 {

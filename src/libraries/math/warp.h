@@ -71,6 +71,8 @@ namespace UTILSLIB
  * template-to-subject mesh warping.
  *
  * @brief Thin-plate-spline 3-D warp fitted from landmark correspondences.
+ *
+ * @snippet ex_math/main.cpp warp_calculate
  */
 class MATHSHARED_EXPORT Warp
 {

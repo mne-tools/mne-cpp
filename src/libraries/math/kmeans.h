@@ -105,6 +105,8 @@ enum class KMeansEmptyAction
  * optional online refinement phase.
  *
  * @brief Lloyd-style K-means clustering with configurable metric, seeding and replicates.
+ *
+ * @snippet ex_math/main.cpp kmeans_calculate
  */
 class MATHSHARED_EXPORT KMeans
 {

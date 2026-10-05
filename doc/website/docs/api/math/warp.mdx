@@ -21,6 +21,17 @@ Used for non-rigid registration of EEG/MEG sensors and template-to-subject mesh 
 
 Thin-plate-spline 3-D warp fitted from landmark correspondences.
 
+```cpp title="src/examples/ex_math/main.cpp"
+// Landmarks moved by a pure translation: the thin-plate spline must reproduce it exactly
+MatrixXf sourceLm(5, 3);
+sourceLm << 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 1, 1, 1;
+const MatrixXf destLm = sourceLm.rowwise() + RowVector3f(0.5f, -0.2f, 0.1f);
+MatrixXf vertices(2, 3);
+vertices << 0.3f, 0.4f, 0.5f, 0.9f, 0.1f, 0.2f;
+Warp warp;
+const MatrixXf warped = warp.calculate(sourceLm, destLm, vertices);
+```
+
 ---
 
 ## Public Methods
@@ -92,6 +103,11 @@ Read electrode positions from MRI Database.
 - *Eigen::MatrixXf* — electrodes Matrix with electrode positions.
 
 ---
+
+## Example
+
+- Full source: [`src/examples/ex_math/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_math/main.cpp)
+- Build target: `ex_math` (runs under CTest)
 
 ## Authors of this file
 

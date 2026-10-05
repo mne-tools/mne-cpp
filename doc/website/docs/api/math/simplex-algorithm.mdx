@@ -21,7 +21,24 @@ class UTILSLIB::SimplexAlgorithm
 
 Header-only Nelder–Mead simplex minimiser templated on the scalar type and on the cost / report callables, implementing the Strategy pattern at zero runtime cost (the functors are inlined by the compiler).
 
-Header-only Nelder–Mead simplex minimiser with templated cost and report functors.
+Header-only Nelder–Mead simplex minimiser with templated cost and report functors. 
+```cpp title="src/examples/ex_math/main.cpp"
+// Minimise the Rosenbrock function from a 3-vertex simplex around (-1, 1); ftol is relative, so the
+// minimum value is offset to 1 (a minimum of exactly 0 never satisfies a relative tolerance)
+auto rosenbrock = [](const VectorXd& x) {
+    return 1.0 + 100.0 * std::pow(x(1) - x(0) * x(0), 2) + std::pow(1.0 - x(0), 2);
+};
+MatrixXd simplex(3, 2);
+simplex << -1.0, 1.0, -0.9, 1.0, -1.0, 1.1;
+VectorXd values(3);
+for (int i = 0; i < 3; ++i) {
+    values(i) = rosenbrock(simplex.row(i).transpose());
+}
+int evaluations = 0;
+const bool converged = SimplexAlgorithm::simplex_minimize<double>(simplex, values, 1e-12, 0.0, rosenbrock, 5000, evaluations);
+Index best = 0;
+values.minCoeff(&best); // vertices are not sorted on return
+```
 
 ---
 
@@ -100,6 +117,11 @@ Overload without report function (no reporting).
 - *bool* — True when minimization succeeded, false otherwise.
 
 ---
+
+## Example
+
+- Full source: [`src/examples/ex_math/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_math/main.cpp)
+- Build target: `ex_math` (runs under CTest)
 
 ## Authors of this file
 

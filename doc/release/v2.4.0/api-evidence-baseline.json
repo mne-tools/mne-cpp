@@ -10,20 +10,20 @@
     "registered_function_modules": 13,
     "registered_header_only": 3,
     "registered_stale": 0,
-    "registered_with_test": 99,
+    "registered_with_test": 101,
     "registered_test_unresolved": 0,
-    "registered_with_example": 47,
+    "registered_with_example": 54,
     "registered_example_not_built": 0,
     "registered_with_python_equiv": 88,
     "registered_without_api_page": 0,
-    "with_snippet": 35,
+    "with_snippet": 42,
     "public_api_units": 478,
     "example_eligible": 383,
     "example_exempt": 95,
-    "eligible_backed_by_registry_example": 47,
-    "eligible_used_by_some_example": 95,
-    "examples_on_disk": 43,
-    "examples_built": 43
+    "eligible_backed_by_registry_example": 54,
+    "eligible_used_by_some_example": 98,
+    "examples_on_disk": 44,
+    "examples_built": 44
   },
   "by_library": {
     "bids": {
@@ -137,11 +137,11 @@
     "math": {
       "public": 7,
       "registered": 7,
-      "with_test": 5,
+      "with_test": 7,
       "eligible": 7,
-      "eligible_with_registry_example": 0,
-      "eligible_used_by_example": 4,
-      "with_snippet": 0
+      "eligible_with_registry_example": 7,
+      "eligible_used_by_example": 7,
+      "with_snippet": 7
     },
     "ml": {
       "public": 4,
@@ -7666,10 +7666,14 @@
       "registry_status": "done",
       "test": "test_utils_kmeans",
       "test_resolves": true,
-      "example": null,
-      "example_state": "none",
-      "including_examples": [],
-      "snippets": [],
+      "example": "ex_math",
+      "example_state": "built",
+      "including_examples": [
+        "ex_math"
+      ],
+      "snippets": [
+        "ex_math/main.cpp#kmeans_calculate"
+      ],
       "api_page": "doc/website/docs/api/math/k-means.mdx",
       "python_equiv": null,
       "example_eligible": true,
@@ -7685,14 +7689,17 @@
       "registry_status": "done",
       "test": "test_utils_mnemath",
       "test_resolves": true,
-      "example": null,
-      "example_state": "none",
+      "example": "ex_math",
+      "example_state": "built",
       "including_examples": [
         "ex_clustered_inverse_mne",
         "ex_clustered_inverse_mne_raw",
-        "ex_inverse_mne_raw"
+        "ex_inverse_mne_raw",
+        "ex_math"
       ],
-      "snippets": [],
+      "snippets": [
+        "ex_math/main.cpp#linalg_usage"
+      ],
       "api_page": "doc/website/docs/api/math/linalg.mdx",
       "python_equiv": "numpy.linalg / scipy.linalg",
       "example_eligible": true,
@@ -7706,14 +7713,17 @@
       "exported": true,
       "registered": true,
       "registry_status": "documented",
-      "test": null,
-      "test_resolves": false,
-      "example": null,
-      "example_state": "none",
+      "test": "test_utils_mnemath",
+      "test_resolves": true,
+      "example": "ex_math",
+      "example_state": "built",
       "including_examples": [
-        "ex_histogram"
+        "ex_histogram",
+        "ex_math"
       ],
-      "snippets": [],
+      "snippets": [
+        "ex_math/main.cpp#numerics_rescale"
+      ],
       "api_page": "doc/website/docs/api/utils/numerics.mdx",
       "python_equiv": null,
       "example_eligible": true,
@@ -7729,10 +7739,14 @@
       "registry_status": "done",
       "test": "test_hpiFit",
       "test_resolves": true,
-      "example": null,
-      "example_state": "none",
-      "including_examples": [],
-      "snippets": [],
+      "example": "ex_math",
+      "example_state": "built",
+      "including_examples": [
+        "ex_math"
+      ],
+      "snippets": [
+        "ex_math/main.cpp#simplex_minimize"
+      ],
       "api_page": "doc/website/docs/api/math/simplex-algorithm.mdx",
       "python_equiv": "scipy.optimize.fmin",
       "example_eligible": true,
@@ -7746,14 +7760,17 @@
       "exported": true,
       "registered": true,
       "registry_status": "documented",
-      "test": null,
-      "test_resolves": false,
-      "example": null,
-      "example_state": "none",
+      "test": "test_utils_spectral",
+      "test_resolves": true,
+      "example": "ex_math",
+      "example_state": "built",
       "including_examples": [
+        "ex_math",
         "ex_spectral"
       ],
-      "snippets": [],
+      "snippets": [
+        "ex_math/main.cpp#spectral_psd"
+      ],
       "api_page": "doc/website/docs/api/utils/spectral.mdx",
       "python_equiv": null,
       "example_eligible": true,
@@ -7769,10 +7786,14 @@
       "registry_status": "done",
       "test": "test_utils_sphere",
       "test_resolves": true,
-      "example": null,
-      "example_state": "none",
-      "including_examples": [],
-      "snippets": [],
+      "example": "ex_math",
+      "example_state": "built",
+      "including_examples": [
+        "ex_math"
+      ],
+      "snippets": [
+        "ex_math/main.cpp#sphere_fit"
+      ],
       "api_page": "doc/website/docs/api/math/sphere.mdx",
       "python_equiv": "mne.make_sphere_model",
       "example_eligible": true,
@@ -7788,12 +7809,15 @@
       "registry_status": "done",
       "test": "test_utils_warp",
       "test_resolves": true,
-      "example": null,
-      "example_state": "none",
+      "example": "ex_math",
+      "example_state": "built",
       "including_examples": [
+        "ex_math",
         "ex_warp"
       ],
-      "snippets": [],
+      "snippets": [
+        "ex_math/main.cpp#warp_calculate"
+      ],
       "api_page": "doc/website/docs/api/math/warp.mdx",
       "python_equiv": null,
       "example_eligible": true,

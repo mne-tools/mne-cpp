@@ -66,6 +66,8 @@ namespace UTILSLIB
  * Eigen for use across MATHLIB, FWDLIB and INVERSELIB.
  *
  * @brief Static Eigen-based linear-algebra helpers used across MATHLIB and the inverse solvers.
+ *
+ * @snippet ex_math/main.cpp linalg_usage
  */
 class MATHSHARED_EXPORT Linalg
 {

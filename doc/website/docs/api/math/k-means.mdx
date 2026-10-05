@@ -19,6 +19,16 @@ Lloyd-style K-means partitional clustering with configurable distance metric, se
 
 Lloyd-style K-means clustering with configurable metric, seeding and replicates.
 
+```cpp title="src/examples/ex_math/main.cpp"
+MatrixXd X(6, 2); // two well separated groups of three points
+X << 0.0, 0.0, 0.1, 0.0, 0.0, 0.1, 5.0, 5.0, 5.1, 5.0, 5.0, 5.1;
+KMeans kmeans(KMeansDistance::SquaredEuclidean, KMeansStart::Sample, 5); // best of 5 replicates
+VectorXi idx;
+MatrixXd centroids, distances;
+VectorXd sumD;
+kmeans.calculate(X, 2, idx, centroids, sumD, distances);
+```
+
 ---
 
 ## Public Methods
@@ -104,6 +114,11 @@ Clusters input data X.
 - *bool* — true if clustering succeeded, false otherwise.
 
 ---
+
+## Example
+
+- Full source: [`src/examples/ex_math/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_math/main.cpp)
+- Build target: `ex_math` (runs under CTest)
 
 ## Authors of this file
 

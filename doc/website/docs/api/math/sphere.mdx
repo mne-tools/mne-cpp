@@ -25,6 +25,13 @@ Used to build spherical head models, fit HPI coils and digitiser scalps.
 
 3-D sphere value type with algebraic and Nelder–Mead best-fit factories.
 
+```cpp title="src/examples/ex_math/main.cpp"
+MatrixX3f points(6, 3); // six points on a sphere of radius 0.09 around (0, 0, 0.04)
+points << 0.09f, 0.0f, 0.04f, -0.09f, 0.0f, 0.04f, 0.0f, 0.09f, 0.04f,
+    0.0f, -0.09f, 0.04f, 0.0f, 0.0f, 0.13f, 0.0f, 0.0f, -0.05f;
+Sphere sphere = Sphere::fit_sphere(points);
+```
+
 ---
 
 ## Public Methods
@@ -127,6 +134,11 @@ Fits a sphere to a point cloud.
 ### fit_sphere_to_points(rr, np, simplex_size, r0, R)
 
 ---
+
+## Example
+
+- Full source: [`src/examples/ex_math/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_math/main.cpp)
+- Build target: `ex_math` (runs under CTest)
 
 ## Authors of this file
 

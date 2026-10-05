@@ -21,6 +21,19 @@ Designed for fan-out across channels via `QtConcurrent` and feeding `CONNECTIVIT
 
 Static multi-taper spectra, PSD and CSD estimator for MEG/EEG time series.
 
+```cpp title="src/examples/ex_math/main.cpp"
+const int nSamples = 200;
+const double sFreq = 100.0;
+RowVectorXd signal(nSamples);
+for (int t = 0; t < nSamples; ++t) {
+    signal(t) = 2.0 * std::sin(2.0 * kPi * 10.0 * t / sFreq); // 10 Hz, amplitude 2
+}
+const auto [tapers, weights] = Spectral::generateTapers(nSamples, std::string("hanning"));
+const MatrixXcd spectra = Spectral::computeTaperedSpectraRow(signal, tapers, nSamples);
+const RowVectorXd psd = Spectral::psdFromTaperedSpectra(spectra, weights, nSamples, sFreq);
+const VectorXd freqs = Spectral::calculateFFTFreqs(nSamples, sFreq);
+```
+
 ---
 
 ## Public Methods
@@ -220,6 +233,11 @@ Calculates a hanning window of given length.
 - *std::pair&lt; Eigen::MatrixXd, Eigen::VectorXd &gt;* — Qpair of tapers and taper weights.
 
 ---
+
+## Example
+
+- Full source: [`src/examples/ex_math/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_math/main.cpp)
+- Build target: `ex_math` (runs under CTest)
 
 ## Authors of this file
 

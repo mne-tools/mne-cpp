@@ -1710,7 +1710,11 @@
       "mne_python": null,
       "sklearn": "sklearn.cluster.KMeans",
       "test": "test_utils_kmeans",
-      "example": null,
+      "example": "ex_math",
+      "example_snippet": [
+        "ex_math/main.cpp#kmeans_calculate"
+      ],
+      "example_mode": "run",
       "status": "done",
       "skigen_candidate": true,
       "skigen_target": "Skigen::Cluster::KMeans (exists)",
@@ -1871,7 +1875,11 @@
       "mne_python": "numpy.linalg / scipy.linalg",
       "sklearn": null,
       "test": "test_utils_mnemath",
-      "example": null,
+      "example": "ex_math",
+      "example_snippet": [
+        "ex_math/main.cpp#linalg_usage"
+      ],
+      "example_mode": "run",
       "status": "done",
       "skigen_candidate": false,
       "documented": true,
@@ -1889,7 +1897,11 @@
       "mne_python": "scipy.optimize.fmin",
       "sklearn": null,
       "test": "test_hpiFit",
-      "example": null,
+      "example": "ex_math",
+      "example_snippet": [
+        "ex_math/main.cpp#simplex_minimize"
+      ],
+      "example_mode": "run",
       "status": "done",
       "skigen_candidate": false,
       "documented": true,
@@ -1907,7 +1919,11 @@
       "mne_python": null,
       "sklearn": null,
       "test": "test_utils_warp",
-      "example": null,
+      "example": "ex_math",
+      "example_snippet": [
+        "ex_math/main.cpp#warp_calculate"
+      ],
+      "example_mode": "run",
       "status": "done",
       "skigen_candidate": false,
       "documented": true,
@@ -1925,7 +1941,11 @@
       "mne_python": "mne.make_sphere_model",
       "sklearn": null,
       "test": "test_utils_sphere",
-      "example": null,
+      "example": "ex_math",
+      "example_snippet": [
+        "ex_math/main.cpp#sphere_fit"
+      ],
+      "example_mode": "run",
       "status": "done",
       "skigen_candidate": false,
       "documented": true,
@@ -6219,8 +6239,12 @@
       "mne_c_tool": null,
       "mne_python": null,
       "sklearn": null,
-      "test": null,
-      "example": null,
+      "test": "test_utils_mnemath",
+      "example": "ex_math",
+      "example_snippet": [
+        "ex_math/main.cpp#numerics_rescale"
+      ],
+      "example_mode": "run",
       "status": "documented",
       "skigen_candidate": false,
       "documented": true,
@@ -6345,8 +6369,12 @@
       "mne_c_tool": null,
       "mne_python": null,
       "sklearn": null,
-      "test": null,
-      "example": null,
+      "test": "test_utils_spectral",
+      "example": "ex_math",
+      "example_snippet": [
+        "ex_math/main.cpp#spectral_psd"
+      ],
+      "example_mode": "run",
       "status": "documented",
       "skigen_candidate": false,
       "documented": true,

@@ -23,6 +23,17 @@ Static linear-algebra utilities (condition numbers, block-diagonal sparse assemb
 
 Static Eigen-based linear-algebra helpers used across `MATHLIB` and the inverse solvers.
 
+```cpp title="src/examples/ex_math/main.cpp"
+MatrixXd tall(3, 2);
+tall << 1, 2, 3, 4, 5, 6;
+const MatrixXd tallPinv = Linalg::pinv(tall); // Moore-Penrose, 2 x 3
+
+MatrixXd square(2, 2);
+square << 4, 1, 2, 3;
+VectorXd singular;
+const double condition = Linalg::getConditionNumber(square, singular); // s_max / s_min
+```
+
 ---
 
 ## Public Methods
@@ -336,6 +347,11 @@ Compares triplet second entry (column).
 - *bool* — True if the column index of lhs is less than that of rhs.
 
 ---
+
+## Example
+
+- Full source: [`src/examples/ex_math/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_math/main.cpp)
+- Build target: `ex_math` (runs under CTest)
 
 ## Authors of this file
 

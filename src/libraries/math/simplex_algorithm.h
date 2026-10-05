@@ -63,6 +63,8 @@ namespace UTILSLIB
  * @brief Header-only Nelder–Mead simplex minimiser with templated cost and report functors.
  * @note  Implements the Strategy pattern — the cost function and report function
  *        are injected as callable template parameters (zero-overhead type erasure).
+ *
+ * @snippet ex_math/main.cpp simplex_minimize
  */
 class MATHSHARED_EXPORT SimplexAlgorithm
 {

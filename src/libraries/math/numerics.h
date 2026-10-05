@@ -68,6 +68,8 @@ namespace UTILSLIB
  * source-estimate pipelines.
  *
  * @brief Static scalar/per-vector numerical helpers (GCD, log2, histograms, baseline rescaling).
+ *
+ * @snippet ex_math/main.cpp numerics_rescale
  */
 class MATHSHARED_EXPORT Numerics
 {
