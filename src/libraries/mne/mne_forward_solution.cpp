@@ -1322,13 +1322,23 @@ bool MNEForwardSolution::read(QIODevice& p_IODevice,
     //   Handle the source locations and orientations
     //
     if (fwd.isFixedOrient() || force_fixed == true) {
+        // Fixing a free solution uses the average patch normals when available (mne-python use_cps=True).
+        const bool patchNormals = !fwd.isFixedOrient() && t_SourceSpace.hemisphereAt(0) && t_SourceSpace.hemisphereAt(0)->patch_inds.size() > 0;
         nuse = 0;
         fwd.source_rr = MatrixXf::Zero(fwd.nsource, 3);
         fwd.source_nn = MatrixXf::Zero(fwd.nsource, 3);
         for (qint32 k = 0; k < t_SourceSpace.size(); ++k) {
             for (qint32 q = 0; q < t_SourceSpace[k].nuse; ++q) {
                 fwd.source_rr.row(nuse + q) = t_SourceSpace[k].rr.row(t_SourceSpace[k].vertno(q));
-                fwd.source_nn.row(nuse + q) = t_SourceSpace[k].nn.row(t_SourceSpace[k].vertno(q));
+                if (patchNormals) {
+                    auto* hemi = t_SourceSpace.hemisphereAt(k);
+                    RowVector3f nn = RowVector3f::Zero();
+                    for (int v : hemi->pinfo[hemi->patch_inds[q]])
+                        nn += t_SourceSpace[k].nn.row(v);
+                    fwd.source_nn.row(nuse + q) = nn.normalized();
+                } else {
+                    fwd.source_nn.row(nuse + q) = t_SourceSpace[k].nn.row(t_SourceSpace[k].vertno(q));
+                }
             }
             nuse += t_SourceSpace[k].nuse;
         }

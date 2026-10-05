@@ -190,10 +190,9 @@ void TestInvEloretaPython::makeInverse_matchesPython_data()
     // Out-of-range loose and depth are clamped to 1 (mne-python loose=1, depth=1, surface-oriented).
     QTest::newRow("loose and depth clamped") << "all" << true << 1.5f << 1.5f << false << 210
                                              << 72.50986836150066 << 10989858.85323278 << 7.537441585025587e-08 << -2.3680535720497407 << false << true;
-    // A fixed forward forces fixed = true; mne-python make_inverse_operator(fixed=True, depth=None) on
-    // convert_forward_solution(force_fixed=True, use_cps=False): read() fixes to vertex normals, not patch normals.
+    // A fixed forward forces fixed = true; mne-python make_inverse_operator(fixed=True, depth=None).
     QTest::newRow("fixed forward") << "all" << true << 0.0f << 0.0f << false << 70
-                                   << 63.31602636142691 << 12965080.564553712 << 7.687265727849766e-08 << 3.8288232560744753 << true << true;
+                                   << 63.40034546591413 << 12939542.625511399 << 7.626999899259236e-08 << -2.3680535720497407 << true << true;
     // depth=dict(exp=0.8, limit_depth_chs=False): the depth prior uses gradiometers, magnetometers and EEG.
     QTest::newRow("free, all depth channels") << "all" << false << 1.0f << 0.8f << false << 210
                                               << 68.40798828918075 << 7903442.255312738 << 4.806491030935612e-08 << 70.0 << false << false;
@@ -365,10 +364,10 @@ void TestInvEloretaPython::kernel_matchesPython_data()
 
     // MNE rows check the shared preparation; their sing/reginv are not compared (zero marks "skip").
     QTest::newRow("MNE loose") << "MNE" << false << false << 210 << 111383781.99468082 << 0.0 << 0.0;
-    QTest::newRow("MNE fixed") << "MNE" << true << false << 70 << 106988626.67247605 << 0.0 << 0.0;
+    QTest::newRow("MNE fixed") << "MNE" << true << false << 70 << 106006220.75199796 << 0.0 << 0.0;
     QTest::newRow("eLORETA loose independent") << "eLORETA" << false << false << 210 << 96341413.3468054 << 68.61269042471012 << 43.58717124957271;
     QTest::newRow("eLORETA loose force equal") << "eLORETA" << false << true << 210 << 95231145.14647257 << 68.64767456445117 << 43.293457695846556;
-    QTest::newRow("eLORETA fixed") << "eLORETA" << true << false << 70 << 96407507.6436803 << 64.79162873700938 << 35.47167322985986;
+    QTest::newRow("eLORETA fixed") << "eLORETA" << true << false << 70 << 96220687.40176067 << 65.19578191146573 << 35.54620323396668;
 }
 
 //=============================================================================================================
@@ -419,8 +418,8 @@ void TestInvEloretaPython::noiseNorm_matchesPython_data()
     // np.sum(1 / prepare_inverse_operator(inv, nave, 1/9, method)['noisenorm'])
     QTest::newRow("dSPM loose") << false << false << 6.850920184879696e-08;
     QTest::newRow("sLORETA loose") << false << true << 1.6188218074164552e-07;
-    QTest::newRow("dSPM fixed") << true << false << 1.081406763848875e-07;
-    QTest::newRow("sLORETA fixed") << true << true << 2.605112453713598e-07;
+    QTest::newRow("dSPM fixed") << true << false << 1.0650605045089541e-07;
+    QTest::newRow("sLORETA fixed") << true << true << 2.5912461249407486e-07;
 }
 
 //=============================================================================================================

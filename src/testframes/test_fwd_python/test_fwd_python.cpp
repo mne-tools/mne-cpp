@@ -414,13 +414,13 @@ void TestFwdPython::labelForward_fixed()
     }
 
     // Reading with force_fixed must place right-hemisphere sources after the left ones:
-    // mne.convert_forward_solution(ref, surf_ori=True, force_fixed=True, use_cps=False)
+    // mne.convert_forward_solution(ref, surf_ori=True, force_fixed=True), i.e. average patch normals
     {
         QFile refFile(data("Result/ref-sample_audvis-meg-eeg-oct-6-fwd.fif"));
         const MNEForwardSolution fixedRef(refFile, true);
         QCOMPARE(static_cast<int>(fixedRef.source_rr.rows()), 7928);
         const Vector3f rr(0.009998258482913594f, -0.05067880820682111f, 0.09408170987849368f);
-        const Vector3f nn(0.21600081631257262f, -0.26954704638533555f, 0.9384498779640356f);
+        const Vector3f nn(0.1567601637522126f, -0.29064558856484646f, 0.9439022157555165f);
         QVERIFY((fixedRef.source_rr.row(3956).transpose() - rr).norm() < 1e-6f);
         QVERIFY((fixedRef.source_nn.row(3956).transpose() - nn).norm() < 1e-6f);
         QVERIFY(std::fabs(fixedRef.source_rr.cwiseAbs().cast<double>().sum() - 1069.459561085619) < 1e-4);
