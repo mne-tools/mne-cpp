@@ -168,23 +168,35 @@ void TestInvEloretaPython::makeInverse_matchesPython_data()
     QTest::addColumn<double>("kernelNormSum");
     QTest::addColumn<double>("dspmNormSum");
     QTest::addColumn<double>("nnZSum");
+    QTest::addColumn<bool>("fixedFwd");
+    QTest::addColumn<bool>("limitDepthChs");
 
     // The last column is the z sum of the source normals, inv['source_nn'][2::3, 2]
     // for free orientations (the tangential vectors are not unique) and all rows
     // for fixed ones; surface-oriented operators use the patch normals.
     QTest::newRow("loose 0.2") << "all" << true << 0.2f << 0.8f << false << 210
-                               << 70.71887643595808 << 12172144.218271181 << 8.033782202042283e-08 << -2.3680535720497407;
+                               << 70.71887643595808 << 12172144.218271181 << 8.033782202042283e-08 << -2.3680535720497407 << false << true;
     QTest::newRow("free") << "all" << false << 1.0f << 0.8f << false << 210
-                          << 71.9772089624631 << 10247045.448053062 << 6.85092011400161e-08 << 70.0;
+                          << 71.9772089624631 << 10247045.448053062 << 6.85092011400161e-08 << 70.0 << false << true;
     QTest::newRow("free, no depth") << "all" << false << 1.0f << 0.0f << false << 210
-                                    << 68.06095753009956 << 7684027.38083116 << 4.63638351561198e-08 << 70.0;
+                                    << 68.06095753009956 << 7684027.38083116 << 4.63638351561198e-08 << 70.0 << false << true;
     QTest::newRow("fixed from free") << "all" << true << 0.0f << 0.8f << true << 70
-                                     << 67.61900529555693 << 17118113.357613612 << 1.1110428823216728e-07 << -2.3680535720497407;
+                                     << 67.61900529555693 << 17118113.357613612 << 1.1110428823216728e-07 << -2.3680535720497407 << false << true;
     // Without gradiometers the depth prior uses the magnetometers only, without MEG the EEG.
     QTest::newRow("free, mag + EEG") << "mag+eeg" << false << 1.0f << 0.8f << false << 210
-                                     << 45.03222412248094 << 8128373.9402625915 << 4.502307626683172e-08 << 70.0;
+                                     << 45.03222412248094 << 8128373.9402625915 << 4.502307626683172e-08 << 70.0 << false << true;
     QTest::newRow("free, EEG") << "eeg" << false << 1.0f << 0.8f << false << 210
-                               << 19.947459515348005 << 0.31427885424231744 << 2.9093402426567023e-08 << 70.0;
+                               << 19.947459515348005 << 0.31427885424231744 << 2.9093402426567023e-08 << 70.0 << false << true;
+    // Out-of-range loose and depth are clamped to 1 (mne-python loose=1, depth=1, surface-oriented).
+    QTest::newRow("loose and depth clamped") << "all" << true << 1.5f << 1.5f << false << 210
+                                             << 72.50986836150066 << 10989858.85323278 << 7.537441585025587e-08 << -2.3680535720497407 << false << true;
+    // A fixed forward forces fixed = true; mne-python make_inverse_operator(fixed=True, depth=None) on
+    // convert_forward_solution(force_fixed=True, use_cps=False): read() fixes to vertex normals, not patch normals.
+    QTest::newRow("fixed forward") << "all" << true << 0.0f << 0.0f << false << 70
+                                   << 63.31602636142691 << 12965080.564553712 << 7.687265727849766e-08 << 3.8288232560744753 << true << true;
+    // depth=dict(exp=0.8, limit_depth_chs=False): the depth prior uses gradiometers, magnetometers and EEG.
+    QTest::newRow("free, all depth channels") << "all" << false << 1.0f << 0.8f << false << 210
+                                              << 68.40798828918075 << 7903442.255312738 << 4.806491030935612e-08 << 70.0 << false << false;
 }
 
 //=============================================================================================================
@@ -201,15 +213,17 @@ void TestInvEloretaPython::makeInverse_matchesPython()
     QFETCH(double, kernelNormSum);
     QFETCH(double, dspmNormSum);
     QFETCH(double, nnZSum);
+    QFETCH(bool, fixedFwd);
+    QFETCH(bool, limitDepthChs);
 
     QFile fwdFile(data("Result/ref-sample_audvis-meg-eeg-oct-6-fwd.fif"));
-    const MNEForwardSolution fwd = MNEForwardSolution(fwdFile, false, surfOri).pick_regions({m_v1});
+    const MNEForwardSolution fwd = MNEForwardSolution(fwdFile, fixedFwd, surfOri).pick_regions({m_v1});
     FiffInfo info = m_info;
     if (channels == "mag+eeg")
         info = m_info.pick_info(m_info.pick_types(QString("mag"), true));
     else if (channels == "eeg")
         info = m_info.pick_info(m_info.pick_types(false, true));
-    const MNEInverseOperator inv = MNEInverseOperator::make_inverse_operator(info, fwd, m_cov, loose, depth, fixed, true);
+    const MNEInverseOperator inv = MNEInverseOperator::make_inverse_operator(info, fwd, m_cov, loose, depth, fixed, limitDepthChs);
     QCOMPARE(inv.nsource, 70);
     QCOMPARE(static_cast<int>(inv.source_nn.rows()), rows);
     double nnZ = 0.0;
