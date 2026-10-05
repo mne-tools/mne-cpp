@@ -1947,14 +1947,21 @@
       "mne_python": "mne.read_surface",
       "sklearn": null,
       "test": "test_fs",
-      "example": "ex_fs_surface",
+      "example": "ex_fs",
+      "example_snippet": [
+        "ex_fs/main.cpp#fs_surface_read"
+      ],
+      "example_mode": "run",
       "status": "done",
       "skigen_candidate": false,
       "documented": true,
       "sidebar_position": 1,
       "guide": null,
       "python_equiv": "mne.read_surface",
-      "python_url": null
+      "python_url": null,
+      "required_data": [
+        "mne-cpp-test-data"
+      ]
     },
     {
       "name": "FsAnnotation",

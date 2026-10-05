@@ -23,6 +23,13 @@ In-memory FreeSurfer triangular cortical surface for one hemisphere.
 
 Owns the vertex coordinate matrix (n_vertices × 3, Tk-surface RAS mm), the triangle index matrix (n_faces × 3, zero-based into the vertex array) and the hemisphere id (0 = `lh`, 1 = `rh`). Construction is purely an I/O operation: each constructor either takes a direct path to a `lh.pial` / `rh.white` / `lh.inflated` style binary surface file, or the `subject_id` / `hemi` / `surf` shorthand resolved against `$SUBJECTS_DIR`. The instance is intended to be paired with an [`FsAnnotation`](/docs/api/fs/fs-annotation) or [`FsLabel`](/docs/api/fs/fs-label) sharing the same vertex indexing.
 
+```cpp title="src/examples/ex_fs/main.cpp"
+FsSurface white("sample", 0, "white", subjectsDir); // lh = 0, rh = 1; curvature is loaded alongside
+const MatrixX3f& rr = white.rr();                   // vertices (metres)
+const MatrixX3i& tris = white.tris();
+const VectorXf& curv = white.curv();
+```
+
 ---
 
 ## Public Methods
@@ -392,8 +399,9 @@ Reads multiple 3-byte integers out of a std::iostream (FreeSurfer format).
 
 ## Example
 
-- Full source: [`src/examples/ex_fs_surface/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_fs_surface/main.cpp)
-- Build target: `ex_fs_surface` (compiled in CI)
+- Full source: [`src/examples/ex_fs/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_fs/main.cpp)
+- Build target: `ex_fs` (runs under CTest)
+- Data: [mne-cpp-test-data](https://github.com/mne-tools/mne-cpp-test-data)
 
 ## Authors of this file
 

@@ -87,6 +87,8 @@ namespace FSLIB
  * @c subject_id / @c hemi / @c surf shorthand resolved against
  * @c $SUBJECTS_DIR. The instance is intended to be paired with an
  * @ref FsAnnotation or @ref FsLabel sharing the same vertex indexing.
+ *
+ * @snippet ex_fs/main.cpp fs_surface_read
  */
 class FSSHARED_EXPORT FsSurface
 {
