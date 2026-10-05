@@ -100,25 +100,6 @@ private:
 
     //=========================================================================================================
     /**
-     * Check if dimensions of input data match the model.
-     *
-     * @param[in] iCols     The number of Clumns to compare.
-     * @return true if changed
-     *
-     */
-    bool checkDataDimensions(const int iCols);
-
-    //=========================================================================================================
-    /**
-     * Check if the InvHpiModelParameters changed.
-     *
-     * @param[in] hpiModelParameters     The model parameters.
-     * @return true if changed
-     */
-    bool checkModelParameters(const InvHpiModelParameters& hpiModelParameters);
-
-    //=========================================================================================================
-    /**
      * Check if the InvHpiModelParameters are empty. HPI and sampling frequencies need to be set.
      *
      * @param[in] hpiModelParameters     The model parameters.

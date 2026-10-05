@@ -135,16 +135,6 @@ public:
 
     //=========================================================================================================
     /**
-     * Qt 3d geometry information. Data are generated within first call.
-     *
-     * @param[in] p_fScaling  Scale factor of the returned geometry tri model.
-     *
-     * @return the geometry model.
-     */
-    Eigen::MatrixXf& getTriCoords(float p_fScaling = 1.0f);
-
-    //=========================================================================================================
-    /**
      * is hemisphere clustered?
      *
      * @return true if hemisphere is clustered, false otherwise.
@@ -225,9 +215,6 @@ public:
     Eigen::VectorXd use_tri_area;  /**< Triangle areas of used triangles. */
 
     MNEClusterInfo cluster_info; /**< Holds the cluster information. */
-private:
-    // Newly added
-    Eigen::MatrixXf m_TriCoords; /**< Holds the rr tri Matrix transformed to geometry data. */
 };
 
 //=============================================================================================================
@@ -284,7 +271,7 @@ inline bool operator==(const MNEHemisphere& a, const MNEHemisphere& b)
                 }
                 return true;
             }() &&
-            a.cluster_info == b.cluster_info && a.m_TriCoords.isApprox(b.m_TriCoords, 0.0001f));
+            a.cluster_info == b.cluster_info);
 }
 } // NAMESPACE
 

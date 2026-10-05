@@ -72,34 +72,6 @@ MatrixXd InvSignalModel::fitData(const InvHpiModelParameters& hpiModelParameters
 
 //=============================================================================================================
 
-bool InvSignalModel::checkDataDimensions(const int iCols)
-{
-    bool bHasChanged = false;
-    if (iCols != m_iCurrentModelCols) {
-        m_iCurrentModelCols = iCols;
-        bHasChanged = true;
-    }
-    return bHasChanged;
-}
-
-//=============================================================================================================
-
-bool InvSignalModel::checkModelParameters(const InvHpiModelParameters& hpiModelParameters)
-{
-    bool bHasChanged = false;
-    if ((m_modelParameters.iSampleFreq() != hpiModelParameters.iSampleFreq()) ||
-        (m_modelParameters.iLineFreq() != hpiModelParameters.iLineFreq()) ||
-        (m_modelParameters.iNHpiCoils() != hpiModelParameters.iNHpiCoils()) ||
-        (m_modelParameters.vecHpiFreqs() != hpiModelParameters.vecHpiFreqs()) ||
-        (m_modelParameters.bBasic() != hpiModelParameters.bBasic())) {
-        bHasChanged = true;
-        m_modelParameters = hpiModelParameters;
-    }
-    return bHasChanged;
-}
-
-//=============================================================================================================
-
 bool InvSignalModel::checkEmpty(const InvHpiModelParameters& hpiModelParameters)
 {
     if (hpiModelParameters.vecHpiFreqs().empty()) {

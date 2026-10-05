@@ -50,8 +50,6 @@ MNEHemisphere::MNEHemisphere()
 , use_tri_cent(MatrixX3d::Zero(0, 3))
 , use_tri_nn(MatrixX3d::Zero(0, 3))
 , use_tri_area(VectorXd::Zero(0))
-//, m_TriCoords()
-//, m_pGeometryData(NULL)
 {
     // Override some base class defaults to match MNEHemisphere semantics
     this->type = 1;
@@ -77,7 +75,6 @@ MNEHemisphere::MNEHemisphere(const MNEHemisphere& p_MNEHemisphere)
 , use_tri_nn(p_MNEHemisphere.use_tri_nn)
 , use_tri_area(p_MNEHemisphere.use_tri_area)
 , cluster_info(p_MNEHemisphere.cluster_info)
-, m_TriCoords(p_MNEHemisphere.m_TriCoords)
 {
     // Copy base class (MNESurfaceOrVolume) fields that MNEHemisphere uses
     this->type = p_MNEHemisphere.type;
@@ -139,7 +136,6 @@ MNEHemisphere& MNEHemisphere::operator=(const MNEHemisphere& other)
         this->use_tri_nn = other.use_tri_nn;
         this->use_tri_area = other.use_tri_area;
         this->cluster_info = other.cluster_info;
-        this->m_TriCoords = other.m_TriCoords;
     }
     return *this;
 }
@@ -404,26 +400,6 @@ void MNEHemisphere::clear()
     use_tri_area = VectorXd::Zero(0);
 
     cluster_info.clear();
-
-    m_TriCoords = MatrixXf();
-}
-
-//=============================================================================================================
-
-MatrixXf& MNEHemisphere::getTriCoords(float p_fScaling)
-{
-    if (m_TriCoords.size() == 0) {
-        m_TriCoords = MatrixXf(3, 3 * itris.rows());
-        for (int i = 0; i < itris.rows(); ++i) {
-            m_TriCoords.col(i * 3) = rr.row(itris(i, 0)).transpose().cast<float>();
-            m_TriCoords.col(i * 3 + 1) = rr.row(itris(i, 1)).transpose().cast<float>();
-            m_TriCoords.col(i * 3 + 2) = rr.row(itris(i, 2)).transpose().cast<float>();
-        }
-    }
-
-    m_TriCoords *= p_fScaling;
-
-    return m_TriCoords;
 }
 
 //=============================================================================================================
@@ -543,19 +519,3 @@ void MNEHemisphere::writeToStream(FiffStream* p_pStream)
         p_pStream->write_float(FIFF_MNE_SOURCE_SPACE_DIST_LIMIT, &this->dist_limit); //p_pStream->write_float_matrix(FIFF_MNE_SOURCE_SPACE_DIST_LIMIT, this->dist_limit);
     }
 }
-
-////=============================================================================================================
-
-//QGeometryData* MNEHemisphere::getGeometryData(float p_fScaling)
-//{
-//    if(m_pGeometryData == NULL)
-//    {
-//        m_pGeometryData = new QGeometryData();
-
-//        MatrixXd* triCoords = getTriCoords(p_fScaling);
-
-//        m_pGeometryData->appendVertexArray(QArray<QVector3D>::fromRawData( reinterpret_cast<const QVector3D*>(triCoords->data()), triCoords->cols() ));
-//    }
-
-//    return m_pGeometryData;
-//}
