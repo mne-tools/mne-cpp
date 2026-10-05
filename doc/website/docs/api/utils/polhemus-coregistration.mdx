@@ -26,6 +26,30 @@ An [`AcquiredPoints`](/docs/api/utils/acquired-points) store filled by explicit 
 
 The computed head–device transform after `computeRegistration`.
 
+```cpp title="src/examples/ex_utils/main.cpp"
+PolhemusConnection connection;
+connection.open(QString()); // empty port name = mock backend sweeping a 10 cm sphere; e.g. "/dev/tty.usbserial" for a Fastrak
+PolhemusCoregistration coreg;
+coreg.setConnection(&connection); // station 1 = pen, station 2 = head tracker
+
+// Model fiducials are the pen fiducials turned 90 deg about z and moved 5 cm in x; the registration must find that transform
+QMatrix4x4 truth;
+truth.translate(0.05f, 0.0f, 0.0f);
+truth.rotate(90.0f, 0.0f, 0.0f, 1.0f);
+const QList<FiducialId> fiducials = {FiducialId::NAS, FiducialId::LPA, FiducialId::RPA};
+QList<QVector3D> penAt;
+for (const FiducialId id : fiducials) {
+    QEventLoop wait; // let the next mock pen sample arrive, as the user would move the pen
+    QTimer::singleShot(350, &wait, &QEventLoop::quit);
+    wait.exec();
+    coreg.captureCurrentPenPositionAsFiducial(id);
+    penAt.append(coreg.penPosition());
+    coreg.setModelFiducial(id, truth.map(coreg.penPosition()));
+}
+const bool registered = coreg.computeRegistration();
+connection.close();
+```
+
 ### Inheritance
 
 ```mermaid
@@ -500,6 +524,11 @@ Call this when the user clears all fiducials.
 ### haveLiveProbePosition()
 
 ---
+
+## Example
+
+- Full source: [`src/examples/ex_utils/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_utils/main.cpp)
+- Build target: `ex_utils` (runs under CTest)
 
 ## Authors of this file
 

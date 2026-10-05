@@ -16,9 +16,8 @@
     "Settings": "Plain parameter record consumed by an algorithm class; shown inside that class's example."
   },
   "example_debt": {
-    "ceiling": 140,
+    "ceiling": 135,
     "names": [
-      "AcquiredPoints",
       "ComputeFwd",
       "Fiff",
       "FiffAnnotationEventUtils",
@@ -153,10 +152,6 @@
       "MNETriangle",
       "MNEVolGeom",
       "MneICP",
-      "PolhemusConnection",
-      "PolhemusCoregistration",
-      "PythonRunner",
-      "PythonTestHelper",
       "SourceMorph"
     ]
   }

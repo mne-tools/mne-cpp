@@ -26,7 +26,12 @@
 #include <utils/layoutloader.h>
 #include <utils/layoutmaker.h>
 #include <utils/montage/standard_montage.h>
+#include <utils/polhemus/acquired_points.h>
 #include <utils/polhemus/fastrak_parser.h>
+#include <utils/polhemus/polhemus_connection.h>
+#include <utils/polhemus/polhemus_coregistration.h>
+#include <utils/python_runner.h>
+#include <utils/python_test_helper.h>
 #include <utils/report.h>
 #include <utils/selectionio.h>
 
@@ -36,8 +41,10 @@
 
 #include <QCoreApplication>
 #include <QDebug>
+#include <QEventLoop>
 #include <QFile>
 #include <QTemporaryDir>
+#include <QTimer>
 
 //=============================================================================================================
 // STL INCLUDES
@@ -253,6 +260,58 @@ int main(int argc, char* argv[])
     //! [report_usage]
     ok &= expect(report.sectionCount() == 2 && html.contains("<table") && html.contains("Fp1") && QFile::exists(dir.filePath("report.html")),
                  "Report renders text and table sections to HTML");
+
+    //! [polhemus_coregistration_usage]
+    PolhemusConnection connection;
+    connection.open(QString()); // empty port name = mock backend sweeping a 10 cm sphere; e.g. "/dev/tty.usbserial" for a Fastrak
+    PolhemusCoregistration coreg;
+    coreg.setConnection(&connection); // station 1 = pen, station 2 = head tracker
+
+    // Model fiducials are the pen fiducials turned 90 deg about z and moved 5 cm in x; the registration must find that transform
+    QMatrix4x4 truth;
+    truth.translate(0.05f, 0.0f, 0.0f);
+    truth.rotate(90.0f, 0.0f, 0.0f, 1.0f);
+    const QList<FiducialId> fiducials = {FiducialId::NAS, FiducialId::LPA, FiducialId::RPA};
+    QList<QVector3D> penAt;
+    for (const FiducialId id : fiducials) {
+        QEventLoop wait; // let the next mock pen sample arrive, as the user would move the pen
+        QTimer::singleShot(350, &wait, &QEventLoop::quit);
+        wait.exec();
+        coreg.captureCurrentPenPositionAsFiducial(id);
+        penAt.append(coreg.penPosition());
+        coreg.setModelFiducial(id, truth.map(coreg.penPosition()));
+    }
+    const bool registered = coreg.computeRegistration();
+    connection.close();
+    //! [polhemus_coregistration_usage]
+    const QVector3D mapped = coreg.worldToModel().map(penAt[1]);
+    ok &= expect(registered && coreg.acquiredPoints()->hasAllFiducials() && coreg.acquiredPoints()->countOf(PointKind::Fiducial) == 3 && (mapped - truth.map(penAt[1])).length() < 1e-5f,
+                 "PolhemusCoregistration maps the captured LPA onto its model position from the mock digitiser");
+
+    //! [acquired_points_usage]
+    AcquiredPoints points;
+    points.append({PointKind::HeadShape, "HSP-1", 1, QVector3D(0.0f, 0.08f, 0.05f)});
+    points.append({PointKind::Eeg, "Cz", 1, QVector3D(0.0f, 0.0f, 0.09f)});
+    points.undoLast(PointKind::HeadShape);
+    //! [acquired_points_usage]
+    ok &= expect(points.points().size() == 1 && points.countOf(PointKind::Eeg) == 1 && !points.hasAllFiducials(), "AcquiredPoints keeps Cz after undoing the head-shape point");
+
+    //! [python_runner_usage]
+    PythonRunner python; // "python3" from PATH; a venv is configured via PythonRunnerConfig
+    QStringList progress;
+    python.setProgressCallback([&](float pct, const QString& msg) { progress << QString("%1 %2").arg(pct).arg(msg); });
+    const PythonRunnerResult run = python.runCode("import sys\nprint('[progress] 50% half')\nprint(sum(map(int, sys.argv[1:])))", {"2", "3"});
+    //! [python_runner_usage]
+    //! [python_test_helper_usage]
+    PythonTestHelper helper;                                                    // oracle access for tests
+    const MatrixXd fromNumpy = helper.evalMatrix("print('1 2'); print('3 4')"); // one line per row
+    //! [python_test_helper_usage]
+    if (python.isPythonAvailable()) {
+        ok &= expect(run.success && run.stdOut.trimmed().endsWith("5") && progress == QStringList({"50 half"}) && fromNumpy == (Matrix2d() << 1, 2, 3, 4).finished(),
+                     "PythonRunner passes arguments and parses [progress] lines; PythonTestHelper reads a matrix");
+    } else {
+        qInfo().noquote() << "  skip  PythonRunner (python3 not found)";
+    }
 
     qInfo() << (ok ? "All utils checks passed." : "utils checks FAILED.");
     return ok ? EXIT_SUCCESS : EXIT_FAILURE;

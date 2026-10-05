@@ -57,37 +57,6 @@ namespace UTILSLIB
 
 //=============================================================================================================
 /**
- * Test-frame convenience class for cross-validating MNE-CPP outputs against
- * MNE-Python reference implementations.
- *
- * Usage inside a QTest test:
- * @code
- *   PythonTestHelper py;
- *   if (!py.isAvailable()) {
- *       QSKIP("Python/MNE-Python not available");
- *   }
- *
- *   // Run a Python snippet that computes a reference value
- *   auto result = py.eval("import mne; print(mne.io.read_info('test.fif')['nchan'])");
- *   QVERIFY(result.success);
- *   QCOMPARE(result.stdOut.trimmed().toInt(), expectedNchan);
- *
- *   // Or run a script and parse a numeric output
- *   double pyValue = py.evalDouble("import numpy as np; print(np.linalg.norm(np.ones(10)))");
- *   QVERIFY(qAbs(cppValue - pyValue) < 1e-6);
- * @endcode
- *
- * When MNE-Python is not installed, tests should QSKIP gracefully — but
- * never silently.  Use the GUARD_PYTHON / GUARD_PYTHON_PACKAGE macros to
- * ensure skips are intentional and visible.  When the environment variable
- * MNE_REQUIRE_PYTHON=true is set (e.g. in CI), those macros QFAIL instead
- * of QSKIP, so a missing Python installation is treated as a hard error.
- *
- * @brief Test helper for MNE-Python cross-validation.
- */
-
-//=============================================================================================================
-/**
  * @brief Skip (or fail) the current test if Python is not available.
  *
  * Use this macro at the top of any test slot that requires Python.
@@ -116,6 +85,37 @@ namespace UTILSLIB
     GUARD_PYTHON((helper).hasPackage(packageName), \
                  QString("Python package '%1' not available").arg(packageName))
 
+/**
+ * Test-frame convenience class for cross-validating MNE-CPP outputs against
+ * MNE-Python reference implementations.
+ *
+ * Usage inside a QTest test:
+ * @code
+ *   PythonTestHelper py;
+ *   if (!py.isAvailable()) {
+ *       QSKIP("Python/MNE-Python not available");
+ *   }
+ *
+ *   // Run a Python snippet that computes a reference value
+ *   auto result = py.eval("import mne; print(mne.io.read_info('test.fif')['nchan'])");
+ *   QVERIFY(result.success);
+ *   QCOMPARE(result.stdOut.trimmed().toInt(), expectedNchan);
+ *
+ *   // Or run a script and parse a numeric output
+ *   double pyValue = py.evalDouble("import numpy as np; print(np.linalg.norm(np.ones(10)))");
+ *   QVERIFY(qAbs(cppValue - pyValue) < 1e-6);
+ * @endcode
+ *
+ * When MNE-Python is not installed, tests should QSKIP gracefully — but
+ * never silently.  Use the GUARD_PYTHON / GUARD_PYTHON_PACKAGE macros to
+ * ensure skips are intentional and visible.  When the environment variable
+ * MNE_REQUIRE_PYTHON=true is set (e.g. in CI), those macros QFAIL instead
+ * of QSKIP, so a missing Python installation is treated as a hard error.
+ *
+ * @brief Test helper for MNE-Python cross-validation.
+ *
+ * @snippet ex_utils/main.cpp python_test_helper_usage
+ */
 class UTILSSHARED_EXPORT PythonTestHelper
 {
 public:

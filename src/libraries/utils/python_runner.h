@@ -120,6 +120,8 @@ using PythonProgressCallback = std::function<void(float pct, const QString& msg)
  * No Python embedding or linkage is required.
  *
  * @brief Python script launcher with logging and progress support.
+ *
+ * @snippet ex_utils/main.cpp python_runner_usage
  */
 class UTILSSHARED_EXPORT PythonRunner : public QObject
 {

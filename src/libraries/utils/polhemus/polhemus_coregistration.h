@@ -78,6 +78,8 @@ namespace UTILSLIB
  *   - An @ref AcquiredPoints store filled by explicit capture calls or
  *     automatically on pen-button press.
  *   - The computed head–device transform after @ref computeRegistration.
+ *
+ * @snippet ex_utils/main.cpp polhemus_coregistration_usage
  */
 class UTILSSHARED_EXPORT PolhemusCoregistration : public QObject
 {

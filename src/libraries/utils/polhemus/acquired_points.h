@@ -87,6 +87,8 @@ struct UTILSSHARED_EXPORT DigitizedPoint
  *
  * The wizard hands one of these to the 3-D view (for visualisation) and
  * later to the export step (for FIFF write). Single-threaded, no locking.
+ *
+ * @snippet ex_utils/main.cpp acquired_points_usage
  */
 class UTILSSHARED_EXPORT AcquiredPoints : public QObject
 {

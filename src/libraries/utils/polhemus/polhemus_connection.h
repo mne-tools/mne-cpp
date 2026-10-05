@@ -80,6 +80,8 @@ struct UTILSSHARED_EXPORT PolhemusSerialConfig
 //=============================================================================================================
 /**
  * @brief Polhemus digitizer connection (mock + serial-port backends).
+ *
+ * @snippet ex_utils/main.cpp polhemus_coregistration_usage
  */
 class UTILSSHARED_EXPORT PolhemusConnection : public QObject
 {
