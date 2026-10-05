@@ -75,14 +75,7 @@
     },
     "G6_parity": {
       "reference": "1.11.0",
-      "unpinned_ci_packages": [
-        "fastcov",
-        "mne",
-        "numpy",
-        "pip",
-        "scikit-learn",
-        "scipy"
-      ],
+      "unpinned_ci_packages": [],
       "inventoried_apis": 443,
       "by_status": {
         "implemented": 251,

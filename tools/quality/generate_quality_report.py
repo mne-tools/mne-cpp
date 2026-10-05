@@ -207,7 +207,7 @@ def render_dashboard(report: dict[str, Any]) -> str:
         ("G5", "Debt metrics ratcheted", ", ".join(f"{k} {v:,}" for k, v in g5.items() if k != "compiler_warnings"),
          "baseline recorded"),
         ("G6", "Pinned reference environment", f"MNE-Python {g6['reference']}; unpinned in CI: "
-         + ", ".join(g6["unpinned_ci_packages"]), status(not g6["unpinned_ci_packages"])),
+         + (", ".join(g6["unpinned_ci_packages"]) or "none"), status(not g6["unpinned_ci_packages"])),
         ("G6", "Parity claims cross-validated", ", ".join(f"{k} {v}" for k, v in g6["claims_by_evidence"].items()),
          status(g6["claims_by_evidence"]["unverified"] == 0 and g6["claims_by_evidence"]["tested"] == 0)),
     ]

@@ -9,21 +9,14 @@
     ],
     "ci_pip_packages": [
       "clang-tidy==22.1.8",
-      "fastcov",
-      "mne",
-      "numpy",
-      "pip",
-      "scikit-learn",
-      "scipy"
+      "fastcov==1.17",
+      "mne==1.11.0",
+      "numpy==2.2.6",
+      "pip==26.2.1",
+      "scikit-learn==1.7.2",
+      "scipy==1.15.3"
     ],
-    "ci_unpinned_packages": [
-      "fastcov",
-      "mne",
-      "numpy",
-      "pip",
-      "scikit-learn",
-      "scipy"
-    ],
+    "ci_unpinned_packages": [],
     "lock_file": null
   },
   "summary": {

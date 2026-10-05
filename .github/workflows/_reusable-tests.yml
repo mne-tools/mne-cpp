@@ -148,8 +148,8 @@ jobs:
 
     - name: Install MNE-Python
       run: |
-        pip install --upgrade pip
-        pip install mne numpy scipy scikit-learn
+        pip install --upgrade pip==26.2.1
+        pip install mne==1.11.0 numpy==2.2.6 scipy==1.15.3 scikit-learn==1.7.2
 
     - name: Cache MNE sample data
       id: cache-mne-data
@@ -314,7 +314,7 @@ jobs:
     # ── Coverage: generate filtered report (fastcov) ─────────────────────
     - name: Install fastcov
       if: matrix.os == 'ubuntu-24.04' && inputs.with_code_coverage
-      run: pip install fastcov
+      run: pip install fastcov==1.17
 
     # --process-gcno keeps compiled-but-never-run files in the report at 0%.
     # summarize_coverage.py then makes paths repository-relative, applies the
