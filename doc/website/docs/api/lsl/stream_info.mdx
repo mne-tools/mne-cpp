@@ -17,6 +17,11 @@ class LSLLIB::stream_info
 
 Value-type descriptor of a single LSL stream: semantic metadata plus transport endpoint, API-compatible with liblsl's [`stream_info`](/docs/api/lsl/stream_info).
 
+```cpp title="src/examples/ex_lsl/main.cpp"
+stream_info info("ex_lsl_eeg", "EEG", 3, 250.0, ChannelFormat::Float32, "ex_lsl"); // name, type, channels, Hz
+stream_outlet outlet(info);                                                        // starts serving immediately
+```
+
 ---
 
 ## Public Methods
@@ -80,6 +85,11 @@ Copy assignment operator.
 - *[stream_info](/docs/api/lsl/stream_info) &* — Reference to this object.
 
 ---
+
+## Example
+
+- Full source: [`src/examples/ex_lsl/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_lsl/main.cpp)
+- Build target: `ex_lsl` (runs under CTest)
 
 ## Authors of this file
 

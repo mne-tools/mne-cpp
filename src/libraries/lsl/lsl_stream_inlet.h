@@ -67,6 +67,10 @@ class StreamInletPrivate;
 //=============================================================================================================
 /**
  * @brief Client-side LSL endpoint: connects to a resolved outlet over TCP and exposes pulled samples as float chunks.
+ *
+ * @snippet ex_lsl/main.cpp lsl_stream_inlet_usage
+ *
+ * @snippet ex_lsl/main.cpp lsl_resolve_stream_usage
  */
 class LSLSHARED_EXPORT stream_inlet
 {

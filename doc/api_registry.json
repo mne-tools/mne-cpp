@@ -4774,7 +4774,11 @@
       "mne_python": null,
       "sklearn": null,
       "test": null,
-      "example": null,
+      "example": "ex_lsl",
+      "example_snippet": [
+        "ex_lsl/main.cpp#lsl_stream_outlet_usage"
+      ],
+      "example_mode": "run",
       "status": "documented",
       "skigen_candidate": false,
       "documented": true,
@@ -4792,7 +4796,12 @@
       "mne_python": null,
       "sklearn": null,
       "test": null,
-      "example": null,
+      "example": "ex_lsl",
+      "example_snippet": [
+        "ex_lsl/main.cpp#lsl_stream_inlet_usage",
+        "ex_lsl/main.cpp#lsl_resolve_stream_usage"
+      ],
+      "example_mode": "run",
       "status": "documented",
       "skigen_candidate": false,
       "documented": true,
@@ -4810,7 +4819,11 @@
       "mne_python": null,
       "sklearn": null,
       "test": null,
-      "example": null,
+      "example": "ex_lsl",
+      "example_snippet": [
+        "ex_lsl/main.cpp#lsl_stream_outlet_usage"
+      ],
+      "example_mode": "run",
       "status": "documented",
       "skigen_candidate": false,
       "documented": true,

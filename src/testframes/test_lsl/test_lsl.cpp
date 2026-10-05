@@ -426,11 +426,8 @@ void TestLsl::testStreamOutletPortAssignment()
     stream_info info("PortTest", "EEG", 1, 100.0);
     stream_outlet outlet(info);
 
-    // Give the background thread a moment to start the TCP server
-    QThread::msleep(100);
-
+    // The constructor returns only once the OS-assigned port is known
     stream_info outInfo = outlet.info();
-    // Port should be assigned by OS (non-zero)
     QVERIFY(outInfo.data_port() > 0);
 }
 

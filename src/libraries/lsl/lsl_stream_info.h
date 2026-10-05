@@ -72,6 +72,8 @@ enum class ChannelFormat : int
 //=============================================================================================================
 /**
  * @brief Value-type descriptor of a single LSL stream: semantic metadata plus transport endpoint, API-compatible with liblsl's stream_info.
+ *
+ * @snippet ex_lsl/main.cpp lsl_stream_outlet_usage
  */
 class LSLSHARED_EXPORT stream_info
 {

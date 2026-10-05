@@ -64,6 +64,8 @@ class StreamOutletPrivate;
 //=============================================================================================================
 /**
  * @brief Server-side LSL endpoint: binds a TCP data server, advertises the stream on the LSL discovery multicast group, and fans samples out to every connected inlet.
+ *
+ * @snippet ex_lsl/main.cpp lsl_stream_outlet_usage
  */
 class LSLSHARED_EXPORT stream_outlet
 {

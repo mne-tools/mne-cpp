@@ -53,6 +53,7 @@
 #include <atomic>
 #include <cstring>
 #include <queue>
+#include <future>
 #include <chrono>
 
 //=============================================================================================================
@@ -106,7 +107,9 @@ public:
     void start()
     {
         m_bRunning = true;
+        std::future<void> listening = m_listening.get_future();
         m_bgThread = std::thread(&StreamOutletPrivate::run, this);
+        listening.wait(); // m_info (with its data port) is not modified after this point
     }
 
     //=========================================================================================================
@@ -177,11 +180,13 @@ private:
         QTcpServer tcpServer;
         if (!tcpServer.listen(QHostAddress::Any, 0)) {
             qDebug() << "[lsl::stream_outlet] Failed to start TCP server:" << tcpServer.errorString();
+            m_listening.set_value();
             return;
         }
 
         // Record the assigned port into stream_info
         m_info.set_data_port(tcpServer.serverPort());
+        m_listening.set_value();
 
         // --- Set up UDP socket for multicast discovery ---
         QUdpSocket udpSocket;
@@ -276,9 +281,10 @@ private:
         udpSocket.close();
     }
 
-    stream_info m_info;           /**< Stream description. */
-    std::atomic<bool> m_bRunning; /**< Background thread running flag. */
-    std::thread m_bgThread;       /**< Background thread. */
+    stream_info m_info;             /**< Stream description. */
+    std::atomic<bool> m_bRunning;   /**< Background thread running flag. */
+    std::thread m_bgThread;         /**< Background thread. */
+    std::promise<void> m_listening; /**< Fulfilled once the TCP port is recorded in m_info. */
 
     std::mutex m_queueMutex;                      /**< Protects the sample queue. */
     std::queue<std::vector<float>> m_sampleQueue; /**< Queue of samples for transmission. */

@@ -17,6 +17,11 @@ class LSLLIB::stream_outlet
 
 Server-side LSL endpoint: binds a TCP data server, advertises the stream on the LSL discovery multicast group, and fans samples out to every connected inlet.
 
+```cpp title="src/examples/ex_lsl/main.cpp"
+stream_info info("ex_lsl_eeg", "EEG", 3, 250.0, ChannelFormat::Float32, "ex_lsl"); // name, type, channels, Hz
+stream_outlet outlet(info);                                                        // starts serving immediately
+```
+
 ---
 
 ## Public Methods
@@ -83,6 +88,11 @@ Check whether any consumers are currently connected.
 - *bool* — True if at least one inlet is connected.
 
 ---
+
+## Example
+
+- Full source: [`src/examples/ex_lsl/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_lsl/main.cpp)
+- Build target: `ex_lsl` (runs under CTest)
 
 ## Authors of this file
 

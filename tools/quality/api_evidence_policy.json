@@ -16,7 +16,7 @@
     "Settings": "Plain parameter record consumed by an algorithm class; shown inside that class's example."
   },
   "example_debt": {
-    "ceiling": 187,
+    "ceiling": 184,
     "names": [
       "AcquiredPoints",
       "BadChannelsMaxwell",
@@ -201,10 +201,7 @@
       "Spline",
       "TFplot",
       "VideoOverlay",
-      "WelchPsd",
-      "stream_info",
-      "stream_inlet",
-      "stream_outlet"
+      "WelchPsd"
     ]
   }
 }

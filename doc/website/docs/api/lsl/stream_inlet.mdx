@@ -17,6 +17,34 @@ class LSLLIB::stream_inlet
 
 Client-side LSL endpoint: connects to a resolved outlet over TCP and exposes pulled samples as float chunks.
 
+```cpp title="src/examples/ex_lsl/main.cpp"
+stream_info source = outlet.info(); // normally an entry of resolve_stream("name", "ex_lsl_eeg")
+source.set_data_host("127.0.0.1");
+stream_inlet inlet(source);
+inlet.open_stream();
+QElapsedTimer clock;
+clock.start();
+while (!outlet.have_consumers() && clock.elapsed() < 5000) { // samples pushed before the outlet accepts the inlet are not delivered
+    QThread::msleep(5);
+}
+outlet.push_sample({1.0f, 2.0f, 3.0f});
+outlet.push_chunk({{4.0f, 5.0f, 6.0f}, {7.0f, 8.0f, 9.0f}});
+
+std::vector<std::vector<float>> received;
+clock.restart();
+while (received.size() < 3 && clock.elapsed() < 5000) {
+    QThread::msleep(20);
+    for (const std::vector<float>& sample : inlet.pull_chunk<float>()) { // one vector per sample
+        received.push_back(sample);
+    }
+}
+inlet.close_stream();
+```
+
+```cpp title="src/examples/ex_lsl/main.cpp"
+const std::vector<stream_info> found = resolve_stream("name", "ex_lsl_eeg", 1.5); // multicast discovery
+```
+
 ---
 
 ## Public Methods
@@ -85,6 +113,11 @@ Pull a chunk of float data (non-template version).
 - *std::vector&lt; std::vector&lt; float &gt; &gt;* — A vector of samples, where each sample is a vector of float channel values.
 
 ---
+
+## Example
+
+- Full source: [`src/examples/ex_lsl/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_lsl/main.cpp)
+- Build target: `ex_lsl` (runs under CTest)
 
 ## Authors of this file
 
