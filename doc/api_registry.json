@@ -1542,7 +1542,11 @@
       "mne_python": "mne.decoding.CSP",
       "sklearn": null,
       "test": "test_decoding_csp",
-      "example": null,
+      "example": "ex_decoding",
+      "example_snippet": [
+        "ex_decoding/main.cpp#decoding_csp_fit_transform"
+      ],
+      "example_mode": "run",
       "status": "done",
       "skigen_candidate": false,
       "notes": "Delegates to Skigen::CSP; adds MNE-specific transform modes (AveragePower/CspSpace), log/z-score standardisation, inverse_transform",
@@ -1561,7 +1565,11 @@
       "mne_python": "mne.decoding.SPoC",
       "sklearn": null,
       "test": "test_decoding_spoc",
-      "example": null,
+      "example": "ex_decoding",
+      "example_snippet": [
+        "ex_decoding/main.cpp#decoding_spoc_fit_transform"
+      ],
+      "example_mode": "run",
       "status": "done",
       "skigen_candidate": false,
       "notes": "Delegates to Skigen::SPoC; adds MNE-specific power feature extraction and transform modes",
@@ -1580,7 +1588,11 @@
       "mne_python": "mne.decoding.SSD",
       "sklearn": null,
       "test": "test_decoding_ssd",
-      "example": null,
+      "example": "ex_decoding",
+      "example_snippet": [
+        "ex_decoding/main.cpp#decoding_ssd_fit_transform"
+      ],
+      "example_mode": "run",
       "status": "done",
       "skigen_candidate": false,
       "notes": "Delegates to Skigen::SSD; adds apply() for denoised low-rank reconstruction",
@@ -1599,7 +1611,11 @@
       "mne_python": "mne_icalabel",
       "sklearn": null,
       "test": "test_ica_label",
-      "example": null,
+      "example": "ex_decoding",
+      "example_snippet": [
+        "ex_decoding/main.cpp#ml_ica_label_classify"
+      ],
+      "example_mode": "run",
       "status": "done",
       "skigen_candidate": false,
       "notes": "ICA label classification — neuroscience-specific, stays in decoding",

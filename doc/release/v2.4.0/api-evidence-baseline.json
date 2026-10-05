@@ -12,18 +12,18 @@
     "registered_stale": 0,
     "registered_with_test": 99,
     "registered_test_unresolved": 0,
-    "registered_with_example": 43,
+    "registered_with_example": 47,
     "registered_example_not_built": 0,
     "registered_with_python_equiv": 88,
     "registered_without_api_page": 0,
-    "with_snippet": 30,
+    "with_snippet": 35,
     "public_api_units": 478,
     "example_eligible": 383,
     "example_exempt": 95,
-    "eligible_backed_by_registry_example": 43,
-    "eligible_used_by_some_example": 90,
-    "examples_on_disk": 42,
-    "examples_built": 42
+    "eligible_backed_by_registry_example": 47,
+    "eligible_used_by_some_example": 95,
+    "examples_on_disk": 43,
+    "examples_built": 43
   },
   "by_library": {
     "bids": {
@@ -58,9 +58,9 @@
       "registered": 4,
       "with_test": 4,
       "eligible": 5,
-      "eligible_with_registry_example": 0,
-      "eligible_used_by_example": 0,
-      "with_snippet": 0
+      "eligible_with_registry_example": 4,
+      "eligible_used_by_example": 5,
+      "with_snippet": 5
     },
     "disp": {
       "public": 66,
@@ -1655,10 +1655,14 @@
       "registry_status": "done",
       "test": "test_decoding_csp",
       "test_resolves": true,
-      "example": null,
-      "example_state": "none",
-      "including_examples": [],
-      "snippets": [],
+      "example": "ex_decoding",
+      "example_state": "built",
+      "including_examples": [
+        "ex_decoding"
+      ],
+      "snippets": [
+        "ex_decoding/main.cpp#decoding_csp_fit_transform"
+      ],
       "api_page": "doc/website/docs/api/decoding/decoding-csp.mdx",
       "python_equiv": "mne.decoding.CSP",
       "example_eligible": true,
@@ -1676,8 +1680,12 @@
       "test_resolves": false,
       "example": null,
       "example_state": "none",
-      "including_examples": [],
-      "snippets": [],
+      "including_examples": [
+        "ex_decoding"
+      ],
+      "snippets": [
+        "ex_decoding/main.cpp#ml_ica_label_classify"
+      ],
       "api_page": null,
       "python_equiv": null,
       "example_eligible": true,
@@ -1693,10 +1701,14 @@
       "registry_status": "done",
       "test": "test_ica_label",
       "test_resolves": true,
-      "example": null,
-      "example_state": "none",
-      "including_examples": [],
-      "snippets": [],
+      "example": "ex_decoding",
+      "example_state": "built",
+      "including_examples": [
+        "ex_decoding"
+      ],
+      "snippets": [
+        "ex_decoding/main.cpp#ml_ica_label_classify"
+      ],
       "api_page": "doc/website/docs/api/decoding/ml-ica-label.mdx",
       "python_equiv": "mne_icalabel",
       "example_eligible": true,
@@ -1712,10 +1724,14 @@
       "registry_status": "done",
       "test": "test_decoding_spoc",
       "test_resolves": true,
-      "example": null,
-      "example_state": "none",
-      "including_examples": [],
-      "snippets": [],
+      "example": "ex_decoding",
+      "example_state": "built",
+      "including_examples": [
+        "ex_decoding"
+      ],
+      "snippets": [
+        "ex_decoding/main.cpp#decoding_spoc_fit_transform"
+      ],
       "api_page": "doc/website/docs/api/decoding/decoding-spoc.mdx",
       "python_equiv": "mne.decoding.SPoC",
       "example_eligible": true,
@@ -1731,10 +1747,14 @@
       "registry_status": "done",
       "test": "test_decoding_ssd",
       "test_resolves": true,
-      "example": null,
-      "example_state": "none",
-      "including_examples": [],
-      "snippets": [],
+      "example": "ex_decoding",
+      "example_state": "built",
+      "including_examples": [
+        "ex_decoding"
+      ],
+      "snippets": [
+        "ex_decoding/main.cpp#decoding_ssd_fit_transform"
+      ],
       "api_page": "doc/website/docs/api/decoding/decoding-ssd.mdx",
       "python_equiv": "mne.decoding.SSD",
       "example_eligible": true,

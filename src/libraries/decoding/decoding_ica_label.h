@@ -126,11 +126,7 @@ struct DECODINGSHARED_EXPORT IcaLabelResult
  * The class has no state, deleted constructor, and no virtual methods;
  * it is purely a namespaced collection of pure functions.
  *
- * @code
- *   QList<IcaLabelResult> labels = MlIcaLabel::classify(
- *       icaSources, eogData, ecgData, sFreq);
- *   QVector<int> artIdx = MlIcaLabel::findArtifactComponents(labels);
- * @endcode
+ * @snippet ex_decoding/main.cpp ml_ica_label_classify
  */
 class DECODINGSHARED_EXPORT MlIcaLabel
 {

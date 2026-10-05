@@ -26,6 +26,12 @@ After `fit` the class works as a deterministic feature extractor: `transform` re
 
 The implementation expects exactly two unique class labels in `y` and epochs already restricted to the discriminative frequency band (e.g. 8–30 Hz for sensorimotor rhythms); no regularisation is applied to the covariance estimate, so callers should ensure enough trials per class to avoid the ill-conditioned regime that motivates the regularised variants of Lotte & Guan 2011. `inverseTransform` provides the closed-form back-projection of a power-feature vector into sensor space, which is what the application layer uses to render CSP topographies side-by-side with the discriminative scores.
 
+```cpp title="src/examples/ex_decoding/main.cpp"
+DecodingCsp csp(2); // one filter per class
+csp.fit(cspEpochs, classes);
+const MatrixXd cspFeatures = csp.transform(cspEpochs); // epochs x components, log band power
+```
+
 ---
 
 ## Public Methods
@@ -154,6 +160,11 @@ Only valid when transformInto == AveragePower.
 - *bool* — True if the model has been fitted.
 
 ---
+
+## Example
+
+- Full source: [`src/examples/ex_decoding/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_decoding/main.cpp)
+- Build target: `ex_decoding` (runs under CTest)
 
 ## Authors of this file
 

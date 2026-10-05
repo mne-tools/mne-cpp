@@ -25,6 +25,12 @@ Computes the spatial filters that jointly maximise variance in the caller-specif
 
 `transform` returns the components themselves — a low-dimensional signal that already lives in the band of interest — while `apply` performs the low-rank back-projection $$X_\{\text\{clean\}\} = A_\{:,1:k\} W_\{1:k,:\} X$$ that yields a sensor-space, denoised reconstruction with the oscillation of interest preserved and the broadband background suppressed; this is the call most downstream pipelines (connectivity, inverse modelling) want when SSD is used purely as a preprocessor.
 
+```cpp title="src/examples/ex_decoding/main.cpp"
+DecodingSsd ssd(2);
+ssd.fit(continuous, kSFreq, 8.0, 12.0, 3.0, 20.0); // signal band, flanking noise band
+const MatrixXd rhythm = ssd.transform(continuous); // components x samples, strongest SNR first
+```
+
 ---
 
 ## Public Methods
@@ -162,6 +168,11 @@ Reconstructs M/EEG signals from which the dynamics described by the excluded com
 - *bool* — True if the model has been fitted.
 
 ---
+
+## Example
+
+- Full source: [`src/examples/ex_decoding/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_decoding/main.cpp)
+- Build target: `ex_decoding` (runs under CTest)
 
 ## Authors of this file
 

@@ -19,6 +19,7 @@ add_subdirectory(ex_averaging)
 add_subdirectory(ex_cancel_noise)
 add_subdirectory(ex_compute_forward)
 add_subdirectory(ex_connectivity_metrics)
+add_subdirectory(ex_decoding)
 add_subdirectory(ex_sts_statistics)
 add_subdirectory(ex_warp)
 

@@ -25,6 +25,12 @@ Estimates a bank of spatial filters whose log band-power envelope is maximally c
 
 After `fit` the decoder behaves as a deterministic feature extractor. `AveragePower` returns one (optionally log- or z-scored) band-power value per component and epoch, which plugs directly into a linear regressor; `CspSpace` returns the time- resolved filtered signal, useful when the downstream model consumes envelopes or instantaneous phase. Inputs must be epoched and already filtered in the relevant frequency band; the target vector $$z$$ is a real-valued vector of length `n_epochs`.
 
+```cpp title="src/examples/ex_decoding/main.cpp"
+DecodingSpoc spoc(1);
+spoc.fit(spocEpochs, target);
+const MatrixXd spocFeatures = spoc.transform(spocEpochs); // epochs x 1, log band power
+```
+
 ---
 
 ## Public Methods
@@ -132,6 +138,11 @@ Fit and transform in one step.
 - *bool* — True if the model has been fitted.
 
 ---
+
+## Example
+
+- Full source: [`src/examples/ex_decoding/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_decoding/main.cpp)
+- Build target: `ex_decoding` (runs under CTest)
 
 ## Authors of this file
 

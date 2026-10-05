@@ -85,6 +85,8 @@ namespace DECODINGLIB
  * want when SSD is used purely as a preprocessor.
  *
  * @see DECODINGLIB, @c mne.decoding.SSD
+ *
+ * @snippet ex_decoding/main.cpp decoding_ssd_fit_transform
  */
 class DECODINGSHARED_EXPORT DecodingSsd
 {

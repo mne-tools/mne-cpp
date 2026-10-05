@@ -92,6 +92,8 @@ namespace DECODINGLIB
  * CSP topographies side-by-side with the discriminative scores.
  *
  * @see DECODINGLIB, @c mne.decoding.CSP
+ *
+ * @snippet ex_decoding/main.cpp decoding_csp_fit_transform
  */
 class DECODINGSHARED_EXPORT DecodingCsp
 {

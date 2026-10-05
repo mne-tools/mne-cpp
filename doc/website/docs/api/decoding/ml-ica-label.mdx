@@ -25,10 +25,13 @@ Static utility that labels [ICA](/docs/api/dsp/ica) components against EOG/ECG r
 
 The two scoring primitives — `maxAbsCorrelation` and `muscleScore` — are exposed publicly so an interactive viewer can display the per-component evidence behind each decision and let the user override the label without having to recompute the [ICA](/docs/api/dsp/ica) itself. The class has no state, deleted constructor, and no virtual methods; it is purely a namespaced collection of pure functions.
 
-```cpp
-QList<IcaLabelResult> labels = MlIcaLabel::classify(
-    icaSources, eogData, ecgData, sFreq);
-QVector<int> artIdx = MlIcaLabel::findArtifactComponents(labels);
+```cpp title="src/examples/ex_decoding/main.cpp"
+const QList<IcaLabelResult> labels = MlIcaLabel::classify(icaSources, eog, ecg, kSFreq);
+const QVector<int> reject = MlIcaLabel::findArtifactComponents(labels); // indices to drop before back-projection
+for (const IcaLabelResult& label : labels) {
+    qInfo().noquote() << "component" << label.componentIndex << IcaLabelResult::labelToString(label.label)
+                      << "confidence" << label.confidence;
+}
 ```
 
 ---
@@ -117,6 +120,11 @@ Muscle artifacts typically have high power above 30 Hz.
 - *double* — Ratio of high-frequency to total power (0 = no muscle, 1 = all muscle).
 
 ---
+
+## Example
+
+- Full source: [`src/examples/ex_decoding/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_decoding/main.cpp)
+- Build target: `ex_decoding` (runs under CTest)
 
 ## Authors of this file
 

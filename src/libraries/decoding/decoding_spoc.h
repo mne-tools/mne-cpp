@@ -86,6 +86,8 @@ namespace DECODINGLIB
  * is a real-valued vector of length @c n_epochs.
  *
  * @see DECODINGLIB, @c mne.decoding.SPoC
+ *
+ * @snippet ex_decoding/main.cpp decoding_spoc_fit_transform
  */
 class DECODINGSHARED_EXPORT DecodingSpoc
 {

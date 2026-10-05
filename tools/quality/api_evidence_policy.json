@@ -16,7 +16,7 @@
     "Settings": "Plain parameter record consumed by an algorithm class; shown inside that class's example."
   },
   "example_debt": {
-    "ceiling": 262,
+    "ceiling": 258,
     "names": [
       "AbstractFormatReader",
       "AcquiredPoints",
@@ -38,9 +38,6 @@
       "ConnectivityAec",
       "CosineFilter",
       "Csd",
-      "DecodingCsp",
-      "DecodingSpoc",
-      "DecodingSsd",
       "Dpss",
       "EDFReader",
       "EegReference",
@@ -212,7 +209,6 @@
       "MNETriangle",
       "MNEVolGeom",
       "MaxwellMovementComp",
-      "MlIcaLabel",
       "MlModel",
       "MlOnnxModel",
       "MlTensor",
