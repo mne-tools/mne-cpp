@@ -4052,14 +4052,21 @@
       "mne_python": null,
       "sklearn": null,
       "test": null,
-      "example": null,
+      "example": "ex_dsp_rt",
+      "example_snippet": [
+        "ex_dsp_rt/main.cpp#rt_averaging_usage"
+      ],
+      "example_mode": "run",
       "status": "documented",
       "skigen_candidate": false,
       "documented": true,
       "sidebar_position": 30,
       "guide": null,
       "python_equiv": null,
-      "python_url": null
+      "python_url": null,
+      "required_data": [
+        "mne-cpp-test-data"
+      ]
     },
     {
       "name": "RtAveragingWorker",
@@ -4070,14 +4077,21 @@
       "mne_python": null,
       "sklearn": null,
       "test": null,
-      "example": null,
+      "example": "ex_dsp_rt",
+      "example_snippet": [
+        "ex_dsp_rt/main.cpp#rt_averaging_worker_usage"
+      ],
+      "example_mode": "run",
       "status": "documented",
       "skigen_candidate": false,
       "documented": true,
       "sidebar_position": 31,
       "guide": null,
       "python_equiv": null,
-      "python_url": null
+      "python_url": null,
+      "required_data": [
+        "mne-cpp-test-data"
+      ]
     },
     {
       "name": "RtConnectivity",
@@ -4088,14 +4102,21 @@
       "mne_python": null,
       "sklearn": null,
       "test": null,
-      "example": null,
+      "example": "ex_dsp_rt",
+      "example_snippet": [
+        "ex_dsp_rt/main.cpp#rt_connectivity_usage"
+      ],
+      "example_mode": "run",
       "status": "documented",
       "skigen_candidate": false,
       "documented": true,
       "sidebar_position": 32,
       "guide": null,
       "python_equiv": null,
-      "python_url": null
+      "python_url": null,
+      "required_data": [
+        "mne-cpp-test-data"
+      ]
     },
     {
       "name": "RtConnectivityWorker",
@@ -4106,14 +4127,21 @@
       "mne_python": null,
       "sklearn": null,
       "test": null,
-      "example": null,
+      "example": "ex_dsp_rt",
+      "example_snippet": [
+        "ex_dsp_rt/main.cpp#rt_connectivity_usage"
+      ],
+      "example_mode": "run",
       "status": "documented",
       "skigen_candidate": false,
       "documented": true,
       "sidebar_position": 33,
       "guide": null,
       "python_equiv": null,
-      "python_url": null
+      "python_url": null,
+      "required_data": [
+        "mne-cpp-test-data"
+      ]
     },
     {
       "name": "RtCov",
@@ -4124,14 +4152,21 @@
       "mne_python": null,
       "sklearn": null,
       "test": null,
-      "example": null,
+      "example": "ex_dsp_rt",
+      "example_snippet": [
+        "ex_dsp_rt/main.cpp#rt_cov_usage"
+      ],
+      "example_mode": "run",
       "status": "documented",
       "skigen_candidate": false,
       "documented": true,
       "sidebar_position": 34,
       "guide": null,
       "python_equiv": null,
-      "python_url": null
+      "python_url": null,
+      "required_data": [
+        "mne-cpp-test-data"
+      ]
     },
     {
       "name": "RtHpi",
@@ -4142,14 +4177,21 @@
       "mne_python": null,
       "sklearn": null,
       "test": null,
-      "example": null,
+      "example": "ex_dsp_rt",
+      "example_snippet": [
+        "ex_dsp_rt/main.cpp#rt_hpi_usage"
+      ],
+      "example_mode": "run",
       "status": "documented",
       "skigen_candidate": false,
       "documented": true,
       "sidebar_position": 35,
       "guide": null,
       "python_equiv": null,
-      "python_url": null
+      "python_url": null,
+      "required_data": [
+        "mne-cpp-test-data"
+      ]
     },
     {
       "name": "RtHpiWorker",
@@ -4160,14 +4202,21 @@
       "mne_python": null,
       "sklearn": null,
       "test": null,
-      "example": null,
+      "example": "ex_dsp_rt",
+      "example_snippet": [
+        "ex_dsp_rt/main.cpp#rt_hpi_usage"
+      ],
+      "example_mode": "run",
       "status": "documented",
       "skigen_candidate": false,
       "documented": true,
       "sidebar_position": 36,
       "guide": null,
       "python_equiv": null,
-      "python_url": null
+      "python_url": null,
+      "required_data": [
+        "mne-cpp-test-data"
+      ]
     },
     {
       "name": "RtInvOp",
@@ -4178,14 +4227,21 @@
       "mne_python": null,
       "sklearn": null,
       "test": null,
-      "example": null,
+      "example": "ex_dsp_rt",
+      "example_snippet": [
+        "ex_dsp_rt/main.cpp#rt_inv_op_usage"
+      ],
+      "example_mode": "run",
       "status": "documented",
       "skigen_candidate": false,
       "documented": true,
       "sidebar_position": 37,
       "guide": null,
       "python_equiv": null,
-      "python_url": null
+      "python_url": null,
+      "required_data": [
+        "mne-cpp-test-data"
+      ]
     },
     {
       "name": "RtInvOpWorker",
@@ -4196,14 +4252,21 @@
       "mne_python": null,
       "sklearn": null,
       "test": null,
-      "example": null,
+      "example": "ex_dsp_rt",
+      "example_snippet": [
+        "ex_dsp_rt/main.cpp#rt_inv_op_usage"
+      ],
+      "example_mode": "run",
       "status": "documented",
       "skigen_candidate": false,
       "documented": true,
       "sidebar_position": 38,
       "guide": null,
       "python_equiv": null,
-      "python_url": null
+      "python_url": null,
+      "required_data": [
+        "mne-cpp-test-data"
+      ]
     },
     {
       "name": "RtNoise",
@@ -4214,14 +4277,21 @@
       "mne_python": null,
       "sklearn": null,
       "test": null,
-      "example": null,
+      "example": "ex_dsp_rt",
+      "example_snippet": [
+        "ex_dsp_rt/main.cpp#rt_noise_usage"
+      ],
+      "example_mode": "run",
       "status": "documented",
       "skigen_candidate": false,
       "documented": true,
       "sidebar_position": 39,
       "guide": null,
       "python_equiv": null,
-      "python_url": null
+      "python_url": null,
+      "required_data": [
+        "mne-cpp-test-data"
+      ]
     },
     {
       "name": "RtNoiseWorker",
@@ -4232,14 +4302,21 @@
       "mne_python": null,
       "sklearn": null,
       "test": null,
-      "example": null,
+      "example": "ex_dsp_rt",
+      "example_snippet": [
+        "ex_dsp_rt/main.cpp#rt_noise_usage"
+      ],
+      "example_mode": "run",
       "status": "documented",
       "skigen_candidate": false,
       "documented": true,
       "sidebar_position": 40,
       "guide": null,
       "python_equiv": null,
-      "python_url": null
+      "python_url": null,
+      "required_data": [
+        "mne-cpp-test-data"
+      ]
     },
     {
       "name": "Fiff",

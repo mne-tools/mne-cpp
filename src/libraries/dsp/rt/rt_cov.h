@@ -82,6 +82,8 @@ struct RtCovComputeResult
  * Real-time covariance worker.
  *
  * @brief Controller that manages background covariance matrix estimation from streaming data.
+ *
+ * @snippet ex_dsp_rt/main.cpp rt_cov_usage
  */
 class DSPSHARED_EXPORT RtCov : public QObject
 {

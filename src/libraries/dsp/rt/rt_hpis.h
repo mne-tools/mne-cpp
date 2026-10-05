@@ -79,6 +79,8 @@ namespace RTPROCESSINGLIB
  * Real-time HPI worker.
  *
  * @brief Background worker thread that runs continuous HPI coil localization.
+ *
+ * @snippet ex_dsp_rt/main.cpp rt_hpi_usage
  */
 class DSPSHARED_EXPORT RtHpiWorker : public QObject
 {
@@ -120,6 +122,8 @@ signals:
  * Real-time Head Coil Positions estimation.
  *
  * @brief Controller that manages RtHpiWorker for continuous head position tracking.
+ *
+ * @snippet ex_dsp_rt/main.cpp rt_hpi_usage
  */
 class DSPSHARED_EXPORT RtHpi : public QObject
 {

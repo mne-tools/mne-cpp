@@ -19,6 +19,16 @@ Real-time averaging worker.
 
 Background worker thread that accumulates and averages epochs in real time.
 
+```cpp title="src/examples/ex_dsp_rt/main.cpp"
+RtAveragingWorker averager(10, 20, 80, 0, 0, 2, info); // up to 10 epochs, 20 pre / 80 post samples, trigger row 2
+FiffEvokedSet evokedSet;
+QObject::connect(&averager, &RtAveragingWorker::resultReady,
+                 [&](const FiffEvokedSet& set, const QStringList&) { evokedSet = set; });
+for (const MatrixXd& block : blocks) {
+    averager.doWork(block); // runs synchronously; RtAveraging moves this worker to a thread
+}
+```
+
 ### Inheritance
 
 ```mermaid
@@ -175,6 +185,12 @@ Sets the to mSeconds of the baseline area.
 Resets the averaged data stored.
 
 ---
+
+## Example
+
+- Full source: [`src/examples/ex_dsp_rt/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_dsp_rt/main.cpp)
+- Build target: `ex_dsp_rt` (runs under CTest)
+- Data: [mne-cpp-test-data](https://github.com/mne-tools/mne-cpp-test-data)
 
 ## Authors of this file
 

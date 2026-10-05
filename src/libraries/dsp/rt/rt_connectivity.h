@@ -74,6 +74,8 @@ namespace RTPROCESSINGLIB
  * Real-time connectivity worker.
  *
  * @brief Background worker thread that computes functional connectivity metrics in real time.
+ *
+ * @snippet ex_dsp_rt/main.cpp rt_connectivity_usage
  */
 class DSPSHARED_EXPORT RtConnectivityWorker : public QObject
 {
@@ -97,6 +99,8 @@ signals:
  * Real-time connectivity estimation.
  *
  * @brief Controller that manages RtConnectivityWorker for online connectivity computation.
+ *
+ * @snippet ex_dsp_rt/main.cpp rt_connectivity_usage
  */
 class DSPSHARED_EXPORT RtConnectivity : public QObject
 {

@@ -10,11 +10,11 @@
  * @brief    Real-time noise power-spectral-density estimation from streaming data blocks.
  *
  * RtNoiseWorker accumulates a configurable number of contiguous data blocks,
- * applies an FFT of user-defined length and averages the squared magnitude
- * spectra into a running noise-PSD estimate. The estimator follows the
- * classical periodogram-averaging recipe (Welch with rectangular windowing
- * and no overlap), so longer accumulation windows trade temporal
- * responsiveness for spectral variance reduction. RtNoise is the QObject
+ * splits them into complete FFT-length segments and averages their
+ * Hann-windowed periodograms into a one-sided PSD in dB re unit^2/Hz, the
+ * same estimate as scipy.signal.welch with no overlap and no detrending.
+ * Longer accumulation windows trade temporal responsiveness for spectral
+ * variance reduction. RtNoise is the QObject
  * front-end that owns the worker, forwards configuration changes, and re-
  * emits the PSD result back on the GUI thread.
  *
@@ -59,6 +59,8 @@ namespace RTPROCESSINGLIB
 //=============================================================================================================
 /**
  * @brief Background worker that computes a noise power spectral density estimate from accumulated data blocks.
+ *
+ * @snippet ex_dsp_rt/main.cpp rt_noise_usage
  */
 class DSPSHARED_EXPORT RtNoiseWorker : public QObject
 {
@@ -112,6 +114,8 @@ private:
 //=============================================================================================================
 /**
  * @brief Controller that manages RtNoiseWorker for real-time noise spectrum estimation.
+ *
+ * @snippet ex_dsp_rt/main.cpp rt_noise_usage
  */
 class DSPSHARED_EXPORT RtNoise : public QObject
 {

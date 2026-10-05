@@ -16,7 +16,7 @@
     "Settings": "Plain parameter record consumed by an algorithm class; shown inside that class's example."
   },
   "example_debt": {
-    "ceiling": 151,
+    "ceiling": 140,
     "names": [
       "AcquiredPoints",
       "ComputeFwd",
@@ -157,17 +157,6 @@
       "PolhemusCoregistration",
       "PythonRunner",
       "PythonTestHelper",
-      "RtAveraging",
-      "RtAveragingWorker",
-      "RtConnectivity",
-      "RtConnectivityWorker",
-      "RtCov",
-      "RtHpi",
-      "RtHpiWorker",
-      "RtInvOp",
-      "RtInvOpWorker",
-      "RtNoise",
-      "RtNoiseWorker",
       "SourceMorph"
     ]
   }

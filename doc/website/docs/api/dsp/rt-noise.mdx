@@ -17,6 +17,15 @@ class RTPROCESSINGLIB::RtNoise
 
 Controller that manages [`RtNoiseWorker`](/docs/api/dsp/rt-noise-worker) for real-time noise spectrum estimation.
 
+```cpp title="src/examples/ex_dsp_rt/main.cpp"
+RtNoiseWorker noiseWorker(64, info200, 10); // 64-point FFT over 10 accumulated blocks
+MatrixXd spectrum;
+QObject::connect(&noiseWorker, &RtNoiseWorker::resultReady, [&](const MatrixXd& psd) { spectrum = psd; });
+for (int b = 0; b < 10; ++b) {
+    noiseWorker.doWork(tones.middleCols(64 * b, 64)); // dB re unit^2/Hz, channels x (fft/2 + 1)
+}
+```
+
 ### Inheritance
 
 ```mermaid
@@ -109,6 +118,12 @@ Blocks until the worker thread has finished, or until the timeout (ms) expires.
 - *bool* — True if the thread finished, false if the timeout expired.
 
 ---
+
+## Example
+
+- Full source: [`src/examples/ex_dsp_rt/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_dsp_rt/main.cpp)
+- Build target: `ex_dsp_rt` (runs under CTest)
+- Data: [mne-cpp-test-data](https://github.com/mne-tools/mne-cpp-test-data)
 
 ## Authors of this file
 

@@ -19,6 +19,17 @@ Real-time inverse operator worker.
 
 Background worker thread that recomputes the [MNE](/docs/api/mne/mne-class) inverse operator when covariance updates arrive.
 
+```cpp title="src/examples/ex_dsp_rt/main.cpp"
+RtInvOp rtInvOp(rawInfo, fwd); // MEG-only operator, loose 0.2, depth 0.8
+MNEInverseOperator inverse;
+bool inverseDone = false;
+QObject::connect(&rtInvOp, &RtInvOp::invOperatorCalculated, [&](const MNEInverseOperator& op) {
+    inverse = op;
+    inverseDone = true;
+});
+rtInvOp.append(noiseCov); // e.g. each new RtCov estimate
+```
+
 ### Inheritance
 
 ```mermaid
@@ -40,6 +51,12 @@ Perform actual inverse operator creation.
   Data to estimate the inverse operator from.
 
 ---
+
+## Example
+
+- Full source: [`src/examples/ex_dsp_rt/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_dsp_rt/main.cpp)
+- Build target: `ex_dsp_rt` (runs under CTest)
+- Data: [mne-cpp-test-data](https://github.com/mne-tools/mne-cpp-test-data)
 
 ## Authors of this file
 

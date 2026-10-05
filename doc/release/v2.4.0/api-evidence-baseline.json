@@ -12,18 +12,18 @@
     "registered_stale": 0,
     "registered_with_test": 101,
     "registered_test_unresolved": 0,
-    "registered_with_example": 151,
+    "registered_with_example": 162,
     "registered_example_not_built": 0,
     "registered_with_python_equiv": 88,
     "registered_without_api_page": 0,
-    "with_snippet": 184,
+    "with_snippet": 195,
     "public_api_units": 478,
     "example_eligible": 383,
     "example_exempt": 95,
-    "eligible_backed_by_registry_example": 151,
-    "eligible_used_by_some_example": 226,
-    "examples_on_disk": 59,
-    "examples_built": 59
+    "eligible_backed_by_registry_example": 162,
+    "eligible_used_by_some_example": 236,
+    "examples_on_disk": 60,
+    "examples_built": 60
   },
   "by_library": {
     "bids": {
@@ -85,9 +85,9 @@
       "registered": 51,
       "with_test": 28,
       "eligible": 80,
-      "eligible_with_registry_example": 40,
-      "eligible_used_by_example": 71,
-      "with_snippet": 69
+      "eligible_with_registry_example": 51,
+      "eligible_used_by_example": 80,
+      "with_snippet": 80
     },
     "fiff": {
       "public": 37,
@@ -122,7 +122,7 @@
       "with_test": 19,
       "eligible": 41,
       "eligible_with_registry_example": 4,
-      "eligible_used_by_example": 6,
+      "eligible_used_by_example": 7,
       "with_snippet": 0
     },
     "lsl": {
@@ -1225,7 +1225,8 @@
         "ex_connectivity",
         "ex_connectivity_comparison",
         "ex_connectivity_metrics",
-        "ex_connectivity_performance"
+        "ex_connectivity_performance",
+        "ex_dsp_rt"
       ],
       "snippets": [
         "ex_connectivity_metrics/main.cpp#connectivity_settings_setup",
@@ -1252,7 +1253,8 @@
         "ex_connectivity",
         "ex_connectivity_comparison",
         "ex_connectivity_metrics",
-        "ex_connectivity_performance"
+        "ex_connectivity_performance",
+        "ex_dsp_rt"
       ],
       "snippets": [],
       "api_page": "doc/website/docs/api/connectivity/connectivity-settings.mdx",
@@ -1625,6 +1627,7 @@
         "ex_connectivity_comparison",
         "ex_connectivity_metrics",
         "ex_connectivity_performance",
+        "ex_dsp_rt",
         "ex_fiff_sniffer"
       ],
       "snippets": [
@@ -5354,10 +5357,15 @@
       "registry_status": "documented",
       "test": null,
       "test_resolves": false,
-      "example": null,
-      "example_state": "none",
-      "including_examples": [],
-      "snippets": [],
+      "example": "ex_dsp_rt",
+      "example_state": "built",
+      "including_examples": [
+        "ex_dsp_rt"
+      ],
+      "snippets": [
+        "ex_dsp_rt/main.cpp#rt_averaging_worker_usage",
+        "ex_dsp_rt/main.cpp#rt_averaging_usage"
+      ],
       "api_page": "doc/website/docs/api/dsp/rt-averaging.mdx",
       "python_equiv": null,
       "example_eligible": true,
@@ -5373,10 +5381,15 @@
       "registry_status": "documented",
       "test": null,
       "test_resolves": false,
-      "example": null,
-      "example_state": "none",
-      "including_examples": [],
-      "snippets": [],
+      "example": "ex_dsp_rt",
+      "example_state": "built",
+      "including_examples": [
+        "ex_dsp_rt"
+      ],
+      "snippets": [
+        "ex_dsp_rt/main.cpp#rt_averaging_worker_usage",
+        "ex_dsp_rt/main.cpp#rt_averaging_usage"
+      ],
       "api_page": "doc/website/docs/api/dsp/rt-averaging-worker.mdx",
       "python_equiv": null,
       "example_eligible": true,
@@ -5392,12 +5405,16 @@
       "registry_status": "documented",
       "test": null,
       "test_resolves": false,
-      "example": null,
-      "example_state": "none",
+      "example": "ex_dsp_rt",
+      "example_state": "built",
       "including_examples": [
-        "ex_connectivity"
+        "ex_connectivity",
+        "ex_dsp_rt"
       ],
-      "snippets": [],
+      "snippets": [
+        "ex_dsp_rt/main.cpp#rt_connectivity_usage",
+        "ex_dsp_rt/main.cpp#rt_connectivity_usage"
+      ],
       "api_page": "doc/website/docs/api/dsp/rt-connectivity.mdx",
       "python_equiv": null,
       "example_eligible": true,
@@ -5413,12 +5430,16 @@
       "registry_status": "documented",
       "test": null,
       "test_resolves": false,
-      "example": null,
-      "example_state": "none",
+      "example": "ex_dsp_rt",
+      "example_state": "built",
       "including_examples": [
-        "ex_connectivity"
+        "ex_connectivity",
+        "ex_dsp_rt"
       ],
-      "snippets": [],
+      "snippets": [
+        "ex_dsp_rt/main.cpp#rt_connectivity_usage",
+        "ex_dsp_rt/main.cpp#rt_connectivity_usage"
+      ],
       "api_page": "doc/website/docs/api/dsp/rt-connectivity-worker.mdx",
       "python_equiv": null,
       "example_eligible": true,
@@ -5434,10 +5455,14 @@
       "registry_status": "documented",
       "test": null,
       "test_resolves": false,
-      "example": null,
-      "example_state": "none",
-      "including_examples": [],
-      "snippets": [],
+      "example": "ex_dsp_rt",
+      "example_state": "built",
+      "including_examples": [
+        "ex_dsp_rt"
+      ],
+      "snippets": [
+        "ex_dsp_rt/main.cpp#rt_cov_usage"
+      ],
       "api_page": "doc/website/docs/api/dsp/rt-cov.mdx",
       "python_equiv": null,
       "example_eligible": true,
@@ -5477,10 +5502,15 @@
       "registry_status": "documented",
       "test": null,
       "test_resolves": false,
-      "example": null,
-      "example_state": "none",
-      "including_examples": [],
-      "snippets": [],
+      "example": "ex_dsp_rt",
+      "example_state": "built",
+      "including_examples": [
+        "ex_dsp_rt"
+      ],
+      "snippets": [
+        "ex_dsp_rt/main.cpp#rt_hpi_usage",
+        "ex_dsp_rt/main.cpp#rt_hpi_usage"
+      ],
       "api_page": "doc/website/docs/api/dsp/rt-hpi.mdx",
       "python_equiv": null,
       "example_eligible": true,
@@ -5496,10 +5526,15 @@
       "registry_status": "documented",
       "test": null,
       "test_resolves": false,
-      "example": null,
-      "example_state": "none",
-      "including_examples": [],
-      "snippets": [],
+      "example": "ex_dsp_rt",
+      "example_state": "built",
+      "including_examples": [
+        "ex_dsp_rt"
+      ],
+      "snippets": [
+        "ex_dsp_rt/main.cpp#rt_hpi_usage",
+        "ex_dsp_rt/main.cpp#rt_hpi_usage"
+      ],
       "api_page": "doc/website/docs/api/dsp/rt-hpi-worker.mdx",
       "python_equiv": null,
       "example_eligible": true,
@@ -5515,10 +5550,15 @@
       "registry_status": "documented",
       "test": null,
       "test_resolves": false,
-      "example": null,
-      "example_state": "none",
-      "including_examples": [],
-      "snippets": [],
+      "example": "ex_dsp_rt",
+      "example_state": "built",
+      "including_examples": [
+        "ex_dsp_rt"
+      ],
+      "snippets": [
+        "ex_dsp_rt/main.cpp#rt_inv_op_usage",
+        "ex_dsp_rt/main.cpp#rt_inv_op_usage"
+      ],
       "api_page": "doc/website/docs/api/dsp/rt-inv-op.mdx",
       "python_equiv": null,
       "example_eligible": true,
@@ -5534,10 +5574,15 @@
       "registry_status": "documented",
       "test": null,
       "test_resolves": false,
-      "example": null,
-      "example_state": "none",
-      "including_examples": [],
-      "snippets": [],
+      "example": "ex_dsp_rt",
+      "example_state": "built",
+      "including_examples": [
+        "ex_dsp_rt"
+      ],
+      "snippets": [
+        "ex_dsp_rt/main.cpp#rt_inv_op_usage",
+        "ex_dsp_rt/main.cpp#rt_inv_op_usage"
+      ],
       "api_page": "doc/website/docs/api/dsp/rt-inv-op-worker.mdx",
       "python_equiv": null,
       "example_eligible": true,
@@ -5553,10 +5598,15 @@
       "registry_status": "documented",
       "test": null,
       "test_resolves": false,
-      "example": null,
-      "example_state": "none",
-      "including_examples": [],
-      "snippets": [],
+      "example": "ex_dsp_rt",
+      "example_state": "built",
+      "including_examples": [
+        "ex_dsp_rt"
+      ],
+      "snippets": [
+        "ex_dsp_rt/main.cpp#rt_noise_usage",
+        "ex_dsp_rt/main.cpp#rt_noise_usage"
+      ],
       "api_page": "doc/website/docs/api/dsp/rt-noise.mdx",
       "python_equiv": null,
       "example_eligible": true,
@@ -5572,10 +5622,15 @@
       "registry_status": "documented",
       "test": null,
       "test_resolves": false,
-      "example": null,
-      "example_state": "none",
-      "including_examples": [],
-      "snippets": [],
+      "example": "ex_dsp_rt",
+      "example_state": "built",
+      "including_examples": [
+        "ex_dsp_rt"
+      ],
+      "snippets": [
+        "ex_dsp_rt/main.cpp#rt_noise_usage",
+        "ex_dsp_rt/main.cpp#rt_noise_usage"
+      ],
       "api_page": "doc/website/docs/api/dsp/rt-noise-worker.mdx",
       "python_equiv": null,
       "example_eligible": true,
@@ -6086,6 +6141,7 @@
       "example": null,
       "example_state": "none",
       "including_examples": [
+        "ex_dsp_rt",
         "ex_make_inverse_operator"
       ],
       "snippets": [],
@@ -6337,6 +6393,7 @@
       "example": null,
       "example_state": "none",
       "including_examples": [
+        "ex_dsp_rt",
         "ex_inverse_mne"
       ],
       "snippets": [],
@@ -6358,6 +6415,7 @@
       "example": null,
       "example_state": "none",
       "including_examples": [
+        "ex_dsp_rt",
         "ex_inverse_mne"
       ],
       "snippets": [],
@@ -6379,6 +6437,7 @@
       "example": null,
       "example_state": "none",
       "including_examples": [
+        "ex_dsp_rt",
         "ex_inverse_mne"
       ],
       "snippets": [],
@@ -6400,6 +6459,7 @@
       "example": null,
       "example_state": "none",
       "including_examples": [
+        "ex_dsp_rt",
         "ex_inverse_mne"
       ],
       "snippets": [],
@@ -6564,7 +6624,8 @@
         "ex_connectivity",
         "ex_connectivity_comparison",
         "ex_connectivity_performance",
-        "ex_dsp_maxwell"
+        "ex_dsp_maxwell",
+        "ex_dsp_rt"
       ],
       "snippets": [
         "ex_read_raw/main.cpp#fiff_raw_data_open",
@@ -7379,6 +7440,7 @@
       "example": null,
       "example_state": "none",
       "including_examples": [
+        "ex_dsp_rt",
         "ex_hpiFit"
       ],
       "snippets": [],
@@ -7400,6 +7462,7 @@
       "example": "ex_hpiFit",
       "example_state": "built",
       "including_examples": [
+        "ex_dsp_rt",
         "ex_hpiFit"
       ],
       "snippets": [],
@@ -7439,7 +7502,9 @@
       "test_resolves": false,
       "example": null,
       "example_state": "none",
-      "including_examples": [],
+      "including_examples": [
+        "ex_dsp_rt"
+      ],
       "snippets": [],
       "api_page": "doc/website/docs/api/inv/inv-hpi-model-parameters.mdx",
       "python_equiv": null,
@@ -9202,6 +9267,7 @@
       "example_state": "built",
       "including_examples": [
         "ex_compute_forward",
+        "ex_dsp_rt",
         "ex_read_fwd",
         "ex_read_fwd_disp_3D"
       ],
@@ -9264,6 +9330,7 @@
       "example": "ex_make_inverse_operator",
       "example_state": "built",
       "including_examples": [
+        "ex_dsp_rt",
         "ex_inverse_mne"
       ],
       "snippets": [],

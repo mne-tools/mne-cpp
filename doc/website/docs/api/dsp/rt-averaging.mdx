@@ -19,6 +19,16 @@ Real-time averaging.
 
 Controller that manages [`RtAveragingWorker`](/docs/api/dsp/rt-averaging-worker) for online epoch averaging with baseline correction.
 
+```cpp title="src/examples/ex_dsp_rt/main.cpp"
+RtAveraging threaded(10, 20, 80, 0, 0, 2, info); // owns the worker thread
+bool averaged = false;
+QObject::connect(&threaded, &RtAveraging::evokedStim,
+                 [&](const FiffEvokedSet& set, const QStringList&) { averaged = set.evoked.first().nave == nBlocks; });
+for (const MatrixXd& block : blocks) {
+    threaded.append(block);
+}
+```
+
 ### Inheritance
 
 ```mermaid
@@ -219,6 +229,12 @@ Sets the to mSeconds of the baseline area.
 Reset the data processing in the real-time worker.
 
 ---
+
+## Example
+
+- Full source: [`src/examples/ex_dsp_rt/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_dsp_rt/main.cpp)
+- Build target: `ex_dsp_rt` (runs under CTest)
+- Data: [mne-cpp-test-data](https://github.com/mne-tools/mne-cpp-test-data)
 
 ## Authors of this file
 

@@ -19,6 +19,17 @@ Real-time Head Coil Positions estimation.
 
 Controller that manages [`RtHpiWorker`](/docs/api/dsp/rt-hpi-worker) for continuous head position tracking.
 
+```cpp title="src/examples/ex_dsp_rt/main.cpp"
+InvHpiDataUpdater updater(hpiInfo); // MEG picks, sensor geometry and digitised coil positions
+updater.prepareDataAndProjectors(hpiData, projectors);
+const InvHpiModelParameters model(QVector<int>({166, 154, 161, 158}), hpiInfo->sfreq, hpiInfo->linefreq, false);
+
+RtHpiWorker hpiWorker(updater.getSensors());
+HpiFitResult workerFit;
+QObject::connect(&hpiWorker, &RtHpiWorker::resultReady, [&](const HpiFitResult& fit) { workerFit = fit; });
+hpiWorker.doWork(updater.getProjectedData(), updater.getProjectors(), model, updater.getHpiDigitizer());
+```
+
 ### Inheritance
 
 ```mermaid
@@ -105,6 +116,12 @@ Restarts the thread by interrupting its computation queue, quitting, waiting and
 Stops the thread by interrupting its computation queue, quitting and waiting.
 
 ---
+
+## Example
+
+- Full source: [`src/examples/ex_dsp_rt/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_dsp_rt/main.cpp)
+- Build target: `ex_dsp_rt` (runs under CTest)
+- Data: [mne-cpp-test-data](https://github.com/mne-tools/mne-cpp-test-data)
 
 ## Authors of this file
 

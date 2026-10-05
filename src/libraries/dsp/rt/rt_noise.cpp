@@ -82,36 +82,35 @@ void RtNoiseWorker::doWork(const MatrixXd& matData)
 
     const int iTotalSamples = m_iNumOfBlocks * m_iBlockSize;
     const int iHalfSpec = m_iFftLength / 2 + 1;
-    const int nb = iTotalSamples / m_iFftLength + 1;
+    const int nb = std::max(1, iTotalSamples / m_iFftLength); // complete segments only
+
+    double winPow = 0.0;
+    for (int k = 0; k < m_iFftLength; ++k) {
+        winPow += static_cast<double>(m_fWin[k]) * m_fWin[k];
+    }
 
     MatrixXd sum_psdx = MatrixXd::Zero(m_iSensors, iHalfSpec);
     RowVectorXd vecDataZeroPad = RowVectorXd::Zero(m_iFftLength);
     RowVectorXcd vecFreqData(iHalfSpec);
+    Eigen::FFT<double> fft;
+    fft.SetFlag(fft.HalfSpectrum);
 
     for (int n = 0; n < nb; ++n) {
         const int iOffset = n * m_iFftLength;
 
         for (int i = 0; i < m_iSensors; ++i) {
-            // Extract and zero-pad segment
             vecDataZeroPad.setZero();
             const int iCopyLen = std::min(m_iFftLength, iTotalSamples - iOffset);
             vecDataZeroPad.head(iCopyLen) = m_matCircBuf.block(i, iOffset, 1, iCopyLen);
-
-            // Apply Hanning window
             for (int k = 0; k < m_iFftLength; ++k) {
                 vecDataZeroPad[k] *= m_fWin[k];
             }
-
-            // FFT
-            Eigen::FFT<double> fft;
-            fft.SetFlag(fft.HalfSpectrum);
             fft.fwd(vecFreqData, vecDataZeroPad);
 
-            // PSD from FFT
+            // One-sided density |X|^2 / (fs * sum w^2), as scipy.signal.welch(scaling="density")
             for (int j = 0; j < iHalfSpec; ++j) {
-                const double mag = std::abs(vecFreqData(j));
-                double spower = mag / (m_dFs * m_iFftLength);
-                if (j > 0 && j < m_iFftLength / 2) {
+                double spower = std::norm(vecFreqData(j)) / (m_dFs * winPow);
+                if (j > 0 && !(m_iFftLength % 2 == 0 && j == m_iFftLength / 2)) {
                     spower *= 2.0;
                 }
                 sum_psdx(i, j) += spower;

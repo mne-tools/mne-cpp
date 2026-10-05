@@ -81,6 +81,8 @@ struct RtInvOpInput
  * Real-time inverse operator worker.
  *
  * @brief Background worker thread that recomputes the MNE inverse operator when covariance updates arrive.
+ *
+ * @snippet ex_dsp_rt/main.cpp rt_inv_op_usage
  */
 class DSPSHARED_EXPORT RtInvOpWorker : public QObject
 {
@@ -110,6 +112,8 @@ signals:
  * Real-time inverse dSPM, sLoreta inverse operator estimation
  *
  * @brief Controller that manages RtInvOpWorker for online inverse operator updates.
+ *
+ * @snippet ex_dsp_rt/main.cpp rt_inv_op_usage
  */
 class DSPSHARED_EXPORT RtInvOp : public QObject
 {

@@ -326,6 +326,20 @@ void TestInvRtLibrary::rtConnectivity_lifecycle()
     rtConn.restart();
     rtConn.stop();
     QThread::msleep(50);
+
+    // A result must come back across the thread boundary
+    RtConnectivity running;
+    ConnectivitySettings settings;
+    settings.append(MatrixXd::Random(2, 128));
+    settings.append(MatrixXd::Random(2, 128));
+    settings.setSamplingFrequency(128);
+    settings.setFFTSize(128);
+    settings.setNodePositions(MatrixX3f::Identity(2, 3));
+    settings.setConnectivityMethods({"COH"});
+    QSignalSpy spy(&running, &RtConnectivity::newConnectivityResultAvailable);
+    running.append(settings);
+    QVERIFY(spy.wait(10000));
+    running.stop();
 }
 
 //=============================================================================================================
@@ -442,6 +456,22 @@ void TestInvRtLibrary::rtNoise_hanningWindow()
 
     QVERIFY(!rtNoise.isRunning());
     rtNoise.stop();
+
+    // A unit tone at an exact bin: PSD density times bin width (fs / nfft) recovers its power 1/2 within the Hann leakage
+    RtNoiseWorker worker(256, pInfo, 4);
+    MatrixXd psdDb;
+    connect(&worker, &RtNoiseWorker::resultReady, this, [&](const MatrixXd& m) { psdDb = m; });
+    for (int b = 0; b < 4; ++b) {
+        MatrixXd block(5, 256);
+        for (int t = 0; t < 256; ++t) {
+            block.col(t).setConstant(std::sin(2.0 * M_PI * 125.0 * (256 * b + t) / 1000.0));
+        }
+        worker.doWork(block);
+    }
+    QCOMPARE(psdDb.cols(), static_cast<Index>(129));
+    VectorXd power = psdDb.row(0).unaryExpr([](double db) { return std::pow(10.0, db / 10.0); }).transpose();
+    const double tonePower = power.segment(30, 5).sum() * 1000.0 / 256.0;
+    QVERIFY2(std::abs(tonePower - 0.5) < 0.02, qPrintable(QString("tone power %1, expected 0.5").arg(tonePower)));
 }
 
 void TestInvRtLibrary::rtNoise_lifecycle()

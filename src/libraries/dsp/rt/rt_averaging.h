@@ -70,6 +70,8 @@ namespace RTPROCESSINGLIB
  * Real-time averaging worker
  *
  * @brief Background worker thread that accumulates and averages epochs in real time.
+ *
+ * @snippet ex_dsp_rt/main.cpp rt_averaging_worker_usage
  */
 class DSPSHARED_EXPORT RtAveragingWorker : public QObject
 {
@@ -285,6 +287,8 @@ signals:
  * Real-time averaging
  *
  * @brief Controller that manages RtAveragingWorker for online epoch averaging with baseline correction.
+ *
+ * @snippet ex_dsp_rt/main.cpp rt_averaging_usage
  */
 class DSPSHARED_EXPORT RtAveraging : public QObject
 {
