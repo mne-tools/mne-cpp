@@ -19,6 +19,42 @@ DECLARE INTERFACE OBSERVER.
 
 The [`IObserver`](/docs/api/utils/i-observer) interface provides the base class of every observer of the observer design pattern.
 
+```cpp title="src/examples/ex_utils/main.cpp"
+// A subject notifies every attached observer; observers pull the state they need
+class Counter : public Subject
+{
+public:
+    void increment()
+    {
+        ++m_value;
+        notify();
+    }
+    int value() const
+    {
+        return m_value;
+    }
+
+private:
+    int m_value = 0;
+};
+
+class LastSeen : public IObserver
+{
+public:
+    void update(Subject* pSubject) override
+    {
+        m_seen = static_cast<Counter*>(pSubject)->value();
+    }
+    int seen() const
+    {
+        return m_seen;
+    }
+
+private:
+    int m_seen = -1;
+};
+```
+
 ### Inheritance
 
 ```mermaid
@@ -46,6 +82,11 @@ Updates the [`IObserver`](/docs/api/utils/i-observer).
   pointer to the subject where observer is attached to.
 
 ---
+
+## Example
+
+- Full source: [`src/examples/ex_utils/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_utils/main.cpp)
+- Build target: `ex_utils` (runs under CTest)
 
 ## Authors of this file
 

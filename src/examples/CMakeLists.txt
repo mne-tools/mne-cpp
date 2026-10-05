@@ -50,6 +50,7 @@ if(NOT WASM)
   add_subdirectory(ex_read_write_raw)
   add_subdirectory(ex_spectral)
   add_subdirectory(ex_tf_plot)
+  add_subdirectory(ex_utils)
 endif()
 
 ## Examples using disp3D

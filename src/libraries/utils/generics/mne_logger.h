@@ -52,6 +52,8 @@ namespace UTILSLIB
  * The Apllicationlogger provides colorized keywords in terminal outputs for better overview
  *
  * @brief Custom Qt message handler that formats and routes qDebug/qWarning/qCritical output to file or console.
+ *
+ * @snippet ex_utils/main.cpp mne_logger_usage
  */
 class UTILSSHARED_EXPORT MNELogger
 {

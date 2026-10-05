@@ -19,6 +19,15 @@ IO utility routines for reading/writing Eigen matrices to text files.
 
 Eigen matrix I/O utilities.
 
+```cpp title="src/examples/ex_utils/main.cpp"
+MatrixXd matrix(2, 3);
+matrix << 1.5, -2.0, 3.25, 0.0, 1e-6, 42.0;
+const QString matrixPath = dir.filePath("matrix.txt");
+IOUtils::write_eigen_matrix(matrix, matrixPath, "example matrix");
+MatrixXd readBack;
+IOUtils::read_eigen_matrix(readBack, matrixPath);
+```
+
 ---
 
 ## Public Methods
@@ -138,6 +147,11 @@ Read Eigen Matrix from file (std::string path).
 ### read_eigen_matrix(out, path)
 
 ---
+
+## Example
+
+- Full source: [`src/examples/ex_utils/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_utils/main.cpp)
+- Build target: `ex_utils` (runs under CTest)
 
 ## Authors of this file
 

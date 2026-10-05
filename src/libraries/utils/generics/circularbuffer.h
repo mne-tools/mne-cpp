@@ -63,6 +63,8 @@ namespace UTILSLIB
  * TEMPLATE CIRCULAR BUFFER
  *
  * @brief Thread-safe lock-free circular (ring) buffer for producer-consumer data exchange between threads.
+ *
+ * @snippet ex_utils/main.cpp circular_buffer_usage
  */
 template<typename T>
 class CircularBuffer

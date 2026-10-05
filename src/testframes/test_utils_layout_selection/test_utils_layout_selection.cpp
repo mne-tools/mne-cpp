@@ -249,6 +249,14 @@ void TestUtilsLayoutSelection::testMakeLayoutNoFit()
     for (const auto& pt : outputPoints) {
         QVERIFY(pt.size() >= 2);
     }
+
+    // Equatorial points lie at 90 degrees from the pole, i.e. at radius prad, in their own direction
+    // (box corner = centre - (w/2, h/2)), as in MNE-C mne_make_eeg_layout
+    const float expected[4][2] = {{0.2f, 0.0f}, {0.0f, 0.2f}, {-0.2f, 0.0f}, {0.0f, -0.2f}};
+    for (int i = 0; i < 4; ++i) {
+        QVERIFY(qAbs(outputPoints[i][0] + 0.25f - expected[i][0]) < 1e-5f);
+        QVERIFY(qAbs(outputPoints[i][1] + 0.25f - expected[i][1]) < 1e-5f);
+    }
 }
 
 //=============================================================================================================

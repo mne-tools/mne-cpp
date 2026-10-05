@@ -62,14 +62,7 @@ struct UTILSSHARED_EXPORT ReportSection
 /**
  * @brief Simple HTML report builder for MEG/EEG analysis results.
  *
- * Usage:
- * @code
- *   Report report("My Analysis");
- *   report.addText("Data Info", "Subject: sub-01, 306 MEG channels");
- *   report.addTable("Channel Stats", headers, rows);
- *   report.addKeyValue("Parameters", {{"Lambda", "0.1"}, {"SNR", "3.0"}});
- *   report.save("/path/to/report.html");
- * @endcode
+ * @snippet ex_utils/main.cpp report_usage
  */
 class UTILSSHARED_EXPORT Report
 {

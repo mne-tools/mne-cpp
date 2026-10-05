@@ -66,6 +66,8 @@ namespace UTILSLIB
  * Processes selection files (mne .sel) files which contain the channels for each selection group.
  *
  * @brief Reader/writer for MNE .sel channel-selection files and Brainstorm .mon montage files.
+ *
+ * @snippet ex_utils/main.cpp selection_io_usage
  */
 class UTILSSHARED_EXPORT SelectionIO
 {

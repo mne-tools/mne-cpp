@@ -19,6 +19,12 @@ The Apllicationlogger provides colorized keywords in terminal outputs for better
 
 Custom Qt message handler that formats and routes qDebug/qWarning/qCritical output to file or console.
 
+```cpp title="src/examples/ex_utils/main.cpp"
+qInstallMessageHandler(MNELogger::customLogWriter); // coloured console output
+MNELogger::setLogFile(dir.filePath("example.log")); // and a plain-text copy
+qInfo() << "logging to" << MNELogger::logFile();
+```
+
 ---
 
 ## Static Methods
@@ -66,6 +72,11 @@ Returns the path of the current log file, empty if file logging is off.
 - *QString* — Path of the active log file, or an empty string if file logging is disabled.
 
 ---
+
+## Example
+
+- Full source: [`src/examples/ex_utils/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_utils/main.cpp)
+- Build target: `ex_utils` (runs under CTest)
 
 ## Authors of this file
 

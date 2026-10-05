@@ -119,7 +119,7 @@ bool LayoutMaker::makeLayout(const QList<QVector<float>>& inputPoints,
      * Do the azimuthal equidistant projection
      */
     for (k = 0; k < nchan; k++) {
-        rr = r0 - static_cast<VectorXf>(rrs.row(k));
+        rr = static_cast<VectorXf>(rrs.row(k)) - r0; // MNE-C VEC_DIFF(r0, rrs[k], rr): rrs[k] - r0
         sphere_coord(rr[0], rr[1], rr[2], &rad, &th, &phi);
         xx[k] = prad * (2.0 * th / M_PI) * cos(phi);
         yy[k] = prad * (2.0 * th / M_PI) * sin(phi);
@@ -270,7 +270,7 @@ bool LayoutMaker::makeLayout(const std::vector<std::vector<float>>& inputPoints,
      * Do the azimuthal equidistant projection
      */
     for (int k = 0; k < nchan; k++) {
-        rr = r0 - static_cast<VectorXf>(rrs.row(k));
+        rr = static_cast<VectorXf>(rrs.row(k)) - r0; // MNE-C VEC_DIFF(r0, rrs[k], rr): rrs[k] - r0
         sphere_coord(rr[0], rr[1], rr[2], &rad, &th, &phi);
         xx[k] = prad * (2.0 * th / M_PI) * cos(phi);
         yy[k] = prad * (2.0 * th / M_PI) * sin(phi);

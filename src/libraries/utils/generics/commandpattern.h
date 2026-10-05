@@ -51,6 +51,8 @@ namespace UTILSLIB
  * Declare interface command
  *
  * @brief The ICommand interface provides the base class of every command of the command design pattern.
+ *
+ * @snippet ex_utils/main.cpp command_pattern_usage
  */
 class ICommand
 {

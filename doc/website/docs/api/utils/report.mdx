@@ -21,13 +21,12 @@ class UTILSLIB::Report
 
 Simple HTML report builder for MEG/EEG analysis results.
 
-Usage: 
-```cpp
-Report report("My Analysis");
-report.addText("Data Info", "Subject: sub-01, 306 MEG channels");
-report.addTable("Channel Stats", headers, rows);
-report.addKeyValue("Parameters", {{"Lambda", "0.1"}, {"SNR", "3.0"}});
-report.save("/path/to/report.html");
+```cpp title="src/examples/ex_utils/main.cpp"
+Report report("Example report");
+report.addText("Summary", "All utilities were exercised.");
+report.addTable("Montage", {"Electrode", "z (m)"}, {{"Cz", "0.087"}, {"Fp1", "0.033"}});
+const QString html = report.toHtml();
+report.save(dir.filePath("report.html"));
 ```
 
 ---
@@ -148,6 +147,11 @@ Get the report title.
 - *const QString &* — Title passed at construction.
 
 ---
+
+## Example
+
+- Full source: [`src/examples/ex_utils/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_utils/main.cpp)
+- Build target: `ex_utils` (runs under CTest)
 
 ## Authors of this file
 

@@ -19,6 +19,11 @@ Processes layout files (AsA .elc, [MNE](/docs/api/mne/mne-class) .lout) files wh
 
 Reads ANT .elc electrode files and [MNE](/docs/api/mne/mne-class) .lout 2-D channel layouts into Qt/STL containers.
 
+```cpp title="src/examples/ex_utils/main.cpp"
+QMap<QString, QPointF> channelPositions;
+LayoutLoader::readMNELoutFile(layoutFile.fileName(), channelPositions);
+```
+
 ---
 
 ## Static Methods
@@ -112,6 +117,11 @@ Reads the specified [MNE](/docs/api/mne/mne-class) .lout file.
 - *bool* — bool true if reading was successful, false otherwise.
 
 ---
+
+## Example
+
+- Full source: [`src/examples/ex_utils/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_utils/main.cpp)
+- Build target: `ex_utils` (runs under CTest)
 
 ## Authors of this file
 

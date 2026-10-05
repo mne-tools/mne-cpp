@@ -82,6 +82,8 @@ using fitUser = fitUserRec*;
  * Make layout files from given 3D points
  *
  * @brief Make layout files from given 3D points.
+ *
+ * @snippet ex_utils/main.cpp layout_maker_usage
  */
 class UTILSSHARED_EXPORT LayoutMaker
 {

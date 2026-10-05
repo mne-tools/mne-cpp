@@ -19,6 +19,27 @@ Declare interface command.
 
 The [`ICommand`](/docs/api/utils/i-command) interface provides the base class of every command of the command design pattern.
 
+```cpp title="src/examples/ex_utils/main.cpp"
+// A command wraps an action so it can be queued or replayed later
+class AppendCommand : public ICommand
+{
+public:
+    AppendCommand(QStringList& target, QString text)
+    : m_target(target)
+    , m_text(std::move(text))
+    {
+    }
+    void execute() override
+    {
+        m_target.append(m_text);
+    }
+
+private:
+    QStringList& m_target;
+    QString m_text;
+};
+```
+
 ### Inheritance
 
 ```mermaid
@@ -42,6 +63,11 @@ Destroys the [`ICommand`](/docs/api/utils/i-command).
 Executes the [`ICommand`](/docs/api/utils/i-command).
 
 ---
+
+## Example
+
+- Full source: [`src/examples/ex_utils/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_utils/main.cpp)
+- Build target: `ex_utils` (runs under CTest)
 
 ## Authors of this file
 

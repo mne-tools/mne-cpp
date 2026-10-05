@@ -69,6 +69,8 @@ struct UTILSSHARED_EXPORT ElectrodePosition
 //=============================================================================================================
 /**
  * @brief Standard EEG montage with named electrode positions.
+ *
+ * @snippet ex_utils/main.cpp standard_montage_usage
  */
 class UTILSSHARED_EXPORT StandardMontage
 {
@@ -81,7 +83,7 @@ public:
     {
         Standard_1020, /**< 10-20 system (21 electrodes). */
         Standard_1010, /**< 10-10 system (81 electrodes). */
-        Standard_1005  /**< 10-05 system (345 electrodes). */
+        Standard_1005  /**< 10-05 system; currently returns the 10-10 positions (the full 345-electrode set is not bundled). */
     };
 
     //=========================================================================================================

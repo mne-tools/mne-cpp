@@ -75,6 +75,8 @@ namespace UTILSLIB
  * Processes layout files (AsA .elc, MNE .lout) files which contain the electrode positions of a EEG/MEG hat.
  *
  * @brief Reads ANT .elc electrode files and MNE .lout 2-D channel layouts into Qt/STL containers.
+ *
+ * @snippet ex_utils/main.cpp layout_loader_usage
  */
 class UTILSSHARED_EXPORT LayoutLoader
 {

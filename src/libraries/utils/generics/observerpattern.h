@@ -62,6 +62,8 @@ class Subject;
  * DECLARE INTERFACE OBSERVER
  *
  * @brief The IObserver interface provides the base class of every observer of the observer design pattern.
+ *
+ * @snippet ex_utils/main.cpp observer_pattern_usage
  */
 class UTILSSHARED_EXPORT IObserver
 {
@@ -89,6 +91,8 @@ public:
  * DECLARE BASE CLASS SUBJECT
  *
  * @brief The Subject class provides the base class of every subject of the observer design pattern.
+ *
+ * @snippet ex_utils/main.cpp observer_pattern_usage
  */
 class UTILSSHARED_EXPORT Subject
 {

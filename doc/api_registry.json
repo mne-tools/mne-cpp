@@ -2067,7 +2067,11 @@
       "mne_python": "mne.channels.make_standard_montage",
       "sklearn": null,
       "test": "test_standard_montage",
-      "example": null,
+      "example": "ex_utils",
+      "example_snippet": [
+        "ex_utils/main.cpp#standard_montage_usage"
+      ],
+      "example_mode": "run",
       "status": "done",
       "skigen_candidate": false,
       "documented": true,
@@ -2085,7 +2089,11 @@
       "mne_python": "mne.Report",
       "sklearn": null,
       "test": "test_report",
-      "example": null,
+      "example": "ex_utils",
+      "example_snippet": [
+        "ex_utils/main.cpp#report_usage"
+      ],
+      "example_mode": "run",
       "status": "done",
       "skigen_candidate": false,
       "documented": true,
@@ -6072,7 +6080,11 @@
       "mne_python": null,
       "sklearn": null,
       "test": null,
-      "example": null,
+      "example": "ex_utils",
+      "example_snippet": [
+        "ex_utils/main.cpp#circular_buffer_usage"
+      ],
+      "example_mode": "run",
       "status": "documented",
       "skigen_candidate": false,
       "documented": true,
@@ -6178,7 +6190,11 @@
       "mne_python": null,
       "sklearn": null,
       "test": null,
-      "example": null,
+      "example": "ex_utils",
+      "example_snippet": [
+        "ex_utils/main.cpp#fastrak_parser_usage"
+      ],
+      "example_mode": "run",
       "status": "documented",
       "skigen_candidate": false,
       "documented": true,
@@ -6240,7 +6256,11 @@
       "mne_python": null,
       "sklearn": null,
       "test": null,
-      "example": null,
+      "example": "ex_utils",
+      "example_snippet": [
+        "ex_utils/main.cpp#command_pattern_usage"
+      ],
+      "example_mode": "run",
       "status": "documented",
       "skigen_candidate": false,
       "documented": true,
@@ -6258,7 +6278,11 @@
       "mne_python": null,
       "sklearn": null,
       "test": null,
-      "example": null,
+      "example": "ex_utils",
+      "example_snippet": [
+        "ex_utils/main.cpp#ioutils_usage"
+      ],
+      "example_mode": "run",
       "status": "documented",
       "skigen_candidate": false,
       "documented": true,
@@ -6276,7 +6300,11 @@
       "mne_python": null,
       "sklearn": null,
       "test": null,
-      "example": null,
+      "example": "ex_utils",
+      "example_snippet": [
+        "ex_utils/main.cpp#observer_pattern_usage"
+      ],
+      "example_mode": "run",
       "status": "documented",
       "skigen_candidate": false,
       "documented": true,
@@ -6294,7 +6322,11 @@
       "mne_python": null,
       "sklearn": null,
       "test": null,
-      "example": null,
+      "example": "ex_utils",
+      "example_snippet": [
+        "ex_utils/main.cpp#layout_loader_usage"
+      ],
+      "example_mode": "run",
       "status": "documented",
       "skigen_candidate": false,
       "documented": true,
@@ -6312,7 +6344,11 @@
       "mne_python": null,
       "sklearn": null,
       "test": null,
-      "example": null,
+      "example": "ex_utils",
+      "example_snippet": [
+        "ex_utils/main.cpp#layout_maker_usage"
+      ],
+      "example_mode": "run",
       "status": "documented",
       "skigen_candidate": false,
       "documented": true,
@@ -6330,7 +6366,11 @@
       "mne_python": null,
       "sklearn": null,
       "test": null,
-      "example": null,
+      "example": "ex_utils",
+      "example_snippet": [
+        "ex_utils/main.cpp#mne_logger_usage"
+      ],
+      "example_mode": "run",
       "status": "documented",
       "skigen_candidate": false,
       "documented": true,
@@ -6464,7 +6504,11 @@
       "mne_python": null,
       "sklearn": null,
       "test": null,
-      "example": null,
+      "example": "ex_utils",
+      "example_snippet": [
+        "ex_utils/main.cpp#selection_io_usage"
+      ],
+      "example_mode": "run",
       "status": "documented",
       "skigen_candidate": false,
       "documented": true,
@@ -6526,7 +6570,11 @@
       "mne_python": null,
       "sklearn": null,
       "test": null,
-      "example": null,
+      "example": "ex_utils",
+      "example_snippet": [
+        "ex_utils/main.cpp#observer_pattern_usage"
+      ],
+      "example_mode": "run",
       "status": "documented",
       "skigen_candidate": false,
       "documented": true,

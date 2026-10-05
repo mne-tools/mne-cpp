@@ -67,6 +67,8 @@ struct UTILSSHARED_EXPORT FastrakSample
  *
  * Thread-affine: the caller is responsible for serialising calls. No
  * heap allocations on the hot path other than the internal buffer.
+ *
+ * @snippet ex_utils/main.cpp fastrak_parser_usage
  */
 class UTILSSHARED_EXPORT FastrakParser
 {

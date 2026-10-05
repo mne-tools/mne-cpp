@@ -19,6 +19,19 @@ Make layout files from given 3D points.
 
 Make layout files from given 3D points.
 
+```cpp title="src/examples/ex_utils/main.cpp"
+// Azimuthal equidistant projection around the fitted sphere: Cz lands near the centre, the nose points up
+QList<QVector<float>> points3d;
+QStringList names;
+for (const ElectrodePosition& electrode : montage1020) {
+    points3d.append({static_cast<float>(electrode.pos.x()), static_cast<float>(electrode.pos.y()), static_cast<float>(electrode.pos.z())});
+    names.append(electrode.name);
+}
+QList<QVector<float>> layout2d;
+QFile layoutFile(dir.filePath("1020.lout"));
+LayoutMaker::makeLayout(points3d, layout2d, names, layoutFile, true, 20.0f, 5.0f, 4.0f, true);
+```
+
 ---
 
 ## Static Methods
@@ -112,6 +125,11 @@ Reads the specified ANT elc-layout file.
 - *bool* — true if making layout was successful, false otherwise.
 
 ---
+
+## Example
+
+- Full source: [`src/examples/ex_utils/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_utils/main.cpp)
+- Build target: `ex_utils` (runs under CTest)
 
 ## Authors of this file
 

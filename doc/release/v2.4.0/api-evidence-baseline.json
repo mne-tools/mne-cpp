@@ -12,18 +12,18 @@
     "registered_stale": 0,
     "registered_with_test": 101,
     "registered_test_unresolved": 0,
-    "registered_with_example": 82,
+    "registered_with_example": 94,
     "registered_example_not_built": 0,
     "registered_with_python_equiv": 88,
     "registered_without_api_page": 0,
-    "with_snippet": 90,
+    "with_snippet": 105,
     "public_api_units": 478,
     "example_eligible": 383,
     "example_exempt": 95,
-    "eligible_backed_by_registry_example": 82,
-    "eligible_used_by_some_example": 147,
-    "examples_on_disk": 48,
-    "examples_built": 48
+    "eligible_backed_by_registry_example": 94,
+    "eligible_used_by_some_example": 158,
+    "examples_on_disk": 49,
+    "examples_built": 49
   },
   "by_library": {
     "bids": {
@@ -193,9 +193,9 @@
       "registered": 17,
       "with_test": 2,
       "eligible": 24,
-      "eligible_with_registry_example": 0,
-      "eligible_used_by_example": 4,
-      "with_snippet": 0
+      "eligible_with_registry_example": 12,
+      "eligible_used_by_example": 15,
+      "with_snippet": 15
     }
   },
   "exported_free_functions": [
@@ -10127,10 +10127,14 @@
       "registry_status": "documented",
       "test": null,
       "test_resolves": false,
-      "example": null,
-      "example_state": "none",
-      "including_examples": [],
-      "snippets": [],
+      "example": "ex_utils",
+      "example_state": "built",
+      "including_examples": [
+        "ex_utils"
+      ],
+      "snippets": [
+        "ex_utils/main.cpp#circular_buffer_usage"
+      ],
       "api_page": "doc/website/docs/api/utils/circular-buffer.mdx",
       "python_equiv": null,
       "example_eligible": true,
@@ -10146,10 +10150,14 @@
       "registry_status": "documented",
       "test": null,
       "test_resolves": false,
-      "example": null,
-      "example_state": "none",
-      "including_examples": [],
-      "snippets": [],
+      "example": "ex_utils",
+      "example_state": "built",
+      "including_examples": [
+        "ex_utils"
+      ],
+      "snippets": [
+        "ex_utils/main.cpp#command_pattern_usage"
+      ],
       "api_page": "doc/website/docs/api/utils/i-command.mdx",
       "python_equiv": null,
       "example_eligible": true,
@@ -10165,8 +10173,8 @@
       "registry_status": "documented",
       "test": null,
       "test_resolves": false,
-      "example": null,
-      "example_state": "none",
+      "example": "ex_utils",
+      "example_state": "built",
       "including_examples": [
         "ex_averaging",
         "ex_cancel_noise",
@@ -10203,9 +10211,12 @@
         "ex_roi_clustered_inverse_pwl_rap_music",
         "ex_spectral",
         "ex_st_clustered_inverse_pwl_rap_music",
-        "ex_tf_plot"
+        "ex_tf_plot",
+        "ex_utils"
       ],
-      "snippets": [],
+      "snippets": [
+        "ex_utils/main.cpp#mne_logger_usage"
+      ],
       "api_page": "doc/website/docs/api/utils/mne-logger.mdx",
       "python_equiv": null,
       "example_eligible": true,
@@ -10221,10 +10232,15 @@
       "registry_status": "documented",
       "test": null,
       "test_resolves": false,
-      "example": null,
-      "example_state": "none",
-      "including_examples": [],
-      "snippets": [],
+      "example": "ex_utils",
+      "example_state": "built",
+      "including_examples": [
+        "ex_utils"
+      ],
+      "snippets": [
+        "ex_utils/main.cpp#observer_pattern_usage",
+        "ex_utils/main.cpp#observer_pattern_usage"
+      ],
       "api_page": "doc/website/docs/api/utils/i-observer.mdx",
       "python_equiv": null,
       "example_eligible": true,
@@ -10240,10 +10256,15 @@
       "registry_status": "documented",
       "test": null,
       "test_resolves": false,
-      "example": null,
-      "example_state": "none",
-      "including_examples": [],
-      "snippets": [],
+      "example": "ex_utils",
+      "example_state": "built",
+      "including_examples": [
+        "ex_utils"
+      ],
+      "snippets": [
+        "ex_utils/main.cpp#observer_pattern_usage",
+        "ex_utils/main.cpp#observer_pattern_usage"
+      ],
       "api_page": "doc/website/docs/api/utils/subject.mdx",
       "python_equiv": null,
       "example_eligible": true,
@@ -10259,17 +10280,20 @@
       "registry_status": "documented",
       "test": null,
       "test_resolves": false,
-      "example": null,
-      "example_state": "none",
+      "example": "ex_utils",
+      "example_state": "built",
       "including_examples": [
         "ex_connectivity",
         "ex_connectivity_comparison",
         "ex_connectivity_performance",
         "ex_hpiFit",
         "ex_read_bem",
-        "ex_read_fwd"
+        "ex_read_fwd",
+        "ex_utils"
       ],
-      "snippets": [],
+      "snippets": [
+        "ex_utils/main.cpp#ioutils_usage"
+      ],
       "api_page": "doc/website/docs/api/utils/io-utils.mdx",
       "python_equiv": null,
       "example_eligible": true,
@@ -10285,12 +10309,15 @@
       "registry_status": "documented",
       "test": null,
       "test_resolves": false,
-      "example": null,
-      "example_state": "none",
+      "example": "ex_utils",
+      "example_state": "built",
       "including_examples": [
-        "ex_make_layout"
+        "ex_make_layout",
+        "ex_utils"
       ],
-      "snippets": [],
+      "snippets": [
+        "ex_utils/main.cpp#layout_loader_usage"
+      ],
       "api_page": "doc/website/docs/api/utils/layout-loader.mdx",
       "python_equiv": null,
       "example_eligible": true,
@@ -10306,12 +10333,15 @@
       "registry_status": "documented",
       "test": null,
       "test_resolves": false,
-      "example": null,
-      "example_state": "none",
+      "example": "ex_utils",
+      "example_state": "built",
       "including_examples": [
-        "ex_make_layout"
+        "ex_make_layout",
+        "ex_utils"
       ],
-      "snippets": [],
+      "snippets": [
+        "ex_utils/main.cpp#layout_maker_usage"
+      ],
       "api_page": "doc/website/docs/api/utils/layout-maker.mdx",
       "python_equiv": null,
       "example_eligible": true,
@@ -10329,8 +10359,12 @@
       "test_resolves": false,
       "example": null,
       "example_state": "none",
-      "including_examples": [],
-      "snippets": [],
+      "including_examples": [
+        "ex_utils"
+      ],
+      "snippets": [
+        "ex_utils/main.cpp#standard_montage_usage"
+      ],
       "api_page": null,
       "python_equiv": null,
       "example_eligible": true,
@@ -10346,10 +10380,14 @@
       "registry_status": "done",
       "test": "test_standard_montage",
       "test_resolves": true,
-      "example": null,
-      "example_state": "none",
-      "including_examples": [],
-      "snippets": [],
+      "example": "ex_utils",
+      "example_state": "built",
+      "including_examples": [
+        "ex_utils"
+      ],
+      "snippets": [
+        "ex_utils/main.cpp#standard_montage_usage"
+      ],
       "api_page": "doc/website/docs/api/utils/standard-montage.mdx",
       "python_equiv": "mne.channels.make_standard_montage",
       "example_eligible": true,
@@ -10403,10 +10441,14 @@
       "registry_status": "documented",
       "test": null,
       "test_resolves": false,
-      "example": null,
-      "example_state": "none",
-      "including_examples": [],
-      "snippets": [],
+      "example": "ex_utils",
+      "example_state": "built",
+      "including_examples": [
+        "ex_utils"
+      ],
+      "snippets": [
+        "ex_utils/main.cpp#fastrak_parser_usage"
+      ],
       "api_page": "doc/website/docs/api/utils/fastrak-parser.mdx",
       "python_equiv": null,
       "example_eligible": true,
@@ -10424,8 +10466,12 @@
       "test_resolves": false,
       "example": null,
       "example_state": "none",
-      "including_examples": [],
-      "snippets": [],
+      "including_examples": [
+        "ex_utils"
+      ],
+      "snippets": [
+        "ex_utils/main.cpp#fastrak_parser_usage"
+      ],
       "api_page": null,
       "python_equiv": null,
       "example_eligible": true,
@@ -10574,10 +10620,14 @@
       "registry_status": "done",
       "test": "test_report",
       "test_resolves": true,
-      "example": null,
-      "example_state": "none",
-      "including_examples": [],
-      "snippets": [],
+      "example": "ex_utils",
+      "example_state": "built",
+      "including_examples": [
+        "ex_utils"
+      ],
+      "snippets": [
+        "ex_utils/main.cpp#report_usage"
+      ],
       "api_page": "doc/website/docs/api/utils/report.mdx",
       "python_equiv": "mne.Report",
       "example_eligible": true,
@@ -10595,8 +10645,12 @@
       "test_resolves": false,
       "example": null,
       "example_state": "none",
-      "including_examples": [],
-      "snippets": [],
+      "including_examples": [
+        "ex_utils"
+      ],
+      "snippets": [
+        "ex_utils/main.cpp#report_usage"
+      ],
       "api_page": null,
       "python_equiv": null,
       "example_eligible": true,
@@ -10612,10 +10666,14 @@
       "registry_status": "documented",
       "test": null,
       "test_resolves": false,
-      "example": null,
-      "example_state": "none",
-      "including_examples": [],
-      "snippets": [],
+      "example": "ex_utils",
+      "example_state": "built",
+      "including_examples": [
+        "ex_utils"
+      ],
+      "snippets": [
+        "ex_utils/main.cpp#selection_io_usage"
+      ],
       "api_page": "doc/website/docs/api/utils/selection-io.mdx",
       "python_equiv": null,
       "example_eligible": true,

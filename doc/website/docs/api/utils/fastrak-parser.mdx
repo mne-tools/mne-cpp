@@ -19,6 +19,15 @@ Streaming parser for Fastrak / FastSCAN ASCII records.
 
 Thread-affine: the caller is responsible for serialising calls. No heap allocations on the hot path other than the internal buffer.
 
+```cpp title="src/examples/ex_utils/main.cpp"
+FastrakParser parser;
+parser.setUnits(FastrakParser::Units::Centimetres);
+parser.append("01   12.50  -3.25   8.00\r\n02  1.0"); // the second record is still incomplete
+FastrakSample sample;
+const bool complete = parser.nextSample(sample);
+const bool pending = parser.nextSample(sample);
+```
+
 ---
 
 ## Public Methods
@@ -96,6 +105,11 @@ Parse one record line (without trailing CR/LF) — exposed for unit tests and fo
 - *bool* — true on success; false on malformed input.
 
 ---
+
+## Example
+
+- Full source: [`src/examples/ex_utils/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_utils/main.cpp)
+- Build target: `ex_utils` (runs under CTest)
 
 ## Authors of this file
 

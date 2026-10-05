@@ -20,6 +20,16 @@ TEMPLATE CIRCULAR BUFFER.
 
 Thread-safe lock-free circular (ring) buffer for producer-consumer data exchange between threads.
 
+```cpp title="src/examples/ex_utils/main.cpp"
+CircularBuffer<double> buffer(4); // single producer, single consumer
+const double block[3] = {1.0, 2.0, 3.0};
+buffer.push(block, 3);
+double first = 0.0;
+double second = 0.0;
+buffer.pop(first);
+buffer.pop(second);
+```
+
 ---
 
 ## Public Methods
@@ -127,6 +137,11 @@ Returns the number of free elements for thread safe reading.
 - *int* — Number of free slots currently available to push into.
 
 ---
+
+## Example
+
+- Full source: [`src/examples/ex_utils/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_utils/main.cpp)
+- Build target: `ex_utils` (runs under CTest)
 
 ## Authors of this file
 

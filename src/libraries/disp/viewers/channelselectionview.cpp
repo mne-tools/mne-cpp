@@ -495,7 +495,7 @@ bool ChannelSelectionView::loadLayout(QString path)
             QVector<float> temp;
             temp.append(channelDig.x());
             temp.append(channelDig.y());
-            temp.append(-channelDig.z());
+            temp.append(channelDig.z());
             inputPoints.append(temp);
 
             names << chName;
@@ -518,8 +518,8 @@ bool ChannelSelectionView::loadLayout(QString path)
                                          width,
                                          height,
                                          false,
-                                         true,
-                                         false)) {
+                                         false,
+                                         true)) {
                 numberTries++;
             } else {
                 numberTries = 11;

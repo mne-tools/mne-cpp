@@ -19,6 +19,16 @@ Processes selection files (mne .sel) files which contain the channels for each s
 
 Reader/writer for [MNE](/docs/api/mne/mne-class) .sel channel-selection files and Brainstorm .mon montage files.
 
+```cpp title="src/examples/ex_utils/main.cpp"
+QMultiMap<QString, QStringList> selections;
+selections.insert("Left-temporal", {"MEG0111", "MEG0112", "MEG0113"});
+selections.insert("Vertex", {"MEG0711"});
+const QString selPath = dir.filePath("groups.sel");
+SelectionIO::writeMNESelFile(selPath, selections);
+QMultiMap<QString, QStringList> reread;
+SelectionIO::readMNESelFile(selPath, reread);
+```
+
 ---
 
 ## Public Methods
@@ -178,6 +188,11 @@ The amount of written files depend on the number of selection groups in selectio
 - *bool* — True if all .mon files were written, false if any file could not be opened for writing.
 
 ---
+
+## Example
+
+- Full source: [`src/examples/ex_utils/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_utils/main.cpp)
+- Build target: `ex_utils` (runs under CTest)
 
 ## Authors of this file
 

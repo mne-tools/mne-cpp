@@ -74,6 +74,8 @@ namespace UTILSLIB
  * IO utility routines for reading/writing Eigen matrices to text files.
  *
  * @brief Eigen matrix I/O utilities.
+ *
+ * @snippet ex_utils/main.cpp ioutils_usage
  */
 class UTILSSHARED_EXPORT IOUtils
 {
