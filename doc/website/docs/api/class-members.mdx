@@ -7,7 +7,7 @@ sidebar_position: 5
 
 # Class Members
 
-Index of 6237 public class members (functions, variables, typedefs, enums) across all documented classes.
+Index of 6241 public class members (functions, variables, typedefs, enums) across all documented classes.
 
 **Jump to:** [A](#a) · [B](#b) · [C](#c) · [D](#d) · [E](#e) · [F](#f) · [G](#g) · [H](#h) · [I](#i) · [J](#j) · [K](#k) · [L](#l) · [M](#m) · [N](#n) · [O](#o) · [P](#p) · [Q](#q) · [R](#r) · [S](#s) · [T](#t) · [U](#u) · [V](#v) · [W](#w) · [X](#x) · [Y](#y) · [Z](#z)
 
@@ -169,7 +169,7 @@ Index of 6237 public class members (functions, variables, typedefs, enums) acros
 - **applyBaselineCorrection** `[fn]` in [FiffEvoked](/docs/api/fiff/fiff-evoked) — Applies baseline correction to the evoked data.
 - **applyBaselineCorrection** `[fn]` in [MNEEpochData](/docs/api/mne/mne-epoch-data) — Applies baseline (mode=mean) correction to the evoked data.
 - **applyBaselineCorrection** `[fn]` in [MNEEpochDataList](/docs/api/mne/mne-epoch-data-list) — Applies baseline correction to the evoked data.
-- **applyCmne** `[fn]` in [InvCMNE](/docs/api/inv/inv-cmne) — Contextual estimate of Eqs. 9-13, as cmne.apply_cmne with normalised weights.
+- **applyCmne** `[fn]` in [InvCMNE](/docs/api/inv/inv-cmne) — Contextual estimate of Eqs.
 - **applyConvFilter** `[fn]` in [FilterKernel](/docs/api/dsp/filter-kernel) — Applies the current filter to the input data using convolution in time domain.
 - **applyDICS** `[fn]` in [InvDICS](/docs/api/inv/inv-dics) — Apply DICS beamformer to time-domain data at a single frequency.
 - **applyDICSCsd** `[fn]` in [InvDICS](/docs/api/inv/inv-dics) — Apply DICS beamformer to CSD matrices to estimate source power per frequency.
@@ -1038,7 +1038,7 @@ Index of 6237 public class members (functions, variables, typedefs, enums) acros
 - **continuousHPIChecked** `[fn]` in [HpiSettingsView](/docs/api/disp/hpi-settings-view) — Returns whether continuous fitting is checked.
 - **contourStep** `[fn]` in `SensorFieldMapper` — Compute a "nice" iso-contour step given a value range and target number of ticks.
 - **Control3DView** `[fn]` in [Control3DView](/docs/api/disp/control3-d-view) — Default constructor.
-- **controlEstimate** `[fn]` in [InvCMNE](/docs/api/inv/inv-cmne) — Control estimate of the paper (cmne.control_estimate): q_t times the mean of q over the previous lookBack samples, without an LSTM.
+- **controlEstimate** `[fn]` in [InvCMNE](/docs/api/inv/inv-cmne) — Control estimate of the paper (cmne.control_estimate): q_t times the mean of q over the previous `lookBack` samples, without an LSTM.
 - **converged** `[var]` in `InfomaxResult` — Whether the algorithm converged.
 - **convert_ch_pos** `[fn]` in [FiffTag](/docs/api/fiff/fiff-tag) — Convert coil position descriptor.
 - **convert_matrix_from_file_data** `[fn]` in [FiffTag](/docs/api/fiff/fiff-tag) — Machine dependent data type conversions (tag info only).
@@ -3177,6 +3177,7 @@ Index of 6237 public class members (functions, variables, typedefs, enums) acros
 - **MeshFactory** `[fn]` in `MeshFactory`
 - **message** `[var]` in `MnaVerificationResult` — Formatted message: "PASS: ..." or "FAIL [error]: ...".
 - **metaChanged** `[signal]` in [ChannelDataModel](/docs/api/disp/channel-data-model) — Emitted when channel metadata (scale, colour, bad-flag) changes.
+- **metadata** `[fn]` in [MlOnnxModel](/docs/api/ml/ml-onnx-model)
 - **MetaData** `[fn]` in `MetaData`
 - **method** `[var]` in `InvCMNESettings` — 0=MNE, 1=dSPM (default), 2=sLORETA.
 - **method** `[var]` in [InvSourceEstimate](/docs/api/inv/inv-source-estimate) — The inverse method that produced this estimate.
@@ -5507,14 +5508,15 @@ Index of 6237 public class members (functions, variables, typedefs, enums) acros
 - **stc** `[var]` in `InvGammaMapResult`
 - **stc** `[var]` in `InvMxneResult`
 - **stc** `[var]` in `InvTfMxneResult` — Sparse source estimate (time domain).
-- **stcCmne** `[var]` in `InvCMNEResult` — CMNE-corrected estimate.
+- **stcCmne** `[var]` in `InvCMNEResult` — Contextual estimate b_t (Eqs.
 - **stcDspm** `[var]` in `InvCMNEResult` — Uncorrected dSPM estimate.
 - **stcLh** `[fn]` in `StcLoadingWorker` — Get the loaded left hemisphere source estimate.
 - **stcLoadingProgress** `[signal]` in `BrainView` — Emitted to report STC loading progress.
 - **StcLoadingWorker** `[fn]` in `StcLoadingWorker` — Constructor.
-- **stcLstmPredict** `[var]` in `InvCMNEResult` — Raw LSTM prediction (diagnostics).
+- **stcLstmPredict** `[var]` in `InvCMNEResult` — Raw LSTM prediction (q_t for the first k samples).
 - **stcNumTimePoints** `[slot]` in `BrainView` — Get the number of time points in the loaded source estimate.
 - **stcRh** `[fn]` in `StcLoadingWorker` — Get the loaded right hemisphere source estimate.
+- **stcSensing** `[var]` in `InvCMNEResult` — Rectified, z-scored dSPM q_t (Eq.
 - **stcStep** `[slot]` in `BrainView` — Get the time step of the loaded source estimate.
 - **stcStepAccum** `[var]` in `SubView`
 - **stcTmin** `[slot]` in `BrainView` — Get the start time of the loaded source estimate.
@@ -6323,7 +6325,7 @@ Index of 6237 public class members (functions, variables, typedefs, enums) acros
 - **zScoreMode** `[fn]` in [ChannelDataView](/docs/api/disp/channel-data-view)
 - **zScoreMode** `[fn]` in [ChannelRhiView](/docs/api/disp/channel-rhi-view)
 - **zScoreModeToggled** `[signal]` in [ChannelDataView](/docs/api/disp/channel-data-view)
-- **zScoreRectify** `[fn]` in [InvCMNE](/docs/api/inv/inv-cmne) — Rectify and z-score each source over time (Eq. 9).
+- **zScoreRectify** `[fn]` in [InvCMNE](/docs/api/inv/inv-cmne) — Rectify and z-score each source over time (Eq.
 - **zScores** `[var]` in `BadChannelsMaxwellResult` — Per-channel z-scores of residuals.
 - **zsize** `[var]` in [MNEVolGeom](/docs/api/mne/mne-vol-geom) — Voxel size in each direction (mm).
 - **zsize** `[var]` in [MriVolData](/docs/api/mri/mri-vol-data) — Voxel spacing in Z direction (mm).

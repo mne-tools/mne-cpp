@@ -55,7 +55,9 @@ Compute CMNE inverse solution.
 
 ### applyCmne(matDspmData, onnxModelPath, sensing, prediction, cmne)
 
-Contextual estimate of Eqs. 9-13, as cmne.apply_cmne with normalised weights.
+Contextual estimate of Eqs.
+
+9-13, as cmne.apply_cmne with normalised weights.
 
 The model must be exported by cmne.export_onnx: look-back, source count and rectification are read from its `cmne_config` metadata.
 
@@ -102,7 +104,9 @@ Control estimate of the paper (cmne.control_estimate): q_t times the mean of q o
 
 ### zScoreRectify(matStcData)
 
-Rectify and z-score each source over time (Eq. 9).
+Rectify and z-score each source over time (Eq.
+
+9).
 
 **Parameters:**
 

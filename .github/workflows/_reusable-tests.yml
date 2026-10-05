@@ -274,6 +274,25 @@ jobs:
               --test-output-size-passed 262144 `
               --timeout 1800
 
+    # QTest's own log does not reach CTest on Windows; rerun failures logging to a file.
+    - name: Show QTest log of failed tests (Windows)
+      if: failure() && matrix.os == 'windows-2025-vs2026'
+      env:
+        QT_QPA_PLATFORM: offscreen
+        MNE_DATA: ~/mne_data
+        MNE_REQUIRE_PYTHON: 'true'
+      run: |
+        $failed = Get-Content build/Testing/Temporary/LastTestsFailed.log -ErrorAction SilentlyContinue
+        foreach ($line in $failed) {
+          $name = ($line -split ':', 2)[1]
+          $exe = "out/Release/bin/$name.exe"
+          if (-not (Test-Path $exe)) { continue }
+          & $exe -o "$name.log,txt" | Out-Null
+          Write-Output "::group::$name"
+          Get-Content "$name.log" | Select-String -NotMatch '^(QINFO|QDEBUG|Coordinate transformation)'
+          Write-Output "::endgroup::"
+        }
+
     # Every not-run test and every QSKIP must carry a reason (gate G1).
     - name: Summarize test run
       if: always() && hashFiles('build/test-results.xml') != ''
