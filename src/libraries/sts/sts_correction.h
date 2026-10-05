@@ -54,6 +54,8 @@ namespace STSLIB
  * Multiple comparison correction methods.
  *
  * @brief Bonferroni, Holm-Bonferroni and Benjamini-Hochberg FDR adjustments for mass-univariate p-value maps.
+ *
+ * @snippet ex_sts_statistics/main.cpp stats_mc_correction_usage
  */
 class STSSHARED_EXPORT StatsMcCorrection
 {

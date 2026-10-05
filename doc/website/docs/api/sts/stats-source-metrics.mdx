@@ -21,6 +21,17 @@ Provides peak localization error (PE) and spatial dispersion (SD) as defined in 
 
 Peak localisation error and spatial dispersion metrics for evaluating distributed M/EEG inverse solutions.
 
+```cpp title="src/examples/ex_sts_statistics/main.cpp"
+VectorXd amplitudes(4);
+amplitudes << 0.1, 2.0, 0.5, -0.4;
+MatrixXd positions(4, 3); // metres
+positions << 0.00, 0.00, 0.00, 0.01, 0.00, 0.00, 0.02, 0.00, 0.00, 0.01, 0.01, 0.00;
+const int peak = StatsSourceMetrics::findPeakIndex(amplitudes);
+const double localizationError = StatsSourceMetrics::peakLocalizationError(Vector3d(0.01, 0.0, 0.003),
+                                                                           positions.row(peak).transpose());
+const double dispersion = StatsSourceMetrics::spatialDispersion(amplitudes, positions, peak);
+```
+
 ---
 
 ## Static Methods
@@ -80,6 +91,11 @@ Find the index of the source with maximum absolute amplitude.
 - *int* — Index of the peak source.
 
 ---
+
+## Example
+
+- Full source: [`src/examples/ex_sts_statistics/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_sts_statistics/main.cpp)
+- Build target: `ex_sts_statistics` (runs under CTest)
 
 ## Authors of this file
 

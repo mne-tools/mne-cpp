@@ -19,6 +19,10 @@ Provides F-test / one-way ANOVA implementation.
 
 One-way ANOVA F-test with exact p-values via the regularised incomplete beta function.
 
+```cpp title="src/examples/ex_sts_statistics/main.cpp"
+const StatsFtestResult anova = StatsFtest::oneWay({a, b, c}); // one-way ANOVA per column
+```
+
 ---
 
 ## Static Methods
@@ -58,6 +62,11 @@ Compute the CDF of the F-distribution using the regularized incomplete beta func
 - *double* — The probability P(F &lt;= f).
 
 ---
+
+## Example
+
+- Full source: [`src/examples/ex_sts_statistics/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_sts_statistics/main.cpp)
+- Build target: `ex_sts_statistics` (runs under CTest)
 
 ## Authors of this file
 

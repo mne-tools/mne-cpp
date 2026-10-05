@@ -19,6 +19,13 @@ Provides t-test implementations: one-sample, paired, and independent two-sample.
 
 One-sample, paired and independent two-sample Student t-tests with exact p-values via the regularised incomplete beta function.
 
+```cpp title="src/examples/ex_sts_statistics/main.cpp"
+const StatsTtestResult oneSample = StatsTtest::oneSample(a);        // H0: column mean = 0
+const StatsTtestResult paired = StatsTtest::paired(a, b);           // H0: mean(a - b) = 0
+const StatsTtestResult independent = StatsTtest::independent(a, b); // pooled variance, df = 10
+const StatsTtestResult rightTail = StatsTtest::oneSample(a, 0.0, StatsTailType::Right);
+```
+
 ---
 
 ## Static Methods
@@ -130,6 +137,11 @@ Public because it is also used by [`StatsFtest`](/docs/api/sts/stats-ftest).
 - *double* — I_x(a, b) in [0, 1]; 0 for x at or below 0 and 1 for x at or above 1.
 
 ---
+
+## Example
+
+- Full source: [`src/examples/ex_sts_statistics/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_sts_statistics/main.cpp)
+- Build target: `ex_sts_statistics` (runs under CTest)
 
 ## Authors of this file
 

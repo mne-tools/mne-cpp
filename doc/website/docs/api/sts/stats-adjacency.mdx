@@ -23,6 +23,14 @@ Adjacency matrix construction for spatial clustering.
 
 Builds the sparse spatial and spatio-temporal neighbourhood graphs that define cluster support for permutation tests.
 
+```cpp title="src/examples/ex_sts_statistics/main.cpp"
+// Two triangles sharing the edge 1-2 form a 4-vertex mesh
+MatrixX3i tris(2, 3);
+tris << 0, 1, 2, 1, 2, 3;
+const SparseMatrix<int> spatial = StatsAdjacency::fromSourceSpace(tris, 4);
+const SparseMatrix<int> spatioTemporal = StatsAdjacency::fromSourceSpaceTemporal(tris, 4, 5); // index = vertex * 5 + time
+```
+
 ---
 
 ## Static Methods
@@ -87,6 +95,11 @@ Constructs a (nVertices*nTimes) x (nVertices*nTimes) adjacency matrix where spat
 - *Eigen::SparseMatrix&lt; int &gt;* — Sparse adjacency matrix (symmetric, nVertices*nTimes x nVertices*nTimes).
 
 ---
+
+## Example
+
+- Full source: [`src/examples/ex_sts_statistics/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_sts_statistics/main.cpp)
+- Build target: `ex_sts_statistics` (runs under CTest)
 
 ## Authors of this file
 

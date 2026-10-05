@@ -71,6 +71,8 @@ struct STSSHARED_EXPORT StatsTtestResult
  * Provides t-test implementations: one-sample, paired, and independent two-sample.
  *
  * @brief One-sample, paired and independent two-sample Student t-tests with exact p-values via the regularised incomplete beta function.
+ *
+ * @snippet ex_sts_statistics/main.cpp stats_ttest_usage
  */
 class STSSHARED_EXPORT StatsTtest
 {

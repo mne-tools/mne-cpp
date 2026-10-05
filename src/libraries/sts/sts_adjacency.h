@@ -69,6 +69,8 @@ namespace STSLIB
  * Adjacency matrix construction for spatial clustering.
  *
  * @brief Builds the sparse spatial and spatio-temporal neighbourhood graphs that define cluster support for permutation tests.
+ *
+ * @snippet ex_sts_statistics/main.cpp stats_adjacency_usage
  */
 class STSSHARED_EXPORT StatsAdjacency
 {

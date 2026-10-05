@@ -25,6 +25,17 @@ Provides multiple regularised covariance estimation methods matching MNE-Python'
 
 Regularised covariance estimators (Ledoit-Wolf, OAS, fixed-diagonal, PCA, Factor Analysis, cross-validated auto-select) matching the MNE-Python compute_covariance() API.
 
+```cpp title="src/examples/ex_sts_statistics/main.cpp"
+MatrixXd data(3, 8); // channels x samples
+data << 0.5, -1.2, 0.3, 0.8, -0.4, 1.1, -0.9, 0.2,
+    0.4, -1.0, 0.1, 0.9, -0.2, 0.8, -1.1, 0.3,
+    -0.3, 0.2, 0.7, -0.5, 0.4, -0.1, 0.1, 0.6;
+data = data.colwise() - data.rowwise().mean(); // the estimators expect zero-mean data
+const auto [covLw, shrinkLw] = StsCovEstimators::ledoitWolf(data);
+const auto [covOas, shrinkOas] = StsCovEstimators::oas(data);
+const auto [covBest, method] = StsCovEstimators::autoSelect(data); // cross-validated choice
+```
+
 ---
 
 ## Static Methods
@@ -169,6 +180,11 @@ Computes: -0.5 * (p * log(2π) + log|Σ| + trace(Σ^\{-1\} * S_test)) where S_te
 - *double* — Average log-likelihood per sample.
 
 ---
+
+## Example
+
+- Full source: [`src/examples/ex_sts_statistics/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_sts_statistics/main.cpp)
+- Build target: `ex_sts_statistics` (runs under CTest)
 
 ## Authors of this file
 

@@ -75,6 +75,8 @@ struct STSSHARED_EXPORT StatsFtestResult
  * Provides F-test / one-way ANOVA implementation.
  *
  * @brief One-way ANOVA F-test with exact p-values via the regularised incomplete beta function.
+ *
+ * @snippet ex_sts_statistics/main.cpp stats_ftest_usage
  */
 class STSSHARED_EXPORT StatsFtest
 {

@@ -19,6 +19,14 @@ Multiple comparison correction methods.
 
 Bonferroni, Holm-Bonferroni and Benjamini-Hochberg FDR adjustments for mass-univariate p-value maps.
 
+```cpp title="src/examples/ex_sts_statistics/main.cpp"
+MatrixXd pValues(1, 8);
+pValues << 0.001, 0.008, 0.039, 0.041, 0.042, 0.06, 0.074, 0.205;
+const MatrixXd pBonferroni = StatsMcCorrection::bonferroni(pValues);
+const MatrixXd pHolm = StatsMcCorrection::holmBonferroni(pValues);
+const MatrixXd pFdr = StatsMcCorrection::fdr(pValues); // Benjamini-Hochberg adjusted p-values
+```
+
 ---
 
 ## Static Methods
@@ -70,6 +78,11 @@ False Discovery Rate (Benjamini-Hochberg) correction.
 - *Eigen::MatrixXd* — Corrected p-values (same shape as input).
 
 ---
+
+## Example
+
+- Full source: [`src/examples/ex_sts_statistics/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_sts_statistics/main.cpp)
+- Build target: `ex_sts_statistics` (runs under CTest)
 
 ## Authors of this file
 

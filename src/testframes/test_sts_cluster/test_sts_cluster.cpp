@@ -33,6 +33,9 @@
 #include <QtTest>
 #include <QObject>
 
+#include <algorithm>
+#include <cmath>
+
 //=============================================================================================================
 // USED NAMESPACES
 //=============================================================================================================
@@ -75,6 +78,7 @@ private slots:
     void testClusterPermutationBasic();
     void testClusterPermutationNullDistribution();
     void testClusterPermutationStrongEffect();
+    void testClusterPvalueFloorOneSampleAndFtest();
 
     void cleanupTestCase();
 
@@ -333,6 +337,11 @@ void TestStsCluster::testClusterPermutationBasic()
     QCOMPARE(static_cast<int>(result.matTObs.rows()), nSpace);
     // Cluster threshold should be set
     QVERIFY(result.clusterThreshold > 0);
+    // The shift of 3 is never exceeded by a permutation; p is still >= 1/(100+1) as in mne-python
+    QVERIFY(!result.vecClusterPvals.isEmpty());
+    for (double p : result.vecClusterPvals) {
+        QVERIFY2(p >= 1.0 / 101.0 && p <= 1.0, qPrintable(QString::number(p)));
+    }
 }
 
 //=============================================================================================================
@@ -398,6 +407,32 @@ void TestStsCluster::testClusterPermutationStrongEffect()
         }
     }
     QVERIFY(foundSignificant);
+}
+
+//=============================================================================================================
+
+void TestStsCluster::testClusterPvalueFloorOneSampleAndFtest()
+{
+    // An effect no permutation reaches: p must be exactly 1/(nPerm+1), as in mne-python
+    const int nSpace = 6;
+    QVector<MatrixXd> shifted, zero;
+    for (int s = 0; s < 10; ++s) {
+        MatrixXd x(nSpace, 1);
+        for (int j = 0; j < nSpace; ++j) {
+            x(j, 0) = 0.1 * std::sin(1.7 * s + j) + (j >= 2 && j <= 3 ? 5.0 : 0.0);
+        }
+        shifted.append(x);
+        zero.append(MatrixXd::Constant(nSpace, 1, 0.1 * std::cos(0.9 * s)));
+    }
+    const SparseMatrix<int> adj = createChainAdjacency(nSpace);
+
+    const StatsClusterResult oneSample = StatsCluster::oneSamplePermutationTest(shifted, adj, 3.0, 99, StatsTailType::Both);
+    const StatsClusterResult fTest = StatsCluster::fTestPermutationTest({shifted, zero}, adj, 10.0, 99);
+    for (const StatsClusterResult* result : {&oneSample, &fTest}) {
+        QVERIFY(!result->vecClusterPvals.isEmpty());
+        const double pMin = *std::min_element(result->vecClusterPvals.begin(), result->vecClusterPvals.end());
+        QCOMPARE(pMin, 1.0 / 100.0);
+    }
 }
 
 //=============================================================================================================

@@ -16,7 +16,7 @@
     "Settings": "Plain parameter record consumed by an algorithm class; shown inside that class's example."
   },
   "example_debt": {
-    "ceiling": 269,
+    "ceiling": 262,
     "names": [
       "AbstractFormatReader",
       "AcquiredPoints",
@@ -269,14 +269,7 @@
       "Sphere",
       "Spline",
       "StandardMontage",
-      "StatsAdjacency",
-      "StatsCluster",
-      "StatsFtest",
-      "StatsMcCorrection",
-      "StatsSourceMetrics",
-      "StatsTtest",
       "StimArtifact",
-      "StsCovEstimators",
       "Subject",
       "SurfaceLaplacian",
       "TFplot",

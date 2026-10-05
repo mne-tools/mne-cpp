@@ -6760,7 +6760,10 @@
       },
       "registry_classes": [
         "StatsAdjacency",
-        "StatsCluster"
+        "StatsCluster",
+        "StatsFtest",
+        "StatsMcCorrection",
+        "StatsTtest"
       ]
     },
     {

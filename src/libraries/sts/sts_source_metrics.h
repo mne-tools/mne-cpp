@@ -61,6 +61,8 @@ namespace STSLIB
  * in Dinh et al. (2021).
  *
  * @brief Peak localisation error and spatial dispersion metrics for evaluating distributed M/EEG inverse solutions.
+ *
+ * @snippet ex_sts_statistics/main.cpp stats_source_metrics_usage
  */
 class STSSHARED_EXPORT StatsSourceMetrics
 {

@@ -24,7 +24,8 @@
  * Rademacher sign flips for the one-sample test, and group-label
  * reassignments for the ANOVA test - with thread-local
  * @c QRandomGenerator instances for reproducibility. Observed cluster
- * p-values are the empirical exceedance probability under that null.
+ * p-values count the observed statistic as one draw from that null, as
+ * MNE-Python does: p = (1 + #exceedances) / (1 + nPermutations).
  *
  * TFCE follows Smith & Nichols (2009): the statistic map is swept by
  * @c nSteps thresholds and each supra-threshold connected component
@@ -122,7 +123,7 @@ StatsClusterResult StatsCluster::permutationTest(
                 count++;
             }
         }
-        clusterPvals[c] = static_cast<double>(count) / static_cast<double>(nPermutations);
+        clusterPvals[c] = static_cast<double>(count + 1) / static_cast<double>(nPermutations + 1);
     }
 
     StatsClusterResult result;
@@ -620,7 +621,7 @@ StatsClusterResult StatsCluster::oneSamplePermutationTest(
                 count++;
             }
         }
-        clusterPvals[c] = static_cast<double>(count) / static_cast<double>(nPermutations);
+        clusterPvals[c] = static_cast<double>(count + 1) / static_cast<double>(nPermutations + 1);
     }
 
     StatsClusterResult result;
@@ -683,7 +684,7 @@ StatsClusterResult StatsCluster::fTestPermutationTest(
                 count++;
             }
         }
-        clusterPvals[c] = static_cast<double>(count) / static_cast<double>(nPermutations);
+        clusterPvals[c] = static_cast<double>(count + 1) / static_cast<double>(nPermutations + 1);
     }
 
     StatsClusterResult result;

@@ -83,6 +83,8 @@ struct STSSHARED_EXPORT StatsClusterResult
  * Cluster-based permutation test for comparing two conditions.
  *
  * @brief Maris-Oostenveld cluster-mass permutation tests and Threshold-Free Cluster Enhancement on (channel,time) or (vertex,time) statistic maps.
+ *
+ * @snippet ex_sts_statistics/main.cpp stats_cluster_usage
  */
 class STSSHARED_EXPORT StatsCluster
 {

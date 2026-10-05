@@ -23,6 +23,28 @@ Cluster-based permutation test for comparing two conditions.
 
 Maris-Oostenveld cluster-mass permutation tests and Threshold-Free Cluster Enhancement on (channel,time) or (vertex,time) statistic maps.
 
+```cpp title="src/examples/ex_sts_statistics/main.cpp"
+// 12 subjects, 8 channels on a line, 1 time point; channels 2-4 carry an effect in condition B
+SparseMatrix<int> chain(8, 8);
+for (int i = 0; i + 1 < 8; ++i) {
+    chain.insert(i, i + 1) = 1;
+    chain.insert(i + 1, i) = 1;
+}
+QVector<MatrixXd> condA, condB;
+for (int s = 0; s < 12; ++s) {
+    MatrixXd noiseA(8, 1), noiseB(8, 1);
+    for (int ch = 0; ch < 8; ++ch) {
+        noiseA(ch, 0) = std::sin(1.3 * s + 0.7 * ch);
+        noiseB(ch, 0) = std::cos(0.9 * s + 1.1 * ch) + ((ch >= 2 && ch <= 4) ? 3.0 : 0.0);
+    }
+    condA.append(noiseA);
+    condB.append(noiseB);
+}
+const StatsClusterResult clusters = StatsCluster::permutationTest(condA, condB, chain, 500);
+// Cluster ids are negative where A < B; |id| - 1 indexes vecClusterStats and vecClusterPvals
+const int effectCluster = clusters.matClusterIds(3, 0);
+```
+
 ---
 
 ## Static Methods
@@ -143,6 +165,11 @@ Enhances a statistic map by integrating cluster extent and height over a range o
 - *Eigen::MatrixXd* — TFCE-enhanced score map (nVertices x nTimes).
 
 ---
+
+## Example
+
+- Full source: [`src/examples/ex_sts_statistics/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_sts_statistics/main.cpp)
+- Build target: `ex_sts_statistics` (runs under CTest)
 
 ## Authors of this file
 

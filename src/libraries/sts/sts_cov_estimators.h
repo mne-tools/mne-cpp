@@ -75,6 +75,8 @@ namespace STSLIB
  * (n_channels x n_samples) and returns a pair of (covariance, parameter).
  *
  * @brief Regularised covariance estimators (Ledoit-Wolf, OAS, fixed-diagonal, PCA, Factor Analysis, cross-validated auto-select) matching the MNE-Python compute_covariance() API.
+ *
+ * @snippet ex_sts_statistics/main.cpp sts_cov_estimators_usage
  */
 class STSSHARED_EXPORT StsCovEstimators
 {

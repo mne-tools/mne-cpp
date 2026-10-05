@@ -1714,7 +1714,11 @@
       "mne_python": "mne.cov (compute_covariance methods)",
       "sklearn": "sklearn.covariance.LedoitWolf, OAS, ShrunkCovariance; sklearn.decomposition.PCA, FactorAnalysis; sklearn.model_selection.cross_val_score",
       "test": "test_sts_cov_estimators",
-      "example": null,
+      "example": "ex_sts_statistics",
+      "example_snippet": [
+        "ex_sts_statistics/main.cpp#sts_cov_estimators_usage"
+      ],
+      "example_mode": "run",
       "status": "done",
       "skigen_candidate": true,
       "skigen_target": "Skigen::Covariance (new module needed)",
@@ -1734,7 +1738,11 @@
       "mne_python": "mne.stats.permutation_cluster_test",
       "sklearn": "sklearn.feature_extraction.grid_to_graph (adjacency only)",
       "test": "test_sts_cluster",
-      "example": null,
+      "example": "ex_sts_statistics",
+      "example_snippet": [
+        "ex_sts_statistics/main.cpp#stats_cluster_usage"
+      ],
+      "example_mode": "run",
       "status": "done",
       "skigen_candidate": false,
       "notes": "Cluster permutation testing — neuroscience-specific statistical method",
@@ -1753,7 +1761,11 @@
       "mne_python": "mne.stats.combine_adjacency",
       "sklearn": "sklearn.feature_extraction.grid_to_graph",
       "test": "test_sts_cluster",
-      "example": null,
+      "example": "ex_sts_statistics",
+      "example_snippet": [
+        "ex_sts_statistics/main.cpp#stats_adjacency_usage"
+      ],
+      "example_mode": "run",
       "status": "done",
       "skigen_candidate": false,
       "documented": true,
@@ -5779,8 +5791,12 @@
       "mne_c_tool": null,
       "mne_python": null,
       "sklearn": null,
-      "test": null,
-      "example": null,
+      "test": "test_sts_cluster",
+      "example": "ex_sts_statistics",
+      "example_snippet": [
+        "ex_sts_statistics/main.cpp#stats_ftest_usage"
+      ],
+      "example_mode": "run",
       "status": "documented",
       "skigen_candidate": false,
       "documented": true,
@@ -5797,8 +5813,12 @@
       "mne_c_tool": null,
       "mne_python": null,
       "sklearn": null,
-      "test": null,
-      "example": null,
+      "test": "test_sts_cluster",
+      "example": "ex_sts_statistics",
+      "example_snippet": [
+        "ex_sts_statistics/main.cpp#stats_mc_correction_usage"
+      ],
+      "example_mode": "run",
       "status": "documented",
       "skigen_candidate": false,
       "documented": true,
@@ -5816,7 +5836,11 @@
       "mne_python": null,
       "sklearn": null,
       "test": null,
-      "example": null,
+      "example": "ex_sts_statistics",
+      "example_snippet": [
+        "ex_sts_statistics/main.cpp#stats_source_metrics_usage"
+      ],
+      "example_mode": "run",
       "status": "documented",
       "skigen_candidate": false,
       "documented": true,
@@ -5833,8 +5857,12 @@
       "mne_c_tool": null,
       "mne_python": null,
       "sklearn": null,
-      "test": null,
-      "example": null,
+      "test": "test_sts_cluster",
+      "example": "ex_sts_statistics",
+      "example_snippet": [
+        "ex_sts_statistics/main.cpp#stats_ttest_usage"
+      ],
+      "example_mode": "run",
       "status": "documented",
       "skigen_candidate": false,
       "documented": true,
