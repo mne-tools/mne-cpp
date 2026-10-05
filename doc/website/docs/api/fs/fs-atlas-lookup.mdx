@@ -19,6 +19,15 @@ RAS-point → anatomical-region resolver backed by a FreeSurfer volumetric parce
 
 Owns the parcellation voxel grid, its inverse RAS-to-voxel affine, and a label-id → region-name map seeded from FreeSurferColorLUT. Designed for cheap per-point queries: a ``labelAtRas()`` call is an affine transform, three bound checks and an `int` → `QString` hash lookup.
 
+```cpp title="src/examples/ex_fs/main.cpp"
+QTemporaryDir dir;
+const QString atlasPath = dir.filePath("atlas.mgh"); // normally aparc+aseg.mgz
+writeAtlas(atlasPath);
+FsAtlasLookup atlas;
+atlas.load(atlasPath);
+const QStringList regionsAt = atlas.labelsForPositions({Vector3f(-4.0f, -4.0f, -4.0f), Vector3f(2.0f, 0.0f, -2.0f), Vector3f(0.0f, 0.0f, 0.0f)});
+```
+
 ---
 
 ## Public Methods
@@ -83,6 +92,12 @@ Check whether a parcellation volume has been loaded.
 - *bool* — true if loaded.
 
 ---
+
+## Example
+
+- Full source: [`src/examples/ex_fs/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_fs/main.cpp)
+- Build target: `ex_fs` (runs under CTest)
+- Data: [mne-cpp-test-data](https://github.com/mne-tools/mne-cpp-test-data)
 
 ## Authors of this file
 

@@ -19,6 +19,14 @@ FreeSurfer colour lookup table: region name + RGBA + packed label, indexed by en
 
 Backs the colour/structure mapping used by [`FsAnnotation`](/docs/api/fs/fs-annotation) and by any caller that needs to translate a packed ``.annot label into the matching anatomical name and RGBA colour. The container is a thin value object: rows of `table` align with `struct_names`, and the label column matches the per-vertex integer stored in ``.annot files so direct equality lookup is sufficient.
 
+```cpp title="src/examples/ex_fs/main.cpp"
+FsAnnotation aparc("sample", 0, "aparc", subjectsDir);
+FsColortable& colors = aparc.getColortable();
+QList<FsLabel> regions;
+QList<RowVector4i> regionColors;
+aparc.toLabels(white, regions, regionColors);
+```
+
 ---
 
 ## Public Methods
@@ -64,6 +72,12 @@ RGBAs encoded in the colortable.
 - *Eigen::MatrixX4i* — RGBAs.
 
 ---
+
+## Example
+
+- Full source: [`src/examples/ex_fs/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_fs/main.cpp)
+- Build target: `ex_fs` (runs under CTest)
+- Data: [mne-cpp-test-data](https://github.com/mne-tools/mne-cpp-test-data)
 
 ## Authors of this file
 

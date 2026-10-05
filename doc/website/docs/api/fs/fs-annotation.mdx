@@ -23,6 +23,14 @@ Single-hemisphere FreeSurfer parcellation: vertex → region label plus embedded
 
 Holds the parsed contents of one ``.annot file: the dense per-vertex label assignment, the explicit vertex index list it was authored against, and the [`[FsColortable](/docs/api/fs/fs-colortable)`](/docs/api/fs/fs-colortable) describing the colour and name of every region. Indexing is aligned with the matching [`[FsSurface](/docs/api/fs/fs-surface)`](/docs/api/fs/fs-surface) for the same subject + hemisphere, so `label`[v] is the region of surface vertex `v`.
 
+```cpp title="src/examples/ex_fs/main.cpp"
+FsAnnotation aparc("sample", 0, "aparc", subjectsDir);
+FsColortable& colors = aparc.getColortable();
+QList<FsLabel> regions;
+QList<RowVector4i> regionColors;
+aparc.toLabels(white, regions, regionColors);
+```
+
 ---
 
 ## Public Methods
@@ -289,6 +297,12 @@ Reads an annotation of a file.
 - *bool* — true if successful, false otherwise.
 
 ---
+
+## Example
+
+- Full source: [`src/examples/ex_fs/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_fs/main.cpp)
+- Build target: `ex_fs` (runs under CTest)
+- Data: [mne-cpp-test-data](https://github.com/mne-tools/mne-cpp-test-data)
 
 ## Authors of this file
 

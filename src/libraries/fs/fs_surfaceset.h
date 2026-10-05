@@ -61,6 +61,8 @@ namespace FSLIB
  * are loaded with the same @c surf name (e.g. @c pial), so the set is
  * homogeneous across hemispheres and stays aligned with a paired
  * @ref FsAnnotationSet sharing the same vertex indexing.
+ *
+ * @snippet ex_fs/main.cpp fs_surface_set_read
  */
 class FSSHARED_EXPORT FsSurfaceSet
 {

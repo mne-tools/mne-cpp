@@ -1889,7 +1889,14 @@
       "mne_python": "mne.read_annot",
       "sklearn": null,
       "test": "test_fs_annotation_labels",
-      "example": null,
+      "example": "ex_fs",
+      "example_snippet": [
+        "ex_fs/main.cpp#fs_annotation_read"
+      ],
+      "example_mode": "run",
+      "required_data": [
+        "mne-cpp-test-data"
+      ],
       "status": "done",
       "skigen_candidate": false,
       "documented": true,
@@ -1907,7 +1914,14 @@
       "mne_python": "mne.read_label",
       "sklearn": null,
       "test": "test_fs_annotation_labels",
-      "example": null,
+      "example": "ex_fs",
+      "example_snippet": [
+        "ex_fs/main.cpp#fs_label_read"
+      ],
+      "example_mode": "run",
+      "required_data": [
+        "mne-cpp-test-data"
+      ],
       "status": "done",
       "skigen_candidate": false,
       "documented": true,
@@ -1925,7 +1939,14 @@
       "mne_python": "mne.grow_labels / mne.split_label / mne.stc_to_label",
       "sklearn": null,
       "test": "test_label_utils",
-      "example": null,
+      "example": "ex_fs",
+      "example_snippet": [
+        "ex_fs/main.cpp#fs_label_utils_usage"
+      ],
+      "example_mode": "run",
+      "required_data": [
+        "mne-cpp-test-data"
+      ],
       "status": "done",
       "skigen_candidate": false,
       "documented": true,
@@ -4414,7 +4435,14 @@
       "mne_python": null,
       "sklearn": null,
       "test": null,
-      "example": null,
+      "example": "ex_fs",
+      "example_snippet": [
+        "ex_fs/main.cpp#fs_annotation_set_read"
+      ],
+      "example_mode": "run",
+      "required_data": [
+        "mne-cpp-test-data"
+      ],
       "status": "documented",
       "skigen_candidate": false,
       "documented": true,
@@ -4432,7 +4460,14 @@
       "mne_python": null,
       "sklearn": null,
       "test": null,
-      "example": null,
+      "example": "ex_fs",
+      "example_snippet": [
+        "ex_fs/main.cpp#fs_atlas_lookup_usage"
+      ],
+      "example_mode": "run",
+      "required_data": [
+        "mne-cpp-test-data"
+      ],
       "status": "documented",
       "skigen_candidate": false,
       "documented": true,
@@ -4450,7 +4485,14 @@
       "mne_python": null,
       "sklearn": null,
       "test": null,
-      "example": null,
+      "example": "ex_fs",
+      "example_snippet": [
+        "ex_fs/main.cpp#fs_annotation_read"
+      ],
+      "example_mode": "run",
+      "required_data": [
+        "mne-cpp-test-data"
+      ],
       "status": "documented",
       "skigen_candidate": false,
       "documented": true,
@@ -4468,7 +4510,14 @@
       "mne_python": null,
       "sklearn": null,
       "test": null,
-      "example": null,
+      "example": "ex_fs",
+      "example_snippet": [
+        "ex_fs/main.cpp#fs_surface_set_read"
+      ],
+      "example_mode": "run",
+      "required_data": [
+        "mne-cpp-test-data"
+      ],
       "status": "documented",
       "skigen_candidate": false,
       "documented": true,

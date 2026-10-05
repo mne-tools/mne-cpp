@@ -19,6 +19,10 @@ Container holding the lh and/or rh [`FsAnnotation`](/docs/api/fs/fs-annotation) 
 
 Keyed on hemisphere id (0 = lh, 1 = rh). When loaded from a single atlas name both hemispheres share the same colortable layout, so cross-hemisphere region lookup is consistent. The set is intended to be aligned one-to-one with an [`FsSurfaceSet`](/docs/api/fs/fs-surface-set) sharing the same subject and vertex count per hemisphere.
 
+```cpp title="src/examples/ex_fs/main.cpp"
+FsAnnotationSet parcellation("sample", 2, "aparc", subjectsDir);
+```
+
 ---
 
 ## Public Methods
@@ -255,6 +259,12 @@ Reads different annotation files and assembles them to a [`FsAnnotationSet`](/do
 - *bool* — true if succesfull, false otherwise.
 
 ---
+
+## Example
+
+- Full source: [`src/examples/ex_fs/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_fs/main.cpp)
+- Build target: `ex_fs` (runs under CTest)
+- Data: [mne-cpp-test-data](https://github.com/mne-tools/mne-cpp-test-data)
 
 ## Authors of this file
 

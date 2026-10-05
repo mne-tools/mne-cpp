@@ -64,6 +64,8 @@ namespace FSLIB
  * label-id → region-name map seeded from FreeSurferColorLUT. Designed for
  * cheap per-point queries: a @c labelAtRas() call is an affine
  * transform, three bound checks and an @c int → @c QString hash lookup.
+ *
+ * @snippet ex_fs/main.cpp fs_atlas_lookup_usage
  */
 class FSSHARED_EXPORT FsAtlasLookup
 {

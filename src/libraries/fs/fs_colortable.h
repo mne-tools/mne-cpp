@@ -67,6 +67,8 @@ namespace FSLIB
  * value object: rows of @c table align with @c struct_names, and the
  * label column matches the per-vertex integer stored in @c .annot files
  * so direct equality lookup is sufficient.
+ *
+ * @snippet ex_fs/main.cpp fs_annotation_read
  */
 class FSSHARED_EXPORT FsColortable
 {

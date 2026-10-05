@@ -23,6 +23,11 @@ A FreeSurfer/[MNE](/docs/api/mne/mne-class) surface label: per-vertex indices, T
 
 Wraps the parsed contents of a ``.label file or an in-memory label constructed programmatically (e.g. by thresholding a source estimate via `[FsLabelUtils](/docs/api/fs/fs-label-utils)::stcToLabel`). Vertex indices reference the matching [`[FsSurface](/docs/api/fs/fs-surface)`](/docs/api/fs/fs-surface) for the same subject and hemisphere; positions are the Tk-surface RAS coordinates copied from that surface; values are the per-vertex scalar payload (statistic, time, weight). Hemisphere is encoded with the FreeSurfer convention \{0 = lh, 1 = rh\}.
 
+```cpp title="src/examples/ex_fs/main.cpp"
+FsLabel v1;
+FsLabel::read(subjectsDir + "/sample/label/lh.V1.label", v1);
+```
+
 ---
 
 ## Public Methods
@@ -132,6 +137,12 @@ Reads a [`FsLabel`](/docs/api/fs/fs-label) from a FreeSurfer label file. This is
 - *bool* — true if successful, false otherwise.
 
 ---
+
+## Example
+
+- Full source: [`src/examples/ex_fs/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_fs/main.cpp)
+- Build target: `ex_fs` (runs under CTest)
+- Data: [mne-cpp-test-data](https://github.com/mne-tools/mne-cpp-test-data)
 
 ## Authors of this file
 

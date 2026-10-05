@@ -23,6 +23,11 @@ Stateless utilities that grow, split and convert [`FsLabel`](/docs/api/fs/fs-lab
 
 All operations take an [`FsSurface`](/docs/api/fs/fs-surface) as the topology source and treat its triangle faces as the vertex adjacency graph. The helpers are static because labels carry their own state and the surface is supplied per call, mirroring the function-based API used by MNE-Python.
 
+```cpp title="src/examples/ex_fs/main.cpp"
+const FsLabel grown = FsLabelUtils::growLabel(v1, white, 1); // add the one-ring neighbours
+const QList<FsLabel> parts = FsLabelUtils::splitLabel(v1, white);
+```
+
 ---
 
 ## Static Methods
@@ -139,6 +144,12 @@ Build adjacency list from surface triangle mesh.
 - *QList&lt; QSet&lt; int &gt; &gt;* — Adjacency list: for each vertex, the set of neighbor vertices.
 
 ---
+
+## Example
+
+- Full source: [`src/examples/ex_fs/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_fs/main.cpp)
+- Build target: `ex_fs` (runs under CTest)
+- Data: [mne-cpp-test-data](https://github.com/mne-tools/mne-cpp-test-data)
 
 ## Authors of this file
 

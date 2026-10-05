@@ -19,6 +19,10 @@ Container holding the lh and/or rh [`FsSurface`](/docs/api/fs/fs-surface) for on
 
 The set is keyed on the hemisphere id (0 = lh, 1 = rh) so callers can do `set`[0] / `set`[1] or iterate over `set.data()`. All member surfaces are loaded with the same `surf` name (e.g. `pial`), so the set is homogeneous across hemispheres and stays aligned with a paired [`FsAnnotationSet`](/docs/api/fs/fs-annotation-set) sharing the same vertex indexing.
 
+```cpp title="src/examples/ex_fs/main.cpp"
+FsSurfaceSet both("sample", 2, "white", subjectsDir); // 2 = both hemispheres
+```
+
 ---
 
 ## Public Methods
@@ -241,6 +245,12 @@ Reads different surface files and assembles them to a [`FsSurfaceSet`](/docs/api
 - *bool* — true if succesfull, false otherwise.
 
 ---
+
+## Example
+
+- Full source: [`src/examples/ex_fs/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_fs/main.cpp)
+- Build target: `ex_fs` (runs under CTest)
+- Data: [mne-cpp-test-data](https://github.com/mne-tools/mne-cpp-test-data)
 
 ## Authors of this file
 

@@ -64,6 +64,8 @@ namespace FSLIB
  * its triangle faces as the vertex adjacency graph. The helpers are static
  * because labels carry their own state and the surface is supplied
  * per call, mirroring the function-based API used by MNE-Python.
+ *
+ * @snippet ex_fs/main.cpp fs_label_utils_usage
  */
 class FSSHARED_EXPORT FsLabelUtils
 {

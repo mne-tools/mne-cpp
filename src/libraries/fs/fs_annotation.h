@@ -78,6 +78,8 @@ class FsSurface;
  * and the @ref FsColortable describing the colour and name of every region.
  * Indexing is aligned with the matching @ref FsSurface for the same
  * subject + hemisphere, so @c label[v] is the region of surface vertex @c v.
+ *
+ * @snippet ex_fs/main.cpp fs_annotation_read
  */
 class FSSHARED_EXPORT FsAnnotation
 {

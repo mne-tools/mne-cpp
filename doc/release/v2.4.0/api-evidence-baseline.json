@@ -12,18 +12,18 @@
     "registered_stale": 0,
     "registered_with_test": 101,
     "registered_test_unresolved": 0,
-    "registered_with_example": 94,
+    "registered_with_example": 101,
     "registered_example_not_built": 0,
     "registered_with_python_equiv": 88,
     "registered_without_api_page": 0,
-    "with_snippet": 105,
+    "with_snippet": 112,
     "public_api_units": 478,
     "example_eligible": 383,
     "example_exempt": 95,
-    "eligible_backed_by_registry_example": 94,
-    "eligible_used_by_some_example": 158,
-    "examples_on_disk": 49,
-    "examples_built": 49
+    "eligible_backed_by_registry_example": 101,
+    "eligible_used_by_some_example": 162,
+    "examples_on_disk": 50,
+    "examples_built": 50
   },
   "by_library": {
     "bids": {
@@ -103,9 +103,9 @@
       "registered": 8,
       "with_test": 4,
       "eligible": 8,
-      "eligible_with_registry_example": 1,
-      "eligible_used_by_example": 4,
-      "with_snippet": 0
+      "eligible_with_registry_example": 8,
+      "eligible_used_by_example": 8,
+      "with_snippet": 7
     },
     "fwd": {
       "public": 13,
@@ -6494,10 +6494,14 @@
       "registry_status": "done",
       "test": "test_fs_annotation_labels",
       "test_resolves": true,
-      "example": null,
-      "example_state": "none",
-      "including_examples": [],
-      "snippets": [],
+      "example": "ex_fs",
+      "example_state": "built",
+      "including_examples": [
+        "ex_fs"
+      ],
+      "snippets": [
+        "ex_fs/main.cpp#fs_annotation_read"
+      ],
       "api_page": "doc/website/docs/api/fs/fs-annotation.mdx",
       "python_equiv": "mne.read_annot",
       "example_eligible": true,
@@ -6513,8 +6517,8 @@
       "registry_status": "documented",
       "test": null,
       "test_resolves": false,
-      "example": null,
-      "example_state": "none",
+      "example": "ex_fs",
+      "example_state": "built",
       "including_examples": [
         "ex_clustered_inverse_mne",
         "ex_clustered_inverse_mne_raw",
@@ -6523,6 +6527,7 @@
         "ex_connectivity",
         "ex_connectivity_comparison",
         "ex_disp_3D",
+        "ex_fs",
         "ex_histogram",
         "ex_inverse_mne_raw",
         "ex_inverse_pwl_rap_music",
@@ -6532,7 +6537,9 @@
         "ex_roi_clustered_inverse_pwl_rap_music",
         "ex_st_clustered_inverse_pwl_rap_music"
       ],
-      "snippets": [],
+      "snippets": [
+        "ex_fs/main.cpp#fs_annotation_set_read"
+      ],
       "api_page": "doc/website/docs/api/fs/fs-annotation-set.mdx",
       "python_equiv": null,
       "example_eligible": true,
@@ -6548,10 +6555,14 @@
       "registry_status": "documented",
       "test": null,
       "test_resolves": false,
-      "example": null,
-      "example_state": "none",
-      "including_examples": [],
-      "snippets": [],
+      "example": "ex_fs",
+      "example_state": "built",
+      "including_examples": [
+        "ex_fs"
+      ],
+      "snippets": [
+        "ex_fs/main.cpp#fs_atlas_lookup_usage"
+      ],
       "api_page": "doc/website/docs/api/fs/fs-atlas-lookup.mdx",
       "python_equiv": null,
       "example_eligible": true,
@@ -6567,10 +6578,14 @@
       "registry_status": "documented",
       "test": null,
       "test_resolves": false,
-      "example": null,
-      "example_state": "none",
-      "including_examples": [],
-      "snippets": [],
+      "example": "ex_fs",
+      "example_state": "built",
+      "including_examples": [
+        "ex_fs"
+      ],
+      "snippets": [
+        "ex_fs/main.cpp#fs_annotation_read"
+      ],
       "api_page": "doc/website/docs/api/fs/fs-colortable.mdx",
       "python_equiv": null,
       "example_eligible": true,
@@ -6586,8 +6601,8 @@
       "registry_status": "done",
       "test": "test_fs_annotation_labels",
       "test_resolves": true,
-      "example": null,
-      "example_state": "none",
+      "example": "ex_fs",
+      "example_state": "built",
       "including_examples": [
         "ex_clustered_inverse_mne",
         "ex_clustered_inverse_mne_raw",
@@ -6595,6 +6610,7 @@
         "ex_clustered_inverse_rap_music_raw",
         "ex_connectivity",
         "ex_connectivity_comparison",
+        "ex_fs",
         "ex_histogram",
         "ex_inverse_mne_raw",
         "ex_inverse_pwl_rap_music",
@@ -6602,7 +6618,9 @@
         "ex_roi_clustered_inverse_pwl_rap_music",
         "ex_st_clustered_inverse_pwl_rap_music"
       ],
-      "snippets": [],
+      "snippets": [
+        "ex_fs/main.cpp#fs_label_read"
+      ],
       "api_page": "doc/website/docs/api/fs/fs-label.mdx",
       "python_equiv": "mne.read_label",
       "example_eligible": true,
@@ -6618,10 +6636,14 @@
       "registry_status": "done",
       "test": "test_label_utils",
       "test_resolves": true,
-      "example": null,
-      "example_state": "none",
-      "including_examples": [],
-      "snippets": [],
+      "example": "ex_fs",
+      "example_state": "built",
+      "including_examples": [
+        "ex_fs"
+      ],
+      "snippets": [
+        "ex_fs/main.cpp#fs_label_utils_usage"
+      ],
       "api_page": "doc/website/docs/api/fs/fs-label-utils.mdx",
       "python_equiv": "mne.grow_labels / mne.split_label / mne.stc_to_label",
       "example_eligible": true,
@@ -6644,6 +6666,7 @@
         "ex_clustered_inverse_mne_raw",
         "ex_clustered_inverse_pwl_rap_music_raw",
         "ex_clustered_inverse_rap_music_raw",
+        "ex_fs",
         "ex_histogram",
         "ex_inverse_mne_raw",
         "ex_inverse_pwl_rap_music",
@@ -6666,8 +6689,8 @@
       "registry_status": "documented",
       "test": null,
       "test_resolves": false,
-      "example": null,
-      "example_state": "none",
+      "example": "ex_fs",
+      "example_state": "built",
       "including_examples": [
         "ex_clustered_inverse_mne",
         "ex_clustered_inverse_mne_raw",
@@ -6676,6 +6699,7 @@
         "ex_connectivity",
         "ex_connectivity_comparison",
         "ex_disp_3D",
+        "ex_fs",
         "ex_fs_surface",
         "ex_inverse_mne_raw",
         "ex_inverse_pwl_rap_music",
@@ -6684,7 +6708,9 @@
         "ex_roi_clustered_inverse_pwl_rap_music",
         "ex_st_clustered_inverse_pwl_rap_music"
       ],
-      "snippets": [],
+      "snippets": [
+        "ex_fs/main.cpp#fs_surface_set_read"
+      ],
       "api_page": "doc/website/docs/api/fs/fs-surface-set.mdx",
       "python_equiv": null,
       "example_eligible": true,

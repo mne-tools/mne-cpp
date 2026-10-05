@@ -16,7 +16,7 @@
     "Settings": "Plain parameter record consumed by an algorithm class; shown inside that class's example."
   },
   "example_debt": {
-    "ceiling": 210,
+    "ceiling": 203,
     "names": [
       "AbstractFormatReader",
       "AcquiredPoints",
@@ -66,14 +66,7 @@
       "FilterThreadArg",
       "FineCalibration",
       "FirFilter",
-      "FsAnnotation",
-      "FsAnnotationSet",
-      "FsAtlasLookup",
-      "FsColortable",
-      "FsLabel",
-      "FsLabelUtils",
       "FsSurface",
-      "FsSurfaceSet",
       "Fwd",
       "FwdBemModel",
       "FwdBemSolution",

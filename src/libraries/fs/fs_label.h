@@ -74,6 +74,8 @@ class FsSurface;
  * Tk-surface RAS coordinates copied from that surface; values are the
  * per-vertex scalar payload (statistic, time, weight). Hemisphere is
  * encoded with the FreeSurfer convention {0 = lh, 1 = rh}.
+ *
+ * @snippet ex_fs/main.cpp fs_label_read
  */
 class FSSHARED_EXPORT FsLabel
 {

@@ -70,6 +70,8 @@ class FsSurfaceSet;
  * region lookup is consistent. The set is intended to be aligned
  * one-to-one with an @ref FsSurfaceSet sharing the same subject and vertex
  * count per hemisphere.
+ *
+ * @snippet ex_fs/main.cpp fs_annotation_set_read
  */
 class FSSHARED_EXPORT FsAnnotationSet
 {
