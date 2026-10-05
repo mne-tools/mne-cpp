@@ -152,6 +152,8 @@ struct FIFFSHARED_EXPORT AverageDescription
  * @ref FiffEvoked per @c FIFFB_EVOKED block (one per averaging
  * condition). Conversion utilities pick channels and shift compensation
  * state across the whole set in lock-step.
+ *
+ * @snippet ex_fiff_api/main.cpp fiff_evoked_set_usage
  */
 class FIFFSHARED_EXPORT FiffEvokedSet
 {

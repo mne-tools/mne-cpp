@@ -74,6 +74,8 @@ class FiffRawData;
  * channels the projector acts on. Multiple @ref FiffProj instances form
  * the @c info['projs'] list and are combined into one projection
  * operator by @c make_projector when raw / evoked data is loaded.
+ *
+ * @snippet ex_fiff_api/main.cpp fiff_proj_usage
  */
 class FIFFSHARED_EXPORT FiffProj
 {

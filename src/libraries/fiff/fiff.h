@@ -85,6 +85,8 @@ namespace FIFFLIB
  * @ref FiffEvokedSet / @ref FiffCov / @ref FiffInfo. Prefer the
  * underlying classes for new code; this class exists so Matlab-style
  * ports compile unchanged.
+ *
+ * @snippet ex_fiff_api/main.cpp fiff_facade_usage
  */
 class FIFFSHARED_EXPORT Fiff
 {

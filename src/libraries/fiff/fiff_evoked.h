@@ -70,6 +70,8 @@ namespace FIFFLIB
  * @c last sample indices, @c baseline, @c kind, @c nave, @c comment and
  * the @ref FiffInfo describing the channels. Use @ref FiffEvokedSet for
  * recordings that contain multiple averaging conditions.
+ *
+ * @snippet ex_fiff_api/main.cpp fiff_evoked_set_usage
  */
 class FIFFSHARED_EXPORT FiffEvoked
 {

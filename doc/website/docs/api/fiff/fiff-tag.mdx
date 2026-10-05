@@ -19,6 +19,18 @@ FIFF tag: 16-byte header (kind, type, size, next) plus payload, with typed decod
 
 Holds the four header fields exactly as stored on disk and a `QByteArray` with the raw payload. Decoders convert the payload to the appropriate C++ representation: scalars via `toInt` / `toFloat` / `toDouble`, dense and sparse matrices via `toFloatMatrix` / `toSparseFloatMatrix`, and the structured FIFF records into their class wrappers (`toFiffId`, `toCoordTrans`, `toChInfo`, `toChPos`, `toDigPoint`, ...). Used by [`FiffStream`](/docs/api/fiff/fiff-stream) both for streaming reads and for assembling tags before write_tag.
 
+```cpp title="src/examples/ex_fiff_api/main.cpp"
+QFile structureFile(dir + "/sample_audvis-ave.fif");
+FiffStream::SPtr stream(new FiffStream(&structureFile));
+const bool opened = stream->open();
+const QList<FiffDirNode::SPtr> measNodes = stream->dirtree()->dir_tree_find(FIFFB_MEAS_INFO);
+std::unique_ptr<FiffTag> tag;
+const bool hasNchan = measNodes.first()->find_tag(stream, FIFF_NCHAN, tag); // raw tag access
+const int nchanTag = *tag->toInt();
+const FiffId fileId = stream->id();
+stream->close();
+```
+
 ### Inheritance
 
 ```mermaid
@@ -456,6 +468,12 @@ This corresponds to the old sizeof(fiffTagRec) - sizeof(fiff_data_t *).
 - *qint32* — the byte size of the on-disk tag info header.
 
 ---
+
+## Example
+
+- Full source: [`src/examples/ex_fiff_api/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_fiff_api/main.cpp)
+- Build target: `ex_fiff_api` (runs under CTest)
+- Data: [mne-cpp-test-data](https://github.com/mne-tools/mne-cpp-test-data)
 
 ## Authors of this file
 

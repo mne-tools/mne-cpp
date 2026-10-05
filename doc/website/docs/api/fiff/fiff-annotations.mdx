@@ -23,6 +23,15 @@ Container for `FiffAnnotation` entries with FIFF, JSON and CSV serializers.
 
 Read and written under `FIFFB_MNE_ANNOTATIONS` so the annotation list travels with the FIFF file. The JSON and CSV exporters let the same annotations be consumed by BIDS sidecars and by external scoring tools that do not understand FIFF directly.
 
+```cpp title="src/examples/ex_fiff_api/main.cpp"
+MatrixXi firstThree = events.events.topRows(3);
+FiffAnnotations annotations = annotationsFromEvents(firstThree, info.sfreq, {{1, "auditory/left"}, {2, "auditory/right"}}, raw.first_samp);
+annotations.append({0.5, 1.0, "BAD_blink", {}, {}, {}});
+FiffAnnotations::write(tmp.filePath("annot.csv"), annotations);
+const FiffAnnotations annotationsBack = FiffAnnotations::read(tmp.filePath("annot.csv"));
+const MatrixXi eventsAgain = eventsFromAnnotations(annotationsBack.select("auditory"), info.sfreq, {{"auditory/left", 1}, {"auditory/right", 2}}, raw.first_samp);
+```
+
 ---
 
 ## Public Methods
@@ -334,6 +343,12 @@ Auto-detects format and writes annotations.
 - *bool* — True on success.
 
 ---
+
+## Example
+
+- Full source: [`src/examples/ex_fiff_api/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_fiff_api/main.cpp)
+- Build target: `ex_fiff_api` (runs under CTest)
+- Data: [mne-cpp-test-data](https://github.com/mne-tools/mne-cpp-test-data)
 
 ## Authors of this file
 

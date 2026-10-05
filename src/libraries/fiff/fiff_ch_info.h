@@ -71,6 +71,8 @@ namespace FIFFLIB
  * @ref FiffChPos coil location, @c unit and @c unit_mul. The @c ch_name
  * string lives next to the record because the FIFF stream stores it as a
  * separate @c FIFF_CH_NAME tag in modern files.
+ *
+ * @snippet ex_fiff_api/main.cpp fiff_info_usage
  */
 class FIFFSHARED_EXPORT FiffChInfo
 {

@@ -68,6 +68,8 @@ class FiffCoordTrans;
  * the coregistration GUI and by every downstream tool that needs a single
  * self-contained record describing where a subject's head sat in the
  * helmet for one measurement.
+ *
+ * @snippet ex_fiff_api/main.cpp fiff_digitizer_data_usage
  */
 class FIFFSHARED_EXPORT FiffDigitizerData
 {

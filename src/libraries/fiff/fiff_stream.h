@@ -105,6 +105,8 @@ class FiffDigitizerData;
  * covariance). The on-disk format is the Elekta/Neuromag FIFF
  * specification — files emitted here round-trip through @c mne.io.fiff
  * in MNE-Python without modification.
+ *
+ * @snippet ex_fiff_api/main.cpp fiff_stream_usage
  */
 
 class FIFFSHARED_EXPORT FiffStream : public QDataStream

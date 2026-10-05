@@ -67,6 +67,8 @@ namespace FIFFLIB
  * (values, inner indices, outer pointers) and the (nrow, ncol, nnz)
  * shape, so it can be streamed in and out without conversion. Convert to
  * an @c Eigen::SparseMatrix for arithmetic and back for serialization.
+ *
+ * @snippet ex_fiff_api/main.cpp fiff_sparse_matrix_usage
  */
 class FIFFSHARED_EXPORT FiffSparseMatrix
 {

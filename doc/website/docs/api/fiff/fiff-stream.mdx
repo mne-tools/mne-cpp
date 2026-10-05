@@ -23,6 +23,18 @@ FIFF tag-stream reader/writer: wraps a QIODevice and exposes typed read_* / writ
 
 Reads or writes one `QIODevice`. Builds the FIFF directory and [`FiffDirNode`](/docs/api/fiff/fiff-dir-node) block tree on `open` and exposes typed loaders / emitters for every structured record (id, channel info, coord trans, named matrix, dig point, projector, CTF comp, raw segment, evoked, covariance). The on-disk format is the Elekta/Neuromag FIFF specification — files emitted here round-trip through `mne.io.fiff` in MNE-Python without modification.
 
+```cpp title="src/examples/ex_fiff_api/main.cpp"
+QFile structureFile(dir + "/sample_audvis-ave.fif");
+FiffStream::SPtr stream(new FiffStream(&structureFile));
+const bool opened = stream->open();
+const QList<FiffDirNode::SPtr> measNodes = stream->dirtree()->dir_tree_find(FIFFB_MEAS_INFO);
+std::unique_ptr<FiffTag> tag;
+const bool hasNchan = measNodes.first()->find_tag(stream, FIFF_NCHAN, tag); // raw tag access
+const int nchanTag = *tag->toInt();
+const FiffId fileId = stream->id();
+stream->close();
+```
+
 ### Inheritance
 
 ```mermaid
@@ -1124,8 +1136,9 @@ Opens the source file, locates the FIFFB_PROCESSING_HISTORY block, reads all tag
 
 ## Example
 
-- Full source: [`src/examples/ex_fiff_io/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_fiff_io/main.cpp)
-- Build target: `ex_fiff_io` (compiled in CI)
+- Full source: [`src/examples/ex_fiff_api/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_fiff_api/main.cpp)
+- Build target: `ex_fiff_api` (runs under CTest)
+- Data: [mne-cpp-test-data](https://github.com/mne-tools/mne-cpp-test-data)
 
 ## Authors of this file
 

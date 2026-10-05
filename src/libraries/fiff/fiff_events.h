@@ -64,6 +64,8 @@ struct AverageCategory;
  * the @c -eve.fif files consumed by @c mne.read_events; the detection
  * path mirrors @c mne.find_events. Used by @ref FiffEpochs and the
  * batch-averaging path in @ref FiffEvokedSet to drive epoch extraction.
+ *
+ * @snippet ex_fiff_api/main.cpp fiff_events_usage
  */
 class FIFFSHARED_EXPORT FiffEvents
 {

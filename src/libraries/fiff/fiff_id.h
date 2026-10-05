@@ -61,6 +61,8 @@ namespace FIFFLIB
  * address by @c FiffStream::write_id when generating new identifiers,
  * matching the Neuromag acquisition stack so file lineage stays
  * reconstructible.
+ *
+ * @snippet ex_fiff_api/main.cpp fiff_stream_usage
  */
 
 class FIFFSHARED_EXPORT FiffId

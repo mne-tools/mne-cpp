@@ -23,6 +23,12 @@ FIFF noise / data covariance: matrix, channel names, kind, applied projectors, b
 
 Round-trips with `*-cov.fif` files and with `mne.Covariance` in MNE-Python. Carries both the raw matrix and the metadata needed to regularize, project away SSP subspaces, and pre-whiten downstream forward / inverse computations.
 
+```cpp title="src/examples/ex_fiff_api/main.cpp"
+QFile covFile(dir + "/sample_audvis-cov.fif");
+FiffCov cov(covFile);
+const FiffCov megCov = cov.pick_channels(info.ch_names.mid(0, 306), cov.bads); // good MEG channels only
+```
+
 ### Inheritance
 
 ```mermaid
@@ -249,6 +255,12 @@ Compute a weighted grand-average covariance from multiple covariance matrices, w
 - *[FiffCov](/docs/api/fiff/fiff-cov)* — The grand-average covariance matrix, or empty [`FiffCov`](/docs/api/fiff/fiff-cov) if covs is empty.
 
 ---
+
+## Example
+
+- Full source: [`src/examples/ex_fiff_api/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_fiff_api/main.cpp)
+- Build target: `ex_fiff_api` (runs under CTest)
+- Data: [mne-cpp-test-data](https://github.com/mne-tools/mne-cpp-test-data)
 
 ## Authors of this file
 

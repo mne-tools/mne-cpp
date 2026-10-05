@@ -19,6 +19,15 @@ Sparse FIFF matrix: CCS or RCS storage with the value / index / pointer triple a
 
 Holds the three arrays the FIFF sparse-matrix tag stores on disk (values, inner indices, outer pointers) and the (nrow, ncol, nnz) shape, so it can be streamed in and out without conversion. Convert to an `Eigen::SparseMatrix` for arithmetic and back for serialization.
 
+```cpp title="src/examples/ex_fiff_api/main.cpp"
+SparseMatrix<double> eigen(3, 4);
+eigen.insert(0, 1) = 2.0;
+eigen.insert(2, 3) = -1.5;
+eigen.makeCompressed();
+const FiffSparseMatrix fiffSparse = FiffSparseMatrix::fromEigenSparse(eigen); // FIFF storage layout
+const SparseMatrix<double> backToEigen = fiffSparse.toEigenSparse();
+```
+
 ---
 
 ## Public Methods
@@ -277,6 +286,12 @@ Create a [`FiffSparseMatrix`](/docs/api/fiff/fiff-sparse-matrix) from an Eigen::
 - *[FiffSparseMatrix](/docs/api/fiff/fiff-sparse-matrix)* — The equivalent [`FiffSparseMatrix`](/docs/api/fiff/fiff-sparse-matrix).
 
 ---
+
+## Example
+
+- Full source: [`src/examples/ex_fiff_api/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_fiff_api/main.cpp)
+- Build target: `ex_fiff_api` (runs under CTest)
+- Data: [mne-cpp-test-data](https://github.com/mne-tools/mne-cpp-test-data)
 
 ## Authors of this file
 

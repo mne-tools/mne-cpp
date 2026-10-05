@@ -19,6 +19,18 @@ Recursive FIFF block-tree node: block kind, block ID, directly contained directo
 
 Each node corresponds to one `FIFFB_BLOCK_START` ... `FIFFB_BLOCK_END` pair in the on-disk tag stream. The full tree is built once by `FiffStream::make_dir_tree` after the directory tag is parsed, and is then traversed by every higher-level reader ([`FiffInfo`](/docs/api/fiff/fiff-info), [`FiffRawData`](/docs/api/fiff/fiff-raw-data), [`FiffEvoked`](/docs/api/fiff/fiff-evoked), [`FiffCov`](/docs/api/fiff/fiff-cov), ...) via `dir_tree_find`. The static `copy_tree` helper streams an entire sub-tree from one [`FiffStream`](/docs/api/fiff/fiff-stream) to another preserving block IDs, which is how MNE-CPP writes derived files that keep provenance back to the source recording.
 
+```cpp title="src/examples/ex_fiff_api/main.cpp"
+QFile structureFile(dir + "/sample_audvis-ave.fif");
+FiffStream::SPtr stream(new FiffStream(&structureFile));
+const bool opened = stream->open();
+const QList<FiffDirNode::SPtr> measNodes = stream->dirtree()->dir_tree_find(FIFFB_MEAS_INFO);
+std::unique_ptr<FiffTag> tag;
+const bool hasNchan = measNodes.first()->find_tag(stream, FIFF_NCHAN, tag); // raw tag access
+const int nchanTag = *tag->toInt();
+const FiffId fileId = stream->id();
+stream->close();
+```
+
 ---
 
 ## Public Methods
@@ -244,6 +256,12 @@ Get textual explanation of a tag.
 - *const char ** — Pointer to the static string explaining the tag, or nullptr if not found.
 
 ---
+
+## Example
+
+- Full source: [`src/examples/ex_fiff_api/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_fiff_api/main.cpp)
+- Build target: `ex_fiff_api` (runs under CTest)
+- Data: [mne-cpp-test-data](https://github.com/mne-tools/mne-cpp-test-data)
 
 ## Authors of this file
 

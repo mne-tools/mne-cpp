@@ -68,6 +68,8 @@ namespace FIFFLIB
  * operators, noise covariances. The name lists let downstream code index
  * the matrix by name instead of by position, which is what the
  * @c pick_channels / @c apply_proj paths rely on.
+ *
+ * @snippet ex_fiff_api/main.cpp fiff_proj_usage
  */
 class FIFFSHARED_EXPORT FiffNamedMatrix : public QSharedData
 {

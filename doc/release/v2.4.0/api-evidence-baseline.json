@@ -12,18 +12,18 @@
     "registered_stale": 0,
     "registered_with_test": 101,
     "registered_test_unresolved": 0,
-    "registered_with_example": 167,
+    "registered_with_example": 188,
     "registered_example_not_built": 0,
     "registered_with_python_equiv": 88,
     "registered_without_api_page": 0,
-    "with_snippet": 205,
+    "with_snippet": 232,
     "public_api_units": 478,
     "example_eligible": 383,
     "example_exempt": 95,
-    "eligible_backed_by_registry_example": 167,
-    "eligible_used_by_some_example": 245,
-    "examples_on_disk": 60,
-    "examples_built": 60
+    "eligible_backed_by_registry_example": 188,
+    "eligible_used_by_some_example": 253,
+    "examples_on_disk": 61,
+    "examples_built": 61
   },
   "by_library": {
     "bids": {
@@ -94,9 +94,9 @@
       "registered": 32,
       "with_test": 10,
       "eligible": 37,
-      "eligible_with_registry_example": 4,
-      "eligible_used_by_example": 18,
-      "with_snippet": 1
+      "eligible_with_registry_example": 25,
+      "eligible_used_by_example": 26,
+      "with_snippet": 28
     },
     "fs": {
       "public": 8,
@@ -5950,8 +5950,8 @@
       "registry_status": "documented",
       "test": null,
       "test_resolves": false,
-      "example": null,
-      "example_state": "none",
+      "example": "ex_fiff_api",
+      "example_state": "built",
       "including_examples": [
         "ex_averaging",
         "ex_cancel_noise",
@@ -5961,6 +5961,7 @@
         "ex_compute_forward",
         "ex_disp",
         "ex_evoked_grad_amp",
+        "ex_fiff_api",
         "ex_fiff_io",
         "ex_fiff_sniffer",
         "ex_filtering",
@@ -5979,7 +5980,9 @@
         "ex_st_clustered_inverse_pwl_rap_music",
         "ex_tf_plot"
       ],
-      "snippets": [],
+      "snippets": [
+        "ex_fiff_api/main.cpp#fiff_facade_usage"
+      ],
       "api_page": "doc/website/docs/api/fiff/fiff-class.mdx",
       "python_equiv": null,
       "example_eligible": true,
@@ -5995,10 +5998,14 @@
       "registry_status": "done",
       "test": "test_fiff_annotation_event_utils",
       "test_resolves": true,
-      "example": null,
-      "example_state": "none",
-      "including_examples": [],
-      "snippets": [],
+      "example": "ex_fiff_api",
+      "example_state": "built",
+      "including_examples": [
+        "ex_fiff_api"
+      ],
+      "snippets": [
+        "ex_fiff_api/main.cpp#fiff_annotations_usage"
+      ],
       "api_page": "doc/website/docs/api/fiff/fiff-annotation-event-utils.mdx",
       "python_equiv": "mne.events_from_annotations",
       "example_eligible": true,
@@ -6017,9 +6024,12 @@
       "example": null,
       "example_state": "none",
       "including_examples": [
-        "ex_dsp_artifacts"
+        "ex_dsp_artifacts",
+        "ex_fiff_api"
       ],
-      "snippets": [],
+      "snippets": [
+        "ex_fiff_api/main.cpp#fiff_annotations_usage"
+      ],
       "api_page": null,
       "python_equiv": null,
       "example_eligible": true,
@@ -6035,12 +6045,15 @@
       "registry_status": "done",
       "test": "test_fiff_annotations",
       "test_resolves": true,
-      "example": null,
-      "example_state": "none",
+      "example": "ex_fiff_api",
+      "example_state": "built",
       "including_examples": [
-        "ex_dsp_artifacts"
+        "ex_dsp_artifacts",
+        "ex_fiff_api"
       ],
-      "snippets": [],
+      "snippets": [
+        "ex_fiff_api/main.cpp#fiff_annotations_usage"
+      ],
       "api_page": "doc/website/docs/api/fiff/fiff-annotations.mdx",
       "python_equiv": "mne.Annotations",
       "example_eligible": true,
@@ -6056,13 +6069,16 @@
       "registry_status": "documented",
       "test": null,
       "test_resolves": false,
-      "example": null,
-      "example_state": "none",
+      "example": "ex_fiff_api",
+      "example_state": "built",
       "including_examples": [
         "ex_dsp_artifacts",
+        "ex_fiff_api",
         "ex_fiff_sniffer"
       ],
-      "snippets": [],
+      "snippets": [
+        "ex_fiff_api/main.cpp#fiff_info_usage"
+      ],
       "api_page": "doc/website/docs/api/fiff/fiff-ch-info.mdx",
       "python_equiv": null,
       "example_eligible": true,
@@ -6078,10 +6094,12 @@
       "registry_status": "documented",
       "test": null,
       "test_resolves": false,
-      "example": null,
-      "example_state": "none",
+      "example": "ex_fiff_api",
+      "example_state": "built",
       "including_examples": [],
-      "snippets": [],
+      "snippets": [
+        "ex_fiff_api/main.cpp#fiff_info_usage"
+      ],
       "api_page": "doc/website/docs/api/fiff/fiff-ch-pos.mdx",
       "python_equiv": null,
       "example_eligible": true,
@@ -6097,13 +6115,16 @@
       "registry_status": "done",
       "test": "test_fiff_coord_trans",
       "test_resolves": true,
-      "example": null,
-      "example_state": "none",
+      "example": "ex_fiff_api",
+      "example_state": "built",
       "including_examples": [
         "ex_coreg",
+        "ex_fiff_api",
         "ex_mri"
       ],
-      "snippets": [],
+      "snippets": [
+        "ex_fiff_api/main.cpp#fiff_coord_trans_usage"
+      ],
       "api_page": "doc/website/docs/api/fiff/fiff-coord-trans.mdx",
       "python_equiv": "mne.transforms.Transform",
       "example_eligible": true,
@@ -6138,13 +6159,16 @@
       "registry_status": "done",
       "test": "test_fiff_cov",
       "test_resolves": true,
-      "example": null,
-      "example_state": "none",
+      "example": "ex_fiff_api",
+      "example_state": "built",
       "including_examples": [
         "ex_dsp_rt",
+        "ex_fiff_api",
         "ex_make_inverse_operator"
       ],
-      "snippets": [],
+      "snippets": [
+        "ex_fiff_api/main.cpp#fiff_cov_usage"
+      ],
       "api_page": "doc/website/docs/api/fiff/fiff-cov.mdx",
       "python_equiv": "mne.Covariance",
       "example_eligible": true,
@@ -6198,12 +6222,14 @@
       "registry_status": "documented",
       "test": null,
       "test_resolves": false,
-      "example": null,
-      "example_state": "none",
+      "example": "ex_fiff_api",
+      "example_state": "built",
       "including_examples": [
         "ex_coreg"
       ],
-      "snippets": [],
+      "snippets": [
+        "ex_fiff_api/main.cpp#fiff_dig_point_set_usage"
+      ],
       "api_page": "doc/website/docs/api/fiff/fiff-dig-point.mdx",
       "python_equiv": null,
       "example_eligible": true,
@@ -6219,14 +6245,17 @@
       "registry_status": "documented",
       "test": null,
       "test_resolves": false,
-      "example": null,
-      "example_state": "none",
+      "example": "ex_fiff_api",
+      "example_state": "built",
       "including_examples": [
         "ex_coreg",
         "ex_disp_3D",
+        "ex_fiff_api",
         "ex_hpiFit"
       ],
-      "snippets": [],
+      "snippets": [
+        "ex_fiff_api/main.cpp#fiff_dig_point_set_usage"
+      ],
       "api_page": "doc/website/docs/api/fiff/fiff-dig-point-set.mdx",
       "python_equiv": null,
       "example_eligible": true,
@@ -6242,12 +6271,15 @@
       "registry_status": "documented",
       "test": null,
       "test_resolves": false,
-      "example": null,
-      "example_state": "none",
+      "example": "ex_fiff_api",
+      "example_state": "built",
       "including_examples": [
+        "ex_fiff_api",
         "ex_fiff_sniffer"
       ],
-      "snippets": [],
+      "snippets": [
+        "ex_fiff_api/main.cpp#fiff_digitizer_data_usage"
+      ],
       "api_page": "doc/website/docs/api/fiff/fiff-digitizer-data.mdx",
       "python_equiv": null,
       "example_eligible": true,
@@ -6282,10 +6314,14 @@
       "registry_status": "documented",
       "test": null,
       "test_resolves": false,
-      "example": null,
-      "example_state": "none",
-      "including_examples": [],
-      "snippets": [],
+      "example": "ex_fiff_api",
+      "example_state": "built",
+      "including_examples": [
+        "ex_fiff_api"
+      ],
+      "snippets": [
+        "ex_fiff_api/main.cpp#fiff_stream_usage"
+      ],
       "api_page": "doc/website/docs/api/fiff/fiff-dir-node.mdx",
       "python_equiv": null,
       "example_eligible": true,
@@ -6339,10 +6375,14 @@
       "registry_status": "documented",
       "test": null,
       "test_resolves": false,
-      "example": null,
-      "example_state": "none",
-      "including_examples": [],
-      "snippets": [],
+      "example": "ex_fiff_api",
+      "example_state": "built",
+      "including_examples": [
+        "ex_fiff_api"
+      ],
+      "snippets": [
+        "ex_fiff_api/main.cpp#fiff_events_usage"
+      ],
       "api_page": "doc/website/docs/api/fiff/fiff-events.mdx",
       "python_equiv": null,
       "example_eligible": true,
@@ -6358,7 +6398,7 @@
       "registry_status": "done",
       "test": "test_fiff_io_evoked_info",
       "test_resolves": true,
-      "example": "ex_read_evoked",
+      "example": "ex_fiff_api",
       "example_state": "built",
       "including_examples": [
         "ex_clustered_inverse_mne",
@@ -6374,7 +6414,9 @@
         "ex_roi_clustered_inverse_pwl_rap_music",
         "ex_st_clustered_inverse_pwl_rap_music"
       ],
-      "snippets": [],
+      "snippets": [
+        "ex_fiff_api/main.cpp#fiff_evoked_set_usage"
+      ],
       "api_page": "doc/website/docs/api/fiff/fiff-evoked.mdx",
       "python_equiv": "mne.Evoked",
       "example_eligible": true,
@@ -6394,9 +6436,12 @@
       "example_state": "none",
       "including_examples": [
         "ex_dsp_rt",
+        "ex_fiff_api",
         "ex_inverse_mne"
       ],
-      "snippets": [],
+      "snippets": [
+        "ex_fiff_api/main.cpp#fiff_evoked_set_usage"
+      ],
       "api_page": null,
       "python_equiv": null,
       "example_eligible": true,
@@ -6416,9 +6461,12 @@
       "example_state": "none",
       "including_examples": [
         "ex_dsp_rt",
+        "ex_fiff_api",
         "ex_inverse_mne"
       ],
-      "snippets": [],
+      "snippets": [
+        "ex_fiff_api/main.cpp#fiff_evoked_set_usage"
+      ],
       "api_page": null,
       "python_equiv": null,
       "example_eligible": true,
@@ -6434,13 +6482,16 @@
       "registry_status": "documented",
       "test": null,
       "test_resolves": false,
-      "example": null,
-      "example_state": "none",
+      "example": "ex_fiff_api",
+      "example_state": "built",
       "including_examples": [
         "ex_dsp_rt",
+        "ex_fiff_api",
         "ex_inverse_mne"
       ],
-      "snippets": [],
+      "snippets": [
+        "ex_fiff_api/main.cpp#fiff_evoked_set_usage"
+      ],
       "api_page": "doc/website/docs/api/fiff/fiff-evoked-set.mdx",
       "python_equiv": null,
       "example_eligible": true,
@@ -6460,9 +6511,12 @@
       "example_state": "none",
       "including_examples": [
         "ex_dsp_rt",
+        "ex_fiff_api",
         "ex_inverse_mne"
       ],
-      "snippets": [],
+      "snippets": [
+        "ex_fiff_api/main.cpp#fiff_evoked_set_usage"
+      ],
       "api_page": null,
       "python_equiv": null,
       "example_eligible": true,
@@ -6497,10 +6551,14 @@
       "registry_status": "documented",
       "test": null,
       "test_resolves": false,
-      "example": null,
-      "example_state": "none",
-      "including_examples": [],
-      "snippets": [],
+      "example": "ex_fiff_api",
+      "example_state": "built",
+      "including_examples": [
+        "ex_fiff_api"
+      ],
+      "snippets": [
+        "ex_fiff_api/main.cpp#fiff_stream_usage"
+      ],
       "api_page": "doc/website/docs/api/fiff/fiff-id.mdx",
       "python_equiv": null,
       "example_eligible": true,
@@ -6516,14 +6574,17 @@
       "registry_status": "done",
       "test": "test_fiff_info",
       "test_resolves": true,
-      "example": null,
-      "example_state": "none",
+      "example": "ex_fiff_api",
+      "example_state": "built",
       "including_examples": [
         "ex_compute_forward",
         "ex_dsp_artifacts",
+        "ex_fiff_api",
         "ex_hpiFit"
       ],
-      "snippets": [],
+      "snippets": [
+        "ex_fiff_api/main.cpp#fiff_info_usage"
+      ],
       "api_page": "doc/website/docs/api/fiff/fiff-info.mdx",
       "python_equiv": "mne.Info",
       "example_eligible": true,
@@ -6539,10 +6600,12 @@
       "registry_status": "documented",
       "test": null,
       "test_resolves": false,
-      "example": null,
-      "example_state": "none",
+      "example": "ex_fiff_api",
+      "example_state": "built",
       "including_examples": [],
-      "snippets": [],
+      "snippets": [
+        "ex_fiff_api/main.cpp#fiff_info_usage"
+      ],
       "api_page": "doc/website/docs/api/fiff/fiff-info-base.mdx",
       "python_equiv": null,
       "example_eligible": true,
@@ -6558,13 +6621,16 @@
       "registry_status": "documented",
       "test": null,
       "test_resolves": false,
-      "example": null,
-      "example_state": "none",
+      "example": "ex_fiff_api",
+      "example_state": "built",
       "including_examples": [
+        "ex_fiff_api",
         "ex_fiff_io",
         "ex_fiff_sniffer"
       ],
-      "snippets": [],
+      "snippets": [
+        "ex_fiff_api/main.cpp#fiff_io_usage"
+      ],
       "api_page": "doc/website/docs/api/fiff/fiff-io.mdx",
       "python_equiv": null,
       "example_eligible": true,
@@ -6580,10 +6646,14 @@
       "registry_status": "documented",
       "test": null,
       "test_resolves": false,
-      "example": null,
-      "example_state": "none",
-      "including_examples": [],
-      "snippets": [],
+      "example": "ex_fiff_api",
+      "example_state": "built",
+      "including_examples": [
+        "ex_fiff_api"
+      ],
+      "snippets": [
+        "ex_fiff_api/main.cpp#fiff_proj_usage"
+      ],
       "api_page": "doc/website/docs/api/fiff/fiff-named-matrix.mdx",
       "python_equiv": null,
       "example_eligible": true,
@@ -6599,10 +6669,14 @@
       "registry_status": "done",
       "test": "test_mne_projections",
       "test_resolves": true,
-      "example": null,
-      "example_state": "none",
-      "including_examples": [],
-      "snippets": [],
+      "example": "ex_fiff_api",
+      "example_state": "built",
+      "including_examples": [
+        "ex_fiff_api"
+      ],
+      "snippets": [
+        "ex_fiff_api/main.cpp#fiff_proj_usage"
+      ],
       "api_page": "doc/website/docs/api/fiff/fiff-proj.mdx",
       "python_equiv": "mne.Projection",
       "example_eligible": true,
@@ -6625,7 +6699,8 @@
         "ex_connectivity_comparison",
         "ex_connectivity_performance",
         "ex_dsp_maxwell",
-        "ex_dsp_rt"
+        "ex_dsp_rt",
+        "ex_fiff_api"
       ],
       "snippets": [
         "ex_read_raw/main.cpp#fiff_raw_data_open",
@@ -6665,10 +6740,14 @@
       "registry_status": "documented",
       "test": null,
       "test_resolves": false,
-      "example": null,
-      "example_state": "none",
-      "including_examples": [],
-      "snippets": [],
+      "example": "ex_fiff_api",
+      "example_state": "built",
+      "including_examples": [
+        "ex_fiff_api"
+      ],
+      "snippets": [
+        "ex_fiff_api/main.cpp#fiff_sparse_matrix_usage"
+      ],
       "api_page": "doc/website/docs/api/fiff/fiff-sparse-matrix.mdx",
       "python_equiv": null,
       "example_eligible": true,
@@ -6684,12 +6763,15 @@
       "registry_status": "done",
       "test": "test_fiff_raw_io",
       "test_resolves": true,
-      "example": "ex_fiff_io",
+      "example": "ex_fiff_api",
       "example_state": "built",
       "including_examples": [
+        "ex_fiff_api",
         "ex_fiff_sniffer"
       ],
-      "snippets": [],
+      "snippets": [
+        "ex_fiff_api/main.cpp#fiff_stream_usage"
+      ],
       "api_page": "doc/website/docs/api/fiff/fiff-stream.mdx",
       "python_equiv": "mne.io.fiff.FiffStream",
       "example_eligible": true,
@@ -6705,10 +6787,14 @@
       "registry_status": "documented",
       "test": null,
       "test_resolves": false,
-      "example": null,
-      "example_state": "none",
-      "including_examples": [],
-      "snippets": [],
+      "example": "ex_fiff_api",
+      "example_state": "built",
+      "including_examples": [
+        "ex_fiff_api"
+      ],
+      "snippets": [
+        "ex_fiff_api/main.cpp#fiff_stream_usage"
+      ],
       "api_page": "doc/website/docs/api/fiff/fiff-tag.mdx",
       "python_equiv": null,
       "example_eligible": true,

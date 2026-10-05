@@ -58,6 +58,8 @@ namespace FIFFLIB
  * for @c r0 and three each for @c ex, @c ey, @c ez. Consumed by
  * forward-solution coil integration and by sensor visualization to draw
  * oriented coil glyphs in the device frame.
+ *
+ * @snippet ex_fiff_api/main.cpp fiff_info_usage
  */
 class FIFFSHARED_EXPORT FiffChPos
 {

@@ -154,6 +154,8 @@ class FiffDirNode;
  * class wrappers (@c toFiffId, @c toCoordTrans, @c toChInfo,
  * @c toChPos, @c toDigPoint, ...). Used by @ref FiffStream both for
  * streaming reads and for assembling tags before write_tag.
+ *
+ * @snippet ex_fiff_api/main.cpp fiff_stream_usage
  */
 class FIFFSHARED_EXPORT FiffTag : public QByteArray
 {

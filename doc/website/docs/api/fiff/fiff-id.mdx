@@ -19,6 +19,18 @@ class FIFFLIB::FiffId
 
 On-disk layout is a 20-byte record (version + 2x4-byte machine ID + 8-byte [`FiffTime`](/docs/api/fiff/fiff-time)). The `machid` is filled from the host MAC address by ``FiffStream::write_id`` when generating new identifiers, matching the Neuromag acquisition stack so file lineage stays reconstructible.
 
+```cpp title="src/examples/ex_fiff_api/main.cpp"
+QFile structureFile(dir + "/sample_audvis-ave.fif");
+FiffStream::SPtr stream(new FiffStream(&structureFile));
+const bool opened = stream->open();
+const QList<FiffDirNode::SPtr> measNodes = stream->dirtree()->dir_tree_find(FIFFB_MEAS_INFO);
+std::unique_ptr<FiffTag> tag;
+const bool hasNchan = measNodes.first()->find_tag(stream, FIFF_NCHAN, tag); // raw tag access
+const int nchanTag = *tag->toInt();
+const FiffId fileId = stream->id();
+stream->close();
+```
+
 ---
 
 ## Public Methods
@@ -153,6 +165,12 @@ Size of the old struct (`fiffIdRec`) 5*int = 5*4 = 20.
 - *qint32* — the size of the old struct `fiffIdRec`.
 
 ---
+
+## Example
+
+- Full source: [`src/examples/ex_fiff_api/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_fiff_api/main.cpp)
+- Build target: `ex_fiff_api` (runs under CTest)
+- Data: [mne-cpp-test-data](https://github.com/mne-tools/mne-cpp-test-data)
 
 ## Authors of this file
 

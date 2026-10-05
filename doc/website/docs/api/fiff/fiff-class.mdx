@@ -19,6 +19,15 @@ MATLAB-style static facade re-exporting every public `FIFFLIB` reader/writer for
 
 Only wrappers — no state. Each method forwards to the matching method on [`FiffStream`](/docs/api/fiff/fiff-stream) / [`FiffRawData`](/docs/api/fiff/fiff-raw-data) / [`FiffEvoked`](/docs/api/fiff/fiff-evoked) / [`FiffEvokedSet`](/docs/api/fiff/fiff-evoked-set) / [`FiffCov`](/docs/api/fiff/fiff-cov) / [`FiffInfo`](/docs/api/fiff/fiff-info). Prefer the underlying classes for new code; this class exists so Matlab-style ports compile unchanged.
 
+```cpp title="src/examples/ex_fiff_api/main.cpp"
+QFile facadeFile(dir + "/sample_audvis_trunc_raw.fif");
+FiffStream::SPtr facadeStream;
+const bool facadeOpened = Fiff::open(facadeFile, facadeStream); // static wrappers around FiffStream
+FiffDirNode::SPtr facadeRoot = facadeStream->dirtree();
+const QStringList facadeBads = Fiff::read_bad_channels(facadeStream, facadeRoot);
+facadeStream->close();
+```
+
 ---
 
 ## Public Methods
@@ -966,6 +975,12 @@ Writes a string tag
   The string data to write.
 
 ---
+
+## Example
+
+- Full source: [`src/examples/ex_fiff_api/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_fiff_api/main.cpp)
+- Build target: `ex_fiff_api` (runs under CTest)
+- Data: [mne-cpp-test-data](https://github.com/mne-tools/mne-cpp-test-data)
 
 ## Authors of this file
 

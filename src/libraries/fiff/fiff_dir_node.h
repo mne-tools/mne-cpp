@@ -74,6 +74,8 @@ class FiffTag;
  * sub-tree from one @ref FiffStream to another preserving block IDs,
  * which is how MNE-CPP writes derived files that keep provenance back to
  * the source recording.
+ *
+ * @snippet ex_fiff_api/main.cpp fiff_stream_usage
  */
 class FIFFSHARED_EXPORT FiffDirNode
 {

@@ -190,7 +190,14 @@
       "mne_python": "mne.io.fiff.FiffStream",
       "sklearn": null,
       "test": "test_fiff_raw_io",
-      "example": "ex_fiff_io",
+      "example": "ex_fiff_api",
+      "example_snippet": [
+        "ex_fiff_api/main.cpp#fiff_stream_usage"
+      ],
+      "example_mode": "run",
+      "required_data": [
+        "mne-cpp-test-data"
+      ],
       "status": "done",
       "skigen_candidate": false,
       "documented": true,
@@ -234,7 +241,14 @@
       "mne_python": "mne.Info",
       "sklearn": null,
       "test": "test_fiff_info",
-      "example": null,
+      "example": "ex_fiff_api",
+      "example_snippet": [
+        "ex_fiff_api/main.cpp#fiff_info_usage"
+      ],
+      "example_mode": "run",
+      "required_data": [
+        "mne-cpp-test-data"
+      ],
       "status": "done",
       "skigen_candidate": false,
       "documented": true,
@@ -252,7 +266,14 @@
       "mne_python": "mne.Evoked",
       "sklearn": null,
       "test": "test_fiff_io_evoked_info",
-      "example": "ex_read_evoked",
+      "example": "ex_fiff_api",
+      "example_snippet": [
+        "ex_fiff_api/main.cpp#fiff_evoked_set_usage"
+      ],
+      "example_mode": "run",
+      "required_data": [
+        "mne-cpp-test-data"
+      ],
       "status": "done",
       "skigen_candidate": false,
       "documented": true,
@@ -288,7 +309,14 @@
       "mne_python": "mne.Covariance",
       "sklearn": null,
       "test": "test_fiff_cov",
-      "example": null,
+      "example": "ex_fiff_api",
+      "example_snippet": [
+        "ex_fiff_api/main.cpp#fiff_cov_usage"
+      ],
+      "example_mode": "run",
+      "required_data": [
+        "mne-cpp-test-data"
+      ],
       "status": "done",
       "skigen_candidate": false,
       "documented": true,
@@ -306,7 +334,14 @@
       "mne_python": "mne.Projection",
       "sklearn": null,
       "test": "test_mne_projections",
-      "example": null,
+      "example": "ex_fiff_api",
+      "example_snippet": [
+        "ex_fiff_api/main.cpp#fiff_proj_usage"
+      ],
+      "example_mode": "run",
+      "required_data": [
+        "mne-cpp-test-data"
+      ],
       "status": "done",
       "skigen_candidate": false,
       "documented": true,
@@ -324,7 +359,14 @@
       "mne_python": "mne.transforms.Transform",
       "sklearn": null,
       "test": "test_fiff_coord_trans",
-      "example": null,
+      "example": "ex_fiff_api",
+      "example_snippet": [
+        "ex_fiff_api/main.cpp#fiff_coord_trans_usage"
+      ],
+      "example_mode": "run",
+      "required_data": [
+        "mne-cpp-test-data"
+      ],
       "status": "done",
       "skigen_candidate": false,
       "documented": true,
@@ -342,7 +384,14 @@
       "mne_python": "mne.Annotations",
       "sklearn": null,
       "test": "test_fiff_annotations",
-      "example": null,
+      "example": "ex_fiff_api",
+      "example_snippet": [
+        "ex_fiff_api/main.cpp#fiff_annotations_usage"
+      ],
+      "example_mode": "run",
+      "required_data": [
+        "mne-cpp-test-data"
+      ],
       "status": "done",
       "skigen_candidate": false,
       "documented": true,
@@ -360,7 +409,14 @@
       "mne_python": "mne.events_from_annotations",
       "sklearn": null,
       "test": "test_fiff_annotation_event_utils",
-      "example": null,
+      "example": "ex_fiff_api",
+      "example_snippet": [
+        "ex_fiff_api/main.cpp#fiff_annotations_usage"
+      ],
+      "example_mode": "run",
+      "required_data": [
+        "mne-cpp-test-data"
+      ],
       "status": "done",
       "skigen_candidate": false,
       "documented": true,
@@ -4334,7 +4390,14 @@
       "mne_python": null,
       "sklearn": null,
       "test": null,
-      "example": null,
+      "example": "ex_fiff_api",
+      "example_snippet": [
+        "ex_fiff_api/main.cpp#fiff_facade_usage"
+      ],
+      "example_mode": "run",
+      "required_data": [
+        "mne-cpp-test-data"
+      ],
       "status": "documented",
       "skigen_candidate": false,
       "documented": true,
@@ -4352,7 +4415,14 @@
       "mne_python": null,
       "sklearn": null,
       "test": null,
-      "example": null,
+      "example": "ex_fiff_api",
+      "example_snippet": [
+        "ex_fiff_api/main.cpp#fiff_info_usage"
+      ],
+      "example_mode": "run",
+      "required_data": [
+        "mne-cpp-test-data"
+      ],
       "status": "documented",
       "skigen_candidate": false,
       "documented": true,
@@ -4370,7 +4440,14 @@
       "mne_python": null,
       "sklearn": null,
       "test": null,
-      "example": null,
+      "example": "ex_fiff_api",
+      "example_snippet": [
+        "ex_fiff_api/main.cpp#fiff_info_usage"
+      ],
+      "example_mode": "run",
+      "required_data": [
+        "mne-cpp-test-data"
+      ],
       "status": "documented",
       "skigen_candidate": false,
       "documented": true,
@@ -4442,7 +4519,14 @@
       "mne_python": null,
       "sklearn": null,
       "test": null,
-      "example": null,
+      "example": "ex_fiff_api",
+      "example_snippet": [
+        "ex_fiff_api/main.cpp#fiff_dig_point_set_usage"
+      ],
+      "example_mode": "run",
+      "required_data": [
+        "mne-cpp-test-data"
+      ],
       "status": "documented",
       "skigen_candidate": false,
       "documented": true,
@@ -4460,7 +4544,14 @@
       "mne_python": null,
       "sklearn": null,
       "test": null,
-      "example": null,
+      "example": "ex_fiff_api",
+      "example_snippet": [
+        "ex_fiff_api/main.cpp#fiff_dig_point_set_usage"
+      ],
+      "example_mode": "run",
+      "required_data": [
+        "mne-cpp-test-data"
+      ],
       "status": "documented",
       "skigen_candidate": false,
       "documented": true,
@@ -4478,7 +4569,14 @@
       "mne_python": null,
       "sklearn": null,
       "test": null,
-      "example": null,
+      "example": "ex_fiff_api",
+      "example_snippet": [
+        "ex_fiff_api/main.cpp#fiff_digitizer_data_usage"
+      ],
+      "example_mode": "run",
+      "required_data": [
+        "mne-cpp-test-data"
+      ],
       "status": "documented",
       "skigen_candidate": false,
       "documented": true,
@@ -4514,7 +4612,14 @@
       "mne_python": null,
       "sklearn": null,
       "test": null,
-      "example": null,
+      "example": "ex_fiff_api",
+      "example_snippet": [
+        "ex_fiff_api/main.cpp#fiff_stream_usage"
+      ],
+      "example_mode": "run",
+      "required_data": [
+        "mne-cpp-test-data"
+      ],
       "status": "documented",
       "skigen_candidate": false,
       "documented": true,
@@ -4532,7 +4637,14 @@
       "mne_python": null,
       "sklearn": null,
       "test": null,
-      "example": null,
+      "example": "ex_fiff_api",
+      "example_snippet": [
+        "ex_fiff_api/main.cpp#fiff_events_usage"
+      ],
+      "example_mode": "run",
+      "required_data": [
+        "mne-cpp-test-data"
+      ],
       "status": "documented",
       "skigen_candidate": false,
       "documented": true,
@@ -4568,7 +4680,14 @@
       "mne_python": null,
       "sklearn": null,
       "test": null,
-      "example": null,
+      "example": "ex_fiff_api",
+      "example_snippet": [
+        "ex_fiff_api/main.cpp#fiff_stream_usage"
+      ],
+      "example_mode": "run",
+      "required_data": [
+        "mne-cpp-test-data"
+      ],
       "status": "documented",
       "skigen_candidate": false,
       "documented": true,
@@ -4586,7 +4705,14 @@
       "mne_python": null,
       "sklearn": null,
       "test": null,
-      "example": null,
+      "example": "ex_fiff_api",
+      "example_snippet": [
+        "ex_fiff_api/main.cpp#fiff_info_usage"
+      ],
+      "example_mode": "run",
+      "required_data": [
+        "mne-cpp-test-data"
+      ],
       "status": "documented",
       "skigen_candidate": false,
       "documented": true,
@@ -4604,7 +4730,14 @@
       "mne_python": null,
       "sklearn": null,
       "test": null,
-      "example": null,
+      "example": "ex_fiff_api",
+      "example_snippet": [
+        "ex_fiff_api/main.cpp#fiff_proj_usage"
+      ],
+      "example_mode": "run",
+      "required_data": [
+        "mne-cpp-test-data"
+      ],
       "status": "documented",
       "skigen_candidate": false,
       "documented": true,
@@ -4640,7 +4773,14 @@
       "mne_python": null,
       "sklearn": null,
       "test": null,
-      "example": null,
+      "example": "ex_fiff_api",
+      "example_snippet": [
+        "ex_fiff_api/main.cpp#fiff_sparse_matrix_usage"
+      ],
+      "example_mode": "run",
+      "required_data": [
+        "mne-cpp-test-data"
+      ],
       "status": "documented",
       "skigen_candidate": false,
       "documented": true,
@@ -4658,7 +4798,14 @@
       "mne_python": null,
       "sklearn": null,
       "test": null,
-      "example": null,
+      "example": "ex_fiff_api",
+      "example_snippet": [
+        "ex_fiff_api/main.cpp#fiff_stream_usage"
+      ],
+      "example_mode": "run",
+      "required_data": [
+        "mne-cpp-test-data"
+      ],
       "status": "documented",
       "skigen_candidate": false,
       "documented": true,
@@ -6989,7 +7136,14 @@
       "mne_python": null,
       "sklearn": null,
       "test": null,
-      "example": null,
+      "example": "ex_fiff_api",
+      "example_snippet": [
+        "ex_fiff_api/main.cpp#fiff_evoked_set_usage"
+      ],
+      "example_mode": "run",
+      "required_data": [
+        "mne-cpp-test-data"
+      ],
       "status": "documented",
       "skigen_candidate": false,
       "documented": true,
@@ -7007,7 +7161,14 @@
       "mne_python": null,
       "sklearn": null,
       "test": null,
-      "example": null,
+      "example": "ex_fiff_api",
+      "example_snippet": [
+        "ex_fiff_api/main.cpp#fiff_io_usage"
+      ],
+      "example_mode": "run",
+      "required_data": [
+        "mne-cpp-test-data"
+      ],
       "status": "documented",
       "skigen_candidate": false,
       "documented": true,

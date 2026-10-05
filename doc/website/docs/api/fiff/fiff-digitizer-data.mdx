@@ -19,6 +19,15 @@ Registration-ready digitization data: dig points, device→head transform and HP
 
 Pairs a [`FiffDigPointSet`](/docs/api/fiff/fiff-dig-point-set) with the [`FiffCoordTrans`](/docs/api/fiff/fiff-coord-trans) that maps it into the head frame, plus optional HPI goodness-of-fit values. Used by the coregistration GUI and by every downstream tool that needs a single self-contained record describing where a subject's head sat in the helmet for one measurement.
 
+```cpp title="src/examples/ex_fiff_api/main.cpp"
+FiffDigitizerData digData;
+digData.points = info.dig;
+digData.npoint = info.dig.size();
+digData.coord_frame = FIFFV_COORD_HEAD;
+digData.head_mri_t_adj = std::make_unique<FiffCoordTrans>(headToMri);
+digData.pickCardinalFiducials(); // LPA, nasion and RPA moved into MRI coordinates
+```
+
 ---
 
 ## Public Methods
@@ -97,6 +106,12 @@ Extracts cardinal digitizer points (LPA, Nasion, RPA) from the digitizer point l
 This is a port of the original C function update_fids_from_dig_data from mne_analyze/adjust_alignment.c.
 
 ---
+
+## Example
+
+- Full source: [`src/examples/ex_fiff_api/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_fiff_api/main.cpp)
+- Build target: `ex_fiff_api` (runs under CTest)
+- Data: [mne-cpp-test-data](https://github.com/mne-tools/mne-cpp-test-data)
 
 ## Authors of this file
 

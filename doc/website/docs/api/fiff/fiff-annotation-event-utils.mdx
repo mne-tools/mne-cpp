@@ -25,6 +25,15 @@ SPDX-License-Identifier: BSD-3-Clause Copyright (c) 2026 MNE-CPP Authors.
 
 Two representations coexist in [MNE](/docs/api/mne/mne-class) workflows: free-text `FIFFLIB::FiffAnnotation` entries (onset / duration / description) and integer (sample, prev, code) event triples extracted from a stim channel or fed to `mne.Epochs`. These free functions translate between the two: mapping annotation descriptions to event codes via a description→code table, exploding annotation durations into start / stop event pairs, and the reverse aggregation. They mirror `mne.events_from_annotations` and `mne.annotations_from_events` in MNE-Python.
 
+```cpp title="src/examples/ex_fiff_api/main.cpp"
+MatrixXi firstThree = events.events.topRows(3);
+FiffAnnotations annotations = annotationsFromEvents(firstThree, info.sfreq, {{1, "auditory/left"}, {2, "auditory/right"}}, raw.first_samp);
+annotations.append({0.5, 1.0, "BAD_blink", {}, {}, {}});
+FiffAnnotations::write(tmp.filePath("annot.csv"), annotations);
+const FiffAnnotations annotationsBack = FiffAnnotations::read(tmp.filePath("annot.csv"));
+const MatrixXi eventsAgain = eventsFromAnnotations(annotationsBack.select("auditory"), info.sfreq, {{"auditory/left", 1}, {"auditory/right", 2}}, raw.first_samp);
+```
+
 ---
 
 ## Functions
@@ -107,6 +116,12 @@ Count annotations by description.
 - *QMap&lt; QString, int &gt;* — QMap&lt;QString, int&gt; Map from description to count.
 
 ---
+
+## Example
+
+- Full source: [`src/examples/ex_fiff_api/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_fiff_api/main.cpp)
+- Build target: `ex_fiff_api` (runs under CTest)
+- Data: [mne-cpp-test-data](https://github.com/mne-tools/mne-cpp-test-data)
 
 ## Authors of this file
 

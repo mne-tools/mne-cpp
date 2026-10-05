@@ -67,6 +67,8 @@ namespace FIFFLIB
  * appropriate, and returns shared pointers so the resulting objects can
  * be freely passed across the rest of the pipeline. Front-end parity
  * with @c mne.io.read_raw_fif and friends.
+ *
+ * @snippet ex_fiff_api/main.cpp fiff_io_usage
  */
 class FIFFSHARED_EXPORT FiffIO : public QObject
 {

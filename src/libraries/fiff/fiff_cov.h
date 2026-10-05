@@ -74,6 +74,8 @@ class FiffRawData;
  * MNE-Python. Carries both the raw matrix and the metadata needed to
  * regularize, project away SSP subspaces, and pre-whiten downstream
  * forward / inverse computations.
+ *
+ * @snippet ex_fiff_api/main.cpp fiff_cov_usage
  */
 class FIFFSHARED_EXPORT FiffCov : public QSharedData
 {

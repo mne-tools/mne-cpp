@@ -69,6 +69,8 @@ namespace FIFFLIB
  * Base class of @ref FiffInfo, used directly when the rest of the
  * acquisition metadata is not available (e.g. realtime client streams,
  * trimmed evoked files).
+ *
+ * @snippet ex_fiff_api/main.cpp fiff_info_usage
  */
 class FIFFSHARED_EXPORT FiffInfoBase
 {

@@ -19,6 +19,14 @@ Channel coil-frame placement: origin `r0` (m) and orthonormal axes `ex` / `ey` /
 
 Twelve floats laid out exactly like the `fiffChPosRec` struct: three for `r0` and three each for `ex`, `ey`, `ez`. Consumed by forward-solution coil integration and by sensor visualization to draw oriented coil glyphs in the device frame.
 
+```cpp title="src/examples/ex_fiff_api/main.cpp"
+QFile rawFile(dir + "/sample_audvis_trunc_raw.fif");
+FiffRawData raw(rawFile);          // reads the measurement info, raw data is read on demand
+const FiffInfo& info = raw.info;   // channels, sampling rate, bads, projectors, digitizer, transforms
+const FiffChInfo& first = info.chs[0];
+const RowVectorXi megPicks = info.pick_types(true, false, false, QStringList(), info.bads); // good MEG channels
+```
+
 ---
 
 ## Public Methods
@@ -74,6 +82,12 @@ Size of the old struct (fiffChPosRec) 13*int = 13*4 = 52.
 - *qint32* — the size of the old struct fiffChPosRec.
 
 ---
+
+## Example
+
+- Full source: [`src/examples/ex_fiff_api/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_fiff_api/main.cpp)
+- Build target: `ex_fiff_api` (runs under CTest)
+- Data: [mne-cpp-test-data](https://github.com/mne-tools/mne-cpp-test-data)
 
 ## Authors of this file
 

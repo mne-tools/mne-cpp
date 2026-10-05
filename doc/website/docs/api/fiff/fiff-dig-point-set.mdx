@@ -19,6 +19,11 @@ Collection of [`FiffDigPoint`](/docs/api/fiff/fiff-dig-point) records as parsed 
 
 Indexed access plus convenience filters (cardinals only, HPI only, EEG only, extras only) so registration code can pick out the subset it needs without re-walking the underlying QList of dig points.
 
+```cpp title="src/examples/ex_fiff_api/main.cpp"
+FiffDigPointSet digitizer(info.dig);                                  // 146 points in head coordinates
+FiffDigPointSet cardinal = digitizer.pickTypes({FIFFV_POINT_CARDINAL}); // LPA, nasion, RPA
+```
+
 ---
 
 ## Public Methods
@@ -271,6 +276,12 @@ Reads [`FiffDigPointSet`](/docs/api/fiff/fiff-dig-point-set) from a fif file.
 - *bool* — true if succeeded, false otherwise.
 
 ---
+
+## Example
+
+- Full source: [`src/examples/ex_fiff_api/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_fiff_api/main.cpp)
+- Build target: `ex_fiff_api` (runs under CTest)
+- Data: [mne-cpp-test-data](https://github.com/mne-tools/mne-cpp-test-data)
 
 ## Authors of this file
 

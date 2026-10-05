@@ -74,6 +74,8 @@ struct FIFFSHARED_EXPORT FiffAnnotation
  * travels with the FIFF file. The JSON and CSV exporters let the same
  * annotations be consumed by BIDS sidecars and by external scoring
  * tools that do not understand FIFF directly.
+ *
+ * @snippet ex_fiff_api/main.cpp fiff_annotations_usage
  */
 class FIFFSHARED_EXPORT FiffAnnotations
 {

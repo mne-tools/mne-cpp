@@ -74,6 +74,8 @@ class FiffDirNode;
  * Indexed access plus convenience filters (cardinals only, HPI only,
  * EEG only, extras only) so registration code can pick out the subset it
  * needs without re-walking the underlying QList of dig points.
+ *
+ * @snippet ex_fiff_api/main.cpp fiff_dig_point_set_usage
  */
 
 class FIFFSHARED_EXPORT FiffDigPointSet

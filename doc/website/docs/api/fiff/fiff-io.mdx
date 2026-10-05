@@ -19,6 +19,11 @@ One-call FIFF reader/writer: opens a file, dispatches to the right specialized l
 
 Sniffs the FIFF block tree, dispatches [`FiffRawData`](/docs/api/fiff/fiff-raw-data) / [`FiffEvokedSet`](/docs/api/fiff/fiff-evoked-set) / [`FiffCov`](/docs/api/fiff/fiff-cov) / [`FiffInfo`](/docs/api/fiff/fiff-info) loaders as appropriate, and returns shared pointers so the resulting objects can be freely passed across the rest of the pipeline. Front-end parity with `mne.io.read_raw_fif` and friends.
 
+```cpp title="src/examples/ex_fiff_api/main.cpp"
+QFile ioFile(dir + "/sample_audvis-ave.fif");
+FiffIO io(ioFile); // detects what the file holds (raw, evoked, fwd, ...)
+```
+
 ### Inheritance
 
 ```mermaid
@@ -187,6 +192,12 @@ Setup a [`FiffStream`](/docs/api/fiff/fiff-stream).
 - *bool* — true if succeeded, false otherwise.
 
 ---
+
+## Example
+
+- Full source: [`src/examples/ex_fiff_api/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_fiff_api/main.cpp)
+- Build target: `ex_fiff_api` (runs under CTest)
+- Data: [mne-cpp-test-data](https://github.com/mne-tools/mne-cpp-test-data)
 
 ## Authors of this file
 

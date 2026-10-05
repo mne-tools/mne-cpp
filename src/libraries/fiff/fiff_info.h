@@ -83,6 +83,8 @@ class FiffStream;
  * @c hpi_results / @c hpi_meas, @c dev_head_t / @c ctf_head_t, plus the
  * @ref FiffInfoBase channel / bads / sfreq subset. Drop-in counterpart of
  * @c mne.Info in MNE-Python.
+ *
+ * @snippet ex_fiff_api/main.cpp fiff_info_usage
  */
 class FIFFSHARED_EXPORT FiffInfo : public FiffInfoBase
 {

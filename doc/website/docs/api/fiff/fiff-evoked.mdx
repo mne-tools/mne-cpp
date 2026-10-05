@@ -23,6 +23,12 @@ Single averaged evoked response: time axis, data, baseline, channel info and ave
 
 Holds one `FIFFB_EVOKED` block: `times`, `data`, `first` / `last` sample indices, `baseline`, `kind`, `nave`, `comment` and the [`FiffInfo`](/docs/api/fiff/fiff-info) describing the channels. Use [`FiffEvokedSet`](/docs/api/fiff/fiff-evoked-set) for recordings that contain multiple averaging conditions.
 
+```cpp title="src/examples/ex_fiff_api/main.cpp"
+QFile aveFile(dir + "/sample_audvis-ave.fif");
+FiffEvokedSet evokedSet(aveFile); // all conditions of an -ave.fif file
+const FiffEvoked& leftAuditory = evokedSet.evoked[0];
+```
+
 ---
 
 ## Public Methods
@@ -226,8 +232,9 @@ Read one evoked data set
 
 ## Example
 
-- Full source: [`src/examples/ex_read_evoked/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_read_evoked/main.cpp)
-- Build target: `ex_read_evoked` (compiled in CI)
+- Full source: [`src/examples/ex_fiff_api/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_fiff_api/main.cpp)
+- Build target: `ex_fiff_api` (runs under CTest)
+- Data: [mne-cpp-test-data](https://github.com/mne-tools/mne-cpp-test-data)
 
 ## Authors of this file
 

@@ -63,6 +63,8 @@ namespace FIFFLIB
  * pair is the lookup key used everywhere else in the codebase — for
  * example, the LPA/Nasion/RPA fiducials are found by searching for
  * @c kind == @c FIFFV_POINT_CARDINAL and @c ident == 1 / 2 / 3.
+ *
+ * @snippet ex_fiff_api/main.cpp fiff_dig_point_set_usage
  */
 class FIFFSHARED_EXPORT FiffDigPoint
 {

@@ -18,6 +18,8 @@
  * and the reverse aggregation. They mirror
  * @c mne.events_from_annotations and @c mne.annotations_from_events in
  * MNE-Python.
+ *
+ * @snippet ex_fiff_api/main.cpp fiff_annotations_usage
  */
 
 #ifndef FIFF_ANNOTATION_EVENT_UTILS_H

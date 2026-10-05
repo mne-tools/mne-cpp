@@ -19,6 +19,15 @@ FIFF event list: (sample, prev, new) integer triples with read / write / detect 
 
 On-disk representation matches `mne.io.write.write_events` output and the `-eve.fif` files consumed by `mne.read_events`; the detection path mirrors `mne.find_events`. Used by [`FiffEpochs`](/docs/api/fiff/fiff-epochs) and the batch-averaging path in [`FiffEvokedSet`](/docs/api/fiff/fiff-evoked-set) to drive epoch extraction.
 
+```cpp title="src/examples/ex_fiff_api/main.cpp"
+FiffEvents events;
+FiffEvents::detect_from_raw(raw, events, "STI 014"); // rising edges of the trigger channel
+QFile eventFile(tmp.filePath("sample-eve.fif"));
+const bool eventsWritten = eventFile.open(QIODevice::WriteOnly) && events.write_to_fif(eventFile);
+eventFile.close();
+FiffEvents eventsBack(eventFile); // mne.read_events reads this file too
+```
+
 ---
 
 ## Public Methods
@@ -207,6 +216,12 @@ Check whether an event matches a category definition.
 - *bool* — true if the event matches.
 
 ---
+
+## Example
+
+- Full source: [`src/examples/ex_fiff_api/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_fiff_api/main.cpp)
+- Build target: `ex_fiff_api` (runs under CTest)
+- Data: [mne-cpp-test-data](https://github.com/mne-tools/mne-cpp-test-data)
 
 ## Authors of this file
 

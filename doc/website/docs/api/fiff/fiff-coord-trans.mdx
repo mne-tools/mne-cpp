@@ -23,6 +23,15 @@ Labelled 4x4 FIFF affine: source frame, destination frame, rotation, translation
 
 Each transform carries its source (`from`) and destination (`to`) `FIFFV_COORD_*` frame identifiers so the inverse and any chained composition can be type-checked at runtime. The inverse is stored alongside the forward transform because both directions are routinely needed (device→head for head-position tracking, head→MRI for source space registration, etc.).
 
+```cpp title="src/examples/ex_fiff_api/main.cpp"
+QFile transFile(dir + "/all-trans.fif");
+FiffCoordTrans headToMri(transFile);            // FIFFV_COORD_HEAD (4) -> FIFFV_COORD_MRI (5)
+const FiffCoordTrans devHead = info.dev_head_t; // device -> head, from the measurement info
+FiffCoordTrans back = devHead.inverted();
+float r[3] = {0.0f, 0.0f, 0.0f};
+FiffCoordTrans::apply_trans(r, devHead, true); // the device origin in head coordinates
+```
+
 ---
 
 ## Public Methods
@@ -568,6 +577,12 @@ Performs a Procrustes alignment between two sets of corresponding 3D points.
 - *[FiffCoordTrans](/docs/api/fiff/fiff-coord-trans)* — The alignment transform, or an empty transform on failure.
 
 ---
+
+## Example
+
+- Full source: [`src/examples/ex_fiff_api/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_fiff_api/main.cpp)
+- Build target: `ex_fiff_api` (runs under CTest)
+- Data: [mne-cpp-test-data](https://github.com/mne-tools/mne-cpp-test-data)
 
 ## Authors of this file
 

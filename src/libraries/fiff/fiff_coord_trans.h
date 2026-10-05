@@ -77,6 +77,8 @@ class FiffTag;
  * alongside the forward transform because both directions are routinely
  * needed (device→head for head-position tracking, head→MRI for source
  * space registration, etc.).
+ *
+ * @snippet ex_fiff_api/main.cpp fiff_coord_trans_usage
  */
 class FIFFSHARED_EXPORT FiffCoordTrans
 {

@@ -19,6 +19,11 @@ One digitizer point: kind (cardinal/HPI/EEG/extra), ident, 3D position in `FIFFV
 
 Field layout matches ``fiffDigPointRec`` on disk. The (`kind`, `ident`) pair is the lookup key used everywhere else in the codebase — for example, the LPA/Nasion/RPA fiducials are found by searching for `kind` == `FIFFV_POINT_CARDINAL` and `ident` == 1 / 2 / 3.
 
+```cpp title="src/examples/ex_fiff_api/main.cpp"
+FiffDigPointSet digitizer(info.dig);                                  // 146 points in head coordinates
+FiffDigPointSet cardinal = digitizer.pickTypes({FIFFV_POINT_CARDINAL}); // LPA, nasion, RPA
+```
+
 ---
 
 ## Public Methods
@@ -46,6 +51,12 @@ Size of the old struct (`fiffDigPointRec`) 5*int = 5*4 = 20.
 - *qint32* — the size of the old struct `fiffDigPointRec`.
 
 ---
+
+## Example
+
+- Full source: [`src/examples/ex_fiff_api/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_fiff_api/main.cpp)
+- Build target: `ex_fiff_api` (runs under CTest)
+- Data: [mne-cpp-test-data](https://github.com/mne-tools/mne-cpp-test-data)
 
 ## Authors of this file
 
