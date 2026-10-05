@@ -75,6 +75,8 @@ class NetworkEdge;
  * rescanning the global edge list.
  *
  * @brief Graph node carrying a 3D position and its incident in/out, full/thresholded edge lists.
+ *
+ * @snippet ex_connectivity_metrics/main.cpp network_build
  */
 
 class CONNECTIVITYSHARED_EXPORT NetworkNode

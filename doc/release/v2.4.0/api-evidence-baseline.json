@@ -12,18 +12,18 @@
     "registered_stale": 0,
     "registered_with_test": 96,
     "registered_test_unresolved": 0,
-    "registered_with_example": 19,
+    "registered_with_example": 36,
     "registered_example_not_built": 0,
     "registered_with_python_equiv": 88,
     "registered_without_api_page": 0,
-    "with_snippet": 1,
+    "with_snippet": 20,
     "public_api_units": 478,
     "example_eligible": 383,
     "example_exempt": 95,
-    "eligible_backed_by_registry_example": 19,
-    "eligible_used_by_some_example": 66,
-    "examples_on_disk": 40,
-    "examples_built": 40
+    "eligible_backed_by_registry_example": 36,
+    "eligible_used_by_some_example": 80,
+    "examples_on_disk": 41,
+    "examples_built": 41
   },
   "by_library": {
     "bids": {
@@ -49,9 +49,9 @@
       "registered": 20,
       "with_test": 7,
       "eligible": 19,
-      "eligible_with_registry_example": 2,
-      "eligible_used_by_example": 5,
-      "with_snippet": 0
+      "eligible_with_registry_example": 19,
+      "eligible_used_by_example": 19,
+      "with_snippet": 19
     },
     "decoding": {
       "public": 5,
@@ -1180,14 +1180,18 @@
       "registry_status": "done",
       "test": "test_connectivity_metrics",
       "test_resolves": true,
-      "example": "ex_connectivity",
+      "example": "ex_connectivity_metrics",
       "example_state": "built",
       "including_examples": [
         "ex_connectivity",
         "ex_connectivity_comparison",
+        "ex_connectivity_metrics",
         "ex_connectivity_performance"
       ],
-      "snippets": [],
+      "snippets": [
+        "ex_connectivity_metrics/main.cpp#connectivity_settings_setup",
+        "ex_connectivity_metrics/main.cpp#connectivity_calculate"
+      ],
       "api_page": "doc/website/docs/api/connectivity/connectivity-class.mdx",
       "python_equiv": "mne_connectivity.spectral_connectivity_epochs",
       "example_eligible": true,
@@ -1208,6 +1212,7 @@
       "including_examples": [
         "ex_connectivity",
         "ex_connectivity_comparison",
+        "ex_connectivity_metrics",
         "ex_connectivity_performance"
       ],
       "snippets": [],
@@ -1226,14 +1231,17 @@
       "registry_status": "documented",
       "test": null,
       "test_resolves": false,
-      "example": null,
-      "example_state": "none",
+      "example": "ex_connectivity_metrics",
+      "example_state": "built",
       "including_examples": [
         "ex_connectivity",
         "ex_connectivity_comparison",
+        "ex_connectivity_metrics",
         "ex_connectivity_performance"
       ],
-      "snippets": [],
+      "snippets": [
+        "ex_connectivity_metrics/main.cpp#abstract_metric_band"
+      ],
       "api_page": "doc/website/docs/api/connectivity/abstract-metric.mdx",
       "python_equiv": null,
       "example_eligible": true,
@@ -1249,10 +1257,14 @@
       "registry_status": "done",
       "test": "test_connectivity_metrics",
       "test_resolves": true,
-      "example": "ex_connectivity",
+      "example": "ex_connectivity_metrics",
       "example_state": "built",
-      "including_examples": [],
-      "snippets": [],
+      "including_examples": [
+        "ex_connectivity_metrics"
+      ],
+      "snippets": [
+        "ex_connectivity_metrics/main.cpp#coherence_calculate"
+      ],
       "api_page": "doc/website/docs/api/connectivity/coherence.mdx",
       "python_equiv": "mne_connectivity.spectral_connectivity_epochs (method='coh')",
       "example_eligible": true,
@@ -1268,10 +1280,14 @@
       "registry_status": "documented",
       "test": null,
       "test_resolves": false,
-      "example": null,
-      "example_state": "none",
-      "including_examples": [],
-      "snippets": [],
+      "example": "ex_connectivity_metrics",
+      "example_state": "built",
+      "including_examples": [
+        "ex_connectivity_metrics"
+      ],
+      "snippets": [
+        "ex_connectivity_metrics/main.cpp#coherency_calculate_abs"
+      ],
       "api_page": "doc/website/docs/api/connectivity/coherency.mdx",
       "python_equiv": null,
       "example_eligible": true,
@@ -1287,10 +1303,14 @@
       "registry_status": "documented",
       "test": null,
       "test_resolves": false,
-      "example": null,
-      "example_state": "none",
-      "including_examples": [],
-      "snippets": [],
+      "example": "ex_connectivity_metrics",
+      "example_state": "built",
+      "including_examples": [
+        "ex_connectivity_metrics"
+      ],
+      "snippets": [
+        "ex_connectivity_metrics/main.cpp#correlation_calculate"
+      ],
       "api_page": "doc/website/docs/api/connectivity/correlation.mdx",
       "python_equiv": null,
       "example_eligible": true,
@@ -1306,10 +1326,14 @@
       "registry_status": "documented",
       "test": null,
       "test_resolves": false,
-      "example": null,
-      "example_state": "none",
-      "including_examples": [],
-      "snippets": [],
+      "example": "ex_connectivity_metrics",
+      "example_state": "built",
+      "including_examples": [
+        "ex_connectivity_metrics"
+      ],
+      "snippets": [
+        "ex_connectivity_metrics/main.cpp#cross_correlation_calculate"
+      ],
       "api_page": "doc/website/docs/api/connectivity/cross-correlation.mdx",
       "python_equiv": null,
       "example_eligible": true,
@@ -1325,10 +1349,14 @@
       "registry_status": "documented",
       "test": null,
       "test_resolves": false,
-      "example": null,
-      "example_state": "none",
-      "including_examples": [],
-      "snippets": [],
+      "example": "ex_connectivity_metrics",
+      "example_state": "built",
+      "including_examples": [
+        "ex_connectivity_metrics"
+      ],
+      "snippets": [
+        "ex_connectivity_metrics/main.cpp#debiased_squared_weighted_phase_lag_index_calculate"
+      ],
       "api_page": "doc/website/docs/api/connectivity/debiased-squared-weighted-phase-lag-index.mdx",
       "python_equiv": null,
       "example_eligible": true,
@@ -1344,10 +1372,14 @@
       "registry_status": "done",
       "test": "test_spectral_connectivity",
       "test_resolves": true,
-      "example": null,
-      "example_state": "none",
-      "including_examples": [],
-      "snippets": [],
+      "example": "ex_connectivity_metrics",
+      "example_state": "built",
+      "including_examples": [
+        "ex_connectivity_metrics"
+      ],
+      "snippets": [
+        "ex_connectivity_metrics/main.cpp#directed_transfer_function_calculate"
+      ],
       "api_page": "doc/website/docs/api/connectivity/directed-transfer-function.mdx",
       "python_equiv": "mne_connectivity.spectral_connectivity_epochs (method='dtf')",
       "example_eligible": true,
@@ -1363,10 +1395,14 @@
       "registry_status": "done",
       "test": "test_spectral_connectivity",
       "test_resolves": true,
-      "example": null,
-      "example_state": "none",
-      "including_examples": [],
-      "snippets": [],
+      "example": "ex_connectivity_metrics",
+      "example_state": "built",
+      "including_examples": [
+        "ex_connectivity_metrics"
+      ],
+      "snippets": [
+        "ex_connectivity_metrics/main.cpp#granger_causality_calculate"
+      ],
       "api_page": "doc/website/docs/api/connectivity/granger-causality.mdx",
       "python_equiv": "mne_connectivity.spectral_connectivity_epochs (method='gc')",
       "example_eligible": true,
@@ -1382,10 +1418,14 @@
       "registry_status": "documented",
       "test": null,
       "test_resolves": false,
-      "example": null,
-      "example_state": "none",
-      "including_examples": [],
-      "snippets": [],
+      "example": "ex_connectivity_metrics",
+      "example_state": "built",
+      "including_examples": [
+        "ex_connectivity_metrics"
+      ],
+      "snippets": [
+        "ex_connectivity_metrics/main.cpp#imag_coherence_calculate"
+      ],
       "api_page": "doc/website/docs/api/connectivity/imag-coherence.mdx",
       "python_equiv": null,
       "example_eligible": true,
@@ -1401,10 +1441,14 @@
       "registry_status": "documented",
       "test": null,
       "test_resolves": false,
-      "example": null,
-      "example_state": "none",
-      "including_examples": [],
-      "snippets": [],
+      "example": "ex_connectivity_metrics",
+      "example_state": "built",
+      "including_examples": [
+        "ex_connectivity_metrics"
+      ],
+      "snippets": [
+        "ex_connectivity_metrics/main.cpp#mvar_model_fit"
+      ],
       "api_page": "doc/website/docs/api/connectivity/mvar-model.mdx",
       "python_equiv": null,
       "example_eligible": true,
@@ -1420,10 +1464,14 @@
       "registry_status": "done",
       "test": "test_spectral_connectivity",
       "test_resolves": true,
-      "example": null,
-      "example_state": "none",
-      "including_examples": [],
-      "snippets": [],
+      "example": "ex_connectivity_metrics",
+      "example_state": "built",
+      "including_examples": [
+        "ex_connectivity_metrics"
+      ],
+      "snippets": [
+        "ex_connectivity_metrics/main.cpp#partial_directed_coherence_calculate"
+      ],
       "api_page": "doc/website/docs/api/connectivity/partial-directed-coherence.mdx",
       "python_equiv": "mne_connectivity.spectral_connectivity_epochs (method='pdc')",
       "example_eligible": true,
@@ -1439,10 +1487,14 @@
       "registry_status": "done",
       "test": "test_connectivity_metrics",
       "test_resolves": true,
-      "example": null,
-      "example_state": "none",
-      "including_examples": [],
-      "snippets": [],
+      "example": "ex_connectivity_metrics",
+      "example_state": "built",
+      "including_examples": [
+        "ex_connectivity_metrics"
+      ],
+      "snippets": [
+        "ex_connectivity_metrics/main.cpp#phase_lag_index_calculate"
+      ],
       "api_page": "doc/website/docs/api/connectivity/phase-lag-index.mdx",
       "python_equiv": "mne_connectivity.spectral_connectivity_epochs (method='pli')",
       "example_eligible": true,
@@ -1458,10 +1510,14 @@
       "registry_status": "done",
       "test": "test_connectivity_metrics",
       "test_resolves": true,
-      "example": null,
-      "example_state": "none",
-      "including_examples": [],
-      "snippets": [],
+      "example": "ex_connectivity_metrics",
+      "example_state": "built",
+      "including_examples": [
+        "ex_connectivity_metrics"
+      ],
+      "snippets": [
+        "ex_connectivity_metrics/main.cpp#phase_locking_value_calculate"
+      ],
       "api_page": "doc/website/docs/api/connectivity/phase-locking-value.mdx",
       "python_equiv": "mne_connectivity.spectral_connectivity_epochs (method='plv')",
       "example_eligible": true,
@@ -1477,10 +1533,14 @@
       "registry_status": "documented",
       "test": null,
       "test_resolves": false,
-      "example": null,
-      "example_state": "none",
-      "including_examples": [],
-      "snippets": [],
+      "example": "ex_connectivity_metrics",
+      "example_state": "built",
+      "including_examples": [
+        "ex_connectivity_metrics"
+      ],
+      "snippets": [
+        "ex_connectivity_metrics/main.cpp#unbiased_squared_phase_lag_index_calculate"
+      ],
       "api_page": "doc/website/docs/api/connectivity/unbiased-squared-phase-lag-index.mdx",
       "python_equiv": null,
       "example_eligible": true,
@@ -1496,10 +1556,14 @@
       "registry_status": "documented",
       "test": null,
       "test_resolves": false,
-      "example": null,
-      "example_state": "none",
-      "including_examples": [],
-      "snippets": [],
+      "example": "ex_connectivity_metrics",
+      "example_state": "built",
+      "including_examples": [
+        "ex_connectivity_metrics"
+      ],
+      "snippets": [
+        "ex_connectivity_metrics/main.cpp#weighted_phase_lag_index_calculate"
+      ],
       "api_page": "doc/website/docs/api/connectivity/weighted-phase-lag-index.mdx",
       "python_equiv": null,
       "example_eligible": true,
@@ -1515,15 +1579,19 @@
       "registry_status": "documented",
       "test": null,
       "test_resolves": false,
-      "example": null,
-      "example_state": "none",
+      "example": "ex_connectivity_metrics",
+      "example_state": "built",
       "including_examples": [
         "ex_connectivity",
         "ex_connectivity_comparison",
+        "ex_connectivity_metrics",
         "ex_connectivity_performance",
         "ex_fiff_sniffer"
       ],
-      "snippets": [],
+      "snippets": [
+        "ex_connectivity_metrics/main.cpp#network_build",
+        "ex_connectivity_metrics/main.cpp#network_threshold"
+      ],
       "api_page": "doc/website/docs/api/connectivity/network.mdx",
       "python_equiv": null,
       "example_eligible": true,
@@ -1539,12 +1607,15 @@
       "registry_status": "documented",
       "test": null,
       "test_resolves": false,
-      "example": null,
-      "example_state": "none",
+      "example": "ex_connectivity_metrics",
+      "example_state": "built",
       "including_examples": [
-        "ex_connectivity"
+        "ex_connectivity",
+        "ex_connectivity_metrics"
       ],
-      "snippets": [],
+      "snippets": [
+        "ex_connectivity_metrics/main.cpp#network_build"
+      ],
       "api_page": "doc/website/docs/api/connectivity/network-edge.mdx",
       "python_equiv": null,
       "example_eligible": true,
@@ -1560,12 +1631,15 @@
       "registry_status": "documented",
       "test": null,
       "test_resolves": false,
-      "example": null,
-      "example_state": "none",
+      "example": "ex_connectivity_metrics",
+      "example_state": "built",
       "including_examples": [
-        "ex_connectivity"
+        "ex_connectivity",
+        "ex_connectivity_metrics"
       ],
-      "snippets": [],
+      "snippets": [
+        "ex_connectivity_metrics/main.cpp#network_build"
+      ],
       "api_page": "doc/website/docs/api/connectivity/network-node.mdx",
       "python_equiv": null,
       "example_eligible": true,

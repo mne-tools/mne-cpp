@@ -85,6 +85,8 @@ class Network;
  * against the spectral and phase-based estimators.
  *
  * @brief Pearson correlation estimator; broadband, zero-lag time-domain baseline.
+ *
+ * @snippet ex_connectivity_metrics/main.cpp correlation_calculate
  */
 class CONNECTIVITYSHARED_EXPORT Correlation : public AbstractMetric
 {

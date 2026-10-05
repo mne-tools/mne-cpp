@@ -77,6 +77,8 @@ class NetworkNode;
  * directionality is purely a storage convention.
  *
  * @brief Weighted, directional edge in a @ref Network; carries per-frequency weights plus a band-averaged scalar.
+ *
+ * @snippet ex_connectivity_metrics/main.cpp network_build
  */
 
 class CONNECTIVITYSHARED_EXPORT NetworkEdge

@@ -80,6 +80,10 @@ class Network;
  * running e.g. PLI + wPLI + dwPLI in one call costs only one FFT pass.
  *
  * @brief Runs the selected functional-connectivity metrics over a @ref ConnectivitySettings batch.
+ *
+ * @snippet ex_connectivity_metrics/main.cpp connectivity_settings_setup
+ *
+ * @snippet ex_connectivity_metrics/main.cpp connectivity_calculate
  */
 class CONNECTIVITYSHARED_EXPORT Connectivity
 {

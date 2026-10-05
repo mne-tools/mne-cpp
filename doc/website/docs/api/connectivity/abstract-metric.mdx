@@ -25,6 +25,13 @@ Holds the two pieces of global state that the dispatcher (`Connectivity::calcula
 
 Static control knobs (storage mode, frequency band) shared by all `CONNECTIVITYLIB` metrics.
 
+```cpp title="src/examples/ex_connectivity_metrics/main.cpp"
+// Spectral metrics evaluate the bins [start, start + amount); -1 means the full half spectrum.
+AbstractMetric::m_iNumberBinStart = -1;
+AbstractMetric::m_iNumberBinAmount = -1;
+AbstractMetric::m_bStorageModeIsActive = false;
+```
+
 ### Inheritance
 
 ```mermaid
@@ -66,6 +73,11 @@ classDiagram
 Constructs a [`AbstractMetric`](/docs/api/connectivity/abstract-metric) object.
 
 ---
+
+## Example
+
+- Full source: [`src/examples/ex_connectivity_metrics/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_connectivity_metrics/main.cpp)
+- Build target: `ex_connectivity_metrics` (runs under CTest)
 
 ## Authors of this file
 

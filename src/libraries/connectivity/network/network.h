@@ -94,6 +94,10 @@ struct VisualizationInfo
  * block read by the disp3D rendering layer.
  *
  * @brief Graph container for one connectivity metric; nodes + weighted edges + threshold/visualisation state.
+ *
+ * @snippet ex_connectivity_metrics/main.cpp network_build
+ *
+ * @snippet ex_connectivity_metrics/main.cpp network_threshold
  */
 
 class CONNECTIVITYSHARED_EXPORT Network

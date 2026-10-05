@@ -91,6 +91,8 @@ class Network;
  * requested in one batch.
  *
  * @brief Weighted Phase Lag Index estimator (Vinck et al. 2011); volume-conduction-robust with lower bias than PLI.
+ *
+ * @snippet ex_connectivity_metrics/main.cpp weighted_phase_lag_index_calculate
  */
 class CONNECTIVITYSHARED_EXPORT WeightedPhaseLagIndex : public AbstractMetric
 {

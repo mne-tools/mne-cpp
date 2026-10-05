@@ -90,6 +90,8 @@ class Network;
  * volume-conduction-robust imaginary coherence of Nolte et al. (2004).
  *
  * @brief Complex coherency core; produces magnitude-squared and imaginary-part reductions for downstream metrics.
+ *
+ * @snippet ex_connectivity_metrics/main.cpp coherency_calculate_abs
  */
 class CONNECTIVITYSHARED_EXPORT Coherency : public AbstractMetric
 {

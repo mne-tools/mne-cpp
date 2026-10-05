@@ -19,7 +19,17 @@ Multivariate autoregressive (MVAR) model fit and its frequency-domain decomposit
 
 The model order `p` is either supplied by the caller or selected automatically by Bayesian Information Criterion over ``[1, 20]; the coefficient matrices are estimated by Levinson-Durbin recursion on the Yule-Walker equations. The resulting `H` and `S` are consumed by the three directed-connectivity metrics in this library (Granger Causality, DTF, PDC) and are exposed via `transferFunction` and `spectralMatrix` at arbitrary normalised frequencies.
 
-MVAR model fit; provides H(f) and S(f) for Granger Causality, DTF and PDC.
+MVAR model fit; provides H(f) and S(f) for Granger Causality, DTF and PDC. 
+```cpp title="src/examples/ex_connectivity_metrics/main.cpp"
+MatrixXd average = MatrixXd::Zero(3, kSamples);
+for (int i = 0; i < settings.size(); ++i) {
+    average += settings.at(i).matData / settings.size();
+}
+MvarModel mvar;
+mvar.fit(average, 4);                                       // pass 0 to select the order by BIC
+const QVector<MatrixXd> coefficients = mvar.coefficients(); // A_1 .. A_p
+const QVector<MatrixXcd> transfer = mvar.transferFunction(VectorXd::LinSpaced(5, 0.0, 0.5));
+```
 
 ---
 
@@ -108,6 +118,11 @@ Computes the spectral matrix S(f) = H(f) * Sigma * H(f)^H.
 - *QVector&lt; Eigen::MatrixXcd &gt;* — Vector of nChannels x nChannels complex matrices, one per frequency.
 
 ---
+
+## Example
+
+- Full source: [`src/examples/ex_connectivity_metrics/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_connectivity_metrics/main.cpp)
+- Build target: `ex_connectivity_metrics` (runs under CTest)
 
 ## Authors of this file
 

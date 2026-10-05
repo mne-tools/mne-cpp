@@ -91,6 +91,8 @@ class Network;
  * over trials via @c QtConcurrent and reduced under a single @c QMutex.
  *
  * @brief Phase Lag Index estimator (Stam et al. 2007); rejects zero-lag volume-conduction mixing.
+ *
+ * @snippet ex_connectivity_metrics/main.cpp phase_lag_index_calculate
  */
 class CONNECTIVITYSHARED_EXPORT PhaseLagIndex : public AbstractMetric
 {

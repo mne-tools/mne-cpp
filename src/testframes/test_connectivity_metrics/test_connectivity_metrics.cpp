@@ -147,6 +147,21 @@ private slots:
 
         QList<Network> networks = Connectivity::calculate(settings);
         QCOMPARE(networks.size(), 1);
+
+        // Trial-averaged Pearson r, as numpy.corrcoef per trial then mean
+        MatrixXd expected = MatrixXd::Zero(4, 4);
+        for (int t = 0; t < settings.size(); ++t) {
+            const MatrixXd c = settings.at(t).matData.colwise() - settings.at(t).matData.rowwise().mean();
+            const VectorXd n = c.rowwise().norm();
+            expected += (c * c.transpose()).cwiseQuotient(n * n.transpose()) / settings.size();
+        }
+        const MatrixXd actual = networks.first().getFullConnectivityMatrix(false);
+        for (int i = 0; i < 4; ++i) {
+            for (int j = i + 1; j < 4; ++j) {
+                QVERIFY2(qAbs(actual(i, j) - expected(i, j)) < 1e-12,
+                         qPrintable(QString("COR(%1,%2) %3 vs %4").arg(i).arg(j).arg(actual(i, j)).arg(expected(i, j))));
+            }
+        }
     }
 
     void testCalculateCrossCorrelation()

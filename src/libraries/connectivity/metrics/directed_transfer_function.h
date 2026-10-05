@@ -84,6 +84,8 @@ class ConnectivitySettings;
  *
  * @brief Directed Transfer Function estimator (Kaminski & Blinowska 1991); directional, includes indirect paths.
  * @since 2.2.0
+ *
+ * @snippet ex_connectivity_metrics/main.cpp directed_transfer_function_calculate
  */
 class CONNECTIVITYSHARED_EXPORT DirectedTransferFunction : public AbstractMetric
 {

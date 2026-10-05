@@ -23,6 +23,11 @@ Each channel pair is reduced to `|sum` Im(S_\{xy\})| / sum |Im(S_\{xy\})|, weigh
 
 Weighted Phase Lag Index estimator (Vinck et al. 2011); volume-conduction-robust with lower bias than PLI.
 
+```cpp title="src/examples/ex_connectivity_metrics/main.cpp"
+Network wpli = WeightedPhaseLagIndex::calculate(settings);
+wpli.setFrequencyRange(8.0f, 12.0f);
+```
+
 ### Inheritance
 
 ```mermaid
@@ -57,6 +62,11 @@ Calculates the WPLI between the rows of the data matrix.
 - *[Network](/docs/api/connectivity/network)* — The connectivity information in form of a network structure.
 
 ---
+
+## Example
+
+- Full source: [`src/examples/ex_connectivity_metrics/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_connectivity_metrics/main.cpp)
+- Build target: `ex_connectivity_metrics` (runs under CTest)
 
 ## Authors of this file
 

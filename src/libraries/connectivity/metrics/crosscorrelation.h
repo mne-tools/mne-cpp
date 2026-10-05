@@ -85,6 +85,8 @@ class Network;
  * is sensitive to delayed coupling because the lag axis is searched.
  *
  * @brief Time-lagged cross-correlation estimator; broadband, sensitive to delayed coupling.
+ *
+ * @snippet ex_connectivity_metrics/main.cpp cross_correlation_calculate
  */
 class CONNECTIVITYSHARED_EXPORT CrossCorrelation : public AbstractMetric
 {

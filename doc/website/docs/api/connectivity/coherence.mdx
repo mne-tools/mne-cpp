@@ -25,6 +25,13 @@ The actual cross-spectral and auto-spectral accumulation is shared with [`Cohere
 
 Magnitude-squared coherence estimator (symmetric, sensitive to zero-lag coupling).
 
+```cpp title="src/examples/ex_connectivity_metrics/main.cpp"
+Network coherence = Coherence::calculate(settings);
+coherence.setFrequencyRange(8.0f, 12.0f);
+const double coh01 = edgeWeight(coherence, 0, 1);
+const double coh02 = edgeWeight(coherence, 0, 2);
+```
+
 ### Inheritance
 
 ```mermaid
@@ -62,8 +69,8 @@ Calculates the coherence between the rows of the data matrix.
 
 ## Example
 
-- Full source: [`src/examples/ex_connectivity/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_connectivity/main.cpp)
-- Build target: `ex_connectivity` (compiled in CI)
+- Full source: [`src/examples/ex_connectivity_metrics/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_connectivity_metrics/main.cpp)
+- Build target: `ex_connectivity_metrics` (runs under CTest)
 
 ## Authors of this file
 

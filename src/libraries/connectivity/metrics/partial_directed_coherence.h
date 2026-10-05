@@ -85,6 +85,8 @@ class ConnectivitySettings;
  *
  * @brief Partial Directed Coherence estimator (Baccala & Sameshima 2001); directional, direct paths only.
  * @since 2.2.0
+ *
+ * @snippet ex_connectivity_metrics/main.cpp partial_directed_coherence_calculate
  */
 class CONNECTIVITYSHARED_EXPORT PartialDirectedCoherence : public AbstractMetric
 {

@@ -91,6 +91,8 @@ class Network;
  * @ref AbstractMetric.
  *
  * @brief Phase Locking Value estimator (Lachaux et al. 1999); amplitude-independent phase coupling, sensitive to zero-lag.
+ *
+ * @snippet ex_connectivity_metrics/main.cpp phase_locking_value_calculate
  */
 class CONNECTIVITYSHARED_EXPORT PhaseLockingValue : public AbstractMetric
 {

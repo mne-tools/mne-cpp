@@ -100,7 +100,7 @@ Network Correlation::calculate(ConnectivitySettings& connectivitySettings)
                                                               reduce);
     resultMat.waitForFinished();
 
-    MatrixXd matDist = resultMat.result();
+    MatrixXd matDist = resultMat.result() / connectivitySettings.size();
 
     //    MatrixXd matDist;
 
@@ -142,18 +142,16 @@ Network Correlation::calculate(ConnectivitySettings& connectivitySettings)
 
 MatrixXd Correlation::compute(const ConnectivitySettings::IntermediateTrialData& inputData)
 {
-    MatrixXd matDist = MatrixXd::Zero(inputData.matData.rows(), inputData.matData.rows());
-    RowVectorXd vecRow;
+    const MatrixXd centered = inputData.matData.colwise() - inputData.matData.rowwise().mean();
+    const VectorXd norms = centered.rowwise().norm();
+    MatrixXd matDist = centered * centered.transpose();
 
-    matDist = inputData.matData * inputData.matData.transpose();
-
-    //    for(int i = 0; i < inputData.matData.rows(); ++i) {
-    //        vecRow = inputData.matData.row(i);
-
-    //        for(j = i; j < inputData.matData.rows(); ++j) {
-    //            matDist(i,j) += (vecRow.dot(inputData.matData.row(j))/vecRow.cols());
-    //        }
-    //    }
+    for (int i = 0; i < matDist.rows(); ++i) {
+        for (int j = 0; j < matDist.cols(); ++j) {
+            const double denom = norms(i) * norms(j);
+            matDist(i, j) = denom > 0.0 ? matDist(i, j) / denom : 0.0;
+        }
+    }
 
     return matDist;
 }

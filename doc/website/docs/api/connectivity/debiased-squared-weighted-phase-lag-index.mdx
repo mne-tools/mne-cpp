@@ -23,6 +23,11 @@ The estimator subtracts the analytically known diagonal variance from both numer
 
 Debiased squared Weighted Phase Lag Index (Vinck et al. 2011); low-bias volume-conduction-robust estimator.
 
+```cpp title="src/examples/ex_connectivity_metrics/main.cpp"
+Network dswpli = DebiasedSquaredWeightedPhaseLagIndex::calculate(settings);
+dswpli.setFrequencyRange(8.0f, 12.0f);
+```
+
 ### Inheritance
 
 ```mermaid
@@ -57,6 +62,11 @@ Calculates the debiased squared weighted phase lag index between the rows of the
 - *[Network](/docs/api/connectivity/network)* — The connectivity information in form of a network structure.
 
 ---
+
+## Example
+
+- Full source: [`src/examples/ex_connectivity_metrics/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_connectivity_metrics/main.cpp)
+- Build target: `ex_connectivity_metrics` (runs under CTest)
 
 ## Authors of this file
 

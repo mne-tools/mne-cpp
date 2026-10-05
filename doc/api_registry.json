@@ -1387,7 +1387,12 @@
       "mne_python": "mne_connectivity.spectral_connectivity_epochs",
       "sklearn": null,
       "test": "test_connectivity_metrics",
-      "example": "ex_connectivity",
+      "example": "ex_connectivity_metrics",
+      "example_snippet": [
+        "ex_connectivity_metrics/main.cpp#connectivity_settings_setup",
+        "ex_connectivity_metrics/main.cpp#connectivity_calculate"
+      ],
+      "example_mode": "run",
       "status": "done",
       "skigen_candidate": false,
       "documented": true,
@@ -1405,7 +1410,11 @@
       "mne_python": "mne_connectivity.spectral_connectivity_epochs (method='coh')",
       "sklearn": null,
       "test": "test_connectivity_metrics",
-      "example": "ex_connectivity",
+      "example": "ex_connectivity_metrics",
+      "example_snippet": [
+        "ex_connectivity_metrics/main.cpp#coherence_calculate"
+      ],
+      "example_mode": "run",
       "status": "done",
       "skigen_candidate": false,
       "documented": true,
@@ -1423,7 +1432,11 @@
       "mne_python": "mne_connectivity.spectral_connectivity_epochs (method='plv')",
       "sklearn": null,
       "test": "test_connectivity_metrics",
-      "example": null,
+      "example": "ex_connectivity_metrics",
+      "example_snippet": [
+        "ex_connectivity_metrics/main.cpp#phase_locking_value_calculate"
+      ],
+      "example_mode": "run",
       "status": "done",
       "skigen_candidate": false,
       "documented": true,
@@ -1441,7 +1454,11 @@
       "mne_python": "mne_connectivity.spectral_connectivity_epochs (method='pli')",
       "sklearn": null,
       "test": "test_connectivity_metrics",
-      "example": null,
+      "example": "ex_connectivity_metrics",
+      "example_snippet": [
+        "ex_connectivity_metrics/main.cpp#phase_lag_index_calculate"
+      ],
+      "example_mode": "run",
       "status": "done",
       "skigen_candidate": false,
       "documented": true,
@@ -1459,7 +1476,11 @@
       "mne_python": "mne_connectivity.spectral_connectivity_epochs (method='gc')",
       "sklearn": null,
       "test": "test_spectral_connectivity",
-      "example": null,
+      "example": "ex_connectivity_metrics",
+      "example_snippet": [
+        "ex_connectivity_metrics/main.cpp#granger_causality_calculate"
+      ],
+      "example_mode": "run",
       "status": "done",
       "skigen_candidate": false,
       "documented": true,
@@ -1477,7 +1498,11 @@
       "mne_python": "mne_connectivity.spectral_connectivity_epochs (method='pdc')",
       "sklearn": null,
       "test": "test_spectral_connectivity",
-      "example": null,
+      "example": "ex_connectivity_metrics",
+      "example_snippet": [
+        "ex_connectivity_metrics/main.cpp#partial_directed_coherence_calculate"
+      ],
+      "example_mode": "run",
       "status": "done",
       "skigen_candidate": false,
       "documented": true,
@@ -1495,7 +1520,11 @@
       "mne_python": "mne_connectivity.spectral_connectivity_epochs (method='dtf')",
       "sklearn": null,
       "test": "test_spectral_connectivity",
-      "example": null,
+      "example": "ex_connectivity_metrics",
+      "example_snippet": [
+        "ex_connectivity_metrics/main.cpp#directed_transfer_function_calculate"
+      ],
+      "example_mode": "run",
       "status": "done",
       "skigen_candidate": false,
       "documented": true,
@@ -2030,7 +2059,11 @@
       "mne_python": null,
       "sklearn": null,
       "test": null,
-      "example": null,
+      "example": "ex_connectivity_metrics",
+      "example_snippet": [
+        "ex_connectivity_metrics/main.cpp#abstract_metric_band"
+      ],
+      "example_mode": "run",
       "status": "documented",
       "skigen_candidate": false,
       "documented": true,
@@ -2048,7 +2081,11 @@
       "mne_python": null,
       "sklearn": null,
       "test": null,
-      "example": null,
+      "example": "ex_connectivity_metrics",
+      "example_snippet": [
+        "ex_connectivity_metrics/main.cpp#coherency_calculate_abs"
+      ],
+      "example_mode": "run",
       "status": "documented",
       "skigen_candidate": false,
       "documented": true,
@@ -2084,7 +2121,11 @@
       "mne_python": null,
       "sklearn": null,
       "test": null,
-      "example": null,
+      "example": "ex_connectivity_metrics",
+      "example_snippet": [
+        "ex_connectivity_metrics/main.cpp#correlation_calculate"
+      ],
+      "example_mode": "run",
       "status": "documented",
       "skigen_candidate": false,
       "documented": true,
@@ -2102,7 +2143,11 @@
       "mne_python": null,
       "sklearn": null,
       "test": null,
-      "example": null,
+      "example": "ex_connectivity_metrics",
+      "example_snippet": [
+        "ex_connectivity_metrics/main.cpp#cross_correlation_calculate"
+      ],
+      "example_mode": "run",
       "status": "documented",
       "skigen_candidate": false,
       "documented": true,
@@ -2120,7 +2165,11 @@
       "mne_python": null,
       "sklearn": null,
       "test": null,
-      "example": null,
+      "example": "ex_connectivity_metrics",
+      "example_snippet": [
+        "ex_connectivity_metrics/main.cpp#debiased_squared_weighted_phase_lag_index_calculate"
+      ],
+      "example_mode": "run",
       "status": "documented",
       "skigen_candidate": false,
       "documented": true,
@@ -2138,7 +2187,11 @@
       "mne_python": null,
       "sklearn": null,
       "test": null,
-      "example": null,
+      "example": "ex_connectivity_metrics",
+      "example_snippet": [
+        "ex_connectivity_metrics/main.cpp#imag_coherence_calculate"
+      ],
+      "example_mode": "run",
       "status": "documented",
       "skigen_candidate": false,
       "documented": true,
@@ -2156,7 +2209,11 @@
       "mne_python": null,
       "sklearn": null,
       "test": null,
-      "example": null,
+      "example": "ex_connectivity_metrics",
+      "example_snippet": [
+        "ex_connectivity_metrics/main.cpp#mvar_model_fit"
+      ],
+      "example_mode": "run",
       "status": "documented",
       "skigen_candidate": false,
       "documented": true,
@@ -2174,7 +2231,12 @@
       "mne_python": null,
       "sklearn": null,
       "test": null,
-      "example": null,
+      "example": "ex_connectivity_metrics",
+      "example_snippet": [
+        "ex_connectivity_metrics/main.cpp#network_build",
+        "ex_connectivity_metrics/main.cpp#network_threshold"
+      ],
+      "example_mode": "run",
       "status": "documented",
       "skigen_candidate": false,
       "documented": true,
@@ -2192,7 +2254,11 @@
       "mne_python": null,
       "sklearn": null,
       "test": null,
-      "example": null,
+      "example": "ex_connectivity_metrics",
+      "example_snippet": [
+        "ex_connectivity_metrics/main.cpp#network_build"
+      ],
+      "example_mode": "run",
       "status": "documented",
       "skigen_candidate": false,
       "documented": true,
@@ -2210,7 +2276,11 @@
       "mne_python": null,
       "sklearn": null,
       "test": null,
-      "example": null,
+      "example": "ex_connectivity_metrics",
+      "example_snippet": [
+        "ex_connectivity_metrics/main.cpp#network_build"
+      ],
+      "example_mode": "run",
       "status": "documented",
       "skigen_candidate": false,
       "documented": true,
@@ -2228,7 +2298,11 @@
       "mne_python": null,
       "sklearn": null,
       "test": null,
-      "example": null,
+      "example": "ex_connectivity_metrics",
+      "example_snippet": [
+        "ex_connectivity_metrics/main.cpp#unbiased_squared_phase_lag_index_calculate"
+      ],
+      "example_mode": "run",
       "status": "documented",
       "skigen_candidate": false,
       "documented": true,
@@ -2246,7 +2320,11 @@
       "mne_python": null,
       "sklearn": null,
       "test": null,
-      "example": null,
+      "example": "ex_connectivity_metrics",
+      "example_snippet": [
+        "ex_connectivity_metrics/main.cpp#weighted_phase_lag_index_calculate"
+      ],
+      "example_mode": "run",
       "status": "documented",
       "skigen_candidate": false,
       "documented": true,

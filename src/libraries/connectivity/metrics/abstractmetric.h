@@ -77,6 +77,8 @@ namespace CONNECTIVITYLIB
  *    output into the single scalar weight stored on each network edge.
  *
  * @brief Static control knobs (storage mode, frequency band) shared by all CONNECTIVITYLIB metrics.
+ *
+ * @snippet ex_connectivity_metrics/main.cpp abstract_metric_band
  */
 class CONNECTIVITYSHARED_EXPORT AbstractMetric
 {

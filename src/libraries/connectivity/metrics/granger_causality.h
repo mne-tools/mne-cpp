@@ -91,6 +91,8 @@ class ConnectivitySettings;
  *
  * @brief Spectral Granger Causality estimator; directional, MVAR-based.
  * @since 2.2.0
+ *
+ * @snippet ex_connectivity_metrics/main.cpp granger_causality_calculate
  */
 class CONNECTIVITYSHARED_EXPORT GrangerCausality : public AbstractMetric
 {

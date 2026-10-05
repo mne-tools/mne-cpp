@@ -23,7 +23,10 @@ Directed Transfer Function estimator of Kaminski & Blinowska (1991).
 
 Computes `DTF_{ij}`(f) = |H_\{ij\}(f)|^2 / sum_k |H_\{ik\}(f)|^2 from the transfer matrix `H` delivered by [`MvarModel`](/docs/api/connectivity/mvar-model) and reduces it to a scalar edge weight by averaging over the frequency window defined on [`AbstractMetric`](/docs/api/connectivity/abstract-metric). The resulting [`Network`](/docs/api/connectivity/network) is directional and includes both direct and indirect causal pathways - use [`PartialDirectedCoherence`](/docs/api/connectivity/partial-directed-coherence) for direct-only flow.
 
-Directed Transfer Function estimator (Kaminski & Blinowska 1991); directional, includes indirect paths.
+Directed Transfer Function estimator (Kaminski & Blinowska 1991); directional, includes indirect paths. 
+```cpp title="src/examples/ex_connectivity_metrics/main.cpp"
+Network dtf = DirectedTransferFunction::calculate(settings);
+```
 
 ### Inheritance
 
@@ -59,6 +62,11 @@ Calculates the Directed Transfer Function between all channel pairs.
 - *[Network](/docs/api/connectivity/network)* — The connectivity information in form of a network structure.
 
 ---
+
+## Example
+
+- Full source: [`src/examples/ex_connectivity_metrics/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_connectivity_metrics/main.cpp)
+- Build target: `ex_connectivity_metrics` (runs under CTest)
 
 ## Authors of this file
 

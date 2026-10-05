@@ -10,10 +10,15 @@ if(WIN32)
   set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_DEBUG ${CMAKE_RUNTIME_OUTPUT_DIRECTORY})
 endif()
 
+if(BUILD_TESTS)
+  include(${CMAKE_CURRENT_SOURCE_DIR}/../../cmake/MneTesting.cmake)
+endif()
+
 ## Examples without special dependencies - can build for WASM
 add_subdirectory(ex_averaging)
 add_subdirectory(ex_cancel_noise)
 add_subdirectory(ex_compute_forward)
+add_subdirectory(ex_connectivity_metrics)
 add_subdirectory(ex_warp)
 
 ## Examples that link mne_disp3D but don't use 3D visualization directly

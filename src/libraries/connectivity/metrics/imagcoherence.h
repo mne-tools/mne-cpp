@@ -89,6 +89,8 @@ class Network;
  * by the dispatcher in @ref Connectivity.
  *
  * @brief Imaginary-coherence estimator (Nolte et al. 2004); rejects zero-lag volume-conduction mixing.
+ *
+ * @snippet ex_connectivity_metrics/main.cpp imag_coherence_calculate
  */
 class CONNECTIVITYSHARED_EXPORT ImagCoherence : public AbstractMetric
 {

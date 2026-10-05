@@ -23,7 +23,10 @@ class CONNECTIVITYLIB::GrangerCausality
 
 For every ordered channel pair ``(j -&gt; i) the estimator fits an MVAR model to the trial-concatenated time series via [`[MvarModel](/docs/api/connectivity/mvar-model)`](/docs/api/connectivity/mvar-model) and evaluates the log ratio of the unconditional and conditional spectra of `X_i`, `GC_{j->i}`(f) = ln( S_\{ii\}(f) / ( S_\{ii\}(f) - (Sigma_\{jj\} - Sigma_\{ij\}^2 / Sigma_\{ii\}) * |H_\{ij\}(f)|^2 ) ). The resulting [`[Network](/docs/api/connectivity/network)`](/docs/api/connectivity/network) is directional and stores the band-averaged GC value as edge weight.
 
-[Spectral](/docs/api/utils/spectral) Granger Causality estimator; directional, MVAR-based.
+Spectral Granger Causality estimator; directional, MVAR-based. 
+```cpp title="src/examples/ex_connectivity_metrics/main.cpp"
+Network granger = GrangerCausality::calculate(settings); // edge j -> i: j Granger-causes i
+```
 
 ### Inheritance
 
@@ -59,6 +62,11 @@ Calculates spectral Granger causality between all channel pairs.
 - *[Network](/docs/api/connectivity/network)* — The connectivity information in form of a network structure.
 
 ---
+
+## Example
+
+- Full source: [`src/examples/ex_connectivity_metrics/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_connectivity_metrics/main.cpp)
+- Build target: `ex_connectivity_metrics` (runs under CTest)
 
 ## Authors of this file
 

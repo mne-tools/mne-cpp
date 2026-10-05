@@ -85,6 +85,8 @@ namespace CONNECTIVITYLIB
  *
  * @brief MVAR model fit; provides H(f) and S(f) for Granger Causality, DTF and PDC.
  * @since 2.2.0
+ *
+ * @snippet ex_connectivity_metrics/main.cpp mvar_model_fit
  */
 class CONNECTIVITYSHARED_EXPORT MvarModel
 {

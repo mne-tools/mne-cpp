@@ -87,6 +87,8 @@ class Network;
  * zero-lag rejection property of the PLI family.
  *
  * @brief Unbiased squared Phase Lag Index estimator; removes the small-sample bias of @ref PhaseLagIndex.
+ *
+ * @snippet ex_connectivity_metrics/main.cpp unbiased_squared_phase_lag_index_calculate
  */
 class CONNECTIVITYSHARED_EXPORT UnbiasedSquaredPhaseLagIndex : public AbstractMetric
 {

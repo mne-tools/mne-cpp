@@ -21,6 +21,11 @@ The estimator subtracts the analytically known diagonal contribution from the sq
 
 Unbiased squared Phase Lag Index estimator; removes the small-sample bias of [`PhaseLagIndex`](/docs/api/connectivity/phase-lag-index).
 
+```cpp title="src/examples/ex_connectivity_metrics/main.cpp"
+Network uspli = UnbiasedSquaredPhaseLagIndex::calculate(settings);
+uspli.setFrequencyRange(8.0f, 12.0f);
+```
+
 ### Inheritance
 
 ```mermaid
@@ -55,6 +60,11 @@ Calculates the USPLI between the rows of the data matrix.
 - *[Network](/docs/api/connectivity/network)* — The connectivity information in form of a network structure.
 
 ---
+
+## Example
+
+- Full source: [`src/examples/ex_connectivity_metrics/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_connectivity_metrics/main.cpp)
+- Build target: `ex_connectivity_metrics` (runs under CTest)
 
 ## Authors of this file
 

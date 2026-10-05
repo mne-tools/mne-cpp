@@ -27,6 +27,11 @@ Each cross-spectral sample is divided by its magnitude (yielding a unit complex 
 
 Phase Locking Value estimator (Lachaux et al. 1999); amplitude-independent phase coupling, sensitive to zero-lag.
 
+```cpp title="src/examples/ex_connectivity_metrics/main.cpp"
+Network plv = PhaseLockingValue::calculate(settings);
+plv.setFrequencyRange(8.0f, 12.0f);
+```
+
 ### Inheritance
 
 ```mermaid
@@ -61,6 +66,11 @@ Calculates the phase locking value between the rows of the data matrix.
 - *[Network](/docs/api/connectivity/network)* — The connectivity information in form of a network structure.
 
 ---
+
+## Example
+
+- Full source: [`src/examples/ex_connectivity_metrics/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_connectivity_metrics/main.cpp)
+- Build target: `ex_connectivity_metrics` (runs under CTest)
 
 ## Authors of this file
 

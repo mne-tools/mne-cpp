@@ -90,6 +90,8 @@ class Network;
  * magnitude-squared coherence.
  *
  * @brief Debiased squared Weighted Phase Lag Index (Vinck et al. 2011); low-bias volume-conduction-robust estimator.
+ *
+ * @snippet ex_connectivity_metrics/main.cpp debiased_squared_weighted_phase_lag_index_calculate
  */
 class CONNECTIVITYSHARED_EXPORT DebiasedSquaredWeightedPhaseLagIndex : public AbstractMetric
 {

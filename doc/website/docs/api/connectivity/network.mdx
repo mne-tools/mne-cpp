@@ -21,6 +21,29 @@ Holds the [`NetworkNode`](/docs/api/connectivity/network-node) list (channel / s
 
 [Graph](/docs/api/disp/graph) container for one connectivity metric; nodes + weighted edges + threshold/visualisation state.
 
+```cpp title="src/examples/ex_connectivity_metrics/main.cpp"
+Network network("manual");
+for (int i = 0; i < 3; ++i) {
+    network.append(NetworkNode::SPtr(new NetworkNode(i, positions.row(i))));
+}
+const QList<QPair<int, int>> pairs = {{0, 1}, {1, 2}};
+const QList<double> weights = {0.9, 0.2};
+for (int k = 0; k < pairs.size(); ++k) {
+    MatrixXd perBin = MatrixXd::Constant(1, 1, weights[k]);
+    NetworkEdge::SPtr edge(new NetworkEdge(pairs[k].first, pairs[k].second, perBin));
+    network.getNodeAt(pairs[k].first)->append(edge);
+    network.getNodeAt(pairs[k].second)->append(edge);
+    network.append(edge);
+}
+```
+
+```cpp title="src/examples/ex_connectivity_metrics/main.cpp"
+network.setThreshold(0.5);
+const MatrixXd adjacency = network.getFullConnectivityMatrix(); // symmetric by default
+const int strongEdges = network.getThresholdedEdges().size();
+const NetworkNode::SPtr hub = network.getNodeAt(1);
+```
+
 ---
 
 ## Public Methods
@@ -416,6 +439,11 @@ Returns the current FFT size.
 - *int* — The used FFT size (number of total frequency bins for a half spectrum - only positive frequencies).
 
 ---
+
+## Example
+
+- Full source: [`src/examples/ex_connectivity_metrics/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_connectivity_metrics/main.cpp)
+- Build target: `ex_connectivity_metrics` (runs under CTest)
 
 ## Authors of this file
 

@@ -86,6 +86,8 @@ class ConnectivitySettings;
  * whose edge weights are the band-averaged |coherency|^2 values in [0, 1].
  *
  * @brief Magnitude-squared coherence estimator (symmetric, sensitive to zero-lag coupling).
+ *
+ * @snippet ex_connectivity_metrics/main.cpp coherence_calculate
  */
 class CONNECTIVITYSHARED_EXPORT Coherence : public AbstractMetric
 {
