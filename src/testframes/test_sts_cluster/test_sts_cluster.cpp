@@ -431,7 +431,8 @@ void TestStsCluster::testClusterPvalueFloorOneSampleAndFtest()
     for (const StatsClusterResult* result : {&oneSample, &fTest}) {
         QVERIFY(!result->vecClusterPvals.isEmpty());
         const double pMin = *std::min_element(result->vecClusterPvals.begin(), result->vecClusterPvals.end());
-        QCOMPARE(pMin, 1.0 / 100.0);
+        // A random permutation can reproduce the observed labelling (sign flips all +1), so allow a few hits
+        QVERIFY2(pMin >= 1.0 / 100.0 && pMin <= 5.0 / 100.0, qPrintable(QString::number(pMin)));
     }
 }
 
