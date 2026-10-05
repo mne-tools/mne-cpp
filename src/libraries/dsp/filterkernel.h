@@ -69,6 +69,8 @@ namespace UTILSLIB
 //=============================================================================================================
 /**
  * @brief Named filter-design parameter descriptor holding a human-readable name and description (e.g. design method or filter type).
+ *
+ * @snippet ex_dsp_filter/main.cpp filter_kernel_design
  */
 class DSPSHARED_EXPORT FilterParameter
 {
@@ -120,6 +122,8 @@ protected:
  * The FilterKernel class provides methods to create/design a FIR filter kernel
  *
  * @brief The FilterKernel class provides methods to create/design a FIR filter kernel
+ *
+ * @snippet ex_dsp_filter/main.cpp filter_kernel_design
  */
 class DSPSHARED_EXPORT FilterKernel
 {

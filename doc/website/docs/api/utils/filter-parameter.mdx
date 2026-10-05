@@ -19,6 +19,15 @@ Named filter-design parameter descriptor holding a human-readable name and descr
 
 design method or filter type).
 
+```cpp title="src/examples/ex_dsp_filter/main.cpp"
+// Frequencies are normalised to Nyquist (500 Hz): 40 Hz cut-off, 10 Hz transition
+const int typeLpf = FilterKernel::m_filterTypes.indexOf(FilterParameter("LPF"));
+const int cosine = FilterKernel::m_designMethods.indexOf(FilterParameter("Cosine"));
+const int tschebyscheff = FilterKernel::m_designMethods.indexOf(FilterParameter("Tschebyscheff"));
+FilterKernel lowPass("lp40", typeLpf, 256, 40.0 / 500.0, 0.0, 10.0 / 500.0, kSFreq, cosine);
+FilterKernel lowPassPm("lp40pm", typeLpf, 256, 40.0 / 500.0, 0.0, 10.0 / 500.0, kSFreq, tschebyscheff);
+```
+
 ---
 
 ## Public Methods
@@ -63,6 +72,11 @@ Returns parameter name.
 - *QString* — Parameter name.
 
 ---
+
+## Example
+
+- Full source: [`src/examples/ex_dsp_filter/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_dsp_filter/main.cpp)
+- Build target: `ex_dsp_filter` (runs under CTest)
 
 ## Authors of this file
 

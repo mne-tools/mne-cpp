@@ -74,6 +74,11 @@ private slots:
         FilterKernel fk("LPF", 0, 128, 0.2, 0.0, 0.01, 1000.0, 0);
         MatrixXd filtered = filterData(data, fk, picks);
         QCOMPARE(filtered.rows(), nCh);
+
+        // Default picks must mean every channel; Eigen's integer LinSpaced(n, 0, n) overruns only for n <= 2
+        const MatrixXd twoChannels = data.topRows(2);
+        const MatrixXd allChannels = filterData(twoChannels, fk);
+        QVERIFY((allChannels - filtered.topRows(2)).cwiseAbs().maxCoeff() < 1e-12);
     }
 
     void filterData_keepOverhead()

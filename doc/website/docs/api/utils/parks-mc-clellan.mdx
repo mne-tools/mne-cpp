@@ -19,6 +19,11 @@ DECLARE CLASS [`ParksMcClellan`](/docs/api/utils/parks-mc-clellan).
 
 Parks-McClellan equiripple FIR filter design algorithm (Remez exchange).
 
+```cpp title="src/examples/ex_dsp_filter/main.cpp"
+// Equiripple 65-tap low-pass, corner 0.08 pi (40 Hz at 1 kHz), transition 0.04 pi
+ParksMcClellan parksMcClellan(65, 0.08, 0.0, 0.04, ParksMcClellan::LPF);
+```
+
 ### Inheritance
 
 ```mermaid
@@ -168,6 +173,11 @@ This was added by IowaHills and is called from CalcParkCoeff2().
 Calculation of the coefficients of the best approximation using the inverse discrete fourier transform.
 
 ---
+
+## Example
+
+- Full source: [`src/examples/ex_dsp_filter/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_dsp_filter/main.cpp)
+- Build target: `ex_dsp_filter` (runs under CTest)
 
 ## Authors of this file
 

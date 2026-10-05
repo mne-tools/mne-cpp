@@ -16,7 +16,7 @@
     "Settings": "Plain parameter record consumed by an algorithm class; shown inside that class's example."
   },
   "example_debt": {
-    "ceiling": 236,
+    "ceiling": 230,
     "names": [
       "AbstractFormatReader",
       "AcquiredPoints",
@@ -35,7 +35,6 @@
       "ColorMap",
       "ComputeFwd",
       "ConnectivityAec",
-      "CosineFilter",
       "EDFReader",
       "EegReference",
       "ElectrodeObject",
@@ -73,10 +72,6 @@
       "FiffTag",
       "FiffTime",
       "FilterChpi",
-      "FilterIO",
-      "FilterKernel",
-      "FilterOverlapAdd",
-      "FilterParameter",
       "FilterThreadArg",
       "FineCalibration",
       "FirFilter",
@@ -219,7 +214,6 @@
       "MriSlicer",
       "MriVolData",
       "MultimodalScene",
-      "ParksMcClellan",
       "PeakFinder",
       "Plot",
       "PolhemusConnection",

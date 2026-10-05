@@ -61,6 +61,8 @@ namespace UTILSLIB
  * DECLARE CLASS ParksMcClellan
  *
  * @brief Parks-McClellan equiripple FIR filter design algorithm (Remez exchange).
+ *
+ * @snippet ex_dsp_filter/main.cpp parks_mcclellan_design
  */
 class DSPSHARED_EXPORT ParksMcClellan : public QObject
 {

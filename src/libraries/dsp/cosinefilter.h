@@ -56,6 +56,8 @@ namespace UTILSLIB
  * Creates a cosine filter response in the frequency domain.
  *
  * @brief Creates a cosine filter response in the frequency domain.
+ *
+ * @snippet ex_dsp_filter/main.cpp cosine_filter_design
  */
 class DSPSHARED_EXPORT CosineFilter
 {

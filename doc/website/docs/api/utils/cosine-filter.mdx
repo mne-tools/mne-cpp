@@ -19,6 +19,12 @@ Creates a cosine filter response in the frequency domain.
 
 Creates a cosine filter response in the frequency domain.
 
+```cpp title="src/examples/ex_dsp_filter/main.cpp"
+// CosineFilter works in absolute Hz: low-pass edge 40 Hz with a 10 Hz slope, FFT length 1024
+CosineFilter cosineLp(1024, 40.0f, 10.0f, 0.0f, 0.0f, kSFreq, CosineFilter::LPF);
+const RowVectorXcd& response = cosineLp.m_vecFftCoeff; // one-sided response, bin k at k * 1000 / 1024 Hz
+```
+
 ---
 
 ## Public Methods
@@ -57,6 +63,11 @@ Constructs a [`CosineFilter`](/docs/api/utils/cosine-filter) object.
   filter type (lowpass, highpass, etc.).
 
 ---
+
+## Example
+
+- Full source: [`src/examples/ex_dsp_filter/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_dsp_filter/main.cpp)
+- Build target: `ex_dsp_filter` (runs under CTest)
 
 ## Authors of this file
 

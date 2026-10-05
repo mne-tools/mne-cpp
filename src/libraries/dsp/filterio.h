@@ -60,6 +60,8 @@ class FilterKernel;
  * Processes txt files which hold filter coefficients.
  *
  * @brief Processes txt files which hold filter coefficients.
+ *
+ * @snippet ex_dsp_filter/main.cpp filter_io_round_trip
  */
 class DSPSHARED_EXPORT FilterIO
 {

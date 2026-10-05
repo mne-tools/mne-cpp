@@ -23,6 +23,15 @@ The [`FilterKernel`](/docs/api/dsp/filter-kernel) class provides methods to crea
 
 The [`FilterKernel`](/docs/api/dsp/filter-kernel) class provides methods to create/design a FIR filter kernel
 
+```cpp title="src/examples/ex_dsp_filter/main.cpp"
+// Frequencies are normalised to Nyquist (500 Hz): 40 Hz cut-off, 10 Hz transition
+const int typeLpf = FilterKernel::m_filterTypes.indexOf(FilterParameter("LPF"));
+const int cosine = FilterKernel::m_designMethods.indexOf(FilterParameter("Cosine"));
+const int tschebyscheff = FilterKernel::m_designMethods.indexOf(FilterParameter("Tschebyscheff"));
+FilterKernel lowPass("lp40", typeLpf, 256, 40.0 / 500.0, 0.0, 10.0 / 500.0, kSFreq, cosine);
+FilterKernel lowPassPm("lp40pm", typeLpf, 256, 40.0 / 500.0, 0.0, 10.0 / 500.0, kSFreq, tschebyscheff);
+```
+
 ---
 
 ## Public Methods
@@ -212,8 +221,8 @@ Applies the current filter to the input data using multiplication in frequency d
 
 ## Example
 
-- Full source: [`src/examples/ex_filtering/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_filtering/main.cpp)
-- Build target: `ex_filtering` (compiled in CI)
+- Full source: [`src/examples/ex_dsp_filter/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_dsp_filter/main.cpp)
+- Build target: `ex_dsp_filter` (runs under CTest)
 
 ## Authors of this file
 

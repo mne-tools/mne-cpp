@@ -19,6 +19,14 @@ Processes txt files which hold filter coefficients.
 
 Processes txt files which hold filter coefficients.
 
+```cpp title="src/examples/ex_dsp_filter/main.cpp"
+QTemporaryDir dir;
+const QString path = dir.filePath("lp40.txt");
+FilterKernel reloaded;
+const bool written = FilterIO::writeFilter(path, lowPass);
+const bool read = FilterIO::readFilter(path, reloaded);
+```
+
 ---
 
 ## Public Methods
@@ -68,6 +76,11 @@ Writes a given filter to txt file .
 - *bool* — true if reading was successful, false otherwise.
 
 ---
+
+## Example
+
+- Full source: [`src/examples/ex_dsp_filter/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_dsp_filter/main.cpp)
+- Build target: `ex_dsp_filter` (runs under CTest)
 
 ## Authors of this file
 

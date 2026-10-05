@@ -309,7 +309,7 @@ MatrixXd RTPROCESSINGLIB::filterDataBlock(const MatrixXd& matData,
     // Do the concurrent filtering
     RowVectorXi vecPicksNew = vecPicks;
     if (vecPicksNew.cols() == 0) {
-        vecPicksNew = RowVectorXi::LinSpaced(matData.rows(), 0, matData.rows());
+        vecPicksNew = RowVectorXi::LinSpaced(matData.rows(), 0, matData.rows() - 1);
     }
 
     // Generate QList structure which can be handled by the QConcurrent framework

@@ -21,6 +21,15 @@ This class will hold all needed information about the last block in order to ove
 
 Applies FIR filtering via FFT-based overlap-add convolution for continuous data streams.
 
+```cpp title="src/examples/ex_dsp_filter/main.cpp"
+FilterOverlapAdd overlapAdd; // keeps the filter tail between calls
+const int block = 1000;
+MatrixXd streamed(2, n);
+for (int start = 0; start < n; start += block) {
+    streamed.middleCols(start, block) = overlapAdd.calculate(data.middleCols(start, block), lowPass);
+}
+```
+
 ---
 
 ## Public Methods
@@ -108,6 +117,11 @@ Calculates the filtered version of the raw input data based on a given list filt
 Reset the stored overlap matrices.
 
 ---
+
+## Example
+
+- Full source: [`src/examples/ex_dsp_filter/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_dsp_filter/main.cpp)
+- Build target: `ex_dsp_filter` (runs under CTest)
 
 ## Authors of this file
 

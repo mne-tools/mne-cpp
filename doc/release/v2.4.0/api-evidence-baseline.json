@@ -12,18 +12,18 @@
     "registered_stale": 0,
     "registered_with_test": 101,
     "registered_test_unresolved": 0,
-    "registered_with_example": 69,
+    "registered_with_example": 74,
     "registered_example_not_built": 0,
     "registered_with_python_equiv": 88,
     "registered_without_api_page": 0,
-    "with_snippet": 69,
+    "with_snippet": 75,
     "public_api_units": 478,
     "example_eligible": 383,
     "example_exempt": 95,
-    "eligible_backed_by_registry_example": 69,
-    "eligible_used_by_some_example": 127,
-    "examples_on_disk": 46,
-    "examples_built": 46
+    "eligible_backed_by_registry_example": 74,
+    "eligible_used_by_some_example": 130,
+    "examples_on_disk": 47,
+    "examples_built": 47
   },
   "by_library": {
     "bids": {
@@ -85,9 +85,9 @@
       "registered": 51,
       "with_test": 28,
       "eligible": 80,
-      "eligible_with_registry_example": 18,
-      "eligible_used_by_example": 34,
-      "with_snippet": 27
+      "eligible_with_registry_example": 23,
+      "eligible_used_by_example": 37,
+      "with_snippet": 33
     },
     "fiff": {
       "public": 37,
@@ -4331,10 +4331,14 @@
       "registry_status": "documented",
       "test": null,
       "test_resolves": false,
-      "example": null,
-      "example_state": "none",
-      "including_examples": [],
-      "snippets": [],
+      "example": "ex_dsp_filter",
+      "example_state": "built",
+      "including_examples": [
+        "ex_dsp_filter"
+      ],
+      "snippets": [
+        "ex_dsp_filter/main.cpp#cosine_filter_design"
+      ],
       "api_page": "doc/website/docs/api/utils/cosine-filter.mdx",
       "python_equiv": null,
       "example_eligible": true,
@@ -4610,10 +4614,14 @@
       "registry_status": "documented",
       "test": null,
       "test_resolves": false,
-      "example": null,
-      "example_state": "none",
-      "including_examples": [],
-      "snippets": [],
+      "example": "ex_dsp_filter",
+      "example_state": "built",
+      "including_examples": [
+        "ex_dsp_filter"
+      ],
+      "snippets": [
+        "ex_dsp_filter/main.cpp#filter_io_round_trip"
+      ],
       "api_page": "doc/website/docs/api/utils/filter-io.mdx",
       "python_equiv": null,
       "example_eligible": true,
@@ -4629,12 +4637,16 @@
       "registry_status": "done",
       "test": "test_filter_kernel",
       "test_resolves": true,
-      "example": "ex_filtering",
+      "example": "ex_dsp_filter",
       "example_state": "built",
       "including_examples": [
+        "ex_dsp_filter",
         "ex_filtering"
       ],
-      "snippets": [],
+      "snippets": [
+        "ex_dsp_filter/main.cpp#filter_kernel_design",
+        "ex_dsp_filter/main.cpp#filter_kernel_design"
+      ],
       "api_page": "doc/website/docs/api/dsp/filter-kernel.mdx",
       "python_equiv": "mne.filter.create_filter",
       "example_eligible": true,
@@ -4650,12 +4662,16 @@
       "registry_status": "documented",
       "test": null,
       "test_resolves": false,
-      "example": null,
-      "example_state": "none",
+      "example": "ex_dsp_filter",
+      "example_state": "built",
       "including_examples": [
+        "ex_dsp_filter",
         "ex_filtering"
       ],
-      "snippets": [],
+      "snippets": [
+        "ex_dsp_filter/main.cpp#filter_kernel_design",
+        "ex_dsp_filter/main.cpp#filter_kernel_design"
+      ],
       "api_page": "doc/website/docs/api/utils/filter-parameter.mdx",
       "python_equiv": null,
       "example_eligible": true,
@@ -5015,10 +5031,14 @@
       "registry_status": "documented",
       "test": null,
       "test_resolves": false,
-      "example": null,
-      "example_state": "none",
-      "including_examples": [],
-      "snippets": [],
+      "example": "ex_dsp_filter",
+      "example_state": "built",
+      "including_examples": [
+        "ex_dsp_filter"
+      ],
+      "snippets": [
+        "ex_dsp_filter/main.cpp#parks_mcclellan_design"
+      ],
       "api_page": "doc/website/docs/api/utils/parks-mc-clellan.mdx",
       "python_equiv": null,
       "example_eligible": true,
@@ -5221,12 +5241,15 @@
       "registry_status": "documented",
       "test": null,
       "test_resolves": false,
-      "example": null,
-      "example_state": "none",
+      "example": "ex_dsp_filter",
+      "example_state": "built",
       "including_examples": [
+        "ex_dsp_filter",
         "ex_filtering"
       ],
-      "snippets": [],
+      "snippets": [
+        "ex_dsp_filter/main.cpp#filter_overlap_add_usage"
+      ],
       "api_page": "doc/website/docs/api/dsp/filter-overlap-add.mdx",
       "python_equiv": null,
       "example_eligible": true,

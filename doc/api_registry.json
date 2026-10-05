@@ -869,7 +869,11 @@
       "mne_python": "mne.filter.create_filter",
       "sklearn": null,
       "test": "test_filter_kernel",
-      "example": "ex_filtering",
+      "example": "ex_dsp_filter",
+      "example_snippet": [
+        "ex_dsp_filter/main.cpp#filter_kernel_design"
+      ],
+      "example_mode": "run",
       "status": "done",
       "skigen_candidate": false,
       "documented": true,
@@ -3798,7 +3802,11 @@
       "mne_python": null,
       "sklearn": null,
       "test": null,
-      "example": null,
+      "example": "ex_dsp_filter",
+      "example_snippet": [
+        "ex_dsp_filter/main.cpp#filter_overlap_add_usage"
+      ],
+      "example_mode": "run",
       "status": "documented",
       "skigen_candidate": false,
       "documented": true,
@@ -6050,7 +6058,11 @@
       "mne_python": null,
       "sklearn": null,
       "test": null,
-      "example": null,
+      "example": "ex_dsp_filter",
+      "example_snippet": [
+        "ex_dsp_filter/main.cpp#cosine_filter_design"
+      ],
+      "example_mode": "run",
       "status": "documented",
       "skigen_candidate": false,
       "documented": true,
@@ -6152,7 +6164,11 @@
       "mne_python": null,
       "sklearn": null,
       "test": null,
-      "example": null,
+      "example": "ex_dsp_filter",
+      "example_snippet": [
+        "ex_dsp_filter/main.cpp#filter_io_round_trip"
+      ],
+      "example_mode": "run",
       "status": "documented",
       "skigen_candidate": false,
       "documented": true,
@@ -6170,7 +6186,11 @@
       "mne_python": null,
       "sklearn": null,
       "test": null,
-      "example": null,
+      "example": "ex_dsp_filter",
+      "example_snippet": [
+        "ex_dsp_filter/main.cpp#filter_kernel_design"
+      ],
+      "example_mode": "run",
       "status": "documented",
       "skigen_candidate": false,
       "documented": true,
@@ -6318,7 +6338,11 @@
       "mne_python": null,
       "sklearn": null,
       "test": null,
-      "example": null,
+      "example": "ex_dsp_filter",
+      "example_snippet": [
+        "ex_dsp_filter/main.cpp#parks_mcclellan_design"
+      ],
+      "example_mode": "run",
       "status": "documented",
       "skigen_candidate": false,
       "documented": true,

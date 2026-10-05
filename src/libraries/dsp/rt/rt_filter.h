@@ -242,6 +242,8 @@ DSPSHARED_EXPORT FIFFLIB::FiffEvoked computeFilteredAverage(const FIFFLIB::FiffR
  * all needed information about the last block in order to overlap it with the current one.
  *
  * @brief Applies FIR filtering via FFT-based overlap-add convolution for continuous data streams.
+ *
+ * @snippet ex_dsp_filter/main.cpp filter_overlap_add_usage
  */
 class DSPSHARED_EXPORT FilterOverlapAdd
 {
