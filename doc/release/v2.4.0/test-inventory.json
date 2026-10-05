@@ -2,8 +2,8 @@
   "schema_version": 1,
   "generated_by": "tools/quality/audit_tests.py",
   "ci_source": {
-    "run_url": "https://github.com/mne-tools/mne-cpp/actions/runs/36243010551",
-    "commit": "96413f7ccc7dabed2c6d40a511960ce8805e0407"
+    "run_url": "https://github.com/mne-tools/mne-cpp/actions/runs/37300892424",
+    "commit": "a1e1941667ba8db717d330f9bdf90020c1792091"
   },
   "summary": {
     "directories": 251,
@@ -28,91 +28,25 @@
     "retry_paths": [],
     "ci": {
       "macos-26": {
-        "executed": 230,
+        "executed": 248,
         "failures": 0,
         "skipped": 0,
-        "registered_not_executed": [
-          "test_fiff_core_python",
-          "test_fiff_raw_formats_python",
-          "test_fiff_raw_save_python",
-          "test_fiff_stream_python",
-          "test_fwd_bem_driver_python",
-          "test_fwd_bem_field_integrals",
-          "test_fwd_python",
-          "test_inv_beamformer_python",
-          "test_inv_dipole_fit_python",
-          "test_inv_eloreta_python",
-          "test_inv_lcmv_python",
-          "test_inv_rap_music_truth",
-          "test_inv_source_estimate_token",
-          "test_mne_cov_python",
-          "test_mne_ctf_comp_python",
-          "test_mne_description_parser",
-          "test_mne_label_python",
-          "test_mne_raw_data_python",
-          "test_mne_source_space_ops_python"
-        ],
-        "executed_not_in_inventory": [
-          "test_rtcmne_cmne"
-        ]
+        "registered_not_executed": [],
+        "executed_not_in_inventory": []
       },
       "ubuntu-24.04": {
-        "executed": 230,
+        "executed": 248,
         "failures": 0,
         "skipped": 0,
-        "registered_not_executed": [
-          "test_fiff_core_python",
-          "test_fiff_raw_formats_python",
-          "test_fiff_raw_save_python",
-          "test_fiff_stream_python",
-          "test_fwd_bem_driver_python",
-          "test_fwd_bem_field_integrals",
-          "test_fwd_python",
-          "test_inv_beamformer_python",
-          "test_inv_dipole_fit_python",
-          "test_inv_eloreta_python",
-          "test_inv_lcmv_python",
-          "test_inv_rap_music_truth",
-          "test_inv_source_estimate_token",
-          "test_mne_cov_python",
-          "test_mne_ctf_comp_python",
-          "test_mne_description_parser",
-          "test_mne_label_python",
-          "test_mne_raw_data_python",
-          "test_mne_source_space_ops_python"
-        ],
-        "executed_not_in_inventory": [
-          "test_rtcmne_cmne"
-        ]
+        "registered_not_executed": [],
+        "executed_not_in_inventory": []
       },
       "windows-2025-vs2026": {
-        "executed": 230,
+        "executed": 248,
         "failures": 0,
         "skipped": 2,
-        "registered_not_executed": [
-          "test_fiff_core_python",
-          "test_fiff_raw_formats_python",
-          "test_fiff_raw_save_python",
-          "test_fiff_stream_python",
-          "test_fwd_bem_driver_python",
-          "test_fwd_bem_field_integrals",
-          "test_fwd_python",
-          "test_inv_beamformer_python",
-          "test_inv_dipole_fit_python",
-          "test_inv_eloreta_python",
-          "test_inv_lcmv_python",
-          "test_inv_rap_music_truth",
-          "test_inv_source_estimate_token",
-          "test_mne_cov_python",
-          "test_mne_ctf_comp_python",
-          "test_mne_description_parser",
-          "test_mne_label_python",
-          "test_mne_raw_data_python",
-          "test_mne_source_space_ops_python"
-        ],
-        "executed_not_in_inventory": [
-          "test_rtcmne_cmne"
-        ]
+        "registered_not_executed": [],
+        "executed_not_in_inventory": []
       }
     }
   },
@@ -2363,9 +2297,9 @@
       "spawns_processes": false,
       "ci_excluded_on": [],
       "ci": {
-        "macos-26": "absent",
-        "ubuntu-24.04": "absent",
-        "windows-2025-vs2026": "absent"
+        "macos-26": "run",
+        "ubuntu-24.04": "run",
+        "windows-2025-vs2026": "run"
       },
       "registry_classes": []
     },
@@ -2820,9 +2754,9 @@
       "spawns_processes": false,
       "ci_excluded_on": [],
       "ci": {
-        "macos-26": "absent",
-        "ubuntu-24.04": "absent",
-        "windows-2025-vs2026": "absent"
+        "macos-26": "run",
+        "ubuntu-24.04": "run",
+        "windows-2025-vs2026": "run"
       },
       "registry_classes": []
     },
@@ -2888,9 +2822,9 @@
       "spawns_processes": false,
       "ci_excluded_on": [],
       "ci": {
-        "macos-26": "absent",
-        "ubuntu-24.04": "absent",
-        "windows-2025-vs2026": "absent"
+        "macos-26": "run",
+        "ubuntu-24.04": "run",
+        "windows-2025-vs2026": "run"
       },
       "registry_classes": []
     },
@@ -2950,9 +2884,9 @@
       "spawns_processes": false,
       "ci_excluded_on": [],
       "ci": {
-        "macos-26": "absent",
-        "ubuntu-24.04": "absent",
-        "windows-2025-vs2026": "absent"
+        "macos-26": "run",
+        "ubuntu-24.04": "run",
+        "windows-2025-vs2026": "run"
       },
       "registry_classes": []
     },
@@ -3329,9 +3263,9 @@
       "spawns_processes": false,
       "ci_excluded_on": [],
       "ci": {
-        "macos-26": "absent",
-        "ubuntu-24.04": "absent",
-        "windows-2025-vs2026": "absent"
+        "macos-26": "run",
+        "ubuntu-24.04": "run",
+        "windows-2025-vs2026": "run"
       },
       "registry_classes": []
     },
@@ -3391,9 +3325,9 @@
       "spawns_processes": false,
       "ci_excluded_on": [],
       "ci": {
-        "macos-26": "absent",
-        "ubuntu-24.04": "absent",
-        "windows-2025-vs2026": "absent"
+        "macos-26": "run",
+        "ubuntu-24.04": "run",
+        "windows-2025-vs2026": "run"
       },
       "registry_classes": []
     },
@@ -3519,9 +3453,9 @@
       "spawns_processes": false,
       "ci_excluded_on": [],
       "ci": {
-        "macos-26": "absent",
-        "ubuntu-24.04": "absent",
-        "windows-2025-vs2026": "absent"
+        "macos-26": "run",
+        "ubuntu-24.04": "run",
+        "windows-2025-vs2026": "run"
       },
       "registry_classes": []
     },
@@ -3839,9 +3773,9 @@
       "spawns_processes": false,
       "ci_excluded_on": [],
       "ci": {
-        "macos-26": "absent",
-        "ubuntu-24.04": "absent",
-        "windows-2025-vs2026": "absent"
+        "macos-26": "run",
+        "ubuntu-24.04": "run",
+        "windows-2025-vs2026": "run"
       },
       "registry_classes": []
     },
@@ -3934,9 +3868,9 @@
       "spawns_processes": false,
       "ci_excluded_on": [],
       "ci": {
-        "macos-26": "absent",
-        "ubuntu-24.04": "absent",
-        "windows-2025-vs2026": "absent"
+        "macos-26": "run",
+        "ubuntu-24.04": "run",
+        "windows-2025-vs2026": "run"
       },
       "registry_classes": []
     },
@@ -4002,9 +3936,9 @@
       "spawns_processes": false,
       "ci_excluded_on": [],
       "ci": {
-        "macos-26": "absent",
-        "ubuntu-24.04": "absent",
-        "windows-2025-vs2026": "absent"
+        "macos-26": "run",
+        "ubuntu-24.04": "run",
+        "windows-2025-vs2026": "run"
       },
       "registry_classes": []
     },
@@ -4036,9 +3970,9 @@
       "spawns_processes": false,
       "ci_excluded_on": [],
       "ci": {
-        "macos-26": "absent",
-        "ubuntu-24.04": "absent",
-        "windows-2025-vs2026": "absent"
+        "macos-26": "run",
+        "ubuntu-24.04": "run",
+        "windows-2025-vs2026": "run"
       },
       "registry_classes": []
     },
@@ -4098,9 +4032,9 @@
       "spawns_processes": false,
       "ci_excluded_on": [],
       "ci": {
-        "macos-26": "absent",
-        "ubuntu-24.04": "absent",
-        "windows-2025-vs2026": "absent"
+        "macos-26": "run",
+        "ubuntu-24.04": "run",
+        "windows-2025-vs2026": "run"
       },
       "registry_classes": []
     },
@@ -4159,9 +4093,9 @@
       "spawns_processes": false,
       "ci_excluded_on": [],
       "ci": {
-        "macos-26": "absent",
-        "ubuntu-24.04": "absent",
-        "windows-2025-vs2026": "absent"
+        "macos-26": "run",
+        "ubuntu-24.04": "run",
+        "windows-2025-vs2026": "run"
       },
       "registry_classes": []
     },
@@ -5004,9 +4938,9 @@
       "spawns_processes": false,
       "ci_excluded_on": [],
       "ci": {
-        "macos-26": "absent",
-        "ubuntu-24.04": "absent",
-        "windows-2025-vs2026": "absent"
+        "macos-26": "run",
+        "ubuntu-24.04": "run",
+        "windows-2025-vs2026": "run"
       },
       "registry_classes": []
     },
@@ -5034,9 +4968,9 @@
       "spawns_processes": false,
       "ci_excluded_on": [],
       "ci": {
-        "macos-26": "absent",
-        "ubuntu-24.04": "absent",
-        "windows-2025-vs2026": "absent"
+        "macos-26": "run",
+        "ubuntu-24.04": "run",
+        "windows-2025-vs2026": "run"
       },
       "registry_classes": []
     },
@@ -5098,9 +5032,9 @@
       "spawns_processes": false,
       "ci_excluded_on": [],
       "ci": {
-        "macos-26": "absent",
-        "ubuntu-24.04": "absent",
-        "windows-2025-vs2026": "absent"
+        "macos-26": "run",
+        "ubuntu-24.04": "run",
+        "windows-2025-vs2026": "run"
       },
       "registry_classes": []
     },
@@ -5388,9 +5322,9 @@
       "spawns_processes": false,
       "ci_excluded_on": [],
       "ci": {
-        "macos-26": "absent",
-        "ubuntu-24.04": "absent",
-        "windows-2025-vs2026": "absent"
+        "macos-26": "run",
+        "ubuntu-24.04": "run",
+        "windows-2025-vs2026": "run"
       },
       "registry_classes": []
     },
@@ -5552,9 +5486,9 @@
       "spawns_processes": false,
       "ci_excluded_on": [],
       "ci": {
-        "macos-26": "absent",
-        "ubuntu-24.04": "absent",
-        "windows-2025-vs2026": "absent"
+        "macos-26": "run",
+        "ubuntu-24.04": "run",
+        "windows-2025-vs2026": "run"
       },
       "registry_classes": []
     },
@@ -5715,9 +5649,9 @@
       "spawns_processes": false,
       "ci_excluded_on": [],
       "ci": {
-        "macos-26": "absent",
-        "ubuntu-24.04": "absent",
-        "windows-2025-vs2026": "absent"
+        "macos-26": "run",
+        "ubuntu-24.04": "run",
+        "windows-2025-vs2026": "run"
       },
       "registry_classes": []
     },
