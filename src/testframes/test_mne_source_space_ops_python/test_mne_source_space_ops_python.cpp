@@ -31,6 +31,7 @@
 //=============================================================================================================
 
 #include <mne/mne_source_space.h>
+#include <mne/mne_hemisphere.h>
 #include <mne/mne_surface.h>
 #include <mne/mne_patch_info.h>
 #include <mne/mne_bem.h>
@@ -91,6 +92,7 @@ private slots:
     void writeRoundTrip();
     void volumeNeighborsRoundTrip();
     void readsPythonVolumeSpace();
+    void icoDownsample_matchesPythonIco();
     void bemNormals_matchPython_data();
     void bemNormals_matchPython();
 
@@ -331,6 +333,39 @@ void TestMneSourceSpaceOpsPython::volumeNeighborsRoundTrip()
                 QVERIFY((sel[0]->rr.row(n) - vol->rr.row(vol->vertno[k])).norm() < 0.0175f);
         }
     }
+}
+
+//=============================================================================================================
+
+void TestMneSourceSpaceOpsPython::icoDownsample_matchesPythonIco()
+{
+    // make_ico_fixture.py: a shuffled, radially scaled mne-python ico-4 sphere; its ico-2 vertices are known.
+    QFile rrFile(QStringLiteral(MNE_SOURCE_SPACE_DATA_DIR "/ico4-perm.txt"));
+    QVERIFY(rrFile.open(QIODevice::ReadOnly | QIODevice::Text));
+    MNEHemisphere hemi;
+    hemi.np = 2562;
+    hemi.rr.resize(hemi.np, 3);
+    QTextStream in(&rrFile);
+    for (int i = 0; i < hemi.np; ++i)
+        in >> hemi.rr(i, 0) >> hemi.rr(i, 1) >> hemi.rr(i, 2);
+    hemi.inuse = VectorXi::Ones(hemi.np);
+    hemi.nuse = hemi.np;
+
+    QFile selFile(QStringLiteral(MNE_SOURCE_SPACE_DATA_DIR "/ico2-in-ico4-perm.txt"));
+    QVERIFY(selFile.open(QIODevice::ReadOnly | QIODevice::Text));
+    const QList<QByteArray> fields = selFile.readAll().simplified().split(' ');
+    VectorXi expected(fields.size());
+    for (int i = 0; i < fields.size(); ++i)
+        expected(i) = fields[i].toInt();
+
+    const MNEHemisphere down = MNESourceSpace::icoDownsample(hemi, 2);
+    QCOMPARE(down.nuse, 162);
+    QCOMPARE(down.inuse.sum(), 162);
+    QVERIFY(down.vertno == expected);
+    QCOMPARE(MNESourceSpace::icoDownsample(hemi, 0).nuse, 12);
+
+    QTest::ignoreMessage(QtWarningMsg, "MNESourceSpace::icoDownsample - Hemisphere has no vertices.");
+    QCOMPARE(MNESourceSpace::icoDownsample(MNEHemisphere(), 2).nuse, MNEHemisphere().nuse);
 }
 
 //=============================================================================================================

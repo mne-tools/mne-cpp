@@ -2317,17 +2317,19 @@ int MNESourceSpace::writeToStream(FiffStream::SPtr& stream, bool selected_only) 
  */
 static Eigen::MatrixX3f generateIcoVertices(int grade)
 {
-    // Base icosahedron vertices
-    const float t = (1.0f + std::sqrt(5.0f)) / 2.0f;
-    std::vector<Eigen::Vector3f> verts = {
-        {-1, t, 0}, {1, t, 0}, {-1, -t, 0}, {1, -t, 0}, {0, -1, t}, {0, 1, t}, {0, -1, -t}, {0, 1, -t}, {t, 0, -1}, {t, 0, 1}, {-t, 0, -1}, {-t, 0, 1}};
-    // Normalize to unit sphere
-    for (auto& v : verts)
-        v.normalize();
+    // The standard icosahedron of MNE-C's icos.fif (poles on z, a vertex on +x), so that the
+    // subdivisions match the ico-N source spaces of MNE-C and mne-python.
+    const float z = 1.0f / std::sqrt(5.0f);
+    const float r = 2.0f * z;
+    std::vector<Eigen::Vector3f> verts = {{0, 0, 1}};
+    for (int k = 0; k < 5; ++k)
+        verts.emplace_back(r * std::cos(0.4f * EIGEN_PI * k), r * std::sin(0.4f * EIGEN_PI * k), z);
+    for (int k = 0; k < 5; ++k)
+        verts.emplace_back(r * std::cos(0.4f * EIGEN_PI * k - 0.2f * EIGEN_PI), r * std::sin(0.4f * EIGEN_PI * k - 0.2f * EIGEN_PI), -z);
+    verts.emplace_back(0, 0, -1);
 
-    // Base icosahedron faces
     std::vector<std::array<int, 3>> faces = {
-        {0, 11, 5}, {0, 5, 1}, {0, 1, 7}, {0, 7, 10}, {0, 10, 11}, {1, 5, 9}, {5, 11, 4}, {11, 10, 2}, {10, 7, 6}, {7, 1, 8}, {3, 9, 4}, {3, 4, 2}, {3, 2, 6}, {3, 6, 8}, {3, 8, 9}, {4, 9, 5}, {2, 4, 11}, {6, 2, 10}, {8, 6, 7}, {9, 8, 1}};
+        {0, 3, 4}, {0, 4, 5}, {0, 5, 1}, {0, 1, 2}, {0, 2, 3}, {3, 2, 8}, {3, 8, 9}, {3, 9, 4}, {4, 9, 10}, {4, 10, 5}, {5, 10, 6}, {5, 6, 1}, {1, 6, 7}, {1, 7, 2}, {2, 7, 8}, {8, 11, 9}, {9, 11, 10}, {10, 11, 6}, {6, 11, 7}, {7, 11, 8}};
 
     // Subdivide
     for (int g = 0; g < grade; ++g) {
