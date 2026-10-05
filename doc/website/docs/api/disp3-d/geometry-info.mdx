@@ -19,6 +19,14 @@ This class allows sensor-to-mesh mapping and calculation of surface constrained 
 
 This class holds static methods for sensor-to-mesh mapping and surface constrained distance calculation on a mesh
 
+```cpp title="src/examples/ex_disp3d_scene/main.cpp"
+MatrixX3f sensors(2, 3);
+sensors << -0.2f, 0.1f, 0.5f,                                                            // above vertex 0
+    3.1f, 2.9f, 0.4f;                                                                    // above vertex 15
+VectorXi projected = GeometryInfo::projectSensors(vertices, sensors);                    // nearest vertex per sensor
+QSharedPointer<MatrixXd> distances = GeometryInfo::scdc(vertices, neighbors, projected); // geodesic: n_vertices x n_sensors
+```
+
 ---
 
 ## Public Methods
@@ -126,6 +134,11 @@ filterBadChannels Filters bad channels from distance table.
 - *Eigen::VectorXi* — Column indices of the bad channels that were found.
 
 ---
+
+## Example
+
+- Full source: [`src/examples/ex_disp3d_scene/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_disp3d_scene/main.cpp)
+- Build target: `ex_disp3d_scene` (runs under CTest)
 
 ## Authors of this file
 

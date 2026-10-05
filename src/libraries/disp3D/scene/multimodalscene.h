@@ -111,6 +111,8 @@ struct DISP3DSHARED_EXPORT SceneLayer
  * with no rendering logic. The renderer (`BrainRenderer` or a future
  * `MultimodalRenderer`) reads layers via @ref layers() and per-kind
  * downcasts the payload pointer.
+ *
+ * @snippet ex_disp3d_scene/main.cpp multimodal_scene_usage
  */
 class DISP3DSHARED_EXPORT MultimodalScene : public QObject
 {

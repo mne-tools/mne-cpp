@@ -21,6 +21,17 @@ The overlay displays any live RGB/video frame "as a small cut-out view" on top o
 
 This class is a passive data holder: `BrainRenderer` owns the GPU resources (vertex buffer, texture, sampler, pipeline) and reads from here each frame.
 
+```cpp title="src/examples/ex_disp3d_scene/main.cpp"
+VideoOverlay overlay; // CPU-side state; the renderer uploads frame() when frameGeneration() changes
+overlay.setEnabled(true);
+overlay.setFocusPosition(QVector3D(0.0f, 0.0f, 0.08f));
+overlay.setSizeMeters(0.05f);
+QImage frame(64, 48, QImage::Format_RGB32);
+frame.fill(Qt::darkGreen);
+overlay.setFrame(frame);
+overlay.setFrame(QImage()); // null frames are ignored
+```
+
 ---
 
 ## Public Methods
@@ -180,6 +191,11 @@ Push a new monocular depth map (single-channel or RGBA grayscale).
 ### setDepthSteps(steps)
 
 ---
+
+## Example
+
+- Full source: [`src/examples/ex_disp3d_scene/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_disp3d_scene/main.cpp)
+- Build target: `ex_disp3d_scene` (runs under CTest)
 
 ## Authors of this file
 

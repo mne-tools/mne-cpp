@@ -48,6 +48,8 @@ namespace DISP3DLIB
  * This class is a passive data holder: BrainRenderer owns the GPU
  * resources (vertex buffer, texture, sampler, pipeline) and reads from
  * here each frame.
+ *
+ * @snippet ex_disp3d_scene/main.cpp video_overlay_usage
  */
 class DISP3DSHARED_EXPORT VideoOverlay
 {

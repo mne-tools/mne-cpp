@@ -12,18 +12,18 @@
     "registered_stale": 0,
     "registered_with_test": 101,
     "registered_test_unresolved": 0,
-    "registered_with_example": 140,
+    "registered_with_example": 146,
     "registered_example_not_built": 0,
     "registered_with_python_equiv": 88,
     "registered_without_api_page": 0,
-    "with_snippet": 163,
+    "with_snippet": 172,
     "public_api_units": 478,
     "example_eligible": 383,
     "example_exempt": 95,
-    "eligible_backed_by_registry_example": 140,
-    "eligible_used_by_some_example": 207,
-    "examples_on_disk": 57,
-    "examples_built": 57
+    "eligible_backed_by_registry_example": 146,
+    "eligible_used_by_some_example": 214,
+    "examples_on_disk": 58,
+    "examples_built": 58
   },
   "by_library": {
     "bids": {
@@ -76,9 +76,9 @@
       "registered": 10,
       "with_test": 0,
       "eligible": 22,
-      "eligible_with_registry_example": 0,
-      "eligible_used_by_example": 4,
-      "with_snippet": 0
+      "eligible_with_registry_example": 6,
+      "eligible_used_by_example": 11,
+      "with_snippet": 9
     },
     "dsp": {
       "public": 80,
@@ -3188,12 +3188,15 @@
       "registry_status": "documented",
       "test": null,
       "test_resolves": false,
-      "example": null,
-      "example_state": "none",
+      "example": "ex_disp3d_scene",
+      "example_state": "built",
       "including_examples": [
+        "ex_disp3d_scene",
         "ex_interpolation"
       ],
-      "snippets": [],
+      "snippets": [
+        "ex_disp3d_scene/main.cpp#geometry_info_usage"
+      ],
       "api_page": "doc/website/docs/api/disp3-d/geometry-info.mdx",
       "python_equiv": null,
       "example_eligible": true,
@@ -3209,12 +3212,15 @@
       "registry_status": "documented",
       "test": null,
       "test_resolves": false,
-      "example": null,
-      "example_state": "none",
+      "example": "ex_disp3d_scene",
+      "example_state": "built",
       "including_examples": [
+        "ex_disp3d_scene",
         "ex_interpolation"
       ],
-      "snippets": [],
+      "snippets": [
+        "ex_disp3d_scene/main.cpp#interpolation_usage"
+      ],
       "api_page": "doc/website/docs/api/disp3-d/interpolation.mdx",
       "python_equiv": null,
       "example_eligible": true,
@@ -3542,8 +3548,12 @@
       "test_resolves": false,
       "example": null,
       "example_state": "none",
-      "including_examples": [],
-      "snippets": [],
+      "including_examples": [
+        "ex_disp3d_scene"
+      ],
+      "snippets": [
+        "ex_disp3d_scene/main.cpp#electrode_object_usage"
+      ],
       "api_page": null,
       "python_equiv": null,
       "example_eligible": true,
@@ -3561,8 +3571,12 @@
       "test_resolves": false,
       "example": null,
       "example_state": "none",
-      "including_examples": [],
-      "snippets": [],
+      "including_examples": [
+        "ex_disp3d_scene"
+      ],
+      "snippets": [
+        "ex_disp3d_scene/main.cpp#electrode_object_usage"
+      ],
       "api_page": null,
       "python_equiv": null,
       "example_eligible": true,
@@ -3578,10 +3592,14 @@
       "registry_status": "documented",
       "test": null,
       "test_resolves": false,
-      "example": null,
-      "example_state": "none",
-      "including_examples": [],
-      "snippets": [],
+      "example": "ex_disp3d_scene",
+      "example_state": "built",
+      "including_examples": [
+        "ex_disp3d_scene"
+      ],
+      "snippets": [
+        "ex_disp3d_scene/main.cpp#electrode_object_usage"
+      ],
       "api_page": "doc/website/docs/api/disp3-d/electrode-object.mdx",
       "python_equiv": null,
       "example_eligible": true,
@@ -3635,10 +3653,14 @@
       "registry_status": "documented",
       "test": null,
       "test_resolves": false,
-      "example": null,
-      "example_state": "none",
-      "including_examples": [],
-      "snippets": [],
+      "example": "ex_disp3d_scene",
+      "example_state": "built",
+      "including_examples": [
+        "ex_disp3d_scene"
+      ],
+      "snippets": [
+        "ex_disp3d_scene/main.cpp#slice_object_usage"
+      ],
       "api_page": "doc/website/docs/api/disp3-d/slice-object.mdx",
       "python_equiv": null,
       "example_eligible": true,
@@ -3673,10 +3695,14 @@
       "registry_status": "documented",
       "test": null,
       "test_resolves": false,
-      "example": null,
-      "example_state": "none",
-      "including_examples": [],
-      "snippets": [],
+      "example": "ex_disp3d_scene",
+      "example_state": "built",
+      "including_examples": [
+        "ex_disp3d_scene"
+      ],
+      "snippets": [
+        "ex_disp3d_scene/main.cpp#video_overlay_usage"
+      ],
       "api_page": "doc/website/docs/api/disp3-d/video-overlay.mdx",
       "python_equiv": null,
       "example_eligible": true,
@@ -3692,10 +3718,14 @@
       "registry_status": "documented",
       "test": null,
       "test_resolves": false,
-      "example": null,
-      "example_state": "none",
-      "including_examples": [],
-      "snippets": [],
+      "example": "ex_disp3d_scene",
+      "example_state": "built",
+      "including_examples": [
+        "ex_disp3d_scene"
+      ],
+      "snippets": [
+        "ex_disp3d_scene/main.cpp#multimodal_scene_usage"
+      ],
       "api_page": "doc/website/docs/api/disp3-d/multimodal-scene.mdx",
       "python_equiv": null,
       "example_eligible": true,
@@ -3713,8 +3743,12 @@
       "test_resolves": false,
       "example": null,
       "example_state": "none",
-      "including_examples": [],
-      "snippets": [],
+      "including_examples": [
+        "ex_disp3d_scene"
+      ],
+      "snippets": [
+        "ex_disp3d_scene/main.cpp#multimodal_scene_usage"
+      ],
       "api_page": null,
       "python_equiv": null,
       "example_eligible": true,

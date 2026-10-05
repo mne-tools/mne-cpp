@@ -16,12 +16,11 @@
     "Settings": "Plain parameter record consumed by an algorithm class; shown inside that class's example."
   },
   "example_debt": {
-    "ceiling": 162,
+    "ceiling": 156,
     "names": [
       "AcquiredPoints",
       "BadChannelsMaxwell",
       "ComputeFwd",
-      "ElectrodeObject",
       "Fiff",
       "FiffAnnotationEventUtils",
       "FiffAnnotations",
@@ -68,8 +67,6 @@
       "FwdEegSphereModelSet",
       "FwdFieldMap",
       "FwdThreadArg",
-      "GeometryInfo",
-      "Interpolation",
       "InvBeamformer",
       "InvBeamformerCompute",
       "InvCMNE",
@@ -160,7 +157,6 @@
       "MNEVolGeom",
       "MaxwellMovementComp",
       "MneICP",
-      "MultimodalScene",
       "PolhemusConnection",
       "PolhemusCoregistration",
       "PythonRunner",
@@ -177,9 +173,7 @@
       "RtNoise",
       "RtNoiseWorker",
       "SSS",
-      "SliceObject",
-      "SourceMorph",
-      "VideoOverlay"
+      "SourceMorph"
     ]
   }
 }

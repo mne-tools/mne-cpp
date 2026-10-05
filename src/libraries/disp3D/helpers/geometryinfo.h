@@ -76,6 +76,8 @@ namespace DISP3DLIB
  * This class allows sensor-to-mesh mapping and calculation of surface constrained distances.
  *
  * @brief This class holds static methods for sensor-to-mesh mapping and surface constrained distance calculation on a mesh
+ *
+ * @snippet ex_disp3d_scene/main.cpp geometry_info_usage
  */
 
 class DISP3DSHARED_EXPORT GeometryInfo

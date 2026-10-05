@@ -65,6 +65,8 @@ namespace DISP3DLIB
  * This class holds methods for creating distance-based weight matrices and for interpolating signals.
  *
  * @brief This class holds methods for creating distance-based weight matrices and for interpolating signals
+ *
+ * @snippet ex_disp3d_scene/main.cpp interpolation_usage
  */
 
 class DISP3DSHARED_EXPORT Interpolation

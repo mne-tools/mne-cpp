@@ -3790,7 +3790,11 @@
       "mne_python": null,
       "sklearn": null,
       "test": null,
-      "example": null,
+      "example": "ex_disp3d_scene",
+      "example_snippet": [
+        "ex_disp3d_scene/main.cpp#electrode_object_usage"
+      ],
+      "example_mode": "run",
       "status": "documented",
       "skigen_candidate": false,
       "documented": true,
@@ -3808,7 +3812,11 @@
       "mne_python": null,
       "sklearn": null,
       "test": null,
-      "example": null,
+      "example": "ex_disp3d_scene",
+      "example_snippet": [
+        "ex_disp3d_scene/main.cpp#geometry_info_usage"
+      ],
+      "example_mode": "run",
       "status": "documented",
       "skigen_candidate": false,
       "documented": true,
@@ -3826,7 +3834,11 @@
       "mne_python": null,
       "sklearn": null,
       "test": null,
-      "example": null,
+      "example": "ex_disp3d_scene",
+      "example_snippet": [
+        "ex_disp3d_scene/main.cpp#interpolation_usage"
+      ],
+      "example_mode": "run",
       "status": "documented",
       "skigen_candidate": false,
       "documented": true,
@@ -3844,7 +3856,11 @@
       "mne_python": null,
       "sklearn": null,
       "test": null,
-      "example": null,
+      "example": "ex_disp3d_scene",
+      "example_snippet": [
+        "ex_disp3d_scene/main.cpp#multimodal_scene_usage"
+      ],
+      "example_mode": "run",
       "status": "documented",
       "skigen_candidate": false,
       "documented": true,
@@ -3934,7 +3950,11 @@
       "mne_python": null,
       "sklearn": null,
       "test": null,
-      "example": null,
+      "example": "ex_disp3d_scene",
+      "example_snippet": [
+        "ex_disp3d_scene/main.cpp#slice_object_usage"
+      ],
+      "example_mode": "run",
       "status": "documented",
       "skigen_candidate": false,
       "documented": true,
@@ -3952,7 +3972,11 @@
       "mne_python": null,
       "sklearn": null,
       "test": null,
-      "example": null,
+      "example": "ex_disp3d_scene",
+      "example_snippet": [
+        "ex_disp3d_scene/main.cpp#video_overlay_usage"
+      ],
+      "example_mode": "run",
       "status": "documented",
       "skigen_candidate": false,
       "documented": true,

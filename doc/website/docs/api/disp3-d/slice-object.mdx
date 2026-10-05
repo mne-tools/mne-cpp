@@ -19,6 +19,18 @@ Data model for a single 2-D MRI volume slice.
 
 Holds the greyscale slice image, orientation metadata, and the slice-to-world transform. Generates a textured quad and vertex/UV data for upload to a QRhi renderer via the slice.vert / slice.frag shaders.
 
+```cpp title="src/examples/ex_disp3d_scene/main.cpp"
+QImage axial(256, 256, QImage::Format_Grayscale8);
+axial.fill(128);
+Matrix4d voxelToWorld = Matrix4d::Identity(); // 1 mm voxels, origin at the volume centre
+voxelToWorld.block<3, 1>(0, 3) = Vector3d(-128.0, -128.0, -128.0);
+SliceObject slice;
+slice.setSlice(axial, SliceOrientation::Axial, 128, voxelToWorld); // the z = 0 mm plane
+slice.setWindowLevel(100.0f, 200.0f);
+QVector<float> quad; // 4 corners x (x, y, z, u, v)
+slice.generateQuadVertices(quad);
+```
+
 ---
 
 ## Public Methods
@@ -169,6 +181,11 @@ Generate quad index buffer: 2 triangles = 6 indices.
   Output index data.
 
 ---
+
+## Example
+
+- Full source: [`src/examples/ex_disp3d_scene/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_disp3d_scene/main.cpp)
+- Build target: `ex_disp3d_scene` (runs under CTest)
 
 ## Authors of this file
 

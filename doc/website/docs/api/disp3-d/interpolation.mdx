@@ -19,6 +19,11 @@ This class holds methods for creating distance-based weight matrices and for int
 
 This class holds methods for creating distance-based weight matrices and for interpolating signals
 
+```cpp title="src/examples/ex_disp3d_scene/main.cpp"
+QSharedPointer<SparseMatrix<float>> weights = Interpolation::createInterpolationMat(projected, distances, Interpolation::linear); // inverse-distance weights
+const VectorXf atVertices = Interpolation::interpolateSignal(*weights, Vector2f(1.0f, 4.0f));                                     // one value per sensor
+```
+
 ---
 
 ## Public Methods
@@ -151,6 +156,11 @@ cubic Cubic hyperbola interpolation function.
 - *double* — dIn^3.
 
 ---
+
+## Example
+
+- Full source: [`src/examples/ex_disp3d_scene/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_disp3d_scene/main.cpp)
+- Build target: `ex_disp3d_scene` (runs under CTest)
 
 ## Authors of this file
 

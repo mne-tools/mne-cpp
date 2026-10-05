@@ -120,6 +120,8 @@ struct DISP3DSHARED_EXPORT ElectrodeArray
  *
  * Holds electrode shaft definitions and contact metadata, and generates CPU-side
  * geometry (vertices/indices) that a QRhi-based renderer can upload to the GPU.
+ *
+ * @snippet ex_disp3d_scene/main.cpp electrode_object_usage
  */
 class DISP3DSHARED_EXPORT ElectrodeObject
 {

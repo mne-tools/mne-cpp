@@ -75,6 +75,8 @@ static_assert(static_cast<int>(SliceOrientation::Sagittal) == 2, "MRI sagittal s
  * Holds the greyscale slice image, orientation metadata, and the
  * slice-to-world transform. Generates a textured quad and vertex/UV data
  * for upload to a QRhi renderer via the slice.vert / slice.frag shaders.
+ *
+ * @snippet ex_disp3d_scene/main.cpp slice_object_usage
  */
 class DISP3DSHARED_EXPORT SliceObject
 {
