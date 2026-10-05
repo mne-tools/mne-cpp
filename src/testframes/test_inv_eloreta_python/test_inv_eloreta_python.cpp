@@ -397,6 +397,16 @@ void TestInvEloretaPython::kernel_matchesPython()
     const double gotK = K.cwiseAbs().sum();
     QVERIFY2(std::fabs(gotK - kernelAbsSum) <= 1e-4 * kernelAbsSum, qPrintable(QString("|K| sum %1, mne-python %2").arg(gotK, 0, 'g', 17).arg(kernelAbsSum, 0, 'g', 17)));
 
+    if (method == QLatin1String("eLORETA")) {
+        // Two iterations are not enough: mne-python warns as well and keeps the unconverged weights.
+        InvMinimumNorm early(fixed ? m_fixed : m_loose, 1.0f / 9.0f, method);
+        early.setELoretaOptions(2, 1e-6, forceEqual);
+        QTest::ignoreMessage(QtWarningMsg, QRegularExpression("eLORETA weight fitting did not converge after 2 iterations"));
+        early.doInverseSetup(m_nave, false);
+        QCOMPARE(static_cast<int>(early.getKernel().rows()), rows);
+        QVERIFY(std::fabs(early.getKernel().cwiseAbs().sum() - kernelAbsSum) > 1e-4 * kernelAbsSum);
+    }
+
     if (singSum == 0.0) {
         return;
     }
