@@ -9,7 +9,12 @@ set(QT_REQUIRED_COMPONENTS Core Concurrent Network)
 find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS ${QT_REQUIRED_COMPONENTS})
 find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS ${QT_REQUIRED_COMPONENTS})
 
-add_executable(${PROJECT_NAME} main.cpp)
+# qt_add_executable links the Emscripten runtime (embind) that Qt's WebAssembly build needs
+if(QT_VERSION_MAJOR GREATER_EQUAL 6)
+    qt_add_executable(${PROJECT_NAME} main.cpp)
+else()
+    add_executable(${PROJECT_NAME} main.cpp)
+endif()
 
 target_link_libraries(${PROJECT_NAME} PRIVATE
   Qt${QT_VERSION_MAJOR}::Core
