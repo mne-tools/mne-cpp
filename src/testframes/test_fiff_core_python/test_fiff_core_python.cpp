@@ -50,6 +50,7 @@
 #include <fiff/fiff_stream.h>
 #include <fiff/fiff_sparse_matrix.h>
 #include <fiff/fiff_constants.h>
+#include <fiff/fiff_events.h>
 
 #include <cmath>
 #include <memory>
@@ -225,6 +226,7 @@ private slots:
     void combine_orientations_data();
     void combine_orientations();
     void applyTrans_withoutMove();
+    void events_matchPython();
 
     void sparse_createAndConvert();
 };
@@ -921,6 +923,70 @@ void TestFiffCorePython::applyTrans_withoutMove()
     const MatrixX3f rotated = t.apply_trans(v, false);
     QVERIFY((rotated.row(0).transpose() - r * Vector3f(0.0f, 0.0f, 1.0f)).norm() < 1e-6f);
     QVERIFY((t.apply_inverse_trans(rotated, false) - v).norm() < 1e-6f);
+}
+
+//=============================================================================================================
+
+void TestFiffCorePython::events_matchPython()
+{
+    const MatrixXi onsets = events(false);
+
+    FiffEvents found;
+    QVERIFY(FiffEvents::detect_from_raw(*m_raw, found));
+    QVERIFY(found.events == onsets);
+
+    // find_events(output='step', consecutive=True): each pulse returns to 0 after this many samples.
+    const QByteArray widths = "5555455545555545554445554";
+    FiffEvents steps;
+    QVERIFY(FiffEvents::detect_from_raw(*m_raw, steps, QStringLiteral("STI 014"), 0xFFFFFFFF, false));
+    QCOMPARE(static_cast<int>(steps.events.rows()), 2 * static_cast<int>(onsets.rows()));
+    for (int k = 0; k < onsets.rows(); ++k) {
+        QVERIFY(steps.events.row(2 * k) == onsets.row(k));
+        QCOMPARE(steps.events(2 * k + 1, 0), onsets(k, 0) + (widths[k] - '0'));
+        QCOMPARE(steps.events(2 * k + 1, 1), onsets(k, 2));
+        QCOMPARE(steps.events(2 * k + 1, 2), 0);
+    }
+
+    // find_events(mask=3, mask_type='and'): codes 4 and 32 vanish, 5 becomes 1.
+    FiffEvents masked;
+    QVERIFY(FiffEvents::detect_from_raw(*m_raw, masked, QString(), 3));
+    const QList<int> maskedCodes{2, 3, 1, 2, 3, 1, 2, 3, 1, 2, 3, 1, 1, 2, 3, 1, 2, 3, 1};
+    QCOMPARE(static_cast<int>(masked.events.rows()), static_cast<int>(maskedCodes.size()));
+    for (int k = 0; k < maskedCodes.size(); ++k)
+        QCOMPARE(masked.events(k, 2), maskedCodes[k]);
+
+    FiffEvents none;
+    QVERIFY(!FiffEvents::detect_from_raw(*m_raw, none, QStringLiteral("STI 999")));
+
+    // FIF and ASCII round trips; read() derives <raw>-eve.fif from the raw file name.
+    QTemporaryDir dir;
+    const QString fifPath = dir.filePath("run-eve.fif");
+    {
+        QFile file(fifPath);
+        QVERIFY(found.write_to_fif(file));
+    }
+    QVERIFY(!FiffEvents().write_to_fif(*m_rawFile));
+    FiffEvents back;
+    QVERIFY(FiffEvents::read(QString(), dir.filePath("run.fif"), back));
+    QVERIFY(back.events == onsets);
+    FiffEvents byName;
+    QVERIFY(FiffEvents::read(fifPath, QString(), byName));
+    QVERIFY(byName.events == onsets);
+    QVERIFY(!FiffEvents::read(QString(), dir.filePath("run.raw"), byName));
+    QVERIFY(!FiffEvents::read(dir.filePath("missing-eve.fif"), QString(), byName));
+    QVERIFY(!FiffEvents::read(QString(), dir.filePath("missing.fif"), byName));
+    FiffEvents noBlock;
+    QFile rawAgain(dataPath("sample_audvis_trunc_raw.fif"));
+    QVERIFY(!FiffEvents::read_from_fif(rawAgain, noBlock));
+
+    const QString evePath = dir.filePath("run.eve");
+    {
+        QFile file(evePath);
+        QVERIFY(found.write_to_ascii(file, static_cast<float>(m_raw->info.sfreq)));
+    }
+    QFile eveFile(evePath);
+    const FiffEvents ascii(eveFile);
+    QVERIFY(ascii.events == onsets);
 }
 
 //=============================================================================================================

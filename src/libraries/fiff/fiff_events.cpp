@@ -57,6 +57,8 @@ FiffEvents::FiffEvents(QIODevice& p_IODevice)
 {
     // Try FIFF first, then ASCII
     if (!read_from_fif(p_IODevice, *this)) {
+        // The FIFF attempt leaves the device open in binary mode.
+        p_IODevice.close();
         read_from_ascii(p_IODevice, *this);
     }
 }
@@ -246,8 +248,10 @@ bool FiffEvents::write_to_fif(QIODevice& p_IODevice) const
     if (!pStream)
         return false;
 
+    // FIFF stores the list row by row (sample, before, after).
+    const Eigen::Matrix<int, Eigen::Dynamic, 3, Eigen::RowMajor> rows = events.leftCols(3);
     pStream->start_block(FIFFB_MNE_EVENTS);
-    pStream->write_int(FIFF_MNE_EVENT_LIST, events.data(), events.rows() * 3);
+    pStream->write_int(FIFF_MNE_EVENT_LIST, rows.data(), rows.rows() * 3);
     pStream->end_block(FIFFB_MNE_EVENTS);
     pStream->end_file();
 
@@ -289,10 +293,11 @@ bool FiffEvents::detect_from_raw(const FiffRawData& raw,
 {
     QString stimCh = triggerCh.isEmpty() ? QString("STI 014") : triggerCh;
 
-    // Find trigger channel index
+    // Channel names are read without spaces ("STI014"), so compare without them.
+    const QString wanted = QString(stimCh).remove(' ');
     int triggerChIdx = -1;
     for (int k = 0; k < raw.info.ch_names.size(); ++k) {
-        if (raw.info.ch_names[k] == stimCh) {
+        if (QString(raw.info.ch_names[k]).remove(' ') == wanted) {
             triggerChIdx = k;
             break;
         }
