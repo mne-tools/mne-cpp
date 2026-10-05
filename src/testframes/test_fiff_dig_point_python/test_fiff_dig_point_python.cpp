@@ -53,6 +53,7 @@
 #include <QtTest>
 #include <QCoreApplication>
 #include <QFile>
+#include <QTemporaryDir>
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -86,6 +87,7 @@ private slots:
     void cardinals_matchPython();
     void allPoints_matchPython();
     void coordFrame_isHeadEverywhere();
+    void writeRoundTrip();
 };
 
 //=============================================================================================================
@@ -234,6 +236,31 @@ void TestFiffDigPointPython::allPoints_matchPython()
     // renumbered the coordinates could still be right while the points became
     // unidentifiable.
     QCOMPARE(identSum, 4927);
+}
+
+//=============================================================================================================
+
+void TestFiffDigPointPython::writeRoundTrip()
+{
+    // The written isotrak file reads back with every point; mne.channels.read_dig_fif reads it too (146 points).
+    QTemporaryDir dir;
+    const QString path = dir.filePath("dig.fif");
+    QString error;
+    QVERIFY2(m_dig.write(path, &error), qPrintable(error));
+    QFile file(path);
+    const FiffDigPointSet back(file);
+    QCOMPARE(back.size(), m_dig.size());
+    for (qint32 i = 0; i < m_dig.size(); ++i) {
+        QCOMPARE(back[i].kind, m_dig[i].kind);
+        QCOMPARE(back[i].ident, m_dig[i].ident);
+        for (int c = 0; c < 3; ++c)
+            QCOMPARE(back[i].r[c], m_dig[i].r[c]);
+    }
+
+    QVERIFY(!m_dig.write(QString(), &error));
+    QCOMPARE(error, QStringLiteral("Output path is empty."));
+    QVERIFY(!m_dig.write(dir.filePath("missing/dig.fif"), &error));
+    QVERIFY(error.startsWith(QStringLiteral("Destination directory")));
 }
 
 //=============================================================================================================
