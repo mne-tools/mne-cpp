@@ -327,6 +327,8 @@ const Eigen::MatrixX3i m_matViridrisData = (Eigen::MatrixX3i(256, 3) << 68, 1, 8
  * any value in @f$[0,1]@f$ to a colour without instantiating an
  * object. Bundled palettes include Viridis, Jet, Hot, HotNeg1,
  * HotNeg2, Bone, Cool, RedBlue and the MNE-Python @c hot variant.
+ *
+ * @snippet ex_disp_plots/main.cpp colormap_usage
  */
 class DISPSHARED_EXPORT ColorMap
 {

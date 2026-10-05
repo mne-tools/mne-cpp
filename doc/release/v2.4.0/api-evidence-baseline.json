@@ -12,18 +12,18 @@
     "registered_stale": 0,
     "registered_with_test": 101,
     "registered_test_unresolved": 0,
-    "registered_with_example": 132,
+    "registered_with_example": 140,
     "registered_example_not_built": 0,
     "registered_with_python_equiv": 88,
     "registered_without_api_page": 0,
-    "with_snippet": 155,
+    "with_snippet": 163,
     "public_api_units": 478,
     "example_eligible": 383,
     "example_exempt": 95,
-    "eligible_backed_by_registry_example": 132,
-    "eligible_used_by_some_example": 204,
-    "examples_on_disk": 56,
-    "examples_built": 56
+    "eligible_backed_by_registry_example": 140,
+    "eligible_used_by_some_example": 207,
+    "examples_on_disk": 57,
+    "examples_built": 57
   },
   "by_library": {
     "bids": {
@@ -67,9 +67,9 @@
       "registered": 66,
       "with_test": 0,
       "eligible": 8,
-      "eligible_with_registry_example": 0,
-      "eligible_used_by_example": 5,
-      "with_snippet": 0
+      "eligible_with_registry_example": 8,
+      "eligible_used_by_example": 8,
+      "with_snippet": 8
     },
     "disp3D": {
       "public": 46,
@@ -1809,12 +1809,15 @@
       "registry_status": "documented",
       "test": null,
       "test_resolves": false,
-      "example": null,
-      "example_state": "none",
+      "example": "ex_disp_plots",
+      "example_state": "built",
       "including_examples": [
+        "ex_disp_plots",
         "ex_histogram"
       ],
-      "snippets": [],
+      "snippets": [
+        "ex_disp_plots/main.cpp#bar_usage"
+      ],
       "api_page": "doc/website/docs/api/disp/bar.mdx",
       "python_equiv": null,
       "example_eligible": true,
@@ -1830,10 +1833,14 @@
       "registry_status": "documented",
       "test": null,
       "test_resolves": false,
-      "example": null,
-      "example_state": "none",
-      "including_examples": [],
-      "snippets": [],
+      "example": "ex_disp_plots",
+      "example_state": "built",
+      "including_examples": [
+        "ex_disp_plots"
+      ],
+      "snippets": [
+        "ex_disp_plots/main.cpp#plot_usage"
+      ],
       "api_page": "doc/website/docs/api/disp/graph.mdx",
       "python_equiv": null,
       "example_eligible": true,
@@ -1849,10 +1856,14 @@
       "registry_status": "documented",
       "test": null,
       "test_resolves": false,
-      "example": null,
-      "example_state": "none",
-      "including_examples": [],
-      "snippets": [],
+      "example": "ex_disp_plots",
+      "example_state": "built",
+      "including_examples": [
+        "ex_disp_plots"
+      ],
+      "snippets": [
+        "ex_disp_plots/main.cpp#colormap_usage"
+      ],
       "api_page": "doc/website/docs/api/disp/color-map.mdx",
       "python_equiv": null,
       "example_eligible": true,
@@ -1868,13 +1879,16 @@
       "registry_status": "documented",
       "test": null,
       "test_resolves": false,
-      "example": null,
-      "example_state": "none",
+      "example": "ex_disp_plots",
+      "example_state": "built",
       "including_examples": [
         "ex_connectivity",
-        "ex_disp"
+        "ex_disp",
+        "ex_disp_plots"
       ],
-      "snippets": [],
+      "snippets": [
+        "ex_disp_plots/main.cpp#image_sc_usage"
+      ],
       "api_page": "doc/website/docs/api/disp/image-sc.mdx",
       "python_equiv": null,
       "example_eligible": true,
@@ -1890,10 +1904,14 @@
       "registry_status": "documented",
       "test": null,
       "test_resolves": false,
-      "example": null,
-      "example_state": "none",
-      "including_examples": [],
-      "snippets": [],
+      "example": "ex_disp_plots",
+      "example_state": "built",
+      "including_examples": [
+        "ex_disp_plots"
+      ],
+      "snippets": [
+        "ex_disp_plots/main.cpp#line_plot_usage"
+      ],
       "api_page": "doc/website/docs/api/disp/line-plot.mdx",
       "python_equiv": null,
       "example_eligible": true,
@@ -1909,14 +1927,17 @@
       "registry_status": "documented",
       "test": null,
       "test_resolves": false,
-      "example": null,
-      "example_state": "none",
+      "example": "ex_disp_plots",
+      "example_state": "built",
       "including_examples": [
         "ex_connectivity",
         "ex_disp",
+        "ex_disp_plots",
         "ex_spectral"
       ],
-      "snippets": [],
+      "snippets": [
+        "ex_disp_plots/main.cpp#plot_usage"
+      ],
       "api_page": "doc/website/docs/api/disp/plot.mdx",
       "python_equiv": null,
       "example_eligible": true,
@@ -1932,12 +1953,15 @@
       "registry_status": "documented",
       "test": null,
       "test_resolves": false,
-      "example": null,
-      "example_state": "none",
+      "example": "ex_disp_plots",
+      "example_state": "built",
       "including_examples": [
+        "ex_disp_plots",
         "ex_histogram"
       ],
-      "snippets": [],
+      "snippets": [
+        "ex_disp_plots/main.cpp#spline_usage"
+      ],
       "api_page": "doc/website/docs/api/disp/spline.mdx",
       "python_equiv": null,
       "example_eligible": true,
@@ -1953,14 +1977,17 @@
       "registry_status": "documented",
       "test": null,
       "test_resolves": false,
-      "example": null,
-      "example_state": "none",
+      "example": "ex_disp_plots",
+      "example_state": "built",
       "including_examples": [
         "ex_connectivity",
         "ex_disp",
+        "ex_disp_plots",
         "ex_tf_plot"
       ],
-      "snippets": [],
+      "snippets": [
+        "ex_disp_plots/main.cpp#tf_plot_usage"
+      ],
       "api_page": "doc/website/docs/api/disp/t-fplot.mdx",
       "python_equiv": null,
       "example_eligible": true,

@@ -66,6 +66,8 @@ namespace DISPLIB
  * Supports multiple series, a settable title and x / y labels and
  * auto-ranging axes. Series are stored as @c QVector<double> pairs
  * and re-drawn during @c paintEvent.
+ *
+ * @snippet ex_disp_plots/main.cpp line_plot_usage
  */
 class DISPSHARED_EXPORT LinePlot : public QWidget
 {

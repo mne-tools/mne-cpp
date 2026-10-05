@@ -66,6 +66,8 @@ namespace DISPLIB
  * content rectangle that @ref Graph leaves free after stamping the
  * title bar at the top and the x / y axis labels on the bottom and
  * left margins.
+ *
+ * @snippet ex_disp_plots/main.cpp plot_usage
  */
 class DISPSHARED_EXPORT Graph : public QWidget
 {

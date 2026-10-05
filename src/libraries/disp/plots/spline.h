@@ -68,6 +68,8 @@ namespace DISPLIB
  * Click-drag drops left / middle / right threshold lines that are
  * emitted as data-space coordinates; otherwise the API mirrors
  * @ref Bar (@c setData / @c updatePlot templates).
+ *
+ * @snippet ex_disp_plots/main.cpp spline_usage
  */
 class DISPSHARED_EXPORT Spline : public QWidget
 {

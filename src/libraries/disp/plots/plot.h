@@ -62,6 +62,8 @@ namespace DISPLIB
  * Owns a list of @c QVector<QPointF> trace paths and supports a
  * @c m_bHoldOn flag for overlaying multiple curves. @c updateData()
  * replaces the visible curve in place.
+ *
+ * @snippet ex_disp_plots/main.cpp plot_usage
  */
 class DISPSHARED_EXPORT Plot : public Graph
 {

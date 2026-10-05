@@ -19,6 +19,12 @@ Histogram QWidget with cubic-spline overlay and interactive threshold markers.
 
 Click-drag drops left / middle / right threshold lines that are emitted as data-space coordinates; otherwise the API mirrors [`Bar`](/docs/api/disp/bar) (`setData` / `updatePlot` templates).
 
+```cpp title="src/examples/ex_disp_plots/main.cpp"
+Spline spline(nullptr, "Amplitude spline");
+spline.setData(classLimits, counts);
+spline.setThreshold(QVector3D(1.0f, 2.0f, 3.0f)); // three vertical marker lines
+```
+
 ### Inheritance
 
 ```mermaid
@@ -156,6 +162,11 @@ setColorMap sets the color mapping on the histogram background
   qstring of the color gradient from user input.
 
 ---
+
+## Example
+
+- Full source: [`src/examples/ex_disp_plots/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_disp_plots/main.cpp)
+- Build target: `ex_disp_plots` (runs under CTest)
 
 ## Authors of this file
 

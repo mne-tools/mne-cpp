@@ -19,6 +19,18 @@ False-colour heat-map QWidget visualising an Eigen matrix with selectable colour
 
 Accepts `MatrixXd`, `MatrixXf` and `MatrixXi` inputs; ``init()`` rebuilds the cached `QImage` from the current matrix and the active colour map, and ``updateData()`` / ``paintEvent()`` keep the rendering in sync with the data.
 
+```cpp title="src/examples/ex_disp_plots/main.cpp"
+MatrixXd ramp(4, 8);
+for (int r = 0; r < ramp.rows(); ++r) {
+    for (int c = 0; c < ramp.cols(); ++c) {
+        ramp(r, c) = c; // rises left to right
+    }
+}
+ImageSc image(ramp); // min..max mapped to 0..1, "Hot" by default
+image.setColorMap("Viridis");
+image.setTitle("ramp");
+```
+
 ### Inheritance
 
 ```mermaid
@@ -141,6 +153,11 @@ Sets the color map to use, e.g.
   The colormap to use.
 
 ---
+
+## Example
+
+- Full source: [`src/examples/ex_disp_plots/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_disp_plots/main.cpp)
+- Build target: `ex_disp_plots` (runs under CTest)
 
 ## Authors of this file
 

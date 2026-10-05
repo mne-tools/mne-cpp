@@ -19,6 +19,18 @@ Simple x / y line-series QWidget rendered with QPainter (no Qt Charts dependency
 
 Supports multiple series, a settable title and x / y labels and auto-ranging axes. Series are stored as `QVector<double>` pairs and re-drawn during `paintEvent`.
 
+```cpp title="src/examples/ex_disp_plots/main.cpp"
+QVector<double> x;
+QVector<double> y;
+for (int i = 0; i <= 100; ++i) {
+    x.append(i / 100.0);
+    y.append(std::sin(2.0 * M_PI * x.last()));
+}
+LinePlot line(x, y, "sin(2 pi t)");
+line.setXLabel("t [s]");
+line.setYLabel("amplitude");
+```
+
 ### Inheritance
 
 ```mermaid
@@ -141,6 +153,11 @@ Updates the plot using the given vectors.
   Y-Axis data to plot.
 
 ---
+
+## Example
+
+- Full source: [`src/examples/ex_disp_plots/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_disp_plots/main.cpp)
+- Build target: `ex_disp_plots` (runs under CTest)
 
 ## Authors of this file
 

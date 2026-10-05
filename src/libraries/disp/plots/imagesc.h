@@ -65,6 +65,8 @@ namespace DISPLIB
  * rebuilds the cached @c QImage from the current matrix and the
  * active colour map, and @c updateData() / @c paintEvent() keep the
  * rendering in sync with the data.
+ *
+ * @snippet ex_disp_plots/main.cpp image_sc_usage
  */
 class DISPSHARED_EXPORT ImageSc : public Graph
 {

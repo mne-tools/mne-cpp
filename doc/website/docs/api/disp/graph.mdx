@@ -19,6 +19,14 @@ Common base widget providing title, axis labels and resize handling for `DISPLIB
 
 Subclasses such as [`Plot`](/docs/api/disp/plot) and [`ImageSc`](/docs/api/disp/image-sc) paint inside the content rectangle that [`Graph`](/docs/api/disp/graph) leaves free after stamping the title bar at the top and the x / y axis labels on the bottom and left margins.
 
+```cpp title="src/examples/ex_disp_plots/main.cpp"
+VectorXd samples = VectorXd::LinSpaced(50, -1.0, 1.0);
+Plot plot(samples); // Plot is a Graph with title and axis labels
+plot.setTitle("ramp");
+plot.setXLabel("sample");
+plot.setYLabel("value");
+```
+
 ### Inheritance
 
 ```mermaid
@@ -83,6 +91,11 @@ Sets the label of the y axes.
   The y axes label.
 
 ---
+
+## Example
+
+- Full source: [`src/examples/ex_disp_plots/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_disp_plots/main.cpp)
+- Build target: `ex_disp_plots` (runs under CTest)
 
 ## Authors of this file
 

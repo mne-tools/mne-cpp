@@ -19,6 +19,12 @@ Time-frequency spectrogram QWidget rendering an Eigen matrix as a colour image.
 
 Two constructors accept either a full or a frequency-cropped `MatrixXd` spectrogram together with a sample rate and a `DISPLIB::ColorMaps` "ColorMaps" enum entry; ``calc_plot()`` builds the cached `QImage` that subsequent `paintEvents` draw.
 
+```cpp title="src/examples/ex_disp_plots/main.cpp"
+MatrixXd tf = MatrixXd::Zero(50, 40);   // frequency rows x time columns
+tf.middleRows(20, 10).setConstant(1.0); // 20-30 Hz band at 100 Hz sampling
+TFplot tfPlot(tf, 100.0, 0.0, 50.0, Jet);
+```
+
 ### Inheritance
 
 ```mermaid
@@ -69,6 +75,11 @@ Constructs [`TFplot`](/docs/api/disp/t-fplot) class.
   colormap used to plot the spectrogram.
 
 ---
+
+## Example
+
+- Full source: [`src/examples/ex_disp_plots/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_disp_plots/main.cpp)
+- Build target: `ex_disp_plots` (runs under CTest)
 
 ## Authors of this file
 

@@ -69,6 +69,8 @@ namespace DISPLIB
  * @ref updatePlot to refresh an existing chart in place; both call
  * @ref splitCoefficientAndExponent internally to format the tick
  * labels with a configurable number of significant digits.
+ *
+ * @snippet ex_disp_plots/main.cpp bar_usage
  */
 class DISPSHARED_EXPORT Bar : public QWidget
 {

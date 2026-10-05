@@ -19,6 +19,12 @@ Static lookup helpers mapping scalar values to `QRgb` / `QColor` across all `DIS
 
 Each palette exists as a 256-row `Eigen::MatrixX3i` RGB table; the `valueToXxx` accessors interpolate between rows so callers can map any value in $$[0,1]$$ to a colour without instantiating an object. Bundled palettes include Viridis, Jet, Hot, HotNeg1, HotNeg2, Bone, Cool, RedBlue and the MNE-Python `hot` variant.
 
+```cpp title="src/examples/ex_disp_plots/main.cpp"
+const QRgb low = ColorMap::valueToColor(0.0, "Viridis"); // v in [0, 1]
+const QRgb mid = ColorMap::valueToColor(0.5, "Viridis");
+const QRgb jet = ColorMap::valueToJet(0.25);
+```
+
 ---
 
 ## Public Methods
@@ -191,6 +197,11 @@ Returns a negated Viridis RGB to a given double value [-1,1].
 - *QRgb* — the corresponding Cool RGB.
 
 ---
+
+## Example
+
+- Full source: [`src/examples/ex_disp_plots/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_disp_plots/main.cpp)
+- Build target: `ex_disp_plots` (runs under CTest)
 
 ## Authors of this file
 
