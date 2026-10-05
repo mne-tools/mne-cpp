@@ -98,6 +98,7 @@ private slots:
     void readsFloatCovariance();
     void readsMeasInfo();
     void readsTagTypes();
+    void printsDirectoryTree();
 
 private:
     FiffDirNode::SPtr findBlock(int kind) const;
@@ -517,6 +518,57 @@ void TestFiffStreamPython::readsTagTypes()
     }
     copy.close();
     stream.close();
+}
+
+//=============================================================================================================
+
+namespace
+{
+QStringList g_messages;
+void collectMessages(QtMsgType, const QMessageLogContext&, const QString& msg)
+{
+    g_messages << msg;
+}
+} // namespace
+
+void TestFiffStreamPython::printsDirectoryTree()
+{
+    // mne-python fiff_open on test_mne_ctf_comp_python/data/ctf_grade0_raw.fif: blocks depth-first (its root 0 is
+    // MNE-CPP's FIFFB_ROOT), with a run of 36 FIFF_CH_INFO (203) tags in the meas info block.
+    QFile file(QStringLiteral(MNE_CTF_COMP_DATA_DIR "/ctf_grade0_raw.fif"));
+    FiffStream stream(&file);
+    QVERIFY(stream.open());
+
+    g_messages.clear();
+    const QtMessageHandler previous = qInstallMessageHandler(collectMessages);
+    stream.dirtree()->print(0);
+    qInstallMessageHandler(previous);
+
+    const QList<int> blocks{FIFFB_ROOT, 100, 101, 109, 107, 106, 370, 371, 357, 371, 357, 371, 357, 371, 357, 371, 357, 102};
+    QList<int> printedBlocks;
+    int printedTags = 0;
+    // Blocks without a description (the CTF compensation 370/371/357) are reported as "Cannot explain".
+    const QRegularExpression entry(QStringLiteral("^(?:(\\d+) = |Cannot explain: (\\d+)$)"));
+    for (int i = 0; i < g_messages.size(); ++i) {
+        const QRegularExpressionMatch m = entry.match(g_messages[i]);
+        // A block line is the one followed by " { ".
+        if (i + 1 < g_messages.size() && g_messages[i + 1] == QStringLiteral(" { "))
+            printedBlocks << (m.captured(1).isEmpty() ? m.captured(2) : m.captured(1)).toInt();
+        else if (m.hasMatch())
+            ++printedTags;
+    }
+    QCOMPARE(printedBlocks, blocks);
+    QVERIFY(g_messages.contains(QStringLiteral("203 = %1").arg(QString::fromLatin1(FiffDirNode::get_tag_explanation(FIFF_CH_INFO)))));
+    QVERIFY(g_messages.contains(QStringLiteral(" [36]\n")));
+    QCOMPARE(QString::fromLatin1(FiffDirNode::get_tag_explanation(-5)), QStringLiteral("unknown"));
+    g_messages.clear();
+    qInstallMessageHandler(collectMessages);
+    FiffDirNode::explain(-5);
+    FiffDirNode::explain_block(-5);
+    qInstallMessageHandler(previous);
+    QCOMPARE(g_messages, QStringList({QStringLiteral("Cannot explain: -5"), QStringLiteral("Cannot explain: -5")}));
+    // One line per run of equal tag kinds: mne-python's tree has 50; the root's FIFF_FILE_ID entry is its id here.
+    QCOMPARE(printedTags, 49);
 }
 
 //=============================================================================================================
