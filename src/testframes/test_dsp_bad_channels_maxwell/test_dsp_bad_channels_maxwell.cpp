@@ -80,14 +80,15 @@ static FiffInfo createSyntheticMegInfo(int nChannels = 102)
         // Channel position
         ch.chpos.r0 << static_cast<float>(x), static_cast<float>(y), static_cast<float>(z);
 
-        // Normal pointing inward (toward origin)
-        Eigen::Vector3f normal;
-        normal << -static_cast<float>(x), -static_cast<float>(y), -static_cast<float>(z);
-        normal.normalize();
-        ch.chpos.ex = normal;
-        ch.chpos.ey = Eigen::Vector3f::UnitY();
-        Eigen::Vector3f ez = normal.cross(Eigen::Vector3f(Eigen::Vector3f::UnitY()));
-        ch.chpos.ez = ez.norm() > 1e-6f ? ez.normalized() : Eigen::Vector3f::UnitZ();
+        // Coil normal ez: radial for every third coil, tangential otherwise (Neuromag-like triplets),
+        // so that internal and external fields are separable relative to the default origin
+        const Eigen::Vector3f radial = (ch.chpos.r0 - Eigen::Vector3f(0.0f, 0.0f, 0.04f)).normalized();
+        Eigen::Vector3f tangent = radial.cross(std::abs(radial.x()) < 0.9f ? Eigen::Vector3f::UnitX() : Eigen::Vector3f::UnitY()).normalized();
+        if (i % 3 == 2)
+            tangent = radial.cross(tangent).normalized();
+        ch.chpos.ez = (i % 3 == 0) ? radial : tangent;
+        ch.chpos.ex = (i % 3 == 0) ? tangent : radial;
+        ch.chpos.ey = ch.chpos.ez.cross(ch.chpos.ex).normalized();
 
         ch.scanNo = i;
         ch.logNo = i + 1;

@@ -78,13 +78,7 @@ struct DSPSHARED_EXPORT MaxwellMoveCompParams
 /**
  * @brief Maxwell movement compensation using SSS.
  *
- * Usage:
- * @code
- *   QList<HeadPosEntry> headPos = ...; // from cHPI fitting
- *   MaxwellMoveCompParams params;
- *   Eigen::MatrixXd compensated = MaxwellMovementComp::apply(
- *       matData, fiffInfo, headPos, params);
- * @endcode
+ * @snippet ex_dsp_maxwell/main.cpp maxwell_movement_comp_usage
  */
 class DSPSHARED_EXPORT MaxwellMovementComp
 {

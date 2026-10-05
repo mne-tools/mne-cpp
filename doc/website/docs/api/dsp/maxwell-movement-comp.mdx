@@ -19,14 +19,18 @@ sidebar_position: 17
 class UTILSLIB::MaxwellMovementComp
 ```
 
-Maxwell movement compensation using [SSS](/docs/api/dsp/sss).
+Maxwell movement compensation using [`SSS`](/docs/api/dsp/sss).
 
-Usage: 
-```cpp
-QList<HeadPosEntry> headPos = ...; // from cHPI fitting
-MaxwellMoveCompParams params;
-Eigen::MatrixXd compensated = MaxwellMovementComp::apply(
-    matData, fiffInfo, headPos, params);
+```cpp title="src/examples/ex_dsp_maxwell/main.cpp"
+QList<HeadPosEntry> headPos(1); // one position from t = 0: identity rotation, no translation
+MaxwellMoveCompParams moveParams;
+moveParams.origin = params.origin;
+const MatrixXd compensated = MaxwellMovementComp::apply(data, info, headPos, 1.0, moveParams);
+
+QTemporaryDir dir;
+const QString posPath = dir.filePath("head.pos"); // same columns as mne.chpi.write_head_pos
+const bool posWritten = MaxwellMovementComp::writeHeadPos(posPath, headPos);
+const QList<HeadPosEntry> posBack = MaxwellMovementComp::readHeadPos(posPath);
 ```
 
 ---
@@ -35,10 +39,10 @@ Eigen::MatrixXd compensated = MaxwellMovementComp::apply(
 
 ### apply(matData, fiffInfo, headPos, dSFreq, params)
 
-Apply movement compensation via [SSS](/docs/api/dsp/sss).
+Apply movement compensation via [`SSS`](/docs/api/dsp/sss).
 
 For each time segment (defined by headPos entries), the data is:
-Projected into [SSS](/docs/api/dsp/sss) multipole space using the actual head position.
+Projected into [`SSS`](/docs/api/dsp/sss) multipole space using the actual head position.
 
 
 Reconstructed at the reference head position.
@@ -100,6 +104,12 @@ Write head positions to a file.
 - *bool* — true if successful.
 
 ---
+
+## Example
+
+- Full source: [`src/examples/ex_dsp_maxwell/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_dsp_maxwell/main.cpp)
+- Build target: `ex_dsp_maxwell` (runs under CTest)
+- Data: [mne-cpp-test-data](https://github.com/mne-tools/mne-cpp-test-data)
 
 ## Authors of this file
 

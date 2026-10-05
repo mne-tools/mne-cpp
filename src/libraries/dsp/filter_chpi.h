@@ -12,6 +12,8 @@
  * Removes continuous head-position indicator (cHPI) excitation signals from MEG data by
  * applying zero-phase Butterworth band-stop (notch) filters at each cHPI frequency.
  * This mirrors MNE-Python's mne.chpi.filter_chpi().
+ *
+ * @snippet ex_dsp_maxwell/main.cpp filter_chpi_usage
  */
 
 #ifndef FILTER_CHPI_DSP_H

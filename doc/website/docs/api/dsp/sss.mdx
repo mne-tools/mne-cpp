@@ -19,13 +19,27 @@ sidebar_position: 7
 class UTILSLIB::SSS
 ```
 
+Implements Signal Space Separation ([`SSS`](/docs/api/dsp/sss)) and temporal [`SSS`](/docs/api/dsp/sss) (tSSS) for MEG data.
+
+```cpp title="src/examples/ex_dsp_maxwell/main.cpp"
+SSS::Params params; // internal order 8, external order 3
+params.origin = Vector3d(0.0, 0.0, 0.04);
+const SSS::Basis basis = SSS::computeBasis(info, params); // geometry only, reusable for every buffer
+```
+
+```cpp title="src/examples/ex_dsp_maxwell/main.cpp"
+const MatrixXd cleaned = SSS::apply(data, basis); // MEG rows replaced by their internal-space reconstruction
+```
+
+`SSS::applyTemporal` additionally removes near-field artefacts (tSSS).
+
 ---
 
 ## Static Methods
 
 ### computeBasis(fiffInfo, params)
 
-Build the SSS spherical-harmonic basis from MEG sensor geometry.
+Build the [`SSS`](/docs/api/dsp/sss) spherical-harmonic basis from MEG sensor geometry.
 
 Only channels with kind == FIFFV_MEG_CH or FIFFV_REF_MEG_CH are used. Sensor positions and normals are taken from [FiffChInfo](/docs/api/fiff/fiff-ch-info)::chpos (coil-centre single-point model).
 
@@ -35,17 +49,17 @@ Only channels with kind == FIFFV_MEG_CH or FIFFV_REF_MEG_CH are used. Sensor pos
   Measurement info containing channel positions.
 
 - **params** : *const Params &*
-  SSS configuration (order, origin, regularisation).
+  [`SSS`](/docs/api/dsp/sss) configuration (order, origin, regularisation).
 
 **Returns:**
 
-- *Basis* — `Basis` struct containing all projectors needed for SSS and tSSS.
+- *Basis* — `Basis` struct containing all projectors needed for [`SSS`](/docs/api/dsp/sss) and tSSS.
 
 ---
 
 ### apply(matData, basis)
 
-Apply SSS to MEG data — suppress external (environmental) interference.
+Apply [`SSS`](/docs/api/dsp/sss) to MEG data — suppress external (environmental) interference.
 
 **Parameters:**
 
@@ -53,7 +67,7 @@ Apply SSS to MEG data — suppress external (environmental) interference.
   Full sensor data (n_channels × n_samples). Non-MEG channels are passed through unchanged.
 
 - **basis** : *const Basis &*
-  Precomputed basis from computeBasis().
+  Precomputed basis from `computeBasis()`.
 
 **Returns:**
 
@@ -63,7 +77,7 @@ Apply SSS to MEG data — suppress external (environmental) interference.
 
 ### applyTemporal(matData, basis, iBufferLength, dCorrLimit)
 
-Apply temporal SSS (tSSS) — additionally suppress near-field artefacts.
+Apply temporal [`SSS`](/docs/api/dsp/sss) (tSSS) — additionally suppress near-field artefacts.
 
 tSSS processes the data in sliding windows and removes the temporal subspace of the external expansion that exceeds `dCorrLimit` (relative to the dominant singular value).
 
@@ -73,7 +87,7 @@ tSSS processes the data in sliding windows and removes the temporal subspace of 
   Full sensor data (n_channels × n_samples).
 
 - **basis** : *const Basis &*
-  Precomputed basis from computeBasis().
+  Precomputed basis from `computeBasis()`.
 
 - **iBufferLength** : *int*
   Window length in samples (default 10000 ≈ 10 s at 1 kHz).
@@ -86,6 +100,12 @@ tSSS processes the data in sliding windows and removes the temporal subspace of 
 - *Eigen::MatrixXd* — tSSS-cleaned data (n_channels × n_samples).
 
 ---
+
+## Example
+
+- Full source: [`src/examples/ex_dsp_maxwell/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_dsp_maxwell/main.cpp)
+- Build target: `ex_dsp_maxwell` (runs under CTest)
+- Data: [mne-cpp-test-data](https://github.com/mne-tools/mne-cpp-test-data)
 
 ## Authors of this file
 

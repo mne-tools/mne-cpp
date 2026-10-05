@@ -7,7 +7,7 @@ sidebar_position: 5
 
 # Class Members
 
-Index of 6240 public class members (functions, variables, typedefs, enums) across all documented classes.
+Index of 6241 public class members (functions, variables, typedefs, enums) across all documented classes.
 
 **Jump to:** [A](#a) · [B](#b) · [C](#c) · [D](#d) · [E](#e) · [F](#f) · [G](#g) · [H](#h) · [I](#i) · [J](#j) · [K](#k) · [L](#l) · [M](#m) · [N](#n) · [O](#o) · [P](#p) · [Q](#q) · [R](#r) · [S](#s) · [T](#t) · [U](#u) · [V](#v) · [W](#w) · [X](#x) · [Y](#y) · [Z](#z)
 
@@ -151,12 +151,12 @@ Index of 6240 public class members (functions, variables, typedefs, enums) acros
 - **apply** `[fn]` in [DecodingSsd](/docs/api/decoding/decoding-ssd) — Denoise data by low-rank factorisation.
 - **apply** `[fn]` in [EogRegression](/docs/api/dsp/eog-regression) — Apply the fitted regression to remove EOG artifacts in-place.
 - **apply** `[fn]` in [FirFilter](/docs/api/dsp/fir-filter) — Apply the filter to a single row vector.
-- **apply** `[fn]` in [MaxwellMovementComp](/docs/api/dsp/maxwell-movement-comp) — Apply movement compensation via SSS.
+- **apply** `[fn]` in [MaxwellMovementComp](/docs/api/dsp/maxwell-movement-comp) — Apply movement compensation via [`SSS`](/docs/api/dsp/sss).
 - **apply** `[fn]` in [MNECTFCompDataSet](/docs/api/mne/mnectf-comp-data-set) — Apply or revert CTF compensation on a single-sample data vector using the current compensation operator.
 - **apply** `[fn]` in [MNECTFCompDataSet](/docs/api/mne/mnectf-comp-data-set) — Overload: apply compensation using the data vector itself as compensation input.
 - **apply** `[fn]` in `SensorFieldMapper` — Apply the precomputed mapping to the current time point.
 - **apply** `[fn]` in [SourceMorph](/docs/api/inv/source-morph) — Apply the morphing to a source estimate.
-- **apply** `[fn]` in [SSS](/docs/api/dsp/sss) — Apply SSS to MEG data — suppress external (environmental) interference.
+- **apply** `[fn]` in [SSS](/docs/api/dsp/sss) — Apply [`SSS`](/docs/api/dsp/sss) to MEG data — suppress external (environmental) interference.
 - **apply** `[fn]` in [Xdawn](/docs/api/dsp/xdawn) — Project one epoch into xDAWN component space.
 - **apply_cov** `[fn]` in [MNEProjOp](/docs/api/mne/mne-proj-op) — Apply this projection operator to a covariance matrix from both sides: C' = (I - P) C (I - P)^T (or P C P^T if do_complement is false).
 - **apply_inverse_trans** `[fn]` in [FiffCoordTrans](/docs/api/fiff/fiff-coord-trans) — Applies the inverse coordinate transform to given coordinates and returns the transformed coordinates.
@@ -185,7 +185,7 @@ Index of 6240 public class members (functions, variables, typedefs, enums) acros
 - **applyOverlayToSurfaces** `[fn]` in `SubView` — Apply this view's overlayMode to every brain surface whose key matches surfaceType.
 - **applySos** `[fn]` in [IirFilter](/docs/api/dsp/iir-filter) — Apply a biquad cascade to one data row (causal, single-pass).
 - **applySourceEstimateColors** `[fn]` in `BrainSurface` — Apply source estimate colors to vertices.
-- **applyTemporal** `[fn]` in [SSS](/docs/api/dsp/sss) — Apply temporal SSS (tSSS) — additionally suppress near-field artefacts.
+- **applyTemporal** `[fn]` in [SSS](/docs/api/dsp/sss) — Apply temporal [`SSS`](/docs/api/dsp/sss) (tSSS) — additionally suppress near-field artefacts.
 - **applyToSurface** `[fn]` in `SourceEstimateOverlay` — Apply source estimate colors to a brain surface at a given time index.
 - **ApplyToView** `[fn]` in [ApplyToView](/docs/api/disp/apply-to-view) — [`ApplyToView`](/docs/api/disp/apply-to-view).
 - **applyTransform** `[fn]` in `BrainSurface` — Apply a transformation to the surface starting from the original data.
@@ -491,7 +491,7 @@ Index of 6240 public class members (functions, variables, typedefs, enums) acros
 - **chInfo** `[var]` in [MNERawInfo](/docs/api/mne/mne-raw-info) — Channel info data .
 - **chname** `[var]` in [FwdCoil](/docs/api/fwd/fwd-coil) — Name of this channel.
 - **chNames** `[var]` in [InvBeamformer](/docs/api/inv/inv-beamformer) — Channel names used for filter computation.
-- **chNumber** `[var]` in `FineCalEntry` — MEG channel number (e.g., 0113 for MEG0113).
+- **chNumber** `[var]` in `FineCalEntry` — MEG channel number (e.g., 113 for MEG0113).
 - **chpos** `[var]` in [FiffChInfo](/docs/api/fiff/fiff-ch-info) — Channel location.
 - **chs** `[var]` in [FiffInfoBase](/docs/api/fiff/fiff-info-base) — List of all channel info descriptors.
 - **chs** `[var]` in [InvDipoleFitData](/docs/api/inv/inv-dipole-fit-data) — Channels.
@@ -775,7 +775,7 @@ Index of 6240 public class members (functions, variables, typedefs, enums) acros
 - **compute_surface_cm** `[fn]` in [MNESurfaceOrVolume](/docs/api/mne/mne-surface-or-volume) — Compute and store the center of mass of a surface's vertices.
 - **computeAverage** `[fn]` in [MNEEpochDataList](/docs/api/mne/mne-epoch-data-list) — Convenience function: reads epochs, optionally applies baseline correction and artifact rejection, then returns the averaged evoked response.
 - **computeAverages** `[fn]` in [FiffEvokedSet](/docs/api/fiff/fiff-evoked-set) — Compute epoch-based averages from raw data according to an averaging description.
-- **computeBasis** `[fn]` in [SSS](/docs/api/dsp/sss) — Build the SSS spherical-harmonic basis from MEG sensor geometry.
+- **computeBasis** `[fn]` in [SSS](/docs/api/dsp/sss) — Build the [`SSS`](/docs/api/dsp/sss) spherical-harmonic basis from MEG sensor geometry.
 - **computeBeamformer** `[fn]` in [InvBeamformerCompute](/docs/api/inv/inv-beamformer-compute) — Compute beamformer spatial filter weights from a leadfield and data covariance (or CSD).
 - **computeEegMapping** `[fn]` in [FwdFieldMap](/docs/api/fwd/fwd-field-map) — Compute EEG electrode-to-surface mapping matrix.
 - **computeEegMapping** `[fn]` in [FwdFieldMap](/docs/api/fwd/fwd-field-map) — Compute EEG electrode-to-surface mapping matrix with SSP projection and average reference.
@@ -1267,7 +1267,6 @@ Index of 6240 public class members (functions, variables, typedefs, enums) acros
 - **dFMax** `[var]` in `InvTfMxneParams` — Maximum frequency (Hz) for Gabor atoms.
 - **dFMin** `[var]` in `InvTfMxneParams` — Minimum frequency (Hz) for Gabor atoms.
 - **dfWithin** `[var]` in `StatsFtestResult` — Within-groups degrees of freedom.
-- **dGain** `[var]` in `FineCalEntry` — Gain correction factor (nominal = 1.0).
 - **dGof** `[var]` in `HeadPosEntry` — Goodness of fit for this head position.
 - **diag** `[var]` in [FiffCov](/docs/api/fiff/fiff-cov) — If the covariance is stored in a diagonal order.
 - **diagnoise** `[var]` in [InvDipoleFitSettings](/docs/api/inv/inv-dipole-fit-settings) — Use only the diagonals of the noise-covariance matrix.
@@ -2005,7 +2004,7 @@ Index of 6240 public class members (functions, variables, typedefs, enums) acros
 
 ## G {#g}
 
-- **gainVector** `[fn]` in [FineCalibration](/docs/api/dsp/fine-calibration) — Build gain correction diagonal matrix for MEG channels.
+- **gainVector** `[fn]` in [FineCalibration](/docs/api/dsp/fine-calibration) — Magnetometer calibration factors.
 - **gamma** `[var]` in [FwdBemModel](/docs/api/fwd/fwd-bem-model) — Conductivity-ratio coupling matrix (nsurf x nsurf).
 - **gantry_angle** `[var]` in [FiffInfo](/docs/api/fiff/fiff-info) — Tilt angle of the dewar in degrees.
 - **gaussian** `[fn]` in [Interpolation](/docs/api/disp3-d/interpolation) — gaussian Gaussian interpolation function (sigma=1).
@@ -2488,8 +2487,8 @@ Index of 6240 public class members (functions, variables, typedefs, enums) acros
 - **ImageSc** `[fn]` in [ImageSc](/docs/api/disp/image-sc) — Creates the scaled image view with a given float matrix.
 - **ImageSc** `[fn]` in [ImageSc](/docs/api/disp/image-sc) — Creates the scaled image view with a given integer matrix.
 - **iMaxIterations** `[var]` in `InvTfMxneParams` — Maximum number of iterations.
-- **imbalance** `[var]` in `FineCalEntry` — Cross-talk imbalance correction (x, y, z).
-- **imbalanceMatrix** `[fn]` in [FineCalibration](/docs/api/dsp/fine-calibration) — Build imbalance matrix.
+- **imbalance** `[var]` in `FineCalEntry` — One term (magnetometer calibration) or three (gradiometer imbalance).
+- **imbalanceMatrix** `[fn]` in [FineCalibration](/docs/api/dsp/fine-calibration) — Gradiometer imbalance terms.
 - **iMinDistance** `[var]` in `PeakFinderParams` — Minimum distance between peaks (samples).
 - **impedance** `[var]` in `BidsElectrode` — Impedance value or "n/a" (OPTIONAL).
 - **in_nuse** `[var]` in [MNESssData](/docs/api/mne/mne-sss-data) — How many components included in the inside expansion.
@@ -2634,13 +2633,13 @@ Index of 6240 public class members (functions, variables, typedefs, enums) acros
 - **InvVectorSourceEstimate** `[fn]` in [InvVectorSourceEstimate](/docs/api/inv/inv-vector-source-estimate) — Construct from data and vertices.
 - **InvVolumeSourceEstimate** `[fn]` in [InvVolumeSourceEstimate](/docs/api/inv/inv-volume-source-estimate)
 - **InvVolumeSourceEstimate** `[fn]` in [InvVolumeSourceEstimate](/docs/api/inv/inv-volume-source-estimate) — Construct from data and vertices.
-- **iOrderIn** `[var]` in `BadChannelsMaxwellParams` — Internal SSS order.
+- **iOrderIn** `[var]` in `BadChannelsMaxwellParams` — Internal [`SSS`](/docs/api/dsp/sss) order.
 - **iOrderIn** `[var]` in `Basis` — Internal order used.
-- **iOrderIn** `[var]` in `MaxwellMoveCompParams` — Internal SSS order.
+- **iOrderIn** `[var]` in `MaxwellMoveCompParams` — Internal [`SSS`](/docs/api/dsp/sss) order.
 - **iOrderIn** `[var]` in `SSSParams` — Internal spherical-harmonic expansion order (default 8).
-- **iOrderOut** `[var]` in `BadChannelsMaxwellParams` — External SSS order.
+- **iOrderOut** `[var]` in `BadChannelsMaxwellParams` — External [`SSS`](/docs/api/dsp/sss) order.
 - **iOrderOut** `[var]` in `Basis` — External order used.
-- **iOrderOut** `[var]` in `MaxwellMoveCompParams` — External SSS order.
+- **iOrderOut** `[var]` in `MaxwellMoveCompParams` — External [`SSS`](/docs/api/dsp/sss) order.
 - **iOrderOut** `[var]` in `SSSParams` — External spherical-harmonic expansion order (default 3).
 - **ip_approach_limit** `[var]` in [FwdBemModel](/docs/api/fwd/fwd-bem-model) — Threshold for isolated-problem approach.
 - **ipcArgs** `[var]` in `MnaNode` — Command-line arguments (supports \{\{placeholder\}\} tokens).
@@ -3763,6 +3762,7 @@ Index of 6240 public class members (functions, variables, typedefs, enums) acros
 - **order** `[fn]` in [MvarModel](/docs/api/connectivity/mvar-model) — Returns the fitted model order.
 - **orient_prior** `[var]` in [MNEInverseOperator](/docs/api/mne/mne-inverse-operator) — Orientation prior (loose-constraint weighting).
 - **orientation** `[var]` in `FastrakSample` — Sensor orientation; identity if not provided.
+- **orientation** `[var]` in `FineCalEntry` — Rows: coil x, y and z (normal) axes.
 - **orientation** `[var]` in `MriSliceImage` — Orientation of the slice.
 - **orientation** `[fn]` in `SensorTreeItem` — Returns the coil orientation (identity if not set).
 - **orientation** `[fn]` in [SliceObject](/docs/api/disp3-d/slice-object)
@@ -3771,7 +3771,7 @@ Index of 6240 public class members (functions, variables, typedefs, enums) acros
 - **orientationType** `[var]` in [InvSourceEstimate](/docs/api/inv/inv-source-estimate) — Orientation constraint used (fixed, free, loose).
 - **orig_tab** `[var]` in [FsColortable](/docs/api/fs/fs-colortable) — [`FsColortable`](/docs/api/fs/fs-colortable) raw data.
 - **origin** `[var]` in `BadChannelsMaxwellParams` — Expansion origin (metres, head frame).
-- **origin** `[var]` in `MaxwellMoveCompParams` — SSS expansion origin (metres).
+- **origin** `[var]` in `MaxwellMoveCompParams` — [`SSS`](/docs/api/dsp/sss) expansion origin (metres).
 - **origin** `[var]` in [MNESssData](/docs/api/mne/mne-sss-data) — The expansion origin.
 - **origin** `[var]` in `SSSParams` — Expansion origin in metres, head-coordinate frame (default: 4 cm superior to head origin).
 - **osInfo** `[var]` in `MnaProvenance` — e.g. "macOS 15.4 arm64"
@@ -3808,7 +3808,7 @@ Index of 6240 public class members (functions, variables, typedefs, enums) acros
 - **param** `[fn]` in [MnaParamTree](/docs/api/mna/mna-param-tree)
 - **Params** `[type]` in [BadChannelDetect](/docs/api/utils/bad-channel-detect) — Convenience alias so callers can still write `BadChannelDetect::Params`.
 - **Params** `[type]` in [EpochExtractor](/docs/api/utils/epoch-extractor) — Convenience alias so callers can still write `EpochExtractor::Params`.
-- **Params** `[type]` in [SSS](/docs/api/dsp/sss) — Convenience alias so callers can still write SSS::Params.
+- **Params** `[type]` in [SSS](/docs/api/dsp/sss) — Convenience alias so callers can still write `SSS::Params`.
 - **paramTree** `[var]` in [MnaGraph](/docs/api/mna/mna-graph) — Hierarchical parameter store with formula-driven bindings.
 - **parent** `[var]` in [FiffDirNode](/docs/api/fiff/fiff-dir-node) — Parent node.
 - **parent_id** `[var]` in [FiffDirNode](/docs/api/fiff/fiff-dir-node) — Newly added to stay consistent with MATLAB implementation.
@@ -3948,6 +3948,7 @@ Index of 6240 public class members (functions, variables, typedefs, enums) acros
 - **position** `[var]` in `DigitizedPoint` — Position in metres, sensor frame.
 - **position** `[var]` in `ElectrodeContact` — 3-D position in MRI (surface RAS) coords.
 - **position** `[var]` in `FastrakSample` — Position in metres (always normalised to SI).
+- **position** `[var]` in `FineCalEntry` — Coil position in device coordinates (metres).
 - **position** `[var]` in `InvFocalDipole` — Dipole position (m) in head coordinates.
 - **position** `[var]` in `LiveMarker`
 - **position** `[fn]` in `SensorTreeItem`

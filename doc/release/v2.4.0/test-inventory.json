@@ -19,7 +19,7 @@
     "requirements": {
       "freesurfer": 2,
       "python": 9,
-      "sample-data": 18,
+      "sample-data": 19,
       "test-data": 101
     },
     "gui": 33,
@@ -3034,7 +3034,9 @@
         "unit"
       ],
       "timeout": 60,
-      "requirements": [],
+      "requirements": [
+        "sample-data"
+      ],
       "gui": false,
       "qskip_sites": 0,
       "spawns_processes": false,

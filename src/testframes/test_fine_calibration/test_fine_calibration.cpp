@@ -26,146 +26,73 @@ class TestFineCalibration : public QObject
     Q_OBJECT
 
 private slots:
-    void testAddAndSize()
+    void testReadMatchesMne()
     {
-        FineCalibration cal;
-        QVERIFY(cal.isEmpty());
-        QCOMPARE(cal.size(), 0);
+        // First lines of MNE-sample-data/SSS/sss_cal_mgh.dat, plus a 3-term gradiometer line and a malformed one
+        QTemporaryFile tmpFile;
+        QVERIFY(tmpFile.open());
+        tmpFile.write("# comment\n"
+                      "113 -0.106600 0.046400 -0.060400 -0.012700 0.005700 -0.999903 -0.186801 -0.982403 -0.003300 -0.981020 0.192489 0.022924 -0.008282\n"
+                      "111 -0.106600 0.046400 -0.060400 -0.012700 0.005700 -0.999903 -0.186801 -0.982403 -0.003300 -0.981020 0.192489 0.022924 0.996645\n"
+                      "MEG2643 0.101700 -0.036100 -0.027800 0.341491 0.939874 -0.004500 0.027699 -0.005300 0.999573 0.942189 -0.333982 -0.026877 0.001 -0.002 0.003\n"
+                      "211 1.0 0.0 0.0 0.0\n");
+        tmpFile.close();
 
-        FineCalEntry entry;
-        entry.chNumber = 113;
-        entry.dGain = 1.001;
-        entry.imbalance = Vector3d(0.001, -0.002, 0.003);
-        cal.addEntry(entry);
+        // mne.preprocessing.read_fine_calibration: locs[:3] position, locs[9:12] coil normal, imb_cals
+        FineCalibration cal = FineCalibration::read(tmpFile.fileName());
+        QCOMPARE(cal.size(), 3);
+        FineCalEntry grad;
+        QVERIFY(cal.findEntry(113, grad));
+        QVERIFY((grad.position - Vector3d(-0.1066, 0.0464, -0.0604)).norm() < 1e-12);
+        QVERIFY((grad.orientation.row(2).transpose() - Vector3d(-0.98102, 0.192489, 0.022924)).norm() < 1e-12);
+        QCOMPARE(grad.imbalance.size(), static_cast<Index>(1));
+        QVERIFY(std::abs(grad.imbalance(0) + 0.008282) < 1e-12);
 
-        QCOMPARE(cal.size(), 1);
-        QVERIFY(!cal.isEmpty());
-    }
+        FineCalEntry grad3;
+        QVERIFY(cal.findEntry(2643, grad3));
+        QCOMPARE(grad3.imbalance.size(), static_cast<Index>(3));
 
-    void testFindEntry()
-    {
-        FineCalibration cal;
-        FineCalEntry e1;
-        e1.chNumber = 113;
-        e1.dGain = 1.05;
-        e1.imbalance = Vector3d(0.01, 0.02, 0.03);
-        cal.addEntry(e1);
-
-        FineCalEntry e2;
-        e2.chNumber = 211;
-        e2.dGain = 0.99;
-        e2.imbalance = Vector3d(-0.01, 0.0, 0.01);
-        cal.addEntry(e2);
-
-        FineCalEntry found;
-        QVERIFY(cal.findEntry(211, found));
-        QCOMPARE(found.chNumber, 211);
-        QVERIFY(std::abs(found.dGain - 0.99) < 1e-10);
-
-        QVERIFY(!cal.findEntry(999, found));
-    }
-
-    void testGainVector()
-    {
-        FineCalibration cal;
-        for (int i = 0; i < 5; ++i) {
-            FineCalEntry e;
-            e.chNumber = i;
-            e.dGain = 1.0 + 0.01 * i;
-            cal.addEntry(e);
-        }
-
-        VectorXd gains = cal.gainVector();
-        QCOMPARE(gains.size(), 5);
-        QVERIFY(std::abs(gains(0) - 1.00) < 1e-10);
-        QVERIFY(std::abs(gains(4) - 1.04) < 1e-10);
-    }
-
-    void testImbalanceMatrix()
-    {
-        FineCalibration cal;
-        FineCalEntry e;
-        e.chNumber = 1;
-        e.dGain = 1.0;
-        e.imbalance = Vector3d(0.1, 0.2, 0.3);
-        cal.addEntry(e);
-
-        MatrixXd imb = cal.imbalanceMatrix();
-        QCOMPARE(imb.rows(), static_cast<Index>(1));
-        QCOMPARE(imb.cols(), static_cast<Index>(3));
-        QVERIFY(std::abs(imb(0, 0) - 0.1) < 1e-10);
-        QVERIFY(std::abs(imb(0, 2) - 0.3) < 1e-10);
+        // Magnetometers (numbers ending in 1) contribute their calibration, gradiometers their imbalance
+        QVERIFY((cal.gainVector() - Vector3d(1.0, 0.996645, 1.0)).norm() < 1e-12);
+        const MatrixXd imb = cal.imbalanceMatrix();
+        QVERIFY(std::abs(imb(0, 0) + 0.008282) < 1e-12 && imb.row(1).isZero() && std::abs(imb(2, 2) - 0.003) < 1e-12);
     }
 
     void testWriteAndRead()
     {
         FineCalibration cal;
-        for (int i = 0; i < 3; ++i) {
-            FineCalEntry e;
-            e.chNumber = 100 + i;
-            e.dGain = 1.0 + 0.001 * i;
-            e.imbalance = Vector3d(0.001 * i, -0.002 * i, 0.003 * i);
-            cal.addEntry(e);
-        }
-
-        QTemporaryFile tmpFile;
-        tmpFile.setAutoRemove(true);
-        QVERIFY(tmpFile.open());
-        QString path = tmpFile.fileName();
-        tmpFile.close();
-
-        QVERIFY(cal.write(path));
-
-        FineCalibration loaded = FineCalibration::read(path);
-        QCOMPARE(loaded.size(), 3);
-
-        FineCalEntry found;
-        QVERIFY(loaded.findEntry(101, found));
-        QVERIFY(std::abs(found.dGain - 1.001) < 1e-5);
-        QVERIFY(std::abs(found.imbalance.x() - 0.001) < 1e-5);
-    }
-
-    void testReadEmpty()
-    {
-        QTemporaryFile tmpFile;
-        tmpFile.setAutoRemove(true);
-        QVERIFY(tmpFile.open());
-        tmpFile.write("# comment only\n");
-        tmpFile.write("\n");
-        tmpFile.close();
-
-        FineCalibration cal = FineCalibration::read(tmpFile.fileName());
-        QVERIFY(cal.isEmpty());
-    }
-
-    void testReadNonexistent()
-    {
-        FineCalibration cal = FineCalibration::read("/nonexistent/path/file.dat");
-        QVERIFY(cal.isEmpty());
-    }
-
-    void testRoundTripPreservesValues()
-    {
-        FineCalibration cal;
         FineCalEntry e;
-        e.chNumber = 42;
-        e.dGain = 0.998765;
-        e.imbalance = Vector3d(1.23e-4, -4.56e-5, 7.89e-3);
+        e.chNumber = 113;
+        e.position = Vector3d(-0.1066, 0.0464, -0.0604);
+        e.orientation.row(2) = Vector3d(-0.98102, 0.192489, 0.022924).transpose();
+        e.imbalance = Vector3d(0.001, -0.002, 0.003);
         cal.addEntry(e);
 
         QTemporaryFile tmpFile;
-        tmpFile.setAutoRemove(true);
         QVERIFY(tmpFile.open());
-        QString path = tmpFile.fileName();
+        const QString path = tmpFile.fileName();
         tmpFile.close();
+        QVERIFY(cal.write(path));
 
-        cal.write(path);
-        FineCalibration loaded = FineCalibration::read(path);
+        // Same line layout as mne.preprocessing.write_fine_calibration (number zero-padded, values %0.6f)
+        QFile written(path);
+        QVERIFY(written.open(QIODevice::ReadOnly));
+        QCOMPARE(QString(written.readLine()).trimmed(),
+                 QStringLiteral("0113 -0.106600 0.046400 -0.060400 1.000000 0.000000 0.000000 0.000000 1.000000 0.000000 -0.981020 0.192489 0.022924 0.001000 -0.002000 0.003000"));
 
         FineCalEntry found;
-        QVERIFY(loaded.findEntry(42, found));
-        QVERIFY(std::abs(found.dGain - 0.998765) < 1e-5);
-        QVERIFY(std::abs(found.imbalance.x() - 1.23e-4) < 1e-7);
+        QVERIFY(FineCalibration::read(path).findEntry(113, found));
+        QVERIFY((found.position - e.position).norm() < 1e-9 && (found.imbalance - e.imbalance).norm() < 1e-9 && (found.orientation - e.orientation).norm() < 1e-9);
+    }
+
+    void testReadEmptyOrMissing()
+    {
+        QTemporaryFile tmpFile;
+        QVERIFY(tmpFile.open());
+        tmpFile.write("# comment only\n\n");
+        tmpFile.close();
+        QVERIFY(FineCalibration::read(tmpFile.fileName()).isEmpty());
+        QVERIFY(FineCalibration::read("/nonexistent/path/file.dat").isEmpty());
     }
 };
 

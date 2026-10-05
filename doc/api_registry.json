@@ -1002,14 +1002,22 @@
       "mne_python": "mne.preprocessing.maxwell_filter",
       "sklearn": null,
       "test": "test_dsp_sss",
-      "example": null,
+      "example": "ex_dsp_maxwell",
+      "example_snippet": [
+        "ex_dsp_maxwell/main.cpp#sss_usage",
+        "ex_dsp_maxwell/main.cpp#sss_apply"
+      ],
+      "example_mode": "run",
       "status": "done",
       "skigen_candidate": false,
       "documented": true,
       "sidebar_position": 7,
       "guide": null,
       "python_equiv": "mne.preprocessing.maxwell_filter",
-      "python_url": null
+      "python_url": null,
+      "required_data": [
+        "mne-cpp-test-data"
+      ]
     },
     {
       "name": "BadChannelsMaxwell",
@@ -1020,7 +1028,7 @@
       "mne_python": "mne.preprocessing.find_bad_channels_maxwell",
       "sklearn": null,
       "test": "test_dsp_bad_channels_maxwell",
-      "example": null,
+      "example": "ex_dsp_maxwell",
       "status": "done",
       "skigen_candidate": false,
       "documented": true,
@@ -1028,7 +1036,14 @@
       "guide": null,
       "python_equiv": "mne.preprocessing.find_bad_channels_maxwell",
       "python_url": null,
-      "kind": "module"
+      "kind": "module",
+      "example_snippet": [
+        "ex_dsp_maxwell/main.cpp#bad_channels_maxwell_usage"
+      ],
+      "example_mode": "run",
+      "required_data": [
+        "mne-cpp-test-data"
+      ]
     },
     {
       "name": "BadChannelsLof",
@@ -1132,7 +1147,7 @@
       "mne_python": "mne.chpi.filter_chpi",
       "sklearn": null,
       "test": "test_dsp_filter_chpi",
-      "example": null,
+      "example": "ex_dsp_maxwell",
       "status": "done",
       "skigen_candidate": false,
       "documented": true,
@@ -1140,7 +1155,14 @@
       "guide": null,
       "python_equiv": "mne.chpi.filter_chpi",
       "python_url": null,
-      "kind": "module"
+      "kind": "module",
+      "example_snippet": [
+        "ex_dsp_maxwell/main.cpp#filter_chpi_usage"
+      ],
+      "example_mode": "run",
+      "required_data": [
+        "mne-cpp-test-data"
+      ]
     },
     {
       "name": "AnnotateArtifact",
@@ -1197,14 +1219,21 @@
       "mne_python": "mne.preprocessing.read_fine_calibration",
       "sklearn": null,
       "test": "test_fine_calibration",
-      "example": null,
+      "example": "ex_dsp_maxwell",
+      "example_snippet": [
+        "ex_dsp_maxwell/main.cpp#fine_calibration_usage"
+      ],
+      "example_mode": "run",
       "status": "done",
       "skigen_candidate": false,
       "documented": true,
       "sidebar_position": 16,
       "guide": null,
       "python_equiv": "mne.preprocessing.read_fine_calibration",
-      "python_url": null
+      "python_url": null,
+      "required_data": [
+        "mne-cpp-test-data"
+      ]
     },
     {
       "name": "MaxwellMovementComp",
@@ -1215,14 +1244,21 @@
       "mne_python": "mne.preprocessing.maxwell_filter (head_pos)",
       "sklearn": null,
       "test": "test_maxwell_movement_comp",
-      "example": null,
+      "example": "ex_dsp_maxwell",
+      "example_snippet": [
+        "ex_dsp_maxwell/main.cpp#maxwell_movement_comp_usage"
+      ],
+      "example_mode": "run",
       "status": "done",
       "skigen_candidate": false,
       "documented": true,
       "sidebar_position": 17,
       "guide": null,
       "python_equiv": "mne.preprocessing.maxwell_filter (head_pos)",
-      "python_url": null
+      "python_url": null,
+      "required_data": [
+        "mne-cpp-test-data"
+      ]
     },
     {
       "name": "SurfaceLaplacian",

@@ -14,6 +14,8 @@
  *
  * Reference:
  *   Taulu, S., Kajola, M. (2005). J. Appl. Phys. 97, 124905.
+ *
+ * @snippet ex_dsp_maxwell/main.cpp bad_channels_maxwell_usage
  */
 
 #ifndef BAD_CHANNELS_MAXWELL_H

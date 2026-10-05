@@ -27,6 +27,15 @@ Channels whose [SSS](/docs/api/dsp/sss) reconstruction error is anomalously high
 
 Reference: Taulu, S., Kajola, M. (2005). J. Appl. Phys. 97, 124905.
 
+```cpp title="src/examples/ex_dsp_maxwell/main.cpp"
+MatrixXd broken = data;
+broken.row(meg[40]).array() += 2e-7; // a sensor with a constant offset the multipole model cannot explain
+BadChannelsMaxwellParams badParams;
+badParams.origin = params.origin;
+badParams.dZThreshold = 50.0; // robust z-score of the reconstruction residual
+const BadChannelsMaxwellResult bads = findBadChannelsMaxwell(broken, info, badParams);
+```
+
 ---
 
 ## Functions
@@ -37,9 +46,9 @@ Reference: Taulu, S., Kajola, M. (2005). J. Appl. Phys. 97, 124905.
 BadChannelsMaxwellResult findBadChannelsMaxwell(const Eigen::MatrixXd & matData, const [FiffInfo](/docs/api/fiff/fiff-info) & info, const BadChannelsMaxwellParams & params);
 ```
 
-Detect bad MEG channels using [SSS](/docs/api/dsp/sss) reconstruction residuals.
+Detect bad MEG channels using [`SSS`](/docs/api/dsp/sss) reconstruction residuals.
 
-Computes the [SSS](/docs/api/dsp/sss) reconstruction of the data, then flags channels whose residual (difference between original and reconstructed) is anomalously large relative to the population of channels.
+Computes the [`SSS`](/docs/api/dsp/sss) reconstruction of the data, then flags channels whose residual (difference between original and reconstructed) is anomalously large relative to the population of channels.
 
 **Parameters:**
 
@@ -57,6 +66,12 @@ Computes the [SSS](/docs/api/dsp/sss) reconstruction of the data, then flags cha
 - *BadChannelsMaxwellResult* — Detection result with bad channel names, indices, residuals, z-scores.
 
 ---
+
+## Example
+
+- Full source: [`src/examples/ex_dsp_maxwell/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_dsp_maxwell/main.cpp)
+- Build target: `ex_dsp_maxwell` (runs under CTest)
+- Data: [mne-cpp-test-data](https://github.com/mne-tools/mne-cpp-test-data)
 
 ## Authors of this file
 

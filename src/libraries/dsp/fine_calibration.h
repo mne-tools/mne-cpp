@@ -49,23 +49,21 @@ namespace UTILSLIB
  */
 struct DSPSHARED_EXPORT FineCalEntry
 {
-    int chNumber = 0;                   /**< MEG channel number (e.g., 0113 for MEG0113). */
-    double dGain = 1.0;                 /**< Gain correction factor (nominal = 1.0). */
-    Eigen::Vector3d imbalance{0, 0, 0}; /**< Cross-talk imbalance correction (x, y, z). */
+    int chNumber = 0;                                         /**< MEG channel number (e.g., 113 for MEG0113). */
+    Eigen::Vector3d position{0, 0, 0};                        /**< Coil position in device coordinates (metres). */
+    Eigen::Matrix3d orientation{Eigen::Matrix3d::Identity()}; /**< Rows: coil x, y and z (normal) axes. */
+    Eigen::VectorXd imbalance{Eigen::VectorXd::Ones(1)};      /**< One term (magnetometer calibration) or three (gradiometer imbalance). */
 };
 
 //=============================================================================================================
 /**
  * @brief Fine calibration data for SSS.
  *
- * A fine calibration file (.dat) contains one line per MEG sensor with:
- *   channel_number  gain  imbalance_x  imbalance_y  imbalance_z
+ * A fine calibration file (.dat) has one line per MEG sensor, as read and written by
+ * mne.preprocessing.read_fine_calibration / write_fine_calibration:
+ *   channel_number  position(3)  x_axis(3)  y_axis(3)  z_axis(3)  imbalance(1 or 3)
  *
- * Usage:
- * @code
- *   FineCalibration cal = FineCalibration::read("/path/to/sss_cal.dat");
- *   cal.write("/path/to/output.dat");
- * @endcode
+ * @snippet ex_dsp_maxwell/main.cpp fine_calibration_usage
  */
 class DSPSHARED_EXPORT FineCalibration
 {
@@ -76,9 +74,8 @@ public:
     /**
      * @brief Read a fine calibration file (.dat format).
      *
-     * Expected format: whitespace-separated columns per line:
-     *   channel_number  gain  imbalance_x  imbalance_y  imbalance_z
-     * Lines starting with '#' are comments.
+     * Each line has 14 or 16 whitespace-separated columns (see the class description);
+     * lines starting with '#' are comments and malformed lines are skipped.
      *
      * @param[in] sPath  Path to .dat file.
      *
@@ -153,22 +150,19 @@ public:
 
     //=========================================================================================================
     /**
-     * @brief Build gain correction diagonal matrix for MEG channels.
+     * @brief Magnetometer calibration factors.
      *
-     * Returns a diagonal matrix where each diagonal element is the gain
-     * factor for the corresponding MEG channel (in the order of m_entries).
-     *
-     * @return Diagonal gain matrix (n_entries × n_entries).
+     * @return One factor per entry: the single calibration term of a magnetometer
+     *         (channel number ending in 1), 1.0 for gradiometers.
      */
     Eigen::VectorXd gainVector() const;
 
     //=========================================================================================================
     /**
-     * @brief Build imbalance matrix.
+     * @brief Gradiometer imbalance terms.
      *
-     * Returns a matrix of cross-talk imbalance vectors (n_entries × 3).
-     *
-     * @return Imbalance matrix (n_entries × 3), one x/y/z row per entry.
+     * @return Matrix (n_entries × 3): the one or three imbalance terms of each
+     *         gradiometer, zero-padded; zero rows for magnetometers.
      */
     Eigen::MatrixXd imbalanceMatrix() const;
 

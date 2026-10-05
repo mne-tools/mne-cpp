@@ -76,25 +76,6 @@ namespace UTILSLIB
 {
 
 //=============================================================================================================
-/**
- * @brief Implements Signal Space Separation (SSS) and temporal SSS (tSSS) for MEG data.
- *
- * Quick-start example:
- * @code
- *   // Build the SSS basis once from sensor geometry
- *   SSS::Params p;
- *   p.iOrderIn  = 8;                          // Standard internal order
- *   p.iOrderOut = 3;                          // Standard external order
- *   p.origin    = Eigen::Vector3d(0,0,0.04);  // 4 cm above head origin
- *   SSS::Basis basis = SSS::computeBasis(fiffInfo, p);
- *
- *   // Apply SSS (suppress environmental noise)
- *   Eigen::MatrixXd cleanData = SSS::apply(rawMegData, basis);
- *
- *   // Apply tSSS (additionally suppress near-field artefacts)
- *   Eigen::MatrixXd tSssData  = SSS::applyTemporal(rawMegData, basis);
- * @endcode
- */
 /** @brief Configuration parameters for SSS/tSSS (defined outside class to work around a Clang default-argument/nested-struct limitation). */
 struct DSPSHARED_EXPORT SSSParams
 {
@@ -104,6 +85,16 @@ struct DSPSHARED_EXPORT SSSParams
     double dRegIn = 1e-5;                   /**< Tikhonov regularisation for the combined-basis pseudoinverse. */
 };
 
+//=============================================================================================================
+/**
+ * @brief Implements Signal Space Separation (SSS) and temporal SSS (tSSS) for MEG data.
+ *
+ * @snippet ex_dsp_maxwell/main.cpp sss_usage
+ *
+ * @snippet ex_dsp_maxwell/main.cpp sss_apply
+ *
+ * SSS::applyTemporal additionally removes near-field artefacts (tSSS).
+ */
 class DSPSHARED_EXPORT SSS
 {
 public:

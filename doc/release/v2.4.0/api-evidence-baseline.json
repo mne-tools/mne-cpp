@@ -12,18 +12,18 @@
     "registered_stale": 0,
     "registered_with_test": 101,
     "registered_test_unresolved": 0,
-    "registered_with_example": 146,
+    "registered_with_example": 151,
     "registered_example_not_built": 0,
     "registered_with_python_equiv": 88,
     "registered_without_api_page": 0,
-    "with_snippet": 172,
+    "with_snippet": 184,
     "public_api_units": 478,
     "example_eligible": 383,
     "example_exempt": 95,
-    "eligible_backed_by_registry_example": 146,
-    "eligible_used_by_some_example": 214,
-    "examples_on_disk": 58,
-    "examples_built": 58
+    "eligible_backed_by_registry_example": 151,
+    "eligible_used_by_some_example": 226,
+    "examples_on_disk": 59,
+    "examples_built": 59
   },
   "by_library": {
     "bids": {
@@ -85,9 +85,9 @@
       "registered": 51,
       "with_test": 28,
       "eligible": 80,
-      "eligible_with_registry_example": 35,
-      "eligible_used_by_example": 59,
-      "with_snippet": 57
+      "eligible_with_registry_example": 40,
+      "eligible_used_by_example": 71,
+      "with_snippet": 69
     },
     "fiff": {
       "public": 37,
@@ -4311,10 +4311,14 @@
       "registry_status": "done",
       "test": "test_dsp_bad_channels_maxwell",
       "test_resolves": true,
-      "example": null,
-      "example_state": "none",
-      "including_examples": [],
-      "snippets": [],
+      "example": "ex_dsp_maxwell",
+      "example_state": "built",
+      "including_examples": [
+        "ex_dsp_maxwell"
+      ],
+      "snippets": [
+        "ex_dsp_maxwell/main.cpp#bad_channels_maxwell_usage"
+      ],
       "api_page": "doc/website/docs/api/dsp/bad-channels-maxwell.mdx",
       "python_equiv": "mne.preprocessing.find_bad_channels_maxwell",
       "example_eligible": true,
@@ -4332,8 +4336,12 @@
       "test_resolves": false,
       "example": null,
       "example_state": "none",
-      "including_examples": [],
-      "snippets": [],
+      "including_examples": [
+        "ex_dsp_maxwell"
+      ],
+      "snippets": [
+        "ex_dsp_maxwell/main.cpp#bad_channels_maxwell_usage"
+      ],
       "api_page": null,
       "python_equiv": null,
       "example_eligible": true,
@@ -4351,8 +4359,12 @@
       "test_resolves": false,
       "example": null,
       "example_state": "none",
-      "including_examples": [],
-      "snippets": [],
+      "including_examples": [
+        "ex_dsp_maxwell"
+      ],
+      "snippets": [
+        "ex_dsp_maxwell/main.cpp#bad_channels_maxwell_usage"
+      ],
       "api_page": null,
       "python_equiv": null,
       "example_eligible": true,
@@ -4736,10 +4748,14 @@
       "registry_status": "done",
       "test": "test_dsp_filter_chpi",
       "test_resolves": true,
-      "example": null,
-      "example_state": "none",
-      "including_examples": [],
-      "snippets": [],
+      "example": "ex_dsp_maxwell",
+      "example_state": "built",
+      "including_examples": [
+        "ex_dsp_maxwell"
+      ],
+      "snippets": [
+        "ex_dsp_maxwell/main.cpp#filter_chpi_usage"
+      ],
       "api_page": "doc/website/docs/api/dsp/filter-chpi.mdx",
       "python_equiv": "mne.chpi.filter_chpi",
       "example_eligible": true,
@@ -4757,8 +4773,12 @@
       "test_resolves": false,
       "example": null,
       "example_state": "none",
-      "including_examples": [],
-      "snippets": [],
+      "including_examples": [
+        "ex_dsp_maxwell"
+      ],
+      "snippets": [
+        "ex_dsp_maxwell/main.cpp#filter_chpi_usage"
+      ],
       "api_page": null,
       "python_equiv": null,
       "example_eligible": true,
@@ -4851,8 +4871,12 @@
       "test_resolves": false,
       "example": null,
       "example_state": "none",
-      "including_examples": [],
-      "snippets": [],
+      "including_examples": [
+        "ex_dsp_maxwell"
+      ],
+      "snippets": [
+        "ex_dsp_maxwell/main.cpp#fine_calibration_usage"
+      ],
       "api_page": null,
       "python_equiv": null,
       "example_eligible": true,
@@ -4868,10 +4892,14 @@
       "registry_status": "done",
       "test": "test_fine_calibration",
       "test_resolves": true,
-      "example": null,
-      "example_state": "none",
-      "including_examples": [],
-      "snippets": [],
+      "example": "ex_dsp_maxwell",
+      "example_state": "built",
+      "including_examples": [
+        "ex_dsp_maxwell"
+      ],
+      "snippets": [
+        "ex_dsp_maxwell/main.cpp#fine_calibration_usage"
+      ],
       "api_page": "doc/website/docs/api/dsp/fine-calibration.mdx",
       "python_equiv": "mne.preprocessing.read_fine_calibration",
       "example_eligible": true,
@@ -5004,8 +5032,12 @@
       "test_resolves": false,
       "example": null,
       "example_state": "none",
-      "including_examples": [],
-      "snippets": [],
+      "including_examples": [
+        "ex_dsp_maxwell"
+      ],
+      "snippets": [
+        "ex_dsp_maxwell/main.cpp#maxwell_movement_comp_usage"
+      ],
       "api_page": null,
       "python_equiv": null,
       "example_eligible": true,
@@ -5023,8 +5055,12 @@
       "test_resolves": false,
       "example": null,
       "example_state": "none",
-      "including_examples": [],
-      "snippets": [],
+      "including_examples": [
+        "ex_dsp_maxwell"
+      ],
+      "snippets": [
+        "ex_dsp_maxwell/main.cpp#maxwell_movement_comp_usage"
+      ],
       "api_page": null,
       "python_equiv": null,
       "example_eligible": true,
@@ -5040,10 +5076,14 @@
       "registry_status": "done",
       "test": "test_maxwell_movement_comp",
       "test_resolves": true,
-      "example": null,
-      "example_state": "none",
-      "including_examples": [],
-      "snippets": [],
+      "example": "ex_dsp_maxwell",
+      "example_state": "built",
+      "including_examples": [
+        "ex_dsp_maxwell"
+      ],
+      "snippets": [
+        "ex_dsp_maxwell/main.cpp#maxwell_movement_comp_usage"
+      ],
       "api_page": "doc/website/docs/api/dsp/maxwell-movement-comp.mdx",
       "python_equiv": "mne.preprocessing.maxwell_filter (head_pos)",
       "example_eligible": true,
@@ -5646,10 +5686,15 @@
       "registry_status": "done",
       "test": "test_dsp_sss",
       "test_resolves": true,
-      "example": null,
-      "example_state": "none",
-      "including_examples": [],
-      "snippets": [],
+      "example": "ex_dsp_maxwell",
+      "example_state": "built",
+      "including_examples": [
+        "ex_dsp_maxwell"
+      ],
+      "snippets": [
+        "ex_dsp_maxwell/main.cpp#sss_usage",
+        "ex_dsp_maxwell/main.cpp#sss_apply"
+      ],
       "api_page": "doc/website/docs/api/dsp/sss.mdx",
       "python_equiv": "mne.preprocessing.maxwell_filter",
       "example_eligible": true,
@@ -5667,8 +5712,13 @@
       "test_resolves": false,
       "example": null,
       "example_state": "none",
-      "including_examples": [],
-      "snippets": [],
+      "including_examples": [
+        "ex_dsp_maxwell"
+      ],
+      "snippets": [
+        "ex_dsp_maxwell/main.cpp#sss_usage",
+        "ex_dsp_maxwell/main.cpp#sss_apply"
+      ],
       "api_page": null,
       "python_equiv": null,
       "example_eligible": true,
@@ -6513,7 +6563,8 @@
       "including_examples": [
         "ex_connectivity",
         "ex_connectivity_comparison",
-        "ex_connectivity_performance"
+        "ex_connectivity_performance",
+        "ex_dsp_maxwell"
       ],
       "snippets": [
         "ex_read_raw/main.cpp#fiff_raw_data_open",

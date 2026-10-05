@@ -46,17 +46,17 @@ static FiffInfo makeSyntheticMegInfo(int nSensors, double radius = 0.12)
         double z = std::sin(phi) * r2d * radius + 0.04; // 4 cm superior
         double yy = y * radius;
 
-        // Outward-pointing normal (radial)
+        // Every third coil is radial, the others tangential: a radial-only array cannot tell
+        // internal from external fields, a Neuromag-like triplet layout can
         Vector3f pos(static_cast<float>(x), static_cast<float>(yy), static_cast<float>(z));
-        Vector3f normal = pos.normalized();
+        const Vector3f radial = (pos - Vector3f(0.0f, 0.0f, 0.04f)).normalized();
+        Vector3f tangent = radial.cross(std::abs(radial.x()) < 0.9f ? Vector3f::UnitX() : Vector3f::UnitY()).normalized();
+        if (i % 3 == 2)
+            tangent = radial.cross(tangent).normalized();
 
-        // Build ez and ex arbitrarily perpendicular
-        Vector3f ez = normal;
-        Vector3f ex = Vector3f(1, 0, 0);
-        if (std::abs(ez.dot(ex)) > 0.9f)
-            ex = Vector3f(0, 1, 0);
+        Vector3f ez = (i % 3 == 0) ? radial : tangent;
+        Vector3f ex = (i % 3 == 0) ? tangent : radial;
         Vector3f ey = ez.cross(ex).normalized();
-        ex = ey.cross(ez).normalized();
 
         FiffChInfo ch;
         ch.kind = FIFFV_MEG_CH;
@@ -213,6 +213,18 @@ private slots:
         QVERIFY2(normOut < normIn * 0.1,
                  qPrintable(QString("SSS did not sufficiently suppress the external field: ratio = %1")
                                 .arg(normOut / normIn)));
+
+        // The closed-form field of a dipole inside the array must pass unchanged
+        const Vector3d dipolePos(0.01, -0.01, 0.06);
+        const Vector3d moment(1e-9, 2e-9, 0.0);
+        VectorXd brain(102);
+        for (int i = 0; i < 102; ++i) {
+            const Vector3d r = info.chs[i].chpos.r0.cast<double>() - dipolePos;
+            const double d = r.norm();
+            brain(i) = info.chs[i].chpos.ez.cast<double>().dot((3.0 * r * r.dot(moment) / (d * d) - moment) / (d * d * d));
+        }
+        const double brainError = (SSS::apply(brain, basis) - brain).norm() / brain.norm();
+        QVERIFY2(brainError < 0.01, qPrintable(QString("SSS distorted an internal dipole field: relative error %1").arg(brainError)));
     }
 
     //=========================================================================

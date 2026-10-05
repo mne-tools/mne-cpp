@@ -53,32 +53,26 @@ FineCalibration FineCalibration::read(const QString& sPath)
             continue;
         }
 
-        QStringList parts = line.split(QRegularExpression("\\s+"), Qt::SkipEmptyParts);
-        if (parts.size() < 5) {
+        const QStringList parts = line.split(QRegularExpression("\\s+"), Qt::SkipEmptyParts);
+        if (parts.size() != 14 && parts.size() != 16) {
             qWarning() << "[FineCalibration::read] Skipping malformed line:" << line;
             continue;
         }
 
         FineCalEntry entry;
         bool ok = false;
-        entry.chNumber = parts[0].toInt(&ok);
-        if (!ok)
+        entry.chNumber = QString(parts[0]).remove(QStringLiteral("MEG")).toInt(&ok);
+        VectorXd values(parts.size() - 1);
+        for (int k = 1; ok && k < parts.size(); ++k) {
+            values(k - 1) = parts[k].toDouble(&ok);
+        }
+        if (!ok) {
+            qWarning() << "[FineCalibration::read] Skipping malformed line:" << line;
             continue;
-
-        entry.dGain = parts[1].toDouble(&ok);
-        if (!ok)
-            continue;
-
-        double ix = parts[2].toDouble(&ok);
-        if (!ok)
-            continue;
-        double iy = parts[3].toDouble(&ok);
-        if (!ok)
-            continue;
-        double iz = parts[4].toDouble(&ok);
-        if (!ok)
-            continue;
-        entry.imbalance = Vector3d(ix, iy, iz);
+        }
+        entry.position = values.head<3>();
+        entry.orientation = Map<const Matrix<double, 3, 3, RowMajor>>(values.data() + 3);
+        entry.imbalance = values.tail(values.size() - 12);
 
         cal.addEntry(entry);
     }
@@ -98,15 +92,19 @@ bool FineCalibration::write(const QString& sPath) const
     }
 
     QTextStream out(&file);
-    out << "# Fine calibration file\n";
-    out << "# channel_number  gain  imbalance_x  imbalance_y  imbalance_z\n";
-
     for (const auto& entry : m_entries) {
-        out << entry.chNumber << " "
-            << QString::number(entry.dGain, 'f', 6) << " "
-            << QString::number(entry.imbalance.x(), 'e', 6) << " "
-            << QString::number(entry.imbalance.y(), 'e', 6) << " "
-            << QString::number(entry.imbalance.z(), 'e', 6) << "\n";
+        out << QString("%1").arg(entry.chNumber, 4, 10, QChar('0'));
+        const Matrix<double, 3, 3, RowMajor> axes = entry.orientation;
+        for (const double v : {entry.position(0), entry.position(1), entry.position(2)}) {
+            out << ' ' << QString::number(v, 'f', 6);
+        }
+        for (int k = 0; k < 9; ++k) {
+            out << ' ' << QString::number(axes.data()[k], 'f', 6);
+        }
+        for (Index k = 0; k < entry.imbalance.size(); ++k) {
+            out << ' ' << QString::number(entry.imbalance(k), 'f', 6);
+        }
+        out << '\n';
     }
 
     file.close();
@@ -130,9 +128,11 @@ bool FineCalibration::findEntry(int chNumber, FineCalEntry& entry) const
 
 VectorXd FineCalibration::gainVector() const
 {
-    VectorXd gains(m_entries.size());
+    VectorXd gains = VectorXd::Ones(m_entries.size());
     for (int i = 0; i < m_entries.size(); ++i) {
-        gains(i) = m_entries[i].dGain;
+        if (m_entries[i].chNumber % 10 == 1) {
+            gains(i) = m_entries[i].imbalance(0);
+        }
     }
     return gains;
 }
@@ -141,9 +141,11 @@ VectorXd FineCalibration::gainVector() const
 
 MatrixXd FineCalibration::imbalanceMatrix() const
 {
-    MatrixXd imb(m_entries.size(), 3);
+    MatrixXd imb = MatrixXd::Zero(m_entries.size(), 3);
     for (int i = 0; i < m_entries.size(); ++i) {
-        imb.row(i) = m_entries[i].imbalance.transpose();
+        if (m_entries[i].chNumber % 10 != 1) {
+            imb.row(i).head(m_entries[i].imbalance.size()) = m_entries[i].imbalance.transpose();
+        }
     }
     return imb;
 }

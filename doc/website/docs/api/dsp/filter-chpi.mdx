@@ -25,6 +25,16 @@ SPDX-License-Identifier: BSD-3-Clause Copyright (c) 2026 MNE-CPP Authors.
 
 Removes continuous head-position indicator (cHPI) excitation signals from MEG data by applying zero-phase Butterworth band-stop (notch) filters at each cHPI frequency. This mirrors MNE-Python's mne.chpi.filter_chpi().
 
+```cpp title="src/examples/ex_dsp_maxwell/main.cpp"
+const double sFreq = 1000.0;
+MatrixXd chpi = MatrixXd::Zero(info.nchan, 4000);
+for (int t = 0; t < chpi.cols(); ++t) {
+    chpi(meg[0], t) = std::sin(2.0 * kPi * 10.0 * t / sFreq) + std::sin(2.0 * kPi * 83.0 * t / sFreq);
+}
+const QVector<double> coilFreqs{83.0};
+filterChpi(chpi, info, sFreq, coilFreqs); // notch every coil frequency on the MEG channels
+```
+
 ---
 
 ## Functions
@@ -83,6 +93,12 @@ Tries to read HPI coil frequencies from the [FiffInfo](/docs/api/fiff/fiff-info)
   Filtering parameters.
 
 ---
+
+## Example
+
+- Full source: [`src/examples/ex_dsp_maxwell/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_dsp_maxwell/main.cpp)
+- Build target: `ex_dsp_maxwell` (runs under CTest)
+- Data: [mne-cpp-test-data](https://github.com/mne-tools/mne-cpp-test-data)
 
 ## Authors of this file
 

@@ -80,26 +80,6 @@ MatrixXd regPinv(const MatrixXd& A, double reg = 1e-5)
     return svd.matrixV() * invSv.asDiagonal() * svd.matrixU().transpose();
 }
 
-//=============================================================================================================
-/**
- * @brief Compute a thin orthonormal basis for the column space of A.
- */
-MatrixXd orthonormalCols(const MatrixXd& A)
-{
-    if (A.size() == 0) {
-        return MatrixXd(A.rows(), 0);
-    }
-
-    ColPivHouseholderQR<MatrixXd> qr(A);
-    qr.setThreshold(1e-12);
-    const int rank = qr.rank();
-    if (rank <= 0) {
-        return MatrixXd(A.rows(), 0);
-    }
-
-    return qr.householderQ() * MatrixXd::Identity(A.rows(), rank);
-}
-
 } // anonymous namespace
 
 //=============================================================================================================
@@ -228,24 +208,19 @@ Vector3d SSS::basisGradCart(int l, int m, bool bInternal,
     double dYdPhi = Plm * dAngFactor_phi;
 
     // ---- Gradient in spherical coordinates ----
-    // For internal:  grad(r^l * Y_l^m)
-    //   G_r  = l  * r^{l-1} * Y_l^m
-    //   G_θ  = r^{l-1} * dY/dθ
-    //   G_φ  = r^{l-1} / sinθ * dY/dφ   (handle sinθ below)
-    //
-    // For external:  grad(r^{-(l+1)} * Y_l^m)
-    //   G_r  = -(l+1) * r^{-(l+2)} * Y_l^m
-    //   G_θ  = r^{-(l+2)} * dY/dθ
-    //   G_φ  = r^{-(l+2)} / sinθ * dY/dφ
+    // Internal (sources inside):  grad(r^{-(l+1)} Y_l^m)
+    //   G_r = -(l+1) r^{-(l+2)} Y,  G_θ = r^{-(l+2)} dY/dθ,  G_φ = r^{-(l+2)} / sinθ dY/dφ
+    // External (sources outside): grad(r^l Y_l^m)
+    //   G_r = l r^{l-1} Y,          G_θ = r^{l-1} dY/dθ,      G_φ = r^{l-1} / sinθ dY/dφ
 
     double radPow, Gr_coeff, Gtu_coeff;
     if (bInternal) {
-        radPow = std::pow(r, l - 1);
-        Gr_coeff = static_cast<double>(l) * radPow;
-        Gtu_coeff = radPow; // G_θ and sinθ*G_φ share this
-    } else {
         radPow = std::pow(r, -(l + 2));
         Gr_coeff = -static_cast<double>(l + 1) * radPow;
+        Gtu_coeff = radPow; // G_θ and sinθ*G_φ share this
+    } else {
+        radPow = std::pow(r, l - 1);
+        Gr_coeff = static_cast<double>(l) * radPow;
         Gtu_coeff = radPow;
     }
 
@@ -374,23 +349,10 @@ SSS::Basis SSS::computeBasis(const FiffInfo& fiffInfo, const Params& params)
     S.leftCols(basis.iNin) = basis.matSin;
     S.rightCols(basis.iNout) = basis.matSout;
 
-    basis.matPinvAll = regPinv(S, params.dRegIn); // (N_in+N_out) × n_meg
-
-    // Build an oblique projector onto the internal subspace along the external
-    // subspace. This preserves internal components better than the direct
-    // joint-fit projector while still annihilating pure external components.
-    const MatrixXd Qin = orthonormalCols(basis.matSin);
-    const MatrixXd Qout = orthonormalCols(basis.matSout);
-
-    if (Qin.cols() == 0) {
-        basis.matProjIn = MatrixXd::Zero(nMeg, nMeg);
-        return basis;
-    }
-
-    const MatrixXd I = MatrixXd::Identity(nMeg, nMeg);
-    const MatrixXd QoutPerp = Qout.cols() > 0 ? (I - Qout * Qout.transpose()) : I;
-    const MatrixXd gram = Qin.transpose() * QoutPerp * Qin;
-    basis.matProjIn = Qin * regPinv(gram, params.dRegIn) * Qin.transpose() * QoutPerp;
+    // Column norms span ~10 orders of magnitude (r^-(l+2) vs r^(l-1)); normalise them before the pseudoinverse, as MNE does
+    const VectorXd colNorms = S.colwise().norm().cwiseMax(1e-300).transpose();
+    basis.matPinvAll = colNorms.cwiseInverse().asDiagonal() * regPinv(S * colNorms.cwiseInverse().asDiagonal(), params.dRegIn); // (N_in+N_out) × n_meg
+    basis.matProjIn = basis.matSin * basis.matPinvAll.topRows(basis.iNin);
 
     return basis;
 }
