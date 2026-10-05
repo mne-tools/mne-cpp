@@ -25,6 +25,8 @@
  * MEGIN VectorView gradiometer pairs.
  *
  * Reference: Graichen U. et al., NeuroImage 86 (2014) 467–478.
+ *
+ * @snippet ex_dsp_analysis/main.cpp sphara_projector_usage
  */
 
 #ifndef SPHARA_UTILS_H

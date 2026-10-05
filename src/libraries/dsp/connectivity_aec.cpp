@@ -69,7 +69,7 @@ void dftHilbert(const VectorXd& input, VectorXd& envelope)
         H[static_cast<size_t>(k)] = 2.0 * X[static_cast<size_t>(k)];
     if (n % 2 == 0)
         H[static_cast<size_t>(n / 2)] = X[static_cast<size_t>(n / 2)];
-    for (int k = (n + 1) / 2; k < n; ++k)
+    for (int k = n / 2 + 1; k < n; ++k) // keeps the Nyquist bin set above for even n
         H[static_cast<size_t>(k)] = std::complex<double>(0.0, 0.0);
 
     // Inverse DFT to get analytic signal

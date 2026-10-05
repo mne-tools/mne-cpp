@@ -193,6 +193,11 @@ void TestConnectivityAec::testHilbertEnvelope()
     double meanEnv = env.segment(start, end - start).mean();
     QVERIFY2(std::abs(meanEnv - 1.0) < 0.2,
              qPrintable(QString("Mean envelope %1 not near 1.0").arg(meanEnv)));
+
+    // The Nyquist bin of an even-length signal is kept, as in scipy.signal.hilbert: |hilbert((-1)^t)| == 1
+    VectorXd nyquist(8);
+    nyquist << 1, -1, 1, -1, 1, -1, 1, -1;
+    QVERIFY((ConnectivityAec::hilbertEnvelope(nyquist).array() - 1.0).abs().maxCoeff() < 1e-12);
 }
 
 //=============================================================================================================

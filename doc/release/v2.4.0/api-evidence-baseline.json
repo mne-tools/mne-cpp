@@ -12,18 +12,18 @@
     "registered_stale": 0,
     "registered_with_test": 101,
     "registered_test_unresolved": 0,
-    "registered_with_example": 120,
+    "registered_with_example": 124,
     "registered_example_not_built": 0,
     "registered_with_python_equiv": 88,
     "registered_without_api_page": 0,
-    "with_snippet": 136,
+    "with_snippet": 145,
     "public_api_units": 478,
     "example_eligible": 383,
     "example_exempt": 95,
-    "eligible_backed_by_registry_example": 120,
-    "eligible_used_by_some_example": 187,
-    "examples_on_disk": 54,
-    "examples_built": 54
+    "eligible_backed_by_registry_example": 124,
+    "eligible_used_by_some_example": 194,
+    "examples_on_disk": 55,
+    "examples_built": 55
   },
   "by_library": {
     "bids": {
@@ -85,9 +85,9 @@
       "registered": 51,
       "with_test": 28,
       "eligible": 80,
-      "eligible_with_registry_example": 31,
-      "eligible_used_by_example": 52,
-      "with_snippet": 48
+      "eligible_with_registry_example": 35,
+      "eligible_used_by_example": 59,
+      "with_snippet": 57
     },
     "fiff": {
       "public": 37,
@@ -4399,10 +4399,14 @@
       "registry_status": "done",
       "test": "test_connectivity_aec",
       "test_resolves": true,
-      "example": null,
-      "example_state": "none",
-      "including_examples": [],
-      "snippets": [],
+      "example": "ex_dsp_analysis",
+      "example_state": "built",
+      "including_examples": [
+        "ex_dsp_analysis"
+      ],
+      "snippets": [
+        "ex_dsp_analysis/main.cpp#connectivity_aec_compute"
+      ],
       "api_page": "doc/website/docs/api/dsp/connectivity-aec.mdx",
       "python_equiv": "mne_connectivity.envelope_correlation",
       "example_eligible": true,
@@ -4735,6 +4739,7 @@
       "example": "ex_dsp_filter",
       "example_state": "built",
       "including_examples": [
+        "ex_dsp_analysis",
         "ex_dsp_filter",
         "ex_filtering"
       ],
@@ -4760,6 +4765,7 @@
       "example": "ex_dsp_filter",
       "example_state": "built",
       "including_examples": [
+        "ex_dsp_analysis",
         "ex_dsp_filter",
         "ex_filtering"
       ],
@@ -4820,10 +4826,14 @@
       "registry_status": "done",
       "test": "test_dsp_firfilter",
       "test_resolves": true,
-      "example": "ex_filtering",
+      "example": "ex_dsp_analysis",
       "example_state": "built",
-      "including_examples": [],
-      "snippets": [],
+      "including_examples": [
+        "ex_dsp_analysis"
+      ],
+      "snippets": [
+        "ex_dsp_analysis/main.cpp#fir_filter_usage"
+      ],
       "api_page": "doc/website/docs/api/dsp/fir-filter.mdx",
       "python_equiv": "mne.filter.filter_data",
       "example_eligible": true,
@@ -5149,12 +5159,15 @@
       "registry_status": "done",
       "test": "test_dsp_peak_finder",
       "test_resolves": true,
-      "example": null,
-      "example_state": "none",
+      "example": "ex_dsp_analysis",
+      "example_state": "built",
       "including_examples": [
+        "ex_dsp_analysis",
         "ex_dsp_spectral"
       ],
-      "snippets": [],
+      "snippets": [
+        "ex_dsp_analysis/main.cpp#peak_finder_usage"
+      ],
       "api_page": "doc/website/docs/api/dsp/peak-finder.mdx",
       "python_equiv": "mne.preprocessing.peak_finder",
       "example_eligible": true,
@@ -5173,9 +5186,12 @@
       "example": null,
       "example_state": "none",
       "including_examples": [
+        "ex_dsp_analysis",
         "ex_dsp_spectral"
       ],
-      "snippets": [],
+      "snippets": [
+        "ex_dsp_analysis/main.cpp#peak_finder_usage"
+      ],
       "api_page": null,
       "python_equiv": null,
       "example_eligible": true,
@@ -5474,10 +5490,14 @@
       "registry_status": "done",
       "test": "test_dsp_simulate",
       "test_resolves": true,
-      "example": null,
-      "example_state": "none",
-      "including_examples": [],
-      "snippets": [],
+      "example": "ex_dsp_analysis",
+      "example_state": "built",
+      "including_examples": [
+        "ex_dsp_analysis"
+      ],
+      "snippets": [
+        "ex_dsp_analysis/main.cpp#simulate_stc_usage"
+      ],
       "api_page": "doc/website/docs/api/dsp/simulate.mdx",
       "python_equiv": "mne.simulation.simulate_stc / simulate_evoked",
       "example_eligible": true,
@@ -5495,8 +5515,12 @@
       "test_resolves": false,
       "example": null,
       "example_state": "none",
-      "including_examples": [],
-      "snippets": [],
+      "including_examples": [
+        "ex_dsp_analysis"
+      ],
+      "snippets": [
+        "ex_dsp_analysis/main.cpp#simulate_stc_usage"
+      ],
       "api_page": null,
       "python_equiv": null,
       "example_eligible": true,
@@ -5538,10 +5562,14 @@
       "registry_status": "done",
       "test": "test_dsp_sphara",
       "test_resolves": true,
-      "example": null,
-      "example_state": "none",
-      "including_examples": [],
-      "snippets": [],
+      "example": "ex_dsp_analysis",
+      "example_state": "built",
+      "including_examples": [
+        "ex_dsp_analysis"
+      ],
+      "snippets": [
+        "ex_dsp_analysis/main.cpp#sphara_projector_usage"
+      ],
       "api_page": "doc/website/docs/api/dsp/sphara.mdx",
       "python_equiv": null,
       "example_eligible": true,
@@ -5664,10 +5692,14 @@
       "registry_status": "done",
       "test": "test_dsp_welch_psd",
       "test_resolves": true,
-      "example": "ex_spectral",
+      "example": "ex_dsp_analysis",
       "example_state": "built",
-      "including_examples": [],
-      "snippets": [],
+      "including_examples": [
+        "ex_dsp_analysis"
+      ],
+      "snippets": [
+        "ex_dsp_analysis/main.cpp#welch_psd_compute"
+      ],
       "api_page": "doc/website/docs/api/dsp/welch-psd.mdx",
       "python_equiv": "mne.time_frequency.psd_welch",
       "example_eligible": true,
@@ -5685,8 +5717,12 @@
       "test_resolves": false,
       "example": null,
       "example_state": "none",
-      "including_examples": [],
-      "snippets": [],
+      "including_examples": [
+        "ex_dsp_analysis"
+      ],
+      "snippets": [
+        "ex_dsp_analysis/main.cpp#welch_psd_compute"
+      ],
       "api_page": null,
       "python_equiv": null,
       "example_eligible": true,
@@ -7451,6 +7487,7 @@
         "ex_connectivity",
         "ex_connectivity_comparison",
         "ex_disp_3D",
+        "ex_dsp_analysis",
         "ex_histogram",
         "ex_interpolation",
         "ex_inverse_mne",

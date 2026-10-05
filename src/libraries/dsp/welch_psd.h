@@ -67,12 +67,7 @@ struct DSPSHARED_EXPORT WelchPsdResult
  * segment, and averages the squared magnitudes.  The result is a one-sided PSD
  * normalised so that integrating over frequency recovers the mean signal power.
  *
- * @code
- *   // 600 Hz data, 512-sample FFT, 50 % overlap, Hann window
- *   WelchPsdResult r = WelchPsd::compute(matData, 600.0, 512);
- *   // r.matPsd   → n_channels × 257
- *   // r.vecFreqs → [0, 1.17, 2.34, …, 300] Hz
- * @endcode
+ * @snippet ex_dsp_analysis/main.cpp welch_psd_compute
  */
 class DSPSHARED_EXPORT WelchPsd
 {

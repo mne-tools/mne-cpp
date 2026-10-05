@@ -21,12 +21,9 @@ class UTILSLIB::ConnectivityAec
 
 Amplitude Envelope [Correlation](/docs/api/connectivity/correlation) connectivity.
 
-```cpp
-// Standard AEC
-MatrixXd aec = ConnectivityAec::compute(bandpassedData);
-
-// Orthogonalized AEC (corrected for source leakage)
-MatrixXd aecCorr = ConnectivityAec::computeOrthogonalized(bandpassedData);
+```cpp title="src/examples/ex_dsp_analysis/main.cpp"
+const MatrixXd aec = ConnectivityAec::compute(envelopeSignals);                   // Pearson r of Hilbert envelopes
+const MatrixXd aecOrth = ConnectivityAec::computeOrthogonalized(envelopeSignals); // leakage-corrected
 ```
 
 ---
@@ -99,6 +96,11 @@ Pearson correlation between two vectors.
 - *double* — Correlation coefficient in [-1, 1].
 
 ---
+
+## Example
+
+- Full source: [`src/examples/ex_dsp_analysis/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_dsp_analysis/main.cpp)
+- Build target: `ex_dsp_analysis` (runs under CTest)
 
 ## Authors of this file
 

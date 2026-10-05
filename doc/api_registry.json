@@ -891,7 +891,11 @@
       "mne_python": "mne.filter.filter_data",
       "sklearn": null,
       "test": "test_dsp_firfilter",
-      "example": "ex_filtering",
+      "example": "ex_dsp_analysis",
+      "example_snippet": [
+        "ex_dsp_analysis/main.cpp#fir_filter_usage"
+      ],
+      "example_mode": "run",
       "status": "done",
       "skigen_candidate": false,
       "documented": true,
@@ -1251,7 +1255,11 @@
       "mne_python": "mne.preprocessing.peak_finder",
       "sklearn": null,
       "test": "test_dsp_peak_finder",
-      "example": null,
+      "example": "ex_dsp_analysis",
+      "example_snippet": [
+        "ex_dsp_analysis/main.cpp#peak_finder_usage"
+      ],
+      "example_mode": "run",
       "status": "done",
       "skigen_candidate": false,
       "documented": true,
@@ -1270,7 +1278,11 @@
       "mne_python": "mne.time_frequency.psd_welch",
       "sklearn": null,
       "test": "test_dsp_welch_psd",
-      "example": "ex_spectral",
+      "example": "ex_dsp_analysis",
+      "example_snippet": [
+        "ex_dsp_analysis/main.cpp#welch_psd_compute"
+      ],
+      "example_mode": "run",
       "status": "done",
       "skigen_candidate": false,
       "documented": true,
@@ -1398,7 +1410,11 @@
       "mne_python": null,
       "sklearn": null,
       "test": "test_dsp_sphara",
-      "example": null,
+      "example": "ex_dsp_analysis",
+      "example_snippet": [
+        "ex_dsp_analysis/main.cpp#sphara_projector_usage"
+      ],
+      "example_mode": "run",
       "status": "done",
       "skigen_candidate": false,
       "notes": "SPHARA — MNE-CPP original; surface harmonics for MEG",
@@ -1418,7 +1434,11 @@
       "mne_python": "mne_connectivity.envelope_correlation",
       "sklearn": null,
       "test": "test_connectivity_aec",
-      "example": null,
+      "example": "ex_dsp_analysis",
+      "example_snippet": [
+        "ex_dsp_analysis/main.cpp#connectivity_aec_compute"
+      ],
+      "example_mode": "run",
       "status": "done",
       "skigen_candidate": false,
       "documented": true,
@@ -1436,7 +1456,11 @@
       "mne_python": "mne.simulation.simulate_stc / simulate_evoked",
       "sklearn": null,
       "test": "test_dsp_simulate",
-      "example": null,
+      "example": "ex_dsp_analysis",
+      "example_snippet": [
+        "ex_dsp_analysis/main.cpp#simulate_stc_usage"
+      ],
+      "example_mode": "run",
       "status": "done",
       "skigen_candidate": false,
       "documented": true,

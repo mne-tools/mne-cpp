@@ -25,6 +25,11 @@ SPHARA represents a discrete EEG / MEG sensor montage as a triangulated manifold
 
 Reference: Graichen U. et al., NeuroImage 86 (2014) 467–478.
 
+```cpp title="src/examples/ex_dsp_analysis/main.cpp"
+const VectorXi channels = (VectorXi(3) << 1, 3, 5).finished();         // rows the basis belongs to
+const MatrixXd projector = makeSpharaProjector(basis, channels, 6, 1); // keep the first basis function
+```
+
 ---
 
 ## Functions
@@ -59,6 +64,11 @@ Constructs a SPHARA operator.
 - *Eigen::MatrixXd* — Returns the final SPHARA operator with dimensions (iOperatorDim,iOperatorDim).
 
 ---
+
+## Example
+
+- Full source: [`src/examples/ex_dsp_analysis/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_dsp_analysis/main.cpp)
+- Build target: `ex_dsp_analysis` (runs under CTest)
 
 ## Authors of this file
 

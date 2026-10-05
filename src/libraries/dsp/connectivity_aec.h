@@ -40,13 +40,7 @@ namespace UTILSLIB
 /**
  * @brief Amplitude Envelope Correlation connectivity.
  *
- * @code
- *   // Standard AEC
- *   MatrixXd aec = ConnectivityAec::compute(bandpassedData);
- *
- *   // Orthogonalized AEC (corrected for source leakage)
- *   MatrixXd aecCorr = ConnectivityAec::computeOrthogonalized(bandpassedData);
- * @endcode
+ * @snippet ex_dsp_analysis/main.cpp connectivity_aec_compute
  */
 class DSPSHARED_EXPORT ConnectivityAec
 {

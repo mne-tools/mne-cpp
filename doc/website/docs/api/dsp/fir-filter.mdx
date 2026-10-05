@@ -21,16 +21,11 @@ class UTILSLIB::FirFilter
 
 Discoverable façade over the [`FilterKernel`](/docs/api/dsp/filter-kernel) FIR-filter engine.
 
-Quick-start example — mirrors the [`IirFilter`](/docs/api/dsp/iir-filter) API: 
-```cpp
-// Design a 256-tap band-pass filter
-FilterKernel bpf = FirFilter::design(256, FirFilter::BandPass, 1.0, 40.0, sFreq);
+Mirrors the [`IirFilter`](/docs/api/dsp/iir-filter) API:
 
-// Apply to a single row vector (group delay already removed — symmetric FIR)
-Eigen::RowVectorXd out = FirFilter::apply(vecData, bpf);
-
-// Apply to all rows of a matrix
-Eigen::MatrixXd clean = FirFilter::applyZeroPhaseMatrix(matData, bpf);
+```cpp title="src/examples/ex_dsp_analysis/main.cpp"
+FilterKernel lowPass = FirFilter::design(256, FirFilter::LowPass, 20.0, 0.0, sFreq, 5.0); // order, type, cutoff(s), Hz, transition
+const RowVectorXd smooth = FirFilter::applyZeroPhase(tones, lowPass);
 ```
 
 ---
@@ -135,8 +130,8 @@ Apply the filter in a zero-phase forward-backward pass to every row of a matrix.
 
 ## Example
 
-- Full source: [`src/examples/ex_filtering/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_filtering/main.cpp)
-- Build target: `ex_filtering` (compiled in CI)
+- Full source: [`src/examples/ex_dsp_analysis/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_dsp_analysis/main.cpp)
+- Build target: `ex_dsp_analysis` (runs under CTest)
 
 ## Authors of this file
 

@@ -23,6 +23,8 @@
  * pipelines that already rely on SciPy semantics (cHPI peak picking, ECG
  * R-wave detection, event onset extraction) port to mne-cpp without
  * behavioural drift.
+ *
+ * @snippet ex_dsp_analysis/main.cpp peak_finder_usage
  */
 
 #ifndef PEAK_FINDER_H

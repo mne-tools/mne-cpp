@@ -51,17 +51,9 @@ namespace UTILSLIB
 /**
  * @brief Discoverable façade over the FilterKernel FIR-filter engine.
  *
- * Quick-start example — mirrors the IirFilter API:
- * @code
- *   // Design a 256-tap band-pass filter
- *   FilterKernel bpf = FirFilter::design(256, FirFilter::BandPass, 1.0, 40.0, sFreq);
+ * Mirrors the IirFilter API:
  *
- *   // Apply to a single row vector (group delay already removed — symmetric FIR)
- *   Eigen::RowVectorXd out = FirFilter::apply(vecData, bpf);
- *
- *   // Apply to all rows of a matrix
- *   Eigen::MatrixXd clean = FirFilter::applyZeroPhaseMatrix(matData, bpf);
- * @endcode
+ * @snippet ex_dsp_analysis/main.cpp fir_filter_usage
  */
 class DSPSHARED_EXPORT FirFilter
 {

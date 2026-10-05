@@ -34,6 +34,14 @@ a minimum topographic prominence — the height by which a peak rises above the 
 
 The API mirrors `scipy.signal.find_peaks` closely so MEG/EEG analysis pipelines that already rely on SciPy semantics (cHPI peak picking, ECG R-wave detection, event onset extraction) port to mne-cpp without behavioural drift.
 
+```cpp title="src/examples/ex_dsp_analysis/main.cpp"
+PeakFinderParams params;
+params.dMinHeight = 0.5; // like scipy.signal.find_peaks(height=0.5, distance=30)
+params.iMinDistance = 30;
+const QList<QPair<int, double>> peaks = peakFinder(wave, params); // (sample, value), sorted by sample
+const VectorXd prominence = peakProminences(wave, {2, 9, 15});
+```
+
 ---
 
 ## Functions
@@ -85,6 +93,11 @@ Prominence is the vertical distance from a peak to the highest valley on either 
 - *Eigen::VectorXd* — Prominence value for each peak.
 
 ---
+
+## Example
+
+- Full source: [`src/examples/ex_dsp_analysis/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_dsp_analysis/main.cpp)
+- Build target: `ex_dsp_analysis` (runs under CTest)
 
 ## Authors of this file
 

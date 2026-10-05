@@ -12,6 +12,8 @@
  * Provides functions equivalent to MNE-Python's mne.simulation module:
  *   - simulateStc(): create synthetic source time courses
  *   - simulateEvoked(): generate synthetic evoked data from forward model
+ *
+ * @snippet ex_dsp_analysis/main.cpp simulate_stc_usage
  */
 
 #ifndef SIMULATE_DSP_H

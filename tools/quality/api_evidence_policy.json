@@ -16,14 +16,13 @@
     "Settings": "Plain parameter record consumed by an algorithm class; shown inside that class's example."
   },
   "example_debt": {
-    "ceiling": 184,
+    "ceiling": 178,
     "names": [
       "AcquiredPoints",
       "BadChannelsMaxwell",
       "Bar",
       "ColorMap",
       "ComputeFwd",
-      "ConnectivityAec",
       "ElectrodeObject",
       "Fiff",
       "FiffAnnotationEventUtils",
@@ -59,7 +58,6 @@
       "FilterChpi",
       "FilterThreadArg",
       "FineCalibration",
-      "FirFilter",
       "FsSurface",
       "Fwd",
       "FwdBemModel",
@@ -176,7 +174,6 @@
       "MnaRegistryLoader",
       "MneICP",
       "MultimodalScene",
-      "PeakFinder",
       "Plot",
       "PolhemusConnection",
       "PolhemusCoregistration",
@@ -194,14 +191,11 @@
       "RtNoise",
       "RtNoiseWorker",
       "SSS",
-      "Simulate",
       "SliceObject",
       "SourceMorph",
-      "Sphara",
       "Spline",
       "TFplot",
-      "VideoOverlay",
-      "WelchPsd"
+      "VideoOverlay"
     ]
   }
 }
