@@ -23,16 +23,9 @@ Butterworth IIR filter design and application using second-order sections.
 
 All filter types (LP, HP, BP, BS) are supported via the classical analogue-prototype → bilinear-transform design route with pre-warped cutoff frequencies. The resulting biquad cascade is numerically stable for high filter orders.
 
-Typical usage: 
-```cpp
-// Design a 4th-order zero-phase Butterworth bandpass 1–40 Hz at 1000 Hz sampling rate
-auto sos = IirFilter::designButterworth(4, IirFilter::BandPass, 1.0, 40.0, 1000.0);
-
-// Apply to one channel
-Eigen::RowVectorXd filtered = IirFilter::applyZeroPhase(rawChannel, sos);
-
-// Apply to all channels of a matrix
-Eigen::MatrixXd matFiltered = IirFilter::applyZeroPhaseMatrix(rawMatrix, sos);
+```cpp title="src/examples/ex_dsp_spectral/main.cpp"
+const QVector<IirBiquad> sos = IirFilter::designButterworth(4, IirFilter::LowPass, 30.0, 0.0, kSFreq);
+const RowVectorXd lowPassed = IirFilter::applyZeroPhase(signal, sos); // forward-backward, no phase shift
 ```
 
 ---
@@ -121,6 +114,11 @@ Apply zero-phase filtering to every row of a matrix (each row = one channel).
 - *Eigen::MatrixXd* — Filtered matrix (n_channels x n_samples).
 
 ---
+
+## Example
+
+- Full source: [`src/examples/ex_dsp_spectral/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_dsp_spectral/main.cpp)
+- Build target: `ex_dsp_spectral` (runs under CTest)
 
 ## Authors of this file
 

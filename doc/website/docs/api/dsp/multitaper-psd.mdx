@@ -23,11 +23,10 @@ Multitaper power spectral density estimator using DPSS (Slepian) tapers.
 
 Applies multiple orthogonal DPSS tapers to the data, computes the FFT of each tapered segment, and averages the resulting periodograms weighted by the taper eigenvalues. This provides a PSD estimate with reduced variance compared to a single-taper (periodogram) approach.
 
-```cpp
-// 600 Hz data, half-bandwidth 4, default tapers
-MultitaperPsdResult r = MultitaperPsd::compute(matData, 600.0);
-// r.matPsd   → n_channels × (n_times/2+1)
-// r.vecFreqs → frequency axis in Hz
+```cpp title="src/examples/ex_dsp_spectral/main.cpp"
+const MultitaperPsdResult psd = MultitaperPsd::compute(signal, kSFreq, 2.0); // NW = 2, i.e. +-1 Hz resolution
+const double binWidth = psd.vecFreqs(1) - psd.vecFreqs(0);
+const double power = psd.matPsd.row(0).sum() * binWidth; // one-sided PSD integrates to the variance
 ```
 
 ---
@@ -60,6 +59,11 @@ Compute multitaper PSD for every channel of a data matrix.
 - *MultitaperPsdResult* — `MultitaperPsdResult` with matPsd and vecFreqs.
 
 ---
+
+## Example
+
+- Full source: [`src/examples/ex_dsp_spectral/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_dsp_spectral/main.cpp)
+- Build target: `ex_dsp_spectral` (runs under CTest)
 
 ## Authors of this file
 

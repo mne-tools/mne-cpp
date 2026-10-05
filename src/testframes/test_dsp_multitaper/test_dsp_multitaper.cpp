@@ -153,15 +153,11 @@ void TestDspMultitaper::testDpssEigenvaluesNearOne()
     int N = 512;
     DpssResult result = Dpss::compute(N, 4.0, 3);
 
-    // vecEigenvalues are the eigenvalues from the Slepian tridiagonal matrix
-    // (not true concentration ratios in [0,1]).  Verify they are positive
-    // and in descending order (largest eigenvalue first).
+    // Concentration ratios from scipy.signal.windows.dpss(512, 4.0, 3, return_ratios=True)
+    const double expected[] = {0.9999999997060645, 0.9999999723665234, 0.999998791537088};
     QCOMPARE(result.vecEigenvalues.size(), 3);
     for (int i = 0; i < result.vecEigenvalues.size(); ++i) {
-        QVERIFY(result.vecEigenvalues(i) > 0.0);
-    }
-    for (int i = 1; i < result.vecEigenvalues.size(); ++i) {
-        QVERIFY(result.vecEigenvalues(i) <= result.vecEigenvalues(i - 1));
+        QVERIFY2(std::fabs(result.vecEigenvalues(i) - expected[i]) < 1e-10, qPrintable(QString::number(result.vecEigenvalues(i), 'g', 17)));
     }
 }
 

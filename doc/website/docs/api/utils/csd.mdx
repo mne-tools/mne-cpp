@@ -19,11 +19,14 @@ Cross-[Spectral](/docs/api/utils/spectral) Density (CSD) estimator.
 
 Provides three methods for computing the CSD matrix between channels: multitaper (DPSS tapers), Fourier (Welch-style segmented), and Morlet wavelet.
 
-```cpp
-// Multitaper CSD: 600 Hz data, 0–60 Hz band, half-bandwidth 4
-CsdResult r = Csd::computeMultitaper(matData, 600.0, 0.0, 60.0, 4.0);
-// r.matCsd       → n_ch × n_ch mean CSD
-// r.csdByFreq[k] → n_ch × n_ch at frequency r.vecFreqs[k]
+```cpp title="src/examples/ex_dsp_spectral/main.cpp"
+MatrixXd twoChannels(2, n);
+twoChannels.row(0) = signal;
+for (int t = 0; t < n; ++t) {
+    twoChannels(1, t) = std::cos(2.0 * kPi * 20.0 * t / kSFreq); // 20 Hz, 90 degrees ahead of channel 0
+}
+const CsdResult csd = Csd::computeMultitaper(twoChannels, kSFreq, 18.0, 22.0, 2.0);
+const std::complex<double> cross = csd.matCsd(0, 1);
 ```
 
 ---
@@ -113,6 +116,11 @@ Compute CSD using Morlet wavelet convolution.
 - *CsdResult* — `CsdResult` with one CSD matrix per target frequency.
 
 ---
+
+## Example
+
+- Full source: [`src/examples/ex_dsp_spectral/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_dsp_spectral/main.cpp)
+- Build target: `ex_dsp_spectral` (runs under CTest)
 
 ## Authors of this file
 

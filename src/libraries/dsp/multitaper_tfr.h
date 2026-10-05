@@ -71,11 +71,7 @@ struct DSPSHARED_EXPORT MultitaperTfrResult
  * Slides a fixed-length analysis window across the data and computes a multitaper
  * PSD at each position, yielding a time-frequency power map per channel.
  *
- * @code
- *   // 600 Hz data, 256-sample windows, 128-sample step, half-bandwidth 4
- *   MultitaperTfrResult r = MultitaperTfr::compute(matData, 600.0);
- *   // r.tfrData[ch] → n_freqs × n_time_steps
- * @endcode
+ * @snippet ex_dsp_spectral/main.cpp multitaper_tfr_compute
  */
 class DSPSHARED_EXPORT MultitaperTfr
 {

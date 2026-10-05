@@ -12,18 +12,18 @@
     "registered_stale": 0,
     "registered_with_test": 101,
     "registered_test_unresolved": 0,
-    "registered_with_example": 54,
+    "registered_with_example": 62,
     "registered_example_not_built": 0,
     "registered_with_python_equiv": 88,
     "registered_without_api_page": 0,
-    "with_snippet": 42,
+    "with_snippet": 56,
     "public_api_units": 478,
     "example_eligible": 383,
     "example_exempt": 95,
-    "eligible_backed_by_registry_example": 54,
-    "eligible_used_by_some_example": 98,
-    "examples_on_disk": 44,
-    "examples_built": 44
+    "eligible_backed_by_registry_example": 62,
+    "eligible_used_by_some_example": 113,
+    "examples_on_disk": 45,
+    "examples_built": 45
   },
   "by_library": {
     "bids": {
@@ -85,9 +85,9 @@
       "registered": 51,
       "with_test": 28,
       "eligible": 80,
-      "eligible_with_registry_example": 3,
-      "eligible_used_by_example": 6,
-      "with_snippet": 0
+      "eligible_with_registry_example": 11,
+      "eligible_used_by_example": 21,
+      "with_snippet": 14
     },
     "fiff": {
       "public": 37,
@@ -4342,10 +4342,14 @@
       "registry_status": "documented",
       "test": null,
       "test_resolves": false,
-      "example": null,
-      "example_state": "none",
-      "including_examples": [],
-      "snippets": [],
+      "example": "ex_dsp_spectral",
+      "example_state": "built",
+      "including_examples": [
+        "ex_dsp_spectral"
+      ],
+      "snippets": [
+        "ex_dsp_spectral/main.cpp#csd_compute"
+      ],
       "api_page": "doc/website/docs/api/utils/csd.mdx",
       "python_equiv": null,
       "example_eligible": true,
@@ -4363,8 +4367,12 @@
       "test_resolves": false,
       "example": null,
       "example_state": "none",
-      "including_examples": [],
-      "snippets": [],
+      "including_examples": [
+        "ex_dsp_spectral"
+      ],
+      "snippets": [
+        "ex_dsp_spectral/main.cpp#csd_compute"
+      ],
       "api_page": null,
       "python_equiv": null,
       "example_eligible": true,
@@ -4380,10 +4388,14 @@
       "registry_status": "documented",
       "test": null,
       "test_resolves": false,
-      "example": null,
-      "example_state": "none",
-      "including_examples": [],
-      "snippets": [],
+      "example": "ex_dsp_spectral",
+      "example_state": "built",
+      "including_examples": [
+        "ex_dsp_spectral"
+      ],
+      "snippets": [
+        "ex_dsp_spectral/main.cpp#dpss_compute"
+      ],
       "api_page": "doc/website/docs/api/utils/dpss.mdx",
       "python_equiv": null,
       "example_eligible": true,
@@ -4401,8 +4413,12 @@
       "test_resolves": false,
       "example": null,
       "example_state": "none",
-      "including_examples": [],
-      "snippets": [],
+      "including_examples": [
+        "ex_dsp_spectral"
+      ],
+      "snippets": [
+        "ex_dsp_spectral/main.cpp#dpss_compute"
+      ],
       "api_page": null,
       "python_equiv": null,
       "example_eligible": true,
@@ -4728,8 +4744,12 @@
       "test_resolves": false,
       "example": null,
       "example_state": "none",
-      "including_examples": [],
-      "snippets": [],
+      "including_examples": [
+        "ex_dsp_spectral"
+      ],
+      "snippets": [
+        "ex_dsp_spectral/main.cpp#iir_filter_usage"
+      ],
       "api_page": null,
       "python_equiv": null,
       "example_eligible": true,
@@ -4745,10 +4765,14 @@
       "registry_status": "done",
       "test": "test_dsp_iirfilter",
       "test_resolves": true,
-      "example": null,
-      "example_state": "none",
-      "including_examples": [],
-      "snippets": [],
+      "example": "ex_dsp_spectral",
+      "example_state": "built",
+      "including_examples": [
+        "ex_dsp_spectral"
+      ],
+      "snippets": [
+        "ex_dsp_spectral/main.cpp#iir_filter_usage"
+      ],
       "api_page": "doc/website/docs/api/dsp/iir-filter.mdx",
       "python_equiv": "mne.filter.filter_data (method='iir')",
       "example_eligible": true,
@@ -4821,10 +4845,14 @@
       "registry_status": "done",
       "test": "test_dsp_morlet_tfr",
       "test_resolves": true,
-      "example": null,
-      "example_state": "none",
-      "including_examples": [],
-      "snippets": [],
+      "example": "ex_dsp_spectral",
+      "example_state": "built",
+      "including_examples": [
+        "ex_dsp_spectral"
+      ],
+      "snippets": [
+        "ex_dsp_spectral/main.cpp#morlet_tfr_compute"
+      ],
       "api_page": "doc/website/docs/api/dsp/morlet-tfr.mdx",
       "python_equiv": "mne.time_frequency.tfr_morlet",
       "example_eligible": true,
@@ -4842,8 +4870,12 @@
       "test_resolves": false,
       "example": null,
       "example_state": "none",
-      "including_examples": [],
-      "snippets": [],
+      "including_examples": [
+        "ex_dsp_spectral"
+      ],
+      "snippets": [
+        "ex_dsp_spectral/main.cpp#morlet_tfr_compute"
+      ],
       "api_page": null,
       "python_equiv": null,
       "example_eligible": true,
@@ -4859,10 +4891,14 @@
       "registry_status": "done",
       "test": "test_dsp_multitaper",
       "test_resolves": true,
-      "example": null,
-      "example_state": "none",
-      "including_examples": [],
-      "snippets": [],
+      "example": "ex_dsp_spectral",
+      "example_state": "built",
+      "including_examples": [
+        "ex_dsp_spectral"
+      ],
+      "snippets": [
+        "ex_dsp_spectral/main.cpp#multitaper_psd_compute"
+      ],
       "api_page": "doc/website/docs/api/dsp/multitaper-psd.mdx",
       "python_equiv": "mne.time_frequency.psd_multitaper",
       "example_eligible": true,
@@ -4880,8 +4916,12 @@
       "test_resolves": false,
       "example": null,
       "example_state": "none",
-      "including_examples": [],
-      "snippets": [],
+      "including_examples": [
+        "ex_dsp_spectral"
+      ],
+      "snippets": [
+        "ex_dsp_spectral/main.cpp#multitaper_psd_compute"
+      ],
       "api_page": null,
       "python_equiv": null,
       "example_eligible": true,
@@ -4897,10 +4937,14 @@
       "registry_status": "done",
       "test": "test_dsp_multitaper",
       "test_resolves": true,
-      "example": null,
-      "example_state": "none",
-      "including_examples": [],
-      "snippets": [],
+      "example": "ex_dsp_spectral",
+      "example_state": "built",
+      "including_examples": [
+        "ex_dsp_spectral"
+      ],
+      "snippets": [
+        "ex_dsp_spectral/main.cpp#multitaper_tfr_compute"
+      ],
       "api_page": "doc/website/docs/api/dsp/multitaper-tfr.mdx",
       "python_equiv": "mne.time_frequency.tfr_multitaper",
       "example_eligible": true,
@@ -4918,8 +4962,12 @@
       "test_resolves": false,
       "example": null,
       "example_state": "none",
-      "including_examples": [],
-      "snippets": [],
+      "including_examples": [
+        "ex_dsp_spectral"
+      ],
+      "snippets": [
+        "ex_dsp_spectral/main.cpp#multitaper_tfr_compute"
+      ],
       "api_page": null,
       "python_equiv": null,
       "example_eligible": true,
@@ -4956,7 +5004,9 @@
       "test_resolves": true,
       "example": null,
       "example_state": "none",
-      "including_examples": [],
+      "including_examples": [
+        "ex_dsp_spectral"
+      ],
       "snippets": [],
       "api_page": "doc/website/docs/api/dsp/peak-finder.mdx",
       "python_equiv": "mne.preprocessing.peak_finder",
@@ -4975,7 +5025,9 @@
       "test_resolves": false,
       "example": null,
       "example_state": "none",
-      "including_examples": [],
+      "including_examples": [
+        "ex_dsp_spectral"
+      ],
       "snippets": [],
       "api_page": null,
       "python_equiv": null,
@@ -5011,10 +5063,14 @@
       "registry_status": "done",
       "test": "test_dsp_resample",
       "test_resolves": true,
-      "example": null,
-      "example_state": "none",
-      "including_examples": [],
-      "snippets": [],
+      "example": "ex_dsp_spectral",
+      "example_state": "built",
+      "including_examples": [
+        "ex_dsp_spectral"
+      ],
+      "snippets": [
+        "ex_dsp_spectral/main.cpp#resample_usage"
+      ],
       "api_page": "doc/website/docs/api/dsp/resample.mdx",
       "python_equiv": "mne.filter.resample",
       "example_eligible": true,
@@ -5302,14 +5358,17 @@
       "registry_status": "documented",
       "test": null,
       "test_resolves": false,
-      "example": null,
-      "example_state": "none",
+      "example": "ex_dsp_spectral",
+      "example_state": "built",
       "including_examples": [
         "ex_connectivity",
         "ex_disp",
+        "ex_dsp_spectral",
         "ex_tf_plot"
       ],
-      "snippets": [],
+      "snippets": [
+        "ex_dsp_spectral/main.cpp#spectrogram_make"
+      ],
       "api_page": "doc/website/docs/api/utils/spectrogram.mdx",
       "python_equiv": null,
       "example_eligible": true,

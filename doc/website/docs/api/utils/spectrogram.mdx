@@ -17,6 +17,10 @@ class UTILSLIB::Spectrogram
 
 Computes time-frequency spectrograms via short-time Fourier transform with configurable window and overlap.
 
+```cpp title="src/examples/ex_dsp_spectral/main.cpp"
+const MatrixXd spectrogram = Spectrogram::makeSpectrogram(signal.transpose(), 64); // frequency bins x samples
+```
+
 ---
 
 ## Static Methods
@@ -38,6 +42,11 @@ Calculates the spectrogram (tf-representation) of a given signal.
 - *Eigen::MatrixXd* — spectrogram-matrix (tf-representation of the input signal).
 
 ---
+
+## Example
+
+- Full source: [`src/examples/ex_dsp_spectral/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_dsp_spectral/main.cpp)
+- Build target: `ex_dsp_spectral` (runs under CTest)
 
 ## Authors of this file
 

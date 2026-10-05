@@ -71,12 +71,7 @@ struct DSPSHARED_EXPORT CsdResult
  * Provides three methods for computing the CSD matrix between channels:
  * multitaper (DPSS tapers), Fourier (Welch-style segmented), and Morlet wavelet.
  *
- * @code
- *   // Multitaper CSD: 600 Hz data, 0–60 Hz band, half-bandwidth 4
- *   CsdResult r = Csd::computeMultitaper(matData, 600.0, 0.0, 60.0, 4.0);
- *   // r.matCsd       → n_ch × n_ch mean CSD
- *   // r.csdByFreq[k] → n_ch × n_ch at frequency r.vecFreqs[k]
- * @endcode
+ * @snippet ex_dsp_spectral/main.cpp csd_compute
  */
 class DSPSHARED_EXPORT Csd
 {

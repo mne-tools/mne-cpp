@@ -905,7 +905,11 @@
       "mne_python": "mne.filter.filter_data (method='iir')",
       "sklearn": null,
       "test": "test_dsp_iirfilter",
-      "example": null,
+      "example": "ex_dsp_spectral",
+      "example_snippet": [
+        "ex_dsp_spectral/main.cpp#iir_filter_usage"
+      ],
+      "example_mode": "run",
       "status": "done",
       "skigen_candidate": false,
       "documented": true,
@@ -1240,7 +1244,11 @@
       "mne_python": "mne.time_frequency.psd_multitaper",
       "sklearn": null,
       "test": "test_dsp_multitaper",
-      "example": null,
+      "example": "ex_dsp_spectral",
+      "example_snippet": [
+        "ex_dsp_spectral/main.cpp#multitaper_psd_compute"
+      ],
+      "example_mode": "run",
       "status": "done",
       "skigen_candidate": false,
       "documented": true,
@@ -1258,7 +1266,11 @@
       "mne_python": "mne.time_frequency.tfr_morlet",
       "sklearn": null,
       "test": "test_dsp_morlet_tfr",
-      "example": null,
+      "example": "ex_dsp_spectral",
+      "example_snippet": [
+        "ex_dsp_spectral/main.cpp#morlet_tfr_compute"
+      ],
+      "example_mode": "run",
       "status": "done",
       "skigen_candidate": false,
       "documented": true,
@@ -1276,7 +1288,11 @@
       "mne_python": "mne.time_frequency.tfr_multitaper",
       "sklearn": null,
       "test": "test_dsp_multitaper",
-      "example": null,
+      "example": "ex_dsp_spectral",
+      "example_snippet": [
+        "ex_dsp_spectral/main.cpp#multitaper_tfr_compute"
+      ],
+      "example_mode": "run",
       "status": "done",
       "skigen_candidate": false,
       "documented": true,
@@ -1294,7 +1310,11 @@
       "mne_python": "mne.filter.resample",
       "sklearn": null,
       "test": "test_dsp_resample",
-      "example": null,
+      "example": "ex_dsp_spectral",
+      "example_snippet": [
+        "ex_dsp_spectral/main.cpp#resample_usage"
+      ],
+      "example_mode": "run",
       "status": "done",
       "skigen_candidate": false,
       "documented": true,
@@ -6024,7 +6044,11 @@
       "mne_python": null,
       "sklearn": null,
       "test": null,
-      "example": null,
+      "example": "ex_dsp_spectral",
+      "example_snippet": [
+        "ex_dsp_spectral/main.cpp#csd_compute"
+      ],
+      "example_mode": "run",
       "status": "documented",
       "skigen_candidate": false,
       "documented": true,
@@ -6042,7 +6066,11 @@
       "mne_python": null,
       "sklearn": null,
       "test": null,
-      "example": null,
+      "example": "ex_dsp_spectral",
+      "example_snippet": [
+        "ex_dsp_spectral/main.cpp#dpss_compute"
+      ],
+      "example_mode": "run",
       "status": "documented",
       "skigen_candidate": false,
       "documented": true,
@@ -6392,7 +6420,11 @@
       "mne_python": null,
       "sklearn": null,
       "test": null,
-      "example": null,
+      "example": "ex_dsp_spectral",
+      "example_snippet": [
+        "ex_dsp_spectral/main.cpp#spectrogram_make"
+      ],
+      "example_mode": "run",
       "status": "documented",
       "skigen_candidate": false,
       "documented": true,

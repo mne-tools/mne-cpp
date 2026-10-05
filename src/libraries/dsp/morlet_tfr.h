@@ -73,12 +73,7 @@ struct DSPSHARED_EXPORT MorletTfrResult
  *   σ_t = nCycles / (2π·f)
  * The instantaneous power at every time sample is |convolution|².
  *
- * @code
- *   // 30 log-spaced frequencies from 4 to 80 Hz, 7 cycles per wavelet
- *   RowVectorXd freqs = RowVectorXd::LinSpaced(30, 4.0, 80.0);
- *   MorletTfrResult r = MorletTfr::compute(vecSignal, 600.0, freqs);
- *   // r.matPower → 30 × n_samples instantaneous-power map
- * @endcode
+ * @snippet ex_dsp_spectral/main.cpp morlet_tfr_compute
  */
 class DSPSHARED_EXPORT MorletTfr
 {

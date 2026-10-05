@@ -52,13 +52,7 @@ namespace UTILSLIB
 /**
  * @brief Polyphase anti-aliased rational resampling for MEG/EEG data.
  *
- * @code
- *   // Resample from 1000 Hz to 250 Hz (4:1 decimation)
- *   Eigen::RowVectorXd downsampled = Resample::resample(vecData, 250.0, 1000.0);
- *
- *   // Resample all channels of a raw data matrix
- *   Eigen::MatrixXd ds = Resample::resampleMatrix(matData, 250.0, 1000.0);
- * @endcode
+ * @snippet ex_dsp_spectral/main.cpp resample_usage
  */
 class DSPSHARED_EXPORT Resample
 {

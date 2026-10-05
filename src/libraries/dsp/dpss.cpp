@@ -80,17 +80,21 @@ DpssResult Dpss::compute(int N, double halfBandwidth, int nTapers)
 
     SelfAdjointEigenSolver<MatrixXd> solver(T);
 
-    // Eigenvalues are sorted ascending; we want the largest nTapers
-    const VectorXd& allEigenvalues = solver.eigenvalues();
+    // Eigenvalues are sorted ascending; the tapers are the eigenvectors of the largest nTapers
     const MatrixXd& allEigenvectors = solver.eigenvectors();
 
     DpssResult result;
     result.matTapers.resize(nTapers, N);
     result.vecEigenvalues.resize(nTapers);
 
+    // Concentration kernel r(m) = sin(2 pi W m) / (pi m), r(0) = 2W (Percival & Walden 1993, p. 390)
+    VectorXd kernel(N);
+    kernel[0] = 2.0 * W;
+    for (int m = 1; m < N; ++m)
+        kernel[m] = std::sin(2.0 * DPSS_PI * W * m) / (DPSS_PI * m);
+
     for (int k = 0; k < nTapers; ++k) {
         const int idx = N - 1 - k; // largest eigenvalue first
-        result.vecEigenvalues[k] = allEigenvalues[idx];
 
         // Extract eigenvector as a row, normalize to unit L2 norm
         VectorXd taper = allEigenvectors.col(idx);
@@ -103,6 +107,12 @@ DpssResult Dpss::compute(int N, double halfBandwidth, int nTapers)
             taper = -taper;
 
         result.matTapers.row(k) = taper.transpose();
+
+        // Fraction of the taper's energy inside [-W, W]: sum over lags of autocorrelation x kernel
+        double ratio = kernel[0] * taper.squaredNorm();
+        for (int m = 1; m < N; ++m)
+            ratio += 2.0 * kernel[m] * taper.head(N - m).dot(taper.tail(N - m));
+        result.vecEigenvalues[k] = ratio;
     }
 
     return result;

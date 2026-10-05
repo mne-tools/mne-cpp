@@ -67,12 +67,7 @@ struct DSPSHARED_EXPORT MultitaperPsdResult
  * eigenvalues. This provides a PSD estimate with reduced variance compared to
  * a single-taper (periodogram) approach.
  *
- * @code
- *   // 600 Hz data, half-bandwidth 4, default tapers
- *   MultitaperPsdResult r = MultitaperPsd::compute(matData, 600.0);
- *   // r.matPsd   → n_channels × (n_times/2+1)
- *   // r.vecFreqs → frequency axis in Hz
- * @endcode
+ * @snippet ex_dsp_spectral/main.cpp multitaper_psd_compute
  */
 class DSPSHARED_EXPORT MultitaperPsd
 {

@@ -23,11 +23,10 @@ Complex Morlet wavelet time-frequency representation.
 
 For each requested centre frequency f the signal is convolved (via FFT) with a complex Morlet wavelet whose time-domain standard deviation is σ_t = nCycles / (2π·f) The instantaneous power at every time sample is |convolution|².
 
-```cpp
-// 30 log-spaced frequencies from 4 to 80 Hz, 7 cycles per wavelet
-RowVectorXd freqs = RowVectorXd::LinSpaced(30, 4.0, 80.0);
-MorletTfrResult r = MorletTfr::compute(vecSignal, 600.0, freqs);
-// r.matPower → 30 × n_samples instantaneous-power map
+```cpp title="src/examples/ex_dsp_spectral/main.cpp"
+RowVectorXd morletFreqs(3);
+morletFreqs << 20.0, 35.0, 55.0;
+const MorletTfrResult morlet = MorletTfr::compute(signal, kSFreq, morletFreqs, 7.0);
 ```
 
 ---
@@ -84,6 +83,11 @@ Compute Morlet TFR for every (selected) channel of a data matrix.
 - *QVector&lt; MorletTfrResult &gt;* — One `MorletTfrResult` per selected channel.
 
 ---
+
+## Example
+
+- Full source: [`src/examples/ex_dsp_spectral/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_dsp_spectral/main.cpp)
+- Build target: `ex_dsp_spectral` (runs under CTest)
 
 ## Authors of this file
 

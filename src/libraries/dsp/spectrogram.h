@@ -60,6 +60,8 @@ struct SpectogramInputData
 
 /**
  * @brief Computes time-frequency spectrograms via short-time Fourier transform with configurable window and overlap.
+ *
+ * @snippet ex_dsp_spectral/main.cpp spectrogram_make
  */
 class DSPSHARED_EXPORT Spectrogram
 {

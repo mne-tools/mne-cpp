@@ -21,12 +21,8 @@ class UTILSLIB::Resample
 
 Polyphase anti-aliased rational resampling for MEG/EEG data.
 
-```cpp
-// Resample from 1000 Hz to 250 Hz (4:1 decimation)
-Eigen::RowVectorXd downsampled = Resample::resample(vecData, 250.0, 1000.0);
-
-// Resample all channels of a raw data matrix
-Eigen::MatrixXd ds = Resample::resampleMatrix(matData, 250.0, 1000.0);
+```cpp title="src/examples/ex_dsp_spectral/main.cpp"
+const RowVectorXd downsampled = Resample::resample(signal, 100.0, kSFreq); // 200 Hz -> 100 Hz
 ```
 
 ---
@@ -85,6 +81,11 @@ The ratio is reduced to its lowest terms p/q via GCD, then a polyphase Hamming-w
 - *Eigen::MatrixXd* — Resampled matrix (n_channels × n_new_samples).
 
 ---
+
+## Example
+
+- Full source: [`src/examples/ex_dsp_spectral/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_dsp_spectral/main.cpp)
+- Build target: `ex_dsp_spectral` (runs under CTest)
 
 ## Authors of this file
 

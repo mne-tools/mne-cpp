@@ -84,17 +84,7 @@ struct DSPSHARED_EXPORT IirBiquad
  * bilinear-transform design route with pre-warped cutoff frequencies.  The resulting
  * biquad cascade is numerically stable for high filter orders.
  *
- * Typical usage:
- * @code
- *   // Design a 4th-order zero-phase Butterworth bandpass 1–40 Hz at 1000 Hz sampling rate
- *   auto sos = IirFilter::designButterworth(4, IirFilter::BandPass, 1.0, 40.0, 1000.0);
- *
- *   // Apply to one channel
- *   Eigen::RowVectorXd filtered = IirFilter::applyZeroPhase(rawChannel, sos);
- *
- *   // Apply to all channels of a matrix
- *   Eigen::MatrixXd matFiltered = IirFilter::applyZeroPhaseMatrix(rawMatrix, sos);
- * @endcode
+ * @snippet ex_dsp_spectral/main.cpp iir_filter_usage
  */
 class DSPSHARED_EXPORT IirFilter
 {

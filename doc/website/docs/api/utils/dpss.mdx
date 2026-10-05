@@ -19,11 +19,8 @@ Discrete Prolate Spheroidal Sequences (Slepian tapers).
 
 Computes DPSS tapers via the tridiagonal eigenvalue formulation. These tapers are used by the multitaper spectral estimator to achieve optimal spectral concentration within a given half-bandwidth.
 
-```cpp
-// 256-sample window, half-bandwidth 4, default number of tapers (7)
-DpssResult r = Dpss::compute(256, 4.0);
-// r.matTapers   → 7 × 256
-// r.vecEigenvalues → 7 concentration ratios ≈ 1.0
+```cpp title="src/examples/ex_dsp_spectral/main.cpp"
+const DpssResult dpss = Dpss::compute(64, 2.5, 4); // N = 64 samples, NW = 2.5, 4 tapers
 ```
 
 ---
@@ -50,6 +47,11 @@ Compute DPSS tapers for a given window length and half-bandwidth.
 - *DpssResult* — `DpssResult` with matTapers (nTapers × N) and vecEigenvalues.
 
 ---
+
+## Example
+
+- Full source: [`src/examples/ex_dsp_spectral/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_dsp_spectral/main.cpp)
+- Build target: `ex_dsp_spectral` (runs under CTest)
 
 ## Authors of this file
 

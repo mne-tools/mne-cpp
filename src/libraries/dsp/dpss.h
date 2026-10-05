@@ -64,12 +64,7 @@ struct DSPSHARED_EXPORT DpssResult
  * are used by the multitaper spectral estimator to achieve optimal spectral
  * concentration within a given half-bandwidth.
  *
- * @code
- *   // 256-sample window, half-bandwidth 4, default number of tapers (7)
- *   DpssResult r = Dpss::compute(256, 4.0);
- *   // r.matTapers   → 7 × 256
- *   // r.vecEigenvalues → 7 concentration ratios ≈ 1.0
- * @endcode
+ * @snippet ex_dsp_spectral/main.cpp dpss_compute
  */
 class DSPSHARED_EXPORT Dpss
 {
