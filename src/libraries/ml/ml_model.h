@@ -54,6 +54,8 @@ namespace MLLIB
 //=============================================================================================================
 /**
  * @brief Backend-agnostic inference interface: load, predict, save plus model/task descriptors.
+ *
+ * @snippet ex_ml/main.cpp ml_onnx_model_usage
  */
 class MLSHARED_EXPORT MlModel
 {

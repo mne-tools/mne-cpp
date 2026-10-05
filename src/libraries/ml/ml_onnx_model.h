@@ -82,6 +82,8 @@ namespace MLLIB
  * logs a warning (@c load, @c save), so the same client code compiles
  * and links on minimal builds and on WebAssembly without conditional
  * call sites.
+ *
+ * @snippet ex_ml/main.cpp ml_onnx_model_usage
  */
 class MLSHARED_EXPORT MlOnnxModel : public MlModel
 {

@@ -19,6 +19,15 @@ Launches Python training scripts via [`PythonRunner`](/docs/api/utils/python-run
 
 Training logic (PyTorch, scikit-learn, MNE-Python, …) lives entirely in the ``.py scripts under `scripts/ml/training/` and runs in a child process; no Python embedding or `libpython` linkage is required. If the configured `UTILSLIB::PythonRunnerConfig` carries a `venvDir`, the runner creates and updates the venv before each script invocation so dependencies are pinned per training job.
 
+```cpp title="src/examples/ex_ml/main.cpp"
+QTemporaryDir dir;
+QFile script(dir.filePath("train.py"));
+const bool written = script.open(QIODevice::WriteOnly) && script.write("import sys\nprint('trained on', sys.argv[1], 'epochs')\n") > 0;
+script.close();
+MLTrainer trainer; // runs python3; a venv and pip install are configured via UTILSLIB::PythonRunnerConfig
+const UTILSLIB::PythonRunnerResult result = trainer.run(script.fileName(), {"5"});
+```
+
 ---
 
 ## Public Methods
@@ -84,6 +93,11 @@ Check that the required Python packages are importable.
 - *QStringList* — List of packages that could NOT be imported (empty = all OK).
 
 ---
+
+## Example
+
+- Full source: [`src/examples/ex_ml/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_ml/main.cpp)
+- Build target: `ex_ml` (runs under CTest)
 
 ## Authors of this file
 

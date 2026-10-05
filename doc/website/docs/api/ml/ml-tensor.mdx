@@ -19,6 +19,15 @@ N-dimensional row-major float32 tensor with shared-buffer storage, Eigen Map acc
 
 The shape is an arbitrary `std::vector<int64_t>` (matching ONNX Runtime), the buffer is a reference-counted `std::vector<float>` (or external memory in view mode), and copy / reshape / slice all stay O(1) by sharing the underlying storage. Eigen Map accessors give in-place row-major views of 2-D tensors; `toMatrixXf` / `toMatrixXd` produce column-major Eigen copies for code that needs the native Eigen layout.
 
+```cpp title="src/examples/ex_ml/main.cpp"
+MatrixXf features(2, 3);
+features << 1.0f, 2.0f, 0.5f,
+    0.0f, -1.0f, 1.5f;
+MlTensor batch(features);                          // owning row-major copy, shape {2, 3}
+MlTensor flat = batch.reshape({6});                // shares the buffer
+MlTensor::RowMajorMatrixMap rows = batch.matrix(); // zero-copy Eigen view
+```
+
 ---
 
 ## Public Methods
@@ -277,6 +286,11 @@ Copy raw data into a new owning tensor (legacy 2-D helper).
 - *[MlTensor](/docs/api/ml/ml-tensor)* — Newly constructed tensor with shape \{rows, cols\}.
 
 ---
+
+## Example
+
+- Full source: [`src/examples/ex_ml/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_ml/main.cpp)
+- Build target: `ex_ml` (runs under CTest)
 
 ## Authors of this file
 

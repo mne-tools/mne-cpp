@@ -12,18 +12,18 @@
     "registered_stale": 0,
     "registered_with_test": 101,
     "registered_test_unresolved": 0,
-    "registered_with_example": 113,
+    "registered_with_example": 117,
     "registered_example_not_built": 0,
     "registered_with_python_equiv": 88,
     "registered_without_api_page": 0,
-    "with_snippet": 129,
+    "with_snippet": 133,
     "public_api_units": 478,
     "example_eligible": 383,
     "example_exempt": 95,
-    "eligible_backed_by_registry_example": 113,
-    "eligible_used_by_some_example": 180,
-    "examples_on_disk": 52,
-    "examples_built": 52
+    "eligible_backed_by_registry_example": 117,
+    "eligible_used_by_some_example": 184,
+    "examples_on_disk": 53,
+    "examples_built": 53
   },
   "by_library": {
     "bids": {
@@ -148,9 +148,9 @@
       "registered": 4,
       "with_test": 4,
       "eligible": 4,
-      "eligible_with_registry_example": 0,
-      "eligible_used_by_example": 0,
-      "with_snippet": 0
+      "eligible_with_registry_example": 4,
+      "eligible_used_by_example": 4,
+      "with_snippet": 4
     },
     "mna": {
       "public": 22,
@@ -8099,10 +8099,14 @@
       "registry_status": "done",
       "test": "test_ml_models",
       "test_resolves": true,
-      "example": null,
-      "example_state": "none",
-      "including_examples": [],
-      "snippets": [],
+      "example": "ex_ml",
+      "example_state": "built",
+      "including_examples": [
+        "ex_ml"
+      ],
+      "snippets": [
+        "ex_ml/main.cpp#ml_onnx_model_usage"
+      ],
       "api_page": "doc/website/docs/api/ml/ml-model.mdx",
       "python_equiv": null,
       "example_eligible": true,
@@ -8118,10 +8122,14 @@
       "registry_status": "done",
       "test": "test_ml_models",
       "test_resolves": true,
-      "example": null,
-      "example_state": "none",
-      "including_examples": [],
-      "snippets": [],
+      "example": "ex_ml",
+      "example_state": "built",
+      "including_examples": [
+        "ex_ml"
+      ],
+      "snippets": [
+        "ex_ml/main.cpp#ml_onnx_model_usage"
+      ],
       "api_page": "doc/website/docs/api/ml/ml-onnx-model.mdx",
       "python_equiv": null,
       "example_eligible": true,
@@ -8137,10 +8145,14 @@
       "registry_status": "done",
       "test": "test_ml_models",
       "test_resolves": true,
-      "example": null,
-      "example_state": "none",
-      "including_examples": [],
-      "snippets": [],
+      "example": "ex_ml",
+      "example_state": "built",
+      "including_examples": [
+        "ex_ml"
+      ],
+      "snippets": [
+        "ex_ml/main.cpp#ml_tensor_usage"
+      ],
       "api_page": "doc/website/docs/api/ml/ml-tensor.mdx",
       "python_equiv": null,
       "example_eligible": true,
@@ -8156,10 +8168,14 @@
       "registry_status": "done",
       "test": "test_ml_trainer",
       "test_resolves": true,
-      "example": null,
-      "example_state": "none",
-      "including_examples": [],
-      "snippets": [],
+      "example": "ex_ml",
+      "example_state": "built",
+      "including_examples": [
+        "ex_ml"
+      ],
+      "snippets": [
+        "ex_ml/main.cpp#ml_trainer_usage"
+      ],
       "api_page": "doc/website/docs/api/ml/ml-trainer.mdx",
       "python_equiv": null,
       "example_eligible": true,

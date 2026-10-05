@@ -69,6 +69,8 @@ namespace MLLIB
  * give in-place row-major views of 2-D tensors; @c toMatrixXf /
  * @c toMatrixXd produce column-major Eigen copies for code that needs
  * the native Eigen layout.
+ *
+ * @snippet ex_ml/main.cpp ml_tensor_usage
  */
 class MLSHARED_EXPORT MlTensor
 {

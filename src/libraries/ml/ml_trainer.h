@@ -64,6 +64,8 @@ namespace MLLIB
  * required. If the configured @ref UTILSLIB::PythonRunnerConfig
  * carries a @c venvDir, the runner creates and updates the venv before
  * each script invocation so dependencies are pinned per training job.
+ *
+ * @snippet ex_ml/main.cpp ml_trainer_usage
  */
 class MLSHARED_EXPORT MLTrainer
 {

@@ -16,7 +16,7 @@
     "Settings": "Plain parameter record consumed by an algorithm class; shown inside that class's example."
   },
   "example_debt": {
-    "ceiling": 191,
+    "ceiling": 187,
     "names": [
       "AcquiredPoints",
       "BadChannelsMaxwell",
@@ -110,7 +110,6 @@
       "InvVectorSourceEstimate",
       "InvVolumeSourceEstimate",
       "LinePlot",
-      "MLTrainer",
       "MNE",
       "MNEBem",
       "MNEBemSurface",
@@ -167,9 +166,6 @@
       "MNETriangle",
       "MNEVolGeom",
       "MaxwellMovementComp",
-      "MlModel",
-      "MlOnnxModel",
-      "MlTensor",
       "MnaGraph",
       "MnaGraphExecutor",
       "MnaIO",

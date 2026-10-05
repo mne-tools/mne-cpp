@@ -19,6 +19,13 @@ class MLLIB::MlOnnxModel
 
 When mne-cpp is configured without `USE_ONNXRUNTIME` every method either throws `std::runtime_error` (`predict`) or returns false / logs a warning (`load`, `save`), so the same client code compiles and links on minimal builds and on WebAssembly without conditional call sites.
 
+```cpp title="src/examples/ex_ml/main.cpp"
+std::unique_ptr<MlModel> model = std::make_unique<MlOnnxModel>();
+const bool loaded = model->load(MNE_EX_ML_DATA_DIR "/affine_softmax.onnx");
+const MlTensor probabilities = model->predict(batch); // shape {2, 2}, one row per sample
+const QString classes = static_cast<MlOnnxModel&>(*model).metadata("classes");
+```
+
 ### Inheritance
 
 ```mermaid
@@ -124,6 +131,11 @@ Load a model from disk.
 - *QString* — The value stored under `key`, or an empty string if the model has none or is not loaded.
 
 ---
+
+## Example
+
+- Full source: [`src/examples/ex_ml/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_ml/main.cpp)
+- Build target: `ex_ml` (runs under CTest)
 
 ## Authors of this file
 

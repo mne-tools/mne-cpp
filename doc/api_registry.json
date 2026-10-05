@@ -1702,7 +1702,11 @@
       "mne_python": null,
       "sklearn": null,
       "test": "test_ml_models",
-      "example": null,
+      "example": "ex_ml",
+      "example_snippet": [
+        "ex_ml/main.cpp#ml_tensor_usage"
+      ],
+      "example_mode": "run",
       "status": "done",
       "skigen_candidate": false,
       "notes": "N-dimensional tensor for ML inference (ONNX Runtime interop)",
@@ -1721,7 +1725,11 @@
       "mne_python": null,
       "sklearn": null,
       "test": "test_ml_models",
-      "example": null,
+      "example": "ex_ml",
+      "example_snippet": [
+        "ex_ml/main.cpp#ml_onnx_model_usage"
+      ],
+      "example_mode": "run",
       "status": "done",
       "skigen_candidate": false,
       "notes": "Abstract base class for ML model inference",
@@ -1740,7 +1748,11 @@
       "mne_python": null,
       "sklearn": null,
       "test": "test_ml_models",
-      "example": null,
+      "example": "ex_ml",
+      "example_snippet": [
+        "ex_ml/main.cpp#ml_onnx_model_usage"
+      ],
+      "example_mode": "run",
       "status": "done",
       "skigen_candidate": false,
       "notes": "ONNX Runtime model inference implementation",
@@ -1759,7 +1771,11 @@
       "mne_python": null,
       "sklearn": null,
       "test": "test_ml_trainer",
-      "example": null,
+      "example": "ex_ml",
+      "example_snippet": [
+        "ex_ml/main.cpp#ml_trainer_usage"
+      ],
+      "example_mode": "run",
       "status": "done",
       "skigen_candidate": false,
       "notes": "Orchestrates ML training via Python subprocess",

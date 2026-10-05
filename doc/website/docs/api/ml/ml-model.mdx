@@ -17,6 +17,13 @@ class MLLIB::MlModel
 
 Backend-agnostic inference interface: load, predict, save plus model/task descriptors.
 
+```cpp title="src/examples/ex_ml/main.cpp"
+std::unique_ptr<MlModel> model = std::make_unique<MlOnnxModel>();
+const bool loaded = model->load(MNE_EX_ML_DATA_DIR "/affine_softmax.onnx");
+const MlTensor probabilities = model->predict(batch); // shape {2, 2}, one row per sample
+const QString classes = static_cast<MlOnnxModel&>(*model).metadata("classes");
+```
+
 ### Inheritance
 
 ```mermaid
@@ -95,6 +102,11 @@ Load a model from disk.
 - *MlTaskType* — The task type this model is configured for.
 
 ---
+
+## Example
+
+- Full source: [`src/examples/ex_ml/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_ml/main.cpp)
+- Build target: `ex_ml` (runs under CTest)
 
 ## Authors of this file
 
