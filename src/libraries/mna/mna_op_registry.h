@@ -59,6 +59,8 @@ namespace MNALIB
  * Singleton catalog of all registered operation schemas.
  *
  * @brief Process-wide lookup from @c opType to @ref MnaOpSchema and implementation function.
+ *
+ * @snippet ex_mna/main.cpp mna_registry_loader_usage
  */
 class MNASHARED_EXPORT MnaOpRegistry
 {

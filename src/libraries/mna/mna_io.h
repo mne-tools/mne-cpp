@@ -52,6 +52,8 @@ namespace MNALIB
 //=============================================================================================================
 /**
  * Read/write MNA project files (.mna = JSON, .mnx = CBOR with "MNX1" magic header).
+ *
+ * @snippet ex_mna/main.cpp mna_project_save
  */
 class MNASHARED_EXPORT MnaIO
 {

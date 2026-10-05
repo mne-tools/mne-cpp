@@ -16,7 +16,7 @@
     "Settings": "Plain parameter record consumed by an algorithm class; shown inside that class's example."
   },
   "example_debt": {
-    "ceiling": 178,
+    "ceiling": 170,
     "names": [
       "AcquiredPoints",
       "BadChannelsMaxwell",
@@ -164,14 +164,6 @@
       "MNETriangle",
       "MNEVolGeom",
       "MaxwellMovementComp",
-      "MnaGraph",
-      "MnaGraphExecutor",
-      "MnaIO",
-      "MnaOpRegistry",
-      "MnaOpSchema",
-      "MnaParamTree",
-      "MnaProject",
-      "MnaRegistryLoader",
       "MneICP",
       "MultimodalScene",
       "Plot",

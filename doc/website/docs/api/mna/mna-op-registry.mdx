@@ -19,6 +19,17 @@ Singleton catalog of all registered operation schemas.
 
 Process-wide lookup from `opType` to [`MnaOpSchema`](/docs/api/mna/mna-op-schema) and implementation function.
 
+```cpp title="src/examples/ex_mna/main.cpp"
+MnaOpRegistry& registry = MnaOpRegistry::instance();
+const int nLoaded = MnaRegistryLoader::loadFile(registryFile.fileName(), registry); // schemas only
+registry.registerOpFunc("ex_constant", [](const QVariantMap&, const QVariantMap& attrs) -> QVariantMap {
+    return {{"out", attrs.value("value").toDouble()}};
+});
+registry.registerOpFunc("ex_affine", [](const QVariantMap& inputs, const QVariantMap& attrs) -> QVariantMap {
+    return {{"out", attrs.value("gain", 1.0).toDouble() * inputs.value("in").toDouble() + attrs.value("offset", 0.0).toDouble()}};
+});
+```
+
 ---
 
 ## Public Methods
@@ -141,6 +152,11 @@ Access the singleton instance.
 - *MnaOpRegistry &* — Reference to the process-wide registry.
 
 ---
+
+## Example
+
+- Full source: [`src/examples/ex_mna/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_mna/main.cpp)
+- Build target: `ex_mna` (runs under CTest)
 
 ## Authors of this file
 

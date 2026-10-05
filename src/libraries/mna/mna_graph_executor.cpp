@@ -75,21 +75,7 @@ MnaGraphExecutor::Context MnaGraphExecutor::execute(MnaGraph& graph,
 
     // Evaluate parameter tree bindings before execution
     graph.paramTree.evaluate(ctx.results);
-
-    // Apply current parameter tree values to node attributes
-    for (MnaNode& n : graph.nodes()) {
-        for (const QString& path : graph.paramTree.allPaths()) {
-            // Path format: "nodeId/attrKey"
-            int sep = path.indexOf(QLatin1Char('/'));
-            if (sep > 0) {
-                QString nodeId = path.left(sep);
-                QString attrKey = path.mid(sep + 1);
-                if (nodeId == n.id) {
-                    n.attributes.insert(attrKey, graph.paramTree.param(path));
-                }
-            }
-        }
-    }
+    applyParamTree(graph);
 
     const QStringList order = graph.topologicalSort();
     const int total = order.size();
@@ -146,6 +132,8 @@ MnaGraphExecutor::Context MnaGraphExecutor::executeIncremental(MnaGraph& graph,
         }
     }
 
+    applyParamTree(graph);
+
     // Get topological order, filter to only those that need execution
     const QStringList fullOrder = graph.topologicalSort();
     QStringList order;
@@ -187,6 +175,19 @@ MnaGraphExecutor::Context MnaGraphExecutor::executeIncremental(MnaGraph& graph,
     graph.paramTree.evaluate(existing.results);
 
     return existing;
+}
+
+//=============================================================================================================
+
+void MnaGraphExecutor::applyParamTree(MnaGraph& graph)
+{
+    for (const QString& path : graph.paramTree.allPaths()) {
+        // Path format: "nodeId/attrKey"
+        const int sep = path.indexOf(QLatin1Char('/'));
+        if (sep > 0 && graph.hasNode(path.left(sep))) {
+            graph.node(path.left(sep)).attributes.insert(path.mid(sep + 1), graph.paramTree.param(path));
+        }
+    }
 }
 
 //=============================================================================================================

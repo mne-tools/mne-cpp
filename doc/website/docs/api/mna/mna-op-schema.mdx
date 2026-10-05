@@ -19,6 +19,14 @@ Contract declaring an operation's expected inputs, outputs, and attributes.
 
 Operation schema for graph validation.
 
+```cpp title="src/examples/ex_mna/main.cpp"
+QStringList problems;
+const bool nodeValid = registry.schema("ex_affine").validate(graph.node("scale"), &problems);
+MnaNode unset = graph.node("source");
+unset.attributes.clear(); // "value" is required
+const bool unsetValid = registry.schema("ex_constant").validate(unset);
+```
+
 ---
 
 ## Public Methods
@@ -40,6 +48,11 @@ Validate that a node conforms to this schema.
 - *bool* — True if the node conforms to the schema.
 
 ---
+
+## Example
+
+- Full source: [`src/examples/ex_mna/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_mna/main.cpp)
+- Build target: `ex_mna` (runs under CTest)
 
 ## Authors of this file
 

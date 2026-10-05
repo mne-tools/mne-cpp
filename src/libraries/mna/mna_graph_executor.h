@@ -71,6 +71,8 @@ namespace MNALIB
  * and invoking registered operation functions.
  *
  * @brief Stateless batch and stream-mode runner for an @ref MnaGraph.
+ *
+ * @snippet ex_mna/main.cpp mna_graph_execute
  */
 class MNASHARED_EXPORT MnaGraphExecutor
 {
@@ -174,6 +176,9 @@ public:
     static void stopStream(StreamContext& ctx);
 
 private:
+    /** Copies every "nodeId/attrKey" value of the graph's parameter tree into that node's attributes. */
+    static void applyParamTree(MnaGraph& graph);
+
     static ProgressCallback s_progressCallback;
 };
 

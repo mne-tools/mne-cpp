@@ -59,6 +59,8 @@ namespace MNALIB
 //=============================================================================================================
 /**
  * Top-level MNA project container. Holds subjects, pipeline steps, and project metadata.
+ *
+ * @snippet ex_mna/main.cpp mna_project_save
  */
 class MNASHARED_EXPORT MnaProject
 {

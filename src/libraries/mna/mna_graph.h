@@ -61,6 +61,8 @@ namespace MNALIB
  * Directed acyclic graph of processing nodes forming a computational pipeline.
  *
  * @brief In-memory DAG of @ref MnaNode operations with validation, topological sort and JSON/CBOR persistence.
+ *
+ * @snippet ex_mna/main.cpp mna_graph_build
  */
 class MNASHARED_EXPORT MnaGraph
 {

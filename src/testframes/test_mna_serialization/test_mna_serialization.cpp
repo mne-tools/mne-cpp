@@ -996,6 +996,9 @@ void TestMnaSerialization::testParamTreeEvaluateExpression()
 
     QVariant val = tree.evaluateExpression("ref('step1::output')", results);
     QCOMPARE(val.toInt(), 42);
+
+    // An unresolved ref stays unresolved inside functions instead of evaluating as 0
+    QVERIFY(!tree.evaluateExpression("clamp(ref('missing::out') * 2, 1, 5)", results).isValid());
 }
 
 void TestMnaSerialization::testParamTreeJsonRoundTrip()

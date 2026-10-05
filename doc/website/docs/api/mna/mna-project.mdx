@@ -19,6 +19,17 @@ Top-level MNA project container.
 
 Holds subjects, pipeline steps, and project metadata.
 
+```cpp title="src/examples/ex_mna/main.cpp"
+MnaProject project;
+project.name = "ex_mna";
+project.pipeline = graph.nodes();
+const QString jsonPath = dir.filePath("pipeline.mna"); // UTF-8 JSON
+const QString cborPath = dir.filePath("pipeline.mnx"); // CBOR with an "MNX1" magic
+const bool saved = MnaIO::write(project, jsonPath) && MnaIO::write(project, cborPath);
+const MnaProject fromJson = MnaIO::read(jsonPath);
+const MnaProject fromCbor = MnaIO::read(cborPath);
+```
+
 ---
 
 ## Public Methods
@@ -117,6 +128,11 @@ Delegates to [`MnaIO`](/docs/api/mna/mna-io).
 - *bool* — True if successful.
 
 ---
+
+## Example
+
+- Full source: [`src/examples/ex_mna/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_mna/main.cpp)
+- Build target: `ex_mna` (runs under CTest)
 
 ## Authors of this file
 

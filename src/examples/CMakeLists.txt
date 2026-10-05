@@ -56,6 +56,7 @@ if(NOT WASM)
   add_subdirectory(ex_bids)
   add_subdirectory(ex_ml)
   add_subdirectory(ex_lsl)
+  add_subdirectory(ex_mna)
   add_subdirectory(ex_utils)
 endif()
 

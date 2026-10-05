@@ -64,6 +64,8 @@ namespace MNALIB
  * value whenever a trigger condition is met.
  *
  * @brief Path-keyed parameter store with formula-driven dynamic bindings.
+ *
+ * @snippet ex_mna/main.cpp mna_param_tree_binding
  */
 class MNASHARED_EXPORT MnaParamTree
 {

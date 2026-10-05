@@ -12,18 +12,18 @@
     "registered_stale": 0,
     "registered_with_test": 101,
     "registered_test_unresolved": 0,
-    "registered_with_example": 124,
+    "registered_with_example": 132,
     "registered_example_not_built": 0,
     "registered_with_python_equiv": 88,
     "registered_without_api_page": 0,
-    "with_snippet": 145,
+    "with_snippet": 155,
     "public_api_units": 478,
     "example_eligible": 383,
     "example_exempt": 95,
-    "eligible_backed_by_registry_example": 124,
-    "eligible_used_by_some_example": 194,
-    "examples_on_disk": 55,
-    "examples_built": 55
+    "eligible_backed_by_registry_example": 132,
+    "eligible_used_by_some_example": 204,
+    "examples_on_disk": 56,
+    "examples_built": 56
   },
   "by_library": {
     "bids": {
@@ -157,9 +157,9 @@
       "registered": 8,
       "with_test": 0,
       "eligible": 22,
-      "eligible_with_registry_example": 0,
-      "eligible_used_by_example": 0,
-      "with_snippet": 0
+      "eligible_with_registry_example": 8,
+      "eligible_used_by_example": 10,
+      "with_snippet": 10
     },
     "mne": {
       "public": 61,
@@ -8260,10 +8260,14 @@
       "registry_status": "documented",
       "test": null,
       "test_resolves": false,
-      "example": null,
-      "example_state": "none",
-      "including_examples": [],
-      "snippets": [],
+      "example": "ex_mna",
+      "example_state": "built",
+      "including_examples": [
+        "ex_mna"
+      ],
+      "snippets": [
+        "ex_mna/main.cpp#mna_graph_build"
+      ],
       "api_page": "doc/website/docs/api/mna/mna-graph.mdx",
       "python_equiv": null,
       "example_eligible": true,
@@ -8279,10 +8283,14 @@
       "registry_status": "documented",
       "test": null,
       "test_resolves": false,
-      "example": null,
-      "example_state": "none",
-      "including_examples": [],
-      "snippets": [],
+      "example": "ex_mna",
+      "example_state": "built",
+      "including_examples": [
+        "ex_mna"
+      ],
+      "snippets": [
+        "ex_mna/main.cpp#mna_graph_execute"
+      ],
       "api_page": "doc/website/docs/api/mna/mna-graph-executor.mdx",
       "python_equiv": null,
       "example_eligible": true,
@@ -8298,10 +8306,14 @@
       "registry_status": "documented",
       "test": null,
       "test_resolves": false,
-      "example": null,
-      "example_state": "none",
-      "including_examples": [],
-      "snippets": [],
+      "example": "ex_mna",
+      "example_state": "built",
+      "including_examples": [
+        "ex_mna"
+      ],
+      "snippets": [
+        "ex_mna/main.cpp#mna_project_save"
+      ],
       "api_page": "doc/website/docs/api/mna/mna-io.mdx",
       "python_equiv": null,
       "example_eligible": true,
@@ -8336,10 +8348,14 @@
       "registry_status": "documented",
       "test": null,
       "test_resolves": false,
-      "example": null,
-      "example_state": "none",
-      "including_examples": [],
-      "snippets": [],
+      "example": "ex_mna",
+      "example_state": "built",
+      "including_examples": [
+        "ex_mna"
+      ],
+      "snippets": [
+        "ex_mna/main.cpp#mna_registry_loader_usage"
+      ],
       "api_page": "doc/website/docs/api/mna/mna-op-registry.mdx",
       "python_equiv": null,
       "example_eligible": true,
@@ -8355,10 +8371,14 @@
       "registry_status": "documented",
       "test": null,
       "test_resolves": false,
-      "example": null,
-      "example_state": "none",
-      "including_examples": [],
-      "snippets": [],
+      "example": "ex_mna",
+      "example_state": "built",
+      "including_examples": [
+        "ex_mna"
+      ],
+      "snippets": [
+        "ex_mna/main.cpp#mna_op_schema_validate"
+      ],
       "api_page": "doc/website/docs/api/mna/mna-op-schema.mdx",
       "python_equiv": null,
       "example_eligible": true,
@@ -8376,8 +8396,12 @@
       "test_resolves": false,
       "example": null,
       "example_state": "none",
-      "including_examples": [],
-      "snippets": [],
+      "including_examples": [
+        "ex_mna"
+      ],
+      "snippets": [
+        "ex_mna/main.cpp#mna_op_schema_validate"
+      ],
       "api_page": null,
       "python_equiv": null,
       "example_eligible": true,
@@ -8395,8 +8419,12 @@
       "test_resolves": false,
       "example": null,
       "example_state": "none",
-      "including_examples": [],
-      "snippets": [],
+      "including_examples": [
+        "ex_mna"
+      ],
+      "snippets": [
+        "ex_mna/main.cpp#mna_op_schema_validate"
+      ],
       "api_page": null,
       "python_equiv": null,
       "example_eligible": true,
@@ -8431,10 +8459,14 @@
       "registry_status": "documented",
       "test": null,
       "test_resolves": false,
-      "example": null,
-      "example_state": "none",
-      "including_examples": [],
-      "snippets": [],
+      "example": "ex_mna",
+      "example_state": "built",
+      "including_examples": [
+        "ex_mna"
+      ],
+      "snippets": [
+        "ex_mna/main.cpp#mna_param_tree_binding"
+      ],
       "api_page": "doc/website/docs/api/mna/mna-param-tree.mdx",
       "python_equiv": null,
       "example_eligible": true,
@@ -8469,10 +8501,14 @@
       "registry_status": "documented",
       "test": null,
       "test_resolves": false,
-      "example": null,
-      "example_state": "none",
-      "including_examples": [],
-      "snippets": [],
+      "example": "ex_mna",
+      "example_state": "built",
+      "including_examples": [
+        "ex_mna"
+      ],
+      "snippets": [
+        "ex_mna/main.cpp#mna_project_save"
+      ],
       "api_page": "doc/website/docs/api/mna/mna-project.mdx",
       "python_equiv": null,
       "example_eligible": true,
@@ -8507,10 +8543,14 @@
       "registry_status": "documented",
       "test": null,
       "test_resolves": false,
-      "example": null,
-      "example_state": "none",
-      "including_examples": [],
-      "snippets": [],
+      "example": "ex_mna",
+      "example_state": "built",
+      "including_examples": [
+        "ex_mna"
+      ],
+      "snippets": [
+        "ex_mna/main.cpp#mna_registry_loader_usage"
+      ],
       "api_page": "doc/website/docs/api/mna/mna-registry-loader.mdx",
       "python_equiv": null,
       "example_eligible": true,

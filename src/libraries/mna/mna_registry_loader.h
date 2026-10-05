@@ -68,6 +68,8 @@ namespace MNALIB
  * drop-in files from a mna-registry.d/ directory.
  *
  * @brief Reads MNA op-schema manifests and feeds them into @ref MnaOpRegistry, with drop-in directory merge support.
+ *
+ * @snippet ex_mna/main.cpp mna_registry_loader_usage
  */
 class MNASHARED_EXPORT MnaRegistryLoader
 {

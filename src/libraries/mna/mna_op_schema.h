@@ -94,6 +94,8 @@ struct MNASHARED_EXPORT MnaOpSchemaAttr
  * Contract declaring an operation's expected inputs, outputs, and attributes.
  *
  * @brief Operation schema for graph validation.
+ *
+ * @snippet ex_mna/main.cpp mna_op_schema_validate
  */
 class MNASHARED_EXPORT MnaOpSchema
 {

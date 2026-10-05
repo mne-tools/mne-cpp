@@ -19,6 +19,16 @@ Executes a computational graph by traversing nodes in topological order and invo
 
 Stateless batch and stream-mode runner for an [`MnaGraph`](/docs/api/mna/mna-graph).
 
+```cpp title="src/examples/ex_mna/main.cpp"
+MnaGraphExecutor::Context ctx = MnaGraphExecutor::execute(graph, {});
+const double first = ctx.results.value("shift::out").toDouble(); // "nodeId::port"
+const double gainAfterFirst = graph.paramTree.param("scale/gain").toDouble();
+
+graph.node("source").attributes["value"] = 1.0;
+graph.node("source").dirty = true; // only source and its downstream nodes run again
+const double second = MnaGraphExecutor::executeIncremental(graph, ctx).results.value("shift::out").toDouble();
+```
+
 ---
 
 ## Static Methods
@@ -134,6 +144,11 @@ Iterates nodes in reverse topological order and deletes the live plugin objects.
   The stream context to stop.
 
 ---
+
+## Example
+
+- Full source: [`src/examples/ex_mna/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_mna/main.cpp)
+- Build target: `ex_mna` (runs under CTest)
 
 ## Authors of this file
 

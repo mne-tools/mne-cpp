@@ -19,6 +19,28 @@ Directed acyclic graph of processing nodes forming a computational pipeline.
 
 In-memory DAG of `MnaNode` operations with validation, topological sort and JSON/CBOR persistence.
 
+```cpp title="src/examples/ex_mna/main.cpp"
+MnaGraph graph;
+MnaNode source;
+source.id = "source";
+source.opType = "ex_constant";
+source.attributes["value"] = 3.0;
+source.outputs.append(port("out", MnaPortDir::Output));
+graph.addNode(source);
+
+for (const QString& id : {QStringLiteral("scale"), QStringLiteral("shift")}) {
+    MnaNode node;
+    node.id = id;
+    node.opType = "ex_affine";
+    node.inputs.append(port("in", MnaPortDir::Input));
+    node.outputs.append(port("out", MnaPortDir::Output));
+    graph.addNode(node);
+}
+graph.node("scale").attributes["gain"] = 2.0;
+graph.connect("source", "out", "scale", "in");
+graph.connect("scale", "out", "shift", "in");
+```
+
 ---
 
 ## Public Methods
@@ -129,6 +151,11 @@ Validate the graph: acyclicity, port connections, data-kind compatibility, op sc
 ### fromCbor(cbor)
 
 ---
+
+## Example
+
+- Full source: [`src/examples/ex_mna/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_mna/main.cpp)
+- Build target: `ex_mna` (runs under CTest)
 
 ## Authors of this file
 

@@ -577,6 +577,11 @@ void TestMnaGraphExecution::testExecuteIncrementalCleanSkip()
     MnaGraphExecutor::Context ctx2 = MnaGraphExecutor::executeIncremental(graph, ctx);
     double dblOut2 = ctx2.results.value("dbl::out").toDouble();
     QCOMPARE(dblOut2, 20.0);
+
+    // Parameter-tree values reach the nodes in incremental runs as well
+    graph.paramTree.setParam("src/value", 4.0);
+    graph.node("src").dirty = true;
+    QCOMPARE(MnaGraphExecutor::executeIncremental(graph, ctx).results.value("dbl::out").toDouble(), 8.0);
 }
 
 //=============================================================================================================

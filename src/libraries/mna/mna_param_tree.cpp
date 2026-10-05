@@ -156,6 +156,8 @@ QVariant MnaParamTree::evaluateExpression(const QString& expr,
     QRegularExpressionMatch clampMatch = clampRe.match(expr.trimmed());
     if (clampMatch.hasMatch()) {
         QVariant inner = evaluateExpression(clampMatch.captured(1).trimmed(), results);
+        if (!inner.isValid())
+            return {};
         double val = inner.toDouble();
         double lo = clampMatch.captured(2).toDouble();
         double hi = clampMatch.captured(3).toDouble();
@@ -168,6 +170,8 @@ QVariant MnaParamTree::evaluateExpression(const QString& expr,
     QRegularExpressionMatch scaleMatch = scaleRe.match(expr.trimmed());
     if (scaleMatch.hasMatch()) {
         QVariant inner = evaluateExpression(scaleMatch.captured(1).trimmed(), results);
+        if (!inner.isValid())
+            return {};
         double factor = scaleMatch.captured(2).toDouble();
         return QVariant(inner.toDouble() * factor);
     }
@@ -178,6 +182,8 @@ QVariant MnaParamTree::evaluateExpression(const QString& expr,
     QRegularExpressionMatch threshMatch = threshRe.match(expr.trimmed());
     if (threshMatch.hasMatch()) {
         QVariant inner = evaluateExpression(threshMatch.captured(1).trimmed(), results);
+        if (!inner.isValid())
+            return {};
         double val = inner.toDouble();
         double thresh = threshMatch.captured(2).toDouble();
         double above = threshMatch.captured(3).toDouble();
@@ -193,6 +199,8 @@ QVariant MnaParamTree::evaluateExpression(const QString& expr,
         double a = lerpMatch.captured(1).toDouble();
         double b = lerpMatch.captured(2).toDouble();
         QVariant tVal = evaluateExpression(lerpMatch.captured(3).trimmed(), results);
+        if (!tVal.isValid())
+            return {};
         double t = tVal.toDouble();
         return QVariant(a + (b - a) * t);
     }
@@ -214,6 +222,8 @@ QVariant MnaParamTree::evaluateExpression(const QString& expr,
     QRegularExpressionMatch mulMatch = mulRe.match(expr.trimmed());
     if (mulMatch.hasMatch()) {
         QVariant left = evaluateExpression(mulMatch.captured(1).trimmed(), results);
+        if (!left.isValid())
+            return {};
         double right = mulMatch.captured(2).toDouble();
         return QVariant(left.toDouble() * right);
     }
@@ -224,6 +234,8 @@ QVariant MnaParamTree::evaluateExpression(const QString& expr,
     if (divMatch.hasMatch()) {
         double left = divMatch.captured(1).toDouble();
         QVariant right = evaluateExpression(divMatch.captured(2).trimmed(), results);
+        if (!right.isValid())
+            return {};
         double rightVal = right.toDouble();
         if (std::abs(rightVal) < 1e-15) {
             return QVariant();
@@ -236,6 +248,8 @@ QVariant MnaParamTree::evaluateExpression(const QString& expr,
     QRegularExpressionMatch addMatch = addRe.match(expr.trimmed());
     if (addMatch.hasMatch()) {
         QVariant left = evaluateExpression(addMatch.captured(1).trimmed(), results);
+        if (!left.isValid())
+            return {};
         double right = addMatch.captured(2).toDouble();
         return QVariant(left.toDouble() + right);
     }

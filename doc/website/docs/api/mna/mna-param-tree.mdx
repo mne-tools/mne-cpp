@@ -21,6 +21,15 @@ Each parameter has a path ("nodeId/attrKey") and an optional binding — a formu
 
 Path-keyed parameter store with formula-driven dynamic bindings.
 
+```cpp title="src/examples/ex_mna/main.cpp"
+graph.paramTree.setParam("shift/offset", 0.5);
+MnaParamBinding binding;
+binding.targetPath = "scale/gain";
+binding.expression = "clamp(ref('source::out') * 2, 0, 5)"; // evaluated against node results
+binding.trigger = "on_change";
+graph.paramTree.addBinding(binding);
+```
+
 ---
 
 ## Public Methods
@@ -103,6 +112,11 @@ Evaluate a single expression in the current context.
 ### fromJson(obj)
 
 ---
+
+## Example
+
+- Full source: [`src/examples/ex_mna/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_mna/main.cpp)
+- Build target: `ex_mna` (runs under CTest)
 
 ## Authors of this file
 
