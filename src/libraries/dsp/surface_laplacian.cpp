@@ -16,6 +16,8 @@
 
 #include "surface_laplacian.h"
 
+#include <math/sphere.h>
+
 //=============================================================================================================
 // EIGEN INCLUDES
 //=============================================================================================================
@@ -144,17 +146,16 @@ MatrixXd SurfaceLaplacian::computeTransform(const MatrixX3d& matPositions,
         return MatrixXd();
     }
 
-    // 1. Centre positions and normalise to unit sphere
-    Vector3d centre = matPositions.colwise().mean();
-    MatrixX3d posCentered = matPositions.rowwise() - centre.transpose();
-
-    // Fit sphere radius if not provided
+    // 1. Centre positions on the sphere and normalise to unit sphere. The electrode centroid is not the
+    //    sphere centre (caps cover the upper head only), so fit the sphere unless a radius is given, in
+    //    which case the sphere is centred at the head-coordinate origin as in mne-python.
+    Vector3d centre = Vector3d::Zero();
     if (dSphereRadius <= 0.0) {
-        dSphereRadius = 0.0;
-        for (int i = 0; i < nCh; ++i)
-            dSphereRadius += posCentered.row(i).norm();
-        dSphereRadius /= static_cast<double>(nCh);
+        Sphere sphere = Sphere::fit_sphere(matPositions.cast<float>());
+        centre = sphere.center().cast<double>();
+        dSphereRadius = sphere.radius();
     }
+    MatrixX3d posCentered = matPositions.rowwise() - centre.transpose();
 
     // Normalise to unit sphere
     MatrixX3d posNorm(nCh, 3);

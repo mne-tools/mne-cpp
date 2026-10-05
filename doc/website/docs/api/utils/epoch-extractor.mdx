@@ -17,20 +17,20 @@ class UTILSLIB::EpochExtractor
 
 Segments continuous raw data into fixed-length epochs locked to events.
 
-```cpp
-EpochExtractor::Params p;
-p.dTmin      = -0.2;     // 200 ms pre-stimulus
-p.dTmax      =  0.8;     // 800 ms post-stimulus
-p.dBaseMin   = -0.2;
-p.dBaseMax   =  0.0;
-p.dThreshold = 150e-6;   // 150 µV peak-to-peak rejection
-
-QVector<MNELIB::MNEEpochData> epochs =
-    EpochExtractor::extract(matRawData, eventSamples, sFreq, p);
-
-// Good epochs only
-QVector<MNELIB::MNEEpochData> clean =
-    EpochExtractor::rejectMarked(epochs);
+```cpp title="src/examples/ex_dsp_preprocessing/main.cpp"
+EpochExtractor::Params params;
+params.dTmin = -0.1;
+params.dTmax = 0.4;
+params.dBaseMin = -0.1;
+params.dBaseMax = 0.0;
+const QVector<MNEEpochData> epochs = EpochExtractor::extract(raw, events, kSFreq, params, codes);
+QVector<MNEEpochData> targets;
+for (const MNEEpochData& epoch : epochs) {
+    if (epoch.event == 1) {
+        targets.append(epoch);
+    }
+}
+const MatrixXd evoked = EpochExtractor::average(EpochExtractor::rejectMarked(targets));
 ```
 
 ---
@@ -104,6 +104,11 @@ Return only the epochs that are NOT marked for rejection.
 - *QVector&lt; [MNEEpochData](/docs/api/mne/mne-epoch-data) &gt;* — Subset of epochs with bReject == false.
 
 ---
+
+## Example
+
+- Full source: [`src/examples/ex_dsp_preprocessing/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_dsp_preprocessing/main.cpp)
+- Build target: `ex_dsp_preprocessing` (runs under CTest)
 
 ## Authors of this file
 

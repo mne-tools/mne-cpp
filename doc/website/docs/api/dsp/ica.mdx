@@ -21,14 +21,9 @@ class UTILSLIB::ICA
 
 Independent Component Analysis using the FastICA algorithm (deflationary, logcosh nonlinearity).
 
-Typical MEG/EEG usage: 
-```cpp
-// Fit ICA on raw sensor data (n_channels x n_samples)
-IcaResult result = ICA::run(matRawData, 20);
-
-// Inspect source waveforms and mark artifact components (e.g. {0, 3})
-QVector<int> exclude = {0, 3};
-Eigen::MatrixXd matClean = ICA::excludeComponents(matRawData, result, exclude);
+```cpp title="src/examples/ex_dsp_preprocessing/main.cpp"
+const IcaResult ica = ICA::run(mixed, 3);                         // FastICA, logcosh, fixed seed
+const MatrixXd cleaned = ICA::excludeComponents(mixed, ica, {0}); // drop component 0, back-project the rest
 ```
 
 ---
@@ -104,6 +99,11 @@ The excluded component(s) are zeroed in source space before back-projection.
 - *Eigen::MatrixXd* — Cleaned sensor data (n_channels x n_samples).
 
 ---
+
+## Example
+
+- Full source: [`src/examples/ex_dsp_preprocessing/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_dsp_preprocessing/main.cpp)
+- Build target: `ex_dsp_preprocessing` (runs under CTest)
 
 ## Authors of this file
 

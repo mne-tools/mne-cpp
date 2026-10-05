@@ -51,11 +51,7 @@ namespace UTILSLIB
  * of the components.  Compared to FastICA it typically converges in fewer iterations
  * and handles badly conditioned data more robustly.
  *
- * @code
- *   IcaResult res = PicardIca::run(matRawData, 20);
- *   QVector<int> exclude = {0, 3};
- *   MatrixXd clean = ICA::excludeComponents(matRawData, res, exclude);
- * @endcode
+ * @snippet ex_dsp_preprocessing/main.cpp picard_ica_run
  */
 class DSPSHARED_EXPORT PicardIca
 {

@@ -65,21 +65,7 @@ struct DSPSHARED_EXPORT EpochExtractorParams
 /**
  * @brief Segments continuous raw data into fixed-length epochs locked to events.
  *
- * @code
- *   EpochExtractor::Params p;
- *   p.dTmin      = -0.2;     // 200 ms pre-stimulus
- *   p.dTmax      =  0.8;     // 800 ms post-stimulus
- *   p.dBaseMin   = -0.2;
- *   p.dBaseMax   =  0.0;
- *   p.dThreshold = 150e-6;   // 150 µV peak-to-peak rejection
- *
- *   QVector<MNELIB::MNEEpochData> epochs =
- *       EpochExtractor::extract(matRawData, eventSamples, sFreq, p);
- *
- *   // Good epochs only
- *   QVector<MNELIB::MNEEpochData> clean =
- *       EpochExtractor::rejectMarked(epochs);
- * @endcode
+ * @snippet ex_dsp_preprocessing/main.cpp epoch_extractor_usage
  */
 class DSPSHARED_EXPORT EpochExtractor
 {

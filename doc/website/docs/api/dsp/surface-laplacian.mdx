@@ -23,12 +23,23 @@ Surface Laplacian / Current Source Density (CSD) transformation.
 
 Computes a reference-free spatial Laplacian of EEG data using spherical spline interpolation (Perrin et al. 1989). This improves spatial resolution by acting as a high-pass spatial filter that enhances local sources and attenuates volume-conducted far-field activity.
 
-```cpp
-Eigen::MatrixX3d pos = ...;  // EEG electrode positions (n_ch × 3)
-Eigen::MatrixXd  data = ...; // EEG data (n_ch × n_times)
-auto result = SurfaceLaplacian::compute(data, pos);
-// result.matData      → CSD-transformed data
-// result.matTransform → n_ch × n_ch transformation matrix
+```cpp title="src/examples/ex_dsp_preprocessing/main.cpp"
+MatrixX3d electrodes(8, 3); // head coordinates in metres, on a 9 cm sphere
+electrodes << 0.0, 0.0, 0.09,
+    0.05785088487178853, 0.0, 0.06894399988070801,
+    0.0, 0.05785088487178853, 0.06894399988070801,
+    -0.05785088487178853, 0.0, 0.06894399988070801,
+    0.0, -0.05785088487178853, 0.06894399988070801,
+    0.0626727816288017, 0.0626727816288017, 0.015628335990023737,
+    -0.0626727816288017, 0.0626727816288017, 0.015628335990023737,
+    -0.06267278162880172, -0.0626727816288017, 0.015628335990023737;
+MatrixXd eeg(8, 10);
+for (int k = 0; k < 8; ++k) {
+    for (int t = 0; t < 10; ++t) {
+        eeg(k, t) = std::sin(t * (k + 1) * 0.3);
+    }
+}
+const SurfaceLaplacianResult csd = SurfaceLaplacian::compute(eeg, electrodes, 1e-5, 4, 50, 0.09);
 ```
 
 ---
@@ -57,7 +68,7 @@ Compute the surface Laplacian (CSD) transformation.
   Number of Legendre terms to evaluate (default 50).
 
 - **dSphereRadius** : *double*
-  [`Sphere`](/docs/api/math/sphere) radius in metres; if &lt;= 0, fitted from positions (default -1).
+  Radius of a sphere centred at the origin, in metres; if &lt;= 0, a sphere (centre and radius) is fitted to the positions (default -1).
 
 **Returns:**
 
@@ -84,13 +95,18 @@ Compute only the CSD transformation matrix (without applying to data).
   Number of Legendre terms (default 50).
 
 - **dSphereRadius** : *double*
-  [`Sphere`](/docs/api/math/sphere) radius; if &lt;= 0, fitted from positions.
+  Radius of a sphere centred at the origin; if &lt;= 0, centre and radius are fitted.
 
 **Returns:**
 
 - *Eigen::MatrixXd* — Transformation matrix (n_channels × n_channels).
 
 ---
+
+## Example
+
+- Full source: [`src/examples/ex_dsp_preprocessing/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_dsp_preprocessing/main.cpp)
+- Build target: `ex_dsp_preprocessing` (runs under CTest)
 
 ## Authors of this file
 

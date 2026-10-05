@@ -927,7 +927,11 @@
       "mne_python": "mne.preprocessing.ICA (fastica)",
       "sklearn": "sklearn.decomposition.FastICA",
       "test": "test_dsp_ica",
-      "example": null,
+      "example": "ex_dsp_preprocessing",
+      "example_snippet": [
+        "ex_dsp_preprocessing/main.cpp#ica_run"
+      ],
+      "example_mode": "run",
       "status": "done",
       "skigen_candidate": false,
       "notes": "Custom FastICA impl; does NOT call sklearn directly",
@@ -946,7 +950,11 @@
       "mne_python": "mne.preprocessing.ICA (picard)",
       "sklearn": null,
       "test": "test_picard_ica",
-      "example": null,
+      "example": "ex_dsp_preprocessing",
+      "example_snippet": [
+        "ex_dsp_preprocessing/main.cpp#picard_ica_run"
+      ],
+      "example_mode": "run",
       "status": "done",
       "skigen_candidate": false,
       "documented": true,
@@ -964,7 +972,11 @@
       "mne_python": "mne.preprocessing.ICA (infomax)",
       "sklearn": null,
       "test": "test_dsp_infomax",
-      "example": null,
+      "example": "ex_dsp_preprocessing",
+      "example_snippet": [
+        "ex_dsp_preprocessing/main.cpp#extended_infomax_compute"
+      ],
+      "example_mode": "run",
       "status": "done",
       "skigen_candidate": false,
       "documented": true,
@@ -1189,7 +1201,11 @@
       "mne_python": "mne.preprocessing.compute_current_source_density",
       "sklearn": null,
       "test": "test_surface_laplacian",
-      "example": null,
+      "example": "ex_dsp_preprocessing",
+      "example_snippet": [
+        "ex_dsp_preprocessing/main.cpp#surface_laplacian_compute"
+      ],
+      "example_mode": "run",
       "status": "done",
       "skigen_candidate": false,
       "documented": true,
@@ -1332,7 +1348,11 @@
       "mne_python": "mne.preprocessing.Xdawn",
       "sklearn": null,
       "test": "test_dsp_xdawn",
-      "example": null,
+      "example": "ex_dsp_preprocessing",
+      "example_snippet": [
+        "ex_dsp_preprocessing/main.cpp#xdawn_fit"
+      ],
+      "example_mode": "run",
       "status": "done",
       "skigen_candidate": false,
       "documented": true,
@@ -5990,7 +6010,11 @@
       "mne_python": null,
       "sklearn": null,
       "test": null,
-      "example": null,
+      "example": "ex_dsp_preprocessing",
+      "example_snippet": [
+        "ex_dsp_preprocessing/main.cpp#channel_derivation_usage"
+      ],
+      "example_mode": "run",
       "status": "documented",
       "skigen_candidate": false,
       "documented": true,
@@ -6088,7 +6112,11 @@
       "mne_python": null,
       "sklearn": null,
       "test": null,
-      "example": null,
+      "example": "ex_dsp_preprocessing",
+      "example_snippet": [
+        "ex_dsp_preprocessing/main.cpp#epoch_extractor_usage"
+      ],
+      "example_mode": "run",
       "status": "documented",
       "skigen_candidate": false,
       "documented": true,

@@ -19,12 +19,12 @@ Channel derivation and re-referencing utilities.
 
 Provides methods to build bipolar and common-average re-referencing schemes, apply arbitrary linear derivation rules to data matrices, and read/write derivation definition files.
 
-```cpp
-QStringList chNames = {"LH1","LH2","LH3","RA1","RA2"};
-auto rules = ChannelDerivation::buildBipolar(chNames);
-// rules: LH1-LH2, LH2-LH3, RA1-RA2
-
-auto [matDerived, derivedNames] = ChannelDerivation::apply(matData, chNames, rules);
+```cpp title="src/examples/ex_dsp_preprocessing/main.cpp"
+const QStringList names = {"LH1", "LH2", "LH3", "RA1"};
+const QVector<DerivationRule> bipolar = ChannelDerivation::buildBipolar(names); // LH1-LH2, LH2-LH3
+const QVector<DerivationRule> average = ChannelDerivation::buildCommonAverage(names);
+const auto [bipolarData, bipolarNames] = ChannelDerivation::apply(raw, names, bipolar);
+const auto [averageData, averageNames] = ChannelDerivation::apply(raw, names, average);
 ```
 
 ---
@@ -124,6 +124,11 @@ Write derivation rules to a text definition file.
 - *bool* — True if the file was written successfully.
 
 ---
+
+## Example
+
+- Full source: [`src/examples/ex_dsp_preprocessing/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_dsp_preprocessing/main.cpp)
+- Build target: `ex_dsp_preprocessing` (runs under CTest)
 
 ## Authors of this file
 

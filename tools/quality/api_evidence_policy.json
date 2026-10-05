@@ -16,7 +16,7 @@
     "Settings": "Plain parameter record consumed by an algorithm class; shown inside that class's example."
   },
   "example_debt": {
-    "ceiling": 243,
+    "ceiling": 236,
     "names": [
       "AbstractFormatReader",
       "AcquiredPoints",
@@ -31,7 +31,6 @@
       "BidsTsv",
       "BrainVisionReader",
       "BridgedElectrodes",
-      "ChannelDerivation",
       "CircularBuffer",
       "ColorMap",
       "ComputeFwd",
@@ -41,8 +40,6 @@
       "EegReference",
       "ElectrodeObject",
       "EogRegression",
-      "EpochExtractor",
-      "ExtendedInfomax",
       "FastrakParser",
       "Fiff",
       "FiffAnnotationEventUtils",
@@ -104,7 +101,6 @@
       "FwdThreadArg",
       "GeometryInfo",
       "Graph",
-      "ICA",
       "ICommand",
       "IOUtils",
       "IObserver",
@@ -225,7 +221,6 @@
       "MultimodalScene",
       "ParksMcClellan",
       "PeakFinder",
-      "PicardIca",
       "Plot",
       "PolhemusConnection",
       "PolhemusCoregistration",
@@ -253,11 +248,9 @@
       "StandardMontage",
       "StimArtifact",
       "Subject",
-      "SurfaceLaplacian",
       "TFplot",
       "VideoOverlay",
       "WelchPsd",
-      "Xdawn",
       "stream_info",
       "stream_inlet",
       "stream_outlet"

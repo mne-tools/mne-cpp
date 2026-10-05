@@ -195,6 +195,23 @@ void TestSurfaceLaplacian::testComputeTransformOnly()
     auto result = SurfaceLaplacian::compute(data, m_positions);
     double diff = (manual - result.matData).norm();
     QVERIFY2(diff < 1e-10, "Transform-only and compute() differ.");
+
+    // Columns 0 and 5 of mne.preprocessing.compute_current_source_density(sphere=(0, 0, 0, 0.085)) applied to eye(16)
+    VectorXd mne0(16), mne5(16);
+    mne0 << 1195.489394839371, 139.00489485396352, -18.795985079259097, -120.87455872800145, -184.10587675514523,
+        -212.99306941783036, -197.46563926756053, -161.4576919332149, -224.49090908665696, -112.72006787790981,
+        -177.1766656319246, -148.64324395277174, -73.52307780228718, -228.48806460265038, -109.15991137112228,
+        -115.8709892408643;
+    mne5 << -269.0737228477899, -126.53986840055701, -312.08548736414195, -207.11784451026534, 45.044486148561234,
+        1394.827499449645, 12.793711560436574, -98.4144230620476, 30.926238504514536, 90.55178651837,
+        -46.26533284745004, 244.38065475133874, 76.85004480766598, 417.37868311466605, 98.56784714244829,
+        192.3545757349581;
+    // The positions lie on that sphere, so the fitted sphere (default) must give the same transform
+    for (double radius : {0.085, -1.0}) {
+        const MatrixXd Tm = SurfaceLaplacian::computeTransform(m_positions, 1e-5, 4, 50, radius);
+        const double err = std::max((Tm.col(0) - mne0).cwiseAbs().maxCoeff(), (Tm.col(5) - mne5).cwiseAbs().maxCoeff());
+        QVERIFY2(err < 1e-6 * mne5.cwiseAbs().maxCoeff(), qPrintable(QString("radius %1: max error %2").arg(radius).arg(err)));
+    }
 }
 
 //=============================================================================================================

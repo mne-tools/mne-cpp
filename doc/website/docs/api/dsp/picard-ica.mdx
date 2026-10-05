@@ -23,10 +23,8 @@ Independent Component Analysis using the Picard algorithm.
 
 Picard uses a preconditioned L-BFGS strategy to minimise the mutual information of the components. Compared to FastICA it typically converges in fewer iterations and handles badly conditioned data more robustly.
 
-```cpp
-IcaResult res = PicardIca::run(matRawData, 20);
-QVector<int> exclude = {0, 3};
-MatrixXd clean = ICA::excludeComponents(matRawData, res, exclude);
+```cpp title="src/examples/ex_dsp_preprocessing/main.cpp"
+const IcaResult picard = PicardIca::run(mixed, 3);
 ```
 
 ---
@@ -62,6 +60,11 @@ Run the Picard [`ICA`](/docs/api/dsp/ica) algorithm.
 - *IcaResult* — `IcaResult` with mixing/unmixing matrices and source time series.
 
 ---
+
+## Example
+
+- Full source: [`src/examples/ex_dsp_preprocessing/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_dsp_preprocessing/main.cpp)
+- Build target: `ex_dsp_preprocessing` (runs under CTest)
 
 ## Authors of this file
 

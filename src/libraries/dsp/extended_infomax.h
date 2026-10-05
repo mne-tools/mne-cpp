@@ -68,6 +68,8 @@ struct DSPSHARED_EXPORT InfomaxResult
  *
  * Performs Independent Component Analysis using the extended infomax algorithm,
  * which can separate both super-Gaussian and sub-Gaussian sources.
+ *
+ * @snippet ex_dsp_preprocessing/main.cpp extended_infomax_compute
  */
 class DSPSHARED_EXPORT ExtendedInfomax
 {

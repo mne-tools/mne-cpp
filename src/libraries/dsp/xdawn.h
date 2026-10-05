@@ -64,12 +64,7 @@ struct DSPSHARED_EXPORT XdawnResult
 /**
  * @brief Event-related response enhancement with xDAWN spatial filtering.
  *
- * Typical usage:
- * @code
- *   auto xd = Xdawn::fit(epochs, 1, 4);
- *   Eigen::MatrixXd comp = Xdawn::apply(epoch.epoch, xd);      // 4 x n_samples
- *   Eigen::MatrixXd den  = Xdawn::denoise(epoch.epoch, xd, 2); // n_channels x n_samples
- * @endcode
+ * @snippet ex_dsp_preprocessing/main.cpp xdawn_fit
  */
 class DSPSHARED_EXPORT Xdawn
 {

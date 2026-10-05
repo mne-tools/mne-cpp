@@ -72,13 +72,7 @@ struct DSPSHARED_EXPORT DerivationRule
  * apply arbitrary linear derivation rules to data matrices, and read/write
  * derivation definition files.
  *
- * @code
- *   QStringList chNames = {"LH1","LH2","LH3","RA1","RA2"};
- *   auto rules = ChannelDerivation::buildBipolar(chNames);
- *   // rules: LH1-LH2, LH2-LH3, RA1-RA2
- *
- *   auto [matDerived, derivedNames] = ChannelDerivation::apply(matData, chNames, rules);
- * @endcode
+ * @snippet ex_dsp_preprocessing/main.cpp channel_derivation_usage
  */
 class DSPSHARED_EXPORT ChannelDerivation
 {

@@ -21,11 +21,9 @@ class UTILSLIB::Xdawn
 
 Event-related response enhancement with xDAWN spatial filtering.
 
-Typical usage: 
-```cpp
-auto xd = Xdawn::fit(epochs, 1, 4);
-Eigen::MatrixXd comp = Xdawn::apply(epoch.epoch, xd);      // 4 x n_samples
-Eigen::MatrixXd den  = Xdawn::denoise(epoch.epoch, xd, 2); // n_channels x n_samples
+```cpp title="src/examples/ex_dsp_preprocessing/main.cpp"
+const XdawnResult xdawn = Xdawn::fit(epochs, 1, 1); // enhance the response to event code 1
+const MatrixXd component = Xdawn::apply(epochs[0].epoch, xdawn);
 ```
 
 ---
@@ -119,6 +117,11 @@ Apply `denoise()` to all epochs in the vector, preserving metadata.
 - *QVector&lt; [MNEEpochData](/docs/api/mne/mne-epoch-data) &gt;* — Copy of the input epochs with denoised epoch matrices.
 
 ---
+
+## Example
+
+- Full source: [`src/examples/ex_dsp_preprocessing/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_dsp_preprocessing/main.cpp)
+- Build target: `ex_dsp_preprocessing` (runs under CTest)
 
 ## Authors of this file
 

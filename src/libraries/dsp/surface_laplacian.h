@@ -65,13 +65,7 @@ struct DSPSHARED_EXPORT SurfaceLaplacianResult
  * by acting as a high-pass spatial filter that enhances local sources and
  * attenuates volume-conducted far-field activity.
  *
- * @code
- *   Eigen::MatrixX3d pos = ...;  // EEG electrode positions (n_ch × 3)
- *   Eigen::MatrixXd  data = ...; // EEG data (n_ch × n_times)
- *   auto result = SurfaceLaplacian::compute(data, pos);
- *   // result.matData      → CSD-transformed data
- *   // result.matTransform → n_ch × n_ch transformation matrix
- * @endcode
+ * @snippet ex_dsp_preprocessing/main.cpp surface_laplacian_compute
  */
 class DSPSHARED_EXPORT SurfaceLaplacian
 {
@@ -85,7 +79,7 @@ public:
      * @param[in] dLambda2          Regularization parameter (default 1e-5).
      * @param[in] iStiffness        Spline stiffness parameter (default 4).
      * @param[in] iNLegendreTerms   Number of Legendre terms to evaluate (default 50).
-     * @param[in] dSphereRadius     Sphere radius in metres; if <= 0, fitted from positions (default -1).
+     * @param[in] dSphereRadius     Radius of a sphere centred at the origin, in metres; if <= 0, a sphere (centre and radius) is fitted to the positions (default -1).
      * @return                      SurfaceLaplacianResult with transformed data and transform matrix.
      */
     static SurfaceLaplacianResult compute(const Eigen::MatrixXd& matData,
@@ -103,7 +97,7 @@ public:
      * @param[in] dLambda2          Regularization parameter (default 1e-5).
      * @param[in] iStiffness        Spline stiffness parameter (default 4).
      * @param[in] iNLegendreTerms   Number of Legendre terms (default 50).
-     * @param[in] dSphereRadius     Sphere radius; if <= 0, fitted from positions.
+     * @param[in] dSphereRadius     Radius of a sphere centred at the origin; if <= 0, centre and radius are fitted.
      * @return                      Transformation matrix (n_channels × n_channels).
      */
     static Eigen::MatrixXd computeTransform(const Eigen::MatrixX3d& matPositions,

@@ -76,15 +76,7 @@ struct DSPSHARED_EXPORT IcaResult
 /**
  * @brief Independent Component Analysis using the FastICA algorithm (deflationary, logcosh nonlinearity).
  *
- * Typical MEG/EEG usage:
- * @code
- *   // Fit ICA on raw sensor data (n_channels x n_samples)
- *   IcaResult result = ICA::run(matRawData, 20);
- *
- *   // Inspect source waveforms and mark artifact components (e.g. {0, 3})
- *   QVector<int> exclude = {0, 3};
- *   Eigen::MatrixXd matClean = ICA::excludeComponents(matRawData, result, exclude);
- * @endcode
+ * @snippet ex_dsp_preprocessing/main.cpp ica_run
  */
 class DSPSHARED_EXPORT ICA
 {
