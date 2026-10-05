@@ -65,6 +65,8 @@ namespace BIDSLIB
  *        data from various file formats (EDF, BrainVision, etc.) used in BIDS datasets.
  *
  *        Subclasses implement format-specific parsing and expose the data uniformly as FIFF structures.
+ *
+ * @snippet ex_bids/main.cpp edf_reader_usage
  */
 class BIDSSHARED_EXPORT AbstractFormatReader
 {

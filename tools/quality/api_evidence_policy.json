@@ -16,20 +16,14 @@
     "Settings": "Plain parameter record consumed by an algorithm class; shown inside that class's example."
   },
   "example_debt": {
-    "ceiling": 197,
+    "ceiling": 191,
     "names": [
-      "AbstractFormatReader",
       "AcquiredPoints",
-      "BIDSPath",
       "BadChannelsMaxwell",
       "Bar",
-      "BidsRawData",
-      "BidsTsv",
-      "BrainVisionReader",
       "ColorMap",
       "ComputeFwd",
       "ConnectivityAec",
-      "EDFReader",
       "ElectrodeObject",
       "Fiff",
       "FiffAnnotationEventUtils",

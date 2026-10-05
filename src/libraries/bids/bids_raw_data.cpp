@@ -134,19 +134,22 @@ void applyElectrodePositions(FiffInfo& info,
     else if (units == "cm")
         scaleFactor = 0.01f;
 
-    QSet<QString> chNames;
-    for (const auto& ch : info.chs)
-        chNames.insert(ch.ch_name);
+    // Ident = 1-based ordinal among electrode channels, the order buildElectrodeRecords() reads them back in
+    QMap<QString, int> chOrdinal;
+    for (const auto& ch : info.chs) {
+        if (ch.kind == FIFFV_EEG_CH || ch.kind == FIFFV_ECOG_CH || ch.kind == FIFFV_SEEG_CH || ch.kind == FIFFV_DBS_CH)
+            chOrdinal.insert(ch.ch_name, static_cast<int>(chOrdinal.size()) + 1);
+    }
 
     info.dig.clear();
-    int ident = 1;
+    int extraIdent = static_cast<int>(chOrdinal.size()) + 1;
     for (const auto& elec : electrodes) {
         if (elec.x == "n/a" || elec.y == "n/a" || elec.z == "n/a")
             continue;
 
         FiffDigPoint dp;
-        dp.kind = chNames.contains(elec.name) ? FIFFV_POINT_EEG : FIFFV_POINT_EXTRA;
-        dp.ident = ident++;
+        dp.kind = chOrdinal.contains(elec.name) ? FIFFV_POINT_EEG : FIFFV_POINT_EXTRA;
+        dp.ident = chOrdinal.contains(elec.name) ? chOrdinal.value(elec.name) : extraIdent++;
         dp.r[0] = elec.x.toFloat() * scaleFactor;
         dp.r[1] = elec.y.toFloat() * scaleFactor;
         dp.r[2] = elec.z.toFloat() * scaleFactor;

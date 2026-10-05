@@ -30,6 +30,8 @@
 #include <QtTest>
 #include <QTemporaryDir>
 
+#include <algorithm>
+
 //=============================================================================================================
 // USED NAMESPACES
 //=============================================================================================================
@@ -492,6 +494,13 @@ void TestBids::testWriteRoundTrip()
     QVERIFY(std::abs(readBack.raw.info.sfreq - original.raw.info.sfreq) < 1.0f);
     QCOMPARE(readBack.events.size(), original.events.size());
     QCOMPARE(readBack.raw.info.bads.size(), original.raw.info.bads.size());
+
+    // Electrode positions stay attached to their names (Cz is the 17th channel but the 9th electrode)
+    for (const BidsElectrode& before : original.electrodes) {
+        auto after = std::find_if(readBack.electrodes.cbegin(), readBack.electrodes.cend(),
+                                  [&](const BidsElectrode& e) { return e.name == before.name; });
+        QVERIFY2(after != readBack.electrodes.cend() && std::abs(after->z.toDouble() - before.z.toDouble()) < 1e-6, qPrintable(before.name));
+    }
 }
 
 //=============================================================================================================

@@ -66,6 +66,8 @@ using BidsTsvRow = QMap<QString, QString>;
  * BidsChannel, BidsElectrode, and BidsEvent respectively.
  *
  * @brief Generic BIDS TSV file I/O.
+ *
+ * @snippet ex_bids/main.cpp bids_tsv_read
  */
 class BIDSSHARED_EXPORT BidsTsv
 {

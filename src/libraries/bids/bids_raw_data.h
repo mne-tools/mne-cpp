@@ -80,19 +80,9 @@ namespace BIDSLIB
  * FiffInfo on read.  Only fields carrying independent information are stored
  * as explicit members.
  *
- * Example:
- * @code
- *   BIDSPath path("/data/bids", "01", "implant01", "rest", "ieeg", "ieeg", ".vhdr");
- *   BidsRawData data = BidsRawData::read(path);
- *   if(data.isValid()) {
- *       qDebug() << "Channels:" << data.raw.info.nchan;
- *       qDebug() << "Events:"   << data.events.size();
+ * @snippet ex_bids/main.cpp bids_raw_data_read
  *
- *       // Round-trip: write to a new BIDS root
- *       BIDSPath out("/data/bids_out", "01", "implant01", "rest", "ieeg", "ieeg", ".vhdr");
- *       data.write(out, path.filePath());
- *   }
- * @endcode
+ * @snippet ex_bids/main.cpp bids_raw_data_write
  */
 class BIDSSHARED_EXPORT BidsRawData
 {

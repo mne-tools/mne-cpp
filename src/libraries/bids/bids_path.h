@@ -66,28 +66,9 @@ namespace BIDSLIB
  * together with a datatype, suffix, extension, and root directory to produce
  * fully qualified file paths that conform to the BIDS specification.
  *
- * Example usage:
- * @code
- *   BIDSPath path;
- *   path.setRoot("/data/bids_dataset");
- *   path.setSubject("01");
- *   path.setSession("implant01");
- *   path.setTask("rest");
- *   path.setDatatype("ieeg");
- *   path.setSuffix("ieeg");
- *   path.setExtension(".vhdr");
- *
- *   // Produces: sub-01_ses-implant01_task-rest_ieeg.vhdr
- *   QString filename = path.basename();
- *
- *   // Produces: /data/bids_dataset/sub-01/ses-implant01/ieeg/
- *   QString dir = path.directory();
- *
- *   // Produces: /data/bids_dataset/sub-01/ses-implant01/ieeg/sub-01_ses-implant01_task-rest_ieeg.vhdr
- *   QString full = path.filePath();
- * @endcode
- *
  * @brief BIDS-compliant path and filename construction.
+ *
+ * @snippet ex_bids/main.cpp bids_path_usage
  */
 class BIDSSHARED_EXPORT BIDSPath
 {

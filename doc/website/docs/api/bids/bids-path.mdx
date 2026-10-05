@@ -23,28 +23,13 @@ Manages BIDS-compliant file paths.
 
 A [`BIDSPath`](/docs/api/bids/bids-path) encodes the BIDS entities (subject, session, task, acquisition, run, etc.) together with a datatype, suffix, extension, and root directory to produce fully qualified file paths that conform to the BIDS specification.
 
-Example usage: 
-```cpp
-BIDSPath path;
-path.setRoot("/data/bids_dataset");
-path.setSubject("01");
-path.setSession("implant01");
-path.setTask("rest");
-path.setDatatype("ieeg");
-path.setSuffix("ieeg");
-path.setExtension(".vhdr");
-
-// Produces: sub-01_ses-implant01_task-rest_ieeg.vhdr
-QString filename = path.basename();
-
-// Produces: /data/bids_dataset/sub-01/ses-implant01/ieeg/
-QString dir = path.directory();
-
-// Produces: /data/bids_dataset/sub-01/ses-implant01/ieeg/sub-01_ses-implant01_task-rest_ieeg.vhdr
-QString full = path.filePath();
-```
-
 BIDS-compliant path and filename construction.
+
+```cpp title="src/examples/ex_bids/main.cpp"
+BIDSPath ieeg(root, "01", "01", "rest", "ieeg", "ieeg", ".vhdr"); // root, sub, ses, task, datatype, suffix, ext
+const QString vhdr = ieeg.filePath();                             // <root>/sub-01/ses-01/ieeg/sub-01_ses-01_task-rest_ieeg.vhdr
+const QString channelsTsv = ieeg.channelsTsvPath().filePath();    // sibling sidecars share the entities
+```
 
 ---
 
@@ -560,6 +545,12 @@ Validates entity values (no forbidden characters: -, _, /).
 - *bool* — true if the value is valid.
 
 ---
+
+## Example
+
+- Full source: [`src/examples/ex_bids/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_bids/main.cpp)
+- Build target: `ex_bids` (runs under CTest)
+- Data: [mne-cpp-test-data](https://github.com/mne-tools/mne-cpp-test-data)
 
 ## Authors of this file
 

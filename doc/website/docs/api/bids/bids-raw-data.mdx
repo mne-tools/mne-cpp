@@ -30,18 +30,16 @@ Central container for a BIDS raw dataset, bundling electrophysiological data wit
 
 Sidecar and coordinate-system fields that are derivable from [FiffInfo](/docs/api/fiff/fiff-info) (sampling frequency, channel counts) are computed on write and applied to [FiffInfo](/docs/api/fiff/fiff-info) on read. Only fields carrying independent information are stored as explicit members.
 
-Example: 
-```cpp
-BIDSPath path("/data/bids", "01", "implant01", "rest", "ieeg", "ieeg", ".vhdr");
-BidsRawData data = BidsRawData::read(path);
-if(data.isValid()) {
-    qDebug() << "Channels:" << data.raw.info.nchan;
-    qDebug() << "Events:"   << data.events.size();
+```cpp title="src/examples/ex_bids/main.cpp"
+BidsRawData data = BidsRawData::read(ieeg); // raw data plus channels, events, electrodes and sidecar metadata
+```
 
-    // Round-trip: write to a new BIDS root
-    BIDSPath out("/data/bids_out", "01", "implant01", "rest", "ieeg", "ieeg", ".vhdr");
-    data.write(out, path.filePath());
-}
+```cpp title="src/examples/ex_bids/main.cpp"
+QTemporaryDir out;
+BidsRawData::WriteOptions options;
+options.datasetName = "ex_bids";
+const BIDSPath written = data.write(BIDSPath(out.path(), "01", "01", "rest", "ieeg", "ieeg", ".vhdr"), vhdr, options);
+const BidsRawData readBack = BidsRawData::read(written);
 ```
 
 ---
@@ -213,6 +211,12 @@ Create the appropriate format reader for a given file extension.
 - *[AbstractFormatReader](/docs/api/bids/abstract-format-reader)::UPtr* — Shared pointer to the reader, or nullptr if unsupported.
 
 ---
+
+## Example
+
+- Full source: [`src/examples/ex_bids/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_bids/main.cpp)
+- Build target: `ex_bids` (runs under CTest)
+- Data: [mne-cpp-test-data](https://github.com/mne-tools/mne-cpp-test-data)
 
 ## Authors of this file
 

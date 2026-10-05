@@ -19,6 +19,13 @@ The [`EDFReader`](/docs/api/bids/edf-reader) reads European Data Format (EDF/EDF
 
 The EDF specification stores data as 16-bit little-endian integers in fixed-duration "data records", with channels interleaved within each record.
 
+```cpp title="src/examples/ex_bids/main.cpp"
+std::unique_ptr<AbstractFormatReader> edf = BidsRawData::createReader(".edf"); // or construct EDFReader directly
+const bool edfOpen = edf->open(BIDSPath(root, "02", "01", "rest", "eeg", "eeg", ".edf").filePath());
+const FIFFLIB::FiffInfo edfInfo = edf->getInfo();
+const MatrixXf edfHead = edf->readRawSegment(0, 201);
+```
+
 ### Inheritance
 
 ```mermaid
@@ -177,6 +184,12 @@ Return measurement channel infos only.
 - *QVector&lt; EDFChannelInfo &gt;* — Infos for the measurement channels only, in channel order.
 
 ---
+
+## Example
+
+- Full source: [`src/examples/ex_bids/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_bids/main.cpp)
+- Build target: `ex_bids` (runs under CTest)
+- Data: [mne-cpp-test-data](https://github.com/mne-tools/mne-cpp-test-data)
 
 ## Authors of this file
 

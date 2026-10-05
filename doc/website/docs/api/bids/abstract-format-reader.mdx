@@ -19,6 +19,13 @@ The [`AbstractFormatReader`](/docs/api/bids/abstract-format-reader) class provid
 
 Subclasses implement format-specific parsing and expose the data uniformly as FIFF structures.
 
+```cpp title="src/examples/ex_bids/main.cpp"
+std::unique_ptr<AbstractFormatReader> edf = BidsRawData::createReader(".edf"); // or construct EDFReader directly
+const bool edfOpen = edf->open(BIDSPath(root, "02", "01", "rest", "eeg", "eeg", ".edf").filePath());
+const FIFFLIB::FiffInfo edfInfo = edf->getInfo();
+const MatrixXf edfHead = edf->readRawSegment(0, 201);
+```
+
 ### Inheritance
 
 ```mermaid
@@ -150,6 +157,12 @@ Check whether this reader can handle the given file extension.
 - *bool* — True if this reader supports the extension.
 
 ---
+
+## Example
+
+- Full source: [`src/examples/ex_bids/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_bids/main.cpp)
+- Build target: `ex_bids` (runs under CTest)
+- Data: [mne-cpp-test-data](https://github.com/mne-tools/mne-cpp-test-data)
 
 ## Authors of this file
 

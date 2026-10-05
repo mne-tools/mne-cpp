@@ -19,6 +19,12 @@ The [`BrainVisionReader`](/docs/api/bids/brain-vision-reader) reads BrainVision 
 
 BrainVision is the most common format for iEEG (sEEG/ECoG) recordings in BIDS datasets. The format stores data as little-endian binary (INT_16, INT_32, or IEEE_FLOAT_32), either MULTIPLEXED (channels interleaved per time point) or VECTORIZED (channels contiguous).
 
+```cpp title="src/examples/ex_bids/main.cpp"
+BrainVisionReader brainVision;
+const bool bvOpen = brainVision.open(vhdr);
+const MatrixXf bvHead = brainVision.readRawSegment(0, 200); // calibrated, volts
+```
+
 ### Inheritance
 
 ```mermaid
@@ -178,6 +184,12 @@ Return all channel infos.
 ### unitScale(sUnit)
 
 ---
+
+## Example
+
+- Full source: [`src/examples/ex_bids/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_bids/main.cpp)
+- Build target: `ex_bids` (runs under CTest)
+- Data: [mne-cpp-test-data](https://github.com/mne-tools/mne-cpp-test-data)
 
 ## Authors of this file
 

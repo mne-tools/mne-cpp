@@ -115,6 +115,8 @@ enum class BVOrientation
  *        BrainVision is the most common format for iEEG (sEEG/ECoG) recordings in BIDS datasets.
  *        The format stores data as little-endian binary (INT_16, INT_32, or IEEE_FLOAT_32),
  *        either MULTIPLEXED (channels interleaved per time point) or VECTORIZED (channels contiguous).
+ *
+ * @snippet ex_bids/main.cpp brain_vision_reader_usage
  */
 class BIDSSHARED_EXPORT BrainVisionReader : public AbstractFormatReader
 {

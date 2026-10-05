@@ -2052,14 +2052,21 @@
       "mne_python": "mne_bids.BIDSPath",
       "sklearn": null,
       "test": "test_bids",
-      "example": null,
+      "example": "ex_bids",
+      "example_snippet": [
+        "ex_bids/main.cpp#bids_path_usage"
+      ],
+      "example_mode": "run",
       "status": "done",
       "skigen_candidate": false,
       "documented": true,
       "sidebar_position": 1,
       "guide": null,
       "python_equiv": "mne_bids.BIDSPath",
-      "python_url": null
+      "python_url": null,
+      "required_data": [
+        "mne-cpp-test-data"
+      ]
     },
     {
       "name": "BidsRawData",
@@ -2070,14 +2077,22 @@
       "mne_python": "mne_bids.read_raw_bids",
       "sklearn": null,
       "test": "test_bids",
-      "example": null,
+      "example": "ex_bids",
+      "example_snippet": [
+        "ex_bids/main.cpp#bids_raw_data_read",
+        "ex_bids/main.cpp#bids_raw_data_write"
+      ],
+      "example_mode": "run",
       "status": "done",
       "skigen_candidate": false,
       "documented": true,
       "sidebar_position": 2,
       "guide": null,
       "python_equiv": "mne_bids.read_raw_bids",
-      "python_url": null
+      "python_url": null,
+      "required_data": [
+        "mne-cpp-test-data"
+      ]
     },
     {
       "name": "StandardMontage",
@@ -2132,14 +2147,21 @@
       "mne_python": null,
       "sklearn": null,
       "test": null,
-      "example": null,
+      "example": "ex_bids",
+      "example_snippet": [
+        "ex_bids/main.cpp#edf_reader_usage"
+      ],
+      "example_mode": "run",
       "status": "documented",
       "skigen_candidate": false,
       "documented": true,
       "sidebar_position": 3,
       "guide": null,
       "python_equiv": null,
-      "python_url": null
+      "python_url": null,
+      "required_data": [
+        "mne-cpp-test-data"
+      ]
     },
     {
       "name": "BidsTsv",
@@ -2150,14 +2172,21 @@
       "mne_python": null,
       "sklearn": null,
       "test": null,
-      "example": null,
+      "example": "ex_bids",
+      "example_snippet": [
+        "ex_bids/main.cpp#bids_tsv_read"
+      ],
+      "example_mode": "run",
       "status": "documented",
       "skigen_candidate": false,
       "documented": true,
       "sidebar_position": 4,
       "guide": null,
       "python_equiv": null,
-      "python_url": null
+      "python_url": null,
+      "required_data": [
+        "mne-cpp-test-data"
+      ]
     },
     {
       "name": "BrainVisionReader",
@@ -2168,14 +2197,21 @@
       "mne_python": null,
       "sklearn": null,
       "test": null,
-      "example": null,
+      "example": "ex_bids",
+      "example_snippet": [
+        "ex_bids/main.cpp#brain_vision_reader_usage"
+      ],
+      "example_mode": "run",
       "status": "documented",
       "skigen_candidate": false,
       "documented": true,
       "sidebar_position": 5,
       "guide": null,
       "python_equiv": null,
-      "python_url": null
+      "python_url": null,
+      "required_data": [
+        "mne-cpp-test-data"
+      ]
     },
     {
       "name": "EDFReader",
@@ -2186,14 +2222,21 @@
       "mne_python": null,
       "sklearn": null,
       "test": null,
-      "example": null,
+      "example": "ex_bids",
+      "example_snippet": [
+        "ex_bids/main.cpp#edf_reader_usage"
+      ],
+      "example_mode": "run",
       "status": "documented",
       "skigen_candidate": false,
       "documented": true,
       "sidebar_position": 6,
       "guide": null,
       "python_equiv": null,
-      "python_url": null
+      "python_url": null,
+      "required_data": [
+        "mne-cpp-test-data"
+      ]
     },
     {
       "name": "AbstractMetric",

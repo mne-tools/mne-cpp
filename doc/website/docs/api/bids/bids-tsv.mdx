@@ -30,6 +30,12 @@ Domain-specific TSV I/O (channels, electrodes, events) is handled by `BidsChanne
 
 Generic BIDS TSV file I/O.
 
+```cpp title="src/examples/ex_bids/main.cpp"
+QStringList headers;
+const QList<BidsTsvRow> rows = BidsTsv::readTsv(ieeg.eventsTsvPath().filePath(), headers);
+// each row maps column name -> cell text, e.g. rows[1]["trial_type"] == "response"
+```
+
 ---
 
 ## Public Methods
@@ -82,6 +88,12 @@ Writes rows to a TSV file.
 - *bool* — true on success, false on I/O error.
 
 ---
+
+## Example
+
+- Full source: [`src/examples/ex_bids/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_bids/main.cpp)
+- Build target: `ex_bids` (runs under CTest)
+- Data: [mne-cpp-test-data](https://github.com/mne-tools/mne-cpp-test-data)
 
 ## Authors of this file
 

@@ -85,6 +85,8 @@ struct BIDSSHARED_EXPORT EDFChannelInfo
  *
  *        The EDF specification stores data as 16-bit little-endian integers in fixed-duration
  *        "data records", with channels interleaved within each record.
+ *
+ * @snippet ex_bids/main.cpp edf_reader_usage
  */
 class BIDSSHARED_EXPORT EDFReader : public AbstractFormatReader
 {
