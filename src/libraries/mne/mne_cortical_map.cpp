@@ -57,12 +57,27 @@ MatrixXd MNECorticalMap::makeCorticalMap(
         return MatrixXd();
     }
 
-    // Get the forward gain matrix (nChannels x nSources)
     if (!fwd.sol || fwd.sol->data.rows() == 0) {
         qWarning("MNECorticalMap::makeCorticalMap - Forward solution is empty.");
         return MatrixXd();
     }
-    const MatrixXd& gain = fwd.sol->data;
+    // The kernel's columns are the inverse operator's channels; pick those rows of the gain by name, as
+    // mne-python's make_inverse_resolution_matrix does.
+    MatrixXd gain = fwd.sol->data;
+    const QStringList& invChannels = inv.eigen_fields ? inv.eigen_fields->col_names : QStringList();
+    if (invChannels.size() == kernel.cols() && fwd.sol->row_names.size() == gain.rows()) {
+        MatrixXd picked(kernel.cols(), gain.cols());
+        for (int c = 0; c < invChannels.size(); ++c) {
+            const int row = static_cast<int>(fwd.sol->row_names.indexOf(invChannels[c]));
+            if (row < 0) {
+                qWarning("MNECorticalMap::makeCorticalMap - Channel %s is not in the forward solution.",
+                         invChannels[c].toUtf8().constData());
+                return MatrixXd();
+            }
+            picked.row(c) = gain.row(row);
+        }
+        gain = picked;
+    }
 
     // Verify dimension compatibility
     if (kernel.cols() != gain.rows()) {
@@ -75,10 +90,5 @@ MatrixXd MNECorticalMap::makeCorticalMap(
         return MatrixXd();
     }
 
-    // M = inv_kernel * fwd_gain^T  =>  (nSources x nChannels) * (nChannels x nSources)^T
-    // Actually gain is (nChannels x nSources), so gain^T is (nSources x nChannels)
-    // M = kernel * gain  =>  (nSources x nChannels) * (nChannels x nSources) = (nSources x nSources)
-    MatrixXd M = kernel * gain;
-
-    return M;
+    return kernel * gain;
 }

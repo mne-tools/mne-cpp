@@ -35,6 +35,7 @@
 #include <mne/mne_forward_solution.h>
 #include <mne/mne_inverse_operator.h>
 #include <mne/mne_source_spaces.h>
+#include <mne/mne_cortical_map.h>
 #include <fiff/fiff_cov.h>
 #include <fiff/fiff_evoked.h>
 #include <fs/fs_label.h>
@@ -403,6 +404,29 @@ void TestMneLabelPython::assembleKernel_label()
 
     if (method == "MNE") {
         QCOMPARE(static_cast<int>(nnLabel.rows()), 0);
+
+        // The resolution matrix K G: mne-python make_inverse_resolution_matrix(fwd, inv, "MNE", 1/9) on the
+        // operator MNE-CPP writes gives trace 44.570330408234156 and |R| sum 1564.2890565507205.
+        prepared.getKernel() = kFull;
+        const MatrixXd R = MNECorticalMap::makeCorticalMap(fwd, prepared, evoked.info);
+        QCOMPARE(R.rows(), kFull.rows());
+        QCOMPARE(R.cols(), fwd.sol->data.cols());
+        // Only the inverse's 364 good channels of the 366-row forward enter K G.
+        QCOMPARE(static_cast<int>(prepared.eigen_fields->col_names.size()), 364);
+        MatrixXd G(364, fwd.sol->data.cols());
+        for (int c = 0; c < 364; ++c)
+            G.row(c) = fwd.sol->data.row(static_cast<int>(fwd.sol->row_names.indexOf(prepared.eigen_fields->col_names[c])));
+        QVERIFY((R - kFull * G).norm() <= 1e-12 * R.norm());
+        QVERIFY(std::abs(R.trace() - 44.570330408234156) <= 1e-6 * 44.570330408234156);
+        QVERIFY(std::abs(R.cwiseAbs().sum() - 1564.2890565507205) <= 1e-6 * 1564.2890565507205);
+
+        QTest::ignoreMessage(QtWarningMsg, QRegularExpression("Inverse kernel is empty"));
+        QVERIFY(MNECorticalMap::makeCorticalMap(fwd, inv, evoked.info).size() == 0);
+        QTest::ignoreMessage(QtWarningMsg, "MNECorticalMap::makeCorticalMap - Forward solution is empty.");
+        QVERIFY(MNECorticalMap::makeCorticalMap(MNEForwardSolution(), prepared, evoked.info).size() == 0);
+        const MNEForwardSolution noMeg = fwd.pick_channels({}, fwd.sol->row_names.mid(0, 306));
+        QTest::ignoreMessage(QtWarningMsg, QRegularExpression("Channel MEG\\w+ is not in the forward solution"));
+        QVERIFY(MNECorticalMap::makeCorticalMap(noMeg, prepared, evoked.info).size() == 0);
     } else {
         QCOMPARE(static_cast<int>(nnLabel.rows()), static_cast<int>(sel.size()));
         QCOMPARE(static_cast<int>(nnLabel.cols()), static_cast<int>(sel.size()));
