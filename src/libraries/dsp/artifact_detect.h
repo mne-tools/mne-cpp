@@ -72,13 +72,7 @@ struct DSPSHARED_EXPORT ArtifactDetectEogParams
 /**
  * @brief ECG and EOG physiological artifact event detection.
  *
- * @code
- *   // ECG: returns sample indices of R-peaks
- *   QVector<int> rPeaks = ArtifactDetect::detectEcg(matData, fiffInfo, sFreq);
- *
- *   // EOG: returns sample indices of blink/saccade onsets
- *   QVector<int> blinks = ArtifactDetect::detectEog(matData, fiffInfo, sFreq);
- * @endcode
+ * @snippet ex_dsp_artifacts/main.cpp artifact_detect_usage
  */
 class DSPSHARED_EXPORT ArtifactDetect
 {

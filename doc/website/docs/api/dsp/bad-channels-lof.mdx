@@ -41,6 +41,17 @@ Detect bad channels using Local Outlier Factor (LOF).
 
 Computes features for each channel (standard deviation, kurtosis, max absolute amplitude) and applies the LOF algorithm to identify outlier channels. LOF compares the local density of a point's neighbourhood to the densities of its neighbours.
 
+```cpp title="src/examples/ex_dsp_artifacts/main.cpp"
+LofBadChannelParams lofParams;
+lofParams.iNNeighbors = 4;
+lofParams.bEegOnly = true;
+const QStringList lofBad = findBadChannelsLof(data, info, lofParams); // features: std, kurtosis, max |x|
+
+MatrixXd features(6, 2); // the generic LOF score on a 2-D point cloud: one far point
+features << 0.0, 0.0, 0.1, 0.0, 0.0, 0.1, 0.1, 0.1, 0.05, 0.05, 3.0, 3.0;
+const VectorXd lofScores = computeLofScores(features, 3);
+```
+
 **Parameters:**
 
 - **data** : *const Eigen::MatrixXd &*
@@ -81,6 +92,11 @@ Pure algorithmic LOF implementation operating on feature vectors.
 - *Eigen::VectorXd* — LOF score for each point (n_points x 1). Values &gt; 1 indicate outliers.
 
 ---
+
+## Example
+
+- Full source: [`src/examples/ex_dsp_artifacts/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_dsp_artifacts/main.cpp)
+- Build target: `ex_dsp_artifacts` (runs under CTest)
 
 ## Authors of this file
 

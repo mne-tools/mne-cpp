@@ -58,14 +58,7 @@ namespace UTILSLIB
  * Fits a least-squares model: data_ch = beta * EOG + residual,
  * then subtracts beta * EOG from each non-EOG channel.
  *
- * Usage:
- * @code
- *   EogRegression eogReg;
- *   eogReg.fit(data, info);           // fit regression coefficients
- *   eogReg.apply(data, info);         // subtract EOG contribution in-place
- *   // or one-step:
- *   EogRegression::fitApply(data, info);
- * @endcode
+ * @snippet ex_dsp_artifacts/main.cpp eog_regression_usage
  */
 class DSPSHARED_EXPORT EogRegression
 {

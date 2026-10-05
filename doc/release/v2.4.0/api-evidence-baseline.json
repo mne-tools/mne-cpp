@@ -12,18 +12,18 @@
     "registered_stale": 0,
     "registered_with_test": 101,
     "registered_test_unresolved": 0,
-    "registered_with_example": 74,
+    "registered_with_example": 82,
     "registered_example_not_built": 0,
     "registered_with_python_equiv": 88,
     "registered_without_api_page": 0,
-    "with_snippet": 75,
+    "with_snippet": 90,
     "public_api_units": 478,
     "example_eligible": 383,
     "example_exempt": 95,
-    "eligible_backed_by_registry_example": 74,
-    "eligible_used_by_some_example": 130,
-    "examples_on_disk": 47,
-    "examples_built": 47
+    "eligible_backed_by_registry_example": 82,
+    "eligible_used_by_some_example": 147,
+    "examples_on_disk": 48,
+    "examples_built": 48
   },
   "by_library": {
     "bids": {
@@ -85,9 +85,9 @@
       "registered": 51,
       "with_test": 28,
       "eligible": 80,
-      "eligible_with_registry_example": 23,
-      "eligible_used_by_example": 37,
-      "with_snippet": 33
+      "eligible_with_registry_example": 31,
+      "eligible_used_by_example": 52,
+      "with_snippet": 48
     },
     "fiff": {
       "public": 37,
@@ -95,7 +95,7 @@
       "with_test": 10,
       "eligible": 37,
       "eligible_with_registry_example": 4,
-      "eligible_used_by_example": 16,
+      "eligible_used_by_example": 18,
       "with_snippet": 1
     },
     "fs": {
@@ -3983,8 +3983,12 @@
       "test_resolves": false,
       "example": null,
       "example_state": "none",
-      "including_examples": [],
-      "snippets": [],
+      "including_examples": [
+        "ex_dsp_artifacts"
+      ],
+      "snippets": [
+        "ex_dsp_artifacts/main.cpp#annotate_amplitude_usage"
+      ],
       "api_page": null,
       "python_equiv": null,
       "example_eligible": true,
@@ -4000,10 +4004,14 @@
       "registry_status": "done",
       "test": "test_dsp_annotate_artifact",
       "test_resolves": true,
-      "example": null,
-      "example_state": "none",
-      "including_examples": [],
-      "snippets": [],
+      "example": "ex_dsp_artifacts",
+      "example_state": "built",
+      "including_examples": [
+        "ex_dsp_artifacts"
+      ],
+      "snippets": [
+        "ex_dsp_artifacts/main.cpp#annotate_amplitude_usage"
+      ],
       "api_page": "doc/website/docs/api/dsp/annotate-artifact.mdx",
       "python_equiv": "mne.preprocessing.annotate_muscle_zscore / annotate_amplitude",
       "example_eligible": true,
@@ -4021,8 +4029,12 @@
       "test_resolves": false,
       "example": null,
       "example_state": "none",
-      "including_examples": [],
-      "snippets": [],
+      "including_examples": [
+        "ex_dsp_artifacts"
+      ],
+      "snippets": [
+        "ex_dsp_artifacts/main.cpp#annotate_amplitude_usage"
+      ],
       "api_page": null,
       "python_equiv": null,
       "example_eligible": true,
@@ -4038,10 +4050,14 @@
       "registry_status": "documented",
       "test": null,
       "test_resolves": false,
-      "example": null,
-      "example_state": "none",
-      "including_examples": [],
-      "snippets": [],
+      "example": "ex_dsp_artifacts",
+      "example_state": "built",
+      "including_examples": [
+        "ex_dsp_artifacts"
+      ],
+      "snippets": [
+        "ex_dsp_artifacts/main.cpp#artifact_detect_usage"
+      ],
       "api_page": "doc/website/docs/api/utils/artifact-detect.mdx",
       "python_equiv": null,
       "example_eligible": true,
@@ -4059,8 +4075,12 @@
       "test_resolves": false,
       "example": null,
       "example_state": "none",
-      "including_examples": [],
-      "snippets": [],
+      "including_examples": [
+        "ex_dsp_artifacts"
+      ],
+      "snippets": [
+        "ex_dsp_artifacts/main.cpp#artifact_detect_usage"
+      ],
       "api_page": null,
       "python_equiv": null,
       "example_eligible": true,
@@ -4078,8 +4098,12 @@
       "test_resolves": false,
       "example": null,
       "example_state": "none",
-      "including_examples": [],
-      "snippets": [],
+      "including_examples": [
+        "ex_dsp_artifacts"
+      ],
+      "snippets": [
+        "ex_dsp_artifacts/main.cpp#artifact_detect_usage"
+      ],
       "api_page": null,
       "python_equiv": null,
       "example_eligible": true,
@@ -4095,10 +4119,14 @@
       "registry_status": "documented",
       "test": null,
       "test_resolves": false,
-      "example": null,
-      "example_state": "none",
-      "including_examples": [],
-      "snippets": [],
+      "example": "ex_dsp_artifacts",
+      "example_state": "built",
+      "including_examples": [
+        "ex_dsp_artifacts"
+      ],
+      "snippets": [
+        "ex_dsp_artifacts/main.cpp#bad_channel_detect_usage"
+      ],
       "api_page": "doc/website/docs/api/utils/bad-channel-detect.mdx",
       "python_equiv": null,
       "example_eligible": true,
@@ -4116,8 +4144,12 @@
       "test_resolves": false,
       "example": null,
       "example_state": "none",
-      "including_examples": [],
-      "snippets": [],
+      "including_examples": [
+        "ex_dsp_artifacts"
+      ],
+      "snippets": [
+        "ex_dsp_artifacts/main.cpp#bad_channel_detect_usage"
+      ],
       "api_page": null,
       "python_equiv": null,
       "example_eligible": true,
@@ -4133,10 +4165,14 @@
       "registry_status": "done",
       "test": "test_dsp_bad_channels_lof",
       "test_resolves": true,
-      "example": null,
-      "example_state": "none",
-      "including_examples": [],
-      "snippets": [],
+      "example": "ex_dsp_artifacts",
+      "example_state": "built",
+      "including_examples": [
+        "ex_dsp_artifacts"
+      ],
+      "snippets": [
+        "ex_dsp_artifacts/main.cpp#find_bad_channels_lof_usage"
+      ],
       "api_page": "doc/website/docs/api/dsp/bad-channels-lof.mdx",
       "python_equiv": "mne.preprocessing._lof",
       "example_eligible": true,
@@ -4154,8 +4190,12 @@
       "test_resolves": false,
       "example": null,
       "example_state": "none",
-      "including_examples": [],
-      "snippets": [],
+      "including_examples": [
+        "ex_dsp_artifacts"
+      ],
+      "snippets": [
+        "ex_dsp_artifacts/main.cpp#find_bad_channels_lof_usage"
+      ],
       "api_page": null,
       "python_equiv": null,
       "example_eligible": true,
@@ -4230,8 +4270,12 @@
       "test_resolves": false,
       "example": null,
       "example_state": "none",
-      "including_examples": [],
-      "snippets": [],
+      "including_examples": [
+        "ex_dsp_artifacts"
+      ],
+      "snippets": [
+        "ex_dsp_artifacts/main.cpp#bridged_electrodes_usage"
+      ],
       "api_page": null,
       "python_equiv": null,
       "example_eligible": true,
@@ -4247,10 +4291,14 @@
       "registry_status": "done",
       "test": "test_dsp_bridged_electrodes",
       "test_resolves": true,
-      "example": null,
-      "example_state": "none",
-      "including_examples": [],
-      "snippets": [],
+      "example": "ex_dsp_artifacts",
+      "example_state": "built",
+      "including_examples": [
+        "ex_dsp_artifacts"
+      ],
+      "snippets": [
+        "ex_dsp_artifacts/main.cpp#bridged_electrodes_usage"
+      ],
       "api_page": "doc/website/docs/api/dsp/bridged-electrodes.mdx",
       "python_equiv": "mne.preprocessing.compute_bridged_electrodes",
       "example_eligible": true,
@@ -4446,10 +4494,14 @@
       "registry_status": "done",
       "test": "test_dsp_eeg_reference",
       "test_resolves": true,
-      "example": null,
-      "example_state": "none",
-      "including_examples": [],
-      "snippets": [],
+      "example": "ex_dsp_artifacts",
+      "example_state": "built",
+      "including_examples": [
+        "ex_dsp_artifacts"
+      ],
+      "snippets": [
+        "ex_dsp_artifacts/main.cpp#set_eeg_reference_usage"
+      ],
       "api_page": "doc/website/docs/api/dsp/eeg-reference.mdx",
       "python_equiv": "mne.set_eeg_reference",
       "example_eligible": true,
@@ -4465,10 +4517,14 @@
       "registry_status": "done",
       "test": "test_dsp_eog_regression",
       "test_resolves": true,
-      "example": null,
-      "example_state": "none",
-      "including_examples": [],
-      "snippets": [],
+      "example": "ex_dsp_artifacts",
+      "example_state": "built",
+      "including_examples": [
+        "ex_dsp_artifacts"
+      ],
+      "snippets": [
+        "ex_dsp_artifacts/main.cpp#eog_regression_usage"
+      ],
       "api_page": "doc/website/docs/api/dsp/eog-regression.mdx",
       "python_equiv": "mne.preprocessing.regress_artifact",
       "example_eligible": true,
@@ -5500,10 +5556,14 @@
       "registry_status": "done",
       "test": "test_dsp_stim_artifact",
       "test_resolves": true,
-      "example": null,
-      "example_state": "none",
-      "including_examples": [],
-      "snippets": [],
+      "example": "ex_dsp_artifacts",
+      "example_state": "built",
+      "including_examples": [
+        "ex_dsp_artifacts"
+      ],
+      "snippets": [
+        "ex_dsp_artifacts/main.cpp#fix_stim_artifact_usage"
+      ],
       "api_page": "doc/website/docs/api/dsp/stim-artifact.mdx",
       "python_equiv": "mne.preprocessing.fix_stim_artifact",
       "example_eligible": true,
@@ -5715,7 +5775,9 @@
       "test_resolves": false,
       "example": null,
       "example_state": "none",
-      "including_examples": [],
+      "including_examples": [
+        "ex_dsp_artifacts"
+      ],
       "snippets": [],
       "api_page": null,
       "python_equiv": null,
@@ -5734,7 +5796,9 @@
       "test_resolves": true,
       "example": null,
       "example_state": "none",
-      "including_examples": [],
+      "including_examples": [
+        "ex_dsp_artifacts"
+      ],
       "snippets": [],
       "api_page": "doc/website/docs/api/fiff/fiff-annotations.mdx",
       "python_equiv": "mne.Annotations",
@@ -5754,6 +5818,7 @@
       "example": null,
       "example_state": "none",
       "including_examples": [
+        "ex_dsp_artifacts",
         "ex_fiff_sniffer"
       ],
       "snippets": [],
@@ -6208,6 +6273,7 @@
       "example_state": "none",
       "including_examples": [
         "ex_compute_forward",
+        "ex_dsp_artifacts",
         "ex_hpiFit"
       ],
       "snippets": [],

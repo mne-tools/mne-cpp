@@ -87,6 +87,8 @@ struct DSPSHARED_EXPORT LofBadChannelParams
  * @param[in] params    LOF parameters.
  *
  * @return List of bad channel names.
+ *
+ * @snippet ex_dsp_artifacts/main.cpp find_bad_channels_lof_usage
  */
 DSPSHARED_EXPORT QStringList findBadChannelsLof(const Eigen::MatrixXd& data,
                                                 const FIFFLIB::FiffInfo& info,

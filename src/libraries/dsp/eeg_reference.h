@@ -76,6 +76,8 @@ namespace UTILSLIB
  *                              - Multiple channel names -> re-reference to mean of those channels.
  * @param[in]     projection    If true, add an SSP projector for average reference instead of modifying data.
  *                              (default: false — modify data directly)
+ *
+ * @snippet ex_dsp_artifacts/main.cpp set_eeg_reference_usage
  */
 DSPSHARED_EXPORT void setEegReference(Eigen::MatrixXd& data,
                                       const FIFFLIB::FiffInfo& info,

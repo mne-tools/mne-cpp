@@ -17,15 +17,11 @@ class UTILSLIB::BadChannelDetect
 
 Automated detection of bad MEG/EEG channels using flat, variance, and correlation criteria.
 
-```cpp
-// Run all three detectors with default parameters
-BadChannelDetect::Params p;
-QVector<int> bad = BadChannelDetect::detect(matData, p);
-
-// Or run individual detectors
-QVector<int> flat  = BadChannelDetect::detectFlat(matData);
-QVector<int> noisy = BadChannelDetect::detectHighVariance(matData);
-QVector<int> weird = BadChannelDetect::detectLowCorrelation(matData);
+```cpp title="src/examples/ex_dsp_artifacts/main.cpp"
+BadChannelDetect::Params badParams;
+badParams.dFlatThreshold = 1e-9; // EEG in volts
+const QVector<int> flat = BadChannelDetect::detectFlat(data.topRows(kEeg), badParams.dFlatThreshold);
+const QVector<int> bad = BadChannelDetect::detect(data.topRows(kEeg), badParams);
 ```
 
 ---
@@ -116,6 +112,11 @@ This detector is most useful for sensor arrays where physically close channels s
 - *QVector&lt; int &gt;* — Row indices of low-correlation channels.
 
 ---
+
+## Example
+
+- Full source: [`src/examples/ex_dsp_artifacts/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_dsp_artifacts/main.cpp)
+- Build target: `ex_dsp_artifacts` (runs under CTest)
 
 ## Authors of this file
 

@@ -91,6 +91,13 @@ If any sample exceeds dPeakMax or falls below dPeakMin, that time point is annot
 
 If peak-to-peak amplitude in a sliding window &lt; dFlatMin, the window is annotated as "BAD_flat".
 
+```cpp title="src/examples/ex_dsp_artifacts/main.cpp"
+AnnotateAmplitudeParams amplitude;
+amplitude.dPeakMax = 200e-6;
+const FiffInfo eogInfo = info.pick_info(RowVectorXi::Constant(1, kEog));
+const FiffAnnotations exceeded = annotateAmplitude(data.row(kEog), eogInfo, kSFreq, amplitude);
+```
+
 **Parameters:**
 
 - **data** : *const Eigen::MatrixXd &*
@@ -110,6 +117,11 @@ If peak-to-peak amplitude in a sliding window &lt; dFlatMin, the window is annot
 - *[FiffAnnotations](/docs/api/fiff/fiff-annotations)* — FiffAnnotations with bad entries.
 
 ---
+
+## Example
+
+- Full source: [`src/examples/ex_dsp_artifacts/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_dsp_artifacts/main.cpp)
+- Build target: `ex_dsp_artifacts` (runs under CTest)
 
 ## Authors of this file
 

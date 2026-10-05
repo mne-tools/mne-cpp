@@ -39,6 +39,16 @@ Repair stimulus artifacts by interpolating or zeroing data around events.
 
 For each event sample, the data in the window [event + tmin_samples, event + tmax_samples] is either linearly interpolated from the boundary values or set to zero.
 
+```cpp title="src/examples/ex_dsp_artifacts/main.cpp"
+MatrixXd stim = data;
+MatrixXi events(2, 3);
+events << 500, 0, 1, 1500, 0, 1;
+for (int r = 0; r < events.rows(); ++r) {
+    stim.block(0, events(r, 0), kEeg, 2).array() += 1e-3; // 8 ms stimulus artefact
+}
+fixStimArtifact(stim, events, kSFreq, 1, -0.004, 0.008); // interpolate between the clean samples at -4 and +8 ms
+```
+
 **Parameters:**
 
 - **data** : *Eigen::MatrixXd &*
@@ -63,6 +73,11 @@ For each event sample, the data in the window [event + tmin_samples, event + tma
   Repair mode (Linear interpolation or zero-padding). Default: `StimArtifactMode::Linear`.
 
 ---
+
+## Example
+
+- Full source: [`src/examples/ex_dsp_artifacts/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_dsp_artifacts/main.cpp)
+- Build target: `ex_dsp_artifacts` (runs under CTest)
 
 ## Authors of this file
 

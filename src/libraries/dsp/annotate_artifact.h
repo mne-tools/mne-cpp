@@ -136,6 +136,8 @@ DSPSHARED_EXPORT FIFFLIB::FiffAnnotations annotateMusclZscore(
  * @param[in] sfreq   Sampling frequency in Hz.
  * @param[in] params  Detection parameters.
  * @return FiffAnnotations with bad entries.
+ *
+ * @snippet ex_dsp_artifacts/main.cpp annotate_amplitude_usage
  */
 DSPSHARED_EXPORT FIFFLIB::FiffAnnotations annotateAmplitude(
     const Eigen::MatrixXd& data,

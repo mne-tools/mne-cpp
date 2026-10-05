@@ -65,6 +65,8 @@ enum class StimArtifactMode
  *                             Default: 0.01 (10 ms after event).
  * @param[in]     mode         Repair mode (Linear interpolation or zero-padding).
  *                             Default: StimArtifactMode::Linear.
+ *
+ * @snippet ex_dsp_artifacts/main.cpp fix_stim_artifact_usage
  */
 DSPSHARED_EXPORT void fixStimArtifact(Eigen::MatrixXd& data,
                                       const Eigen::MatrixXi& events,

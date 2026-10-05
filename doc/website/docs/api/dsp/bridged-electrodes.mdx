@@ -65,6 +65,10 @@ Detect bridged EEG electrodes.
 
 Finds pairs of EEG channels whose electrical distance falls below the threshold, indicating a physical or gel bridge.
 
+```cpp title="src/examples/ex_dsp_artifacts/main.cpp"
+const QList<QPair<int, int>> bridged = computeBridgedElectrodes(data, info);
+```
+
 **Parameters:**
 
 - **data** : *const Eigen::MatrixXd &*
@@ -81,6 +85,11 @@ Finds pairs of EEG channels whose electrical distance falls below the threshold,
 - *QList&lt; QPair&lt; int, int &gt; &gt;* — List of bridged electrode pairs as (channel_index_1, channel_index_2) using indices into info.chs.
 
 ---
+
+## Example
+
+- Full source: [`src/examples/ex_dsp_artifacts/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_dsp_artifacts/main.cpp)
+- Build target: `ex_dsp_artifacts` (runs under CTest)
 
 ## Authors of this file
 

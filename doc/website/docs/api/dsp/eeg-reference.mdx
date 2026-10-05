@@ -41,6 +41,11 @@ Re-reference EEG channels to average, specific channel(s), or REST.
 
 Only modifies rows corresponding to EEG channels (kind == FIFFV_EEG_CH). Non-EEG channels are left untouched.
 
+```cpp title="src/examples/ex_dsp_artifacts/main.cpp"
+MatrixXd averageRef = data;
+setEegReference(averageRef, info); // average of the EEG channels; EOG/ECG rows untouched
+```
+
 **Parameters:**
 
 - **data** : *Eigen::MatrixXd &*
@@ -108,6 +113,11 @@ Creates new bipolar channels by subtracting cathode from anode for each pair. Th
   If true, remove the original anode/cathode channels from the output (default: true).
 
 ---
+
+## Example
+
+- Full source: [`src/examples/ex_dsp_artifacts/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_dsp_artifacts/main.cpp)
+- Build target: `ex_dsp_artifacts` (runs under CTest)
 
 ## Authors of this file
 

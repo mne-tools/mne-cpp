@@ -17,12 +17,9 @@ class UTILSLIB::ArtifactDetect
 
 ECG and EOG physiological artifact event detection.
 
-```cpp
-// ECG: returns sample indices of R-peaks
-QVector<int> rPeaks = ArtifactDetect::detectEcg(matData, fiffInfo, sFreq);
-
-// EOG: returns sample indices of blink/saccade onsets
-QVector<int> blinks = ArtifactDetect::detectEog(matData, fiffInfo, sFreq);
+```cpp title="src/examples/ex_dsp_artifacts/main.cpp"
+const QVector<int> beats = ArtifactDetect::detectEcg(data, info, kSFreq);  // R-peak samples on the ECG channel
+const QVector<int> blinks = ArtifactDetect::detectEog(data, info, kSFreq); // onsets above +-150 uV on the EOG channel
 ```
 
 ---
@@ -80,6 +77,11 @@ The function searches [FiffInfo](/docs/api/fiff/fiff-info) for channels with kin
 - *QVector&lt; int &gt;* — Sample indices (0-based) of detected EOG events (onset of supra-threshold excursion).
 
 ---
+
+## Example
+
+- Full source: [`src/examples/ex_dsp_artifacts/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_dsp_artifacts/main.cpp)
+- Build target: `ex_dsp_artifacts` (runs under CTest)
 
 ## Authors of this file
 

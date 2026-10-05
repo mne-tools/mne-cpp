@@ -23,13 +23,11 @@ Remove EOG artifacts via linear regression.
 
 Fits a least-squares model: data_ch = beta * EOG + residual, then subtracts beta * EOG from each non-EOG channel.
 
-Usage: 
-```cpp
-EogRegression eogReg;
-eogReg.fit(data, info);           // fit regression coefficients
-eogReg.apply(data, info);         // subtract EOG contribution in-place
-// or one-step:
-EogRegression::fitApply(data, info);
+```cpp title="src/examples/ex_dsp_artifacts/main.cpp"
+MatrixXd cleaned = data;
+EogRegression regression;
+regression.fit(cleaned, info); // EOG channels are found by kind
+regression.apply(cleaned, info);
 ```
 
 ---
@@ -115,6 +113,11 @@ Convenience: fit and apply in one step.
   Optional explicit EOG channel names.
 
 ---
+
+## Example
+
+- Full source: [`src/examples/ex_dsp_artifacts/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_dsp_artifacts/main.cpp)
+- Build target: `ex_dsp_artifacts` (runs under CTest)
 
 ## Authors of this file
 

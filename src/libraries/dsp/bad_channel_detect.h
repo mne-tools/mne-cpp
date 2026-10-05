@@ -73,16 +73,7 @@ struct DSPSHARED_EXPORT BadChannelDetectParams
 /**
  * @brief Automated detection of bad MEG/EEG channels using flat, variance, and correlation criteria.
  *
- * @code
- *   // Run all three detectors with default parameters
- *   BadChannelDetect::Params p;
- *   QVector<int> bad = BadChannelDetect::detect(matData, p);
- *
- *   // Or run individual detectors
- *   QVector<int> flat  = BadChannelDetect::detectFlat(matData);
- *   QVector<int> noisy = BadChannelDetect::detectHighVariance(matData);
- *   QVector<int> weird = BadChannelDetect::detectLowCorrelation(matData);
- * @endcode
+ * @snippet ex_dsp_artifacts/main.cpp bad_channel_detect_usage
  */
 class DSPSHARED_EXPORT BadChannelDetect
 {

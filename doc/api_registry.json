@@ -1035,7 +1035,11 @@
       "mne_python": "mne.preprocessing._lof",
       "sklearn": "sklearn.neighbors.LocalOutlierFactor",
       "test": "test_dsp_bad_channels_lof",
-      "example": null,
+      "example": "ex_dsp_artifacts",
+      "example_snippet": [
+        "ex_dsp_artifacts/main.cpp#find_bad_channels_lof_usage"
+      ],
+      "example_mode": "run",
       "status": "done",
       "skigen_candidate": true,
       "skigen_target": "Skigen::Neighbors::LocalOutlierFactor",
@@ -1056,7 +1060,11 @@
       "mne_python": "mne.preprocessing.regress_artifact",
       "sklearn": null,
       "test": "test_dsp_eog_regression",
-      "example": null,
+      "example": "ex_dsp_artifacts",
+      "example_snippet": [
+        "ex_dsp_artifacts/main.cpp#eog_regression_usage"
+      ],
+      "example_mode": "run",
       "status": "done",
       "skigen_candidate": false,
       "documented": true,
@@ -1074,7 +1082,11 @@
       "mne_python": "mne.set_eeg_reference",
       "sklearn": null,
       "test": "test_dsp_eeg_reference",
-      "example": null,
+      "example": "ex_dsp_artifacts",
+      "example_snippet": [
+        "ex_dsp_artifacts/main.cpp#set_eeg_reference_usage"
+      ],
+      "example_mode": "run",
       "status": "done",
       "skigen_candidate": false,
       "documented": true,
@@ -1093,7 +1105,11 @@
       "mne_python": "mne.preprocessing.fix_stim_artifact",
       "sklearn": null,
       "test": "test_dsp_stim_artifact",
-      "example": null,
+      "example": "ex_dsp_artifacts",
+      "example_snippet": [
+        "ex_dsp_artifacts/main.cpp#fix_stim_artifact_usage"
+      ],
+      "example_mode": "run",
       "status": "done",
       "skigen_candidate": false,
       "documented": true,
@@ -1131,7 +1147,11 @@
       "mne_python": "mne.preprocessing.annotate_muscle_zscore / annotate_amplitude",
       "sklearn": null,
       "test": "test_dsp_annotate_artifact",
-      "example": null,
+      "example": "ex_dsp_artifacts",
+      "example_snippet": [
+        "ex_dsp_artifacts/main.cpp#annotate_amplitude_usage"
+      ],
+      "example_mode": "run",
       "status": "done",
       "skigen_candidate": false,
       "documented": true,
@@ -1150,7 +1170,11 @@
       "mne_python": "mne.preprocessing.compute_bridged_electrodes",
       "sklearn": null,
       "test": "test_dsp_bridged_electrodes",
-      "example": null,
+      "example": "ex_dsp_artifacts",
+      "example_snippet": [
+        "ex_dsp_artifacts/main.cpp#bridged_electrodes_usage"
+      ],
+      "example_mode": "run",
       "status": "done",
       "skigen_candidate": false,
       "documented": true,
@@ -5982,7 +6006,11 @@
       "mne_python": null,
       "sklearn": null,
       "test": null,
-      "example": null,
+      "example": "ex_dsp_artifacts",
+      "example_snippet": [
+        "ex_dsp_artifacts/main.cpp#artifact_detect_usage"
+      ],
+      "example_mode": "run",
       "status": "documented",
       "skigen_candidate": false,
       "documented": true,
@@ -6000,7 +6028,11 @@
       "mne_python": null,
       "sklearn": null,
       "test": null,
-      "example": null,
+      "example": "ex_dsp_artifacts",
+      "example_snippet": [
+        "ex_dsp_artifacts/main.cpp#bad_channel_detect_usage"
+      ],
+      "example_mode": "run",
       "status": "documented",
       "skigen_candidate": false,
       "documented": true,
