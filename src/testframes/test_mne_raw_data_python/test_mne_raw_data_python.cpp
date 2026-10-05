@@ -31,6 +31,10 @@
 #include <mne/mne_ch_selection.h>
 #include <mne/mne_proj_op.h>
 #include <mne/mne_filter_def.h>
+#include <mne/mne_deriv.h>
+#include <mne/mne_sparse_named_matrix.h>
+
+#include <fiff/fiff_sparse_matrix.h>
 
 #include <memory>
 #include <vector>
@@ -47,12 +51,14 @@
 //=============================================================================================================
 
 #include <Eigen/Core>
+#include <Eigen/SparseCore>
 
 //=============================================================================================================
 // USED NAMESPACES
 //=============================================================================================================
 
 using namespace MNELIB;
+using namespace FIFFLIB;
 using namespace Eigen;
 
 namespace
@@ -104,6 +110,7 @@ private slots:
     void filtersSegments_data();
     void filtersSegments();
     void rejectsMissingFile();
+    void picksDerivedChannel();
 
 private:
     MNEChSelection makeSelection() const;
@@ -358,6 +365,74 @@ void TestMneRawDataPython::rejectsMissingFile()
 {
     std::unique_ptr<MNERawData> missing(MNERawData::open_file(m_rawPath + ".missing", false, false, MNEFilterDef()));
     QVERIFY(!missing);
+}
+
+//=============================================================================================================
+
+void TestMneRawDataPython::picksDerivedChannel()
+{
+    // A bipolar derivation MEG0113 - MEG0112: every read path is linear, so it must equal the difference of the reads.
+    MNEFilterDef filter;
+    filter.filter_on = true;
+    filter.size = 4096;
+    filter.taper_size = 2048;
+    filter.lowpass = filter.eog_lowpass = 40.0f;
+    filter.lowpass_width = filter.eog_lowpass_width = 5.0f;
+    std::unique_ptr<MNERawData> raw(MNERawData::open_file(m_rawPath, false, false, filter));
+    QVERIFY(raw);
+    const int a = static_cast<int>(raw->ch_names.indexOf("MEG0113"));
+    const int b = static_cast<int>(raw->ch_names.indexOf("MEG0112"));
+    SparseMatrix<float> d(1, raw->info->nchan);
+    d.insert(0, a) = 1.0f;
+    d.insert(0, b) = -1.0f;
+    d.makeCompressed();
+    auto deriv = std::make_unique<MNEDeriv>();
+    deriv->deriv_data = std::make_unique<MNESparseNamedMatrix>();
+    deriv->deriv_data->nrow = 1;
+    deriv->deriv_data->ncol = raw->info->nchan;
+    deriv->deriv_data->rowlist = {"BIP"};
+    deriv->deriv_data->collist = raw->ch_names;
+    deriv->deriv_data->data = std::make_unique<FiffSparseMatrix>(FiffSparseMatrix::fromEigenSparse(d));
+    // Matching a derivation to the data counts its non-zeros per input channel (MNE-C mne_match_derivations).
+    deriv->in_use = VectorXi::Zero(raw->info->nchan);
+    deriv->in_use(a) = deriv->in_use(b) = 1;
+    raw->deriv_matched = std::move(deriv);
+
+    // Channel 0 is derived, 1 and 2 are its inputs.
+    MNEChSelection sel;
+    sel.nchan = 3;
+    sel.pick = VectorXi(3);
+    sel.pick << -1, a, b;
+    sel.pick_deriv = VectorXi(3);
+    sel.pick_deriv << 0, -1, -1;
+    sel.nderiv = 1;
+    sel.chspick = sel.chspick_nospace = {"BIP", "MEG0113", "MEG0112"};
+
+    const int first = raw->first_samp + 2990;
+    for (int path = 0; path < 3; ++path) {
+        PickBuffer buf(3, 25);
+        if (path == 0)
+            QCOMPARE(raw->pick_data(&sel, first, 25, buf.rows.data()), 0);
+        else if (path == 1)
+            QCOMPARE(raw->pick_data_proj(&sel, first, 25, buf.rows.data()), 0);
+        else
+            QCOMPARE(raw->pick_data_filt(&sel, first, 25, buf.rows.data()), 0);
+        const RowVectorXf expected = buf.values.row(1) - buf.values.row(2);
+        QVERIFY2((buf.values.row(0) - expected).cwiseAbs().maxCoeff() <= 1e-5f * expected.cwiseAbs().maxCoeff(),
+                 qPrintable(QStringLiteral("path %1").arg(path)));
+        QVERIFY(expected.cwiseAbs().maxCoeff() > 0.0f);
+    }
+
+    // The derived channel alone: its inputs must still be filtered (a fresh reader has nothing cached).
+    std::unique_ptr<MNERawData> fresh(MNERawData::open_file(m_rawPath, false, false, filter));
+    fresh->deriv_matched = std::move(raw->deriv_matched);
+    MNEChSelection only = sel;
+    only.nchan = 1;
+    PickBuffer alone(1, 25);
+    QCOMPARE(fresh->pick_data_filt(&only, first, 25, alone.rows.data()), 0);
+    PickBuffer inputs(3, 25);
+    QCOMPARE(raw->pick_data_filt(&sel, first, 25, inputs.rows.data()), 0);
+    QVERIFY((alone.values.row(0) - (inputs.values.row(1) - inputs.values.row(2))).cwiseAbs().maxCoeff() <= 1e-5f * inputs.values.row(1).cwiseAbs().maxCoeff());
 }
 
 //=============================================================================================================
