@@ -1,7 +1,6 @@
 {
   "meta": {
     "generated_by": "tools/parity/gap_analysis.py",
-    "generated_on": "2026-07-11",
     "mne_python_ref": "1.11.0",
     "mne_python_pinned": "1.11",
     "registry": "doc/api_registry.json",

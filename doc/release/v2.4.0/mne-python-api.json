@@ -1,0 +1,4602 @@
+{
+  "schema_version": 1,
+  "generated_by": "tools/parity/extract_mne_python_api.py",
+  "mne_python": "1.11.0",
+  "mne_python_pinned": "1.11",
+  "namespaces": [
+    "mne",
+    "mne.io",
+    "mne.export",
+    "mne.preprocessing",
+    "mne.channels",
+    "mne.forward",
+    "mne.minimum_norm",
+    "mne.inverse_sparse",
+    "mne.beamformer",
+    "mne.source_space",
+    "mne.time_frequency",
+    "mne.decoding",
+    "mne.stats",
+    "mne.simulation"
+  ],
+  "excluded_namespaces": [
+    "mne.commands",
+    "mne.cuda",
+    "mne.datasets",
+    "mne.defaults",
+    "mne.fixes",
+    "mne.gui",
+    "mne.html_templates",
+    "mne.utils"
+  ],
+  "summary": {
+    "total": 456,
+    "in_scope": 443,
+    "excluded": 13,
+    "deprecated": 4,
+    "classes": 71,
+    "functions": 385
+  },
+  "apis": [
+    {
+      "python": "mne.AcqParserFIF",
+      "kind": "class",
+      "submodule": "(top-level)",
+      "domain": "epochs",
+      "signature": "(info)",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.Annotations",
+      "kind": "class",
+      "submodule": "(top-level)",
+      "domain": "core",
+      "signature": "(onset, duration, description, orig_time=None, ch_names=None, *, extras=None)",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.BaseEpochs",
+      "kind": "class",
+      "submodule": "(top-level)",
+      "domain": "epochs",
+      "signature": "(info, data, events, event_id=None, tmin=-0.2, tmax=0.5, baseline=(None, 0), raw=None, picks=None, reject=None, flat=None, decim=1, reject_tmin=None, reject_tmax=None, detrend=None, proj=True, on_missing='raise', preload_at_end=False, selection=None, drop_log=None, filename=None, metadata=None, event_repeated='error', *, raw_sfreq=None, annotations=None, verbose=None)",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.BiHemiLabel",
+      "kind": "class",
+      "submodule": "(top-level)",
+      "domain": "core",
+      "signature": "(lh, rh, name=None, color=None)",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.Covariance",
+      "kind": "class",
+      "submodule": "(top-level)",
+      "domain": "cov",
+      "signature": "(data, names, bads, projs, nfree, eig=None, eigvec=None, method=None, loglik=None, *, verbose=None)",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.Dipole",
+      "kind": "class",
+      "submodule": "(top-level)",
+      "domain": "inverse",
+      "signature": "(times, pos, amplitude, ori, gof, name=None, conf=None, khi2=None, nfree=None, *, verbose=None)",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.DipoleFixed",
+      "kind": "class",
+      "submodule": "(top-level)",
+      "domain": "inverse",
+      "signature": "(info, data, times, nave, aspect_kind, comment='', *, verbose=None)",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.Epochs",
+      "kind": "class",
+      "submodule": "(top-level)",
+      "domain": "epochs",
+      "signature": "(raw, events=None, event_id=None, tmin=-0.2, tmax=0.5, baseline=(None, 0), picks=None, preload=False, reject=None, flat=None, proj=True, decim=1, reject_tmin=None, reject_tmax=None, detrend=None, on_missing='raise', reject_by_annotation=True, metadata=None, event_repeated='error', verbose=None)",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.EpochsArray",
+      "kind": "class",
+      "submodule": "(top-level)",
+      "domain": "epochs",
+      "signature": "(data, info, events=None, tmin=0.0, event_id=None, reject=None, flat=None, reject_tmin=None, reject_tmax=None, baseline=None, proj=True, on_missing='raise', metadata=None, selection=None, *, drop_log=None, raw_sfreq=None, verbose=None)",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.Evoked",
+      "kind": "class",
+      "submodule": "(top-level)",
+      "domain": "core",
+      "signature": "(fname, condition=None, proj=True, kind='average', allow_maxshield=False, *, verbose=None)",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.EvokedArray",
+      "kind": "class",
+      "submodule": "(top-level)",
+      "domain": "core",
+      "signature": "(data, info, tmin=0.0, comment='', nave=1, kind='average', baseline=None, *, verbose=None)",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.Forward",
+      "kind": "class",
+      "submodule": "(top-level)",
+      "domain": "forward",
+      "signature": "",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.Info",
+      "kind": "class",
+      "submodule": "(top-level)",
+      "domain": "core",
+      "signature": "(*args, **kwargs)",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.Label",
+      "kind": "class",
+      "submodule": "(top-level)",
+      "domain": "core",
+      "signature": "(vertices=(), pos=None, values=None, hemi=None, comment='', name=None, filename=None, subject=None, color=None, *, verbose=None)",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.MixedSourceEstimate",
+      "kind": "class",
+      "submodule": "(top-level)",
+      "domain": "inverse",
+      "signature": "(data, vertices=None, tmin=None, tstep=None, subject=None, verbose=None)",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.MixedVectorSourceEstimate",
+      "kind": "class",
+      "submodule": "(top-level)",
+      "domain": "inverse",
+      "signature": "(data, vertices=None, tmin=None, tstep=None, subject=None, verbose=None)",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.Projection",
+      "kind": "class",
+      "submodule": "(top-level)",
+      "domain": "core",
+      "signature": "(*, data, desc='', kind=1 (FIFFV_PROJ_ITEM_FIELD), active=False, explained_var=None)",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.Report",
+      "kind": "class",
+      "submodule": "(top-level)",
+      "domain": "viz",
+      "signature": "(info_fname=None, subjects_dir=None, subject=None, title=None, cov_fname=None, baseline=None, image_format='auto', raw_psd=False, projs=False, *, img_max_width=850, img_max_res=100, collapse=(), verbose=None)",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.SourceEstimate",
+      "kind": "class",
+      "submodule": "(top-level)",
+      "domain": "inverse",
+      "signature": "(data, vertices, tmin, tstep, subject=None, verbose=None)",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.SourceMorph",
+      "kind": "class",
+      "submodule": "(top-level)",
+      "domain": "source_space",
+      "signature": "(subject_from, subject_to, kind, zooms, niter_affine, niter_sdr, spacing, smooth, xhemi, morph_mat, vertices_to, shape, affine, pre_affine, sdr_morph, src_data, vol_morph_mat, *, verbose=None)",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.SourceSpaces",
+      "kind": "class",
+      "submodule": "(top-level)",
+      "domain": "source_space",
+      "signature": "(source_spaces, info=None)",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.Transform",
+      "kind": "class",
+      "submodule": "(top-level)",
+      "domain": "core",
+      "signature": "(fro, to, trans=None)",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.VectorSourceEstimate",
+      "kind": "class",
+      "submodule": "(top-level)",
+      "domain": "inverse",
+      "signature": "(data, vertices=None, tmin=None, tstep=None, subject=None, verbose=None)",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.VolSourceEstimate",
+      "kind": "class",
+      "submodule": "(top-level)",
+      "domain": "inverse",
+      "signature": "(data, vertices, tmin, tstep, subject=None, verbose=None)",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.VolVectorSourceEstimate",
+      "kind": "class",
+      "submodule": "(top-level)",
+      "domain": "inverse",
+      "signature": "(data, vertices=None, tmin=None, tstep=None, subject=None, verbose=None)",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.add_reference_channels",
+      "kind": "function",
+      "submodule": "(top-level)",
+      "domain": "core",
+      "signature": "(inst, ref_channels, copy=True)",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.add_source_space_distances",
+      "kind": "function",
+      "submodule": "(top-level)",
+      "domain": "source_space",
+      "signature": "(src, dist_limit=inf, n_jobs=None, *, verbose=None)",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.annotations_from_events",
+      "kind": "function",
+      "submodule": "(top-level)",
+      "domain": "core",
+      "signature": "(events, sfreq, event_desc=None, first_samp=0, orig_time=None, verbose=None)",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.apply_forward",
+      "kind": "function",
+      "submodule": "(top-level)",
+      "domain": "forward",
+      "signature": "(fwd, stc, info, start=None, stop=None, use_cps=True, on_missing='raise', verbose=None)",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.apply_forward_raw",
+      "kind": "function",
+      "submodule": "(top-level)",
+      "domain": "forward",
+      "signature": "(fwd, stc, info, start=None, stop=None, on_missing='raise', use_cps=True, verbose=None)",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.average_forward_solutions",
+      "kind": "function",
+      "submodule": "(top-level)",
+      "domain": "forward",
+      "signature": "(fwds, weights=None, verbose=None)",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.beamformer.Beamformer",
+      "kind": "class",
+      "submodule": "beamformer",
+      "domain": "inverse",
+      "signature": "",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.beamformer.apply_dics",
+      "kind": "function",
+      "submodule": "beamformer",
+      "domain": "inverse",
+      "signature": "(evoked, filters, verbose=None)",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.beamformer.apply_dics_csd",
+      "kind": "function",
+      "submodule": "beamformer",
+      "domain": "inverse",
+      "signature": "(csd, filters, verbose=None)",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.beamformer.apply_dics_epochs",
+      "kind": "function",
+      "submodule": "beamformer",
+      "domain": "inverse",
+      "signature": "(epochs, filters, return_generator=False, verbose=None)",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.beamformer.apply_dics_tfr_epochs",
+      "kind": "function",
+      "submodule": "beamformer",
+      "domain": "inverse",
+      "signature": "(epochs_tfr, filters, return_generator=False, verbose=None)",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.beamformer.apply_lcmv",
+      "kind": "function",
+      "submodule": "beamformer",
+      "domain": "inverse",
+      "signature": "(evoked, filters, *, verbose=None)",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.beamformer.apply_lcmv_cov",
+      "kind": "function",
+      "submodule": "beamformer",
+      "domain": "inverse",
+      "signature": "(data_cov, filters, verbose=None)",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.beamformer.apply_lcmv_epochs",
+      "kind": "function",
+      "submodule": "beamformer",
+      "domain": "inverse",
+      "signature": "(epochs, filters, *, return_generator=False, verbose=None)",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.beamformer.apply_lcmv_raw",
+      "kind": "function",
+      "submodule": "beamformer",
+      "domain": "inverse",
+      "signature": "(raw, filters, start=None, stop=None, *, verbose=None)",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.beamformer.make_dics",
+      "kind": "function",
+      "submodule": "beamformer",
+      "domain": "inverse",
+      "signature": "(info, forward, csd, reg=0.05, noise_csd=None, label=None, pick_ori=None, rank=None, weight_norm=None, reduce_rank=False, depth=1.0, real_filter=True, inversion='matrix', verbose=None)",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.beamformer.make_lcmv",
+      "kind": "function",
+      "submodule": "beamformer",
+      "domain": "inverse",
+      "signature": "(info, forward, data_cov, reg=0.05, noise_cov=None, label=None, pick_ori=None, rank='info', weight_norm='unit-noise-gain-invariant', reduce_rank=False, depth=None, inversion='matrix', verbose=None)",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.beamformer.make_lcmv_resolution_matrix",
+      "kind": "function",
+      "submodule": "beamformer",
+      "domain": "inverse",
+      "signature": "(filters, forward, info)",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.beamformer.rap_music",
+      "kind": "function",
+      "submodule": "beamformer",
+      "domain": "inverse",
+      "signature": "(evoked, forward, noise_cov, n_dipoles=5, return_residual=False, *, verbose=None)",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.beamformer.read_beamformer",
+      "kind": "function",
+      "submodule": "beamformer",
+      "domain": "inverse",
+      "signature": "(fname)",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.beamformer.trap_music",
+      "kind": "function",
+      "submodule": "beamformer",
+      "domain": "inverse",
+      "signature": "(evoked, forward, noise_cov, n_dipoles=5, return_residual=False, *, verbose=None)",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.channel_indices_by_type",
+      "kind": "function",
+      "submodule": "(top-level)",
+      "domain": "core",
+      "signature": "(info, picks=None, *, exclude=())",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.channel_type",
+      "kind": "function",
+      "submodule": "(top-level)",
+      "domain": "core",
+      "signature": "(info, idx)",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.channels.DigMontage",
+      "kind": "class",
+      "submodule": "channels",
+      "domain": "channels",
+      "signature": "(*, dig=None, ch_names=None)",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.channels.Layout",
+      "kind": "class",
+      "submodule": "channels",
+      "domain": "channels",
+      "signature": "(box, pos, names, ids, kind)",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.channels.combine_channels",
+      "kind": "function",
+      "submodule": "channels",
+      "domain": "channels",
+      "signature": "(inst, groups, method='mean', keep_stim=False, drop_bad=False, *, on_missing='raise', verbose=None)",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.channels.compute_dev_head_t",
+      "kind": "function",
+      "submodule": "channels",
+      "domain": "channels",
+      "signature": "(montage)",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.channels.compute_native_head_t",
+      "kind": "function",
+      "submodule": "channels",
+      "domain": "channels",
+      "signature": "(montage, *, on_missing='warn', verbose=None)",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.channels.equalize_channels",
+      "kind": "function",
+      "submodule": "channels",
+      "domain": "channels",
+      "signature": "(instances, copy=True, verbose=None)",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.channels.find_ch_adjacency",
+      "kind": "function",
+      "submodule": "channels",
+      "domain": "channels",
+      "signature": "(info, ch_type)",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.channels.find_layout",
+      "kind": "function",
+      "submodule": "channels",
+      "domain": "channels",
+      "signature": "(info, ch_type=None, exclude='bads')",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.channels.fix_mag_coil_types",
+      "kind": "function",
+      "submodule": "channels",
+      "domain": "channels",
+      "signature": "(info, use_cal=False)",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.channels.generate_2d_layout",
+      "kind": "function",
+      "submodule": "channels",
+      "domain": "channels",
+      "signature": "(xy, w=0.07, h=0.05, pad=0.02, ch_names=None, ch_indices=None, name='ecog', bg_image=None, normalize=True)",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.channels.get_builtin_ch_adjacencies",
+      "kind": "function",
+      "submodule": "channels",
+      "domain": "channels",
+      "signature": "(*, descriptions=False)",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.channels.get_builtin_montages",
+      "kind": "function",
+      "submodule": "channels",
+      "domain": "channels",
+      "signature": "(*, descriptions=False)",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.channels.make_1020_channel_selections",
+      "kind": "function",
+      "submodule": "channels",
+      "domain": "channels",
+      "signature": "(info, midline='z', *, return_ch_names=False)",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.channels.make_dig_montage",
+      "kind": "function",
+      "submodule": "channels",
+      "domain": "channels",
+      "signature": "(ch_pos=None, nasion=None, lpa=None, rpa=None, hsp=None, hpi=None, coord_frame='unknown')",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.channels.make_eeg_layout",
+      "kind": "function",
+      "submodule": "channels",
+      "domain": "channels",
+      "signature": "(info, radius=0.5, width=None, height=None, exclude='bads', csd=False)",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.channels.make_grid_layout",
+      "kind": "function",
+      "submodule": "channels",
+      "domain": "channels",
+      "signature": "(info, picks=None, n_col=None)",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.channels.make_standard_montage",
+      "kind": "function",
+      "submodule": "channels",
+      "domain": "channels",
+      "signature": "(kind, head_size='auto')",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.channels.read_ch_adjacency",
+      "kind": "function",
+      "submodule": "channels",
+      "domain": "channels",
+      "signature": "(fname, picks=None)",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.channels.read_custom_montage",
+      "kind": "function",
+      "submodule": "channels",
+      "domain": "channels",
+      "signature": "(fname, head_size=0.095, coord_frame=None, *, verbose=None)",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.channels.read_dig_captrak",
+      "kind": "function",
+      "submodule": "channels",
+      "domain": "channels",
+      "signature": "(fname)",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.channels.read_dig_curry",
+      "kind": "function",
+      "submodule": "channels",
+      "domain": "channels",
+      "signature": "(fname)",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.channels.read_dig_dat",
+      "kind": "function",
+      "submodule": "channels",
+      "domain": "channels",
+      "signature": "(fname)",
+      "deprecated": true,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.channels.read_dig_egi",
+      "kind": "function",
+      "submodule": "channels",
+      "domain": "channels",
+      "signature": "(fname)",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.channels.read_dig_fif",
+      "kind": "function",
+      "submodule": "channels",
+      "domain": "channels",
+      "signature": "(fname, *, verbose=None)",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.channels.read_dig_hpts",
+      "kind": "function",
+      "submodule": "channels",
+      "domain": "channels",
+      "signature": "(fname, unit='mm')",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.channels.read_dig_localite",
+      "kind": "function",
+      "submodule": "channels",
+      "domain": "channels",
+      "signature": "(fname, nasion=None, lpa=None, rpa=None)",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.channels.read_dig_polhemus_isotrak",
+      "kind": "function",
+      "submodule": "channels",
+      "domain": "channels",
+      "signature": "(fname, ch_names=None, unit='m')",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.channels.read_layout",
+      "kind": "function",
+      "submodule": "channels",
+      "domain": "channels",
+      "signature": "(fname=None, *, scale=True)",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.channels.read_polhemus_fastscan",
+      "kind": "function",
+      "submodule": "channels",
+      "domain": "channels",
+      "signature": "(fname, unit='mm', on_header_missing='raise', *, verbose=None)",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.channels.read_vectorview_selection",
+      "kind": "function",
+      "submodule": "channels",
+      "domain": "channels",
+      "signature": "(name, fname=None, info=None, verbose=None)",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.channels.rename_channels",
+      "kind": "function",
+      "submodule": "channels",
+      "domain": "channels",
+      "signature": "(info, mapping, allow_duplicates=False, *, on_missing='raise', verbose=None)",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.channels.transform_to_head",
+      "kind": "function",
+      "submodule": "channels",
+      "domain": "channels",
+      "signature": "(montage)",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.channels.unify_bad_channels",
+      "kind": "function",
+      "submodule": "channels",
+      "domain": "channels",
+      "signature": "(insts)",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.combine_evoked",
+      "kind": "function",
+      "submodule": "(top-level)",
+      "domain": "core",
+      "signature": "(all_evoked, weights)",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.compute_covariance",
+      "kind": "function",
+      "submodule": "(top-level)",
+      "domain": "cov",
+      "signature": "(epochs, keep_sample_mean=True, tmin=None, tmax=None, projs=None, *, on_few_samples='warn', method='empirical', method_params=None, cv=3, scalings=None, n_jobs=None, return_estimators=False, on_mismatch='raise', rank=None, verbose=None)",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.compute_proj_epochs",
+      "kind": "function",
+      "submodule": "(top-level)",
+      "domain": "core",
+      "signature": "(epochs, n_grad=2, n_mag=2, n_eeg=2, n_jobs=None, desc_prefix=None, meg='separate', verbose=None)",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.compute_proj_evoked",
+      "kind": "function",
+      "submodule": "(top-level)",
+      "domain": "core",
+      "signature": "(evoked, n_grad=2, n_mag=2, n_eeg=2, desc_prefix=None, meg='separate', verbose=None)",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.compute_proj_raw",
+      "kind": "function",
+      "submodule": "(top-level)",
+      "domain": "core",
+      "signature": "(raw, start=0, stop=None, duration=1, n_grad=2, n_mag=2, n_eeg=0, reject=None, flat=None, n_jobs=None, meg='separate', verbose=None)",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.compute_rank",
+      "kind": "function",
+      "submodule": "(top-level)",
+      "domain": "core",
+      "signature": "(inst, rank=None, scalings=None, info=None, tol='auto', *, proj=True, tol_kind='absolute', on_rank_mismatch='ignore', on_few_samples=None, verbose=None)",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.compute_raw_covariance",
+      "kind": "function",
+      "submodule": "(top-level)",
+      "domain": "cov",
+      "signature": "(raw, tmin=0, tmax=None, tstep=0.2, reject=None, flat=None, picks=None, *, on_few_samples='warn', method='empirical', method_params=None, cv=3, scalings=None, n_jobs=None, return_estimators=False, reject_by_annotation=True, rank=None, verbose=None)",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.compute_source_morph",
+      "kind": "function",
+      "submodule": "(top-level)",
+      "domain": "source_space",
+      "signature": "(src, subject_from=None, subject_to='fsaverage', subjects_dir=None, zooms='auto', niter_affine=(100, 100, 10), niter_sdr=(5, 5, 3), spacing=5, smooth=None, warn=True, xhemi=False, sparse=False, src_to=None, precompute=False, verbose=None)",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.concatenate_epochs",
+      "kind": "function",
+      "submodule": "(top-level)",
+      "domain": "epochs",
+      "signature": "(epochs_list, add_offset=True, *, on_mismatch='raise', verbose=None)",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.concatenate_events",
+      "kind": "function",
+      "submodule": "(top-level)",
+      "domain": "epochs",
+      "signature": "(events, first_samps, last_samps)",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.concatenate_raws",
+      "kind": "function",
+      "submodule": "(top-level)",
+      "domain": "io",
+      "signature": "(raws, preload=None, events_list=None, *, on_mismatch='raise', verbose=None)",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.convert_forward_solution",
+      "kind": "function",
+      "submodule": "(top-level)",
+      "domain": "forward",
+      "signature": "(fwd, surf_ori=False, force_fixed=False, copy=True, use_cps=True, *, verbose=None)",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.count_annotations",
+      "kind": "function",
+      "submodule": "(top-level)",
+      "domain": "core",
+      "signature": "(annotations)",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.count_events",
+      "kind": "function",
+      "submodule": "(top-level)",
+      "domain": "epochs",
+      "signature": "(events, ids=None)",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.create_default_subject",
+      "kind": "function",
+      "submodule": "(top-level)",
+      "domain": "channels",
+      "signature": "(fs_home=None, update=False, subjects_dir=None, verbose=None)",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.create_info",
+      "kind": "function",
+      "submodule": "(top-level)",
+      "domain": "core",
+      "signature": "(ch_names, sfreq, ch_types='misc', verbose=None)",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.decimate_surface",
+      "kind": "function",
+      "submodule": "(top-level)",
+      "domain": "source_space",
+      "signature": "(points, triangles, n_triangles, method='quadric', *, verbose=None)",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.decoding.BaseEstimator",
+      "kind": "class",
+      "submodule": "decoding",
+      "domain": "decoding",
+      "signature": "()",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.decoding.CSP",
+      "kind": "class",
+      "submodule": "decoding",
+      "domain": "decoding",
+      "signature": "(n_components=4, reg=None, log=None, cov_est='concat', transform_into='average_power', norm_trace=False, cov_method_params=None, *, restr_type='restricting', info=None, rank=None, component_order='mutual_info')",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.decoding.EMS",
+      "kind": "class",
+      "submodule": "decoding",
+      "domain": "decoding",
+      "signature": "()",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.decoding.FilterEstimator",
+      "kind": "class",
+      "submodule": "decoding",
+      "domain": "decoding",
+      "signature": "(info, l_freq, h_freq, picks=None, filter_length='auto', l_trans_bandwidth='auto', h_trans_bandwidth='auto', n_jobs=None, method='fir', iir_params=None, fir_design='firwin')",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.decoding.GeneralizingEstimator",
+      "kind": "class",
+      "submodule": "decoding",
+      "domain": "decoding",
+      "signature": "(base_estimator, scoring=None, n_jobs=None, *, position=0, allow_2d=False, verbose=None)",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.decoding.LinearModel",
+      "kind": "class",
+      "submodule": "decoding",
+      "domain": "decoding",
+      "signature": "(model=None)",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.decoding.PSDEstimator",
+      "kind": "class",
+      "submodule": "decoding",
+      "domain": "decoding",
+      "signature": "(sfreq=6.283185307179586, fmin=0, fmax=inf, bandwidth=None, adaptive=False, low_bias=True, n_jobs=None, normalization='length')",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.decoding.ReceptiveField",
+      "kind": "class",
+      "submodule": "decoding",
+      "domain": "decoding",
+      "signature": "(tmin, tmax, sfreq, feature_names=None, estimator=None, fit_intercept=None, scoring='r2', patterns=False, n_jobs=None, edge_correction=True)",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.decoding.SPoC",
+      "kind": "class",
+      "submodule": "decoding",
+      "domain": "decoding",
+      "signature": "(n_components=4, reg=None, log=None, transform_into='average_power', cov_method_params=None, *, restr_type=None, info=None, rank=None)",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.decoding.SSD",
+      "kind": "class",
+      "submodule": "decoding",
+      "domain": "decoding",
+      "signature": "(info, filt_params_signal, filt_params_noise, reg=None, n_components=None, picks=None, sort_by_spectral_ratio=True, return_filtered=False, n_fft=None, cov_method_params=None, *, restr_type='whitening', rank=None)",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.decoding.Scaler",
+      "kind": "class",
+      "submodule": "decoding",
+      "domain": "decoding",
+      "signature": "(info=None, scalings=None, with_mean=True, with_std=True)",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.decoding.SlidingEstimator",
+      "kind": "class",
+      "submodule": "decoding",
+      "domain": "decoding",
+      "signature": "(base_estimator, scoring=None, n_jobs=None, *, position=0, allow_2d=False, verbose=None)",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.decoding.SpatialFilter",
+      "kind": "class",
+      "submodule": "decoding",
+      "domain": "decoding",
+      "signature": "(info, filters, *, evals=None, patterns=None, patterns_method='pinv')",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.decoding.TemporalFilter",
+      "kind": "class",
+      "submodule": "decoding",
+      "domain": "decoding",
+      "signature": "(l_freq=None, h_freq=None, sfreq=1.0, filter_length='auto', l_trans_bandwidth='auto', h_trans_bandwidth='auto', n_jobs=None, method='fir', iir_params=None, fir_window='hamming', fir_design='firwin')",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.decoding.TimeDelayingRidge",
+      "kind": "class",
+      "submodule": "decoding",
+      "domain": "decoding",
+      "signature": "(tmin, tmax, sfreq, alpha=0.0, reg_type='ridge', fit_intercept=True, n_jobs=None, edge_correction=True)",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.decoding.TimeFrequency",
+      "kind": "class",
+      "submodule": "decoding",
+      "domain": "decoding",
+      "signature": "(freqs, sfreq=1.0, method='morlet', n_cycles=7.0, time_bandwidth=None, use_fft=True, decim=1, output='complex', n_jobs=1, verbose=None)",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.decoding.TransformerMixin",
+      "kind": "class",
+      "submodule": "decoding",
+      "domain": "decoding",
+      "signature": "()",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.decoding.UnsupervisedSpatialFilter",
+      "kind": "class",
+      "submodule": "decoding",
+      "domain": "decoding",
+      "signature": "(estimator, average=False)",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.decoding.Vectorizer",
+      "kind": "class",
+      "submodule": "decoding",
+      "domain": "decoding",
+      "signature": "()",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.decoding.XdawnTransformer",
+      "kind": "class",
+      "submodule": "decoding",
+      "domain": "decoding",
+      "signature": "(n_components=2, reg=None, signal_cov=None, cov_method_params=None, *, restr_type=None, info=None, rank='full')",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.decoding.compute_ems",
+      "kind": "function",
+      "submodule": "decoding",
+      "domain": "decoding",
+      "signature": "(epochs, conditions=None, picks=None, n_jobs=None, cv=None, *, verbose=None)",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.decoding.cross_val_multiscore",
+      "kind": "function",
+      "submodule": "decoding",
+      "domain": "decoding",
+      "signature": "(estimator, X, y=None, groups=None, scoring=None, cv=None, n_jobs=None, verbose=None, fit_params=None, pre_dispatch='2*n_jobs')",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.decoding.get_coef",
+      "kind": "function",
+      "submodule": "decoding",
+      "domain": "decoding",
+      "signature": "(estimator, attr='filters_', inverse_transform=False, *, step_name=None, verbose=None)",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.decoding.get_spatial_filter_from_estimator",
+      "kind": "function",
+      "submodule": "decoding",
+      "domain": "decoding",
+      "signature": "(estimator, info, *, inverse_transform=False, step_name=None, get_coefs=('filters_', 'patterns_', 'evals_'), patterns_method=None, verbose=None)",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.dig_mri_distances",
+      "kind": "function",
+      "submodule": "(top-level)",
+      "domain": "source_space",
+      "signature": "(info, trans, subject, subjects_dir=None, dig_kinds='auto', exclude_frontal=False, on_defects='raise', verbose=None)",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.equalize_channels",
+      "kind": "function",
+      "submodule": "(top-level)",
+      "domain": "channels",
+      "signature": "(instances, copy=True, verbose=None)",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.events_from_annotations",
+      "kind": "function",
+      "submodule": "(top-level)",
+      "domain": "core",
+      "signature": "(raw, event_id='auto', regexp='^(?![Bb][Aa][Dd]|[Ee][Dd][Gg][Ee]).*$', use_rounding=True, chunk_duration=None, tol=1e-08, verbose=None)",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.export.export_epochs",
+      "kind": "function",
+      "submodule": "export",
+      "domain": "io",
+      "signature": "(fname, epochs, fmt='auto', *, overwrite=False, verbose=None)",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.export.export_evokeds",
+      "kind": "function",
+      "submodule": "export",
+      "domain": "io",
+      "signature": "(fname, evoked, fmt='auto', *, overwrite=False, verbose=None)",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.export.export_evokeds_mff",
+      "kind": "function",
+      "submodule": "export",
+      "domain": "io",
+      "signature": "(fname, evoked, history=None, *, overwrite=False, verbose=None)",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.export.export_raw",
+      "kind": "function",
+      "submodule": "export",
+      "domain": "io",
+      "signature": "(fname, raw, fmt='auto', physical_range='auto', add_ch_type=False, *, overwrite=False, verbose=None)",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.extract_label_time_course",
+      "kind": "function",
+      "submodule": "(top-level)",
+      "domain": "inverse",
+      "signature": "(stcs, labels, src, mode='auto', allow_empty=False, return_generator=False, *, mri_resolution=True, verbose=None)",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.find_events",
+      "kind": "function",
+      "submodule": "(top-level)",
+      "domain": "epochs",
+      "signature": "(raw, stim_channel=None, output='onset', consecutive='increasing', min_duration=0, shortest_event=2, mask=None, uint_cast=False, mask_type='and', initial_event=False, verbose=None)",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.find_layout",
+      "kind": "function",
+      "submodule": "(top-level)",
+      "domain": "channels",
+      "signature": "(info, ch_type=None, exclude='bads')",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.find_stim_steps",
+      "kind": "function",
+      "submodule": "(top-level)",
+      "domain": "epochs",
+      "signature": "(raw, pad_start=None, pad_stop=None, merge=0, stim_channel=None)",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.fit_dipole",
+      "kind": "function",
+      "submodule": "(top-level)",
+      "domain": "inverse",
+      "signature": "(evoked, cov, bem, trans=None, min_dist=5.0, n_jobs=None, pos=None, ori=None, rank=None, accuracy='normal', tol=5e-05, verbose=None)",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.forward.Forward",
+      "kind": "class",
+      "submodule": "forward",
+      "domain": "forward",
+      "signature": "",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.forward.apply_forward",
+      "kind": "function",
+      "submodule": "forward",
+      "domain": "forward",
+      "signature": "(fwd, stc, info, start=None, stop=None, use_cps=True, on_missing='raise', verbose=None)",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.forward.apply_forward_raw",
+      "kind": "function",
+      "submodule": "forward",
+      "domain": "forward",
+      "signature": "(fwd, stc, info, start=None, stop=None, on_missing='raise', use_cps=True, verbose=None)",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.forward.average_forward_solutions",
+      "kind": "function",
+      "submodule": "forward",
+      "domain": "forward",
+      "signature": "(fwds, weights=None, verbose=None)",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.forward.compute_depth_prior",
+      "kind": "function",
+      "submodule": "forward",
+      "domain": "forward",
+      "signature": "(forward, info, exp=0.8, limit=10.0, limit_depth_chs=False, combine_xyz='spectral', noise_cov=None, rank=None, verbose=None)",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.forward.compute_orient_prior",
+      "kind": "function",
+      "submodule": "forward",
+      "domain": "forward",
+      "signature": "(forward, loose='auto', verbose=None)",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.forward.convert_forward_solution",
+      "kind": "function",
+      "submodule": "forward",
+      "domain": "forward",
+      "signature": "(fwd, surf_ori=False, force_fixed=False, copy=True, use_cps=True, *, verbose=None)",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.forward.is_fixed_orient",
+      "kind": "function",
+      "submodule": "forward",
+      "domain": "forward",
+      "signature": "(forward, orig=False)",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.forward.make_field_map",
+      "kind": "function",
+      "submodule": "forward",
+      "domain": "forward",
+      "signature": "(evoked, trans='auto', subject=None, subjects_dir=None, ch_type=None, mode='fast', meg_surf='helmet', origin=None, n_jobs=None, *, upsampling=1, head_source=('bem', 'head'), verbose=None)",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.forward.make_forward_dipole",
+      "kind": "function",
+      "submodule": "forward",
+      "domain": "forward",
+      "signature": "(dipole, bem, info, trans=None, n_jobs=None, *, on_inside='raise', verbose=None)",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.forward.make_forward_solution",
+      "kind": "function",
+      "submodule": "forward",
+      "domain": "forward",
+      "signature": "(info, trans, src, bem, meg=True, eeg=True, *, mindist=0.0, ignore_ref=False, n_jobs=None, on_inside='raise', verbose=None)",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.forward.read_forward_solution",
+      "kind": "function",
+      "submodule": "forward",
+      "domain": "forward",
+      "signature": "(fname, include=(), exclude=(), *, ordered=True, verbose=None)",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.forward.restrict_forward_to_label",
+      "kind": "function",
+      "submodule": "forward",
+      "domain": "forward",
+      "signature": "(fwd, labels)",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.forward.restrict_forward_to_stc",
+      "kind": "function",
+      "submodule": "forward",
+      "domain": "forward",
+      "signature": "(fwd, stc, on_missing='ignore')",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.forward.use_coil_def",
+      "kind": "function",
+      "submodule": "forward",
+      "domain": "forward",
+      "signature": "(fname)",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.forward.write_forward_solution",
+      "kind": "function",
+      "submodule": "forward",
+      "domain": "forward",
+      "signature": "(fname, fwd, overwrite=False, verbose=None)",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.get_config",
+      "kind": "function",
+      "submodule": "(top-level)",
+      "domain": "core",
+      "signature": "(key=None, default=None, raise_error=False, home_dir=None, use_env=True)",
+      "deprecated": false,
+      "excluded": true,
+      "exclusion_reason": "Python-ecosystem plumbing (config, logging, docs)"
+    },
+    {
+      "python": "mne.get_config_path",
+      "kind": "function",
+      "submodule": "(top-level)",
+      "domain": "core",
+      "signature": "(home_dir=None)",
+      "deprecated": false,
+      "excluded": true,
+      "exclusion_reason": "Python-ecosystem plumbing (config, logging, docs)"
+    },
+    {
+      "python": "mne.get_head_surf",
+      "kind": "function",
+      "submodule": "(top-level)",
+      "domain": "source_space",
+      "signature": "(subject, source=('bem', 'head'), subjects_dir=None, on_defects='raise', verbose=None)",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.get_meg_helmet_surf",
+      "kind": "function",
+      "submodule": "(top-level)",
+      "domain": "source_space",
+      "signature": "(info, trans=None, *, upsampling=1, verbose=None)",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.get_montage_volume_labels",
+      "kind": "function",
+      "submodule": "(top-level)",
+      "domain": "source_space",
+      "signature": "(montage, subject, subjects_dir=None, aseg='auto', dist=2)",
+      "deprecated": false,
+      "excluded": true,
+      "exclusion_reason": "Python-ecosystem plumbing (config, logging, docs)"
+    },
+    {
+      "python": "mne.get_volume_labels_from_aseg",
+      "kind": "function",
+      "submodule": "(top-level)",
+      "domain": "core",
+      "signature": "(mgz_fname, return_colors=False, atlas_ids=None)",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.get_volume_labels_from_src",
+      "kind": "function",
+      "submodule": "(top-level)",
+      "domain": "source_space",
+      "signature": "(src, subject, subjects_dir)",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.grade_to_tris",
+      "kind": "function",
+      "submodule": "(top-level)",
+      "domain": "inverse",
+      "signature": "(grade, verbose=None)",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.grade_to_vertices",
+      "kind": "function",
+      "submodule": "(top-level)",
+      "domain": "source_space",
+      "signature": "(subject, grade, subjects_dir=None, n_jobs=None, verbose=None)",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.grand_average",
+      "kind": "function",
+      "submodule": "(top-level)",
+      "domain": "core",
+      "signature": "(all_inst, interpolate_bads=True, drop_bads=True)",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.grow_labels",
+      "kind": "function",
+      "submodule": "(top-level)",
+      "domain": "core",
+      "signature": "(subject, seeds, extents, hemis, subjects_dir=None, n_jobs=None, overlap=True, names=None, surface='white', colors=None)",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.head_to_mni",
+      "kind": "function",
+      "submodule": "(top-level)",
+      "domain": "core",
+      "signature": "(pos, subject, mri_head_t, subjects_dir=None, verbose=None)",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.head_to_mri",
+      "kind": "function",
+      "submodule": "(top-level)",
+      "domain": "core",
+      "signature": "(pos, subject, mri_head_t, subjects_dir=None, *, kind='mri', unscale=False, verbose=None)",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.inverse_sparse.gamma_map",
+      "kind": "function",
+      "submodule": "inverse_sparse",
+      "domain": "inverse",
+      "signature": "(evoked, forward, noise_cov, alpha, loose='auto', depth=0.8, xyz_same_gamma=True, maxit=10000, tol=1e-06, update_mode=1, gammas=None, pca=True, return_residual=False, return_as_dipoles=False, rank=None, pick_ori=None, verbose=None)",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.inverse_sparse.make_stc_from_dipoles",
+      "kind": "function",
+      "submodule": "inverse_sparse",
+      "domain": "inverse",
+      "signature": "(dipoles, src, verbose=None)",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.inverse_sparse.mixed_norm",
+      "kind": "function",
+      "submodule": "inverse_sparse",
+      "domain": "inverse",
+      "signature": "(evoked, forward, noise_cov, alpha='sure', loose='auto', depth=0.8, maxit=3000, tol=0.0001, active_set_size=10, debias=True, time_pca=True, weights=None, weights_min=0.0, solver='auto', n_mxne_iter=1, return_residual=False, return_as_dipoles=False, dgap_freq=10, rank=None, pick_ori=None, sure_alpha_grid='auto', random_state=None, verbose=None)",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.inverse_sparse.tf_mixed_norm",
+      "kind": "function",
+      "submodule": "inverse_sparse",
+      "domain": "inverse",
+      "signature": "(evoked, forward, noise_cov, loose='auto', depth=0.8, maxit=3000, tol=0.0001, weights=None, weights_min=0.0, pca=True, debias=True, wsize=64, tstep=4, window=0.02, return_residual=False, return_as_dipoles=False, alpha=None, l1_ratio=None, dgap_freq=10, rank=None, pick_ori=None, n_tfmxne_iter=1, verbose=None)",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.io.BaseRaw",
+      "kind": "class",
+      "submodule": "io",
+      "domain": "io",
+      "signature": "(info, preload=False, first_samps=(0,), last_samps=None, filenames=None, raw_extras=(None,), orig_format='double', dtype=<class 'numpy.float64'>, buffer_size_sec=1.0, orig_units=None, *, verbose=None)",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.io.Raw",
+      "kind": "class",
+      "submodule": "io",
+      "domain": "io",
+      "signature": "(fname, allow_maxshield=False, preload=False, on_split_missing='raise', verbose=None)",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.io.RawArray",
+      "kind": "class",
+      "submodule": "io",
+      "domain": "io",
+      "signature": "(data, info, first_samp=0, copy='auto', verbose=None)",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.io.anonymize_info",
+      "kind": "function",
+      "submodule": "io",
+      "domain": "io",
+      "signature": "(info, daysback=None, keep_his=False, verbose=None)",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.io.concatenate_raws",
+      "kind": "function",
+      "submodule": "io",
+      "domain": "io",
+      "signature": "(raws, preload=None, events_list=None, *, on_mismatch='raise', verbose=None)",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.io.get_channel_type_constants",
+      "kind": "function",
+      "submodule": "io",
+      "domain": "io",
+      "signature": "(include_defaults=False)",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.io.match_channel_orders",
+      "kind": "function",
+      "submodule": "io",
+      "domain": "io",
+      "signature": "(insts, copy=True)",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.io.read_epochs_eeglab",
+      "kind": "function",
+      "submodule": "io",
+      "domain": "io",
+      "signature": "(input_fname, events=None, event_id=None, eog=(), *, uint16_codec=None, montage_units='auto', verbose=None) -> 'EpochsEEGLAB'",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.io.read_epochs_fieldtrip",
+      "kind": "function",
+      "submodule": "io",
+      "domain": "io",
+      "signature": "(fname, info, data_name='data', trialinfo_column=0) -> mne.epochs.EpochsArray",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.io.read_epochs_kit",
+      "kind": "function",
+      "submodule": "io",
+      "domain": "io",
+      "signature": "(input_fname, events, event_id=None, mrk=None, elp=None, hsp=None, allow_unknown_format=False, standardize_names=False, verbose=None) -> mne.io.kit.kit.EpochsKIT",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.io.read_evoked_besa",
+      "kind": "function",
+      "submodule": "io",
+      "domain": "io",
+      "signature": "(fname, verbose=None)",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.io.read_evoked_fieldtrip",
+      "kind": "function",
+      "submodule": "io",
+      "domain": "io",
+      "signature": "(fname, info, comment=None, data_name='data')",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.io.read_evokeds_mff",
+      "kind": "function",
+      "submodule": "io",
+      "domain": "io",
+      "signature": "(fname, condition=None, channel_naming='E%d', baseline=None, verbose=None)",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.io.read_fiducials",
+      "kind": "function",
+      "submodule": "io",
+      "domain": "io",
+      "signature": "(fname, *, verbose=None)",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.io.read_info",
+      "kind": "function",
+      "submodule": "io",
+      "domain": "io",
+      "signature": "(fname, verbose=None)",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.io.read_raw",
+      "kind": "function",
+      "submodule": "io",
+      "domain": "io",
+      "signature": "(fname, *, preload=False, verbose=None, **kwargs) -> mne.io.base.BaseRaw",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.io.read_raw_ant",
+      "kind": "function",
+      "submodule": "io",
+      "domain": "io",
+      "signature": "(fname, eog=None, misc='BIP\\\\d+', bipolars=None, impedance_annotation='impedance', *, encoding: 'str' = 'latin-1', preload=False, verbose=None) -> 'RawANT'",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.io.read_raw_artemis123",
+      "kind": "function",
+      "submodule": "io",
+      "domain": "io",
+      "signature": "(input_fname, preload=False, verbose=None, pos_fname=None, add_head_trans=True) -> 'RawArtemis123'",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.io.read_raw_bdf",
+      "kind": "function",
+      "submodule": "io",
+      "domain": "io",
+      "signature": "(input_fname, eog=None, misc=None, stim_channel='auto', exclude=(), infer_types=False, include=None, preload=False, units=None, encoding='utf8', exclude_after_unique=False, *, verbose=None) -> mne.io.edf.edf.RawBDF",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.io.read_raw_boxy",
+      "kind": "function",
+      "submodule": "io",
+      "domain": "io",
+      "signature": "(fname, preload=False, verbose=None) -> 'RawBOXY'",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.io.read_raw_brainvision",
+      "kind": "function",
+      "submodule": "io",
+      "domain": "io",
+      "signature": "(vhdr_fname, eog=('HEOGL', 'HEOGR', 'VEOGb'), misc='auto', scale=1.0, ignore_marker_types=False, preload=False, verbose=None) -> mne.io.brainvision.brainvision.RawBrainVision",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.io.read_raw_bti",
+      "kind": "function",
+      "submodule": "io",
+      "domain": "io",
+      "signature": "(pdf_fname, config_fname='config', head_shape_fname='hs_file', rotation_x=0.0, translation=(0.0, 0.02, 0.11), convert=True, rename_channels=True, sort_by_ch_name=True, ecg_ch='E31', eog_ch=('E63', 'E64'), preload=False, verbose=None) -> mne.io.bti.bti.RawBTi",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.io.read_raw_cnt",
+      "kind": "function",
+      "submodule": "io",
+      "domain": "io",
+      "signature": "(input_fname, eog=(), misc=(), ecg=(), emg=(), data_format='auto', date_format='mm/dd/yy', *, header='auto', preload=False, verbose=None) -> 'RawCNT'",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.io.read_raw_ctf",
+      "kind": "function",
+      "submodule": "io",
+      "domain": "io",
+      "signature": "(directory, system_clock='truncate', preload=False, clean_names=False, verbose=None) -> 'RawCTF'",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.io.read_raw_curry",
+      "kind": "function",
+      "submodule": "io",
+      "domain": "io",
+      "signature": "(fname, preload=False, on_bad_hpi_match='warn', verbose=None) -> 'RawCurry'",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.io.read_raw_edf",
+      "kind": "function",
+      "submodule": "io",
+      "domain": "io",
+      "signature": "(input_fname, eog=None, misc=None, stim_channel='auto', exclude=(), infer_types=False, include=None, preload=False, units=None, encoding='utf8', exclude_after_unique=False, *, verbose=None) -> mne.io.edf.edf.RawEDF",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.io.read_raw_eeglab",
+      "kind": "function",
+      "submodule": "io",
+      "domain": "io",
+      "signature": "(input_fname, eog=(), preload=False, uint16_codec=None, montage_units='auto', verbose=None) -> 'RawEEGLAB'",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.io.read_raw_egi",
+      "kind": "function",
+      "submodule": "io",
+      "domain": "io",
+      "signature": "(input_fname, eog=None, misc=None, include=None, exclude=None, preload=False, channel_naming='E%d', *, events_as_annotations=True, verbose=None) -> 'RawEGI'",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.io.read_raw_eximia",
+      "kind": "function",
+      "submodule": "io",
+      "domain": "io",
+      "signature": "(fname, preload=False, verbose=None) -> 'RawEximia'",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.io.read_raw_eyelink",
+      "kind": "function",
+      "submodule": "io",
+      "domain": "io",
+      "signature": "(fname, *, create_annotations=True, apply_offsets=False, find_overlaps=False, overlap_threshold=0.05, verbose=None) -> 'RawEyelink'",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.io.read_raw_fieldtrip",
+      "kind": "function",
+      "submodule": "io",
+      "domain": "io",
+      "signature": "(fname, info, data_name='data') -> mne.io.array._array.RawArray",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.io.read_raw_fif",
+      "kind": "function",
+      "submodule": "io",
+      "domain": "io",
+      "signature": "(fname, allow_maxshield=False, preload=False, on_split_missing='raise', verbose=None) -> mne.io.fiff.raw.Raw",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.io.read_raw_fil",
+      "kind": "function",
+      "submodule": "io",
+      "domain": "io",
+      "signature": "(binfile, precision='single', preload=False, *, verbose=None) -> 'RawFIL'",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.io.read_raw_gdf",
+      "kind": "function",
+      "submodule": "io",
+      "domain": "io",
+      "signature": "(input_fname, eog=None, misc=None, stim_channel='auto', exclude=(), include=None, preload=False, verbose=None) -> mne.io.edf.edf.RawGDF",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.io.read_raw_hitachi",
+      "kind": "function",
+      "submodule": "io",
+      "domain": "io",
+      "signature": "(fname, preload=False, verbose=None) -> 'RawHitachi'",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.io.read_raw_kit",
+      "kind": "function",
+      "submodule": "io",
+      "domain": "io",
+      "signature": "(input_fname, mrk=None, elp=None, hsp=None, stim='>', slope='-', stimthresh=1, preload=False, stim_code='binary', allow_unknown_format=False, standardize_names=False, *, bad_coils=(), verbose=None) -> mne.io.kit.kit.RawKIT",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.io.read_raw_nedf",
+      "kind": "function",
+      "submodule": "io",
+      "domain": "io",
+      "signature": "(filename, preload=False, verbose=None) -> mne.io.nedf.nedf.RawNedf",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.io.read_raw_neuralynx",
+      "kind": "function",
+      "submodule": "io",
+      "domain": "io",
+      "signature": "(fname, *, preload=False, exclude_fname_patterns=None, verbose=None) -> 'RawNeuralynx'",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.io.read_raw_nicolet",
+      "kind": "function",
+      "submodule": "io",
+      "domain": "io",
+      "signature": "(input_fname, ch_type, eog=(), ecg=(), emg=(), misc=(), preload=False, verbose=None) -> 'RawNicolet'",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.io.read_raw_nihon",
+      "kind": "function",
+      "submodule": "io",
+      "domain": "io",
+      "signature": "(fname, preload=False, *, encoding='utf-8', verbose=None) -> 'RawNihon'",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.io.read_raw_nirx",
+      "kind": "function",
+      "submodule": "io",
+      "domain": "io",
+      "signature": "(fname, saturated='annotate', *, preload=False, encoding='latin-1', verbose=None) -> 'RawNIRX'",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.io.read_raw_nsx",
+      "kind": "function",
+      "submodule": "io",
+      "domain": "io",
+      "signature": "(input_fname, stim_channel=True, eog=None, misc=None, preload=False, *, verbose=None) -> 'RawNSX'",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.io.read_raw_persyst",
+      "kind": "function",
+      "submodule": "io",
+      "domain": "io",
+      "signature": "(fname, preload=False, verbose=None) -> 'RawPersyst'",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.io.read_raw_snirf",
+      "kind": "function",
+      "submodule": "io",
+      "domain": "io",
+      "signature": "(fname, optode_frame='unknown', *, sfreq=None, preload=False, verbose=None) -> 'RawSNIRF'",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.io.show_fiff",
+      "kind": "function",
+      "submodule": "io",
+      "domain": "io",
+      "signature": "(fname, indent='    ', read_limit=inf, max_str=30, output=<class 'str'>, tag=None, *, show_bytes=False, verbose=None)",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.io.write_fiducials",
+      "kind": "function",
+      "submodule": "io",
+      "domain": "io",
+      "signature": "(fname, pts, coord_frame='unknown', *, overwrite=False, verbose=None)",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.io.write_info",
+      "kind": "function",
+      "submodule": "io",
+      "domain": "io",
+      "signature": "(fname, info, *, data_type=None, reset_range=True, overwrite=False, verbose=None)",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.label_sign_flip",
+      "kind": "function",
+      "submodule": "(top-level)",
+      "domain": "core",
+      "signature": "(label, src)",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.labels_to_stc",
+      "kind": "function",
+      "submodule": "(top-level)",
+      "domain": "core",
+      "signature": "(labels, values, tmin=0, tstep=1, subject=None, src=None, verbose=None)",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.make_ad_hoc_cov",
+      "kind": "function",
+      "submodule": "(top-level)",
+      "domain": "cov",
+      "signature": "(info, std=None, *, verbose=None)",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.make_bem_model",
+      "kind": "function",
+      "submodule": "(top-level)",
+      "domain": "forward",
+      "signature": "(subject, ico=4, conductivity=(0.3, 0.006, 0.3), subjects_dir=None, verbose=None)",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.make_bem_solution",
+      "kind": "function",
+      "submodule": "(top-level)",
+      "domain": "forward",
+      "signature": "(surfs, *, solver='mne', verbose=None)",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.make_field_map",
+      "kind": "function",
+      "submodule": "(top-level)",
+      "domain": "forward",
+      "signature": "(evoked, trans='auto', subject=None, subjects_dir=None, ch_type=None, mode='fast', meg_surf='helmet', origin=None, n_jobs=None, *, upsampling=1, head_source=('bem', 'head'), verbose=None)",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.make_fixed_length_epochs",
+      "kind": "function",
+      "submodule": "(top-level)",
+      "domain": "epochs",
+      "signature": "(raw, duration=1.0, preload=False, reject_by_annotation=True, proj=True, overlap=0.0, id=1, verbose=None)",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.make_fixed_length_events",
+      "kind": "function",
+      "submodule": "(top-level)",
+      "domain": "epochs",
+      "signature": "(raw, id=1, start=0, stop=None, duration=1.0, first_samp=True, overlap=0.0)",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.make_forward_dipole",
+      "kind": "function",
+      "submodule": "(top-level)",
+      "domain": "forward",
+      "signature": "(dipole, bem, info, trans=None, n_jobs=None, *, on_inside='raise', verbose=None)",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.make_forward_solution",
+      "kind": "function",
+      "submodule": "(top-level)",
+      "domain": "forward",
+      "signature": "(info, trans, src, bem, meg=True, eeg=True, *, mindist=0.0, ignore_ref=False, n_jobs=None, on_inside='raise', verbose=None)",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.make_sphere_model",
+      "kind": "function",
+      "submodule": "(top-level)",
+      "domain": "forward",
+      "signature": "(r0=(0.0, 0.0, 0.04), head_radius=0.09, info=None, relative_radii=(0.9, 0.92, 0.97, 1.0), sigmas=(0.33, 1.0, 0.004, 0.33), verbose=None)",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.match_channel_orders",
+      "kind": "function",
+      "submodule": "(top-level)",
+      "domain": "io",
+      "signature": "(insts, copy=True)",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.merge_events",
+      "kind": "function",
+      "submodule": "(top-level)",
+      "domain": "epochs",
+      "signature": "(events, ids, new_id, replace_events=True)",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.minimum_norm.InverseOperator",
+      "kind": "class",
+      "submodule": "minimum_norm",
+      "domain": "inverse",
+      "signature": "",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.minimum_norm.apply_inverse",
+      "kind": "function",
+      "submodule": "minimum_norm",
+      "domain": "inverse",
+      "signature": "(evoked, inverse_operator, lambda2=0.1111111111111111, method='dSPM', pick_ori=None, prepared=False, label=None, method_params=None, return_residual=False, use_cps=True, verbose=None)",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.minimum_norm.apply_inverse_cov",
+      "kind": "function",
+      "submodule": "minimum_norm",
+      "domain": "inverse",
+      "signature": "(cov, info, inverse_operator, nave=1, lambda2=0.1111111111111111, method='dSPM', pick_ori=None, prepared=False, label=None, method_params=None, use_cps=True, verbose=None)",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.minimum_norm.apply_inverse_epochs",
+      "kind": "function",
+      "submodule": "minimum_norm",
+      "domain": "inverse",
+      "signature": "(epochs, inverse_operator, lambda2, method='dSPM', label=None, nave=1, pick_ori=None, return_generator=False, prepared=False, method_params=None, use_cps=True, verbose=None)",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.minimum_norm.apply_inverse_raw",
+      "kind": "function",
+      "submodule": "minimum_norm",
+      "domain": "inverse",
+      "signature": "(raw, inverse_operator, lambda2, method='dSPM', label=None, start=None, stop=None, nave=1, time_func=None, pick_ori=None, buffer_size=None, prepared=False, method_params=None, use_cps=True, verbose=None)",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.minimum_norm.apply_inverse_tfr_epochs",
+      "kind": "function",
+      "submodule": "minimum_norm",
+      "domain": "inverse",
+      "signature": "(epochs_tfr, inverse_operator, lambda2, method='dSPM', label=None, nave=1, pick_ori=None, return_generator=False, prepared=False, method_params=None, use_cps=True, verbose=None)",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.minimum_norm.compute_rank_inverse",
+      "kind": "function",
+      "submodule": "minimum_norm",
+      "domain": "inverse",
+      "signature": "(inv)",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.minimum_norm.compute_source_psd",
+      "kind": "function",
+      "submodule": "minimum_norm",
+      "domain": "inverse",
+      "signature": "(raw, inverse_operator, lambda2=0.1111111111111111, method='dSPM', tmin=0.0, tmax=None, fmin=0.0, fmax=200.0, n_fft=2048, overlap=0.5, pick_ori=None, label=None, nave=1, pca=True, prepared=False, method_params=None, inv_split=None, bandwidth='hann', adaptive=False, low_bias=False, n_jobs=None, return_sensor=False, dB=False, *, verbose=None)",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.minimum_norm.compute_source_psd_epochs",
+      "kind": "function",
+      "submodule": "minimum_norm",
+      "domain": "inverse",
+      "signature": "(epochs, inverse_operator, lambda2=0.1111111111111111, method='dSPM', fmin=0.0, fmax=200.0, pick_ori=None, label=None, nave=1, pca=True, inv_split=None, bandwidth=4.0, adaptive=False, low_bias=True, return_generator=False, n_jobs=None, prepared=False, method_params=None, return_sensor=False, use_cps=True, verbose=None)",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.minimum_norm.estimate_snr",
+      "kind": "function",
+      "submodule": "minimum_norm",
+      "domain": "inverse",
+      "signature": "(evoked, inv, verbose=None)",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.minimum_norm.get_cross_talk",
+      "kind": "function",
+      "submodule": "minimum_norm",
+      "domain": "inverse",
+      "signature": "(resmat, src, idx, mode=None, *, n_comp=1, norm=False, return_pca_vars=False, vector=False, verbose=None)",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.minimum_norm.get_point_spread",
+      "kind": "function",
+      "submodule": "minimum_norm",
+      "domain": "inverse",
+      "signature": "(resmat, src, idx, mode=None, *, n_comp=1, norm=False, return_pca_vars=False, vector=False, verbose=None)",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.minimum_norm.make_inverse_operator",
+      "kind": "function",
+      "submodule": "minimum_norm",
+      "domain": "inverse",
+      "signature": "(info, forward, noise_cov, loose='auto', depth=0.8, fixed='auto', rank=None, use_cps=True, verbose=None)",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.minimum_norm.make_inverse_resolution_matrix",
+      "kind": "function",
+      "submodule": "minimum_norm",
+      "domain": "inverse",
+      "signature": "(forward, inverse_operator, method='dSPM', lambda2=0.1111111111111111, verbose=None)",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.minimum_norm.prepare_inverse_operator",
+      "kind": "function",
+      "submodule": "minimum_norm",
+      "domain": "inverse",
+      "signature": "(orig, nave, lambda2, method='dSPM', method_params=None, copy=True, verbose=None)",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.minimum_norm.read_inverse_operator",
+      "kind": "function",
+      "submodule": "minimum_norm",
+      "domain": "inverse",
+      "signature": "(fname, *, verbose=None)",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.minimum_norm.resolution_metrics",
+      "kind": "function",
+      "submodule": "minimum_norm",
+      "domain": "inverse",
+      "signature": "(resmat, src, function='psf', metric='peak_err', threshold=0.5, verbose=None)",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.minimum_norm.source_band_induced_power",
+      "kind": "function",
+      "submodule": "minimum_norm",
+      "domain": "inverse",
+      "signature": "(epochs, inverse_operator, bands, label=None, lambda2=0.1111111111111111, method='dSPM', nave=1, n_cycles=5, df=1, use_fft=False, decim=1, baseline=None, baseline_mode='logratio', pca=True, n_jobs=None, prepared=False, method_params=None, use_cps=True, *, verbose=None)",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.minimum_norm.source_induced_power",
+      "kind": "function",
+      "submodule": "minimum_norm",
+      "domain": "inverse",
+      "signature": "(epochs, inverse_operator, freqs, label=None, lambda2=0.1111111111111111, method='dSPM', nave=1, n_cycles=5, decim=1, use_fft=False, pick_ori=None, baseline=None, baseline_mode='logratio', pca=True, n_jobs=None, *, return_plv=True, zero_mean=False, prepared=False, method_params=None, use_cps=True, verbose=None)",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.minimum_norm.write_inverse_operator",
+      "kind": "function",
+      "submodule": "minimum_norm",
+      "domain": "inverse",
+      "signature": "(fname, inv, *, overwrite=False, verbose=None)",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.morph_labels",
+      "kind": "function",
+      "submodule": "(top-level)",
+      "domain": "core",
+      "signature": "(labels, subject_to, subject_from=None, subjects_dir=None, surf_name='white', verbose=None)",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.morph_source_spaces",
+      "kind": "function",
+      "submodule": "(top-level)",
+      "domain": "source_space",
+      "signature": "(src_from, subject_to, surf='white', subject_from=None, subjects_dir=None, verbose=None)",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.open_docs",
+      "kind": "function",
+      "submodule": "(top-level)",
+      "domain": "core",
+      "signature": "(kind=None, version=None)",
+      "deprecated": false,
+      "excluded": true,
+      "exclusion_reason": "Python-ecosystem plumbing (config, logging, docs)"
+    },
+    {
+      "python": "mne.open_report",
+      "kind": "function",
+      "submodule": "(top-level)",
+      "domain": "viz",
+      "signature": "(fname, **params)",
+      "deprecated": false,
+      "excluded": true,
+      "exclusion_reason": "Python-ecosystem plumbing (config, logging, docs)"
+    },
+    {
+      "python": "mne.parse_config",
+      "kind": "function",
+      "submodule": "(top-level)",
+      "domain": "core",
+      "signature": "(fname)",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.pick_channels",
+      "kind": "function",
+      "submodule": "(top-level)",
+      "domain": "core",
+      "signature": "(ch_names, include, exclude=(), ordered=True, *, verbose=None)",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.pick_channels_cov",
+      "kind": "function",
+      "submodule": "(top-level)",
+      "domain": "core",
+      "signature": "(orig, include=(), exclude='bads', ordered=True, copy=True, *, verbose=None)",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.pick_channels_forward",
+      "kind": "function",
+      "submodule": "(top-level)",
+      "domain": "core",
+      "signature": "(orig, include=(), exclude=(), ordered=True, copy=True, *, verbose=None)",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.pick_channels_regexp",
+      "kind": "function",
+      "submodule": "(top-level)",
+      "domain": "core",
+      "signature": "(ch_names, regexp)",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.pick_events",
+      "kind": "function",
+      "submodule": "(top-level)",
+      "domain": "epochs",
+      "signature": "(events, include=None, exclude=None, step=False)",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.pick_info",
+      "kind": "function",
+      "submodule": "(top-level)",
+      "domain": "core",
+      "signature": "(info, sel=(), copy=True, verbose=None)",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.pick_types",
+      "kind": "function",
+      "submodule": "(top-level)",
+      "domain": "core",
+      "signature": "(info, meg=False, eeg=False, stim=False, eog=False, ecg=False, emg=False, ref_meg='auto', *, misc=False, resp=False, chpi=False, exci=False, ias=False, syst=False, seeg=False, dipole=False, gof=False, bio=False, ecog=False, fnirs=False, csd=False, dbs=False, temperature=False, gsr=False, eyetrack=False, include=(), exclude='bads', selection=None)",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.pick_types_forward",
+      "kind": "function",
+      "submodule": "(top-level)",
+      "domain": "core",
+      "signature": "(orig, meg=False, eeg=False, ref_meg=True, seeg=False, ecog=False, dbs=False, include=(), exclude=())",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.preprocessing.EOGRegression",
+      "kind": "class",
+      "submodule": "preprocessing",
+      "domain": "preprocessing",
+      "signature": "(picks=None, exclude='bads', picks_artifact='eog', proj=True)",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.preprocessing.ICA",
+      "kind": "class",
+      "submodule": "preprocessing",
+      "domain": "preprocessing",
+      "signature": "(n_components=None, *, noise_cov=None, random_state=None, method='fastica', fit_params=None, max_iter='auto', allow_ref_meg=False, verbose=None)",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.preprocessing.Xdawn",
+      "kind": "class",
+      "submodule": "preprocessing",
+      "domain": "preprocessing",
+      "signature": "(n_components=2, signal_cov=None, correct_overlap='auto', reg=None)",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.preprocessing.annotate_amplitude",
+      "kind": "function",
+      "submodule": "preprocessing",
+      "domain": "preprocessing",
+      "signature": "(raw, peak=None, flat=None, bad_percent=5, min_duration=0.005, picks=None, *, verbose=None)",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.preprocessing.annotate_break",
+      "kind": "function",
+      "submodule": "preprocessing",
+      "domain": "preprocessing",
+      "signature": "(raw, events=None, min_break_duration=15.0, t_start_after_previous=5.0, t_stop_before_next=5.0, ignore=('bad', 'edge'), *, verbose=None)",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.preprocessing.annotate_movement",
+      "kind": "function",
+      "submodule": "preprocessing",
+      "domain": "preprocessing",
+      "signature": "(raw, pos, rotation_velocity_limit=None, translation_velocity_limit=None, mean_distance_limit=None, use_dev_head_trans='average')",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.preprocessing.annotate_muscle_zscore",
+      "kind": "function",
+      "submodule": "preprocessing",
+      "domain": "preprocessing",
+      "signature": "(raw, threshold=4, ch_type=None, min_length_good=0.1, filter_freq=(110, 140), n_jobs=None, verbose=None)",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.preprocessing.annotate_nan",
+      "kind": "function",
+      "submodule": "preprocessing",
+      "domain": "preprocessing",
+      "signature": "(raw, *, verbose=None)",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.preprocessing.apply_pca_obs",
+      "kind": "function",
+      "submodule": "preprocessing",
+      "domain": "preprocessing",
+      "signature": "(raw: mne.io.fiff.raw.Raw, picks: list[str], *, qrs_times: numpy.ndarray, n_components: int = 4, n_jobs: int | None = None, copy: bool = True, verbose: bool | str | int | None = None) -> mne.io.fiff.raw.Raw",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.preprocessing.compute_average_dev_head_t",
+      "kind": "function",
+      "submodule": "preprocessing",
+      "domain": "preprocessing",
+      "signature": "(raw, pos, *, verbose=None)",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.preprocessing.compute_bridged_electrodes",
+      "kind": "function",
+      "submodule": "preprocessing",
+      "domain": "preprocessing",
+      "signature": "(inst, lm_cutoff=16, epoch_threshold=0.5, l_freq=0.5, h_freq=30, epoch_duration=2, bw_method=None, verbose=None)",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.preprocessing.compute_current_source_density",
+      "kind": "function",
+      "submodule": "preprocessing",
+      "domain": "preprocessing",
+      "signature": "(inst, sphere='auto', lambda2=1e-05, stiffness=4, n_legendre_terms=50, copy=True, *, verbose=None)",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.preprocessing.compute_fine_calibration",
+      "kind": "function",
+      "submodule": "preprocessing",
+      "domain": "preprocessing",
+      "signature": "(raw, n_imbalance=3, t_window=10.0, ext_order=2, origin=(0.0, 0.0, 0.0), cross_talk=None, calibration=None, *, angle_limit=5.0, err_limit=5.0, verbose=None)",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.preprocessing.compute_maxwell_basis",
+      "kind": "function",
+      "submodule": "preprocessing",
+      "domain": "preprocessing",
+      "signature": "(info, origin='auto', int_order=8, ext_order=3, calibration=None, coord_frame='head', regularize='in', ignore_ref=True, bad_condition='error', mag_scale=100.0, extended_proj=(), verbose=None)",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.preprocessing.compute_proj_ecg",
+      "kind": "function",
+      "submodule": "preprocessing",
+      "domain": "preprocessing",
+      "signature": "(raw, raw_event=None, tmin=-0.2, tmax=0.4, n_grad=2, n_mag=2, n_eeg=2, l_freq=1.0, h_freq=35.0, average=True, filter_length='10s', n_jobs=None, ch_name=None, reject={'grad': 2e-10, 'mag': 3e-12, 'eeg': 5e-05, 'eog': 0.00025}, flat=None, bads=(), avg_ref=False, no_proj=False, event_id=999, ecg_l_freq=5, ecg_h_freq=35, tstart=0.0, qrs_threshold='auto', filter_method='fir', iir_params=None, copy=True, return_drop_log=False, meg='separate', verbose=None)",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.preprocessing.compute_proj_eog",
+      "kind": "function",
+      "submodule": "preprocessing",
+      "domain": "preprocessing",
+      "signature": "(raw, raw_event=None, tmin=-0.2, tmax=0.2, n_grad=2, n_mag=2, n_eeg=2, l_freq=1.0, h_freq=35.0, average=True, filter_length='10s', n_jobs=None, reject={'grad': 2e-10, 'mag': 3e-12, 'eeg': 0.0005, 'eog': inf}, flat=None, bads=(), avg_ref=False, no_proj=False, event_id=998, eog_l_freq=1, eog_h_freq=10, tstart=0.0, filter_method='fir', iir_params=None, ch_name=None, copy=True, return_drop_log=False, meg='separate', verbose=None)",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.preprocessing.compute_proj_hfc",
+      "kind": "function",
+      "submodule": "preprocessing",
+      "domain": "preprocessing",
+      "signature": "(info, order=1, picks='meg', exclude='bads', *, accuracy='accurate', verbose=None)",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.preprocessing.corrmap",
+      "kind": "function",
+      "submodule": "preprocessing",
+      "domain": "preprocessing",
+      "signature": "(icas, template, threshold='auto', label=None, ch_type='eeg', *, sensors=True, show_names=False, contours=6, outlines='head', sphere=None, image_interp='cubic', extrapolate='auto', border='mean', cmap=None, plot=True, show=True, verbose=None)",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.preprocessing.cortical_signal_suppression",
+      "kind": "function",
+      "submodule": "preprocessing",
+      "domain": "preprocessing",
+      "signature": "(evoked, picks=None, mag_picks=None, grad_picks=None, n_proj=6, *, verbose=None)",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.preprocessing.create_ecg_epochs",
+      "kind": "function",
+      "submodule": "preprocessing",
+      "domain": "preprocessing",
+      "signature": "(raw, ch_name=None, event_id=999, picks=None, tmin=-0.5, tmax=0.5, l_freq=8, h_freq=16, reject=None, flat=None, baseline=None, preload=True, keep_ecg=False, reject_by_annotation=True, decim=1, verbose=None)",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.preprocessing.create_eog_epochs",
+      "kind": "function",
+      "submodule": "preprocessing",
+      "domain": "preprocessing",
+      "signature": "(raw, ch_name=None, event_id=998, picks=None, tmin=-0.5, tmax=0.5, l_freq=1, h_freq=10, reject=None, flat=None, baseline=None, preload=True, reject_by_annotation=True, thresh=None, decim=1, verbose=None)",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.preprocessing.equalize_bads",
+      "kind": "function",
+      "submodule": "preprocessing",
+      "domain": "preprocessing",
+      "signature": "(insts, interp_thresh=1.0, copy=True)",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.preprocessing.find_bad_channels_lof",
+      "kind": "function",
+      "submodule": "preprocessing",
+      "domain": "preprocessing",
+      "signature": "(raw, n_neighbors=20, *, picks=None, metric='euclidean', threshold=1.5, return_scores=False, verbose=None)",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.preprocessing.find_bad_channels_maxwell",
+      "kind": "function",
+      "submodule": "preprocessing",
+      "domain": "preprocessing",
+      "signature": "(raw, limit=7.0, duration=5.0, min_count=5, return_scores=False, origin='auto', int_order=8, ext_order=3, calibration=None, cross_talk=None, coord_frame='head', regularize='in', ignore_ref=False, bad_condition='error', head_pos=None, mag_scale=100.0, skip_by_annotation=('edge', 'bad_acq_skip'), h_freq=40.0, extended_proj=(), mc_interp='hann', verbose=None)",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.preprocessing.find_ecg_events",
+      "kind": "function",
+      "submodule": "preprocessing",
+      "domain": "preprocessing",
+      "signature": "(raw, event_id=999, ch_name=None, tstart=0.0, l_freq=5, h_freq=35, qrs_threshold='auto', filter_length='10s', return_ecg=False, reject_by_annotation=True, verbose=None)",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.preprocessing.find_eog_events",
+      "kind": "function",
+      "submodule": "preprocessing",
+      "domain": "preprocessing",
+      "signature": "(raw, event_id=998, l_freq=1, h_freq=10, filter_length='10s', ch_name=None, tstart=0, reject_by_annotation=False, thresh=None, verbose=None)",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.preprocessing.fix_stim_artifact",
+      "kind": "function",
+      "submodule": "preprocessing",
+      "domain": "preprocessing",
+      "signature": "(inst, events=None, event_id=None, tmin=0.0, tmax=0.01, *, baseline=None, mode='linear', stim_channel=None, picks=None)",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.preprocessing.get_score_funcs",
+      "kind": "function",
+      "submodule": "preprocessing",
+      "domain": "preprocessing",
+      "signature": "()",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.preprocessing.ica_find_ecg_events",
+      "kind": "function",
+      "submodule": "preprocessing",
+      "domain": "preprocessing",
+      "signature": "(raw, ecg_source, event_id=999, tstart=0.0, l_freq=5, h_freq=35, qrs_threshold='auto', verbose=None)",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.preprocessing.ica_find_eog_events",
+      "kind": "function",
+      "submodule": "preprocessing",
+      "domain": "preprocessing",
+      "signature": "(raw, eog_source=None, event_id=998, l_freq=1, h_freq=10, verbose=None)",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.preprocessing.infomax",
+      "kind": "function",
+      "submodule": "preprocessing",
+      "domain": "preprocessing",
+      "signature": "(data, weights=None, l_rate=None, block=None, w_change=1e-12, anneal_deg=60.0, anneal_step=0.9, extended=True, n_subgauss=1, kurt_size=6000, ext_blocks=1, max_iter=200, random_state=None, blowup=10000.0, blowup_fac=0.5, n_small_angle=20, use_bias=True, verbose=None, return_n_iter=False)",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.preprocessing.interpolate_bridged_electrodes",
+      "kind": "function",
+      "submodule": "preprocessing",
+      "domain": "preprocessing",
+      "signature": "(inst, bridged_idx, bad_limit=4)",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.preprocessing.maxwell_filter",
+      "kind": "function",
+      "submodule": "preprocessing",
+      "domain": "preprocessing",
+      "signature": "(raw, origin='auto', int_order=8, ext_order=3, calibration=None, cross_talk=None, st_duration=None, st_correlation=0.98, coord_frame='head', destination=None, regularize='in', ignore_ref=False, bad_condition='error', head_pos=None, st_fixed=True, st_only=False, mag_scale=100.0, skip_by_annotation=('edge', 'bad_acq_skip'), extended_proj=(), st_overlap=True, mc_interp='hann', verbose=None)",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.preprocessing.maxwell_filter_prepare_emptyroom",
+      "kind": "function",
+      "submodule": "preprocessing",
+      "domain": "preprocessing",
+      "signature": "(raw_er, *, raw, bads='from_raw', annotations='from_raw', meas_date='keep', emit_warning=False, verbose=None)",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.preprocessing.oversampled_temporal_projection",
+      "kind": "function",
+      "submodule": "preprocessing",
+      "domain": "preprocessing",
+      "signature": "(raw, duration=10.0, picks=None, verbose=None)",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.preprocessing.peak_finder",
+      "kind": "function",
+      "submodule": "preprocessing",
+      "domain": "preprocessing",
+      "signature": "(x0, thresh=None, extrema=1, verbose=None)",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.preprocessing.read_eog_regression",
+      "kind": "function",
+      "submodule": "preprocessing",
+      "domain": "preprocessing",
+      "signature": "(fname)",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.preprocessing.read_fine_calibration",
+      "kind": "function",
+      "submodule": "preprocessing",
+      "domain": "preprocessing",
+      "signature": "(fname)",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.preprocessing.read_ica",
+      "kind": "function",
+      "submodule": "preprocessing",
+      "domain": "preprocessing",
+      "signature": "(fname, verbose=None)",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.preprocessing.read_ica_eeglab",
+      "kind": "function",
+      "submodule": "preprocessing",
+      "domain": "preprocessing",
+      "signature": "(fname, *, montage_units='auto', verbose=None)",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.preprocessing.realign_raw",
+      "kind": "function",
+      "submodule": "preprocessing",
+      "domain": "preprocessing",
+      "signature": "(raw, other, t_raw, t_other, *, verbose=None)",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.preprocessing.regress_artifact",
+      "kind": "function",
+      "submodule": "preprocessing",
+      "domain": "preprocessing",
+      "signature": "(inst, picks=None, *, exclude='bads', picks_artifact='eog', betas=None, proj=True, copy=True, verbose=None)",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.preprocessing.write_fine_calibration",
+      "kind": "function",
+      "submodule": "preprocessing",
+      "domain": "preprocessing",
+      "signature": "(fname, calibration)",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.random_parcellation",
+      "kind": "function",
+      "submodule": "(top-level)",
+      "domain": "core",
+      "signature": "(subject, n_parcel, hemi, subjects_dir=None, surface='white', random_state=None)",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.read_annotations",
+      "kind": "function",
+      "submodule": "(top-level)",
+      "domain": "core",
+      "signature": "(fname, sfreq='auto', uint16_codec=None, encoding='utf8', ignore_marker_types=False) -> mne.annotations.Annotations",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.read_bem_solution",
+      "kind": "function",
+      "submodule": "(top-level)",
+      "domain": "forward",
+      "signature": "(fname, *, verbose=None)",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.read_bem_surfaces",
+      "kind": "function",
+      "submodule": "(top-level)",
+      "domain": "forward",
+      "signature": "(fname, patch_stats=False, s_id=None, on_defects='raise', verbose=None)",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.read_cov",
+      "kind": "function",
+      "submodule": "(top-level)",
+      "domain": "cov",
+      "signature": "(fname, verbose=None)",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.read_dipole",
+      "kind": "function",
+      "submodule": "(top-level)",
+      "domain": "inverse",
+      "signature": "(fname, verbose=None)",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.read_epochs",
+      "kind": "function",
+      "submodule": "(top-level)",
+      "domain": "epochs",
+      "signature": "(fname, proj=True, preload=True, verbose=None) -> 'EpochsFIF'",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.read_epochs_eeglab",
+      "kind": "function",
+      "submodule": "(top-level)",
+      "domain": "io",
+      "signature": "(input_fname, events=None, event_id=None, eog=(), *, uint16_codec=None, montage_units='auto', verbose=None) -> 'EpochsEEGLAB'",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.read_epochs_fieldtrip",
+      "kind": "function",
+      "submodule": "(top-level)",
+      "domain": "io",
+      "signature": "(fname, info, data_name='data', trialinfo_column=0) -> mne.epochs.EpochsArray",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.read_epochs_kit",
+      "kind": "function",
+      "submodule": "(top-level)",
+      "domain": "io",
+      "signature": "(input_fname, events, event_id=None, mrk=None, elp=None, hsp=None, allow_unknown_format=False, standardize_names=False, verbose=None) -> mne.io.kit.kit.EpochsKIT",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.read_events",
+      "kind": "function",
+      "submodule": "(top-level)",
+      "domain": "epochs",
+      "signature": "(filename, include=None, exclude=None, mask=None, mask_type='and', return_event_id=False, verbose=None)",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.read_evoked_besa",
+      "kind": "function",
+      "submodule": "(top-level)",
+      "domain": "io",
+      "signature": "(fname, verbose=None)",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.read_evoked_fieldtrip",
+      "kind": "function",
+      "submodule": "(top-level)",
+      "domain": "io",
+      "signature": "(fname, info, comment=None, data_name='data')",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.read_evokeds",
+      "kind": "function",
+      "submodule": "(top-level)",
+      "domain": "core",
+      "signature": "(fname, condition=None, baseline=None, kind='average', proj=True, allow_maxshield=False, verbose=None) -> 'list[Evoked] | Evoked'",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.read_evokeds_mff",
+      "kind": "function",
+      "submodule": "(top-level)",
+      "domain": "io",
+      "signature": "(fname, condition=None, channel_naming='E%d', baseline=None, verbose=None)",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.read_forward_solution",
+      "kind": "function",
+      "submodule": "(top-level)",
+      "domain": "forward",
+      "signature": "(fname, include=(), exclude=(), *, ordered=True, verbose=None)",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.read_freesurfer_lut",
+      "kind": "function",
+      "submodule": "(top-level)",
+      "domain": "core",
+      "signature": "(fname=None)",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.read_label",
+      "kind": "function",
+      "submodule": "(top-level)",
+      "domain": "core",
+      "signature": "(filename, subject=None, color=None, *, verbose=None)",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.read_labels_from_annot",
+      "kind": "function",
+      "submodule": "(top-level)",
+      "domain": "core",
+      "signature": "(subject, parc='aparc', hemi='both', surf_name='white', annot_fname=None, regexp=None, subjects_dir=None, sort=True, verbose=None)",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.read_lta",
+      "kind": "function",
+      "submodule": "(top-level)",
+      "domain": "core",
+      "signature": "(fname, verbose=None)",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.read_morph_map",
+      "kind": "function",
+      "submodule": "(top-level)",
+      "domain": "core",
+      "signature": "(subject_from, subject_to, subjects_dir=None, xhemi=False, verbose=None)",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.read_proj",
+      "kind": "function",
+      "submodule": "(top-level)",
+      "domain": "core",
+      "signature": "(fname, *, verbose=None)",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.read_reject_parameters",
+      "kind": "function",
+      "submodule": "(top-level)",
+      "domain": "core",
+      "signature": "(fname)",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.read_source_estimate",
+      "kind": "function",
+      "submodule": "(top-level)",
+      "domain": "inverse",
+      "signature": "(fname, subject=None)",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.read_source_morph",
+      "kind": "function",
+      "submodule": "(top-level)",
+      "domain": "source_space",
+      "signature": "(fname)",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.read_source_spaces",
+      "kind": "function",
+      "submodule": "(top-level)",
+      "domain": "source_space",
+      "signature": "(fname, patch_stats=False, verbose=None)",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.read_surface",
+      "kind": "function",
+      "submodule": "(top-level)",
+      "domain": "source_space",
+      "signature": "(fname, read_metadata=False, return_dict=False, file_format='auto', verbose=None)",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.read_talxfm",
+      "kind": "function",
+      "submodule": "(top-level)",
+      "domain": "core",
+      "signature": "(subject, subjects_dir=None, verbose=None)",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.read_trans",
+      "kind": "function",
+      "submodule": "(top-level)",
+      "domain": "core",
+      "signature": "(fname, return_all=False, verbose=None)",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.read_tri",
+      "kind": "function",
+      "submodule": "(top-level)",
+      "domain": "source_space",
+      "signature": "(fname_in, swap=False, verbose=None)",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.read_vectorview_selection",
+      "kind": "function",
+      "submodule": "(top-level)",
+      "domain": "channels",
+      "signature": "(name, fname=None, info=None, verbose=None)",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.rename_channels",
+      "kind": "function",
+      "submodule": "(top-level)",
+      "domain": "channels",
+      "signature": "(info, mapping, allow_duplicates=False, *, on_missing='raise', verbose=None)",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.scale_bem",
+      "kind": "function",
+      "submodule": "(top-level)",
+      "domain": "channels",
+      "signature": "(subject_to, bem_name, subject_from=None, scale=None, subjects_dir=None, *, on_defects='raise', verbose=None)",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.scale_labels",
+      "kind": "function",
+      "submodule": "(top-level)",
+      "domain": "channels",
+      "signature": "(subject_to, pattern=None, overwrite=False, subject_from=None, scale=None, subjects_dir=None)",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.scale_mri",
+      "kind": "function",
+      "submodule": "(top-level)",
+      "domain": "channels",
+      "signature": "(subject_from, subject_to, scale, overwrite=False, subjects_dir=None, skip_fiducials=False, labels=True, annot=False, *, on_defects='raise', verbose=None)",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.scale_source_space",
+      "kind": "function",
+      "submodule": "(top-level)",
+      "domain": "channels",
+      "signature": "(subject_to, src_name, subject_from=None, scale=None, subjects_dir=None, n_jobs=None, verbose=None)",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.sensitivity_map",
+      "kind": "function",
+      "submodule": "(top-level)",
+      "domain": "core",
+      "signature": "(fwd, projs=None, ch_type='grad', mode='fixed', exclude=(), *, verbose=None)",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.set_bipolar_reference",
+      "kind": "function",
+      "submodule": "(top-level)",
+      "domain": "core",
+      "signature": "(inst, anode, cathode, ch_name=None, ch_info=None, drop_refs=True, copy=True, on_bad='warn', verbose=None)",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.set_cache_dir",
+      "kind": "function",
+      "submodule": "(top-level)",
+      "domain": "core",
+      "signature": "(cache_dir)",
+      "deprecated": false,
+      "excluded": true,
+      "exclusion_reason": "Python-ecosystem plumbing (config, logging, docs)"
+    },
+    {
+      "python": "mne.set_config",
+      "kind": "function",
+      "submodule": "(top-level)",
+      "domain": "core",
+      "signature": "(key, value, home_dir=None, set_env=True)",
+      "deprecated": false,
+      "excluded": true,
+      "exclusion_reason": "Python-ecosystem plumbing (config, logging, docs)"
+    },
+    {
+      "python": "mne.set_eeg_reference",
+      "kind": "function",
+      "submodule": "(top-level)",
+      "domain": "core",
+      "signature": "(inst, ref_channels='average', copy=True, projection=False, ch_type='auto', forward=None, *, joint=False, verbose=None)",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.set_log_file",
+      "kind": "function",
+      "submodule": "(top-level)",
+      "domain": "core",
+      "signature": "(fname=None, output_format='%(message)s', overwrite=None)",
+      "deprecated": false,
+      "excluded": true,
+      "exclusion_reason": "Python-ecosystem plumbing (config, logging, docs)"
+    },
+    {
+      "python": "mne.set_log_level",
+      "kind": "function",
+      "submodule": "(top-level)",
+      "domain": "core",
+      "signature": "(verbose=None, return_old_level=False, add_frames=None)",
+      "deprecated": false,
+      "excluded": true,
+      "exclusion_reason": "Python-ecosystem plumbing (config, logging, docs)"
+    },
+    {
+      "python": "mne.set_memmap_min_size",
+      "kind": "function",
+      "submodule": "(top-level)",
+      "domain": "core",
+      "signature": "(memmap_min_size)",
+      "deprecated": false,
+      "excluded": true,
+      "exclusion_reason": "Python-ecosystem plumbing (config, logging, docs)"
+    },
+    {
+      "python": "mne.setup_source_space",
+      "kind": "function",
+      "submodule": "(top-level)",
+      "domain": "source_space",
+      "signature": "(subject, spacing='oct6', surface='white', subjects_dir=None, add_dist=True, n_jobs=None, *, verbose=None)",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.setup_volume_source_space",
+      "kind": "function",
+      "submodule": "(top-level)",
+      "domain": "source_space",
+      "signature": "(subject=None, pos=5.0, mri=None, sphere=None, bem=None, surface=None, mindist=5.0, exclude=0.0, subjects_dir=None, volume_label=None, add_interpolator=True, sphere_units='m', single_volume=False, *, n_jobs=None, verbose=None)",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.simulation.SourceSimulator",
+      "kind": "class",
+      "submodule": "simulation",
+      "domain": "simulation",
+      "signature": "(src, tstep=0.001, duration=None, first_samp=0)",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.simulation.add_chpi",
+      "kind": "function",
+      "submodule": "simulation",
+      "domain": "simulation",
+      "signature": "(raw, head_pos=None, interp='cos2', n_jobs=None, verbose=None)",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.simulation.add_ecg",
+      "kind": "function",
+      "submodule": "simulation",
+      "domain": "simulation",
+      "signature": "(raw, head_pos=None, interp='cos2', n_jobs=None, random_state=None, verbose=None)",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.simulation.add_eog",
+      "kind": "function",
+      "submodule": "simulation",
+      "domain": "simulation",
+      "signature": "(raw, head_pos=None, interp='cos2', n_jobs=None, random_state=None, verbose=None)",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.simulation.add_noise",
+      "kind": "function",
+      "submodule": "simulation",
+      "domain": "simulation",
+      "signature": "(inst, cov, iir_filter=None, random_state=None, verbose=None)",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.simulation.select_source_in_label",
+      "kind": "function",
+      "submodule": "simulation",
+      "domain": "simulation",
+      "signature": "(src, label, random_state=None, location='random', subject=None, subjects_dir=None, surf='sphere')",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.simulation.simulate_evoked",
+      "kind": "function",
+      "submodule": "simulation",
+      "domain": "simulation",
+      "signature": "(fwd, stc, info, cov=None, nave=30, iir_filter=None, random_state=None, use_cps=True, verbose=None)",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.simulation.simulate_raw",
+      "kind": "function",
+      "submodule": "simulation",
+      "domain": "simulation",
+      "signature": "(info, stc=None, trans=None, src=None, bem=None, head_pos=None, mindist=1.0, interp='cos2', n_jobs=None, use_cps=True, forward=None, first_samp=0, max_iter=10000, verbose=None)",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.simulation.simulate_sparse_stc",
+      "kind": "function",
+      "submodule": "simulation",
+      "domain": "simulation",
+      "signature": "(src, n_dipoles, times, data_fun=<function <lambda>>, labels=None, random_state=None, location='random', subject=None, subjects_dir=None, surf='sphere')",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.simulation.simulate_stc",
+      "kind": "function",
+      "submodule": "simulation",
+      "domain": "simulation",
+      "signature": "(src, labels, stc_data, tmin, tstep, value_fun=None, allow_overlap=False)",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.source_space.SourceSpaces",
+      "kind": "class",
+      "submodule": "source_space",
+      "domain": "source_space",
+      "signature": "(source_spaces, info=None)",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.source_space.add_source_space_distances",
+      "kind": "function",
+      "submodule": "source_space",
+      "domain": "source_space",
+      "signature": "(src, dist_limit=inf, n_jobs=None, *, verbose=None)",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.source_space.compute_distance_to_sensors",
+      "kind": "function",
+      "submodule": "source_space",
+      "domain": "source_space",
+      "signature": "(src, info, picks=None, trans=None, verbose=None)",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.source_space.get_decimated_surfaces",
+      "kind": "function",
+      "submodule": "source_space",
+      "domain": "source_space",
+      "signature": "(src)",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.source_space.read_source_spaces",
+      "kind": "function",
+      "submodule": "source_space",
+      "domain": "source_space",
+      "signature": "(fname, patch_stats=False, verbose=None)",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.source_space.setup_source_space",
+      "kind": "function",
+      "submodule": "source_space",
+      "domain": "source_space",
+      "signature": "(subject, spacing='oct6', surface='white', subjects_dir=None, add_dist=True, n_jobs=None, *, verbose=None)",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.source_space.setup_volume_source_space",
+      "kind": "function",
+      "submodule": "source_space",
+      "domain": "source_space",
+      "signature": "(subject=None, pos=5.0, mri=None, sphere=None, bem=None, surface=None, mindist=5.0, exclude=0.0, subjects_dir=None, volume_label=None, add_interpolator=True, sphere_units='m', single_volume=False, *, n_jobs=None, verbose=None)",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.source_space.write_source_spaces",
+      "kind": "function",
+      "submodule": "source_space",
+      "domain": "source_space",
+      "signature": "(fname, src, *, overwrite=False, verbose=None)",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.spatial_dist_adjacency",
+      "kind": "function",
+      "submodule": "(top-level)",
+      "domain": "inverse",
+      "signature": "(src, dist, verbose=None)",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.spatial_inter_hemi_adjacency",
+      "kind": "function",
+      "submodule": "(top-level)",
+      "domain": "inverse",
+      "signature": "(src, dist, verbose=None)",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.spatial_src_adjacency",
+      "kind": "function",
+      "submodule": "(top-level)",
+      "domain": "inverse",
+      "signature": "(src, dist=None, verbose=None)",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.spatial_tris_adjacency",
+      "kind": "function",
+      "submodule": "(top-level)",
+      "domain": "inverse",
+      "signature": "(tris, remap_vertices=False, verbose=None)",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.spatio_temporal_dist_adjacency",
+      "kind": "function",
+      "submodule": "(top-level)",
+      "domain": "inverse",
+      "signature": "(src, n_times, dist, verbose=None)",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.spatio_temporal_src_adjacency",
+      "kind": "function",
+      "submodule": "(top-level)",
+      "domain": "inverse",
+      "signature": "(src, n_times, dist=None, verbose=None)",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.spatio_temporal_tris_adjacency",
+      "kind": "function",
+      "submodule": "(top-level)",
+      "domain": "inverse",
+      "signature": "(tris, n_times, remap_vertices=False, verbose=None)",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.split_label",
+      "kind": "function",
+      "submodule": "(top-level)",
+      "domain": "core",
+      "signature": "(label, parts=2, subject=None, subjects_dir=None, freesurfer=False)",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.stats.bonferroni_correction",
+      "kind": "function",
+      "submodule": "stats",
+      "domain": "stats",
+      "signature": "(pval, alpha=0.05)",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.stats.bootstrap_confidence_interval",
+      "kind": "function",
+      "submodule": "stats",
+      "domain": "stats",
+      "signature": "(arr, ci=0.95, n_bootstraps=2000, stat_fun='mean', random_state=None)",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.stats.combine_adjacency",
+      "kind": "function",
+      "submodule": "stats",
+      "domain": "stats",
+      "signature": "(*structure)",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.stats.f_mway_rm",
+      "kind": "function",
+      "submodule": "stats",
+      "domain": "stats",
+      "signature": "(data, factor_levels, effects='all', correction=False, return_pvals=True)",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.stats.f_oneway",
+      "kind": "function",
+      "submodule": "stats",
+      "domain": "stats",
+      "signature": "(*args)",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.stats.f_threshold_mway_rm",
+      "kind": "function",
+      "submodule": "stats",
+      "domain": "stats",
+      "signature": "(n_subjects, factor_levels, effects='A*B', pvalue=0.05)",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.stats.fdr_correction",
+      "kind": "function",
+      "submodule": "stats",
+      "domain": "stats",
+      "signature": "(pvals, alpha=0.05, method='indep')",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.stats.linear_regression",
+      "kind": "function",
+      "submodule": "stats",
+      "domain": "stats",
+      "signature": "(inst, design_matrix, names=None)",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.stats.linear_regression_raw",
+      "kind": "function",
+      "submodule": "stats",
+      "domain": "stats",
+      "signature": "(raw, events, event_id=None, tmin=-0.1, tmax=1, covariates=None, reject=None, flat=None, tstep=1.0, decim=1, picks=None, solver='cholesky')",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.stats.permutation_cluster_1samp_test",
+      "kind": "function",
+      "submodule": "stats",
+      "domain": "stats",
+      "signature": "(X, threshold=None, n_permutations=1024, tail=0, stat_fun=None, adjacency=None, n_jobs=None, seed=None, max_step=1, exclude=None, step_down_p=0, t_power=1, out_type='indices', check_disjoint=False, buffer_size=1000, verbose=None)",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.stats.permutation_cluster_test",
+      "kind": "function",
+      "submodule": "stats",
+      "domain": "stats",
+      "signature": "(X, threshold=None, n_permutations=1024, tail=0, stat_fun=None, adjacency=None, n_jobs=None, seed=None, max_step=1, exclude=None, step_down_p=0, t_power=1, out_type='indices', check_disjoint=False, buffer_size=1000, verbose=None)",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.stats.permutation_t_test",
+      "kind": "function",
+      "submodule": "stats",
+      "domain": "stats",
+      "signature": "(X, n_permutations=10000, tail=0, n_jobs=None, seed=None, verbose=None)",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.stats.spatio_temporal_cluster_1samp_test",
+      "kind": "function",
+      "submodule": "stats",
+      "domain": "stats",
+      "signature": "(X, threshold=None, n_permutations=1024, tail=0, stat_fun=None, adjacency=None, n_jobs=None, seed=None, max_step=1, spatial_exclude=None, step_down_p=0, t_power=1, out_type='indices', check_disjoint=False, buffer_size=1000, verbose=None)",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.stats.spatio_temporal_cluster_test",
+      "kind": "function",
+      "submodule": "stats",
+      "domain": "stats",
+      "signature": "(X, threshold=None, n_permutations=1024, tail=0, stat_fun=None, adjacency=None, n_jobs=None, seed=None, max_step=1, spatial_exclude=None, step_down_p=0, t_power=1, out_type='indices', check_disjoint=False, buffer_size=1000, verbose=None)",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.stats.summarize_clusters_stc",
+      "kind": "function",
+      "submodule": "stats",
+      "domain": "stats",
+      "signature": "(clu, p_thresh=0.05, tstep=1.0, tmin=0, subject='fsaverage', vertices=None)",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.stats.ttest_1samp_no_p",
+      "kind": "function",
+      "submodule": "stats",
+      "domain": "stats",
+      "signature": "(X, sigma=0, method='relative')",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.stats.ttest_ind_no_p",
+      "kind": "function",
+      "submodule": "stats",
+      "domain": "stats",
+      "signature": "(a, b, equal_var=True, sigma=0.0)",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.stc_near_sensors",
+      "kind": "function",
+      "submodule": "(top-level)",
+      "domain": "inverse",
+      "signature": "(evoked, trans, subject, distance=0.01, mode='sum', project=True, subjects_dir=None, src=None, picks=None, surface='auto', verbose=None)",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.stc_to_label",
+      "kind": "function",
+      "submodule": "(top-level)",
+      "domain": "core",
+      "signature": "(stc, src=None, smooth=True, connected=False, subjects_dir=None, verbose=None)",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.sys_info",
+      "kind": "function",
+      "submodule": "(top-level)",
+      "domain": "core",
+      "signature": "(fid=None, show_paths=False, *, dependencies='user', unicode='auto', check_version=True)",
+      "deprecated": false,
+      "excluded": true,
+      "exclusion_reason": "Python-ecosystem plumbing (config, logging, docs)"
+    },
+    {
+      "python": "mne.time_frequency.AverageTFR",
+      "kind": "class",
+      "submodule": "time_frequency",
+      "domain": "time_frequency",
+      "signature": "(*, inst=None, freqs=None, method=None, tmin=None, tmax=None, picks=None, proj=False, decim=1, comment=None, n_jobs=None, verbose=None, **method_kw)",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.time_frequency.AverageTFRArray",
+      "kind": "class",
+      "submodule": "time_frequency",
+      "domain": "time_frequency",
+      "signature": "(info, data, times, freqs, *, nave=None, comment=None, method=None, weights=None)",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.time_frequency.BaseTFR",
+      "kind": "class",
+      "submodule": "time_frequency",
+      "domain": "time_frequency",
+      "signature": "(inst, method, freqs, tmin, tmax, picks, proj, *, decim, n_jobs, reject_by_annotation=None, verbose=None, **method_kw)",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.time_frequency.CrossSpectralDensity",
+      "kind": "class",
+      "submodule": "time_frequency",
+      "domain": "time_frequency",
+      "signature": "(data, ch_names, frequencies, n_fft, tmin=None, tmax=None, projs=None)",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.time_frequency.EpochsSpectrum",
+      "kind": "class",
+      "submodule": "time_frequency",
+      "domain": "time_frequency",
+      "signature": "(inst, method, fmin, fmax, tmin, tmax, picks, exclude, proj, remove_dc, *, n_jobs, verbose=None, **method_kw)",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.time_frequency.EpochsSpectrumArray",
+      "kind": "class",
+      "submodule": "time_frequency",
+      "domain": "time_frequency",
+      "signature": "(data, info, freqs, events=None, event_id=None, dim_names=('epoch', 'channel', 'freq'), weights=None, *, verbose=None)",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.time_frequency.EpochsTFR",
+      "kind": "class",
+      "submodule": "time_frequency",
+      "domain": "time_frequency",
+      "signature": "(*, inst=None, freqs=None, method=None, tmin=None, tmax=None, picks=None, proj=False, decim=1, n_jobs=None, verbose=None, **method_kw)",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.time_frequency.EpochsTFRArray",
+      "kind": "class",
+      "submodule": "time_frequency",
+      "domain": "time_frequency",
+      "signature": "(info, data, times, freqs, *, comment=None, method=None, events=None, event_id=None, selection=None, drop_log=None, metadata=None, weights=None)",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.time_frequency.RawTFR",
+      "kind": "class",
+      "submodule": "time_frequency",
+      "domain": "time_frequency",
+      "signature": "(inst, method=None, freqs=None, *, tmin=None, tmax=None, picks=None, proj=False, reject_by_annotation=False, decim=1, n_jobs=None, verbose=None, **method_kw)",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.time_frequency.RawTFRArray",
+      "kind": "class",
+      "submodule": "time_frequency",
+      "domain": "time_frequency",
+      "signature": "(info, data, times, freqs, *, method=None, weights=None)",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.time_frequency.Spectrum",
+      "kind": "class",
+      "submodule": "time_frequency",
+      "domain": "time_frequency",
+      "signature": "(inst, method, fmin, fmax, tmin, tmax, picks, exclude, proj, remove_dc, reject_by_annotation, *, n_jobs, verbose=None, **method_kw)",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.time_frequency.SpectrumArray",
+      "kind": "class",
+      "submodule": "time_frequency",
+      "domain": "time_frequency",
+      "signature": "(data, info, freqs, dim_names=('channel', 'freq'), weights=None, *, verbose=None)",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.time_frequency.combine_spectrum",
+      "kind": "function",
+      "submodule": "time_frequency",
+      "domain": "time_frequency",
+      "signature": "(all_spectrum, weights='nave')",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.time_frequency.combine_tfr",
+      "kind": "function",
+      "submodule": "time_frequency",
+      "domain": "time_frequency",
+      "signature": "(all_tfr, weights='nave')",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.time_frequency.csd_array_fourier",
+      "kind": "function",
+      "submodule": "time_frequency",
+      "domain": "time_frequency",
+      "signature": "(X, sfreq, t0=0, fmin=0, fmax=inf, tmin=None, tmax=None, ch_names=None, n_fft=None, projs=None, n_jobs=None, *, verbose=None)",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.time_frequency.csd_array_morlet",
+      "kind": "function",
+      "submodule": "time_frequency",
+      "domain": "time_frequency",
+      "signature": "(X, sfreq, frequencies, t0=0, tmin=None, tmax=None, ch_names=None, n_cycles=7, use_fft=True, decim=1, projs=None, n_jobs=None, *, verbose=None)",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.time_frequency.csd_array_multitaper",
+      "kind": "function",
+      "submodule": "time_frequency",
+      "domain": "time_frequency",
+      "signature": "(X, sfreq, t0=0, fmin=0, fmax=inf, tmin=None, tmax=None, ch_names=None, n_fft=None, bandwidth=None, adaptive=False, low_bias=True, projs=None, n_jobs=None, max_iter=250, *, verbose=None)",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.time_frequency.csd_fourier",
+      "kind": "function",
+      "submodule": "time_frequency",
+      "domain": "time_frequency",
+      "signature": "(epochs, fmin=0, fmax=inf, tmin=None, tmax=None, picks=None, n_fft=None, projs=None, n_jobs=None, *, verbose=None)",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.time_frequency.csd_morlet",
+      "kind": "function",
+      "submodule": "time_frequency",
+      "domain": "time_frequency",
+      "signature": "(epochs, frequencies, tmin=None, tmax=None, picks=None, n_cycles=7, use_fft=True, decim=1, projs=None, n_jobs=None, *, verbose=None)",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.time_frequency.csd_multitaper",
+      "kind": "function",
+      "submodule": "time_frequency",
+      "domain": "time_frequency",
+      "signature": "(epochs, fmin=0, fmax=inf, tmin=None, tmax=None, picks=None, n_fft=None, bandwidth=None, adaptive=False, low_bias=True, projs=None, n_jobs=None, *, verbose=None)",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.time_frequency.csd_tfr",
+      "kind": "function",
+      "submodule": "time_frequency",
+      "domain": "time_frequency",
+      "signature": "(epochs_tfr, tmin=None, tmax=None, picks=None, projs=None, verbose=None)",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.time_frequency.dpss_windows",
+      "kind": "function",
+      "submodule": "time_frequency",
+      "domain": "time_frequency",
+      "signature": "(N, half_nbw, Kmax, *, sym=True, norm=None, low_bias=True)",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.time_frequency.fit_iir_model_raw",
+      "kind": "function",
+      "submodule": "time_frequency",
+      "domain": "time_frequency",
+      "signature": "(raw, order=2, picks=None, tmin=None, tmax=None, verbose=None)",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.time_frequency.fwhm",
+      "kind": "function",
+      "submodule": "time_frequency",
+      "domain": "time_frequency",
+      "signature": "(freq, n_cycles)",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.time_frequency.istft",
+      "kind": "function",
+      "submodule": "time_frequency",
+      "domain": "time_frequency",
+      "signature": "(X, tstep=None, Tx=None)",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.time_frequency.morlet",
+      "kind": "function",
+      "submodule": "time_frequency",
+      "domain": "time_frequency",
+      "signature": "(sfreq, freqs, n_cycles=7.0, sigma=None, zero_mean=False)",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.time_frequency.pick_channels_csd",
+      "kind": "function",
+      "submodule": "time_frequency",
+      "domain": "time_frequency",
+      "signature": "(csd, include=(), exclude=(), ordered=True, copy=True, *, verbose=None)",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.time_frequency.psd_array_multitaper",
+      "kind": "function",
+      "submodule": "time_frequency",
+      "domain": "time_frequency",
+      "signature": "(x, sfreq, fmin=0.0, fmax=inf, bandwidth=None, adaptive=False, low_bias=True, normalization='length', remove_dc=True, output='power', n_jobs=None, *, max_iter=150, verbose=None)",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.time_frequency.psd_array_welch",
+      "kind": "function",
+      "submodule": "time_frequency",
+      "domain": "time_frequency",
+      "signature": "(x, sfreq, fmin=0, fmax=inf, n_fft=256, n_overlap=0, n_per_seg=None, n_jobs=None, average='mean', window='hamming', remove_dc=True, *, output='power', verbose=None)",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.time_frequency.read_csd",
+      "kind": "function",
+      "submodule": "time_frequency",
+      "domain": "time_frequency",
+      "signature": "(fname)",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.time_frequency.read_spectrum",
+      "kind": "function",
+      "submodule": "time_frequency",
+      "domain": "time_frequency",
+      "signature": "(fname)",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.time_frequency.read_tfrs",
+      "kind": "function",
+      "submodule": "time_frequency",
+      "domain": "time_frequency",
+      "signature": "(fname, condition=None, *, verbose=None)",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.time_frequency.stft",
+      "kind": "function",
+      "submodule": "time_frequency",
+      "domain": "time_frequency",
+      "signature": "(x, wsize, tstep=None, verbose=None)",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.time_frequency.stftfreq",
+      "kind": "function",
+      "submodule": "time_frequency",
+      "domain": "time_frequency",
+      "signature": "(wsize, sfreq=None)",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.time_frequency.tfr_array_morlet",
+      "kind": "function",
+      "submodule": "time_frequency",
+      "domain": "time_frequency",
+      "signature": "(data, sfreq, freqs, n_cycles=7.0, zero_mean=True, use_fft=True, decim=1, output='complex', n_jobs=None, *, verbose=None)",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.time_frequency.tfr_array_multitaper",
+      "kind": "function",
+      "submodule": "time_frequency",
+      "domain": "time_frequency",
+      "signature": "(data, sfreq, freqs, n_cycles=7.0, zero_mean=True, time_bandwidth=4.0, use_fft=True, decim=1, output='complex', n_jobs=None, *, return_weights=False, verbose=None)",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.time_frequency.tfr_array_stockwell",
+      "kind": "function",
+      "submodule": "time_frequency",
+      "domain": "time_frequency",
+      "signature": "(data, sfreq, fmin=None, fmax=None, n_fft=None, width=1.0, decim=1, return_itc=False, n_jobs=None, *, verbose=None)",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.time_frequency.tfr_morlet",
+      "kind": "function",
+      "submodule": "time_frequency",
+      "domain": "time_frequency",
+      "signature": "(inst, freqs, n_cycles, use_fft=False, return_itc=True, decim=1, n_jobs=None, picks=None, zero_mean=True, average=True, output='power', verbose=None)",
+      "deprecated": true,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.time_frequency.tfr_multitaper",
+      "kind": "function",
+      "submodule": "time_frequency",
+      "domain": "time_frequency",
+      "signature": "(inst, freqs, n_cycles, time_bandwidth=4.0, use_fft=True, return_itc=True, decim=1, n_jobs=None, picks=None, average=True, *, verbose=None)",
+      "deprecated": true,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.time_frequency.tfr_stockwell",
+      "kind": "function",
+      "submodule": "time_frequency",
+      "domain": "time_frequency",
+      "signature": "(inst, fmin=None, fmax=None, n_fft=None, width=1.0, decim=1, return_itc=False, n_jobs=None, verbose=None)",
+      "deprecated": true,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.time_frequency.write_tfrs",
+      "kind": "function",
+      "submodule": "time_frequency",
+      "domain": "time_frequency",
+      "signature": "(fname, tfr, overwrite=False, *, verbose=None)",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.transform_surface_to",
+      "kind": "function",
+      "submodule": "(top-level)",
+      "domain": "core",
+      "signature": "(surf, dest, trans, copy=False)",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.use_coil_def",
+      "kind": "function",
+      "submodule": "(top-level)",
+      "domain": "forward",
+      "signature": "(fname)",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.use_log_level",
+      "kind": "class",
+      "submodule": "(top-level)",
+      "domain": "core",
+      "signature": "(verbose=None, *, add_frames=None)",
+      "deprecated": false,
+      "excluded": true,
+      "exclusion_reason": "Python-ecosystem plumbing (config, logging, docs)"
+    },
+    {
+      "python": "mne.verbose",
+      "kind": "function",
+      "submodule": "(top-level)",
+      "domain": "core",
+      "signature": "(function: ~_FuncT) -> ~_FuncT",
+      "deprecated": false,
+      "excluded": true,
+      "exclusion_reason": "Python-ecosystem plumbing (config, logging, docs)"
+    },
+    {
+      "python": "mne.vertex_to_mni",
+      "kind": "function",
+      "submodule": "(top-level)",
+      "domain": "core",
+      "signature": "(vertices, hemis, subject, subjects_dir=None, verbose=None)",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.what",
+      "kind": "function",
+      "submodule": "(top-level)",
+      "domain": "core",
+      "signature": "(fname)",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.whiten_evoked",
+      "kind": "function",
+      "submodule": "(top-level)",
+      "domain": "cov",
+      "signature": "(evoked, noise_cov, picks=None, diag=None, rank=None, scalings=None, verbose=None)",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.write_bem_solution",
+      "kind": "function",
+      "submodule": "(top-level)",
+      "domain": "forward",
+      "signature": "(fname, bem, overwrite=False, *, verbose=None)",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.write_bem_surfaces",
+      "kind": "function",
+      "submodule": "(top-level)",
+      "domain": "forward",
+      "signature": "(fname, surfs, overwrite=False, *, verbose=None)",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.write_cov",
+      "kind": "function",
+      "submodule": "(top-level)",
+      "domain": "cov",
+      "signature": "(fname, cov, *, overwrite=False, verbose=None)",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.write_events",
+      "kind": "function",
+      "submodule": "(top-level)",
+      "domain": "epochs",
+      "signature": "(filename, events, *, overwrite=False, verbose=None)",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.write_evokeds",
+      "kind": "function",
+      "submodule": "(top-level)",
+      "domain": "core",
+      "signature": "(fname, evoked, *, on_mismatch='raise', overwrite=False, verbose=None)",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.write_forward_solution",
+      "kind": "function",
+      "submodule": "(top-level)",
+      "domain": "forward",
+      "signature": "(fname, fwd, overwrite=False, verbose=None)",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.write_head_bem",
+      "kind": "function",
+      "submodule": "(top-level)",
+      "domain": "forward",
+      "signature": "(fname, rr, tris, on_defects='raise', overwrite=False, *, verbose=None)",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.write_label",
+      "kind": "function",
+      "submodule": "(top-level)",
+      "domain": "core",
+      "signature": "(filename, label, verbose=None)",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.write_labels_to_annot",
+      "kind": "function",
+      "submodule": "(top-level)",
+      "domain": "core",
+      "signature": "(labels, subject=None, parc=None, overwrite=False, subjects_dir=None, annot_fname=None, colormap='hsv', hemi='both', sort=True, table_name='MNE-Python Colortable', verbose=None)",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.write_proj",
+      "kind": "function",
+      "submodule": "(top-level)",
+      "domain": "core",
+      "signature": "(fname, projs, *, overwrite=False, verbose=None)",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.write_source_spaces",
+      "kind": "function",
+      "submodule": "(top-level)",
+      "domain": "source_space",
+      "signature": "(fname, src, *, overwrite=False, verbose=None)",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.write_surface",
+      "kind": "function",
+      "submodule": "(top-level)",
+      "domain": "source_space",
+      "signature": "(fname, coords, faces, create_stamp='', volume_info=None, file_format='auto', overwrite=False, *, verbose=None)",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    },
+    {
+      "python": "mne.write_trans",
+      "kind": "function",
+      "submodule": "(top-level)",
+      "domain": "core",
+      "signature": "(fname, trans, *, overwrite=False, verbose=None)",
+      "deprecated": false,
+      "excluded": false,
+      "exclusion_reason": null
+    }
+  ]
+}

@@ -2,7 +2,6 @@
 
 > **Do not hand-edit.** This is rendered from the qualitative parity data in `doc/api_registry.json` (`classes` + `parity`). To change a verdict, edit the registry and rerun `python3 tools/parity/gap_analysis.py`.
 
-- Generated: **2026-07-11**
 - MNE-Python reference: **1.11.0** (pinned 1.11.x)
 - Source of truth: `doc/api_registry.json`
 

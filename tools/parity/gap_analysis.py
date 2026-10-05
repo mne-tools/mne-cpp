@@ -40,7 +40,6 @@ Usage::
 from __future__ import annotations
 
 import argparse
-import datetime as _dt
 import inspect
 import json
 import sys
@@ -411,7 +410,6 @@ def build_report(
                 OrderedDict(
                     [
                         ("generated_by", "tools/parity/gap_analysis.py"),
-                        ("generated_on", _dt.date.today().isoformat()),
                         ("mne_python_ref", mne_version),
                         ("mne_python_pinned", pinned),
                         ("registry", "doc/api_registry.json"),
@@ -442,7 +440,6 @@ def render_markdown(report: Dict[str, Any]) -> str:
       "verdict, edit the registry and rerun "
       "`python3 tools/parity/gap_analysis.py`.")
     a("")
-    a(f"- Generated: **{meta['generated_on']}**")
     a(f"- MNE-Python reference: **{meta['mne_python_ref']}** "
       f"(pinned {meta['mne_python_pinned']}.x)")
     a(f"- Source of truth: `{meta['registry']}`")
@@ -526,7 +523,7 @@ def refresh_gap_doc(report: Dict[str, Any]) -> None:
         "> context and must not contradict the generated data.",
         "",
         f"- Generated reference: **MNE-Python {meta['mne_python_ref']}** "
-        f"(pinned {meta['mne_python_pinned']}.x), on **{meta['generated_on']}**.",
+        f"(pinned {meta['mne_python_pinned']}.x).",
         f"- Inventoried public APIs: **{summ['total']}** — "
         f"implemented **{bs['implemented']}**, partial **{bs['partial']}**, "
         f"missing **{bs['missing']}**, not-applicable **{bs['not-applicable']}**.",
