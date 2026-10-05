@@ -74,6 +74,7 @@ ComputeFwd::~ComputeFwd()
 
 void ComputeFwd::initFwd()
 {
+    m_bInitialized = false;
     m_spaces.clear();
     m_iNSource = 0;
 
@@ -436,6 +437,7 @@ void ComputeFwd::initFwd()
         delete filteredStream;
         filteredStream = nullptr;
     }
+    m_bInitialized = true;
 }
 
 //=============================================================================================================
@@ -518,6 +520,10 @@ void ComputeFwd::populateMetadata(MNEForwardSolution& fwd)
 
 std::unique_ptr<MNEForwardSolution> ComputeFwd::calculateFwd()
 {
+    if (!m_bInitialized) {
+        qCritical("ComputeFwd::calculateFwd - the forward computation could not be set up.");
+        return nullptr;
+    }
     auto fwdSolution = std::make_unique<MNEForwardSolution>();
     populateMetadata(*fwdSolution);
     int iNMeg = 0;
@@ -618,6 +624,8 @@ std::unique_ptr<MNEForwardSolution> ComputeFwd::calculateFwd()
 
 bool ComputeFwd::updateHeadPos(const FiffCoordTrans& transDevHead, MNEForwardSolution& fwd)
 {
+    if (!m_bInitialized)
+        return false;
     int iNMeg = 0;
     if (m_megcoils) {
         iNMeg = m_megcoils->ncoil();

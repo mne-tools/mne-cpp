@@ -41,3 +41,19 @@ for grade in (3, 0):
             for c in range(3):
                 grad[:, 9 * s + 3 * c + d] = diff[:, 3 * s + c]
     np.savetxt(here / "data" / f"ctf_grade{grade}_grad.txt", grad, fmt="%.17g")
+
+# One-layer BEM (ico-3 sphere of radius 90 mm at (0, 0, 40) mm, inner skull, sigma 0.3) and the
+# compensated BEM gains; the -sol file is not stored, MNE-CPP computes the solution itself.
+from mne.bem import _surfaces_to_bem  # noqa: E402
+from mne.surface import _get_ico_surface  # noqa: E402
+
+ico = _get_ico_surface(3)
+surf = dict(rr=ico["rr"] * 90 + [0, 0, 40], tris=ico["tris"], id=1, coord_frame=5, np=len(ico["rr"]), ntri=len(ico["tris"]))
+bem_surfs = _surfaces_to_bem([surf], [1], [0.3], incomplete="ignore")
+mne.write_bem_surfaces(here / "data" / "one-layer-bem.fif", bem_surfs, overwrite=True, verbose=False)
+bem = mne.make_bem_solution(bem_surfs, verbose=False)
+for grade in (3, 0):
+    raw = here.parent / "test_mne_ctf_comp_python" / "data" / f"ctf_grade{grade}_raw.fif"
+    info = mne.io.read_raw_fif(raw, verbose=False).info
+    fwd = mne.make_forward_solution(info, None, src, bem, meg=True, eeg=False, mindist=0, verbose=False)
+    np.savetxt(here / "data" / f"ctf_grade{grade}_bem_gain.txt", fwd["sol"]["data"], fmt="%.17g")

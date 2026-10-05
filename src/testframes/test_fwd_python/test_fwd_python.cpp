@@ -703,6 +703,29 @@ void TestFwdPython::ctfCompensatedForward()
     QVERIFY(vecFwd != nullptr);
     const double vecErr = (vecFwd->sol->data - ref).norm() / ref.norm();
     QVERIFY2(vecErr < 1e-4, qPrintable(QStringLiteral("vector-field gain differs by %1").arg(vecErr)));
+
+    // The BEM takes the single-orientation path (fwd_comp_field); mne-python on the one-layer BEM of the fixture.
+    MatrixXd bemRef(7, 6);
+    {
+        QFile file(QStringLiteral(MNE_FWD_DATA_DIR "/ctf_grade%1_bem_gain.txt").arg(grade));
+        QVERIFY(file.open(QIODevice::ReadOnly | QIODevice::Text));
+        QTextStream in(&file);
+        for (int r = 0; r < 7; ++r)
+            for (int c = 0; c < 6; ++c)
+                in >> bemRef(r, c);
+    }
+    // Like MNE-C, the surfaces are read from the -sol name; a file without a solution has it recomputed.
+    QTemporaryDir bemDir;
+    s->bemname = bemDir.filePath("one-layer-bem.fif");
+    QTest::ignoreMessage(QtCriticalMsg, QRegularExpression("Cannot open .*one-layer-bem-sol.fif"));
+    QTest::ignoreMessage(QtCriticalMsg, QRegularExpression("Cannot open .*one-layer-bem-sol.fif"));
+    QTest::ignoreMessage(QtCriticalMsg, "ComputeFwd::calculateFwd - the forward computation could not be set up.");
+    QVERIFY(std::make_shared<ComputeFwd>(s)->calculateFwd() == nullptr);
+    QVERIFY(QFile::copy(QStringLiteral(MNE_FWD_DATA_DIR "/one-layer-bem.fif"), bemDir.filePath("one-layer-bem-sol.fif")));
+    auto bemFwd = std::make_shared<ComputeFwd>(s)->calculateFwd();
+    QVERIFY(bemFwd != nullptr);
+    const double bemErr = (bemFwd->sol->data - bemRef).norm() / bemRef.norm();
+    QVERIFY2(bemErr < 1e-3, qPrintable(QStringLiteral("BEM gain differs from mne-python by %1").arg(bemErr)));
 }
 
 //=============================================================================================================

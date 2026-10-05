@@ -165,6 +165,7 @@ private:
     FwdEegSphereModelSet::UPtr m_eegModels;             /**< EEG sphere model set. */
     FwdEegSphereModel::UPtr m_eegModel;                 /**< Active EEG sphere model. */
     FwdBemModel::UPtr m_bemModel;                       /**< BEM model. */
+    bool m_bInitialized = false;                        /**< Whether initFwd completed. */
 
     QList<FIFFLIB::FiffChInfo> m_listMegChs;  /**< MEG channel information. */
     QList<FIFFLIB::FiffChInfo> m_listEegChs;  /**< EEG channel information. */
