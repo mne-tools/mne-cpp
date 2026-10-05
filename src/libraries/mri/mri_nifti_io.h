@@ -69,6 +69,8 @@ namespace MRILIB
  * @c sform/qform/pixdim priority chain. The class is a pure namespace of
  * @c static methods so callers can use it without owning any state; the
  * populated @ref MriVolData carries the result.
+ *
+ * @snippet ex_mri/main.cpp mri_nifti_io_read
  */
 class MRISHARED_EXPORT MriNiftiIO
 {

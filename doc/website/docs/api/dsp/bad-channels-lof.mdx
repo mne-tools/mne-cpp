@@ -27,6 +27,17 @@ LOF (Breunig et al., SIGMOD 2000) scores each channel by the ratio between its o
 
 The detector follows MNE-Python's `mne.preprocessing.find_bad_channels_lof` so MEG / EEG pipelines can switch between the two without changing the downstream interpolation / [SSS](/docs/api/dsp/sss) step.
 
+```cpp title="src/examples/ex_dsp_artifacts/main.cpp"
+LofBadChannelParams lofParams;
+lofParams.iNNeighbors = 4;
+lofParams.bEegOnly = true;
+const QStringList lofBad = findBadChannelsLof(data, info, lofParams); // features: std, kurtosis, max |x|
+
+MatrixXd features(6, 2); // the generic LOF score on a 2-D point cloud: one far point
+features << 0.0, 0.0, 0.1, 0.0, 0.0, 0.1, 0.1, 0.1, 0.05, 0.05, 3.0, 3.0;
+const VectorXd lofScores = computeLofScores(features, 3);
+```
+
 ---
 
 ## Functions
@@ -40,17 +51,6 @@ QStringList findBadChannelsLof(const Eigen::MatrixXd & data, const [FiffInfo](/d
 Detect bad channels using Local Outlier Factor (LOF).
 
 Computes features for each channel (standard deviation, kurtosis, max absolute amplitude) and applies the LOF algorithm to identify outlier channels. LOF compares the local density of a point's neighbourhood to the densities of its neighbours.
-
-```cpp title="src/examples/ex_dsp_artifacts/main.cpp"
-LofBadChannelParams lofParams;
-lofParams.iNNeighbors = 4;
-lofParams.bEegOnly = true;
-const QStringList lofBad = findBadChannelsLof(data, info, lofParams); // features: std, kurtosis, max |x|
-
-MatrixXd features(6, 2); // the generic LOF score on a 2-D point cloud: one far point
-features << 0.0, 0.0, 0.1, 0.0, 0.0, 0.1, 0.1, 0.1, 0.05, 0.05, 3.0, 3.0;
-const VectorXd lofScores = computeLofScores(features, 3);
-```
 
 **Parameters:**
 

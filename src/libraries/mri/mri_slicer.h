@@ -109,6 +109,8 @@ struct MRISHARED_EXPORT MriSliceImage
  * via the volume's percentile-clipped window, and emits the result with
  * the slice→RAS transform the viewer needs to draw rulers and crosshairs
  * in millimetres.
+ *
+ * @snippet ex_mri/main.cpp mri_slicer_usage
  */
 class MRISHARED_EXPORT MriSlicer
 {

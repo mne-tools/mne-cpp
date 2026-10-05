@@ -51,6 +51,7 @@ if(NOT WASM)
   add_subdirectory(ex_spectral)
   add_subdirectory(ex_tf_plot)
   add_subdirectory(ex_fs)
+  add_subdirectory(ex_mri)
   add_subdirectory(ex_utils)
 endif()
 

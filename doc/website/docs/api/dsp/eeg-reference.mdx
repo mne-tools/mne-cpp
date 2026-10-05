@@ -27,6 +27,11 @@ Every EEG measurement is implicitly a potential difference between an active ele
 
 Re-referencing is implemented as a single matrix multiplication so that channel covariances and inverse operators remain valid after re- referencing, provided the same operator is also applied to the noise covariance.
 
+```cpp title="src/examples/ex_dsp_artifacts/main.cpp"
+MatrixXd averageRef = data;
+setEegReference(averageRef, info); // average of the EEG channels; EOG/ECG rows untouched
+```
+
 ---
 
 ## Functions
@@ -40,11 +45,6 @@ void setEegReference(Eigen::MatrixXd & data, const [FiffInfo](/docs/api/fiff/fif
 Re-reference EEG channels to average, specific channel(s), or REST.
 
 Only modifies rows corresponding to EEG channels (kind == FIFFV_EEG_CH). Non-EEG channels are left untouched.
-
-```cpp title="src/examples/ex_dsp_artifacts/main.cpp"
-MatrixXd averageRef = data;
-setEegReference(averageRef, info); // average of the EEG channels; EOG/ECG rows untouched
-```
 
 **Parameters:**
 

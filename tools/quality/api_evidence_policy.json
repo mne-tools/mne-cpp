@@ -16,7 +16,7 @@
     "Settings": "Plain parameter record consumed by an algorithm class; shown inside that class's example."
   },
   "example_debt": {
-    "ceiling": 203,
+    "ceiling": 197,
     "names": [
       "AbstractFormatReader",
       "AcquiredPoints",
@@ -185,12 +185,6 @@
       "MnaProject",
       "MnaRegistryLoader",
       "MneICP",
-      "MriCorFifIO",
-      "MriCorIO",
-      "MriMghIO",
-      "MriNiftiIO",
-      "MriSlicer",
-      "MriVolData",
       "MultimodalScene",
       "PeakFinder",
       "Plot",

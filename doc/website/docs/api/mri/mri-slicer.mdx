@@ -19,6 +19,12 @@ Orthogonal-plane resampler (axial / coronal / sagittal) from [`MriVolData`](/doc
 
 Pure `static` methods  no instance state is owned. For a given orientation and slice index, samples the source volume at the matching row/column/depth plane, normalises voxel intensities into 8-bit grayscale via the volume's percentile-clipped window, and emits the result with the slice→RAS transform the viewer needs to draw rulers and crosshairs in millimetres.
 
+```cpp title="src/examples/ex_mri/main.cpp"
+const Vector3f ras(0.001f, -0.0005f, -0.002f); // metres; voxel (2,3,1)
+const Vector3i voxel = MriSlicer::rasToVoxel(vox2ras, ras);
+const QVector<MriSliceImage> planes = MriSlicer::extractOrthogonal(voxels, mgh.dims(), vox2ras, ras); // axial, coronal, sagittal
+```
+
 ---
 
 ## Static Methods
@@ -303,6 +309,11 @@ Convert voxel index to RAS coordinate using a volume's transform.
 - *Eigen::Vector3f* — RAS coordinate.
 
 ---
+
+## Example
+
+- Full source: [`src/examples/ex_mri/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_mri/main.cpp)
+- Build target: `ex_mri` (runs under CTest)
 
 ## Authors of this file
 

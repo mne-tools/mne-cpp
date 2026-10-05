@@ -23,6 +23,14 @@ Format reference: [https://surfer.nmr.mgh.harvard.edu/fswiki/FsTutorial/MghForma
 
 Ported from `make_mgh_cor_set()` in MNE C `mne_make_cor_set` by Matti Hamalainen.
 
+```cpp title="src/examples/ex_mri/main.cpp"
+MriVolData mgh;
+QVector<FiffCoordTrans> extraTransforms; // e.g. Talairach, if the footer names one
+MriMghIO::read(dataDir + "/gradient.mgz", mgh, extraTransforms);
+const Matrix4f vox2ras = mgh.computeVox2Ras();        // scanner RAS, metres
+const QVector<float> voxels = mgh.voxelDataAsFloat(); // x fastest
+```
+
 ---
 
 ## Static Methods
@@ -57,6 +65,11 @@ For .mgz files, automatic gzip decompression is performed via zlib.
 - *bool* — True on success, false on error.
 
 ---
+
+## Example
+
+- Full source: [`src/examples/ex_mri/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_mri/main.cpp)
+- Build target: `ex_mri` (runs under CTest)
 
 ## Authors of this file
 

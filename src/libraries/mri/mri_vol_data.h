@@ -139,6 +139,8 @@ struct MRISHARED_EXPORT MriSlice
  *
  * Ported from @c mneMRIdataRec in MNE C (@c mne_types_mne-c.h) by Matti
  * Hamalainen.
+ *
+ * @snippet ex_mri/main.cpp mri_vol_data_read
  */
 class MRISHARED_EXPORT MriVolData
 {

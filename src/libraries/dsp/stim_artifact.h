@@ -12,6 +12,8 @@
  * Repairs stimulus artifacts in continuous data by replacing samples in a window around each
  * stimulus event with either linearly interpolated values (from the window boundaries) or zeros.
  * This mirrors the functionality of MNE-Python's mne.preprocessing.fix_stim_artifact().
+ *
+ * @snippet ex_dsp_artifacts/main.cpp fix_stim_artifact_usage
  */
 
 #ifndef STIM_ARTIFACT_DSP_H
@@ -65,8 +67,6 @@ enum class StimArtifactMode
  *                             Default: 0.01 (10 ms after event).
  * @param[in]     mode         Repair mode (Linear interpolation or zero-padding).
  *                             Default: StimArtifactMode::Linear.
- *
- * @snippet ex_dsp_artifacts/main.cpp fix_stim_artifact_usage
  */
 DSPSHARED_EXPORT void fixStimArtifact(Eigen::MatrixXd& data,
                                       const Eigen::MatrixXi& events,

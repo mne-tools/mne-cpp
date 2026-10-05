@@ -27,6 +27,13 @@ The detectors in this header scan continuous MEG / EEG data and emit `FIFFLIB::F
 
 Both routines mirror the semantics of their MNE-Python counterparts `mne.preprocessing.annotate_muscle_zscore` and `mne.preprocessing.annotate_amplitude` so cross-toolchain pipelines produce identical bad-segment lists.
 
+```cpp title="src/examples/ex_dsp_artifacts/main.cpp"
+AnnotateAmplitudeParams amplitude;
+amplitude.dPeakMax = 200e-6;
+const FiffInfo eogInfo = info.pick_info(RowVectorXi::Constant(1, kEog));
+const FiffAnnotations exceeded = annotateAmplitude(data.row(kEog), eogInfo, kSFreq, amplitude);
+```
+
 ---
 
 ## Functions
@@ -90,13 +97,6 @@ If any sample exceeds dPeakMax or falls below dPeakMin, that time point is annot
 
 
 If peak-to-peak amplitude in a sliding window &lt; dFlatMin, the window is annotated as "BAD_flat".
-
-```cpp title="src/examples/ex_dsp_artifacts/main.cpp"
-AnnotateAmplitudeParams amplitude;
-amplitude.dPeakMax = 200e-6;
-const FiffInfo eogInfo = info.pick_info(RowVectorXi::Constant(1, kEog));
-const FiffAnnotations exceeded = annotateAmplitude(data.row(kEog), eogInfo, kSFreq, amplitude);
-```
 
 **Parameters:**
 

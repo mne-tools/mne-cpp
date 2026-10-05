@@ -22,6 +22,8 @@
  * The detector follows MNE-Python's @c mne.preprocessing.find_bad_channels_lof
  * so MEG / EEG pipelines can switch between the two without changing the
  * downstream interpolation / SSS step.
+ *
+ * @snippet ex_dsp_artifacts/main.cpp find_bad_channels_lof_usage
  */
 
 #ifndef BAD_CHANNELS_LOF_H
@@ -87,8 +89,6 @@ struct DSPSHARED_EXPORT LofBadChannelParams
  * @param[in] params    LOF parameters.
  *
  * @return List of bad channel names.
- *
- * @snippet ex_dsp_artifacts/main.cpp find_bad_channels_lof_usage
  */
 DSPSHARED_EXPORT QStringList findBadChannelsLof(const Eigen::MatrixXd& data,
                                                 const FIFFLIB::FiffInfo& info,

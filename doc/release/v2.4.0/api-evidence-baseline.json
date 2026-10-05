@@ -12,18 +12,18 @@
     "registered_stale": 0,
     "registered_with_test": 101,
     "registered_test_unresolved": 0,
-    "registered_with_example": 101,
+    "registered_with_example": 107,
     "registered_example_not_built": 0,
     "registered_with_python_equiv": 88,
     "registered_without_api_page": 0,
-    "with_snippet": 112,
+    "with_snippet": 120,
     "public_api_units": 478,
     "example_eligible": 383,
     "example_exempt": 95,
-    "eligible_backed_by_registry_example": 101,
-    "eligible_used_by_some_example": 162,
-    "examples_on_disk": 50,
-    "examples_built": 50
+    "eligible_backed_by_registry_example": 107,
+    "eligible_used_by_some_example": 170,
+    "examples_on_disk": 51,
+    "examples_built": 51
   },
   "by_library": {
     "bids": {
@@ -175,9 +175,9 @@
       "registered": 6,
       "with_test": 0,
       "eligible": 8,
-      "eligible_with_registry_example": 0,
-      "eligible_used_by_example": 0,
-      "with_snippet": 0
+      "eligible_with_registry_example": 6,
+      "eligible_used_by_example": 8,
+      "with_snippet": 8
     },
     "sts": {
       "public": 10,
@@ -5859,7 +5859,8 @@
       "example": null,
       "example_state": "none",
       "including_examples": [
-        "ex_coreg"
+        "ex_coreg",
+        "ex_mri"
       ],
       "snippets": [],
       "api_page": "doc/website/docs/api/fiff/fiff-coord-trans.mdx",
@@ -9771,10 +9772,14 @@
       "registry_status": "documented",
       "test": null,
       "test_resolves": false,
-      "example": null,
-      "example_state": "none",
-      "including_examples": [],
-      "snippets": [],
+      "example": "ex_mri",
+      "example_state": "built",
+      "including_examples": [
+        "ex_mri"
+      ],
+      "snippets": [
+        "ex_mri/main.cpp#mri_cor_fif_io_write"
+      ],
       "api_page": "doc/website/docs/api/mri/mri-cor-fif-io.mdx",
       "python_equiv": null,
       "example_eligible": true,
@@ -9790,10 +9795,14 @@
       "registry_status": "documented",
       "test": null,
       "test_resolves": false,
-      "example": null,
-      "example_state": "none",
-      "including_examples": [],
-      "snippets": [],
+      "example": "ex_mri",
+      "example_state": "built",
+      "including_examples": [
+        "ex_mri"
+      ],
+      "snippets": [
+        "ex_mri/main.cpp#mri_cor_io_read"
+      ],
       "api_page": "doc/website/docs/api/mri/mri-cor-io.mdx",
       "python_equiv": null,
       "example_eligible": true,
@@ -9809,10 +9818,14 @@
       "registry_status": "documented",
       "test": null,
       "test_resolves": false,
-      "example": null,
-      "example_state": "none",
-      "including_examples": [],
-      "snippets": [],
+      "example": "ex_mri",
+      "example_state": "built",
+      "including_examples": [
+        "ex_mri"
+      ],
+      "snippets": [
+        "ex_mri/main.cpp#mri_mgh_io_read"
+      ],
       "api_page": "doc/website/docs/api/mri/mri-mgh-io.mdx",
       "python_equiv": null,
       "example_eligible": true,
@@ -9828,10 +9841,14 @@
       "registry_status": "documented",
       "test": null,
       "test_resolves": false,
-      "example": null,
-      "example_state": "none",
-      "including_examples": [],
-      "snippets": [],
+      "example": "ex_mri",
+      "example_state": "built",
+      "including_examples": [
+        "ex_mri"
+      ],
+      "snippets": [
+        "ex_mri/main.cpp#mri_nifti_io_read"
+      ],
       "api_page": "doc/website/docs/api/mri/mri-nifti-io.mdx",
       "python_equiv": null,
       "example_eligible": true,
@@ -9849,8 +9866,12 @@
       "test_resolves": false,
       "example": null,
       "example_state": "none",
-      "including_examples": [],
-      "snippets": [],
+      "including_examples": [
+        "ex_mri"
+      ],
+      "snippets": [
+        "ex_mri/main.cpp#mri_slicer_usage"
+      ],
       "api_page": null,
       "python_equiv": null,
       "example_eligible": true,
@@ -9866,10 +9887,14 @@
       "registry_status": "documented",
       "test": null,
       "test_resolves": false,
-      "example": null,
-      "example_state": "none",
-      "including_examples": [],
-      "snippets": [],
+      "example": "ex_mri",
+      "example_state": "built",
+      "including_examples": [
+        "ex_mri"
+      ],
+      "snippets": [
+        "ex_mri/main.cpp#mri_slicer_usage"
+      ],
       "api_page": "doc/website/docs/api/mri/mri-slicer.mdx",
       "python_equiv": null,
       "example_eligible": true,
@@ -9887,8 +9912,12 @@
       "test_resolves": false,
       "example": null,
       "example_state": "none",
-      "including_examples": [],
-      "snippets": [],
+      "including_examples": [
+        "ex_mri"
+      ],
+      "snippets": [
+        "ex_mri/main.cpp#mri_vol_data_read"
+      ],
       "api_page": null,
       "python_equiv": null,
       "example_eligible": true,
@@ -9904,10 +9933,14 @@
       "registry_status": "documented",
       "test": null,
       "test_resolves": false,
-      "example": null,
-      "example_state": "none",
-      "including_examples": [],
-      "snippets": [],
+      "example": "ex_mri",
+      "example_state": "built",
+      "including_examples": [
+        "ex_mri"
+      ],
+      "snippets": [
+        "ex_mri/main.cpp#mri_vol_data_read"
+      ],
       "api_page": "doc/website/docs/api/mri/mri-vol-data.mdx",
       "python_equiv": null,
       "example_eligible": true,

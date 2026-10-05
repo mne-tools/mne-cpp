@@ -87,6 +87,8 @@ namespace MRILIB
  *
  * Ported from @c save_slices() / @c write_slice() in MNE C @c write_mri_set.c
  * by Matti Hamalainen.
+ *
+ * @snippet ex_mri/main.cpp mri_cor_fif_io_write
  */
 class MRISHARED_EXPORT MriCorFifIO
 {

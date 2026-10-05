@@ -25,6 +25,8 @@
  * @c mne.preprocessing.annotate_muscle_zscore and
  * @c mne.preprocessing.annotate_amplitude so cross-toolchain pipelines
  * produce identical bad-segment lists.
+ *
+ * @snippet ex_dsp_artifacts/main.cpp annotate_amplitude_usage
  */
 
 #ifndef ANNOTATE_ARTIFACT_DSP_H
@@ -136,8 +138,6 @@ DSPSHARED_EXPORT FIFFLIB::FiffAnnotations annotateMusclZscore(
  * @param[in] sfreq   Sampling frequency in Hz.
  * @param[in] params  Detection parameters.
  * @return FiffAnnotations with bad entries.
- *
- * @snippet ex_dsp_artifacts/main.cpp annotate_amplitude_usage
  */
 DSPSHARED_EXPORT FIFFLIB::FiffAnnotations annotateAmplitude(
     const Eigen::MatrixXd& data,

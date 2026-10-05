@@ -21,6 +21,8 @@
  * or filtering is required up-front. Output is a list of @c (i, j) channel-
  * index pairs that the caller can mark bad, interpolate, or pass into the
  * SSS bad-channel set.
+ *
+ * @snippet ex_dsp_artifacts/main.cpp bridged_electrodes_usage
  */
 
 #ifndef BRIDGED_ELECTRODES_H
@@ -101,8 +103,6 @@ DSPSHARED_EXPORT Eigen::MatrixXd computeElectricalDistance(const Eigen::MatrixXd
  *
  * @return List of bridged electrode pairs as (channel_index_1, channel_index_2)
  *         using indices into info.chs.
- *
- * @snippet ex_dsp_artifacts/main.cpp bridged_electrodes_usage
  */
 DSPSHARED_EXPORT QList<QPair<int, int>> computeBridgedElectrodes(
     const Eigen::MatrixXd& data,

@@ -21,6 +21,11 @@ Walks a `mri/T1` (or `mri/orig`, `mri/brain`, …) directory, loads the 256 `COR
 
 Ported from `make_cor_set()` in [MNE](/docs/api/mne/mne-class) C `mne_make_cor_set` by Matti Hamalainen.
 
+```cpp title="src/examples/ex_mri/main.cpp"
+QVector<MriSlice> corSlices;
+MriCorIO::read(corDir, corSlices);
+```
+
 ---
 
 ## Static Methods
@@ -47,6 +52,11 @@ Expects files named COR-001 through COR-256, each containing 256×256 unsigned c
 - *bool* — True on success, false on error.
 
 ---
+
+## Example
+
+- Full source: [`src/examples/ex_mri/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_mri/main.cpp)
+- Build target: `ex_mri` (runs under CTest)
 
 ## Authors of this file
 

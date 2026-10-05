@@ -97,6 +97,8 @@ namespace MRILIB
  *
  * Ported from @c make_mgh_cor_set() in MNE C @c mne_make_cor_set by Matti
  * Hamalainen.
+ *
+ * @snippet ex_mri/main.cpp mri_mgh_io_read
  */
 class MRISHARED_EXPORT MriMghIO
 {

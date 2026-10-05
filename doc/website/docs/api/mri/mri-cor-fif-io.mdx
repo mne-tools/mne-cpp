@@ -21,6 +21,11 @@ Writes MRI slice data  whether originally loaded from a FreeSurfer COR tree, an 
 
 Ported from `save_slices()` / `write_slice()` in [MNE](/docs/api/mne/mne-class) C `write_mri_set.c` by Matti Hamalainen.
 
+```cpp title="src/examples/ex_mri/main.cpp"
+const QString corFif = dir.filePath("COR.fif");
+MriCorFifIO::write(corFif, corSlices, extraTransforms);
+```
+
 ---
 
 ## Static Methods
@@ -45,6 +50,11 @@ Writes COR.fif file from slice data.
 - *bool* — True on success, false on error.
 
 ---
+
+## Example
+
+- Full source: [`src/examples/ex_mri/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_mri/main.cpp)
+- Build target: `ex_mri` (runs under CTest)
 
 ## Authors of this file
 

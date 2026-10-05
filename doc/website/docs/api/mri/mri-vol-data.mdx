@@ -25,6 +25,11 @@ Format reference: [https://surfer.nmr.mgh.harvard.edu/fswiki/FsTutorial/MghForma
 
 Ported from `mneMRIdataRec` in MNE C (`mne_types_mne-c.h`) by Matti Hamalainen.
 
+```cpp title="src/examples/ex_mri/main.cpp"
+MriVolData nifti;
+nifti.read(dataDir + "/gradient.nii.gz"); // the suffix selects the NIfTI reader
+```
+
 ---
 
 ## Public Methods
@@ -129,6 +134,11 @@ Identical to `computeVox2Ras()` but forces c_ras = (0,0,0), producing the coordi
 - *Eigen::Matrix4f* — The 4×4 voxel-to-tkRAS transform in meters.
 
 ---
+
+## Example
+
+- Full source: [`src/examples/ex_mri/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_mri/main.cpp)
+- Build target: `ex_mri` (runs under CTest)
 
 ## Authors of this file
 

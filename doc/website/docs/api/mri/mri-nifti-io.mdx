@@ -19,6 +19,11 @@ Stateless decoder for NIfTI-1 single-file volumes (``.nii and ``.nii.gz).
 
 Parses the 348-byte fixed-size header, expands any voxel-type / endianness combination NIfTI-1 supports into the canonical 16-bit unsigned slice buffer produced by [`MriMghIO`](/docs/api/mri/mri-mgh-io), and resolves voxel→RAS via the `sform/qform/pixdim` priority chain. The class is a pure namespace of `static` methods so callers can use it without owning any state; the populated [`MriVolData`](/docs/api/mri/mri-vol-data) carries the result.
 
+```cpp title="src/examples/ex_mri/main.cpp"
+MriVolData direct;
+MriNiftiIO::read(dataDir + "/gradient.nii.gz", direct);
+```
+
 ---
 
 ## Static Methods
@@ -65,6 +70,11 @@ Exposed for direct use by tests; `read` calls it transparently when the input pa
 - *bool* — True on success.
 
 ---
+
+## Example
+
+- Full source: [`src/examples/ex_mri/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_mri/main.cpp)
+- Build target: `ex_mri` (runs under CTest)
 
 ## Authors of this file
 
