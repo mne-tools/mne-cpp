@@ -55,6 +55,8 @@ namespace FIFFLIB
  * let @c FiffRawData::read_segment binary-search the directory for the
  * buffers that cover a requested sample window and stream them in
  * without rescanning the file.
+ *
+ * @snippet ex_fiff_structure/main.cpp fiff_raw_dir_usage
  */
 class FIFFSHARED_EXPORT FiffRawDir
 {

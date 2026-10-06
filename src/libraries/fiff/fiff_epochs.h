@@ -7,16 +7,11 @@
  * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
  * @since    2.2.1
  * @date     May 2026
- * @brief    Static epoching utilities: cut a FiffRawData stream into fixed-length, event-aligned epochs.
+ * @brief    Static epoching utilities: cut continuous data into fixed-length epochs, concatenate and average them.
  *
- * Implements the equivalent of @c mne.Epochs construction from a
- * continuous recording: given a @ref FIFFLIB::FiffRawData, an event list (or a
- * fixed step), and a time window (@c tmin, @c tmax), it returns a
- * 3D (nepoch × nchan × nsamples) stack along with the associated
- * @ref FIFFLIB::FiffInfo. Bad-segment rejection (via @ref FIFFLIB::FiffAnnotation
- * "BAD_*" entries) and peak-to-peak / flatness rejection
- * (via @ref FIFFLIB::RejectionParams in @ref fiff_evoked_set.h) are applied as
- * the epochs are cut.
+ * Equivalent of @c mne.make_fixed_length_epochs (duration, overlap, optional short last epoch),
+ * @c mne.concatenate_epochs and @c Epochs.average on plain data matrices. Event-locked epochs with
+ * rejection are averaged by @ref FIFFLIB::FiffEvokedSet::computeAverages.
  */
 
 #ifndef FIFF_EPOCHS_H
@@ -53,7 +48,7 @@ namespace FIFFLIB
 /**
  * @brief Fixed-length epoching result: the (nepoch × nchan × nsamples) data stack plus the matching @ref FiffInfo.
  *
- * Returned by the static epoch-cutting helpers in @c FiffEpochsUtils.
+ * Returned by the static epoch-cutting helpers of @ref FiffEpochs.
  * Mirrors the @c mne.EpochsArray construction return value in
  * MNE-Python.
  */
@@ -66,11 +61,12 @@ struct FIFFSHARED_EXPORT FiffEpochData
 
 //=============================================================================================================
 /**
- * @brief Free / static helpers that turn a @ref FiffRawData plus an event list into fixed-length epochs.
+ * @brief Static helpers that cut continuous data into fixed-length epochs, concatenate and average them.
  *
- * Stateless — operates on the @ref FiffRawData and event arguments
- * directly. Used by the source-reconstruction pipeline and by the offline
- * averaging tooling when building epochs for an @ref FiffEvokedSet.
+ * Stateless; operates on data matrices. Counterpart of @c mne.make_fixed_length_epochs and
+ * @c mne.concatenate_epochs in MNE-Python.
+ *
+ * @snippet ex_fiff_structure/main.cpp fiff_epochs_usage
  */
 class FIFFSHARED_EXPORT FiffEpochs
 {

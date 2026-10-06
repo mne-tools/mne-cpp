@@ -58,6 +58,10 @@ namespace FIFFLIB
  * type (32-bit), size (32-bit), pos (32-bit). The arrays of these records
  * materialize the @c FIFF_DIR tag at the tail of every well-formed FIFF
  * file and drive random-access tag lookup in @ref FiffStream.
+ *
+ * @snippet ex_fiff_structure/main.cpp fiff_dir_entry_usage
+ *
+ * @snippet ex_fiff_structure/main.cpp fiff_raw_dir_usage
  */
 
 class FIFFSHARED_EXPORT FiffDirEntry

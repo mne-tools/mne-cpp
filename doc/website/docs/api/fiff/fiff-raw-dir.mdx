@@ -19,6 +19,14 @@ Per-buffer raw-data directory entry: data kind, first sample, sample count, on-d
 
 One entry per `FIFF_DATA_BUFFER` tag. The (`first`, `nsamp`) fields let `FiffRawData::read_segment` binary-search the directory for the buffers that cover a requested sample window and stream them in without rescanning the file.
 
+```cpp title="src/examples/ex_fiff_structure/main.cpp"
+// The raw data directory: one FiffRawDir per data buffer, each pointing at its FiffDirEntry in the file.
+int samples = 0;
+for (const FiffRawDir& buffer : raw.rawdir)
+    samples += buffer.nsamp;
+const FiffDirEntry::SPtr firstBuffer = raw.rawdir.first().ent;
+```
+
 ---
 
 ## Public Methods
@@ -62,6 +70,12 @@ Every member has value semantics, so the compiler-generated member-wise assignme
 Destroys the raw Directory entry.
 
 ---
+
+## Example
+
+- Full source: [`src/examples/ex_fiff_structure/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_fiff_structure/main.cpp)
+- Build target: `ex_fiff_structure` (runs under CTest)
+- Data: [mne-cpp-test-data](https://github.com/mne-tools/mne-cpp-test-data)
 
 ## Authors of this file
 

@@ -16,16 +16,8 @@
     "Settings": "Plain parameter record consumed by an algorithm class; shown inside that class's example."
   },
   "example_debt": {
-    "ceiling": 65,
+    "ceiling": 57,
     "names": [
-      "FiffCoordTransSet",
-      "FiffCtfComp",
-      "FiffDataRef",
-      "FiffDirEntry",
-      "FiffEpochs",
-      "FiffFileSharer",
-      "FiffRawDir",
-      "FiffTime",
       "FilterThreadArg",
       "MNE",
       "MNEBem",

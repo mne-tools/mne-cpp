@@ -19,6 +19,14 @@ One CTF software-gradient compensation matrix: grade kind, calibration flag and 
 
 A list of [`FiffCtfComp`](/docs/api/fiff/fiff-ctf-comp) lives inside [`FiffInfo`](/docs/api/fiff/fiff-info) and lets raw / evoked data be moved between compensation grades by chaining the appropriate matrices. The `save_calibrated` flag controls whether the matrix was stored already-calibrated (and therefore must not be re-multiplied by the channel cals on apply).
 
+```cpp title="src/examples/ex_fiff_structure/main.cpp"
+// CTF third-order gradient compensation: info.comps holds one FiffCtfComp per grade.
+QFile ctfFile(parser.value(ctfOption));
+const FiffRawData ctf(ctfFile);
+FiffCtfComp toGrade1;
+ok &= ctf.info.make_compensator(0, 1, toGrade1); // uncompensated -> grade 1
+```
+
 ---
 
 ## Public Methods
@@ -68,6 +76,12 @@ Destroys the CTF software compensation data.
 Initializes the CTF software compensation data.
 
 ---
+
+## Example
+
+- Full source: [`src/examples/ex_fiff_structure/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_fiff_structure/main.cpp)
+- Build target: `ex_fiff_structure` (runs under CTest)
+- Data: [mne-cpp-test-data](https://github.com/mne-tools/mne-cpp-test-data)
 
 ## Authors of this file
 

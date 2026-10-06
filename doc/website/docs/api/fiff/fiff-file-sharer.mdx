@@ -15,9 +15,18 @@ sidebar_position: 23
 class FIFFLIB::FiffFileSharer
 ```
 
-Refcounted memory-mapped view of a FIFF file shared between cooperating consumers.
+Copies FIFF recordings into a shared directory and signals their arrival to a watching consumer.
 
-Each consumer gets a zero-copy `QByteArray` view of the same backing pages. When the last reference goes away the mapping is unmapped. Used to let the GUI, the realtime pipeline and the recording dumper share one open FIFF file without duplicate I/O.
+```cpp title="src/examples/ex_fiff_structure/main.cpp"
+// Hand a finished recording to another application through a watched directory.
+QDir::setCurrent(tmp.path());
+FiffFileSharer consumer("shared");
+QStringList arrived;
+QObject::connect(&consumer, &FiffFileSharer::newFileAtPath, [&](const QString& path) { arrived << path; });
+consumer.initWatcher();
+FiffFileSharer producer("shared");
+producer.copyRealtimeFile(rawPath); // shared/realtime_file0_raw.fif
+```
 
 ### Inheritance
 
@@ -49,7 +58,7 @@ Constructs a [`FiffFileSharer`](/docs/api/fiff/fiff-file-sharer) to watch/save t
 
 ### copyRealtimeFile(sSourcePath)
 
-Copies unfinished fiff file to set directory and appends relevant end tags to copy.
+Copies an unfinished FIFF file into the shared directory and closes its raw block; the copy appears there only once it is complete.
 
 **Parameters:**
 
@@ -63,6 +72,12 @@ Copies unfinished fiff file to set directory and appends relevant end tags to co
 Sets member QFileSystemWatcher to watch set directory.
 
 ---
+
+## Example
+
+- Full source: [`src/examples/ex_fiff_structure/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_fiff_structure/main.cpp)
+- Build target: `ex_fiff_structure` (runs under CTest)
+- Data: [mne-cpp-test-data](https://github.com/mne-tools/mne-cpp-test-data)
 
 ## Authors of this file
 

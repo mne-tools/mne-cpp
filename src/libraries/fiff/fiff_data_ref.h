@@ -49,6 +49,8 @@ namespace FIFFLIB
  * size in bytes, byte offset into the external file). The 64-bit fields
  * let referenced payloads exceed 2 GiB, which is required by long
  * continuous Neuromag recordings split into multi-file FIFF trees.
+ *
+ * @snippet ex_fiff_structure/main.cpp fiff_data_ref_usage
  */
 
 class FIFFSHARED_EXPORT FiffDataRef

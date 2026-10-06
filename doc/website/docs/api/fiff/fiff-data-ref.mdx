@@ -19,6 +19,13 @@ External data reference: type, endian, byte size and offset into an external FIF
 
 Mirrors the original ``fiffDataRefRec`` exactly: a 24-byte record made of two `qint32` (type, endianness flag) followed by two `qint64` (payload size in bytes, byte offset into the external file). The 64-bit fields let referenced payloads exceed 2 GiB, which is required by long continuous Neuromag recordings split into multi-file FIFF trees.
 
+```cpp title="src/examples/ex_fiff_structure/main.cpp"
+// A reference to data in an external file: 2 x 32-bit type and byte order, 2 x 64-bit size and offset.
+FiffDataRef reference;
+reference.size = 3LL << 31; // beyond 2 GiB
+reference.offset = 1024;
+```
+
 ---
 
 ## Public Methods
@@ -48,6 +55,12 @@ Size of the old struct (`fiffDataRefRec`) 2*int + 2*long = 2*4 + 2*8 = 24.
 - *qint32* — the size of the old struct `fiffDataRefRec`.
 
 ---
+
+## Example
+
+- Full source: [`src/examples/ex_fiff_structure/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_fiff_structure/main.cpp)
+- Build target: `ex_fiff_structure` (runs under CTest)
+- Data: [mne-cpp-test-data](https://github.com/mne-tools/mne-cpp-test-data)
 
 ## Authors of this file
 

@@ -3,27 +3,27 @@
   "generated_by": "tools/quality/audit_api_evidence.py",
   "policy": "tools/quality/api_evidence_policy.json",
   "summary": {
-    "exported_classes": 462,
+    "exported_classes": 461,
     "exported_free_functions": 114,
-    "registered_classes": 354,
+    "registered_classes": 353,
     "exported_not_registered": 124,
     "registered_function_modules": 13,
     "registered_header_only": 3,
     "registered_stale": 0,
     "registered_with_test": 101,
     "registered_test_unresolved": 0,
-    "registered_with_example": 226,
+    "registered_with_example": 232,
     "registered_example_not_built": 0,
     "registered_with_python_equiv": 88,
     "registered_without_api_page": 0,
-    "with_snippet": 281,
-    "public_api_units": 478,
-    "example_eligible": 383,
+    "with_snippet": 289,
+    "public_api_units": 477,
+    "example_eligible": 382,
     "example_exempt": 95,
-    "eligible_backed_by_registry_example": 226,
-    "eligible_used_by_some_example": 291,
-    "examples_on_disk": 66,
-    "examples_built": 66
+    "eligible_backed_by_registry_example": 232,
+    "eligible_used_by_some_example": 299,
+    "examples_on_disk": 67,
+    "examples_built": 67
   },
   "by_library": {
     "bids": {
@@ -90,13 +90,13 @@
       "with_snippet": 80
     },
     "fiff": {
-      "public": 37,
-      "registered": 32,
+      "public": 36,
+      "registered": 31,
       "with_test": 10,
-      "eligible": 37,
-      "eligible_with_registry_example": 25,
-      "eligible_used_by_example": 26,
-      "with_snippet": 28
+      "eligible": 36,
+      "eligible_with_registry_example": 31,
+      "eligible_used_by_example": 34,
+      "with_snippet": 36
     },
     "fs": {
       "public": 8,
@@ -6132,25 +6132,6 @@
       "exempt_reason": null
     },
     {
-      "name": "FiffCoordTransSet",
-      "header": "fiff/fiff_coord_trans_set.h",
-      "library": "fiff",
-      "kind": "exported-class",
-      "exported": true,
-      "registered": true,
-      "registry_status": "documented",
-      "test": null,
-      "test_resolves": false,
-      "example": null,
-      "example_state": "none",
-      "including_examples": [],
-      "snippets": [],
-      "api_page": "doc/website/docs/api/fiff/fiff-coord-trans-set.mdx",
-      "python_equiv": null,
-      "example_eligible": true,
-      "exempt_reason": null
-    },
-    {
       "name": "FiffCov",
       "header": "fiff/fiff_cov.h",
       "library": "fiff",
@@ -6187,10 +6168,14 @@
       "registry_status": "documented",
       "test": null,
       "test_resolves": false,
-      "example": null,
-      "example_state": "none",
-      "including_examples": [],
-      "snippets": [],
+      "example": "ex_fiff_structure",
+      "example_state": "built",
+      "including_examples": [
+        "ex_fiff_structure"
+      ],
+      "snippets": [
+        "ex_fiff_structure/main.cpp#fiff_ctf_comp_usage"
+      ],
       "api_page": "doc/website/docs/api/fiff/fiff-ctf-comp.mdx",
       "python_equiv": null,
       "example_eligible": true,
@@ -6206,10 +6191,14 @@
       "registry_status": "documented",
       "test": null,
       "test_resolves": false,
-      "example": null,
-      "example_state": "none",
-      "including_examples": [],
-      "snippets": [],
+      "example": "ex_fiff_structure",
+      "example_state": "built",
+      "including_examples": [
+        "ex_fiff_structure"
+      ],
+      "snippets": [
+        "ex_fiff_structure/main.cpp#fiff_data_ref_usage"
+      ],
       "api_page": "doc/website/docs/api/fiff/fiff-data-ref.mdx",
       "python_equiv": null,
       "example_eligible": true,
@@ -6298,10 +6287,15 @@
       "registry_status": "documented",
       "test": null,
       "test_resolves": false,
-      "example": null,
-      "example_state": "none",
-      "including_examples": [],
-      "snippets": [],
+      "example": "ex_fiff_structure",
+      "example_state": "built",
+      "including_examples": [
+        "ex_fiff_structure"
+      ],
+      "snippets": [
+        "ex_fiff_structure/main.cpp#fiff_dir_entry_usage",
+        "ex_fiff_structure/main.cpp#fiff_raw_dir_usage"
+      ],
       "api_page": "doc/website/docs/api/fiff/fiff-dir-entry.mdx",
       "python_equiv": null,
       "example_eligible": true,
@@ -6342,8 +6336,12 @@
       "test_resolves": false,
       "example": null,
       "example_state": "none",
-      "including_examples": [],
-      "snippets": [],
+      "including_examples": [
+        "ex_fiff_structure"
+      ],
+      "snippets": [
+        "ex_fiff_structure/main.cpp#fiff_epochs_usage"
+      ],
       "api_page": null,
       "python_equiv": null,
       "example_eligible": true,
@@ -6359,10 +6357,14 @@
       "registry_status": "done",
       "test": "test_epochs",
       "test_resolves": true,
-      "example": "ex_read_epochs",
+      "example": "ex_fiff_structure",
       "example_state": "built",
-      "including_examples": [],
-      "snippets": [],
+      "including_examples": [
+        "ex_fiff_structure"
+      ],
+      "snippets": [
+        "ex_fiff_structure/main.cpp#fiff_epochs_usage"
+      ],
       "api_page": "doc/website/docs/api/fiff/fiff-epochs.mdx",
       "python_equiv": "mne.Epochs",
       "example_eligible": true,
@@ -6541,10 +6543,14 @@
       "registry_status": "documented",
       "test": null,
       "test_resolves": false,
-      "example": null,
-      "example_state": "none",
-      "including_examples": [],
-      "snippets": [],
+      "example": "ex_fiff_structure",
+      "example_state": "built",
+      "including_examples": [
+        "ex_fiff_structure"
+      ],
+      "snippets": [
+        "ex_fiff_structure/main.cpp#fiff_file_sharer_usage"
+      ],
       "api_page": "doc/website/docs/api/fiff/fiff-file-sharer.mdx",
       "python_equiv": null,
       "example_eligible": true,
@@ -6563,7 +6569,8 @@
       "example": "ex_fiff_api",
       "example_state": "built",
       "including_examples": [
-        "ex_fiff_api"
+        "ex_fiff_api",
+        "ex_fiff_structure"
       ],
       "snippets": [
         "ex_fiff_api/main.cpp#fiff_stream_usage"
@@ -6711,6 +6718,7 @@
         "ex_dsp_maxwell",
         "ex_dsp_rt",
         "ex_fiff_api",
+        "ex_fiff_structure",
         "ex_fwd_api",
         "ex_inv_hpi"
       ],
@@ -6733,10 +6741,14 @@
       "registry_status": "documented",
       "test": null,
       "test_resolves": false,
-      "example": null,
-      "example_state": "none",
-      "including_examples": [],
-      "snippets": [],
+      "example": "ex_fiff_structure",
+      "example_state": "built",
+      "including_examples": [
+        "ex_fiff_structure"
+      ],
+      "snippets": [
+        "ex_fiff_structure/main.cpp#fiff_raw_dir_usage"
+      ],
       "api_page": "doc/website/docs/api/fiff/fiff-raw-dir.mdx",
       "python_equiv": null,
       "example_eligible": true,
@@ -6779,7 +6791,8 @@
       "example_state": "built",
       "including_examples": [
         "ex_fiff_api",
-        "ex_fiff_sniffer"
+        "ex_fiff_sniffer",
+        "ex_fiff_structure"
       ],
       "snippets": [
         "ex_fiff_api/main.cpp#fiff_stream_usage"
@@ -6822,10 +6835,14 @@
       "registry_status": "documented",
       "test": null,
       "test_resolves": false,
-      "example": null,
-      "example_state": "none",
-      "including_examples": [],
-      "snippets": [],
+      "example": "ex_fiff_structure",
+      "example_state": "built",
+      "including_examples": [
+        "ex_fiff_structure"
+      ],
+      "snippets": [
+        "ex_fiff_structure/main.cpp#fiff_dir_entry_usage"
+      ],
       "api_page": "doc/website/docs/api/fiff/fiff-time.mdx",
       "python_equiv": null,
       "example_eligible": true,

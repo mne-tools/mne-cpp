@@ -291,7 +291,14 @@
       "mne_python": "mne.Epochs",
       "sklearn": null,
       "test": "test_epochs",
-      "example": "ex_read_epochs",
+      "example": "ex_fiff_structure",
+      "example_snippet": [
+        "ex_fiff_structure/main.cpp#fiff_epochs_usage"
+      ],
+      "example_mode": "run",
+      "required_data": [
+        "mne-cpp-test-data"
+      ],
       "status": "done",
       "skigen_candidate": false,
       "documented": true,
@@ -4612,24 +4619,6 @@
       "python_url": null
     },
     {
-      "name": "FiffCoordTransSet",
-      "module": "fiff",
-      "header": "fiff/fiff_coord_trans_set.h",
-      "origin": "mne-c",
-      "mne_c_tool": null,
-      "mne_python": null,
-      "sklearn": null,
-      "test": null,
-      "example": null,
-      "status": "documented",
-      "skigen_candidate": false,
-      "documented": true,
-      "sidebar_position": 14,
-      "guide": null,
-      "python_equiv": null,
-      "python_url": null
-    },
-    {
       "name": "FiffCtfComp",
       "module": "fiff",
       "header": "fiff/fiff_ctf_comp.h",
@@ -4638,7 +4627,14 @@
       "mne_python": null,
       "sklearn": null,
       "test": null,
-      "example": null,
+      "example": "ex_fiff_structure",
+      "example_snippet": [
+        "ex_fiff_structure/main.cpp#fiff_ctf_comp_usage"
+      ],
+      "example_mode": "run",
+      "required_data": [
+        "mne-cpp-test-data"
+      ],
       "status": "documented",
       "skigen_candidate": false,
       "documented": true,
@@ -4656,7 +4652,14 @@
       "mne_python": null,
       "sklearn": null,
       "test": null,
-      "example": null,
+      "example": "ex_fiff_structure",
+      "example_snippet": [
+        "ex_fiff_structure/main.cpp#fiff_data_ref_usage"
+      ],
+      "example_mode": "run",
+      "required_data": [
+        "mne-cpp-test-data"
+      ],
       "status": "documented",
       "skigen_candidate": false,
       "documented": true,
@@ -4749,7 +4752,15 @@
       "mne_python": null,
       "sklearn": null,
       "test": null,
-      "example": null,
+      "example": "ex_fiff_structure",
+      "example_snippet": [
+        "ex_fiff_structure/main.cpp#fiff_dir_entry_usage",
+        "ex_fiff_structure/main.cpp#fiff_raw_dir_usage"
+      ],
+      "example_mode": "run",
+      "required_data": [
+        "mne-cpp-test-data"
+      ],
       "status": "documented",
       "skigen_candidate": false,
       "documented": true,
@@ -4817,7 +4828,14 @@
       "mne_python": null,
       "sklearn": null,
       "test": null,
-      "example": null,
+      "example": "ex_fiff_structure",
+      "example_snippet": [
+        "ex_fiff_structure/main.cpp#fiff_file_sharer_usage"
+      ],
+      "example_mode": "run",
+      "required_data": [
+        "mne-cpp-test-data"
+      ],
       "status": "documented",
       "skigen_candidate": false,
       "documented": true,
@@ -4910,7 +4928,14 @@
       "mne_python": null,
       "sklearn": null,
       "test": null,
-      "example": null,
+      "example": "ex_fiff_structure",
+      "example_snippet": [
+        "ex_fiff_structure/main.cpp#fiff_raw_dir_usage"
+      ],
+      "example_mode": "run",
+      "required_data": [
+        "mne-cpp-test-data"
+      ],
       "status": "documented",
       "skigen_candidate": false,
       "documented": true,
@@ -4978,7 +5003,14 @@
       "mne_python": null,
       "sklearn": null,
       "test": null,
-      "example": null,
+      "example": "ex_fiff_structure",
+      "example_snippet": [
+        "ex_fiff_structure/main.cpp#fiff_dir_entry_usage"
+      ],
+      "example_mode": "run",
+      "required_data": [
+        "mne-cpp-test-data"
+      ],
       "status": "documented",
       "skigen_candidate": false,
       "documented": true,

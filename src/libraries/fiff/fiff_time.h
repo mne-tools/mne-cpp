@@ -44,6 +44,8 @@ namespace FIFFLIB
  * used by @c FIFF_MEAS_DATE and the per-buffer timestamps embedded in raw
  * data blocks, so an instance can be streamed in and out without
  * per-field marshalling.
+ *
+ * @snippet ex_fiff_structure/main.cpp fiff_dir_entry_usage
  */
 
 class FIFFSHARED_EXPORT FiffTime

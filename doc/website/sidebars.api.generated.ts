@@ -39,7 +39,6 @@ const apiSidebar: SidebarsConfig['apiSidebar'] = [
         'api/fiff/fiff-class',
         'api/fiff/fiff-ch-info',
         'api/fiff/fiff-ch-pos',
-        'api/fiff/fiff-coord-trans-set',
         'api/fiff/fiff-ctf-comp',
         'api/fiff/fiff-data-ref',
         'api/fiff/fiff-dig-point',

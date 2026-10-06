@@ -69,6 +69,8 @@ namespace FIFFLIB
  * appropriate matrices. The @c save_calibrated flag controls whether the
  * matrix was stored already-calibrated (and therefore must not be
  * re-multiplied by the channel cals on apply).
+ *
+ * @snippet ex_fiff_structure/main.cpp fiff_ctf_comp_usage
  */
 class FIFFSHARED_EXPORT FiffCtfComp
 {

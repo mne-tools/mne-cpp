@@ -19,6 +19,15 @@ FIFF time stamp: Unix seconds plus a microsecond fraction matching the on-disk `
 
 Layout is two 32-bit fields (secs, usecs) — the exact representation used by `FIFF_MEAS_DATE` and the per-buffer timestamps embedded in raw data blocks, so an instance can be streamed in and out without per-field marshalling.
 
+```cpp title="src/examples/ex_fiff_structure/main.cpp"
+QFile structureFile(rawPath);
+FiffStream::SPtr stream(new FiffStream(&structureFile));
+ok &= stream->open();
+const QList<FiffDirEntry::SPtr>& directory = stream->dir(); // every tag (kind, type, size, position) + a kind -1 end
+const FiffTime created = stream->id().time;                 // seconds and microseconds since 1970
+stream->close();
+```
+
 ---
 
 ## Public Methods
@@ -62,6 +71,12 @@ Size of the old struct (fiffTimeRec) 2*int = 2*4 = 8.
 - *qint32* — the size of the old struct fiffTimeRec.
 
 ---
+
+## Example
+
+- Full source: [`src/examples/ex_fiff_structure/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_fiff_structure/main.cpp)
+- Build target: `ex_fiff_structure` (runs under CTest)
+- Data: [mne-cpp-test-data](https://github.com/mne-tools/mne-cpp-test-data)
 
 ## Authors of this file
 

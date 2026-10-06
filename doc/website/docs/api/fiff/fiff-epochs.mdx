@@ -19,9 +19,20 @@ sidebar_position: 5
 class FIFFLIB::FiffEpochs
 ```
 
-Free / static helpers that turn a [`FiffRawData`](/docs/api/fiff/fiff-raw-data) plus an event list into fixed-length epochs.
+Static helpers that cut continuous data into fixed-length epochs, concatenate and average them.
 
-Stateless — operates on the [`FiffRawData`](/docs/api/fiff/fiff-raw-data) and event arguments directly. Used by the source-reconstruction pipeline and by the offline averaging tooling when building epochs for an [`FiffEvokedSet`](/docs/api/fiff/fiff-evoked-set).
+Stateless; operates on data matrices. Counterpart of `mne.make_fixed_length_epochs` and `mne.concatenate_epochs` in MNE-Python.
+
+```cpp title="src/examples/ex_fiff_structure/main.cpp"
+QFile rawFile(rawPath);
+FiffRawData raw(rawFile);
+MatrixXd data;
+MatrixXd times;
+ok &= raw.read_raw_segment(data, times); // all 6007 samples
+const double sfreq = raw.info.sfreq;
+const QList<FiffEpochData> epochs = FiffEpochs::makeFixedLengthEpochs(data, sfreq, 2.0, 0.5); // 2 s, 0.5 s overlap
+const FiffEvoked average = FiffEpochs::averageEpochs(epochs, sfreq);
+```
 
 ---
 
@@ -113,8 +124,9 @@ Convenience method to get a list of data matrices from epoch structures, suitabl
 
 ## Example
 
-- Full source: [`src/examples/ex_read_epochs/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_read_epochs/main.cpp)
-- Build target: `ex_read_epochs` (compiled in CI)
+- Full source: [`src/examples/ex_fiff_structure/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_fiff_structure/main.cpp)
+- Build target: `ex_fiff_structure` (runs under CTest)
+- Data: [mne-cpp-test-data](https://github.com/mne-tools/mne-cpp-test-data)
 
 ## Authors of this file
 

@@ -19,6 +19,23 @@ Directory entry: tag kind + on-disk type + byte size + absolute file offset (16-
 
 Exact memory image of the legacy ``fiffDirEntryRec`:` kind (32-bit), type (32-bit), size (32-bit), pos (32-bit). The arrays of these records materialize the `FIFF_DIR` tag at the tail of every well-formed FIFF file and drive random-access tag lookup in [`[FiffStream](/docs/api/fiff/fiff-stream)`](/docs/api/fiff/fiff-stream).
 
+```cpp title="src/examples/ex_fiff_structure/main.cpp"
+QFile structureFile(rawPath);
+FiffStream::SPtr stream(new FiffStream(&structureFile));
+ok &= stream->open();
+const QList<FiffDirEntry::SPtr>& directory = stream->dir(); // every tag (kind, type, size, position) + a kind -1 end
+const FiffTime created = stream->id().time;                 // seconds and microseconds since 1970
+stream->close();
+```
+
+```cpp title="src/examples/ex_fiff_structure/main.cpp"
+// The raw data directory: one FiffRawDir per data buffer, each pointing at its FiffDirEntry in the file.
+int samples = 0;
+for (const FiffRawDir& buffer : raw.rawdir)
+    samples += buffer.nsamp;
+const FiffDirEntry::SPtr firstBuffer = raw.rawdir.first().ent;
+```
+
 ---
 
 ## Public Methods
@@ -57,6 +74,12 @@ Size of the old struct (`fiffDirEntryRec`) 4*int = 4*4 = 16.
 - *qint32* — the size of the old struct `fiffDirEntryRec`.
 
 ---
+
+## Example
+
+- Full source: [`src/examples/ex_fiff_structure/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_fiff_structure/main.cpp)
+- Build target: `ex_fiff_structure` (runs under CTest)
+- Data: [mne-cpp-test-data](https://github.com/mne-tools/mne-cpp-test-data)
 
 ## Authors of this file
 
