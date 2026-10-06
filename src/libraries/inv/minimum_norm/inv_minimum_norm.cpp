@@ -485,7 +485,7 @@ void InvMinimumNorm::computeELoreta()
                 Matrix3d mVec = eigM.eigenvectors();
                 Vector3d mPow;
                 for (int d = 0; d < 3; ++d) {
-                    mPow(d) = (mEig(d) > 1e-30) ? std::pow(mEig(d), -0.5) : 0.0;
+                    mPow(d) = (mEig(d) > 1e-7 * mEig(2)) ? std::pow(mEig(d), -0.5) : 0.0; // mne _sym_mat_pow rcond
                 }
                 R_mat[s_idx] = mVec * mPow.asDiagonal() * mVec.transpose();
             }
@@ -533,10 +533,11 @@ void InvMinimumNorm::computeELoreta()
         }
     }
 
-    // Undo source_std weighting on G
+    // Undo source_std weighting on G and renormalize R against the unbiased gain, as mne-python does
     for (int i = 0; i < G.cols(); ++i) {
         G.col(i) /= sourceStd(i);
     }
+    computeGRGt();
 
     // Compute R^{1/2}
     VectorXd R_sqrt_vec;
@@ -551,7 +552,7 @@ void InvMinimumNorm::computeELoreta()
             Matrix3d rVec = eigR.eigenvectors();
             Vector3d rSqrt;
             for (int d = 0; d < 3; ++d) {
-                rSqrt(d) = (rEig(d) > 1e-30) ? std::sqrt(rEig(d)) : 0.0;
+                rSqrt(d) = (rEig(d) > 1e-7 * rEig(2)) ? std::sqrt(rEig(d)) : 0.0;
             }
             R_sqrt_mat[s_idx] = rVec * rSqrt.asDiagonal() * rVec.transpose();
         }
