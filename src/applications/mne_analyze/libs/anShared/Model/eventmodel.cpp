@@ -462,40 +462,20 @@ float EventModel::getFreq()
 
 bool EventModel::saveToFile(const QString& sPath)
 {
-#if QT_VERSION > QT_VERSION_CHECK(6, 0, 0)
-    using Qt::endl;
-#endif
 #ifdef WASMBUILD
-    //QBuffer* bufferOut = new QBuffer;
-    QByteArray* bufferOut = new QByteArray;
-
-    QTextStream out(bufferOut, QIODevice::ReadWrite);
-    auto events = m_EventManager.getEventsInGroups(m_selectedEventGroups);
-    for (const auto& event : *events) {
-        // .eve columns are sample, onset in seconds, before and after. The
-        // last one is the trigger code and used to be hardcoded to 1, which
-        // exported every event as the same condition.
-        out << "  " << event.sample
-            << "   " << QString::number(static_cast<float>(event.sample - m_pFiffModel->absoluteFirstSample()) / this->getFreq(), 'f', 4)
-            << "          0         " << event.eventCode << endl;
-    }
-
-    // Wee need to call the QFileDialog here instead of the data load plugin since we need access to the QByteArray
-    QFileDialog::saveFileContent(bufferOut->data(), "events.eve");
-
-    // bufferOut->deleteLater();
-
-    return true;
+    // The browser offers the bytes as a download; sPath has no meaning there.
+    Q_UNUSED(sPath)
+    QBuffer device;
+    device.open(QIODevice::WriteOnly);
 #else
-    qInfo() << "EventView::saveToFile";
-
-    QFile file(sPath);
-    if (!file.open(QIODevice::WriteOnly)) {
+    QFile device(sPath);
+    if (!device.open(QIODevice::WriteOnly)) {
         qWarning() << "[EventModel::saveToFile] Unable to access file.";
         return false;
     }
+#endif
 
-    QTextStream out(&file);
+    QTextStream out(&device);
     auto events = m_EventManager.getEventsInGroups(m_selectedEventGroups);
     for (const auto& event : *events) {
         // .eve columns are sample, onset in seconds, before and after. The
@@ -505,9 +485,12 @@ bool EventModel::saveToFile(const QString& sPath)
             << "   " << QString::number(static_cast<float>(event.sample - m_pFiffModel->absoluteFirstSample()) / this->getFreq(), 'f', 4)
             << "          0         " << event.eventCode << "\n";
     }
+    out.flush();
 
-    return true;
+#ifdef WASMBUILD
+    QFileDialog::saveFileContent(device.data(), "events.eve");
 #endif
+    return true;
 }
 
 //=============================================================================================================

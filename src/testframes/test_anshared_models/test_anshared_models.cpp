@@ -43,6 +43,7 @@
 #include <anShared/Management/communicator.h>
 
 #include <fiff/fiff_info.h>
+#include <fiff/fiff_raw_data.h>
 
 #include <cmath>
 
@@ -54,6 +55,7 @@
 #include <QCoreApplication>
 #include <QFile>
 #include <QScopedPointer>
+#include <QTemporaryDir>
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -80,6 +82,7 @@ private:
 private slots:
     void initTestCase();
     void rawModel_matchesPython();
+    void rawModel_saveToFileRoundTrips();
     void rawModel_emptyStateIsSafe();
     void eventModel_emptyStateIsSafe();
     void analyzeData_startsEmpty();
@@ -128,6 +131,25 @@ void TestAnSharedModels::rawModel_matchesPython()
 
     // The sample range has to be ordered, or every downstream length is negative.
     QVERIFY(model.absoluteLastSample() > model.absoluteFirstSample());
+}
+
+//=============================================================================================================
+
+void TestAnSharedModels::rawModel_saveToFileRoundTrips()
+{
+    FiffRawViewModel model(rawPath());
+    QTemporaryDir dir;
+    QVERIFY(dir.isValid());
+    const QString out = dir.filePath("saved_raw.fif");
+    QVERIFY(model.saveToFile(out));
+
+    QFile file(out);
+    const FIFFLIB::FiffRawData saved(file);
+    QCOMPARE(static_cast<int>(saved.first_samp), 12900);
+    QCOMPARE(static_cast<int>(saved.last_samp), 18906);
+    QCOMPARE(saved.info.nchan, 376);
+
+    QVERIFY(!FiffRawViewModel().saveToFile(dir.filePath("empty_raw.fif")));
 }
 
 //=============================================================================================================

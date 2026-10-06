@@ -227,38 +227,24 @@ QVariant FiffRawViewModel::data(const QModelIndex& index,
 
 bool FiffRawViewModel::saveToFile(const QString& sPath)
 {
+    if (!m_pFiffIO || m_pFiffIO->m_qlistRaw.isEmpty()) {
+        return false;
+    }
 #ifdef WASMBUILD
-    QBuffer* bufferOut = new QBuffer;
-
-    if (m_pFiffIO->m_qlistRaw.size() > 0) {
-        if (m_bPerformFiltering) {
-            return RTPROCESSINGLIB::filterFile(*bufferOut, m_pFiffIO->m_qlistRaw[0], m_filterKernel);
-        } else {
-            return m_pFiffIO->write_raw(*bufferOut, 0);
-        }
-
-        // Wee need to call the QFileDialog here instead of the data load plugin since we need access to the QByteArray
-        QFileDialog::saveFileContent(bufferOut->data(), getModelName());
-
-        return true;
-    }
-
-    //bufferOut->deleteLater();
-
-    return false;
+    // The browser offers the bytes as a download; sPath has no meaning there.
+    Q_UNUSED(sPath)
+    QBuffer device;
 #else
-    QFile fFileOut(sPath);
-
-    if (m_pFiffIO->m_qlistRaw.size() > 0) {
-        if (m_bPerformFiltering) {
-            return RTPROCESSINGLIB::filterFile(fFileOut, m_pFiffIO->m_qlistRaw[0], m_filterKernel);
-        } else {
-            return m_pFiffIO->write_raw(fFileOut, 0);
-        }
-    }
-
-    return false;
+    QFile device(sPath);
 #endif
+    const bool ok = m_bPerformFiltering ? RTPROCESSINGLIB::filterFile(device, m_pFiffIO->m_qlistRaw[0], m_filterKernel)
+                                        : m_pFiffIO->write_raw(device, 0);
+#ifdef WASMBUILD
+    if (ok) {
+        QFileDialog::saveFileContent(device.data(), getModelName());
+    }
+#endif
+    return ok;
 }
 
 //=============================================================================================================
