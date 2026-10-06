@@ -24,9 +24,8 @@
  * identifiers from @ref fiff_constants.h.
  *
  * The class also publishes the small algebra needed at the call sites:
- * multiplication, inversion, and the convenience helper that picks the
- * right transform out of a @ref FIFFLIB::FiffCoordTransSet by (@c from, @c to)
- * pair. Surface-compatible with the @c mne.transforms.Transform object
+ * multiplication, inversion and applying the transform to point sets.
+ * Surface-compatible with the @c mne.transforms.Transform object
  * in MNE-Python.
  */
 

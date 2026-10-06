@@ -43,7 +43,6 @@ set(SOURCES
     fiff_dir_node.cpp
     fiff_sparse_matrix.cpp
     fiff_digitizer_data.cpp
-    fiff_coord_trans_set.cpp
     fiff_file_sharer.cpp
     fiff_annotations.cpp
     fiff_annotation_event_utils.cpp
@@ -83,7 +82,6 @@ set(HEADERS
     fiff_dir_node.h
     fiff_sparse_matrix.h
     fiff_digitizer_data.h
-    fiff_coord_trans_set.h
     fiff_file_sharer.h
     fiff_annotations.h
     fiff_annotation_event_utils.h

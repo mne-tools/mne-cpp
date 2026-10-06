@@ -59,6 +59,8 @@ if $CHECK_ONLY; then
   python3 tools/doxy2mdx/check_generated.py --xml-dir doc/xml_out/xml
   exit 0
 fi
+# Pages of removed classes would otherwise linger; index.mdx is hand-written (check_generated.py KEEP).
+find doc/website/docs/api -type f ! -path doc/website/docs/api/index.mdx -delete
 python3 tools/doxy2mdx/doxy2mdx.py \
     --xml-dir doc/xml_out/xml \
     --out-dir doc/website/docs/api \
