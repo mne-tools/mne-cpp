@@ -405,20 +405,24 @@ void TestMneLabelPython::assembleKernel_label()
     if (method == "MNE") {
         QCOMPARE(static_cast<int>(nnLabel.rows()), 0);
 
-        // The resolution matrix K G: mne-python make_inverse_resolution_matrix(fwd, inv, "MNE", 1/9) on the
-        // operator MNE-CPP writes gives trace 44.570330408234156 and |R| sum 1564.2890565507205.
+        // The resolution matrix K G of a loose inverse: K and G in surface coordinates. mne-python
+        // make_inverse_resolution_matrix(fwd, inv, "MNE", 1/9) on make_inverse_operator(..., loose=0.2, depth=0.8)
+        // returns its Cartesian kernel times the surface gain; trace and Frobenius norm of the consistent product do
+        // not depend on the per-source basis: trace 43.488585536748346, norm 7.8792209245077.
         prepared.getKernel() = kFull;
         const MatrixXd R = MNECorticalMap::makeCorticalMap(fwd, prepared, evoked.info);
         QCOMPARE(R.rows(), kFull.rows());
         QCOMPARE(R.cols(), fwd.sol->data.cols());
         // Only the inverse's 364 good channels of the 366-row forward enter K G.
         QCOMPARE(static_cast<int>(prepared.eigen_fields->col_names.size()), 364);
+        MNEForwardSolution surfFwd = fwd;
+        surfFwd.convert_to_surf_ori();
         MatrixXd G(364, fwd.sol->data.cols());
         for (int c = 0; c < 364; ++c)
-            G.row(c) = fwd.sol->data.row(static_cast<int>(fwd.sol->row_names.indexOf(prepared.eigen_fields->col_names[c])));
+            G.row(c) = surfFwd.sol->data.row(static_cast<int>(surfFwd.sol->row_names.indexOf(prepared.eigen_fields->col_names[c])));
         QVERIFY((R - kFull * G).norm() <= 1e-12 * R.norm());
-        QVERIFY(std::abs(R.trace() - 44.570330408234156) <= 1e-6 * 44.570330408234156);
-        QVERIFY(std::abs(R.cwiseAbs().sum() - 1564.2890565507205) <= 1e-6 * 1564.2890565507205);
+        QVERIFY2(std::abs(R.trace() - 43.488585536748346) <= 1e-5 * 43.488585536748346, qPrintable(QString::number(R.trace(), 'g', 17)));
+        QVERIFY2(std::abs(R.norm() - 7.8792209245077) <= 1e-5 * 7.8792209245077, qPrintable(QString::number(R.norm(), 'g', 17)));
 
         QTest::ignoreMessage(QtWarningMsg, QRegularExpression("Inverse kernel is empty"));
         QVERIFY(MNECorticalMap::makeCorticalMap(fwd, inv, evoked.info).size() == 0);

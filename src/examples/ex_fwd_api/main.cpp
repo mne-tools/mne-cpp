@@ -194,12 +194,12 @@ int main(int argc, char* argv[])
 
     //! [fwd_read_usage]
     MNEForwardSolution back;
-    Fwd::read_forward_solution(solFile, back); // same as MNEForwardSolution::read: drops the bad channels
-    MNEForwardSolution all;
-    MNEForwardSolution::read(solFile, all, false, false, {}, {}, false); // keeps them, like mne.read_forward_solution
+    Fwd::read_forward_solution(solFile, back); // all 366 rows, like mne.read_forward_solution
+    MNEForwardSolution good;
+    MNEForwardSolution::read(solFile, good, false, false, {}, {}, true); // without the channels marked bad
     //! [fwd_read_usage]
-    ok &= expect(back.nsource == 78 && back.nchan == 364 && all.nchan == 366 && (all.sol->data - fwd->sol->data).norm() <= 1e-6 * fwd->sol->data.norm(),
-                 "Fwd::read_forward_solution reads the solution back without the 2 bads; all 366 rows round-trip");
+    ok &= expect(back.nsource == 78 && back.nchan == 366 && good.nchan == 364 && (back.sol->data - fwd->sol->data).norm() <= 1e-6 * fwd->sol->data.norm(),
+                 "Fwd::read_forward_solution reads all 366 rows back; bExcludeBads drops the 2 bads");
 
     qInfo().noquote() << (ok ? "All fwd checks passed." : "fwd checks FAILED.");
     return ok ? EXIT_SUCCESS : EXIT_FAILURE;

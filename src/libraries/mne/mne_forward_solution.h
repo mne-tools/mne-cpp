@@ -173,7 +173,7 @@ public:
      * @param[in] surf_ori      Use surface based source coordinate system? (optional).
      * @param[in] include       Include these channels (optional).
      * @param[in] exclude       Exclude these channels (optional).
-     * @param[in] bExcludeBads  If true bads are also read; default = false (optional).
+     * @param[in] bExcludeBads  Drop the channels marked bad in the file; mne.read_forward_solution keeps them.
      *
      */
     MNEForwardSolution(QIODevice& p_IODevice,
@@ -399,7 +399,7 @@ public:
      * @param[in] surf_ori      Use surface based source coordinate system? (optional).
      * @param[in] include       Include these channels (optional).
      * @param[in] exclude       Exclude these channels (optional).
-     * @param[in] bExcludeBads  If true bads are also read; default = false (optional).
+     * @param[in] bExcludeBads  Drop the channels marked bad in the file; mne.read_forward_solution keeps them.
      *
      * @return true if succeeded, false otherwise.
      */
@@ -409,7 +409,7 @@ public:
                      bool surf_ori = false,
                      const QStringList& include = FIFFLIB::defaultQStringList,
                      const QStringList& exclude = FIFFLIB::defaultQStringList,
-                     bool bExcludeBads = true);
+                     bool bExcludeBads = false);
 
     //=========================================================================================================
     /**
@@ -452,6 +452,14 @@ public:
      * Helper to convert the forward solution to fixed ori from free
      */
     void to_fixed_ori();
+
+    //=========================================================================================================
+    /**
+     * Rotates a free-orientation solution into local surface coordinates (two tangential components, then the
+     * normal), using average patch normals when the source spaces carry them. Equivalent of
+     * mne.convert_forward_solution(fwd, surf_ori=True). Does nothing if already surface-oriented or fixed.
+     */
+    void convert_to_surf_ori();
 
     //=========================================================================================================
     /**

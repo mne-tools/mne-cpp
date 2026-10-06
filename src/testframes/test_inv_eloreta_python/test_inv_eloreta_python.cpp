@@ -176,6 +176,9 @@ void TestInvEloretaPython::makeInverse_matchesPython_data()
     // for fixed ones; surface-oriented operators use the patch normals.
     QTest::newRow("loose 0.2") << "all" << true << 0.2f << 0.8f << false << 210
                                << 70.71887643595808 << 12172144.218271181 << 8.033782202042283e-08 << -2.3680535720497407 << false << true;
+    // make_inverse_operator rotates a Cartesian forward to the surface itself, as mne-python does.
+    QTest::newRow("loose 0.2, Cartesian forward") << "all" << false << 0.2f << 0.8f << false << 210
+                                                  << 70.71887643595808 << 12172144.218271181 << 8.033782202042283e-08 << -2.3680535720497407 << false << true;
     QTest::newRow("free") << "all" << false << 1.0f << 0.8f << false << 210
                           << 71.9772089624631 << 10247045.448053062 << 6.85092011400161e-08 << 70.0 << false << true;
     QTest::newRow("free, no depth") << "all" << false << 1.0f << 0.0f << false << 210
@@ -272,8 +275,8 @@ void TestInvEloretaPython::estimateSnr_matchesPython_data()
                                    << 20262.11598655369 << 48.12854153575698 << 48.12854153575698 << 0;
     // data = G[:, 32] * 3e-9 * (1..421): the first three samples have snr <= 1. The
     // closest chi^2 decision is 1e-5 relative away from the threshold.
-    QTest::newRow("source ramp") << 3e-9 << 22241.730459096696 << 25.288635457990637 << 100.40339424410143
-                                 << 2178.910634716406 << 2.123883171237634 << 10.498679616516537 << 3;
+    QTest::newRow("source ramp") << 3e-9 << 22241.730511764537 << 25.288635517873463 << 100.40339448185408
+                                 << 2850.5600179457488 << 2.772030260790861 << 13.980787564056596 << 3;
 }
 
 //=============================================================================================================
@@ -323,8 +326,8 @@ void TestInvEloretaPython::applyInverseRaw_matchesPython_data()
     QTest::addColumn<double>("value60_50");
 
     // apply_inverse_raw(raw, inv, 1/9, method, start=1000, stop=1100)
-    QTest::newRow("dSPM") << "dSPM" << 5.802343644914849 << 0.000676038579355509 << 0.0005588898740929932;
-    QTest::newRow("MNE") << "MNE" << 4.381609183047944e-08 << 4.339177901056041e-12 << 3.5389690616879216e-12;
+    QTest::newRow("dSPM") << "dSPM" << 5.211519370192427 << 0.0009743752200853925 << 0.00027809531943498786;
+    QTest::newRow("MNE") << "MNE" << 4.634099676551055e-08 << 7.413099034522484e-12 << 2.106972417282718e-12;
 }
 
 //=============================================================================================================
@@ -363,10 +366,10 @@ void TestInvEloretaPython::kernel_matchesPython_data()
     QTest::addColumn<double>("reginvSum");
 
     // MNE rows check the shared preparation; their sing/reginv are not compared (zero marks "skip").
-    QTest::newRow("MNE loose") << "MNE" << false << false << 210 << 111383781.99468082 << 0.0 << 0.0;
+    QTest::newRow("MNE loose") << "MNE" << false << false << 210 << 110682612.61671561 << 0.0 << 0.0;
     QTest::newRow("MNE fixed") << "MNE" << true << false << 70 << 106006220.75199796 << 0.0 << 0.0;
-    QTest::newRow("eLORETA loose independent") << "eLORETA" << false << false << 210 << 96341413.3468054 << 68.61269042471012 << 43.58717124957271;
-    QTest::newRow("eLORETA loose force equal") << "eLORETA" << false << true << 210 << 95231145.14647257 << 68.64767456445117 << 43.293457695846556;
+    QTest::newRow("eLORETA loose independent") << "eLORETA" << false << false << 210 << 96478643.23133183 << 67.98721846773766 << 42.853400214515;
+    QTest::newRow("eLORETA loose force equal") << "eLORETA" << false << true << 210 << 96866113.76862757 << 67.8697853708028 << 42.10190537427339;
     QTest::newRow("eLORETA fixed") << "eLORETA" << true << false << 70 << 96220687.40176067 << 65.19578191146573 << 35.54620323396668;
 }
 
@@ -426,8 +429,8 @@ void TestInvEloretaPython::noiseNorm_matchesPython_data()
     QTest::addColumn<double>("normSum");
 
     // np.sum(1 / prepare_inverse_operator(inv, nave, 1/9, method)['noisenorm'])
-    QTest::newRow("dSPM loose") << false << false << 6.850920184879696e-08;
-    QTest::newRow("sLORETA loose") << false << true << 1.6188218074164552e-07;
+    QTest::newRow("dSPM loose") << false << false << 8.033782240825505e-08;
+    QTest::newRow("sLORETA loose") << false << true << 1.9790974939286774e-07;
     QTest::newRow("dSPM fixed") << true << false << 1.0650605045089541e-07;
     QTest::newRow("sLORETA fixed") << true << true << 2.5912461249407486e-07;
 }

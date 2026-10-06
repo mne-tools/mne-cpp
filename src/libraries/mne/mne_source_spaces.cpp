@@ -233,6 +233,12 @@ MNESourceSpaces MNESourceSpaces::pick_regions(const QList<FsLabel>& p_qListLabel
             selHemi->use_tri_cent = use_tri_cent_new;
             selHemi->use_tri_nn = use_tri_nn_new;
             selHemi->use_tri_area = use_tri_area_new;
+            // patch_inds is indexed by used source, so it must follow the selection
+            if (origHemi && origHemi->patch_inds.size() == origSpace.nuse) {
+                selHemi->patch_inds.resize(selVertices.size());
+                for (qint32 i = 0; i < selVertices.size(); ++i)
+                    selHemi->patch_inds[i] = origHemi->patch_inds[selVertices[i]];
+            }
         }
     }
 

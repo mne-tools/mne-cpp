@@ -61,14 +61,21 @@ MatrixXd MNECorticalMap::makeCorticalMap(
         qWarning("MNECorticalMap::makeCorticalMap - Forward solution is empty.");
         return MatrixXd();
     }
+    // A loose inverse kernel is in surface coordinates; rotate a Cartesian free forward to match
+    // (mne-python _convert_forward_match_inv).
+    MNEForwardSolution matched = fwd;
+    const bool looseInverse = inv.orient_prior && inv.orient_prior->data.size() > 0 && (inv.orient_prior->data.array() < 1.0).any();
+    if (looseInverse && !matched.isFixedOrient())
+        matched.convert_to_surf_ori();
+
     // The kernel's columns are the inverse operator's channels; pick those rows of the gain by name, as
     // mne-python's make_inverse_resolution_matrix does.
-    MatrixXd gain = fwd.sol->data;
+    MatrixXd gain = matched.sol->data;
     const QStringList& invChannels = inv.eigen_fields ? inv.eigen_fields->col_names : QStringList();
-    if (invChannels.size() == kernel.cols() && fwd.sol->row_names.size() == gain.rows()) {
+    if (invChannels.size() == kernel.cols() && matched.sol->row_names.size() == gain.rows()) {
         MatrixXd picked(kernel.cols(), gain.cols());
         for (int c = 0; c < invChannels.size(); ++c) {
-            const int row = static_cast<int>(fwd.sol->row_names.indexOf(invChannels[c]));
+            const int row = static_cast<int>(matched.sol->row_names.indexOf(invChannels[c]));
             if (row < 0) {
                 qWarning("MNECorticalMap::makeCorticalMap - Channel %s is not in the forward solution.",
                          invChannels[c].toUtf8().constData());

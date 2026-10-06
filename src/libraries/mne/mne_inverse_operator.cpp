@@ -567,11 +567,9 @@ MNEInverseOperator MNEInverseOperator::make_inverse_operator(const FiffInfo& inf
     bool is_fixed_ori = forward.isFixedOrient();
     MNEInverseOperator inv;
 
-    //
-    // Surface-orientation sanity check
-    //
-    if (fixed && !forward.surf_ori) {
-        qWarning("Warning: Forward solution is not surface-oriented. A surface-oriented solution is recommended for fixed-orientation inverse operators.");
+    // Loose and fixed constraints are relative to the cortical normal, as in mne-python's _prepare_forward.
+    if (!is_fixed_ori && (fixed || loose < 1.0f)) {
+        forward.convert_to_surf_ori();
     }
 
     //Check parameters

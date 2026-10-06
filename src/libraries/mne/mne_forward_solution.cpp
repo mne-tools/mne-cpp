@@ -1366,77 +1366,8 @@ bool MNEForwardSolution::read(QIODevice& p_IODevice,
             qInfo("[done]");
         }
     } else if (surf_ori) {
-        //
-        //   Rotate the local source coordinate systems
-        //
-        qInfo("\tConverting to surface-based source orientations...");
-
-        bool use_ave_nn = false;
-        auto* hemi0 = t_SourceSpace.hemisphereAt(0);
-        if (hemi0 && hemi0->patch_inds.size() > 0) {
-            use_ave_nn = true;
-            qInfo("\tAverage patch normals will be employed in the rotation to the local surface coordinates...");
-        }
-
-        nuse = 0;
-        qint32 pp = 0;
-        fwd.source_rr = MatrixXf::Zero(fwd.nsource, 3);
-        fwd.source_nn = MatrixXf::Zero(fwd.nsource * 3, 3);
-
-        qWarning("Warning source_ori: Rotating the source coordinate system haven't been verified --> Singular Vectors U are different from MATLAB!");
-
-        for (qint32 k = 0; k < t_SourceSpace.size(); ++k) {
-            for (qint32 q = 0; q < t_SourceSpace[k].nuse; ++q)
-                fwd.source_rr.block(q + nuse, 0, 1, 3) = t_SourceSpace[k].rr.block(t_SourceSpace[k].vertno(q), 0, 1, 3);
-
-            for (qint32 p = 0; p < t_SourceSpace[k].nuse; ++p) {
-                //
-                //  Project out the surface normal and compute SVD
-                //
-                Vector3f nn;
-                if (use_ave_nn) {
-                    auto* hemiK = t_SourceSpace.hemisphereAt(k);
-                    VectorXi t_vIdx = hemiK->pinfo[hemiK->patch_inds[p]];
-                    Matrix3Xf t_nn(3, t_vIdx.size());
-                    for (qint32 i = 0; i < t_vIdx.size(); ++i)
-                        t_nn.col(i) = t_SourceSpace[k].nn.block(t_vIdx[i], 0, 1, 3).transpose();
-                    nn = t_nn.rowwise().sum();
-                    nn.array() /= nn.norm();
-                } else
-                    nn = t_SourceSpace[k].nn.block(t_SourceSpace[k].vertno(p), 0, 1, 3).transpose();
-
-                Matrix3f tmp = Matrix3f::Identity(nn.rows(), nn.rows()) - nn * nn.transpose();
-
-                JacobiSVD<MatrixXf> t_svd(tmp, Eigen::ComputeThinU);
-                //Sort singular values and singular vectors
-                VectorXf t_s = t_svd.singularValues();
-                MatrixXf U = t_svd.matrixU();
-                Linalg::sort<float>(t_s, U);
-
-                //
-                //  Make sure that ez is in the direction of nn
-                //
-                if ((nn.transpose() * U.block(0, 2, 3, 1))(0, 0) < 0)
-                    U *= -1;
-                fwd.source_nn.block(pp, 0, 3, 3) = U.transpose();
-                pp += 3;
-            }
-            nuse += t_SourceSpace[k].nuse;
-        }
-        MatrixXd tmp = fwd.source_nn.transpose().cast<double>();
-        SparseMatrix<double> surf_rot = Linalg::make_block_diag(tmp, 3);
-
-        fwd.sol->data *= surf_rot;
-
-        if (!fwd.sol_grad->isEmpty()) {
-            SparseMatrix<double> t_matKron;
-            SparseMatrix<double> t_eye(3, 3);
-            for (qint32 i = 0; i < 3; ++i)
-                t_eye.insert(i, i) = 1.0f;
-            t_matKron = kroneckerProduct(surf_rot, t_eye); //kron(surf_rot,eye(3));
-            fwd.sol_grad->data *= t_matKron;
-        }
-        qInfo("[done]");
+        fwd.surf_ori = false;
+        fwd.convert_to_surf_ori();
     } else {
         qInfo("\tCartesian source orientations...");
         nuse = 0;
@@ -1587,6 +1518,84 @@ void MNEForwardSolution::restrict_gain_matrix(MatrixXd& G, const FiffInfo& info)
                 qWarning("Could not find MEG or EEG channels");
         }
     }
+}
+
+//=============================================================================================================
+
+void MNEForwardSolution::convert_to_surf_ori()
+{
+    if (this->surf_ori || this->isFixedOrient())
+        return;
+    qint32 nuse = 0;
+    //
+    //   Rotate the local source coordinate systems
+    //
+    qInfo("\tConverting to surface-based source orientations...");
+
+    bool use_ave_nn = false;
+    auto* hemi0 = src.hemisphereAt(0);
+    if (hemi0 && hemi0->patch_inds.size() > 0) {
+        use_ave_nn = true;
+        qInfo("\tAverage patch normals will be employed in the rotation to the local surface coordinates...");
+    }
+
+    qint32 pp = 0;
+    this->source_rr = MatrixXf::Zero(this->nsource, 3);
+    this->source_nn = MatrixXf::Zero(this->nsource * 3, 3);
+
+    for (qint32 k = 0; k < src.size(); ++k) {
+        for (qint32 q = 0; q < src[k].nuse; ++q)
+            this->source_rr.block(q + nuse, 0, 1, 3) = src[k].rr.block(src[k].vertno(q), 0, 1, 3);
+
+        for (qint32 p = 0; p < src[k].nuse; ++p) {
+            //
+            //  Project out the surface normal and compute SVD
+            //
+            Vector3f nn;
+            if (use_ave_nn) {
+                auto* hemiK = src.hemisphereAt(k);
+                VectorXi t_vIdx = hemiK->pinfo[hemiK->patch_inds[p]];
+                Matrix3Xf t_nn(3, t_vIdx.size());
+                for (qint32 i = 0; i < t_vIdx.size(); ++i)
+                    t_nn.col(i) = src[k].nn.block(t_vIdx[i], 0, 1, 3).transpose();
+                nn = t_nn.rowwise().sum();
+                nn.array() /= nn.norm();
+            } else
+                nn = src[k].nn.block(src[k].vertno(p), 0, 1, 3).transpose();
+
+            Matrix3f tmp = Matrix3f::Identity(nn.rows(), nn.rows()) - nn * nn.transpose();
+
+            JacobiSVD<MatrixXf> t_svd(tmp, Eigen::ComputeThinU);
+            //Sort singular values and singular vectors
+            VectorXf t_s = t_svd.singularValues();
+            MatrixXf U = t_svd.matrixU();
+            Linalg::sort<float>(t_s, U);
+
+            //
+            //  Make sure that ez is in the direction of nn
+            //
+            if ((nn.transpose() * U.block(0, 2, 3, 1))(0, 0) < 0)
+                U *= -1;
+            this->source_nn.block(pp, 0, 3, 3) = U.transpose();
+            pp += 3;
+        }
+        nuse += src[k].nuse;
+    }
+    MatrixXd tmp = this->source_nn.transpose().cast<double>();
+    SparseMatrix<double> surf_rot = Linalg::make_block_diag(tmp, 3);
+
+    this->sol->data *= surf_rot;
+
+    if (!this->sol_grad->isEmpty()) {
+        SparseMatrix<double> t_matKron;
+        SparseMatrix<double> t_eye(3, 3);
+        for (qint32 i = 0; i < 3; ++i)
+            t_eye.insert(i, i) = 1.0f;
+        t_matKron = kroneckerProduct(surf_rot, t_eye); //kron(surf_rot,eye(3));
+        this->sol_grad->data *= t_matKron;
+    }
+    this->surf_ori = true;
+    qInfo("[done]");
 }
 
 //=============================================================================================================
