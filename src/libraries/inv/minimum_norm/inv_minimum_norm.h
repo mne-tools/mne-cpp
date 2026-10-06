@@ -65,6 +65,8 @@ namespace INVLIB
  * - Pascual-Marqui, Methods Find. Exp. Clin. Pharmacol. 24D, 5-12, 2002 (sLORETA).
  *
  * @brief Minimum norm estimation
+ *
+ * @snippet ex_inv_api/main.cpp inv_minimum_norm_usage
  */
 class INVSHARED_EXPORT InvMinimumNorm
 {

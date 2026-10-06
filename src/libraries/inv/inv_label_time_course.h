@@ -63,12 +63,7 @@ namespace INVLIB
  * - **max**: Maximum absolute value at each time point.
  * - **auto**: mean_flip for scalar STCs.
  *
- * @code
- *   QList<FSLIB::FsLabel> labels = ...;
- *   InvSourceEstimate stc = ...;
- *   Eigen::MatrixXd tc = InvLabelTimeCourse::extract(stc, labels, "mean_flip");
- *   // tc: n_labels × n_times
- * @endcode
+ * @snippet ex_inv_api/main.cpp inv_label_time_course_usage
  */
 class INVSHARED_EXPORT InvLabelTimeCourse
 {

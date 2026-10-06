@@ -36,11 +36,10 @@ Provides the five standard aggregation modes used in MNE-Python's `extract_label
 
 **auto**: mean_flip for scalar STCs.
 
-```cpp
-QList<FSLIB::FsLabel> labels = ...;
-InvSourceEstimate stc = ...;
-Eigen::MatrixXd tc = InvLabelTimeCourse::extract(stc, labels, "mean_flip");
-// tc: n_labels × n_times
+```cpp title="src/examples/ex_inv_api/main.cpp"
+const MatrixXd labelMean = InvLabelTimeCourse::extract(stc, {v1}, "mean");     // 1 x 421
+const MatrixXd labelMax = InvLabelTimeCourse::extract(stc, {v1}, "max");       // the largest |value| per sample
+const MatrixXd labelFlip = InvLabelTimeCourse::extract(stc, {v1}, "mean_flip"); // signs flipped by the patch normals
 ```
 
 ---
@@ -87,6 +86,12 @@ For surface source spaces, the sign of each vertex's contribution should be flip
 - *Eigen::VectorXd* — Sign vector (+1 or -1 per vertex).
 
 ---
+
+## Example
+
+- Full source: [`src/examples/ex_inv_api/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_inv_api/main.cpp)
+- Build target: `ex_inv_api` (runs under CTest)
+- Data: [mne-cpp-test-data](https://github.com/mne-tools/mne-cpp-test-data)
 
 ## Authors of this file
 

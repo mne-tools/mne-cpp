@@ -25,6 +25,32 @@ Carries the dense ``(n_sources × n_times) data matrix plus vertex indices, time
 
 Source-space inverse-solution container with dense grid plus optional focal-dipole, coupling and connectivity layers.
 
+```cpp title="src/examples/ex_inv_api/main.cpp"
+FsLabel v1;
+FsLabel::read(data + "/subjects/sample/label/lh.V1.label", v1);
+QFile fwdFile(data + "/Result/ref-sample_audvis-meg-eeg-oct-6-fwd.fif");
+// surf_ori = true: loose orientation constraints are relative to the cortical normals
+const MNEForwardSolution fwd = MNEForwardSolution(fwdFile, false, true).pick_regions({v1}); // 70 sources x 3
+QFile covFile(data + "/MEG/sample/sample_audvis-cov.fif");
+const FiffCov noiseCov(covFile);
+QFile aveFile(data + "/MEG/sample/sample_audvis-ave.fif");
+const FiffEvoked evoked(aveFile, 0); // "Left Auditory"
+
+const MNEInverseOperator inverse = MNEInverseOperator::make_inverse_operator(evoked.info, fwd, noiseCov, 0.2f, 0.8f);
+const float lambda2 = 1.0f / 9.0f; // SNR 3
+InvMinimumNorm dspm(inverse, lambda2, "dSPM");
+const InvSourceEstimate stc = dspm.calculateInverse(evoked); // one row per source, combined over orientations
+```
+
+```cpp title="src/examples/ex_inv_api/main.cpp"
+InvSourceEstimateIO::writeCsv(stc, tmp.filePath("v1-dspm.csv"));
+const InvSourceEstimate fromCsv = InvSourceEstimateIO::readCsv(tmp.filePath("v1-dspm.csv"));
+QFile stcFile(tmp.filePath("v1-dspm-lh.stc"));
+InvSourceEstimate(stc).write(stcFile); // MNE .stc format, readable by mne.read_source_estimate
+QFile stcBack(stcFile.fileName());
+const InvSourceEstimate fromStc(stcBack);
+```
+
 ### Inheritance
 
 ```mermaid
@@ -299,6 +325,12 @@ The .w format stores vertex indices (3-byte big-endian) and float values (4-byte
 - *[InvSourceEstimate](/docs/api/inv/inv-source-estimate)* — The source estimate with single-column data.
 
 ---
+
+## Example
+
+- Full source: [`src/examples/ex_inv_api/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_inv_api/main.cpp)
+- Build target: `ex_inv_api` (runs under CTest)
+- Data: [mne-cpp-test-data](https://github.com/mne-tools/mne-cpp-test-data)
 
 ## Authors of this file
 

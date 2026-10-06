@@ -57,13 +57,7 @@ namespace INVLIB
  * and L is the lead field (forward operator). Columns of R are point-spread
  * functions (PSFs) and rows are cross-talk functions (CTFs).
  *
- * @code
- *   // Given an inverse kernel K (n_sources × n_channels)
- *   // and a lead field L (n_channels × n_sources):
- *   Eigen::MatrixXd R = InvResolutionMatrix::compute(K, L);
- *   Eigen::VectorXd psf = InvResolutionMatrix::getPsf(R, sourceIdx);
- *   Eigen::VectorXd ctf = InvResolutionMatrix::getCtf(R, sourceIdx);
- * @endcode
+ * @snippet ex_inv_api/main.cpp inv_resolution_matrix_usage
  */
 class INVSHARED_EXPORT InvResolutionMatrix
 {

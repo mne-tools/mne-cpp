@@ -45,6 +45,8 @@ namespace INVLIB
 //=============================================================================================================
 /**
  * @brief Extended I/O methods for InvSourceEstimate.
+ *
+ * @snippet ex_inv_api/main.cpp inv_source_estimate_io_usage
  */
 class INVSHARED_EXPORT InvSourceEstimateIO
 {

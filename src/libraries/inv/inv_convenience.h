@@ -20,6 +20,8 @@
  * spectral analysis directly on @ref INVLIB::InvSourceEstimate output. All
  * methods are headers-only orchestration on top of @ref INVLIB::InvMinimumNorm
  * and the underlying FIFF / MNE primitives.
+ *
+ * @snippet ex_inv_api/main.cpp inv_sparse_usage
  */
 
 #ifndef INV_CONVENIENCE_H

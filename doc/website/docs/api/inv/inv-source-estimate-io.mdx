@@ -21,6 +21,15 @@ class INVLIB::InvSourceEstimateIO
 
 Extended I/O methods for [`InvSourceEstimate`](/docs/api/inv/inv-source-estimate).
 
+```cpp title="src/examples/ex_inv_api/main.cpp"
+InvSourceEstimateIO::writeCsv(stc, tmp.filePath("v1-dspm.csv"));
+const InvSourceEstimate fromCsv = InvSourceEstimateIO::readCsv(tmp.filePath("v1-dspm.csv"));
+QFile stcFile(tmp.filePath("v1-dspm-lh.stc"));
+InvSourceEstimate(stc).write(stcFile); // MNE .stc format, readable by mne.read_source_estimate
+QFile stcBack(stcFile.fileName());
+const InvSourceEstimate fromStc(stcBack);
+```
+
 ---
 
 ## Static Methods
@@ -85,6 +94,12 @@ No header; pure numeric matrix (n_vertices × n_times).
 - *bool* — true if successful.
 
 ---
+
+## Example
+
+- Full source: [`src/examples/ex_inv_api/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_inv_api/main.cpp)
+- Build target: `ex_inv_api` (runs under CTest)
+- Data: [mne-cpp-test-data](https://github.com/mne-tools/mne-cpp-test-data)
 
 ## Authors of this file
 

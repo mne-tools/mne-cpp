@@ -27,6 +27,17 @@ SPDX-License-Identifier: BSD-3-Clause Copyright (c) 2026 MNE-CPP Authors.
 
 Free functions in this header glue together the lower-level `INVLIB` classes so users can match the MNE-Python ergonomics: `INVLIB::applyInverseEpochs` applies a precomputed inverse operator across an epoch list, `applyInverseRaw` streams raw data through the kernel, `estimateSnr` returns the whitened-data SNR trace from an evoked + inverse pair, `computeWhitener` produces the diagonal whitener from a noise covariance, and `computeSourcePsd` / `computeSourceBandPower` run Welch-based spectral analysis directly on [`InvSourceEstimate`](/docs/api/inv/inv-source-estimate) output. All methods are headers-only orchestration on top of [`InvMinimumNorm`](/docs/api/inv/inv-minimum-norm) and the underlying FIFF / [MNE](/docs/api/mne/mne-class) primitives.
 
+```cpp title="src/examples/ex_inv_api/main.cpp"
+// Whitened data and a gain per nAm make the noise level 1, as mne.inverse_sparse.mixed_norm does.
+const auto [whitener, rank] = computeWhitener(*inverse.noise_cov); // rank 360: 364 channels minus 4 projectors
+QFile fixedFile(fwdFile.fileName());
+const MNEForwardSolution fixedFwd = MNEForwardSolution(fixedFile, true, true).pick_regions({v1}).pick_channels(inverse.noise_cov->names);
+const MatrixXd gain = whitener * fixedFwd.sol->data * 1e-9;
+const MatrixXd measured = whitener * evoked.pick_channels(inverse.noise_cov->names).data.middleCols(170, 40); // 83-148 ms
+const double alphaMax = (gain.transpose() * measured).rowwise().norm().maxCoeff();
+const InvMxneResult mxne = InvMxne::compute(gain, measured, 0.5 * alphaMax, 1000, 1e-10);
+```
+
 ---
 
 ## Functions
@@ -216,6 +227,12 @@ Integrates source PSD within specified frequency bands.
 - *QMap&lt; QString, Eigen::VectorXd &gt;* — Map of band name -&gt; power vector (n_sources).
 
 ---
+
+## Example
+
+- Full source: [`src/examples/ex_inv_api/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_inv_api/main.cpp)
+- Build target: `ex_inv_api` (runs under CTest)
+- Data: [mne-cpp-test-data](https://github.com/mne-tools/mne-cpp-test-data)
 
 ## Authors of this file
 

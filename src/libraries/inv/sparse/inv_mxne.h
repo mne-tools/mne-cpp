@@ -72,6 +72,8 @@ struct INVSHARED_EXPORT InvMxneResult
  * using an Iteratively Reweighted Least Squares (IRLS) approach for the L21-norm (group lasso).
  *
  * @brief MxNE sparse inverse solver.
+ *
+ * @snippet ex_inv_api/main.cpp inv_sparse_usage
  */
 class INVSHARED_EXPORT InvMxne
 {

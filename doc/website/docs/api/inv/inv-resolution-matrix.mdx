@@ -23,12 +23,12 @@ Resolution matrix analysis for linear inverse operators.
 
 The resolution matrix R = K · L, where K is the inverse operator (kernel) and L is the lead field (forward operator). Columns of R are point-spread functions (PSFs) and rows are cross-talk functions (CTFs).
 
-```cpp
-// Given an inverse kernel K (n_sources × n_channels)
-// and a lead field L (n_channels × n_sources):
-Eigen::MatrixXd R = InvResolutionMatrix::compute(K, L);
-Eigen::VectorXd psf = InvResolutionMatrix::getPsf(R, sourceIdx);
-Eigen::VectorXd ctf = InvResolutionMatrix::getCtf(R, sourceIdx);
+```cpp title="src/examples/ex_inv_api/main.cpp"
+InvMinimumNorm mne(inverse, lambda2, "MNE");
+mne.doInverseSetup(evoked.nave);
+const MatrixXd& kernel = mne.getKernel(); // 210 source components x 364 good channels
+const MNEForwardSolution goodFwd = fwd.pick_channels(inverse.noise_cov->names);
+const MatrixXd resolution = InvResolutionMatrix::compute(kernel, goodFwd.sol->data);
 ```
 
 ---
@@ -168,6 +168,12 @@ Distance between true source location and the location of the maximum of the PSF
 - *Eigen::VectorXd* — Peak localisation error per source (n_sources).
 
 ---
+
+## Example
+
+- Full source: [`src/examples/ex_inv_api/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_inv_api/main.cpp)
+- Build target: `ex_inv_api` (runs under CTest)
+- Data: [mne-cpp-test-data](https://github.com/mne-tools/mne-cpp-test-data)
 
 ## Authors of this file
 

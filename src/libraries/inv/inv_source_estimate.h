@@ -83,6 +83,10 @@ namespace INVLIB
  * implements round-trip STC / W binary I/O with mne-python and mne-c.
  *
  * @brief Source-space inverse-solution container with dense grid plus optional focal-dipole, coupling and connectivity layers.
+ *
+ * @snippet ex_inv_api/main.cpp inv_minimum_norm_usage
+ *
+ * @snippet ex_inv_api/main.cpp inv_source_estimate_io_usage
  */
 class INVSHARED_EXPORT InvSourceEstimate
 {

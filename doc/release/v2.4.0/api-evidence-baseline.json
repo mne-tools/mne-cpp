@@ -12,18 +12,18 @@
     "registered_stale": 0,
     "registered_with_test": 101,
     "registered_test_unresolved": 0,
-    "registered_with_example": 197,
+    "registered_with_example": 203,
     "registered_example_not_built": 0,
     "registered_with_python_equiv": 88,
     "registered_without_api_page": 0,
-    "with_snippet": 242,
+    "with_snippet": 250,
     "public_api_units": 478,
     "example_eligible": 383,
     "example_exempt": 95,
-    "eligible_backed_by_registry_example": 197,
-    "eligible_used_by_some_example": 259,
-    "examples_on_disk": 62,
-    "examples_built": 62
+    "eligible_backed_by_registry_example": 203,
+    "eligible_used_by_some_example": 265,
+    "examples_on_disk": 63,
+    "examples_built": 63
   },
   "by_library": {
     "bids": {
@@ -121,9 +121,9 @@
       "registered": 35,
       "with_test": 19,
       "eligible": 41,
-      "eligible_with_registry_example": 4,
-      "eligible_used_by_example": 7,
-      "with_snippet": 0
+      "eligible_with_registry_example": 10,
+      "eligible_used_by_example": 13,
+      "with_snippet": 8
     },
     "lsl": {
       "public": 3,
@@ -6165,6 +6165,7 @@
       "including_examples": [
         "ex_dsp_rt",
         "ex_fiff_api",
+        "ex_inv_api",
         "ex_make_inverse_operator"
       ],
       "snippets": [
@@ -6407,6 +6408,7 @@
         "ex_clustered_inverse_pwl_rap_music_raw",
         "ex_clustered_inverse_rap_music_raw",
         "ex_histogram",
+        "ex_inv_api",
         "ex_inverse_mne",
         "ex_inverse_mne_raw",
         "ex_inverse_pwl_rap_music",
@@ -6949,6 +6951,7 @@
         "ex_connectivity_comparison",
         "ex_fs",
         "ex_histogram",
+        "ex_inv_api",
         "ex_inverse_mne_raw",
         "ex_inverse_pwl_rap_music",
         "ex_inverse_rap_music",
@@ -7703,10 +7706,14 @@
       "registry_status": "done",
       "test": "test_inv_convenience",
       "test_resolves": true,
-      "example": null,
-      "example_state": "none",
-      "including_examples": [],
-      "snippets": [],
+      "example": "ex_inv_api",
+      "example_state": "built",
+      "including_examples": [
+        "ex_inv_api"
+      ],
+      "snippets": [
+        "ex_inv_api/main.cpp#inv_sparse_usage"
+      ],
       "api_page": "doc/website/docs/api/inv/inv-convenience.mdx",
       "python_equiv": "mne.minimum_norm.apply_inverse_epochs / apply_inverse_raw / apply_inverse_cov",
       "example_eligible": true,
@@ -7722,10 +7729,14 @@
       "registry_status": "done",
       "test": "test_label_time_course",
       "test_resolves": true,
-      "example": null,
-      "example_state": "none",
-      "including_examples": [],
-      "snippets": [],
+      "example": "ex_inv_api",
+      "example_state": "built",
+      "including_examples": [
+        "ex_inv_api"
+      ],
+      "snippets": [
+        "ex_inv_api/main.cpp#inv_label_time_course_usage"
+      ],
       "api_page": "doc/website/docs/api/inv/inv-label-time-course.mdx",
       "python_equiv": "mne.extract_label_time_course",
       "example_eligible": true,
@@ -7741,10 +7752,14 @@
       "registry_status": "done",
       "test": "test_resolution_matrix",
       "test_resolves": true,
-      "example": null,
-      "example_state": "none",
-      "including_examples": [],
-      "snippets": [],
+      "example": "ex_inv_api",
+      "example_state": "built",
+      "including_examples": [
+        "ex_inv_api"
+      ],
+      "snippets": [
+        "ex_inv_api/main.cpp#inv_resolution_matrix_usage"
+      ],
       "api_page": "doc/website/docs/api/inv/inv-resolution-matrix.mdx",
       "python_equiv": "mne.minimum_norm.make_inverse_resolution_matrix",
       "example_eligible": true,
@@ -7779,8 +7794,8 @@
       "registry_status": "done",
       "test": "test_source_estimate_types",
       "test_resolves": true,
-      "example": null,
-      "example_state": "none",
+      "example": "ex_inv_api",
+      "example_state": "built",
       "including_examples": [
         "ex_clustered_inverse_mne",
         "ex_clustered_inverse_mne_raw",
@@ -7792,6 +7807,7 @@
         "ex_dsp_analysis",
         "ex_histogram",
         "ex_interpolation",
+        "ex_inv_api",
         "ex_inverse_mne",
         "ex_inverse_mne_raw",
         "ex_inverse_pwl_rap_music",
@@ -7800,7 +7816,10 @@
         "ex_roi_clustered_inverse_pwl_rap_music",
         "ex_st_clustered_inverse_pwl_rap_music"
       ],
-      "snippets": [],
+      "snippets": [
+        "ex_inv_api/main.cpp#inv_minimum_norm_usage",
+        "ex_inv_api/main.cpp#inv_source_estimate_io_usage"
+      ],
       "api_page": "doc/website/docs/api/inv/inv-source-estimate.mdx",
       "python_equiv": "mne.SourceEstimate",
       "example_eligible": true,
@@ -7816,10 +7835,14 @@
       "registry_status": "done",
       "test": "test_source_estimate_io",
       "test_resolves": true,
-      "example": null,
-      "example_state": "none",
-      "including_examples": [],
-      "snippets": [],
+      "example": "ex_inv_api",
+      "example_state": "built",
+      "including_examples": [
+        "ex_inv_api"
+      ],
+      "snippets": [
+        "ex_inv_api/main.cpp#inv_source_estimate_io_usage"
+      ],
       "api_page": "doc/website/docs/api/inv/inv-source-estimate-io.mdx",
       "python_equiv": "mne.SourceEstimate.save / read",
       "example_eligible": true,
@@ -7930,7 +7953,7 @@
       "registry_status": "done",
       "test": "test_compute_raw_inverse",
       "test_resolves": true,
-      "example": "ex_inverse_mne",
+      "example": "ex_inv_api",
       "example_state": "built",
       "including_examples": [
         "ex_clustered_inverse_mne",
@@ -7939,11 +7962,14 @@
         "ex_connectivity_comparison",
         "ex_disp_3D",
         "ex_histogram",
+        "ex_inv_api",
         "ex_inverse_mne",
         "ex_inverse_mne_raw",
         "ex_make_inverse_operator"
       ],
-      "snippets": [],
+      "snippets": [
+        "ex_inv_api/main.cpp#inv_minimum_norm_usage"
+      ],
       "api_page": "doc/website/docs/api/inv/inv-minimum-norm.mdx",
       "python_equiv": "mne.minimum_norm.apply_inverse",
       "example_eligible": true,
@@ -8119,10 +8145,14 @@
       "registry_status": "done",
       "test": "test_inv_sparse",
       "test_resolves": true,
-      "example": null,
-      "example_state": "none",
-      "including_examples": [],
-      "snippets": [],
+      "example": "ex_inv_api",
+      "example_state": "built",
+      "including_examples": [
+        "ex_inv_api"
+      ],
+      "snippets": [
+        "ex_inv_api/main.cpp#inv_sparse_usage"
+      ],
       "api_page": "doc/website/docs/api/inv/inv-mxne.mdx",
       "python_equiv": "mne.inverse_sparse.mixed_norm",
       "example_eligible": true,
@@ -8140,8 +8170,12 @@
       "test_resolves": false,
       "example": null,
       "example_state": "none",
-      "including_examples": [],
-      "snippets": [],
+      "including_examples": [
+        "ex_inv_api"
+      ],
+      "snippets": [
+        "ex_inv_api/main.cpp#inv_sparse_usage"
+      ],
       "api_page": null,
       "python_equiv": null,
       "example_eligible": true,
@@ -9394,6 +9428,7 @@
         "ex_compute_forward",
         "ex_dsp_rt",
         "ex_fwd_api",
+        "ex_inv_api",
         "ex_read_fwd",
         "ex_read_fwd_disp_3D"
       ],
@@ -9457,6 +9492,7 @@
       "example_state": "built",
       "including_examples": [
         "ex_dsp_rt",
+        "ex_inv_api",
         "ex_inverse_mne"
       ],
       "snippets": [],

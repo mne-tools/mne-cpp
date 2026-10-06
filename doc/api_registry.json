@@ -601,7 +601,14 @@
       "mne_python": "mne.minimum_norm.apply_inverse",
       "sklearn": null,
       "test": "test_compute_raw_inverse",
-      "example": "ex_inverse_mne",
+      "example": "ex_inv_api",
+      "example_snippet": [
+        "ex_inv_api/main.cpp#inv_minimum_norm_usage"
+      ],
+      "example_mode": "run",
+      "required_data": [
+        "mne-cpp-test-data"
+      ],
       "status": "done",
       "skigen_candidate": false,
       "documented": true,
@@ -728,7 +735,14 @@
       "mne_python": "mne.inverse_sparse.mixed_norm",
       "sklearn": "sklearn.linear_model.MultiTaskLasso (internal)",
       "test": "test_inv_sparse",
-      "example": null,
+      "example": "ex_inv_api",
+      "example_snippet": [
+        "ex_inv_api/main.cpp#inv_sparse_usage"
+      ],
+      "example_mode": "run",
+      "required_data": [
+        "mne-cpp-test-data"
+      ],
       "status": "done",
       "skigen_candidate": false,
       "notes": "Uses IRLS internally, not direct sklearn MultiTaskLasso",
@@ -801,7 +815,15 @@
       "mne_python": "mne.SourceEstimate",
       "sklearn": null,
       "test": "test_source_estimate_types",
-      "example": null,
+      "example": "ex_inv_api",
+      "example_snippet": [
+        "ex_inv_api/main.cpp#inv_minimum_norm_usage",
+        "ex_inv_api/main.cpp#inv_source_estimate_io_usage"
+      ],
+      "example_mode": "run",
+      "required_data": [
+        "mne-cpp-test-data"
+      ],
       "status": "done",
       "skigen_candidate": false,
       "documented": true,
@@ -855,7 +877,14 @@
       "mne_python": "mne.SourceEstimate.save / read",
       "sklearn": null,
       "test": "test_source_estimate_io",
-      "example": null,
+      "example": "ex_inv_api",
+      "example_snippet": [
+        "ex_inv_api/main.cpp#inv_source_estimate_io_usage"
+      ],
+      "example_mode": "run",
+      "required_data": [
+        "mne-cpp-test-data"
+      ],
       "status": "done",
       "skigen_candidate": false,
       "documented": true,
@@ -873,7 +902,14 @@
       "mne_python": "mne.extract_label_time_course",
       "sklearn": null,
       "test": "test_label_time_course",
-      "example": null,
+      "example": "ex_inv_api",
+      "example_snippet": [
+        "ex_inv_api/main.cpp#inv_label_time_course_usage"
+      ],
+      "example_mode": "run",
+      "required_data": [
+        "mne-cpp-test-data"
+      ],
       "status": "done",
       "skigen_candidate": false,
       "documented": true,
@@ -891,7 +927,14 @@
       "mne_python": "mne.minimum_norm.make_inverse_resolution_matrix",
       "sklearn": null,
       "test": "test_resolution_matrix",
-      "example": null,
+      "example": "ex_inv_api",
+      "example_snippet": [
+        "ex_inv_api/main.cpp#inv_resolution_matrix_usage"
+      ],
+      "example_mode": "run",
+      "required_data": [
+        "mne-cpp-test-data"
+      ],
       "status": "done",
       "skigen_candidate": false,
       "documented": true,
@@ -909,7 +952,14 @@
       "mne_python": "mne.minimum_norm.apply_inverse_epochs / apply_inverse_raw / apply_inverse_cov",
       "sklearn": null,
       "test": "test_inv_convenience",
-      "example": null,
+      "example": "ex_inv_api",
+      "example_snippet": [
+        "ex_inv_api/main.cpp#inv_sparse_usage"
+      ],
+      "example_mode": "run",
+      "required_data": [
+        "mne-cpp-test-data"
+      ],
       "status": "done",
       "skigen_candidate": false,
       "documented": true,
