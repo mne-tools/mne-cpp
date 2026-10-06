@@ -318,7 +318,7 @@ void TestFiffStreamPython::attachesEnvironment()
         QFile f(path);
         FiffStream::SPtr u = FiffStream::open_update(f);
         QVERIFY(u);
-        QVERIFY(u->attach_env(QStringLiteral("/data/study"), QStringLiteral("mne_process --raw a.fif")));
+        QVERIFY(u->attach_env(QStringLiteral("/data/stüdy"), QStringLiteral("mne_process --raw a.fif")));
         u->close();
     }
 
@@ -329,7 +329,8 @@ void TestFiffStreamPython::attachesEnvironment()
     QCOMPARE(env.size(), 1);
     FiffTag::UPtr tag;
     QVERIFY(env[0]->find_tag(r, FIFF_MNE_ENV_WORKING_DIR, tag));
-    QCOMPARE(tag->toString(), QString("/data/study"));
+    // Strings are written as UTF-8: the tag holds the bytes, not the characters, of a non-ASCII path.
+    QCOMPARE(tag->toString(), QStringLiteral("/data/stüdy"));
     QVERIFY(env[0]->find_tag(r, FIFF_MNE_ENV_COMMAND_LINE, tag));
     QCOMPARE(tag->toString(), QString("mne_process --raw a.fif"));
     // The measurement block written before is still there.

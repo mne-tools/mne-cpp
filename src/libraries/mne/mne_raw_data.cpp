@@ -540,6 +540,8 @@ MNERawData::MNERawData()
 , comp(nullptr)
 , comp_file(MNE_CTFV_NOGRAD)
 , comp_now(MNE_CTFV_NOGRAD)
+, max_event(0)
+, dig_trigger_mask(0)
 , deriv(nullptr)
 , deriv_matched(nullptr)
 {
@@ -556,6 +558,9 @@ MNERawData::~MNERawData()
     this->ch_names.clear();
 
     this->badlist.clear();
+
+    this->dig_trigger.clear();
+    this->event_list.reset();
 }
 
 //=============================================================================================================

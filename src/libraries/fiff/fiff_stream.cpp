@@ -3220,13 +3220,14 @@ fiff_long_t FiffStream::write_string(fiff_int_t kind,
 {
     fiff_long_t pos = this->device()->pos();
 
-    fiff_int_t datasize = data.size();
+    const QByteArray bytes = data.toUtf8();
+    const fiff_int_t datasize = static_cast<fiff_int_t>(bytes.size());
     *this << (qint32)kind;
     *this << (qint32)FIFFT_STRING;
     *this << (qint32)datasize;
     *this << (qint32)FIFFV_NEXT_SEQ;
 
-    this->writeRawData(data.toUtf8().constData(), datasize);
+    this->writeRawData(bytes.constData(), datasize);
 
     return pos;
 }
@@ -3235,14 +3236,15 @@ fiff_long_t FiffStream::write_string(fiff_int_t kind,
 
 void FiffStream::write_rt_command(fiff_int_t command, const QString& data)
 {
-    fiff_int_t datasize = data.size();
+    const QByteArray bytes = data.toUtf8();
+    const fiff_int_t datasize = static_cast<fiff_int_t>(bytes.size());
     *this << (qint32)FIFF_MNE_RT_COMMAND;
     *this << (qint32)FIFFT_VOID;
     *this << 4 + (qint32)datasize;
     *this << (qint32)FIFFV_NEXT_SEQ;
     *this << command;
 
-    this->writeRawData(data.toUtf8().constData(), datasize);
+    this->writeRawData(bytes.constData(), datasize);
 }
 
 //=============================================================================================================
