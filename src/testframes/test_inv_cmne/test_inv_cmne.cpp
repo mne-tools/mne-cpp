@@ -387,6 +387,15 @@ void TestInvCmne::testDspmKernelMatchesDefinition()
     QVERIFY((result.stcSensing.data - q).norm() < 1e-9 * q.norm());
     QVERIFY((result.stcCmne.data - control).norm() < 1e-9 * control.norm());
 
+    // MEG (T^2 ~ 1e-24) and EEG (V^2 ~ 1e-11) variances in one covariance: every channel must stay whitened.
+    VectorXd units = VectorXd::Constant(nCh, 1e-12);
+    units.tail(4).setConstant(3e-6);
+    const MatrixXd mixedCov = units.asDiagonal() * noiseCov * units.asDiagonal();
+    const MatrixXd mixedGain = units.asDiagonal() * gain;
+    const InvCMNEResult mixed = InvCMNE::compute(units.asDiagonal() * evoked, mixedGain, mixedCov, srcCov, settings);
+    QVERIFY2((mixed.matKernelDspm * units.asDiagonal() - ref).norm() < 1e-6 * ref.norm(),
+             qPrintable(QString("mixed-unit kernel differs by %1").arg((mixed.matKernelDspm * units.asDiagonal() - ref).norm() / ref.norm())));
+
     // A model that cannot be loaded leaves only the dSPM estimate.
     settings.onnxModelPath = QStringLiteral("/nonexistent/model.onnx");
     QTest::ignoreMessage(QtWarningMsg, QRegularExpression("Cannot load CMNE model"));

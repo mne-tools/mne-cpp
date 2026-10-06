@@ -109,7 +109,11 @@ MatrixXd InvCMNE::computeDspmKernel(
     // C_n = V * D * V^T  ->  C_n^{-1/2} = V * D^{-1/2} * V^T
     qInfo() << "  [dSPM kernel] Eigendecomposition of noise covariance"
             << "(" << nChannels << "x" << nChannels << ") …";
-    SelfAdjointEigenSolver<MatrixXd> eigSolver(matNoiseCov);
+    // Decompose the correlation matrix D^-1/2 C D^-1/2: MEG (T^2) and EEG (V^2) variances differ by 1e13,
+    // so a cutoff relative to the largest eigenvalue of C would drop every MEG component.
+    const VectorXd scale = matNoiseCov.diagonal().cwiseMax(std::numeric_limits<double>::min()).cwiseSqrt();
+    const MatrixXd correlation = scale.cwiseInverse().asDiagonal() * matNoiseCov * scale.cwiseInverse().asDiagonal();
+    SelfAdjointEigenSolver<MatrixXd> eigSolver(correlation);
     VectorXd eigVals = eigSolver.eigenvalues();
     MatrixXd eigVecs = eigSolver.eigenvectors();
 
@@ -121,7 +125,8 @@ MatrixXd InvCMNE::computeDspmKernel(
         eigValsInvSqrt(i) = (eigVals(i) > threshold) ? 1.0 / std::sqrt(eigVals(i)) : 0.0;
     }
 
-    MatrixXd matWhitener = eigVecs * eigValsInvSqrt.asDiagonal() * eigVecs.transpose();
+    // W = (R^+)^1/2 D^-1/2 satisfies W C W^T = I on the retained subspace.
+    MatrixXd matWhitener = eigVecs * eigValsInvSqrt.asDiagonal() * eigVecs.transpose() * scale.cwiseInverse().asDiagonal();
 
     // Step 2: Whiten gain matrix
     qInfo() << "  [dSPM kernel] Whitening gain matrix …";
