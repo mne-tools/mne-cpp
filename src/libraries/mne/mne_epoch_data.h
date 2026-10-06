@@ -56,6 +56,8 @@ namespace MNELIB
  * Epoch data, which corresponds to an event
  *
  * @brief Single epoch (trial slice) of sensor data with timing and rejection metadata.
+ *
+ * @snippet ex_mne_api/main.cpp mne_epoch_data_list_usage
  */
 class MNESHARED_EXPORT MNEEpochData
 {

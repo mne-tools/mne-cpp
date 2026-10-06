@@ -442,7 +442,14 @@
       "mne_python": "mne.Forward",
       "sklearn": null,
       "test": "test_mne_forward_solution",
-      "example": "ex_read_fwd",
+      "example": "ex_inv_api",
+      "example_snippet": [
+        "ex_inv_api/main.cpp#inv_minimum_norm_usage"
+      ],
+      "example_mode": "run",
+      "required_data": [
+        "mne-cpp-test-data"
+      ],
       "status": "done",
       "skigen_candidate": false,
       "documented": true,
@@ -460,7 +467,14 @@
       "mne_python": "mne.InverseOperator",
       "sklearn": null,
       "test": "test_tool_inverse_operator",
-      "example": "ex_make_inverse_operator",
+      "example": "ex_inv_api",
+      "example_snippet": [
+        "ex_inv_api/main.cpp#inv_minimum_norm_usage"
+      ],
+      "example_mode": "run",
+      "required_data": [
+        "mne-cpp-test-data"
+      ],
       "status": "done",
       "skigen_candidate": false,
       "documented": true,
@@ -479,6 +493,8 @@
       "sklearn": null,
       "test": "test_mne_source_data",
       "example": null,
+      "example_exempt": true,
+      "example_exempt_reason": "Abstract base of MNEHemisphere and volume source spaces; used through MNESourceSpaces (ex_mne_api mne_source_spaces_usage).",
       "status": "done",
       "skigen_candidate": false,
       "documented": true,
@@ -496,7 +512,14 @@
       "mne_python": "mne.make_bem_model",
       "sklearn": null,
       "test": "test_fwd_bem_data",
-      "example": "ex_read_bem",
+      "example": "ex_mne_api",
+      "example_snippet": [
+        "ex_mne_api/main.cpp#mne_bem_usage"
+      ],
+      "example_mode": "run",
+      "required_data": [
+        "mne-cpp-test-data"
+      ],
       "status": "done",
       "skigen_candidate": false,
       "documented": true,
@@ -514,7 +537,14 @@
       "mne_python": "mne.coreg.Coregistration",
       "sklearn": null,
       "test": "test_coregistration",
-      "example": "ex_coreg",
+      "example": "ex_mne_api",
+      "example_snippet": [
+        "ex_mne_api/main.cpp#mne_icp_usage"
+      ],
+      "example_mode": "run",
+      "required_data": [
+        "mne-cpp-test-data"
+      ],
       "status": "done",
       "skigen_candidate": false,
       "documented": true,
@@ -5605,6 +5635,8 @@
       "sklearn": null,
       "test": null,
       "example": null,
+      "example_exempt": true,
+      "example_exempt_reason": "Per-thread work item of the parallel source-space filter inside MNESourceSpace::filter_source_space; built and consumed only there, never by callers.",
       "status": "documented",
       "skigen_candidate": false,
       "documented": true,
@@ -5640,7 +5672,14 @@
       "mne_python": null,
       "sklearn": null,
       "test": null,
-      "example": null,
+      "example": "ex_mne_api",
+      "example_snippet": [
+        "ex_mne_api/main.cpp#mne_bem_usage"
+      ],
+      "example_mode": "run",
+      "required_data": [
+        "mne-cpp-test-data"
+      ],
       "status": "documented",
       "skigen_candidate": false,
       "documented": true,
@@ -5658,7 +5697,14 @@
       "mne_python": null,
       "sklearn": null,
       "test": null,
-      "example": null,
+      "example": "ex_mne_api",
+      "example_snippet": [
+        "ex_mne_api/main.cpp#mne_ctf_comp_data_set_usage"
+      ],
+      "example_mode": "run",
+      "required_data": [
+        "mne-cpp-test-data"
+      ],
       "status": "documented",
       "skigen_candidate": false,
       "documented": true,
@@ -5676,7 +5722,14 @@
       "mne_python": null,
       "sklearn": null,
       "test": null,
-      "example": null,
+      "example": "ex_mne_api",
+      "example_snippet": [
+        "ex_mne_api/main.cpp#mne_ctf_comp_data_set_usage"
+      ],
+      "example_mode": "run",
+      "required_data": [
+        "mne-cpp-test-data"
+      ],
       "status": "documented",
       "skigen_candidate": false,
       "documented": true,
@@ -5694,7 +5747,14 @@
       "mne_python": null,
       "sklearn": null,
       "test": null,
-      "example": null,
+      "example": "ex_mne_api",
+      "example_snippet": [
+        "ex_mne_api/main.cpp#mne_raw_data_usage"
+      ],
+      "example_mode": "run",
+      "required_data": [
+        "mne-cpp-test-data"
+      ],
       "status": "documented",
       "skigen_candidate": false,
       "documented": true,
@@ -5748,7 +5808,14 @@
       "mne_python": null,
       "sklearn": null,
       "test": null,
-      "example": null,
+      "example": "ex_mne_api",
+      "example_snippet": [
+        "ex_mne_api/main.cpp#mne_cov_matrix_usage"
+      ],
+      "example_mode": "run",
+      "required_data": [
+        "mne-cpp-test-data"
+      ],
       "status": "documented",
       "skigen_candidate": false,
       "documented": true,
@@ -5820,7 +5887,14 @@
       "mne_python": null,
       "sklearn": null,
       "test": null,
-      "example": null,
+      "example": "ex_mne_api",
+      "example_snippet": [
+        "ex_mne_api/main.cpp#mne_epoch_data_list_usage"
+      ],
+      "example_mode": "run",
+      "required_data": [
+        "mne-cpp-test-data"
+      ],
       "status": "documented",
       "skigen_candidate": false,
       "documented": true,
@@ -5838,7 +5912,14 @@
       "mne_python": null,
       "sklearn": null,
       "test": null,
-      "example": null,
+      "example": "ex_mne_api",
+      "example_snippet": [
+        "ex_mne_api/main.cpp#mne_epoch_data_list_usage"
+      ],
+      "example_mode": "run",
+      "required_data": [
+        "mne-cpp-test-data"
+      ],
       "status": "documented",
       "skigen_candidate": false,
       "documented": true,
@@ -5856,7 +5937,14 @@
       "mne_python": null,
       "sklearn": null,
       "test": null,
-      "example": null,
+      "example": "ex_mne_api",
+      "example_snippet": [
+        "ex_mne_api/main.cpp#mne_raw_data_usage"
+      ],
+      "example_mode": "run",
+      "required_data": [
+        "mne-cpp-test-data"
+      ],
       "status": "documented",
       "skigen_candidate": false,
       "documented": true,
@@ -5874,7 +5962,14 @@
       "mne_python": null,
       "sklearn": null,
       "test": null,
-      "example": null,
+      "example": "ex_mne_api",
+      "example_snippet": [
+        "ex_mne_api/main.cpp#mne_source_spaces_usage"
+      ],
+      "example_mode": "run",
+      "required_data": [
+        "mne-cpp-test-data"
+      ],
       "status": "documented",
       "skigen_candidate": false,
       "documented": true,
@@ -5929,6 +6024,8 @@
       "sklearn": null,
       "test": null,
       "example": null,
+      "example_exempt": true,
+      "example_exempt_reason": "Raw FreeSurfer MGH tag record kept by the surface reader inside MNESourceSpace; never constructed by callers.",
       "status": "documented",
       "skigen_candidate": false,
       "documented": true,
@@ -5947,6 +6044,8 @@
       "sklearn": null,
       "test": null,
       "example": null,
+      "example_exempt": true,
+      "example_exempt_reason": "Container of MNEMghTag records filled by the surface reader inside MNESourceSpace; never constructed by callers.",
       "status": "documented",
       "skigen_candidate": false,
       "documented": true,
@@ -5983,6 +6082,8 @@
       "sklearn": null,
       "test": null,
       "example": null,
+      "example_exempt": true,
+      "example_exempt_reason": "Colour-scale setting of the legacy MNE-C mesh viewer held by MNEMshDisplaySurface; UI state with no computation to demonstrate.",
       "status": "documented",
       "skigen_candidate": false,
       "documented": true,
@@ -6037,6 +6138,8 @@
       "sklearn": null,
       "test": null,
       "example": null,
+      "example_exempt": true,
+      "example_exempt_reason": "Camera state of the legacy MNE-C mesh viewer held by MNEMshDisplaySurfaceSet; UI state with no computation to demonstrate.",
       "status": "documented",
       "skigen_candidate": false,
       "documented": true,
@@ -6055,6 +6158,8 @@
       "sklearn": null,
       "test": null,
       "example": null,
+      "example_exempt": true,
+      "example_exempt_reason": "Light of the legacy MNE-C mesh viewer held by MNEMshDisplaySurfaceSet; UI state with no computation to demonstrate.",
       "status": "documented",
       "skigen_candidate": false,
       "documented": true,
@@ -6073,6 +6178,8 @@
       "sklearn": null,
       "test": null,
       "example": null,
+      "example_exempt": true,
+      "example_exempt_reason": "Lighting rig of the legacy MNE-C mesh viewer held by MNEMshDisplaySurfaceSet; UI state with no computation to demonstrate.",
       "status": "documented",
       "skigen_candidate": false,
       "documented": true,
@@ -6091,6 +6198,8 @@
       "sklearn": null,
       "test": null,
       "example": null,
+      "example_exempt": true,
+      "example_exempt_reason": "Pick record of the legacy MNE-C mesh viewer held by MNEMshDisplaySurfaceSet; UI state with no computation to demonstrate.",
       "status": "documented",
       "skigen_candidate": false,
       "documented": true,
@@ -6108,7 +6217,14 @@
       "mne_python": null,
       "sklearn": null,
       "test": null,
-      "example": null,
+      "example": "ex_mne_api",
+      "example_snippet": [
+        "ex_mne_api/main.cpp#mne_ctf_comp_data_set_usage"
+      ],
+      "example_mode": "run",
+      "required_data": [
+        "mne-cpp-test-data"
+      ],
       "status": "documented",
       "skigen_candidate": false,
       "documented": true,
@@ -6145,6 +6261,8 @@
       "sklearn": null,
       "test": null,
       "example": null,
+      "example_exempt": true,
+      "example_exempt_reason": "Per-vertex nearest-source record stored in MNESurfaceOrVolume::nearest; filled while reading a source space (ex_mne_api mne_source_spaces_usage).",
       "status": "documented",
       "skigen_candidate": false,
       "documented": true,
@@ -6163,6 +6281,8 @@
       "sklearn": null,
       "test": null,
       "example": null,
+      "example_exempt": true,
+      "example_exempt_reason": "Patch statistics computed while reading a source space with patches; reached through MNEHemisphere::pinfo (ex_mne_api mne_source_spaces_usage).",
       "status": "documented",
       "skigen_candidate": false,
       "documented": true,
@@ -6181,6 +6301,8 @@
       "sklearn": null,
       "test": null,
       "example": null,
+      "example_exempt": true,
+      "example_exempt_reason": "Search-acceleration record (triangle activity mask) internal to MNESurface::project_to_surface; callers use MNEProjectToSurface (ex_mne_api mne_project_to_surface_usage).",
       "status": "documented",
       "skigen_candidate": false,
       "documented": true,
@@ -6198,7 +6320,14 @@
       "mne_python": null,
       "sklearn": null,
       "test": null,
-      "example": null,
+      "example": "ex_mne_api",
+      "example_snippet": [
+        "ex_mne_api/main.cpp#mne_raw_data_usage"
+      ],
+      "example_mode": "run",
+      "required_data": [
+        "mne-cpp-test-data"
+      ],
       "status": "documented",
       "skigen_candidate": false,
       "documented": true,
@@ -6216,7 +6345,14 @@
       "mne_python": null,
       "sklearn": null,
       "test": null,
-      "example": null,
+      "example": "ex_mne_api",
+      "example_snippet": [
+        "ex_mne_api/main.cpp#mne_raw_data_usage"
+      ],
+      "example_mode": "run",
+      "required_data": [
+        "mne-cpp-test-data"
+      ],
       "status": "documented",
       "skigen_candidate": false,
       "documented": true,
@@ -6234,7 +6370,14 @@
       "mne_python": null,
       "sklearn": null,
       "test": null,
-      "example": null,
+      "example": "ex_mne_api",
+      "example_snippet": [
+        "ex_mne_api/main.cpp#mne_project_to_surface_usage"
+      ],
+      "example_mode": "run",
+      "required_data": [
+        "mne-cpp-test-data"
+      ],
       "status": "documented",
       "skigen_candidate": false,
       "documented": true,
@@ -6252,7 +6395,14 @@
       "mne_python": null,
       "sklearn": null,
       "test": null,
-      "example": null,
+      "example": "ex_mne_api",
+      "example_snippet": [
+        "ex_mne_api/main.cpp#mne_raw_data_usage"
+      ],
+      "example_mode": "run",
+      "required_data": [
+        "mne-cpp-test-data"
+      ],
       "status": "documented",
       "skigen_candidate": false,
       "documented": true,
@@ -6270,7 +6420,14 @@
       "mne_python": null,
       "sklearn": null,
       "test": null,
-      "example": null,
+      "example": "ex_mne_api",
+      "example_snippet": [
+        "ex_mne_api/main.cpp#mne_raw_data_usage"
+      ],
+      "example_mode": "run",
+      "required_data": [
+        "mne-cpp-test-data"
+      ],
       "status": "documented",
       "skigen_candidate": false,
       "documented": true,
@@ -6288,7 +6445,14 @@
       "mne_python": null,
       "sklearn": null,
       "test": null,
-      "example": null,
+      "example": "ex_mne_api",
+      "example_snippet": [
+        "ex_mne_api/main.cpp#mne_raw_data_usage"
+      ],
+      "example_mode": "run",
+      "required_data": [
+        "mne-cpp-test-data"
+      ],
       "status": "documented",
       "skigen_candidate": false,
       "documented": true,
@@ -6306,7 +6470,14 @@
       "mne_python": null,
       "sklearn": null,
       "test": null,
-      "example": null,
+      "example": "ex_mne_api",
+      "example_snippet": [
+        "ex_mne_api/main.cpp#mne_source_spaces_usage"
+      ],
+      "example_mode": "run",
+      "required_data": [
+        "mne-cpp-test-data"
+      ],
       "status": "documented",
       "skigen_candidate": false,
       "documented": true,
@@ -6379,6 +6550,8 @@
       "sklearn": null,
       "test": null,
       "example": null,
+      "example_exempt": true,
+      "example_exempt_reason": "Common base of MNESurface, MNESourceSpace and MNEBemSurface; used through those (ex_mne_api mne_bem_usage, mne_source_spaces_usage).",
       "status": "documented",
       "skigen_candidate": false,
       "documented": true,
@@ -6397,6 +6570,8 @@
       "sklearn": null,
       "test": null,
       "example": null,
+      "example_exempt": true,
+      "example_exempt_reason": "Flat display patch of the legacy MNE-C mesh viewer held by MNEMshDisplaySurfaceSet; UI state with no computation to demonstrate.",
       "status": "documented",
       "skigen_candidate": false,
       "documented": true,
@@ -6415,6 +6590,8 @@
       "sklearn": null,
       "test": null,
       "example": null,
+      "example_exempt": true,
+      "example_exempt_reason": "Per-triangle cache (centroid, area, normal) filled by MNESurfaceOrVolume::add_triangle_data; read through MNEBemSurface/MNESourceSpaces, shown in ex_mne_api mne_bem_usage.",
       "status": "documented",
       "skigen_candidate": false,
       "documented": true,
@@ -6433,6 +6610,8 @@
       "sklearn": null,
       "test": null,
       "example": null,
+      "example_exempt": true,
+      "example_exempt_reason": "FreeSurfer volume geometry header decoded from MGH tags by the surface reader; a field of MNESurfaceOrVolume, not built by callers.",
       "status": "documented",
       "skigen_candidate": false,
       "documented": true,

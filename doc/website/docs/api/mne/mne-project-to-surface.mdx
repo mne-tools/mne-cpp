@@ -19,6 +19,16 @@ Description of what this class is intended to do (in detail).
 
 Projects 3-D points onto a triangulated surface mesh and returns nearest vertices and distances
 
+```cpp title="src/examples/ex_mne_api/main.cpp"
+MNEProjectToSurface projector(innerSkull);
+MatrixXf points(2, 3);
+points << 0.0f, 0.0f, 0.12f, 0.05f, 0.01f, 0.03f; // one point outside, one inside the skull
+MatrixXf onSurface;
+VectorXi triangle;
+VectorXf distance;
+projector.find_closest_on_surface(points, points.rows(), onSurface, triangle, distance);
+```
+
 ---
 
 ## Public Methods
@@ -70,6 +80,12 @@ Project a set of points onto the surface and return the nearest triangle and sig
 - *bool* — true if succeeded, false otherwise.
 
 ---
+
+## Example
+
+- Full source: [`src/examples/ex_mne_api/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_mne_api/main.cpp)
+- Build target: `ex_mne_api` (runs under CTest)
+- Data: [mne-cpp-test-data](https://github.com/mne-tools/mne-cpp-test-data)
 
 ## Authors of this file
 

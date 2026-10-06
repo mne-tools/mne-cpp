@@ -150,6 +150,8 @@ static Eigen::MatrixXd defaultD;
  * SSP/CTF state it was computed under.
  *
  * @brief In-memory representation of an @c -fwd.fif forward solution.
+ *
+ * @snippet ex_inv_api/main.cpp inv_minimum_norm_usage
  */
 class MNESHARED_EXPORT MNEForwardSolution
 {

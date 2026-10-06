@@ -23,6 +23,22 @@ MNE-style inverse operator.
 
 Encapsulates the SVD decomposition of the whitened and weighted lead-field matrix together with noise and source covariance, priors, and the source space. Supports reading/writing FIFF files, preparation for application (regularisation, whitening, noise normalisation), and gain-matrix clustering.
 
+```cpp title="src/examples/ex_inv_api/main.cpp"
+FsLabel v1;
+FsLabel::read(data + "/subjects/sample/label/lh.V1.label", v1);
+QFile fwdFile(data + "/Result/ref-sample_audvis-meg-eeg-oct-6-fwd.fif");
+const MNEForwardSolution fwd = MNEForwardSolution(fwdFile).pick_regions({v1}); // 70 sources x 3 orientations
+QFile covFile(data + "/MEG/sample/sample_audvis-cov.fif");
+const FiffCov noiseCov(covFile);
+QFile aveFile(data + "/MEG/sample/sample_audvis-ave.fif");
+const FiffEvoked evoked(aveFile, 0); // "Left Auditory"
+
+const MNEInverseOperator inverse = MNEInverseOperator::make_inverse_operator(evoked.info, fwd, noiseCov, 0.2f, 0.8f);
+const float lambda2 = 1.0f / 9.0f; // SNR 3
+InvMinimumNorm dspm(inverse, lambda2, "dSPM");
+const InvSourceEstimate stc = dspm.calculateInverse(evoked); // one row per source, combined over orientations
+```
+
 ---
 
 ## Public Methods
@@ -315,8 +331,9 @@ Read an inverse operator from a FIFF file.
 
 ## Example
 
-- Full source: [`src/examples/ex_make_inverse_operator/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_make_inverse_operator/main.cpp)
-- Build target: `ex_make_inverse_operator` (compiled in CI)
+- Full source: [`src/examples/ex_inv_api/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_inv_api/main.cpp)
+- Build target: `ex_inv_api` (runs under CTest)
+- Data: [mne-cpp-test-data](https://github.com/mne-tools/mne-cpp-test-data)
 
 ## Authors of this file
 

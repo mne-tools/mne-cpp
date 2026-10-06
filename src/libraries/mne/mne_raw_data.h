@@ -77,6 +77,8 @@ struct FilterData;
  * Implements the MNE Raw Data (Replaces *mneRawData,mneRawDataRec; struct of MNE-C mne_types.h).
  *
  * @brief A comprehensive raw data structure
+ *
+ * @snippet ex_mne_api/main.cpp mne_raw_data_usage
  */
 class MNESHARED_EXPORT MNERawData
 {

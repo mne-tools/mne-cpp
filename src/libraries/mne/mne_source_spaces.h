@@ -76,6 +76,8 @@ namespace MNELIB
  * @c mne_setup_source_space.
  *
  * @brief List of @ref MNESourceSpace objects forming a subject source space.
+ *
+ * @snippet ex_mne_api/main.cpp mne_source_spaces_usage
  */
 class MNESHARED_EXPORT MNESourceSpaces
 {

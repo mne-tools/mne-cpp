@@ -23,6 +23,22 @@ Forward solution: leadfield matrix mapping source-space dipoles to sensor measur
 
 In-memory representation of an `-fwd.fif` forward solution.
 
+```cpp title="src/examples/ex_inv_api/main.cpp"
+FsLabel v1;
+FsLabel::read(data + "/subjects/sample/label/lh.V1.label", v1);
+QFile fwdFile(data + "/Result/ref-sample_audvis-meg-eeg-oct-6-fwd.fif");
+const MNEForwardSolution fwd = MNEForwardSolution(fwdFile).pick_regions({v1}); // 70 sources x 3 orientations
+QFile covFile(data + "/MEG/sample/sample_audvis-cov.fif");
+const FiffCov noiseCov(covFile);
+QFile aveFile(data + "/MEG/sample/sample_audvis-ave.fif");
+const FiffEvoked evoked(aveFile, 0); // "Left Auditory"
+
+const MNEInverseOperator inverse = MNEInverseOperator::make_inverse_operator(evoked.info, fwd, noiseCov, 0.2f, 0.8f);
+const float lambda2 = 1.0f / 9.0f; // SNR 3
+InvMinimumNorm dspm(inverse, lambda2, "dSPM");
+const InvSourceEstimate stc = dspm.calculateInverse(evoked); // one row per source, combined over orientations
+```
+
 ---
 
 ## Public Methods
@@ -452,8 +468,9 @@ Restrict gain matrix entries for optimal depth weighting.
 
 ## Example
 
-- Full source: [`src/examples/ex_read_fwd/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_read_fwd/main.cpp)
-- Build target: `ex_read_fwd` (compiled in CI)
+- Full source: [`src/examples/ex_inv_api/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_inv_api/main.cpp)
+- Build target: `ex_inv_api` (runs under CTest)
+- Data: [mne-cpp-test-data](https://github.com/mne-tools/mne-cpp-test-data)
 
 ## Authors of this file
 

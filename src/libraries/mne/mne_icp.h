@@ -9,12 +9,15 @@
  * @date     March 2026
  * @brief    Iterative Closest Point alignment between MEG digitiser points and an MRI head surface.
  *
- * @c MNELIB::MNEIcp wraps the classical point-to-surface ICP used by
- * mne-cpp's coregistration tools to refine an initial @c head <-> @c MRI
- * transformation. It projects each digitiser point onto the nearest
- * triangle of an @ref MNELIB::MNEBemSurface (via @ref MNELIB::MNEProjectToSurface),
- * solves a rigid-body least squares with SVD and iterates until
- * convergence.
+ * Free functions for the point-to-surface ICP used by mne-cpp's coregistration
+ * tools to refine an initial @c head <-> @c MRI transformation:
+ * @c MNELIB::fitMatchedPoints aligns matched point pairs (e.g. fiducials),
+ * @c MNELIB::discard3DPointOutliers drops points far from the surface, and
+ * @c MNELIB::performIcp projects each point onto the nearest triangle of an
+ * @ref MNELIB::MNEBemSurface (via @ref MNELIB::MNEProjectToSurface), solves a
+ * rigid-body least squares with SVD and iterates until convergence.
+ *
+ * @snippet ex_mne_api/main.cpp mne_icp_usage
  */
 
 #ifndef MNE_ICP_H

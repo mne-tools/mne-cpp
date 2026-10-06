@@ -19,6 +19,35 @@ Covariance matrix storage.
 
 Stores a noise or source covariance matrix in dense (packed lower-triangle), diagonal, or sparse form together with its eigendecomposition and associated metadata (projection operator, [SSS](/docs/api/dsp/sss) info, channel classification, bad channels).
 
+```cpp title="src/examples/ex_mne_api/main.cpp"
+// Whiten one time point of the evoked response with the projected noise covariance
+QFile aveFile(data + "/MEG/sample/sample_audvis-ave.fif");
+FiffEvoked ave(aveFile, 0, QPair<float, float>(-1.0f, -1.0f), false);
+QStringList megNames; // the 305 good MEG channels
+for (const QString& name : ave.info.ch_names) {
+    if (name.startsWith("MEG") && !ave.info.bads.contains(name)) {
+        megNames << name;
+    }
+}
+ave = ave.pick_channels(megNames);
+const int nMeg = static_cast<int>(megNames.size());
+std::unique_ptr<MNEProjOp> aveProj;
+MNEProjOp::makeProjection({aveFile.fileName()}, ave.info.chs, nMeg, aveProj);
+aveProj->assign_channels(megNames, nMeg);
+aveProj->make_proj();
+VectorXf x = ave.data.col(200).cast<float>(); // t = 133 ms
+aveProj->project_vector(x, true);
+
+auto noise = MNECovMatrix::read(data + "/MEG/sample/sample_audvis-cov.fif", FIFFV_MNE_NOISE_COV);
+const int ncovFile = noise->ncov;
+auto noiseMeg = noise->pick_chs_omit(megNames, nMeg, false, ave.info.chs);
+aveProj->apply_cov(noiseMeg.get());
+noiseMeg->classify_channels(ave.info.chs, nMeg);
+noiseMeg->decompose_eigen(); // the 3 projected directions become zero eigenvalues
+VectorXf whitened(nMeg);
+noiseMeg->whiten_vector(x, whitened, nMeg);
+```
+
 ---
 
 ## Public Methods
@@ -347,6 +376,12 @@ Compute the linear index into a symmetric lower-triangular packed storage array 
 - *int* — The packed storage index.
 
 ---
+
+## Example
+
+- Full source: [`src/examples/ex_mne_api/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_mne_api/main.cpp)
+- Build target: `ex_mne_api` (runs under CTest)
+- Data: [mne-cpp-test-data](https://github.com/mne-tools/mne-cpp-test-data)
 
 ## Authors of this file
 

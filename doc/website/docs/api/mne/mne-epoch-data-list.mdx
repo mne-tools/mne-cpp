@@ -19,6 +19,17 @@ Epoch data list, which corresponds to a set of events.
 
 Ordered list of [`MNEEpochData`](/docs/api/mne/mne-epoch-data) objects sharing a common measurement info.
 
+```cpp title="src/examples/ex_mne_api/main.cpp"
+QFile rawFile(data + "/MEG/sample/sample_audvis_trunc_raw.fif");
+const FiffRawData raw(rawFile);
+FiffEvents events;
+FiffEvents::detect_from_raw(raw, events); // rising edges on STI 014
+// Epochs of event 1 from -100 to 300 ms, no rejection
+MNEEpochDataList epochs = MNEEpochDataList::readEpochs(raw, events.events, -0.1f, 0.3f, 1, {});
+const MNEEpochData& firstEpoch = *epochs.first();
+FiffEvoked evoked = epochs.average(raw.info, raw.first_samp, raw.last_samp);
+```
+
 ### Inheritance
 
 ```mermaid
@@ -250,6 +261,12 @@ Convenience function: reads epochs, optionally applies baseline correction and a
 - *[FiffEvoked](/docs/api/fiff/fiff-evoked)* — The averaged evoked data.
 
 ---
+
+## Example
+
+- Full source: [`src/examples/ex_mne_api/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_mne_api/main.cpp)
+- Build target: `ex_mne_api` (runs under CTest)
+- Data: [mne-cpp-test-data](https://github.com/mne-tools/mne-cpp-test-data)
 
 ## Authors of this file
 

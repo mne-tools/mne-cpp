@@ -19,6 +19,17 @@ Epoch data, which corresponds to an event.
 
 Single epoch (trial slice) of sensor data with timing and rejection metadata.
 
+```cpp title="src/examples/ex_mne_api/main.cpp"
+QFile rawFile(data + "/MEG/sample/sample_audvis_trunc_raw.fif");
+const FiffRawData raw(rawFile);
+FiffEvents events;
+FiffEvents::detect_from_raw(raw, events); // rising edges on STI 014
+// Epochs of event 1 from -100 to 300 ms, no rejection
+MNEEpochDataList epochs = MNEEpochDataList::readEpochs(raw, events.events, -0.1f, 0.3f, 1, {});
+const MNEEpochData& firstEpoch = *epochs.first();
+FiffEvoked evoked = epochs.average(raw.info, raw.first_samp, raw.last_samp);
+```
+
 ---
 
 ## Public Methods
@@ -99,6 +110,12 @@ Returns whether this epoch should be excluded from averaging.
 - *bool* — true when the epoch should be excluded.
 
 ---
+
+## Example
+
+- Full source: [`src/examples/ex_mne_api/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_mne_api/main.cpp)
+- Build target: `ex_mne_api` (runs under CTest)
+- Data: [mne-cpp-test-data](https://github.com/mne-tools/mne-cpp-test-data)
 
 ## Authors of this file
 

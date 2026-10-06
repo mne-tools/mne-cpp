@@ -35,6 +35,7 @@ add_subdirectory(ex_inv_beamformer)
 add_subdirectory(ex_inv_dipole_fit)
 add_subdirectory(ex_inv_hpi)
 add_subdirectory(ex_math)
+add_subdirectory(ex_mne_api)
 add_subdirectory(ex_sts_statistics)
 add_subdirectory(ex_warp)
 

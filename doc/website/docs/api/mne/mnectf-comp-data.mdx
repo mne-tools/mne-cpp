@@ -19,6 +19,25 @@ Represents a single CTF compensation data element.
 
 Holds the compensation matrix together with optional sparse pre-/post-selectors and intermediate computation buffers used by `MNECTFCompDataSet::apply()` and apply_transpose().
 
+```cpp title="src/examples/ex_mne_api/main.cpp"
+// Open a third-order gradiometer recording and read it uncompensated (grade 0)
+std::unique_ptr<MNERawData> ctfRaw(MNERawData::open_file_comp(ctfPath, false, false, MNEFilterDef(), 0));
+const MNECTFCompDataSet& comp = *ctfRaw->comp; // grades 1, 2, 3 and two 4D kinds
+const MNECTFCompData* third = nullptr;
+for (const auto& c : comp.comps) {
+    if (c->kind == MNECTFCompDataSet::map_comp_kind(3)) {
+        third = c.get();
+    }
+}
+const int grade = MNECTFCompDataSet::get_comp(ctfRaw->info->chInfo, ctfRaw->info->nchan);
+Matrix<float, Dynamic, Dynamic, RowMajor> ctf(ctfRaw->info->nchan, 21);
+std::vector<float*> ctfRows(ctf.rows());
+for (int c = 0; c < ctf.rows(); ++c) {
+    ctfRows[c] = ctf.row(c).data();
+}
+ctfRaw->pick_data(nullptr, ctfRaw->first_samp, 21, ctfRows.data());
+```
+
 ---
 
 ## Public Methods
@@ -66,6 +85,12 @@ Apply or remove channel calibration to/from the compensation matrix by scaling e
 - *int* — OK on success, FAIL if a channel is not found.
 
 ---
+
+## Example
+
+- Full source: [`src/examples/ex_mne_api/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_mne_api/main.cpp)
+- Build target: `ex_mne_api` (runs under CTest)
+- Data: [mne-cpp-test-data](https://github.com/mne-tools/mne-cpp-test-data)
 
 ## Authors of this file
 

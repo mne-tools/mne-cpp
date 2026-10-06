@@ -123,6 +123,8 @@ struct RegionMT
  * matrix together with noise and source covariance, priors, and the source
  * space.  Supports reading/writing FIFF files, preparation for application
  * (regularisation, whitening, noise normalisation), and gain-matrix clustering.
+ *
+ * @snippet ex_inv_api/main.cpp inv_minimum_norm_usage
  */
 class MNESHARED_EXPORT MNEInverseOperator
 {

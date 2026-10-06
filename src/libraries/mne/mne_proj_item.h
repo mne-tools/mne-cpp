@@ -62,6 +62,8 @@ namespace MNELIB
  *
  * Projection items are aggregated by MNEProjOp to form the complete SSP
  * operator that is applied during inverse computations and dipole fitting.
+ *
+ * @snippet ex_mne_api/main.cpp mne_raw_data_usage
  */
 class MNESHARED_EXPORT MNEProjItem
 {

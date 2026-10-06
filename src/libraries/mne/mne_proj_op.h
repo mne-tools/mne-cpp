@@ -64,6 +64,8 @@ class MNECovMatrix;
  * named matrix of projection vectors. When the operator is compiled
  * (make_projector), the individual items are orthogonalised into a single
  * dense projector stored in @ref proj_data.
+ *
+ * @snippet ex_mne_api/main.cpp mne_raw_data_usage
  */
 class MNESHARED_EXPORT MNEProjOp
 {

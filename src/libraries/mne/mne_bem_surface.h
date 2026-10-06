@@ -69,6 +69,8 @@ namespace MNELIB
  * triangle metadata (centers, normals, areas) and I/O.
  *
  * @brief BEM surface provides geometry information
+ *
+ * @snippet ex_mne_api/main.cpp mne_bem_usage
  */
 class MNESHARED_EXPORT MNEBemSurface : public MNESurface
 {

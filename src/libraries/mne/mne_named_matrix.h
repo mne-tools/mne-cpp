@@ -79,6 +79,8 @@ namespace MNELIB
  *
  * @note This class is functionally similar to FIFFLIB::FiffNamedMatrix.
  *       A future consolidation of both types is planned.
+ *
+ * @snippet ex_mne_api/main.cpp mne_ctf_comp_data_set_usage
  */
 class MNESHARED_EXPORT MNENamedMatrix
 {

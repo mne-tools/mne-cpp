@@ -30,6 +30,25 @@ The class provides factory methods to:
 
 All factory methods return `std::unique_ptr<MNENamedMatrix>` for clear ownership.
 
+```cpp title="src/examples/ex_mne_api/main.cpp"
+// Open a third-order gradiometer recording and read it uncompensated (grade 0)
+std::unique_ptr<MNERawData> ctfRaw(MNERawData::open_file_comp(ctfPath, false, false, MNEFilterDef(), 0));
+const MNECTFCompDataSet& comp = *ctfRaw->comp; // grades 1, 2, 3 and two 4D kinds
+const MNECTFCompData* third = nullptr;
+for (const auto& c : comp.comps) {
+    if (c->kind == MNECTFCompDataSet::map_comp_kind(3)) {
+        third = c.get();
+    }
+}
+const int grade = MNECTFCompDataSet::get_comp(ctfRaw->info->chInfo, ctfRaw->info->nchan);
+Matrix<float, Dynamic, Dynamic, RowMajor> ctf(ctfRaw->info->nchan, 21);
+std::vector<float*> ctfRows(ctf.rows());
+for (int c = 0; c < ctf.rows(); ++c) {
+    ctfRows[c] = ctf.row(c).data();
+}
+ctfRaw->pick_data(nullptr, ctfRaw->first_samp, 21, ctfRows.data());
+```
+
 ---
 
 ## Public Methods
@@ -142,6 +161,12 @@ Reads a two-dimensional tagged matrix of the given `kind` from `node` (or its fi
 - *std::unique_ptr&lt; [MNENamedMatrix](/docs/api/mne/mne-named-matrix) &gt;* — A unique pointer to the read matrix, or `nullptr` on failure.
 
 ---
+
+## Example
+
+- Full source: [`src/examples/ex_mne_api/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_mne_api/main.cpp)
+- Build target: `ex_mne_api` (runs under CTest)
+- Data: [mne-cpp-test-data](https://github.com/mne-tools/mne-cpp-test-data)
 
 ## Authors of this file
 

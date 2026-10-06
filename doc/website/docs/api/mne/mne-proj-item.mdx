@@ -21,6 +21,46 @@ A single SSP (Signal-Space Projection) item.
 
 Projection items are aggregated by [`MNEProjOp`](/docs/api/mne/mne-proj-op) to form the complete SSP operator that is applied during inverse computations and dipole fitting.
 
+```cpp title="src/examples/ex_mne_api/main.cpp"
+// MNE-C style reader: buffer directory, channel selection, projection and overlap-add filter
+MNEFilterDef filter; // 40 Hz lowpass, 5 Hz transition, 4096-sample blocks
+filter.filter_on = true;
+filter.size = 4096;
+filter.taper_size = 2048;
+filter.lowpass = filter.eog_lowpass = 40.0f;
+filter.lowpass_width = filter.eog_lowpass_width = 5.0f;
+std::unique_ptr<MNERawData> mneRaw(MNERawData::open_file(rawFile.fileName(), false, false, filter));
+const MNERawInfo& rawInfo = *mneRaw->info;
+const MNERawBufDef& firstBuffer = mneRaw->bufs.front();
+
+MNEChSelection sel; // channel names are stored without spaces
+sel.chspick = sel.chspick_nospace = {"MEG0113", "EEG001", "EOG061"};
+sel.nchan = sel.ndef = static_cast<int>(sel.chspick.size());
+sel.pick_deriv = VectorXi::Constant(sel.nchan, -1);
+sel.pick.resize(sel.nchan);
+for (int c = 0; c < sel.nchan; ++c) {
+    sel.pick[c] = static_cast<int>(mneRaw->ch_names.indexOf(sel.chspick[c]));
+}
+
+const int ns = 25;
+Matrix<float, Dynamic, Dynamic, RowMajor> segment(sel.nchan, ns);
+std::vector<float*> rows{segment.row(0).data(), segment.row(1).data(), segment.row(2).data()};
+mneRaw->pick_data(&sel, mneRaw->first_samp + 2990, ns, rows.data()); // calibrated, across a buffer boundary
+const double eegRaw = segment(1, 0);
+mneRaw->pick_data_filt(&sel, mneRaw->first_samp + 2990, ns, rows.data());
+const double eegFilt = segment(1, 0);
+
+// The file stores its 4 SSP projectors as inactive; makeProjection switches them on
+std::unique_ptr<MNEProjOp> proj;
+MNEProjOp::makeProjection({rawFile.fileName()}, rawInfo.chInfo, rawInfo.nchan, proj);
+proj->assign_channels(mneRaw->ch_names, rawInfo.nchan);
+proj->make_proj();
+const MNEProjItem& firstItem = proj->items[0];
+mneRaw->proj = std::move(proj);
+mneRaw->pick_data_proj(&sel, mneRaw->first_samp + 2990, ns, rows.data());
+const double eegProj = segment(1, 0);
+```
+
 ---
 
 ## Public Methods
@@ -104,6 +144,12 @@ Iterates over `list` and checks if any channel name matches a column in the proj
 - *int* — `true` (non-zero) if this item affects at least one channel, `false` (0) otherwise.
 
 ---
+
+## Example
+
+- Full source: [`src/examples/ex_mne_api/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_mne_api/main.cpp)
+- Build target: `ex_mne_api` (runs under CTest)
+- Data: [mne-cpp-test-data](https://github.com/mne-tools/mne-cpp-test-data)
 
 ## Authors of this file
 

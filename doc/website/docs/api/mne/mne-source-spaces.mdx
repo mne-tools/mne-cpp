@@ -19,6 +19,17 @@ Container pairing the left and right cortical source spaces (and optional discre
 
 List of [`MNESourceSpace`](/docs/api/mne/mne-source-space) objects forming a subject source space.
 
+```cpp title="src/examples/ex_mne_api/main.cpp"
+QFile srcFile(data + "/subjects/sample/bem/sample-oct-6-src.fif");
+FiffStream::SPtr stream(new FiffStream(&srcFile));
+MNESourceSpaces src;
+stream->open();
+MNESourceSpaces::readFromStream(stream, true, src); // add_geom: normals, triangle data and patches
+stream->close();
+const auto& lh = dynamic_cast<const MNEHemisphere&>(src[0]);
+QList<VectorXi> vertno = src.get_vertno(); // used vertices per hemisphere
+```
+
 ---
 
 ## Public Methods
@@ -334,6 +345,12 @@ Access the underlying shared_ptr at the given index (const).
 - *bool* — true if succeeded, false otherwise.
 
 ---
+
+## Example
+
+- Full source: [`src/examples/ex_mne_api/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_mne_api/main.cpp)
+- Build target: `ex_mne_api` (runs under CTest)
+- Data: [mne-cpp-test-data](https://github.com/mne-tools/mne-cpp-test-data)
 
 ## Authors of this file
 

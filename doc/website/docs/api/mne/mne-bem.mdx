@@ -23,6 +23,12 @@ Boundary element model: aggregates the inner-skull, outer-skull and scalp [`MNEB
 
 Aggregated boundary element model loaded from a `-bem.fif` file.
 
+```cpp title="src/examples/ex_mne_api/main.cpp"
+QFile bemFile(data + "/subjects/sample/bem/sample-5120-bem.fif");
+MNEBem bem(bemFile); // one MNEBemSurface per BEM layer
+const MNEBemSurface& innerSkull = bem[0];
+```
+
 ---
 
 ## Public Methods
@@ -232,8 +238,9 @@ Transform the Bem using the inverse.
 
 ## Example
 
-- Full source: [`src/examples/ex_read_bem/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_read_bem/main.cpp)
-- Build target: `ex_read_bem` (compiled in CI)
+- Full source: [`src/examples/ex_mne_api/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_mne_api/main.cpp)
+- Build target: `ex_mne_api` (runs under CTest)
+- Data: [mne-cpp-test-data](https://github.com/mne-tools/mne-cpp-test-data)
 
 ## Authors of this file
 

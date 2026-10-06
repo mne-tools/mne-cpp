@@ -73,6 +73,8 @@ namespace MNELIB
  * @ref MNEBemSurface objects of a head conductor model.
  *
  * @brief Aggregated boundary element model loaded from a @c -bem.fif file.
+ *
+ * @snippet ex_mne_api/main.cpp mne_bem_usage
  */
 class MNESHARED_EXPORT MNEBem
 {

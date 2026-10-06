@@ -63,6 +63,8 @@ class MNEBemSurface;
  * Description of what this class is intended to do (in detail).
  *
  * @brief Projects 3-D points onto a triangulated surface mesh and returns nearest vertices and distances
+ *
+ * @snippet ex_mne_api/main.cpp mne_project_to_surface_usage
  */
 
 class MNESHARED_EXPORT MNEProjectToSurface

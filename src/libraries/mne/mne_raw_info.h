@@ -66,6 +66,8 @@ namespace MNELIB
 //=============================================================================================================
 /**
  * @brief Information about raw data in a FIFF file.
+ *
+ * @snippet ex_mne_api/main.cpp mne_raw_data_usage
  */
 class MNESHARED_EXPORT MNERawInfo
 {

@@ -84,6 +84,8 @@ class MNESssData;
  * Stores a noise or source covariance matrix in dense (packed lower-triangle),
  * diagonal, or sparse form together with its eigendecomposition and associated
  * metadata (projection operator, SSS info, channel classification, bad channels).
+ *
+ * @snippet ex_mne_api/main.cpp mne_cov_matrix_usage
  */
 class MNESHARED_EXPORT MNECovMatrix
 {

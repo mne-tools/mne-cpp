@@ -35,6 +35,8 @@ namespace MNELIB
 #define MNEFILTERDEF
 /**
  * Filter definition parameters.
+ *
+ * @snippet ex_mne_api/main.cpp mne_raw_data_usage
  */
 class MNESHARED_EXPORT MNEFilterDef
 {

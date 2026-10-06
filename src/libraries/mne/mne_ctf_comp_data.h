@@ -59,6 +59,8 @@ namespace MNELIB
  * Holds the compensation matrix together with optional sparse
  * pre-/post-selectors and intermediate computation buffers used
  * by MNECTFCompDataSet::apply() and apply_transpose().
+ *
+ * @snippet ex_mne_api/main.cpp mne_ctf_comp_data_set_usage
  */
 class MNESHARED_EXPORT MNECTFCompData
 {

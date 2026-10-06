@@ -63,6 +63,8 @@ struct ArtifactRejectionData
  * Epoch data list, which corresponds to a set of events
  *
  * @brief Ordered list of @ref MNEEpochData objects sharing a common measurement info.
+ *
+ * @snippet ex_mne_api/main.cpp mne_epoch_data_list_usage
  */
 class MNESHARED_EXPORT MNEEpochDataList : public QList<MNEEpochData::SPtr>
 {

@@ -66,6 +66,8 @@ namespace MNELIB
  * Hemisphere source space geometry information
  *
  * @brief Hemisphere provides geometry information
+ *
+ * @snippet ex_mne_api/main.cpp mne_source_spaces_usage
  */
 class MNESHARED_EXPORT MNEHemisphere : public MNESourceSpace
 {

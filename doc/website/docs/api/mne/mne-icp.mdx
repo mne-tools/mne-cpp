@@ -23,7 +23,23 @@ class; the functions live directly in the library namespace.
 
 SPDX-License-Identifier: BSD-3-Clause Copyright (c) 2026 MNE-CPP Authors.
 
-`MNELIB::MNEIcp` wraps the classical point-to-surface ICP used by mne-cpp's coregistration tools to refine an initial `head` &lt;-&gt; `MRI` transformation. It projects each digitiser point onto the nearest triangle of an [`MNEBemSurface`](/docs/api/mne/mne-bem-surface) (via [`MNEProjectToSurface`](/docs/api/mne/mne-project-to-surface)), solves a rigid-body least squares with SVD and iterates until convergence.
+Free functions for the point-to-surface ICP used by mne-cpp's coregistration tools to refine an initial `head` &lt;-&gt; `MRI` transformation: ``MNELIB::fitMatchedPoints`` aligns matched point pairs (e.g. fiducials), ``MNELIB::discard3DPointOutliers`` drops points far from the surface, and ``MNELIB::performIcp`` projects each point onto the nearest triangle of an [`[MNEBemSurface](/docs/api/mne/mne-bem-surface)`](/docs/api/mne/mne-bem-surface) (via [`[MNEProjectToSurface](/docs/api/mne/mne-project-to-surface)`](/docs/api/mne/mne-project-to-surface)), solves a rigid-body least squares with SVD and iterates until convergence.
+
+```cpp title="src/examples/ex_mne_api/main.cpp"
+// 1. Rough start from three matched points (e.g. the fiducials)
+Matrix4f start;
+MatrixXf mriPoints(3, 3);
+mriPoints << innerSkull.rr.row(0), innerSkull.rr.row(20), innerSkull.rr.row(40);
+fitMatchedPoints(headShape.topRows(3), mriPoints, start);
+FiffCoordTrans headToMri(FIFFV_COORD_HEAD, FIFFV_COORD_MRI, start);
+// 2. Drop head shape points further than 10 mm from the surface, then refine with ICP
+auto surface = QSharedPointer<MNEProjectToSurface>::create(innerSkull);
+VectorXi take;
+MatrixXf kept;
+discard3DPointOutliers(surface, headShape, headToMri, take, kept, 0.01f);
+float rmse = 0.0f;
+performIcp(surface, kept, headToMri, rmse, false, 50, 1e-6f);
+```
 
 ---
 
@@ -139,8 +155,9 @@ Discard outliers compared to a given 3D surface.
 
 ## Example
 
-- Full source: [`src/examples/ex_coreg/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_coreg/main.cpp)
-- Build target: `ex_coreg` (compiled in CI)
+- Full source: [`src/examples/ex_mne_api/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_mne_api/main.cpp)
+- Build target: `ex_mne_api` (runs under CTest)
+- Data: [mne-cpp-test-data](https://github.com/mne-tools/mne-cpp-test-data)
 
 ## Authors of this file
 

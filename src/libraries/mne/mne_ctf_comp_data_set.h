@@ -68,6 +68,8 @@ class MNECTFCompData;
  * Stores all available compensation data sets read from a FIFF file together
  * with the compiled current/undo operator pair used to switch between
  * compensation grades at runtime.
+ *
+ * @snippet ex_mne_api/main.cpp mne_ctf_comp_data_set_usage
  */
 class MNESHARED_EXPORT MNECTFCompDataSet
 {

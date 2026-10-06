@@ -59,6 +59,8 @@ namespace MNELIB
  * Sample values are stored in a row-major matrix (nchan x ns) that is
  * managed by an external ring buffer; an empty (0x0) matrix indicates
  * that the data are not currently resident in memory.
+ *
+ * @snippet ex_mne_api/main.cpp mne_raw_data_usage
  */
 class MNESHARED_EXPORT MNERawBufDef
 {
