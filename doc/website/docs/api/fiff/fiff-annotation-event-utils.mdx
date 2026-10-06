@@ -23,7 +23,7 @@ class; the functions live directly in the library namespace.
 
 SPDX-License-Identifier: BSD-3-Clause Copyright (c) 2026 MNE-CPP Authors.
 
-Two representations coexist in [MNE](/docs/api/mne/mne-class) workflows: free-text `FIFFLIB::FiffAnnotation` entries (onset / duration / description) and integer (sample, prev, code) event triples extracted from a stim channel or fed to `mne.Epochs`. These free functions translate between the two: mapping annotation descriptions to event codes via a description→code table, exploding annotation durations into start / stop event pairs, and the reverse aggregation. They mirror `mne.events_from_annotations` and `mne.annotations_from_events` in MNE-Python.
+Two representations coexist in [MNE](/docs/api/mne/mne-class) workflows: free-text [`FiffAnnotation`](/docs/api/fiff/fiff-annotation) entries (onset / duration / description) and integer (sample, prev, code) event triples extracted from a stim channel or fed to `mne.Epochs`. These free functions translate between the two: mapping annotation descriptions to event codes via a description→code table, exploding annotation durations into start / stop event pairs, and the reverse aggregation. They mirror `mne.events_from_annotations` and `mne.annotations_from_events` in MNE-Python.
 
 ```cpp title="src/examples/ex_fiff_api/main.cpp"
 MatrixXi firstThree = events.events.topRows(3);

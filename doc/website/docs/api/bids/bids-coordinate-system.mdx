@@ -1,0 +1,81 @@
+---
+id: bids-coordinate-system
+title: "BIDSLIB::BidsCoordinateSystem"
+sidebar_label: BidsCoordinateSystem
+sidebar_position: 8
+---
+
+# BidsCoordinateSystem
+
+**Namespace:** `BIDSLIB` &nbsp;·&nbsp; **Library:** BIDS Library
+
+`#include <bids/bids_coordinate_system.h>`
+
+```cpp
+struct BIDSLIB::BidsCoordinateSystem
+```
+
+Coordinate system metadata from *_coordsystem.json.
+
+Describes the spatial reference frame used for electrode positions.
+
+---
+
+## Public Methods
+
+### toFiffCoordTrans(fromFrame, toFrame)
+
+Convert parsed transform to a [FiffCoordTrans](/docs/api/fiff/fiff-coord-trans).
+
+**Parameters:**
+
+- **fromFrame** : *int*
+  Source coordinate frame (default FIFFV_COORD_MRI = 5).
+
+- **toFrame** : *int*
+  Destination coordinate frame (default FIFFV_COORD_HEAD = 4).
+
+**Returns:**
+
+- *[FiffCoordTrans](/docs/api/fiff/fiff-coord-trans)* — FiffCoordTrans populated with the parsed 4x4 matrix.
+
+---
+
+## Static Methods
+
+### readJson(sFilePath)
+
+Read a BIDS *_coordsystem.json file.
+
+**Parameters:**
+
+- **sFilePath** : *const QString &*
+  Path to the coordsystem.json file.
+
+**Returns:**
+
+- *[BidsCoordinateSystem](/docs/api/bids/bids-coordinate-system)* — Populated coordinate system, or default if file cannot be read.
+
+---
+
+### writeJson(sFilePath, cs)
+
+Write a BIDS *_coordsystem.json file.
+
+**Parameters:**
+
+- **sFilePath** : *const QString &*
+  Output path.
+
+- **cs** : *const [BidsCoordinateSystem](/docs/api/bids/bids-coordinate-system) &*
+  Coordinate system metadata.
+
+**Returns:**
+
+- *bool* — true on success.
+
+---
+
+## Authors of this file
+
+- Christoph Dinh &lt;christoph.dinh@mne-cpp.org&gt;

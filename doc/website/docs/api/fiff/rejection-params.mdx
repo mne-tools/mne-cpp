@@ -1,0 +1,30 @@
+---
+id: rejection-params
+title: "FIFFLIB::RejectionParams"
+sidebar_label: RejectionParams
+sidebar_position: 38
+---
+
+# RejectionParams
+
+**Namespace:** `FIFFLIB` &nbsp;·&nbsp; **Library:** FIFF Library
+
+`#include <fiff/fiff_evoked_set.h>`
+
+```cpp
+struct FIFFLIB::RejectionParams
+```
+
+Artifact-rejection thresholds for the MNE-C batch averaging pipeline (gradiometer / magnetometer / EEG / EOG / ECG, peak-to-peak and flatness).
+
+Field-for-field port of `rejDataRec` from MNE-C `browser_types.h`. Used by [`AverageDescription`](/docs/api/fiff/average-description) to drive `mne_process_raw's` peak-to-peak and flatness rejection when computing batch evokeds; the default values match the MNE-C defaults so existing "ave description" files keep producing identical results.
+
+---
+
+## Authors of this file
+
+- Christoph Dinh &lt;christoph.dinh@mne-cpp.org&gt;
+- Florian Schlembach &lt;fschlembach@web.de&gt;
+- Lorenz Esch &lt;lorenz.esch@tu-ilmenau.de&gt;
+- Gabriel Motta &lt;gabrielbenmotta@gmail.com&gt;
+- Juan GPC &lt;jgarciaprieto@mgh.harvard.edu&gt;

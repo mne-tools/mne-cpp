@@ -52,21 +52,21 @@ class AuditTestCase(unittest.TestCase):
     def setUp(self) -> None:
         self.xml = Path(tempfile.mkdtemp())
         self.addCleanup(shutil.rmtree, self.xml)
-        self.compounds: dict[str, str] = {}
+        self.compounds: dict[str, tuple[str, str]] = {}
         self.add("FIFFLIB::FiffInfo", "fiff/fiff_info.h")
         self.add("FIFFLIB::FiffTool", "fiff/fiff_tool.h")
         self.add("std::vector", "vector")
         self.add("BrainView", "disp3D/view/brainview.h")
 
-    def add(self, name: str, header: str) -> None:
-        self.compounds[name] = header
+    def add(self, name: str, header: str, kind: str = "class") -> None:
+        self.compounds[name] = (header, kind)
 
     def problems(self, registry: dict | None = None, exclusions: dict | None = None) -> list[str]:
         index = ["<doxygenindex>",
                  '<compound kind="namespace" refid="ns_f"><name>FIFFLIB</name></compound>',
                  '<compound kind="namespace" refid="ns_s"><name>std</name></compound>']
-        for i, (name, header) in enumerate(self.compounds.items()):
-            index.append(f'<compound kind="class" refid="c{i}"><name>{name}</name></compound>')
+        for i, (name, (header, kind)) in enumerate(self.compounds.items()):
+            index.append(f'<compound kind="{kind}" refid="c{i}"><name>{name}</name></compound>')
             (self.xml / f"c{i}.xml").write_text(
                 f'<doxygen><compounddef id="c{i}"><compoundname>{name}</compoundname>'
                 f'<location file="{header}"/></compounddef></doxygen>', encoding="utf-8")
@@ -98,7 +98,21 @@ class TestRegistryAudit(AuditTestCase):
 
     def test_nested_classes_are_not_public_units(self) -> None:
         self.add("FIFFLIB::FiffInfo::Entry", "fiff/fiff_info.h")
+        self.add("FIFFLIB::FiffInfo::Item", "fiff/fiff_info.h", "struct")
         self.assertEqual([], self.problems())
+
+    def test_unregistered_struct_fails(self) -> None:
+        """Exported structs (parameter and result records) are public API like classes."""
+        self.add("FIFFLIB::FiffParams", "fiff/fiff_params.h", "struct")
+        self.assertEqual(["class 'FIFFLIB::FiffParams' (fiff/fiff_params.h) is in the Doxygen XML but not in the registry"],
+                         self.problems())
+
+    def test_documented_struct_passes(self) -> None:
+        self.add("FIFFLIB::FiffParams", "fiff/fiff_params.h", "struct")
+        registry = json.loads(json.dumps(REGISTRY))
+        registry["classes"].append({"name": "FiffParams", "module": "fiff", "header": "fiff/fiff_params.h",
+                                    "documented": True})
+        self.assertEqual([], self.problems(registry))
 
 
 class TestExclusions(AuditTestCase):

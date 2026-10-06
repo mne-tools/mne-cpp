@@ -1,0 +1,59 @@
+---
+id: bids-channel
+title: "BIDSLIB::BidsChannel"
+sidebar_label: BidsChannel
+sidebar_position: 7
+---
+
+# BidsChannel
+
+**Namespace:** `BIDSLIB` &nbsp;·&nbsp; **Library:** BIDS Library
+
+`#include <bids/bids_channel.h>`
+
+```cpp
+struct BIDSLIB::BidsChannel
+```
+
+Channel metadata record corresponding to one row in *_channels.tsv.
+
+---
+
+## Static Methods
+
+### readTsv(sFilePath)
+
+Read a BIDS *_channels.tsv file.
+
+**Parameters:**
+
+- **sFilePath** : *const QString &*
+  Path to the channels.tsv file.
+
+**Returns:**
+
+- *QList&lt; [BidsChannel](/docs/api/bids/bids-channel) &gt;* — List of channel records.
+
+---
+
+### writeTsv(sFilePath, channels)
+
+Write a BIDS *_channels.tsv file.
+
+**Parameters:**
+
+- **sFilePath** : *const QString &*
+  Output path.
+
+- **channels** : *const QList&lt; [BidsChannel](/docs/api/bids/bids-channel) &gt; &*
+  List of channel records.
+
+**Returns:**
+
+- *bool* — true on success.
+
+---
+
+## Authors of this file
+
+- Christoph Dinh &lt;christoph.dinh@mne-cpp.org&gt;

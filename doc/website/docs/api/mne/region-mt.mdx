@@ -1,0 +1,41 @@
+---
+id: region-mt
+title: "MNELIB::RegionMT"
+sidebar_label: RegionMT
+sidebar_position: 65
+---
+
+# RegionMT
+
+**Namespace:** `MNELIB` &nbsp;·&nbsp; **Library:** MNE Library
+
+`#include <mne/mne_inverse_operator.h>`
+
+```cpp
+struct MNELIB::RegionMT
+```
+
+Input parameters for multi-threaded [KMeans](/docs/api/math/k-means) clustering on a single cortical region.
+
+---
+
+## Public Methods
+
+### cluster()
+
+Run [KMeans](/docs/api/math/k-means) clustering on this region.
+
+**Returns:**
+
+- *[RegionMTOut](/docs/api/mne/region-mt-out)* — Clustering result including centroid positions and assignments.
+
+---
+
+## Authors of this file
+
+- Christoph Dinh &lt;christoph.dinh@mne-cpp.org&gt;
+- Christof Pieloth &lt;pieloth@labp.htwk-leipzig.de&gt;
+- Lorenz Esch &lt;lorenz.esch@tu-ilmenau.de&gt;
+- Gabriel Motta &lt;gabrielbenmotta@gmail.com&gt;
+- Juan GPC &lt;jgarciaprieto@mgh.harvard.edu&gt;
+- Andreas Griesshammer &lt;ag@fieldlineinc.com&gt;

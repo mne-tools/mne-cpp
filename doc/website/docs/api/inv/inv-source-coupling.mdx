@@ -1,0 +1,34 @@
+---
+id: inv-source-coupling
+title: "INVLIB::InvSourceCoupling"
+sidebar_label: InvSourceCoupling
+sidebar_position: 48
+---
+
+# InvSourceCoupling
+
+**Namespace:** `INVLIB` &nbsp;·&nbsp; **Library:** Inverse Library
+
+`#include <inv/inv_source_coupling.h>`
+
+```cpp
+struct INVLIB::InvSourceCoupling
+```
+
+Describes a group of N coupled (correlated) source grid points found by algorithms such as RAP-MUSIC.
+
+The group can be a pair, triplet, or any N-tuple of grid indices together with their orientations and an N x N correlation matrix.
+
+N-tuple of correlated grid sources with orientations and correlation matrix.
+
+---
+
+## Public Methods
+
+### InvSourceCoupling()
+
+---
+
+## Authors of this file
+
+- Christoph Dinh &lt;christoph.dinh@mne-cpp.org&gt;

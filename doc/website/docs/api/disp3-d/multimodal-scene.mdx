@@ -18,7 +18,7 @@ class DISP3DLIB::MultimodalScene
 Host-app-agnostic controller that owns the ordered renderable set and dispatches picks back to the producing layer.
 
 Responsibilities:
-Maintain an ordered registry of `SceneLayer` payloads keyed by id.
+Maintain an ordered registry of [`SceneLayer`](/docs/api/disp3-d/scene-layer) payloads keyed by id.
 
 
 Emit `layersChanged` whenever a layer is added, removed, or its visibility/opacity flips, so the renderer can rebuild its draw list.
@@ -27,7 +27,7 @@ Emit `layersChanged` whenever a layer is added, removed, or its visibility/opaci
 Maintain a shared timeline (current time index) that data overlays across modalities consume; emits `timeSampleChanged`.
 
 
-Maintain the most recent `PickResult` and emit `picked` when a layer producer reports a hit; consumers (Pick dock, status bar, MRI ortho viewer) subscribe to that signal.
+Maintain the most recent [`PickResult`](/docs/api/disp3-d/pick-result) and emit `picked` when a layer producer reports a hit; consumers (Pick dock, status bar, MRI ortho viewer) subscribe to that signal.
 
 The class is **non-virtual** on purpose: it is a pure data/dispatch hub with no rendering logic. The renderer (``BrainRenderer`` or a future `MultimodalRenderer`) reads layers via `layers()` and per-kind downcasts the payload pointer.
 
@@ -82,7 +82,7 @@ If a layer with the same `SceneLayer::id` already exists, the stored layer is ov
 
 **Parameters:**
 
-- **layer** : *SceneLayer*
+- **layer** : *[SceneLayer](/docs/api/disp3-d/scene-layer)*
   Layer record. The caller retains ownership of the underlying payload via the shared_ptr.
 
 ---
@@ -112,7 +112,7 @@ Remove every layer.
 
 **Returns:**
 
-- *QVector&lt; SceneLayer &gt;* — All layers in current draw order (sorted by kind, then by drawOrder, then by insertion order).
+- *QVector&lt; [SceneLayer](/docs/api/disp3-d/scene-layer) &gt;* — All layers in current draw order (sorted by kind, then by drawOrder, then by insertion order).
 
 ---
 
@@ -125,7 +125,7 @@ Remove every layer.
 
 **Returns:**
 
-- *const SceneLayer ** — Pointer to the layer with the given id, or nullptr. The pointer is valid only until the next mutation.
+- *const [SceneLayer](/docs/api/disp3-d/scene-layer) ** — Pointer to the layer with the given id, or nullptr. The pointer is valid only until the next mutation.
 
 ---
 
@@ -250,7 +250,7 @@ The values are clamped to fmin &lt;= fmid &lt;= fmax. Emits `overlayThresholdsCh
 
 **Returns:**
 
-- *const PickResult &* — Most recent pick reported via `reportPick`. Default- constructed (kind == None) until the first hit.
+- *const [PickResult](/docs/api/disp3-d/pick-result) &* — Most recent pick reported via `reportPick`. Default- constructed (kind == None) until the first hit.
 
 ---
 
@@ -262,7 +262,7 @@ Emits `picked`. Used by both real ray-cast picking and synthetic picks (e.g. wiz
 
 **Parameters:**
 
-- **pick** : *const PickResult &*
+- **pick** : *const [PickResult](/docs/api/disp3-d/pick-result) &*
   Pick result to store as the last pick and broadcast.
 
 ---

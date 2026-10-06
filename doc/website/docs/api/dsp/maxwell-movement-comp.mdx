@@ -55,13 +55,13 @@ Reconstructed at the reference head position.
 - **fiffInfo** : *const [FiffInfo](/docs/api/fiff/fiff-info) &*
   Measurement info (channel positions, etc.).
 
-- **headPos** : *const QList&lt; HeadPosEntry &gt; &*
+- **headPos** : *const QList&lt; [HeadPosEntry](/docs/api/dsp/head-pos-entry) &gt; &*
   Head positions over time (from cHPI).
 
 - **dSFreq** : *double*
   Sampling frequency (Hz).
 
-- **params** : *const MaxwellMoveCompParams &*
+- **params** : *const [MaxwellMoveCompParams](/docs/api/dsp/maxwell-move-comp-params) &*
   Compensation parameters.
 
 **Returns:**
@@ -83,7 +83,7 @@ File format: whitespace-separated columns per line: time q1 q2 q3 tx ty tz gof
 
 **Returns:**
 
-- *QList&lt; HeadPosEntry &gt;* — List of head position entries.
+- *QList&lt; [HeadPosEntry](/docs/api/dsp/head-pos-entry) &gt;* — List of head position entries.
 
 ---
 
@@ -96,7 +96,7 @@ Write head positions to a file.
 - **sPath** : *const QString &*
   Output file path.
 
-- **headPos** : *const QList&lt; HeadPosEntry &gt; &*
+- **headPos** : *const QList&lt; [HeadPosEntry](/docs/api/dsp/head-pos-entry) &gt; &*
   Head positions to write.
 
 **Returns:**

@@ -1,0 +1,61 @@
+---
+id: bids-dataset-description
+title: "BIDSLIB::BidsDatasetDescription"
+sidebar_label: BidsDatasetDescription
+sidebar_position: 9
+---
+
+# BidsDatasetDescription
+
+**Namespace:** `BIDSLIB` &nbsp;·&nbsp; **Library:** BIDS Library
+
+`#include <bids/bids_dataset_description.h>`
+
+```cpp
+struct BIDSLIB::BidsDatasetDescription
+```
+
+Dataset-level metadata from dataset_description.json.
+
+Every BIDS dataset must contain a dataset_description.json at its root. This struct captures the required and recommended fields.
+
+---
+
+## Static Methods
+
+### read(sFilePath)
+
+Read a dataset_description.json file.
+
+**Parameters:**
+
+- **sFilePath** : *const QString &*
+  Path to dataset_description.json.
+
+**Returns:**
+
+- *[BidsDatasetDescription](/docs/api/bids/bids-dataset-description)* — Populated description, or default if file cannot be read.
+
+---
+
+### write(sFilePath, desc)
+
+Write a dataset_description.json file.
+
+**Parameters:**
+
+- **sFilePath** : *const QString &*
+  Output path.
+
+- **desc** : *const [BidsDatasetDescription](/docs/api/bids/bids-dataset-description) &*
+  Dataset description to write.
+
+**Returns:**
+
+- *bool* — true on success.
+
+---
+
+## Authors of this file
+
+- Christoph Dinh &lt;christoph.dinh@mne-cpp.org&gt;

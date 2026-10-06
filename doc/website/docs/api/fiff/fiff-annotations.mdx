@@ -19,7 +19,7 @@ sidebar_position: 9
 class FIFFLIB::FiffAnnotations
 ```
 
-Container for `FiffAnnotation` entries with FIFF, JSON and CSV serializers.
+Container for [`FiffAnnotation`](/docs/api/fiff/fiff-annotation) entries with FIFF, JSON and CSV serializers.
 
 Read and written under `FIFFB_MNE_ANNOTATIONS` so the annotation list travels with the FIFF file. The JSON and CSV exporters let the same annotations be consumed by BIDS sidecars and by external scoring tools that do not understand FIFF directly.
 
@@ -73,7 +73,7 @@ Const subscript operator.
 
 **Returns:**
 
-- *const FiffAnnotation &* — Const reference to the annotation.
+- *const [FiffAnnotation](/docs/api/fiff/fiff-annotation) &* — Const reference to the annotation.
 
 ---
 
@@ -88,7 +88,7 @@ Subscript operator.
 
 **Returns:**
 
-- *FiffAnnotation &* — Reference to the annotation.
+- *[FiffAnnotation](/docs/api/fiff/fiff-annotation) &* — Reference to the annotation.
 
 ---
 
@@ -98,7 +98,7 @@ Appends an annotation.
 
 **Parameters:**
 
-- **annotation** : *const FiffAnnotation &*
+- **annotation** : *const [FiffAnnotation](/docs/api/fiff/fiff-annotation) &*
   The annotation to append.
 
 ---
@@ -149,7 +149,7 @@ Returns a const reference to the underlying vector.
 
 **Returns:**
 
-- *const QVector&lt; FiffAnnotation &gt; &* — Const reference to annotation vector.
+- *const QVector&lt; [FiffAnnotation](/docs/api/fiff/fiff-annotation) &gt; &* — Const reference to annotation vector.
 
 ---
 

@@ -1,0 +1,26 @@
+---
+id: electrode-array
+title: "DISP3DLIB::ElectrodeArray"
+sidebar_label: ElectrodeArray
+sidebar_position: 11
+---
+
+# ElectrodeArray
+
+**Namespace:** `DISP3DLIB` &nbsp;·&nbsp; **Library:** 3D Display Library
+
+`#include <disp3D/electrodeobject.h>`
+
+```cpp
+struct DISP3DLIB::ElectrodeArray
+```
+
+One electrode array — sEEG depth shaft, ECoG strip, or ECoG grid.
+
+The Depth-only fields (`shaftRadius`, `shaftColor`) are ignored for Strip and Grid layouts. The Grid-only fields (`gridRows`, `gridCols`) default to 1 and so describe a degenerate single contact for the other layouts.
+
+---
+
+## Authors of this file
+
+- Christoph Dinh &lt;christoph.dinh@mne-cpp.org&gt;

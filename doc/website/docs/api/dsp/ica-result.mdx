@@ -1,0 +1,26 @@
+---
+id: ica-result
+title: "UTILSLIB::IcaResult"
+sidebar_label: IcaResult
+sidebar_position: 52
+---
+
+# IcaResult
+
+**Namespace:** `RTPROCESSINGLIB` &nbsp;·&nbsp; **Library:** DSP Library
+
+`#include <dsp/ica.h>`
+
+```cpp
+struct UTILSLIB::IcaResult
+```
+
+Result of an [`ICA`](/docs/api/dsp/ica) decomposition.
+
+Holds the mixing and unmixing matrices and the extracted source time series. The relationship is: sources = unmixing * (data - mean) data_recon = mixing * sources + mean
+
+---
+
+## Authors of this file
+
+- Christoph Dinh &lt;christoph.dinh@mne-cpp.org&gt;

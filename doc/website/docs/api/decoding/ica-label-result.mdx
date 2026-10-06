@@ -1,0 +1,32 @@
+---
+id: ica-label-result
+title: "DECODINGLIB::IcaLabelResult"
+sidebar_label: IcaLabelResult
+sidebar_position: 5
+---
+
+# IcaLabelResult
+
+**Namespace:** `DECODINGLIB` &nbsp;·&nbsp; **Library:** Decoding Library
+
+`#include <decoding/decoding_ica_label.h>`
+
+```cpp
+struct DECODINGLIB::IcaLabelResult
+```
+
+Outcome of labelling a single [ICA](/docs/api/dsp/ica) component.
+
+Pairs a component index with its winning `IcaComponentLabel` and a confidence score in $$[0, 1]$$ derived from the underlying correlation or spectral statistic (for EOG/ECG: the maximum absolute Pearson correlation with the reference traces; for muscle: the fraction of power above 30 Hz). Downstream consumers typically threshold the score or render it next to the component topography so the user can override the automatic decision.
+
+---
+
+## Static Methods
+
+### labelToString(label)
+
+---
+
+## Authors of this file
+
+- Christoph Dinh &lt;christoph.dinh@mne-cpp.org&gt;

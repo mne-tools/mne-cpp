@@ -1,0 +1,63 @@
+---
+id: bids-event
+title: "BIDSLIB::BidsEvent"
+sidebar_label: BidsEvent
+sidebar_position: 11
+---
+
+# BidsEvent
+
+**Namespace:** `BIDSLIB` &nbsp;·&nbsp; **Library:** BIDS Library
+
+`#include <bids/bids_event.h>`
+
+```cpp
+struct BIDSLIB::BidsEvent
+```
+
+Single event annotation, typically parsed from or written to *_events.tsv.
+
+Each event represents a discrete occurrence during the recording, such as a stimulus presentation, button press, or seizure onset.
+
+---
+
+## Static Methods
+
+### readTsv(sFilePath)
+
+Read a BIDS *_events.tsv file.
+
+Parses onset, duration, sample, value, and trial_type columns. Missing or "n/a" fields default to zero / empty.
+
+**Parameters:**
+
+- **sFilePath** : *const QString &*
+  Path to the events.tsv file.
+
+**Returns:**
+
+- *QList&lt; [BidsEvent](/docs/api/bids/bids-event) &gt;* — List of events.
+
+---
+
+### writeTsv(sFilePath, events)
+
+Write a BIDS *_events.tsv file.
+
+**Parameters:**
+
+- **sFilePath** : *const QString &*
+  Output path.
+
+- **events** : *const QList&lt; [BidsEvent](/docs/api/bids/bids-event) &gt; &*
+  List of events.
+
+**Returns:**
+
+- *bool* — true on success.
+
+---
+
+## Authors of this file
+
+- Christoph Dinh &lt;christoph.dinh@mne-cpp.org&gt;

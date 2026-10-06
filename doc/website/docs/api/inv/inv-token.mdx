@@ -1,0 +1,44 @@
+---
+id: inv-token
+title: "INVLIB::InvToken"
+sidebar_label: InvToken
+sidebar_position: 51
+---
+
+# InvToken
+
+**Namespace:** `INVLIB` &nbsp;·&nbsp; **Library:** Inverse Library
+
+`#include <inv/inv_token.h>`
+
+```cpp
+struct INVLIB::InvToken
+```
+
+A single token in the serialised representation of an [`InvSourceEstimate`](/docs/api/inv/inv-source-estimate).
+
+Structural tokens (section markers, metadata labels, booleans) use only the `id` field. Value-carrier tokens (amplitudes, positions, times) pair `id` with a continuous `value`.
+
+For purely discrete architectures the continuous `value` can be quantised into a bin index and encoded as ``InvTokenId::QuantBinBase`` + bin, discarding the float.
+
+One element of a tokenised neural-source representation.
+
+---
+
+## Public Methods
+
+### InvToken()
+
+---
+
+### InvToken(_id)
+
+---
+
+### InvToken(_id, _val)
+
+---
+
+## Authors of this file
+
+- Christoph Dinh &lt;christoph.dinh@mne-cpp.org&gt;

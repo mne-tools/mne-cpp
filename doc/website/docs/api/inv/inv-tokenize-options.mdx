@@ -1,0 +1,28 @@
+---
+id: inv-tokenize-options
+title: "INVLIB::InvTokenizeOptions"
+sidebar_label: InvTokenizeOptions
+sidebar_position: 52
+---
+
+# InvTokenizeOptions
+
+**Namespace:** `INVLIB` &nbsp;·&nbsp; **Library:** Inverse Library
+
+`#include <inv/inv_token.h>`
+
+```cpp
+struct INVLIB::InvTokenizeOptions
+```
+
+Controls which layers of an [`InvSourceEstimate`](/docs/api/inv/inv-source-estimate) are emitted during tokenization.
+
+Dense data layers (grid amplitudes, connectivity matrices) can be very large; setting their flags to `false` yields a compact metadata-only token sequence suitable for context-limited transformer windows.
+
+Tokenization options controlling layer inclusion and sub-sampling.
+
+---
+
+## Authors of this file
+
+- Christoph Dinh &lt;christoph.dinh@mne-cpp.org&gt;

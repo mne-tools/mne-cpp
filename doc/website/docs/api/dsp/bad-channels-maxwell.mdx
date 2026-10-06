@@ -43,7 +43,7 @@ const BadChannelsMaxwellResult bads = findBadChannelsMaxwell(broken, info, badPa
 ### findBadChannelsMaxwell(matData, info, params)
 
 ```cpp
-BadChannelsMaxwellResult findBadChannelsMaxwell(const Eigen::MatrixXd & matData, const [FiffInfo](/docs/api/fiff/fiff-info) & info, const BadChannelsMaxwellParams & params);
+[BadChannelsMaxwellResult](/docs/api/dsp/bad-channels-maxwell-result) findBadChannelsMaxwell(const Eigen::MatrixXd & matData, const [FiffInfo](/docs/api/fiff/fiff-info) & info, const [BadChannelsMaxwellParams](/docs/api/dsp/bad-channels-maxwell-params) & params);
 ```
 
 Detect bad MEG channels using [`SSS`](/docs/api/dsp/sss) reconstruction residuals.
@@ -58,12 +58,12 @@ Computes the [`SSS`](/docs/api/dsp/sss) reconstruction of the data, then flags c
 - **info** : *const [FiffInfo](/docs/api/fiff/fiff-info) &*
   Measurement info with channel positions.
 
-- **params** : *const BadChannelsMaxwellParams &*
+- **params** : *const [BadChannelsMaxwellParams](/docs/api/dsp/bad-channels-maxwell-params) &*
   Detection parameters.
 
 **Returns:**
 
-- *BadChannelsMaxwellResult* — Detection result with bad channel names, indices, residuals, z-scores.
+- *[BadChannelsMaxwellResult](/docs/api/dsp/bad-channels-maxwell-result)* — Detection result with bad channel names, indices, residuals, z-scores.
 
 ---
 

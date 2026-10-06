@@ -5,10 +5,10 @@
   "summary": {
     "exported_classes": 462,
     "exported_free_functions": 114,
-    "registered_classes": 354,
-    "exported_not_registered": 124,
+    "registered_classes": 468,
+    "exported_not_registered": 39,
     "registered_function_modules": 13,
-    "registered_header_only": 3,
+    "registered_header_only": 32,
     "registered_stale": 0,
     "registered_with_test": 102,
     "registered_test_unresolved": 0,
@@ -16,19 +16,19 @@
     "registered_example_not_built": 0,
     "registered_with_python_equiv": 89,
     "registered_without_api_page": 0,
-    "with_snippet": 330,
-    "public_api_units": 478,
-    "example_eligible": 363,
-    "example_exempt": 115,
+    "with_snippet": 351,
+    "public_api_units": 507,
+    "example_eligible": 389,
+    "example_exempt": 118,
     "eligible_backed_by_registry_example": 269,
-    "eligible_used_by_some_example": 327,
+    "eligible_used_by_some_example": 348,
     "examples_on_disk": 68,
     "examples_built": 68
   },
   "by_library": {
     "bids": {
       "public": 14,
-      "registered": 6,
+      "registered": 14,
       "with_test": 2,
       "eligible": 14,
       "eligible_with_registry_example": 6,
@@ -45,17 +45,17 @@
       "with_snippet": 0
     },
     "connectivity": {
-      "public": 20,
-      "registered": 20,
+      "public": 21,
+      "registered": 21,
       "with_test": 7,
-      "eligible": 19,
+      "eligible": 20,
       "eligible_with_registry_example": 19,
-      "eligible_used_by_example": 19,
-      "with_snippet": 19
+      "eligible_used_by_example": 20,
+      "with_snippet": 20
     },
     "decoding": {
       "public": 5,
-      "registered": 4,
+      "registered": 5,
       "with_test": 4,
       "eligible": 5,
       "eligible_with_registry_example": 4,
@@ -63,8 +63,8 @@
       "with_snippet": 5
     },
     "disp": {
-      "public": 66,
-      "registered": 66,
+      "public": 69,
+      "registered": 69,
       "with_test": 0,
       "eligible": 8,
       "eligible_with_registry_example": 8,
@@ -73,7 +73,7 @@
     },
     "disp3D": {
       "public": 46,
-      "registered": 10,
+      "registered": 14,
       "with_test": 0,
       "eligible": 22,
       "eligible_with_registry_example": 6,
@@ -81,19 +81,19 @@
       "with_snippet": 9
     },
     "dsp": {
-      "public": 80,
-      "registered": 51,
+      "public": 84,
+      "registered": 84,
       "with_test": 28,
-      "eligible": 80,
+      "eligible": 84,
       "eligible_with_registry_example": 51,
-      "eligible_used_by_example": 80,
-      "with_snippet": 80
+      "eligible_used_by_example": 84,
+      "with_snippet": 84
     },
     "fiff": {
-      "public": 37,
-      "registered": 32,
+      "public": 38,
+      "registered": 38,
       "with_test": 10,
-      "eligible": 37,
+      "eligible": 38,
       "eligible_with_registry_example": 32,
       "eligible_used_by_example": 35,
       "with_snippet": 37
@@ -108,22 +108,22 @@
       "with_snippet": 8
     },
     "fwd": {
-      "public": 13,
-      "registered": 13,
+      "public": 14,
+      "registered": 14,
       "with_test": 3,
-      "eligible": 10,
+      "eligible": 11,
       "eligible_with_registry_example": 10,
-      "eligible_used_by_example": 8,
-      "with_snippet": 10
+      "eligible_used_by_example": 9,
+      "with_snippet": 11
     },
     "inv": {
-      "public": 43,
-      "registered": 35,
+      "public": 55,
+      "registered": 55,
       "with_test": 19,
-      "eligible": 40,
+      "eligible": 52,
       "eligible_with_registry_example": 33,
-      "eligible_used_by_example": 39,
-      "with_snippet": 39
+      "eligible_used_by_example": 47,
+      "with_snippet": 47
     },
     "lsl": {
       "public": 3,
@@ -135,13 +135,13 @@
       "with_snippet": 3
     },
     "math": {
-      "public": 7,
-      "registered": 7,
+      "public": 9,
+      "registered": 9,
       "with_test": 7,
-      "eligible": 7,
+      "eligible": 9,
       "eligible_with_registry_example": 7,
-      "eligible_used_by_example": 7,
-      "with_snippet": 7
+      "eligible_used_by_example": 9,
+      "with_snippet": 9
     },
     "ml": {
       "public": 4,
@@ -154,7 +154,7 @@
     },
     "mna": {
       "public": 22,
-      "registered": 8,
+      "registered": 22,
       "with_test": 0,
       "eligible": 22,
       "eligible_with_registry_example": 8,
@@ -162,17 +162,17 @@
       "with_snippet": 10
     },
     "mne": {
-      "public": 61,
-      "registered": 57,
+      "public": 66,
+      "registered": 66,
       "with_test": 6,
-      "eligible": 42,
+      "eligible": 47,
       "eligible_with_registry_example": 40,
-      "eligible_used_by_example": 38,
-      "with_snippet": 40
+      "eligible_used_by_example": 43,
+      "with_snippet": 45
     },
     "mri": {
       "public": 8,
-      "registered": 6,
+      "registered": 8,
       "with_test": 0,
       "eligible": 8,
       "eligible_with_registry_example": 6,
@@ -181,7 +181,7 @@
     },
     "sts": {
       "public": 10,
-      "registered": 7,
+      "registered": 10,
       "with_test": 6,
       "eligible": 10,
       "eligible_with_registry_example": 7,
@@ -190,7 +190,7 @@
     },
     "utils": {
       "public": 24,
-      "registered": 17,
+      "registered": 24,
       "with_test": 2,
       "eligible": 24,
       "eligible_with_registry_example": 17,
@@ -777,15 +777,15 @@
       "library": "bids",
       "kind": "exported-class",
       "exported": true,
-      "registered": false,
-      "registry_status": null,
+      "registered": true,
+      "registry_status": "documented",
       "test": null,
       "test_resolves": false,
       "example": null,
       "example_state": "none",
       "including_examples": [],
       "snippets": [],
-      "api_page": null,
+      "api_page": "doc/website/docs/api/bids/bids-channel.mdx",
       "python_equiv": null,
       "example_eligible": true,
       "exempt_reason": null
@@ -796,15 +796,15 @@
       "library": "bids",
       "kind": "exported-class",
       "exported": true,
-      "registered": false,
-      "registry_status": null,
+      "registered": true,
+      "registry_status": "documented",
       "test": null,
       "test_resolves": false,
       "example": null,
       "example_state": "none",
       "including_examples": [],
       "snippets": [],
-      "api_page": null,
+      "api_page": "doc/website/docs/api/bids/bids-coordinate-system.mdx",
       "python_equiv": null,
       "example_eligible": true,
       "exempt_reason": null
@@ -815,15 +815,15 @@
       "library": "bids",
       "kind": "exported-class",
       "exported": true,
-      "registered": false,
-      "registry_status": null,
+      "registered": true,
+      "registry_status": "documented",
       "test": null,
       "test_resolves": false,
       "example": null,
       "example_state": "none",
       "including_examples": [],
       "snippets": [],
-      "api_page": null,
+      "api_page": "doc/website/docs/api/bids/bids-dataset-description.mdx",
       "python_equiv": null,
       "example_eligible": true,
       "exempt_reason": null
@@ -834,8 +834,8 @@
       "library": "bids",
       "kind": "exported-class",
       "exported": true,
-      "registered": false,
-      "registry_status": null,
+      "registered": true,
+      "registry_status": "documented",
       "test": null,
       "test_resolves": false,
       "example": null,
@@ -844,7 +844,7 @@
         "ex_bids"
       ],
       "snippets": [],
-      "api_page": null,
+      "api_page": "doc/website/docs/api/bids/bids-electrode.mdx",
       "python_equiv": null,
       "example_eligible": true,
       "exempt_reason": null
@@ -855,15 +855,15 @@
       "library": "bids",
       "kind": "exported-class",
       "exported": true,
-      "registered": false,
-      "registry_status": null,
+      "registered": true,
+      "registry_status": "documented",
       "test": null,
       "test_resolves": false,
       "example": null,
       "example_state": "none",
       "including_examples": [],
       "snippets": [],
-      "api_page": null,
+      "api_page": "doc/website/docs/api/bids/bids-event.mdx",
       "python_equiv": null,
       "example_eligible": true,
       "exempt_reason": null
@@ -967,8 +967,8 @@
       "library": "bids",
       "kind": "exported-class",
       "exported": true,
-      "registered": false,
-      "registry_status": null,
+      "registered": true,
+      "registry_status": "documented",
       "test": null,
       "test_resolves": false,
       "example": null,
@@ -979,7 +979,7 @@
       "snippets": [
         "ex_bids/main.cpp#brain_vision_reader_usage"
       ],
-      "api_page": null,
+      "api_page": "doc/website/docs/api/bids/brain-vision-channel-info.mdx",
       "python_equiv": null,
       "example_eligible": true,
       "exempt_reason": null
@@ -990,8 +990,8 @@
       "library": "bids",
       "kind": "exported-class",
       "exported": true,
-      "registered": false,
-      "registry_status": null,
+      "registered": true,
+      "registry_status": "documented",
       "test": null,
       "test_resolves": false,
       "example": null,
@@ -1002,7 +1002,7 @@
       "snippets": [
         "ex_bids/main.cpp#brain_vision_reader_usage"
       ],
-      "api_page": null,
+      "api_page": "doc/website/docs/api/bids/brain-vision-marker.mdx",
       "python_equiv": null,
       "example_eligible": true,
       "exempt_reason": null
@@ -1036,8 +1036,8 @@
       "library": "bids",
       "kind": "exported-class",
       "exported": true,
-      "registered": false,
-      "registry_status": null,
+      "registered": true,
+      "registry_status": "documented",
       "test": null,
       "test_resolves": false,
       "example": null,
@@ -1048,7 +1048,7 @@
       "snippets": [
         "ex_bids/main.cpp#edf_reader_usage"
       ],
-      "api_page": null,
+      "api_page": "doc/website/docs/api/bids/edf-channel-info.mdx",
       "python_equiv": null,
       "example_eligible": true,
       "exempt_reason": null
@@ -1640,6 +1640,35 @@
       "exempt_reason": null
     },
     {
+      "name": "VisualizationInfo",
+      "header": "connectivity/network/network.h",
+      "library": "connectivity",
+      "kind": "header-only",
+      "exported": false,
+      "registered": true,
+      "registry_status": "documented",
+      "test": null,
+      "test_resolves": false,
+      "example": null,
+      "example_state": "none",
+      "including_examples": [
+        "ex_connectivity",
+        "ex_connectivity_comparison",
+        "ex_connectivity_metrics",
+        "ex_connectivity_performance",
+        "ex_dsp_rt",
+        "ex_fiff_sniffer"
+      ],
+      "snippets": [
+        "ex_connectivity_metrics/main.cpp#network_build",
+        "ex_connectivity_metrics/main.cpp#network_threshold"
+      ],
+      "api_page": "doc/website/docs/api/connectivity/visualization-info.mdx",
+      "python_equiv": null,
+      "example_eligible": true,
+      "exempt_reason": null
+    },
+    {
       "name": "NetworkEdge",
       "header": "connectivity/network/networkedge.h",
       "library": "connectivity",
@@ -1716,8 +1745,8 @@
       "library": "decoding",
       "kind": "exported-class",
       "exported": true,
-      "registered": false,
-      "registry_status": null,
+      "registered": true,
+      "registry_status": "documented",
       "test": null,
       "test_resolves": false,
       "example": null,
@@ -1728,7 +1757,7 @@
       "snippets": [
         "ex_decoding/main.cpp#ml_ica_label_classify"
       ],
-      "api_page": null,
+      "api_page": "doc/website/docs/api/decoding/ica-label-result.mdx",
       "python_equiv": null,
       "example_eligible": true,
       "exempt_reason": null
@@ -2456,6 +2485,25 @@
       "exempt_reason": "header prefix 'disp/viewers/': Qt widget or view; evidenced by a screenshot scenario and GUI test (G4), not by a compiled console example."
     },
     {
+      "name": "ChannelDisplayInfo",
+      "header": "disp/viewers/helpers/channeldatamodel.h",
+      "library": "disp",
+      "kind": "header-only",
+      "exported": false,
+      "registered": true,
+      "registry_status": "documented",
+      "test": null,
+      "test_resolves": false,
+      "example": null,
+      "example_state": "none",
+      "including_examples": [],
+      "snippets": [],
+      "api_page": "doc/website/docs/api/disp/channel-display-info.mdx",
+      "python_equiv": null,
+      "example_eligible": false,
+      "exempt_reason": "header prefix 'disp/viewers/': Qt widget or view; evidenced by a screenshot scenario and GUI test (G4), not by a compiled console example."
+    },
+    {
       "name": "ChannelInfoModel",
       "header": "disp/viewers/helpers/channelinfomodel.h",
       "library": "disp",
@@ -2774,6 +2822,44 @@
       "including_examples": [],
       "snippets": [],
       "api_page": "doc/website/docs/api/disp/selection-scene-item.mdx",
+      "python_equiv": null,
+      "example_eligible": false,
+      "exempt_reason": "header prefix 'disp/viewers/': Qt widget or view; evidenced by a screenshot scenario and GUI test (G4), not by a compiled console example."
+    },
+    {
+      "name": "TimeRulerEventMark",
+      "header": "disp/viewers/helpers/timerulerwidget.h",
+      "library": "disp",
+      "kind": "header-only",
+      "exported": false,
+      "registered": true,
+      "registry_status": "documented",
+      "test": null,
+      "test_resolves": false,
+      "example": null,
+      "example_state": "none",
+      "including_examples": [],
+      "snippets": [],
+      "api_page": "doc/website/docs/api/disp/time-ruler-event-mark.mdx",
+      "python_equiv": null,
+      "example_eligible": false,
+      "exempt_reason": "header prefix 'disp/viewers/': Qt widget or view; evidenced by a screenshot scenario and GUI test (G4), not by a compiled console example."
+    },
+    {
+      "name": "TimeRulerReferenceMark",
+      "header": "disp/viewers/helpers/timerulerwidget.h",
+      "library": "disp",
+      "kind": "header-only",
+      "exported": false,
+      "registered": true,
+      "registry_status": "documented",
+      "test": null,
+      "test_resolves": false,
+      "example": null,
+      "example_state": "none",
+      "including_examples": [],
+      "snippets": [],
+      "api_page": "doc/website/docs/api/disp/time-ruler-reference-mark.mdx",
       "python_equiv": null,
       "example_eligible": false,
       "exempt_reason": "header prefix 'disp/viewers/': Qt widget or view; evidenced by a screenshot scenario and GUI test (G4), not by a compiled console example."
@@ -3545,8 +3631,8 @@
       "library": "disp3D",
       "kind": "exported-class",
       "exported": true,
-      "registered": false,
-      "registry_status": null,
+      "registered": true,
+      "registry_status": "documented",
       "test": null,
       "test_resolves": false,
       "example": null,
@@ -3557,7 +3643,7 @@
       "snippets": [
         "ex_disp3d_scene/main.cpp#electrode_object_usage"
       ],
-      "api_page": null,
+      "api_page": "doc/website/docs/api/disp3-d/electrode-array.mdx",
       "python_equiv": null,
       "example_eligible": true,
       "exempt_reason": null
@@ -3568,8 +3654,8 @@
       "library": "disp3D",
       "kind": "exported-class",
       "exported": true,
-      "registered": false,
-      "registry_status": null,
+      "registered": true,
+      "registry_status": "documented",
       "test": null,
       "test_resolves": false,
       "example": null,
@@ -3580,7 +3666,7 @@
       "snippets": [
         "ex_disp3d_scene/main.cpp#electrode_object_usage"
       ],
-      "api_page": null,
+      "api_page": "doc/website/docs/api/disp3-d/electrode-contact.mdx",
       "python_equiv": null,
       "example_eligible": true,
       "exempt_reason": null
@@ -3740,8 +3826,8 @@
       "library": "disp3D",
       "kind": "exported-class",
       "exported": true,
-      "registered": false,
-      "registry_status": null,
+      "registered": true,
+      "registry_status": "documented",
       "test": null,
       "test_resolves": false,
       "example": null,
@@ -3752,7 +3838,7 @@
       "snippets": [
         "ex_disp3d_scene/main.cpp#multimodal_scene_usage"
       ],
-      "api_page": null,
+      "api_page": "doc/website/docs/api/disp3-d/scene-layer.mdx",
       "python_equiv": null,
       "example_eligible": true,
       "exempt_reason": null
@@ -3763,15 +3849,15 @@
       "library": "disp3D",
       "kind": "exported-class",
       "exported": true,
-      "registered": false,
-      "registry_status": null,
+      "registered": true,
+      "registry_status": "documented",
       "test": null,
       "test_resolves": false,
       "example": null,
       "example_state": "none",
       "including_examples": [],
       "snippets": [],
-      "api_page": null,
+      "api_page": "doc/website/docs/api/disp3-d/pick-result.mdx",
       "python_equiv": null,
       "example_eligible": true,
       "exempt_reason": null
@@ -4080,8 +4166,8 @@
       "library": "dsp",
       "kind": "exported-class",
       "exported": true,
-      "registered": false,
-      "registry_status": null,
+      "registered": true,
+      "registry_status": "documented",
       "test": null,
       "test_resolves": false,
       "example": null,
@@ -4092,7 +4178,7 @@
       "snippets": [
         "ex_dsp_artifacts/main.cpp#annotate_amplitude_usage"
       ],
-      "api_page": null,
+      "api_page": "doc/website/docs/api/dsp/annotate-amplitude-params.mdx",
       "python_equiv": null,
       "example_eligible": true,
       "exempt_reason": null
@@ -4126,8 +4212,8 @@
       "library": "dsp",
       "kind": "exported-class",
       "exported": true,
-      "registered": false,
-      "registry_status": null,
+      "registered": true,
+      "registry_status": "documented",
       "test": null,
       "test_resolves": false,
       "example": null,
@@ -4138,7 +4224,7 @@
       "snippets": [
         "ex_dsp_artifacts/main.cpp#annotate_amplitude_usage"
       ],
-      "api_page": null,
+      "api_page": "doc/website/docs/api/dsp/annotate-muscl-params.mdx",
       "python_equiv": null,
       "example_eligible": true,
       "exempt_reason": null
@@ -4172,8 +4258,8 @@
       "library": "dsp",
       "kind": "exported-class",
       "exported": true,
-      "registered": false,
-      "registry_status": null,
+      "registered": true,
+      "registry_status": "documented",
       "test": null,
       "test_resolves": false,
       "example": null,
@@ -4184,7 +4270,7 @@
       "snippets": [
         "ex_dsp_artifacts/main.cpp#artifact_detect_usage"
       ],
-      "api_page": null,
+      "api_page": "doc/website/docs/api/utils/artifact-detect-ecg-params.mdx",
       "python_equiv": null,
       "example_eligible": true,
       "exempt_reason": null
@@ -4195,8 +4281,8 @@
       "library": "dsp",
       "kind": "exported-class",
       "exported": true,
-      "registered": false,
-      "registry_status": null,
+      "registered": true,
+      "registry_status": "documented",
       "test": null,
       "test_resolves": false,
       "example": null,
@@ -4207,7 +4293,7 @@
       "snippets": [
         "ex_dsp_artifacts/main.cpp#artifact_detect_usage"
       ],
-      "api_page": null,
+      "api_page": "doc/website/docs/api/utils/artifact-detect-eog-params.mdx",
       "python_equiv": null,
       "example_eligible": true,
       "exempt_reason": null
@@ -4241,8 +4327,8 @@
       "library": "dsp",
       "kind": "exported-class",
       "exported": true,
-      "registered": false,
-      "registry_status": null,
+      "registered": true,
+      "registry_status": "documented",
       "test": null,
       "test_resolves": false,
       "example": null,
@@ -4253,7 +4339,7 @@
       "snippets": [
         "ex_dsp_artifacts/main.cpp#bad_channel_detect_usage"
       ],
-      "api_page": null,
+      "api_page": "doc/website/docs/api/utils/bad-channel-detect-params.mdx",
       "python_equiv": null,
       "example_eligible": true,
       "exempt_reason": null
@@ -4287,8 +4373,8 @@
       "library": "dsp",
       "kind": "exported-class",
       "exported": true,
-      "registered": false,
-      "registry_status": null,
+      "registered": true,
+      "registry_status": "documented",
       "test": null,
       "test_resolves": false,
       "example": null,
@@ -4299,7 +4385,7 @@
       "snippets": [
         "ex_dsp_artifacts/main.cpp#find_bad_channels_lof_usage"
       ],
-      "api_page": null,
+      "api_page": "doc/website/docs/api/dsp/lof-bad-channel-params.mdx",
       "python_equiv": null,
       "example_eligible": true,
       "exempt_reason": null
@@ -4333,8 +4419,8 @@
       "library": "dsp",
       "kind": "exported-class",
       "exported": true,
-      "registered": false,
-      "registry_status": null,
+      "registered": true,
+      "registry_status": "documented",
       "test": null,
       "test_resolves": false,
       "example": null,
@@ -4345,7 +4431,7 @@
       "snippets": [
         "ex_dsp_maxwell/main.cpp#bad_channels_maxwell_usage"
       ],
-      "api_page": null,
+      "api_page": "doc/website/docs/api/dsp/bad-channels-maxwell-params.mdx",
       "python_equiv": null,
       "example_eligible": true,
       "exempt_reason": null
@@ -4356,8 +4442,8 @@
       "library": "dsp",
       "kind": "exported-class",
       "exported": true,
-      "registered": false,
-      "registry_status": null,
+      "registered": true,
+      "registry_status": "documented",
       "test": null,
       "test_resolves": false,
       "example": null,
@@ -4368,7 +4454,7 @@
       "snippets": [
         "ex_dsp_maxwell/main.cpp#bad_channels_maxwell_usage"
       ],
-      "api_page": null,
+      "api_page": "doc/website/docs/api/dsp/bad-channels-maxwell-result.mdx",
       "python_equiv": null,
       "example_eligible": true,
       "exempt_reason": null
@@ -4379,8 +4465,8 @@
       "library": "dsp",
       "kind": "exported-class",
       "exported": true,
-      "registered": false,
-      "registry_status": null,
+      "registered": true,
+      "registry_status": "documented",
       "test": null,
       "test_resolves": false,
       "example": null,
@@ -4391,7 +4477,7 @@
       "snippets": [
         "ex_dsp_artifacts/main.cpp#bridged_electrodes_usage"
       ],
-      "api_page": null,
+      "api_page": "doc/website/docs/api/dsp/bridged-electrode-params.mdx",
       "python_equiv": null,
       "example_eligible": true,
       "exempt_reason": null
@@ -4448,8 +4534,8 @@
       "library": "dsp",
       "kind": "exported-class",
       "exported": true,
-      "registered": false,
-      "registry_status": null,
+      "registered": true,
+      "registry_status": "documented",
       "test": null,
       "test_resolves": false,
       "example": null,
@@ -4460,7 +4546,7 @@
       "snippets": [
         "ex_dsp_preprocessing/main.cpp#channel_derivation_usage"
       ],
-      "api_page": null,
+      "api_page": "doc/website/docs/api/utils/derivation-rule.mdx",
       "python_equiv": null,
       "example_eligible": true,
       "exempt_reason": null
@@ -4540,8 +4626,8 @@
       "library": "dsp",
       "kind": "exported-class",
       "exported": true,
-      "registered": false,
-      "registry_status": null,
+      "registered": true,
+      "registry_status": "documented",
       "test": null,
       "test_resolves": false,
       "example": null,
@@ -4552,7 +4638,7 @@
       "snippets": [
         "ex_dsp_spectral/main.cpp#csd_compute"
       ],
-      "api_page": null,
+      "api_page": "doc/website/docs/api/utils/csd-result.mdx",
       "python_equiv": null,
       "example_eligible": true,
       "exempt_reason": null
@@ -4586,8 +4672,8 @@
       "library": "dsp",
       "kind": "exported-class",
       "exported": true,
-      "registered": false,
-      "registry_status": null,
+      "registered": true,
+      "registry_status": "documented",
       "test": null,
       "test_resolves": false,
       "example": null,
@@ -4598,7 +4684,7 @@
       "snippets": [
         "ex_dsp_spectral/main.cpp#dpss_compute"
       ],
-      "api_page": null,
+      "api_page": "doc/website/docs/api/utils/dpss-result.mdx",
       "python_equiv": null,
       "example_eligible": true,
       "exempt_reason": null
@@ -4678,8 +4764,8 @@
       "library": "dsp",
       "kind": "exported-class",
       "exported": true,
-      "registered": false,
-      "registry_status": null,
+      "registered": true,
+      "registry_status": "documented",
       "test": null,
       "test_resolves": false,
       "example": null,
@@ -4690,7 +4776,7 @@
       "snippets": [
         "ex_dsp_preprocessing/main.cpp#epoch_extractor_usage"
       ],
-      "api_page": null,
+      "api_page": "doc/website/docs/api/utils/epoch-extractor-params.mdx",
       "python_equiv": null,
       "example_eligible": true,
       "exempt_reason": null
@@ -4724,8 +4810,8 @@
       "library": "dsp",
       "kind": "exported-class",
       "exported": true,
-      "registered": false,
-      "registry_status": null,
+      "registered": true,
+      "registry_status": "documented",
       "test": null,
       "test_resolves": false,
       "example": null,
@@ -4736,7 +4822,7 @@
       "snippets": [
         "ex_dsp_preprocessing/main.cpp#extended_infomax_compute"
       ],
-      "api_page": null,
+      "api_page": "doc/website/docs/api/dsp/infomax-result.mdx",
       "python_equiv": null,
       "example_eligible": true,
       "exempt_reason": null
@@ -4770,8 +4856,8 @@
       "library": "dsp",
       "kind": "exported-class",
       "exported": true,
-      "registered": false,
-      "registry_status": null,
+      "registered": true,
+      "registry_status": "documented",
       "test": null,
       "test_resolves": false,
       "example": null,
@@ -4782,7 +4868,7 @@
       "snippets": [
         "ex_dsp_maxwell/main.cpp#filter_chpi_usage"
       ],
-      "api_page": null,
+      "api_page": "doc/website/docs/api/dsp/filter-chpi-params.mdx",
       "python_equiv": null,
       "example_eligible": true,
       "exempt_reason": null
@@ -4868,8 +4954,8 @@
       "library": "dsp",
       "kind": "exported-class",
       "exported": true,
-      "registered": false,
-      "registry_status": null,
+      "registered": true,
+      "registry_status": "documented",
       "test": null,
       "test_resolves": false,
       "example": null,
@@ -4880,7 +4966,7 @@
       "snippets": [
         "ex_dsp_maxwell/main.cpp#fine_calibration_usage"
       ],
-      "api_page": null,
+      "api_page": "doc/website/docs/api/dsp/fine-cal-entry.mdx",
       "python_equiv": null,
       "example_eligible": true,
       "exempt_reason": null
@@ -4960,8 +5046,8 @@
       "library": "dsp",
       "kind": "exported-class",
       "exported": true,
-      "registered": false,
-      "registry_status": null,
+      "registered": true,
+      "registry_status": "documented",
       "test": null,
       "test_resolves": false,
       "example": null,
@@ -4972,7 +5058,7 @@
       "snippets": [
         "ex_dsp_preprocessing/main.cpp#ica_run"
       ],
-      "api_page": null,
+      "api_page": "doc/website/docs/api/dsp/ica-result.mdx",
       "python_equiv": null,
       "example_eligible": true,
       "exempt_reason": null
@@ -4983,8 +5069,8 @@
       "library": "dsp",
       "kind": "exported-class",
       "exported": true,
-      "registered": false,
-      "registry_status": null,
+      "registered": true,
+      "registry_status": "documented",
       "test": null,
       "test_resolves": false,
       "example": null,
@@ -4995,7 +5081,7 @@
       "snippets": [
         "ex_dsp_spectral/main.cpp#iir_filter_usage"
       ],
-      "api_page": null,
+      "api_page": "doc/website/docs/api/dsp/iir-biquad.mdx",
       "python_equiv": null,
       "example_eligible": true,
       "exempt_reason": null
@@ -5029,8 +5115,8 @@
       "library": "dsp",
       "kind": "exported-class",
       "exported": true,
-      "registered": false,
-      "registry_status": null,
+      "registered": true,
+      "registry_status": "documented",
       "test": null,
       "test_resolves": false,
       "example": null,
@@ -5041,7 +5127,7 @@
       "snippets": [
         "ex_dsp_maxwell/main.cpp#maxwell_movement_comp_usage"
       ],
-      "api_page": null,
+      "api_page": "doc/website/docs/api/dsp/head-pos-entry.mdx",
       "python_equiv": null,
       "example_eligible": true,
       "exempt_reason": null
@@ -5052,8 +5138,8 @@
       "library": "dsp",
       "kind": "exported-class",
       "exported": true,
-      "registered": false,
-      "registry_status": null,
+      "registered": true,
+      "registry_status": "documented",
       "test": null,
       "test_resolves": false,
       "example": null,
@@ -5064,7 +5150,7 @@
       "snippets": [
         "ex_dsp_maxwell/main.cpp#maxwell_movement_comp_usage"
       ],
-      "api_page": null,
+      "api_page": "doc/website/docs/api/dsp/maxwell-move-comp-params.mdx",
       "python_equiv": null,
       "example_eligible": true,
       "exempt_reason": null
@@ -5121,8 +5207,8 @@
       "library": "dsp",
       "kind": "exported-class",
       "exported": true,
-      "registered": false,
-      "registry_status": null,
+      "registered": true,
+      "registry_status": "documented",
       "test": null,
       "test_resolves": false,
       "example": null,
@@ -5133,7 +5219,7 @@
       "snippets": [
         "ex_dsp_spectral/main.cpp#morlet_tfr_compute"
       ],
-      "api_page": null,
+      "api_page": "doc/website/docs/api/dsp/morlet-tfr-result.mdx",
       "python_equiv": null,
       "example_eligible": true,
       "exempt_reason": null
@@ -5167,8 +5253,8 @@
       "library": "dsp",
       "kind": "exported-class",
       "exported": true,
-      "registered": false,
-      "registry_status": null,
+      "registered": true,
+      "registry_status": "documented",
       "test": null,
       "test_resolves": false,
       "example": null,
@@ -5179,7 +5265,7 @@
       "snippets": [
         "ex_dsp_spectral/main.cpp#multitaper_psd_compute"
       ],
-      "api_page": null,
+      "api_page": "doc/website/docs/api/dsp/multitaper-psd-result.mdx",
       "python_equiv": null,
       "example_eligible": true,
       "exempt_reason": null
@@ -5213,8 +5299,8 @@
       "library": "dsp",
       "kind": "exported-class",
       "exported": true,
-      "registered": false,
-      "registry_status": null,
+      "registered": true,
+      "registry_status": "documented",
       "test": null,
       "test_resolves": false,
       "example": null,
@@ -5225,7 +5311,7 @@
       "snippets": [
         "ex_dsp_spectral/main.cpp#multitaper_tfr_compute"
       ],
-      "api_page": null,
+      "api_page": "doc/website/docs/api/dsp/multitaper-tfr-result.mdx",
       "python_equiv": null,
       "example_eligible": true,
       "exempt_reason": null
@@ -5283,8 +5369,8 @@
       "library": "dsp",
       "kind": "exported-class",
       "exported": true,
-      "registered": false,
-      "registry_status": null,
+      "registered": true,
+      "registry_status": "documented",
       "test": null,
       "test_resolves": false,
       "example": null,
@@ -5296,7 +5382,7 @@
       "snippets": [
         "ex_dsp_analysis/main.cpp#peak_finder_usage"
       ],
-      "api_page": null,
+      "api_page": "doc/website/docs/api/dsp/peak-finder-params.mdx",
       "python_equiv": null,
       "example_eligible": true,
       "exempt_reason": null
@@ -5469,6 +5555,53 @@
       "exempt_reason": null
     },
     {
+      "name": "RtCovComputeResult",
+      "header": "dsp/rt/rt_cov.h",
+      "library": "dsp",
+      "kind": "header-only",
+      "exported": false,
+      "registered": true,
+      "registry_status": "documented",
+      "test": null,
+      "test_resolves": false,
+      "example": null,
+      "example_state": "none",
+      "including_examples": [
+        "ex_dsp_rt"
+      ],
+      "snippets": [
+        "ex_dsp_rt/main.cpp#rt_cov_usage"
+      ],
+      "api_page": "doc/website/docs/api/dsp/rt-cov-compute-result.mdx",
+      "python_equiv": null,
+      "example_eligible": true,
+      "exempt_reason": null
+    },
+    {
+      "name": "FilterObject",
+      "header": "dsp/rt/rt_filter.h",
+      "library": "dsp",
+      "kind": "header-only",
+      "exported": false,
+      "registered": true,
+      "registry_status": "documented",
+      "test": null,
+      "test_resolves": false,
+      "example": null,
+      "example_state": "none",
+      "including_examples": [
+        "ex_dsp_filter",
+        "ex_filtering"
+      ],
+      "snippets": [
+        "ex_dsp_filter/main.cpp#filter_overlap_add_usage"
+      ],
+      "api_page": "doc/website/docs/api/dsp/filter-object.mdx",
+      "python_equiv": null,
+      "example_eligible": true,
+      "exempt_reason": null
+    },
+    {
       "name": "FilterOverlapAdd",
       "header": "dsp/rt/rt_filter.h",
       "library": "dsp",
@@ -5560,6 +5693,30 @@
         "ex_dsp_rt/main.cpp#rt_inv_op_usage"
       ],
       "api_page": "doc/website/docs/api/dsp/rt-inv-op.mdx",
+      "python_equiv": null,
+      "example_eligible": true,
+      "exempt_reason": null
+    },
+    {
+      "name": "RtInvOpInput",
+      "header": "dsp/rt/rt_inv_op.h",
+      "library": "dsp",
+      "kind": "header-only",
+      "exported": false,
+      "registered": true,
+      "registry_status": "documented",
+      "test": null,
+      "test_resolves": false,
+      "example": null,
+      "example_state": "none",
+      "including_examples": [
+        "ex_dsp_rt"
+      ],
+      "snippets": [
+        "ex_dsp_rt/main.cpp#rt_inv_op_usage",
+        "ex_dsp_rt/main.cpp#rt_inv_op_usage"
+      ],
+      "api_page": "doc/website/docs/api/dsp/rt-inv-op-input.mdx",
       "python_equiv": null,
       "example_eligible": true,
       "exempt_reason": null
@@ -5665,8 +5822,8 @@
       "library": "dsp",
       "kind": "exported-class",
       "exported": true,
-      "registered": false,
-      "registry_status": null,
+      "registered": true,
+      "registry_status": "documented",
       "test": null,
       "test_resolves": false,
       "example": null,
@@ -5677,7 +5834,33 @@
       "snippets": [
         "ex_dsp_analysis/main.cpp#simulate_stc_usage"
       ],
-      "api_page": null,
+      "api_page": "doc/website/docs/api/dsp/simulate-stc-params.mdx",
+      "python_equiv": null,
+      "example_eligible": true,
+      "exempt_reason": null
+    },
+    {
+      "name": "SpectogramInputData",
+      "header": "dsp/spectrogram.h",
+      "library": "dsp",
+      "kind": "header-only",
+      "exported": false,
+      "registered": true,
+      "registry_status": "documented",
+      "test": null,
+      "test_resolves": false,
+      "example": null,
+      "example_state": "none",
+      "including_examples": [
+        "ex_connectivity",
+        "ex_disp",
+        "ex_dsp_spectral",
+        "ex_tf_plot"
+      ],
+      "snippets": [
+        "ex_dsp_spectral/main.cpp#spectrogram_make"
+      ],
+      "api_page": "doc/website/docs/api/utils/spectogram-input-data.mdx",
       "python_equiv": null,
       "example_eligible": true,
       "exempt_reason": null
@@ -5761,8 +5944,8 @@
       "library": "dsp",
       "kind": "exported-class",
       "exported": true,
-      "registered": false,
-      "registry_status": null,
+      "registered": true,
+      "registry_status": "documented",
       "test": null,
       "test_resolves": false,
       "example": null,
@@ -5774,7 +5957,7 @@
         "ex_dsp_maxwell/main.cpp#sss_usage",
         "ex_dsp_maxwell/main.cpp#sss_apply"
       ],
-      "api_page": null,
+      "api_page": "doc/website/docs/api/dsp/sss-params.mdx",
       "python_equiv": null,
       "example_eligible": true,
       "exempt_reason": null
@@ -5831,8 +6014,8 @@
       "library": "dsp",
       "kind": "exported-class",
       "exported": true,
-      "registered": false,
-      "registry_status": null,
+      "registered": true,
+      "registry_status": "documented",
       "test": null,
       "test_resolves": false,
       "example": null,
@@ -5843,7 +6026,7 @@
       "snippets": [
         "ex_dsp_preprocessing/main.cpp#surface_laplacian_compute"
       ],
-      "api_page": null,
+      "api_page": "doc/website/docs/api/dsp/surface-laplacian-result.mdx",
       "python_equiv": null,
       "example_eligible": true,
       "exempt_reason": null
@@ -5877,8 +6060,8 @@
       "library": "dsp",
       "kind": "exported-class",
       "exported": true,
-      "registered": false,
-      "registry_status": null,
+      "registered": true,
+      "registry_status": "documented",
       "test": null,
       "test_resolves": false,
       "example": null,
@@ -5889,7 +6072,7 @@
       "snippets": [
         "ex_dsp_analysis/main.cpp#welch_psd_compute"
       ],
-      "api_page": null,
+      "api_page": "doc/website/docs/api/dsp/welch-psd-result.mdx",
       "python_equiv": null,
       "example_eligible": true,
       "exempt_reason": null
@@ -5923,8 +6106,8 @@
       "library": "dsp",
       "kind": "exported-class",
       "exported": true,
-      "registered": false,
-      "registry_status": null,
+      "registered": true,
+      "registry_status": "documented",
       "test": null,
       "test_resolves": false,
       "example": null,
@@ -5935,7 +6118,7 @@
       "snippets": [
         "ex_dsp_preprocessing/main.cpp#xdawn_fit"
       ],
-      "api_page": null,
+      "api_page": "doc/website/docs/api/dsp/xdawn-result.mdx",
       "python_equiv": null,
       "example_eligible": true,
       "exempt_reason": null
@@ -6017,8 +6200,8 @@
       "library": "fiff",
       "kind": "exported-class",
       "exported": true,
-      "registered": false,
-      "registry_status": null,
+      "registered": true,
+      "registry_status": "documented",
       "test": null,
       "test_resolves": false,
       "example": null,
@@ -6030,7 +6213,7 @@
       "snippets": [
         "ex_fiff_api/main.cpp#fiff_annotations_usage"
       ],
-      "api_page": null,
+      "api_page": "doc/website/docs/api/fiff/fiff-annotation.mdx",
       "python_equiv": null,
       "example_eligible": true,
       "exempt_reason": null
@@ -6354,8 +6537,8 @@
       "library": "fiff",
       "kind": "exported-class",
       "exported": true,
-      "registered": false,
-      "registry_status": null,
+      "registered": true,
+      "registry_status": "documented",
       "test": null,
       "test_resolves": false,
       "example": null,
@@ -6366,7 +6549,7 @@
       "snippets": [
         "ex_fiff_structure/main.cpp#fiff_epochs_usage"
       ],
-      "api_page": null,
+      "api_page": "doc/website/docs/api/fiff/fiff-epoch-data.mdx",
       "python_equiv": null,
       "example_eligible": true,
       "exempt_reason": null
@@ -6461,8 +6644,8 @@
       "library": "fiff",
       "kind": "exported-class",
       "exported": true,
-      "registered": false,
-      "registry_status": null,
+      "registered": true,
+      "registry_status": "documented",
       "test": null,
       "test_resolves": false,
       "example": null,
@@ -6477,7 +6660,7 @@
       "snippets": [
         "ex_fiff_api/main.cpp#fiff_evoked_set_usage"
       ],
-      "api_page": null,
+      "api_page": "doc/website/docs/api/fiff/average-category.mdx",
       "python_equiv": null,
       "example_eligible": true,
       "exempt_reason": null
@@ -6488,8 +6671,8 @@
       "library": "fiff",
       "kind": "exported-class",
       "exported": true,
-      "registered": false,
-      "registry_status": null,
+      "registered": true,
+      "registry_status": "documented",
       "test": null,
       "test_resolves": false,
       "example": null,
@@ -6504,7 +6687,7 @@
       "snippets": [
         "ex_fiff_api/main.cpp#fiff_evoked_set_usage"
       ],
-      "api_page": null,
+      "api_page": "doc/website/docs/api/fiff/average-description.mdx",
       "python_equiv": null,
       "example_eligible": true,
       "exempt_reason": null
@@ -6542,8 +6725,8 @@
       "library": "fiff",
       "kind": "exported-class",
       "exported": true,
-      "registered": false,
-      "registry_status": null,
+      "registered": true,
+      "registry_status": "documented",
       "test": null,
       "test_resolves": false,
       "example": null,
@@ -6558,7 +6741,26 @@
       "snippets": [
         "ex_fiff_api/main.cpp#fiff_evoked_set_usage"
       ],
-      "api_page": null,
+      "api_page": "doc/website/docs/api/fiff/rejection-params.mdx",
+      "python_equiv": null,
+      "example_eligible": true,
+      "exempt_reason": null
+    },
+    {
+      "name": "FiffExplainEntry",
+      "header": "fiff/fiff_explain.h",
+      "library": "fiff",
+      "kind": "header-only",
+      "exported": false,
+      "registered": true,
+      "registry_status": "documented",
+      "test": null,
+      "test_resolves": false,
+      "example": null,
+      "example_state": "none",
+      "including_examples": [],
+      "snippets": [],
+      "api_page": "doc/website/docs/api/fiff/fiff-explain-entry.mdx",
       "python_equiv": null,
       "example_eligible": true,
       "exempt_reason": null
@@ -7343,6 +7545,29 @@
       "exempt_reason": null
     },
     {
+      "name": "fitUserRec",
+      "header": "fwd/fwd_eeg_sphere_model.h",
+      "library": "fwd",
+      "kind": "header-only",
+      "exported": false,
+      "registered": true,
+      "registry_status": "documented",
+      "test": null,
+      "test_resolves": false,
+      "example": null,
+      "example_state": "none",
+      "including_examples": [
+        "ex_fwd_api"
+      ],
+      "snippets": [
+        "ex_fwd_api/main.cpp#fwd_eeg_sphere_model_usage"
+      ],
+      "api_page": "doc/website/docs/api/fwd/fit-user-rec.mdx",
+      "python_equiv": null,
+      "example_eligible": true,
+      "exempt_reason": null
+    },
+    {
       "name": "FwdEegSphereModelSet",
       "header": "fwd/fwd_eeg_sphere_model_set.h",
       "library": "fwd",
@@ -7519,6 +7744,29 @@
       "exempt_reason": null
     },
     {
+      "name": "FitDipUserRec",
+      "header": "inv/dipole_fit/inv_dipole_fit_data.h",
+      "library": "inv",
+      "kind": "header-only",
+      "exported": false,
+      "registered": true,
+      "registry_status": "documented",
+      "test": null,
+      "test_resolves": false,
+      "example": null,
+      "example_state": "none",
+      "including_examples": [
+        "ex_inv_dipole_fit"
+      ],
+      "snippets": [
+        "ex_inv_dipole_fit/main.cpp#inv_dipole_fit_data_usage"
+      ],
+      "api_page": "doc/website/docs/api/inv/fit-dip-user-rec.mdx",
+      "python_equiv": null,
+      "example_eligible": true,
+      "exempt_reason": null
+    },
+    {
       "name": "InvDipoleFitData",
       "header": "inv/dipole_fit/inv_dipole_fit_data.h",
       "library": "inv",
@@ -7537,6 +7785,29 @@
         "ex_inv_dipole_fit/main.cpp#inv_dipole_fit_data_usage"
       ],
       "api_page": "doc/website/docs/api/inv/inv-dipole-fit-data.mdx",
+      "python_equiv": null,
+      "example_eligible": true,
+      "exempt_reason": null
+    },
+    {
+      "name": "dipoleFitFuncsRec",
+      "header": "inv/dipole_fit/inv_dipole_fit_data.h",
+      "library": "inv",
+      "kind": "header-only",
+      "exported": false,
+      "registered": true,
+      "registry_status": "documented",
+      "test": null,
+      "test_resolves": false,
+      "example": null,
+      "example_state": "none",
+      "including_examples": [
+        "ex_inv_dipole_fit"
+      ],
+      "snippets": [
+        "ex_inv_dipole_fit/main.cpp#inv_dipole_fit_data_usage"
+      ],
+      "api_page": "doc/website/docs/api/inv/dipole-fit-funcs-rec.mdx",
       "python_equiv": null,
       "example_eligible": true,
       "exempt_reason": null
@@ -7680,6 +7951,56 @@
       "exempt_reason": null
     },
     {
+      "name": "CoilParam",
+      "header": "inv/hpi/inv_hpi_fit.h",
+      "library": "inv",
+      "kind": "header-only",
+      "exported": false,
+      "registered": true,
+      "registry_status": "documented",
+      "test": null,
+      "test_resolves": false,
+      "example": null,
+      "example_state": "none",
+      "including_examples": [
+        "ex_dsp_rt",
+        "ex_hpiFit",
+        "ex_inv_hpi"
+      ],
+      "snippets": [
+        "ex_inv_hpi/main.cpp#inv_hpi_usage"
+      ],
+      "api_page": "doc/website/docs/api/inv/coil-param.mdx",
+      "python_equiv": null,
+      "example_eligible": true,
+      "exempt_reason": null
+    },
+    {
+      "name": "HpiFitResult",
+      "header": "inv/hpi/inv_hpi_fit.h",
+      "library": "inv",
+      "kind": "header-only",
+      "exported": false,
+      "registered": true,
+      "registry_status": "documented",
+      "test": null,
+      "test_resolves": false,
+      "example": null,
+      "example_state": "none",
+      "including_examples": [
+        "ex_dsp_rt",
+        "ex_hpiFit",
+        "ex_inv_hpi"
+      ],
+      "snippets": [
+        "ex_inv_hpi/main.cpp#inv_hpi_usage"
+      ],
+      "api_page": "doc/website/docs/api/inv/hpi-fit-result.mdx",
+      "python_equiv": null,
+      "example_eligible": true,
+      "exempt_reason": null
+    },
+    {
       "name": "InvHpiFit",
       "header": "inv/hpi/inv_hpi_fit.h",
       "library": "inv",
@@ -7701,6 +8022,52 @@
       ],
       "api_page": "doc/website/docs/api/inv/inv-hpi-fit.mdx",
       "python_equiv": "mne.chpi",
+      "example_eligible": true,
+      "exempt_reason": null
+    },
+    {
+      "name": "DipFitError",
+      "header": "inv/hpi/inv_hpi_fit_data.h",
+      "library": "inv",
+      "kind": "header-only",
+      "exported": false,
+      "registered": true,
+      "registry_status": "documented",
+      "test": null,
+      "test_resolves": false,
+      "example": null,
+      "example_state": "none",
+      "including_examples": [
+        "ex_inv_hpi"
+      ],
+      "snippets": [
+        "ex_inv_hpi/main.cpp#inv_hpi_fit_data_usage"
+      ],
+      "api_page": "doc/website/docs/api/inv/dip-fit-error.mdx",
+      "python_equiv": null,
+      "example_eligible": true,
+      "exempt_reason": null
+    },
+    {
+      "name": "HPISortStruct",
+      "header": "inv/hpi/inv_hpi_fit_data.h",
+      "library": "inv",
+      "kind": "header-only",
+      "exported": false,
+      "registered": true,
+      "registry_status": "documented",
+      "test": null,
+      "test_resolves": false,
+      "example": null,
+      "example_state": "none",
+      "including_examples": [
+        "ex_inv_hpi"
+      ],
+      "snippets": [
+        "ex_inv_hpi/main.cpp#inv_hpi_fit_data_usage"
+      ],
+      "api_page": "doc/website/docs/api/inv/hpi-sort-struct.mdx",
+      "python_equiv": null,
       "example_eligible": true,
       "exempt_reason": null
     },
@@ -7823,6 +8190,25 @@
       "exempt_reason": null
     },
     {
+      "name": "InvConnectivity",
+      "header": "inv/inv_connectivity.h",
+      "library": "inv",
+      "kind": "header-only",
+      "exported": false,
+      "registered": true,
+      "registry_status": "documented",
+      "test": null,
+      "test_resolves": false,
+      "example": null,
+      "example_state": "none",
+      "including_examples": [],
+      "snippets": [],
+      "api_page": "doc/website/docs/api/inv/inv-connectivity.mdx",
+      "python_equiv": null,
+      "example_eligible": true,
+      "exempt_reason": null
+    },
+    {
       "name": "InvConvenience",
       "header": "inv/inv_convenience.h",
       "library": "inv",
@@ -7842,6 +8228,25 @@
       ],
       "api_page": "doc/website/docs/api/inv/inv-convenience.mdx",
       "python_equiv": "mne.minimum_norm.apply_inverse_epochs / apply_inverse_raw / apply_inverse_cov",
+      "example_eligible": true,
+      "exempt_reason": null
+    },
+    {
+      "name": "InvFocalDipole",
+      "header": "inv/inv_focal_dipole.h",
+      "library": "inv",
+      "kind": "header-only",
+      "exported": false,
+      "registered": true,
+      "registry_status": "documented",
+      "test": null,
+      "test_resolves": false,
+      "example": null,
+      "example_state": "none",
+      "including_examples": [],
+      "snippets": [],
+      "api_page": "doc/website/docs/api/inv/inv-focal-dipole.mdx",
+      "python_equiv": null,
       "example_eligible": true,
       "exempt_reason": null
     },
@@ -7897,15 +8302,15 @@
       "library": "inv",
       "kind": "exported-class",
       "exported": true,
-      "registered": false,
-      "registry_status": null,
+      "registered": true,
+      "registry_status": "documented",
       "test": null,
       "test_resolves": false,
       "example": null,
       "example_state": "none",
       "including_examples": [],
       "snippets": [],
-      "api_page": null,
+      "api_page": "doc/website/docs/api/inv/inv-source-coupling.mdx",
       "python_equiv": null,
       "example_eligible": true,
       "exempt_reason": null
@@ -7972,6 +8377,44 @@
       ],
       "api_page": "doc/website/docs/api/inv/inv-source-estimate-io.mdx",
       "python_equiv": "mne.SourceEstimate.save / read",
+      "example_eligible": true,
+      "exempt_reason": null
+    },
+    {
+      "name": "InvToken",
+      "header": "inv/inv_token.h",
+      "library": "inv",
+      "kind": "header-only",
+      "exported": false,
+      "registered": true,
+      "registry_status": "documented",
+      "test": null,
+      "test_resolves": false,
+      "example": null,
+      "example_state": "none",
+      "including_examples": [],
+      "snippets": [],
+      "api_page": "doc/website/docs/api/inv/inv-token.mdx",
+      "python_equiv": null,
+      "example_eligible": true,
+      "exempt_reason": null
+    },
+    {
+      "name": "InvTokenizeOptions",
+      "header": "inv/inv_token.h",
+      "library": "inv",
+      "kind": "header-only",
+      "exported": false,
+      "registered": true,
+      "registry_status": "documented",
+      "test": null,
+      "test_resolves": false,
+      "example": null,
+      "example_state": "none",
+      "including_examples": [],
+      "snippets": [],
+      "api_page": "doc/website/docs/api/inv/inv-tokenize-options.mdx",
+      "python_equiv": null,
       "example_eligible": true,
       "exempt_reason": null
     },
@@ -8050,8 +8493,8 @@
       "library": "inv",
       "kind": "exported-class",
       "exported": true,
-      "registered": false,
-      "registry_status": null,
+      "registered": true,
+      "registry_status": "documented",
       "test": null,
       "test_resolves": false,
       "example": null,
@@ -8062,7 +8505,7 @@
       "snippets": [
         "ex_inv_api/main.cpp#inv_cmne_usage"
       ],
-      "api_page": null,
+      "api_page": "doc/website/docs/api/inv/inv-cmne-result.mdx",
       "python_equiv": null,
       "example_eligible": true,
       "exempt_reason": null
@@ -8073,15 +8516,15 @@
       "library": "inv",
       "kind": "exported-class",
       "exported": true,
-      "registered": false,
-      "registry_status": null,
+      "registered": true,
+      "registry_status": "documented",
       "test": null,
       "test_resolves": false,
       "example": null,
       "example_state": "none",
       "including_examples": [],
       "snippets": [],
-      "api_page": null,
+      "api_page": "doc/website/docs/api/inv/inv-cmne-settings.mdx",
       "python_equiv": null,
       "example_eligible": false,
       "exempt_reason": "name suffix 'Settings': Plain parameter record consumed by an algorithm class; shown inside that class's example."
@@ -8165,6 +8608,29 @@
       "exempt_reason": null
     },
     {
+      "name": "InvDipolePair",
+      "header": "inv/rap_music/inv_dipole.h",
+      "library": "inv",
+      "kind": "header-only",
+      "exported": false,
+      "registered": true,
+      "registry_status": "documented",
+      "test": null,
+      "test_resolves": false,
+      "example": null,
+      "example_state": "none",
+      "including_examples": [
+        "ex_inv_beamformer"
+      ],
+      "snippets": [
+        "ex_inv_beamformer/main.cpp#inv_rap_music_usage"
+      ],
+      "api_page": "doc/website/docs/api/inv/inv-dipole-pair.mdx",
+      "python_equiv": null,
+      "example_eligible": true,
+      "exempt_reason": null
+    },
+    {
       "name": "InvPwlRapMusic",
       "header": "inv/rap_music/inv_pwl_rap_music.h",
       "library": "inv",
@@ -8217,6 +8683,31 @@
       "exempt_reason": null
     },
     {
+      "name": "Pair",
+      "header": "inv/rap_music/inv_rap_music.h",
+      "library": "inv",
+      "kind": "header-only",
+      "exported": false,
+      "registered": true,
+      "registry_status": "documented",
+      "test": null,
+      "test_resolves": false,
+      "example": null,
+      "example_state": "none",
+      "including_examples": [
+        "ex_clustered_inverse_rap_music_raw",
+        "ex_inv_beamformer",
+        "ex_inverse_rap_music"
+      ],
+      "snippets": [
+        "ex_inv_beamformer/main.cpp#inv_rap_music_usage"
+      ],
+      "api_page": "doc/website/docs/api/inv/pair.mdx",
+      "python_equiv": null,
+      "example_eligible": true,
+      "exempt_reason": null
+    },
+    {
       "name": "InvTrapMusic",
       "header": "inv/rap_music/inv_trap_music.h",
       "library": "inv",
@@ -8245,8 +8736,8 @@
       "library": "inv",
       "kind": "exported-class",
       "exported": true,
-      "registered": false,
-      "registry_status": null,
+      "registered": true,
+      "registry_status": "documented",
       "test": null,
       "test_resolves": false,
       "example": null,
@@ -8257,7 +8748,7 @@
       "snippets": [
         "ex_inv_beamformer/main.cpp#inv_trap_music_usage"
       ],
-      "api_page": null,
+      "api_page": "doc/website/docs/api/inv/trap-music-dipole.mdx",
       "python_equiv": null,
       "example_eligible": true,
       "exempt_reason": null
@@ -8291,8 +8782,8 @@
       "library": "inv",
       "kind": "exported-class",
       "exported": true,
-      "registered": false,
-      "registry_status": null,
+      "registered": true,
+      "registry_status": "documented",
       "test": null,
       "test_resolves": false,
       "example": null,
@@ -8303,7 +8794,7 @@
       "snippets": [
         "ex_inv_api/main.cpp#inv_gamma_map_usage"
       ],
-      "api_page": null,
+      "api_page": "doc/website/docs/api/inv/inv-gamma-map-result.mdx",
       "python_equiv": null,
       "example_eligible": true,
       "exempt_reason": null
@@ -8337,8 +8828,8 @@
       "library": "inv",
       "kind": "exported-class",
       "exported": true,
-      "registered": false,
-      "registry_status": null,
+      "registered": true,
+      "registry_status": "documented",
       "test": null,
       "test_resolves": false,
       "example": null,
@@ -8349,7 +8840,7 @@
       "snippets": [
         "ex_inv_api/main.cpp#inv_sparse_usage"
       ],
-      "api_page": null,
+      "api_page": "doc/website/docs/api/inv/inv-mxne-result.mdx",
       "python_equiv": null,
       "example_eligible": true,
       "exempt_reason": null
@@ -8383,8 +8874,8 @@
       "library": "inv",
       "kind": "exported-class",
       "exported": true,
-      "registered": false,
-      "registry_status": null,
+      "registered": true,
+      "registry_status": "documented",
       "test": null,
       "test_resolves": false,
       "example": null,
@@ -8395,7 +8886,7 @@
       "snippets": [
         "ex_inv_api/main.cpp#inv_tf_mxne_usage"
       ],
-      "api_page": null,
+      "api_page": "doc/website/docs/api/inv/inv-tf-mxne-params.mdx",
       "python_equiv": null,
       "example_eligible": true,
       "exempt_reason": null
@@ -8406,8 +8897,8 @@
       "library": "inv",
       "kind": "exported-class",
       "exported": true,
-      "registered": false,
-      "registry_status": null,
+      "registered": true,
+      "registry_status": "documented",
       "test": null,
       "test_resolves": false,
       "example": null,
@@ -8418,7 +8909,7 @@
       "snippets": [
         "ex_inv_api/main.cpp#inv_tf_mxne_usage"
       ],
-      "api_page": null,
+      "api_page": "doc/website/docs/api/inv/inv-tf-mxne-result.mdx",
       "python_equiv": null,
       "example_eligible": true,
       "exempt_reason": null
@@ -8614,6 +9105,53 @@
       "exempt_reason": null
     },
     {
+      "name": "TaperedSpectraInputData",
+      "header": "math/spectral.h",
+      "library": "math",
+      "kind": "header-only",
+      "exported": false,
+      "registered": true,
+      "registry_status": "documented",
+      "test": null,
+      "test_resolves": false,
+      "example": null,
+      "example_state": "none",
+      "including_examples": [
+        "ex_math",
+        "ex_spectral"
+      ],
+      "snippets": [
+        "ex_math/main.cpp#spectral_psd"
+      ],
+      "api_page": "doc/website/docs/api/utils/tapered-spectra-input-data.mdx",
+      "python_equiv": null,
+      "example_eligible": true,
+      "exempt_reason": null
+    },
+    {
+      "name": "FitUser",
+      "header": "math/sphere.h",
+      "library": "math",
+      "kind": "header-only",
+      "exported": false,
+      "registered": true,
+      "registry_status": "documented",
+      "test": null,
+      "test_resolves": false,
+      "example": null,
+      "example_state": "none",
+      "including_examples": [
+        "ex_math"
+      ],
+      "snippets": [
+        "ex_math/main.cpp#sphere_fit"
+      ],
+      "api_page": "doc/website/docs/api/math/fit-user.mdx",
+      "python_equiv": null,
+      "example_eligible": true,
+      "exempt_reason": null
+    },
+    {
       "name": "Sphere",
       "header": "math/sphere.h",
       "library": "math",
@@ -8758,15 +9296,15 @@
       "library": "mna",
       "kind": "exported-class",
       "exported": true,
-      "registered": false,
-      "registry_status": null,
+      "registered": true,
+      "registry_status": "documented",
       "test": null,
       "test_resolves": false,
       "example": null,
       "example_state": "none",
       "including_examples": [],
       "snippets": [],
-      "api_page": null,
+      "api_page": "doc/website/docs/api/mna/mna-file-ref.mdx",
       "python_equiv": null,
       "example_eligible": true,
       "exempt_reason": null
@@ -8846,15 +9384,15 @@
       "library": "mna",
       "kind": "exported-class",
       "exported": true,
-      "registered": false,
-      "registry_status": null,
+      "registered": true,
+      "registry_status": "documented",
       "test": null,
       "test_resolves": false,
       "example": null,
       "example_state": "none",
       "including_examples": [],
       "snippets": [],
-      "api_page": null,
+      "api_page": "doc/website/docs/api/mna/mna-node.mdx",
       "python_equiv": null,
       "example_eligible": true,
       "exempt_reason": null
@@ -8911,8 +9449,8 @@
       "library": "mna",
       "kind": "exported-class",
       "exported": true,
-      "registered": false,
-      "registry_status": null,
+      "registered": true,
+      "registry_status": "documented",
       "test": null,
       "test_resolves": false,
       "example": null,
@@ -8923,7 +9461,7 @@
       "snippets": [
         "ex_mna/main.cpp#mna_op_schema_validate"
       ],
-      "api_page": null,
+      "api_page": "doc/website/docs/api/mna/mna-op-schema-attr.mdx",
       "python_equiv": null,
       "example_eligible": true,
       "exempt_reason": null
@@ -8934,8 +9472,8 @@
       "library": "mna",
       "kind": "exported-class",
       "exported": true,
-      "registered": false,
-      "registry_status": null,
+      "registered": true,
+      "registry_status": "documented",
       "test": null,
       "test_resolves": false,
       "example": null,
@@ -8946,7 +9484,7 @@
       "snippets": [
         "ex_mna/main.cpp#mna_op_schema_validate"
       ],
-      "api_page": null,
+      "api_page": "doc/website/docs/api/mna/mna-op-schema-port.mdx",
       "python_equiv": null,
       "example_eligible": true,
       "exempt_reason": null
@@ -8957,15 +9495,15 @@
       "library": "mna",
       "kind": "exported-class",
       "exported": true,
-      "registered": false,
-      "registry_status": null,
+      "registered": true,
+      "registry_status": "documented",
       "test": null,
       "test_resolves": false,
       "example": null,
       "example_state": "none",
       "including_examples": [],
       "snippets": [],
-      "api_page": null,
+      "api_page": "doc/website/docs/api/mna/mna-param-binding.mdx",
       "python_equiv": null,
       "example_eligible": true,
       "exempt_reason": null
@@ -8999,15 +9537,15 @@
       "library": "mna",
       "kind": "exported-class",
       "exported": true,
-      "registered": false,
-      "registry_status": null,
+      "registered": true,
+      "registry_status": "documented",
       "test": null,
       "test_resolves": false,
       "example": null,
       "example_state": "none",
       "including_examples": [],
       "snippets": [],
-      "api_page": null,
+      "api_page": "doc/website/docs/api/mna/mna-port.mdx",
       "python_equiv": null,
       "example_eligible": true,
       "exempt_reason": null
@@ -9041,15 +9579,15 @@
       "library": "mna",
       "kind": "exported-class",
       "exported": true,
-      "registered": false,
-      "registry_status": null,
+      "registered": true,
+      "registry_status": "documented",
       "test": null,
       "test_resolves": false,
       "example": null,
       "example_state": "none",
       "including_examples": [],
       "snippets": [],
-      "api_page": null,
+      "api_page": "doc/website/docs/api/mna/mna-recording.mdx",
       "python_equiv": null,
       "example_eligible": true,
       "exempt_reason": null
@@ -9083,15 +9621,15 @@
       "library": "mna",
       "kind": "exported-class",
       "exported": true,
-      "registered": false,
-      "registry_status": null,
+      "registered": true,
+      "registry_status": "documented",
       "test": null,
       "test_resolves": false,
       "example": null,
       "example_state": "none",
       "including_examples": [],
       "snippets": [],
-      "api_page": null,
+      "api_page": "doc/website/docs/api/mna/mna-script.mdx",
       "python_equiv": null,
       "example_eligible": true,
       "exempt_reason": null
@@ -9102,15 +9640,15 @@
       "library": "mna",
       "kind": "exported-class",
       "exported": true,
-      "registered": false,
-      "registry_status": null,
+      "registered": true,
+      "registry_status": "documented",
       "test": null,
       "test_resolves": false,
       "example": null,
       "example_state": "none",
       "including_examples": [],
       "snippets": [],
-      "api_page": null,
+      "api_page": "doc/website/docs/api/mna/mna-session.mdx",
       "python_equiv": null,
       "example_eligible": true,
       "exempt_reason": null
@@ -9121,15 +9659,15 @@
       "library": "mna",
       "kind": "exported-class",
       "exported": true,
-      "registered": false,
-      "registry_status": null,
+      "registered": true,
+      "registry_status": "documented",
       "test": null,
       "test_resolves": false,
       "example": null,
       "example_state": "none",
       "including_examples": [],
       "snippets": [],
-      "api_page": null,
+      "api_page": "doc/website/docs/api/mna/mna-subject.mdx",
       "python_equiv": null,
       "example_eligible": true,
       "exempt_reason": null
@@ -9140,15 +9678,15 @@
       "library": "mna",
       "kind": "exported-class",
       "exported": true,
-      "registered": false,
-      "registry_status": null,
+      "registered": true,
+      "registry_status": "documented",
       "test": null,
       "test_resolves": false,
       "example": null,
       "example_state": "none",
       "including_examples": [],
       "snippets": [],
-      "api_page": null,
+      "api_page": "doc/website/docs/api/mna/mna-provenance.mdx",
       "python_equiv": null,
       "example_eligible": true,
       "exempt_reason": null
@@ -9159,15 +9697,15 @@
       "library": "mna",
       "kind": "exported-class",
       "exported": true,
-      "registered": false,
-      "registry_status": null,
+      "registered": true,
+      "registry_status": "documented",
       "test": null,
       "test_resolves": false,
       "example": null,
       "example_state": "none",
       "including_examples": [],
       "snippets": [],
-      "api_page": null,
+      "api_page": "doc/website/docs/api/mna/mna-verification.mdx",
       "python_equiv": null,
       "example_eligible": true,
       "exempt_reason": null
@@ -9178,15 +9716,15 @@
       "library": "mna",
       "kind": "exported-class",
       "exported": true,
-      "registered": false,
-      "registry_status": null,
+      "registered": true,
+      "registry_status": "documented",
       "test": null,
       "test_resolves": false,
       "example": null,
       "example_state": "none",
       "including_examples": [],
       "snippets": [],
-      "api_page": null,
+      "api_page": "doc/website/docs/api/mna/mna-verification-check.mdx",
       "python_equiv": null,
       "example_eligible": true,
       "exempt_reason": null
@@ -9197,15 +9735,15 @@
       "library": "mna",
       "kind": "exported-class",
       "exported": true,
-      "registered": false,
-      "registry_status": null,
+      "registered": true,
+      "registry_status": "documented",
       "test": null,
       "test_resolves": false,
       "example": null,
       "example_state": "none",
       "including_examples": [],
       "snippets": [],
-      "api_page": null,
+      "api_page": "doc/website/docs/api/mna/mna-verification-result.mdx",
       "python_equiv": null,
       "example_eligible": true,
       "exempt_reason": null
@@ -9559,6 +10097,39 @@
       "exempt_reason": null
     },
     {
+      "name": "ArtifactRejectionData",
+      "header": "mne/mne_epoch_data_list.h",
+      "library": "mne",
+      "kind": "header-only",
+      "exported": false,
+      "registered": true,
+      "registry_status": "documented",
+      "test": null,
+      "test_resolves": false,
+      "example": null,
+      "example_state": "none",
+      "including_examples": [
+        "ex_averaging",
+        "ex_clustered_inverse_mne_raw",
+        "ex_clustered_inverse_pwl_rap_music_raw",
+        "ex_clustered_inverse_rap_music_raw",
+        "ex_connectivity",
+        "ex_connectivity_comparison",
+        "ex_connectivity_performance",
+        "ex_inverse_mne_raw",
+        "ex_mne_api",
+        "ex_read_epochs",
+        "ex_st_clustered_inverse_pwl_rap_music"
+      ],
+      "snippets": [
+        "ex_mne_api/main.cpp#mne_epoch_data_list_usage"
+      ],
+      "api_page": "doc/website/docs/api/mne/artifact-rejection-data.mdx",
+      "python_equiv": null,
+      "example_eligible": true,
+      "exempt_reason": null
+    },
+    {
       "name": "MNEEpochDataList",
       "header": "mne/mne_epoch_data_list.h",
       "library": "mne",
@@ -9690,6 +10261,64 @@
       "exempt_reason": null
     },
     {
+      "name": "RegionData",
+      "header": "mne/mne_forward_solution.h",
+      "library": "mne",
+      "kind": "header-only",
+      "exported": false,
+      "registered": true,
+      "registry_status": "documented",
+      "test": null,
+      "test_resolves": false,
+      "example": null,
+      "example_state": "none",
+      "including_examples": [
+        "ex_compute_forward",
+        "ex_dsp_rt",
+        "ex_fwd_api",
+        "ex_inv_api",
+        "ex_inv_beamformer",
+        "ex_read_fwd",
+        "ex_read_fwd_disp_3D"
+      ],
+      "snippets": [
+        "ex_inv_api/main.cpp#inv_minimum_norm_usage"
+      ],
+      "api_page": "doc/website/docs/api/mne/region-data.mdx",
+      "python_equiv": null,
+      "example_eligible": true,
+      "exempt_reason": null
+    },
+    {
+      "name": "RegionDataOut",
+      "header": "mne/mne_forward_solution.h",
+      "library": "mne",
+      "kind": "header-only",
+      "exported": false,
+      "registered": true,
+      "registry_status": "documented",
+      "test": null,
+      "test_resolves": false,
+      "example": null,
+      "example_state": "none",
+      "including_examples": [
+        "ex_compute_forward",
+        "ex_dsp_rt",
+        "ex_fwd_api",
+        "ex_inv_api",
+        "ex_inv_beamformer",
+        "ex_read_fwd",
+        "ex_read_fwd_disp_3D"
+      ],
+      "snippets": [
+        "ex_inv_api/main.cpp#inv_minimum_norm_usage"
+      ],
+      "api_page": "doc/website/docs/api/mne/region-data-out.mdx",
+      "python_equiv": null,
+      "example_eligible": true,
+      "exempt_reason": null
+    },
+    {
       "name": "MNEHemisphere",
       "header": "mne/mne_hemisphere.h",
       "library": "mne",
@@ -9759,6 +10388,56 @@
       ],
       "api_page": "doc/website/docs/api/mne/mne-inverse-operator.mdx",
       "python_equiv": "mne.InverseOperator",
+      "example_eligible": true,
+      "exempt_reason": null
+    },
+    {
+      "name": "RegionMT",
+      "header": "mne/mne_inverse_operator.h",
+      "library": "mne",
+      "kind": "header-only",
+      "exported": false,
+      "registered": true,
+      "registry_status": "documented",
+      "test": null,
+      "test_resolves": false,
+      "example": null,
+      "example_state": "none",
+      "including_examples": [
+        "ex_dsp_rt",
+        "ex_inv_api",
+        "ex_inverse_mne"
+      ],
+      "snippets": [
+        "ex_inv_api/main.cpp#inv_minimum_norm_usage"
+      ],
+      "api_page": "doc/website/docs/api/mne/region-mt.mdx",
+      "python_equiv": null,
+      "example_eligible": true,
+      "exempt_reason": null
+    },
+    {
+      "name": "RegionMTOut",
+      "header": "mne/mne_inverse_operator.h",
+      "library": "mne",
+      "kind": "header-only",
+      "exported": false,
+      "registered": true,
+      "registry_status": "documented",
+      "test": null,
+      "test_resolves": false,
+      "example": null,
+      "example_state": "none",
+      "including_examples": [
+        "ex_dsp_rt",
+        "ex_inv_api",
+        "ex_inverse_mne"
+      ],
+      "snippets": [
+        "ex_inv_api/main.cpp#inv_minimum_norm_usage"
+      ],
+      "api_page": "doc/website/docs/api/mne/region-mt-out.mdx",
+      "python_equiv": null,
       "example_eligible": true,
       "exempt_reason": null
     },
@@ -10162,15 +10841,15 @@
       "library": "mne",
       "kind": "exported-class",
       "exported": true,
-      "registered": false,
-      "registry_status": null,
+      "registered": true,
+      "registry_status": "documented",
       "test": null,
       "test_resolves": false,
       "example": null,
       "example_state": "none",
       "including_examples": [],
       "snippets": [],
-      "api_page": null,
+      "api_page": "doc/website/docs/api/mne/cov-definition.mdx",
       "python_equiv": null,
       "example_eligible": true,
       "exempt_reason": null
@@ -10181,15 +10860,15 @@
       "library": "mne",
       "kind": "exported-class",
       "exported": true,
-      "registered": false,
-      "registry_status": null,
+      "registered": true,
+      "registry_status": "documented",
       "test": null,
       "test_resolves": false,
       "example": null,
       "example_state": "none",
       "including_examples": [],
       "snippets": [],
-      "api_page": null,
+      "api_page": "doc/website/docs/api/mne/cov-description.mdx",
       "python_equiv": null,
       "example_eligible": true,
       "exempt_reason": null
@@ -10200,15 +10879,15 @@
       "library": "mne",
       "kind": "exported-class",
       "exported": true,
-      "registered": false,
-      "registry_status": null,
+      "registered": true,
+      "registry_status": "documented",
       "test": null,
       "test_resolves": false,
       "example": null,
       "example_state": "none",
       "including_examples": [],
       "snippets": [],
-      "api_page": null,
+      "api_page": "doc/website/docs/api/mne/filter-settings.mdx",
       "python_equiv": null,
       "example_eligible": false,
       "exempt_reason": "name suffix 'Settings': Plain parameter record consumed by an algorithm class; shown inside that class's example."
@@ -10219,15 +10898,15 @@
       "library": "mne",
       "kind": "exported-class",
       "exported": true,
-      "registered": false,
-      "registry_status": null,
+      "registered": true,
+      "registry_status": "documented",
       "test": null,
       "test_resolves": false,
       "example": null,
       "example_state": "none",
       "including_examples": [],
       "snippets": [],
-      "api_page": null,
+      "api_page": "doc/website/docs/api/mne/processing-settings.mdx",
       "python_equiv": null,
       "example_eligible": false,
       "exempt_reason": "name suffix 'Settings': Plain parameter record consumed by an algorithm class; shown inside that class's example."
@@ -10677,8 +11356,8 @@
       "library": "mri",
       "kind": "exported-class",
       "exported": true,
-      "registered": false,
-      "registry_status": null,
+      "registered": true,
+      "registry_status": "documented",
       "test": null,
       "test_resolves": false,
       "example": null,
@@ -10689,7 +11368,7 @@
       "snippets": [
         "ex_mri/main.cpp#mri_slicer_usage"
       ],
-      "api_page": null,
+      "api_page": "doc/website/docs/api/mri/mri-slice-image.mdx",
       "python_equiv": null,
       "example_eligible": true,
       "exempt_reason": null
@@ -10723,8 +11402,8 @@
       "library": "mri",
       "kind": "exported-class",
       "exported": true,
-      "registered": false,
-      "registry_status": null,
+      "registered": true,
+      "registry_status": "documented",
       "test": null,
       "test_resolves": false,
       "example": null,
@@ -10735,7 +11414,7 @@
       "snippets": [
         "ex_mri/main.cpp#mri_vol_data_read"
       ],
-      "api_page": null,
+      "api_page": "doc/website/docs/api/mri/mri-slice.mdx",
       "python_equiv": null,
       "example_eligible": true,
       "exempt_reason": null
@@ -10815,8 +11494,8 @@
       "library": "sts",
       "kind": "exported-class",
       "exported": true,
-      "registered": false,
-      "registry_status": null,
+      "registered": true,
+      "registry_status": "documented",
       "test": null,
       "test_resolves": false,
       "example": null,
@@ -10827,7 +11506,7 @@
       "snippets": [
         "ex_sts_statistics/main.cpp#stats_cluster_usage"
       ],
-      "api_page": null,
+      "api_page": "doc/website/docs/api/sts/stats-cluster-result.mdx",
       "python_equiv": null,
       "example_eligible": true,
       "exempt_reason": null
@@ -10907,8 +11586,8 @@
       "library": "sts",
       "kind": "exported-class",
       "exported": true,
-      "registered": false,
-      "registry_status": null,
+      "registered": true,
+      "registry_status": "documented",
       "test": null,
       "test_resolves": false,
       "example": null,
@@ -10919,7 +11598,7 @@
       "snippets": [
         "ex_sts_statistics/main.cpp#stats_ftest_usage"
       ],
-      "api_page": null,
+      "api_page": "doc/website/docs/api/sts/stats-ftest-result.mdx",
       "python_equiv": null,
       "example_eligible": true,
       "exempt_reason": null
@@ -10976,8 +11655,8 @@
       "library": "sts",
       "kind": "exported-class",
       "exported": true,
-      "registered": false,
-      "registry_status": null,
+      "registered": true,
+      "registry_status": "documented",
       "test": null,
       "test_resolves": false,
       "example": null,
@@ -10988,7 +11667,7 @@
       "snippets": [
         "ex_sts_statistics/main.cpp#stats_ttest_usage"
       ],
-      "api_page": null,
+      "api_page": "doc/website/docs/api/sts/stats-ttest-result.mdx",
       "python_equiv": null,
       "example_eligible": true,
       "exempt_reason": null
@@ -11230,8 +11909,8 @@
       "library": "utils",
       "kind": "exported-class",
       "exported": true,
-      "registered": false,
-      "registry_status": null,
+      "registered": true,
+      "registry_status": "documented",
       "test": null,
       "test_resolves": false,
       "example": null,
@@ -11242,7 +11921,7 @@
       "snippets": [
         "ex_utils/main.cpp#standard_montage_usage"
       ],
-      "api_page": null,
+      "api_page": "doc/website/docs/api/utils/electrode-position.mdx",
       "python_equiv": null,
       "example_eligible": true,
       "exempt_reason": null
@@ -11299,8 +11978,8 @@
       "library": "utils",
       "kind": "exported-class",
       "exported": true,
-      "registered": false,
-      "registry_status": null,
+      "registered": true,
+      "registry_status": "documented",
       "test": null,
       "test_resolves": false,
       "example": null,
@@ -11311,7 +11990,7 @@
       "snippets": [
         "ex_utils/main.cpp#acquired_points_usage"
       ],
-      "api_page": null,
+      "api_page": "doc/website/docs/api/utils/digitized-point.mdx",
       "python_equiv": null,
       "example_eligible": true,
       "exempt_reason": null
@@ -11345,8 +12024,8 @@
       "library": "utils",
       "kind": "exported-class",
       "exported": true,
-      "registered": false,
-      "registry_status": null,
+      "registered": true,
+      "registry_status": "documented",
       "test": null,
       "test_resolves": false,
       "example": null,
@@ -11357,7 +12036,7 @@
       "snippets": [
         "ex_utils/main.cpp#fastrak_parser_usage"
       ],
-      "api_page": null,
+      "api_page": "doc/website/docs/api/utils/fastrak-sample.mdx",
       "python_equiv": null,
       "example_eligible": true,
       "exempt_reason": null
@@ -11391,8 +12070,8 @@
       "library": "utils",
       "kind": "exported-class",
       "exported": true,
-      "registered": false,
-      "registry_status": null,
+      "registered": true,
+      "registry_status": "documented",
       "test": null,
       "test_resolves": false,
       "example": null,
@@ -11403,7 +12082,7 @@
       "snippets": [
         "ex_utils/main.cpp#polhemus_coregistration_usage"
       ],
-      "api_page": null,
+      "api_page": "doc/website/docs/api/utils/polhemus-serial-config.mdx",
       "python_equiv": null,
       "example_eligible": true,
       "exempt_reason": null
@@ -11460,8 +12139,8 @@
       "library": "utils",
       "kind": "exported-class",
       "exported": true,
-      "registered": false,
-      "registry_status": null,
+      "registered": true,
+      "registry_status": "documented",
       "test": null,
       "test_resolves": false,
       "example": null,
@@ -11472,7 +12151,7 @@
       "snippets": [
         "ex_utils/main.cpp#python_runner_usage"
       ],
-      "api_page": null,
+      "api_page": "doc/website/docs/api/utils/python-runner-config.mdx",
       "python_equiv": null,
       "example_eligible": true,
       "exempt_reason": null
@@ -11483,8 +12162,8 @@
       "library": "utils",
       "kind": "exported-class",
       "exported": true,
-      "registered": false,
-      "registry_status": null,
+      "registered": true,
+      "registry_status": "documented",
       "test": null,
       "test_resolves": false,
       "example": null,
@@ -11495,7 +12174,7 @@
       "snippets": [
         "ex_utils/main.cpp#python_runner_usage"
       ],
-      "api_page": null,
+      "api_page": "doc/website/docs/api/utils/python-runner-result.mdx",
       "python_equiv": null,
       "example_eligible": true,
       "exempt_reason": null
@@ -11552,8 +12231,8 @@
       "library": "utils",
       "kind": "exported-class",
       "exported": true,
-      "registered": false,
-      "registry_status": null,
+      "registered": true,
+      "registry_status": "documented",
       "test": null,
       "test_resolves": false,
       "example": null,
@@ -11564,7 +12243,7 @@
       "snippets": [
         "ex_utils/main.cpp#report_usage"
       ],
-      "api_page": null,
+      "api_page": "doc/website/docs/api/utils/report-section.mdx",
       "python_equiv": null,
       "example_eligible": true,
       "exempt_reason": null

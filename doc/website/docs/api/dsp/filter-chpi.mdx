@@ -42,7 +42,7 @@ filterChpi(chpi, info, sFreq, coilFreqs); // notch every coil frequency on the M
 ### filterChpi(data, info, sfreq, hpiFreqs, params)
 
 ```cpp
-void filterChpi(Eigen::MatrixXd & data, const [FiffInfo](/docs/api/fiff/fiff-info) & info, double sfreq, const QVector< double > & hpiFreqs, const FilterChpiParams & params);
+void filterChpi(Eigen::MatrixXd & data, const [FiffInfo](/docs/api/fiff/fiff-info) & info, double sfreq, const QVector< double > & hpiFreqs, const [FilterChpiParams](/docs/api/dsp/filter-chpi-params) & params);
 ```
 
 Remove cHPI excitation signals from MEG data by notch filtering.
@@ -63,7 +63,7 @@ Applies a zero-phase Butterworth band-stop (notch) filter at each specified cHPI
 - **hpiFreqs** : *const QVector&lt; double &gt; &*
   List of cHPI excitation frequencies in Hz. Typical Elekta/MEGIN system: \{83, 143, 203, 263, 293\}.
 
-- **params** : *const FilterChpiParams &*
+- **params** : *const [FilterChpiParams](/docs/api/dsp/filter-chpi-params) &*
   Filtering parameters.
 
 ---
@@ -71,7 +71,7 @@ Applies a zero-phase Butterworth band-stop (notch) filter at each specified cHPI
 ### filterChpi(data, info, sfreq, params)
 
 ```cpp
-void filterChpi(Eigen::MatrixXd & data, const [FiffInfo](/docs/api/fiff/fiff-info) & info, double sfreq, const FilterChpiParams & params);
+void filterChpi(Eigen::MatrixXd & data, const [FiffInfo](/docs/api/fiff/fiff-info) & info, double sfreq, const [FilterChpiParams](/docs/api/dsp/filter-chpi-params) & params);
 ```
 
 Overload that attempts to extract cHPI frequencies from [FiffInfo](/docs/api/fiff/fiff-info).
@@ -89,7 +89,7 @@ Tries to read HPI coil frequencies from the [FiffInfo](/docs/api/fiff/fiff-info)
 - **sfreq** : *double*
   Sampling frequency in Hz.
 
-- **params** : *const FilterChpiParams &*
+- **params** : *const [FilterChpiParams](/docs/api/dsp/filter-chpi-params) &*
   Filtering parameters.
 
 ---

@@ -26,16 +26,17 @@ from collections import defaultdict
 from pathlib import Path
 
 EXCLUSIONS = Path(__file__).resolve().parent / "api_docs_exclusions.json"
+TYPE_KINDS = ("class", "struct")
 
 
 def xml_classes(xml_dir: Path) -> dict[str, str]:
-    """Public, non-nested classes in the XML: qualified name -> header path."""
+    """Public, non-nested classes and structs in the XML: qualified name -> header path."""
     root = ET.parse(xml_dir / "index.xml").getroot()
-    names = {c.findtext("name") or "" for c in root.findall("compound") if c.get("kind") == "class"}
+    names = {c.findtext("name") or "" for c in root.findall("compound") if c.get("kind") in TYPE_KINDS}
     out: dict[str, str] = {}
     for comp in root.findall("compound"):
         name = comp.findtext("name") or ""
-        if comp.get("kind") != "class" or "::" in name and name.rsplit("::", 1)[0] in names:
+        if comp.get("kind") not in TYPE_KINDS or "::" in name and name.rsplit("::", 1)[0] in names:
             continue
         leaf = name.split("::")[-1]
         if leaf.startswith("_") or leaf.lower().endswith("private") or "::detail::" in name:
@@ -141,12 +142,14 @@ def main(argv: list[str] | None = None) -> int:
     if args.apply:
         module_of_ns = {mod.get("namespace"): key for key, mod in registry["modules"].items()}
         registered = {entry["name"] for entry in registry["classes"]}
+        # Several namespaces span directories (UTILSLIB covers dsp/ and math/); siblings in the header decide.
+        module_of_header = {entry["header"]: entry["module"] for entry in registry["classes"]}
         last = defaultdict(int)
         for entry in registry["classes"]:
             last[entry["module"]] = max(last[entry["module"]], int(entry.get("sidebar_position") or 0))
         added = 0
         for name, header in sorted(classes.items()):
-            module = module_of_ns.get(name.split("::")[0]) if "::" in name else None
+            module = module_of_header.get(header) or (module_of_ns.get(name.split("::")[0]) if "::" in name else None)
             if module is None or exclusion_for(name, header, exclusions) or name.split("::")[-1] in registered:
                 continue
             last[module] += 1

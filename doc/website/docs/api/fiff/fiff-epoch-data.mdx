@@ -1,0 +1,26 @@
+---
+id: fiff-epoch-data
+title: "FIFFLIB::FiffEpochData"
+sidebar_label: FiffEpochData
+sidebar_position: 36
+---
+
+# FiffEpochData
+
+**Namespace:** `FIFFLIB` &nbsp;·&nbsp; **Library:** FIFF Library
+
+`#include <fiff/fiff_epochs.h>`
+
+```cpp
+struct FIFFLIB::FiffEpochData
+```
+
+Fixed-length epoching result: the (nepoch × nchan × nsamples) data stack plus the matching [`FiffInfo`](/docs/api/fiff/fiff-info).
+
+Returned by the static epoch-cutting helpers of [`FiffEpochs`](/docs/api/fiff/fiff-epochs). Mirrors the `mne.EpochsArray` construction return value in MNE-Python.
+
+---
+
+## Authors of this file
+
+- Christoph Dinh &lt;christoph.dinh@mne-cpp.org&gt;

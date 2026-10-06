@@ -26,12 +26,12 @@ All public namespaces in the MNE-CPP library tree.
 | [`MATHLIB`](/docs/api/math/) | 0 | Mathematical algorithms and geometry (linear algebra, optimization, spectral estimation). |
 | [`MLLIB`](/docs/api/ml/) | 4 | Tensors, model abstraction, ONNX Runtime inference and Python training drivers used across mne-cpp. |
 | [`MNALIB`](/docs/api/mna/) | 22 | MNE Analysis Container Format (mna/mnx). |
-| [`MNELIB`](/docs/api/mne/) | 68 | Core [`MNE`](/docs/api/mne/mne-class) data structures (source spaces, source estimates, hemispheres). |
+| [`MNELIB`](/docs/api/mne/) | 65 | Core [`MNE`](/docs/api/mne/mne-class) data structures (source spaces, source estimates, hemispheres). |
 | [`MRILIB`](/docs/api/mri/) | 8 | Volume I/O, voxel geometry and slice resampling for structural MRI data inside mne-cpp. |
 | [`RTPROCESSINGLIB`](/docs/api/dsp/) | 15 |  |
 | [`STSLIB`](/docs/api/sts/) | 10 | Statistical testing (t-tests, F-tests, cluster permutation, multiple comparison correction). |
 | `SURFACEKEYS` | 0 | Centralised string constants for surface map keys. |
-| [`UTILSLIB`](/docs/api/utils/) | 93 | Shared utilities (I/O helpers, spectral analysis, layout management, warp algorithms). |
+| [`UTILSLIB`](/docs/api/utils/) | 92 | Shared utilities (I/O helpers, spectral analysis, layout management, warp algorithms). |
 | `Ui` | 0 |  |
 
 ## Class inventory by namespace
@@ -40,17 +40,17 @@ All public namespaces in the MNE-CPP library tree.
 
 - [AbstractFormatReader](/docs/api/bids/abstract-format-reader)
 - [BIDSPath](/docs/api/bids/bids-path)
-- `BidsChannel`
-- `BidsCoordinateSystem`
-- `BidsDatasetDescription`
-- `BidsElectrode`
-- `BidsEvent`
+- [BidsChannel](/docs/api/bids/bids-channel)
+- [BidsCoordinateSystem](/docs/api/bids/bids-coordinate-system)
+- [BidsDatasetDescription](/docs/api/bids/bids-dataset-description)
+- [BidsElectrode](/docs/api/bids/bids-electrode)
+- [BidsEvent](/docs/api/bids/bids-event)
 - [BidsRawData](/docs/api/bids/bids-raw-data)
 - [BidsTsv](/docs/api/bids/bids-tsv)
-- `BrainVisionChannelInfo`
-- `BrainVisionMarker`
+- [BrainVisionChannelInfo](/docs/api/bids/brain-vision-channel-info)
+- [BrainVisionMarker](/docs/api/bids/brain-vision-marker)
 - [BrainVisionReader](/docs/api/bids/brain-vision-reader)
-- `EDFChannelInfo`
+- [EDFChannelInfo](/docs/api/bids/edf-channel-info)
 - [EDFReader](/docs/api/bids/edf-reader)
 
 ### COMLIB
@@ -85,7 +85,7 @@ All public namespaces in the MNE-CPP library tree.
 - [PhaseLagIndex](/docs/api/connectivity/phase-lag-index)
 - [PhaseLockingValue](/docs/api/connectivity/phase-locking-value)
 - [UnbiasedSquaredPhaseLagIndex](/docs/api/connectivity/unbiased-squared-phase-lag-index)
-- `VisualizationInfo`
+- [VisualizationInfo](/docs/api/connectivity/visualization-info)
 - [WeightedPhaseLagIndex](/docs/api/connectivity/weighted-phase-lag-index)
 
 ### DECODINGLIB
@@ -93,23 +93,23 @@ All public namespaces in the MNE-CPP library tree.
 - [DecodingCsp](/docs/api/decoding/decoding-csp)
 - [DecodingSpoc](/docs/api/decoding/decoding-spoc)
 - [DecodingSsd](/docs/api/decoding/decoding-ssd)
-- `IcaLabelResult`
+- [IcaLabelResult](/docs/api/decoding/ica-label-result)
 - [MlIcaLabel](/docs/api/decoding/ml-ica-label)
 
 ### DISP3DLIB
 
-- `ElectrodeArray`
-- `ElectrodeContact`
+- [ElectrodeArray](/docs/api/disp3-d/electrode-array)
+- [ElectrodeContact](/docs/api/disp3-d/electrode-contact)
 - [ElectrodeObject](/docs/api/disp3-d/electrode-object)
 - [GeometryInfo](/docs/api/disp3-d/geometry-info)
 - [Interpolation](/docs/api/disp3-d/interpolation)
 - [MultimodalScene](/docs/api/disp3-d/multimodal-scene)
-- `PickResult`
+- [PickResult](/docs/api/disp3-d/pick-result)
 - [RtSensorDataWorker](/docs/api/disp3-d/rt-sensor-data-worker)
 - [RtSensorInterpolationMatWorker](/docs/api/disp3-d/rt-sensor-interpolation-mat-worker)
 - [RtSourceDataWorker](/docs/api/disp3-d/rt-source-data-worker)
 - [RtSourceInterpolationMatWorker](/docs/api/disp3-d/rt-source-interpolation-mat-worker)
-- `SceneLayer`
+- [SceneLayer](/docs/api/disp3-d/scene-layer)
 - [SliceObject](/docs/api/disp3-d/slice-object)
 - [VideoOverlay](/docs/api/disp3-d/video-overlay)
 
@@ -129,7 +129,7 @@ All public namespaces in the MNE-CPP library tree.
 - [ButterflyView](/docs/api/disp/butterfly-view)
 - [ChannelDataModel](/docs/api/disp/channel-data-model)
 - [ChannelDataView](/docs/api/disp/channel-data-view)
-- `ChannelDisplayInfo`
+- [ChannelDisplayInfo](/docs/api/disp/channel-display-info)
 - [ChannelInfoModel](/docs/api/disp/channel-info-model)
 - [ChannelLabelPanel](/docs/api/disp/channel-label-panel)
 - [ChannelRhiView](/docs/api/disp/channel-rhi-view)
@@ -180,17 +180,17 @@ All public namespaces in the MNE-CPP library tree.
 - [Spline](/docs/api/disp/spline)
 - [TFplot](/docs/api/disp/t-fplot)
 - [TfSettingsView](/docs/api/disp/tf-settings-view)
-- `TimeRulerEventMark`
-- `TimeRulerReferenceMark`
+- [TimeRulerEventMark](/docs/api/disp/time-ruler-event-mark)
+- [TimeRulerReferenceMark](/docs/api/disp/time-ruler-reference-mark)
 - [TimeRulerWidget](/docs/api/disp/time-ruler-widget)
 - [TriggerDetectionView](/docs/api/disp/trigger-detection-view)
 
 ### FIFFLIB
 
-- `AverageCategory`
-- `AverageDescription`
+- [AverageCategory](/docs/api/fiff/average-category)
+- [AverageDescription](/docs/api/fiff/average-description)
 - [Fiff](/docs/api/fiff/fiff-class)
-- `FiffAnnotation`
+- [FiffAnnotation](/docs/api/fiff/fiff-annotation)
 - [FiffAnnotations](/docs/api/fiff/fiff-annotations)
 - [FiffChInfo](/docs/api/fiff/fiff-ch-info)
 - [FiffChPos](/docs/api/fiff/fiff-ch-pos)
@@ -204,12 +204,12 @@ All public namespaces in the MNE-CPP library tree.
 - [FiffDigitizerData](/docs/api/fiff/fiff-digitizer-data)
 - [FiffDirEntry](/docs/api/fiff/fiff-dir-entry)
 - [FiffDirNode](/docs/api/fiff/fiff-dir-node)
-- `FiffEpochData`
+- [FiffEpochData](/docs/api/fiff/fiff-epoch-data)
 - [FiffEpochs](/docs/api/fiff/fiff-epochs)
 - [FiffEvents](/docs/api/fiff/fiff-events)
 - [FiffEvoked](/docs/api/fiff/fiff-evoked)
 - [FiffEvokedSet](/docs/api/fiff/fiff-evoked-set)
-- `FiffExplainEntry`
+- [FiffExplainEntry](/docs/api/fiff/fiff-explain-entry)
 - [FiffFileSharer](/docs/api/fiff/fiff-file-sharer)
 - [FiffIO](/docs/api/fiff/fiff-io)
 - [FiffId](/docs/api/fiff/fiff-id)
@@ -223,7 +223,7 @@ All public namespaces in the MNE-CPP library tree.
 - [FiffStream](/docs/api/fiff/fiff-stream)
 - [FiffTag](/docs/api/fiff/fiff-tag)
 - [FiffTime](/docs/api/fiff/fiff-time)
-- `RejectionParams`
+- [RejectionParams](/docs/api/fiff/rejection-params)
 
 ### FSLIB
 
@@ -251,33 +251,33 @@ All public namespaces in the MNE-CPP library tree.
 - [FwdEegSphereModelSet](/docs/api/fwd/fwd-eeg-sphere-model-set)
 - [FwdFieldMap](/docs/api/fwd/fwd-field-map)
 - [FwdThreadArg](/docs/api/fwd/fwd-thread-arg)
-- `fitUserRec`
+- [fitUserRec](/docs/api/fwd/fit-user-rec)
 
 ### INVLIB
 
-- `CoilParam`
-- `DipFitError`
-- `FitDipUserRec`
-- `HPISortStruct`
-- `HpiFitResult`
+- [CoilParam](/docs/api/inv/coil-param)
+- [DipFitError](/docs/api/inv/dip-fit-error)
+- [FitDipUserRec](/docs/api/inv/fit-dip-user-rec)
+- [HPISortStruct](/docs/api/inv/hpi-sort-struct)
+- [HpiFitResult](/docs/api/inv/hpi-fit-result)
 - [InvBeamformer](/docs/api/inv/inv-beamformer)
 - [InvBeamformerCompute](/docs/api/inv/inv-beamformer-compute)
 - [InvCMNE](/docs/api/inv/inv-cmne)
-- `InvCMNEResult`
-- `InvCMNESettings`
-- `InvConnectivity`
+- [InvCMNEResult](/docs/api/inv/inv-cmne-result)
+- [InvCMNESettings](/docs/api/inv/inv-cmne-settings)
+- [InvConnectivity](/docs/api/inv/inv-connectivity)
 - [InvDICS](/docs/api/inv/inv-dics)
 - [InvDipole](/docs/api/inv/inv-dipole)
 - [InvDipoleFit](/docs/api/inv/inv-dipole-fit)
 - [InvDipoleFitData](/docs/api/inv/inv-dipole-fit-data)
 - [InvDipoleFitSettings](/docs/api/inv/inv-dipole-fit-settings)
 - [InvDipoleForward](/docs/api/inv/inv-dipole-forward)
-- `InvDipolePair`
+- [InvDipolePair](/docs/api/inv/inv-dipole-pair)
 - [InvEcd](/docs/api/inv/inv-ecd)
 - [InvEcdSet](/docs/api/inv/inv-ecd-set)
-- `InvFocalDipole`
+- [InvFocalDipole](/docs/api/inv/inv-focal-dipole)
 - [InvGammaMap](/docs/api/inv/inv-gamma-map)
-- `InvGammaMapResult`
+- [InvGammaMapResult](/docs/api/inv/inv-gamma-map-result)
 - [InvGuessData](/docs/api/inv/inv-guess-data)
 - [InvHpiDataUpdater](/docs/api/inv/inv-hpi-data-updater)
 - [InvHpiFit](/docs/api/inv/inv-hpi-fit)
@@ -287,28 +287,28 @@ All public namespaces in the MNE-CPP library tree.
 - [InvLabelTimeCourse](/docs/api/inv/inv-label-time-course)
 - [InvMinimumNorm](/docs/api/inv/inv-minimum-norm)
 - [InvMxne](/docs/api/inv/inv-mxne)
-- `InvMxneResult`
+- [InvMxneResult](/docs/api/inv/inv-mxne-result)
 - [InvPwlRapMusic](/docs/api/inv/inv-pwl-rap-music)
 - [InvRapMusic](/docs/api/inv/inv-rap-music)
 - [InvResolutionMatrix](/docs/api/inv/inv-resolution-matrix)
 - [InvSensorSet](/docs/api/inv/inv-sensor-set)
 - [InvSensorSetCreator](/docs/api/inv/inv-sensor-set-creator)
 - [InvSignalModel](/docs/api/inv/inv-signal-model)
-- `InvSourceCoupling`
+- [InvSourceCoupling](/docs/api/inv/inv-source-coupling)
 - [InvSourceEstimate](/docs/api/inv/inv-source-estimate)
 - [InvSourceEstimateIO](/docs/api/inv/inv-source-estimate-io)
 - [InvTfMxne](/docs/api/inv/inv-tf-mxne)
-- `InvTfMxneParams`
-- `InvTfMxneResult`
-- `InvToken`
-- `InvTokenizeOptions`
+- [InvTfMxneParams](/docs/api/inv/inv-tf-mxne-params)
+- [InvTfMxneResult](/docs/api/inv/inv-tf-mxne-result)
+- [InvToken](/docs/api/inv/inv-token)
+- [InvTokenizeOptions](/docs/api/inv/inv-tokenize-options)
 - [InvTrapMusic](/docs/api/inv/inv-trap-music)
 - [InvVectorSourceEstimate](/docs/api/inv/inv-vector-source-estimate)
 - [InvVolumeSourceEstimate](/docs/api/inv/inv-volume-source-estimate)
-- `Pair`
+- [Pair](/docs/api/inv/pair)
 - [SourceMorph](/docs/api/inv/source-morph)
-- `TrapMusicDipole`
-- `dipoleFitFuncsRec`
+- [TrapMusicDipole](/docs/api/inv/trap-music-dipole)
+- [dipoleFitFuncsRec](/docs/api/inv/dipole-fit-funcs-rec)
 
 ### LSLLIB
 
@@ -325,37 +325,35 @@ All public namespaces in the MNE-CPP library tree.
 
 ### MNALIB
 
-- `MnaFileRef`
+- [MnaFileRef](/docs/api/mna/mna-file-ref)
 - [MnaGraph](/docs/api/mna/mna-graph)
 - [MnaGraphExecutor](/docs/api/mna/mna-graph-executor)
 - [MnaIO](/docs/api/mna/mna-io)
-- `MnaNode`
+- [MnaNode](/docs/api/mna/mna-node)
 - [MnaOpRegistry](/docs/api/mna/mna-op-registry)
 - [MnaOpSchema](/docs/api/mna/mna-op-schema)
-- `MnaOpSchemaAttr`
-- `MnaOpSchemaPort`
-- `MnaParamBinding`
+- [MnaOpSchemaAttr](/docs/api/mna/mna-op-schema-attr)
+- [MnaOpSchemaPort](/docs/api/mna/mna-op-schema-port)
+- [MnaParamBinding](/docs/api/mna/mna-param-binding)
 - [MnaParamTree](/docs/api/mna/mna-param-tree)
-- `MnaPort`
+- [MnaPort](/docs/api/mna/mna-port)
 - [MnaProject](/docs/api/mna/mna-project)
-- `MnaProvenance`
-- `MnaRecording`
+- [MnaProvenance](/docs/api/mna/mna-provenance)
+- [MnaRecording](/docs/api/mna/mna-recording)
 - [MnaRegistryLoader](/docs/api/mna/mna-registry-loader)
-- `MnaScript`
-- `MnaSession`
-- `MnaSubject`
-- `MnaVerification`
-- `MnaVerificationCheck`
-- `MnaVerificationResult`
+- [MnaScript](/docs/api/mna/mna-script)
+- [MnaSession](/docs/api/mna/mna-session)
+- [MnaSubject](/docs/api/mna/mna-subject)
+- [MnaVerification](/docs/api/mna/mna-verification)
+- [MnaVerificationCheck](/docs/api/mna/mna-verification-check)
+- [MnaVerificationResult](/docs/api/mna/mna-verification-result)
 
 ### MNELIB
 
-- `ArtifactRejectionData`
-- `AverageCategory`
-- `AverageDescription`
-- `CovDefinition`
-- `CovDescription`
-- `FilterSettings`
+- [ArtifactRejectionData](/docs/api/mne/artifact-rejection-data)
+- [CovDefinition](/docs/api/mne/cov-definition)
+- [CovDescription](/docs/api/mne/cov-description)
+- [FilterSettings](/docs/api/mne/filter-settings)
 - [FilterThreadArg](/docs/api/mne/filter-thread-arg)
 - [MNE](/docs/api/mne/mne-class)
 - [MNEBem](/docs/api/mne/mne-bem)
@@ -412,12 +410,11 @@ All public namespaces in the MNE-CPP library tree.
 - [MNESurfacePatch](/docs/api/mne/mne-surface-patch)
 - [MNETriangle](/docs/api/mne/mne-triangle)
 - [MNEVolGeom](/docs/api/mne/mne-vol-geom)
-- `ProcessingSettings`
-- `RegionData`
-- `RegionDataOut`
-- `RegionMT`
-- `RegionMTOut`
-- `RejectionParams`
+- [ProcessingSettings](/docs/api/mne/processing-settings)
+- [RegionData](/docs/api/mne/region-data)
+- [RegionDataOut](/docs/api/mne/region-data-out)
+- [RegionMT](/docs/api/mne/region-mt)
+- [RegionMTOut](/docs/api/mne/region-mt-out)
 
 ### MRILIB
 
@@ -425,25 +422,25 @@ All public namespaces in the MNE-CPP library tree.
 - [MriCorIO](/docs/api/mri/mri-cor-io)
 - [MriMghIO](/docs/api/mri/mri-mgh-io)
 - [MriNiftiIO](/docs/api/mri/mri-nifti-io)
-- `MriSlice`
-- `MriSliceImage`
+- [MriSlice](/docs/api/mri/mri-slice)
+- [MriSliceImage](/docs/api/mri/mri-slice-image)
 - [MriSlicer](/docs/api/mri/mri-slicer)
 - [MriVolData](/docs/api/mri/mri-vol-data)
 
 ### RTPROCESSINGLIB
 
-- `FilterObject`
+- [FilterObject](/docs/api/dsp/filter-object)
 - [FilterOverlapAdd](/docs/api/dsp/filter-overlap-add)
 - [RtAveraging](/docs/api/dsp/rt-averaging)
 - [RtAveragingWorker](/docs/api/dsp/rt-averaging-worker)
 - [RtConnectivity](/docs/api/dsp/rt-connectivity)
 - [RtConnectivityWorker](/docs/api/dsp/rt-connectivity-worker)
 - [RtCov](/docs/api/dsp/rt-cov)
-- `RtCovComputeResult`
+- [RtCovComputeResult](/docs/api/dsp/rt-cov-compute-result)
 - [RtHpi](/docs/api/dsp/rt-hpi)
 - [RtHpiWorker](/docs/api/dsp/rt-hpi-worker)
 - [RtInvOp](/docs/api/dsp/rt-inv-op)
-- `RtInvOpInput`
+- [RtInvOpInput](/docs/api/dsp/rt-inv-op-input)
 - [RtInvOpWorker](/docs/api/dsp/rt-inv-op-worker)
 - [RtNoise](/docs/api/dsp/rt-noise)
 - [RtNoiseWorker](/docs/api/dsp/rt-noise-worker)
@@ -452,107 +449,106 @@ All public namespaces in the MNE-CPP library tree.
 
 - [StatsAdjacency](/docs/api/sts/stats-adjacency)
 - [StatsCluster](/docs/api/sts/stats-cluster)
-- `StatsClusterResult`
+- [StatsClusterResult](/docs/api/sts/stats-cluster-result)
 - [StatsFtest](/docs/api/sts/stats-ftest)
-- `StatsFtestResult`
+- [StatsFtestResult](/docs/api/sts/stats-ftest-result)
 - [StatsMcCorrection](/docs/api/sts/stats-mc-correction)
 - [StatsSourceMetrics](/docs/api/sts/stats-source-metrics)
 - [StatsTtest](/docs/api/sts/stats-ttest)
-- `StatsTtestResult`
+- [StatsTtestResult](/docs/api/sts/stats-ttest-result)
 - [StsCovEstimators](/docs/api/sts/sts-cov-estimators)
 
 ### UTILSLIB
 
 - [AcquiredPoints](/docs/api/utils/acquired-points)
-- `AnnotateAmplitudeParams`
-- `AnnotateMusclParams`
+- [AnnotateAmplitudeParams](/docs/api/dsp/annotate-amplitude-params)
+- [AnnotateMusclParams](/docs/api/dsp/annotate-muscl-params)
 - [ArtifactDetect](/docs/api/utils/artifact-detect)
-- `ArtifactDetectEcgParams`
-- `ArtifactDetectEogParams`
+- [ArtifactDetectEcgParams](/docs/api/utils/artifact-detect-ecg-params)
+- [ArtifactDetectEogParams](/docs/api/utils/artifact-detect-eog-params)
 - [BadChannelDetect](/docs/api/utils/bad-channel-detect)
-- `BadChannelDetectParams`
-- `BadChannelsMaxwellParams`
-- `BadChannelsMaxwellResult`
-- `BridgedElectrodeParams`
+- [BadChannelDetectParams](/docs/api/utils/bad-channel-detect-params)
+- [BadChannelsMaxwellParams](/docs/api/dsp/bad-channels-maxwell-params)
+- [BadChannelsMaxwellResult](/docs/api/dsp/bad-channels-maxwell-result)
+- [BridgedElectrodeParams](/docs/api/dsp/bridged-electrode-params)
 - [ChannelDerivation](/docs/api/utils/channel-derivation)
 - [CircularBuffer](/docs/api/utils/circular-buffer)
 - [ConnectivityAec](/docs/api/dsp/connectivity-aec)
 - [CosineFilter](/docs/api/utils/cosine-filter)
 - [Csd](/docs/api/utils/csd)
-- `CsdResult`
-- `DerivationRule`
-- `DigitizedPoint`
+- [CsdResult](/docs/api/utils/csd-result)
+- [DerivationRule](/docs/api/utils/derivation-rule)
+- [DigitizedPoint](/docs/api/utils/digitized-point)
 - [Dpss](/docs/api/utils/dpss)
-- `DpssResult`
-- `ElectrodePosition`
+- [DpssResult](/docs/api/utils/dpss-result)
+- [ElectrodePosition](/docs/api/utils/electrode-position)
 - [EogRegression](/docs/api/dsp/eog-regression)
 - [EpochExtractor](/docs/api/utils/epoch-extractor)
-- `EpochExtractorParams`
+- [EpochExtractorParams](/docs/api/utils/epoch-extractor-params)
 - [ExtendedInfomax](/docs/api/dsp/extended-infomax)
 - [FastrakParser](/docs/api/utils/fastrak-parser)
-- `FastrakSample`
-- `FilterChpiParams`
+- [FastrakSample](/docs/api/utils/fastrak-sample)
+- [FilterChpiParams](/docs/api/dsp/filter-chpi-params)
 - [FilterIO](/docs/api/utils/filter-io)
 - [FilterKernel](/docs/api/dsp/filter-kernel)
 - [FilterParameter](/docs/api/utils/filter-parameter)
-- `FineCalEntry`
+- [FineCalEntry](/docs/api/dsp/fine-cal-entry)
 - [FineCalibration](/docs/api/dsp/fine-calibration)
 - [FirFilter](/docs/api/dsp/fir-filter)
-- `FitUser`
-- `HeadPosEntry`
+- [FitUser](/docs/api/math/fit-user)
+- [HeadPosEntry](/docs/api/dsp/head-pos-entry)
 - [ICA](/docs/api/dsp/ica)
 - [ICommand](/docs/api/utils/i-command)
 - [IOUtils](/docs/api/utils/io-utils)
 - [IObserver](/docs/api/utils/i-observer)
-- `IcaResult`
-- `IirBiquad`
+- [IcaResult](/docs/api/dsp/ica-result)
+- [IirBiquad](/docs/api/dsp/iir-biquad)
 - [IirFilter](/docs/api/dsp/iir-filter)
-- `InfomaxResult`
+- [InfomaxResult](/docs/api/dsp/infomax-result)
 - [KMeans](/docs/api/math/k-means)
 - [LayoutLoader](/docs/api/utils/layout-loader)
 - [LayoutMaker](/docs/api/utils/layout-maker)
 - [Linalg](/docs/api/math/linalg)
-- `LofBadChannelParams`
+- [LofBadChannelParams](/docs/api/dsp/lof-bad-channel-params)
 - [MNELogger](/docs/api/utils/mne-logger)
-- `MaxwellMoveCompParams`
+- [MaxwellMoveCompParams](/docs/api/dsp/maxwell-move-comp-params)
 - [MaxwellMovementComp](/docs/api/dsp/maxwell-movement-comp)
 - [MorletTfr](/docs/api/dsp/morlet-tfr)
-- `MorletTfrResult`
+- [MorletTfrResult](/docs/api/dsp/morlet-tfr-result)
 - [MultitaperPsd](/docs/api/dsp/multitaper-psd)
-- `MultitaperPsdResult`
+- [MultitaperPsdResult](/docs/api/dsp/multitaper-psd-result)
 - [MultitaperTfr](/docs/api/dsp/multitaper-tfr)
-- `MultitaperTfrResult`
+- [MultitaperTfrResult](/docs/api/dsp/multitaper-tfr-result)
 - [Numerics](/docs/api/utils/numerics)
 - [ParksMcClellan](/docs/api/utils/parks-mc-clellan)
-- `PeakFinderParams`
+- [PeakFinderParams](/docs/api/dsp/peak-finder-params)
 - [PicardIca](/docs/api/dsp/picard-ica)
 - [PolhemusConnection](/docs/api/utils/polhemus-connection)
 - [PolhemusCoregistration](/docs/api/utils/polhemus-coregistration)
-- `PolhemusSerialConfig`
+- [PolhemusSerialConfig](/docs/api/utils/polhemus-serial-config)
 - [PythonRunner](/docs/api/utils/python-runner)
-- `PythonRunnerConfig`
-- `PythonRunnerResult`
+- [PythonRunnerConfig](/docs/api/utils/python-runner-config)
+- [PythonRunnerResult](/docs/api/utils/python-runner-result)
 - [PythonTestHelper](/docs/api/utils/python-test-helper)
 - [Report](/docs/api/utils/report)
-- `ReportSection`
+- [ReportSection](/docs/api/utils/report-section)
 - [Resample](/docs/api/dsp/resample)
 - [SSS](/docs/api/dsp/sss)
-- `SSSParams`
+- [SSSParams](/docs/api/dsp/sss-params)
 - [SelectionIO](/docs/api/utils/selection-io)
 - [SimplexAlgorithm](/docs/api/math/simplex-algorithm)
-- `SimulateStcParams`
-- `SpectogramInputData`
+- [SimulateStcParams](/docs/api/dsp/simulate-stc-params)
+- [SpectogramInputData](/docs/api/utils/spectogram-input-data)
 - [Spectral](/docs/api/utils/spectral)
 - [Spectrogram](/docs/api/utils/spectrogram)
 - [Sphere](/docs/api/math/sphere)
 - [StandardMontage](/docs/api/utils/standard-montage)
 - [Subject](/docs/api/utils/subject)
 - [SurfaceLaplacian](/docs/api/dsp/surface-laplacian)
-- `SurfaceLaplacianResult`
-- `TaperedSpectraInputData`
+- [SurfaceLaplacianResult](/docs/api/dsp/surface-laplacian-result)
+- [TaperedSpectraInputData](/docs/api/utils/tapered-spectra-input-data)
 - [Warp](/docs/api/math/warp)
 - [WelchPsd](/docs/api/dsp/welch-psd)
-- `WelchPsdResult`
+- [WelchPsdResult](/docs/api/dsp/welch-psd-result)
 - [Xdawn](/docs/api/dsp/xdawn)
-- `XdawnResult`
-- `fitUserRec`
+- [XdawnResult](/docs/api/dsp/xdawn-result)

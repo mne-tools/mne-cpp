@@ -55,7 +55,7 @@ Design a Butterworth filter as a cascade of second-order sections.
 
 **Returns:**
 
-- *QVector&lt; IirBiquad &gt;* — QVector of `IirBiquad` sections (multiply their transfer functions to get H(z)).
+- *QVector&lt; [IirBiquad](/docs/api/dsp/iir-biquad) &gt;* — QVector of [`IirBiquad`](/docs/api/dsp/iir-biquad) sections (multiply their transfer functions to get H(z)).
 
 ---
 
@@ -68,7 +68,7 @@ Apply a biquad cascade to one data row (causal, single-pass).
 - **vecData** : *const Eigen::RowVectorXd &*
   Input row vector.
 
-- **sos** : *const QVector&lt; IirBiquad &gt; &*
+- **sos** : *const QVector&lt; [IirBiquad](/docs/api/dsp/iir-biquad) &gt; &*
   Second-order sections from `designButterworth()`.
 
 **Returns:**
@@ -88,7 +88,7 @@ The effective order is doubled and there is no phase distortion.
 - **vecData** : *const Eigen::RowVectorXd &*
   Input row vector.
 
-- **sos** : *const QVector&lt; IirBiquad &gt; &*
+- **sos** : *const QVector&lt; [IirBiquad](/docs/api/dsp/iir-biquad) &gt; &*
   Second-order sections from `designButterworth()`.
 
 **Returns:**
@@ -106,7 +106,7 @@ Apply zero-phase filtering to every row of a matrix (each row = one channel).
 - **matData** : *const Eigen::MatrixXd &*
   Input matrix (n_channels x n_samples).
 
-- **sos** : *const QVector&lt; IirBiquad &gt; &*
+- **sos** : *const QVector&lt; [IirBiquad](/docs/api/dsp/iir-biquad) &gt; &*
   Second-order sections from `designButterworth()`.
 
 **Returns:**

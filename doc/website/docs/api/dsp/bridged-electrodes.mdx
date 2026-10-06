@@ -62,7 +62,7 @@ Electrical distance is defined as the standard deviation of the difference signa
 ### computeBridgedElectrodes(data, info, params)
 
 ```cpp
-QList< QPair< int, int > > computeBridgedElectrodes(const Eigen::MatrixXd & data, const [FiffInfo](/docs/api/fiff/fiff-info) & info, const BridgedElectrodeParams & params);
+QList< QPair< int, int > > computeBridgedElectrodes(const Eigen::MatrixXd & data, const [FiffInfo](/docs/api/fiff/fiff-info) & info, const [BridgedElectrodeParams](/docs/api/dsp/bridged-electrode-params) & params);
 ```
 
 Detect bridged EEG electrodes.
@@ -77,7 +77,7 @@ Finds pairs of EEG channels whose electrical distance falls below the threshold,
 - **info** : *const [FiffInfo](/docs/api/fiff/fiff-info) &*
   FiffInfo with channel types.
 
-- **params** : *const BridgedElectrodeParams &*
+- **params** : *const [BridgedElectrodeParams](/docs/api/dsp/bridged-electrode-params) &*
   Detection parameters.
 
 **Returns:**

@@ -140,7 +140,7 @@ Equivalent of MNE-Python's mne.minimum_norm.estimate_snr(): `snr` is the global 
 
 **Returns:**
 
-- *QPair&lt; Eigen::VectorXd, Eigen::VectorXd &gt;* — `Pair` of (snr, snrEst), one value per time point.
+- *QPair&lt; Eigen::VectorXd, Eigen::VectorXd &gt;* — [`Pair`](/docs/api/inv/pair) of (snr, snrEst), one value per time point.
 
 ---
 
@@ -164,7 +164,7 @@ Returns a whitening matrix W such that W * data has identity covariance. Matches
 
 **Returns:**
 
-- *QPair&lt; Eigen::MatrixXd, int &gt;* — `Pair` of (whitener matrix, effective rank).
+- *QPair&lt; Eigen::MatrixXd, int &gt;* — [`Pair`](/docs/api/inv/pair) of (whitener matrix, effective rank).
 
 ---
 
@@ -197,7 +197,7 @@ Takes a source estimate (n_sources x n_times) and computes the power spectral de
 
 **Returns:**
 
-- *QPair&lt; Eigen::MatrixXd, Eigen::VectorXd &gt;* — `Pair` of (PSD matrix [n_sources x n_freqs], frequency vector).
+- *QPair&lt; Eigen::MatrixXd, Eigen::VectorXd &gt;* — [`Pair`](/docs/api/inv/pair) of (PSD matrix [n_sources x n_freqs], frequency vector).
 
 ---
 

@@ -39,7 +39,7 @@ const QVector<float> voxels = mgh.voxelDataAsFloat(); // x fastest
 
 Reads a FreeSurfer MGH or MGZ file.
 
-Parses the header geometry (dimensions, voxel sizes, direction cosines, center RAS), reads voxel data into per-slice `MriSlice` structures, and extracts footer tags including the Talairach .xfm path.
+Parses the header geometry (dimensions, voxel sizes, direction cosines, center RAS), reads voxel data into per-slice [`MriSlice`](/docs/api/mri/mri-slice) structures, and extracts footer tags including the Talairach .xfm path.
 
 For .mgz files, automatic gzip decompression is performed via zlib.
 

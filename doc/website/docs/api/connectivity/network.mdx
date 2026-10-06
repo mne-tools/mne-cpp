@@ -17,7 +17,7 @@ class CONNECTIVITYLIB::Network
 
 [Graph](/docs/api/disp/graph) container for one functional-connectivity result.
 
-Holds the [`NetworkNode`](/docs/api/connectivity/network-node) list (channel / source positions) and the [`NetworkEdge`](/docs/api/connectivity/network-edge) list (per-frequency weight matrices + scalar band- averaged weights). Provides full and thresholded views of both edges and the corresponding adjacency matrix, the metric name ("COH", "PLI", "GC", ...) and threshold currently in effect, and the `VisualizationInfo` block read by the disp3D rendering layer.
+Holds the [`NetworkNode`](/docs/api/connectivity/network-node) list (channel / source positions) and the [`NetworkEdge`](/docs/api/connectivity/network-edge) list (per-frequency weight matrices + scalar band- averaged weights). Provides full and thresholded views of both edges and the corresponding adjacency matrix, the metric name ("COH", "PLI", "GC", ...) and threshold currently in effect, and the [`VisualizationInfo`](/docs/api/connectivity/visualization-info) block read by the disp3D rendering layer.
 
 [Graph](/docs/api/disp/graph) container for one connectivity metric; nodes + weighted edges + threshold/visualisation state.
 
@@ -362,7 +362,7 @@ Get the current visualization info.
 
 **Returns:**
 
-- *VisualizationInfo* — The current visualization info.
+- *[VisualizationInfo](/docs/api/connectivity/visualization-info)* — The current visualization info.
 
 ---
 
@@ -372,7 +372,7 @@ Set the current visualization info.
 
 **Parameters:**
 
-- **visualizationInfo** : *const VisualizationInfo &*
+- **visualizationInfo** : *const [VisualizationInfo](/docs/api/connectivity/visualization-info) &*
   The new visualization info.
 
 ---

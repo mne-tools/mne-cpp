@@ -52,7 +52,7 @@ Uses non-rejected epochs only. The target signal covariance is estimated from th
 
 **Returns:**
 
-- *XdawnResult* — `XdawnResult` containing filters, patterns, and covariances.
+- *[XdawnResult](/docs/api/dsp/xdawn-result)* — [`XdawnResult`](/docs/api/dsp/xdawn-result) containing filters, patterns, and covariances.
 
 ---
 
@@ -65,7 +65,7 @@ Project one epoch into xDAWN component space.
 - **matEpoch** : *const Eigen::MatrixXd &*
   Epoch data (n_channels x n_samples).
 
-- **result** : *const XdawnResult &*
+- **result** : *const [XdawnResult](/docs/api/dsp/xdawn-result) &*
   Result from `fit()`.
 
 **Returns:**
@@ -85,7 +85,7 @@ If `nComponents` &lt;= 0 or exceeds the fitted dimensionality, all fitted compon
 - **matEpoch** : *const Eigen::MatrixXd &*
   Epoch data (n_channels x n_samples).
 
-- **result** : *const XdawnResult &*
+- **result** : *const [XdawnResult](/docs/api/dsp/xdawn-result) &*
   Result from `fit()`.
 
 - **nComponents** : *int*
@@ -106,7 +106,7 @@ Apply `denoise()` to all epochs in the vector, preserving metadata.
 - **epochs** : *const QVector&lt; [MNEEpochData](/docs/api/mne/mne-epoch-data) &gt; &*
   Input epochs.
 
-- **result** : *const XdawnResult &*
+- **result** : *const [XdawnResult](/docs/api/dsp/xdawn-result) &*
   Result from `fit()`.
 
 - **nComponents** : *int*

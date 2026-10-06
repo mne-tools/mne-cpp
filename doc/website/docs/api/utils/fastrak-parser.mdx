@@ -68,7 +68,7 @@ Pop the next fully-decoded sample, if any.
 
 **Parameters:**
 
-- **out** : *FastrakSample &*
+- **out** : *[FastrakSample](/docs/api/utils/fastrak-sample) &*
   Receives the decoded sample; malformed lines are skipped.
 
 **Returns:**
@@ -97,7 +97,7 @@ Parse one record line (without trailing CR/LF) — exposed for unit tests and fo
 - **units** : *Units*
   Unit of the positions in `record`.
 
-- **out** : *FastrakSample &*
+- **out** : *[FastrakSample](/docs/api/utils/fastrak-sample) &*
   Receives the decoded sample with the position in metres.
 
 **Returns:**

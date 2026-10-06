@@ -44,7 +44,7 @@ Channels are grouped by shaft prefix (all leading alphabetic characters and apos
 
 **Returns:**
 
-- *QVector&lt; DerivationRule &gt;* — Vector of `DerivationRule`, e.g. LH1-LH2 (+1·LH1, −1·LH2), LH2-LH3, RA1-RA2.
+- *QVector&lt; [DerivationRule](/docs/api/utils/derivation-rule) &gt;* — Vector of [`DerivationRule`](/docs/api/utils/derivation-rule), e.g. LH1-LH2 (+1·LH1, −1·LH2), LH2-LH3, RA1-RA2.
 
 ---
 
@@ -61,7 +61,7 @@ Each output channel equals the original channel minus the mean of all channels: 
 
 **Returns:**
 
-- *QVector&lt; DerivationRule &gt;* — Vector of `DerivationRule`, one per input channel.
+- *QVector&lt; [DerivationRule](/docs/api/utils/derivation-rule) &gt;* — Vector of [`DerivationRule`](/docs/api/utils/derivation-rule), one per input channel.
 
 ---
 
@@ -77,7 +77,7 @@ Apply derivation rules to a data matrix.
 - **channelNames** : *const QStringList &*
   Channel names corresponding to rows of matData.
 
-- **rules** : *const QVector&lt; DerivationRule &gt; &*
+- **rules** : *const QVector&lt; [DerivationRule](/docs/api/utils/derivation-rule) &gt; &*
   Derivation rules to apply.
 
 **Returns:**
@@ -103,7 +103,7 @@ Read derivation rules from an MNE-C derivation text file (`MNELIB::MNEDerivSet::
 
 **Returns:**
 
-- *QVector&lt; DerivationRule &gt;* — Vector of parsed `DerivationRule`. Empty on error.
+- *QVector&lt; [DerivationRule](/docs/api/utils/derivation-rule) &gt;* — Vector of parsed [`DerivationRule`](/docs/api/utils/derivation-rule). Empty on error.
 
 ---
 
@@ -116,7 +116,7 @@ Write derivation rules in MNE-C derivation text syntax, readable by readDefiniti
 - **path** : *const QString &*
   Path to the output file.
 
-- **rules** : *const QVector&lt; DerivationRule &gt; &*
+- **rules** : *const QVector&lt; [DerivationRule](/docs/api/utils/derivation-rule) &gt; &*
   Derivation rules to write.
 
 **Returns:**

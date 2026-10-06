@@ -1,0 +1,36 @@
+---
+id: inv-connectivity
+title: "INVLIB::InvConnectivity"
+sidebar_label: InvConnectivity
+sidebar_position: 43
+---
+
+# InvConnectivity
+
+**Namespace:** `INVLIB` &nbsp;·&nbsp; **Library:** Inverse Library
+
+`#include <inv/inv_connectivity.h>`
+
+```cpp
+struct INVLIB::InvConnectivity
+```
+
+Stores a pairwise connectivity measure between source locations (grid points, sEEG contacts, etc.).
+
+The matrix is [N x N] where N equals the number of sources in the parent [`InvSourceEstimate`](/docs/api/inv/inv-source-estimate). Each [`InvConnectivity`](/docs/api/inv/inv-connectivity) instance represents one metric in one frequency band and time window. For frequency-resolved connectivity, add one entry per band to the parent's connectivity vector.
+
+This struct is intentionally lightweight and self-contained — it does not depend on the connectivity library. Application code can populate it from [Network](/docs/api/connectivity/network)::getFullConnectivityMatrix().
+
+Pairwise source connectivity matrix with measure, directionality, and frequency/time metadata.
+
+---
+
+## Public Methods
+
+### InvConnectivity()
+
+---
+
+## Authors of this file
+
+- Christoph Dinh &lt;christoph.dinh@mne-cpp.org&gt;

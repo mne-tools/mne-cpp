@@ -45,7 +45,7 @@ const VectorXd lofScores = computeLofScores(features, 3);
 ### findBadChannelsLof(data, info, params)
 
 ```cpp
-QStringList findBadChannelsLof(const Eigen::MatrixXd & data, const [FiffInfo](/docs/api/fiff/fiff-info) & info, const LofBadChannelParams & params);
+QStringList findBadChannelsLof(const Eigen::MatrixXd & data, const [FiffInfo](/docs/api/fiff/fiff-info) & info, const [LofBadChannelParams](/docs/api/dsp/lof-bad-channel-params) & params);
 ```
 
 Detect bad channels using Local Outlier Factor (LOF).
@@ -60,7 +60,7 @@ Computes features for each channel (standard deviation, kurtosis, max absolute a
 - **info** : *const [FiffInfo](/docs/api/fiff/fiff-info) &*
   FiffInfo with channel types.
 
-- **params** : *const LofBadChannelParams &*
+- **params** : *const [LofBadChannelParams](/docs/api/dsp/lof-bad-channel-params) &*
   LOF parameters.
 
 **Returns:**

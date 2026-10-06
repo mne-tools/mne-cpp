@@ -1,0 +1,31 @@
+---
+id: iir-biquad
+title: "UTILSLIB::IirBiquad"
+sidebar_label: IirBiquad
+sidebar_position: 53
+---
+
+# IirBiquad
+
+**Namespace:** `RTPROCESSINGLIB` &nbsp;·&nbsp; **Library:** DSP Library
+
+`#include <dsp/iirfilter.h>`
+
+```cpp
+struct UTILSLIB::IirBiquad
+```
+
+Coefficients of one second-order IIR section (biquad).
+
+Transfer function (Direct-Form II): 
+```cpp
+H(z) = (b0 + b1*z^-1 + b2*z^-2) / (1 + a1*z^-1 + a2*z^-2)
+```
+
+ Note: a0 is normalised to 1. For first-order sections set b2 = a2 = 0.
+
+---
+
+## Authors of this file
+
+- Christoph Dinh &lt;christoph.dinh@mne-cpp.org&gt;

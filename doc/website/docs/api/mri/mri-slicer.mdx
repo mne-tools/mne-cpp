@@ -15,7 +15,7 @@ sidebar_position: 5
 class MRILIB::MriSlicer
 ```
 
-Orthogonal-plane resampler (axial / coronal / sagittal) from [`MriVolData`](/docs/api/mri/mri-vol-data) to `MriSliceImage`.
+Orthogonal-plane resampler (axial / coronal / sagittal) from [`MriVolData`](/docs/api/mri/mri-vol-data) to [`MriSliceImage`](/docs/api/mri/mri-slice-image).
 
 Pure `static` methods  no instance state is owned. For a given orientation and slice index, samples the source volume at the matching row/column/depth plane, normalises voxel intensities into 8-bit grayscale via the volume's percentile-clipped window, and emits the result with the slice→RAS transform the viewer needs to draw rulers and crosshairs in millimetres.
 
@@ -52,7 +52,7 @@ Extract a 2D slice from a 3D volume stored as a flat array.
 
 **Returns:**
 
-- *MriSliceImage* — The extracted slice image.
+- *[MriSliceImage](/docs/api/mri/mri-slice-image)* — The extracted slice image.
 
 ---
 
@@ -138,7 +138,7 @@ Extract all three orthogonal slices at a given RAS point.
 
 **Returns:**
 
-- *QVector&lt; MriSliceImage &gt;* — Vector of three `MriSliceImage` (axial, coronal, sagittal).
+- *QVector&lt; [MriSliceImage](/docs/api/mri/mri-slice-image) &gt;* — Vector of three [`MriSliceImage`](/docs/api/mri/mri-slice-image) (axial, coronal, sagittal).
 
 ---
 
@@ -195,7 +195,7 @@ Extract a 2D slice from an [`MriVolData`](/docs/api/mri/mri-vol-data) volume.
 
 **Returns:**
 
-- *MriSliceImage* — The extracted slice image.
+- *[MriSliceImage](/docs/api/mri/mri-slice-image)* — The extracted slice image.
 
 ---
 
@@ -270,7 +270,7 @@ Extract all three orthogonal slices at a given RAS point.
 
 **Returns:**
 
-- *QVector&lt; MriSliceImage &gt;* — Vector of three `MriSliceImage` (axial, coronal, sagittal).
+- *QVector&lt; [MriSliceImage](/docs/api/mri/mri-slice-image) &gt;* — Vector of three [`MriSliceImage`](/docs/api/mri/mri-slice-image) (axial, coronal, sagittal).
 
 ---
 

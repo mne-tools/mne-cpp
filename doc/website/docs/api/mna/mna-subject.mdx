@@ -1,0 +1,78 @@
+---
+id: mna-subject
+title: "MNALIB::MnaSubject"
+sidebar_label: MnaSubject
+sidebar_position: 19
+---
+
+# MnaSubject
+
+**Namespace:** `MNALIB` &nbsp;·&nbsp; **Library:** MNA Library
+
+`#include <mna/mna_subject.h>`
+
+```cpp
+struct MNALIB::MnaSubject
+```
+
+Represents a subject (participant) in the project.
+
+---
+
+## Public Methods
+
+### toJson()
+
+Serialize to QJsonObject.
+
+**Returns:**
+
+- *QJsonObject* — JSON object with the subject id, FreeSurfer directory, sessions and preserved extras.
+
+---
+
+### toCbor()
+
+Serialize to QCborMap.
+
+**Returns:**
+
+- *QCborMap* — CBOR map with the subject id, FreeSurfer directory, sessions and preserved extras.
+
+---
+
+## Static Methods
+
+### fromJson(json)
+
+Deserialize from QJsonObject.
+
+**Parameters:**
+
+- **json** : *const QJsonObject &*
+  JSON object as produced by `toJson()`.
+
+**Returns:**
+
+- *[MnaSubject](/docs/api/mna/mna-subject)* — The subject; missing keys take default values and unknown keys go to extras.
+
+---
+
+### fromCbor(cbor)
+
+Deserialize from QCborMap.
+
+**Parameters:**
+
+- **cbor** : *const QCborMap &*
+  CBOR map as produced by `toCbor()`.
+
+**Returns:**
+
+- *[MnaSubject](/docs/api/mna/mna-subject)* — The subject; missing keys take default values and unknown keys go to extras.
+
+---
+
+## Authors of this file
+
+- Christoph Dinh &lt;christoph.dinh@mne-cpp.org&gt;

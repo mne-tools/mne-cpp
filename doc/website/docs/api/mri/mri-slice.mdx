@@ -1,0 +1,36 @@
+---
+id: mri-slice
+title: "MRILIB::MriSlice"
+sidebar_label: MriSlice
+sidebar_position: 7
+---
+
+# MriSlice
+
+**Namespace:** `MRILIB` &nbsp;·&nbsp; **Library:** MRI Library
+
+`#include <mri/mri_vol_data.h>`
+
+```cpp
+struct MRILIB::MriSlice
+```
+
+Single 2D MRI slice (pixels + slice→RAS transform) used as the volume's storage unit.
+
+Mirrors the on-disk `FIFFB_MRI_SLICE` record so that round-tripping through COR.fif is lossless: each slice owns its pixel buffer in the source's native `FIFFV_MRI_PIXEL_BYTE` / `_WORD` / `_FLOAT` encoding, its width/height in pixels and millimetres, and an explicit [`FiffCoordTrans`](/docs/api/fiff/fiff-coord-trans) mapping slice (column, row) to MRI surface RAS. The slicing pipeline and the COR.fif writer consume slices directly  every format-specific loader (MGH, NIfTI, raw COR) builds its volume as a vector of these.
+
+Ported from `mriSliceRec` in the original [MNE](/docs/api/mne/mne-class) C `mne_make_cor_set`.
+
+---
+
+## Public Methods
+
+### MriSlice()
+
+Default constructor.
+
+---
+
+## Authors of this file
+
+- Christoph Dinh &lt;christoph.dinh@mne-cpp.org&gt;

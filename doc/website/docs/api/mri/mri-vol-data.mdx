@@ -15,9 +15,9 @@ sidebar_position: 6
 class MRILIB::MriVolData
 ```
 
-Format-agnostic 3D MRI volume: header geometry, voxel buffer (as a vector of `MriSlice`), scan parameters and provenance.
+Format-agnostic 3D MRI volume: header geometry, voxel buffer (as a vector of [`MriSlice`](/docs/api/mri/mri-slice)), scan parameters and provenance.
 
-The volume is the single in-memory representation every consumer in mne-cpp operates on, regardless of whether it was loaded from MGH/MGZ, NIfTI-1 or a FreeSurfer COR directory. Storage is decomposed into a vector of `MriSlice` so the COR.fif writer can serialise without an intermediate copy, while the slice viewer and the BEM coregistration step both index it through the same (column, row, slice) coordinate.
+The volume is the single in-memory representation every consumer in mne-cpp operates on, regardless of whether it was loaded from MGH/MGZ, NIfTI-1 or a FreeSurfer COR directory. Storage is decomposed into a vector of [`MriSlice`](/docs/api/mri/mri-slice) so the COR.fif writer can serialise without an intermediate copy, while the slice viewer and the BEM coregistration step both index it through the same (column, row, slice) coordinate.
 
 The header captures FreeSurfer's MGH conventions: voxel sizes (`spacingX/Y/Z`), direction cosines (`Mdc`, column-major), centre RAS (`c_ras`) and voxel data type (`MRI_UCHAR` / `MRI_INT` / `MRI_FLOAT` / `MRI_SHORT`). Optional scan parameters (TR, flip angle, TE, TI, FoV) and tags (Talairach transform path, provenance) round out the structure. The ``read()`` entry point dispatches on the file extension so callers do not need to branch on format.
 

@@ -1,0 +1,78 @@
+---
+id: mna-file-ref
+title: "MNALIB::MnaFileRef"
+sidebar_label: MnaFileRef
+sidebar_position: 9
+---
+
+# MnaFileRef
+
+**Namespace:** `MNALIB` &nbsp;·&nbsp; **Library:** MNA Library
+
+`#include <mna/mna_file_ref.h>`
+
+```cpp
+struct MNALIB::MnaFileRef
+```
+
+A reference to a file within an MNA project.
+
+---
+
+## Public Methods
+
+### toJson()
+
+Serialize to QJsonObject.
+
+**Returns:**
+
+- *QJsonObject* — JSON object with all fields and preserved extras; embedded data is Base64-encoded.
+
+---
+
+### toCbor()
+
+Serialize to QCborMap.
+
+**Returns:**
+
+- *QCborMap* — CBOR map with all fields and preserved extras; embedded data is stored as a byte string.
+
+---
+
+## Static Methods
+
+### fromJson(json)
+
+Deserialize from QJsonObject.
+
+**Parameters:**
+
+- **json** : *const QJsonObject &*
+  JSON object as produced by `toJson()`.
+
+**Returns:**
+
+- *[MnaFileRef](/docs/api/mna/mna-file-ref)* — The file reference; missing keys take default values and unknown keys go to extras.
+
+---
+
+### fromCbor(cbor)
+
+Deserialize from QCborMap.
+
+**Parameters:**
+
+- **cbor** : *const QCborMap &*
+  CBOR map as produced by `toCbor()`.
+
+**Returns:**
+
+- *[MnaFileRef](/docs/api/mna/mna-file-ref)* — The file reference; missing keys take default values and unknown keys go to extras.
+
+---
+
+## Authors of this file
+
+- Christoph Dinh &lt;christoph.dinh@mne-cpp.org&gt;

@@ -49,7 +49,7 @@ const INVLIB::InvSourceEstimate random = simulateStc((VectorXi(1) << 102).finish
 ### simulateStc(activeVertices, allVertices, params)
 
 ```cpp
-[InvSourceEstimate](/docs/api/inv/inv-source-estimate) simulateStc(const Eigen::VectorXi & activeVertices, const Eigen::VectorXi & allVertices, const SimulateStcParams & params);
+[InvSourceEstimate](/docs/api/inv/inv-source-estimate) simulateStc(const Eigen::VectorXi & activeVertices, const Eigen::VectorXi & allVertices, const [SimulateStcParams](/docs/api/dsp/simulate-stc-params) & params);
 ```
 
 Create a synthetic source time course.
@@ -64,7 +64,7 @@ Generates an [InvSourceEstimate](/docs/api/inv/inv-source-estimate) with Gaussia
 - **allVertices** : *const Eigen::VectorXi &*
   Full vertex index vector for the source space.
 
-- **params** : *const SimulateStcParams &*
+- **params** : *const [SimulateStcParams](/docs/api/dsp/simulate-stc-params) &*
   Simulation parameters (sfreq, tmin, duration).
 
 **Returns:**

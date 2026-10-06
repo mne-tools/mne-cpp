@@ -63,7 +63,7 @@ Segments the data matrix into non-overlapping (or overlapping) epochs of the spe
 
 **Returns:**
 
-- *QList&lt; FiffEpochData &gt;* — List of epoch data structures.
+- *QList&lt; [FiffEpochData](/docs/api/fiff/fiff-epoch-data) &gt;* — List of epoch data structures.
 
 ---
 
@@ -73,12 +73,12 @@ Concatenate multiple epoch sets into a single list.
 
 **Parameters:**
 
-- **epochSets** : *const QList&lt; QList&lt; FiffEpochData &gt; &gt; &*
+- **epochSets** : *const QList&lt; QList&lt; [FiffEpochData](/docs/api/fiff/fiff-epoch-data) &gt; &gt; &*
   List of epoch sets to concatenate.
 
 **Returns:**
 
-- *QList&lt; FiffEpochData &gt;* — Combined list of all epochs.
+- *QList&lt; [FiffEpochData](/docs/api/fiff/fiff-epoch-data) &gt;* — Combined list of all epochs.
 
 ---
 
@@ -90,7 +90,7 @@ All epochs must have the same dimensions. Returns a [`FiffEvoked`](/docs/api/fif
 
 **Parameters:**
 
-- **epochs** : *const QList&lt; FiffEpochData &gt; &*
+- **epochs** : *const QList&lt; [FiffEpochData](/docs/api/fiff/fiff-epoch-data) &gt; &*
   List of epochs.
 
 - **dSFreq** : *double*
@@ -113,7 +113,7 @@ Convenience method to get a list of data matrices from epoch structures, suitabl
 
 **Parameters:**
 
-- **epochs** : *const QList&lt; FiffEpochData &gt; &*
+- **epochs** : *const QList&lt; [FiffEpochData](/docs/api/fiff/fiff-epoch-data) &gt; &*
   List of epoch data.
 
 **Returns:**

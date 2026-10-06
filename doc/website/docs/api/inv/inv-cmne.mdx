@@ -55,12 +55,12 @@ Compute CMNE inverse solution.
 - **matSrcCov** : *const Eigen::MatrixXd &*
   Source covariance (n_sources x n_sources, diagonal).
 
-- **settings** : *const InvCMNESettings &*
+- **settings** : *const [InvCMNESettings](/docs/api/inv/inv-cmne-settings) &*
   CMNE settings.
 
 **Returns:**
 
-- *InvCMNEResult* — `InvCMNEResult` containing dSPM and CMNE source estimates.
+- *[InvCMNEResult](/docs/api/inv/inv-cmne-result)* — [`InvCMNEResult`](/docs/api/inv/inv-cmne-result) containing dSPM and CMNE source estimates.
 
 ---
 
@@ -150,7 +150,7 @@ This is a convenience wrapper that calls `scripts/ml/training/train_cmne_lstm.py
 - **outOnnxPath** : *const QString &*
   Desired output path for the ONNX model.
 
-- **settings** : *const InvCMNESettings &*
+- **settings** : *const [InvCMNESettings](/docs/api/inv/inv-cmne-settings) &*
   CMNE settings (look-back, method, SNR are forwarded).
 
 - **gtStcPrefix** : *const QString &*
@@ -179,7 +179,7 @@ This is a convenience wrapper that calls `scripts/ml/training/train_cmne_lstm.py
 
 **Returns:**
 
-- *UTILSLIB::PythonRunnerResult* — PythonRunnerResult with exit code, captured output and progress.
+- *[PythonRunnerResult](/docs/api/utils/python-runner-result)* — PythonRunnerResult with exit code, captured output and progress.
 
 ---
 

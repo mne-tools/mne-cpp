@@ -1,0 +1,40 @@
+---
+id: pick-result
+title: "PickResult"
+sidebar_label: PickResult
+sidebar_position: 13
+---
+
+# PickResult
+
+**Namespace:** `DISP3DLIB` &nbsp;·&nbsp; **Library:** 3D Display Library
+
+`#include <disp3D/raypicker.h>`
+
+```cpp
+struct PickResult
+```
+
+Result of a ray–mesh intersection test containing the hit point, triangle index, and distance.
+
+Describes the result of a ray-pick operation.
+
+---
+
+## Public Methods
+
+### displayLabel()
+
+Build a human-readable display label for the hit object.
+
+Includes annotation region, sensor name, BEM compartment, etc.
+
+**Returns:**
+
+- *QString* — Display label string, empty if no hit.
+
+---
+
+## Authors of this file
+
+- Christoph Dinh &lt;christoph.dinh@mne-cpp.org&gt;

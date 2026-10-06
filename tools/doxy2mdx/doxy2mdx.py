@@ -973,7 +973,7 @@ def generate_class_mdx(compounddef,
     if tparams:
         tps = [f"{a} = {b}" if b else a for a, b in tparams]
         lines.append(f"template <{', '.join(tps)}>")
-    lines.append(f"class {compound_name}")
+    lines.append(f"{compounddef.get('kind', 'class')} {compound_name}")
     lines.append("```")
     lines.append("")
 
@@ -2028,12 +2028,14 @@ def main(argv: Optional[List[str]] = None) -> int:
     found_qualified: set = set()
     generated: List[Path] = []
     warnings = 0
+    type_names = {c.findtext("name", "").strip() for c in index_root.findall("compound")
+                  if c.get("kind") in ("class", "struct")}
 
     for compound in index_root.findall("compound"):
-        if compound.get("kind") != "class":
+        if compound.get("kind") not in ("class", "struct"):
             continue
         name = compound.findtext("name", "").strip()
-        if not name:
+        if not name or "::" in name and name.rsplit("::", 1)[0] in type_names:
             continue
         if only is not None and name not in only:
             continue

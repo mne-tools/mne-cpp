@@ -216,7 +216,7 @@ For each category in the description, matching events are epoched from the raw d
 - **raw** : *const [FiffRawData](/docs/api/fiff/fiff-raw-data) &*
   The raw data.
 
-- **desc** : *const AverageDescription &*
+- **desc** : *const [AverageDescription](/docs/api/fiff/average-description) &*
   The averaging description (categories, rejection, etc.).
 
 - **events** : *const Eigen::MatrixXi &*
@@ -246,7 +246,7 @@ Check whether an epoch passes artifact rejection criteria.
 - **bads** : *const QStringList &*
   List of bad channel names.
 
-- **rej** : *const RejectionParams &*
+- **rej** : *const [RejectionParams](/docs/api/fiff/rejection-params) &*
   Rejection parameters.
 
 - **reason** : *QString &*

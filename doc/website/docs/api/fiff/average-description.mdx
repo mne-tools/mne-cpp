@@ -1,0 +1,30 @@
+---
+id: average-description
+title: "FIFFLIB::AverageDescription"
+sidebar_label: AverageDescription
+sidebar_position: 34
+---
+
+# AverageDescription
+
+**Namespace:** `FIFFLIB` &nbsp;·&nbsp; **Library:** FIFF Library
+
+`#include <fiff/fiff_evoked_set.h>`
+
+```cpp
+struct FIFFLIB::AverageDescription
+```
+
+Top-level MNE-C ave-description record: comment, category list, shared rejection limits and output file paths.
+
+Port of `aveDataRec` from MNE-C `browser_types.h`. Owns the list of [`AverageCategory`](/docs/api/fiff/average-category) entries, the shared [`RejectionParams`](/docs/api/fiff/rejection-params), the skew-correction flag and the I/O paths (output ave file, event source, log file) so an entire batch-averaging job can be described as one value.
+
+---
+
+## Authors of this file
+
+- Christoph Dinh &lt;christoph.dinh@mne-cpp.org&gt;
+- Florian Schlembach &lt;fschlembach@web.de&gt;
+- Lorenz Esch &lt;lorenz.esch@tu-ilmenau.de&gt;
+- Gabriel Motta &lt;gabrielbenmotta@gmail.com&gt;
+- Juan GPC &lt;jgarciaprieto@mgh.harvard.edu&gt;

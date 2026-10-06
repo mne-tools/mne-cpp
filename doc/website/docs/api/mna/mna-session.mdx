@@ -1,0 +1,78 @@
+---
+id: mna-session
+title: "MNALIB::MnaSession"
+sidebar_label: MnaSession
+sidebar_position: 18
+---
+
+# MnaSession
+
+**Namespace:** `MNALIB` &nbsp;·&nbsp; **Library:** MNA Library
+
+`#include <mna/mna_session.h>`
+
+```cpp
+struct MNALIB::MnaSession
+```
+
+Groups recordings belonging to one measurement session.
+
+---
+
+## Public Methods
+
+### toJson()
+
+Serialize to QJsonObject.
+
+**Returns:**
+
+- *QJsonObject* — JSON object with the session id, its recordings and preserved extras.
+
+---
+
+### toCbor()
+
+Serialize to QCborMap.
+
+**Returns:**
+
+- *QCborMap* — CBOR map with the session id, its recordings and preserved extras.
+
+---
+
+## Static Methods
+
+### fromJson(json)
+
+Deserialize from QJsonObject.
+
+**Parameters:**
+
+- **json** : *const QJsonObject &*
+  JSON object as produced by `toJson()`.
+
+**Returns:**
+
+- *[MnaSession](/docs/api/mna/mna-session)* — The session; missing keys take default values and unknown keys go to extras.
+
+---
+
+### fromCbor(cbor)
+
+Deserialize from QCborMap.
+
+**Parameters:**
+
+- **cbor** : *const QCborMap &*
+  CBOR map as produced by `toCbor()`.
+
+**Returns:**
+
+- *[MnaSession](/docs/api/mna/mna-session)* — The session; missing keys take default values and unknown keys go to extras.
+
+---
+
+## Authors of this file
+
+- Christoph Dinh &lt;christoph.dinh@mne-cpp.org&gt;

@@ -1,0 +1,48 @@
+---
+id: mna-script
+title: "MNALIB::MnaScript"
+sidebar_label: MnaScript
+sidebar_position: 17
+---
+
+# MnaScript
+
+**Namespace:** `MNALIB` &nbsp;·&nbsp; **Library:** MNA Library
+
+`#include <mna/mna_script.h>`
+
+```cpp
+struct MNALIB::MnaScript
+```
+
+Inline script definition embedded in an [`MnaNode`](/docs/api/mna/mna-node).
+
+When the node's execMode is Script, the executor writes the code to a temporary file, invokes the interpreter, and captures the results.
+
+Inline interpreter-launched source code carried by a Script-mode [`MnaNode`](/docs/api/mna/mna-node).
+
+---
+
+## Public Methods
+
+### toJson()
+
+---
+
+### toCbor()
+
+---
+
+## Static Methods
+
+### fromJson(json)
+
+---
+
+### fromCbor(cbor)
+
+---
+
+## Authors of this file
+
+- Christoph Dinh &lt;christoph.dinh@mne-cpp.org&gt;

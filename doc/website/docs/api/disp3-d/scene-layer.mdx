@@ -1,0 +1,28 @@
+---
+id: scene-layer
+title: "DISP3DLIB::SceneLayer"
+sidebar_label: SceneLayer
+sidebar_position: 14
+---
+
+# SceneLayer
+
+**Namespace:** `DISP3DLIB` &nbsp;·&nbsp; **Library:** 3D Display Library
+
+`#include <disp3D/multimodalscene.h>`
+
+```cpp
+struct DISP3DLIB::SceneLayer
+```
+
+Opaque, type-erased handle to a layer payload.
+
+The payload is owned by the caller (e.g. the plugin that loaded the data) and supplied as a `std::shared_ptr<void>` so the scene neither owns nor inspects it. The scene only needs the `DISP3DLIB::SceneLayer::kind` "kind", the `id`, and the generic visibility / opacity flags to drive draw order; the renderer downcasts the payload by `DISP3DLIB::SceneLayer::kind` "kind".
+
+This indirection keeps `disp3D/scene/` free of QRhi includes and means new renderables (sEEG, ECoG, future fNIRS optodes, …) plug in without touching this header.
+
+---
+
+## Authors of this file
+
+- Christoph Dinh &lt;christoph.dinh@mne-cpp.org&gt;

@@ -57,7 +57,13 @@ const apiSidebar: SidebarsConfig['apiSidebar'] = [
         'api/fiff/fiff-tag',
         'api/fiff/fiff-time',
         'api/fiff/fiff-evoked-set',
-        'api/fiff/fiff-io'
+        'api/fiff/fiff-io',
+        'api/fiff/average-category',
+        'api/fiff/average-description',
+        'api/fiff/fiff-annotation',
+        'api/fiff/fiff-epoch-data',
+        'api/fiff/fiff-explain-entry',
+        'api/fiff/rejection-params'
       ],
     },
     {
@@ -123,7 +129,16 @@ const apiSidebar: SidebarsConfig['apiSidebar'] = [
         'api/mne/mne-surface-or-volume',
         'api/mne/mne-surface-patch',
         'api/mne/mne-triangle',
-        'api/mne/mne-vol-geom'
+        'api/mne/mne-vol-geom',
+        'api/mne/artifact-rejection-data',
+        'api/mne/cov-definition',
+        'api/mne/cov-description',
+        'api/mne/filter-settings',
+        'api/mne/processing-settings',
+        'api/mne/region-data',
+        'api/mne/region-data-out',
+        'api/mne/region-mt',
+        'api/mne/region-mt-out'
       ],
     },
     {
@@ -145,7 +160,8 @@ const apiSidebar: SidebarsConfig['apiSidebar'] = [
         'api/fwd/fwd-eeg-sphere-layer',
         'api/fwd/fwd-eeg-sphere-model-set',
         'api/fwd/fwd-field-map',
-        'api/fwd/fwd-thread-arg'
+        'api/fwd/fwd-thread-arg',
+        'api/fwd/fit-user-rec'
       ],
     },
     {
@@ -189,7 +205,27 @@ const apiSidebar: SidebarsConfig['apiSidebar'] = [
         'api/inv/inv-pwl-rap-music',
         'api/inv/inv-sensor-set',
         'api/inv/inv-sensor-set-creator',
-        'api/inv/inv-signal-model'
+        'api/inv/inv-signal-model',
+        'api/inv/coil-param',
+        'api/inv/dip-fit-error',
+        'api/inv/fit-dip-user-rec',
+        'api/inv/hpi-sort-struct',
+        'api/inv/hpi-fit-result',
+        'api/inv/inv-cmne-result',
+        'api/inv/inv-cmne-settings',
+        'api/inv/inv-connectivity',
+        'api/inv/inv-dipole-pair',
+        'api/inv/inv-focal-dipole',
+        'api/inv/inv-gamma-map-result',
+        'api/inv/inv-mxne-result',
+        'api/inv/inv-source-coupling',
+        'api/inv/inv-tf-mxne-params',
+        'api/inv/inv-tf-mxne-result',
+        'api/inv/inv-token',
+        'api/inv/inv-tokenize-options',
+        'api/inv/pair',
+        'api/inv/trap-music-dipole',
+        'api/inv/dipole-fit-funcs-rec'
       ],
     },
     {
@@ -238,7 +274,32 @@ const apiSidebar: SidebarsConfig['apiSidebar'] = [
         'api/dsp/rt-inv-op',
         'api/dsp/rt-inv-op-worker',
         'api/dsp/rt-noise',
-        'api/dsp/rt-noise-worker'
+        'api/dsp/rt-noise-worker',
+        'api/dsp/filter-object',
+        'api/dsp/rt-cov-compute-result',
+        'api/dsp/rt-inv-op-input',
+        'api/dsp/annotate-amplitude-params',
+        'api/dsp/annotate-muscl-params',
+        'api/dsp/bad-channels-maxwell-params',
+        'api/dsp/bad-channels-maxwell-result',
+        'api/dsp/bridged-electrode-params',
+        'api/dsp/filter-chpi-params',
+        'api/dsp/fine-cal-entry',
+        'api/dsp/head-pos-entry',
+        'api/dsp/ica-result',
+        'api/dsp/iir-biquad',
+        'api/dsp/infomax-result',
+        'api/dsp/lof-bad-channel-params',
+        'api/dsp/maxwell-move-comp-params',
+        'api/dsp/morlet-tfr-result',
+        'api/dsp/multitaper-psd-result',
+        'api/dsp/multitaper-tfr-result',
+        'api/dsp/peak-finder-params',
+        'api/dsp/sss-params',
+        'api/dsp/simulate-stc-params',
+        'api/dsp/surface-laplacian-result',
+        'api/dsp/welch-psd-result',
+        'api/dsp/xdawn-result'
       ],
     },
     {
@@ -267,7 +328,8 @@ const apiSidebar: SidebarsConfig['apiSidebar'] = [
         'api/connectivity/network-edge',
         'api/connectivity/network-node',
         'api/connectivity/unbiased-squared-phase-lag-index',
-        'api/connectivity/weighted-phase-lag-index'
+        'api/connectivity/weighted-phase-lag-index',
+        'api/connectivity/visualization-info'
       ],
     },
     {
@@ -280,7 +342,8 @@ const apiSidebar: SidebarsConfig['apiSidebar'] = [
         'api/decoding/decoding-csp',
         'api/decoding/decoding-spoc',
         'api/decoding/decoding-ssd',
-        'api/decoding/ml-ica-label'
+        'api/decoding/ml-ica-label',
+        'api/decoding/ica-label-result'
       ],
     },
     {
@@ -309,7 +372,10 @@ const apiSidebar: SidebarsConfig['apiSidebar'] = [
         'api/sts/stats-ftest',
         'api/sts/stats-mc-correction',
         'api/sts/stats-source-metrics',
-        'api/sts/stats-ttest'
+        'api/sts/stats-ttest',
+        'api/sts/stats-cluster-result',
+        'api/sts/stats-ftest-result',
+        'api/sts/stats-ttest-result'
       ],
     },
     {
@@ -340,7 +406,8 @@ const apiSidebar: SidebarsConfig['apiSidebar'] = [
         'api/math/linalg',
         'api/math/simplex-algorithm',
         'api/math/warp',
-        'api/math/sphere'
+        'api/math/sphere',
+        'api/math/fit-user'
       ],
     },
     {
@@ -355,7 +422,9 @@ const apiSidebar: SidebarsConfig['apiSidebar'] = [
         'api/mri/mri-mgh-io',
         'api/mri/mri-nifti-io',
         'api/mri/mri-slicer',
-        'api/mri/mri-vol-data'
+        'api/mri/mri-vol-data',
+        'api/mri/mri-slice',
+        'api/mri/mri-slice-image'
       ],
     },
     {
@@ -370,7 +439,15 @@ const apiSidebar: SidebarsConfig['apiSidebar'] = [
         'api/bids/abstract-format-reader',
         'api/bids/bids-tsv',
         'api/bids/brain-vision-reader',
-        'api/bids/edf-reader'
+        'api/bids/edf-reader',
+        'api/bids/bids-channel',
+        'api/bids/bids-coordinate-system',
+        'api/bids/bids-dataset-description',
+        'api/bids/bids-electrode',
+        'api/bids/bids-event',
+        'api/bids/brain-vision-channel-info',
+        'api/bids/brain-vision-marker',
+        'api/bids/edf-channel-info'
       ],
     },
     {
@@ -409,7 +486,23 @@ const apiSidebar: SidebarsConfig['apiSidebar'] = [
         'api/utils/selection-io',
         'api/utils/spectral',
         'api/utils/spectrogram',
-        'api/utils/subject'
+        'api/utils/subject',
+        'api/utils/artifact-detect-ecg-params',
+        'api/utils/artifact-detect-eog-params',
+        'api/utils/bad-channel-detect-params',
+        'api/utils/csd-result',
+        'api/utils/derivation-rule',
+        'api/utils/digitized-point',
+        'api/utils/dpss-result',
+        'api/utils/electrode-position',
+        'api/utils/epoch-extractor-params',
+        'api/utils/fastrak-sample',
+        'api/utils/polhemus-serial-config',
+        'api/utils/python-runner-config',
+        'api/utils/python-runner-result',
+        'api/utils/report-section',
+        'api/utils/spectogram-input-data',
+        'api/utils/tapered-spectra-input-data'
       ],
     },
     {
@@ -438,7 +531,21 @@ const apiSidebar: SidebarsConfig['apiSidebar'] = [
         'api/mna/mna-op-schema',
         'api/mna/mna-param-tree',
         'api/mna/mna-project',
-        'api/mna/mna-registry-loader'
+        'api/mna/mna-registry-loader',
+        'api/mna/mna-file-ref',
+        'api/mna/mna-node',
+        'api/mna/mna-op-schema-attr',
+        'api/mna/mna-op-schema-port',
+        'api/mna/mna-param-binding',
+        'api/mna/mna-port',
+        'api/mna/mna-provenance',
+        'api/mna/mna-recording',
+        'api/mna/mna-script',
+        'api/mna/mna-session',
+        'api/mna/mna-subject',
+        'api/mna/mna-verification',
+        'api/mna/mna-verification-check',
+        'api/mna/mna-verification-result'
       ],
     },
     {
@@ -513,7 +620,10 @@ const apiSidebar: SidebarsConfig['apiSidebar'] = [
         'api/disp/t-fplot',
         'api/disp/tf-settings-view',
         'api/disp/time-ruler-widget',
-        'api/disp/trigger-detection-view'
+        'api/disp/trigger-detection-view',
+        'api/disp/channel-display-info',
+        'api/disp/time-ruler-event-mark',
+        'api/disp/time-ruler-reference-mark'
       ],
     },
     {
@@ -532,7 +642,11 @@ const apiSidebar: SidebarsConfig['apiSidebar'] = [
         'api/disp3-d/rt-source-data-worker',
         'api/disp3-d/rt-source-interpolation-mat-worker',
         'api/disp3-d/slice-object',
-        'api/disp3-d/video-overlay'
+        'api/disp3-d/video-overlay',
+        'api/disp3-d/electrode-array',
+        'api/disp3-d/electrode-contact',
+        'api/disp3-d/pick-result',
+        'api/disp3-d/scene-layer'
       ],
     }
 ];

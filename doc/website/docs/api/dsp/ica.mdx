@@ -53,7 +53,7 @@ Fit FastICA on the given data matrix.
 
 **Returns:**
 
-- *IcaResult* — `IcaResult` containing mixing/unmixing matrices and source time series.
+- *[IcaResult](/docs/api/dsp/ica-result)* — [`IcaResult`](/docs/api/dsp/ica-result) containing mixing/unmixing matrices and source time series.
 
 ---
 
@@ -68,7 +68,7 @@ The same mean centering as during fitting is applied.
 - **matData** : *const Eigen::MatrixXd &*
   New data (n_channels x n_samples), same channel order as training data.
 
-- **result** : *const IcaResult &*
+- **result** : *const [IcaResult](/docs/api/dsp/ica-result) &*
   Result from a previous `ICA::run()` call.
 
 **Returns:**
@@ -88,7 +88,7 @@ The excluded component(s) are zeroed in source space before back-projection.
 - **matData** : *const Eigen::MatrixXd &*
   Original sensor data (n_channels x n_samples).
 
-- **result** : *const IcaResult &*
+- **result** : *const [IcaResult](/docs/api/dsp/ica-result) &*
   Result from `ICA::run()` on matData (or a representative segment).
 
 - **excludedComponents** : *const QVector&lt; int &gt; &*

@@ -17,7 +17,7 @@ class MLLIB::MLTrainer
 
 Launches Python training scripts via [`PythonRunner`](/docs/api/utils/python-runner) with automatic venv handling and prerequisite checks.
 
-Training logic (PyTorch, scikit-learn, MNE-Python, …) lives entirely in the ``.py scripts under `scripts/ml/training/` and runs in a child process; no Python embedding or `libpython` linkage is required. If the configured `UTILSLIB::PythonRunnerConfig` carries a `venvDir`, the runner creates and updates the venv before each script invocation so dependencies are pinned per training job.
+Training logic (PyTorch, scikit-learn, MNE-Python, …) lives entirely in the ``.py scripts under `scripts/ml/training/` and runs in a child process; no Python embedding or `libpython` linkage is required. If the configured [`[PythonRunnerConfig](/docs/api/utils/python-runner-config)`](/docs/api/utils/python-runner-config) carries a `venvDir`, the runner creates and updates the venv before each script invocation so dependencies are pinned per training job.
 
 ```cpp title="src/examples/ex_ml/main.cpp"
 QTemporaryDir dir;
@@ -44,7 +44,7 @@ Construct an [`MLTrainer`](/docs/api/ml/ml-trainer) with explicit [PythonRunner]
 
 **Parameters:**
 
-- **config** : *const UTILSLIB::PythonRunnerConfig &*
+- **config** : *const [PythonRunnerConfig](/docs/api/utils/python-runner-config) &*
   PythonRunner configuration to use.
 
 ---
@@ -75,7 +75,7 @@ If the [PythonRunner](/docs/api/utils/python-runner) is configured with a venvDi
 
 **Returns:**
 
-- *UTILSLIB::PythonRunnerResult* — PythonRunnerResult with exit code, output, and progress.
+- *[PythonRunnerResult](/docs/api/utils/python-runner-result)* — PythonRunnerResult with exit code, output, and progress.
 
 ---
 

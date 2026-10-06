@@ -1,0 +1,30 @@
+---
+id: average-category
+title: "FIFFLIB::AverageCategory"
+sidebar_label: AverageCategory
+sidebar_position: 33
+---
+
+# AverageCategory
+
+**Namespace:** `FIFFLIB` &nbsp;·&nbsp; **Library:** FIFF Library
+
+`#include <fiff/fiff_evoked_set.h>`
+
+```cpp
+struct FIFFLIB::AverageCategory
+```
+
+One averaging category in an MNE-C ave-description file: trigger logic, timing window, baseline interval and display color.
+
+Port of `aveCategRec` from MNE-C `browser_types.h`. Describes one condition the batch averager produces: which trigger event (with required previous / following events and ignore masks), the epoch time window (`tmin` / `tmax`), the optional baseline interval, and the post-processing flags (baseline correction, std-error vs. average, absolute values).
+
+---
+
+## Authors of this file
+
+- Christoph Dinh &lt;christoph.dinh@mne-cpp.org&gt;
+- Florian Schlembach &lt;fschlembach@web.de&gt;
+- Lorenz Esch &lt;lorenz.esch@tu-ilmenau.de&gt;
+- Gabriel Motta &lt;gabrielbenmotta@gmail.com&gt;
+- Juan GPC &lt;jgarciaprieto@mgh.harvard.edu&gt;

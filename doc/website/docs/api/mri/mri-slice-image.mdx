@@ -1,0 +1,26 @@
+---
+id: mri-slice-image
+title: "MRILIB::MriSliceImage"
+sidebar_label: MriSliceImage
+sidebar_position: 8
+---
+
+# MriSliceImage
+
+**Namespace:** `MRILIB` &nbsp;·&nbsp; **Library:** MRI Library
+
+`#include <mri/mri_slicer.h>`
+
+```cpp
+struct MRILIB::MriSliceImage
+```
+
+Single 2D MRI cross-section produced by [`MriSlicer`](/docs/api/mri/mri-slicer) (pixel buffer + RAS metadata).
+
+Carries one orthogonal-plane sample of a 3D [`MriVolData`](/docs/api/mri/mri-vol-data) ready for upload to the slice viewer: a normalised 8-bit grayscale pixel buffer, the in-volume slice index it was sampled at, and the bookkeeping the widget needs to map mouse picks back to RAS millimetres.
+
+---
+
+## Authors of this file
+
+- Christoph Dinh &lt;christoph.dinh@mne-cpp.org&gt;

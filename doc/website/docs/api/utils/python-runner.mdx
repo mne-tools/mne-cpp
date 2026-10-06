@@ -74,7 +74,7 @@ Construct a [`PythonRunner`](/docs/api/utils/python-runner) with explicit config
 
 **Parameters:**
 
-- **config** : *const PythonRunnerConfig &*
+- **config** : *const [PythonRunnerConfig](/docs/api/utils/python-runner-config) &*
   Execution configuration.
 
 - **pParent** : *QObject **
@@ -88,7 +88,7 @@ Set the configuration.
 
 **Parameters:**
 
-- **config** : *const PythonRunnerConfig &*
+- **config** : *const [PythonRunnerConfig](/docs/api/utils/python-runner-config) &*
   Execution configuration.
 
 ---
@@ -99,7 +99,7 @@ Get the current configuration.
 
 **Returns:**
 
-- *const PythonRunnerConfig &* — Current configuration.
+- *const [PythonRunnerConfig](/docs/api/utils/python-runner-config) &* — Current configuration.
 
 ---
 
@@ -141,7 +141,7 @@ Run a Python script synchronously.
 
 **Returns:**
 
-- *PythonRunnerResult* — `PythonRunnerResult` with exit code, output, and progress.
+- *[PythonRunnerResult](/docs/api/utils/python-runner-result)* — [`PythonRunnerResult`](/docs/api/utils/python-runner-result) with exit code, output, and progress.
 
 ---
 
@@ -159,7 +159,7 @@ Run a Python one-liner synchronously (`python -c "..."`).
 
 **Returns:**
 
-- *PythonRunnerResult* — `PythonRunnerResult`.
+- *[PythonRunnerResult](/docs/api/utils/python-runner-result)* — [`PythonRunnerResult`](/docs/api/utils/python-runner-result).
 
 ---
 
@@ -217,7 +217,7 @@ On success, updates the internal config so that subsequent `run()`/runCode() cal
 
 **Returns:**
 
-- *PythonRunnerResult* — `PythonRunnerResult` describing the venv setup outcome.
+- *[PythonRunnerResult](/docs/api/utils/python-runner-result)* — [`PythonRunnerResult`](/docs/api/utils/python-runner-result) describing the venv setup outcome.
 
 ---
 
@@ -237,7 +237,7 @@ Equivalent to calling `ensureVenv()` + `run()`, but returns early with an error 
 
 **Returns:**
 
-- *PythonRunnerResult* — `PythonRunnerResult`.
+- *[PythonRunnerResult](/docs/api/utils/python-runner-result)* — [`PythonRunnerResult`](/docs/api/utils/python-runner-result).
 
 ---
 

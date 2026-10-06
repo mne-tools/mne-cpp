@@ -1,0 +1,78 @@
+---
+id: mna-recording
+title: "MNALIB::MnaRecording"
+sidebar_label: MnaRecording
+sidebar_position: 16
+---
+
+# MnaRecording
+
+**Namespace:** `MNALIB` &nbsp;·&nbsp; **Library:** MNA Library
+
+`#include <mna/mna_recording.h>`
+
+```cpp
+struct MNALIB::MnaRecording
+```
+
+Groups files belonging to one recording run.
+
+---
+
+## Public Methods
+
+### toJson()
+
+Serialize to QJsonObject.
+
+**Returns:**
+
+- *QJsonObject* — JSON object with the recording id, its file references and preserved extras.
+
+---
+
+### toCbor()
+
+Serialize to QCborMap.
+
+**Returns:**
+
+- *QCborMap* — CBOR map with the recording id, its file references and preserved extras.
+
+---
+
+## Static Methods
+
+### fromJson(json)
+
+Deserialize from QJsonObject.
+
+**Parameters:**
+
+- **json** : *const QJsonObject &*
+  JSON object as produced by `toJson()`.
+
+**Returns:**
+
+- *[MnaRecording](/docs/api/mna/mna-recording)* — The recording; missing keys take default values and unknown keys go to extras.
+
+---
+
+### fromCbor(cbor)
+
+Deserialize from QCborMap.
+
+**Parameters:**
+
+- **cbor** : *const QCborMap &*
+  CBOR map as produced by `toCbor()`.
+
+**Returns:**
+
+- *[MnaRecording](/docs/api/mna/mna-recording)* — The recording; missing keys take default values and unknown keys go to extras.
+
+---
+
+## Authors of this file
+
+- Christoph Dinh &lt;christoph.dinh@mne-cpp.org&gt;

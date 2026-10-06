@@ -1,0 +1,81 @@
+---
+id: bids-electrode
+title: "BIDSLIB::BidsElectrode"
+sidebar_label: BidsElectrode
+sidebar_position: 10
+---
+
+# BidsElectrode
+
+**Namespace:** `BIDSLIB` &nbsp;·&nbsp; **Library:** BIDS Library
+
+`#include <bids/bids_electrode.h>`
+
+```cpp
+struct BIDSLIB::BidsElectrode
+```
+
+Electrode position record corresponding to one row in *_electrodes.tsv.
+
+---
+
+## Static Methods
+
+### readTsv(sFilePath)
+
+Read a BIDS *_electrodes.tsv file.
+
+**Parameters:**
+
+- **sFilePath** : *const QString &*
+  Path to the electrodes.tsv file.
+
+**Returns:**
+
+- *QList&lt; [BidsElectrode](/docs/api/bids/bids-electrode) &gt;* — List of electrode records.
+
+---
+
+### writeTsv(sFilePath, electrodes)
+
+Write a BIDS *_electrodes.tsv file.
+
+**Parameters:**
+
+- **sFilePath** : *const QString &*
+  Output path.
+
+- **electrodes** : *const QList&lt; [BidsElectrode](/docs/api/bids/bids-electrode) &gt; &*
+  List of electrode records.
+
+**Returns:**
+
+- *bool* — true on success.
+
+---
+
+### toFiffDigPoints(electrodes, trans)
+
+Convert a list of BIDS electrodes to a FIFF digitizer point set.
+
+Each electrode with valid numeric x/y/z coordinates is converted to a [FiffDigPoint](/docs/api/fiff/fiff-dig-point) with kind FIFFV_POINT_EEG. Electrodes with "n/a" coordinates are skipped.
+
+If a coordinate transform is supplied, the positions are transformed from the BIDS coordinate frame into the FIFF head frame before insertion.
+
+**Parameters:**
+
+- **electrodes** : *const QList&lt; [BidsElectrode](/docs/api/bids/bids-electrode) &gt; &*
+  List of BIDS electrode records.
+
+- **trans** : *const [FiffCoordTrans](/docs/api/fiff/fiff-coord-trans) &*
+  Optional coordinate transform (BIDS frame → head). Pass a default-constructed FiffCoordTrans to skip.
+
+**Returns:**
+
+- *[FiffDigPointSet](/docs/api/fiff/fiff-dig-point-set)* — FiffDigPointSet with one point per valid electrode.
+
+---
+
+## Authors of this file
+
+- Christoph Dinh &lt;christoph.dinh@mne-cpp.org&gt;
