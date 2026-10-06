@@ -164,6 +164,8 @@ private slots:
         FiffInfoBase info = makeSyntheticInfoBase(4);
         RowVectorXi megPicks = info.pick_types(QString("mag"), false, false);
         QVERIFY(megPicks.size() > 0);
+        // A default-constructed info has nchan -1 and no channels; this used to throw bad_alloc.
+        QCOMPARE(FiffInfoBase().pick_types(QString("mag"), true, true).size(), Index(0));
     }
 
     //=========================================================================
