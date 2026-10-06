@@ -115,7 +115,7 @@ public:
      *
      * @param[in]  mgzFile         Path to the .mgz or .mgh file.
      * @param[out] volData          MriVolData structure to populate.
-     * @param[out] additionalTrans  Additional coordinate transforms found in footer (e.g., Talairach).
+     * @param[out] additionalTrans  Surface RAS -> RAS and, if the footer names a talairach.xfm, the Talairach chain of @ref FIFFLIB::FiffCoordTransSet.
      * @param[in]  subjectMriDir   Path to subject's mri/ directory (for resolving relative .xfm paths).
      * @param[in]  verbose         If true, print progress information.
      *

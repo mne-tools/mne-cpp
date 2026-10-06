@@ -843,10 +843,14 @@ void TestMriIO::testMghFooterTalairachTag()
     QVERIFY(!vol.talairachXfmPath.isEmpty());
     QCOMPARE(vol.talairachXfmPath, QString("talairach.xfm"));
 
-    // Talairach transform should have been parsed
-    QCOMPARE(trans.size(), 1);
+    // Surface RAS -> RAS, then the Talairach chain (MNE-C mne_mri_add_talairach_transforms)
+    QCOMPARE(trans.size(), 4);
     QCOMPARE(trans[0].from, FIFFV_COORD_MRI);
-    QCOMPARE(trans[0].to, FIFFV_COORD_MRI_DISPLAY);
+    QCOMPARE(trans[0].to, FIFFV_MNE_COORD_RAS);
+    QCOMPARE(trans[1].from, FIFFV_MNE_COORD_RAS);
+    QCOMPARE(trans[1].to, FIFFV_MNE_COORD_MNI_TAL);
+    QCOMPARE(trans[2].to, FIFFV_MNE_COORD_FS_TAL_GTZ);
+    QCOMPARE(trans[3].to, FIFFV_MNE_COORD_FS_TAL_LTZ);
 }
 
 //=============================================================================================================

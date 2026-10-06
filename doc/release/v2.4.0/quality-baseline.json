@@ -50,8 +50,8 @@
       "public_api_units": 478,
       "exported_not_registered": 124,
       "example_eligible": 383,
-      "eligible_backed_percent": 69.71,
-      "snippets": 328,
+      "eligible_backed_percent": 69.97,
+      "snippets": 329,
       "registered_test_percent": 28.53
     },
     "G4_screenshots": {
@@ -68,7 +68,7 @@
       "c_style_cast": 429,
       "raw_new": 169,
       "raw_delete": 275,
-      "console_io": 370,
+      "console_io": 358,
       "numeric_define": 834,
       "qt_new_unparented": 825,
       "oversized_unit": 8

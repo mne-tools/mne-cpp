@@ -8,7 +8,7 @@ sidebar_position: 38
 
 ## Overview
 
-`mne_collect_transforms` collects coordinate transforms from FIFF files. It reads device-to-head and MRI-to-head transforms and optionally writes them to an output file.
+`mne_collect_transforms` collects the coordinate transforms that link MEG device, head, MRI, scanner RAS, MNI Talairach and FreeSurfer Talairach coordinates, prints them and optionally writes them to one FIFF file.
 
 This is a C++ port of the original MNE-C tool by Matti Hämäläinen.
 
@@ -23,16 +23,17 @@ mne_collect_transforms [options]
 | Option | Description |
 |---|---|
 | `--meas <name>` | MEG measurement file (device→head transform) |
-| `--mri <name>` | FIFF MRI description file (MRI→head transform) |
+| `--mri <name>` | FIFF MRI description or `-trans.fif` file (MRI→head transform; without `--mgh` also the Talairach chain stored in it) |
+| `--mgh <name>` | mgh/mgz MRI volume; its centre and `transforms/talairach.xfm` next to it give the surface RAS→RAS→MNI→Talairach chain |
 | `--out <name>` | Output file name |
 | `--help` | Print help |
 | `--version` | Print version |
 
-At least one of `--meas` or `--mri` must be specified.
+At least one of `--meas`, `--mri` or `--mgh` must be specified.
 
 ## Description
 
-This utility extracts coordinate transformation matrices from FIFF files. It reads the device-to-head transform from a MEG measurement file and the MRI-to-head transform from an MRI description file. The transforms can be written to a single output FIFF file for later use.
+The device→head transform comes from the measurement file and the MRI (surface RAS)→head transform from the coregistration. The remaining links follow MNE-C: surface RAS→RAS is a shift by the centre of the MRI volume, RAS→MNI Talairach is read from the subject's `talairach.xfm`, and MNI→FreeSurfer Talairach uses M. Brett's two fixed approximations, one above and one below the AC–PC plane. Composed, the chain maps head coordinates to MNI coordinates exactly as `mne.head_to_mni` does (`FIFFLIB::FiffCoordTransSet`).
 
 ### Workflow Context
 
@@ -41,8 +42,9 @@ Use this tool to gather transforms for visualization or when transforms need to 
 ### Example
 
 ```bash
-# Collect both transforms into one file
-mne_collect_transforms --meas raw.fif --mri T1-neuromag.fif --out transforms.fif
+# Collect the full chain into one file
+mne_collect_transforms --meas raw.fif --mri sample-trans.fif \
+    --mgh $SUBJECTS_DIR/sample/mri/T1.mgz --out transforms.fif
 
 # Collect only the device-to-head transform
 mne_collect_transforms --meas raw.fif --out dev_head.fif

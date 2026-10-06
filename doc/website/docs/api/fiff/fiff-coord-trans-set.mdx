@@ -15,25 +15,121 @@ sidebar_position: 14
 class FIFFLIB::FiffCoordTransSet
 ```
 
-Container for the FIFF coordinate transforms found in (or written to) a FIFFB_MRI / FIFFB_HPI_MEAS block.
+The chain of transforms from MEG head coordinates to MNI and FreeSurfer Talairach coordinates.
 
-Owns the list of [`FiffCoordTrans`](/docs/api/fiff/fiff-coord-trans) and the metadata that travels with them (fiducial points, registration comments). Provides lookup by (`from`, `to`) frame pair so consumers can ask for, e.g., `FIFFV_COORD_HEAD` → `FIFFV_COORD_MRI` without iterating manually.
+Head -&gt; surface RAS (the FreeSurfer MRI frame) comes from the coregistration, surface RAS -&gt; scanner RAS from the centre (c_ras) of the subject's MRI, scanner RAS -&gt; MNI Talairach from `mri/transforms/talairach.xfm`, and MNI -&gt; FreeSurfer Talairach from the fixed Brett approximations MNE-C uses (one matrix above and one below the AC-PC plane). Empty transforms mark links that are not known.
+
+```cpp title="src/examples/ex_fiff_api/main.cpp"
+// Head -> MRI -> RAS -> MNI Talairach -> Talairach, as mne_analyze reports a picked location
+FiffCoordTransSet chain;
+chain.read(dir + "/../../subjects/sample/mri/brain-neuromag/sets/COR.fif"); // surface RAS -> RAS of the MRI set
+chain.read(dir + "/all-trans.fif");                                         // the coregistration, head -> MRI
+chain.addTalairach(QStringLiteral(MNE_TALAIRACH_XFM));                      // the subject's mri/transforms/talairach.xfm
+MatrixX3f headPoints(1, 3);
+headPoints << 0.03f, -0.02f, 0.12f;
+const MatrixX3f mni = chain.headToMni(headPoints);
+const MatrixX3f talairach = chain.mniToTalairach(mni);
+```
 
 ---
 
 ## Public Methods
 
-### FiffCoordTransSet()
+### addTalairach(xfmPath)
 
-Constructs the [`FiffCoordTransSet`](/docs/api/fiff/fiff-coord-trans-set).
+Sets the RAS -&gt; MNI transform from a ``.xfm file and the two MNI -&gt; FreeSurfer Talairach transforms (MNE-C mne_mri_add_talairach_transforms).
+
+**Parameters:**
+
+- **xfmPath** : *const QString &*
+  Path to the `talairach.xfm` file.
+
+**Returns:**
+
+- *bool* — True if the ``.xfm file could be read.
 
 ---
 
-### ~FiffCoordTransSet()
+### read(path)
 
-Destroys the [`FiffCoordTransSet`](/docs/api/fiff/fiff-coord-trans-set).
+Takes every transform of the chain stored in a FIFF file, such as a `-trans.fif` file or a `COR.fif` MRI set (MNE-C mne_collect_transforms).
+
+Transforms already in the set are replaced, so read the MRI set first and the coregistration last.
+
+**Parameters:**
+
+- **path** : *const QString &*
+  FIFF file path.
+
+**Returns:**
+
+- *int* — The number of transforms taken from the file, or -1 if the file cannot be opened.
 
 ---
+
+### write(stream)
+
+Writes every non-empty transform, head -&gt; MRI first.
+
+**Parameters:**
+
+- **stream** : *[FiffStream](/docs/api/fiff/fiff-stream) &*
+  An open FIFF stream.
+
+---
+
+### headToMni(rr)
+
+Maps MEG head coordinates to MNI Talairach coordinates, as `mne.head_to_mni` does.
+
+**Parameters:**
+
+- **rr** : *const Eigen::MatrixX3f &*
+  Points in head coordinates (metres), one per row.
+
+**Returns:**
+
+- *Eigen::MatrixX3f* — The points in MNI Talairach coordinates (metres), or an empty matrix if a link of the chain is missing.
+
+---
+
+### mniToTalairach(rr)
+
+Maps MNI Talairach coordinates to FreeSurfer Talairach coordinates, using the transform for points above or below the AC-PC plane (MNI z &gt; 0 or not).
+
+**Parameters:**
+
+- **rr** : *const Eigen::MatrixX3f &*
+  Points in MNI Talairach coordinates (metres), one per row.
+
+**Returns:**
+
+- *Eigen::MatrixX3f* — The points in FreeSurfer Talairach coordinates (metres), or an empty matrix if the transforms are missing.
+
+---
+
+## Static Methods
+
+### readMniTransform(path)
+
+Reads the scanner RAS -&gt; MNI Talairach transform of a FreeSurfer/MNI ``.xfm file (MNE-C read_mni_coord_transform_file).
+
+**Parameters:**
+
+- **path** : *const QString &*
+  Path to the ``.xfm file, usually `mri/transforms/talairach.xfm` in the subject directory.
+
+**Returns:**
+
+- *[FiffCoordTrans](/docs/api/fiff/fiff-coord-trans)* — The transform in metres, or an empty transform if the file holds no linear transform.
+
+---
+
+## Example
+
+- Full source: [`src/examples/ex_fiff_api/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_fiff_api/main.cpp)
+- Build target: `ex_fiff_api` (runs under CTest)
+- Data: [mne-cpp-test-data](https://github.com/mne-tools/mne-cpp-test-data)
 
 ## Authors of this file
 

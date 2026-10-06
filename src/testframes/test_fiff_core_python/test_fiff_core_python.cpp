@@ -47,6 +47,7 @@
 #include <fiff/fiff_info.h>
 #include <fiff/fiff_ctf_comp.h>
 #include <fiff/fiff_coord_trans.h>
+#include <fiff/fiff_coord_trans_set.h>
 #include <fiff/fiff_stream.h>
 #include <fiff/fiff_sparse_matrix.h>
 #include <fiff/fiff_constants.h>
@@ -226,6 +227,7 @@ private slots:
     void combine_orientations_data();
     void combine_orientations();
     void applyTrans_withoutMove();
+    void transSet_headToMniMatchesPython();
     void events_matchPython();
 
     void sparse_createAndConvert();
@@ -923,6 +925,45 @@ void TestFiffCorePython::applyTrans_withoutMove()
     const MatrixX3f rotated = t.apply_trans(v, false);
     QVERIFY((rotated.row(0).transpose() - r * Vector3f(0.0f, 0.0f, 1.0f)).norm() < 1e-6f);
     QVERIFY((t.apply_inverse_trans(rotated, false) - v).norm() < 1e-6f);
+}
+
+//=============================================================================================================
+
+void TestFiffCorePython::transSet_headToMniMatchesPython()
+{
+    // Sample subject: COR.fif carries surface RAS -> RAS, all-trans.fif the coregistration and
+    // data/sample-talairach.xfm is the subject's mri/transforms/talairach.xfm.
+    const QString corFile = QCoreApplication::applicationDirPath() + "/../resources/data/mne-cpp-test-data/subjects/sample/mri/brain-neuromag/sets/COR.fif";
+    FiffCoordTransSet chain;
+    QCOMPARE(chain.read(corFile), 2); // head -> MRI (identity) and surface RAS -> RAS
+    QCOMPARE(chain.headToMni(MatrixX3f::Zero(1, 3)).rows(), 0);
+    QCOMPARE(chain.read(dataPath("all-trans.fif")), 1);
+    QVERIFY(chain.addTalairach(QStringLiteral(FIFF_CORE_DATA_DIR "/sample-talairach.xfm")));
+    QVERIFY(!chain.addTalairach(corFile));
+
+    MatrixX3f head(3, 3);
+    head << 0.0f, 0.0f, 0.0f, 0.03f, -0.02f, 0.12f, -0.04f, 0.01f, -0.03f;
+    // mne.head_to_mni(head, "sample", mri_head_t) / 1000 and M. Brett's Talairach matrices on top
+    MatrixX3f mni(3, 3);
+    mni << 0.004136082f, -0.023704993f, -0.066782980f, 0.036469229f, -0.065504959f, 0.057827104f, -0.037269056f, -0.010483342f, -0.095647763f;
+    MatrixX3f talairach(3, 3);
+    talairach << 0.004094721f, -0.025770282f, -0.054881228f, 0.036104536f, -0.060801158f, 0.056314317f, -0.036896366f, -0.014173468f, -0.079740031f;
+    QVERIFY((chain.headToMni(head) - mni).cwiseAbs().maxCoeff() < 1e-6f);
+    QVERIFY((chain.mniToTalairach(mni) - talairach).cwiseAbs().maxCoeff() < 1e-6f);
+
+    // Written in MNE-C mne_collect_transforms order and read back, also through an inverted transform.
+    QTemporaryDir dir;
+    const QString file = dir.filePath("chain-trans.fif");
+    {
+        QFile out(file);
+        FiffStream::SPtr stream = FiffStream::start_file(out);
+        chain.write(*stream);
+        stream->write_coord_trans(chain.RAS_MNI_tal_t.inverted());
+        stream->end_file();
+    }
+    FiffCoordTransSet reread;
+    QCOMPARE(reread.read(file), 6);
+    QVERIFY((reread.headToMni(head) - mni).cwiseAbs().maxCoeff() < 1e-6f);
 }
 
 //=============================================================================================================

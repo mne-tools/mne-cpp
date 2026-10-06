@@ -52,7 +52,7 @@ For .mgz files, automatic gzip decompression is performed via zlib.
   [`MriVolData`](/docs/api/mri/mri-vol-data) structure to populate.
 
 - **additionalTrans** : *QVector&lt; [FiffCoordTrans](/docs/api/fiff/fiff-coord-trans) &gt; &*
-  Additional coordinate transforms found in footer (e.g., Talairach).
+  Surface RAS -&gt; RAS and, if the footer names a talairach.xfm, the Talairach chain of [`FiffCoordTransSet`](/docs/api/fiff/fiff-coord-trans-set).
 
 - **subjectMriDir** : *const QString &*
   Path to subject's mri/ directory (for resolving relative .xfm paths).

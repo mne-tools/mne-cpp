@@ -25,6 +25,7 @@
 #include <fiff/fiff_ch_info.h>
 #include <fiff/fiff_constants.h>
 #include <fiff/fiff_coord_trans.h>
+#include <fiff/fiff_coord_trans_set.h>
 #include <fiff/fiff_cov.h>
 #include <fiff/fiff_dig_point_set.h>
 #include <fiff/fiff_digitizer_data.h>
@@ -135,6 +136,21 @@ int main(int argc, char* argv[])
     // mne.read_trans: 1 -> 4 ... ; info["dev_head_t"] translation (-0.006129, 0.000064, 0.064742) m
     ok &= expect(devHead.from == FIFFV_COORD_DEVICE && devHead.to == FIFFV_COORD_HEAD && (Vector3f(r[0], r[1], r[2]) - Vector3f(-0.006129f, 0.000064f, 0.064742f)).norm() < 1e-6f && (back.trans * devHead.trans).isIdentity(1e-5f) && !headToMri.isEmpty(),
                  "FiffCoordTrans: device origin maps to (-6.13, 0.06, 64.74) mm in head coordinates");
+
+    //! [fiff_coord_trans_set_usage]
+    // Head -> MRI -> RAS -> MNI Talairach -> Talairach, as mne_analyze reports a picked location
+    FiffCoordTransSet chain;
+    chain.read(dir + "/../../subjects/sample/mri/brain-neuromag/sets/COR.fif"); // surface RAS -> RAS of the MRI set
+    chain.read(dir + "/all-trans.fif");                                         // the coregistration, head -> MRI
+    chain.addTalairach(QStringLiteral(MNE_TALAIRACH_XFM));                      // the subject's mri/transforms/talairach.xfm
+    MatrixX3f headPoints(1, 3);
+    headPoints << 0.03f, -0.02f, 0.12f;
+    const MatrixX3f mni = chain.headToMni(headPoints);
+    const MatrixX3f talairach = chain.mniToTalairach(mni);
+    //! [fiff_coord_trans_set_usage]
+    // mne.head_to_mni([0.03, -0.02, 0.12], "sample", mri_head_t): (36.47, -65.50, 57.83) mm
+    ok &= expect(mni.rows() == 1 && (mni.row(0) - RowVector3f(0.036469229f, -0.065504959f, 0.057827104f)).norm() < 1e-6f && (talairach.row(0) - RowVector3f(0.036104536f, -0.060801158f, 0.056314317f)).norm() < 1e-6f,
+                 "FiffCoordTransSet: head point at (36.47, -65.50, 57.83) mm MNI like mne.head_to_mni");
 
     //! [fiff_proj_usage]
     const FiffProj& pca = info.projs[0]; // "PCA-v1", 1 vector over 102 magnetometers, inactive

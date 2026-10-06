@@ -8121,7 +8121,14 @@
       "mne_python": null,
       "sklearn": null,
       "test": null,
-      "example": null,
+      "example": "ex_fiff_api",
+      "example_snippet": [
+        "ex_fiff_api/main.cpp#fiff_coord_trans_set_usage"
+      ],
+      "example_mode": "run",
+      "required_data": [
+        "mne-cpp-test-data"
+      ],
       "status": "documented",
       "skigen_candidate": false,
       "documented": true,

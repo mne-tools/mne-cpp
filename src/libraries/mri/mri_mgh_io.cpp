@@ -30,6 +30,7 @@
 #include "mri_mgh_io.h"
 
 #include <fiff/fiff_coord_trans.h>
+#include <fiff/fiff_coord_trans_set.h>
 #include <fiff/fiff_constants.h>
 #include <fiff/fiff_file.h>
 
@@ -41,7 +42,6 @@
 #include <QFileInfo>
 #include <QDataStream>
 #include <QDebug>
-#include <QRegularExpression>
 #include <QDebug>
 
 #include <zlib.h>
@@ -114,6 +114,9 @@ bool MriMghIO::read(const QString& mgzFile,
                   vox2ras(r, 0), vox2ras(r, 1), vox2ras(r, 2), vox2ras(r, 3));
         }
     }
+
+    // Surface RAS -> scanner RAS: a shift by the volume centre (MNE-C mne_mri_add_transforms).
+    additionalTrans.append(FiffCoordTrans(FIFFV_COORD_MRI, FIFFV_MNE_COORD_RAS, Matrix3f::Identity(), Vector3f(volData.c_ras / 1000.0f)));
 
     // Step 4: Read voxel data
     if (!readVoxelData(fileData, volData)) {
@@ -462,62 +465,16 @@ bool MriMghIO::parseFooter(const QByteArray& data,
                 xfmPath = subjectMriDir + "/transforms/" + xfmPath;
             }
 
-            if (QFileInfo::exists(xfmPath)) {
-                QFile xfmFile(xfmPath);
-                if (xfmFile.open(QIODevice::ReadOnly | QIODevice::Text)) {
-                    // Parse Linear_Transform from .xfm file
-                    // Format:
-                    //   MNI Transform File
-                    //   ...
-                    //   Linear_Transform =
-                    //   mat[0][0] mat[0][1] mat[0][2] mat[0][3]
-                    //   mat[1][0] mat[1][1] mat[1][2] mat[1][3]
-                    //   mat[2][0] mat[2][1] mat[2][2] mat[2][3] ;
-                    QString xfmContent = xfmFile.readAll();
-                    xfmFile.close();
-
-                    int ltIdx = xfmContent.indexOf("Linear_Transform");
-                    if (ltIdx >= 0) {
-                        int eqIdx = xfmContent.indexOf('=', ltIdx);
-                        if (eqIdx >= 0) {
-                            QString matStr = xfmContent.mid(eqIdx + 1).trimmed();
-                            matStr.remove(';');
-
-                            QStringList vals = matStr.split(QRegularExpression("\\s+"),
-                                                            Qt::SkipEmptyParts);
-
-                            if (vals.size() >= 12) {
-                                // RAS -> MNI Talairach (3×4 matrix, in mm)
-                                Matrix4f rasMniTal = Matrix4f::Identity();
-                                for (int r = 0; r < 3; ++r) {
-                                    for (int c = 0; c < 4; ++c) {
-                                        rasMniTal(r, c) = vals[r * 4 + c].toFloat();
-                                    }
-                                }
-
-                                // Convert translation from mm to meters
-                                rasMniTal(0, 3) /= 1000.0f;
-                                rasMniTal(1, 3) /= 1000.0f;
-                                rasMniTal(2, 3) /= 1000.0f;
-
-                                // Create RAS -> MNI Talairach transform
-                                FiffCoordTrans talTrans(
-                                    FIFFV_COORD_MRI, FIFFV_COORD_MRI_DISPLAY,
-                                    rasMniTal, true);
-
-                                additionalTrans.append(talTrans);
-
-                                if (verbose) {
-                                    qInfo("Read Talairach transform from %s\n", qPrintable(xfmPath));
-                                }
-                            }
-                        }
-                    }
-                }
-            } else {
+            FiffCoordTransSet talairach;
+            if (talairach.addTalairach(xfmPath)) {
+                additionalTrans.append(talairach.RAS_MNI_tal_t);
+                additionalTrans.append(talairach.MNI_tal_tal_gtz_t);
+                additionalTrans.append(talairach.MNI_tal_tal_ltz_t);
                 if (verbose) {
-                    qWarning("Talairach transform file not found: %s\n", qPrintable(xfmPath));
+                    qInfo("Read Talairach transform from %s\n", qPrintable(xfmPath));
                 }
+            } else if (verbose) {
+                qWarning("Talairach transform not readable: %s\n", qPrintable(xfmPath));
             }
         }
     }

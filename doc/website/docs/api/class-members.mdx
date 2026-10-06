@@ -7,7 +7,7 @@ sidebar_position: 5
 
 # Class Members
 
-Index of 6270 public class members (functions, variables, typedefs, enums) across all documented classes.
+Index of 6275 public class members (functions, variables, typedefs, enums) across all documented classes.
 
 **Jump to:** [A](#a) · [B](#b) · [C](#c) · [D](#d) · [E](#e) · [F](#f) · [G](#g) · [H](#h) · [I](#i) · [J](#j) · [K](#k) · [L](#l) · [M](#m) · [N](#n) · [O](#o) · [P](#p) · [Q](#q) · [R](#r) · [S](#s) · [T](#t) · [U](#u) · [V](#v) · [W](#w) · [X](#x) · [Y](#y) · [Z](#z)
 
@@ -98,6 +98,7 @@ Index of 6270 public class members (functions, variables, typedefs, enums) acros
 - **addSubject** `[slot]` in [BidsViewModel](/docs/api/disp/bids-view-model) — Adds subject with given input name.
 - **addSurface** `[fn]` in `BrainTreeModel`
 - **addTable** `[fn]` in [Report](/docs/api/utils/report) — Add a table section.
+- **addTalairach** `[fn]` in [FiffCoordTransSet](/docs/api/fiff/fiff-coord-trans-set) — Sets the RAS -&gt; MNI transform from a ``.xfm file and the two MNI -&gt; FreeSurfer Talairach transforms (MNE-C mne_mri_add_talairach_transforms).
 - **addText** `[fn]` in [Report](/docs/api/utils/report) — Add a text section.
 - **addToData** `[slot]` in [BidsViewModel](/docs/api/disp/bids-view-model) — Adds a sub-item to a data item (ex.
 - **addTriangleData** `[fn]` in [MNEBemSurface](/docs/api/mne/mne-bem-surface) — Definition of the mne_add_triangle_data function in mne_add_geometry_info.c.
@@ -1624,7 +1625,6 @@ Index of 6270 public class members (functions, variables, typedefs, enums) acros
 - **FiffCoordTrans** `[fn]` in [FiffCoordTrans](/docs/api/fiff/fiff-coord-trans) — Copy constructor.
 - **FiffCoordTrans** `[fn]` in [FiffCoordTrans](/docs/api/fiff/fiff-coord-trans) — Constructs a coordinate transformation from a rotation matrix and translation vector.
 - **FiffCoordTrans** `[fn]` in [FiffCoordTrans](/docs/api/fiff/fiff-coord-trans) — Constructs a coordinate transformation from a 4×4 homogeneous matrix.
-- **FiffCoordTransSet** `[fn]` in [FiffCoordTransSet](/docs/api/fiff/fiff-coord-trans-set) — Constructs the [`FiffCoordTransSet`](/docs/api/fiff/fiff-coord-trans-set).
 - **FiffCov** `[fn]` in [FiffCov](/docs/api/fiff/fiff-cov) — Constructs the covariance data matrix.
 - **FiffCov** `[fn]` in [FiffCov](/docs/api/fiff/fiff-cov) — Constructs a covariance data matrix, by reading from a IO device.
 - **FiffCov** `[fn]` in [FiffCov](/docs/api/fiff/fiff-cov) — Copy constructor.
@@ -2406,6 +2406,7 @@ Index of 6270 public class members (functions, variables, typedefs, enums) acros
 - **headerData** `[fn]` in [FrequencySpectrumModel](/docs/api/disp/frequency-spectrum-model) — Returns the data for the given role and section in the header with the specified orientation.
 - **headerData** `[fn]` in [RtFiffRawViewModel](/docs/api/disp/rt-fiff-raw-view-model) — Returns the data for the given role and section in the header with the specified orientation.
 - **headToDevice** `[fn]` in [PolhemusCoregistration](/docs/api/utils/polhemus-coregistration)
+- **headToMni** `[fn]` in [FiffCoordTransSet](/docs/api/fiff/fiff-coord-trans-set) — Maps MEG head coordinates to MNI Talairach coordinates, as `mne.head_to_mni` does.
 - **headToWorld** `[fn]` in [PolhemusCoregistration](/docs/api/utils/polhemus-coregistration)
 - **height** `[var]` in [MNEVolGeom](/docs/api/mne/mne-vol-geom)
 - **height** `[var]` in `MriSlice` — Height of the image in pixels.
@@ -3316,6 +3317,7 @@ Index of 6270 public class members (functions, variables, typedefs, enums) acros
 - **MNEVolGeom** `[fn]` in [MNEVolGeom](/docs/api/mne/mne-vol-geom) — Constructs the [`MNE`](/docs/api/mne/mne-class) Volume Geometry.
 - **MNI_tal_tal_gtz_t** `[var]` in [FiffCoordTransSet](/docs/api/fiff/fiff-coord-trans-set) — Transform MNI Talairach to FreeSurfer Talairach coordinates (z &gt; 0).
 - **MNI_tal_tal_ltz_t** `[var]` in [FiffCoordTransSet](/docs/api/fiff/fiff-coord-trans-set) — Transform MNI Talairach to FreeSurfer Talairach coordinates (z &lt; 0).
+- **mniToTalairach** `[fn]` in [FiffCoordTransSet](/docs/api/fiff/fiff-coord-trans-set) — Maps MNI Talairach coordinates to FreeSurfer Talairach coordinates, using the transform for points above or below the AC-PC plane (MNI z &gt; 0 or not).
 - **modalitiesChanged** `[signal]` in [ModalitySelectionView](/docs/api/disp/modality-selection-view) — Emit this signal whenever the user changed the modality.
 - **modality** `[fn]` in `RtSensorStreamManager`
 - **modalityChanged** `[signal]` in [DipoleFitView](/docs/api/disp/dipole-fit-view) — Send new modality selection.
@@ -4133,6 +4135,7 @@ Index of 6270 public class members (functions, variables, typedefs, enums) acros
 - **read** `[fn]` in [BidsRawData](/docs/api/bids/bids-raw-data) — Read a BIDS dataset from disk.
 - **read** `[fn]` in [FiffAnnotations](/docs/api/fiff/fiff-annotations) — Auto-detects format and reads annotations.
 - **read** `[fn]` in [FiffCoordTrans](/docs/api/fiff/fiff-coord-trans) — Reads a coordinate transform from a fif file.
+- **read** `[fn]` in [FiffCoordTransSet](/docs/api/fiff/fiff-coord-trans-set) — Takes every transform of the chain stored in a FIFF file, such as a `-trans.fif` file or a `COR.fif` MRI set (MNE-C mne_collect_transforms).
 - **read** `[fn]` in [FiffEvents](/docs/api/fiff/fiff-events) — Read events from a FIFF or ASCII event file.
 - **read** `[fn]` in [FiffEvoked](/docs/api/fiff/fiff-evoked) — fiff_read_evoked
 - **read** `[fn]` in [FiffEvokedSet](/docs/api/fiff/fiff-evoked-set) — fiff_read_evoked
@@ -4246,6 +4249,7 @@ Index of 6270 public class members (functions, variables, typedefs, enums) acros
 - **readMetadata** `[fn]` in `RtDataClient` — Reads fiff metaata class from data connection.
 - **readMNESelFile** `[fn]` in [SelectionIO](/docs/api/utils/selection-io) — Reads the specified MNE sel file.
 - **readMNESelFile** `[fn]` in [SelectionIO](/docs/api/utils/selection-io) — Reads the specified MNE sel file.
+- **readMniTransform** `[fn]` in [FiffCoordTransSet](/docs/api/fiff/fiff-coord-trans-set) — Reads the scanner RAS -&gt; MNI Talairach transform of a FreeSurfer/MNI ``.xfm file (MNE-C read_mni_coord_transform_file).
 - **readMriTransform** `[fn]` in [FiffCoordTrans](/docs/api/fiff/fiff-coord-trans) — Reads the MRI → head coordinate transform from a FIFF file.
 - **readRawBuffer** `[fn]` in `RtDataClient` — Reads fiff measurement information of a data the connection.
 - **readRawSegment** `[fn]` in [AbstractFormatReader](/docs/api/bids/abstract-format-reader) — Read a segment of raw data.
@@ -6202,6 +6206,7 @@ Index of 6270 public class members (functions, variables, typedefs, enums) acros
 - **write** `[fn]` in [BidsRawData](/docs/api/bids/bids-raw-data) — Convenience overload — write with default options.
 - **write** `[fn]` in [FiffAnnotations](/docs/api/fiff/fiff-annotations) — Auto-detects format and writes annotations.
 - **write** `[fn]` in [FiffCoordTrans](/docs/api/fiff/fiff-coord-trans) — Writes the transformation to file.
+- **write** `[fn]` in [FiffCoordTransSet](/docs/api/fiff/fiff-coord-trans-set) — Writes every non-empty transform, head -&gt; MRI first.
 - **write** `[fn]` in [FiffDigPointSet](/docs/api/fiff/fiff-dig-point-set) — Writes the [`FiffDigPointSet`](/docs/api/fiff/fiff-dig-point-set) to a FIFF file.
 - **write** `[fn]` in [FiffDigPointSet](/docs/api/fiff/fiff-dig-point-set) — Convenience overload: write the digitizer point set to a path on disk.
 - **write** `[fn]` in [FiffIO](/docs/api/fiff/fiff-io) — Write data to a single pIODevice.

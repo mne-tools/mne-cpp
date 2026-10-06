@@ -7,17 +7,12 @@
  * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
  * @since    2.0.0
  * @date     February 2026
- * @brief    Ordered set of FIFF coordinate transforms, the on-disk content of a FIFFB_MRI / FIFFB_HPI_MEAS block.
+ * @brief    The MNE-C transform chain from MEG head coordinates to MNI and FreeSurfer Talairach coordinates.
  *
- * Container that owns multiple @ref FIFFLIB::FiffCoordTrans instances along with the
- * auxiliary tags that travel with them inside the FIFF tree
- * (@c FIFF_MNE_RT_COMMAND comments, fiducial points from
- * @c FIFFB_ISOTRAK, ...). Used by @ref FIFFLIB::FiffStream::read_meas_info "FiffStream::read_meas_info" to
- * return every device→head / head→MRI / MRI→RAS transform discovered in
- * the file, and by the registration tooling
- * (@c mne_analyze, @c mne_coregistration) to load and persist coregistered
- * ``-trans.fif`` files in the same format @c mne.write_trans produces in
- * MNE-Python.
+ * C++ peer of the MNE-C @c coordTransSet that @c mne_analyze uses to report a picked
+ * location in head, MRI, MNI and Talairach coordinates and that @c mne_collect_transforms
+ * gathers into one file; @ref FIFFLIB::FiffCoordTransSet::headToMni matches
+ * @c mne.head_to_mni.
  */
 
 #ifndef FIFFCOORDTRANSSET_H
@@ -28,16 +23,20 @@
 //=============================================================================================================
 
 #include "fiff_global.h"
+#include "fiff_coord_trans.h"
 
 //=============================================================================================================
 // EIGEN INCLUDES
 //=============================================================================================================
+
+#include <Eigen/Core>
 
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
 
 #include <QSharedPointer>
+#include <QString>
 
 #include <memory>
 
@@ -52,16 +51,19 @@ namespace FIFFLIB
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-class FiffCoordTrans;
+class FiffStream;
 
 //=============================================================================================================
 /**
- * @brief Container for the FIFF coordinate transforms found in (or written to) a FIFFB_MRI / FIFFB_HPI_MEAS block.
+ * @brief The chain of transforms from MEG head coordinates to MNI and FreeSurfer Talairach coordinates.
  *
- * Owns the list of @ref FiffCoordTrans and the metadata that travels with
- * them (fiducial points, registration comments). Provides lookup by
- * (@c from, @c to) frame pair so consumers can ask for, e.g.,
- * @c FIFFV_COORD_HEAD → @c FIFFV_COORD_MRI without iterating manually.
+ * Head -> surface RAS (the FreeSurfer MRI frame) comes from the coregistration, surface RAS -> scanner
+ * RAS from the centre (c_ras) of the subject's MRI, scanner RAS -> MNI Talairach from
+ * @c mri/transforms/talairach.xfm, and MNI -> FreeSurfer Talairach from the fixed Brett
+ * approximations MNE-C uses (one matrix above and one below the AC-PC plane). Empty
+ * transforms mark links that are not known.
+ *
+ * @snippet ex_fiff_api/main.cpp fiff_coord_trans_set_usage
  */
 class FIFFSHARED_EXPORT FiffCoordTransSet
 {
@@ -73,22 +75,72 @@ public:
 
     //=========================================================================================================
     /**
-     * Constructs the FiffCoordTransSet
+     * Reads the scanner RAS -> MNI Talairach transform of a FreeSurfer/MNI @c .xfm file
+     * (MNE-C read_mni_coord_transform_file).
+     *
+     * @param[in] path   Path to the @c .xfm file, usually @c mri/transforms/talairach.xfm in the subject directory.
+     *
+     * @return The transform in metres, or an empty transform if the file holds no linear transform.
      */
-    FiffCoordTransSet();
+    static FiffCoordTrans readMniTransform(const QString& path);
 
     //=========================================================================================================
     /**
-     * Destroys the FiffCoordTransSet
+     * Sets the RAS -> MNI transform from a @c .xfm file and the two MNI -> FreeSurfer Talairach
+     * transforms (MNE-C mne_mri_add_talairach_transforms).
+     *
+     * @param[in] xfmPath    Path to the @c talairach.xfm file.
+     *
+     * @return True if the @c .xfm file could be read.
      */
-    ~FiffCoordTransSet();
+    bool addTalairach(const QString& xfmPath);
 
-public:
-    std::unique_ptr<FiffCoordTrans> head_surf_RAS_t;   /**< Transform from MEG head coordinates to surface RAS. */
-    std::unique_ptr<FiffCoordTrans> surf_RAS_RAS_t;    /**< Transform from surface RAS to RAS (nonzero origin) coordinates. */
-    std::unique_ptr<FiffCoordTrans> RAS_MNI_tal_t;     /**< Transform from RAS (nonzero origin) to MNI Talairach coordinates. */
-    std::unique_ptr<FiffCoordTrans> MNI_tal_tal_gtz_t; /**< Transform MNI Talairach to FreeSurfer Talairach coordinates (z > 0). */
-    std::unique_ptr<FiffCoordTrans> MNI_tal_tal_ltz_t; /**< Transform MNI Talairach to FreeSurfer Talairach coordinates (z < 0). */
+    //=========================================================================================================
+    /**
+     * Takes every transform of the chain stored in a FIFF file, such as a @c -trans.fif file or a
+     * @c COR.fif MRI set (MNE-C mne_collect_transforms). Transforms already in the set are replaced,
+     * so read the MRI set first and the coregistration last.
+     *
+     * @param[in] path   FIFF file path.
+     *
+     * @return The number of transforms taken from the file, or -1 if the file cannot be opened.
+     */
+    int read(const QString& path);
+
+    //=========================================================================================================
+    /**
+     * Writes every non-empty transform, head -> MRI first.
+     *
+     * @param[in] stream     An open FIFF stream.
+     */
+    void write(FiffStream& stream) const;
+
+    //=========================================================================================================
+    /**
+     * Maps MEG head coordinates to MNI Talairach coordinates, as @c mne.head_to_mni does.
+     *
+     * @param[in] rr     Points in head coordinates (metres), one per row.
+     *
+     * @return The points in MNI Talairach coordinates (metres), or an empty matrix if a link of the chain is missing.
+     */
+    Eigen::MatrixX3f headToMni(const Eigen::MatrixX3f& rr) const;
+
+    //=========================================================================================================
+    /**
+     * Maps MNI Talairach coordinates to FreeSurfer Talairach coordinates, using the transform
+     * for points above or below the AC-PC plane (MNI z > 0 or not).
+     *
+     * @param[in] rr     Points in MNI Talairach coordinates (metres), one per row.
+     *
+     * @return The points in FreeSurfer Talairach coordinates (metres), or an empty matrix if the transforms are missing.
+     */
+    Eigen::MatrixX3f mniToTalairach(const Eigen::MatrixX3f& rr) const;
+
+    FiffCoordTrans head_surf_RAS_t;   /**< Transform from MEG head coordinates to surface RAS. */
+    FiffCoordTrans surf_RAS_RAS_t;    /**< Transform from surface RAS to RAS (nonzero origin) coordinates. */
+    FiffCoordTrans RAS_MNI_tal_t;     /**< Transform from RAS (nonzero origin) to MNI Talairach coordinates. */
+    FiffCoordTrans MNI_tal_tal_gtz_t; /**< Transform MNI Talairach to FreeSurfer Talairach coordinates (z > 0). */
+    FiffCoordTrans MNI_tal_tal_ltz_t; /**< Transform MNI Talairach to FreeSurfer Talairach coordinates (z < 0). */
 };
 
 //=============================================================================================================
