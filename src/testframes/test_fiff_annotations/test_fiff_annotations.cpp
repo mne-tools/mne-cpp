@@ -296,7 +296,7 @@ void TestFiffAnnotations::testWriteReadCsv()
 {
     FiffAnnotations original;
     original.append(0.0, 0.5, "stim");
-    original.append(1.0, 0.3, "resp");
+    original.append(3600.123456, 0.3, "resp");
 
     QString path = m_tempDir.filePath("annot_test.csv");
     QVERIFY(FiffAnnotations::writeCsv(path, original));
@@ -304,6 +304,7 @@ void TestFiffAnnotations::testWriteReadCsv()
     FiffAnnotations restored = FiffAnnotations::readCsv(path);
     QCOMPARE(restored.size(), 2);
     QCOMPARE(restored[0].onset, 0.0);
+    QCOMPARE(restored[1].onset, 3600.123456);
     QCOMPARE(restored[0].description, QString("stim"));
 }
 

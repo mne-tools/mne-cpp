@@ -326,6 +326,7 @@ bool FiffAnnotations::writeCsv(const QString& path, const FiffAnnotations& annot
     }
 
     QTextStream out(&file);
+    out.setRealNumberPrecision(17); // round-trip exact; the default 6 digits lose sub-ms onsets after 1000 s
     out << "onset,duration,description\n";
 
     for (const FiffAnnotation& a : annot.toVector()) {
