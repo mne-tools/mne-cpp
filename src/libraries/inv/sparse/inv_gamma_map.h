@@ -13,7 +13,7 @@
  * learning (SBL) solver of Wipf &amp; Rao, NeuroImage 44(3), 947-966
  * (2009). The algorithm models source amplitudes as Gaussians with
  * per-source variance hyperparameters @f$\gamma_{i}@f$ and uses an
- * EM / fixed-point update to iteratively re-estimate the @f$\gamma@f$
+ * MacKay fixed-point update (as in @c mne.inverse_sparse.gamma_map) to re-estimate the @f$\gamma@f$
  * vector from the data; sources whose @f$\gamma_{i}@f$ collapses below
  * threshold are pruned, leaving a sparse active set. Output is an
  * @ref INVLIB::InvGammaMapResult carrying the @ref INVLIB::InvSourceEstimate, the
@@ -83,7 +83,7 @@ public:
      * @param[in] matGain           Forward gain matrix (n_channels x n_sources).
      * @param[in] matData           Measurement data (n_channels x n_times).
      * @param[in] matNoiseCov       Noise covariance matrix (n_channels x n_channels).
-     * @param[in] nIterations       Maximum number of EM iterations.
+     * @param[in] nIterations       Maximum number of fixed-point iterations.
      * @param[in] tolerance         Convergence tolerance on relative gamma change.
      * @param[in] gammaThreshold    Threshold below which sources are pruned.
      *

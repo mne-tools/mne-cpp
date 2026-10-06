@@ -87,11 +87,10 @@ InvMxneResult InvMxne::compute(
             }
         }
 
-        // Build diagonal weight matrix W = diag(1/w_i^2)
+        // Stationary point of the L21 objective: G^T (M - G X) = alpha X_i / ||X_i||, so W = diag(1/w_i)
         VectorXd vecWdiag(nActive);
         for (int i = 0; i < nActive; ++i) {
-            double w = vecWeights(activeIdx[i]);
-            vecWdiag(i) = 1.0 / (w * w);
+            vecWdiag(i) = 1.0 / vecWeights(activeIdx[i]);
         }
 
         // Solve (G^T*G + alpha*W) * X_active = G^T*M

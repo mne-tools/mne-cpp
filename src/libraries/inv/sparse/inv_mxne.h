@@ -67,7 +67,8 @@ struct INVSHARED_EXPORT InvMxneResult
 /**
  * Mixed-Norm Estimate (MxNE) sparse inverse solver.
  *
- * Minimizes: ||M - G*X||^2_F + alpha * sum_i ||X_i||_2
+ * Minimizes: 0.5 * ||M - G*X||^2_F + alpha * sum_i ||X_i||_2, the objective of
+ * mne.inverse_sparse.mixed_norm (without debiasing)
  * using an Iteratively Reweighted Least Squares (IRLS) approach for the L21-norm (group lasso).
  *
  * @brief MxNE sparse inverse solver.

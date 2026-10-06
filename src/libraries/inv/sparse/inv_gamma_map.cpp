@@ -31,6 +31,7 @@
 
 #include <cmath>
 #include <algorithm>
+#include <limits>
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -90,11 +91,12 @@ InvGammaMapResult InvGammaMap::compute(
         // Data covariance model: C_M = G_active * Gamma_active * G_active^T + NoiseCov
         MatrixXd matCm = matG_active * vecGamma_active.asDiagonal() * matG_active.transpose() + matNoiseCov;
 
-        // Solve C_M^{-1} * M
-        MatrixXd matCmInvM = matCm.ldlt().solve(matData);
+        const auto ldlt = matCm.ldlt();
+        const MatrixXd matCmInvG = ldlt.solve(matG_active);
+        const MatrixXd matA = matCmInvG.transpose() * matData; // G^T C_M^{-1} M
 
         // Posterior mean: X_active = Gamma_active * G_active^T * C_M^{-1} * M
-        MatrixXd matX_active = vecGamma_active.asDiagonal() * matG_active.transpose() * matCmInvM;
+        MatrixXd matX_active = vecGamma_active.asDiagonal() * matA;
 
         // Write back to full solution
         matX.setZero();
@@ -102,11 +104,11 @@ InvGammaMapResult InvGammaMap::compute(
             matX.row(activeIdx[i]) = matX_active.row(i);
         }
 
-        // Update gamma: gamma_i = ||X_i||^2_2 / T
+        // MacKay update (Wipf & Nagarajan 2009, eq. 10), as in mne.inverse_sparse.gamma_map
         vecGammaOld = vecGamma;
         for (int i = 0; i < nActive; ++i) {
-            int srcIdx = activeIdx[i];
-            vecGamma(srcIdx) = matX_active.row(i).squaredNorm() / static_cast<double>(nTimes);
+            const double denom = std::max(matG_active.col(i).dot(matCmInvG.col(i)), std::numeric_limits<double>::epsilon());
+            vecGamma(activeIdx[i]) = vecGamma_active(i) * matA.row(i).squaredNorm() / static_cast<double>(nTimes) / denom;
         }
 
         // Prune sources with gamma below threshold
