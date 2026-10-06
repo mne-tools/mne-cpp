@@ -104,8 +104,8 @@ int main(int argc, char* argv[])
 
     //! [fiff_info_usage]
     QFile rawFile(dir + "/sample_audvis_trunc_raw.fif");
-    FiffRawData raw(rawFile);          // reads the measurement info, raw data is read on demand
-    const FiffInfo& info = raw.info;   // channels, sampling rate, bads, projectors, digitizer, transforms
+    FiffRawData raw(rawFile);        // reads the measurement info, raw data is read on demand
+    const FiffInfo& info = raw.info; // channels, sampling rate, bads, projectors, digitizer, transforms
     const FiffChInfo& first = info.chs[0];
     const RowVectorXi megPicks = info.pick_types(true, false, false, QStringList(), info.bads); // good MEG channels
     //! [fiff_info_usage]
@@ -117,7 +117,7 @@ int main(int argc, char* argv[])
                  "FiffChInfo/FiffChPos: MEG0113 is a 3012 planar gradiometer at (-0.1066, 0.0464, -0.0604) m");
 
     //! [fiff_dig_point_set_usage]
-    FiffDigPointSet digitizer(info.dig);                                  // 146 points in head coordinates
+    FiffDigPointSet digitizer(info.dig);                                    // 146 points in head coordinates
     FiffDigPointSet cardinal = digitizer.pickTypes({FIFFV_POINT_CARDINAL}); // LPA, nasion, RPA
     //! [fiff_dig_point_set_usage]
     // mne: 146 points; dig[0] = LPA at (-0.0713766, 0, 5.1e-9)

@@ -17,6 +17,13 @@ class FWDLIB::Fwd
 
 Static-method façade that re-exposes [MNEForwardSolution](/docs/api/mne/mne-forward-solution) toolbox-equivalent entry points under their familiar `mne_*` names.
 
+```cpp title="src/examples/ex_fwd_api/main.cpp"
+MNEForwardSolution back;
+Fwd::read_forward_solution(solFile, back); // same as MNEForwardSolution::read: drops the bad channels
+MNEForwardSolution all;
+MNEForwardSolution::read(solFile, all, false, false, {}, {}, false); // keeps them, like mne.read_forward_solution
+```
+
 ---
 
 ## Public Methods
@@ -58,6 +65,12 @@ mne_read_forward_solution
 - *bool* — true if succeeded, false otherwise.
 
 ---
+
+## Example
+
+- Full source: [`src/examples/ex_fwd_api/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_fwd_api/main.cpp)
+- Build target: `ex_fwd_api` (runs under CTest)
+- Data: [mne-cpp-test-data](https://github.com/mne-tools/mne-cpp-test-data)
 
 ## Authors of this file
 

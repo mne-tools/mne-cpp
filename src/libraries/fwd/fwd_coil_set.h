@@ -65,6 +65,8 @@ class FwdBemSolution;
  * Implements FwdCoilSet (replaces @c fwdCoilSet / @c fwdCoilSetRec from MNE-C @c fwd_types.h).
  *
  * @brief Container of FwdCoil instances acting both as the in-memory image of the @c coil_def.dat template database and as a per-channel sensor array in a chosen coordinate frame (device / head / MRI).
+ *
+ * @snippet ex_fwd_api/main.cpp fwd_coil_set_usage
  */
 class FWDSHARED_EXPORT FwdCoilSet
 {

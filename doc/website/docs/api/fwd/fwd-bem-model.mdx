@@ -25,6 +25,15 @@ Holds the BEM model surfaces, conductivity parameters and the pre-inverted poten
 
 Refactored from the MNE-C `fwdBemModel` / `fwdBemModelRec` struct (``fwd_types.h``). Raw C-style arrays were replaced with Eigen types; surface ownership is managed through `std::unique_ptr`.
 
+```cpp title="src/examples/ex_fwd_api/main.cpp"
+auto bem = FwdBemModel::fwd_bem_load_homog_surface(data + "/subjects/sample/bem/sample-5120-bem.fif");
+bem->fwd_bem_load_recompute_solution(data + "/subjects/sample/bem/sample-5120-bem-sol.fif", FWD_BEM_LINEAR_COLL, 0);
+bem->fwd_bem_set_head_mri_t(FiffCoordTrans::readMriTransform(data + "/MEG/sample/all-trans.fif"));
+bem->fwd_bem_specify_coils(coils.get()); // stores a FwdBemSolution per coil set in coils->user_data
+VectorXf B(coils->ncoil());
+FwdBemModel::fwd_bem_field(rd, Q, *coils, B, bem.get()); // T per A m
+```
+
 ---
 
 ## Public Methods
@@ -1404,6 +1413,12 @@ Returns one row per cardinal dipole direction (x, y, z).
 - *int* — OK on success, FAIL on error.
 
 ---
+
+## Example
+
+- Full source: [`src/examples/ex_fwd_api/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_fwd_api/main.cpp)
+- Build target: `ex_fwd_api` (runs under CTest)
+- Data: [mne-cpp-test-data](https://github.com/mne-tools/mne-cpp-test-data)
 
 ## Authors of this file
 

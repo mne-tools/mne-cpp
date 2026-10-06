@@ -59,6 +59,8 @@ namespace FWDLIB
  * Implements a Forward BEM Solution (replaces @c fwdBemSolution / @c fwdBemSolutionRec from MNE-C @c fwd_types.h).
  *
  * @brief Channel-specific projection that contracts a BEM node-potential vector down to one entry per MEG coil or EEG electrode — i.e. the Geselowitz surface-integral weights cached as a dense @c ncoil × @c np matrix.
+ *
+ * @snippet ex_fwd_api/main.cpp fwd_bem_model_usage
  */
 class FWDSHARED_EXPORT FwdBemSolution
 {

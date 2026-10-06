@@ -21,8 +21,8 @@ Owns just the fields needed to interpret a data matrix: `chs`, `ch_names`, `ncha
 
 ```cpp title="src/examples/ex_fiff_api/main.cpp"
 QFile rawFile(dir + "/sample_audvis_trunc_raw.fif");
-FiffRawData raw(rawFile);          // reads the measurement info, raw data is read on demand
-const FiffInfo& info = raw.info;   // channels, sampling rate, bads, projectors, digitizer, transforms
+FiffRawData raw(rawFile);        // reads the measurement info, raw data is read on demand
+const FiffInfo& info = raw.info; // channels, sampling rate, bads, projectors, digitizer, transforms
 const FiffChInfo& first = info.chs[0];
 const RowVectorXi megPicks = info.pick_types(true, false, false, QStringList(), info.bads); // good MEG channels
 ```

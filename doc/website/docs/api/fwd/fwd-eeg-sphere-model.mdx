@@ -23,6 +23,17 @@ Implements [`FwdEegSphereModel`](/docs/api/fwd/fwd-eeg-sphere-model) (replaces `
 
 Multi-shell concentric-sphere head model holding the Berg-Scherg equivalent-source parameters that accelerate the de Munck Legendre series for EEG, plus the Sarvas closed-form coefficients used for the spherically-symmetric MEG forward solution.
 
+```cpp title="src/examples/ex_fwd_api/main.cpp"
+std::unique_ptr<FwdEegSphereModelSet> models(FwdEegSphereModelSet::fwd_add_default_eeg_sphere_model(nullptr));
+std::unique_ptr<FwdEegSphereModel> sphere(models->fwd_select_eeg_sphere_model("Default")); // 4 layers: brain, CSF, skull, scalp
+// Scalp radius 90 mm; 3 Berg-Scherg dipoles approximate the layered potentials
+sphere->fwd_setup_eeg_sphere_model(0.09f, true, 3);
+sphere->r0 = Vector3f(0.0f, 0.0f, 0.04f);
+auto els = FwdCoilSet::create_eeg_els(eeg, eeg.size());
+VectorXf V(els->ncoil());
+FwdEegSphereModel::fwd_eeg_spherepot_coil(rd, Q, *els, V, sphere.get()); // V per A m
+```
+
 ---
 
 ## Public Methods
@@ -511,6 +522,12 @@ Objective function for the simplex optimizer: evaluate the residual sum of squar
 - *double* — Sum of squared residuals; 1.0 if any mu exceeds +/-1.
 
 ---
+
+## Example
+
+- Full source: [`src/examples/ex_fwd_api/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_fwd_api/main.cpp)
+- Build target: `ex_fwd_api` (runs under CTest)
+- Data: [mne-cpp-test-data](https://github.com/mne-tools/mne-cpp-test-data)
 
 ## Authors of this file
 

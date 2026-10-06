@@ -129,6 +129,8 @@ class FwdThreadArg;
  * Refactored from the MNE-C @c fwdBemModel / @c fwdBemModelRec struct
  * (@c fwd_types.h). Raw C-style arrays were replaced with Eigen types;
  * surface ownership is managed through @c std::unique_ptr.
+ *
+ * @snippet ex_fwd_api/main.cpp fwd_bem_model_usage
  */
 class FWDSHARED_EXPORT FwdBemModel
 {

@@ -19,6 +19,12 @@ Implements [`FwdCoilSet`](/docs/api/fwd/fwd-coil-set) (replaces `fwdCoilSet` / `
 
 Container of [`FwdCoil`](/docs/api/fwd/fwd-coil) instances acting both as the in-memory image of the `coil_def.dat` template database and as a per-channel sensor array in a chosen coordinate frame (device / head / MRI).
 
+```cpp title="src/examples/ex_fwd_api/main.cpp"
+auto templates = FwdCoilSet::read_coil_defs(coilDefs); // integration points per coil type
+auto coils = templates->create_meg_coils(meg, meg.size(), FWD_COIL_ACCURACY_ACCURATE, raw.info.dev_head_t);
+const FwdCoil& first = *coils->coils[0]; // MEG 0113 in head coordinates
+```
+
 ---
 
 ## Public Methods
@@ -202,6 +208,12 @@ Read a coil definitions from file.
 - *FwdCoilSet::UPtr* — The read meg coil set.
 
 ---
+
+## Example
+
+- Full source: [`src/examples/ex_fwd_api/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_fwd_api/main.cpp)
+- Build target: `ex_fwd_api` (runs under CTest)
+- Data: [mne-cpp-test-data](https://github.com/mne-tools/mne-cpp-test-data)
 
 ## Authors of this file
 

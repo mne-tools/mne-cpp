@@ -93,6 +93,8 @@ using fitUser = fitUserRec*;
  * Implements FwdEegSphereModel (replaces @c fwdEegSphereModel / @c fwdEegSphereModelRec from MNE-C @c fwd_types.h).
  *
  * @brief Multi-shell concentric-sphere head model holding the Berg-Scherg equivalent-source parameters that accelerate the de Munck Legendre series for EEG, plus the Sarvas closed-form coefficients used for the spherically-symmetric MEG forward solution.
+ *
+ * @snippet ex_fwd_api/main.cpp fwd_eeg_sphere_model_usage
  */
 class FWDSHARED_EXPORT FwdEegSphereModel
 {

@@ -97,6 +97,8 @@ namespace FWDLIB
  * after a new device-to-head transform.
  *
  * @brief Top-level driver for MEG/EEG forward-solution computation.
+ *
+ * @snippet ex_fwd_api/main.cpp compute_fwd_usage
  */
 class FWDSHARED_EXPORT ComputeFwd
 {

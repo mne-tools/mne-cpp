@@ -20,7 +20,7 @@ Collection of [`FiffDigPoint`](/docs/api/fiff/fiff-dig-point) records as parsed 
 Indexed access plus convenience filters (cardinals only, HPI only, EEG only, extras only) so registration code can pick out the subset it needs without re-walking the underlying QList of dig points.
 
 ```cpp title="src/examples/ex_fiff_api/main.cpp"
-FiffDigPointSet digitizer(info.dig);                                  // 146 points in head coordinates
+FiffDigPointSet digitizer(info.dig);                                    // 146 points in head coordinates
 FiffDigPointSet cardinal = digitizer.pickTypes({FIFFV_POINT_CARDINAL}); // LPA, nasion, RPA
 ```
 

@@ -47,6 +47,8 @@ namespace FWDLIB
 //=============================================================================================================
 /**
  * @brief Static-method façade that re-exposes MNEForwardSolution toolbox-equivalent entry points under their familiar @c mne_* names.
+ *
+ * @snippet ex_fwd_api/main.cpp fwd_read_usage
  */
 class FWDSHARED_EXPORT Fwd
 {

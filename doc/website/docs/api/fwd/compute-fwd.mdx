@@ -25,6 +25,31 @@ Implements the forward-solution computation driver.
 
 Top-level driver for MEG/EEG forward-solution computation.
 
+```cpp title="src/examples/ex_fwd_api/main.cpp"
+// mne_forward_solution --meg --eeg --accurate --label V1-lh.label with sphere models instead of a BEM
+const QString label = tmp.filePath("V1-lh.label"); // the hemisphere is taken from the "-lh.label" suffix
+QFile::copy(data + "/subjects/sample/label/lh.V1.label", label);
+auto settings = std::make_shared<ComputeFwdSettings>();
+settings->include_meg = true;
+settings->include_eeg = true;
+settings->accurate = true;
+settings->srcname = data + "/subjects/sample/bem/sample-oct-6-src.fif";
+settings->measname = rawFile.fileName();
+settings->mriname = data + "/MEG/sample/all-trans.fif";
+settings->r0 = origin;
+settings->eeg_sphere_rad = 0.09f;
+settings->mindist = 0.0f;
+settings->filter_spaces = false;
+settings->labels = {label};
+settings->nlabel = 1;
+settings->solname = tmp.filePath("V1-fwd.fif");
+settings->pFiffInfo = QSharedPointer<FiffInfo>::create(raw.info);
+settings->checkIntegrity();
+auto fwd = std::make_shared<ComputeFwd>(settings)->calculateFwd();
+QFile solFile(settings->solname);
+fwd->write(solFile);
+```
+
 ---
 
 ## Public Methods
@@ -76,8 +101,9 @@ Update the head position with a new device-to-head transform and recompute the M
 
 ## Example
 
-- Full source: [`src/examples/ex_compute_forward/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_compute_forward/main.cpp)
-- Build target: `ex_compute_forward` (compiled in CI)
+- Full source: [`src/examples/ex_fwd_api/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_fwd_api/main.cpp)
+- Build target: `ex_fwd_api` (runs under CTest)
+- Data: [mne-cpp-test-data](https://github.com/mne-tools/mne-cpp-test-data)
 
 ## Authors of this file
 

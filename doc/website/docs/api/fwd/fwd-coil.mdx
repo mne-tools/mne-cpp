@@ -19,6 +19,12 @@ Implements [`FwdCoil`](/docs/api/fwd/fwd-coil) (replaces `fwdCoil` / `fwdCoilRec
 
 Single MEG sensor coil or EEG electrode — stores the coil-local frame and the ``(r_mag, cos_mag, w) integration-point triples that approximate the Biot-Savart surface integral over the coil area.
 
+```cpp title="src/examples/ex_fwd_api/main.cpp"
+auto templates = FwdCoilSet::read_coil_defs(coilDefs); // integration points per coil type
+auto coils = templates->create_meg_coils(meg, meg.size(), FWD_COIL_ACCURACY_ACCURATE, raw.info.dev_head_t);
+const FwdCoil& first = *coils->coils[0]; // MEG 0113 in head coordinates
+```
+
 ---
 
 ## Public Methods
@@ -142,6 +148,12 @@ Transform coordinate frame if so desired.
 - *FwdCoil::UPtr* — The created coil.
 
 ---
+
+## Example
+
+- Full source: [`src/examples/ex_fwd_api/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_fwd_api/main.cpp)
+- Build target: `ex_fwd_api` (runs under CTest)
+- Data: [mne-cpp-test-data](https://github.com/mne-tools/mne-cpp-test-data)
 
 ## Authors of this file
 

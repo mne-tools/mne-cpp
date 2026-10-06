@@ -526,7 +526,14 @@
       "mne_python": "mne.make_forward_solution",
       "sklearn": null,
       "test": "test_tool_forward_generation",
-      "example": "ex_compute_forward",
+      "example": "ex_fwd_api",
+      "example_snippet": [
+        "ex_fwd_api/main.cpp#compute_fwd_usage"
+      ],
+      "example_mode": "run",
+      "required_data": [
+        "mne-cpp-test-data"
+      ],
       "status": "done",
       "skigen_candidate": false,
       "documented": true,
@@ -544,7 +551,14 @@
       "mne_python": "mne.make_bem_model",
       "sklearn": null,
       "test": "test_fwd_bem_data",
-      "example": null,
+      "example": "ex_fwd_api",
+      "example_snippet": [
+        "ex_fwd_api/main.cpp#fwd_bem_model_usage"
+      ],
+      "example_mode": "run",
+      "required_data": [
+        "mne-cpp-test-data"
+      ],
       "status": "done",
       "skigen_candidate": false,
       "documented": true,
@@ -562,7 +576,14 @@
       "mne_python": "mne.make_sphere_model",
       "sklearn": null,
       "test": "test_fwd_sphere_settings",
-      "example": null,
+      "example": "ex_fwd_api",
+      "example_snippet": [
+        "ex_fwd_api/main.cpp#fwd_eeg_sphere_model_usage"
+      ],
+      "example_mode": "run",
+      "required_data": [
+        "mne-cpp-test-data"
+      ],
       "status": "done",
       "skigen_candidate": false,
       "documented": true,
@@ -4959,7 +4980,14 @@
       "mne_python": null,
       "sklearn": null,
       "test": null,
-      "example": null,
+      "example": "ex_fwd_api",
+      "example_snippet": [
+        "ex_fwd_api/main.cpp#fwd_read_usage"
+      ],
+      "example_mode": "run",
+      "required_data": [
+        "mne-cpp-test-data"
+      ],
       "status": "documented",
       "skigen_candidate": false,
       "documented": true,
@@ -4977,7 +5005,14 @@
       "mne_python": null,
       "sklearn": null,
       "test": null,
-      "example": null,
+      "example": "ex_fwd_api",
+      "example_snippet": [
+        "ex_fwd_api/main.cpp#fwd_bem_model_usage"
+      ],
+      "example_mode": "run",
+      "required_data": [
+        "mne-cpp-test-data"
+      ],
       "status": "documented",
       "skigen_candidate": false,
       "documented": true,
@@ -4995,7 +5030,14 @@
       "mne_python": null,
       "sklearn": null,
       "test": null,
-      "example": null,
+      "example": "ex_fwd_api",
+      "example_snippet": [
+        "ex_fwd_api/main.cpp#fwd_coil_set_usage"
+      ],
+      "example_mode": "run",
+      "required_data": [
+        "mne-cpp-test-data"
+      ],
       "status": "documented",
       "skigen_candidate": false,
       "documented": true,
@@ -5013,7 +5055,14 @@
       "mne_python": null,
       "sklearn": null,
       "test": null,
-      "example": null,
+      "example": "ex_fwd_api",
+      "example_snippet": [
+        "ex_fwd_api/main.cpp#fwd_coil_set_usage"
+      ],
+      "example_mode": "run",
+      "required_data": [
+        "mne-cpp-test-data"
+      ],
       "status": "documented",
       "skigen_candidate": false,
       "documented": true,
@@ -5032,6 +5081,8 @@
       "sklearn": null,
       "test": null,
       "example": null,
+      "example_exempt": true,
+      "example_exempt_reason": "CTF compensation wrapper that FwdBemModel builds for compensated coil sets during ComputeFwd; callers reach it through ComputeFwd (ex_fwd_api compute_fwd_usage).",
       "status": "documented",
       "skigen_candidate": false,
       "documented": true,
@@ -5049,7 +5100,14 @@
       "mne_python": null,
       "sklearn": null,
       "test": null,
-      "example": null,
+      "example": "ex_fwd_api",
+      "example_snippet": [
+        "ex_fwd_api/main.cpp#fwd_eeg_sphere_model_usage"
+      ],
+      "example_mode": "run",
+      "required_data": [
+        "mne-cpp-test-data"
+      ],
       "status": "documented",
       "skigen_candidate": false,
       "documented": true,
@@ -5067,7 +5125,14 @@
       "mne_python": null,
       "sklearn": null,
       "test": null,
-      "example": null,
+      "example": "ex_fwd_api",
+      "example_snippet": [
+        "ex_fwd_api/main.cpp#fwd_eeg_sphere_model_usage"
+      ],
+      "example_mode": "run",
+      "required_data": [
+        "mne-cpp-test-data"
+      ],
       "status": "documented",
       "skigen_candidate": false,
       "documented": true,
@@ -5085,7 +5150,14 @@
       "mne_python": null,
       "sklearn": null,
       "test": null,
-      "example": null,
+      "example": "ex_fwd_api",
+      "example_snippet": [
+        "ex_fwd_api/main.cpp#fwd_field_map_usage"
+      ],
+      "example_mode": "run",
+      "required_data": [
+        "mne-cpp-test-data"
+      ],
       "status": "documented",
       "skigen_candidate": false,
       "documented": true,
@@ -5104,6 +5176,8 @@
       "sklearn": null,
       "test": null,
       "example": null,
+      "example_exempt": true,
+      "example_exempt_reason": "Per-thread work item of the parallel dipole loop inside ComputeFwd; built and consumed only by FwdBemModel, never by callers.",
       "status": "documented",
       "skigen_candidate": false,
       "documented": true,

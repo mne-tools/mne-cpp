@@ -67,6 +67,8 @@ namespace FWDLIB
  * Definitions for the EEG Sphere Model Set (replaces @c fwdEegSphereModelSet / @c fwdEegSphereModelSetRec from MNE-C @c fwd_types.h).
  *
  * @brief Name-indexed collection of FwdEegSphereModel objects parsed from an @c mne_setup_eeg_sphere_model parameter file so callers can resolve textual model names ("Default", "Stok", …) into ready-to-use analytic head models.
+ *
+ * @snippet ex_fwd_api/main.cpp fwd_eeg_sphere_model_usage
  */
 
 class FWDSHARED_EXPORT FwdEegSphereModelSet

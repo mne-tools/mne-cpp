@@ -16,9 +16,8 @@
     "Settings": "Plain parameter record consumed by an algorithm class; shown inside that class's example."
   },
   "example_debt": {
-    "ceiling": 111,
+    "ceiling": 99,
     "names": [
-      "ComputeFwd",
       "FiffCoordTransSet",
       "FiffCtfComp",
       "FiffDataRef",
@@ -28,17 +27,6 @@
       "FiffRawDir",
       "FiffTime",
       "FilterThreadArg",
-      "Fwd",
-      "FwdBemModel",
-      "FwdBemSolution",
-      "FwdCoil",
-      "FwdCoilSet",
-      "FwdCompData",
-      "FwdEegSphereLayer",
-      "FwdEegSphereModel",
-      "FwdEegSphereModelSet",
-      "FwdFieldMap",
-      "FwdThreadArg",
       "InvBeamformer",
       "InvBeamformerCompute",
       "InvCMNE",

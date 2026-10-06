@@ -12,18 +12,18 @@
     "registered_stale": 0,
     "registered_with_test": 101,
     "registered_test_unresolved": 0,
-    "registered_with_example": 188,
+    "registered_with_example": 197,
     "registered_example_not_built": 0,
     "registered_with_python_equiv": 88,
     "registered_without_api_page": 0,
-    "with_snippet": 232,
+    "with_snippet": 242,
     "public_api_units": 478,
     "example_eligible": 383,
     "example_exempt": 95,
-    "eligible_backed_by_registry_example": 188,
-    "eligible_used_by_some_example": 253,
-    "examples_on_disk": 61,
-    "examples_built": 61
+    "eligible_backed_by_registry_example": 197,
+    "eligible_used_by_some_example": 259,
+    "examples_on_disk": 62,
+    "examples_built": 62
   },
   "by_library": {
     "bids": {
@@ -112,9 +112,9 @@
       "registered": 13,
       "with_test": 3,
       "eligible": 12,
-      "eligible_with_registry_example": 1,
-      "eligible_used_by_example": 2,
-      "with_snippet": 0
+      "eligible_with_registry_example": 10,
+      "eligible_used_by_example": 8,
+      "with_snippet": 10
     },
     "inv": {
       "public": 43,
@@ -6120,6 +6120,7 @@
       "including_examples": [
         "ex_coreg",
         "ex_fiff_api",
+        "ex_fwd_api",
         "ex_mri"
       ],
       "snippets": [
@@ -6700,7 +6701,8 @@
         "ex_connectivity_performance",
         "ex_dsp_maxwell",
         "ex_dsp_rt",
-        "ex_fiff_api"
+        "ex_fiff_api",
+        "ex_fwd_api"
       ],
       "snippets": [
         "ex_read_raw/main.cpp#fiff_raw_data_open",
@@ -7063,12 +7065,15 @@
       "registry_status": "done",
       "test": "test_tool_forward_generation",
       "test_resolves": true,
-      "example": "ex_compute_forward",
+      "example": "ex_fwd_api",
       "example_state": "built",
       "including_examples": [
-        "ex_compute_forward"
+        "ex_compute_forward",
+        "ex_fwd_api"
       ],
-      "snippets": [],
+      "snippets": [
+        "ex_fwd_api/main.cpp#compute_fwd_usage"
+      ],
       "api_page": "doc/website/docs/api/fwd/compute-fwd.mdx",
       "python_equiv": "mne.make_forward_solution",
       "example_eligible": true,
@@ -7087,7 +7092,8 @@
       "example": null,
       "example_state": "none",
       "including_examples": [
-        "ex_compute_forward"
+        "ex_compute_forward",
+        "ex_fwd_api"
       ],
       "snippets": [],
       "api_page": "doc/website/docs/api/fwd/compute-fwd-settings.mdx",
@@ -7105,10 +7111,14 @@
       "registry_status": "documented",
       "test": null,
       "test_resolves": false,
-      "example": null,
-      "example_state": "none",
-      "including_examples": [],
-      "snippets": [],
+      "example": "ex_fwd_api",
+      "example_state": "built",
+      "including_examples": [
+        "ex_fwd_api"
+      ],
+      "snippets": [
+        "ex_fwd_api/main.cpp#fwd_read_usage"
+      ],
       "api_page": "doc/website/docs/api/fwd/fwd-class.mdx",
       "python_equiv": null,
       "example_eligible": true,
@@ -7124,10 +7134,14 @@
       "registry_status": "done",
       "test": "test_fwd_bem_data",
       "test_resolves": true,
-      "example": null,
-      "example_state": "none",
-      "including_examples": [],
-      "snippets": [],
+      "example": "ex_fwd_api",
+      "example_state": "built",
+      "including_examples": [
+        "ex_fwd_api"
+      ],
+      "snippets": [
+        "ex_fwd_api/main.cpp#fwd_bem_model_usage"
+      ],
       "api_page": "doc/website/docs/api/fwd/fwd-bem-model.mdx",
       "python_equiv": "mne.make_bem_model",
       "example_eligible": true,
@@ -7143,10 +7157,14 @@
       "registry_status": "documented",
       "test": null,
       "test_resolves": false,
-      "example": null,
-      "example_state": "none",
-      "including_examples": [],
-      "snippets": [],
+      "example": "ex_fwd_api",
+      "example_state": "built",
+      "including_examples": [
+        "ex_fwd_api"
+      ],
+      "snippets": [
+        "ex_fwd_api/main.cpp#fwd_bem_model_usage"
+      ],
       "api_page": "doc/website/docs/api/fwd/fwd-bem-solution.mdx",
       "python_equiv": null,
       "example_eligible": true,
@@ -7162,10 +7180,12 @@
       "registry_status": "documented",
       "test": null,
       "test_resolves": false,
-      "example": null,
-      "example_state": "none",
+      "example": "ex_fwd_api",
+      "example_state": "built",
       "including_examples": [],
-      "snippets": [],
+      "snippets": [
+        "ex_fwd_api/main.cpp#fwd_coil_set_usage"
+      ],
       "api_page": "doc/website/docs/api/fwd/fwd-coil.mdx",
       "python_equiv": null,
       "example_eligible": true,
@@ -7181,12 +7201,15 @@
       "registry_status": "documented",
       "test": null,
       "test_resolves": false,
-      "example": null,
-      "example_state": "none",
+      "example": "ex_fwd_api",
+      "example_state": "built",
       "including_examples": [
+        "ex_fwd_api",
         "ex_hpiFit"
       ],
-      "snippets": [],
+      "snippets": [
+        "ex_fwd_api/main.cpp#fwd_coil_set_usage"
+      ],
       "api_page": "doc/website/docs/api/fwd/fwd-coil-set.mdx",
       "python_equiv": null,
       "example_eligible": true,
@@ -7221,10 +7244,12 @@
       "registry_status": "documented",
       "test": null,
       "test_resolves": false,
-      "example": null,
-      "example_state": "none",
+      "example": "ex_fwd_api",
+      "example_state": "built",
       "including_examples": [],
-      "snippets": [],
+      "snippets": [
+        "ex_fwd_api/main.cpp#fwd_eeg_sphere_model_usage"
+      ],
       "api_page": "doc/website/docs/api/fwd/fwd-eeg-sphere-layer.mdx",
       "python_equiv": null,
       "example_eligible": true,
@@ -7240,10 +7265,14 @@
       "registry_status": "done",
       "test": "test_fwd_sphere_settings",
       "test_resolves": true,
-      "example": null,
-      "example_state": "none",
-      "including_examples": [],
-      "snippets": [],
+      "example": "ex_fwd_api",
+      "example_state": "built",
+      "including_examples": [
+        "ex_fwd_api"
+      ],
+      "snippets": [
+        "ex_fwd_api/main.cpp#fwd_eeg_sphere_model_usage"
+      ],
       "api_page": "doc/website/docs/api/fwd/fwd-eeg-sphere-model.mdx",
       "python_equiv": "mne.make_sphere_model",
       "example_eligible": true,
@@ -7259,10 +7288,14 @@
       "registry_status": "documented",
       "test": null,
       "test_resolves": false,
-      "example": null,
-      "example_state": "none",
-      "including_examples": [],
-      "snippets": [],
+      "example": "ex_fwd_api",
+      "example_state": "built",
+      "including_examples": [
+        "ex_fwd_api"
+      ],
+      "snippets": [
+        "ex_fwd_api/main.cpp#fwd_eeg_sphere_model_usage"
+      ],
       "api_page": "doc/website/docs/api/fwd/fwd-eeg-sphere-model-set.mdx",
       "python_equiv": null,
       "example_eligible": true,
@@ -7278,10 +7311,14 @@
       "registry_status": "documented",
       "test": null,
       "test_resolves": false,
-      "example": null,
-      "example_state": "none",
-      "including_examples": [],
-      "snippets": [],
+      "example": "ex_fwd_api",
+      "example_state": "built",
+      "including_examples": [
+        "ex_fwd_api"
+      ],
+      "snippets": [
+        "ex_fwd_api/main.cpp#fwd_field_map_usage"
+      ],
       "api_page": "doc/website/docs/api/fwd/fwd-field-map.mdx",
       "python_equiv": null,
       "example_eligible": true,
@@ -9356,6 +9393,7 @@
       "including_examples": [
         "ex_compute_forward",
         "ex_dsp_rt",
+        "ex_fwd_api",
         "ex_read_fwd",
         "ex_read_fwd_disp_3D"
       ],

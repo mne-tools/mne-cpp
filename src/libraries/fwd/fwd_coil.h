@@ -86,6 +86,8 @@ inline constexpr bool FWD_IS_MEG_COIL(int x)
  * Implements FwdCoil (replaces @c fwdCoil / @c fwdCoilRec from MNE-C @c fwd_types.h).
  *
  * @brief Single MEG sensor coil or EEG electrode — stores the coil-local frame and the @c (r_mag, cos_mag, w) integration-point triples that approximate the Biot-Savart surface integral over the coil area.
+ *
+ * @snippet ex_fwd_api/main.cpp fwd_coil_set_usage
  */
 class FWDSHARED_EXPORT FwdCoil
 {

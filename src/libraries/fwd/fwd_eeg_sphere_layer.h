@@ -59,6 +59,8 @@ namespace FWDLIB
  * Implements FwdEegSphereLayer (replaces @c fwdEegSphereLayer / @c fwdEegSphereLayerRec from MNE-C @c fwd_types.h).
  *
  * @brief One concentric shell (outer radius @c rad, conductivity @c sigma and the derived ratios) of a multi-shell de Munck / Berg-Scherg EEG head model.
+ *
+ * @snippet ex_fwd_api/main.cpp fwd_eeg_sphere_model_usage
  */
 class FWDSHARED_EXPORT FwdEegSphereLayer
 {

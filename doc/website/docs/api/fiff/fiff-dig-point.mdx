@@ -20,7 +20,7 @@ One digitizer point: kind (cardinal/HPI/EEG/extra), ident, 3D position in `FIFFV
 Field layout matches ``fiffDigPointRec`` on disk. The (`kind`, `ident`) pair is the lookup key used everywhere else in the codebase — for example, the LPA/Nasion/RPA fiducials are found by searching for `kind` == `FIFFV_POINT_CARDINAL` and `ident` == 1 / 2 / 3.
 
 ```cpp title="src/examples/ex_fiff_api/main.cpp"
-FiffDigPointSet digitizer(info.dig);                                  // 146 points in head coordinates
+FiffDigPointSet digitizer(info.dig);                                    // 146 points in head coordinates
 FiffDigPointSet cardinal = digitizer.pickTypes({FIFFV_POINT_CARDINAL}); // LPA, nasion, RPA
 ```
 

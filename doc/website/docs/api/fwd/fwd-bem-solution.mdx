@@ -19,6 +19,15 @@ Implements a Forward BEM Solution (replaces `fwdBemSolution` / `fwdBemSolutionRe
 
 Channel-specific projection that contracts a BEM node-potential vector down to one entry per MEG coil or EEG electrode — i.e. the Geselowitz surface-integral weights cached as a dense `ncoil` × `np` matrix.
 
+```cpp title="src/examples/ex_fwd_api/main.cpp"
+auto bem = FwdBemModel::fwd_bem_load_homog_surface(data + "/subjects/sample/bem/sample-5120-bem.fif");
+bem->fwd_bem_load_recompute_solution(data + "/subjects/sample/bem/sample-5120-bem-sol.fif", FWD_BEM_LINEAR_COLL, 0);
+bem->fwd_bem_set_head_mri_t(FiffCoordTrans::readMriTransform(data + "/MEG/sample/all-trans.fif"));
+bem->fwd_bem_specify_coils(coils.get()); // stores a FwdBemSolution per coil set in coils->user_data
+VectorXf B(coils->ncoil());
+FwdBemModel::fwd_bem_field(rd, Q, *coils, B, bem.get()); // T per A m
+```
+
 ---
 
 ## Public Methods
@@ -34,6 +43,12 @@ Constructs the Forward BEM Solution.
 Destroys the Forward BEM Solution.
 
 ---
+
+## Example
+
+- Full source: [`src/examples/ex_fwd_api/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_fwd_api/main.cpp)
+- Build target: `ex_fwd_api` (runs under CTest)
+- Data: [mne-cpp-test-data](https://github.com/mne-tools/mne-cpp-test-data)
 
 ## Authors of this file
 

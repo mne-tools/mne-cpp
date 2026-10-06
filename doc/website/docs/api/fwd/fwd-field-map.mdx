@@ -21,6 +21,15 @@ Uses Legendre-series lead-field dot products evaluated on a sphere fitted to the
 
 Ported from MNE-Python (BSD-3-Clause): `_do_self_dots`, `_do_surface_dots`, `_fast_sphere_dot_r0` (`_lead_dots.py`); `_compute_mapping_matrix`, `_pinv_trunc` (`_field_interpolation.py`).
 
+```cpp title="src/examples/ex_fwd_api/main.cpp"
+auto normalCoils = templates->create_meg_coils(goodMeg, goodMeg.size(), FWD_COIL_ACCURACY_NORMAL, raw.info.dev_head_t);
+const Vector3f origin(0.0f, 0.0f, 0.04f);
+MatrixX3f surfRr(3, 3);
+surfRr << 0.0f, 0.0f, 0.12f, 0.08f, 0.0f, 0.08f, 0.0f, -0.09f, 0.07f;
+const MatrixX3f surfNn = (surfRr.rowwise() - origin.transpose()).rowwise().normalized();
+auto mapping = FwdFieldMap::computeMegMapping(*normalCoils, surfRr, surfNn, origin); // nvert x nchan
+```
+
 ---
 
 ## Static Methods
@@ -152,6 +161,12 @@ Compute EEG electrode-to-surface mapping matrix with SSP projection and average 
 - *std::unique_ptr&lt; Eigen::MatrixXf &gt;* — Mapping matrix (nvert × nchan), or null on failure.
 
 ---
+
+## Example
+
+- Full source: [`src/examples/ex_fwd_api/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_fwd_api/main.cpp)
+- Build target: `ex_fwd_api` (runs under CTest)
+- Data: [mne-cpp-test-data](https://github.com/mne-tools/mne-cpp-test-data)
 
 ## Authors of this file
 

@@ -67,6 +67,8 @@ namespace FWDLIB
  *   (@c _lead_dots.py);
  *   @c _compute_mapping_matrix, @c _pinv_trunc
  *   (@c _field_interpolation.py).
+ *
+ * @snippet ex_fwd_api/main.cpp fwd_field_map_usage
  */
 class FWDSHARED_EXPORT FwdFieldMap
 {
