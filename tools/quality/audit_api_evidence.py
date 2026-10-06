@@ -144,6 +144,8 @@ def build_report(repo_root: Path = REPO_ROOT) -> dict[str, Any]:
             candidate = f"doc/website/docs/api/{module['dir_slug']}/{page_slug(name, module['dir_slug'])}.mdx"
             page = candidate if (repo_root / candidate).is_file() else None
         exempt_reason = exemption(name, header, policy)
+        if exempt_reason is None and entry and entry.get("example_exempt"):
+            exempt_reason = f"registry: {entry.get('example_exempt_reason')}"
         example_state = (
             "none" if not example
             else "missing" if example not in example_dirs

@@ -40,8 +40,7 @@ class FixtureTree:
     def __init__(self, root: Path) -> None:
         _write(root, "src/libraries/fiff/fiff_reader.h",
                "class FIFFSHARED_EXPORT FiffReader : public QObject\n{\n};\n"
-               "struct FIFFSHARED_EXPORT FiffRecord\n{\n};\n"
-               "FIFFSHARED_EXPORT int countTags(const QString& path);\n")
+               "struct FIFFSHARED_EXPORT FiffRecord\n{\n};\n"               "class FIFFSHARED_EXPORT FiffWorker\n{\n};\n"               "FIFFSHARED_EXPORT int countTags(const QString& path);\n")
         _write(root, "src/libraries/fiff/fiff_utils.h", "namespace FIFFLIB { int helper(); }\n")
         _write(root, "src/libraries/disp/viewers/rawview.h", "class DISPSHARED_EXPORT RawView\n{\n};\n")
         _write(root, "src/examples/CMakeLists.txt", "add_subdirectory(ex_read)\n")
@@ -56,6 +55,8 @@ class FixtureTree:
                 {"name": "FiffUtils", "module": "fiff", "header": "fiff/fiff_utils.h", "kind": "module",
                  "test": "test_gone", "example": "ex_orphan"},
                 {"name": "FiffOld", "module": "fiff", "header": "fiff/fiff_old.h"},
+                {"name": "FiffWorker", "module": "fiff", "header": "fiff/fiff_reader.h",
+                 "example_exempt": True, "example_exempt_reason": "Internal work item."},
             ],
         }
         _write(root, "doc/api_registry.json", json.dumps(registry))
@@ -99,8 +100,11 @@ class AuditTests(unittest.TestCase):
         records = {r["name"]: r for r in report["classes"]}
         self.assertFalse(records["RawView"]["example_eligible"])
         self.assertIn("disp/viewers/", records["RawView"]["exempt_reason"])
+        self.assertFalse(records["FiffWorker"]["example_eligible"])
+        self.assertEqual(records["FiffWorker"]["exempt_reason"], "registry: Internal work item.")
         summary = report["summary"]
-        self.assertEqual(summary["public_api_units"], 4)
+        self.assertEqual(summary["public_api_units"], 5)
+        self.assertEqual(summary["example_exempt"], 2)
         self.assertEqual(summary["example_eligible"] + summary["example_exempt"], summary["public_api_units"])
         self.assertEqual(summary["eligible_backed_by_registry_example"], 1)
         self.assertEqual(summary["registered_stale"], 1)

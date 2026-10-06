@@ -18,10 +18,10 @@
     "registered_without_api_page": 0,
     "with_snippet": 330,
     "public_api_units": 478,
-    "example_eligible": 383,
-    "example_exempt": 95,
+    "example_eligible": 363,
+    "example_exempt": 115,
     "eligible_backed_by_registry_example": 269,
-    "eligible_used_by_some_example": 328,
+    "eligible_used_by_some_example": 327,
     "examples_on_disk": 68,
     "examples_built": 68
   },
@@ -111,7 +111,7 @@
       "public": 13,
       "registered": 13,
       "with_test": 3,
-      "eligible": 12,
+      "eligible": 10,
       "eligible_with_registry_example": 10,
       "eligible_used_by_example": 8,
       "with_snippet": 10
@@ -120,7 +120,7 @@
       "public": 43,
       "registered": 35,
       "with_test": 19,
-      "eligible": 41,
+      "eligible": 40,
       "eligible_with_registry_example": 33,
       "eligible_used_by_example": 39,
       "with_snippet": 39
@@ -165,9 +165,9 @@
       "public": 61,
       "registered": 57,
       "with_test": 6,
-      "eligible": 59,
+      "eligible": 42,
       "eligible_with_registry_example": 40,
-      "eligible_used_by_example": 39,
+      "eligible_used_by_example": 38,
       "with_snippet": 40
     },
     "mri": {
@@ -7295,8 +7295,8 @@
       "snippets": [],
       "api_page": "doc/website/docs/api/fwd/fwd-comp-data.mdx",
       "python_equiv": null,
-      "example_eligible": true,
-      "exempt_reason": null
+      "example_eligible": false,
+      "exempt_reason": "registry: CTF compensation wrapper that FwdBemModel builds for compensated coil sets during ComputeFwd; callers reach it through ComputeFwd (ex_fwd_api compute_fwd_usage)."
     },
     {
       "name": "FwdEegSphereLayer",
@@ -7404,8 +7404,8 @@
       "snippets": [],
       "api_page": "doc/website/docs/api/fwd/fwd-thread-arg.mdx",
       "python_equiv": null,
-      "example_eligible": true,
-      "exempt_reason": null
+      "example_eligible": false,
+      "exempt_reason": "registry: Per-thread work item of the parallel dipole loop inside ComputeFwd; built and consumed only by FwdBemModel, never by callers."
     },
     {
       "name": "InvBeamformer",
@@ -7446,8 +7446,8 @@
       "snippets": [],
       "api_page": "doc/website/docs/api/inv/inv-beamformer-compute.mdx",
       "python_equiv": null,
-      "example_eligible": true,
-      "exempt_reason": null
+      "example_eligible": false,
+      "exempt_reason": "registry: Static numerical core (filter weights, power, regularised inverses) shared by InvLCMV and InvDICS; callers use those (ex_inv_beamformer inv_lcmv_usage)."
     },
     {
       "name": "InvDICS",
@@ -9226,8 +9226,8 @@
       "snippets": [],
       "api_page": "doc/website/docs/api/mne/filter-thread-arg.mdx",
       "python_equiv": null,
-      "example_eligible": true,
-      "exempt_reason": null
+      "example_eligible": false,
+      "exempt_reason": "registry: Per-thread work item of the parallel source-space filter inside MNESourceSpace::filter_source_space; built and consumed only there, never by callers."
     },
     {
       "name": "MNE",
@@ -9868,8 +9868,8 @@
       "snippets": [],
       "api_page": "doc/website/docs/api/mne/mne-mgh-tag.mdx",
       "python_equiv": null,
-      "example_eligible": true,
-      "exempt_reason": null
+      "example_eligible": false,
+      "exempt_reason": "registry: Raw FreeSurfer MGH tag record kept by the surface reader inside MNESourceSpace; never constructed by callers."
     },
     {
       "name": "MNEMghTagGroup",
@@ -9887,8 +9887,8 @@
       "snippets": [],
       "api_page": "doc/website/docs/api/mne/mne-mgh-tag-group.mdx",
       "python_equiv": null,
-      "example_eligible": true,
-      "exempt_reason": null
+      "example_eligible": false,
+      "exempt_reason": "registry: Container of MNEMghTag records filled by the surface reader inside MNESourceSpace; never constructed by callers."
     },
     {
       "name": "MNEMneData",
@@ -9950,8 +9950,8 @@
       "snippets": [],
       "api_page": "doc/website/docs/api/mne/mne-msh-color-scale-def.mdx",
       "python_equiv": null,
-      "example_eligible": true,
-      "exempt_reason": null
+      "example_eligible": false,
+      "exempt_reason": "registry: Colour-scale setting of the legacy MNE-C mesh viewer held by MNEMshDisplaySurface; UI state with no computation to demonstrate."
     },
     {
       "name": "MNEMshDisplaySurface",
@@ -10016,8 +10016,8 @@
       "snippets": [],
       "api_page": "doc/website/docs/api/mne/mne-msh-eyes.mdx",
       "python_equiv": null,
-      "example_eligible": true,
-      "exempt_reason": null
+      "example_eligible": false,
+      "exempt_reason": "registry: Camera state of the legacy MNE-C mesh viewer held by MNEMshDisplaySurfaceSet; UI state with no computation to demonstrate."
     },
     {
       "name": "MNEMshLight",
@@ -10035,8 +10035,8 @@
       "snippets": [],
       "api_page": "doc/website/docs/api/mne/mne-msh-light.mdx",
       "python_equiv": null,
-      "example_eligible": true,
-      "exempt_reason": null
+      "example_eligible": false,
+      "exempt_reason": "registry: Light of the legacy MNE-C mesh viewer held by MNEMshDisplaySurfaceSet; UI state with no computation to demonstrate."
     },
     {
       "name": "MNEMshLightSet",
@@ -10054,8 +10054,8 @@
       "snippets": [],
       "api_page": "doc/website/docs/api/mne/mne-msh-light-set.mdx",
       "python_equiv": null,
-      "example_eligible": true,
-      "exempt_reason": null
+      "example_eligible": false,
+      "exempt_reason": "registry: Lighting rig of the legacy MNE-C mesh viewer held by MNEMshDisplaySurfaceSet; UI state with no computation to demonstrate."
     },
     {
       "name": "MNEMshPicked",
@@ -10073,8 +10073,8 @@
       "snippets": [],
       "api_page": "doc/website/docs/api/mne/mne-msh-picked.mdx",
       "python_equiv": null,
-      "example_eligible": true,
-      "exempt_reason": null
+      "example_eligible": false,
+      "exempt_reason": "registry: Pick record of the legacy MNE-C mesh viewer held by MNEMshDisplaySurfaceSet; UI state with no computation to demonstrate."
     },
     {
       "name": "MNENamedMatrix",
@@ -10115,8 +10115,8 @@
       "snippets": [],
       "api_page": "doc/website/docs/api/mne/mne-named-vector.mdx",
       "python_equiv": null,
-      "example_eligible": true,
-      "exempt_reason": null
+      "example_eligible": false,
+      "exempt_reason": "registry: Scratch record inside MNEProjOp::make_proj_bad that picks one projection vector onto the channel list; callers use MNEProjOp (ex_mne_api mne_raw_data_usage)."
     },
     {
       "name": "MNENearest",
@@ -10134,8 +10134,8 @@
       "snippets": [],
       "api_page": "doc/website/docs/api/mne/mne-nearest.mdx",
       "python_equiv": null,
-      "example_eligible": true,
-      "exempt_reason": null
+      "example_eligible": false,
+      "exempt_reason": "registry: Per-vertex nearest-source record stored in MNESurfaceOrVolume::nearest; filled while reading a source space (ex_mne_api mne_source_spaces_usage)."
     },
     {
       "name": "MNEPatchInfo",
@@ -10153,8 +10153,8 @@
       "snippets": [],
       "api_page": "doc/website/docs/api/mne/mne-patch-info.mdx",
       "python_equiv": null,
-      "example_eligible": true,
-      "exempt_reason": null
+      "example_eligible": false,
+      "exempt_reason": "registry: Patch statistics computed while reading a source space with patches; reached through MNEHemisphere::pinfo (ex_mne_api mne_source_spaces_usage)."
     },
     {
       "name": "CovDefinition",
@@ -10248,8 +10248,8 @@
       "snippets": [],
       "api_page": "doc/website/docs/api/mne/mne-proj-data.mdx",
       "python_equiv": null,
-      "example_eligible": true,
-      "exempt_reason": null
+      "example_eligible": false,
+      "exempt_reason": "registry: Search-acceleration record (triangle activity mask) internal to MNESurface::project_to_surface; callers use MNEProjectToSurface (ex_mne_api mne_project_to_surface_usage)."
     },
     {
       "name": "MNEProjItem",
@@ -10406,8 +10406,8 @@
       "snippets": [],
       "api_page": "doc/website/docs/api/mne/mne-source-space.mdx",
       "python_equiv": "mne.SourceSpaces",
-      "example_eligible": true,
-      "exempt_reason": null
+      "example_eligible": false,
+      "exempt_reason": "registry: Abstract base of MNEHemisphere and volume source spaces; used through MNESourceSpaces (ex_mne_api mne_source_spaces_usage)."
     },
     {
       "name": "MNESourceSpaces",
@@ -10519,8 +10519,8 @@
       "snippets": [],
       "api_page": "doc/website/docs/api/mne/mne-surface-or-volume.mdx",
       "python_equiv": null,
-      "example_eligible": true,
-      "exempt_reason": null
+      "example_eligible": false,
+      "exempt_reason": "registry: Common base of MNESurface, MNESourceSpace and MNEBemSurface; used through those (ex_mne_api mne_bem_usage, mne_source_spaces_usage)."
     },
     {
       "name": "MNESurfacePatch",
@@ -10538,8 +10538,8 @@
       "snippets": [],
       "api_page": "doc/website/docs/api/mne/mne-surface-patch.mdx",
       "python_equiv": null,
-      "example_eligible": true,
-      "exempt_reason": null
+      "example_eligible": false,
+      "exempt_reason": "registry: Flat display patch of the legacy MNE-C mesh viewer held by MNEMshDisplaySurfaceSet; UI state with no computation to demonstrate."
     },
     {
       "name": "MNETriangle",
@@ -10557,8 +10557,8 @@
       "snippets": [],
       "api_page": "doc/website/docs/api/mne/mne-triangle.mdx",
       "python_equiv": null,
-      "example_eligible": true,
-      "exempt_reason": null
+      "example_eligible": false,
+      "exempt_reason": "registry: Per-triangle cache (centroid, area, normal) filled by MNESurfaceOrVolume::add_triangle_data; read through MNEBemSurface/MNESourceSpaces, shown in ex_mne_api mne_bem_usage."
     },
     {
       "name": "MNEVolGeom",
@@ -10576,8 +10576,8 @@
       "snippets": [],
       "api_page": "doc/website/docs/api/mne/mne-vol-geom.mdx",
       "python_equiv": null,
-      "example_eligible": true,
-      "exempt_reason": null
+      "example_eligible": false,
+      "exempt_reason": "registry: FreeSurfer volume geometry header decoded from MGH tags by the surface reader; a field of MNESurfaceOrVolume, not built by callers."
     },
     {
       "name": "MriCorFifIO",
