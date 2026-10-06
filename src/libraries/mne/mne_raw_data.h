@@ -247,10 +247,6 @@ public:
     int comp_now;                                    /**< Current compensation grade applied to data. */
     std::unique_ptr<MNEFilterDef> filter;            /**< Filter definition (highpass/lowpass). */
     std::unique_ptr<FilterData> filter_data;         /**< Pre-computed frequency-domain filter state. */
-    std::unique_ptr<MNEEventList> event_list;        /**< Trigger event list. */
-    unsigned int max_event;                          /**< Maximum event number in use. */
-    QString dig_trigger;                             /**< Name of the digital trigger channel. */
-    unsigned int dig_trigger_mask;                   /**< Bit mask applied to digital trigger channel. */
     Eigen::VectorXf offsets;                         /**< DC offset corrections for display. */
     std::unique_ptr<RingBuffer> ring;                /**< Ring buffer for raw data. */
     std::unique_ptr<RingBuffer> filt_ring;           /**< Ring buffer for filtered data. */

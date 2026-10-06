@@ -39,11 +39,7 @@
 #include "mne_cov_matrix.h"
 #include "mne_ctf_comp_data.h"
 #include "mne_ctf_comp_data_set.h"
-#include "mne_layout_port.h"
-#include "mne_layout.h"
 #include "mne_ch_selection.h"
-#include "mne_event.h"
-#include "mne_event_list.h"
 #include "mne_filter_def.h"
 
 #include <QStringList>

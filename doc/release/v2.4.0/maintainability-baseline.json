@@ -2,8 +2,8 @@
   "schema_version": 1,
   "generated_by": "tools/quality/audit_maintainability.py",
   "policy": "tools/quality/maintainability_policy.json",
-  "scanned_files": 1503,
-  "scanned_lines": 393065,
+  "scanned_files": 1497,
+  "scanned_lines": 392646,
   "oversized_threshold": 2000,
   "metrics": {
     "null_macro": {

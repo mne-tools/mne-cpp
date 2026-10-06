@@ -32,7 +32,6 @@ set(SOURCES
     mne_ctf_comp_data_set.cpp
     mne_deriv.cpp
     mne_deriv_set.cpp
-    mne_mne_data.cpp
     mne_named_matrix.cpp
     mne_named_vector.cpp
     mne_proj_item.cpp
@@ -86,15 +85,10 @@ set(HEADERS
     mne_ctf_comp_data_set.h
     mne_deriv.h
     mne_deriv_set.h
-    mne_mne_data.h
     mne_named_matrix.h
     mne_named_vector.h
     mne_sparse_named_matrix.h
-    mne_layout_port.h
-    mne_layout.h
     mne_ch_selection.h
-    mne_event.h
-    mne_event_list.h
     mne_filter_def.h
     mne_proj_item.h
     mne_proj_op.h

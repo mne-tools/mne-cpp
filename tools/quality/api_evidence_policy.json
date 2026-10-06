@@ -16,7 +16,7 @@
     "Settings": "Plain parameter record consumed by an algorithm class; shown inside that class's example."
   },
   "example_debt": {
-    "ceiling": 57,
+    "ceiling": 52,
     "names": [
       "FilterThreadArg",
       "MNE",
@@ -33,19 +33,14 @@
       "MNEDescriptionParser",
       "MNEEpochData",
       "MNEEpochDataList",
-      "MNEEvent",
-      "MNEEventList",
       "MNEFilterDef",
       "MNEForwardSolution",
       "MNEHemisphere",
       "MNEInverseOperator",
-      "MNELayout",
-      "MNELayoutPort",
       "MNEMeasData",
       "MNEMeasDataSet",
       "MNEMghTag",
       "MNEMghTagGroup",
-      "MNEMneData",
       "MNEMorphMap",
       "MNEMshColorScaleDef",
       "MNEMshDisplaySurface",
