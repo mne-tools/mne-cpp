@@ -1418,7 +1418,16 @@ void TestMneLibrary::epochData_readEpochs()
 
     QMap<QString, double> reject;
     MNEEpochDataList epochList = MNEEpochDataList::readEpochs(raw, events, -0.1f, 0.3f, 1, reject);
-    QVERIFY(epochList.size() > 0);
+    // mne.Epochs(tmin=-0.1, tmax=0.3, baseline=None, proj=False): 5 x 376 x 121, both ends rounded
+    QCOMPARE(epochList.size(), 5);
+    QCOMPARE(epochList[0]->epoch.cols(), 121);
+    QVERIFY(std::abs(epochList[0]->epoch(0, 0) - -3.3350798663498733e-15) < 1e-6 * 3.3350798663498733e-15);
+    QVERIFY(std::abs(epochList[4]->epoch(0, 120) - -4.747725008757484e-15) < 1e-6 * 4.747725008757484e-15);
+    const FiffEvoked evoked = epochList.average(raw.info, 0, 120);
+    QVERIFY(std::abs(evoked.data.topRows(306).norm() - 6.181772649047045e-13) < 1e-6 * 6.181772649047045e-13);
+    QCOMPARE(evoked.times.size(), 121);
+    QCOMPARE(evoked.times[30], 0.0f);
+    QVERIFY(std::abs(evoked.times[0] - -0.09989760657919393) < 1e-6);
 }
 
 //=============================================================================================================

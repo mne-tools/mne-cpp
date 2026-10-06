@@ -34,6 +34,12 @@
 #include <QDebug>
 
 //=============================================================================================================
+// STL INCLUDES
+//=============================================================================================================
+
+#include <cmath>
+
+//=============================================================================================================
 // USED NAMESPACES
 //=============================================================================================================
 
@@ -111,8 +117,9 @@ MNEEpochDataList MNEEpochDataList::readEpochs(const FiffRawData& raw,
     for (p = 0; p < count; ++p) {
         // Read a data segment
         event_samp = events(selected(p), 0);
-        from = event_samp + tmin * raw.info.sfreq;
-        to = event_samp + floor(tmax * raw.info.sfreq + 0.5);
+        // Like mne.Epochs: both ends rounded to the nearest sample
+        from = event_samp + static_cast<fiff_int_t>(std::lround(tmin * raw.info.sfreq));
+        to = event_samp + static_cast<fiff_int_t>(std::lround(tmax * raw.info.sfreq));
 
         epoch.reset(new MNEEpochData());
 
@@ -200,9 +207,12 @@ FiffEvoked MNEEpochDataList::average(const FiffInfo& info,
     p_evoked.first = first;
     p_evoked.last = last;
 
-    p_evoked.times = RowVectorXf::LinSpaced(this->first()->epoch.cols(), this->first()->tmin, this->first()->tmax);
-
-    p_evoked.times[static_cast<int>(this->first()->tmin * -1 * info.sfreq)] = 0;
+    // Sample times relative to the event, as in readEpochs (and mne.Epochs.times)
+    const long firstSample = std::lround(this->first()->tmin * info.sfreq);
+    p_evoked.times.resize(this->first()->epoch.cols());
+    for (Eigen::Index i = 0; i < p_evoked.times.size(); ++i) {
+        p_evoked.times[i] = static_cast<float>((firstSample + i) / info.sfreq);
+    }
 
     p_evoked.comment = QString::number(this->at(0)->event);
 
