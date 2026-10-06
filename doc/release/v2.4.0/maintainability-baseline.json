@@ -3,7 +3,7 @@
   "generated_by": "tools/quality/audit_maintainability.py",
   "policy": "tools/quality/maintainability_policy.json",
   "scanned_files": 1508,
-  "scanned_lines": 394377,
+  "scanned_lines": 394648,
   "oversized_threshold": 2000,
   "metrics": {
     "null_macro": {
@@ -55,12 +55,12 @@
       }
     },
     "c_style_cast": {
-      "total": 434,
-      "files": 74,
+      "total": 429,
+      "files": 73,
       "by_scope": {
         "applications": 61,
         "libraries": 275,
-        "tools": 98
+        "tools": 93
       },
       "suppressed": [],
       "top": {
@@ -153,7 +153,6 @@
         "src/tools/server/mne_rt_server/mne_rt_server/mne_rt_server.cpp": 3,
         "src/tools/server/mne_rt_server/plugins/fiffsimulator/fiffsimulator.cpp": 4,
         "src/tools/surface/mne_add_patch_info/main.cpp": 3,
-        "src/tools/surface/mne_make_morph_maps/main.cpp": 5,
         "src/tools/surface/mne_morph_labels/main.cpp": 4
       }
     },
@@ -490,12 +489,12 @@
       }
     },
     "numeric_define": {
-      "total": 835,
-      "files": 32,
+      "total": 834,
+      "files": 31,
       "by_scope": {
         "applications": 69,
         "libraries": 730,
-        "tools": 36
+        "tools": 35
       },
       "suppressed": [],
       "top": {
@@ -546,8 +545,7 @@
         "src/tools/inverse/mne_compute_raw_inverse/main.cpp": 1,
         "src/tools/server/mne_rt_server/mne_rt_server/IConnector.h": 1,
         "src/tools/server/mne_rt_server/mne_rt_server/commandthread.cpp": 1,
-        "src/tools/server/mne_rt_server/mne_rt_server/mne_rt_commands.h": 2,
-        "src/tools/surface/mne_make_morph_maps/main.cpp": 1
+        "src/tools/server/mne_rt_server/mne_rt_server/mne_rt_commands.h": 2
       }
     },
     "qt_new_unparented": {

@@ -27,6 +27,7 @@
 #include <fiff/fiff_evoked_set.h>
 #include <fiff/fiff_raw_data.h>
 #include <fiff/fiff_stream.h>
+#include <fs/fs_surface.h>
 #include <mne/mne.h>
 #include <mne/mne_bem.h>
 #include <mne/mne_bem_surface.h>
@@ -46,6 +47,7 @@
 #include <mne/mne_icp.h>
 #include <mne/mne_layout.h>
 #include <mne/mne_meas_data.h>
+#include <mne/mne_morph_map.h>
 #include <mne/mne_meas_data_set.h>
 #include <mne/mne_msh_display_surface.h>
 #include <mne/mne_msh_display_surface_set.h>
@@ -92,6 +94,7 @@
 
 using namespace FIFFLIB;
 using namespace MNELIB;
+using namespace FSLIB;
 using namespace Eigen;
 
 //=============================================================================================================
@@ -456,6 +459,27 @@ int main(int argc, char* argv[])
     // mne.channels.read_layout("Vectorview-all.lout", scale=False): 306 viewports in -85 ... 90 x -83 ... 75, MEG 0113 at (-73.4162, 33.4167); 138 boxes left of x = 0
     ok &= expect(layout && layout->ports.size() == 306 && (positions.value("MEG 0113") - QPointF(-73.416206, 33.416687)).manhattanLength() < 1e-4 && leftHalf == 138 && shownTriplet == 3,
                  "MNELayout/MNELayoutPort: Vectorview layout like mne.channels.read_layout, zoom and channel matching");
+
+    //! [mne_morph_map_usage]
+    // Morph map between the registered spheres of two subjects: every vertex of "large" is a
+    // barycentric blend of the three corners of the "small" triangle it falls into.
+    const QString subjectsDir = QStringLiteral(MNE_MORPH_SUBJECTS_DIR);
+    FsSurface smallSphere;
+    FsSurface largeSphere;
+    FsSurface::read(subjectsDir + "/small/surf/lh.sphere.reg", smallSphere, false);
+    FsSurface::read(subjectsDir + "/large/surf/lh.sphere.reg", largeSphere, false);
+    MNEMorphMap smallToLarge = MNEMorphMap::compute(smallSphere.rr(), smallSphere.tris(), largeSphere.rr());
+    smallToLarge.from_subj = "small";
+    smallToLarge.to_subj = "large";
+    smallToLarge.hemi = 0;
+    const QString mapFile = tmp.filePath("small-large-morph.fif");
+    MNEMorphMap::write(mapFile, {&smallToLarge});
+    const auto reread = MNEMorphMap::read(mapFile, "small", "large", 0);
+    const Eigen::SparseMatrix<double> weights = reread->toEigen(); // 642 x 162, feeds INVLIB::SourceMorph
+    //! [mne_morph_map_usage]
+    // mne.read_morph_map("small", "large"): vertex 0 of "large" = 0.4372 * v0 + 0.3726 * v42 + 0.1902 * v51 of "small"
+    ok &= expect(weights.rows() == 642 && weights.cols() == 162 && std::abs(weights.coeff(0, 0) - 0.43720984) < 1e-5 && std::abs(weights.coeff(0, 42) - 0.37262118) < 1e-5 && std::abs(weights.coeff(0, 51) - 0.19016896) < 1e-5,
+                 "MNEMorphMap: sphere-registered morph map like mne.read_morph_map, saved and reloaded");
 
     qInfo().noquote() << (ok ? "All mne checks passed." : "mne checks FAILED.");
     return ok ? EXIT_SUCCESS : EXIT_FAILURE;

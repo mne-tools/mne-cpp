@@ -7,7 +7,7 @@ sidebar_position: 5
 
 # Class Members
 
-Index of 6262 public class members (functions, variables, typedefs, enums) across all documented classes.
+Index of 6270 public class members (functions, variables, typedefs, enums) across all documented classes.
 
 **Jump to:** [A](#a) · [B](#b) · [C](#c) · [D](#d) · [E](#e) · [F](#f) · [G](#g) · [H](#h) · [I](#i) · [J](#j) · [K](#k) · [L](#l) · [M](#m) · [N](#n) · [O](#o) · [P](#p) · [Q](#q) · [R](#r) · [S](#s) · [T](#t) · [U](#u) · [V](#v) · [W](#w) · [X](#x) · [Y](#y) · [Z](#z)
 
@@ -297,7 +297,7 @@ Index of 6262 public class members (functions, variables, typedefs, enums) acros
 - **bemSurfaceData** `[fn]` in `BemTreeItem`
 - **bemTopVertexInMri** `[slot]` in `BrainView` — Return the highest-Z vertex of the BEM head surface in MRI coords.
 - **BemTreeItem** `[fn]` in `BemTreeItem`
-- **best** `[var]` in [MNEMorphMap](/docs/api/mne/mne-morph-map) — Index of the closest source surface vertex for each target vertex.
+- **best** `[var]` in [MNEMorphMap](/docs/api/mne/mne-morph-map) — Nearest source vertex of every destination vertex (computed maps only).
 - **bg_color** `[var]` in [MNEMshDisplaySurfaceSet](/docs/api/mne/mne-msh-display-surface-set) — Background color (RGB).
 - **BIDSPath** `[fn]` in [BIDSPath](/docs/api/bids/bids-path) — Constructs an empty [`BIDSPath`](/docs/api/bids/bids-path).
 - **BIDSPath** `[fn]` in [BIDSPath](/docs/api/bids/bids-path) — Constructs a [`BIDSPath`](/docs/api/bids/bids-path) with the most common entities.
@@ -754,6 +754,7 @@ Index of 6262 public class members (functions, variables, typedefs, enums) acros
 - **compute** `[fn]` in [InvResolutionMatrix](/docs/api/inv/inv-resolution-matrix) — Compute the resolution matrix R = inverseKernel × leadField.
 - **compute** `[fn]` in [InvTfMxne](/docs/api/inv/inv-tf-mxne) — Compute the TF-MxNE inverse solution.
 - **compute** `[fn]` in [InvTrapMusic](/docs/api/inv/inv-trap-music) — Compute TRAP-MUSIC source localization.
+- **compute** `[fn]` in [MNEMorphMap](/docs/api/mne/mne-morph-map) — Computes the map between two registered spheres (MNE-C `mne_compose_morph_maps`, accurate mode; `mne.surface._make_morph_map_hemi`).
 - **compute** `[fn]` in [MorletTfr](/docs/api/dsp/morlet-tfr) — Compute Morlet TFR for a single channel time series.
 - **compute** `[fn]` in [MultitaperPsd](/docs/api/dsp/multitaper-psd) — Compute multitaper PSD for every channel of a data matrix.
 - **compute** `[fn]` in [MultitaperTfr](/docs/api/dsp/multitaper-tfr) — Compute sliding-window multitaper TFR for every channel of a data matrix.
@@ -1857,8 +1858,7 @@ Index of 6262 public class members (functions, variables, typedefs, enums) acros
 - **FrequencySpectrumModel** `[fn]` in [FrequencySpectrumModel](/docs/api/disp/frequency-spectrum-model) — Constructs an real-time multi sample array table model for the given parent.
 - **from** `[var]` in [FiffCoordTrans](/docs/api/fiff/fiff-coord-trans) — Source coordinate system.
 - **from** `[var]` in [MNEEvent](/docs/api/mne/mne-event) — Trigger value before the transition.
-- **from_kind** `[var]` in [MNEMorphMap](/docs/api/mne/mne-morph-map) — FsSurface kind identifier (e.g., hemisphere) of the source surface (-1 = unknown).
-- **from_subj** `[var]` in [MNEMorphMap](/docs/api/mne/mne-morph-map) — Subject name of the source surface.
+- **from_subj** `[var]` in [MNEMorphMap](/docs/api/mne/mne-morph-map) — Source subject.
 - **fromBemSurface** `[fn]` in `BrainSurface` — Load geometry from a MNE BEM surface.
 - **fromBuffer** `[fn]` in [MlTensor](/docs/api/ml/ml-tensor) — Copy raw data into a new owning tensor (legacy 2-D helper).
 - **fromCardinalPoints** `[fn]` in [FiffCoordTrans](/docs/api/fiff/fiff-coord-trans) — Constructs a coordinate transformation from cardinal points (LPA, Nasion, RPA).
@@ -2416,6 +2416,7 @@ Index of 6262 public class members (functions, variables, typedefs, enums) acros
 - **hemi** `[fn]` in [FsAnnotation](/docs/api/fs/fs-annotation) — Returns the hemisphere id (0 = lh; 1 = rh).
 - **hemi** `[var]` in [FsLabel](/docs/api/fs/fs-label) — Hemisphere (lh = 0; rh = 1).
 - **hemi** `[fn]` in [FsSurface](/docs/api/fs/fs-surface) — Returns the hemisphere id (0 = lh; 1 = rh).
+- **hemi** `[var]` in [MNEMorphMap](/docs/api/mne/mne-morph-map) — 0 for the left, 1 for the right hemisphere, -1 if unknown.
 - **hemisphere** `[var]` in `PickResult` — Hemisphere for `CorticalVertex` (0 = left, 1 = right).
 - **hemisphere** `[var]` in `PolhemusSerialConfig` — Hemisphere vector for all stations.
 - **hemisphereAt** `[fn]` in [MNESourceSpaces](/docs/api/mne/mne-source-spaces) — Safe downcast to [`MNEHemisphere`](/docs/api/mne/mne-hemisphere) at the given index.
@@ -3074,7 +3075,7 @@ Index of 6262 public class members (functions, variables, typedefs, enums) acros
 - **makeSpectrogram** `[fn]` in [Spectrogram](/docs/api/utils/spectrogram) — Calculates the spectrogram (tf-representation) of a given signal.
 - **manufacturer** `[var]` in [BidsRawData](/docs/api/bids/bids-raw-data) — Amplifier manufacturer (RECOMMENDED).
 - **manufacturerModelName** `[var]` in [BidsRawData](/docs/api/bids/bids-raw-data) — Amplifier model (RECOMMENDED).
-- **map** `[var]` in [MNEMorphMap](/docs/api/mne/mne-morph-map) — Sparse interpolation matrix: multiply source surface data by this to obtain values on the target ('this') surface.
+- **map** `[var]` in [MNEMorphMap](/docs/api/mne/mne-morph-map) — Destination x source interpolation weights.
 - **map_comp_kind** `[fn]` in [MNECTFCompDataSet](/docs/api/mne/mnectf-comp-data-set) — Map a gradient compensation integer code to the corresponding CTF compensation constant.
 - **maps** `[var]` in [MNEMshDisplaySurface](/docs/api/mne/mne-msh-display-surface) — Morphing maps from other surfaces to this one.
 - **markChBad** `[fn]` in [RtFiffRawViewModel](/docs/api/disp/rt-fiff-raw-view-model) — markChBad marks the selected channels as bad/good in m_chInfolist
@@ -3268,7 +3269,9 @@ Index of 6262 public class members (functions, variables, typedefs, enums) acros
 - **MNEMghTagGroup** `[fn]` in [MNEMghTagGroup](/docs/api/mne/mne-mgh-tag-group)
 - **MNEMghTagGroup** `[fn]` in [MNEMghTagGroup](/docs/api/mne/mne-mgh-tag-group)
 - **MNEMneData** `[fn]` in [MNEMneData](/docs/api/mne/mne-mne-data) — Constructs the [`MNEMneData`](/docs/api/mne/mne-mne-data).
-- **MNEMorphMap** `[fn]` in [MNEMorphMap](/docs/api/mne/mne-morph-map) — Constructs the [`MNEMorphMap`](/docs/api/mne/mne-morph-map).
+- **MNEMorphMap** `[fn]` in [MNEMorphMap](/docs/api/mne/mne-morph-map)
+- **MNEMorphMap** `[fn]` in [MNEMorphMap](/docs/api/mne/mne-morph-map)
+- **MNEMorphMap** `[fn]` in [MNEMorphMap](/docs/api/mne/mne-morph-map) — Copies the map including its matrix.
 - **MNEMshColorScaleDef** `[fn]` in [MNEMshColorScaleDef](/docs/api/mne/mne-msh-color-scale-def) — Constructs the [`MNEMshColorScaleDef`](/docs/api/mne/mne-msh-color-scale-def).
 - **MNEMshDisplaySurface** `[fn]` in [MNEMshDisplaySurface](/docs/api/mne/mne-msh-display-surface) — Constructs the [`MNEMshDisplaySurface`](/docs/api/mne/mne-msh-display-surface).
 - **MNEMshDisplaySurfaceSet** `[fn]` in [MNEMshDisplaySurfaceSet](/docs/api/mne/mne-msh-display-surface-set) — Constructs the [`MNEMshDisplaySurfaceSet`](/docs/api/mne/mne-msh-display-surface-set).
@@ -3716,6 +3719,7 @@ Index of 6262 public class members (functions, variables, typedefs, enums) acros
 - **operator=** `[fn]` in [MNEInverseOperator](/docs/api/mne/mne-inverse-operator) — Copy assignment.
 - **operator=** `[fn]` in [MNEMghTagGroup](/docs/api/mne/mne-mgh-tag-group)
 - **operator=** `[fn]` in [MNEMghTagGroup](/docs/api/mne/mne-mgh-tag-group)
+- **operator=** `[fn]` in [MNEMorphMap](/docs/api/mne/mne-morph-map)
 - **operator=** `[fn]` in [MNEMshLightSet](/docs/api/mne/mne-msh-light-set)
 - **operator=** `[fn]` in [MNEMshLightSet](/docs/api/mne/mne-msh-light-set)
 - **operator=** `[fn]` in [MNEProjItem](/docs/api/mne/mne-proj-item) — Copy assignment operator.
@@ -4152,6 +4156,7 @@ Index of 6262 public class members (functions, variables, typedefs, enums) acros
 - **read** `[fn]` in [MNEDerivSet](/docs/api/mne/mne-deriv-set) — Reads every derivation stored in the `FIFFB_MNE_DERIVATIONS` blocks of a file (MNE-C `mne_read_deriv`).
 - **read** `[fn]` in [MNEForwardSolution](/docs/api/mne/mne-forward-solution)
 - **read** `[fn]` in [MNELayout](/docs/api/mne/mne-layout) — Reads an MNE-C ``.lout file.
+- **read** `[fn]` in [MNEMorphMap](/docs/api/mne/mne-morph-map) — Reads one map from a morph-map file (MNE-C `load_one_morph_map`).
 - **read** `[fn]` in [MNENamedMatrix](/docs/api/mne/mne-named-matrix) — Factory: read a named matrix from a FIFF file.
 - **read** `[fn]` in [MNEProjOp](/docs/api/mne/mne-proj-op) — Read a projection operator from a FIFF file by path.
 - **read** `[fn]` in [MNESparseNamedMatrix](/docs/api/mne/mne-sparse-named-matrix) — Reads a sparse named matrix (MNE-C `mne_read_sparse_named_matrix`).
@@ -5711,6 +5716,7 @@ Index of 6262 public class members (functions, variables, typedefs, enums) acros
 - **to** `[var]` in [FiffCoordTrans](/docs/api/fiff/fiff-coord-trans) — Destination coordinate system.
 - **to** `[var]` in [MNEEvent](/docs/api/mne/mne-event) — Trigger value after the transition.
 - **to_fixed_ori** `[fn]` in [MNEForwardSolution](/docs/api/mne/mne-forward-solution) — Helper to convert the forward solution to fixed ori from free.
+- **to_subj** `[var]` in [MNEMorphMap](/docs/api/mne/mne-morph-map) — Destination subject.
 - **toByte** `[fn]` in [FiffTag](/docs/api/fiff/fiff-tag) — to Byte Fast access; Data are deleted if tag gets deleted, and vice versa
 - **toCbor** `[fn]` in `MnaFileRef` — Serialize to QCborMap.
 - **toCbor** `[fn]` in [MnaGraph](/docs/api/mna/mna-graph)
@@ -5732,6 +5738,7 @@ Index of 6262 public class members (functions, variables, typedefs, enums) acros
 - **toDigPoint** `[fn]` in [FiffTag](/docs/api/fiff/fiff-tag) — to fiff DIG POINT
 - **toDirEntry** `[fn]` in [FiffTag](/docs/api/fiff/fiff-tag) — to fiff OLD PACK
 - **toDouble** `[fn]` in [FiffTag](/docs/api/fiff/fiff-tag) — to Double Fast access; Data are deleted if tag gets deleted, and vice versa
+- **toEigen** `[fn]` in [MNEMorphMap](/docs/api/mne/mne-morph-map) — Returns the map as a matrix that takes source vertex values to destination vertices.
 - **toEigenSparse** `[fn]` in [FiffSparseMatrix](/docs/api/fiff/fiff-sparse-matrix) — Convert to Eigen::SparseMatrix&lt;double&gt; (cast from float).
 - **toFiffChInfo** `[fn]` in `BrainVisionChannelInfo`
 - **toFiffChInfo** `[fn]` in `EDFChannelInfo`
@@ -6208,6 +6215,7 @@ Index of 6262 public class members (functions, variables, typedefs, enums) acros
 - **write** `[fn]` in [MNEDerivSet](/docs/api/mne/mne-deriv-set) — Writes the set as a `FIFFB_MNE_DERIVATIONS` block (MNE-C `mne_write_deriv_file`).
 - **write** `[fn]` in [MNEForwardSolution](/docs/api/mne/mne-forward-solution) — Write the forward solution to a FIFF file.
 - **write** `[fn]` in [MNEInverseOperator](/docs/api/mne/mne-inverse-operator) — Write the inverse operator to a FIFF file.
+- **write** `[fn]` in [MNEMorphMap](/docs/api/mne/mne-morph-map) — Writes maps as `FIFFB_MNE_MORPH_MAP` blocks (MNE-C `mne_save_morph_map_matrices`).
 - **write** `[fn]` in [MNESparseNamedMatrix](/docs/api/mne/mne-sparse-named-matrix) — Writes the matrix as a `FIFFB_MNE_NAMED_MATRIX` block (MNE-C `mne_write_sparse_named_matrix`).
 - **write** `[fn]` in [MriCorFifIO](/docs/api/mri/mri-cor-fif-io) — Writes COR.fif file from slice data.
 - **write_bad_channels** `[fn]` in [FiffStream](/docs/api/fiff/fiff-stream) — Write a bad channel list as a FIFFB_MNE_BAD_CHANNELS block.

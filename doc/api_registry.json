@@ -6119,7 +6119,14 @@
       "mne_python": null,
       "sklearn": null,
       "test": null,
-      "example": null,
+      "example": "ex_mne_api",
+      "example_snippet": [
+        "ex_mne_api/main.cpp#mne_morph_map_usage"
+      ],
+      "example_mode": "run",
+      "required_data": [
+        "mne-cpp-test-data"
+      ],
       "status": "documented",
       "skigen_candidate": false,
       "documented": true,

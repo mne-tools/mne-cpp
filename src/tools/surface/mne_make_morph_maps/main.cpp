@@ -9,10 +9,9 @@
  * @date     March, 2026
  * @brief    Compute morphing maps between two subjects using sphere-registered surfaces.
  *
- * The morphing map provides a sparse matrix that transforms vertex data from one
- * subject's cortical surface to another, using the FreeSurfer spherical registration
- * (?h.sphere.reg). For each destination vertex, the nearest source vertices are
- * found on the registered sphere and their contributions are weighted by inverse distance.
+ * Writes $SUBJECTS_DIR/morph-maps/<from>-<to>-morph.fif with the maps of both
+ * hemispheres in both directions, like MNE-C mne_make_morph_maps and
+ * mne.read_morph_map (see MNELIB::MNEMorphMap::compute).
  */
 
 //=============================================================================================================
@@ -20,8 +19,7 @@
 //=============================================================================================================
 
 #include <fs/fs_surface.h>
-#include <fiff/fiff_stream.h>
-#include <fiff/fiff_constants.h>
+#include <mne/mne_morph_map.h>
 #include <utils/generics/mne_logger.h>
 
 //=============================================================================================================
@@ -31,78 +29,27 @@
 #include <QCoreApplication>
 #include <QCommandLineParser>
 #include <QCommandLineOption>
-#include <QFile>
 #include <QDir>
-#include <QDebug>
 
 //=============================================================================================================
-// EIGEN INCLUDES
+// STL INCLUDES
 //=============================================================================================================
 
-#include <Eigen/Core>
-#include <Eigen/SparseCore>
+#include <vector>
 
 //=============================================================================================================
 // USED NAMESPACES
 //=============================================================================================================
 
 using namespace FSLIB;
-using namespace FIFFLIB;
+using namespace MNELIB;
 using namespace UTILSLIB;
-using namespace Eigen;
 
 //=============================================================================================================
 // STATIC DEFINITIONS
 //=============================================================================================================
 
 #define PROGRAM_VERSION MNE_CPP_VERSION
-#define N_NEAREST 5 // Number of nearest neighbors for interpolation
-
-//=============================================================================================================
-/**
- * Build a morph map (sparse matrix) from src sphere to dst sphere.
- * For each destination vertex, finds the N_NEAREST source vertices on the sphere
- * and computes inverse-distance weights.
- */
-static SparseMatrix<double> computeMorphMap(const MatrixX3f& srcSphere,
-                                            const MatrixX3f& dstSphere,
-                                            int nNearest)
-{
-    int nSrc = srcSphere.rows();
-    int nDst = dstSphere.rows();
-
-    typedef Triplet<double> T;
-    std::vector<T> triplets;
-    triplets.reserve(static_cast<std::size_t>(nDst) * nNearest);
-
-    for (int d = 0; d < nDst; ++d) {
-        // Find nNearest closest source vertices
-        std::vector<std::pair<float, int>> dists(nSrc);
-        for (int s = 0; s < nSrc; ++s)
-            dists[s] = std::make_pair((srcSphere.row(s) - dstSphere.row(d)).squaredNorm(), s);
-
-        std::partial_sort(dists.begin(), dists.begin() + nNearest, dists.end());
-
-        // Compute inverse-distance weights
-        double wSum = 0;
-        std::vector<std::pair<int, double>> neighbors;
-        for (int n = 0; n < nNearest; ++n) {
-            float dist = sqrtf(dists[n].first);
-            double w = (dist > 1e-10f) ? 1.0 / dist : 1e10;
-            neighbors.push_back(std::make_pair(dists[n].second, w));
-            wSum += w;
-        }
-
-        // Normalize and store
-        for (auto& [idx, w] : neighbors) {
-            triplets.push_back(T(d, idx, w / wSum));
-        }
-    }
-
-    SparseMatrix<double> morphMap(nDst, nSrc);
-    morphMap.setFromTriplets(triplets.begin(), triplets.end());
-    return morphMap;
-}
 
 //=============================================================================================================
 
@@ -114,32 +61,25 @@ int main(int argc, char* argv[])
     QCoreApplication::setApplicationVersion(PROGRAM_VERSION);
 
     QCommandLineParser parser;
-    parser.setApplicationDescription("Compute morphing maps between two subjects.");
+    parser.setApplicationDescription("Compute the morphing maps between two subjects from their ?h.sphere.reg surfaces.");
     parser.addHelpOption();
     parser.addVersionOption();
 
     QCommandLineOption fromOpt("from", "Source subject name.", "subject");
     parser.addOption(fromOpt);
-
     QCommandLineOption toOpt("to", "Destination subject name.", "subject");
     parser.addOption(toOpt);
-
     QCommandLineOption subjDirOpt("subjects_dir", "Subjects directory.", "dir", qEnvironmentVariable("SUBJECTS_DIR"));
     parser.addOption(subjDirOpt);
-
-    QCommandLineOption outOpt("out", "Output morph map FIFF file.", "file");
+    QCommandLineOption outOpt("out", "Output morph map FIFF file (default $SUBJECTS_DIR/morph-maps/<from>-<to>-morph.fif).", "file");
     parser.addOption(outOpt);
-
-    QCommandLineOption nearestOpt("nearest", "Number of nearest neighbors.", "n", "5");
-    parser.addOption(nearestOpt);
 
     parser.process(app);
 
-    QString fromSubject = parser.value(fromOpt);
-    QString toSubject = parser.value(toOpt);
-    QString subjectsDir = parser.value(subjDirOpt);
+    const QString fromSubject = parser.value(fromOpt);
+    const QString toSubject = parser.value(toOpt);
+    const QString subjectsDir = parser.value(subjDirOpt);
     QString outFile = parser.value(outOpt);
-    int nNearest = parser.value(nearestOpt).toInt();
 
     if (fromSubject.isEmpty() || toSubject.isEmpty()) {
         qCritical("--from and --to are required.");
@@ -150,77 +90,36 @@ int main(int argc, char* argv[])
         return 1;
     }
     if (outFile.isEmpty()) {
+        QDir().mkpath(subjectsDir + "/morph-maps");
         outFile = QString("%1/morph-maps/%2-%3-morph.fif").arg(subjectsDir, fromSubject, toSubject);
-        QDir().mkpath(QString("%1/morph-maps").arg(subjectsDir));
     }
 
-    QStringList hemis = {"lh", "rh"};
-
-    QFile outF(outFile);
-    if (!outF.open(QIODevice::WriteOnly)) {
-        qCritical("Cannot open output file: %s", qPrintable(outFile));
-        return 1;
-    }
-    FiffStream::SPtr stream = FiffStream::start_file(outF);
-    if (!stream) {
-        qCritical("Cannot open output file: %s", qPrintable(outFile));
-        return 1;
-    }
-    stream->start_block(FIFFB_MNE);
-
-    for (const QString& hemi : hemis) {
-        qInfo("\nProcessing %s hemisphere...", qPrintable(hemi));
-
-        // Load sphere-registered surfaces
-        QString srcPath = QString("%1/%2/surf/%3.sphere.reg").arg(subjectsDir, fromSubject, hemi);
-        QString dstPath = QString("%1/%2/surf/%3.sphere.reg").arg(subjectsDir, toSubject, hemi);
-
-        FsSurface srcSphere, dstSphere;
-        if (!FsSurface::read(srcPath, srcSphere)) {
-            qCritical("Cannot read: %s", qPrintable(srcPath));
-            stream->end_block(FIFFB_MNE);
-            stream->end_file();
+    std::vector<MNEMorphMap> maps;
+    for (int hemi = 0; hemi < 2; ++hemi) {
+        const QString name = QString(hemi == 0 ? "lh" : "rh") + ".sphere.reg";
+        FsSurface fromSphere;
+        FsSurface toSphere;
+        if (!FsSurface::read(QString("%1/%2/surf/%3").arg(subjectsDir, fromSubject, name), fromSphere, false) ||
+            !FsSurface::read(QString("%1/%2/surf/%3").arg(subjectsDir, toSubject, name), toSphere, false)) {
+            qCritical("Cannot read the %s surfaces.", qPrintable(name));
             return 1;
         }
-        if (!FsSurface::read(dstPath, dstSphere)) {
-            qCritical("Cannot read: %s", qPrintable(dstPath));
-            stream->end_block(FIFFB_MNE);
-            stream->end_file();
-            return 1;
-        }
-
-        qInfo("  Source: %d vertices", (int)srcSphere.rr().rows());
-        qInfo("  Dest:   %d vertices", (int)dstSphere.rr().rows());
-
-        // Compute morph map
-        qInfo("  Computing morph map (nearest=%d)...", nNearest);
-        SparseMatrix<double> morphMap = computeMorphMap(srcSphere.rr(), dstSphere.rr(), nNearest);
-        qInfo("  Morph map: %dx%d, %ld nonzeros",
-              (int)morphMap.rows(), (int)morphMap.cols(), (long)morphMap.nonZeros());
-
-        // Write morph map as FIFF sparse matrix
-        // Store as row/col/data arrays
-        stream->start_block(FIFFB_MNE_MORPH_MAP);
-
-        // Write hemisphere id
-        int hemiId = (hemi == "lh") ? FIFFV_MNE_SURF_LEFT_HEMI : FIFFV_MNE_SURF_RIGHT_HEMI;
-        stream->write_int(FIFF_MNE_HEMI, &hemiId);
-
-        // Write source subject
-        stream->write_string(FIFF_MNE_MORPH_MAP_FROM, fromSubject);
-        stream->write_string(FIFF_MNE_MORPH_MAP_TO, toSubject);
-
-        // Write the morph map as a FIFF sparse matrix (RCS format)
-        SparseMatrix<float> morphMapF = morphMap.cast<float>();
-        morphMapF.makeCompressed();
-        stream->write_float_sparse_rcs(FIFF_MNE_MORPH_MAP, morphMapF);
-
-        stream->end_block(FIFFB_MNE_MORPH_MAP);
+        MNEMorphMap fromTo = MNEMorphMap::compute(fromSphere.rr(), fromSphere.tris(), toSphere.rr());
+        fromTo.hemi = hemi;
+        fromTo.from_subj = fromSubject;
+        fromTo.to_subj = toSubject;
+        MNEMorphMap toFrom = MNEMorphMap::compute(toSphere.rr(), toSphere.tris(), fromSphere.rr());
+        toFrom.hemi = hemi;
+        toFrom.from_subj = toSubject;
+        toFrom.to_subj = fromSubject;
+        qInfo("%s: %d -> %d and %d -> %d vertices", qPrintable(name), fromTo.map->cols(), fromTo.map->rows(), toFrom.map->cols(), toFrom.map->rows());
+        maps.push_back(std::move(fromTo));
+        maps.push_back(std::move(toFrom));
     }
-
-    stream->end_block(FIFFB_MNE);
-    stream->end_file();
-
-    qInfo("\nWritten morph maps to: %s", qPrintable(outFile));
+    if (!MNEMorphMap::write(outFile, {&maps[0], &maps[2], &maps[1], &maps[3]})) {
+        qCritical("Cannot write %s", qPrintable(outFile));
+        return 1;
+    }
+    qInfo("Written morph maps to: %s", qPrintable(outFile));
     return 0;
 }

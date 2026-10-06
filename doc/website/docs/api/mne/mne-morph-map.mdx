@@ -15,9 +15,25 @@ sidebar_position: 31
 class MNELIB::MNEMorphMap
 ```
 
-Replaces *morphMap,morphMapRec struct (analyze_types.c).
+Morph map of one hemisphere from one subject to another.
 
-Vertex-to-vertex mapping between two FreeSurfer surface meshes for morphing source estimates.
+```cpp title="src/examples/ex_mne_api/main.cpp"
+// Morph map between the registered spheres of two subjects: every vertex of "large" is a
+// barycentric blend of the three corners of the "small" triangle it falls into.
+const QString subjectsDir = QStringLiteral(MNE_MORPH_SUBJECTS_DIR);
+FsSurface smallSphere;
+FsSurface largeSphere;
+FsSurface::read(subjectsDir + "/small/surf/lh.sphere.reg", smallSphere, false);
+FsSurface::read(subjectsDir + "/large/surf/lh.sphere.reg", largeSphere, false);
+MNEMorphMap smallToLarge = MNEMorphMap::compute(smallSphere.rr(), smallSphere.tris(), largeSphere.rr());
+smallToLarge.from_subj = "small";
+smallToLarge.to_subj = "large";
+smallToLarge.hemi = 0;
+const QString mapFile = tmp.filePath("small-large-morph.fif");
+MNEMorphMap::write(mapFile, {&smallToLarge});
+const auto reread = MNEMorphMap::read(mapFile, "small", "large", 0);
+const Eigen::SparseMatrix<double> weights = reread->toEigen(); // 642 x 162, feeds INVLIB::SourceMorph
+```
 
 ---
 
@@ -25,15 +41,113 @@ Vertex-to-vertex mapping between two FreeSurfer surface meshes for morphing sour
 
 ### MNEMorphMap()
 
-Constructs the [`MNEMorphMap`](/docs/api/mne/mne-morph-map).
+---
+
+### MNEMorphMap()
+
+---
+
+### operator=()
 
 ---
 
 ### ~MNEMorphMap()
 
-Destroys the [`MNEMorphMap`](/docs/api/mne/mne-morph-map).
+---
+
+### MNEMorphMap(other)
+
+Copies the map including its matrix.
+
+**Parameters:**
+
+- **other** : *const MNEMorphMap &*
+  The map to copy.
 
 ---
+
+### toEigen()
+
+Returns the map as a matrix that takes source vertex values to destination vertices.
+
+**Returns:**
+
+- *Eigen::SparseMatrix&lt; double &gt;* — The destination x source sparse matrix in double precision (e.g. for SourceMorph).
+
+---
+
+## Static Methods
+
+### compute(fromRr, fromTris, toRr)
+
+Computes the map between two registered spheres (MNE-C `mne_compose_morph_maps`, accurate mode; `mne.surface._make_morph_map_hemi`).
+
+Both spheres are scaled to unit radius. Each destination vertex is mapped to the source triangle it falls into, among the triangles around its nearest source vertex, with barycentric weights; best holds that nearest vertex.
+
+**Parameters:**
+
+- **fromRr** : *const Eigen::MatrixX3f &*
+  Source sphere vertices.
+
+- **fromTris** : *const Eigen::MatrixX3i &*
+  Source sphere triangles.
+
+- **toRr** : *const Eigen::MatrixX3f &*
+  Destination sphere vertices.
+
+**Returns:**
+
+- *MNEMorphMap* — The map (destination vertices x source vertices).
+
+---
+
+### read(path, fromSubj, toSubj, hemi)
+
+Reads one map from a morph-map file (MNE-C `load_one_morph_map`).
+
+**Parameters:**
+
+- **path** : *const QString &*
+  A `-morph.fif` file.
+
+- **fromSubj** : *const QString &*
+  Source subject.
+
+- **toSubj** : *const QString &*
+  Destination subject.
+
+- **hemi** : *int*
+  0 for the left, 1 for the right hemisphere.
+
+**Returns:**
+
+- *std::optional&lt; MNEMorphMap &gt;* — The map, or no value if the file has no such map.
+
+---
+
+### write(path, maps)
+
+Writes maps as `FIFFB_MNE_MORPH_MAP` blocks (MNE-C `mne_save_morph_map_matrices`).
+
+**Parameters:**
+
+- **path** : *const QString &*
+  The output file.
+
+- **maps** : *const QList&lt; const MNEMorphMap * &gt; &*
+  The maps; from_subj, to_subj and hemi identify each one.
+
+**Returns:**
+
+- *bool* — True if the file was written.
+
+---
+
+## Example
+
+- Full source: [`src/examples/ex_mne_api/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_mne_api/main.cpp)
+- Build target: `ex_mne_api` (runs under CTest)
+- Data: [mne-cpp-test-data](https://github.com/mne-tools/mne-cpp-test-data)
 
 ## Authors of this file
 

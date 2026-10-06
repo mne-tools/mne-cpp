@@ -35,6 +35,8 @@
 #include <mne/mne_surface.h>
 #include <mne/mne_patch_info.h>
 #include <mne/mne_bem.h>
+#include <mne/mne_morph_map.h>
+#include <fs/fs_surface.h>
 
 #include <fiff/fiff_stream.h>
 #include <fiff/fiff_constants.h>
@@ -51,6 +53,8 @@
 #include <QFile>
 #include <QTemporaryDir>
 
+#include <tuple>
+
 //=============================================================================================================
 // EIGEN INCLUDES
 //=============================================================================================================
@@ -63,6 +67,7 @@
 
 using namespace MNELIB;
 using namespace FIFFLIB;
+using namespace FSLIB;
 using namespace Eigen;
 
 namespace
@@ -92,6 +97,7 @@ private slots:
     void writeRoundTrip();
     void volumeNeighborsRoundTrip();
     void readsPythonVolumeSpace();
+    void morphMap_matchesPython();
     void icoDownsample_matchesPythonIco();
     void bemNormals_matchPython_data();
     void bemNormals_matchPython();
@@ -492,6 +498,47 @@ void TestMneSourceSpaceOpsPython::bemNormals_matchPython()
     QVERIFY2(closeTo(s.nn.cwiseAbs().cast<double>().sum(), absSum, 1e-6),
              qPrintable(QString("|nn| sum %1").arg(s.nn.cwiseAbs().cast<double>().sum(), 0, 'g', 17)));
     QVERIFY((s.nn.row(17).cast<double>().transpose() - normal17).norm() < 1e-6);
+}
+
+//=============================================================================================================
+
+void TestMneSourceSpaceOpsPython::morphMap_matchesPython()
+{
+    // data/morph-subjects (make_morph_fixture.py): ico-2 and rotated ico-3 spheres of two subjects and
+    // the morph maps mne.read_morph_map computed between them.
+    const QString subjects = QStringLiteral(MNE_SOURCE_SPACE_DATA_DIR "/morph-subjects");
+    const QString file = subjects + "/morph-maps/large-small-morph.fif";
+    for (int hemi = 0; hemi < 2; ++hemi) {
+        const QString name = QString(hemi == 0 ? "/lh" : "/rh") + ".sphere.reg";
+        FsSurface small;
+        FsSurface large;
+        QVERIFY(FsSurface::read(subjects + "/small/surf" + name, small, false));
+        QVERIFY(FsSurface::read(subjects + "/large/surf" + name, large, false));
+        for (const auto& [from, to, fromSurf, toSurf] : {std::tuple{"small", "large", &small, &large}, std::tuple{"large", "small", &large, &small}}) {
+            const auto python = MNEMorphMap::read(file, from, to, hemi);
+            QVERIFY(python);
+            const MNEMorphMap ours = MNEMorphMap::compute(fromSurf->rr(), fromSurf->tris(), toSurf->rr());
+            QCOMPARE(ours.map->rows(), python->map->rows());
+            QCOMPARE(ours.map->cols(), python->map->cols());
+            // Every row must pick python's triangle and weights, up to float storage precision.
+            const Eigen::MatrixXd diff = Eigen::MatrixXd(ours.toEigen() - python->toEigen()).cwiseAbs();
+            const double worstRow = diff.rowwise().sum().maxCoeff();
+            QVERIFY2(worstRow < 1e-4, qPrintable(QString("%1 -> %2 hemi %3: %4").arg(from, to).arg(hemi).arg(worstRow)));
+            // Rows are interpolation weights.
+            QVERIFY((Eigen::VectorXd(ours.toEigen() * Eigen::VectorXd::Ones(ours.map->cols())).array() - 1.0).abs().maxCoeff() < 1e-5);
+        }
+    }
+
+    // Round trip through our writer.
+    MNEMorphMap left = *MNEMorphMap::read(file, "small", "large", 0);
+    left.from_subj = "a";
+    left.to_subj = "b";
+    QTemporaryDir dir;
+    QVERIFY(MNEMorphMap::write(dir.filePath("a-b-morph.fif"), {&left}));
+    const auto back = MNEMorphMap::read(dir.filePath("a-b-morph.fif"), "a", "b", 0);
+    QVERIFY(back);
+    QCOMPARE((back->toEigen() - left.toEigen()).norm(), 0.0);
+    QVERIFY(!MNEMorphMap::read(dir.filePath("a-b-morph.fif"), "a", "b", 1));
 }
 
 //=============================================================================================================

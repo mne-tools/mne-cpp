@@ -12,7 +12,7 @@
  * @ref INVLIB::SourceMorph is the C++ peer of mne-python's
  * @c mne.compute_source_morph + @c SourceMorph.apply. It consumes the
  * sparse vertex-to-vertex interpolation matrix produced by
- * @c FSLIB::MNEMorphMap (nearest-neighbour on the subject sphere)
+ * @ref MNELIB::MNEMorphMap (barycentric weights on the registered sphere)
  * and stores it together with the from/to vertex lists so a precomputed
  * morph can be re-applied to many source estimates from the same
  * subject pair without re-doing the surface interpolation. The
@@ -74,7 +74,7 @@ public:
      *
      * @param[in] verticesFrom  Source vertices in the "from" subject's source space.
      * @param[in] verticesTo    Target vertices in the "to" subject's source space.
-     * @param[in] morphMap      Sparse interpolation matrix (nTo x nFrom) — e.g. from MNEMorphMap::map.
+     * @param[in] morphMap      Sparse interpolation matrix (nTo x nFrom), e.g. MNEMorphMap::toEigen().
      */
     void compute(const Eigen::VectorXi& verticesFrom,
                  const Eigen::VectorXi& verticesTo,

@@ -50,8 +50,8 @@
       "public_api_units": 478,
       "exported_not_registered": 124,
       "example_eligible": 383,
-      "eligible_backed_percent": 69.45,
-      "snippets": 327,
+      "eligible_backed_percent": 69.71,
+      "snippets": 328,
       "registered_test_percent": 28.53
     },
     "G4_screenshots": {
@@ -65,11 +65,11 @@
       "compiler_warnings": 0,
       "null_macro": 43,
       "typedef_struct": 12,
-      "c_style_cast": 434,
+      "c_style_cast": 429,
       "raw_new": 169,
       "raw_delete": 275,
       "console_io": 370,
-      "numeric_define": 835,
+      "numeric_define": 834,
       "qt_new_unparented": 825,
       "oversized_unit": 8
     },

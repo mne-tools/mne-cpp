@@ -16,11 +16,10 @@
     "Settings": "Plain parameter record consumed by an algorithm class; shown inside that class's example."
   },
   "example_debt": {
-    "ceiling": 3,
+    "ceiling": 2,
     "names": [
       "FiffCoordTransSet",
-      "MNEMneData",
-      "MNEMorphMap"
+      "MNEMneData"
     ]
   }
 }

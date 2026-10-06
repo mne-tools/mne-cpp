@@ -18,12 +18,14 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
   Qt${QT_VERSION_MAJOR}::Core
   mne_mne
   mne_fiff
+  mne_fs
   Eigen3::Eigen
 )
 
 target_compile_definitions(${PROJECT_NAME} PRIVATE
     MNE_CTF_FILE="${CMAKE_CURRENT_SOURCE_DIR}/../../testframes/test_mne_ctf_comp_python/data/ctf_grade3_raw.fif"
-    MNE_SSS_FILE="${CMAKE_CURRENT_SOURCE_DIR}/../../testframes/test_fiff_raw_formats_python/data/raw_sss_raw.fif")
+    MNE_SSS_FILE="${CMAKE_CURRENT_SOURCE_DIR}/../../testframes/test_fiff_raw_formats_python/data/raw_sss_raw.fif"
+    MNE_MORPH_SUBJECTS_DIR="${CMAKE_CURRENT_SOURCE_DIR}/../../testframes/test_mne_source_space_ops_python/data/morph-subjects")
 
 if(NOT BUILD_SHARED_LIBS)
     target_compile_definitions(${PROJECT_NAME} PRIVATE STATICBUILD)
