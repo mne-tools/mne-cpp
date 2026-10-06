@@ -16,9 +16,8 @@
     "Settings": "Plain parameter record consumed by an algorithm class; shown inside that class's example."
   },
   "example_debt": {
-    "ceiling": 42,
+    "ceiling": 41,
     "names": [
-      "AnnotateMusclParams",
       "ArtifactDetectEcgParams",
       "ArtifactDetectEogParams",
       "ArtifactRejectionData",

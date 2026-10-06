@@ -15,7 +15,8 @@
 //=============================================================================================================
 
 #include "annotate_artifact.h"
-#include "iirfilter.h"
+#include "connectivity_aec.h"
+#include "firfilter.h"
 
 #include <fiff/fiff_info.h>
 #include <fiff/fiff_constants.h>
@@ -72,26 +73,6 @@ QVector<QPair<int, int>> findContiguousSegments(const VectorXi& mask)
 
 //=============================================================================================================
 /**
- * @brief Merge segments that are closer than gapSamples apart.
- */
-void mergeCloseSegments(QVector<QPair<int, int>>& segs, int gapSamples)
-{
-    if (segs.size() < 2)
-        return;
-    QVector<QPair<int, int>> merged;
-    merged.append(segs.first());
-    for (int i = 1; i < segs.size(); ++i) {
-        if (segs[i].first - merged.last().second <= gapSamples) {
-            merged.last().second = segs[i].second;
-        } else {
-            merged.append(segs[i]);
-        }
-    }
-    segs = merged;
-}
-
-//=============================================================================================================
-/**
  * @brief Remove segments shorter than minSamples.
  */
 void removeShortSegments(QVector<QPair<int, int>>& segs, int minSamples)
@@ -108,16 +89,20 @@ void removeShortSegments(QVector<QPair<int, int>>& segs, int minSamples)
 
 //=============================================================================================================
 /**
- * @brief Find channel indices matching a given kind.
+ * @brief Smallest 2^a 3^b 5^c >= n (mne.filter.next_fast_len, the FFT length of apply_hilbert's n_fft="auto").
  */
-QVector<int> findChannelsByKind(const FiffInfo& info, int kind)
+int nextFastLen(int n)
 {
-    QVector<int> indices;
-    for (int i = 0; i < info.chs.size(); ++i) {
-        if (info.chs[i].kind == kind)
-            indices.append(i);
+    int best = std::numeric_limits<int>::max();
+    for (long long p5 = 1; p5 < 2LL * n + 1; p5 *= 5) {
+        for (long long p35 = p5; p35 < 2LL * n + 1; p35 *= 3) {
+            long long v = p35;
+            while (v < n)
+                v *= 2;
+            best = static_cast<int>(std::min<long long>(best, v));
+        }
     }
-    return indices;
+    return best;
 }
 
 } // anonymous namespace
@@ -130,84 +115,56 @@ FiffAnnotations UTILSLIB::annotateMusclZscore(
     const MatrixXd& data,
     const FiffInfo& info,
     double sfreq,
-    const AnnotateMusclParams& params)
+    const AnnotateMusclParams& params,
+    RowVectorXd* scores)
 {
+    // Adapted from mne.preprocessing.annotate_muscle_zscore (MNE-Python, BSD-3-Clause).
     FiffAnnotations annot;
-    const Eigen::Index nTimes = data.cols();
-
+    const Index nTimes = data.cols();
     if (data.rows() == 0 || nTimes == 0)
         return annot;
 
-    //--- 1. Find MEG channels; fall back to EEG if none ---
-    QVector<int> chIdx = findChannelsByKind(info, FIFFV_MEG_CH);
-    if (chIdx.isEmpty())
-        chIdx = findChannelsByKind(info, FIFFV_EEG_CH);
-    if (chIdx.isEmpty()) {
+    RowVectorXi picks = info.pick_types(QStringLiteral("mag"), false, false);
+    if (picks.size() == 0)
+        picks = info.pick_types(QStringLiteral("grad"), false, false);
+    if (picks.size() == 0)
+        picks = info.pick_types(false, true, false);
+    if (picks.size() == 0) {
         qWarning("annotateMusclZscore: no MEG or EEG channels found");
         return annot;
     }
+    MatrixXd sub(picks.size(), nTimes);
+    for (Index i = 0; i < picks.size(); ++i)
+        sub.row(i) = data.row(picks(i));
 
-    //--- 2. Extract submatrix ---
-    const int nCh = chIdx.size();
-    MatrixXd sub(nCh, nTimes);
-    for (int i = 0; i < nCh; ++i)
-        sub.row(i) = data.row(chIdx[i]);
-
-    //--- 3. Bandpass filter ---
-    auto sos = IirFilter::designButterworth(params.iFilterOrder,
-                                            IirFilter::BandPass,
-                                            params.dFilterLow,
-                                            params.dFilterHigh,
-                                            sfreq);
-    MatrixXd filtered = IirFilter::applyZeroPhaseMatrix(sub, sos);
-
-    //--- 4. Envelope approximation (absolute value) ---
-    filtered = filtered.cwiseAbs();
-
-    //--- 5. Z-score per channel ---
-    MatrixXd zscores(nCh, nTimes);
-    int validChannels = 0;
-    for (int ch = 0; ch < nCh; ++ch) {
-        const double mean = filtered.row(ch).mean();
-        const double variance = (filtered.row(ch).array() - mean).square().mean();
-        const double stddev = std::sqrt(variance);
-        if (stddev < 1e-30) {
-            zscores.row(ch).setZero();
-            continue;
-        }
-        zscores.row(ch) = (filtered.row(ch).array() - mean) / stddev;
-        ++validChannels;
+    const MatrixXd band = FirFilter::filterData(sub, sfreq, params.dFilterLow, params.dFilterHigh);
+    const int nFft = nextFastLen(static_cast<int>(nTimes));
+    RowVectorXd score = RowVectorXd::Zero(nTimes);
+    for (Index i = 0; i < band.rows(); ++i) {
+        const RowVectorXd env = ConnectivityAec::hilbertEnvelope(band.row(i).transpose(), nFft).transpose();
+        const double mean = env.mean();
+        const double sd = std::sqrt((env.array() - mean).square().mean());
+        if (sd > 0.0)
+            score += (env.array() - mean).matrix() / sd;
     }
+    score /= std::sqrt(static_cast<double>(band.rows()));
+    score = FirFilter::filterData(score, sfreq, -1.0, 4.0);
+    if (scores)
+        *scores = score;
 
-    if (validChannels == 0)
-        return annot;
-
-    //--- 6. Average z-score across channels ---
-    RowVectorXd avgZ = zscores.colwise().mean();
-
-    //--- 7. Threshold ---
     VectorXi mask(nTimes);
-    for (Eigen::Index i = 0; i < nTimes; ++i)
-        mask(static_cast<int>(i)) = (avgZ(i) > params.dThreshold) ? 1 : 0;
-
-    //--- 8. Find contiguous segments ---
-    auto segs = findContiguousSegments(mask);
-
-    //--- 9. Merge close segments ---
-    const int gapSamples = static_cast<int>(std::round(params.dMinGapSec * sfreq));
-    mergeCloseSegments(segs, gapSamples);
-
-    //--- 10. Remove short segments ---
-    const int minSamples = static_cast<int>(std::round(params.dMinDuration * sfreq));
-    removeShortSegments(segs, minSamples);
-
-    //--- Convert to annotations ---
-    for (const auto& seg : segs) {
-        const double onset = static_cast<double>(seg.first) / sfreq;
-        const double duration = static_cast<double>(seg.second - seg.first + 1) / sfreq;
-        annot.append(onset, duration, QStringLiteral("BAD_muscle"));
+    for (Index i = 0; i < nTimes; ++i)
+        mask(i) = score(i) > params.dThreshold ? 1 : 0;
+    // Good stretches shorter than min_length_good, including those at the edges, become bad.
+    const double minGood = params.dMinLengthGood * sfreq;
+    for (const auto& seg : findContiguousSegments((1 - mask.array()).matrix())) {
+        if (seg.second - seg.first + 1 < minGood)
+            mask.segment(seg.first, seg.second - seg.first + 1).setOnes();
     }
-
+    for (const auto& seg : findContiguousSegments(mask)) {
+        const int last = std::min(seg.second + 1, static_cast<int>(nTimes) - 1);
+        annot.append(seg.first / sfreq, (last - seg.first) / sfreq, QStringLiteral("BAD_muscle"));
+    }
     return annot;
 }
 

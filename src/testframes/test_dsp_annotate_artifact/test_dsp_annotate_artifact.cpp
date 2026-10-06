@@ -15,6 +15,7 @@
 //=============================================================================================================
 
 #include <dsp/annotate_artifact.h>
+#include <dsp/firfilter.h>
 #include <fiff/fiff_info.h>
 #include <fiff/fiff_ch_info.h>
 #include <fiff/fiff_constants.h>
@@ -35,6 +36,7 @@
 // STL INCLUDES
 //=============================================================================================================
 
+#include <algorithm>
 #include <cmath>
 
 //=============================================================================================================
@@ -79,6 +81,40 @@ FiffInfo makeMegInfo(int nCh, double sfreq)
 }
 
 /**
+ * @brief FiffInfo with nCh magnetometers (unit T), as mne.create_info(..., "mag") gives.
+ */
+FiffInfo makeMagInfo(int nCh)
+{
+    FiffInfo info = makeMegInfo(nCh, 1000.0);
+    for (FiffChInfo& ch : info.chs)
+        ch.unit = FIFF_UNIT_T;
+    return info;
+}
+
+/**
+ * @brief 4 x 3000 samples at 1 kHz: eight incommensurate background sines per channel and
+ * 120 Hz bursts at 0.8-1.4 s, 2.0-2.3 s and 2.6-2.62 s with 20 ms ramps (the mne oracle input).
+ */
+MatrixXd muscleData()
+{
+    const double freqs[8] = {7.3, 31.7, 57.1, 93.9, 151.3, 233.9, 317.1, 411.7};
+    const double bursts[3][3] = {{0.8, 1.4, 2e-11}, {2.0, 2.3, 1.5e-11}, {2.6, 2.62, 3e-11}};
+    MatrixXd data = MatrixXd::Zero(4, 3000);
+    for (int s = 0; s < data.cols(); ++s) {
+        const double t = s / 1000.0;
+        double burst = 0.0;
+        for (const auto& b : bursts)
+            burst += b[2] * std::clamp(std::min(t - b[0], b[1] - t) / 0.02, 0.0, 1.0) * std::sin(2.0 * M_PI * 120.0 * t);
+        for (int c = 0; c < 4; ++c) {
+            for (int k = 0; k < 8; ++k)
+                data(c, s) += 1e-12 * std::sin(2.0 * M_PI * freqs[k] * t + 0.7 * c + 1.3 * k);
+            data(c, s) += burst;
+        }
+    }
+    return data;
+}
+
+/**
  * @brief Create clean 10 Hz sine data.
  */
 MatrixXd makeCleanSine(int nCh, int nSamples, double sfreq, double freqHz = 10.0)
@@ -93,20 +129,6 @@ MatrixXd makeCleanSine(int nCh, int nSamples, double sfreq, double freqHz = 10.0
     return data;
 }
 
-/**
- * @brief Inject a high-frequency burst into data.
- */
-void injectBurst(MatrixXd& data, double sfreq, double burstFreq,
-                 int startSample, int endSample, double amplitude = 10.0)
-{
-    for (int s = startSample; s <= endSample && s < static_cast<int>(data.cols()); ++s) {
-        const double t = static_cast<double>(s) / sfreq;
-        const double val = amplitude * std::sin(2.0 * M_PI * burstFreq * t);
-        for (Eigen::Index ch = 0; ch < data.rows(); ++ch)
-            data(ch, s) += val;
-    }
-}
-
 } // anonymous namespace
 
 //=============================================================================================================
@@ -118,10 +140,10 @@ class TestDspAnnotateArtifact : public QObject
     Q_OBJECT
 
 private slots:
-    void testMusclZscoreDetectsHighFreq();
+    void testMusclZscoreMatchesPython_data();
+    void testMusclZscoreMatchesPython();
     void testMusclZscoreCleanData();
-    void testMusclZscoreThreshold();
-    void testMusclZscoreMinDuration();
+    void testFirFilterMatchesPython();
     void testAmplitudeExceedMax();
     void testAmplitudeBelowMin();
     void testAmplitudeFlat();
@@ -134,35 +156,42 @@ private slots:
 // Muscle artifact tests
 //=============================================================================================================
 
-void TestDspAnnotateArtifact::testMusclZscoreDetectsHighFreq()
+void TestDspAnnotateArtifact::testMusclZscoreMatchesPython_data()
 {
-    const double sfreq = 1000.0;
-    const int nCh = 3;
-    const int nSamples = 2000; // 2 seconds
-    FiffInfo info = makeMegInfo(nCh, sfreq);
-    MatrixXd data = makeCleanSine(nCh, nSamples, sfreq, 10.0);
+    QTest::addColumn<double>("threshold");
+    QTest::addColumn<QVector<double>>("onsets");
+    QTest::addColumn<QVector<double>>("durations");
 
-    // Inject strong 120 Hz burst at samples 500-700 (200 ms)
-    injectBurst(data, sfreq, 120.0, 500, 700, 50.0);
+    // annotate_muscle_zscore(RawArray(muscleData(), 4 mags at 1 kHz), threshold=..., min_length_good=0.1)
+    QTest::newRow("threshold 4") << 4.0 << QVector<double>{} << QVector<double>{};
+    QTest::newRow("threshold 2.5") << 2.5 << QVector<double>{0.84, 2.117} << QVector<double>{0.521, 0.073};
+}
+
+//=============================================================================================================
+
+void TestDspAnnotateArtifact::testMusclZscoreMatchesPython()
+{
+    QFETCH(double, threshold);
+    QFETCH(QVector<double>, onsets);
+    QFETCH(QVector<double>, durations);
 
     AnnotateMusclParams params;
-    params.dThreshold = 3.0;
-    params.dMinDuration = 0.02; // 20 ms — ensure burst is long enough
-    FiffAnnotations annot = annotateMusclZscore(data, info, sfreq, params);
+    params.dThreshold = threshold;
+    RowVectorXd scores;
+    const FiffAnnotations annot = annotateMusclZscore(muscleData(), makeMagInfo(4), 1000.0, params, &scores);
 
-    QVERIFY2(annot.size() > 0, "Should detect muscle artifact from 120 Hz burst");
+    // scores_muscle: sum |s| 5126.557472094637, s[1000] 3.310615511574129, s[1700] -1.4815054738007716
+    QVERIFY2(std::fabs(scores.cwiseAbs().sum() - 5126.557472094637) < 1e-6 * 5126.557472094637,
+             qPrintable(QString("score sum %1").arg(scores.cwiseAbs().sum(), 0, 'g', 17)));
+    QVERIFY(std::fabs(scores(1000) - 3.310615511574129) < 1e-6);
+    QVERIFY(std::fabs(scores(1700) + 1.4815054738007716) < 1e-6);
 
-    // The annotation should overlap with the burst region (0.5 - 0.7 s)
-    bool foundOverlap = false;
+    QCOMPARE(annot.size(), onsets.size());
     for (int i = 0; i < annot.size(); ++i) {
-        const double aStart = annot[i].onset;
-        const double aEnd = annot[i].onset + annot[i].duration;
-        if (aEnd > 0.5 && aStart < 0.7) {
-            foundOverlap = true;
-            QCOMPARE(annot[i].description, QStringLiteral("BAD_muscle"));
-        }
+        QVERIFY(std::fabs(annot[i].onset - onsets[i]) < 1e-9);
+        QVERIFY(std::fabs(annot[i].duration - durations[i]) < 1e-9);
+        QCOMPARE(annot[i].description, QStringLiteral("BAD_muscle"));
     }
-    QVERIFY2(foundOverlap, "Annotation should overlap with the burst region");
 }
 
 //=============================================================================================================
@@ -170,64 +199,39 @@ void TestDspAnnotateArtifact::testMusclZscoreDetectsHighFreq()
 void TestDspAnnotateArtifact::testMusclZscoreCleanData()
 {
     const double sfreq = 1000.0;
-    const int nCh = 3;
-    const int nSamples = 2000;
-    FiffInfo info = makeMegInfo(nCh, sfreq);
-    MatrixXd data = makeCleanSine(nCh, nSamples, sfreq, 10.0);
-
-    AnnotateMusclParams params;
-    params.dThreshold = 5.0;
-    FiffAnnotations annot = annotateMusclZscore(data, info, sfreq, params);
-
-    QCOMPARE(annot.size(), 0);
+    MatrixXd data = makeCleanSine(3, 2000, sfreq, 10.0);
+    // A pure tone has no band power except the filter's start transient, which mne marks too:
+    // annotate_muscle_zscore on 3 mags of sin(2 pi 10 t) gives onset 0, duration 0.109.
+    const FiffAnnotations annot = annotateMusclZscore(data, makeMagInfo(3), sfreq);
+    QCOMPARE(annot.size(), 1);
+    QVERIFY(std::fabs(annot[0].onset) < 1e-12 && std::fabs(annot[0].duration - 0.109) < 1e-9);
+    // Channels that are neither MEG nor EEG give no annotation.
+    QTest::ignoreMessage(QtWarningMsg, "annotateMusclZscore: no MEG or EEG channels found");
+    QCOMPARE(annotateMusclZscore(data, FiffInfo(), sfreq).size(), 0);
 }
 
 //=============================================================================================================
 
-void TestDspAnnotateArtifact::testMusclZscoreThreshold()
+void TestDspAnnotateArtifact::testFirFilterMatchesPython()
 {
-    const double sfreq = 1000.0;
-    const int nCh = 3;
-    const int nSamples = 2000;
-    FiffInfo info = makeMegInfo(nCh, sfreq);
-    MatrixXd data = makeCleanSine(nCh, nSamples, sfreq, 10.0);
-    injectBurst(data, sfreq, 120.0, 500, 700, 50.0);
+    // mne.filter.create_filter(None, 1000, l_freq, h_freq, fir_design="firwin")
+    const RowVectorXd band = FirFilter::designMne(1000.0, 110.0, 140.0);
+    QCOMPARE(band.size(), 121);
+    QVERIFY(std::fabs(band.cwiseAbs().sum() - 1.678800064409924) < 1e-12);
+    QVERIFY(std::fabs(band(60) - 0.12204211470179285) < 1e-14);
+    QVERIFY(std::fabs(band(10) - 0.000833491119518251) < 1e-14);
+    const RowVectorXd low = FirFilter::designMne(1000.0, -1.0, 4.0);
+    QCOMPARE(low.size(), 1651);
+    QVERIFY(std::fabs(low.cwiseAbs().sum() - 1.7219281349401758) < 1e-12);
+    const RowVectorXd high = FirFilter::designMne(1000.0, 1.0, -1.0);
+    QCOMPARE(high.size(), 3301);
+    QVERIFY(std::fabs(high(1650) - 0.9989951297110371) < 1e-14);
 
-    // Low threshold — should detect
-    AnnotateMusclParams paramsLow;
-    paramsLow.dThreshold = 2.0;
-    paramsLow.dMinDuration = 0.01;
-    FiffAnnotations annotLow = annotateMusclZscore(data, info, sfreq, paramsLow);
-
-    // Very high threshold — should not detect
-    AnnotateMusclParams paramsHigh;
-    paramsHigh.dThreshold = 100.0;
-    paramsHigh.dMinDuration = 0.01;
-    FiffAnnotations annotHigh = annotateMusclZscore(data, info, sfreq, paramsHigh);
-
-    QVERIFY2(annotLow.size() > 0, "Low threshold should detect the burst");
-    QCOMPARE(annotHigh.size(), 0);
-}
-
-//=============================================================================================================
-
-void TestDspAnnotateArtifact::testMusclZscoreMinDuration()
-{
-    const double sfreq = 1000.0;
-    const int nCh = 3;
-    const int nSamples = 2000;
-    FiffInfo info = makeMegInfo(nCh, sfreq);
-    MatrixXd data = makeCleanSine(nCh, nSamples, sfreq, 10.0);
-
-    // Very short burst: only 10 samples = 10 ms
-    injectBurst(data, sfreq, 120.0, 500, 509, 80.0);
-
-    AnnotateMusclParams params;
-    params.dThreshold = 3.0;
-    params.dMinDuration = 0.5; // 500 ms minimum — should filter out the short burst
-
-    FiffAnnotations annot = annotateMusclZscore(data, info, sfreq, params);
-    QCOMPARE(annot.size(), 0);
+    // mne.filter.filter_data(muscleData(), 1000, 110, 140, fir_design="firwin")
+    const MatrixXd filtered = FirFilter::filterData(muscleData(), 1000.0, 110.0, 140.0);
+    QVERIFY2(std::fabs(filtered.cwiseAbs().sum() - 4.506005234345971e-08) < 1e-6 * 4.506005234345971e-08,
+             qPrintable(QString("filtered sum %1").arg(filtered.cwiseAbs().sum(), 0, 'g', 17)));
+    QVERIFY(std::fabs(filtered(2, 1500) + 3.2877804115954136e-13) < 1e-6 * 3.2877804115954136e-13);
 }
 
 //=============================================================================================================

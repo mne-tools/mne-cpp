@@ -45,6 +45,7 @@
 // STL INCLUDES
 //=============================================================================================================
 
+#include <algorithm>
 #include <cmath>
 #include <cstdlib>
 #include <random>
@@ -214,6 +215,30 @@ int main(int argc, char* argv[])
     const FiffAnnotations exceeded = annotateAmplitude(data.row(kEog), eogInfo, kSFreq, amplitude);
     //! [annotate_amplitude_usage]
     ok &= expect(exceeded.size() == 3, QString("annotateAmplitude marks %1 EOG excursions above 200 uV (3)").arg(exceeded.size()));
+
+    // 4 s of 8 EEG channels at 1 kHz: alpha, a few tones and a 125 Hz EMG burst from 1.5 to 2.5 s
+    const double emgSFreq = 1000.0;
+    MatrixXd emgData(kEeg, 4000);
+    for (int s = 0; s < emgData.cols(); ++s) {
+        const double t = s / emgSFreq;
+        const double emg = std::clamp(std::min(t - 1.5, 2.5 - t) / 0.05, 0.0, 1.0) * std::sin(2.0 * kPi * 125.0 * t);
+        for (int c = 0; c < kEeg; ++c) {
+            emgData(c, s) = 10e-6 * std::sin(2.0 * kPi * 10.0 * t + 0.3 * c) + 5e-6 * emg;
+            const double tones[4] = {47.0, 83.0, 171.0, 263.0};
+            for (int k = 0; k < 4; ++k)
+                emgData(c, s) += 1e-6 * std::sin(2.0 * kPi * tones[k] * t + 0.9 * c + 0.4 * k);
+        }
+    }
+    //! [annotate_muscle_zscore_usage]
+    AnnotateMusclParams muscle; // mne defaults: z > 4 in the 110-140 Hz envelope, gaps < 0.1 s filled
+    const FiffAnnotations emgBad = annotateMusclZscore(emgData, info.pick_info(RowVectorXi::LinSpaced(kEeg, 0, kEeg - 1)), emgSFreq, muscle);
+    //! [annotate_muscle_zscore_usage]
+    // mne.preprocessing.annotate_muscle_zscore on the same data: one BAD_muscle, onset 1.563 s, duration 0.875 s
+    ok &= expect(emgBad.size() == 1 && std::fabs(emgBad[0].onset - 1.563) < 1e-9 && std::fabs(emgBad[0].duration - 0.875) < 1e-9,
+                 QString("annotateMusclZscore marks %1 EMG burst(s), first at %2 s for %3 s (mne: 1.563 s, 0.875 s)")
+                     .arg(emgBad.size())
+                     .arg(emgBad.isEmpty() ? -1.0 : emgBad[0].onset)
+                     .arg(emgBad.isEmpty() ? -1.0 : emgBad[0].duration));
 
     qInfo() << (ok ? "All dsp artifact checks passed." : "dsp artifact checks FAILED.");
     return ok ? EXIT_SUCCESS : EXIT_FAILURE;

@@ -28,6 +28,13 @@ FilterKernel lowPass = FirFilter::design(256, FirFilter::LowPass, 20.0, 0.0, sFr
 const RowVectorXd smooth = FirFilter::applyZeroPhase(tones, lowPass);
 ```
 
+designMne / filterData reproduce mne.filter.create_filter / filter_data:
+
+```cpp title="src/examples/ex_dsp_analysis/main.cpp"
+const RowVectorXd mneKernel = FirFilter::designMne(sFreq, -1.0, 20.0);   // mne.filter.create_filter defaults: 165 taps
+const MatrixXd mneLow = FirFilter::filterData(tones, sFreq, -1.0, 20.0); // mne.filter.filter_data(x, 250, None, 20)
+```
+
 ---
 
 ## Static Methods
@@ -125,6 +132,51 @@ Apply the filter in a zero-phase forward-backward pass to every row of a matrix.
 **Returns:**
 
 - *Eigen::MatrixXd* — Zero-phase filtered matrix (same dimensions as input).
+
+---
+
+### designMne(dSFreq, dLFreq, dHFreq)
+
+Designs the zero-phase FIR filter of `mne.filter.create_filter` with its defaults: firwin design with a Hamming window, "auto" transition bands (min(max(0.25 f, 2 Hz), f) below, min(max(0.25 f, 2 Hz), Nyquist - f) above) and "auto" length 3.3 / narrowest band.
+
+**Parameters:**
+
+- **dSFreq** : *double*
+  Sampling frequency in Hz.
+
+- **dLFreq** : *double*
+  High-pass edge in Hz, or a negative value for a low-pass.
+
+- **dHFreq** : *double*
+  Low-pass edge in Hz, or a negative value for a high-pass.
+
+**Returns:**
+
+- *Eigen::RowVectorXd* — The odd-length impulse response.
+
+---
+
+### filterData(matData, dSFreq, dLFreq, dHFreq)
+
+Filters every row like `mne.filter.filter_data` with its FIR defaults: the designMne kernel applied by overlap-add with zero phase, each row padded by reflecting it about its end samples ("reflect_limited").
+
+**Parameters:**
+
+- **matData** : *const Eigen::MatrixXd &*
+  Data, one row per channel.
+
+- **dSFreq** : *double*
+  Sampling frequency in Hz.
+
+- **dLFreq** : *double*
+  High-pass edge in Hz, or a negative value for a low-pass.
+
+- **dHFreq** : *double*
+  Low-pass edge in Hz, or a negative value for a high-pass.
+
+**Returns:**
+
+- *Eigen::MatrixXd* — The filtered data.
 
 ---
 

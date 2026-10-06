@@ -64,14 +64,17 @@ For each pair (i, j): orthogonalize j w.r.t. i, compute envelope correlation, th
 
 ---
 
-### hilbertEnvelope(signal)
+### hilbertEnvelope(signal, nFft)
 
-Compute the analytic signal envelope via Hilbert transform (using FFT).
+Compute the analytic signal envelope via Hilbert transform (using FFT), like `numpy.abs`(scipy.signal.hilbert(signal, N=nFft)[:n_samples]).
 
 **Parameters:**
 
 - **signal** : *const Eigen::VectorXd &*
   Real-valued signal (n_samples).
+
+- **nFft** : *int*
+  FFT length (zero padding), at least n_samples; 0 for n_samples.
 
 **Returns:**
 

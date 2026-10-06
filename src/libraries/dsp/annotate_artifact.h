@@ -12,21 +12,22 @@
  * The detectors in this header scan continuous MEG / EEG data and emit
  * @ref FIFFLIB::FiffAnnotation intervals marking time segments that
  * should be excluded from downstream averaging, ICA fitting or PSD
- * estimation. @c annotateMuscleZscore band-pass filters the signal in
- * the 110–140 Hz range (typical EMG band), takes the smoothed envelope
- * across channels and z-scores it against the global median absolute
- * deviation; samples whose z-score exceeds a user threshold are merged
- * into BAD_muscle annotations. @ref UTILSLIB::annotateAmplitude "annotateAmplitude" flags two boundary
+ * estimation. @c annotateMusclZscore band-pass filters the signal in
+ * the 110–140 Hz range (typical EMG band), z-scores the Hilbert envelope
+ * of every channel, combines and smooths the scores and marks samples
+ * above a threshold as BAD_muscle. @ref UTILSLIB::annotateAmplitude "annotateAmplitude" flags two boundary
  * conditions instead: per-channel peak-to-peak amplitude exceeding an
  * upper limit ("high-amplitude" artefact) and amplitude falling below a
  * lower limit for longer than a minimum duration ("flat" / dead channel).
  *
  * Both routines mirror the semantics of their MNE-Python counterparts
  * @c mne.preprocessing.annotate_muscle_zscore and
- * @c mne.preprocessing.annotate_amplitude so cross-toolchain pipelines
- * produce identical bad-segment lists.
+ * @c mne.preprocessing.annotate_amplitude; annotateMusclZscore reproduces
+ * mne's onsets and durations sample for sample.
  *
  * @snippet ex_dsp_artifacts/main.cpp annotate_amplitude_usage
+ *
+ * @snippet ex_dsp_artifacts/main.cpp annotate_muscle_zscore_usage
  */
 
 #ifndef ANNOTATE_ARTIFACT_DSP_H
@@ -76,15 +77,15 @@ namespace UTILSLIB
 //=============================================================================================================
 /**
  * @brief Parameters for muscle artifact annotation.
+ *
+ * @snippet ex_dsp_artifacts/main.cpp annotate_muscle_zscore_usage
  */
 struct DSPSHARED_EXPORT AnnotateMusclParams
 {
-    double dThreshold = 5.0;    /**< Z-score threshold for marking as muscle artifact. */
-    double dFilterLow = 110.0;  /**< High-pass cutoff for muscle band (Hz). */
-    double dFilterHigh = 140.0; /**< Low-pass cutoff for muscle band (Hz). */
-    int iFilterOrder = 4;       /**< Butterworth order. */
-    double dMinDuration = 0.1;  /**< Minimum annotation duration in seconds. */
-    double dMinGapSec = 0.25;   /**< Merge annotations closer than this (seconds). */
+    double dThreshold = 4.0;     /**< Z-score threshold for marking as muscle artifact. */
+    double dFilterLow = 110.0;   /**< Lower edge of the muscle band (Hz). */
+    double dFilterHigh = 140.0;  /**< Upper edge of the muscle band (Hz). */
+    double dMinLengthGood = 0.1; /**< Good stretches shorter than this (seconds) between annotations become bad. */
 };
 
 //=============================================================================================================
@@ -107,25 +108,27 @@ struct DSPSHARED_EXPORT AnnotateAmplitudeParams
 /**
  * @brief Detect muscle artifacts via high-frequency z-score and annotate bad segments.
  *
- * Algorithm:
- * 1. Bandpass filter data in muscle frequency band (default 110–140 Hz).
- * 2. Compute Hilbert envelope (approximated via absolute value of filtered signal).
- * 3. Compute z-score of the envelope across time for each MEG channel.
- * 4. Average z-score across channels.
- * 5. Threshold: mark time points where average z-score > threshold.
- * 6. Merge adjacent annotations and apply minimum duration.
+ * Algorithm of @c mne.preprocessing.annotate_muscle_zscore with ch_type None:
+ * 1. Pick the magnetometers, else the gradiometers, else the EEG channels.
+ * 2. Band-pass them with mne's default FIR filter (@ref FirFilter::filterData).
+ * 3. Take the Hilbert envelope (FFT length padded to the next 5-smooth size).
+ * 4. Z-score every channel over time, sum over channels and divide by sqrt(n_channels).
+ * 5. Low-pass the score at 4 Hz with the same FIR filter.
+ * 6. Mark samples above the threshold; good stretches shorter than dMinLengthGood become bad.
  *
  * @param[in] data    Raw data matrix (n_channels × n_times).
  * @param[in] info    Measurement info.
  * @param[in] sfreq   Sampling frequency in Hz.
  * @param[in] params  Detection parameters.
+ * @param[out] scores If not null, receives the smoothed score per sample (mne's scores_muscle).
  * @return FiffAnnotations with "BAD_muscle" entries.
  */
 DSPSHARED_EXPORT FIFFLIB::FiffAnnotations annotateMusclZscore(
     const Eigen::MatrixXd& data,
     const FIFFLIB::FiffInfo& info,
     double sfreq,
-    const AnnotateMusclParams& params = AnnotateMusclParams());
+    const AnnotateMusclParams& params = AnnotateMusclParams(),
+    Eigen::RowVectorXd* scores = nullptr);
 
 //=============================================================================================================
 /**

@@ -17,7 +17,17 @@ struct UTILSLIB::AnnotateMusclParams
 
 Parameters for muscle artifact annotation.
 
+```cpp title="src/examples/ex_dsp_artifacts/main.cpp"
+AnnotateMusclParams muscle; // mne defaults: z > 4 in the 110-140 Hz envelope, gaps < 0.1 s filled
+const FiffAnnotations emgBad = annotateMusclZscore(emgData, info.pick_info(RowVectorXi::LinSpaced(kEeg, 0, kEeg - 1)), emgSFreq, muscle);
+```
+
 ---
+
+## Example
+
+- Full source: [`src/examples/ex_dsp_artifacts/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_dsp_artifacts/main.cpp)
+- Build target: `ex_dsp_artifacts` (runs under CTest)
 
 ## Authors of this file
 

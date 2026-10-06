@@ -12,7 +12,7 @@
     "registered_stale": 0,
     "registered_with_test": 102,
     "registered_test_unresolved": 0,
-    "registered_with_example": 318,
+    "registered_with_example": 319,
     "registered_example_not_built": 0,
     "registered_with_python_equiv": 89,
     "registered_without_api_page": 0,
@@ -20,7 +20,7 @@
     "public_api_units": 507,
     "example_eligible": 372,
     "example_exempt": 135,
-    "eligible_backed_by_registry_example": 318,
+    "eligible_backed_by_registry_example": 319,
     "eligible_used_by_some_example": 332,
     "examples_on_disk": 68,
     "examples_built": 68
@@ -85,7 +85,7 @@
       "registered": 84,
       "with_test": 28,
       "eligible": 80,
-      "eligible_with_registry_example": 75,
+      "eligible_with_registry_example": 76,
       "eligible_used_by_example": 80,
       "with_snippet": 84
     },
@@ -4187,6 +4187,8 @@
       ],
       "snippets": [
         "ex_dsp_artifacts/main.cpp#annotate_amplitude_usage",
+        "ex_dsp_artifacts/main.cpp#annotate_muscle_zscore_usage",
+        "ex_dsp_artifacts/main.cpp#annotate_muscle_zscore_usage",
         "ex_dsp_artifacts/main.cpp#annotate_amplitude_usage"
       ],
       "api_page": "doc/website/docs/api/dsp/annotate-amplitude-params.mdx",
@@ -4211,6 +4213,8 @@
       ],
       "snippets": [
         "ex_dsp_artifacts/main.cpp#annotate_amplitude_usage",
+        "ex_dsp_artifacts/main.cpp#annotate_muscle_zscore_usage",
+        "ex_dsp_artifacts/main.cpp#annotate_muscle_zscore_usage",
         "ex_dsp_artifacts/main.cpp#annotate_amplitude_usage"
       ],
       "api_page": "doc/website/docs/api/dsp/annotate-artifact.mdx",
@@ -4228,13 +4232,15 @@
       "registry_status": "documented",
       "test": null,
       "test_resolves": false,
-      "example": null,
-      "example_state": "none",
+      "example": "ex_dsp_artifacts",
+      "example_state": "built",
       "including_examples": [
         "ex_dsp_artifacts"
       ],
       "snippets": [
         "ex_dsp_artifacts/main.cpp#annotate_amplitude_usage",
+        "ex_dsp_artifacts/main.cpp#annotate_muscle_zscore_usage",
+        "ex_dsp_artifacts/main.cpp#annotate_muscle_zscore_usage",
         "ex_dsp_artifacts/main.cpp#annotate_amplitude_usage"
       ],
       "api_page": "doc/website/docs/api/dsp/annotate-muscl-params.mdx",
@@ -5045,7 +5051,8 @@
         "ex_dsp_analysis"
       ],
       "snippets": [
-        "ex_dsp_analysis/main.cpp#fir_filter_usage"
+        "ex_dsp_analysis/main.cpp#fir_filter_usage",
+        "ex_dsp_analysis/main.cpp#fir_filter_mne_usage"
       ],
       "api_page": "doc/website/docs/api/dsp/fir-filter.mdx",
       "python_equiv": "mne.filter.filter_data",

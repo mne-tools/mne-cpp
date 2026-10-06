@@ -1243,6 +1243,7 @@ Index of 6244 public class members (functions, variables, typedefs, enums) acros
 - **design** `[fn]` in [FirFilter](/docs/api/dsp/fir-filter) — Design a linear-phase FIR filter using [`FilterKernel`](/docs/api/dsp/filter-kernel) as the backend.
 - **designButterworth** `[fn]` in [IirFilter](/docs/api/dsp/iir-filter) — Design a Butterworth filter as a cascade of second-order sections.
 - **DesignMethod** `[enum]` in [FirFilter](/docs/api/dsp/fir-filter) — FIR design method — wraps [`FilterKernel`](/docs/api/dsp/filter-kernel)'s iDesignMethod integer codes.
+- **designMne** `[fn]` in [FirFilter](/docs/api/dsp/fir-filter) — Designs the zero-phase FIR filter of `mne.filter.create_filter` with its defaults: firwin design with a Hamming window, "auto" transition bands (min(max(0.25 f, 2 Hz), f) below, min(max(0.25 f, 2 Hz), Nyquist - f) above) and "auto" length 3.3 / narrowest band.
 - **detach** `[fn]` in [Subject](/docs/api/utils/subject) — Detaches an observer of the subject.
 - **detect** `[fn]` in [BadChannelDetect](/docs/api/utils/bad-channel-detect) — Run all three detectors and return the union of bad channel row indices.
 - **detect_from_raw** `[fn]` in [FiffEvents](/docs/api/fiff/fiff-events) — Detect trigger events from raw data using a stimulus channel.
@@ -1262,10 +1263,10 @@ Index of 6244 public class members (functions, variables, typedefs, enums) acros
 - **devicePoseChanged** `[signal]` in [PolhemusCoregistration](/docs/api/utils/polhemus-coregistration)
 - **deviceToWorld** `[fn]` in [PolhemusCoregistration](/docs/api/utils/polhemus-coregistration)
 - **dfBetween** `[var]` in [StatsFtestResult](/docs/api/sts/stats-ftest-result) — Between-groups degrees of freedom.
-- **dFilterHigh** `[var]` in [AnnotateMusclParams](/docs/api/dsp/annotate-muscl-params) — Low-pass cutoff for muscle band (Hz).
+- **dFilterHigh** `[var]` in [AnnotateMusclParams](/docs/api/dsp/annotate-muscl-params) — Upper edge of the muscle band (Hz).
 - **dFilterHigh** `[var]` in [ArtifactDetectEcgParams](/docs/api/utils/artifact-detect-ecg-params) — Bandpass upper cutoff (Hz).
 - **dFilterHigh** `[var]` in [ArtifactDetectEogParams](/docs/api/utils/artifact-detect-eog-params) — Low-pass cutoff (Hz).
-- **dFilterLow** `[var]` in [AnnotateMusclParams](/docs/api/dsp/annotate-muscl-params) — High-pass cutoff for muscle band (Hz).
+- **dFilterLow** `[var]` in [AnnotateMusclParams](/docs/api/dsp/annotate-muscl-params) — Lower edge of the muscle band (Hz).
 - **dFilterLow** `[var]` in [ArtifactDetectEcgParams](/docs/api/utils/artifact-detect-ecg-params) — Bandpass lower cutoff (Hz).
 - **dFlatMin** `[var]` in [AnnotateAmplitudeParams](/docs/api/dsp/annotate-amplitude-params) — Flatness threshold — annotate if peak-to-peak in a window &lt; this.
 - **dFlatThreshold** `[var]` in [BadChannelDetectParams](/docs/api/utils/bad-channel-detect-params) — Peak-to-peak below this -&gt; flat (SI units; ~0.1 fT for MEG).
@@ -1341,10 +1342,9 @@ Index of 6244 public class members (functions, variables, typedefs, enums) acros
 - **distanceTimeSpacerChanged** `[signal]` in [FiffRawViewSettings](/docs/api/disp/fiff-raw-view-settings) — Emit this signal whenever the user changed the time spacer distance.
 - **distanceTimeSpacerChanged** `[fn]` in [RtFiffRawViewModel](/docs/api/disp/rt-fiff-raw-view-model) — distanceTimeSpacerChanged changes the distance of the time spacers
 - **dMinDuration** `[var]` in [AnnotateAmplitudeParams](/docs/api/dsp/annotate-amplitude-params) — Minimum duration of annotation (seconds).
-- **dMinDuration** `[var]` in [AnnotateMusclParams](/docs/api/dsp/annotate-muscl-params) — Minimum annotation duration in seconds.
-- **dMinGapSec** `[var]` in [AnnotateMusclParams](/docs/api/dsp/annotate-muscl-params) — Merge annotations closer than this (seconds).
 - **dMinGapSec** `[var]` in [ArtifactDetectEogParams](/docs/api/utils/artifact-detect-eog-params) — Minimum gap between successive events in seconds.
 - **dMinHeight** `[var]` in [PeakFinderParams](/docs/api/dsp/peak-finder-params) — Minimum peak height.
+- **dMinLengthGood** `[var]` in [AnnotateMusclParams](/docs/api/dsp/annotate-muscl-params) — Good stretches shorter than this (seconds) between annotations become bad.
 - **dMinRatio** `[var]` in [BadChannelsMaxwellParams](/docs/api/dsp/bad-channels-maxwell-params) — Minimum relative residual to consider (skip near-zero).
 - **dMinRRSec** `[var]` in [ArtifactDetectEcgParams](/docs/api/utils/artifact-detect-ecg-params) — Minimum R–R interval in seconds (caps detection rate at ~170 bpm).
 - **dNotchWidth** `[var]` in [FilterChpiParams](/docs/api/dsp/filter-chpi-params) — Half-width of each notch filter in Hz (notch = freq +/- width).
@@ -1711,6 +1711,7 @@ Index of 6244 public class members (functions, variables, typedefs, enums) acros
 - **filterBadChannels** `[fn]` in [GeometryInfo](/docs/api/disp3-d/geometry-info) — filterBadChannels Filters bad channels from distance table.
 - **filterChanged** `[signal]` in [FilterDesignView](/docs/api/disp/filter-design-view) — Emitted when the filter changes.
 - **filterChannelTypeChanged** `[signal]` in [FilterDesignView](/docs/api/disp/filter-design-view) — Emitted when the filter channel type changed.
+- **filterData** `[fn]` in [FirFilter](/docs/api/dsp/fir-filter) — Filters every row like `mne.filter.filter_data` with its FIR defaults: the designMne kernel applied by overlap-add with zero phase, each row padded by reflecting it about its end samples ("reflect_limited").
 - **FilterDesignView** `[fn]` in [FilterDesignView](/docs/api/disp/filter-design-view) — Constructs a [`FilterDesignView`](/docs/api/disp/filter-design-view) dialog which is a child of parent.
 - **filtered** `[var]` in [FilterThreadArg](/docs/api/mne/filter-thread-arg) — Optional stream to log omitted point locations (may be NULL).
 - **FilterIO** `[fn]` in [FilterIO](/docs/api/utils/filter-io) — Constructs a [`FilterIO`](/docs/api/utils/filter-io) object.
@@ -2422,7 +2423,7 @@ Index of 6244 public class members (functions, variables, typedefs, enums) acros
 - **highpass** `[var]` in [MNERawInfo](/docs/api/mne/mne-raw-info) — Highpass filter setting.
 - **highpass_width** `[var]` in [MNEFilterDef](/docs/api/mne/mne-filter-def) — Highpass transition width in Hz.
 - **highpassWidth** `[var]` in [FilterSettings](/docs/api/mne/filter-settings) — Highpass transition width (Hz).
-- **hilbertEnvelope** `[fn]` in [ConnectivityAec](/docs/api/dsp/connectivity-aec) — Compute the analytic signal envelope via Hilbert transform (using FFT).
+- **hilbertEnvelope** `[fn]` in [ConnectivityAec](/docs/api/dsp/connectivity-aec) — Compute the analytic signal envelope via Hilbert transform (using FFT), like `numpy.abs`(scipy.signal.hilbert(signal, N=nFft)[:n_samples]).
 - **histcounts** `[fn]` in [Numerics](/docs/api/utils/numerics) — Creates a class and frequency distribution from data matrix.
 - **histcounts** `[fn]` in [Numerics](/docs/api/utils/numerics)
 - **histcounts** `[fn]` in [Numerics](/docs/api/utils/numerics)
@@ -2463,7 +2464,6 @@ Index of 6244 public class members (functions, variables, typedefs, enums) acros
 - **idx** `[var]` in [HPISortStruct](/docs/api/inv/hpi-sort-struct)
 - **IdxIntValue** `[type]` in [Linalg](/docs/api/math/linalg) — Typedef of a pair of ints.
 - **ieegReference** `[var]` in [BidsRawData](/docs/api/bids/bids-raw-data) — Reference electrode name (RECOMMENDED).
-- **iFilterOrder** `[var]` in [AnnotateMusclParams](/docs/api/dsp/annotate-muscl-params) — Butterworth order.
 - **iFilterOrder** `[var]` in [ArtifactDetectEcgParams](/docs/api/utils/artifact-detect-ecg-params) — Butterworth order for the bandpass pre-filter.
 - **iFilterOrder** `[var]` in [ArtifactDetectEogParams](/docs/api/utils/artifact-detect-eog-params) — Butterworth order for the low-pass pre-filter.
 - **iFilterOrder** `[var]` in [FilterChpiParams](/docs/api/dsp/filter-chpi-params) — Butterworth order for each notch filter.

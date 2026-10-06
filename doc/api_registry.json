@@ -1141,7 +1141,8 @@
       "test": "test_dsp_firfilter",
       "example": "ex_dsp_analysis",
       "example_snippet": [
-        "ex_dsp_analysis/main.cpp#fir_filter_usage"
+        "ex_dsp_analysis/main.cpp#fir_filter_usage",
+        "ex_dsp_analysis/main.cpp#fir_filter_mne_usage"
       ],
       "example_mode": "run",
       "status": "done",
@@ -1423,7 +1424,8 @@
       "test": "test_dsp_annotate_artifact",
       "example": "ex_dsp_artifacts",
       "example_snippet": [
-        "ex_dsp_artifacts/main.cpp#annotate_amplitude_usage"
+        "ex_dsp_artifacts/main.cpp#annotate_amplitude_usage",
+        "ex_dsp_artifacts/main.cpp#annotate_muscle_zscore_usage"
       ],
       "example_mode": "run",
       "status": "done",
@@ -9667,7 +9669,11 @@
       "mne_python": null,
       "sklearn": null,
       "test": null,
-      "example": null,
+      "example": "ex_dsp_artifacts",
+      "example_snippet": [
+        "ex_dsp_artifacts/main.cpp#annotate_muscle_zscore_usage"
+      ],
+      "example_mode": "run",
       "status": "documented",
       "skigen_candidate": false,
       "documented": true,

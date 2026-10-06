@@ -22,16 +22,16 @@
   "summary": {
     "claims": 359,
     "by_evidence": {
-      "cross-validated-static": 4,
+      "cross-validated-static": 5,
       "cross-validated-live": 1,
-      "tested": 84,
+      "tested": 83,
       "unverified": 270
     },
     "by_source": {
       "classes": {
-        "cross-validated-static": 4,
+        "cross-validated-static": 5,
         "cross-validated-live": 1,
-        "tested": 84,
+        "tested": 83,
         "unverified": 0
       },
       "parity": {
@@ -44,6 +44,7 @@
     "tests_by_relation": {
       "cross-validated-static": [
         "test_anshared_models",
+        "test_dsp_annotate_artifact",
         "test_fiff_core_python",
         "test_fiff_cov_python",
         "test_fiff_dig_point_python",
@@ -488,7 +489,7 @@
       "python": "mne.preprocessing.annotate_muscle_zscore / annotate_amplitude",
       "claimed": "implemented",
       "test": "test_dsp_annotate_artifact",
-      "evidence": "tested"
+      "evidence": "cross-validated-static"
     },
     {
       "source": "classes",

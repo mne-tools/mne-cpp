@@ -13,14 +13,14 @@ Coverage from `5053fe099` (https://github.com/mne-tools/mne-cpp/actions/runs/362
 | G2 | Applications >= 50.0% line | 24.9% | **open** |
 | G2 | Tools >= 50.0% line | 61.68% | met |
 | G2 | Libraries >= 65.0% branch | 42.9% | **open** |
-| G3 | Eligible APIs have an executable example | 85.48% of 372; 353 snippets | **open** |
+| G3 | Eligible APIs have an executable example | 85.75% of 372; 353 snippets | **open** |
 | G3 | Exported API is registered | 39 exported classes unregistered | **open** |
 | G4 | Documentation images generated in CI | 19 referenced, 0 without producer, placeholders in 0 workflows | met |
 | G4 | Visual regression compares to goldens | 0 golden comparisons | **open** |
 | G5 | Zero compiler warnings | enforced by -Werror on every matrix entry | met |
 | G5 | Debt metrics ratcheted | null_macro 43, typedef_struct 12, c_style_cast 429, raw_new 169, raw_delete 275, console_io 358, numeric_define 834, qt_new_unparented 823, oversized_unit 8 | baseline recorded |
 | G6 | Pinned reference environment | MNE-Python 1.11.0; unpinned in CI: none | met |
-| G6 | Parity claims cross-validated | cross-validated-static 4, cross-validated-live 1, tested 84, unverified 270 | **open** |
+| G6 | Parity claims cross-validated | cross-validated-static 5, cross-validated-live 1, tested 83, unverified 270 | **open** |
 
 Detailed reports: [test inventory](test-inventory.md), [coverage](coverage-baseline.md), [API evidence](api-evidence-baseline.md), [visual](visual-baseline.md), [maintainability](maintainability-baseline.md), [parity evidence](parity-baseline.md), [MNE-Python gap](mne-python-gap.md).
 
