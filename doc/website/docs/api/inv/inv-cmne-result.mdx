@@ -19,7 +19,24 @@ Result container for the CMNE inverse solver.
 
 CMNE result
 
+```cpp title="src/examples/ex_inv_api/main.cpp"
+// Contextual MNE: dSPM with a fixed-orientation kernel, then rectified and z-scored per source. Without an
+// ONNX LSTM model the result is the paper's control estimate.
+InvCMNESettings cmneSettings;
+cmneSettings.lambda2 = lambda2;
+cmneSettings.lookBack = 20;
+const MatrixXd fixedGain = fixedFwd.sol->data;
+const MatrixXd sourceCov = MatrixXd::Identity(fixedGain.cols(), fixedGain.cols());
+const InvCMNEResult cmne = InvCMNE::compute(goodData, fixedGain, inverse.noise_cov->data, sourceCov, cmneSettings);
+```
+
 ---
+
+## Example
+
+- Full source: [`src/examples/ex_inv_api/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_inv_api/main.cpp)
+- Build target: `ex_inv_api` (runs under CTest)
+- Data: [mne-cpp-test-data](https://github.com/mne-tools/mne-cpp-test-data)
 
 ## Authors of this file
 

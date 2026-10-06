@@ -17,7 +17,25 @@ struct UTILSLIB::HeadPosEntry
 
 A head position entry (time, translation, rotation quaternion).
 
+```cpp title="src/examples/ex_dsp_maxwell/main.cpp"
+QList<HeadPosEntry> headPos(1); // one position from t = 0: identity rotation, no translation
+MaxwellMoveCompParams moveParams;
+moveParams.origin = params.origin;
+const MatrixXd compensated = MaxwellMovementComp::apply(data, info, headPos, 1.0, moveParams);
+
+QTemporaryDir dir;
+const QString posPath = dir.filePath("head.pos"); // same columns as mne.chpi.write_head_pos
+const bool posWritten = MaxwellMovementComp::writeHeadPos(posPath, headPos);
+const QList<HeadPosEntry> posBack = MaxwellMovementComp::readHeadPos(posPath);
+```
+
 ---
+
+## Example
+
+- Full source: [`src/examples/ex_dsp_maxwell/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_dsp_maxwell/main.cpp)
+- Build target: `ex_dsp_maxwell` (runs under CTest)
+- Data: [mne-cpp-test-data](https://github.com/mne-tools/mne-cpp-test-data)
 
 ## Authors of this file
 

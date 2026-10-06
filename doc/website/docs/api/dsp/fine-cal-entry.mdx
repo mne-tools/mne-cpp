@@ -17,7 +17,25 @@ struct UTILSLIB::FineCalEntry
 
 Per-sensor fine calibration entry.
 
+```cpp title="src/examples/ex_dsp_maxwell/main.cpp"
+FineCalibration calibration;
+FineCalEntry magnetometer;
+magnetometer.chNumber = 111; // numbers ending in 1 are magnetometers
+magnetometer.position = Vector3d(-0.1066, 0.0464, -0.0604);
+magnetometer.imbalance = VectorXd::Constant(1, 0.996645); // calibration factor
+calibration.addEntry(magnetometer);
+const QString calPath = dir.filePath("sss_cal.dat"); // the format of mne.preprocessing.write_fine_calibration
+const bool calWritten = calibration.write(calPath);
+const FineCalibration calBack = FineCalibration::read(calPath);
+```
+
 ---
+
+## Example
+
+- Full source: [`src/examples/ex_dsp_maxwell/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_dsp_maxwell/main.cpp)
+- Build target: `ex_dsp_maxwell` (runs under CTest)
+- Data: [mne-cpp-test-data](https://github.com/mne-tools/mne-cpp-test-data)
 
 ## Authors of this file
 

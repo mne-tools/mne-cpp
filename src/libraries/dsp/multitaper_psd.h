@@ -51,6 +51,8 @@ namespace UTILSLIB
 //=============================================================================================================
 /**
  * @brief Result of a multitaper PSD computation.
+ *
+ * @snippet ex_dsp_spectral/main.cpp multitaper_psd_compute
  */
 struct DSPSHARED_EXPORT MultitaperPsdResult
 {

@@ -19,7 +19,17 @@ Result of a Welch PSD computation.
 
 matPsd rows correspond to channels (or the single channel passed to computeVector). Each column corresponds to a frequency bin from vecFreqs.
 
+```cpp title="src/examples/ex_dsp_analysis/main.cpp"
+const WelchPsdResult welch = WelchPsd::compute(tones, sFreq, 250, 0.5, WelchPsd::Hann); // 1 Hz bins, 50 % overlap
+// welch.matPsd: n_channels x 126 one-sided PSD (unit^2/Hz); welch.vecFreqs: 0 ... 125 Hz
+```
+
 ---
+
+## Example
+
+- Full source: [`src/examples/ex_dsp_analysis/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_dsp_analysis/main.cpp)
+- Build target: `ex_dsp_analysis` (runs under CTest)
 
 ## Authors of this file
 

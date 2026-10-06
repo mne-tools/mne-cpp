@@ -59,6 +59,8 @@ namespace UTILSLIB
 //=============================================================================================================
 /**
  * Parameters for peak detection.
+ *
+ * @snippet ex_dsp_analysis/main.cpp peak_finder_usage
  */
 struct DSPSHARED_EXPORT PeakFinderParams
 {

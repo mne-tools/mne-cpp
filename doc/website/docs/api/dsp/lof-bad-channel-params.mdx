@@ -17,7 +17,23 @@ struct UTILSLIB::LofBadChannelParams
 
 Parameters for LOF bad channel detection.
 
+```cpp title="src/examples/ex_dsp_artifacts/main.cpp"
+LofBadChannelParams lofParams;
+lofParams.iNNeighbors = 4;
+lofParams.bEegOnly = true;
+const QStringList lofBad = findBadChannelsLof(data, info, lofParams); // features: std, kurtosis, max |x|
+
+MatrixXd features(6, 2); // the generic LOF score on a 2-D point cloud: one far point
+features << 0.0, 0.0, 0.1, 0.0, 0.0, 0.1, 0.1, 0.1, 0.05, 0.05, 3.0, 3.0;
+const VectorXd lofScores = computeLofScores(features, 3);
+```
+
 ---
+
+## Example
+
+- Full source: [`src/examples/ex_dsp_artifacts/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_dsp_artifacts/main.cpp)
+- Build target: `ex_dsp_artifacts` (runs under CTest)
 
 ## Authors of this file
 

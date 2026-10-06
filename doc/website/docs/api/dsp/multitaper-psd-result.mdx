@@ -17,7 +17,18 @@ struct UTILSLIB::MultitaperPsdResult
 
 Result of a multitaper PSD computation.
 
+```cpp title="src/examples/ex_dsp_spectral/main.cpp"
+const MultitaperPsdResult psd = MultitaperPsd::compute(signal, kSFreq, 2.0); // NW = 2, i.e. +-1 Hz resolution
+const double binWidth = psd.vecFreqs(1) - psd.vecFreqs(0);
+const double power = psd.matPsd.row(0).sum() * binWidth; // one-sided PSD integrates to the variance
+```
+
 ---
+
+## Example
+
+- Full source: [`src/examples/ex_dsp_spectral/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_dsp_spectral/main.cpp)
+- Build target: `ex_dsp_spectral` (runs under CTest)
 
 ## Authors of this file
 

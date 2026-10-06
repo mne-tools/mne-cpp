@@ -17,7 +17,18 @@ struct UTILSLIB::ElectrodePosition
 
 Represents an electrode position in a montage.
 
+```cpp title="src/examples/ex_utils/main.cpp"
+const QList<ElectrodePosition> montage1020 = StandardMontage::getMontage(StandardMontage::System::Standard_1020);
+Vector3d cz;
+const bool found = StandardMontage::findElectrode("Cz", cz); // positions in metres, head coordinates
+```
+
 ---
+
+## Example
+
+- Full source: [`src/examples/ex_utils/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_utils/main.cpp)
+- Build target: `ex_utils` (runs under CTest)
 
 ## Authors of this file
 

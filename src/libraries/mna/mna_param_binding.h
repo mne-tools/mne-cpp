@@ -56,6 +56,8 @@ namespace MNALIB
  * expression that is re-evaluated when a trigger condition is met.
  *
  * @brief Dynamic parameter binding for the MNA parameter tree.
+ *
+ * @snippet ex_mna/main.cpp mna_param_tree_binding
  */
 struct MNASHARED_EXPORT MnaParamBinding
 {

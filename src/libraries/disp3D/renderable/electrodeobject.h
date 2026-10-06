@@ -61,6 +61,8 @@ namespace DISP3DLIB
 //=============================================================================================================
 /**
  * @brief Single contact on a depth electrode shaft.
+ *
+ * @snippet ex_disp3d_scene/main.cpp electrode_object_usage
  */
 struct DISP3DSHARED_EXPORT ElectrodeContact
 {
@@ -102,6 +104,8 @@ enum class ElectrodeLayout
  * for Strip and Grid layouts. The Grid-only fields (@ref gridRows,
  * @ref DISP3DLIB::ElectrodeArray::gridCols "gridCols") default to 1 and so describe a degenerate single
  * contact for the other layouts.
+ *
+ * @snippet ex_disp3d_scene/main.cpp electrode_object_usage
  */
 struct DISP3DSHARED_EXPORT ElectrodeArray
 {

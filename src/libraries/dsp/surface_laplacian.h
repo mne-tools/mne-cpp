@@ -49,6 +49,8 @@ namespace UTILSLIB
 //=============================================================================================================
 /**
  * @brief Result of a surface Laplacian (CSD) computation.
+ *
+ * @snippet ex_dsp_preprocessing/main.cpp surface_laplacian_compute
  */
 struct DSPSHARED_EXPORT SurfaceLaplacianResult
 {

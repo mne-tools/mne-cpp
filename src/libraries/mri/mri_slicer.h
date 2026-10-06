@@ -88,6 +88,8 @@ enum class SliceOrientation
  * upload to the slice viewer: a normalised 8-bit grayscale pixel buffer,
  * the in-volume slice index it was sampled at, and the bookkeeping the
  * widget needs to map mouse picks back to RAS millimetres.
+ *
+ * @snippet ex_mri/main.cpp mri_slicer_usage
  */
 struct MRISHARED_EXPORT MriSliceImage
 {

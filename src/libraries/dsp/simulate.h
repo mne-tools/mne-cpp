@@ -66,6 +66,8 @@ namespace UTILSLIB
 //=============================================================================================================
 /**
  * @brief Parameters for source time course simulation.
+ *
+ * @snippet ex_dsp_analysis/main.cpp simulate_stc_usage
  */
 struct DSPSHARED_EXPORT SimulateStcParams
 {

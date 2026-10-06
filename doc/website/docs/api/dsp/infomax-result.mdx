@@ -17,7 +17,17 @@ struct UTILSLIB::InfomaxResult
 
 Result structure for Extended Infomax [`ICA`](/docs/api/dsp/ica).
 
+```cpp title="src/examples/ex_dsp_preprocessing/main.cpp"
+const MatrixXd centered = mixed.colwise() - mixed.rowwise().mean();                            // infomax expects zero-mean data
+const InfomaxResult infomax = ExtendedInfomax::compute(centered, 3, 500, 0.1, 1e-7, true, 42); // the 0.001 default is too slow here
+```
+
 ---
+
+## Example
+
+- Full source: [`src/examples/ex_dsp_preprocessing/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_dsp_preprocessing/main.cpp)
+- Build target: `ex_dsp_preprocessing` (runs under CTest)
 
 ## Authors of this file
 

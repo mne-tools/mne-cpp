@@ -17,7 +17,25 @@ struct INVLIB::InvTfMxneParams
 
 Parameters for the TF-MxNE solver.
 
+```cpp title="src/examples/ex_inv_api/main.cpp"
+// TF-MxNE: sparse in space and in a Gabor time-frequency dictionary; 40 samples at 150 Hz.
+InvTfMxneParams tfParams;
+tfParams.dAlphaSpace = 0.5 * alphaMax;
+tfParams.dAlphaTime = 0.05 * alphaMax;
+tfParams.dSFreq = evoked.info.sfreq;
+tfParams.iNFreqs = 4;
+tfParams.dFMin = 5.0;
+tfParams.dFMax = 40.0;
+const InvTfMxneResult tfMxne = InvTfMxne::compute(gain, measured, tfParams);
+```
+
 ---
+
+## Example
+
+- Full source: [`src/examples/ex_inv_api/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_inv_api/main.cpp)
+- Build target: `ex_inv_api` (runs under CTest)
+- Data: [mne-cpp-test-data](https://github.com/mne-tools/mne-cpp-test-data)
 
 ## Authors of this file
 

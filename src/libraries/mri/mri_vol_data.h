@@ -85,6 +85,8 @@ namespace MRILIB
  * as a vector of these.
  *
  * Ported from @c mriSliceRec in the original MNE C @c mne_make_cor_set.
+ *
+ * @snippet ex_mri/main.cpp mri_cor_io_read
  */
 struct MRISHARED_EXPORT MriSlice
 {

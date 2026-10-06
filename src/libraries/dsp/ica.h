@@ -62,6 +62,8 @@ namespace UTILSLIB
  * Holds the mixing and unmixing matrices and the extracted source time series. The relationship is:
  *   sources   = unmixing  * (data - mean)
  *   data_recon = mixing   * sources + mean
+ *
+ * @snippet ex_dsp_preprocessing/main.cpp ica_run
  */
 struct DSPSHARED_EXPORT IcaResult
 {

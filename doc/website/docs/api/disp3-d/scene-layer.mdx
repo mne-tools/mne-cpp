@@ -21,7 +21,36 @@ The payload is owned by the caller (e.g. the plugin that loaded the data) and su
 
 This indirection keeps `disp3D/scene/` free of QRhi includes and means new renderables (sEEG, ECoG, future fNIRS optodes, …) plug in without touching this header.
 
+```cpp title="src/examples/ex_disp3d_scene/main.cpp"
+MultimodalScene scene;
+scene.registerBoundsFn(SceneLayerKind::Electrode, [](const SceneLayer& layer, QVector3D& bbMin, QVector3D& bbMax) {
+    const auto* object = static_cast<const ElectrodeObject*>(layer.payload.get());
+    bbMin = bbMax = object->arrays().first().contacts.first().position;
+    for (const ElectrodeContact& c : object->arrays().first().contacts) {
+        bbMin = QVector3D(std::min(bbMin.x(), c.position.x()), std::min(bbMin.y(), c.position.y()), std::min(bbMin.z(), c.position.z()));
+        bbMax = QVector3D(std::max(bbMax.x(), c.position.x()), std::max(bbMax.y(), c.position.y()), std::max(bbMax.z(), c.position.z()));
+    }
+    return true;
+});
+SceneLayer layer;
+layer.id = "seeg_LH";
+layer.kind = SceneLayerKind::Electrode;
+auto payload = std::make_shared<ElectrodeObject>(); // owns GPU buffers, so it is not copyable
+payload->setArrays(electrodes.arrays());
+layer.payload = payload;
+scene.addLayer(layer);
+scene.setOverlayThresholds(2.0f, 4.0f, 8.0f);
+QVector3D bbMin;
+QVector3D bbMax;
+scene.worldBounds(bbMin, bbMax); // union over visible layers with a bounds function
+```
+
 ---
+
+## Example
+
+- Full source: [`src/examples/ex_disp3d_scene/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_disp3d_scene/main.cpp)
+- Build target: `ex_disp3d_scene` (runs under CTest)
 
 ## Authors of this file
 

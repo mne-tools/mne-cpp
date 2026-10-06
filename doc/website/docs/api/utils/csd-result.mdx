@@ -17,7 +17,22 @@ struct UTILSLIB::CsdResult
 
 Result of a Cross-[Spectral](/docs/api/utils/spectral) Density computation.
 
+```cpp title="src/examples/ex_dsp_spectral/main.cpp"
+MatrixXd twoChannels(2, n);
+twoChannels.row(0) = signal;
+for (int t = 0; t < n; ++t) {
+    twoChannels(1, t) = std::cos(2.0 * kPi * 20.0 * t / kSFreq); // 20 Hz, 90 degrees ahead of channel 0
+}
+const CsdResult csd = Csd::computeMultitaper(twoChannels, kSFreq, 18.0, 22.0, 2.0);
+const std::complex<double> cross = csd.matCsd(0, 1);
+```
+
 ---
+
+## Example
+
+- Full source: [`src/examples/ex_dsp_spectral/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_dsp_spectral/main.cpp)
+- Build target: `ex_dsp_spectral` (runs under CTest)
 
 ## Authors of this file
 

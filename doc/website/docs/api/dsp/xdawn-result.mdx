@@ -17,7 +17,17 @@ struct UTILSLIB::XdawnResult
 
 Result of an xDAWN decomposition.
 
+```cpp title="src/examples/ex_dsp_preprocessing/main.cpp"
+const XdawnResult xdawn = Xdawn::fit(epochs, 1, 1); // enhance the response to event code 1
+const MatrixXd component = Xdawn::apply(epochs[0].epoch, xdawn);
+```
+
 ---
+
+## Example
+
+- Full source: [`src/examples/ex_dsp_preprocessing/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_dsp_preprocessing/main.cpp)
+- Build target: `ex_dsp_preprocessing` (runs under CTest)
 
 ## Authors of this file
 

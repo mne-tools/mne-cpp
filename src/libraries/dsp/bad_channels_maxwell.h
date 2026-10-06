@@ -51,6 +51,8 @@ namespace UTILSLIB
 //=============================================================================================================
 /**
  * @brief Parameters for SSS-based bad channel detection.
+ *
+ * @snippet ex_dsp_maxwell/main.cpp bad_channels_maxwell_usage
  */
 struct DSPSHARED_EXPORT BadChannelsMaxwellParams
 {
@@ -65,6 +67,8 @@ struct DSPSHARED_EXPORT BadChannelsMaxwellParams
 //=============================================================================================================
 /**
  * @brief Result of SSS-based bad channel detection.
+ *
+ * @snippet ex_dsp_maxwell/main.cpp bad_channels_maxwell_usage
  */
 struct DSPSHARED_EXPORT BadChannelsMaxwellResult
 {

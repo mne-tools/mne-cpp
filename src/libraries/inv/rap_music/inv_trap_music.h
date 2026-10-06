@@ -53,6 +53,8 @@ namespace INVLIB
 //=============================================================================================================
 /**
  * @brief Result of a TRAP-MUSIC source scan.
+ *
+ * @snippet ex_inv_beamformer/main.cpp inv_trap_music_usage
  */
 struct INVSHARED_EXPORT TrapMusicDipole
 {

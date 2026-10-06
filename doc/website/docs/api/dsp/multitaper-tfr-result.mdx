@@ -17,7 +17,16 @@ struct UTILSLIB::MultitaperTfrResult
 
 Result of a multitaper TFR computation.
 
+```cpp title="src/examples/ex_dsp_spectral/main.cpp"
+const MultitaperTfrResult tfr = MultitaperTfr::compute(signal, kSFreq, 128, 32); // 128-sample windows, 32-sample hop
+```
+
 ---
+
+## Example
+
+- Full source: [`src/examples/ex_dsp_spectral/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_dsp_spectral/main.cpp)
+- Build target: `ex_dsp_spectral` (runs under CTest)
 
 ## Authors of this file
 

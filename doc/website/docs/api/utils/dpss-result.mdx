@@ -17,7 +17,16 @@ struct UTILSLIB::DpssResult
 
 Result of a DPSS taper computation.
 
+```cpp title="src/examples/ex_dsp_spectral/main.cpp"
+const DpssResult dpss = Dpss::compute(64, 2.5, 4); // N = 64 samples, NW = 2.5, 4 tapers
+```
+
 ---
+
+## Example
+
+- Full source: [`src/examples/ex_dsp_spectral/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_dsp_spectral/main.cpp)
+- Build target: `ex_dsp_spectral` (runs under CTest)
 
 ## Authors of this file
 

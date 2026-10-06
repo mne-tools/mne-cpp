@@ -17,7 +17,18 @@ struct UTILSLIB::MorletTfrResult
 
 Result of a Morlet TFR computation for one channel.
 
+```cpp title="src/examples/ex_dsp_spectral/main.cpp"
+RowVectorXd morletFreqs(3);
+morletFreqs << 20.0, 35.0, 55.0;
+const MorletTfrResult morlet = MorletTfr::compute(signal, kSFreq, morletFreqs, 7.0);
+```
+
 ---
+
+## Example
+
+- Full source: [`src/examples/ex_dsp_spectral/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_dsp_spectral/main.cpp)
+- Build target: `ex_dsp_spectral` (runs under CTest)
 
 ## Authors of this file
 

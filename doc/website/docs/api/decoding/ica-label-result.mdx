@@ -19,6 +19,15 @@ Outcome of labelling a single [ICA](/docs/api/dsp/ica) component.
 
 Pairs a component index with its winning `IcaComponentLabel` and a confidence score in $$[0, 1]$$ derived from the underlying correlation or spectral statistic (for EOG/ECG: the maximum absolute Pearson correlation with the reference traces; for muscle: the fraction of power above 30 Hz). Downstream consumers typically threshold the score or render it next to the component topography so the user can override the automatic decision.
 
+```cpp title="src/examples/ex_decoding/main.cpp"
+const QList<IcaLabelResult> labels = MlIcaLabel::classify(icaSources, eog, ecg, kSFreq);
+const QVector<int> reject = MlIcaLabel::findArtifactComponents(labels); // indices to drop before back-projection
+for (const IcaLabelResult& label : labels) {
+    qInfo().noquote() << "component" << label.componentIndex << IcaLabelResult::labelToString(label.label)
+                      << "confidence" << label.confidence;
+}
+```
+
 ---
 
 ## Static Methods
@@ -26,6 +35,11 @@ Pairs a component index with its winning `IcaComponentLabel` and a confidence sc
 ### labelToString(label)
 
 ---
+
+## Example
+
+- Full source: [`src/examples/ex_decoding/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_decoding/main.cpp)
+- Build target: `ex_decoding` (runs under CTest)
 
 ## Authors of this file
 

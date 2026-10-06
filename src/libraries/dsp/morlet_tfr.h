@@ -57,6 +57,8 @@ namespace UTILSLIB
 //=============================================================================================================
 /**
  * @brief Result of a Morlet TFR computation for one channel.
+ *
+ * @snippet ex_dsp_spectral/main.cpp morlet_tfr_compute
  */
 struct DSPSHARED_EXPORT MorletTfrResult
 {

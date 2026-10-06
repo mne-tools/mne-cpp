@@ -56,6 +56,8 @@ namespace UTILSLIB
 //=============================================================================================================
 /**
  * @brief Result of a Cross-Spectral Density computation.
+ *
+ * @snippet ex_dsp_spectral/main.cpp csd_compute
  */
 struct DSPSHARED_EXPORT CsdResult
 {

@@ -66,6 +66,8 @@ namespace UTILSLIB
 //=============================================================================================================
 /**
  * Parameters for LOF bad channel detection.
+ *
+ * @snippet ex_dsp_artifacts/main.cpp find_bad_channels_lof_usage
  */
 struct DSPSHARED_EXPORT LofBadChannelParams
 {

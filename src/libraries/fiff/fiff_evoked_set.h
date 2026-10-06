@@ -132,6 +132,8 @@ struct FIFFSHARED_EXPORT AverageCategory
  * skew-correction flag and the I/O paths (output ave file, event source,
  * log file) so an entire batch-averaging job can be described as one
  * value.
+ *
+ * @snippet ex_mne_api/main.cpp mne_description_parser_usage
  */
 struct FIFFSHARED_EXPORT AverageDescription
 {

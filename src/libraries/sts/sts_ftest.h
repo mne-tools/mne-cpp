@@ -61,6 +61,8 @@ namespace STSLIB
  * Result structure for F-tests.
  *
  * @brief Per-call output of a one-way ANOVA F-test: F-statistics, p-values, and between/within degrees of freedom.
+ *
+ * @snippet ex_sts_statistics/main.cpp stats_ftest_usage
  */
 struct STSSHARED_EXPORT StatsFtestResult
 {

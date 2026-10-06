@@ -80,6 +80,8 @@ enum class SceneLayerKind
  * This indirection keeps `disp3D/scene/` free of QRhi includes and means
  * new renderables (sEEG, ECoG, future fNIRS optodes, …) plug in without
  * touching this header.
+ *
+ * @snippet ex_disp3d_scene/main.cpp multimodal_scene_usage
  */
 struct DISP3DSHARED_EXPORT SceneLayer
 {

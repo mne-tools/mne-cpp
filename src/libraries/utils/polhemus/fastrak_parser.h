@@ -52,6 +52,8 @@ namespace UTILSLIB
 //=============================================================================================================
 /**
  * @brief One decoded sample from a Fastrak ASCII stream.
+ *
+ * @snippet ex_utils/main.cpp fastrak_parser_usage
  */
 struct UTILSSHARED_EXPORT FastrakSample
 {

@@ -21,6 +21,11 @@ Mirrors the on-disk `FIFFB_MRI_SLICE` record so that round-tripping through COR.
 
 Ported from `mriSliceRec` in the original [MNE](/docs/api/mne/mne-class) C `mne_make_cor_set`.
 
+```cpp title="src/examples/ex_mri/main.cpp"
+QVector<MriSlice> corSlices;
+MriCorIO::read(corDir, corSlices);
+```
+
 ---
 
 ## Public Methods
@@ -30,6 +35,11 @@ Ported from `mriSliceRec` in the original [MNE](/docs/api/mne/mne-class) C `mne_
 Default constructor.
 
 ---
+
+## Example
+
+- Full source: [`src/examples/ex_mri/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_mri/main.cpp)
+- Build target: `ex_mri` (runs under CTest)
 
 ## Authors of this file
 

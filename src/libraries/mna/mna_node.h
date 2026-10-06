@@ -70,6 +70,8 @@ namespace MNALIB
  * One operation in the computational graph.
  *
  * @brief Single executable step in an MNA pipeline graph, with attributes, typed ports, exec mode, verification and provenance.
+ *
+ * @snippet ex_mna/main.cpp mna_graph_build
  */
 struct MNASHARED_EXPORT MnaNode
 {

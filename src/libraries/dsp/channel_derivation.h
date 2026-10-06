@@ -57,6 +57,8 @@ namespace UTILSLIB
 //=============================================================================================================
 /**
  * @brief A single derivation rule mapping input channels (with weights) to one output channel.
+ *
+ * @snippet ex_dsp_preprocessing/main.cpp channel_derivation_usage
  */
 struct DSPSHARED_EXPORT DerivationRule
 {

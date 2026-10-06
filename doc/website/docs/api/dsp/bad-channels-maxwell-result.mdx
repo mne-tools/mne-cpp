@@ -17,7 +17,22 @@ struct UTILSLIB::BadChannelsMaxwellResult
 
 Result of SSS-based bad channel detection.
 
+```cpp title="src/examples/ex_dsp_maxwell/main.cpp"
+MatrixXd broken = data;
+broken.row(meg[40]).array() += 2e-7; // a sensor with a constant offset the multipole model cannot explain
+BadChannelsMaxwellParams badParams;
+badParams.origin = params.origin;
+badParams.dZThreshold = 50.0; // robust z-score of the reconstruction residual
+const BadChannelsMaxwellResult bads = findBadChannelsMaxwell(broken, info, badParams);
+```
+
 ---
+
+## Example
+
+- Full source: [`src/examples/ex_dsp_maxwell/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_dsp_maxwell/main.cpp)
+- Build target: `ex_dsp_maxwell` (runs under CTest)
+- Data: [mne-cpp-test-data](https://github.com/mne-tools/mne-cpp-test-data)
 
 ## Authors of this file
 

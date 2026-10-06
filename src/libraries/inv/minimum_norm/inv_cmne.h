@@ -65,6 +65,8 @@ namespace INVLIB
  * Result container for the CMNE inverse solver.
  *
  * @brief CMNE result
+ *
+ * @snippet ex_inv_api/main.cpp inv_cmne_usage
  */
 struct INVSHARED_EXPORT InvCMNEResult
 {

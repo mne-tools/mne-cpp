@@ -17,7 +17,25 @@ struct UTILSLIB::SimulateStcParams
 
 Parameters for source time course simulation.
 
+```cpp title="src/examples/ex_dsp_analysis/main.cpp"
+const VectorXi vertices = VectorXi::LinSpaced(5, 100, 104);
+MatrixXd waveforms(2, 4);
+waveforms << 1.0, 2.0, 3.0, 4.0,
+    -1.0, 0.0, 1.0, 0.0;
+const INVLIB::InvSourceEstimate stc = simulateStcFromWaveforms(waveforms, (VectorXi(2) << 101, 104).finished(), vertices, 0.0f, 0.01f);
+
+SimulateStcParams gaussians; // one Gaussian bump per active vertex, seeded
+gaussians.sfreq = 200.0f;
+gaussians.duration = 0.5f;
+const INVLIB::InvSourceEstimate random = simulateStc((VectorXi(1) << 102).finished(), vertices, gaussians);
+```
+
 ---
+
+## Example
+
+- Full source: [`src/examples/ex_dsp_analysis/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_dsp_analysis/main.cpp)
+- Build target: `ex_dsp_analysis` (runs under CTest)
 
 ## Authors of this file
 

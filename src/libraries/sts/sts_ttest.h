@@ -58,6 +58,8 @@ namespace STSLIB
  * Result structure for t-tests.
  *
  * @brief Per-call output of a Student t-test: t-statistics, p-values and degrees of freedom.
+ *
+ * @snippet ex_sts_statistics/main.cpp stats_ttest_usage
  */
 struct STSSHARED_EXPORT StatsTtestResult
 {

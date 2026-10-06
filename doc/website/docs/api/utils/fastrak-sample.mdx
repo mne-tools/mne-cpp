@@ -17,7 +17,21 @@ struct UTILSLIB::FastrakSample
 
 One decoded sample from a Fastrak ASCII stream.
 
+```cpp title="src/examples/ex_utils/main.cpp"
+FastrakParser parser;
+parser.setUnits(FastrakParser::Units::Centimetres);
+parser.append("01   12.50  -3.25   8.00\r\n02  1.0"); // the second record is still incomplete
+FastrakSample sample;
+const bool complete = parser.nextSample(sample);
+const bool pending = parser.nextSample(sample);
+```
+
 ---
+
+## Example
+
+- Full source: [`src/examples/ex_utils/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_utils/main.cpp)
+- Build target: `ex_utils` (runs under CTest)
 
 ## Authors of this file
 

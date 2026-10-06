@@ -19,7 +19,17 @@ Result of an [`ICA`](/docs/api/dsp/ica) decomposition.
 
 Holds the mixing and unmixing matrices and the extracted source time series. The relationship is: sources = unmixing * (data - mean) data_recon = mixing * sources + mean
 
+```cpp title="src/examples/ex_dsp_preprocessing/main.cpp"
+const IcaResult ica = ICA::run(mixed, 3);                         // FastICA, logcosh, fixed seed
+const MatrixXd cleaned = ICA::excludeComponents(mixed, ica, {0}); // drop component 0, back-project the rest
+```
+
 ---
+
+## Example
+
+- Full source: [`src/examples/ex_dsp_preprocessing/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_dsp_preprocessing/main.cpp)
+- Build target: `ex_dsp_preprocessing` (runs under CTest)
 
 ## Authors of this file
 

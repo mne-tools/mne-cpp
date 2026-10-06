@@ -57,6 +57,8 @@ namespace UTILSLIB
  * Result of a Python script execution.
  *
  * @brief Script execution result container.
+ *
+ * @snippet ex_utils/main.cpp python_runner_usage
  */
 struct UTILSSHARED_EXPORT PythonRunnerResult
 {
@@ -73,6 +75,8 @@ struct UTILSSHARED_EXPORT PythonRunnerResult
  * Configuration for a PythonRunner invocation.
  *
  * @brief Script execution configuration.
+ *
+ * @snippet ex_utils/main.cpp python_runner_usage
  */
 struct UTILSSHARED_EXPORT PythonRunnerConfig
 {

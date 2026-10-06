@@ -66,6 +66,8 @@ namespace UTILSLIB
  *   H(z) = (b0 + b1*z^-1 + b2*z^-2) / (1 + a1*z^-1 + a2*z^-2)
  * @endcode
  * Note: a0 is normalised to 1.  For first-order sections set b2 = a2 = 0.
+ *
+ * @snippet ex_dsp_spectral/main.cpp iir_filter_usage
  */
 struct DSPSHARED_EXPORT IirBiquad
 {

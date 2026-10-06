@@ -49,6 +49,8 @@ namespace UTILSLIB
 //=============================================================================================================
 /**
  * @brief Result of a DPSS taper computation.
+ *
+ * @snippet ex_dsp_spectral/main.cpp dpss_compute
  */
 struct DSPSHARED_EXPORT DpssResult
 {

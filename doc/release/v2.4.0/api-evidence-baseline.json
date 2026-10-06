@@ -12,15 +12,15 @@
     "registered_stale": 0,
     "registered_with_test": 102,
     "registered_test_unresolved": 0,
-    "registered_with_example": 269,
+    "registered_with_example": 315,
     "registered_example_not_built": 0,
     "registered_with_python_equiv": 89,
     "registered_without_api_page": 0,
-    "with_snippet": 351,
+    "with_snippet": 353,
     "public_api_units": 507,
     "example_eligible": 389,
     "example_exempt": 118,
-    "eligible_backed_by_registry_example": 269,
+    "eligible_backed_by_registry_example": 315,
     "eligible_used_by_some_example": 348,
     "examples_on_disk": 68,
     "examples_built": 68
@@ -58,7 +58,7 @@
       "registered": 5,
       "with_test": 4,
       "eligible": 5,
-      "eligible_with_registry_example": 4,
+      "eligible_with_registry_example": 5,
       "eligible_used_by_example": 5,
       "with_snippet": 5
     },
@@ -76,7 +76,7 @@
       "registered": 14,
       "with_test": 0,
       "eligible": 22,
-      "eligible_with_registry_example": 6,
+      "eligible_with_registry_example": 9,
       "eligible_used_by_example": 11,
       "with_snippet": 9
     },
@@ -85,7 +85,7 @@
       "registered": 84,
       "with_test": 28,
       "eligible": 84,
-      "eligible_with_registry_example": 51,
+      "eligible_with_registry_example": 72,
       "eligible_used_by_example": 84,
       "with_snippet": 84
     },
@@ -94,7 +94,7 @@
       "registered": 38,
       "with_test": 10,
       "eligible": 38,
-      "eligible_with_registry_example": 32,
+      "eligible_with_registry_example": 34,
       "eligible_used_by_example": 35,
       "with_snippet": 37
     },
@@ -121,7 +121,7 @@
       "registered": 55,
       "with_test": 19,
       "eligible": 52,
-      "eligible_with_registry_example": 33,
+      "eligible_with_registry_example": 41,
       "eligible_used_by_example": 47,
       "with_snippet": 47
     },
@@ -157,9 +157,9 @@
       "registered": 22,
       "with_test": 0,
       "eligible": 22,
-      "eligible_with_registry_example": 8,
+      "eligible_with_registry_example": 10,
       "eligible_used_by_example": 10,
-      "with_snippet": 10
+      "with_snippet": 12
     },
     "mne": {
       "public": 66,
@@ -175,7 +175,7 @@
       "registered": 8,
       "with_test": 0,
       "eligible": 8,
-      "eligible_with_registry_example": 6,
+      "eligible_with_registry_example": 8,
       "eligible_used_by_example": 8,
       "with_snippet": 8
     },
@@ -184,7 +184,7 @@
       "registered": 10,
       "with_test": 6,
       "eligible": 10,
-      "eligible_with_registry_example": 7,
+      "eligible_with_registry_example": 10,
       "eligible_used_by_example": 10,
       "with_snippet": 10
     },
@@ -193,7 +193,7 @@
       "registered": 24,
       "with_test": 2,
       "eligible": 24,
-      "eligible_with_registry_example": 17,
+      "eligible_with_registry_example": 21,
       "eligible_used_by_example": 24,
       "with_snippet": 24
     }
@@ -1749,12 +1749,13 @@
       "registry_status": "documented",
       "test": null,
       "test_resolves": false,
-      "example": null,
-      "example_state": "none",
+      "example": "ex_decoding",
+      "example_state": "built",
       "including_examples": [
         "ex_decoding"
       ],
       "snippets": [
+        "ex_decoding/main.cpp#ml_ica_label_classify",
         "ex_decoding/main.cpp#ml_ica_label_classify"
       ],
       "api_page": "doc/website/docs/api/decoding/ica-label-result.mdx",
@@ -1778,6 +1779,7 @@
         "ex_decoding"
       ],
       "snippets": [
+        "ex_decoding/main.cpp#ml_ica_label_classify",
         "ex_decoding/main.cpp#ml_ica_label_classify"
       ],
       "api_page": "doc/website/docs/api/decoding/ml-ica-label.mdx",
@@ -3635,12 +3637,14 @@
       "registry_status": "documented",
       "test": null,
       "test_resolves": false,
-      "example": null,
-      "example_state": "none",
+      "example": "ex_disp3d_scene",
+      "example_state": "built",
       "including_examples": [
         "ex_disp3d_scene"
       ],
       "snippets": [
+        "ex_disp3d_scene/main.cpp#electrode_object_usage",
+        "ex_disp3d_scene/main.cpp#electrode_object_usage",
         "ex_disp3d_scene/main.cpp#electrode_object_usage"
       ],
       "api_page": "doc/website/docs/api/disp3-d/electrode-array.mdx",
@@ -3658,12 +3662,14 @@
       "registry_status": "documented",
       "test": null,
       "test_resolves": false,
-      "example": null,
-      "example_state": "none",
+      "example": "ex_disp3d_scene",
+      "example_state": "built",
       "including_examples": [
         "ex_disp3d_scene"
       ],
       "snippets": [
+        "ex_disp3d_scene/main.cpp#electrode_object_usage",
+        "ex_disp3d_scene/main.cpp#electrode_object_usage",
         "ex_disp3d_scene/main.cpp#electrode_object_usage"
       ],
       "api_page": "doc/website/docs/api/disp3-d/electrode-contact.mdx",
@@ -3687,6 +3693,8 @@
         "ex_disp3d_scene"
       ],
       "snippets": [
+        "ex_disp3d_scene/main.cpp#electrode_object_usage",
+        "ex_disp3d_scene/main.cpp#electrode_object_usage",
         "ex_disp3d_scene/main.cpp#electrode_object_usage"
       ],
       "api_page": "doc/website/docs/api/disp3-d/electrode-object.mdx",
@@ -3813,6 +3821,7 @@
         "ex_disp3d_scene"
       ],
       "snippets": [
+        "ex_disp3d_scene/main.cpp#multimodal_scene_usage",
         "ex_disp3d_scene/main.cpp#multimodal_scene_usage"
       ],
       "api_page": "doc/website/docs/api/disp3-d/multimodal-scene.mdx",
@@ -3830,12 +3839,13 @@
       "registry_status": "documented",
       "test": null,
       "test_resolves": false,
-      "example": null,
-      "example_state": "none",
+      "example": "ex_disp3d_scene",
+      "example_state": "built",
       "including_examples": [
         "ex_disp3d_scene"
       ],
       "snippets": [
+        "ex_disp3d_scene/main.cpp#multimodal_scene_usage",
         "ex_disp3d_scene/main.cpp#multimodal_scene_usage"
       ],
       "api_page": "doc/website/docs/api/disp3-d/scene-layer.mdx",
@@ -4170,12 +4180,13 @@
       "registry_status": "documented",
       "test": null,
       "test_resolves": false,
-      "example": null,
-      "example_state": "none",
+      "example": "ex_dsp_artifacts",
+      "example_state": "built",
       "including_examples": [
         "ex_dsp_artifacts"
       ],
       "snippets": [
+        "ex_dsp_artifacts/main.cpp#annotate_amplitude_usage",
         "ex_dsp_artifacts/main.cpp#annotate_amplitude_usage"
       ],
       "api_page": "doc/website/docs/api/dsp/annotate-amplitude-params.mdx",
@@ -4199,6 +4210,7 @@
         "ex_dsp_artifacts"
       ],
       "snippets": [
+        "ex_dsp_artifacts/main.cpp#annotate_amplitude_usage",
         "ex_dsp_artifacts/main.cpp#annotate_amplitude_usage"
       ],
       "api_page": "doc/website/docs/api/dsp/annotate-artifact.mdx",
@@ -4222,6 +4234,7 @@
         "ex_dsp_artifacts"
       ],
       "snippets": [
+        "ex_dsp_artifacts/main.cpp#annotate_amplitude_usage",
         "ex_dsp_artifacts/main.cpp#annotate_amplitude_usage"
       ],
       "api_page": "doc/website/docs/api/dsp/annotate-muscl-params.mdx",
@@ -4360,6 +4373,7 @@
         "ex_dsp_artifacts"
       ],
       "snippets": [
+        "ex_dsp_artifacts/main.cpp#find_bad_channels_lof_usage",
         "ex_dsp_artifacts/main.cpp#find_bad_channels_lof_usage"
       ],
       "api_page": "doc/website/docs/api/dsp/bad-channels-lof.mdx",
@@ -4377,12 +4391,13 @@
       "registry_status": "documented",
       "test": null,
       "test_resolves": false,
-      "example": null,
-      "example_state": "none",
+      "example": "ex_dsp_artifacts",
+      "example_state": "built",
       "including_examples": [
         "ex_dsp_artifacts"
       ],
       "snippets": [
+        "ex_dsp_artifacts/main.cpp#find_bad_channels_lof_usage",
         "ex_dsp_artifacts/main.cpp#find_bad_channels_lof_usage"
       ],
       "api_page": "doc/website/docs/api/dsp/lof-bad-channel-params.mdx",
@@ -4406,6 +4421,8 @@
         "ex_dsp_maxwell"
       ],
       "snippets": [
+        "ex_dsp_maxwell/main.cpp#bad_channels_maxwell_usage",
+        "ex_dsp_maxwell/main.cpp#bad_channels_maxwell_usage",
         "ex_dsp_maxwell/main.cpp#bad_channels_maxwell_usage"
       ],
       "api_page": "doc/website/docs/api/dsp/bad-channels-maxwell.mdx",
@@ -4423,12 +4440,14 @@
       "registry_status": "documented",
       "test": null,
       "test_resolves": false,
-      "example": null,
-      "example_state": "none",
+      "example": "ex_dsp_maxwell",
+      "example_state": "built",
       "including_examples": [
         "ex_dsp_maxwell"
       ],
       "snippets": [
+        "ex_dsp_maxwell/main.cpp#bad_channels_maxwell_usage",
+        "ex_dsp_maxwell/main.cpp#bad_channels_maxwell_usage",
         "ex_dsp_maxwell/main.cpp#bad_channels_maxwell_usage"
       ],
       "api_page": "doc/website/docs/api/dsp/bad-channels-maxwell-params.mdx",
@@ -4446,12 +4465,14 @@
       "registry_status": "documented",
       "test": null,
       "test_resolves": false,
-      "example": null,
-      "example_state": "none",
+      "example": "ex_dsp_maxwell",
+      "example_state": "built",
       "including_examples": [
         "ex_dsp_maxwell"
       ],
       "snippets": [
+        "ex_dsp_maxwell/main.cpp#bad_channels_maxwell_usage",
+        "ex_dsp_maxwell/main.cpp#bad_channels_maxwell_usage",
         "ex_dsp_maxwell/main.cpp#bad_channels_maxwell_usage"
       ],
       "api_page": "doc/website/docs/api/dsp/bad-channels-maxwell-result.mdx",
@@ -4521,6 +4542,7 @@
         "ex_dsp_preprocessing"
       ],
       "snippets": [
+        "ex_dsp_preprocessing/main.cpp#channel_derivation_usage",
         "ex_dsp_preprocessing/main.cpp#channel_derivation_usage"
       ],
       "api_page": "doc/website/docs/api/utils/channel-derivation.mdx",
@@ -4538,12 +4560,13 @@
       "registry_status": "documented",
       "test": null,
       "test_resolves": false,
-      "example": null,
-      "example_state": "none",
+      "example": "ex_dsp_preprocessing",
+      "example_state": "built",
       "including_examples": [
         "ex_dsp_preprocessing"
       ],
       "snippets": [
+        "ex_dsp_preprocessing/main.cpp#channel_derivation_usage",
         "ex_dsp_preprocessing/main.cpp#channel_derivation_usage"
       ],
       "api_page": "doc/website/docs/api/utils/derivation-rule.mdx",
@@ -4613,6 +4636,7 @@
         "ex_dsp_spectral"
       ],
       "snippets": [
+        "ex_dsp_spectral/main.cpp#csd_compute",
         "ex_dsp_spectral/main.cpp#csd_compute"
       ],
       "api_page": "doc/website/docs/api/utils/csd.mdx",
@@ -4630,12 +4654,13 @@
       "registry_status": "documented",
       "test": null,
       "test_resolves": false,
-      "example": null,
-      "example_state": "none",
+      "example": "ex_dsp_spectral",
+      "example_state": "built",
       "including_examples": [
         "ex_dsp_spectral"
       ],
       "snippets": [
+        "ex_dsp_spectral/main.cpp#csd_compute",
         "ex_dsp_spectral/main.cpp#csd_compute"
       ],
       "api_page": "doc/website/docs/api/utils/csd-result.mdx",
@@ -4659,6 +4684,7 @@
         "ex_dsp_spectral"
       ],
       "snippets": [
+        "ex_dsp_spectral/main.cpp#dpss_compute",
         "ex_dsp_spectral/main.cpp#dpss_compute"
       ],
       "api_page": "doc/website/docs/api/utils/dpss.mdx",
@@ -4676,12 +4702,13 @@
       "registry_status": "documented",
       "test": null,
       "test_resolves": false,
-      "example": null,
-      "example_state": "none",
+      "example": "ex_dsp_spectral",
+      "example_state": "built",
       "including_examples": [
         "ex_dsp_spectral"
       ],
       "snippets": [
+        "ex_dsp_spectral/main.cpp#dpss_compute",
         "ex_dsp_spectral/main.cpp#dpss_compute"
       ],
       "api_page": "doc/website/docs/api/utils/dpss-result.mdx",
@@ -4797,6 +4824,7 @@
         "ex_dsp_preprocessing"
       ],
       "snippets": [
+        "ex_dsp_preprocessing/main.cpp#extended_infomax_compute",
         "ex_dsp_preprocessing/main.cpp#extended_infomax_compute"
       ],
       "api_page": "doc/website/docs/api/dsp/extended-infomax.mdx",
@@ -4814,12 +4842,13 @@
       "registry_status": "documented",
       "test": null,
       "test_resolves": false,
-      "example": null,
-      "example_state": "none",
+      "example": "ex_dsp_preprocessing",
+      "example_state": "built",
       "including_examples": [
         "ex_dsp_preprocessing"
       ],
       "snippets": [
+        "ex_dsp_preprocessing/main.cpp#extended_infomax_compute",
         "ex_dsp_preprocessing/main.cpp#extended_infomax_compute"
       ],
       "api_page": "doc/website/docs/api/dsp/infomax-result.mdx",
@@ -4958,12 +4987,13 @@
       "registry_status": "documented",
       "test": null,
       "test_resolves": false,
-      "example": null,
-      "example_state": "none",
+      "example": "ex_dsp_maxwell",
+      "example_state": "built",
       "including_examples": [
         "ex_dsp_maxwell"
       ],
       "snippets": [
+        "ex_dsp_maxwell/main.cpp#fine_calibration_usage",
         "ex_dsp_maxwell/main.cpp#fine_calibration_usage"
       ],
       "api_page": "doc/website/docs/api/dsp/fine-cal-entry.mdx",
@@ -4987,6 +5017,7 @@
         "ex_dsp_maxwell"
       ],
       "snippets": [
+        "ex_dsp_maxwell/main.cpp#fine_calibration_usage",
         "ex_dsp_maxwell/main.cpp#fine_calibration_usage"
       ],
       "api_page": "doc/website/docs/api/dsp/fine-calibration.mdx",
@@ -5033,6 +5064,7 @@
         "ex_dsp_preprocessing"
       ],
       "snippets": [
+        "ex_dsp_preprocessing/main.cpp#ica_run",
         "ex_dsp_preprocessing/main.cpp#ica_run"
       ],
       "api_page": "doc/website/docs/api/dsp/ica.mdx",
@@ -5050,12 +5082,13 @@
       "registry_status": "documented",
       "test": null,
       "test_resolves": false,
-      "example": null,
-      "example_state": "none",
+      "example": "ex_dsp_preprocessing",
+      "example_state": "built",
       "including_examples": [
         "ex_dsp_preprocessing"
       ],
       "snippets": [
+        "ex_dsp_preprocessing/main.cpp#ica_run",
         "ex_dsp_preprocessing/main.cpp#ica_run"
       ],
       "api_page": "doc/website/docs/api/dsp/ica-result.mdx",
@@ -5073,12 +5106,13 @@
       "registry_status": "documented",
       "test": null,
       "test_resolves": false,
-      "example": null,
-      "example_state": "none",
+      "example": "ex_dsp_spectral",
+      "example_state": "built",
       "including_examples": [
         "ex_dsp_spectral"
       ],
       "snippets": [
+        "ex_dsp_spectral/main.cpp#iir_filter_usage",
         "ex_dsp_spectral/main.cpp#iir_filter_usage"
       ],
       "api_page": "doc/website/docs/api/dsp/iir-biquad.mdx",
@@ -5102,6 +5136,7 @@
         "ex_dsp_spectral"
       ],
       "snippets": [
+        "ex_dsp_spectral/main.cpp#iir_filter_usage",
         "ex_dsp_spectral/main.cpp#iir_filter_usage"
       ],
       "api_page": "doc/website/docs/api/dsp/iir-filter.mdx",
@@ -5119,12 +5154,14 @@
       "registry_status": "documented",
       "test": null,
       "test_resolves": false,
-      "example": null,
-      "example_state": "none",
+      "example": "ex_dsp_maxwell",
+      "example_state": "built",
       "including_examples": [
         "ex_dsp_maxwell"
       ],
       "snippets": [
+        "ex_dsp_maxwell/main.cpp#maxwell_movement_comp_usage",
+        "ex_dsp_maxwell/main.cpp#maxwell_movement_comp_usage",
         "ex_dsp_maxwell/main.cpp#maxwell_movement_comp_usage"
       ],
       "api_page": "doc/website/docs/api/dsp/head-pos-entry.mdx",
@@ -5142,12 +5179,14 @@
       "registry_status": "documented",
       "test": null,
       "test_resolves": false,
-      "example": null,
-      "example_state": "none",
+      "example": "ex_dsp_maxwell",
+      "example_state": "built",
       "including_examples": [
         "ex_dsp_maxwell"
       ],
       "snippets": [
+        "ex_dsp_maxwell/main.cpp#maxwell_movement_comp_usage",
+        "ex_dsp_maxwell/main.cpp#maxwell_movement_comp_usage",
         "ex_dsp_maxwell/main.cpp#maxwell_movement_comp_usage"
       ],
       "api_page": "doc/website/docs/api/dsp/maxwell-move-comp-params.mdx",
@@ -5171,6 +5210,8 @@
         "ex_dsp_maxwell"
       ],
       "snippets": [
+        "ex_dsp_maxwell/main.cpp#maxwell_movement_comp_usage",
+        "ex_dsp_maxwell/main.cpp#maxwell_movement_comp_usage",
         "ex_dsp_maxwell/main.cpp#maxwell_movement_comp_usage"
       ],
       "api_page": "doc/website/docs/api/dsp/maxwell-movement-comp.mdx",
@@ -5194,6 +5235,7 @@
         "ex_dsp_spectral"
       ],
       "snippets": [
+        "ex_dsp_spectral/main.cpp#morlet_tfr_compute",
         "ex_dsp_spectral/main.cpp#morlet_tfr_compute"
       ],
       "api_page": "doc/website/docs/api/dsp/morlet-tfr.mdx",
@@ -5211,12 +5253,13 @@
       "registry_status": "documented",
       "test": null,
       "test_resolves": false,
-      "example": null,
-      "example_state": "none",
+      "example": "ex_dsp_spectral",
+      "example_state": "built",
       "including_examples": [
         "ex_dsp_spectral"
       ],
       "snippets": [
+        "ex_dsp_spectral/main.cpp#morlet_tfr_compute",
         "ex_dsp_spectral/main.cpp#morlet_tfr_compute"
       ],
       "api_page": "doc/website/docs/api/dsp/morlet-tfr-result.mdx",
@@ -5240,6 +5283,7 @@
         "ex_dsp_spectral"
       ],
       "snippets": [
+        "ex_dsp_spectral/main.cpp#multitaper_psd_compute",
         "ex_dsp_spectral/main.cpp#multitaper_psd_compute"
       ],
       "api_page": "doc/website/docs/api/dsp/multitaper-psd.mdx",
@@ -5257,12 +5301,13 @@
       "registry_status": "documented",
       "test": null,
       "test_resolves": false,
-      "example": null,
-      "example_state": "none",
+      "example": "ex_dsp_spectral",
+      "example_state": "built",
       "including_examples": [
         "ex_dsp_spectral"
       ],
       "snippets": [
+        "ex_dsp_spectral/main.cpp#multitaper_psd_compute",
         "ex_dsp_spectral/main.cpp#multitaper_psd_compute"
       ],
       "api_page": "doc/website/docs/api/dsp/multitaper-psd-result.mdx",
@@ -5286,6 +5331,7 @@
         "ex_dsp_spectral"
       ],
       "snippets": [
+        "ex_dsp_spectral/main.cpp#multitaper_tfr_compute",
         "ex_dsp_spectral/main.cpp#multitaper_tfr_compute"
       ],
       "api_page": "doc/website/docs/api/dsp/multitaper-tfr.mdx",
@@ -5303,12 +5349,13 @@
       "registry_status": "documented",
       "test": null,
       "test_resolves": false,
-      "example": null,
-      "example_state": "none",
+      "example": "ex_dsp_spectral",
+      "example_state": "built",
       "including_examples": [
         "ex_dsp_spectral"
       ],
       "snippets": [
+        "ex_dsp_spectral/main.cpp#multitaper_tfr_compute",
         "ex_dsp_spectral/main.cpp#multitaper_tfr_compute"
       ],
       "api_page": "doc/website/docs/api/dsp/multitaper-tfr-result.mdx",
@@ -5356,6 +5403,7 @@
         "ex_dsp_spectral"
       ],
       "snippets": [
+        "ex_dsp_analysis/main.cpp#peak_finder_usage",
         "ex_dsp_analysis/main.cpp#peak_finder_usage"
       ],
       "api_page": "doc/website/docs/api/dsp/peak-finder.mdx",
@@ -5373,13 +5421,14 @@
       "registry_status": "documented",
       "test": null,
       "test_resolves": false,
-      "example": null,
-      "example_state": "none",
+      "example": "ex_dsp_analysis",
+      "example_state": "built",
       "including_examples": [
         "ex_dsp_analysis",
         "ex_dsp_spectral"
       ],
       "snippets": [
+        "ex_dsp_analysis/main.cpp#peak_finder_usage",
         "ex_dsp_analysis/main.cpp#peak_finder_usage"
       ],
       "api_page": "doc/website/docs/api/dsp/peak-finder-params.mdx",
@@ -5809,6 +5858,7 @@
         "ex_dsp_analysis"
       ],
       "snippets": [
+        "ex_dsp_analysis/main.cpp#simulate_stc_usage",
         "ex_dsp_analysis/main.cpp#simulate_stc_usage"
       ],
       "api_page": "doc/website/docs/api/dsp/simulate.mdx",
@@ -5826,12 +5876,13 @@
       "registry_status": "documented",
       "test": null,
       "test_resolves": false,
-      "example": null,
-      "example_state": "none",
+      "example": "ex_dsp_analysis",
+      "example_state": "built",
       "including_examples": [
         "ex_dsp_analysis"
       ],
       "snippets": [
+        "ex_dsp_analysis/main.cpp#simulate_stc_usage",
         "ex_dsp_analysis/main.cpp#simulate_stc_usage"
       ],
       "api_page": "doc/website/docs/api/dsp/simulate-stc-params.mdx",
@@ -6001,6 +6052,7 @@
         "ex_dsp_preprocessing"
       ],
       "snippets": [
+        "ex_dsp_preprocessing/main.cpp#surface_laplacian_compute",
         "ex_dsp_preprocessing/main.cpp#surface_laplacian_compute"
       ],
       "api_page": "doc/website/docs/api/dsp/surface-laplacian.mdx",
@@ -6018,12 +6070,13 @@
       "registry_status": "documented",
       "test": null,
       "test_resolves": false,
-      "example": null,
-      "example_state": "none",
+      "example": "ex_dsp_preprocessing",
+      "example_state": "built",
       "including_examples": [
         "ex_dsp_preprocessing"
       ],
       "snippets": [
+        "ex_dsp_preprocessing/main.cpp#surface_laplacian_compute",
         "ex_dsp_preprocessing/main.cpp#surface_laplacian_compute"
       ],
       "api_page": "doc/website/docs/api/dsp/surface-laplacian-result.mdx",
@@ -6047,6 +6100,7 @@
         "ex_dsp_analysis"
       ],
       "snippets": [
+        "ex_dsp_analysis/main.cpp#welch_psd_compute",
         "ex_dsp_analysis/main.cpp#welch_psd_compute"
       ],
       "api_page": "doc/website/docs/api/dsp/welch-psd.mdx",
@@ -6064,12 +6118,13 @@
       "registry_status": "documented",
       "test": null,
       "test_resolves": false,
-      "example": null,
-      "example_state": "none",
+      "example": "ex_dsp_analysis",
+      "example_state": "built",
       "including_examples": [
         "ex_dsp_analysis"
       ],
       "snippets": [
+        "ex_dsp_analysis/main.cpp#welch_psd_compute",
         "ex_dsp_analysis/main.cpp#welch_psd_compute"
       ],
       "api_page": "doc/website/docs/api/dsp/welch-psd-result.mdx",
@@ -6093,6 +6148,7 @@
         "ex_dsp_preprocessing"
       ],
       "snippets": [
+        "ex_dsp_preprocessing/main.cpp#xdawn_fit",
         "ex_dsp_preprocessing/main.cpp#xdawn_fit"
       ],
       "api_page": "doc/website/docs/api/dsp/xdawn.mdx",
@@ -6110,12 +6166,13 @@
       "registry_status": "documented",
       "test": null,
       "test_resolves": false,
-      "example": null,
-      "example_state": "none",
+      "example": "ex_dsp_preprocessing",
+      "example_state": "built",
       "including_examples": [
         "ex_dsp_preprocessing"
       ],
       "snippets": [
+        "ex_dsp_preprocessing/main.cpp#xdawn_fit",
         "ex_dsp_preprocessing/main.cpp#xdawn_fit"
       ],
       "api_page": "doc/website/docs/api/dsp/xdawn-result.mdx",
@@ -6541,12 +6598,13 @@
       "registry_status": "documented",
       "test": null,
       "test_resolves": false,
-      "example": null,
-      "example_state": "none",
+      "example": "ex_fiff_structure",
+      "example_state": "built",
       "including_examples": [
         "ex_fiff_structure"
       ],
       "snippets": [
+        "ex_fiff_structure/main.cpp#fiff_epochs_usage",
         "ex_fiff_structure/main.cpp#fiff_epochs_usage"
       ],
       "api_page": "doc/website/docs/api/fiff/fiff-epoch-data.mdx",
@@ -6570,6 +6628,7 @@
         "ex_fiff_structure"
       ],
       "snippets": [
+        "ex_fiff_structure/main.cpp#fiff_epochs_usage",
         "ex_fiff_structure/main.cpp#fiff_epochs_usage"
       ],
       "api_page": "doc/website/docs/api/fiff/fiff-epochs.mdx",
@@ -6658,6 +6717,7 @@
         "ex_mne_api"
       ],
       "snippets": [
+        "ex_mne_api/main.cpp#mne_description_parser_usage",
         "ex_fiff_api/main.cpp#fiff_evoked_set_usage"
       ],
       "api_page": "doc/website/docs/api/fiff/average-category.mdx",
@@ -6675,8 +6735,8 @@
       "registry_status": "documented",
       "test": null,
       "test_resolves": false,
-      "example": null,
-      "example_state": "none",
+      "example": "ex_mne_api",
+      "example_state": "built",
       "including_examples": [
         "ex_dsp_rt",
         "ex_fiff_api",
@@ -6685,6 +6745,7 @@
         "ex_mne_api"
       ],
       "snippets": [
+        "ex_mne_api/main.cpp#mne_description_parser_usage",
         "ex_fiff_api/main.cpp#fiff_evoked_set_usage"
       ],
       "api_page": "doc/website/docs/api/fiff/average-description.mdx",
@@ -6712,6 +6773,7 @@
         "ex_mne_api"
       ],
       "snippets": [
+        "ex_mne_api/main.cpp#mne_description_parser_usage",
         "ex_fiff_api/main.cpp#fiff_evoked_set_usage"
       ],
       "api_page": "doc/website/docs/api/fiff/fiff-evoked-set.mdx",
@@ -6739,6 +6801,7 @@
         "ex_mne_api"
       ],
       "snippets": [
+        "ex_mne_api/main.cpp#mne_description_parser_usage",
         "ex_fiff_api/main.cpp#fiff_evoked_set_usage"
       ],
       "api_page": "doc/website/docs/api/fiff/rejection-params.mdx",
@@ -7968,6 +8031,7 @@
         "ex_inv_hpi"
       ],
       "snippets": [
+        "ex_inv_hpi/main.cpp#inv_hpi_usage",
         "ex_inv_hpi/main.cpp#inv_hpi_usage"
       ],
       "api_page": "doc/website/docs/api/inv/coil-param.mdx",
@@ -7985,14 +8049,15 @@
       "registry_status": "documented",
       "test": null,
       "test_resolves": false,
-      "example": null,
-      "example_state": "none",
+      "example": "ex_inv_hpi",
+      "example_state": "built",
       "including_examples": [
         "ex_dsp_rt",
         "ex_hpiFit",
         "ex_inv_hpi"
       ],
       "snippets": [
+        "ex_inv_hpi/main.cpp#inv_hpi_usage",
         "ex_inv_hpi/main.cpp#inv_hpi_usage"
       ],
       "api_page": "doc/website/docs/api/inv/hpi-fit-result.mdx",
@@ -8018,6 +8083,7 @@
         "ex_inv_hpi"
       ],
       "snippets": [
+        "ex_inv_hpi/main.cpp#inv_hpi_usage",
         "ex_inv_hpi/main.cpp#inv_hpi_usage"
       ],
       "api_page": "doc/website/docs/api/inv/inv-hpi-fit.mdx",
@@ -8480,6 +8546,7 @@
         "ex_inv_api"
       ],
       "snippets": [
+        "ex_inv_api/main.cpp#inv_cmne_usage",
         "ex_inv_api/main.cpp#inv_cmne_usage"
       ],
       "api_page": "doc/website/docs/api/inv/inv-cmne.mdx",
@@ -8497,12 +8564,13 @@
       "registry_status": "documented",
       "test": null,
       "test_resolves": false,
-      "example": null,
-      "example_state": "none",
+      "example": "ex_inv_api",
+      "example_state": "built",
       "including_examples": [
         "ex_inv_api"
       ],
       "snippets": [
+        "ex_inv_api/main.cpp#inv_cmne_usage",
         "ex_inv_api/main.cpp#inv_cmne_usage"
       ],
       "api_page": "doc/website/docs/api/inv/inv-cmne-result.mdx",
@@ -8600,6 +8668,7 @@
         "ex_inv_beamformer"
       ],
       "snippets": [
+        "ex_inv_beamformer/main.cpp#inv_rap_music_usage",
         "ex_inv_beamformer/main.cpp#inv_rap_music_usage"
       ],
       "api_page": "doc/website/docs/api/inv/inv-dipole.mdx",
@@ -8617,12 +8686,13 @@
       "registry_status": "documented",
       "test": null,
       "test_resolves": false,
-      "example": null,
-      "example_state": "none",
+      "example": "ex_inv_beamformer",
+      "example_state": "built",
       "including_examples": [
         "ex_inv_beamformer"
       ],
       "snippets": [
+        "ex_inv_beamformer/main.cpp#inv_rap_music_usage",
         "ex_inv_beamformer/main.cpp#inv_rap_music_usage"
       ],
       "api_page": "doc/website/docs/api/inv/inv-dipole-pair.mdx",
@@ -8723,6 +8793,7 @@
         "ex_inv_beamformer"
       ],
       "snippets": [
+        "ex_inv_beamformer/main.cpp#inv_trap_music_usage",
         "ex_inv_beamformer/main.cpp#inv_trap_music_usage"
       ],
       "api_page": "doc/website/docs/api/inv/inv-trap-music.mdx",
@@ -8740,12 +8811,13 @@
       "registry_status": "documented",
       "test": null,
       "test_resolves": false,
-      "example": null,
-      "example_state": "none",
+      "example": "ex_inv_beamformer",
+      "example_state": "built",
       "including_examples": [
         "ex_inv_beamformer"
       ],
       "snippets": [
+        "ex_inv_beamformer/main.cpp#inv_trap_music_usage",
         "ex_inv_beamformer/main.cpp#inv_trap_music_usage"
       ],
       "api_page": "doc/website/docs/api/inv/trap-music-dipole.mdx",
@@ -8769,6 +8841,7 @@
         "ex_inv_api"
       ],
       "snippets": [
+        "ex_inv_api/main.cpp#inv_gamma_map_usage",
         "ex_inv_api/main.cpp#inv_gamma_map_usage"
       ],
       "api_page": "doc/website/docs/api/inv/inv-gamma-map.mdx",
@@ -8786,12 +8859,13 @@
       "registry_status": "documented",
       "test": null,
       "test_resolves": false,
-      "example": null,
-      "example_state": "none",
+      "example": "ex_inv_api",
+      "example_state": "built",
       "including_examples": [
         "ex_inv_api"
       ],
       "snippets": [
+        "ex_inv_api/main.cpp#inv_gamma_map_usage",
         "ex_inv_api/main.cpp#inv_gamma_map_usage"
       ],
       "api_page": "doc/website/docs/api/inv/inv-gamma-map-result.mdx",
@@ -8815,6 +8889,7 @@
         "ex_inv_api"
       ],
       "snippets": [
+        "ex_inv_api/main.cpp#inv_sparse_usage",
         "ex_inv_api/main.cpp#inv_sparse_usage"
       ],
       "api_page": "doc/website/docs/api/inv/inv-mxne.mdx",
@@ -8832,12 +8907,13 @@
       "registry_status": "documented",
       "test": null,
       "test_resolves": false,
-      "example": null,
-      "example_state": "none",
+      "example": "ex_inv_api",
+      "example_state": "built",
       "including_examples": [
         "ex_inv_api"
       ],
       "snippets": [
+        "ex_inv_api/main.cpp#inv_sparse_usage",
         "ex_inv_api/main.cpp#inv_sparse_usage"
       ],
       "api_page": "doc/website/docs/api/inv/inv-mxne-result.mdx",
@@ -8861,6 +8937,8 @@
         "ex_inv_api"
       ],
       "snippets": [
+        "ex_inv_api/main.cpp#inv_tf_mxne_usage",
+        "ex_inv_api/main.cpp#inv_tf_mxne_usage",
         "ex_inv_api/main.cpp#inv_tf_mxne_usage"
       ],
       "api_page": "doc/website/docs/api/inv/inv-tf-mxne.mdx",
@@ -8878,12 +8956,14 @@
       "registry_status": "documented",
       "test": null,
       "test_resolves": false,
-      "example": null,
-      "example_state": "none",
+      "example": "ex_inv_api",
+      "example_state": "built",
       "including_examples": [
         "ex_inv_api"
       ],
       "snippets": [
+        "ex_inv_api/main.cpp#inv_tf_mxne_usage",
+        "ex_inv_api/main.cpp#inv_tf_mxne_usage",
         "ex_inv_api/main.cpp#inv_tf_mxne_usage"
       ],
       "api_page": "doc/website/docs/api/inv/inv-tf-mxne-params.mdx",
@@ -8901,12 +8981,14 @@
       "registry_status": "documented",
       "test": null,
       "test_resolves": false,
-      "example": null,
-      "example_state": "none",
+      "example": "ex_inv_api",
+      "example_state": "built",
       "including_examples": [
         "ex_inv_api"
       ],
       "snippets": [
+        "ex_inv_api/main.cpp#inv_tf_mxne_usage",
+        "ex_inv_api/main.cpp#inv_tf_mxne_usage",
         "ex_inv_api/main.cpp#inv_tf_mxne_usage"
       ],
       "api_page": "doc/website/docs/api/inv/inv-tf-mxne-result.mdx",
@@ -9388,10 +9470,12 @@
       "registry_status": "documented",
       "test": null,
       "test_resolves": false,
-      "example": null,
-      "example_state": "none",
+      "example": "ex_mna",
+      "example_state": "built",
       "including_examples": [],
-      "snippets": [],
+      "snippets": [
+        "ex_mna/main.cpp#mna_graph_build"
+      ],
       "api_page": "doc/website/docs/api/mna/mna-node.mdx",
       "python_equiv": null,
       "example_eligible": true,
@@ -9499,10 +9583,12 @@
       "registry_status": "documented",
       "test": null,
       "test_resolves": false,
-      "example": null,
-      "example_state": "none",
+      "example": "ex_mna",
+      "example_state": "built",
       "including_examples": [],
-      "snippets": [],
+      "snippets": [
+        "ex_mna/main.cpp#mna_param_tree_binding"
+      ],
       "api_page": "doc/website/docs/api/mna/mna-param-binding.mdx",
       "python_equiv": null,
       "example_eligible": true,
@@ -11360,12 +11446,13 @@
       "registry_status": "documented",
       "test": null,
       "test_resolves": false,
-      "example": null,
-      "example_state": "none",
+      "example": "ex_mri",
+      "example_state": "built",
       "including_examples": [
         "ex_mri"
       ],
       "snippets": [
+        "ex_mri/main.cpp#mri_slicer_usage",
         "ex_mri/main.cpp#mri_slicer_usage"
       ],
       "api_page": "doc/website/docs/api/mri/mri-slice-image.mdx",
@@ -11389,6 +11476,7 @@
         "ex_mri"
       ],
       "snippets": [
+        "ex_mri/main.cpp#mri_slicer_usage",
         "ex_mri/main.cpp#mri_slicer_usage"
       ],
       "api_page": "doc/website/docs/api/mri/mri-slicer.mdx",
@@ -11406,12 +11494,13 @@
       "registry_status": "documented",
       "test": null,
       "test_resolves": false,
-      "example": null,
-      "example_state": "none",
+      "example": "ex_mri",
+      "example_state": "built",
       "including_examples": [
         "ex_mri"
       ],
       "snippets": [
+        "ex_mri/main.cpp#mri_cor_io_read",
         "ex_mri/main.cpp#mri_vol_data_read"
       ],
       "api_page": "doc/website/docs/api/mri/mri-slice.mdx",
@@ -11435,6 +11524,7 @@
         "ex_mri"
       ],
       "snippets": [
+        "ex_mri/main.cpp#mri_cor_io_read",
         "ex_mri/main.cpp#mri_vol_data_read"
       ],
       "api_page": "doc/website/docs/api/mri/mri-vol-data.mdx",
@@ -11481,6 +11571,7 @@
         "ex_sts_statistics"
       ],
       "snippets": [
+        "ex_sts_statistics/main.cpp#stats_cluster_usage",
         "ex_sts_statistics/main.cpp#stats_cluster_usage"
       ],
       "api_page": "doc/website/docs/api/sts/stats-cluster.mdx",
@@ -11498,12 +11589,13 @@
       "registry_status": "documented",
       "test": null,
       "test_resolves": false,
-      "example": null,
-      "example_state": "none",
+      "example": "ex_sts_statistics",
+      "example_state": "built",
       "including_examples": [
         "ex_sts_statistics"
       ],
       "snippets": [
+        "ex_sts_statistics/main.cpp#stats_cluster_usage",
         "ex_sts_statistics/main.cpp#stats_cluster_usage"
       ],
       "api_page": "doc/website/docs/api/sts/stats-cluster-result.mdx",
@@ -11573,6 +11665,7 @@
         "ex_sts_statistics"
       ],
       "snippets": [
+        "ex_sts_statistics/main.cpp#stats_ftest_usage",
         "ex_sts_statistics/main.cpp#stats_ftest_usage"
       ],
       "api_page": "doc/website/docs/api/sts/stats-ftest.mdx",
@@ -11590,12 +11683,13 @@
       "registry_status": "documented",
       "test": null,
       "test_resolves": false,
-      "example": null,
-      "example_state": "none",
+      "example": "ex_sts_statistics",
+      "example_state": "built",
       "including_examples": [
         "ex_sts_statistics"
       ],
       "snippets": [
+        "ex_sts_statistics/main.cpp#stats_ftest_usage",
         "ex_sts_statistics/main.cpp#stats_ftest_usage"
       ],
       "api_page": "doc/website/docs/api/sts/stats-ftest-result.mdx",
@@ -11642,6 +11736,7 @@
         "ex_sts_statistics"
       ],
       "snippets": [
+        "ex_sts_statistics/main.cpp#stats_ttest_usage",
         "ex_sts_statistics/main.cpp#stats_ttest_usage"
       ],
       "api_page": "doc/website/docs/api/sts/stats-ttest.mdx",
@@ -11659,12 +11754,13 @@
       "registry_status": "documented",
       "test": null,
       "test_resolves": false,
-      "example": null,
-      "example_state": "none",
+      "example": "ex_sts_statistics",
+      "example_state": "built",
       "including_examples": [
         "ex_sts_statistics"
       ],
       "snippets": [
+        "ex_sts_statistics/main.cpp#stats_ttest_usage",
         "ex_sts_statistics/main.cpp#stats_ttest_usage"
       ],
       "api_page": "doc/website/docs/api/sts/stats-ttest-result.mdx",
@@ -11913,12 +12009,13 @@
       "registry_status": "documented",
       "test": null,
       "test_resolves": false,
-      "example": null,
-      "example_state": "none",
+      "example": "ex_utils",
+      "example_state": "built",
       "including_examples": [
         "ex_utils"
       ],
       "snippets": [
+        "ex_utils/main.cpp#standard_montage_usage",
         "ex_utils/main.cpp#standard_montage_usage"
       ],
       "api_page": "doc/website/docs/api/utils/electrode-position.mdx",
@@ -11942,6 +12039,7 @@
         "ex_utils"
       ],
       "snippets": [
+        "ex_utils/main.cpp#standard_montage_usage",
         "ex_utils/main.cpp#standard_montage_usage"
       ],
       "api_page": "doc/website/docs/api/utils/standard-montage.mdx",
@@ -12011,6 +12109,7 @@
         "ex_utils"
       ],
       "snippets": [
+        "ex_utils/main.cpp#fastrak_parser_usage",
         "ex_utils/main.cpp#fastrak_parser_usage"
       ],
       "api_page": "doc/website/docs/api/utils/fastrak-parser.mdx",
@@ -12028,12 +12127,13 @@
       "registry_status": "documented",
       "test": null,
       "test_resolves": false,
-      "example": null,
-      "example_state": "none",
+      "example": "ex_utils",
+      "example_state": "built",
       "including_examples": [
         "ex_utils"
       ],
       "snippets": [
+        "ex_utils/main.cpp#fastrak_parser_usage",
         "ex_utils/main.cpp#fastrak_parser_usage"
       ],
       "api_page": "doc/website/docs/api/utils/fastrak-sample.mdx",
@@ -12126,6 +12226,8 @@
         "ex_utils"
       ],
       "snippets": [
+        "ex_utils/main.cpp#python_runner_usage",
+        "ex_utils/main.cpp#python_runner_usage",
         "ex_utils/main.cpp#python_runner_usage"
       ],
       "api_page": "doc/website/docs/api/utils/python-runner.mdx",
@@ -12143,12 +12245,14 @@
       "registry_status": "documented",
       "test": null,
       "test_resolves": false,
-      "example": null,
-      "example_state": "none",
+      "example": "ex_utils",
+      "example_state": "built",
       "including_examples": [
         "ex_utils"
       ],
       "snippets": [
+        "ex_utils/main.cpp#python_runner_usage",
+        "ex_utils/main.cpp#python_runner_usage",
         "ex_utils/main.cpp#python_runner_usage"
       ],
       "api_page": "doc/website/docs/api/utils/python-runner-config.mdx",
@@ -12166,12 +12270,14 @@
       "registry_status": "documented",
       "test": null,
       "test_resolves": false,
-      "example": null,
-      "example_state": "none",
+      "example": "ex_utils",
+      "example_state": "built",
       "including_examples": [
         "ex_utils"
       ],
       "snippets": [
+        "ex_utils/main.cpp#python_runner_usage",
+        "ex_utils/main.cpp#python_runner_usage",
         "ex_utils/main.cpp#python_runner_usage"
       ],
       "api_page": "doc/website/docs/api/utils/python-runner-result.mdx",

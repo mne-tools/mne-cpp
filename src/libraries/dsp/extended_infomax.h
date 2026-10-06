@@ -52,6 +52,8 @@ namespace UTILSLIB
 //=============================================================================================================
 /**
  * Result structure for Extended Infomax ICA.
+ *
+ * @snippet ex_dsp_preprocessing/main.cpp extended_infomax_compute
  */
 struct DSPSHARED_EXPORT InfomaxResult
 {

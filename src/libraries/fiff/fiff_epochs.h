@@ -51,6 +51,8 @@ namespace FIFFLIB
  * Returned by the static epoch-cutting helpers of @ref FiffEpochs.
  * Mirrors the @c mne.EpochsArray construction return value in
  * MNE-Python.
+ *
+ * @snippet ex_fiff_structure/main.cpp fiff_epochs_usage
  */
 struct FIFFSHARED_EXPORT FiffEpochData
 {

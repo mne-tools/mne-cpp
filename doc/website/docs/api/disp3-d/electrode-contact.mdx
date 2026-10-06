@@ -17,7 +17,29 @@ struct DISP3DLIB::ElectrodeContact
 
 Single contact on a depth electrode shaft.
 
+```cpp title="src/examples/ex_disp3d_scene/main.cpp"
+ElectrodeArray shaft;
+shaft.label = "LH";
+shaft.layout = ElectrodeLayout::Depth;
+for (int k = 0; k < 4; ++k) {
+    ElectrodeContact contact;
+    contact.name = QString("LH%1").arg(k + 1);
+    contact.position = QVector3D(10.0f + 3.5f * k, -20.0f, 5.0f); // surface RAS, mm
+    shaft.contacts.append(contact);
+}
+ElectrodeObject electrodes;
+electrodes.setArrays({shaft});
+electrodes.selectContact("LH3");
+QVector<float> instances; // per contact: position, radius, RGBA, selected = 9 floats
+electrodes.generateContactInstances(instances);
+```
+
 ---
+
+## Example
+
+- Full source: [`src/examples/ex_disp3d_scene/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_disp3d_scene/main.cpp)
+- Build target: `ex_disp3d_scene` (runs under CTest)
 
 ## Authors of this file
 

@@ -52,6 +52,8 @@ namespace UTILSLIB
  *
  * matPsd rows correspond to channels (or the single channel passed to computeVector).
  * Each column corresponds to a frequency bin from vecFreqs.
+ *
+ * @snippet ex_dsp_analysis/main.cpp welch_psd_compute
  */
 struct DSPSHARED_EXPORT WelchPsdResult
 {

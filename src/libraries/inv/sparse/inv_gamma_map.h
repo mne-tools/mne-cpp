@@ -54,6 +54,8 @@ namespace INVLIB
 //=============================================================================================================
 /**
  * Result structure for the Gamma-MAP solver.
+ *
+ * @snippet ex_inv_api/main.cpp inv_gamma_map_usage
  */
 struct INVSHARED_EXPORT InvGammaMapResult
 {

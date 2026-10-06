@@ -17,7 +17,20 @@ struct UTILSLIB::DerivationRule
 
 A single derivation rule mapping input channels (with weights) to one output channel.
 
+```cpp title="src/examples/ex_dsp_preprocessing/main.cpp"
+const QStringList names = {"LH1", "LH2", "LH3", "RA1"};
+const QVector<DerivationRule> bipolar = ChannelDerivation::buildBipolar(names); // LH1-LH2, LH2-LH3
+const QVector<DerivationRule> average = ChannelDerivation::buildCommonAverage(names);
+const auto [bipolarData, bipolarNames] = ChannelDerivation::apply(raw, names, bipolar);
+const auto [averageData, averageNames] = ChannelDerivation::apply(raw, names, average);
+```
+
 ---
+
+## Example
+
+- Full source: [`src/examples/ex_dsp_preprocessing/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_dsp_preprocessing/main.cpp)
+- Build target: `ex_dsp_preprocessing` (runs under CTest)
 
 ## Authors of this file
 

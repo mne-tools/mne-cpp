@@ -52,6 +52,8 @@ namespace UTILSLIB
 //=============================================================================================================
 /**
  * @brief A head position entry (time, translation, rotation quaternion).
+ *
+ * @snippet ex_dsp_maxwell/main.cpp maxwell_movement_comp_usage
  */
 struct DSPSHARED_EXPORT HeadPosEntry
 {
@@ -64,6 +66,8 @@ struct DSPSHARED_EXPORT HeadPosEntry
 //=============================================================================================================
 /**
  * @brief Parameters for Maxwell movement compensation.
+ *
+ * @snippet ex_dsp_maxwell/main.cpp maxwell_movement_comp_usage
  */
 struct DSPSHARED_EXPORT MaxwellMoveCompParams
 {

@@ -19,7 +19,16 @@ Result structure for F-tests.
 
 Per-call output of a one-way ANOVA F-test: F-statistics, p-values, and between/within degrees of freedom.
 
+```cpp title="src/examples/ex_sts_statistics/main.cpp"
+const StatsFtestResult anova = StatsFtest::oneWay({a, b, c}); // one-way ANOVA per column
+```
+
 ---
+
+## Example
+
+- Full source: [`src/examples/ex_sts_statistics/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_sts_statistics/main.cpp)
+- Build target: `ex_sts_statistics` (runs under CTest)
 
 ## Authors of this file
 

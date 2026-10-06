@@ -54,6 +54,8 @@ namespace INVLIB
 //=============================================================================================================
 /**
  * Result structure for the MxNE solver.
+ *
+ * @snippet ex_inv_api/main.cpp inv_sparse_usage
  */
 struct INVSHARED_EXPORT InvMxneResult
 {

@@ -56,6 +56,8 @@ namespace UTILSLIB
 //=============================================================================================================
 /**
  * @brief Result of a multitaper TFR computation.
+ *
+ * @snippet ex_dsp_spectral/main.cpp multitaper_tfr_compute
  */
 struct DSPSHARED_EXPORT MultitaperTfrResult
 {

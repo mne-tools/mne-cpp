@@ -24,7 +24,17 @@ H(z) = (b0 + b1*z^-1 + b2*z^-2) / (1 + a1*z^-1 + a2*z^-2)
 
  Note: a0 is normalised to 1. For first-order sections set b2 = a2 = 0.
 
+```cpp title="src/examples/ex_dsp_spectral/main.cpp"
+const QVector<IirBiquad> sos = IirFilter::designButterworth(4, IirFilter::LowPass, 30.0, 0.0, kSFreq);
+const RowVectorXd lowPassed = IirFilter::applyZeroPhase(signal, sos); // forward-backward, no phase shift
+```
+
 ---
+
+## Example
+
+- Full source: [`src/examples/ex_dsp_spectral/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_dsp_spectral/main.cpp)
+- Build target: `ex_dsp_spectral` (runs under CTest)
 
 ## Authors of this file
 

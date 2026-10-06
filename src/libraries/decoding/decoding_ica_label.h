@@ -94,6 +94,8 @@ enum class IcaComponentLabel
  * fraction of power above 30 Hz). Downstream consumers typically
  * threshold the score or render it next to the component topography so
  * the user can override the automatic decision.
+ *
+ * @snippet ex_decoding/main.cpp ml_ica_label_classify
  */
 struct DECODINGSHARED_EXPORT IcaLabelResult
 {

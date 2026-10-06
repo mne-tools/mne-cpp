@@ -59,6 +59,8 @@ namespace UTILSLIB
 //=============================================================================================================
 /**
  * @brief Represents an electrode position in a montage.
+ *
+ * @snippet ex_utils/main.cpp standard_montage_usage
  */
 struct UTILSSHARED_EXPORT ElectrodePosition
 {

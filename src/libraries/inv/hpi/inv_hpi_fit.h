@@ -104,6 +104,8 @@ struct CoilParam
  * The struct specifing all data needed to perform coil-wise fitting.
  *
  * @brief Complete HPI fit output: per-coil dipole parameters, head-to-device transform, fit error, and head movement distance
+ *
+ * @snippet ex_inv_hpi/main.cpp inv_hpi_usage
  */
 struct HpiFitResult
 {

@@ -19,7 +19,18 @@ Single 2D MRI cross-section produced by [`MriSlicer`](/docs/api/mri/mri-slicer) 
 
 Carries one orthogonal-plane sample of a 3D [`MriVolData`](/docs/api/mri/mri-vol-data) ready for upload to the slice viewer: a normalised 8-bit grayscale pixel buffer, the in-volume slice index it was sampled at, and the bookkeeping the widget needs to map mouse picks back to RAS millimetres.
 
+```cpp title="src/examples/ex_mri/main.cpp"
+const Vector3f ras(0.001f, -0.0005f, -0.002f); // metres; voxel (2,3,1)
+const Vector3i voxel = MriSlicer::rasToVoxel(vox2ras, ras);
+const QVector<MriSliceImage> planes = MriSlicer::extractOrthogonal(voxels, mgh.dims(), vox2ras, ras); // axial, coronal, sagittal
+```
+
 ---
+
+## Example
+
+- Full source: [`src/examples/ex_mri/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_mri/main.cpp)
+- Build target: `ex_mri` (runs under CTest)
 
 ## Authors of this file
 

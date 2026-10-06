@@ -19,7 +19,19 @@ Configuration for a [`PythonRunner`](/docs/api/utils/python-runner) invocation.
 
 Script execution configuration.
 
+```cpp title="src/examples/ex_utils/main.cpp"
+PythonRunner python; // "python3" from PATH; a venv is configured via PythonRunnerConfig
+QStringList progress;
+python.setProgressCallback([&](float pct, const QString& msg) { progress << QString("%1 %2").arg(pct).arg(msg); });
+const PythonRunnerResult run = python.runCode("import sys\nprint('[progress] 50% half')\nprint(sum(map(int, sys.argv[1:])))", {"2", "3"});
+```
+
 ---
+
+## Example
+
+- Full source: [`src/examples/ex_utils/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_utils/main.cpp)
+- Build target: `ex_utils` (runs under CTest)
 
 ## Authors of this file
 

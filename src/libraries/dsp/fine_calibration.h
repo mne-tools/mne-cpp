@@ -46,6 +46,8 @@ namespace UTILSLIB
 //=============================================================================================================
 /**
  * @brief Per-sensor fine calibration entry.
+ *
+ * @snippet ex_dsp_maxwell/main.cpp fine_calibration_usage
  */
 struct DSPSHARED_EXPORT FineCalEntry
 {

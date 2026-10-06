@@ -54,6 +54,8 @@ class InvDipole;
  * searching algorithm.
  *
  * @brief Pair of correlated dipole indices and orientations found by the RAP MUSIC scanning step
+ *
+ * @snippet ex_inv_beamformer/main.cpp inv_rap_music_usage
  */
 template<typename T>
 struct InvDipolePair

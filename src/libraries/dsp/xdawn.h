@@ -48,6 +48,8 @@ namespace UTILSLIB
 //=============================================================================================================
 /**
  * @brief Result of an xDAWN decomposition.
+ *
+ * @snippet ex_dsp_preprocessing/main.cpp xdawn_fit
  */
 struct DSPSHARED_EXPORT XdawnResult
 {

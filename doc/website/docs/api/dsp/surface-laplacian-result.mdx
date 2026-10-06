@@ -17,7 +17,31 @@ struct UTILSLIB::SurfaceLaplacianResult
 
 Result of a surface Laplacian (CSD) computation.
 
+```cpp title="src/examples/ex_dsp_preprocessing/main.cpp"
+MatrixX3d electrodes(8, 3); // head coordinates in metres, on a 9 cm sphere
+electrodes << 0.0, 0.0, 0.09,
+    0.05785088487178853, 0.0, 0.06894399988070801,
+    0.0, 0.05785088487178853, 0.06894399988070801,
+    -0.05785088487178853, 0.0, 0.06894399988070801,
+    0.0, -0.05785088487178853, 0.06894399988070801,
+    0.0626727816288017, 0.0626727816288017, 0.015628335990023737,
+    -0.0626727816288017, 0.0626727816288017, 0.015628335990023737,
+    -0.06267278162880172, -0.0626727816288017, 0.015628335990023737;
+MatrixXd eeg(8, 10);
+for (int k = 0; k < 8; ++k) {
+    for (int t = 0; t < 10; ++t) {
+        eeg(k, t) = std::sin(t * (k + 1) * 0.3);
+    }
+}
+const SurfaceLaplacianResult csd = SurfaceLaplacian::compute(eeg, electrodes, 1e-5, 4, 50, 0.09);
+```
+
 ---
+
+## Example
+
+- Full source: [`src/examples/ex_dsp_preprocessing/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_dsp_preprocessing/main.cpp)
+- Build target: `ex_dsp_preprocessing` (runs under CTest)
 
 ## Authors of this file
 

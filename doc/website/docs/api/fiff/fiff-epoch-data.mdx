@@ -19,7 +19,24 @@ Fixed-length epoching result: the (nepoch × nchan × nsamples) data stack plus 
 
 Returned by the static epoch-cutting helpers of [`FiffEpochs`](/docs/api/fiff/fiff-epochs). Mirrors the `mne.EpochsArray` construction return value in MNE-Python.
 
+```cpp title="src/examples/ex_fiff_structure/main.cpp"
+QFile rawFile(rawPath);
+FiffRawData raw(rawFile);
+MatrixXd data;
+MatrixXd times;
+ok &= raw.read_raw_segment(data, times); // all 6007 samples
+const double sfreq = raw.info.sfreq;
+const QList<FiffEpochData> epochs = FiffEpochs::makeFixedLengthEpochs(data, sfreq, 2.0, 0.5); // 2 s, 0.5 s overlap
+const FiffEvoked average = FiffEpochs::averageEpochs(epochs, sfreq);
+```
+
 ---
+
+## Example
+
+- Full source: [`src/examples/ex_fiff_structure/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_fiff_structure/main.cpp)
+- Build target: `ex_fiff_structure` (runs under CTest)
+- Data: [mne-cpp-test-data](https://github.com/mne-tools/mne-cpp-test-data)
 
 ## Authors of this file
 

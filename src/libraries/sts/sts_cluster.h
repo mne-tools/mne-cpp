@@ -68,6 +68,8 @@ namespace STSLIB
  * Result structure for cluster permutation tests.
  *
  * @brief Per-call output of a cluster permutation test: observed statistic map, cluster masses, cluster p-values and cluster labels.
+ *
+ * @snippet ex_sts_statistics/main.cpp stats_cluster_usage
  */
 struct STSSHARED_EXPORT StatsClusterResult
 {

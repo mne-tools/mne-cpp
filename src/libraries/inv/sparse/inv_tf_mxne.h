@@ -58,6 +58,8 @@ namespace INVLIB
 //=============================================================================================================
 /**
  * @brief Result structure for the TF-MxNE solver.
+ *
+ * @snippet ex_inv_api/main.cpp inv_tf_mxne_usage
  */
 struct INVSHARED_EXPORT InvTfMxneResult
 {
@@ -71,6 +73,8 @@ struct INVSHARED_EXPORT InvTfMxneResult
 //=============================================================================================================
 /**
  * @brief Parameters for the TF-MxNE solver.
+ *
+ * @snippet ex_inv_api/main.cpp inv_tf_mxne_usage
  */
 struct INVSHARED_EXPORT InvTfMxneParams
 {

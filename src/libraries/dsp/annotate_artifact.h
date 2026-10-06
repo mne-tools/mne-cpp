@@ -90,6 +90,8 @@ struct DSPSHARED_EXPORT AnnotateMusclParams
 //=============================================================================================================
 /**
  * @brief Parameters for amplitude-based annotation.
+ *
+ * @snippet ex_dsp_artifacts/main.cpp annotate_amplitude_usage
  */
 struct DSPSHARED_EXPORT AnnotateAmplitudeParams
 {
