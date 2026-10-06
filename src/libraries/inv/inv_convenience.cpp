@@ -299,10 +299,12 @@ QPair<MatrixXd, int> INVLIB::computeWhitener(
         eigvec = solver.eigenvectors().transpose();
     }
 
-    // Auto-detect rank from eigenvalue spectrum
+    // Auto-detect rank from eigenvalue spectrum. FiffCov::prepare_noise_cov already zeroed the null space per
+    // channel type; a threshold relative to the largest (EEG) eigenvalue would drop every MEG component.
+    const bool prepared = noiseCov.eig.size() > 0 && noiseCov.eigvec.size() > 0;
     if (rank <= 0) {
         double maxEig = eig.maxCoeff();
-        double threshold = maxEig * 1e-10;
+        double threshold = prepared ? 0.0 : maxEig * 1e-10;
         rank = 0;
         for (int i = 0; i < eig.size(); ++i) {
             if (eig(i) > threshold)
