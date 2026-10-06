@@ -39,11 +39,6 @@
 namespace MNELIB
 {
 
-// Import averaging types from FIFFLIB for backward compatibility
-using FIFFLIB::RejectionParams;
-using FIFFLIB::AverageCategory;
-using FIFFLIB::AverageDescription;
-
 //=============================================================================================================
 /**
  * Covariance matrix computation definition.
@@ -69,7 +64,7 @@ struct MNESHARED_EXPORT CovDefinition
 struct MNESHARED_EXPORT CovDescription
 {
     QList<CovDefinition> defs;    /**< Definition sections. */
-    RejectionParams rej;          /**< Rejection limits. */
+    FIFFLIB::RejectionParams rej; /**< Rejection limits. */
     bool removeSampleMean = true; /**< Remove the mean at each sample. */
     bool fixSkew = false;         /**< Fix skew on trigger lines. */
     QString filename;             /**< Output file. */

@@ -21,8 +21,7 @@
  * heatmaps in DISPLIB and DISP3DLIB.
  *
  * The projection is done by first fitting a sphere to the
- * supplied head-frame points (helper struct @ref UTILSLIB::fitUserRec
- * carries the working set for the non-linear fit), then
+ * supplied head-frame points (@ref UTILSLIB::Sphere::fit_sphere_simplex), then
  * applying an azimuthal projection of every electrode onto
  * the tangent plane at the sphere apex. Optional mirroring
  * flags exist for caps whose left/right convention differs
@@ -63,19 +62,6 @@
 
 namespace UTILSLIB
 {
-
-//=============================================================================================================
-// TYPEDEFS
-//=============================================================================================================
-
-/** @brief Workspace for sphere-fitting used by the layout maker, holding 3-D point coordinates and fit parameters. */
-struct fitUserRec
-{
-    Eigen::MatrixXf rr;
-    int np;
-    int report;
-};
-using fitUser = fitUserRec*;
 
 //=============================================================================================================
 /**

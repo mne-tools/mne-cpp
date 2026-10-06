@@ -12,11 +12,8 @@
  * @date     November 2014
  * @brief    Implementation of @ref UTILSLIB::LayoutMaker — sphere fit, azimuthal projection and @c .lout writer.
  *
- * The non-linear sphere fit uses a fixed-step gradient descent
- * over the squared radial residuals; the algorithm and the
- * @c fitUserRec workspace mirror the original MNE-C
- * @c make_eeg_layout routine, so generated layouts remain
- * bit-identical to what mne-c users have used for decades.
+ * The sphere is fitted with @ref UTILSLIB::Sphere::fit_sphere_simplex,
+ * the Nelder-Mead fit of the original MNE-C @c make_eeg_layout routine.
  */
 
 //=============================================================================================================

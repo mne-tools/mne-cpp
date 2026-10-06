@@ -129,7 +129,7 @@ bool MNEDescriptionParser::getFloat(QTextStream& in, float& val)
 //=============================================================================================================
 
 bool MNEDescriptionParser::parseRejectionParam(const QString& keyword, QTextStream& in,
-                                               RejectionParams& rej, bool& ok)
+                                               FIFFLIB::RejectionParams& rej, bool& ok)
 {
     ok = true;
     float fval;
@@ -188,7 +188,7 @@ bool MNEDescriptionParser::parseRejectionParam(const QString& keyword, QTextStre
 // AVERAGE DESCRIPTION PARSER
 //=============================================================================================================
 
-bool MNEDescriptionParser::parseAverageFile(const QString& fileName, AverageDescription& desc)
+bool MNEDescriptionParser::parseAverageFile(const QString& fileName, FIFFLIB::AverageDescription& desc)
 {
     QFile file(fileName);
     if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
@@ -197,13 +197,13 @@ bool MNEDescriptionParser::parseAverageFile(const QString& fileName, AverageDesc
     }
 
     QTextStream in(&file);
-    desc = AverageDescription();
+    desc = FIFFLIB::AverageDescription();
 
     bool expectBrace = false;
     bool bminSet = false, bmaxSet = false;
     bool inAverage = false;
     bool inCategory = false;
-    AverageCategory currentCat;
+    FIFFLIB::AverageCategory currentCat;
 
     QString word;
     while (!(word = nextWord(in)).isEmpty()) {
@@ -247,7 +247,7 @@ bool MNEDescriptionParser::parseAverageFile(const QString& fileName, AverageDesc
                 if (!currentCat.nextIgnore)
                     currentCat.nextIgnore = currentCat.ignore;
                 desc.categories.append(currentCat);
-                currentCat = AverageCategory();
+                currentCat = FIFFLIB::AverageCategory();
                 inCategory = false;
                 bminSet = bmaxSet = false;
             } else if (inAverage) {

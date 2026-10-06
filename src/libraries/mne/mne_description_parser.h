@@ -57,7 +57,7 @@ public:
      * @param[out] desc     Parsed description.
      * @return true if successful, false on error.
      */
-    static bool parseAverageFile(const QString& fileName, AverageDescription& desc);
+    static bool parseAverageFile(const QString& fileName, FIFFLIB::AverageDescription& desc);
 
     /**
      * Parse a covariance description file.
@@ -95,7 +95,7 @@ private:
      * Returns true if the keyword was handled, false otherwise (unrecognized keyword).
      */
     static bool parseRejectionParam(const QString& keyword, QTextStream& in,
-                                    RejectionParams& rej, bool& ok);
+                                    FIFFLIB::RejectionParams& rej, bool& ok);
 };
 
 } // namespace MNELIB
