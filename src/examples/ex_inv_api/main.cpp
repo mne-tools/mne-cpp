@@ -34,10 +34,14 @@
 #include <inv/sparse/inv_gamma_map.h>
 #include <inv/sparse/inv_mxne.h>
 #include <inv/sparse/inv_tf_mxne.h>
+#include <mne/mne_cluster_info.h>
+#include <mne/mne_cortical_map.h>
+#include <mne/mne_hemisphere.h>
 #include <mne/mne_forward_solution.h>
 #include <mne/mne_inverse_operator.h>
 #include <fiff/fiff_cov.h>
 #include <fiff/fiff_evoked.h>
+#include <fs/fs_annotationset.h>
 #include <fs/fs_label.h>
 
 //=============================================================================================================
@@ -133,6 +137,36 @@ int main(int argc, char* argv[])
     ok &= expect(resolution.rows() == 210 && resolution.cols() == 210 && near(resolution.norm(), 6.13352636100184, 1e-4),
                  "InvResolutionMatrix: MNE resolution matrix matches mne.minimum_norm.make_inverse_resolution_matrix");
 
+    //! [mne_cortical_map_usage]
+    // The same resolution matrix from a prepared inverse; the forward is rotated to the inverse's surface basis
+    MNEInverseOperator prepared = inverse.prepare_inverse_operator(evoked.nave, lambda2, false, false);
+    MatrixXd surfaceKernel;
+    SparseMatrix<double> noNormals;
+    QList<VectorXi> kernelVertices;
+    prepared.assemble_kernel(FsLabel(), "MNE", false, surfaceKernel, noNormals, kernelVertices);
+    prepared.getKernel() = surfaceKernel;
+    const MatrixXd corticalMap = MNECorticalMap::makeCorticalMap(fwd, prepared, evoked.info);
+    //! [mne_cortical_map_usage]
+    // mne K (Cartesian) times the Cartesian gain, the same product in one basis: trace 26.1330, Frobenius norm 6.13353
+    ok &= expect(corticalMap.rows() == 210 && corticalMap.cols() == 210 && near(corticalMap.trace(), 26.133038866971994, 1e-4) && near(corticalMap.norm(), 6.13352636100184, 1e-4),
+                 "MNECorticalMap: K G in the inverse's surface basis matches mne");
+
+    //! [mne_cluster_info_usage]
+    // Cluster the V1 sources within their aparc regions into groups of about 20 (k-means on the gain columns;
+    // squared Euclidean distance makes each centroid the mean of its sources)
+    const FsAnnotationSet aparc(data + "/subjects/sample/label/lh.aparc.annot", data + "/subjects/sample/label/rh.aparc.annot");
+    MatrixXd clusterMean; // 3 x 70 sources -> 3 x nClusters, averaging per orientation
+    const MNEForwardSolution clustered = fwd.cluster_forward_solution(aparc, 20, clusterMean, FiffCov(), FiffInfo(), "sqeuclidean");
+    const MNEClusterInfo& clusters = clustered.src.hemisphereAt(0)->cluster_info;
+    int assigned = 0;
+    for (const VectorXi& members : clusters.clusterVertnos) {
+        assigned += static_cast<int>(members.size());
+    }
+    clusters.write(tmp.filePath("v1-clusters.txt")); // plus centroids_v1-clusters.txt
+    //! [mne_cluster_info_usage]
+    ok &= expect(clustered.isClustered() && clusters.numClust() == clustered.nsource && assigned == 70 && clusters.numClust() >= 4 && (clustered.sol->data - fwd.sol->data * clusterMean).norm() <= 1e-9 * fwd.sol->data.norm() && QFile::exists(tmp.filePath("centroids_v1-clusters.txt")),
+                 "MNEClusterInfo: every V1 source in one cluster, clustered gain is the cluster mean");
+
     //! [inv_vector_source_estimate_usage]
     // The MNE kernel keeps x, y and z per source: an apply_inverse(..., pick_ori="vector") estimate.
     const MatrixXd goodData = evoked.pick_channels(inverse.noise_cov->names).data;
@@ -153,7 +187,7 @@ int main(int argc, char* argv[])
                  "InvVolumeSourceEstimate: source values land on their voxels, the rest of the grid is zero");
 
     //! [source_morph_usage]
-    // Morph the 70 V1 sources onto 35 targets by averaging neighbouring pairs (an MNEMorphMap in practice).
+    // Morph the 70 V1 sources onto 35 targets by averaging neighbouring pairs (a sphere-based morph map in practice).
     SparseMatrix<double> pairAverage(35, 70);
     for (int i = 0; i < 35; ++i) {
         pairAverage.insert(i, 2 * i) = 0.5;

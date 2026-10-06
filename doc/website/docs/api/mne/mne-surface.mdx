@@ -19,6 +19,19 @@ Implements the [`MNE`](/docs/api/mne/mne-class) [FsSurface](/docs/api/fs/fs-surf
 
 Lightweight triangulated surface (vertices, triangles, normals).
 
+```cpp title="src/examples/ex_mne_api/main.cpp"
+// Total solid angle seen from a point: 4 pi inside a closed surface, 0 outside
+auto skull = MNESurface::read_bem_surface2(bemFile.fileName(), FIFFV_BEM_SURF_ID_BRAIN, true);
+skull->compute_surface_cm();
+const double inside = skull->sum_solids(Map<const Vector3f>(skull->cm)) / (4.0 * M_PI);
+const double outside = skull->sum_solids(Vector3f(0.0f, 0.0f, 0.2f)) / (4.0 * M_PI);
+
+// The same surface as an MNE-C viewer display surface
+MNEMshDisplaySurfaceSet display;
+display.add_bem_surface(bemFile.fileName(), FIFFV_BEM_SURF_ID_BRAIN, "inner skull", 1, 1); // checks closure
+const MNEMshDisplaySurface& shown = *display.surfs[0];
+```
+
 ### Inheritance
 
 ```mermaid
@@ -358,6 +371,12 @@ Read a BEM surface from a FIFF file.
 - *std::unique_ptr&lt; [MNESurface](/docs/api/mne/mne-surface) &gt;* — The loaded surface, or nullptr on failure. Caller takes ownership.
 
 ---
+
+## Example
+
+- Full source: [`src/examples/ex_mne_api/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_mne_api/main.cpp)
+- Build target: `ex_mne_api` (runs under CTest)
+- Data: [mne-cpp-test-data](https://github.com/mne-tools/mne-cpp-test-data)
 
 ## Authors of this file
 

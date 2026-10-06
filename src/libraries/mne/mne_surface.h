@@ -61,6 +61,8 @@ class MNEProjData;
  * Implements the MNE FsSurface (Replaces typedef mneSurfaceOrVolume mneSurface; struct of MNE-C mne_types.h).
  *
  * @brief Lightweight triangulated surface (vertices, triangles, normals).
+ *
+ * @snippet ex_mne_api/main.cpp mne_surface_usage
  */
 class MNESHARED_EXPORT MNESurface : public MNESurfaceOrVolume
 {

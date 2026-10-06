@@ -19,6 +19,16 @@ Single measurement epoch or average within [`MNEMeasData`](/docs/api/mne/mne-mea
 
 Replaces `*mneMeasDataSet` / `mneMeasDataSetRec` from MNE-C ``mne_types.h``. Holds the measured data matrix, optional projector / whitened / filtered copies, baseline values, and per-epoch metadata (number of averages, time range, etc.).
 
+```cpp title="src/examples/ex_mne_api/main.cpp"
+// MNE-C measurement container: data set 1 of the evoked file, MEG and EEG channels, time-major
+std::unique_ptr<MNEMeasData> meas(MNEMeasData::mne_read_meas_data(aveFile.fileName(), 1, nullptr, nullptr, {}, 0));
+const MNEMeasDataSet& left = *meas->current;
+const float meg0113 = left.data(180, 0); // t = 99.9 ms
+meas->adjust_baselines(-0.2f, 0.0f);
+VectorXf at100ms(meas->nchan);
+left.getValuesAtTime(0.1f, 0.0f, meas->nchan, false, at100ms.data()); // linear interpolation between samples
+```
+
 ---
 
 ## Public Methods
@@ -114,6 +124,12 @@ Refactored: mne_get_values_from_data_ch (mne_get_values.c)
 - *int* — 0 on success, -1 on error.
 
 ---
+
+## Example
+
+- Full source: [`src/examples/ex_mne_api/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_mne_api/main.cpp)
+- Build target: `ex_mne_api` (runs under CTest)
+- Data: [mne-cpp-test-data](https://github.com/mne-tools/mne-cpp-test-data)
 
 ## Authors of this file
 

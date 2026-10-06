@@ -44,6 +44,8 @@ namespace MNELIB
  *   cov { ... def { ... } ... }
  *
  * Lines starting with '#' are comments.
+ *
+ * @snippet ex_mne_api/main.cpp mne_description_parser_usage
  */
 class MNESHARED_EXPORT MNEDescriptionParser
 {

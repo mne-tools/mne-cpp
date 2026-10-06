@@ -21,6 +21,28 @@ File format is a keyword-value text format with nested blocks: average \{ ... ca
 
 Lines starting with '#' are comments.
 
+```cpp title="src/examples/ex_mne_api/main.cpp"
+// An MNE-C averaging description (mne_process_raw --ave), parsed and run on the raw recording
+const QString aveDesc = tmp.filePath("audvis.ave");
+QFile descFile(aveDesc);
+ok &= descFile.open(QIODevice::WriteOnly | QIODevice::Text);
+descFile.write("average {\n"
+               "    category {\n"
+               "        name   \"Left Auditory\"\n"
+               "        event  1\n"
+               "        tmin   -0.1\n"
+               "        tmax   0.3\n"
+               "        bmin   -0.1\n"
+               "        bmax   0.0\n"
+               "    }\n"
+               "}\n");
+descFile.close();
+AverageDescription averaging;
+MNEDescriptionParser::parseAverageFile(aveDesc, averaging);
+QString log;
+const FiffEvokedSet averages = FiffEvokedSet::computeAverages(raw, averaging, events.events, log);
+```
+
 ---
 
 ## Static Methods
@@ -60,6 +82,12 @@ Parse a covariance description file.
 - *bool* — true if successful, false on error.
 
 ---
+
+## Example
+
+- Full source: [`src/examples/ex_mne_api/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_mne_api/main.cpp)
+- Build target: `ex_mne_api` (runs under CTest)
+- Data: [mne-cpp-test-data](https://github.com/mne-tools/mne-cpp-test-data)
 
 ## Authors of this file
 

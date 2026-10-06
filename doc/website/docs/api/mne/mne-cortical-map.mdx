@@ -15,9 +15,20 @@ sidebar_position: 13
 class MNELIB::MNECorticalMap
 ```
 
-Cortical map interpolation: creates a mapping matrix that transforms sensor-level data to source space using forward and inverse operators.
+Builds the resolution matrix K G that maps source activity to its estimate.
 
-Cortical map interpolation utilities
+Resolution matrix of an inverse operator
+
+```cpp title="src/examples/ex_inv_api/main.cpp"
+// The same resolution matrix from a prepared inverse; the forward is rotated to the inverse's surface basis
+MNEInverseOperator prepared = inverse.prepare_inverse_operator(evoked.nave, lambda2, false, false);
+MatrixXd surfaceKernel;
+SparseMatrix<double> noNormals;
+QList<VectorXi> kernelVertices;
+prepared.assemble_kernel(FsLabel(), "MNE", false, surfaceKernel, noNormals, kernelVertices);
+prepared.getKernel() = surfaceKernel;
+const MatrixXd corticalMap = MNECorticalMap::makeCorticalMap(fwd, prepared, evoked.info);
+```
 
 ---
 
@@ -51,6 +62,12 @@ K is the inverse operator kernel; G holds the rows of the forward gain for the k
 - *Eigen::MatrixXd* — The cortical mapping matrix (nSources x nSources).
 
 ---
+
+## Example
+
+- Full source: [`src/examples/ex_inv_api/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_inv_api/main.cpp)
+- Build target: `ex_inv_api` (runs under CTest)
+- Data: [mne-cpp-test-data](https://github.com/mne-tools/mne-cpp-test-data)
 
 ## Authors of this file
 

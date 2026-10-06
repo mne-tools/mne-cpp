@@ -77,6 +77,8 @@ namespace MNELIB
  * Replaces *mshDisplaySurface, mshDisplaySurfaceRec struct (analyze_types.c).
  *
  * @brief The MNE Msh Display FsSurface class holds information about a surface to be rendered.
+ *
+ * @snippet ex_mne_api/main.cpp mne_surface_usage
  */
 class MNESHARED_EXPORT MNEMshDisplaySurface : public MNESurface
 {

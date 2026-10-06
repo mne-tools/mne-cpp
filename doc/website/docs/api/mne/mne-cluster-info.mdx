@@ -19,6 +19,20 @@ Per-cluster bookkeeping for a label-restricted clustering of a forward solution:
 
 Cluster table used to compress and reconstruct a clustered leadfield.
 
+```cpp title="src/examples/ex_inv_api/main.cpp"
+// Cluster the V1 sources within their aparc regions into groups of about 20 (k-means on the gain columns;
+// squared Euclidean distance makes each centroid the mean of its sources)
+const FsAnnotationSet aparc(data + "/subjects/sample/label/lh.aparc.annot", data + "/subjects/sample/label/rh.aparc.annot");
+MatrixXd clusterMean; // 3 x 70 sources -> 3 x nClusters, averaging per orientation
+const MNEForwardSolution clustered = fwd.cluster_forward_solution(aparc, 20, clusterMean, FiffCov(), FiffInfo(), "sqeuclidean");
+const MNEClusterInfo& clusters = clustered.src.hemisphereAt(0)->cluster_info;
+int assigned = 0;
+for (const VectorXi& members : clusters.clusterVertnos) {
+    assigned += static_cast<int>(members.size());
+}
+clusters.write(tmp.filePath("v1-clusters.txt")); // plus centroids_v1-clusters.txt
+```
+
 ---
 
 ## Public Methods
@@ -57,7 +71,7 @@ Returns the number of clusters.
 
 ### write(p_sFileName)
 
-Writes the cluster info to a file.
+Writes the cluster info as text, and the centroid vertex numbers to `centroids_<name>` in the same directory.
 
 **Parameters:**
 
@@ -65,6 +79,12 @@ Writes the cluster info to a file.
   FileName to write to.
 
 ---
+
+## Example
+
+- Full source: [`src/examples/ex_inv_api/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_inv_api/main.cpp)
+- Build target: `ex_inv_api` (runs under CTest)
+- Data: [mne-cpp-test-data](https://github.com/mne-tools/mne-cpp-test-data)
 
 ## Authors of this file
 

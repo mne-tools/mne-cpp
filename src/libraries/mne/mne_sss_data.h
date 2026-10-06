@@ -68,6 +68,8 @@ namespace MNELIB
  * Implements MNE SSS Data (Replaces *mneSssData,mneSssDataRec struct of MNE-C mne_types.h).
  *
  * @brief Container for Signal Space Separation (SSS/Maxwell filtering) expansion coefficients and metadata.
+ *
+ * @snippet ex_mne_api/main.cpp mne_sss_data_usage
  */
 class MNESHARED_EXPORT MNESssData
 {

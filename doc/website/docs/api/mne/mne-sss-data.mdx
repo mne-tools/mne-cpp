@@ -19,6 +19,10 @@ Implements [`MNE`](/docs/api/mne/mne-class) [SSS](/docs/api/dsp/sss) Data (Repla
 
 Container for Signal Space Separation ([SSS](/docs/api/dsp/sss)/Maxwell filtering) expansion coefficients and metadata.
 
+```cpp title="src/examples/ex_mne_api/main.cpp"
+auto sss = MNESssData::read(sssPath); // the SSS block written by mne.preprocessing.maxwell_filter
+```
+
 ---
 
 ## Public Methods
@@ -95,6 +99,12 @@ Read the [SSS](/docs/api/dsp/sss) data from the given node of an open fiff strea
 - *std::unique_ptr&lt; [MNESssData](/docs/api/mne/mne-sss-data) &gt;* — The read SSS data.
 
 ---
+
+## Example
+
+- Full source: [`src/examples/ex_mne_api/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_mne_api/main.cpp)
+- Build target: `ex_mne_api` (runs under CTest)
+- Data: [mne-cpp-test-data](https://github.com/mne-tools/mne-cpp-test-data)
 
 ## Authors of this file
 

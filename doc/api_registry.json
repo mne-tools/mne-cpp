@@ -5654,7 +5654,14 @@
       "mne_python": null,
       "sklearn": null,
       "test": null,
-      "example": null,
+      "example": "ex_mne_api",
+      "example_snippet": [
+        "ex_mne_api/main.cpp#mne_facade_usage"
+      ],
+      "example_mode": "run",
+      "required_data": [
+        "mne-cpp-test-data"
+      ],
       "status": "documented",
       "skigen_candidate": false,
       "documented": true,
@@ -5772,7 +5779,14 @@
       "mne_python": null,
       "sklearn": null,
       "test": null,
-      "example": null,
+      "example": "ex_inv_api",
+      "example_snippet": [
+        "ex_inv_api/main.cpp#mne_cluster_info_usage"
+      ],
+      "example_mode": "run",
+      "required_data": [
+        "mne-cpp-test-data"
+      ],
       "status": "documented",
       "skigen_candidate": false,
       "documented": true,
@@ -5790,7 +5804,14 @@
       "mne_python": null,
       "sklearn": null,
       "test": null,
-      "example": null,
+      "example": "ex_inv_api",
+      "example_snippet": [
+        "ex_inv_api/main.cpp#mne_cortical_map_usage"
+      ],
+      "example_mode": "run",
+      "required_data": [
+        "mne-cpp-test-data"
+      ],
       "status": "documented",
       "skigen_candidate": false,
       "documented": true,
@@ -5869,7 +5890,14 @@
       "mne_python": null,
       "sklearn": null,
       "test": null,
-      "example": null,
+      "example": "ex_mne_api",
+      "example_snippet": [
+        "ex_mne_api/main.cpp#mne_description_parser_usage"
+      ],
+      "example_mode": "run",
+      "required_data": [
+        "mne-cpp-test-data"
+      ],
       "status": "documented",
       "skigen_candidate": false,
       "documented": true,
@@ -5987,7 +6015,14 @@
       "mne_python": null,
       "sklearn": null,
       "test": null,
-      "example": null,
+      "example": "ex_mne_api",
+      "example_snippet": [
+        "ex_mne_api/main.cpp#mne_meas_data_usage"
+      ],
+      "example_mode": "run",
+      "required_data": [
+        "mne-cpp-test-data"
+      ],
       "status": "documented",
       "skigen_candidate": false,
       "documented": true,
@@ -6005,7 +6040,14 @@
       "mne_python": null,
       "sklearn": null,
       "test": null,
-      "example": null,
+      "example": "ex_mne_api",
+      "example_snippet": [
+        "ex_mne_api/main.cpp#mne_meas_data_usage"
+      ],
+      "example_mode": "run",
+      "required_data": [
+        "mne-cpp-test-data"
+      ],
       "status": "documented",
       "skigen_candidate": false,
       "documented": true,
@@ -6101,7 +6143,14 @@
       "mne_python": null,
       "sklearn": null,
       "test": null,
-      "example": null,
+      "example": "ex_mne_api",
+      "example_snippet": [
+        "ex_mne_api/main.cpp#mne_surface_usage"
+      ],
+      "example_mode": "run",
+      "required_data": [
+        "mne-cpp-test-data"
+      ],
       "status": "documented",
       "skigen_candidate": false,
       "documented": true,
@@ -6119,7 +6168,14 @@
       "mne_python": null,
       "sklearn": null,
       "test": null,
-      "example": null,
+      "example": "ex_mne_api",
+      "example_snippet": [
+        "ex_mne_api/main.cpp#mne_surface_usage"
+      ],
+      "example_mode": "run",
+      "required_data": [
+        "mne-cpp-test-data"
+      ],
       "status": "documented",
       "skigen_candidate": false,
       "documented": true,
@@ -6243,6 +6299,8 @@
       "sklearn": null,
       "test": null,
       "example": null,
+      "example_exempt": true,
+      "example_exempt_reason": "Scratch record inside MNEProjOp::make_proj_bad that picks one projection vector onto the channel list; callers use MNEProjOp (ex_mne_api mne_raw_data_usage).",
       "status": "documented",
       "skigen_candidate": false,
       "documented": true,
@@ -6513,7 +6571,14 @@
       "mne_python": null,
       "sklearn": null,
       "test": null,
-      "example": null,
+      "example": "ex_mne_api",
+      "example_snippet": [
+        "ex_mne_api/main.cpp#mne_sss_data_usage"
+      ],
+      "example_mode": "run",
+      "required_data": [
+        "mne-cpp-test-data"
+      ],
       "status": "documented",
       "skigen_candidate": false,
       "documented": true,
@@ -6531,7 +6596,14 @@
       "mne_python": null,
       "sklearn": null,
       "test": null,
-      "example": null,
+      "example": "ex_mne_api",
+      "example_snippet": [
+        "ex_mne_api/main.cpp#mne_surface_usage"
+      ],
+      "example_mode": "run",
+      "required_data": [
+        "mne-cpp-test-data"
+      ],
       "status": "documented",
       "skigen_candidate": false,
       "documented": true,

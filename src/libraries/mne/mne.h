@@ -71,6 +71,8 @@ namespace MNELIB
 /**
  * DECLARE MNE WRAPPER CLASS
  * @brief The MNE class provides wrapper functions to stay consistent with mne matlab toolbox.
+ *
+ * @snippet ex_mne_api/main.cpp mne_facade_usage
  */
 
 class MNESHARED_EXPORT MNE

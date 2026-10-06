@@ -21,6 +21,19 @@ Note that another implementation can be found in movie_types.h
 
 The [`MNE`](/docs/api/mne/mne-class) Msh Display [FsSurface](/docs/api/fs/fs-surface) Set class holds information about a set of surfaces to be rendered.
 
+```cpp title="src/examples/ex_mne_api/main.cpp"
+// Total solid angle seen from a point: 4 pi inside a closed surface, 0 outside
+auto skull = MNESurface::read_bem_surface2(bemFile.fileName(), FIFFV_BEM_SURF_ID_BRAIN, true);
+skull->compute_surface_cm();
+const double inside = skull->sum_solids(Map<const Vector3f>(skull->cm)) / (4.0 * M_PI);
+const double outside = skull->sum_solids(Vector3f(0.0f, 0.0f, 0.2f)) / (4.0 * M_PI);
+
+// The same surface as an MNE-C viewer display surface
+MNEMshDisplaySurfaceSet display;
+display.add_bem_surface(bemFile.fileName(), FIFFV_BEM_SURF_ID_BRAIN, "inner skull", 1, 1); // checks closure
+const MNEMshDisplaySurface& shown = *display.surfs[0];
+```
+
 ---
 
 ## Public Methods
@@ -158,6 +171,12 @@ Deep-copy a light set including all individual light entries.
 - *std::unique_ptr&lt; [MNEMshLightSet](/docs/api/mne/mne-msh-light-set) &gt;* — A new deep copy. Caller takes ownership.
 
 ---
+
+## Example
+
+- Full source: [`src/examples/ex_mne_api/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_mne_api/main.cpp)
+- Build target: `ex_mne_api` (runs under CTest)
+- Data: [mne-cpp-test-data](https://github.com/mne-tools/mne-cpp-test-data)
 
 ## Authors of this file
 

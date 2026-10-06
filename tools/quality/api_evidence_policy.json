@@ -16,23 +16,12 @@
     "Settings": "Plain parameter record consumed by an algorithm class; shown inside that class's example."
   },
   "example_debt": {
-    "ceiling": 15,
+    "ceiling": 4,
     "names": [
-      "MNE",
-      "MNEClusterInfo",
-      "MNECorticalMap",
       "MNEDeriv",
       "MNEDerivSet",
-      "MNEDescriptionParser",
-      "MNEMeasData",
-      "MNEMeasDataSet",
       "MNEMorphMap",
-      "MNEMshDisplaySurface",
-      "MNEMshDisplaySurfaceSet",
-      "MNENamedVector",
-      "MNESparseNamedMatrix",
-      "MNESssData",
-      "MNESurface"
+      "MNESparseNamedMatrix"
     ]
   }
 }

@@ -7,13 +7,11 @@
  * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
  * @since    2.2.0
  * @date     April 2026
- * @brief    Vertex-to-vertex map between two cortical surfaces (e.g. subject -> fsaverage).
+ * @brief    Resolution matrix K G of an inverse operator and its forward solution.
  *
- * @ref MNELIB::MNECorticalMap stores the resampling weights used by
- * FreeSurfer's surface-based morphing: for each target-surface vertex,
- * the small set of source-surface vertices and barycentric coefficients
- * that produce its value. Read from @c .map files and assembled into a
- * sparse linear morph by @ref MNELIB::MNEMorphMap.
+ * @ref MNELIB::MNECorticalMap::makeCorticalMap multiplies the prepared inverse
+ * kernel K by the forward gain G of the kernel's channels, giving the map from
+ * true to estimated source activity (mne-python make_inverse_resolution_matrix).
  */
 
 #ifndef MNE_CORTICAL_MAP_H
@@ -56,12 +54,13 @@ class MNEInverseOperator;
 
 //=============================================================================================================
 /**
- * Cortical map interpolation: creates a mapping matrix that transforms
- * sensor-level data to source space using forward and inverse operators.
+ * Builds the resolution matrix K G that maps source activity to its estimate.
  *
- * @brief Cortical map interpolation utilities
+ * @brief Resolution matrix of an inverse operator
  *
  * @since 2.2.0
+ *
+ * @snippet ex_inv_api/main.cpp mne_cortical_map_usage
  */
 class MNESHARED_EXPORT MNECorticalMap
 {

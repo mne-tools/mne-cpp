@@ -66,6 +66,8 @@ class MNESurfacePatch;
  * Replaces  *mshDisplaySurfaceSet, mshDisplaySurfaceSetRec struct (analyze_types.c). Note that another implementation can be found in movie_types.h
  *
  * @brief The MNE Msh Display FsSurface Set class holds information about a set of surfaces to be rendered.
+ *
+ * @snippet ex_mne_api/main.cpp mne_surface_usage
  */
 class MNESHARED_EXPORT MNEMshDisplaySurfaceSet
 {

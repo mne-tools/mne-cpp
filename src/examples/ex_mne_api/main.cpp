@@ -22,20 +22,28 @@
 #include <fiff/fiff_constants.h>
 #include <fiff/fiff_coord_trans.h>
 #include <fiff/fiff_events.h>
+#include <fiff/fiff_proj.h>
 #include <fiff/fiff_evoked.h>
+#include <fiff/fiff_evoked_set.h>
 #include <fiff/fiff_raw_data.h>
 #include <fiff/fiff_stream.h>
+#include <mne/mne.h>
 #include <mne/mne_bem.h>
 #include <mne/mne_bem_surface.h>
 #include <mne/mne_ch_selection.h>
 #include <mne/mne_cov_matrix.h>
 #include <mne/mne_ctf_comp_data.h>
 #include <mne/mne_ctf_comp_data_set.h>
+#include <mne/mne_description_parser.h>
 #include <mne/mne_epoch_data.h>
 #include <mne/mne_epoch_data_list.h>
 #include <mne/mne_filter_def.h>
 #include <mne/mne_hemisphere.h>
 #include <mne/mne_icp.h>
+#include <mne/mne_meas_data.h>
+#include <mne/mne_meas_data_set.h>
+#include <mne/mne_msh_display_surface.h>
+#include <mne/mne_msh_display_surface_set.h>
 #include <mne/mne_named_matrix.h>
 #include <mne/mne_proj_item.h>
 #include <mne/mne_proj_op.h>
@@ -44,6 +52,8 @@
 #include <mne/mne_raw_data.h>
 #include <mne/mne_raw_info.h>
 #include <mne/mne_source_spaces.h>
+#include <mne/mne_sss_data.h>
+#include <mne/mne_surface.h>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -53,6 +63,7 @@
 #include <QCommandLineParser>
 #include <QDebug>
 #include <QFile>
+#include <QTemporaryDir>
 
 //=============================================================================================================
 // EIGEN INCLUDES
@@ -108,12 +119,16 @@ int main(int argc, char* argv[])
     QCommandLineOption dataOption("data", "MNE-CPP test data <dir>.", "dir",
                                   QCoreApplication::applicationDirPath() + "/../resources/data/mne-cpp-test-data");
     QCommandLineOption ctfOption("ctf", "CTF raw file stored at compensation grade 3.", "file", QString(MNE_CTF_FILE));
+    QCommandLineOption sssOption("sss", "Raw file with an SSS processing record.", "file", QString(MNE_SSS_FILE));
     parser.addOption(dataOption);
     parser.addOption(ctfOption);
+    parser.addOption(sssOption);
     parser.process(app);
     const QString data = parser.value(dataOption);
     const QString ctfPath = parser.value(ctfOption);
-    bool ok = true;
+    const QString sssPath = parser.value(sssOption);
+    QTemporaryDir tmp;
+    bool ok = tmp.isValid();
 
     //! [mne_bem_usage]
     QFile bemFile(data + "/subjects/sample/bem/sample-5120-bem.fif");
@@ -298,6 +313,91 @@ int main(int argc, char* argv[])
     // raw.apply_gradient_compensation(0): sum |MEG| over the 7 MEG channels 2.45885e-10 (1.47942e-11 as stored)
     ok &= expect(comp.ncomp == 5 && grade == 0 && third && MNECTFCompDataSet::explain_comp(third->kind) == "third order gradiometer" && third->data->nrow == 7 && near(ctf.topRows(7).cast<double>().cwiseAbs().sum(), 2.4588499274586883e-10, 1e-5),
                  "MNECTFCompDataSet/MNECTFCompData/MNENamedMatrix: grade 3 -> 0 like raw.apply_gradient_compensation");
+
+    //! [mne_description_parser_usage]
+    // An MNE-C averaging description (mne_process_raw --ave), parsed and run on the raw recording
+    const QString aveDesc = tmp.filePath("audvis.ave");
+    QFile descFile(aveDesc);
+    ok &= descFile.open(QIODevice::WriteOnly | QIODevice::Text);
+    descFile.write("average {\n"
+                   "    category {\n"
+                   "        name   \"Left Auditory\"\n"
+                   "        event  1\n"
+                   "        tmin   -0.1\n"
+                   "        tmax   0.3\n"
+                   "        bmin   -0.1\n"
+                   "        bmax   0.0\n"
+                   "    }\n"
+                   "}\n");
+    descFile.close();
+    AverageDescription averaging;
+    MNEDescriptionParser::parseAverageFile(aveDesc, averaging);
+    QString log;
+    const FiffEvokedSet averages = FiffEvokedSet::computeAverages(raw, averaging, events.events, log);
+    //! [mne_description_parser_usage]
+    // mne.Epochs(event_id=1, tmin=-0.1, tmax=0.3, baseline=(-0.1, 0)).average(): 6 epochs, |MEG| 2.01258e-13, EEG 001 at 0 s 7.77233e-10
+    const bool averaged = averaging.categories.size() == 1 && averaging.categories[0].doBaseline && averages.evoked.size() == 1;
+    ok &= expect(averaged && averages.evoked[0].nave == 6 && averages.evoked[0].data.cols() == 121 && near(averages.evoked[0].data.topRows(306).norm(), 2.0125814419559757e-13, 1e-5) && near(averages.evoked[0].data(315, 30), 7.77233498919796e-10, 1e-5),
+                 "MNEDescriptionParser: an .ave description averages like mne.Epochs with a baseline");
+
+    //! [mne_meas_data_usage]
+    // MNE-C measurement container: data set 1 of the evoked file, MEG and EEG channels, time-major
+    std::unique_ptr<MNEMeasData> meas(MNEMeasData::mne_read_meas_data(aveFile.fileName(), 1, nullptr, nullptr, {}, 0));
+    const MNEMeasDataSet& left = *meas->current;
+    const float meg0113 = left.data(180, 0); // t = 99.9 ms
+    meas->adjust_baselines(-0.2f, 0.0f);
+    VectorXf at100ms(meas->nchan);
+    left.getValuesAtTime(0.1f, 0.0f, meas->nchan, false, at100ms.data()); // linear interpolation between samples
+    //! [mne_meas_data_usage]
+    // mne.read_evokeds(condition=0, baseline=None, proj=False): 366 MEG/EEG channels, 421 samples from -199.8 ms, nave 55;
+    // MEG 0113 at sample 180 -4.74022e-12. MNE-C's baseline window stops before the sample at 0 s (120 samples, not mne's 121):
+    // EEG 001 baseline -9.38499e-06, at 100 ms (interpolated) -1.45063e-06
+    ok &= expect(meas->nchan == 366 && meas->nbad == 2 && left.np == 421 && left.nave == 55 && left.comment == "Left Auditory" && near(left.tmin, -0.19979521315838786, 1e-6) && near(meg0113, -4.740224134628893e-12, 1e-5) && near(at100ms(306), -1.4506279631761285e-06, 1e-4) && near(left.baselines(306), -9.384992481327106e-06, 1e-5),
+                 "MNEMeasData/MNEMeasDataSet: evoked set, baseline and interpolated values match mne");
+
+    //! [mne_sss_data_usage]
+    auto sss = MNESssData::read(sssPath); // the SSS block written by mne.preprocessing.maxwell_filter
+    //! [mne_sss_data_usage]
+    // maxwell_filter(origin=(0, 0, 0.04), int_order=8, ext_order=3): head frame, 306 channels, 70 of 80 internal and 15 external components
+    ok &= expect(sss && sss->job == FIFFV_SSS_JOB_FILTER && sss->coord_frame == FIFFV_COORD_HEAD && sss->nchan == 306 && sss->in_order == 8 && sss->out_order == 3 && sss->in_nuse == 70 && sss->out_nuse == 15 && std::fabs(sss->origin[2] - 0.04f) < 1e-7f,
+                 "MNESssData: Maxwell filter parameters like info['proc_history'] of the fixture");
+
+    //! [mne_facade_usage]
+    // The MNE facade mirrors the MNE-Matlab/Python toolbox functions
+    const QString eveName = tmp.filePath("audvis-eve.fif");
+    {
+        QFile eveOut(eveName);
+        MNE::write_events_to_fif(eveOut, events.events);
+    }
+    MatrixXi eventsBack;
+    MNE::read_events(eveName, rawFile.fileName(), eventsBack);
+    QList<FiffProj> projs = raw.info.projs; // stored inactive in the raw file
+    FiffProj::activate_projs(projs);
+    MatrixXd ssp; // like mne._fiff.proj.make_projector(info['projs'], ch_names, bads)
+    const int nProj = MNE::make_projector(projs, raw.info.ch_names, ssp, raw.info.bads);
+    //! [mne_facade_usage]
+    // mne.find_events: 25 events, first at sample 13988 with code 2; make_projector: 4 vectors, trace 372 of 376
+    ok &= expect(eventsBack.rows() == 25 && eventsBack(0, 0) == 13988 && eventsBack(0, 2) == 2 && nProj == 4 && near(ssp.trace(), 372.0, 1e-9) && near(ssp.norm(), 19.28730152198591, 1e-9),
+                 "MNE: event file round trip and SSP projector like mne.find_events / make_projector");
+
+    //! [mne_surface_usage]
+    // Total solid angle seen from a point: 4 pi inside a closed surface, 0 outside
+    auto skull = MNESurface::read_bem_surface2(bemFile.fileName(), FIFFV_BEM_SURF_ID_BRAIN, true);
+    skull->compute_surface_cm();
+    const double inside = skull->sum_solids(Map<const Vector3f>(skull->cm)) / (4.0 * M_PI);
+    const double outside = skull->sum_solids(Vector3f(0.0f, 0.0f, 0.2f)) / (4.0 * M_PI);
+
+    // The same surface as an MNE-C viewer display surface
+    MNEMshDisplaySurfaceSet display;
+    display.add_bem_surface(bemFile.fileName(), FIFFV_BEM_SURF_ID_BRAIN, "inner skull", 1, 1); // checks closure
+    const MNEMshDisplaySurface& shown = *display.surfs[0];
+    //! [mne_surface_usage]
+    // mne.surface._get_solids (which returns the solid angle / 2): 0.5 at the centroid, 0 at (0, 0, 200) mm;
+    // bounding box -66.7 ... 105.8 mm, centroid (0.67, -10.01, 44.26) mm
+    ok &= expect(near(inside, 1.0, 1e-6) && std::fabs(outside) < 1e-6 && (Map<const Vector3f>(skull->cm) - Vector3f(0.00067339f, -0.01001356f, 0.04426273f)).norm() < 1e-6f,
+                 "MNESurface: solid angles show the inner skull is closed, like mne._get_solids");
+    ok &= expect(display.nsurf == 1 && shown.np == 2562 && shown.surf_name == "inner skull" && near(shown.fov, 0.10576099902391434, 1e-6) && (shown.minv - Vector3f(-0.0667366f, -0.0880172f, -0.0445037f)).norm() < 1e-6f,
+                 "MNEMshDisplaySurfaceSet/MNEMshDisplaySurface: the BEM surface and its extent in the viewer");
 
     qInfo().noquote() << (ok ? "All mne checks passed." : "mne checks FAILED.");
     return ok ? EXIT_SUCCESS : EXIT_FAILURE;

@@ -50,6 +50,8 @@ namespace MNELIB
  * Replaces @c *mneMeasDataSet / @c mneMeasDataSetRec from MNE-C @c mne_types.h.
  * Holds the measured data matrix, optional projector / whitened / filtered copies,
  * baseline values, and per-epoch metadata (number of averages, time range, etc.).
+ *
+ * @snippet ex_mne_api/main.cpp mne_meas_data_usage
  */
 class MNESHARED_EXPORT MNEMeasDataSet
 {

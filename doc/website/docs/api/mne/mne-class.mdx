@@ -19,6 +19,21 @@ DECLARE [`MNE`](/docs/api/mne/mne-class) WRAPPER CLASS.
 
 The [`MNE`](/docs/api/mne/mne-class) class provides wrapper functions to stay consistent with mne matlab toolbox.
 
+```cpp title="src/examples/ex_mne_api/main.cpp"
+// The MNE facade mirrors the MNE-Matlab/Python toolbox functions
+const QString eveName = tmp.filePath("audvis-eve.fif");
+{
+    QFile eveOut(eveName);
+    MNE::write_events_to_fif(eveOut, events.events);
+}
+MatrixXi eventsBack;
+MNE::read_events(eveName, rawFile.fileName(), eventsBack);
+QList<FiffProj> projs = raw.info.projs; // stored inactive in the raw file
+FiffProj::activate_projs(projs);
+MatrixXd ssp; // like mne._fiff.proj.make_projector(info['projs'], ch_names, bads)
+const int nProj = MNE::make_projector(projs, raw.info.ch_names, ssp, raw.info.bads);
+```
+
 ---
 
 ## Public Methods
@@ -474,6 +489,12 @@ mne_transpose_named_matrix
   FiffNamedMatrix which shoul be transposed.
 
 ---
+
+## Example
+
+- Full source: [`src/examples/ex_mne_api/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_mne_api/main.cpp)
+- Build target: `ex_mne_api` (runs under CTest)
+- Data: [mne-cpp-test-data](https://github.com/mne-tools/mne-cpp-test-data)
 
 ## Authors of this file
 

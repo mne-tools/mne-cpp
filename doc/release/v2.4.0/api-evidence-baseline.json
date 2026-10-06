@@ -12,16 +12,16 @@
     "registered_stale": 0,
     "registered_with_test": 101,
     "registered_test_unresolved": 0,
-    "registered_with_example": 249,
+    "registered_with_example": 259,
     "registered_example_not_built": 0,
     "registered_with_python_equiv": 88,
     "registered_without_api_page": 0,
-    "with_snippet": 310,
+    "with_snippet": 320,
     "public_api_units": 472,
     "example_eligible": 377,
     "example_exempt": 95,
-    "eligible_backed_by_registry_example": 249,
-    "eligible_used_by_some_example": 312,
+    "eligible_backed_by_registry_example": 259,
+    "eligible_used_by_some_example": 320,
     "examples_on_disk": 68,
     "examples_built": 68
   },
@@ -166,9 +166,9 @@
       "registered": 52,
       "with_test": 5,
       "eligible": 54,
-      "eligible_with_registry_example": 21,
-      "eligible_used_by_example": 24,
-      "with_snippet": 21
+      "eligible_with_registry_example": 31,
+      "eligible_used_by_example": 32,
+      "with_snippet": 31
     },
     "mri": {
       "public": 8,
@@ -6448,7 +6448,8 @@
         "ex_dsp_rt",
         "ex_fiff_api",
         "ex_inv_dipole_fit",
-        "ex_inverse_mne"
+        "ex_inverse_mne",
+        "ex_mne_api"
       ],
       "snippets": [
         "ex_fiff_api/main.cpp#fiff_evoked_set_usage"
@@ -6474,7 +6475,8 @@
         "ex_dsp_rt",
         "ex_fiff_api",
         "ex_inv_dipole_fit",
-        "ex_inverse_mne"
+        "ex_inverse_mne",
+        "ex_mne_api"
       ],
       "snippets": [
         "ex_fiff_api/main.cpp#fiff_evoked_set_usage"
@@ -6500,7 +6502,8 @@
         "ex_dsp_rt",
         "ex_fiff_api",
         "ex_inv_dipole_fit",
-        "ex_inverse_mne"
+        "ex_inverse_mne",
+        "ex_mne_api"
       ],
       "snippets": [
         "ex_fiff_api/main.cpp#fiff_evoked_set_usage"
@@ -6526,7 +6529,8 @@
         "ex_dsp_rt",
         "ex_fiff_api",
         "ex_inv_dipole_fit",
-        "ex_inverse_mne"
+        "ex_inverse_mne",
+        "ex_mne_api"
       ],
       "snippets": [
         "ex_fiff_api/main.cpp#fiff_evoked_set_usage"
@@ -6692,7 +6696,8 @@
       "example": "ex_fiff_api",
       "example_state": "built",
       "including_examples": [
-        "ex_fiff_api"
+        "ex_fiff_api",
+        "ex_mne_api"
       ],
       "snippets": [
         "ex_fiff_api/main.cpp#fiff_proj_usage"
@@ -6898,6 +6903,7 @@
         "ex_disp_3D",
         "ex_fs",
         "ex_histogram",
+        "ex_inv_api",
         "ex_inverse_mne_raw",
         "ex_inverse_pwl_rap_music",
         "ex_inverse_rap_music",
@@ -9209,8 +9215,8 @@
       "registry_status": "documented",
       "test": null,
       "test_resolves": false,
-      "example": null,
-      "example_state": "none",
+      "example": "ex_mne_api",
+      "example_state": "built",
       "including_examples": [
         "ex_averaging",
         "ex_cancel_noise",
@@ -9230,6 +9236,7 @@
         "ex_inverse_mne_raw",
         "ex_inverse_pwl_rap_music",
         "ex_inverse_rap_music",
+        "ex_mne_api",
         "ex_read_bem",
         "ex_read_epochs",
         "ex_read_evoked",
@@ -9238,7 +9245,9 @@
         "ex_spectral",
         "ex_st_clustered_inverse_pwl_rap_music"
       ],
-      "snippets": [],
+      "snippets": [
+        "ex_mne_api/main.cpp#mne_facade_usage"
+      ],
       "api_page": "doc/website/docs/api/mne/mne-class.mdx",
       "python_equiv": null,
       "example_eligible": true,
@@ -9327,10 +9336,14 @@
       "registry_status": "documented",
       "test": null,
       "test_resolves": false,
-      "example": null,
-      "example_state": "none",
-      "including_examples": [],
-      "snippets": [],
+      "example": "ex_inv_api",
+      "example_state": "built",
+      "including_examples": [
+        "ex_inv_api"
+      ],
+      "snippets": [
+        "ex_inv_api/main.cpp#mne_cluster_info_usage"
+      ],
       "api_page": "doc/website/docs/api/mne/mne-cluster-info.mdx",
       "python_equiv": null,
       "example_eligible": true,
@@ -9346,10 +9359,14 @@
       "registry_status": "documented",
       "test": null,
       "test_resolves": false,
-      "example": null,
-      "example_state": "none",
-      "including_examples": [],
-      "snippets": [],
+      "example": "ex_inv_api",
+      "example_state": "built",
+      "including_examples": [
+        "ex_inv_api"
+      ],
+      "snippets": [
+        "ex_inv_api/main.cpp#mne_cortical_map_usage"
+      ],
       "api_page": "doc/website/docs/api/mne/mne-cortical-map.mdx",
       "python_equiv": null,
       "example_eligible": true,
@@ -9472,10 +9489,14 @@
       "registry_status": "documented",
       "test": null,
       "test_resolves": false,
-      "example": null,
-      "example_state": "none",
-      "including_examples": [],
-      "snippets": [],
+      "example": "ex_mne_api",
+      "example_state": "built",
+      "including_examples": [
+        "ex_mne_api"
+      ],
+      "snippets": [
+        "ex_mne_api/main.cpp#mne_description_parser_usage"
+      ],
       "api_page": "doc/website/docs/api/mne/mne-description-parser.mdx",
       "python_equiv": null,
       "example_eligible": true,
@@ -9603,6 +9624,7 @@
       "example": "ex_mne_api",
       "example_state": "built",
       "including_examples": [
+        "ex_inv_api",
         "ex_mne_api"
       ],
       "snippets": [
@@ -9672,10 +9694,14 @@
       "registry_status": "documented",
       "test": null,
       "test_resolves": false,
-      "example": null,
-      "example_state": "none",
-      "including_examples": [],
-      "snippets": [],
+      "example": "ex_mne_api",
+      "example_state": "built",
+      "including_examples": [
+        "ex_mne_api"
+      ],
+      "snippets": [
+        "ex_mne_api/main.cpp#mne_meas_data_usage"
+      ],
       "api_page": "doc/website/docs/api/mne/mne-meas-data.mdx",
       "python_equiv": null,
       "example_eligible": true,
@@ -9691,10 +9717,14 @@
       "registry_status": "documented",
       "test": null,
       "test_resolves": false,
-      "example": null,
-      "example_state": "none",
-      "including_examples": [],
-      "snippets": [],
+      "example": "ex_mne_api",
+      "example_state": "built",
+      "including_examples": [
+        "ex_mne_api"
+      ],
+      "snippets": [
+        "ex_mne_api/main.cpp#mne_meas_data_usage"
+      ],
       "api_page": "doc/website/docs/api/mne/mne-meas-data-set.mdx",
       "python_equiv": null,
       "example_eligible": true,
@@ -9786,10 +9816,14 @@
       "registry_status": "documented",
       "test": null,
       "test_resolves": false,
-      "example": null,
-      "example_state": "none",
-      "including_examples": [],
-      "snippets": [],
+      "example": "ex_mne_api",
+      "example_state": "built",
+      "including_examples": [
+        "ex_mne_api"
+      ],
+      "snippets": [
+        "ex_mne_api/main.cpp#mne_surface_usage"
+      ],
       "api_page": "doc/website/docs/api/mne/mne-msh-display-surface.mdx",
       "python_equiv": null,
       "example_eligible": true,
@@ -9805,12 +9839,15 @@
       "registry_status": "documented",
       "test": null,
       "test_resolves": false,
-      "example": null,
-      "example_state": "none",
+      "example": "ex_mne_api",
+      "example_state": "built",
       "including_examples": [
-        "ex_fiff_sniffer"
+        "ex_fiff_sniffer",
+        "ex_mne_api"
       ],
-      "snippets": [],
+      "snippets": [
+        "ex_mne_api/main.cpp#mne_surface_usage"
+      ],
       "api_page": "doc/website/docs/api/mne/mne-msh-display-surface-set.mdx",
       "python_equiv": null,
       "example_eligible": true,
@@ -10277,10 +10314,14 @@
       "registry_status": "documented",
       "test": null,
       "test_resolves": false,
-      "example": null,
-      "example_state": "none",
-      "including_examples": [],
-      "snippets": [],
+      "example": "ex_mne_api",
+      "example_state": "built",
+      "including_examples": [
+        "ex_mne_api"
+      ],
+      "snippets": [
+        "ex_mne_api/main.cpp#mne_sss_data_usage"
+      ],
       "api_page": "doc/website/docs/api/mne/mne-sss-data.mdx",
       "python_equiv": null,
       "example_eligible": true,
@@ -10296,10 +10337,14 @@
       "registry_status": "documented",
       "test": null,
       "test_resolves": false,
-      "example": null,
-      "example_state": "none",
-      "including_examples": [],
-      "snippets": [],
+      "example": "ex_mne_api",
+      "example_state": "built",
+      "including_examples": [
+        "ex_mne_api"
+      ],
+      "snippets": [
+        "ex_mne_api/main.cpp#mne_surface_usage"
+      ],
       "api_page": "doc/website/docs/api/mne/mne-surface.mdx",
       "python_equiv": null,
       "example_eligible": true,

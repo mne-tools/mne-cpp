@@ -80,6 +80,8 @@ class MNENamedMatrix;
  * Replaces @c *mneMeasData / @c mneMeasDataRec from MNE-C @c mne_types.h.
  * Holds channel information, coordinate transforms, projection operators,
  * and one or more MNEMeasDataSet epochs loaded from a FIFF evoked-response file.
+ *
+ * @snippet ex_mne_api/main.cpp mne_meas_data_usage
  */
 class MNESHARED_EXPORT MNEMeasData
 {

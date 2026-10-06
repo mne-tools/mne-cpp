@@ -24,7 +24,7 @@ Morphs source estimates from one subject's source space to another.
 Usage:
 
 ```cpp title="src/examples/ex_inv_api/main.cpp"
-// Morph the 70 V1 sources onto 35 targets by averaging neighbouring pairs (an MNEMorphMap in practice).
+// Morph the 70 V1 sources onto 35 targets by averaging neighbouring pairs (a sphere-based morph map in practice).
 SparseMatrix<double> pairAverage(35, 70);
 for (int i = 0; i < 35; ++i) {
     pairAverage.insert(i, 2 * i) = 0.5;
