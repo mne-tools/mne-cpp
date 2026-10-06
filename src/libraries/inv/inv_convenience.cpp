@@ -29,6 +29,7 @@
 #include <fiff/fiff_cov.h>
 #include <fiff/fiff_info.h>
 #include <fiff/fiff_proj.h>
+#include <math/numerics.h>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -101,35 +102,6 @@ VectorXd computeRowPsd(const VectorXd& row, int nFft, double sfreq)
     }
 
     return psd;
-}
-
-/**
- * Value exceeded by a chi^2 variable with @p dof degrees of freedom with probability @p p
- * (scipy.stats.chi2.isf). P(a, x) is summed from its power series, A&S 6.5.29, and the
- * quantile bisected; Q = 1 - P keeps ~1e-13 relative accuracy for the p = 1e-3 used here.
- */
-double chi2Isf(double p, int dof)
-{
-    const double a = 0.5 * dof;
-    auto upperTail = [a](double chi2) {
-        const double x = 0.5 * chi2;
-        double term = 1.0;
-        double sum = 1.0;
-        for (int n = 1; n < 100000 && term > 1e-17 * sum; ++n) {
-            term *= x / (a + n);
-            sum += term;
-        }
-        return 1.0 - sum * std::exp(a * std::log(x) - x - std::lgamma(a + 1.0));
-    };
-    double lo = 0.0;
-    double hi = dof + 10.0 * std::sqrt(2.0 * dof) + 50.0;
-    while (upperTail(hi) > p)
-        hi *= 2.0;
-    for (int i = 0; i < 200 && hi - lo > 1e-14 * hi; ++i) {
-        const double mid = 0.5 * (lo + hi);
-        (upperTail(mid) > p ? lo : hi) = mid;
-    }
-    return 0.5 * (lo + hi);
 }
 
 } // anonymous namespace
@@ -250,7 +222,7 @@ QPair<VectorXd, VectorXd> INVLIB::estimateSnr(
     }
 
     const ArrayXd sing2 = inv.sing.array().square();
-    const double limit = chi2Isf(1e-3, rank);
+    const double limit = UTILSLIB::Numerics::chi2Isf(1e-3, rank);
     bool converged = false;
     for (int iter = 0; iter < 1000 && !converged; ++iter) {
         converged = true;

@@ -93,6 +93,34 @@ int Numerics::nchoose2(int n)
 
 //=============================================================================================================
 
+double Numerics::chi2Isf(double p, int dof)
+{
+    // P(a, x) summed from its power series (A&S 6.5.29), the quantile bisected; Q = 1 - P keeps
+    // ~1e-13 relative accuracy for the p = 1e-3 the inverse SNR estimates use.
+    const double a = 0.5 * dof;
+    auto upperTail = [a](double chi2) {
+        const double x = 0.5 * chi2;
+        double term = 1.0;
+        double sum = 1.0;
+        for (int n = 1; n < 100000 && term > 1e-17 * sum; ++n) {
+            term *= x / (a + n);
+            sum += term;
+        }
+        return 1.0 - sum * std::exp(a * std::log(x) - x - std::lgamma(a + 1.0));
+    };
+    double lo = 0.0;
+    double hi = dof + 10.0 * std::sqrt(2.0 * dof) + 50.0;
+    while (upperTail(hi) > p)
+        hi *= 2.0;
+    for (int i = 0; i < 200 && hi - lo > 1e-14 * hi; ++i) {
+        const double mid = 0.5 * (lo + hi);
+        (upperTail(mid) > p ? lo : hi) = mid;
+    }
+    return 0.5 * (lo + hi);
+}
+
+//=============================================================================================================
+
 MatrixXd Numerics::rescale(const MatrixXd& data,
                            const RowVectorXf& times,
                            const QPair<float, float>& baseline,

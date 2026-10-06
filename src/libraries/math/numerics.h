@@ -113,6 +113,17 @@ public:
 
     //=========================================================================================================
     /**
+     * Value a chi^2 variable exceeds with probability @p p (@c scipy.stats.chi2.isf).
+     *
+     * @param[in] p     Upper-tail probability.
+     * @param[in] dof   Degrees of freedom.
+     *
+     * @return The quantile.
+     */
+    static double chi2Isf(double p, int dof);
+
+    //=========================================================================================================
+    /**
      * Rescale (baseline correct) data.
      *
      * @param[in] data           Data Matrix (m x n_time).
