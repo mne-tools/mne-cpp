@@ -54,6 +54,10 @@ namespace UTILSLIB
  * Mirrors the IirFilter API:
  *
  * @snippet ex_dsp_analysis/main.cpp fir_filter_usage
+ *
+ * designMne / filterData reproduce mne.filter.create_filter / filter_data:
+ *
+ * @snippet ex_dsp_analysis/main.cpp fir_filter_mne_usage
  */
 class DSPSHARED_EXPORT FirFilter
 {
@@ -152,6 +156,35 @@ public:
     static Eigen::MatrixXd applyZeroPhaseMatrix(const Eigen::MatrixXd& matData,
                                                 FilterKernel& kernel,
                                                 const Eigen::RowVectorXi& vecPicks = Eigen::RowVectorXi());
+
+    //=========================================================================================================
+    /**
+     * Designs the zero-phase FIR filter of @c mne.filter.create_filter with its defaults: firwin
+     * design with a Hamming window, "auto" transition bands (min(max(0.25 f, 2 Hz), f) below,
+     * min(max(0.25 f, 2 Hz), Nyquist - f) above) and "auto" length 3.3 / narrowest band.
+     *
+     * @param[in] dSFreq   Sampling frequency in Hz.
+     * @param[in] dLFreq   High-pass edge in Hz, or a negative value for a low-pass.
+     * @param[in] dHFreq   Low-pass edge in Hz, or a negative value for a high-pass.
+     *
+     * @return The odd-length impulse response.
+     */
+    static Eigen::RowVectorXd designMne(double dSFreq, double dLFreq, double dHFreq);
+
+    //=========================================================================================================
+    /**
+     * Filters every row like @c mne.filter.filter_data with its FIR defaults: the designMne
+     * kernel applied by overlap-add with zero phase, each row padded by reflecting it about
+     * its end samples ("reflect_limited").
+     *
+     * @param[in] matData   Data, one row per channel.
+     * @param[in] dSFreq    Sampling frequency in Hz.
+     * @param[in] dLFreq    High-pass edge in Hz, or a negative value for a low-pass.
+     * @param[in] dHFreq    Low-pass edge in Hz, or a negative value for a high-pass.
+     *
+     * @return The filtered data.
+     */
+    static Eigen::MatrixXd filterData(const Eigen::MatrixXd& matData, double dSFreq, double dLFreq, double dHFreq);
 };
 
 } // namespace UTILSLIB

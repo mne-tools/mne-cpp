@@ -120,6 +120,14 @@ int main(int argc, char* argv[])
     ok &= expect(smooth.size() == tones.size() && std::fabs(kept - 1.0) < 0.02 && removed < 0.01,
                  QString("FirFilter 20 Hz low-pass keeps 10 Hz (%1) and removes 40 Hz (%2)").arg(kept, 0, 'f', 4).arg(removed, 0, 'f', 4));
 
+    //! [fir_filter_mne_usage]
+    const RowVectorXd mneKernel = FirFilter::designMne(sFreq, -1.0, 20.0);   // mne.filter.create_filter defaults: 165 taps
+    const MatrixXd mneLow = FirFilter::filterData(tones, sFreq, -1.0, 20.0); // mne.filter.filter_data(x, 250, None, 20)
+    //! [fir_filter_mne_usage]
+    // mne.filter.filter_data(tones, 250, None, 20, fir_design="firwin"): y[500] = 1.252432598430886e-4, sum |y| = 635.2187231296152
+    ok &= expect(mneKernel.size() == 165 && std::fabs(mneLow(0, 500) - 1.252432598430886e-4) < 1e-12 && std::fabs(mneLow.cwiseAbs().sum() - 635.2187231296152) < 1e-9,
+                 QString("FirFilter::filterData = mne.filter.filter_data (y[500] = %1)").arg(mneLow(0, 500), 0, 'g', 12));
+
     // sin(t/40) + 0.3 sin(t/7) + slow drift
     VectorXd wave(200);
     for (int t = 0; t < wave.size(); ++t) {

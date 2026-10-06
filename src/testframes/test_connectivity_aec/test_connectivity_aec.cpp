@@ -198,6 +198,16 @@ void TestConnectivityAec::testHilbertEnvelope()
     VectorXd nyquist(8);
     nyquist << 1, -1, 1, -1, 1, -1, 1, -1;
     QVERIFY((ConnectivityAec::hilbertEnvelope(nyquist).array() - 1.0).abs().maxCoeff() < 1e-12);
+
+    // Odd length, with and without zero padding: np.abs(scipy.signal.hilbert(x, N))[:11]
+    VectorXd x(11);
+    for (int t = 0; t < 11; ++t)
+        x(t) = std::sin(0.37 * t) + 0.2 * std::cos(1.9 * t);
+    const VectorXd plain = ConnectivityAec::hilbertEnvelope(x);
+    const VectorXd padded = ConnectivityAec::hilbertEnvelope(x, 16);
+    QCOMPARE(padded.size(), Index(11));
+    QVERIFY(std::fabs(plain(3) - 1.1435319204801477) < 1e-12 && std::fabs(plain.sum() - 8.30721257858724) < 1e-12);
+    QVERIFY(std::fabs(padded(3) - 1.1546371765124595) < 1e-12 && std::fabs(padded.sum() - 8.612710849272082) < 1e-12);
 }
 
 //=============================================================================================================

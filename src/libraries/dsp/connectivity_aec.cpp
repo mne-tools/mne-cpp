@@ -20,9 +20,10 @@
 // STD INCLUDES
 //=============================================================================================================
 
+#include <algorithm>
 #include <cmath>
-#include <complex>
-#include <vector>
+
+#include <unsupported/Eigen/FFT>
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -30,61 +31,6 @@
 
 using namespace UTILSLIB;
 using namespace Eigen;
-
-//=============================================================================================================
-// STATIC HELPERS
-//=============================================================================================================
-
-namespace
-{
-
-// Simple DFT-based Hilbert transform (no external FFT library needed)
-// For production use, this should be replaced with an FFT-based implementation
-void dftHilbert(const VectorXd& input, VectorXd& envelope)
-{
-    const int n = static_cast<int>(input.size());
-    envelope.resize(n);
-
-    if (n == 0)
-        return;
-
-    // Compute DFT
-    std::vector<std::complex<double>> X(static_cast<size_t>(n));
-    for (int k = 0; k < n; ++k) {
-        std::complex<double> sum(0.0, 0.0);
-        for (int t = 0; t < n; ++t) {
-            double angle = -2.0 * M_PI * k * t / n;
-            sum += input[t] * std::complex<double>(std::cos(angle), std::sin(angle));
-        }
-        X[static_cast<size_t>(k)] = sum;
-    }
-
-    // Apply Hilbert transform in frequency domain:
-    // H[0] = X[0], H[N/2] = X[N/2]
-    // H[k] = 2*X[k] for 0 < k < N/2
-    // H[k] = 0       for N/2 < k < N
-    std::vector<std::complex<double>> H(static_cast<size_t>(n));
-    H[0] = X[0];
-    for (int k = 1; k < (n + 1) / 2; ++k)
-        H[static_cast<size_t>(k)] = 2.0 * X[static_cast<size_t>(k)];
-    if (n % 2 == 0)
-        H[static_cast<size_t>(n / 2)] = X[static_cast<size_t>(n / 2)];
-    for (int k = n / 2 + 1; k < n; ++k) // keeps the Nyquist bin set above for even n
-        H[static_cast<size_t>(k)] = std::complex<double>(0.0, 0.0);
-
-    // Inverse DFT to get analytic signal
-    for (int t = 0; t < n; ++t) {
-        std::complex<double> sum(0.0, 0.0);
-        for (int k = 0; k < n; ++k) {
-            double angle = 2.0 * M_PI * k * t / n;
-            sum += H[static_cast<size_t>(k)] * std::complex<double>(std::cos(angle), std::sin(angle));
-        }
-        sum /= static_cast<double>(n);
-        envelope[t] = std::abs(sum);
-    }
-}
-
-} // anonymous namespace
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS
@@ -173,11 +119,30 @@ MatrixXd ConnectivityAec::computeOrthogonalized(const MatrixXd& matData)
 
 //=============================================================================================================
 
-VectorXd ConnectivityAec::hilbertEnvelope(const VectorXd& signal)
+VectorXd ConnectivityAec::hilbertEnvelope(const VectorXd& signal, int nFft)
 {
-    VectorXd env;
-    dftHilbert(signal, env);
-    return env;
+    const Index n = signal.size();
+    const Index nPad = std::max<Index>(nFft, n);
+    if (n == 0) {
+        return VectorXd();
+    }
+    VectorXd padded = VectorXd::Zero(nPad);
+    padded.head(n) = signal;
+
+    FFT<double> fft;
+    fft.SetFlag(FFT<double>::HalfSpectrum);
+    VectorXcd half;
+    fft.fwd(half, padded);
+
+    // Analytic spectrum: DC and (even length) Nyquist kept, positive frequencies doubled, negative zeroed
+    VectorXcd spec = VectorXcd::Zero(nPad);
+    spec.head(half.size()) = half;
+    spec.segment(1, (nPad - 1) / 2) *= 2.0;
+
+    fft.ClearFlag(FFT<double>::HalfSpectrum);
+    VectorXcd analytic;
+    fft.inv(analytic, spec);
+    return analytic.head(n).cwiseAbs();
 }
 
 //=============================================================================================================

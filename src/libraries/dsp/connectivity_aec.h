@@ -72,13 +72,15 @@ public:
 
     //=========================================================================================================
     /**
-     * Compute the analytic signal envelope via Hilbert transform (using FFT).
+     * Compute the analytic signal envelope via Hilbert transform (using FFT), like
+     * @c numpy.abs(scipy.signal.hilbert(signal, N=nFft)[:n_samples]).
      *
      * @param[in] signal  Real-valued signal (n_samples).
+     * @param[in] nFft    FFT length (zero padding), at least n_samples; 0 for n_samples.
      *
      * @return Envelope (n_samples) — absolute value of analytic signal.
      */
-    static Eigen::VectorXd hilbertEnvelope(const Eigen::VectorXd& signal);
+    static Eigen::VectorXd hilbertEnvelope(const Eigen::VectorXd& signal, int nFft = 0);
 
     //=========================================================================================================
     /**
