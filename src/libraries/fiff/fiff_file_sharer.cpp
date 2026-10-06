@@ -60,20 +60,25 @@ FiffFileSharer::FiffFileSharer(const QString& sDirName)
 
 void FiffFileSharer::copyRealtimeFile(const QString& sSourcePath)
 {
-    if (initSharedDirectory()) {
-        QString sFilePath(m_sDirectory + "/" + m_sDefaultFileName + QString::number(m_iFileIndex++) + "_raw.fif");
+    if (!initSharedDirectory())
+        return;
 
-        if (QFile::copy(sSourcePath, sFilePath)) {
-            QFile newFile(sFilePath);
-            if (newFile.open(QIODevice::ReadWrite)) {
-                FIFFLIB::FiffStream stream(&newFile);
-                stream.skipRawData(newFile.bytesAvailable());
-                stream.finish_writing_raw();
+    // Complete the copy under a temporary name and rename it, so the watcher never sees a half-written file.
+    const QString sFilePath(m_sDirectory + "/" + m_sDefaultFileName + QString::number(m_iFileIndex++) + "_raw.fif");
+    const QString sPartPath(sFilePath + ".part");
+    QFile::remove(sPartPath);
+    if (!QFile::copy(sSourcePath, sPartPath))
+        return;
 
-                newFile.close();
-            }
-        }
+    QFile newFile(sPartPath);
+    if (newFile.open(QIODevice::ReadWrite)) {
+        FIFFLIB::FiffStream stream(&newFile);
+        stream.skipRawData(newFile.bytesAvailable());
+        stream.finish_writing_raw();
+        newFile.close();
     }
+    QFile::remove(sFilePath);
+    QFile::rename(sPartPath, sFilePath);
 }
 
 //=============================================================================================================
@@ -85,8 +90,6 @@ void FiffFileSharer::initWatcher()
         m_fileWatcher.addPath(m_sDirectory);
         connect(&m_fileWatcher, &QFileSystemWatcher::directoryChanged,
                 this, &FiffFileSharer::onDirectoryChanged, Qt::UniqueConnection);
-        connect(&m_fileWatcher, &QFileSystemWatcher::fileChanged,
-                this, &FiffFileSharer::onFileChanged, Qt::UniqueConnection);
     } else {
         qWarning() << "[FiffFileSharer::initWatcher] Unable to initilaize shared directory";
     }
@@ -108,18 +111,12 @@ void FiffFileSharer::clearSharedDirectory()
 
 void FiffFileSharer::onDirectoryChanged(const QString& sPath)
 {
+    // Files appear complete (renamed into place), so every new one can be reported as soon as it is listed.
     QString filePath(sPath + "/" + m_sDefaultFileName + QString::number(m_iFileIndex) + "_raw.fif");
-    m_fileWatcher.addPath(filePath);
-}
-
-//=============================================================================================================
-
-void FiffFileSharer::onFileChanged(const QString& sPath)
-{
-    emit newFileAtPath(sPath);
-    m_fileWatcher.removePath(sPath);
-
-    m_iFileIndex++;
+    while (QFile::exists(filePath)) {
+        emit newFileAtPath(filePath);
+        filePath = sPath + "/" + m_sDefaultFileName + QString::number(++m_iFileIndex) + "_raw.fif";
+    }
 }
 
 //=============================================================================================================

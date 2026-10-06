@@ -12,6 +12,7 @@
 //=============================================================================================================
 
 #include <QtTest/QtTest>
+#include <QDir>
 #include <QFile>
 #include <QBuffer>
 #include <QTemporaryDir>
@@ -604,10 +605,28 @@ void TestFiffIoEvokedInfo::fileSharer_defaultConstruction()
 
 void TestFiffIoEvokedInfo::fileSharer_withDirectory()
 {
+    // A producer copies two recordings into the shared directory; the consumer is told about both, and each file
+    // is complete (it reads back with all samples) by the time it is announced.
     QTemporaryDir tmpDir;
     QVERIFY(tmpDir.isValid());
-    FiffFileSharer sharer(tmpDir.path());
-    QVERIFY(true); // Construction with valid directory shouldn't crash
+    const QString previous = QDir::currentPath();
+    QDir::setCurrent(tmpDir.path());
+    FiffFileSharer consumer("shared");
+    QSignalSpy arrived(&consumer, &FiffFileSharer::newFileAtPath);
+    consumer.initWatcher();
+    FiffFileSharer producer("shared");
+    producer.copyRealtimeFile(rawPath());
+    producer.copyRealtimeFile(rawPath());
+    QTRY_COMPARE_WITH_TIMEOUT(arrived.count(), 2, 10000);
+    QDir::setCurrent(previous);
+
+    for (const QList<QVariant>& signal : arrived) {
+        QFile file(signal.at(0).toString());
+        const FiffRawData raw(file);
+        QCOMPARE(raw.last_samp - raw.first_samp + 1, 6007);
+    }
+    QVERIFY(arrived.at(0).at(0).toString().endsWith("realtime_file0_raw.fif"));
+    QVERIFY(arrived.at(1).at(0).toString().endsWith("realtime_file1_raw.fif"));
 }
 
 //=============================================================================================================
