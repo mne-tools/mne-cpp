@@ -296,7 +296,7 @@ bool MNESourceSpaces::readFromStream(FiffStream::SPtr& p_pStream,
         //           src(k) = this;
     }
 
-    qInfo("\t%lld source spaces read\n", spaces.size());
+    qInfo("\t%lld source spaces read\n", static_cast<long long>(spaces.size()));
 
     if (open_here)
         p_pStream->close();

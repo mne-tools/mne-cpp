@@ -1653,17 +1653,12 @@ void BrainView::render(QRhiCommandBuffer* cb)
     // sequentially here would leave only the last pane's vertex colours.
     {
         QRhiResourceUpdateBatch* preUpload = rhi()->nextResourceUpdateBatch();
+#ifndef __EMSCRIPTEN__
+        // WORKAROUND(QRhi-GLES2): WASM draws all geometry from merged per-category buffers;
+        // per-surface uploads would pollute the GLES2 element-buffer bindings.
         for (auto it = m_surfaces.begin(); it != m_surfaces.end(); ++it) {
-#ifdef __EMSCRIPTEN__
-            // WORKAROUND(QRhi-GLES2): Per-surface GPU buffers are unused on
-            // WASM — all geometry is drawn via merged per-category buffers.
-            // Skip individual uploads to avoid polluting GLES2
-            // element-buffer bindings.
-            continue;
-#endif
             it.value()->updateBuffers(rhi(), preUpload);
         }
-#ifndef __EMSCRIPTEN__
         if (m_debugPointerSurface) {
             m_debugPointerSurface->updateBuffers(rhi(), preUpload);
         }
@@ -1847,7 +1842,6 @@ void BrainView::render(QRhiCommandBuffer* cb)
         // Pass 1: Opaque Surfaces (Brain surfaces)
         // Use viewport-specific shader from subview
         BrainRenderer::ShaderMode currentShader = sv.brainShader;
-        BrainRenderer::ShaderMode currentBemShader = sv.bemShader;
         const QString overlayName = visualizationModeName(sv.overlayMode);
 
         // Collect matched brain surface keys for this pane's info panel
@@ -1867,22 +1861,17 @@ void BrainView::render(QRhiCommandBuffer* cb)
                     .arg(shaderModeName(currentShader), sv.surfaceType, overlayName));
         }
 
+#ifndef __EMSCRIPTEN__
+        // WORKAROUND(QRhi-GLES2): WASM draws brain surfaces from a merged per-category buffer below.
         for (auto it = m_surfaces.begin(); it != m_surfaces.end(); ++it) {
             if (!sv.matchesSurfaceType(it.key()))
                 continue;
             if (!sv.shouldRenderSurface(it.key()))
                 continue;
-
-#ifdef __EMSCRIPTEN__
-            // WORKAROUND(QRhi-GLES2): Brain surfaces drawn via merged
-            // per-category buffer (one drawIndexed per render pass).
-            continue;
-#endif
-#ifndef __EMSCRIPTEN__
             drawnKeys << it.key();
-#endif
             m_renderer->renderSurface(cb, rhi(), sceneData, it.value().get(), currentShader);
         }
+#endif
 
 #ifndef __EMSCRIPTEN__
         // Update info panel with drawn brain surface keys after rendering
@@ -1920,6 +1909,7 @@ void BrainView::render(QRhiCommandBuffer* cb)
         // Determine per-viewport field-map visibility
         const bool megFieldVisible = sv.visibility.megFieldMap;
         const bool eegFieldVisible = sv.visibility.eegFieldMap;
+        const BrainRenderer::ShaderMode currentBemShader = sv.bemShader;
         const QString& megFieldKey = m_fieldMapper.megSurfaceKey();
         const QString& eegFieldKey = m_fieldMapper.eegSurfaceKey();
 

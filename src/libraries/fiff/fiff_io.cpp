@@ -225,7 +225,7 @@ bool FiffIO::write(QFile& p_QFile,
             } else {
                 FiffIO::write_raw(p_QFile, idx);
             }
-            qInfo("\nFinished Writing %lli raw data sets!\n", m_qlistRaw.size());
+            qInfo("\nFinished Writing %lld raw data sets!\n", static_cast<long long>(m_qlistRaw.size()));
         }
         case FIFFB_EVOKED:
 

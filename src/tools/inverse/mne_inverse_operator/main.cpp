@@ -461,7 +461,7 @@ int main(int argc, char* argv[])
         qInfo("Reading SSP projectors from %s...",
               projFileName.toUtf8().constData());
         QList<FiffProj> fileProjs = readProjFile(projFileName);
-        qInfo("  Found %lld projectors.", fileProjs.size());
+        qInfo("  Found %lld projectors.", static_cast<long long>(fileProjs.size()));
         extraProjs.append(fileProjs);
     }
 

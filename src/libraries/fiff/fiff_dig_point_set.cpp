@@ -241,7 +241,7 @@ void FiffDigPointSet::writeToStream(FiffStream* p_pStream)
         p_pStream->write_dig_point(m_qListDigPoint[h]);
     }
 
-    qInfo("\t%lld digitizer points written\n", m_qListDigPoint.size());
+    qInfo("\t%lld digitizer points written\n", static_cast<long long>(m_qListDigPoint.size()));
     p_pStream->end_block(FIFFB_ISOTRAK);
     p_pStream->end_block(FIFFB_MEAS_INFO);
     p_pStream->end_block(FIFFB_MEAS);

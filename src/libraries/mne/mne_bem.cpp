@@ -150,7 +150,7 @@ bool MNEBem::readFromStream(FiffStream::SPtr& p_pStream, bool add_geom, MNEBem& 
         //           src(k) = this;
     }
 
-    qInfo("\t%lld bem surfaces read\n", bemsurf.size());
+    qInfo("\t%lld bem surfaces read\n", static_cast<long long>(bemsurf.size()));
 
     if (open_here) {
         p_pStream->close();
@@ -308,7 +308,7 @@ void MNEBem::writeToStream(FiffStream* p_pStream)
         p_pStream->end_block(FIFFB_BEM_SURF);
         qInfo("[done]\n");
     }
-    qInfo("\t%lld bem surfaces written\n", m_qListBemSurface.size());
+    qInfo("\t%lld bem surfaces written\n", static_cast<long long>(m_qListBemSurface.size()));
     p_pStream->end_block(FIFFB_BEM);
 }
 

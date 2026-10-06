@@ -114,12 +114,12 @@ void FiffId::clear()
 bool FiffId::get_machid(int* fixed_id)
 {
     QList<QString> possibleHardwareAdresses;
+    fixed_id[0] = 0;
+    fixed_id[1] = 0;
 
 #ifndef __EMSCRIPTEN__
     QList<QNetworkInterface> ifaces = QNetworkInterface::allInterfaces();
 
-    fixed_id[0] = 0;
-    fixed_id[1] = 0;
     if (!ifaces.isEmpty()) {
         for (int i = 0; i < ifaces.size(); ++i) {
             unsigned int flags = ifaces[i].flags();

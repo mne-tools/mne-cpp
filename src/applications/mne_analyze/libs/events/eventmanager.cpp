@@ -607,6 +607,8 @@ void EventManager::initSharedMemory(SharedMemoryMode mode)
 {
 #ifndef NO_IPC
     m_pSharedMemManager->init(mode);
+#else
+    Q_UNUSED(mode)
 #endif
 }
 

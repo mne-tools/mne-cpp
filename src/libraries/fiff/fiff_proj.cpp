@@ -93,7 +93,7 @@ void FiffProj::activate_projs(QList<FiffProj>& p_qListFiffProj)
     for (it = p_qListFiffProj.begin(); it != p_qListFiffProj.end(); ++it)
         it->active = true;
 
-    qInfo("\t%lld projection items activated.\n", p_qListFiffProj.size());
+    qInfo("\t%lld projection items activated.\n", static_cast<long long>(p_qListFiffProj.size()));
 }
 
 //=============================================================================================================

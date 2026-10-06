@@ -324,7 +324,7 @@ void DipoleObject::updateBuffers(QRhi* rhi, QRhiResourceUpdateBatch* u)
     }
 
     if (m_instancesDirty && m_instanceCount > 0) {
-        if (!m_gpu->instanceBuffer || m_gpu->instanceBuffer->size() < m_instanceData.size()) {
+        if (!m_gpu->instanceBuffer || static_cast<qsizetype>(m_gpu->instanceBuffer->size()) < m_instanceData.size()) {
             m_gpu->instanceBuffer.reset(rhi->newBuffer(QRhiBuffer::Dynamic, QRhiBuffer::VertexBuffer, m_instanceData.size()));
             m_gpu->instanceBuffer->create();
             qDebug() << "DipoleObject: Created instance buffer size" << m_instanceData.size();

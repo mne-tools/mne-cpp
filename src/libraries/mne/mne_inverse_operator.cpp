@@ -656,7 +656,7 @@ MNEInverseOperator MNEInverseOperator::make_inverse_operator(const FiffInfo& inf
             }
         }
     }
-    qInfo("\tComputing inverse operator with %lld channels.\n", gain_info.ch_names.size());
+    qInfo("\tComputing inverse operator with %lld channels.\n", static_cast<long long>(gain_info.ch_names.size()));
 
     //
     // 6. Compose the source covariance matrix

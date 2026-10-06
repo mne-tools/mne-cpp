@@ -193,7 +193,7 @@ bool FiffEvoked::read(QIODevice& p_IODevice,
             QString t;
             if (!t_pStream->get_evoked_entries(evoked_node, comments, aspect_kinds, t))
                 t = QString("None found, must use integer");
-            qWarning("%lld datasets present, setno parameter must be set. Candidate setno names:\n%s", evoked_node.size(), t.toUtf8().constData());
+            qWarning("%lld datasets present, setno parameter must be set. Candidate setno names:\n%s", static_cast<long long>(evoked_node.size()), t.toUtf8().constData());
             return false;
         } else
             setno = 0;
@@ -240,7 +240,7 @@ bool FiffEvoked::read(QIODevice& p_IODevice,
     QList<FiffDirNode::SPtr> aspects = my_evoked->dir_tree_find(FIFFB_ASPECT);
 
     if (aspects.size() > 1)
-        qInfo("\tMultiple (%lld) aspects found. Taking first one.\n", aspects.size());
+        qInfo("\tMultiple (%lld) aspects found. Taking first one.\n", static_cast<long long>(aspects.size()));
 
     FiffDirNode::SPtr my_aspect = aspects[0];
 
@@ -309,7 +309,7 @@ bool FiffEvoked::read(QIODevice& p_IODevice,
     qInfo("\tFound the data of interest:\n");
     qInfo("\t\tt = %10.2f ... %10.2f ms (%s)\n", 1000 * static_cast<float>(first) / info.sfreq, 1000 * static_cast<float>(last) / info.sfreq, comment.toUtf8().constData());
     if (info.comps.size() > 0)
-        qInfo("\t\t%lld CTF compensation matrices available\n", info.comps.size());
+        qInfo("\t\t%lld CTF compensation matrices available\n", static_cast<long long>(info.comps.size()));
 
     //
     // Read the data in the aspect block

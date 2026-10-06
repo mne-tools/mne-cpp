@@ -1184,7 +1184,7 @@ bool MNEForwardSolution::read(QIODevice& p_IODevice,
     if (bExcludeBads) {
         bads = t_pStream->read_bad_channels(t_pStream->dirtree());
         if (bads.size() > 0) {
-            qInfo("\t%lld bad channels ( ", bads.size());
+            qInfo("\t%lld bad channels ( ", static_cast<long long>(bads.size()));
             for (qint32 i = 0; i < bads.size(); ++i)
                 qInfo("\"%s\" ", bads[i].toUtf8().constData());
             qInfo(") read");
@@ -1490,7 +1490,7 @@ void MNEForwardSolution::restrict_gain_matrix(MatrixXd& G, const FiffInfo& info)
 {
     // Figure out which ones have been used
     if (info.chs.size() != G.rows()) {
-        qWarning("Error G.rows() and length of info.chs do not match: %ld != %lli", G.rows(), info.chs.size());
+        qWarning("Error G.rows() and length of info.chs do not match: %lld != %lld", static_cast<long long>(G.rows()), static_cast<long long>(info.chs.size()));
         return;
     }
 

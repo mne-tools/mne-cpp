@@ -64,7 +64,7 @@ void MNE::setup_compensators(FiffRawData& raw,
             raw.info.projs[k].active = true;
         }
 
-        qInfo("%lld projection items activated\n", raw.info.projs.size());
+        qInfo("%lld projection items activated\n", static_cast<long long>(raw.info.projs.size()));
         // Create the projector
         //        fiff_int_t nproj = MNE::make_projector_info(raw.info, raw.proj); Using the member function instead
         fiff_int_t nproj = raw.info.make_projector(raw.proj);

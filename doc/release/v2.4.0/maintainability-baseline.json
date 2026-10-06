@@ -3,7 +3,7 @@
   "generated_by": "tools/quality/audit_maintainability.py",
   "policy": "tools/quality/maintainability_policy.json",
   "scanned_files": 1508,
-  "scanned_lines": 394916,
+  "scanned_lines": 394877,
   "oversized_threshold": 2000,
   "metrics": {
     "null_macro": {
@@ -548,10 +548,10 @@
       }
     },
     "qt_new_unparented": {
-      "total": 825,
-      "files": 83,
+      "total": 823,
+      "files": 81,
       "by_scope": {
-        "applications": 715,
+        "applications": 713,
         "libraries": 108,
         "tools": 2
       },
@@ -577,8 +577,6 @@
         "src/applications/mne_align/align_wizard.cpp": 53,
         "src/applications/mne_analyze/libs/anShared/Management/analyzedata.h": 2,
         "src/applications/mne_analyze/libs/anShared/Management/statusbar.cpp": 3,
-        "src/applications/mne_analyze/libs/anShared/Model/eventmodel.cpp": 1,
-        "src/applications/mne_analyze/libs/anShared/Model/fiffrawviewmodel.cpp": 1,
         "src/applications/mne_analyze/mne_analyze/mainwindow.cpp": 9,
         "src/applications/mne_analyze/plugins/averaging/averaging.cpp": 7,
         "src/applications/mne_analyze/plugins/channelselection/channelselection.cpp": 6,
@@ -670,7 +668,7 @@
       "top": {
         "src/applications/mne_analyze_studio/workbench/mainwindow.cpp": 9128,
         "src/applications/mne_browse/Windows/mainwindow.cpp": 4574,
-        "src/libraries/disp3D/view/brainview.cpp": 3907,
+        "src/libraries/disp3D/view/brainview.cpp": 3897,
         "src/applications/mne_inspect/app/mainwindow.cpp": 3573,
         "src/libraries/fiff/fiff_stream.cpp": 3413,
         "src/libraries/fwd/fwd_bem_model.cpp": 3368,
@@ -682,7 +680,7 @@
         "src/applications/mne_browse/Windows/mainwindow.cpp": 4574,
         "src/applications/mne_inspect/app/mainwindow.cpp": 3573,
         "src/libraries/disp/viewers/helpers/channelrhiview.cpp": 2833,
-        "src/libraries/disp3D/view/brainview.cpp": 3907,
+        "src/libraries/disp3D/view/brainview.cpp": 3897,
         "src/libraries/fiff/fiff_stream.cpp": 3413,
         "src/libraries/fwd/fwd_bem_model.cpp": 3368,
         "src/libraries/mne/mne_source_space.cpp": 2424
