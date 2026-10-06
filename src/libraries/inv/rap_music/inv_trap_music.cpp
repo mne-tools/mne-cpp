@@ -93,60 +93,54 @@ QList<TrapMusicDipole> InvTrapMusic::compute(const MatrixXd& matLeadField,
     // Signal subspace: U_s columns
     MatrixXd signalSubspace = dataSvd.matrixU().leftCols(nSignal);
 
-    // Projector for the found sources (starts as identity)
+    // Topographies G_k o_k of the sources found so far; the RAP step projects out their span.
+    MatrixXd found(nCh, 0);
     MatrixXd projector = MatrixXd::Identity(nCh, nCh);
 
     for (int iter = 0; iter < m_iMaxSources; ++iter) {
-        // Project the lead field and signal subspace
         MatrixXd projLF = projector * matLeadField;
         MatrixXd projSS = projector * signalSubspace;
 
-        // Re-orthogonalise the projected signal subspace
-        int ssDim = static_cast<int>(projSS.cols()) - iter;
+        // Truncation step: iteration k keeps n - k + 1 dimensions of the projected signal subspace
+        const int ssDim = static_cast<int>(projSS.cols()) - iter;
         if (ssDim < 1)
             break;
-        ssDim = std::min(ssDim, static_cast<int>(projSS.cols()));
-
         JacobiSVD<MatrixXd> ssSvd(projSS, ComputeThinU);
-        MatrixXd truncSS = ssSvd.matrixU().leftCols(ssDim); // Truncation step
+        const MatrixXd truncSS = ssSvd.matrixU().leftCols(ssDim);
 
-        // Scan correlations
-        VectorXd correlations = scanCorrelations(projLF, truncSS, iNOrient);
-
-        // Find best source
+        const VectorXd correlations = scanCorrelations(projLF, truncSS, iNOrient);
         Index bestIdx = 0;
-        double bestCorr = correlations.maxCoeff(&bestIdx);
-
+        const double bestCorr = correlations.maxCoeff(&bestIdx);
         if (bestCorr < m_dThreshold)
             break;
 
-        // Build dipole result
         TrapMusicDipole dipole;
         dipole.sourceIdx = static_cast<int>(bestIdx);
         dipole.correlation = bestCorr;
         dipole.position = matSourcePos.row(bestIdx).transpose();
 
-        // Estimate orientation from lead field columns
-        int colStart = static_cast<int>(bestIdx) * iNOrient;
-        if (iNOrient == 1) {
-            dipole.orientation = Vector3d(0, 0, 1);
-        } else {
-            // Project lead field columns onto signal subspace to get orientation
-            MatrixXd lfSrc = matLeadField.block(0, colStart, nCh, iNOrient);
-            MatrixXd proj = truncSS * truncSS.transpose() * lfSrc;
-            JacobiSVD<MatrixXd> orientSvd(proj, ComputeThinV);
-            Vector3d orient = orientSvd.matrixV().col(0);
+        // The orientation maximises the correlation of the projected topography P G_k o with the subspace.
+        const int colStart = static_cast<int>(bestIdx) * iNOrient;
+        VectorXd orient = VectorXd::Ones(1);
+        if (iNOrient > 1) {
+            const MatrixXd projSrc = projLF.middleCols(colStart, iNOrient);
+            // Maximise ||U^T P G o|| / ||P G o||, a generalised eigenproblem with the Gram matrix of P G.
+            const MatrixXd gram = projSrc.transpose() * projSrc;
+            const MatrixXd fit = projSrc.transpose() * truncSS * truncSS.transpose() * projSrc;
+            GeneralizedSelfAdjointEigenSolver<MatrixXd> ges(fit, gram);
+            orient = ges.eigenvectors().col(iNOrient - 1);
             orient.normalize();
-            dipole.orientation = orient;
+            dipole.orientation = Vector3d(orient(0), orient(1), orient(2));
+        } else {
+            dipole.orientation = Vector3d(0, 0, 1);
         }
-
         dipoles.append(dipole);
 
-        // Project out the found source from the lead field (RAP step)
-        MatrixXd lfSrc = matLeadField.block(0, colStart, nCh, iNOrient);
-        MatrixXd lfOrth = lfSrc.householderQr().householderQ() *
-            MatrixXd::Identity(nCh, iNOrient);
-        projector = projector - lfOrth * lfOrth.transpose() * projector;
+        // RAP step: P = I - A A^+ with A the found topographies
+        found.conservativeResize(NoChange, found.cols() + 1);
+        found.col(found.cols() - 1) = matLeadField.middleCols(colStart, iNOrient) * orient;
+        const MatrixXd q = found.householderQr().householderQ() * MatrixXd::Identity(nCh, found.cols());
+        projector = MatrixXd::Identity(nCh, nCh) - q * q.transpose();
     }
 
     return dipoles;
@@ -161,19 +155,21 @@ VectorXd InvTrapMusic::scanCorrelations(const MatrixXd& matLeadField,
     const int nSrcTotal = static_cast<int>(matLeadField.cols()) / iNOrient;
     VectorXd correlations(nSrcTotal);
 
-    // Projector onto signal subspace
-    MatrixXd P_s = matSignalSubspace * matSignalSubspace.transpose();
-
     for (int s = 0; s < nSrcTotal; ++s) {
-        int colStart = s * iNOrient;
-        MatrixXd G_s = matLeadField.block(0, colStart, matLeadField.rows(), iNOrient);
-
-        // MUSIC correlation: ||P_s * G_s||_F / ||G_s||_F
-        MatrixXd projG = P_s * G_s;
-        double normProjG = projG.norm();
-        double normG = G_s.norm();
-
-        correlations[s] = (normG > 1e-15) ? (normProjG / normG) : 0.0;
+        const MatrixXd G_s = matLeadField.middleCols(s * iNOrient, iNOrient);
+        if (G_s.norm() <= 1e-15) {
+            correlations[s] = 0.0;
+            continue;
+        }
+        // Subspace correlation (Mosher & Leahy): largest singular value of U_s^T orth(G_s), the best
+        // orientation's cosine with the signal subspace.
+        JacobiSVD<MatrixXd> gSvd(G_s, ComputeThinU);
+        const VectorXd& sv = gSvd.singularValues();
+        int rank = 0;
+        while (rank < sv.size() && sv(rank) > 1e-10 * sv(0))
+            ++rank;
+        const MatrixXd basis = gSvd.matrixU().leftCols(rank);
+        correlations[s] = JacobiSVD<MatrixXd>(matSignalSubspace.transpose() * basis).singularValues()(0);
     }
 
     return correlations;

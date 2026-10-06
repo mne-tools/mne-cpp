@@ -16,6 +16,8 @@
 
 #include <inv/rap_music/inv_trap_music.h>
 
+#include <algorithm>
+
 //=============================================================================================================
 // EIGEN INCLUDES
 //=============================================================================================================
@@ -172,9 +174,21 @@ void TestTrapMusic::testTwoSources()
     QVERIFY2(dipoles[0].sourceIdx != dipoles[1].sourceIdx,
              "Found two sources should have different indices");
 
-    // Both should have positive correlation
-    QVERIFY(dipoles[0].correlation > 0.0);
-    QVERIFY(dipoles[1].correlation > 0.0);
+    // The ground truth: both sources, each with subspace correlation ~1 and its generating orientation.
+    QVector<int> found{dipoles[0].sourceIdx, dipoles[1].sourceIdx};
+    std::sort(found.begin(), found.end());
+    QCOMPARE(found, QVector<int>({srcIdx1, srcIdx2}));
+    for (const TrapMusicDipole& d : dipoles) {
+        QVERIFY2(d.correlation > 0.999, qPrintable(QString("correlation %1").arg(d.correlation)));
+        const Vector3d& truth = d.sourceIdx == srcIdx1 ? orient1 : orient2;
+        QVERIFY2(std::abs(d.orientation.dot(truth)) > 0.999, qPrintable(QString("orientation cosine %1").arg(d.orientation.dot(truth))));
+    }
+
+    // Noise-free data: the correlations are 1 to round-off, and nothing else passes a strict threshold.
+    const MatrixXd clean = lfSrc1 * orient1 * ts1.transpose() + lfSrc2 * orient2 * ts2.transpose();
+    const QList<TrapMusicDipole> exact = InvTrapMusic(3, 0.999).compute(m_leadField, clean, m_sourcePos, 3);
+    QCOMPARE(exact.size(), 2);
+    QVERIFY(exact[0].correlation > 1.0 - 1e-9 && exact[1].correlation > 1.0 - 1e-9);
 }
 
 //=============================================================================================================
