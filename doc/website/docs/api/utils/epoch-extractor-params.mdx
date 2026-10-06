@@ -17,7 +17,28 @@ struct UTILSLIB::EpochExtractorParams
 
 Epoch extraction parameters (defined outside class to avoid Clang/GCC default-argument issues with nested structs).
 
+```cpp title="src/examples/ex_dsp_preprocessing/main.cpp"
+EpochExtractor::Params params;
+params.dTmin = -0.1;
+params.dTmax = 0.4;
+params.dBaseMin = -0.1;
+params.dBaseMax = 0.0;
+const QVector<MNEEpochData> epochs = EpochExtractor::extract(raw, events, kSFreq, params, codes);
+QVector<MNEEpochData> targets;
+for (const MNEEpochData& epoch : epochs) {
+    if (epoch.event == 1) {
+        targets.append(epoch);
+    }
+}
+const MatrixXd evoked = EpochExtractor::average(EpochExtractor::rejectMarked(targets));
+```
+
 ---
+
+## Example
+
+- Full source: [`src/examples/ex_dsp_preprocessing/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_dsp_preprocessing/main.cpp)
+- Build target: `ex_dsp_preprocessing` (runs under CTest)
 
 ## Authors of this file
 

@@ -16,14 +16,13 @@
     "Settings": "Plain parameter record consumed by an algorithm class; shown inside that class's example."
   },
   "example_debt": {
-    "ceiling": 62,
+    "ceiling": 42,
     "names": [
       "AnnotateMusclParams",
       "ArtifactDetectEcgParams",
       "ArtifactDetectEogParams",
       "ArtifactRejectionData",
       "AverageCategory",
-      "BadChannelDetectParams",
       "BidsChannel",
       "BidsCoordinateSystem",
       "BidsDatasetDescription",
@@ -32,20 +31,12 @@
       "BrainVisionChannelInfo",
       "BrainVisionMarker",
       "BridgedElectrodeParams",
-      "CoilParam",
       "CovDefinition",
       "CovDescription",
       "DigitizedPoint",
-      "DipFitError",
       "EDFChannelInfo",
-      "EpochExtractorParams",
       "FiffAnnotation",
-      "FiffExplainEntry",
       "FilterChpiParams",
-      "FilterObject",
-      "FitDipUserRec",
-      "FitUser",
-      "HPISortStruct",
       "InvConnectivity",
       "InvFocalDipole",
       "InvSourceCoupling",
@@ -66,20 +57,9 @@
       "Pair",
       "PickResult",
       "PolhemusSerialConfig",
-      "RegionData",
-      "RegionDataOut",
-      "RegionMT",
-      "RegionMTOut",
       "RejectionParams",
       "ReportSection",
-      "RtCovComputeResult",
-      "RtInvOpInput",
-      "SSSParams",
-      "SpectogramInputData",
-      "TaperedSpectraInputData",
-      "VisualizationInfo",
-      "dipoleFitFuncsRec",
-      "fitUserRec"
+      "VisualizationInfo"
     ]
   }
 }

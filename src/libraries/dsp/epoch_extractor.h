@@ -49,7 +49,11 @@ namespace UTILSLIB
 {
 
 //=============================================================================================================
-/** @brief Epoch extraction parameters (defined outside class to avoid Clang/GCC default-argument issues with nested structs). */
+/**
+ * @brief Epoch extraction parameters (defined outside class to avoid Clang/GCC default-argument issues with nested structs).
+ *
+ * @snippet ex_dsp_preprocessing/main.cpp epoch_extractor_usage
+ */
 struct DSPSHARED_EXPORT EpochExtractorParams
 {
     double dTmin = -0.2;        /**< Epoch start relative to event in seconds (negative = pre-stimulus). */

@@ -8568,7 +8568,9 @@
       "sidebar_position": 37,
       "guide": null,
       "python_equiv": null,
-      "python_url": null
+      "python_url": null,
+      "example_exempt": true,
+      "example_exempt_reason": "Row type of the static tag-name tables behind the show_fiff tool; not used outside fiff_explain."
     },
     {
       "name": "RejectionParams",
@@ -8604,7 +8606,9 @@
       "sidebar_position": 14,
       "guide": null,
       "python_equiv": null,
-      "python_url": null
+      "python_url": null,
+      "example_exempt": true,
+      "example_exempt_reason": "Workspace of the Berg-Scherg least-squares fit inside FwdEegSphereModel::fwd_eeg_fit_berg_scherg; built and consumed only there (ex_fwd_api fwd_eeg_sphere_model_usage)."
     },
     {
       "name": "CoilParam",
@@ -8622,7 +8626,9 @@
       "sidebar_position": 36,
       "guide": null,
       "python_equiv": null,
-      "python_url": null
+      "python_url": null,
+      "example_exempt": true,
+      "example_exempt_reason": "Per-coil dipole record InvHpiFit passes between its private fit steps; callers read HpiFitResult (ex_inv_hpi inv_hpi_usage)."
     },
     {
       "name": "DipFitError",
@@ -8640,7 +8646,9 @@
       "sidebar_position": 37,
       "guide": null,
       "python_equiv": null,
-      "python_url": null
+      "python_url": null,
+      "example_exempt": true,
+      "example_exempt_reason": "Per-iteration residual record of the HPI dipole fit inside InvHpiFitData; internal to the fit (ex_inv_hpi inv_hpi_fit_data_usage)."
     },
     {
       "name": "FitDipUserRec",
@@ -8658,7 +8666,9 @@
       "sidebar_position": 38,
       "guide": null,
       "python_equiv": null,
-      "python_url": null
+      "python_url": null,
+      "example_exempt": true,
+      "example_exempt_reason": "Objective-function workspace of the dipole fit inside InvDipoleFit; built and consumed only there (ex_inv_dipole_fit inv_dipole_fit_usage)."
     },
     {
       "name": "HPISortStruct",
@@ -8676,7 +8686,9 @@
       "sidebar_position": 39,
       "guide": null,
       "python_equiv": null,
-      "python_url": null
+      "python_url": null,
+      "example_exempt": true,
+      "example_exempt_reason": "Sort key InvHpiFitData uses to match coil fits to expected positions; internal to the HPI fit (ex_inv_hpi inv_hpi_fit_data_usage)."
     },
     {
       "name": "HpiFitResult",
@@ -9020,7 +9032,9 @@
       "sidebar_position": 55,
       "guide": null,
       "python_equiv": null,
-      "python_url": null
+      "python_url": null,
+      "example_exempt": true,
+      "example_exempt_reason": "Forward-field function table set up by InvDipoleFitData::setup_dipole_fit_data, never by callers (ex_inv_dipole_fit inv_dipole_fit_data_usage)."
     },
     {
       "name": "MnaFileRef",
@@ -9388,7 +9402,9 @@
       "sidebar_position": 63,
       "guide": null,
       "python_equiv": null,
-      "python_url": null
+      "python_url": null,
+      "example_exempt": true,
+      "example_exempt_reason": "Per-region work item of the parallel clustering in MNEForwardSolution::cluster_forward_solution; built and consumed only there (ex_inv_api mne_cluster_info_usage)."
     },
     {
       "name": "RegionDataOut",
@@ -9406,7 +9422,9 @@
       "sidebar_position": 64,
       "guide": null,
       "python_equiv": null,
-      "python_url": null
+      "python_url": null,
+      "example_exempt": true,
+      "example_exempt_reason": "Per-region result of the parallel clustering in MNEForwardSolution::cluster_forward_solution; consumed only there (ex_inv_api mne_cluster_info_usage)."
     },
     {
       "name": "RegionMT",
@@ -9424,7 +9442,9 @@
       "sidebar_position": 65,
       "guide": null,
       "python_equiv": null,
-      "python_url": null
+      "python_url": null,
+      "example_exempt": true,
+      "example_exempt_reason": "Per-region work item of the parallel KMeans clustering in MNEInverseOperator::cluster_kernel; built and consumed only there."
     },
     {
       "name": "RegionMTOut",
@@ -9442,7 +9462,9 @@
       "sidebar_position": 66,
       "guide": null,
       "python_equiv": null,
-      "python_url": null
+      "python_url": null,
+      "example_exempt": true,
+      "example_exempt_reason": "Per-region result of the parallel KMeans clustering in MNEInverseOperator::cluster_kernel; consumed only there."
     },
     {
       "name": "MriSlice",
@@ -9504,7 +9526,9 @@
       "sidebar_position": 41,
       "guide": null,
       "python_equiv": null,
-      "python_url": null
+      "python_url": null,
+      "example_exempt": true,
+      "example_exempt_reason": "Per-channel work item of the parallel overlap-add filter in filterDataBlock; built and consumed only there (ex_dsp_filter filter_data_usage)."
     },
     {
       "name": "RtCovComputeResult",
@@ -9522,7 +9546,9 @@
       "sidebar_position": 42,
       "guide": null,
       "python_equiv": null,
-      "python_url": null
+      "python_url": null,
+      "example_exempt": true,
+      "example_exempt_reason": "Map-reduce partial result of the RtCov worker; callers receive the finished FiffCov (ex_dsp_rt rt_cov_usage)."
     },
     {
       "name": "RtInvOpInput",
@@ -9540,7 +9566,9 @@
       "sidebar_position": 43,
       "guide": null,
       "python_equiv": null,
-      "python_url": null
+      "python_url": null,
+      "example_exempt": true,
+      "example_exempt_reason": "Queue item RtInvOp hands to its RtInvOpWorker thread; built by RtInvOp::append, never by callers (ex_dsp_rt rt_inv_op_usage)."
     },
     {
       "name": "StatsClusterResult",
@@ -9693,7 +9721,11 @@
       "mne_python": null,
       "sklearn": null,
       "test": null,
-      "example": null,
+      "example": "ex_dsp_artifacts",
+      "example_snippet": [
+        "ex_dsp_artifacts/main.cpp#bad_channel_detect_usage"
+      ],
+      "example_mode": "run",
       "status": "documented",
       "skigen_candidate": false,
       "documented": true,
@@ -9885,7 +9917,11 @@
       "mne_python": null,
       "sklearn": null,
       "test": null,
-      "example": null,
+      "example": "ex_dsp_preprocessing",
+      "example_snippet": [
+        "ex_dsp_preprocessing/main.cpp#epoch_extractor_usage"
+      ],
+      "example_mode": "run",
       "status": "documented",
       "skigen_candidate": false,
       "documented": true,
@@ -9975,7 +10011,9 @@
       "sidebar_position": 6,
       "guide": null,
       "python_equiv": null,
-      "python_url": null
+      "python_url": null,
+      "example_exempt": true,
+      "example_exempt_reason": "Cost-function workspace of Sphere::fit_sphere_simplex; built and consumed only there (ex_math sphere_fit)."
     },
     {
       "name": "HeadPosEntry",
@@ -10292,7 +10330,14 @@
       "mne_python": null,
       "sklearn": null,
       "test": null,
-      "example": null,
+      "example": "ex_dsp_maxwell",
+      "example_snippet": [
+        "ex_dsp_maxwell/main.cpp#sss_usage"
+      ],
+      "example_mode": "run",
+      "required_data": [
+        "mne-cpp-test-data"
+      ],
       "status": "documented",
       "skigen_candidate": false,
       "documented": true,
@@ -10339,7 +10384,9 @@
       "sidebar_position": 64,
       "guide": null,
       "python_equiv": null,
-      "python_url": null
+      "python_url": null,
+      "example_exempt": true,
+      "example_exempt_reason": "Per-window work item of the parallel Spectrogram map-reduce; built and consumed only there (ex_dsp_spectral spectrogram_make)."
     },
     {
       "name": "SurfaceLaplacianResult",
@@ -10379,7 +10426,9 @@
       "sidebar_position": 65,
       "guide": null,
       "python_equiv": null,
-      "python_url": null
+      "python_url": null,
+      "example_exempt": true,
+      "example_exempt_reason": "Per-row work item of the parallel tapered-spectra computation in Spectral; built and consumed only there (ex_math spectral_psd)."
     },
     {
       "name": "WelchPsdResult",

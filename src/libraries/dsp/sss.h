@@ -76,7 +76,11 @@ namespace UTILSLIB
 {
 
 //=============================================================================================================
-/** @brief Configuration parameters for SSS/tSSS (defined outside class to work around a Clang default-argument/nested-struct limitation). */
+/**
+ * @brief Configuration parameters for SSS/tSSS (defined outside class to work around a Clang default-argument/nested-struct limitation).
+ *
+ * @snippet ex_dsp_maxwell/main.cpp sss_usage
+ */
 struct DSPSHARED_EXPORT SSSParams
 {
     int iOrderIn = 8;                       /**< Internal spherical-harmonic expansion order (default 8). N_in = iOrderIn*(iOrderIn+2) = 80. */

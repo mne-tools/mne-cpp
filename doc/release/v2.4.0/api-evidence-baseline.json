@@ -12,16 +12,16 @@
     "registered_stale": 0,
     "registered_with_test": 102,
     "registered_test_unresolved": 0,
-    "registered_with_example": 315,
+    "registered_with_example": 318,
     "registered_example_not_built": 0,
     "registered_with_python_equiv": 89,
     "registered_without_api_page": 0,
     "with_snippet": 353,
     "public_api_units": 507,
-    "example_eligible": 389,
-    "example_exempt": 118,
-    "eligible_backed_by_registry_example": 315,
-    "eligible_used_by_some_example": 348,
+    "example_eligible": 372,
+    "example_exempt": 135,
+    "eligible_backed_by_registry_example": 318,
+    "eligible_used_by_some_example": 332,
     "examples_on_disk": 68,
     "examples_built": 68
   },
@@ -84,16 +84,16 @@
       "public": 84,
       "registered": 84,
       "with_test": 28,
-      "eligible": 84,
-      "eligible_with_registry_example": 72,
-      "eligible_used_by_example": 84,
+      "eligible": 80,
+      "eligible_with_registry_example": 75,
+      "eligible_used_by_example": 80,
       "with_snippet": 84
     },
     "fiff": {
       "public": 38,
       "registered": 38,
       "with_test": 10,
-      "eligible": 38,
+      "eligible": 37,
       "eligible_with_registry_example": 34,
       "eligible_used_by_example": 35,
       "with_snippet": 37
@@ -111,18 +111,18 @@
       "public": 14,
       "registered": 14,
       "with_test": 3,
-      "eligible": 11,
+      "eligible": 10,
       "eligible_with_registry_example": 10,
-      "eligible_used_by_example": 9,
+      "eligible_used_by_example": 8,
       "with_snippet": 11
     },
     "inv": {
       "public": 55,
       "registered": 55,
       "with_test": 19,
-      "eligible": 52,
+      "eligible": 47,
       "eligible_with_registry_example": 41,
-      "eligible_used_by_example": 47,
+      "eligible_used_by_example": 42,
       "with_snippet": 47
     },
     "lsl": {
@@ -138,9 +138,9 @@
       "public": 9,
       "registered": 9,
       "with_test": 7,
-      "eligible": 9,
+      "eligible": 7,
       "eligible_with_registry_example": 7,
-      "eligible_used_by_example": 9,
+      "eligible_used_by_example": 7,
       "with_snippet": 9
     },
     "ml": {
@@ -165,9 +165,9 @@
       "public": 66,
       "registered": 66,
       "with_test": 6,
-      "eligible": 47,
+      "eligible": 43,
       "eligible_with_registry_example": 40,
-      "eligible_used_by_example": 43,
+      "eligible_used_by_example": 39,
       "with_snippet": 45
     },
     "mri": {
@@ -4327,6 +4327,7 @@
         "ex_dsp_artifacts"
       ],
       "snippets": [
+        "ex_dsp_artifacts/main.cpp#bad_channel_detect_usage",
         "ex_dsp_artifacts/main.cpp#bad_channel_detect_usage"
       ],
       "api_page": "doc/website/docs/api/utils/bad-channel-detect.mdx",
@@ -4344,12 +4345,13 @@
       "registry_status": "documented",
       "test": null,
       "test_resolves": false,
-      "example": null,
-      "example_state": "none",
+      "example": "ex_dsp_artifacts",
+      "example_state": "built",
       "including_examples": [
         "ex_dsp_artifacts"
       ],
       "snippets": [
+        "ex_dsp_artifacts/main.cpp#bad_channel_detect_usage",
         "ex_dsp_artifacts/main.cpp#bad_channel_detect_usage"
       ],
       "api_page": "doc/website/docs/api/utils/bad-channel-detect-params.mdx",
@@ -4778,6 +4780,7 @@
         "ex_dsp_preprocessing"
       ],
       "snippets": [
+        "ex_dsp_preprocessing/main.cpp#epoch_extractor_usage",
         "ex_dsp_preprocessing/main.cpp#epoch_extractor_usage"
       ],
       "api_page": "doc/website/docs/api/utils/epoch-extractor.mdx",
@@ -4795,12 +4798,13 @@
       "registry_status": "documented",
       "test": null,
       "test_resolves": false,
-      "example": null,
-      "example_state": "none",
+      "example": "ex_dsp_preprocessing",
+      "example_state": "built",
       "including_examples": [
         "ex_dsp_preprocessing"
       ],
       "snippets": [
+        "ex_dsp_preprocessing/main.cpp#epoch_extractor_usage",
         "ex_dsp_preprocessing/main.cpp#epoch_extractor_usage"
       ],
       "api_page": "doc/website/docs/api/utils/epoch-extractor-params.mdx",
@@ -5623,8 +5627,8 @@
       ],
       "api_page": "doc/website/docs/api/dsp/rt-cov-compute-result.mdx",
       "python_equiv": null,
-      "example_eligible": true,
-      "exempt_reason": null
+      "example_eligible": false,
+      "exempt_reason": "registry: Map-reduce partial result of the RtCov worker; callers receive the finished FiffCov (ex_dsp_rt rt_cov_usage)."
     },
     {
       "name": "FilterObject",
@@ -5647,8 +5651,8 @@
       ],
       "api_page": "doc/website/docs/api/dsp/filter-object.mdx",
       "python_equiv": null,
-      "example_eligible": true,
-      "exempt_reason": null
+      "example_eligible": false,
+      "exempt_reason": "registry: Per-channel work item of the parallel overlap-add filter in filterDataBlock; built and consumed only there (ex_dsp_filter filter_data_usage)."
     },
     {
       "name": "FilterOverlapAdd",
@@ -5767,8 +5771,8 @@
       ],
       "api_page": "doc/website/docs/api/dsp/rt-inv-op-input.mdx",
       "python_equiv": null,
-      "example_eligible": true,
-      "exempt_reason": null
+      "example_eligible": false,
+      "exempt_reason": "registry: Queue item RtInvOp hands to its RtInvOpWorker thread; built by RtInvOp::append, never by callers (ex_dsp_rt rt_inv_op_usage)."
     },
     {
       "name": "RtInvOpWorker",
@@ -5913,8 +5917,8 @@
       ],
       "api_page": "doc/website/docs/api/utils/spectogram-input-data.mdx",
       "python_equiv": null,
-      "example_eligible": true,
-      "exempt_reason": null
+      "example_eligible": false,
+      "exempt_reason": "registry: Per-window work item of the parallel Spectrogram map-reduce; built and consumed only there (ex_dsp_spectral spectrogram_make)."
     },
     {
       "name": "Spectrogram",
@@ -5982,6 +5986,7 @@
       ],
       "snippets": [
         "ex_dsp_maxwell/main.cpp#sss_usage",
+        "ex_dsp_maxwell/main.cpp#sss_usage",
         "ex_dsp_maxwell/main.cpp#sss_apply"
       ],
       "api_page": "doc/website/docs/api/dsp/sss.mdx",
@@ -5999,12 +6004,13 @@
       "registry_status": "documented",
       "test": null,
       "test_resolves": false,
-      "example": null,
-      "example_state": "none",
+      "example": "ex_dsp_maxwell",
+      "example_state": "built",
       "including_examples": [
         "ex_dsp_maxwell"
       ],
       "snippets": [
+        "ex_dsp_maxwell/main.cpp#sss_usage",
         "ex_dsp_maxwell/main.cpp#sss_usage",
         "ex_dsp_maxwell/main.cpp#sss_apply"
       ],
@@ -6825,8 +6831,8 @@
       "snippets": [],
       "api_page": "doc/website/docs/api/fiff/fiff-explain-entry.mdx",
       "python_equiv": null,
-      "example_eligible": true,
-      "exempt_reason": null
+      "example_eligible": false,
+      "exempt_reason": "registry: Row type of the static tag-name tables behind the show_fiff tool; not used outside fiff_explain."
     },
     {
       "name": "FiffFileSharer",
@@ -7627,8 +7633,8 @@
       ],
       "api_page": "doc/website/docs/api/fwd/fit-user-rec.mdx",
       "python_equiv": null,
-      "example_eligible": true,
-      "exempt_reason": null
+      "example_eligible": false,
+      "exempt_reason": "registry: Workspace of the Berg-Scherg least-squares fit inside FwdEegSphereModel::fwd_eeg_fit_berg_scherg; built and consumed only there (ex_fwd_api fwd_eeg_sphere_model_usage)."
     },
     {
       "name": "FwdEegSphereModelSet",
@@ -7826,8 +7832,8 @@
       ],
       "api_page": "doc/website/docs/api/inv/fit-dip-user-rec.mdx",
       "python_equiv": null,
-      "example_eligible": true,
-      "exempt_reason": null
+      "example_eligible": false,
+      "exempt_reason": "registry: Objective-function workspace of the dipole fit inside InvDipoleFit; built and consumed only there (ex_inv_dipole_fit inv_dipole_fit_usage)."
     },
     {
       "name": "InvDipoleFitData",
@@ -7872,8 +7878,8 @@
       ],
       "api_page": "doc/website/docs/api/inv/dipole-fit-funcs-rec.mdx",
       "python_equiv": null,
-      "example_eligible": true,
-      "exempt_reason": null
+      "example_eligible": false,
+      "exempt_reason": "registry: Forward-field function table set up by InvDipoleFitData::setup_dipole_fit_data, never by callers (ex_inv_dipole_fit inv_dipole_fit_data_usage)."
     },
     {
       "name": "InvDipoleFitSettings",
@@ -8036,8 +8042,8 @@
       ],
       "api_page": "doc/website/docs/api/inv/coil-param.mdx",
       "python_equiv": null,
-      "example_eligible": true,
-      "exempt_reason": null
+      "example_eligible": false,
+      "exempt_reason": "registry: Per-coil dipole record InvHpiFit passes between its private fit steps; callers read HpiFitResult (ex_inv_hpi inv_hpi_usage)."
     },
     {
       "name": "HpiFitResult",
@@ -8111,8 +8117,8 @@
       ],
       "api_page": "doc/website/docs/api/inv/dip-fit-error.mdx",
       "python_equiv": null,
-      "example_eligible": true,
-      "exempt_reason": null
+      "example_eligible": false,
+      "exempt_reason": "registry: Per-iteration residual record of the HPI dipole fit inside InvHpiFitData; internal to the fit (ex_inv_hpi inv_hpi_fit_data_usage)."
     },
     {
       "name": "HPISortStruct",
@@ -8134,8 +8140,8 @@
       ],
       "api_page": "doc/website/docs/api/inv/hpi-sort-struct.mdx",
       "python_equiv": null,
-      "example_eligible": true,
-      "exempt_reason": null
+      "example_eligible": false,
+      "exempt_reason": "registry: Sort key InvHpiFitData uses to match coil fits to expected positions; internal to the HPI fit (ex_inv_hpi inv_hpi_fit_data_usage)."
     },
     {
       "name": "InvHpiFitData",
@@ -9207,8 +9213,8 @@
       ],
       "api_page": "doc/website/docs/api/utils/tapered-spectra-input-data.mdx",
       "python_equiv": null,
-      "example_eligible": true,
-      "exempt_reason": null
+      "example_eligible": false,
+      "exempt_reason": "registry: Per-row work item of the parallel tapered-spectra computation in Spectral; built and consumed only there (ex_math spectral_psd)."
     },
     {
       "name": "FitUser",
@@ -9230,8 +9236,8 @@
       ],
       "api_page": "doc/website/docs/api/math/fit-user.mdx",
       "python_equiv": null,
-      "example_eligible": true,
-      "exempt_reason": null
+      "example_eligible": false,
+      "exempt_reason": "registry: Cost-function workspace of Sphere::fit_sphere_simplex; built and consumed only there (ex_math sphere_fit)."
     },
     {
       "name": "Sphere",
@@ -10372,8 +10378,8 @@
       ],
       "api_page": "doc/website/docs/api/mne/region-data.mdx",
       "python_equiv": null,
-      "example_eligible": true,
-      "exempt_reason": null
+      "example_eligible": false,
+      "exempt_reason": "registry: Per-region work item of the parallel clustering in MNEForwardSolution::cluster_forward_solution; built and consumed only there (ex_inv_api mne_cluster_info_usage)."
     },
     {
       "name": "RegionDataOut",
@@ -10401,8 +10407,8 @@
       ],
       "api_page": "doc/website/docs/api/mne/region-data-out.mdx",
       "python_equiv": null,
-      "example_eligible": true,
-      "exempt_reason": null
+      "example_eligible": false,
+      "exempt_reason": "registry: Per-region result of the parallel clustering in MNEForwardSolution::cluster_forward_solution; consumed only there (ex_inv_api mne_cluster_info_usage)."
     },
     {
       "name": "MNEHemisphere",
@@ -10499,8 +10505,8 @@
       ],
       "api_page": "doc/website/docs/api/mne/region-mt.mdx",
       "python_equiv": null,
-      "example_eligible": true,
-      "exempt_reason": null
+      "example_eligible": false,
+      "exempt_reason": "registry: Per-region work item of the parallel KMeans clustering in MNEInverseOperator::cluster_kernel; built and consumed only there."
     },
     {
       "name": "RegionMTOut",
@@ -10524,8 +10530,8 @@
       ],
       "api_page": "doc/website/docs/api/mne/region-mt-out.mdx",
       "python_equiv": null,
-      "example_eligible": true,
-      "exempt_reason": null
+      "example_eligible": false,
+      "exempt_reason": "registry: Per-region result of the parallel KMeans clustering in MNEInverseOperator::cluster_kernel; consumed only there."
     },
     {
       "name": "MNELayout",

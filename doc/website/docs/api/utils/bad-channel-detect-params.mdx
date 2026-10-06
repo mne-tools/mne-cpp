@@ -17,7 +17,19 @@ struct UTILSLIB::BadChannelDetectParams
 
 Bad-channel detection parameters (defined outside class to avoid Clang/GCC default-argument issues with nested structs).
 
+```cpp title="src/examples/ex_dsp_artifacts/main.cpp"
+BadChannelDetect::Params badParams;
+badParams.dFlatThreshold = 1e-9; // EEG in volts
+const QVector<int> flat = BadChannelDetect::detectFlat(data.topRows(kEeg), badParams.dFlatThreshold);
+const QVector<int> bad = BadChannelDetect::detect(data.topRows(kEeg), badParams);
+```
+
 ---
+
+## Example
+
+- Full source: [`src/examples/ex_dsp_artifacts/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_dsp_artifacts/main.cpp)
+- Build target: `ex_dsp_artifacts` (runs under CTest)
 
 ## Authors of this file
 

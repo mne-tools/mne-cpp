@@ -55,7 +55,11 @@ namespace UTILSLIB
 {
 
 //=============================================================================================================
-/** @brief Bad-channel detection parameters (defined outside class to avoid Clang/GCC default-argument issues with nested structs). */
+/**
+ * @brief Bad-channel detection parameters (defined outside class to avoid Clang/GCC default-argument issues with nested structs).
+ *
+ * @snippet ex_dsp_artifacts/main.cpp bad_channel_detect_usage
+ */
 struct DSPSHARED_EXPORT BadChannelDetectParams
 {
     // Flat signal

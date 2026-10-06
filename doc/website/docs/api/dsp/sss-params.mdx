@@ -17,7 +17,19 @@ struct UTILSLIB::SSSParams
 
 Configuration parameters for [SSS](/docs/api/dsp/sss)/tSSS (defined outside class to work around a Clang default-argument/nested-struct limitation).
 
+```cpp title="src/examples/ex_dsp_maxwell/main.cpp"
+SSS::Params params; // internal order 8, external order 3
+params.origin = Vector3d(0.0, 0.0, 0.04);
+const SSS::Basis basis = SSS::computeBasis(info, params); // geometry only, reusable for every buffer
+```
+
 ---
+
+## Example
+
+- Full source: [`src/examples/ex_dsp_maxwell/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_dsp_maxwell/main.cpp)
+- Build target: `ex_dsp_maxwell` (runs under CTest)
+- Data: [mne-cpp-test-data](https://github.com/mne-tools/mne-cpp-test-data)
 
 ## Authors of this file
 
