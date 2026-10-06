@@ -25,6 +25,12 @@ Extends RAP-MUSIC by adding a truncation step to the signal subspace at each ite
 
 Reference: Makela et al., NeuroImage 197, 616-626, 2019.
 
+```cpp title="src/examples/ex_inv_beamformer/main.cpp"
+MatrixX3d positions = fwd.source_rr.cast<double>();
+InvTrapMusic trap(2, 0.85); // at most 2 dipoles, stop below a subspace correlation of 0.85
+const QList<TrapMusicDipole> dipoles = trap.compute(G, measured, positions, 3);
+```
+
 ---
 
 ## Public Methods
@@ -89,6 +95,12 @@ Compute the MUSIC-type subspace correlation for all source locations.
 - *Eigen::VectorXd* — Correlation vector (n_sources).
 
 ---
+
+## Example
+
+- Full source: [`src/examples/ex_inv_beamformer/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_inv_beamformer/main.cpp)
+- Build target: `ex_inv_beamformer` (runs under CTest)
+- Data: [mne-cpp-test-data](https://github.com/mne-tools/mne-cpp-test-data)
 
 ## Authors of this file
 

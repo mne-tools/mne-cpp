@@ -25,6 +25,21 @@ High-level driver for sequential dipole fitting.
 
 Refactored from fit_dipoles.c / dipole_fit_setup.c (MNE-C).
 
+```cpp title="src/examples/ex_inv_dipole_fit/main.cpp"
+InvDipoleFitSettings settings; // the options of the MNE-C mne_dipole_fit tool
+settings.measname = tmp.filePath("synthetic-ave.fif");
+settings.include_meg = true;
+settings.include_eeg = false;
+settings.guess_mindist = 0.0f;
+settings.tmin = 0.0f;
+settings.dipname = tmp.filePath("fit.dat"); // MNE-C .dat dipole file
+settings.checkIntegrity();
+InvDipoleFit fit(&settings);
+InvEcdSet dipoles = fit.calculateFit();
+const bool saved = dipoles.save_dipoles_dip(tmp.filePath("fit.dip")); // readable by mne.read_dipole
+const InvEcdSet reread = InvEcdSet::read_dipoles_dip(tmp.filePath("fit.dip"));
+```
+
 ---
 
 ## Public Methods
@@ -194,6 +209,12 @@ Refactored: fit_dipoles_raw (fit_dipoles.c)
 - *bool* — true when successful.
 
 ---
+
+## Example
+
+- Full source: [`src/examples/ex_inv_dipole_fit/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_inv_dipole_fit/main.cpp)
+- Build target: `ex_inv_dipole_fit` (runs under CTest)
+- Data: [mne-cpp-test-data](https://github.com/mne-tools/mne-cpp-test-data)
 
 ## Authors of this file
 

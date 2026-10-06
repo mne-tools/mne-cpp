@@ -51,6 +51,8 @@ namespace INVLIB
  * Implements one Electric Current Dipole (Replaces *ecd,ecdRec struct of MNE-C fit_types.h).
  *
  * @brief Single equivalent current dipole with position, orientation, amplitude, and goodness-of-fit.
+ *
+ * @snippet ex_inv_dipole_fit/main.cpp inv_dipole_fit_data_usage
  */
 class INVSHARED_EXPORT InvEcd
 {

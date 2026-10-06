@@ -72,6 +72,8 @@ struct InvDipolePair
  * DECLARE CLASS Dipoles
  *
  * @brief Stores position, orientation, and correlation of a single current dipole estimated by RAP MUSIC
+ *
+ * @snippet ex_inv_beamformer/main.cpp inv_rap_music_usage
  */
 template<class T>
 class InvDipole

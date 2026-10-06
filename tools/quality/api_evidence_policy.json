@@ -16,7 +16,7 @@
     "Settings": "Plain parameter record consumed by an algorithm class; shown inside that class's example."
   },
   "example_debt": {
-    "ceiling": 92,
+    "ceiling": 65,
     "names": [
       "FiffCoordTransSet",
       "FiffCtfComp",
@@ -27,32 +27,6 @@
       "FiffRawDir",
       "FiffTime",
       "FilterThreadArg",
-      "InvBeamformer",
-      "InvBeamformerCompute",
-      "InvCMNE",
-      "InvDICS",
-      "InvDipole",
-      "InvDipoleFit",
-      "InvDipoleFitData",
-      "InvDipoleForward",
-      "InvEcd",
-      "InvEcdSet",
-      "InvGammaMap",
-      "InvGuessData",
-      "InvHpiDataUpdater",
-      "InvHpiFit",
-      "InvHpiFitData",
-      "InvHpiModelParameters",
-      "InvLCMV",
-      "InvPwlRapMusic",
-      "InvRapMusic",
-      "InvSensorSet",
-      "InvSensorSetCreator",
-      "InvSignalModel",
-      "InvTfMxne",
-      "InvTrapMusic",
-      "InvVectorSourceEstimate",
-      "InvVolumeSourceEstimate",
       "MNE",
       "MNEBem",
       "MNEBemSurface",
@@ -108,8 +82,7 @@
       "MNESurfacePatch",
       "MNETriangle",
       "MNEVolGeom",
-      "MneICP",
-      "SourceMorph"
+      "MneICP"
     ]
   }
 }

@@ -61,6 +61,8 @@ class InvDipoleFitData;
  * Implements InvGuessData (Replaces *guessData,guessDataRec struct of MNE-C fit_types.h).
  *
  * @brief Precomputed guess point grid with forward fields for initial dipole position candidates.
+ *
+ * @snippet ex_inv_dipole_fit/main.cpp inv_dipole_fit_data_usage
  */
 class INVSHARED_EXPORT InvGuessData
 {

@@ -59,6 +59,8 @@ namespace INVLIB
  * Implements Electric Current Dipole Set (Replaces *ecdSet,ecdSetRec struct of MNE-C fit_types.h).
  *
  * @brief Holds a set of Electric Current Dipoles.
+ *
+ * @snippet ex_inv_dipole_fit/main.cpp inv_dipole_fit_usage
  */
 
 class INVSHARED_EXPORT InvEcdSet

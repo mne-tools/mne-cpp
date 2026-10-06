@@ -62,6 +62,8 @@ namespace INVLIB
  * current dipole (ECD) at each requested time point.
  *
  * Refactored from fit_dipoles.c / dipole_fit_setup.c (MNE-C).
+ *
+ * @snippet ex_inv_dipole_fit/main.cpp inv_dipole_fit_usage
  */
 class INVSHARED_EXPORT InvDipoleFit
 {

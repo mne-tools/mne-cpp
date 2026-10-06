@@ -29,8 +29,7 @@ Source-space inverse-solution container with dense grid plus optional focal-dipo
 FsLabel v1;
 FsLabel::read(data + "/subjects/sample/label/lh.V1.label", v1);
 QFile fwdFile(data + "/Result/ref-sample_audvis-meg-eeg-oct-6-fwd.fif");
-// surf_ori = true: loose orientation constraints are relative to the cortical normals
-const MNEForwardSolution fwd = MNEForwardSolution(fwdFile, false, true).pick_regions({v1}); // 70 sources x 3
+const MNEForwardSolution fwd = MNEForwardSolution(fwdFile).pick_regions({v1}); // 70 sources x 3 orientations
 QFile covFile(data + "/MEG/sample/sample_audvis-cov.fif");
 const FiffCov noiseCov(covFile);
 QFile aveFile(data + "/MEG/sample/sample_audvis-ave.fif");

@@ -25,6 +25,20 @@ Implements the RAP MUSIC scanning algorithm which iteratively identifies correla
 
 Reference: Mosher & Leahy, IEEE Trans. Signal Process. 47(2), 332-340, 1999.
 
+```cpp title="src/examples/ex_inv_beamformer/main.cpp"
+// Noise-free data from the two sources with different time courses; RAP-MUSIC scans source pairs.
+const int nSamples = 60;
+MatrixXd measured(G.rows(), nSamples);
+for (int t = 0; t < nSamples; ++t)
+    measured.col(t) = g1 * std::sin(0.21 * t) + g2 * std::sin(0.53 * t + 0.4);
+QList<InvDipolePair<double>> pairs;
+InvRapMusic rap(fwd, false, 1, 0.5); // one correlated pair, subspace correlation >= 0.5
+rap.calculateInverse(measured, pairs);
+QList<InvDipolePair<double>> powellPairs;
+InvPwlRapMusic pwlRap(fwd, false, 1, 0.5); // Powell coordinate search: far fewer pairs, may stop at a local optimum
+pwlRap.calculateInverse(measured, powellPairs);
+```
+
 ### Inheritance
 
 ```mermaid
@@ -127,8 +141,9 @@ Sets the source estimate attributes.
 
 ## Example
 
-- Full source: [`src/examples/ex_inverse_rap_music/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_inverse_rap_music/main.cpp)
-- Build target: `ex_inverse_rap_music` (compiled in CI)
+- Full source: [`src/examples/ex_inv_beamformer/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_inv_beamformer/main.cpp)
+- Build target: `ex_inv_beamformer` (runs under CTest)
+- Data: [mne-cpp-test-data](https://github.com/mne-tools/mne-cpp-test-data)
 
 ## Authors of this file
 

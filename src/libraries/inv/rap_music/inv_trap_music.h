@@ -73,6 +73,8 @@ struct INVSHARED_EXPORT TrapMusicDipole
  * projects it out, and truncates the subspace dimension.
  *
  * Reference: Makela et al., NeuroImage 197, 616-626, 2019.
+ *
+ * @snippet ex_inv_beamformer/main.cpp inv_trap_music_usage
  */
 class INVSHARED_EXPORT InvTrapMusic
 {

@@ -55,7 +55,7 @@ Constructs a forward operator, by reading from a IO device.
   Exclude these channels (optional).
 
 - **bExcludeBads** : *bool*
-  If true bads are also read; default = false (optional).
+  Drop the channels marked bad in the file; mne.read_forward_solution keeps them.
 
 ---
 
@@ -342,6 +342,14 @@ Helper to convert the forward solution to fixed ori from free.
 
 ---
 
+### convert_to_surf_ori()
+
+Rotates a free-orientation solution into local surface coordinates (two tangential components, then the normal), using average patch normals when the source spaces carry them.
+
+Equivalent of mne.convert_forward_solution(fwd, surf_ori=True). Does nothing if already surface-oriented or fixed.
+
+---
+
 ### getSourcePositionsByLabel(lPickedLabels, tSurfSetInflated)
 
 Returns the positions of the specified sources based on their beloning labels.
@@ -420,7 +428,7 @@ ToDo move this to [FiffCov](/docs/api/fiff/fiff-cov)
   Exclude these channels (optional).
 
 - **bExcludeBads** : *bool*
-  If true bads are also read; default = false (optional).
+  Drop the channels marked bad in the file; mne.read_forward_solution keeps them.
 
 **Returns:**
 

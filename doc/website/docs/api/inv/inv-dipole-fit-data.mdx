@@ -21,6 +21,24 @@ Dipole fit workspace holding sensor geometry, forward model, noise covariance, a
 
 Refactored from dipoleFitDataRec / fit_types.h (MNE-C).
 
+```cpp title="src/examples/ex_inv_dipole_fit/main.cpp"
+// MEG channels and SSP projectors from the sample file, sphere at (0, 0, 40) mm, ad-hoc noise
+// (5e-13 T/m gradiometers, 20 fT magnetometers).
+Vector3f r0(0.0f, 0.0f, 0.04f);
+std::unique_ptr<InvDipoleFitData> fitData(InvDipoleFitData::setup_dipole_fit_data(
+    QString(), sampleAve, QString(), &r0, nullptr, false, QString(), QString(),
+    5e-13f, 20e-15f, 0.2e-6f, 0.1f, 0.1f, 0.1f, false, {sampleAve}, true, false));
+MatrixXf gain(fitData->nmeg, 3);
+const bool fieldOk = InvDipoleFitData::compute_dipole_field(*fitData, truePos, false, gain) == 0; // projected, not whitened
+VectorXf field = gain * trueMoment;
+
+InvGuessData guesses(QString(), QString(), 0.0f, 0.02f, 0.015f, fitData.get(), 0.08f); // 15 mm grid in an 80 mm sphere
+std::unique_ptr<InvDipoleForward> atTruth(InvDipoleFitData::dipole_forward_one(fitData.get(), truePos, nullptr));
+InvEcd dipole;
+VectorXf b = field; // fit_one projects and whitens in place
+const bool fitted = InvDipoleFitData::fit_one(fitData.get(), &guesses, 0.0f, b, false, dipole);
+```
+
 ---
 
 ## Public Methods
@@ -360,6 +378,12 @@ Refactored: dipole_forward_one (fit_dipoles.c)
 - *[InvDipoleForward](/docs/api/inv/inv-dipole-forward) ** — The populated forward object, or nullptr on error.
 
 ---
+
+## Example
+
+- Full source: [`src/examples/ex_inv_dipole_fit/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_inv_dipole_fit/main.cpp)
+- Build target: `ex_inv_dipole_fit` (runs under CTest)
+- Data: [mne-cpp-test-data](https://github.com/mne-tools/mne-cpp-test-data)
 
 ## Authors of this file
 

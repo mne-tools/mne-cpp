@@ -76,19 +76,10 @@ namespace INVLIB
  * source localization using cross-spectral density (CSD) matrices.
  *
  * Typical workflow:
- * @code
- *   // 1. Compute CSD matrices for frequency bands of interest (externally)
- *   //    csdMatrices[i] = CSD at frequency[i], shape (n_channels, n_channels)
- *
- *   // 2. Build the DICS spatial filter
- *   InvBeamformer filters = InvDICS::makeDICS(info, forward, csdMatrices, frequencies,
- *                                              reg, realFilter, pickOri, weightNorm);
- *
- *   // 3. Apply to CSD to get source power per frequency
- *   InvSourceEstimate power = InvDICS::applyDICSCsd(csdMatrices, frequencies, filters);
- * @endcode
  *
  * @brief DICS beamformer (frequency-domain).
+ *
+ * @snippet ex_inv_beamformer/main.cpp inv_dics_usage
  */
 class INVSHARED_EXPORT InvDICS
 {

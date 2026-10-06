@@ -23,6 +23,13 @@ Volume source estimate: scalar values at voxel locations.
 
 Extends [`InvSourceEstimate`](/docs/api/inv/inv-source-estimate) with grid shape information to allow reshaping the flat data into a 3D volume.
 
+```cpp title="src/examples/ex_inv_api/main.cpp"
+// A volume estimate keeps the grid shape, so a time slice can be written back into the full grid.
+InvVolumeSourceEstimate volumeStc(stc.data.topRows(4), VectorXi::LinSpaced(4, 0, 6), stc.tmin, stc.tstep);
+volumeStc.setShape({2, 2, 2}); // 8 voxels, 4 of them sources
+const VectorXd grid = volumeStc.toVolume(200);
+```
+
 ### Inheritance
 
 ```mermaid
@@ -119,6 +126,12 @@ Compute the centre of mass of the activity at a given time point.
 - *Eigen::Vector3d* — 3D position (x, y, z) in voxel coordinates, or (0,0,0) if no activity.
 
 ---
+
+## Example
+
+- Full source: [`src/examples/ex_inv_api/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_inv_api/main.cpp)
+- Build target: `ex_inv_api` (runs under CTest)
+- Data: [mne-cpp-test-data](https://github.com/mne-tools/mne-cpp-test-data)
 
 ## Authors of this file
 

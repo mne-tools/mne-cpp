@@ -63,6 +63,8 @@ namespace INVLIB
  * @brief Powell-accelerated RAP MUSIC variant using gradient-free optimization for refined dipole fitting
  *
  * ToDo Detailed description
+ *
+ * @snippet ex_inv_beamformer/main.cpp inv_rap_music_usage
  */
 class INVSHARED_EXPORT InvPwlRapMusic : public InvRapMusic
 {

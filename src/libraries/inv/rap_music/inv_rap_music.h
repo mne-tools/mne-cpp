@@ -85,6 +85,8 @@ struct Pair
  * residual correlation drops below threshold.
  *
  * Reference: Mosher & Leahy, IEEE Trans. Signal Process. 47(2), 332-340, 1999.
+ *
+ * @snippet ex_inv_beamformer/main.cpp inv_rap_music_usage
  */
 class INVSHARED_EXPORT InvRapMusic
 {

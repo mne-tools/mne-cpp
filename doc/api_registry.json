@@ -626,7 +626,14 @@
       "mne_python": null,
       "sklearn": null,
       "test": "test_inv_cmne",
-      "example": "ex_clustered_inverse_mne",
+      "example": "ex_inv_api",
+      "example_snippet": [
+        "ex_inv_api/main.cpp#inv_cmne_usage"
+      ],
+      "example_mode": "run",
+      "required_data": [
+        "mne-cpp-test-data"
+      ],
       "status": "done",
       "skigen_candidate": false,
       "notes": "CMNE (Dinh et al. 2021) — MNE-CPP original; deep-learning-enhanced inverse",
@@ -645,7 +652,14 @@
       "mne_python": "mne.beamformer.make_lcmv / apply_lcmv",
       "sklearn": null,
       "test": "test_inv_beamformer",
-      "example": null,
+      "example": "ex_inv_beamformer",
+      "example_snippet": [
+        "ex_inv_beamformer/main.cpp#inv_lcmv_usage"
+      ],
+      "example_mode": "run",
+      "required_data": [
+        "mne-cpp-test-data"
+      ],
       "status": "done",
       "skigen_candidate": false,
       "documented": true,
@@ -663,7 +677,14 @@
       "mne_python": "mne.beamformer.make_dics / apply_dics",
       "sklearn": null,
       "test": "test_inv_beamformer",
-      "example": null,
+      "example": "ex_inv_beamformer",
+      "example_snippet": [
+        "ex_inv_beamformer/main.cpp#inv_dics_usage"
+      ],
+      "example_mode": "run",
+      "required_data": [
+        "mne-cpp-test-data"
+      ],
       "status": "done",
       "skigen_candidate": false,
       "documented": true,
@@ -681,7 +702,14 @@
       "mne_python": "mne.beamformer.rap_music",
       "sklearn": null,
       "test": "test_inv_dipole_rap_mne",
-      "example": "ex_inverse_rap_music",
+      "example": "ex_inv_beamformer",
+      "example_snippet": [
+        "ex_inv_beamformer/main.cpp#inv_rap_music_usage"
+      ],
+      "example_mode": "run",
+      "required_data": [
+        "mne-cpp-test-data"
+      ],
       "status": "done",
       "skigen_candidate": false,
       "documented": true,
@@ -699,7 +727,14 @@
       "mne_python": "mne.beamformer.trap_music",
       "sklearn": null,
       "test": "test_trap_music",
-      "example": null,
+      "example": "ex_inv_beamformer",
+      "example_snippet": [
+        "ex_inv_beamformer/main.cpp#inv_trap_music_usage"
+      ],
+      "example_mode": "run",
+      "required_data": [
+        "mne-cpp-test-data"
+      ],
       "status": "done",
       "skigen_candidate": false,
       "documented": true,
@@ -717,7 +752,14 @@
       "mne_python": "mne.fit_dipole",
       "sklearn": null,
       "test": "test_dipole_fit",
-      "example": null,
+      "example": "ex_inv_dipole_fit",
+      "example_snippet": [
+        "ex_inv_dipole_fit/main.cpp#inv_dipole_fit_usage"
+      ],
+      "example_mode": "run",
+      "required_data": [
+        "mne-cpp-test-data"
+      ],
       "status": "done",
       "skigen_candidate": false,
       "documented": true,
@@ -761,7 +803,14 @@
       "mne_python": "mne.inverse_sparse.gamma_map",
       "sklearn": null,
       "test": "test_inv_sparse",
-      "example": null,
+      "example": "ex_inv_api",
+      "example_snippet": [
+        "ex_inv_api/main.cpp#inv_gamma_map_usage"
+      ],
+      "example_mode": "run",
+      "required_data": [
+        "mne-cpp-test-data"
+      ],
       "status": "done",
       "skigen_candidate": false,
       "documented": true,
@@ -779,7 +828,14 @@
       "mne_python": "mne.inverse_sparse.tf_mixed_norm",
       "sklearn": null,
       "test": "test_tf_mxne",
-      "example": null,
+      "example": "ex_inv_api",
+      "example_snippet": [
+        "ex_inv_api/main.cpp#inv_tf_mxne_usage"
+      ],
+      "example_mode": "run",
+      "required_data": [
+        "mne-cpp-test-data"
+      ],
       "status": "done",
       "skigen_candidate": false,
       "documented": true,
@@ -797,7 +853,14 @@
       "mne_python": "mne.chpi",
       "sklearn": null,
       "test": "test_hpiFit",
-      "example": "ex_hpiFit",
+      "example": "ex_inv_hpi",
+      "example_snippet": [
+        "ex_inv_hpi/main.cpp#inv_hpi_usage"
+      ],
+      "example_mode": "run",
+      "required_data": [
+        "mne-cpp-test-data"
+      ],
       "status": "done",
       "skigen_candidate": false,
       "documented": true,
@@ -841,7 +904,14 @@
       "mne_python": "mne.VectorSourceEstimate",
       "sklearn": null,
       "test": "test_source_estimate_types",
-      "example": null,
+      "example": "ex_inv_api",
+      "example_snippet": [
+        "ex_inv_api/main.cpp#inv_vector_source_estimate_usage"
+      ],
+      "example_mode": "run",
+      "required_data": [
+        "mne-cpp-test-data"
+      ],
       "status": "done",
       "skigen_candidate": false,
       "documented": true,
@@ -859,7 +929,14 @@
       "mne_python": "mne.VolumeSourceEstimate",
       "sklearn": null,
       "test": "test_source_estimate_types",
-      "example": null,
+      "example": "ex_inv_api",
+      "example_snippet": [
+        "ex_inv_api/main.cpp#inv_volume_source_estimate_usage"
+      ],
+      "example_mode": "run",
+      "required_data": [
+        "mne-cpp-test-data"
+      ],
       "status": "done",
       "skigen_candidate": false,
       "documented": true,
@@ -978,7 +1055,14 @@
       "mne_python": "mne.SourceMorph",
       "sklearn": null,
       "test": "test_source_morph",
-      "example": null,
+      "example": "ex_inv_api",
+      "example_snippet": [
+        "ex_inv_api/main.cpp#source_morph_usage"
+      ],
+      "example_mode": "run",
+      "required_data": [
+        "mne-cpp-test-data"
+      ],
       "status": "done",
       "skigen_candidate": false,
       "documented": true,
@@ -7310,7 +7394,14 @@
       "mne_python": null,
       "sklearn": null,
       "test": null,
-      "example": null,
+      "example": "ex_inv_beamformer",
+      "example_snippet": [
+        "ex_inv_beamformer/main.cpp#inv_lcmv_usage"
+      ],
+      "example_mode": "run",
+      "required_data": [
+        "mne-cpp-test-data"
+      ],
       "status": "documented",
       "skigen_candidate": false,
       "documented": true,
@@ -7329,6 +7420,8 @@
       "sklearn": null,
       "test": null,
       "example": null,
+      "example_exempt": true,
+      "example_exempt_reason": "Static numerical core (filter weights, power, regularised inverses) shared by InvLCMV and InvDICS; callers use those (ex_inv_beamformer inv_lcmv_usage).",
       "status": "documented",
       "skigen_candidate": false,
       "documented": true,
@@ -7346,7 +7439,14 @@
       "mne_python": null,
       "sklearn": null,
       "test": null,
-      "example": null,
+      "example": "ex_inv_beamformer",
+      "example_snippet": [
+        "ex_inv_beamformer/main.cpp#inv_rap_music_usage"
+      ],
+      "example_mode": "run",
+      "required_data": [
+        "mne-cpp-test-data"
+      ],
       "status": "documented",
       "skigen_candidate": false,
       "documented": true,
@@ -7364,7 +7464,14 @@
       "mne_python": null,
       "sklearn": null,
       "test": null,
-      "example": null,
+      "example": "ex_inv_dipole_fit",
+      "example_snippet": [
+        "ex_inv_dipole_fit/main.cpp#inv_dipole_fit_data_usage"
+      ],
+      "example_mode": "run",
+      "required_data": [
+        "mne-cpp-test-data"
+      ],
       "status": "documented",
       "skigen_candidate": false,
       "documented": true,
@@ -7400,7 +7507,14 @@
       "mne_python": null,
       "sklearn": null,
       "test": null,
-      "example": null,
+      "example": "ex_inv_dipole_fit",
+      "example_snippet": [
+        "ex_inv_dipole_fit/main.cpp#inv_dipole_fit_data_usage"
+      ],
+      "example_mode": "run",
+      "required_data": [
+        "mne-cpp-test-data"
+      ],
       "status": "documented",
       "skigen_candidate": false,
       "documented": true,
@@ -7418,7 +7532,14 @@
       "mne_python": null,
       "sklearn": null,
       "test": null,
-      "example": null,
+      "example": "ex_inv_dipole_fit",
+      "example_snippet": [
+        "ex_inv_dipole_fit/main.cpp#inv_dipole_fit_data_usage"
+      ],
+      "example_mode": "run",
+      "required_data": [
+        "mne-cpp-test-data"
+      ],
       "status": "documented",
       "skigen_candidate": false,
       "documented": true,
@@ -7436,7 +7557,14 @@
       "mne_python": null,
       "sklearn": null,
       "test": null,
-      "example": null,
+      "example": "ex_inv_dipole_fit",
+      "example_snippet": [
+        "ex_inv_dipole_fit/main.cpp#inv_dipole_fit_usage"
+      ],
+      "example_mode": "run",
+      "required_data": [
+        "mne-cpp-test-data"
+      ],
       "status": "documented",
       "skigen_candidate": false,
       "documented": true,
@@ -7454,7 +7582,14 @@
       "mne_python": null,
       "sklearn": null,
       "test": null,
-      "example": null,
+      "example": "ex_inv_dipole_fit",
+      "example_snippet": [
+        "ex_inv_dipole_fit/main.cpp#inv_dipole_fit_data_usage"
+      ],
+      "example_mode": "run",
+      "required_data": [
+        "mne-cpp-test-data"
+      ],
       "status": "documented",
       "skigen_candidate": false,
       "documented": true,
@@ -7472,7 +7607,14 @@
       "mne_python": null,
       "sklearn": null,
       "test": null,
-      "example": null,
+      "example": "ex_inv_hpi",
+      "example_snippet": [
+        "ex_inv_hpi/main.cpp#inv_hpi_usage"
+      ],
+      "example_mode": "run",
+      "required_data": [
+        "mne-cpp-test-data"
+      ],
       "status": "documented",
       "skigen_candidate": false,
       "documented": true,
@@ -7490,7 +7632,14 @@
       "mne_python": null,
       "sklearn": null,
       "test": null,
-      "example": null,
+      "example": "ex_inv_hpi",
+      "example_snippet": [
+        "ex_inv_hpi/main.cpp#inv_hpi_fit_data_usage"
+      ],
+      "example_mode": "run",
+      "required_data": [
+        "mne-cpp-test-data"
+      ],
       "status": "documented",
       "skigen_candidate": false,
       "documented": true,
@@ -7508,7 +7657,14 @@
       "mne_python": null,
       "sklearn": null,
       "test": null,
-      "example": null,
+      "example": "ex_inv_hpi",
+      "example_snippet": [
+        "ex_inv_hpi/main.cpp#inv_hpi_usage"
+      ],
+      "example_mode": "run",
+      "required_data": [
+        "mne-cpp-test-data"
+      ],
       "status": "documented",
       "skigen_candidate": false,
       "documented": true,
@@ -7526,7 +7682,14 @@
       "mne_python": null,
       "sklearn": null,
       "test": null,
-      "example": null,
+      "example": "ex_inv_beamformer",
+      "example_snippet": [
+        "ex_inv_beamformer/main.cpp#inv_rap_music_usage"
+      ],
+      "example_mode": "run",
+      "required_data": [
+        "mne-cpp-test-data"
+      ],
       "status": "documented",
       "skigen_candidate": false,
       "documented": true,
@@ -7544,7 +7707,14 @@
       "mne_python": null,
       "sklearn": null,
       "test": null,
-      "example": null,
+      "example": "ex_inv_hpi",
+      "example_snippet": [
+        "ex_inv_hpi/main.cpp#inv_sensor_set_usage"
+      ],
+      "example_mode": "run",
+      "required_data": [
+        "mne-cpp-test-data"
+      ],
       "status": "documented",
       "skigen_candidate": false,
       "documented": true,
@@ -7562,7 +7732,14 @@
       "mne_python": null,
       "sklearn": null,
       "test": null,
-      "example": null,
+      "example": "ex_inv_hpi",
+      "example_snippet": [
+        "ex_inv_hpi/main.cpp#inv_sensor_set_usage"
+      ],
+      "example_mode": "run",
+      "required_data": [
+        "mne-cpp-test-data"
+      ],
       "status": "documented",
       "skigen_candidate": false,
       "documented": true,
@@ -7580,7 +7757,14 @@
       "mne_python": null,
       "sklearn": null,
       "test": null,
-      "example": null,
+      "example": "ex_inv_hpi",
+      "example_snippet": [
+        "ex_inv_hpi/main.cpp#inv_signal_model_usage"
+      ],
+      "example_mode": "run",
+      "required_data": [
+        "mne-cpp-test-data"
+      ],
       "status": "documented",
       "skigen_candidate": false,
       "documented": true,

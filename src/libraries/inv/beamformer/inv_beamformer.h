@@ -67,6 +67,8 @@ namespace INVLIB
  * This class is the C++ equivalent of MNE-Python's Beamformer dict.
  *
  * @brief Computed beamformer spatial filter container.
+ *
+ * @snippet ex_inv_beamformer/main.cpp inv_lcmv_usage
  */
 class INVSHARED_EXPORT InvBeamformer
 {

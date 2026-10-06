@@ -19,6 +19,16 @@ Description of what this class is intended to do (in detail).
 
 Configuration parameters for the HPI signal model (line frequency, coil frequencies, sample rate, buffer size)
 
+```cpp title="src/examples/ex_inv_hpi/main.cpp"
+InvHpiDataUpdater updater(info); // good MEG channels, their sensors and the digitised coil positions
+updater.prepareDataAndProjectors(segment, MatrixXd::Identity(info->nchan, info->nchan));
+// The coil frequencies are known but not their order; the first fit with bOrderFrequencies finds it.
+const InvHpiModelParameters model(QVector<int>({154, 158, 161, 166}), info->sfreq, info->linefreq, true);
+InvHpiFit hpi(updater.getSensors());
+HpiFitResult fit;
+hpi.fit(updater.getProjectedData(), updater.getProjectors(), model, updater.getHpiDigitizer(), true, fit);
+```
+
 ---
 
 ## Public Methods
@@ -97,6 +107,12 @@ Inline functions to get acces to parameters.
 ### bBasic()
 
 ---
+
+## Example
+
+- Full source: [`src/examples/ex_inv_hpi/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_inv_hpi/main.cpp)
+- Build target: `ex_inv_hpi` (runs under CTest)
+- Data: [mne-cpp-test-data](https://github.com/mne-tools/mne-cpp-test-data)
 
 ## Authors of this file
 

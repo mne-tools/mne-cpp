@@ -133,6 +133,8 @@ class InvEcd;
  * fully initialised instance.
  *
  * Refactored from dipoleFitDataRec / fit_types.h (MNE-C).
+ *
+ * @snippet ex_inv_dipole_fit/main.cpp inv_dipole_fit_data_usage
  */
 class INVSHARED_EXPORT InvDipoleFitData
 {

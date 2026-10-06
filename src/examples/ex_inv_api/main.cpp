@@ -26,8 +26,14 @@
 #include <inv/inv_resolution_matrix.h>
 #include <inv/inv_source_estimate.h>
 #include <inv/inv_source_estimate_io.h>
+#include <inv/inv_vector_source_estimate.h>
+#include <inv/inv_volume_source_estimate.h>
+#include <inv/minimum_norm/inv_cmne.h>
 #include <inv/minimum_norm/inv_minimum_norm.h>
+#include <inv/morph/source_morph.h>
+#include <inv/sparse/inv_gamma_map.h>
 #include <inv/sparse/inv_mxne.h>
+#include <inv/sparse/inv_tf_mxne.h>
 #include <mne/mne_forward_solution.h>
 #include <mne/mne_inverse_operator.h>
 #include <fiff/fiff_cov.h>
@@ -101,8 +107,7 @@ int main(int argc, char* argv[])
     FsLabel v1;
     FsLabel::read(data + "/subjects/sample/label/lh.V1.label", v1);
     QFile fwdFile(data + "/Result/ref-sample_audvis-meg-eeg-oct-6-fwd.fif");
-    // surf_ori = true: loose orientation constraints are relative to the cortical normals
-    const MNEForwardSolution fwd = MNEForwardSolution(fwdFile, false, true).pick_regions({v1}); // 70 sources x 3
+    const MNEForwardSolution fwd = MNEForwardSolution(fwdFile).pick_regions({v1}); // 70 sources x 3 orientations
     QFile covFile(data + "/MEG/sample/sample_audvis-cov.fif");
     const FiffCov noiseCov(covFile);
     QFile aveFile(data + "/MEG/sample/sample_audvis-ave.fif");
@@ -128,9 +133,42 @@ int main(int argc, char* argv[])
     ok &= expect(resolution.rows() == 210 && resolution.cols() == 210 && near(resolution.norm(), 6.13352636100184, 1e-4),
                  "InvResolutionMatrix: MNE resolution matrix matches mne.minimum_norm.make_inverse_resolution_matrix");
 
+    //! [inv_vector_source_estimate_usage]
+    // The MNE kernel keeps x, y and z per source: an apply_inverse(..., pick_ori="vector") estimate.
+    const MatrixXd goodData = evoked.pick_channels(inverse.noise_cov->names).data;
+    const InvVectorSourceEstimate vectorStc(kernel * goodData, stc.vertices, stc.tmin, stc.tstep);
+    const InvSourceEstimate magnitude = vectorStc.magnitude(); // 70 x 421 vector lengths
+    //! [inv_vector_source_estimate_usage]
+    // mne.minimum_norm.apply_inverse(evoked, inv, 1/9, "MNE", pick_ori="vector"): sum of lengths 4.31370e-4
+    ok &= expect(vectorStc.nVertices() == 70 && near(magnitude.data.sum(), 0.0004313698431300483, 1e-4) && near(magnitude.data(0, 200), 3.865084798591962e-09, 1e-4),
+                 "InvVectorSourceEstimate: vector MNE lengths match apply_inverse(pick_ori=\"vector\")");
+
+    //! [inv_volume_source_estimate_usage]
+    // A volume estimate keeps the grid shape, so a time slice can be written back into the full grid.
+    InvVolumeSourceEstimate volumeStc(stc.data.topRows(4), VectorXi::LinSpaced(4, 0, 6), stc.tmin, stc.tstep);
+    volumeStc.setShape({2, 2, 2}); // 8 voxels, 4 of them sources
+    const VectorXd grid = volumeStc.toVolume(200);
+    //! [inv_volume_source_estimate_usage]
+    ok &= expect(grid.size() == 8 && grid(0) == stc.data(0, 200) && grid(6) == stc.data(3, 200) && grid(1) == 0.0,
+                 "InvVolumeSourceEstimate: source values land on their voxels, the rest of the grid is zero");
+
+    //! [source_morph_usage]
+    // Morph the 70 V1 sources onto 35 targets by averaging neighbouring pairs (an MNEMorphMap in practice).
+    SparseMatrix<double> pairAverage(35, 70);
+    for (int i = 0; i < 35; ++i) {
+        pairAverage.insert(i, 2 * i) = 0.5;
+        pairAverage.insert(i, 2 * i + 1) = 0.5;
+    }
+    SourceMorph morph;
+    morph.compute(stc.vertices, VectorXi::LinSpaced(35, 0, 34), pairAverage);
+    const InvSourceEstimate morphed = morph.apply(stc);
+    //! [source_morph_usage]
+    ok &= expect(morph.isComputed() && morphed.data.rows() == 35 && near(morphed.data(3, 200), 0.5 * (stc.data(6, 200) + stc.data(7, 200)), 1e-12),
+                 "SourceMorph: the morph matrix maps every time sample");
+
     //! [inv_label_time_course_usage]
-    const MatrixXd labelMean = InvLabelTimeCourse::extract(stc, {v1}, "mean");     // 1 x 421
-    const MatrixXd labelMax = InvLabelTimeCourse::extract(stc, {v1}, "max");       // the largest |value| per sample
+    const MatrixXd labelMean = InvLabelTimeCourse::extract(stc, {v1}, "mean");      // 1 x 421
+    const MatrixXd labelMax = InvLabelTimeCourse::extract(stc, {v1}, "max");        // the largest |value| per sample
     const MatrixXd labelFlip = InvLabelTimeCourse::extract(stc, {v1}, "mean_flip"); // signs flipped by the patch normals
     //! [inv_label_time_course_usage]
     // mne.extract_label_time_course(stc, v1, src, mode=...): sum |tc| for "mean" 5321.19 and "max" 18182.6
@@ -150,6 +188,43 @@ int main(int argc, char* argv[])
     // mne mixed_norm_solver(M, G, 0.5 * alpha_max, n_orient=1, debias=False): sources 8, 30, 37 with 21.37, 1.019, 4.455 nAm
     ok &= expect(rank == 360 && near(alphaMax, 14.508623946749108, 1e-4) && mxne.activeVertices == QVector<int>({8, 30, 37}) && near(mxne.stc.data.row(0).norm(), 21.373078745157443, 1e-3) && near(mxne.stc.data.row(2).norm(), 4.455019654645694, 1e-3),
                  "computeWhitener/InvMxne: whitened rank 360, MxNE picks the 3 V1 sources mne.inverse_sparse finds");
+
+    //! [inv_gamma_map_usage]
+    // Gamma-MAP: sparse Bayesian learning with unit (whitened) noise, MacKay updates as in mne.inverse_sparse.gamma_map.
+    const InvGammaMapResult gammaMap = InvGammaMap::compute(gain, measured, MatrixXd::Identity(gain.rows(), gain.rows()), 1000, 1e-8);
+    //! [inv_gamma_map_usage]
+    ok &= expect(!gammaMap.activeVertices.isEmpty() && gammaMap.activeVertices.size() < 70 && gammaMap.vecGamma.size() == 70,
+                 QString("InvGammaMap: %1 of 70 V1 sources keep a nonzero variance").arg(gammaMap.activeVertices.size()));
+
+    //! [inv_tf_mxne_usage]
+    // TF-MxNE: sparse in space and in a Gabor time-frequency dictionary; 40 samples at 150 Hz.
+    InvTfMxneParams tfParams;
+    tfParams.dAlphaSpace = 0.5 * alphaMax;
+    tfParams.dAlphaTime = 0.05 * alphaMax;
+    tfParams.dSFreq = evoked.info.sfreq;
+    tfParams.iNFreqs = 4;
+    tfParams.dFMin = 5.0;
+    tfParams.dFMax = 40.0;
+    const InvTfMxneResult tfMxne = InvTfMxne::compute(gain, measured, tfParams);
+    //! [inv_tf_mxne_usage]
+    ok &= expect(!tfMxne.activeVertices.isEmpty() && tfMxne.activeVertices.size() <= 5 && tfMxne.activeVertices.contains(8),
+                 QString("InvTfMxne: %1 V1 sources, including the strongest MxNE source 8").arg(tfMxne.activeVertices.size()));
+
+    //! [inv_cmne_usage]
+    // Contextual MNE: dSPM with a fixed-orientation kernel, then rectified and z-scored per source. Without an
+    // ONNX LSTM model the result is the paper's control estimate.
+    InvCMNESettings cmneSettings;
+    cmneSettings.lambda2 = lambda2;
+    cmneSettings.lookBack = 20;
+    const MatrixXd fixedGain = fixedFwd.sol->data;
+    const MatrixXd sourceCov = MatrixXd::Identity(fixedGain.cols(), fixedGain.cols());
+    const InvCMNEResult cmne = InvCMNE::compute(goodData, fixedGain, inverse.noise_cov->data, sourceCov, cmneSettings);
+    //! [inv_cmne_usage]
+    // Every row of the dSPM kernel maps sensor noise with the noise covariance to unit variance.
+    const MatrixXd& kDspm = cmne.matKernelDspm;
+    const VectorXd unitNoise = (kDspm * inverse.noise_cov->data * kDspm.transpose()).diagonal();
+    ok &= expect(kDspm.rows() == 70 && (unitNoise.array() - 1.0).abs().maxCoeff() < 1e-6 && cmne.stcCmne.data.rows() == 70 && cmne.stcCmne.data.cols() == 421,
+                 "InvCMNE: dSPM kernel has unit noise variance per source, CMNE estimate for all 421 samples");
 
     //! [inv_source_estimate_io_usage]
     InvSourceEstimateIO::writeCsv(stc, tmp.filePath("v1-dspm.csv"));

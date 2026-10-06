@@ -60,6 +60,8 @@ namespace INVLIB
  * Description of what this class is intended to do (in detail).
  *
  * @brief Configuration parameters for the HPI signal model (line frequency, coil frequencies, sample rate, buffer size)
+ *
+ * @snippet ex_inv_hpi/main.cpp inv_hpi_usage
  */
 class INVSHARED_EXPORT InvHpiModelParameters
 {

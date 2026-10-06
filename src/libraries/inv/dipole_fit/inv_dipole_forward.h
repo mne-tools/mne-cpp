@@ -62,6 +62,8 @@ namespace INVLIB
  * column-normalized, and decomposed via SVD: A = U * diag(sing) * V^T.
  * The members uu, vv, and sing store the SVD factors used for fast goodness-of-fit evaluation
  * and dipole moment reconstruction.
+ *
+ * @snippet ex_inv_dipole_fit/main.cpp inv_dipole_fit_data_usage
  */
 class INVSHARED_EXPORT InvDipoleForward
 {

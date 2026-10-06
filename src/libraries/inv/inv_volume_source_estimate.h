@@ -47,6 +47,8 @@ namespace INVLIB
  *
  * Extends InvSourceEstimate with grid shape information to allow reshaping
  * the flat data into a 3D volume.
+ *
+ * @snippet ex_inv_api/main.cpp inv_volume_source_estimate_usage
  */
 class INVSHARED_EXPORT InvVolumeSourceEstimate : public InvSourceEstimate
 {

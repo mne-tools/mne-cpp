@@ -41,6 +41,8 @@ namespace INVLIB
  *
  * data has shape (n_vertices*3 x n_times). Rows are interleaved: [x0,y0,z0, x1,y1,z1, ...].
  * Use magnitude() to collapse to scalar (n_vertices x n_times) for visualisation.
+ *
+ * @snippet ex_inv_api/main.cpp inv_vector_source_estimate_usage
  */
 class INVSHARED_EXPORT InvVectorSourceEstimate : public InvSourceEstimate
 {

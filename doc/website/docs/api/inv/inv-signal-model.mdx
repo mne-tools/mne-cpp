@@ -19,6 +19,13 @@ Description of what this class is intended to do (in detail).
 
 Generates the forward sinusoidal model matrix for HPI coil signals at known drive frequencies
 
+```cpp title="src/examples/ex_inv_hpi/main.cpp"
+// Sine and cosine amplitudes of every coil frequency in every channel, least-squares fitted.
+InvSignalModel signalModel;
+const InvHpiModelParameters ordered(fit.hpiFreqs, info->sfreq, info->linefreq, false);
+const MatrixXd amplitudes = signalModel.fitData(ordered, updater.getProjectedData()); // (sin, cos) x 4 coils, then channels
+```
+
 ---
 
 ## Public Methods
@@ -46,6 +53,12 @@ Fit the data to the model constructed from given model parameters.
 - *Eigen::MatrixXd* — the fitted data
 
 ---
+
+## Example
+
+- Full source: [`src/examples/ex_inv_hpi/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_inv_hpi/main.cpp)
+- Build target: `ex_inv_hpi` (runs under CTest)
+- Data: [mne-cpp-test-data](https://github.com/mne-tools/mne-cpp-test-data)
 
 ## Authors of this file
 

@@ -21,11 +21,18 @@ class INVLIB::SourceMorph
 
 Morphs source estimates from one subject's source space to another.
 
-Usage: 
-```cpp
+Usage:
+
+```cpp title="src/examples/ex_inv_api/main.cpp"
+// Morph the 70 V1 sources onto 35 targets by averaging neighbouring pairs (an MNEMorphMap in practice).
+SparseMatrix<double> pairAverage(35, 70);
+for (int i = 0; i < 35; ++i) {
+    pairAverage.insert(i, 2 * i) = 0.5;
+    pairAverage.insert(i, 2 * i + 1) = 0.5;
+}
 SourceMorph morph;
-morph.compute(srcVerticesFrom, srcVerticesTo, morphMapLh, morphMapRh);
-InvSourceEstimate morphed = morph.apply(stc);
+morph.compute(stc.vertices, VectorXi::LinSpaced(35, 0, 34), pairAverage);
+const InvSourceEstimate morphed = morph.apply(stc);
 ```
 
 ---
@@ -89,6 +96,12 @@ Get the number of target vertices.
 - *int* — Number of vertices in the target subject's source space.
 
 ---
+
+## Example
+
+- Full source: [`src/examples/ex_inv_api/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_inv_api/main.cpp)
+- Build target: `ex_inv_api` (runs under CTest)
+- Data: [mne-cpp-test-data](https://github.com/mne-tools/mne-cpp-test-data)
 
 ## Authors of this file
 

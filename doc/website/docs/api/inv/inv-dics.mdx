@@ -21,20 +21,17 @@ class INVLIB::InvDICS
 
 Dynamic Imaging of Coherent Sources (DICS) beamformer for frequency-domain source localization using cross-spectral density (CSD) matrices.
 
-Typical workflow: 
-```cpp
-// 1. Compute CSD matrices for frequency bands of interest (externally)
-//    csdMatrices[i] = CSD at frequency[i], shape (n_channels, n_channels)
-
-// 2. Build the DICS spatial filter
-InvBeamformer filters = InvDICS::makeDICS(info, forward, csdMatrices, frequencies,
-                                           reg, realFilter, pickOri, weightNorm);
-
-// 3. Apply to CSD to get source power per frequency
-InvSourceEstimate power = InvDICS::applyDICSCsd(csdMatrices, frequencies, filters);
-```
+Typical workflow:
 
 DICS beamformer (frequency-domain).
+
+```cpp title="src/examples/ex_inv_beamformer/main.cpp"
+// A single real cross-spectral density at 10 Hz equal to the data covariance gives the LCMV power.
+const VectorXd frequencies = VectorXd::Constant(1, 10.0);
+const InvBeamformer dics = InvDICS::makeDICS(info, fwd, {dataCov.data}, frequencies, 0.05, true, noiseCov,
+                                             BeamformerPickOri::MaxPower, BeamformerWeightNorm::UnitNoiseGain);
+const VectorXd dicsPower = InvDICS::applyDICSCsd({dataCov.data}, frequencies, dics).data.col(0);
+```
 
 ---
 
@@ -163,6 +160,12 @@ Apply DICS beamformer to each epoch in a list.
 - *QList&lt; [InvSourceEstimate](/docs/api/inv/inv-source-estimate) &gt;* — List of source estimates, one per epoch.
 
 ---
+
+## Example
+
+- Full source: [`src/examples/ex_inv_beamformer/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_inv_beamformer/main.cpp)
+- Build target: `ex_inv_beamformer` (runs under CTest)
+- Data: [mne-cpp-test-data](https://github.com/mne-tools/mne-cpp-test-data)
 
 ## Authors of this file
 

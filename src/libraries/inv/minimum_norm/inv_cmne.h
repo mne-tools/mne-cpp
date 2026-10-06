@@ -84,6 +84,8 @@ struct INVSHARED_EXPORT InvCMNEResult
  *   for Source Estimation in Neuroimaging", 2021.
  *
  * @brief CMNE inverse solver
+ *
+ * @snippet ex_inv_api/main.cpp inv_cmne_usage
  */
 class INVSHARED_EXPORT InvCMNE
 {

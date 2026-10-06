@@ -65,19 +65,10 @@ namespace INVLIB
  * Linearly Constrained Minimum Variance (LCMV) beamformer for MEG/EEG source localization.
  *
  * Typical workflow:
- * @code
- *   // 1. Compute the spatial filter from forward model + data covariance
- *   InvBeamformer filters = InvLCMV::makeLCMV(info, forward, dataCov, noiseCov, reg,
- *                                              pickOri, weightNorm, reduceRank, inversion);
- *
- *   // 2. Apply to evoked data -> source time courses
- *   InvSourceEstimate stc = InvLCMV::applyLCMV(evoked, filters);
- *
- *   // 3. Or apply to covariance -> source power map
- *   InvSourceEstimate power = InvLCMV::applyLCMVCov(dataCov, filters);
- * @endcode
  *
  * @brief LCMV beamformer (time-domain).
+ *
+ * @snippet ex_inv_beamformer/main.cpp inv_lcmv_usage
  */
 class INVSHARED_EXPORT InvLCMV
 {

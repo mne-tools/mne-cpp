@@ -72,6 +72,8 @@ namespace INVLIB
  * This class brings all the data and objects used for HPI fitting into the right format.
  *
  * @brief Preprocesses raw HPI coil data (SSP projection, compensation, sinusoidal model fitting) before dipole localization
+ *
+ * @snippet ex_inv_hpi/main.cpp inv_hpi_usage
  */
 class INVSHARED_EXPORT InvHpiDataUpdater
 {

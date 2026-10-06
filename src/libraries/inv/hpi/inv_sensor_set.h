@@ -75,6 +75,8 @@ enum class Accuracy : int
 
 /**
  * @brief Stores MEG sensor geometry (positions, orientations, weights, coil count) for a single sensor type
+ *
+ * @snippet ex_inv_hpi/main.cpp inv_sensor_set_usage
  */
 class INVSHARED_EXPORT InvSensorSet
 {
@@ -243,6 +245,8 @@ inline bool InvSensorSet::operator!=(const InvSensorSet& b) const
  * Create a InvSensorSet struct from a channel list with specified accuracy.
  *
  * @brief Builds InvSensorSet objects from FiffInfo channel definitions, applying SSP projections and compensation
+ *
+ * @snippet ex_inv_hpi/main.cpp inv_sensor_set_usage
  */
 class INVSHARED_EXPORT InvSensorSetCreator
 {

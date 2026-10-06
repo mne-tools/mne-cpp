@@ -19,6 +19,16 @@ Create a [`InvSensorSet`](/docs/api/inv/inv-sensor-set) struct from a channel li
 
 Builds [`InvSensorSet`](/docs/api/inv/inv-sensor-set) objects from [FiffInfo](/docs/api/fiff/fiff-info) channel definitions, applying SSP projections and compensation
 
+```cpp title="src/examples/ex_inv_hpi/main.cpp"
+InvSensorSetCreator creator; // reads resources/general/coilDefinitions/coil_def.dat
+QList<FiffChInfo> megChannels;
+for (const FiffChInfo& ch : info->chs) {
+    if (ch.kind == FIFFV_MEG_CH)
+        megChannels << ch;
+}
+const InvSensorSet sensors = creator.updateSensorSet(megChannels, Accuracy::high); // integration points per coil
+```
+
 ---
 
 ## Public Methods
@@ -46,6 +56,12 @@ Update [`InvSensorSet`](/docs/api/inv/inv-sensor-set) from new channel list with
 - *[InvSensorSet](/docs/api/inv/inv-sensor-set)* — Sensor set built from the MEG coil definitions, or an empty set if channelList is empty.
 
 ---
+
+## Example
+
+- Full source: [`src/examples/ex_inv_hpi/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_inv_hpi/main.cpp)
+- Build target: `ex_inv_hpi` (runs under CTest)
+- Data: [mne-cpp-test-data](https://github.com/mne-tools/mne-cpp-test-data)
 
 ## Authors of this file
 

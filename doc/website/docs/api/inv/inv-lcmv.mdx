@@ -21,20 +21,17 @@ class INVLIB::InvLCMV
 
 Linearly Constrained Minimum Variance (LCMV) beamformer for MEG/EEG source localization.
 
-Typical workflow: 
-```cpp
-// 1. Compute the spatial filter from forward model + data covariance
-InvBeamformer filters = InvLCMV::makeLCMV(info, forward, dataCov, noiseCov, reg,
-                                           pickOri, weightNorm, reduceRank, inversion);
-
-// 2. Apply to evoked data -> source time courses
-InvSourceEstimate stc = InvLCMV::applyLCMV(evoked, filters);
-
-// 3. Or apply to covariance -> source power map
-InvSourceEstimate power = InvLCMV::applyLCMVCov(dataCov, filters);
-```
+Typical workflow:
 
 LCMV beamformer (time-domain).
+
+```cpp title="src/examples/ex_inv_beamformer/main.cpp"
+FiffCov dataCov = noiseCov; // noise plus the two sources
+dataCov.data += g1 * g1.transpose() + g2 * g2.transpose();
+const InvBeamformer lcmv = InvLCMV::makeLCMV(info, fwd, dataCov, 0.05, noiseCov,
+                                             BeamformerPickOri::MaxPower, BeamformerWeightNorm::UnitNoiseGain);
+const VectorXd lcmvPower = InvLCMV::applyLCMVCov(dataCov, lcmv).data.col(0); // one value per source
+```
 
 ---
 
@@ -195,6 +192,12 @@ The resolution matrix describes the point-spread function of the beamformer. Eac
 - *Eigen::MatrixXd* — Resolution matrix (n_sources x n_sources).
 
 ---
+
+## Example
+
+- Full source: [`src/examples/ex_inv_beamformer/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_inv_beamformer/main.cpp)
+- Build target: `ex_inv_beamformer` (runs under CTest)
+- Data: [mne-cpp-test-data](https://github.com/mne-tools/mne-cpp-test-data)
 
 ## Authors of this file
 

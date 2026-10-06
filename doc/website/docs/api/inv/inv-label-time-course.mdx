@@ -37,8 +37,8 @@ Provides the five standard aggregation modes used in MNE-Python's `extract_label
 **auto**: mean_flip for scalar STCs.
 
 ```cpp title="src/examples/ex_inv_api/main.cpp"
-const MatrixXd labelMean = InvLabelTimeCourse::extract(stc, {v1}, "mean");     // 1 x 421
-const MatrixXd labelMax = InvLabelTimeCourse::extract(stc, {v1}, "max");       // the largest |value| per sample
+const MatrixXd labelMean = InvLabelTimeCourse::extract(stc, {v1}, "mean");      // 1 x 421
+const MatrixXd labelMax = InvLabelTimeCourse::extract(stc, {v1}, "max");        // the largest |value| per sample
 const MatrixXd labelFlip = InvLabelTimeCourse::extract(stc, {v1}, "mean_flip"); // signs flipped by the patch normals
 ```
 

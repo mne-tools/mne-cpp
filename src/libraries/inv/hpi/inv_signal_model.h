@@ -56,6 +56,8 @@ namespace INVLIB
  * Description of what this class is intended to do (in detail).
  *
  * @brief Generates the forward sinusoidal model matrix for HPI coil signals at known drive frequencies
+ *
+ * @snippet ex_inv_hpi/main.cpp inv_signal_model_usage
  */
 class INVSHARED_EXPORT InvSignalModel
 {

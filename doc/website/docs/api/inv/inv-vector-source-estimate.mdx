@@ -23,6 +23,13 @@ Vector source estimate: each vertex carries a 3D orientation vector across time.
 
 data has shape (n_vertices*3 x n_times). Rows are interleaved: [x0,y0,z0, x1,y1,z1, ...]. Use `magnitude()` to collapse to scalar (n_vertices x n_times) for visualisation.
 
+```cpp title="src/examples/ex_inv_api/main.cpp"
+// The MNE kernel keeps x, y and z per source: an apply_inverse(..., pick_ori="vector") estimate.
+const MatrixXd goodData = evoked.pick_channels(inverse.noise_cov->names).data;
+const InvVectorSourceEstimate vectorStc(kernel * goodData, stc.vertices, stc.tmin, stc.tstep);
+const InvSourceEstimate magnitude = vectorStc.magnitude(); // 70 x 421 vector lengths
+```
+
 ### Inheritance
 
 ```mermaid
@@ -108,6 +115,12 @@ Project the 3D vectors onto surface normals to produce a signed scalar estimate.
 - *[InvSourceEstimate](/docs/api/inv/inv-source-estimate)* — Scalar source estimate (n_vertices x n_times).
 
 ---
+
+## Example
+
+- Full source: [`src/examples/ex_inv_api/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_inv_api/main.cpp)
+- Build target: `ex_inv_api` (runs under CTest)
+- Data: [mne-cpp-test-data](https://github.com/mne-tools/mne-cpp-test-data)
 
 ## Authors of this file
 

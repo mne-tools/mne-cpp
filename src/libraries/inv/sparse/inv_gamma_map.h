@@ -72,6 +72,8 @@ struct INVSHARED_EXPORT InvGammaMapResult
  * sources whose gamma falls below a threshold, yielding a sparse solution.
  *
  * @brief Gamma-MAP sparse inverse solver.
+ *
+ * @snippet ex_inv_api/main.cpp inv_gamma_map_usage
  */
 class INVSHARED_EXPORT InvGammaMap
 {

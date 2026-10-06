@@ -57,11 +57,8 @@ namespace INVLIB
  * @brief Morphs source estimates from one subject's source space to another.
  *
  * Usage:
- * @code
- *   SourceMorph morph;
- *   morph.compute(srcVerticesFrom, srcVerticesTo, morphMapLh, morphMapRh);
- *   InvSourceEstimate morphed = morph.apply(stc);
- * @endcode
+ *
+ * @snippet ex_inv_api/main.cpp source_morph_usage
  */
 class INVSHARED_EXPORT SourceMorph
 {

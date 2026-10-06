@@ -12,18 +12,18 @@
     "registered_stale": 0,
     "registered_with_test": 101,
     "registered_test_unresolved": 0,
-    "registered_with_example": 203,
+    "registered_with_example": 226,
     "registered_example_not_built": 0,
     "registered_with_python_equiv": 88,
     "registered_without_api_page": 0,
-    "with_snippet": 250,
+    "with_snippet": 281,
     "public_api_units": 478,
     "example_eligible": 383,
     "example_exempt": 95,
-    "eligible_backed_by_registry_example": 203,
-    "eligible_used_by_some_example": 265,
-    "examples_on_disk": 63,
-    "examples_built": 63
+    "eligible_backed_by_registry_example": 226,
+    "eligible_used_by_some_example": 291,
+    "examples_on_disk": 66,
+    "examples_built": 66
   },
   "by_library": {
     "bids": {
@@ -121,9 +121,9 @@
       "registered": 35,
       "with_test": 19,
       "eligible": 41,
-      "eligible_with_registry_example": 10,
-      "eligible_used_by_example": 13,
-      "with_snippet": 8
+      "eligible_with_registry_example": 33,
+      "eligible_used_by_example": 39,
+      "with_snippet": 39
     },
     "lsl": {
       "public": 3,
@@ -6166,6 +6166,7 @@
         "ex_dsp_rt",
         "ex_fiff_api",
         "ex_inv_api",
+        "ex_inv_beamformer",
         "ex_make_inverse_operator"
       ],
       "snippets": [
@@ -6409,6 +6410,7 @@
         "ex_clustered_inverse_rap_music_raw",
         "ex_histogram",
         "ex_inv_api",
+        "ex_inv_beamformer",
         "ex_inverse_mne",
         "ex_inverse_mne_raw",
         "ex_inverse_pwl_rap_music",
@@ -6440,6 +6442,7 @@
       "including_examples": [
         "ex_dsp_rt",
         "ex_fiff_api",
+        "ex_inv_dipole_fit",
         "ex_inverse_mne"
       ],
       "snippets": [
@@ -6465,6 +6468,7 @@
       "including_examples": [
         "ex_dsp_rt",
         "ex_fiff_api",
+        "ex_inv_dipole_fit",
         "ex_inverse_mne"
       ],
       "snippets": [
@@ -6490,6 +6494,7 @@
       "including_examples": [
         "ex_dsp_rt",
         "ex_fiff_api",
+        "ex_inv_dipole_fit",
         "ex_inverse_mne"
       ],
       "snippets": [
@@ -6515,6 +6520,7 @@
       "including_examples": [
         "ex_dsp_rt",
         "ex_fiff_api",
+        "ex_inv_dipole_fit",
         "ex_inverse_mne"
       ],
       "snippets": [
@@ -6583,7 +6589,8 @@
         "ex_compute_forward",
         "ex_dsp_artifacts",
         "ex_fiff_api",
-        "ex_hpiFit"
+        "ex_hpiFit",
+        "ex_inv_hpi"
       ],
       "snippets": [
         "ex_fiff_api/main.cpp#fiff_info_usage"
@@ -6704,7 +6711,8 @@
         "ex_dsp_maxwell",
         "ex_dsp_rt",
         "ex_fiff_api",
-        "ex_fwd_api"
+        "ex_fwd_api",
+        "ex_inv_hpi"
       ],
       "snippets": [
         "ex_read_raw/main.cpp#fiff_raw_data_open",
@@ -6952,6 +6960,7 @@
         "ex_fs",
         "ex_histogram",
         "ex_inv_api",
+        "ex_inv_beamformer",
         "ex_inverse_mne_raw",
         "ex_inverse_pwl_rap_music",
         "ex_inverse_rap_music",
@@ -7356,10 +7365,14 @@
       "registry_status": "documented",
       "test": null,
       "test_resolves": false,
-      "example": null,
-      "example_state": "none",
-      "including_examples": [],
-      "snippets": [],
+      "example": "ex_inv_beamformer",
+      "example_state": "built",
+      "including_examples": [
+        "ex_inv_beamformer"
+      ],
+      "snippets": [
+        "ex_inv_beamformer/main.cpp#inv_lcmv_usage"
+      ],
       "api_page": "doc/website/docs/api/inv/inv-beamformer.mdx",
       "python_equiv": null,
       "example_eligible": true,
@@ -7394,10 +7407,14 @@
       "registry_status": "done",
       "test": "test_inv_beamformer",
       "test_resolves": true,
-      "example": null,
-      "example_state": "none",
-      "including_examples": [],
-      "snippets": [],
+      "example": "ex_inv_beamformer",
+      "example_state": "built",
+      "including_examples": [
+        "ex_inv_beamformer"
+      ],
+      "snippets": [
+        "ex_inv_beamformer/main.cpp#inv_dics_usage"
+      ],
       "api_page": "doc/website/docs/api/inv/inv-dics.mdx",
       "python_equiv": "mne.beamformer.make_dics / apply_dics",
       "example_eligible": true,
@@ -7413,10 +7430,14 @@
       "registry_status": "done",
       "test": "test_inv_beamformer",
       "test_resolves": true,
-      "example": null,
-      "example_state": "none",
-      "including_examples": [],
-      "snippets": [],
+      "example": "ex_inv_beamformer",
+      "example_state": "built",
+      "including_examples": [
+        "ex_inv_beamformer"
+      ],
+      "snippets": [
+        "ex_inv_beamformer/main.cpp#inv_lcmv_usage"
+      ],
       "api_page": "doc/website/docs/api/inv/inv-lcmv.mdx",
       "python_equiv": "mne.beamformer.make_lcmv / apply_lcmv",
       "example_eligible": true,
@@ -7432,10 +7453,14 @@
       "registry_status": "done",
       "test": "test_dipole_fit",
       "test_resolves": true,
-      "example": null,
-      "example_state": "none",
-      "including_examples": [],
-      "snippets": [],
+      "example": "ex_inv_dipole_fit",
+      "example_state": "built",
+      "including_examples": [
+        "ex_inv_dipole_fit"
+      ],
+      "snippets": [
+        "ex_inv_dipole_fit/main.cpp#inv_dipole_fit_usage"
+      ],
       "api_page": "doc/website/docs/api/inv/inv-dipole-fit.mdx",
       "python_equiv": "mne.fit_dipole",
       "example_eligible": true,
@@ -7451,10 +7476,14 @@
       "registry_status": "documented",
       "test": null,
       "test_resolves": false,
-      "example": null,
-      "example_state": "none",
-      "including_examples": [],
-      "snippets": [],
+      "example": "ex_inv_dipole_fit",
+      "example_state": "built",
+      "including_examples": [
+        "ex_inv_dipole_fit"
+      ],
+      "snippets": [
+        "ex_inv_dipole_fit/main.cpp#inv_dipole_fit_data_usage"
+      ],
       "api_page": "doc/website/docs/api/inv/inv-dipole-fit-data.mdx",
       "python_equiv": null,
       "example_eligible": true,
@@ -7472,7 +7501,9 @@
       "test_resolves": false,
       "example": null,
       "example_state": "none",
-      "including_examples": [],
+      "including_examples": [
+        "ex_inv_dipole_fit"
+      ],
       "snippets": [],
       "api_page": "doc/website/docs/api/inv/inv-dipole-fit-settings.mdx",
       "python_equiv": null,
@@ -7489,10 +7520,14 @@
       "registry_status": "documented",
       "test": null,
       "test_resolves": false,
-      "example": null,
-      "example_state": "none",
-      "including_examples": [],
-      "snippets": [],
+      "example": "ex_inv_dipole_fit",
+      "example_state": "built",
+      "including_examples": [
+        "ex_inv_dipole_fit"
+      ],
+      "snippets": [
+        "ex_inv_dipole_fit/main.cpp#inv_dipole_fit_data_usage"
+      ],
       "api_page": "doc/website/docs/api/inv/inv-dipole-forward.mdx",
       "python_equiv": null,
       "example_eligible": true,
@@ -7508,10 +7543,14 @@
       "registry_status": "documented",
       "test": null,
       "test_resolves": false,
-      "example": null,
-      "example_state": "none",
-      "including_examples": [],
-      "snippets": [],
+      "example": "ex_inv_dipole_fit",
+      "example_state": "built",
+      "including_examples": [
+        "ex_inv_dipole_fit"
+      ],
+      "snippets": [
+        "ex_inv_dipole_fit/main.cpp#inv_dipole_fit_data_usage"
+      ],
       "api_page": "doc/website/docs/api/inv/inv-ecd.mdx",
       "python_equiv": null,
       "example_eligible": true,
@@ -7527,10 +7566,14 @@
       "registry_status": "documented",
       "test": null,
       "test_resolves": false,
-      "example": null,
-      "example_state": "none",
-      "including_examples": [],
-      "snippets": [],
+      "example": "ex_inv_dipole_fit",
+      "example_state": "built",
+      "including_examples": [
+        "ex_inv_dipole_fit"
+      ],
+      "snippets": [
+        "ex_inv_dipole_fit/main.cpp#inv_dipole_fit_usage"
+      ],
       "api_page": "doc/website/docs/api/inv/inv-ecd-set.mdx",
       "python_equiv": null,
       "example_eligible": true,
@@ -7546,10 +7589,14 @@
       "registry_status": "documented",
       "test": null,
       "test_resolves": false,
-      "example": null,
-      "example_state": "none",
-      "including_examples": [],
-      "snippets": [],
+      "example": "ex_inv_dipole_fit",
+      "example_state": "built",
+      "including_examples": [
+        "ex_inv_dipole_fit"
+      ],
+      "snippets": [
+        "ex_inv_dipole_fit/main.cpp#inv_dipole_fit_data_usage"
+      ],
       "api_page": "doc/website/docs/api/inv/inv-guess-data.mdx",
       "python_equiv": null,
       "example_eligible": true,
@@ -7565,13 +7612,16 @@
       "registry_status": "documented",
       "test": null,
       "test_resolves": false,
-      "example": null,
-      "example_state": "none",
+      "example": "ex_inv_hpi",
+      "example_state": "built",
       "including_examples": [
         "ex_dsp_rt",
-        "ex_hpiFit"
+        "ex_hpiFit",
+        "ex_inv_hpi"
       ],
-      "snippets": [],
+      "snippets": [
+        "ex_inv_hpi/main.cpp#inv_hpi_usage"
+      ],
       "api_page": "doc/website/docs/api/inv/inv-hpi-data-updater.mdx",
       "python_equiv": null,
       "example_eligible": true,
@@ -7587,13 +7637,16 @@
       "registry_status": "done",
       "test": "test_hpiFit",
       "test_resolves": true,
-      "example": "ex_hpiFit",
+      "example": "ex_inv_hpi",
       "example_state": "built",
       "including_examples": [
         "ex_dsp_rt",
-        "ex_hpiFit"
+        "ex_hpiFit",
+        "ex_inv_hpi"
       ],
-      "snippets": [],
+      "snippets": [
+        "ex_inv_hpi/main.cpp#inv_hpi_usage"
+      ],
       "api_page": "doc/website/docs/api/inv/inv-hpi-fit.mdx",
       "python_equiv": "mne.chpi",
       "example_eligible": true,
@@ -7609,10 +7662,14 @@
       "registry_status": "documented",
       "test": null,
       "test_resolves": false,
-      "example": null,
-      "example_state": "none",
-      "including_examples": [],
-      "snippets": [],
+      "example": "ex_inv_hpi",
+      "example_state": "built",
+      "including_examples": [
+        "ex_inv_hpi"
+      ],
+      "snippets": [
+        "ex_inv_hpi/main.cpp#inv_hpi_fit_data_usage"
+      ],
       "api_page": "doc/website/docs/api/inv/inv-hpi-fit-data.mdx",
       "python_equiv": null,
       "example_eligible": true,
@@ -7628,12 +7685,15 @@
       "registry_status": "documented",
       "test": null,
       "test_resolves": false,
-      "example": null,
-      "example_state": "none",
+      "example": "ex_inv_hpi",
+      "example_state": "built",
       "including_examples": [
-        "ex_dsp_rt"
+        "ex_dsp_rt",
+        "ex_inv_hpi"
       ],
-      "snippets": [],
+      "snippets": [
+        "ex_inv_hpi/main.cpp#inv_hpi_usage"
+      ],
       "api_page": "doc/website/docs/api/inv/inv-hpi-model-parameters.mdx",
       "python_equiv": null,
       "example_eligible": true,
@@ -7649,10 +7709,15 @@
       "registry_status": "documented",
       "test": null,
       "test_resolves": false,
-      "example": null,
-      "example_state": "none",
-      "including_examples": [],
-      "snippets": [],
+      "example": "ex_inv_hpi",
+      "example_state": "built",
+      "including_examples": [
+        "ex_inv_hpi"
+      ],
+      "snippets": [
+        "ex_inv_hpi/main.cpp#inv_sensor_set_usage",
+        "ex_inv_hpi/main.cpp#inv_sensor_set_usage"
+      ],
       "api_page": "doc/website/docs/api/inv/inv-sensor-set.mdx",
       "python_equiv": null,
       "example_eligible": true,
@@ -7668,10 +7733,15 @@
       "registry_status": "documented",
       "test": null,
       "test_resolves": false,
-      "example": null,
-      "example_state": "none",
-      "including_examples": [],
-      "snippets": [],
+      "example": "ex_inv_hpi",
+      "example_state": "built",
+      "including_examples": [
+        "ex_inv_hpi"
+      ],
+      "snippets": [
+        "ex_inv_hpi/main.cpp#inv_sensor_set_usage",
+        "ex_inv_hpi/main.cpp#inv_sensor_set_usage"
+      ],
       "api_page": "doc/website/docs/api/inv/inv-sensor-set-creator.mdx",
       "python_equiv": null,
       "example_eligible": true,
@@ -7687,10 +7757,14 @@
       "registry_status": "documented",
       "test": null,
       "test_resolves": false,
-      "example": null,
-      "example_state": "none",
-      "including_examples": [],
-      "snippets": [],
+      "example": "ex_inv_hpi",
+      "example_state": "built",
+      "including_examples": [
+        "ex_inv_hpi"
+      ],
+      "snippets": [
+        "ex_inv_hpi/main.cpp#inv_signal_model_usage"
+      ],
       "api_page": "doc/website/docs/api/inv/inv-signal-model.mdx",
       "python_equiv": null,
       "example_eligible": true,
@@ -7808,6 +7882,7 @@
         "ex_histogram",
         "ex_interpolation",
         "ex_inv_api",
+        "ex_inv_beamformer",
         "ex_inverse_mne",
         "ex_inverse_mne_raw",
         "ex_inverse_pwl_rap_music",
@@ -7858,10 +7933,14 @@
       "registry_status": "done",
       "test": "test_source_estimate_types",
       "test_resolves": true,
-      "example": null,
-      "example_state": "none",
-      "including_examples": [],
-      "snippets": [],
+      "example": "ex_inv_api",
+      "example_state": "built",
+      "including_examples": [
+        "ex_inv_api"
+      ],
+      "snippets": [
+        "ex_inv_api/main.cpp#inv_vector_source_estimate_usage"
+      ],
       "api_page": "doc/website/docs/api/inv/inv-vector-source-estimate.mdx",
       "python_equiv": "mne.VectorSourceEstimate",
       "example_eligible": true,
@@ -7877,10 +7956,14 @@
       "registry_status": "done",
       "test": "test_source_estimate_types",
       "test_resolves": true,
-      "example": null,
-      "example_state": "none",
-      "including_examples": [],
-      "snippets": [],
+      "example": "ex_inv_api",
+      "example_state": "built",
+      "including_examples": [
+        "ex_inv_api"
+      ],
+      "snippets": [
+        "ex_inv_api/main.cpp#inv_volume_source_estimate_usage"
+      ],
       "api_page": "doc/website/docs/api/inv/inv-volume-source-estimate.mdx",
       "python_equiv": "mne.VolumeSourceEstimate",
       "example_eligible": true,
@@ -7896,10 +7979,14 @@
       "registry_status": "done",
       "test": "test_inv_cmne",
       "test_resolves": true,
-      "example": "ex_clustered_inverse_mne",
+      "example": "ex_inv_api",
       "example_state": "built",
-      "including_examples": [],
-      "snippets": [],
+      "including_examples": [
+        "ex_inv_api"
+      ],
+      "snippets": [
+        "ex_inv_api/main.cpp#inv_cmne_usage"
+      ],
       "api_page": "doc/website/docs/api/inv/inv-cmne.mdx",
       "python_equiv": null,
       "example_eligible": true,
@@ -7917,8 +8004,12 @@
       "test_resolves": false,
       "example": null,
       "example_state": "none",
-      "including_examples": [],
-      "snippets": [],
+      "including_examples": [
+        "ex_inv_api"
+      ],
+      "snippets": [
+        "ex_inv_api/main.cpp#inv_cmne_usage"
+      ],
       "api_page": null,
       "python_equiv": null,
       "example_eligible": true,
@@ -7985,10 +8076,14 @@
       "registry_status": "done",
       "test": "test_source_morph",
       "test_resolves": true,
-      "example": null,
-      "example_state": "none",
-      "including_examples": [],
-      "snippets": [],
+      "example": "ex_inv_api",
+      "example_state": "built",
+      "including_examples": [
+        "ex_inv_api"
+      ],
+      "snippets": [
+        "ex_inv_api/main.cpp#source_morph_usage"
+      ],
       "api_page": "doc/website/docs/api/inv/source-morph.mdx",
       "python_equiv": "mne.SourceMorph",
       "example_eligible": true,
@@ -8004,10 +8099,14 @@
       "registry_status": "documented",
       "test": null,
       "test_resolves": false,
-      "example": null,
-      "example_state": "none",
-      "including_examples": [],
-      "snippets": [],
+      "example": "ex_inv_beamformer",
+      "example_state": "built",
+      "including_examples": [
+        "ex_inv_beamformer"
+      ],
+      "snippets": [
+        "ex_inv_beamformer/main.cpp#inv_rap_music_usage"
+      ],
       "api_page": "doc/website/docs/api/inv/inv-dipole.mdx",
       "python_equiv": null,
       "example_eligible": true,
@@ -8023,15 +8122,18 @@
       "registry_status": "documented",
       "test": null,
       "test_resolves": false,
-      "example": null,
-      "example_state": "none",
+      "example": "ex_inv_beamformer",
+      "example_state": "built",
       "including_examples": [
         "ex_clustered_inverse_pwl_rap_music_raw",
+        "ex_inv_beamformer",
         "ex_inverse_pwl_rap_music",
         "ex_roi_clustered_inverse_pwl_rap_music",
         "ex_st_clustered_inverse_pwl_rap_music"
       ],
-      "snippets": [],
+      "snippets": [
+        "ex_inv_beamformer/main.cpp#inv_rap_music_usage"
+      ],
       "api_page": "doc/website/docs/api/inv/inv-pwl-rap-music.mdx",
       "python_equiv": null,
       "example_eligible": true,
@@ -8047,13 +8149,16 @@
       "registry_status": "done",
       "test": "test_inv_dipole_rap_mne",
       "test_resolves": true,
-      "example": "ex_inverse_rap_music",
+      "example": "ex_inv_beamformer",
       "example_state": "built",
       "including_examples": [
         "ex_clustered_inverse_rap_music_raw",
+        "ex_inv_beamformer",
         "ex_inverse_rap_music"
       ],
-      "snippets": [],
+      "snippets": [
+        "ex_inv_beamformer/main.cpp#inv_rap_music_usage"
+      ],
       "api_page": "doc/website/docs/api/inv/inv-rap-music.mdx",
       "python_equiv": "mne.beamformer.rap_music",
       "example_eligible": true,
@@ -8069,10 +8174,14 @@
       "registry_status": "done",
       "test": "test_trap_music",
       "test_resolves": true,
-      "example": null,
-      "example_state": "none",
-      "including_examples": [],
-      "snippets": [],
+      "example": "ex_inv_beamformer",
+      "example_state": "built",
+      "including_examples": [
+        "ex_inv_beamformer"
+      ],
+      "snippets": [
+        "ex_inv_beamformer/main.cpp#inv_trap_music_usage"
+      ],
       "api_page": "doc/website/docs/api/inv/inv-trap-music.mdx",
       "python_equiv": "mne.beamformer.trap_music",
       "example_eligible": true,
@@ -8090,8 +8199,12 @@
       "test_resolves": false,
       "example": null,
       "example_state": "none",
-      "including_examples": [],
-      "snippets": [],
+      "including_examples": [
+        "ex_inv_beamformer"
+      ],
+      "snippets": [
+        "ex_inv_beamformer/main.cpp#inv_trap_music_usage"
+      ],
       "api_page": null,
       "python_equiv": null,
       "example_eligible": true,
@@ -8107,10 +8220,14 @@
       "registry_status": "done",
       "test": "test_inv_sparse",
       "test_resolves": true,
-      "example": null,
-      "example_state": "none",
-      "including_examples": [],
-      "snippets": [],
+      "example": "ex_inv_api",
+      "example_state": "built",
+      "including_examples": [
+        "ex_inv_api"
+      ],
+      "snippets": [
+        "ex_inv_api/main.cpp#inv_gamma_map_usage"
+      ],
       "api_page": "doc/website/docs/api/inv/inv-gamma-map.mdx",
       "python_equiv": "mne.inverse_sparse.gamma_map",
       "example_eligible": true,
@@ -8128,8 +8245,12 @@
       "test_resolves": false,
       "example": null,
       "example_state": "none",
-      "including_examples": [],
-      "snippets": [],
+      "including_examples": [
+        "ex_inv_api"
+      ],
+      "snippets": [
+        "ex_inv_api/main.cpp#inv_gamma_map_usage"
+      ],
       "api_page": null,
       "python_equiv": null,
       "example_eligible": true,
@@ -8191,10 +8312,14 @@
       "registry_status": "done",
       "test": "test_tf_mxne",
       "test_resolves": true,
-      "example": null,
-      "example_state": "none",
-      "including_examples": [],
-      "snippets": [],
+      "example": "ex_inv_api",
+      "example_state": "built",
+      "including_examples": [
+        "ex_inv_api"
+      ],
+      "snippets": [
+        "ex_inv_api/main.cpp#inv_tf_mxne_usage"
+      ],
       "api_page": "doc/website/docs/api/inv/inv-tf-mxne.mdx",
       "python_equiv": "mne.inverse_sparse.tf_mixed_norm",
       "example_eligible": true,
@@ -8212,8 +8337,12 @@
       "test_resolves": false,
       "example": null,
       "example_state": "none",
-      "including_examples": [],
-      "snippets": [],
+      "including_examples": [
+        "ex_inv_api"
+      ],
+      "snippets": [
+        "ex_inv_api/main.cpp#inv_tf_mxne_usage"
+      ],
       "api_page": null,
       "python_equiv": null,
       "example_eligible": true,
@@ -8231,8 +8360,12 @@
       "test_resolves": false,
       "example": null,
       "example_state": "none",
-      "including_examples": [],
-      "snippets": [],
+      "including_examples": [
+        "ex_inv_api"
+      ],
+      "snippets": [
+        "ex_inv_api/main.cpp#inv_tf_mxne_usage"
+      ],
       "api_page": null,
       "python_equiv": null,
       "example_eligible": true,
@@ -9429,6 +9562,7 @@
         "ex_dsp_rt",
         "ex_fwd_api",
         "ex_inv_api",
+        "ex_inv_beamformer",
         "ex_read_fwd",
         "ex_read_fwd_disp_3D"
       ],
@@ -10832,6 +10966,7 @@
         "ex_connectivity_comparison",
         "ex_connectivity_performance",
         "ex_hpiFit",
+        "ex_inv_hpi",
         "ex_read_bem",
         "ex_read_fwd",
         "ex_utils"

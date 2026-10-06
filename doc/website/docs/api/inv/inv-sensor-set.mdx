@@ -17,6 +17,16 @@ class INVLIB::InvSensorSet
 
 Stores MEG sensor geometry (positions, orientations, weights, coil count) for a single sensor type.
 
+```cpp title="src/examples/ex_inv_hpi/main.cpp"
+InvSensorSetCreator creator; // reads resources/general/coilDefinitions/coil_def.dat
+QList<FiffChInfo> megChannels;
+for (const FiffChInfo& ch : info->chs) {
+    if (ch.kind == FIFFV_MEG_CH)
+        megChannels << ch;
+}
+const InvSensorSet sensors = creator.updateSensorSet(megChannels, Accuracy::high); // integration points per coil
+```
+
 ---
 
 ## Public Methods
@@ -101,6 +111,12 @@ Default Constructor.
 ### operator!=(b)
 
 ---
+
+## Example
+
+- Full source: [`src/examples/ex_inv_hpi/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_inv_hpi/main.cpp)
+- Build target: `ex_inv_hpi` (runs under CTest)
+- Data: [mne-cpp-test-data](https://github.com/mne-tools/mne-cpp-test-data)
 
 ## Authors of this file
 

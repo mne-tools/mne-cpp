@@ -102,6 +102,8 @@ struct HPISortStruct
  * and @c ft_compute_leadfield reference implementations.
  *
  * @brief Per-coil magnetic-dipole fitter (leadfield, residual, Nelder-Mead refinement) for the HPI pipeline.
+ *
+ * @snippet ex_inv_hpi/main.cpp inv_hpi_fit_data_usage
  */
 class INVSHARED_EXPORT InvHpiFitData
 {

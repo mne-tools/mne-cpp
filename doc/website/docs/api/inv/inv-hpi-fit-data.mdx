@@ -21,6 +21,20 @@ Routines are validated against FieldTrip's `magnetic_dipole` and `ft_compute_lea
 
 Per-coil magnetic-dipole fitter (leadfield, residual, Nelder-Mead refinement) for the HPI pipeline.
 
+```cpp title="src/examples/ex_inv_hpi/main.cpp"
+// One coil's magnetic-dipole fit, as InvHpiFit runs it per coil: seeded 5 mm off the fitted position.
+const MatrixXd coilsDevice = fit.devHeadTrans.apply_inverse_trans(updater.getHpiDigitizer().cast<float>()).cast<double>();
+InvHpiFitData coilFit;
+coilFit.m_coilPos = coilsDevice.row(0) + RowVector3d(0.005, 0.0, 0.0);
+const int strongest = amplitudes.row(0).squaredNorm() >= amplitudes.row(4).squaredNorm() ? 0 : 4;
+coilFit.m_sensorData = amplitudes.row(strongest).transpose();
+coilFit.m_sensors = updater.getSensors();
+coilFit.m_matProjector = updater.getProjectors();
+coilFit.m_iMaxIterations = 500;
+coilFit.m_fAbortError = 1e-9f;
+coilFit.doDipfitConcurrent();
+```
+
 ---
 
 ## Public Methods
@@ -36,6 +50,12 @@ Default constructor.
 dipfit function is adapted from Fieldtrip Software.
 
 ---
+
+## Example
+
+- Full source: [`src/examples/ex_inv_hpi/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_inv_hpi/main.cpp)
+- Build target: `ex_inv_hpi` (runs under CTest)
+- Data: [mne-cpp-test-data](https://github.com/mne-tools/mne-cpp-test-data)
 
 ## Authors of this file
 

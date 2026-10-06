@@ -131,6 +131,8 @@ struct HpiFitResult
  * recomputing it on every call.
  *
  * @brief Drives one HPI fit (per-coil dipole localisation, coil ordering, dewar-to-head transform).
+ *
+ * @snippet ex_inv_hpi/main.cpp inv_hpi_usage
  */
 class INVSHARED_EXPORT InvHpiFit
 {

@@ -23,6 +23,14 @@ This class is the C++ equivalent of MNE-Python's Beamformer dict.
 
 Computed beamformer spatial filter container.
 
+```cpp title="src/examples/ex_inv_beamformer/main.cpp"
+FiffCov dataCov = noiseCov; // noise plus the two sources
+dataCov.data += g1 * g1.transpose() + g2 * g2.transpose();
+const InvBeamformer lcmv = InvLCMV::makeLCMV(info, fwd, dataCov, 0.05, noiseCov,
+                                             BeamformerPickOri::MaxPower, BeamformerWeightNorm::UnitNoiseGain);
+const VectorXd lcmvPower = InvLCMV::applyLCMVCov(dataCov, lcmv).data.col(0); // one value per source
+```
+
 ---
 
 ## Public Methods
@@ -82,6 +90,12 @@ Returns the number of frequency bins (1 for LCMV, &gt;= 1 for DICS).
 - *int* — Number of frequency bins with separate filter weights.
 
 ---
+
+## Example
+
+- Full source: [`src/examples/ex_inv_beamformer/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_inv_beamformer/main.cpp)
+- Build target: `ex_inv_beamformer` (runs under CTest)
+- Data: [mne-cpp-test-data](https://github.com/mne-tools/mne-cpp-test-data)
 
 ## Authors of this file
 
