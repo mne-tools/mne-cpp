@@ -26,7 +26,9 @@
 // QT INCLUDES
 //=============================================================================================================
 
+#include <QDir>
 #include <QFile>
+#include <QFileInfo>
 #include <QTextStream>
 
 //=============================================================================================================
@@ -72,7 +74,7 @@ void MNEClusterInfo::write(QString p_sFileName) const
         out << "\nLabel : " << clusterLabelNames[i] << "\n";
         out << "FsLabel ID : " << clusterLabelIds[i] << "\n";
         out << "Centroid Vertno : " << centroidVertno[i] << "\n";
-        out << "Centroid rr : " << centroidSource_rr[i](0) << ", " << clusterSource_rr[i](1) << ", " << clusterSource_rr[i](2) << "\n";
+        out << "Centroid rr : " << centroidSource_rr[i](0) << ", " << centroidSource_rr[i](1) << ", " << centroidSource_rr[i](2) << "\n";
         out << "Vertnos :\n";
         for (qint32 j = 0; j < clusterVertnos[i].size(); ++j)
             out << clusterVertnos[i][j] << ", ";
@@ -89,7 +91,9 @@ void MNEClusterInfo::write(QString p_sFileName) const
     // optional, as QFile destructor will already do it:
     file.close();
 
-    QFile file_centroids("./centroids_" + p_sFileName);
+    // Next to the main file: <dir>/centroids_<name>
+    const QFileInfo info(p_sFileName);
+    QFile file_centroids(info.dir().filePath("centroids_" + info.fileName()));
 
     if (file_centroids.open(QIODevice::WriteOnly | QIODevice::Text)) {
         QTextStream out_centroids(&file_centroids);

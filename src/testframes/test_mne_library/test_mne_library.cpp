@@ -1107,8 +1107,25 @@ void TestMneLibrary::forwardSolution_pickTypes()
 void TestMneLibrary::forwardSolution_clusterInfo()
 {
     MNEClusterInfo ci;
-    ci.clusterVertnos.append(VectorXi::LinSpaced(5, 0, 4));
-    QCOMPARE(ci.clusterVertnos.size(), 1);
+    ci.clusterLabelNames << "V1";
+    ci.clusterLabelIds << 7;
+    ci.centroidVertno << 42;
+    ci.centroidSource_rr << Vector3f(0.5f, 0.25f, 0.125f);
+    ci.clusterVertnos << VectorXi::LinSpaced(2, 41, 42);
+    MatrixX3f rr(2, 3);
+    rr << 1.0f, 2.0f, 3.0f, 4.0f, 5.0f, 6.0f;
+    ci.clusterSource_rr << rr;
+    ci.clusterDistances << VectorXd::Zero(2);
+
+    // The centroid line holds the centroid, and the centroid list lands next to the file.
+    QTemporaryDir dir;
+    ci.write(dir.filePath("clusters.txt"));
+    QFile text(dir.filePath("clusters.txt"));
+    QVERIFY(text.open(QIODevice::ReadOnly | QIODevice::Text));
+    QVERIFY(QString(text.readAll()).contains("Centroid rr : 0.5, 0.25, 0.125\n"));
+    QFile centroids(dir.filePath("centroids_clusters.txt"));
+    QVERIFY(centroids.open(QIODevice::ReadOnly | QIODevice::Text));
+    QCOMPARE(QString(centroids.readAll()), QString("42, "));
 }
 
 void TestMneLibrary::forwardSolution_reduceForward()

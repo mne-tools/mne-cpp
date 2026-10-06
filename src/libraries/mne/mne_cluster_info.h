@@ -55,6 +55,8 @@ namespace MNELIB
  * solution: contained vertices, representative dipole and mean orientation.
  *
  * @brief Cluster table used to compress and reconstruct a clustered leadfield.
+ *
+ * @snippet ex_inv_api/main.cpp mne_cluster_info_usage
  */
 class MNESHARED_EXPORT MNEClusterInfo
 {
@@ -92,7 +94,8 @@ public:
 
     //=========================================================================================================
     /**
-     * Writes the cluster info to a file
+     * Writes the cluster info as text, and the centroid vertex numbers to
+     * @c centroids_<name> in the same directory.
      *
      * @param[in] p_sFileName    FileName to write to.
      */
