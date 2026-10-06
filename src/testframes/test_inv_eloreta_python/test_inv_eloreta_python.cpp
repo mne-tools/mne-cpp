@@ -33,7 +33,9 @@
  *
  * The same free operator feeds mne.minimum_norm.estimate_snr (sample evoked,
  * and a ramp of source 10's z column) and apply_inverse_raw on samples
- * 1000-1099 of sample_audvis_trunc_raw.fif. mne-python reads the data with
+ * 1000-1099 of sample_audvis_trunc_raw.fif, and the MNEMneData slots (SNR and
+ * lambda2 per time against the MNE-C regularization run in numpy, predicted
+ * data against apply_inverse's residual). mne-python reads the data with
  * the spaces dropped from the channel names, as MNE-CPP reads all names.
  */
 
@@ -98,6 +100,9 @@ private slots:
     void makeInverse_matchesPython();
     void estimateSnr_matchesPython_data();
     void estimateSnr_matchesPython();
+    void mneData_matchesPython_data();
+    void mneData_matchesPython();
+    void mneData_predictedMatchesPython();
     void applyInverseRaw_matchesPython_data();
     void applyInverseRaw_matchesPython();
     void kernel_matchesPython_data();
@@ -314,6 +319,89 @@ void TestInvEloretaPython::estimateSnr_matchesPython()
     QVERIFY(std::fabs(est(100) - est100) <= 1e-9 * est100);
     QVERIFY(std::fabs(est(400) - est400) <= 1e-9 * est400);
     QCOMPARE(static_cast<int>((est.array() == 0.0).count()), zeros);
+}
+
+//=============================================================================================================
+
+void TestInvEloretaPython::mneData_matchesPython_data()
+{
+    QTest::addColumn<double>("amplitude");
+    QTest::addColumn<double>("datapAbsSum");
+    QTest::addColumn<double>("snrSum");
+    QTest::addColumn<double>("snr100");
+    QTest::addColumn<double>("lambda2Sum");
+    QTest::addColumn<double>("lambda2_100");
+    QTest::addColumn<double>("lambda2_400");
+    QTest::addColumn<int>("hundreds");
+
+    // p = prepare_inverse_operator(inv, nave, 1/9, 'MNE'); white = p['whitener'] @ p['proj'] @ data,
+    // datap = p['eigen_fields']['data'] @ white, SNR = (white**2).sum(0) / 360 (= estimate_snr's snr**2)
+    // and MNE-C noise_regularization in numpy: lambda2 = 10 * 0.9**k until
+    // sum((datap[:, t] * lambda2 / (sing**2 + lambda2))**2) < chi2.isf(1e-3, 209), 100 where SNR < 1.
+    QTest::newRow("sample evoked") << 0.0 << 1380634.501489471 << 146652.3428555677 << 354.67510619465145
+                                   << 3.26430206181887e-11 << 7.259979873896993e-14 << 8.066644304329992e-14 << 0;
+    QTest::newRow("source ramp") << 3e-9 << 1337443.740125139 << 1564872.3486447309 << 639.5150849852365
+                                 << 460.038001613079 << 0.0706965049015105 << 0.0026972160559060807 << 3;
+}
+
+//=============================================================================================================
+
+void TestInvEloretaPython::mneData_matchesPython()
+{
+    QFETCH(double, amplitude);
+    QFETCH(double, datapAbsSum);
+    QFETCH(double, snrSum);
+    QFETCH(double, snr100);
+    QFETCH(double, lambda2Sum);
+    QFETCH(double, lambda2_100);
+    QFETCH(double, lambda2_400);
+    QFETCH(int, hundreds);
+
+    FiffEvoked evoked = m_evoked;
+    if (amplitude > 0.0) {
+        const VectorXd g = m_freeFwd.sol->data.col(32);
+        const RowVectorXd ramp = RowVectorXd::LinSpaced(evoked.data.cols(), 1.0, static_cast<double>(evoked.data.cols())) * amplitude;
+        evoked.data.setZero();
+        for (int i = 0; i < g.size(); ++i)
+            evoked.data.row(evoked.info.ch_names.indexOf(m_freeFwd.sol->row_names[i])) = g(i) * ramp;
+    }
+
+    InvMinimumNorm mn(m_loose, 1.0f / 9.0f, "MNE");
+    const MNEMneData mne = mn.mneData(evoked);
+    QCOMPARE(static_cast<int>(mne.datap.rows()), 210);
+    QCOMPARE(static_cast<int>(mne.datap.cols()), 421);
+    const double gotDatap = mne.datap.cwiseAbs().sum();
+    QVERIFY2(std::fabs(gotDatap - datapAbsSum) <= 1e-6 * datapAbsSum, qPrintable(QString("datap sum %1").arg(gotDatap, 0, 'g', 17)));
+    QVERIFY2(std::fabs(mne.SNR.sum() - snrSum) <= 1e-6 * snrSum, qPrintable(QString("SNR sum %1").arg(mne.SNR.sum(), 0, 'g', 17)));
+    QVERIFY(std::fabs(mne.SNR(100) - snr100) <= 1e-6 * snr100);
+    // lambda2 is 10 * 0.9^k: one iteration off moves a value by 10%.
+    const double gotLambda2 = mne.lambda2_est.sum();
+    QVERIFY2(std::fabs(gotLambda2 - lambda2Sum) <= 1e-6 * lambda2Sum, qPrintable(QString("lambda2 sum %1").arg(gotLambda2, 0, 'g', 17)));
+    QVERIFY(std::fabs(mne.lambda2_est(100) - lambda2_100) <= 1e-6 * lambda2_100);
+    QVERIFY(std::fabs(mne.lambda2_est(400) - lambda2_400) <= 1e-6 * lambda2_400);
+    QCOMPARE(static_cast<int>((mne.lambda2_est.array() == 100.0).count()), hundreds);
+    QCOMPARE(mne.lambda2, mne.lambda2_est);
+}
+
+//=============================================================================================================
+
+void TestInvEloretaPython::mneData_predictedMatchesPython()
+{
+    // lambda2 = trace_ratio / 9 = mean(sing**2) / 9 (power SNR 9, MNE-C op->nchan = number of
+    // singular values); apply_inverse(evoked, inv, lambda2, 'MNE', return_residual=True):
+    // predicted = data - residual.
+    InvMinimumNorm mn(m_loose, 1.0f / 9.0f, "MNE");
+    const MNEMneData mne = mn.mneData(m_evoked, 9.0);
+    QVERIFY(std::fabs(mne.lambda2(0) - 0.19047619047619055) <= 1e-12);
+    QCOMPARE(mne.lambda2.size(), mne.lambda2_est.size());
+    QCOMPARE(static_cast<int>(mne.predicted.rows()), 364);
+    const QStringList& names = mn.getPreparedInverseOperator().noise_cov->names;
+    QCOMPARE(names[5], QString("MEG0121"));
+    QCOMPARE(names[300], QString("MEG2632"));
+    const double absSum = mne.predicted.cwiseAbs().sum();
+    QVERIFY2(std::fabs(absSum - 0.047335931752795365) <= 1e-6 * 0.047335931752795365, qPrintable(QString("predicted sum %1").arg(absSum, 0, 'g', 17)));
+    QVERIFY(std::fabs(mne.predicted(5, 100) - 1.2397408293656668e-13) <= 1e-6 * 1.2397408293656668e-13);
+    QVERIFY(std::fabs(mne.predicted(300, 250) - 3.511460530211612e-13) <= 1e-6 * 3.511460530211612e-13);
 }
 
 //=============================================================================================================

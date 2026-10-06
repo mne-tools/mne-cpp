@@ -36,6 +36,7 @@
 #include "../inv_global.h"
 
 #include <mne/mne_inverse_operator.h>
+#include <mne/mne_mne_data.h>
 #include "../inv_source_estimate.h"
 #include <fs/fs_label.h>
 
@@ -113,6 +114,19 @@ public:
     virtual InvSourceEstimate calculateInverse(const FIFFLIB::FiffEvoked& p_fiffEvoked, bool pick_normal = false);
 
     virtual InvSourceEstimate calculateInverse(const Eigen::MatrixXd& data, float tmin, float tstep, bool pick_normal = false) const;
+
+    //=========================================================================================================
+    /**
+     * Sets the inverse up for the evoked data and computes their MNE data: eigenfield projections,
+     * SNR and lambda2 per time point and the predicted data (MNE-C @c mne_analyze; see
+     * @ref MNELIB::MNEMneData::compute).
+     *
+     * @param[in] p_fiffEvoked   Evoked data.
+     * @param[in] snr            Power SNR for a fixed lambda2, <= 0 to use the estimated lambda2 per time point.
+     *
+     * @return The MNE data; empty if the channels do not match the inverse operator.
+     */
+    MNELIB::MNEMneData mneData(const FIFFLIB::FiffEvoked& p_fiffEvoked, double snr = 0.0);
 
     //=========================================================================================================
     /**

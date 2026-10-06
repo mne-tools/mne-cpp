@@ -12,7 +12,7 @@
  *
  * Builds a loose-orientation inverse operator for the 70 lh.V1 sources of the
  * sample forward solution and compares every result with MNE-Python 1.11
- * (make_inverse_operator, apply_inverse, make_inverse_resolution_matrix,
+ * (make_inverse_operator, apply_inverse, estimate_snr, make_inverse_resolution_matrix,
  * extract_label_time_course, mixed_norm_solver). Exits non-zero on
  * any mismatch.
  */
@@ -125,6 +125,17 @@ int main(int argc, char* argv[])
     // mne.minimum_norm.apply_inverse(evoked, inv, 1/9, "dSPM"): 70 x 421, sum |stc| = 372483.6, stc[0, 0] = 5.00927
     ok &= expect(stc.data.rows() == 70 && stc.data.cols() == 421 && near(stc.data.cwiseAbs().sum(), 372483.6177246599, 1e-4) && near(stc.data(0, 0), 5.0092691144321755, 1e-4) && near(stc.tmin, -0.19979521, 1e-6),
                  "InvMinimumNorm/InvSourceEstimate: dSPM on 70 V1 sources matches mne.minimum_norm.apply_inverse");
+
+    //! [mne_mne_data_usage]
+    const MNEMneData perTime = dspm.mneData(evoked);       // lambda2 estimated per time point (MNE-C mne_analyze)
+    const MNEMneData atSnr3 = dspm.mneData(evoked, 9.0);   // power SNR 9: lambda2 = mean(sing^2) / 9
+    const VectorXd amplitudeSnr = perTime.SNR.cwiseSqrt(); // == mne.minimum_norm.estimate_snr's snr
+    const MatrixXd residual = evoked.pick_channels(inverse.noise_cov->names).data - atSnr3.predicted;
+    //! [mne_mne_data_usage]
+    // SNR = sum(whitened^2) / rank, the lambda2 search = MNE-C noise_regularization (both in numpy);
+    // predicted = data - apply_inverse(evoked, inv, mean(sing**2) / 9, "MNE", return_residual=True)[1]
+    ok &= expect(near(perTime.SNR.sum(), 146652.3428555677, 1e-6) && near(amplitudeSnr(100), std::sqrt(354.67510619465145), 1e-6) && near(perTime.lambda2.sum(), 3.26430206181887e-11, 1e-6) && near(atSnr3.lambda2(0), 0.19047619047619055, 1e-9) && near(atSnr3.predicted.cwiseAbs().sum(), 0.047335931752795365, 1e-6) && residual.rows() == 364,
+                 "MNEMneData: SNR, lambda2 and predicted data match mne.minimum_norm.estimate_snr / apply_inverse");
 
     //! [inv_resolution_matrix_usage]
     InvMinimumNorm mne(inverse, lambda2, "MNE");

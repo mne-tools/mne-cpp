@@ -8000,16 +8000,23 @@
       "header": "mne/mne_mne_data.h",
       "origin": "mne-c",
       "mne_c_tool": null,
-      "mne_python": null,
+      "mne_python": "mne.minimum_norm.estimate_snr",
       "sklearn": null,
-      "test": null,
-      "example": null,
+      "test": "test_inv_eloreta_python",
+      "example": "ex_inv_api",
+      "example_snippet": [
+        "ex_inv_api/main.cpp#mne_mne_data_usage"
+      ],
+      "example_mode": "run",
+      "required_data": [
+        "mne-cpp-test-data"
+      ],
       "status": "documented",
       "skigen_candidate": false,
       "documented": true,
       "sidebar_position": 30,
       "guide": null,
-      "python_equiv": null,
+      "python_equiv": "mne.minimum_norm.estimate_snr",
       "python_url": null
     },
     {

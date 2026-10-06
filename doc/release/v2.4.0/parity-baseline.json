@@ -20,16 +20,16 @@
     "lock_file": null
   },
   "summary": {
-    "claims": 358,
+    "claims": 359,
     "by_evidence": {
-      "cross-validated-static": 3,
+      "cross-validated-static": 4,
       "cross-validated-live": 1,
       "tested": 84,
       "unverified": 270
     },
     "by_source": {
       "classes": {
-        "cross-validated-static": 3,
+        "cross-validated-static": 4,
         "cross-validated-live": 1,
         "tested": 84,
         "unverified": 0
@@ -793,6 +793,14 @@
       "claimed": "implemented",
       "test": "test_report",
       "evidence": "tested"
+    },
+    {
+      "source": "classes",
+      "mne_cpp": "MNEMneData",
+      "python": "mne.minimum_norm.estimate_snr",
+      "claimed": "implemented",
+      "test": "test_inv_eloreta_python",
+      "evidence": "cross-validated-static"
     },
     {
       "source": "parity",

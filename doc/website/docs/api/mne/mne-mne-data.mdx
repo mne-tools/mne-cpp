@@ -9,6 +9,10 @@ sidebar_position: 30
 
 **Namespace:** `MNELIB` &nbsp;·&nbsp; **Library:** MNE Library
 
+:::info[Python equivalent]
+`mne.minimum_norm.estimate_snr` in MNE-Python.
+:::
+
 `#include <mne/mne_mne_data.h>`
 
 ```cpp
@@ -18,6 +22,13 @@ class MNELIB::MNEMneData
 Implements [`MNE`](/docs/api/mne/mne-class) Mne Data (Replaces *mneMneData,mneMneDataRec; struct of MNE-C `mne_types.h`).
 
 Data associated with [`MNE`](/docs/api/mne/mne-class) computations for each mneMeasDataSet
+
+```cpp title="src/examples/ex_inv_api/main.cpp"
+const MNEMneData perTime = dspm.mneData(evoked);       // lambda2 estimated per time point (MNE-C mne_analyze)
+const MNEMneData atSnr3 = dspm.mneData(evoked, 9.0);   // power SNR 9: lambda2 = mean(sing^2) / 9
+const VectorXd amplitudeSnr = perTime.SNR.cwiseSqrt(); // == mne.minimum_norm.estimate_snr's snr
+const MatrixXd residual = evoked.pick_channels(inverse.noise_cov->names).data - atSnr3.predicted;
+```
 
 ---
 
@@ -34,6 +45,78 @@ Constructs the [`MNEMneData`](/docs/api/mne/mne-mne-data).
 Destroys the [`MNEMneData`](/docs/api/mne/mne-mne-data).
 
 ---
+
+### computeRegularization(inv, data)
+
+Projects the whitened data on the eigenfields (MNE-C `mne_project_to_eigen_fields`) and estimates SNR and lambda2_est per time point (MNE-C `compute_regularization`, noise method).
+
+SNR is the power of the whitened data per non-zero noise eigenvalue (the square of `mne.minimum_norm.estimate_snr's` `snr`). lambda2_est is 100 where SNR &lt; 1; elsewhere it starts at 10 and shrinks by 0.9 until the squared prediction error of the whitened data falls below the chi^2 point at p = 0.001 with one degree of freedom less than the components used.
+
+**Parameters:**
+
+- **inv** : *const [MNEInverseOperator](/docs/api/mne/mne-inverse-operator) &*
+  A prepared inverse operator.
+
+- **data** : *const Eigen::MatrixXd &*
+  Measured data, one row per channel of `inv`, one column per time.
+
+---
+
+### selectRegularization(inv, snr)
+
+Selects lambda2 per time point (MNE-C `select_regularization`): trace_ratio / `snr` for a positive power SNR, lambda2_est otherwise.
+
+trace_ratio is the mean squared singular value.
+
+**Parameters:**
+
+- **inv** : *const [MNEInverseOperator](/docs/api/mne/mne-inverse-operator) &*
+  The prepared inverse operator used for computeRegularization.
+
+- **snr** : *double*
+  Power SNR, &lt;= 0 to use lambda2_est.
+
+---
+
+### computePredicted(inv)
+
+Computes the data the minimum-norm estimate predicts with the selected lambda2, colored back to the sensors (MNE-C `compute_predicted_data`; the data part of `mne.minimum_norm.apply_inverse's` residual).
+
+**Parameters:**
+
+- **inv** : *const [MNEInverseOperator](/docs/api/mne/mne-inverse-operator) &*
+  The prepared inverse operator used for computeRegularization.
+
+---
+
+## Static Methods
+
+### compute(inv, data, snr)
+
+Fills all fields for one data set: projects it on the eigenfields, estimates the SNR and lambda2 per time point, selects the lambda2 to use and computes the predicted data.
+
+**Parameters:**
+
+- **inv** : *const [MNEInverseOperator](/docs/api/mne/mne-inverse-operator) &*
+  An inverse operator prepared with `MNEInverseOperator::prepare_inverse_operator`.
+
+- **data** : *const Eigen::MatrixXd &*
+  Measured data, one row per channel of `inv` in its order, one column per time.
+
+- **snr** : *double*
+  Power SNR for a fixed lambda2 (see `selectRegularization`), &lt;= 0 to use lambda2_est.
+
+**Returns:**
+
+- *[MNEMneData](/docs/api/mne/mne-mne-data)* — The [`MNE`](/docs/api/mne/mne-class) data.
+
+---
+
+## Example
+
+- Full source: [`src/examples/ex_inv_api/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_inv_api/main.cpp)
+- Build target: `ex_inv_api` (runs under CTest)
+- Data: [mne-cpp-test-data](https://github.com/mne-tools/mne-cpp-test-data)
 
 ## Authors of this file
 

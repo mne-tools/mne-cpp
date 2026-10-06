@@ -7,7 +7,7 @@ sidebar_position: 5
 
 # Class Members
 
-Index of 6275 public class members (functions, variables, typedefs, enums) across all documented classes.
+Index of 6281 public class members (functions, variables, typedefs, enums) across all documented classes.
 
 **Jump to:** [A](#a) · [B](#b) · [C](#c) · [D](#d) · [E](#e) · [F](#f) · [G](#g) · [H](#h) · [I](#i) · [J](#j) · [K](#k) · [L](#l) · [M](#m) · [N](#n) · [O](#o) · [P](#p) · [Q](#q) · [R](#r) · [S](#s) · [T](#t) · [U](#u) · [V](#v) · [W](#w) · [X](#x) · [Y](#y) · [Z](#z)
 
@@ -492,6 +492,7 @@ Index of 6275 public class members (functions, variables, typedefs, enums) acros
 - **checkIntegrity** `[fn]` in [InvDipoleFitSettings](/docs/api/inv/inv-dipole-fit-settings) — Check whether Dipole Fit Settings are correctly set.
 - **checkPrerequisites** `[fn]` in [MLTrainer](/docs/api/ml/ml-trainer) — Check that the required Python packages are importable.
 - **checks** `[var]` in `MnaVerification` — Declarative checks (authored by user, evaluated by executor).
+- **chi2Isf** `[fn]` in [Numerics](/docs/api/utils/numerics) — Value a chi^2 variable exceeds with probability `p` (`scipy.stats.chi2.isf`).
 - **children** `[var]` in [FiffDirNode](/docs/api/fiff/fiff-dir-node) — Child nodes.
 - **chInfo** `[var]` in [MNERawInfo](/docs/api/mne/mne-raw-info) — Channel info data .
 - **chname** `[var]` in [FwdCoil](/docs/api/fwd/fwd-coil) — Name of this channel.
@@ -755,6 +756,7 @@ Index of 6275 public class members (functions, variables, typedefs, enums) acros
 - **compute** `[fn]` in [InvResolutionMatrix](/docs/api/inv/inv-resolution-matrix) — Compute the resolution matrix R = inverseKernel × leadField.
 - **compute** `[fn]` in [InvTfMxne](/docs/api/inv/inv-tf-mxne) — Compute the TF-MxNE inverse solution.
 - **compute** `[fn]` in [InvTrapMusic](/docs/api/inv/inv-trap-music) — Compute TRAP-MUSIC source localization.
+- **compute** `[fn]` in [MNEMneData](/docs/api/mne/mne-mne-data) — Fills all fields for one data set: projects it on the eigenfields, estimates the SNR and lambda2 per time point, selects the lambda2 to use and computes the predicted data.
 - **compute** `[fn]` in [MNEMorphMap](/docs/api/mne/mne-morph-map) — Computes the map between two registered spheres (MNE-C `mne_compose_morph_maps`, accurate mode; `mne.surface._make_morph_map_hemi`).
 - **compute** `[fn]` in [MorletTfr](/docs/api/dsp/morlet-tfr) — Compute Morlet TFR for a single channel time series.
 - **compute** `[fn]` in [MultitaperPsd](/docs/api/dsp/multitaper-psd) — Compute multitaper PSD for every channel of a data matrix.
@@ -804,7 +806,9 @@ Index of 6275 public class members (functions, variables, typedefs, enums) acros
 - **computeNormRange** `[fn]` in `SensorFieldMapper` — Compute the normalization range anchored at the peak-GFP time.
 - **computeOrthogonalized** `[fn]` in [ConnectivityAec](/docs/api/dsp/connectivity-aec) — Compute orthogonalized AEC (corrected for volume conduction / source leakage).
 - **computePower** `[fn]` in [InvBeamformerCompute](/docs/api/inv/inv-beamformer-compute) — Compute source power from spatial filter weights and a data covariance / CSD matrix.
+- **computePredicted** `[fn]` in [MNEMneData](/docs/api/mne/mne-mne-data) — Computes the data the minimum-norm estimate predicts with the selected lambda2, colored back to the sensors (MNE-C `compute_predicted_data`; the data part of `mne.minimum_norm.apply_inverse's` residual).
 - **computeRegistration** `[fn]` in [PolhemusCoregistration](/docs/api/utils/polhemus-coregistration) — Compute the head→device rigid transform from the three captured fiducials (NAS, LPA, RPA).
+- **computeRegularization** `[fn]` in [MNEMneData](/docs/api/mne/mne-mne-data) — Projects the whitened data on the eigenfields (MNE-C `mne_project_to_eigen_fields`) and estimates SNR and lambda2_est per time point (MNE-C `compute_regularization`, noise method).
 - **computeSignFlip** `[fn]` in [InvLabelTimeCourse](/docs/api/inv/inv-label-time-course) — Compute sign-flip vector for a label based on vertex normals.
 - **computeSingleView** `[fn]` in `CameraController` — Compute camera matrices for a single-view viewport.
 - **computeTaperedSpectraMatrix** `[fn]` in [Spectral](/docs/api/utils/spectral) — Calculates the full tapered spectra of a given input matrix data.
@@ -1182,7 +1186,7 @@ Index of 6275 public class members (functions, variables, typedefs, enums) acros
 - **dataKind** `[var]` in `MnaPort` — Data kind flowing through this port.
 - **DataLoader** `[fn]` in `DataLoader`
 - **dataname** `[var]` in [InvEcdSet](/docs/api/inv/inv-ecd-set) — The associated data file.
-- **datap** `[var]` in [MNEMneData](/docs/api/mne/mne-mne-data) — Projection of the whitened data onto the field eigenvectors.
+- **datap** `[var]` in [MNEMneData](/docs/api/mne/mne-mne-data) — Projection of the whitened data onto the eigenfields, components x times.
 - **datasetName** `[var]` in `WriteOptions` — Name for dataset_description.json (defaults to "[Unspecified]").
 - **datasetType** `[var]` in `BidsDatasetDescription` — "raw" or "derivative" (RECOMMENDED).
 - **datatype** `[fn]` in [BIDSPath](/docs/api/bids/bids-path) — BIDS datatype string.
@@ -3244,6 +3248,7 @@ Index of 6275 public class members (functions, variables, typedefs, enums) acros
 - **MNECTFCompData** `[fn]` in [MNECTFCompData](/docs/api/mne/mnectf-comp-data) — Copy constructor.
 - **MNECTFCompDataSet** `[fn]` in [MNECTFCompDataSet](/docs/api/mne/mnectf-comp-data-set) — Construct an empty compensation data set.
 - **MNECTFCompDataSet** `[fn]` in [MNECTFCompDataSet](/docs/api/mne/mnectf-comp-data-set) — Copy constructor.
+- **mneData** `[fn]` in [InvMinimumNorm](/docs/api/inv/inv-minimum-norm) — Sets the inverse up for the evoked data and computes their MNE data: eigenfield projections, SNR and lambda2 per time point and the predicted data (MNE-C `mne_analyze`; see `MNELIB::MNEMneData::compute`).
 - **MNEDeriv** `[fn]` in [MNEDeriv](/docs/api/mne/mne-deriv) — Constructs an empty [`MNE`](/docs/api/mne/mne-class) Derivation.
 - **MNEDeriv** `[fn]` in [MNEDeriv](/docs/api/mne/mne-deriv) — Copies the derivation including its matrix.
 - **MNEDerivSet** `[fn]` in [MNEDerivSet](/docs/api/mne/mne-deriv-set)
@@ -3982,7 +3987,7 @@ Index of 6275 public class members (functions, variables, typedefs, enums) acros
 - **PowellOffset** `[fn]` in [InvPwlRapMusic](/docs/api/inv/inv-pwl-rap-music)
 - **predict** `[fn]` in [MlModel](/docs/api/ml/ml-model) — Run inference on the given input tensor.
 - **predict** `[fn]` in [MlOnnxModel](/docs/api/ml/ml-onnx-model) — Run inference on the given input tensor.
-- **predicted** `[var]` in [MNEMneData](/docs/api/mne/mne-mne-data) — The predicted data.
+- **predicted** `[var]` in [MNEMneData](/docs/api/mne/mne-mne-data) — The predicted data, channels x times.
 - **prefiltering** `[var]` in `EDFChannelInfo`
 - **prepare_forward** `[fn]` in [MNEForwardSolution](/docs/api/mne/mne-forward-solution) — Prepare forward for assembling the inverse operator.
 - **prepare_inverse_operator** `[fn]` in [MNEInverseOperator](/docs/api/mne/mne-inverse-operator) — Prepare the inverse operator for source estimation.
@@ -4625,6 +4630,7 @@ Index of 6275 public class members (functions, variables, typedefs, enums) acros
 - **SelectionScene** `[fn]` in [SelectionScene](/docs/api/disp/selection-scene) — Constructs a [`SelectionScene`](/docs/api/disp/selection-scene).
 - **SelectionSceneItem** `[fn]` in [SelectionSceneItem](/docs/api/disp/selection-scene-item) — Constructs a [`SelectionSceneItem`](/docs/api/disp/selection-scene-item).
 - **selectOnsets** `[fn]` in [MNEEventList](/docs/api/mne/mne-event-list) — Keeps the onsets of one trigger value (MNE-C `filter_events`): events rising from 0 to `value`, or every onset if `value` is 0.
+- **selectRegularization** `[fn]` in [MNEMneData](/docs/api/mne/mne-mne-data) — Selects lambda2 per time point (MNE-C `select_regularization`): trace_ratio / `snr` for a positive power SNR, lambda2_est otherwise.
 - **selectRows** `[fn]` in [EvokedSetModel](/docs/api/disp/evoked-set-model) — Selects the given list of channel indeces and unselect all other channels.
 - **selectRows** `[fn]` in [FrequencySpectrumModel](/docs/api/disp/frequency-spectrum-model) — Selects the given list of channel indeces and unselect all other channels.
 - **selectRows** `[fn]` in [RtFiffRawViewModel](/docs/api/disp/rt-fiff-raw-view-model) — Selects the given list of channel indeces and unselect all other channels.

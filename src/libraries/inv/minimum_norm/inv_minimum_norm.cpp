@@ -170,6 +170,18 @@ InvSourceEstimate InvMinimumNorm::calculateInverse(const MatrixXd& data, float t
 
 //=============================================================================================================
 
+MNEMneData InvMinimumNorm::mneData(const FiffEvoked& p_fiffEvoked, double snr)
+{
+    if (!m_inverseOperator.check_ch_names(p_fiffEvoked.info)) {
+        qWarning("Channel name check failed.");
+        return MNEMneData();
+    }
+    doInverseSetup(p_fiffEvoked.nave, false);
+    return MNEMneData::compute(inv, p_fiffEvoked.pick_channels(inv.noise_cov->names).data, snr);
+}
+
+//=============================================================================================================
+
 void InvMinimumNorm::doInverseSetup(qint32 nave, bool pick_normal)
 {
     //

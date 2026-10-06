@@ -117,6 +117,24 @@ Computes a L2-norm inverse solution Actual code using these principles might be 
 
 ---
 
+### mneData(p_fiffEvoked, snr)
+
+Sets the inverse up for the evoked data and computes their [MNE](/docs/api/mne/mne-class) data: eigenfield projections, SNR and lambda2 per time point and the predicted data (MNE-C `mne_analyze`; see `MNELIB::MNEMneData::compute`).
+
+**Parameters:**
+
+- **p_fiffEvoked** : *const [FiffEvoked](/docs/api/fiff/fiff-evoked) &*
+  Evoked data.
+
+- **snr** : *double*
+  Power SNR for a fixed lambda2, &lt;= 0 to use the estimated lambda2 per time point.
+
+**Returns:**
+
+- *[MNEMneData](/docs/api/mne/mne-mne-data)* — The MNE data; empty if the channels do not match the inverse operator.
+
+---
+
 ### doInverseSetup(nave, pick_normal)
 
 Perform the inverse setup: Prepares this inverse operator and assembles the kernel.

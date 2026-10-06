@@ -50,9 +50,9 @@
       "public_api_units": 478,
       "exported_not_registered": 124,
       "example_eligible": 383,
-      "eligible_backed_percent": 69.97,
-      "snippets": 329,
-      "registered_test_percent": 28.53
+      "eligible_backed_percent": 70.23,
+      "snippets": 330,
+      "registered_test_percent": 28.81
     },
     "G4_screenshots": {
       "referenced_images": 19,
@@ -83,9 +83,9 @@
         "missing": 137,
         "not-applicable": 8
       },
-      "claims": 358,
+      "claims": 359,
       "claims_by_evidence": {
-        "cross-validated-static": 3,
+        "cross-validated-static": 4,
         "cross-validated-live": 1,
         "tested": 84,
         "unverified": 270
