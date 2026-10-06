@@ -78,6 +78,39 @@ private slots:
         QVERIFY(!result.stc.isEmpty());
     }
 
+    void testReachesTheMinimum()
+    {
+        // Deterministic problem (G_ij = sin(1.7 (i+1)(j+1) + 0.3 i + 2.9 j), unit columns) with two sources built from
+        // dictionary atoms. 20000 FISTA iterations give the minimum 2.4973926222293006 of
+        // 0.5 ||M - G Z Phi||^2 + 0.5 ||Z||_21 + 0.1 ||Z||_1, with rows 5 and 22 of norm 2.04175 and 1.23000.
+        MatrixXd G(20, 40);
+        for (int i = 0; i < 20; ++i)
+            for (int j = 0; j < 40; ++j)
+                G(i, j) = std::sin(1.7 * (i + 1) * (j + 1) + 0.3 * i + 2.9 * j);
+        G.colwise().normalize();
+        const MatrixXd phi = InvTfMxne::buildGaborDictionary(100, 8, 1.0, 40.0, 1000.0);
+        MatrixXd z0 = MatrixXd::Zero(40, 16);
+        z0(5, 10) = 3.0;
+        z0(22, 13) = 2.0;
+
+        InvTfMxneParams params;
+        params.dAlphaSpace = 0.5;
+        params.dAlphaTime = 0.1;
+        params.dSFreq = 1000.0;
+        params.bDebias = false; // default iterations and tolerance: they must land within 1e-3 of the minimum
+        const InvTfMxneResult result = InvTfMxne::compute(G, G * z0 * phi, params);
+
+        QCOMPARE(result.activeVertices, QVector<int>({5, 22}));
+        const MatrixXd& z = result.tfCoefficients;
+        MatrixXd full = MatrixXd::Zero(40, 16);
+        full.row(5) = z.row(0);
+        full.row(22) = z.row(1);
+        const double objective = 0.5 * (G * (z0 - full) * phi).squaredNorm() + 0.5 * z.rowwise().norm().sum() + 0.1 * z.cwiseAbs().sum();
+        QVERIFY2(objective - 2.4973926222293006 < 1e-3 * 2.4973926222293006, qPrintable(QString::number(objective, 'g', 17)));
+        QVERIFY2(std::abs(z.row(0).norm() - 2.0417480369211485) < 0.03 && std::abs(z.row(1).norm() - 1.23000146767257) < 0.03,
+                 qPrintable(QString("%1 %2").arg(z.row(0).norm()).arg(z.row(1).norm())));
+    }
+
     void testComputeEmptyGain()
     {
         MatrixXd G(0, 0);

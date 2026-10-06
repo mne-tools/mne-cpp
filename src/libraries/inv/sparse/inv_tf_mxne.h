@@ -90,20 +90,13 @@ struct INVSHARED_EXPORT InvTfMxneParams
  * @brief Time-Frequency Mixed-Norm Estimate (TF-MxNE) sparse inverse solver.
  *
  * Solves the inverse problem in the time-frequency domain:
- *   min ||M - G*Phi*Z||^2_F + alpha_space * ||Z||_21 + alpha_time * ||Z||_1
+ *   min 0.5 * ||M - G*Z*Phi||^2_F + alpha_space * ||Z||_21 + alpha_time * ||Z||_1
  *
- * where Phi is a Gabor dictionary (tight frame) and Z are the TF coefficients.
+ * where Phi is a Gabor dictionary and Z are the TF coefficients, solved by FISTA.
  * The L21 penalty enforces spatial sparsity (few active sources) while L1
  * enforces temporal sparsity (focal activations in time-frequency).
  *
- * Usage:
- * @code
- *   InvTfMxneParams params;
- *   params.dAlphaSpace = 0.5;
- *   params.dAlphaTime  = 0.1;
- *   params.dSFreq      = 1000.0;
- *   InvTfMxneResult result = InvTfMxne::compute(matGain, matData, params);
- * @endcode
+ * @snippet ex_inv_api/main.cpp inv_tf_mxne_usage
  */
 class INVSHARED_EXPORT InvTfMxne
 {

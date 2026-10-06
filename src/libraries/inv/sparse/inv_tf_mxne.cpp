@@ -24,6 +24,10 @@
 
 #include "inv_tf_mxne.h"
 
+#include <Eigen/SVD>
+
+#include <cmath>
+
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
@@ -126,83 +130,47 @@ InvTfMxneResult InvTfMxne::compute(const MatrixXd& matGain,
     // where G_expanded = G ⊗ Phi^T, z_vec = vec(Z)
     // But we solve iteratively using Block Coordinate Descent.
 
-    // Initialize Z to zero
+    // FISTA on 0.5 ||M - G Z Phi||^2 + alpha_space ||Z||_21 + alpha_time ||Z||_1. The step is 1/L with the global
+    // Lipschitz constant L = ||G||_2^2 ||Phi||_2^2; per-source steps on a joint gradient overshoot and stall.
+    const double gNorm = JacobiSVD<MatrixXd>(matGain).singularValues()(0);
+    const double phiNorm = JacobiSVD<MatrixXd>(Phi).singularValues()(0);
+    const double lipschitz = gNorm * gNorm * phiNorm * phiNorm;
+
+    // Sparse-group prox: soft-threshold each coefficient, then shrink the source's group norm.
+    const auto prox = [&](MatrixXd& V) {
+        const double threshL1 = params.dAlphaTime / lipschitz;
+        const double threshL21 = params.dAlphaSpace / lipschitz;
+        V = V.array().sign() * (V.array().abs() - threshL1).max(0.0);
+        for (int j = 0; j < nSources; ++j) {
+            const double groupNorm = V.row(j).norm();
+            if (groupNorm > threshL21)
+                V.row(j) *= 1.0 - threshL21 / groupNorm;
+            else
+                V.row(j).setZero();
+        }
+    };
+    const auto objectiveOf = [&](const MatrixXd& V) {
+        return 0.5 * (matData - matGain * V * Phi).squaredNorm() + params.dAlphaSpace * V.rowwise().norm().sum() + params.dAlphaTime * V.cwiseAbs().sum();
+    };
+
     MatrixXd Z = MatrixXd::Zero(nSources, nAtoms);
-
-    // Precompute G^T * G diagonal for Lipschitz constants
-    VectorXd lipschitz(nSources);
-    for (int j = 0; j < nSources; ++j) {
-        lipschitz(j) = matGain.col(j).squaredNorm();
-    }
-    // Scale by dictionary energy
-    double phiEnergy = 0.0;
-    for (int a = 0; a < nAtoms; ++a) {
-        phiEnergy += Phi.row(a).squaredNorm();
-    }
-    lipschitz *= phiEnergy;
-
-    // Proximal gradient descent (ISTA-like)
-    MatrixXd residual = matData;
-    double prevObj = std::numeric_limits<double>::max();
-
+    MatrixXd Y = Z;
+    double tk = 1.0;
+    double prevObj = objectiveOf(Z);
     for (int iter = 0; iter < params.iMaxIterations; ++iter) {
-        // Compute residual: R = M - G * (Z * Phi)
-        MatrixXd X = Z * Phi; // (nSources × nTimes)
-        residual = matData - matGain * X;
-
-        // Compute objective: ||R||^2_F + alpha_space * ||Z||_21 + alpha_time * ||Z||_1
-        double dataFit = residual.squaredNorm();
-        double l21Norm = 0.0;
-        double l1Norm = 0.0;
-        for (int j = 0; j < nSources; ++j) {
-            l21Norm += Z.row(j).norm();
-            l1Norm += Z.row(j).lpNorm<1>();
-        }
-        double objective = 0.5 * dataFit + params.dAlphaSpace * l21Norm + params.dAlphaTime * l1Norm;
-
-        // Check convergence
-        if (std::abs(prevObj - objective) / (std::abs(prevObj) + 1e-12) < params.dTolerance) {
-            result.nIterations = iter + 1;
-            break;
-        }
-        prevObj = objective;
+        MatrixXd zNew = Y + matGain.transpose() * (matData - matGain * Y * Phi) * Phi.transpose() / lipschitz;
+        prox(zNew);
+        const double tNew = 0.5 * (1.0 + std::sqrt(1.0 + 4.0 * tk * tk));
+        Y = zNew + ((tk - 1.0) / tNew) * (zNew - Z);
+        Z = zNew;
+        tk = tNew;
         result.nIterations = iter + 1;
-
-        // Gradient step + proximal operator for each source
-        // Gradient of data term w.r.t. Z_j: -G_j^T * R * Phi^T
-        MatrixXd GtR = matGain.transpose() * residual; // (nSources × nTimes)
-        MatrixXd grad = GtR * Phi.transpose();         // (nSources × nAtoms)
-
-        for (int j = 0; j < nSources; ++j) {
-            if (lipschitz(j) < 1e-12)
-                continue;
-
-            double stepSize = 1.0 / lipschitz(j);
-
-            // Gradient step
-            RowVectorXd zNew = Z.row(j) + stepSize * grad.row(j);
-
-            // Proximal operator: soft-threshold (L1) then group-threshold (L21)
-            // L1 soft threshold
-            double threshL1 = params.dAlphaTime * stepSize;
-            for (int a = 0; a < nAtoms; ++a) {
-                double val = zNew(a);
-                double sign = (val > 0.0) ? 1.0 : -1.0;
-                zNew(a) = sign * std::max(0.0, std::abs(val) - threshL1);
-            }
-
-            // L21 group threshold
-            double groupNorm = zNew.norm();
-            double threshL21 = params.dAlphaSpace * stepSize;
-            if (groupNorm > threshL21) {
-                zNew *= (1.0 - threshL21 / groupNorm);
-            } else {
-                zNew.setZero();
-            }
-
-            Z.row(j) = zNew;
-        }
+        const double objective = objectiveOf(Z);
+        if (std::abs(prevObj - objective) <= params.dTolerance * std::abs(objective))
+            break;
+        prevObj = objective;
     }
+    MatrixXd residual = matData - matGain * Z * Phi;
 
     // Reconstruct time-domain source estimate from TF coefficients
     MatrixXd X = Z * Phi; // (nSources × nTimes)
