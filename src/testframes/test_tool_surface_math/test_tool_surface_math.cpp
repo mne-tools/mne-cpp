@@ -349,54 +349,64 @@ void TestToolSurfaceMath::testBuildNearestMapOffset()
 
 void TestToolSurfaceMath::testComputeMorphMapIdentity()
 {
-    // Same src and dst on unit sphere → should morph to identity
-    MatrixX3f sphere(4, 3);
-    sphere << 1, 0, 0, 0, 1, 0, 0, 0, 1, -1, 0, 0;
-    sphere.rowwise().normalize();
+    // Same sphere on both sides: every vertex maps onto itself
+    MatrixX3f rr;
+    MatrixX3i tris;
+    buildTestIcosahedron(rr, tris);
 
-    SparseMatrix<double> M = computeMorphMap(sphere, sphere, 3);
-    QCOMPARE(M.rows(), (Eigen::Index)4);
-    QCOMPARE(M.cols(), (Eigen::Index)4);
-
-    // Diagonal should be dominant (close to 1)
-    for (int i = 0; i < 4; i++) {
-        QVERIFY(M.coeff(i, i) > 0.5);
-    }
+    SparseMatrix<double> M = MNEMorphMap::compute(rr, tris, rr).toEigen();
+    QCOMPARE(M.rows(), (Eigen::Index)12);
+    QCOMPARE(M.cols(), (Eigen::Index)12);
+    QVERIFY((MatrixXd(M) - MatrixXd::Identity(12, 12)).cwiseAbs().maxCoeff() < 1e-5);
 }
 
 void TestToolSurfaceMath::testComputeMorphMapSparse()
 {
-    MatrixX3f src(6, 3);
-    src << 1, 0, 0, 0, 1, 0, 0, 0, 1,
-        -1, 0, 0, 0, -1, 0, 0, 0, -1;
-    src.rowwise().normalize();
+    // A destination point maps to the three corners of the triangle it falls into
+    MatrixX3f rr;
+    MatrixX3i tris;
+    buildTestIcosahedron(rr, tris, 50.0f);
 
-    MatrixX3f dst(3, 3);
-    dst << 1, 0, 0, 0, 1, 0, 0, 0, 1;
-    dst.rowwise().normalize();
+    MatrixX3f dst(2, 3);
+    dst.row(0) = (rr.row(tris(4, 0)) + rr.row(tris(4, 1)) + rr.row(tris(4, 2))).normalized() * 3.0f;
+    dst.row(1) = (0.6f * rr.row(tris(9, 0)) + 0.3f * rr.row(tris(9, 1)) + 0.1f * rr.row(tris(9, 2))).normalized();
 
-    SparseMatrix<double> M = computeMorphMap(src, dst, 2);
-    QCOMPARE(M.rows(), (Eigen::Index)3);
-    QCOMPARE(M.cols(), (Eigen::Index)6);
-    QVERIFY(M.nonZeros() > 0);
+    MatrixXd M(MNEMorphMap::compute(rr, tris, dst).toEigen());
+    QCOMPARE(M.rows(), (Eigen::Index)2);
+    QCOMPARE(M.cols(), (Eigen::Index)12);
+    for (int c = 0; c < 3; ++c) {
+        QVERIFY(qAbs(M(0, tris(4, c)) - 1.0 / 3.0) < 1e-4);
+    }
+    QVERIFY(M(1, tris(9, 0)) > M(1, tris(9, 1)));
+    QVERIFY(M(1, tris(9, 1)) > M(1, tris(9, 2)));
+    QVERIFY(M(1, tris(9, 2)) > 0.0);
+    QCOMPARE((M.array() != 0.0).count(), (Eigen::Index)6);
 }
 
 void TestToolSurfaceMath::testComputeMorphMapRowSum()
 {
-    // Each row of a morph map should sum to approximately 1
-    MatrixX3f sphere(8, 3);
-    for (int i = 0; i < 8; i++) {
-        float theta = 2 * M_PI * i / 8;
-        sphere.row(i) = Vector3f(cos(theta), sin(theta), 0).normalized();
+    // Rows are barycentric weights: they sum to 1 and give the foot of the point on a face plane
+    MatrixX3f rr;
+    MatrixX3i tris;
+    buildTestIcosahedron(rr, tris);
+
+    MatrixX3f dst(40, 3);
+    for (int i = 0; i < dst.rows(); ++i) {
+        const float z = -0.95f + 1.9f * i / (dst.rows() - 1);
+        const float phi = 2.4f * i;
+        const float r = std::sqrt(1.0f - z * z);
+        dst.row(i) = Vector3f(r * std::cos(phi), r * std::sin(phi), z);
     }
 
-    SparseMatrix<double> M = computeMorphMap(sphere, sphere, 3);
-    for (int i = 0; i < M.rows(); i++) {
-        double rowSum = 0;
-        for (SparseMatrix<double>::InnerIterator it(M, i); it; ++it) {
-            rowSum += it.value();
-        }
-        QVERIFY(qAbs(rowSum - 1.0) < 0.1);
+    SparseMatrix<double> M = MNEMorphMap::compute(rr, tris, dst).toEigen();
+    const VectorXd rowSums = M * VectorXd::Ones(12);
+    QVERIFY((rowSums.array() - 1.0).abs().maxCoeff() < 1e-5);
+
+    const MatrixXd mapped = M * rr.cast<double>();
+    for (int i = 0; i < dst.rows(); ++i) {
+        // Unit icosahedron inradius is 0.7947: the foot is at most 1 - 0.7947 away
+        QVERIFY((mapped.row(i) - dst.row(i).cast<double>()).norm() < 0.21);
+        QVERIFY(mapped.row(i).norm() > 0.79);
     }
 }
 
