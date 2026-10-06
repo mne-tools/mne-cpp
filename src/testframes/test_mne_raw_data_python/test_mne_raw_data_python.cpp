@@ -32,6 +32,7 @@
 #include <mne/mne_proj_op.h>
 #include <mne/mne_filter_def.h>
 #include <mne/mne_deriv.h>
+#include <mne/mne_deriv_set.h>
 #include <mne/mne_sparse_named_matrix.h>
 
 #include <fiff/fiff_sparse_matrix.h>
@@ -382,21 +383,21 @@ void TestMneRawDataPython::picksDerivedChannel()
     QVERIFY(raw);
     const int a = static_cast<int>(raw->ch_names.indexOf("MEG0113"));
     const int b = static_cast<int>(raw->ch_names.indexOf("MEG0112"));
-    SparseMatrix<float> d(1, raw->info->nchan);
-    d.insert(0, a) = 1.0f;
-    d.insert(0, b) = -1.0f;
-    d.makeCompressed();
-    auto deriv = std::make_unique<MNEDeriv>();
-    deriv->deriv_data = std::make_unique<MNESparseNamedMatrix>();
-    deriv->deriv_data->nrow = 1;
-    deriv->deriv_data->ncol = raw->info->nchan;
-    deriv->deriv_data->rowlist = {"BIP"};
-    deriv->deriv_data->collist = raw->ch_names;
-    deriv->deriv_data->data = std::make_unique<FiffSparseMatrix>(FiffSparseMatrix::fromEigenSparse(d));
-    // Matching a derivation to the data counts its non-zeros per input channel (MNE-C mne_match_derivations).
-    deriv->in_use = VectorXi::Zero(raw->info->nchan);
-    deriv->in_use(a) = deriv->in_use(b) = 1;
-    raw->deriv_matched = std::move(deriv);
+    // A derivation set with one usable row and one whose input is not recorded.
+    const MNEDerivSet set = MNEDerivSet::fromDefinitions({{"BIP", {{"MEG0113", 1.0}, {"MEG0112", -1.0}}}, {"MISSING", {{"MEG0113", 1.0}, {"EEG999", -1.0}}}});
+    std::unique_ptr<MNEDeriv> deriv = set.match(raw->ch_names);
+    QVERIFY(deriv);
+    // Matching keeps the usable row, takes the data's channel order and counts per channel how many rows use it.
+    QCOMPARE(deriv->deriv_data->rowlist, QStringList({"BIP"}));
+    QCOMPARE(deriv->deriv_data->collist, raw->ch_names);
+    VectorXi inUse = VectorXi::Zero(raw->info->nchan);
+    inUse(a) = inUse(b) = 1;
+    QCOMPARE(deriv->in_use, inUse);
+    QVERIFY(!MNEDerivSet::fromDefinitions({{"MISSING", {{"EEG999", 1.0}}}}).match(raw->ch_names));
+    // Attaching matches and validates in one step; both inputs are gradiometers, so BIP is valid.
+    QCOMPARE(raw->attachDerivations(set), 1);
+    QCOMPARE(raw->deriv_matched->in_use, inUse);
+    QCOMPARE(raw->deriv_matched->chs[0].ch_name, QString("MEG0113"));
 
     // Channel 0 is derived, 1 and 2 are its inputs.
     MNEChSelection sel;

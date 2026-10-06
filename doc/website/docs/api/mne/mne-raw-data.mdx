@@ -209,6 +209,24 @@ Pick filtered data for a channel selection by loading filter buffers, applying t
 
 ---
 
+### attachDerivations(derivations, keepPrevious)
+
+Attaches channel derivations (MNE-C `mne_raw_attach_derivations`): merges them into deriv, matches the merged set to the channels of the file into deriv_matched and validates it against the channel info.
+
+**Parameters:**
+
+- **derivations** : *const [MNEDerivSet](/docs/api/mne/mne-deriv-set) &*
+  The derivations to add.
+
+- **keepPrevious** : *bool*
+  Keep the derivations attached before instead of replacing them.
+
+**Returns:**
+
+- *int* — The number of derived channels that are valid for these data.
+
+---
+
 ## Static Methods
 
 ### open_file_comp(name, omit_skip, allow_maxshield, filter, comp_set)

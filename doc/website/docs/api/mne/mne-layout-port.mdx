@@ -1,0 +1,84 @@
+---
+id: mne-layout-port
+title: "MNELIB::MNELayoutPort"
+sidebar_label: MNELayoutPort
+sidebar_position: 25
+---
+
+# MNELayoutPort
+
+**Namespace:** `MNELIB` &nbsp;·&nbsp; **Library:** MNE Library
+
+`#include <mne/mne_layout_port.h>`
+
+```cpp
+class MNELIB::MNELayoutPort
+```
+
+Single viewport of a plotter layout (one line of an MNE-C ``.lout file).
+
+Channel names are stored in matching form: lower case, without spaces and without anything after a dash (MNE-C `mne_lout_clean_name`), so "MEG 0113" and "meg0113" select the same port and a CTF "MLC11-2622" matches "MLC11".
+
+```cpp title="src/examples/ex_mne_api/main.cpp"
+// The Neuromag Vectorview layout: one viewport per channel
+auto layout = MNELayout::read(layoutDir + "/Vectorview-all.lout");
+const QMap<QString, QPointF> positions = layout->channelPositions();                     // lower-left corners, keyed "MEG 0113"
+const int leftHalf = layout->confine(QRectF(QPointF(-85.0, -83.0), QPointF(0.0, 75.0))); // zoom to the left half
+const int shownTriplet = layout->matchPorts(QStringList({"MEG0113", "MEG0112", "MEG0111"}));
+```
+
+---
+
+## Public Methods
+
+### contains(channel)
+
+Returns whether `channel` (any spelling) is one of the port's channels.
+
+**Parameters:**
+
+- **channel** : *const QString &*
+  A channel name.
+
+**Returns:**
+
+- *bool* — True if the cleaned name equals one of the port's channel names.
+
+---
+
+### rect()
+
+Returns the viewport box.
+
+**Returns:**
+
+- *QRectF* — The box from (xmin, ymin) with the port's width and height.
+
+---
+
+## Static Methods
+
+### cleanName(name)
+
+Returns `name` in matching form.
+
+**Parameters:**
+
+- **name** : *const QString &*
+  A channel name.
+
+**Returns:**
+
+- *QString* — The name in lower case, without spaces and cut at the first dash.
+
+---
+
+## Example
+
+- Full source: [`src/examples/ex_mne_api/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_mne_api/main.cpp)
+- Build target: `ex_mne_api` (runs under CTest)
+- Data: [mne-cpp-test-data](https://github.com/mne-tools/mne-cpp-test-data)
+
+## Authors of this file
+
+- Christoph Dinh &lt;christoph.dinh@mne-cpp.org&gt;

@@ -16,14 +16,17 @@
 
 #include "channel_derivation.h"
 
+#include <mne/mne_deriv_set.h>
+
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
 
 #include <QFile>
 #include <QTextStream>
-#include <QRegularExpression>
 #include <QDebug>
+
+#include <cmath>
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -31,6 +34,7 @@
 
 using namespace UTILSLIB;
 using namespace Eigen;
+using namespace MNELIB;
 
 //=============================================================================================================
 // STATIC HELPERS
@@ -157,54 +161,14 @@ QPair<MatrixXd, QStringList> ChannelDerivation::apply(
 
 QVector<DerivationRule> ChannelDerivation::readDefinitionFile(const QString& path)
 {
-    QFile file(path);
-    if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
-        qWarning() << "ChannelDerivation::readDefinitionFile - cannot open:" << path;
+    const std::optional<MNEDerivSet> set = MNEDerivSet::readText(path);
+    if (!set) {
         return {};
     }
-
     QVector<DerivationRule> rules;
-    QTextStream in(&file);
-
-    // Pattern: output_name = weight1 * input1 + weight2 * input2 + ...
-    static const QRegularExpression reTerms(
-        R"(([+-]?\s*[\d.]+(?:[eE][+-]?\d+)?)\s*\*\s*(\S+))");
-
-    while (!in.atEnd()) {
-        QString line = in.readLine().trimmed();
-        if (line.isEmpty() || line.startsWith('#')) {
-            continue;
-        }
-
-        int eqPos = line.indexOf('=');
-        if (eqPos < 0) {
-            qWarning() << "ChannelDerivation::readDefinitionFile - malformed line:" << line;
-            continue;
-        }
-
-        DerivationRule rule;
-        rule.outputName = line.left(eqPos).trimmed();
-        QString rhs = line.mid(eqPos + 1);
-
-        QRegularExpressionMatchIterator matchIt = reTerms.globalMatch(rhs);
-        while (matchIt.hasNext()) {
-            QRegularExpressionMatch m = matchIt.next();
-            QString weightStr = m.captured(1).remove(' ');
-            bool ok = false;
-            double weight = weightStr.toDouble(&ok);
-            if (ok) {
-                rule.inputWeights[m.captured(2)] = weight;
-            } else {
-                qWarning() << "ChannelDerivation::readDefinitionFile - bad weight:" << weightStr;
-            }
-        }
-
-        if (!rule.inputWeights.isEmpty()) {
-            rules.append(rule);
-        }
+    for (const MNEDerivSet::Definition& definition : set->definitions()) {
+        rules.append({definition.first, definition.second});
     }
-
-    file.close();
     return rules;
 }
 
@@ -217,24 +181,15 @@ bool ChannelDerivation::writeDefinitionFile(const QString& path, const QVector<D
         qWarning() << "ChannelDerivation::writeDefinitionFile - cannot open:" << path;
         return false;
     }
-
+    // MNE-C mne_make_derivations syntax; names are quoted because they may contain spaces.
     QTextStream out(&file);
-    out << "# Channel derivation file\n";
-    out << "# Format: output_name = weight1 * input1 + weight2 * input2 + ...\n";
-
+    out << "# Channel derivations: \"name\" = weight * \"input\" + ...\n";
     for (const DerivationRule& rule : rules) {
-        out << rule.outputName << " = ";
-        bool first = true;
+        out << '"' << rule.outputName << "\" =";
         for (auto it = rule.inputWeights.constBegin(); it != rule.inputWeights.constEnd(); ++it) {
-            if (!first) {
-                out << " + ";
-            }
-            out << it.value() << " * " << it.key();
-            first = false;
+            out << ' ' << (it.value() < 0.0 ? '-' : '+') << ' ' << QString::number(std::fabs(it.value()), 'g', 17) << " * \"" << it.key() << '"';
         }
-        out << "\n";
+        out << '\n';
     }
-
-    file.close();
     return true;
 }

@@ -118,12 +118,12 @@ public:
         const QVector<DerivationRule>& rules);
 
     /**
-     * @brief Read derivation rules from a text definition file.
+     * @brief Read derivation rules from an MNE-C derivation text file (MNELIB::MNEDerivSet::readText).
      *
-     * File format (lines starting with '#' are comments):
      * @code
-     * # output_name = weight1 * input1 + weight2 * input2 + ...
-     * LH1-LH2 = 1.0 * LH1 + -1.0 * LH2
+     * # comment
+     * "LH1-LH2" = "LH1" - "LH2"
+     * "C3-avg" = 0.75 * "C3" - 0.25 * "C4" - 0.25 * "Cz" - 0.25 * "Pz"
      * @endcode
      *
      * @param[in] path   Path to the definition file.
@@ -133,7 +133,7 @@ public:
     static QVector<DerivationRule> readDefinitionFile(const QString& path);
 
     /**
-     * @brief Write derivation rules to a text definition file.
+     * @brief Write derivation rules in MNE-C derivation text syntax, readable by readDefinitionFile and mne_make_derivations.
      *
      * @param[in] path    Path to the output file.
      * @param[in] rules   Derivation rules to write.

@@ -7,7 +7,7 @@ sidebar_position: 5
 
 # Class Members
 
-Index of 6184 public class members (functions, variables, typedefs, enums) across all documented classes.
+Index of 6262 public class members (functions, variables, typedefs, enums) across all documented classes.
 
 **Jump to:** [A](#a) · [B](#b) · [C](#c) · [D](#d) · [E](#e) · [F](#f) · [G](#g) · [H](#h) · [I](#i) · [J](#j) · [K](#k) · [L](#l) · [M](#m) · [N](#n) · [O](#o) · [P](#p) · [Q](#q) · [R](#r) · [S](#s) · [T](#t) · [U](#u) · [V](#v) · [W](#w) · [X](#x) · [Y](#y) · [Z](#z)
 
@@ -137,6 +137,8 @@ Index of 6184 public class members (functions, variables, typedefs, enums) acros
 - **append** `[fn]` in [FastrakParser](/docs/api/utils/fastrak-parser) — Append raw bytes received from the serial port.
 - **append** `[fn]` in [FiffAnnotations](/docs/api/fiff/fiff-annotations) — Appends an annotation.
 - **append** `[fn]` in [FiffAnnotations](/docs/api/fiff/fiff-annotations) — Appends an annotation by fields.
+- **append** `[fn]` in [MNEDerivSet](/docs/api/mne/mne-deriv-set) — Appends copies of the derivations of another set (MNE-C `mne_merge_deriv_sets`).
+- **append** `[fn]` in [MNEEventList](/docs/api/mne/mne-event-list) — Appends the events of another list (MNE-C `mne_add_to_event_list`).
 - **append** `[fn]` in [MNESourceSpaces](/docs/api/mne/mne-source-spaces) — Appends a deep copy of the given source space.
 - **append** `[fn]` in [Network](/docs/api/connectivity/network) — Appends a network edge to this network node.
 - **append** `[fn]` in [Network](/docs/api/connectivity/network) — Appends a network edge to this network node.
@@ -212,6 +214,7 @@ Index of 6184 public class members (functions, variables, typedefs, enums) acros
 - **atlasDirChanged** `[signal]` in [FwdSettingsView](/docs/api/disp/fwd-settings-view) — Emit this signal whenever the atlas directory is set.
 - **attach** `[fn]` in [Subject](/docs/api/utils/subject) — Attaches an observer to the subject.
 - **attach_env** `[fn]` in [FiffStream](/docs/api/fiff/fiff-stream) — Attach environment metadata (working directory, command line) to this stream.
+- **attachDerivations** `[fn]` in [MNERawData](/docs/api/mne/mne-raw-data) — Attaches channel derivations (MNE-C `mne_raw_attach_derivations`): merges them into deriv, matches the merged set to the channels of the file into deriv_matched and validates it against the channel info.
 - **attributes** `[var]` in `MnaNode` — Operation parameters.
 - **attributes** `[var]` in [MnaOpSchema](/docs/api/mna/mna-op-schema) — Expected attributes.
 - **autoDetectPortName** `[fn]` in [PolhemusConnection](/docs/api/utils/polhemus-connection) — Best-effort auto-detection of an attached Fastrak/FastSCAN.
@@ -465,6 +468,7 @@ Index of 6184 public class members (functions, variables, typedefs, enums) acros
 - **channelNumber** `[var]` in `BrainVisionChannelInfo`
 - **channelNumber** `[var]` in `EDFChannelInfo`
 - **channelOffsetChanged** `[signal]` in [ChannelRhiView](/docs/api/disp/channel-rhi-view) — Emitted whenever the first visible channel index changes.
+- **channelPositions** `[fn]` in [MNELayout](/docs/api/mne/mne-layout) — Returns the lower-left corner of every channel's viewport, keyed by the name in the file.
 - **ChannelRhiView** `[fn]` in [ChannelRhiView](/docs/api/disp/channel-rhi-view)
 - **channelRms** `[fn]` in [ChannelDataModel](/docs/api/disp/channel-data-model) — Compute the RMS amplitude of a channel over a sample window.
 - **channelScrollRequested** `[signal]` in [ChannelLabelPanel](/docs/api/disp/channel-label-panel) — Emitted while the user drags vertically on the panel.
@@ -505,6 +509,7 @@ Index of 6184 public class members (functions, variables, typedefs, enums) acros
 - **classify** `[fn]` in [MlIcaLabel](/docs/api/decoding/ml-ica-label) — Classify each ICA component using reference signals and spectral heuristics.
 - **classify_channels** `[fn]` in [MNECovMatrix](/docs/api/mne/mne-cov-matrix) — Assign channel-type classifications (MEG mag, MEG grad, EEG) to channels in this covariance matrix, based on channel information.
 - **clean** `[fn]` in [InvDipole](/docs/api/inv/inv-dipole) — clean
+- **cleanName** `[fn]` in [MNELayoutPort](/docs/api/mne/mne-layout-port) — Returns `name` in matching form.
 - **clear** `[fn]` in [AcquiredPoints](/docs/api/utils/acquired-points) — Drop every captured point.
 - **clear** `[fn]` in [BidsRawData](/docs/api/bids/bids-raw-data) — Clears all data members and resets to invalid state.
 - **clear** `[fn]` in [CircularBuffer](/docs/api/utils/circular-buffer) — Clears the buffer.
@@ -709,6 +714,7 @@ Index of 6184 public class members (functions, variables, typedefs, enums) acros
 - **comment** `[var]` in `FiffAnnotation` — Optional free-form comment.
 - **comment** `[var]` in [FiffEvoked](/docs/api/fiff/fiff-evoked) — Comment on dataset.
 - **comment** `[var]` in [FsLabel](/docs/api/fs/fs-label) — Comment from the first line of the label file.
+- **comment** `[var]` in [MNEEvent](/docs/api/mne/mne-event) — Free-text event comment.
 - **comment** `[var]` in [MNEMeasDataSet](/docs/api/mne/mne-meas-data-set) — Comment / description associated with this data set.
 - **comp** `[var]` in [FiffRawData](/docs/api/fiff/fiff-raw-data) — Compensator.
 - **comp** `[var]` in [FwdThreadArg](/docs/api/fwd/fwd-thread-arg) — Which component to compute for free orientations.
@@ -809,6 +815,7 @@ Index of 6184 public class members (functions, variables, typedefs, enums) acros
 - **condition** `[fn]` in [MNECovMatrix](/docs/api/mne/mne-cov-matrix) — Condition the covariance matrix by eigendecomposition with per-channel-type scaling, zeroing sub-threshold eigenvalues, and reconstructing.
 - **confidence** `[var]` in `IcaLabelResult` — Confidence score in [0, 1].
 - **config** `[fn]` in [PythonRunner](/docs/api/utils/python-runner) — Get the current configuration.
+- **confine** `[fn]` in [MNELayout](/docs/api/mne/mne-layout) — Zooms to the ports inside `area` (MNE-C `mne_lout_confine`).
 - **connect** `[fn]` in [MnaGraph](/docs/api/mna/mna-graph) — Connect output port of srcNode to input port of dstNode.
 - **connectedChanged** `[signal]` in [PolhemusConnection](/docs/api/utils/polhemus-connection) — Emitted whenever `UTILSLIB::PolhemusConnection::isConnected` "isConnected" changes.
 - **connection** `[fn]` in [PolhemusCoregistration](/docs/api/utils/polhemus-coregistration)
@@ -857,6 +864,7 @@ Index of 6184 public class members (functions, variables, typedefs, enums) acros
 - **ConstSPtr** `[type]` in [FiffChInfo](/docs/api/fiff/fiff-ch-info) — Const shared pointer type for [`FiffChInfo`](/docs/api/fiff/fiff-ch-info).
 - **ConstSPtr** `[type]` in [FiffChPos](/docs/api/fiff/fiff-ch-pos) — Const shared pointer type for [`FiffChPos`](/docs/api/fiff/fiff-ch-pos).
 - **ConstSPtr** `[type]` in [FiffCoordTrans](/docs/api/fiff/fiff-coord-trans) — Const shared pointer type for [`FiffCoordTrans`](/docs/api/fiff/fiff-coord-trans).
+- **ConstSPtr** `[type]` in [FiffCoordTransSet](/docs/api/fiff/fiff-coord-trans-set) — Const shared pointer type for [`FiffCoordTransSet`](/docs/api/fiff/fiff-coord-trans-set).
 - **ConstSPtr** `[type]` in [FiffCov](/docs/api/fiff/fiff-cov) — Const shared pointer type for [`FiffCov`](/docs/api/fiff/fiff-cov).
 - **ConstSPtr** `[type]` in [FiffCtfComp](/docs/api/fiff/fiff-ctf-comp) — Const shared pointer type for [`FiffCtfComp`](/docs/api/fiff/fiff-ctf-comp).
 - **ConstSPtr** `[type]` in [FiffDigitizerData](/docs/api/fiff/fiff-digitizer-data) — Const shared pointer type for [`FiffDigitizerData`](/docs/api/fiff/fiff-digitizer-data).
@@ -932,7 +940,6 @@ Index of 6184 public class members (functions, variables, typedefs, enums) acros
 - **ConstSPtr** `[type]` in [MNECTFCompData](/docs/api/mne/mnectf-comp-data) — Const shared pointer type for [`MNECTFCompData`](/docs/api/mne/mnectf-comp-data).
 - **ConstSPtr** `[type]` in [MNECTFCompDataSet](/docs/api/mne/mnectf-comp-data-set) — Const shared pointer type for [`MNECTFCompDataSet`](/docs/api/mne/mnectf-comp-data-set).
 - **ConstSPtr** `[type]` in [MNEDeriv](/docs/api/mne/mne-deriv) — Const shared pointer type for [`MNEDeriv`](/docs/api/mne/mne-deriv).
-- **ConstSPtr** `[type]` in [MNEDerivSet](/docs/api/mne/mne-deriv-set) — Const shared pointer type for [`MNEDerivSet`](/docs/api/mne/mne-deriv-set).
 - **ConstSPtr** `[type]` in [MNEEpochData](/docs/api/mne/mne-epoch-data) — Const shared pointer type for [`MNEEpochData`](/docs/api/mne/mne-epoch-data).
 - **ConstSPtr** `[type]` in [MNEEpochDataList](/docs/api/mne/mne-epoch-data-list) — Const shared pointer type for [`MNEEpochDataList`](/docs/api/mne/mne-epoch-data-list).
 - **ConstSPtr** `[type]` in [MNEForwardSolution](/docs/api/mne/mne-forward-solution) — Const shared pointer type for [`MNEForwardSolution`](/docs/api/mne/mne-forward-solution).
@@ -942,6 +949,7 @@ Index of 6184 public class members (functions, variables, typedefs, enums) acros
 - **ConstSPtr** `[type]` in [MNEMeasDataSet](/docs/api/mne/mne-meas-data-set) — Const shared pointer type for [`MNEMeasDataSet`](/docs/api/mne/mne-meas-data-set).
 - **ConstSPtr** `[type]` in [MNEMghTag](/docs/api/mne/mne-mgh-tag) — Const shared pointer type for [`MNEMghTag`](/docs/api/mne/mne-mgh-tag).
 - **ConstSPtr** `[type]` in [MNEMghTagGroup](/docs/api/mne/mne-mgh-tag-group) — Const shared pointer type for [`MNEMghTagGroup`](/docs/api/mne/mne-mgh-tag-group).
+- **ConstSPtr** `[type]` in [MNEMneData](/docs/api/mne/mne-mne-data) — Const shared pointer type for [`MNEMneData`](/docs/api/mne/mne-mne-data).
 - **ConstSPtr** `[type]` in [MNEMorphMap](/docs/api/mne/mne-morph-map) — Const shared pointer type for [`MNEMorphMap`](/docs/api/mne/mne-morph-map).
 - **ConstSPtr** `[type]` in [MNEMshColorScaleDef](/docs/api/mne/mne-msh-color-scale-def) — Const shared pointer type for [`MNEMshColorScaleDef`](/docs/api/mne/mne-msh-color-scale-def).
 - **ConstSPtr** `[type]` in [MNEMshDisplaySurface](/docs/api/mne/mne-msh-display-surface) — Const shared pointer type for [`MNEMshDisplaySurface`](/docs/api/mne/mne-msh-display-surface).
@@ -1009,6 +1017,7 @@ Index of 6184 public class members (functions, variables, typedefs, enums) acros
 - **ConstUPtr** `[type]` in [FiffChInfo](/docs/api/fiff/fiff-ch-info) — Const unique pointer type for [`FiffChInfo`](/docs/api/fiff/fiff-ch-info).
 - **ConstUPtr** `[type]` in [FiffChPos](/docs/api/fiff/fiff-ch-pos) — Const unique pointer type for [`FiffChPos`](/docs/api/fiff/fiff-ch-pos).
 - **ConstUPtr** `[type]` in [FiffCoordTrans](/docs/api/fiff/fiff-coord-trans) — Const unique pointer type for [`FiffCoordTrans`](/docs/api/fiff/fiff-coord-trans).
+- **ConstUPtr** `[type]` in [FiffCoordTransSet](/docs/api/fiff/fiff-coord-trans-set) — Const unique pointer type for [`FiffCoordTransSet`](/docs/api/fiff/fiff-coord-trans-set).
 - **ConstUPtr** `[type]` in [FiffCov](/docs/api/fiff/fiff-cov) — Const unique pointer type for [`FiffCov`](/docs/api/fiff/fiff-cov).
 - **ConstUPtr** `[type]` in [FiffCtfComp](/docs/api/fiff/fiff-ctf-comp) — Const unique pointer type for [`FiffCtfComp`](/docs/api/fiff/fiff-ctf-comp).
 - **ConstUPtr** `[type]` in [FiffDigitizerData](/docs/api/fiff/fiff-digitizer-data) — Const unique pointer type for [`FiffDigitizerData`](/docs/api/fiff/fiff-digitizer-data).
@@ -1030,6 +1039,7 @@ Index of 6184 public class members (functions, variables, typedefs, enums) acros
 - **ConstUPtr** `[type]` in [FiffTag](/docs/api/fiff/fiff-tag) — Const unique pointer type for [`FiffTag`](/docs/api/fiff/fiff-tag).
 - **contactInstanceCount** `[fn]` in [ElectrodeObject](/docs/api/disp3-d/electrode-object)
 - **contacts** `[var]` in `ElectrodeArray` — Contacts in array-local order.
+- **contains** `[fn]` in [MNELayoutPort](/docs/api/mne/mne-layout-port) — Returns whether `channel` (any spelling) is one of the port's channels.
 - **contHpiStatusChanged** `[signal]` in [HpiSettingsView](/docs/api/disp/hpi-settings-view) — Emit this signal whenever continous HPI checkbox changed.
 - **continuousHPIChecked** `[fn]` in [HpiSettingsView](/docs/api/disp/hpi-settings-view) — Returns whether continuous fitting is checked.
 - **contourStep** `[fn]` in `SensorFieldMapper` — Compute a "nice" iso-contour step given a value range and target number of ticks.
@@ -1072,6 +1082,7 @@ Index of 6184 public class members (functions, variables, typedefs, enums) acros
 - **cosmag** `[fn]` in [InvSensorSet](/docs/api/inv/inv-sensor-set)
 - **cosmag** `[fn]` in [InvSensorSet](/docs/api/inv/inv-sensor-set)
 - **count** `[fn]` in `Command` — Returns the number of parameters.
+- **count** `[fn]` in [MNEDerivSet](/docs/api/mne/mne-deriv-set) — Returns the number of derived channels over all derivations (MNE-C `mne_count_deriv`).
 - **count** `[fn]` in `RawCommand` — Returns the number of parameters.
 - **countOf** `[fn]` in [AcquiredPoints](/docs/api/utils/acquired-points)
 - **couplings** `[var]` in [InvSourceEstimate](/docs/api/inv/inv-source-estimate) — Correlated source groups overlaid on the grid.
@@ -1097,6 +1108,7 @@ Index of 6184 public class members (functions, variables, typedefs, enums) acros
 - **createBatchedSpheres** `[fn]` in `MeshFactory` — Create a batched mesh of identical spheres at multiple positions (used for source space points, digitizer points, etc.).
 - **createCylinder** `[fn]` in `MeshFactory` — Create a cylinder between two world-space endpoints.
 - **created** `[var]` in [MnaProject](/docs/api/mna/mna-project) — Creation timestamp.
+- **created_here** `[var]` in [MNEEvent](/docs/api/mne/mne-event) — True if the event was added by the program rather than read.
 - **createFilterChannelList** `[fn]` in [RtFiffRawViewModel](/docs/api/disp/rt-fiff-raw-view-model) — Create list of channels which are to be filtered based on channel names.
 - **createFromData** `[fn]` in `BrainSurface` — Create surface from raw vertex and triangle data.
 - **createFromData** `[fn]` in `BrainSurface` — Create surface from raw vertex, normal and triangle data.
@@ -1168,6 +1180,7 @@ Index of 6184 public class members (functions, variables, typedefs, enums) acros
 - **dataKind** `[var]` in `MnaPort` — Data kind flowing through this port.
 - **DataLoader** `[fn]` in `DataLoader`
 - **dataname** `[var]` in [InvEcdSet](/docs/api/inv/inv-ecd-set) — The associated data file.
+- **datap** `[var]` in [MNEMneData](/docs/api/mne/mne-mne-data) — Projection of the whitened data onto the field eigenvectors.
 - **datasetName** `[var]` in `WriteOptions` — Name for dataset_description.json (defaults to "[Unspecified]").
 - **datasetType** `[var]` in `BidsDatasetDescription` — "raw" or "derivative" (RECOMMENDED).
 - **datatype** `[fn]` in [BIDSPath](/docs/api/bids/bids-path) — BIDS datatype string.
@@ -1191,6 +1204,8 @@ Index of 6184 public class members (functions, variables, typedefs, enums) acros
 - **decompress** `[fn]` in [MriNiftiIO](/docs/api/mri/mri-nifti-io) — Decompresses a ``.nii.gz file into `rawData`.
 - **defaultForIndex** `[fn]` in `SubView` — Return default `SubView` configuration for viewport `index`.
 - **defaultValue** `[var]` in `MnaOpSchemaAttr` — Default when not set.
+- **Definition** `[type]` in [MNEDerivSet](/docs/api/mne/mne-deriv-set) — Derived channel name and the weight of every input channel.
+- **definitions** `[fn]` in [MNEDerivSet](/docs/api/mne/mne-deriv-set) — Returns every derivation of the set as definitions, in file order.
 - **defs** `[var]` in `CovDescription` — Definition sections.
 - **degreesOfFreedom** `[var]` in `StatsTtestResult` — Degrees of freedom.
 - **delay** `[var]` in `AverageCategory` — Stimulus delay (s).
@@ -1210,7 +1225,7 @@ Index of 6184 public class members (functions, variables, typedefs, enums) acros
 - **deriv** `[var]` in [MNERawData](/docs/api/mne/mne-raw-data) — Derivation data definitions.
 - **deriv_data** `[var]` in [MNEDeriv](/docs/api/mne/mne-deriv) — The derivation data itself (sparse named matrix).
 - **deriv_matched** `[var]` in [MNERawData](/docs/api/mne/mne-raw-data) — Derivation data matched to this raw data.
-- **derivs** `[var]` in [MNEDerivSet](/docs/api/mne/mne-deriv-set) — List of derivation items.
+- **derivs** `[var]` in [MNEDerivSet](/docs/api/mne/mne-deriv-set) — The derivations, owned.
 - **desc** `[var]` in [FiffProj](/docs/api/fiff/fiff-proj) — Projector description.
 - **desc** `[var]` in [FwdCoil](/docs/api/fwd/fwd-coil) — Description for this type of a coil.
 - **desc** `[var]` in [MNEProjItem](/docs/api/mne/mne-proj-item) — Human-readable description (e.g.
@@ -1266,6 +1281,8 @@ Index of 6184 public class members (functions, variables, typedefs, enums) acros
 - **dig** `[var]` in [FiffInfo](/docs/api/fiff/fiff-info) — List of all digitization point descriptors.
 - **dig** `[var]` in `ViewVisibilityProfile`
 - **dig_trans** `[var]` in [FiffInfo](/docs/api/fiff/fiff-info) — Digitizer coordinate transformation.
+- **dig_trigger** `[var]` in [MNERawData](/docs/api/mne/mne-raw-data) — Name of the digital trigger channel.
+- **dig_trigger_mask** `[var]` in [MNERawData](/docs/api/mne/mne-raw-data) — Bit mask applied to digital trigger channel.
 - **digCardinal** `[var]` in `ViewVisibilityProfile`
 - **digEeg** `[var]` in `ViewVisibilityProfile`
 - **digExtra** `[var]` in `ViewVisibilityProfile`
@@ -1494,6 +1511,7 @@ Index of 6184 public class members (functions, variables, typedefs, enums) acros
 - **evalVector** `[fn]` in [PythonTestHelper](/docs/api/utils/python-test-helper) — Run inline Python code that prints a flat array of doubles (one per line or space-separated), and parse it into an Eigen VectorXd.
 - **even_vertex_color** `[var]` in [MNEMshDisplaySurface](/docs/api/mne/mne-msh-display-surface) — Uniform RGBA color for non-data-driven coloring.
 - **event** `[var]` in [MNEEpochData](/docs/api/mne/mne-epoch-data) — The event code.
+- **event_list** `[var]` in [MNERawData](/docs/api/mne/mne-raw-data) — Trigger event list.
 - **eventFile** `[var]` in `AverageDescription` — Read events from here.
 - **eventFile** `[var]` in `AverageDescription` — Read events from here.
 - **eventFile** `[var]` in `CovDescription` — Read events from here.
@@ -1506,6 +1524,7 @@ Index of 6184 public class members (functions, variables, typedefs, enums) acros
 - **events** `[var]` in [BidsRawData](/docs/api/bids/bids-raw-data) — Events from *_events.tsv.
 - **events** `[var]` in `CovDefinition` — The interesting events.
 - **events** `[var]` in [FiffEvents](/docs/api/fiff/fiff-events) — Event matrix (nEvents x 3): [sample, before, after].
+- **events** `[var]` in [MNEEventList](/docs/api/mne/mne-event-list) — The events.
 - **eventSample** `[var]` in [MNEEpochData](/docs/api/mne/mne-epoch-data) — The sample index of the triggering event.
 - **eventsOutFiles** `[var]` in `ProcessingSettings` — Save events to these files.
 - **eventsTsvPath** `[fn]` in [BIDSPath](/docs/api/bids/bids-path) — Returns the path for the events.tsv sidecar.
@@ -1543,6 +1562,7 @@ Index of 6184 public class members (functions, variables, typedefs, enums) acros
 - **expression** `[var]` in `MnaParamBinding` — Formula string, e.g. "clamp(ref('noise_est_01/snr') * 0.1, 0.01, 1.0)".
 - **expression** `[var]` in `MnaVerificationCheck` — Simple evaluable expression: "rank(covariance) &gt; 0".
 - **extension** `[fn]` in [BIDSPath](/docs/api/bids/bids-path) — File extension.
+- **extent** `[fn]` in [MNELayout](/docs/api/mne/mne-layout) — Returns the drawing area given on the first line of the file.
 - **externalToolVersion** `[var]` in `MnaProvenance` — e.g. "FreeSurfer 7.4.1", "Python 3.11.5"
 - **extract** `[fn]` in [EpochExtractor](/docs/api/utils/epoch-extractor) — Extract epochs from a continuous raw data matrix.
 - **extract** `[fn]` in [InvLabelTimeCourse](/docs/api/inv/inv-label-time-course) — Extract label time courses from a source estimate.
@@ -1603,6 +1623,7 @@ Index of 6184 public class members (functions, variables, typedefs, enums) acros
 - **FiffCoordTrans** `[fn]` in [FiffCoordTrans](/docs/api/fiff/fiff-coord-trans) — Copy constructor.
 - **FiffCoordTrans** `[fn]` in [FiffCoordTrans](/docs/api/fiff/fiff-coord-trans) — Constructs a coordinate transformation from a rotation matrix and translation vector.
 - **FiffCoordTrans** `[fn]` in [FiffCoordTrans](/docs/api/fiff/fiff-coord-trans) — Constructs a coordinate transformation from a 4×4 homogeneous matrix.
+- **FiffCoordTransSet** `[fn]` in [FiffCoordTransSet](/docs/api/fiff/fiff-coord-trans-set) — Constructs the [`FiffCoordTransSet`](/docs/api/fiff/fiff-coord-trans-set).
 - **FiffCov** `[fn]` in [FiffCov](/docs/api/fiff/fiff-cov) — Constructs the covariance data matrix.
 - **FiffCov** `[fn]` in [FiffCov](/docs/api/fiff/fiff-cov) — Constructs a covariance data matrix, by reading from a IO device.
 - **FiffCov** `[fn]` in [FiffCov](/docs/api/fiff/fiff-cov) — Copy constructor.
@@ -1681,6 +1702,7 @@ Index of 6184 public class members (functions, variables, typedefs, enums) acros
 - **filename** `[var]` in [MNEVolGeom](/docs/api/mne/mne-vol-geom) — Path to the MRI data file this geometry was read from.
 - **fileName** `[fn]` in [FsAnnotation](/docs/api/fs/fs-annotation) — annotation file name
 - **fileName** `[fn]` in [FsSurface](/docs/api/fs/fs-surface) — surf file name
+- **fileName** `[var]` in [MNELayout](/docs/api/mne/mne-layout) — File this layout was read from.
 - **fileName** `[var]` in `MriSlice` — Source file name.
 - **fileName** `[var]` in [MriVolData](/docs/api/mri/mri-vol-data) — Name of the source file.
 - **fileNameChanged** `[signal]` in [ProjectSettingsView](/docs/api/disp/project-settings-view)
@@ -1834,6 +1856,7 @@ Index of 6184 public class members (functions, variables, typedefs, enums) acros
 - **FrequencySpectrumDelegate** `[fn]` in [FrequencySpectrumDelegate](/docs/api/disp/frequency-spectrum-delegate) — Creates a new abstract item delegate with the given parent.
 - **FrequencySpectrumModel** `[fn]` in [FrequencySpectrumModel](/docs/api/disp/frequency-spectrum-model) — Constructs an real-time multi sample array table model for the given parent.
 - **from** `[var]` in [FiffCoordTrans](/docs/api/fiff/fiff-coord-trans) — Source coordinate system.
+- **from** `[var]` in [MNEEvent](/docs/api/mne/mne-event) — Trigger value before the transition.
 - **from_kind** `[var]` in [MNEMorphMap](/docs/api/mne/mne-morph-map) — FsSurface kind identifier (e.g., hemisphere) of the source surface (-1 = unknown).
 - **from_subj** `[var]` in [MNEMorphMap](/docs/api/mne/mne-morph-map) — Subject name of the source surface.
 - **fromBemSurface** `[fn]` in `BrainSurface` — Load geometry from a MNE BEM surface.
@@ -1854,6 +1877,7 @@ Index of 6184 public class members (functions, variables, typedefs, enums) acros
 - **fromCbor** `[fn]` in `MnaVerificationCheck`
 - **fromCbor** `[fn]` in `MnaVerificationResult`
 - **fromChannelPositions** `[fn]` in [StatsAdjacency](/docs/api/sts/stats-adjacency) — Build a spatial adjacency matrix from channel positions in FiffInfo.
+- **fromDefinitions** `[fn]` in [MNEDerivSet](/docs/api/mne/mne-deriv-set) — Builds one derivation from definitions such as those of dsp::ChannelDerivation.
 - **fromEigenSparse** `[fn]` in [FiffSparseMatrix](/docs/api/fiff/fiff-sparse-matrix) — Create a [`FiffSparseMatrix`](/docs/api/fiff/fiff-sparse-matrix) from an Eigen::SparseMatrix&lt;double&gt;.
 - **fromEigenSparse** `[fn]` in [FiffSparseMatrix](/docs/api/fiff/fiff-sparse-matrix) — Create a [`FiffSparseMatrix`](/docs/api/fiff/fiff-sparse-matrix) from an Eigen::SparseMatrix&lt;float&gt;.
 - **fromJson** `[fn]` in `MnaFileRef` — Deserialize from QJsonObject.
@@ -1871,6 +1895,7 @@ Index of 6184 public class members (functions, variables, typedefs, enums) acros
 - **fromJson** `[fn]` in `MnaVerification`
 - **fromJson** `[fn]` in `MnaVerificationCheck`
 - **fromJson** `[fn]` in `MnaVerificationResult`
+- **fromMatrix** `[fn]` in [MNEEventList](/docs/api/mne/mne-event-list) — Builds a list from rows of sample, value before and value after.
 - **fromSourceSpace** `[fn]` in [StatsAdjacency](/docs/api/sts/stats-adjacency) — Build a spatial adjacency matrix from a triangulated source space.
 - **fromSourceSpaceTemporal** `[fn]` in [StatsAdjacency](/docs/api/sts/stats-adjacency) — Build a spatio-temporal adjacency matrix from a triangulated source space.
 - **fromSurface** `[fn]` in `BrainSurface` — Load geometry from a FreeSurfer surface.
@@ -2375,6 +2400,7 @@ Index of 6184 public class members (functions, variables, typedefs, enums) acros
 - **head_mri_t** `[var]` in [FiffDigitizerData](/docs/api/fiff/fiff-digitizer-data) — Head to MRI coordinate transformation.
 - **head_mri_t** `[var]` in [FwdBemModel](/docs/api/fwd/fwd-bem-model) — Head-to-MRI coordinate transform.
 - **head_mri_t_adj** `[var]` in [FiffDigitizerData](/docs/api/fiff/fiff-digitizer-data) — Adjusted head to MRI transformation.
+- **head_surf_RAS_t** `[var]` in [FiffCoordTransSet](/docs/api/fiff/fiff-coord-trans-set) — Transform from MEG head coordinates to surface RAS.
 - **headerData** `[fn]` in [ChannelInfoModel](/docs/api/disp/channel-info-model)
 - **headerData** `[fn]` in [EvokedSetModel](/docs/api/disp/evoked-set-model) — Returns the data for the given role and section in the header with the specified orientation.
 - **headerData** `[fn]` in [FrequencySpectrumModel](/docs/api/disp/frequency-spectrum-model) — Returns the data for the given role and section in the header with the specified orientation.
@@ -2575,6 +2601,7 @@ Index of 6184 public class members (functions, variables, typedefs, enums) acros
 - **InvEcdSet** `[fn]` in [InvEcdSet](/docs/api/inv/inv-ecd-set) — Copy constructor.
 - **inverseTransform** `[fn]` in [DecodingCsp](/docs/api/decoding/decoding-csp) — Project CSP power features back to sensor space.
 - **inversion** `[var]` in [InvBeamformer](/docs/api/inv/inv-beamformer) — Inversion method used.
+- **invert** `[var]` in [MNELayoutPort](/docs/api/mne/mne-layout-port) — Draw the signal upside down (negative height in the file).
 - **invert_transform** `[fn]` in [Fiff](/docs/api/fiff/fiff-class) — fiff_invert_transform
 - **invert_transform** `[fn]` in [FiffCoordTrans](/docs/api/fiff/fiff-coord-trans) — Invert a coordinate transformation (actual obsolete - cause trans and inverse are both stored).
 - **inverted** `[fn]` in [FiffCoordTrans](/docs/api/fiff/fiff-coord-trans) — Returns a new inverted copy of this transformation (swaps from/to and trans/invtrans).
@@ -2740,6 +2767,7 @@ Index of 6184 public class members (functions, variables, typedefs, enums) acros
 - **isVisible** `[fn]` in `AbstractTreeItem`
 - **isVisible** `[fn]` in `BrainSurface` — Check if the surface is visible.
 - **isVisible** `[fn]` in `DipoleObject`
+- **isVisible** `[fn]` in [MNELayout](/docs/api/mne/mne-layout) — Returns whether a port lies completely inside the visible area.
 - **isVisible** `[fn]` in `NetworkObject`
 - **isVisible** `[fn]` in `PolylineObject`
 - **iTargetEvent** `[var]` in `XdawnResult` — Event code used as the target class.
@@ -2793,6 +2821,7 @@ Index of 6184 public class members (functions, variables, typedefs, enums) acros
 - **label** `[var]` in `ElectrodeArray` — Array label: "LH", "GridA", etc.
 - **label** `[var]` in `EventMarker` — Short text label (shown at the bottom strip); defaults to type number.
 - **label** `[var]` in `IcaLabelResult` — Assigned label.
+- **label** `[var]` in [MNELayoutPort](/docs/api/mne/mne-layout-port) — Channel names as written in the file (e.g.
 - **label** `[var]` in `PickResult` — Human-readable label (contact name, vertex coordinate string, …).
 - **label** `[var]` in `TimeRulerEventMark` — Short text (event type number).
 - **label** `[var]` in `TimeRulerReferenceMark` — Short text identifier, e.g. M1.
@@ -2806,6 +2835,8 @@ Index of 6184 public class members (functions, variables, typedefs, enums) acros
 - **lambda** `[var]` in [FwdEegSphereModel](/docs/api/fwd/fwd-eeg-sphere-model)
 - **lambda** `[var]` in [MNECovMatrix](/docs/api/mne/mne-cov-matrix) — Eigenvalues of the covariance matrix.
 - **lambda2** `[var]` in `InvCMNESettings` — Tikhonov regularisation (SNR=3 -&gt; lambda^2=1/9).
+- **lambda2** `[var]` in [MNEMneData](/docs/api/mne/mne-mne-data) — Regularization parameter to be used (as a function of time).
+- **lambda2_est** `[var]` in [MNEMneData](/docs/api/mne/mne-mne-data) — Regularization parameter estimated from available data.
 - **language** `[var]` in `MnaScript` — "python", "shell", "r", "matlab", "octave", "julia"
 - **last** `[var]` in [FiffEvoked](/docs/api/fiff/fiff-evoked) — Last time sample.
 - **last** `[var]` in [FiffRawDir](/docs/api/fiff/fiff-raw-dir) — last sample.
@@ -3056,8 +3087,13 @@ Index of 6184 public class members (functions, variables, typedefs, enums) acros
 - **markerMoved** `[signal]` in [RtFiffRawView](/docs/api/disp/rt-fiff-raw-view) — position is emitted whenever user moves the mouse inside of the table view viewport
 - **markerMoved** `[fn]` in [RtFiffRawViewDelegate](/docs/api/disp/rt-fiff-raw-view-delegate) — markerMoved is called whenever user moves the mouse inside of the table view viewport
 - **match** `[fn]` in [BIDSPath](/docs/api/bids/bids-path) — Searches the BIDS root for all files matching the current entities.
+- **match** `[fn]` in [MNEDerivSet](/docs/api/mne/mne-deriv-set) — Keeps the derivations whose inputs are all among `chNames` and merges them into one derivation whose columns are exactly `chNames` (MNE-C `mne_match_merge_deriv`).
+- **matched** `[var]` in [MNELayoutPort](/docs/api/mne/mne-layout-port) — Set by the last `MNELayout::matchPorts` call.
+- **matches** `[fn]` in [MNELayout](/docs/api/mne/mne-layout) — Returns which port shows which channel after `matchPorts(const QStringList&)`.
 - **matchesSurfaceType** `[fn]` in `SubView` — True when the brain-surface `key` matches this view's surfaceType (e.g.
 - **matchEvent** `[fn]` in [FiffEvents](/docs/api/fiff/fiff-events) — Check whether an event matches a category definition.
+- **matchPorts** `[fn]` in [MNELayout](/docs/api/mne/mne-layout) — Marks the visible ports that show `channel` (MNE-C `mne_lout_match_ports`).
+- **matchPorts** `[fn]` in [MNELayout](/docs/api/mne/mne-layout) — Matches many channels at once (MNE-C `mne_lout_match_ports_many`) and fills `matches()`.
 - **matClusterIds** `[var]` in `StatsClusterResult` — Cluster label at each (channel, time) point; 0 = not in cluster.
 - **matCsd** `[var]` in `CsdResult` — n_channels × n_channels mean CSD across selected frequencies
 - **matData** `[var]` in `IntermediateTrialData`
@@ -3105,7 +3141,9 @@ Index of 6184 public class members (functions, variables, typedefs, enums) acros
 - **matTstat** `[var]` in `StatsTtestResult` — t-statistics (same shape as input columns).
 - **matUnmixing** `[var]` in `IcaResult` — Unmixing matrix W (n_components x n_channels).
 - **matUnmixing** `[var]` in `InfomaxResult` — Unmixing matrix (n_components x n_channels).
+- **max_event** `[var]` in [MNERawData](/docs/api/mne/mne-raw-data) — Maximum event number in use.
 - **maxAbsCorrelation** `[fn]` in [MlIcaLabel](/docs/api/decoding/ml-ica-label) — Compute the maximum absolute Pearson correlation between a source and reference channels.
+- **maxOnset** `[fn]` in [MNEEventList](/docs/api/mne/mne-event-list) — Returns the largest trigger value that starts from 0.
 - **maxPowerOri** `[var]` in [InvBeamformer](/docs/api/inv/inv-beamformer) — Optimal orientation per source (n_sources, 3).
 - **maxshield_data** `[var]` in [MNERawInfo](/docs/api/mne/mne-raw-info) — Are these unprocessed MaxShield data.
 - **maxSources** `[var]` in `InvTokenizeOptions` — Sub-sample grid sources (-1 = all).
@@ -3205,7 +3243,10 @@ Index of 6184 public class members (functions, variables, typedefs, enums) acros
 - **MNECTFCompDataSet** `[fn]` in [MNECTFCompDataSet](/docs/api/mne/mnectf-comp-data-set) — Construct an empty compensation data set.
 - **MNECTFCompDataSet** `[fn]` in [MNECTFCompDataSet](/docs/api/mne/mnectf-comp-data-set) — Copy constructor.
 - **MNEDeriv** `[fn]` in [MNEDeriv](/docs/api/mne/mne-deriv) — Constructs an empty [`MNE`](/docs/api/mne/mne-class) Derivation.
-- **MNEDerivSet** `[fn]` in [MNEDerivSet](/docs/api/mne/mne-deriv-set) — Constructs the [`MNE`](/docs/api/mne/mne-class) Derivation Set.
+- **MNEDeriv** `[fn]` in [MNEDeriv](/docs/api/mne/mne-deriv) — Copies the derivation including its matrix.
+- **MNEDerivSet** `[fn]` in [MNEDerivSet](/docs/api/mne/mne-deriv-set)
+- **MNEDerivSet** `[fn]` in [MNEDerivSet](/docs/api/mne/mne-deriv-set)
+- **MNEDerivSet** `[fn]` in [MNEDerivSet](/docs/api/mne/mne-deriv-set) — Copies the set including every derivation.
 - **MNEEpochData** `[fn]` in [MNEEpochData](/docs/api/mne/mne-epoch-data) — Default constructor.
 - **MNEEpochData** `[fn]` in [MNEEpochData](/docs/api/mne/mne-epoch-data) — Copy constructor.
 - **MNEEpochDataList** `[fn]` in [MNEEpochDataList](/docs/api/mne/mne-epoch-data-list) — Default constructor.
@@ -3226,6 +3267,7 @@ Index of 6184 public class members (functions, variables, typedefs, enums) acros
 - **MNEMghTagGroup** `[fn]` in [MNEMghTagGroup](/docs/api/mne/mne-mgh-tag-group) — Constructs an empty [`MNEMghTagGroup`](/docs/api/mne/mne-mgh-tag-group).
 - **MNEMghTagGroup** `[fn]` in [MNEMghTagGroup](/docs/api/mne/mne-mgh-tag-group)
 - **MNEMghTagGroup** `[fn]` in [MNEMghTagGroup](/docs/api/mne/mne-mgh-tag-group)
+- **MNEMneData** `[fn]` in [MNEMneData](/docs/api/mne/mne-mne-data) — Constructs the [`MNEMneData`](/docs/api/mne/mne-mne-data).
 - **MNEMorphMap** `[fn]` in [MNEMorphMap](/docs/api/mne/mne-morph-map) — Constructs the [`MNEMorphMap`](/docs/api/mne/mne-morph-map).
 - **MNEMshColorScaleDef** `[fn]` in [MNEMshColorScaleDef](/docs/api/mne/mne-msh-color-scale-def) — Constructs the [`MNEMshColorScaleDef`](/docs/api/mne/mne-msh-color-scale-def).
 - **MNEMshDisplaySurface** `[fn]` in [MNEMshDisplaySurface](/docs/api/mne/mne-msh-display-surface) — Constructs the [`MNEMshDisplaySurface`](/docs/api/mne/mne-msh-display-surface).
@@ -3269,6 +3311,8 @@ Index of 6184 public class members (functions, variables, typedefs, enums) acros
 - **MNESurfacePatch** `[fn]` in [MNESurfacePatch](/docs/api/mne/mne-surface-patch) — Constructs a patch with `np` vertices.
 - **MNETriangle** `[fn]` in [MNETriangle](/docs/api/mne/mne-triangle) — Constructs an empty [`MNETriangle`](/docs/api/mne/mne-triangle) with zeroed geometry.
 - **MNEVolGeom** `[fn]` in [MNEVolGeom](/docs/api/mne/mne-vol-geom) — Constructs the [`MNE`](/docs/api/mne/mne-class) Volume Geometry.
+- **MNI_tal_tal_gtz_t** `[var]` in [FiffCoordTransSet](/docs/api/fiff/fiff-coord-trans-set) — Transform MNI Talairach to FreeSurfer Talairach coordinates (z &gt; 0).
+- **MNI_tal_tal_ltz_t** `[var]` in [FiffCoordTransSet](/docs/api/fiff/fiff-coord-trans-set) — Transform MNI Talairach to FreeSurfer Talairach coordinates (z &lt; 0).
 - **modalitiesChanged** `[signal]` in [ModalitySelectionView](/docs/api/disp/modality-selection-view) — Emit this signal whenever the user changed the modality.
 - **modality** `[fn]` in `RtSensorStreamManager`
 - **modalityChanged** `[signal]` in [DipoleFitView](/docs/api/disp/dipole-fit-view) — Send new modality selection.
@@ -3351,6 +3395,7 @@ Index of 6184 public class members (functions, variables, typedefs, enums) acros
 - **name** `[var]` in [MNEMshLightSet](/docs/api/mne/mne-msh-light-set) — Name of this light set.
 - **names** `[var]` in [FiffCov](/docs/api/fiff/fiff-cov) — Channel names.
 - **names** `[var]` in [MNECovMatrix](/docs/api/mne/mne-cov-matrix) — Channel names (optional).
+- **names** `[var]` in [MNELayoutPort](/docs/api/mne/mne-layout-port) — Channel names in matching form (see `cleanName()`).
 - **names** `[var]` in [MNENamedVector](/docs/api/mne/mne-named-vector) — Name list for the elements.
 - **names** `[var]` in [MNEProjOp](/docs/api/mne/mne-proj-op) — Names of the channels in the final compiled projector.
 - **nave** `[var]` in [FiffEvoked](/docs/api/fiff/fiff-evoked) — Number of averaged epochs.
@@ -3409,6 +3454,7 @@ Index of 6184 public class members (functions, variables, typedefs, enums) acros
 - **NetworkObject** `[fn]` in `NetworkObject` — Default constructor.
 - **NetworkTreeItem** `[fn]` in `NetworkTreeItem` — Constructs a `NetworkTreeItem`.
 - **neval** `[var]` in [InvEcd](/docs/api/inv/inv-ecd) — Number of function evaluations required for this fit.
+- **nevent** `[fn]` in [MNEEventList](/docs/api/mne/mne-event-list) — Returns the number of events in the list.
 - **new_file_id** `[fn]` in [FiffId](/docs/api/fiff/fiff-id) — Constructs a (hopefully) unique file id.
 - **new_fit_user** `[fn]` in [FwdEegSphereModel](/docs/api/fwd/fwd-eeg-sphere-model) — Allocate and initialize a fitting workspace for Berg-Scherg parameter estimation.
 - **newAverageActivationMap** `[signal]` in [AverageSelectionView](/docs/api/disp/average-selection-view) — Emmited when new average activation is available.
@@ -3661,6 +3707,8 @@ Index of 6184 public class members (functions, variables, typedefs, enums) acros
 - **operator=** `[fn]` in [InvHpiModelParameters](/docs/api/inv/inv-hpi-model-parameters)
 - **operator=** `[fn]` in [InvSourceEstimate](/docs/api/inv/inv-source-estimate) — Assignment Operator.
 - **operator=** `[fn]` in [MNEBemSurface](/docs/api/mne/mne-bem-surface) — Copy assignment.
+- **operator=** `[fn]` in [MNEDerivSet](/docs/api/mne/mne-deriv-set)
+- **operator=** `[fn]` in [MNEDerivSet](/docs/api/mne/mne-deriv-set) — Replaces the derivations by copies of those of another set.
 - **operator=** `[fn]` in [MNEEpochData](/docs/api/mne/mne-epoch-data) — Copy assignment.
 - **operator=** `[fn]` in [MNEForwardSolution](/docs/api/mne/mne-forward-solution) — Copy assignment operator.
 - **operator=** `[fn]` in [MNEForwardSolution](/docs/api/mne/mne-forward-solution) — Move assignment operator.
@@ -3898,6 +3946,9 @@ Index of 6184 public class members (functions, variables, typedefs, enums) acros
 - **PolhemusCoregistration** `[fn]` in [PolhemusCoregistration](/docs/api/utils/polhemus-coregistration)
 - **PolylineObject** `[fn]` in `PolylineObject` — Constructs a `PolylineObject` without any points.
 - **pop** `[fn]` in [CircularBuffer](/docs/api/utils/circular-buffer) — Returns the first element (first in first out).
+- **portAt** `[fn]` in [MNELayout](/docs/api/mne/mne-layout) — Returns the port whose interior contains a point.
+- **portno** `[var]` in [MNELayoutPort](/docs/api/mne/mne-layout-port) — Running number of this viewport.
+- **ports** `[var]` in [MNELayout](/docs/api/mne/mne-layout) — Viewports in file order.
 - **pos** `[var]` in `CoilParam`
 - **pos** `[var]` in `ElectrodePosition` — Position in metres (MNI head coords).
 - **pos** `[var]` in [FiffDirEntry](/docs/api/fiff/fiff-dir-entry) — Location in file; Note: the data is located at pos + FIFFC_DATA_OFFSET: 2GB restriction -&gt; change this to fiff_long_t.
@@ -3925,6 +3976,7 @@ Index of 6184 public class members (functions, variables, typedefs, enums) acros
 - **PowellOffset** `[fn]` in [InvPwlRapMusic](/docs/api/inv/inv-pwl-rap-music)
 - **predict** `[fn]` in [MlModel](/docs/api/ml/ml-model) — Run inference on the given input tensor.
 - **predict** `[fn]` in [MlOnnxModel](/docs/api/ml/ml-onnx-model) — Run inference on the given input tensor.
+- **predicted** `[var]` in [MNEMneData](/docs/api/mne/mne-mne-data) — The predicted data.
 - **prefiltering** `[var]` in `EDFChannelInfo`
 - **prepare_forward** `[fn]` in [MNEForwardSolution](/docs/api/mne/mne-forward-solution) — Prepare forward for assembling the inverse operator.
 - **prepare_inverse_operator** `[fn]` in [MNEInverseOperator](/docs/api/mne/mne-inverse-operator) — Prepare the inverse operator for source estimation.
@@ -4057,6 +4109,7 @@ Index of 6184 public class members (functions, variables, typedefs, enums) acros
 - **range** `[var]` in [FiffChInfo](/docs/api/fiff/fiff-ch-info) — Voltmeter range (-1 = auto ranging).
 - **rank** `[var]` in [InvBeamformer](/docs/api/inv/inv-beamformer) — Data covariance rank used.
 - **rank** `[fn]` in [Linalg](/docs/api/math/linalg) — Returns the rank of a matrix A.
+- **RAS_MNI_tal_t** `[var]` in [FiffCoordTransSet](/docs/api/fiff/fiff-coord-trans-set) — Transform from RAS (nonzero origin) to MNI Talairach coordinates.
 - **rasGood** `[var]` in [MriVolData](/docs/api/mri/mri-vol-data) — Whether the direction cosines in the header are valid.
 - **rasToVoxel** `[fn]` in [MriSlicer](/docs/api/mri/mri-slicer) — Convert RAS coordinate to voxel index.
 - **rasToVoxel** `[fn]` in [MriSlicer](/docs/api/mri/mri-slicer) — Convert RAS coordinate to voxel index using a volume's transform.
@@ -4096,9 +4149,12 @@ Index of 6184 public class members (functions, variables, typedefs, enums) acros
 - **read** `[fn]` in [MnaProject](/docs/api/mna/mna-project) — Read an MNA project from file.
 - **read** `[fn]` in [MNECovMatrix](/docs/api/mne/mne-cov-matrix) — Read a covariance matrix of the specified kind from a FIFF file.
 - **read** `[fn]` in [MNECTFCompDataSet](/docs/api/mne/mnectf-comp-data-set) — Read all CTF compensation data sets (matrices and channel info) from a FIFF file, calibrate them, and return a populated set.
+- **read** `[fn]` in [MNEDerivSet](/docs/api/mne/mne-deriv-set) — Reads every derivation stored in the `FIFFB_MNE_DERIVATIONS` blocks of a file (MNE-C `mne_read_deriv`).
 - **read** `[fn]` in [MNEForwardSolution](/docs/api/mne/mne-forward-solution)
+- **read** `[fn]` in [MNELayout](/docs/api/mne/mne-layout) — Reads an MNE-C ``.lout file.
 - **read** `[fn]` in [MNENamedMatrix](/docs/api/mne/mne-named-matrix) — Factory: read a named matrix from a FIFF file.
 - **read** `[fn]` in [MNEProjOp](/docs/api/mne/mne-proj-op) — Read a projection operator from a FIFF file by path.
+- **read** `[fn]` in [MNESparseNamedMatrix](/docs/api/mne/mne-sparse-named-matrix) — Reads a sparse named matrix (MNE-C `mne_read_sparse_named_matrix`).
 - **read** `[fn]` in [MNESssData](/docs/api/mne/mne-sss-data) — Read SSS data from anywhere in a file Refactored: mne_read (mne_sss_data.c).
 - **read** `[fn]` in [MriCorIO](/docs/api/mri/mri-cor-io) — Reads COR slice files from a directory.
 - **read** `[fn]` in [MriMghIO](/docs/api/mri/mri-mgh-io) — Reads a FreeSurfer MGH or MGZ file.
@@ -4165,9 +4221,10 @@ Index of 6184 public class members (functions, variables, typedefs, enums) acros
 - **readBrainstormMonFile** `[fn]` in [SelectionIO](/docs/api/utils/selection-io) — Reads the specified Brainstorm montage file.
 - **readCsv** `[fn]` in [FiffAnnotations](/docs/api/fiff/fiff-annotations) — Reads annotations from a CSV file.
 - **readCsv** `[fn]` in [InvSourceEstimateIO](/docs/api/inv/inv-source-estimate-io) — Read source estimate from CSV format.
-- **readDefinitionFile** `[fn]` in [ChannelDerivation](/docs/api/utils/channel-derivation) — Read derivation rules from a text definition file.
+- **readDefinitionFile** `[fn]` in [ChannelDerivation](/docs/api/utils/channel-derivation) — Read derivation rules from an MNE-C derivation text file (`MNELIB::MNEDerivSet::readText`).
 - **readEpochs** `[fn]` in [MNEEpochDataList](/docs/api/mne/mne-epoch-data-list) — Read the epochs from a raw file based on provided events.
 - **reader** `[var]` in [BidsRawData](/docs/api/bids/bids-raw-data) — The underlying format reader (keeps file open).
+- **readFif** `[fn]` in [MNEEventList](/docs/api/mne/mne-event-list) — Reads the event block of a FIFF file (MNE-C `mne_load_events_fiff`).
 - **readFilter** `[fn]` in [FilterIO](/docs/api/utils/filter-io) — Reads a given txt file and scans it for filter coefficients.
 - **readFromStream** `[fn]` in [FiffDigPointSet](/docs/api/fiff/fiff-dig-point-set) — Reads [`FiffDigPointSet`](/docs/api/fiff/fiff-dig-point-set) from a fif file.
 - **readFromStream** `[fn]` in [MNEBem](/docs/api/mne/mne-bem)
@@ -4182,8 +4239,6 @@ Index of 6184 public class members (functions, variables, typedefs, enums) acros
 - **readMeasTransform** `[fn]` in [FiffCoordTrans](/docs/api/fiff/fiff-coord-trans) — Reads the MEG device → head coordinate transform from a FIFF file.
 - **readMegEegChannels** `[fn]` in [FiffInfo](/docs/api/fiff/fiff-info) — Read MEG and EEG channel information from a FIFF file, excluding bad channels.
 - **readMetadata** `[fn]` in `RtDataClient` — Reads fiff metaata class from data connection.
-- **readMNELoutFile** `[fn]` in [LayoutLoader](/docs/api/utils/layout-loader) — Reads the specified MNE .lout file.
-- **readMNELoutFile** `[fn]` in [LayoutLoader](/docs/api/utils/layout-loader) — Reads the specified MNE .lout file.
 - **readMNESelFile** `[fn]` in [SelectionIO](/docs/api/utils/selection-io) — Reads the specified MNE sel file.
 - **readMNESelFile** `[fn]` in [SelectionIO](/docs/api/utils/selection-io) — Reads the specified MNE sel file.
 - **readMriTransform** `[fn]` in [FiffCoordTrans](/docs/api/fiff/fiff-coord-trans) — Reads the MRI → head coordinate transform from a FIFF file.
@@ -4193,6 +4248,8 @@ Index of 6184 public class members (functions, variables, typedefs, enums) acros
 - **readRawSegment** `[fn]` in [EDFReader](/docs/api/bids/edf-reader) — Read a segment of raw data.
 - **readsLm** `[fn]` in [Warp](/docs/api/math/warp) — Read electrode positions from MRI Database.
 - **readsLm** `[fn]` in [Warp](/docs/api/math/warp) — Read electrode positions from MRI Database.
+- **readText** `[fn]` in [MNEDerivSet](/docs/api/mne/mne-deriv-set) — Reads MNE-C's text syntax (`mne_make_derivations` in).
+- **readText** `[fn]` in [MNEEventList](/docs/api/mne/mne-event-list) — Reads an MNE-C text event file (MNE-C `mne_load_events`).
 - **readTransform** `[fn]` in [FiffCoordTrans](/docs/api/fiff/fiff-coord-trans) — Reads a specified coordinate transform from a FIFF file.
 - **readTransformAscii** `[fn]` in [FiffCoordTrans](/docs/api/fiff/fiff-coord-trans) — Reads a coordinate transform from an ASCII 4×3 matrix file (mm-to-m conversion applied).
 - **readTransformFromNode** `[fn]` in [FiffCoordTrans](/docs/api/fiff/fiff-coord-trans) — Reads a coordinate transform from a FIFF stream node.
@@ -4209,6 +4266,7 @@ Index of 6184 public class members (functions, variables, typedefs, enums) acros
 - **recordings** `[var]` in `MnaSession` — Recordings in this session.
 - **recordingTimerStateChanged** `[signal]` in [ProjectSettingsView](/docs/api/disp/project-settings-view)
 - **recordingType** `[var]` in [BidsRawData](/docs/api/bids/bids-raw-data) — "continuous", "epoched", or "discontinuous" (RECOMMENDED).
+- **rect** `[fn]` in [MNELayoutPort](/docs/api/mne/mne-layout-port) — Returns the viewport box.
 - **redrawGUI** `[fn]` in [ProjectorsView](/docs/api/disp/projectors-view) — Redraw the view.
 - **reduce** `[fn]` in [InvSourceEstimate](/docs/api/inv/inv-source-estimate) — Reduces the source estimate to selected samples.
 - **reduce** `[fn]` in [Spectral](/docs/api/utils/spectral) — Reduces the taperedSpectra results to a final result.
@@ -4290,6 +4348,7 @@ Index of 6184 public class members (functions, variables, typedefs, enums) acros
 - **resetAllSubViewState** `[slot]` in `BrainView` — Reset all per-pane `SubView` state (camera, visibility, shaders, surface type, overlay) to its index-specific factory defaults and reset the single-view state too.
 - **resetAverage** `[signal]` in [AveragingSettingsView](/docs/api/disp/averaging-settings-view)
 - **resetChannelOrder** `[fn]` in [ChannelDataView](/docs/api/disp/channel-data-view)
+- **resetConfine** `[fn]` in [MNELayout](/docs/api/mne/mne-layout) — Shows the whole layout again.
 - **resetMultiViewLayout** `[slot]` in `BrainView` — Reset the multi-view splitter layout to equal-sized panes.
 - **resetRegistration** `[fn]` in [PolhemusCoregistration](/docs/api/utils/polhemus-coregistration) — Reset the registration state (headToWorld, headToDevice) to identity.
 - **resetRotation** `[fn]` in `CameraController` — Reset single-view rotation to identity.
@@ -4403,6 +4462,7 @@ Index of 6184 public class members (functions, variables, typedefs, enums) acros
 - **s** `[var]` in [MNESurfacePatch](/docs/api/mne/mne-surface-patch) — Patch represented as a source space surface.
 - **sample** `[var]` in `BidsEvent` — Sample index (0-based) corresponding to onset.
 - **sample** `[var]` in `EventMarker` — Absolute sample index of the event onset.
+- **sample** `[var]` in [MNEEvent](/docs/api/mne/mne-event) — Sample number.
 - **sample** `[var]` in `TimeRulerEventMark` — Absolute sample index.
 - **sample** `[var]` in `TimeRulerReferenceMark` — Absolute sample index.
 - **sampleClicked** `[signal]` in [ChannelDataView](/docs/api/disp/channel-data-view) — Emitted when the user clicks on a sample position.
@@ -4555,6 +4615,7 @@ Index of 6184 public class members (functions, variables, typedefs, enums) acros
 - **SelectionItem** `[fn]` in [SelectionItem](/docs/api/disp/selection-item)
 - **SelectionScene** `[fn]` in [SelectionScene](/docs/api/disp/selection-scene) — Constructs a [`SelectionScene`](/docs/api/disp/selection-scene).
 - **SelectionSceneItem** `[fn]` in [SelectionSceneItem](/docs/api/disp/selection-scene-item) — Constructs a [`SelectionSceneItem`](/docs/api/disp/selection-scene-item).
+- **selectOnsets** `[fn]` in [MNEEventList](/docs/api/mne/mne-event-list) — Keeps the onsets of one trigger value (MNE-C `filter_events`): events rising from 0 to `value`, or every onset if `value` is 0.
 - **selectRows** `[fn]` in [EvokedSetModel](/docs/api/disp/evoked-set-model) — Selects the given list of channel indeces and unselect all other channels.
 - **selectRows** `[fn]` in [FrequencySpectrumModel](/docs/api/disp/frequency-spectrum-model) — Selects the given list of channel indeces and unselect all other channels.
 - **selectRows** `[fn]` in [RtFiffRawViewModel](/docs/api/disp/rt-fiff-raw-view-model) — Selects the given list of channel indeces and unselect all other channels.
@@ -5118,6 +5179,7 @@ Index of 6184 public class members (functions, variables, typedefs, enums) acros
 - **shortname** `[var]` in [MNEDeriv](/docs/api/mne/mne-deriv) — Short nickname for this derivation.
 - **shouldRenderSurface** `[fn]` in `SubView` — True when the surface identified by `key` should be rendered according to this view's visibility profile.
 - **show** `[var]` in [FiffDigitizerData](/docs/api/fiff/fiff-digitizer-data) — Whether the digitizer data should be shown.
+- **show** `[var]` in [MNEEvent](/docs/api/mne/mne-event) — Display flag (application-defined).
 - **show_aux_data** `[var]` in [MNEMshDisplaySurface](/docs/api/mne/mne-msh-display-surface) — Non-zero to show auxiliary data related to this surface.
 - **show_minimal** `[var]` in [FiffDigitizerData](/docs/api/fiff/fiff-digitizer-data) — Show fiducials and coils only.
 - **showAllChannels** `[fn]` in [ButterflyView](/docs/api/disp/butterfly-view) — Shows all channels in view.
@@ -5179,6 +5241,7 @@ Index of 6184 public class members (functions, variables, typedefs, enums) acros
 - **sliceToWorld** `[fn]` in [SliceObject](/docs/api/disp3-d/slice-object)
 - **slotRect** `[fn]` in `MultiViewLayout` — Compute the pixel rectangle for a layout slot.
 - **sMethod** `[var]` in `VisualizationInfo` — The color method: Map (uses sColormap parameter) or Color (uses colNodes and colEdges).
+- **SNR** `[var]` in [MNEMneData](/docs/api/mne/mne-mne-data) — Estimated power SNR as a function of time.
 - **softwareVersions** `[var]` in [BidsRawData](/docs/api/bids/bids-raw-data) — Recording software versions (RECOMMENDED).
 - **sol** `[var]` in [MNEForwardSolution](/docs/api/mne/mne-forward-solution) — Forward solution.
 - **sol_grad** `[var]` in [MNEForwardSolution](/docs/api/mne/mne-forward-solution) — ToDo...
@@ -5190,6 +5253,7 @@ Index of 6184 public class members (functions, variables, typedefs, enums) acros
 - **solveOpticalCalibration** `[fn]` in [PolhemusCoregistration](/docs/api/utils/polhemus-coregistration) — Fit a 3D line through the focus points in tracker-local frame.
 - **sort** `[fn]` in [Linalg](/docs/api/math/linalg) — Sorts a vector (ascending order) in place and returns the track of the original indices.
 - **sort** `[fn]` in [Linalg](/docs/api/math/linalg) — Sorts a vector and a corresponding matrix in place and returns the track of the original indices.
+- **sort** `[fn]` in [MNEEventList](/docs/api/mne/mne-event-list) — Sorts the events by sample; events at the same sample keep their order.
 - **sortChannelsByType** `[fn]` in [ChannelDataView](/docs/api/disp/channel-data-view)
 - **sortrows** `[fn]` in [Linalg](/docs/api/math/linalg) — Sort rows in ascending order.
 - **source_cov** `[var]` in [MNEInverseOperator](/docs/api/mne/mne-inverse-operator) — Source covariance matrix (depth + orientation weighting).
@@ -5279,6 +5343,7 @@ Index of 6184 public class members (functions, variables, typedefs, enums) acros
 - **SPtr** `[type]` in [FiffChInfo](/docs/api/fiff/fiff-ch-info) — Shared pointer type for [`FiffChInfo`](/docs/api/fiff/fiff-ch-info).
 - **SPtr** `[type]` in [FiffChPos](/docs/api/fiff/fiff-ch-pos) — Shared pointer type for [`FiffChPos`](/docs/api/fiff/fiff-ch-pos).
 - **SPtr** `[type]` in [FiffCoordTrans](/docs/api/fiff/fiff-coord-trans) — Shared pointer type for [`FiffCoordTrans`](/docs/api/fiff/fiff-coord-trans).
+- **SPtr** `[type]` in [FiffCoordTransSet](/docs/api/fiff/fiff-coord-trans-set) — Shared pointer type for [`FiffCoordTransSet`](/docs/api/fiff/fiff-coord-trans-set).
 - **SPtr** `[type]` in [FiffCov](/docs/api/fiff/fiff-cov) — Shared pointer type for [`FiffCov`](/docs/api/fiff/fiff-cov).
 - **SPtr** `[type]` in [FiffCtfComp](/docs/api/fiff/fiff-ctf-comp) — Shared pointer type for [`FiffCtfComp`](/docs/api/fiff/fiff-ctf-comp).
 - **SPtr** `[type]` in [FiffDigitizerData](/docs/api/fiff/fiff-digitizer-data) — Shared pointer type for [`FiffDigitizerData`](/docs/api/fiff/fiff-digitizer-data).
@@ -5355,7 +5420,6 @@ Index of 6184 public class members (functions, variables, typedefs, enums) acros
 - **SPtr** `[type]` in [MNECTFCompData](/docs/api/mne/mnectf-comp-data) — Shared pointer type for [`MNECTFCompData`](/docs/api/mne/mnectf-comp-data).
 - **SPtr** `[type]` in [MNECTFCompDataSet](/docs/api/mne/mnectf-comp-data-set) — Shared pointer type for [`MNECTFCompDataSet`](/docs/api/mne/mnectf-comp-data-set).
 - **SPtr** `[type]` in [MNEDeriv](/docs/api/mne/mne-deriv) — Shared pointer type for [`MNEDeriv`](/docs/api/mne/mne-deriv).
-- **SPtr** `[type]` in [MNEDerivSet](/docs/api/mne/mne-deriv-set) — Shared pointer type for [`MNEDerivSet`](/docs/api/mne/mne-deriv-set).
 - **SPtr** `[type]` in [MNEEpochData](/docs/api/mne/mne-epoch-data) — Shared pointer type for [`MNEEpochData`](/docs/api/mne/mne-epoch-data).
 - **SPtr** `[type]` in [MNEEpochDataList](/docs/api/mne/mne-epoch-data-list) — Shared pointer type for [`MNEEpochDataList`](/docs/api/mne/mne-epoch-data-list).
 - **SPtr** `[type]` in [MNEForwardSolution](/docs/api/mne/mne-forward-solution) — Shared pointer type for [`MNEForwardSolution`](/docs/api/mne/mne-forward-solution).
@@ -5365,6 +5429,7 @@ Index of 6184 public class members (functions, variables, typedefs, enums) acros
 - **SPtr** `[type]` in [MNEMeasDataSet](/docs/api/mne/mne-meas-data-set) — Shared pointer type for [`MNEMeasDataSet`](/docs/api/mne/mne-meas-data-set).
 - **SPtr** `[type]` in [MNEMghTag](/docs/api/mne/mne-mgh-tag) — Shared pointer type for [`MNEMghTag`](/docs/api/mne/mne-mgh-tag).
 - **SPtr** `[type]` in [MNEMghTagGroup](/docs/api/mne/mne-mgh-tag-group) — Shared pointer type for [`MNEMghTagGroup`](/docs/api/mne/mne-mgh-tag-group).
+- **SPtr** `[type]` in [MNEMneData](/docs/api/mne/mne-mne-data) — Shared pointer type for [`MNEMneData`](/docs/api/mne/mne-mne-data).
 - **SPtr** `[type]` in [MNEMorphMap](/docs/api/mne/mne-morph-map) — Shared pointer type for [`MNEMorphMap`](/docs/api/mne/mne-morph-map).
 - **SPtr** `[type]` in [MNEMshColorScaleDef](/docs/api/mne/mne-msh-color-scale-def) — Shared pointer type for [`MNEMshColorScaleDef`](/docs/api/mne/mne-msh-color-scale-def).
 - **SPtr** `[type]` in [MNEMshDisplaySurface](/docs/api/mne/mne-msh-display-surface) — Shared pointer type for [`MNEMshDisplaySurface`](/docs/api/mne/mne-msh-display-surface).
@@ -5541,6 +5606,7 @@ Index of 6184 public class members (functions, variables, typedefs, enums) acros
 - **surf_name** `[var]` in [FwdBemModel](/docs/api/fwd/fwd-bem-model) — File from which surfaces were loaded.
 - **surf_name** `[var]` in [MNEMshDisplaySurface](/docs/api/mne/mne-msh-display-surface) — Name of the surface (e.g., "inflated", "white").
 - **surf_ori** `[var]` in [MNEForwardSolution](/docs/api/mne/mne-forward-solution) — If surface oriented.
+- **surf_RAS_RAS_t** `[var]` in [FiffCoordTransSet](/docs/api/fiff/fiff-coord-trans-set) — Transform from surface RAS to RAS (nonzero origin) coordinates.
 - **surf_tri** `[var]` in [MNESurfacePatch](/docs/api/mne/mne-surface-patch) — Map from complete-surface triangle index to patch triangle index (-1 if absent).
 - **surf_vert** `[var]` in [MNESurfacePatch](/docs/api/mne/mne-surface-patch) — Map from complete-surface vertex index to patch vertex index (-1 if absent).
 - **surfaceData** `[fn]` in `SurfaceTreeItem`
@@ -5643,6 +5709,7 @@ Index of 6184 public class members (functions, variables, typedefs, enums) acros
 - **tmin** `[fn]` in `SourceEstimateManager`
 - **tmin** `[fn]` in `SourceEstimateOverlay` — Get the minimum time value.
 - **to** `[var]` in [FiffCoordTrans](/docs/api/fiff/fiff-coord-trans) — Destination coordinate system.
+- **to** `[var]` in [MNEEvent](/docs/api/mne/mne-event) — Trigger value after the transition.
 - **to_fixed_ori** `[fn]` in [MNEForwardSolution](/docs/api/mne/mne-forward-solution) — Helper to convert the forward solution to fixed ori from free.
 - **toByte** `[fn]` in [FiffTag](/docs/api/fiff/fiff-tag) — to Byte Fast access; Data are deleted if tag gets deleted, and vice versa
 - **toCbor** `[fn]` in `MnaFileRef` — Serialize to QCborMap.
@@ -5706,6 +5773,7 @@ Index of 6184 public class members (functions, variables, typedefs, enums) acros
 - **toLabels** `[fn]` in [FsAnnotation](/docs/api/fs/fs-annotation) — python labels_from_parc
 - **toLabels** `[fn]` in [FsAnnotationSet](/docs/api/fs/fs-annotation-set) — python labels_from_parc
 - **toMachidString** `[fn]` in [FiffId](/docs/api/fiff/fiff-id) — Returns the machine ID as a human-readable string.
+- **toMatrix** `[fn]` in [MNEEventList](/docs/api/mne/mne-event-list) — Returns the events as rows of sample, value before and value after, the layout of `FIFFLIB::FiffEvents::events` and of `mne.read_events`.
 - **toMatrixList** `[fn]` in [FiffEpochs](/docs/api/fiff/fiff-epochs) — Extract data matrices from epoch structures.
 - **toMatrixXd** `[fn]` in [MlTensor](/docs/api/ml/ml-tensor)
 - **toMatrixXf** `[fn]` in [MlTensor](/docs/api/ml/ml-tensor)
@@ -5900,6 +5968,7 @@ Index of 6184 public class members (functions, variables, typedefs, enums) acros
 - **UPtr** `[type]` in [FiffChInfo](/docs/api/fiff/fiff-ch-info) — Unique pointer type for [`FiffChInfo`](/docs/api/fiff/fiff-ch-info).
 - **UPtr** `[type]` in [FiffChPos](/docs/api/fiff/fiff-ch-pos) — Unique pointer type for [`FiffChPos`](/docs/api/fiff/fiff-ch-pos).
 - **UPtr** `[type]` in [FiffCoordTrans](/docs/api/fiff/fiff-coord-trans) — Unique pointer type for [`FiffCoordTrans`](/docs/api/fiff/fiff-coord-trans).
+- **UPtr** `[type]` in [FiffCoordTransSet](/docs/api/fiff/fiff-coord-trans-set) — Unique pointer type for [`FiffCoordTransSet`](/docs/api/fiff/fiff-coord-trans-set).
 - **UPtr** `[type]` in [FiffCov](/docs/api/fiff/fiff-cov) — Unique pointer type for [`FiffCov`](/docs/api/fiff/fiff-cov).
 - **UPtr** `[type]` in [FiffCtfComp](/docs/api/fiff/fiff-ctf-comp) — Unique pointer type for [`FiffCtfComp`](/docs/api/fiff/fiff-ctf-comp).
 - **UPtr** `[type]` in [FiffDigitizerData](/docs/api/fiff/fiff-digitizer-data) — Unique pointer type for [`FiffDigitizerData`](/docs/api/fiff/fiff-digitizer-data).
@@ -5961,6 +6030,7 @@ Index of 6184 public class members (functions, variables, typedefs, enums) acros
 - **valid** `[var]` in [MNEVolGeom](/docs/api/mne/mne-vol-geom) — Non-zero if the geometry information below is valid.
 - **validate** `[fn]` in [MnaGraph](/docs/api/mna/mna-graph) — Validate the graph: acyclicity, port connections, data-kind compatibility, op schema compliance, required attributes.
 - **validate** `[fn]` in [MnaOpSchema](/docs/api/mna/mna-op-schema) — Validate that a node conforms to this schema.
+- **validate** `[fn]` in [MNEDeriv](/docs/api/mne/mne-deriv) — Checks every derived channel against channel info (MNE-C `mne_validate_deriv`).
 - **vals** `[var]` in [MNERawBufDef](/docs/api/mne/mne-raw-buf-def) — Sample values matrix [nchan x ns], row-major (empty if not loaded).
 - **value** `[var]` in `BidsEvent` — Numeric event value / trigger code.
 - **value** `[var]` in `ElectrodeContact` — Optional scalar for colormap overlay.
@@ -6061,6 +6131,7 @@ Index of 6184 public class members (functions, variables, typedefs, enums) acros
 - **viewResized** `[signal]` in [ChannelRhiView](/docs/api/disp/channel-rhi-view)
 - **visibility** `[var]` in `SubView`
 - **visible** `[var]` in `SceneLayer`
+- **visibleArea** `[fn]` in [MNELayout](/docs/api/mne/mne-layout) — Returns the area currently shown (the extent unless `confine()` zoomed in).
 - **visibleChannelCount** `[fn]` in [ChannelRhiView](/docs/api/disp/channel-rhi-view)
 - **visibleCount** `[var]` in `TileResult`
 - **visibleFirstSample** `[fn]` in [ChannelRhiView](/docs/api/disp/channel-rhi-view) — Returns the absolute sample index currently shown at x = 0 (left edge).
@@ -6134,8 +6205,10 @@ Index of 6184 public class members (functions, variables, typedefs, enums) acros
 - **write** `[fn]` in [MnaProject](/docs/api/mna/mna-project) — Write an MNA project to file.
 - **write** `[fn]` in [MNEBem](/docs/api/mne/mne-bem) — [`MNE`](/docs/api/mne/mne-class) Toolbox function mne_write_bem_surfaces_block.
 - **write** `[fn]` in [MNEClusterInfo](/docs/api/mne/mne-cluster-info) — Writes the cluster info as text, and the centroid vertex numbers to `centroids_&lt;name&gt;` in the same directory.
+- **write** `[fn]` in [MNEDerivSet](/docs/api/mne/mne-deriv-set) — Writes the set as a `FIFFB_MNE_DERIVATIONS` block (MNE-C `mne_write_deriv_file`).
 - **write** `[fn]` in [MNEForwardSolution](/docs/api/mne/mne-forward-solution) — Write the forward solution to a FIFF file.
 - **write** `[fn]` in [MNEInverseOperator](/docs/api/mne/mne-inverse-operator) — Write the inverse operator to a FIFF file.
+- **write** `[fn]` in [MNESparseNamedMatrix](/docs/api/mne/mne-sparse-named-matrix) — Writes the matrix as a `FIFFB_MNE_NAMED_MATRIX` block (MNE-C `mne_write_sparse_named_matrix`).
 - **write** `[fn]` in [MriCorFifIO](/docs/api/mri/mri-cor-fif-io) — Writes COR.fif file from slice data.
 - **write_bad_channels** `[fn]` in [FiffStream](/docs/api/fiff/fiff-stream) — Write a bad channel list as a FIFFB_MNE_BAD_CHANNELS block.
 - **write_ch_info** `[fn]` in [Fiff](/docs/api/fiff/fiff-class) — fiff_write_ch_info
@@ -6194,7 +6267,8 @@ Index of 6184 public class members (functions, variables, typedefs, enums) acros
 - **writeBrainstormMonFiles** `[fn]` in [SelectionIO](/docs/api/utils/selection-io) — Writes the specified selection groups to different Brainstorm .mon files.
 - **writeCsv** `[fn]` in [FiffAnnotations](/docs/api/fiff/fiff-annotations) — Writes annotations to a CSV file.
 - **writeCsv** `[fn]` in [InvSourceEstimateIO](/docs/api/inv/inv-source-estimate-io) — Export source estimate to CSV format.
-- **writeDefinitionFile** `[fn]` in [ChannelDerivation](/docs/api/utils/channel-derivation) — Write derivation rules to a text definition file.
+- **writeDefinitionFile** `[fn]` in [ChannelDerivation](/docs/api/utils/channel-derivation) — Write derivation rules in MNE-C derivation text syntax, readable by readDefinitionFile and mne_make_derivations.
+- **writeFif** `[fn]` in [MNEEventList](/docs/api/mne/mne-event-list) — Writes the list as an event block with comments, readable by `mne.read_events`.
 - **writeFilter** `[fn]` in [FilterIO](/docs/api/utils/filter-io) — Writes a given filter to txt file .
 - **writeHeadPos** `[fn]` in [MaxwellMovementComp](/docs/api/dsp/maxwell-movement-comp) — Write head positions to a file.
 - **writeHemispherePair** `[fn]` in [InvSourceEstimate](/docs/api/inv/inv-source-estimate) — Write the estimate as an MNE-C / MNE-Python compatible hemisphere pair.
@@ -6231,6 +6305,8 @@ Index of 6184 public class members (functions, variables, typedefs, enums) acros
 - **x2** `[var]` in `Pair` — Index two of the pair.
 - **x_ras** `[var]` in [MNEVolGeom](/docs/api/mne/mne-vol-geom)
 - **x_ras** `[var]` in [MriVolData](/docs/api/mri/mri-vol-data) — X-direction cosines (xr, xa, xs).
+- **xmax** `[var]` in [MNELayoutPort](/docs/api/mne/mne-layout-port) — Viewport right bound.
+- **xmin** `[var]` in [MNELayoutPort](/docs/api/mne/mne-layout-port) — Viewport left bound.
 - **xplotter_layout** `[var]` in [FiffInfo](/docs/api/fiff/fiff-info) — xplotter layout tag.
 - **XRay** `[var]` in `BrainRenderer`
 - **xsize** `[var]` in [MNEVolGeom](/docs/api/mne/mne-vol-geom)
@@ -6247,6 +6323,8 @@ Index of 6184 public class members (functions, variables, typedefs, enums) acros
 - **y** `[var]` in `VertexData`
 - **y_ras** `[var]` in [MNEVolGeom](/docs/api/mne/mne-vol-geom)
 - **y_ras** `[var]` in [MriVolData](/docs/api/mri/mri-vol-data) — Y-direction cosines (yr, ya, ys).
+- **ymax** `[var]` in [MNELayoutPort](/docs/api/mne/mne-layout-port) — Viewport top bound.
+- **ymin** `[var]` in [MNELayoutPort](/docs/api/mne/mne-layout-port) — Viewport bottom bound.
 - **ysize** `[var]` in [MNEVolGeom](/docs/api/mne/mne-vol-geom)
 - **ysize** `[var]` in [MriVolData](/docs/api/mri/mri-vol-data) — Voxel spacing in Y direction (mm).
 

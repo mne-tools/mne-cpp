@@ -19,6 +19,27 @@ One item in a derivation data set.
 
 Holds a sparse named matrix of derivation coefficients together with validity and usage metadata and matched channel information.
 
+```cpp title="src/examples/ex_mne_api/main.cpp"
+// A bipolar EOG-like montage in MNE-C's text syntax, saved as a derivation file and applied while reading raw data
+const QString montage = tmp.filePath("montage.txt");
+QFile montageFile(montage);
+ok &= montageFile.open(QIODevice::WriteOnly | QIODevice::Text);
+montageFile.write("\"EEG001-EEG002\" = \"EEG001\" - \"EEG002\"\n\"FRONT\" = 0.5 * \"EEG001\" + 0.5 * \"EEG002\" - \"EEG999\"\n");
+montageFile.close();
+const auto derivations = MNEDerivSet::readText(montage);
+derivations->write(tmp.filePath("montage-deriv.fif"));
+const auto fromFif = MNEDerivSet::read(tmp.filePath("montage-deriv.fif"));
+const int usable = mneRaw->attachDerivations(*fromFif); // FRONT needs EEG999 and is dropped
+MNEChSelection bipolar;
+bipolar.chspick = bipolar.chspick_nospace = {"EEG001-EEG002", "EEG001", "EEG002"};
+bipolar.nchan = bipolar.ndef = 3;
+bipolar.nderiv = 1;
+bipolar.pick = (VectorXi(3) << -1, mneRaw->ch_names.indexOf("EEG001"), mneRaw->ch_names.indexOf("EEG002")).finished();
+bipolar.pick_deriv = (VectorXi(3) << 0, -1, -1).finished();
+mneRaw->proj.reset();
+mneRaw->pick_data(&bipolar, mneRaw->first_samp + 2990, ns, rows.data());
+```
+
 ---
 
 ## Public Methods
@@ -29,11 +50,45 @@ Constructs an empty [`MNE`](/docs/api/mne/mne-class) Derivation.
 
 ---
 
+### MNEDeriv(other)
+
+Copies the derivation including its matrix.
+
+**Parameters:**
+
+- **other** : *const MNEDeriv &*
+  The derivation to copy.
+
+---
+
 ### ~MNEDeriv()
 
 Destructor.
 
 ---
+
+### validate(chInfo)
+
+Checks every derived channel against channel info (MNE-C `mne_validate_deriv`).
+
+A derived channel is valid if all its inputs are present and of the same kind and unit; valid and chs are filled, chs with the info of the first input.
+
+**Parameters:**
+
+- **chInfo** : *const QList&lt; [FiffChInfo](/docs/api/fiff/fiff-ch-info) &gt; &*
+  Channel info of the recording.
+
+**Returns:**
+
+- *int* — The number of valid derived channels.
+
+---
+
+## Example
+
+- Full source: [`src/examples/ex_mne_api/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_mne_api/main.cpp)
+- Build target: `ex_mne_api` (runs under CTest)
+- Data: [mne-cpp-test-data](https://github.com/mne-tools/mne-cpp-test-data)
 
 ## Authors of this file
 

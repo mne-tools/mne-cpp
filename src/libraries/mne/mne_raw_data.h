@@ -224,6 +224,19 @@ public:
      */
     static MNERawData* open_file(const QString& name, int omit_skip, int allow_maxshield, const MNEFilterDef& filter);
 
+    //=========================================================================================================
+    /**
+     * Attaches channel derivations (MNE-C @c mne_raw_attach_derivations): merges them into deriv,
+     * matches the merged set to the channels of the file into deriv_matched and validates it
+     * against the channel info.
+     *
+     * @param[in] derivations    The derivations to add.
+     * @param[in] keepPrevious   Keep the derivations attached before instead of replacing them.
+     *
+     * @return The number of derived channels that are valid for these data.
+     */
+    int attachDerivations(const MNEDerivSet& derivations, bool keepPrevious = false);
+
 public:
     QString filename; /**< Path to the raw FIFF file. */
     //  FIFFLIB::fiffFile       file;

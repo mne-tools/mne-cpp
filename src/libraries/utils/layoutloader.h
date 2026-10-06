@@ -10,25 +10,11 @@
  *           Gabriel Motta <gabrielbenmotta@gmail.com>
  * @since    0.1.0
  * @date     September 2014
- * @brief    Reader for ANT @c .elc electrode files and MNE @c .lout 2-D channel layouts used by the topographic plotting widgets.
+ * @brief    Reader for ANT @c .elc electrode files used by the topographic plotting widgets.
  *
- * @ref UTILSLIB::LayoutLoader parses two complementary layout
- * descriptions that mne-cpp consumes throughout its UI and
- * forward-modelling stack:
- *
- * - ANT @c .elc — the ASCII electrode list emitted by
- *   ANT/eemagine systems, carrying both 3-D head-frame and
- *   2-D projected positions plus a per-file unit declaration
- *   (mm / cm / m); used when a user imports a new EEG cap or
- *   when DISP3DLIB builds the sensor visualisation.
- *
- * - MNE @c .lout — the legacy MNE-C topographic layout used
- *   by @c DISPLIB::ButterflyView and the time-frequency plots,
- *   storing per-channel @c (x,y,width,height,name) tuples.
- *
- * Both @c QString and @c std::string overloads are provided so
- * the loader is callable from the Qt-aware GUI layer and from
- * the pure-C++ test fixtures without a string conversion.
+ * ANT @c .elc is the ASCII electrode list of ANT/eemagine systems with 3-D head-frame
+ * and 2-D projected positions and a unit declaration (mm / cm / m). MNE-C @c .lout
+ * layouts are read by @ref MNELIB::MNELayout.
  */
 
 #ifndef LAYOUTLOADER_H
@@ -72,9 +58,9 @@ namespace UTILSLIB
 
 //=============================================================================================================
 /**
- * Processes layout files (AsA .elc, MNE .lout) files which contain the electrode positions of a EEG/MEG hat.
+ * Reads ANT .elc files, which contain the electrode positions of an EEG cap.
  *
- * @brief Reads ANT .elc electrode files and MNE .lout 2-D channel layouts into Qt/STL containers.
+ * @brief Reads ANT .elc electrode files into Qt/STL containers.
  *
  * @snippet ex_utils/main.cpp layout_loader_usage
  */
@@ -115,26 +101,6 @@ public:
                                std::vector<std::vector<float>>& location3D,
                                std::vector<std::vector<float>>& location2D,
                                std::string& unit);
-
-    //=========================================================================================================
-    /**
-     * Reads the specified MNE .lout file.
-     * @param[in] path holds the file path of the lout file which is to be read.
-     * @param[out] channelData holds the x,y and channel number for every channel. The map keys are the channel names (i.e. 'MEG 0113').
-     * @return bool true if reading was successful, false otherwise.
-     */
-    static bool readMNELoutFile(const QString& path,
-                                QMap<QString, QPointF>& channelData);
-
-    //=========================================================================================================
-    /**
-     * Reads the specified MNE .lout file.
-     * @param[in] path holds the file path of the lout file which is to be read.
-     * @param[out] channelData holds the x,y and channel number for every channel. The map keys are the channel names (i.e. 'MEG 0113').
-     * @return bool true if reading was successful, false otherwise.
-     */
-    static bool readMNELoutFile(const std::string& path,
-                                QMap<std::string, QPointF>& channelData);
 
 private:
 };

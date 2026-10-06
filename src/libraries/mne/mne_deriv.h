@@ -7,13 +7,13 @@
  * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
  * @since    2.0.0
  * @date     March 2026
- * @brief    Single channel derivation (linear combination of physical channels exposed as a virtual channel).
+ * @brief    One channel derivation: a sparse matrix whose rows define virtual channels as weighted sums of recorded ones.
  *
- * @ref MNELIB::MNEDeriv stores one row of a derivation matrix together
- * with the name of the resulting virtual channel and the names of the
- * physical sources it depends on. Derivations are used by the legacy
- * MNE-C tooling to expose bipolar montages or laplacian channels without
- * modifying the underlying raw data.
+ * @ref MNELIB::MNEDeriv holds the derivation matrix of one file or montage
+ * (rows = derived channels, columns = input channels) together with the
+ * state of matching it to a recording. Derivations expose bipolar montages
+ * or re-referenced channels without modifying the raw data; @ref MNELIB::MNERawData
+ * applies the matched derivation while reading.
  */
 
 #ifndef MNEDERIV_H
@@ -56,6 +56,8 @@ namespace MNELIB
  *
  * Holds a sparse named matrix of derivation coefficients together with
  * validity and usage metadata and matched channel information.
+ *
+ * @snippet ex_mne_api/main.cpp mne_deriv_set_usage
  */
 class MNESHARED_EXPORT MNEDeriv
 {
@@ -71,9 +73,30 @@ public:
 
     //=========================================================================================================
     /**
+     * Copies the derivation including its matrix.
+     *
+     * @param[in] other   The derivation to copy.
+     */
+    MNEDeriv(const MNEDeriv& other);
+
+    //=========================================================================================================
+    /**
      * Destructor.
      */
     ~MNEDeriv();
+
+    //=========================================================================================================
+    /**
+     * Checks every derived channel against channel info (MNE-C @c mne_validate_deriv).
+     *
+     * A derived channel is valid if all its inputs are present and of the same kind and
+     * unit; valid and chs are filled, chs with the info of the first input.
+     *
+     * @param[in] chInfo   Channel info of the recording.
+     *
+     * @return The number of valid derived channels.
+     */
+    int validate(const QList<FIFFLIB::FiffChInfo>& chInfo);
 
 public:
     QString filename;                                 /**< Source file name the derivation was loaded from. */

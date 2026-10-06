@@ -5854,7 +5854,14 @@
       "mne_python": null,
       "sklearn": null,
       "test": null,
-      "example": null,
+      "example": "ex_mne_api",
+      "example_snippet": [
+        "ex_mne_api/main.cpp#mne_deriv_set_usage"
+      ],
+      "example_mode": "run",
+      "required_data": [
+        "mne-cpp-test-data"
+      ],
       "status": "documented",
       "skigen_candidate": false,
       "documented": true,
@@ -5872,7 +5879,14 @@
       "mne_python": null,
       "sklearn": null,
       "test": null,
-      "example": null,
+      "example": "ex_mne_api",
+      "example_snippet": [
+        "ex_mne_api/main.cpp#mne_deriv_set_usage"
+      ],
+      "example_mode": "run",
+      "required_data": [
+        "mne-cpp-test-data"
+      ],
       "status": "documented",
       "skigen_candidate": false,
       "documented": true,
@@ -6553,7 +6567,14 @@
       "mne_python": null,
       "sklearn": null,
       "test": null,
-      "example": null,
+      "example": "ex_mne_api",
+      "example_snippet": [
+        "ex_mne_api/main.cpp#mne_deriv_set_usage"
+      ],
+      "example_mode": "run",
+      "required_data": [
+        "mne-cpp-test-data"
+      ],
       "status": "documented",
       "skigen_candidate": false,
       "documented": true,
@@ -7962,6 +7983,142 @@
       "skigen_candidate": false,
       "documented": true,
       "sidebar_position": 35,
+      "guide": null,
+      "python_equiv": null,
+      "python_url": null
+    },
+    {
+      "name": "MNEMneData",
+      "module": "mne",
+      "header": "mne/mne_mne_data.h",
+      "origin": "mne-c",
+      "mne_c_tool": null,
+      "mne_python": null,
+      "sklearn": null,
+      "test": null,
+      "example": null,
+      "status": "documented",
+      "skigen_candidate": false,
+      "documented": true,
+      "sidebar_position": 30,
+      "guide": null,
+      "python_equiv": null,
+      "python_url": null
+    },
+    {
+      "name": "MNELayout",
+      "module": "mne",
+      "header": "mne/mne_layout.h",
+      "origin": "mne-c",
+      "mne_c_tool": null,
+      "mne_python": null,
+      "sklearn": null,
+      "test": null,
+      "example": "ex_mne_api",
+      "example_snippet": [
+        "ex_mne_api/main.cpp#mne_layout_usage"
+      ],
+      "example_mode": "run",
+      "required_data": [
+        "mne-cpp-test-data"
+      ],
+      "status": "documented",
+      "skigen_candidate": false,
+      "documented": true,
+      "sidebar_position": 24,
+      "guide": null,
+      "python_equiv": null,
+      "python_url": null
+    },
+    {
+      "name": "MNELayoutPort",
+      "module": "mne",
+      "header": "mne/mne_layout_port.h",
+      "origin": "mne-c",
+      "mne_c_tool": null,
+      "mne_python": null,
+      "sklearn": null,
+      "test": null,
+      "example": "ex_mne_api",
+      "example_snippet": [
+        "ex_mne_api/main.cpp#mne_layout_usage"
+      ],
+      "example_mode": "run",
+      "required_data": [
+        "mne-cpp-test-data"
+      ],
+      "status": "documented",
+      "skigen_candidate": false,
+      "documented": true,
+      "sidebar_position": 25,
+      "guide": null,
+      "python_equiv": null,
+      "python_url": null
+    },
+    {
+      "name": "MNEEvent",
+      "module": "mne",
+      "header": "mne/mne_event.h",
+      "origin": "mne-c",
+      "mne_c_tool": null,
+      "mne_python": null,
+      "sklearn": null,
+      "test": null,
+      "example": "ex_mne_api",
+      "example_snippet": [
+        "ex_mne_api/main.cpp#mne_event_list_usage"
+      ],
+      "example_mode": "run",
+      "required_data": [
+        "mne-cpp-test-data"
+      ],
+      "status": "documented",
+      "skigen_candidate": false,
+      "documented": true,
+      "sidebar_position": 20,
+      "guide": null,
+      "python_equiv": null,
+      "python_url": null
+    },
+    {
+      "name": "MNEEventList",
+      "module": "mne",
+      "header": "mne/mne_event_list.h",
+      "origin": "mne-c",
+      "mne_c_tool": null,
+      "mne_python": null,
+      "sklearn": null,
+      "test": null,
+      "example": "ex_mne_api",
+      "example_snippet": [
+        "ex_mne_api/main.cpp#mne_event_list_usage"
+      ],
+      "example_mode": "run",
+      "required_data": [
+        "mne-cpp-test-data"
+      ],
+      "status": "documented",
+      "skigen_candidate": false,
+      "documented": true,
+      "sidebar_position": 21,
+      "guide": null,
+      "python_equiv": null,
+      "python_url": null
+    },
+    {
+      "name": "FiffCoordTransSet",
+      "module": "fiff",
+      "header": "fiff/fiff_coord_trans_set.h",
+      "origin": "mne-c",
+      "mne_c_tool": null,
+      "mne_python": null,
+      "sklearn": null,
+      "test": null,
+      "example": null,
+      "status": "documented",
+      "skigen_candidate": false,
+      "documented": true,
+      "sidebar_position": 14,
       "guide": null,
       "python_equiv": null,
       "python_url": null

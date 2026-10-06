@@ -35,6 +35,9 @@
 #include <fiff/fiff_digitizer_data.h>
 
 #include <mne/mne.h>
+#include <fiff/fiff_events.h>
+#include <mne/mne_event_list.h>
+#include <mne/mne_layout.h>
 #include <mne/mne_inverse_operator.h>
 #include <inv/inv_source_estimate.h>
 #include <mne/mne_source_spaces.h>
@@ -204,6 +207,15 @@ private slots:
 
     // ── Volume source space ──
     void volumeSourceSpace_create();
+
+    // ── Layouts ──
+    void layout_read_data();
+    void layout_read();
+    void layout_matchAndConfine();
+
+    // ── Event lists ──
+    void eventList_text();
+    void eventList_fifRoundTrip();
 
     // ── Misc small types ──
     void misc_hemisphere();
@@ -1466,6 +1478,152 @@ void TestMneLibrary::volumeSourceSpace_create()
 
 //=============================================================================================================
 // Misc small types
+//=============================================================================================================
+
+void TestMneLibrary::layout_read_data()
+{
+    QTest::addColumn<QString>("file");
+    QTest::addColumn<int>("nport");
+    QTest::addColumn<QRectF>("extent");
+    QTest::addColumn<QString>("channel");
+    QTest::addColumn<QRectF>("box");
+    QTest::addColumn<int>("portno");
+
+    // mne.channels.read_layout(file, scale=False): names, pos (x, y, w, h), box and ids
+    QTest::newRow("Vectorview") << "Vectorview-all" << 306 << QRectF(QPointF(-85.0, -83.0), QPointF(90.0, 75.0)) << "MEG 0113" << QRectF(-73.416206, 33.416687, 6.0, 5.0) << 113;
+    QTest::newRow("CTF") << "CTF-275" << 275 << QRectF(QPointF(-42.27, -39.99), QPointF(42.33, 31.8)) << "MLC11-2622" << QRectF(-4.09, 10.91, 4.0, 3.0) << 1;
+}
+
+void TestMneLibrary::layout_read()
+{
+    QFETCH(QString, file);
+    QFETCH(int, nport);
+    QFETCH(QRectF, extent);
+    QFETCH(QString, channel);
+    QFETCH(QRectF, box);
+    QFETCH(int, portno);
+
+    const auto layout = MNELayout::read(QCoreApplication::applicationDirPath() + "/../resources/general/2DLayouts/" + file + ".lout");
+    QVERIFY(layout);
+    QCOMPARE(static_cast<int>(layout->ports.size()), nport);
+    QVERIFY((layout->extent().topLeft() - extent.topLeft()).manhattanLength() < 1e-4 && (layout->extent().bottomRight() - extent.bottomRight()).manhattanLength() < 1e-4);
+    const auto it = std::find_if(layout->ports.cbegin(), layout->ports.cend(), [&channel](const MNELayoutPort& p) { return p.label == channel; });
+    QVERIFY(it != layout->ports.cend());
+    QCOMPARE(it->portno, portno);
+    QVERIFY((it->rect().topLeft() - box.topLeft()).manhattanLength() < 1e-4);
+    QVERIFY(std::abs(it->rect().width() - box.width()) < 1e-5 && std::abs(it->rect().height() - box.height()) < 1e-5);
+    QCOMPARE(layout->channelPositions().size(), nport);
+    QVERIFY((layout->channelPositions().value(channel) - box.topLeft()).manhattanLength() < 1e-4);
+
+    QVERIFY(!MNELayout::read("/nonexistent.lout"));
+}
+
+void TestMneLibrary::layout_matchAndConfine()
+{
+    // Two channels share port 2, port 3 is drawn inverted (negative height), comments and blank lines are skipped.
+    QTemporaryDir dir;
+    QFile file(dir.filePath("test.lout"));
+    QVERIFY(file.open(QIODevice::WriteOnly | QIODevice::Text));
+    file.write("# test layout\n0 100 0 50\n\n1 10 10 10 5 MEG 0113\n2 30 10 10 5 MEG 0112:MEG 0111\n3 60 30 10 -5 MLC11-2622\n");
+    file.close();
+    auto layout = MNELayout::read(file.fileName());
+    QVERIFY(layout);
+    QCOMPARE(static_cast<int>(layout->ports.size()), 3);
+    QVERIFY(layout->ports[2].invert);
+    QCOMPARE(layout->ports[2].rect(), QRectF(60, 30, 10, 5));
+    QCOMPARE(layout->ports[1].names, QStringList({"meg0112", "meg0111"}));
+    QCOMPARE(layout->channelPositions().value("MEG 0111"), QPointF(30, 10));
+
+    // Names match in any spelling; a CTF suffix after the dash is ignored.
+    QCOMPARE(layout->matchPorts("meg0111"), 1);
+    QVERIFY(layout->ports[1].matched && !layout->ports[0].matched);
+    QCOMPARE(layout->matchPorts("MLC11"), 1);
+    QCOMPARE(layout->matchPorts("MEG 011"), 0);
+    QCOMPARE(layout->matchPorts(QStringList({"MEG 0113", "MEG 0111", "EEG 001", "MEG 0112"})), 3);
+    QCOMPARE(layout->matches().rows(), 3);
+    QCOMPARE(layout->matches().cols(), 4);
+    QVERIFY(layout->matches()(0, 0) == 1 && layout->matches()(1, 1) == 1 && layout->matches()(1, 3) == 1 && layout->matches().col(2).sum() == 0);
+
+    // The interior of a port, not its border, selects it.
+    QCOMPARE(layout->portAt(QPointF(35, 12)), 1);
+    QCOMPARE(layout->portAt(QPointF(30, 12)), -1);
+    QCOMPARE(layout->portAt(QPointF(90, 45)), -1);
+
+    // Zoom to the ports inside the area (corners in any order) plus 1 % of the width; hidden ports no longer match.
+    QCOMPARE(layout->confine(QRectF(QPointF(45, 0), QPointF(0, 20))), 2);
+    QVERIFY(std::abs(layout->visibleArea().left() - 9.7) < 1e-9 && std::abs(layout->visibleArea().right() - 40.3) < 1e-9);
+    QVERIFY(std::abs(layout->visibleArea().top() - 9.7) < 1e-9 && std::abs(layout->visibleArea().bottom() - 15.3) < 1e-9);
+    QVERIFY(!layout->isVisible(layout->ports[2]));
+    QCOMPARE(layout->matchPorts("MLC11"), 0);
+    QCOMPARE(layout->confine(QRectF(80, 40, 5, 5)), 0);
+    QVERIFY(std::abs(layout->visibleArea().left() - 9.7) < 1e-9);
+    layout->resetConfine();
+    QCOMPARE(layout->visibleArea(), layout->extent());
+    QCOMPARE(layout->matchPorts("MLC11"), 1);
+}
+
+//=============================================================================================================
+
+void TestMneLibrary::eventList_text()
+{
+    // MNE-C text event files: the current format starts with a line of zero trigger values that
+    // gives the first sample of the data; old files have none and use an extra offset instead.
+    QTemporaryDir dir;
+    QFile current(dir.filePath("current.eve"));
+    QVERIFY(current.open(QIODevice::WriteOnly | QIODevice::Text));
+    current.write("# events\n 1000   3.330 0 0\n 1300   4.329 0 1   left ear\n 1310   4.363 1 0\n   -1   5.000 0 2\n");
+    current.close();
+    const auto list = MNEEventList::readText(current.fileName(), 1000, 0, 300.0f);
+    QVERIFY(list);
+    QCOMPARE(list->nevent(), 3);
+    QCOMPARE(list->events[0], (MNEEvent{300, 0, 1, false, false, "left ear"}));
+    QCOMPARE(list->events[1].sample, 310);
+    QVERIFY(list->events[1].comment.isEmpty());
+    QCOMPARE(list->events[2].sample, 500); // from the time: 5 s * 300 Hz - 1000
+
+    QFile old(dir.filePath("old.eve"));
+    QVERIFY(old.open(QIODevice::WriteOnly | QIODevice::Text));
+    old.write(" 300 1.0 0 1\n 400 1.3 0 2\n");
+    old.close();
+    const auto oldList = MNEEventList::readText(old.fileName(), 1000, 950, 300.0f);
+    QVERIFY(oldList);
+    QCOMPARE(oldList->toMatrix(), (Eigen::MatrixXi(2, 3) << 250, 0, 1, 350, 0, 2).finished());
+
+    QVERIFY(!MNEEventList::readText(dir.filePath("missing.eve"), 0, 0, 300.0f));
+}
+
+void TestMneLibrary::eventList_fifRoundTrip()
+{
+    // Comments are written as Latin-1 bytes like MNE-C; events without a comment get an empty entry.
+    QTemporaryDir dir;
+    MNEEventList list = MNEEventList::fromMatrix((Eigen::MatrixXi(4, 3) << 14385, 0, 1, 13988, 0, 2, 14172, 0, 3, 14180, 3, 0).finished());
+    list.events[0].comment = "first left";
+    list.events[2].comment = "réponse";
+    QVERIFY(list.writeFif(dir.filePath("t-eve.fif"), 12900));
+
+    const auto back = MNEEventList::readFif(dir.filePath("t-eve.fif"), 12900);
+    QVERIFY(back);
+    QCOMPARE(back->events, list.events);
+
+    // FiffEvents reads the same block, without comments and without the offset.
+    QFile file(dir.filePath("t-eve.fif"));
+    FiffEvents plain;
+    QVERIFY(FiffEvents::read_from_fif(file, plain));
+    QCOMPARE(plain.events.col(0), (list.toMatrix().col(0).array() + 12900).matrix());
+
+    MNEEventList sorted = *back;
+    sorted.sort();
+    QCOMPARE(sorted.events[0].sample, 13988);
+    QCOMPARE(sorted.events[3].comment, QString("first left"));
+    QCOMPARE(sorted.selectOnsets(3).nevent(), 1);
+    QCOMPARE(sorted.selectOnsets().nevent(), 3);
+    QCOMPARE(sorted.maxOnset(), 3u);
+    sorted.append(*back);
+    QCOMPARE(sorted.nevent(), 8);
+
+    QVERIFY(!MNEEventList::readFif(dir.filePath("missing.fif")));
+}
+
 //=============================================================================================================
 
 void TestMneLibrary::misc_hemisphere()

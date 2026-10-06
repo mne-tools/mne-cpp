@@ -66,9 +66,6 @@ private slots:
     void testReadAsaElcFileStdString();
     void testReadAsaElcFileNonExistent();
     void testReadAsaElcFileWrongExtension();
-    void testReadMNELoutFileQString();
-    void testReadMNELoutFileStdString();
-    void testReadMNELoutFileNonExistent();
 
     // ── LayoutMaker ───────────────────────────────────────────────────
     void testMakeLayoutNoFit();
@@ -180,45 +177,6 @@ void TestUtilsLayoutSelection::testReadAsaElcFileWrongExtension()
     QString unit;
 
     bool ok = LayoutLoader::readAsaElcFile(QString("/some/file.txt"), channelNames, location3D, location2D, unit);
-    QVERIFY(!ok);
-}
-
-//=============================================================================================================
-
-void TestUtilsLayoutSelection::testReadMNELoutFileQString()
-{
-    QString loutPath = resourcePath() + "general/2DLayouts/Vectorview-all.lout";
-    if (!QFile::exists(loutPath)) {
-        QSKIP("LOUT file not available");
-    }
-
-    QMap<QString, QPointF> channelData;
-    bool ok = LayoutLoader::readMNELoutFile(loutPath, channelData);
-    QVERIFY(ok);
-    QVERIFY(!channelData.isEmpty());
-}
-
-//=============================================================================================================
-
-void TestUtilsLayoutSelection::testReadMNELoutFileStdString()
-{
-    QString loutPath = resourcePath() + "general/2DLayouts/Vectorview-all.lout";
-    if (!QFile::exists(loutPath)) {
-        QSKIP("LOUT file not available");
-    }
-
-    QMap<std::string, QPointF> channelData;
-    bool ok = LayoutLoader::readMNELoutFile(loutPath.toStdString(), channelData);
-    QVERIFY(ok);
-    QVERIFY(!channelData.isEmpty());
-}
-
-//=============================================================================================================
-
-void TestUtilsLayoutSelection::testReadMNELoutFileNonExistent()
-{
-    QMap<QString, QPointF> channelData;
-    bool ok = LayoutLoader::readMNELoutFile(QString("/nonexistent.lout"), channelData);
     QVERIFY(!ok);
 }
 

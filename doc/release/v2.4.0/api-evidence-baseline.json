@@ -3,25 +3,25 @@
   "generated_by": "tools/quality/audit_api_evidence.py",
   "policy": "tools/quality/api_evidence_policy.json",
   "summary": {
-    "exported_classes": 456,
+    "exported_classes": 462,
     "exported_free_functions": 114,
-    "registered_classes": 348,
+    "registered_classes": 354,
     "exported_not_registered": 124,
     "registered_function_modules": 13,
     "registered_header_only": 3,
     "registered_stale": 0,
     "registered_with_test": 101,
     "registered_test_unresolved": 0,
-    "registered_with_example": 259,
+    "registered_with_example": 266,
     "registered_example_not_built": 0,
     "registered_with_python_equiv": 88,
     "registered_without_api_page": 0,
-    "with_snippet": 320,
-    "public_api_units": 472,
-    "example_eligible": 377,
+    "with_snippet": 327,
+    "public_api_units": 478,
+    "example_eligible": 383,
     "example_exempt": 95,
-    "eligible_backed_by_registry_example": 259,
-    "eligible_used_by_some_example": 320,
+    "eligible_backed_by_registry_example": 266,
+    "eligible_used_by_some_example": 326,
     "examples_on_disk": 68,
     "examples_built": 68
   },
@@ -90,10 +90,10 @@
       "with_snippet": 80
     },
     "fiff": {
-      "public": 36,
-      "registered": 31,
+      "public": 37,
+      "registered": 32,
       "with_test": 10,
-      "eligible": 36,
+      "eligible": 37,
       "eligible_with_registry_example": 31,
       "eligible_used_by_example": 34,
       "with_snippet": 36
@@ -162,13 +162,13 @@
       "with_snippet": 10
     },
     "mne": {
-      "public": 56,
-      "registered": 52,
+      "public": 61,
+      "registered": 57,
       "with_test": 5,
-      "eligible": 54,
-      "eligible_with_registry_example": 31,
-      "eligible_used_by_example": 32,
-      "with_snippet": 31
+      "eligible": 59,
+      "eligible_with_registry_example": 38,
+      "eligible_used_by_example": 38,
+      "with_snippet": 38
     },
     "mri": {
       "public": 8,
@@ -6133,6 +6133,25 @@
       "exempt_reason": null
     },
     {
+      "name": "FiffCoordTransSet",
+      "header": "fiff/fiff_coord_trans_set.h",
+      "library": "fiff",
+      "kind": "exported-class",
+      "exported": true,
+      "registered": true,
+      "registry_status": "documented",
+      "test": null,
+      "test_resolves": false,
+      "example": null,
+      "example_state": "none",
+      "including_examples": [],
+      "snippets": [],
+      "api_page": "doc/website/docs/api/fiff/fiff-coord-trans-set.mdx",
+      "python_equiv": null,
+      "example_eligible": true,
+      "exempt_reason": null
+    },
+    {
       "name": "FiffCov",
       "header": "fiff/fiff_cov.h",
       "library": "fiff",
@@ -9451,10 +9470,14 @@
       "registry_status": "documented",
       "test": null,
       "test_resolves": false,
-      "example": null,
-      "example_state": "none",
-      "including_examples": [],
-      "snippets": [],
+      "example": "ex_mne_api",
+      "example_state": "built",
+      "including_examples": [
+        "ex_mne_api"
+      ],
+      "snippets": [
+        "ex_mne_api/main.cpp#mne_deriv_set_usage"
+      ],
       "api_page": "doc/website/docs/api/mne/mne-deriv.mdx",
       "python_equiv": null,
       "example_eligible": true,
@@ -9470,10 +9493,14 @@
       "registry_status": "documented",
       "test": null,
       "test_resolves": false,
-      "example": null,
-      "example_state": "none",
-      "including_examples": [],
-      "snippets": [],
+      "example": "ex_mne_api",
+      "example_state": "built",
+      "including_examples": [
+        "ex_mne_api"
+      ],
+      "snippets": [
+        "ex_mne_api/main.cpp#mne_deriv_set_usage"
+      ],
       "api_page": "doc/website/docs/api/mne/mne-deriv-set.mdx",
       "python_equiv": null,
       "example_eligible": true,
@@ -9555,6 +9582,52 @@
         "ex_mne_api/main.cpp#mne_epoch_data_list_usage"
       ],
       "api_page": "doc/website/docs/api/mne/mne-epoch-data-list.mdx",
+      "python_equiv": null,
+      "example_eligible": true,
+      "exempt_reason": null
+    },
+    {
+      "name": "MNEEvent",
+      "header": "mne/mne_event.h",
+      "library": "mne",
+      "kind": "exported-class",
+      "exported": true,
+      "registered": true,
+      "registry_status": "documented",
+      "test": null,
+      "test_resolves": false,
+      "example": "ex_mne_api",
+      "example_state": "built",
+      "including_examples": [
+        "ex_mne_api"
+      ],
+      "snippets": [
+        "ex_mne_api/main.cpp#mne_event_list_usage"
+      ],
+      "api_page": "doc/website/docs/api/mne/mne-event.mdx",
+      "python_equiv": null,
+      "example_eligible": true,
+      "exempt_reason": null
+    },
+    {
+      "name": "MNEEventList",
+      "header": "mne/mne_event_list.h",
+      "library": "mne",
+      "kind": "exported-class",
+      "exported": true,
+      "registered": true,
+      "registry_status": "documented",
+      "test": null,
+      "test_resolves": false,
+      "example": "ex_mne_api",
+      "example_state": "built",
+      "including_examples": [
+        "ex_mne_api"
+      ],
+      "snippets": [
+        "ex_mne_api/main.cpp#mne_event_list_usage"
+      ],
+      "api_page": "doc/website/docs/api/mne/mne-event-list.mdx",
       "python_equiv": null,
       "example_eligible": true,
       "exempt_reason": null
@@ -9685,6 +9758,50 @@
       "exempt_reason": null
     },
     {
+      "name": "MNELayout",
+      "header": "mne/mne_layout.h",
+      "library": "mne",
+      "kind": "exported-class",
+      "exported": true,
+      "registered": true,
+      "registry_status": "documented",
+      "test": null,
+      "test_resolves": false,
+      "example": "ex_mne_api",
+      "example_state": "built",
+      "including_examples": [
+        "ex_mne_api"
+      ],
+      "snippets": [
+        "ex_mne_api/main.cpp#mne_layout_usage"
+      ],
+      "api_page": "doc/website/docs/api/mne/mne-layout.mdx",
+      "python_equiv": null,
+      "example_eligible": true,
+      "exempt_reason": null
+    },
+    {
+      "name": "MNELayoutPort",
+      "header": "mne/mne_layout_port.h",
+      "library": "mne",
+      "kind": "exported-class",
+      "exported": true,
+      "registered": true,
+      "registry_status": "documented",
+      "test": null,
+      "test_resolves": false,
+      "example": "ex_mne_api",
+      "example_state": "built",
+      "including_examples": [],
+      "snippets": [
+        "ex_mne_api/main.cpp#mne_layout_usage"
+      ],
+      "api_page": "doc/website/docs/api/mne/mne-layout-port.mdx",
+      "python_equiv": null,
+      "example_eligible": true,
+      "exempt_reason": null
+    },
+    {
       "name": "MNEMeasData",
       "header": "mne/mne_meas_data.h",
       "library": "mne",
@@ -9764,6 +9881,25 @@
       "including_examples": [],
       "snippets": [],
       "api_page": "doc/website/docs/api/mne/mne-mgh-tag-group.mdx",
+      "python_equiv": null,
+      "example_eligible": true,
+      "exempt_reason": null
+    },
+    {
+      "name": "MNEMneData",
+      "header": "mne/mne_mne_data.h",
+      "library": "mne",
+      "kind": "exported-class",
+      "exported": true,
+      "registered": true,
+      "registry_status": "documented",
+      "test": null,
+      "test_resolves": false,
+      "example": null,
+      "example_state": "none",
+      "including_examples": [],
+      "snippets": [],
+      "api_page": "doc/website/docs/api/mne/mne-mne-data.mdx",
       "python_equiv": null,
       "example_eligible": true,
       "exempt_reason": null
@@ -10295,10 +10431,14 @@
       "registry_status": "documented",
       "test": null,
       "test_resolves": false,
-      "example": null,
-      "example_state": "none",
-      "including_examples": [],
-      "snippets": [],
+      "example": "ex_mne_api",
+      "example_state": "built",
+      "including_examples": [
+        "ex_mne_api"
+      ],
+      "snippets": [
+        "ex_mne_api/main.cpp#mne_deriv_set_usage"
+      ],
       "api_page": "doc/website/docs/api/mne/mne-sparse-named-matrix.mdx",
       "python_equiv": null,
       "example_eligible": true,

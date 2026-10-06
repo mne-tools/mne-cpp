@@ -34,12 +34,17 @@
 #include <mne/mne_cov_matrix.h>
 #include <mne/mne_ctf_comp_data.h>
 #include <mne/mne_ctf_comp_data_set.h>
+#include <mne/mne_deriv.h>
+#include <mne/mne_deriv_set.h>
 #include <mne/mne_description_parser.h>
 #include <mne/mne_epoch_data.h>
 #include <mne/mne_epoch_data_list.h>
 #include <mne/mne_filter_def.h>
 #include <mne/mne_hemisphere.h>
+#include <mne/mne_event.h>
+#include <mne/mne_event_list.h>
 #include <mne/mne_icp.h>
+#include <mne/mne_layout.h>
 #include <mne/mne_meas_data.h>
 #include <mne/mne_meas_data_set.h>
 #include <mne/mne_msh_display_surface.h>
@@ -52,6 +57,7 @@
 #include <mne/mne_raw_data.h>
 #include <mne/mne_raw_info.h>
 #include <mne/mne_source_spaces.h>
+#include <mne/mne_sparse_named_matrix.h>
 #include <mne/mne_sss_data.h>
 #include <mne/mne_surface.h>
 
@@ -127,6 +133,7 @@ int main(int argc, char* argv[])
     const QString data = parser.value(dataOption);
     const QString ctfPath = parser.value(ctfOption);
     const QString sssPath = parser.value(sssOption);
+    const QString layoutDir = QCoreApplication::applicationDirPath() + "/../resources/general/2DLayouts";
     QTemporaryDir tmp;
     bool ok = tmp.isValid();
 
@@ -398,6 +405,57 @@ int main(int argc, char* argv[])
                  "MNESurface: solid angles show the inner skull is closed, like mne._get_solids");
     ok &= expect(display.nsurf == 1 && shown.np == 2562 && shown.surf_name == "inner skull" && near(shown.fov, 0.10576099902391434, 1e-6) && (shown.minv - Vector3f(-0.0667366f, -0.0880172f, -0.0445037f)).norm() < 1e-6f,
                  "MNEMshDisplaySurfaceSet/MNEMshDisplaySurface: the BEM surface and its extent in the viewer");
+
+    //! [mne_event_list_usage]
+    // Annotate the detected onsets, save them with their comments and read them back relative to the first sample
+    MNEEventList annotated = MNEEventList::fromMatrix(events.events).selectOnsets();
+    annotated.sort();
+    for (MNEEvent& event : annotated.events) {
+        event.comment = event.to == 1 ? "left auditory" : QString();
+    }
+    const QString commentedName = tmp.filePath("commented-eve.fif");
+    annotated.writeFif(commentedName);
+    const auto relative = MNEEventList::readFif(commentedName, raw.first_samp);
+    const MNEEventList leftAuditory = relative->selectOnsets(1);
+    //! [mne_event_list_usage]
+    // mne.find_events: 25 onsets, codes up to 32, 6 of code 1, the first at 14385 - 12900
+    ok &= expect(annotated.nevent() == 25 && annotated.maxOnset() == 32 && leftAuditory.nevent() == 6 && leftAuditory.events[0].sample == 14385 - 12900 && leftAuditory.events[0].comment == "left auditory" && relative->events[0].comment.isEmpty(),
+                 "MNEEventList/MNEEvent: commented event file, onsets selected like mne.find_events");
+
+    //! [mne_deriv_set_usage]
+    // A bipolar EOG-like montage in MNE-C's text syntax, saved as a derivation file and applied while reading raw data
+    const QString montage = tmp.filePath("montage.txt");
+    QFile montageFile(montage);
+    ok &= montageFile.open(QIODevice::WriteOnly | QIODevice::Text);
+    montageFile.write("\"EEG001-EEG002\" = \"EEG001\" - \"EEG002\"\n\"FRONT\" = 0.5 * \"EEG001\" + 0.5 * \"EEG002\" - \"EEG999\"\n");
+    montageFile.close();
+    const auto derivations = MNEDerivSet::readText(montage);
+    derivations->write(tmp.filePath("montage-deriv.fif"));
+    const auto fromFif = MNEDerivSet::read(tmp.filePath("montage-deriv.fif"));
+    const int usable = mneRaw->attachDerivations(*fromFif); // FRONT needs EEG999 and is dropped
+    MNEChSelection bipolar;
+    bipolar.chspick = bipolar.chspick_nospace = {"EEG001-EEG002", "EEG001", "EEG002"};
+    bipolar.nchan = bipolar.ndef = 3;
+    bipolar.nderiv = 1;
+    bipolar.pick = (VectorXi(3) << -1, mneRaw->ch_names.indexOf("EEG001"), mneRaw->ch_names.indexOf("EEG002")).finished();
+    bipolar.pick_deriv = (VectorXi(3) << 0, -1, -1).finished();
+    mneRaw->proj.reset();
+    mneRaw->pick_data(&bipolar, mneRaw->first_samp + 2990, ns, rows.data());
+    //! [mne_deriv_set_usage]
+    // The derived channel is the difference of its inputs, read in one pass
+    ok &= expect(derivations->count() == 2 && fromFif->count() == 2 && usable == 1 && mneRaw->deriv_matched->deriv_data->nrow == 1 && segment.row(0).isApprox(segment.row(1) - segment.row(2), 1e-6f),
+                 "MNEDerivSet/MNEDeriv/MNESparseNamedMatrix: MNE-C montage file, matched to the recording and read by MNERawData");
+
+    //! [mne_layout_usage]
+    // The Neuromag Vectorview layout: one viewport per channel
+    auto layout = MNELayout::read(layoutDir + "/Vectorview-all.lout");
+    const QMap<QString, QPointF> positions = layout->channelPositions();                     // lower-left corners, keyed "MEG 0113"
+    const int leftHalf = layout->confine(QRectF(QPointF(-85.0, -83.0), QPointF(0.0, 75.0))); // zoom to the left half
+    const int shownTriplet = layout->matchPorts(QStringList({"MEG0113", "MEG0112", "MEG0111"}));
+    //! [mne_layout_usage]
+    // mne.channels.read_layout("Vectorview-all.lout", scale=False): 306 viewports in -85 ... 90 x -83 ... 75, MEG 0113 at (-73.4162, 33.4167); 138 boxes left of x = 0
+    ok &= expect(layout && layout->ports.size() == 306 && (positions.value("MEG 0113") - QPointF(-73.416206, 33.416687)).manhattanLength() < 1e-4 && leftHalf == 138 && shownTriplet == 3,
+                 "MNELayout/MNELayoutPort: Vectorview layout like mne.channels.read_layout, zoom and channel matching");
 
     qInfo().noquote() << (ok ? "All mne checks passed." : "mne checks FAILED.");
     return ok ? EXIT_SUCCESS : EXIT_FAILURE;

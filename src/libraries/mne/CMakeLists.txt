@@ -32,7 +32,10 @@ set(SOURCES
     mne_ctf_comp_data_set.cpp
     mne_deriv.cpp
     mne_deriv_set.cpp
+    mne_sparse_named_matrix.cpp
     mne_mne_data.cpp
+    mne_layout.cpp
+    mne_event_list.cpp
     mne_named_matrix.cpp
     mne_named_vector.cpp
     mne_proj_item.cpp

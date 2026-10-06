@@ -111,7 +111,7 @@ private slots:
 
     // ── MNEDeriv / MNEDerivSet ──
     void deriv_defaultConstruction();
-    void derivSet_defaultConstruction();
+    void derivSet_textFifAndValidation();
 
     // ── MNEProjOp ──
     void projOp_defaultConstruction();
@@ -424,10 +424,62 @@ void TestMneRawProjComp::deriv_defaultConstruction()
     QVERIFY(!deriv.deriv_data);
 }
 
-void TestMneRawProjComp::derivSet_defaultConstruction()
+void TestMneRawProjComp::derivSet_textFifAndValidation()
 {
-    MNEDerivSet derivSet;
-    QVERIFY(derivSet.derivs.isEmpty());
+    // MNE-C text syntax: quoted names with spaces, implicit weight 1, a leading minus, repeated inputs add up,
+    // a derivation whose weights cancel is dropped.
+    QTemporaryDir dir;
+    QFile text(dir.filePath("montage.txt"));
+    QVERIFY(text.open(QIODevice::WriteOnly | QIODevice::Text));
+    text.write("# bipolar and reference\n"
+               "\"EEG 001-EEG 002\" = \"EEG 001\" - \"EEG 002\"\n"
+               "avg = 0.5 * \"EEG 001\" + 0.5 * \"EEG 002\" - 0.25 * \"EEG 003\" - 0.25 * \"EEG 003\"\n"
+               "neg = - 2 * \"EEG 003\"\n"
+               "none = \"EEG 001\" - \"EEG 001\"\n");
+    text.close();
+    const auto set = MNEDerivSet::readText(text.fileName());
+    QVERIFY(set);
+    QCOMPARE(set->count(), 3);
+    const QList<MNEDerivSet::Definition> defs = set->definitions();
+    QCOMPARE(defs[0].first, QString("EEG 001-EEG 002"));
+    QCOMPARE(defs[0].second, (QMap<QString, double>{{"EEG 001", 1.0}, {"EEG 002", -1.0}}));
+    QCOMPARE(defs[1].second.value("EEG 003"), -0.5);
+    QCOMPARE(defs[2].second, (QMap<QString, double>{{"EEG 003", -2.0}}));
+
+    // FIFF round trip of the FIFFB_MNE_DERIVATIONS block; FIFF name lists carry no spaces.
+    MNEDerivSet both = *set;
+    both.append(MNEDerivSet::fromDefinitions({{"EOG", {{"EOG061", 1.0}}}}, "eog"));
+    QVERIFY(both.write(dir.filePath("deriv.fif")));
+    const auto back = MNEDerivSet::read(dir.filePath("deriv.fif"));
+    QVERIFY(back);
+    QCOMPARE(static_cast<int>(back->derivs.size()), 2);
+    QCOMPARE(back->count(), 4);
+    QCOMPARE(back->definitions()[0].first, QString("EEG001-EEG002"));
+    QCOMPARE(back->definitions()[1].second.value("EEG003"), -0.5);
+    QCOMPARE(back->definitions()[3].second, (QMap<QString, double>{{"EOG061", 1.0}}));
+
+    // Validation: inputs must exist and share kind and unit.
+    QList<FiffChInfo> chs;
+    for (const auto& [name, kind] : QList<QPair<QString, int>>{{"EEG001", FIFFV_EEG_CH}, {"EEG002", FIFFV_EEG_CH}, {"EOG061", FIFFV_EOG_CH}}) {
+        FiffChInfo ch;
+        ch.ch_name = name;
+        ch.kind = kind;
+        ch.unit = FIFF_UNIT_V;
+        chs << ch;
+    }
+    MNEDeriv first = *back->derivs[0];
+    QCOMPARE(first.validate(chs), 1);
+    QCOMPARE(first.valid, (Eigen::VectorXi(3) << 1, 0, 0).finished());
+    QCOMPARE(first.chs[0].ch_name, QString("EEG001"));
+    chs[1].kind = FIFFV_MEG_CH;
+    QCOMPARE(first.validate(chs), 0);
+
+    QFile bad(dir.filePath("bad.txt"));
+    QVERIFY(bad.open(QIODevice::WriteOnly | QIODevice::Text));
+    bad.write("a = b + c\nd = e = f\n"); // an equal sign after inputs
+    bad.close();
+    QVERIFY(!MNEDerivSet::readText(bad.fileName()));
+    QVERIFY(!MNEDerivSet().write(dir.filePath("none.fif")));
 }
 
 //=============================================================================================================

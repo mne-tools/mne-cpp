@@ -10,7 +10,7 @@
  *           Andreas Griesshammer <ag@fieldlineinc.com>
  * @since    0.1.0
  * @date     September 2014
- * @brief    Implementation of the ANT @c .elc / MNE @c .lout parsers declared in @ref layoutloader.h.
+ * @brief    Implementation of the ANT @c .elc parser declared in @ref layoutloader.h.
  *
  * The parsers are deliberately tolerant of trailing whitespace
  * and missing comment lines because exported layouts from
@@ -222,101 +222,6 @@ bool LayoutLoader::readAsaElcFile(const std::string& path,
     }
 
     Q_UNUSED(numberElectrodes);
-
-    return true;
-}
-
-//=============================================================================================================
-
-bool LayoutLoader::readMNELoutFile(const QString& path, QMap<QString, QPointF>& channelData)
-{
-    //Open .elc file
-    if (!path.contains(".lout"))
-        return false;
-
-    channelData.clear();
-
-    QFile file(path);
-    if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
-        qDebug() << "Error opening mne lout file";
-        return false;
-    }
-
-    //Start reading from file
-    QTextStream in(&file);
-
-    //skip first line
-    in.readLine();
-
-    while (!in.atEnd()) {
-        QString line = in.readLine();
-
-        QStringList fields = line.split(QRegularExpression("\\s+"));
-
-        //Delete last element if it is a blank character
-        if (fields.at(fields.size() - 1) == "")
-            fields.removeLast();
-
-        QPointF posTemp;
-        posTemp.setX(fields.at(1).toDouble()); //x
-        posTemp.setY(fields.at(2).toDouble()); //y
-
-        //Create channel data map entry
-        QString key = QString("%1 %2").arg(fields.at(fields.size() - 2)).arg(fields.at(fields.size() - 1));
-        channelData.insert(key, posTemp);
-    }
-
-    file.close();
-
-    return true;
-}
-
-//=============================================================================================================
-
-bool LayoutLoader::readMNELoutFile(const std::string& path, QMap<std::string, QPointF>& channelData)
-{
-    if (path.find(".lout") == std::string::npos) {
-        return false;
-    }
-
-    channelData.clear();
-    std::ifstream inFile(path);
-
-    if (!inFile.is_open()) {
-        qDebug() << "Error opening mne lout file";
-        return false;
-    }
-
-    std::string line;
-
-    // Skip first line (bounding box)
-    std::getline(inFile, line);
-
-    while (std::getline(inFile, line)) {
-        if (line.empty())
-            continue;
-
-        std::vector<std::string> elements;
-        std::stringstream stream{line};
-        std::string element;
-
-        stream >> std::ws;
-        while (stream >> element) {
-            elements.push_back(std::move(element));
-            stream >> std::ws;
-        }
-
-        if (elements.size() < 4)
-            continue;
-
-        QPointF posTemp;
-        posTemp.setX(std::stod(elements.at(1))); //x
-        posTemp.setY(std::stod(elements.at(2))); //y
-
-        //Create channel data map entry
-        std::string key{elements.at(elements.size() - 2) + " " + elements.at(elements.size() - 1)};
-        channelData.insert(key, posTemp);
-    }
 
     return true;
 }

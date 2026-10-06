@@ -1,0 +1,180 @@
+---
+id: mne-layout
+title: "MNELIB::MNELayout"
+sidebar_label: MNELayout
+sidebar_position: 24
+---
+
+# MNELayout
+
+**Namespace:** `MNELIB` &nbsp;·&nbsp; **Library:** MNE Library
+
+`#include <mne/mne_layout.h>`
+
+```cpp
+class MNELIB::MNELayout
+```
+
+Plotter layout with viewports, channel matching and zoom.
+
+```cpp title="src/examples/ex_mne_api/main.cpp"
+// The Neuromag Vectorview layout: one viewport per channel
+auto layout = MNELayout::read(layoutDir + "/Vectorview-all.lout");
+const QMap<QString, QPointF> positions = layout->channelPositions();                     // lower-left corners, keyed "MEG 0113"
+const int leftHalf = layout->confine(QRectF(QPointF(-85.0, -83.0), QPointF(0.0, 75.0))); // zoom to the left half
+const int shownTriplet = layout->matchPorts(QStringList({"MEG0113", "MEG0112", "MEG0111"}));
+```
+
+---
+
+## Public Methods
+
+### channelPositions()
+
+Returns the lower-left corner of every channel's viewport, keyed by the name in the file.
+
+**Returns:**
+
+- *QMap&lt; QString, QPointF &gt;* — Channel name -&gt; viewport origin; a port listing several channels contributes each of them.
+
+---
+
+### matchPorts(channel)
+
+Marks the visible ports that show `channel` (MNE-C `mne_lout_match_ports`).
+
+**Parameters:**
+
+- **channel** : *const QString &*
+  A channel name in any spelling.
+
+**Returns:**
+
+- *int* — The number of ports marked.
+
+---
+
+### matchPorts(channels)
+
+Matches many channels at once (MNE-C `mne_lout_match_ports_many`) and fills `matches()`.
+
+**Parameters:**
+
+- **channels** : *const QStringList &*
+  Channel names in any spelling.
+
+**Returns:**
+
+- *int* — The number of port/channel pairs found.
+
+---
+
+### matches()
+
+Returns which port shows which channel after `matchPorts(const QStringList&)`.
+
+**Returns:**
+
+- *const Eigen::MatrixXi &* — Ports x channels, 1 where the port shows the channel.
+
+---
+
+### portAt(point)
+
+Returns the port whose interior contains a point.
+
+**Parameters:**
+
+- **point** : *const QPointF &*
+  A point in layout coordinates.
+
+**Returns:**
+
+- *int* — The index into ports, or -1.
+
+---
+
+### confine(area)
+
+Zooms to the ports inside `area` (MNE-C `mne_lout_confine`).
+
+The visible area becomes the bounding box of those ports plus a 1 % margin; without any port inside it stays unchanged.
+
+**Parameters:**
+
+- **area** : *const QRectF &*
+  The requested area; corners may be given in either order.
+
+**Returns:**
+
+- *int* — The number of ports inside the area.
+
+---
+
+### resetConfine()
+
+Shows the whole layout again.
+
+---
+
+### isVisible(port)
+
+Returns whether a port lies completely inside the visible area.
+
+**Parameters:**
+
+- **port** : *const [MNELayoutPort](/docs/api/mne/mne-layout-port) &*
+  A port of this layout.
+
+**Returns:**
+
+- *bool* — True if the port is visible.
+
+---
+
+### extent()
+
+Returns the drawing area given on the first line of the file.
+
+**Returns:**
+
+- *QRectF* — The extent in layout coordinates.
+
+---
+
+### visibleArea()
+
+Returns the area currently shown (the extent unless `confine()` zoomed in).
+
+**Returns:**
+
+- *QRectF* — The visible area in layout coordinates.
+
+---
+
+## Static Methods
+
+### read(path)
+
+Reads an MNE-C ``.lout file.
+
+**Parameters:**
+
+- **path** : *const QString &*
+  The layout file.
+
+**Returns:**
+
+- *std::optional&lt; [MNELayout](/docs/api/mne/mne-layout) &gt;* — The layout, or no value if the file cannot be read or a line is malformed.
+
+---
+
+## Example
+
+- Full source: [`src/examples/ex_mne_api/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_mne_api/main.cpp)
+- Build target: `ex_mne_api` (runs under CTest)
+- Data: [mne-cpp-test-data](https://github.com/mne-tools/mne-cpp-test-data)
+
+## Authors of this file
+
+- Christoph Dinh &lt;christoph.dinh@mne-cpp.org&gt;

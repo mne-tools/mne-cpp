@@ -329,6 +329,7 @@ namespace FIFFLIB
  */
 #define FIFFB_MNE_CTF_COMP 370
 #define FIFFB_MNE_CTF_COMP_DATA 371
+#define FIFFB_MNE_DERIVATIONS 372
 
 /*
  * Fiff tags associated with MNE computations (3500...)
@@ -415,9 +416,11 @@ namespace FIFFLIB
 /*
  * 3560... Miscellaneous
  */
-#define FIFF_MNE_PROJ_ITEM_ACTIVE 3560 /**< Is this projection item active?*/
-#define FIFF_MNE_EVENT_LIST 3561       /**< An event list (for STI 014)*/
-#define FIFF_MNE_HEMI 3562             /**< Hemisphere association for general purposes*/
+#define FIFF_MNE_PROJ_ITEM_ACTIVE 3560   /**< Is this projection item active?*/
+#define FIFF_MNE_EVENT_LIST 3561         /**< An event list (for STI 014)*/
+#define FIFF_MNE_EVENT_TRIGGER_MASK 3565 /**< Mask applied to the trigger channel values*/
+#define FIFF_MNE_EVENT_COMMENTS 3566     /**< Event comments, one NUL-terminated string per event*/
+#define FIFF_MNE_HEMI 3562               /**< Hemisphere association for general purposes*/
 
 /*
  * 3570... Morphing maps
@@ -432,6 +435,7 @@ namespace FIFFLIB
 #define FIFF_MNE_CTF_COMP_KIND 3580       /**< What kind of compensation*/
 #define FIFF_MNE_CTF_COMP_DATA 3581       /**< The compensation data itself*/
 #define FIFF_MNE_CTF_COMP_CALIBRATED 3582 /**< Are the coefficients calibrated?*/
+#define FIFF_MNE_DERIVATION_DATA 3585     /**< Channel derivations (EEG montages and other virtual channels)*/
 
 /*
  * 3700... Real-Time Communication

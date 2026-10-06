@@ -88,12 +88,12 @@ Apply derivation rules to a data matrix.
 
 ### readDefinitionFile(path)
 
-Read derivation rules from a text definition file.
+Read derivation rules from an MNE-C derivation text file (`MNELIB::MNEDerivSet::readText`).
 
-File format (lines starting with '#' are comments): 
 ```cpp
-# output_name = weight1 * input1 + weight2 * input2 + ...
-LH1-LH2 = 1.0 * LH1 + -1.0 * LH2
+# comment
+"LH1-LH2" = "LH1" - "LH2"
+"C3-avg" = 0.75 * "C3" - 0.25 * "C4" - 0.25 * "Cz" - 0.25 * "Pz"
 ```
 
 **Parameters:**
@@ -109,7 +109,7 @@ LH1-LH2 = 1.0 * LH1 + -1.0 * LH2
 
 ### writeDefinitionFile(path, rules)
 
-Write derivation rules to a text definition file.
+Write derivation rules in MNE-C derivation text syntax, readable by readDefinitionFile and mne_make_derivations.
 
 **Parameters:**
 

@@ -234,11 +234,21 @@ int main(int argc, char* argv[])
     ok &= expect(layout2d.size() == names.size() && std::hypot(czX, czY) < 1.0f && layout2d[iFp1][1] > layout2d[iCz][1] && layout2d[iO1][1] < layout2d[iCz][1] && layout2d[iFp1][0] < layout2d[iCz][0] && layout2d[iT8][0] > layout2d[iCz][0],
                  QString("LayoutMaker: Cz at (%1, %2), Fp1 front-left, O1 back, T8 right").arg(czX).arg(czY));
 
+    QFile capFile(dir.filePath("cap.elc"));
+    ok &= capFile.open(QIODevice::WriteOnly | QIODevice::Text);
+    capFile.write("NumberPositions=\t2\nUnitPosition\tmm\nPositions\nFp1 :\t-29.4\t83.9\t-7.0\nCz :\t0.0\t0.0\t87.0\n"
+                  "Labels\nFp1\tCz\n");
+    capFile.close();
     //! [layout_loader_usage]
-    QMap<QString, QPointF> channelPositions;
-    LayoutLoader::readMNELoutFile(layoutFile.fileName(), channelPositions);
+    // ANT .elc electrode file: names, 3-D positions and their unit
+    QStringList capNames;
+    QList<QVector<float>> cap3D;
+    QList<QVector<float>> cap2D;
+    QString capUnit;
+    LayoutLoader::readAsaElcFile(capFile.fileName(), capNames, cap3D, cap2D, capUnit);
     //! [layout_loader_usage]
-    ok &= expect(channelPositions.size() == names.size(), QString("LayoutLoader reads %1 channels back").arg(channelPositions.size()));
+    ok &= expect(capNames == QStringList({"Fp1", "Cz"}) && capUnit == "mm" && cap3D.size() == 2 && cap3D[1] == QVector<float>({0.0f, 0.0f, 87.0f}),
+                 "LayoutLoader reads the electrode names, positions and unit of an .elc file");
 
     //! [fastrak_parser_usage]
     FastrakParser parser;

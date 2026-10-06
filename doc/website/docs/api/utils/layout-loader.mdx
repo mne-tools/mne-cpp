@@ -15,13 +15,17 @@ sidebar_position: 27
 class UTILSLIB::LayoutLoader
 ```
 
-Processes layout files (AsA .elc, [MNE](/docs/api/mne/mne-class) .lout) files which contain the electrode positions of a EEG/MEG hat.
+Reads ANT .elc files, which contain the electrode positions of an EEG cap.
 
-Reads ANT .elc electrode files and [MNE](/docs/api/mne/mne-class) .lout 2-D channel layouts into Qt/STL containers.
+Reads ANT .elc electrode files into Qt/STL containers.
 
 ```cpp title="src/examples/ex_utils/main.cpp"
-QMap<QString, QPointF> channelPositions;
-LayoutLoader::readMNELoutFile(layoutFile.fileName(), channelPositions);
+// ANT .elc electrode file: names, 3-D positions and their unit
+QStringList capNames;
+QList<QVector<float>> cap3D;
+QList<QVector<float>> cap2D;
+QString capUnit;
+LayoutLoader::readAsaElcFile(capFile.fileName(), capNames, cap3D, cap2D, capUnit);
 ```
 
 ---
@@ -79,42 +83,6 @@ Reads the specified ANT elc-layout file.
 **Returns:**
 
 - *bool* — true if reading was successful, false otherwise.
-
----
-
-### readMNELoutFile(path, channelData)
-
-Reads the specified [MNE](/docs/api/mne/mne-class) .lout file.
-
-**Parameters:**
-
-- **path** : *const QString &*
-  holds the file path of the lout file which is to be read.
-
-- **channelData** : *QMap&lt; QString, QPointF &gt; &*
-  holds the x,y and channel number for every channel. The map keys are the channel names (i.e. 'MEG 0113').
-
-**Returns:**
-
-- *bool* — bool true if reading was successful, false otherwise.
-
----
-
-### readMNELoutFile(path, channelData)
-
-Reads the specified [MNE](/docs/api/mne/mne-class) .lout file.
-
-**Parameters:**
-
-- **path** : *const std::string &*
-  holds the file path of the lout file which is to be read.
-
-- **channelData** : *QMap&lt; std::string, QPointF &gt; &*
-  holds the x,y and channel number for every channel. The map keys are the channel names (i.e. 'MEG 0113').
-
-**Returns:**
-
-- *bool* — bool true if reading was successful, false otherwise.
 
 ---
 

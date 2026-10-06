@@ -1,0 +1,45 @@
+---
+id: mne-event
+title: "MNELIB::MNEEvent"
+sidebar_label: MNEEvent
+sidebar_position: 20
+---
+
+# MNEEvent
+
+**Namespace:** `MNELIB` &nbsp;·&nbsp; **Library:** MNE Library
+
+`#include <mne/mne_event.h>`
+
+```cpp
+class MNELIB::MNEEvent
+```
+
+Single trigger-event marker.
+
+Records a stimulus transition (from one value to another) at a given sample position, together with an optional free-text comment.
+
+```cpp title="src/examples/ex_mne_api/main.cpp"
+// Annotate the detected onsets, save them with their comments and read them back relative to the first sample
+MNEEventList annotated = MNEEventList::fromMatrix(events.events).selectOnsets();
+annotated.sort();
+for (MNEEvent& event : annotated.events) {
+    event.comment = event.to == 1 ? "left auditory" : QString();
+}
+const QString commentedName = tmp.filePath("commented-eve.fif");
+annotated.writeFif(commentedName);
+const auto relative = MNEEventList::readFif(commentedName, raw.first_samp);
+const MNEEventList leftAuditory = relative->selectOnsets(1);
+```
+
+---
+
+## Example
+
+- Full source: [`src/examples/ex_mne_api/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_mne_api/main.cpp)
+- Build target: `ex_mne_api` (runs under CTest)
+- Data: [mne-cpp-test-data](https://github.com/mne-tools/mne-cpp-test-data)
+
+## Authors of this file
+
+- Christoph Dinh &lt;christoph.dinh@mne-cpp.org&gt;

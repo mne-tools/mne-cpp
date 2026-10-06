@@ -2,8 +2,8 @@
   "schema_version": 1,
   "generated_by": "tools/quality/audit_maintainability.py",
   "policy": "tools/quality/maintainability_policy.json",
-  "scanned_files": 1497,
-  "scanned_lines": 392721,
+  "scanned_files": 1508,
+  "scanned_lines": 394377,
   "oversized_threshold": 2000,
   "metrics": {
     "null_macro": {
@@ -277,11 +277,11 @@
       }
     },
     "raw_delete": {
-      "total": 276,
-      "files": 102,
+      "total": 275,
+      "files": 101,
       "by_scope": {
         "applications": 155,
-        "libraries": 99,
+        "libraries": 98,
         "tools": 22
       },
       "suppressed": [],
@@ -391,7 +391,6 @@
         "src/libraries/lsl/lsl_stream_inlet.cpp": 5,
         "src/libraries/lsl/lsl_stream_outlet.cpp": 2,
         "src/libraries/mna/mna_graph_executor.cpp": 2,
-        "src/libraries/mne/mne_deriv_set.cpp": 1,
         "src/libraries/mne/mne_meas_data.cpp": 4,
         "src/libraries/mne/mne_source_space.cpp": 1,
         "src/libraries/utils/generics/circularbuffer.h": 5,
@@ -491,17 +490,17 @@
       }
     },
     "numeric_define": {
-      "total": 831,
+      "total": 835,
       "files": 32,
       "by_scope": {
         "applications": 69,
-        "libraries": 726,
+        "libraries": 730,
         "tools": 36
       },
       "suppressed": [],
       "top": {
         "src/libraries/fiff/fiff_file.h": 401,
-        "src/libraries/fiff/fiff_constants.h": 261,
+        "src/libraries/fiff/fiff_constants.h": 265,
         "src/applications/mne_analyze_studio/extensions/fiff_browser_extension/browsercore/Utils/rawsettings.h": 35,
         "src/applications/mne_scan/plugins/tmsi/tmsidriver.h": 24,
         "src/libraries/disp/viewers/helpers/bidsviewmodel.h": 13,
@@ -526,7 +525,7 @@
         "src/applications/mne_scan/plugins/writetofile/writetofile.h": 1,
         "src/libraries/disp/viewers/coregsettingsview.cpp": 1,
         "src/libraries/disp/viewers/helpers/bidsviewmodel.h": 13,
-        "src/libraries/fiff/fiff_constants.h": 261,
+        "src/libraries/fiff/fiff_constants.h": 265,
         "src/libraries/fiff/fiff_file.h": 401,
         "src/libraries/fiff/fiff_tag.h": 5,
         "src/libraries/inv/dipole_fit/inv_dipole_fit_data.cpp": 4,
@@ -676,7 +675,7 @@
         "src/applications/mne_browse/Windows/mainwindow.cpp": 4574,
         "src/libraries/disp3D/view/brainview.cpp": 3907,
         "src/applications/mne_inspect/app/mainwindow.cpp": 3573,
-        "src/libraries/fiff/fiff_stream.cpp": 3411,
+        "src/libraries/fiff/fiff_stream.cpp": 3413,
         "src/libraries/fwd/fwd_bem_model.cpp": 3368,
         "src/libraries/disp/viewers/helpers/channelrhiview.cpp": 2833,
         "src/libraries/mne/mne_source_space.cpp": 2424
@@ -687,7 +686,7 @@
         "src/applications/mne_inspect/app/mainwindow.cpp": 3573,
         "src/libraries/disp/viewers/helpers/channelrhiview.cpp": 2833,
         "src/libraries/disp3D/view/brainview.cpp": 3907,
-        "src/libraries/fiff/fiff_stream.cpp": 3411,
+        "src/libraries/fiff/fiff_stream.cpp": 3413,
         "src/libraries/fwd/fwd_bem_model.cpp": 3368,
         "src/libraries/mne/mne_source_space.cpp": 2424
       }

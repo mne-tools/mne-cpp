@@ -24,7 +24,7 @@
 #include "helpers/channelinfomodel.h"
 #include "helpers/selectionscene.h"
 
-#include <utils/layoutloader.h>
+#include <mne/mne_layout.h>
 #include <utils/selectionio.h>
 #include <utils/layoutmaker.h>
 
@@ -473,7 +473,9 @@ void ChannelSelectionView::updateProcessingMode(ProcessingMode mode)
 bool ChannelSelectionView::loadLayout(QString path)
 {
     qDebug() << "loadLayout:" << path;
-    bool state = LayoutLoader::readMNELoutFile(path, m_layoutMap);
+    const std::optional<MNELIB::MNELayout> layout = MNELIB::MNELayout::read(path);
+    const bool state = layout.has_value();
+    m_layoutMap = state ? layout->channelPositions() : QMap<QString, QPointF>();
 
     //if no layout for EEG is specified generate from digitizer points
     QList<QVector<float>> inputPoints;

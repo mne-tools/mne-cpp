@@ -1,0 +1,186 @@
+---
+id: mne-event-list
+title: "MNELIB::MNEEventList"
+sidebar_label: MNEEventList
+sidebar_position: 21
+---
+
+# MNEEventList
+
+**Namespace:** `MNELIB` &nbsp;·&nbsp; **Library:** MNE Library
+
+`#include <mne/mne_event_list.h>`
+
+```cpp
+class MNELIB::MNEEventList
+```
+
+Ordered list of trigger events with comments.
+
+```cpp title="src/examples/ex_mne_api/main.cpp"
+// Annotate the detected onsets, save them with their comments and read them back relative to the first sample
+MNEEventList annotated = MNEEventList::fromMatrix(events.events).selectOnsets();
+annotated.sort();
+for (MNEEvent& event : annotated.events) {
+    event.comment = event.to == 1 ? "left auditory" : QString();
+}
+const QString commentedName = tmp.filePath("commented-eve.fif");
+annotated.writeFif(commentedName);
+const auto relative = MNEEventList::readFif(commentedName, raw.first_samp);
+const MNEEventList leftAuditory = relative->selectOnsets(1);
+```
+
+---
+
+## Public Methods
+
+### writeFif(path, offset)
+
+Writes the list as an event block with comments, readable by `mne.read_events`.
+
+**Parameters:**
+
+- **path** : *const QString &*
+  The output file.
+
+- **offset** : *int*
+  Samples to add back to every event.
+
+**Returns:**
+
+- *bool* — True if the file was written.
+
+---
+
+### sort()
+
+Sorts the events by sample; events at the same sample keep their order.
+
+---
+
+### append(other)
+
+Appends the events of another list (MNE-C `mne_add_to_event_list`).
+
+**Parameters:**
+
+- **other** : *const [MNEEventList](/docs/api/mne/mne-event-list) &*
+  The events to append.
+
+---
+
+### selectOnsets(value)
+
+Keeps the onsets of one trigger value (MNE-C `filter_events`): events rising from 0 to `value`, or every onset if `value` is 0.
+
+**Parameters:**
+
+- **value** : *unsigned int*
+  The trigger value to keep, or 0 for all onsets.
+
+**Returns:**
+
+- *[MNEEventList](/docs/api/mne/mne-event-list)* — The selected events in their original order.
+
+---
+
+### maxOnset()
+
+Returns the largest trigger value that starts from 0.
+
+**Returns:**
+
+- *unsigned int* — The largest onset value, 0 for a list without onsets.
+
+---
+
+### toMatrix()
+
+Returns the events as rows of sample, value before and value after, the layout of `FIFFLIB::FiffEvents::events` and of `mne.read_events`.
+
+**Returns:**
+
+- *Eigen::MatrixXi* — nEvents x 3 matrix.
+
+---
+
+### nevent()
+
+Returns the number of events in the list.
+
+**Returns:**
+
+- *int* — Number of events.
+
+---
+
+## Static Methods
+
+### readFif(path, offset)
+
+Reads the event block of a FIFF file (MNE-C `mne_load_events_fiff`).
+
+**Parameters:**
+
+- **path** : *const QString &*
+  A `-eve.fif` file or a raw file carrying an event block.
+
+- **offset** : *int*
+  Samples to subtract from every event, e.g. the first sample of the recording.
+
+**Returns:**
+
+- *std::optional&lt; [MNEEventList](/docs/api/mne/mne-event-list) &gt;* — The events with their comments, or no value if the file has no event block.
+
+---
+
+### readText(path, offset, oldOffset, sfreq)
+
+Reads an MNE-C text event file (MNE-C `mne_load_events`).
+
+Each line holds sample, time, trigger value before and after, and an optional comment; `#` starts a comment line. A negative sample is computed from the time. A first line with both trigger values 0 marks the current format: it gives the first sample of the recording and is not an event. Old files have no such line; their samples are shifted by `oldOffset` instead.
+
+**Parameters:**
+
+- **path** : *const QString &*
+  The text file.
+
+- **offset** : *int*
+  Samples to subtract from every event (the recording's first sample).
+
+- **oldOffset** : *int*
+  Extra offset used by files in the old format.
+
+- **sfreq** : *float*
+  Sampling frequency, to convert times of events without a sample.
+
+**Returns:**
+
+- *std::optional&lt; [MNEEventList](/docs/api/mne/mne-event-list) &gt;* — The events, or no value if the file cannot be read or holds no events.
+
+---
+
+### fromMatrix(matrix)
+
+Builds a list from rows of sample, value before and value after.
+
+**Parameters:**
+
+- **matrix** : *const Eigen::MatrixXi &*
+  nEvents x 3 matrix as returned by `toMatrix()`.
+
+**Returns:**
+
+- *[MNEEventList](/docs/api/mne/mne-event-list)* — The events, without comments.
+
+---
+
+## Example
+
+- Full source: [`src/examples/ex_mne_api/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_mne_api/main.cpp)
+- Build target: `ex_mne_api` (runs under CTest)
+- Data: [mne-cpp-test-data](https://github.com/mne-tools/mne-cpp-test-data)
+
+## Authors of this file
+
+- Christoph Dinh &lt;christoph.dinh@mne-cpp.org&gt;

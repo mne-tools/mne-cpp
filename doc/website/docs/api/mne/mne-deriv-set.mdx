@@ -15,7 +15,28 @@ sidebar_position: 16
 class MNELIB::MNEDerivSet
 ```
 
-Collection of [`MNEDeriv`](/docs/api/mne/mne-deriv) channel derivation definitions loaded from a file.
+Collection of channel derivations.
+
+```cpp title="src/examples/ex_mne_api/main.cpp"
+// A bipolar EOG-like montage in MNE-C's text syntax, saved as a derivation file and applied while reading raw data
+const QString montage = tmp.filePath("montage.txt");
+QFile montageFile(montage);
+ok &= montageFile.open(QIODevice::WriteOnly | QIODevice::Text);
+montageFile.write("\"EEG001-EEG002\" = \"EEG001\" - \"EEG002\"\n\"FRONT\" = 0.5 * \"EEG001\" + 0.5 * \"EEG002\" - \"EEG999\"\n");
+montageFile.close();
+const auto derivations = MNEDerivSet::readText(montage);
+derivations->write(tmp.filePath("montage-deriv.fif"));
+const auto fromFif = MNEDerivSet::read(tmp.filePath("montage-deriv.fif"));
+const int usable = mneRaw->attachDerivations(*fromFif); // FRONT needs EEG999 and is dropped
+MNEChSelection bipolar;
+bipolar.chspick = bipolar.chspick_nospace = {"EEG001-EEG002", "EEG001", "EEG002"};
+bipolar.nchan = bipolar.ndef = 3;
+bipolar.nderiv = 1;
+bipolar.pick = (VectorXi(3) << -1, mneRaw->ch_names.indexOf("EEG001"), mneRaw->ch_names.indexOf("EEG002")).finished();
+bipolar.pick_deriv = (VectorXi(3) << 0, -1, -1).finished();
+mneRaw->proj.reset();
+mneRaw->pick_data(&bipolar, mneRaw->first_samp + 2990, ns, rows.data());
+```
 
 ---
 
@@ -23,15 +44,164 @@ Collection of [`MNEDeriv`](/docs/api/mne/mne-deriv) channel derivation definitio
 
 ### MNEDerivSet()
 
-Constructs the [`MNE`](/docs/api/mne/mne-class) Derivation Set.
+---
+
+### MNEDerivSet()
+
+---
+
+### operator=()
 
 ---
 
 ### ~MNEDerivSet()
 
-Destructor.
+---
+
+### MNEDerivSet(other)
+
+Copies the set including every derivation.
+
+**Parameters:**
+
+- **other** : *const MNEDerivSet &*
+  The set to copy.
 
 ---
+
+### operator=(other)
+
+Replaces the derivations by copies of those of another set.
+
+**Parameters:**
+
+- **other** : *const MNEDerivSet &*
+  The set to copy.
+
+**Returns:**
+
+- *MNEDerivSet &* — This set.
+
+---
+
+### write(path)
+
+Writes the set as a `FIFFB_MNE_DERIVATIONS` block (MNE-C `mne_write_deriv_file`).
+
+**Parameters:**
+
+- **path** : *const QString &*
+  The output file.
+
+**Returns:**
+
+- *bool* — True if the file was written; an empty set is not written.
+
+---
+
+### definitions()
+
+Returns every derivation of the set as definitions, in file order.
+
+**Returns:**
+
+- *QList&lt; Definition &gt;* — Derived channel names with the weights of their inputs.
+
+---
+
+### append(other)
+
+Appends copies of the derivations of another set (MNE-C `mne_merge_deriv_sets`).
+
+**Parameters:**
+
+- **other** : *const MNEDerivSet &*
+  The derivations to append.
+
+---
+
+### match(chNames)
+
+Keeps the derivations whose inputs are all among `chNames` and merges them into one derivation whose columns are exactly `chNames` (MNE-C `mne_match_merge_deriv`).
+
+**Parameters:**
+
+- **chNames** : *const QStringList &*
+  Channel names of a recording, in data order.
+
+**Returns:**
+
+- *std::unique_ptr&lt; [MNEDeriv](/docs/api/mne/mne-deriv) &gt;* — The merged derivation with `MNEDeriv::in_use` set, or nullptr if nothing matched.
+
+---
+
+### count()
+
+Returns the number of derived channels over all derivations (MNE-C `mne_count_deriv`).
+
+**Returns:**
+
+- *int* — The total number of rows.
+
+---
+
+## Static Methods
+
+### read(path)
+
+Reads every derivation stored in the `FIFFB_MNE_DERIVATIONS` blocks of a file (MNE-C `mne_read_deriv`).
+
+**Parameters:**
+
+- **path** : *const QString &*
+  A derivation file written by `write()` or MNE-C `mne_make_derivations`.
+
+**Returns:**
+
+- *std::optional&lt; MNEDerivSet &gt;* — The set (empty if the file holds no derivations), or no value if the file cannot be read.
+
+---
+
+### readText(path)
+
+Reads MNE-C's text syntax (`mne_make_derivations` in).
+
+Each derivation is `name` = followed by terms joined by + and -; a term is a channel name optionally preceded by a weight and *, e.g. `"EEG 001-EEG 002"` = "EEG 001" - "EEG 002". Names with spaces are quoted, tokens are separated by white space and `#` starts a comment line. Weights of the same input channel add up; derivations whose weights are all zero are dropped.
+
+**Parameters:**
+
+- **path** : *const QString &*
+  The text file.
+
+**Returns:**
+
+- *std::optional&lt; MNEDerivSet &gt;* — One derivation holding all definitions, or no value on a syntax error.
+
+---
+
+### fromDefinitions(definitions, name)
+
+Builds one derivation from definitions such as those of dsp::[ChannelDerivation](/docs/api/utils/channel-derivation).
+
+**Parameters:**
+
+- **definitions** : *const QList&lt; Definition &gt; &*
+  Derived channel names with the weights of their inputs.
+
+- **name** : *const QString &*
+  Short name of the derivation.
+
+**Returns:**
+
+- *MNEDerivSet* — A set with one derivation; input channels appear in order of first use.
+
+---
+
+## Example
+
+- Full source: [`src/examples/ex_mne_api/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_mne_api/main.cpp)
+- Build target: `ex_mne_api` (runs under CTest)
+- Data: [mne-cpp-test-data](https://github.com/mne-tools/mne-cpp-test-data)
 
 ## Authors of this file
 

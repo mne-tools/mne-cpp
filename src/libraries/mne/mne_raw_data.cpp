@@ -1496,3 +1496,21 @@ MNERawData* MNERawData::open_file(const QString& name, int omit_skip, int allow_
 {
     return open_file_comp(name, omit_skip, allow_maxshield, filter, -1);
 }
+
+//=============================================================================================================
+
+int MNERawData::attachDerivations(const MNEDerivSet& derivations, bool keepPrevious)
+{
+    if (!keepPrevious || !deriv) {
+        deriv = std::make_unique<MNEDerivSet>();
+    }
+    deriv->append(derivations);
+    deriv_matched = deriv->match(ch_names);
+    if (!deriv_matched) {
+        qInfo("No derivations are valid for these raw data.");
+        return 0;
+    }
+    const int nvalid = deriv_matched->validate(info->chInfo);
+    qInfo("%d of %d of the matched derivations are valid for these raw data.", nvalid, deriv_matched->deriv_data->nrow);
+    return nvalid;
+}
