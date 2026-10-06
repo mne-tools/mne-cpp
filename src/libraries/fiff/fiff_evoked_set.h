@@ -76,6 +76,8 @@ class FiffRawData;
  * peak-to-peak and flatness rejection when computing batch evokeds; the
  * default values match the MNE-C defaults so existing "ave description"
  * files keep producing identical results.
+ *
+ * @snippet ex_mne_api/main.cpp mne_description_parser_usage
  */
 struct FIFFSHARED_EXPORT RejectionParams
 {
@@ -102,6 +104,8 @@ struct FIFFSHARED_EXPORT RejectionParams
  * window (@c tmin / @c tmax), the optional baseline interval, and the
  * post-processing flags (baseline correction, std-error vs.\ average,
  * absolute values).
+ *
+ * @snippet ex_mne_api/main.cpp mne_description_parser_usage
  */
 struct FIFFSHARED_EXPORT AverageCategory
 {

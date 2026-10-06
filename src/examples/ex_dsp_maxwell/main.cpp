@@ -191,7 +191,8 @@ int main(int argc, char* argv[])
         chpi(meg[0], t) = std::sin(2.0 * kPi * 10.0 * t / sFreq) + std::sin(2.0 * kPi * 83.0 * t / sFreq);
     }
     const QVector<double> coilFreqs{83.0};
-    filterChpi(chpi, info, sFreq, coilFreqs); // notch every coil frequency on the MEG channels
+    FilterChpiParams chpiParams; // +-2 Hz order-4 notches on the MEG channels only
+    filterChpi(chpi, info, sFreq, coilFreqs, chpiParams);
     //! [filter_chpi_usage]
     double at10 = 0.0;
     double at83 = 0.0;

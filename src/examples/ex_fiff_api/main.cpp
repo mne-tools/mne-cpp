@@ -184,7 +184,8 @@ int main(int argc, char* argv[])
     //! [fiff_annotations_usage]
     MatrixXi firstThree = events.events.topRows(3);
     FiffAnnotations annotations = annotationsFromEvents(firstThree, info.sfreq, {{1, "auditory/left"}, {2, "auditory/right"}}, raw.first_samp);
-    annotations.append({0.5, 1.0, "BAD_blink", {}, {}, {}});
+    const FiffAnnotation blink{0.5, 1.0, "BAD_blink", {}, {}, {}}; // onset s, duration s, description, channels, ...
+    annotations.append(blink);
     FiffAnnotations::write(tmp.filePath("annot.csv"), annotations);
     const FiffAnnotations annotationsBack = FiffAnnotations::read(tmp.filePath("annot.csv"));
     const MatrixXi eventsAgain = eventsFromAnnotations(annotationsBack.select("auditory"), info.sfreq, {{"auditory/left", 1}, {"auditory/right", 2}}, raw.first_samp);

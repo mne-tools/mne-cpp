@@ -52,6 +52,8 @@ namespace BIDSLIB
  *
  * Each event represents a discrete occurrence during the recording, such as a
  * stimulus presentation, button press, or seizure onset.
+ *
+ * @snippet ex_bids/main.cpp bids_sidecar_records
  */
 struct BIDSSHARED_EXPORT BidsEvent
 {

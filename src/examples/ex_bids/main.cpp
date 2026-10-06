@@ -18,7 +18,11 @@
 // INCLUDES
 //=============================================================================================================
 
+#include <bids/bids_channel.h>
+#include <bids/bids_coordinate_system.h>
+#include <bids/bids_dataset_description.h>
 #include <bids/bids_electrode.h>
+#include <bids/bids_event.h>
 #include <bids/bids_path.h>
 #include <bids/bids_raw_data.h>
 #include <bids/bids_tsv.h>
@@ -101,6 +105,16 @@ int main(int argc, char* argv[])
     ok &= expect(headers == QStringList({"onset", "duration", "sample", "value", "trial_type"}) && rows.size() == 4 && rows[1]["trial_type"] == "response" && rows[3]["onset"] == "5.250000",
                  "BidsTsv reads the 5 event columns and 4 rows");
 
+    //! [bids_sidecar_records]
+    const BidsDatasetDescription description = BidsDatasetDescription::read(root + "/dataset_description.json");
+    const QList<BidsChannel> channels = BidsChannel::readTsv(channelsTsv);               // one row per channel
+    const QList<BidsEvent> events = BidsEvent::readTsv(ieeg.eventsTsvPath().filePath()); // onset, duration, sample, value, trial_type
+    const QList<BidsElectrode> electrodes = BidsElectrode::readTsv(ieeg.electrodesTsvPath().filePath());
+    const BidsCoordinateSystem coords = BidsCoordinateSystem::readJson(ieeg.coordsystemJsonPath().filePath());
+    //! [bids_sidecar_records]
+    ok &= expect(description.name == "MNE-CPP Test Dataset" && description.bidsVersion == "1.9.0" && channels.size() == 32 && channels[0].name == "FP1" && channels[0].units == "µV" && events.size() == 4 && events[3].sample == 5250 && events[3].value == 3 && events[3].trialType == "feedback" && electrodes.size() == 10 && electrodes[0].name == "FP1" && electrodes[0].x == "-0.0254" && coords.system == "ACPC" && coords.units == "m",
+                 "dataset_description, channels/events/electrodes.tsv and coordsystem.json read as written");
+
     //! [brain_vision_reader_usage]
     BrainVisionReader brainVision;
     const bool bvOpen = brainVision.open(vhdr);
@@ -109,6 +123,14 @@ int main(int argc, char* argv[])
     // mne.io.read_raw_brainvision: 32 channels at 1000 Hz, 7900 samples; data[0, 0] = -23.5 uV, data[5, 100] = 38.5 uV
     ok &= expect(bvOpen && brainVision.getChannelCount() == 32 && brainVision.getSampleCount() == 7900 && brainVision.getFrequency() == 1000.0f && near(bvHead(0, 0), -2.35e-5, 1e-4) && near(bvHead(5, 100), 3.85e-5, 1e-4),
                  QString("BrainVision: %1 x %2 samples, (0,0) = %3 V match mne").arg(brainVision.getChannelCount()).arg(brainVision.getSampleCount()).arg(bvHead(0, 0)));
+
+    //! [brain_vision_metadata]
+    const QVector<BrainVisionChannelInfo> bvChannels = brainVision.getChannelInfos(); // name, resolution, unit per Ch<n>= line
+    const QVector<BrainVisionMarker> markers = brainVision.getMarkers();              // Mk<n>= lines: type, description, 0-based position
+    //! [brain_vision_metadata]
+    // mne.io.read_raw_brainvision annotations: 13 after the "New Segment", first "Stimulus/S253" at 0.486 s
+    ok &= expect(bvChannels.size() == 32 && bvChannels[0].name == "FP1" && bvChannels[0].resolution == 0.5f && markers.size() == 14 && markers[1].type == "Stimulus" && markers[1].description == "S253" && markers[1].position == 486,
+                 QString("BrainVision metadata: %1 channels, %2 markers, S253 at sample %3 (mne 0.486 s)").arg(bvChannels.size()).arg(markers.size()).arg(markers.value(1).position));
 
     //! [edf_reader_usage]
     std::unique_ptr<AbstractFormatReader> edf = BidsRawData::createReader(".edf"); // or construct EDFReader directly
@@ -119,6 +141,13 @@ int main(int argc, char* argv[])
     // mne.io.read_raw_edf: 25 channels at 128 Hz, 1228 samples, first channel "EEG Fp1"; data[3, 200] = 0.1757724
     ok &= expect(edfOpen && dynamic_cast<EDFReader*>(edf.get()) != nullptr && edf->formatName() == "EDF" && edfInfo.nchan == 25 && edfInfo.ch_names.first() == "EEG Fp1" && edf->getSampleCount() == 1228 && near(edfHead(0, 0), 0.17594066, 1e-5) && near(edfHead(3, 200), 0.17577240650034331, 1e-5),
                  QString("EDF: %1 channels, %2 samples, (3,200) = %3 match mne").arg(edfInfo.nchan).arg(edf->getSampleCount()).arg(edfHead(3, 200), 0, 'g', 8));
+
+    //! [edf_channel_info]
+    const QVector<EDFChannelInfo> edfChannels = static_cast<EDFReader*>(edf.get())->getMeasurementChannelInfos(); // header fields per signal
+    //! [edf_channel_info]
+    // mne.io.read_raw_edf: physical_max of the first two signals 175946, -217624
+    ok &= expect(edfChannels.size() == 25 && edfChannels[0].label == "EEG Fp1" && edfChannels[0].physicalMax == 175946.0f && edfChannels[1].physicalMax == -217624.0f && edfChannels[0].frequency == 128.0f,
+                 QString("EDF header: %1 signals, %2 physical max %3").arg(edfChannels.size()).arg(edfChannels.value(0).label).arg(edfChannels.value(0).physicalMax));
 
     //! [bids_raw_data_read]
     BidsRawData data = BidsRawData::read(ieeg); // raw data plus channels, events, electrodes and sidecar metadata

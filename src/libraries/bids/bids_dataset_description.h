@@ -54,6 +54,8 @@ namespace BIDSLIB
  *
  * Every BIDS dataset must contain a dataset_description.json at its root.
  * This struct captures the required and recommended fields.
+ *
+ * @snippet ex_bids/main.cpp bids_sidecar_records
  */
 struct BIDSSHARED_EXPORT BidsDatasetDescription
 {

@@ -16,26 +16,12 @@
     "Settings": "Plain parameter record consumed by an algorithm class; shown inside that class's example."
   },
   "example_debt": {
-    "ceiling": 41,
+    "ceiling": 26,
     "names": [
-      "ArtifactDetectEcgParams",
-      "ArtifactDetectEogParams",
       "ArtifactRejectionData",
-      "AverageCategory",
-      "BidsChannel",
-      "BidsCoordinateSystem",
-      "BidsDatasetDescription",
-      "BidsElectrode",
-      "BidsEvent",
-      "BrainVisionChannelInfo",
-      "BrainVisionMarker",
-      "BridgedElectrodeParams",
       "CovDefinition",
       "CovDescription",
       "DigitizedPoint",
-      "EDFChannelInfo",
-      "FiffAnnotation",
-      "FilterChpiParams",
       "InvConnectivity",
       "InvFocalDipole",
       "InvSourceCoupling",
@@ -56,7 +42,6 @@
       "Pair",
       "PickResult",
       "PolhemusSerialConfig",
-      "RejectionParams",
       "ReportSection",
       "VisualizationInfo"
     ]

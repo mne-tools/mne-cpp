@@ -55,6 +55,8 @@ namespace FIFFLIB
  * Field-for-field counterpart of one row of @c mne.Annotations in
  * MNE-Python. Onset is given in seconds relative to the recording start
  * (matching the @c first_samp / @c sfreq convention of @ref FiffRawData).
+ *
+ * @snippet ex_fiff_api/main.cpp fiff_annotations_usage
  */
 struct FIFFSHARED_EXPORT FiffAnnotation
 {

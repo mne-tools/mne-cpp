@@ -60,6 +60,8 @@ namespace BIDSLIB
 //=============================================================================================================
 /**
  * @brief Marker entry from the .vmrk file.
+ *
+ * @snippet ex_bids/main.cpp brain_vision_metadata
  */
 struct BIDSSHARED_EXPORT BrainVisionMarker
 {
@@ -74,6 +76,8 @@ struct BIDSSHARED_EXPORT BrainVisionMarker
 //=============================================================================================================
 /**
  * @brief Channel info from the .vhdr header.
+ *
+ * @snippet ex_bids/main.cpp brain_vision_metadata
  */
 struct BIDSSHARED_EXPORT BrainVisionChannelInfo
 {

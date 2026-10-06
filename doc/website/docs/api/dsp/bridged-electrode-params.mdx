@@ -17,7 +17,17 @@ struct UTILSLIB::BridgedElectrodeParams
 
 Parameters for bridged electrode detection.
 
+```cpp title="src/examples/ex_dsp_artifacts/main.cpp"
+BridgedElectrodeParams bridging; // electrical distance below 0.3 flags a pair
+const QList<QPair<int, int>> bridged = computeBridgedElectrodes(data, info, bridging);
+```
+
 ---
+
+## Example
+
+- Full source: [`src/examples/ex_dsp_artifacts/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_dsp_artifacts/main.cpp)
+- Build target: `ex_dsp_artifacts` (runs under CTest)
 
 ## Authors of this file
 

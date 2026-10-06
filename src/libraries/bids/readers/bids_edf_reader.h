@@ -58,6 +58,8 @@ namespace BIDSLIB
 //=============================================================================================================
 /**
  * @brief Channel-level metadata from the EDF header.
+ *
+ * @snippet ex_bids/main.cpp edf_channel_info
  */
 struct BIDSSHARED_EXPORT EDFChannelInfo
 {

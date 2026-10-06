@@ -17,6 +17,14 @@ struct BIDSLIB::BidsElectrode
 
 Electrode position record corresponding to one row in *_electrodes.tsv.
 
+```cpp title="src/examples/ex_bids/main.cpp"
+const BidsDatasetDescription description = BidsDatasetDescription::read(root + "/dataset_description.json");
+const QList<BidsChannel> channels = BidsChannel::readTsv(channelsTsv);               // one row per channel
+const QList<BidsEvent> events = BidsEvent::readTsv(ieeg.eventsTsvPath().filePath()); // onset, duration, sample, value, trial_type
+const QList<BidsElectrode> electrodes = BidsElectrode::readTsv(ieeg.electrodesTsvPath().filePath());
+const BidsCoordinateSystem coords = BidsCoordinateSystem::readJson(ieeg.coordsystemJsonPath().filePath());
+```
+
 ---
 
 ## Static Methods
@@ -75,6 +83,11 @@ If a coordinate transform is supplied, the positions are transformed from the BI
 - *[FiffDigPointSet](/docs/api/fiff/fiff-dig-point-set)* — FiffDigPointSet with one point per valid electrode.
 
 ---
+
+## Example
+
+- Full source: [`src/examples/ex_bids/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_bids/main.cpp)
+- Build target: `ex_bids` (runs under CTest)
 
 ## Authors of this file
 

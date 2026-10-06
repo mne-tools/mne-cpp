@@ -66,6 +66,8 @@ namespace UTILSLIB
 //=============================================================================================================
 /**
  * Parameters for bridged electrode detection.
+ *
+ * @snippet ex_dsp_artifacts/main.cpp bridged_electrodes_usage
  */
 struct DSPSHARED_EXPORT BridgedElectrodeParams
 {

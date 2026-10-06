@@ -64,6 +64,8 @@ namespace BIDSLIB
  * @brief Coordinate system metadata from *_coordsystem.json.
  *
  * Describes the spatial reference frame used for electrode positions.
+ *
+ * @snippet ex_bids/main.cpp bids_sidecar_records
  */
 struct BIDSSHARED_EXPORT BidsCoordinateSystem
 {

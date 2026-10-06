@@ -17,7 +17,19 @@ struct UTILSLIB::ArtifactDetectEogParams
 
 EOG blink / saccade detection parameters (defined outside class to avoid Clang/GCC default-argument issues with nested structs).
 
+```cpp title="src/examples/ex_dsp_artifacts/main.cpp"
+ArtifactDetect::EcgParams ecg;                                                  // 5-40 Hz band-pass, R peaks at least 0.35 s apart
+ArtifactDetect::EogParams eog;                                                  // 10 Hz low-pass, +-150 uV
+const QVector<int> beats = ArtifactDetect::detectEcg(data, info, kSFreq, ecg);  // R-peak samples on the ECG channel
+const QVector<int> blinks = ArtifactDetect::detectEog(data, info, kSFreq, eog); // blink onsets on the EOG channel
+```
+
 ---
+
+## Example
+
+- Full source: [`src/examples/ex_dsp_artifacts/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_dsp_artifacts/main.cpp)
+- Build target: `ex_dsp_artifacts` (runs under CTest)
 
 ## Authors of this file
 

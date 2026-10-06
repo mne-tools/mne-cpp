@@ -19,7 +19,23 @@ One FIFF / [MNE](/docs/api/mne/mne-class) annotation: onset (s), duration (s) an
 
 Field-for-field counterpart of one row of `mne.Annotations` in MNE-Python. Onset is given in seconds relative to the recording start (matching the `first_samp` / `sfreq` convention of [`FiffRawData`](/docs/api/fiff/fiff-raw-data)).
 
+```cpp title="src/examples/ex_fiff_api/main.cpp"
+MatrixXi firstThree = events.events.topRows(3);
+FiffAnnotations annotations = annotationsFromEvents(firstThree, info.sfreq, {{1, "auditory/left"}, {2, "auditory/right"}}, raw.first_samp);
+const FiffAnnotation blink{0.5, 1.0, "BAD_blink", {}, {}, {}}; // onset s, duration s, description, channels, ...
+annotations.append(blink);
+FiffAnnotations::write(tmp.filePath("annot.csv"), annotations);
+const FiffAnnotations annotationsBack = FiffAnnotations::read(tmp.filePath("annot.csv"));
+const MatrixXi eventsAgain = eventsFromAnnotations(annotationsBack.select("auditory"), info.sfreq, {{"auditory/left", 1}, {"auditory/right", 2}}, raw.first_samp);
+```
+
 ---
+
+## Example
+
+- Full source: [`src/examples/ex_fiff_api/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_fiff_api/main.cpp)
+- Build target: `ex_fiff_api` (runs under CTest)
+- Data: [mne-cpp-test-data](https://github.com/mne-tools/mne-cpp-test-data)
 
 ## Authors of this file
 

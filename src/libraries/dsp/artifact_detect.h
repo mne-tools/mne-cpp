@@ -48,7 +48,11 @@ namespace UTILSLIB
 {
 
 //=============================================================================================================
-/** @brief ECG R-peak detection parameters (defined outside class to avoid Clang/GCC default-argument issues with nested structs). */
+/**
+ * @brief ECG R-peak detection parameters (defined outside class to avoid Clang/GCC default-argument issues with nested structs).
+ *
+ * @snippet ex_dsp_artifacts/main.cpp artifact_detect_usage
+ */
 struct DSPSHARED_EXPORT ArtifactDetectEcgParams
 {
     double dFilterLow = 5.0;    /**< Bandpass lower cutoff (Hz). */
@@ -59,7 +63,11 @@ struct DSPSHARED_EXPORT ArtifactDetectEcgParams
 };
 
 //=============================================================================================================
-/** @brief EOG blink / saccade detection parameters (defined outside class to avoid Clang/GCC default-argument issues with nested structs). */
+/**
+ * @brief EOG blink / saccade detection parameters (defined outside class to avoid Clang/GCC default-argument issues with nested structs).
+ *
+ * @snippet ex_dsp_artifacts/main.cpp artifact_detect_usage
+ */
 struct DSPSHARED_EXPORT ArtifactDetectEogParams
 {
     double dFilterHigh = 10.0;   /**< Low-pass cutoff (Hz). */

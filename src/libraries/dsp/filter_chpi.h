@@ -56,6 +56,8 @@ namespace UTILSLIB
 //=============================================================================================================
 /**
  * @brief Parameters for cHPI notch filtering.
+ *
+ * @snippet ex_dsp_maxwell/main.cpp filter_chpi_usage
  */
 struct DSPSHARED_EXPORT FilterChpiParams
 {

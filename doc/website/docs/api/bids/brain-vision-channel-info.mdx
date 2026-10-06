@@ -17,6 +17,11 @@ struct BIDSLIB::BrainVisionChannelInfo
 
 Channel info from the .vhdr header.
 
+```cpp title="src/examples/ex_bids/main.cpp"
+const QVector<BrainVisionChannelInfo> bvChannels = brainVision.getChannelInfos(); // name, resolution, unit per Ch<n>= line
+const QVector<BrainVisionMarker> markers = brainVision.getMarkers();              // Mk<n>= lines: type, description, 0-based position
+```
+
 ---
 
 ## Public Methods
@@ -24,6 +29,11 @@ Channel info from the .vhdr header.
 ### toFiffChInfo()
 
 ---
+
+## Example
+
+- Full source: [`src/examples/ex_bids/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_bids/main.cpp)
+- Build target: `ex_bids` (runs under CTest)
 
 ## Authors of this file
 

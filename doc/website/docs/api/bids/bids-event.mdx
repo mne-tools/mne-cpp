@@ -19,6 +19,14 @@ Single event annotation, typically parsed from or written to *_events.tsv.
 
 Each event represents a discrete occurrence during the recording, such as a stimulus presentation, button press, or seizure onset.
 
+```cpp title="src/examples/ex_bids/main.cpp"
+const BidsDatasetDescription description = BidsDatasetDescription::read(root + "/dataset_description.json");
+const QList<BidsChannel> channels = BidsChannel::readTsv(channelsTsv);               // one row per channel
+const QList<BidsEvent> events = BidsEvent::readTsv(ieeg.eventsTsvPath().filePath()); // onset, duration, sample, value, trial_type
+const QList<BidsElectrode> electrodes = BidsElectrode::readTsv(ieeg.electrodesTsvPath().filePath());
+const BidsCoordinateSystem coords = BidsCoordinateSystem::readJson(ieeg.coordsystemJsonPath().filePath());
+```
+
 ---
 
 ## Static Methods
@@ -57,6 +65,11 @@ Write a BIDS *_events.tsv file.
 - *bool* — true on success.
 
 ---
+
+## Example
+
+- Full source: [`src/examples/ex_bids/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_bids/main.cpp)
+- Build target: `ex_bids` (runs under CTest)
 
 ## Authors of this file
 

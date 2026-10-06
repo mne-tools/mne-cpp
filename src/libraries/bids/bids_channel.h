@@ -50,6 +50,8 @@ namespace BIDSLIB
 //=============================================================================================================
 /**
  * @brief Channel metadata record corresponding to one row in *_channels.tsv.
+ *
+ * @snippet ex_bids/main.cpp bids_sidecar_records
  */
 struct BIDSSHARED_EXPORT BidsChannel
 {

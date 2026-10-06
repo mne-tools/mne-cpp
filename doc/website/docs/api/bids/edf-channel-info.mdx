@@ -17,6 +17,10 @@ struct BIDSLIB::EDFChannelInfo
 
 Channel-level metadata from the EDF header.
 
+```cpp title="src/examples/ex_bids/main.cpp"
+const QVector<EDFChannelInfo> edfChannels = static_cast<EDFReader*>(edf.get())->getMeasurementChannelInfos(); // header fields per signal
+```
+
 ---
 
 ## Public Methods
@@ -24,6 +28,11 @@ Channel-level metadata from the EDF header.
 ### toFiffChInfo()
 
 ---
+
+## Example
+
+- Full source: [`src/examples/ex_bids/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_bids/main.cpp)
+- Build target: `ex_bids` (runs under CTest)
 
 ## Authors of this file
 

@@ -37,6 +37,8 @@ descFile.write("average {\n"
 descFile.close();
 AverageDescription averaging;
 MNEDescriptionParser::parseAverageFile(aveDesc, averaging);
+const AverageCategory& leftCategory = averaging.categories.first(); // name, events, tmin/tmax, baseline
+const RejectionParams& rejection = averaging.rej;                   // MNE-C defaults unless the file sets them (EEG 100 uV, ...)
 QString log;
 const FiffEvokedSet averages = FiffEvokedSet::computeAverages(raw, averaging, events.events, log);
 ```

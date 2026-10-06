@@ -134,8 +134,10 @@ int main(int argc, char* argv[])
     data.row(7) = data.row(6) + 0.1e-6 * MatrixXd::NullaryExpr(1, n, [&]() { return noise(gen); }); // bridged pair
 
     //! [artifact_detect_usage]
-    const QVector<int> beats = ArtifactDetect::detectEcg(data, info, kSFreq);  // R-peak samples on the ECG channel
-    const QVector<int> blinks = ArtifactDetect::detectEog(data, info, kSFreq); // onsets above +-150 uV on the EOG channel
+    ArtifactDetect::EcgParams ecg;                                                  // 5-40 Hz band-pass, R peaks at least 0.35 s apart
+    ArtifactDetect::EogParams eog;                                                  // 10 Hz low-pass, +-150 uV
+    const QVector<int> beats = ArtifactDetect::detectEcg(data, info, kSFreq, ecg);  // R-peak samples on the ECG channel
+    const QVector<int> blinks = ArtifactDetect::detectEog(data, info, kSFreq, eog); // blink onsets on the EOG channel
     //! [artifact_detect_usage]
     ok &= expect(beats.size() == 12 && std::abs(beats[0] - 100) <= 2 && std::abs(beats[1] - beats[0] - 200) <= 2,
                  QString("ECG: %1 beats, first at sample %2 (12 beats every 200 samples from 100)").arg(beats.size()).arg(beats.value(0)));
@@ -168,7 +170,8 @@ int main(int argc, char* argv[])
                  QString("LOF scores = sklearn (far point %1); %2 EEG channel(s) flagged").arg(lofScores(5)).arg(lofBad.size()));
 
     //! [bridged_electrodes_usage]
-    const QList<QPair<int, int>> bridged = computeBridgedElectrodes(data, info);
+    BridgedElectrodeParams bridging; // electrical distance below 0.3 flags a pair
+    const QList<QPair<int, int>> bridged = computeBridgedElectrodes(data, info, bridging);
     //! [bridged_electrodes_usage]
     ok &= expect(bridged.size() == 1 && bridged[0] == qMakePair(6, 7),
                  QString("bridged electrodes: %1 pair(s), first %2-%3 (6-7)").arg(bridged.size()).arg(bridged.value(0).first).arg(bridged.value(0).second));

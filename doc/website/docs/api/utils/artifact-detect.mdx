@@ -18,8 +18,10 @@ class UTILSLIB::ArtifactDetect
 ECG and EOG physiological artifact event detection.
 
 ```cpp title="src/examples/ex_dsp_artifacts/main.cpp"
-const QVector<int> beats = ArtifactDetect::detectEcg(data, info, kSFreq);  // R-peak samples on the ECG channel
-const QVector<int> blinks = ArtifactDetect::detectEog(data, info, kSFreq); // onsets above +-150 uV on the EOG channel
+ArtifactDetect::EcgParams ecg;                                                  // 5-40 Hz band-pass, R peaks at least 0.35 s apart
+ArtifactDetect::EogParams eog;                                                  // 10 Hz low-pass, +-150 uV
+const QVector<int> beats = ArtifactDetect::detectEcg(data, info, kSFreq, ecg);  // R-peak samples on the ECG channel
+const QVector<int> blinks = ArtifactDetect::detectEog(data, info, kSFreq, eog); // blink onsets on the EOG channel
 ```
 
 ---

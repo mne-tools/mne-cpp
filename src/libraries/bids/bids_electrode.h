@@ -62,6 +62,8 @@ namespace BIDSLIB
 //=============================================================================================================
 /**
  * @brief Electrode position record corresponding to one row in *_electrodes.tsv.
+ *
+ * @snippet ex_bids/main.cpp bids_sidecar_records
  */
 struct BIDSSHARED_EXPORT BidsElectrode
 {

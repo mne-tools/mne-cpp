@@ -12,16 +12,16 @@
     "registered_stale": 0,
     "registered_with_test": 102,
     "registered_test_unresolved": 0,
-    "registered_with_example": 319,
+    "registered_with_example": 334,
     "registered_example_not_built": 0,
     "registered_with_python_equiv": 89,
     "registered_without_api_page": 0,
-    "with_snippet": 353,
+    "with_snippet": 358,
     "public_api_units": 507,
     "example_eligible": 372,
     "example_exempt": 135,
-    "eligible_backed_by_registry_example": 319,
-    "eligible_used_by_some_example": 332,
+    "eligible_backed_by_registry_example": 334,
+    "eligible_used_by_some_example": 336,
     "examples_on_disk": 68,
     "examples_built": 68
   },
@@ -31,9 +31,9 @@
       "registered": 14,
       "with_test": 2,
       "eligible": 14,
-      "eligible_with_registry_example": 6,
-      "eligible_used_by_example": 10,
-      "with_snippet": 9
+      "eligible_with_registry_example": 14,
+      "eligible_used_by_example": 14,
+      "with_snippet": 14
     },
     "com": {
       "public": 7,
@@ -85,7 +85,7 @@
       "registered": 84,
       "with_test": 28,
       "eligible": 80,
-      "eligible_with_registry_example": 76,
+      "eligible_with_registry_example": 80,
       "eligible_used_by_example": 80,
       "with_snippet": 84
     },
@@ -94,7 +94,7 @@
       "registered": 38,
       "with_test": 10,
       "eligible": 37,
-      "eligible_with_registry_example": 34,
+      "eligible_with_registry_example": 37,
       "eligible_used_by_example": 35,
       "with_snippet": 37
     },
@@ -781,10 +781,14 @@
       "registry_status": "documented",
       "test": null,
       "test_resolves": false,
-      "example": null,
-      "example_state": "none",
-      "including_examples": [],
-      "snippets": [],
+      "example": "ex_bids",
+      "example_state": "built",
+      "including_examples": [
+        "ex_bids"
+      ],
+      "snippets": [
+        "ex_bids/main.cpp#bids_sidecar_records"
+      ],
       "api_page": "doc/website/docs/api/bids/bids-channel.mdx",
       "python_equiv": null,
       "example_eligible": true,
@@ -800,10 +804,14 @@
       "registry_status": "documented",
       "test": null,
       "test_resolves": false,
-      "example": null,
-      "example_state": "none",
-      "including_examples": [],
-      "snippets": [],
+      "example": "ex_bids",
+      "example_state": "built",
+      "including_examples": [
+        "ex_bids"
+      ],
+      "snippets": [
+        "ex_bids/main.cpp#bids_sidecar_records"
+      ],
       "api_page": "doc/website/docs/api/bids/bids-coordinate-system.mdx",
       "python_equiv": null,
       "example_eligible": true,
@@ -819,10 +827,14 @@
       "registry_status": "documented",
       "test": null,
       "test_resolves": false,
-      "example": null,
-      "example_state": "none",
-      "including_examples": [],
-      "snippets": [],
+      "example": "ex_bids",
+      "example_state": "built",
+      "including_examples": [
+        "ex_bids"
+      ],
+      "snippets": [
+        "ex_bids/main.cpp#bids_sidecar_records"
+      ],
       "api_page": "doc/website/docs/api/bids/bids-dataset-description.mdx",
       "python_equiv": null,
       "example_eligible": true,
@@ -838,12 +850,14 @@
       "registry_status": "documented",
       "test": null,
       "test_resolves": false,
-      "example": null,
-      "example_state": "none",
+      "example": "ex_bids",
+      "example_state": "built",
       "including_examples": [
         "ex_bids"
       ],
-      "snippets": [],
+      "snippets": [
+        "ex_bids/main.cpp#bids_sidecar_records"
+      ],
       "api_page": "doc/website/docs/api/bids/bids-electrode.mdx",
       "python_equiv": null,
       "example_eligible": true,
@@ -859,10 +873,14 @@
       "registry_status": "documented",
       "test": null,
       "test_resolves": false,
-      "example": null,
-      "example_state": "none",
-      "including_examples": [],
-      "snippets": [],
+      "example": "ex_bids",
+      "example_state": "built",
+      "including_examples": [
+        "ex_bids"
+      ],
+      "snippets": [
+        "ex_bids/main.cpp#bids_sidecar_records"
+      ],
       "api_page": "doc/website/docs/api/bids/bids-event.mdx",
       "python_equiv": null,
       "example_eligible": true,
@@ -971,12 +989,14 @@
       "registry_status": "documented",
       "test": null,
       "test_resolves": false,
-      "example": null,
-      "example_state": "none",
+      "example": "ex_bids",
+      "example_state": "built",
       "including_examples": [
         "ex_bids"
       ],
       "snippets": [
+        "ex_bids/main.cpp#brain_vision_metadata",
+        "ex_bids/main.cpp#brain_vision_metadata",
         "ex_bids/main.cpp#brain_vision_reader_usage"
       ],
       "api_page": "doc/website/docs/api/bids/brain-vision-channel-info.mdx",
@@ -994,12 +1014,14 @@
       "registry_status": "documented",
       "test": null,
       "test_resolves": false,
-      "example": null,
-      "example_state": "none",
+      "example": "ex_bids",
+      "example_state": "built",
       "including_examples": [
         "ex_bids"
       ],
       "snippets": [
+        "ex_bids/main.cpp#brain_vision_metadata",
+        "ex_bids/main.cpp#brain_vision_metadata",
         "ex_bids/main.cpp#brain_vision_reader_usage"
       ],
       "api_page": "doc/website/docs/api/bids/brain-vision-marker.mdx",
@@ -1023,6 +1045,8 @@
         "ex_bids"
       ],
       "snippets": [
+        "ex_bids/main.cpp#brain_vision_metadata",
+        "ex_bids/main.cpp#brain_vision_metadata",
         "ex_bids/main.cpp#brain_vision_reader_usage"
       ],
       "api_page": "doc/website/docs/api/bids/brain-vision-reader.mdx",
@@ -1040,12 +1064,13 @@
       "registry_status": "documented",
       "test": null,
       "test_resolves": false,
-      "example": null,
-      "example_state": "none",
+      "example": "ex_bids",
+      "example_state": "built",
       "including_examples": [
         "ex_bids"
       ],
       "snippets": [
+        "ex_bids/main.cpp#edf_channel_info",
         "ex_bids/main.cpp#edf_reader_usage"
       ],
       "api_page": "doc/website/docs/api/bids/edf-channel-info.mdx",
@@ -1069,6 +1094,7 @@
         "ex_bids"
       ],
       "snippets": [
+        "ex_bids/main.cpp#edf_channel_info",
         "ex_bids/main.cpp#edf_reader_usage"
       ],
       "api_page": "doc/website/docs/api/bids/edf-reader.mdx",
@@ -4264,6 +4290,8 @@
         "ex_dsp_artifacts"
       ],
       "snippets": [
+        "ex_dsp_artifacts/main.cpp#artifact_detect_usage",
+        "ex_dsp_artifacts/main.cpp#artifact_detect_usage",
         "ex_dsp_artifacts/main.cpp#artifact_detect_usage"
       ],
       "api_page": "doc/website/docs/api/utils/artifact-detect.mdx",
@@ -4281,12 +4309,14 @@
       "registry_status": "documented",
       "test": null,
       "test_resolves": false,
-      "example": null,
-      "example_state": "none",
+      "example": "ex_dsp_artifacts",
+      "example_state": "built",
       "including_examples": [
         "ex_dsp_artifacts"
       ],
       "snippets": [
+        "ex_dsp_artifacts/main.cpp#artifact_detect_usage",
+        "ex_dsp_artifacts/main.cpp#artifact_detect_usage",
         "ex_dsp_artifacts/main.cpp#artifact_detect_usage"
       ],
       "api_page": "doc/website/docs/api/utils/artifact-detect-ecg-params.mdx",
@@ -4304,12 +4334,14 @@
       "registry_status": "documented",
       "test": null,
       "test_resolves": false,
-      "example": null,
-      "example_state": "none",
+      "example": "ex_dsp_artifacts",
+      "example_state": "built",
       "including_examples": [
         "ex_dsp_artifacts"
       ],
       "snippets": [
+        "ex_dsp_artifacts/main.cpp#artifact_detect_usage",
+        "ex_dsp_artifacts/main.cpp#artifact_detect_usage",
         "ex_dsp_artifacts/main.cpp#artifact_detect_usage"
       ],
       "api_page": "doc/website/docs/api/utils/artifact-detect-eog-params.mdx",
@@ -4498,12 +4530,13 @@
       "registry_status": "documented",
       "test": null,
       "test_resolves": false,
-      "example": null,
-      "example_state": "none",
+      "example": "ex_dsp_artifacts",
+      "example_state": "built",
       "including_examples": [
         "ex_dsp_artifacts"
       ],
       "snippets": [
+        "ex_dsp_artifacts/main.cpp#bridged_electrodes_usage",
         "ex_dsp_artifacts/main.cpp#bridged_electrodes_usage"
       ],
       "api_page": "doc/website/docs/api/dsp/bridged-electrode-params.mdx",
@@ -4527,6 +4560,7 @@
         "ex_dsp_artifacts"
       ],
       "snippets": [
+        "ex_dsp_artifacts/main.cpp#bridged_electrodes_usage",
         "ex_dsp_artifacts/main.cpp#bridged_electrodes_usage"
       ],
       "api_page": "doc/website/docs/api/dsp/bridged-electrodes.mdx",
@@ -4882,6 +4916,7 @@
         "ex_dsp_maxwell"
       ],
       "snippets": [
+        "ex_dsp_maxwell/main.cpp#filter_chpi_usage",
         "ex_dsp_maxwell/main.cpp#filter_chpi_usage"
       ],
       "api_page": "doc/website/docs/api/dsp/filter-chpi.mdx",
@@ -4899,12 +4934,13 @@
       "registry_status": "documented",
       "test": null,
       "test_resolves": false,
-      "example": null,
-      "example_state": "none",
+      "example": "ex_dsp_maxwell",
+      "example_state": "built",
       "including_examples": [
         "ex_dsp_maxwell"
       ],
       "snippets": [
+        "ex_dsp_maxwell/main.cpp#filter_chpi_usage",
         "ex_dsp_maxwell/main.cpp#filter_chpi_usage"
       ],
       "api_page": "doc/website/docs/api/dsp/filter-chpi-params.mdx",
@@ -6274,13 +6310,14 @@
       "registry_status": "documented",
       "test": null,
       "test_resolves": false,
-      "example": null,
-      "example_state": "none",
+      "example": "ex_fiff_api",
+      "example_state": "built",
       "including_examples": [
         "ex_dsp_artifacts",
         "ex_fiff_api"
       ],
       "snippets": [
+        "ex_fiff_api/main.cpp#fiff_annotations_usage",
         "ex_fiff_api/main.cpp#fiff_annotations_usage"
       ],
       "api_page": "doc/website/docs/api/fiff/fiff-annotation.mdx",
@@ -6305,6 +6342,7 @@
         "ex_fiff_api"
       ],
       "snippets": [
+        "ex_fiff_api/main.cpp#fiff_annotations_usage",
         "ex_fiff_api/main.cpp#fiff_annotations_usage"
       ],
       "api_page": "doc/website/docs/api/fiff/fiff-annotations.mdx",
@@ -6720,8 +6758,8 @@
       "registry_status": "documented",
       "test": null,
       "test_resolves": false,
-      "example": null,
-      "example_state": "none",
+      "example": "ex_mne_api",
+      "example_state": "built",
       "including_examples": [
         "ex_dsp_rt",
         "ex_fiff_api",
@@ -6730,6 +6768,8 @@
         "ex_mne_api"
       ],
       "snippets": [
+        "ex_mne_api/main.cpp#mne_description_parser_usage",
+        "ex_mne_api/main.cpp#mne_description_parser_usage",
         "ex_mne_api/main.cpp#mne_description_parser_usage",
         "ex_fiff_api/main.cpp#fiff_evoked_set_usage"
       ],
@@ -6759,6 +6799,8 @@
       ],
       "snippets": [
         "ex_mne_api/main.cpp#mne_description_parser_usage",
+        "ex_mne_api/main.cpp#mne_description_parser_usage",
+        "ex_mne_api/main.cpp#mne_description_parser_usage",
         "ex_fiff_api/main.cpp#fiff_evoked_set_usage"
       ],
       "api_page": "doc/website/docs/api/fiff/average-description.mdx",
@@ -6787,6 +6829,8 @@
       ],
       "snippets": [
         "ex_mne_api/main.cpp#mne_description_parser_usage",
+        "ex_mne_api/main.cpp#mne_description_parser_usage",
+        "ex_mne_api/main.cpp#mne_description_parser_usage",
         "ex_fiff_api/main.cpp#fiff_evoked_set_usage"
       ],
       "api_page": "doc/website/docs/api/fiff/fiff-evoked-set.mdx",
@@ -6804,8 +6848,8 @@
       "registry_status": "documented",
       "test": null,
       "test_resolves": false,
-      "example": null,
-      "example_state": "none",
+      "example": "ex_mne_api",
+      "example_state": "built",
       "including_examples": [
         "ex_dsp_rt",
         "ex_fiff_api",
@@ -6814,6 +6858,8 @@
         "ex_mne_api"
       ],
       "snippets": [
+        "ex_mne_api/main.cpp#mne_description_parser_usage",
+        "ex_mne_api/main.cpp#mne_description_parser_usage",
         "ex_mne_api/main.cpp#mne_description_parser_usage",
         "ex_fiff_api/main.cpp#fiff_evoked_set_usage"
       ],

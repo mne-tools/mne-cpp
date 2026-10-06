@@ -342,11 +342,13 @@ int main(int argc, char* argv[])
     descFile.close();
     AverageDescription averaging;
     MNEDescriptionParser::parseAverageFile(aveDesc, averaging);
+    const AverageCategory& leftCategory = averaging.categories.first(); // name, events, tmin/tmax, baseline
+    const RejectionParams& rejection = averaging.rej;                   // MNE-C defaults unless the file sets them (EEG 100 uV, ...)
     QString log;
     const FiffEvokedSet averages = FiffEvokedSet::computeAverages(raw, averaging, events.events, log);
     //! [mne_description_parser_usage]
     // mne.Epochs(event_id=1, tmin=-0.1, tmax=0.3, baseline=(-0.1, 0)).average(): 6 epochs, |MEG| 2.01258e-13, EEG 001 at 0 s 7.77233e-10
-    const bool averaged = averaging.categories.size() == 1 && averaging.categories[0].doBaseline && averages.evoked.size() == 1;
+    const bool averaged = averaging.categories.size() == 1 && leftCategory.doBaseline && leftCategory.comment == "Left Auditory" && leftCategory.events == QVector<unsigned int>{1} && rejection.eegReject == 100e-6f && averages.evoked.size() == 1;
     ok &= expect(averaged && averages.evoked[0].nave == 6 && averages.evoked[0].data.cols() == 121 && near(averages.evoked[0].data.topRows(306).norm(), 2.0125814419559757e-13, 1e-5) && near(averages.evoked[0].data(315, 30), 7.77233498919796e-10, 1e-5),
                  "MNEDescriptionParser: an .ave description averages like mne.Epochs with a baseline");
 

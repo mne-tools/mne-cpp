@@ -19,7 +19,37 @@ Artifact-rejection thresholds for the MNE-C batch averaging pipeline (gradiomete
 
 Field-for-field port of `rejDataRec` from MNE-C `browser_types.h`. Used by [`AverageDescription`](/docs/api/fiff/average-description) to drive `mne_process_raw's` peak-to-peak and flatness rejection when computing batch evokeds; the default values match the MNE-C defaults so existing "ave description" files keep producing identical results.
 
+```cpp title="src/examples/ex_mne_api/main.cpp"
+// An MNE-C averaging description (mne_process_raw --ave), parsed and run on the raw recording
+const QString aveDesc = tmp.filePath("audvis.ave");
+QFile descFile(aveDesc);
+ok &= descFile.open(QIODevice::WriteOnly | QIODevice::Text);
+descFile.write("average {\n"
+               "    category {\n"
+               "        name   \"Left Auditory\"\n"
+               "        event  1\n"
+               "        tmin   -0.1\n"
+               "        tmax   0.3\n"
+               "        bmin   -0.1\n"
+               "        bmax   0.0\n"
+               "    }\n"
+               "}\n");
+descFile.close();
+AverageDescription averaging;
+MNEDescriptionParser::parseAverageFile(aveDesc, averaging);
+const AverageCategory& leftCategory = averaging.categories.first(); // name, events, tmin/tmax, baseline
+const RejectionParams& rejection = averaging.rej;                   // MNE-C defaults unless the file sets them (EEG 100 uV, ...)
+QString log;
+const FiffEvokedSet averages = FiffEvokedSet::computeAverages(raw, averaging, events.events, log);
+```
+
 ---
+
+## Example
+
+- Full source: [`src/examples/ex_mne_api/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_mne_api/main.cpp)
+- Build target: `ex_mne_api` (runs under CTest)
+- Data: [mne-cpp-test-data](https://github.com/mne-tools/mne-cpp-test-data)
 
 ## Authors of this file
 

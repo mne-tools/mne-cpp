@@ -28,7 +28,8 @@ Two EEG electrodes are said to be bridged when conductive paste, sweat or skin a
 The implementation operates on the raw broadband signal; no rereferencing or filtering is required up-front. Output is a list of ``(i, j) channel- index pairs that the caller can mark bad, interpolate, or pass into the SSS bad-channel set.
 
 ```cpp title="src/examples/ex_dsp_artifacts/main.cpp"
-const QList<QPair<int, int>> bridged = computeBridgedElectrodes(data, info);
+BridgedElectrodeParams bridging; // electrical distance below 0.3 flags a pair
+const QList<QPair<int, int>> bridged = computeBridgedElectrodes(data, info, bridging);
 ```
 
 ---
