@@ -56,6 +56,8 @@ namespace MNALIB
 //=============================================================================================================
 /**
  * Groups files belonging to one recording run.
+ *
+ * @snippet ex_mna/main.cpp mna_project_files
  */
 struct MNASHARED_EXPORT MnaRecording
 {

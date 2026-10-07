@@ -40,8 +40,13 @@
 #include "mna_graph.h"
 #include "mna_op_registry.h"
 
+#include <QCryptographicHash>
 #include <QDir>
+#include <QElapsedTimer>
+#include <QSysInfo>
 #include <QTemporaryFile>
+
+#include <algorithm>
 #ifndef WASMBUILD
 #include <QProcess>
 #endif
@@ -87,27 +92,9 @@ MnaGraphExecutor::Context MnaGraphExecutor::execute(MnaGraph& graph,
             s_progressCallback(nodeId, i + 1, total);
         }
 
-        MnaNode& n = graph.node(nodeId);
-
-        // Gather inputs from upstream results
-        QVariantMap inputs;
-        for (const MnaPort& p : n.inputs) {
-            if (!p.sourceNodeId.isEmpty()) {
-                QString key = p.sourceNodeId + QStringLiteral("::") + p.sourcePortName;
-                inputs.insert(p.name, ctx.results.value(key));
-            }
+        if (!runNode(graph, graph.node(nodeId), ctx)) {
+            break;
         }
-
-        // Execute the node
-        QVariantMap outputs = executeNode(n, inputs);
-
-        // Store outputs in context
-        for (auto it = outputs.constBegin(); it != outputs.constEnd(); ++it) {
-            ctx.results.insert(nodeId + QStringLiteral("::") + it.key(), it.value());
-        }
-
-        n.dirty = false;
-        n.executedAt = QDateTime::currentDateTimeUtc();
     }
 
     // Re-evaluate parameter tree after execution (for on_change bindings)
@@ -152,24 +139,9 @@ MnaGraphExecutor::Context MnaGraphExecutor::executeIncremental(MnaGraph& graph,
             s_progressCallback(nodeId, i + 1, total);
         }
 
-        MnaNode& n = graph.node(nodeId);
-
-        QVariantMap inputs;
-        for (const MnaPort& p : n.inputs) {
-            if (!p.sourceNodeId.isEmpty()) {
-                QString key = p.sourceNodeId + QStringLiteral("::") + p.sourcePortName;
-                inputs.insert(p.name, existing.results.value(key));
-            }
+        if (!runNode(graph, graph.node(nodeId), existing)) {
+            break;
         }
-
-        QVariantMap outputs = executeNode(n, inputs);
-
-        for (auto it = outputs.constBegin(); it != outputs.constEnd(); ++it) {
-            existing.results.insert(nodeId + QStringLiteral("::") + it.key(), it.value());
-        }
-
-        n.dirty = false;
-        n.executedAt = QDateTime::currentDateTimeUtc();
     }
 
     graph.paramTree.evaluate(existing.results);
@@ -188,6 +160,100 @@ void MnaGraphExecutor::applyParamTree(MnaGraph& graph)
             graph.node(path.left(sep)).attributes.insert(path.mid(sep + 1), graph.paramTree.param(path));
         }
     }
+}
+
+//=============================================================================================================
+
+bool MnaGraphExecutor::runNode(MnaGraph& graph, MnaNode& node, Context& ctx)
+{
+    QVariantMap inputs;
+    for (const MnaPort& p : node.inputs) {
+        if (!p.sourceNodeId.isEmpty()) {
+            inputs.insert(p.name, ctx.results.value(p.sourceNodeId + QStringLiteral("::") + p.sourcePortName));
+        }
+    }
+    // Checks see the node's attributes and inputs by name, post checks its outputs too.
+    QVariantMap scope = node.attributes;
+    scope.insert(inputs);
+
+    MnaVerification& verification = node.verification;
+    MnaProvenance& provenance = verification.provenance;
+    provenance = MnaProvenance();
+    provenance.mneCppVersion = QStringLiteral(MNE_CPP_VERSION);
+    provenance.qtVersion = QString::fromLatin1(qVersion());
+    provenance.osInfo = QSysInfo::prettyProductName() + QLatin1Char(' ') + QSysInfo::currentCpuArchitecture();
+    provenance.hostName = QSysInfo::machineHostName();
+    provenance.resolvedAttributes = node.attributes;
+    for (auto it = inputs.constBegin(); it != inputs.constEnd(); ++it) {
+        provenance.inputHashes.insert(it.key(), QString::fromLatin1(QCryptographicHash::hash(it.value().toString().toUtf8(), QCryptographicHash::Sha256).toHex()));
+    }
+
+    const auto failsHard = [](const QList<MnaVerificationResult>& results) {
+        return std::any_of(results.cbegin(), results.cend(), [](const MnaVerificationResult& r) {
+            return !r.passed && r.severity == QLatin1String("error");
+        });
+    };
+    verification.preResults = runChecks(graph, node, QStringLiteral("pre"), scope);
+    verification.postResults.clear();
+    if (failsHard(verification.preResults)) {
+        ctx.abortedNode = node.id;
+        return false;
+    }
+
+    provenance.startedAt = QDateTime::currentDateTimeUtc();
+    QElapsedTimer timer;
+    timer.start();
+    const QVariantMap outputs = executeNode(node, inputs);
+    provenance.wallTimeMs = timer.elapsed();
+    provenance.finishedAt = QDateTime::currentDateTimeUtc();
+
+    for (auto it = outputs.constBegin(); it != outputs.constEnd(); ++it) {
+        ctx.results.insert(node.id + QStringLiteral("::") + it.key(), it.value());
+    }
+    node.dirty = false;
+    node.executedAt = provenance.finishedAt;
+
+    scope.insert(outputs);
+    verification.postResults = runChecks(graph, node, QStringLiteral("post"), scope);
+    if (failsHard(verification.postResults)) {
+        ctx.abortedNode = node.id;
+        return false;
+    }
+    return true;
+}
+
+//=============================================================================================================
+
+QList<MnaVerificationResult> MnaGraphExecutor::runChecks(const MnaGraph& graph, const MnaNode& node, const QString& phase, const QVariantMap& scope)
+{
+    QList<MnaVerificationResult> results;
+    for (const MnaVerificationCheck& check : node.verification.checks) {
+        if (check.phase != phase) {
+            continue;
+        }
+        MnaVerificationResult result;
+        result.checkId = check.id;
+        result.severity = check.severity;
+        result.evaluatedAt = QDateTime::currentDateTimeUtc();
+        if (!check.script.code.isEmpty()) {
+            MnaNode scriptNode = node;
+            scriptNode.execMode = MnaNodeExecMode::Script;
+            scriptNode.script = check.script;
+            const QVariantMap out = executeNode(scriptNode, scope);
+            result.actualValue = out.value(QStringLiteral("exit_code"));
+            result.passed = result.actualValue.toInt() == 0;
+        } else {
+            result.actualValue = graph.paramTree.evaluateExpression(check.expression, scope);
+            result.passed = result.actualValue.userType() == QMetaType::Bool && result.actualValue.toBool();
+        }
+        result.message = result.passed ? QStringLiteral("PASS: %1").arg(check.description)
+                                       : QStringLiteral("FAIL [%1]: %2").arg(check.severity, check.description);
+        if (!result.passed && !check.onFail.isEmpty()) {
+            result.message += QStringLiteral(" (%1)").arg(check.onFail);
+        }
+        results.append(result);
+    }
+    return results;
 }
 
 //=============================================================================================================

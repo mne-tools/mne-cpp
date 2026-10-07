@@ -54,6 +54,8 @@ namespace MNALIB
 //=============================================================================================================
 /**
  * Groups recordings belonging to one measurement session.
+ *
+ * @snippet ex_mna/main.cpp mna_project_files
  */
 struct MNASHARED_EXPORT MnaSession
 {

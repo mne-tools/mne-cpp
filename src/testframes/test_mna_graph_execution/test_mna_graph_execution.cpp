@@ -22,6 +22,7 @@
 #include <mna/mna_node.h>
 #include <mna/mna_port.h>
 #include <mna/mna_types.h>
+#include <mna/mna_verification.h>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -148,6 +149,7 @@ private slots:
 
     // --- Graph Executor ---
     void testExecuteLinearGraph();
+    void testVerificationChecksAndProvenance();
     void testExecuteIncrementalCleanSkip();
     void testProgressCallback();
 
@@ -547,6 +549,67 @@ void TestMnaGraphExecution::testExecuteLinearGraph()
     // add output = 7
     double addOut = ctx.results.value("add::out").toDouble();
     QCOMPARE(addOut, 7.0);
+}
+
+//=============================================================================================================
+
+void TestMnaGraphExecution::testVerificationChecksAndProvenance()
+{
+    // source(value=3) -> double -> add_one, with checks on "dbl"
+    MnaGraph graph;
+    MnaNode src = makeSourceNode("src", "test_source");
+    src.attributes["value"] = 3.0;
+    graph.addNode(src);
+    MnaNode dbl = makeNode("dbl", "test_double");
+    dbl.attributes["limit"] = 10.0;
+    MnaVerificationCheck positive{"in_positive", "Input is positive", "pre", "in > 0", {}, "error", {}};
+    MnaVerificationCheck underLimit{"out_under_limit", "Output stays below the limit", "post", "out < ref('limit')", {}, "error", "lower the source value"};
+    MnaVerificationCheck exact{"out_is_six", "Output is six", "post", "out == 6", {}, "info", {}};
+    dbl.verification.checks = {positive, underLimit, exact};
+    graph.addNode(dbl);
+    graph.addNode(makeNode("add", "test_add_one"));
+    graph.connect("src", "out", "dbl", "in");
+    graph.connect("dbl", "out", "add", "in");
+
+    MnaGraphExecutor::Context ctx = MnaGraphExecutor::execute(graph, {});
+    const MnaVerification& v = graph.node("dbl").verification;
+    QVERIFY(ctx.abortedNode.isEmpty());
+    QCOMPARE(ctx.results.value("add::out").toDouble(), 7.0);
+    QCOMPARE(v.preResults.size(), 1);
+    QCOMPARE(v.postResults.size(), 2);
+    QVERIFY(v.preResults[0].passed && v.postResults[0].passed && v.postResults[1].passed);
+    QCOMPARE(v.postResults[0].message, QStringLiteral("PASS: Output stays below the limit"));
+    QCOMPARE(v.provenance.mneCppVersion, QStringLiteral(MNE_CPP_VERSION));
+    QCOMPARE(v.provenance.resolvedAttributes.value("limit").toDouble(), 10.0);
+    // SHA-256 of the input's text "3"
+    QCOMPARE(v.provenance.inputHashes.value("in"), QStringLiteral("4e07408562bedb8b60ce05c1decfe3ad16b72230967de01f640b7e4729b49fce"));
+    QVERIFY(v.provenance.startedAt.isValid() && v.provenance.finishedAt >= v.provenance.startedAt);
+
+    // Comparison operators of check expressions, at their boundaries
+    const QVariantMap at6{{"out", 6.0}};
+    for (const auto& [expr, expected] : {std::pair{"out >= 6", true}, {"out <= 6", true}, {"out > 6", false}, {"out < 6", false}, {"out != 6", false}, {"out == 6.0", true}}) {
+        QCOMPARE(graph.paramTree.evaluateExpression(expr, at6).toBool(), expected);
+    }
+
+    // An "error" post check that fails stops the run before "add"
+    graph.node("src").attributes["value"] = 6.0;
+    graph.node("src").dirty = true;
+    ctx = MnaGraphExecutor::executeIncremental(graph, ctx);
+    QCOMPARE(ctx.abortedNode, QStringLiteral("dbl"));
+    QCOMPARE(ctx.results.value("add::out").toDouble(), 7.0);
+    QVERIFY(!graph.node("dbl").verification.postResults[0].passed);
+    QCOMPARE(graph.node("dbl").verification.postResults[0].message, QStringLiteral("FAIL [error]: Output stays below the limit (lower the source value)"));
+    QVERIFY(!graph.node("dbl").verification.postResults[1].passed); // "info" fails but does not stop
+
+    // A failing "error" pre check skips the node itself
+    graph.node("src").attributes["value"] = -1.0;
+    graph.node("src").dirty = true;
+    ctx.abortedNode.clear();
+    ctx = MnaGraphExecutor::executeIncremental(graph, ctx);
+    QCOMPARE(ctx.abortedNode, QStringLiteral("dbl"));
+    QVERIFY(!graph.node("dbl").verification.preResults[0].passed);
+    QVERIFY(graph.node("dbl").verification.postResults.isEmpty());
+    QCOMPARE(ctx.results.value("dbl::out").toDouble(), 12.0);
 }
 
 //=============================================================================================================

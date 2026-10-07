@@ -87,6 +87,9 @@ public:
 
         /// Graph-level inputs (populated before execution)
         QVariantMap graphInputs;
+
+        /// Node whose failed "error" check stopped the run (empty if it ran to the end)
+        QString abortedNode;
     };
 
     //=========================================================================================================
@@ -178,6 +181,15 @@ public:
 private:
     /** Copies every "nodeId/attrKey" value of the graph's parameter tree into that node's attributes. */
     static void applyParamTree(MnaGraph& graph);
+
+    /**
+     * Runs one node with its verification: pre checks, execution, post checks, provenance.
+     * Returns false if a failed "error" check stops the run.
+     */
+    static bool runNode(MnaGraph& graph, MnaNode& node, Context& ctx);
+
+    /** Evaluates the node's checks of one phase against its attributes, inputs and outputs. */
+    static QList<MnaVerificationResult> runChecks(const MnaGraph& graph, const MnaNode& node, const QString& phase, const QVariantMap& scope);
 
     static ProgressCallback s_progressCallback;
 };

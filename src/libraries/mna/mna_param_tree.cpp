@@ -137,6 +137,26 @@ QStringList MnaParamTree::evaluate(const QMap<QString, QVariant>& results)
 QVariant MnaParamTree::evaluateExpression(const QString& expr,
                                           const QMap<QString, QVariant>& results) const
 {
+    // Comparison (verification checks): left OP right, both sides evaluated recursively
+    static const QRegularExpression cmpRe(QStringLiteral("^(.+?)\\s*(>=|<=|==|!=|>|<)\\s*(.+)$"));
+    const QRegularExpressionMatch cmpMatch = cmpRe.match(expr.trimmed());
+    if (cmpMatch.hasMatch()) {
+        const QVariant left = evaluateExpression(cmpMatch.captured(1), results);
+        const QVariant right = evaluateExpression(cmpMatch.captured(3), results);
+        if (!left.isValid() || !right.isValid())
+            return {};
+        const double a = left.toDouble();
+        const double b = right.toDouble();
+        const QString op = cmpMatch.captured(2);
+        return QVariant(op == ">=" ? a >= b : op == "<=" ? a <= b
+                            : op == "=="                 ? a == b
+                            : op == "!="                 ? a != b
+                            : op == ">"                  ? a > b
+                                                         : a < b);
+    }
+    if (expr.trimmed() == QLatin1String("true") || expr.trimmed() == QLatin1String("false"))
+        return QVariant(expr.trimmed() == QLatin1String("true"));
+
     // Built-in function: ref('path') — look up a parameter or result value
     static const QRegularExpression refRe(QStringLiteral("ref\\('([^']+)'\\)"));
 
@@ -215,6 +235,13 @@ QVariant MnaParamTree::evaluateExpression(const QString& expr,
     double numVal = expr.trimmed().toDouble(&ok);
     if (ok) {
         return QVariant(numVal);
+    }
+
+    // Bare name: a parameter or a results entry (checks see a node's ports and attributes by name)
+    static const QRegularExpression nameRe(QStringLiteral("^[A-Za-z_][\\w./:]*$"));
+    if (nameRe.match(expr.trimmed()).hasMatch()) {
+        const QString name = expr.trimmed();
+        return m_params.contains(name) ? m_params.value(name) : results.value(name);
     }
 
     // Simple binary: left * right

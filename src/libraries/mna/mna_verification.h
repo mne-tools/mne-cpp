@@ -65,13 +65,15 @@ namespace MNALIB
  * Evaluated by the executor; can warn, abort, or log an informational note.
  *
  * @brief Verification check for a graph node.
+ *
+ * @snippet ex_mna/main.cpp mna_verification_usage
  */
 struct MNASHARED_EXPORT MnaVerificationCheck
 {
     QString id;          ///< Unique check identifier within the node (e.g. "cov_posdef")
     QString description; ///< Human-readable: "Covariance matrix must be positive-definite"
     QString phase;       ///< "pre" (before execution) or "post" (after execution)
-    QString expression;  ///< Simple evaluable expression: "rank(covariance) > 0"
+    QString expression;  ///< MnaParamTree expression over attributes, inputs and (post) outputs: "rank > 0"
     MnaScript script;    ///< Optional script for complex checks (exit code 0 = pass).
                          ///< When script.code is non-empty, the executor runs the script
                          ///< instead of evaluating `expression`. Supports {{placeholder}}
@@ -90,6 +92,8 @@ struct MNASHARED_EXPORT MnaVerificationCheck
  * The result of evaluating a single verification check.
  *
  * @brief Check evaluation result.
+ *
+ * @snippet ex_mna/main.cpp mna_verification_usage
  */
 struct MNASHARED_EXPORT MnaVerificationResult
 {
@@ -112,6 +116,8 @@ struct MNASHARED_EXPORT MnaVerificationResult
  * Records input hashes, resolved parameter values, software versions, and timing.
  *
  * @brief Provenance record for reproducibility.
+ *
+ * @snippet ex_mna/main.cpp mna_verification_usage
  */
 struct MNASHARED_EXPORT MnaProvenance
 {
@@ -153,6 +159,8 @@ struct MNASHARED_EXPORT MnaProvenance
  * and a complete provenance snapshot.
  *
  * @brief Verification, explanation, and provenance for a graph node.
+ *
+ * @snippet ex_mna/main.cpp mna_verification_usage
  */
 struct MNASHARED_EXPORT MnaVerification
 {

@@ -59,6 +59,8 @@ namespace MNALIB
  * interpreter, and captures the results.
  *
  * @brief Inline interpreter-launched source code carried by a Script-mode @ref MnaNode.
+ *
+ * @snippet ex_mna/main.cpp mna_project_files
  */
 struct MNASHARED_EXPORT MnaScript
 {

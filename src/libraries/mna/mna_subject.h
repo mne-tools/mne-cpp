@@ -57,6 +57,8 @@ namespace MNALIB
 //=============================================================================================================
 /**
  * Represents a subject (participant) in the project.
+ *
+ * @snippet ex_mna/main.cpp mna_project_files
  */
 struct MNASHARED_EXPORT MnaSubject
 {

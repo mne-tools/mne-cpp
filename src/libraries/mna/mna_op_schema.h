@@ -67,6 +67,8 @@ namespace MNALIB
 //=============================================================================================================
 /**
  * Port descriptor within an operation schema.
+ *
+ * @snippet ex_mna/main.cpp mna_op_schema_validate
  */
 struct MNASHARED_EXPORT MnaOpSchemaPort
 {
@@ -79,6 +81,8 @@ struct MNASHARED_EXPORT MnaOpSchemaPort
 //=============================================================================================================
 /**
  * Attribute descriptor within an operation schema.
+ *
+ * @snippet ex_mna/main.cpp mna_op_schema_validate
  */
 struct MNASHARED_EXPORT MnaOpSchemaAttr
 {

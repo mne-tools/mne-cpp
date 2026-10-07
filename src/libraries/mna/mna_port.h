@@ -58,6 +58,8 @@ namespace MNALIB
  * Typed input/output slot on a graph node.
  *
  * @brief Named, typed port on an MNA graph node with upstream link and optional real-time stream binding.
+ *
+ * @snippet ex_mna/main.cpp mna_graph_build
  */
 struct MNASHARED_EXPORT MnaPort
 {

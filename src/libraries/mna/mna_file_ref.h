@@ -58,6 +58,8 @@ namespace MNALIB
 //=============================================================================================================
 /**
  * A reference to a file within an MNA project.
+ *
+ * @snippet ex_mna/main.cpp mna_project_files
  */
 struct MNASHARED_EXPORT MnaFileRef
 {
