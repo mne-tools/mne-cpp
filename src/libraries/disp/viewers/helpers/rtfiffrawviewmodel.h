@@ -570,9 +570,15 @@ private:
      * Calculates the filtered version of the raw input data
      *
      * @param[in] data          data which is to be filtered.
-     * @param[in] iDataIndex    current position in the global data matrix.
+     * @param[in] iDataIndex    buffer column of the first sample of data; the block may wrap around the buffer end.
      */
     void filterDataBlock(const Eigen::MatrixXd& data, int iDataIndex);
+
+    //=========================================================================================================
+    /**
+     * Moves the write position back to column 0 and archives the finished sweep's first values and triggers.
+     */
+    void startNewSweep();
 
     //=========================================================================================================
     /**
@@ -597,7 +603,6 @@ private:
     qint32 m_iCurrentSampleFreeze;   /**< Current sample which holds the current position in the data matrix when freezing tool is active. */
     qint32 m_iMaxFilterLength;       /**< Max order of the current filters. */
     qint32 m_iCurrentBlockSize;      /**< Current block size. */
-    qint32 m_iResidual;              /**< Current amount of samples which were to size. */
     int m_iCurrentTriggerChIndex;    /**< The index of the current trigger channel. */
     int m_iDistanceTimerSpacer;      /**< The distance for the horizontal time spacers in the view in ms. */
     int m_iDetectedTriggers;         /**< Detected triggers since the last reset. */

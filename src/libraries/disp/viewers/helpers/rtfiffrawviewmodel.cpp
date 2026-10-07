@@ -59,6 +59,28 @@ using namespace Eigen;
 using namespace RTPROCESSINGLIB;
 
 //=============================================================================================================
+// DEFINE GLOBAL METHODS
+//=============================================================================================================
+
+namespace
+{
+
+/** Calls fn(iColumn, iOffset, iLength) for each piece of the span [iStart, iStart + iLength) wrapped into [0, iSize). */
+template<typename Fn>
+void forWrappedSpan(int iStart, int iLength, int iSize, Fn fn)
+{
+    iStart = ((iStart % iSize) + iSize) % iSize;
+    for (int iDone = 0; iDone < iLength;) {
+        const int iPiece = std::min(iLength - iDone, iSize - iStart);
+        fn(iStart, iDone, iPiece);
+        iDone += iPiece;
+        iStart = 0;
+    }
+}
+
+} // namespace
+
+//=============================================================================================================
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
@@ -80,8 +102,7 @@ RtFiffRawViewModel::RtFiffRawViewModel(QObject* parent)
 , m_iCurrentStartingSample(0)
 , m_iCurrentSampleFreeze(0)
 , m_iMaxFilterLength(128)
-, m_iCurrentBlockSize(1024)
-, m_iResidual(0)
+, m_iCurrentBlockSize(0)
 , m_iCurrentTriggerChIndex(0)
 , m_iDistanceTimerSpacer(1000)
 , m_iDetectedTriggers(0)
@@ -387,11 +408,16 @@ void RtFiffRawViewModel::setSamplingInfo(float sps, int T, bool bSetZero)
 
 MatrixXd RtFiffRawViewModel::getLastBlock()
 {
-    if (!m_filterKernel.isEmpty() && m_bPerformFiltering) {
-        return m_matDataFiltered.block(0, m_iCurrentSample - m_iCurrentBlockSize, m_matDataFiltered.rows(), m_iCurrentBlockSize);
+    const MatrixXdR& matData = (!m_filterKernel.isEmpty() && m_bPerformFiltering) ? m_matDataFiltered : m_matDataRaw;
+
+    MatrixXd matBlock(matData.rows(), m_iCurrentBlockSize);
+    if (m_iCurrentBlockSize > 0) {
+        forWrappedSpan(m_iCurrentSample - m_iCurrentBlockSize, m_iCurrentBlockSize, static_cast<int>(matData.cols()), [&](int iCol, int iOffset, int iLength) {
+            matBlock.middleCols(iOffset, iLength) = matData.middleCols(iCol, iLength);
+        });
     }
 
-    return m_matDataRaw.block(0, m_iCurrentSample - m_iCurrentBlockSize, m_matDataRaw.rows(), m_iCurrentBlockSize);
+    return matBlock;
 }
 
 //=============================================================================================================
@@ -407,9 +433,13 @@ void RtFiffRawViewModel::addData(const QList<MatrixXd>& data)
     //SPHARA
     bool doSphara = m_bSpharaActivated && m_matSparseSpharaMult.cols() > 0 && m_matDataRaw.rows() == m_matSparseSpharaMult.cols() ? true : false;
 
-    //Copy new data into the global data matrix
+    const int iMaxCols = static_cast<int>(m_matDataRaw.cols());
+    if (iMaxCols == 0) {
+        return;
+    }
+
+    //Copy new data into the ring buffer: stream sample s goes to column s mod iMaxCols
     for (qint32 b = 0; b < data.size(); ++b) {
-        int nCol = data.at(b).cols();
         int nRow = data.at(b).rows();
 
         if (nRow != m_matDataRaw.rows()) {
@@ -417,128 +447,62 @@ void RtFiffRawViewModel::addData(const QList<MatrixXd>& data)
             return;
         }
 
-        //Reset m_iCurrentSample and start filling the data matrix from the beginning again. Also add residual amount of data to the end of the matrix.
-        if (m_iCurrentSample + nCol > m_matDataRaw.cols()) {
-            m_iResidual = nCol - ((m_iCurrentSample + nCol) % m_matDataRaw.cols());
+        const MatrixXd& matBlock = data.at(b);
+        const int nCol = static_cast<int>(matBlock.cols());
 
-            if (m_iResidual == nCol) {
-                m_iResidual = 0;
-            }
-
-            //            std::cout<<"incoming data exceeds internal data cols by: "<<(m_iCurrentSample+nCol) % m_matDataRaw.cols()<<std::endl;
-            //            std::cout<<"m_iCurrentSample+nCol: "<<m_iCurrentSample+nCol<<std::endl;
-            //            std::cout<<"m_matDataRaw.cols(): "<<m_matDataRaw.cols()<<std::endl;
-            //            std::cout<<"nCol-m_iResidual: "<<nCol-m_iResidual<<std::endl<<std::endl;
-
-            if (doComp) {
-                if (doProj) {
-                    //Comp + Proj
-                    m_matDataRaw.block(0, m_iCurrentSample, nRow, m_iResidual) = m_matSparseProjCompMult * data.at(b).block(0, 0, nRow, m_iResidual);
-                } else {
-                    //Comp
-                    m_matDataRaw.block(0, m_iCurrentSample, nRow, m_iResidual) = m_matSparseCompMult * data.at(b).block(0, 0, nRow, m_iResidual);
-                }
-            } else {
-                if (doProj) {
-                    //Proj
-                    m_matDataRaw.block(0, m_iCurrentSample, nRow, m_iResidual) = m_matSparseProjMult * data.at(b).block(0, 0, nRow, m_iResidual);
-                } else {
-                    //None - Raw
-                    m_matDataRaw.block(0, m_iCurrentSample, nRow, m_iResidual) = data.at(b).block(0, 0, nRow, m_iResidual);
-                }
-            }
-
-            m_iCurrentStartingSample += m_iCurrentSample;
-            m_iCurrentStartingSample += m_iResidual;
-
-            m_iCurrentSample = 0;
-
-            if (!m_bIsFreezed) {
-                m_vecLastBlockFirstValuesFiltered = m_matDataFiltered.col(0);
-                m_vecLastBlockFirstValuesRaw = m_matDataRaw.col(0);
-            }
-
-            //Store old detected triggers
-            m_qMapDetectedTriggerOld = m_qMapDetectedTrigger;
-
-            //Clear detected triggers
-            if (m_bTriggerDetectionActive) {
-                QMutableMapIterator<int, QList<QPair<int, double>>> i(m_qMapDetectedTrigger);
-                while (i.hasNext()) {
-                    i.next();
-                    i.value().clear();
-                }
-            }
-        } else {
-            m_iResidual = 0;
-        }
-
-        //std::cout<<"incoming data is ok"<<std::endl;
-
+        MatrixXd matCorrected;
         if (doComp) {
-            if (doProj) {
-                //Comp + Proj
-                m_matDataRaw.block(0, m_iCurrentSample, nRow, nCol) = m_matSparseProjCompMult * data.at(b);
-            } else {
-                //Comp
-                m_matDataRaw.block(0, m_iCurrentSample, nRow, nCol) = m_matSparseCompMult * data.at(b);
-            }
+            matCorrected = doProj ? MatrixXd(m_matSparseProjCompMult * matBlock) : MatrixXd(m_matSparseCompMult * matBlock);
         } else {
-            if (doProj) {
-                //Proj
-                m_matDataRaw.block(0, m_iCurrentSample, nRow, nCol) = m_matSparseProjMult * data.at(b);
-            } else {
-                //None - Raw
-                m_matDataRaw.block(0, m_iCurrentSample, nRow, nCol) = data.at(b);
-            }
+            matCorrected = doProj ? MatrixXd(m_matSparseProjMult * matBlock) : matBlock;
         }
 
-        //Filter if neccessary else set filtered data matrix to zero
+        QList<QPair<int, double>> lTriggers;
+        if (m_bTriggerDetectionActive) {
+            lTriggers = RTPROCESSINGLIB::detectTriggerFlanksMax(matBlock, m_iCurrentTriggerChIndex, 0, m_dTriggerThreshold, true, 500);
+        }
+
+        forWrappedSpan(m_iCurrentSample, nCol, iMaxCols, [&](int iCol, int iOffset, int iLength) {
+            if (iCol == 0 && m_iCurrentSample == iMaxCols) {
+                startNewSweep();
+            }
+
+            m_matDataRaw.middleCols(iCol, iLength) = matCorrected.middleCols(iOffset, iLength);
+            if (m_filterKernel.isEmpty() || !m_bPerformFiltering) {
+                m_matDataFiltered.middleCols(iCol, iLength).setZero();
+                if (doSphara) {
+                    m_matDataRaw.middleCols(iCol, iLength) = m_matSparseSpharaMult * m_matDataRaw.middleCols(iCol, iLength);
+                }
+            }
+
+            for (const QPair<int, double>& trigger : std::as_const(lTriggers)) {
+                if (trigger.first >= iOffset && trigger.first < iOffset + iLength) {
+                    m_qMapDetectedTrigger[m_iCurrentTriggerChIndex].append({iCol + trigger.first - iOffset, trigger.second});
+                }
+            }
+
+            m_iCurrentSample = iCol + iLength;
+        });
+
+        if (!lTriggers.isEmpty()) {
+            m_iDetectedTriggers += lTriggers.size();
+            emit triggerDetected(m_iDetectedTriggers, m_qMapDetectedTrigger);
+        }
+
+        //Filter the whole block at once so the overlap-add stays continuous across the wrap
         if (!m_filterKernel.isEmpty() && m_bPerformFiltering) {
-            filterDataBlock(m_matDataRaw.block(0, m_iCurrentSample, nRow, nCol), m_iCurrentSample);
+            const int iBlockStart = m_iCurrentSample - nCol;
+            filterDataBlock(matCorrected, iBlockStart);
 
             //Perform SPHARA on filtered data after actual filtering - SPHARA should be applied on the best possible data
             if (doSphara) {
-                if (m_iCurrentSample - m_iMaxFilterLength / 2 >= 0) {
-                    m_matDataFiltered.block(0, m_iCurrentSample - m_iMaxFilterLength / 2, nRow, nCol) = m_matSparseSpharaMult * m_matDataFiltered.block(0, m_iCurrentSample - m_iMaxFilterLength / 2, nRow, nCol);
-                } else {
-                    if (m_iCurrentSample - m_iMaxFilterLength / 2 < 0) {
-                        m_matDataFiltered.block(0, 0, nRow, nCol) = m_matSparseSpharaMult * m_matDataFiltered.block(0, 0, nRow, nCol);
-                        int iResidual = m_iResidual + m_iMaxFilterLength / 2;
-                        m_matDataFiltered.block(0, m_matDataFiltered.cols() - iResidual, nRow, iResidual) = m_matSparseSpharaMult * m_matDataFiltered.block(0, m_matDataFiltered.cols() - iResidual, nRow, iResidual);
-                    }
-                }
-            }
-        } else {
-            m_matDataFiltered.block(0, m_iCurrentSample, nRow, nCol).setZero(); // = m_matDataRaw.block(0, m_iCurrentSample, nRow, nCol);
-
-            //Perform SPHARA on raw data data
-            if (doSphara) {
-                m_matDataRaw.block(0, m_iCurrentSample, nRow, nCol) = m_matSparseSpharaMult * m_matDataRaw.block(0, m_iCurrentSample, nRow, nCol);
+                forWrappedSpan(iBlockStart - m_iMaxFilterLength / 2, nCol, iMaxCols, [&](int iCol, int, int iLength) {
+                    m_matDataFiltered.middleCols(iCol, iLength) = m_matSparseSpharaMult * m_matDataFiltered.middleCols(iCol, iLength);
+                });
             }
         }
 
-        m_iCurrentSample += nCol;
-        m_iCurrentBlockSize = nCol;
-
-        //detect the trigger flanks in the trigger channels
-        if (m_bTriggerDetectionActive) {
-            int iOldDetectedTriggers = m_qMapDetectedTrigger[m_iCurrentTriggerChIndex].size();
-
-            QList<QPair<int, double>> qMapDetectedTrigger = RTPROCESSINGLIB::detectTriggerFlanksMax(data.at(b), m_iCurrentTriggerChIndex, m_iCurrentSample - nCol, m_dTriggerThreshold, true, 500);
-            //QList<QPair<int,double> > qMapDetectedTrigger = RTPROCESSINGLIB::detectTriggerFlanksGrad(data.at(b), m_iCurrentTriggerChIndex, m_iCurrentSample-nCol, m_dTriggerThreshold, false, "Rising");
-
-            //Append results to already found triggers
-            m_qMapDetectedTrigger[m_iCurrentTriggerChIndex].append(qMapDetectedTrigger);
-
-            //Compute newly counted triggers
-            int newTriggers = m_qMapDetectedTrigger[m_iCurrentTriggerChIndex].size() - iOldDetectedTriggers;
-
-            if (newTriggers != 0) {
-                m_iDetectedTriggers += newTriggers;
-                emit triggerDetected(m_iDetectedTriggers, m_qMapDetectedTrigger);
-            }
-        }
+        m_iCurrentBlockSize = std::min(nCol, iMaxCols);
     }
 
     //Update data content
@@ -548,6 +512,31 @@ void RtFiffRawViewModel::addData(const QList<MatrixXd>& data)
     roles << Qt::DisplayRole;
 
     emit dataChanged(topLeft, bottomRight, roles);
+}
+
+//=============================================================================================================
+
+void RtFiffRawViewModel::startNewSweep()
+{
+    m_iCurrentStartingSample += m_iCurrentSample;
+    m_iCurrentSample = 0;
+
+    if (!m_bIsFreezed) {
+        m_vecLastBlockFirstValuesFiltered = m_matDataFiltered.col(0);
+        m_vecLastBlockFirstValuesRaw = m_matDataRaw.col(0);
+    }
+
+    //Store old detected triggers
+    m_qMapDetectedTriggerOld = m_qMapDetectedTrigger;
+
+    //Clear detected triggers
+    if (m_bTriggerDetectionActive) {
+        QMutableMapIterator<int, QList<QPair<int, double>>> i(m_qMapDetectedTrigger);
+        while (i.hasNext()) {
+            i.next();
+            i.value().clear();
+        }
+    }
 }
 
 //=============================================================================================================
@@ -1169,9 +1158,7 @@ void RtFiffRawViewModel::filterDataBlock()
 
 void RtFiffRawViewModel::filterDataBlock(const MatrixXd& data, int iDataIndex)
 {
-    //std::cout<<"START RtFiffRawViewModel::filterDataBlock"<<std::endl;
-
-    if (iDataIndex >= m_matDataFiltered.cols() || data.cols() < m_iMaxFilterLength) {
+    if (data.cols() < m_iMaxFilterLength) {
         return;
     }
 
@@ -1187,6 +1174,10 @@ void RtFiffRawViewModel::filterDataBlock(const MatrixXd& data, int iDataIndex)
         }
     }
 
+    const int iMaxCols = static_cast<int>(m_matDataFiltered.cols());
+    const int nCol = static_cast<int>(data.cols());
+    const int iFilterDelay = m_iMaxFilterLength / 2;
+
     //Do the concurrent filtering
     if (!timeData.isEmpty()) {
         QFuture<void> future = QtConcurrent::map(timeData,
@@ -1194,91 +1185,38 @@ void RtFiffRawViewModel::filterDataBlock(const MatrixXd& data, int iDataIndex)
 
         future.waitForFinished();
 
-        //Do the overlap add method and store in m_matDataFiltered
-        int iFilterDelay = m_iMaxFilterLength / 2;
-        int iFilteredNumberCols = timeData.at(0).second.second.cols();
-
+        //Overlap-add: output sample k of this block is convolution sample iDataIndex + k, drawn iFilterDelay earlier
         for (int r = 0; r < timeData.size(); ++r) {
-            if (iDataIndex + 2 * data.cols() > m_matDataRaw.cols()) {
-                //Handle last data block
-                //std::cout<<"Handle last data block"<<std::endl;
+            const int iRow = timeData.at(r).second.first;
+            RowVectorXd tempData = timeData.at(r).second.second;
 
-                if (m_bDrawFilterFront) {
-                    //Get the currently filtered data. This data has a delay of filterLength/2 in front and back.
-                    RowVectorXd tempData = timeData.at(r).second.second;
-
-                    //Perform the actual overlap add by adding the last filterlength data to the newly filtered one
-                    tempData.head(m_iMaxFilterLength) += m_matOverlap.row(timeData.at(r).second.first);
-
-                    //Write the newly calulated filtered data to the filter data matrix. Keep in mind that the current block also effect last part of the last block (begin at dataIndex-iFilterDelay).
-                    int start = iDataIndex - iFilterDelay < 0 ? 0 : iDataIndex - iFilterDelay;
-                    m_matDataFiltered.row(timeData.at(r).second.first).segment(start, iFilteredNumberCols - m_iMaxFilterLength) = tempData.head(iFilteredNumberCols - m_iMaxFilterLength);
-                } else {
-                    //Perform this else case everytime the filter was changed. Do not begin to plot from dataIndex-iFilterDelay because the impsulse response and m_matOverlap do not match with the new filter anymore.
-                    m_matDataFiltered.row(timeData.at(r).second.first).segment(iDataIndex - iFilterDelay, m_iMaxFilterLength) = timeData.at(r).second.second.segment(m_iMaxFilterLength, m_iMaxFilterLength);
-                    m_matDataFiltered.row(timeData.at(r).second.first).segment(iDataIndex + iFilterDelay, iFilteredNumberCols - 2 * m_iMaxFilterLength) = timeData.at(r).second.second.segment(m_iMaxFilterLength, iFilteredNumberCols - 2 * m_iMaxFilterLength);
-                }
-
-                //Refresh the m_matOverlap with the new calculated filtered data.
-                m_matOverlap.row(timeData.at(r).second.first) = timeData.at(r).second.second.tail(m_iMaxFilterLength);
-            } else if (iDataIndex == 0) {
-                //Handle first data block
-                //std::cout<<"Handle first data block"<<std::endl;
-
-                if (m_bDrawFilterFront) {
-                    //Get the currently filtered data. This data has a delay of filterLength/2 in front and back.
-                    RowVectorXd tempData = timeData.at(r).second.second;
-
-                    //Add newly calculate data to the tail of the current filter data matrix
-                    m_matDataFiltered.row(timeData.at(r).second.first).segment(m_matDataFiltered.cols() - iFilterDelay - m_iResidual, iFilterDelay) = tempData.head(iFilterDelay) + m_matOverlap.row(timeData.at(r).second.first).head(iFilterDelay);
-
-                    //Perform the actual overlap add by adding the last filterlength data to the newly filtered one
-                    tempData.head(m_iMaxFilterLength) += m_matOverlap.row(timeData.at(r).second.first);
-                    m_matDataFiltered.row(timeData.at(r).second.first).head(iFilteredNumberCols - m_iMaxFilterLength - iFilterDelay) = tempData.segment(iFilterDelay, iFilteredNumberCols - m_iMaxFilterLength - iFilterDelay);
-
-                    //Copy residual data from the front to the back. The residual is != 0 if the chosen block size cannot be evenly fit into the matrix size
-                    m_matDataFiltered.row(timeData.at(r).second.first).tail(m_iResidual) = m_matDataFiltered.row(timeData.at(r).second.first).head(m_iResidual);
-                } else {
-                    //Perform this else case everytime the filter was changed. Do not begin to plot from dataIndex-iFilterDelay because the impsulse response and m_matOverlap do not match with the new filter anymore.
-                    m_matDataFiltered.row(timeData.at(r).second.first).head(m_iMaxFilterLength) = timeData.at(r).second.second.segment(m_iMaxFilterLength, m_iMaxFilterLength);
-                    m_matDataFiltered.row(timeData.at(r).second.first).segment(iFilterDelay, iFilteredNumberCols - 2 * m_iMaxFilterLength) = timeData.at(r).second.second.segment(m_iMaxFilterLength, iFilteredNumberCols - 2 * m_iMaxFilterLength);
-                }
-
-                //Refresh the m_matOverlap with the new calculated filtered data.
-                m_matOverlap.row(timeData.at(r).second.first) = timeData.at(r).second.second.tail(m_iMaxFilterLength);
+            if (m_bDrawFilterFront) {
+                tempData.head(m_iMaxFilterLength) += m_matOverlap.row(iRow);
+                forWrappedSpan(iDataIndex - iFilterDelay, nCol, iMaxCols, [&](int iCol, int iOffset, int iLength) {
+                    m_matDataFiltered.row(iRow).segment(iCol, iLength) = tempData.segment(iOffset, iLength);
+                });
             } else {
-                //Handle middle data blocks
-                //std::cout<<"Handle middle data block"<<std::endl;
-
-                if (m_bDrawFilterFront) {
-                    //Get the currently filtered data. This data has a delay of filterLength/2 in front and back.
-                    RowVectorXd tempData = timeData.at(r).second.second;
-
-                    //Perform the actual overlap add by adding the last filterlength data to the newly filtered one
-                    tempData.head(m_iMaxFilterLength) += m_matOverlap.row(timeData.at(r).second.first);
-
-                    //Write the newly calulated filtered data to the filter data matrix. Keep in mind that the current block also effect last part of the last block (begin at dataIndex-iFilterDelay).
-                    m_matDataFiltered.row(timeData.at(r).second.first).segment(iDataIndex - iFilterDelay, iFilteredNumberCols - m_iMaxFilterLength) = tempData.head(iFilteredNumberCols - m_iMaxFilterLength);
-                } else {
-                    //Perform this else case everytime the filter was changed. Do not begin to plot from dataIndex-iFilterDelay because the impsulse response and m_matOverlap do not match with the new filter anymore.
-                    m_matDataFiltered.row(timeData.at(r).second.first).segment(iDataIndex - iFilterDelay, m_iMaxFilterLength).setZero(); // = timeData.at(r).second.second.segment(m_iMaxFilterLength,m_iMaxFilterLength);
-                    m_matDataFiltered.row(timeData.at(r).second.first).segment(iDataIndex + iFilterDelay, iFilteredNumberCols - 2 * m_iMaxFilterLength) = timeData.at(r).second.second.segment(m_iMaxFilterLength, iFilteredNumberCols - 2 * m_iMaxFilterLength);
-                }
-
-                //Refresh the m_matOverlap with the new calculated filtered data.
-                m_matOverlap.row(timeData.at(r).second.first) = timeData.at(r).second.second.tail(m_iMaxFilterLength);
+                //The overlap belongs to the previous filter, so skip the start-up transient of the new one
+                forWrappedSpan(iDataIndex - iFilterDelay, m_iMaxFilterLength, iMaxCols, [&](int iCol, int, int iLength) {
+                    m_matDataFiltered.row(iRow).segment(iCol, iLength).setZero();
+                });
+                forWrappedSpan(iDataIndex - iFilterDelay + m_iMaxFilterLength, nCol - m_iMaxFilterLength, iMaxCols, [&](int iCol, int iOffset, int iLength) {
+                    m_matDataFiltered.row(iRow).segment(iCol, iLength) = tempData.segment(m_iMaxFilterLength + iOffset, iLength);
+                });
             }
+
+            m_matOverlap.row(iRow) = tempData.tail(m_iMaxFilterLength);
         }
     }
 
     m_bDrawFilterFront = true;
 
     //Fill filtered data with raw data if the channel was not filtered
-    for (int i = 0; i < notFilterChannelIndex.size(); ++i) {
-        m_matDataFiltered.row(notFilterChannelIndex.at(i)).segment(iDataIndex, data.row(notFilterChannelIndex.at(i)).cols()) = data.row(notFilterChannelIndex.at(i));
-    }
-
-    //std::cout<<"END RtFiffRawViewModel::filterDataBlock"<<std::endl;
+    forWrappedSpan(iDataIndex, nCol, iMaxCols, [&](int iCol, int iOffset, int iLength) {
+        for (int i : std::as_const(notFilterChannelIndex)) {
+            m_matDataFiltered.row(i).segment(iCol, iLength) = data.row(i).segment(iOffset, iLength);
+        }
+    });
 }
 
 //=============================================================================================================

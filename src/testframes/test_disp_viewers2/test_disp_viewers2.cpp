@@ -334,6 +334,13 @@ private slots:
 
     //=========================================================================================================
     /**
+     * Verifies that stream sample s lands in buffer column s mod N for raw data, filtered data and detected
+     * triggers, for block sizes that do and do not divide the buffer length.
+     */
+    void rtFiffRawViewModel_ringBufferWrap();
+
+    //=========================================================================================================
+    /**
      * Verifies that EvokedSetModel constructs, reports sensible defaults, and
      * setEvokedSet does not crash on an empty set.
      */
@@ -1129,13 +1136,13 @@ void TestDispViewers2::rtFiffRawViewModel_dataFlow()
     secondBlock.row(0).setConstant(2.0);
     secondBlock.row(2).setConstant(-2.0);
     model.addData({secondBlock});
-    QCOMPARE(model.getCurrentSampleIndex(), 60);
+    QCOMPARE(model.getCurrentSampleIndex(), 20);
     QCOMPARE(model.getLastBlock(), secondBlock);
     QCOMPARE(model.getMaxValueFromRawViewModel(0), static_cast<double>(1e-11f));
     QCOMPARE(dataSpy.size(), 2);
 
     model.addData({Eigen::MatrixXd::Zero(3, 10)});
-    QCOMPARE(model.getCurrentSampleIndex(), 60);
+    QCOMPARE(model.getCurrentSampleIndex(), 20);
     QCOMPARE(dataSpy.size(), 2);
 
     model.toggleFreeze(QModelIndex());
@@ -1182,6 +1189,119 @@ void TestDispViewers2::rtFiffRawViewModel_dataFlow()
 
 //=============================================================================================================
 
+void TestDispViewers2::rtFiffRawViewModel_ringBufferWrap()
+{
+    const int N = 100;
+    auto column = [](const RtFiffRawViewModel& model, int row, int col) {
+        return model.data(model.index(row, 1)).value<RowVectorPair>().first[col];
+    };
+
+    // Raw: a ramp (value = stream index) must read back as column c = s mod N.
+    for (const int nBlock : {60, 64, 100, 37, 25}) {
+        RtFiffRawViewModel model;
+        auto info = createBrowserTestInfo();
+        model.setFiffInfo(info);
+        model.setSamplingInfo(100.0f, 1, true);
+        QCOMPARE(model.getMaxSamples(), N);
+
+        int iTotal = 0;
+        while (iTotal < 5 * N + 13) {
+            Eigen::MatrixXd block = Eigen::MatrixXd::Zero(4, nBlock);
+            for (int s = 0; s < nBlock; ++s) {
+                block.col(s).setConstant(iTotal + s);
+            }
+            model.addData({block});
+            iTotal += nBlock;
+
+            const int iCur = model.getCurrentSampleIndex();
+            QCOMPARE(iCur, (iTotal - 1) % N + 1);
+            QCOMPARE(model.getFirstSampleOffset(), iTotal - iCur);
+            QCOMPARE(model.getLastBlock(), block);
+            for (int c = 0; c < N; ++c) {
+                const int s = c < iCur ? model.getFirstSampleOffset() + c : model.getFirstSampleOffset() - N + c;
+                if (s >= 0 && column(model, 0, c) != s) {
+                    QFAIL(qPrintable(QStringLiteral("block %1, %2 samples: column %3 holds %4, expected %5")
+                                         .arg(nBlock)
+                                         .arg(iTotal)
+                                         .arg(c)
+                                         .arg(column(model, 0, c))
+                                         .arg(s)));
+                }
+            }
+        }
+    }
+
+    // Filtered: the overlap-add output equals the offline convolution, delayed by half the kernel.
+    {
+        RtFiffRawViewModel model;
+        auto info = createBrowserTestInfo();
+        model.setFiffInfo(info);
+        model.setSamplingInfo(100.0f, 1, true);
+        const FilterKernel kernel(QStringLiteral("lp"), 0, 50, 0.2, 0.0, 0.05, 100.0, 0);
+        const Eigen::RowVectorXd h = kernel.getCoefficients();
+        const int L = static_cast<int>(h.cols());
+        const int iDelay = L / 2;
+        model.setFilterChannelType(QStringLiteral("MEG"));
+        model.setFilter({kernel});
+        model.setFilterActive(true);
+
+        const int nBlock = 64;
+        const int iTotal = 8 * nBlock;
+        Eigen::MatrixXd stream = Eigen::MatrixXd::Zero(4, iTotal);
+        for (int s = 0; s < iTotal; ++s) {
+            stream(0, s) = std::sin(0.13 * s) + 0.5 * std::sin(1.7 * s);
+            stream(3, s) = s % 7;
+        }
+        for (int b = 0; b < iTotal / nBlock; ++b) {
+            model.addData({stream.middleCols(b * nBlock, nBlock)});
+        }
+
+        // Samples from the second block on are final once the following half kernel has arrived.
+        for (int t = iTotal - N; t < iTotal - iDelay; ++t) {
+            double y = 0.0;
+            for (int j = 0; j < L && t + iDelay - j >= 0; ++j) {
+                y += h(j) * stream(0, t + iDelay - j);
+            }
+            if (std::fabs(column(model, 0, t % N) - y) > 1e-9) {
+                QFAIL(qPrintable(QStringLiteral("filtered sample %1 (column %2): %3, expected %4")
+                                     .arg(t)
+                                     .arg(t % N)
+                                     .arg(column(model, 0, t % N))
+                                     .arg(y)));
+            }
+        }
+        for (int t = iTotal - N; t < iTotal; ++t) {
+            QCOMPARE(column(model, 3, t % N), stream(3, t));
+        }
+    }
+
+    // Triggers: positions are buffer columns of the sweep they belong to.
+    {
+        RtFiffRawViewModel model;
+        auto info = createBrowserTestInfo();
+        model.setFiffInfo(info);
+        model.setSamplingInfo(100.0f, 1, true);
+        model.triggerInfoChanged({{2.0, Qt::red}}, true, QStringLiteral("STI014"), 1.0);
+        QSignalSpy triggerSpy(&model, &RtFiffRawViewModel::triggerDetected);
+
+        // Pulses at stream samples 90 (before the wrap inside block 60..119) and 215 (after the wrap inside 180..239)
+        Eigen::MatrixXd stream = Eigen::MatrixXd::Zero(4, 240);
+        stream(3, 90) = 2.0;
+        stream(3, 215) = 2.0;
+        model.addData({stream.middleCols(0, 60)});
+        model.addData({stream.middleCols(60, 60)});
+        QCOMPARE(model.getDetectedTriggersOld(), (QList<QPair<int, double>>{{90, 2.0}}));
+        QVERIFY(model.getDetectedTriggers().isEmpty());
+        model.addData({stream.middleCols(120, 60)});
+        model.addData({stream.middleCols(180, 60)});
+        QCOMPARE(model.getDetectedTriggers(), (QList<QPair<int, double>>{{15, 2.0}}));
+        QVERIFY(model.getDetectedTriggersOld().isEmpty());
+        QCOMPARE(triggerSpy.size(), 2);
+    }
+}
+
+//=============================================================================================================
+
 void TestDispViewers2::rtFiffRawViewModel_projectionWrapFilterAndRoles()
 {
     RtFiffRawViewModel model;
@@ -1197,8 +1317,8 @@ void TestDispViewers2::rtFiffRawViewModel_projectionWrapFilterAndRoles()
     model.updateProjection({FiffProj(FIFFV_PROJ_ITEM_FIELD, true, QStringLiteral("common"), vectors)});
     model.updateCompensator(0);
 
-    // 3 blocks of 40 into a 100-sample buffer: the third fills the last 20 columns and is then written again from
-    // column 0, so column 0 holds sample 80
+    // 3 blocks of 40 into a 100-sample buffer: the third fills the last 20 columns and wraps to columns 0..19,
+    // so column 10 holds sample 110
     Eigen::MatrixXd block(4, 40);
     for (int b = 0; b < 3; ++b) {
         for (int s = 0; s < 40; ++s) {
@@ -1210,7 +1330,7 @@ void TestDispViewers2::rtFiffRawViewModel_projectionWrapFilterAndRoles()
         }
         model.addData({block});
     }
-    QCOMPARE(model.getCurrentSampleIndex(), 40);
+    QCOMPARE(model.getCurrentSampleIndex(), 20);
     const Eigen::MatrixXd last = model.getLastBlock();
     for (int s = 0; s < 40; ++s) {
         const double d = std::sin(0.1 * (80 + s));
@@ -1225,7 +1345,7 @@ void TestDispViewers2::rtFiffRawViewModel_projectionWrapFilterAndRoles()
     QCOMPARE(model.data(model.index(3, 0)).toString(), QStringLiteral("STI014"));
     const auto row = model.data(model.index(0, 1)).value<RowVectorPair>();
     QCOMPARE(row.second, 100);
-    QVERIFY(std::fabs(row.first[10] - std::sin(0.1 * 90)) < 1e-12);
+    QVERIFY(std::fabs(row.first[10] - std::sin(0.1 * 110)) < 1e-12);
     QCOMPARE(model.data(model.index(1, 2)).toBool(), false);
     QCOMPARE(model.data(model.index(0, 0), Qt::BackgroundRole).value<QBrush>().color(), QColor(Qt::darkGray));
     QVERIFY(!model.data(model.index(0, 0), Qt::ToolTipRole).isValid());
@@ -1238,7 +1358,7 @@ void TestDispViewers2::rtFiffRawViewModel_projectionWrapFilterAndRoles()
     model.toggleFreeze(QModelIndex());
     model.addData({block * 0.0});
     const auto frozen = model.data(model.index(0, 1)).value<RowVectorPair>();
-    QVERIFY(std::fabs(frozen.first[10] - std::sin(0.1 * 90)) < 1e-12);
+    QVERIFY(std::fabs(frozen.first[10] - std::sin(0.1 * 110)) < 1e-12);
     model.toggleFreeze(QModelIndex());
 
     // Real-time filtering: a 50-tap low-pass on the MEG channels only, a pass-through on STIM
@@ -2167,12 +2287,17 @@ void TestDispViewers2::rtFiffRawView_paintsHidesRowsAndAddsEvents()
     QVERIFY(!view.grab().isNull());
     model->toggleFreeze(QModelIndex());
 
-    // "Add event" at x = 150 of the plot column: buffer column 150 * maxSamples / width, plus the offset
+    // "Add event" at x = 150 of the plot column: 1200 samples streamed into 1000 columns, so the clicked column lies
+    // behind the cursor (column 200) and holds a sample of the previous sweep
     QSignalSpy eventSpy(&view, &RtFiffRawView::addSampleAsEvent);
     contextAction(QPoint(150, 10), QStringLiteral("Add event"));
     QCOMPARE(eventSpy.size(), 1);
+    QCOMPARE(model->getCurrentSampleIndex(), 200);
+    QCOMPARE(model->getFirstSampleOffset(), 1000);
     const double dx = static_cast<double>(table->columnWidth(1)) / 1000.0;
-    QCOMPARE(eventSpy.at(0).at(0).toInt(), static_cast<int>(150.0 / dx) + model->getFirstSampleOffset());
+    const int iColumn = static_cast<int>(150.0 / dx);
+    QVERIFY(iColumn > 200);
+    QCOMPARE(eventSpy.at(0).at(0).toInt(), iColumn);
 
     const QString shot = QDir::temp().filePath(QStringLiteral("test_disp_viewers2_rawview.png"));
     view.takeScreenshot(shot);
