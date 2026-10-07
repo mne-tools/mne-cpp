@@ -2952,7 +2952,7 @@ void BrainView::castRay(const QPoint& pos)
         return;
 
     // ── Pick against all scene geometry ────────────────────────────────
-    PickResult pickResult;
+    RayHit pickResult;
     if (hasValidPane) {
         pickResult = RayPicker::pick(rayOrigin, rayDir, sv, m_surfaces, m_itemSurfaceMap, m_itemDipoleMap);
     }

@@ -61,14 +61,14 @@ bool RayPicker::unproject(const QPoint& screenPos,
 
 //=============================================================================================================
 
-PickResult RayPicker::pick(const QVector3D& rayOrigin,
-                           const QVector3D& rayDir,
-                           const SubView& subView,
-                           const QMap<QString, std::shared_ptr<BrainSurface>>& surfaces,
-                           const QMap<const QStandardItem*, std::shared_ptr<BrainSurface>>& itemSurfaceMap,
-                           const QMap<const QStandardItem*, std::shared_ptr<DipoleObject>>& itemDipoleMap)
+RayHit RayPicker::pick(const QVector3D& rayOrigin,
+                       const QVector3D& rayDir,
+                       const SubView& subView,
+                       const QMap<QString, std::shared_ptr<BrainSurface>>& surfaces,
+                       const QMap<const QStandardItem*, std::shared_ptr<BrainSurface>>& itemSurfaceMap,
+                       const QMap<const QStandardItem*, std::shared_ptr<DipoleObject>>& itemDipoleMap)
 {
-    PickResult result;
+    RayHit result;
     float closestDist = std::numeric_limits<float>::max();
 
     // ── Test surfaces ──────────────────────────────────────────────────
@@ -156,7 +156,7 @@ PickResult RayPicker::pick(const QVector3D& rayOrigin,
 
 //=============================================================================================================
 
-QString RayPicker::buildLabel(const PickResult& result,
+QString RayPicker::buildLabel(const RayHit& result,
                               [[maybe_unused]] const QMap<const QStandardItem*, std::shared_ptr<BrainSurface>>& itemSurfaceMap,
                               [[maybe_unused]] const QMap<QString, std::shared_ptr<BrainSurface>>& surfaces)
 {
@@ -234,7 +234,7 @@ QString RayPicker::buildLabel(const PickResult& result,
 
 //=============================================================================================================
 
-QString PickResult::displayLabel() const
+QString RayHit::displayLabel() const
 {
     // Delegated to the static builder in RayPicker; this method is a
     // convenience wrapper when the caller doesn't have the surface maps.

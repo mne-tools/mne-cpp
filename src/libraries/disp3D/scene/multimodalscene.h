@@ -16,7 +16,7 @@
  * iterates layers in order and issues the corresponding draw calls.
  *
  * It also routes pick events from @ref RayPicker through every
- * layer and returns a uniform @ref PickResult to the host, hiding
+ * layer and returns a uniform @ref DISP3DLIB::PickResult to the host, hiding
  * the per-primitive intersection logic.
  */
 
@@ -105,7 +105,7 @@ struct DISP3DSHARED_EXPORT SceneLayer
  *     visibility/opacity flips, so the renderer can rebuild its draw list.
  *   - Maintain a shared timeline (current time index) that data overlays
  *     across modalities consume; emits @ref timeSampleChanged.
- *   - Maintain the most recent @ref PickResult and emit @ref picked when
+ *   - Maintain the most recent @ref DISP3DLIB::PickResult and emit @ref picked when
  *     a layer producer reports a hit; consumers (Pick dock, status bar,
  *     MRI ortho viewer) subscribe to that signal.
  *

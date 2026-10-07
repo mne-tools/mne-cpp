@@ -196,7 +196,7 @@ private slots:
     //=========================================================================================================
     /**
      * Verifies RayPicker static methods: unproject with a valid viewport/matrix,
-     * pick with empty surface/dipole maps, and displayLabel on a PickResult.
+     * pick with empty surface/dipole maps, and displayLabel on a RayHit.
      */
     void rayPicker_basics();
 
@@ -754,7 +754,7 @@ void TestDisp3dBrainView::rayPicker_basics()
     QMap<const QStandardItem*, std::shared_ptr<BrainSurface>> itemSurfaceMap;
     QMap<const QStandardItem*, std::shared_ptr<DipoleObject>> itemDipoleMap;
 
-    PickResult result = RayPicker::pick(
+    RayHit result = RayPicker::pick(
         QVector3D(0, 0, 1),
         QVector3D(0, 0, -1),
         sv, surfaces, itemSurfaceMap, itemDipoleMap);
@@ -765,8 +765,8 @@ void TestDisp3dBrainView::rayPicker_basics()
     QString label = RayPicker::buildLabel(result, itemSurfaceMap, surfaces);
     QVERIFY(label.isEmpty());
 
-    // displayLabel on a no-hit PickResult
-    PickResult noHit;
+    // displayLabel on a no-hit RayHit
+    RayHit noHit;
     QVERIFY(noHit.displayLabel().isEmpty());
 
     QApplication::processEvents();
