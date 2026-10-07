@@ -29,6 +29,8 @@
 
 #include <QCoreApplication>
 #include <QMatrix4x4>
+#include <QSignalSpy>
+#include <QtMath>
 #include <QQuaternion>
 #include <QSettings>
 #include <QTemporaryDir>
@@ -93,6 +95,19 @@ private slots:
     void registration_requiresAllFiducials();
 
     void sessionState_roundTrip();
+
+    void liveTracking_stationsMirrorTipAndGimbalGuard();
+    void liveCapture_fiducialsHeadShapeVertexAndButton();
+    void headFrameFallback_buildsFrameFromCapturedFiducials();
+    void pivotCalibration_recoversTipOffset();
+    void pivotCalibration_rejectsTooFewOrSingleAxisSamples();
+    void opticalCalibration_recoversAxis_data();
+    void opticalCalibration_recoversAxis();
+
+private:
+    static void feed(PolhemusConnection& conn, int station, const QVector3D& pos, const QQuaternion& ori);
+    static void calibrateOptics(PolhemusCoregistration& coreg, PolhemusConnection& conn, const QVector3D& center,
+                                const QVector3D& axis);
 };
 
 //=============================================================================================================
@@ -471,6 +486,313 @@ void TestPolhemusCoregistration::sessionState_roundTrip()
     const QVector3D mappedSecond = second.worldToModel().map(probe);
     QVERIFY2((mappedFirst - mappedSecond).length() < 1.0e-5f,
              "registration differs after a save and restore cycle");
+}
+
+//=============================================================================================================
+
+void TestPolhemusCoregistration::feed(PolhemusConnection& conn, int station, const QVector3D& pos, const QQuaternion& ori)
+{
+    emit conn.pointReceived(station, pos, ori);
+}
+
+//=============================================================================================================
+
+void TestPolhemusCoregistration::liveTracking_stationsMirrorTipAndGimbalGuard()
+{
+    PolhemusCoregistration coreg;
+    PolhemusConnection conn;
+    coreg.setConnection(&conn);
+    QSignalSpy deviceSpy(&coreg, &PolhemusCoregistration::devicePoseChanged);
+    QSignalSpy penSpy(&coreg, &PolhemusCoregistration::penPoseChanged);
+    QSignalSpy probeSpy(&coreg, &PolhemusCoregistration::probePoseChanged);
+
+    // Tracker (station 2): deviceToWorld = T(pos) R(ori) T(offset) R(offsetRot)
+    const QQuaternion trackerOri = QQuaternion::fromAxisAndAngle(QVector3D(0, 0, 1), 30.0f);
+    const QQuaternion offsetRot = QQuaternion::fromAxisAndAngle(QVector3D(1, 0, 0), 90.0f);
+    coreg.setTrackerToDeviceOffset(QVector3D(0.01f, 0.0f, 0.0f), offsetRot);
+    feed(conn, 2, QVector3D(0.1f, 0.2f, 0.3f), trackerOri);
+    QCOMPARE(deviceSpy.count(), 1);
+    const QVector3D deviceOrigin = coreg.deviceToWorld().map(QVector3D());
+    const QVector3D expectedOrigin = QVector3D(0.1f, 0.2f, 0.3f) + trackerOri.rotatedVector(QVector3D(0.01f, 0, 0));
+    QVERIFY((deviceOrigin - expectedOrigin).length() < 1e-6f);
+    const QVector3D deviceY = coreg.deviceToWorld().mapVector(QVector3D(0, 1, 0));
+    QVERIFY((deviceY - (trackerOri * offsetRot).rotatedVector(QVector3D(0, 1, 0))).length() < 1e-6f);
+
+    // Pen (station 1): mirrored X/Y, tip offset rotated by the sensor orientation
+    const QQuaternion penOri = QQuaternion::fromAxisAndAngle(QVector3D(1, 0, 0), 90.0f);
+    coreg.setAxisMirror(true, true);
+    coreg.setPenTipOffset(QVector3D(0.0f, 0.0f, -0.1f));
+    coreg.setTipOffsetEnabled(true);
+    feed(conn, 1, QVector3D(0.05f, 0.06f, 0.07f), penOri);
+    QVERIFY(coreg.haveLivePenPosition());
+    QVERIFY((coreg.penPosition() - QVector3D(-0.05f, 0.04f, 0.07f)).length() < 1e-6f);
+    QCOMPARE(penSpy.count(), 1);
+
+    // Near gimbal lock (pitch 85 deg about Y) the pose is frozen, but the signal still fires
+    feed(conn, 1, QVector3D(0.5f, 0.5f, 0.5f), QQuaternion::fromAxisAndAngle(QVector3D(0, 1, 0), 85.0f));
+    QVERIFY((coreg.penPosition() - QVector3D(-0.05f, 0.04f, 0.07f)).length() < 1e-6f);
+    QCOMPARE(penSpy.count(), 2);
+
+    // Probe (station 3) and an unknown station
+    feed(conn, 3, QVector3D(0.2f, 0.1f, 0.0f), penOri);
+    QVERIFY(coreg.haveLiveProbePosition());
+    QCOMPARE(coreg.probePosition(), QVector3D(-0.2f, -0.1f, 0.0f));
+    QCOMPARE(coreg.probeOrientation(), penOri);
+    feed(conn, 4, QVector3D(), QQuaternion());
+    QCOMPARE(deviceSpy.count() + penSpy.count() + probeSpy.count(), 4);
+
+    // After detaching, samples are ignored
+    coreg.setConnection(nullptr);
+    feed(conn, 1, QVector3D(), QQuaternion());
+    QCOMPARE(penSpy.count(), 2);
+}
+
+//=============================================================================================================
+
+void TestPolhemusCoregistration::liveCapture_fiducialsHeadShapeVertexAndButton()
+{
+    PolhemusCoregistration coreg;
+    PolhemusConnection conn;
+    coreg.setConnection(&conn);
+    QSignalSpy buttonSpy(&coreg, &PolhemusCoregistration::penButtonPressed);
+
+    const QVector3D lpa(-0.075f, 0.0f, 0.0f), nas(0.0f, 0.095f, 0.0f), rpa(0.075f, 0.0f, 0.0f);
+    const QVector<std::pair<FiducialId, QVector3D>> fids = {
+        {FiducialId::LPA, lpa + QVector3D(0, 0, 0.01f)}, {FiducialId::LPA, lpa}, {FiducialId::NAS, nas}, {FiducialId::RPA, rpa}};
+    for (const auto& [id, pos] : fids) {
+        feed(conn, 1, pos, QQuaternion());
+        QVERIFY(coreg.captureCurrentPenPositionAsFiducial(id));
+    }
+    // Re-capturing LPA replaced the first one
+    QCOMPARE(coreg.acquiredPoints()->countOf(PointKind::Fiducial), 3);
+    QCOMPARE(coreg.acquiredPoints()->fiducial(FiducialId::LPA), lpa);
+    QVERIFY(coreg.hasAllPenFiducials());
+
+    for (int i = 0; i < 2; ++i) {
+        feed(conn, 1, QVector3D(0.01f * i, 0.02f, 0.09f), QQuaternion());
+        QVERIFY(coreg.captureCurrentPenPositionAsHeadShape());
+    }
+    QCOMPARE(coreg.acquiredPoints()->countOf(PointKind::HeadShape), 2);
+    QCOMPARE(coreg.acquiredPoints()->points().last().label, QStringLiteral("HSP-2"));
+
+    feed(conn, 1, QVector3D(0.0f, 0.02f, 0.1f), QQuaternion());
+    QVERIFY(coreg.captureCurrentPenPositionAsVertex());
+    QVERIFY(coreg.hasPenVertex());
+    QCOMPARE(coreg.penVertex(), QVector3D(0.0f, 0.02f, 0.1f));
+
+    // The pen button is forwarded only for the pen station, with the tip-adjusted position
+    emit conn.penButtonPressed(3, QVector3D(1, 1, 1), QQuaternion());
+    QCOMPARE(buttonSpy.count(), 0);
+    emit conn.penButtonPressed(1, QVector3D(0.03f, 0.0f, 0.0f), QQuaternion());
+    QCOMPARE(buttonSpy.count(), 1);
+    QCOMPARE(buttonSpy.at(0).at(0).value<QVector3D>(), QVector3D(0.03f, 0.0f, 0.0f));
+}
+
+//=============================================================================================================
+
+void TestPolhemusCoregistration::headFrameFallback_buildsFrameFromCapturedFiducials()
+{
+    PolhemusCoregistration coreg;
+    PolhemusConnection conn;
+    coreg.setConnection(&conn);
+    // A rotated head: NAS along world +y, LPA along world -x around origin (0.01, 0.02, 0.03)
+    const QVector3D o(0.01f, 0.02f, 0.03f);
+    const QVector<std::pair<FiducialId, QVector3D>> fids = {
+        {FiducialId::LPA, o + QVector3D(-0.07f, 0, 0)}, {FiducialId::NAS, o + QVector3D(0.01f, 0.1f, 0)}, {FiducialId::RPA, o + QVector3D(0.07f, 0, 0)}};
+    for (const auto& [id, pos] : fids) {
+        feed(conn, 1, pos, QQuaternion());
+        QVERIFY(coreg.captureCurrentPenPositionAsFiducial(id));
+    }
+    feed(conn, 2, QVector3D(0.2f, 0.0f, 0.0f), QQuaternion());
+
+    QVERIFY(coreg.computeRegistration());
+    // Head frame: origin midway between the ears, x towards NAS, y towards LPA (orthogonalised), z = x cross y
+    const QMatrix4x4 h = coreg.headToWorld();
+    QVERIFY((h.map(QVector3D()) - o).length() < 1e-6f);
+    const QVector3D ex = QVector3D(0.01f, 0.1f, 0).normalized();
+    QVERIFY((h.mapVector(QVector3D(1, 0, 0)) - ex).length() < 1e-5f);
+    const QVector3D ey = h.mapVector(QVector3D(0, 1, 0));
+    QVERIFY(std::fabs(QVector3D::dotProduct(ey, ex)) < 1e-5f);
+    QVERIFY(ey.x() < 0.0f);
+    QVERIFY((h.mapVector(QVector3D(0, 0, 1)) - QVector3D(0, 0, 1)).length() < 1e-5f);
+    QVERIFY(coreg.worldToModel().isIdentity());
+    QVERIFY((coreg.headToDevice().map(QVector3D()) - (o - QVector3D(0.2f, 0, 0))).length() < 1e-6f);
+
+    // NAS on the ear line: no frame can be built
+    PolhemusCoregistration flat;
+    flat.setConnection(&conn);
+    const QVector<std::pair<FiducialId, QVector3D>> line = {
+        {FiducialId::LPA, QVector3D(-0.07f, 0, 0)}, {FiducialId::NAS, QVector3D(0.03f, 0, 0)}, {FiducialId::RPA, QVector3D(0.07f, 0, 0)}};
+    for (const auto& [id, pos] : line) {
+        feed(conn, 1, pos, QQuaternion());
+        QVERIFY(flat.captureCurrentPenPositionAsFiducial(id));
+    }
+    QVERIFY(!flat.computeRegistration());
+}
+
+//=============================================================================================================
+
+void TestPolhemusCoregistration::pivotCalibration_recoversTipOffset()
+{
+    PolhemusCoregistration coreg;
+    PolhemusConnection conn;
+    coreg.setConnection(&conn);
+    QSignalSpy doneSpy(&coreg, &PolhemusCoregistration::pivotCalibrationDone);
+    QSignalSpy sampleSpy(&coreg, &PolhemusCoregistration::pivotSampleCollected);
+
+    // The pen pivots about a fixed tip T; the sensor sits at T - R_i * offset
+    const QVector3D tip(0.1f, 0.2f, 0.05f);
+    const QVector3D offset(0.01f, -0.02f, -0.12f);
+    coreg.startPivotCalibration();
+    emit conn.penButtonPressed(1, tip, QQuaternion());
+    QCOMPARE(coreg.pivotState(), PolhemusCoregistration::PivotState::Collecting);
+
+    for (int i = 0; i < 14; ++i) {
+        const float phi = qDegreesToRadians(25.0f * i);
+        const QQuaternion r = QQuaternion::fromAxisAndAngle(QVector3D(std::cos(phi), std::sin(phi), 0.3f), 30.0f);
+        feed(conn, 1, tip - r.rotatedVector(offset), r);
+        // A repeat of the same orientation and a gimbal-locked pose are not collected
+        feed(conn, 1, tip - r.rotatedVector(offset), r);
+        feed(conn, 1, tip, QQuaternion::fromAxisAndAngle(QVector3D(0, 1, 0), 85.0f));
+    }
+    QCOMPARE(coreg.pivotSampleCount(), 14);
+    QCOMPARE(sampleSpy.count(), 14);
+    QVERIFY(sampleSpy.last().at(1).toFloat() > 30.0f);
+
+    emit conn.penButtonPressed(1, tip, QQuaternion());
+    QCOMPARE(coreg.pivotState(), PolhemusCoregistration::PivotState::Done);
+    QCOMPARE(doneSpy.count(), 1);
+    QVERIFY2((coreg.penTipOffset() - offset).length() < 1e-5f,
+             qPrintable(QString("offset %1 %2 %3").arg(coreg.penTipOffset().x()).arg(coreg.penTipOffset().y()).arg(coreg.penTipOffset().z())));
+    QVERIFY(coreg.pivotResidualMm() < 0.01f);
+}
+
+//=============================================================================================================
+
+void TestPolhemusCoregistration::pivotCalibration_rejectsTooFewOrSingleAxisSamples()
+{
+    PolhemusCoregistration coreg;
+    PolhemusConnection conn;
+    coreg.setConnection(&conn);
+    const QVector3D offset(0.0f, 0.0f, -0.12f);
+
+    // Fewer than 10 samples
+    coreg.startPivotCalibration();
+    emit conn.penButtonPressed(1, QVector3D(), QQuaternion());
+    for (int i = 0; i < 5; ++i) {
+        const QQuaternion r = QQuaternion::fromAxisAndAngle(QVector3D(1, 0, 0), 10.0f * i);
+        feed(conn, 1, -r.rotatedVector(offset), r);
+    }
+    emit conn.penButtonPressed(1, QVector3D(), QQuaternion());
+    QCOMPARE(coreg.pivotState(), PolhemusCoregistration::PivotState::Idle);
+
+    // Rotations about the pen's own axis leave tip depth and offset length indistinguishable
+    coreg.startPivotCalibration();
+    emit conn.penButtonPressed(1, QVector3D(), QQuaternion());
+    for (int i = 0; i < 12; ++i) {
+        const QQuaternion r = QQuaternion::fromAxisAndAngle(QVector3D(0, 0, 1), 10.0f * i);
+        feed(conn, 1, -r.rotatedVector(offset), r);
+    }
+    QCOMPARE(coreg.pivotSampleCount(), 12);
+    emit conn.penButtonPressed(1, QVector3D(), QQuaternion());
+    QCOMPARE(coreg.pivotState(), PolhemusCoregistration::PivotState::Idle);
+    QCOMPARE(coreg.penTipOffset(), QVector3D());
+}
+
+//=============================================================================================================
+
+void TestPolhemusCoregistration::calibrateOptics(PolhemusCoregistration& coreg, PolhemusConnection& conn,
+                                                 const QVector3D& center, const QVector3D& axis)
+{
+    // Focus points on the optical axis, seen from five different tracker poses
+    for (int k = 0; k < 5; ++k) {
+        const QQuaternion trackerOri = QQuaternion::fromAxisAndAngle(QVector3D(0.2f * k, 1.0f, 0.5f), 15.0f + 7.0f * k);
+        const QVector3D trackerPos(0.3f + 0.01f * k, -0.1f, 0.4f - 0.02f * k);
+        feed(conn, 2, trackerPos, trackerOri);
+        feed(conn, 1, trackerPos + trackerOri.rotatedVector(center + (0.10f + 0.06f * k) * axis), QQuaternion());
+        QVERIFY(coreg.captureOpticalCalibSample());
+    }
+    QCOMPARE(coreg.opticalCalibSampleCount(), 5);
+}
+
+//=============================================================================================================
+
+void TestPolhemusCoregistration::opticalCalibration_recoversAxis_data()
+{
+    QTest::addColumn<int>("mode");
+    QTest::newRow("captured objective center") << 0;
+    QTest::newRow("unconstrained") << 2;
+}
+
+//=============================================================================================================
+
+void TestPolhemusCoregistration::opticalCalibration_recoversAxis()
+{
+    QFETCH(int, mode);
+    PolhemusCoregistration coreg;
+    PolhemusConnection conn;
+    coreg.setConnection(&conn);
+    QSignalSpy changedSpy(&coreg, &PolhemusCoregistration::opticalCalibrationChanged);
+
+    const QVector3D center(0.05f, 0.18f, -0.03f);
+    const QVector3D axis = QVector3D(0.1f, 1.0f, -0.3f).normalized();
+    coreg.setKnownTrackerToObjectiveDistance(mode == 1 ? center.length() : 0.0f);
+
+    calibrateOptics(coreg, conn, center, axis);
+    if (mode == 0) {
+        const QQuaternion trackerOri = QQuaternion::fromAxisAndAngle(QVector3D(0, 0, 1), 40.0f);
+        feed(conn, 2, QVector3D(0.1f, 0.1f, 0.1f), trackerOri);
+        feed(conn, 1, QVector3D(0.1f, 0.1f, 0.1f) + trackerOri.rotatedVector(center), QQuaternion());
+        QVERIFY(coreg.captureObjectiveCenter());
+        QVERIFY((coreg.objectiveCenterLocal() - center).length() < 1e-5f);
+    }
+    QVERIFY(coreg.solveOpticalCalibration());
+    QVERIFY(coreg.opticalCalibrationValid());
+    QCOMPARE(changedSpy.count(), 1);
+
+    QVERIFY2(QVector3D::dotProduct(coreg.opticalAxisLocal(), axis) > 1.0f - 1e-5f,
+             qPrintable(QString("axis %1 %2 %3").arg(coreg.opticalAxisLocal().x()).arg(coreg.opticalAxisLocal().y()).arg(coreg.opticalAxisLocal().z())));
+    QVERIFY(coreg.opticalCalibResidualMm() < 0.05f);
+    QVERIFY(std::fabs(coreg.opticalCalibDepthSpreadMm() - 240.0f) < 0.1f);
+    // The centre lies on the axis; with a captured centre or a known distance it is the true one
+    const QVector3D c = coreg.opticalCenterLocal();
+    const QVector3D rel = c - center;
+    QVERIFY((rel - QVector3D::dotProduct(rel, axis) * axis).length() < 1e-5f);
+    if (mode != 2) {
+        QVERIFY2(rel.length() < 1e-4f, qPrintable(QString("centre off by %1 m").arg(rel.length())));
+    }
+
+    // World ray and up vector for the current tracker pose
+    const QQuaternion trackerOri = QQuaternion::fromAxisAndAngle(QVector3D(1, 0, 0), 20.0f);
+    const QVector3D trackerPos(0.2f, 0.0f, 0.1f);
+    feed(conn, 2, trackerPos, trackerOri);
+    QVector3D origin, direction, up;
+    QVERIFY(coreg.opticalRayInWorld(origin, direction));
+    QVERIFY((origin - (trackerPos + trackerOri.rotatedVector(c))).length() < 1e-5f);
+    QVERIFY((direction - trackerOri.rotatedVector(axis)).length() < 1e-4f);
+    QVERIFY(coreg.opticalUpInWorld(up));
+    QVERIFY(std::fabs(QVector3D::dotProduct(up, direction)) < 1e-5f);
+    QVERIFY(QVector3D::dotProduct(up, trackerOri.rotatedVector(QVector3D(0, 0, 1))) > 0.9f);
+
+    // Fine adjustment towards a target 2 degrees off the axis, then undo
+    const QVector3D tilted = QQuaternion::fromAxisAndAngle(up, 2.0f).rotatedVector(direction);
+    float correction = 0.0f;
+    QVERIFY(coreg.applyOpticalAxisFineAdjust(origin + 0.3f * tilted, correction));
+    QVERIFY(std::fabs(correction - 2.0f) < 0.01f);
+    QVERIFY(coreg.opticalFineAdjustApplied());
+    QCOMPARE(coreg.opticalFineAdjustDeg(), correction);
+    QVERIFY(coreg.opticalRayInWorld(origin, direction));
+    QVERIFY((direction - tilted).length() < 1e-4f);
+    QVERIFY(!coreg.applyOpticalAxisFineAdjust(origin + 0.3f * QQuaternion::fromAxisAndAngle(up, 20.0f).rotatedVector(direction), correction));
+    QVERIFY(correction > 10.0f);
+    QVERIFY(!coreg.applyOpticalAxisFineAdjust(origin, correction));
+    coreg.clearOpticalFineAdjust();
+    QVERIFY(!coreg.opticalFineAdjustApplied());
+    QVERIFY((coreg.opticalAxisLocal() - axis).length() < 1e-4f);
+
+    coreg.clearOpticalCalibSamples();
+    QVERIFY(!coreg.opticalCalibrationValid());
+    QVERIFY(!coreg.solveOpticalCalibration());
 }
 
 //=============================================================================================================
