@@ -275,6 +275,7 @@ private slots:
      * columnCount return sensible values, and basic data() queries do not crash.
      */
     void channelInfoModel_basics();
+    void channelInfoModel_columnsRolesAndLayoutMapping();
 
     //=========================================================================================================
     /**
@@ -1065,6 +1066,79 @@ void TestDispViewers2::evokedSetModel_projectionRolesAndAverageMaps()
     model.setAverageActivation(QSharedPointer<QMap<QString, bool>>::create());
     QVERIFY(model.getAverageColor()->isEmpty());
     QVERIFY(model.getAverageActivation()->isEmpty());
+}
+
+//=============================================================================================================
+
+void TestDispViewers2::channelInfoModel_columnsRolesAndLayoutMapping()
+{
+    auto info = createBrowserTestInfo();
+    info->chs[1].unit = FIFF_UNIT_T_M;
+    info->chs[1].chpos.coil_type = FIFFV_COIL_VV_PLANAR_T1;
+    info->chs[0].chpos.r0 = Eigen::Vector3f(0.01f, -0.02f, 0.05f);
+    FiffChInfo eeg;
+    eeg.ch_name = QStringLiteral("EEG-007");
+    eeg.kind = FIFFV_EEG_CH;
+    eeg.unit = FIFF_UNIT_V;
+    info->chs.append(eeg);
+    info->ch_names.append(eeg.ch_name);
+    info->nchan = 5;
+
+    ChannelInfoModel model(info);
+    QSignalSpy mappedSpy(&model, &ChannelInfoModel::channelsMappedToLayout);
+    QCOMPARE(model.rowCount(), 5);
+    QCOMPARE(model.columnCount(), 13);
+
+    // Layout names drop the kind prefix and separators and re-prefix MEG / EEG; other kinds keep their name
+    const QStringList mapped = {"MEG 0111", "MEG 0112", "MEG 0113", "STI014", "EEG 007"};
+    QCOMPARE(model.getMappedChannelsList(), mapped);
+    QCOMPARE(model.getIndexFromMappedChName(QStringLiteral("EEG 007")), 4);
+    QCOMPARE(model.getIndexFromOrigChName(QStringLiteral("MEG0113")), 2);
+    QCOMPARE(model.getBadChannelList(), QStringList{QStringLiteral("MEG0112")});
+
+    model.layoutChanged({{QStringLiteral("MEG 0111"), QPointF(1.5, -2.0)}, {QStringLiteral("EEG 007"), QPointF(3, 4)}});
+    QCOMPARE(mappedSpy.size(), 1);
+
+    auto cell = [&model](int row, int column, int role) {
+        return model.data(model.index(row, column), role);
+    };
+    QCOMPARE(cell(3, 0, Qt::DisplayRole).toInt(), 3);
+    QCOMPARE(cell(3, 0, ChannelInfoModelRoles::GetChNumber).toInt(), 3);
+    QCOMPARE(cell(4, 1, ChannelInfoModelRoles::GetOrigChName).toString(), QStringLiteral("EEG-007"));
+    QCOMPARE(cell(4, 2, ChannelInfoModelRoles::GetChAlias).toString(), QStringLiteral("EEG-007"));
+    QCOMPARE(cell(4, 3, ChannelInfoModelRoles::GetMappedLayoutChName).toString(), QStringLiteral("EEG 007"));
+    QCOMPARE(cell(4, 4, ChannelInfoModelRoles::GetChKind).toInt(), static_cast<int>(FIFFV_EEG_CH));
+    QCOMPARE(cell(1, 5, ChannelInfoModelRoles::GetMEGType).toString(), QStringLiteral("MEG_grad"));
+    QCOMPARE(cell(0, 5, Qt::DisplayRole).toString(), QStringLiteral("MEG_mag"));
+    QCOMPARE(cell(4, 5, Qt::DisplayRole).toString(), QStringLiteral("non_MEG"));
+    QCOMPARE(cell(4, 6, ChannelInfoModelRoles::GetChUnit).toInt(), static_cast<int>(FIFF_UNIT_V));
+    QCOMPARE(cell(0, 7, ChannelInfoModelRoles::GetChPosition).toPointF(), QPointF(1.5, -2.0));
+    QCOMPARE(cell(4, 7, Qt::DisplayRole).toString(), QStringLiteral("(3|4)"));
+    QCOMPARE(cell(2, 7, ChannelInfoModelRoles::GetChPosition).toPointF(), QPointF());
+    const QVector3D digitizer = cell(0, 8, ChannelInfoModelRoles::GetChDigitizer).value<QVector3D>();
+    QVERIFY((digitizer - QVector3D(1.0f, -2.0f, 5.0f)).length() < 1e-5f);
+    QVERIFY(!cell(0, 9, Qt::DisplayRole).isValid());
+    QCOMPARE(cell(1, 10, ChannelInfoModelRoles::GetChCoilType).toInt(), static_cast<int>(FIFFV_COIL_VV_PLANAR_T1));
+    QVERIFY(cell(1, 11, ChannelInfoModelRoles::GetIsBad).toBool());
+    QVERIFY(!cell(2, 11, Qt::DisplayRole).toBool());
+    QCOMPARE(cell(0, 12, Qt::DisplayRole).toInt(), 0);
+    for (int column = 0; column < 13; ++column) {
+        QCOMPARE(cell(0, column, Qt::TextAlignmentRole).toInt(), static_cast<int>(Qt::AlignHCenter | Qt::AlignVCenter));
+        QVERIFY(!model.headerData(column, Qt::Horizontal).toString().isEmpty());
+    }
+    QVERIFY(!cell(9, 1, Qt::DisplayRole).isValid());
+    QCOMPARE(model.headerData(2, Qt::Vertical).toString(), QStringLiteral("Ch 2"));
+    QVERIFY(!model.headerData(9, Qt::Vertical).isValid());
+    QVERIFY(!model.headerData(0, Qt::Horizontal, Qt::ToolTipRole).isValid());
+    QVERIFY(model.flags(model.index(0, 0)).testFlag(Qt::ItemIsSelectable));
+    QVERIFY(model.setData(model.index(0, 0), 1));
+    QVERIFY(model.insertRows(0, 1));
+    QVERIFY(model.removeRows(0, 1));
+
+    model.assignedOperatorsChanged({});
+    model.clearModel();
+    QCOMPARE(model.rowCount(), 0);
+    QVERIFY(model.getMappedChannelsList().isEmpty());
 }
 
 //=============================================================================================================
