@@ -70,6 +70,9 @@
 #include <QScrollBar>
 #include <QSignalSpy>
 #include <QStringList>
+#include <QDir>
+#include <QHeaderView>
+#include <QMenu>
 #include <QTableView>
 
 #include <Eigen/Core>
@@ -294,6 +297,7 @@ private slots:
      * and lifecycle methods survive.
      */
     void rtFiffRawView_lifecycle();
+    void rtFiffRawView_paintsHidesRowsAndAddsEvents();
 
     //=========================================================================================================
     /**
@@ -1552,6 +1556,123 @@ void TestDispViewers2::rtFiffRawView_lifecycle()
     view.clearView();
 
     QApplication::processEvents();
+}
+
+//=============================================================================================================
+
+void TestDispViewers2::rtFiffRawView_paintsHidesRowsAndAddsEvents()
+{
+    RtFiffRawView view(QStringLiteral("test_disp_viewers2_rawview"));
+    view.resize(600, 400);
+    auto info = createBrowserTestInfo();
+    view.init(info);
+    QCOMPARE(view.getSamplingFreq(), 1000.0f);
+    auto* table = view.findChild<QTableView*>();
+    QVERIFY(table != nullptr);
+    auto* model = qobject_cast<RtFiffRawViewModel*>(table->model());
+    QVERIFY(model != nullptr);
+
+    view.setWindowSize(1);
+    QCOMPARE(view.getWindowSize(), 1);
+    QCOMPARE(model->getMaxSamples(), 1000);
+    view.setSignalColor(Qt::darkBlue);
+    QCOMPARE(view.getSignalColor(), QColor(Qt::darkBlue));
+    view.setBackgroundColor(Qt::white);
+    QCOMPARE(view.getBackgroundColor(), QColor(Qt::white));
+    view.setScalingMap({{FIFF_UNIT_T, 2.0f}, {FIFFV_STIM_CH, 4.0f}});
+    QCOMPARE(view.getScalingMap().value(FIFF_UNIT_T), 2.0f);
+    view.setDistanceTimeSpacer(200);
+    QCOMPARE(view.getDistanceTimeSpacer(), 200);
+    view.triggerInfoChanged({{3.0, Qt::red}}, true, QStringLiteral("STI014"), 1.0);
+
+    // Four blocks of 300 samples: the trigger channel steps to 3 every 250 samples
+    QSignalSpy triggerSpy(&view, &RtFiffRawView::triggerDetected);
+    for (int b = 0; b < 4; ++b) {
+        Eigen::MatrixXd block = Eigen::MatrixXd::Zero(4, 300);
+        for (int s = 0; s < 300; ++s) {
+            const int t = 300 * b + s;
+            block(0, s) = std::sin(0.02 * t);
+            block(2, s) = 0.5;
+            block(3, s) = (t % 250 < 5) ? 3.0 : 0.0;
+        }
+        view.addData({block});
+    }
+    QVERIFY(!triggerSpy.isEmpty());
+    QCOMPARE(view.getLastBlock().cols(), 300);
+    view.addData({});
+
+    view.show();
+    QVERIFY(QTest::qWaitForWindowExposed(&view));
+    QVERIFY(!view.grab().isNull());
+
+    // MEG0112 is bad in the test info: hiding bad channels leaves three rows that share the height
+    QVERIFY(!view.getBadChannelHideStatus());
+    view.hideBadChannels();
+    QVERIFY(view.getBadChannelHideStatus());
+    QVERIFY(table->isRowHidden(1));
+    const int h = table->height();
+    QCOMPARE(table->verticalHeader()->defaultSectionSize(), static_cast<int>(h * 4.0f / 3.0f));
+    view.hideBadChannels();
+    QVERIFY(!table->isRowHidden(1));
+    QCOMPARE(table->verticalHeader()->defaultSectionSize(), h);
+
+    view.setZoom(2.0);
+    QCOMPARE(view.getZoom(), 2.0);
+    QCOMPARE(table->verticalHeader()->defaultSectionSize(), static_cast<int>(h / 2.0f));
+
+    view.showSelectedChannelsOnly({QStringLiteral("MEG0111"), QStringLiteral("STI014")});
+    QVERIFY(!table->isRowHidden(0));
+    QVERIFY(table->isRowHidden(2));
+    QVERIFY(!table->isRowHidden(3));
+    view.showSelectedChannelsOnly(info->ch_names);
+
+    // The context menu offers the event and bad-marking actions; trigger them as the user would
+    auto contextAction = [&view, table](const QPoint& pos, const QString& text) {
+        emit table->customContextMenuRequested(pos);
+        QMenu* menu = view.findChildren<QMenu*>().last();
+        for (QAction* action : menu->actions()) {
+            if (action->text() == text) {
+                action->trigger();
+            }
+        }
+        menu->close();
+        menu->deleteLater();
+    };
+    QSignalSpy markSpy(&view, &RtFiffRawView::channelMarkingChanged);
+    table->selectRow(2);
+    contextAction(table->visualRect(model->index(2, 1)).center(), QStringLiteral("Mark as bad"));
+    QVERIFY(info->bads.contains(QStringLiteral("MEG0113")));
+    contextAction(table->visualRect(model->index(2, 1)).center(), QStringLiteral("Mark as good"));
+    QVERIFY(!info->bads.contains(QStringLiteral("MEG0113")));
+    QCOMPARE(markSpy.size(), 2);
+
+    // Only show / hide / reset the selected rows
+    table->selectRow(0);
+    contextAction(table->visualRect(model->index(0, 1)).center(), QStringLiteral("Only show selection"));
+    QVERIFY(!table->isRowHidden(0));
+    QVERIFY(table->isRowHidden(3));
+    contextAction(table->visualRect(model->index(0, 1)).center(), QStringLiteral("Reset selection"));
+    QVERIFY(!table->isRowHidden(3));
+    table->selectRow(3);
+    contextAction(table->visualRect(model->index(3, 1)).center(), QStringLiteral("Hide selection"));
+    QVERIFY(table->isRowHidden(3));
+    contextAction(table->visualRect(model->index(0, 1)).center(), QStringLiteral("Reset selection"));
+
+    model->toggleFreeze(QModelIndex());
+    QVERIFY(!view.grab().isNull());
+    model->toggleFreeze(QModelIndex());
+
+    // "Add event" at x = 150 of the plot column: buffer column 150 * maxSamples / width, plus the offset
+    QSignalSpy eventSpy(&view, &RtFiffRawView::addSampleAsEvent);
+    contextAction(QPoint(150, 10), QStringLiteral("Add event"));
+    QCOMPARE(eventSpy.size(), 1);
+    const double dx = static_cast<double>(table->columnWidth(1)) / 1000.0;
+    QCOMPARE(eventSpy.at(0).at(0).toInt(), static_cast<int>(150.0 / dx) + model->getFirstSampleOffset());
+
+    const QString shot = QDir::temp().filePath(QStringLiteral("test_disp_viewers2_rawview.png"));
+    view.takeScreenshot(shot);
+    QVERIFY(QFile::exists(shot));
+    QFile::remove(shot);
 }
 
 //=============================================================================================================
