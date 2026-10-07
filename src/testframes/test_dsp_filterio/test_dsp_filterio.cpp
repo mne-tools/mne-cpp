@@ -46,6 +46,7 @@ private slots:
         QCOMPARE(restored.getDesignMethod().getName(), original.getDesignMethod().getName());
         QCOMPARE(restored.getFilterType().getName(), original.getFilterType().getName());
         QCOMPARE(restored.getSamplingFrequency(), original.getSamplingFrequency());
+        QCOMPARE(restored.getParksWidth(), original.getParksWidth());
         QCOMPARE(restored.getCoefficients().size(), original.getCoefficients().size());
 
         for (int i = 0; i < restored.getCoefficients().size(); ++i) {

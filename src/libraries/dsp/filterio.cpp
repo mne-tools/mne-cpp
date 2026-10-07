@@ -105,6 +105,9 @@ bool FilterIO::readFilter(QString path, FilterKernel& filter)
             if (line.contains("DesignMethod") && fields.size() == 2)
                 filter.setDesignMethod(FilterKernel::m_designMethods.indexOf(FilterParameter(fields.at(1))));
 
+            if (line.contains("ParksWidth") && fields.size() == 2)
+                filter.setParksWidth(fields.at(1).toDouble());
+
         } else // Read filter coefficients
             coefficientsTemp.push_back(fields.join("").toDouble());
     }
@@ -147,6 +150,7 @@ bool FilterIO::writeFilter(const QString& path, const FilterKernel& filter)
         out << "#LPFreq " << filter.getLowpassFreq() << "\n";
         out << "#CenterFreq " << filter.getCenterFrequency() << "\n";
         out << "#DesignMethod " << filter.getDesignMethod().getName() << "\n";
+        out << "#ParksWidth " << filter.getParksWidth() << "\n";
 
         for (int i = 0; i < filter.getCoefficients().cols(); i++)
             out << filter.getCoefficients()(i) << "\n";

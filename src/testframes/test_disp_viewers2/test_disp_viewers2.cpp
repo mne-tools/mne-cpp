@@ -742,6 +742,7 @@ void TestDispViewers2::filterDesignView_designExportLoad()
     QCOMPARE(pTaps->value(), 128);
     QVERIFY(qAbs(view.getCurrentFilter().getHighpassFreq() - 4.0) < 1e-9);
     QVERIFY(qAbs(view.getCurrentFilter().getLowpassFreq() - 30.0) < 1e-9);
+    QVERIFY((view.getCurrentFilter().getCoefficients() - kernel.getCoefficients()).cwiseAbs().maxCoeff() < 1e-6);
 
     // Plot export as PNG
     const QString sPng = dir.filePath(QStringLiteral("plot.png"));
