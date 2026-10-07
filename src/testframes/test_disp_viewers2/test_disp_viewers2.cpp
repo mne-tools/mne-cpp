@@ -342,6 +342,7 @@ private slots:
      * Verifies that FrequencySpectrumDelegate constructs with a null QTableView,
      * setScaleType does not crash, and sizeHint returns a valid size.
      */
+    void spectrumView_scalesBoundsAndPaints();
     void frequencySpectrumDelegate_basics();
 
     //=========================================================================================================
@@ -1725,6 +1726,78 @@ void TestDispViewers2::frequencySpectrumModel_basics()
     model.resetSelection();
 
     QApplication::processEvents();
+}
+
+//=============================================================================================================
+
+void TestDispViewers2::spectrumView_scalesBoundsAndPaints()
+{
+    // 4 channels at 1000 Hz, 100 frequency bins of 5 Hz up to Nyquist (500 Hz)
+    QSharedPointer<FiffInfo> info = createBrowserTestInfo();
+    Eigen::MatrixXd psd(4, 100);
+    for (int b = 0; b < 100; ++b) {
+        psd.col(b).setConstant(1.0 + 0.1 * b);
+    }
+    psd(1, 20) = 50.0;
+
+    for (const int scaleType : {0, 1}) {
+        SpectrumView view(QStringLiteral("test_disp_viewers2_spectrum"));
+        view.resize(500, 600);
+        view.setBoundaries(1, 40);
+        view.addData(psd);
+        view.init(info, scaleType);
+        view.addData(psd);
+        auto* table = view.findChild<QTableView*>();
+        QVERIFY(table != nullptr);
+        auto* model = qobject_cast<FrequencySpectrumModel*>(table->model());
+        QVERIFY(model != nullptr);
+        QCOMPARE(model->rowCount(), 4);
+        QCOMPARE(model->getNumStems(), 100);
+        QCOMPARE(model->getInfo(), info);
+        // Linear: bin k at 5k Hz, normalised by the last bin (495 Hz); log: log10(f + 1) / log10(496)
+        const Eigen::RowVectorXd scale = model->getFreqScale();
+        const double expected20 = scaleType ? std::log10(101.0) / std::log10(496.0) : 100.0 / 495.0;
+        QVERIFY(std::fabs(scale[20] - expected20) < 1e-12);
+        QCOMPARE(scale[99], 1.0);
+
+        // 20..200 Hz: the last bin below 20 Hz and the first above 200 Hz bound the scale
+        view.setBoundaries(20, 200);
+        const double nf = 500.0;
+        QVERIFY(scale[model->getLowerFrqBound()] * nf < 20.0);
+        QVERIFY(scale[model->getLowerFrqBound() + 1] * nf >= 20.0);
+        QVERIFY(scale[model->getUpperFrqBound()] * nf > 200.0);
+        QVERIFY(scale[model->getUpperFrqBound() - 1] * nf <= 200.0);
+        const Eigen::RowVectorXd bound = model->getFreqScaleBound();
+        QCOMPARE(bound[model->getLowerFrqBound()], 0.0);
+        QCOMPARE(bound[model->getUpperFrqBound()], 1.0);
+
+        QCOMPARE(model->data(model->index(2, 0)).toString(), QStringLiteral("MEG0113"));
+        QCOMPARE(model->data(model->index(1, 1)).value<Eigen::RowVectorXd>(), psd.row(1));
+        QCOMPARE(model->headerData(1, Qt::Horizontal).toString(), QStringLiteral("data plot"));
+        QCOMPARE(model->headerData(3, Qt::Vertical).toString(), QStringLiteral("STI014"));
+
+        // Freeze keeps the old spectrum while new data arrives
+        model->toggleFreeze(QModelIndex());
+        view.addData(psd * 2.0);
+        QCOMPARE(model->data(model->index(1, 1)).value<Eigen::RowVectorXd>(), psd.row(1));
+        model->toggleFreeze(QModelIndex());
+        QCOMPARE(model->data(model->index(1, 1)).value<Eigen::RowVectorXd>(), Eigen::RowVectorXd(psd.row(1) * 2.0));
+
+        model->selectRows({1, 3, 7});
+        QCOMPARE(model->rowCount(), 2);
+        QCOMPARE(model->data(model->index(1, 0)).toString(), QStringLiteral("STI014"));
+        model->resetSelection();
+
+        // Paint the plot rows and move the mouse over the first one to draw the read-out
+        view.show();
+        QVERIFY(QTest::qWaitForWindowExposed(&view));
+        QVERIFY(!view.grab().isNull());
+        QMouseEvent move(QEvent::MouseMove, QPointF(250, 70), table->viewport()->mapToGlobal(QPointF(250, 70)),
+                         Qt::NoButton, Qt::NoButton, Qt::NoModifier);
+        QApplication::sendEvent(table->viewport(), &move);
+        QVERIFY(!view.grab().isNull());
+        QCOMPARE(table->currentIndex().row(), 0);
+    }
 }
 
 //=============================================================================================================
