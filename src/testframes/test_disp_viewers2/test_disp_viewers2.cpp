@@ -89,6 +89,9 @@
 #include <QTemporaryDir>
 #include <QInputDialog>
 #include <QMessageBox>
+#include <QFileDialog>
+#include <QRadioButton>
+#include <QVector3D>
 #include <QTimer>
 
 #include <functional>
@@ -236,6 +239,12 @@ private slots:
      * lifecycle transitions.
      */
     void coregSettingsView_lifecycle();
+
+    //=========================================================================================================
+    /**
+     * Verifies CoregSettingsView fiducial picking, transformation parameters, scaling modes and signals.
+     */
+    void coregSettingsView_fiducialsAndParams();
 
     //=========================================================================================================
     /**
@@ -595,6 +604,134 @@ void TestDispViewers2::hpiSettingsView_lifecycle()
     view.clearView();
 
     QApplication::processEvents();
+}
+
+//=============================================================================================================
+
+void TestDispViewers2::coregSettingsView_fiducialsAndParams()
+{
+    CoregSettingsView view(QString{});
+    view.show();
+    auto* pPick = view.findChild<QCheckBox*>(QStringLiteral("m_qCheckBox_PickFiducials"));
+    auto* pResult = view.findChild<QWidget*>(QStringLiteral("m_qWidget_ResultFiducials"));
+    auto* pFidX = view.findChild<QLineEdit*>(QStringLiteral("m_qLineEdit_FidX"));
+    auto* pFidZ = view.findChild<QLineEdit*>(QStringLiteral("m_qLineEdit_FidZ"));
+    QVERIFY(pPick);
+    QVERIFY(pResult);
+    QVERIFY(pFidX);
+    QVERIFY(pFidZ);
+
+    // Picking toggles the result widget and reports the state.
+    QSignalSpy pickSpy(&view, &CoregSettingsView::pickFiducials);
+    pPick->setChecked(true);
+    QCOMPARE(pickSpy.last().at(0).toBool(), true);
+    QVERIFY(pResult->isEnabled());
+
+    // Each picked position is stored and the selection steps LPA -> NAS -> RPA -> LPA.
+    QSignalSpy fidSpy(&view, &CoregSettingsView::fiducialChanged);
+    view.findChild<QRadioButton*>(QStringLiteral("m_qRadioButton_LPA"))->setChecked(true);
+    QCOMPARE(view.getCurrentFiducial(), FIFFV_POINT_LPA);
+    view.setFiducials(QVector3D(-0.07f, 0.0f, 0.0f));
+    QCOMPARE(view.getCurrentFiducial(), FIFFV_POINT_NASION);
+    view.setFiducials(QVector3D(0.0f, 0.09f, 0.01f));
+    QCOMPARE(view.getCurrentFiducial(), FIFFV_POINT_RPA);
+    view.setFiducials(QVector3D(0.07f, 0.0f, 0.0f));
+    QCOMPARE(view.getCurrentFiducial(), FIFFV_POINT_LPA);
+    QVERIFY(fidSpy.count() >= 3);
+    QCOMPARE(fidSpy.last().at(0).toInt(), FIFFV_POINT_LPA);
+    // Back at LPA the stored LPA position is displayed (cm-truncated, in mm).
+    QCOMPARE(pFidX->text(), QStringLiteral("-70 mm"));
+    view.findChild<QRadioButton*>(QStringLiteral("m_qRadioButton_NAS"))->setChecked(true);
+    QCOMPARE(fidSpy.last().at(0).toInt(), FIFFV_POINT_NASION);
+    QCOMPARE(pFidZ->text(), QStringLiteral("10 mm"));
+
+    // Fitting ends picking.
+    QSignalSpy fitFidSpy(&view, &CoregSettingsView::fitFiducials);
+    QSignalSpy fitIcpSpy(&view, &CoregSettingsView::fitICP);
+    QTest::mouseClick(view.findChild<QPushButton*>(QStringLiteral("m_qPushButton_FitFiducials")), Qt::LeftButton);
+    QCOMPARE(fitFidSpy.count(), 1);
+    QVERIFY(!pPick->isChecked());
+    QVERIFY(!pResult->isEnabled());
+    QCOMPARE(pickSpy.last().at(0).toBool(), false);
+    pPick->setChecked(true);
+    QTest::mouseClick(view.findChild<QPushButton*>(QStringLiteral("m_qPushButton_FitICP")), Qt::LeftButton);
+    QCOMPARE(fitIcpSpy.count(), 1);
+    QVERIFY(!pPick->isChecked());
+
+    // Scaling mode enables the matching spin boxes and selects how the scale is read back.
+    auto* pMode = view.findChild<QComboBox*>(QStringLiteral("m_qComboBox_ScalingMode"));
+    auto* pScaleX = view.findChild<QDoubleSpinBox*>(QStringLiteral("m_qDoubleSpinBox_ScalingX"));
+    auto* pScaleY = view.findChild<QDoubleSpinBox*>(QStringLiteral("m_qDoubleSpinBox_ScalingY"));
+    auto* pScaleZ = view.findChild<QDoubleSpinBox*>(QStringLiteral("m_qDoubleSpinBox_ScalingZ"));
+    QVERIFY(pMode && pScaleX && pScaleY && pScaleZ);
+
+    QSignalSpy paramSpy(&view, &CoregSettingsView::transParamChanged);
+    const Eigen::Vector3f vecTransIn(0.001f, -0.002f, 0.003f);
+    const Eigen::Vector3f vecRotIn(0.1f, 0.2f, 0.3f);
+    const Eigen::Vector3f vecScaleIn(1.0f, 1.0f, 1.0f);
+    view.setTransParams(vecTransIn, vecRotIn, vecScaleIn);
+    QCOMPARE(paramSpy.count(), 0); // programmatic update must not echo back
+
+    Eigen::Vector3f vecRot, vecTrans, vecScale;
+    pMode->setCurrentText(QStringLiteral("None"));
+    QVERIFY(!pScaleX->isEnabled() && !pScaleY->isEnabled() && !pScaleZ->isEnabled());
+    view.getTransParams(vecRot, vecTrans, vecScale);
+    QVERIFY(vecTrans.isApprox(vecTransIn, 1e-3f));
+    QVERIFY(vecRot.isApprox(vecRotIn, 1e-3f));
+    QVERIFY(vecScale.isApprox(Eigen::Vector3f::Ones()));
+
+    pMode->setCurrentText(QStringLiteral("Uniform"));
+    QVERIFY(pScaleX->isEnabled() && !pScaleY->isEnabled() && !pScaleZ->isEnabled());
+    pScaleX->setValue(1.25);
+    QVERIFY(paramSpy.count() >= 1);
+    view.getTransParams(vecRot, vecTrans, vecScale);
+    QVERIFY(vecScale.isApprox(Eigen::Vector3f::Constant(1.25f)));
+
+    pMode->setCurrentText(QStringLiteral("3-Axis"));
+    QVERIFY(pScaleX->isEnabled() && pScaleY->isEnabled() && pScaleZ->isEnabled());
+    pScaleY->setValue(0.9);
+    pScaleZ->setValue(1.1);
+    view.getTransParams(vecRot, vecTrans, vecScale);
+    QVERIFY(vecScale.isApprox(Eigen::Vector3f(1.25f, 0.9f, 1.1f), 1e-4f));
+
+    // Fit settings and result labels.
+    view.findChild<QSpinBox*>(QStringLiteral("m_qSpinBox_MaxIter"))->setValue(42);
+    QCOMPARE(view.getMaxIter(), 42);
+    view.findChild<QDoubleSpinBox*>(QStringLiteral("m_qDoubleSpinBox_Converge"))->setValue(0.5);
+    QVERIFY(qAbs(view.getConvergence() - 0.0005f) < 1e-7f);
+    view.findChild<QSpinBox*>(QStringLiteral("m_qSpinBox_MaxDist"))->setValue(7);
+    QVERIFY(qAbs(view.getOmmitDistance() - 0.007f) < 1e-7f);
+    view.findChild<QCheckBox*>(QStringLiteral("m_qCheckBox_AutoScale"))->setChecked(true);
+    QVERIFY(view.getAutoScale());
+    view.setOmittedPoints(5);
+    QCOMPARE(view.findChild<QLabel*>(QStringLiteral("m_qLabel_NOmitted"))->text(), QStringLiteral("5"));
+    view.setRMSE(0.0025f);
+    QCOMPARE(view.findChild<QLabel*>(QStringLiteral("m_qLabel_RMSE"))->text(), QStringLiteral("2.5 mm"));
+
+    // BEM selection: clearing (the placeholder) is silent, the first added BEM becomes current.
+    QSignalSpy bemSpy(&view, &CoregSettingsView::changeSelectedBem);
+    QCOMPARE(view.getCurrentSelectedBem(), QStringLiteral("Select BEM"));
+    view.clearSelectionBem();
+    QCOMPARE(bemSpy.count(), 0);
+    view.addSelectionBem(QStringLiteral("sample-head.fif"));
+    view.addSelectionBem(QStringLiteral("sample-5120-bem.fif"));
+    QCOMPARE(bemSpy.count(), 1);
+    QCOMPARE(view.getCurrentSelectedBem(), QStringLiteral("sample-head.fif"));
+    view.findChild<QComboBox*>(QStringLiteral("m_qComboBox_BemItems"))->setCurrentIndex(1);
+    QCOMPARE(bemSpy.last().at(0).toString(), QStringLiteral("sample-5120-bem.fif"));
+    view.clearSelectionBem();
+    QCOMPARE(bemSpy.count(), 2);
+    QVERIFY(view.getCurrentSelectedBem().isEmpty());
+
+    // File buttons emit the chosen path and nothing when cancelled.
+    QSignalSpy digSpy(&view, &CoregSettingsView::digFileChanged);
+    answerNextModal([](QWidget* pModal) {
+        auto* pDialog = qobject_cast<QFileDialog*>(pModal);
+        QVERIFY(pDialog);
+        pDialog->reject();
+    });
+    QTest::mouseClick(view.findChild<QPushButton*>(QStringLiteral("m_qPushButton_LoadDig")), Qt::LeftButton);
+    QCOMPARE(digSpy.count(), 0);
 }
 
 //=============================================================================================================
