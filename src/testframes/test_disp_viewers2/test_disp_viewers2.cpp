@@ -697,6 +697,13 @@ void TestDispViewers2::coregSettingsView_fiducialsAndParams()
     view.getTransParams(vecRot, vecTrans, vecScale);
     QVERIFY(vecScale.isApprox(Eigen::Vector3f(1.25f, 0.9f, 1.1f), 1e-4f));
 
+    // A non-uniform scale survives the set/get round trip (index 0 is x).
+    view.setTransParams(vecTransIn, vecRotIn, Eigen::Vector3f(1.1f, 1.2f, 1.3f));
+    QCOMPARE(pScaleX->value(), 1.1);
+    view.getTransParams(vecRot, vecTrans, vecScale);
+    QVERIFY(vecScale.isApprox(Eigen::Vector3f(1.1f, 1.2f, 1.3f), 1e-4f));
+    QVERIFY(vecRot.isApprox(vecRotIn, 1e-3f));
+
     // Fit settings and result labels.
     view.findChild<QSpinBox*>(QStringLiteral("m_qSpinBox_MaxIter"))->setValue(42);
     QCOMPARE(view.getMaxIter(), 42);

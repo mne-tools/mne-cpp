@@ -551,9 +551,9 @@ void CoregSettingsView::setTransParams(const Vector3f& vecTrans,
     m_pUi->m_qDoubleSpinBox_RotY->setValue(vecRot(1) * 180 / M_PI);
     m_pUi->m_qDoubleSpinBox_RotZ->setValue(vecRot(0) * 180 / M_PI);
 
-    m_pUi->m_qDoubleSpinBox_ScalingX->setValue(vecScale(2));
+    m_pUi->m_qDoubleSpinBox_ScalingX->setValue(vecScale(0));
     m_pUi->m_qDoubleSpinBox_ScalingY->setValue(vecScale(1));
-    m_pUi->m_qDoubleSpinBox_ScalingZ->setValue(vecScale(0));
+    m_pUi->m_qDoubleSpinBox_ScalingZ->setValue(vecScale(2));
 }
 
 //=============================================================================================================
