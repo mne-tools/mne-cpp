@@ -294,6 +294,7 @@ void TestComRtClient::testRtDataClientReadsWhatTheServerWrites()
         QCOMPARE(got->proj_name, info.proj_name);
         QCOMPARE(got->proj_id, info.proj_id);
         QCOMPARE(got->gantry_angle, info.gantry_angle);
+        QCOMPARE(got->utc_offset, info.utc_offset);
         QCOMPARE(got->acq_pars, info.acq_pars);
         QCOMPARE(got->acq_stim, info.acq_stim);
         QCOMPARE(got->bads, info.bads);

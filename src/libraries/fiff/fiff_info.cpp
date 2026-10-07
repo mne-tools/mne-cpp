@@ -457,7 +457,7 @@ void FiffInfo::writeToStream(FiffStream* p_pStream) const
     p_pStream->write_float(FIFF_LOWPASS, &this->lowpass);
     p_pStream->write_string(FIFF_EXPERIMENTER, this->experimenter);
     p_pStream->write_string(FIFF_DESCRIPTION, this->description);
-    p_pStream->write_string(FIFF_UNIT_C, this->utc_offset);
+    p_pStream->write_string(FIFF_UTC_OFFSET, this->utc_offset);
     p_pStream->write_string(FIFF_PROJ_NAME, this->proj_name);
     p_pStream->write_int(FIFF_PROJ_ID, &this->proj_id);
     p_pStream->write_int(FIFF_GANTRY_ANGLE, &this->gantry_angle);
