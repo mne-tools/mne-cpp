@@ -1376,6 +1376,7 @@ bool PolhemusCoregistration::restoreSessionState(QSettings& settings, const QStr
     if (m_pPoints) {
         const char* fidLabels[] = {"", "LPA", "NAS", "RPA"};
         for (int i = 1; i <= 3; ++i) {
+            m_pPoints->removeFiducial(static_cast<FiducialId>(i));
             if (m_hasPenFid[i]) {
                 DigitizedPoint dp;
                 dp.kind = PointKind::Fiducial;

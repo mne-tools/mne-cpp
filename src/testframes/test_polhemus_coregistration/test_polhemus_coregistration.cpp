@@ -103,6 +103,7 @@ private slots:
     void pivotCalibration_rejectsTooFewOrSingleAxisSamples();
     void opticalCalibration_recoversAxis_data();
     void opticalCalibration_recoversAxis();
+    void opticalSession_roundTripAndRestoreReplacesFiducials();
 
 private:
     static void feed(PolhemusConnection& conn, int station, const QVector3D& pos, const QQuaternion& ori);
@@ -794,6 +795,78 @@ void TestPolhemusCoregistration::opticalCalibration_recoversAxis()
     coreg.clearOpticalCalibSamples();
     QVERIFY(!coreg.opticalCalibrationValid());
     QVERIFY(!coreg.solveOpticalCalibration());
+}
+
+//=============================================================================================================
+
+void TestPolhemusCoregistration::opticalSession_roundTripAndRestoreReplacesFiducials()
+{
+    QTemporaryDir tmpDir;
+    QVERIFY(tmpDir.isValid());
+    PolhemusCoregistration first;
+    PolhemusConnection conn;
+    first.setConnection(&conn);
+    const QVector3D center(0.0f, 0.2f, 0.0f);
+    const QVector3D axis = QVector3D(0.0f, 1.0f, 0.2f).normalized();
+    calibrateOptics(first, conn, center, axis);
+    feed(conn, 1, QVector3D(0.3f, 0.0f, 0.4f) + center, QQuaternion());
+    feed(conn, 2, QVector3D(0.3f, 0.0f, 0.4f), QQuaternion());
+    QVERIFY(first.captureObjectiveCenter());
+    QVERIFY(first.solveOpticalCalibration());
+    QVector3D origin, direction;
+    QVERIFY(first.opticalRayInWorld(origin, direction));
+    float correction = 0.0f;
+    QVERIFY(first.applyOpticalAxisFineAdjust(origin + 0.3f * QQuaternion::fromAxisAndAngle(QVector3D(1, 0, 0), 1.0f).rotatedVector(direction), correction));
+    first.setModelVertex(QVector3D(0.0f, 0.0f, 0.12f));
+    feed(conn, 1, QVector3D(0.0f, 0.01f, 0.11f), QQuaternion());
+    QVERIFY(first.captureCurrentPenPositionAsVertex());
+    const QVector<std::pair<FiducialId, QVector3D>> fids = {
+        {FiducialId::LPA, QVector3D(-0.07f, 0, 0)}, {FiducialId::NAS, QVector3D(0, 0.1f, 0)}, {FiducialId::RPA, QVector3D(0.07f, 0, 0)}};
+    for (const auto& [id, pos] : fids) {
+        feed(conn, 1, pos, QQuaternion());
+        QVERIFY(first.captureCurrentPenPositionAsFiducial(id));
+    }
+    QVERIFY(first.computeRegistration());
+
+    QSettings saved(tmpDir.path() + "/optical.ini", QSettings::IniFormat);
+    first.saveSessionState(saved);
+    saved.sync();
+
+    // The restoring side already holds different live fiducials; the restored ones must replace them
+    PolhemusCoregistration second;
+    second.setConnection(&conn);
+    for (const auto& [id, pos] : fids) {
+        feed(conn, 1, pos + QVector3D(0.0f, 0.0f, 0.05f), QQuaternion());
+        QVERIFY(second.captureCurrentPenPositionAsFiducial(id));
+    }
+    QVERIFY(second.restoreSessionState(saved));
+    QVERIFY(second.restoreSessionState(saved));
+    QCOMPARE(second.acquiredPoints()->countOf(PointKind::Fiducial), 3);
+    for (const auto& [id, pos] : fids) {
+        QCOMPARE(second.acquiredPoints()->fiducial(id), pos);
+    }
+
+    QCOMPARE(second.opticalCalibrationValid(), true);
+    QCOMPARE(second.opticalCalibSampleCount(), 5);
+    QCOMPARE(second.hasObjectiveCenter(), true);
+    QVERIFY((second.objectiveCenterLocal() - first.objectiveCenterLocal()).length() < 1e-6f);
+    QVERIFY((second.opticalAxisLocal() - first.opticalAxisLocal()).length() < 1e-6f);
+    QVERIFY((second.opticalCenterLocal() - first.opticalCenterLocal()).length() < 1e-6f);
+    QCOMPARE(second.opticalFineAdjustApplied(), true);
+    QVERIFY(std::fabs(second.opticalFineAdjustDeg() - first.opticalFineAdjustDeg()) < 1e-6f);
+    QVERIFY(std::fabs(second.opticalCalibResidualMm() - first.opticalCalibResidualMm()) < 1e-4f);
+    QVERIFY(std::fabs(second.opticalCalibDepthSpreadMm() - first.opticalCalibDepthSpreadMm()) < 1e-3f);
+    QCOMPARE(second.hasPenVertex(), true);
+    QCOMPARE(second.hasModelVertex(), true);
+    QCOMPARE(second.penVertex(), first.penVertex());
+    QCOMPARE(second.modelVertex(), first.modelVertex());
+    QCOMPARE(second.headToWorld(), first.headToWorld());
+    second.clearOpticalFineAdjust();
+    QVERIFY((second.opticalAxisLocal() - axis).length() < 1e-4f);
+    QVERIFY(second.solveOpticalCalibration());
+
+    QSettings empty(tmpDir.path() + "/empty.ini", QSettings::IniFormat);
+    QVERIFY(!second.restoreSessionState(empty));
 }
 
 //=============================================================================================================
