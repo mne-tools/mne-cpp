@@ -21,6 +21,7 @@
 
 #include <fiff/fiff_cov.h>
 #include <fiff/fiff_raw_data.h>
+#include <fiff/fiff_evoked_set.h>
 
 #include <iostream>
 #include <utils/ioutils.h>
@@ -269,12 +270,16 @@ void TestFiffCov::computeFromEpochs_matchesPython_data()
     QTest::addColumn<float>("delay");
     QTest::addColumn<int>("nfree");
     QTest::addColumn<Vector3d>("ref");
+    QTest::addColumn<double>("eegReject");
     QTest::newRow("baseline whole window") << QList<int>{1, 2} << -0.2f << 0.0f << true << 0.0f << true << 0.0f << 731
-                                           << Vector3d(2.652924332488991e-30, 7.054628857691069e-17, 5.769123724874705e-24);
+                                           << Vector3d(2.652924332488991e-30, 7.054628857691069e-17, 5.769123724874705e-24) << 0.0;
     QTest::newRow("pre-stimulus baseline, mean kept") << QList<int>{3} << -0.1f << 0.1f << true << 0.0f << false << 0.0f << 365
-                                                      << Vector3d(1.4593490861834027e-30, 6.011250385749755e-18, 2.5599899614022574e-25);
+                                                      << Vector3d(1.4593490861834027e-30, 6.011250385749755e-18, 2.5599899614022574e-25) << 0.0;
     QTest::newRow("no baseline, 50 ms delay") << QList<int>{1, 2, 3, 4} << -0.2f << 0.0f << false << 0.0f << true << 0.05f << 1402
-                                              << Vector3d(2.7808598052155747e-30, 1.5451764897172425e-16, 7.910586499046573e-24);
+                                              << Vector3d(2.7808598052155747e-30, 1.5451764897172425e-16, 7.910586499046573e-24) << 0.0;
+    // reject=dict(eeg=1.4230782369752743e-08), the median EEG peak-to-peak: 6 of 12 epochs kept
+    QTest::newRow("EEG rejection") << QList<int>{1, 2} << -0.2f << 0.0f << false << 0.0f << true << 0.0f << 365
+                                   << Vector3d(2.1310039616688094e-30, 8.497450692077036e-18, -2.3499708997499783e-26) << 1.4230782369752743e-08;
 }
 
 void TestFiffCov::computeFromEpochs_matchesPython()
@@ -288,6 +293,7 @@ void TestFiffCov::computeFromEpochs_matchesPython()
     QFETCH(float, delay);
     QFETCH(int, nfree);
     QFETCH(Vector3d, ref);
+    QFETCH(double, eegReject);
 
     QFile rawFile(sampleDataPath() + "/sample_audvis_trunc_raw.fif");
     if (!rawFile.exists()) {
@@ -296,7 +302,10 @@ void TestFiffCov::computeFromEpochs_matchesPython()
     FiffRawData raw(rawFile);
     const MatrixXi events = deriveStimEvents(raw);
 
-    const FiffCov cov = FiffCov::compute_from_epochs(raw, events, codes, tmin, tmax, tmin, bmax, baseline, removeMean, 0, delay);
+    RejectionParams rej; // 0 turns a limit off; only the EEG one is under test
+    rej.megGradReject = rej.megMagReject = rej.eegReject = rej.eogReject = 0.0f;
+    rej.eegReject = static_cast<float>(eegReject);
+    const FiffCov cov = FiffCov::compute_from_epochs(raw, events, codes, tmin, tmax, tmin, bmax, baseline, removeMean, 0, delay, eegReject > 0.0 ? &rej : nullptr);
     QCOMPARE(cov.nfree, nfree);
     const int i = cov.names.indexOf("MEG0113");
     const int e = cov.names.indexOf("EEG001");

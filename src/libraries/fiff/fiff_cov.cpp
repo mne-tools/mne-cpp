@@ -25,6 +25,7 @@
 #include "fiff_cov.h"
 #include "fiff_stream.h"
 #include "fiff_raw_data.h"
+#include "fiff_evoked_set.h"
 #include "fiff_info_base.h"
 #include "fiff_dir_node.h"
 #include "fiff_file.h"
@@ -458,7 +459,8 @@ FiffCov FiffCov::compute_from_epochs(const FiffRawData& raw,
                                      bool doBaseline,
                                      bool removeMean,
                                      unsigned int ignoreMask,
-                                     float delay)
+                                     float delay,
+                                     const RejectionParams* rej)
 {
     FiffCov cov;
     float sfreq = raw.info.sfreq;
@@ -511,6 +513,11 @@ FiffCov FiffCov::compute_from_epochs(const FiffRawData& raw,
         MatrixXd epochTimes;
         if (!raw.read_raw_segment(epochData, epochTimes, epochStart, epochEnd))
             continue;
+        QString reason;
+        if (rej && !FiffEvokedSet::checkArtifacts(epochData, raw.info, raw.info.bads, *rej, reason)) {
+            qInfo().noquote() << "[FiffCov::compute_from_epochs] Rejected epoch at" << evSample << reason;
+            continue;
+        }
 
         // Baseline subtraction
         if (doBaseline) {

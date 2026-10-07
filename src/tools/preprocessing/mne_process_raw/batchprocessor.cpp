@@ -366,7 +366,8 @@ int BatchProcessor::run(const ProcessingSettings& settings)
                     def.doBaseline,
                     covDesc.removeSampleMean,
                     def.ignore,
-                    def.delay);
+                    def.delay,
+                    &covDesc.rej);
 
                 if (defCov.dim > 0) {
                     defCovs.append(defCov);

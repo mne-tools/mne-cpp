@@ -65,6 +65,7 @@ namespace FIFFLIB
 //=============================================================================================================
 
 class FiffRawData;
+struct RejectionParams;
 
 //=============================================================================================================
 /**
@@ -186,6 +187,7 @@ public:
      * @param[in] removeMean    Whether to remove sample mean from the covariance estimate.
      * @param[in] ignoreMask    Bit mask ANDed away from event codes before matching (default: 0 = no masking).
      * @param[in] delay         Delay in seconds applied to the event sample before extracting the epoch (default: 0).
+     * @param[in] rej           If given, epochs failing these limits (before baseline, as MNE-C compute_cov) are skipped.
      *
      * @return The computed noise covariance matrix, or empty FiffCov on failure.
      */
@@ -199,7 +201,8 @@ public:
                                        bool doBaseline = false,
                                        bool removeMean = true,
                                        unsigned int ignoreMask = 0,
-                                       float delay = 0.0f);
+                                       float delay = 0.0f,
+                                       const RejectionParams* rej = nullptr);
 
     //=========================================================================================================
     /**
