@@ -2424,17 +2424,21 @@ void TestDispViewers2::rtFiffRawView_paintsHidesRowsAndAddsEvents()
     QVERIFY(!view.grab().isNull());
     model->toggleFreeze(QModelIndex());
 
-    // "Add event" at x = 150 of the plot column: 1200 samples streamed into 1000 columns, so the clicked column lies
-    // behind the cursor (column 200) and holds a sample of the previous sweep
+    // "Add event": 1200 samples streamed into 1000 columns put the cursor at column 200 of sweep 2, so a click on
+    // column 100 is sample 1100 and a click on column 600 still shows sample 600 of the previous sweep
     QSignalSpy eventSpy(&view, &RtFiffRawView::addSampleAsEvent);
-    contextAction(QPoint(150, 10), QStringLiteral("Add event"));
-    QCOMPARE(eventSpy.size(), 1);
     QCOMPARE(model->getCurrentSampleIndex(), 200);
     QCOMPARE(model->getFirstSampleOffset(), 1000);
     const double dx = static_cast<double>(table->columnWidth(1)) / 1000.0;
-    const int iColumn = static_cast<int>(150.0 / dx);
-    QVERIFY(iColumn > 200);
-    QCOMPARE(eventSpy.at(0).at(0).toInt(), iColumn);
+    const int xNew = static_cast<int>(100.5 * dx);
+    const int xOld = static_cast<int>(600.5 * dx);
+    contextAction(QPoint(xNew, 10), QStringLiteral("Add event"));
+    contextAction(QPoint(xOld, 10), QStringLiteral("Add event"));
+    QCOMPARE(eventSpy.size(), 2);
+    QVERIFY(qAbs(eventSpy.at(0).at(0).toInt() - 1100) <= 1.0 / dx + 1);
+    QVERIFY(qAbs(eventSpy.at(1).at(0).toInt() - 600) <= 1.0 / dx + 1);
+    QCOMPARE(eventSpy.at(0).at(0).toInt(), 1000 + static_cast<int>(xNew / dx));
+    QCOMPARE(eventSpy.at(1).at(0).toInt(), static_cast<int>(xOld / dx));
 
     const QString shot = QDir::temp().filePath(QStringLiteral("test_disp_viewers2_rawview.png"));
     view.takeScreenshot(shot);
