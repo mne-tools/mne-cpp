@@ -809,6 +809,7 @@ void TestDispViewers2::rtFiffRawViewModel_projectionWrapFilterAndRoles()
         model.addData({block});
     }
     QCOMPARE(model.getCurrentSampleIndex(), 40);
+    QCOMPARE(model.getFirstSampleOffset(), 80);
     const Eigen::MatrixXd last = model.getLastBlock();
     for (int s = 0; s < 40; ++s) {
         const double d = std::sin(0.1 * (80 + s));

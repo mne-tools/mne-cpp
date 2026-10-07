@@ -448,8 +448,8 @@ void RtFiffRawViewModel::addData(const QList<MatrixXd>& data)
                 }
             }
 
+            // The whole block is written again from column 0, so column 0 now holds sample start + current sample.
             m_iCurrentStartingSample += m_iCurrentSample;
-            m_iCurrentStartingSample += m_iResidual;
 
             m_iCurrentSample = 0;
 
