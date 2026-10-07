@@ -22,22 +22,22 @@
   "summary": {
     "claims": 359,
     "by_evidence": {
-      "cross-validated-static": 36,
+      "cross-validated-static": 56,
       "cross-validated-live": 2,
-      "tested": 158,
+      "tested": 138,
       "unverified": 163
     },
     "by_source": {
       "classes": {
-        "cross-validated-static": 5,
+        "cross-validated-static": 7,
         "cross-validated-live": 1,
-        "tested": 83,
+        "tested": 81,
         "unverified": 0
       },
       "parity": {
-        "cross-validated-static": 31,
+        "cross-validated-static": 49,
         "cross-validated-live": 1,
-        "tested": 75,
+        "tested": 57,
         "unverified": 163
       }
     },
@@ -66,6 +66,7 @@
         "test_mne_source_space_ops_python",
         "test_mne_source_space_python",
         "test_spectral_connectivity",
+        "test_sts_cluster",
         "test_tool_list_source_space"
       ],
       "cross-validated-live": [
@@ -697,7 +698,7 @@
       "python": "mne.stats.permutation_cluster_test",
       "claimed": "implemented",
       "test": "test_sts_cluster",
-      "evidence": "tested"
+      "evidence": "cross-validated-static"
     },
     {
       "source": "classes",
@@ -705,7 +706,7 @@
       "python": "mne.stats.combine_adjacency",
       "claimed": "implemented",
       "test": "test_sts_cluster",
-      "evidence": "tested"
+      "evidence": "cross-validated-static"
     },
     {
       "source": "classes",
@@ -1057,7 +1058,7 @@
       "python": "mne.channels.find_ch_adjacency",
       "claimed": "implemented",
       "test": "test_sts_cluster",
-      "evidence": "tested"
+      "evidence": "cross-validated-static"
     },
     {
       "source": "parity",
@@ -1113,7 +1114,7 @@
       "python": "mne.channels.read_ch_adjacency",
       "claimed": "partial",
       "test": "test_sts_cluster",
-      "evidence": "tested"
+      "evidence": "cross-validated-static"
     },
     {
       "source": "parity",
@@ -2417,7 +2418,7 @@
       "python": "mne.spatial_dist_adjacency",
       "claimed": "partial",
       "test": "test_sts_cluster",
-      "evidence": "tested"
+      "evidence": "cross-validated-static"
     },
     {
       "source": "parity",
@@ -2425,7 +2426,7 @@
       "python": "mne.spatial_inter_hemi_adjacency",
       "claimed": "partial",
       "test": "test_sts_cluster",
-      "evidence": "tested"
+      "evidence": "cross-validated-static"
     },
     {
       "source": "parity",
@@ -2433,7 +2434,7 @@
       "python": "mne.spatial_src_adjacency",
       "claimed": "implemented",
       "test": "test_sts_cluster",
-      "evidence": "tested"
+      "evidence": "cross-validated-static"
     },
     {
       "source": "parity",
@@ -2441,7 +2442,7 @@
       "python": "mne.spatial_tris_adjacency",
       "claimed": "implemented",
       "test": "test_sts_cluster",
-      "evidence": "tested"
+      "evidence": "cross-validated-static"
     },
     {
       "source": "parity",
@@ -2449,7 +2450,7 @@
       "python": "mne.spatio_temporal_dist_adjacency",
       "claimed": "partial",
       "test": "test_sts_cluster",
-      "evidence": "tested"
+      "evidence": "cross-validated-static"
     },
     {
       "source": "parity",
@@ -2457,7 +2458,7 @@
       "python": "mne.spatio_temporal_src_adjacency",
       "claimed": "implemented",
       "test": "test_sts_cluster",
-      "evidence": "tested"
+      "evidence": "cross-validated-static"
     },
     {
       "source": "parity",
@@ -2465,7 +2466,7 @@
       "python": "mne.spatio_temporal_tris_adjacency",
       "claimed": "implemented",
       "test": "test_sts_cluster",
-      "evidence": "tested"
+      "evidence": "cross-validated-static"
     },
     {
       "source": "parity",
@@ -2481,7 +2482,7 @@
       "python": "mne.stats.combine_adjacency",
       "claimed": "partial",
       "test": "test_sts_cluster",
-      "evidence": "tested"
+      "evidence": "cross-validated-static"
     },
     {
       "source": "parity",
@@ -2489,7 +2490,7 @@
       "python": "mne.stats.f_oneway",
       "claimed": "implemented",
       "test": "test_sts_cluster",
-      "evidence": "tested"
+      "evidence": "cross-validated-static"
     },
     {
       "source": "parity",
@@ -2497,7 +2498,7 @@
       "python": "mne.stats.permutation_cluster_1samp_test",
       "claimed": "implemented",
       "test": "test_sts_cluster",
-      "evidence": "tested"
+      "evidence": "cross-validated-static"
     },
     {
       "source": "parity",
@@ -2505,7 +2506,7 @@
       "python": "mne.stats.permutation_cluster_test",
       "claimed": "implemented",
       "test": "test_sts_cluster",
-      "evidence": "tested"
+      "evidence": "cross-validated-static"
     },
     {
       "source": "parity",
@@ -2513,7 +2514,7 @@
       "python": "mne.stats.permutation_t_test",
       "claimed": "implemented",
       "test": "test_sts_cluster",
-      "evidence": "tested"
+      "evidence": "cross-validated-static"
     },
     {
       "source": "parity",
@@ -2521,7 +2522,7 @@
       "python": "mne.stats.spatio_temporal_cluster_1samp_test",
       "claimed": "implemented",
       "test": "test_sts_cluster",
-      "evidence": "tested"
+      "evidence": "cross-validated-static"
     },
     {
       "source": "parity",
@@ -2529,7 +2530,7 @@
       "python": "mne.stats.spatio_temporal_cluster_test",
       "claimed": "implemented",
       "test": "test_sts_cluster",
-      "evidence": "tested"
+      "evidence": "cross-validated-static"
     },
     {
       "source": "parity",
@@ -2537,7 +2538,7 @@
       "python": "mne.stats.ttest_1samp_no_p",
       "claimed": "implemented",
       "test": "test_sts_cluster",
-      "evidence": "tested"
+      "evidence": "cross-validated-static"
     },
     {
       "source": "parity",
@@ -2545,7 +2546,7 @@
       "python": "mne.stats.ttest_ind_no_p",
       "claimed": "implemented",
       "test": "test_sts_cluster",
-      "evidence": "tested"
+      "evidence": "cross-validated-static"
     },
     {
       "source": "parity",
