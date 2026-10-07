@@ -197,7 +197,7 @@ public:
 
     //=========================================================================================================
     /**
-     * Create surface from raw vertex and triangle data.
+     * Create surface from raw vertex and triangle data. Vertex normals are the sums of the adjacent face normals.
      *
      * @param[in] vertices   Nx3 matrix of vertex positions.
      * @param[in] triangles  Mx3 matrix of triangle indices.

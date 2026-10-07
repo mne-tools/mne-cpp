@@ -320,6 +320,8 @@ void TestDisp3dBrainSurface::testVertexCount()
     createQuadSurface(surf);
     QCOMPARE(surf.vertexCount(), (uint32_t)4);
     QCOMPARE(surf.indexCount(), (uint32_t)6); // 2 triangles = 6 indices
+    // Without explicit normals the face normals are used: the quad lies in z = 0
+    QCOMPARE(surf.vertexDataRef()[2].norm, QVector3D(0.0f, 0.0f, 1.0f));
 }
 
 //=============================================================================================================

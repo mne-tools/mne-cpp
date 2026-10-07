@@ -189,17 +189,7 @@ void BrainSurface::fromBemSurface(const MNELIB::MNEBemSurface& surf, const QColo
 
 void BrainSurface::createFromData(const Eigen::MatrixX3f& vertices, const Eigen::MatrixX3i& triangles, const QColor& color)
 {
-    // Compute spherical normals (legacy behavior / fallback)
-    // Note: detailed normals should be passed via the overload for specific shapes
-    Eigen::MatrixX3f normals(vertices.rows(), 3);
-    for (int i = 0; i < vertices.rows(); ++i) {
-        QVector3D p(vertices(i, 0), vertices(i, 1), vertices(i, 2));
-        QVector3D n = p.normalized();
-        normals(i, 0) = n.x();
-        normals(i, 1) = n.y();
-        normals(i, 2) = n.z();
-    }
-    createFromData(vertices, normals, triangles, color);
+    createFromData(vertices, FSLIB::FsSurface::compute_normals(vertices, triangles), triangles, color);
 }
 
 void BrainSurface::createFromData(const Eigen::MatrixX3f& vertices, const Eigen::MatrixX3f& normals, const Eigen::MatrixX3i& triangles, const QColor& color)

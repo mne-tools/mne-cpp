@@ -261,6 +261,17 @@ void TestFS::testComputeNormalsPlane()
         QVERIFY2(nz > 0.99f,
                  qPrintable(QString("Vertex %1: Z-component = %2, expected ~1.0").arg(i).arg(nn(i, 2))));
     }
+
+    // Square pyramid: vertex normals sum all adjacent triangle normals (mne.surface.complete_surface_info)
+    MatrixX3f pyramid(5, 3);
+    pyramid << 0, 0, 0, 1, 0, 0, 1, 1, 0, 0, 1, 0, 0.5f, 0.5f, 1;
+    MatrixX3i sides(4, 3);
+    sides << 0, 1, 4, 1, 2, 4, 2, 3, 4, 3, 0, 4;
+    const MatrixX3f pyramidNn = FsSurface::compute_normals(pyramid, sides);
+    const float c = 0.57735027f;
+    QVERIFY((pyramidNn.row(0) - RowVector3f(-c, -c, c)).norm() < 1e-6f);
+    QVERIFY((pyramidNn.row(2) - RowVector3f(c, c, c)).norm() < 1e-6f);
+    QVERIFY((pyramidNn.row(4) - RowVector3f(0, 0, 1)).norm() < 1e-6f);
 }
 
 //=============================================================================================================

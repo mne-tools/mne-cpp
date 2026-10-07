@@ -140,7 +140,7 @@ MatrixX3f FsSurface::compute_normals(const MatrixX3f& rr, const MatrixX3i& tris)
     for (qint32 p = 0; p < tris.rows(); ++p) {
         Vector3i verts = tris.row(p);
         for (qint32 j = 0; j < verts.size(); ++j)
-            nn.row(verts(j)) = tri_nn.row(p);
+            nn.row(verts(j)) += tri_nn.row(p);
     }
 
     tmp = nn.cwiseProduct(nn);
