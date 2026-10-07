@@ -712,6 +712,18 @@ void TestDispViewers2::coregSettingsView_fiducialsAndParams()
     QCOMPARE(view.getWeightHSP(), 3.0f);
     QCOMPARE(view.getWeightRPA(), 1.0f);
     QCOMPARE(view.getWeightNAS(), 10.0f);
+
+    // Digitizer picks follow the check boxes; cardinal points are always used.
+    auto* pEeg = view.findChild<QCheckBox*>(QStringLiteral("m_qCheckBox_EEG"));
+    auto* pHpi = view.findChild<QCheckBox*>(QStringLiteral("m_qCheckBox_HPI"));
+    auto* pHsp = view.findChild<QCheckBox*>(QStringLiteral("m_qCheckBox_HSP"));
+    pEeg->setChecked(true);
+    pHpi->setChecked(true);
+    pHsp->setChecked(true);
+    QCOMPARE(view.getDigitizerCheckState(), QList<int>({FIFFV_POINT_CARDINAL, FIFFV_POINT_EEG, FIFFV_POINT_HPI, FIFFV_POINT_EXTRA}));
+    pEeg->setChecked(false);
+    pHsp->setChecked(false);
+    QCOMPARE(view.getDigitizerCheckState(), QList<int>({FIFFV_POINT_CARDINAL, FIFFV_POINT_HPI}));
     view.setOmittedPoints(5);
     QCOMPARE(view.findChild<QLabel*>(QStringLiteral("m_qLabel_NOmitted"))->text(), QStringLiteral("5"));
     view.setRMSE(0.0025f);

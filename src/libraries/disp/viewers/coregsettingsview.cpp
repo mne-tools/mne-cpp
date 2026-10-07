@@ -476,13 +476,13 @@ QList<int> CoregSettingsView::getDigitizerCheckState()
     QList<int> lPicks({FIFFV_POINT_CARDINAL});
 
     // choose to use other points as well
-    if (m_pUi->m_qCheckBox_EEG) {
+    if (m_pUi->m_qCheckBox_EEG->isChecked()) {
         lPicks << FIFFV_POINT_EEG;
     }
-    if (m_pUi->m_qCheckBox_HPI) {
+    if (m_pUi->m_qCheckBox_HPI->isChecked()) {
         lPicks << FIFFV_POINT_HPI;
     }
-    if (m_pUi->m_qCheckBox_HSP) {
+    if (m_pUi->m_qCheckBox_HSP->isChecked()) {
         lPicks << FIFFV_POINT_EXTRA;
     }
     return lPicks;
