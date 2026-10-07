@@ -116,12 +116,12 @@ void FiffInfoBase::clear()
 RowVectorXi FiffInfoBase::pick_types(const QString meg, bool eeg, bool stim, const QStringList& include, const QStringList& exclude) const
 {
     // A default-constructed info has nchan -1; count the channels actually present.
-    const qint32 nchan = static_cast<qint32>(this->chs.size());
-    RowVectorXi pick = RowVectorXi::Zero(nchan);
+    const qint32 nchPresent = static_cast<qint32>(this->chs.size());
+    RowVectorXi pick = RowVectorXi::Zero(nchPresent);
 
     fiff_int_t kind;
     qint32 k;
-    for (k = 0; k < nchan; ++k) {
+    for (k = 0; k < nchPresent; ++k) {
         kind = this->chs[k].kind;
 
         if ((kind == FIFFV_MEG_CH || kind == FIFFV_REF_MEG_CH)) {
@@ -141,7 +141,7 @@ RowVectorXi FiffInfoBase::pick_types(const QString meg, bool eeg, bool stim, con
     // restrict channels to selection if provided
     qint32 p = 0;
     QStringList myinclude;
-    for (k = 0; k < nchan; ++k) {
+    for (k = 0; k < nchPresent; ++k) {
         if (pick(0, k)) {
             myinclude << this->ch_names[k];
             ++p;
