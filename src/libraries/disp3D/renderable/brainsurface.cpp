@@ -36,6 +36,18 @@ uint32_t curvatureGray(const QVector<float>& curvature, int index)
         ? 0x40u
         : 0xAAu;
 }
+
+// Overlay alpha is blended into RGB here because the shader keeps the curvature grey in the alpha channel.
+uint32_t overCortex(uint32_t overlay, uint32_t gray)
+{
+    const uint32_t a = overlay >> 24;
+    uint32_t rgb = 0;
+    for (int shift = 0; shift < 24; shift += 8) {
+        const uint32_t c = (overlay >> shift) & 0xFFu;
+        rgb |= ((c * a + gray * (255u - a) + 127u) / 255u) << shift;
+    }
+    return withAlpha(rgb, gray);
+}
 } // namespace
 
 //=============================================================================================================
@@ -309,7 +321,7 @@ void BrainSurface::applySourceEstimateColors(const QVector<uint32_t>& colors)
     // curvature grey in alpha so Surface mode can still render the classic
     // light/dark cortex while RGB is occupied by source-estimate colours.
     for (int i = 0; i < qMin(colors.size(), m_vertexData.size()); ++i) {
-        m_vertexData[i].color = withAlpha(colors[i], curvatureGray(m_curvature, i));
+        m_vertexData[i].color = overCortex(colors[i], curvatureGray(m_curvature, i));
     }
 
     markVertexDirty();
@@ -363,7 +375,7 @@ void BrainSurface::updateVertexColors()
     // (colorAnnotation) and is unaffected.
     if (!m_stcColors.isEmpty()) {
         for (int i = 0; i < qMin(m_stcColors.size(), m_vertexData.size()); ++i) {
-            m_vertexData[i].color = withAlpha(m_stcColors[i], curvatureGray(m_curvature, i));
+            m_vertexData[i].color = overCortex(m_stcColors[i], curvatureGray(m_curvature, i));
         }
     }
 

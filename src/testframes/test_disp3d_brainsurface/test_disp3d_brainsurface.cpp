@@ -355,7 +355,15 @@ void TestDisp3dBrainSurface::testApplySourceEstimateColors()
     colors.append(packABGR(0, 0, 255)); // Blue
 
     surf.applySourceEstimateColors(colors);
-    QVERIFY(true); // Should not crash
+    QCOMPARE(surf.vertexDataRef()[0].color & 0x00FFFFFFu, packABGR(255, 0, 0) & 0x00FFFFFFu);
+
+    // The shader draws only RGB, so overlay alpha must be blended over the cortex grey (0xAA without curvature).
+    surf.applySourceEstimateColors({packABGR(255, 0, 0, 0), packABGR(255, 0, 0, 51), packABGR(0, 0, 255)});
+    QCOMPARE(surf.vertexDataRef()[0].color & 0x00FFFFFFu, packABGR(0xAA, 0xAA, 0xAA) & 0x00FFFFFFu);
+    QCOMPARE(surf.vertexDataRef()[1].color & 0x00FFFFFFu, packABGR(187, 136, 136) & 0x00FFFFFFu);
+    QCOMPARE(surf.vertexDataRef()[2].color & 0x00FFFFFFu, packABGR(0, 0, 255) & 0x00FFFFFFu);
+    surf.setUseDefaultColor(true); // rebuilds the vertex colours from the stored overlay
+    QCOMPARE(surf.vertexDataRef()[1].color & 0x00FFFFFFu, packABGR(187, 136, 136) & 0x00FFFFFFu);
 }
 
 //=============================================================================================================
