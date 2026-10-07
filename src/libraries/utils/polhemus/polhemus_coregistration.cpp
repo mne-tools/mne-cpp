@@ -821,12 +821,16 @@ bool PolhemusCoregistration::solveOpticalCalibration()
             << "Optical calibration: using directly captured objective center, |O|="
             << opticalCenter.norm() * 1000.0 << " mm";
     } else if (knownDist > 0.0 && N >= 2) {
-        // Project PCA center onto sphere of radius knownDist
+        // Start where the PCA axis meets the sphere |O| = R on the side the axis points away from the
+        // tracker; the descent below only takes small steps, so it cannot travel from a distant start.
         double R = knownDist;
         Eigen::Vector3d O = opticalCenter;
-        double Onorm = O.norm();
-        if (Onorm > 1e-9) {
-            O = O * (R / Onorm);
+        const double along = centroid.dot(axisDir);
+        const double disc = along * along - centroid.squaredNorm() + R * R;
+        if (disc >= 0.0) {
+            O = centroid + (-along + std::sqrt(disc)) * axisDir;
+        } else if (O.norm() > 1e-9) {
+            O = O * (R / O.norm());
         } else {
             O = centroid.normalized() * R;
         }

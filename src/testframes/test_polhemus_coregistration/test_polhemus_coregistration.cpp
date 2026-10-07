@@ -721,6 +721,7 @@ void TestPolhemusCoregistration::opticalCalibration_recoversAxis_data()
 {
     QTest::addColumn<int>("mode");
     QTest::newRow("captured objective center") << 0;
+    QTest::newRow("known distance") << 1;
     QTest::newRow("unconstrained") << 2;
 }
 
