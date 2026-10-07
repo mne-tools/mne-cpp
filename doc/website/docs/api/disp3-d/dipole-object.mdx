@@ -19,6 +19,22 @@ Renderable dipole object that builds instanced arrow geometry from an [InvEcdSet
 
 Renderable dipole arrow set with instanced GPU rendering for QRhi.
 
+```cpp title="src/examples/ex_disp3d_scene/main.cpp"
+InvEcdSet dipoles;
+InvEcd strong;
+strong.rd = Vector3f(0.0f, 0.0f, 0.05f);
+strong.Q = Vector3f(0.0f, 0.0f, 20e-9f);
+InvEcd weak;
+weak.rd = Vector3f(0.03f, 0.0f, 0.05f);
+weak.Q = Vector3f(10e-9f, 0.0f, 0.0f);
+dipoles.addEcd(strong);
+dipoles.addEcd(weak);
+DipoleObject dipoleGlyphs;
+dipoleGlyphs.load(dipoles); // one cone per dipole, scaled by moment
+float dipoleDistance = 0.0f;
+const int pickedDipole = dipoleGlyphs.intersect(QVector3D(0.03f, 0.0f, 0.2f), QVector3D(0.0f, 0.0f, -1.0f), dipoleDistance);
+```
+
 ---
 
 ## Public Methods
@@ -99,6 +115,11 @@ Test ray intersection with dipoles.
 - *int* — Index of intersected dipole, or -1 if none.
 
 ---
+
+## Example
+
+- Full source: [`src/examples/ex_disp3d_scene/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_disp3d_scene/main.cpp)
+- Build target: `ex_disp3d_scene` (runs under CTest)
 
 ## Authors of this file
 

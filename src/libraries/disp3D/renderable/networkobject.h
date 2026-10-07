@@ -53,6 +53,8 @@ namespace DISP3DLIB
  * using the same instanced rendering pipeline as DipoleObject for the QRhi backend.
  *
  * @brief Renderable network visualization for QRhi.
+ *
+ * @snippet ex_disp3d_scene/main.cpp network_object_usage
  */
 class DISP3DSHARED_EXPORT NetworkObject
 {

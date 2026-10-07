@@ -10699,7 +10699,9 @@
       "sidebar_position": 17,
       "guide": null,
       "python_equiv": null,
-      "python_url": null
+      "python_url": null,
+      "example_exempt": true,
+      "example_exempt_reason": "QRhi draw backend owned privately by BrainView; it needs a live GPU device and is driven only through BrainView, whose example covers it."
     },
     {
       "name": "BrainSurface",
@@ -10710,6 +10712,11 @@
       "mne_python": null,
       "sklearn": null,
       "test": "test_disp3d_brainsurface",
+      "example": "ex_disp3d_scene",
+      "example_snippet": [
+        "ex_disp3d_scene/main.cpp#brain_surface_usage"
+      ],
+      "example_mode": "run",
       "status": "documented",
       "skigen_candidate": false,
       "documented": true,
@@ -10744,6 +10751,11 @@
       "mne_python": null,
       "sklearn": null,
       "test": "test_disp3d_brainview",
+      "example": "ex_disp3d_scene",
+      "example_snippet": [
+        "ex_disp3d_scene/main.cpp#brain_view_usage"
+      ],
+      "example_mode": "run",
       "status": "documented",
       "skigen_candidate": false,
       "documented": true,
@@ -10846,6 +10858,11 @@
       "mne_python": null,
       "sklearn": null,
       "test": "test_disp3d_brainview",
+      "example": "ex_disp3d_scene",
+      "example_snippet": [
+        "ex_disp3d_scene/main.cpp#dipole_object_usage"
+      ],
+      "example_mode": "run",
       "status": "documented",
       "skigen_candidate": false,
       "documented": true,
@@ -10880,6 +10897,11 @@
       "mne_python": null,
       "sklearn": null,
       "test": null,
+      "example": "ex_disp3d_scene",
+      "example_snippet": [
+        "ex_disp3d_scene/main.cpp#brain_view_usage"
+      ],
+      "example_mode": "run",
       "status": "documented",
       "skigen_candidate": false,
       "documented": true,
@@ -10914,6 +10936,11 @@
       "mne_python": null,
       "sklearn": null,
       "test": "test_disp3d_brainview",
+      "example": "ex_disp3d_scene",
+      "example_snippet": [
+        "ex_disp3d_scene/main.cpp#multi_view_layout_usage"
+      ],
+      "example_mode": "run",
       "status": "documented",
       "skigen_candidate": false,
       "documented": true,
@@ -10931,6 +10958,11 @@
       "mne_python": null,
       "sklearn": null,
       "test": null,
+      "example": "ex_disp3d_scene",
+      "example_snippet": [
+        "ex_disp3d_scene/main.cpp#network_object_usage"
+      ],
+      "example_mode": "run",
       "status": "documented",
       "skigen_candidate": false,
       "documented": true,
@@ -10965,6 +10997,11 @@
       "mne_python": null,
       "sklearn": null,
       "test": "test_disp3d_brainview",
+      "example": "ex_disp3d_scene",
+      "example_snippet": [
+        "ex_disp3d_scene/main.cpp#polyline_object_usage"
+      ],
+      "example_mode": "run",
       "status": "documented",
       "skigen_candidate": false,
       "documented": true,
@@ -11039,7 +11076,9 @@
       "sidebar_position": 37,
       "guide": null,
       "python_equiv": null,
-      "python_url": null
+      "python_url": null,
+      "example_exempt": true,
+      "example_exempt_reason": "Real-time sensor streaming state owned privately by BrainView; exercised through BrainView's streaming API (test_disp3d_brainview, test_sensor_streaming)."
     },
     {
       "name": "RtSourceDataController",
@@ -11067,6 +11106,11 @@
       "mne_python": null,
       "sklearn": null,
       "test": "test_sensor_field_mapper",
+      "example": "ex_disp3d_scene",
+      "example_snippet": [
+        "ex_disp3d_scene/main.cpp#sensor_field_mapper_usage"
+      ],
+      "example_mode": "run",
       "status": "documented",
       "skigen_candidate": false,
       "documented": true,
@@ -11107,7 +11151,9 @@
       "sidebar_position": 41,
       "guide": null,
       "python_equiv": null,
-      "python_url": null
+      "python_url": null,
+      "example_exempt": true,
+      "example_exempt_reason": "Source-estimate loading and playback state owned privately by BrainView; exercised through BrainView (test_disp3d_brainview)."
     },
     {
       "name": "SourceEstimateOverlay",
@@ -11118,6 +11164,11 @@
       "mne_python": null,
       "sklearn": null,
       "test": null,
+      "example": "ex_disp3d_scene",
+      "example_snippet": [
+        "ex_disp3d_scene/main.cpp#source_estimate_overlay_usage"
+      ],
+      "example_mode": "run",
       "status": "documented",
       "skigen_candidate": false,
       "documented": true,
@@ -11203,6 +11254,11 @@
       "mne_python": null,
       "sklearn": null,
       "test": null,
+      "example": "ex_disp3d_scene",
+      "example_snippet": [
+        "ex_disp3d_scene/main.cpp#brain_surface_usage"
+      ],
+      "example_mode": "run",
       "status": "documented",
       "skigen_candidate": false,
       "documented": true,

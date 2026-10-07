@@ -23,6 +23,15 @@ The class operates on surface and contour surfaces stored in the caller's surfac
 
 Sensor-to-surface field mapper that interpolates MEG/EEG measurements onto cortical meshes and generates iso-contour overlays.
 
+```cpp title="src/examples/ex_disp3d_scene/main.cpp"
+// Contour spacing for a field map spanning +-120 fT with about 10 lines
+const float contourSpacing = SensorFieldMapper::contourStep(-120e-15f, 120e-15f, 10);
+QMap<QString, std::shared_ptr<BrainSurface>> sceneSurfaces;
+sceneSurfaces.insert("bem_inner_skull", std::make_shared<BrainSurface>());
+sceneSurfaces.insert("bem_head", std::make_shared<BrainSurface>());
+const QString headKey = SensorFieldMapper::findHeadSurfaceKey(sceneSurfaces); // where EEG maps are drawn
+```
+
 ---
 
 ## Public Methods
@@ -302,6 +311,11 @@ Replicates MNE-Python's `fit_sphere_to_headshape` (linear least- squares sphere 
 - *Eigen::Vector3f* — The sphere centre in head coordinates (metres). Returns (0, 0, 0.04) if the fit cannot be performed.
 
 ---
+
+## Example
+
+- Full source: [`src/examples/ex_disp3d_scene/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_disp3d_scene/main.cpp)
+- Build target: `ex_disp3d_scene` (runs under CTest)
 
 ## Authors of this file
 

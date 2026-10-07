@@ -21,6 +21,18 @@ It handles user interaction, surface loading, and coordinates with the [`BrainRe
 
 Top-level QWidget hosting the QRhi-based 3-D brain visualization with mouse interaction and multi-view support.
 
+```cpp title="src/examples/ex_disp3d_scene/main.cpp"
+BrainView view; // QRhi widget; nothing is rendered until it is shown
+view.setViewCount(2);
+const bool twoPanes = view.viewCount() == 2 && view.viewMode() == BrainView::MultiView;
+LiveMarker trackerTip;
+trackerTip.position = QVector3D(0.0f, 0.08f, 0.04f);
+trackerTip.color = Qt::yellow;
+view.setLiveMarkers({trackerTip}); // transient, does not move the camera
+view.clearLiveMarkers();
+view.setViewCount(1);
+```
+
 ### Inheritance
 
 ```mermaid
@@ -72,6 +84,11 @@ Each view can start from a different orientation (e.g., top, front, left).
   Initial camera rotation quaternion.
 
 ---
+
+## Example
+
+- Full source: [`src/examples/ex_disp3d_scene/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_disp3d_scene/main.cpp)
+- Build target: `ex_disp3d_scene` (runs under CTest)
 
 ## Authors of this file
 

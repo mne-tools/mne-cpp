@@ -63,6 +63,8 @@ class BrainSurface;
  * them, keeping ownership in the BrainView.
  *
  * @brief Sensor-to-surface field mapper that interpolates MEG/EEG measurements onto cortical meshes and generates iso-contour overlays.
+ *
+ * @snippet ex_disp3d_scene/main.cpp sensor_field_mapper_usage
  */
 class DISP3DSHARED_EXPORT SensorFieldMapper
 {

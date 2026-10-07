@@ -19,7 +19,24 @@ Lightweight live overlay marker rendered as a single sphere.
 
 Used by `BrainView::setLiveMarkers` to draw transient markers (e.g. digitizer tracker tip, orientation axes) without going through the model pipeline or recalculating scene bounds.
 
+```cpp title="src/examples/ex_disp3d_scene/main.cpp"
+BrainView view; // QRhi widget; nothing is rendered until it is shown
+view.setViewCount(2);
+const bool twoPanes = view.viewCount() == 2 && view.viewMode() == BrainView::MultiView;
+LiveMarker trackerTip;
+trackerTip.position = QVector3D(0.0f, 0.08f, 0.04f);
+trackerTip.color = Qt::yellow;
+view.setLiveMarkers({trackerTip}); // transient, does not move the camera
+view.clearLiveMarkers();
+view.setViewCount(1);
+```
+
 ---
+
+## Example
+
+- Full source: [`src/examples/ex_disp3d_scene/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_disp3d_scene/main.cpp)
+- Build target: `ex_disp3d_scene` (runs under CTest)
 
 ## Authors of this file
 

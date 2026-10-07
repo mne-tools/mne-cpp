@@ -73,6 +73,8 @@ namespace DISP3DLIB
  * draw it without a dedicated shader.
  *
  * @brief Connected line segments through an ordered list of points.
+ *
+ * @snippet ex_disp3d_scene/main.cpp polyline_object_usage
  */
 class DISP3DSHARED_EXPORT PolylineObject
 {

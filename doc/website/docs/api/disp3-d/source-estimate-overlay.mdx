@@ -19,6 +19,16 @@ class DISP3DLIB::SourceEstimateOverlay
 
 Color-mapped source estimate overlay that interpolates activation values onto a cortical surface mesh.
 
+```cpp title="src/examples/ex_disp3d_scene/main.cpp"
+// Source estimate on vertices 0 and 2 only; the others stay cortex grey
+MatrixXd activity(2, 1);
+activity << 1.0, 0.1;
+SourceEstimateOverlay sourceOverlay;
+sourceOverlay.setStcData(InvSourceEstimate(activity, (VectorXi(2) << 0, 2).finished(), 0.0f, 0.001f), 0);
+sourceOverlay.setThresholds(0.2f, 0.5f, 1.0f);
+sourceOverlay.applyToSurface(&patch, 0); // no interpolation matrix: values land on their own vertices
+```
+
 ---
 
 ## Public Methods
@@ -283,6 +293,11 @@ Used by the real-time streaming controller to feed data into the queue.
 - *Eigen::VectorXd* — Concatenated source values vector (nSourcesLH + nSourcesRH).
 
 ---
+
+## Example
+
+- Full source: [`src/examples/ex_disp3d_scene/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_disp3d_scene/main.cpp)
+- Build target: `ex_disp3d_scene` (runs under CTest)
 
 ## Authors of this file
 

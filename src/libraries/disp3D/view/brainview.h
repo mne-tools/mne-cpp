@@ -83,6 +83,8 @@ class SliceObject;
  * Used by @ref BrainView::setLiveMarkers to draw transient markers
  * (e.g. digitizer tracker tip, orientation axes) without going through
  * the model pipeline or recalculating scene bounds.
+ *
+ * @snippet ex_disp3d_scene/main.cpp brain_view_usage
  */
 struct DISP3DSHARED_EXPORT LiveMarker
 {
@@ -98,6 +100,8 @@ struct DISP3DSHARED_EXPORT LiveMarker
  * surface loading, and coordinates with the BrainRenderer.
  *
  * @brief Top-level QWidget hosting the QRhi-based 3-D brain visualization with mouse interaction and multi-view support.
+ *
+ * @snippet ex_disp3d_scene/main.cpp brain_view_usage
  */
 class DISP3DSHARED_EXPORT BrainView : public QRhiWidget
 {

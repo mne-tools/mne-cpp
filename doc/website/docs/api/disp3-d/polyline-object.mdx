@@ -21,6 +21,14 @@ Each segment is one instance of a unit cylinder, using the same instance layout 
 
 Connected line segments through an ordered list of points.
 
+```cpp title="src/examples/ex_disp3d_scene/main.cpp"
+// Head-position track: N points draw N - 1 tube segments; repeated positions are skipped
+PolylineObject track;
+track.setPoints({Vector3f(0.0f, 0.0f, 0.0f), Vector3f(0.0f, 0.0f, 0.0f), Vector3f(0.001f, 0.0f, 0.0f), Vector3f(0.002f, 0.001f, 0.0f)});
+track.setRadius(0.0005f);
+track.setGradient(Qt::blue, Qt::red); // oldest to newest
+```
+
 ---
 
 ## Public Methods
@@ -163,6 +171,11 @@ Sets whether the polyline is drawn.
 - *bool* — Whether there is at least one segment to draw.
 
 ---
+
+## Example
+
+- Full source: [`src/examples/ex_disp3d_scene/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_disp3d_scene/main.cpp)
+- Build target: `ex_disp3d_scene` (runs under CTest)
 
 ## Authors of this file
 

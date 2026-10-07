@@ -19,6 +19,21 @@ class DISP3DLIB::BrainSurface
 
 Renderable cortical surface mesh with per-vertex color, curvature data, and GPU buffer management.
 
+```cpp title="src/examples/ex_disp3d_scene/main.cpp"
+// A 2 x 2 cm flat patch at z = 0 (metres), picked by a ray cast straight down
+MatrixX3f patchVertices(4, 3);
+patchVertices << 0.0f, 0.0f, 0.0f, 0.02f, 0.0f, 0.0f, 0.02f, 0.02f, 0.0f, 0.0f, 0.02f, 0.0f;
+MatrixX3i patchTriangles(2, 3);
+patchTriangles << 0, 1, 2, 0, 2, 3;
+BrainSurface patch;
+patch.createFromData(patchVertices, patchTriangles, Qt::gray);
+patch.setHemi(0);
+float hitDistance = 0.0f;
+int hitVertex = -1;
+const bool picked = patch.intersects(QVector3D(0.019f, 0.019f, 0.05f), QVector3D(0.0f, 0.0f, -1.0f), hitDistance, hitVertex);
+const VertexData& corner = patch.vertexDataRef().at(2); // interleaved position, normal and packed ABGR colour
+```
+
 ---
 
 ## Public Methods
@@ -126,6 +141,8 @@ Load geometry from a [MNE](/docs/api/mne/mne-class) BEM surface.
 ### createFromData(vertices, triangles, color)
 
 Create surface from raw vertex and triangle data.
+
+Vertex normals are the sums of the adjacent face normals.
 
 **Parameters:**
 
@@ -491,6 +508,11 @@ a single sphere in a batched mesh). Pass start=-1 to clear the vertex range high
   Number of vertices to highlight.
 
 ---
+
+## Example
+
+- Full source: [`src/examples/ex_disp3d_scene/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_disp3d_scene/main.cpp)
+- Build target: `ex_disp3d_scene` (runs under CTest)
 
 ## Authors of this file
 

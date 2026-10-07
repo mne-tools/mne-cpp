@@ -12,16 +12,16 @@
     "registered_stale": 0,
     "registered_with_test": 129,
     "registered_test_unresolved": 0,
-    "registered_with_example": 357,
+    "registered_with_example": 367,
     "registered_example_not_built": 0,
     "registered_with_python_equiv": 89,
     "registered_without_api_page": 0,
-    "with_snippet": 378,
+    "with_snippet": 388,
     "public_api_units": 509,
-    "example_eligible": 370,
-    "example_exempt": 139,
-    "eligible_backed_by_registry_example": 357,
-    "eligible_used_by_some_example": 337,
+    "example_eligible": 367,
+    "example_exempt": 142,
+    "eligible_backed_by_registry_example": 367,
+    "eligible_used_by_some_example": 345,
     "examples_on_disk": 68,
     "examples_built": 68
   },
@@ -75,10 +75,10 @@
       "public": 48,
       "registered": 48,
       "with_test": 27,
-      "eligible": 23,
-      "eligible_with_registry_example": 10,
-      "eligible_used_by_example": 11,
-      "with_snippet": 10
+      "eligible": 20,
+      "eligible_with_registry_example": 20,
+      "eligible_used_by_example": 19,
+      "with_snippet": 20
     },
     "dsp": {
       "public": 84,
@@ -1653,6 +1653,7 @@
         "ex_connectivity_comparison",
         "ex_connectivity_metrics",
         "ex_connectivity_performance",
+        "ex_disp3d_scene",
         "ex_dsp_rt",
         "ex_fiff_sniffer"
       ],
@@ -1683,6 +1684,7 @@
         "ex_connectivity_comparison",
         "ex_connectivity_metrics",
         "ex_connectivity_performance",
+        "ex_disp3d_scene",
         "ex_dsp_rt",
         "ex_fiff_sniffer"
       ],
@@ -1710,7 +1712,8 @@
       "example_state": "built",
       "including_examples": [
         "ex_connectivity",
-        "ex_connectivity_metrics"
+        "ex_connectivity_metrics",
+        "ex_disp3d_scene"
       ],
       "snippets": [
         "ex_connectivity_metrics/main.cpp#network_build"
@@ -1734,7 +1737,8 @@
       "example_state": "built",
       "including_examples": [
         "ex_connectivity",
-        "ex_connectivity_metrics"
+        "ex_connectivity_metrics",
+        "ex_disp3d_scene"
       ],
       "snippets": [
         "ex_connectivity_metrics/main.cpp#network_build"
@@ -3646,10 +3650,15 @@
       "registry_status": "documented",
       "test": "test_disp3d_brainsurface",
       "test_resolves": true,
-      "example": null,
-      "example_state": "none",
-      "including_examples": [],
-      "snippets": [],
+      "example": "ex_disp3d_scene",
+      "example_state": "built",
+      "including_examples": [
+        "ex_disp3d_scene"
+      ],
+      "snippets": [
+        "ex_disp3d_scene/main.cpp#brain_surface_usage",
+        "ex_disp3d_scene/main.cpp#brain_surface_usage"
+      ],
       "api_page": "doc/website/docs/api/disp3-d/brain-surface.mdx",
       "python_equiv": null,
       "example_eligible": true,
@@ -3665,10 +3674,15 @@
       "registry_status": "documented",
       "test": null,
       "test_resolves": false,
-      "example": null,
-      "example_state": "none",
-      "including_examples": [],
-      "snippets": [],
+      "example": "ex_disp3d_scene",
+      "example_state": "built",
+      "including_examples": [
+        "ex_disp3d_scene"
+      ],
+      "snippets": [
+        "ex_disp3d_scene/main.cpp#brain_surface_usage",
+        "ex_disp3d_scene/main.cpp#brain_surface_usage"
+      ],
       "api_page": "doc/website/docs/api/disp3-d/vertex-data.mdx",
       "python_equiv": null,
       "example_eligible": true,
@@ -3684,10 +3698,14 @@
       "registry_status": "documented",
       "test": "test_disp3d_brainview",
       "test_resolves": true,
-      "example": null,
-      "example_state": "none",
-      "including_examples": [],
-      "snippets": [],
+      "example": "ex_disp3d_scene",
+      "example_state": "built",
+      "including_examples": [
+        "ex_disp3d_scene"
+      ],
+      "snippets": [
+        "ex_disp3d_scene/main.cpp#dipole_object_usage"
+      ],
       "api_page": "doc/website/docs/api/disp3-d/dipole-object.mdx",
       "python_equiv": null,
       "example_eligible": true,
@@ -3778,10 +3796,14 @@
       "registry_status": "documented",
       "test": null,
       "test_resolves": false,
-      "example": null,
-      "example_state": "none",
-      "including_examples": [],
-      "snippets": [],
+      "example": "ex_disp3d_scene",
+      "example_state": "built",
+      "including_examples": [
+        "ex_disp3d_scene"
+      ],
+      "snippets": [
+        "ex_disp3d_scene/main.cpp#network_object_usage"
+      ],
       "api_page": "doc/website/docs/api/disp3-d/network-object.mdx",
       "python_equiv": null,
       "example_eligible": true,
@@ -3797,10 +3819,14 @@
       "registry_status": "documented",
       "test": "test_disp3d_brainview",
       "test_resolves": true,
-      "example": null,
-      "example_state": "none",
-      "including_examples": [],
-      "snippets": [],
+      "example": "ex_disp3d_scene",
+      "example_state": "built",
+      "including_examples": [
+        "ex_disp3d_scene"
+      ],
+      "snippets": [
+        "ex_disp3d_scene/main.cpp#polyline_object_usage"
+      ],
       "api_page": "doc/website/docs/api/disp3-d/polyline-object.mdx",
       "python_equiv": null,
       "example_eligible": true,
@@ -3839,10 +3865,14 @@
       "registry_status": "documented",
       "test": null,
       "test_resolves": false,
-      "example": null,
-      "example_state": "none",
-      "including_examples": [],
-      "snippets": [],
+      "example": "ex_disp3d_scene",
+      "example_state": "built",
+      "including_examples": [
+        "ex_disp3d_scene"
+      ],
+      "snippets": [
+        "ex_disp3d_scene/main.cpp#source_estimate_overlay_usage"
+      ],
       "api_page": "doc/website/docs/api/disp3-d/source-estimate-overlay.mdx",
       "python_equiv": null,
       "example_eligible": true,
@@ -3956,8 +3986,8 @@
       "snippets": [],
       "api_page": "doc/website/docs/api/disp3-d/rt-sensor-stream-manager.mdx",
       "python_equiv": null,
-      "example_eligible": true,
-      "exempt_reason": null
+      "example_eligible": false,
+      "exempt_reason": "registry: Real-time sensor streaming state owned privately by BrainView; exercised through BrainView's streaming API (test_disp3d_brainview, test_sensor_streaming)."
     },
     {
       "name": "SensorFieldMapper",
@@ -3969,10 +3999,14 @@
       "registry_status": "documented",
       "test": "test_sensor_field_mapper",
       "test_resolves": true,
-      "example": null,
-      "example_state": "none",
-      "including_examples": [],
-      "snippets": [],
+      "example": "ex_disp3d_scene",
+      "example_state": "built",
+      "including_examples": [
+        "ex_disp3d_scene"
+      ],
+      "snippets": [
+        "ex_disp3d_scene/main.cpp#sensor_field_mapper_usage"
+      ],
       "api_page": "doc/website/docs/api/disp3-d/sensor-field-mapper.mdx",
       "python_equiv": null,
       "example_eligible": true,
@@ -3994,8 +4028,8 @@
       "snippets": [],
       "api_page": "doc/website/docs/api/disp3-d/source-estimate-manager.mdx",
       "python_equiv": null,
-      "example_eligible": true,
-      "exempt_reason": null
+      "example_eligible": false,
+      "exempt_reason": "registry: Source-estimate loading and playback state owned privately by BrainView; exercised through BrainView (test_disp3d_brainview)."
     },
     {
       "name": "BrainRenderer",
@@ -4013,8 +4047,8 @@
       "snippets": [],
       "api_page": "doc/website/docs/api/disp3-d/brain-renderer.mdx",
       "python_equiv": null,
-      "example_eligible": true,
-      "exempt_reason": null
+      "example_eligible": false,
+      "exempt_reason": "registry: QRhi draw backend owned privately by BrainView; it needs a live GPU device and is driven only through BrainView, whose example covers it."
     },
     {
       "name": "BrainView",
@@ -4026,8 +4060,8 @@
       "registry_status": "documented",
       "test": "test_disp3d_brainview",
       "test_resolves": true,
-      "example": null,
-      "example_state": "none",
+      "example": "ex_disp3d_scene",
+      "example_state": "built",
       "including_examples": [
         "ex_clustered_inverse_mne",
         "ex_clustered_inverse_mne_raw",
@@ -4036,6 +4070,7 @@
         "ex_connectivity",
         "ex_connectivity_comparison",
         "ex_coreg",
+        "ex_disp3d_scene",
         "ex_disp_3D",
         "ex_fs_surface",
         "ex_inverse_mne_raw",
@@ -4045,7 +4080,10 @@
         "ex_roi_clustered_inverse_pwl_rap_music",
         "ex_st_clustered_inverse_pwl_rap_music"
       ],
-      "snippets": [],
+      "snippets": [
+        "ex_disp3d_scene/main.cpp#brain_view_usage",
+        "ex_disp3d_scene/main.cpp#brain_view_usage"
+      ],
       "api_page": "doc/website/docs/api/disp3-d/brain-view.mdx",
       "python_equiv": null,
       "example_eligible": true,
@@ -4061,8 +4099,8 @@
       "registry_status": "documented",
       "test": null,
       "test_resolves": false,
-      "example": null,
-      "example_state": "none",
+      "example": "ex_disp3d_scene",
+      "example_state": "built",
       "including_examples": [
         "ex_clustered_inverse_mne",
         "ex_clustered_inverse_mne_raw",
@@ -4071,6 +4109,7 @@
         "ex_connectivity",
         "ex_connectivity_comparison",
         "ex_coreg",
+        "ex_disp3d_scene",
         "ex_disp_3D",
         "ex_fs_surface",
         "ex_inverse_mne_raw",
@@ -4080,7 +4119,10 @@
         "ex_roi_clustered_inverse_pwl_rap_music",
         "ex_st_clustered_inverse_pwl_rap_music"
       ],
-      "snippets": [],
+      "snippets": [
+        "ex_disp3d_scene/main.cpp#brain_view_usage",
+        "ex_disp3d_scene/main.cpp#brain_view_usage"
+      ],
       "api_page": "doc/website/docs/api/disp3-d/live-marker.mdx",
       "python_equiv": null,
       "example_eligible": true,
@@ -4096,10 +4138,14 @@
       "registry_status": "documented",
       "test": "test_disp3d_brainview",
       "test_resolves": true,
-      "example": null,
-      "example_state": "none",
-      "including_examples": [],
-      "snippets": [],
+      "example": "ex_disp3d_scene",
+      "example_state": "built",
+      "including_examples": [
+        "ex_disp3d_scene"
+      ],
+      "snippets": [
+        "ex_disp3d_scene/main.cpp#multi_view_layout_usage"
+      ],
       "api_page": "doc/website/docs/api/disp3-d/multi-view-layout.mdx",
       "python_equiv": null,
       "example_eligible": true,
@@ -8057,6 +8103,7 @@
       "example": "ex_inv_dipole_fit",
       "example_state": "built",
       "including_examples": [
+        "ex_disp3d_scene",
         "ex_inv_dipole_fit"
       ],
       "snippets": [
@@ -8508,6 +8555,7 @@
         "ex_clustered_inverse_rap_music_raw",
         "ex_connectivity",
         "ex_connectivity_comparison",
+        "ex_disp3d_scene",
         "ex_disp_3D",
         "ex_dsp_analysis",
         "ex_histogram",

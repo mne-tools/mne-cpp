@@ -33,6 +33,15 @@ Layout rules:
 
 Multi-view geometry computations.
 
+```cpp title="src/examples/ex_disp3d_scene/main.cpp"
+MultiViewLayout layout;
+layout.setSplitX(0.25f);
+const QSize canvas(800, 600);
+const QRect left = layout.slotRect(0, 2, canvas);
+const QRect bottomRight = layout.slotRect(2, 3, canvas);
+const SplitterHit onBar = layout.hitTestSplitter(QPoint(200, 300), 2, canvas);
+```
+
 ---
 
 ## Public Methods
@@ -214,6 +223,11 @@ Return the Qt::CursorShape appropriate for a splitter hit.
 - *Qt::CursorShape* — Cursor shape (ArrowCursor if None).
 
 ---
+
+## Example
+
+- Full source: [`src/examples/ex_disp3d_scene/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_disp3d_scene/main.cpp)
+- Build target: `ex_disp3d_scene` (runs under CTest)
 
 ## Authors of this file
 

@@ -65,6 +65,8 @@ namespace DISP3DLIB
 
 /**
  * @brief Interleaved vertex attributes (position, normal, color, curvature) for brain surface GPU upload.
+ *
+ * @snippet ex_disp3d_scene/main.cpp brain_surface_usage
  */
 struct VertexData
 {
@@ -82,6 +84,8 @@ struct VertexData
  * BrainSurface manages the geometry and visual properties of a single brain mesh.
  *
  * @brief Renderable cortical surface mesh with per-vertex color, curvature data, and GPU buffer management.
+ *
+ * @snippet ex_disp3d_scene/main.cpp brain_surface_usage
  */
 class DISP3DSHARED_EXPORT BrainSurface
 {

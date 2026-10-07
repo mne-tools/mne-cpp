@@ -63,6 +63,8 @@ enum class SplitterHit
  *   - 4 panes → 2×2 grid split at (m_splitX, m_splitY)
  *
  * @brief    Multi-view geometry computations.
+ *
+ * @snippet ex_disp3d_scene/main.cpp multi_view_layout_usage
  */
 class DISP3DSHARED_EXPORT MultiViewLayout
 {

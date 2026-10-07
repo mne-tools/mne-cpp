@@ -19,6 +19,25 @@ class DISP3DLIB::NetworkObject
 
 Renderable network visualization for QRhi.
 
+```cpp title="src/examples/ex_disp3d_scene/main.cpp"
+Network graph("coherence");
+for (int i = 0; i < 3; ++i) {
+    graph.append(NetworkNode::SPtr(new NetworkNode(i, RowVectorXf::Constant(3, 0.01f * static_cast<float>(i)))));
+}
+const QList<QPair<int, int>> links = {{0, 1}, {1, 2}};
+const QList<double> strengths = {0.9, 0.3};
+for (int k = 0; k < links.size(); ++k) {
+    NetworkEdge::SPtr edge(new NetworkEdge(links[k].first, links[k].second, MatrixXd::Constant(1, 1, strengths[k])));
+    graph.getNodeAt(links[k].first)->append(edge);
+    graph.getNodeAt(links[k].second)->append(edge);
+    graph.append(edge);
+}
+NetworkObject networkGlyphs;
+networkGlyphs.load(graph, "Viridis"); // spheres for nodes, cylinders for edges
+const int edgesAll = networkGlyphs.edgeInstanceCount();
+networkGlyphs.setThreshold(0.5); // keep only the strong 0-1 link
+```
+
 ---
 
 ## Public Methods
@@ -150,6 +169,11 @@ Upload or update GPU buffers for edge geometry.
 ### hasData()
 
 ---
+
+## Example
+
+- Full source: [`src/examples/ex_disp3d_scene/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_disp3d_scene/main.cpp)
+- Build target: `ex_disp3d_scene` (runs under CTest)
 
 ## Authors of this file
 

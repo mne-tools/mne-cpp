@@ -51,6 +51,8 @@ namespace DISP3DLIB
  * and manages GPU buffers for QRhi-based rendering.
  *
  * @brief Renderable dipole arrow set with instanced GPU rendering for QRhi.
+ *
+ * @snippet ex_disp3d_scene/main.cpp dipole_object_usage
  */
 class DISP3DSHARED_EXPORT DipoleObject
 {

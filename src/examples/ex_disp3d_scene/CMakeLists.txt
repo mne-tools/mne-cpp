@@ -20,6 +20,8 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
   Qt${QT_VERSION_MAJOR}::Gui
   Qt${QT_VERSION_MAJOR}::Widgets
   mne_disp3D
+  mne_inv
+  mne_connectivity
   Eigen3::Eigen
 )
 
@@ -28,5 +30,5 @@ if(NOT BUILD_SHARED_LIBS)
 endif()
 
 if(BUILD_TESTS)
-    mne_add_test(${PROJECT_NAME} LABELS example unit TIMEOUT 120)
+    mne_add_test(${PROJECT_NAME} LABELS example unit TIMEOUT 120 ENVIRONMENT QT_QPA_PLATFORM=offscreen)
 endif()

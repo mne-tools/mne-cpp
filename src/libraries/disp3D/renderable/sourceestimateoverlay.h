@@ -56,6 +56,8 @@ class BrainSurface;
  * colormap visualization to brain surfaces.
  *
  * @brief Color-mapped source estimate overlay that interpolates activation values onto a cortical surface mesh.
+ *
+ * @snippet ex_disp3d_scene/main.cpp source_estimate_overlay_usage
  */
 class DISP3DSHARED_EXPORT SourceEstimateOverlay
 {
