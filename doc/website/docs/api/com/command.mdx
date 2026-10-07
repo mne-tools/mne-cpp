@@ -1,0 +1,350 @@
+---
+id: command
+title: "COMLIB::Command"
+sidebar_label: Command
+sidebar_position: 1
+---
+
+# Command
+
+**Namespace:** `COMLIB` &nbsp;·&nbsp; **Library:** Communication Library
+
+`#include <com/command.h>`
+
+```cpp
+class COMLIB::Command
+```
+
+Named, parameterised command exchanged with `mne_rt_server`; supports both JSON and CLI serialisation.
+
+Holds the command keyword, description, parallel lists of parameter names / values / descriptions, and a JSON-vs-CLI flag. Constructible either from a parsed `QJsonObject` (when echoing the server’s advertised command list) or from explicit string/value lists (when authoring a request). Implements [`ICommand`](/docs/api/utils/i-command) so it can be dispatched through [`CommandManager`](/docs/api/com/command-manager) and surfaces parameter access by both name (`operator[](QString)`) and index (``operator[](qint32)``).
+
+### Inheritance
+
+```mermaid
+classDiagram
+    QObject <|-- Command
+    ICommand <|-- Command
+    click ICommand "/docs/api/utils/i-command"
+```
+
+---
+
+## Public Methods
+
+### Command(p_bIsJson, parent)
+
+Constructs a [`Command`](/docs/api/com/command).
+
+**Parameters:**
+
+- **p_bIsJson** : *bool*
+  If is received/should be send as JSON (optional, default true).
+
+- **parent** : *QObject **
+  Parent QObject (optional).
+
+---
+
+### Command(p_sCommand, p_qCommandContent, p_bIsJson, parent)
+
+Constructor which parses a command stored in a json object.
+
+**Parameters:**
+
+- **p_sCommand** : *const QString &*
+  [`Command`](/docs/api/com/command).
+
+- **p_qCommandContent** : *const QJsonObject &*
+  Content encapsulated in a JsonObject.
+
+- **p_bIsJson** : *bool*
+  If is received/should be send as JSON (optional, default true).
+
+- **parent** : *QObject **
+  Parent QObject (optional).
+
+---
+
+### Command(p_sCommand, p_sDescription, p_bIsJson, parent)
+
+Constructs a command without parameters.
+
+**Parameters:**
+
+- **p_sCommand** : *const QString &*
+  [`Command`](/docs/api/com/command).
+
+- **p_sDescription** : *const QString &*
+  [`Command`](/docs/api/com/command) description.
+
+- **p_bIsJson** : *bool*
+  If is received/should be send as JSON (optional, default true).
+
+- **parent** : *QObject **
+  Parent QObject (optional).
+
+---
+
+### Command(p_sCommand, p_sDescription, p_qListParamNames, p_qListParamValues, p_bIsJson, parent)
+
+Constructor which assembles a command from single parts.
+
+**Parameters:**
+
+- **p_sCommand** : *const QString &*
+  [`Command`](/docs/api/com/command).
+
+- **p_sDescription** : *const QString &*
+  [`Command`](/docs/api/com/command) description.
+
+- **p_qListParamNames** : *const QStringList &*
+  Parameter names.
+
+- **p_qListParamValues** : *const QList&lt; QVariant &gt; &*
+  Parameter values/types.
+
+- **p_bIsJson** : *bool*
+  If is received/should be send as JSON (optional, default true).
+
+- **parent** : *QObject **
+  Parent QObject (optional).
+
+---
+
+### Command(p_sCommand, p_sDescription, p_qListParamNames, p_qListParamValues, p_vecParameterDescriptions, p_bIsJson, parent)
+
+Constructor which assembles a command from single parts.
+
+**Parameters:**
+
+- **p_sCommand** : *const QString &*
+  [`Command`](/docs/api/com/command).
+
+- **p_sDescription** : *const QString &*
+  [`Command`](/docs/api/com/command) description.
+
+- **p_qListParamNames** : *const QStringList &*
+  Parameter names.
+
+- **p_qListParamValues** : *const QList&lt; QVariant &gt; &*
+  Parameter values/types.
+
+- **p_vecParameterDescriptions** : *const QStringList &*
+  Parameter descriptions;.
+
+- **p_bIsJson** : *bool*
+  Whether the command is exchanged in JSON format.
+
+- **parent** : *QObject **
+  Parent QObject.
+
+---
+
+### Command(p_Command)
+
+Copy constructor.
+
+**Parameters:**
+
+- **p_Command** : *const Command &*
+  [`Command`](/docs/api/com/command) to be copied.
+
+---
+
+### ~Command()
+
+Destroys the command.
+
+---
+
+### command()
+
+Short command for this request.
+
+**Returns:**
+
+- *QString* — Short command representation.
+
+---
+
+### count()
+
+Returns the number of parameters.
+
+**Returns:**
+
+- *quint32* — number of parameters.
+
+---
+
+### description()
+
+Gets the help text or description of this command.
+
+**Returns:**
+
+- *QString* — Help text.
+
+---
+
+### execute()
+
+Inherited by [ICommand](/docs/api/utils/i-command).
+
+Emits received().
+
+---
+
+### isJson()
+
+If received command was Json fomratted or triggered command should be Json formatted.
+
+**Returns:**
+
+- *bool &* — Json formatted.
+
+---
+
+### pDescriptions()
+
+Get parameter descriptions.
+
+**Returns:**
+
+- *QList&lt; QString &gt;* — parameter descriptions.
+
+---
+
+### pNames()
+
+Get parameter names.
+
+**Returns:**
+
+- *QList&lt; QString &gt;* — parameter names.
+
+---
+
+### pValues()
+
+Returns parameter values.
+
+**Returns:**
+
+- *QList&lt; QVariant &gt; &* — parameter values.
+
+---
+
+### reply(p_sReply)
+
+Inherited command reply channel.
+
+**Parameters:**
+
+- **p_sReply** : *const QString &*
+  command reply.
+
+---
+
+### send()
+
+Sender slot which emmits triggered signal.
+
+---
+
+### toJsonObject()
+
+Creates a JSON [`Command`](/docs/api/com/command) Object.
+
+**Returns:**
+
+- *QJsonObject* — [`Command`](/docs/api/com/command) converted to a JSON Object.
+
+---
+
+### toStringList()
+
+Creates a StringList with three items.
+
+First item is the command, second the parameter list and thrid the description.
+
+**Returns:**
+
+- *QStringList* — [`Command`](/docs/api/com/command) as a StringList.
+
+---
+
+### toStringReadySend()
+
+Creates a string JSON formatted ready send command.
+
+**Returns:**
+
+- *QString* — [`Command`](/docs/api/com/command) as a JSON formatted string which contains parameter values too.
+
+---
+
+### operator=(rhs)
+
+Assignment Operator.
+
+**Parameters:**
+
+- **rhs** : *const [Command](/docs/api/com/command) &*
+  [`Command`](/docs/api/com/command) which should be assigned.
+
+**Returns:**
+
+- *[Command](/docs/api/com/command) &* — Reference to this object.
+
+---
+
+### operator\[\](key)
+
+Subscript operator [] to access parameter values by name.
+
+**Parameters:**
+
+- **key** : *const QString &*
+  the parameter name.
+
+**Returns:**
+
+- *QVariant &* — Parameter value related to the parameter name.
+
+---
+
+### operator\[\](idx)
+
+Subscript operator [] to access parameter values by index.
+
+**Parameters:**
+
+- **idx** : *qint32*
+  the parameter index.
+
+**Returns:**
+
+- *QVariant &* — Parameter value related to the parameter index.
+
+---
+
+### operator\[\](key)
+
+Subscript operator [].
+
+**Parameters:**
+
+- **key** : *const QString &*
+  the parameter name.
+
+**Returns:**
+
+- *const QVariant* — Parameter value related to the parameter name.
+
+---
+
+## Authors of this file
+
+- Christoph Dinh &lt;christoph.dinh@mne-cpp.org&gt;

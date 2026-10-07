@@ -507,6 +507,23 @@ const apiSidebar: SidebarsConfig['apiSidebar'] = [
     },
     {
       type: 'category',
+      label: "Communication Library",
+      collapsible: true,
+      collapsed: true,
+      link: {type: 'doc', id: 'api/com/index'},
+      items: [
+        'api/com/command',
+        'api/com/command-manager',
+        'api/com/command-parser',
+        'api/com/meta-data',
+        'api/com/raw-command',
+        'api/com/rt-client',
+        'api/com/rt-cmd-client',
+        'api/com/rt-data-client'
+      ],
+    },
+    {
+      type: 'category',
       label: "LSL Library",
       collapsible: true,
       collapsed: true,

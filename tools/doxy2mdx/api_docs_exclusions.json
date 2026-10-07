@@ -4,15 +4,5 @@
     "std": "Standard library.",
     "Ui": "Qt Designer generated form classes.",
     "SURFACEKEYS": "String-key constants for disp3D surface lookups, not types."
-  },
-  "classes": {
-    "COMLIB::Command": "Real-time client protocol type; needs a running mne_rt_server and is evidenced by integration tests (api_evidence_policy.json).",
-    "COMLIB::CommandManager": "Real-time client protocol type; see COMLIB::Command.",
-    "COMLIB::CommandParser": "Real-time client protocol type; see COMLIB::Command.",
-    "COMLIB::MetaData": "Real-time client protocol type; see COMLIB::Command.",
-    "COMLIB::RawCommand": "Real-time client protocol type; see COMLIB::Command.",
-    "COMLIB::RtClient": "Real-time client protocol type; see COMLIB::Command.",
-    "COMLIB::RtCmdClient": "Real-time client protocol type; see COMLIB::Command.",
-    "COMLIB::RtDataClient": "Real-time client protocol type; see COMLIB::Command."
   }
 }

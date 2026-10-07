@@ -1,0 +1,137 @@
+---
+id: raw-command
+title: "COMLIB::RawCommand"
+sidebar_label: RawCommand
+sidebar_position: 5
+---
+
+# RawCommand
+
+**Namespace:** `COMLIB` &nbsp;·&nbsp; **Library:** Communication Library
+
+`#include <com/raw_command.h>`
+
+```cpp
+class COMLIB::RawCommand
+```
+
+Tokenised but unresolved command: a keyword plus a list of raw string arguments awaiting type binding.
+
+Emitted by [`CommandParser`](/docs/api/com/command-parser) before any [`CommandManager`](/docs/api/com/command-manager) has claimed the request. Observers turn the `QList<QString>` arguments into typed [`Command`](/docs/api/com/command) parameters once the matching schema is located. Retains the JSON-vs-CLI dialect flag so replies travel back in the same encoding the caller used.
+
+### Inheritance
+
+```mermaid
+classDiagram
+    QObject <|-- RawCommand
+    ICommand <|-- RawCommand
+    click ICommand "/docs/api/utils/i-command"
+```
+
+---
+
+## Public Methods
+
+### RawCommand(parent)
+
+Default constructor.
+
+**Parameters:**
+
+- **parent** : *QObject **
+  Parent QObject (optional).
+
+---
+
+### RawCommand(p_sCommand, p_bIsJson, parent)
+
+Constructor which parses a command stored in a json object.
+
+**Parameters:**
+
+- **p_sCommand** : *const QString &*
+  [`Command`](/docs/api/com/command).
+
+- **p_bIsJson** : *bool*
+  If is received/should be send as JSON (optional, default true).
+
+- **parent** : *QObject **
+  Parent QObject (optional).
+
+---
+
+### RawCommand(p_rawCommand)
+
+Copy constructor.
+
+**Parameters:**
+
+- **p_rawCommand** : *const RawCommand &*
+  [`RawCommand`](/docs/api/com/raw-command) which should be copied.
+
+---
+
+### command()
+
+[`Command`](/docs/api/com/command) name.
+
+**Returns:**
+
+- *QString* — short command representation.
+
+---
+
+### count()
+
+Returns the number of parameters.
+
+**Returns:**
+
+- *quint32* — number of parameters.
+
+---
+
+### execute()
+
+Executes the [ICommand](/docs/api/utils/i-command).
+
+---
+
+### isJson()
+
+Returns whether the received command was in Json format.
+
+**Returns:**
+
+- *bool* — true if received command was in Json format, false otherwise.
+
+---
+
+### pValues()
+
+Returns parameter values.
+
+**Returns:**
+
+- *QList&lt; QString &gt; &* — parameter values.
+
+---
+
+### operator=(rhs)
+
+Assignment Operator.
+
+**Parameters:**
+
+- **rhs** : *const [RawCommand](/docs/api/com/raw-command) &*
+  [`RawCommand`](/docs/api/com/raw-command) which should be assigned.
+
+**Returns:**
+
+- *[RawCommand](/docs/api/com/raw-command) &* — Reference to this object.
+
+---
+
+## Authors of this file
+
+- Christoph Dinh &lt;christoph.dinh@mne-cpp.org&gt;

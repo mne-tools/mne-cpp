@@ -1,0 +1,91 @@
+---
+id: command-parser
+title: "COMLIB::CommandParser"
+sidebar_label: CommandParser
+sidebar_position: 3
+---
+
+# CommandParser
+
+**Namespace:** `COMLIB` &nbsp;·&nbsp; **Library:** Communication Library
+
+`#include <com/command_parser.h>`
+
+```cpp
+class COMLIB::CommandParser
+```
+
+Observer-pattern subject that decodes JSON or CLI command strings into [`RawCommand`](/docs/api/com/raw-command) and notifies attached managers.
+
+Single entry point ``parse()`` accepts either dialect, builds a [`[RawCommand](/docs/api/com/raw-command)`](/docs/api/com/raw-command), and broadcasts it to every attached [`[CommandManager](/docs/api/com/command-manager)`](/docs/api/com/command-manager); the `response` signal carries replies back from whichever manager handled the request so the caller (typically a [`[RtCmdClient](/docs/api/com/rt-cmd-client)`](/docs/api/com/rt-cmd-client)) can forward them to the originating socket.
+
+### Inheritance
+
+```mermaid
+classDiagram
+    QObject <|-- CommandParser
+    Subject <|-- CommandParser
+    click Subject "/docs/api/utils/subject"
+```
+
+---
+
+## Public Methods
+
+### CommandParser(parent)
+
+Default constructor.
+
+**Parameters:**
+
+- **parent** : *QObject **
+  Parent QObject (optional).
+
+---
+
+### exists(p_sCommand)
+
+Checks if a command exists.
+
+**Parameters:**
+
+- **p_sCommand** : *const QString &*
+  [`Command`](/docs/api/com/command) to check.
+
+**Returns:**
+
+- *bool* — true if command exists, false otherwise.
+
+---
+
+### parse(p_sInput, p_qListCommandsParsed)
+
+Parses a CLI command or JSON command (list) and notifies all attached observers (command managers).
+
+**Parameters:**
+
+- **p_sInput** : *const QString &*
+  Input to parse.
+
+- **p_qListCommandsParsed** : *QStringList &*
+  List of parsed commands.
+
+**Returns:**
+
+- *bool* — false if the input is empty, malformed JSON or an unknown CLI command, true otherwise.
+
+---
+
+### getRawCommand()
+
+Returns the stored [`RawCommand`](/docs/api/com/raw-command).
+
+**Returns:**
+
+- *[RawCommand](/docs/api/com/raw-command) &* — the stored [`RawCommand`](/docs/api/com/raw-command).
+
+---
+
+## Authors of this file
+
+- Christoph Dinh &lt;christoph.dinh@mne-cpp.org&gt;

@@ -1,0 +1,191 @@
+---
+id: command-manager
+title: "COMLIB::CommandManager"
+sidebar_label: CommandManager
+sidebar_position: 2
+---
+
+# CommandManager
+
+**Namespace:** `COMLIB` &nbsp;·&nbsp; **Library:** Communication Library
+
+`#include <com/command_manager.h>`
+
+```cpp
+class COMLIB::CommandManager
+```
+
+Observer-side registry of [`Command`](/docs/api/com/command) schemas a subsystem accepts from the shared [`CommandParser`](/docs/api/com/command-parser).
+
+Holds a `QMap<QString,Command>` indexed by command keyword; when [`CommandParser`](/docs/api/com/command-parser) notifies attached managers of a new [`RawCommand`](/docs/api/com/raw-command), each manager looks the keyword up in its own map and either dispatches the corresponding `[`[Command](/docs/api/com/command)`](/docs/api/com/command)` (re-emitting `triggered` / `response`) or silently passes. Schemas can be added one at a time or bulk-loaded from a `QJsonDocument` matching the server’s self-described command list.
+
+### Inheritance
+
+```mermaid
+classDiagram
+    QObject <|-- CommandManager
+    IObserver <|-- CommandManager
+    click IObserver "/docs/api/utils/i-observer"
+```
+
+---
+
+## Public Methods
+
+### CommandManager(p_bIsActive, parent)
+
+---
+
+### CommandManager(p_qByteArrayJsonDoc, p_bIsActive, parent)
+
+---
+
+### CommandManager(p_jsonDoc, p_bIsActive, parent)
+
+---
+
+### ~CommandManager()
+
+---
+
+### clear()
+
+Clears the command manager.
+
+---
+
+### commandMap()
+
+Returns the lookup table of all available commands.
+
+**Returns:**
+
+- *QMap&lt; QString, [Command](/docs/api/com/command) &gt; &* — the command lookup table.
+
+---
+
+### hasCommand(p_sCommand)
+
+Checks if a command is managed;.
+
+**Parameters:**
+
+- **p_sCommand** : *const QString &*
+  COmmand to check.
+
+**Returns:**
+
+- *bool* — true if part of command manager, false otherwise.
+
+---
+
+### insert(p_jsonDocument)
+
+Inserts commands encoded in a json document.
+
+Attention existing items are overwritten.
+
+**Parameters:**
+
+- **p_jsonDocument** : *const QJsonDocument &*
+  JSON document containing commands.
+
+---
+
+### insert(p_sKey, p_sDescription)
+
+Inserts a single command.
+
+Attention existing items are overwritten.
+
+**Parameters:**
+
+- **p_sKey** : *const QString &*
+  [`Command`](/docs/api/com/command) name used as the key.
+
+- **p_sDescription** : *const QString &*
+  Human-readable description of the command.
+
+---
+
+### insert(p_sKey, p_command)
+
+Inserts a new command and emmits dataChanged signal.
+
+**Parameters:**
+
+- **p_sKey** : *const QString &*
+  [`Command`](/docs/api/com/command) key word.
+
+- **p_command** : *const [Command](/docs/api/com/command) &*
+  [`Command`](/docs/api/com/command) content. Attention [`CommandManager`](/docs/api/com/command-manager) takes ownership of that command by reseting commad's parent;.
+
+---
+
+### isActive()
+
+Returns if [`CommandManager`](/docs/api/com/command-manager) is active.
+
+If true, this manager parses incomming commands.
+
+**Returns:**
+
+- *bool* — if true, incomming commands are parsed.
+
+---
+
+### setStatus(status)
+
+Sets the activation status of the [`CommandManager`](/docs/api/com/command-manager).
+
+**Parameters:**
+
+- **status** : *bool*
+  the new activation status of the [`CommandManager`](/docs/api/com/command-manager).
+
+---
+
+### update(p_pSubject)
+
+Updates the [IObserver](/docs/api/utils/i-observer) ([`CommandManager`](/docs/api/com/command-manager)) when a new command was received.
+
+**Parameters:**
+
+- **p_pSubject** : *[Subject](/docs/api/utils/subject) **
+  pointer to the subject ([`CommandParser`](/docs/api/com/command-parser)) to which observer ([`CommandManager`](/docs/api/com/command-manager)) is attached to.
+
+---
+
+### operator\[\](key)
+
+Subscript operator [] to access commands by command name.
+
+**Parameters:**
+
+- **key** : *const QString &*
+  the command key word.
+
+**Returns:**
+
+- *[Command](/docs/api/com/command) &* — [`Command`](/docs/api/com/command) object related to command key word.
+
+---
+
+### operator\[\](key)
+
+Subscript operator [] to access commands by command name.
+
+**Parameters:**
+
+- **key** : *const QString &*
+  the command key word.
+
+**Returns:**
+
+- *const [Command](/docs/api/com/command)* — [`Command`](/docs/api/com/command) object related to command key word.
+
+---
+
+## Authors of this file
+
+- Christoph Dinh &lt;christoph.dinh@mne-cpp.org&gt;

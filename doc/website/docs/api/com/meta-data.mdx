@@ -1,0 +1,32 @@
+---
+id: meta-data
+title: "COMLIB::MetaData"
+sidebar_label: MetaData
+sidebar_position: 4
+---
+
+# MetaData
+
+**Namespace:** `COMLIB` &nbsp;·&nbsp; **Library:** Communication Library
+
+`#include <com/rt_data_client.h>`
+
+```cpp
+struct COMLIB::MetaData
+```
+
+Value-type aggregate of the FIFF metadata blocks `mne_rt_server` sends at the start of a measurement.
+
+`mne_rt_server` delivers both the per-channel `FiffInfo` header and the head-shape `FiffDigitizerData` block before the first sample buffer; callers usually need both to make sense of the stream (channel positions for visualisation, digitiser points for coregistration). `[`MetaData`](/docs/api/com/meta-data)` lets `RtDataClient::readMetadata` return them together without introducing a `std::pair` or splitting the read into two round trips.
+
+---
+
+## Public Methods
+
+### MetaData(pInfo, pDigitizerData)
+
+---
+
+## Authors of this file
+
+- Christoph Dinh &lt;christoph.dinh@mne-cpp.org&gt;
