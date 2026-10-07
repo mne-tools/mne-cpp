@@ -16,7 +16,7 @@ Coverage from `5053fe099` (https://github.com/mne-tools/mne-cpp/actions/runs/362
 | G3 | Eligible APIs have an executable example | 100.0% of 367; 388 snippets | met |
 | G3 | Exported API is registered | 0 exported classes unregistered | met |
 | G4 | Documentation images generated in CI | 19 referenced, 0 without producer, placeholders in 0 workflows | met |
-| G4 | Visual regression compares to goldens | 0 golden comparisons | **open** |
+| G4 | Visual regression compares to goldens | 19 golden comparisons | met |
 | G5 | Zero compiler warnings | enforced by -Werror on every matrix entry | met |
 | G5 | Debt metrics ratcheted | null_macro 43, typedef_struct 12, c_style_cast 429, raw_new 169, raw_delete 275, console_io 358, numeric_define 834, qt_new_unparented 823, oversized_unit 8 | baseline recorded |
 | G6 | Pinned reference environment | MNE-Python 1.11.0; unpinned in CI: none | met |

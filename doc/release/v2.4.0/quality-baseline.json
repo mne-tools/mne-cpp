@@ -59,7 +59,7 @@
       "referenced_without_producer": 0,
       "doc_shots_run_in_ci": true,
       "placeholder_workflows": 0,
-      "golden_comparisons": 0
+      "golden_comparisons": 19
     },
     "G5_maintainability": {
       "compiler_warnings": 0,

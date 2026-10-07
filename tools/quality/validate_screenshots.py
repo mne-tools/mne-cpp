@@ -22,7 +22,10 @@ Image checks (skipped with ``--skip-images``)
     every shot has a PNG, which must decode completely (signature, chunk CRCs,
     zlib stream, scanline filters), have the declared size, be fully opaque
     and not be blank (one colour covering almost the whole frame).  PNGs
-    without a manifest entry are orphans.
+    without a manifest entry are orphans.  A shot with ``golden`` metadata
+    must match its golden: normalised RMSE <= ``max_rmse`` and at most
+    ``MAX_CHANGED_FRACTION`` of the pixels differing by more than
+    ``CHANGED_LEVEL`` in any channel.
 
 Only the standard library is used, so the result is identical on every platform.
 
@@ -66,6 +69,9 @@ KIND_RE = re.compile(r"spec\.kind\s*==\s*QLatin1String\(\"([a-z_0-9]+)\"\)")
 MIN_SIDE, MAX_SIDE = 64, 8192
 # A real application frame never has one colour on more than this share of its pixels.
 BLANK_FRACTION = 0.995
+# Golden comparison: antialiasing noise stays below this level; real changes do not.
+CHANGED_LEVEL = 16
+MAX_CHANGED_FRACTION = 0.005
 
 PNG_SIGNATURE = b"\x89PNG\r\n\x1a\n"
 CHANNELS = {0: 1, 2: 3, 4: 2, 6: 4}
@@ -176,6 +182,22 @@ def image_problems(image: Image, declared: list[int] | None) -> list[str]:
     return problems
 
 
+def golden_problems(image: Image, golden: Image, max_rmse: float) -> list[str]:
+    if (image.width, image.height, image.channels) != (golden.width, golden.height, golden.channels):
+        return [f"differs from golden format {golden.width}x{golden.height}x{golden.channels}"]
+    diff = bytes(abs(a - b) for a, b in zip(image.pixels, golden.pixels))
+    rmse = (sum(d * d for d in diff) / len(diff)) ** 0.5 / 255
+    mask = diff.translate(bytes(int(level > CHANGED_LEVEL) for level in range(256)))
+    changed_bits = 0
+    for c in range(image.channels):
+        changed_bits |= int.from_bytes(mask[c::image.channels], "big")
+    changed = bin(changed_bits).count("1") / (image.width * image.height)
+    if rmse <= max_rmse and changed <= MAX_CHANGED_FRACTION:
+        return []
+    return [f"regression vs golden: RMSE {rmse:.4f} (max {max_rmse}), "
+            f"{changed:.2%} of pixels changed (max {MAX_CHANGED_FRACTION:.2%})"]
+
+
 def implemented_kinds(runner: Path) -> set[str]:
     return set(KIND_RE.findall(runner.read_text(encoding="utf-8"))) if runner.is_file() else set()
 
@@ -256,14 +278,20 @@ def _file_problems(path: Path, declared: list[int] | None) -> list[str]:
         return [str(exc)]
 
 
-def validate_images(images_dir: Path, shots: dict[str, dict[str, Any]], declared_ids: set[str]) -> list[str]:
+def validate_images(images_dir: Path, shots: dict[str, dict[str, Any]], declared_ids: set[str],
+                    manifest_dir: Path) -> list[str]:
     problems = []
     for shot_id, shot in sorted(shots.items()):
         path = images_dir / f"{shot_id}.png"
         if not path.is_file():
             problems.append(f"image '{shot_id}': missing ({path})")
             continue
-        problems += [f"image '{shot_id}': {p}" for p in _file_problems(path, shot["size"])]
+        own = _file_problems(path, shot["size"])
+        golden = shot.get("golden")
+        if golden and not own:
+            own = golden_problems(decode_png(path.read_bytes()),
+                                  decode_png((manifest_dir / golden["path"]).read_bytes()), golden["max_rmse"])
+        problems += [f"image '{shot_id}': {p}" for p in own]
     for path in sorted(images_dir.rglob("*.png")) if images_dir.is_dir() else []:
         shot_id = path.relative_to(images_dir).with_suffix("").as_posix()
         if shot_id not in declared_ids:
@@ -283,7 +311,7 @@ def validate(manifest_path: Path, root: Path, runner: Path, images_dir: Path | N
                 return problems
             images_dir = (manifest_path.parent / out_dir).resolve()
         declared_ids = {shot.get("id") for shot in manifest.get("shots") or [] if isinstance(shot, dict)}
-        problems += validate_images(images_dir, shots, declared_ids)
+        problems += validate_images(images_dir, shots, declared_ids, manifest_path.parent)
     return problems
 
 

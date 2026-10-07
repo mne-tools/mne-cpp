@@ -22,7 +22,9 @@ and for the repository as a whole
 
 * which CI workflows fabricate placeholder PNGs instead of generating images,
 * whether CI builds and runs ``mne_doc_shots``,
-* whether the screenshot regression job compares against a golden (``--ref``).
+* whether the screenshot regression job compares against a golden (``--ref``),
+* how many CI-generated shots are compared against a committed golden
+  (manifest ``golden`` entries, checked by ``validate_screenshots.py``).
 
 Generated PNGs are not versioned (they live under an ignored directory), so the
 committed report is derived from sources and workflows only.  ``--images``
@@ -171,7 +173,10 @@ def build_report(images_dir: Path | None = None) -> dict[str, Any]:
             "placeholder_workflows": workflows["placeholder_workflows"],
             "doc_shots_run_in_ci": bool(workflows["doc_shots_workflows"]),
             "regression_jobs": workflows["regression"],
-            "golden_references": sum(1 for job in workflows["regression"] if job["compares_to_golden"]),
+            "golden_references": sum(1 for job in workflows["regression"] if job["compares_to_golden"])
+            + (sum(1 for shot in shots.values()
+                   if shot.get("golden") and (MANIFEST.parent / shot["golden"]["path"]).is_file())
+               if workflows["doc_shots_workflows"] else 0),
         },
         "images": records,
     }
@@ -194,7 +199,8 @@ def render_markdown(report: dict[str, Any]) -> str:
         f"- Produced but never referenced: {s['produced_without_consumer']}",
         f"- CI builds and runs `mne_doc_shots`: {'yes' if s['doc_shots_run_in_ci'] else '**no**'}",
         f"- Workflows fabricating placeholder PNGs: {', '.join(f'`{w}`' for w in s['placeholder_workflows']) or 'none'}",
-        f"- Screenshot regression jobs comparing to a golden: {s['golden_references']} of {len(s['regression_jobs'])}",
+        f"- Golden comparisons in CI (regression jobs with `--ref` + manifest shots with a golden): "
+        f"{s['golden_references']}",
         "",
         "| Image | Producer | Kind | Size | Consumers |",
         "|---|---|---|---|---|",

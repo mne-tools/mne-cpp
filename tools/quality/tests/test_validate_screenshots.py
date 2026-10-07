@@ -201,6 +201,29 @@ class ManifestFixtureTests(TreeCase):
         self.assertNotIn("'app/golden'", problems)
         self.assertIn("shot 'app/no-golden' golden: max_rmse must be within 0..1", problems)
 
+    def test_golden_comparison(self) -> None:
+        (self.root / "screenshots" / "goldens").mkdir()
+        (self.root / "screenshots" / "goldens" / "g.png").write_bytes(VALID)
+        golden = {"path": "goldens/g.png", "max_rmse": 0.01, "platform": "ubuntu-24.04"}
+        # One pixel off by 200 levels: below both thresholds (antialiasing-like noise).
+        self.add("app/noise", png(W, H, lambda x, y: (200, 0, 0) if (x, y) == (3, 3) else scene(x, y)),
+                 golden=golden)
+        # A 10x10 block changed: 1.6% of the pixels.
+        self.add("app/block", png(W, H, lambda x, y: (255, 255, 255) if x < 10 and y < 10 else scene(x, y)),
+                 golden=golden)
+        # Every pixel off by 8 levels: below the changed level, but RMSE 0.031.
+        self.add("app/shift", png(W, H, lambda x, y: tuple(min(c + 8, 255) for c in scene(x, y))), golden=golden)
+        problems = "\n".join(self.problems())
+        self.assertNotIn("app/noise", problems)
+        self.assertIn("image 'app/block': regression vs golden", problems)
+        self.assertIn("1.63% of pixels changed", problems)
+        self.assertRegex(problems, r"image 'app/shift': regression vs golden: RMSE 0\.0[23]\d+ \(max 0\.01\), 0\.00%")
+
+    def test_golden_size_mismatch(self) -> None:
+        golden = shots.decode_png(png(W // 2, H, scene))
+        self.assertEqual(shots.golden_problems(shots.decode_png(VALID), golden, 0.01),
+                         [f"differs from golden format {W // 2}x{H}x3"])
+
     def test_missing_golden_file(self) -> None:
         self.add("app/g", golden={"path": "goldens/none.png", "max_rmse": 0.01, "platform": "ubuntu-24.04"})
         self.assertIn("shot 'app/g' golden: missing none.png", "\n".join(self.problems()))
