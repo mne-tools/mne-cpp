@@ -48,14 +48,14 @@ namespace MNELIB
 {
 
 /**
- * @brief Artifact rejection thresholds and flags for each channel type (grad, mag, eeg, eog) used during epoch dropping
+ * @brief Per-channel peak-to-peak check record used internally by MNEEpochDataList::checkForArtifact.
  */
 struct ArtifactRejectionData
 {
-    bool bRejected = false;
-    Eigen::RowVectorXd data;
-    double dThreshold;
-    QString sChName;
+    bool bRejected = false;  /**< Set when the channel's peak-to-peak range exceeds dThreshold. */
+    Eigen::RowVectorXd data; /**< One channel of the epoch. */
+    double dThreshold = 0.0; /**< Peak-to-peak limit for the channel type. */
+    QString sChName;         /**< Channel name. */
 };
 
 //=============================================================================================================
@@ -164,8 +164,6 @@ public:
                                  const QMap<QString, double>& mapReject,
                                  const QStringList& lExcludeChs = QStringList());
 
-    static void checkChThreshold(ArtifactRejectionData& inputData);
-
     //=========================================================================================================
     /**
      * averageCategories
@@ -226,6 +224,15 @@ public:
                                               const QMap<QString, double>& mapReject,
                                               const QStringList& lExcludeChs = QStringList(),
                                               const Eigen::RowVectorXi& vecPicks = Eigen::RowVectorXi());
+
+private:
+    //=========================================================================================================
+    /**
+     * Per-channel worker of checkForArtifact: flags the channel when its peak-to-peak range exceeds the threshold.
+     *
+     * @param[in, out] inputData     The channel data and threshold; bRejected is set on output.
+     */
+    static void checkChThreshold(ArtifactRejectionData& inputData);
 };
 } // NAMESPACE
 

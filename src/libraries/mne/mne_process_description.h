@@ -43,6 +43,8 @@ namespace MNELIB
 /**
  * Covariance matrix computation definition.
  * Ported from covDefRec (MNE-C browser_types.h).
+ *
+ * @snippet ex_mne_api/main.cpp mne_cov_description_usage
  */
 struct MNESHARED_EXPORT CovDefinition
 {
@@ -60,6 +62,8 @@ struct MNESHARED_EXPORT CovDefinition
 /**
  * Covariance matrix computation specification.
  * Ported from covDataRec (MNE-C browser_types.h).
+ *
+ * @snippet ex_mne_api/main.cpp mne_cov_description_usage
  */
 struct MNESHARED_EXPORT CovDescription
 {

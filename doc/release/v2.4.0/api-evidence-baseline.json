@@ -12,16 +12,16 @@
     "registered_stale": 0,
     "registered_with_test": 102,
     "registered_test_unresolved": 0,
-    "registered_with_example": 346,
+    "registered_with_example": 357,
     "registered_example_not_built": 0,
     "registered_with_python_equiv": 89,
     "registered_without_api_page": 0,
-    "with_snippet": 368,
+    "with_snippet": 378,
     "public_api_units": 507,
-    "example_eligible": 372,
-    "example_exempt": 135,
-    "eligible_backed_by_registry_example": 346,
-    "eligible_used_by_some_example": 340,
+    "example_eligible": 369,
+    "example_exempt": 138,
+    "eligible_backed_by_registry_example": 357,
+    "eligible_used_by_some_example": 337,
     "examples_on_disk": 68,
     "examples_built": 68
   },
@@ -49,7 +49,7 @@
       "registered": 21,
       "with_test": 7,
       "eligible": 20,
-      "eligible_with_registry_example": 19,
+      "eligible_with_registry_example": 20,
       "eligible_used_by_example": 20,
       "with_snippet": 20
     },
@@ -76,9 +76,9 @@
       "registered": 14,
       "with_test": 0,
       "eligible": 22,
-      "eligible_with_registry_example": 9,
+      "eligible_with_registry_example": 10,
       "eligible_used_by_example": 11,
-      "with_snippet": 9
+      "with_snippet": 10
     },
     "dsp": {
       "public": 84,
@@ -120,10 +120,10 @@
       "public": 55,
       "registered": 55,
       "with_test": 19,
-      "eligible": 47,
-      "eligible_with_registry_example": 41,
-      "eligible_used_by_example": 42,
-      "with_snippet": 47
+      "eligible": 46,
+      "eligible_with_registry_example": 46,
+      "eligible_used_by_example": 41,
+      "with_snippet": 52
     },
     "lsl": {
       "public": 3,
@@ -165,10 +165,10 @@
       "public": 66,
       "registered": 66,
       "with_test": 6,
-      "eligible": 43,
-      "eligible_with_registry_example": 40,
-      "eligible_used_by_example": 39,
-      "with_snippet": 45
+      "eligible": 42,
+      "eligible_with_registry_example": 42,
+      "eligible_used_by_example": 38,
+      "with_snippet": 49
     },
     "mri": {
       "public": 8,
@@ -192,9 +192,9 @@
       "public": 24,
       "registered": 24,
       "with_test": 2,
-      "eligible": 24,
-      "eligible_with_registry_example": 21,
-      "eligible_used_by_example": 24,
+      "eligible": 23,
+      "eligible_with_registry_example": 23,
+      "eligible_used_by_example": 23,
       "with_snippet": 24
     }
   },
@@ -1657,6 +1657,7 @@
         "ex_fiff_sniffer"
       ],
       "snippets": [
+        "ex_connectivity_metrics/main.cpp#network_threshold",
         "ex_connectivity_metrics/main.cpp#network_build",
         "ex_connectivity_metrics/main.cpp#network_threshold"
       ],
@@ -1675,8 +1676,8 @@
       "registry_status": "documented",
       "test": null,
       "test_resolves": false,
-      "example": null,
-      "example_state": "none",
+      "example": "ex_connectivity_metrics",
+      "example_state": "built",
       "including_examples": [
         "ex_connectivity",
         "ex_connectivity_comparison",
@@ -1686,6 +1687,7 @@
         "ex_fiff_sniffer"
       ],
       "snippets": [
+        "ex_connectivity_metrics/main.cpp#network_threshold",
         "ex_connectivity_metrics/main.cpp#network_build",
         "ex_connectivity_metrics/main.cpp#network_threshold"
       ],
@@ -3363,7 +3365,7 @@
       "exempt_reason": "header prefix 'disp3D/input/': Interaction handler of an interactive view; evidenced by GUI tests."
     },
     {
-      "name": "PickResult",
+      "name": "RayHit",
       "header": "disp3D/input/raypicker.h",
       "library": "disp3D",
       "kind": "exported-class",
@@ -3889,10 +3891,12 @@
       "registry_status": "documented",
       "test": null,
       "test_resolves": false,
-      "example": null,
-      "example_state": "none",
+      "example": "ex_disp3d_scene",
+      "example_state": "built",
       "including_examples": [],
-      "snippets": [],
+      "snippets": [
+        "ex_disp3d_scene/main.cpp#pick_result_usage"
+      ],
       "api_page": "doc/website/docs/api/disp3-d/pick-result.mdx",
       "python_equiv": null,
       "example_eligible": true,
@@ -6463,7 +6467,8 @@
         "ex_fiff_api",
         "ex_inv_api",
         "ex_inv_beamformer",
-        "ex_make_inverse_operator"
+        "ex_make_inverse_operator",
+        "ex_mne_api"
       ],
       "snippets": [
         "ex_fiff_api/main.cpp#fiff_cov_usage"
@@ -8324,10 +8329,12 @@
       "registry_status": "documented",
       "test": null,
       "test_resolves": false,
-      "example": null,
-      "example_state": "none",
+      "example": "ex_inv_api",
+      "example_state": "built",
       "including_examples": [],
-      "snippets": [],
+      "snippets": [
+        "ex_inv_api/main.cpp#inv_source_estimate_token_usage"
+      ],
       "api_page": "doc/website/docs/api/inv/inv-connectivity.mdx",
       "python_equiv": null,
       "example_eligible": true,
@@ -8366,10 +8373,12 @@
       "registry_status": "documented",
       "test": null,
       "test_resolves": false,
-      "example": null,
-      "example_state": "none",
+      "example": "ex_inv_api",
+      "example_state": "built",
       "including_examples": [],
-      "snippets": [],
+      "snippets": [
+        "ex_inv_api/main.cpp#inv_source_estimate_token_usage"
+      ],
       "api_page": "doc/website/docs/api/inv/inv-focal-dipole.mdx",
       "python_equiv": null,
       "example_eligible": true,
@@ -8431,10 +8440,12 @@
       "registry_status": "documented",
       "test": null,
       "test_resolves": false,
-      "example": null,
-      "example_state": "none",
+      "example": "ex_inv_api",
+      "example_state": "built",
       "including_examples": [],
-      "snippets": [],
+      "snippets": [
+        "ex_inv_api/main.cpp#inv_source_estimate_token_usage"
+      ],
       "api_page": "doc/website/docs/api/inv/inv-source-coupling.mdx",
       "python_equiv": null,
       "example_eligible": true,
@@ -8515,10 +8526,13 @@
       "registry_status": "documented",
       "test": null,
       "test_resolves": false,
-      "example": null,
-      "example_state": "none",
+      "example": "ex_inv_api",
+      "example_state": "built",
       "including_examples": [],
-      "snippets": [],
+      "snippets": [
+        "ex_inv_api/main.cpp#inv_source_estimate_token_usage",
+        "ex_inv_api/main.cpp#inv_source_estimate_token_usage"
+      ],
       "api_page": "doc/website/docs/api/inv/inv-token.mdx",
       "python_equiv": null,
       "example_eligible": true,
@@ -8534,10 +8548,13 @@
       "registry_status": "documented",
       "test": null,
       "test_resolves": false,
-      "example": null,
-      "example_state": "none",
+      "example": "ex_inv_api",
+      "example_state": "built",
       "including_examples": [],
-      "snippets": [],
+      "snippets": [
+        "ex_inv_api/main.cpp#inv_source_estimate_token_usage",
+        "ex_inv_api/main.cpp#inv_source_estimate_token_usage"
+      ],
       "api_page": "doc/website/docs/api/inv/inv-tokenize-options.mdx",
       "python_equiv": null,
       "example_eligible": true,
@@ -8833,8 +8850,8 @@
       ],
       "api_page": "doc/website/docs/api/inv/pair.mdx",
       "python_equiv": null,
-      "example_eligible": true,
-      "exempt_reason": null
+      "example_eligible": false,
+      "exempt_reason": "registry: Internal index pair of the RAP-MUSIC source-pair search; only appears in protected InvRapMusic helpers."
     },
     {
       "name": "InvTrapMusic",
@@ -10317,8 +10334,8 @@
       ],
       "api_page": "doc/website/docs/api/mne/artifact-rejection-data.mdx",
       "python_equiv": null,
-      "example_eligible": true,
-      "exempt_reason": null
+      "example_eligible": false,
+      "exempt_reason": "registry: Internal per-channel scratch record of MNEEpochDataList::checkForArtifact; never part of a public signature."
     },
     {
       "name": "MNEEpochDataList",
@@ -11036,10 +11053,13 @@
       "registry_status": "documented",
       "test": null,
       "test_resolves": false,
-      "example": null,
-      "example_state": "none",
+      "example": "ex_mne_api",
+      "example_state": "built",
       "including_examples": [],
-      "snippets": [],
+      "snippets": [
+        "ex_mne_api/main.cpp#mne_cov_description_usage",
+        "ex_mne_api/main.cpp#mne_cov_description_usage"
+      ],
       "api_page": "doc/website/docs/api/mne/cov-definition.mdx",
       "python_equiv": null,
       "example_eligible": true,
@@ -11055,10 +11075,13 @@
       "registry_status": "documented",
       "test": null,
       "test_resolves": false,
-      "example": null,
-      "example_state": "none",
+      "example": "ex_mne_api",
+      "example_state": "built",
       "including_examples": [],
-      "snippets": [],
+      "snippets": [
+        "ex_mne_api/main.cpp#mne_cov_description_usage",
+        "ex_mne_api/main.cpp#mne_cov_description_usage"
+      ],
       "api_page": "doc/website/docs/api/mne/cov-description.mdx",
       "python_equiv": null,
       "example_eligible": true,
@@ -11077,7 +11100,10 @@
       "example": null,
       "example_state": "none",
       "including_examples": [],
-      "snippets": [],
+      "snippets": [
+        "ex_mne_api/main.cpp#mne_cov_description_usage",
+        "ex_mne_api/main.cpp#mne_cov_description_usage"
+      ],
       "api_page": "doc/website/docs/api/mne/filter-settings.mdx",
       "python_equiv": null,
       "example_eligible": false,
@@ -11096,7 +11122,10 @@
       "example": null,
       "example_state": "none",
       "including_examples": [],
-      "snippets": [],
+      "snippets": [
+        "ex_mne_api/main.cpp#mne_cov_description_usage",
+        "ex_mne_api/main.cpp#mne_cov_description_usage"
+      ],
       "api_page": "doc/website/docs/api/mne/processing-settings.mdx",
       "python_equiv": null,
       "example_eligible": false,
@@ -12168,6 +12197,7 @@
         "ex_utils"
       ],
       "snippets": [
+        "ex_utils/main.cpp#acquired_points_usage",
         "ex_utils/main.cpp#acquired_points_usage"
       ],
       "api_page": "doc/website/docs/api/utils/acquired-points.mdx",
@@ -12185,12 +12215,13 @@
       "registry_status": "documented",
       "test": null,
       "test_resolves": false,
-      "example": null,
-      "example_state": "none",
+      "example": "ex_utils",
+      "example_state": "built",
       "including_examples": [
         "ex_utils"
       ],
       "snippets": [
+        "ex_utils/main.cpp#acquired_points_usage",
         "ex_utils/main.cpp#acquired_points_usage"
       ],
       "api_page": "doc/website/docs/api/utils/digitized-point.mdx",
@@ -12262,6 +12293,7 @@
         "ex_utils"
       ],
       "snippets": [
+        "ex_utils/main.cpp#polhemus_coregistration_usage",
         "ex_utils/main.cpp#polhemus_coregistration_usage"
       ],
       "api_page": "doc/website/docs/api/utils/polhemus-connection.mdx",
@@ -12279,12 +12311,13 @@
       "registry_status": "documented",
       "test": null,
       "test_resolves": false,
-      "example": null,
-      "example_state": "none",
+      "example": "ex_utils",
+      "example_state": "built",
       "including_examples": [
         "ex_utils"
       ],
       "snippets": [
+        "ex_utils/main.cpp#polhemus_coregistration_usage",
         "ex_utils/main.cpp#polhemus_coregistration_usage"
       ],
       "api_page": "doc/website/docs/api/utils/polhemus-serial-config.mdx",
@@ -12456,8 +12489,8 @@
       ],
       "api_page": "doc/website/docs/api/utils/report-section.mdx",
       "python_equiv": null,
-      "example_eligible": true,
-      "exempt_reason": null
+      "example_eligible": false,
+      "exempt_reason": "registry: Private storage record of Report; sections are created through the Report::add* methods covered by the report example."
     },
     {
       "name": "SelectionIO",

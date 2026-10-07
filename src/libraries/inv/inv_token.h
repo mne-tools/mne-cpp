@@ -182,6 +182,8 @@ enum class InvTokenId : int32_t
  * and encoded as @c InvTokenId::QuantBinBase + bin, discarding the float.
  *
  * @brief One element of a tokenised neural-source representation.
+ *
+ * @snippet ex_inv_api/main.cpp inv_source_estimate_token_usage
  */
 struct InvToken
 {
@@ -213,6 +215,8 @@ struct InvToken
  * suitable for context-limited transformer windows.
  *
  * @brief Tokenization options controlling layer inclusion and sub-sampling.
+ *
+ * @snippet ex_inv_api/main.cpp inv_source_estimate_token_usage
  */
 struct InvTokenizeOptions
 {

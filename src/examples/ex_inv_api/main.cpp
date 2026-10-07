@@ -26,6 +26,7 @@
 #include <inv/inv_resolution_matrix.h>
 #include <inv/inv_source_estimate.h>
 #include <inv/inv_source_estimate_io.h>
+#include <inv/inv_source_estimate_token.h>
 #include <inv/inv_vector_source_estimate.h>
 #include <inv/inv_volume_source_estimate.h>
 #include <inv/minimum_norm/inv_cmne.h>
@@ -270,6 +271,33 @@ int main(int argc, char* argv[])
     const VectorXd unitNoise = (kDspm * inverse.noise_cov->data * kDspm.transpose()).diagonal();
     ok &= expect(kDspm.rows() == 70 && (unitNoise.array() - 1.0).abs().maxCoeff() < 1e-6 && cmne.stcCmne.data.rows() == 70 && cmne.stcCmne.data.cols() == 421,
                  "InvCMNE: dSPM kernel has unit noise variance per source, CMNE estimate for all 421 samples");
+
+    //! [inv_source_estimate_token_usage]
+    InvSourceEstimate layered = stc;
+    InvFocalDipole dipole; // an off-grid ECD result alongside the grid
+    dipole.position = Vector3f(0.01f, -0.08f, 0.03f);
+    dipole.moment = Vector3f(0.0f, 0.0f, 20e-9f);
+    dipole.goodness = 0.9f;
+    layered.focalDipoles.push_back(dipole);
+    InvSourceCoupling pair; // two grid sources that move together
+    pair.gridIndices = {0, 1};
+    pair.moments = {Vector3d::UnitZ(), Vector3d::UnitZ()};
+    pair.correlations = Matrix2d{{1.0, 0.8}, {0.8, 1.0}};
+    layered.couplings.push_back(pair);
+    InvConnectivity coherence; // a source-space connectivity layer
+    coherence.measure = "coh";
+    coherence.matrix = Matrix2d{{1.0, 0.4}, {0.4, 1.0}};
+    coherence.fmin = 8.0f;
+    coherence.fmax = 12.0f;
+    layered.connectivity.push_back(coherence);
+    InvTokenizeOptions options; // at most 5 sources and 10 samples; values travel as float
+    options.maxSources = 5;
+    options.maxTimePoints = 10;
+    const std::vector<InvToken> tokens = tokenize(layered, options);
+    const InvSourceEstimate fromTokenStream = fromTokens(tokens);
+    //! [inv_source_estimate_token_usage]
+    ok &= expect(tokens.front().id == InvTokenId::Bos && tokens.back().id == InvTokenId::Eos && fromTokenStream.data.rows() == 5 && fromTokenStream.data.cols() == 10 && fromTokenStream.focalDipoles.size() == 1 && std::fabs(fromTokenStream.focalDipoles[0].moment.z() - 20e-9f) < 1e-15f && fromTokenStream.couplings.size() == 1 && std::fabs(fromTokenStream.couplings[0].correlations(0, 1) - 0.8) < 1e-7 && fromTokenStream.connectivity.size() == 1 && fromTokenStream.connectivity[0].fmax == 12.0f,
+                 QString("tokenize/fromTokens: %1 tokens carry 5 x 10 samples and the dipole, coupling and connectivity layers").arg(tokens.size()));
 
     //! [inv_source_estimate_io_usage]
     InvSourceEstimateIO::writeCsv(stc, tmp.filePath("v1-dspm.csv"));

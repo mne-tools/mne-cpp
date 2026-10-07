@@ -49,6 +49,8 @@ namespace INVLIB
  * an N x N correlation matrix.
  *
  * @brief N-tuple of correlated grid sources with orientations and correlation matrix.
+ *
+ * @snippet ex_inv_api/main.cpp inv_source_estimate_token_usage
  */
 struct INVSHARED_EXPORT InvSourceCoupling
 {

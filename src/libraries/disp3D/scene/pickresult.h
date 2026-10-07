@@ -11,7 +11,7 @@
  *
  * Every renderable that supports picking (BrainSurface triangles,
  * DipoleObject arrow instances, ElectrodeObject contacts,
- * SliceObject voxels) returns a @ref PickResult so the host GUI can
+ * SliceObject voxels) returns a @ref DISP3DLIB::PickResult so the host GUI can
  * react with a single switch on @ref DISP3DLIB::PickResult::kind "PickResult::kind" regardless of
  * which primitive was hit.
  */
@@ -66,6 +66,8 @@ enum class PickKind
  * (Pick dock, status bar, MRI ortho viewer, time-course panel) read the
  * generic fields (`kind`, `world`, `objectId`, `label`, `value`) plus any
  * kind-specific fields they understand.
+ *
+ * @snippet ex_disp3d_scene/main.cpp pick_result_usage
  */
 struct DISP3DSHARED_EXPORT PickResult
 {

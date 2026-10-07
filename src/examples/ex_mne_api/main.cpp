@@ -21,6 +21,7 @@
 
 #include <fiff/fiff_constants.h>
 #include <fiff/fiff_coord_trans.h>
+#include <fiff/fiff_cov.h>
 #include <fiff/fiff_events.h>
 #include <fiff/fiff_proj.h>
 #include <fiff/fiff_evoked.h>
@@ -351,6 +352,34 @@ int main(int argc, char* argv[])
     const bool averaged = averaging.categories.size() == 1 && leftCategory.doBaseline && leftCategory.comment == "Left Auditory" && leftCategory.events == QVector<unsigned int>{1} && rejection.eegReject == 100e-6f && averages.evoked.size() == 1;
     ok &= expect(averaged && averages.evoked[0].nave == 6 && averages.evoked[0].data.cols() == 121 && near(averages.evoked[0].data.topRows(306).norm(), 2.0125814419559757e-13, 1e-5) && near(averages.evoked[0].data(315, 30), 7.77233498919796e-10, 1e-5),
                  "MNEDescriptionParser: an .ave description averages like mne.Epochs with a baseline");
+
+    //! [mne_cov_description_usage]
+    // An MNE-C covariance description (mne_process_raw --cov): pre-stimulus data of events 1 and 2
+    const QString covDescPath = tmp.filePath("audvis.cov");
+    QFile covDescFile(covDescPath);
+    ok &= covDescFile.open(QIODevice::WriteOnly | QIODevice::Text);
+    covDescFile.write("cov {\n"
+                      "    eegReject 14.230782369752743e-9\n"
+                      "    def {\n"
+                      "        event 1\n"
+                      "        event 2\n"
+                      "        tmin  -0.2\n"
+                      "        tmax  0.0\n"
+                      "    }\n"
+                      "}\n");
+    covDescFile.close();
+    CovDescription covariance;
+    MNEDescriptionParser::parseCovarianceFile(covDescPath, covariance);
+    covariance.rej.megGradReject = covariance.rej.megMagReject = covariance.rej.eogReject = 0.0f; // EEG limit only
+    const CovDefinition& preStim = covariance.defs.first();
+    const FiffCov noiseCov = FiffCov::compute_from_epochs(raw, events.events, {1, 2}, preStim.tmin, preStim.tmax, preStim.bmin, preStim.bmax, preStim.doBaseline,
+                                                          covariance.removeSampleMean, preStim.ignore, preStim.delay, &covariance.rej);
+    //! [mne_cov_description_usage]
+    // mne.compute_covariance of mne.Epochs(event_id=[1, 2], tmin=-0.2, tmax=0, baseline=None, reject=dict(eeg=14.23e-9)):
+    // 6 of 12 epochs kept, nfree 365, C[EEG001, EEG001] = 8.497450692077036e-18
+    const int eeg001 = noiseCov.names.indexOf("EEG001");
+    ok &= expect(preStim.events == QVector<unsigned int>({1, 2}) && noiseCov.nfree == 365 && near(noiseCov.data(eeg001, eeg001), 8.497450692077036e-18, 1e-6),
+                 QString("MNEDescriptionParser: a .cov description with EEG rejection gives nfree %1 like mne.compute_covariance").arg(noiseCov.nfree));
 
     //! [mne_meas_data_usage]
     // MNE-C measurement container: data set 1 of the evoked file, MEG and EEG channels, time-major

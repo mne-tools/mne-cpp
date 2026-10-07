@@ -73,6 +73,8 @@ class NetworkNode;
 
 /**
  * @brief Per-network rendering hints: colour-map name or fixed RGBA for nodes and edges.
+ *
+ * @snippet ex_connectivity_metrics/main.cpp network_threshold
  */
 struct VisualizationInfo
 {

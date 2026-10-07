@@ -17,7 +17,20 @@ struct UTILSLIB::DigitizedPoint
 
 A single digitised point captured during the alignment session.
 
+```cpp title="src/examples/ex_utils/main.cpp"
+AcquiredPoints points;
+points.append({PointKind::HeadShape, "HSP-1", 1, QVector3D(0.0f, 0.08f, 0.05f)});
+points.append({PointKind::Eeg, "Cz", 1, QVector3D(0.0f, 0.0f, 0.09f)});
+points.undoLast(PointKind::HeadShape);
+const DigitizedPoint& kept = points.points().first(); // kind, label, FIFF ident, position (m)
+```
+
 ---
+
+## Example
+
+- Full source: [`src/examples/ex_utils/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_utils/main.cpp)
+- Build target: `ex_utils` (runs under CTest)
 
 ## Authors of this file
 

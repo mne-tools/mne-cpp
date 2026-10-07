@@ -51,6 +51,8 @@ namespace INVLIB
  * connectivity library.  Application code can populate it from Network::getFullConnectivityMatrix().
  *
  * @brief Pairwise source connectivity matrix with measure, directionality, and frequency/time metadata.
+ *
+ * @snippet ex_inv_api/main.cpp inv_source_estimate_token_usage
  */
 struct InvConnectivity
 {

@@ -187,6 +187,23 @@ int main(int argc, char* argv[])
     scene.worldBounds(bbMin, bbMax);
     ok &= expect(bbMin == QVector3D(-1.0f, -1.0f, -1.0f) && bbMax == QVector3D(1.0f, 1.0f, 1.0f), "Hiding the only layer falls back to the unit cube");
 
+    //! [pick_result_usage]
+    // A picker reports the contact under the cursor; the host reads the most recent pick back
+    const bool hitBefore = isHit(scene.lastPick());
+    PickResult contactPick;
+    contactPick.kind = PickKind::ElectrodeContact;
+    contactPick.sourceId = "seeg_LH";
+    contactPick.world = electrodes.arrays().first().contacts.first().position;
+    contactPick.label = electrodes.arrays().first().contacts.first().name;
+    contactPick.value = 3.5f;
+    contactPick.timeSample = 120;
+    scene.reportPick(contactPick);
+    const PickResult& lastPick = scene.lastPick();
+    //! [pick_result_usage]
+    ok &= expect(!hitBefore && isHit(lastPick) && lastPick.sourceId == "seeg_LH" && lastPick.world == QVector3D(10.0f, -20.0f, 5.0f) && lastPick.value == 3.5f &&
+                     lastPick.objectId == -1,
+                 "MultimodalScene keeps the reported contact pick");
+
     qInfo().noquote() << (ok ? "All disp3D scene checks passed." : "disp3D scene checks FAILED.");
     return ok ? EXIT_SUCCESS : EXIT_FAILURE;
 }

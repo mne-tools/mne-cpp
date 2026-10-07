@@ -28,7 +28,8 @@ The computed head–device transform after `computeRegistration`.
 
 ```cpp title="src/examples/ex_utils/main.cpp"
 PolhemusConnection connection;
-connection.open(QString()); // empty port name = mock backend sweeping a 10 cm sphere; e.g. "/dev/tty.usbserial" for a Fastrak
+PolhemusSerialConfig serial;        // 115200 baud, inches; the hemisphere and stream command a Fastrak needs
+connection.open(QString(), serial); // empty port name = mock backend sweeping a 10 cm sphere; e.g. "/dev/tty.usbserial" for a Fastrak
 PolhemusCoregistration coreg;
 coreg.setConnection(&connection); // station 1 = pen, station 2 = head tracker
 

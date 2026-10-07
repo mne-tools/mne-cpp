@@ -42,6 +42,8 @@ namespace INVLIB
  * and associated fit quality metrics.
  *
  * @brief Single focal dipole with free 3D position, moment, and fit-quality metrics.
+ *
+ * @snippet ex_inv_api/main.cpp inv_source_estimate_token_usage
  */
 struct InvFocalDipole
 {

@@ -8331,7 +8331,11 @@
       "mne_python": null,
       "sklearn": null,
       "test": null,
-      "example": null,
+      "example": "ex_connectivity_metrics",
+      "example_snippet": [
+        "ex_connectivity_metrics/main.cpp#network_threshold"
+      ],
+      "example_mode": "run",
       "status": "documented",
       "skigen_candidate": false,
       "documented": true,
@@ -8415,7 +8419,11 @@
       "mne_python": null,
       "sklearn": null,
       "test": null,
-      "example": null,
+      "example": "ex_disp3d_scene",
+      "example_snippet": [
+        "ex_disp3d_scene/main.cpp#pick_result_usage"
+      ],
+      "example_mode": "run",
       "status": "documented",
       "skigen_candidate": false,
       "documented": true,
@@ -8822,7 +8830,11 @@
       "mne_python": null,
       "sklearn": null,
       "test": null,
-      "example": null,
+      "example": "ex_inv_api",
+      "example_snippet": [
+        "ex_inv_api/main.cpp#inv_source_estimate_token_usage"
+      ],
+      "example_mode": "run",
       "status": "documented",
       "skigen_candidate": false,
       "documented": true,
@@ -8865,7 +8877,11 @@
       "mne_python": null,
       "sklearn": null,
       "test": null,
-      "example": null,
+      "example": "ex_inv_api",
+      "example_snippet": [
+        "ex_inv_api/main.cpp#inv_source_estimate_token_usage"
+      ],
+      "example_mode": "run",
       "status": "documented",
       "skigen_candidate": false,
       "documented": true,
@@ -8933,7 +8949,11 @@
       "mne_python": null,
       "sklearn": null,
       "test": null,
-      "example": null,
+      "example": "ex_inv_api",
+      "example_snippet": [
+        "ex_inv_api/main.cpp#inv_source_estimate_token_usage"
+      ],
+      "example_mode": "run",
       "status": "documented",
       "skigen_candidate": false,
       "documented": true,
@@ -9001,7 +9021,11 @@
       "mne_python": null,
       "sklearn": null,
       "test": null,
-      "example": null,
+      "example": "ex_inv_api",
+      "example_snippet": [
+        "ex_inv_api/main.cpp#inv_source_estimate_token_usage"
+      ],
+      "example_mode": "run",
       "status": "documented",
       "skigen_candidate": false,
       "documented": true,
@@ -9019,7 +9043,11 @@
       "mne_python": null,
       "sklearn": null,
       "test": null,
-      "example": null,
+      "example": "ex_inv_api",
+      "example_snippet": [
+        "ex_inv_api/main.cpp#inv_source_estimate_token_usage"
+      ],
+      "example_mode": "run",
       "status": "documented",
       "skigen_candidate": false,
       "documented": true,
@@ -9044,7 +9072,9 @@
       "sidebar_position": 53,
       "guide": null,
       "python_equiv": null,
-      "python_url": null
+      "python_url": null,
+      "example_exempt": true,
+      "example_exempt_reason": "Internal index pair of the RAP-MUSIC source-pair search; only appears in protected InvRapMusic helpers."
     },
     {
       "name": "TrapMusicDipole",
@@ -9415,7 +9445,9 @@
       "sidebar_position": 58,
       "guide": null,
       "python_equiv": null,
-      "python_url": null
+      "python_url": null,
+      "example_exempt": true,
+      "example_exempt_reason": "Internal per-channel scratch record of MNEEpochDataList::checkForArtifact; never part of a public signature."
     },
     {
       "name": "CovDefinition",
@@ -9426,7 +9458,11 @@
       "mne_python": null,
       "sklearn": null,
       "test": null,
-      "example": null,
+      "example": "ex_mne_api",
+      "example_snippet": [
+        "ex_mne_api/main.cpp#mne_cov_description_usage"
+      ],
+      "example_mode": "run",
       "status": "documented",
       "skigen_candidate": false,
       "documented": true,
@@ -9444,7 +9480,11 @@
       "mne_python": null,
       "sklearn": null,
       "test": null,
-      "example": null,
+      "example": "ex_mne_api",
+      "example_snippet": [
+        "ex_mne_api/main.cpp#mne_cov_description_usage"
+      ],
+      "example_mode": "run",
       "status": "documented",
       "skigen_candidate": false,
       "documented": true,
@@ -9974,7 +10014,11 @@
       "mne_python": null,
       "sklearn": null,
       "test": null,
-      "example": null,
+      "example": "ex_utils",
+      "example_snippet": [
+        "ex_utils/main.cpp#acquired_points_usage"
+      ],
+      "example_mode": "run",
       "status": "documented",
       "skigen_candidate": false,
       "documented": true,
@@ -10376,7 +10420,11 @@
       "mne_python": null,
       "sklearn": null,
       "test": null,
-      "example": null,
+      "example": "ex_utils",
+      "example_snippet": [
+        "ex_utils/main.cpp#polhemus_coregistration_usage"
+      ],
+      "example_mode": "run",
       "status": "documented",
       "skigen_candidate": false,
       "documented": true,
@@ -10445,7 +10493,9 @@
       "sidebar_position": 63,
       "guide": null,
       "python_equiv": null,
-      "python_url": null
+      "python_url": null,
+      "example_exempt": true,
+      "example_exempt_reason": "Private storage record of Report; sections are created through the Report::add* methods covered by the report example."
     },
     {
       "name": "SSSParams",

@@ -296,8 +296,12 @@ int main(int argc, char* argv[])
     const MatrixXd adjacency = network.getFullConnectivityMatrix(); // symmetric by default
     const int strongEdges = network.getThresholdedEdges().size();
     const NetworkNode::SPtr hub = network.getNodeAt(1);
+    VisualizationInfo look; // how disp3D colours the network: a colormap or fixed node/edge colours
+    look.sMethod = "Color";
+    look.colEdges = Eigen::Vector4i(0, 0, 255, 255);
+    network.setVisualizationInfo(look);
     //! [network_threshold]
-    ok &= expect(adjacency(1, 0) == 0.9 && adjacency(2, 1) == 0.2 && strongEdges == 1,
+    ok &= expect(adjacency(1, 0) == 0.9 && adjacency(2, 1) == 0.2 && strongEdges == 1 && network.getVisualizationInfo().colEdges(2) == 255,
                  "manual network: mirrored adjacency, one edge above 0.5");
     ok &= expect(hub->getFullDegree() == 2 && hub->getThresholdedDegree() == 1 && std::fabs(hub->getFullStrength() - 1.1) < 1e-12,
                  "node 1: degree 2, thresholded degree 1, strength 1.1");

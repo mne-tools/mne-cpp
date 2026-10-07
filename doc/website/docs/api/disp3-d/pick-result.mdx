@@ -1,6 +1,6 @@
 ---
 id: pick-result
-title: "PickResult"
+title: "DISP3DLIB::PickResult"
 sidebar_label: PickResult
 sidebar_position: 13
 ---
@@ -9,31 +9,36 @@ sidebar_position: 13
 
 **Namespace:** `DISP3DLIB` &nbsp;·&nbsp; **Library:** 3D Display Library
 
-`#include <disp3D/raypicker.h>`
+`#include <disp3D/pickresult.h>`
 
 ```cpp
-struct PickResult
+struct DISP3DLIB::PickResult
 ```
 
-Result of a ray–mesh intersection test containing the hit point, triangle index, and distance.
+Uniform payload for object-id picking across the multimodal scene.
 
-Describes the result of a ray-pick operation.
+Producers fill in only the fields relevant to their ``kind``. Consumers (Pick dock, status bar, MRI ortho viewer, time-course panel) read the generic fields (``kind``, ``world``, ``objectId``, ``label``, ``value``) plus any kind-specific fields they understand.
+
+```cpp title="src/examples/ex_disp3d_scene/main.cpp"
+// A picker reports the contact under the cursor; the host reads the most recent pick back
+const bool hitBefore = isHit(scene.lastPick());
+PickResult contactPick;
+contactPick.kind = PickKind::ElectrodeContact;
+contactPick.sourceId = "seeg_LH";
+contactPick.world = electrodes.arrays().first().contacts.first().position;
+contactPick.label = electrodes.arrays().first().contacts.first().name;
+contactPick.value = 3.5f;
+contactPick.timeSample = 120;
+scene.reportPick(contactPick);
+const PickResult& lastPick = scene.lastPick();
+```
 
 ---
 
-## Public Methods
+## Example
 
-### displayLabel()
-
-Build a human-readable display label for the hit object.
-
-Includes annotation region, sensor name, BEM compartment, etc.
-
-**Returns:**
-
-- *QString* — Display label string, empty if no hit.
-
----
+- Full source: [`src/examples/ex_disp3d_scene/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_disp3d_scene/main.cpp)
+- Build target: `ex_disp3d_scene` (runs under CTest)
 
 ## Authors of this file
 

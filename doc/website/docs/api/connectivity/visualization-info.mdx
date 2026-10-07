@@ -17,7 +17,23 @@ struct CONNECTIVITYLIB::VisualizationInfo
 
 Per-network rendering hints: colour-map name or fixed RGBA for nodes and edges.
 
+```cpp title="src/examples/ex_connectivity_metrics/main.cpp"
+network.setThreshold(0.5);
+const MatrixXd adjacency = network.getFullConnectivityMatrix(); // symmetric by default
+const int strongEdges = network.getThresholdedEdges().size();
+const NetworkNode::SPtr hub = network.getNodeAt(1);
+VisualizationInfo look; // how disp3D colours the network: a colormap or fixed node/edge colours
+look.sMethod = "Color";
+look.colEdges = Eigen::Vector4i(0, 0, 255, 255);
+network.setVisualizationInfo(look);
+```
+
 ---
+
+## Example
+
+- Full source: [`src/examples/ex_connectivity_metrics/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_connectivity_metrics/main.cpp)
+- Build target: `ex_connectivity_metrics` (runs under CTest)
 
 ## Authors of this file
 

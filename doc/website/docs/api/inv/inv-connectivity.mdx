@@ -23,6 +23,31 @@ This struct is intentionally lightweight and self-contained — it does not depe
 
 Pairwise source connectivity matrix with measure, directionality, and frequency/time metadata.
 
+```cpp title="src/examples/ex_inv_api/main.cpp"
+InvSourceEstimate layered = stc;
+InvFocalDipole dipole; // an off-grid ECD result alongside the grid
+dipole.position = Vector3f(0.01f, -0.08f, 0.03f);
+dipole.moment = Vector3f(0.0f, 0.0f, 20e-9f);
+dipole.goodness = 0.9f;
+layered.focalDipoles.push_back(dipole);
+InvSourceCoupling pair; // two grid sources that move together
+pair.gridIndices = {0, 1};
+pair.moments = {Vector3d::UnitZ(), Vector3d::UnitZ()};
+pair.correlations = Matrix2d{{1.0, 0.8}, {0.8, 1.0}};
+layered.couplings.push_back(pair);
+InvConnectivity coherence; // a source-space connectivity layer
+coherence.measure = "coh";
+coherence.matrix = Matrix2d{{1.0, 0.4}, {0.4, 1.0}};
+coherence.fmin = 8.0f;
+coherence.fmax = 12.0f;
+layered.connectivity.push_back(coherence);
+InvTokenizeOptions options; // at most 5 sources and 10 samples; values travel as float
+options.maxSources = 5;
+options.maxTimePoints = 10;
+const std::vector<InvToken> tokens = tokenize(layered, options);
+const InvSourceEstimate fromTokenStream = fromTokens(tokens);
+```
+
 ---
 
 ## Public Methods
@@ -30,6 +55,11 @@ Pairwise source connectivity matrix with measure, directionality, and frequency/
 ### InvConnectivity()
 
 ---
+
+## Example
+
+- Full source: [`src/examples/ex_inv_api/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_inv_api/main.cpp)
+- Build target: `ex_inv_api` (runs under CTest)
 
 ## Authors of this file
 

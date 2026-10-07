@@ -273,7 +273,8 @@ int main(int argc, char* argv[])
 
     //! [polhemus_coregistration_usage]
     PolhemusConnection connection;
-    connection.open(QString()); // empty port name = mock backend sweeping a 10 cm sphere; e.g. "/dev/tty.usbserial" for a Fastrak
+    PolhemusSerialConfig serial;        // 115200 baud, inches; the hemisphere and stream command a Fastrak needs
+    connection.open(QString(), serial); // empty port name = mock backend sweeping a 10 cm sphere; e.g. "/dev/tty.usbserial" for a Fastrak
     PolhemusCoregistration coreg;
     coreg.setConnection(&connection); // station 1 = pen, station 2 = head tracker
 
@@ -303,8 +304,9 @@ int main(int argc, char* argv[])
     points.append({PointKind::HeadShape, "HSP-1", 1, QVector3D(0.0f, 0.08f, 0.05f)});
     points.append({PointKind::Eeg, "Cz", 1, QVector3D(0.0f, 0.0f, 0.09f)});
     points.undoLast(PointKind::HeadShape);
+    const DigitizedPoint& kept = points.points().first(); // kind, label, FIFF ident, position (m)
     //! [acquired_points_usage]
-    ok &= expect(points.points().size() == 1 && points.countOf(PointKind::Eeg) == 1 && !points.hasAllFiducials(), "AcquiredPoints keeps Cz after undoing the head-shape point");
+    ok &= expect(points.points().size() == 1 && kept.label == "Cz" && kept.position.z() == 0.09f && points.countOf(PointKind::Eeg) == 1 && !points.hasAllFiducials(), "AcquiredPoints keeps Cz after undoing the head-shape point");
 
     //! [python_runner_usage]
     PythonRunner python; // "python3" from PATH; a venv is configured via PythonRunnerConfig

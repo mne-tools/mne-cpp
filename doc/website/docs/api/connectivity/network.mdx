@@ -42,6 +42,10 @@ network.setThreshold(0.5);
 const MatrixXd adjacency = network.getFullConnectivityMatrix(); // symmetric by default
 const int strongEdges = network.getThresholdedEdges().size();
 const NetworkNode::SPtr hub = network.getNodeAt(1);
+VisualizationInfo look; // how disp3D colours the network: a colormap or fixed node/edge colours
+look.sMethod = "Color";
+look.colEdges = Eigen::Vector4i(0, 0, 255, 255);
+network.setVisualizationInfo(look);
 ```
 
 ---

@@ -16,22 +16,7 @@
     "Settings": "Plain parameter record consumed by an algorithm class; shown inside that class's example."
   },
   "example_debt": {
-    "ceiling": 14,
-    "names": [
-      "ArtifactRejectionData",
-      "CovDefinition",
-      "CovDescription",
-      "DigitizedPoint",
-      "InvConnectivity",
-      "InvFocalDipole",
-      "InvSourceCoupling",
-      "InvToken",
-      "InvTokenizeOptions",
-      "Pair",
-      "PickResult",
-      "PolhemusSerialConfig",
-      "ReportSection",
-      "VisualizationInfo"
-    ]
+    "ceiling": 0,
+    "names": []
   }
 }

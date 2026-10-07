@@ -194,7 +194,7 @@ Assignment Operator.
 
 ## Static Methods
 
-### compute_from_epochs(raw, events, eventCodes, tmin, tmax, bmin, bmax, doBaseline, removeMean, ignoreMask, delay)
+### compute_from_epochs(raw, events, eventCodes, tmin, tmax, bmin, bmax, doBaseline, removeMean, ignoreMask, delay, rej)
 
 Compute a noise covariance matrix from raw data based on event-locked epochs.
 
@@ -234,6 +234,9 @@ Ported from compute_cov.c (MNE-C).
 
 - **delay** : *float*
   Delay in seconds applied to the event sample before extracting the epoch (default: 0).
+
+- **rej** : *const [RejectionParams](/docs/api/fiff/rejection-params) **
+  If given, epochs failing these limits (before baseline, as MNE-C compute_cov) are skipped.
 
 **Returns:**
 

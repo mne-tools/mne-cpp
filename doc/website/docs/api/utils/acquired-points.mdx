@@ -24,6 +24,7 @@ AcquiredPoints points;
 points.append({PointKind::HeadShape, "HSP-1", 1, QVector3D(0.0f, 0.08f, 0.05f)});
 points.append({PointKind::Eeg, "Cz", 1, QVector3D(0.0f, 0.0f, 0.09f)});
 points.undoLast(PointKind::HeadShape);
+const DigitizedPoint& kept = points.points().first(); // kind, label, FIFF ident, position (m)
 ```
 
 ### Inheritance

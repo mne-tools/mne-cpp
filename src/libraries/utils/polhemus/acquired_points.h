@@ -72,6 +72,8 @@ enum class FiducialId
 //=============================================================================================================
 /**
  * @brief A single digitised point captured during the alignment session.
+ *
+ * @snippet ex_utils/main.cpp acquired_points_usage
  */
 struct UTILSSHARED_EXPORT DigitizedPoint
 {

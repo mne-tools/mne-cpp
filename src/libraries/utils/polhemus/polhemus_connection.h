@@ -60,6 +60,8 @@ namespace UTILSLIB
 //=============================================================================================================
 /**
  * @brief Settings used to open a real Polhemus serial connection.
+ *
+ * @snippet ex_utils/main.cpp polhemus_coregistration_usage
  */
 struct UTILSSHARED_EXPORT PolhemusSerialConfig
 {
