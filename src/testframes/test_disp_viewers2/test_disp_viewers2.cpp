@@ -87,6 +87,7 @@
 #include <QTableView>
 #include <QTableWidget>
 #include <QTemporaryDir>
+#include <QInputDialog>
 #include <QMessageBox>
 #include <QTimer>
 
@@ -134,6 +135,17 @@ void clickNextMessageBoxButton(const QString& sText)
             }
         }
         QFAIL(qPrintable(QStringLiteral("no button ") + sText));
+    });
+}
+
+/** Enters sText into the next modal QInputDialog and accepts it. */
+void answerNextInputDialog(const QString& sText)
+{
+    answerNextModal([sText](QWidget* pModal) {
+        auto* pDialog = qobject_cast<QInputDialog*>(pModal);
+        QVERIFY(pDialog);
+        pDialog->setTextValue(sText);
+        pDialog->accept();
     });
 }
 
@@ -415,7 +427,7 @@ private slots:
 
     //=========================================================================================================
     /**
-     * Verifies ProjectSettingsView project/subject scanning, deleting, file naming and timer.
+     * Verifies ProjectSettingsView project/subject scanning, adding, deleting, file naming and timer.
      */
     void projectSettingsView_projectsSubjectsAndTimer();
 
@@ -2487,10 +2499,38 @@ void TestDispViewers2::projectSettingsView_projectsSubjectsAndTimer()
     QCOMPARE(subjectSpy.last().at(0).toString(), QStringLiteral("SubX"));
     QVERIFY(view.getCurrentFileName().startsWith(sRoot + QStringLiteral("/ProjB/SubX/")));
 
+    // Adding a project creates its folder and selects it.
+    answerNextInputDialog(QStringLiteral("ProjC"));
+    view.findChild<QPushButton*>(QStringLiteral("m_qPushButtonNewProject"))->click();
+    QVERIFY(QDir(sRoot + QStringLiteral("/ProjC")).exists());
+    QCOMPARE(items(pProjects), QStringList({"ProjA", "ProjB", "ProjC"}));
+    QCOMPARE(pProjects->currentText(), QStringLiteral("ProjC"));
+    QCOMPARE(projectSpy.last().at(0).toString(), QStringLiteral("ProjC"));
+    QCOMPARE(pSubjects->count(), 0);
+    QVERIFY(pFileName->text().startsWith(sRoot + QStringLiteral("/ProjC/")));
+
+    // Adding a subject creates its folder below the current project and selects it.
+    answerNextInputDialog(QStringLiteral("SubNew"));
+    view.findChild<QPushButton*>(QStringLiteral("m_qPushButtonNewSubject"))->click();
+    QVERIFY(QDir(sRoot + QStringLiteral("/ProjC/SubNew")).exists());
+    QCOMPARE(items(pSubjects), QStringList({"SubNew"}));
+    QCOMPARE(pSubjects->currentText(), QStringLiteral("SubNew"));
+    QVERIFY(view.getCurrentFileName().startsWith(sRoot + QStringLiteral("/ProjC/SubNew/")));
+
+    // ... also when the project already has subjects sorting before the new one.
+    pProjects->setCurrentText(QStringLiteral("ProjA"));
+    answerNextInputDialog(QStringLiteral("Sub3"));
+    view.findChild<QPushButton*>(QStringLiteral("m_qPushButtonNewSubject"))->click();
+    QVERIFY(QDir(sRoot + QStringLiteral("/ProjA/Sub3")).exists());
+    QCOMPARE(items(pSubjects), QStringList({"Sub1", "Sub2", "Sub3"}));
+    QCOMPARE(pSubjects->currentText(), QStringLiteral("Sub3"));
+    QCOMPARE(subjectSpy.last().at(0).toString(), QStringLiteral("Sub3"));
+    QVERIFY(view.getCurrentFileName().startsWith(sRoot + QStringLiteral("/ProjA/Sub3/")));
+
     // Cancelled add dialog changes nothing.
     answerNextModal([](QWidget* pModal) { qobject_cast<QDialog*>(pModal)->reject(); });
     view.findChild<QPushButton*>(QStringLiteral("m_qPushButtonNewProject"))->click();
-    QCOMPARE(pProjects->count(), 2);
+    QCOMPARE(pProjects->count(), 3);
 
     // Delete subject: "Keep data" and a declined confirmation keep the folder, confirming removes it.
     pProjects->setCurrentText(QStringLiteral("ProjA"));
@@ -2524,7 +2564,7 @@ void TestDispViewers2::projectSettingsView_projectsSubjectsAndTimer()
     pDeleteSubject->click();
     QVERIFY(!QDir(sRoot + QStringLiteral("/ProjA/Sub1")).exists());
     QVERIFY(QDir(sRoot + QStringLiteral("/ProjA/Sub2")).exists());
-    QCOMPARE(items(pSubjects), QStringList({"Sub2"}));
+    QCOMPARE(items(pSubjects), QStringList({"Sub2", "Sub3"}));
 
     // Delete project removes the whole tree.
     pProjects->setCurrentText(QStringLiteral("ProjB"));
@@ -2539,7 +2579,7 @@ void TestDispViewers2::projectSettingsView_projectsSubjectsAndTimer()
     });
     view.findChild<QPushButton*>(QStringLiteral("m_qPushButtonDeleteProject"))->click();
     QVERIFY(!QDir(sRoot + QStringLiteral("/ProjB")).exists());
-    QCOMPARE(items(pProjects), QStringList({"ProjA"}));
+    QCOMPARE(items(pProjects), QStringList({"ProjA", "ProjC"}));
 
     // Recording timer: spin boxes set the total, elapsed time counts up and down.
     QSignalSpy timerSpy(&view, &ProjectSettingsView::timerChanged);

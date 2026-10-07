@@ -329,6 +329,8 @@ void ProjectSettingsView::addProject()
         emit newProject(m_sCurrentProject);
 
         scanForProjects();
+        scanForSubjects();
+        updateFileName();
     }
 }
 
@@ -366,6 +368,9 @@ void ProjectSettingsView::paradigmChanged(const QString& sNewParadigm)
 
 void ProjectSettingsView::scanForProjects()
 {
+    // Repopulating the combo box must not report its transient selections as user choices.
+    const QSignalBlocker blocker(m_pUi->m_qComboBox_ProjectSelection);
+
     //clear
     m_pUi->m_qComboBox_ProjectSelection->clear();
     m_sListProjects.clear();
@@ -386,6 +391,9 @@ void ProjectSettingsView::scanForProjects()
 
 void ProjectSettingsView::scanForSubjects()
 {
+    // Repopulating the combo box must not report its transient selections as user choices.
+    const QSignalBlocker blocker(m_pUi->m_qComboBox_SubjectSelection);
+
     //clear
     m_pUi->m_qComboBox_SubjectSelection->clear();
     m_sListSubjects.clear();
