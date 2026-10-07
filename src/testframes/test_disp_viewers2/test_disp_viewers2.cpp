@@ -77,7 +77,16 @@
 #include <QMenu>
 #include <QGraphicsScene>
 #include <QPainter>
+#include <QCheckBox>
+#include <QComboBox>
+#include <QDoubleSpinBox>
+#include <QLabel>
+#include <QLineEdit>
+#include <QPushButton>
+#include <QSpinBox>
 #include <QTableView>
+#include <QTableWidget>
+#include <QTemporaryDir>
 
 #include <Eigen/Core>
 
@@ -172,6 +181,7 @@ private slots:
      * lifecycle transitions.
      */
     void hpiSettingsView_lifecycle();
+    void hpiSettingsView_coilTablesPresetsAndFeedback();
 
     //=========================================================================================================
     /**
@@ -387,6 +397,113 @@ void TestDispViewers2::initTestCase()
 
 void TestDispViewers2::cleanupTestCase()
 {
+}
+
+//=============================================================================================================
+
+void TestDispViewers2::hpiSettingsView_coilTablesPresetsAndFeedback()
+{
+    // An empty settings path keeps the user's stored coil frequencies out of the test
+    HpiSettingsView view(QString{});
+    QSignalSpy freqSpy(&view, &HpiSettingsView::coilFrequenciesChanged);
+    auto* freqTable = view.findChild<QTableWidget*>(QStringLiteral("m_tableWidget_Frequencies"));
+    auto* resultTable = view.findChild<QTableWidget*>(QStringLiteral("m_tableWidget_results"));
+    QVERIFY(freqTable && resultTable);
+
+    QTemporaryDir dir;
+    QVERIFY(dir.isValid());
+    QFile presets(dir.filePath(QStringLiteral("presets.json")));
+    QVERIFY(presets.open(QIODevice::WriteOnly));
+    presets.write(R"({"4": [{"name": "VectorView", "coils": [154, 158, 162, 166]}]})");
+    presets.close();
+    view.loadCoilPresets(presets.fileName());
+
+    // 4 HPI coils, 3 fiducials, 2 EEG and 1 extra point
+    QList<FiffDigPoint> points;
+    const QVector<int> kinds = {FIFFV_POINT_CARDINAL, FIFFV_POINT_CARDINAL, FIFFV_POINT_CARDINAL, FIFFV_POINT_HPI,
+                                FIFFV_POINT_HPI, FIFFV_POINT_HPI, FIFFV_POINT_HPI, FIFFV_POINT_EEG,
+                                FIFFV_POINT_EEG, FIFFV_POINT_EXTRA};
+    for (int i = 0; i < kinds.size(); ++i) {
+        FiffDigPoint p;
+        p.kind = kinds[i];
+        p.ident = i + 1;
+        points.append(p);
+    }
+    view.newDigitizerList(points);
+    auto label = [&view](const char* name) {
+        return view.findChild<QLabel*>(QLatin1String(name))->text();
+    };
+    QCOMPARE(label("m_label_numberLoadedCoils"), QStringLiteral("4"));
+    QCOMPARE(label("m_label_numberLoadedFiducials"), QStringLiteral("3"));
+    QCOMPARE(label("m_label_numberLoadedEEG"), QStringLiteral("2"));
+    QCOMPARE(label("m_label_numberLoadedAdditional"), QStringLiteral("1"));
+    QCOMPARE(freqTable->rowCount(), 4);
+    QCOMPARE(resultTable->rowCount(), 4);
+    QCOMPARE(freqSpy.last().at(0).value<QVector<int>>(), (QVector<int>{293, 307, 314, 321}));
+
+    // Choosing the preset for 4 coils fills the table
+    auto* preset = view.findChild<QComboBox*>(QStringLiteral("comboBox_coilPreset"));
+    QCOMPARE(preset->count(), 2);
+    preset->setCurrentIndex(1);
+    QCOMPARE(freqSpy.last().at(0).value<QVector<int>>(), (QVector<int>{154, 158, 162, 166}));
+    QCOMPARE(freqTable->item(3, 1)->text(), QStringLiteral("166"));
+
+    // Editing a frequency cell, and "none" for an unused coil
+    freqTable->item(0, 1)->setText(QStringLiteral("300"));
+    freqTable->item(2, 1)->setText(QStringLiteral("none"));
+    QCOMPARE(freqSpy.last().at(0).value<QVector<int>>(), (QVector<int>{300, 158, -1, 166}));
+
+    // Removing coil 2 renumbers both tables; adding one back appends an unset frequency
+    freqTable->setCurrentCell(1, 1);
+    QTest::mouseClick(view.findChild<QPushButton*>(QStringLiteral("m_pushButton_removeCoil")), Qt::LeftButton);
+    QCOMPARE(freqSpy.last().at(0).value<QVector<int>>(), (QVector<int>{300, -1, 166}));
+    QCOMPARE(freqTable->rowCount(), 3);
+    QCOMPARE(freqTable->item(2, 0)->text(), QStringLiteral("3"));
+    QCOMPARE(resultTable->item(2, 0)->text(), QStringLiteral("3"));
+    QTest::mouseClick(view.findChild<QPushButton*>(QStringLiteral("m_pushButton_addCoil")), Qt::LeftButton);
+    QCOMPARE(freqTable->rowCount(), 4);
+    QCOMPARE(freqTable->item(3, 1)->text(), QStringLiteral("none"));
+    QCOMPARE(freqSpy.last().at(0).value<QVector<int>>(), (QVector<int>{300, -1, 166, -1}));
+
+    // Fit results: errors in mm, GoF in %, good/bad against the allowed mean error
+    view.findChild<QDoubleSpinBox*>(QStringLiteral("m_doubleSpinBox_maxHPIContinousDist"))->setValue(3.0);
+    view.setErrorLabels({0.0011, 0.0024, 0.0005, 0.0039}, 0.002);
+    QCOMPARE(resultTable->item(1, 1)->text(), QStringLiteral("2.40 mm"));
+    QCOMPARE(label("m_label_averagedFitError"), QStringLiteral("2.00 mm"));
+    QCOMPARE(label("m_label_fitFeedback"), QStringLiteral("Last fit: Good"));
+    view.setErrorLabels({0.004}, 0.0045);
+    QCOMPARE(label("m_label_fitFeedback"), QStringLiteral("Last fit: Bad"));
+    Eigen::VectorXd gof(4);
+    gof << 0.991, 0.95, 0.9, 0.875;
+    view.setGoFLabels(gof, 0.929);
+    QCOMPARE(resultTable->item(3, 2)->text(), QStringLiteral("87.50 %"));
+    QCOMPARE(label("m_average_gof_set"), QStringLiteral("92.90 %"));
+
+    view.findChild<QDoubleSpinBox*>(QStringLiteral("m_doubleSpinBox_moveThreshold"))->setValue(3.0);
+    view.findChild<QDoubleSpinBox*>(QStringLiteral("m_doubleSpinBox_rotThreshold"))->setValue(5.0);
+    QCOMPARE(view.getAllowedMovementChanged(), 3.0);
+    QCOMPARE(view.getAllowedRotationChanged(), 5.0);
+    view.setMovementResults(0.002, 4.0);
+    QCOMPARE(view.findChild<QLineEdit*>(QStringLiteral("m_qLineEdit_moveResult"))->text(), QStringLiteral("2.00 mm"));
+    QCOMPARE(label("m_label_movementFeedback"), QStringLiteral("Small"));
+    view.setMovementResults(0.002, 6.0);
+    QCOMPARE(label("m_label_movementFeedback"), QStringLiteral("Big"));
+    view.setMovementResults(0.0031, 1.0);
+    QCOMPARE(label("m_label_movementFeedback"), QStringLiteral("Big"));
+
+    // Check boxes and spin boxes report through their signals
+    QSignalSpy sspSpy(&view, &HpiSettingsView::sspStatusChanged);
+    QSignalSpy contSpy(&view, &HpiSettingsView::contHpiStatusChanged);
+    QSignalSpy windowSpy(&view, &HpiSettingsView::fittingWindowSizeChanged);
+    QTest::mouseClick(view.findChild<QCheckBox*>(QStringLiteral("m_checkBox_useSSP")), Qt::LeftButton);
+    QTest::mouseClick(view.findChild<QCheckBox*>(QStringLiteral("m_checkBox_continousHPI")), Qt::LeftButton);
+    view.findChild<QSpinBox*>(QStringLiteral("m_spinBox_samplesToFit"))->setValue(450);
+    QCOMPARE(sspSpy.size(), 1);
+    QVERIFY(view.getSspStatusChanged());
+    QVERIFY(view.continuousHPIChecked());
+    QCOMPARE(contSpy.size(), 1);
+    QCOMPARE(windowSpy.last().at(0).toInt(), 450);
+    QCOMPARE(view.getFittingWindowSize(), 450);
 }
 
 //=============================================================================================================
