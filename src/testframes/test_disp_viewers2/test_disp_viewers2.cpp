@@ -26,6 +26,7 @@
 #include <disp/viewers/fwdsettingsview.h>
 #include <disp/viewers/fiffrawviewsettings.h>
 #include <disp/viewers/projectsettingsview.h>
+#include <disp/viewers/filterdesignview.h>
 #include <disp/viewers/bidsview.h>
 #include <disp/viewers/channelselectionview.h>
 #include <disp/viewers/channeldataview.h>
@@ -76,6 +77,7 @@
 #include <QHeaderView>
 #include <QMenu>
 #include <QGraphicsScene>
+#include <QGraphicsView>
 #include <QPainter>
 #include <QCheckBox>
 #include <QComboBox>
@@ -90,6 +92,7 @@
 #include <QInputDialog>
 #include <QMessageBox>
 #include <QFileDialog>
+#include <QFileInfo>
 #include <QLocale>
 #include <QRadioButton>
 #include <QVector3D>
@@ -139,6 +142,21 @@ void clickNextMessageBoxButton(const QString& sText)
             }
         }
         QFAIL(qPrintable(QStringLiteral("no button ") + sText));
+    });
+}
+
+/** Selects sPath in the next modal QFileDialog and accepts it. */
+void chooseFileInNextDialog(const QString& sPath)
+{
+    answerNextModal([sPath](QWidget* pModal) {
+        auto* pDialog = qobject_cast<QFileDialog*>(pModal);
+        QVERIFY(pDialog);
+        // Typing the name works for open dialogs too, whose selectFile() is dropped for an existing file
+        auto* pName = pDialog->findChild<QLineEdit*>(QStringLiteral("fileNameEdit"));
+        QVERIFY(pName);
+        pDialog->setDirectory(QFileInfo(sPath).absolutePath());
+        pName->setText(QFileInfo(sPath).fileName());
+        static_cast<QDialog*>(pDialog)->accept();
     });
 }
 
@@ -246,6 +264,13 @@ private slots:
      * Verifies CoregSettingsView fiducial picking, transformation parameters, scaling modes and signals.
      */
     void coregSettingsView_fiducialsAndParams();
+
+    //=========================================================================================================
+    /**
+     * Verifies FilterDesignView filter design from the controls, band clamping, channel type, plot and filter file
+     * export/import.
+     */
+    void filterDesignView_designExportLoad();
 
     //=========================================================================================================
     /**
@@ -612,6 +637,117 @@ void TestDispViewers2::hpiSettingsView_lifecycle()
     view.clearView();
 
     QApplication::processEvents();
+}
+
+//=============================================================================================================
+
+void TestDispViewers2::filterDesignView_designExportLoad()
+{
+    FilterDesignView view(QString{});
+    view.resize(600, 400);
+    view.show();
+    auto* pFrom = view.findChild<QDoubleSpinBox*>(QStringLiteral("m_doubleSpinBox_from"));
+    auto* pTo = view.findChild<QDoubleSpinBox*>(QStringLiteral("m_doubleSpinBox_to"));
+    auto* pTrans = view.findChild<QDoubleSpinBox*>(QStringLiteral("m_doubleSpinBox_transitionband"));
+    auto* pTaps = view.findChild<QSpinBox*>(QStringLiteral("m_spinBox_filterTaps"));
+    auto* pMethod = view.findChild<QComboBox*>(QStringLiteral("m_comboBox_designMethod"));
+    auto* pApply = view.findChild<QComboBox*>(QStringLiteral("m_comboBox_filterApplyTo"));
+    QVERIFY(pFrom);
+    QVERIFY(pTo);
+    QVERIFY(pTrans);
+    QVERIFY(pTaps);
+    QVERIFY(pMethod);
+    QVERIFY(pApply);
+
+    // A band-pass from the controls, with the taps forced even and the band edges at the requested frequencies
+    QSignalSpy filterSpy(&view, &FilterDesignView::filterChanged);
+    QSignalSpy fromSpy(&view, &FilterDesignView::updateFilterFrom);
+    QSignalSpy toSpy(&view, &FilterDesignView::updateFilterTo);
+    view.setSamplingRate(1000.0);
+    view.setMaxAllowedFilterTaps(257);
+    QCOMPARE(pTaps->maximum(), 256);
+    pTaps->setValue(128);
+    view.setFrom(2.0);
+    view.setTo(45.0);
+    QCOMPARE(view.getFrom(), 2.0);
+    QCOMPARE(view.getTo(), 45.0);
+    QCOMPARE(fromSpy.last().at(0).toDouble(), 2.0);
+    QCOMPARE(toSpy.last().at(0).toDouble(), 45.0);
+    FilterKernel kernel = view.getCurrentFilter();
+    QCOMPARE(filterSpy.last().at(0).value<FilterKernel>().getName(), kernel.getName());
+    QCOMPARE(kernel.getFilterType().getName(), QStringLiteral("BPF"));
+    QCOMPARE(kernel.getFilterOrder(), 128);
+    QCOMPARE(kernel.getSamplingFrequency(), 1000.0);
+    QVERIFY(qAbs(kernel.getHighpassFreq() - 2.0) < 1e-9);
+    QVERIFY(qAbs(kernel.getLowpassFreq() - 45.0) < 1e-9);
+    QCOMPARE(kernel.getCoefficients().cols(), 128);
+
+    // Band edges are clamped to Nyquist and kept ordered
+    view.setSamplingRate(60.0);
+    QCOMPARE(pTo->maximum(), 30.0);
+    QCOMPARE(view.getTo(), 30.0);
+    QVERIFY(qAbs(view.getCurrentFilter().getLowpassFreq() - 30.0) < 1e-9);
+    view.setSamplingRate(1000.0);
+    view.setTo(40.0);
+    view.setFrom(10.0);
+    QCOMPARE(pTo->minimum(), 10.0);
+    QCOMPARE(pFrom->maximum(), 40.0);
+
+    // Editing a control and finishing the edit redesigns the filter
+    const int iBefore = filterSpy.count();
+    pTrans->setValue(2.0);
+    emit pTrans->editingFinished();
+    QCOMPARE(filterSpy.count(), iBefore + 1);
+    QVERIFY(qAbs(view.getCurrentFilter().getParksWidth() * 500.0 - 2.0) < 1e-9);
+    pMethod->setCurrentIndex(pMethod->count() - 1);
+    QCOMPARE(view.getCurrentFilter().getDesignMethod().getName(), pMethod->currentText());
+    pMethod->setCurrentIndex(0);
+
+    // Channel type: selection, Enter and Delete report it
+    QSignalSpy typeSpy(&view, &FilterDesignView::filterChannelTypeChanged);
+    view.setChannelType(QStringLiteral("EEG"));
+    QCOMPARE(view.getChannelType(), QStringLiteral("EEG"));
+    QCOMPARE(typeSpy.last().at(0).toString(), QStringLiteral("EEG"));
+    QTest::keyClick(&view, Qt::Key_Return);
+    QTest::keyClick(&view, Qt::Key_Delete);
+    QTest::keyClick(&view, Qt::Key_A);
+    QCOMPARE(typeSpy.count(), 3);
+
+    // The response plot is drawn
+    auto* pPlot = view.findChild<QGraphicsView*>(QStringLiteral("m_graphicsView_filterPlot"));
+    QVERIFY(pPlot && pPlot->scene());
+    QVERIFY(!pPlot->scene()->items().isEmpty());
+    view.guiStyleChanged(AbstractView::StyleMode::Dark);
+    view.resize(700, 500);
+
+    // Export the coefficients, then load them back through the load button
+    QTemporaryDir dir;
+    QVERIFY(dir.isValid());
+    const QString sFile = dir.filePath(QStringLiteral("designed.txt"));
+    view.setFrom(4.0);
+    view.setTo(30.0);
+    kernel = view.getCurrentFilter();
+    chooseFileInNextDialog(sFile);
+    QTest::mouseClick(view.findChild<QPushButton*>(QStringLiteral("m_pushButton_exportFilter")), Qt::LeftButton);
+    QVERIFY(QFile::exists(sFile));
+
+    view.setFrom(1.0);
+    view.setTo(20.0);
+    pTaps->setValue(64);
+    view.setFrom(1.0);
+    chooseFileInNextDialog(sFile);
+    QTest::mouseClick(view.findChild<QPushButton*>(QStringLiteral("m_pushButton_loadFilter")), Qt::LeftButton);
+    QCOMPARE(view.getFrom(), 4.0);
+    QCOMPARE(view.getTo(), 30.0);
+    QCOMPARE(pTaps->value(), 128);
+    QVERIFY(qAbs(view.getCurrentFilter().getHighpassFreq() - 4.0) < 1e-9);
+    QVERIFY(qAbs(view.getCurrentFilter().getLowpassFreq() - 30.0) < 1e-9);
+
+    // Plot export as PNG
+    const QString sPng = dir.filePath(QStringLiteral("plot.png"));
+    chooseFileInNextDialog(sPng);
+    QTest::mouseClick(view.findChild<QPushButton*>(QStringLiteral("m_pushButton_exportPlot")), Qt::LeftButton);
+    QVERIFY(!QImage(sPng).isNull());
 }
 
 //=============================================================================================================
