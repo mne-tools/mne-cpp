@@ -689,6 +689,7 @@ void TestDispViewers2::butterflyView_drawsAveragesAcrossTheFullWidth()
         return darkest < qGray(frame.pixel(x, 150)) - 40;
     };
     QVERIFY(curveAt(52));
+    QVERIFY2(curveAt(392), "decimated curve ends before the right edge");
 }
 
 //=============================================================================================================

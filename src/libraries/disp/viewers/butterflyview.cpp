@@ -551,7 +551,7 @@ void ButterflyView::createPlotPath(qint32 row, QPainter& painter) const
 
                 qSamplePosition.setY(-newY);
 
-                qSamplePosition.setX(path.currentPosition().x() + fDx);
+                qSamplePosition.setX(1.0 + fDx * i);
 
                 path.lineTo(qSamplePosition);
             }
