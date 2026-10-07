@@ -12,16 +12,16 @@
     "registered_stale": 0,
     "registered_with_test": 102,
     "registered_test_unresolved": 0,
-    "registered_with_example": 334,
+    "registered_with_example": 346,
     "registered_example_not_built": 0,
     "registered_with_python_equiv": 89,
     "registered_without_api_page": 0,
-    "with_snippet": 358,
+    "with_snippet": 368,
     "public_api_units": 507,
     "example_eligible": 372,
     "example_exempt": 135,
-    "eligible_backed_by_registry_example": 334,
-    "eligible_used_by_some_example": 336,
+    "eligible_backed_by_registry_example": 346,
+    "eligible_used_by_some_example": 340,
     "examples_on_disk": 68,
     "examples_built": 68
   },
@@ -157,9 +157,9 @@
       "registered": 22,
       "with_test": 0,
       "eligible": 22,
-      "eligible_with_registry_example": 10,
-      "eligible_used_by_example": 10,
-      "with_snippet": 12
+      "eligible_with_registry_example": 22,
+      "eligible_used_by_example": 14,
+      "with_snippet": 22
     },
     "mne": {
       "public": 66,
@@ -9441,10 +9441,12 @@
       "registry_status": "documented",
       "test": null,
       "test_resolves": false,
-      "example": null,
-      "example_state": "none",
+      "example": "ex_mna",
+      "example_state": "built",
       "including_examples": [],
-      "snippets": [],
+      "snippets": [
+        "ex_mna/main.cpp#mna_project_files"
+      ],
       "api_page": "doc/website/docs/api/mna/mna-file-ref.mdx",
       "python_equiv": null,
       "example_eligible": true,
@@ -9579,6 +9581,8 @@
         "ex_mna"
       ],
       "snippets": [
+        "ex_mna/main.cpp#mna_op_schema_validate",
+        "ex_mna/main.cpp#mna_op_schema_validate",
         "ex_mna/main.cpp#mna_op_schema_validate"
       ],
       "api_page": "doc/website/docs/api/mna/mna-op-schema.mdx",
@@ -9596,12 +9600,14 @@
       "registry_status": "documented",
       "test": null,
       "test_resolves": false,
-      "example": null,
-      "example_state": "none",
+      "example": "ex_mna",
+      "example_state": "built",
       "including_examples": [
         "ex_mna"
       ],
       "snippets": [
+        "ex_mna/main.cpp#mna_op_schema_validate",
+        "ex_mna/main.cpp#mna_op_schema_validate",
         "ex_mna/main.cpp#mna_op_schema_validate"
       ],
       "api_page": "doc/website/docs/api/mna/mna-op-schema-attr.mdx",
@@ -9619,12 +9625,14 @@
       "registry_status": "documented",
       "test": null,
       "test_resolves": false,
-      "example": null,
-      "example_state": "none",
+      "example": "ex_mna",
+      "example_state": "built",
       "including_examples": [
         "ex_mna"
       ],
       "snippets": [
+        "ex_mna/main.cpp#mna_op_schema_validate",
+        "ex_mna/main.cpp#mna_op_schema_validate",
         "ex_mna/main.cpp#mna_op_schema_validate"
       ],
       "api_page": "doc/website/docs/api/mna/mna-op-schema-port.mdx",
@@ -9686,10 +9694,12 @@
       "registry_status": "documented",
       "test": null,
       "test_resolves": false,
-      "example": null,
-      "example_state": "none",
+      "example": "ex_mna",
+      "example_state": "built",
       "including_examples": [],
-      "snippets": [],
+      "snippets": [
+        "ex_mna/main.cpp#mna_graph_build"
+      ],
       "api_page": "doc/website/docs/api/mna/mna-port.mdx",
       "python_equiv": null,
       "example_eligible": true,
@@ -9728,10 +9738,12 @@
       "registry_status": "documented",
       "test": null,
       "test_resolves": false,
-      "example": null,
-      "example_state": "none",
+      "example": "ex_mna",
+      "example_state": "built",
       "including_examples": [],
-      "snippets": [],
+      "snippets": [
+        "ex_mna/main.cpp#mna_project_files"
+      ],
       "api_page": "doc/website/docs/api/mna/mna-recording.mdx",
       "python_equiv": null,
       "example_eligible": true,
@@ -9770,10 +9782,12 @@
       "registry_status": "documented",
       "test": null,
       "test_resolves": false,
-      "example": null,
-      "example_state": "none",
+      "example": "ex_mna",
+      "example_state": "built",
       "including_examples": [],
-      "snippets": [],
+      "snippets": [
+        "ex_mna/main.cpp#mna_project_files"
+      ],
       "api_page": "doc/website/docs/api/mna/mna-script.mdx",
       "python_equiv": null,
       "example_eligible": true,
@@ -9789,10 +9803,12 @@
       "registry_status": "documented",
       "test": null,
       "test_resolves": false,
-      "example": null,
-      "example_state": "none",
+      "example": "ex_mna",
+      "example_state": "built",
       "including_examples": [],
-      "snippets": [],
+      "snippets": [
+        "ex_mna/main.cpp#mna_project_files"
+      ],
       "api_page": "doc/website/docs/api/mna/mna-session.mdx",
       "python_equiv": null,
       "example_eligible": true,
@@ -9808,10 +9824,12 @@
       "registry_status": "documented",
       "test": null,
       "test_resolves": false,
-      "example": null,
-      "example_state": "none",
+      "example": "ex_mna",
+      "example_state": "built",
       "including_examples": [],
-      "snippets": [],
+      "snippets": [
+        "ex_mna/main.cpp#mna_project_files"
+      ],
       "api_page": "doc/website/docs/api/mna/mna-subject.mdx",
       "python_equiv": null,
       "example_eligible": true,
@@ -9827,10 +9845,17 @@
       "registry_status": "documented",
       "test": null,
       "test_resolves": false,
-      "example": null,
-      "example_state": "none",
-      "including_examples": [],
-      "snippets": [],
+      "example": "ex_mna",
+      "example_state": "built",
+      "including_examples": [
+        "ex_mna"
+      ],
+      "snippets": [
+        "ex_mna/main.cpp#mna_verification_usage",
+        "ex_mna/main.cpp#mna_verification_usage",
+        "ex_mna/main.cpp#mna_verification_usage",
+        "ex_mna/main.cpp#mna_verification_usage"
+      ],
       "api_page": "doc/website/docs/api/mna/mna-provenance.mdx",
       "python_equiv": null,
       "example_eligible": true,
@@ -9846,10 +9871,17 @@
       "registry_status": "documented",
       "test": null,
       "test_resolves": false,
-      "example": null,
-      "example_state": "none",
-      "including_examples": [],
-      "snippets": [],
+      "example": "ex_mna",
+      "example_state": "built",
+      "including_examples": [
+        "ex_mna"
+      ],
+      "snippets": [
+        "ex_mna/main.cpp#mna_verification_usage",
+        "ex_mna/main.cpp#mna_verification_usage",
+        "ex_mna/main.cpp#mna_verification_usage",
+        "ex_mna/main.cpp#mna_verification_usage"
+      ],
       "api_page": "doc/website/docs/api/mna/mna-verification.mdx",
       "python_equiv": null,
       "example_eligible": true,
@@ -9865,10 +9897,17 @@
       "registry_status": "documented",
       "test": null,
       "test_resolves": false,
-      "example": null,
-      "example_state": "none",
-      "including_examples": [],
-      "snippets": [],
+      "example": "ex_mna",
+      "example_state": "built",
+      "including_examples": [
+        "ex_mna"
+      ],
+      "snippets": [
+        "ex_mna/main.cpp#mna_verification_usage",
+        "ex_mna/main.cpp#mna_verification_usage",
+        "ex_mna/main.cpp#mna_verification_usage",
+        "ex_mna/main.cpp#mna_verification_usage"
+      ],
       "api_page": "doc/website/docs/api/mna/mna-verification-check.mdx",
       "python_equiv": null,
       "example_eligible": true,
@@ -9884,10 +9923,17 @@
       "registry_status": "documented",
       "test": null,
       "test_resolves": false,
-      "example": null,
-      "example_state": "none",
-      "including_examples": [],
-      "snippets": [],
+      "example": "ex_mna",
+      "example_state": "built",
+      "including_examples": [
+        "ex_mna"
+      ],
+      "snippets": [
+        "ex_mna/main.cpp#mna_verification_usage",
+        "ex_mna/main.cpp#mna_verification_usage",
+        "ex_mna/main.cpp#mna_verification_usage",
+        "ex_mna/main.cpp#mna_verification_usage"
+      ],
       "api_page": "doc/website/docs/api/mna/mna-verification-result.mdx",
       "python_equiv": null,
       "example_eligible": true,

@@ -9100,7 +9100,11 @@
       "mne_python": null,
       "sklearn": null,
       "test": null,
-      "example": null,
+      "example": "ex_mna",
+      "example_snippet": [
+        "ex_mna/main.cpp#mna_project_files"
+      ],
+      "example_mode": "run",
       "status": "documented",
       "skigen_candidate": false,
       "documented": true,
@@ -9140,7 +9144,11 @@
       "mne_python": null,
       "sklearn": null,
       "test": null,
-      "example": null,
+      "example": "ex_mna",
+      "example_snippet": [
+        "ex_mna/main.cpp#mna_op_schema_validate"
+      ],
+      "example_mode": "run",
       "status": "documented",
       "skigen_candidate": false,
       "documented": true,
@@ -9158,7 +9166,11 @@
       "mne_python": null,
       "sklearn": null,
       "test": null,
-      "example": null,
+      "example": "ex_mna",
+      "example_snippet": [
+        "ex_mna/main.cpp#mna_op_schema_validate"
+      ],
+      "example_mode": "run",
       "status": "documented",
       "skigen_candidate": false,
       "documented": true,
@@ -9198,7 +9210,11 @@
       "mne_python": null,
       "sklearn": null,
       "test": null,
-      "example": null,
+      "example": "ex_mna",
+      "example_snippet": [
+        "ex_mna/main.cpp#mna_graph_build"
+      ],
+      "example_mode": "run",
       "status": "documented",
       "skigen_candidate": false,
       "documented": true,
@@ -9216,7 +9232,11 @@
       "mne_python": null,
       "sklearn": null,
       "test": null,
-      "example": null,
+      "example": "ex_mna",
+      "example_snippet": [
+        "ex_mna/main.cpp#mna_verification_usage"
+      ],
+      "example_mode": "run",
       "status": "documented",
       "skigen_candidate": false,
       "documented": true,
@@ -9234,7 +9254,11 @@
       "mne_python": null,
       "sklearn": null,
       "test": null,
-      "example": null,
+      "example": "ex_mna",
+      "example_snippet": [
+        "ex_mna/main.cpp#mna_project_files"
+      ],
+      "example_mode": "run",
       "status": "documented",
       "skigen_candidate": false,
       "documented": true,
@@ -9252,7 +9276,11 @@
       "mne_python": null,
       "sklearn": null,
       "test": null,
-      "example": null,
+      "example": "ex_mna",
+      "example_snippet": [
+        "ex_mna/main.cpp#mna_project_files"
+      ],
+      "example_mode": "run",
       "status": "documented",
       "skigen_candidate": false,
       "documented": true,
@@ -9270,7 +9298,11 @@
       "mne_python": null,
       "sklearn": null,
       "test": null,
-      "example": null,
+      "example": "ex_mna",
+      "example_snippet": [
+        "ex_mna/main.cpp#mna_project_files"
+      ],
+      "example_mode": "run",
       "status": "documented",
       "skigen_candidate": false,
       "documented": true,
@@ -9288,7 +9320,11 @@
       "mne_python": null,
       "sklearn": null,
       "test": null,
-      "example": null,
+      "example": "ex_mna",
+      "example_snippet": [
+        "ex_mna/main.cpp#mna_project_files"
+      ],
+      "example_mode": "run",
       "status": "documented",
       "skigen_candidate": false,
       "documented": true,
@@ -9306,7 +9342,11 @@
       "mne_python": null,
       "sklearn": null,
       "test": null,
-      "example": null,
+      "example": "ex_mna",
+      "example_snippet": [
+        "ex_mna/main.cpp#mna_verification_usage"
+      ],
+      "example_mode": "run",
       "status": "documented",
       "skigen_candidate": false,
       "documented": true,
@@ -9324,7 +9364,11 @@
       "mne_python": null,
       "sklearn": null,
       "test": null,
-      "example": null,
+      "example": "ex_mna",
+      "example_snippet": [
+        "ex_mna/main.cpp#mna_verification_usage"
+      ],
+      "example_mode": "run",
       "status": "documented",
       "skigen_candidate": false,
       "documented": true,
@@ -9342,7 +9386,11 @@
       "mne_python": null,
       "sklearn": null,
       "test": null,
-      "example": null,
+      "example": "ex_mna",
+      "example_snippet": [
+        "ex_mna/main.cpp#mna_verification_usage"
+      ],
+      "example_mode": "run",
       "status": "documented",
       "skigen_candidate": false,
       "documented": true,

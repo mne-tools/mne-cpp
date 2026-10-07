@@ -27,6 +27,7 @@
 #include <mna/mna_param_tree.h>
 #include <mna/mna_project.h>
 #include <mna/mna_registry_loader.h>
+#include <mna/mna_verification.h>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -116,7 +117,8 @@ int main(int argc, char* argv[])
     source.id = "source";
     source.opType = "ex_constant";
     source.attributes["value"] = 3.0;
-    source.outputs.append(port("out", MnaPortDir::Output));
+    const MnaPort sourceOut = port("out", MnaPortDir::Output); // name, data kind, direction
+    source.outputs.append(sourceOut);
     graph.addNode(source);
 
     for (const QString& id : {QStringLiteral("scale"), QStringLiteral("shift")}) {
@@ -138,8 +140,10 @@ int main(int argc, char* argv[])
     MnaNode unset = graph.node("source");
     unset.attributes.clear(); // "value" is required
     const bool unsetValid = registry.schema("ex_constant").validate(unset);
+    const MnaOpSchemaPort affineIn = registry.schema("ex_affine").inputPorts.first();   // "in", Matrix, required
+    const MnaOpSchemaAttr affineGain = registry.schema("ex_affine").attributes.first(); // "gain", double, default 1
     //! [mna_op_schema_validate]
-    ok &= expect(nodeValid && problems.isEmpty() && !unsetValid && graph.validate() && graph.topologicalSort() == QStringList({"source", "scale", "shift"}),
+    ok &= expect(nodeValid && problems.isEmpty() && !unsetValid && affineIn.name == "in" && affineIn.required && affineGain.name == "gain" && affineGain.defaultValue.toDouble() == 1.0 && graph.validate() && graph.topologicalSort() == QStringList({"source", "scale", "shift"}),
                  "MnaOpSchema accepts the wired node and rejects a missing required attribute; graph order source -> scale -> shift");
 
     //! [mna_param_tree_binding]
@@ -165,9 +169,50 @@ int main(int argc, char* argv[])
     ok &= expect(first == 6.5 && gainAfterFirst == 5.0 && second == 5.5 && graph.paramTree.param("scale/gain").toDouble() == 2.0,
                  QString("MnaGraphExecutor: shift::out = %1, then %2 after the binding sets gain to %3").arg(first).arg(second).arg(gainAfterFirst));
 
+    //! [mna_verification_usage]
+    MnaVerification& checks = graph.node("shift").verification;
+    checks.explanation = "Adds the offset; the result must stay positive.";
+    MnaVerificationCheck positive;
+    positive.id = "out_positive";
+    positive.description = "Output is positive";
+    positive.phase = "post";         // "pre" sees attributes and inputs, "post" also outputs
+    positive.expression = "out > 0"; // or MnaScript code whose exit code 0 passes
+    positive.severity = "error";     // a failed "error" check stops the run
+    checks.checks.append(positive);
+    graph.node("source").attributes["value"] = -2.0;
+    graph.node("source").dirty = true;
+    const MnaGraphExecutor::Context checked = MnaGraphExecutor::executeIncremental(graph, ctx);
+    const MnaVerificationResult& verdict = checks.postResults.first();
+    const MnaProvenance& provenance = checks.provenance; // versions, host, input SHA-256, timing
+    //! [mna_verification_usage]
+    // gain is 2 again, so shift::out = 2 * -2 + 0.5 = -3.5 fails the check
+    ok &= expect(!verdict.passed && verdict.actualValue == QVariant(false) && checked.abortedNode == "shift" && checked.results.value("shift::out").toDouble() == -3.5 && provenance.mneCppVersion == MNE_CPP_VERSION && provenance.inputHashes.contains("in"),
+                 "MnaVerification: " + verdict.message);
+
+    //! [mna_project_files]
+    MnaFileRef raw;
+    raw.role = MnaFileRole::Raw;
+    raw.path = "sub-01/ses-01/meg/sample_audvis_raw.fif"; // relative POSIX path
+    raw.format = "fiff";
+    MnaRecording recording;
+    recording.id = "run-01";
+    recording.files.append(raw);
+    MnaSession session;
+    session.id = "ses-01";
+    session.recordings.append(recording);
+    MnaSubject subject;
+    subject.id = "sub-01";
+    subject.freeSurferDir = "subjects/sample";
+    subject.sessions.append(session);
+    MnaScript report; // a script node: inline code run by an interpreter
+    report.language = "python";
+    report.code = "print({{in}})";
+    //! [mna_project_files]
+
     //! [mna_project_save]
     MnaProject project;
     project.name = "ex_mna";
+    project.subjects.append(subject);
     project.pipeline = graph.nodes();
     const QString jsonPath = dir.filePath("pipeline.mna"); // UTF-8 JSON
     const QString cborPath = dir.filePath("pipeline.mnx"); // CBOR with an "MNX1" magic
@@ -175,7 +220,7 @@ int main(int argc, char* argv[])
     const MnaProject fromJson = MnaIO::read(jsonPath);
     const MnaProject fromCbor = MnaIO::read(cborPath);
     //! [mna_project_save]
-    ok &= expect(saved && fromJson.name == "ex_mna" && fromJson.pipeline.size() == 3 && fromCbor.pipeline.size() == 3 && fromCbor.pipeline[1].inputs[0].sourceNodeId == "source" && fromJson.pipeline[1].attributes.value("gain").toDouble() == 5.0,
+    ok &= expect(saved && fromJson.name == "ex_mna" && fromCbor.subjects.size() == 1 && fromCbor.subjects[0].sessions[0].recordings[0].files[0].path == raw.path && fromJson.pipeline[2].verification.postResults.first().message == verdict.message && report.language == "python" && fromJson.pipeline.size() == 3 && fromCbor.pipeline.size() == 3 && fromCbor.pipeline[1].inputs[0].sourceNodeId == "source" && fromJson.pipeline[1].attributes.value("gain").toDouble() == 2.0,
                  "MnaIO round-trips the 3-node pipeline through .mna and .mnx");
 
     qInfo().noquote() << (ok ? "All mna checks passed." : "mna checks FAILED.");

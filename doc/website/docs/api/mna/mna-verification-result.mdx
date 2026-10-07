@@ -19,6 +19,23 @@ The result of evaluating a single verification check.
 
 Check evaluation result.
 
+```cpp title="src/examples/ex_mna/main.cpp"
+MnaVerification& checks = graph.node("shift").verification;
+checks.explanation = "Adds the offset; the result must stay positive.";
+MnaVerificationCheck positive;
+positive.id = "out_positive";
+positive.description = "Output is positive";
+positive.phase = "post";         // "pre" sees attributes and inputs, "post" also outputs
+positive.expression = "out > 0"; // or MnaScript code whose exit code 0 passes
+positive.severity = "error";     // a failed "error" check stops the run
+checks.checks.append(positive);
+graph.node("source").attributes["value"] = -2.0;
+graph.node("source").dirty = true;
+const MnaGraphExecutor::Context checked = MnaGraphExecutor::executeIncremental(graph, ctx);
+const MnaVerificationResult& verdict = checks.postResults.first();
+const MnaProvenance& provenance = checks.provenance; // versions, host, input SHA-256, timing
+```
+
 ---
 
 ## Public Methods
@@ -40,6 +57,11 @@ Check evaluation result.
 ### fromCbor(cbor)
 
 ---
+
+## Example
+
+- Full source: [`src/examples/ex_mna/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_mna/main.cpp)
+- Build target: `ex_mna` (runs under CTest)
 
 ## Authors of this file
 

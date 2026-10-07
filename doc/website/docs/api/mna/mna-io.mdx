@@ -20,6 +20,7 @@ Read/write MNA project files (.mna = JSON, .mnx = CBOR with "MNX1" magic header)
 ```cpp title="src/examples/ex_mna/main.cpp"
 MnaProject project;
 project.name = "ex_mna";
+project.subjects.append(subject);
 project.pipeline = graph.nodes();
 const QString jsonPath = dir.filePath("pipeline.mna"); // UTF-8 JSON
 const QString cborPath = dir.filePath("pipeline.mnx"); // CBOR with an "MNX1" magic

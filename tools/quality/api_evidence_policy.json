@@ -16,7 +16,7 @@
     "Settings": "Plain parameter record consumed by an algorithm class; shown inside that class's example."
   },
   "example_debt": {
-    "ceiling": 26,
+    "ceiling": 14,
     "names": [
       "ArtifactRejectionData",
       "CovDefinition",
@@ -27,18 +27,6 @@
       "InvSourceCoupling",
       "InvToken",
       "InvTokenizeOptions",
-      "MnaFileRef",
-      "MnaOpSchemaAttr",
-      "MnaOpSchemaPort",
-      "MnaPort",
-      "MnaProvenance",
-      "MnaRecording",
-      "MnaScript",
-      "MnaSession",
-      "MnaSubject",
-      "MnaVerification",
-      "MnaVerificationCheck",
-      "MnaVerificationResult",
       "Pair",
       "PickResult",
       "PolhemusSerialConfig",

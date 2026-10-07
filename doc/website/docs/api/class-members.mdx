@@ -7,7 +7,7 @@ sidebar_position: 5
 
 # Class Members
 
-Index of 6244 public class members (functions, variables, typedefs, enums) across all documented classes.
+Index of 6245 public class members (functions, variables, typedefs, enums) across all documented classes.
 
 **Jump to:** [A](#a) · [B](#b) · [C](#c) · [D](#d) · [E](#e) · [F](#f) · [G](#g) · [H](#h) · [I](#i) · [J](#j) · [K](#k) · [L](#l) · [M](#m) · [N](#n) · [O](#o) · [P](#p) · [Q](#q) · [R](#r) · [S](#s) · [T](#t) · [U](#u) · [V](#v) · [W](#w) · [X](#x) · [Y](#y) · [Z](#z)
 
@@ -16,6 +16,7 @@ Index of 6244 public class members (functions, variables, typedefs, enums) acros
 - **a** `[var]` in [MNEProjData](/docs/api/mne/mne-proj-data) — Triangle-local dot product r12 .
 - **a1** `[var]` in [IirBiquad](/docs/api/dsp/iir-biquad) — Denominator coefficient z^-1 (a0 normalised to 1).
 - **a2** `[var]` in [IirBiquad](/docs/api/dsp/iir-biquad) — Denominator coefficient z^-2.
+- **abortedNode** `[var]` in `Context` — Node whose failed "error" check stopped the run (empty if it ran to the end).
 - **AbstractMetric** `[fn]` in [AbstractMetric](/docs/api/connectivity/abstract-metric) — Constructs a [`AbstractMetric`](/docs/api/connectivity/abstract-metric) object.
 - **AbstractTreeItem** `[fn]` in `AbstractTreeItem`
 - **AbstractView** `[fn]` in [AbstractView](/docs/api/disp/abstract-view) — Constructs a [`AbstractView`](/docs/api/disp/abstract-view) which is a child of parent.
@@ -1548,7 +1549,7 @@ Index of 6244 public class members (functions, variables, typedefs, enums) acros
 - **explain_comp** `[fn]` in [MNECTFCompDataSet](/docs/api/mne/mnectf-comp-data-set) — Return a human-readable description string for a compensation kind constant.
 - **explanation** `[var]` in [MnaVerification](/docs/api/mna/mna-verification) — Human-readable explanation of what this node does and why.
 - **expression** `[var]` in [MnaParamBinding](/docs/api/mna/mna-param-binding) — Formula string, e.g. "clamp(ref('noise_est_01/snr') * 0.1, 0.01, 1.0)".
-- **expression** `[var]` in [MnaVerificationCheck](/docs/api/mna/mna-verification-check) — Simple evaluable expression: "rank(covariance) &gt; 0".
+- **expression** `[var]` in [MnaVerificationCheck](/docs/api/mna/mna-verification-check) — [`MnaParamTree`](/docs/api/mna/mna-param-tree) expression over attributes, inputs and (post) outputs: "rank &gt; 0".
 - **extension** `[fn]` in [BIDSPath](/docs/api/bids/bids-path) — File extension.
 - **extent** `[fn]` in [MNELayout](/docs/api/mne/mne-layout) — Returns the drawing area given on the first line of the file.
 - **externalToolVersion** `[var]` in [MnaProvenance](/docs/api/mna/mna-provenance) — e.g. "FreeSurfer 7.4.1", "Python 3.11.5"

@@ -25,7 +25,8 @@ MnaNode source;
 source.id = "source";
 source.opType = "ex_constant";
 source.attributes["value"] = 3.0;
-source.outputs.append(port("out", MnaPortDir::Output));
+const MnaPort sourceOut = port("out", MnaPortDir::Output); // name, data kind, direction
+source.outputs.append(sourceOut);
 graph.addNode(source);
 
 for (const QString& id : {QStringLiteral("scale"), QStringLiteral("shift")}) {

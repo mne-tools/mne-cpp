@@ -17,6 +17,26 @@ struct MNALIB::MnaSubject
 
 Represents a subject (participant) in the project.
 
+```cpp title="src/examples/ex_mna/main.cpp"
+MnaFileRef raw;
+raw.role = MnaFileRole::Raw;
+raw.path = "sub-01/ses-01/meg/sample_audvis_raw.fif"; // relative POSIX path
+raw.format = "fiff";
+MnaRecording recording;
+recording.id = "run-01";
+recording.files.append(raw);
+MnaSession session;
+session.id = "ses-01";
+session.recordings.append(recording);
+MnaSubject subject;
+subject.id = "sub-01";
+subject.freeSurferDir = "subjects/sample";
+subject.sessions.append(session);
+MnaScript report; // a script node: inline code run by an interpreter
+report.language = "python";
+report.code = "print({{in}})";
+```
+
 ---
 
 ## Public Methods
@@ -72,6 +92,11 @@ Deserialize from QCborMap.
 - *[MnaSubject](/docs/api/mna/mna-subject)* — The subject; missing keys take default values and unknown keys go to extras.
 
 ---
+
+## Example
+
+- Full source: [`src/examples/ex_mna/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_mna/main.cpp)
+- Build target: `ex_mna` (runs under CTest)
 
 ## Authors of this file
 

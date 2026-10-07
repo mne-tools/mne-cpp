@@ -25,6 +25,8 @@ const bool nodeValid = registry.schema("ex_affine").validate(graph.node("scale")
 MnaNode unset = graph.node("source");
 unset.attributes.clear(); // "value" is required
 const bool unsetValid = registry.schema("ex_constant").validate(unset);
+const MnaOpSchemaPort affineIn = registry.schema("ex_affine").inputPorts.first();   // "in", Matrix, required
+const MnaOpSchemaAttr affineGain = registry.schema("ex_affine").attributes.first(); // "gain", double, default 1
 ```
 
 ---
