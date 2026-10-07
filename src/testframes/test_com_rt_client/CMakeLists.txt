@@ -28,6 +28,8 @@ set(MNE_LIBS_REQUIRED mne_com mne_fiff mne_utils mne_math)
 
 target_link_libraries(${PROJECT_NAME} PRIVATE
     ${QT_REQUIRED_COMPONENT_LIBS} ${MNE_LIBS_REQUIRED} Eigen3::Eigen)
+target_compile_definitions(${PROJECT_NAME} PRIVATE
+    MNE_CTF_COMP_DATA_DIR="${CMAKE_CURRENT_SOURCE_DIR}/../test_mne_ctf_comp_python/data")
 
 set_target_properties(${PROJECT_NAME} PROPERTIES
     WIN32_EXECUTABLE FALSE

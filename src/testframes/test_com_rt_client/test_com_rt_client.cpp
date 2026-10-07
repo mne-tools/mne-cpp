@@ -33,12 +33,25 @@
 #include <QJsonDocument>
 #include <QJsonObject>
 #include <QAbstractSocket>
+#include <QDataStream>
+#include <QFile>
+#include <QTcpServer>
+#include <QTcpSocket>
+
+#include <fiff/fiff_constants.h>
+#include <fiff/fiff_digitizer_data.h>
+#include <fiff/fiff_file.h>
+#include <fiff/fiff_raw_data.h>
+#include <fiff/fiff_stream.h>
+
+#include <memory>
 
 //=============================================================================================================
 // USED NAMESPACES
 //=============================================================================================================
 
 using namespace COMLIB;
+using namespace FIFFLIB;
 
 //=============================================================================================================
 /**
@@ -61,6 +74,9 @@ private slots:
     void testRtDataClientConstruction();
     void testRtDataClientDisconnectedState();
     void testRtDataClientSetClientAlias();
+    void testRtDataClientReadsWhatTheServerWrites_data();
+    void testRtDataClientReadsWhatTheServerWrites();
+    void testRtDataClientClientIdAliasAndRawBuffer();
 
     // ── RtClient (offline) ────────────────────────────────────────────
     void testRtClientConstruction();
@@ -177,6 +193,199 @@ void TestComRtClient::testRtDataClientSetClientAlias()
     // setClientAlias should not crash when disconnected
     client.setClientAlias("test_alias");
     QVERIFY(true); // No crash
+}
+
+//=============================================================================================================
+
+namespace
+{
+
+// The bytes mne_rt_server's FiffStreamThread sends for a measurement info.
+QByteArray serverMeasInfo(const FiffInfo& info)
+{
+    QByteArray block;
+    FiffStream out(&block, QIODevice::WriteOnly);
+    info.writeToStream(&out);
+    return block;
+}
+
+// A local server that accepts one data client and returns the server-side socket.
+QTcpSocket* acceptClient(QTcpServer& server, RtDataClient& client)
+{
+    client.connectToHost(QHostAddress::LocalHost, server.serverPort());
+    if (!client.waitForConnected(5000) || !server.waitForNewConnection(5000)) {
+        return nullptr;
+    }
+    return server.nextPendingConnection();
+}
+
+} // namespace
+
+//=============================================================================================================
+
+void TestComRtClient::testRtDataClientReadsWhatTheServerWrites_data()
+{
+    QTest::addColumn<bool>("withProjector");
+    QTest::newRow("ctf compensators") << false;
+    QTest::newRow("ctf compensators + projector") << true;
+}
+
+//=============================================================================================================
+
+void TestComRtClient::testRtDataClientReadsWhatTheServerWrites()
+{
+    QFETCH(bool, withProjector);
+    QFile raw(QStringLiteral(MNE_CTF_COMP_DATA_DIR "/ctf_grade1_raw.fif"));
+    FiffRawData rawData(raw);
+    FiffInfo info = rawData.info;
+    QCOMPARE(info.nchan, 36);
+    QCOMPARE(info.comps.size(), 5);
+    QCOMPARE(info.dig.size(), 3);
+    if (withProjector) {
+        Eigen::MatrixXd vec(2, 3);
+        vec << 0.6, 0.8, 0.0, 0.0, 0.6, -0.8;
+        FiffNamedMatrix vectors(2, 3, QStringList(), info.ch_names.mid(0, 3), vec);
+        info.projs.append(FiffProj(FIFFV_PROJ_ITEM_FIELD, true, QStringLiteral("PCA-v1"), vectors));
+    }
+    info.experimenter = QStringLiteral("rt test");
+    info.description = QStringLiteral("wire round trip");
+    info.proj_name = QStringLiteral("rt");
+    info.proj_id = 7;
+    info.utc_offset = QStringLiteral("+02:00");
+    info.acq_pars = QStringLiteral("ACQch001 110113");
+    info.acq_stim = QStringLiteral("STI 014");
+    info.bads = QStringList{info.ch_names.first()};
+
+    QTcpServer server;
+    QVERIFY(server.listen(QHostAddress::LocalHost));
+    for (int pass = 0; pass < 2; ++pass) {
+        RtDataClient client;
+        std::unique_ptr<QTcpSocket> peer(acceptClient(server, client));
+        QVERIFY(peer);
+        peer->write(serverMeasInfo(info));
+        QVERIFY(peer->waitForBytesWritten(5000));
+
+        FiffInfo::SPtr got;
+        FiffDigitizerData::SPtr dig;
+        if (pass == 0) {
+            got = client.readInfo();
+        } else {
+            const MetaData meta = client.readMetadata();
+            got = meta.m_pInfo;
+            dig = meta.m_pDigitizerData;
+        }
+
+        QCOMPARE(got->nchan, info.nchan);
+        QCOMPARE(got->ch_names, info.ch_names);
+        QCOMPARE(got->chs.size(), info.chs.size());
+        for (int k = 0; k < info.nchan; ++k) {
+            QCOMPARE(got->chs[k].kind, info.chs[k].kind);
+            QCOMPARE(got->chs[k].cal, info.chs[k].cal);
+            QVERIFY(got->chs[k].chpos.r0 == info.chs[k].chpos.r0);
+        }
+        QCOMPARE(got->sfreq, info.sfreq);
+        QCOMPARE(got->highpass, info.highpass);
+        QCOMPARE(got->lowpass, info.lowpass);
+        QCOMPARE(got->linefreq, info.linefreq);
+        QCOMPARE(got->meas_date[0], info.meas_date[0]);
+        QCOMPARE(got->meas_date[1], info.meas_date[1]);
+        QCOMPARE(got->experimenter, info.experimenter);
+        QCOMPARE(got->description, info.description);
+        QCOMPARE(got->proj_name, info.proj_name);
+        QCOMPARE(got->proj_id, info.proj_id);
+        QCOMPARE(got->gantry_angle, info.gantry_angle);
+        QCOMPARE(got->acq_pars, info.acq_pars);
+        QCOMPARE(got->acq_stim, info.acq_stim);
+        QCOMPARE(got->bads, info.bads);
+        QVERIFY(got->dev_head_t.trans == info.dev_head_t.trans);
+        QCOMPARE(got->dig.size(), info.dig.size());
+        QCOMPARE(got->projs.size(), info.projs.size());
+        for (int p = 0; p < info.projs.size(); ++p) {
+            QCOMPARE(got->projs[p].desc, info.projs[p].desc);
+            QCOMPARE(got->projs[p].kind, info.projs[p].kind);
+            QCOMPARE(got->projs[p].active, info.projs[p].active);
+            QCOMPARE(got->projs[p].data->col_names, info.projs[p].data->col_names);
+            QVERIFY(got->projs[p].data->data.isApprox(info.projs[p].data->data, 1e-6));
+        }
+        QCOMPARE(got->comps.size(), info.comps.size());
+        for (int c = 0; c < info.comps.size(); ++c) {
+            QCOMPARE(got->comps[c].kind, info.comps[c].kind);
+            QCOMPARE(got->comps[c].save_calibrated, info.comps[c].save_calibrated);
+            QCOMPARE(got->comps[c].data->row_names, info.comps[c].data->row_names);
+            QCOMPARE(got->comps[c].data->col_names, info.comps[c].data->col_names);
+            QVERIFY(got->comps[c].data->data.isApprox(info.comps[c].data->data, 1e-6));
+        }
+        if (dig) {
+            QCOMPARE(dig->npoint, info.dig.size());
+            QCOMPARE(dig->points.size(), info.dig.size());
+            QCOMPARE(dig->active.size(), info.dig.size());
+            for (int k = 0; k < info.dig.size(); ++k) {
+                QCOMPARE(dig->points[k].ident, info.dig[k].ident);
+                QCOMPARE(dig->points[k].r[0], info.dig[k].r[0]);
+            }
+        }
+    }
+}
+
+//=============================================================================================================
+
+void TestComRtClient::testRtDataClientClientIdAliasAndRawBuffer()
+{
+    QTcpServer server;
+    QVERIFY(server.listen(QHostAddress::LocalHost));
+    RtDataClient client;
+    std::unique_ptr<QTcpSocket> peer(acceptClient(server, client));
+    QVERIFY(peer);
+
+    // The server answers the id request with FIFF_MNE_RT_CLIENT_ID (FiffStreamThread::writeClientId)
+    QByteArray idBlock;
+    {
+        FiffStream out(&idBlock, QIODevice::WriteOnly);
+        const qint32 id = 42;
+        out.write_int(FIFF_MNE_RT_CLIENT_ID, &id);
+    }
+    peer->write(idBlock);
+    QVERIFY(peer->waitForBytesWritten(5000));
+    QCOMPARE(client.getClientId(), 42);
+    QCOMPARE(client.getClientId(), 42);
+
+    // The id request and the alias arrive as MNE_RT commands 1 and 2
+    client.setClientAlias(QStringLiteral("tëst"));
+    QByteArray received;
+    while (received.size() < 20 + 20 + 5 && peer->waitForReadyRead(5000)) {
+        received += peer->readAll();
+    }
+    QDataStream in(received);
+    in.setByteOrder(QDataStream::BigEndian);
+    qint32 kind, type, size, next, command;
+    in >> kind >> type >> size >> next >> command;
+    QCOMPARE(kind, FIFF_MNE_RT_COMMAND);
+    QCOMPARE(command, 1);
+    QCOMPARE(size, 4);
+    in >> kind >> type >> size >> next >> command;
+    QCOMPARE(command, 2);
+    QCOMPARE(QString::fromUtf8(received.mid(40, size - 4)), QStringLiteral("tëst"));
+
+    // One raw buffer of 3 channels x 4 samples (column-major floats), then a non-data tag
+    Eigen::MatrixXf data(3, 4);
+    data << 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12;
+    QByteArray buffers;
+    {
+        FiffStream out(&buffers, QIODevice::WriteOnly);
+        out.write_float(FIFF_DATA_BUFFER, data.data(), static_cast<int>(data.size()));
+        const qint32 marker = 0;
+        out.write_int(FIFF_MNE_RT_CLIENT_ID, &marker);
+    }
+    peer->write(buffers);
+    QVERIFY(peer->waitForBytesWritten(5000));
+    Eigen::MatrixXf got;
+    fiff_int_t kindRead = 0;
+    client.readRawBuffer(3, got, kindRead);
+    QCOMPARE(kindRead, FIFF_DATA_BUFFER);
+    QVERIFY(got == data);
+    client.readRawBuffer(3, got, kindRead);
+    QCOMPARE(kindRead, FIFF_MNE_RT_CLIENT_ID);
+    QVERIFY(got == data);
 }
 
 //=============================================================================================================
