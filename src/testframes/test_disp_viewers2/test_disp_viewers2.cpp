@@ -47,6 +47,7 @@
 #include <disp/viewers/helpers/bidsviewmodel.h>
 #include <disp/viewers/helpers/mneoperator.h>
 #include <disp/viewers/helpers/channelrhiview.h>
+#include <disp/viewers/helpers/channeldatamodel.h>
 
 #include <fiff/fiff_info.h>
 #include <fiff/fiff_ch_info.h>
@@ -76,6 +77,7 @@
 
 using namespace DISPLIB;
 using namespace FIFFLIB;
+using Eigen::MatrixXd;
 
 namespace
 {
@@ -277,6 +279,7 @@ private slots:
      */
     void channelRhiView_stateContracts();
     void channelRhiView_rendersAndDrawsOverlays();
+    void channelDataModel_bufferDetrendAndDecimation();
 
     //=========================================================================================================
     /**
@@ -1122,6 +1125,145 @@ void TestDispViewers2::channelRhiView_rendersAndDrawsOverlays()
     view.resize(600, 300);
     QApplication::processEvents();
     QVERIFY(!view.grab().isNull());
+}
+
+//=============================================================================================================
+
+void TestDispViewers2::channelDataModel_bufferDetrendAndDecimation()
+{
+    QSharedPointer<FiffInfo> info(new FiffInfo);
+    const QVector<std::pair<int, int>> kinds = {{FIFFV_MEG_CH, FIFF_UNIT_T_M}, {FIFFV_MEG_CH, FIFF_UNIT_T}, {FIFFV_EEG_CH, FIFF_UNIT_V}, {FIFFV_EOG_CH, FIFF_UNIT_V}, {FIFFV_ECG_CH, FIFF_UNIT_V}, {FIFFV_EMG_CH, FIFF_UNIT_V}, {FIFFV_STIM_CH, FIFF_UNIT_NONE}, {FIFFV_MISC_CH, FIFF_UNIT_NONE}};
+    info->sfreq = 500.0f;
+    info->nchan = kinds.size();
+    for (int i = 0; i < kinds.size(); ++i) {
+        FiffChInfo ch;
+        ch.ch_name = QStringLiteral("CH%1").arg(i);
+        ch.kind = kinds[i].first;
+        ch.unit = kinds[i].second;
+        info->chs.append(ch);
+        info->ch_names.append(ch.ch_name);
+    }
+    info->bads = {QStringLiteral("CH2")};
+
+    ChannelDataModel model;
+    QSignalSpy metaSpy(&model, &ChannelDataModel::metaChanged);
+    model.init(info);
+    QCOMPARE(model.channelCount(), 8);
+    QCOMPARE(model.sfreq(), 500.0f);
+    const QStringList labels = {"MEG grad", "MEG mag", "EEG", "EOG", "ECG", "EMG", "STIM", "MISC"};
+    const QVector<float> scales = {400e-13f, 1.2e-12f, 30e-6f, 150e-6f, 1e-3f, 1e-3f, 5.0f, 1.0f};
+    for (int i = 0; i < 8; ++i) {
+        QCOMPARE(model.channelInfo(i).typeLabel, labels[i]);
+        QCOMPARE(model.channelInfo(i).name, info->ch_names[i]);
+        QCOMPARE(model.channelInfo(i).bad, i == 2);
+        QVERIFY(model.channelInfo(i).color.isValid());
+    }
+    QCOMPARE(model.channelInfo(0).amplitudeMax, scales[0]);
+    QCOMPARE(model.channelInfo(1).amplitudeMax, 400e-13f);
+    QCOMPARE(model.channelInfo(99).name, QString());
+
+    // The browser's string-keyed scales map onto grad/mag/EEG/... separately
+    model.setScaleMapFromStrings({{"MEG_grad", 1e-10}, {"MEG_mag", 2e-12}, {"MEG_EEG", 5e-5}, {"MEG_EOG", 2e-4}, {"MEG_EMG", 3e-3}, {"MEG_ECG", 4e-3}, {"MEG_MISC", 2.0}, {"MEG_STIM", 7.0}});
+    const QVector<float> userScales = {1e-10f, 2e-12f, 5e-5f, 2e-4f, 4e-3f, 3e-3f, 7.0f, 2.0f};
+    for (int i = 0; i < 8; ++i) {
+        QCOMPARE(model.channelInfo(i).amplitudeMax, userScales[i]);
+    }
+
+    // Bad flags round-trip into the FiffInfo
+    model.setChannelBad(2, false);
+    model.setChannelBad(5, true);
+    model.setChannelBad(5, true);
+    QCOMPARE(info->bads, QStringList{QStringLiteral("CH5")});
+    QVERIFY(model.channelInfo(5).bad);
+
+    // Virtual channels get defaults for every missing field
+    model.setSignalColor(Qt::darkGreen);
+    ChannelDisplayInfo named;
+    named.name = QStringLiteral("EOG bipolar");
+    named.typeLabel = QStringLiteral("EOG");
+    named.color = Qt::red;
+    named.amplitudeMax = 1e-4f;
+    model.setVirtualChannels({named, ChannelDisplayInfo{}});
+    QCOMPARE(model.channelCount(), 10);
+    QCOMPARE(model.channelInfo(8).name, QStringLiteral("EOG bipolar"));
+    QVERIFY(model.channelInfo(8).isVirtualChannel);
+    QCOMPARE(model.channelInfo(9).name, QStringLiteral("Virtual 2"));
+    QCOMPARE(model.channelInfo(9).typeLabel, QStringLiteral("MISC"));
+    QCOMPARE(model.channelInfo(9).color, QColor(Qt::darkGreen));
+    QCOMPARE(model.channelInfo(9).amplitudeMax, 1.0f);
+    QVERIFY(metaSpy.size() >= 6);
+
+    // Ring buffer: 3 channels, keep at most 1200 samples
+    ChannelDataModel ring;
+    ring.setMaxStoredSamples(1200);
+    MatrixXd block(3, 500);
+    for (int b = 0; b < 3; ++b) {
+        for (int s = 0; s < 500; ++s) {
+            const int t = 500 * b + s;
+            block(0, s) = 2.0 + 0.5 * t;
+            block(1, s) = std::sin(0.37 * t) + 0.01 * (t % 11);
+            block(2, s) = (t % 2) ? 3.0 : -3.0;
+        }
+        ring.appendData(block);
+    }
+    ring.appendData(MatrixXd());
+    QCOMPARE(ring.totalSamples(), 1200);
+    QCOMPARE(ring.firstSample(), 300);
+    QCOMPARE(ring.sampleValueAt(0, 300), 152.0f);
+    QCOMPARE(ring.sampleValueAt(0, 299), 0.0f);
+    QCOMPARE(ring.sampleValueAt(7, 400), 0.0f);
+    // RMS uses at most the last 1000 samples of the window
+    QCOMPARE(ring.channelRms(2, 0, 5000), 3.0f);
+    double sumSq = 0.0;
+    for (int t = 500; t < 1500; ++t) {
+        sumSq += (2.0 + 0.5 * t) * (2.0 + 0.5 * t);
+    }
+    QVERIFY(std::fabs(ring.channelRms(0, 300, 1500) - std::sqrt(sumSq / 1000.0)) < 1e-2f * std::sqrt(sumSq / 1000.0));
+    QCOMPARE(ring.channelRms(0, 900, 900), 0.0f);
+    QCOMPARE(ring.channelRms(-1, 0, 10), 0.0f);
+
+    // Raw path: one vertex per sample, detrended over the window
+    int vboFirst = -1;
+    ring.setDetrendMode(DetrendMode::Linear);
+    QVector<float> v = ring.decimatedVertices(0, 400, 450, 100, vboFirst);
+    QCOMPARE(vboFirst, 400);
+    QCOMPARE(v.size(), 100);
+    for (int i = 0; i < 50; ++i) {
+        QCOMPARE(v[2 * i], static_cast<float>(i));
+        QVERIFY(std::fabs(v[2 * i + 1]) < 1e-3f);
+    }
+    ring.setRemoveDC(true);
+    v = ring.decimatedVertices(0, 400, 450, 100, vboFirst);
+    QVERIFY(std::fabs(v[1] - (-0.5f * 24.5f)) < 1e-3f);
+    QVERIFY(std::fabs(v[99] - 0.5f * 24.5f) < 1e-3f);
+    ring.setRemoveDC(false);
+    v = ring.decimatedVertices(0, 100, 310, 400, vboFirst);
+    QCOMPARE(vboFirst, 300);
+    QCOMPARE(v[1], 152.0f);
+    QVERIFY(ring.decimatedVertices(0, 450, 400, 10, vboFirst).isEmpty());
+    QVERIFY(ring.decimatedVertices(9, 400, 450, 10, vboFirst).isEmpty());
+
+    // Decimation path: max then min of each 10-sample bin
+    v = ring.decimatedVertices(1, 300, 1300, 100, vboFirst);
+    QCOMPARE(v.size(), 400);
+    for (int px = 0; px < 100; ++px) {
+        float mx = -1e9f, mn = 1e9f;
+        for (int t = 300 + 10 * px; t < 310 + 10 * px; ++t) {
+            const float val = static_cast<float>(std::sin(0.37 * t) + 0.01 * (t % 11));
+            mx = std::max(mx, val);
+            mn = std::min(mn, val);
+        }
+        QCOMPARE(v[4 * px], 10.0f * px);
+        QCOMPARE(v[4 * px + 1], mx);
+        QCOMPARE(v[4 * px + 3], mn);
+    }
+
+    ring.setData(MatrixXd::Ones(2, 4), 10);
+    QCOMPARE(ring.firstSample(), 10);
+    QCOMPARE(ring.totalSamples(), 4);
+    ring.clearData();
+    QCOMPARE(ring.totalSamples(), 0);
+    QCOMPARE(ring.firstSample(), 0);
 }
 
 //=============================================================================================================
