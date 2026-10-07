@@ -47,6 +47,8 @@
 #include <disp/viewers/helpers/bidsviewmodel.h>
 #include <disp/viewers/helpers/mneoperator.h>
 #include <disp/viewers/helpers/channelrhiview.h>
+#include <disp/viewers/helpers/selectionsceneitem.h>
+#include <disp/viewers/helpers/averagesceneitem.h>
 #include <disp/viewers/helpers/channeldatamodel.h>
 
 #include <fiff/fiff_info.h>
@@ -73,6 +75,8 @@
 #include <QDir>
 #include <QHeaderView>
 #include <QMenu>
+#include <QGraphicsScene>
+#include <QPainter>
 #include <QTableView>
 
 #include <Eigen/Core>
@@ -266,6 +270,7 @@ private slots:
      * Verifies that EvokedSetModel constructs, reports sensible defaults, and
      * setEvokedSet does not crash on an empty set.
      */
+    void averageLayoutView_drawsEachChannelsAverage();
     void evokedSetModel_basics();
     void evokedSetModel_projectionRolesAndAverageMaps();
 
@@ -936,6 +941,91 @@ void TestDispViewers2::rtFiffRawViewModel_projectionWrapFilterAndRoles()
     model.addEvent(42);
     QCOMPARE(added, std::vector<int>{42});
     QCOMPARE(model.getEventsToDisplay(3, 9), (std::vector<int>{3, 9}));
+}
+
+//=============================================================================================================
+
+void TestDispViewers2::averageLayoutView_drawsEachChannelsAverage()
+{
+    // A positive step on MEG0111 and a negative one on MEG0113, both from the stimulus onset
+    auto set = QSharedPointer<FiffEvokedSet>::create();
+    set->info = *createBrowserTestInfo();
+    FiffEvoked evoked;
+    evoked.comment = QStringLiteral("aud");
+    evoked.baseline = qMakePair(-0.05f, 0.0f);
+    evoked.times = Eigen::RowVectorXf::LinSpaced(120, -0.06f, 0.059f);
+    evoked.times(60) = 0.0f;
+    evoked.data = Eigen::MatrixXd::Zero(4, 120);
+    evoked.data.row(0).tail(60).setConstant(8e-13);
+    evoked.data.row(2).tail(60).setConstant(-8e-13);
+    set->evoked.append(evoked);
+    auto model = QSharedPointer<EvokedSetModel>::create();
+    model->setEvokedSet(set);
+    auto pInfo = QSharedPointer<FiffInfo>::create(set->info);
+
+    AverageLayoutView view(QStringLiteral("test_disp_viewers2_average_layout"));
+    view.setFiffInfo(pInfo);
+    view.setEvokedSetModel(model);
+    view.setBackgroundColor(Qt::white);
+    QCOMPARE(view.getBackgroundColor(), QColor(Qt::white));
+    QCOMPARE(view.getEvokedSetModel(), model);
+
+    // Two channels, one bad, laid out left and right
+    SelectionItem selection;
+    selection.m_sChannelName = {QStringLiteral("MEG0111"), QStringLiteral("MEG0113")};
+    selection.m_iChannelNumber = {0, 2};
+    selection.m_iChannelKind = {FIFFV_MEG_CH, FIFFV_MEG_CH};
+    selection.m_iChannelUnit = {FIFF_UNIT_T, FIFF_UNIT_T};
+    selection.m_qpChannelPosition = {QPointF(-1.0, 0.0), QPointF(1.0, 0.0)};
+    selection.m_bShowAll = false;
+    view.channelSelectionChanged(QVariant::fromValue(&selection));
+    view.setScaleMap({{FIFF_UNIT_T, 1e-12f}});
+    view.setAverageColor(QSharedPointer<QMap<QString, QColor>>::create(QMap<QString, QColor>{{QStringLiteral("aud"), Qt::red}}));
+    view.setAverageActivation(QSharedPointer<QMap<QString, bool>>::create(QMap<QString, bool>{{QStringLiteral("aud"), true}}));
+    view.setSingleAverageColor(Qt::black);
+    QCOMPARE(view.getAverageColor()->value(QStringLiteral("aud")), QColor(Qt::black));
+    QVERIFY(view.getAverageActivation()->value(QStringLiteral("aud")));
+
+    auto* scene = view.findChild<QGraphicsScene*>();
+    QVERIFY(scene != nullptr);
+    QCOMPARE(scene->items().size(), 2);
+    // Recolouring keeps the channel items (name, number and layout position) intact
+    QStringList names;
+    for (QGraphicsItem* item : scene->items()) {
+        auto* averageItem = static_cast<AverageSceneItem*>(item);
+        names << averageItem->m_sChannelName;
+        QCOMPARE(std::abs(averageItem->pos().x()), 160.0);
+    }
+    names.sort();
+    QCOMPARE(names, (QStringList{QStringLiteral("MEG0111"), QStringLiteral("MEG0113")}));
+
+    // Item at x = -160 (MEG0111) and x = +160 (MEG0113), 120 x 60 each: 0.8 of full scale is 24 px off centre
+    QImage image(480, 120, QImage::Format_RGB32);
+    image.fill(Qt::white);
+    {
+        QPainter painter(&image);
+        scene->render(&painter, QRectF(0, 0, 480, 120), QRectF(-240, -60, 480, 120));
+    }
+    auto darkAt = [&image](int x, int y) {
+        return qGray(image.pixel(x, y)) < 160;
+    };
+    auto curveRow = [&darkAt](int x) {
+        for (int y = 0; y < 120; ++y) {
+            if (y != 60 && darkAt(x, y) && !darkAt(x, 59) && !darkAt(x, 61)) {
+                return y;
+            }
+        }
+        return -1;
+    };
+    // After the stimulus (right half of each item) the curves sit 24 px above / below the centre line
+    QVERIFY2(std::abs(curveRow(80 + 40) - (60 - 24)) <= 2, qPrintable(QString::number(curveRow(120))));
+    QVERIFY2(std::abs(curveRow(400 + 40) - (60 + 24)) <= 2, qPrintable(QString::number(curveRow(440))));
+
+    const QString shot = QDir::temp().filePath(QStringLiteral("test_disp_viewers2_average_layout.svg"));
+    view.takeScreenshot(shot);
+    QVERIFY(QFile::exists(shot));
+    QFile::remove(shot);
+    view.clearView();
 }
 
 //=============================================================================================================

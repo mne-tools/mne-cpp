@@ -175,6 +175,5 @@ void AverageScene::setSignalItemColor(const QColor& signalColor)
         }
     }
 
-    repaintItems(items);
     this->update();
 }
