@@ -54,6 +54,9 @@
 #include <fiff/fiff_coord_trans.h>
 #include <fiff/fiff_evoked_set.h>
 #include <fiff/fiff_dig_point.h>
+#include <fiff/fiff_named_matrix.h>
+#include <fiff/fiff_proj.h>
+#include <dsp/filterkernel.h>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -77,6 +80,7 @@
 
 using namespace DISPLIB;
 using namespace FIFFLIB;
+using UTILSLIB::FilterKernel;
 using Eigen::MatrixXd;
 
 namespace
@@ -251,6 +255,7 @@ private slots:
      * Verifies RtFiffRawViewModel metadata, ring-buffer data flow, selection, freeze, and trigger state.
      */
     void rtFiffRawViewModel_dataFlow();
+    void rtFiffRawViewModel_projectionWrapFilterAndRoles();
 
     //=========================================================================================================
     /**
@@ -771,6 +776,110 @@ void TestDispViewers2::rtFiffRawViewModel_dataFlow()
     QVERIFY(!model.getDetectedTriggers().isEmpty());
 
     QApplication::processEvents();
+}
+
+//=============================================================================================================
+
+void TestDispViewers2::rtFiffRawViewModel_projectionWrapFilterAndRoles()
+{
+    RtFiffRawViewModel model;
+    auto info = createBrowserTestInfo();
+    info->bads.clear();
+    model.setFiffInfo(info);
+    model.setSamplingInfo(100.0f, 1, true);
+
+    // An active projector removing the common mode of the three MEG channels
+    Eigen::MatrixXd vec(1, 3);
+    vec.setConstant(1.0 / std::sqrt(3.0));
+    FiffNamedMatrix vectors(1, 3, QStringList(), info->ch_names.mid(0, 3), vec);
+    model.updateProjection({FiffProj(FIFFV_PROJ_ITEM_FIELD, true, QStringLiteral("common"), vectors)});
+    model.updateCompensator(0);
+
+    // 3 blocks of 40 into a 100-sample buffer: the third fills the last 20 columns and is then written again from
+    // column 0, so column 0 holds sample 80
+    Eigen::MatrixXd block(4, 40);
+    for (int b = 0; b < 3; ++b) {
+        for (int s = 0; s < 40; ++s) {
+            const double t = 40 * b + s;
+            block(0, s) = 5.0 + std::sin(0.1 * t);
+            block(1, s) = 5.0;
+            block(2, s) = 5.0 - std::sin(0.1 * t);
+            block(3, s) = (s == 7) ? 2.0 : 0.0;
+        }
+        model.addData({block});
+    }
+    QCOMPARE(model.getCurrentSampleIndex(), 40);
+    const Eigen::MatrixXd last = model.getLastBlock();
+    for (int s = 0; s < 40; ++s) {
+        const double d = std::sin(0.1 * (80 + s));
+        QVERIFY(std::fabs(last(0, s) - d) < 1e-12);
+        QVERIFY(std::fabs(last(1, s)) < 1e-12);
+        QVERIFY(std::fabs(last(2, s) + d) < 1e-12);
+        QCOMPARE(last(3, s), s == 7 ? 2.0 : 0.0);
+    }
+
+    // data(): name, row pointer into the buffer, bad flag, background
+    model.setBackgroundColor(Qt::darkGray);
+    QCOMPARE(model.data(model.index(3, 0)).toString(), QStringLiteral("STI014"));
+    const auto row = model.data(model.index(0, 1)).value<RowVectorPair>();
+    QCOMPARE(row.second, 100);
+    QVERIFY(std::fabs(row.first[10] - std::sin(0.1 * 90)) < 1e-12);
+    QCOMPARE(model.data(model.index(1, 2)).toBool(), false);
+    QCOMPARE(model.data(model.index(0, 0), Qt::BackgroundRole).value<QBrush>().color(), QColor(Qt::darkGray));
+    QVERIFY(!model.data(model.index(0, 0), Qt::ToolTipRole).isValid());
+    QCOMPARE(model.headerData(1, Qt::Horizontal).toString(), QStringLiteral("data plot"));
+    QCOMPARE(model.headerData(1, Qt::Horizontal, Qt::TextAlignmentRole).toInt(), static_cast<int>(Qt::AlignLeft));
+    QCOMPARE(model.headerData(2, Qt::Vertical).toString(), QStringLiteral("MEG0113"));
+    QVERIFY(!model.headerData(0, Qt::Horizontal, Qt::ToolTipRole).isValid());
+
+    // Freezing keeps serving the snapshot while new data arrives
+    model.toggleFreeze(QModelIndex());
+    model.addData({block * 0.0});
+    const auto frozen = model.data(model.index(0, 1)).value<RowVectorPair>();
+    QVERIFY(std::fabs(frozen.first[10] - std::sin(0.1 * 90)) < 1e-12);
+    model.toggleFreeze(QModelIndex());
+
+    // Real-time filtering: a 50-tap low-pass on the MEG channels only, a pass-through on STIM
+    model.setFilterChannelType(QStringLiteral("MEG"));
+    model.setFilter({FilterKernel(QStringLiteral("lp"), 0, 50, 0.2, 0.0, 0.05, 100.0, 0)});
+    model.setFilterActive(true);
+    Eigen::MatrixXd tone(4, 50);
+    for (int s = 0; s < 50; ++s) {
+        tone.col(s) << std::sin(0.2 * s), 0.0, 0.0, s % 5;
+    }
+    for (int b = 0; b < 4; ++b) {
+        model.addData({tone});
+    }
+    const Eigen::MatrixXd filtered = model.getLastBlock();
+    QVERIFY(filtered.allFinite());
+    QCOMPARE(filtered.row(3), tone.row(3));
+    // The active common-mode projector leaves 2/3 of the tone on channel 0 and -1/3 on channels 1 and 2; filtering is linear
+    QVERIFY(filtered.row(1).cwiseAbs().maxCoeff() > 0.1);
+    QVERIFY((filtered.row(1) - filtered.row(2)).cwiseAbs().maxCoeff() < 1e-12);
+    QVERIFY((filtered.row(0) + 2.0 * filtered.row(1)).cwiseAbs().maxCoeff() < 1e-12);
+    model.setFilterActive(false);
+    QCOMPARE(model.getLastBlock().row(3), tone.row(3));
+
+    // Default scale per channel kind, overridden by setScaling
+    QCOMPARE(model.getMaxValueFromRawViewModel(3), 5.0);
+    model.setScaling({{FIFF_UNIT_T, 2e-12f}, {FIFFV_STIM_CH, 3.0f}});
+    QCOMPARE(model.getMaxValueFromRawViewModel(0), static_cast<double>(2e-12f));
+    QCOMPARE(model.getMaxValueFromRawViewModel(3), 3.0);
+
+    model.distanceTimeSpacerChanged(0);
+    QCOMPARE(model.getNumberOfTimeSpacers(), 0);
+    model.distanceTimeSpacerChanged(250);
+    QCOMPARE(model.getNumberOfTimeSpacers(), 3);
+    model.resetTriggerCounter();
+
+    std::vector<int> added;
+    model.addEvent(1);
+    QVERIFY(model.getEventsToDisplay(0, 10).empty());
+    model.setEventCallbacks([&added](int s) { added.push_back(s); },
+                            [](int b, int e) { return std::vector<int>{b, e}; });
+    model.addEvent(42);
+    QCOMPARE(added, std::vector<int>{42});
+    QCOMPARE(model.getEventsToDisplay(3, 9), (std::vector<int>{3, 9}));
 }
 
 //=============================================================================================================
