@@ -7,12 +7,13 @@ sidebar_position: 2
 
 # Class List
 
-All 468 documented public classes in MNE-CPP, sorted alphabetically.
+All 502 documented public classes in MNE-CPP, sorted alphabetically.
 
 | Class | Library | Header |
 |-------|---------|--------|
 | [AbstractFormatReader](/docs/api/bids/abstract-format-reader) | BIDS Library | `bids/readers/bids_abstract_format_reader.h` |
 | [AbstractMetric](/docs/api/connectivity/abstract-metric) | Connectivity Library | `connectivity/metrics/abstractmetric.h` |
+| [AbstractTreeItem](/docs/api/disp3-d/abstract-tree-item) | 3D Display Library | `disp3D/model/items/abstracttreeitem.h` |
 | [AbstractView](/docs/api/disp/abstract-view) | Display Library | `disp/viewers/abstractview.h` |
 | [AcquiredPoints](/docs/api/utils/acquired-points) | Utilities Library | `utils/polhemus/acquired_points.h` |
 | [AnnotateAmplitudeParams](/docs/api/dsp/annotate-amplitude-params) | DSP Library | `dsp/annotate_artifact.h` |
@@ -38,6 +39,7 @@ All 468 documented public classes in MNE-CPP, sorted alphabetically.
 | [BadChannelsMaxwellParams](/docs/api/dsp/bad-channels-maxwell-params) | DSP Library | `dsp/bad_channels_maxwell.h` |
 | [BadChannelsMaxwellResult](/docs/api/dsp/bad-channels-maxwell-result) | DSP Library | `dsp/bad_channels_maxwell.h` |
 | [Bar](/docs/api/disp/bar) | Display Library | `disp/plots/bar.h` |
+| [BemTreeItem](/docs/api/disp3-d/bem-tree-item) | 3D Display Library | `disp3D/model/items/bemtreeitem.h` |
 | [BidsChannel](/docs/api/bids/bids-channel) | BIDS Library | `bids/bids_channel.h` |
 | [BidsCoordinateSystem](/docs/api/bids/bids-coordinate-system) | BIDS Library | `bids/bids_coordinate_system.h` |
 | [BidsDatasetDescription](/docs/api/bids/bids-dataset-description) | BIDS Library | `bids/bids_dataset_description.h` |
@@ -48,12 +50,18 @@ All 468 documented public classes in MNE-CPP, sorted alphabetically.
 | [BidsTsv](/docs/api/bids/bids-tsv) | BIDS Library | `bids/bids_tsv.h` |
 | [BidsView](/docs/api/disp/bids-view) | Display Library | `disp/viewers/bidsview.h` |
 | [BidsViewModel](/docs/api/disp/bids-view-model) | Display Library | `disp/viewers/helpers/bidsviewmodel.h` |
+| [BrainRenderer](/docs/api/disp3-d/brain-renderer) | 3D Display Library | `disp3D/view/brainrenderer.h` |
+| [BrainSurface](/docs/api/disp3-d/brain-surface) | 3D Display Library | `disp3D/renderable/brainsurface.h` |
+| [BrainTreeModel](/docs/api/disp3-d/brain-tree-model) | 3D Display Library | `disp3D/model/braintreemodel.h` |
+| [BrainView](/docs/api/disp3-d/brain-view) | 3D Display Library | `disp3D/view/brainview.h` |
 | [BrainVisionChannelInfo](/docs/api/bids/brain-vision-channel-info) | BIDS Library | `bids/readers/bids_brain_vision_reader.h` |
 | [BrainVisionMarker](/docs/api/bids/brain-vision-marker) | BIDS Library | `bids/readers/bids_brain_vision_reader.h` |
 | [BrainVisionReader](/docs/api/bids/brain-vision-reader) | BIDS Library | `bids/readers/bids_brain_vision_reader.h` |
 | [BridgedElectrodeParams](/docs/api/dsp/bridged-electrode-params) | DSP Library | `dsp/bridged_electrodes.h` |
 | [BridgedElectrodes](/docs/api/dsp/bridged-electrodes) | DSP Library | `dsp/bridged_electrodes.h` |
 | [ButterflyView](/docs/api/disp/butterfly-view) | Display Library | `disp/viewers/butterflyview.h` |
+| [CameraController](/docs/api/disp3-d/camera-controller) | 3D Display Library | `disp3D/input/cameracontroller.h` |
+| [CameraResult](/docs/api/disp3-d/camera-result) | 3D Display Library | `disp3D/input/cameracontroller.h` |
 | [ChannelDataModel](/docs/api/disp/channel-data-model) | Display Library | `disp/viewers/helpers/channeldatamodel.h` |
 | [ChannelDataView](/docs/api/disp/channel-data-view) | Display Library | `disp/viewers/channeldataview.h` |
 | [ChannelDerivation](/docs/api/utils/channel-derivation) | Utilities Library | `dsp/channel_derivation.h` |
@@ -84,15 +92,20 @@ All 468 documented public classes in MNE-CPP, sorted alphabetically.
 | [CrossCorrelation](/docs/api/connectivity/cross-correlation) | Connectivity Library | `connectivity/metrics/crosscorrelation.h` |
 | [Csd](/docs/api/utils/csd) | Utilities Library | `dsp/csd.h` |
 | [CsdResult](/docs/api/utils/csd-result) | Utilities Library | `dsp/csd.h` |
+| [DataLoader](/docs/api/disp3-d/data-loader) | 3D Display Library | `disp3D/core/dataloader.h` |
 | [DebiasedSquaredWeightedPhaseLagIndex](/docs/api/connectivity/debiased-squared-weighted-phase-lag-index) | Connectivity Library | `connectivity/metrics/debiasedsquaredweightedphaselagindex.h` |
 | [DecodingCsp](/docs/api/decoding/decoding-csp) | Decoding Library | `decoding/decoding_csp.h` |
 | [DecodingSpoc](/docs/api/decoding/decoding-spoc) | Decoding Library | `decoding/decoding_spoc.h` |
 | [DecodingSsd](/docs/api/decoding/decoding-ssd) | Decoding Library | `decoding/decoding_ssd.h` |
 | [DerivationRule](/docs/api/utils/derivation-rule) | Utilities Library | `dsp/channel_derivation.h` |
 | [DigitizedPoint](/docs/api/utils/digitized-point) | Utilities Library | `utils/polhemus/acquired_points.h` |
+| [DigitizerSetTreeItem](/docs/api/disp3-d/digitizer-set-tree-item) | 3D Display Library | `disp3D/model/items/digitizersettreeitem.h` |
+| [DigitizerTreeItem](/docs/api/disp3-d/digitizer-tree-item) | 3D Display Library | `disp3D/model/items/digitizertreeitem.h` |
 | [DipFitError](/docs/api/inv/dip-fit-error) | Inverse Library | `inv/hpi/inv_hpi_fit_data.h` |
 | [dipoleFitFuncsRec](/docs/api/inv/dipole-fit-funcs-rec) | Inverse Library | `inv/dipole_fit/inv_dipole_fit_data.h` |
 | [DipoleFitView](/docs/api/disp/dipole-fit-view) | Display Library | `disp/viewers/dipolefitview.h` |
+| [DipoleObject](/docs/api/disp3-d/dipole-object) | 3D Display Library | `disp3D/renderable/dipoleobject.h` |
+| [DipoleTreeItem](/docs/api/disp3-d/dipole-tree-item) | 3D Display Library | `disp3D/model/items/dipoletreeitem.h` |
 | [DirectedTransferFunction](/docs/api/connectivity/directed-transfer-function) | Connectivity Library | `connectivity/metrics/directed_transfer_function.h` |
 | [Dpss](/docs/api/utils/dpss) | Utilities Library | `dsp/dpss.h` |
 | [DpssResult](/docs/api/utils/dpss-result) | Utilities Library | `dsp/dpss.h` |
@@ -258,9 +271,11 @@ All 468 documented public classes in MNE-CPP, sorted alphabetically.
 | [LayoutScene](/docs/api/disp/layout-scene) | Display Library | `disp/viewers/helpers/layoutscene.h` |
 | [Linalg](/docs/api/math/linalg) | Math Library | `math/linalg.h` |
 | [LinePlot](/docs/api/disp/line-plot) | Display Library | `disp/plots/lineplot.h` |
+| [LiveMarker](/docs/api/disp3-d/live-marker) | 3D Display Library | `disp3D/view/brainview.h` |
 | [LofBadChannelParams](/docs/api/dsp/lof-bad-channel-params) | DSP Library | `dsp/bad_channels_lof.h` |
 | [MaxwellMoveCompParams](/docs/api/dsp/maxwell-move-comp-params) | DSP Library | `dsp/maxwell_movement_comp.h` |
 | [MaxwellMovementComp](/docs/api/dsp/maxwell-movement-comp) | DSP Library | `dsp/maxwell_movement_comp.h` |
+| [MeshFactory](/docs/api/disp3-d/mesh-factory) | 3D Display Library | `disp3D/geometry/meshfactory.h` |
 | [MinimumNormSettingsView](/docs/api/disp/minimum-norm-settings-view) | Display Library | `disp/viewers/minimumnormsettingsview.h` |
 | [MlIcaLabel](/docs/api/decoding/ml-ica-label) | Decoding Library | `decoding/decoding_ica_label.h` |
 | [MlModel](/docs/api/ml/ml-model) | Machine Learning Library | `ml/ml_model.h` |
@@ -364,11 +379,14 @@ All 468 documented public classes in MNE-CPP, sorted alphabetically.
 | [MultitaperTfr](/docs/api/dsp/multitaper-tfr) | DSP Library | `dsp/multitaper_tfr.h` |
 | [MultitaperTfrResult](/docs/api/dsp/multitaper-tfr-result) | DSP Library | `dsp/multitaper_tfr.h` |
 | [MultiView](/docs/api/disp/multi-view) | Display Library | `disp/viewers/multiview.h` |
+| [MultiViewLayout](/docs/api/disp3-d/multi-view-layout) | 3D Display Library | `disp3D/view/multiviewlayout.h` |
 | [MultiViewWindow](/docs/api/disp/multi-view-window) | Display Library | `disp/viewers/multiviewwindow.h` |
 | [MvarModel](/docs/api/connectivity/mvar-model) | Connectivity Library | `connectivity/metrics/mvar_model.h` |
 | [Network](/docs/api/connectivity/network) | Connectivity Library | `connectivity/network/network.h` |
 | [NetworkEdge](/docs/api/connectivity/network-edge) | Connectivity Library | `connectivity/network/networkedge.h` |
 | [NetworkNode](/docs/api/connectivity/network-node) | Connectivity Library | `connectivity/network/networknode.h` |
+| [NetworkObject](/docs/api/disp3-d/network-object) | 3D Display Library | `disp3D/renderable/networkobject.h` |
+| [NetworkTreeItem](/docs/api/disp3-d/network-tree-item) | 3D Display Library | `disp3D/model/items/networktreeitem.h` |
 | [Numerics](/docs/api/utils/numerics) | Utilities Library | `math/numerics.h` |
 | [OverviewBarWidget](/docs/api/disp/overview-bar-widget) | Display Library | `disp/viewers/helpers/overviewbarwidget.h` |
 | [Pair](/docs/api/inv/pair) | Inverse Library | `inv/rap_music/inv_rap_music.h` |
@@ -384,6 +402,7 @@ All 468 documented public classes in MNE-CPP, sorted alphabetically.
 | [PolhemusConnection](/docs/api/utils/polhemus-connection) | Utilities Library | `utils/polhemus/polhemus_connection.h` |
 | [PolhemusCoregistration](/docs/api/utils/polhemus-coregistration) | Utilities Library | `utils/polhemus/polhemus_coregistration.h` |
 | [PolhemusSerialConfig](/docs/api/utils/polhemus-serial-config) | Utilities Library | `utils/polhemus/polhemus_connection.h` |
+| [PolylineObject](/docs/api/disp3-d/polyline-object) | 3D Display Library | `disp3D/renderable/polylineobject.h` |
 | [ProcessingSettings](/docs/api/mne/processing-settings) | MNE Library | `mne/mne_process_description.h` |
 | [ProgressView](/docs/api/disp/progress-view) | Display Library | `disp/viewers/progressview.h` |
 | [ProjectorsView](/docs/api/disp/projectors-view) | Display Library | `disp/viewers/projectorsview.h` |
@@ -393,6 +412,8 @@ All 468 documented public classes in MNE-CPP, sorted alphabetically.
 | [PythonRunnerResult](/docs/api/utils/python-runner-result) | Utilities Library | `utils/python_runner.h` |
 | [PythonTestHelper](/docs/api/utils/python-test-helper) | Utilities Library | `utils/python_test_helper.h` |
 | [QuickControlView](/docs/api/disp/quick-control-view) | Display Library | `disp/viewers/quickcontrolview.h` |
+| [RayHit](/docs/api/disp3-d/ray-hit) | 3D Display Library | `disp3D/input/raypicker.h` |
+| [RayPicker](/docs/api/disp3-d/ray-picker) | 3D Display Library | `disp3D/input/raypicker.h` |
 | [RegionData](/docs/api/mne/region-data) | MNE Library | `mne/mne_forward_solution.h` |
 | [RegionDataOut](/docs/api/mne/region-data-out) | MNE Library | `mne/mne_forward_solution.h` |
 | [RegionMT](/docs/api/mne/region-mt) | MNE Library | `mne/mne_inverse_operator.h` |
@@ -417,8 +438,11 @@ All 468 documented public classes in MNE-CPP, sorted alphabetically.
 | [RtInvOpWorker](/docs/api/dsp/rt-inv-op-worker) | DSP Library | `dsp/rt/rt_inv_op.h` |
 | [RtNoise](/docs/api/dsp/rt-noise) | DSP Library | `dsp/rt/rt_noise.h` |
 | [RtNoiseWorker](/docs/api/dsp/rt-noise-worker) | DSP Library | `dsp/rt/rt_noise.h` |
+| [RtSensorDataController](/docs/api/disp3-d/rt-sensor-data-controller) | 3D Display Library | `disp3D/workers/rtsensordatacontroller.h` |
 | [RtSensorDataWorker](/docs/api/disp3-d/rt-sensor-data-worker) | 3D Display Library | `disp3D/workers/rtsensordataworker.h` |
 | [RtSensorInterpolationMatWorker](/docs/api/disp3-d/rt-sensor-interpolation-mat-worker) | 3D Display Library | `disp3D/workers/rtsensorinterpolationmatworker.h` |
+| [RtSensorStreamManager](/docs/api/disp3-d/rt-sensor-stream-manager) | 3D Display Library | `disp3D/scene/rtsensorstreammanager.h` |
+| [RtSourceDataController](/docs/api/disp3-d/rt-source-data-controller) | 3D Display Library | `disp3D/workers/rtsourcedatacontroller.h` |
 | [RtSourceDataWorker](/docs/api/disp3-d/rt-source-data-worker) | 3D Display Library | `disp3D/workers/rtsourcedataworker.h` |
 | [RtSourceInterpolationMatWorker](/docs/api/disp3-d/rt-source-interpolation-mat-worker) | 3D Display Library | `disp3D/workers/rtsourceinterpolationmatworker.h` |
 | [ScaleControl](/docs/api/disp/scale-control) | Display Library | `disp/viewers/helpers/scalecontrol.h` |
@@ -428,11 +452,16 @@ All 468 documented public classes in MNE-CPP, sorted alphabetically.
 | [SelectionItem](/docs/api/disp/selection-item) | Display Library | `disp/viewers/helpers/selectionsceneitem.h` |
 | [SelectionScene](/docs/api/disp/selection-scene) | Display Library | `disp/viewers/helpers/selectionscene.h` |
 | [SelectionSceneItem](/docs/api/disp/selection-scene-item) | Display Library | `disp/viewers/helpers/selectionsceneitem.h` |
+| [SensorFieldMapper](/docs/api/disp3-d/sensor-field-mapper) | 3D Display Library | `disp3D/scene/sensorfieldmapper.h` |
+| [SensorTreeItem](/docs/api/disp3-d/sensor-tree-item) | 3D Display Library | `disp3D/model/items/sensortreeitem.h` |
 | [SimplexAlgorithm](/docs/api/math/simplex-algorithm) | Math Library | `math/simplex_algorithm.h` |
 | [Simulate](/docs/api/dsp/simulate) | DSP Library | `dsp/simulate.h` |
 | [SimulateStcParams](/docs/api/dsp/simulate-stc-params) | DSP Library | `dsp/simulate.h` |
 | [SliceObject](/docs/api/disp3-d/slice-object) | 3D Display Library | `disp3D/renderable/sliceobject.h` |
+| [SourceEstimateManager](/docs/api/disp3-d/source-estimate-manager) | 3D Display Library | `disp3D/scene/sourceestimatemanager.h` |
+| [SourceEstimateOverlay](/docs/api/disp3-d/source-estimate-overlay) | 3D Display Library | `disp3D/renderable/sourceestimateoverlay.h` |
 | [SourceMorph](/docs/api/inv/source-morph) | Inverse Library | `inv/morph/source_morph.h` |
+| [SourceSpaceTreeItem](/docs/api/disp3-d/source-space-tree-item) | 3D Display Library | `disp3D/model/items/sourcespacetreeitem.h` |
 | [SpectogramInputData](/docs/api/utils/spectogram-input-data) | Utilities Library | `dsp/spectrogram.h` |
 | [Spectral](/docs/api/utils/spectral) | Utilities Library | `math/spectral.h` |
 | [Spectrogram](/docs/api/utils/spectrogram) | Utilities Library | `dsp/spectrogram.h` |
@@ -454,14 +483,17 @@ All 468 documented public classes in MNE-CPP, sorted alphabetically.
 | [StatsSourceMetrics](/docs/api/sts/stats-source-metrics) | Statistics Library | `sts/sts_source_metrics.h` |
 | [StatsTtest](/docs/api/sts/stats-ttest) | Statistics Library | `sts/sts_ttest.h` |
 | [StatsTtestResult](/docs/api/sts/stats-ttest-result) | Statistics Library | `sts/sts_ttest.h` |
+| [StcLoadingWorker](/docs/api/disp3-d/stc-loading-worker) | 3D Display Library | `disp3D/workers/stcloadingworker.h` |
 | [StimArtifact](/docs/api/dsp/stim-artifact) | DSP Library | `dsp/stim_artifact.h` |
 | [stream_info](/docs/api/lsl/stream_info) | LSL Library | `lsl/lsl_stream_info.h` |
 | [stream_inlet](/docs/api/lsl/stream_inlet) | LSL Library | `lsl/lsl_stream_inlet.h` |
 | [stream_outlet](/docs/api/lsl/stream_outlet) | LSL Library | `lsl/lsl_stream_outlet.h` |
 | [StsCovEstimators](/docs/api/sts/sts-cov-estimators) | Statistics Library | `sts/sts_cov_estimators.h` |
 | [Subject](/docs/api/utils/subject) | Utilities Library | `utils/generics/observerpattern.h` |
+| [SubView](/docs/api/disp3-d/sub-view) | 3D Display Library | `disp3D/core/viewstate.h` |
 | [SurfaceLaplacian](/docs/api/dsp/surface-laplacian) | DSP Library | `dsp/surface_laplacian.h` |
 | [SurfaceLaplacianResult](/docs/api/dsp/surface-laplacian-result) | DSP Library | `dsp/surface_laplacian.h` |
+| [SurfaceTreeItem](/docs/api/disp3-d/surface-tree-item) | 3D Display Library | `disp3D/model/items/surfacetreeitem.h` |
 | [TaperedSpectraInputData](/docs/api/utils/tapered-spectra-input-data) | Utilities Library | `math/spectral.h` |
 | [TFplot](/docs/api/disp/t-fplot) | Display Library | `disp/plots/tfplot.h` |
 | [TfSettingsView](/docs/api/disp/tf-settings-view) | Display Library | `disp/viewers/tfsettingsview.h` |
@@ -471,7 +503,9 @@ All 468 documented public classes in MNE-CPP, sorted alphabetically.
 | [TrapMusicDipole](/docs/api/inv/trap-music-dipole) | Inverse Library | `inv/rap_music/inv_trap_music.h` |
 | [TriggerDetectionView](/docs/api/disp/trigger-detection-view) | Display Library | `disp/viewers/triggerdetectionview.h` |
 | [UnbiasedSquaredPhaseLagIndex](/docs/api/connectivity/unbiased-squared-phase-lag-index) | Connectivity Library | `connectivity/metrics/unbiasedsquaredphaselagindex.h` |
+| [VertexData](/docs/api/disp3-d/vertex-data) | 3D Display Library | `disp3D/renderable/brainsurface.h` |
 | [VideoOverlay](/docs/api/disp3-d/video-overlay) | 3D Display Library | `disp3D/renderable/videooverlay.h` |
+| [ViewVisibilityProfile](/docs/api/disp3-d/view-visibility-profile) | 3D Display Library | `disp3D/core/viewstate.h` |
 | [VisualizationInfo](/docs/api/connectivity/visualization-info) | Connectivity Library | `connectivity/network/network.h` |
 | [Warp](/docs/api/math/warp) | Math Library | `math/warp.h` |
 | [WeightedPhaseLagIndex](/docs/api/connectivity/weighted-phase-lag-index) | Connectivity Library | `connectivity/metrics/weightedphaselagindex.h` |

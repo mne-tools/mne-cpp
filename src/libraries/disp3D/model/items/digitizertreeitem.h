@@ -30,6 +30,9 @@
 #include <QVector3D>
 #include <QVector>
 
+namespace DISP3DLIB
+{
+
 //=============================================================================================================
 /**
  * DigitizerTreeItem represents a group of digitizer points of the same category
@@ -114,5 +117,7 @@ private:
     QStringList m_names;            /**< Display names for individual points. */
     float m_scale;                  /**< Radius/size for rendering. */
 };
+
+} // namespace DISP3DLIB
 
 #endif // DIGITIZERTREEITEM_H

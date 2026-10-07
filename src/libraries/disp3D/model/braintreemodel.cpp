@@ -25,6 +25,9 @@
 #include <inv/dipole_fit/inv_ecd_set.h>
 #include <mne/mne_hemisphere.h>
 
+namespace DISP3DLIB
+{
+
 BrainTreeModel::BrainTreeModel(QObject* parent)
 : QStandardItemModel(parent)
 {
@@ -235,3 +238,5 @@ NetworkTreeItem* BrainTreeModel::addNetwork(const CONNECTIVITYLIB::Network& netw
 
     return item;
 }
+
+} // namespace DISP3DLIB

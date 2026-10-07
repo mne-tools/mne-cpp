@@ -69,6 +69,7 @@ using namespace Eigen;
 using namespace UTILSLIB;
 using namespace MNELIB;
 using namespace FSLIB;
+using namespace DISP3DLIB;
 
 //=============================================================================================================
 // MAIN

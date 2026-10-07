@@ -44,6 +44,9 @@
 #include <memory>
 #include <vector>
 
+namespace DISP3DLIB
+{
+
 class BrainSurface;
 
 //=============================================================================================================
@@ -355,5 +358,7 @@ private:
     float m_megVmax = 0.0f; /**< Colour-map normalisation: max |mapped| at peak-GFP time for MEG. */
     float m_eegVmax = 0.0f; /**< Colour-map normalisation: max |mapped| at peak-GFP time for EEG. */
 };
+
+} // namespace DISP3DLIB
 
 #endif // SENSORFIELDMAPPER_H

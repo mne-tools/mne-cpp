@@ -1,0 +1,110 @@
+---
+id: ray-picker
+title: "DISP3DLIB::RayPicker"
+sidebar_label: RayPicker
+sidebar_position: 35
+---
+
+# RayPicker
+
+**Namespace:** `DISP3DLIB` &nbsp;·&nbsp; **Library:** 3D Display Library
+
+`#include <disp3D/raypicker.h>`
+
+```cpp
+class DISP3DLIB::RayPicker
+```
+
+Stateless ray-picking utility.
+
+Given camera matrices, a screen position, and the scene contents, this class casts a ray and returns a [`RayHit`](/docs/api/disp3-d/ray-hit) describing the closest intersection. It has no state of its own — hover tracking is handled by the caller.
+
+Ray casting and intersection testing.
+
+---
+
+## Static Methods
+
+### unproject(screenPos, paneRect, pvm, rayOrigin, rayDir)
+
+Unproject a screen position to a world-space ray.
+
+**Parameters:**
+
+- **screenPos** : *const QPoint &*
+  2D cursor position (widget coords).
+
+- **paneRect** : *const QRect &*
+  Rectangle of the active viewport pane.
+
+- **pvm** : *const QMatrix4x4 &*
+  Combined projection × view × model matrix.
+
+- **rayOrigin** : *QVector3D &*
+  Ray origin (world space).
+
+- **rayDir** : *QVector3D &*
+  Ray direction (normalised, world space).
+
+**Returns:**
+
+- *bool* — True if the unproject succeeded.
+
+---
+
+### pick(rayOrigin, rayDir, subView, surfaces, itemSurfaceMap, itemDipoleMap)
+
+Cast a ray against all surfaces in the scene.
+
+**Parameters:**
+
+- **rayOrigin** : *const QVector3D &*
+  World-space ray origin.
+
+- **rayDir** : *const QVector3D &*
+  World-space ray direction (normalised).
+
+- **subView** : *const [SubView](/docs/api/disp3-d/sub-view) &*
+  Active [`SubView`](/docs/api/disp3-d/sub-view) (for visibility / surface type filtering).
+
+- **surfaces** : *const QMap&lt; QString, std::shared_ptr&lt; [BrainSurface](/docs/api/disp3-d/brain-surface) &gt; &gt; &*
+  Map of surface key → [`BrainSurface`](/docs/api/disp3-d/brain-surface).
+
+- **itemSurfaceMap** : *const QMap&lt; const QStandardItem *, std::shared_ptr&lt; [BrainSurface](/docs/api/disp3-d/brain-surface) &gt; &gt; &*
+  Map of tree item → [`BrainSurface`](/docs/api/disp3-d/brain-surface) (for reverse lookup).
+
+- **itemDipoleMap** : *const QMap&lt; const QStandardItem *, std::shared_ptr&lt; [DipoleObject](/docs/api/disp3-d/dipole-object) &gt; &gt; &*
+  Map of tree item → [`DipoleObject`](/docs/api/disp3-d/dipole-object).
+
+**Returns:**
+
+- *[RayHit](/docs/api/disp3-d/ray-hit)* — [`RayHit`](/docs/api/disp3-d/ray-hit) for the closest hit.
+
+---
+
+### buildLabel(result, itemSurfaceMap, surfaces)
+
+Build a display label from a [`RayHit`](/docs/api/disp3-d/ray-hit).
+
+This examines the surface key, annotation data, and item type to produce a human-readable hover label.
+
+**Parameters:**
+
+- **result** : *const [RayHit](/docs/api/disp3-d/ray-hit) &*
+  [`RayHit`](/docs/api/disp3-d/ray-hit) from `pick()`.
+
+- **itemSurfaceMap** : *const QMap&lt; const QStandardItem *, std::shared_ptr&lt; [BrainSurface](/docs/api/disp3-d/brain-surface) &gt; &gt; &*
+  Map for reverse item → surface lookup.
+
+- **surfaces** : *const QMap&lt; QString, std::shared_ptr&lt; [BrainSurface](/docs/api/disp3-d/brain-surface) &gt; &gt; &*
+  FsSurface map for key-based lookup.
+
+**Returns:**
+
+- *QString* — Display label string.
+
+---
+
+## Authors of this file
+
+- Christoph Dinh &lt;christoph.dinh@mne-cpp.org&gt;

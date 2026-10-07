@@ -20,6 +20,9 @@
 
 #include <set>
 
+namespace DISP3DLIB
+{
+
 namespace
 {
 uint32_t withAlpha(uint32_t color, uint32_t alpha)
@@ -867,3 +870,5 @@ void BrainSurface::setSelectedVertexRange(int start, int count)
     m_selectedVertexCount = count;
     updateVertexColors();
 }
+
+} // namespace DISP3DLIB

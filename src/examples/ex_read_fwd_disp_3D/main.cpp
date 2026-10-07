@@ -41,6 +41,7 @@ using namespace MNELIB;
 using namespace MNELIB;
 using namespace UTILSLIB;
 using namespace FSLIB;
+using namespace DISP3DLIB;
 
 //=============================================================================================================
 // MAIN

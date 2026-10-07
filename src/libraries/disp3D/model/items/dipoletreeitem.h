@@ -9,7 +9,7 @@
  * @date     March 2026
  * @brief    Tree item wrapping a fitted @ref INVLIB::InvEcdSet of equivalent current dipoles.
  *
- * Each dipole becomes one instance in the @ref DipoleObject arrow
+ * Each dipole becomes one instance in the @ref DISP3DLIB::DipoleObject arrow
  * mesh: position drives the instance translation, orientation the
  * rotation, goodness-of-fit the colour mapped through the active
  * dipole colormap. Toggling visibility on this item simply hides
@@ -28,6 +28,9 @@
 #include "abstracttreeitem.h"
 #include <inv/dipole_fit/inv_ecd_set.h>
 
+namespace DISP3DLIB
+{
+
 /**
  * @brief Tree item representing a set of fitted dipoles in the 3-D scene hierarchy.
  */
@@ -42,5 +45,7 @@ public:
 private:
     INVLIB::InvEcdSet m_ecdSet;
 };
+
+} // namespace DISP3DLIB
 
 #endif // DIPOLETREEITEM_H

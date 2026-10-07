@@ -37,6 +37,8 @@
 
 #include <Eigen/Core>
 
+using namespace DISP3DLIB;
+
 //=============================================================================================================
 /**
  * @brief Tests for BrainSurface creation, geometry, and MeshFactory primitives.

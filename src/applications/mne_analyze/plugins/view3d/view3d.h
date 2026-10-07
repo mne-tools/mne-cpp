@@ -44,11 +44,14 @@ class AbstractModel;
 class DipoleFitModel;
 }
 
+namespace DISP3DLIB
+{
 class BrainView;
 class BrainTreeModel;
 class BemTreeItem;
 class DigitizerSetTreeItem;
 class DipoleTreeItem;
+}
 
 namespace DISPLIB
 {
@@ -165,7 +168,7 @@ private:
      *
      * @param[in] pModel   new 3D model to be emitted.
      */
-    void new3DModel(QSharedPointer<BrainTreeModel> pModel);
+    void new3DModel(QSharedPointer<DISP3DLIB::BrainTreeModel> pModel);
 
     //=========================================================================================================
     /**
@@ -202,10 +205,10 @@ private:
 
     int m_iFiducial; /**< Currently selected fiducial. */
 
-    QSharedPointer<BrainTreeModel> m_p3DModel; /**< The 3D model data. */
-    BemTreeItem* m_pBemTreeCoreg;              /**< TThe BEM head model of the coregistration plugin. */
+    QSharedPointer<DISP3DLIB::BrainTreeModel> m_p3DModel; /**< The 3D model data. */
+    DISP3DLIB::BemTreeItem* m_pBemTreeCoreg;              /**< TThe BEM head model of the coregistration plugin. */
 
-    BrainView* m_pView3D;                     /**< The Disp3D view. */
+    DISP3DLIB::BrainView* m_pView3D;          /**< The Disp3D view. */
     DISPLIB::Control3DView* m_pControl3DView; /**< The 3D Control view. */
 
     bool m_bPickingActivated; /**< If Picking is activated*/

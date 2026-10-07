@@ -1,0 +1,105 @@
+---
+id: dipole-object
+title: "DISP3DLIB::DipoleObject"
+sidebar_label: DipoleObject
+sidebar_position: 26
+---
+
+# DipoleObject
+
+**Namespace:** `DISP3DLIB` &nbsp;·&nbsp; **Library:** 3D Display Library
+
+`#include <disp3D/dipoleobject.h>`
+
+```cpp
+class DISP3DLIB::DipoleObject
+```
+
+Renderable dipole object that builds instanced arrow geometry from an [InvEcdSet](/docs/api/inv/inv-ecd-set) and manages GPU buffers for QRhi-based rendering.
+
+Renderable dipole arrow set with instanced GPU rendering for QRhi.
+
+---
+
+## Public Methods
+
+### DipoleObject()
+
+---
+
+### ~DipoleObject()
+
+---
+
+### load(ecdSet)
+
+---
+
+### applyTransform(trans)
+
+---
+
+### updateBuffers(rhi, u)
+
+---
+
+### vertexBuffer()
+
+---
+
+### indexBuffer()
+
+---
+
+### instanceBuffer()
+
+---
+
+### indexCount()
+
+---
+
+### instanceCount()
+
+---
+
+### isVisible()
+
+---
+
+### setVisible(visible)
+
+---
+
+### debugFirstDipolePosition()
+
+---
+
+### setSelected(index, selected)
+
+---
+
+### intersect(rayOrigin, rayDir, dist)
+
+Test ray intersection with dipoles.
+
+**Parameters:**
+
+- **rayOrigin** : *const QVector3D &*
+  Ray origin in world space.
+
+- **rayDir** : *const QVector3D &*
+  Ray direction (normalized).
+
+- **dist** : *float &*
+  Distance to intersection.
+
+**Returns:**
+
+- *int* — Index of intersected dipole, or -1 if none.
+
+---
+
+## Authors of this file
+
+- Christoph Dinh &lt;christoph.dinh@mne-cpp.org&gt;

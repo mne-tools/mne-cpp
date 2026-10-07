@@ -16,6 +16,9 @@
 
 #include "sensortreeitem.h"
 
+namespace DISP3DLIB
+{
+
 SensorTreeItem::SensorTreeItem(const QString& text, const QVector3D& pos, const QColor& color, float scale, int type)
 : AbstractTreeItem(text, type)
 , m_pos(pos)
@@ -49,3 +52,5 @@ bool SensorTreeItem::hasOrientation() const
 {
     return m_hasOrientation;
 }
+
+} // namespace DISP3DLIB

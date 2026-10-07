@@ -1,0 +1,490 @@
+---
+id: brain-renderer
+title: "DISP3DLIB::BrainRenderer"
+sidebar_label: BrainRenderer
+sidebar_position: 17
+---
+
+# BrainRenderer
+
+**Namespace:** `DISP3DLIB` &nbsp;·&nbsp; **Library:** 3D Display Library
+
+`#include <disp3D/brainrenderer.h>`
+
+```cpp
+class DISP3DLIB::BrainRenderer
+```
+
+[`BrainRenderer`](/docs/api/disp3-d/brain-renderer) handles the low-level RHI rendering logic, managing pipelines, shaders, and draw calls for brain surfaces.
+
+Qt RHI-based 3-D renderer managing scene objects, lighting, camera, and render pipeline for brain visualization.
+
+---
+
+## Public Methods
+
+### BrainRenderer()
+
+Default Constructor.
+
+---
+
+### ~BrainRenderer()
+
+Destructor.
+
+---
+
+### initialize(rhi, rp, sampleCount)
+
+Initialize resources (shaders, pipelines) for the given RHI and render pass.
+
+Ensures pipelines for all supported modes are created.
+
+**Parameters:**
+
+- **rhi** : *QRhi **
+  Pointer to QRhi instance.
+
+- **rp** : *QRhiRenderPassDescriptor **
+  Render pass descriptor.
+
+- **sampleCount** : *int*
+  MSAA sample count.
+
+---
+
+### ensureRenderTargets(rhi, colorTex, pixelSize)
+
+Create the dual render-target pair for multi-pass rendering.
+
+Both render targets share the same color texture and depth-stencil buffer but differ in their load/store flags:
+m_rtClear: clears color+depth on beginPass (first pass)
+
+
+m_rtPreserve: preserves previous output (passes 2+)
+
+Qt bakes these flags into native resources at create() time, so calling setFlags() dynamically does NOT work (especially on WebGL). This is the validated pattern from test_wasm_multi_pass.
+
+**Parameters:**
+
+- **rhi** : *QRhi **
+  QRhi instance.
+
+- **colorTex** : *QRhiTexture **
+  Color texture (owned by QRhiWidget or caller).
+
+- **pixelSize** : *const QSize &*
+  Render target dimensions.
+
+---
+
+### rtClear()
+
+**Returns:**
+
+- *QRhiRenderTarget ** — The clearing render target (pass 1).
+
+---
+
+### rtPreserve()
+
+**Returns:**
+
+- *QRhiRenderTarget ** — The preserving render target (passes 2+).
+
+---
+
+### beginFrame(cb)
+
+Begin the first render pass of a frame.
+
+Clears color and depth.
+
+**Parameters:**
+
+- **cb** : *QRhiCommandBuffer **
+  Command buffer to record to.
+
+---
+
+### beginPreservingPass(cb)
+
+Begin an additional render pass that preserves previous output.
+
+Uses the internal preserving render target (m_rtPreserve).
+
+**Parameters:**
+
+- **cb** : *QRhiCommandBuffer **
+  Command buffer.
+
+---
+
+### updateSceneUniforms(rhi, data)
+
+Set uniforms that are shared for the entire frame.
+
+**Parameters:**
+
+- **rhi** : *QRhi **
+  QRhi instance that owns the uniform buffers.
+
+- **data** : *const SceneData &*
+  Scene uniforms (MVP, light, etc).
+
+---
+
+### renderSurface(cb, rhi, data, surface, mode)
+
+Render a single surface.
+
+Must be called between beginFrame/beginPreservingPass and endPass.
+
+**Parameters:**
+
+- **cb** : *QRhiCommandBuffer **
+  Command buffer.
+
+- **rhi** : *QRhi **
+  QRhi pointer.
+
+- **data** : *const SceneData &*
+  Scene uniforms (MVP, light, etc).
+
+- **surface** : *[BrainSurface](/docs/api/disp3-d/brain-surface) **
+  Pointer to surface to draw.
+
+- **mode** : *ShaderMode*
+  Shader mode to use for this surface.
+
+---
+
+### prepareSurfaceDraw(u, data, surface)
+
+Upload uniform data for a surface into a shared resource batch.
+
+This is the batched equivalent of the first half of `renderSurface()`. Call once per surface, then submit the batch with cb-&gt;resourceUpdate(), and finally call `issueSurfaceDraw()` for each surface.
+
+**Parameters:**
+
+- **u** : *QRhiResourceUpdateBatch **
+  Shared resource update batch.
+
+- **data** : *const SceneData &*
+  Scene uniforms (MVP, light, etc).
+
+- **surface** : *[BrainSurface](/docs/api/disp3-d/brain-surface) **
+  Pointer to surface.
+
+**Returns:**
+
+- *int* — Uniform buffer offset for this draw, or -1 on failure.
+
+---
+
+### issueSurfaceDraw(cb, surface, mode, uniformOffset)
+
+Issue draw commands for a surface using a pre-computed uniform offset.
+
+Call after cb-&gt;resourceUpdate() has been submitted with the batch from `prepareSurfaceDraw()`. Does not create resource batches or modify viewport/scissor state.
+
+**Parameters:**
+
+- **cb** : *QRhiCommandBuffer **
+  Command buffer.
+
+- **surface** : *[BrainSurface](/docs/api/disp3-d/brain-surface) **
+  Pointer to surface to draw.
+
+- **mode** : *ShaderMode*
+  Shader mode.
+
+- **uniformOffset** : *int*
+  Offset returned by `prepareSurfaceDraw()`.
+
+---
+
+### prepareMergedSurfaces(rhi, u, surfaces, groupName)
+
+Prepare merged brain surface geometry for single-drawIndexed rendering.
+
+Call BEFORE `beginFrame()` with a pre-upload resource batch.
+
+Uses dirty-flag caching: geometry is only rebuilt when the surface list changes (add/remove/visibility toggle). Per-vertex color updates (STC animation) only re-upload the color channel.
+
+**Parameters:**
+
+- **rhi** : *QRhi **
+  QRhi pointer.
+
+- **u** : *QRhiResourceUpdateBatch **
+  Resource update batch (pre-render uploads).
+
+- **surfaces** : *const QVector&lt; [BrainSurface](/docs/api/disp3-d/brain-surface) * &gt; &*
+  Brain surfaces to merge.
+
+- **groupName** : *const QString &*
+  Category name (e.g. "brain", "bem", "srcsp").
+
+---
+
+### invalidateMergedGroup(groupName)
+
+Mark a merged group as dirty so it is rebuilt on the next prepareMergedSurfaces call.
+
+Call when surfaces are added/removed or visibility changes.
+
+**Parameters:**
+
+- **groupName** : *const QString &*
+  Category name to invalidate.
+
+---
+
+### hasMergedContent(groupName)
+
+Check if a merged group has drawable geometry (indexCount &gt; 0).
+
+Use before `beginPreservingPass()` to avoid empty render passes which can clear the framebuffer on some WebGL implementations.
+
+**Parameters:**
+
+- **groupName** : *const QString &*
+  Category name to check.
+
+**Returns:**
+
+- *bool* — true if the group exists and has indices to draw.
+
+---
+
+### drawMergedSurfaces(cb, rhi, data, mode, groupName)
+
+Draw previously prepared merged surfaces in a single drawIndexed.
+
+Call between `beginFrame()`/beginPreservingPass() and `endPass()`.
+
+**Parameters:**
+
+- **cb** : *QRhiCommandBuffer **
+  Command buffer.
+
+- **rhi** : *QRhi **
+  QRhi pointer.
+
+- **data** : *const SceneData &*
+  Scene uniforms.
+
+- **mode** : *ShaderMode*
+  Shader mode.
+
+- **groupName** : *const QString &*
+  Name of the merged surface group to draw.
+
+---
+
+### renderDipoles(cb, rhi, data, dipoles)
+
+Render dipoles using instanced rendering.
+
+**Parameters:**
+
+- **cb** : *QRhiCommandBuffer **
+  Command buffer.
+
+- **rhi** : *QRhi **
+  QRhi pointer.
+
+- **data** : *const SceneData &*
+  Scene uniforms.
+
+- **dipoles** : *[DipoleObject](/docs/api/disp3-d/dipole-object) **
+  Pointer to [`DipoleObject`](/docs/api/disp3-d/dipole-object).
+
+---
+
+### renderNetwork(cb, rhi, data, network)
+
+Render a connectivity network using instanced rendering.
+
+Renders both node spheres and edge cylinders as two draw calls.
+
+**Parameters:**
+
+- **cb** : *QRhiCommandBuffer **
+  Command buffer.
+
+- **rhi** : *QRhi **
+  QRhi pointer.
+
+- **data** : *const SceneData &*
+  Scene uniforms.
+
+- **network** : *[NetworkObject](/docs/api/disp3-d/network-object) **
+  Pointer to [`NetworkObject`](/docs/api/disp3-d/network-object).
+
+---
+
+### renderPolyline(cb, rhi, data, polyline)
+
+Render a polyline as connected segments.
+
+**Parameters:**
+
+- **cb** : *QRhiCommandBuffer **
+  Command buffer.
+
+- **rhi** : *QRhi **
+  QRhi pointer.
+
+- **data** : *const SceneData &*
+  Scene uniforms.
+
+- **polyline** : *[PolylineObject](/docs/api/disp3-d/polyline-object) **
+  Pointer to [`PolylineObject`](/docs/api/disp3-d/polyline-object).
+
+---
+
+### prepareVideoOverlay(rhi, u, overlay)
+
+Prepare live video overlay GPU resources and upload the latest frame.
+
+Must be called before a render pass starts. Texture uploads require a blit encoder on Metal and must not be recorded while a render encoder is active.
+
+**Parameters:**
+
+- **rhi** : *QRhi **
+  QRhi pointer.
+
+- **u** : *QRhiResourceUpdateBatch **
+  Resource update batch owned by the caller.
+
+- **overlay** : *[VideoOverlay](/docs/api/disp3-d/video-overlay) **
+  Pointer to [`VideoOverlay`](/docs/api/disp3-d/video-overlay); ignored when null/disabled.
+
+---
+
+### renderVideoOverlay(cb, rhi, data, overlay)
+
+Render a live video overlay as a camera-facing textured quad.
+
+Always drawn last (depth test disabled) so the cut-out sits on top of the head surface at the current focus position.
+
+**Parameters:**
+
+- **cb** : *QRhiCommandBuffer **
+  Command buffer (must be inside a render pass).
+
+- **rhi** : *QRhi **
+  QRhi pointer.
+
+- **data** : *const SceneData &*
+  Scene uniforms (MVP, camera position).
+
+- **overlay** : *[VideoOverlay](/docs/api/disp3-d/video-overlay) **
+  Pointer to [`VideoOverlay`](/docs/api/disp3-d/video-overlay); ignored when null/disabled.
+
+---
+
+### renderVideoOverlayOnSurface(cb, rhi, data, overlay, surface)
+
+Render a live video overlay projected onto an existing surface mesh.
+
+**Parameters:**
+
+- **cb** : *QRhiCommandBuffer **
+  Command buffer (must be inside a render pass).
+
+- **rhi** : *QRhi **
+  QRhi pointer.
+
+- **data** : *const SceneData &*
+  Scene uniforms (MVP, camera position).
+
+- **overlay** : *[VideoOverlay](/docs/api/disp3-d/video-overlay) **
+  Pointer to [`VideoOverlay`](/docs/api/disp3-d/video-overlay); ignored when null/disabled.
+
+- **surface** : *[BrainSurface](/docs/api/disp3-d/brain-surface) **
+  Target surface mesh (typically scalp/head).
+
+---
+
+### prepareSlice(rhi, u, slice, slotIndex)
+
+Prepare MRI slice GPU resources and upload texture data.
+
+Must be called before a render pass starts. Creates the slice pipeline lazily on first use and uploads the slice texture.
+
+**Parameters:**
+
+- **rhi** : *QRhi **
+  QRhi pointer.
+
+- **u** : *QRhiResourceUpdateBatch **
+  Resource update batch owned by the caller.
+
+- **slice** : *[SliceObject](/docs/api/disp3-d/slice-object) **
+  Pointer to [`SliceObject`](/docs/api/disp3-d/slice-object); ignored when null.
+
+- **slotIndex** : *int*
+  Slot index (0=axial, 1=coronal, 2=sagittal).
+
+---
+
+### prepareSliceDraw(u, data, slotIndex)
+
+Upload uniform data for an MRI slice into a shared resource batch.
+
+Call once per visible slice, then submit the batch with cb-&gt;resourceUpdate(), and finally call `issueSliceDraw()` for each slice.
+
+**Parameters:**
+
+- **u** : *QRhiResourceUpdateBatch **
+  Shared resource update batch.
+
+- **data** : *const SceneData &*
+  Scene uniforms (MVP, camera position).
+
+- **slotIndex** : *int*
+  Slot index (0=axial, 1=coronal, 2=sagittal).
+
+**Returns:**
+
+- *int* — Uniform buffer offset for this draw, or -1 on failure.
+
+---
+
+### issueSliceDraw(cb, slotIndex, uniformOffset)
+
+Issue draw commands for a prepared MRI slice.
+
+Call after cb-&gt;resourceUpdate() has been submitted with the batch from `prepareSliceDraw()`. Does not create resource batches.
+
+**Parameters:**
+
+- **cb** : *QRhiCommandBuffer **
+  Command buffer (must be inside a render pass).
+
+- **slotIndex** : *int*
+  Slot index matching the prepareSliceDraw call.
+
+- **uniformOffset** : *int*
+  Offset returned by `prepareSliceDraw()`.
+
+---
+
+### endPass(cb)
+
+End any render pass (clearing or preserving).
+
+**Parameters:**
+
+- **cb** : *QRhiCommandBuffer **
+  Command buffer.
+
+---
+
+## Authors of this file
+
+- Christoph Dinh &lt;christoph.dinh@mne-cpp.org&gt;

@@ -30,6 +30,9 @@
 #include <QVector3D>
 #include <QMatrix4x4>
 
+namespace DISP3DLIB
+{
+
 /**
  * @brief Tree item representing MEG or EEG sensor positions in the 3-D scene hierarchy.
  */
@@ -72,5 +75,7 @@ private:
     QMatrix4x4 m_orientation; /**< Coil orientation (3x3 rotation in 4x4). */
     bool m_hasOrientation = false;
 };
+
+} // namespace DISP3DLIB
 
 #endif // SENSORTREEITEM_H

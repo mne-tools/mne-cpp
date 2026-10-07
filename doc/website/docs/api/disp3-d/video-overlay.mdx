@@ -19,7 +19,7 @@ Camera-facing textured quad rendered at a focus point in the 3-D scene.
 
 The overlay displays any live RGB/video frame "as a small cut-out view" on top of the 3-D scene. It is a billboarded square positioned at `focusPosition` with side length `sizeMeters`, textured with the latest video frame.
 
-This class is a passive data holder: `BrainRenderer` owns the GPU resources (vertex buffer, texture, sampler, pipeline) and reads from here each frame.
+This class is a passive data holder: [`BrainRenderer`](/docs/api/disp3-d/brain-renderer) owns the GPU resources (vertex buffer, texture, sampler, pipeline) and reads from here each frame.
 
 ```cpp title="src/examples/ex_disp3d_scene/main.cpp"
 VideoOverlay overlay; // CPU-side state; the renderer uploads frame() when frameGeneration() changes

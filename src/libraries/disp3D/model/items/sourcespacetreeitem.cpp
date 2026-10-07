@@ -16,6 +16,9 @@
 
 #include "sourcespacetreeitem.h"
 
+namespace DISP3DLIB
+{
+
 //=============================================================================================================
 // DEFINE MEMBER METHODS
 //=============================================================================================================
@@ -45,3 +48,5 @@ float SourceSpaceTreeItem::scale() const
 {
     return m_scale;
 }
+
+} // namespace DISP3DLIB

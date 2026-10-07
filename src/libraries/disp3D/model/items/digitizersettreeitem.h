@@ -10,7 +10,7 @@
  * @brief    Container item that groups raw FIFF digitizer points by category (Cardinal, HPI, EEG, Extra).
  *
  * Takes a flat @c QList<FiffDigPoint> from the FIFF info block
- * and fans it into one @ref DigitizerTreeItem child per category
+ * and fans it into one @ref DISP3DLIB::DigitizerTreeItem child per category
  * with the canonical colour scheme (Nasion green, LPA red, RPA
  * blue, HPI dark-red, EEG cyan, Extra magenta) and per-category
  * sphere radius (2 mm fiducials, 1 mm everything else).
@@ -36,6 +36,9 @@
 //=============================================================================================================
 // FORWARD DECLARATIONS
 //=============================================================================================================
+
+namespace DISP3DLIB
+{
 
 class DigitizerTreeItem;
 
@@ -89,5 +92,7 @@ public:
      */
     int totalPointCount() const;
 };
+
+} // namespace DISP3DLIB
 
 #endif // DIGITIZERSETTREEITEM_H

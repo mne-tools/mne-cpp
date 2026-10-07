@@ -23,6 +23,9 @@
 #include <QFile>
 #include <QDebug>
 
+namespace DISP3DLIB
+{
+
 //=============================================================================================================
 // DEFINE MEMBER METHODS
 //=============================================================================================================
@@ -173,3 +176,5 @@ void StcLoadingWorker::process()
     emit progress(100, "Complete");
     emit finished(true);
 }
+
+} // namespace DISP3DLIB

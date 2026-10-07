@@ -9,9 +9,9 @@
  * @date     March 2026
  * @brief    Owns the source-time-course overlay together with its loader, real-time controller and target cortical surfaces.
  *
- * SourceEstimateManager couples @ref SourceEstimateOverlay (the
- * static colour-mapped renderable), @ref StcLoadingWorker (background
- * loader for @c .stc files) and @ref RtSourceDataController (the
+ * SourceEstimateManager couples @ref DISP3DLIB::SourceEstimateOverlay (the
+ * static colour-mapped renderable), @ref DISP3DLIB::StcLoadingWorker (background
+ * loader for @c .stc files) and @ref DISP3DLIB::RtSourceDataController (the
  * real-time pipeline) into a single object that the GUI talks to.
  * It exposes time-point scrubbing, playback, looping and threshold /
  * colormap selection without leaking the worker-thread plumbing.
@@ -38,6 +38,10 @@
 //=============================================================================================================
 
 class QThread;
+
+namespace DISP3DLIB
+{
+
 class BrainSurface;
 class SourceEstimateOverlay;
 class StcLoadingWorker;
@@ -244,5 +248,7 @@ private:
     bool m_isLoading = false;                               /**< True while async load is in progress. */
     bool m_isStreaming = false;                             /**< True while real-time streaming is active. */
 };
+
+} // namespace DISP3DLIB
 
 #endif // SOURCEESTIMATEMANAGER_H

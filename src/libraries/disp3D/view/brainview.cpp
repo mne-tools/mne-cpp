@@ -65,6 +65,9 @@
 
 using namespace FIFFLIB;
 
+namespace DISP3DLIB
+{
+
 // QSettings is constructed with its default ctor below; it picks up the
 // organisation and application names that each host (mne_align,
 // mne_inspect, ex_disp_3D, ...) sets on QCoreApplication in its main(),
@@ -3894,3 +3897,5 @@ void BrainView::setMriSlicesVisible(bool visible)
     m_sceneDirty = true;
     update();
 }
+
+} // namespace DISP3DLIB

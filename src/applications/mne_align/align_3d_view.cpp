@@ -28,6 +28,7 @@
 #include <QVBoxLayout>
 
 using namespace MNEALIGN;
+using namespace DISP3DLIB;
 using DISP3DLIB::MultimodalScene;
 using DISP3DLIB::SceneLayer;
 using DISP3DLIB::SceneLayerKind;

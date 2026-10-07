@@ -16,6 +16,9 @@
 
 #include "surfacetreeitem.h"
 
+namespace DISP3DLIB
+{
+
 SurfaceTreeItem::SurfaceTreeItem(const QString& text)
 : AbstractTreeItem(text, SurfaceItem)
 {
@@ -58,3 +61,5 @@ int SurfaceTreeItem::shaderMode() const
 {
     return data(ShaderModeRole).toInt();
 }
+
+} // namespace DISP3DLIB

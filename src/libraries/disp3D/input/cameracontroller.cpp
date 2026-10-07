@@ -19,6 +19,9 @@
 #include <algorithm>
 #include <cmath>
 
+namespace DISP3DLIB
+{
+
 //=============================================================================================================
 // DEFINE MEMBER METHODS
 //=============================================================================================================
@@ -119,3 +122,5 @@ void CameraController::applyMousePan(const QPoint& delta,
     const float panSpeed = sceneSize * 0.002f;
     pan += QVector2D(-delta.x() * panSpeed, delta.y() * panSpeed);
 }
+
+} // namespace DISP3DLIB

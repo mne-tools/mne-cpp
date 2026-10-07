@@ -1,0 +1,497 @@
+---
+id: brain-surface
+title: "DISP3DLIB::BrainSurface"
+sidebar_label: BrainSurface
+sidebar_position: 18
+---
+
+# BrainSurface
+
+**Namespace:** `DISP3DLIB` &nbsp;·&nbsp; **Library:** 3D Display Library
+
+`#include <disp3D/brainsurface.h>`
+
+```cpp
+class DISP3DLIB::BrainSurface
+```
+
+[`BrainSurface`](/docs/api/disp3-d/brain-surface) manages the geometry and visual properties of a single brain mesh.
+
+Renderable cortical surface mesh with per-vertex color, curvature data, and GPU buffer management.
+
+---
+
+## Public Methods
+
+### BrainSurface()
+
+Default Constructor.
+
+---
+
+### ~BrainSurface()
+
+Destructor.
+
+---
+
+### setVisible(visible)
+
+Set the visibility of the surface.
+
+**Parameters:**
+
+- **visible** : *bool*
+  True if visible.
+
+---
+
+### isVisible()
+
+Check if the surface is visible.
+
+**Returns:**
+
+- *bool* — True if visible.
+
+---
+
+### setHemi(hemi)
+
+Set the hemisphere index.
+
+**Parameters:**
+
+- **hemi** : *int*
+  0 for Left, 1 for Right.
+
+---
+
+### setTissueType(type)
+
+Set the tissue type (Brain, Skin, Skull, etc.).
+
+**Parameters:**
+
+- **type** : *TissueType*
+  TissueType enum value.
+
+---
+
+### tissueType()
+
+Get the tissue type.
+
+**Returns:**
+
+- *TissueType* — TissueType enum value.
+
+---
+
+### hemi()
+
+Get the hemisphere index.
+
+**Returns:**
+
+- *int* — Hemisphere index (0=LH, 1=RH).
+
+---
+
+### fromSurface(surf)
+
+Load geometry from a FreeSurfer surface.
+
+**Parameters:**
+
+- **surf** : *const [FsSurface](/docs/api/fs/fs-surface) &*
+  Input FreeSurfer surface.
+
+---
+
+### fromBemSurface(surf, color)
+
+Load geometry from a [MNE](/docs/api/mne/mne-class) BEM surface.
+
+**Parameters:**
+
+- **surf** : *const [MNEBemSurface](/docs/api/mne/mne-bem-surface) &*
+  Input BEM surface.
+
+- **color** : *const QColor &*
+  Base color for the surface.
+
+---
+
+### createFromData(vertices, triangles, color)
+
+Create surface from raw vertex and triangle data.
+
+**Parameters:**
+
+- **vertices** : *const Eigen::MatrixX3f &*
+  Nx3 matrix of vertex positions.
+
+- **triangles** : *const Eigen::MatrixX3i &*
+  Mx3 matrix of triangle indices.
+
+- **color** : *const QColor &*
+  FsSurface color.
+
+---
+
+### createFromData(vertices, normals, triangles, color)
+
+Create surface from raw vertex, normal and triangle data.
+
+**Parameters:**
+
+- **vertices** : *const Eigen::MatrixX3f &*
+  Nx3 matrix of vertex positions.
+
+- **normals** : *const Eigen::MatrixX3f &*
+  Nx3 matrix of vertex normals.
+
+- **triangles** : *const Eigen::MatrixX3i &*
+  Mx3 matrix of triangle indices.
+
+- **color** : *const QColor &*
+  FsSurface color.
+
+---
+
+### loadAnnotation(path)
+
+Load annotation data from file.
+
+**Parameters:**
+
+- **path** : *const QString &*
+  Path to the .annot file.
+
+**Returns:**
+
+- *bool* — True if successful.
+
+---
+
+### addAnnotation(annotation)
+
+Add annotation data directly.
+
+**Parameters:**
+
+- **annotation** : *const [FsAnnotation](/docs/api/fs/fs-annotation) &*
+  Input annotation data.
+
+---
+
+### setVisualizationMode(mode)
+
+Set the visualization mode ([FsSurface](/docs/api/fs/fs-surface), [FsAnnotation](/docs/api/fs/fs-annotation), Scientific).
+
+**Parameters:**
+
+- **mode** : *VisualizationMode*
+  VisualizationMode enum.
+
+---
+
+### applySourceEstimateColors(colors)
+
+Apply source estimate colors to vertices.
+
+**Parameters:**
+
+- **colors** : *const QVector&lt; uint32_t &gt; &*
+  Vector of packed ABGR colors, one per vertex.
+
+---
+
+### clearSourceEstimateColors()
+
+Clear source estimate overlay colors and restore curvature-based coloring.
+
+---
+
+### updateBuffers(rhi, u)
+
+Update graphics buffers (vertex/index) on the GPU.
+
+**Parameters:**
+
+- **rhi** : *QRhi **
+  Pointer to QRhi instance.
+
+- **u** : *QRhiResourceUpdateBatch **
+  Resource update batch.
+
+---
+
+### vertexBuffer()
+
+---
+
+### indexBuffer()
+
+---
+
+### indexCount()
+
+---
+
+### vertexCount()
+
+---
+
+### vertexPositions()
+
+Get a copy of the current vertex positions.
+
+**Returns:**
+
+- *Eigen::MatrixX3f* — Nx3 matrix of the current (possibly transformed) vertex positions.
+
+---
+
+### vertexNormals()
+
+Get a copy of the current vertex normals.
+
+**Returns:**
+
+- *Eigen::MatrixX3f* — Nx3 matrix of the current vertex normals.
+
+---
+
+### triangleIndices()
+
+Get the triangle index buffer.
+
+**Returns:**
+
+- *QVector&lt; uint32_t &gt;* — Copy of the index data, three vertex indices per triangle.
+
+---
+
+### vertexDataRef()
+
+Const-ref access to CPU-side vertex data (used by merged rendering).
+
+**Returns:**
+
+- *const QVector&lt; [VertexData](/docs/api/disp3-d/vertex-data) &gt; &* — Reference to the internal vertex array, valid while this surface lives.
+
+---
+
+### indexDataRef()
+
+Const-ref access to CPU-side index data (used by merged rendering).
+
+**Returns:**
+
+- *const QVector&lt; uint32_t &gt; &* — Reference to the internal triangle index array, valid while this surface lives.
+
+---
+
+### vertexGeneration()
+
+Monotonically increasing counter bumped whenever vertex data changes.
+
+**Returns:**
+
+- *quint64* — Current vertex data generation counter.
+
+---
+
+### minX()
+
+Get minimum X coordinate.
+
+**Returns:**
+
+- *float* — Minimum X value.
+
+---
+
+### maxX()
+
+Get maximum X coordinate.
+
+**Returns:**
+
+- *float* — Maximum X value.
+
+---
+
+### boundingBox(min, max)
+
+Get bounding box of the surface.
+
+**Parameters:**
+
+- **min** : *QVector3D &*
+  Minimum coordinates.
+
+- **max** : *QVector3D &*
+  Maximum coordinates.
+
+---
+
+### intersects(rayOrigin, rayDir, dist, vertexIdx)
+
+Test ray intersection with this surface.
+
+**Parameters:**
+
+- **rayOrigin** : *const QVector3D &*
+  Ray origin in world/local space (object is assumed at 0,0,0 usually unless transformed externally). Note: The [`BrainSurface`](/docs/api/disp3-d/brain-surface) vertices are typically already transformed (e.g. by View3D model matrix logic? No, [`BrainView`](/docs/api/disp3-d/brain-view) applies matrix in shader. The vertices here are raw. So ray must be transformed to local space OR vertices transformed to world.
+
+- **rayDir** : *const QVector3D &*
+  Ray direction (normalized).
+
+- **dist** : *float &*
+  Distance to intersection.
+
+- **vertexIdx** : *int &*
+  Index of the vertex closest to the intersection.
+
+**Returns:**
+
+- *bool* — True if intersected.
+
+---
+
+### getAnnotationLabel(vertexIdx)
+
+Get the annotation label name for a given vertex.
+
+**Parameters:**
+
+- **vertexIdx** : *int*
+  Index of the vertex.
+
+**Returns:**
+
+- *QString* — FsLabel name.
+
+---
+
+### getAnnotationLabelId(vertexIdx)
+
+---
+
+### setSelectedRegion(regionId)
+
+Set the selected region for highlighting.
+
+**Parameters:**
+
+- **regionId** : *int*
+  The ID of the region to highlight.
+
+---
+
+### translateX(offset)
+
+Translate all vertices along the X axis.
+
+**Parameters:**
+
+- **offset** : *float*
+  Amount to translate.
+
+---
+
+### transform(m)
+
+Apply a generic 4x4 transformation matrix to all vertices and normals.
+
+**Parameters:**
+
+- **m** : *const QMatrix4x4 &*
+  Transformation matrix.
+
+---
+
+### applyTransform(m)
+
+Apply a transformation to the surface starting from the original data.
+
+Note: This prevents transformation accumulation.
+
+**Parameters:**
+
+- **m** : *const QMatrix4x4 &*
+  Transformation matrix.
+
+---
+
+### computeNeighbors()
+
+Compute neighbor vertices from triangle connectivity.
+
+Required for surface-constrained distance calculations.
+
+**Returns:**
+
+- *std::vector&lt; Eigen::VectorXi &gt;* — Vector of neighbor indices for each vertex.
+
+---
+
+### verticesAsMatrix()
+
+Get vertex positions as Eigen matrix.
+
+**Returns:**
+
+- *Eigen::MatrixX3f* — Nx3 matrix of vertex positions.
+
+---
+
+### setUseDefaultColor(useDefault)
+
+Set/Get whether to use the default surface color.
+
+**Parameters:**
+
+- **useDefault** : *bool*
+  True to use the surface's default color as base, false for white.
+
+---
+
+### setSelected(selected)
+
+---
+
+### isSelected()
+
+---
+
+### selectedRegionId()
+
+---
+
+### selectedVertexStart()
+
+---
+
+### setSelectedVertexRange(start, count)
+
+Highlight a contiguous range of vertices (e.g.
+
+a single sphere in a batched mesh). Pass start=-1 to clear the vertex range highlight.
+
+**Parameters:**
+
+- **start** : *int*
+  First vertex index to highlight (-1 to clear).
+
+- **count** : *int*
+  Number of vertices to highlight.
+
+---
+
+## Authors of this file
+
+- Christoph Dinh &lt;christoph.dinh@mne-cpp.org&gt;

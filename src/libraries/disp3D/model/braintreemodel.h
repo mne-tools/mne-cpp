@@ -10,7 +10,7 @@
  * @brief    QStandardItemModel hierarchy that organises every 3-D scene object (surfaces, sensors, sources, networks) for a QTreeView.
  *
  * BrainTreeModel is the single source of truth for what is in the
- * scene: each renderable owns a @ref AbstractTreeItem "AbstractTreeItem"-derived row
+ * scene: each renderable owns a @ref DISP3DLIB::AbstractTreeItem "AbstractTreeItem"-derived row
  * and exposes its visibility, transform, colour and alpha through
  * the standard Qt item-data roles. The tree is structured by
  * subject &rarr; modality &rarr; instance so a multi-subject study can
@@ -44,8 +44,10 @@ namespace INVLIB
 class InvEcdSet;
 }
 
-class NetworkTreeItem;
+namespace DISP3DLIB
+{
 
+class NetworkTreeItem;
 class SurfaceTreeItem;
 class BemTreeItem;
 
@@ -87,5 +89,7 @@ private:
     // Helpers to find specific items
     QStandardItem* getSubjectItem(const QString& subject);
 };
+
+} // namespace DISP3DLIB
 
 #endif // BRAINTREEMODEL_H

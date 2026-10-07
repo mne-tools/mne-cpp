@@ -97,6 +97,7 @@ using namespace FSLIB;
 using namespace MNELIB;
 using namespace MNALIB;
 using namespace MRILIB;
+using namespace DISP3DLIB;
 
 //=============================================================================================================
 // OVERLAY COLOR BAR
@@ -2026,9 +2027,9 @@ void MainWindow::setupConnections()
             const QSignalBlocker bA(m_mriAxialSlider);
             const QSignalBlocker bC(m_mriCoronalSlider);
             const QSignalBlocker bS(m_mriSagittalSlider);
-            m_mriAxialSlider->setMaximum(MriSlicer::dimensionForOrientation(*vol, SliceOrientation::Axial) - 1);
-            m_mriCoronalSlider->setMaximum(MriSlicer::dimensionForOrientation(*vol, SliceOrientation::Coronal) - 1);
-            m_mriSagittalSlider->setMaximum(MriSlicer::dimensionForOrientation(*vol, SliceOrientation::Sagittal) - 1);
+            m_mriAxialSlider->setMaximum(MriSlicer::dimensionForOrientation(*vol, MRILIB::SliceOrientation::Axial) - 1);
+            m_mriCoronalSlider->setMaximum(MriSlicer::dimensionForOrientation(*vol, MRILIB::SliceOrientation::Coronal) - 1);
+            m_mriSagittalSlider->setMaximum(MriSlicer::dimensionForOrientation(*vol, MRILIB::SliceOrientation::Sagittal) - 1);
         }
         syncMriSlidersFromCrosshair();
 
@@ -3460,14 +3461,14 @@ void MainWindow::syncMriSlidersFromCrosshair()
     const Eigen::Vector3i voxel = MriSlicer::rasToVoxel(*vol, m_mriSlicesPlugin.crosshair());
 
     const int sx = qBound(0,
-                          MriSlicer::sliceIndexForOrientation(*vol, SliceOrientation::Sagittal, voxel),
-                          MriSlicer::dimensionForOrientation(*vol, SliceOrientation::Sagittal) - 1);
+                          MriSlicer::sliceIndexForOrientation(*vol, MRILIB::SliceOrientation::Sagittal, voxel),
+                          MriSlicer::dimensionForOrientation(*vol, MRILIB::SliceOrientation::Sagittal) - 1);
     const int sy = qBound(0,
-                          MriSlicer::sliceIndexForOrientation(*vol, SliceOrientation::Coronal, voxel),
-                          MriSlicer::dimensionForOrientation(*vol, SliceOrientation::Coronal) - 1);
+                          MriSlicer::sliceIndexForOrientation(*vol, MRILIB::SliceOrientation::Coronal, voxel),
+                          MriSlicer::dimensionForOrientation(*vol, MRILIB::SliceOrientation::Coronal) - 1);
     const int sz = qBound(0,
-                          MriSlicer::sliceIndexForOrientation(*vol, SliceOrientation::Axial, voxel),
-                          MriSlicer::dimensionForOrientation(*vol, SliceOrientation::Axial) - 1);
+                          MriSlicer::sliceIndexForOrientation(*vol, MRILIB::SliceOrientation::Axial, voxel),
+                          MriSlicer::dimensionForOrientation(*vol, MRILIB::SliceOrientation::Axial) - 1);
 
     {
         const QSignalBlocker bA(m_mriAxialSlider);
@@ -3506,9 +3507,9 @@ void MainWindow::onMriSliderChanged()
 
     // Convert voxel to RAS and move crosshair
     Eigen::Vector3i voxel = MriSlicer::rasToVoxel(*vol, m_mriSlicesPlugin.crosshair());
-    voxel(MriSlicer::voxelAxisForOrientation(*vol, SliceOrientation::Sagittal)) = sx;
-    voxel(MriSlicer::voxelAxisForOrientation(*vol, SliceOrientation::Coronal)) = sy;
-    voxel(MriSlicer::voxelAxisForOrientation(*vol, SliceOrientation::Axial)) = sz;
+    voxel(MriSlicer::voxelAxisForOrientation(*vol, MRILIB::SliceOrientation::Sagittal)) = sx;
+    voxel(MriSlicer::voxelAxisForOrientation(*vol, MRILIB::SliceOrientation::Coronal)) = sy;
+    voxel(MriSlicer::voxelAxisForOrientation(*vol, MRILIB::SliceOrientation::Axial)) = sz;
     const Eigen::Vector3f ras = MriSlicer::voxelToRas(*vol, voxel);
     m_mriSlicesPlugin.setCrosshair(ras);
 

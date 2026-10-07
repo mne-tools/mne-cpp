@@ -31,6 +31,9 @@
 #include <QMatrix4x4>
 #include <QVector3D>
 
+namespace DISP3DLIB
+{
+
 /**
  * @brief Base tree item providing check-state, visibility, and data-role storage for all 3-D scene items.
  */
@@ -84,5 +87,7 @@ public:
 protected:
     int m_type;
 };
+
+} // namespace DISP3DLIB
 
 #endif // ABSTRACTTREEITEM_H

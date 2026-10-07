@@ -1,0 +1,308 @@
+---
+id: sensor-field-mapper
+title: "DISP3DLIB::SensorFieldMapper"
+sidebar_label: SensorFieldMapper
+sidebar_position: 39
+---
+
+# SensorFieldMapper
+
+**Namespace:** `DISP3DLIB` &nbsp;·&nbsp; **Library:** 3D Display Library
+
+`#include <disp3D/sensorfieldmapper.h>`
+
+```cpp
+class DISP3DLIB::SensorFieldMapper
+```
+
+Encapsulates sensor-to-surface field mapping for MEG and EEG sensors.
+
+This class owns the mapping state (evoked data, mapping matrices, channel picks, contour prefixes, surface key references) and provides methods to build mapping matrices and apply them to produce per-vertex field colours and iso-contour meshes.
+
+The class operates on surface and contour surfaces stored in the caller's surface map. It reads from / writes to those surfaces but does not own them, keeping ownership in the [`BrainView`](/docs/api/disp3-d/brain-view).
+
+Sensor-to-surface field mapper that interpolates MEG/EEG measurements onto cortical meshes and generates iso-contour overlays.
+
+---
+
+## Public Methods
+
+### SensorFieldMapper()
+
+Construct an empty (unloaded) mapper.
+
+---
+
+### setEvoked(evoked)
+
+Set the evoked data that supplies measurements and channel info.
+
+After calling this, ``isLoaded()`` returns `true` when non-empty.
+
+**Parameters:**
+
+- **evoked** : *const [FiffEvoked](/docs/api/fiff/fiff-evoked) &*
+  The evoked dataset (contains info + data matrix).
+
+---
+
+### isLoaded()
+
+**Returns:**
+
+- *bool* — `true` if evoked data has been loaded and is non-empty.
+
+---
+
+### setTimePoint(tp)
+
+Set the active time point index into the evoked data matrix.
+
+**Parameters:**
+
+- **tp** : *int*
+  Zero-based time index.
+
+---
+
+### timePoint()
+
+**Returns:**
+
+- *int* — Current time point index.
+
+---
+
+### setMegFieldMapOnHead(onHead)
+
+Whether the MEG field should be mapped onto the head (BEM) surface rather than the helmet surface.
+
+**Parameters:**
+
+- **onHead** : *bool*
+  `true` to map onto head, `false` for helmet.
+
+---
+
+### megFieldMapOnHead()
+
+---
+
+### setColormap(name)
+
+Set the colormap name used when painting field values.
+
+**Parameters:**
+
+- **name** : *const QString &*
+  Colormap identifier (e.g. "MNE", "hot", "RdBu_r").
+
+---
+
+### colormap()
+
+---
+
+### evoked()
+
+**Returns:**
+
+- *const [FiffEvoked](/docs/api/fiff/fiff-evoked) &* — Const reference to the loaded evoked data.
+
+---
+
+### hasMappingFor(newEvoked)
+
+Check whether the current mapping matrices can be reused for a new evoked data set (i.e., same sensor configuration: same channels, same SSP projectors, same bad channels).
+
+**Parameters:**
+
+- **newEvoked** : *const [FiffEvoked](/docs/api/fiff/fiff-evoked) &*
+  The candidate new evoked data.
+
+**Returns:**
+
+- *bool* — `true` if the existing mapping is compatible, `false` if rebuild is needed.
+
+---
+
+### megPick()
+
+**Returns:**
+
+- *const Eigen::VectorXi &* — Const reference to the MEG channel pick indices.
+
+---
+
+### eegPick()
+
+**Returns:**
+
+- *const Eigen::VectorXi &* — Const reference to the EEG channel pick indices.
+
+---
+
+### megMapping()
+
+**Returns:**
+
+- *std::shared_ptr&lt; Eigen::MatrixXf &gt;* — Shared pointer to the MEG mapping matrix (may be null).
+
+---
+
+### eegMapping()
+
+**Returns:**
+
+- *std::shared_ptr&lt; Eigen::MatrixXf &gt;* — Shared pointer to the EEG mapping matrix (may be null).
+
+---
+
+### buildMapping(surfaces, headToMriTrans, applySensorTrans)
+
+Build the MEG/EEG sensor-to-surface mapping matrices.
+
+Needs the caller's surface map to locate the helmet and/or head surface. Also needs the head-to-MRI transformation and whether sensor transforms should be applied.
+
+**Parameters:**
+
+- **surfaces** : *const QMap&lt; QString, std::shared_ptr&lt; [BrainSurface](/docs/api/disp3-d/brain-surface) &gt; &gt; &*
+  All surfaces keyed by name.
+
+- **headToMriTrans** : *const [FiffCoordTrans](/docs/api/fiff/fiff-coord-trans) &*
+  Head → MRI coordinate transform.
+
+- **applySensorTrans** : *bool*
+  Whether to apply the sensor → MRI transform.
+
+**Returns:**
+
+- *bool* — `true` on success (at least one mapping built).
+
+---
+
+### apply(surfaces, singleView, subViews)
+
+Apply the precomputed mapping to the current time point.
+
+Paints per-vertex colours onto the target surfaces and optionally generates iso-contour line meshes.
+
+**Parameters:**
+
+- **surfaces** : *QMap&lt; QString, std::shared_ptr&lt; [BrainSurface](/docs/api/disp3-d/brain-surface) &gt; &gt; &*
+  FsSurface map (contour surfaces may be added).
+
+- **singleView** : *const [SubView](/docs/api/disp3-d/sub-view) &*
+  The single-view [`SubView`](/docs/api/disp3-d/sub-view) for visibility flags.
+
+- **subViews** : *const QVector&lt; [SubView](/docs/api/disp3-d/sub-view) &gt; &*
+  The four multi-view SubViews.
+
+---
+
+### megSurfaceKey()
+
+**Returns:**
+
+- *const QString &* — The surface key used for the MEG mapping target.
+
+---
+
+### eegSurfaceKey()
+
+**Returns:**
+
+- *const QString &* — The surface key used for the EEG mapping target.
+
+---
+
+### computeNormRange()
+
+Compute the normalization range anchored at the peak-GFP time.
+
+For each modality the Global Field Power (GFP = sqrt(mean(V_i^2))) is evaluated across all time samples and we pick the time of maximum GFP. vmax = max(|mapped|) is then computed at that peak time, giving the colour-map range [-vmax, +vmax].
+
+This matches MNE-Python's plot_field behaviour, where the initial view shows the evoked peak, so the colour scale is anchored to it. The range stays fixed during time scrubbing until explicitly recomputed (e.g. by switching to a new evoked data set).
+
+Must be called after building or reusing a mapping matrix with new evoked data. ``buildMapping()`` calls this automatically.
+
+---
+
+## Static Methods
+
+### findHeadSurfaceKey(surfaces)
+
+Find a BEM head surface key in the given surface map.
+
+Looks for "bem_head" first, then any BEM surface whose tissue type is `BrainSurface::TissueSkin`.
+
+**Parameters:**
+
+- **surfaces** : *const QMap&lt; QString, std::shared_ptr&lt; [BrainSurface](/docs/api/disp3-d/brain-surface) &gt; &gt; &*
+  Surface map keyed by surface name.
+
+**Returns:**
+
+- *QString* — Head surface key, else the first BEM key, or an empty string if no BEM surface exists.
+
+---
+
+### findHelmetSurfaceKey(surfaces)
+
+Find the MEG helmet surface key ("sens_surface_meg") if present.
+
+**Parameters:**
+
+- **surfaces** : *const QMap&lt; QString, std::shared_ptr&lt; [BrainSurface](/docs/api/disp3-d/brain-surface) &gt; &gt; &*
+  Surface map keyed by surface name.
+
+**Returns:**
+
+- *QString* — "sens_surface_meg" if present, otherwise an empty string.
+
+---
+
+### contourStep(minVal, maxVal, targetTicks)
+
+Compute a "nice" iso-contour step given a value range and target number of ticks.
+
+**Parameters:**
+
+- **minVal** : *float*
+  Lower bound of the value range.
+
+- **maxVal** : *float*
+  Upper bound of the value range.
+
+- **targetTicks** : *int*
+  Desired number of contour intervals.
+
+**Returns:**
+
+- *float* — Step of 1, 2, 5 or 10 times a power of ten, or 0 for an empty range or non-positive targetTicks.
+
+---
+
+### fitSphereOrigin(info, radius)
+
+Fit a sphere to the digitization headshape points.
+
+Replicates MNE-Python's `fit_sphere_to_headshape` (linear least- squares sphere fit). Uses FIFFV_POINT_EXTRA digitization points by default; falls back to EXTRA + EEG if fewer than 4 extra points exist. Nose/face points (z &lt; 0 && y &gt; 0) are excluded.
+
+**Parameters:**
+
+- **info** : *const [FiffInfo](/docs/api/fiff/fiff-info) &*
+  FiffInfo containing the digitization points.
+
+- **radius** : *float **
+  Fitted sphere radius (metres). May be `nullptr`.
+
+**Returns:**
+
+- *Eigen::Vector3f* — The sphere centre in head coordinates (metres). Returns (0, 0, 0.04) if the fit cannot be performed.
+
+---
+
+## Authors of this file
+
+- Christoph Dinh &lt;christoph.dinh@mne-cpp.org&gt;

@@ -21,6 +21,9 @@
 #include <QPair>
 #include <cmath>
 
+namespace DISP3DLIB
+{
+
 //=============================================================================================================
 // STATIC HELPERS
 //=============================================================================================================
@@ -459,3 +462,5 @@ std::shared_ptr<BrainSurface> MeshFactory::createBatchedSpheres(const QVector<QV
     surf->createFromData(allVerts, allNorms, allTris, color);
     return surf;
 }
+
+} // namespace DISP3DLIB

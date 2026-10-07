@@ -1,0 +1,81 @@
+---
+id: sensor-tree-item
+title: "DISP3DLIB::SensorTreeItem"
+sidebar_label: SensorTreeItem
+sidebar_position: 40
+---
+
+# SensorTreeItem
+
+**Namespace:** `DISP3DLIB` &nbsp;·&nbsp; **Library:** 3D Display Library
+
+`#include <disp3D/sensortreeitem.h>`
+
+```cpp
+class DISP3DLIB::SensorTreeItem
+```
+
+Tree item representing MEG or EEG sensor positions in the 3-D scene hierarchy.
+
+### Inheritance
+
+```mermaid
+classDiagram
+    AbstractTreeItem <|-- SensorTreeItem
+    click AbstractTreeItem "/docs/api/disp3-d/abstract-tree-item"
+```
+
+---
+
+## Public Methods
+
+### SensorTreeItem(text, pos, color, scale, type)
+
+---
+
+### ~SensorTreeItem()
+
+---
+
+### position()
+
+---
+
+### scale()
+
+---
+
+### setOrientation(orient)
+
+Set the coil orientation matrix (3x3 rotation from coil_trans).
+
+**Parameters:**
+
+- **orient** : *const QMatrix4x4 &*
+  Coil rotation stored in the upper-left 3x3 of a 4x4 matrix.
+
+---
+
+### orientation()
+
+Returns the coil orientation (identity if not set).
+
+**Returns:**
+
+- *const QMatrix4x4 &* — Reference to the stored coil orientation matrix.
+
+---
+
+### hasOrientation()
+
+Returns true if an explicit orientation was set.
+
+**Returns:**
+
+- *bool* — True once `setOrientation()` has been called.
+
+---
+
+## Authors of this file
+
+- Christoph Dinh &lt;christoph.dinh@mne-cpp.org&gt;

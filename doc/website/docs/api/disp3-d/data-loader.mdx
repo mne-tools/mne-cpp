@@ -1,0 +1,154 @@
+---
+id: data-loader
+title: "DISP3DLIB::DataLoader"
+sidebar_label: DataLoader
+sidebar_position: 23
+---
+
+# DataLoader
+
+**Namespace:** `DISP3DLIB` &nbsp;·&nbsp; **Library:** 3D Display Library
+
+`#include <disp3D/dataloader.h>`
+
+```cpp
+class DISP3DLIB::DataLoader
+```
+
+Pure I/O helpers that load [MNE](/docs/api/mne/mne-class) data files and return results.
+
+These static methods have zero coupling to the widget layer. [`BrainView`](/docs/api/disp3-d/brain-view) calls them to obtain data and then wires the results into its own model / surface map / member state.
+
+---
+
+## Public Methods
+
+### DataLoader()
+
+---
+
+## Static Methods
+
+### loadSensors(fifPath, megHelmetOverridePath)
+
+Load sensor channels, digitizer points and MEG helmet from a FIF file.
+
+**Parameters:**
+
+- **fifPath** : *const QString &*
+  Path to the FIF file.
+
+- **megHelmetOverridePath** : *const QString &*
+  Optional override for the helmet surface file.
+
+**Returns:**
+
+- *SensorLoadResult* — Populated `SensorLoadResult`.
+
+---
+
+### loadHelmetSurface(helmetFilePath, devHeadTrans, applyTrans)
+
+Load a standalone MEG helmet surface from a BEM FIF file.
+
+**Parameters:**
+
+- **helmetFilePath** : *const QString &*
+  Path to the helmet BEM FIF file.
+
+- **devHeadTrans** : *const QMatrix4x4 &*
+  Device-to-Head transformation matrix (identity if none).
+
+- **applyTrans** : *bool*
+  Whether to apply the dev→head transform.
+
+**Returns:**
+
+- *std::shared_ptr&lt; [BrainSurface](/docs/api/disp3-d/brain-surface) &gt;* — Shared pointer to the loaded [`BrainSurface`](/docs/api/disp3-d/brain-surface), or nullptr on failure.
+
+---
+
+### loadDipoles(dipPath)
+
+Load dipole set from a .dip file.
+
+**Parameters:**
+
+- **dipPath** : *const QString &*
+  Path to the dipole file.
+
+**Returns:**
+
+- *[InvEcdSet](/docs/api/inv/inv-ecd-set)* — The loaded InvEcdSet (may be empty on failure).
+
+---
+
+### loadSourceSpace(fwdPath)
+
+Load source space from a forward-solution FIF file.
+
+**Parameters:**
+
+- **fwdPath** : *const QString &*
+  Path to the FIF file with source space.
+
+**Returns:**
+
+- *[MNESourceSpaces](/docs/api/mne/mne-source-spaces)* — The loaded source space (may be empty on failure).
+
+---
+
+### loadHeadToMriTransform(transPath, trans)
+
+Load a coordinate transformation from a FIF file and normalise it to Head → MRI orientation.
+
+**Parameters:**
+
+- **transPath** : *const QString &*
+  Path to the FIF file.
+
+- **trans** : *[FiffCoordTrans](/docs/api/fiff/fiff-coord-trans) &*
+  The resulting transform (Head → MRI).
+
+**Returns:**
+
+- *bool* — true on success.
+
+---
+
+### loadEvoked(evokedPath, aveIndex)
+
+Load an [FiffEvoked](/docs/api/fiff/fiff-evoked) from a FIF file.
+
+**Parameters:**
+
+- **evokedPath** : *const QString &*
+  Path to the FIF file.
+
+- **aveIndex** : *int*
+  Set index to load.
+
+**Returns:**
+
+- *[FiffEvoked](/docs/api/fiff/fiff-evoked)* — The loaded FiffEvoked (may be empty on failure).
+
+---
+
+### probeEvokedSets(evokedPath)
+
+Probe a FIF file for the available evoked data sets.
+
+**Parameters:**
+
+- **evokedPath** : *const QString &*
+  Path to the FIF file.
+
+**Returns:**
+
+- *QStringList* — List of human-readable labels for each set.
+
+---
+
+## Authors of this file
+
+- Christoph Dinh &lt;christoph.dinh@mne-cpp.org&gt;

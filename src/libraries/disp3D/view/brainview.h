@@ -11,14 +11,14 @@
  *
  * BrainView is the public face of disp3D &mdash; the QWidget that
  * any host application embeds to get an interactive cortical /
- * sensor / source scene. It connects @ref BrainTreeModel data
- * changes to scene rebuilds, drives @ref CameraController from the
+ * sensor / source scene. It connects @ref DISP3DLIB::BrainTreeModel data
+ * changes to scene rebuilds, drives @ref DISP3DLIB::CameraController from the
  * Qt mouse / wheel events, switches between single- and multi-view
- * layouts through @ref MultiViewLayout and delegates the actual
- * drawing to @ref BrainRenderer.
+ * layouts through @ref DISP3DLIB::MultiViewLayout and delegates the actual
+ * drawing to @ref DISP3DLIB::BrainRenderer.
  *
  * Live overlays such as digitizer tracker markers or AR avatars are
- * exposed through the lightweight @ref LiveMarker struct so the host
+ * exposed through the lightweight @ref DISP3DLIB::LiveMarker struct so the host
  * GUI can spray transient annotations on the scene without going
  * through the tree model.
  */
@@ -59,21 +59,22 @@ class QLabel;
 class QStandardItem;
 class QFrame;
 class QTimer;
+namespace CONNECTIVITYLIB
+{
+class Network;
+}
+
+namespace DISP3DLIB
+{
+
 class BrainTreeModel;
 class BrainRenderer;
 class BrainSurface;
 class DipoleObject;
 class NetworkObject;
 class PolylineObject;
-namespace DISP3DLIB
-{
 class VideoOverlay;
 class SliceObject;
-}
-namespace CONNECTIVITYLIB
-{
-class Network;
-}
 
 //=============================================================================================================
 /**
@@ -1352,5 +1353,7 @@ private:
     QFrame* m_horizontalSeparator = nullptr;          /**< Visual separator between top/bottom panes. */
     bool m_perspectiveRotatedSincePress = false;      /**< True if mouse drag rotated a perspective pane. */
 };
+
+} // namespace DISP3DLIB
 
 #endif // BRAINVIEW_H

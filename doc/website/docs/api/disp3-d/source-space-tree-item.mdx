@@ -1,0 +1,85 @@
+---
+id: source-space-tree-item
+title: "DISP3DLIB::SourceSpaceTreeItem"
+sidebar_label: SourceSpaceTreeItem
+sidebar_position: 43
+---
+
+# SourceSpaceTreeItem
+
+**Namespace:** `DISP3DLIB` &nbsp;·&nbsp; **Library:** 3D Display Library
+
+`#include <disp3D/sourcespacetreeitem.h>`
+
+```cpp
+class DISP3DLIB::SourceSpaceTreeItem
+```
+
+[`SourceSpaceTreeItem`](/docs/api/disp3-d/source-space-tree-item) represents a single source space point in the tree model.
+
+Each item stores its 3D position and rendering scale.
+
+Source space point tree item.
+
+### Inheritance
+
+```mermaid
+classDiagram
+    AbstractTreeItem <|-- SourceSpaceTreeItem
+    click AbstractTreeItem "/docs/api/disp3-d/abstract-tree-item"
+```
+
+---
+
+## Public Methods
+
+### SourceSpaceTreeItem(text, positions, color, scale, type)
+
+Constructs a [`SourceSpaceTreeItem`](/docs/api/disp3-d/source-space-tree-item) for a hemisphere.
+
+**Parameters:**
+
+- **text** : *const QString &*
+  Display text for the item (e.g. "LH", "RH").
+
+- **positions** : *const QVector&lt; QVector3D &gt; &*
+  3D positions of all source points in this hemisphere (in meters).
+
+- **color** : *const QColor &*
+  Color for rendering.
+
+- **scale** : *float*
+  Radius/size of each rendered sphere.
+
+- **type** : *int*
+  Item type identifier.
+
+---
+
+### ~SourceSpaceTreeItem()
+
+---
+
+### positions()
+
+Returns all source point positions.
+
+**Returns:**
+
+- *const QVector&lt; QVector3D &gt; &* — Vector of position vectors.
+
+---
+
+### scale()
+
+Returns the rendering scale.
+
+**Returns:**
+
+- *float* — Scale value.
+
+---
+
+## Authors of this file
+
+- Christoph Dinh &lt;christoph.dinh@mne-cpp.org&gt;

@@ -18,8 +18,8 @@
  * The vector is then mapped through a configurable colormap (Hot,
  * Jet, MNE) with adjustable normalisation thresholds (fmin, fmid,
  * fmax) and the resulting ABGR bytes are written into the
- * secondary colour slot of the target @ref BrainSurface &mdash; the
- * renderer simply switches @ref VisualizationMode to
+ * secondary colour slot of the target @ref DISP3DLIB::BrainSurface &mdash; the
+ * renderer simply switches @ref DISP3DLIB::VisualizationMode to
  * @c ModeSourceEstimate and the cortex lights up without any
  * geometry change.
  */
@@ -44,6 +44,9 @@
 //=============================================================================================================
 // FORWARD DECLARATIONS
 //=============================================================================================================
+
+namespace DISP3DLIB
+{
 
 class BrainSurface;
 
@@ -293,5 +296,7 @@ private:
         m_colorCache.clear();
     }
 };
+
+} // namespace DISP3DLIB
 
 #endif // SOURCEESTIMATEOVERLAY_H

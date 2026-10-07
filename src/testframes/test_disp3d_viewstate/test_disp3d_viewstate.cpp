@@ -30,6 +30,8 @@
 #include <QTemporaryDir>
 #include <QtTest>
 
+using namespace DISP3DLIB;
+
 //=============================================================================================================
 /**
  * @brief Tests for ViewVisibilityProfile, SubView, rendertypes, and surfacekeys.

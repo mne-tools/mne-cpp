@@ -10,7 +10,7 @@
  * @brief    Qt-RHI scene renderer: shader pipelines, lighting, dual render targets and per-frame draw orchestration for disp3D.
  *
  * BrainRenderer is the only object in disp3D that talks directly to
- * QRhi. It creates the shader pipelines for every @ref ShaderMode
+ * QRhi. It creates the shader pipelines for every @ref DISP3DLIB::ShaderMode
  * (Standard Phong, Holographic, Anatomical, Dipole arrows, XRay,
  * ShowNormals), allocates the dual @c rtClear / @c rtPreserve render
  * targets needed for the multi-pass cortex + overlay composition, and
@@ -18,12 +18,12 @@
  * visible scene object.
  *
  * The renderer packs camera matrices, light direction, viewport,
- * scissor and the active overlay mode into one @ref BrainRenderer::SceneData uniform
+ * scissor and the active overlay mode into one @ref DISP3DLIB::BrainRenderer::SceneData uniform
  * block per draw, which keeps the WebGL backend happy (Qt RHI on
  * WebGL cannot rebind state mid-pass).
  *
- * All scene objects (@ref BrainSurface, @ref DipoleObject,
- * @ref NetworkObject, @ref DISP3DLIB::VideoOverlay) are accepted through opaque
+ * All scene objects (@ref DISP3DLIB::BrainSurface, @ref DISP3DLIB::DipoleObject,
+ * @ref DISP3DLIB::NetworkObject, @ref DISP3DLIB::VideoOverlay) are accepted through opaque
  * pointers so the renderer never pulls in the heavy headers of the
  * modalities it draws.
  */
@@ -55,15 +55,16 @@ class QRhiResourceUpdateBatch;
 class QRhiTexture;
 class QRhiRenderBuffer;
 class QRhiTextureRenderTarget;
+
+namespace DISP3DLIB
+{
+
 class BrainSurface;
 class DipoleObject;
 class NetworkObject;
 class PolylineObject;
-namespace DISP3DLIB
-{
 class VideoOverlay;
 class SliceObject;
-}
 
 //=============================================================================================================
 /**
@@ -88,13 +89,13 @@ public:
 
     // ShaderMode is defined in core/rendertypes.h for lightweight inclusion.
     // These aliases preserve backward compatibility.
-    using ShaderMode = ::ShaderMode;
-    static constexpr ShaderMode Standard = ::Standard;
-    static constexpr ShaderMode Holographic = ::Holographic;
-    static constexpr ShaderMode Anatomical = ::Anatomical;
-    static constexpr ShaderMode Dipole = ::Dipole;
-    static constexpr ShaderMode XRay = ::XRay;
-    static constexpr ShaderMode ShowNormals = ::ShowNormals;
+    using ShaderMode = DISP3DLIB::ShaderMode;
+    static constexpr ShaderMode Standard = DISP3DLIB::Standard;
+    static constexpr ShaderMode Holographic = DISP3DLIB::Holographic;
+    static constexpr ShaderMode Anatomical = DISP3DLIB::Anatomical;
+    static constexpr ShaderMode Dipole = DISP3DLIB::Dipole;
+    static constexpr ShaderMode XRay = DISP3DLIB::XRay;
+    static constexpr ShaderMode ShowNormals = DISP3DLIB::ShowNormals;
 
     /**
      * @brief Aggregated GPU resources and render state for the 3-D brain visualization scene.
@@ -424,5 +425,7 @@ private:
     struct Impl;
     std::unique_ptr<Impl> d;
 };
+
+} // namespace DISP3DLIB
 
 #endif // BRAINRENDERER_H

@@ -36,6 +36,9 @@ using namespace FIFFLIB;
 using namespace MNELIB;
 using namespace INVLIB;
 
+namespace DISP3DLIB
+{
+
 //=============================================================================================================
 // STATIC METHODS
 //=============================================================================================================
@@ -415,3 +418,5 @@ QStringList DataLoader::probeEvokedSets(const QString& evokedPath)
     }
     return result;
 }
+
+} // namespace DISP3DLIB

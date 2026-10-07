@@ -13,7 +13,7 @@
  * perspective, Top-right orthographic top, Bottom-left
  * orthographic left, Bottom-right orthographic front) inside the
  * owning QRhiWidget, honours user-dragged splitter ratios, and
- * publishes the per-pane @ref SubView so the camera and renderer
+ * publishes the per-pane @ref DISP3DLIB::SubView so the camera and renderer
  * can set viewport / scissor and pick the right matrix preset.
  */
 
@@ -31,6 +31,9 @@
 #include <QPoint>
 #include <QVector>
 #include <Qt>
+
+namespace DISP3DLIB
+{
 
 //=============================================================================================================
 /**
@@ -209,5 +212,7 @@ private:
     int m_minPanePx = 80;
     int m_separatorLinePx = 2;
 };
+
+} // namespace DISP3DLIB
 
 #endif // MULTIVIEWLAYOUT_H

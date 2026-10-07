@@ -48,9 +48,9 @@ class QTimer;
 
 namespace DISP3DLIB
 {
+
 class RtSensorDataWorker;
 class RtSensorInterpolationMatWorker;
-}
 
 //=============================================================================================================
 /**
@@ -330,5 +330,7 @@ private:
     QThread* m_pInterpThread = nullptr;                                   /**< Background thread for interpolation matrix worker. */
     DISP3DLIB::RtSensorInterpolationMatWorker* m_pInterpWorker = nullptr; /**< Interpolation matrix worker. */
 };
+
+} // namespace DISP3DLIB
 
 #endif // BRAINVIEW_RTSENSORDATACONTROLLER_H

@@ -49,8 +49,11 @@ class QProgressBar;
 class QToolButton;
 class QTreeWidget;
 class QTreeWidgetItem;
+namespace DISP3DLIB
+{
 class BrainView;
 class BrainTreeModel;
+}
 class OverlayColorBar;
 
 
@@ -263,8 +266,8 @@ private:
 
 private:
     // Core components
-    BrainView* m_brainView = nullptr;
-    BrainTreeModel* m_model = nullptr;
+    DISP3DLIB::BrainView* m_brainView = nullptr;
+    DISP3DLIB::BrainTreeModel* m_model = nullptr;
 
     // Group boxes (disabled until data is loaded)
     QGroupBox* m_surfGroup = nullptr;

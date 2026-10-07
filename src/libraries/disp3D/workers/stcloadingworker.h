@@ -18,7 +18,7 @@
  *
  * On completion the controller signals the GUI to attach the data
  * to the cortical surfaces, after which scrubbing and playback are
- * served by @ref SourceEstimateOverlay without any further I/O.
+ * served by @ref DISP3DLIB::SourceEstimateOverlay without any further I/O.
  */
 
 #ifndef STCLOADINGWORKER_H
@@ -40,6 +40,9 @@
 //=============================================================================================================
 // FORWARD DECLARATIONS
 //=============================================================================================================
+
+namespace DISP3DLIB
+{
 
 class BrainSurface;
 
@@ -219,5 +222,7 @@ private:
     QSharedPointer<Eigen::SparseMatrix<float>> m_interpMatRh; /**< RH interpolation matrix. */
     std::atomic<bool> m_cancelled{false};                     /**< Cancellation flag. */
 };
+
+} // namespace DISP3DLIB
 
 #endif // STCLOADINGWORKER_H

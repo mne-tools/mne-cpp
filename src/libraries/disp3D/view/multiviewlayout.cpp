@@ -19,6 +19,9 @@
 #include <algorithm>
 #include <cmath>
 
+namespace DISP3DLIB
+{
+
 //=============================================================================================================
 // DEFINE MEMBER METHODS
 //=============================================================================================================
@@ -268,3 +271,5 @@ void MultiViewLayout::dragSplitter(const QPoint& pos,
         m_splitY = clampSplit(static_cast<float>(clampedY) / static_cast<float>(h));
     }
 }
+
+} // namespace DISP3DLIB

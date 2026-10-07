@@ -17,7 +17,7 @@ class DISP3DLIB::RtSourceInterpolationMatWorker
 
 [`RtSourceInterpolationMatWorker`](/docs/api/disp3-d/rt-source-interpolation-mat-worker) computes sparse source-to-vertex interpolation matrices in a background thread.
 
-This worker encapsulates the expensive `GeometryInfo::scdc()` (geodesic distance computation) and `Interpolation::createInterpolationMat()` calls that were previously performed either in `StcLoadingWorker` (at load time only) or not recomputed at all when parameters changed at runtime.
+This worker encapsulates the expensive `GeometryInfo::scdc()` (geodesic distance computation) and `Interpolation::createInterpolationMat()` calls that were previously performed either in [`StcLoadingWorker`](/docs/api/disp3-d/stc-loading-worker) (at load time only) or not recomputed at all when parameters changed at runtime.
 
 The worker for each hemisphere stores:
 [FsSurface](/docs/api/fs/fs-surface) vertex positions and neighbor topology

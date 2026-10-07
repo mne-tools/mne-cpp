@@ -46,7 +46,10 @@ class Control3DView;
 }
 
 #ifdef MNE_DISP3D
+namespace DISP3DLIB
+{
 class BrainTreeModel;
+}
 #endif
 
 //=============================================================================================================
@@ -158,7 +161,7 @@ private:
      * @param[in] pModel   new 3D Model.
      */
 #ifdef MNE_DISP3D
-    void init3DGui(QSharedPointer<BrainTreeModel> pModel);
+    void init3DGui(QSharedPointer<DISP3DLIB::BrainTreeModel> pModel);
 #endif
 
     //=========================================================================================================

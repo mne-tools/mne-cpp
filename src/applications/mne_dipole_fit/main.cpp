@@ -51,6 +51,7 @@ using namespace INVLIB;
 using namespace FSLIB;
 using namespace MNELIB;
 using namespace UTILSLIB;
+using namespace DISP3DLIB;
 
 //=============================================================================================================
 // STATIC DEFINITIONS

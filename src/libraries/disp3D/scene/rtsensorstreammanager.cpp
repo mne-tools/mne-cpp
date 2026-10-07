@@ -21,6 +21,9 @@
 
 #include <QDebug>
 
+namespace DISP3DLIB
+{
+
 //=============================================================================================================
 // DEFINE MEMBER METHODS
 //=============================================================================================================
@@ -183,3 +186,5 @@ void RtSensorStreamManager::setColormap(const QString& name)
     if (m_controller)
         m_controller->setColormapType(name);
 }
+
+} // namespace DISP3DLIB

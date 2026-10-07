@@ -9,15 +9,15 @@
  * @date     March 2026
  * @brief    Instanced connectivity-graph renderable: node spheres and edge cylinders coloured by weight through a named colormap.
  *
- * NetworkObject mirrors the @ref DipoleObject instancing pattern
+ * NetworkObject mirrors the @ref DISP3DLIB::DipoleObject instancing pattern
  * but splits the scene into two meshes &mdash; nodes (spheres) and
  * edges (cylinders) &mdash; each with its own vertex / index / instance
  * buffer triple. The node mesh re-uses the dipole instance layout
  * for shader compatibility (model + colour + isSelected), so a
  * single pipeline serves both renderables.
  *
- * @ref NetworkObject::setColormap "setColormap" selects the palette (Viridis, Hot, Jet, ...) used
- * to map edge weight to RGBA; @ref NetworkObject::setThreshold "setThreshold" prunes edges and
+ * @ref DISP3DLIB::NetworkObject::setColormap "setColormap" selects the palette (Viridis, Hot, Jet, ...) used
+ * to map edge weight to RGBA; @ref DISP3DLIB::NetworkObject::setThreshold "setThreshold" prunes edges and
  * nodes below a normalised cut-off and regenerates the instance
  * stream without touching the underlying @ref CONNECTIVITYLIB::Network.
  */
@@ -43,6 +43,9 @@
 class QRhi;
 class QRhiBuffer;
 class QRhiResourceUpdateBatch;
+
+namespace DISP3DLIB
+{
 
 //=============================================================================================================
 /**
@@ -205,5 +208,7 @@ private:
 
     bool m_visible = true;
 };
+
+} // namespace DISP3DLIB
 
 #endif // NETWORKOBJECT_H

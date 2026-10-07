@@ -1,0 +1,60 @@
+---
+id: network-tree-item
+title: "DISP3DLIB::NetworkTreeItem"
+sidebar_label: NetworkTreeItem
+sidebar_position: 32
+---
+
+# NetworkTreeItem
+
+**Namespace:** `DISP3DLIB` &nbsp;·&nbsp; **Library:** 3D Display Library
+
+`#include <disp3D/networktreeitem.h>`
+
+```cpp
+class DISP3DLIB::NetworkTreeItem
+```
+
+[`NetworkTreeItem`](/docs/api/disp3-d/network-tree-item) holds metadata about a connectivity network in the tree model.
+
+Tree item representing a connectivity network.
+
+### Inheritance
+
+```mermaid
+classDiagram
+    AbstractTreeItem <|-- NetworkTreeItem
+    click AbstractTreeItem "/docs/api/disp3-d/abstract-tree-item"
+```
+
+---
+
+## Public Methods
+
+### NetworkTreeItem(text, objectKey)
+
+Constructs a [`NetworkTreeItem`](/docs/api/disp3-d/network-tree-item).
+
+**Parameters:**
+
+- **text** : *const QString &*
+  Display text.
+
+- **objectKey** : *const QString &*
+  Unique key (e.g. "net_coherence").
+
+---
+
+### objectKey()
+
+Returns the object key identifying this network.
+
+**Returns:**
+
+- *QString* — The object key.
+
+---
+
+## Authors of this file
+
+- Christoph Dinh &lt;christoph.dinh@mne-cpp.org&gt;

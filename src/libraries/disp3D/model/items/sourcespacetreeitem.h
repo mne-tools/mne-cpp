@@ -12,7 +12,7 @@
  * Source-space points come from @ref MNELIB::MNESourceSpaces (the
  * decimated cortical grid used by the forward model). Each
  * hemisphere is rendered as a single batched-sphere mesh built by
- * @ref MeshFactory::createBatchedSpheres so the typical
+ * @ref DISP3DLIB::MeshFactory::createBatchedSpheres so the typical
  * ~7500-point ico-4 grid stays at one draw call per hemisphere.
  */
 
@@ -29,6 +29,9 @@
 
 #include <QVector3D>
 #include <QVector>
+
+namespace DISP3DLIB
+{
 
 //=============================================================================================================
 /**
@@ -77,5 +80,7 @@ private:
     QVector<QVector3D> m_positions; /**< 3D positions of all source points. */
     float m_scale;                  /**< Radius/size for rendering. */
 };
+
+} // namespace DISP3DLIB
 
 #endif // SOURCESPACETREEITEM_H

@@ -11,10 +11,10 @@
  *
  * On every timer tick the worker pops the next packet (or averages
  * the queue), multiplies it by the dense (n_vertices x n_channels)
- * mapping matrix produced by @ref SensorFieldMapper, applies
+ * mapping matrix produced by @ref DISP3DLIB::SensorFieldMapper, applies
  * symmetric normalisation around zero, maps through the active
  * MEG / EEG colormap and packs the result as ABGR uint32 ready for
- * direct upload into the target @ref BrainSurface colour slot.
+ * direct upload into the target @ref DISP3DLIB::BrainSurface colour slot.
  *
  * All public setters are mutex-protected so the controller can
  * swap the mapping matrix or change colormap mid-stream.

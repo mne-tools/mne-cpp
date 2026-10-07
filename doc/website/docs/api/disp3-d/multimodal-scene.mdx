@@ -29,7 +29,7 @@ Maintain a shared timeline (current time index) that data overlays across modali
 
 Maintain the most recent [`PickResult`](/docs/api/disp3-d/pick-result) and emit `picked` when a layer producer reports a hit; consumers (Pick dock, status bar, MRI ortho viewer) subscribe to that signal.
 
-The class is **non-virtual** on purpose: it is a pure data/dispatch hub with no rendering logic. The renderer (``BrainRenderer`` or a future `MultimodalRenderer`) reads layers via `layers()` and per-kind downcasts the payload pointer.
+The class is **non-virtual** on purpose: it is a pure data/dispatch hub with no rendering logic. The renderer (`[`[BrainRenderer](/docs/api/disp3-d/brain-renderer)`](/docs/api/disp3-d/brain-renderer)` or a future `MultimodalRenderer`) reads layers via `layers()` and per-kind downcasts the payload pointer.
 
 ```cpp title="src/examples/ex_disp3d_scene/main.cpp"
 MultimodalScene scene;

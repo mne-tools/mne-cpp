@@ -1,0 +1,171 @@
+---
+id: camera-controller
+title: "DISP3DLIB::CameraController"
+sidebar_label: CameraController
+sidebar_position: 21
+---
+
+# CameraController
+
+**Namespace:** `DISP3DLIB` &nbsp;·&nbsp; **Library:** 3D Display Library
+
+`#include <disp3D/cameracontroller.h>`
+
+```cpp
+class DISP3DLIB::CameraController
+```
+
+Encapsulates camera state and produces view/projection matrices.
+
+This class is independent of any Qt widget — it takes scene geometry parameters and view configuration, and produces camera matrices. It also handles rotation, zoom, and pan from mouse delta values.
+
+Camera state and matrix computation.
+
+---
+
+## Public Methods
+
+### CameraController()
+
+Constructor.
+
+---
+
+### setSceneCenter(center)
+
+Set the scene center (centroid of visible objects).
+
+**Parameters:**
+
+- **center** : *const QVector3D &*
+  Scene centroid in world coordinates.
+
+---
+
+### setSceneSize(size)
+
+Set the scene size (extent of visible objects).
+
+**Parameters:**
+
+- **size** : *float*
+  Scene extent in world units; values at or below 0.01 fall back to 0.3.
+
+---
+
+### sceneCenter()
+
+---
+
+### sceneSize()
+
+---
+
+### setRotation(q)
+
+Set user rotation for single-view.
+
+**Parameters:**
+
+- **q** : *const QQuaternion &*
+  Camera rotation quaternion.
+
+---
+
+### rotation()
+
+---
+
+### setZoom(z)
+
+Single-view zoom level.
+
+**Parameters:**
+
+- **z** : *float*
+  Zoom level; each unit moves the camera 5% of the scene size closer.
+
+---
+
+### zoom()
+
+---
+
+### resetRotation()
+
+Reset single-view rotation to identity.
+
+---
+
+### computeSingleView(aspectRatio)
+
+Compute camera matrices for a single-view viewport.
+
+**Parameters:**
+
+- **aspectRatio** : *float*
+  Width / height of the viewport.
+
+**Returns:**
+
+- *[CameraResult](/docs/api/disp3-d/camera-result)* — [`CameraResult`](/docs/api/disp3-d/camera-result) with all matrices.
+
+---
+
+### computeMultiView(subView, aspectRatio)
+
+Compute camera matrices for a multi-view pane.
+
+**Parameters:**
+
+- **subView** : *const [SubView](/docs/api/disp3-d/sub-view) &*
+  Per-view state (preset, zoom, pan, rotation).
+
+- **aspectRatio** : *float*
+  Width / height of the pane.
+
+**Returns:**
+
+- *[CameraResult](/docs/api/disp3-d/camera-result)* — [`CameraResult`](/docs/api/disp3-d/camera-result) with all matrices.
+
+---
+
+## Static Methods
+
+### applyMouseRotation(delta, rotation, speed)
+
+Apply rotation from mouse drag delta (single-view or perspective pane).
+
+**Parameters:**
+
+- **delta** : *const QPoint &*
+  Mouse delta in pixels.
+
+- **rotation** : *QQuaternion &*
+  Rotation quaternion to update.
+
+- **speed** : *float*
+  Rotation speed multiplier (default 0.5).
+
+---
+
+### applyMousePan(delta, pan, sceneSize)
+
+Apply pan from mouse drag delta (planar multi-view pane).
+
+**Parameters:**
+
+- **delta** : *const QPoint &*
+  Mouse delta in pixels.
+
+- **pan** : *QVector2D &*
+  Pan offset to update.
+
+- **sceneSize** : *float*
+  Current scene size for scaling.
+
+---
+
+## Authors of this file
+
+- Christoph Dinh &lt;christoph.dinh@mne-cpp.org&gt;

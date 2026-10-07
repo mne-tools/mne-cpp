@@ -36,6 +36,9 @@
 
 using namespace FIFFLIB;
 
+namespace DISP3DLIB
+{
+
 //=============================================================================================================
 // ANONYMOUS HELPERS
 //=============================================================================================================
@@ -816,3 +819,5 @@ void SensorFieldMapper::updateContourSurfaces(
     updateSurf("_zero", zeroBuf, QColor(0, 0, 0, 220), visible && !zeroBuf.verts.isEmpty());
     updateSurf("_pos", posBuf, QColor(255, 0, 0, 200), visible && !posBuf.verts.isEmpty());
 }
+
+} // namespace DISP3DLIB

@@ -71,6 +71,7 @@ using namespace CONNECTIVITYLIB;
 using namespace MNELIB;
 using namespace INVLIB;
 using namespace FIFFLIB;
+using namespace DISP3DLIB;
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS

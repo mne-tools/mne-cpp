@@ -15,7 +15,7 @@
  * renderable, a sort key and a visibility flag; the controller
  * iterates layers in order and issues the corresponding draw calls.
  *
- * It also routes pick events from @ref RayPicker through every
+ * It also routes pick events from @ref DISP3DLIB::RayPicker through every
  * layer and returns a uniform @ref DISP3DLIB::PickResult to the host, hiding
  * the per-primitive intersection logic.
  */

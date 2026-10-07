@@ -17,7 +17,7 @@ class DISP3DLIB::RtSensorInterpolationMatWorker
 
 [`RtSensorInterpolationMatWorker`](/docs/api/disp3-d/rt-sensor-interpolation-mat-worker) computes dense sensor-to-surface field-mapping matrices in a background thread.
 
-This worker encapsulates the expensive `FieldMap::computeMegMapping()` and computeEegMapping() calls that were previously performed synchronously on the main thread inside BrainView::buildSensorFieldMapping().
+This worker encapsulates the expensive `FieldMap::computeMegMapping()` and computeEegMapping() calls that were previously performed synchronously on the main thread inside [BrainView](/docs/api/disp3-d/brain-view)::buildSensorFieldMapping().
 
 The worker stores all relevant parameters (evoked info, surface geometry, transforms, etc.) and recomputes the mapping matrices when any parameter changes. It emits newMappingMatrixAvailable() when a new matrix is ready.
 

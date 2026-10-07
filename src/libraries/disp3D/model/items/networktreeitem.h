@@ -10,7 +10,7 @@
  * @brief    Tree item identifying a connectivity network rendered as instanced nodes and edges.
  *
  * Holds only the unique object key that maps the item back to its
- * @ref CONNECTIVITYLIB::Network payload inside @ref NetworkObject. The
+ * @ref CONNECTIVITYLIB::Network payload inside @ref DISP3DLIB::NetworkObject. The
  * actual graph (nodes as spheres, edges as cylinders colour-mapped
  * by weight) lives on the GPU as a pair of instanced meshes,
  * regenerated whenever the threshold or colormap changes.
@@ -26,6 +26,9 @@
 #include "../../disp3D_global.h"
 
 #include "abstracttreeitem.h"
+
+namespace DISP3DLIB
+{
 
 //=============================================================================================================
 /**
@@ -60,5 +63,7 @@ public:
 private:
     QString m_objectKey; /**< Unique key for this network item. */
 };
+
+} // namespace DISP3DLIB
 
 #endif // NETWORKTREEITEM_H

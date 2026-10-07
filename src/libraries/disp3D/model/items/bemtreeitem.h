@@ -28,6 +28,9 @@
 #include "abstracttreeitem.h"
 #include <mne/mne_bem_surface.h>
 
+namespace DISP3DLIB
+{
+
 /**
  * @brief Tree item representing a BEM surface layer in the 3-D scene hierarchy.
  */
@@ -42,5 +45,7 @@ public:
 private:
     MNELIB::MNEBemSurface m_bemSurface;
 };
+
+} // namespace DISP3DLIB
 
 #endif // BEMTREEITEM_H

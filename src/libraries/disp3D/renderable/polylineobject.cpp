@@ -26,6 +26,9 @@
 #include <QtMath>
 #include <rhi/qrhi.h>
 
+namespace DISP3DLIB
+{
+
 //=============================================================================================================
 // DEFINE MEMBER METHODS
 //=============================================================================================================
@@ -278,3 +281,5 @@ QRhiBuffer* PolylineObject::instanceBuffer() const
 {
     return m_gpu->instanceBuffer.get();
 }
+
+} // namespace DISP3DLIB

@@ -23,6 +23,9 @@
 #include <QVector4D>
 #include <limits>
 
+namespace DISP3DLIB
+{
+
 //=============================================================================================================
 // DEFINE MEMBER METHODS
 //=============================================================================================================
@@ -258,3 +261,5 @@ QString RayHit::displayLabel() const
 
     return surfaceKey;
 }
+
+} // namespace DISP3DLIB

@@ -16,6 +16,9 @@
 
 #include "digitizertreeitem.h"
 
+namespace DISP3DLIB
+{
+
 //=============================================================================================================
 // DEFINE MEMBER METHODS
 //=============================================================================================================
@@ -63,3 +66,5 @@ DigitizerTreeItem::PointKind DigitizerTreeItem::pointKind() const
 {
     return m_kind;
 }
+
+} // namespace DISP3DLIB

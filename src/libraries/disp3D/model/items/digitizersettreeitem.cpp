@@ -22,6 +22,9 @@
 #include <QVector3D>
 #include <QDebug>
 
+namespace DISP3DLIB
+{
+
 //=============================================================================================================
 // DEFINE MEMBER METHODS
 //=============================================================================================================
@@ -148,3 +151,5 @@ int DigitizerSetTreeItem::totalPointCount() const
     }
     return count;
 }
+
+} // namespace DISP3DLIB

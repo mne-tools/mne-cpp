@@ -12,9 +12,9 @@
  * RtSensorStreamManager bridges the streaming side (sensor packets
  * arriving on a worker thread) and the rendering side (per-vertex
  * colour updates on the target head / helmet surface). It owns the
- * @ref RtSensorDataController plus the dense MEG / EEG mapping
- * matrix produced by @ref SensorFieldMapper and forwards new
- * colour buffers to the bound @ref BrainSurface on every frame.
+ * @ref DISP3DLIB::RtSensorDataController plus the dense MEG / EEG mapping
+ * matrix produced by @ref DISP3DLIB::SensorFieldMapper and forwards new
+ * colour buffers to the bound @ref DISP3DLIB::BrainSurface on every frame.
  */
 
 #ifndef RTSENSORSTREAMMANAGER_H
@@ -36,6 +36,9 @@
 //=============================================================================================================
 // FORWARD DECLARATIONS
 //=============================================================================================================
+
+namespace DISP3DLIB
+{
 
 class BrainSurface;
 class RtSensorDataController;
@@ -158,5 +161,7 @@ private:
     bool m_isStreaming = false;                           /**< True while streaming is active. */
     QString m_modality;                                   /**< Active modality: "MEG" or "EEG". */
 };
+
+} // namespace DISP3DLIB
 
 #endif // RTSENSORSTREAMMANAGER_H

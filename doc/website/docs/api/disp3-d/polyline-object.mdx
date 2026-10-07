@@ -1,0 +1,169 @@
+---
+id: polyline-object
+title: "DISP3DLIB::PolylineObject"
+sidebar_label: PolylineObject
+sidebar_position: 33
+---
+
+# PolylineObject
+
+**Namespace:** `DISP3DLIB` &nbsp;·&nbsp; **Library:** 3D Display Library
+
+`#include <disp3D/polylineobject.h>`
+
+```cpp
+class DISP3DLIB::PolylineObject
+```
+
+Renders an ordered sequence of points as connected line segments.
+
+Each segment is one instance of a unit cylinder, using the same instance layout as [`DipoleObject`](/docs/api/disp3-d/dipole-object) and [`NetworkObject`](/docs/api/disp3-d/network-object) so the existing Dipole pipeline can draw it without a dedicated shader.
+
+Connected line segments through an ordered list of points.
+
+---
+
+## Public Methods
+
+### PolylineObject()
+
+Constructs a [`PolylineObject`](/docs/api/disp3-d/polyline-object) without any points.
+
+---
+
+### ~PolylineObject()
+
+Destroys the [`PolylineObject`](/docs/api/disp3-d/polyline-object).
+
+---
+
+### setPoints(vecPoints)
+
+Sets the points of the polyline.
+
+Fewer than two points clears the object, since a single point has no segment to draw.
+
+**Parameters:**
+
+- **vecPoints** : *const QVector&lt; Eigen::Vector3f &gt; &*
+  Points in scene coordinates, in order.
+
+---
+
+### clear()
+
+Clears all points.
+
+---
+
+### setRadius(fRadius)
+
+Sets the radius of the drawn segments.
+
+**Parameters:**
+
+- **fRadius** : *float*
+  Segment radius in scene units.
+
+---
+
+### setGradient(startColor, endColor)
+
+Sets the colours the segments are graded between from start to end.
+
+Grading the line makes the direction of travel readable without any extra decoration.
+
+**Parameters:**
+
+- **startColor** : *const QColor &*
+  Colour of the first segment.
+
+- **endColor** : *const QColor &*
+  Colour of the last segment.
+
+---
+
+### updateBuffers(rhi, u)
+
+Uploads or refreshes the GPU buffers.
+
+**Parameters:**
+
+- **rhi** : *QRhi **
+  The RHI to allocate through.
+
+- **u** : *QRhiResourceUpdateBatch **
+  Batch collecting the resource updates.
+
+---
+
+### vertexBuffer()
+
+**Returns:**
+
+- *QRhiBuffer ** — Vertex buffer of the unit segment mesh.
+
+---
+
+### indexBuffer()
+
+**Returns:**
+
+- *QRhiBuffer ** — Index buffer of the unit segment mesh.
+
+---
+
+### instanceBuffer()
+
+**Returns:**
+
+- *QRhiBuffer ** — Per-segment instance buffer.
+
+---
+
+### indexCount()
+
+**Returns:**
+
+- *int* — Number of indices in the unit segment mesh.
+
+---
+
+### instanceCount()
+
+**Returns:**
+
+- *int* — Number of segment instances, one less than the number of points.
+
+---
+
+### isVisible()
+
+**Returns:**
+
+- *bool* — Whether the polyline is drawn.
+
+---
+
+### setVisible(bVisible)
+
+Sets whether the polyline is drawn.
+
+**Parameters:**
+
+- **bVisible** : *bool*
+  True to draw the polyline.
+
+---
+
+### hasData()
+
+**Returns:**
+
+- *bool* — Whether there is at least one segment to draw.
+
+---
+
+## Authors of this file
+
+- Christoph Dinh &lt;christoph.dinh@mne-cpp.org&gt;

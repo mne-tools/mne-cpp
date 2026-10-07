@@ -26,6 +26,9 @@
 #include <QDebug>
 #include <cmath>
 
+namespace DISP3DLIB
+{
+
 //=============================================================================================================
 // DEFINE MEMBER METHODS
 //=============================================================================================================
@@ -436,3 +439,5 @@ Eigen::VectorXd SourceEstimateOverlay::sourceDataColumn(int timeIndex) const
 
     return result;
 }
+
+} // namespace DISP3DLIB

@@ -30,6 +30,9 @@ using namespace CONNECTIVITYLIB;
 using namespace DISPLIB;
 using namespace Eigen;
 
+namespace DISP3DLIB
+{
+
 //=============================================================================================================
 // PIMPL
 //=============================================================================================================
@@ -582,3 +585,5 @@ void NetworkObject::updateEdgeBuffers(QRhi* rhi, QRhiResourceUpdateBatch* u)
         m_edgeInstancesDirty = false;
     }
 }
+
+} // namespace DISP3DLIB

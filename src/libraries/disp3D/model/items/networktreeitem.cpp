@@ -16,6 +16,9 @@
 
 #include "networktreeitem.h"
 
+namespace DISP3DLIB
+{
+
 //=============================================================================================================
 // DEFINE MEMBER METHODS
 //=============================================================================================================
@@ -25,3 +28,5 @@ NetworkTreeItem::NetworkTreeItem(const QString& text, const QString& objectKey)
 , m_objectKey(objectKey)
 {
 }
+
+} // namespace DISP3DLIB

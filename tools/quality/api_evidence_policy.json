@@ -16,7 +16,21 @@
     "Settings": "Plain parameter record consumed by an algorithm class; shown inside that class's example."
   },
   "example_debt": {
-    "ceiling": 0,
-    "names": []
+    "ceiling": 13,
+    "names": [
+      "BrainRenderer",
+      "BrainSurface",
+      "BrainView",
+      "DipoleObject",
+      "LiveMarker",
+      "MultiViewLayout",
+      "NetworkObject",
+      "PolylineObject",
+      "RtSensorStreamManager",
+      "SensorFieldMapper",
+      "SourceEstimateManager",
+      "SourceEstimateOverlay",
+      "VertexData"
+    ]
   }
 }

@@ -26,6 +26,9 @@
 #include <QSet>
 #include <cmath>
 
+namespace DISP3DLIB
+{
+
 //=============================================================================================================
 // DEFINE MEMBER METHODS
 //=============================================================================================================
@@ -358,3 +361,5 @@ const SourceEstimateOverlay* SourceEstimateManager::overlay() const
 {
     return m_overlay.get();
 }
+
+} // namespace DISP3DLIB

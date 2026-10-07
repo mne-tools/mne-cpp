@@ -27,7 +27,7 @@
  * alongside the geometry so a single draw covers the whole surface.
  *
  * The header itself only carries the import / export macro plumbing;
- * consumers should include @ref BrainView (top-level QWidget) or the
+ * consumers should include @ref DISP3DLIB::BrainView (top-level QWidget) or the
  * scene controllers in scene/ and workers/ for high-level integration.
  */
 

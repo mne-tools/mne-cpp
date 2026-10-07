@@ -45,11 +45,14 @@
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
+namespace DISP3DLIB
+{
 class BrainView;
 class BrainTreeModel;
 class NetworkTreeItem;
 class BemTreeItem;
 class DigitizerSetTreeItem;
+}
 
 namespace SCMEASLIB
 {
@@ -191,14 +194,14 @@ protected:
     QMatrix4x4 m_tAlignment;                /**< Transformation matrix alignment fiducials/tracked in head space. */
     FIFFLIB::FiffCoordTrans m_mriHeadTrans; /**< The mri to head transformation. */
 
-    QSharedPointer<BrainTreeModel> m_pData3DModel; /**< The Disp3D model. */
+    QSharedPointer<DISP3DLIB::BrainTreeModel> m_pData3DModel; /**< The Disp3D model. */
 
-    DigitizerSetTreeItem* m_pTrackedDigitizer; /**< The 3D item pointing to the tracked digitizers. */
-    QPointer<BrainView> m_p3DView;             /**< The Disp3D view. */
-    NetworkTreeItem* m_pRtConnectivityItem;    /**< The Disp3D real time item. */
-    bool m_bRtSourceActive;                    /**< Whether realtime source is active. */
-    BemTreeItem* m_pBemHeadAvr;                /**< The fsaverage BEM head model. */
-    QPointer<QAction> m_pActionQuickControl;   /**< Show quick control widget. */
+    DISP3DLIB::DigitizerSetTreeItem* m_pTrackedDigitizer; /**< The 3D item pointing to the tracked digitizers. */
+    QPointer<DISP3DLIB::BrainView> m_p3DView;             /**< The Disp3D view. */
+    DISP3DLIB::NetworkTreeItem* m_pRtConnectivityItem;    /**< The Disp3D real time item. */
+    bool m_bRtSourceActive;                               /**< Whether realtime source is active. */
+    DISP3DLIB::BemTreeItem* m_pBemHeadAvr;                /**< The fsaverage BEM head model. */
+    QPointer<QAction> m_pActionQuickControl;              /**< Show quick control widget. */
 };
 } // NAMESPACE
 

@@ -1,0 +1,113 @@
+---
+id: digitizer-tree-item
+title: "DISP3DLIB::DigitizerTreeItem"
+sidebar_label: DigitizerTreeItem
+sidebar_position: 25
+---
+
+# DigitizerTreeItem
+
+**Namespace:** `DISP3DLIB` &nbsp;·&nbsp; **Library:** 3D Display Library
+
+`#include <disp3D/digitizertreeitem.h>`
+
+```cpp
+class DISP3DLIB::DigitizerTreeItem
+```
+
+[`DigitizerTreeItem`](/docs/api/disp3-d/digitizer-tree-item) represents a group of digitizer points of the same category (Cardinal, HPI, EEG, Extra) in the tree model.
+
+Each item stores batched 3D positions for efficient rendering as a single mesh with replicated sphere geometry.
+
+This matches the disp3D [`DigitizerTreeItem`](/docs/api/disp3-d/digitizer-tree-item) pattern using per-category grouping with color-coded sphere rendering.
+
+Digitizer point group tree item.
+
+### Inheritance
+
+```mermaid
+classDiagram
+    AbstractTreeItem <|-- DigitizerTreeItem
+    click AbstractTreeItem "/docs/api/disp3-d/abstract-tree-item"
+```
+
+---
+
+## Public Methods
+
+### DigitizerTreeItem(text, kind, positions, names, color, scale, type)
+
+Constructs a [`DigitizerTreeItem`](/docs/api/disp3-d/digitizer-tree-item) for a single category of digitizer points.
+
+**Parameters:**
+
+- **text** : *const QString &*
+  Display text for the item (e.g. "Cardinal", "HPI", "EEG", "Extra").
+
+- **kind** : *PointKind*
+  The digitizer point category.
+
+- **positions** : *const QVector&lt; QVector3D &gt; &*
+  3D positions of all points in this category (in meters).
+
+- **names** : *const QStringList &*
+  Display names for individual points (e.g. "Nasion", "LPA").
+
+- **color** : *const QColor &*
+  Color for rendering this category.
+
+- **scale** : *float*
+  Radius of each rendered sphere.
+
+- **type** : *int*
+  Item type identifier.
+
+---
+
+### ~DigitizerTreeItem()
+
+---
+
+### positions()
+
+Returns all point positions in this category.
+
+**Returns:**
+
+- *const QVector&lt; QVector3D &gt; &* — Vector of 3D position vectors.
+
+---
+
+### pointNames()
+
+Returns the display names for individual points.
+
+**Returns:**
+
+- *const QStringList &* — List of point names.
+
+---
+
+### scale()
+
+Returns the rendering scale (sphere radius).
+
+**Returns:**
+
+- *float* — Scale value in meters.
+
+---
+
+### pointKind()
+
+Returns the digitizer point category.
+
+**Returns:**
+
+- *PointKind* — Point kind enum value.
+
+---
+
+## Authors of this file
+
+- Christoph Dinh &lt;christoph.dinh@mne-cpp.org&gt;

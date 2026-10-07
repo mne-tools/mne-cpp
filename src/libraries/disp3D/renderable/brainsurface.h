@@ -10,13 +10,13 @@
  * @brief    Renderable cortical / BEM mesh with interleaved vertex attributes and Qt-RHI buffer management.
  *
  * BrainSurface is the core 3-D primitive of disp3D. It owns the
- * interleaved @ref VertexData stream (position, normal, packed-ABGR
+ * interleaved @ref DISP3DLIB::VertexData stream (position, normal, packed-ABGR
  * base / annotation colour, surface-id) and the matching index
  * buffer, plus the QRhi vertex / index buffer pair that the renderer
  * binds for every draw.
  *
  * Per-vertex colour is computed once on the CPU from one of four
- * sources selected by @ref VisualizationMode &mdash; flat base colour,
+ * sources selected by @ref DISP3DLIB::VisualizationMode &mdash; flat base colour,
  * FsAnnotation parcellation, scientific curvature shading (Lambertian
  * ambient + sulcal darkening), or a source-time-course value mapped
  * through the active colormap &mdash; then packed into the second
@@ -60,6 +60,9 @@ class QRhiResourceUpdateBatch;
 // STRUCTS
 //=============================================================================================================
 
+namespace DISP3DLIB
+{
+
 /**
  * @brief Interleaved vertex attributes (position, normal, color, curvature) for brain surface GPU upload.
  */
@@ -97,11 +100,11 @@ public:
 
     // VisualizationMode is defined in core/rendertypes.h for lightweight inclusion.
     // These aliases preserve backward compatibility.
-    using VisualizationMode = ::VisualizationMode;
-    static constexpr VisualizationMode ModeSurface = ::ModeSurface;
-    static constexpr VisualizationMode ModeAnnotation = ::ModeAnnotation;
-    static constexpr VisualizationMode ModeScientific = ::ModeScientific;
-    static constexpr VisualizationMode ModeSourceEstimate = ::ModeSourceEstimate;
+    using VisualizationMode = DISP3DLIB::VisualizationMode;
+    static constexpr VisualizationMode ModeSurface = DISP3DLIB::ModeSurface;
+    static constexpr VisualizationMode ModeAnnotation = DISP3DLIB::ModeAnnotation;
+    static constexpr VisualizationMode ModeScientific = DISP3DLIB::ModeScientific;
+    static constexpr VisualizationMode ModeSourceEstimate = DISP3DLIB::ModeSourceEstimate;
 
     enum TissueType
     {
@@ -492,5 +495,7 @@ private:
     mutable QVector3D m_aabbMax;
     mutable bool m_bAABBDirty = true;
 };
+
+} // namespace DISP3DLIB
 
 #endif // BRAINSURFACE_H

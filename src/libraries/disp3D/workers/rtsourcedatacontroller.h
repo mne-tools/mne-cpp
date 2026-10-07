@@ -53,9 +53,9 @@ class FsLabel;
 
 namespace DISP3DLIB
 {
+
 class RtSourceDataWorker;
 class RtSourceInterpolationMatWorker;
-}
 
 //=============================================================================================================
 /**
@@ -361,5 +361,7 @@ private:
     QThread* m_pInterpThread = nullptr;                                   /**< Background thread for interpolation matrix worker. */
     DISP3DLIB::RtSourceInterpolationMatWorker* m_pInterpWorker = nullptr; /**< Interpolation matrix worker. */
 };
+
+} // namespace DISP3DLIB
 
 #endif // BRAINVIEW_RTSOURCEDATACONTROLLER_H

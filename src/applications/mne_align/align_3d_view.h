@@ -40,8 +40,11 @@
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
+namespace DISP3DLIB
+{
 class BrainTreeModel;
 class BrainView;
+}
 
 namespace DISP3DLIB
 {
@@ -260,8 +263,8 @@ private:
     bool m_haveHeadToMriOverride = false;
     QMatrix4x4 m_headToMriOverride;
 
-    QPointer<BrainView> m_pBrainView;
-    QPointer<BrainTreeModel> m_pBrainModel;
+    QPointer<DISP3DLIB::BrainView> m_pBrainView;
+    QPointer<DISP3DLIB::BrainTreeModel> m_pBrainModel;
 };
 
 } // namespace MNEALIGN

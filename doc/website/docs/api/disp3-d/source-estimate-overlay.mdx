@@ -1,0 +1,289 @@
+---
+id: source-estimate-overlay
+title: "DISP3DLIB::SourceEstimateOverlay"
+sidebar_label: SourceEstimateOverlay
+sidebar_position: 42
+---
+
+# SourceEstimateOverlay
+
+**Namespace:** `DISP3DLIB` &nbsp;·&nbsp; **Library:** 3D Display Library
+
+`#include <disp3D/sourceestimateoverlay.h>`
+
+```cpp
+class DISP3DLIB::SourceEstimateOverlay
+```
+
+[`SourceEstimateOverlay`](/docs/api/disp3-d/source-estimate-overlay) manages source estimate data (.stc files) and applies colormap visualization to brain surfaces.
+
+Color-mapped source estimate overlay that interpolates activation values onto a cortical surface mesh.
+
+---
+
+## Public Methods
+
+### SourceEstimateOverlay()
+
+Constructor.
+
+---
+
+### ~SourceEstimateOverlay()
+
+Destructor.
+
+---
+
+### loadStc(path, hemi)
+
+Load a source estimate file (.stc) for a hemisphere.
+
+**Parameters:**
+
+- **path** : *const QString &*
+  Path to the .stc file.
+
+- **hemi** : *int*
+  Hemisphere index (0=lh, 1=rh).
+
+**Returns:**
+
+- *bool* — True if successful.
+
+---
+
+### isLoaded()
+
+Check if source estimate data is loaded.
+
+**Returns:**
+
+- *bool* — True if data is loaded for at least one hemisphere.
+
+---
+
+### applyToSurface(surface, timeIndex)
+
+Apply source estimate colors to a brain surface at a given time index.
+
+**Parameters:**
+
+- **surface** : *[BrainSurface](/docs/api/disp3-d/brain-surface) **
+  Pointer to the brain surface.
+
+- **timeIndex** : *int*
+  Time sample index.
+
+---
+
+### computeInterpolationMatrix(surface, hemi, cancelDist)
+
+Compute interpolation matrix for a surface.
+
+This spreads sparse source values to all surface vertices.
+
+**Parameters:**
+
+- **surface** : *[BrainSurface](/docs/api/disp3-d/brain-surface) **
+  Pointer to the brain surface.
+
+- **hemi** : *int*
+  Hemisphere index (0=lh, 1=rh).
+
+- **cancelDist** : *double*
+  Cancel distance for interpolation (default 0.05m).
+
+---
+
+### setColormap(name)
+
+Set the colormap to use for visualization.
+
+**Parameters:**
+
+- **name** : *const QString &*
+  Colormap name ("Hot", "Jet", "Viridis", "Cool", "RedBlue").
+
+---
+
+### colormap()
+
+Get the current colormap name.
+
+**Returns:**
+
+- *QString* — The colormap name.
+
+---
+
+### setThresholds(min, mid, max)
+
+Set threshold values for normalization.
+
+Values below min are transparent, values above max are clamped.
+
+**Parameters:**
+
+- **min** : *float*
+  Minimum threshold.
+
+- **mid** : *float*
+  Mid-point threshold (used for some colormaps).
+
+- **max** : *float*
+  Maximum threshold.
+
+---
+
+### thresholdMin()
+
+Get the current threshold values.
+
+**Returns:**
+
+- *float* — Minimum threshold; values below it are rendered transparent.
+
+---
+
+### thresholdMid()
+
+---
+
+### thresholdMax()
+
+---
+
+### numTimePoints()
+
+Get the number of time points in the source estimate.
+
+**Returns:**
+
+- *int* — Number of time samples.
+
+---
+
+### timeAtIndex(idx)
+
+Get the time value at a given index.
+
+**Parameters:**
+
+- **idx** : *int*
+  Time sample index.
+
+**Returns:**
+
+- *float* — Time in seconds.
+
+---
+
+### tmin()
+
+Get the minimum time value.
+
+**Returns:**
+
+- *float* — Time in seconds.
+
+---
+
+### tstep()
+
+Get the time step between samples.
+
+**Returns:**
+
+- *float* — Time step in seconds.
+
+---
+
+### getDataRange(minVal, maxVal)
+
+Get the data range (min/max values) across all time points for auto-thresholding.
+
+**Parameters:**
+
+- **minVal** : *double &*
+  Minimum data value.
+
+- **maxVal** : *double &*
+  Maximum data value.
+
+---
+
+### setStcData(stc, hemi)
+
+Set the source estimate data directly (used by async loader).
+
+**Parameters:**
+
+- **stc** : *const [InvSourceEstimate](/docs/api/inv/inv-source-estimate) &*
+  The source estimate data.
+
+- **hemi** : *int*
+  Hemisphere index (0=lh, 1=rh).
+
+---
+
+### setInterpolationMatrix(mat, hemi)
+
+Set the interpolation matrix directly (used by async loader).
+
+**Parameters:**
+
+- **mat** : *QSharedPointer&lt; Eigen::SparseMatrix&lt; float &gt; &gt;*
+  The interpolation matrix.
+
+- **hemi** : *int*
+  Hemisphere index (0=lh, 1=rh).
+
+---
+
+### updateThresholdsFromData()
+
+Update thresholds based on loaded data range.
+
+---
+
+### interpolationMatLh()
+
+Get the interpolation matrix for the left hemisphere.
+
+**Returns:**
+
+- *QSharedPointer&lt; Eigen::SparseMatrix&lt; float &gt; &gt;* — Shared pointer to the LH interpolation matrix (may be null).
+
+---
+
+### interpolationMatRh()
+
+Get the interpolation matrix for the right hemisphere.
+
+**Returns:**
+
+- *QSharedPointer&lt; Eigen::SparseMatrix&lt; float &gt; &gt;* — Shared pointer to the RH interpolation matrix (may be null).
+
+---
+
+### sourceDataColumn(timeIndex)
+
+Get a single column of concatenated source data (LH + RH) at a given time index.
+
+Used by the real-time streaming controller to feed data into the queue.
+
+**Parameters:**
+
+- **timeIndex** : *int*
+  Time sample index.
+
+**Returns:**
+
+- *Eigen::VectorXd* — Concatenated source values vector (nSourcesLH + nSourcesRH).
+
+---
+
+## Authors of this file
+
+- Christoph Dinh &lt;christoph.dinh@mne-cpp.org&gt;

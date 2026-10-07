@@ -16,6 +16,9 @@
 
 #include "abstracttreeitem.h"
 
+namespace DISP3DLIB
+{
+
 AbstractTreeItem::AbstractTreeItem(const QString& text, int type)
 : QStandardItem(text)
 , m_type(type)
@@ -71,3 +74,5 @@ float AbstractTreeItem::alpha() const
 {
     return data(AlphaRole).toFloat();
 }
+
+} // namespace DISP3DLIB

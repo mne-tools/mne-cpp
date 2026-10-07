@@ -24,6 +24,7 @@
 
 using namespace Eigen;
 using namespace FIFFLIB;
+using namespace DISP3DLIB;
 
 namespace
 {

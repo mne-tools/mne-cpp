@@ -49,6 +49,7 @@ using namespace VIEW3DPLUGIN;
 using namespace ANSHAREDLIB;
 using namespace DISPLIB;
 using namespace FIFFLIB;
+using namespace DISP3DLIB;
 //=============================================================================================================
 // DEFINE MEMBER METHODS
 //=============================================================================================================

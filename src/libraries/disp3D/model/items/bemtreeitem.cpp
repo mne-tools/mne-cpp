@@ -16,6 +16,9 @@
 
 #include "bemtreeitem.h"
 
+namespace DISP3DLIB
+{
+
 BemTreeItem::BemTreeItem(const QString& text, const MNELIB::MNEBemSurface& bemSurf)
 : AbstractTreeItem(text, BemItem)
 , m_bemSurface(bemSurf)
@@ -28,3 +31,5 @@ const MNELIB::MNEBemSurface& BemTreeItem::bemSurfaceData() const
 {
     return m_bemSurface;
 }
+
+} // namespace DISP3DLIB

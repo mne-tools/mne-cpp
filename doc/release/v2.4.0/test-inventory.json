@@ -773,7 +773,9 @@
         "ubuntu-24.04": "run",
         "windows-2025-vs2026": "run"
       },
-      "registry_classes": []
+      "registry_classes": [
+        "BrainSurface"
+      ]
     },
     {
       "name": "test_disp3d_brainview",
@@ -803,7 +805,27 @@
         "ubuntu-24.04": "run",
         "windows-2025-vs2026": "run"
       },
-      "registry_classes": []
+      "registry_classes": [
+        "BemTreeItem",
+        "BrainTreeModel",
+        "BrainView",
+        "CameraController",
+        "CameraResult",
+        "DigitizerSetTreeItem",
+        "DigitizerTreeItem",
+        "DipoleObject",
+        "DipoleTreeItem",
+        "MultiViewLayout",
+        "NetworkTreeItem",
+        "PolylineObject",
+        "RayHit",
+        "RayPicker",
+        "RtSensorStreamManager",
+        "SourceEstimateManager",
+        "SourceSpaceTreeItem",
+        "StcLoadingWorker",
+        "SurfaceTreeItem"
+      ]
     },
     {
       "name": "test_disp3d_headless",
@@ -835,7 +857,10 @@
         "ubuntu-24.04": "run",
         "windows-2025-vs2026": "run"
       },
-      "registry_classes": []
+      "registry_classes": [
+        "DataLoader",
+        "MeshFactory"
+      ]
     },
     {
       "name": "test_disp3d_viewstate",
@@ -864,7 +889,10 @@
         "ubuntu-24.04": "run",
         "windows-2025-vs2026": "run"
       },
-      "registry_classes": []
+      "registry_classes": [
+        "SubView",
+        "ViewVisibilityProfile"
+      ]
     },
     {
       "name": "test_disp_colormap",
@@ -6205,7 +6233,9 @@
         "ubuntu-24.04": "run",
         "windows-2025-vs2026": "run"
       },
-      "registry_classes": []
+      "registry_classes": [
+        "RtSourceDataController"
+      ]
     },
     {
       "name": "test_rtprocessing_averaging",
@@ -6417,7 +6447,9 @@
         "ubuntu-24.04": "run",
         "windows-2025-vs2026": "run"
       },
-      "registry_classes": []
+      "registry_classes": [
+        "SensorFieldMapper"
+      ]
     },
     {
       "name": "test_sensor_streaming",
@@ -6446,7 +6478,9 @@
         "ubuntu-24.04": "run",
         "windows-2025-vs2026": "run"
       },
-      "registry_classes": []
+      "registry_classes": [
+        "RtSensorDataController"
+      ]
     },
     {
       "name": "test_setup_forward_model",

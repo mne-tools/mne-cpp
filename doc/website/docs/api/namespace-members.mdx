@@ -7,7 +7,7 @@ sidebar_position: 6
 
 # Namespace Members
 
-Index of 324 namespace-level symbols (functions, typedefs, enums, variables) across all public namespaces.
+Index of 339 namespace-level symbols (functions, typedefs, enums, variables) across all public namespaces.
 
 - **_fiff_block_explanations** `[var]` in [FIFFLIB](/docs/api/fiff/)
 - **_fiff_explanations** `[var]` in [FIFFLIB](/docs/api/fiff/)
@@ -218,6 +218,7 @@ Index of 324 namespace-level symbols (functions, typedefs, enums, variables) acr
 - **InvSourceSpaceType** `[enum]` in [INVLIB](/docs/api/inv/) — Enumerates the source space type underlying a source estimate.
 - **InvTokenId** `[enum]` in [INVLIB](/docs/api/inv/) — Token vocabulary for the [`InvSourceEstimate`](/docs/api/inv/inv-source-estimate) tokenization format.
 - **isHit** `[fn]` in [DISP3DLIB](/docs/api/disp3-d/)
+- **isTrue** `[fn]` in [DISP3DLIB](/docs/api/disp3-d/) — Read a boolean from QSettings with a default fallback.
 - **kBemHead** `[var]` in `SURFACEKEYS`
 - **kBemPrefix** `[var]` in `SURFACEKEYS`
 - **kContourEeg** `[var]` in `SURFACEKEYS`
@@ -262,6 +263,7 @@ Index of 324 namespace-level symbols (functions, typedefs, enums, variables) acr
 - **mnaFileRoleToString** `[fn]` in [MNALIB](/docs/api/mna/) — Convert `MnaFileRole` to its string representation.
 - **MnaNodeExecMode** `[enum]` in [MNALIB](/docs/api/mna/) — Execution mode for a graph node.
 - **MnaPortDir** `[enum]` in [MNALIB](/docs/api/mna/) — Direction of a port on a graph node.
+- **mneAnalyzeColor** `[fn]` in [DISP3DLIB](/docs/api/disp3-d/) — MNE analyze colormap: teal → blue → gray → red → yellow.
 - **mneChSelection** `[type]` in [MNELIB](/docs/api/mne/)
 - **mneChSelectionRec** `[type]` in [MNELIB](/docs/api/mne/) — Backward-compatible typedef aliases.
 - **mneUserFreeFunc** `[type]` in [MNELIB](/docs/api/mne/) — Generic destructor callback for user-attached data.
@@ -277,6 +279,10 @@ Index of 324 namespace-level symbols (functions, typedefs, enums, variables) acr
 - **MRI_SHORT** `[var]` in [MRILIB](/docs/api/mri/) — Signed 16-bit short.
 - **MRI_TENSOR** `[var]` in [MRILIB](/docs/api/mri/) — Tensor (unused in practice).
 - **MRI_UCHAR** `[var]` in [MRILIB](/docs/api/mri/) — Unsigned char (8-bit).
+- **multiViewPresetIsPerspective** `[fn]` in [DISP3DLIB](/docs/api/disp3-d/) — Whether a preset is a perspective (free-rotate) camera rather than an orthographic-style fixed camera.
+- **multiViewPresetName** `[fn]` in [DISP3DLIB](/docs/api/disp3-d/) — Human-readable name for a multi-view preset index (0–6).
+- **multiViewPresetOffset** `[fn]` in [DISP3DLIB](/docs/api/disp3-d/) — Camera rotation quaternion for a multi-view preset index (0–6).
+- **normalizedVisualizationTarget** `[fn]` in [DISP3DLIB](/docs/api/disp3-d/) — Clamp a visualization target index to [-1, maxIndex].
 - **operator!=** `[fn]` in [FIFFLIB](/docs/api/fiff/) — Compares two [`FiffTime`](/docs/api/fiff/fiff-time) instances for inequality.
 - **operator&lt;&lt;** `[fn]` in [FIFFLIB](/docs/api/fiff/)
 - **operator&lt;&lt;** `[fn]` in [FIFFLIB](/docs/api/fiff/)
@@ -294,9 +300,11 @@ Index of 324 namespace-level symbols (functions, typedefs, enums, variables) acr
 - **operator==** `[fn]` in [MNELIB](/docs/api/mne/)
 - **operator==** `[fn]` in [MNELIB](/docs/api/mne/)
 - **operator==** `[fn]` in [MNELIB](/docs/api/mne/)
+- **packABGR** `[fn]` in [DISP3DLIB](/docs/api/disp3-d/) — Pack RGBA colour components into a single ABGR uint32_t suitable for GPU vertex attributes declared as UNormByte4.
 - **peakFinder** `[fn]` in [UTILSLIB](/docs/api/utils/) — Find peaks in a 1D signal.
 - **peakProminences** `[fn]` in [UTILSLIB](/docs/api/utils/) — Compute prominence of each peak.
 - **performIcp** `[fn]` in [MNELIB](/docs/api/mne/) — The ICP algorithm to register a point cloud with a surface.
+- **perspectivePresetRotation** `[fn]` in [DISP3DLIB](/docs/api/disp3-d/) — Default perspective rotation quaternion used for the "Perspective" camera.
 - **PickKind** `[enum]` in [DISP3DLIB](/docs/api/disp3-d/) — Kind of object that produced a 3-D pick.
 - **PointKind** `[enum]` in [UTILSLIB](/docs/api/utils/) — Logical category of a captured point.
 - **PythonLineCallback** `[type]` in [UTILSLIB](/docs/api/utils/) — Line-level callback signature.
@@ -309,12 +317,16 @@ Index of 324 namespace-level symbols (functions, typedefs, enums, variables) acr
 - **sensorTypeToObjectKey** `[fn]` in `SURFACEKEYS` — Map from user-facing sensor type name (e.g.
 - **setBipolarReference** `[fn]` in [UTILSLIB](/docs/api/utils/) — Create bipolar derivations from EEG channels.
 - **setEegReference** `[fn]` in [UTILSLIB](/docs/api/utils/) — Re-reference EEG channels to average, specific channel(s), or REST.
+- **ShaderMode** `[enum]` in [DISP3DLIB](/docs/api/disp3-d/) — Shader pipeline modes supported by the renderer.
+- **shaderModeFromName** `[fn]` in [DISP3DLIB](/docs/api/disp3-d/) — Convert a shader name ("Standard", "Holographic", "Anatomical") to enum.
+- **shaderModeName** `[fn]` in [DISP3DLIB](/docs/api/disp3-d/) — Convert a `ShaderMode` enum to display string.
 - **simulateEvoked** `[fn]` in [UTILSLIB](/docs/api/utils/) — Simulate evoked data from a source estimate and forward model.
 - **simulateEvokedNoiseless** `[fn]` in [UTILSLIB](/docs/api/utils/) — Simulate evoked data without noise.
 - **simulateStc** `[fn]` in [UTILSLIB](/docs/api/utils/) — Create a synthetic source time course.
 - **simulateStcFromWaveforms** `[fn]` in [UTILSLIB](/docs/api/utils/) — Create a synthetic source time course from custom waveforms.
 - **SliceOrientation** `[enum]` in [DISP3DLIB](/docs/api/disp3-d/) — Orientation for an orthogonal MRI slice.
 - **SliceOrientation** `[enum]` in [MRILIB](/docs/api/mri/) — Slice orientation for orthogonal MRI volume slicing.
+- **SplitterHit** `[enum]` in [DISP3DLIB](/docs/api/disp3-d/) — Identifies which splitter(s) are hit by a cursor position.
 - **StatsCorrection** `[enum]` in [STSLIB](/docs/api/sts/) — Multiple comparison correction method.
 - **StatsTailType** `[enum]` in [STSLIB](/docs/api/sts/) — Tail type for statistical tests.
 - **StimArtifactMode** `[enum]` in [UTILSLIB](/docs/api/utils/) — Mode for stimulus artifact repair.
@@ -333,3 +345,6 @@ Index of 324 namespace-level symbols (functions, typedefs, enums, variables) acr
 - **tokenValues** `[fn]` in [INVLIB](/docs/api/inv/) — Extract just the continuous values from a token sequence (discarding IDs).
 - **toQMatrix4x4** `[fn]` in `SURFACEKEYS` — Convert an Eigen 4x4 matrix to a QMatrix4x4.
 - **vecDefaultWeights** `[var]` in [MNELIB](/docs/api/mne/)
+- **VisualizationMode** `[enum]` in [DISP3DLIB](/docs/api/disp3-d/) — Overlay visualisation modes for brain surfaces.
+- **visualizationModeFromName** `[fn]` in [DISP3DLIB](/docs/api/disp3-d/) — Convert a visualization mode name to enum.
+- **visualizationModeName** `[fn]` in [DISP3DLIB](/docs/api/disp3-d/) — Convert a `VisualizationMode` enum to display string.

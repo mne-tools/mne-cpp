@@ -12,7 +12,7 @@
  * DataLoader is a thin facade over @ref FSLIB and @ref MNELIB readers
  * that turns raw files (FsSurface, FsAnnotation, MNESourceSpaces,
  * MNEBemSurface, FIFF digitizer / sensor blocks) into the in-memory
- * objects that @ref BrainTreeModel and the @c renderable/ layer
+ * objects that @ref DISP3DLIB::BrainTreeModel and the @c renderable/ layer
  * expect. It exists so GUI code can populate the 3-D scene without
  * knowing the FreeSurfer / MNE file-format conventions (subject
  * directory layout, hemisphere suffixes, surface-RAS vs head
@@ -49,6 +49,9 @@
 //=============================================================================================================
 // FORWARD DECLARATIONS
 //=============================================================================================================
+
+namespace DISP3DLIB
+{
 
 class BrainSurface;
 class SensorTreeItem;
@@ -160,5 +163,7 @@ public:
      */
     static QStringList probeEvokedSets(const QString& evokedPath);
 };
+
+} // namespace DISP3DLIB
 
 #endif // DATALOADER_H

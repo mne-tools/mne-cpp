@@ -1,0 +1,26 @@
+---
+id: live-marker
+title: "DISP3DLIB::LiveMarker"
+sidebar_label: LiveMarker
+sidebar_position: 28
+---
+
+# LiveMarker
+
+**Namespace:** `DISP3DLIB` &nbsp;·&nbsp; **Library:** 3D Display Library
+
+`#include <disp3D/brainview.h>`
+
+```cpp
+struct DISP3DLIB::LiveMarker
+```
+
+Lightweight live overlay marker rendered as a single sphere.
+
+Used by `BrainView::setLiveMarkers` to draw transient markers (e.g. digitizer tracker tip, orientation axes) without going through the model pipeline or recalculating scene bounds.
+
+---
+
+## Authors of this file
+
+- Christoph Dinh &lt;christoph.dinh@mne-cpp.org&gt;

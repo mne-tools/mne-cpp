@@ -35,6 +35,9 @@ using DISP3DLIB::VideoOverlay;
 #include <map>
 #include <cstring>
 
+namespace DISP3DLIB
+{
+
 //=============================================================================================================
 // PIMPL
 //=============================================================================================================
@@ -1907,3 +1910,5 @@ void BrainRenderer::drawMergedSurfaces(QRhiCommandBuffer* cb, QRhi* rhi,
     draw(pipeline);
 #endif
 }
+
+} // namespace DISP3DLIB

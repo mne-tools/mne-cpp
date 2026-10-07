@@ -1,0 +1,220 @@
+---
+id: multi-view-layout
+title: "DISP3DLIB::MultiViewLayout"
+sidebar_label: MultiViewLayout
+sidebar_position: 30
+---
+
+# MultiViewLayout
+
+**Namespace:** `DISP3DLIB` &nbsp;·&nbsp; **Library:** 3D Display Library
+
+`#include <disp3D/multiviewlayout.h>`
+
+```cpp
+class DISP3DLIB::MultiViewLayout
+```
+
+Pure-geometry class for multi-view viewport layout.
+
+This class has no widget dependencies — it works with sizes, rectangles, and fractional split positions. The hosting widget queries this class for rectangles and hit-test results, and updates separator widgets accordingly.
+
+Layout rules:
+1 pane → full area
+
+
+2 panes → side-by-side, split at m_splitX
+
+
+3 panes → full-width top row + 2 bottom panes split at m_splitX
+
+
+4 panes → 2×2 grid split at (m_splitX, m_splitY)
+
+Multi-view geometry computations.
+
+---
+
+## Public Methods
+
+### MultiViewLayout()
+
+Constructor.
+
+---
+
+### splitX()
+
+---
+
+### splitY()
+
+---
+
+### setSplitX(x)
+
+---
+
+### setSplitY(y)
+
+---
+
+### resetSplits()
+
+---
+
+### hitTolerancePx()
+
+---
+
+### minPanePx()
+
+---
+
+### separatorLinePx()
+
+---
+
+### slotRect(slot, numEnabled, outputSize)
+
+Compute the pixel rectangle for a layout slot.
+
+**Parameters:**
+
+- **slot** : *int*
+  Slot index (0-based among enabled viewports).
+
+- **numEnabled** : *int*
+  Total number of enabled panes (1–4).
+
+- **outputSize** : *const QSize &*
+  Total output pixel size.
+
+**Returns:**
+
+- *QRect* — Pixel rectangle for the slot.
+
+---
+
+### hitTestSplitter(pos, numEnabled, outputSize)
+
+Hit-test the splitter bars.
+
+**Parameters:**
+
+- **pos** : *const QPoint &*
+  Cursor position (widget coords).
+
+- **numEnabled** : *int*
+  Total number of enabled panes.
+
+- **outputSize** : *const QSize &*
+  Total output pixel size.
+
+**Returns:**
+
+- *SplitterHit* — Which splitter(s) are under the cursor.
+
+---
+
+### viewportIndexAt(pos, enabledViewports, outputSize)
+
+Given a cursor position and output size, determine which viewport index the cursor is in.
+
+**Parameters:**
+
+- **pos** : *const QPoint &*
+  Cursor position (widget coords).
+
+- **enabledViewports** : *const QVector&lt; int &gt; &*
+  Ordered list of enabled viewport indices.
+
+- **outputSize** : *const QSize &*
+  Total output pixel size.
+
+**Returns:**
+
+- *int* — Viewport index, or -1 if outside.
+
+---
+
+### insetForSeparator(paneRect, slot, numEnabled)
+
+Apply a separator-pixel inset to a pane rect so adjacent panes don't overlap the separator bar.
+
+This is used in the render loop to trim viewports.
+
+**Parameters:**
+
+- **paneRect** : *const QRect &*
+  Original pane rectangle.
+
+- **slot** : *int*
+  Slot index (0-based).
+
+- **numEnabled** : *int*
+  Total enabled count.
+
+**Returns:**
+
+- *QRect* — Inset rectangle.
+
+---
+
+### separatorGeometries(numEnabled, widgetSize, verticalRect, horizontalRect)
+
+Compute the separator widget geometries.
+
+**Parameters:**
+
+- **numEnabled** : *int*
+  Number of enabled panes.
+
+- **widgetSize** : *const QSize &*
+  Widget size in pixels.
+
+- **verticalRect** : *QRect &*
+  Geometry for the vertical separator (empty if hidden).
+
+- **horizontalRect** : *QRect &*
+  Geometry for the horizontal separator (empty if hidden).
+
+---
+
+### dragSplitter(pos, activeSplitter, widgetSize)
+
+Update split fractions from a mouse drag position.
+
+**Parameters:**
+
+- **pos** : *const QPoint &*
+  Current cursor position.
+
+- **activeSplitter** : *SplitterHit*
+  Which splitter is being dragged.
+
+- **widgetSize** : *const QSize &*
+  Widget size in pixels.
+
+---
+
+## Static Methods
+
+### cursorForHit(hit)
+
+Return the Qt::CursorShape appropriate for a splitter hit.
+
+**Parameters:**
+
+- **hit** : *SplitterHit*
+  Hit-test result.
+
+**Returns:**
+
+- *Qt::CursorShape* — Cursor shape (ArrowCursor if None).
+
+---
+
+## Authors of this file
+
+- Christoph Dinh &lt;christoph.dinh@mne-cpp.org&gt;

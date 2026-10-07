@@ -1,0 +1,156 @@
+---
+id: network-object
+title: "DISP3DLIB::NetworkObject"
+sidebar_label: NetworkObject
+sidebar_position: 31
+---
+
+# NetworkObject
+
+**Namespace:** `DISP3DLIB` &nbsp;·&nbsp; **Library:** 3D Display Library
+
+`#include <disp3D/networkobject.h>`
+
+```cpp
+class DISP3DLIB::NetworkObject
+```
+
+[`NetworkObject`](/docs/api/disp3-d/network-object) renders connectivity network nodes (instanced spheres) and edges (instanced cylinders) using the same instanced rendering pipeline as [`DipoleObject`](/docs/api/disp3-d/dipole-object) for the QRhi backend.
+
+Renderable network visualization for QRhi.
+
+---
+
+## Public Methods
+
+### NetworkObject()
+
+Default constructor.
+
+---
+
+### ~NetworkObject()
+
+Destructor.
+
+---
+
+### load(network, sColormap)
+
+Load network data and generate node/edge instances.
+
+**Parameters:**
+
+- **network** : *const [Network](/docs/api/connectivity/network) &*
+  The connectivity network to visualize.
+
+- **sColormap** : *const QString &*
+  Colormap name for weight-based coloring (e.g. "Viridis", "Hot").
+
+---
+
+### setThreshold(dThreshold)
+
+Update the threshold and regenerate visible edges/nodes.
+
+**Parameters:**
+
+- **dThreshold** : *double*
+  New threshold value (0.0 – 1.0).
+
+---
+
+### setColormap(sColormap)
+
+Set the colormap used for edge/node coloring.
+
+**Parameters:**
+
+- **sColormap** : *const QString &*
+  Colormap name (e.g. "Hot", "Viridis", "Jet").
+
+---
+
+### updateNodeBuffers(rhi, u)
+
+Upload or update GPU buffers for node geometry.
+
+**Parameters:**
+
+- **rhi** : *QRhi **
+  QRhi instance.
+
+- **u** : *QRhiResourceUpdateBatch **
+  Resource update batch.
+
+---
+
+### updateEdgeBuffers(rhi, u)
+
+Upload or update GPU buffers for edge geometry.
+
+**Parameters:**
+
+- **rhi** : *QRhi **
+  QRhi instance.
+
+- **u** : *QRhiResourceUpdateBatch **
+  Resource update batch.
+
+---
+
+### nodeVertexBuffer()
+
+---
+
+### nodeIndexBuffer()
+
+---
+
+### nodeInstanceBuffer()
+
+---
+
+### nodeIndexCount()
+
+---
+
+### nodeInstanceCount()
+
+---
+
+### edgeVertexBuffer()
+
+---
+
+### edgeIndexBuffer()
+
+---
+
+### edgeInstanceBuffer()
+
+---
+
+### edgeIndexCount()
+
+---
+
+### edgeInstanceCount()
+
+---
+
+### isVisible()
+
+---
+
+### setVisible(visible)
+
+---
+
+### hasData()
+
+---
+
+## Authors of this file
+
+- Christoph Dinh &lt;christoph.dinh@mne-cpp.org&gt;

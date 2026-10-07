@@ -35,6 +35,7 @@
 #include <QVBoxLayout>
 
 using namespace MNEANALYZESTUDIO;
+using namespace DISP3DLIB;
 
 namespace
 {

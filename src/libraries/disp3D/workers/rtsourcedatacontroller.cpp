@@ -24,6 +24,9 @@
 #include <QTimer>
 #include <QDebug>
 
+namespace DISP3DLIB
+{
+
 //=============================================================================================================
 // DEFINE MEMBER METHODS
 //=============================================================================================================
@@ -334,3 +337,5 @@ void RtSourceDataController::setAnnotationInfoRight(const Eigen::VectorXi& vecLa
         m_pInterpWorker->setAnnotationInfoRight(vecLabelIds, lLabels, vecVertNo);
     }
 }
+
+} // namespace DISP3DLIB

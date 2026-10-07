@@ -1,0 +1,87 @@
+---
+id: view-visibility-profile
+title: "DISP3DLIB::ViewVisibilityProfile"
+sidebar_label: ViewVisibilityProfile
+sidebar_position: 48
+---
+
+# ViewVisibilityProfile
+
+**Namespace:** `DISP3DLIB` &nbsp;·&nbsp; **Library:** 3D Display Library
+
+`#include <disp3D/viewstate.h>`
+
+```cpp
+struct DISP3DLIB::ViewVisibilityProfile
+```
+
+Per-view toggle flags controlling which data layers (brain, sensors, sources, network) are visible.
+
+Per-object visibility flags for a single viewport.
+
+Every viewport (single-view or multi-view pane) carries an independent visibility profile so that each pane can show a different combination of objects.
+
+---
+
+## Public Methods
+
+### isObjectVisible(object)
+
+Query visibility of a named object.
+
+**Parameters:**
+
+- **object** : *const QString &*
+  Object key (e.g. "lh", "bem_head", "sens_meg").
+
+**Returns:**
+
+- *bool* — True if visible.
+
+---
+
+### setObjectVisible(object, visible)
+
+Set visibility of a named object.
+
+**Parameters:**
+
+- **object** : *const QString &*
+  Object key.
+
+- **visible** : *bool*
+  New visibility state.
+
+---
+
+### load(settings, prefix)
+
+Load this profile from QSettings under the given key prefix.
+
+**Parameters:**
+
+- **settings** : *const QSettings &*
+  Settings store to read from.
+
+- **prefix** : *const QString &*
+  QSettings key prefix (e.g. "singleVis_").
+
+---
+
+### save(settings, prefix)
+
+Save this profile to QSettings under the given key prefix.
+
+**Parameters:**
+
+- **settings** : *QSettings &*
+  Settings store to write to.
+
+- **prefix** : *const QString &*
+  QSettings key prefix.
+
+---
+
+## Authors of this file
+
+- Christoph Dinh &lt;christoph.dinh@mne-cpp.org&gt;

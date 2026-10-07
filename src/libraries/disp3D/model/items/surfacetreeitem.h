@@ -29,6 +29,9 @@
 #include <fs/fs_surface.h>
 #include <fs/fs_annotation.h>
 
+namespace DISP3DLIB
+{
+
 /**
  * @brief Tree item representing a FreeSurfer cortical surface in the 3-D scene hierarchy.
  */
@@ -55,5 +58,7 @@ public:
     FSLIB::FsAnnotation annotationData() const;
     int shaderMode() const;
 };
+
+} // namespace DISP3DLIB
 
 #endif // SURFACETREEITEM_H

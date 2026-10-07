@@ -22,6 +22,9 @@
 #include <QTimer>
 #include <QDebug>
 
+namespace DISP3DLIB
+{
+
 //=============================================================================================================
 // DEFINE MEMBER METHODS
 //=============================================================================================================
@@ -317,3 +320,5 @@ void RtSensorDataController::onNewEegMapping(const QString& surfaceKey,
     qDebug() << "RtSensorDataController: New EEG mapping received and forwarded"
              << "(" << mappingMat->rows() << "x" << mappingMat->cols() << ")";
 }
+
+} // namespace DISP3DLIB

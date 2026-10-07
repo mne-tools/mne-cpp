@@ -1,0 +1,174 @@
+---
+id: mesh-factory
+title: "DISP3DLIB::MeshFactory"
+sidebar_label: MeshFactory
+sidebar_position: 29
+---
+
+# MeshFactory
+
+**Namespace:** `DISP3DLIB` &nbsp;·&nbsp; **Library:** 3D Display Library
+
+`#include <disp3D/meshfactory.h>`
+
+```cpp
+class DISP3DLIB::MeshFactory
+```
+
+Static factory for procedural mesh primitives.
+
+All methods return fully constructed [`BrainSurface`](/docs/api/disp3-d/brain-surface) objects ready for rendering. This eliminates duplicated icosahedron / plate / barbell code that was spread across [BrainView](/docs/api/disp3-d/brain-view)::onRowsInserted.
+
+---
+
+## Public Methods
+
+### MeshFactory()
+
+---
+
+## Static Methods
+
+### createSphere(center, radius, color, subdivisions)
+
+Create a subdivided icosahedron sphere.
+
+**Parameters:**
+
+- **center** : *const QVector3D &*
+  World-space center of the sphere.
+
+- **radius** : *float*
+  Radius in meters.
+
+- **color** : *const QColor &*
+  FsSurface color.
+
+- **subdivisions** : *int*
+  Number of subdivision passes (0 = 20 tris, 1 = 80 tris).
+
+**Returns:**
+
+- *std::shared_ptr&lt; [BrainSurface](/docs/api/disp3-d/brain-surface) &gt;* — Shared pointer to the created [`BrainSurface`](/docs/api/disp3-d/brain-surface).
+
+---
+
+### createPlate(center, orientation, color, size)
+
+Create a thin oriented rectangular plate (used for MEG magnetometers).
+
+**Parameters:**
+
+- **center** : *const QVector3D &*
+  World-space center.
+
+- **orientation** : *const QMatrix4x4 &*
+  3×3 rotation embedded in a 4×4 matrix (coil_trans).
+
+- **color** : *const QColor &*
+  FsSurface color.
+
+- **size** : *float*
+  Side length in meters (plate is size × size × thin).
+
+**Returns:**
+
+- *std::shared_ptr&lt; [BrainSurface](/docs/api/disp3-d/brain-surface) &gt;* — Shared pointer to the created [`BrainSurface`](/docs/api/disp3-d/brain-surface).
+
+---
+
+### createBarbell(center, orientation, color, size)
+
+Create a barbell shape (two spheres connected by a thin rod), used for MEG gradiometers.
+
+**Parameters:**
+
+- **center** : *const QVector3D &*
+  World-space center.
+
+- **orientation** : *const QMatrix4x4 &*
+  3×3 rotation embedded in a 4×4 matrix (coil_trans).
+
+- **color** : *const QColor &*
+  FsSurface color.
+
+- **size** : *float*
+  Overall size scale in meters.
+
+**Returns:**
+
+- *std::shared_ptr&lt; [BrainSurface](/docs/api/disp3-d/brain-surface) &gt;* — Shared pointer to the created [`BrainSurface`](/docs/api/disp3-d/brain-surface).
+
+---
+
+### createBatchedSpheres(positions, radius, color, subdivisions)
+
+Create a batched mesh of identical spheres at multiple positions (used for source space points, digitizer points, etc.).
+
+All spheres are merged into a single [`BrainSurface`](/docs/api/disp3-d/brain-surface) for efficient rendering.
+
+**Parameters:**
+
+- **positions** : *const QVector&lt; QVector3D &gt; &*
+  World-space positions for each sphere.
+
+- **radius** : *float*
+  Sphere radius in meters.
+
+- **color** : *const QColor &*
+  Sphere color.
+
+- **subdivisions** : *int*
+  Number of subdivision passes per sphere.
+
+**Returns:**
+
+- *std::shared_ptr&lt; [BrainSurface](/docs/api/disp3-d/brain-surface) &gt;* — Shared pointer to the batched [`BrainSurface`](/docs/api/disp3-d/brain-surface).
+
+---
+
+### createCylinder(from, to, radius, color, sides)
+
+Create a cylinder between two world-space endpoints.
+
+**Parameters:**
+
+- **from** : *const QVector3D &*
+  Start point (metres).
+
+- **to** : *const QVector3D &*
+  End point (metres).
+
+- **radius** : *float*
+  Cylinder radius (metres).
+
+- **color** : *const QColor &*
+  Surface color.
+
+- **sides** : *int*
+  Number of sides around the circumference (min 3).
+
+**Returns:**
+
+- *std::shared_ptr&lt; [BrainSurface](/docs/api/disp3-d/brain-surface) &gt;* — Shared pointer to the created [`BrainSurface`](/docs/api/disp3-d/brain-surface).
+
+---
+
+### sphereVertexCount(subdivisions)
+
+Number of vertices in a subdivided icosahedron (for picking calculations).
+
+**Parameters:**
+
+- **subdivisions** : *int*
+  Number of subdivision passes.
+
+**Returns:**
+
+- *int* — Number of vertices.
+
+---
+
+## Authors of this file
+
+- Christoph Dinh &lt;christoph.dinh@mne-cpp.org&gt;

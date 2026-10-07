@@ -23,8 +23,11 @@ class QLabel;
 class QListWidget;
 class QComboBox;
 
+namespace DISP3DLIB
+{
 class BrainTreeModel;
 class BrainView;
+}
 
 namespace MNEANALYZESTUDIO
 {
@@ -77,8 +80,8 @@ private:
     QLabel* m_statusLabel;
     QComboBox* m_surfaceTypeCombo;
     QListWidget* m_loadedFilesList;
-    BrainView* m_brainView;
-    BrainTreeModel* m_model;
+    DISP3DLIB::BrainView* m_brainView;
+    DISP3DLIB::BrainTreeModel* m_model;
 };
 
 } // namespace MNEANALYZESTUDIO

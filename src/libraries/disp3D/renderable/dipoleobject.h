@@ -42,6 +42,9 @@ class QRhi;
 class QRhiBuffer;
 class QRhiResourceUpdateBatch;
 
+namespace DISP3DLIB
+{
+
 //=============================================================================================================
 /**
  * Renderable dipole object that builds instanced arrow geometry from an InvEcdSet
@@ -139,5 +142,7 @@ private:
 
     std::vector<QVector4D> m_originalColors;
 };
+
+} // namespace DISP3DLIB
 
 #endif // DIPOLEOBJECT_H

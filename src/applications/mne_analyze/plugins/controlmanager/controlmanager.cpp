@@ -42,6 +42,7 @@
 
 using namespace CONTROLMANAGERPLUGIN;
 using namespace ANSHAREDLIB;
+using namespace DISP3DLIB;
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS

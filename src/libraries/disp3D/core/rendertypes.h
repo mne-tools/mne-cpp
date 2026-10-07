@@ -13,11 +13,11 @@
  * from any disp3D translation unit without forcing a recompile of
  * every shader pipeline when a new render mode is added.
  *
- * @ref ShaderMode selects between the Standard Phong lighting model,
+ * @ref DISP3DLIB::ShaderMode selects between the Standard Phong lighting model,
  * Holographic (translucent fresnel), Anatomical (matte tissue),
  * Dipole (instanced arrow shader), XRay (additive front-faces) and
  * ShowNormals (debug visualisation of vertex normals). @ref
- * VisualizationMode selects how per-vertex colour is computed in the
+ * DISP3DLIB::VisualizationMode selects how per-vertex colour is computed in the
  * fragment shader: from the base surface tint, from FsAnnotation
  * parcellation, from a scientific (curvature-shaded) palette, or
  * from a source-time-course overlay.
@@ -33,6 +33,9 @@
 #include "../disp3D_global.h"
 
 #include <cstdint>
+
+namespace DISP3DLIB
+{
 
 //=============================================================================================================
 /**
@@ -81,5 +84,7 @@ enum VisualizationMode
     ModeScientific,    /**< Scientific colourmap (curvature). */
     ModeSourceEstimate /**< Source-estimate overlay colours. */
 };
+
+} // namespace DISP3DLIB
 
 #endif // RENDERTYPES_H

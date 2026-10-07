@@ -16,6 +16,9 @@
 
 #include "dipoletreeitem.h"
 
+namespace DISP3DLIB
+{
+
 DipoleTreeItem::DipoleTreeItem(const QString& text, const INVLIB::InvEcdSet& set, int type)
 : AbstractTreeItem(text, type)
 , m_ecdSet(set)
@@ -26,3 +29,5 @@ const INVLIB::InvEcdSet& DipoleTreeItem::ecdSet() const
 {
     return m_ecdSet;
 }
+
+} // namespace DISP3DLIB

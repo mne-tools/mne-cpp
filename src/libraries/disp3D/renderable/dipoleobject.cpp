@@ -22,6 +22,9 @@
 #include <QRandomGenerator>
 #include <QDebug>
 
+namespace DISP3DLIB
+{
+
 //=============================================================================================================
 // PIMPL
 //=============================================================================================================
@@ -404,3 +407,5 @@ void DipoleObject::setSelected(int index, bool selected)
 
     m_instancesDirty = true;
 }
+
+} // namespace DISP3DLIB

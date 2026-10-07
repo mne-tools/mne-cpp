@@ -1,0 +1,97 @@
+---
+id: abstract-tree-item
+title: "DISP3DLIB::AbstractTreeItem"
+sidebar_label: AbstractTreeItem
+sidebar_position: 15
+---
+
+# AbstractTreeItem
+
+**Namespace:** `DISP3DLIB` &nbsp;·&nbsp; **Library:** 3D Display Library
+
+`#include <disp3D/abstracttreeitem.h>`
+
+```cpp
+class DISP3DLIB::AbstractTreeItem
+```
+
+Base tree item providing check-state, visibility, and data-role storage for all 3-D scene items.
+
+### Inheritance
+
+```mermaid
+classDiagram
+    QStandardItem <|-- AbstractTreeItem
+    AbstractTreeItem <|-- BemTreeItem
+    click BemTreeItem "/docs/api/disp3-d/bem-tree-item"
+    AbstractTreeItem <|-- DigitizerTreeItem
+    click DigitizerTreeItem "/docs/api/disp3-d/digitizer-tree-item"
+    AbstractTreeItem <|-- DipoleTreeItem
+    click DipoleTreeItem "/docs/api/disp3-d/dipole-tree-item"
+    AbstractTreeItem <|-- NetworkTreeItem
+    click NetworkTreeItem "/docs/api/disp3-d/network-tree-item"
+    AbstractTreeItem <|-- SensorTreeItem
+    click SensorTreeItem "/docs/api/disp3-d/sensor-tree-item"
+    AbstractTreeItem <|-- SourceSpaceTreeItem
+    click SourceSpaceTreeItem "/docs/api/disp3-d/source-space-tree-item"
+    AbstractTreeItem <|-- SurfaceTreeItem
+    click SurfaceTreeItem "/docs/api/disp3-d/surface-tree-item"
+```
+
+---
+
+## Public Methods
+
+### AbstractTreeItem(text, type)
+
+---
+
+### ~AbstractTreeItem()
+
+---
+
+### type()
+
+---
+
+### setVisible(visible)
+
+---
+
+### isVisible()
+
+---
+
+### setTransform(transform)
+
+---
+
+### transform()
+
+---
+
+### setColor(color)
+
+---
+
+### color()
+
+---
+
+### setAlpha(alpha)
+
+---
+
+### alpha()
+
+---
+
+## Static Methods
+
+### itemTypeId(type)
+
+---
+
+## Authors of this file
+
+- Christoph Dinh &lt;christoph.dinh@mne-cpp.org&gt;
