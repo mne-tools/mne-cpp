@@ -423,42 +423,42 @@ bool CoregSettingsView::getAutoScale()
 
 float CoregSettingsView::getWeightLPA()
 {
-    return m_pUi->m_qDoubleSpinBox_WeightLpa->text().toFloat();
+    return static_cast<float>(m_pUi->m_qDoubleSpinBox_WeightLpa->value());
 }
 
 //=============================================================================================================
 
 float CoregSettingsView::getWeightRPA()
 {
-    return m_pUi->m_qDoubleSpinBox_WeightRpa->text().toFloat();
+    return static_cast<float>(m_pUi->m_qDoubleSpinBox_WeightRpa->value());
 }
 
 //=============================================================================================================
 
 float CoregSettingsView::getWeightNAS()
 {
-    return m_pUi->m_qDoubleSpinBox_WeightNas->text().toFloat();
+    return static_cast<float>(m_pUi->m_qDoubleSpinBox_WeightNas->value());
 }
 
 //=============================================================================================================
 
 float CoregSettingsView::getWeightEEG()
 {
-    return m_pUi->m_qDoubleSpinBox_WeightEEG->text().toFloat();
+    return static_cast<float>(m_pUi->m_qDoubleSpinBox_WeightEEG->value());
 }
 
 //=============================================================================================================
 
 float CoregSettingsView::getWeightHPI()
 {
-    return m_pUi->m_qDoubleSpinBox_WeightHPI->text().toFloat();
+    return static_cast<float>(m_pUi->m_qDoubleSpinBox_WeightHPI->value());
 }
 
 //=============================================================================================================
 
 float CoregSettingsView::getWeightHSP()
 {
-    return m_pUi->m_qDoubleSpinBox_WeightHSP->text().toFloat();
+    return static_cast<float>(m_pUi->m_qDoubleSpinBox_WeightHSP->value());
 }
 
 //=============================================================================================================

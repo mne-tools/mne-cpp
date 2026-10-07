@@ -90,6 +90,7 @@
 #include <QInputDialog>
 #include <QMessageBox>
 #include <QFileDialog>
+#include <QLocale>
 #include <QRadioButton>
 #include <QVector3D>
 #include <QTimer>
@@ -611,6 +612,8 @@ void TestDispViewers2::hpiSettingsView_lifecycle()
 void TestDispViewers2::coregSettingsView_fiducialsAndParams()
 {
     CoregSettingsView view(QString{});
+    // A decimal-comma locale makes number parsing of displayed text observable.
+    view.setLocale(QLocale(QLocale::German, QLocale::Germany));
     view.show();
     auto* pPick = view.findChild<QCheckBox*>(QStringLiteral("m_qCheckBox_PickFiducials"));
     auto* pResult = view.findChild<QWidget*>(QStringLiteral("m_qWidget_ResultFiducials"));
@@ -703,6 +706,12 @@ void TestDispViewers2::coregSettingsView_fiducialsAndParams()
     QVERIFY(qAbs(view.getOmmitDistance() - 0.007f) < 1e-7f);
     view.findChild<QCheckBox*>(QStringLiteral("m_qCheckBox_AutoScale"))->setChecked(true);
     QVERIFY(view.getAutoScale());
+    view.findChild<QDoubleSpinBox*>(QStringLiteral("m_qDoubleSpinBox_WeightLpa"))->setValue(2.0);
+    view.findChild<QDoubleSpinBox*>(QStringLiteral("m_qDoubleSpinBox_WeightHSP"))->setValue(3.0);
+    QCOMPARE(view.getWeightLPA(), 2.0f);
+    QCOMPARE(view.getWeightHSP(), 3.0f);
+    QCOMPARE(view.getWeightRPA(), 1.0f);
+    QCOMPARE(view.getWeightNAS(), 10.0f);
     view.setOmittedPoints(5);
     QCOMPARE(view.findChild<QLabel*>(QStringLiteral("m_qLabel_NOmitted"))->text(), QStringLiteral("5"));
     view.setRMSE(0.0025f);
