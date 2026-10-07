@@ -87,6 +87,10 @@
 #include <QTableView>
 #include <QTableWidget>
 #include <QTemporaryDir>
+#include <QMessageBox>
+#include <QTimer>
+
+#include <functional>
 #include <QTreeView>
 #include <QStandardItem>
 #include <QKeyEvent>
@@ -104,6 +108,34 @@ using Eigen::MatrixXd;
 
 namespace
 {
+
+/** Runs fn on the next application-modal widget as soon as it is shown. */
+void answerNextModal(const std::function<void(QWidget*)>& fn)
+{
+    QTimer::singleShot(10, qApp, [fn]() {
+        if (QWidget* pModal = QApplication::activeModalWidget()) {
+            fn(pModal);
+        } else {
+            answerNextModal(fn);
+        }
+    });
+}
+
+/** Clicks the button labelled sText on the next modal QMessageBox. */
+void clickNextMessageBoxButton(const QString& sText)
+{
+    answerNextModal([sText](QWidget* pModal) {
+        auto* pBox = qobject_cast<QMessageBox*>(pModal);
+        QVERIFY(pBox);
+        for (QAbstractButton* pButton : pBox->buttons()) {
+            if (pButton->text().remove(QLatin1Char('&')) == sText) {
+                pButton->click();
+                return;
+            }
+        }
+        QFAIL(qPrintable(QStringLiteral("no button ") + sText));
+    });
+}
 
 QSharedPointer<FiffInfo> createBrowserTestInfo()
 {
@@ -377,9 +409,20 @@ private slots:
 
     //=========================================================================================================
     /**
-     * Verifies that MNEOperator constructs via default, copy, and type constructors.
+     * Verifies BidsView tree building, context-menu moves, selection and removal.
      */
     void bidsView_treeMovesAndSelection();
+
+    //=========================================================================================================
+    /**
+     * Verifies ProjectSettingsView project/subject scanning, deleting, file naming and timer.
+     */
+    void projectSettingsView_projectsSubjectsAndTimer();
+
+    //=========================================================================================================
+    /**
+     * Verifies that MNEOperator constructs via default, copy, and type constructors.
+     */
     void mneOperator_basics();
 
     //=========================================================================================================
@@ -2386,6 +2429,148 @@ void TestDispViewers2::bidsView_treeMovesAndSelection()
     QCOMPARE(model.item(1)->child(1)->child(0)->rowCount(), 0);
     QVERIFY(model.removeItem(model.item(0)->index()));
     QCOMPARE(model.rowCount(), 1);
+}
+
+//=============================================================================================================
+
+void TestDispViewers2::projectSettingsView_projectsSubjectsAndTimer()
+{
+    QTemporaryDir root;
+    QVERIFY(root.isValid());
+    const QString sRoot = root.path();
+    for (const QString& sSub : {QStringLiteral("ProjA/Sub1"), QStringLiteral("ProjA/Sub2"), QStringLiteral("ProjB/SubX")}) {
+        QVERIFY(QDir().mkpath(sRoot + QLatin1Char('/') + sSub));
+    }
+
+    ProjectSettingsView view(QString(), sRoot, QStringLiteral("ProjA"), QStringLiteral("Sub2"), QString());
+    view.show();
+    auto* pProjects = view.findChild<QComboBox*>(QStringLiteral("m_qComboBox_ProjectSelection"));
+    auto* pSubjects = view.findChild<QComboBox*>(QStringLiteral("m_qComboBox_SubjectSelection"));
+    auto* pParadigm = view.findChild<QLineEdit*>(QStringLiteral("m_qLineEditParadigm"));
+    auto* pFileName = view.findChild<QLineEdit*>(QStringLiteral("m_qLineEditFileName"));
+    QVERIFY(pProjects && pSubjects && pParadigm && pFileName);
+
+    auto items = [](QComboBox* pBox) {
+        QStringList list;
+        for (int i = 0; i < pBox->count(); ++i) {
+            list << pBox->itemText(i);
+        }
+        return list;
+    };
+
+    // Initial scan picks up both projects and keeps the requested subject.
+    QCOMPARE(items(pProjects), QStringList({"ProjA", "ProjB"}));
+    QCOMPARE(pProjects->currentText(), QStringLiteral("ProjA"));
+    QCOMPARE(items(pSubjects), QStringList({"Sub1", "Sub2"}));
+    QCOMPARE(pSubjects->currentText(), QStringLiteral("Sub2"));
+
+    // File name: <root>/<project>/<subject>/<stamp>_<subject>[_<paradigm>]_raw.fif
+    QString sFile = view.getCurrentFileName();
+    QVERIFY(sFile.startsWith(sRoot + QStringLiteral("/ProjA/Sub2/")));
+    QVERIFY(sFile.endsWith(QStringLiteral("_Sub2_raw.fif")));
+    QCOMPARE(pFileName->text(), sFile);
+
+    QSignalSpy paradigmSpy(&view, &ProjectSettingsView::newParadigm);
+    QSignalSpy fileSpy(&view, &ProjectSettingsView::fileNameChanged);
+    pParadigm->setText(QStringLiteral("Rest"));
+    QCOMPARE(paradigmSpy.last().at(0).toString(), QStringLiteral("Rest"));
+    QVERIFY(fileSpy.last().at(0).toString().endsWith(QStringLiteral("_Sub2_Rest_raw.fif")));
+    view.triggerFileNameUpdate();
+    QVERIFY(pFileName->text().endsWith(QStringLiteral("_Sub2_Rest_raw.fif")));
+
+    // Switching project rescans subjects and falls back to the first one.
+    QSignalSpy projectSpy(&view, &ProjectSettingsView::newProject);
+    QSignalSpy subjectSpy(&view, &ProjectSettingsView::newSubject);
+    pProjects->setCurrentText(QStringLiteral("ProjB"));
+    QCOMPARE(projectSpy.last().at(0).toString(), QStringLiteral("ProjB"));
+    QCOMPARE(items(pSubjects), QStringList({"SubX"}));
+    QCOMPARE(subjectSpy.last().at(0).toString(), QStringLiteral("SubX"));
+    QVERIFY(view.getCurrentFileName().startsWith(sRoot + QStringLiteral("/ProjB/SubX/")));
+
+    // Cancelled add dialog changes nothing.
+    answerNextModal([](QWidget* pModal) { qobject_cast<QDialog*>(pModal)->reject(); });
+    view.findChild<QPushButton*>(QStringLiteral("m_qPushButtonNewProject"))->click();
+    QCOMPARE(pProjects->count(), 2);
+
+    // Delete subject: "Keep data" and a declined confirmation keep the folder, confirming removes it.
+    pProjects->setCurrentText(QStringLiteral("ProjA"));
+    pSubjects->setCurrentText(QStringLiteral("Sub1"));
+    auto* pDeleteSubject = view.findChild<QPushButton*>(QStringLiteral("m_qPushButtonDeleteSubject"));
+    clickNextMessageBoxButton(QStringLiteral("Keep data"));
+    pDeleteSubject->click();
+    QVERIFY(QDir(sRoot + QStringLiteral("/ProjA/Sub1")).exists());
+
+    answerNextModal([](QWidget* pModal) {
+        clickNextMessageBoxButton(QStringLiteral("No"));
+        auto* pBox = qobject_cast<QMessageBox*>(pModal);
+        for (QAbstractButton* pButton : pBox->buttons()) {
+            if (pButton->text() == QStringLiteral("Delete data")) {
+                pButton->click();
+            }
+        }
+    });
+    pDeleteSubject->click();
+    QVERIFY(QDir(sRoot + QStringLiteral("/ProjA/Sub1")).exists());
+
+    answerNextModal([](QWidget* pModal) {
+        clickNextMessageBoxButton(QStringLiteral("Yes"));
+        auto* pBox = qobject_cast<QMessageBox*>(pModal);
+        for (QAbstractButton* pButton : pBox->buttons()) {
+            if (pButton->text() == QStringLiteral("Delete data")) {
+                pButton->click();
+            }
+        }
+    });
+    pDeleteSubject->click();
+    QVERIFY(!QDir(sRoot + QStringLiteral("/ProjA/Sub1")).exists());
+    QVERIFY(QDir(sRoot + QStringLiteral("/ProjA/Sub2")).exists());
+    QCOMPARE(items(pSubjects), QStringList({"Sub2"}));
+
+    // Delete project removes the whole tree.
+    pProjects->setCurrentText(QStringLiteral("ProjB"));
+    answerNextModal([](QWidget* pModal) {
+        clickNextMessageBoxButton(QStringLiteral("Yes"));
+        auto* pBox = qobject_cast<QMessageBox*>(pModal);
+        for (QAbstractButton* pButton : pBox->buttons()) {
+            if (pButton->text() == QStringLiteral("Delete data")) {
+                pButton->click();
+            }
+        }
+    });
+    view.findChild<QPushButton*>(QStringLiteral("m_qPushButtonDeleteProject"))->click();
+    QVERIFY(!QDir(sRoot + QStringLiteral("/ProjB")).exists());
+    QCOMPARE(items(pProjects), QStringList({"ProjA"}));
+
+    // Recording timer: spin boxes set the total, elapsed time counts up and down.
+    QSignalSpy timerSpy(&view, &ProjectSettingsView::timerChanged);
+    view.findChild<QSpinBox*>(QStringLiteral("m_spinBox_hours"))->setValue(1);
+    view.findChild<QSpinBox*>(QStringLiteral("m_spinBox_min"))->setValue(2);
+    view.findChild<QSpinBox*>(QStringLiteral("m_spinBox_sec"))->setValue(3);
+    QCOMPARE(timerSpy.last().at(0).toInt(), 3723000);
+    auto* pToGo = view.findChild<QLabel*>(QStringLiteral("m_label_timeToGo"));
+    auto* pPassed = view.findChild<QLabel*>(QStringLiteral("m_label_timePassed"));
+    QCOMPARE(pToGo->text(), QStringLiteral("01:02:03"));
+    view.setRecordingElapsedTime(1000);
+    QCOMPARE(pToGo->text(), QStringLiteral("01:02:02"));
+    QCOMPARE(pPassed->text(), QStringLiteral("00:00:01"));
+    view.setRecordingElapsedTime(3723000 - 200);
+    QCOMPARE(pPassed->text(), QStringLiteral("01:02:03"));
+
+    QSignalSpy timerStateSpy(&view, &ProjectSettingsView::recordingTimerStateChanged);
+    auto* pUseTimer = view.findChild<QCheckBox*>(QStringLiteral("m_checkBox_useRecordingTimer"));
+    pUseTimer->setChecked(!pUseTimer->isChecked());
+    QCOMPARE(timerStateSpy.count(), 1);
+    QCOMPARE(timerStateSpy.last().at(0).toBool(), pUseTimer->isChecked());
+
+    // Optional UI parts can be hidden and shown again.
+    view.hideFileNameUi();
+    view.hideParadigmUi();
+    QVERIFY(pFileName->isHidden());
+    QVERIFY(pParadigm->isHidden());
+    view.showFileNameUi();
+    view.showParadigmUi();
+    QVERIFY(!pFileName->isHidden());
+    QVERIFY(!pParadigm->isHidden());
 }
 
 //=============================================================================================================
