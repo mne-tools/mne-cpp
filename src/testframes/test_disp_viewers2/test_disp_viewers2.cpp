@@ -87,6 +87,9 @@
 #include <QTableView>
 #include <QTableWidget>
 #include <QTemporaryDir>
+#include <QTreeView>
+#include <QStandardItem>
+#include <QKeyEvent>
 
 #include <Eigen/Core>
 
@@ -376,6 +379,7 @@ private slots:
     /**
      * Verifies that MNEOperator constructs via default, copy, and type constructors.
      */
+    void bidsView_treeMovesAndSelection();
     void mneOperator_basics();
 
     //=========================================================================================================
@@ -2272,6 +2276,116 @@ void TestDispViewers2::bidsViewModel_basics()
     QVERIFY(!model.removeItem(QModelIndex()));
 
     QApplication::processEvents();
+}
+
+//=============================================================================================================
+
+void TestDispViewers2::bidsView_treeMovesAndSelection()
+{
+    BidsViewModel model;
+    BidsView view;
+    view.setModel(&model);
+    view.resize(400, 400);
+    view.show();
+    QVERIFY(QTest::qWaitForWindowExposed(&view));
+    auto* tree = view.findChild<QTreeView*>();
+    QVERIFY(tree != nullptr);
+
+    // sub-01/ses-01/func/raw.fif, then an average under it, a second subject and session
+    auto* raw = new QStandardItem(QStringLiteral("raw.fif"));
+    raw->setData(QStringLiteral("payload"));
+    model.addData(QModelIndex(), raw, BIDS_FUNCTIONALDATA);
+    auto* average = new QStandardItem(QStringLiteral("avg"));
+    model.addData(raw->index(), average, BIDS_AVERAGE);
+    auto* anat = new QStandardItem(QStringLiteral("T1.mgz"));
+    model.addData(raw->index(), anat, BIDS_ANATOMICALDATA);
+    const QModelIndex sub2 = model.addSubject(QStringLiteral("Second subject"));
+    const QModelIndex ses2 = model.addSessionToSubject(QStringLiteral("sub-Secondsubject"), QStringLiteral("pre op"));
+
+    QCOMPARE(model.rowCount(), 2);
+    QCOMPARE(model.itemFromIndex(sub2)->text(), QStringLiteral("sub-Secondsubject"));
+    QCOMPARE(model.itemFromIndex(ses2)->text(), QStringLiteral("ses-preop"));
+    QStandardItem* ses1 = model.item(0)->child(0);
+    QCOMPARE(ses1->text(), QStringLiteral("ses-01"));
+    QCOMPARE(ses1->rowCount(), 2);
+    QCOMPARE(ses1->child(0)->text(), QStringLiteral("func"));
+    QCOMPARE(ses1->child(1)->text(), QStringLiteral("anat"));
+    QCOMPARE(average->parent(), raw);
+    QCOMPARE(average->data(BIDS_ITEM_TYPE).toInt(), BIDS_AVERAGE);
+    QCOMPARE(anat->data(BIDS_ITEM_SESSION).value<QModelIndex>(), ses1->index());
+    QVERIFY(!model.addSessionToSubject(QStringLiteral("sub-nobody"), QStringLiteral("x")).isValid());
+
+    // Selecting an item emits its index and, when it carries data, that data
+    QSignalSpy itemSpy(&view, &BidsView::selectedItemChanged);
+    QSignalSpy modelSpy(&view, &BidsView::selectedModelChanged);
+    tree->selectionModel()->select(raw->index(), QItemSelectionModel::ClearAndSelect);
+    QCOMPARE(itemSpy.last().at(0).value<QModelIndex>(), raw->index());
+    QCOMPARE(modelSpy.last().at(0).toString(), QStringLiteral("payload"));
+
+    // Context menu on the raw file: move it to sub-Secondsubject/ses-preop
+    auto openMenuAt = [&view, tree](const QModelIndex& index) {
+        emit tree->customContextMenuRequested(tree->visualRect(index).center());
+        return view.findChildren<QMenu*>().last();
+    };
+    auto actionNamed = [](QMenu* menu, const QString& text) -> QAction* {
+        QList<QAction*> pending = menu->actions();
+        while (!pending.isEmpty()) {
+            QAction* action = pending.takeFirst();
+            if (action->text() == text) {
+                return action;
+            }
+            if (action->menu()) {
+                pending += action->menu()->actions();
+            }
+        }
+        return nullptr;
+    };
+    tree->expandAll();
+    QMenu* menu = openMenuAt(raw->index());
+    QAction* moveData = actionNamed(menu, QStringLiteral("ses-preop"));
+    QVERIFY(moveData != nullptr);
+    QVERIFY(actionNamed(menu, QStringLiteral("Remove Data")) != nullptr);
+    menu->close();
+    moveData->trigger();
+    QStandardItem* ses2Item = model.item(1)->child(0);
+    QCOMPARE(ses2Item->child(0)->text(), QStringLiteral("func"));
+    QCOMPARE(ses2Item->child(0)->child(0)->text(), QStringLiteral("raw.fif"));
+    // The emptied func folder of ses-01 is removed; anat stays
+    QCOMPARE(model.item(0)->child(0)->rowCount(), 1);
+    QCOMPARE(model.item(0)->child(0)->child(0)->text(), QStringLiteral("anat"));
+
+    // Move ses-01 (with its anat data) to the second subject
+    tree->expandAll();
+    menu = openMenuAt(model.item(0)->child(0)->index());
+    QAction* moveSession = actionNamed(menu, QStringLiteral("sub-Secondsubject"));
+    QVERIFY(moveSession != nullptr);
+    menu->close();
+    moveSession->trigger();
+    QCOMPARE(model.item(0)->rowCount(), 0);
+    QCOMPARE(model.item(1)->rowCount(), 2);
+    QStandardItem* movedAnat = model.item(1)->child(1)->child(0)->child(0);
+    QCOMPARE(movedAnat->text(), QStringLiteral("T1.mgz"));
+    QCOMPARE(movedAnat->data(BIDS_ITEM_SUBJECT).value<QModelIndex>(), model.item(1)->index());
+
+    // Subject and empty-area menus offer add actions
+    tree->expandAll();
+    menu = openMenuAt(model.item(0)->index());
+    QVERIFY(actionNamed(menu, QStringLiteral("Add Session")) != nullptr);
+    menu->close();
+    emit tree->customContextMenuRequested(QPoint(5, tree->viewport()->height() - 5));
+    QVERIFY(actionNamed(view.findChildren<QMenu*>().last(), QStringLiteral("Add Subject")) != nullptr);
+    view.findChildren<QMenu*>().last()->close();
+
+    // Delete on a non-subject item asks the model owner to remove it
+    QSignalSpy removeSpy(&view, &BidsView::removeItem);
+    tree->setCurrentIndex(movedAnat->index());
+    QKeyEvent del(QEvent::KeyPress, Qt::Key_Delete, Qt::NoModifier);
+    QApplication::sendEvent(&view, &del);
+    QCOMPARE(removeSpy.size(), 1);
+    QVERIFY(model.removeItem(removeSpy.at(0).at(0).value<QModelIndex>()));
+    QCOMPARE(model.item(1)->child(1)->child(0)->rowCount(), 0);
+    QVERIFY(model.removeItem(model.item(0)->index()));
+    QCOMPARE(model.rowCount(), 1);
 }
 
 //=============================================================================================================
