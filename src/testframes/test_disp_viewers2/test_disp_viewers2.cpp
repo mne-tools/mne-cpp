@@ -236,6 +236,7 @@ private slots:
      * and survives lifecycle transitions.
      */
     void butterflyView_lifecycle();
+    void butterflyView_drawsAveragesAcrossTheFullWidth();
 
     //=========================================================================================================
     /**
@@ -641,6 +642,53 @@ void TestDispViewers2::butterflyView_lifecycle()
     view.clearView();
 
     QApplication::processEvents();
+}
+
+//=============================================================================================================
+
+void TestDispViewers2::butterflyView_drawsAveragesAcrossTheFullWidth()
+{
+    // One magnetometer average of 3 * width samples: the curve is decimated, and must still span the width
+    auto set = QSharedPointer<FiffEvokedSet>::create();
+    set->info = *createBrowserTestInfo();
+    set->info.bads.clear();
+    FiffEvoked evoked;
+    evoked.comment = QStringLiteral("aud");
+    evoked.baseline = qMakePair(-0.1f, 0.0f);
+    evoked.times = Eigen::RowVectorXf::LinSpaced(1200, -0.2f, 0.9992f);
+    evoked.times(200) = 0.0f;
+    evoked.data = Eigen::MatrixXd::Zero(4, 1200);
+    evoked.data.row(0).setConstant(5e-13);
+    set->evoked.append(evoked);
+
+    auto model = QSharedPointer<EvokedSetModel>::create();
+    model->setEvokedSet(set);
+    ButterflyView view(QStringLiteral("test_disp_viewers2_butterfly"));
+    view.resize(400, 200);
+    view.setEvokedSetModel(model);
+    view.setScaleMap({{FIFF_UNIT_T, 1e-12f}});
+    view.setModalityMap({{QStringLiteral("MAG"), true}});
+    view.setSelectedChannels({0});
+    view.setBackgroundColor(Qt::white);
+    view.setAverageActivation(QSharedPointer<QMap<QString, bool>>::create(QMap<QString, bool>{{QStringLiteral("aud"), true}}));
+    view.setAverageActivation(QSharedPointer<QMap<QString, bool>>::create(QMap<QString, bool>{{QStringLiteral("aud"), true}}));
+    view.setSingleAverageColor(Qt::black);
+    view.show();
+    view.dataUpdate();
+    QVERIFY(QTest::qWaitForWindowExposed(&view));
+
+    // The constant 0.5e-12 T at scale 1e-12 T sits a quarter height above the centre: y = 50
+    const QImage frame = view.grab().toImage();
+    QVERIFY(!frame.isNull());
+    // Grid lines run the full height, so compare the curve row with the same column well below it
+    auto curveAt = [&frame](int x) {
+        int darkest = 255;
+        for (int y = 48; y <= 52; ++y) {
+            darkest = std::min(darkest, qGray(frame.pixel(x, y)));
+        }
+        return darkest < qGray(frame.pixel(x, 150)) - 40;
+    };
+    QVERIFY(curveAt(52));
 }
 
 //=============================================================================================================
