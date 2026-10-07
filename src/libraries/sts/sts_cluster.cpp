@@ -77,9 +77,10 @@ StatsClusterResult StatsCluster::permutationTest(
     // Step 1: Compute the observed t-map
     MatrixXd tObs = computeTMap(dataA, dataB);
 
-    // Step 2: Determine cluster-forming threshold from clusterAlpha and df
+    // Step 2: Determine cluster-forming threshold from clusterAlpha and df.
+    // inverseTCdf is two-tailed; a one-tailed test puts all of clusterAlpha in one tail (as mne-python).
     int df = nA - 1;
-    double threshold = inverseTCdf(clusterAlpha, df);
+    double threshold = inverseTCdf(tail == StatsTailType::Both ? clusterAlpha : 2.0 * clusterAlpha, df);
 
     // Step 3: Find observed clusters
     auto [clusterIds, clusterStats] = findClusters(tObs, threshold, adjacency, tail);

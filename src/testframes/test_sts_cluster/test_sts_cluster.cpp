@@ -87,6 +87,7 @@ private slots:
     void testFtestMatchesScipy();
     void testCorrectionsMatchMne();
     void testTrisAdjacencyMatchesMne();
+    void testClusterThresholdMatchesMne();
     void testClusterSumsMatchMne();
 
     void cleanupTestCase();
@@ -602,6 +603,29 @@ void TestStsCluster::testTrisAdjacencyMatchesMne()
                                .split(' ');
     expected.sort();
     QCOMPARE(upperEdges(StatsAdjacency::fromSourceSpaceTemporal(tris, 6, 4)), expected);
+}
+
+//=============================================================================================================
+
+void TestStsCluster::testClusterThresholdMatchesMne()
+{
+    // mne's automatic threshold for a paired/one-sample test with 9 subjects at p = 0.05:
+    // -scipy.stats.t.ppf(0.05 / (1 + (tail == 0)), 8), i.e. the one-tailed quantile for a one-tailed test
+    QVector<MatrixXd> a, b;
+    for (int s = 0; s < 9; ++s) {
+        a.append(oracleSubject(s, -1));
+        b.append(MatrixXd::Constant(6, 4, 0.1 * std::cos(s)));
+    }
+    MatrixX3i tris(4, 3);
+    tris << 0, 1, 2, 1, 3, 2, 2, 3, 4, 3, 5, 4;
+    const SparseMatrix<int> adj = StatsAdjacency::fromSourceSpace(tris, 6);
+    const QVector<std::pair<StatsTailType, double>> cases = {
+        {StatsTailType::Both, 2.3060041352}, {StatsTailType::Right, 1.85954803752}, {StatsTailType::Left, 1.85954803752}};
+    for (const auto& [tail, expected] : cases) {
+        const StatsClusterResult r = StatsCluster::permutationTest(a, b, adj, 8, 0.05, 0.05, tail);
+        QVERIFY2(std::fabs(r.clusterThreshold - expected) < 1e-8,
+                 qPrintable(QString("tail %1: %2 vs %3").arg(static_cast<int>(tail)).arg(r.clusterThreshold, 0, 'g', 12).arg(expected, 0, 'g', 12)));
+    }
 }
 
 //=============================================================================================================
