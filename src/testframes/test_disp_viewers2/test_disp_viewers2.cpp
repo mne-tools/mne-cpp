@@ -263,6 +263,7 @@ private slots:
      * setEvokedSet does not crash on an empty set.
      */
     void evokedSetModel_basics();
+    void evokedSetModel_projectionRolesAndAverageMaps();
 
     //=========================================================================================================
     /**
@@ -899,6 +900,118 @@ void TestDispViewers2::evokedSetModel_basics()
     model.setEvokedSet(QSharedPointer<FiffEvokedSet>::create(emptySet));
 
     QApplication::processEvents();
+}
+
+//=============================================================================================================
+
+void TestDispViewers2::evokedSetModel_projectionRolesAndAverageMaps()
+{
+    auto set = QSharedPointer<FiffEvokedSet>::create();
+    set->info = *createBrowserTestInfo();
+    set->info.bads.clear();
+    for (const QString& comment : {QStringLiteral("aud"), QStringLiteral("vis")}) {
+        FiffEvoked evoked;
+        evoked.comment = comment;
+        evoked.baseline = qMakePair(-0.1f, 0.0f);
+        evoked.times = Eigen::RowVectorXf::LinSpaced(30, -0.1f, 0.19f);
+        evoked.times(10) = 0.0f;
+        evoked.data = Eigen::MatrixXd::Zero(4, 30);
+        for (int s = 0; s < 30; ++s) {
+            const double v = (comment == QLatin1String("aud") ? 1.0 : 2.0) * std::sin(0.3 * s);
+            evoked.data(0, s) = 3.0 + v;
+            evoked.data(1, s) = 3.0;
+            evoked.data(2, s) = 3.0 - v;
+            evoked.data(3, s) = s;
+        }
+        set->evoked.append(evoked);
+    }
+
+    EvokedSetModel model;
+    QSignalSpy colorSpy(&model, &EvokedSetModel::newAverageColorMap);
+    QSignalSpy activationSpy(&model, &EvokedSetModel::newAverageActivationMap);
+    model.setEvokedSet(set);
+    QVERIFY(model.isInit());
+    QCOMPARE(model.rowCount(), 4);
+    QCOMPARE(model.columnCount(), 3);
+    QCOMPARE(model.getNumAverages(), 2);
+    QCOMPARE(model.getNumSamples(), 30);
+    QCOMPARE(model.getNumPreStimSamples(), 10);
+    QCOMPARE(model.getSamplingFrequency(), 1000.0f);
+    QCOMPARE(model.getNumberOfTimeSpacers(), 0);
+    QCOMPARE(model.getBaselineInfo().first.toFloat(), -0.1f);
+    QCOMPARE(colorSpy.size(), 1);
+    QCOMPARE(activationSpy.size(), 1);
+    QCOMPARE(model.getAverageColor()->value(QStringLiteral("vis")), QColor(Qt::yellow));
+    QVERIFY(model.getAverageActivation()->value(QStringLiteral("aud")));
+
+    // Column 1: one row per average type for the butterfly; column 2: whole matrices for the 2D layout
+    auto rows = model.data(2, 1).value<QList<AvrTypeRowVector>>();
+    QCOMPARE(rows.size(), 2);
+    QCOMPARE(rows.at(1).first, QStringLiteral("vis"));
+    QCOMPARE(rows.at(1).second, set->evoked.at(1).data.row(2));
+    const auto matrices = model.data(0, 2, EvokedSetModelRoles::GetAverageData).value<QList<AvrTypeRowVectorPair>>();
+    QCOMPARE(matrices.size(), 2);
+    QCOMPARE(matrices.at(0).second.second, 30);
+    // Column-major (nchan x nsamples), the layout AverageSceneItem indexes with sample * nchan + channel
+    QCOMPARE(matrices.at(0).second.first[5 * 4 + 3], 5.0);
+    QVERIFY(!model.data(0, 1, Qt::BackgroundRole).isValid());
+    QVERIFY(!model.data(0, 1, Qt::ToolTipRole).isValid());
+    QCOMPARE(model.data(0, 0).toStringList(), set->info.ch_names);
+    QCOMPARE(model.headerData(1, Qt::Horizontal).toString(), QStringLiteral("data plot"));
+    QCOMPARE(model.headerData(1, Qt::Horizontal, Qt::TextAlignmentRole).toInt(), static_cast<int>(Qt::AlignLeft));
+    QVERIFY(!model.headerData(0, Qt::Horizontal).isValid());
+
+    // Selection remaps rows; kind, unit, coil and bad follow the selection
+    model.selectRows({3, 0, 99});
+    QCOMPARE(model.getIdxSelMap().size(), 2);
+    QCOMPARE(model.getKind(0), FIFFV_STIM_CH);
+    QCOMPARE(model.getUnit(1), FIFF_UNIT_T);
+    QCOMPARE(model.getCoil(1), FIFFV_COIL_VV_MAG_T3);
+    QCOMPARE(model.getKind(5), 0);
+    QCOMPARE(model.getUnit(5), FIFF_UNIT_NONE);
+    QCOMPARE(model.getCoil(5), FIFFV_COIL_NONE);
+    set->info.bads = {QStringLiteral("MEG0111")};
+    QVERIFY(model.getIsChannelBad(1));
+    QVERIFY(!model.getIsChannelBad(0));
+    QVERIFY(!model.getIsChannelBad(7));
+    set->info.bads.clear();
+    model.resetSelection();
+
+    // An active common-mode projector applies to every average once the data is updated
+    Eigen::MatrixXd vec(1, 3);
+    vec.setConstant(1.0 / std::sqrt(3.0));
+    FiffNamedMatrix vectors(1, 3, QStringList(), set->info.ch_names.mid(0, 3), vec);
+    model.updateProjection({FiffProj(FIFFV_PROJ_ITEM_FIELD, true, QStringLiteral("common"), vectors)});
+    model.updateCompensator(0);
+    model.setEvokedSet(set);
+    rows = model.data(0, 1).value<QList<AvrTypeRowVector>>();
+    for (int s = 0; s < 30; ++s) {
+        QVERIFY(std::fabs(rows.at(1).second(s) - 2.0 * std::sin(0.3 * s)) < 1e-12);
+    }
+    QCOMPARE(model.data(3, 1).value<QList<AvrTypeRowVector>>().at(0).second, set->evoked.at(0).data.row(3));
+
+    // Freezing keeps the projected data; dropping an average keeps its colour for when it returns
+    model.toggleFreeze();
+    QVERIFY(model.isFreezed());
+    model.getAverageColor()->insert(QStringLiteral("vis"), Qt::cyan);
+    const FiffEvoked vis = set->evoked.takeLast();
+    model.setEvokedSet(set);
+    QCOMPARE(model.getNumAverages(), 1);
+    QCOMPARE(model.data(0, 1).value<QList<AvrTypeRowVector>>().size(), 2);
+    QCOMPARE(model.data(0, 2, EvokedSetModelRoles::GetAverageData).value<QList<AvrTypeRowVectorPair>>().size(), 2);
+    QCOMPARE(colorSpy.size(), 2);
+    QVERIFY(!model.getAverageColor()->contains(QStringLiteral("vis")));
+    model.toggleFreeze();
+    QCOMPARE(model.data(0, 1).value<QList<AvrTypeRowVector>>().size(), 1);
+    set->evoked.append(vis);
+    model.setEvokedSet(set);
+    QCOMPARE(model.getAverageColor()->value(QStringLiteral("vis")), QColor(Qt::cyan));
+    QCOMPARE(model.getEvokedSet(), set);
+
+    model.setAverageColor(QSharedPointer<QMap<QString, QColor>>::create());
+    model.setAverageActivation(QSharedPointer<QMap<QString, bool>>::create());
+    QVERIFY(model.getAverageColor()->isEmpty());
+    QVERIFY(model.getAverageActivation()->isEmpty());
 }
 
 //=============================================================================================================
